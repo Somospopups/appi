@@ -1,5 +1,7 @@
 {
   "version": 1,
   "actualizado": "2026-07-30",
-  "bloqueados": []
+  "bloqueados": [
+    "MS7M-BDMK-000G"
+  ]
 }
