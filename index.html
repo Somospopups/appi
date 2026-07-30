@@ -2022,8 +2022,209 @@
   body.dark .person-modal-body .pm-row .pm-lbl { color: #a0a0b0; }
   body.dark .person-modal-body .pm-row .pm-val { color: #f0f0f5; }
 </style>
+<style>
+/* ============ PANTALLA DE ACTIVACIÓN ============ */
+#lockScreen {
+  position: fixed; inset: 0; z-index: 9999;
+  background: linear-gradient(160deg, #eaf1ff 0%, #f5ecff 45%, #ffe9f2 100%);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+  overflow-y: auto;
+}
+#lockScreen.hidden { display: none; }
+body.dark #lockScreen {
+  background: linear-gradient(160deg, #0f1424 0%, #1a1530 45%, #2a1530 100%);
+  color: #e8e8ec;
+}
+.lock-card {
+  background: rgba(255,255,255,0.75);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255,255,255,0.8);
+  border-radius: 28px;
+  box-shadow: 0 20px 60px rgba(80,90,130,0.15);
+  padding: 32px 26px;
+  max-width: 420px; width: 100%;
+  text-align: center;
+}
+body.dark .lock-card {
+  background: rgba(30,30,50,0.75);
+  border-color: rgba(255,255,255,0.08);
+}
+.lock-logo {
+  width: 88px; height: 88px; margin: 0 auto 16px;
+  border-radius: 24px;
+  background: linear-gradient(135deg, #5b8def, #a06bff, #ff6b9d);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 44px; font-weight: 900; color: #fff;
+  box-shadow: 0 8px 24px rgba(120,100,220,0.35);
+}
+.lock-title {
+  font-size: 24px; font-weight: 800; margin: 0 0 6px;
+  letter-spacing: -0.3px;
+}
+.lock-subtitle {
+  font-size: 14px; color: #5c5c66; margin: 0 0 24px;
+  line-height: 1.5;
+}
+body.dark .lock-subtitle { color: #a0a0b0; }
+.lock-id-box {
+  background: rgba(91,141,239,0.10);
+  border: 2px dashed rgba(91,141,239,0.35);
+  border-radius: 16px;
+  padding: 14px 12px;
+  margin-bottom: 16px;
+}
+body.dark .lock-id-box {
+  background: rgba(91,141,239,0.15);
+  border-color: rgba(91,141,239,0.35);
+}
+.lock-id-label {
+  font-size: 11px; font-weight: 700; color: #5c5c66;
+  text-transform: uppercase; letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+body.dark .lock-id-label { color: #a0a0b0; }
+.lock-id-value {
+  font-family: 'Courier New', monospace;
+  font-size: 20px; font-weight: 800; color: #3d63c9;
+  letter-spacing: 2px; word-break: break-all;
+}
+body.dark .lock-id-value { color: #a8b8ff; }
+.lock-actions {
+  display: flex; gap: 8px; margin-bottom: 20px;
+}
+.lock-btn {
+  flex: 1; padding: 12px; border-radius: 12px;
+  border: none; font-family: inherit;
+  font-size: 13px; font-weight: 700; cursor: pointer;
+  transition: transform 0.15s ease;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.lock-btn:active { transform: scale(0.96); }
+.lock-btn.copy {
+  background: rgba(91,141,239,0.15); color: #3d63c9;
+}
+.lock-btn.whatsapp {
+  background: linear-gradient(135deg, #25D366, #128C7E);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(37,211,102,0.35);
+}
+body.dark .lock-btn.copy {
+  background: rgba(91,141,239,0.25); color: #a8b8ff;
+}
+.lock-divider {
+  display: flex; align-items: center; gap: 10px;
+  margin: 20px 0 16px;
+  color: #8a8a94; font-size: 12px; font-weight: 600;
+}
+.lock-divider::before, .lock-divider::after {
+  content: ''; flex: 1; height: 1px;
+  background: rgba(80,90,130,0.15);
+}
+body.dark .lock-divider::before, body.dark .lock-divider::after {
+  background: rgba(255,255,255,0.10);
+}
+.lock-input {
+  width: 100%; padding: 14px 16px;
+  border-radius: 14px;
+  border: 2px solid rgba(80,90,130,0.15);
+  background: rgba(255,255,255,0.9);
+  font-family: 'Courier New', monospace;
+  font-size: 16px; font-weight: 700;
+  color: #1c1c1e; text-align: center;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  -webkit-appearance: none; appearance: none;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+.lock-input:focus {
+  border-color: #5b8def;
+}
+body.dark .lock-input {
+  background: rgba(40,40,60,0.8);
+  color: #f0f0f5;
+  border-color: rgba(255,255,255,0.15);
+}
+.lock-activate-btn {
+  width: 100%; padding: 16px; border-radius: 14px;
+  border: none; cursor: pointer; font-family: inherit;
+  font-size: 15px; font-weight: 800;
+  background: linear-gradient(135deg, #5b8def, #a06bff);
+  color: #fff;
+  box-shadow: 0 8px 20px rgba(120,100,220,0.35);
+  transition: transform 0.15s ease;
+}
+.lock-activate-btn:active { transform: scale(0.97); }
+.lock-error {
+  margin-top: 10px; padding: 10px 14px;
+  background: rgba(217,83,79,0.12);
+  border: 1px solid rgba(217,83,79,0.25);
+  border-radius: 10px;
+  color: #d9534f; font-size: 13px; font-weight: 600;
+  display: none;
+}
+.lock-error.show { display: block; }
+.lock-footer {
+  margin-top: 20px; font-size: 11px;
+  color: #8a8a94; line-height: 1.5;
+}
+body.dark .lock-footer { color: #6b6b76; }
+</style> 
 </head>
 <body>
+ <!-- ============ PANTALLA DE ACTIVACIÓN ============ -->
+<div id="lockScreen" class="hidden">
+  <div class="lock-card">
+    <div class="lock-logo">💧</div>
+    <h1 class="lock-title">APPI necesita activación</h1>
+    <p class="lock-subtitle">
+      Para usar APPI necesitás una licencia.<br/>
+      Enviá tu ID de dispositivo junto al comprobante de pago.
+    </p>
+    
+    <div class="lock-id-box">
+      <div class="lock-id-label">Tu ID de dispositivo</div>
+      <div class="lock-id-value" id="deviceIdDisplay">Cargando...</div>
+    </div>
+    
+    <div class="lock-actions">
+      <button class="lock-btn copy" id="btnCopyId">
+        📋 Copiar ID
+      </button>
+      <button class="lock-btn whatsapp" id="btnWhatsappActivate">
+        💬 Enviar por WhatsApp
+      </button>
+    </div>
+    
+    <div class="lock-divider">Ya tenés tu código?</div>
+    
+    <input 
+      type="text" 
+      class="lock-input" 
+      id="activationInput" 
+      placeholder="XXXX-XXXX-XXXX"
+      maxlength="14"
+      autocomplete="off"
+      autocapitalize="characters"
+      spellcheck="false"
+    />
+    
+    <button class="lock-activate-btn" id="btnActivate">
+      Activar APPI
+    </button>
+    
+    <div class="lock-error" id="activationError">
+      ⚠️ Código incorrecto. Verificalo e intentá de nuevo.
+    </div>
+    
+    <div class="lock-footer">
+      Una vez activada, no vas a necesitar volver a ingresar el código en este dispositivo.
+    </div>
+  </div>
+</div>
 <div class="toast" id="toast"><span class="check-ic">✓</span><span id="toastTxt">Guardado</span></div>
 
 <div class="app">
@@ -5151,8 +5352,93 @@ document.getElementById('importInput').onchange = (e)=>{
 })();
 
 /* ============ INICIO ============ */
-loadEquipoFromStorage();
-showView('view-home');
+/* ============================================================
+   🔒 SISTEMA DE ACTIVACIÓN / LICENCIA
+============================================================ */
+const WHATSAPP_NUMERO = '5493515638843';
+const SECRET_KEY = 'APPI-2024-MH-PSA-GERMAN';
+
+// Genera un ID único para este dispositivo
+function generarDeviceId() {
+  let id = localStorage.getItem('appi_device_id');
+  if (id) return id;
+  const timestamp = Date.now().toString(36).toUpperCase();
+  const random = Math.random().toString(36).substring(2, 8).toUpperCase();
+  const parte1 = (timestamp.substring(0, 4) + random.substring(0, 2)).substring(0, 4);
+  const parte2 = (random.substring(2, 6) + timestamp.substring(4, 6)).substring(0, 4);
+  const parte3 = (timestamp.substring(6) + random).substring(0, 4).padEnd(4, 'X');
+  id = `${parte1}-${parte2}-${parte3}`;
+  localStorage.setItem('appi_device_id', id);
+  return id;
+}
+
+// Hash simple para generar el código de activación
+function hashCode(str) {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
+  }
+  return Math.abs(hash);
+}
+
+// Genera el código de activación esperado para un deviceId
+function generarCodigoActivacion(deviceId) {
+  const base = deviceId + SECRET_KEY;
+  const hash1 = hashCode(base).toString(36).toUpperCase().padStart(4, '0').substring(0, 4);
+  const hash2 = hashCode(base + '1').toString(36).toUpperCase().padStart(4, '0').substring(0, 4);
+  const hash3 = hashCode(base + '2').toString(36).toUpperCase().padStart(4, '0').substring(0, 4);
+  return `${hash1}-${hash2}-${hash3}`;
+}
+
+// Valida si el código ingresado es correcto
+function validarCodigo(deviceId, codigoIngresado) {
+  const esperado = generarCodigoActivacion(deviceId);
+  return codigoIngresado.toUpperCase().trim() === esperado;
+}
+
+// ¿La app está activada?
+function estaActivada() {
+  const activacion = localStorage.getItem('appi_activada');
+  if (!activacion) return false;
+  try {
+    const data = JSON.parse(activacion);
+    const deviceId = generarDeviceId();
+    return validarCodigo(deviceId, data.codigo);
+  } catch(e) {
+    return false;
+  }
+}
+
+// Muestra la pantalla de bloqueo
+function mostrarPantallaBloqueo() {
+  const deviceId = generarDeviceId();
+  document.getElementById('deviceIdDisplay').textContent = deviceId;
+  document.getElementById('lockScreen').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+  
+  // Botón: copiar ID
+  document.getElementById('btnCopyId').onclick = async () => {
+    try {
+      await navigator.clipboard.writeText(deviceId);
+      haptic(10);
+      showToast('ID copiado ✓');
+    } catch(e) {
+      // Fallback
+      const el = document.getElementById('deviceIdDisplay');
+      const range = document.createRange();
+      range.selectNode(el);
+      window.getSelection().removeAllRanges();
+      window.getSelection().addRange(range);
+      showToast('ID seleccionado');
+    }
+  };
+  
+  // Botón: WhatsApp
+  document.getElementById('btnWhatsappActivate').onclick = () => {
+    const mensaje = `Hola! Quiero activar APPI 💧\n\nMi ID de dispositivo es:\n${deviceId}\n\nAdjunto el comprobante de pago.`;
+    window.open(`https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(mensaje)}`, '_blank');
 </script>
 <script>
   if ('serviceWorker' in navigator) {
