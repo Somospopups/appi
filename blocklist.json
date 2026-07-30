@@ -1,5 +1,7 @@
 {
   "version": 1,
   "actualizado": "2026-07-30",
-  "bloqueados": []
+  "bloqueados": [
+    "MS7R-3B75-GEPK"
+  ]
 }
