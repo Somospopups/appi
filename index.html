@@ -2546,10 +2546,16 @@ body.dark .lock-footer { color: #6b6b76; }
     <div id="equipoContent"></div>
 
     <input type="file" id="equipoFileInput" accept=".xls,.xlsx,.csv" style="display:none"/>
+    <input type="file" id="garantiasFileInput" accept=".xls,.xlsx,.csv" style="display:none"/>
 
     <div class="actions" id="equipoBottomActions" style="margin-top:14px; display:none">
       <button class="btn" id="btnEquipoReload">🔄 Actualizar</button>
       <button class="btn whatsapp" id="btnEquipoShare">Compartir</button>
+    </div>
+    <div class="actions" id="equipoGarantiasActions" style="margin-top:10px; display:none">
+      <button class="btn" id="btnCargarGarantias" style="background:linear-gradient(135deg,#f5b301,#ff8f6b);color:#fff;border:none">
+        📄 Cargar Garantías
+      </button>
     </div>
     <div class="actions" id="equipoDangerActions" style="margin-top:10px; display:none">
       <button class="btn btn-danger-outline" id="btnEquipoDelete">🗑️ Eliminar equipo cargado</button>
