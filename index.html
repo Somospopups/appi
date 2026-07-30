@@ -5496,12 +5496,69 @@ function iniciarApp() {
   showView('view-home');
 }
 
-// Verificar al arrancar
-if (estaActivada()) {
-  iniciarApp();
-} else {
-  mostrarPantallaBloqueo();
+// ===========================================================
+// 🚫 CHEQUEO DE LISTA NEGRA (BLOCKLIST)
+// ===========================================================
+const BLOCKLIST_URL = 'https://german1987diaz.github.io/appi/blocklist.json';
+
+async function chequearBlocklist() {
+  try {
+    // Agregamos un timestamp para evitar caché
+    const url = BLOCKLIST_URL + '?t=' + Date.now();
+    const respuesta = await fetch(url, { cache: 'no-store' });
+    if (!respuesta.ok) return false;
+    const datos = await respuesta.json();
+    if (!Array.isArray(datos.bloqueados)) return false;
+    const miId = generarDeviceId();
+    const bloqueado = datos.bloqueados.some(b => 
+      (typeof b === 'string' ? b : b.id) === miId
+    );
+    if (bloqueado) {
+      localStorage.setItem('appi_bloqueado', '1');
+      return true;
+    } else {
+      localStorage.removeItem('appi_bloqueado');
+      return false;
+    }
+  } catch(e) {
+    // Sin internet o error: usar último estado conocido
+    return localStorage.getItem('appi_bloqueado') === '1';
+  }
 }
+
+function mostrarPantallaBloqueado() {
+  const deviceId = generarDeviceId();
+  document.body.innerHTML = `
+    <div style="position:fixed;inset:0;background:linear-gradient(160deg,#2a0f0f 0%,#1a0f24 100%);color:#fff;display:flex;align-items:center;justify-content:center;padding:20px;font-family:-apple-system,BlinkMacSystemFont,sans-serif;">
+      <div style="max-width:420px;text-align:center;background:rgba(30,30,50,0.85);padding:32px 26px;border-radius:24px;border:1px solid rgba(255,255,255,0.1);box-shadow:0 20px 60px rgba(0,0,0,0.4);">
+        <div style="width:72px;height:72px;margin:0 auto 16px;border-radius:20px;background:linear-gradient(135deg,#d9534f,#ff6b6b);display:flex;align-items:center;justify-content:center;font-size:36px;">🚫</div>
+        <h1 style="margin:0 0 10px;font-size:22px;font-weight:800;">Licencia revocada</h1>
+        <p style="margin:0 0 20px;color:#ccc;font-size:14px;line-height:1.5;">
+          Esta licencia ha sido desactivada.<br/>
+          Contactá al soporte para más información.
+        </p>
+        <div style="background:rgba(217,83,79,0.15);border:2px dashed rgba(217,83,79,0.35);border-radius:12px;padding:12px;margin-bottom:20px;">
+          <div style="font-size:11px;font-weight:700;color:#ffb0ab;text-transform:uppercase;margin-bottom:6px;">Tu ID</div>
+          <div style="font-family:'Courier New',monospace;font-size:16px;font-weight:800;letter-spacing:2px;">${deviceId}</div>
+        </div>
+        <a href="https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent('Hola! Mi licencia de APPI aparece como revocada. Mi ID es: ' + deviceId)}" style="display:block;padding:14px;background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;text-decoration:none;border-radius:12px;font-weight:700;">💬 Contactar por WhatsApp</a>
+      </div>
+    </div>
+  `;
+}
+
+// Verificar al arrancar
+(async function() {
+  if (estaActivada()) {
+    // Iniciar la app inmediatamente
+    iniciarApp();
+    // Chequear blocklist en segundo plano
+    const bloqueado = await chequearBlocklist();
+    if (bloqueado) mostrarPantallaBloqueado();
+  } else {
+    mostrarPantallaBloqueo();
+  }
+})();
 </script>
 <script>
   if ('serviceWorker' in navigator) {
