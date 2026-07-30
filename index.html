@@ -5435,10 +5435,73 @@ function mostrarPantallaBloqueo() {
     }
   };
   
-  // Botón: WhatsApp
+    // Botón: WhatsApp
   document.getElementById('btnWhatsappActivate').onclick = () => {
     const mensaje = `Hola! Quiero activar APPI 💧\n\nMi ID de dispositivo es:\n${deviceId}\n\nAdjunto el comprobante de pago.`;
     window.open(`https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(mensaje)}`, '_blank');
+    haptic(10);
+  };
+  
+  // Auto-formato del input mientras escribe
+  const input = document.getElementById('activationInput');
+  input.addEventListener('input', (e) => {
+    let val = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    if (val.length > 4 && val.length <= 8) {
+      val = val.substring(0, 4) + '-' + val.substring(4);
+    } else if (val.length > 8) {
+      val = val.substring(0, 4) + '-' + val.substring(4, 8) + '-' + val.substring(8, 12);
+    }
+    e.target.value = val;
+    document.getElementById('activationError').classList.remove('show');
+  });
+  
+  // Botón: activar
+  document.getElementById('btnActivate').onclick = () => {
+    const codigo = input.value.trim().toUpperCase();
+    if (codigo.length < 14) {
+      document.getElementById('activationError').textContent = '⚠️ El código debe tener 12 caracteres.';
+      document.getElementById('activationError').classList.add('show');
+      haptic(20);
+      return;
+    }
+    if (validarCodigo(deviceId, codigo)) {
+      localStorage.setItem('appi_activada', JSON.stringify({
+        codigo: codigo,
+        fecha: Date.now(),
+        deviceId: deviceId
+      }));
+      haptic(30);
+      showToast('¡APPI activada! 🎉', 2000);
+      setTimeout(() => {
+        document.getElementById('lockScreen').classList.add('hidden');
+        document.body.style.overflow = '';
+        iniciarApp();
+      }, 1000);
+    } else {
+      document.getElementById('activationError').textContent = '⚠️ Código incorrecto. Verificalo e intentá de nuevo.';
+      document.getElementById('activationError').classList.add('show');
+      haptic(20);
+    }
+  };
+  
+  // Enter para activar
+  input.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') document.getElementById('btnActivate').click();
+  });
+}
+
+// Inicia la app normalmente
+function iniciarApp() {
+  loadEquipoFromStorage();
+  showView('view-home');
+}
+
+// Verificar al arrancar
+if (estaActivada()) {
+  iniciarApp();
+} else {
+  mostrarPantallaBloqueo();
+}
 </script>
 <script>
   if ('serviceWorker' in navigator) {
