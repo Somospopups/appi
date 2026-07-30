@@ -4001,7 +4001,8 @@ function renderEquipo(){
     document.getElementById('equipoSubtitle').textContent = 'Cargá tu planilla para empezar';
     return;
   }
-  tabsWrap.style.display = 'flex'; bottomActs.style.display = 'flex';
+  tabsWrap.style.display = 'flex';
+  bottomActs.style.display = equipoActiveTab === 'dashboard' ? 'none' : 'flex';
   if(dangerActs) dangerActs.style.display = 'flex';
   document.getElementById('equipoSubtitle').textContent = `${equipoData.personas.length} personas · ${equipoData.titular.nombre || equipoData.titular.dip || 'Tu equipo'}`;
   if(equipoActiveTab === 'dashboard') renderEquipoDashboard();
