@@ -39,17 +39,16 @@
   "screenshots": [
     {
       "src": "./screenshot-mobile.png",
-      "sizes": "720x1280",
+      "sizes": "1170x2532",
       "type": "image/png",
       "form_factor": "narrow",
       "label": "Vista principal de APPI"
     },
     {
       "src": "./screenshot-wide.png",
-      "sizes": "1280x720",
+      "sizes": "2048x2732",
       "type": "image/png",
-      "form_factor": "wide",
-      "label": "Vista de escritorio de APPI"
+      "label": "Vista secundaria de APPI"
     }
   ]
 }
