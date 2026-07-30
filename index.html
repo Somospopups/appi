@@ -5437,7 +5437,7 @@ function mostrarPantallaBloqueo() {
   
     // Botón: WhatsApp
   document.getElementById('btnWhatsappActivate').onclick = () => {
-    const mensaje = `Hola! Quiero activar APPI 💧\n\nMi ID de dispositivo es:\n${deviceId}\n\nAdjunto el comprobante de pago.`;
+    const mensaje = `¡Hola! 👋 Bienvenido/a a APPI 💧\n\nEstoy iniciando mi activación en la aplicación.\n\n📋 Mi ID de dispositivo es:\n\n${deviceId}\n\n¡Gracias! Quedo a la espera de mi código de activación para empezar a usar APPI. 🚀`;
     window.open(`https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(mensaje)}`, '_blank');
     haptic(10);
   };
