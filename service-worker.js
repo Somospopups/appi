@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v16';
+const CACHE_NAME = 'appi-v17';
 const ARCHIVOS = [
   './',
   './index.html',
