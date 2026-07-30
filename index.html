@@ -4996,6 +4996,8 @@ async function generarImagenArbol(personaRaiz){
       const hasKids = p.hijos && p.hijos.length > 0;
       const pts = p.pnAct || 0;
       const totalDesc = contarDescendientes(p);
+      const g = p.garantias;
+      const tieneGarantias = g && (g.presentadas > 0 || g.pendientes > 0);
       return `
         <div class="org-node-wrap">
           <div class="org-node">
@@ -5003,6 +5005,7 @@ async function generarImagenArbol(personaRaiz){
             <span class="on-cat-badge" style="background:${info.color}">${info.name}</span>
             <div class="on-name">${escapeXml(p.nombre)}</div>
             <div class="on-pts">${formatPB(pts)} PB</div>
+            ${tieneGarantias ? `<div style="margin-top:5px;padding-top:5px;border-top:1px dashed rgba(60,70,110,0.35);font-size:10.5px;font-weight:700;color:#a3670b;line-height:1.5">📄 ${formatPB(g.presentadas)}<br/>⚠️ ${formatPB(g.vencidas)} (${formatPB(g.porcVencidas)}%)<br/>⏳ ${formatPB(g.pendientes)}</div>` : ''}
           </div>
           ${hasKids ? `<div class="org-children open">
             ${p.hijos.map(h => `<div class="org-child-wrap">${renderNodoExport(h)}</div>`).join('')}
