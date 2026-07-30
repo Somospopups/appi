@@ -2553,10 +2553,8 @@ body.dark .lock-footer { color: #6b6b76; }
       <button class="btn" id="btnEquipoReload">🔄 Actualizar</button>
       <button class="btn whatsapp" id="btnEquipoShare">Compartir</button>
     </div>
-    <div class="actions" id="equipoGarantiasActions" style="margin-top:10px; display:none">
-      <button class="btn" id="btnCargarGarantias" style="background:linear-gradient(135deg,#f5b301,#ff8f6b);color:#fff;border:none">
-        📄 Cargar Garantías
-      </button>
+    <div id="equipoGarantiasActions" style="display:none">
+      <button id="btnCargarGarantias" style="display:none">📄 Cargar Garantías</button>
     </div>
     <div class="actions" id="equipoDangerActions" style="margin-top:10px; display:none">
       <button class="btn btn-danger-outline" id="btnEquipoDelete">🗑️ Eliminar equipo cargado</button>
@@ -4005,8 +4003,6 @@ function renderEquipo(){
   }
   tabsWrap.style.display = 'flex'; bottomActs.style.display = 'flex';
   if(dangerActs) dangerActs.style.display = 'flex';
-  const garantiasActs = document.getElementById('equipoGarantiasActions');
-  if(garantiasActs) garantiasActs.style.display = 'flex';
   document.getElementById('equipoSubtitle').textContent = `${equipoData.personas.length} personas · ${equipoData.titular.nombre || equipoData.titular.dip || 'Tu equipo'}`;
   if(equipoActiveTab === 'dashboard') renderEquipoDashboard();
   if(equipoActiveTab === 'arbol') renderEquipoArbol();
@@ -4080,8 +4076,20 @@ document.getElementById('equipoFileInput').onchange = (e)=>{
         procesado.fileSize = file.size;
         equipoData = procesado;
         saveEquipoToStorage();
-        haptic(20); showToast(`${procesado.personas.length} personas cargadas ✓`, 2000);
+        haptic(20);
         renderEquipo();
+        // Preguntar si quiere cargar garantías
+        setTimeout(() => {
+          confirmarAccion({
+            title: `¡${procesado.personas.length} personas cargadas! ✅`,
+            html: `<p>Tu equipo se cargó correctamente.</p><div class="tip"><strong>📄 ¿Querés cargar también el archivo de Garantías por Organización?</strong><br/>Esto te va a permitir ver información adicional de cada persona.</div>`,
+            okText: 'Sí, cargar garantías',
+            cancelText: 'No, ahora no',
+            onConfirm: () => {
+              document.getElementById('garantiasFileInput').click();
+            }
+          });
+        }, 400);
       }
     } catch(err){
       console.error('❌ Error procesando archivo:', err);
