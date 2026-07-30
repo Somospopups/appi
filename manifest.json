@@ -45,10 +45,11 @@
       "label": "Vista principal de APPI"
     },
     {
-      "src": "./screenshot-wide.png",
-      "sizes": "2048x2732",
+      "src": "./icon-512.png",
+      "sizes": "512x512",
       "type": "image/png",
-      "label": "Vista secundaria de APPI"
+      "form_factor": "wide",
+      "label": "Icono de APPI"
     }
   ]
 }
