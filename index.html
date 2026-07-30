@@ -4413,23 +4413,52 @@ ${(function(){
       }).join('')}
     </div>` : ''}
 
-        ${bdayMes.length > 0 ? `
-    <div class="bday-list">
-      <h4>🎂 Cumpleaños de ${MONTHS[hoy.getMonth()]}</h4>
-      ${bdayMes.map(p=>{
+       ${(function(){
+      if(bdayMes.length === 0) return '';
+      const hoyDia = hoy.getDate();
+      const hoyMes = hoy.getMonth() + 1;
+      const cumplenHoy = bdayMes.filter(p => {
+        const parts = (p.cumple||'').split('-');
+        return parts.length >= 3 && parseInt(parts[2]) === hoyDia && parseInt(parts[1]) === hoyMes;
+      });
+      
+      const renderBdayItem = (p) => {
         const parts = (p.cumple||'').split('-');
         const dia = parts[2] || '?';
-        return `<div class="bday-item clickable" data-persona="${p.id}"><div class="bd-day"><div class="bd-num">${dia}</div><div class="bd-mon">${MONTHS_SHORT[hoy.getMonth()]}</div></div><div class="bd-info"><div class="bd-name">${escapeXml(p.nombre)}</div><div class="bd-meta">${catInfoOf(p.cat).name}${p.tel ? ' · '+escapeXml(p.tel) : ''}</div></div>${(function(){
-  const tels = parseTelefonos(p.tel);
-  if(tels.length === 0) return '';
-  if(tels.length === 1){
-    return `<button class="bd-call" data-tel="${tels[0].digits}" data-nom="${escapeXml(p.nombre)}">💬</button>`;
-  }
-  // Múltiples teléfonos: botón que abre menú de selección
-  return `<button class="bd-call" data-multitel="${p.id}" data-nom="${escapeXml(p.nombre)}">💬 x${tels.length}</button>`;
-})()}</div>`;
-      }).join('')}
-    </div>` : ''}
+        const tels = parseTelefonos(p.tel);
+        let btnWa = '';
+        if(tels.length === 1){
+          btnWa = `<button class="bd-call" data-tel="${tels[0].digits}" data-nom="${escapeXml(p.nombre)}">💬</button>`;
+        } else if(tels.length > 1){
+          btnWa = `<button class="bd-call" data-multitel="${p.id}" data-nom="${escapeXml(p.nombre)}">💬 x${tels.length}</button>`;
+        }
+        return `<div class="bday-item clickable" data-persona="${p.id}"><div class="bd-day"><div class="bd-num">${dia}</div><div class="bd-mon">${MONTHS_SHORT[hoy.getMonth()]}</div></div><div class="bd-info"><div class="bd-name">${escapeXml(p.nombre)}</div><div class="bd-meta">${catInfoOf(p.cat).name}${p.tel ? ' · '+escapeXml(p.tel) : ''}</div></div>${btnWa}</div>`;
+      };
+      
+      let html = '';
+      
+      // 1) Cumpleañeros de HOY (siempre visibles)
+      if(cumplenHoy.length > 0){
+        html += `<div class="bday-list" style="background:linear-gradient(135deg,rgba(58,208,164,0.20),rgba(255,143,107,0.15));border-color:rgba(58,208,164,0.4)">
+          <h4 style="color:#1d7a5c">🎉 Cumplen HOY (${cumplenHoy.length})</h4>
+          ${cumplenHoy.map(renderBdayItem).join('')}
+        </div>`;
+      }
+      
+      // 2) Listado del mes (colapsable)
+      html += `<div class="bday-list" id="bdayListWrap">
+        <div id="bdayHeader" style="cursor:pointer;user-select:none;display:flex;align-items:center;justify-content:space-between;gap:8px" onclick="document.getElementById('bdayFullList').classList.toggle('open');this.querySelector('.bday-arrow').style.transform=document.getElementById('bdayFullList').classList.contains('open')?'rotate(180deg)':'rotate(0deg)'">
+          <h4 style="margin:0">🎂 Cumpleaños de ${MONTHS[hoy.getMonth()]} (${bdayMes.length})</h4>
+          <span class="bday-arrow" style="font-size:22px;color:#a03631;transition:transform 0.25s ease;line-height:1">⌄</span>
+        </div>
+        <div id="bdayFullList" style="display:none;margin-top:12px">
+          ${bdayMes.map(renderBdayItem).join('')}
+        </div>
+      </div>
+      <style>#bdayFullList.open{display:block !important}</style>`;
+      
+      return html;
+    })()}
 
     <div style="text-align:center; font-size:11px; color:#8a8a94; margin-top:10px; padding: 0 10px;">
       📁 ${escapeXml(equipoData.fileName || 'Archivo cargado')} · ${equipoData.fileSize ? (equipoData.fileSize/1024).toFixed(0)+' KB' : ''}<br/>
