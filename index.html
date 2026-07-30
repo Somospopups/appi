@@ -4522,6 +4522,8 @@ function renderTreeNodeOrg(p){
   const isExpanded = equipoExpanded.has(p.id);
   const pts = p.pnAct || 0;
   const totalDesc = contarDescendientes(p);
+  const g = p.garantias;
+  const tieneGarantias = g && (g.presentadas > 0 || g.pendientes > 0);
   let html = `
     <div class="org-node-wrap">
       <div class="org-node" data-pid="${p.id}">
@@ -4529,6 +4531,7 @@ function renderTreeNodeOrg(p){
         <span class="on-cat-badge" style="background:${info.color}">${info.name}</span>
         <div class="on-name">${escapeXml(p.nombre)}</div>
         <div class="on-pts">${formatPB(pts)} PB</div>
+        ${tieneGarantias ? `<div style="margin-top:4px;padding-top:4px;border-top:1px dashed rgba(80,90,130,0.25);font-size:9.5px;font-weight:600;color:#a3670b;line-height:1.4">📄 ${formatPB(g.presentadas)}<br/>⚠️ ${formatPB(g.vencidas)} (${formatPB(g.porcVencidas)}%)<br/>⏳ ${formatPB(g.pendientes)}</div>` : ''}
       </div>
       ${hasKids ? `<div class="org-children ${isExpanded?'open':''}">
         ${p.hijos.map(h=>`<div class="org-child-wrap">${renderTreeNodeOrg(h)}</div>`).join('')}
