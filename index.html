@@ -2091,6 +2091,33 @@ body.dark .lock-id-label { color: #a0a0b0; }
   letter-spacing: 2px; word-break: break-all;
 }
 body.dark .lock-id-value { color: #a8b8ff; }
+ .lock-id-row {
+  display: flex; align-items: center; justify-content: center;
+  gap: 10px;
+}
+.lock-copy-icon {
+  background: rgba(91,141,239,0.20);
+  border: none; cursor: pointer;
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+  transition: transform 0.15s ease, background 0.2s ease;
+  flex: none;
+}
+.lock-copy-icon:active {
+  transform: scale(0.9);
+  background: rgba(91,141,239,0.35);
+}
+body.dark .lock-copy-icon {
+  background: rgba(91,141,239,0.25);
+}
+.lock-btn-full {
+  width: 100%;
+  padding: 16px;
+  font-size: 15px;
+  margin-bottom: 4px;
+}
 .lock-actions {
   display: flex; gap: 8px; margin-bottom: 20px;
 }
@@ -2186,18 +2213,16 @@ body.dark .lock-footer { color: #6b6b76; }
     </p>
     
     <div class="lock-id-box">
-      <div class="lock-id-label">Tu ID de dispositivo</div>
-      <div class="lock-id-value" id="deviceIdDisplay">Cargando...</div>
-    </div>
-    
-    <div class="lock-actions">
-      <button class="lock-btn copy" id="btnCopyId">
-        📋 Copiar ID
-      </button>
-      <button class="lock-btn whatsapp" id="btnWhatsappActivate">
-        💬 Enviar por WhatsApp
-      </button>
-    </div>
+  <div class="lock-id-label">Tu ID de dispositivo</div>
+  <div class="lock-id-row">
+    <span class="lock-id-value" id="deviceIdDisplay">Cargando...</span>
+    <button class="lock-copy-icon" id="btnCopyId" title="Copiar ID">📋</button>
+  </div>
+</div>
+
+<button class="lock-btn whatsapp lock-btn-full" id="btnWhatsappActivate">
+  💬 Enviar por WhatsApp
+</button>
     
     <div class="lock-divider">Ya tenés tu código?</div>
     
