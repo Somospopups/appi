@@ -4352,7 +4352,49 @@ function renderEquipoDashboard(){
         </div>`;
       }).join('')}
     </div>
-
+${(function(){
+      const totalPres = personas.reduce((s,p)=> s + (p.garantias?.presentadas || 0), 0);
+      const totalVenc = personas.reduce((s,p)=> s + (p.garantias?.vencidas || 0), 0);
+      const totalPend = personas.reduce((s,p)=> s + (p.garantias?.pendientes || 0), 0);
+      if(totalPres === 0 && totalPend === 0) return '';
+      const pctVenc = totalPres > 0 ? Math.round((totalVenc/totalPres)*100) : 0;
+      // Top 5 con más pendientes
+      const topPendientes = [...personas]
+        .filter(p => p.garantias && p.garantias.pendientes > 0)
+        .sort((a,b)=> (b.garantias.pendientes||0) - (a.garantias.pendientes||0))
+        .slice(0, 5);
+      return `
+        <div class="top-list" style="background:linear-gradient(135deg,rgba(245,179,1,0.10),rgba(255,143,107,0.06));border:1px solid rgba(245,179,1,0.25)">
+          <h4 style="color:#a3670b">📄 Garantías del Equipo</h4>
+          <div class="stats-grid" style="margin-bottom:14px">
+            <div class="stat-card" style="background:rgba(255,255,255,0.65)">
+              <span class="st-emo">📄</span>
+              <div class="st-val" style="color:#a3670b">${formatPB(totalPres)}</div>
+              <div class="st-lbl">Presentadas</div>
+            </div>
+            <div class="stat-card" style="background:rgba(255,255,255,0.65)">
+              <span class="st-emo">⚠️</span>
+              <div class="st-val" style="color:#d9534f">${formatPB(totalVenc)}</div>
+              <div class="st-lbl">Vencidas (${pctVenc}%)</div>
+            </div>
+          </div>
+          <div class="stats-grid" style="margin-bottom:14px">
+            <div class="stat-card" style="background:rgba(255,255,255,0.65);grid-column:span 2">
+              <span class="st-emo">⏳</span>
+              <div class="st-val" style="color:#f5b301">${formatPB(totalPend)}</div>
+              <div class="st-lbl">Pendientes por presentar</div>
+            </div>
+          </div>
+          ${topPendientes.length > 0 ? `
+            <h4 style="color:#a3670b;margin-top:12px;font-size:12px">⏳ Top con más pendientes</h4>
+            ${topPendientes.map((p,i)=>{
+              const info = catInfoOf(p.cat);
+              return `<div class="top-item clickable" data-persona="${p.id}"><div class="rank" style="background:linear-gradient(135deg,#f5b301,#ff8f6b)">${i+1}</div><div class="tp-name">${escapeXml(p.nombre)}</div><div class="tp-cat" style="background:${info.color}">${info.name}</div><div class="tp-pts" style="color:#a3670b">${formatPB(p.garantias.pendientes)}</div></div>`;
+            }).join('')}
+          ` : ''}
+        </div>
+      `;
+    })()}
         ${top10.length > 0 ? `
     <div class="top-list">
       <h4 style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
