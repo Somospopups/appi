@@ -4096,7 +4096,171 @@ document.getElementById('equipoFileInput').onchange = (e)=>{
   e.target.value = '';
 };
 document.getElementById('btnEquipoReload').onclick = ()=> document.getElementById('equipoFileInput').click();
+/* ============ CARGA DE GARANTÍAS ============ */
+document.getElementById('btnCargarGarantias').onclick = ()=> {
+  if(!equipoData || !equipoData.personas){
+    modal.open({ icon:'⚠️', title:'Cargá primero tu equipo', html:'<p>Primero tenés que cargar el archivo de Línea Descendente.</p>' });
+    return;
+  }
+  // Si ya hay garantías cargadas, preguntar antes de reemplazar
+  const tieneGarantias = equipoData.personas.some(p => p.garantias);
+  if(tieneGarantias){
+    confirmarAccion({
+      title:'¿Reemplazar garantías?',
+      html:'<p>Ya tenés datos de garantías cargados. ¿Querés reemplazarlos con el archivo nuevo?</p>',
+      okText:'Sí, reemplazar', danger:true,
+      onConfirm: ()=> document.getElementById('garantiasFileInput').click()
+    });
+  } else {
+    document.getElementById('garantiasFileInput').click();
+  }
+};
 
+document.getElementById('garantiasFileInput').onchange = (e)=>{
+  const file = e.target.files[0]; 
+  if(!file) return;
+  showToast('Procesando garantías…', 3000);
+  const reader = new FileReader();
+  reader.onload = (evt)=>{
+    try {
+      const buffer = evt.target.result;
+      const uint8 = new Uint8Array(buffer);
+      const firstBytes = new TextDecoder('utf-8').decode(uint8.slice(0, 500)).toLowerCase();
+      const esHTML = firstBytes.includes('<html') || firstBytes.includes('<!doctype') || firstBytes.includes('<table');
+      let rows;
+      if(esHTML){
+        let htmlText;
+        try { htmlText = new TextDecoder('windows-1252').decode(uint8); } catch(e){ htmlText = new TextDecoder('utf-8').decode(uint8); }
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(htmlText, 'text/html');
+        const tables = doc.querySelectorAll('table');
+        if(tables.length === 0) throw new Error('Sin tablas.');
+        rows = [];
+        tables.forEach(table => {
+          const trs = table.getElementsByTagName('tr');
+          for(let i = 0; i < trs.length; i++){
+            const cells = []; 
+            const tds = trs[i].children;
+            for(let j = 0; j < tds.length; j++){
+              const td = tds[j];
+              if(td.tagName === 'TD' || td.tagName === 'TH'){
+                if(td.querySelector('table')) cells.push('');
+                else cells.push(td.textContent.trim().replace(/\s+/g,' '));
+              }
+            }
+            if(cells.length > 0) rows.push(cells);
+          }
+        });
+      } else {
+        const wb = XLSX.read(uint8, { type: 'array', cellDates: false });
+        rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, defval: '', raw: true });
+      }
+      
+      const resultado = procesarGarantias(rows);
+      if(resultado){
+        // Cruzar con el equipo existente
+        let cruzados = 0;
+        let noEncontrados = 0;
+        equipoData.personas.forEach(p => {
+          const g = resultado.garantiasMap[p.codigo];
+          if(g){
+            p.garantias = {
+              presentadas: g.presentadas,
+              vencidas: g.vencidas,
+              porcVencidas: g.porcVencidas,
+              pendientes: g.pendientes
+            };
+            cruzados++;
+          }
+        });
+        // Contar los que estaban en garantías pero no en equipo
+        Object.keys(resultado.garantiasMap).forEach(dip => {
+          const existe = equipoData.personas.some(p => p.codigo === dip);
+          if(!existe) noEncontrados++;
+        });
+        
+        saveEquipoToStorage();
+        haptic(20);
+        modal.open({
+          icon:'✅', 
+          iconBg:'linear-gradient(135deg,#3ad0a4,#5b8def)',
+          title:'Garantías cargadas',
+          html:`<p><strong>${cruzados}</strong> personas actualizadas con datos de garantías.</p>${noEncontrados > 0 ? `<div class="tip">ℹ️ ${noEncontrados} personas del archivo de garantías no están en tu equipo. Se ignoraron.</div>` : ''}`
+        });
+        renderEquipo();
+      }
+    } catch(err){ 
+      modal.open({ icon:'⚠️', title:'Error al leer archivo', html:`<p>${escapeXml(err.message)}</p>` }); 
+    }
+  };
+  reader.readAsArrayBuffer(file);
+  e.target.value = '';
+};
+
+function procesarGarantias(rows){
+  // Buscar la fila de encabezados (la que tiene "Nombre" y "Dip" y "Present")
+  let headerRow = -1;
+  for(let i = 0; i < Math.min(rows.length, 30); i++){
+    const r = rows[i] || [];
+    if(r.length < 5) continue;
+    let keywordCount = 0;
+    let tieneNombre = false;
+    r.forEach(cell => {
+      const c = (cell==null?'':cell).toString().toLowerCase().trim();
+      if(c === 'nombre') { tieneNombre = true; keywordCount++; }
+      if(c === 'dip') keywordCount++;
+      if(c.includes('present')) keywordCount++;
+      if(c.includes('venc')) keywordCount++;
+      if(c.includes('pend')) keywordCount++;
+    });
+    if(tieneNombre && keywordCount >= 3){ 
+      headerRow = i; 
+      break; 
+    }
+  }
+  
+  if(headerRow === -1){ 
+    modal.open({ icon:'⚠️', title:'Archivo inválido', html:'<p>No se encontró la tabla de garantías. Verificá que sea el archivo correcto.</p>' }); 
+    return null; 
+  }
+  
+  const headerRawRow = rows[headerRow] || [];
+  const headers = headerRawRow.map(c => (c==null?'':c).toString().toLowerCase().trim());
+  const findCol = (patterns) => { 
+    for(let i = 0; i < headers.length; i++){ 
+      for(const p of patterns){ 
+        if(headers[i].includes(p)) return i; 
+      } 
+    } 
+    return -1; 
+  };
+  
+  const idx = {
+    nombre: findCol(['nombre']),
+    dip: findCol(['dip']),
+    present: findCol(['present']),
+    venc: findCol(['venc']),
+    porc: findCol(['%']),
+    pend: findCol(['pend'])
+  };
+  
+  const garantiasMap = {};
+  for(let i = headerRow + 1; i < rows.length; i++){
+    const r = rows[i] || [];
+    const dip = (r[idx.dip]||'').toString().trim();
+    if(!dip) continue;
+    
+    garantiasMap[dip] = {
+      presentadas: parsePB(r[idx.present]),
+      vencidas: parsePB(r[idx.venc]),
+      porcVencidas: parsePB(r[idx.porc]),
+      pendientes: parsePB(r[idx.pend])
+    };
+  }
+  
+  return { garantiasMap };
+}
+ 
 const btnEquipoDelete = document.getElementById('btnEquipoDelete');
 if(btnEquipoDelete){
   btnEquipoDelete.onclick = ()=>{
