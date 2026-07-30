@@ -2559,6 +2559,7 @@ body.dark .lock-footer { color: #6b6b76; }
     <div class="actions" id="equipoDangerActions" style="margin-top:10px; display:none">
       <button class="btn btn-danger-outline" id="btnEquipoDelete">🗑️ Eliminar equipo cargado</button>
     </div>
+    <div id="equipoFileInfo" style="display:none; text-align:center; font-size:11px; color:#8a8a94; margin-top:14px; padding:0 10px;"></div>
   </section>
 
 </div>
@@ -4005,6 +4006,11 @@ function renderEquipo(){
   bottomActs.style.display = equipoActiveTab === 'dashboard' ? 'none' : 'flex';
   if(dangerActs) dangerActs.style.display = 'flex';
   document.getElementById('equipoSubtitle').textContent = `${equipoData.personas.length} personas · ${equipoData.titular.nombre || equipoData.titular.dip || 'Tu equipo'}`;
+ const fileInfoEl = document.getElementById('equipoFileInfo');
+  if(fileInfoEl){
+    fileInfoEl.style.display = 'block';
+    fileInfoEl.innerHTML = `📁 ${escapeXml(equipoData.fileName || 'Archivo cargado')} · ${equipoData.fileSize ? (equipoData.fileSize/1024).toFixed(0)+' KB' : ''}<br/>Última carga: ${new Date(equipoData.fechaCarga).toLocaleDateString('es-AR')}`;
+  }
   if(equipoActiveTab === 'dashboard') renderEquipoDashboard();
   if(equipoActiveTab === 'arbol') renderEquipoArbol();
   if(equipoActiveTab === 'lista') renderEquipoLista();
@@ -4469,10 +4475,7 @@ ${(function(){
       return html;
     })()}
 
-    <div style="text-align:center; font-size:11px; color:#8a8a94; margin-top:10px; padding: 0 10px;">
-      📁 ${escapeXml(equipoData.fileName || 'Archivo cargado')} · ${equipoData.fileSize ? (equipoData.fileSize/1024).toFixed(0)+' KB' : ''}<br/>
-      Última carga: ${new Date(equipoData.fechaCarga).toLocaleDateString('es-AR')}
-    </div>
+    
   `;
 
   cont.innerHTML = html;
