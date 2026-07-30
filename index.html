@@ -4002,9 +4002,10 @@ function renderEquipo(){
     document.getElementById('equipoSubtitle').textContent = 'Cargá tu planilla para empezar';
     return;
   }
-  tabsWrap.style.display = 'flex';
-  bottomActs.style.display = 'flex';
+  tabsWrap.style.display = 'flex'; bottomActs.style.display = 'flex';
   if(dangerActs) dangerActs.style.display = 'flex';
+  const garantiasActs = document.getElementById('equipoGarantiasActions');
+  if(garantiasActs) garantiasActs.style.display = 'flex';
   document.getElementById('equipoSubtitle').textContent = `${equipoData.personas.length} personas · ${equipoData.titular.nombre || equipoData.titular.dip || 'Tu equipo'}`;
   if(equipoActiveTab === 'dashboard') renderEquipoDashboard();
   if(equipoActiveTab === 'arbol') renderEquipoArbol();
