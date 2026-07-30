@@ -2056,8 +2056,14 @@ body.dark .lock-card {
   border-radius: 24px;
   background: linear-gradient(135deg, #5b8def, #a06bff, #ff6b9d);
   display: flex; align-items: center; justify-content: center;
-  font-size: 44px; font-weight: 900; color: #fff;
+  overflow: hidden;
   box-shadow: 0 8px 24px rgba(120,100,220,0.35);
+  padding: 8px;
+}
+.lock-logo img {
+  width: 100%; height: 100%;
+  object-fit: contain;
+  border-radius: 16px;
 }
 .lock-title {
   font-size: 24px; font-weight: 800; margin: 0 0 6px;
@@ -2205,7 +2211,7 @@ body.dark .lock-footer { color: #6b6b76; }
  <!-- ============ PANTALLA DE ACTIVACIÓN ============ -->
 <div id="lockScreen" class="hidden">
   <div class="lock-card">
-    <div class="lock-logo">💧</div>
+    <div class="lock-logo"><img src="./icon-192.png" alt="APPI" /></div>
     <h1 class="lock-title">APPI necesita activación</h1>
     <p class="lock-subtitle">
       Para usar APPI necesitás una licencia.<br/>
