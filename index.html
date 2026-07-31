@@ -3794,6 +3794,11 @@ function catBadgeStyle(info){
   const border = info.border === 'dashed' ? 'border:1.5px dashed #b0b0ba;' : (info.color === '#ffffff' ? 'border:1.5px solid #d0d0d8;' : '');
   return `background:${info.color};color:${textColor};${border}`;
 }
+function catBadgeStyle(info){
+  const textColor = info.textColor || '#fff';
+  const border = info.border === 'dashed' ? 'border:1.5px dashed #b0b0ba;' : (info.color === '#ffffff' ? 'border:1.5px solid #d0d0d8;' : '');
+  return `background:${info.color};color:${textColor};${border}`;
+}
 let equipoData = null;
 let equipoActiveTab = 'dashboard';
 let equipoTreeMode = 'lista';
@@ -4495,7 +4500,7 @@ ${(function(){
         const info = catInfoOf(p.cat);
         const rankCls = i===0?'gold':(i===1?'silver':(i===2?'bronze':''));
         const valor = equipoTopMode === 'personal' ? p.pnAct : p.pbOrg;
-                return `<div class="top-item clickable" data-persona="${p.id}"><div class="rank ${rankCls}">${i+1}</div><div class="tp-name">${escapeXml(p.nombre)}</div><div class="tp-cat" style="background:${info.color}">${info.name}</div><div class="tp-pts">${formatPB(valor)}</div></div>`;
+                return `<div class="top-item clickable" data-persona="${p.id}"><div class="rank ${rankCls}">${i+1}</div><div class="tp-name">${escapeXml(p.nombre)}</div><div class="tp-cat" style="${catBadgeStyle(info)}">${info.name}</div><div class="tp-pts">${formatPB(valor)}</div></div>`;
       }).join('')}
     </div>` : ''}
 
