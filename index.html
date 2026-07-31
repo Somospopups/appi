@@ -1696,63 +1696,69 @@
   }
 
       /* ============ NUEVO DISEÑO DE NODOS EXPORT ============ */
-    .exp-node-new {
+      .exp-node-new {
     display: flex; flex-direction: column; align-items: center;
-    background: #ffffff !important;
-    border-radius: 20px;
-    padding: 14px 16px;
-    width: 220px;
-    min-width: 220px;
-    max-width: 220px;
-    min-height: 200px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.10);
-    border: 6px solid #ccc;
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 8px 10px;
+    width: 160px;
+    min-width: 160px;
+    max-width: 160px;
+    min-height: 140px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+    border: 3px solid #ccc;
     position: relative;
     box-sizing: border-box;
     flex-shrink: 0;
-    justify-content: flex-start;
+    justify-content: center;
+    color: #1c1c1e;
+  }
+  .exp-node-new.inactive {
+    min-height: 80px;
+    padding: 8px 10px;
+  }
+  .exp-node-new.dark-bg {
+    color: #ffffff;
   }
     .exp-node-new.inactive {
     /* Sin cambios visuales, solo el icono 💤 en el nodo */
   }
-  .exp-node-new .exp-name {
-    font-size: 13px; font-weight: 900;
-    color: #1c1c1e;
+    .exp-node-new .exp-name {
+    font-size: 10.5px; font-weight: 900;
+    color: inherit;
     text-align: center;
-    line-height: 1.25;
-    margin-bottom: 10px;
+    line-height: 1.2;
+    margin-bottom: 6px;
     word-break: break-word;
     max-width: 100%;
     letter-spacing: 0.2px;
     text-transform: uppercase;
   }
-  .exp-node-new .exp-pb {
-    font-size: 14px; font-weight: 800;
-    color: #3d63c9;
-    background: rgba(91,141,239,0.12);
-    padding: 5px 16px;
+    .exp-node-new .exp-pb {
+    font-size: 11px; font-weight: 800;
+    color: inherit;
+    background: rgba(255,255,255,0.35);
+    padding: 3px 10px;
     border-radius: 999px;
-    margin-bottom: 10px;
+    margin-bottom: 6px;
   }
-  .exp-node-new .exp-garantias {
-    display: flex; flex-direction: column;
+   .exp-node-new .exp-garantias {
+    display: flex; flex-direction: row;
     gap: 4px;
     width: 100%;
-    padding-top: 10px;
-    border-top: 1px dashed rgba(0,0,0,0.15);
-    font-size: 12px;
+    padding-top: 6px;
+    border-top: 1px dashed rgba(255,255,255,0.4);
+    font-size: 10px;
     font-weight: 700;
-  }
-    .exp-node-new .exp-garantias .g-row {
-    display: flex; align-items: center;
+    color: inherit;
     justify-content: center;
-    gap: 6px;
     white-space: nowrap;
   }
-  .exp-node-new .exp-garantias .g-row.vendidos { color: #1d7a5c; }
-  .exp-node-new .exp-garantias .g-row.vencidos { color: #d9534f; }
-  .exp-node-new .exp-garantias .g-row.adeudados { color: #a3670b; }
-  .exp-node-new .exp-inactive-label {
+  .exp-node-new .exp-garantias .g-row {
+    display: inline-flex; align-items: center;
+    gap: 2px;
+    color: inherit;
+  }
     font-size: 12px;
     color: #8a8a94;
     font-style: italic;
