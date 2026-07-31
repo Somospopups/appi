@@ -5438,6 +5438,47 @@ function calcularEspaciadoDinamico(totalPersonas){
   return { horizontal: 8, vertical: 20 };
 }
 
+ // ============ SISTEMA DE DETECCIÓN A4 VS PÓSTER ============
+
+// Constantes de tamaño A4 en píxeles (a 150 DPI, buena calidad para imprimir)
+const A4_ANCHO_PX = 1754;  // 297mm a 150 DPI (horizontal)
+const A4_ALTO_PX = 1240;   // 210mm a 150 DPI (horizontal)
+const MARGEN_HOJA_PX = 60; // Margen interno de cada hoja
+const SOLAPE_PX = 30;      // 5mm de solape para pegar las hojas
+
+// Decide si un árbol entra en A4 o necesita póster
+function detectarFormato(anchoImagen, altoImagen){
+  const anchoUtil = A4_ANCHO_PX - (MARGEN_HOJA_PX * 2);
+  const altoUtil = A4_ALTO_PX - (MARGEN_HOJA_PX * 2);
+  
+  if(anchoImagen <= anchoUtil && altoImagen <= altoUtil){
+    return { tipo: 'A4', columnas: 1, filas: 1, totalHojas: 1 };
+  }
+  
+  // Calcular cuántas hojas necesitamos
+  const columnasNecesarias = Math.ceil(anchoImagen / anchoUtil);
+  const filasNecesarias = Math.ceil(altoImagen / altoUtil);
+  
+  // Ajustar para que siempre sean números pares (excepto 1)
+  let columnas = columnasNecesarias;
+  let filas = filasNecesarias;
+  
+  if(columnas > 1 && columnas % 2 !== 0) columnas++;
+  if(filas > 1 && filas % 2 !== 0) filas++;
+  
+  return {
+    tipo: 'POSTER',
+    columnas: columnas,
+    filas: filas,
+    totalHojas: columnas * filas
+  };
+}
+
+// Calcula la mejor grilla de póster minimizando hojas
+function calcularMejorGrillaPoster(anchoImagen, altoImagen){
+  return detectarFormato(anchoImagen, altoImagen);
+}
+
 // Genera el HTML de un nodo con el NUEVO diseño (círculo + datos)
 function renderNodoExportNuevo(p){
   const info = catInfoOf(p.cat);
