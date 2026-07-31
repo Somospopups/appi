@@ -5534,29 +5534,7 @@ function renderNodoExportNuevo(p){
     const nombreTitular = (equipoData.titular.nombre || '').split(',')[0].trim() || 'Mi equipo';
     
     // Render de nodos (todos expandidos)
-    const renderNodoExport = (p) => {
-      const info = catInfoOf(p.cat);
-      const hasKids = p.hijos && p.hijos.length > 0;
-      const pts = p.pnAct || 0;
-      const totalDesc = contarDescendientes(p);
-      const g = p.garantias;
-      const tieneGarantias = g && (g.presentadas > 0 || g.pendientes > 0);
-      return `
-        <div class="org-node-wrap">
-          <div class="org-node">
-            ${totalDesc > 0 ? `<span class="on-count">${totalDesc}</span>` : ''}
-            <span class="on-cat-badge" style="${catBadgeStyle(info)}">${info.name}</span>
-            <div class="on-name">${escapeXml(p.nombre)}</div>
-            <div class="on-pts">${formatPB(pts)} PB</div>
-            ${tieneGarantias ? `<div style="margin-top:5px;padding-top:5px;border-top:1px dashed rgba(60,70,110,0.35);font-size:10.5px;font-weight:700;color:#a3670b;line-height:1.5">📄 ${formatPB(g.presentadas)}<br/>⚠️ ${formatPB(g.vencidas)} (${formatPB(g.porcVencidas)}%)<br/>⏳ ${formatPB(g.pendientes)}</div>` : ''}
-          </div>
-          ${hasKids ? `<div class="org-children open">
-            ${p.hijos.map(h => `<div class="org-child-wrap">${renderNodoExport(h)}</div>`).join('')}
-          </div>` : ''}
-        </div>
-      `;
-    };
-    
+       const renderNodoExport = (p) => renderNodoExportNuevo(p);    
     const fechaHoy = new Date().toLocaleDateString('es-AR', { day:'numeric', month:'long', year:'numeric' });
     
     renderEl.innerHTML = `
