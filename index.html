@@ -5870,42 +5870,25 @@ function renderNodoExportNuevo(p){
       blob = await res.blob();
     }
     
-    if(!blob) throw new Error('No se pudo generar la imagen (canvas muy grande). Probá con una rama más chica.');
+        if(!blob) throw new Error('No se pudo generar la imagen (canvas muy grande). Probá con una rama más chica.');
     
-    const fileName = `Equipo_${nombreTitular.replace(/\s+/g,'_')}_${personaRaiz.nombre.split(',')[0].trim().replace(/\s+/g,'_')}.png`;
-    const file = new File([blob], fileName, { type: 'image/png' });
+    // Detectar formato automáticamente
+    const formato = detectarFormato(canvas.width, canvas.height);
     
-    // Limpiar
+    // Limpiar loading y render temporal
     renderEl.remove();
     loading.remove();
     
-    // Compartir o descargar
-    let compartido = false;
-    if(navigator.canShare && navigator.canShare({ files: [file] })){
-      try {
-        await navigator.share({
-          files: [file],
-          title: `Equipo de ${nombreTitular}`,
-          text: `🌳 Equipo de ${nombreTitular} — ${personaRaiz.nombre}\n${totalRama} personas · ${pctActivos}% activos`
-        });
-        compartido = true;
-        haptic(20);
-      } catch(e){
-        console.log('Share cancelado o falló:', e);
-      }
-    }
-    
-    // Si no se pudo compartir (o el user cancela), descargar
-    if(!compartido){
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = fileName;
-      a.click();
-      URL.revokeObjectURL(url);
-      haptic(15);
-      showToast('Imagen descargada 📥', 2000);
-    }
+    // Mostrar opciones al usuario
+    mostrarOpcionesExportacion({
+      canvas: canvas,
+      blob: blob,
+      formato: formato,
+      nombreTitular: nombreTitular,
+      personaRaiz: personaRaiz,
+      totalRama: totalRama,
+      pctActivos: pctActivos
+    });
     
   } catch(err){
     console.error('Error generando imagen:', err);
