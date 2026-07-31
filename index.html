@@ -5896,14 +5896,31 @@ function renderNodoExportNuevo(p){
   const esInactivo = pts === 0;
   const g = p.garantias || { presentadas: 0, vencidas: 0, pendientes: 0 };
   
-  // Determinar color del borde según categoría
+  // Color de fondo según categoría
+  let colorFondo = info.color;
   let colorBorde = info.color;
+  let esFondoOscuro = false;
+  
   if(info.color === '#ffffff'){
-    colorBorde = '#1c1c1e'; // Distribuidor: borde negro
+    // Distribuidor: fondo blanco con borde negro
+    colorFondo = '#ffffff';
+    colorBorde = '#1c1c1e';
+    esFondoOscuro = false;
   } else if(info.color === '#e8e8ec'){
-    colorBorde = '#b0b0ba'; // Junior: borde gris clarito
+    // Junior: fondo gris clarito
+    colorFondo = '#e8e8ec';
+    colorBorde = '#b0b0ba';
+    esFondoOscuro = false;
+  } else {
+    // Categorías con color: el fondo es el color de la categoría
+    colorFondo = info.color;
+    colorBorde = info.color;
+    // Determinar si el fondo es oscuro (para usar texto blanco)
+    esFondoOscuro = ['CE','LE','EJ','E'].includes((p.cat||'').toUpperCase());
   }
-  const estiloNodo = `border-color: ${colorBorde};`;
+  
+  const estiloNodo = `background: ${colorFondo}; border-color: ${colorBorde};`;
+  const claseOscura = esFondoOscuro ? 'dark-bg' : '';
   
   // Contenido del nodo (inactivo o activo)
   let contenidoInterno = '';
@@ -5917,9 +5934,9 @@ function renderNodoExportNuevo(p){
       <div class="exp-name">${escapeXml(p.nombre)}</div>
       <div class="exp-pb">PB: ${formatPB(pts)}</div>
       <div class="exp-garantias">
-        <div class="g-row vendidos">📄 ${formatPB(g.presentadas)} vendidos</div>
-        <div class="g-row vencidos">⚠️ ${formatPB(g.vencidas)} vencidos</div>
-        <div class="g-row adeudados">⏳ ${formatPB(g.pendientes)} adeudados</div>
+        <span class="g-row">📄 ${formatPB(g.presentadas)}</span>
+        <span class="g-row">⚠️ ${formatPB(g.vencidas)}</span>
+        <span class="g-row">⏳ ${formatPB(g.pendientes)}</span>
       </div>
     `;
   }
@@ -5927,7 +5944,7 @@ function renderNodoExportNuevo(p){
   // Construir el nodo completo
   let html = `
     <div class="org-node-wrap">
-      <div class="exp-node-new ${esInactivo ? 'inactive' : ''}" style="${estiloNodo}">
+      <div class="exp-node-new ${esInactivo ? 'inactive' : ''} ${claseOscura}" style="${estiloNodo}">
         ${contenidoInterno}
       </div>
       ${hasKids ? `<div class="org-children open">
