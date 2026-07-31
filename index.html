@@ -15,7 +15,8 @@
 
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+ 
 <style>
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body {
@@ -1686,6 +1687,72 @@
     background: rgba(60,70,110,0.5) !important;
   }
 
+    /* ============ NUEVO DISEÑO DE NODOS EXPORT ============ */
+  .exp-node-new {
+    display: flex; flex-direction: column; align-items: center;
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 10px 12px 12px;
+    min-width: 140px;
+    max-width: 180px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+    border: 1px solid rgba(0,0,0,0.08);
+    position: relative;
+  }
+  .exp-node-new.inactive {
+    opacity: 0.55;
+  }
+  .exp-node-new .exp-circle {
+    width: 54px; height: 54px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 900;
+    letter-spacing: 0.5px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+    margin-bottom: 8px;
+    border: 2px solid rgba(0,0,0,0.08);
+  }
+  .exp-node-new .exp-name {
+    font-size: 11px; font-weight: 800;
+    color: #1c1c1e;
+    text-align: center;
+    line-height: 1.25;
+    margin-bottom: 6px;
+    word-break: break-word;
+    max-width: 100%;
+  }
+  .exp-node-new .exp-pb {
+    font-size: 11px; font-weight: 700;
+    color: #3d63c9;
+    background: rgba(91,141,239,0.10);
+    padding: 3px 10px;
+    border-radius: 999px;
+    margin-bottom: 6px;
+  }
+  .exp-node-new .exp-garantias {
+    display: flex; flex-direction: column;
+    gap: 2px;
+    width: 100%;
+    padding-top: 6px;
+    border-top: 1px dashed rgba(0,0,0,0.12);
+    font-size: 10px;
+    font-weight: 600;
+    color: #3a3a48;
+  }
+  .exp-node-new .exp-garantias .g-row {
+    display: flex; align-items: center;
+    justify-content: center;
+    gap: 4px;
+    white-space: nowrap;
+  }
+  .exp-node-new .exp-garantias .g-row.vendidos { color: #1d7a5c; }
+  .exp-node-new .exp-garantias .g-row.vencidos { color: #d9534f; }
+  .exp-node-new .exp-garantias .g-row.adeudados { color: #a3670b; }
+  .exp-node-new .exp-inactive-label {
+    font-size: 10px;
+    color: #8a8a94;
+    font-style: italic;
+    font-weight: 600;
+  }
   .export-loading {
     position: fixed; inset: 0; z-index: 400;
     background: rgba(20,20,30,0.75);
@@ -4014,11 +4081,6 @@ function catBadgeStyle(info){
   const border = info.border === 'dashed' ? 'border:1.5px dashed #b0b0ba;' : (info.color === '#ffffff' ? 'border:1.5px solid #d0d0d8;' : '');
   return `background:${info.color};color:${textColor};${border}`;
 }
-function catBadgeStyle(info){
-  const textColor = info.textColor || '#fff';
-  const border = info.border === 'dashed' ? 'border:1.5px dashed #b0b0ba;' : (info.color === '#ffffff' ? 'border:1.5px solid #d0d0d8;' : '');
-  return `background:${info.color};color:${textColor};${border}`;
-}
 let equipoData = null;
 let equipoActiveTab = 'dashboard';
 let equipoTreeMode = 'lista';
@@ -5366,7 +5428,65 @@ function abrirSelectorPersona(){
 }
 
 // Genera la imagen del árbol de una persona específica
-async function generarImagenArbol(personaRaiz){
+// ============ NUEVO SISTEMA DE NODOS PARA EXPORTAR ============
+
+// Calcula el espaciado entre nodos según el tamaño del equipo
+function calcularEspaciadoDinamico(totalPersonas){
+  if(totalPersonas <= 10) return { horizontal: 30, vertical: 40 };
+  if(totalPersonas <= 30) return { horizontal: 20, vertical: 32 };
+  if(totalPersonas <= 80) return { horizontal: 12, vertical: 24 };
+  return { horizontal: 8, vertical: 20 };
+}
+
+// Genera el HTML de un nodo con el NUEVO diseño (círculo + datos)
+function renderNodoExportNuevo(p){
+  const info = catInfoOf(p.cat);
+  const hasKids = p.hijos && p.hijos.length > 0;
+  const pts = Number(p.pnAct) || 0;
+  const esInactivo = pts === 0;
+  const g = p.garantias || { presentadas: 0, vencidas: 0, pendientes: 0 };
+  
+  // Estilo del círculo con color de categoría
+  const textColor = info.textColor || '#fff';
+  const borderStyle = info.color === '#ffffff' 
+    ? 'border: 2px solid #1c1c1e;' 
+    : (info.border === 'dashed' ? 'border: 2px dashed #999;' : 'border: 2px solid rgba(0,0,0,0.12);');
+  const circleStyle = `background: ${info.color}; color: ${textColor}; ${borderStyle}`;
+  
+  // Contenido del nodo (inactivo o activo)
+  let contenidoInterno = '';
+  if(esInactivo){
+    contenidoInterno = `
+      <div class="exp-name">${escapeXml(p.nombre)}</div>
+      <div class="exp-inactive-label">💤 Inactivo</div>
+    `;
+  } else {
+    contenidoInterno = `
+      <div class="exp-name">${escapeXml(p.nombre)}</div>
+      <div class="exp-pb">PB: ${formatPB(pts)}</div>
+      <div class="exp-garantias">
+        <div class="g-row vendidos">📄 ${formatPB(g.presentadas)} vendidos</div>
+        <div class="g-row vencidos">⚠️ ${formatPB(g.vencidas)} vencidos</div>
+        <div class="g-row adeudados">⏳ ${formatPB(g.pendientes)} adeudados</div>
+      </div>
+    `;
+  }
+  
+  // Construir el nodo completo
+  let html = `
+    <div class="org-node-wrap">
+      <div class="exp-node-new ${esInactivo ? 'inactive' : ''}">
+        <div class="exp-circle" style="${circleStyle}">${info.name}</div>
+        ${contenidoInterno}
+      </div>
+      ${hasKids ? `<div class="org-children open">
+        ${p.hijos.map(h => `<div class="org-child-wrap">${renderNodoExportNuevo(h)}</div>`).join('')}
+      </div>` : ''}
+    </div>
+  `;
+  return html;
+}
+ async function generarImagenArbol(personaRaiz){
   const desc = contarDescendientes(personaRaiz);
   const totalPers = desc + 1;
   
