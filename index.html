@@ -5681,16 +5681,13 @@ async function generarPdfPoster(canvasOriginal, filas, columnas, nombreArchivo){
     format: [A4_ANCHO_PX, A4_ALTO_PX]
   });
   
-  // Primera página: guía de ensamblaje
-  const guia = generarGuiaEnsamblaje(canvasOriginal, filas, columnas);
-  pdf.addImage(guia.toDataURL('image/jpeg', 0.92), 'JPEG', 0, 0, A4_ANCHO_PX, A4_ALTO_PX);
-  
-  // Dividir la imagen en hojas
+    // Dividir la imagen en hojas y agregarlas al PDF
   const hojas = dividirImagenEnHojas(canvasOriginal, filas, columnas);
   
-  // Agregar cada hoja como página nueva
   for(let i = 0; i < hojas.length; i++){
-    pdf.addPage([A4_ANCHO_PX, A4_ALTO_PX], 'landscape');
+    if(i > 0){
+      pdf.addPage([A4_ANCHO_PX, A4_ALTO_PX], 'landscape');
+    }
     pdf.addImage(hojas[i].toDataURL('image/jpeg', 0.92), 'JPEG', 0, 0, A4_ANCHO_PX, A4_ALTO_PX);
   }
   
