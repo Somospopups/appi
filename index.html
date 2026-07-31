@@ -4635,7 +4635,12 @@ ${(function(){
 }
 function renderEquipoArbol(){
   const cont = document.getElementById('equipoContent');
-  cont.innerHTML = `<div id="treeContainer">${renderTreeListaHTML()}</div>`;
+  const titulo = `<div style="display:flex;align-items:center;gap:10px;margin:8px 4px 12px">
+    <div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(80,90,130,0.25),transparent)"></div>
+    <h3 style="margin:0;font-size:12px;font-weight:800;color:#5c5c66;letter-spacing:2px;text-transform:uppercase">🌳 Equipo Base</h3>
+    <div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(80,90,130,0.25),transparent)"></div>
+  </div>`;
+  cont.innerHTML = titulo + `<div id="treeContainer">${renderTreeListaHTML()}</div>`;
   bindTreeEvents();
 }
 function renderTreeListaHTML(){
