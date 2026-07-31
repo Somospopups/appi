@@ -4068,6 +4068,8 @@ function renderEquipo(){
   }
   tabsWrap.style.display = 'flex';
   bottomActs.style.display = equipoActiveTab === 'dashboard' ? 'none' : 'flex';
+  const btnReload = document.getElementById('btnEquipoReload');
+  if(btnReload) btnReload.style.display = 'none';
   if(dangerActs) dangerActs.style.display = 'flex';
   document.getElementById('equipoSubtitle').textContent = `${equipoData.personas.length} personas · ${equipoData.titular.nombre || equipoData.titular.dip || 'Tu equipo'}`;
  const fileInfoEl = document.getElementById('equipoFileInfo');
