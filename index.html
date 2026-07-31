@@ -4429,10 +4429,13 @@ function renderEquipoDashboard(){
         const cnt = porCat[c];
         const pct = maxCat > 0 ? (cnt/maxCat)*100 : 0;
         return `
+        const barColor = info.color === '#ffffff' ? '#c0c0c8' : info.color;
+        const barTextColor = info.textColor || '#fff';
+        return `
         <div class="cat-bar-row clickable" data-goto="${c}">
           <div class="cb-name">${info.name}</div>
           <div class="cb-bar-wrap">
-            <div class="cb-bar" style="width:${pct}%; background:linear-gradient(135deg,${info.color},${info.color}cc)">${cnt}</div>
+            <div class="cb-bar" style="width:${pct}%; background:${barColor}; color:${barTextColor}">${cnt}</div>
           </div>
           <div class="cb-count">${cnt}</div>
         </div>`;
