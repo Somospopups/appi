@@ -5701,12 +5701,14 @@ function renderNodoExportNuevo(p){
   const esInactivo = pts === 0;
   const g = p.garantias || { presentadas: 0, vencidas: 0, pendientes: 0 };
   
-  // Estilo del círculo con color de categoría
-  const textColor = info.textColor || '#fff';
-  const borderStyle = info.color === '#ffffff' 
-    ? 'border: 2px solid #1c1c1e;' 
-    : (info.border === 'dashed' ? 'border: 2px dashed #999;' : 'border: 2px solid rgba(0,0,0,0.12);');
-  const circleStyle = `background: ${info.color}; color: ${textColor}; ${borderStyle}`;
+  // Determinar color del borde según categoría
+  let colorBorde = info.color;
+  if(info.color === '#ffffff'){
+    colorBorde = '#1c1c1e'; // Distribuidor: borde negro
+  } else if(info.color === '#e8e8ec'){
+    colorBorde = '#b0b0ba'; // Junior: borde gris clarito
+  }
+  const estiloNodo = `border-color: ${colorBorde};`;
   
   // Contenido del nodo (inactivo o activo)
   let contenidoInterno = '';
@@ -5730,8 +5732,7 @@ function renderNodoExportNuevo(p){
   // Construir el nodo completo
   let html = `
     <div class="org-node-wrap">
-      <div class="exp-node-new ${esInactivo ? 'inactive' : ''}">
-        <div class="exp-circle" style="${circleStyle}">${info.name}</div>
+      <div class="exp-node-new ${esInactivo ? 'inactive' : ''}" style="${estiloNodo}">
         ${contenidoInterno}
       </div>
       ${hasKids ? `<div class="org-children open">
