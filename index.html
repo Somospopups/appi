@@ -5479,6 +5479,209 @@ function calcularMejorGrillaPoster(anchoImagen, altoImagen){
   return detectarFormato(anchoImagen, altoImagen);
 }
 
+ // ============ GENERAR PDF MULTIPÁGINA (PÓSTER) ============
+
+// Divide un canvas grande en varios canvas pequeños (hojas)
+function dividirImagenEnHojas(canvasOriginal, filas, columnas){
+  const anchoUtil = A4_ANCHO_PX - (MARGEN_HOJA_PX * 2);
+  const altoUtil = A4_ALTO_PX - (MARGEN_HOJA_PX * 2);
+  
+  // Escalar imagen para que ocupe exactamente el espacio disponible
+  const anchoTotal = anchoUtil * columnas;
+  const altoTotal = altoUtil * filas;
+  
+  const hojas = [];
+  
+  for(let fila = 0; fila < filas; fila++){
+    for(let col = 0; col < columnas; col++){
+      const canvasHoja = document.createElement('canvas');
+      canvasHoja.width = A4_ANCHO_PX;
+      canvasHoja.height = A4_ALTO_PX;
+      const ctx = canvasHoja.getContext('2d');
+      
+      // Fondo blanco
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, A4_ANCHO_PX, A4_ALTO_PX);
+      
+      // Calcular qué parte de la imagen original va en esta hoja
+      const srcX = col * (canvasOriginal.width / columnas);
+      const srcY = fila * (canvasOriginal.height / filas);
+      const srcW = canvasOriginal.width / columnas;
+      const srcH = canvasOriginal.height / filas;
+      
+      // Dibujar la porción correspondiente
+      ctx.drawImage(
+        canvasOriginal,
+        srcX, srcY, srcW, srcH,
+        MARGEN_HOJA_PX, MARGEN_HOJA_PX, anchoUtil, altoUtil
+      );
+      
+      // Agregar marcas de corte
+      agregarMarcasDeCorte(ctx, fila, col, filas, columnas);
+      
+      // Agregar numeración de hoja
+      const numeroHoja = (fila * columnas) + col + 1;
+      const totalHojas = filas * columnas;
+      agregarNumeracionHoja(ctx, numeroHoja, totalHojas, fila, col);
+      
+      hojas.push(canvasHoja);
+    }
+  }
+  
+  return hojas;
+}
+
+// Agrega marcas de corte a una hoja
+function agregarMarcasDeCorte(ctx, fila, col, totalFilas, totalColumnas){
+  ctx.strokeStyle = '#888';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([5, 5]);
+  
+  const largo = 20;
+  const m = MARGEN_HOJA_PX;
+  
+  // Esquinas de corte (siempre se dibujan)
+  ctx.beginPath();
+  // Esquina superior izquierda
+  ctx.moveTo(m - largo, m); ctx.lineTo(m + largo, m);
+  ctx.moveTo(m, m - largo); ctx.lineTo(m, m + largo);
+  // Esquina superior derecha
+  ctx.moveTo(A4_ANCHO_PX - m - largo, m); ctx.lineTo(A4_ANCHO_PX - m + largo, m);
+  ctx.moveTo(A4_ANCHO_PX - m, m - largo); ctx.lineTo(A4_ANCHO_PX - m, m + largo);
+  // Esquina inferior izquierda
+  ctx.moveTo(m - largo, A4_ALTO_PX - m); ctx.lineTo(m + largo, A4_ALTO_PX - m);
+  ctx.moveTo(m, A4_ALTO_PX - m - largo); ctx.lineTo(m, A4_ALTO_PX - m + largo);
+  // Esquina inferior derecha
+  ctx.moveTo(A4_ANCHO_PX - m - largo, A4_ALTO_PX - m); ctx.lineTo(A4_ANCHO_PX - m + largo, A4_ALTO_PX - m);
+  ctx.moveTo(A4_ANCHO_PX - m, A4_ALTO_PX - m - largo); ctx.lineTo(A4_ANCHO_PX - m, A4_ALTO_PX - m + largo);
+  ctx.stroke();
+  ctx.setLineDash([]);
+}
+
+// Agrega la numeración de página en cada hoja
+function agregarNumeracionHoja(ctx, numero, total, fila, col){
+  ctx.font = 'bold 20px Arial, sans-serif';
+  ctx.fillStyle = '#666';
+  ctx.textAlign = 'center';
+  ctx.fillText(`Hoja ${numero} de ${total}  (Fila ${fila+1}, Col ${col+1})`, A4_ANCHO_PX / 2, A4_ALTO_PX - 20);
+}
+
+// Genera una hoja de guía de ensamblaje
+function generarGuiaEnsamblaje(canvasOriginal, filas, columnas){
+  const canvasGuia = document.createElement('canvas');
+  canvasGuia.width = A4_ANCHO_PX;
+  canvasGuia.height = A4_ALTO_PX;
+  const ctx = canvasGuia.getContext('2d');
+  
+  // Fondo blanco
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, A4_ANCHO_PX, A4_ALTO_PX);
+  
+  // Título
+  ctx.fillStyle = '#1c1c1e';
+  ctx.font = 'bold 40px Arial, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('📋 GUÍA DE ENSAMBLAJE', A4_ANCHO_PX / 2, 80);
+  
+  ctx.font = '22px Arial, sans-serif';
+  ctx.fillStyle = '#666';
+  ctx.fillText(`Este póster está compuesto por ${filas * columnas} hojas A4`, A4_ANCHO_PX / 2, 130);
+  ctx.fillText(`Ordenalas en ${filas} fila(s) x ${columnas} columna(s)`, A4_ANCHO_PX / 2, 165);
+  
+  // Dibujar miniatura del póster con la grilla
+  const miniAncho = 900;
+  const miniAlto = (canvasOriginal.height / canvasOriginal.width) * miniAncho;
+  const miniX = (A4_ANCHO_PX - miniAncho) / 2;
+  const miniY = 220;
+  
+  ctx.drawImage(canvasOriginal, miniX, miniY, miniAncho, miniAlto);
+  
+  // Dibujar líneas de división
+  ctx.strokeStyle = '#5b8def';
+  ctx.lineWidth = 3;
+  ctx.setLineDash([10, 5]);
+  
+  for(let c = 1; c < columnas; c++){
+    const x = miniX + (miniAncho / columnas) * c;
+    ctx.beginPath();
+    ctx.moveTo(x, miniY);
+    ctx.lineTo(x, miniY + miniAlto);
+    ctx.stroke();
+  }
+  for(let f = 1; f < filas; f++){
+    const y = miniY + (miniAlto / filas) * f;
+    ctx.beginPath();
+    ctx.moveTo(miniX, y);
+    ctx.lineTo(miniX + miniAncho, y);
+    ctx.stroke();
+  }
+  ctx.setLineDash([]);
+  
+  // Numerar cada sección
+  ctx.font = 'bold 48px Arial, sans-serif';
+  ctx.fillStyle = 'rgba(91,141,239,0.85)';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  
+  for(let f = 0; f < filas; f++){
+    for(let c = 0; c < columnas; c++){
+      const numero = (f * columnas) + c + 1;
+      const cx = miniX + (miniAncho / columnas) * c + (miniAncho / columnas) / 2;
+      const cy = miniY + (miniAlto / filas) * f + (miniAlto / filas) / 2;
+      
+      // Círculo blanco de fondo
+      ctx.fillStyle = 'rgba(255,255,255,0.95)';
+      ctx.beginPath();
+      ctx.arc(cx, cy, 35, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Número
+      ctx.fillStyle = '#5b8def';
+      ctx.fillText(numero, cx, cy);
+    }
+  }
+  
+  // Instrucciones al pie
+  ctx.font = '18px Arial, sans-serif';
+  ctx.fillStyle = '#666';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillText('Imprimí las hojas siguientes en tamaño A4 y unilas siguiendo las marcas de corte', A4_ANCHO_PX / 2, A4_ALTO_PX - 50);
+  ctx.fillText('Generado con APPI 🚀', A4_ANCHO_PX / 2, A4_ALTO_PX - 20);
+  
+  return canvasGuia;
+}
+
+// Genera el PDF final con todas las páginas
+async function generarPdfPoster(canvasOriginal, filas, columnas, nombreArchivo){
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF({
+    orientation: 'landscape',
+    unit: 'px',
+    format: [A4_ANCHO_PX, A4_ALTO_PX]
+  });
+  
+  // Primera página: guía de ensamblaje
+  const guia = generarGuiaEnsamblaje(canvasOriginal, filas, columnas);
+  pdf.addImage(guia.toDataURL('image/jpeg', 0.92), 'JPEG', 0, 0, A4_ANCHO_PX, A4_ALTO_PX);
+  
+  // Dividir la imagen en hojas
+  const hojas = dividirImagenEnHojas(canvasOriginal, filas, columnas);
+  
+  // Agregar cada hoja como página nueva
+  for(let i = 0; i < hojas.length; i++){
+    pdf.addPage([A4_ANCHO_PX, A4_ALTO_PX], 'landscape');
+    pdf.addImage(hojas[i].toDataURL('image/jpeg', 0.92), 'JPEG', 0, 0, A4_ANCHO_PX, A4_ALTO_PX);
+  }
+  
+  // Guardar el PDF
+  const pdfBlob = pdf.output('blob');
+  return {
+    blob: pdfBlob,
+    file: new File([pdfBlob], nombreArchivo, { type: 'application/pdf' })
+  };
+}
+
 // Genera el HTML de un nodo con el NUEVO diseño (círculo + datos)
 function renderNodoExportNuevo(p){
   const info = catInfoOf(p.cat);
