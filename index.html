@@ -5815,77 +5815,40 @@ function mostrarOpcionesExportacion(datos){
 
 // Procesa la exportación según el modo elegido
 async function procesarExportacion(datos){
-  const { modo, canvas, blob, formato, nombreBase, nombreTitular, personaRaiz, totalRama, pctActivos } = datos;
+  const { modo, canvas, blob, nombreBase, nombreTitular, personaRaiz, totalRama, pctActivos } = datos;
   
-  // Loading
-  const loading = document.createElement('div');
-  loading.className = 'export-loading show';
-  loading.innerHTML = `<div class="spinner"></div><div class="msg">${formato.tipo === 'A4' ? 'Preparando imagen…' : 'Generando PDF…'}</div>`;
-  document.body.appendChild(loading);
+  const fileName = `${nombreBase}.png`;
+  const file = new File([blob], fileName, { type: 'image/png' });
+  const mensajeCompartir = `🌳 Equipo de ${nombreTitular} — ${personaRaiz.nombre}\n${totalRama} personas · ${pctActivos}% activos`;
   
-  await new Promise(r => setTimeout(r, 100));
-  
-  try {
-    let fileName, fileBlob, fileType, mensajeCompartir;
-    
-    if(formato.tipo === 'A4'){
-      // A4: usar la imagen PNG original
-      fileName = `${nombreBase}.png`;
-      fileBlob = blob;
-      fileType = 'image/png';
-      mensajeCompartir = `🌳 Equipo de ${nombreTitular} — ${personaRaiz.nombre}\n${totalRama} personas · ${pctActivos}% activos`;
-    } else {
-      // PÓSTER: generar PDF multipágina
-      fileName = `${nombreBase}_Poster_${formato.totalHojas}hojas.pdf`;
-      const pdfResult = await generarPdfPoster(canvas, formato.filas, formato.columnas, fileName);
-      fileBlob = pdfResult.blob;
-      fileType = 'application/pdf';
-      mensajeCompartir = `🌳 Póster del equipo de ${nombreTitular}\n\n📄 ${personaRaiz.nombre}\n${totalRama} personas · ${pctActivos}% activos\n🖼️ Para imprimir en ${formato.totalHojas} hojas A4 (${formato.filas}×${formato.columnas})`;
-    }
-    
-    const file = new File([fileBlob], fileName, { type: fileType });
-    
-    loading.remove();
-    
-    if(modo === 'whatsapp'){
-      // Compartir por WhatsApp / Share nativo
-      let compartido = false;
-      if(navigator.canShare && navigator.canShare({ files: [file] })){
-        try {
-          await navigator.share({
-            files: [file],
-            title: `Equipo de ${nombreTitular}`,
-            text: mensajeCompartir
-          });
-          compartido = true;
-          haptic(20);
-        } catch(e){
-          console.log('Share cancelado:', e);
-        }
+  if(modo === 'whatsapp'){
+    // Compartir por WhatsApp / Share nativo
+    let compartido = false;
+    if(navigator.canShare && navigator.canShare({ files: [file] })){
+      try {
+        await navigator.share({
+          files: [file],
+          title: `Equipo de ${nombreTitular}`,
+          text: mensajeCompartir
+        });
+        compartido = true;
+        haptic(20);
+      } catch(e){
+        console.log('Share cancelado:', e);
       }
-      // Fallback: descargar
-      if(!compartido){
-        descargarArchivo(fileBlob, fileName);
-        showToast('Archivo descargado — compartilo desde tu galería', 3000);
-      }
-    } else {
-      // Descargar directo
-      descargarArchivo(fileBlob, fileName);
-      haptic(15);
-      showToast(formato.tipo === 'A4' ? 'Imagen descargada 📥' : 'PDF descargado 📥', 2000);
     }
-    
-  } catch(err){
-    console.error('Error en exportación:', err);
-    loading.remove();
-    modal.open({
-      icon: '⚠️',
-      title: 'Error al exportar',
-      html: `<p>No se pudo generar el archivo.</p><div class="tip">Detalle: ${escapeXml(err.message || 'Error desconocido')}</div>`
-    });
+    // Fallback: descargar
+    if(!compartido){
+      descargarArchivo(blob, fileName);
+      showToast('Imagen descargada — compartila desde tu galería', 3000);
+    }
+  } else {
+    // Descargar directo
+    descargarArchivo(blob, fileName);
+    haptic(15);
+    showToast('Imagen descargada 📥', 2000);
   }
 }
-
 // Helper: descargar un blob como archivo
 function descargarArchivo(blob, fileName){
   const url = URL.createObjectURL(blob);
