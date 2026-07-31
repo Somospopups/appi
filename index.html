@@ -74,7 +74,68 @@
     cursor: pointer; font-size: 18px; color: #3d63c9;
     font-weight: 700; line-height: 1;
   }
-
+  .help-btn.pulse-hint {
+    animation: helpPulse 1.5s ease-in-out infinite;
+  }
+  @keyframes helpPulse {
+    0%, 100% { 
+      box-shadow: 0 0 0 0 rgba(91,141,239,0.6);
+      transform: scale(1);
+    }
+    50% { 
+      box-shadow: 0 0 0 12px rgba(91,141,239,0);
+      transform: scale(1.08);
+    }
+  }
+  .help-tooltip {
+    position: absolute;
+    right: 44px;
+    top: 12px;
+    background: linear-gradient(135deg, #5b8def, #a06bff);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 6px 12px;
+    border-radius: 999px;
+    white-space: nowrap;
+    box-shadow: 0 4px 12px rgba(91,141,239,0.4);
+    opacity: 0;
+    transform: translateX(10px);
+    animation: tooltipShow 0.4s ease forwards, tooltipHide 0.4s ease 3s forwards;
+    pointer-events: none;
+    z-index: 10;
+  }
+  .help-tooltip::after {
+    content: '';
+    position: absolute;
+    right: -6px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0; height: 0;
+    border-top: 6px solid transparent;
+    border-bottom: 6px solid transparent;
+    border-left: 6px solid #a06bff;
+  }
+  @keyframes tooltipShow {
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  @keyframes tooltipHide {
+    from {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateX(10px);
+    }
+  }
+  body.dark .help-tooltip {
+    box-shadow: 0 4px 12px rgba(160,107,255,0.5);
+  }
+ 
   header.top.home-header { margin-bottom: 16px; }
   header.top.home-header h1 { font-size: 24px; }
   header.top.home-header .script { font-size: 30px; }
