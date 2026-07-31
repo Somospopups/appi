@@ -5536,6 +5536,9 @@ function renderNodoExportNuevo(p){
     // Render de nodos (todos expandidos)
        const renderNodoExport = (p) => renderNodoExportNuevo(p);    
     const fechaHoy = new Date().toLocaleDateString('es-AR', { day:'numeric', month:'long', year:'numeric' });
+
+       // Calcular espaciado dinámico según tamaño del equipo
+    const espaciado = calcularEspaciadoDinamico(totalRama);
     
     renderEl.innerHTML = `
       <div class="exp-header">
@@ -5546,7 +5549,7 @@ function renderNodoExportNuevo(p){
         </div>
       </div>
       <div style="display:inline-block; min-width:100%;">
-        <div style="display:flex; flex-direction:column; align-items:center; gap:12px;">
+         <div style="display:flex; flex-direction:column; align-items:center; gap:${espaciado.vertical}px;">
           ${renderNodoExport(personaRaiz)}
         </div>
       </div>
