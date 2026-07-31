@@ -1318,6 +1318,31 @@
     transform: translateX(4px);
     box-shadow: 0 4px 14px rgba(80,90,130,0.12);
   }
+ body.dark .tree-node {
+    background: rgba(255,255,255,0.05);
+    border-color: rgba(255,255,255,0.08);
+  }
+  body.dark .tree-node:hover {
+    background: rgba(255,255,255,0.10);
+  }
+  body.dark .tree-node .tree-name {
+    color: #e8e8ec;
+  }
+  body.dark .tree-node .tree-pts {
+    color: #a8b8ff;
+    background: rgba(91,141,239,0.15);
+  }
+  body.dark .tree-node .tree-pts.zero {
+    color: #6b6b76;
+    background: rgba(160,160,176,0.08);
+  }
+  body.dark .tree-list {
+    background: rgba(255,255,255,0.03);
+    border-color: rgba(255,255,255,0.08);
+  }
+  body.dark .tree-children {
+    border-left-color: rgba(255,255,255,0.15);
+  }
   .tree-node .tree-arrow {
     width: 18px; text-align: center;
     font-size: 11px;
