@@ -1431,14 +1431,22 @@
     padding: 6px 4px;
   }
   .org-node {
-    padding: 8px 12px; border-radius: 12px;
-    background: linear-gradient(135deg, #fff, rgba(255,255,255,0.85));
-    border: 2px solid rgba(80,90,130,0.15);
-    min-width: 120px; text-align: center;
-    box-shadow: 0 3px 10px rgba(80,90,130,0.10);
+    padding: 12px 14px;
+    border-radius: 20px;
+    background: var(--nodeBg, #ffffff);
+    color: var(--nodeText, #1c1c1e);
+    border: var(--nodeBorder, 2px solid rgba(0,0,0,0.15));
+    min-width: 110px;
+    max-width: 150px;
+    text-align: center;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.10);
     cursor: pointer;
-    transition: transform .15s ease;
+    transition: transform 0.15s ease, box-shadow 0.2s ease;
     position: relative;
+  }
+  .org-node:hover {
+    box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+    transform: translateY(-2px);
   }
   .org-node:active { transform: scale(0.97); }
   .org-node.selected {
@@ -4928,14 +4936,25 @@ function renderTreeNodeOrg(p){
   const totalDesc = contarDescendientes(p);
   const g = p.garantias;
   const tieneGarantias = g && (g.presentadas > 0 || g.pendientes > 0);
+  
+  // Colores según categoría
+  const nodeBg = info.color;
+  const nodeText = info.textColor || '#1c1c1e';
+  const nodeBorder = info.border === 'solid' ? '2px solid #1c1c1e' : '2px solid rgba(0,0,0,0.15)';
+  const nodeStyle = `--nodeBg:${nodeBg};--nodeText:${nodeText};--nodeBorder:${nodeBorder}`;
+  
+  // Color para separador de garantías (contraste con el fondo)
+  const isDarkBg = ['CE','LE','EJ','E'].includes((p.cat||'').toUpperCase());
+  const garantiaBorderColor = isDarkBg ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.20)';
+  const garantiaTextColor = isDarkBg ? 'rgba(255,255,255,0.95)' : '#1c1c1e';
+  
   let html = `
     <div class="org-node-wrap">
-      <div class="org-node" data-pid="${p.id}">
+      <div class="org-node" data-pid="${p.id}" style="${nodeStyle}">
         ${totalDesc > 0 ? `<span class="on-count">${totalDesc}</span>` : ''}
-        <span class="on-cat-badge" style="${catBadgeStyle(info)}">${info.name}</span>
-        <div class="on-name">${escapeXml(p.nombre)}</div>
-        <div class="on-pts">${formatPB(pts)} PB</div>
-        ${tieneGarantias ? `<div style="margin-top:4px;padding-top:4px;border-top:1px dashed rgba(80,90,130,0.25);font-size:9.5px;font-weight:600;color:#a3670b;line-height:1.4">📄 ${formatPB(g.presentadas)}<br/>⚠️ ${formatPB(g.vencidas)} (${formatPB(g.porcVencidas)}%)<br/>⏳ ${formatPB(g.pendientes)}</div>` : ''}
+        <div class="on-name" style="font-weight:700;font-size:11.5px;line-height:1.25;margin-bottom:3px">${escapeXml(p.nombre)}</div>
+        <div class="on-pts" style="font-size:11px;font-weight:600;opacity:0.9">${info.name} · ${formatPB(pts)} PB</div>
+        ${tieneGarantias ? `<div style="margin-top:5px;padding-top:5px;border-top:1px dashed ${garantiaBorderColor};font-size:9.5px;font-weight:600;color:${garantiaTextColor};line-height:1.4">📄 ${formatPB(g.presentadas)}<br/>⚠️ ${formatPB(g.vencidas)} (${formatPB(g.porcVencidas)}%)<br/>⏳ ${formatPB(g.pendientes)}</div>` : ''}
       </div>
       ${hasKids ? `<div class="org-children ${isExpanded?'open':''}">
         ${p.hijos.map(h=>`<div class="org-child-wrap">${renderTreeNodeOrg(h)}</div>`).join('')}
@@ -4944,7 +4963,7 @@ function renderTreeNodeOrg(p){
   `;
   return html;
 }
-function contarDescendientes(p){
+ function contarDescendientes(p){
   let c = 0;
   (p.hijos||[]).forEach(h=>{ c += 1 + contarDescendientes(h); });
   return c;
