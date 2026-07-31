@@ -4922,7 +4922,7 @@ function openPersonaModal(p){
   
   const html = `<div class="person-modal-body">
     <div class="pm-row"><span class="pm-lbl">N° de Distribuidor</span><span class="pm-val">${escapeXml(p.codigo||'—')}</span></div>
-    <div class="pm-row"><span class="pm-lbl">Categoría</span><span class="pm-val" style="color:${info.color}">${info.full}</span></div>
+    <div class="pm-row"><span class="pm-lbl">Categoría</span><span class="pm-val"><span style="${catBadgeStyle(info)};padding:3px 10px;border-radius:8px;font-size:11px;font-weight:800;letter-spacing:0.3px;margin-right:6px">${info.name}</span>${info.full}</span></div>
     <div class="pm-row"><span class="pm-lbl">Estado</span><span class="pm-val">${p.estado || '—'}</span></div>
         <div class="pm-row" style="background:rgba(91,141,239,0.08); margin:6px -6px; padding:10px 12px; border-radius:8px; border-bottom:none"><span class="pm-lbl">👤 PB Personal</span><span class="pm-val" style="color:#3d63c9; font-size:15px">${formatPB(p.pnAct)}</span></div>
     ${(function(){
