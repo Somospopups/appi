@@ -5451,29 +5451,49 @@ function detectarFormato(anchoImagen, altoImagen){
   const anchoUtil = A4_ANCHO_PX - (MARGEN_HOJA_PX * 2);
   const altoUtil = A4_ALTO_PX - (MARGEN_HOJA_PX * 2);
   
-  if(anchoImagen <= anchoUtil && altoImagen <= altoUtil){
-    return { tipo: 'A4', columnas: 1, filas: 1, totalHojas: 1 };
+  // Opciones de grilla ordenadas por cantidad de hojas (menor a mayor)
+  // Máximo 4 hojas para mantener la calidad y facilidad de armado
+  const opcionesGrilla = [
+    { filas: 1, columnas: 1, total: 1 },   // 1 hoja A4
+    { filas: 1, columnas: 2, total: 2 },   // 2 hojas horizontal
+    { filas: 2, columnas: 1, total: 2 },   // 2 hojas vertical
+    { filas: 2, columnas: 2, total: 4 }    // 4 hojas 2x2
+  ];
+  
+  // Buscar la primera grilla donde la imagen entre con buena calidad
+  for(const opcion of opcionesGrilla){
+    const anchoDisponible = anchoUtil * opcion.columnas;
+    const altoDisponible = altoUtil * opcion.filas;
+    
+    // Calcular escala necesaria para que entre
+    const escalaAncho = anchoDisponible / anchoImagen;
+    const escalaAlto = altoDisponible / altoImagen;
+    const escalaFinal = Math.min(escalaAncho, escalaAlto);
+    
+    // Si la escala es >= 0.35 los nodos son legibles
+    if(escalaFinal >= 0.35){
+      if(opcion.total === 1){
+        return { tipo: 'A4', columnas: 1, filas: 1, totalHojas: 1, escala: escalaFinal };
+      }
+      return {
+        tipo: 'POSTER',
+        columnas: opcion.columnas,
+        filas: opcion.filas,
+        totalHojas: opcion.total,
+        escala: escalaFinal
+      };
+    }
   }
   
-  // Calcular cuántas hojas necesitamos
-  const columnasNecesarias = Math.ceil(anchoImagen / anchoUtil);
-  const filasNecesarias = Math.ceil(altoImagen / altoUtil);
-  
-  // Ajustar para que siempre sean números pares (excepto 1)
-  let columnas = columnasNecesarias;
-  let filas = filasNecesarias;
-  
-  if(columnas > 1 && columnas % 2 !== 0) columnas++;
-  if(filas > 1 && filas % 2 !== 0) filas++;
-  
+  // Si nada entra bien, forzar 2x2 (4 hojas) con escala automática
   return {
     tipo: 'POSTER',
-    columnas: columnas,
-    filas: filas,
-    totalHojas: columnas * filas
+    columnas: 2,
+    filas: 2,
+    totalHojas: 4,
+    escala: Math.min((anchoUtil * 2) / anchoImagen, (altoUtil * 2) / altoImagen)
   };
 }
-
 // Calcula la mejor grilla de póster minimizando hojas
 function calcularMejorGrillaPoster(anchoImagen, altoImagen){
   return detectarFormato(anchoImagen, altoImagen);
