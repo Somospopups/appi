@@ -5499,6 +5499,183 @@ function calcularMejorGrillaPoster(anchoImagen, altoImagen){
   return detectarFormato(anchoImagen, altoImagen);
 }
 
+ // ============ SISTEMA DE DIVISIÓN POR RAMAS ============
+
+// Calcula cuántas hojas necesita una rama según su tamaño
+function estimarTamañoRama(persona){
+  const totalDesc = contarDescendientes(persona) + 1;
+  // Aproximado: cuántas personas caben cómodamente en una hoja A4
+  // Con nodos de 220x200 y márgenes, entran ~30 personas por hoja
+  const personasPorHoja = 30;
+  return Math.ceil(totalDesc / personasPorHoja);
+}
+
+// Agrupa ramas chicas que pueden compartir hoja
+function agruparRamas(raices){
+  const grupos = [];
+  let grupoActual = [];
+  let personasEnGrupo = 0;
+  const MAX_PERSONAS_POR_HOJA = 30;
+  
+  raices.forEach(rama => {
+    const totalRama = contarDescendientes(rama) + 1;
+    
+    // Si esta rama sola necesita más de 1 hoja, va sola
+    if(totalRama > MAX_PERSONAS_POR_HOJA){
+      if(grupoActual.length > 0){
+        grupos.push(grupoActual);
+        grupoActual = [];
+        personasEnGrupo = 0;
+      }
+      grupos.push([rama]);
+      return;
+    }
+    
+    // Si agregar esta rama supera el límite, cerramos el grupo actual
+    if(personasEnGrupo + totalRama > MAX_PERSONAS_POR_HOJA && grupoActual.length > 0){
+      grupos.push(grupoActual);
+      grupoActual = [];
+      personasEnGrupo = 0;
+    }
+    
+    grupoActual.push(rama);
+    personasEnGrupo += totalRama;
+  });
+  
+  if(grupoActual.length > 0){
+    grupos.push(grupoActual);
+  }
+  
+  return grupos;
+}
+
+// Genera el HTML de una hoja con una o varias ramas
+function generarHtmlHoja(ramas, numeroHoja, totalHojas, nombreTitular){
+  const totalPersonas = ramas.reduce((s, r) => s + contarDescendientes(r) + 1, 0);
+  const activos = ramas.reduce((s, r) => {
+    let count = 0;
+    const contar = (p) => {
+      if((p.pnAct || 0) > 0) count++;
+      (p.hijos || []).forEach(contar);
+    };
+    contar(r);
+    return s + count;
+  }, 0);
+  const pctActivos = totalPersonas ? Math.round((activos / totalPersonas) * 100) : 0;
+  
+  // Título de la hoja
+  let titulo;
+  if(ramas.length === 1){
+    titulo = `Rama: ${ramas[0].nombre}`;
+  } else {
+    const nombres = ramas.map(r => r.nombre.split(',')[0].trim()).join(' + ');
+    titulo = `Ramas: ${nombres}`;
+  }
+  
+  const fechaHoy = new Date().toLocaleDateString('es-AR', { day:'numeric', month:'long', year:'numeric' });
+  
+  return `
+    <div class="exp-header">
+      <div class="exp-title">📄 ${escapeXml(titulo)}</div>
+      <div class="exp-name">Equipo de ${escapeXml(nombreTitular)}</div>
+      <div class="exp-meta">
+        📅 ${fechaHoy} · <strong>${totalPersonas}</strong> personas · <strong>${pctActivos}%</strong> activos
+      </div>
+    </div>
+    <div style="display:inline-block; min-width:100%;">
+      <div style="display:flex; flex-direction:row; align-items:flex-start; justify-content:center; gap:40px; flex-wrap:wrap;">
+        ${ramas.map(r => `<div style="display:flex; flex-direction:column; align-items:center;">${renderNodoExportNuevo(r)}</div>`).join('')}
+      </div>
+    </div>
+    <div class="exp-footer">
+      Hoja ${numeroHoja} de ${totalHojas} · Generado desde APPI 🚀
+    </div>
+  `;
+}
+
+// Genera una imagen de una hoja específica
+async function generarImagenHoja(htmlHoja){
+  // Crear contenedor temporal
+  let renderEl = document.getElementById('exportRender');
+  if(renderEl) renderEl.remove();
+  renderEl = document.createElement('div');
+  renderEl.id = 'exportRender';
+  renderEl.innerHTML = htmlHoja;
+  document.body.appendChild(renderEl);
+  
+  await new Promise(r => setTimeout(r, 200));
+  
+  const anchoRender = renderEl.scrollWidth;
+  const altoRender = renderEl.scrollHeight;
+  
+  // Escala inteligente
+  const MAX_CANVAS = 14000;
+  let scaleFinal = 3;
+  if(anchoRender * scaleFinal > MAX_CANVAS || altoRender * scaleFinal > MAX_CANVAS){
+    scaleFinal = Math.min(MAX_CANVAS / anchoRender, MAX_CANVAS / altoRender);
+    scaleFinal = Math.max(1, Math.min(scaleFinal, 3));
+  }
+  
+  const canvas = await html2canvas(renderEl, {
+    backgroundColor: '#ffffff',
+    scale: scaleFinal,
+    logging: false,
+    useCORS: true,
+    allowTaint: true,
+    imageTimeout: 0,
+    removeContainer: false,
+    width: anchoRender,
+    height: altoRender,
+    windowWidth: anchoRender,
+    windowHeight: altoRender,
+    letterRendering: true,
+    foreignObjectRendering: false
+  });
+  
+  renderEl.remove();
+  
+  return new Promise((resolve, reject) => {
+    canvas.toBlob(blob => {
+      if(blob) resolve(blob);
+      else reject(new Error('No se pudo generar la imagen'));
+    }, 'image/png', 1.0);
+  });
+}
+
+// Genera un ZIP con todas las hojas
+async function generarZipRamas(personaRaiz, nombreTitular){
+  // Si la persona raíz no tiene hijos, es una hoja sola
+  const ramas = (personaRaiz.hijos && personaRaiz.hijos.length > 0) 
+    ? personaRaiz.hijos 
+    : [personaRaiz];
+  
+  // Agrupar ramas que pueden compartir hoja
+  const grupos = agruparRamas(ramas);
+  const totalHojas = grupos.length;
+  
+  const zip = new JSZip();
+  const nombreLimpio = personaRaiz.nombre.split(',')[0].trim().replace(/\s+/g,'_');
+  
+  for(let i = 0; i < grupos.length; i++){
+    const htmlHoja = generarHtmlHoja(grupos[i], i + 1, totalHojas, nombreTitular);
+    const blob = await generarImagenHoja(htmlHoja);
+    
+    // Nombre del archivo dentro del ZIP
+    const nombresRamas = grupos[i].map(r => r.nombre.split(',')[0].trim().replace(/\s+/g,'_')).join('_y_');
+    const fileName = `Hoja_${String(i + 1).padStart(2,'0')}_${nombresRamas}.png`;
+    
+    zip.file(fileName, blob);
+  }
+  
+  // Generar el ZIP
+  const zipBlob = await zip.generateAsync({ type: 'blob' });
+  return {
+    blob: zipBlob,
+    totalHojas: totalHojas,
+    nombreArchivo: `Equipo_${nombreLimpio}_${totalHojas}_hojas.zip`
+  };
+}
+
  // ============ GENERAR PDF MULTIPÁGINA (PÓSTER) ============
 
 // Divide un canvas grande en varios canvas pequeños (hojas)
