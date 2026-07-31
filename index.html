@@ -5934,11 +5934,16 @@ function mostrarOpcionesExportacion(datos){
   const nombreBase = `Equipo_${nombreTitular.replace(/\s+/g,'_')}_${nombreLimpio}`;
   
   const esA4 = formato.tipo === 'A4';
-  const titulo = esA4 ? '📄 Imagen lista (A4)' : `🖼️ Póster de ${formato.totalHojas} hojas`;
-  const subtitulo = esA4 
-    ? `Entra en una sola hoja A4` 
-    : `${formato.filas} filas × ${formato.columnas} columnas`;
   
+  // Si entra en 1 hoja: descarga directa sin preguntar
+  if(esA4){
+    procesarExportacionSimple({
+      blob, nombreBase, nombreTitular, personaRaiz, totalRama, pctActivos
+    });
+    return;
+  }
+  
+  // Si NO entra en 1 hoja: preguntar qué prefiere
   const html = `
     <div style="text-align:center; margin-bottom:16px; padding:12px; background:rgba(91,141,239,0.08); border-radius:12px;">
       <div style="font-size:13px; color:#3a3a48; line-height:1.5;">
@@ -5948,54 +5953,116 @@ function mostrarOpcionesExportacion(datos){
     </div>
     
     <p style="margin:0 0 12px; font-size:13px; color:#5c5c66; text-align:center;">
-      ¿Qué querés hacer con la imagen?
+      ¿Cómo querés la imagen?
     </p>
     
-    <button class="share-menu-item" id="btnDescargarExp">
-      <div class="sm-ico" style="background:linear-gradient(135deg,#5b8def,#a06bff)">💾</div>
+    <button class="share-menu-item" id="btnImagenUnica">
+      <div class="sm-ico" style="background:linear-gradient(135deg,#5b8def,#a06bff)">📱</div>
       <div class="sm-txt">
-        <div class="sm-title">Descargar en el dispositivo</div>
-        <div class="sm-desc">${esA4 ? 'Guardar imagen PNG' : 'Guardar PDF con todas las hojas'}</div>
+        <div class="sm-title">Imagen única para ver</div>
+        <div class="sm-desc">Una sola imagen larga con TODO el equipo. Ideal para ver en el celular.</div>
       </div>
       <span class="sm-arrow">›</span>
     </button>
     
-    <button class="share-menu-item" id="btnWhatsappExp">
-      <div class="sm-ico" style="background:linear-gradient(135deg,#25D366,#128C7E)">💬</div>
+    <button class="share-menu-item" id="btnZipHojas">
+      <div class="sm-ico" style="background:linear-gradient(135deg,#f5b301,#ff8f6b)">🖨️</div>
       <div class="sm-txt">
-        <div class="sm-title">Enviar por WhatsApp</div>
-        <div class="sm-desc">${esA4 ? 'Compartir imagen' : 'Compartir PDF'}</div>
+        <div class="sm-title">ZIP con hojas para imprimir</div>
+        <div class="sm-desc">Varias imágenes divididas por ramas. Ideal para imprimir en A4.</div>
       </div>
       <span class="sm-arrow">›</span>
     </button>
   `;
   
   modal.open({
-    icon: esA4 ? '📄' : '🖼️',
+    icon: '🖼️',
     iconBg: 'linear-gradient(135deg,#5b8def,#a06bff)',
-    title: titulo,
-    sub: subtitulo,
+    title: 'Elegí el formato',
+    sub: `${totalRama} personas — 2 opciones`,
     html: html
   });
   
   setTimeout(() => {
-    document.getElementById('btnDescargarExp').onclick = async () => {
+    document.getElementById('btnImagenUnica').onclick = async () => {
       modal.close();
-      await procesarExportacion({
-        modo: 'descargar',
-        canvas, blob, formato, nombreBase, nombreTitular, personaRaiz, totalRama, pctActivos
+      await procesarExportacionSimple({
+        blob, nombreBase, nombreTitular, personaRaiz, totalRama, pctActivos
       });
     };
-    document.getElementById('btnWhatsappExp').onclick = async () => {
+    document.getElementById('btnZipHojas').onclick = async () => {
       modal.close();
-      await procesarExportacion({
-        modo: 'whatsapp',
-        canvas, blob, formato, nombreBase, nombreTitular, personaRaiz, totalRama, pctActivos
+      await procesarExportacionZip({
+        personaRaiz, nombreTitular, totalRama, pctActivos
       });
     };
   }, 50);
 }
 
+// Descarga simple de una imagen PNG única
+async function procesarExportacionSimple(datos){
+  const { blob, nombreBase, nombreTitular, personaRaiz, totalRama, pctActivos } = datos;
+  const fileName = `${nombreBase}.png`;
+  const file = new File([blob], fileName, { type: 'image/png' });
+  const mensajeCompartir = `🌳 Equipo de ${nombreTitular} — ${personaRaiz.nombre}\n${totalRama} personas · ${pctActivos}% activos`;
+  
+  // Intentar compartir por WhatsApp/Share nativo
+  let compartido = false;
+  if(navigator.canShare && navigator.canShare({ files: [file] })){
+    try {
+      await navigator.share({
+        files: [file],
+        title: `Equipo de ${nombreTitular}`,
+        text: mensajeCompartir
+      });
+      compartido = true;
+      haptic(20);
+    } catch(e){
+      console.log('Share cancelado:', e);
+    }
+  }
+  
+  // Fallback: descargar
+  if(!compartido){
+    descargarArchivo(blob, fileName);
+    haptic(15);
+    showToast('Imagen descargada 📥', 2000);
+  }
+}
+
+// Genera y descarga el ZIP con hojas divididas por ramas
+async function procesarExportacionZip(datos){
+  const { personaRaiz, nombreTitular, totalRama, pctActivos } = datos;
+  
+  // Mostrar loading
+  const loading = document.createElement('div');
+  loading.className = 'export-loading show';
+  loading.innerHTML = `<div class="spinner"></div><div class="msg">Generando hojas…</div>`;
+  document.body.appendChild(loading);
+  
+  await new Promise(r => setTimeout(r, 100));
+  
+  try {
+    const resultado = await generarZipRamas(personaRaiz, nombreTitular);
+    
+    loading.remove();
+    haptic(20);
+    
+    // Descargar el ZIP
+    descargarArchivo(resultado.blob, resultado.nombreArchivo);
+    showToast(`ZIP con ${resultado.totalHojas} hojas descargado 📥`, 3000);
+    
+  } catch(err){
+    console.error('Error generando ZIP:', err);
+    loading.remove();
+    modal.open({
+      icon: '⚠️',
+      title: 'Error al generar ZIP',
+      html: `<p>No se pudo crear el archivo.</p><div class="tip">Detalle: ${escapeXml(err.message || 'Error desconocido')}</div>`
+    });
+  }
+}
+ 
 // Procesa la exportación según el modo elegido
 async function procesarExportacion(datos){
   const { modo, canvas, blob, nombreBase, nombreTitular, personaRaiz, totalRama, pctActivos } = datos;
