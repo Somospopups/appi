@@ -2837,6 +2837,54 @@ const HELP = {
     
     <div class="warn-tip"><strong>🔒 Privacidad:</strong> Toda esta información queda SOLO en tu dispositivo. No se sube a ningún servidor. Nadie más puede verla, ni siquiera nosotros.</div>`
   },
+ equipoTablero: {
+    icon:'📊', iconBg:'linear-gradient(135deg,#5b8def,#a06bff)',
+    title:'Tablero',
+    sub:'Vista general de tu equipo',
+    html:`<p>Todo tu equipo en un vistazo.</p>
+    
+    <div class="tip"><strong>📈 QUÉ VAS A VER</strong><br/>
+    • Total de personas y activos (%)<br/>
+    • PB totales del equipo<br/>
+    • Distribución por categoría (DJ, D, DC, CE, L, LE, E)<br/>
+    • Ranking de Ventas (Personal y de Organización)<br/>
+    • Cumpleañeros de HOY (destacados)<br/>
+    • Cumpleañeros del mes (desplegable)<br/>
+    • Garantías del equipo (presentadas, vencidas, pendientes)<br/>
+    • Top con más pendientes por presentar</div>
+    
+    <div class="tip"><strong>💡 TIP:</strong> tocá cualquier estadística o persona para ver más detalles.</div>`
+  },
+  equipoArbol: {
+    icon:'🌳', iconBg:'linear-gradient(135deg,#3ad0a4,#5b8def)',
+    title:'Árbol',
+    sub:'La estructura de tu equipo',
+    html:`<p>La estructura completa de tu equipo, visualizada.</p>
+    
+    <div class="tip"><strong>🔍 QUÉ PODÉS HACER</strong><br/>
+    • Ver la jerarquía completa (quién está debajo de quién)<br/>
+    • Tocá cada persona para ver quiénes están bajo su línea<br/>
+    • Ver PB Personal (👤) y de Organización (👥)<br/>
+    • Ver garantías: presentadas, vencidas y pendientes<br/>
+    • Los colores de las categorías te ayudan a identificar niveles</div>
+    
+    <div class="tip"><strong>💡 TIP:</strong> podés exportar el árbol como imagen para compartirlo por WhatsApp.</div>`
+  },
+  equipoLista: {
+    icon:'📋', iconBg:'linear-gradient(135deg,#ff8f6b,#ff6b9d)',
+    title:'Lista',
+    sub:'Todas las personas de tu equipo',
+    html:`<p>Todas las personas de tu equipo en un solo lugar.</p>
+    
+    <div class="tip"><strong>🔍 QUÉ PODÉS HACER</strong><br/>
+    • Buscá por nombre o número de distribuidor<br/>
+    • Filtrá por categoría (DJ, D, DC, CE, etc.)<br/>
+    • Filtrá por estado (Activos o Inactivos)<br/>
+    • Ver el PB Personal y de Organización de cada uno<br/>
+    • Tocá cualquier persona para ver detalles completos</div>
+    
+    <div class="tip"><strong>💡 TIP:</strong> desde el detalle podés contactar por WhatsApp, llamar o enviar email en un toque.</div>`
+  },
   score: { icon:'🌟', iconBg:'linear-gradient(135deg,#5b8def,#a06bff,#ff6b9d)', title:'Score General', sub:'¿Cómo se calcula?', html:`<p>Combina las 4 herramientas personales en un número de 0 a 100.</p><ul><li>⚖️ 30% Rueda de la Vida</li><li>📊 30% Rueda del Negocio</li><li>🚀 25% Las 7 P</li><li>💰 15% Salud financiera</li></ul>` }
 };
 
@@ -2845,7 +2893,16 @@ document.getElementById('btnHelpHome').addEventListener('click', ()=>showHelp('h
 document.getElementById('btnHelpPresu').addEventListener('click', ()=>showHelp('presu'));
 document.getElementById('btnHelpSiete').addEventListener('click', ()=>showHelp('siete'));
 document.getElementById('btnHelpWheel').addEventListener('click', ()=>showHelp('wheel'));
-document.getElementById('btnHelpEquipo').addEventListener('click', ()=>showHelp('equipo'));
+document.getElementById('btnHelpEquipo').addEventListener('click', ()=>{
+  if(!equipoData || !equipoData.personas || equipoData.personas.length === 0){
+    showHelp('equipo');
+    return;
+  }
+  if(equipoActiveTab === 'dashboard') showHelp('equipoTablero');
+  else if(equipoActiveTab === 'arbol') showHelp('equipoArbol');
+  else if(equipoActiveTab === 'lista') showHelp('equipoLista');
+  else showHelp('equipo');
+});
 
 /* ============================================================
    RUEDAS
