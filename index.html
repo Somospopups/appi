@@ -1689,16 +1689,21 @@
   }
 
       /* ============ NUEVO DISEÑO DE NODOS EXPORT ============ */
-  .exp-node-new {
+    .exp-node-new {
     display: flex; flex-direction: column; align-items: center;
-    background: #ffffff;
+    background: #ffffff !important;
     border-radius: 20px;
     padding: 14px 16px;
-    min-width: 170px;
+    width: 220px;
+    min-width: 220px;
     max-width: 220px;
+    min-height: 200px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.10);
-    border: 4px solid #ccc;
+    border: 6px solid #ccc;
     position: relative;
+    box-sizing: border-box;
+    flex-shrink: 0;
+    justify-content: flex-start;
   }
   .exp-node-new.inactive {
     opacity: 0.5;
