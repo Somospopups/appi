@@ -5730,6 +5730,161 @@ function renderNodoExportNuevo(p){
   `;
   return html;
 }
+ // ============ MOSTRAR OPCIONES DE EXPORTACIÓN AL USUARIO ============
+
+function mostrarOpcionesExportacion(datos){
+  const { canvas, blob, formato, nombreTitular, personaRaiz, totalRama, pctActivos } = datos;
+  const nombrePersona = personaRaiz.nombre.split(',')[0].trim();
+  const nombreLimpio = nombrePersona.replace(/\s+/g,'_');
+  const nombreBase = `Equipo_${nombreTitular.replace(/\s+/g,'_')}_${nombreLimpio}`;
+  
+  const esA4 = formato.tipo === 'A4';
+  const titulo = esA4 ? '📄 Imagen lista (A4)' : `🖼️ Póster de ${formato.totalHojas} hojas`;
+  const subtitulo = esA4 
+    ? `Entra en una sola hoja A4` 
+    : `${formato.filas} filas × ${formato.columnas} columnas`;
+  
+  const html = `
+    <div style="text-align:center; margin-bottom:16px; padding:12px; background:rgba(91,141,239,0.08); border-radius:12px;">
+      <div style="font-size:13px; color:#3a3a48; line-height:1.5;">
+        <strong>${escapeXml(personaRaiz.nombre)}</strong><br/>
+        ${totalRama} personas · ${pctActivos}% activos
+      </div>
+    </div>
+    
+    <p style="margin:0 0 12px; font-size:13px; color:#5c5c66; text-align:center;">
+      ¿Qué querés hacer con la imagen?
+    </p>
+    
+    <button class="share-menu-item" id="btnDescargarExp">
+      <div class="sm-ico" style="background:linear-gradient(135deg,#5b8def,#a06bff)">💾</div>
+      <div class="sm-txt">
+        <div class="sm-title">Descargar en el dispositivo</div>
+        <div class="sm-desc">${esA4 ? 'Guardar imagen PNG' : 'Guardar PDF con todas las hojas'}</div>
+      </div>
+      <span class="sm-arrow">›</span>
+    </button>
+    
+    <button class="share-menu-item" id="btnWhatsappExp">
+      <div class="sm-ico" style="background:linear-gradient(135deg,#25D366,#128C7E)">💬</div>
+      <div class="sm-txt">
+        <div class="sm-title">Enviar por WhatsApp</div>
+        <div class="sm-desc">${esA4 ? 'Compartir imagen' : 'Compartir PDF'}</div>
+      </div>
+      <span class="sm-arrow">›</span>
+    </button>
+  `;
+  
+  modal.open({
+    icon: esA4 ? '📄' : '🖼️',
+    iconBg: 'linear-gradient(135deg,#5b8def,#a06bff)',
+    title: titulo,
+    sub: subtitulo,
+    html: html
+  });
+  
+  setTimeout(() => {
+    document.getElementById('btnDescargarExp').onclick = async () => {
+      modal.close();
+      await procesarExportacion({
+        modo: 'descargar',
+        canvas, blob, formato, nombreBase, nombreTitular, personaRaiz, totalRama, pctActivos
+      });
+    };
+    document.getElementById('btnWhatsappExp').onclick = async () => {
+      modal.close();
+      await procesarExportacion({
+        modo: 'whatsapp',
+        canvas, blob, formato, nombreBase, nombreTitular, personaRaiz, totalRama, pctActivos
+      });
+    };
+  }, 50);
+}
+
+// Procesa la exportación según el modo elegido
+async function procesarExportacion(datos){
+  const { modo, canvas, blob, formato, nombreBase, nombreTitular, personaRaiz, totalRama, pctActivos } = datos;
+  
+  // Loading
+  const loading = document.createElement('div');
+  loading.className = 'export-loading show';
+  loading.innerHTML = `<div class="spinner"></div><div class="msg">${formato.tipo === 'A4' ? 'Preparando imagen…' : 'Generando PDF…'}</div>`;
+  document.body.appendChild(loading);
+  
+  await new Promise(r => setTimeout(r, 100));
+  
+  try {
+    let fileName, fileBlob, fileType, mensajeCompartir;
+    
+    if(formato.tipo === 'A4'){
+      // A4: usar la imagen PNG original
+      fileName = `${nombreBase}.png`;
+      fileBlob = blob;
+      fileType = 'image/png';
+      mensajeCompartir = `🌳 Equipo de ${nombreTitular} — ${personaRaiz.nombre}\n${totalRama} personas · ${pctActivos}% activos`;
+    } else {
+      // PÓSTER: generar PDF multipágina
+      fileName = `${nombreBase}_Poster_${formato.totalHojas}hojas.pdf`;
+      const pdfResult = await generarPdfPoster(canvas, formato.filas, formato.columnas, fileName);
+      fileBlob = pdfResult.blob;
+      fileType = 'application/pdf';
+      mensajeCompartir = `🌳 Póster del equipo de ${nombreTitular}\n\n📄 ${personaRaiz.nombre}\n${totalRama} personas · ${pctActivos}% activos\n🖼️ Para imprimir en ${formato.totalHojas} hojas A4 (${formato.filas}×${formato.columnas})`;
+    }
+    
+    const file = new File([fileBlob], fileName, { type: fileType });
+    
+    loading.remove();
+    
+    if(modo === 'whatsapp'){
+      // Compartir por WhatsApp / Share nativo
+      let compartido = false;
+      if(navigator.canShare && navigator.canShare({ files: [file] })){
+        try {
+          await navigator.share({
+            files: [file],
+            title: `Equipo de ${nombreTitular}`,
+            text: mensajeCompartir
+          });
+          compartido = true;
+          haptic(20);
+        } catch(e){
+          console.log('Share cancelado:', e);
+        }
+      }
+      // Fallback: descargar
+      if(!compartido){
+        descargarArchivo(fileBlob, fileName);
+        showToast('Archivo descargado — compartilo desde tu galería', 3000);
+      }
+    } else {
+      // Descargar directo
+      descargarArchivo(fileBlob, fileName);
+      haptic(15);
+      showToast(formato.tipo === 'A4' ? 'Imagen descargada 📥' : 'PDF descargado 📥', 2000);
+    }
+    
+  } catch(err){
+    console.error('Error en exportación:', err);
+    loading.remove();
+    modal.open({
+      icon: '⚠️',
+      title: 'Error al exportar',
+      html: `<p>No se pudo generar el archivo.</p><div class="tip">Detalle: ${escapeXml(err.message || 'Error desconocido')}</div>`
+    });
+  }
+}
+
+// Helper: descargar un blob como archivo
+function descargarArchivo(blob, fileName){
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = fileName;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 100);
+}
  async function generarImagenArbol(personaRaiz){
   const desc = contarDescendientes(personaRaiz);
   const totalPers = desc + 1;
