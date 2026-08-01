@@ -5350,19 +5350,231 @@ function openPersonaModal(p){
 /* ============ COMPARTIR MI EQUIPO ============ */
 
 // Compartir texto por WhatsApp (función original)
-async function compartirEquipoTexto(){
-  if(!equipoData) return;
-  const total = equipoData.personas.length;
-  const activos = equipoData.personas.filter(p => (p.pnAct||0) > 0).length;
-  const pts = equipoData.personas.reduce((s,p)=> s + (p.pnAct||0), 0);
+// ============ GENERADORES DE MENSAJES DE COMPARTIR ============
+
+// Obtiene todas las personas descendientes de una raíz (incluyéndola)
+function obtenerDescendientes(persona){
+  const lista = [persona];
+  const recoger = (p) => {
+    (p.hijos || []).forEach(h => {
+      lista.push(h);
+      recoger(h);
+    });
+  };
+  recoger(persona);
+  return lista;
+}
+
+// Genera mensaje: Datos de todo mi equipo
+function generarMensajeMiEquipo(){
+  const personas = equipoData.personas.filter(p => !p.esTitular);
+  const total = personas.length;
+  const activos = personas.filter(p => (p.pnAct||0) > 0).length;
+  const pts = personas.reduce((s,p) => s + (p.pnAct||0), 0);
   const porCat = {};
-  equipoData.personas.forEach(p=>{ const k = p.cat || '?'; porCat[k] = (porCat[k]||0)+1; });
-  const catsOrden = ['E','LE','L','CE','DC','D','DJ'];
+  personas.forEach(p => { const k = p.cat || '?'; porCat[k] = (porCat[k]||0) + 1; });
+  const catsOrden = ['E','EJ','LE','L','CE','DC','D','DJ'];
+  
+  // Garantías totales
+  const gPres = personas.reduce((s,p) => s + (p.garantias?.presentadas || 0), 0);
+  const gVenc = personas.reduce((s,p) => s + (p.garantias?.vencidas || 0), 0);
+  const gPend = personas.reduce((s,p) => s + (p.garantias?.pendientes || 0), 0);
+  const pctVenc = gPres > 0 ? Math.round((gVenc/gPres)*100) : 0;
+  
+  // Top 3 Personal y Organización
+  const top3Personal = [...personas].sort((a,b) => (b.pnAct||0) - (a.pnAct||0)).filter(p => (p.pnAct||0) > 0).slice(0, 3);
+  const top3Org = [...personas].map(p => ({...p, pbOrg: calcularPBOrganizacion(p)}))
+    .filter(p => p.pbOrg > 0)
+    .sort((a,b) => b.pbOrg - a.pbOrg)
+    .slice(0, 3);
+  
   let msg = `🌳 *MI EQUIPO*\n📅 ${MONTHS[new Date().getMonth()]} ${new Date().getFullYear()}\n━━━━━━━━━━━━━━━\n\n`;
-  msg += `👥 Total: *${total}* personas\n✅ Activos: *${activos}* (${Math.round(activos/total*100)}%)\n⭐ PB totales: *${formatPB(pts)}*\n\n📊 *Por categoría:*\n`;
-  catsOrden.forEach(c=>{ if(porCat[c]) msg += `• ${catInfoOf(c).name}: ${porCat[c]}\n`; });
-  try { if(navigator.share){ await navigator.share({ title:'Mi Equipo', text: msg }); return; } } catch(e){}
-  window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+  msg += `👥 Total: *${total}* personas\n✅ Activos: *${activos}* (${total ? Math.round(activos/total*100) : 0}%)\n⭐ PB totales: *${formatPB(pts)}*\n\n`;
+  msg += `📊 *Por categoría:*\n`;
+  catsOrden.forEach(c => { if(porCat[c]) msg += `• ${catInfoOf(c).name}: ${porCat[c]}\n`; });
+  
+  if(gPres > 0 || gPend > 0){
+    msg += `\n📄 *Garantías del equipo:*\n`;
+    msg += `• Vendidos: ${formatPB(gPres)}\n`;
+    msg += `• Vencidos: ${formatPB(gVenc)} (${pctVenc}%)\n`;
+    msg += `• Pendientes: ${formatPB(gPend)}\n`;
+  }
+  
+  if(top3Personal.length > 0){
+    msg += `\n🏆 *Top 3 Personal:*\n`;
+    top3Personal.forEach((p,i) => {
+      msg += `${i+1}. ${p.nombre.split(',')[0].trim()} - ${formatPB(p.pnAct)} PB\n`;
+    });
+  }
+  
+  if(top3Org.length > 0){
+    msg += `\n🏆 *Top 3 Organización:*\n`;
+    top3Org.forEach((p,i) => {
+      msg += `${i+1}. ${p.nombre.split(',')[0].trim()} - ${formatPB(p.pbOrg)} PB\n`;
+    });
+  }
+  
+  msg += `\n━━━━━━━━━━━━━━━\nEnviado desde *APPI* 🚀`;
+  return msg;
+}
+
+// Genera mensaje: Datos personales de una persona
+function generarMensajePersonal(persona){
+  const info = catInfoOf(persona.cat);
+  const pbOrg = calcularPBOrganizacion(persona);
+  const g = persona.garantias || { presentadas: 0, vencidas: 0, pendientes: 0 };
+  const pctVenc = g.presentadas > 0 ? Math.round((g.vencidas/g.presentadas)*100) : 0;
+  
+  let msg = `👤 *${persona.nombre}*\n📅 ${MONTHS[new Date().getMonth()]} ${new Date().getFullYear()}\n━━━━━━━━━━━━━━━\n\n`;
+  msg += `📊 Categoría: ${info.name} (${info.full})\n`;
+  msg += `⭐ PB Personal: *${formatPB(persona.pnAct)}*\n`;
+  if(pbOrg > (persona.pnAct || 0)){
+    msg += `👥 PB Organización: *${formatPB(pbOrg)}*\n`;
+  }
+  
+  if(g.presentadas > 0 || g.pendientes > 0){
+    msg += `\n📄 *Garantías:*\n`;
+    msg += `• Vendidos: ${formatPB(g.presentadas)}\n`;
+    msg += `• Vencidos: ${formatPB(g.vencidas)} (${pctVenc}%)\n`;
+    msg += `• Pendientes: ${formatPB(g.pendientes)}\n`;
+  }
+  
+  if(persona.alta){
+    msg += `\n📅 Alta: ${persona.alta}\n`;
+  }
+  if(persona.cumple){
+    const parts = persona.cumple.split('-');
+    if(parts.length >= 3){
+      const dia = parseInt(parts[2]);
+      const mes = parseInt(parts[1]);
+      if(!isNaN(dia) && !isNaN(mes)){
+        msg += `🎂 Cumpleaños: ${dia} de ${MONTHS[mes-1]}\n`;
+      }
+    }
+  }
+  
+  msg += `\n━━━━━━━━━━━━━━━\nEnviado desde *APPI* 🚀`;
+  return msg;
+}
+
+// Genera mensaje: Datos del equipo de una persona
+function generarMensajeEquipoDePersona(persona){
+  const descendientes = obtenerDescendientes(persona).filter(p => p.id !== persona.id);
+  const total = descendientes.length;
+  
+  if(total === 0){
+    return `🌳 *EQUIPO DE ${persona.nombre.toUpperCase()}*\n\n⚠️ Esta persona no tiene equipo (sin descendientes)\n\n━━━━━━━━━━━━━━━\nEnviado desde *APPI* 🚀`;
+  }
+  
+  const activos = descendientes.filter(p => (p.pnAct||0) > 0).length;
+  const pts = descendientes.reduce((s,p) => s + (p.pnAct||0), 0);
+  const porCat = {};
+  descendientes.forEach(p => { const k = p.cat || '?'; porCat[k] = (porCat[k]||0) + 1; });
+  const catsOrden = ['E','EJ','LE','L','CE','DC','D','DJ'];
+  
+  const gPres = descendientes.reduce((s,p) => s + (p.garantias?.presentadas || 0), 0);
+  const gVenc = descendientes.reduce((s,p) => s + (p.garantias?.vencidas || 0), 0);
+  const gPend = descendientes.reduce((s,p) => s + (p.garantias?.pendientes || 0), 0);
+  const pctVenc = gPres > 0 ? Math.round((gVenc/gPres)*100) : 0;
+  
+  const top3Personal = [...descendientes].sort((a,b) => (b.pnAct||0) - (a.pnAct||0)).filter(p => (p.pnAct||0) > 0).slice(0, 3);
+  const top3Org = [...descendientes].map(p => ({...p, pbOrg: calcularPBOrganizacion(p)}))
+    .filter(p => p.pbOrg > 0)
+    .sort((a,b) => b.pbOrg - a.pbOrg)
+    .slice(0, 3);
+  
+  let msg = `🌳 *EQUIPO DE ${persona.nombre.toUpperCase()}*\n📅 ${MONTHS[new Date().getMonth()]} ${new Date().getFullYear()}\n━━━━━━━━━━━━━━━\n\n`;
+  msg += `👥 Total: *${total}* personas\n✅ Activos: *${activos}* (${total ? Math.round(activos/total*100) : 0}%)\n⭐ PB totales: *${formatPB(pts)}*\n\n`;
+  msg += `📊 *Por categoría:*\n`;
+  catsOrden.forEach(c => { if(porCat[c]) msg += `• ${catInfoOf(c).name}: ${porCat[c]}\n`; });
+  
+  if(gPres > 0 || gPend > 0){
+    msg += `\n📄 *Garantías del equipo:*\n`;
+    msg += `• Vendidos: ${formatPB(gPres)}\n`;
+    msg += `• Vencidos: ${formatPB(gVenc)} (${pctVenc}%)\n`;
+    msg += `• Pendientes: ${formatPB(gPend)}\n`;
+  }
+  
+  if(top3Personal.length > 0){
+    msg += `\n🏆 *Top 3 Personal:*\n`;
+    top3Personal.forEach((p,i) => {
+      msg += `${i+1}. ${p.nombre.split(',')[0].trim()} - ${formatPB(p.pnAct)} PB\n`;
+    });
+  }
+  
+  if(top3Org.length > 0){
+    msg += `\n🏆 *Top 3 Organización:*\n`;
+    top3Org.forEach((p,i) => {
+      msg += `${i+1}. ${p.nombre.split(',')[0].trim()} - ${formatPB(p.pbOrg)} PB\n`;
+    });
+  }
+  
+  msg += `\n━━━━━━━━━━━━━━━\nEnviado desde *APPI* 🚀`;
+  return msg;
+}
+
+// Genera mensaje: Personal + Equipo combinado
+function generarMensajeCombinado(persona){
+  const info = catInfoOf(persona.cat);
+  const pbOrg = calcularPBOrganizacion(persona);
+  const g = persona.garantias || { presentadas: 0, vencidas: 0, pendientes: 0 };
+  const pctVenc = g.presentadas > 0 ? Math.round((g.vencidas/g.presentadas)*100) : 0;
+  
+  const descendientes = obtenerDescendientes(persona).filter(p => p.id !== persona.id);
+  const total = descendientes.length;
+  const activos = descendientes.filter(p => (p.pnAct||0) > 0).length;
+  const pts = descendientes.reduce((s,p) => s + (p.pnAct||0), 0);
+  const porCat = {};
+  descendientes.forEach(p => { const k = p.cat || '?'; porCat[k] = (porCat[k]||0) + 1; });
+  const catsOrden = ['E','EJ','LE','L','CE','DC','D','DJ'];
+  
+  const top3Org = [...descendientes].map(p => ({...p, pbOrg: calcularPBOrganizacion(p)}))
+    .filter(p => p.pbOrg > 0)
+    .sort((a,b) => b.pbOrg - a.pbOrg)
+    .slice(0, 3);
+  
+  let msg = `👤 *${persona.nombre}*\n📅 ${MONTHS[new Date().getMonth()]} ${new Date().getFullYear()}\n━━━━━━━━━━━━━━━\n\n`;
+  msg += `📊 *SUS DATOS:*\n`;
+  msg += `• Categoría: ${info.name}\n`;
+  msg += `• PB Personal: ${formatPB(persona.pnAct)}\n`;
+  if(pbOrg > (persona.pnAct || 0)){
+    msg += `• PB Organización: ${formatPB(pbOrg)}\n`;
+  }
+  if(g.presentadas > 0 || g.pendientes > 0){
+    msg += `• 📄 Vendidos: ${formatPB(g.presentadas)}\n`;
+    msg += `• ⚠️ Vencidos: ${formatPB(g.vencidas)} (${pctVenc}%)\n`;
+    msg += `• ⏳ Pendientes: ${formatPB(g.pendientes)}\n`;
+  }
+  
+  if(total > 0){
+    msg += `\n━━━━━━━━━━━━━━━\n🌳 *SU EQUIPO:*\n`;
+    msg += `• ${total} personas · ${activos} activas (${total ? Math.round(activos/total*100) : 0}%)\n`;
+    msg += `• PB totales: ${formatPB(pts)}\n\n`;
+    msg += `📊 *Por categoría:*\n`;
+    const catsTexto = catsOrden.filter(c => porCat[c]).map(c => `${catInfoOf(c).name}: ${porCat[c]}`).join(' · ');
+    msg += `${catsTexto}\n`;
+    
+    if(top3Org.length > 0){
+      msg += `\n🏆 *Top 3 Ventas:*\n`;
+      top3Org.forEach((p,i) => {
+        msg += `${i+1}. ${p.nombre.split(',')[0].trim()} - ${formatPB(p.pbOrg)} PB\n`;
+      });
+    }
+  }
+  
+  msg += `\n━━━━━━━━━━━━━━━\nEnviado desde *APPI* 🚀`;
+  return msg;
+}
+
+// Función principal: envía el mensaje por WhatsApp
+async function enviarMensajeWhatsApp(mensaje, titulo){
+  try {
+    if(navigator.share){
+      await navigator.share({ title: titulo || 'APPI', text: mensaje });
+      return;
+    }
+  } catch(e){}
+  window.open('https://wa.me/?text=' + encodeURIComponent(mensaje), '_blank');
 }
 
 // Menú principal: elegir tipo de compartir
@@ -5394,7 +5606,7 @@ document.getElementById('btnEquipoShare').onclick = ()=>{
   setTimeout(()=>{
     const bt = document.getElementById('smText');
     const bi = document.getElementById('smImage');
-    if(bt) bt.onclick = ()=>{ modal.close(); haptic(10); compartirEquipoTexto(); };
+    if(bt) bt.onclick = ()=>{ modal.close(); haptic(10); enviarMensajeWhatsApp(generarMensajeMiEquipo(), 'Mi Equipo'); };
     if(bi) bi.onclick = ()=>{ modal.close(); haptic(10); abrirSelectorPersona(); };
   }, 50);
 };
