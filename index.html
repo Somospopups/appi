@@ -2445,6 +2445,662 @@ body.dark .lock-input {
 }
 body.dark .lock-footer { color: #6b6b76; }
 </style> 
+
+<style>
+  /* ============ HOME DASHBOARD 2026 ============ */
+  header.top.home-header {
+    text-align: left;
+    margin-bottom: 14px;
+    padding-top: 2px;
+  }
+  .home-header .theme-toggle,
+  .home-header .help-btn { top: 0; }
+  .home-brand-row {
+    min-height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 8px;
+  }
+  .home-brand-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 16px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.52);
+    border: 1px solid rgba(255,255,255,0.76);
+    box-shadow: 0 10px 26px rgba(80,90,130,0.10);
+    color: #15151d;
+    font-size: 15px;
+    font-weight: 950;
+    letter-spacing: 1.4px;
+  }
+  .home-hero-card {
+    position: relative;
+    overflow: hidden;
+    border-radius: 30px;
+    padding: 20px 18px 18px;
+    background:
+      radial-gradient(circle at 14% 12%, rgba(255,255,255,0.70), transparent 35%),
+      linear-gradient(135deg, rgba(91,141,239,0.26), rgba(160,107,255,0.20) 52%, rgba(255,107,157,0.18));
+    border: 1px solid rgba(255,255,255,0.78);
+    box-shadow: 0 16px 40px rgba(80,90,130,0.14), inset 0 1px 0 rgba(255,255,255,0.8);
+  }
+  .home-hero-card::after {
+    content: "";
+    position: absolute;
+    width: 150px; height: 150px;
+    right: -58px; top: -54px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(255,255,255,0.52), rgba(255,255,255,0.08));
+    pointer-events: none;
+  }
+  .home-kicker {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.58);
+    color: #3d63c9;
+    font-size: 11px;
+    font-weight: 850;
+    text-transform: uppercase;
+    letter-spacing: 0.55px;
+  }
+  .home-kicker::before { content: "✦"; font-size: 10px; }
+  header.top.home-header h1#homeGreeting {
+    position: relative;
+    z-index: 1;
+    margin: 14px 0 0;
+    color: #161620;
+    font-size: 30px;
+    line-height: 1.05;
+    font-weight: 950;
+    letter-spacing: -0.8px;
+  }
+  header.top.home-header .home-subtitle {
+    position: relative;
+    z-index: 1;
+    margin: 7px 0 16px;
+    color: #4e5161;
+    font-size: 14px;
+    font-weight: 650;
+    text-transform: none;
+  }
+  .home-month-card {
+    position: relative;
+    z-index: 1;
+    padding: 12px 13px;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.58);
+    border: 1px solid rgba(255,255,255,0.75);
+    -webkit-backdrop-filter: blur(14px) saturate(170%);
+    backdrop-filter: blur(14px) saturate(170%);
+  }
+  .home-month-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 9px;
+  }
+  .home-month-row span {
+    color: #3a3a48;
+    font-size: 13px;
+    font-weight: 850;
+  }
+  .home-month-row strong {
+    color: #3d63c9;
+    font-size: 12px;
+    font-weight: 850;
+  }
+  .home-month-progress {
+    width: 100%;
+    height: 8px;
+    border-radius: 999px;
+    background: rgba(80,90,130,0.12);
+    overflow: hidden;
+  }
+  .home-month-progress .fill {
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #5b8def, #a06bff, #ff6b9d);
+    box-shadow: 0 0 16px rgba(160,107,255,0.35);
+    transition: width .55s ease;
+  }
+  .home-month-caption {
+    margin-top: 7px;
+    color: #777887;
+    font-size: 11.5px;
+    font-weight: 650;
+  }
+  .home-month-caption span { color: #3d63c9; font-weight: 900; }
+
+  .score-compact.score-dashboard {
+    margin-bottom: 14px;
+    padding: 0;
+    overflow: hidden;
+    cursor: default;
+    background: rgba(255,255,255,0.58);
+    border: 1px solid rgba(255,255,255,0.78);
+    border-radius: 26px;
+    box-shadow: 0 12px 34px rgba(80,90,130,0.12);
+  }
+  .score-dashboard .score-shell {
+    position: relative;
+    padding: 18px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 16px;
+    align-items: center;
+  }
+  .score-dashboard .score-shell::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 8% 20%, rgba(91,141,239,0.16), transparent 35%),
+      radial-gradient(circle at 88% 10%, rgba(255,107,157,0.14), transparent 38%);
+    pointer-events: none;
+  }
+  .score-dashboard .score-info,
+  .score-dashboard .score-ring { position: relative; z-index: 1; }
+  .score-dashboard .score-kicker {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 8px;
+    color: #6b6b76;
+    font-size: 11px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: .55px;
+  }
+  .score-dashboard .score-kicker .dot-live {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: linear-gradient(135deg,#5b8def,#ff6b9d);
+    box-shadow: 0 0 0 5px rgba(91,141,239,0.11);
+  }
+  .score-dashboard .score-number {
+    display: flex;
+    align-items: baseline;
+    gap: 3px;
+    margin-bottom: 8px;
+    font-size: 42px;
+    line-height: .95;
+    font-weight: 1000;
+    letter-spacing: -2px;
+    background: linear-gradient(90deg,#5b8def,#a06bff,#ff6b9d);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .score-dashboard .score-number span {
+    font-size: 17px;
+    letter-spacing: -0.4px;
+    color: #8a8a94;
+    -webkit-text-fill-color: #8a8a94;
+    font-weight: 800;
+  }
+  .score-dashboard .score-msg {
+    margin: 0 0 12px;
+    color: #4a4a55;
+    font-size: 13px;
+    line-height: 1.35;
+    font-weight: 600;
+  }
+  .score-dashboard .score-meta-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .score-dashboard .score-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 9px;
+    border-radius: 999px;
+    background: rgba(91,141,239,0.12);
+    color: #3d63c9;
+    font-size: 11.5px;
+    font-weight: 850;
+  }
+  .score-dashboard .score-action {
+    border: none;
+    border-radius: 999px;
+    padding: 8px 12px;
+    color: #fff;
+    background: linear-gradient(135deg,#25D366,#128C7E);
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 900;
+    cursor: pointer;
+    box-shadow: 0 8px 18px rgba(37,211,102,0.26);
+  }
+  .score-dashboard .score-action.start {
+    background: linear-gradient(135deg,#5b8def,#a06bff);
+    box-shadow: 0 8px 18px rgba(91,141,239,0.28);
+  }
+  .score-dashboard .score-ring {
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: conic-gradient(#5b8def var(--score-deg), rgba(80,90,130,0.10) 0);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.55);
+  }
+  .score-dashboard .score-ring::before {
+    content: "";
+    position: absolute;
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.90);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.8);
+  }
+  .score-dashboard .score-ring span {
+    position: relative;
+    z-index: 1;
+    color: #3d63c9;
+    font-size: 13px;
+    font-weight: 950;
+  }
+
+  .next-step-card {
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 16px;
+    padding: 16px;
+    border-radius: 24px;
+    background: linear-gradient(135deg, rgba(21,25,39,0.92), rgba(61,99,201,0.86));
+    color: #fff;
+    box-shadow: 0 14px 36px rgba(61,99,201,0.22);
+  }
+  .next-step-card::after {
+    content: "";
+    position: absolute;
+    right: -36px;
+    bottom: -48px;
+    width: 128px; height: 128px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.12);
+  }
+  .next-step-card .step-grid {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 46px 1fr;
+    gap: 12px;
+    align-items: start;
+  }
+  .next-step-card .step-icon {
+    width: 46px; height: 46px;
+    border-radius: 16px;
+    display: grid;
+    place-items: center;
+    background: rgba(255,255,255,0.16);
+    border: 1px solid rgba(255,255,255,0.18);
+    font-size: 23px;
+  }
+  .next-step-card .step-label {
+    margin-bottom: 3px;
+    color: rgba(255,255,255,0.72);
+    font-size: 10.5px;
+    font-weight: 950;
+    text-transform: uppercase;
+    letter-spacing: .6px;
+  }
+  .next-step-card h3 {
+    margin: 0 0 5px;
+    color: #fff;
+    font-size: 17px;
+    font-weight: 950;
+    letter-spacing: -0.25px;
+  }
+  .next-step-card p {
+    margin: 0;
+    color: rgba(255,255,255,0.78);
+    font-size: 12.8px;
+    line-height: 1.42;
+  }
+  .next-step-card .step-action {
+    position: relative;
+    z-index: 1;
+    margin-top: 14px;
+    width: 100%;
+    border: none;
+    border-radius: 16px;
+    padding: 12px 14px;
+    background: rgba(255,255,255,0.94);
+    color: #26345d;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 950;
+    cursor: pointer;
+  }
+  .next-step-card.done {
+    background: linear-gradient(135deg, rgba(29,122,92,0.96), rgba(58,208,164,0.82));
+    box-shadow: 0 14px 36px rgba(29,122,92,0.20);
+  }
+
+  .home-section-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 4px 2px 10px;
+  }
+  .home-section-head span {
+    display: block;
+    margin-bottom: 2px;
+    color: #8a8a94;
+    font-size: 10.5px;
+    font-weight: 950;
+    text-transform: uppercase;
+    letter-spacing: .7px;
+  }
+  .home-section-head h2 {
+    margin: 0;
+    color: #1c1c27;
+    font-size: 20px;
+    line-height: 1.1;
+    font-weight: 950;
+    letter-spacing: -0.5px;
+  }
+  .home-section-head button {
+    border: none;
+    border-radius: 999px;
+    padding: 8px 12px;
+    background: rgba(91,141,239,0.13);
+    color: #3d63c9;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 900;
+    cursor: pointer;
+  }
+  #toolsList.home-tools-grid {
+    display: block;
+  }
+  .home-section-block + .home-section-block { margin-top: 14px; }
+  .mini-section-label {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin: 0 2px 9px;
+    color: #60606d;
+    font-size: 12px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: .45px;
+  }
+  .home-tool-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .quick-tool-card,
+  .business-card {
+    font-family: inherit;
+    color: inherit;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  .quick-tool-card {
+    width: 100%;
+    display: block;
+    position: relative;
+    overflow: hidden;
+    min-height: 154px;
+    padding: 13px;
+    border-radius: 22px;
+    border: 1px solid rgba(255,255,255,0.75);
+    background: rgba(255,255,255,0.58);
+    box-shadow: 0 10px 28px rgba(80,90,130,0.09);
+    text-align: left;
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .quick-tool-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 18% 0%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 48%);
+    opacity: .9;
+    pointer-events: none;
+  }
+  .quick-tool-card:active,
+  .business-card:active { transform: scale(.98); }
+  .quick-tool-top {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .quick-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 15px;
+    display: grid;
+    place-items: center;
+    color: #fff;
+    font-size: 21px;
+    background: var(--accent);
+    box-shadow: 0 8px 18px color-mix(in srgb, var(--accent) 28%, transparent);
+  }
+  .quick-state {
+    max-width: 86px;
+    padding: 4px 7px;
+    border-radius: 999px;
+    font-size: 10.5px;
+    line-height: 1.1;
+    font-weight: 950;
+    text-align: right;
+    background: rgba(80,90,130,0.09);
+    color: #777887;
+  }
+  .quick-state.pos,
+  .quick-state.done { background: rgba(58,208,164,0.16); color: #1d7a5c; }
+  .quick-state.neg { background: rgba(217,83,79,0.13); color: #d9534f; }
+  .quick-state.pending { background: rgba(91,141,239,0.13); color: #3d63c9; }
+  .quick-state.empty { background: rgba(80,90,130,0.08); color: #8a8a94; }
+  .quick-tool-card h3 {
+    position: relative;
+    z-index: 1;
+    margin: 0 0 4px;
+    color: #1c1c27;
+    font-size: 15px;
+    font-weight: 950;
+    letter-spacing: -0.2px;
+  }
+  .quick-tool-card p {
+    position: relative;
+    z-index: 1;
+    margin: 0 0 12px;
+    color: #777887;
+    font-size: 11.5px;
+    line-height: 1.28;
+    font-weight: 650;
+  }
+  .quick-progress-line {
+    position: relative;
+    z-index: 1;
+    height: 5px;
+    border-radius: 999px;
+    background: rgba(80,90,130,0.10);
+    overflow: hidden;
+  }
+  .quick-progress-line span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    width: var(--pct, 0%);
+    background: var(--accent);
+    transition: width .55s ease;
+  }
+  .quick-updated {
+    position: relative;
+    z-index: 1;
+    display: block;
+    margin-top: 7px;
+    color: #8a8a94;
+    font-size: 10.5px;
+    font-weight: 700;
+  }
+  .business-card {
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    border: none;
+    border-radius: 24px;
+    padding: 16px;
+    background: linear-gradient(135deg, rgba(58,208,164,0.18), rgba(91,141,239,0.14), rgba(160,107,255,0.12));
+    border: 1px solid rgba(255,255,255,0.78);
+    box-shadow: 0 10px 28px rgba(80,90,130,0.09);
+    display: grid;
+    grid-template-columns: 52px 1fr auto;
+    gap: 13px;
+    align-items: center;
+    text-align: left;
+  }
+  .business-card .business-icon {
+    width: 52px; height: 52px;
+    border-radius: 18px;
+    display: grid;
+    place-items: center;
+    color: #fff;
+    font-size: 24px;
+    background: linear-gradient(135deg,#3ad0a4,#a06bff);
+    box-shadow: 0 10px 20px rgba(58,208,164,0.22);
+  }
+  .business-card h3 {
+    margin: 0 0 3px;
+    color: #1c1c27;
+    font-size: 17px;
+    font-weight: 950;
+    letter-spacing: -0.25px;
+  }
+  .business-card p {
+    margin: 0;
+    color: #6b6b76;
+    font-size: 12.2px;
+    font-weight: 650;
+    line-height: 1.32;
+  }
+  .business-card .business-status {
+    text-align: right;
+    color: #3d63c9;
+    font-weight: 950;
+    white-space: nowrap;
+  }
+  .business-card .business-status small {
+    display: block;
+    margin-top: 2px;
+    color: #8a8a94;
+    font-size: 10.5px;
+    font-weight: 850;
+    text-transform: uppercase;
+    letter-spacing: .25px;
+  }
+  .business-progress {
+    grid-column: 2 / 4;
+    height: 5px;
+    border-radius: 999px;
+    background: rgba(80,90,130,0.10);
+    overflow: hidden;
+  }
+  .business-progress span {
+    display: block;
+    height: 100%;
+    width: var(--pct,0%);
+    border-radius: inherit;
+    background: linear-gradient(90deg,#3ad0a4,#a06bff);
+  }
+
+  #view-home .backup-collapsible {
+    margin-top: 16px;
+    border-radius: 22px;
+    background: rgba(255,255,255,0.42);
+  }
+  #view-home .backup-collapsible .backup-head { padding: 12px 15px; }
+  #view-home .backup-collapsible .backup-head .b-title { font-size: 12.5px; }
+
+  @media (max-width: 360px) {
+    .home-tool-grid { gap: 8px; }
+    .quick-tool-card { padding: 12px; min-height: 148px; }
+    .score-dashboard .score-shell { grid-template-columns: 1fr; }
+    .score-dashboard .score-ring { display: none; }
+    .business-card { grid-template-columns: 48px 1fr; }
+    .business-card .business-status { grid-column: 1 / 3; text-align: left; }
+    .business-progress { grid-column: 1 / 3; }
+  }
+
+  body.dark .home-brand-mark,
+  body.dark .home-hero-card,
+  body.dark .home-month-card,
+  body.dark .score-compact.score-dashboard,
+  body.dark .quick-tool-card,
+  body.dark .business-card {
+    border-color: rgba(255,255,255,0.09);
+  }
+  body.dark .home-brand-mark {
+    background: rgba(30,30,50,0.58);
+    color: #f0f0f5;
+  }
+  body.dark .home-hero-card {
+    background:
+      radial-gradient(circle at 14% 12%, rgba(255,255,255,0.09), transparent 35%),
+      linear-gradient(135deg, rgba(91,141,239,0.22), rgba(160,107,255,0.17) 52%, rgba(255,107,157,0.13));
+  }
+  body.dark .home-kicker,
+  body.dark .home-month-card {
+    background: rgba(30,30,50,0.50);
+  }
+  body.dark header.top.home-header h1#homeGreeting,
+  body.dark .home-section-head h2,
+  body.dark .quick-tool-card h3,
+  body.dark .business-card h3,
+  body.dark .home-month-row span { color: #f0f0f5; }
+  body.dark header.top.home-header .home-subtitle,
+  body.dark .home-month-caption,
+  body.dark .score-dashboard .score-msg,
+  body.dark .quick-tool-card p,
+  body.dark .business-card p,
+  body.dark .mini-section-label { color: #a0a0b0; }
+  body.dark .home-month-row strong,
+  body.dark .home-month-caption span,
+  body.dark .score-dashboard .score-pill,
+  body.dark .business-card .business-status { color: #a8b8ff; }
+  body.dark .score-compact.score-dashboard,
+  body.dark .quick-tool-card {
+    background: rgba(30,30,50,0.55);
+  }
+  body.dark .score-dashboard .score-ring::before {
+    background: rgba(30,30,50,0.94);
+  }
+  body.dark .quick-progress-line,
+  body.dark .business-progress,
+  body.dark .home-month-progress { background: rgba(255,255,255,0.08); }
+  body.dark .business-card {
+    background: linear-gradient(135deg, rgba(58,208,164,0.13), rgba(91,141,239,0.12), rgba(160,107,255,0.10));
+  }
+  body.dark .home-section-head button {
+    background: rgba(91,141,239,0.20);
+    color: #a8b8ff;
+  }
+  body.dark #view-home .backup-collapsible {
+    background: rgba(30,30,50,0.44);
+    border-color: rgba(255,255,255,0.08);
+  }
+</style>
 </head>
 <body>
  <!-- ============ PANTALLA DE ACTIVACIÓN ============ -->
@@ -2504,34 +3160,47 @@ body.dark .lock-footer { color: #6b6b76; }
     <header class="top home-header">
       <button class="theme-toggle" id="btnTheme" aria-label="Cambiar tema" title="Cambiar modo día/noche">🌙</button>
       <button class="help-btn" id="btnHelpHome" aria-label="Ayuda">?</button>
-      <h1>APPI</h1>
-      <div class="script">tu asistente</div>
-      <div class="date-context">
-        <div class="today" id="todayText">—</div>
-        <div class="month-progress"><div class="fill" id="monthProgressFill" style="width:0%"></div></div>
-        <div class="day-info" id="dayInfo">—</div>
+
+      <div class="home-brand-row">
+        <span class="home-brand-mark">APPI</span>
+      </div>
+
+      <div class="home-hero-card">
+        <div class="home-kicker">Tu tablero personal</div>
+        <h1 id="homeGreeting">Hola 👋</h1>
+        <p class="home-subtitle" id="todayText">—</p>
+
+        <div class="home-month-card">
+          <div class="home-month-row">
+            <span id="homeMonthName">Este mes</span>
+            <strong id="dayInfo">—</strong>
+          </div>
+          <div class="month-progress home-month-progress">
+            <div class="fill" id="monthProgressFill" style="width:0%"></div>
+          </div>
+          <div class="home-month-caption"><span id="monthProgressPct">0%</span> del mes recorrido</div>
+        </div>
       </div>
     </header>
 
-    <div class="welcome-banner" id="welcomeBanner" style="display:none">
-      <div class="wico">👋</div>
-      <div class="wtxt">
-        <h4>¡Bienvenido/a!</h4>
-        <p>Tocá el <strong>?</strong> arriba a la derecha para ver cómo usarla.</p>
+    <div id="bdayBannerWrap"></div>
+    <div id="scoreCompactWrap"></div>
+    <div id="nextStepWrap"></div>
+
+    <div class="home-section-head">
+      <div>
+        <span>Herramientas</span>
+        <h2>Accesos rápidos</h2>
       </div>
-      <button class="wclose" id="welcomeClose">✕</button>
+      <button type="button" onclick="showView('view-planning'); renderPlanningTools();">Ver todo</button>
     </div>
 
-    <div id="bdayBannerWrap"></div>
-
-    <div id="scoreCompactWrap"></div>
-
-    <div class="tools-list" id="toolsList"></div>
+    <div class="tools-list home-tools-grid" id="toolsList"></div>
 
     <div class="backup-collapsible" id="backupCollapsible">
       <div class="backup-head" id="backupHead">
         <span class="b-icon">💾</span>
-        <span class="b-title">Copia de seguridad</span>
+        <span class="b-title">Backup y datos</span>
         <span class="b-arrow">⌄</span>
       </div>
       <div class="backup-body">
@@ -2545,7 +3214,7 @@ body.dark .lock-footer { color: #6b6b76; }
     </div>
 
     <div class="footer-quote">
-      Con APPI podés mejorar tu vida todos los días.<br/>Planificá, formate y accioná.
+      Tu mes en foco, tus datos ordenados y tu próximo paso siempre claro.
     </div>
   </section>
   <!-- PLANIFICANDO MI MES -->
@@ -2927,9 +3596,11 @@ const HELP = {
       <li>🌳 <strong>Mi Equipo</strong> (cargando la planilla de tu empresa)</li>
     </ul>
     
+    <div class="tip"><strong>🌟 TABLERO DEL HOME</strong><br/>
+    En la pantalla principal vas a ver el progreso del mes, tu <strong>Score del mes</strong> y un <strong>próximo paso recomendado</strong> para saber qué cargar o revisar primero.</div>
+    
     <div class="tip"><strong>🌟 SCORE GENERAL</strong><br/>
-    Cuando cargues datos en las herramientas, aparecerá un número del 0 al 100 que resume tu mes.<br/><br/>
-    Se calcula así:<br/>
+    El número del 0 al 100 resume tu mes con esta fórmula:<br/>
     • ⚖️ 30% Rueda de la Vida<br/>
     • 📊 30% Rueda del Negocio<br/>
     • 🚀 25% Las 7 P<br/>
@@ -6803,10 +7474,23 @@ function timeAgo(ts){
 function lastUpdateFor(key){ return timeAgo(localStorage.getItem('lastUpdate_' + key)); }
 function renderDateContext(){
   const now = new Date();
-  document.getElementById('todayText').textContent = `${DAYS[now.getDay()]} ${now.getDate()} de ${MONTHS[now.getMonth()]}`;
+  const hour = now.getHours();
+  const saludo = hour < 12 ? 'Buen día' : (hour < 20 ? 'Buenas tardes' : 'Buenas noches');
   const daysInMonth = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
-  document.getElementById('monthProgressFill').style.width = Math.round((now.getDate() / daysInMonth) * 100) + '%';
-  document.getElementById('dayInfo').textContent = `Día ${now.getDate()} de ${daysInMonth}`;
+  const pct = Math.round((now.getDate() / daysInMonth) * 100);
+  const fecha = `${DAYS[now.getDay()]} ${now.getDate()} de ${MONTHS[now.getMonth()]}`;
+  const greeting = document.getElementById('homeGreeting');
+  const today = document.getElementById('todayText');
+  const monthName = document.getElementById('homeMonthName');
+  const progress = document.getElementById('monthProgressFill');
+  const pctText = document.getElementById('monthProgressPct');
+  const dayInfo = document.getElementById('dayInfo');
+  if(greeting) greeting.textContent = `${saludo} 👋`;
+  if(today) today.textContent = fecha;
+  if(monthName) monthName.textContent = `${MONTHS[now.getMonth()]} ${now.getFullYear()}`;
+  if(progress) progress.style.width = pct + '%';
+  if(pctText) pctText.textContent = pct + '%';
+  if(dayInfo) dayInfo.textContent = `Día ${now.getDate()} de ${daysInMonth}`;
 }
 function renderBdayBanner(){
   const wrap = document.getElementById('bdayBannerWrap');
@@ -6834,26 +7518,108 @@ function renderBdayBanner(){
   `;
   document.getElementById('bdayBannerClick').onclick = ()=>{ openEquipo(); };
 }
+function estadoHomeMensual(){
+  const pr = obtenerDatosPresupuestoActual();
+  const sp = obtenerProgresoSieteActual();
+  const rv = obtenerPromedioRuedaActual('vida');
+  const rn = obtenerPromedioRuedaActual('negocio');
+  return { pr, sp, rv, rn, conDatos: (pr.existe ? 1 : 0) + (sp.existe ? 1 : 0) + (rv ? 1 : 0) + (rn ? 1 : 0), total: 4 };
+}
+function obtenerProximoPaso(){
+  const { pr, sp, rv, rn } = estadoHomeMensual();
+  const eq = obtenerDatosEquipo();
+  const equipoCargado = eq.existe && (eq.total || 0) > 0;
+  if(!pr.existe){
+    return { icon:'💰', tone:'presu', label:'Próximo paso', title:'Cargá tu presupuesto mensual', desc:'Empezá por ingresos y gastos para que APPI pueda medir la salud de tu mes.', btn:'Ir a Presupuesto', run:()=>openPresu() };
+  }
+  if(pr.existe && pr.ing <= 0){
+    return { icon:'💵', tone:'presu', label:'Completar datos', title:'Agregá tus ingresos del mes', desc:'Tenés movimientos cargados, pero falta el ingreso para calcular mejor tu balance.', btn:'Completar presupuesto', run:()=>openPresu() };
+  }
+  if(!sp.existe){
+    return { icon:'🚀', tone:'siete', label:'Próximo paso', title:'Iniciá Las 7 P', desc:'Definí tu plan mensual paso a paso y convertí tus objetivos en acciones concretas.', btn:'Abrir Las 7 P', run:()=>openSiete() };
+  }
+  if(sp.done < sp.total){
+    return { icon:'✅', tone:'siete', label:'Seguir avanzando', title:`Completá Las 7 P (${sp.done}/${sp.total})`, desc:'Te quedan puntos por cerrar. Terminarlos ayuda a ordenar el foco del mes.', btn:'Continuar Las 7 P', run:()=>openSiete() };
+  }
+  if(!rv){
+    return { icon:'⚖️', tone:'vida', label:'Próximo paso', title:'Evaluá tu Rueda de la Vida', desc:'Medí tus áreas personales para detectar dónde conviene poner energía esta semana.', btn:'Evaluar vida', run:()=>openRueda('vida') };
+  }
+  if(!rn){
+    return { icon:'📊', tone:'negocio', label:'Próximo paso', title:'Evaluá tu Rueda del Negocio', desc:'Revisá tus áreas profesionales y encontrá oportunidades concretas de mejora.', btn:'Evaluar negocio', run:()=>openRueda('negocio') };
+  }
+  if(!equipoCargado){
+    return { icon:'🌳', tone:'equipo', label:'Potenciá tu negocio', title:'Cargá tu equipo', desc:'Importá tu línea descendente para ver actividad, cumpleaños y datos clave.', btn:'Ir a Mi Equipo', run:()=>openEquipo() };
+  }
+  return { icon:'📤', tone:'done', label:'Mes ordenado', title:'Compartí tu informe mensual', desc:'Ya tenés las herramientas principales cargadas. Enviá un resumen por WhatsApp.', btn:'Compartir resumen', run:(e)=>compartirConsolidado(e), done:true };
+}
+function renderNextStep(){
+  const wrap = document.getElementById('nextStepWrap');
+  if(!wrap) return;
+  const step = obtenerProximoPaso();
+  wrap.innerHTML = `
+    <div class="next-step-card ${step.done ? 'done' : ''}" id="nextStepCard">
+      <div class="step-grid">
+        <div class="step-icon">${step.icon}</div>
+        <div>
+          <div class="step-label">${step.label}</div>
+          <h3>${escapeXml(step.title)}</h3>
+          <p>${escapeXml(step.desc)}</p>
+        </div>
+      </div>
+      <button type="button" class="step-action" id="btnNextStep">${escapeXml(step.btn)} →</button>
+    </div>
+  `;
+  const btn = document.getElementById('btnNextStep');
+  if(btn){
+    btn.onclick = (e)=>{
+      e.stopPropagation();
+      haptic(12);
+      step.run(e);
+    };
+  }
+}
 function renderScoreCompact(){
   const wrap = document.getElementById('scoreCompactWrap');
+  if(!wrap) return;
   const sc = calcularScoreGeneral();
-  if(sc.peso === 0){ wrap.innerHTML = ''; return; }
-  let msg = sc.score >= 80 ? '🌟 ¡Excelente mes!' : sc.score >= 60 ? '💪 Buen mes' : sc.score >= 40 ? '📈 Trabajá áreas clave' : '🌱 Momento de replantear';
+  const { conDatos, total } = estadoHomeMensual();
+  const deg = Math.max(0, Math.min(100, sc.score)) * 3.6;
+  let msg = 'Todavía no hay datos. Empezá cargando tu presupuesto para activar el tablero.';
+  if(sc.peso > 0){
+    msg = sc.score >= 80 ? 'Excelente ritmo. Mantené el foco y compartí tu avance.' :
+          sc.score >= 60 ? 'Buen mes. Revisá el próximo paso para seguir subiendo.' :
+          sc.score >= 40 ? 'Hay base para mejorar. Elegí una herramienta y avanzá hoy.' :
+          'Momento ideal para ordenar prioridades y tomar una acción simple.';
+  }
+  const actionLabel = sc.peso > 0 ? 'Compartir' : 'Empezar';
+  const actionClass = sc.peso > 0 ? '' : 'start';
   wrap.innerHTML = `
-    <div class="score-compact" id="scoreCompact">
-      <div class="top-row">
-        <div class="label-side"><span class="star">🌟</span><span class="lbl-text">Score del mes</span></div>
-        <div class="score-val">${sc.score}<span class="max">/100</span></div>
-      </div>
-      <div class="bar-full"><div class="fill" style="width:${sc.score}%"></div></div>
-      <div class="bottom-row">
-        <div class="msg">${msg}</div>
-        <button class="share-mini" id="btnShareMini"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.37 5.06L2 22l4.94-1.37C8.42 21.5 10.15 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2z"/></svg>Compartir</button>
+    <div class="score-compact score-dashboard" id="scoreCompact" style="--score-deg:${deg}deg">
+      <div class="score-shell">
+        <div class="score-info">
+          <div class="score-kicker"><span class="dot-live"></span> Score del mes</div>
+          <div class="score-number">${sc.score}<span>/100</span></div>
+          <p class="score-msg">${escapeXml(msg)}</p>
+          <div class="score-meta-row">
+            <span class="score-pill">${conDatos}/${total} herramientas activas</span>
+            <button type="button" class="score-action ${actionClass}" id="btnScoreAction">${actionLabel}</button>
+          </div>
+        </div>
+        <div class="score-ring"><span>${sc.score}%</span></div>
       </div>
     </div>
   `;
-  document.getElementById('scoreCompact').onclick = (e)=>{ if(e.target.closest('#btnShareMini')) return; showHelp('score'); };
-  document.getElementById('btnShareMini').onclick = compartirConsolidado;
+  const card = document.getElementById('scoreCompact');
+  const action = document.getElementById('btnScoreAction');
+  if(card) card.onclick = (e)=>{ if(e.target.closest('#btnScoreAction')) return; showHelp('score'); };
+  if(action){
+    action.onclick = (e)=>{
+      e.stopPropagation();
+      haptic(10);
+      if(sc.peso > 0) compartirConsolidado(e);
+      else { showView('view-planning'); renderPlanningTools(); }
+    };
+  }
 }
 function renderToolCard(cfg){
   const { icon, iconClass, title, sub, statusVal, statusLbl, statusClass, progressPct, progressColor, timeAgo, onClick, accent } = cfg;
@@ -6867,92 +7633,94 @@ function renderToolCard(cfg){
       ${progressPct !== undefined ? `<div class="tool-progress"><div class="mini-bar"><div class="fill" style="width:${progressPct}%; background:${progressColor}"></div></div>${timeAgo ? `<span class="time-ago">🕐 ${timeAgo}</span>` : ''}</div>` : (timeAgo ? `<div class="tool-progress"><div class="mini-bar" style="visibility:hidden"></div><span class="time-ago">🕐 ${timeAgo}</span></div>` : '')}
     </div>`;
 }
+function renderHomeQuickCard(cfg){
+  const pct = cfg.progressPct === undefined ? 0 : Math.max(0, Math.min(100, Math.round(cfg.progressPct)));
+  const updated = cfg.timeAgo ? `<span class="quick-updated">🕐 ${cfg.timeAgo}</span>` : '';
+  return `
+    <button type="button" class="quick-tool-card" style="--accent:${cfg.accent}; --pct:${pct}%" onclick="${cfg.onClick}">
+      <div class="quick-tool-top">
+        <div class="quick-icon" style="background:${cfg.gradient || cfg.accent}">${cfg.icon}</div>
+        <span class="quick-state ${cfg.statusClass || 'empty'}">${cfg.statusVal}</span>
+      </div>
+      <h3>${escapeXml(cfg.title)}</h3>
+      <p>${escapeXml(cfg.sub)}</p>
+      <div class="quick-progress-line"><span></span></div>
+      ${updated}
+    </button>
+  `;
+}
 function renderToolsList(){
   const pr = obtenerDatosPresupuestoActual();
   const sp = obtenerProgresoSieteActual();
   const rv = obtenerPromedioRuedaActual('vida');
   const rn = obtenerPromedioRuedaActual('negocio');
   const eq = obtenerDatosEquipo();
-  
-  const planningIcon = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 14l2 2 4-4"/></svg>`;
-  const eqIcon = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>`;
-  
-  // Contar cuántas herramientas de planificación tienen datos
-  const totalHerramientas = 4;
-  const conDatos = (pr.existe ? 1 : 0) + (sp.existe ? 1 : 0) + (rv ? 1 : 0) + (rn ? 1 : 0);
-  
-  // Mini valores para mostrar dentro de la tarjeta
-  const miniPresu = pr.existe 
-    ? `<span class="pm-val ${pr.neto>=0?'pos':'neg'}">${pr.neto>=0?'+':'-'}$${formatMoney(Math.abs(pr.neto))}</span>` 
-    : `<span class="pm-val empty">Sin cargar</span>`;
-  const miniSiete = sp.existe 
-    ? `<span class="pm-val">${sp.done}/${sp.total}</span>` 
-    : `<span class="pm-val empty">Sin iniciar</span>`;
-  const miniVida = rv 
-    ? `<span class="pm-val">${rv.avg.toFixed(1)}/10</span>` 
-    : `<span class="pm-val empty">Sin evaluar</span>`;
-  const miniNeg = rn 
-    ? `<span class="pm-val">${rn.avg.toFixed(1)}/10</span>` 
-    : `<span class="pm-val empty">Sin evaluar</span>`;
-  
-  const planningCard = `
-    <div class="tool-card planning-card" style="--accent:#5b8def" onclick="showView('view-planning'); renderPlanningTools();">
-      <div class="tool-head">
-        <div class="tool-icon vida">${planningIcon}</div>
-        <div class="tool-title-block">
-          <h3>Planificando mi mes</h3>
-          <div class="tool-sub">Presupuesto, 7P y Ruedas</div>
-        </div>
-        <div class="tool-status">
-          <div class="status-val neutral">${conDatos}/${totalHerramientas}</div>
-          <div class="status-lbl">Activas</div>
-        </div>
+  const equipoCargado = eq.existe && (eq.total || 0) > 0;
+
+  const presuStatus = pr.existe ? `${pr.neto>=0?'+':'-'}$${formatMoney(Math.abs(pr.neto))}` : 'Sin cargar';
+  const presuPct = pr.existe && pr.ing > 0 ? Math.min(100, (pr.gast / pr.ing) * 100) : 0;
+  const sieteCompleto = sp.existe && sp.done === sp.total;
+  const vidaPct = rv ? rv.avg * 10 : 0;
+  const negocioPct = rn ? rn.avg * 10 : 0;
+
+  const c1 = renderHomeQuickCard({
+    icon:'💰', title:'Presupuesto', sub:'Ingresos y gastos del mes',
+    statusVal: presuStatus,
+    statusClass: pr.existe ? (pr.neto >= 0 ? 'pos' : 'neg') : 'empty',
+    progressPct: presuPct,
+    timeAgo: lastUpdateFor('presu'),
+    onClick:'openPresu()', accent:'#f5b301', gradient:'linear-gradient(135deg,#f5b301,#ff8f6b)'
+  });
+  const c2 = renderHomeQuickCard({
+    icon:'🚀', title:'Las 7 P', sub:'Plan mensual paso a paso',
+    statusVal: sp.existe ? `${sp.done}/${sp.total}` : 'Sin iniciar',
+    statusClass: sp.existe ? (sieteCompleto ? 'done' : 'pending') : 'empty',
+    progressPct: sp.existe ? sp.pct : 0,
+    timeAgo: lastUpdateFor('siete'),
+    onClick:'openSiete()', accent:'#3ad0a4', gradient:'linear-gradient(135deg,#3ad0a4,#5b8def)'
+  });
+  const c3 = renderHomeQuickCard({
+    icon:'⚖️', title:'Rueda Vida', sub:'8 áreas personales',
+    statusVal: rv ? `${rv.avg.toFixed(1)}/10` : 'Sin evaluar',
+    statusClass: rv ? 'pending' : 'empty',
+    progressPct: vidaPct,
+    timeAgo: lastUpdateFor('rueda_vida'),
+    onClick:`openRueda('vida')`, accent:'#5b8def', gradient:'linear-gradient(135deg,#5b8def,#a06bff)'
+  });
+  const c4 = renderHomeQuickCard({
+    icon:'📊', title:'Rueda Negocio', sub:'8 áreas profesionales',
+    statusVal: rn ? `${rn.avg.toFixed(1)}/10` : 'Sin evaluar',
+    statusClass: rn ? 'pending' : 'empty',
+    progressPct: negocioPct,
+    timeAgo: lastUpdateFor('rueda_negocio'),
+    onClick:`openRueda('negocio')`, accent:'#ff6b9d', gradient:'linear-gradient(135deg,#ff8f6b,#ff6b9d)'
+  });
+
+  const equipoCard = `
+    <button type="button" class="business-card" onclick="openEquipo()">
+      <div class="business-icon">🌳</div>
+      <div>
+        <h3>Mi Equipo</h3>
+        <p>${equipoCargado ? `${eq.activos} activos de ${eq.total} personas` : 'Importá tu línea descendente y mirá datos clave.'}</p>
       </div>
-      <div class="planning-mini-grid">
-        <div class="planning-mini">
-          <span class="pm-emo">💰</span>
-          <div class="pm-info">
-            <div class="pm-name">Presupuesto</div>
-            ${miniPresu}
-          </div>
-        </div>
-        <div class="planning-mini">
-          <span class="pm-emo">🚀</span>
-          <div class="pm-info">
-            <div class="pm-name">Las 7 P</div>
-            ${miniSiete}
-          </div>
-        </div>
-        <div class="planning-mini">
-          <span class="pm-emo">⚖️</span>
-          <div class="pm-info">
-            <div class="pm-name">Rueda Vida</div>
-            ${miniVida}
-          </div>
-        </div>
-        <div class="planning-mini">
-          <span class="pm-emo">📊</span>
-          <div class="pm-info">
-            <div class="pm-name">Rueda Neg.</div>
-            ${miniNeg}
-          </div>
-        </div>
+      <div class="business-status">
+        ${equipoCargado ? `${eq.total}` : 'Sin cargar'}
+        <small>${equipoCargado ? `${eq.pctActivos}% activos` : 'Equipo'}</small>
       </div>
+      <div class="business-progress" style="--pct:${equipoCargado ? eq.pctActivos : 0}%"><span></span></div>
+    </button>
+  `;
+
+  document.getElementById('toolsList').innerHTML = `
+    <div class="home-section-block">
+      <div class="mini-section-label"><span>📅</span> Mi mes</div>
+      <div class="home-tool-grid">${c1 + c2 + c3 + c4}</div>
+    </div>
+    <div class="home-section-block">
+      <div class="mini-section-label"><span>🌱</span> Mi negocio</div>
+      ${equipoCard}
     </div>
   `;
-  
-  const equipoCard = renderToolCard({ 
-    icon: eqIcon, iconClass:'equipo', title:'Mi Equipo', sub:'Línea descendente', 
-    statusVal: eq.existe ? `${eq.total}` : 'Sin cargar', 
-    statusLbl: eq.existe ? `${eq.pctActivos}% activos` : '', 
-    statusClass: eq.existe ? 'neutral' : 'empty', 
-    progressPct: eq.existe ? eq.pctActivos : undefined, 
-    progressColor:'linear-gradient(90deg,#3ad0a4,#a06bff)', 
-    timeAgo: lastUpdateFor('equipo'), 
-    onClick:'openEquipo()', accent:'#3ad0a4' 
-  });
-  
-  document.getElementById('toolsList').innerHTML = planningCard + equipoCard;
 }
 async function compartirConsolidado(e){
   if(e) e.stopPropagation();
@@ -6971,6 +7739,7 @@ function renderHomeCompleto(){
   renderDateContext();
   renderBdayBanner();
   renderScoreCompact();
+  renderNextStep();
   renderToolsList();
 }
 function renderPlanningTools(){
