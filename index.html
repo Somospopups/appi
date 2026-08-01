@@ -5425,7 +5425,26 @@ function generarMensajePersonal(persona){
   const g = persona.garantias || { presentadas: 0, vencidas: 0, pendientes: 0 };
   const pctVenc = g.presentadas > 0 ? Math.round((g.vencidas/g.presentadas)*100) : 0;
   
-  let msg = `👤 *${persona.nombre}*\n📅 ${MONTHS[new Date().getMonth()]} ${new Date().getFullYear()}\n━━━━━━━━━━━━━━━\n\n`;
+  // Formatear fecha de alta
+  let fechaAltaFormateada = '';
+  if(persona.alta){
+    const parts = persona.alta.split('-');
+    if(parts.length >= 3){
+      const anio = parseInt(parts[0]);
+      const mes = parseInt(parts[1]);
+      const dia = parseInt(parts[2]);
+      if(!isNaN(dia) && !isNaN(mes) && !isNaN(anio)){
+        fechaAltaFormateada = `${dia} de ${MONTHS[mes-1]} de ${anio}`;
+      }
+    }
+    if(!fechaAltaFormateada) fechaAltaFormateada = persona.alta;
+  }
+  
+  let msg = `👤 *${persona.nombre}*\n`;
+  if(fechaAltaFormateada){
+    msg += `📅 Alta: ${fechaAltaFormateada}\n`;
+  }
+  msg += `━━━━━━━━━━━━━━━\n\n`;
   msg += `📊 Categoría: ${info.name} (${info.full})\n`;
   msg += `⭐ PB Personal: *${formatPB(persona.pnAct)}*\n`;
   if(pbOrg > (persona.pnAct || 0)){
@@ -5439,24 +5458,9 @@ function generarMensajePersonal(persona){
     msg += `• Pendientes: ${formatPB(g.pendientes)}\n`;
   }
   
-  if(persona.alta){
-    msg += `\n📅 Alta: ${persona.alta}\n`;
-  }
-  if(persona.cumple){
-    const parts = persona.cumple.split('-');
-    if(parts.length >= 3){
-      const dia = parseInt(parts[2]);
-      const mes = parseInt(parts[1]);
-      if(!isNaN(dia) && !isNaN(mes)){
-        msg += `🎂 Cumpleaños: ${dia} de ${MONTHS[mes-1]}\n`;
-      }
-    }
-  }
-  
   msg += `\n━━━━━━━━━━━━━━━\nEnviado desde *APPI* 🚀`;
   return msg;
 }
-
 // Genera mensaje: Datos del equipo de una persona
 function generarMensajeEquipoDePersona(persona){
   const descendientes = obtenerDescendientes(persona).filter(p => p.id !== persona.id);
