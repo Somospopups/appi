@@ -6707,8 +6707,43 @@ document.getElementById('importInput').onchange = (e)=>{
 };
 
 (function(){
-  if(!localStorage.getItem('welcomeSeen')) document.getElementById('welcomeBanner').style.display = 'flex';
-  document.getElementById('welcomeClose').onclick = ()=>{ localStorage.setItem('welcomeSeen','1'); document.getElementById('welcomeBanner').style.display = 'none'; };
+  // Ocultar la tarjeta vieja siempre (ya no la usamos)
+  const welcomeBanner = document.getElementById('welcomeBanner');
+  if(welcomeBanner) welcomeBanner.style.display = 'none';
+  
+  // Mostrar animación en botón "?" solo la primera vez
+  if(!localStorage.getItem('welcomeSeen')){
+    const btnHelp = document.getElementById('btnHelpHome');
+    if(btnHelp){
+      // Agregar animación de pulso
+      btnHelp.classList.add('pulse-hint');
+      
+      // Crear tooltip
+      const tooltip = document.createElement('div');
+      tooltip.className = 'help-tooltip';
+      tooltip.textContent = '¿Cómo funciona?';
+      btnHelp.parentElement.appendChild(tooltip);
+      
+      // Quitar el tooltip después de 4 segundos
+      setTimeout(() => {
+        if(tooltip.parentElement) tooltip.parentElement.removeChild(tooltip);
+      }, 4000);
+      
+      // Al hacer clic, marcar como visto y quitar animación
+      const detenerAnimacion = () => {
+        btnHelp.classList.remove('pulse-hint');
+        localStorage.setItem('welcomeSeen', '1');
+        btnHelp.removeEventListener('click', detenerAnimacion);
+      };
+      btnHelp.addEventListener('click', detenerAnimacion);
+      
+      // También quitar la animación después de 15 segundos automáticamente
+      setTimeout(() => {
+        btnHelp.classList.remove('pulse-hint');
+        localStorage.setItem('welcomeSeen', '1');
+      }, 15000);
+    }
+  }
 })();
 
 /* ============ MODO DÍA/NOCHE ============ */
