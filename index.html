@@ -3580,40 +3580,37 @@ function confirmarAccion({title, sub, html, okText, cancelText, danger, onConfir
 const HELP = {
   home: {
     icon:'🏠', iconBg:'linear-gradient(135deg,#5b8def,#a06bff,#ff6b9d)',
-    title:'Bienvenido/a a APPI',
-    sub:'Tu asistente personal',
-    html:`<p>Tu asistente personal para <strong>planificar, formarte y accionar</strong>. Todo en un solo lugar, siempre a mano.</p>
-    
-    <p><strong>🎯 QUÉ VAS A ENCONTRAR</strong></p>
-    <p>Tenés 5 herramientas para trabajar mes a mes:</p>
+    title:'Pantalla principal',
+    sub:'Tu tablero de acción',
+    html:`<p>Tu pantalla principal es un tablero para ver rápidamente cómo viene tu mes y decidir qué hacer a continuación.</p>
+
+    <div class="tip"><strong>👋 SALUDO Y PROGRESO DEL MES</strong><br/>
+    Encontrá tu saludo y el avance general de lo que cargaste y completaste durante el mes.</div>
+
+    <div class="tip"><strong>🌟 SCORE DEL MES</strong><br/>
+    Un número de 0 a 100 que resume tu progreso. Tocá el Score para conocer cómo leerlo, cómo se calcula y compartir tu informe.</div>
+
+    <div class="tip"><strong>🎯 PRÓXIMO PASO RECOMENDADO</strong><br/>
+    APPI te sugiere qué cargar o revisar primero para que puedas avanzar sin perder el foco.</div>
+
+    <p><strong>⚡ ACCESOS RÁPIDOS</strong></p>
+    <p>Desde el Home podés entrar directamente a tus herramientas:</p>
     <ul>
-      <li>📅 <strong>Planificando mi mes</strong> (4 herramientas juntas):
-        <br>&nbsp;&nbsp;• 💰 Presupuesto Mensual
-        <br>&nbsp;&nbsp;• 🚀 Las 7 P
-        <br>&nbsp;&nbsp;• ⚖️ Rueda de la Vida
-        <br>&nbsp;&nbsp;• 📊 Rueda del Negocio
-      </li>
-      <li>🌳 <strong>Mi Equipo</strong> (cargando la planilla de tu empresa)</li>
+      <li>💰 <strong>Presupuesto</strong></li>
+      <li>🚀 <strong>Las 7 P</strong></li>
+      <li>⚖️ <strong>Rueda Vida</strong></li>
+      <li>📊 <strong>Rueda Negocio</strong></li>
+      <li>🌳 <strong>Mi Equipo</strong></li>
     </ul>
-    
-    <div class="tip"><strong>🌟 TABLERO DEL HOME</strong><br/>
-    En la pantalla principal vas a ver el progreso del mes, tu <strong>Score del mes</strong> y un <strong>próximo paso recomendado</strong> para saber qué cargar o revisar primero.</div>
-    
-    <div class="tip"><strong>🌟 SCORE GENERAL</strong><br/>
-    El número del 0 al 100 resume tu mes con esta fórmula:<br/>
-    • ⚖️ 30% Rueda de la Vida<br/>
-    • 📊 30% Rueda del Negocio<br/>
-    • 🚀 25% Las 7 P<br/>
-    • 💰 15% Salud financiera</div>
-    
+
     <div class="tip"><strong>🎂 CUMPLEAÑOS</strong><br/>
-    Si cargaste "Mi Equipo", te va a aparecer un aviso cuando alguien de tu equipo cumpla años ese día.</div>
-    
-    <div class="tip"><strong>💡 TIPS</strong><br/>
-    • 🌙 Cambiá entre modo día y noche con el ícono arriba a la izquierda<br/>
-    • 💾 Podés hacer backup de todos tus datos (abajo)<br/>
-    • 📤 Compartí tu resumen del mes por WhatsApp<br/>
-    • 🔒 Todo se guarda solo en tu dispositivo (100% privado)</div>`
+    Si cargaste "Mi Equipo", vas a ver un aviso cuando alguien de tu equipo cumpla años ese día.</div>
+
+    <div class="tip"><strong>💾 BACKUP Y DATOS</strong><br/>
+    Podés hacer backup de todos tus datos desde la pantalla principal. Todo se guarda en tu dispositivo y podés restaurarlo cuando lo necesites.</div>
+
+    <div class="tip"><strong>💡 TIP</strong><br/>
+    Usá el botón ? cuando necesites una explicación de cada herramienta y compartí tu informe del mes por WhatsApp.</div>`
   },
   presu: {
     icon:'💰', iconBg:'linear-gradient(135deg,#f5b301,#ff8f6b)',
@@ -3813,7 +3810,17 @@ const HELP = {
     
     <div class="tip"><strong>💡 TIP:</strong> desde el detalle podés contactar por WhatsApp, llamar o enviar email en un toque.</div>`
   },
-  score: { icon:'🌟', iconBg:'linear-gradient(135deg,#5b8def,#a06bff,#ff6b9d)', title:'Score General', sub:'¿Cómo se calcula?', html:`<p>Combina las 4 herramientas personales en un número de 0 a 100.</p><ul><li>⚖️ 30% Rueda de la Vida</li><li>📊 30% Rueda del Negocio</li><li>🚀 25% Las 7 P</li><li>💰 15% Salud financiera</li></ul>` }
+  score: { icon:'🌟', iconBg:'linear-gradient(135deg,#5b8def,#a06bff,#ff6b9d)', title:'Score del mes', sub:'Cómo leerlo y compartirlo', html:`<p>El <strong>Score del mes</strong> es un número de 0 a 100 que resume cómo viene tu mes. Cuanto más alto sea, mayor es tu nivel de avance y carga en las herramientas.</p>
+    <div class="tip"><strong>📖 CÓMO LEERLO</strong><br/>
+    Mirá el número y la barra de progreso para tener una visión rápida de tu avance. El Score se actualiza cuando completás o modificás la información de tus herramientas.</div>
+    <div class="tip"><strong>🧮 CÓMO SE CALCULA</strong><br/>
+    Combina estas 4 áreas personales:<br/>
+    • ⚖️ 30% Rueda de la Vida<br/>
+    • 📊 30% Rueda del Negocio<br/>
+    • 🚀 25% Las 7 P<br/>
+    • 💰 15% Salud financiera</div>
+    <div class="tip"><strong>📤 COMPARTÍ TU INFORME</strong><br/>
+    Tocá el botón de compartir para enviar tu informe del mes por WhatsApp y mostrar tu progreso.</div>` }
 };
 
 function showHelp(key){ const h = HELP[key]; if(h) modal.open(h); }
