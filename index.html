@@ -518,6 +518,37 @@
   .view { display: none; }
   .view.active { display: block; animation: fade .25s ease; }
   @keyframes fade { from { opacity: 0; transform: translateY(4px);} to {opacity:1; transform:none;} }
+
+  /* ============ SEGUIMIENTO ============ */
+  .seguimiento-summary { display:grid; grid-template-columns:repeat(3,1fr); gap:9px; margin-bottom:14px; }
+  .seguimiento-stat { padding:13px 10px; border-radius:18px; background:rgba(255,255,255,.62); border:1px solid rgba(255,255,255,.8); text-align:center; box-shadow:0 8px 22px rgba(80,90,130,.07); }
+  .seguimiento-stat strong { display:block; color:#1c1c27; font-size:22px; line-height:1; }
+  .seguimiento-stat span { display:block; margin-top:5px; color:#777887; font-size:10px; font-weight:850; }
+  .seguimiento-actions { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:12px 0 16px; }
+  .seguimiento-form, .seguimiento-item { padding:15px; border-radius:20px; background:rgba(255,255,255,.62); border:1px solid rgba(255,255,255,.82); box-shadow:0 8px 22px rgba(80,90,130,.07); }
+  .seguimiento-form { margin-bottom:14px; }
+  .seguimiento-form h3 { margin:0 0 12px; font-size:16px; color:#1c1c27; }
+  .seg-field { margin-bottom:10px; }
+  .seg-field label { display:block; margin-bottom:5px; color:#60606d; font-size:11px; font-weight:900; }
+  .seg-field input, .seg-field select, .seg-field textarea { box-sizing:border-box; width:100%; padding:12px; border:1px solid rgba(80,90,130,.16); border-radius:12px; background:rgba(255,255,255,.75); color:#282832; font:inherit; font-size:14px; }
+  .seg-field textarea { min-height:70px; resize:vertical; }
+  .seguimiento-item { position:relative; margin-bottom:10px; }
+  .seg-item-head { display:flex; justify-content:space-between; gap:8px; align-items:flex-start; }
+  .seg-item-head h3 { margin:0; color:#1c1c27; font-size:16px; }
+  .seg-item-phone { margin-top:3px; color:#777887; font-size:12px; }
+  .seg-badge { padding:5px 8px; border-radius:999px; background:rgba(91,141,239,.13); color:#3d63c9; font-size:10px; font-weight:900; white-space:nowrap; }
+  .seg-meta { display:flex; flex-wrap:wrap; gap:6px; margin:11px 0; color:#60606d; font-size:11px; font-weight:750; }
+  .seg-meta span { padding:5px 7px; border-radius:8px; background:rgba(80,90,130,.08); }
+  .seg-note { margin:0 0 11px; color:#60606d; font-size:12px; line-height:1.35; }
+  .seg-item-actions { display:flex; gap:7px; flex-wrap:wrap; }
+  .seg-item-actions button { border:0; border-radius:10px; padding:9px 10px; background:rgba(91,141,239,.13); color:#3d63c9; font:inherit; font-size:11px; font-weight:900; cursor:pointer; }
+  .seg-item-actions button.done { background:rgba(58,208,164,.16); color:#1d7a5c; }
+  .seg-item-actions button.delete { background:rgba(217,83,79,.12); color:#b94440; }
+  .seg-empty { padding:27px 18px; border-radius:20px; background:rgba(255,255,255,.48); text-align:center; color:#777887; }
+  .seg-empty strong { display:block; margin-bottom:5px; color:#3d3d49; font-size:16px; }
+  body.dark .seguimiento-stat, body.dark .seguimiento-form, body.dark .seguimiento-item, body.dark .seg-empty { background:rgba(30,30,50,.55); border-color:rgba(255,255,255,.09); }
+  body.dark .seguimiento-stat strong, body.dark .seguimiento-form h3, body.dark .seg-item-head h3, body.dark .seg-empty strong { color:#f0f0f5; }
+  body.dark .seg-field input, body.dark .seg-field select, body.dark .seg-field textarea { background:rgba(30,30,50,.7); color:#f0f0f5; border-color:rgba(255,255,255,.12); }
 </style>
 <style>
   .history-item {
@@ -3426,6 +3457,32 @@ body.dark .lock-footer { color: #6b6b76; }
     <div id="presuHistList"></div>
   </section>
 
+  <!-- SEGUIMIENTO DE PERSONAS -->
+  <section id="view-seguimiento" class="view">
+    <header class="top">
+      <button class="back-btn" id="btnBackSeguimiento" aria-label="Volver">‹</button>
+      <h1>Seguimiento</h1>
+      <div class="script">de personas</div>
+      <p>Tu próximo paso, siempre claro</p>
+    </header>
+    <div class="seguimiento-summary" id="seguimientoSummary"></div>
+    <div class="seguimiento-actions">
+      <button class="btn primary" id="btnNuevoSeguimiento">＋ Nueva persona</button>
+      <button class="btn" id="btnSegFilter">📋 Ver todas</button>
+    </div>
+    <div class="seguimiento-form" id="seguimientoForm" style="display:none">
+      <h3 id="seguimientoFormTitle">Nueva persona</h3>
+      <div class="seg-field"><label for="segNombre">Nombre</label><input id="segNombre" placeholder="Ej: María López" autocomplete="name"></div>
+      <div class="seg-field"><label for="segTelefono">Teléfono</label><input id="segTelefono" placeholder="Ej: 351 555 1234" type="tel"></div>
+      <div class="seg-field"><label for="segInteres">¿Qué le interesa?</label><select id="segInteres"><option>Producto</option><option>Negocio</option><option>Empresa</option><option>Desarrollo personal</option><option>Por definir</option></select></div>
+      <div class="seg-field"><label for="segEstado">Estado</label><select id="segEstado"><option>Sin contactar</option><option>Contactado</option><option>Presentación realizada</option><option>Demostración realizada</option><option>Seguimiento pendiente</option><option>Cliente</option><option>Invitado</option><option>No interesado</option></select></div>
+      <div class="seg-field"><label for="segFecha">Próximo contacto</label><input id="segFecha" type="date"></div>
+      <div class="seg-field"><label for="segNotas">Notas</label><textarea id="segNotas" placeholder="¿Qué acordaron? ¿Qué tenés que recordar?"></textarea></div>
+      <div class="actions"><button class="btn" id="btnCancelarSeg">Cancelar</button><button class="btn primary" id="btnGuardarSeg">Guardar</button></div>
+    </div>
+    <div id="seguimientoList"></div>
+  </section>
+
   <!-- 🌳 MI EQUIPO -->
   <section id="view-equipo" class="view">
     <header class="top">
@@ -3886,13 +3943,14 @@ function showView(id){
   document.querySelectorAll('nav.tabs button').forEach(b=>{
     b.classList.toggle('active', b.dataset.view===id);
   });
-  const hideTabsOn = ['view-home','view-siete','view-siete-detail','view-presu','view-presu-hist','view-equipo','view-planning'];
+  const hideTabsOn = ['view-home','view-siete','view-siete-detail','view-presu','view-presu-hist','view-equipo','view-seguimiento','view-planning'];
   document.getElementById('tabs').style.display = hideTabsOn.includes(id) ? 'none' : 'flex';
   if(id==='view-history') renderHistory();
   if(id==='view-eval')    renderAreas();
   if(id==='view-wheel')   renderWheel();
   if(id==='view-home')    renderHomeCompleto();
   if(id==='view-planning') renderPlanningTools();
+  if(id==='view-seguimiento') renderSeguimiento();
   document.body.classList.toggle('evaluar-hint', id === 'view-wheel');
   window.scrollTo({top:0});
 }
@@ -3921,6 +3979,7 @@ document.getElementById('btnBackSieteDetail').addEventListener('click', ()=> { s
 document.getElementById('btnBackPresu').addEventListener('click', ()=> showView('view-home'));
 document.getElementById('btnBackPresuHist').addEventListener('click', ()=> showView('view-presu'));
 document.getElementById('btnBackEquipo').addEventListener('click', ()=> showView('view-home'));
+document.getElementById('btnBackSeguimiento').addEventListener('click', ()=> showView('view-home'));
 document.getElementById('btnBackPlanning').addEventListener('click', ()=> showView('view-home'));
 document.querySelectorAll('nav.tabs button').forEach(btn=>btn.addEventListener('click', ()=> showView(btn.dataset.view)));
 document.getElementById('month').addEventListener('change', e => { state.month = +e.target.value; persistDraft(); });
@@ -7552,6 +7611,41 @@ function obtenerProximoPaso(){
   }
   return { icon:'📤', tone:'done', label:'Mes ordenado', title:'Compartí tu informe mensual', desc:'Ya tenés las herramientas principales cargadas. Enviá un resumen por WhatsApp.', btn:'Compartir resumen', run:(e)=>compartirConsolidado(e), done:true };
 }
+const SEG_KEY = 'seguimientoPersonas';
+let seguimientoFiltro = 'pendientes';
+let seguimientoEditId = null;
+function cargarSeguimientos(){ try { return JSON.parse(localStorage.getItem(SEG_KEY) || '[]'); } catch(e){ return []; } }
+function guardarSeguimientos(list){ localStorage.setItem(SEG_KEY, JSON.stringify(list)); localStorage.setItem('lastUpdate_seguimiento', Date.now().toString()); }
+function fechaSeg(d){ if(!d) return ''; const [y,m,day]=d.split('-'); return `${day}/${m}/${y}`; }
+function seguimientoVencido(p){ return p.fecha && p.fecha < new Date().toISOString().slice(0,10) && !['Cliente','No interesado'].includes(p.estado); }
+function seguimientoPendientes(){ return cargarSeguimientos().filter(p=>!['Cliente','No interesado'].includes(p.estado)).length; }
+function seguimientoProgreso(){ const a=cargarSeguimientos(); if(!a.length) return 0; return Math.round(a.filter(p=>p.estado==='Cliente').length/a.length*100); }
+function openSeguimiento(){ showView('view-seguimiento'); }
+function limpiarFormularioSeg(){ ['segNombre','segTelefono','segFecha','segNotas'].forEach(id=>document.getElementById(id).value=''); document.getElementById('segInteres').value='Producto'; document.getElementById('segEstado').value='Sin contactar'; seguimientoEditId=null; }
+function renderSeguimiento(){
+  const all=cargarSeguimientos();
+  const hoy=new Date().toISOString().slice(0,10);
+  const pendientes=all.filter(p=>!['Cliente','No interesado'].includes(p.estado));
+  const hoyCount=pendientes.filter(p=>p.fecha===hoy).length;
+  const vencidos=pendientes.filter(seguimientoVencido).length;
+  document.getElementById('seguimientoSummary').innerHTML=`<div class="seguimiento-stat"><strong>${hoyCount}</strong><span>Para hoy</span></div><div class="seguimiento-stat"><strong>${vencidos}</strong><span>Vencidos</span></div><div class="seguimiento-stat"><strong>${pendientes.length}</strong><span>Pendientes</span></div>`;
+  const list=seguimientoFiltro==='todas' ? all : seguimientoFiltro==='hoy' ? all.filter(p=>p.fecha===hoy) : pendientes;
+  const cont=document.getElementById('seguimientoList');
+  if(!list.length){ cont.innerHTML='<div class="seg-empty"><strong> todavía no hay personas</strong>Agregá tu primer contacto para tener claro cuál es el próximo paso.</div>'; return; }
+  cont.innerHTML=list.map(p=>`<article class="seguimiento-item"><div class="seg-item-head"><div><h3>${escapeXml(p.nombre)}</h3><div class="seg-item-phone">${escapeXml(p.telefono||'Sin teléfono')}</div></div><span class="seg-badge">${escapeXml(p.estado)}</span></div><div class="seg-meta"><span>🎯 ${escapeXml(p.interes)}</span>${p.fecha?`<span>📅 ${fechaSeg(p.fecha)}${seguimientoVencido(p)?' · vencido':''}</span>`:''}</div>${p.notas?`<p class="seg-note">${escapeXml(p.notas)}</p>`:''}<div class="seg-item-actions"><button class="done" data-seg-done="${p.id}">✅ Listo</button><button data-seg-edit="${p.id}">✏️ Editar</button><button class="delete" data-seg-delete="${p.id}">Eliminar</button></div></article>`).join('');
+  cont.querySelectorAll('[data-seg-done]').forEach(b=>b.onclick=()=>actualizarSeguimiento(+b.dataset.segDone,'Cliente'));
+  cont.querySelectorAll('[data-seg-edit]').forEach(b=>b.onclick=()=>editarSeguimiento(+b.dataset.segEdit));
+  cont.querySelectorAll('[data-seg-delete]').forEach(b=>b.onclick=()=>eliminarSeguimiento(+b.dataset.segDelete));
+}
+function editarSeguimiento(id){ const p=cargarSeguimientos().find(x=>x.id===id); if(!p) return; seguimientoEditId=id; document.getElementById('segNombre').value=p.nombre; document.getElementById('segTelefono').value=p.telefono||''; document.getElementById('segInteres').value=p.interes; document.getElementById('segEstado').value=p.estado; document.getElementById('segFecha').value=p.fecha||''; document.getElementById('segNotas').value=p.notas||''; document.getElementById('seguimientoFormTitle').textContent='Editar persona'; document.getElementById('seguimientoForm').style.display='block'; window.scrollTo({top:0,behavior:'smooth'}); }
+function actualizarSeguimiento(id,estado){ const a=cargarSeguimientos(); const p=a.find(x=>x.id===id); if(p){p.estado=estado; guardarSeguimientos(a); renderSeguimiento(); renderHomeCompleto(); showToast('Seguimiento actualizado ✅',1800);} }
+function eliminarSeguimiento(id){ if(!confirm('¿Eliminar esta persona?')) return; guardarSeguimientos(cargarSeguimientos().filter(p=>p.id!==id)); renderSeguimiento(); renderHomeCompleto(); }
+
+document.getElementById('btnNuevoSeguimiento').addEventListener('click',()=>{ limpiarFormularioSeg(); document.getElementById('seguimientoFormTitle').textContent='Nueva persona'; document.getElementById('seguimientoForm').style.display='block'; document.getElementById('segNombre').focus(); });
+document.getElementById('btnCancelarSeg').addEventListener('click',()=>{ document.getElementById('seguimientoForm').style.display='none'; limpiarFormularioSeg(); });
+document.getElementById('btnGuardarSeg').addEventListener('click',()=>{ const nombre=document.getElementById('segNombre').value.trim(); if(!nombre){ showToast('Escribí un nombre',1800); document.getElementById('segNombre').focus(); return; } const a=cargarSeguimientos(); const item={id:seguimientoEditId||Date.now(),nombre,telefono:document.getElementById('segTelefono').value.trim(),interes:document.getElementById('segInteres').value,estado:document.getElementById('segEstado').value,fecha:document.getElementById('segFecha').value,notas:document.getElementById('segNotas').value.trim()}; const i=a.findIndex(x=>x.id===item.id); if(i>=0)a[i]=item; else a.unshift(item); guardarSeguimientos(a); document.getElementById('seguimientoForm').style.display='none'; limpiarFormularioSeg(); renderSeguimiento(); renderHomeCompleto(); showToast('Persona guardada ✅',1800); });
+document.getElementById('btnSegFilter').addEventListener('click',()=>{ seguimientoFiltro=seguimientoFiltro==='pendientes'?'todas':'pendientes'; document.getElementById('btnSegFilter').textContent=seguimientoFiltro==='todas'?'👥 Ver pendientes':'📋 Ver todas'; renderSeguimiento(); });
+
 function renderNextStep(){
   const wrap = document.getElementById('nextStepWrap');
   if(!wrap) return;
@@ -7711,6 +7805,18 @@ function renderToolsList(){
     </button>
   `;
 
+  const seguimientoCard = `
+    <button type="button" class="business-card" onclick="openSeguimiento()">
+      <div class="business-icon">👥</div>
+      <div>
+        <h3>Seguimiento</h3>
+        <p>Personas para contactar y próximos pasos.</p>
+      </div>
+      <div class="business-status">${seguimientoPendientes()}<small>pendientes</small></div>
+      <div class="business-progress" style="--pct:${seguimientoProgreso()}%"><span></span></div>
+    </button>
+  `;
+
   document.getElementById('toolsList').innerHTML = `
     <div class="home-section-block">
       <div class="mini-section-label"><span>📅</span> Mi mes</div>
@@ -7719,6 +7825,7 @@ function renderToolsList(){
     <div class="home-section-block">
       <div class="mini-section-label"><span>🌱</span> Mi negocio</div>
       ${equipoCard}
+      ${seguimientoCard}
     </div>
   `;
 }
