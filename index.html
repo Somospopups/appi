@@ -549,6 +549,10 @@
   body.dark .seguimiento-stat, body.dark .seguimiento-form, body.dark .seguimiento-item, body.dark .seg-empty { background:rgba(30,30,50,.55); border-color:rgba(255,255,255,.09); }
   body.dark .seguimiento-stat strong, body.dark .seguimiento-form h3, body.dark .seg-item-head h3, body.dark .seg-empty strong { color:#f0f0f5; }
   body.dark .seg-field input, body.dark .seg-field select, body.dark .seg-field textarea { background:rgba(30,30,50,.7); color:#f0f0f5; border-color:rgba(255,255,255,.12); }
+
+  /* ============ CARRERA PSA ============ */
+  .career-card{padding:16px;border-radius:20px;background:rgba(255,255,255,.62);border:1px solid rgba(255,255,255,.82);box-shadow:0 8px 22px rgba(80,90,130,.07);margin-bottom:12px}
+  .career-card h3{margin:0 0 12px;color:#1c1c27;font-size:17px}.career-row{display:flex;justify-content:space-between;align-items:end;gap:12px}.career-big{font-size:30px;font-weight:950;color:#3d63c9}.career-small{display:block;color:#777887;font-size:11px;font-weight:850}.career-card input,.career-card select{width:100%;box-sizing:border-box;padding:11px;border:1px solid rgba(80,90,130,.16);border-radius:12px;background:rgba(255,255,255,.75);font:inherit}.career-bar{height:10px;margin:10px 0;border-radius:99px;background:rgba(80,90,130,.1);overflow:hidden}.career-bar span{display:block;height:100%;width:0;border-radius:inherit;background:linear-gradient(90deg,#3ad0a4,#5b8def)}.career-rule{padding:11px;border-radius:13px;background:rgba(91,141,239,.12);color:#50505c;font-size:12px;line-height:1.35}.career-rule b{display:block;color:#3d63c9;margin-bottom:3px}.career-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.career-label{display:block;color:#777887;font-size:11px;font-weight:900;margin-bottom:5px}body.dark .career-card{background:rgba(30,30,50,.55);border-color:rgba(255,255,255,.09)}body.dark .career-card h3{color:#f0f0f5}body.dark .career-card input,body.dark .career-card select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:rgba(255,255,255,.12)}
 </style>
 <style>
   .history-item {
@@ -3457,6 +3461,14 @@ body.dark .lock-footer { color: #6b6b76; }
     <div id="presuHistList"></div>
   </section>
 
+  <!-- CARRERA PSA -->
+  <section id="view-carrera" class="view">
+    <header class="top"><button class="back-btn" id="btnBackCarrera" aria-label="Volver">‹</button><h1>Mi</h1><div class="script">carrera PSA</div><p>Tu avance, explicado de forma simple</p></header>
+    <div class="career-card"><h3>📈 Progreso del mes</h3><div class="career-grid"><div><label class="career-label">Categoría actual</label><select id="careerCategoria"><option>Distribuidor Junior</option><option>Distribuidor</option><option>Distribuidor Calificado</option><option>Coordinador de Equipo</option></select></div><div><label class="career-label">Objetivo de PB</label><input id="careerObjetivo" type="number" min="0" value="13"></div></div><div class="career-row" style="margin-top:14px"><div><span class="career-small">PB personales cargados</span><strong class="career-big" id="careerPb">0</strong></div><div style="width:48%"><label class="career-label">Cargar PB</label><input id="careerPbInput" type="number" min="0" placeholder="0"></div></div><div class="career-bar"><span id="careerPbBar"></span></div><div class="career-rule" id="careerPbHint">Cargá tus PB para ver tu avance.</div><div class="actions"><button class="btn primary" id="btnCareerSave">Guardar progreso</button></div></div>
+    <div class="career-card"><h3>🗓️ Mantenimiento trimestral</h3><div class="career-grid"><div><label class="career-label">Meses cumplidos</label><input id="careerMeses" type="number" min="0" max="3" value="0"></div><div><label class="career-label">Meses necesarios</label><input id="careerMesesReq" type="number" min="1" max="3" value="2"></div></div><div class="career-rule" id="careerTrimHint" style="margin-top:12px">Todavía no hay datos.</div><div class="actions"><button class="btn primary" id="btnCareerTrim">Guardar trimestre</button></div></div>
+    <div class="career-card"><h3>💰 Mis valores</h3><p style="color:#777887;font-size:12px;line-height:1.4;margin-top:0">Cargá tus propios valores. Pueden cambiar según vigencia, país y condición fiscal.</p><div class="career-grid"><div><label class="career-label">Valor de 1 PB</label><input id="careerValorPb" type="number" min="0" placeholder="$"></div><div><label class="career-label">Moneda</label><select id="careerMoneda"><option>ARS ($)</option><option>BOB (Bs)</option><option>CLP ($)</option><option>USD (US$)</option><option>EUR (€)</option></select></div><div><label class="career-label">Bonus 1 patrocinio</label><input id="careerBonus1" type="number" min="0" placeholder="$"></div><div><label class="career-label">Bonus 2 patrocinios</label><input id="careerBonus2" type="number" min="0" placeholder="$"></div></div><div class="actions"><button class="btn primary" id="btnCareerValues">Guardar valores</button></div></div>
+  </section>
+
   <!-- SEGUIMIENTO DE PERSONAS -->
   <section id="view-seguimiento" class="view">
     <header class="top">
@@ -3950,7 +3962,7 @@ function showView(id){
   document.querySelectorAll('nav.tabs button').forEach(b=>{
     b.classList.toggle('active', b.dataset.view===id);
   });
-  const hideTabsOn = ['view-home','view-siete','view-siete-detail','view-presu','view-presu-hist','view-equipo','view-seguimiento','view-planning'];
+  const hideTabsOn = ['view-home','view-siete','view-siete-detail','view-presu','view-presu-hist','view-equipo','view-seguimiento','view-carrera','view-planning'];
   document.getElementById('tabs').style.display = hideTabsOn.includes(id) ? 'none' : 'flex';
   if(id==='view-history') renderHistory();
   if(id==='view-eval')    renderAreas();
@@ -3958,6 +3970,7 @@ function showView(id){
   if(id==='view-home')    renderHomeCompleto();
   if(id==='view-planning') renderPlanningTools();
   if(id==='view-seguimiento') renderSeguimiento();
+  if(id==='view-carrera') renderCarrera();
   document.body.classList.toggle('evaluar-hint', id === 'view-wheel');
   window.scrollTo({top:0});
 }
@@ -3987,6 +4000,7 @@ document.getElementById('btnBackPresu').addEventListener('click', ()=> showView(
 document.getElementById('btnBackPresuHist').addEventListener('click', ()=> showView('view-presu'));
 document.getElementById('btnBackEquipo').addEventListener('click', ()=> showView('view-home'));
 document.getElementById('btnBackSeguimiento').addEventListener('click', ()=> showView('view-home'));
+document.getElementById('btnBackCarrera').addEventListener('click', ()=> showView('view-home'));
 document.getElementById('btnBackPlanning').addEventListener('click', ()=> showView('view-home'));
 document.querySelectorAll('nav.tabs button').forEach(btn=>btn.addEventListener('click', ()=> showView(btn.dataset.view)));
 document.getElementById('month').addEventListener('change', e => { state.month = +e.target.value; persistDraft(); });
@@ -7618,6 +7632,14 @@ function obtenerProximoPaso(){
   }
   return { icon:'📤', tone:'done', label:'Mes ordenado', title:'Compartí tu informe mensual', desc:'Ya tenés las herramientas principales cargadas. Enviá un resumen por WhatsApp.', btn:'Compartir resumen', run:(e)=>compartirConsolidado(e), done:true };
 }
+const CAREER_KEY='carreraPSA';
+function cargarCarrera(){try{return JSON.parse(localStorage.getItem(CAREER_KEY)||'{}')}catch(e){return {}}}
+function guardarCarrera(d){localStorage.setItem(CAREER_KEY,JSON.stringify(d));localStorage.setItem('lastUpdate_carrera',Date.now().toString())}
+function renderCarrera(){const d=cargarCarrera(); const pb=+d.pb||0,obj=+d.objetivo||13,mes=+d.meses||0,req=+d.mesesReq||2; document.getElementById('careerCategoria').value=d.categoria||'Distribuidor Junior';document.getElementById('careerObjetivo').value=obj;document.getElementById('careerPb').textContent=pb;document.getElementById('careerPbInput').value=pb;document.getElementById('careerPbBar').style.width=Math.min(100,obj?pb/obj*100:0)+'%';document.getElementById('careerPbHint').innerHTML=pb>=obj?'<b>Objetivo cumplido 🎉</b>Muy buen avance este mes.':`<b>Próximo paso</b>Te faltan ${Math.max(0,obj-pb)} PB para completar tu objetivo.`;document.getElementById('careerMeses').value=mes;document.getElementById('careerMesesReq').value=req;document.getElementById('careerTrimHint').innerHTML=mes>=req?'<b>Trimestre cumplido ✅</b>Ya alcanzaste el requisito cargado.':`<b>Mantenimiento en progreso</b>${mes} de ${req} meses cumplidos.`;document.getElementById('careerValorPb').value=d.valorPb||'';document.getElementById('careerBonus1').value=d.bonus1||'';document.getElementById('careerBonus2').value=d.bonus2||'';document.getElementById('careerMoneda').value=d.moneda||'ARS ($)'}
+function openCarrera(){showView('view-carrera')}
+document.getElementById('btnCareerSave').onclick=()=>{const d=cargarCarrera();d.categoria=document.getElementById('careerCategoria').value;d.objetivo=+document.getElementById('careerObjetivo').value||0;d.pb=+document.getElementById('careerPbInput').value||0;guardarCarrera(d);renderCarrera();showToast('Progreso guardado ✅',1800);renderHomeCompleto()};
+document.getElementById('btnCareerTrim').onclick=()=>{const d=cargarCarrera();d.meses=Math.max(0,Math.min(3,+document.getElementById('careerMeses').value||0));d.mesesReq=Math.max(1,Math.min(3,+document.getElementById('careerMesesReq').value||2));guardarCarrera(d);renderCarrera();showToast('Trimestre guardado ✅',1800)};
+document.getElementById('btnCareerValues').onclick=()=>{const d=cargarCarrera();d.valorPb=document.getElementById('careerValorPb').value;d.bonus1=document.getElementById('careerBonus1').value;d.bonus2=document.getElementById('careerBonus2').value;d.moneda=document.getElementById('careerMoneda').value;guardarCarrera(d);showToast('Valores guardados ✅',1800)};
 const SEG_KEY = 'seguimientoPersonas';
 let seguimientoFiltro = 'pendientes';
 let seguimientoEditId = null;
@@ -7812,6 +7834,18 @@ function renderToolsList(){
     </button>
   `;
 
+  const carreraData = cargarCarrera();
+  const carreraPb = +carreraData.pb || 0;
+  const carreraObj = +carreraData.objetivo || 13;
+  const carreraCard = `
+    <button type="button" class="business-card" onclick="openCarrera()">
+      <div class="business-icon">📈</div>
+      <div><h3>Mi carrera PSA</h3><p>${carreraPb}/${carreraObj} PB personales del mes</p></div>
+      <div class="business-status">${Math.min(100,Math.round(carreraObj ? carreraPb/carreraObj*100 : 0))}%<small>avance</small></div>
+      <div class="business-progress" style="--pct:${Math.min(100,carreraObj ? carreraPb/carreraObj*100 : 0)}%"><span></span></div>
+    </button>
+  `;
+
   const seguimientoCard = `
     <button type="button" class="business-card" onclick="openSeguimiento()">
       <div class="business-icon">👥</div>
@@ -7832,6 +7866,7 @@ function renderToolsList(){
     <div class="home-section-block">
       <div class="mini-section-label"><span>🌱</span> Mi negocio</div>
       ${equipoCard}
+      ${carreraCard}
       ${seguimientoCard}
     </div>
   `;
