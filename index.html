@@ -5584,8 +5584,16 @@ document.getElementById('btnEquipoShare').onclick = ()=>{
     <button class="share-menu-item" id="smText">
       <div class="sm-ico" style="background:linear-gradient(135deg,#25D366,#128C7E)">💬</div>
       <div class="sm-txt">
-        <div class="sm-title">Texto por WhatsApp</div>
-        <div class="sm-desc">Resumen del equipo en texto</div>
+        <div class="sm-title">Datos de mi equipo</div>
+        <div class="sm-desc">Resumen general por WhatsApp</div>
+      </div>
+      <span class="sm-arrow">›</span>
+    </button>
+    <button class="share-menu-item" id="smDistribuidor">
+      <div class="sm-ico" style="background:linear-gradient(135deg,#f5b301,#ff8f6b)">👤</div>
+      <div class="sm-txt">
+        <div class="sm-title">Datos de un distribuidor</div>
+        <div class="sm-desc">Elegí a alguien de tu equipo</div>
       </div>
       <span class="sm-arrow">›</span>
     </button>
@@ -5593,7 +5601,7 @@ document.getElementById('btnEquipoShare').onclick = ()=>{
       <div class="sm-ico" style="background:linear-gradient(135deg,#5b8def,#a06bff)">🖼️</div>
       <div class="sm-txt">
         <div class="sm-title">Imagen del árbol</div>
-        <div class="sm-desc">Organigrama de una rama en imagen</div>
+        <div class="sm-desc">Organigrama en imagen</div>
       </div>
       <span class="sm-arrow">›</span>
     </button>
@@ -5605,12 +5613,150 @@ document.getElementById('btnEquipoShare').onclick = ()=>{
   });
   setTimeout(()=>{
     const bt = document.getElementById('smText');
+    const bd = document.getElementById('smDistribuidor');
     const bi = document.getElementById('smImage');
     if(bt) bt.onclick = ()=>{ modal.close(); haptic(10); enviarMensajeWhatsApp(generarMensajeMiEquipo(), 'Mi Equipo'); };
+    if(bd) bd.onclick = ()=>{ modal.close(); haptic(10); abrirSelectorDistribuidor(); };
     if(bi) bi.onclick = ()=>{ modal.close(); haptic(10); abrirSelectorPersona(); };
   }, 50);
 };
 
+// Selector para elegir un distribuidor y ver qué datos compartir
+function abrirSelectorDistribuidor(){
+  const personasOrdenadas = [...equipoData.personas].filter(p => !p.esTitular).sort((a,b) => {
+    const da = contarDescendientes(a);
+    const db = contarDescendientes(b);
+    if(db !== da) return db - da;
+    return a.nombre.localeCompare(b.nombre);
+  });
+  
+  const renderLista = (filtro='') => {
+    const f = normalize(filtro);
+    const lista = personasOrdenadas.filter(p => 
+      !f || normalize(p.nombre).includes(f) || (p.codigo||'').toLowerCase().includes(f)
+    ).slice(0, 100);
+    if(lista.length === 0){
+      return '<div class="empty" style="padding:20px">🔍 Sin coincidencias</div>';
+    }
+    return lista.map(p => {
+      const info = catInfoOf(p.cat);
+      const desc = contarDescendientes(p);
+      return `
+        <div class="person-picker-item" data-pid="${p.id}">
+          <span class="pp-cat" style="background:${info.color}">${info.name}</span>
+          <div class="pp-info">
+            <div class="pp-name">${escapeXml(p.nombre)}</div>
+            <div class="pp-meta">${(p.codigo||'') + ' · ' + desc + ' descendiente' + (desc===1?'':'s')}</div>
+          </div>
+          <span class="pp-count">${desc + 1} pers</span>
+        </div>
+      `;
+    }).join('');
+  };
+  
+  const html = `
+    <p style="margin:0 0 12px; font-size:13px; color:#5c5c66">
+      Elegí el distribuidor cuyos datos querés compartir.
+    </p>
+    <div class="person-picker-search">
+      <span style="color:#8a8a94">🔍</span>
+      <input type="text" id="pickerSearchDist" placeholder="Buscar por nombre o N° de Distribuidor…" />
+    </div>
+    <div class="person-picker-list" id="pickerListDist">
+      ${renderLista()}
+    </div>
+  `;
+  modal.open({
+    icon:'👤', iconBg:'linear-gradient(135deg,#f5b301,#ff8f6b)',
+    title:'Elegí un distribuidor', sub:'Buscá o desplazate por la lista',
+    html
+  });
+  setTimeout(()=>{
+    const inp = document.getElementById('pickerSearchDist');
+    const cont = document.getElementById('pickerListDist');
+    if(inp){
+      inp.oninput = e => { cont.innerHTML = renderLista(e.target.value); bindPickerClicks(); };
+      inp.focus();
+    }
+    bindPickerClicks();
+  }, 50);
+  
+  function bindPickerClicks(){
+    document.querySelectorAll('#pickerListDist .person-picker-item').forEach(el=>{
+      el.onclick = ()=>{
+        const pid = +el.dataset.pid;
+        const p = equipoData.personas.find(x => x.id === pid);
+        if(!p) return;
+        modal.close();
+        haptic(15);
+        elegirTipoMensaje(p);
+      };
+    });
+  }
+}
+
+// Modal: ¿qué datos querés compartir de esta persona?
+function elegirTipoMensaje(persona){
+  const totalDesc = contarDescendientes(persona);
+  const tieneEquipo = totalDesc > 0;
+  
+  const html = `
+    <div style="text-align:center; margin-bottom:16px; padding:12px; background:rgba(91,141,239,0.08); border-radius:12px;">
+      <div style="font-size:13px; color:#3a3a48; line-height:1.5;">
+        <strong>${escapeXml(persona.nombre)}</strong><br/>
+        ${tieneEquipo ? `${totalDesc} descendiente${totalDesc===1?'':'s'}` : 'Sin equipo'}
+      </div>
+    </div>
+    
+    <p style="margin:0 0 12px; font-size:13px; color:#5c5c66; text-align:center;">
+      ¿Qué datos querés compartir?
+    </p>
+    
+    <button class="share-menu-item" id="btnMsgPersonal">
+      <div class="sm-ico" style="background:linear-gradient(135deg,#5b8def,#a06bff)">👤</div>
+      <div class="sm-txt">
+        <div class="sm-title">Sus datos personales</div>
+        <div class="sm-desc">Categoría, PB, garantías, etc.</div>
+      </div>
+      <span class="sm-arrow">›</span>
+    </button>
+    
+    ${tieneEquipo ? `
+    <button class="share-menu-item" id="btnMsgEquipo">
+      <div class="sm-ico" style="background:linear-gradient(135deg,#3ad0a4,#5b8def)">🌳</div>
+      <div class="sm-txt">
+        <div class="sm-title">Datos de su equipo</div>
+        <div class="sm-desc">Resumen de su organización</div>
+      </div>
+      <span class="sm-arrow">›</span>
+    </button>
+    
+    <button class="share-menu-item" id="btnMsgCombinado">
+      <div class="sm-ico" style="background:linear-gradient(135deg,#f5b301,#ff8f6b)">📊</div>
+      <div class="sm-txt">
+        <div class="sm-title">Personal + Equipo</div>
+        <div class="sm-desc">Los dos combinados</div>
+      </div>
+      <span class="sm-arrow">›</span>
+    </button>
+    ` : ''}
+  `;
+  
+  modal.open({
+    icon:'💬', iconBg:'linear-gradient(135deg,#25D366,#128C7E)',
+    title:'¿Qué querés compartir?', sub:persona.nombre.split(',')[0].trim(),
+    html
+  });
+  
+  setTimeout(()=>{
+    const bp = document.getElementById('btnMsgPersonal');
+    const be = document.getElementById('btnMsgEquipo');
+    const bc = document.getElementById('btnMsgCombinado');
+    if(bp) bp.onclick = ()=>{ modal.close(); haptic(10); enviarMensajeWhatsApp(generarMensajePersonal(persona), persona.nombre); };
+    if(be) be.onclick = ()=>{ modal.close(); haptic(10); enviarMensajeWhatsApp(generarMensajeEquipoDePersona(persona), 'Equipo de ' + persona.nombre); };
+    if(bc) bc.onclick = ()=>{ modal.close(); haptic(10); enviarMensajeWhatsApp(generarMensajeCombinado(persona), persona.nombre); };
+  }, 50);
+}
 // Selector: elegir de qué persona se genera el árbol
 function abrirSelectorPersona(){
   const titular = equipoData.titular.nombre || 'Mi equipo';
