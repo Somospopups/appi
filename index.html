@@ -535,7 +535,7 @@
   .seguimiento-item { position:relative; margin-bottom:10px; }
   .seg-item-head { display:flex; justify-content:space-between; gap:8px; align-items:flex-start; }
   .seg-item-head h3 { margin:0; color:#1c1c27; font-size:16px; }
-  .seg-item-phone { margin-top:3px; color:#777887; font-size:12px; }
+  .seg-item-phone { margin-top:4px; color:#777887; font-size:12px; }
   .seg-badge { padding:5px 8px; border-radius:999px; background:rgba(91,141,239,.13); color:#3d63c9; font-size:10px; font-weight:900; white-space:nowrap; }
   .seg-meta { display:flex; flex-wrap:wrap; gap:6px; margin:11px 0; color:#60606d; font-size:11px; font-weight:750; }
   .seg-meta span { padding:5px 7px; border-radius:8px; background:rgba(80,90,130,.08); }
@@ -3135,6 +3135,23 @@ body.dark .lock-footer { color: #6b6b76; }
     background: rgba(30,30,50,0.44);
     border-color: rgba(255,255,255,0.08);
   }
+</style>
+<style>
+  .seg-name-line{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.seg-name-line h3{margin:0}.seg-contact-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:10px 0}.seg-contact-actions a{display:flex;align-items:center;justify-content:center;min-height:48px;padding:10px 12px;border-radius:15px;text-decoration:none;font-size:14px;font-weight:900}.seg-contact-actions .wa-msg,.seg-contact-actions .phone-call{background:#78d957;color:#fff}.seg-card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}.seg-card-top .seg-item-head{flex:1}.seg-card-tags{display:flex;flex-direction:column;align-items:flex-end;gap:6px}.seg-card-note-label{display:block;margin:5px 0;color:#60606d;font-size:11px;font-weight:900}.seg-inline-notes{width:100%;min-height:78px;box-sizing:border-box;padding:10px 12px;border:1px solid rgba(80,90,130,.14);border-radius:14px;background:rgba(255,255,255,.72);color:#30303c;font:inherit;font-size:13px;resize:vertical}.seg-item-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}.seg-item-actions button{min-height:42px}.seg-item-actions button.done{background:rgba(58,208,164,.16);color:#197454}.seg-item-actions button.delete{background:rgba(217,83,79,.12);color:#b94440}body.dark .seg-inline-notes{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:rgba(255,255,255,.12)}</style>
+<style>
+  .seg-contact-actions{display:flex;gap:8px;margin:14px 0 4px}.seg-contact-actions a{flex:1;display:flex;align-items:center;justify-content:center;min-height:42px;padding:9px 10px;border-radius:12px;text-decoration:none;font-size:12.5px;font-weight:800}.seg-contact-actions .wa-msg{background:linear-gradient(135deg,#25D366,#128C7E);color:#fff}.seg-contact-actions .phone-call{background:linear-gradient(135deg,#5b8def,#a06bff);color:#fff}.seg-note-readonly{padding:12px;border-radius:14px;background:rgba(255,255,255,.55);color:#60606d;font-size:13px;line-height:1.4;min-height:20px;white-space:pre-wrap}.seg-note-readonly.empty{color:#999aa5;font-style:italic}body.dark .seg-note-readonly{background:rgba(30,30,50,.5);color:#b8b8c5}</style>
+<style>
+
+  /* Contacto compacto: misma lógica visual que Listo / Editar / Eliminar */
+  .seg-contact-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0 4px}.seg-contact-actions a{min-height:36px;padding:7px 8px;border-radius:10px;font-size:10.5px;font-weight:900;line-height:1.15}.seg-contact-actions .wa-msg{background:rgba(58,208,164,.16);color:#197454}.seg-contact-actions .phone-call{background:rgba(91,141,239,.14);color:#3d63c9}
+  .person-modal-body .pm-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}.person-modal-body .pm-actions button{min-height:38px;padding:7px 6px;border-radius:10px;font-size:11px;font-weight:900;line-height:1.12}.person-modal-body .pm-actions .pm-wa{background:rgba(58,208,164,.16);color:#197454}.person-modal-body .pm-actions .pm-call{background:rgba(91,141,239,.14);color:#3d63c9}.person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.15);color:#c24d7d}
+</style>
+<style>
+  .seguimiento-item .seg-item-head .seg-item-phone{display:block;margin-top:4px;text-align:left;font-size:12px;color:#777887;font-weight:750}
+</style>
+<style>
+
+  .seg-row-one{display:flex;align-items:center;justify-content:space-between;gap:10px}.seg-row-one h3{margin:0}.seg-row-two{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:9px}.seg-row-phone{color:#777887;font-size:12px;font-weight:800;white-space:nowrap}.seg-row-two .seg-contact-actions{margin:0;flex:1;justify-content:flex-end}.seg-row-two .seg-contact-actions a{min-height:34px;padding:6px 9px;font-size:10.5px;flex:0 1 auto}.seg-card-top{display:block}.seg-card-tags{display:flex;flex-direction:row;align-items:center;gap:6px}.seg-card-tags .seg-badge{white-space:nowrap}@media(max-width:390px){.seg-row-two{align-items:stretch;flex-direction:column}.seg-row-two .seg-contact-actions{width:100%}.seg-row-two .seg-contact-actions a{flex:1}}
 </style>
 </head>
 <body>
@@ -6034,18 +6051,16 @@ function openPersonaModal(p){
   if(telefonos.length === 1){
     const t = telefonos[0];
     botonesTel = `
-      <button class="pm-wa" onclick="window.open('https://wa.me/${t.digits}?text='+encodeURIComponent('Hola ${escapeXml(p.nombre)}, ¿cómo estás?'),'_blank')">💬 Enviar mensaje por WhatsApp</button>
-      <button class="pm-wa-call" onclick="llamarWhatsAppDirecto('${t.digits}')">📲 Llamar por WhatsApp</button>
-      <button class="pm-call" onclick="window.open('tel:${t.digits}','_self')">📞 Llamar por teléfono</button>
+      <button class="pm-wa" onclick="window.open('https://wa.me/${t.digits}?text='+encodeURIComponent('Hola ${escapeXml(p.nombre)}, ¿cómo estás?'),'_blank')">💬 Contactar por WhatsApp</button>
+      <button class="pm-call" onclick="window.open('tel:${t.digits}','_self')">📞 Llamar al contacto</button>
     `;
   } else if(telefonos.length > 1){
     // Múltiples teléfonos: uno por línea con ambos botones
     botonesTel = telefonos.map((t, i) => `
       <div style="display:flex; gap:6px; margin-bottom:6px;">
         <span style="flex:1; font-size:12px; padding:8px 10px; background:rgba(91,141,239,0.10); border-radius:10px; color:#3d63c9; font-weight:700; display:flex; align-items:center;">📱 ${escapeXml(t.display)}</span>
-        <button class="pm-wa" style="flex:none; padding:8px 12px;" title="Enviar mensaje por WhatsApp" onclick="window.open('https://wa.me/${t.digits}?text='+encodeURIComponent('Hola ${escapeXml(p.nombre)}, ¿cómo estás?'),'_blank')">💬</button>
-        <button class="pm-wa-call" style="flex:none; padding:8px 12px;" title="Llamar por WhatsApp" onclick="llamarWhatsAppDirecto('${t.digits}')">📲</button>
-        <button class="pm-call" style="flex:none; padding:8px 12px;" title="Llamar por teléfono" onclick="window.open('tel:${t.digits}','_self')">📞</button>
+        <button class="pm-wa" style="flex:none; padding:8px 12px;" title="Contactar por WhatsApp" onclick="window.open('https://wa.me/${t.digits}?text='+encodeURIComponent('Hola ${escapeXml(p.nombre)}, ¿cómo estás?'),'_blank')">💬</button>
+        <button class="pm-call" style="flex:none; padding:8px 12px;" title="Llamar al contacto" onclick="window.open('tel:${t.digits}','_self')">📞</button>
       </div>
     `).join('');
   }
@@ -7661,9 +7676,10 @@ function seguimientoVencido(p){ return p.fecha && p.fecha < new Date().toISOStri
 function seguimientoPendientes(){ return cargarSeguimientos().filter(p=>p.estado !== 'No le interesa').length; }
 function seguimientoProgreso(){ const a=cargarSeguimientos(); if(!a.length) return 0; return Math.round(a.filter(p=>p.estado==='Cliente').length/a.length*100); }
 function openSeguimiento(){ showView('view-seguimiento'); }
+function capitalizarNombreSeg(valor){ return String(valor||'').toLocaleLowerCase('es-AR').replace(/(^|[\s'-])(\p{L})/gu,(m,sep,letra)=>sep+letra.toLocaleUpperCase('es-AR')).replace(/\s{2,}/g,' '); }
 function limpiarFormularioSeg(){ ['segNombre','segTelefono','segFecha','segNotas'].forEach(id=>document.getElementById(id).value=''); document.getElementById('segInteres').value='Producto'; document.getElementById('segEstado').value='No contactado'; seguimientoEditId=null; }
 function segDigits(phone){return String(phone||'').replace(/\D/g,'')}
-function segContactActions(p){const d=segDigits(p.telefono);if(!d)return '';const msg=encodeURIComponent(`Hola ${p.nombre}, ¿cómo estás?`);return `<div class="seg-contact-actions"><a class="wa-msg" title="Enviar mensaje por WhatsApp" aria-label="Enviar mensaje por WhatsApp" href="https://wa.me/${d}?text=${msg}" target="_blank" rel="noopener">💬</a><a class="wa-call" title="Llamar por WhatsApp" aria-label="Llamar por WhatsApp" href="whatsapp://call?phone=${d}" onclick="setTimeout(()=>{if(document.visibilityState==='visible')window.open('https://wa.me/${d}','_blank')},700)">📲</a><a class="phone-call" title="Llamar por teléfono" aria-label="Llamar por teléfono" href="tel:${d}">📞</a></div>`}
+function segContactActions(p){const d=segDigits(p.telefono);if(!d)return '';const msg=encodeURIComponent(`Hola ${p.nombre}, ¿cómo estás?`);return `<div class="seg-contact-actions"><a class="wa-msg" title="Contactar por WhatsApp" aria-label="Contactar por WhatsApp" href="https://wa.me/${d}?text=${msg}" target="_blank" rel="noopener">💬 Contactar por WhatsApp</a><a class="phone-call" title="Llamar al contacto" aria-label="Llamar al contacto" href="tel:${d}">📞 Llamar por teléfono</a></div>`}
 function renderSeguimiento(){
   const all=cargarSeguimientos();
   const hoy=new Date().toISOString().slice(0,10);
@@ -7674,18 +7690,20 @@ function renderSeguimiento(){
   const list=seguimientoFiltro==='todas' ? all : seguimientoFiltro==='hoy' ? all.filter(p=>p.fecha===hoy) : pendientes;
   const cont=document.getElementById('seguimientoList');
   if(!list.length){ cont.innerHTML='<div class="seg-empty"><strong> todavía no hay personas</strong>Agregá tu primer contacto para tener claro cuál es el próximo paso.</div>'; return; }
-  cont.innerHTML=list.map(p=>`<article class="seguimiento-item"><div class="seg-item-head"><div><div class="seg-name-line"><h3>${escapeXml(p.nombre)}</h3>${segContactActions(p)}</div><div class="seg-item-phone">${escapeXml(p.telefono||'Sin teléfono')}</div></div><span class="seg-badge">${escapeXml(p.estado)}</span></div><div class="seg-meta"><span>🎯 ${escapeXml(p.interes)}</span>${p.fecha?`<span>📅 ${fechaSeg(p.fecha)}${seguimientoVencido(p)?' · vencido':''}</span>`:''}</div>${p.notas?`<p class="seg-note">${escapeXml(p.notas)}</p>`:''}<div class="seg-item-actions"><button class="done" data-seg-done="${p.id}">✅ Listo</button><button data-seg-edit="${p.id}">✏️ Editar</button><button class="delete" data-seg-delete="${p.id}">Eliminar</button></div></article>`).join('');
+  cont.innerHTML=list.map(p=>`<article class="seguimiento-item"><div class="seg-card-top"><div class="seg-row-one"><h3>${escapeXml(p.nombre)}</h3><div class="seg-card-tags"><span class="seg-badge">${escapeXml(p.interes)}</span><span class="seg-badge">${escapeXml(p.estado)}</span></div></div><div class="seg-row-two"><span class="seg-row-phone">${escapeXml(p.telefono||'Sin teléfono')}</span>${segContactActions(p)}</div></div>${p.fecha?`<div class="seg-meta"><span>📅 ${fechaSeg(p.fecha)}${seguimientoVencido(p)?' · vencido':''}</span></div>`:''}<label class="seg-card-note-label">Notas</label><div class="seg-note-readonly ${p.notas?'':'empty'}">${p.notas?escapeXml(p.notas):'Sin notas cargadas'}</div><div class="seg-item-actions"><button class="done" data-seg-done="${p.id}">✅ Listo</button><button data-seg-edit="${p.id}">✏️ Editar</button><button class="delete" data-seg-delete="${p.id}">Eliminar</button></div></article>`).join('');
   cont.querySelectorAll('[data-seg-done]').forEach(b=>b.onclick=()=>actualizarSeguimiento(+b.dataset.segDone,'Contactado'));
   cont.querySelectorAll('[data-seg-edit]').forEach(b=>b.onclick=()=>editarSeguimiento(+b.dataset.segEdit));
   cont.querySelectorAll('[data-seg-delete]').forEach(b=>b.onclick=()=>eliminarSeguimiento(+b.dataset.segDelete));
 }
-function editarSeguimiento(id){ const p=cargarSeguimientos().find(x=>x.id===id); if(!p) return; seguimientoEditId=id; document.getElementById('segNombre').value=p.nombre; document.getElementById('segTelefono').value=p.telefono||''; document.getElementById('segInteres').value=p.interes==='Ambas'?'Ambas cosas':(p.interes||'Producto'); const estados={ 'Sin contactar':'No contactado','Presentación realizada':'Seguimiento','Demostración realizada':'Seguimiento','Seguimiento pendiente':'Seguimiento','Cliente':'Contactado','Invitado':'Más adelante','No interesado':'No le interesa' }; document.getElementById('segEstado').value=estados[p.estado]||p.estado||'No contactado'; document.getElementById('segFecha').value=p.fecha||''; document.getElementById('segNotas').value=p.notas||''; document.getElementById('seguimientoFormTitle').textContent='Editar persona'; document.getElementById('seguimientoForm').style.display='block'; window.scrollTo({top:0,behavior:'smooth'}); }
+function editarSeguimiento(id){ const p=cargarSeguimientos().find(x=>x.id===id); if(!p) return; seguimientoEditId=id; document.getElementById('segNombre').value=capitalizarNombreSeg(p.nombre); document.getElementById('segTelefono').value=p.telefono||''; document.getElementById('segInteres').value=p.interes==='Ambas'?'Ambas cosas':(p.interes||'Producto'); const estados={ 'Sin contactar':'No contactado','Presentación realizada':'Seguimiento','Demostración realizada':'Seguimiento','Seguimiento pendiente':'Seguimiento','Cliente':'Contactado','Invitado':'Más adelante','No interesado':'No le interesa' }; document.getElementById('segEstado').value=estados[p.estado]||p.estado||'No contactado'; document.getElementById('segFecha').value=p.fecha||''; document.getElementById('segNotas').value=p.notas||''; document.getElementById('seguimientoFormTitle').textContent='Editar persona'; document.getElementById('seguimientoForm').style.display='block'; window.scrollTo({top:0,behavior:'smooth'}); }
 function actualizarSeguimiento(id,estado){ const a=cargarSeguimientos(); const p=a.find(x=>x.id===id); if(p){p.estado=estado; guardarSeguimientos(a); renderSeguimiento(); renderHomeCompleto(); showToast('Seguimiento actualizado ✅',1800);} }
+function guardarNotaSeg(id,nota){ const a=cargarSeguimientos(); const p=a.find(x=>x.id===id); if(p){p.notas=nota.trim(); guardarSeguimientos(a); showToast('Nota guardada ✅',1400);} }
 function eliminarSeguimiento(id){ if(!confirm('¿Eliminar esta persona?')) return; guardarSeguimientos(cargarSeguimientos().filter(p=>p.id!==id)); renderSeguimiento(); renderHomeCompleto(); }
 
+document.getElementById('segNombre').addEventListener('input',e=>{ const pos=e.target.selectionStart; e.target.value=capitalizarNombreSeg(e.target.value); try{e.target.setSelectionRange(pos,pos)}catch(err){} });
 document.getElementById('btnNuevoSeguimiento').addEventListener('click',()=>{ limpiarFormularioSeg(); document.getElementById('seguimientoFormTitle').textContent='Nueva persona'; document.getElementById('seguimientoForm').style.display='block'; document.getElementById('segNombre').focus(); });
 document.getElementById('btnCancelarSeg').addEventListener('click',()=>{ document.getElementById('seguimientoForm').style.display='none'; limpiarFormularioSeg(); });
-document.getElementById('btnGuardarSeg').addEventListener('click',()=>{ const nombre=document.getElementById('segNombre').value.trim(); if(!nombre){ showToast('Escribí un nombre',1800); document.getElementById('segNombre').focus(); return; } const a=cargarSeguimientos(); const item={id:seguimientoEditId||Date.now(),nombre,telefono:document.getElementById('segTelefono').value.trim(),interes:document.getElementById('segInteres').value,estado:document.getElementById('segEstado').value,fecha:document.getElementById('segFecha').value,notas:document.getElementById('segNotas').value.trim()}; const i=a.findIndex(x=>x.id===item.id); if(i>=0)a[i]=item; else a.unshift(item); guardarSeguimientos(a); document.getElementById('seguimientoForm').style.display='none'; limpiarFormularioSeg(); renderSeguimiento(); renderHomeCompleto(); showToast('Persona guardada ✅',1800); });
+document.getElementById('btnGuardarSeg').addEventListener('click',()=>{ const nombre=capitalizarNombreSeg(document.getElementById('segNombre').value).trim(); if(!nombre){ showToast('Escribí un nombre',1800); document.getElementById('segNombre').focus(); return; } const a=cargarSeguimientos(); const item={id:seguimientoEditId||Date.now(),nombre,telefono:document.getElementById('segTelefono').value.trim(),interes:document.getElementById('segInteres').value,estado:document.getElementById('segEstado').value,fecha:document.getElementById('segFecha').value,notas:document.getElementById('segNotas').value.trim()}; const i=a.findIndex(x=>x.id===item.id); if(i>=0)a[i]=item; else a.unshift(item); guardarSeguimientos(a); document.getElementById('seguimientoForm').style.display='none'; limpiarFormularioSeg(); renderSeguimiento(); renderHomeCompleto(); showToast('Persona guardada ✅',1800); });
 document.getElementById('btnSegFilter').addEventListener('click',()=>{ seguimientoFiltro=seguimientoFiltro==='pendientes'?'todas':'pendientes'; document.getElementById('btnSegFilter').textContent=seguimientoFiltro==='todas'?'👥 Ver pendientes':'📋 Ver todas'; renderSeguimiento(); });
 
 function renderNextStep(){
@@ -8307,5 +8325,5 @@ function mostrarPantallaBloqueado() {
     });
   }
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a24e6b86aa50c194',t:'MTc4NTY4NzczMg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a24ee3c06da4ed09',t:'MTc4NTY5MjY1Ng=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
