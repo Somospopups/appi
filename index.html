@@ -3464,7 +3464,7 @@ body.dark .lock-footer { color: #6b6b76; }
   <!-- CARRERA PSA -->
   <section id="view-carrera" class="view">
     <header class="top"><button class="back-btn" id="btnBackCarrera" aria-label="Volver">‹</button><h1>Mi</h1><div class="script">carrera PSA</div><p>Tu avance, explicado de forma simple</p></header>
-    <div class="career-card"><h3>📈 Progreso del mes</h3><div class="career-grid"><div><label class="career-label">Categoría actual</label><select id="careerCategoria"><option>Distribuidor Junior</option><option>Distribuidor</option><option>Distribuidor Calificado</option><option>Coordinador de Equipo</option></select></div><div><label class="career-label">Objetivo de PB</label><input id="careerObjetivo" type="number" min="0" value="13"></div></div><div class="career-row" style="margin-top:14px"><div><span class="career-small">PB personales cargados</span><strong class="career-big" id="careerPb">0</strong></div><div style="width:48%"><label class="career-label">Cargar PB</label><input id="careerPbInput" type="number" min="0" placeholder="0"></div></div><div class="career-bar"><span id="careerPbBar"></span></div><div class="career-rule" id="careerPbHint">Cargá tus PB para ver tu avance.</div><div class="actions"><button class="btn primary" id="btnCareerSave">Guardar progreso</button></div></div>
+    <div class="career-card"><h3>📈 Progreso del mes</h3><div class="career-grid"><div><label class="career-label">Categoría actual</label><select id="careerCategoria"><option value="DJ">Distribuidor Junior (DJ)</option><option value="D">Distribuidor (D)</option><option value="DC">Distribuidor Calificado (DC)</option><option value="CE">Coordinador de Equipo (CE)</option><option value="LE">Líder (LE)</option><option value="EJ">Líder Ejecutivo (EJ)</option><option value="E">Empresario (E)</option></select></div><div><label class="career-label">Objetivo de PB</label><input id="careerObjetivo" type="number" min="0" value="13"></div></div><div class="career-row" style="margin-top:14px"><div><span class="career-small">PB personales cargados</span><strong class="career-big" id="careerPb">0</strong></div><div style="width:48%"><label class="career-label">Cargar PB</label><input id="careerPbInput" type="number" min="0" placeholder="0"></div></div><div class="career-bar"><span id="careerPbBar"></span></div><div class="career-rule" id="careerPbHint">Cargá tus PB para ver tu avance.</div><div class="actions"><button class="btn primary" id="btnCareerSave">Guardar progreso</button></div></div>
     <div class="career-card"><h3>🗓️ Mantenimiento trimestral</h3><div class="career-grid"><div><label class="career-label">Meses cumplidos</label><input id="careerMeses" type="number" min="0" max="3" value="0"></div><div><label class="career-label">Meses necesarios</label><input id="careerMesesReq" type="number" min="1" max="3" value="2"></div></div><div class="career-rule" id="careerTrimHint" style="margin-top:12px">Todavía no hay datos.</div><div class="actions"><button class="btn primary" id="btnCareerTrim">Guardar trimestre</button></div></div>
     <div class="career-card"><h3>🤝 Equipo y bonus</h3><div class="career-grid"><div><label class="career-label">Patrocinios personales</label><input id="careerPatrocinios" type="number" min="0" value="0"></div><div><label class="career-label">Organizaciones DJ</label><input id="careerOrganizaciones" type="number" min="0" value="0"></div><div><label class="career-label">Patrocinios con 9 PB o más</label><input id="careerPatrociniosCalif" type="number" min="0" max="2" value="0"></div><div><label class="career-label">PB personales del mes</label><input id="careerBonusPb" type="number" min="0" value="0"></div></div><div class="career-rule" id="careerBonusHint" style="margin-top:12px">Cargá tus datos para ver si alcanzás las condiciones del bonus.</div><div class="actions"><button class="btn primary" id="btnCareerBonus">Guardar actividad</button></div></div>
     <div class="career-card"><h3>💰 Mis valores</h3><p style="color:#777887;font-size:12px;line-height:1.4;margin-top:0">Cargá tus propios valores. Pueden cambiar según vigencia, país y condición fiscal.</p><div class="career-grid"><div><label class="career-label">Valor de 1 PB</label><input id="careerValorPb" type="number" min="0" placeholder="$"></div><div><label class="career-label">Moneda</label><select id="careerMoneda"><option>ARS ($)</option><option>BOB (Bs)</option><option>CLP ($)</option><option>USD (US$)</option><option>EUR (€)</option></select></div><div><label class="career-label">Bonus 1 patrocinio</label><input id="careerBonus1" type="number" min="0" placeholder="$"></div><div><label class="career-label">Bonus 2 patrocinios</label><input id="careerBonus2" type="number" min="0" placeholder="$"></div></div><div class="actions"><button class="btn primary" id="btnCareerValues">Guardar valores</button></div></div>
@@ -3487,8 +3487,8 @@ body.dark .lock-footer { color: #6b6b76; }
       <h3 id="seguimientoFormTitle">Nueva persona</h3>
       <div class="seg-field"><label for="segNombre">Nombre</label><input id="segNombre" placeholder="Ej: María López" autocomplete="name"></div>
       <div class="seg-field"><label for="segTelefono">Teléfono</label><input id="segTelefono" placeholder="Ej: 351 555 1234" type="tel"></div>
-      <div class="seg-field"><label for="segInteres">¿Qué le interesa?</label><select id="segInteres"><option>Producto</option><option>Negocio</option><option>Empresa</option><option>Desarrollo personal</option><option>Por definir</option></select></div>
-      <div class="seg-field"><label for="segEstado">Estado</label><select id="segEstado"><option>Sin contactar</option><option>Contactado</option><option>Presentación realizada</option><option>Demostración realizada</option><option>Seguimiento pendiente</option><option>Cliente</option><option>Invitado</option><option>No interesado</option></select></div>
+      <div class="seg-field"><label for="segInteres">¿Por qué lo llamamos?</label><select id="segInteres"><option>Producto</option><option>Negocio</option><option>Ambas cosas</option></select></div>
+      <div class="seg-field"><label for="segEstado">Estado</label><select id="segEstado"><option>Contactado</option><option>No contactado</option><option>Seguimiento</option><option>Más adelante</option><option>No le interesa</option></select></div>
       <div class="seg-field"><label for="segFecha">Próximo contacto</label><input id="segFecha" type="date"></div>
       <div class="seg-field"><label for="segNotas">Notas</label><textarea id="segNotas" placeholder="¿Qué acordaron? ¿Qué tenés que recordar?"></textarea></div>
       <div class="actions"><button class="btn" id="btnCancelarSeg">Cancelar</button><button class="btn primary" id="btnGuardarSeg">Guardar</button></div>
@@ -4893,7 +4893,7 @@ const CAT_INFO = {
   'DJ': { name: 'DJ', color: '#e8e8ec', textColor: '#1c1c1e', full: 'Distribuidor Junior' },
   'D':  { name: 'D', color: '#ffffff', textColor: '#1c1c1e', full: 'Distribuidor', border: 'solid' },
   'DC': { name: 'DC', color: '#f7c630', textColor: '#1c1c1e', full: 'Distribuidor Calificado' },
-  'CE': { name: 'CE', color: '#4b7a55', textColor: '#ffffff', full: 'Coordinador' },
+  'CE': { name: 'CE', color: '#4b7a55', textColor: '#ffffff', full: 'Coordinador de Equipo' },
   'LE': { name: 'LE', color: '#006fb2', textColor: '#ffffff', full: 'Líder' },
   'EJ': { name: 'EJ', color: '#dd2c33', textColor: '#ffffff', full: 'Líder Ejecutivo' },
   'E':  { name: 'E', color: '#000000', textColor: '#ffffff', full: 'Empresario' }
@@ -5656,7 +5656,10 @@ ${(function(){
           ${bdayMes.map(renderBdayItem).join('')}
         </div>
       </div>
-      <style>#bdayFullList.open{display:block !important}</style>`;
+      <style>#bdayFullList.open{display:block !important}
+  .seg-name-line{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.seg-name-line h3{margin:0}.seg-contact-actions{display:flex;align-items:center;gap:4px}.seg-contact-actions a{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;padding:0;border-radius:8px;text-decoration:none;font-size:13px;font-weight:900}.seg-contact-actions .wa-msg{background:rgba(37,211,102,.16);color:#147a43}.seg-contact-actions .wa-call{background:rgba(37,211,102,.10);color:#147a43}.seg-contact-actions .phone-call{background:rgba(91,141,239,.14);color:#3d63c9}
+  .person-modal-body .pm-actions .pm-wa-call{background:linear-gradient(135deg,#31b866,#168b50);color:#fff;border:0;border-radius:10px;font:inherit;font-size:12px;font-weight:850;padding:10px;cursor:pointer;}
+</style>`;
       
       return html;
     })()}
@@ -6017,6 +6020,10 @@ function parseTelefonos(telStr){
   return tels;
 }
 
+function llamarWhatsAppDirecto(numero){
+  const url='whatsapp://call?phone='+encodeURIComponent(numero);let abierto=false;const onBlur=()=>{abierto=true;window.removeEventListener('blur',onBlur)};window.addEventListener('blur',onBlur);window.location.href=url;setTimeout(()=>{window.removeEventListener('blur',onBlur);if(!abierto)window.open('https://wa.me/'+numero,'_blank')},900);
+}
+
 function openPersonaModal(p){
   const info = catInfoOf(p.cat);
   const telefonos = parseTelefonos(p.tel);
@@ -6027,16 +6034,18 @@ function openPersonaModal(p){
   if(telefonos.length === 1){
     const t = telefonos[0];
     botonesTel = `
-      <button class="pm-wa" onclick="window.open('https://wa.me/${t.digits}','_blank')">💬 WhatsApp</button>
-      <button class="pm-call" onclick="window.open('tel:${t.digits}','_self')">📞 Llamar</button>
+      <button class="pm-wa" onclick="window.open('https://wa.me/${t.digits}?text='+encodeURIComponent('Hola ${escapeXml(p.nombre)}, ¿cómo estás?'),'_blank')">💬 Enviar mensaje por WhatsApp</button>
+      <button class="pm-wa-call" onclick="llamarWhatsAppDirecto('${t.digits}')">📲 Llamar por WhatsApp</button>
+      <button class="pm-call" onclick="window.open('tel:${t.digits}','_self')">📞 Llamar por teléfono</button>
     `;
   } else if(telefonos.length > 1){
     // Múltiples teléfonos: uno por línea con ambos botones
     botonesTel = telefonos.map((t, i) => `
       <div style="display:flex; gap:6px; margin-bottom:6px;">
         <span style="flex:1; font-size:12px; padding:8px 10px; background:rgba(91,141,239,0.10); border-radius:10px; color:#3d63c9; font-weight:700; display:flex; align-items:center;">📱 ${escapeXml(t.display)}</span>
-        <button class="pm-wa" style="flex:none; padding:8px 12px;" onclick="window.open('https://wa.me/${t.digits}','_blank')">💬</button>
-        <button class="pm-call" style="flex:none; padding:8px 12px;" onclick="window.open('tel:${t.digits}','_self')">📞</button>
+        <button class="pm-wa" style="flex:none; padding:8px 12px;" title="Enviar mensaje por WhatsApp" onclick="window.open('https://wa.me/${t.digits}?text='+encodeURIComponent('Hola ${escapeXml(p.nombre)}, ¿cómo estás?'),'_blank')">💬</button>
+        <button class="pm-wa-call" style="flex:none; padding:8px 12px;" title="Llamar por WhatsApp" onclick="llamarWhatsAppDirecto('${t.digits}')">📲</button>
+        <button class="pm-call" style="flex:none; padding:8px 12px;" title="Llamar por teléfono" onclick="window.open('tel:${t.digits}','_self')">📞</button>
       </div>
     `).join('');
   }
@@ -7636,7 +7645,7 @@ function obtenerProximoPaso(){
 const CAREER_KEY='carreraPSA';
 function cargarCarrera(){try{return JSON.parse(localStorage.getItem(CAREER_KEY)||'{}')}catch(e){return {}}}
 function guardarCarrera(d){localStorage.setItem(CAREER_KEY,JSON.stringify(d));localStorage.setItem('lastUpdate_carrera',Date.now().toString())}
-function renderCarrera(){const d=cargarCarrera(); const pb=+d.pb||0,obj=+d.objetivo||13,mes=+d.meses||0,req=+d.mesesReq||2; document.getElementById('careerCategoria').value=d.categoria||'Distribuidor Junior';document.getElementById('careerObjetivo').value=obj;document.getElementById('careerPb').textContent=pb;document.getElementById('careerPbInput').value=pb;document.getElementById('careerPbBar').style.width=Math.min(100,obj?pb/obj*100:0)+'%';document.getElementById('careerPbHint').innerHTML=pb>=obj?'<b>Objetivo cumplido 🎉</b>Muy buen avance este mes.':`<b>Próximo paso</b>Te faltan ${Math.max(0,obj-pb)} PB para completar tu objetivo.`;document.getElementById('careerMeses').value=mes;document.getElementById('careerMesesReq').value=req;document.getElementById('careerTrimHint').innerHTML=mes>=req?'<b>Trimestre cumplido ✅</b>Ya alcanzaste el requisito cargado.':`<b>Mantenimiento en progreso</b>${mes} de ${req} meses cumplidos.`;document.getElementById('careerValorPb').value=d.valorPb||'';document.getElementById('careerBonus1').value=d.bonus1||'';document.getElementById('careerBonus2').value=d.bonus2||'';document.getElementById('careerMoneda').value=d.moneda||'ARS ($)';document.getElementById('careerPatrocinios').value=d.patrocinios||0;document.getElementById('careerOrganizaciones').value=d.organizaciones||0;document.getElementById('careerPatrociniosCalif').value=d.patrociniosCalif||0;document.getElementById('careerBonusPb').value=d.bonusPb||0;const bpb=+d.bonusPb||0,bc=+d.patrociniosCalif||0,reqBonus=bpb>=12&&bc>=1;document.getElementById('careerBonusHint').innerHTML=reqBonus?'<b>Condición alcanzada ✅</b>Podés consultar tu bonus según los valores vigentes.':`<b>Bonus en progreso</b>Necesitás 12 PB personales y 1 o 2 patrocinios con 9 PB o más.`}
+function renderCarrera(){const d=cargarCarrera(); const pb=+d.pb||0,obj=+d.objetivo||13,mes=+d.meses||0,req=+d.mesesReq||2; const catMap={'Distribuidor Junior':'DJ','Distribuidor':'D','Distribuidor Calificado':'DC','Coordinador':'CE','Coordinador de Equipo':'CE','Líder':'LE','Líder Ejecutivo':'EJ','Empresario':'E'};document.getElementById('careerCategoria').value=catMap[d.categoria]||d.categoria||'DJ';document.getElementById('careerObjetivo').value=obj;document.getElementById('careerPb').textContent=pb;document.getElementById('careerPbInput').value=pb;document.getElementById('careerPbBar').style.width=Math.min(100,obj?pb/obj*100:0)+'%';document.getElementById('careerPbHint').innerHTML=pb>=obj?'<b>Objetivo cumplido 🎉</b>Muy buen avance este mes.':`<b>Próximo paso</b>Te faltan ${Math.max(0,obj-pb)} PB para completar tu objetivo.`;document.getElementById('careerMeses').value=mes;document.getElementById('careerMesesReq').value=req;document.getElementById('careerTrimHint').innerHTML=mes>=req?'<b>Trimestre cumplido ✅</b>Ya alcanzaste el requisito cargado.':`<b>Mantenimiento en progreso</b>${mes} de ${req} meses cumplidos.`;document.getElementById('careerValorPb').value=d.valorPb||'';document.getElementById('careerBonus1').value=d.bonus1||'';document.getElementById('careerBonus2').value=d.bonus2||'';document.getElementById('careerMoneda').value=d.moneda||'ARS ($)';document.getElementById('careerPatrocinios').value=d.patrocinios||0;document.getElementById('careerOrganizaciones').value=d.organizaciones||0;document.getElementById('careerPatrociniosCalif').value=d.patrociniosCalif||0;document.getElementById('careerBonusPb').value=d.bonusPb||0;const bpb=+d.bonusPb||0,bc=+d.patrociniosCalif||0,reqBonus=bpb>=12&&bc>=1;document.getElementById('careerBonusHint').innerHTML=reqBonus?'<b>Condición alcanzada ✅</b>Podés consultar tu bonus según los valores vigentes.':`<b>Bonus en progreso</b>Necesitás 12 PB personales y 1 o 2 patrocinios con 9 PB o más.`}
 function openCarrera(){showView('view-carrera')}
 document.getElementById('btnCareerSave').onclick=()=>{const d=cargarCarrera();d.categoria=document.getElementById('careerCategoria').value;d.objetivo=+document.getElementById('careerObjetivo').value||0;d.pb=+document.getElementById('careerPbInput').value||0;guardarCarrera(d);renderCarrera();showToast('Progreso guardado ✅',1800);renderHomeCompleto()};
 document.getElementById('btnCareerTrim').onclick=()=>{const d=cargarCarrera();d.meses=Math.max(0,Math.min(3,+document.getElementById('careerMeses').value||0));d.mesesReq=Math.max(1,Math.min(3,+document.getElementById('careerMesesReq').value||2));guardarCarrera(d);renderCarrera();showToast('Trimestre guardado ✅',1800)};
@@ -7648,27 +7657,29 @@ let seguimientoEditId = null;
 function cargarSeguimientos(){ try { return JSON.parse(localStorage.getItem(SEG_KEY) || '[]'); } catch(e){ return []; } }
 function guardarSeguimientos(list){ localStorage.setItem(SEG_KEY, JSON.stringify(list)); localStorage.setItem('lastUpdate_seguimiento', Date.now().toString()); }
 function fechaSeg(d){ if(!d) return ''; const [y,m,day]=d.split('-'); return `${day}/${m}/${y}`; }
-function seguimientoVencido(p){ return p.fecha && p.fecha < new Date().toISOString().slice(0,10) && !['Cliente','No interesado'].includes(p.estado); }
-function seguimientoPendientes(){ return cargarSeguimientos().filter(p=>!['Cliente','No interesado'].includes(p.estado)).length; }
+function seguimientoVencido(p){ return p.fecha && p.fecha < new Date().toISOString().slice(0,10) && p.estado !== 'No le interesa'; }
+function seguimientoPendientes(){ return cargarSeguimientos().filter(p=>p.estado !== 'No le interesa').length; }
 function seguimientoProgreso(){ const a=cargarSeguimientos(); if(!a.length) return 0; return Math.round(a.filter(p=>p.estado==='Cliente').length/a.length*100); }
 function openSeguimiento(){ showView('view-seguimiento'); }
-function limpiarFormularioSeg(){ ['segNombre','segTelefono','segFecha','segNotas'].forEach(id=>document.getElementById(id).value=''); document.getElementById('segInteres').value='Producto'; document.getElementById('segEstado').value='Sin contactar'; seguimientoEditId=null; }
+function limpiarFormularioSeg(){ ['segNombre','segTelefono','segFecha','segNotas'].forEach(id=>document.getElementById(id).value=''); document.getElementById('segInteres').value='Producto'; document.getElementById('segEstado').value='No contactado'; seguimientoEditId=null; }
+function segDigits(phone){return String(phone||'').replace(/\D/g,'')}
+function segContactActions(p){const d=segDigits(p.telefono);if(!d)return '';const msg=encodeURIComponent(`Hola ${p.nombre}, ¿cómo estás?`);return `<div class="seg-contact-actions"><a class="wa-msg" title="Enviar mensaje por WhatsApp" aria-label="Enviar mensaje por WhatsApp" href="https://wa.me/${d}?text=${msg}" target="_blank" rel="noopener">💬</a><a class="wa-call" title="Llamar por WhatsApp" aria-label="Llamar por WhatsApp" href="whatsapp://call?phone=${d}" onclick="setTimeout(()=>{if(document.visibilityState==='visible')window.open('https://wa.me/${d}','_blank')},700)">📲</a><a class="phone-call" title="Llamar por teléfono" aria-label="Llamar por teléfono" href="tel:${d}">📞</a></div>`}
 function renderSeguimiento(){
   const all=cargarSeguimientos();
   const hoy=new Date().toISOString().slice(0,10);
-  const pendientes=all.filter(p=>!['Cliente','No interesado'].includes(p.estado));
+  const pendientes=all.filter(p=>p.estado !== 'No le interesa');
   const hoyCount=pendientes.filter(p=>p.fecha===hoy).length;
   const vencidos=pendientes.filter(seguimientoVencido).length;
   document.getElementById('seguimientoSummary').innerHTML=`<div class="seguimiento-stat"><strong>${hoyCount}</strong><span>Para hoy</span></div><div class="seguimiento-stat"><strong>${vencidos}</strong><span>Vencidos</span></div><div class="seguimiento-stat"><strong>${pendientes.length}</strong><span>Pendientes</span></div>`;
   const list=seguimientoFiltro==='todas' ? all : seguimientoFiltro==='hoy' ? all.filter(p=>p.fecha===hoy) : pendientes;
   const cont=document.getElementById('seguimientoList');
   if(!list.length){ cont.innerHTML='<div class="seg-empty"><strong> todavía no hay personas</strong>Agregá tu primer contacto para tener claro cuál es el próximo paso.</div>'; return; }
-  cont.innerHTML=list.map(p=>`<article class="seguimiento-item"><div class="seg-item-head"><div><h3>${escapeXml(p.nombre)}</h3><div class="seg-item-phone">${escapeXml(p.telefono||'Sin teléfono')}</div></div><span class="seg-badge">${escapeXml(p.estado)}</span></div><div class="seg-meta"><span>🎯 ${escapeXml(p.interes)}</span>${p.fecha?`<span>📅 ${fechaSeg(p.fecha)}${seguimientoVencido(p)?' · vencido':''}</span>`:''}</div>${p.notas?`<p class="seg-note">${escapeXml(p.notas)}</p>`:''}<div class="seg-item-actions"><button class="done" data-seg-done="${p.id}">✅ Listo</button><button data-seg-edit="${p.id}">✏️ Editar</button><button class="delete" data-seg-delete="${p.id}">Eliminar</button></div></article>`).join('');
-  cont.querySelectorAll('[data-seg-done]').forEach(b=>b.onclick=()=>actualizarSeguimiento(+b.dataset.segDone,'Cliente'));
+  cont.innerHTML=list.map(p=>`<article class="seguimiento-item"><div class="seg-item-head"><div><div class="seg-name-line"><h3>${escapeXml(p.nombre)}</h3>${segContactActions(p)}</div><div class="seg-item-phone">${escapeXml(p.telefono||'Sin teléfono')}</div></div><span class="seg-badge">${escapeXml(p.estado)}</span></div><div class="seg-meta"><span>🎯 ${escapeXml(p.interes)}</span>${p.fecha?`<span>📅 ${fechaSeg(p.fecha)}${seguimientoVencido(p)?' · vencido':''}</span>`:''}</div>${p.notas?`<p class="seg-note">${escapeXml(p.notas)}</p>`:''}<div class="seg-item-actions"><button class="done" data-seg-done="${p.id}">✅ Listo</button><button data-seg-edit="${p.id}">✏️ Editar</button><button class="delete" data-seg-delete="${p.id}">Eliminar</button></div></article>`).join('');
+  cont.querySelectorAll('[data-seg-done]').forEach(b=>b.onclick=()=>actualizarSeguimiento(+b.dataset.segDone,'Contactado'));
   cont.querySelectorAll('[data-seg-edit]').forEach(b=>b.onclick=()=>editarSeguimiento(+b.dataset.segEdit));
   cont.querySelectorAll('[data-seg-delete]').forEach(b=>b.onclick=()=>eliminarSeguimiento(+b.dataset.segDelete));
 }
-function editarSeguimiento(id){ const p=cargarSeguimientos().find(x=>x.id===id); if(!p) return; seguimientoEditId=id; document.getElementById('segNombre').value=p.nombre; document.getElementById('segTelefono').value=p.telefono||''; document.getElementById('segInteres').value=p.interes; document.getElementById('segEstado').value=p.estado; document.getElementById('segFecha').value=p.fecha||''; document.getElementById('segNotas').value=p.notas||''; document.getElementById('seguimientoFormTitle').textContent='Editar persona'; document.getElementById('seguimientoForm').style.display='block'; window.scrollTo({top:0,behavior:'smooth'}); }
+function editarSeguimiento(id){ const p=cargarSeguimientos().find(x=>x.id===id); if(!p) return; seguimientoEditId=id; document.getElementById('segNombre').value=p.nombre; document.getElementById('segTelefono').value=p.telefono||''; document.getElementById('segInteres').value=p.interes==='Ambas'?'Ambas cosas':(p.interes||'Producto'); const estados={ 'Sin contactar':'No contactado','Presentación realizada':'Seguimiento','Demostración realizada':'Seguimiento','Seguimiento pendiente':'Seguimiento','Cliente':'Contactado','Invitado':'Más adelante','No interesado':'No le interesa' }; document.getElementById('segEstado').value=estados[p.estado]||p.estado||'No contactado'; document.getElementById('segFecha').value=p.fecha||''; document.getElementById('segNotas').value=p.notas||''; document.getElementById('seguimientoFormTitle').textContent='Editar persona'; document.getElementById('seguimientoForm').style.display='block'; window.scrollTo({top:0,behavior:'smooth'}); }
 function actualizarSeguimiento(id,estado){ const a=cargarSeguimientos(); const p=a.find(x=>x.id===id); if(p){p.estado=estado; guardarSeguimientos(a); renderSeguimiento(); renderHomeCompleto(); showToast('Seguimiento actualizado ✅',1800);} }
 function eliminarSeguimiento(id){ if(!confirm('¿Eliminar esta persona?')) return; guardarSeguimientos(cargarSeguimientos().filter(p=>p.id!==id)); renderSeguimiento(); renderHomeCompleto(); }
 
@@ -8154,21 +8165,12 @@ function mostrarPantallaBloqueo() {
   document.getElementById('lockScreen').classList.remove('hidden');
   document.body.style.overflow = 'hidden';
   
-  // Botón: copiar ID
+  // Botón: copiar exactamente el ID visible en pantalla
   document.getElementById('btnCopyId').onclick = async () => {
-    try {
-      await navigator.clipboard.writeText(deviceId);
-      haptic(10);
-      showToast('ID copiado ✓');
-    } catch(e) {
-      // Fallback
-      const el = document.getElementById('deviceIdDisplay');
-      const range = document.createRange();
-      range.selectNode(el);
-      window.getSelection().removeAllRanges();
-      window.getSelection().addRange(range);
-      showToast('ID seleccionado');
-    }
+    const idVisible = document.getElementById('deviceIdDisplay').textContent.trim();
+    if(!idVisible || idVisible === 'Cargando...'){ showToast('Esperá a que aparezca tu ID',1800); return; }
+    try { await navigator.clipboard.writeText(idVisible); haptic(10); showToast('ID copiado ✓',1800); }
+    catch(e){ const input=document.createElement('textarea');input.value=idVisible;input.setAttribute('readonly','');input.style.position='fixed';input.style.opacity='0';document.body.appendChild(input);input.select();let ok=false;try{ok=document.execCommand('copy')}catch(err){}input.remove();if(ok)showToast('ID copiado ✓',1800);else{const range=document.createRange(),el=document.getElementById('deviceIdDisplay');range.selectNodeContents(el);window.getSelection().removeAllRanges();window.getSelection().addRange(range);showToast('ID seleccionado; copialo con Ctrl+C',2200)}}
   };
   
     // Botón: WhatsApp
@@ -8305,5 +8307,5 @@ function mostrarPantallaBloqueado() {
     });
   }
 </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a24e6b86aa50c194',t:'MTc4NTY4NzczMg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
