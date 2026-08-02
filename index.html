@@ -3153,6 +3153,18 @@ body.dark .lock-footer { color: #6b6b76; }
 
   .seg-row-one{display:flex;align-items:center;justify-content:space-between;gap:10px}.seg-row-one h3{margin:0}.seg-row-two{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:9px}.seg-row-phone{color:#777887;font-size:12px;font-weight:800;white-space:nowrap}.seg-row-two .seg-contact-actions{margin:0;flex:1;justify-content:flex-end}.seg-row-two .seg-contact-actions a{min-height:34px;padding:6px 9px;font-size:10.5px;flex:0 1 auto}.seg-card-top{display:block}.seg-card-tags{display:flex;flex-direction:row;align-items:center;gap:6px}.seg-card-tags .seg-badge{white-space:nowrap}@media(max-width:390px){.seg-row-two{align-items:stretch;flex-direction:column}.seg-row-two .seg-contact-actions{width:100%}.seg-row-two .seg-contact-actions a{flex:1}}
 </style>
+<style>
+  /* Dashboard Contactos del Mes: misma familia visual que Mi Equipo */
+  .equipo-contact-dashboard{padding:16px;border-radius:22px;background:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.72);box-shadow:0 10px 28px rgba(80,90,130,.09);margin-bottom:14px}.equipo-contact-dashboard h3{margin:0 0 12px;color:#1c1c27;font-size:16px}.eq-status-row,.eq-type-row{display:flex;gap:4px;padding:4px;border-radius:11px;background:rgba(80,90,130,.08);overflow-x:auto}.eq-filter,.eq-type{flex:1;min-width:max-content;padding:8px 9px;border:0;border-radius:8px;background:transparent;color:#6b6b76;font:inherit;font-size:10.5px;font-weight:800;cursor:pointer;white-space:nowrap}.eq-filter.active,.eq-type.active{background:linear-gradient(135deg,#5b8def,#a06bff);color:#fff;box-shadow:0 3px 10px rgba(120,100,220,.35)}.eq-type-row{margin-top:10px}.eq-type{font-size:11px}.eq-contact-counts{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:12px}.eq-contact-count{padding:11px 4px;border-radius:16px;background:rgba(255,255,255,.62);border:1px solid rgba(255,255,255,.7);text-align:center;box-shadow:0 5px 14px rgba(80,90,130,.06)}.eq-contact-count b{display:block;color:#3d63c9;font-size:20px}.eq-contact-count span{display:block;margin-top:3px;color:#777887;font-size:8px;font-weight:850;line-height:1.1}.eq-contact-list{margin-top:12px}.eq-contact-person{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 0;border-top:1px solid rgba(80,90,130,.1)}.eq-contact-person strong{display:block;font-size:12px;color:#30303c}.eq-contact-person small{display:block;color:#777887;font-size:10px;margin-top:2px}.eq-contact-person .eq-contact-badge{padding:5px 8px;border-radius:8px;background:rgba(91,141,239,.12);color:#3d63c9;font-size:9px;font-weight:900}.eq-contact-empty{padding:14px 4px;color:#777887;text-align:center;font-size:11px}body.dark .equipo-contact-dashboard{background:rgba(30,30,50,.55);border-color:rgba(255,255,255,.1)}body.dark .equipo-contact-dashboard h3,.dark .eq-contact-person strong{color:#f0f0f5}body.dark .eq-contact-count{background:rgba(30,30,50,.45);border-color:rgba(255,255,255,.08)}
+</style>
+<style>
+
+  .equipo-contact-dashboard{padding:0;border-radius:22px;background:transparent;border:0;box-shadow:none;margin:0 0 14px}.equipo-contact-dashboard h3{margin:0 0 10px;font-size:15px;color:#3a3a48;text-align:left}.eq-contact-tabs{display:flex;gap:4px;padding:4px;border-radius:18px;background:rgba(255,255,255,.68);border:1px solid rgba(255,255,255,.72);box-shadow:0 8px 22px rgba(80,90,130,.08);margin-bottom:12px}.eq-contact-tab{flex:1;min-height:57px;border:0;border-radius:14px;background:transparent;color:#6b6b76;font:inherit;font-size:10px;font-weight:900;line-height:1.15;cursor:pointer;padding:7px 4px}.eq-contact-tab.active{background:linear-gradient(135deg,#43cdb4,#5b8def,#a06bff);color:#fff;box-shadow:0 6px 16px rgba(91,141,239,.26)}.eq-contact-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}.eq-contact-stat{min-height:94px;padding:13px 10px;border-radius:20px;background:rgba(255,255,255,.62);border:1px solid rgba(255,255,255,.78);box-shadow:0 10px 24px rgba(80,90,130,.08);text-align:center}.eq-contact-stat span{display:block;font-size:22px}.eq-contact-stat b{display:block;margin-top:2px;color:#3d63c9;font-size:25px;line-height:1}.eq-contact-stat small{display:block;margin-top:6px;color:#777887;font-size:9px;font-weight:950}.eq-contact-filters{display:flex;gap:5px;overflow-x:auto;padding:4px;border-radius:12px;background:rgba(255,255,255,.56);margin-bottom:11px}.eq-filter{flex:0 0 auto;border:0;border-radius:8px;padding:8px 9px;background:transparent;color:#6b6b76;font:inherit;font-size:10px;font-weight:850;cursor:pointer;white-space:nowrap}.eq-filter.active{background:linear-gradient(135deg,#5b8def,#a06bff);color:#fff;box-shadow:0 3px 10px rgba(120,100,220,.3)}.eq-contact-list{padding:0 10px;border-radius:16px;background:rgba(255,255,255,.42)}.eq-contact-person{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 0;border-bottom:1px solid rgba(80,90,130,.1)}.eq-contact-person:last-child{border-bottom:0}.eq-contact-person strong{display:block;font-size:12px;color:#30303c}.eq-contact-person small{display:block;margin-top:2px;color:#777887;font-size:10px}.eq-contact-badge{padding:5px 7px;border-radius:8px;background:rgba(91,141,239,.12);color:#3d63c9;font-size:9px;font-weight:900}.eq-contact-empty{padding:16px 4px;color:#777887;text-align:center;font-size:11px}body.dark .eq-contact-tabs,body.dark .eq-contact-stat,body.dark .eq-contact-filters,body.dark .eq-contact-list{background:rgba(30,30,50,.55);border-color:rgba(255,255,255,.1)}body.dark .equipo-contact-dashboard h3,body.dark .eq-contact-person strong{color:#f0f0f5}
+</style>
+<style>
+
+  .eq-contact-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 0 12px}.eq-contact-stat{min-height:78px;padding:9px 4px;border-radius:17px;background:rgba(255,255,255,.62);border:1px solid rgba(255,255,255,.78);box-shadow:0 7px 16px rgba(80,90,130,.07);text-align:center;cursor:pointer;font:inherit}.eq-contact-stat span{display:block;font-size:19px;line-height:1}.eq-contact-stat b{display:block;margin-top:3px;color:#3d63c9;font-size:21px;line-height:1}.eq-contact-stat small{display:block;margin-top:5px;color:#777887;font-size:8px;font-weight:950;line-height:1.05}.eq-contact-stat.selected{background:linear-gradient(135deg,rgba(91,141,239,.28),rgba(160,107,255,.24));border-color:rgba(91,141,239,.38);box-shadow:0 7px 17px rgba(91,141,239,.16)}.eq-contact-detail-title{margin:4px 2px 7px;color:#60606d;font-size:10px;font-weight:950;text-transform:uppercase;letter-spacing:.45px}.eq-contact-list{margin-top:0}.eq-contact-filters{display:none}@media(max-width:360px){.eq-contact-stats{gap:6px}.eq-contact-stat{min-height:72px}.eq-contact-stat small{font-size:7px}}
+</style>
 </head>
 <body>
  <!-- ============ PANTALLA DE ACTIVACIÓN ============ -->
@@ -3491,8 +3503,9 @@ body.dark .lock-footer { color: #6b6b76; }
   <section id="view-seguimiento" class="view">
     <header class="top">
       <button class="back-btn" id="btnBackSeguimiento" aria-label="Volver">‹</button>
-      <h1>Seguimiento</h1>
-      <div class="script">de personas</div>
+      <h1>Contactos</h1>
+      <div class="script">del Mes</div>
+      
       <p>Tu próximo paso, siempre claro</p>
     </header>
     <div class="seguimiento-summary" id="seguimientoSummary"></div>
@@ -3504,7 +3517,7 @@ body.dark .lock-footer { color: #6b6b76; }
       <h3 id="seguimientoFormTitle">Nueva persona</h3>
       <div class="seg-field"><label for="segNombre">Nombre</label><input id="segNombre" placeholder="Ej: María López" autocomplete="name"></div>
       <div class="seg-field"><label for="segTelefono">Teléfono</label><input id="segTelefono" placeholder="Ej: 351 555 1234" type="tel"></div>
-      <div class="seg-field"><label for="segInteres">¿Por qué lo llamamos?</label><select id="segInteres"><option>Producto</option><option>Negocio</option><option>Ambas cosas</option></select></div>
+      <div class="seg-field"><label for="segInteres">¿Por qué lo llamamos?</label><select id="segInteres"><option>Producto</option><option>Negocio</option><option>Canjes</option><option>Ambas cosas</option></select></div>
       <div class="seg-field"><label for="segEstado">Estado</label><select id="segEstado"><option>Contactado</option><option>No contactado</option><option>Seguimiento</option><option>Más adelante</option><option>No le interesa</option></select></div>
       <div class="seg-field"><label for="segFecha">Próximo contacto</label><input id="segFecha" type="date"></div>
       <div class="seg-field"><label for="segNotas">Notas</label><textarea id="segNotas" placeholder="¿Qué acordaron? ¿Qué tenés que recordar?"></textarea></div>
@@ -5496,6 +5509,19 @@ if(btnEquipoDelete){
   };
 }
 
+let equipoContactStatus='todos';
+let equipoContactType='ventas';
+function renderEquipoContactPanel(){
+  const all=typeof cargarSeguimientos==='function'?cargarSeguimientos():[];
+  const statusLabels=[['todos','👥','CONTACTOS'],['Contactado','✅','CONTACTADOS'],['No contactado','📵','NO CONTACTADOS'],['Seguimiento','🔄','SEGUIMIENTO'],['Más adelante','⏳','MÁS ADELANTE'],['No le interesa','🚫','NO LE INTERESA']];
+  const typeLabels=[['ventas','VENTAS'],['canjes','CANJES'],['presentaciones','PRESENTACIONES DE NEGOCIO']];
+  const typeMatch={ventas:['Producto','Ambas cosas'],canjes:['Canjes'],presentaciones:['Negocio','Ambas cosas']};
+  const inTab=all.filter(p=>typeMatch[equipoContactType].includes(p.interes));
+  const count=(st)=>st==='todos'?inTab.length:inTab.filter(p=>p.estado===st).length;
+  const filtered=inTab.filter(p=>equipoContactStatus==='todos'||p.estado===equipoContactStatus);
+  return `<div class="equipo-contact-dashboard"><h3>📊 Contactos del Mes</h3><div class="eq-contact-tabs">${typeLabels.map(x=>`<button class="eq-contact-tab ${equipoContactType===x[0]?'active':''}" data-eqtype="${x[0]}">${x[1]}</button>`).join('')}</div><div class="eq-contact-stats">${statusLabels.map(x=>`<button class="eq-contact-stat ${equipoContactStatus===x[0]?'selected':''}" data-eqstatus="${x[0]}"><span>${x[1]}</span><b>${count(x[0])}</b><small>${x[2]}</small></button>`).join('')}</div><div class="eq-contact-detail-title">${equipoContactStatus==='todos'?'Todos los contactos':statusLabels.find(x=>x[0]===equipoContactStatus)[2]}</div><div class="eq-contact-list">${filtered.length?filtered.slice(0,12).map(p=>`<div class="eq-contact-person"><div><strong>${escapeXml(p.nombre)}</strong><small>${escapeXml(p.telefono||'Sin teléfono')} · ${escapeXml(p.interes)}</small></div><span class="eq-contact-badge">${escapeXml(p.estado)}</span></div>`).join(''):'<div class="eq-contact-empty">No hay contactos en esta categoría.</div>'}</div></div>`;
+}
+function bindEquipoContactPanel(cont){cont.querySelectorAll('[data-eqstatus]').forEach(b=>b.onclick=()=>{equipoContactStatus=b.dataset.eqstatus;renderSeguimiento()});cont.querySelectorAll('[data-eqtype]').forEach(b=>b.onclick=()=>{equipoContactType=b.dataset.eqtype;renderSeguimiento()})}
 function renderEquipoDashboard(){
   const cont = document.getElementById('equipoContent');
   const personas = equipoData.personas;
@@ -5676,6 +5702,9 @@ ${(function(){
       <style>#bdayFullList.open{display:block !important}
   .seg-name-line{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.seg-name-line h3{margin:0}.seg-contact-actions{display:flex;align-items:center;gap:4px}.seg-contact-actions a{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;padding:0;border-radius:8px;text-decoration:none;font-size:13px;font-weight:900}.seg-contact-actions .wa-msg{background:rgba(37,211,102,.16);color:#147a43}.seg-contact-actions .wa-call{background:rgba(37,211,102,.10);color:#147a43}.seg-contact-actions .phone-call{background:rgba(91,141,239,.14);color:#3d63c9}
   .person-modal-body .pm-actions .pm-wa-call{background:linear-gradient(135deg,#31b866,#168b50);color:#fff;border:0;border-radius:10px;font:inherit;font-size:12px;font-weight:850;padding:10px;cursor:pointer;}
+
+  /* Dashboard de contactos dentro de Mi Equipo */
+  .equipo-contact-dashboard{margin:0 0 14px;padding:14px;border-radius:20px;background:rgba(255,255,255,.55);border:1px solid rgba(255,255,255,.72);box-shadow:0 10px 25px rgba(80,90,130,.08)}.equipo-contact-dashboard h3{margin:0 0 11px;color:#1c1c27;font-size:16px}.eq-status-row,.eq-type-row{display:flex;gap:6px;overflow-x:auto;padding-bottom:3px}.eq-filter,.eq-type{flex:1;min-width:max-content;border:0;border-radius:10px;padding:9px 10px;background:rgba(80,90,130,.08);color:#60606d;font:inherit;font-size:10.5px;font-weight:900;cursor:pointer;white-space:nowrap}.eq-filter.active,.eq-type.active{background:linear-gradient(135deg,#5b8def,#a06bff);color:#fff;box-shadow:0 5px 12px rgba(91,141,239,.22)}.eq-type-row{margin-top:11px}.eq-type{font-size:11px}.eq-contact-counts{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-top:12px}.eq-contact-count{padding:8px 3px;border-radius:10px;background:rgba(255,255,255,.5);text-align:center}.eq-contact-count b{display:block;color:#3d63c9;font-size:17px}.eq-contact-count span{display:block;color:#777887;font-size:8px;font-weight:900;line-height:1.1}.eq-contact-list{margin-top:11px}.eq-contact-person{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 0;border-top:1px solid rgba(80,90,130,.10)}.eq-contact-person strong{display:block;font-size:12px;color:#30303c}.eq-contact-person small{display:block;color:#777887;font-size:10px;margin-top:2px}.eq-contact-person .eq-contact-badge{padding:4px 7px;border-radius:8px;background:rgba(91,141,239,.12);color:#3d63c9;font-size:9px;font-weight:900}.eq-contact-empty{padding:12px 4px;color:#777887;text-align:center;font-size:11px}body.dark .equipo-contact-dashboard{background:rgba(30,30,50,.55);border-color:rgba(255,255,255,.1)}body.dark .equipo-contact-dashboard h3,.dark .eq-contact-person strong{color:#f0f0f5}body.dark .eq-contact-count{background:rgba(30,30,50,.45)}
 </style>`;
       
       return html;
@@ -7689,11 +7718,12 @@ function renderSeguimiento(){
   document.getElementById('seguimientoSummary').innerHTML=`<div class="seguimiento-stat"><strong>${hoyCount}</strong><span>Para hoy</span></div><div class="seguimiento-stat"><strong>${vencidos}</strong><span>Vencidos</span></div><div class="seguimiento-stat"><strong>${pendientes.length}</strong><span>Pendientes</span></div>`;
   const list=seguimientoFiltro==='todas' ? all : seguimientoFiltro==='hoy' ? all.filter(p=>p.fecha===hoy) : pendientes;
   const cont=document.getElementById('seguimientoList');
-  if(!list.length){ cont.innerHTML='<div class="seg-empty"><strong> todavía no hay personas</strong>Agregá tu primer contacto para tener claro cuál es el próximo paso.</div>'; return; }
-  cont.innerHTML=list.map(p=>`<article class="seguimiento-item"><div class="seg-card-top"><div class="seg-row-one"><h3>${escapeXml(p.nombre)}</h3><div class="seg-card-tags"><span class="seg-badge">${escapeXml(p.interes)}</span><span class="seg-badge">${escapeXml(p.estado)}</span></div></div><div class="seg-row-two"><span class="seg-row-phone">${escapeXml(p.telefono||'Sin teléfono')}</span>${segContactActions(p)}</div></div>${p.fecha?`<div class="seg-meta"><span>📅 ${fechaSeg(p.fecha)}${seguimientoVencido(p)?' · vencido':''}</span></div>`:''}<label class="seg-card-note-label">Notas</label><div class="seg-note-readonly ${p.notas?'':'empty'}">${p.notas?escapeXml(p.notas):'Sin notas cargadas'}</div><div class="seg-item-actions"><button class="done" data-seg-done="${p.id}">✅ Listo</button><button data-seg-edit="${p.id}">✏️ Editar</button><button class="delete" data-seg-delete="${p.id}">Eliminar</button></div></article>`).join('');
+  if(!list.length){ cont.innerHTML=renderEquipoContactPanel()+'<div class="seg-empty"><strong>Todavía no hay personas</strong>Agregá tu primer contacto para ver el resumen.</div>'; bindEquipoContactPanel(cont); return; }
+  cont.innerHTML=renderEquipoContactPanel()+list.map(p=>`<article class="seguimiento-item"><div class="seg-card-top"><div class="seg-row-one"><h3>${escapeXml(p.nombre)}</h3><div class="seg-card-tags"><span class="seg-badge">${escapeXml(p.interes)}</span><span class="seg-badge">${escapeXml(p.estado)}</span></div></div><div class="seg-row-two"><span class="seg-row-phone">${escapeXml(p.telefono||'Sin teléfono')}</span>${segContactActions(p)}</div></div>${p.fecha?`<div class="seg-meta"><span>📅 ${fechaSeg(p.fecha)}${seguimientoVencido(p)?' · vencido':''}</span></div>`:''}<label class="seg-card-note-label">Notas</label><div class="seg-note-readonly ${p.notas?'':'empty'}">${p.notas?escapeXml(p.notas):'Sin notas cargadas'}</div><div class="seg-item-actions"><button class="done" data-seg-done="${p.id}">✅ Listo</button><button data-seg-edit="${p.id}">✏️ Editar</button><button class="delete" data-seg-delete="${p.id}">Eliminar</button></div></article>`).join('');
   cont.querySelectorAll('[data-seg-done]').forEach(b=>b.onclick=()=>actualizarSeguimiento(+b.dataset.segDone,'Contactado'));
   cont.querySelectorAll('[data-seg-edit]').forEach(b=>b.onclick=()=>editarSeguimiento(+b.dataset.segEdit));
   cont.querySelectorAll('[data-seg-delete]').forEach(b=>b.onclick=()=>eliminarSeguimiento(+b.dataset.segDelete));
+  bindEquipoContactPanel(cont);
 }
 function editarSeguimiento(id){ const p=cargarSeguimientos().find(x=>x.id===id); if(!p) return; seguimientoEditId=id; document.getElementById('segNombre').value=capitalizarNombreSeg(p.nombre); document.getElementById('segTelefono').value=p.telefono||''; document.getElementById('segInteres').value=p.interes==='Ambas'?'Ambas cosas':(p.interes||'Producto'); const estados={ 'Sin contactar':'No contactado','Presentación realizada':'Seguimiento','Demostración realizada':'Seguimiento','Seguimiento pendiente':'Seguimiento','Cliente':'Contactado','Invitado':'Más adelante','No interesado':'No le interesa' }; document.getElementById('segEstado').value=estados[p.estado]||p.estado||'No contactado'; document.getElementById('segFecha').value=p.fecha||''; document.getElementById('segNotas').value=p.notas||''; document.getElementById('seguimientoFormTitle').textContent='Editar persona'; document.getElementById('seguimientoForm').style.display='block'; window.scrollTo({top:0,behavior:'smooth'}); }
 function actualizarSeguimiento(id,estado){ const a=cargarSeguimientos(); const p=a.find(x=>x.id===id); if(p){p.estado=estado; guardarSeguimientos(a); renderSeguimiento(); renderHomeCompleto(); showToast('Seguimiento actualizado ✅',1800);} }
@@ -7881,7 +7911,7 @@ function renderToolsList(){
     <button type="button" class="business-card" onclick="openSeguimiento()">
       <div class="business-icon">👥</div>
       <div>
-        <h3>Seguimiento</h3>
+        <h3>Contactos del Mes</h3>
         <p>Personas para contactar y próximos pasos.</p>
       </div>
       <div class="business-status">${seguimientoPendientes()}<small>pendientes</small></div>
@@ -7897,7 +7927,6 @@ function renderToolsList(){
     <div class="home-section-block">
       <div class="mini-section-label"><span>🌱</span> Mi negocio</div>
       ${equipoCard}
-      ${carreraCard}
       ${seguimientoCard}
     </div>
   `;
@@ -8325,5 +8354,5 @@ function mostrarPantallaBloqueado() {
     });
   }
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a24ee3c06da4ed09',t:'MTc4NTY5MjY1Ng=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a24f625ad9475777',t:'MTc4NTY5Nzg0Mg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
