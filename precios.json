@@ -1,510 +1,3632 @@
 {
-  "version": 1,
+  "version": 3,
   "actualizado": "2026-08-03",
-  "productos": [
+  "preciosCruzados": [
     {
-      "id": "senior4",
-      "nombre": "PSA Senior 4",
-      "pb": 5,
-      "categoria": "Purificador",
-      "icono": "🚰"
+      "nombre": "ABLANDADOR PSA DOMUS",
+      "pb": 3.8,
+      "precioUser": 2782000.0,
+      "precio": 2782000.0
     },
     {
-      "id": "senior3",
-      "nombre": "PSA Senior 3",
-      "pb": 4,
-      "categoria": "Purificador",
-      "icono": "🚰"
+      "nombre": "ABLANDADOR PSA DOMUS + INSTALACION",
+      "pb": 3.8,
+      "precioUser": 2961000.0,
+      "precio": 2961000.0
     },
     {
-      "id": "vero",
-      "nombre": "PSA Vero / Rotoplas",
+      "nombre": "ABLANDADOR PSA MINI DOMUS",
+      "pb": 3.8,
+      "precioUser": 2198000.0,
+      "precio": 2198000.0
+    },
+    {
+      "nombre": "ABLANDADOR PSA MINI DOMUS + INSTALACION",
+      "pb": 3.8,
+      "precioUser": 2369000.0,
+      "precio": 2369000.0
+    },
+    {
+      "nombre": "SENIOR 4 BIANCO + KIT POSV",
+      "pb": 3.3,
+      "precioUser": 913000.0,
+      "precio": 913000.0
+    },
+    {
+      "nombre": "SENIOR 4 BIANCO + KIT POSV. Plan canje",
+      "pb": 3.3,
+      "precioUser": 821700.0,
+      "precio": 821700.0
+    },
+    {
+      "nombre": "SENIOR 4 BM + KIT POSV",
+      "pb": 3.3,
+      "precioUser": 808000.0,
+      "precio": 808000.0
+    },
+    {
+      "nombre": "SENIOR 4 BM + KIT POSV Plan canje",
+      "pb": 3.3,
+      "precioUser": 727200.0,
+      "precio": 727200.0
+    },
+    {
+      "nombre": "SENIOR 4 GRIGIO + KIT POSV",
+      "pb": 3.3,
+      "precioUser": 913000.0,
+      "precio": 913000.0
+    },
+    {
+      "nombre": "SENIOR 4 GRIGIO + KIT POSV Plan canje",
+      "pb": 3.3,
+      "precioUser": 821700.0,
+      "precio": 821700.0
+    },
+    {
+      "nombre": "SENIOR 4 NERO + KIT POSV",
+      "pb": 3.3,
+      "precioUser": 913000.0,
+      "precio": 913000.0
+    },
+    {
+      "nombre": "SENIOR 4 NERO + KIT POSV. Plan canje",
+      "pb": 3.3,
+      "precioUser": 821700.0,
+      "precio": 821700.0
+    },
+    {
+      "nombre": "SENIOR BIANCO + KIT POSV",
+      "pb": 3.3,
+      "precioUser": 751000.0,
+      "precio": 751000.0
+    },
+    {
+      "nombre": "SENIOR BIANCO + KIT POSV. Plan canje",
+      "pb": 3.3,
+      "precioUser": 675900.0,
+      "precio": 675900.0
+    },
+    {
+      "nombre": "1-P PORTATÍL",
+      "pb": 0,
+      "precioUser": 122000.0,
+      "precio": 122000.0
+    },
+    {
+      "nombre": "C3 GRIGIO",
+      "pb": 0.55,
+      "precioUser": 208000.0,
+      "precio": 208000.0
+    },
+    {
+      "nombre": "C3 GRIGIO Plan canje",
+      "pb": 2.95,
+      "precioUser": 187200.0,
+      "precio": 187200.0
+    },
+    {
+      "nombre": "DUCHA BIANCO C/KDF",
+      "pb": 1.15,
+      "precioUser": 296000.0,
+      "precio": 296000.0
+    },
+    {
+      "nombre": "DUCHA BIANCO C/KDF Plan canje",
+      "pb": 2.95,
+      "precioUser": 266400.0,
+      "precio": 266400.0
+    },
+    {
+      "nombre": "DUCHA BIANCO C/KDF-POLI",
+      "pb": 1.15,
+      "precioUser": 296000.0,
+      "precio": 296000.0
+    },
+    {
+      "nombre": "DUCHA BIANCO C/KDF-POLI Plan canje",
+      "pb": 2.95,
+      "precioUser": 266400.0,
+      "precio": 266400.0
+    },
+    {
+      "nombre": "DUCHA GRIGIO C/KDF",
+      "pb": 1.15,
+      "precioUser": 296000.0,
+      "precio": 296000.0
+    },
+    {
+      "nombre": "DUCHA GRIGIO C/KDF Plan canje",
+      "pb": 2.95,
+      "precioUser": 266400.0,
+      "precio": 266400.0
+    },
+    {
+      "nombre": "DUCHA GRIGIO C/KDF-POLI",
+      "pb": 1.15,
+      "precioUser": 296000.0,
+      "precio": 296000.0
+    },
+    {
+      "nombre": "DUCHA GRIGIO C/KDF-POLI Plan canje",
+      "pb": 2.95,
+      "precioUser": 266400.0,
+      "precio": 266400.0
+    },
+    {
+      "nombre": "IONTRIX 3",
+      "pb": 3.1,
+      "precioUser": 1176000.0,
+      "precio": 1176000.0
+    },
+    {
+      "nombre": "IONTRIX 3 Plan canje",
+      "pb": 2.95,
+      "precioUser": 1058400.0,
+      "precio": 1058400.0
+    },
+    {
+      "nombre": "MINI BIANCO + KIT POSV",
       "pb": 3.5,
-      "categoria": "Purificador",
-      "icono": "💎"
+      "precioUser": 411000.0,
+      "precio": 411000.0
     },
     {
-      "id": "mini",
-      "nombre": "PSA Mini",
-      "pb": 2,
-      "categoria": "Purificador",
-      "icono": "🔹"
-    },
-    {
-      "id": "ducha",
-      "nombre": "PSA Ducha",
-      "pb": 1.5,
-      "categoria": "Purificador",
-      "icono": "🚿"
-    },
-    {
-      "id": "aire",
-      "nombre": "Purificador de Aire",
-      "pb": 4,
-      "categoria": "Aire",
-      "icono": "🌬️"
-    },
-    {
-      "id": "filtro_s",
-      "nombre": "Pack Filtros Senior (x4)",
-      "pb": 0.8,
-      "categoria": "Repuesto",
-      "icono": "♻️"
-    },
-    {
-      "id": "filtro_v",
-      "nombre": "Filtro Vero / Mini",
-      "pb": 0.5,
-      "categoria": "Repuesto",
-      "icono": "♻️"
-    }
-  ],
-  "bonus": {
-    "b1": 28750,
-    "b2": 100000,
-    "moneda": "ARS ($)",
-    "AR": {
-      "1": "28750",
-      "2": "100000",
-      "moneda": "ARS ($)"
-    }
-  },
-  "ganancias": {
-    "DC_150": [
-      {
-        "pais": "Argentina",
-        "valor": "$1.567.500 + $57.750",
-        "codigo": "ARS"
-      },
-      {
-        "pais": "Bolivia",
-        "valor": "Bs 9.900",
-        "codigo": "BOB"
-      },
-      {
-        "pais": "Colombia",
-        "valor": "$1.105.500",
-        "codigo": "COP"
-      },
-      {
-        "pais": "Ecuador",
-        "valor": "$4.587.000",
-        "codigo": "USD"
-      },
-      {
-        "pais": "Paraguay",
-        "valor": "₲ 7.095.000",
-        "codigo": "PYG"
-      },
-      {
-        "pais": "Perú",
-        "valor": "S/ 4.092",
-        "codigo": "PEN"
-      },
-      {
-        "pais": "Uruguay",
-        "valor": "USD 1.089",
-        "codigo": "USD"
-      },
-      {
-        "pais": "Chile",
-        "valor": "1.320 €",
-        "codigo": "EUR"
-      },
-      {
-        "pais": "España",
-        "valor": "USD 3.762 + € 4.560",
-        "codigo": "MIX"
-      }
-    ],
-    "CE_600": [
-      {
-        "pais": "Argentina",
-        "valor": "$5.415.000 + $199.500",
-        "codigo": "ARS"
-      },
-      {
-        "pais": "Bolivia",
-        "valor": "Bs 34.200",
-        "codigo": "BOB"
-      },
-      {
-        "pais": "Colombia",
-        "valor": "$3.819.000",
-        "codigo": "COP"
-      },
-      {
-        "pais": "Ecuador",
-        "valor": "$15.846.000",
-        "codigo": "USD"
-      },
-      {
-        "pais": "Paraguay",
-        "valor": "₲ 24.510.000",
-        "codigo": "PYG"
-      },
-      {
-        "pais": "Perú",
-        "valor": "S/ 14.136",
-        "codigo": "PEN"
-      },
-      {
-        "pais": "Uruguay",
-        "valor": "USD 3.762",
-        "codigo": "USD"
-      },
-      {
-        "pais": "Chile",
-        "valor": "€ 4.560",
-        "codigo": "EUR"
-      },
-      {
-        "pais": "España",
-        "valor": "USD 3.762 + € 4.560",
-        "codigo": "MIX"
-      }
-    ],
-    "DC": [
-      {
-        "pais": "Argentina",
-        "valor": "$1.567.500 + $57.750",
-        "codigo": "ARS"
-      },
-      {
-        "pais": "Bolivia",
-        "valor": "Bs 9.900",
-        "codigo": "BOB"
-      },
-      {
-        "pais": "Colombia",
-        "valor": "$1.105.500",
-        "codigo": "COP"
-      },
-      {
-        "pais": "Ecuador",
-        "valor": "$4.587.000",
-        "codigo": "USD"
-      },
-      {
-        "pais": "Paraguay",
-        "valor": "₲ 7.095.000",
-        "codigo": "PYG"
-      },
-      {
-        "pais": "Perú",
-        "valor": "S/ 4.092",
-        "codigo": "PEN"
-      },
-      {
-        "pais": "Uruguay",
-        "valor": "USD 1.089",
-        "codigo": "USD"
-      },
-      {
-        "pais": "Chile",
-        "valor": "1.320 €",
-        "codigo": "EUR"
-      },
-      {
-        "pais": "España",
-        "valor": "USD 3.762 + € 4.560",
-        "codigo": "MIX"
-      }
-    ],
-    "CE": [
-      {
-        "pais": "Argentina",
-        "valor": "$5.415.000 + $199.500",
-        "codigo": "ARS"
-      },
-      {
-        "pais": "Bolivia",
-        "valor": "Bs 34.200",
-        "codigo": "BOB"
-      },
-      {
-        "pais": "Colombia",
-        "valor": "$3.819.000",
-        "codigo": "COP"
-      },
-      {
-        "pais": "Ecuador",
-        "valor": "$15.846.000",
-        "codigo": "USD"
-      },
-      {
-        "pais": "Paraguay",
-        "valor": "₲ 24.510.000",
-        "codigo": "PYG"
-      },
-      {
-        "pais": "Perú",
-        "valor": "S/ 14.136",
-        "codigo": "PEN"
-      },
-      {
-        "pais": "Uruguay",
-        "valor": "USD 3.762",
-        "codigo": "USD"
-      },
-      {
-        "pais": "Chile",
-        "valor": "€ 4.560",
-        "codigo": "EUR"
-      },
-      {
-        "pais": "España",
-        "valor": "USD 3.762 + € 4.560",
-        "codigo": "MIX"
-      }
-    ]
-  },
-  "lista": [
-    {
-      "id": "senior4",
-      "nombre": "PSA Senior 4",
-      "pb": 5,
-      "categoria": "Purificador",
-      "icono": "🚰"
-    },
-    {
-      "id": "senior3",
-      "nombre": "PSA Senior 3",
-      "pb": 4,
-      "categoria": "Purificador",
-      "icono": "🚰"
-    },
-    {
-      "id": "vero",
-      "nombre": "PSA Vero / Rotoplas",
+      "nombre": "MINI BIANCO + KIT POSV. Plan canje",
       "pb": 3.5,
-      "categoria": "Purificador",
-      "icono": "💎"
+      "precioUser": 369900.0,
+      "precio": 369900.0
     },
     {
-      "id": "mini",
-      "nombre": "PSA Mini",
-      "pb": 2,
-      "categoria": "Purificador",
-      "icono": "🔹"
-    },
-    {
-      "id": "ducha",
-      "nombre": "PSA Ducha",
-      "pb": 1.5,
-      "categoria": "Purificador",
-      "icono": "🚿"
-    },
-    {
-      "id": "aire",
-      "nombre": "Purificador de Aire",
-      "pb": 4,
-      "categoria": "Aire",
-      "icono": "🌬️"
-    },
-    {
-      "id": "filtro_s",
-      "nombre": "Pack Filtros Senior (x4)",
-      "pb": 0.8,
-      "categoria": "Repuesto",
-      "icono": "♻️"
-    },
-    {
-      "id": "filtro_v",
-      "nombre": "Filtro Vero / Mini",
-      "pb": 0.5,
-      "categoria": "Repuesto",
-      "icono": "♻️"
-    }
-  ],
-  "preciosDistribuidor": [
-    {
-      "id": "senior4",
-      "nombre": "PSA Senior 4",
-      "nombreNorm": "psa senior 4",
-      "pb": 5,
-      "precio": 175000
-    },
-    {
-      "id": "senior3",
-      "nombre": "PSA Senior 3",
-      "nombreNorm": "psa senior 3",
-      "pb": 4,
-      "precio": 150000
-    },
-    {
-      "id": "vero",
-      "nombre": "PSA Vero / Rotoplas",
-      "nombreNorm": "psa vero / rotoplas",
+      "nombre": "MINI NERO + KIT POSV",
       "pb": 3.5,
-      "precio": 137500
+      "precioUser": 411000.0,
+      "precio": 411000.0
     },
     {
-      "id": "mini",
-      "nombre": "PSA Mini",
-      "nombreNorm": "psa mini",
-      "pb": 2,
-      "precio": 100000
+      "nombre": "MINI NERO + KIT POSV. Plan canje",
+      "pb": 3.5,
+      "precioUser": 369900.0,
+      "precio": 369900.0
     },
     {
-      "id": "ducha",
-      "nombre": "PSA Ducha",
-      "nombreNorm": "psa ducha",
-      "pb": 1.5,
-      "precio": 87500
+      "nombre": "POLI 2 BIANCO",
+      "pb": 0.85,
+      "precioUser": 280000.0,
+      "precio": 280000.0
     },
     {
-      "id": "aire",
-      "nombre": "Purificador de Aire",
-      "nombreNorm": "purificador de aire",
-      "pb": 4,
-      "precio": 150000
+      "nombre": "QUANTUM BM BIANCO + POSV",
+      "pb": 3.3,
+      "precioUser": 1271000.0,
+      "precio": 1271000.0
     },
     {
-      "id": "filtro_s",
-      "nombre": "Pack Filtros Senior (x4)",
-      "nombreNorm": "pack filtros senior (x4)",
+      "nombre": "QUANTUM BM BIANCO + POSV Plan canje",
+      "pb": 3.3,
+      "precioUser": 1143900.0,
+      "precio": 1143900.0
+    },
+    {
+      "nombre": "QUANTUM SM BIANCO + POSV",
+      "pb": 3.3,
+      "precioUser": 1271000.0,
+      "precio": 1271000.0
+    },
+    {
+      "nombre": "QUANTUM SM BIANCO + POSV. Plan canje",
+      "pb": 3.3,
+      "precioUser": 1143900.0,
+      "precio": 1143900.0
+    },
+    {
+      "nombre": "S- 2 BM BIANCO + POSV",
+      "pb": 3.3,
+      "precioUser": 1079000.0,
+      "precio": 1079000.0
+    },
+    {
+      "nombre": "S- 2 BM BIANCO + POSV. Plan canje",
+      "pb": 3.3,
+      "precioUser": 971100.0,
+      "precio": 971100.0
+    },
+    {
+      "nombre": "S- 2 SM BIANCO + POSV",
+      "pb": 3.3,
+      "precioUser": 1079000.0,
+      "precio": 1079000.0
+    },
+    {
+      "nombre": "S- 2 SM BIANCO + POSV. Plan canje",
+      "pb": 3.3,
+      "precioUser": 971100.0,
+      "precio": 971100.0
+    },
+    {
+      "nombre": "S- 2 SM NERO + POSV",
+      "pb": 3.3,
+      "precioUser": 1079000.0,
+      "precio": 1079000.0
+    },
+    {
+      "nombre": "S- 2 SM NERO + POSV. Plan canje",
+      "pb": 2.95,
+      "precioUser": 971100.0,
+      "precio": 971100.0
+    },
+    {
+      "nombre": "SENIK BM BIANCO + POSV",
+      "pb": 3.3,
+      "precioUser": 1248000.0,
+      "precio": 1248000.0
+    },
+    {
+      "nombre": "SENIK BM BIANCO + POSV. Plan canje",
+      "pb": 3.3,
+      "precioUser": 1123200.0,
+      "precio": 1123200.0
+    },
+    {
+      "nombre": "SENIK SM BIANCO + POSV",
+      "pb": 3.3,
+      "precioUser": 1248000.0,
+      "precio": 1248000.0
+    },
+    {
+      "nombre": "SENIK SM BIANCO + POSV. Plan canje",
+      "pb": 3.3,
+      "precioUser": 1123200.0,
+      "precio": 1123200.0
+    },
+    {
+      "nombre": "VERO BIANCO + KIT POSV",
+      "pb": 3.3,
+      "precioUser": 528000.0,
+      "precio": 528000.0
+    },
+    {
+      "nombre": "VERO BIANCO + KIT POSV. Plan canje",
+      "pb": 3.3,
+      "precioUser": 475200.0,
+      "precio": 475200.0
+    },
+    {
+      "nombre": "SODA BURBY BIANCO",
+      "pb": 2.15,
+      "precioUser": 438000.0,
+      "precio": 438000.0
+    },
+    {
+      "nombre": "SODA BURBY BIANCO Plan canje",
+      "pb": 2.95,
+      "precioUser": 394200.0,
+      "precio": 394200.0
+    },
+    {
+      "nombre": "OSMOSIS ROPOT",
+      "pb": 3.5,
+      "precioUser": 1937000.0,
+      "precio": 1937000.0
+    },
+    {
+      "nombre": "OSMOSIS ROPOT Plan canje",
+      "pb": 2.95,
+      "precioUser": 1743300.0,
+      "precio": 1743300.0
+    },
+    {
+      "nombre": "PURIFICADOR DE AIRE",
+      "pb": 4.5,
+      "precioUser": 1596000.0,
+      "precio": 1596000.0
+    },
+    {
+      "nombre": "(001) ADAPT. UNIVERSAL C/MANGUERA",
+      "pb": 0,
+      "precioUser": 22250.0,
+      "precio": 22250.0
+    },
+    {
+      "nombre": "(002) ADAPT. ROSCA (FV TIPO UNIMIX)",
+      "pb": 0,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(003) ADAPT. ROSCA CORTA",
+      "pb": 0,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(004) ADAPT. ROSCA LARGA",
+      "pb": 0,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(005) ADAPT. UNIV.MARIPOSA DIAM.11-12",
+      "pb": 0,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(006) ADAPT. UNIV.MARIPOSA DIAM.14",
+      "pb": 0,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(007) ADAPT. UNIV.MARIPOSA DIAM.16",
+      "pb": 0,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(008) ADAPT. UNIV.MARIPOSA DIAM.18",
+      "pb": 0,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(009) ADAPT. UNIV.MARIPOSA DIAM.20",
+      "pb": 0,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(010) ADAPT. ROSCA HEMBRA-HEMBRA",
+      "pb": 0,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(016) ADAPT. ROSCA HEMBRA O.N",
+      "pb": 0,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(018) ADAPT. ROSCA CANILLA TIPO PATIO",
+      "pb": 0,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(019) ADAPT. ROSCA MACHO",
+      "pb": 18.1,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(020) ADAPT. ROSCA ESPECIAL",
+      "pb": 0,
+      "precioUser": 24800.0,
+      "precio": 24800.0
+    },
+    {
+      "nombre": "(024) ADAPT. ROSCA HEMBRA",
+      "pb": 20.1,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(027) ADAPT. ROSCA LARGA PASO FINO",
+      "pb": 0,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(030) ADAPT. H-M 1/2 C/TUERCA DUCHA II",
+      "pb": 0,
+      "precioUser": 35800.0,
+      "precio": 35800.0
+    },
+    {
+      "nombre": "(036) ADAPT. M-M 3/4 BG DUCHA II",
+      "pb": 0,
+      "precioUser": 35800.0,
+      "precio": 35800.0
+    },
+    {
+      "nombre": "(037) ADAPT. ROSCA MACHO (FV SWING PLUS)",
+      "pb": 0,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(039) ADAPT. ROSCA HEMBRA-HEMBRA DIÁM.22",
+      "pb": 0,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(041) ADAPT. ROSCA CANILLA PIAZZA",
+      "pb": 0,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(051) ADAPT. SIN ROSCA DIAM. 17",
+      "pb": 0,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(053) ADAPT. ROSCA BSP 3/4 X 14 HILOS",
+      "pb": 0,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(073) ADAPT. ROSCA MÚLTIPLE",
+      "pb": 0,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(078) ADAPT. ROSCA DIAM",
+      "pb": 23.5,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(083) ADAPT. ROSCA MACHO 22 X 1",
+      "pb": 0,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(100) ADAPT. ROSCA HEMBRA BSP 1/2",
+      "pb": 0,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(102) ADAPT. ROSCA MACHO FV DIÁM",
+      "pb": 18.6,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(103) ADAPT. ROSCA HEMBRA P/HIDROMET",
+      "pb": 0,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(135) ADAPT. ROSCA MACHO 21 X 1",
+      "pb": 0,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(142) ADAPT. ROSCA MACHO X 1",
+      "pb": 16.3,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(144) ADAPT. ROSCA MACHO X 1",
+      "pb": 18.2,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(147) ADAPT. ROSCA TIPO RACOR M. 24 X 1",
+      "pb": 0,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(148) ADAPT. ROSCA HEMBRA (SWING PLUS) M. 24X1",
+      "pb": 0,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(149) ADAPT. ROSCA P/LAVARROPA M 24 X 1",
+      "pb": 0,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(155) ADAPT. S- C/ORING. P/MANOMETRO",
+      "pb": 0,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(164) ADAPT. ROSCA MACHO 20 X 1",
+      "pb": 0,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(174) ADAPT. ROSCA AIREADOR M 24 X 1",
+      "pb": 0,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(177) ADAPT. RECTANGULAR P/PEGAR",
+      "pb": 0,
+      "precioUser": 54550.0,
+      "precio": 54550.0
+    },
+    {
+      "nombre": "(20) ADAPT. M-H BG 3/4 P/ DUCHA CR",
+      "pb": 0,
+      "precioUser": 35800.0,
+      "precio": 35800.0
+    },
+    {
+      "nombre": "(228) ADAPT. OVALADO",
+      "pb": 0,
+      "precioUser": 54550.0,
+      "precio": 54550.0
+    },
+    {
+      "nombre": "(229) ADAPT. ROSCA H-H 22 X 1 LARGO",
+      "pb": 0,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(245) ADAPT. ROSCA H-M 23 X 1",
+      "pb": 0,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(246) ADAPT. ROSCA MACHO 23 X 1",
+      "pb": 0,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(573) ADAPT. UNIVERSAL C/MANGUERA NERO",
+      "pb": 0,
+      "precioUser": 22250.0,
+      "precio": 22250.0
+    },
+    {
+      "nombre": "ADAPT. ESPECIAL KIT 90°",
+      "pb": 0,
+      "precioUser": 80000.0,
+      "precio": 80000.0
+    },
+    {
+      "nombre": "ARANDELA ADAPTADOR DIÁM. 19 X 5",
+      "pb": 0,
+      "precioUser": 7150.0,
+      "precio": 7150.0
+    },
+    {
+      "nombre": "ARANDELA ADAPTADOR DIÁM. 21 X 5",
+      "pb": 0,
+      "precioUser": 7150.0,
+      "precio": 7150.0
+    },
+    {
+      "nombre": "BUJE DE DERIVACIÓN CANILLA BM",
+      "pb": 0,
+      "precioUser": 10550.0,
+      "precio": 10550.0
+    },
+    {
+      "nombre": "CONECT.COCODRILO S- X 5 UNID",
+      "pb": 0,
+      "precioUser": 15100.0,
+      "precio": 15100.0
+    },
+    {
+      "nombre": "CONECTOR RAPIDO DE SALIDA PSA 10KD",
+      "pb": 0,
+      "precioUser": 33950.0,
+      "precio": 33950.0
+    },
+    {
+      "nombre": "CONJ.SOPORTE ACRILICO P/MINI",
+      "pb": 0,
+      "precioUser": 22150.0,
+      "precio": 22150.0
+    },
+    {
+      "nombre": "CONJ.SOPORTE ACRILICO P/SENIOR 4",
+      "pb": 0,
+      "precioUser": 27450.0,
+      "precio": 27450.0
+    },
+    {
+      "nombre": "CONJ.SOPORTE ACRILICO SENIOR/VERO",
+      "pb": 0,
+      "precioUser": 27450.0,
+      "precio": 27450.0
+    },
+    {
+      "nombre": "CONJ.SOPORTE PSA STOPPER",
+      "pb": 0,
+      "precioUser": 22150.0,
+      "precio": 22150.0
+    },
+    {
+      "nombre": "FUNDA PSA DOMUS",
+      "pb": 3.8,
+      "precioUser": 69700.0,
+      "precio": 69700.0
+    },
+    {
+      "nombre": "FUNDA PSA MINI DOMUS",
+      "pb": 3.8,
+      "precioUser": 58850.0,
+      "precio": 58850.0
+    },
+    {
+      "nombre": "GRIFERÍA PSA BICOMANDO",
+      "pb": 0,
+      "precioUser": 517000.0,
+      "precio": 517000.0
+    },
+    {
+      "nombre": "GRIFERÍA PSA BICOMANDO NERO",
+      "pb": 0,
+      "precioUser": 517000.0,
+      "precio": 517000.0
+    },
+    {
+      "nombre": "GRIFERÍA PSA BM",
+      "pb": 0,
+      "precioUser": 211000.0,
+      "precio": 211000.0
+    },
+    {
+      "nombre": "GRIFERÍA PSA BM NERO",
+      "pb": 0,
+      "precioUser": 211000.0,
+      "precio": 211000.0
+    },
+    {
+      "nombre": "KIT ADAPT.P/CANILLA NO TRADICIONAL DUCHA II",
+      "pb": 6.9,
+      "precioUser": 54550.0,
+      "precio": 54550.0
+    },
+    {
+      "nombre": "KIT ADAPT.RECTOS P/CANILLAS PSA DUCHA II",
+      "pb": 6.9,
+      "precioUser": 72250.0,
+      "precio": 72250.0
+    },
+    {
+      "nombre": "KIT PARA BAJA PRESION UNIVERSAL",
+      "pb": 0,
+      "precioUser": 22250.0,
+      "precio": 22250.0
+    },
+    {
+      "nombre": "LAP BM 8 X 8",
+      "pb": 0,
+      "precioUser": 52900.0,
+      "precio": 52900.0
+    },
+    {
+      "nombre": "LAP DUCHA 1/2 X 1/2",
+      "pb": 0,
+      "precioUser": 59250.0,
+      "precio": 59250.0
+    },
+    {
+      "nombre": "LAP DUCHA II MACHO-MACHO 1/2 X 1/2",
+      "pb": 0,
+      "precioUser": 59250.0,
+      "precio": 59250.0
+    },
+    {
+      "nombre": "LAP SM 24 X 1",
+      "pb": 0,
+      "precioUser": 52900.0,
+      "precio": 52900.0
+    },
+    {
+      "nombre": "LAP SM P/ MANGUERA BY PASS",
+      "pb": 0,
+      "precioUser": 93550.0,
+      "precio": 93550.0
+    },
+    {
+      "nombre": "LLAVE DE AJUSTE P/TAPA PREFILTRO 40K-D",
+      "pb": 0,
+      "precioUser": 6250.0,
+      "precio": 6250.0
+    },
+    {
+      "nombre": "LLAVE DE CORTE S- MACHO/HEMBRA",
+      "pb": 6.9,
+      "precioUser": 37000.0,
+      "precio": 37000.0
+    },
+    {
+      "nombre": "LLAVE DE CORTE S- MACHO/MACHO",
+      "pb": 6.9,
+      "precioUser": 37000.0,
+      "precio": 37000.0
+    },
+    {
+      "nombre": "PRECINTO X 25",
+      "pb": 0,
+      "precioUser": 5950.0,
+      "precio": 5950.0
+    },
+    {
+      "nombre": "PROLONGADOR DE 3/4 PSA POLI",
+      "pb": 0,
+      "precioUser": 19850.0,
+      "precio": 19850.0
+    },
+    {
+      "nombre": "PROLONGADOR PSA DUCHA II",
+      "pb": 0,
+      "precioUser": 41350.0,
+      "precio": 41350.0
+    },
+    {
+      "nombre": "REGULADOR DE CAUDAL",
+      "pb": 0,
+      "precioUser": 108000.0,
+      "precio": 108000.0
+    },
+    {
+      "nombre": "SET ADAPTACION RETRO P/KIT CANILLA",
+      "pb": 0,
+      "precioUser": 33950.0,
+      "precio": 33950.0
+    },
+    {
+      "nombre": "TAPON REGULADOR P/DUCHA X 5 UNIDADES",
+      "pb": 0,
+      "precioUser": 8700.0,
+      "precio": 8700.0
+    },
+    {
+      "nombre": "TE C/LLAVE DE CORTE P/GRIFERÍA PSA Y ECO-D",
+      "pb": 0,
+      "precioUser": 80550.0,
+      "precio": 80550.0
+    },
+    {
+      "nombre": "VARILLA INST. ECO-D SM",
+      "pb": 0,
+      "precioUser": 55600.0,
+      "precio": 55600.0
+    },
+    {
+      "nombre": "REPOSICION PSA 10K-D",
       "pb": 0.8,
-      "precio": 70000
+      "precioUser": 260000.0,
+      "precio": 260000.0
     },
     {
-      "id": "filtro_v",
-      "nombre": "Filtro Vero / Mini",
-      "nombreNorm": "filtro vero / mini",
-      "pb": 0.5,
-      "precio": 62500
+      "nombre": "REPOSICION PSA 40K-D",
+      "pb": 0.8,
+      "precioUser": 403000.0,
+      "precio": 403000.0
+    },
+    {
+      "nombre": "ACCESORIO PARA CEBAR MATE",
+      "pb": 0,
+      "precioUser": 5100.0,
+      "precio": 5100.0
+    },
+    {
+      "nombre": "BOLSA MATERIAL REGENERANTE X 2",
+      "pb": 0,
+      "precioUser": 29100.0,
+      "precio": 29100.0
+    },
+    {
+      "nombre": "BUJE DE CONEXION P/CANILLA DISPENSER",
+      "pb": 0,
+      "precioUser": 55550.0,
+      "precio": 55550.0
+    },
+    {
+      "nombre": "CAMPANA P/PSA DUCHA",
+      "pb": 0,
+      "precioUser": 5950.0,
+      "precio": 5950.0
+    },
+    {
+      "nombre": "CANILLA AGUA CALIENTE DISPENSER 2",
+      "pb": 0,
+      "precioUser": 37000.0,
+      "precio": 37000.0
+    },
+    {
+      "nombre": "CANILLA AGUA CALIENTE DISPENSER DS",
+      "pb": 0,
+      "precioUser": 37000.0,
+      "precio": 37000.0
+    },
+    {
+      "nombre": "CANILLA AGUA CALIENTE DISPENSER MESA/PIE",
+      "pb": 0,
+      "precioUser": 37000.0,
+      "precio": 37000.0
+    },
+    {
+      "nombre": "CANILLA AGUA CALIENTE P/ECO-D PIE Y SM",
+      "pb": 0,
+      "precioUser": 39850.0,
+      "precio": 39850.0
+    },
+    {
+      "nombre": "CANILLA AGUA FRIA DISPENSER 2",
+      "pb": 0,
+      "precioUser": 37000.0,
+      "precio": 37000.0
+    },
+    {
+      "nombre": "CANILLA AGUA FRIA DISPENSER DS",
+      "pb": 0,
+      "precioUser": 37000.0,
+      "precio": 37000.0
+    },
+    {
+      "nombre": "CANILLA AGUA FRIA DISPENSER MESA/PIE",
+      "pb": 0,
+      "precioUser": 37000.0,
+      "precio": 37000.0
+    },
+    {
+      "nombre": "CANILLA AGUA FRIA P/ECO-D PIE Y SM",
+      "pb": 0,
+      "precioUser": 39850.0,
+      "precio": 39850.0
+    },
+    {
+      "nombre": "CANULA P/BOTELLA TERMICA X 5 UNID",
+      "pb": 0,
+      "precioUser": 8450.0,
+      "precio": 8450.0
+    },
+    {
+      "nombre": "CEPILLO DE ACERO P/IONTRIX",
+      "pb": 0,
+      "precioUser": 22150.0,
+      "precio": 22150.0
+    },
+    {
+      "nombre": "CONJ.SOPORTE ESCUADRA P/DISPENSER PIE C/CONECTORES",
+      "pb": 0,
+      "precioUser": 143000.0,
+      "precio": 143000.0
+    },
+    {
+      "nombre": "ELECTRODO P/IONTRIX",
+      "pb": 0,
+      "precioUser": 175000.0,
+      "precio": 175000.0
+    },
+    {
+      "nombre": "FIPOR N° 3 X 2 UNID",
+      "pb": 0,
+      "precioUser": 30100.0,
+      "precio": 30100.0
+    },
+    {
+      "nombre": "FIPOR N° 3 X 4 UNID",
+      "pb": 0,
+      "precioUser": 54550.0,
+      "precio": 54550.0
+    },
+    {
+      "nombre": "FIPOR N° 3 X 6 UNID",
+      "pb": 0,
+      "precioUser": 81600.0,
+      "precio": 81600.0
+    },
+    {
+      "nombre": "FIPOR N° 3 X 8 UNIDADES",
+      "pb": 0,
+      "precioUser": 99100.0,
+      "precio": 99100.0
+    },
+    {
+      "nombre": "FLOR PSA DUCHA BLANCO/BIANCO C/CODO CROMADO",
+      "pb": 0,
+      "precioUser": 30100.0,
+      "precio": 30100.0
+    },
+    {
+      "nombre": "FLOR PSA DUCHA GRIGIO C/CODO CROMADO",
+      "pb": 1.15,
+      "precioUser": 30100.0,
+      "precio": 30100.0
+    },
+    {
+      "nombre": "FUENTE DE ALIMENTACION OSMOSIS PSA ROPOT",
+      "pb": 3.5,
+      "precioUser": 72000.0,
+      "precio": 72000.0
+    },
+    {
+      "nombre": "FUENTE DE ALIMENTACION P/DOMUS-MINI DOMUS",
+      "pb": 0,
+      "precioUser": 56100.0,
+      "precio": 56100.0
+    },
+    {
+      "nombre": "FUENTE DE ALIMENTACION P/IONTRIX",
+      "pb": 0,
+      "precioUser": 178000.0,
+      "precio": 178000.0
+    },
+    {
+      "nombre": "GATILLO P/CANILLA BAJO MESADA PSA",
+      "pb": 0,
+      "precioUser": 15100.0,
+      "precio": 15100.0
+    },
+    {
+      "nombre": "JARRA AGUA OSMOSIS PSA ROPOT",
+      "pb": 3.5,
+      "precioUser": 61800.0,
+      "precio": 61800.0
+    },
+    {
+      "nombre": "JUEGO JUNTAS POLI 2 $ 816,67",
+      "pb": 0.85,
+      "precioUser": 2450.0,
+      "precio": 2450.0
+    },
+    {
+      "nombre": "KIT P/DETERMINACIÓN DUREZA (10 TIRAS)",
+      "pb": 0,
+      "precioUser": 26100.0,
+      "precio": 26100.0
+    },
+    {
+      "nombre": "KIT P/MEDICION DE CLORO P/IONTRIX",
+      "pb": 0,
+      "precioUser": 10850.0,
+      "precio": 10850.0
+    },
+    {
+      "nombre": "KIT P/MEDICION DE IONES P/IONTRIX",
+      "pb": 0,
+      "precioUser": 38100.0,
+      "precio": 38100.0
+    },
+    {
+      "nombre": "KIT P/MEDICION DE PH P/IONTRIX",
+      "pb": 0,
+      "precioUser": 19850.0,
+      "precio": 19850.0
+    },
+    {
+      "nombre": "KIT POSVENTA 1 AÑO OSMOSIS PSA ROPOT",
+      "pb": 3.5,
+      "precioUser": 310000.0,
+      "precio": 310000.0
+    },
+    {
+      "nombre": "KIT POSVENTA PURIF. AIRE PSA",
+      "pb": 0,
+      "precioUser": 159000.0,
+      "precio": 159000.0
+    },
+    {
+      "nombre": "KIT PSA LAB P/IONTRIX",
+      "pb": 0,
+      "precioUser": 109000.0,
+      "precio": 109000.0
+    },
+    {
+      "nombre": "MANG. BLACK DIÁM. X C/CONEC. SEN4/S",
+      "pb": 8.5,
+      "precioUser": 13550.0,
+      "precio": 13550.0
+    },
+    {
+      "nombre": "MANG. BLACK DIÁM. X 700 C/CONEC. SEN4/S",
+      "pb": 8.5,
+      "precioUser": 10550.0,
+      "precio": 10550.0
+    },
+    {
+      "nombre": "MANG. SEMIRRÍGIDA AZUL DIÁM.8 (X METRO)",
+      "pb": 0,
+      "precioUser": 7500.0,
+      "precio": 7500.0
+    },
+    {
+      "nombre": "MANG. SEMIRRÍGIDA BLANCA DIÁM.8 (X METRO)",
+      "pb": 0,
+      "precioUser": 7500.0,
+      "precio": 7500.0
+    },
+    {
+      "nombre": "MANG. SEMIRRÍGIDA VERDE DIÁM.8 (X METRO)",
+      "pb": 0,
+      "precioUser": 7500.0,
+      "precio": 7500.0
+    },
+    {
+      "nombre": "MANG.PLATA DIÁM. X CONEC. SEN/VERO/S",
+      "pb": 8.5,
+      "precioUser": 10550.0,
+      "precio": 10550.0
+    },
+    {
+      "nombre": "MANG.PLATA DIÁM. X CONEC. P/MINI",
+      "pb": 8.5,
+      "precioUser": 8700.0,
+      "precio": 8700.0
+    },
+    {
+      "nombre": "MANG.PLATA DIÁM. X 700 CONEC. P/MINI",
+      "pb": 8.5,
+      "precioUser": 4700.0,
+      "precio": 4700.0
+    },
+    {
+      "nombre": "MARIPOSA DE FIJACION P/IONTRIX",
+      "pb": 0,
+      "precioUser": 8700.0,
+      "precio": 8700.0
+    },
+    {
+      "nombre": "MARIPOSA DE FIJACION P/IONTRIX 3",
+      "pb": 3.1,
+      "precioUser": 8700.0,
+      "precio": 8700.0
+    },
+    {
+      "nombre": "MATERIAL REGENERANTE X KG P/DOMUS",
+      "pb": 2.5,
+      "precioUser": 31900.0,
+      "precio": 31900.0
+    },
+    {
+      "nombre": "MODULO POTENCIADOR P/IONTRIX 3",
+      "pb": 3.1,
+      "precioUser": 37000.0,
+      "precio": 37000.0
+    },
+    {
+      "nombre": "O-RING INTERNO TAPA CUERPO PSA DUCHA (JUEGO)",
+      "pb": 0,
+      "precioUser": 4800.0,
+      "precio": 4800.0
+    },
+    {
+      "nombre": "ORTOTOLIDINA",
+      "pb": 0,
+      "precioUser": 6400.0,
+      "precio": 6400.0
+    },
+    {
+      "nombre": "PASTILLA HIDROSENSIBLE P/ECO-D",
+      "pb": 0,
+      "precioUser": 33000.0,
+      "precio": 33000.0
+    },
+    {
+      "nombre": "PASTILLA SANITIZANTE MAX X 8 UNID",
+      "pb": 0,
+      "precioUser": 4700.0,
+      "precio": 4700.0
+    },
+    {
+      "nombre": "PAÑO ALTA TURBIDEZ 24 X 21 X 3 UNID",
+      "pb": 0,
+      "precioUser": 26000.0,
+      "precio": 26000.0
+    },
+    {
+      "nombre": "PICO DE DESCARGA GRIFERIA NERO",
+      "pb": 0,
+      "precioUser": 94800.0,
+      "precio": 94800.0
+    },
+    {
+      "nombre": "PICO DESCARGA CANILLA BM2/GRIFERIA PSA",
+      "pb": 0,
+      "precioUser": 94800.0,
+      "precio": 94800.0
+    },
+    {
+      "nombre": "PREFILTRO ENTRADA PURIF. DE AIRE PSA",
+      "pb": 4.5,
+      "precioUser": 48600.0,
+      "precio": 48600.0
+    },
+    {
+      "nombre": "PREFILTRO P/10 KD",
+      "pb": 0,
+      "precioUser": 19850.0,
+      "precio": 19850.0
+    },
+    {
+      "nombre": "PROLONGADOR P/ PICO PSA SENIOR 3",
+      "pb": 0,
+      "precioUser": 19850.0,
+      "precio": 19850.0
+    },
+    {
+      "nombre": "PROLONGADOR P/PICO PSA SENIOR",
+      "pb": 0,
+      "precioUser": 19850.0,
+      "precio": 19850.0
+    },
+    {
+      "nombre": "PROMO CILINDRO + PACK RENDIMIENTO II",
+      "pb": 0,
+      "precioUser": 112000.0,
+      "precio": 112000.0
+    },
+    {
+      "nombre": "RECARGA P/SODA BURBY",
+      "pb": 0,
+      "precioUser": 28400.0,
+      "precio": 28400.0
+    },
+    {
+      "nombre": "RECIPIENTE P/AGUA ENTRADA OSMOSIS PSA ROPOT",
+      "pb": 3.5,
+      "precioUser": 48900.0,
+      "precio": 48900.0
+    },
+    {
+      "nombre": "REPUESTO BACTERIOSTÁTICO 25 MIC S- /QUA/SEN",
+      "pb": 0,
+      "precioUser": 75950.0,
+      "precio": 75950.0
+    },
+    {
+      "nombre": "REPUESTO BACTERIOSTÁTICO 5 MIC S- /QUA/SEN",
+      "pb": 0,
+      "precioUser": 75950.0,
+      "precio": 75950.0
+    },
+    {
+      "nombre": "REPUESTO BACTERIOSTÁTICO 50 MIC S- /QUA/SEN",
+      "pb": 0,
+      "precioUser": 75950.0,
+      "precio": 75950.0
+    },
+    {
+      "nombre": "REPUESTO CUERPO PSA DUCHA BIANCO",
+      "pb": 1.15,
+      "precioUser": 21100.0,
+      "precio": 21100.0
+    },
+    {
+      "nombre": "REPUESTO CUERPO PSA DUCHA GRIGIO",
+      "pb": 1.15,
+      "precioUser": 21100.0,
+      "precio": 21100.0
+    },
+    {
+      "nombre": "REPUESTO N°1 SEDIMENTOS OSMOSIS PSA ROPOT",
+      "pb": 3.5,
+      "precioUser": 48600.0,
+      "precio": 48600.0
+    },
+    {
+      "nombre": "REPUESTO N°2 CARBON BLOQUE OSMOSIS PSA ROPOT",
+      "pb": 3.5,
+      "precioUser": 54550.0,
+      "precio": 54550.0
+    },
+    {
+      "nombre": "REPUESTO N°3 MEMBRANA OSMOSIS PSA ROPOT",
+      "pb": 3.5,
+      "precioUser": 158000.0,
+      "precio": 158000.0
+    },
+    {
+      "nombre": "REPUESTO N°4 POST MEMBRANA OSMOSIS PSA ROPOT",
+      "pb": 3.5,
+      "precioUser": 55600.0,
+      "precio": 55600.0
+    },
+    {
+      "nombre": "REPUESTO PSA DUCHA C/KDF",
+      "pb": 1.15,
+      "precioUser": 143000.0,
+      "precio": 143000.0
+    },
+    {
+      "nombre": "REPUESTO PSA DUCHA C/KDF/POLIFOSFATO",
+      "pb": 0,
+      "precioUser": 143000.0,
+      "precio": 143000.0
+    },
+    {
+      "nombre": "REPUESTO PSA POLI",
+      "pb": 0,
+      "precioUser": 83150.0,
+      "precio": 83150.0
+    },
+    {
+      "nombre": "REPUESTO PSA POLI 2",
+      "pb": 0.85,
+      "precioUser": 83150.0,
+      "precio": 83150.0
+    },
+    {
+      "nombre": "REPUESTO PSA PORTÁTIL",
+      "pb": 0,
+      "precioUser": 88450.0,
+      "precio": 88450.0
+    },
+    {
+      "nombre": "RESERVORIO COMPLETO P/ECO-D",
+      "pb": 0,
+      "precioUser": 35800.0,
+      "precio": 35800.0
+    },
+    {
+      "nombre": "TAPA ACRILICO P/STOPPER/40K-D",
+      "pb": 0,
+      "precioUser": 77750.0,
+      "precio": 77750.0
+    },
+    {
+      "nombre": "TAPA CENTRADORA P/IONTRIX",
+      "pb": 0,
+      "precioUser": 11300.0,
+      "precio": 11300.0
+    },
+    {
+      "nombre": "TAPA CENTRADORA P/IONTRIX 3",
+      "pb": 3.1,
+      "precioUser": 11300.0,
+      "precio": 11300.0
+    },
+    {
+      "nombre": "TAPA CON FLOTANTE P/DISPENSER",
+      "pb": 0,
+      "precioUser": 153000.0,
+      "precio": 153000.0
+    },
+    {
+      "nombre": "TAPA P/BOTELLA PSA TERMICA PICO SPORT",
+      "pb": 0,
+      "precioUser": 8450.0,
+      "precio": 8450.0
+    },
+    {
+      "nombre": "TAPA P/CUERPO PSA DUCHA CR MARFIL",
+      "pb": 0,
+      "precioUser": 21100.0,
+      "precio": 21100.0
+    },
+    {
+      "nombre": "TAPA P/CUERPO PSA DUCHA PLATA",
+      "pb": 0,
+      "precioUser": 21100.0,
+      "precio": 21100.0
+    },
+    {
+      "nombre": "TAPA PREFILTRO C/AUTOPURGA",
+      "pb": 0,
+      "precioUser": 18200.0,
+      "precio": 18200.0
+    },
+    {
+      "nombre": "TAPA PREFILTRO PSA S- II",
+      "pb": 6.9,
+      "precioUser": 25550.0,
+      "precio": 25550.0
+    },
+    {
+      "nombre": "TAPA PREFILTRO SENIOR 3",
+      "pb": 0,
+      "precioUser": 18200.0,
+      "precio": 18200.0
+    },
+    {
+      "nombre": "TAPA PREFILTRO SENIOR 4",
+      "pb": 3.3,
+      "precioUser": 32350.0,
+      "precio": 32350.0
+    },
+    {
+      "nombre": "TAPON P/CONECTOR DE RECARGA P/IONTRIX",
+      "pb": 0,
+      "precioUser": 11300.0,
+      "precio": 11300.0
+    },
+    {
+      "nombre": "TERMOSTATO AGUA CALIENTE 85° P/DISPENSER",
+      "pb": 0,
+      "precioUser": 37000.0,
+      "precio": 37000.0
+    },
+    {
+      "nombre": "TUBO CONEXION PSA DUCHA C/O-RING",
+      "pb": 0,
+      "precioUser": 35800.0,
+      "precio": 35800.0
+    },
+    {
+      "nombre": "VASO ACRILICO PSA POLI 2",
+      "pb": 0.85,
+      "precioUser": 67550.0,
+      "precio": 67550.0
+    },
+    {
+      "nombre": "VÁLVULA BY PASS C3 GRIGIO",
+      "pb": 0.55,
+      "precioUser": 22250.0,
+      "precio": 22250.0
+    },
+    {
+      "nombre": "VÁLVULA BY PASS NERO",
+      "pb": 0,
+      "precioUser": 22250.0,
+      "precio": 22250.0
+    },
+    {
+      "nombre": "VÁLVULA BY PASS UNIVERSAL",
+      "pb": 0,
+      "precioUser": 22250.0,
+      "precio": 22250.0
+    },
+    {
+      "nombre": "ADICIONAL INST. HASTA 60 KM (PSA POLI X 2)",
+      "pb": 0,
+      "precioUser": 229000.0,
+      "precio": 229000.0
+    },
+    {
+      "nombre": "ADICIONAL INST. HASTA 60 KM (PSA POLI)",
+      "pb": 0,
+      "precioUser": 167000.0,
+      "precio": 167000.0
+    },
+    {
+      "nombre": "ADICIONAL INSTAL. HASTA 60 KM",
+      "pb": 0,
+      "precioUser": 147000.0,
+      "precio": 147000.0
+    },
+    {
+      "nombre": "ADICIONAL POR KILOMETRAJE EXCEDIDO",
+      "pb": 0,
+      "precioUser": 4650.0,
+      "precio": 4650.0
+    },
+    {
+      "nombre": "GRIFERÍA PSA BICOMANDO + INST",
+      "pb": 3.8,
+      "precioUser": 664000.0,
+      "precio": 664000.0
+    },
+    {
+      "nombre": "GRIFERÍA PSA BICOMANDO NERO + INST",
+      "pb": 3.8,
+      "precioUser": 664000.0,
+      "precio": 664000.0
+    },
+    {
+      "nombre": "GRIFERÍA PSA BM + INST",
+      "pb": 3.8,
+      "precioUser": 358000.0,
+      "precio": 358000.0
+    },
+    {
+      "nombre": "GRIFERÍA PSA BM NERO + INST",
+      "pb": 3.8,
+      "precioUser": 358000.0,
+      "precio": 358000.0
+    },
+    {
+      "nombre": "INSTALACION DISPENSER PSA (HASTA 60 KM)",
+      "pb": 3.8,
+      "precioUser": 190000.0,
+      "precio": 190000.0
+    },
+    {
+      "nombre": "INSTALACION PSA DOMUS/MINI DOMUS (HASTA 60 KM)",
+      "pb": 3.8,
+      "precioUser": 190000.0,
+      "precio": 190000.0
+    },
+    {
+      "nombre": "MANTENIMIENTO ANUAL DISPENSER PSA",
+      "pb": 0,
+      "precioUser": 164000.0,
+      "precio": 164000.0
+    },
+    {
+      "nombre": "MODULO REPARACION DE PRODUCTO",
+      "pb": 0,
+      "precioUser": 12000.0,
+      "precio": 12000.0
+    },
+    {
+      "nombre": "SERVICE CON INSTALADOR HASTA 60 KM",
+      "pb": 0,
+      "precioUser": 113000.0,
+      "precio": 113000.0
+    },
+    {
+      "nombre": "TRANSF.SM/BM + GRIF.PSA BICOMANDO",
+      "pb": 0,
+      "precioUser": 541000.0,
+      "precio": 541000.0
+    },
+    {
+      "nombre": "TRANSF.SM/BM + GRIF.PSA BICOMANDO + INST",
+      "pb": 0,
+      "precioUser": 688000.0,
+      "precio": 688000.0
+    },
+    {
+      "nombre": "TRANSF.SM/BM + GRIF.PSA BICOMANDO NERO",
+      "pb": 3.3,
+      "precioUser": 541000.0,
+      "precio": 541000.0
+    },
+    {
+      "nombre": "TRANSF.SM/BM + GRIF.PSA BICOMANDO NERO + INST",
+      "pb": 3.3,
+      "precioUser": 688000.0,
+      "precio": 688000.0
+    },
+    {
+      "nombre": "TRANSF.SM/BM + GRIFERÍA PSA BM",
+      "pb": 3.8,
+      "precioUser": 221000.0,
+      "precio": 221000.0
+    },
+    {
+      "nombre": "TRANSF.SM/BM + GRIFERÍA PSA BM + INSTAL",
+      "pb": 3.8,
+      "precioUser": 368000.0,
+      "precio": 368000.0
+    },
+    {
+      "nombre": "TRANSF.SM/BM + GRIFERÍA PSA BM NERO",
+      "pb": 3.8,
+      "precioUser": 221000.0,
+      "precio": 221000.0
+    },
+    {
+      "nombre": "TRANSF.SM/BM + GRIFERÍA PSA BM NERO + INSTAL",
+      "pb": 3.8,
+      "precioUser": 368000.0,
+      "precio": 368000.0
+    },
+    {
+      "nombre": "BOTELLA 600 CC NO GASF AMAR-AMAR 100 % RECICLADA",
+      "pb": 0,
+      "precioUser": 37150.0,
+      "precio": 37150.0
+    },
+    {
+      "nombre": "BOTELLA 600 CC NO GASF AMAR-AQUA % RECICLADA",
+      "pb": 0,
+      "precioUser": 37150.0,
+      "precio": 37150.0
+    },
+    {
+      "nombre": "BOTELLA 600 CC NO GASF AMAR-ROS 100 % RECICLADA",
+      "pb": 0,
+      "precioUser": 37150.0,
+      "precio": 37150.0
+    },
+    {
+      "nombre": "BOTELLA 600 CC NO GASF AMAR-VER 100 % RECICLADA",
+      "pb": 0,
+      "precioUser": 37150.0,
+      "precio": 37150.0
+    },
+    {
+      "nombre": "BOTELLA 600 CC NO GASF AQUA-AMAR 100 % RECICLADA",
+      "pb": 0,
+      "precioUser": 37150.0,
+      "precio": 37150.0
+    },
+    {
+      "nombre": "BOTELLA 600 CC NO GASF AQUA-AQUA 100 % RECICLADA",
+      "pb": 0,
+      "precioUser": 37150.0,
+      "precio": 37150.0
+    },
+    {
+      "nombre": "BOTELLA 600 CC NO GASF AQUA-ROSA 100% RECICLADA",
+      "pb": 0,
+      "precioUser": 37150.0,
+      "precio": 37150.0
+    },
+    {
+      "nombre": "BOTELLA 600 CC NO GASF AQUA-VERDE 100% RECICLADA",
+      "pb": 0,
+      "precioUser": 37150.0,
+      "precio": 37150.0
+    },
+    {
+      "nombre": "BOTELLA 600 CC NO GASF ROS-AMAR 100 % RECICLADA",
+      "pb": 0,
+      "precioUser": 37150.0,
+      "precio": 37150.0
+    },
+    {
+      "nombre": "BOTELLA 600 CC NO GASF ROS-AQUA 100 % RECICLADA",
+      "pb": 0,
+      "precioUser": 37150.0,
+      "precio": 37150.0
+    },
+    {
+      "nombre": "BOTELLA 600 CC NO GASF ROS-ROS 100 % RECICLADA",
+      "pb": 0,
+      "precioUser": 37150.0,
+      "precio": 37150.0
+    },
+    {
+      "nombre": "BOTELLA 600 CC NO GASF ROS-VER 100 % RECICLADA",
+      "pb": 0,
+      "precioUser": 37150.0,
+      "precio": 37150.0
+    },
+    {
+      "nombre": "BOTELLA 600 CC NO GASF VER-AMAR 100 % RECICLADA",
+      "pb": 0,
+      "precioUser": 37150.0,
+      "precio": 37150.0
+    },
+    {
+      "nombre": "BOTELLA 600 CC NO GASF VER-AQUA 100 % RECICLADA",
+      "pb": 0,
+      "precioUser": 37150.0,
+      "precio": 37150.0
+    },
+    {
+      "nombre": "BOTELLA 600 CC NO GASF VER-ROS 100 % RECICLADA",
+      "pb": 0,
+      "precioUser": 37150.0,
+      "precio": 37150.0
+    },
+    {
+      "nombre": "BOTELLA 600 CC NO GASF VER-VER 100 % RECICLADA",
+      "pb": 0,
+      "precioUser": 37150.0,
+      "precio": 37150.0
+    },
+    {
+      "nombre": "BOTELLA DE VIDRIO 1 LT. PSA",
+      "pb": 0,
+      "precioUser": 42800.0,
+      "precio": 42800.0
+    },
+    {
+      "nombre": "BOTELLA NEO AQUA-AQUA REUTILIZ",
+      "pb": 0,
+      "precioUser": 64200.0,
+      "precio": 64200.0
+    },
+    {
+      "nombre": "BOTELLA PSA NO GAS. 1 LITRO X 1 REUTILIZABLE",
+      "pb": 0,
+      "precioUser": 12000.0,
+      "precio": 12000.0
+    },
+    {
+      "nombre": "BOTELLA PSA NO GAS. X ML PACK X2 REUTILIZ",
+      "pb": 0,
+      "precioUser": 19150.0,
+      "precio": 19150.0
+    },
+    {
+      "nombre": "BOTELLA PSA P/SODA BURBY X ML X2 REUTILIZ",
+      "pb": 0,
+      "precioUser": 25150.0,
+      "precio": 25150.0
+    },
+    {
+      "nombre": "BOTELLA PSA TÉRMICA 500 CC BLANCA",
+      "pb": 0,
+      "precioUser": 61200.0,
+      "precio": 61200.0
+    },
+    {
+      "nombre": "BOTELLA PSA TÉRMICA 500 CC NEGRA",
+      "pb": 0,
+      "precioUser": 61200.0,
+      "precio": 61200.0
+    },
+    {
+      "nombre": "BOTELLA PSA TÉRMICA 750 CC BLANCA",
+      "pb": 0,
+      "precioUser": 71150.0,
+      "precio": 71150.0
+    },
+    {
+      "nombre": "BOTELLA PSA TÉRMICA 750 CC NEGRA",
+      "pb": 0,
+      "precioUser": 71150.0,
+      "precio": 71150.0
+    },
+    {
+      "nombre": "KIT MATE 2 PSA BIANCO (MATE+BOMBILLA)",
+      "pb": 3.3,
+      "precioUser": 38500.0,
+      "precio": 38500.0
+    },
+    {
+      "nombre": "KIT MATE 2 PSA NERO (MATE+BOMBILLA)",
+      "pb": 3.3,
+      "precioUser": 38500.0,
+      "precio": 38500.0
+    },
+    {
+      "nombre": "LAPIZ GRAFITO NEGRO PSA X 10 UNID",
+      "pb": 0,
+      "precioUser": 4250.0,
+      "precio": 4250.0
+    },
+    {
+      "nombre": "REJILLEX BLANCO",
+      "pb": 0,
+      "precioUser": 8700.0,
+      "precio": 8700.0
+    },
+    {
+      "nombre": "REJILLEX GRIGIO",
+      "pb": 0,
+      "precioUser": 8700.0,
+      "precio": 8700.0
+    },
+    {
+      "nombre": "SET MATE 2 PSA BIANCO (TERMO+MATE+BOMBILLA)",
+      "pb": 0.85,
+      "precioUser": 131000.0,
+      "precio": 131000.0
+    },
+    {
+      "nombre": "TERMO 2 PSA BLANCO",
+      "pb": 0,
+      "precioUser": 92550.0,
+      "precio": 92550.0
+    },
+    {
+      "nombre": "ANALISIS ESPECIFICOS",
+      "pb": 0,
+      "precioUser": 78400.0,
+      "precio": 78400.0
+    },
+    {
+      "nombre": "BOTELLA P/ANALISIS DE AGUA",
+      "pb": 0,
+      "precioUser": 4700.0,
+      "precio": 4700.0
+    },
+    {
+      "nombre": "MODULO A. FISICO QUIMICO BASICO",
+      "pb": 0,
+      "precioUser": 126000.0,
+      "precio": 126000.0
+    },
+    {
+      "nombre": "MODULO B. FISICO QUIMICO INTERMEDIO",
+      "pb": 0,
+      "precioUser": 285000.0,
+      "precio": 285000.0
+    },
+    {
+      "nombre": "MODULO C. FISICO QUIMICO COMPLETO",
+      "pb": 0,
+      "precioUser": 421000.0,
+      "precio": 421000.0
+    },
+    {
+      "nombre": "MODULO D. BACTERIOLOGICO",
+      "pb": 0,
+      "precioUser": 126000.0,
+      "precio": 126000.0
+    },
+    {
+      "nombre": "MODULO E. SOLIDOS EN SUSPENSION",
+      "pb": 0,
+      "precioUser": 60650.0,
+      "precio": 60650.0
+    },
+    {
+      "nombre": "RECIPIENTE P/ANALISIS DE AGUA",
+      "pb": 0,
+      "precioUser": 10850.0,
+      "precio": 10850.0
+    },
+    {
+      "nombre": "ACEIT. NEGRA FRASCO X 220 GRS PREMIUM",
+      "pb": 0,
+      "precioUser": 9400.0,
+      "precio": 9400.0
+    },
+    {
+      "nombre": "ACEIT. VERDES FRASCO X 220 GRS",
+      "pb": 0,
+      "precioUser": 8250.0,
+      "precio": 8250.0
+    },
+    {
+      "nombre": "ACEITE DE OLIVA NININA X 500 CC",
+      "pb": 0,
+      "precioUser": 40000.0,
+      "precio": 40000.0
+    },
+    {
+      "nombre": "ACEITE OLIVA 500 CC ESTUCHE PACK X 2 UNID",
+      "pb": 0,
+      "precioUser": 34250.0,
+      "precio": 34250.0
+    },
+    {
+      "nombre": "ACEITE OLIVA EX. V. 250 CC",
+      "pb": 0,
+      "precioUser": 11250.0,
+      "precio": 11250.0
+    },
+    {
+      "nombre": "ACEITE OLIVA EX. V. 5 L CAJA X 2 UNID",
+      "pb": 0,
+      "precioUser": 278000.0,
+      "precio": 278000.0
+    },
+    {
+      "nombre": "ACEITE OLIVA EX. V. 5 LTS",
+      "pb": 0,
+      "precioUser": 139000.0,
+      "precio": 139000.0
+    },
+    {
+      "nombre": "ACEITE OLIVA EX. V. 500 CC",
+      "pb": 0,
+      "precioUser": 17950.0,
+      "precio": 17950.0
+    },
+    {
+      "nombre": "ACEITE OLIVA GOURMET 250 CC CAJA X 12 UNID",
+      "pb": 0,
+      "precioUser": 121500.0,
+      "precio": 121500.0
+    },
+    {
+      "nombre": "ACEITE OLIVA GOURMET 500 CC CAJA X 12 UNID",
+      "pb": 0,
+      "precioUser": 193900.0,
+      "precio": 193900.0
+    },
+    {
+      "nombre": "ACEITE OLIVARE BOTELLA X 1 LITRO",
+      "pb": 0,
+      "precioUser": 34250.0,
+      "precio": 34250.0
+    },
+    {
+      "nombre": "PASAS DE UVA NININA PACK X 5 UNID. 150 GM C/U",
+      "pb": 0,
+      "precioUser": 18000.0,
+      "precio": 18000.0
     }
   ],
   "preciosUsuario": [
     {
-      "id": "senior4",
-      "nombre": "PSA Senior 4",
-      "nombreNorm": "psa senior 4",
-      "pb": 5,
-      "precio": 280000
+      "nombre": "ABLANDADOR PSA DOMUS",
+      "pb": 3.8,
+      "precioUser": 2782000.0,
+      "precio": 2782000.0
     },
     {
-      "id": "senior3",
-      "nombre": "PSA Senior 3",
-      "nombreNorm": "psa senior 3",
-      "pb": 4,
-      "precio": 240000
+      "nombre": "ABLANDADOR PSA DOMUS + INSTALACION",
+      "pb": 3.8,
+      "precioUser": 2961000.0,
+      "precio": 2961000.0
     },
     {
-      "id": "vero",
-      "nombre": "PSA Vero / Rotoplas",
-      "nombreNorm": "psa vero / rotoplas",
+      "nombre": "ABLANDADOR PSA MINI DOMUS",
+      "pb": 3.8,
+      "precioUser": 2198000.0,
+      "precio": 2198000.0
+    },
+    {
+      "nombre": "ABLANDADOR PSA MINI DOMUS + INSTALACION",
+      "pb": 3.8,
+      "precioUser": 2369000.0,
+      "precio": 2369000.0
+    },
+    {
+      "nombre": "SENIOR 4 BIANCO + KIT POSV",
+      "pb": 3.3,
+      "precioUser": 913000.0,
+      "precio": 913000.0
+    },
+    {
+      "nombre": "SENIOR 4 BIANCO + KIT POSV. Plan canje",
+      "pb": 3.3,
+      "precioUser": 821700.0,
+      "precio": 821700.0
+    },
+    {
+      "nombre": "SENIOR 4 BM + KIT POSV",
+      "pb": 3.3,
+      "precioUser": 808000.0,
+      "precio": 808000.0
+    },
+    {
+      "nombre": "SENIOR 4 BM + KIT POSV Plan canje",
+      "pb": 3.3,
+      "precioUser": 727200.0,
+      "precio": 727200.0
+    },
+    {
+      "nombre": "SENIOR 4 GRIGIO + KIT POSV",
+      "pb": 3.3,
+      "precioUser": 913000.0,
+      "precio": 913000.0
+    },
+    {
+      "nombre": "SENIOR 4 GRIGIO + KIT POSV Plan canje",
+      "pb": 3.3,
+      "precioUser": 821700.0,
+      "precio": 821700.0
+    },
+    {
+      "nombre": "SENIOR 4 NERO + KIT POSV",
+      "pb": 3.3,
+      "precioUser": 913000.0,
+      "precio": 913000.0
+    },
+    {
+      "nombre": "SENIOR 4 NERO + KIT POSV. Plan canje",
+      "pb": 3.3,
+      "precioUser": 821700.0,
+      "precio": 821700.0
+    },
+    {
+      "nombre": "SENIOR BIANCO + KIT POSV",
+      "pb": 3.3,
+      "precioUser": 751000.0,
+      "precio": 751000.0
+    },
+    {
+      "nombre": "SENIOR BIANCO + KIT POSV. Plan canje",
+      "pb": 3.3,
+      "precioUser": 675900.0,
+      "precio": 675900.0
+    },
+    {
+      "nombre": "1-P PORTATÍL",
+      "pb": 0,
+      "precioUser": 122000.0,
+      "precio": 122000.0
+    },
+    {
+      "nombre": "C3 GRIGIO",
+      "pb": 0.55,
+      "precioUser": 208000.0,
+      "precio": 208000.0
+    },
+    {
+      "nombre": "C3 GRIGIO Plan canje",
+      "pb": 2.95,
+      "precioUser": 187200.0,
+      "precio": 187200.0
+    },
+    {
+      "nombre": "DUCHA BIANCO C/KDF",
+      "pb": 1.15,
+      "precioUser": 296000.0,
+      "precio": 296000.0
+    },
+    {
+      "nombre": "DUCHA BIANCO C/KDF Plan canje",
+      "pb": 2.95,
+      "precioUser": 266400.0,
+      "precio": 266400.0
+    },
+    {
+      "nombre": "DUCHA BIANCO C/KDF-POLI",
+      "pb": 1.15,
+      "precioUser": 296000.0,
+      "precio": 296000.0
+    },
+    {
+      "nombre": "DUCHA BIANCO C/KDF-POLI Plan canje",
+      "pb": 2.95,
+      "precioUser": 266400.0,
+      "precio": 266400.0
+    },
+    {
+      "nombre": "DUCHA GRIGIO C/KDF",
+      "pb": 1.15,
+      "precioUser": 296000.0,
+      "precio": 296000.0
+    },
+    {
+      "nombre": "DUCHA GRIGIO C/KDF Plan canje",
+      "pb": 2.95,
+      "precioUser": 266400.0,
+      "precio": 266400.0
+    },
+    {
+      "nombre": "DUCHA GRIGIO C/KDF-POLI",
+      "pb": 1.15,
+      "precioUser": 296000.0,
+      "precio": 296000.0
+    },
+    {
+      "nombre": "DUCHA GRIGIO C/KDF-POLI Plan canje",
+      "pb": 2.95,
+      "precioUser": 266400.0,
+      "precio": 266400.0
+    },
+    {
+      "nombre": "IONTRIX 3",
+      "pb": 3.1,
+      "precioUser": 1176000.0,
+      "precio": 1176000.0
+    },
+    {
+      "nombre": "IONTRIX 3 Plan canje",
+      "pb": 2.95,
+      "precioUser": 1058400.0,
+      "precio": 1058400.0
+    },
+    {
+      "nombre": "MINI BIANCO + KIT POSV",
       "pb": 3.5,
-      "precio": 220000
+      "precioUser": 411000.0,
+      "precio": 411000.0
     },
     {
-      "id": "mini",
-      "nombre": "PSA Mini",
-      "nombreNorm": "psa mini",
-      "pb": 2,
-      "precio": 160000
-    },
-    {
-      "id": "ducha",
-      "nombre": "PSA Ducha",
-      "nombreNorm": "psa ducha",
-      "pb": 1.5,
-      "precio": 140000
-    },
-    {
-      "id": "aire",
-      "nombre": "Purificador de Aire",
-      "nombreNorm": "purificador de aire",
-      "pb": 4,
-      "precio": 240000
-    },
-    {
-      "id": "filtro_s",
-      "nombre": "Pack Filtros Senior (x4)",
-      "nombreNorm": "pack filtros senior (x4)",
-      "pb": 0.8,
-      "precio": 112000
-    },
-    {
-      "id": "filtro_v",
-      "nombre": "Filtro Vero / Mini",
-      "nombreNorm": "filtro vero / mini",
-      "pb": 0.5,
-      "precio": 100000
-    }
-  ],
-  "preciosCruzados": [
-    {
-      "nombre": "PSA Senior 4",
-      "nombreNorm": "psa senior 4",
-      "pb": 5,
-      "precioDist": 175000,
-      "precioUser": 280000,
-      "ganancia": 105000,
-      "margen": 60.0
-    },
-    {
-      "nombre": "PSA Senior 3",
-      "nombreNorm": "psa senior 3",
-      "pb": 4,
-      "precioDist": 150000,
-      "precioUser": 240000,
-      "ganancia": 90000,
-      "margen": 60.0
-    },
-    {
-      "nombre": "PSA Vero / Rotoplas",
-      "nombreNorm": "psa vero / rotoplas",
+      "nombre": "MINI BIANCO + KIT POSV. Plan canje",
       "pb": 3.5,
-      "precioDist": 137500,
-      "precioUser": 220000,
-      "ganancia": 82500,
-      "margen": 60.0
+      "precioUser": 369900.0,
+      "precio": 369900.0
     },
     {
-      "nombre": "PSA Mini",
-      "nombreNorm": "psa mini",
-      "pb": 2,
-      "precioDist": 100000,
-      "precioUser": 160000,
-      "ganancia": 60000,
-      "margen": 60.0
+      "nombre": "MINI NERO + KIT POSV",
+      "pb": 3.5,
+      "precioUser": 411000.0,
+      "precio": 411000.0
     },
     {
-      "nombre": "PSA Ducha",
-      "nombreNorm": "psa ducha",
-      "pb": 1.5,
-      "precioDist": 87500,
-      "precioUser": 140000,
-      "ganancia": 52500,
-      "margen": 60.0
+      "nombre": "MINI NERO + KIT POSV. Plan canje",
+      "pb": 3.5,
+      "precioUser": 369900.0,
+      "precio": 369900.0
     },
     {
-      "nombre": "Purificador de Aire",
-      "nombreNorm": "purificador de aire",
-      "pb": 4,
-      "precioDist": 150000,
-      "precioUser": 240000,
-      "ganancia": 90000,
-      "margen": 60.0
+      "nombre": "POLI 2 BIANCO",
+      "pb": 0.85,
+      "precioUser": 280000.0,
+      "precio": 280000.0
     },
     {
-      "nombre": "Pack Filtros Senior (x4)",
-      "nombreNorm": "pack filtros senior (x4)",
+      "nombre": "QUANTUM BM BIANCO + POSV",
+      "pb": 3.3,
+      "precioUser": 1271000.0,
+      "precio": 1271000.0
+    },
+    {
+      "nombre": "QUANTUM BM BIANCO + POSV Plan canje",
+      "pb": 3.3,
+      "precioUser": 1143900.0,
+      "precio": 1143900.0
+    },
+    {
+      "nombre": "QUANTUM SM BIANCO + POSV",
+      "pb": 3.3,
+      "precioUser": 1271000.0,
+      "precio": 1271000.0
+    },
+    {
+      "nombre": "QUANTUM SM BIANCO + POSV. Plan canje",
+      "pb": 3.3,
+      "precioUser": 1143900.0,
+      "precio": 1143900.0
+    },
+    {
+      "nombre": "S- 2 BM BIANCO + POSV",
+      "pb": 3.3,
+      "precioUser": 1079000.0,
+      "precio": 1079000.0
+    },
+    {
+      "nombre": "S- 2 BM BIANCO + POSV. Plan canje",
+      "pb": 3.3,
+      "precioUser": 971100.0,
+      "precio": 971100.0
+    },
+    {
+      "nombre": "S- 2 SM BIANCO + POSV",
+      "pb": 3.3,
+      "precioUser": 1079000.0,
+      "precio": 1079000.0
+    },
+    {
+      "nombre": "S- 2 SM BIANCO + POSV. Plan canje",
+      "pb": 3.3,
+      "precioUser": 971100.0,
+      "precio": 971100.0
+    },
+    {
+      "nombre": "S- 2 SM NERO + POSV",
+      "pb": 3.3,
+      "precioUser": 1079000.0,
+      "precio": 1079000.0
+    },
+    {
+      "nombre": "S- 2 SM NERO + POSV. Plan canje",
+      "pb": 2.95,
+      "precioUser": 971100.0,
+      "precio": 971100.0
+    },
+    {
+      "nombre": "SENIK BM BIANCO + POSV",
+      "pb": 3.3,
+      "precioUser": 1248000.0,
+      "precio": 1248000.0
+    },
+    {
+      "nombre": "SENIK BM BIANCO + POSV. Plan canje",
+      "pb": 3.3,
+      "precioUser": 1123200.0,
+      "precio": 1123200.0
+    },
+    {
+      "nombre": "SENIK SM BIANCO + POSV",
+      "pb": 3.3,
+      "precioUser": 1248000.0,
+      "precio": 1248000.0
+    },
+    {
+      "nombre": "SENIK SM BIANCO + POSV. Plan canje",
+      "pb": 3.3,
+      "precioUser": 1123200.0,
+      "precio": 1123200.0
+    },
+    {
+      "nombre": "VERO BIANCO + KIT POSV",
+      "pb": 3.3,
+      "precioUser": 528000.0,
+      "precio": 528000.0
+    },
+    {
+      "nombre": "VERO BIANCO + KIT POSV. Plan canje",
+      "pb": 3.3,
+      "precioUser": 475200.0,
+      "precio": 475200.0
+    },
+    {
+      "nombre": "SODA BURBY BIANCO",
+      "pb": 2.15,
+      "precioUser": 438000.0,
+      "precio": 438000.0
+    },
+    {
+      "nombre": "SODA BURBY BIANCO Plan canje",
+      "pb": 2.95,
+      "precioUser": 394200.0,
+      "precio": 394200.0
+    },
+    {
+      "nombre": "OSMOSIS ROPOT",
+      "pb": 3.5,
+      "precioUser": 1937000.0,
+      "precio": 1937000.0
+    },
+    {
+      "nombre": "OSMOSIS ROPOT Plan canje",
+      "pb": 2.95,
+      "precioUser": 1743300.0,
+      "precio": 1743300.0
+    },
+    {
+      "nombre": "PURIFICADOR DE AIRE",
+      "pb": 4.5,
+      "precioUser": 1596000.0,
+      "precio": 1596000.0
+    },
+    {
+      "nombre": "(001) ADAPT. UNIVERSAL C/MANGUERA",
+      "pb": 0,
+      "precioUser": 22250.0,
+      "precio": 22250.0
+    },
+    {
+      "nombre": "(002) ADAPT. ROSCA (FV TIPO UNIMIX)",
+      "pb": 0,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(003) ADAPT. ROSCA CORTA",
+      "pb": 0,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(004) ADAPT. ROSCA LARGA",
+      "pb": 0,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(005) ADAPT. UNIV.MARIPOSA DIAM.11-12",
+      "pb": 0,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(006) ADAPT. UNIV.MARIPOSA DIAM.14",
+      "pb": 0,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(007) ADAPT. UNIV.MARIPOSA DIAM.16",
+      "pb": 0,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(008) ADAPT. UNIV.MARIPOSA DIAM.18",
+      "pb": 0,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(009) ADAPT. UNIV.MARIPOSA DIAM.20",
+      "pb": 0,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(010) ADAPT. ROSCA HEMBRA-HEMBRA",
+      "pb": 0,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(016) ADAPT. ROSCA HEMBRA O.N",
+      "pb": 0,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(018) ADAPT. ROSCA CANILLA TIPO PATIO",
+      "pb": 0,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(019) ADAPT. ROSCA MACHO",
+      "pb": 18.1,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(020) ADAPT. ROSCA ESPECIAL",
+      "pb": 0,
+      "precioUser": 24800.0,
+      "precio": 24800.0
+    },
+    {
+      "nombre": "(024) ADAPT. ROSCA HEMBRA",
+      "pb": 20.1,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(027) ADAPT. ROSCA LARGA PASO FINO",
+      "pb": 0,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(030) ADAPT. H-M 1/2 C/TUERCA DUCHA II",
+      "pb": 0,
+      "precioUser": 35800.0,
+      "precio": 35800.0
+    },
+    {
+      "nombre": "(036) ADAPT. M-M 3/4 BG DUCHA II",
+      "pb": 0,
+      "precioUser": 35800.0,
+      "precio": 35800.0
+    },
+    {
+      "nombre": "(037) ADAPT. ROSCA MACHO (FV SWING PLUS)",
+      "pb": 0,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(039) ADAPT. ROSCA HEMBRA-HEMBRA DIÁM.22",
+      "pb": 0,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(041) ADAPT. ROSCA CANILLA PIAZZA",
+      "pb": 0,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(051) ADAPT. SIN ROSCA DIAM. 17",
+      "pb": 0,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(053) ADAPT. ROSCA BSP 3/4 X 14 HILOS",
+      "pb": 0,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(073) ADAPT. ROSCA MÚLTIPLE",
+      "pb": 0,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(078) ADAPT. ROSCA DIAM",
+      "pb": 23.5,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(083) ADAPT. ROSCA MACHO 22 X 1",
+      "pb": 0,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(100) ADAPT. ROSCA HEMBRA BSP 1/2",
+      "pb": 0,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(102) ADAPT. ROSCA MACHO FV DIÁM",
+      "pb": 18.6,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(103) ADAPT. ROSCA HEMBRA P/HIDROMET",
+      "pb": 0,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(135) ADAPT. ROSCA MACHO 21 X 1",
+      "pb": 0,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(142) ADAPT. ROSCA MACHO X 1",
+      "pb": 16.3,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(144) ADAPT. ROSCA MACHO X 1",
+      "pb": 18.2,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(147) ADAPT. ROSCA TIPO RACOR M. 24 X 1",
+      "pb": 0,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(148) ADAPT. ROSCA HEMBRA (SWING PLUS) M. 24X1",
+      "pb": 0,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(149) ADAPT. ROSCA P/LAVARROPA M 24 X 1",
+      "pb": 0,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(155) ADAPT. S- C/ORING. P/MANOMETRO",
+      "pb": 0,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(164) ADAPT. ROSCA MACHO 20 X 1",
+      "pb": 0,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(174) ADAPT. ROSCA AIREADOR M 24 X 1",
+      "pb": 0,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(177) ADAPT. RECTANGULAR P/PEGAR",
+      "pb": 0,
+      "precioUser": 54550.0,
+      "precio": 54550.0
+    },
+    {
+      "nombre": "(20) ADAPT. M-H BG 3/4 P/ DUCHA CR",
+      "pb": 0,
+      "precioUser": 35800.0,
+      "precio": 35800.0
+    },
+    {
+      "nombre": "(228) ADAPT. OVALADO",
+      "pb": 0,
+      "precioUser": 54550.0,
+      "precio": 54550.0
+    },
+    {
+      "nombre": "(229) ADAPT. ROSCA H-H 22 X 1 LARGO",
+      "pb": 0,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(245) ADAPT. ROSCA H-M 23 X 1",
+      "pb": 0,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(246) ADAPT. ROSCA MACHO 23 X 1",
+      "pb": 0,
+      "precioUser": 18000.0,
+      "precio": 18000.0
+    },
+    {
+      "nombre": "(573) ADAPT. UNIVERSAL C/MANGUERA NERO",
+      "pb": 0,
+      "precioUser": 22250.0,
+      "precio": 22250.0
+    },
+    {
+      "nombre": "ADAPT. ESPECIAL KIT 90°",
+      "pb": 0,
+      "precioUser": 80000.0,
+      "precio": 80000.0
+    },
+    {
+      "nombre": "ARANDELA ADAPTADOR DIÁM. 19 X 5",
+      "pb": 0,
+      "precioUser": 7150.0,
+      "precio": 7150.0
+    },
+    {
+      "nombre": "ARANDELA ADAPTADOR DIÁM. 21 X 5",
+      "pb": 0,
+      "precioUser": 7150.0,
+      "precio": 7150.0
+    },
+    {
+      "nombre": "BUJE DE DERIVACIÓN CANILLA BM",
+      "pb": 0,
+      "precioUser": 10550.0,
+      "precio": 10550.0
+    },
+    {
+      "nombre": "CONECT.COCODRILO S- X 5 UNID",
+      "pb": 0,
+      "precioUser": 15100.0,
+      "precio": 15100.0
+    },
+    {
+      "nombre": "CONECTOR RAPIDO DE SALIDA PSA 10KD",
+      "pb": 0,
+      "precioUser": 33950.0,
+      "precio": 33950.0
+    },
+    {
+      "nombre": "CONJ.SOPORTE ACRILICO P/MINI",
+      "pb": 0,
+      "precioUser": 22150.0,
+      "precio": 22150.0
+    },
+    {
+      "nombre": "CONJ.SOPORTE ACRILICO P/SENIOR 4",
+      "pb": 0,
+      "precioUser": 27450.0,
+      "precio": 27450.0
+    },
+    {
+      "nombre": "CONJ.SOPORTE ACRILICO SENIOR/VERO",
+      "pb": 0,
+      "precioUser": 27450.0,
+      "precio": 27450.0
+    },
+    {
+      "nombre": "CONJ.SOPORTE PSA STOPPER",
+      "pb": 0,
+      "precioUser": 22150.0,
+      "precio": 22150.0
+    },
+    {
+      "nombre": "FUNDA PSA DOMUS",
+      "pb": 3.8,
+      "precioUser": 69700.0,
+      "precio": 69700.0
+    },
+    {
+      "nombre": "FUNDA PSA MINI DOMUS",
+      "pb": 3.8,
+      "precioUser": 58850.0,
+      "precio": 58850.0
+    },
+    {
+      "nombre": "GRIFERÍA PSA BICOMANDO",
+      "pb": 0,
+      "precioUser": 517000.0,
+      "precio": 517000.0
+    },
+    {
+      "nombre": "GRIFERÍA PSA BICOMANDO NERO",
+      "pb": 0,
+      "precioUser": 517000.0,
+      "precio": 517000.0
+    },
+    {
+      "nombre": "GRIFERÍA PSA BM",
+      "pb": 0,
+      "precioUser": 211000.0,
+      "precio": 211000.0
+    },
+    {
+      "nombre": "GRIFERÍA PSA BM NERO",
+      "pb": 0,
+      "precioUser": 211000.0,
+      "precio": 211000.0
+    },
+    {
+      "nombre": "KIT ADAPT.P/CANILLA NO TRADICIONAL DUCHA II",
+      "pb": 6.9,
+      "precioUser": 54550.0,
+      "precio": 54550.0
+    },
+    {
+      "nombre": "KIT ADAPT.RECTOS P/CANILLAS PSA DUCHA II",
+      "pb": 6.9,
+      "precioUser": 72250.0,
+      "precio": 72250.0
+    },
+    {
+      "nombre": "KIT PARA BAJA PRESION UNIVERSAL",
+      "pb": 0,
+      "precioUser": 22250.0,
+      "precio": 22250.0
+    },
+    {
+      "nombre": "LAP BM 8 X 8",
+      "pb": 0,
+      "precioUser": 52900.0,
+      "precio": 52900.0
+    },
+    {
+      "nombre": "LAP DUCHA 1/2 X 1/2",
+      "pb": 0,
+      "precioUser": 59250.0,
+      "precio": 59250.0
+    },
+    {
+      "nombre": "LAP DUCHA II MACHO-MACHO 1/2 X 1/2",
+      "pb": 0,
+      "precioUser": 59250.0,
+      "precio": 59250.0
+    },
+    {
+      "nombre": "LAP SM 24 X 1",
+      "pb": 0,
+      "precioUser": 52900.0,
+      "precio": 52900.0
+    },
+    {
+      "nombre": "LAP SM P/ MANGUERA BY PASS",
+      "pb": 0,
+      "precioUser": 93550.0,
+      "precio": 93550.0
+    },
+    {
+      "nombre": "LLAVE DE AJUSTE P/TAPA PREFILTRO 40K-D",
+      "pb": 0,
+      "precioUser": 6250.0,
+      "precio": 6250.0
+    },
+    {
+      "nombre": "LLAVE DE CORTE S- MACHO/HEMBRA",
+      "pb": 6.9,
+      "precioUser": 37000.0,
+      "precio": 37000.0
+    },
+    {
+      "nombre": "LLAVE DE CORTE S- MACHO/MACHO",
+      "pb": 6.9,
+      "precioUser": 37000.0,
+      "precio": 37000.0
+    },
+    {
+      "nombre": "PRECINTO X 25",
+      "pb": 0,
+      "precioUser": 5950.0,
+      "precio": 5950.0
+    },
+    {
+      "nombre": "PROLONGADOR DE 3/4 PSA POLI",
+      "pb": 0,
+      "precioUser": 19850.0,
+      "precio": 19850.0
+    },
+    {
+      "nombre": "PROLONGADOR PSA DUCHA II",
+      "pb": 0,
+      "precioUser": 41350.0,
+      "precio": 41350.0
+    },
+    {
+      "nombre": "REGULADOR DE CAUDAL",
+      "pb": 0,
+      "precioUser": 108000.0,
+      "precio": 108000.0
+    },
+    {
+      "nombre": "SET ADAPTACION RETRO P/KIT CANILLA",
+      "pb": 0,
+      "precioUser": 33950.0,
+      "precio": 33950.0
+    },
+    {
+      "nombre": "TAPON REGULADOR P/DUCHA X 5 UNIDADES",
+      "pb": 0,
+      "precioUser": 8700.0,
+      "precio": 8700.0
+    },
+    {
+      "nombre": "TE C/LLAVE DE CORTE P/GRIFERÍA PSA Y ECO-D",
+      "pb": 0,
+      "precioUser": 80550.0,
+      "precio": 80550.0
+    },
+    {
+      "nombre": "VARILLA INST. ECO-D SM",
+      "pb": 0,
+      "precioUser": 55600.0,
+      "precio": 55600.0
+    },
+    {
+      "nombre": "REPOSICION PSA 10K-D",
       "pb": 0.8,
-      "precioDist": 70000,
-      "precioUser": 112000,
-      "ganancia": 42000,
-      "margen": 60.0
+      "precioUser": 260000.0,
+      "precio": 260000.0
     },
     {
-      "nombre": "Filtro Vero / Mini",
-      "nombreNorm": "filtro vero / mini",
-      "pb": 0.5,
-      "precioDist": 62500,
-      "precioUser": 100000,
-      "ganancia": 37500,
-      "margen": 60.0
+      "nombre": "REPOSICION PSA 40K-D",
+      "pb": 0.8,
+      "precioUser": 403000.0,
+      "precio": 403000.0
+    },
+    {
+      "nombre": "ACCESORIO PARA CEBAR MATE",
+      "pb": 0,
+      "precioUser": 5100.0,
+      "precio": 5100.0
+    },
+    {
+      "nombre": "BOLSA MATERIAL REGENERANTE X 2",
+      "pb": 0,
+      "precioUser": 29100.0,
+      "precio": 29100.0
+    },
+    {
+      "nombre": "BUJE DE CONEXION P/CANILLA DISPENSER",
+      "pb": 0,
+      "precioUser": 55550.0,
+      "precio": 55550.0
+    },
+    {
+      "nombre": "CAMPANA P/PSA DUCHA",
+      "pb": 0,
+      "precioUser": 5950.0,
+      "precio": 5950.0
+    },
+    {
+      "nombre": "CANILLA AGUA CALIENTE DISPENSER 2",
+      "pb": 0,
+      "precioUser": 37000.0,
+      "precio": 37000.0
+    },
+    {
+      "nombre": "CANILLA AGUA CALIENTE DISPENSER DS",
+      "pb": 0,
+      "precioUser": 37000.0,
+      "precio": 37000.0
+    },
+    {
+      "nombre": "CANILLA AGUA CALIENTE DISPENSER MESA/PIE",
+      "pb": 0,
+      "precioUser": 37000.0,
+      "precio": 37000.0
+    },
+    {
+      "nombre": "CANILLA AGUA CALIENTE P/ECO-D PIE Y SM",
+      "pb": 0,
+      "precioUser": 39850.0,
+      "precio": 39850.0
+    },
+    {
+      "nombre": "CANILLA AGUA FRIA DISPENSER 2",
+      "pb": 0,
+      "precioUser": 37000.0,
+      "precio": 37000.0
+    },
+    {
+      "nombre": "CANILLA AGUA FRIA DISPENSER DS",
+      "pb": 0,
+      "precioUser": 37000.0,
+      "precio": 37000.0
+    },
+    {
+      "nombre": "CANILLA AGUA FRIA DISPENSER MESA/PIE",
+      "pb": 0,
+      "precioUser": 37000.0,
+      "precio": 37000.0
+    },
+    {
+      "nombre": "CANILLA AGUA FRIA P/ECO-D PIE Y SM",
+      "pb": 0,
+      "precioUser": 39850.0,
+      "precio": 39850.0
+    },
+    {
+      "nombre": "CANULA P/BOTELLA TERMICA X 5 UNID",
+      "pb": 0,
+      "precioUser": 8450.0,
+      "precio": 8450.0
+    },
+    {
+      "nombre": "CEPILLO DE ACERO P/IONTRIX",
+      "pb": 0,
+      "precioUser": 22150.0,
+      "precio": 22150.0
+    },
+    {
+      "nombre": "CONJ.SOPORTE ESCUADRA P/DISPENSER PIE C/CONECTORES",
+      "pb": 0,
+      "precioUser": 143000.0,
+      "precio": 143000.0
+    },
+    {
+      "nombre": "ELECTRODO P/IONTRIX",
+      "pb": 0,
+      "precioUser": 175000.0,
+      "precio": 175000.0
+    },
+    {
+      "nombre": "FIPOR N° 3 X 2 UNID",
+      "pb": 0,
+      "precioUser": 30100.0,
+      "precio": 30100.0
+    },
+    {
+      "nombre": "FIPOR N° 3 X 4 UNID",
+      "pb": 0,
+      "precioUser": 54550.0,
+      "precio": 54550.0
+    },
+    {
+      "nombre": "FIPOR N° 3 X 6 UNID",
+      "pb": 0,
+      "precioUser": 81600.0,
+      "precio": 81600.0
+    },
+    {
+      "nombre": "FIPOR N° 3 X 8 UNIDADES",
+      "pb": 0,
+      "precioUser": 99100.0,
+      "precio": 99100.0
+    },
+    {
+      "nombre": "FLOR PSA DUCHA BLANCO/BIANCO C/CODO CROMADO",
+      "pb": 0,
+      "precioUser": 30100.0,
+      "precio": 30100.0
+    },
+    {
+      "nombre": "FLOR PSA DUCHA GRIGIO C/CODO CROMADO",
+      "pb": 1.15,
+      "precioUser": 30100.0,
+      "precio": 30100.0
+    },
+    {
+      "nombre": "FUENTE DE ALIMENTACION OSMOSIS PSA ROPOT",
+      "pb": 3.5,
+      "precioUser": 72000.0,
+      "precio": 72000.0
+    },
+    {
+      "nombre": "FUENTE DE ALIMENTACION P/DOMUS-MINI DOMUS",
+      "pb": 0,
+      "precioUser": 56100.0,
+      "precio": 56100.0
+    },
+    {
+      "nombre": "FUENTE DE ALIMENTACION P/IONTRIX",
+      "pb": 0,
+      "precioUser": 178000.0,
+      "precio": 178000.0
+    },
+    {
+      "nombre": "GATILLO P/CANILLA BAJO MESADA PSA",
+      "pb": 0,
+      "precioUser": 15100.0,
+      "precio": 15100.0
+    },
+    {
+      "nombre": "JARRA AGUA OSMOSIS PSA ROPOT",
+      "pb": 3.5,
+      "precioUser": 61800.0,
+      "precio": 61800.0
+    },
+    {
+      "nombre": "JUEGO JUNTAS POLI 2 $ 816,67",
+      "pb": 0.85,
+      "precioUser": 2450.0,
+      "precio": 2450.0
+    },
+    {
+      "nombre": "KIT P/DETERMINACIÓN DUREZA (10 TIRAS)",
+      "pb": 0,
+      "precioUser": 26100.0,
+      "precio": 26100.0
+    },
+    {
+      "nombre": "KIT P/MEDICION DE CLORO P/IONTRIX",
+      "pb": 0,
+      "precioUser": 10850.0,
+      "precio": 10850.0
+    },
+    {
+      "nombre": "KIT P/MEDICION DE IONES P/IONTRIX",
+      "pb": 0,
+      "precioUser": 38100.0,
+      "precio": 38100.0
+    },
+    {
+      "nombre": "KIT P/MEDICION DE PH P/IONTRIX",
+      "pb": 0,
+      "precioUser": 19850.0,
+      "precio": 19850.0
+    },
+    {
+      "nombre": "KIT POSVENTA 1 AÑO OSMOSIS PSA ROPOT",
+      "pb": 3.5,
+      "precioUser": 310000.0,
+      "precio": 310000.0
+    },
+    {
+      "nombre": "KIT POSVENTA PURIF. AIRE PSA",
+      "pb": 0,
+      "precioUser": 159000.0,
+      "precio": 159000.0
+    },
+    {
+      "nombre": "KIT PSA LAB P/IONTRIX",
+      "pb": 0,
+      "precioUser": 109000.0,
+      "precio": 109000.0
+    },
+    {
+      "nombre": "MANG. BLACK DIÁM. X C/CONEC. SEN4/S",
+      "pb": 8.5,
+      "precioUser": 13550.0,
+      "precio": 13550.0
+    },
+    {
+      "nombre": "MANG. BLACK DIÁM. X 700 C/CONEC. SEN4/S",
+      "pb": 8.5,
+      "precioUser": 10550.0,
+      "precio": 10550.0
+    },
+    {
+      "nombre": "MANG. SEMIRRÍGIDA AZUL DIÁM.8 (X METRO)",
+      "pb": 0,
+      "precioUser": 7500.0,
+      "precio": 7500.0
+    },
+    {
+      "nombre": "MANG. SEMIRRÍGIDA BLANCA DIÁM.8 (X METRO)",
+      "pb": 0,
+      "precioUser": 7500.0,
+      "precio": 7500.0
+    },
+    {
+      "nombre": "MANG. SEMIRRÍGIDA VERDE DIÁM.8 (X METRO)",
+      "pb": 0,
+      "precioUser": 7500.0,
+      "precio": 7500.0
+    },
+    {
+      "nombre": "MANG.PLATA DIÁM. X CONEC. SEN/VERO/S",
+      "pb": 8.5,
+      "precioUser": 10550.0,
+      "precio": 10550.0
+    },
+    {
+      "nombre": "MANG.PLATA DIÁM. X CONEC. P/MINI",
+      "pb": 8.5,
+      "precioUser": 8700.0,
+      "precio": 8700.0
+    },
+    {
+      "nombre": "MANG.PLATA DIÁM. X 700 CONEC. P/MINI",
+      "pb": 8.5,
+      "precioUser": 4700.0,
+      "precio": 4700.0
+    },
+    {
+      "nombre": "MARIPOSA DE FIJACION P/IONTRIX",
+      "pb": 0,
+      "precioUser": 8700.0,
+      "precio": 8700.0
+    },
+    {
+      "nombre": "MARIPOSA DE FIJACION P/IONTRIX 3",
+      "pb": 3.1,
+      "precioUser": 8700.0,
+      "precio": 8700.0
+    },
+    {
+      "nombre": "MATERIAL REGENERANTE X KG P/DOMUS",
+      "pb": 2.5,
+      "precioUser": 31900.0,
+      "precio": 31900.0
+    },
+    {
+      "nombre": "MODULO POTENCIADOR P/IONTRIX 3",
+      "pb": 3.1,
+      "precioUser": 37000.0,
+      "precio": 37000.0
+    },
+    {
+      "nombre": "O-RING INTERNO TAPA CUERPO PSA DUCHA (JUEGO)",
+      "pb": 0,
+      "precioUser": 4800.0,
+      "precio": 4800.0
+    },
+    {
+      "nombre": "ORTOTOLIDINA",
+      "pb": 0,
+      "precioUser": 6400.0,
+      "precio": 6400.0
+    },
+    {
+      "nombre": "PASTILLA HIDROSENSIBLE P/ECO-D",
+      "pb": 0,
+      "precioUser": 33000.0,
+      "precio": 33000.0
+    },
+    {
+      "nombre": "PASTILLA SANITIZANTE MAX X 8 UNID",
+      "pb": 0,
+      "precioUser": 4700.0,
+      "precio": 4700.0
+    },
+    {
+      "nombre": "PAÑO ALTA TURBIDEZ 24 X 21 X 3 UNID",
+      "pb": 0,
+      "precioUser": 26000.0,
+      "precio": 26000.0
+    },
+    {
+      "nombre": "PICO DE DESCARGA GRIFERIA NERO",
+      "pb": 0,
+      "precioUser": 94800.0,
+      "precio": 94800.0
+    },
+    {
+      "nombre": "PICO DESCARGA CANILLA BM2/GRIFERIA PSA",
+      "pb": 0,
+      "precioUser": 94800.0,
+      "precio": 94800.0
+    },
+    {
+      "nombre": "PREFILTRO ENTRADA PURIF. DE AIRE PSA",
+      "pb": 4.5,
+      "precioUser": 48600.0,
+      "precio": 48600.0
+    },
+    {
+      "nombre": "PREFILTRO P/10 KD",
+      "pb": 0,
+      "precioUser": 19850.0,
+      "precio": 19850.0
+    },
+    {
+      "nombre": "PROLONGADOR P/ PICO PSA SENIOR 3",
+      "pb": 0,
+      "precioUser": 19850.0,
+      "precio": 19850.0
+    },
+    {
+      "nombre": "PROLONGADOR P/PICO PSA SENIOR",
+      "pb": 0,
+      "precioUser": 19850.0,
+      "precio": 19850.0
+    },
+    {
+      "nombre": "PROMO CILINDRO + PACK RENDIMIENTO II",
+      "pb": 0,
+      "precioUser": 112000.0,
+      "precio": 112000.0
+    },
+    {
+      "nombre": "RECARGA P/SODA BURBY",
+      "pb": 0,
+      "precioUser": 28400.0,
+      "precio": 28400.0
+    },
+    {
+      "nombre": "RECIPIENTE P/AGUA ENTRADA OSMOSIS PSA ROPOT",
+      "pb": 3.5,
+      "precioUser": 48900.0,
+      "precio": 48900.0
+    },
+    {
+      "nombre": "REPUESTO BACTERIOSTÁTICO 25 MIC S- /QUA/SEN",
+      "pb": 0,
+      "precioUser": 75950.0,
+      "precio": 75950.0
+    },
+    {
+      "nombre": "REPUESTO BACTERIOSTÁTICO 5 MIC S- /QUA/SEN",
+      "pb": 0,
+      "precioUser": 75950.0,
+      "precio": 75950.0
+    },
+    {
+      "nombre": "REPUESTO BACTERIOSTÁTICO 50 MIC S- /QUA/SEN",
+      "pb": 0,
+      "precioUser": 75950.0,
+      "precio": 75950.0
+    },
+    {
+      "nombre": "REPUESTO CUERPO PSA DUCHA BIANCO",
+      "pb": 1.15,
+      "precioUser": 21100.0,
+      "precio": 21100.0
+    },
+    {
+      "nombre": "REPUESTO CUERPO PSA DUCHA GRIGIO",
+      "pb": 1.15,
+      "precioUser": 21100.0,
+      "precio": 21100.0
+    },
+    {
+      "nombre": "REPUESTO N°1 SEDIMENTOS OSMOSIS PSA ROPOT",
+      "pb": 3.5,
+      "precioUser": 48600.0,
+      "precio": 48600.0
+    },
+    {
+      "nombre": "REPUESTO N°2 CARBON BLOQUE OSMOSIS PSA ROPOT",
+      "pb": 3.5,
+      "precioUser": 54550.0,
+      "precio": 54550.0
+    },
+    {
+      "nombre": "REPUESTO N°3 MEMBRANA OSMOSIS PSA ROPOT",
+      "pb": 3.5,
+      "precioUser": 158000.0,
+      "precio": 158000.0
+    },
+    {
+      "nombre": "REPUESTO N°4 POST MEMBRANA OSMOSIS PSA ROPOT",
+      "pb": 3.5,
+      "precioUser": 55600.0,
+      "precio": 55600.0
+    },
+    {
+      "nombre": "REPUESTO PSA DUCHA C/KDF",
+      "pb": 1.15,
+      "precioUser": 143000.0,
+      "precio": 143000.0
+    },
+    {
+      "nombre": "REPUESTO PSA DUCHA C/KDF/POLIFOSFATO",
+      "pb": 0,
+      "precioUser": 143000.0,
+      "precio": 143000.0
+    },
+    {
+      "nombre": "REPUESTO PSA POLI",
+      "pb": 0,
+      "precioUser": 83150.0,
+      "precio": 83150.0
+    },
+    {
+      "nombre": "REPUESTO PSA POLI 2",
+      "pb": 0.85,
+      "precioUser": 83150.0,
+      "precio": 83150.0
+    },
+    {
+      "nombre": "REPUESTO PSA PORTÁTIL",
+      "pb": 0,
+      "precioUser": 88450.0,
+      "precio": 88450.0
+    },
+    {
+      "nombre": "RESERVORIO COMPLETO P/ECO-D",
+      "pb": 0,
+      "precioUser": 35800.0,
+      "precio": 35800.0
+    },
+    {
+      "nombre": "TAPA ACRILICO P/STOPPER/40K-D",
+      "pb": 0,
+      "precioUser": 77750.0,
+      "precio": 77750.0
+    },
+    {
+      "nombre": "TAPA CENTRADORA P/IONTRIX",
+      "pb": 0,
+      "precioUser": 11300.0,
+      "precio": 11300.0
+    },
+    {
+      "nombre": "TAPA CENTRADORA P/IONTRIX 3",
+      "pb": 3.1,
+      "precioUser": 11300.0,
+      "precio": 11300.0
+    },
+    {
+      "nombre": "TAPA CON FLOTANTE P/DISPENSER",
+      "pb": 0,
+      "precioUser": 153000.0,
+      "precio": 153000.0
+    },
+    {
+      "nombre": "TAPA P/BOTELLA PSA TERMICA PICO SPORT",
+      "pb": 0,
+      "precioUser": 8450.0,
+      "precio": 8450.0
+    },
+    {
+      "nombre": "TAPA P/CUERPO PSA DUCHA CR MARFIL",
+      "pb": 0,
+      "precioUser": 21100.0,
+      "precio": 21100.0
+    },
+    {
+      "nombre": "TAPA P/CUERPO PSA DUCHA PLATA",
+      "pb": 0,
+      "precioUser": 21100.0,
+      "precio": 21100.0
+    },
+    {
+      "nombre": "TAPA PREFILTRO C/AUTOPURGA",
+      "pb": 0,
+      "precioUser": 18200.0,
+      "precio": 18200.0
+    },
+    {
+      "nombre": "TAPA PREFILTRO PSA S- II",
+      "pb": 6.9,
+      "precioUser": 25550.0,
+      "precio": 25550.0
+    },
+    {
+      "nombre": "TAPA PREFILTRO SENIOR 3",
+      "pb": 0,
+      "precioUser": 18200.0,
+      "precio": 18200.0
+    },
+    {
+      "nombre": "TAPA PREFILTRO SENIOR 4",
+      "pb": 3.3,
+      "precioUser": 32350.0,
+      "precio": 32350.0
+    },
+    {
+      "nombre": "TAPON P/CONECTOR DE RECARGA P/IONTRIX",
+      "pb": 0,
+      "precioUser": 11300.0,
+      "precio": 11300.0
+    },
+    {
+      "nombre": "TERMOSTATO AGUA CALIENTE 85° P/DISPENSER",
+      "pb": 0,
+      "precioUser": 37000.0,
+      "precio": 37000.0
+    },
+    {
+      "nombre": "TUBO CONEXION PSA DUCHA C/O-RING",
+      "pb": 0,
+      "precioUser": 35800.0,
+      "precio": 35800.0
+    },
+    {
+      "nombre": "VASO ACRILICO PSA POLI 2",
+      "pb": 0.85,
+      "precioUser": 67550.0,
+      "precio": 67550.0
+    },
+    {
+      "nombre": "VÁLVULA BY PASS C3 GRIGIO",
+      "pb": 0.55,
+      "precioUser": 22250.0,
+      "precio": 22250.0
+    },
+    {
+      "nombre": "VÁLVULA BY PASS NERO",
+      "pb": 0,
+      "precioUser": 22250.0,
+      "precio": 22250.0
+    },
+    {
+      "nombre": "VÁLVULA BY PASS UNIVERSAL",
+      "pb": 0,
+      "precioUser": 22250.0,
+      "precio": 22250.0
+    },
+    {
+      "nombre": "ADICIONAL INST. HASTA 60 KM (PSA POLI X 2)",
+      "pb": 0,
+      "precioUser": 229000.0,
+      "precio": 229000.0
+    },
+    {
+      "nombre": "ADICIONAL INST. HASTA 60 KM (PSA POLI)",
+      "pb": 0,
+      "precioUser": 167000.0,
+      "precio": 167000.0
+    },
+    {
+      "nombre": "ADICIONAL INSTAL. HASTA 60 KM",
+      "pb": 0,
+      "precioUser": 147000.0,
+      "precio": 147000.0
+    },
+    {
+      "nombre": "ADICIONAL POR KILOMETRAJE EXCEDIDO",
+      "pb": 0,
+      "precioUser": 4650.0,
+      "precio": 4650.0
+    },
+    {
+      "nombre": "GRIFERÍA PSA BICOMANDO + INST",
+      "pb": 3.8,
+      "precioUser": 664000.0,
+      "precio": 664000.0
+    },
+    {
+      "nombre": "GRIFERÍA PSA BICOMANDO NERO + INST",
+      "pb": 3.8,
+      "precioUser": 664000.0,
+      "precio": 664000.0
+    },
+    {
+      "nombre": "GRIFERÍA PSA BM + INST",
+      "pb": 3.8,
+      "precioUser": 358000.0,
+      "precio": 358000.0
+    },
+    {
+      "nombre": "GRIFERÍA PSA BM NERO + INST",
+      "pb": 3.8,
+      "precioUser": 358000.0,
+      "precio": 358000.0
+    },
+    {
+      "nombre": "INSTALACION DISPENSER PSA (HASTA 60 KM)",
+      "pb": 3.8,
+      "precioUser": 190000.0,
+      "precio": 190000.0
+    },
+    {
+      "nombre": "INSTALACION PSA DOMUS/MINI DOMUS (HASTA 60 KM)",
+      "pb": 3.8,
+      "precioUser": 190000.0,
+      "precio": 190000.0
+    },
+    {
+      "nombre": "MANTENIMIENTO ANUAL DISPENSER PSA",
+      "pb": 0,
+      "precioUser": 164000.0,
+      "precio": 164000.0
+    },
+    {
+      "nombre": "MODULO REPARACION DE PRODUCTO",
+      "pb": 0,
+      "precioUser": 12000.0,
+      "precio": 12000.0
+    },
+    {
+      "nombre": "SERVICE CON INSTALADOR HASTA 60 KM",
+      "pb": 0,
+      "precioUser": 113000.0,
+      "precio": 113000.0
+    },
+    {
+      "nombre": "TRANSF.SM/BM + GRIF.PSA BICOMANDO",
+      "pb": 0,
+      "precioUser": 541000.0,
+      "precio": 541000.0
+    },
+    {
+      "nombre": "TRANSF.SM/BM + GRIF.PSA BICOMANDO + INST",
+      "pb": 0,
+      "precioUser": 688000.0,
+      "precio": 688000.0
+    },
+    {
+      "nombre": "TRANSF.SM/BM + GRIF.PSA BICOMANDO NERO",
+      "pb": 3.3,
+      "precioUser": 541000.0,
+      "precio": 541000.0
+    },
+    {
+      "nombre": "TRANSF.SM/BM + GRIF.PSA BICOMANDO NERO + INST",
+      "pb": 3.3,
+      "precioUser": 688000.0,
+      "precio": 688000.0
+    },
+    {
+      "nombre": "TRANSF.SM/BM + GRIFERÍA PSA BM",
+      "pb": 3.8,
+      "precioUser": 221000.0,
+      "precio": 221000.0
+    },
+    {
+      "nombre": "TRANSF.SM/BM + GRIFERÍA PSA BM + INSTAL",
+      "pb": 3.8,
+      "precioUser": 368000.0,
+      "precio": 368000.0
+    },
+    {
+      "nombre": "TRANSF.SM/BM + GRIFERÍA PSA BM NERO",
+      "pb": 3.8,
+      "precioUser": 221000.0,
+      "precio": 221000.0
+    },
+    {
+      "nombre": "TRANSF.SM/BM + GRIFERÍA PSA BM NERO + INSTAL",
+      "pb": 3.8,
+      "precioUser": 368000.0,
+      "precio": 368000.0
+    },
+    {
+      "nombre": "BOTELLA 600 CC NO GASF AMAR-AMAR 100 % RECICLADA",
+      "pb": 0,
+      "precioUser": 37150.0,
+      "precio": 37150.0
+    },
+    {
+      "nombre": "BOTELLA 600 CC NO GASF AMAR-AQUA % RECICLADA",
+      "pb": 0,
+      "precioUser": 37150.0,
+      "precio": 37150.0
+    },
+    {
+      "nombre": "BOTELLA 600 CC NO GASF AMAR-ROS 100 % RECICLADA",
+      "pb": 0,
+      "precioUser": 37150.0,
+      "precio": 37150.0
+    },
+    {
+      "nombre": "BOTELLA 600 CC NO GASF AMAR-VER 100 % RECICLADA",
+      "pb": 0,
+      "precioUser": 37150.0,
+      "precio": 37150.0
+    },
+    {
+      "nombre": "BOTELLA 600 CC NO GASF AQUA-AMAR 100 % RECICLADA",
+      "pb": 0,
+      "precioUser": 37150.0,
+      "precio": 37150.0
+    },
+    {
+      "nombre": "BOTELLA 600 CC NO GASF AQUA-AQUA 100 % RECICLADA",
+      "pb": 0,
+      "precioUser": 37150.0,
+      "precio": 37150.0
+    },
+    {
+      "nombre": "BOTELLA 600 CC NO GASF AQUA-ROSA 100% RECICLADA",
+      "pb": 0,
+      "precioUser": 37150.0,
+      "precio": 37150.0
+    },
+    {
+      "nombre": "BOTELLA 600 CC NO GASF AQUA-VERDE 100% RECICLADA",
+      "pb": 0,
+      "precioUser": 37150.0,
+      "precio": 37150.0
+    },
+    {
+      "nombre": "BOTELLA 600 CC NO GASF ROS-AMAR 100 % RECICLADA",
+      "pb": 0,
+      "precioUser": 37150.0,
+      "precio": 37150.0
+    },
+    {
+      "nombre": "BOTELLA 600 CC NO GASF ROS-AQUA 100 % RECICLADA",
+      "pb": 0,
+      "precioUser": 37150.0,
+      "precio": 37150.0
+    },
+    {
+      "nombre": "BOTELLA 600 CC NO GASF ROS-ROS 100 % RECICLADA",
+      "pb": 0,
+      "precioUser": 37150.0,
+      "precio": 37150.0
+    },
+    {
+      "nombre": "BOTELLA 600 CC NO GASF ROS-VER 100 % RECICLADA",
+      "pb": 0,
+      "precioUser": 37150.0,
+      "precio": 37150.0
+    },
+    {
+      "nombre": "BOTELLA 600 CC NO GASF VER-AMAR 100 % RECICLADA",
+      "pb": 0,
+      "precioUser": 37150.0,
+      "precio": 37150.0
+    },
+    {
+      "nombre": "BOTELLA 600 CC NO GASF VER-AQUA 100 % RECICLADA",
+      "pb": 0,
+      "precioUser": 37150.0,
+      "precio": 37150.0
+    },
+    {
+      "nombre": "BOTELLA 600 CC NO GASF VER-ROS 100 % RECICLADA",
+      "pb": 0,
+      "precioUser": 37150.0,
+      "precio": 37150.0
+    },
+    {
+      "nombre": "BOTELLA 600 CC NO GASF VER-VER 100 % RECICLADA",
+      "pb": 0,
+      "precioUser": 37150.0,
+      "precio": 37150.0
+    },
+    {
+      "nombre": "BOTELLA DE VIDRIO 1 LT. PSA",
+      "pb": 0,
+      "precioUser": 42800.0,
+      "precio": 42800.0
+    },
+    {
+      "nombre": "BOTELLA NEO AQUA-AQUA REUTILIZ",
+      "pb": 0,
+      "precioUser": 64200.0,
+      "precio": 64200.0
+    },
+    {
+      "nombre": "BOTELLA PSA NO GAS. 1 LITRO X 1 REUTILIZABLE",
+      "pb": 0,
+      "precioUser": 12000.0,
+      "precio": 12000.0
+    },
+    {
+      "nombre": "BOTELLA PSA NO GAS. X ML PACK X2 REUTILIZ",
+      "pb": 0,
+      "precioUser": 19150.0,
+      "precio": 19150.0
+    },
+    {
+      "nombre": "BOTELLA PSA P/SODA BURBY X ML X2 REUTILIZ",
+      "pb": 0,
+      "precioUser": 25150.0,
+      "precio": 25150.0
+    },
+    {
+      "nombre": "BOTELLA PSA TÉRMICA 500 CC BLANCA",
+      "pb": 0,
+      "precioUser": 61200.0,
+      "precio": 61200.0
+    },
+    {
+      "nombre": "BOTELLA PSA TÉRMICA 500 CC NEGRA",
+      "pb": 0,
+      "precioUser": 61200.0,
+      "precio": 61200.0
+    },
+    {
+      "nombre": "BOTELLA PSA TÉRMICA 750 CC BLANCA",
+      "pb": 0,
+      "precioUser": 71150.0,
+      "precio": 71150.0
+    },
+    {
+      "nombre": "BOTELLA PSA TÉRMICA 750 CC NEGRA",
+      "pb": 0,
+      "precioUser": 71150.0,
+      "precio": 71150.0
+    },
+    {
+      "nombre": "KIT MATE 2 PSA BIANCO (MATE+BOMBILLA)",
+      "pb": 3.3,
+      "precioUser": 38500.0,
+      "precio": 38500.0
+    },
+    {
+      "nombre": "KIT MATE 2 PSA NERO (MATE+BOMBILLA)",
+      "pb": 3.3,
+      "precioUser": 38500.0,
+      "precio": 38500.0
+    },
+    {
+      "nombre": "LAPIZ GRAFITO NEGRO PSA X 10 UNID",
+      "pb": 0,
+      "precioUser": 4250.0,
+      "precio": 4250.0
+    },
+    {
+      "nombre": "REJILLEX BLANCO",
+      "pb": 0,
+      "precioUser": 8700.0,
+      "precio": 8700.0
+    },
+    {
+      "nombre": "REJILLEX GRIGIO",
+      "pb": 0,
+      "precioUser": 8700.0,
+      "precio": 8700.0
+    },
+    {
+      "nombre": "SET MATE 2 PSA BIANCO (TERMO+MATE+BOMBILLA)",
+      "pb": 0.85,
+      "precioUser": 131000.0,
+      "precio": 131000.0
+    },
+    {
+      "nombre": "TERMO 2 PSA BLANCO",
+      "pb": 0,
+      "precioUser": 92550.0,
+      "precio": 92550.0
+    },
+    {
+      "nombre": "ANALISIS ESPECIFICOS",
+      "pb": 0,
+      "precioUser": 78400.0,
+      "precio": 78400.0
+    },
+    {
+      "nombre": "BOTELLA P/ANALISIS DE AGUA",
+      "pb": 0,
+      "precioUser": 4700.0,
+      "precio": 4700.0
+    },
+    {
+      "nombre": "MODULO A. FISICO QUIMICO BASICO",
+      "pb": 0,
+      "precioUser": 126000.0,
+      "precio": 126000.0
+    },
+    {
+      "nombre": "MODULO B. FISICO QUIMICO INTERMEDIO",
+      "pb": 0,
+      "precioUser": 285000.0,
+      "precio": 285000.0
+    },
+    {
+      "nombre": "MODULO C. FISICO QUIMICO COMPLETO",
+      "pb": 0,
+      "precioUser": 421000.0,
+      "precio": 421000.0
+    },
+    {
+      "nombre": "MODULO D. BACTERIOLOGICO",
+      "pb": 0,
+      "precioUser": 126000.0,
+      "precio": 126000.0
+    },
+    {
+      "nombre": "MODULO E. SOLIDOS EN SUSPENSION",
+      "pb": 0,
+      "precioUser": 60650.0,
+      "precio": 60650.0
+    },
+    {
+      "nombre": "RECIPIENTE P/ANALISIS DE AGUA",
+      "pb": 0,
+      "precioUser": 10850.0,
+      "precio": 10850.0
+    },
+    {
+      "nombre": "ACEIT. NEGRA FRASCO X 220 GRS PREMIUM",
+      "pb": 0,
+      "precioUser": 9400.0,
+      "precio": 9400.0
+    },
+    {
+      "nombre": "ACEIT. VERDES FRASCO X 220 GRS",
+      "pb": 0,
+      "precioUser": 8250.0,
+      "precio": 8250.0
+    },
+    {
+      "nombre": "ACEITE DE OLIVA NININA X 500 CC",
+      "pb": 0,
+      "precioUser": 40000.0,
+      "precio": 40000.0
+    },
+    {
+      "nombre": "ACEITE OLIVA 500 CC ESTUCHE PACK X 2 UNID",
+      "pb": 0,
+      "precioUser": 34250.0,
+      "precio": 34250.0
+    },
+    {
+      "nombre": "ACEITE OLIVA EX. V. 250 CC",
+      "pb": 0,
+      "precioUser": 11250.0,
+      "precio": 11250.0
+    },
+    {
+      "nombre": "ACEITE OLIVA EX. V. 5 L CAJA X 2 UNID",
+      "pb": 0,
+      "precioUser": 278000.0,
+      "precio": 278000.0
+    },
+    {
+      "nombre": "ACEITE OLIVA EX. V. 5 LTS",
+      "pb": 0,
+      "precioUser": 139000.0,
+      "precio": 139000.0
+    },
+    {
+      "nombre": "ACEITE OLIVA EX. V. 500 CC",
+      "pb": 0,
+      "precioUser": 17950.0,
+      "precio": 17950.0
+    },
+    {
+      "nombre": "ACEITE OLIVA GOURMET 250 CC CAJA X 12 UNID",
+      "pb": 0,
+      "precioUser": 121500.0,
+      "precio": 121500.0
+    },
+    {
+      "nombre": "ACEITE OLIVA GOURMET 500 CC CAJA X 12 UNID",
+      "pb": 0,
+      "precioUser": 193900.0,
+      "precio": 193900.0
+    },
+    {
+      "nombre": "ACEITE OLIVARE BOTELLA X 1 LITRO",
+      "pb": 0,
+      "precioUser": 34250.0,
+      "precio": 34250.0
+    },
+    {
+      "nombre": "PASAS DE UVA NININA PACK X 5 UNID. 150 GM C/U",
+      "pb": 0,
+      "precioUser": 18000.0,
+      "precio": 18000.0
     }
   ]
 }
