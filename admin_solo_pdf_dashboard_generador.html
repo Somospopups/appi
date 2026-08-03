@@ -117,10 +117,36 @@ function fmt(n){return '$'+Number(n).toLocaleString('es-AR',{maximumFractionDigi
 function norm(s){return (s||'').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim();}
 function parseNum(str){if(!str) return 0;let s=(''+str).replace(/[^\d.,-]/g,'');if(!s) return 0;if(s.indexOf('.')!==-1&&s.indexOf(',')!==-1){if(s.lastIndexOf(',')>s.lastIndexOf('.')){s=s.replace(/\./g,'').replace(',','.');}else{s=s.replace(/,/g,'');}}else if(s.indexOf(',')!==-1){const p=s.split(',');if(p.length===2&&p[1].length<=2){s=p[0].replace(/\./g,'')+'.'+p[1];}else{s=s.replace(/,/g,'');}}const n=parseFloat(s);return isNaN(n)?0:n;}
 function detectar(headers){const m={};headers.forEach((h,i)=>{const nh=norm(h);if(/prod|modelo|art|nombre|codigo/.test(nh)&&m.nombre===undefined) m.nombre=i;if(/precio|importe|valor/.test(nh)&&m.precio===undefined) m.precio=i;if(/pb|punto/.test(nh)&&m.pb===undefined) m.pb=i;});if(m.nombre===undefined&&headers.length>0) m.nombre=0;return m;}
-function parseRows(rows){
-  if(!rows||rows.length<2) return [];let hr=-1;for(let i=0;i<Math.min(rows.length,20);i++){const r=rows[i]||[];const c=r.filter(v=>/prod|modelo|nombre|precio|pb|punto/i.test((v||'').toString())).length;if(c>=2){hr=i;break;}}if(hr===-1) hr=0;
-  const headers=(rows[hr]||[]).map(v=>(v||'').toString().trim());const map=detectar(headers);const out=[];
-  for(let i=hr+1;i<rows.length;i++){const r=rows[i]||[];if(r.every(v=>!v)) continue;const nomRaw=r[map.nombre];const nom=(nomRaw||'').toString().trim();if(!nom||nom.length<2) continue;let precio=0;if(map.precio!==undefined){const pv=r[map.precio];if(typeof pv==='number') precio=pv;else precio=parseNum(pv);}if(precio===0){for(let j=0;j<r.length;j++){if(j===map.nombre) continue;const v=r[j];if(typeof v==='number'&&v>100){precio=v;break;}}}let pb=0;if(map.pb!==undefined){pb=parseFloat((''+(r[map.pb]||'')).replace(',','.'))||0;}if(precio<100) continue;out.push({nombre:nom,nombreNorm:norm(nom),pb,precio});}
+function parseRows(rows, tipo){
+  if(!rows||rows.length<2) return [];
+  let hr=-1;for(let i=0;i<Math.min(rows.length,20);i++){const r=rows[i]||[];const c=r.filter(v=>/prod|modelo|nombre|precio|pb|punto|sugerido|lista|contado|debito|pcio/i.test((v||'').toString())).length;if(c>=2){hr=i;break;}}if(hr===-1) hr=0;
+  const headers=(rows[hr]||[]).map(v=>(v||'').toString().trim());const map=detectar(headers, tipo);const out=[];
+  for(let i=hr+1;i<rows.length;i++){
+    const r=rows[i]||[];if(r.every(v=>!v)) continue;
+    const nomRaw=r[map.nombre];const nom=(nomRaw||'').toString().trim();if(!nom||nom.length<2) continue;
+    let precio=0;
+    if(map.precio!==undefined){
+      const pv=r[map.precio];
+      if(typeof pv==='number') precio=pv;else precio=parseNum(pv);
+    }
+    if(precio===0){
+      for(let j=0;j<r.length;j++){
+        if(j===map.nombre) continue;
+        const v=r[j];
+        if(typeof v==='number'&&v>100){precio=v;break;}
+        const hNorm=norm(headers[j]||'');
+        if(tipo==='dist' && /(pcio.*lista|lista.*contado|dist)/i.test(hNorm)){
+          const val=parseNum(v); if(val>100){precio=val;break;}
+        }
+        if(tipo==='user' && /(sugerido|contado.*debito|1.*cuota|usuario)/i.test(hNorm)){
+          const val=parseNum(v); if(val>100){precio=val;break;}
+        }
+      }
+    }
+    let pb=0;if(map.pb!==undefined){pb=parseFloat((''+(r[map.pb]||'')).replace(',','.'))||0;}
+    if(precio<100) continue;
+    out.push({nombre:nom,nombreNorm:norm(nom),pb,precio});
+  }
   return out;
 }
 async function extraerPDF(file){

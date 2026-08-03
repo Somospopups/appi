@@ -209,14 +209,57 @@ function loadDistUser(){
   try{const u=localStorage.getItem(USER_KEY);if(u) preciosUserData=JSON.parse(u);}catch(e){}
 }
 function normalizeProducto(s){return (s||'').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim();}
-function detectarColumnasPrecios(headers){
-  const map={};headers.forEach((h,i)=>{const nh=normalizeProducto(h);if(!nh) return;if(/prod|modelo|art|nombre|codigo/.test(nh)&&map.nombre===undefined) map.nombre=i;if(/precio|importe|valor/.test(nh)&&map.precio===undefined) map.precio=i;if(/pb|punto/.test(nh)&&map.pb===undefined) map.pb=i;});if(map.nombre===undefined&&headers.length>0) map.nombre=0;return map;
+function detectarColumnasPrecios(headers, tipo){
+  const map={};
+  const normHeaders=headers.map(h=>norm(h));
+  normHeaders.forEach((nh,i)=>{ if(!nh) return; if(/prod|modelo|art|nombre|codigo|descripcion/.test(nh) && map.nombre===undefined) map.nombre=i; });
+  if(map.nombre===undefined && headers.length>0) map.nombre=0;
+  normHeaders.forEach((nh,i)=>{ if(/\bpb\b|puntos? bonific/.test(nh) && map.pb===undefined) map.pb=i; });
+  if(tipo==='dist'){
+    normHeaders.forEach((nh,i)=>{
+      if(map.precio!==undefined) return;
+      if(/(pcio|precio)\s*lista/.test(nh) || (/lista/.test(nh) && /contado/.test(nh) && /unif/.test(nh)) || /contado\s*unif/.test(nh) || /distribuidor/.test(nh)) map.precio=i;
+    });
+  } else if(tipo==='user'){
+    normHeaders.forEach((nh,i)=>{
+      if(map.precio!==undefined) return;
+      if(/sugerido/.test(nh) || /contado.*debito/.test(nh) || /1\s*cuota.*tc/.test(nh) || /contado.*1.*cuota/.test(nh) || /usuario/.test(nh)) map.precio=i;
+    });
+  }
+  if(map.precio===undefined){
+    normHeaders.forEach((nh,i)=>{
+      if(/precio|importe|valor|\$/.test(nh) && map.precio===undefined) map.precio=i;
+    });
+  }
+  return map;
 }
-function parsePreciosRows(rows){
+function parsePreciosRows(rows, tipo){
   if(!rows||rows.length<2) return [];
-  let headerRow=-1;for(let i=0;i<Math.min(rows.length,20);i++){const r=rows[i]||[];const c=r.filter(v=>{const s=(v||'').toString().toLowerCase();return /prod|modelo|nombre|precio|pb|punto/.test(s);}).length;if(c>=2){headerRow=i;break;}}if(headerRow===-1) headerRow=0;
-  const headerRaw=rows[headerRow]||[];const headers=headerRaw.map(c=>(c||'').toString().trim());const colMap=detectarColumnasPrecios(headers);const data=[];
-  for(let i=headerRow+1;i<rows.length;i++){const r=rows[i]||[];if(r.length===0||r.every(c=>!c)) continue;const nombreRaw=r[colMap.nombre];const nombre=(nombreRaw||'').toString().trim();if(!nombre||nombre.length<2) continue;let precio=0;if(colMap.precio!==undefined){const pv=r[colMap.precio];if(typeof pv==='number') precio=pv;else{let s=(''+pv).replace(/[^0-9.,-]/g,'').replace(',','.');let clean=s;if(clean.indexOf('.')!==-1&&clean.indexOf(',')!==-1){clean=clean.replace(/\./g,'').replace(',','.');}else if(clean.indexOf(',')!==-1){const parts=clean.split(',');if(parts[1]&&parts[1].length<=2) clean=parts[0].replace(/\./g,'')+'.'+parts[1];else clean=clean.replace(/,/g,'');}precio=parseFloat(clean)||0;}}if(precio===0){for(let j=0;j<r.length;j++){if(j===colMap.nombre) continue;const v=r[j];if(typeof v==='number'&&v>100){precio=v;break;}}}let pb=0;if(colMap.pb!==undefined){const pbRaw=r[colMap.pb];if(pbRaw!==undefined) pb=parseFloat((''+pbRaw).replace(',','.'))||0;}data.push({id:normalizeProducto(nombre)+'_'+i,nombre,nombreNorm:normalizeProducto(nombre),pb,precio,fila:i});}
+  let headerRow=-1;for(let i=0;i<Math.min(rows.length,20);i++){const r=rows[i]||[];const c=r.filter(v=>{const s=(v||'').toString().toLowerCase();return /prod|modelo|nombre|precio|pb|punto|sugerido|lista|contado|debito|pcio/.test(s);}).length;if(c>=2){headerRow=i;break;}}if(headerRow===-1) headerRow=0;
+  const headerRaw=rows[headerRow]||[];const headers=headerRaw.map(c=>(c||'').toString().trim());const colMap=detectarColumnasPrecios(headers, tipo);const data=[];
+  for(let i=headerRow+1;i<rows.length;i++){
+    const r=rows[i]||[];if(r.length===0||r.every(c=>!c)) continue;
+    const nombreRaw=r[colMap.nombre];const nombre=(nombreRaw||'').toString().trim();if(!nombre||nombre.length<2) continue;
+    let precio=0;
+    if(colMap.precio!==undefined){
+      const pv=r[colMap.precio];
+      if(typeof pv==='number') precio=pv;
+      else { let s=(''+pv).replace(/[^0-9.,-]/g,'').replace(',', '.'); precio=parseFloat(s)||0; }
+    }
+    if(precio===0){
+      for(let j=0;j<r.length;j++){
+        if(j===colMap.nombre) continue;
+        const v=r[j];
+        if(typeof v==='number'&&v>100){precio=v;break;}
+        const hNorm=normalizeProducto(headers[j]||'');
+        if(tipo==='dist' && /(pcio.*lista|lista.*contado|dist)/i.test(hNorm)){ const val=parseFloat((''+v).replace(/[^0-9.,-]/g,'').replace(',', '.'))||0; if(val>100){precio=val;break;} }
+        if(tipo==='user' && /(sugerido|contado.*debito|1.*cuota)/i.test(hNorm)){ const val=parseFloat((''+v).replace(/[^0-9.,-]/g,'').replace(',', '.'))||0; if(val>100){precio=val;break;} }
+      }
+    }
+    let pb=0;if(colMap.pb!==undefined){const pbRaw=r[colMap.pb];if(pbRaw!==undefined) pb=parseFloat((''+pbRaw).replace(',','.'))||0;}
+    if(precio<100) continue;
+    data.push({id:normalizeProducto(nombre)+'_'+i,nombre:nombre,nombreNorm:normalizeProducto(nombre),pb:pb,precio:precio,fila:i});
+  }
   return data;
 }
 function cruzarPreciosAdmin(){
@@ -322,7 +365,7 @@ async function procesarArchivoPrecio(file,tipo){
       const sheet=wb.SheetNames[0];
       const ws=wb.Sheets[sheet];
       const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
-      const parsed=parsePreciosRows(rows);
+      const parsed=parsePreciosRows(rows, tipo);
       if(parsed.length===0){alert('No se detectaron productos');return;}
       if(tipo==='dist'){preciosDistData=parsed;localStorage.setItem(DIST_KEY,JSON.stringify(parsed));showToast(`Dist: ${parsed.length} productos ✅`);}
       else{preciosUserData=parsed;localStorage.setItem(USER_KEY,JSON.stringify(parsed));showToast(`Usuario: ${parsed.length} productos ✅`);}
