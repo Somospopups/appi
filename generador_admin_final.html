@@ -320,25 +320,32 @@ function parsePrecioNumero(str){
   }
   const n=parseFloat(s); return isNaN(n)?0:n;
 }
-function parsePreciosDesdeTexto(texto){
+function parsePreciosDesdeTexto(texto, tipo){
   const lineas=texto.split(/\r?\n/).map(l=>l.trim()).filter(l=>l.length>3);
-  const datos=[]; const ignorar=/^(lista de precios|precio|producto|modelo|catalogo|vigencia|distribuidor|usuario|página|page|\d+ de \d+)/i;
-  for(const lineaRaw of lineas){
-    if(ignorar.test(lineaRaw)) continue;
-    let pb=0; let linea=lineaRaw;
-    const pbMatch=linea.match(/(\d+(?:[.,]\d+)?)\s*PB/i) || linea.match(/PB\s*[:\-]?\s*(\d+(?:[.,]\d+)?)/i);
-    if(pbMatch){ pb=parseFloat(pbMatch[1].replace(',','.'))||0; linea=linea.replace(pbMatch[0],'').trim(); }
-    const precioMatch=linea.match(/(?:\$\s*)?(\d{1,3}(?:[.,]\d{3})*(?:[.,]\d{2})?|\d{3,})\s*$/);
-    let precio=0; let nombre=linea;
-    if(precioMatch){ const precioStr=precioMatch[1]; precio=parsePrecioNumero(precioStr); if(precio>0){ nombre=linea.substring(0, precioMatch.index).trim().replace(/[\-–—·;:]+\\s*$/, '').trim(); } }
-    if(precio===0){
-      const todos=[...lineaRaw.matchAll(/(\d{1,3}(?:[.,]\d{3})*(?:[.,]\d{2})?)/g)];
-      if(todos.length>=1){ const ultimo=todos[todos.length-1][1]; const val=parsePrecioNumero(ultimo); if(val>=100){ precio=val; nombre=lineaRaw.substring(0, lineaRaw.lastIndexOf(todos[todos.length-1][1])).trim(); } }
+  const datos=[];
+  const ign=/^(lista de precios|precio|producto|modelo|catalogo|vigencia|distribuidor|usuario|página|page|\d+ de \d+|subtotal|total)/i;
+  for(const raw of lineas){
+    if(ign.test(raw)) continue;
+    let pb=0;let linea=raw;
+    const pbMatch=linea.match(/(\d+(?:[.,]\d+)?)\s*PB/i)||linea.match(/PB\s*[:\-]?\s*(\d+(?:[.,]\d+)?)/i);
+    if(pbMatch){pb=parseFloat(pbMatch[1].replace(',','.'))||0;linea=linea.replace(pbMatch[0],'').trim();}
+    const precioRegex=/\$?\s*(\d{1,3}(?:[.,]\d{3})*(?:[.,]\d{2})?)/g;
+    const matches=[...linea.matchAll(precioRegex)];
+    const validos=matches.map(m=>({raw:m[1],valor:parseNum(m[1]),index:m.index})).filter(p=>p.valor>=100);
+    if(validos.length===0) continue;
+    let precioElegido=0;let idx=-1;
+    if(tipo==='dist'){
+      precioElegido=validos[0].valor; idx=validos[0].index;
+    } else if(tipo==='user'){
+      precioElegido=validos[validos.length-1].valor; idx=validos[validos.length-1].index;
+    } else {
+      precioElegido=validos[validos.length-1].valor; idx=validos[validos.length-1].index;
     }
-    if(!nombre || nombre.length<3) continue;
-    if(precio<100) continue;
-    if(/^\d+$/.test(nombre)) continue;
-    datos.push({id:(nombre.toLowerCase().replace(/[^a-z0-9]+/g,'_')+'_'+datos.length), nombre:nombre, nombreNorm:nombre.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim(), pb, precio});
+    if(precioElegido<100) continue;
+    let nombreRaw=linea.substring(0, idx!==-1?idx:linea.length).trim();
+    nombreRaw=nombreRaw.replace(/\$?\s*\d[\d.,]+/g,'').replace(/\s{2,}/g,' ').trim().replace(/[-–—·;:.,]+$/,'').trim();
+    if(nombreRaw.length<4) continue;
+    datos.push({id:normalizeProducto(nombreRaw)+'_'+datos.length,nombre:nombreRaw,nombreNorm:normalizeProducto(nombreRaw),pb,precio:precioElegido});
   }
   return datos;
 }
@@ -349,7 +356,7 @@ async function procesarArchivoPrecio(file,tipo){
       showToast('📄 Leyendo PDF...', 'warning', 2000);
       const texto=await extraerTextoDePDF(file);
       console.log('Texto PDF', texto.slice(0,1000));
-      const parsed=parsePreciosDesdeTexto(texto);
+      const parsed=parsePreciosDesdeTexto(texto, tipo);
       if(parsed.length===0){ alert('No se detectaron productos en PDF. Texto:\\n\\n'+texto.slice(0,1000)+'\\n\\nVerifique que PDF tenga texto seleccionable, no sea imagen escaneada.'); return; }
       if(tipo==='dist'){preciosDistData=parsed;localStorage.setItem(DIST_KEY,JSON.stringify(parsed));showToast(`Dist (PDF): ${parsed.length} productos ✅`);}
       else{preciosUserData=parsed;localStorage.setItem(USER_KEY,JSON.stringify(parsed));showToast(`Usuario (PDF): ${parsed.length} productos ✅`);}

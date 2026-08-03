@@ -3703,6 +3703,11 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
       <button class="clear-btn" id="preciosSearchClear">✕</button>
     </div>
 
+    <div id="preciosLeyenda" style="display:none;padding:8px 12px;border-radius:10px;background:rgba(255,255,255,0.5);font-size:11px;line-height:1.3;margin-bottom:10px">
+      <span style="display:inline-block;width:10px;height:10px;background:#1d7a5c;border-radius:50%;margin-right:4px"></span> Verde = Ganancia (Usuario > Dist) · 
+      <span style="display:inline-block;width:10px;height:10px;background:#d9534f;border-radius:50%;margin:0 4px 0 8px"></span> Rojo = Pérdida o producto solo en un archivo
+    </div>
+
     <div class="filter-chips" id="preciosFilterChips" style="display:none"></div>
 
     <div id="preciosContent"></div>
@@ -8334,7 +8339,7 @@ function renderPrecios(){
           const elGan=document.getElementById('statGanancia'); if(elGan) elGan.textContent=(typeof formatPrecio!=='undefined'?formatPrecio(ganProm):'$'+Math.round(ganProm));
           const elMarg=document.getElementById('statMargen'); if(elMarg) elMarg.textContent=Math.round(margProm)+'%';
         }
-        if(searchBox) searchBox.style.display='flex';
+        if(searchBox) searchBox.style.display='flex'; const leyenda=document.getElementById('preciosLeyenda'); if(leyenda) leyenda.style.display='block';
         if(filterChips){
           filterChips.style.display='flex';
           filterChips.innerHTML=`<button class="filter-chip ${preciosFiltro==='all'?'active':''}" data-pf="all">Todos (${filtrados.length})</button><button class="filter-chip ${preciosFiltro==='ganancia'?'active':''}" data-pf="ganancia">Con ganancia</button><button class="filter-chip ${preciosFiltro==='sin_cruce'?'active':''}" data-pf="sin_cruce">Sin cruce</button>`;
@@ -8402,7 +8407,7 @@ function renderPrecios(){
       document.getElementById('statGanancia').textContent=formatPrecio(ganProm);
       document.getElementById('statMargen').textContent=Math.round(margProm)+'%';
     }
-    if(searchBox) searchBox.style.display='flex';
+    if(searchBox) searchBox.style.display='flex'; const leyenda=document.getElementById('preciosLeyenda'); if(leyenda) leyenda.style.display='block';
     if(filterChips){
       filterChips.style.display='flex';
       filterChips.innerHTML=`<button class="filter-chip ${preciosFiltro==='all'?'active':''}" data-pf="all">Todos (${filtrados.length})</button><button class="filter-chip ${preciosFiltro==='ganancia'?'active':''}" data-pf="ganancia">Con ganancia</button><button class="filter-chip ${preciosFiltro==='sin_cruce'?'active':''}" data-pf="sin_cruce">Sin cruce</button>`;
@@ -8440,7 +8445,7 @@ function renderPrecios(){
     const tipo= hasDist ? 'Distribuidor' : 'Usuario';
     const filtrados=preciosSearch ? data.filter(c=> normalizeProducto(c.nombre).includes(normalizeProducto(preciosSearch))) : data;
     if(resumen) resumen.style.display='none';
-    if(searchBox) searchBox.style.display='flex';
+    if(searchBox) searchBox.style.display='flex'; const leyenda=document.getElementById('preciosLeyenda'); if(leyenda) leyenda.style.display='block';
     if(filterChips) filterChips.style.display='none';
     if(content){
       content.innerHTML=`<div class="cat-chart"><h4>📋 ${tipo}: ${filtrados.length} productos</h4>${filtrados.map(c=>`<div class="person-item"><span class="pi-cat" style="background:${hasDist?'#4b7a55':'#f5b301'}">${c.pb?c.pb+' PB':'-'}</span><div class="pi-info"><div class="pi-name">${c.nombre}</div><div class="pi-meta">${tipo}: ${formatPrecio(c.precio)}${c.pb?' · '+c.pb+' PB':''}</div></div><div class="pi-pts">${formatPrecio(c.precio)}</div></div>`).join('')}</div>`;

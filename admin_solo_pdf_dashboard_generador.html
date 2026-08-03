@@ -152,16 +152,74 @@ function parseRows(rows, tipo){
 async function extraerPDF(file){
   const buf=await file.arrayBuffer();const pdf=await pdfjsLib.getDocument({data:buf}).promise;let txt='';for(let i=1;i<=pdf.numPages;i++){const page=await pdf.getPage(i);const c=await page.getTextContent();let items=c.items.map(it=>({str:it.str,x:it.transform[4],y:it.transform[5]}));items.sort((a,b)=>{if(Math.abs(a.y-b.y)>2) return b.y-a.y;return a.x-b.x;});let curY=null,line='';for(const it of items){if(curY===null) curY=it.y;if(Math.abs(it.y-curY)>3){txt+=line+'\n';line=it.str;curY=it.y;}else{if(line&&!line.endsWith(' ')&&!it.str.startsWith(' ')) line+=' ';line+=it.str;}}if(line) txt+=line+'\n';}return txt;
 }
-function parseTexto(texto){
-  const lines=texto.split(/\r?\n/).map(l=>l.trim()).filter(l=>l.length>3);const out=[];const ign=/^(lista de precios|precio|producto|modelo|catalogo|vigencia|distribuidor|usuario|página|page)/i;
+function parseTexto(texto, tipo){
+  const lines=texto.split(/\r?\n/).map(l=>l.trim()).filter(l=>l.length>3);
+  const out=[];
+  const ign=/^(lista de precios|precio|producto|modelo|catalogo|vigencia|distribuidor|usuario|página|page|\d+ de \d+|subtotal|total|hoja)/i;
+  // Detectar posiciones de columnas si hay encabezado con Pcio Lista vs Sugerido en la misma línea
   for(const raw of lines){
     if(ign.test(raw)) continue;
-    let pb=0;let line=raw;const m=line.match(/(\d+(?:[.,]\d+)?)\s*PB/i)||line.match(/PB\s*[:\-]?\s*(\d+(?:[.,]\d+)?)/i);if(m){pb=parseFloat(m[1].replace(',','.'))||0;line=line.replace(m[0],'').trim();}
-    let precio=0;let nombre=line;const pm=line.match(/(?:\$\s*)?(\d{1,3}(?:[.,]\d{3})*(?:[.,]\d{2})?|\d{3,})\s*$/);
-    if(pm){precio=parseNum(pm[1]);if(precio>0){nombre=line.substring(0,pm.index).trim().replace(/[-–—·;:]+$/,'').trim();}}
-    if(precio===0){const all=[...raw.matchAll(/(\d{1,3}(?:[.,]\d{3})*(?:[.,]\d{2})?)/g)];if(all.length>=1){const last=all[all.length-1][1];const v=parseNum(last);if(v>=100){precio=v;nombre=raw.substring(0,raw.lastIndexOf(all[all.length-1][1])).trim();}}}
-    if(!nombre||nombre.length<3||precio<100) continue;if(/^\d+$/.test(nombre)) continue;
-    out.push({nombre,nombreNorm:norm(nombre),pb,precio});
+    // Limpiar líneas que son solo números de página o fecha
+    if(/^\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}$/.test(raw)) continue;
+
+    let pb=0;
+    let linea=raw;
+    const pbMatch=linea.match(/(\d+(?:[.,]\d+)?)\s*PB/i)||linea.match(/PB\s*[:\-]?\s*(\d+(?:[.,]\d+)?)/i);
+    if(pbMatch){ pb=parseFloat(pbMatch[1].replace(',','.'))||0; linea=linea.replace(pbMatch[0],'').trim(); }
+
+    // Extraer TODOS los precios de la línea
+    const precioRegex = /\$?\s*(\d{1,3}(?:[.,]\d{3})*(?:[.,]\d{2})?)/g;
+    const matches=[...linea.matchAll(precioRegex)];
+    // Filtrar solo precios >= 100 (evitar PB y números chicos)
+    const preciosValidos=matches.map(m=>({raw:m[1],valor:parseNum(m[1]),index:m.index})).filter(p=>p.valor>=100);
+
+    if(preciosValidos.length===0) continue;
+
+    // Para archivos con múltiples columnas de precio en la misma línea,
+    // elegir según tipo y posición
+    let precioElegido=0;
+    let precioIndex=-1;
+    if(tipo==='dist'){
+      // Buscar columna que en el encabezado sería Pcio Lista - suele ser la primera columna de precio o la que está más a la izquierda entre los precios
+      // En PDFs de contado unificado, Pcio Lista suele ser el primer precio grande después del nombre
+      // Tomamos el primer precio válido
+      precioElegido=preciosValidos[0].valor;
+      precioIndex=preciosValidos[0].index;
+    } else if(tipo==='user'){
+      // Para usuario (Sugerido Contado - Debito 1 cuota), suele ser el último precio de la fila o el que está más a la derecha
+      // En el ejemplo: ACEITE ... $34.250 $34.250 $11.416 $34.250 -> el último es el sugerido
+      // Tomamos el último precio válido
+      precioElegido=preciosValidos[preciosValidos.length-1].valor;
+      precioIndex=preciosValidos[preciosValidos.length-1].index;
+      // Si hay 4 precios y el tipo es user, a veces el sugerido es el 2do o 3ro, pero probamos con el último
+      // Si hay patrón de 3 precios iguales + uno diferente (11.416), el diferente es cuota, no total - tomar el que más se repite o el último
+    } else {
+      // Sin tipo, tomar último
+      precioElegido=preciosValidos[preciosValidos.length-1].valor;
+      precioIndex=preciosValidos[preciosValidos.length-1].index;
+    }
+
+    if(precioElegido<100) continue;
+
+    // Nombre = texto antes del primer precio, limpio de números y símbolos
+    let nombreRaw=linea.substring(0, precioIndex!== -1 ? precioIndex : linea.length).trim();
+    // Quitar todos los precios que quedaron dentro del nombre
+    nombreRaw=nombreRaw.replace(/\$?\s*\d{1,3}(?:[.,]\d{3})*(?:[.,]\d{2})?/g,'').trim();
+    // Quitar caracteres raros al final
+    nombreRaw=nombreRaw.replace(/[-–—·;:.,]+\s*$/,'').trim();
+    // Si después de limpiar queda muy corto, usar la línea original sin precios
+    if(nombreRaw.length<3){
+      // Intentar tomar texto antes de números
+      const sinNumeros=raw.replace(/\$?\s*\d[\d.,]+/g,'').replace(/\s{2,}/g,' ').trim();
+      nombreRaw=sinNumeros;
+    }
+    // Filtrar nombres que son solo números o muy genéricos
+    if(!nombreRaw || nombreRaw.length<4) continue;
+    if(/^\d+$/.test(nombreRaw)) continue;
+    // Evitar líneas que son totales
+    if(/^(subtotal|total|suma|pagina)/i.test(nombreRaw)) continue;
+
+    out.push({nombre:nombreRaw,nombreNorm:norm(nombreRaw),pb,precio:precioElegido});
   }
   return out;
 }
