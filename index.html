@@ -3695,38 +3695,7 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
   <section id="view-precios" class="view">
     <header class="top"><button class="back-btn" id="btnBackPrecios" aria-label="Volver">‹</button><h1>Lista de</h1><div class="script">Precios</div><p>Distribuidor vs Usuario - Cruce automático</p></header>
 
-    <div class="career-card" style="border:1px solid rgba(58,208,164,0.25);background:linear-gradient(135deg,rgba(58,208,164,0.12),rgba(91,141,239,0.08))">
-      <h3>📥 Cargar archivos de precios</h3>
-      <p style="font-size:12px;color:#5c5c66;margin:0 0 12px;line-height:1.4">Cargá los 2 Excel como hacés con Mi Equipo. Columnas detectadas automáticamente: Producto, Modelo, PB, Precio. Formato .xls, .xlsx o .csv</p>
-      
-      <div style="padding:12px;border-radius:14px;background:rgba(91,141,239,0.12);border:1px solid rgba(91,141,239,0.20);margin-bottom:12px">
-        <div style="display:flex;align-items:center;gap:10px">
-          <div style="font-size:22px">☁️</div>
-          <div style="flex:1">
-            <b style="font-size:13px;display:block">Precios oficiales desde tu panel admin</b>
-            <small style="font-size:11px;color:#6b6b76;display:block" id="preciosOficialesStatus">Cargando precios oficiales...</small>
-          </div>
-          <div style="width:10px;height:10px;border-radius:50%;background:#a0a0b0" id="preciosOficialesDot"></div>
-        </div>
-        <div style="font-size:11px;color:#8a8a94;margin-top:8px;line-height:1.4">Solo vos (admin) cargás las 2 planillas en tu panel de claves. APPI las muestra acá automáticamente, ya cruzadas con ganancia. Los clientes no pueden editar.</div>
-      </div>
-      <div id="preciosOficialesMeta" style="display:none"></div>
-      <!-- Mantener inputs ocultos por compatibilidad pero no visibles -->
-      <div style="display:none"><input type="file" id="fileDistribuidor" accept=".xls,.xlsx,.csv" /><input type="file" id="fileUsuario" accept=".xls,.xlsx,.csv" /><span id="statusDistribuidor"></span><span id="statusUsuario"></span></div>
 
-      <div id="preciosResumen" style="display:none">
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px">
-          <div class="resumen-box ingresos" style="padding:10px"><div class="lbl">Productos cruzados</div><div class="val" id="statCruzados" style="font-size:18px">0</div></div>
-          <div class="resumen-box" style="padding:10px;background:rgba(58,208,164,0.12)"><div class="lbl" style="color:#1d7a5c">Ganancia prom.</div><div class="val" id="statGanancia" style="font-size:16px;color:#1d7a5c">-</div></div>
-          <div class="resumen-box" style="padding:10px;background:rgba(245,179,1,0.12)"><div class="lbl" style="color:#a3670b">Margen prom.</div><div class="val" id="statMargen" style="font-size:16px;color:#a3670b">-</div></div>
-        </div>
-      </div>
-
-      <div class="actions">
-        <button class="btn btn-secondary" id="btnPreciosEjemplo">📋 Ver ejemplo formato</button>
-        <button class="btn btn-danger" id="btnPreciosLimpiar" style="display:none">🗑️ Limpiar todo</button>
-      </div>
-    </div>
 
     <div class="search-box" id="preciosSearchBox" style="display:none">
       <span class="icon">🔍</span>
