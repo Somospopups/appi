@@ -8674,38 +8674,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   loadPreciosFromStorage();
 });
 
-// Actualizar Home para incluir Precios
-(function(){
-  const _origHomeToolsFinal = window.renderToolsList;
-  // Ya tenemos override final, ahora agregamos Precios a ese override si no está
-  const interval=setInterval(()=>{
-    if(typeof renderToolsList==='function'){
-      const orig=renderToolsList;
-      // Evitar doble wrap
-      if(orig.toString().includes('homeExtraTools')){ clearInterval(interval); 
-        // parchear el innerHTML de homeExtraTools para agregar Precios
-        const check=setInterval(()=>{
-          const el=document.getElementById('homeExtraTools');
-          if(el && !el.innerHTML.includes('Precios')){
-            // Re-render con 3 cards
-            const grid=el.querySelector('.home-tool-grid');
-            if(grid){
-              const preciosCard=`<button type="button" class="quick-tool-card" style="--accent:linear-gradient(135deg,#4b7a55,#3ad0a4); --pct:0%" onclick="openPrecios()">
-                <div class="quick-tool-top"><div class="quick-icon" style="background:linear-gradient(135deg,#4b7a55,#3ad0a4)">💲</div><span class="quick-state pending">2 archivos</span></div>
-                <h3>Lista Precios</h3>
-                <p>Distribuidor vs Usuario + ganancia</p>
-                <div class="quick-progress-line"><span style="width:0%"></span></div>
-              </button>`;
-              grid.innerHTML+=preciosCard;
-            }
-            clearInterval(check);
-          }
-        },1000);
-        clearInterval(interval);
-      }
-    }
-  },500);
-})();
+// Interval removido - ahora homeExtra incluye 3 cards fijo
 
 // Integrar con Calculadora: mostrar ganancia si hay precios cargados
 const _origCalcularTotalPB = typeof calcularTotalPB==='function' ? calcularTotalPB : null;
@@ -9278,7 +9247,7 @@ function renderHomeCompleto(){
 }
 
 
-// === OVERRIDE HOME TOOLS FINAL (after original definition) ===
+// === OVERRIDE HOME TOOLS FINAL (after original definition) - 3 CARDS FIJO ===
 (function(){
   const _origTools = renderToolsList;
   renderToolsList = function(){
@@ -9286,7 +9255,9 @@ function renderHomeCompleto(){
     try{
       const list=document.getElementById('toolsList');
       if(!list) return;
-      if(document.getElementById('homeExtraTools')) return;
+      // Siempre recrear para evitar que desaparezca al volver atrás
+      const existing=document.getElementById('homeExtraTools');
+      if(existing) existing.remove();
       const extra=document.createElement('div');
       extra.id='homeExtraTools';
       extra.className='home-section-block';
@@ -9305,10 +9276,16 @@ function renderHomeCompleto(){
             <p>Productos → PB → Categoría</p>
             <div class="quick-progress-line"><span style="width:0%"></span></div>
           </button>
+          <button type="button" class="quick-tool-card" style="--accent:linear-gradient(135deg,#4b7a55,#3ad0a4); --pct:0%" onclick="openPrecios()">
+            <div class="quick-tool-top"><div class="quick-icon" style="background:linear-gradient(135deg,#4b7a55,#3ad0a4)">💲</div><span class="quick-state pending">Oficial</span></div>
+            <h3>Lista Precios</h3>
+            <p>Distribuidor vs Usuario + ganancia</p>
+            <div class="quick-progress-line"><span style="width:0%"></span></div>
+          </button>
         </div>
       `;
       list.appendChild(extra);
-    }catch(e){}
+    }catch(e){ console.log('homeExtra error',e); }
   };
 })();
 
