@@ -8047,31 +8047,6 @@ function aplicarPreciosOficiales(data){
 // Cargar al iniciar la app, en segundo plano
 setTimeout(()=>{ fetchPreciosOficiales(); }, 1200);
 
-function cargarCalcProductosConOficial(){
-  // Intenta cargar de localStorage de admin, si no, default
-  try{
-    const oficialStr=localStorage.getItem(PRODUCTOS_OFICIALES_KEY);
-    if(oficialStr){
-      const oficial=JSON.parse(oficialStr);
-      if(Array.isArray(oficial) && oficial.length){
-        // Si el usuario nunca personalizó (CALC_KEY no existe), usar oficial
-        const customRaw=localStorage.getItem('calcProductos');
-        if(!customRaw){
-          return JSON.parse(JSON.stringify(oficial));
-        }
-      }
-    }
-  }catch(e){}
-  return null;
-}
-
-// Patch cargarCalcProductos para priorizar oficial si no hay custom
-const _origCargarCalcProductos = cargarCalcProductos;
-cargarCalcProductos = function(){
-  const conOficial=cargarCalcProductosConOficial();
-  if(conOficial) return conOficial;
-  return _origCargarCalcProductos();
-};
 
 
 
@@ -8200,15 +8175,7 @@ document.addEventListener('click',e=>{
     haptic(6);
     return;
   }
-  const wrapCalc=t.closest('#calcTabs');
-  if(wrapCalc){
-    const tab=t.dataset.ctab;
-    wrapCalc.querySelectorAll('.calc-tab').forEach(b=>b.classList.remove('active')); t.classList.add('active');
-    const target=document.getElementById('calcTab-'+tab); if(target) target.classList.add('active');
-    haptic(6);
-    return;
-  }
-});
+  });
 
 
 
@@ -8579,42 +8546,6 @@ document.addEventListener('DOMContentLoaded',()=>{
 // Interval removido - ahora homeExtra incluye 3 cards fijo
 
 // Integrar con Calculadora: mostrar ganancia si hay precios cargados
-const _origCalcularTotalPB = typeof calcularTotalPB==='function' ? calcularTotalPB : null;
-if(_origCalcularTotalPB){
-  calcularTotalPB = function(){
-    const total=_origCalcularTotalPB();
-    try{
-      // Si hay precios cruzados, mostrar ganancia estimada
-      const cruz=cruzarPrecios();
-      if(cruz.length>0 && typeof calcCantidades!=='undefined'){
-        const productos=cargarCalcProductos();
-        let gananciaTotal=0;
-        productos.forEach(p=>{
-          const qty=calcCantidades[p.id]||0;
-          if(qty>0){
-            const match=cruz.find(c=> normalizeProducto(c.nombre).includes(normalizeProducto(p.nombre)) || normalizeProducto(p.nombre).includes(normalizeProducto(c.nombre)) );
-            if(match) gananciaTotal+= (match.ganancia||0)*qty;
-          }
-        });
-        const equiv=document.getElementById('calcEquivCat');
-        if(equiv && gananciaTotal!==0){
-          equiv.innerHTML+=`<br/><span style="display:inline-flex;margin-top:6px;padding:4px 10px;border-radius:999px;background:rgba(58,208,164,0.15);color:#1d7a5c;font-size:11px;font-weight:900">💵 Ganancia est: ${formatPrecio(gananciaTotal)}</span>`;
-        }
-      }
-    }catch(e){}
-    return total;
-  };
-}
-
-
-const __btnCalcGuardar=document.getElementById('btnCalcGuardar');
-if(__btnCalcGuardar) __btnCalcGuardar.onclick=()=>{
-  const total=calcularTotalPB();
-  if(total<=0){ showToast('Primero cargá productos',1500); return; }
-  const d=cargarCarrera(); d.pb=total; guardarCarrera(d); renderCarrera(); showToast('PB guardados en Carrera: '+total+' ✅',2000);
-};
-const __btnCalcReset=document.getElementById('btnCalcReset');
-if(__btnCalcReset) __btnCalcReset.onclick=()=>{ calcCantidades={}; renderCalculadora(); showToast('Calculadora reseteada',1200); };
 
 // ==== ALERTAS DE EQUIPO ====
 // Genera alertas para equipo cercano a calificar
