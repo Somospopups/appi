@@ -8923,7 +8923,7 @@ function renderHomeCompleto(){
 }
 
 
-// === OVERRIDE HOME TOOLS FINAL - SOLO LISTA PRECIOS (Presentacion y Calculadora removidas por pedido) ===
+// === OVERRIDE HOME TOOLS FINAL - SOLO LISTA PRECIOS - BOTON SIMPLE ===
 (function(){
   const _origTools = renderToolsList;
   renderToolsList = function(){
@@ -8937,15 +8937,9 @@ function renderHomeCompleto(){
       extra.id='homeExtraTools';
       extra.className='home-section-block';
       extra.innerHTML=`
-        <div class="mini-section-label"><span>💲</span> Precios</div>
-        <div class="home-tool-grid">
-          <button type="button" class="quick-tool-card" style="--accent:linear-gradient(135deg,#4b7a55,#3ad0a4); --pct:100%;grid-column:1 / -1" onclick="openPrecios()">
-            <div class="quick-tool-top"><div class="quick-icon" style="background:linear-gradient(135deg,#4b7a55,#3ad0a4)">💲</div><span class="quick-state pending">Oficial</span></div>
-            <h3>Lista de Precios</h3>
-            <p>Distribuidor vs Usuario + ganancia - Actualizado desde panel admin</p>
-            <div class="quick-progress-line"><span style="width:100%"></span></div>
-          </button>
-        </div>
+        <button type="button" class="business-card" style="width:100%;justify-content:center;text-align:center;padding:18px" onclick="openPrecios()">
+          <h3 style="margin:0;font-size:16px;font-weight:900;letter-spacing:0.5px">LISTA DE PRECIOS</h3>
+        </button>
       `;
       list.appendChild(extra);
     }catch(e){ console.log('homeExtra error',e); }
