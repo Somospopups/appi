@@ -550,7 +550,7 @@
   body.dark .seguimiento-stat strong, body.dark .seguimiento-form h3, body.dark .seg-item-head h3, body.dark .seg-empty strong { color:#f0f0f5; }
   body.dark .seg-field input, body.dark .seg-field select, body.dark .seg-field textarea { background:rgba(30,30,50,.7); color:#f0f0f5; border-color:rgba(255,255,255,.12); }
 
-  /* ============ CARRERA PSA ============ */
+  /* ============ CARRERA ============ */
   .career-card{padding:16px;border-radius:20px;background:rgba(255,255,255,.62);border:1px solid rgba(255,255,255,.82);box-shadow:0 8px 22px rgba(80,90,130,.07);margin-bottom:12px}
   .career-card h3{margin:0 0 12px;color:#1c1c27;font-size:17px}.career-row{display:flex;justify-content:space-between;align-items:end;gap:12px}.career-big{font-size:30px;font-weight:950;color:#3d63c9}.career-small{display:block;color:#777887;font-size:11px;font-weight:850}.career-card input,.career-card select{width:100%;box-sizing:border-box;padding:11px;border:1px solid rgba(80,90,130,.16);border-radius:12px;background:rgba(255,255,255,.75);font:inherit}.career-bar{height:10px;margin:10px 0;border-radius:99px;background:rgba(80,90,130,.1);overflow:hidden}.career-bar span{display:block;height:100%;width:0;border-radius:inherit;background:linear-gradient(90deg,#3ad0a4,#5b8def)}.career-rule{padding:11px;border-radius:13px;background:rgba(91,141,239,.12);color:#50505c;font-size:12px;line-height:1.35}.career-rule b{display:block;color:#3d63c9;margin-bottom:3px}.career-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.career-label{display:block;color:#777887;font-size:11px;font-weight:900;margin-bottom:5px}body.dark .career-card{background:rgba(30,30,50,.55);border-color:rgba(255,255,255,.09)}body.dark .career-card h3{color:#f0f0f5}body.dark .career-card input,body.dark .career-card select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:rgba(255,255,255,.12)}
 </style>
@@ -3167,7 +3167,7 @@ body.dark .lock-footer { color: #6b6b76; }
 </style>
 
 <style>
-/* ===== CARRERA PSA MEJORADA ===== */
+/* ===== CARRERA MEJORADA ===== */
 .carrera-tabs{display:flex;gap:6px;padding:6px;border-radius:16px;background:rgba(255,255,255,.60);border:1px solid rgba(255,255,255,.75);margin-bottom:14px;overflow-x:auto}
 .carrera-tab{flex:1;min-width:max-content;padding:10px 12px;border-radius:12px;border:none;background:transparent;color:#6b6b76;font:inherit;font-size:12px;font-weight:850;cursor:pointer;white-space:nowrap;transition:all .2s ease}
 .carrera-tab.active{background:linear-gradient(135deg,#5b8def,#a06bff);color:#fff;box-shadow:0 4px 14px rgba(120,100,220,.35)}
@@ -3594,9 +3594,9 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
     <div id="presuHistList"></div>
   </section>
 
-  <!-- CARRERA PSA MEJORADA -->
+  <!-- CARRERA MEJORADA -->
   <section id="view-carrera" class="view">
-    <header class="top"><button class="back-btn" id="btnBackCarrera" aria-label="Volver">‹</button><h1>Mi</h1><div class="script">carrera PSA</div><p>Tu avance, explicado de forma simple</p></header>
+    <header class="top"><button class="back-btn" id="btnBackCarrera" aria-label="Volver">‹</button><h1>Mi</h1><div class="script">carrera</div><p>Tu avance, explicado de forma simple</p></header>
 
     <div class="carrera-tabs" id="carreraTabs">
       <button class="carrera-tab active" data-ctab="progreso">📈 Progreso</button>
@@ -3651,7 +3651,7 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
 
     <!-- TAB CATEGORIAS -->
     <div class="carrera-tab-content" id="careerTab-categorias">
-      <div class="section-hint"><span class="h-emo">🏆</span> Las 8 categorías del plan de carrera PSA. Tocá una para ver requisitos.</div>
+      <div class="section-hint"><span class="h-emo">🏆</span> Las 8 categorías del plan de carrera. Tocá una para ver requisitos.</div>
       <div id="careerCategoriesList" class="cat-timeline"></div>
       <div id="careerCategoryDetail"></div>
     </div>
@@ -3676,111 +3676,17 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
     <!-- TAB GLOSARIO -->
     <div class="carrera-tab-content" id="careerTab-glosario">
       <div class="career-card">
-        <h3>📘 Glosario PSA</h3>
+        <h3>📘 Glosario</h3>
         <div style="margin-top:10px">
-          <div style="padding:12px;border-radius:12px;background:rgba(255,255,255,.6);margin-bottom:8px"><b style="color:#3d63c9">PB (Puntos Bonificables)</b><br/><span style="font-size:12.5px;color:#5c5c66">Cada producto PSA vale cierta cantidad de PB. Tus PB personales determinan tu categoría y comisiones. Ej: Senior 4 ~ 4-5 PB.</span></div>
+          <div style="padding:12px;border-radius:12px;background:rgba(255,255,255,.6);margin-bottom:8px"><b style="color:#3d63c9">PB (Puntos Bonificables)</b><br/><span style="font-size:12.5px;color:#5c5c66">Cada producto vale cierta cantidad de PB. Tus PB personales determinan tu categoría y comisiones. Ej: Senior 4 ~ 4-5 PB.</span></div>
           <div style="padding:12px;border-radius:12px;background:rgba(255,255,255,.6);margin-bottom:8px"><b style="color:#1d7a5c">❤️ Corazón</b><br/><span style="font-size:12.5px;color:#5c5c66">Presentación completa del negocio a un invitado con seguimiento. 5 corazones = requisito para pasar a CE. Representa actividad de patrocinio.</span></div>
-          <div style="padding:12px;border-radius:12px;background:rgba(255,255,255,.6);margin-bottom:8px"><b style="color:#a3670b">🤝 Patrocinio</b><br/><span style="font-size:12.5px;color:#5c5c66">Persona que vos ingresás directamente a PSA. Si hace 9 PB, te ayuda a calificar bonus.</span></div>
+          <div style="padding:12px;border-radius:12px;background:rgba(255,255,255,.6);margin-bottom:8px"><b style="color:#a3670b">🤝 Patrocinio</b><br/><span style="font-size:12.5px;color:#5c5c66">Persona que vos ingresás directamente al equipo. Si hace 9 PB, te ayuda a calificar bonus.</span></div>
           <div style="padding:12px;border-radius:12px;background:rgba(255,255,255,.6);margin-bottom:8px"><b style="color:#7a4bd9">(A+B) / (A+B+C)</b><br/><span style="font-size:12.5px;color:#5c5c66">A=PB personales del mes, B=PB de organizaciones en mes presente, C=PB mes anterior. Usado para pase y mantenimiento.</span></div>
           <div style="padding:12px;border-radius:12px;background:rgba(255,255,255,.6);margin-bottom:8px"><b style="color:#d9534f">Mes Arrastre vs Calendario</b><br/><span style="font-size:12.5px;color:#5c5c66">Arrastre: 30 días corridos desde tu fecha de alta. Calendario: mes natural del 1 al 30/31.</span></div>
           <div style="padding:12px;border-radius:12px;background:rgba(255,255,255,.6);margin-bottom:8px"><b>🎯 PB Sólido</b><br/><span style="font-size:12.5px;color:#5c5c66">PB necesarios para cobrar la ganancia sólida de la categoría (150 PB DC, 600 PB CE, etc). Es un premio extra por alcanzar volumen organizacional.</span></div>
         </div>
       </div>
-      <div class="career-card"><h3>🎨 Colores por categoría</h3><p style="font-size:12px;color:#6b6b76;margin:0 0 10px">Actualizado según identidad PSA para coherencia visual.</p><div id="careerColorLegend"></div></div>
-    </div>
-  </section>
-
-  <!-- PRESENTACION DEL NEGOCIO -->
-  <section id="view-presentacion" class="view">
-    <header class="top"><button class="back-btn" id="btnBackPresentacion" aria-label="Volver">‹</button><h1>Presentación</h1><div class="script">del Negocio</div><p>Mostrá PSA en 2 minutos</p></header>
-
-    <div class="present-card" style="--accent:linear-gradient(135deg,#5b8def,#a06bff)">
-      <div class="present-icon" style="background:linear-gradient(135deg,#5b8def,#a06bff)">💧</div>
-      <h3>Los 4 Pilares de PSA</h3>
-      <div class="pilar-grid">
-        <div class="pilar-item"><div class="p-ico">🌿</div><b>Salud</b><small>Agua y aire puros para tu familia</small></div>
-        <div class="pilar-item"><div class="p-ico">💼</div><b>Negocio</b><small>Independiente y escalable</small></div>
-        <div class="pilar-item"><div class="p-ico">📚</div><b>Desarrollo</b><small>Crecimiento personal y profesional</small></div>
-        <div class="pilar-item"><div class="p-ico">⏰</div><b>Libertad</b><small>Tiempo y dinero a tu ritmo</small></div>
-      </div>
-    </div>
-
-    <div class="present-card" style="--accent:linear-gradient(135deg,#3ad0a4,#5b8def)">
-      <div class="present-icon" style="background:linear-gradient(135deg,#3ad0a4,#5b8def)">🏢</div>
-      <h3>La Empresa</h3>
-      <p><b>PSA es una división de Industrias Pugliese S.A.</b>, grupo argentino con más de 80 años de trayectoria. Fundada en 1990, pionera en purificación de agua domiciliaria en Argentina.</p>
-      <p>✔️ Líder indiscutida desde 1990<br/>✔️ Presencia en 8+ países LATAM y Europa<br/>✔️ Más de 1 millón de hogares con PSA<br/>✔️ Certificaciones ISO, AIDIS, WQA<br/>✔️ Empresa B certificada, compromiso ambiental<br/>✔️ Tecnología 100% desarrollada en Argentina</p>
-      <div class="tip" style="margin-top:10px">🧊 Dato curioso: PSA instaló purificadores hasta en la Antártida.</div>
-    </div>
-
-    <div class="present-card" style="--accent:linear-gradient(135deg,#f5b301,#ff8f6b)">
-      <div class="present-icon" style="background:linear-gradient(135deg,#f5b301,#ff8f6b)">💰</div>
-      <h3>El Negocio</h3>
-      <p><b>2 tipos de ingresos:</b></p>
-      <div class="pilar-grid">
-        <div class="pilar-item" style="background:rgba(58,208,164,.12)"><div class="p-ico">🛒</div><b>Activos</b><small>Venta directa y posventa de purificadores</small></div>
-        <div class="pilar-item" style="background:rgba(91,141,239,.12)"><div class="p-ico">🌳</div><b>Pasivos</b><small>Comisiones por el equipo que ayudás a formar</small></div>
-      </div>
-      <p style="margin-top:12px">Modelo <b>Flex Marketing Plan®</b>: único, con lo mejor del marketing de redes pero sin sus rigideces. Vos sos dueño de tu negocio, manejás horarios y zona.</p>
-      <div class="prod-list">
-        <div class="prod-item"><div class="prod-ico">💵</div><div class="prod-info"><b>Ganancias inmediatas</b><small>30% promedio por venta directa</small></div></div>
-        <div class="prod-item"><div class="prod-ico">📈</div><div class="prod-info"><b>Crecimiento exponencial</b><small>A medida que tu equipo crece, tu ingreso también</small></div></div>
-        <div class="prod-item"><div class="prod-ico">🏖️</div><div class="prod-info"><b>Viajes y reconocimientos</b><small>Desde CE en adelante</small></div></div>
-      </div>
-    </div>
-
-    <div class="present-card" style="--accent:linear-gradient(135deg,#5b8def,#a06bff)">
-      <div class="present-icon" style="background:linear-gradient(135deg,#a06bff,#ff6b9d)">💧</div>
-      <h3>El Producto</h3>
-      <p>Purificadores de <b>agua</b> y <b>aire</b> con tecnología de vanguardia. Bacteriológicos, eliminan cloro, metales pesados, trihalometanos.</p>
-      <div class="prod-list">
-        <div class="prod-item"><div class="prod-ico">🚰</div><div class="prod-info"><b>Línea Senior</b><small>Senior 2, 3, 4 – Sobre y bajo mesada – 3 años de vida útil</small></div></div>
-        <div class="prod-item"><div class="prod-ico">💎</div><div class="prod-info"><b>Línea Vero / Mini / Rotoplas</b><small>Diferentes necesidades y presupuestos</small></div></div>
-        <div class="prod-item"><div class="prod-ico">🚿</div><div class="prod-info"><b>Ducha PSA</b><small>Ideal para piel y alergias</small></div></div>
-        <div class="prod-item"><div class="prod-ico">🌬️</div><div class="prod-info"><b>Purificador de Aire</b><small>Bacterias, polvo, polen, humo</small></div></div>
-        <div class="prod-item"><div class="prod-ico">♻️</div><div class="prod-info"><b>Posventa sostenible</b><small>Filtros de repuesto cada 3-6 meses, fidelización del cliente</small></div></div>
-      </div>
-    </div>
-
-    <div class="present-card" style="--accent:linear-gradient(135deg,#a06bff,#ff6b9d)">
-      <div class="present-icon" style="background:linear-gradient(135deg,#ff8f6b,#ff6b9d)">✨</div>
-      <h3>Vos: el factor decisivo</h3>
-      <p>PSA pone la empresa, el producto y el plan. <b>Vos ponés la actitud.</b></p>
-      <p>3 claves del éxito:<br/>🔥 <b>Aprender</b> – Sistema de capacitación continuo<br/>🔥 <b>Hacer</b> – Demostraciones, corazones, patrocinios<br/>🔥 <b>Enseñar</b> – Duplicar y formar tu equipo</p>
-      <div style="margin-top:12px;padding:12px;border-radius:14px;background:linear-gradient(135deg,rgba(91,141,239,.12),rgba(255,107,157,.10));border:1px dashed rgba(91,141,239,.2);font-size:13px;line-height:1.45">“Este negocio puede solucionarte dos de los problemas más grandes: tiempo y dinero.”<br/><small style="color:#8a8a94">– Filosofía PSA</small></div>
-      <div class="actions" style="margin-top:14px"><button class="btn whatsapp" id="btnPresentCompartir">📤 Compartir esta presentación</button></div>
-    </div>
-  </section>
-
-  <!-- CALCULADORA PB -->
-  <section id="view-calculadora" class="view">
-    <header class="top"><button class="back-btn" id="btnBackCalculadora" aria-label="Volver">‹</button><h1>Calculadora</h1><div class="script">de PB</div><p>Convertí productos en avance</p></header>
-
-    <div class="calc-tabs" id="calcTabs"><button class="calc-tab active" data-ctab="productos">📦 Productos → PB</button><button class="calc-tab" data-ctab="categoria">🎯 PB → Categoría</button></div>
-
-    <div id="calcTab-productos" class="carrera-tab-content active">
-      <div class="career-card">
-        <h3>📦 Productos del mes</h3>
-        <p style="font-size:12px;color:#6b6b76;margin:0 0 10px;line-height:1.4">Tocá + / –. Los PB se calculan automáticamente. Podés editar los PB por producto.</p>
-        <div id="calcProductosList"></div>
-        <div class="calc-result" id="calcTotalResult"><div class="lbl">PB Totales generados</div><div class="big" id="calcTotalPB">0</div><div class="lbl" id="calcEquivCat">—</div></div>
-        <div class="actions" style="margin-top:12px"><button class="btn primary" id="btnCalcGuardar">💾 Guardar en Carrera</button><button class="btn" id="btnCalcReset">↺ Reset</button></div>
-      </div>
-      <div class="career-card">
-        <h3>⚙️ Editar valores PB</h3>
-        <p style="font-size:12px;color:#777887">Si tu lista cambia, editala. Se guarda local.</p>
-        <div id="calcEditList" style="margin-top:10px"></div>
-        <div class="actions"><button class="btn primary" id="btnCalcSaveEdit">Guardar productos</button></div>
-      </div>
-    </div>
-
-    <div id="calcTab-categoria" class="carrera-tab-content">
-      <div class="career-card">
-        <h3>🎯 ¿Dónde estás?</h3>
-        <label class="career-label">Ingresá tus PB personales actuales</label>
-        <input id="calcInputPB" type="number" min="0" placeholder="Ej: 11" style="width:100%;padding:12px;border-radius:12px;border:1px solid rgba(80,90,130,.16);background:rgba(255,255,255,.75);font:inherit;margin-top:6px"/>
-        <div id="calcCategoriaResult" style="margin-top:14px"></div>
-      </div>
+      <div class="career-card"><h3>🎨 Colores por categoría</h3><p style="font-size:12px;color:#6b6b76;margin:0 0 10px">Actualizado según identidad de marca para coherencia visual.</p><div id="careerColorLegend"></div></div>
     </div>
   </section>
 
@@ -4302,7 +4208,7 @@ const RUEDAS = {
   negocio: {
     id: 'negocio', title: 'Rueda', script: 'del Negocio',
     storageDraft: 'ruedaNegocioDraft', storageHist: 'ruedaNegocioHist',
-    intro: 'Así como te acercamos la Rueda de la Vida, te recomendamos la Rueda del Negocio. Esta te invita a reflexionar sobre las diferentes áreas del Negocio PSA y cuál es, del 0 al 10, tu nivel de acción y compromiso con cada una. Tomate unos minutos para analizarlo sinceramente. Si lo hacés, puede ser una herramienta muy poderosa para transformar tus resultados en la actividad. El objetivo, nuevamente, es la estabilidad de la rueda. Te recomendamos llevarla adelante con tu Línea Ascendente.',
+    intro: 'Así como te acercamos la Rueda de la Vida, te recomendamos la Rueda del Negocio. Esta te invita a reflexionar sobre las diferentes áreas del Negocio y cuál es, del 0 al 10, tu nivel de acción y compromiso con cada una. Tomate unos minutos para analizarlo sinceramente. Si lo hacés, puede ser una herramienta muy poderosa para transformar tus resultados en la actividad. El objetivo, nuevamente, es la estabilidad de la rueda. Te recomendamos llevarla adelante con tu Línea Ascendente.',
     areas: [
       { key:'proposito',    name:'Propósito',    color:'#5b8def', desc:'¿Sé cuál es mi propósito? ¿Cuál es el sueño que me alimenta día a día a llevar adelante esta actividad y mis acciones diarias?' },
       { key:'metas',        name:'Metas',        color:'#7a6bff', desc:'¿Planteo mis metas en función de mis sueños y objetivos? ¿Las tengo presentes al momento de planificar mi mes, semana y día? ¿Son medibles, específicas? ¿Tienen un tiempo determinado? ¿Son alcanzables y superables?' },
@@ -4334,7 +4240,7 @@ function showView(id){
   document.querySelectorAll('nav.tabs button').forEach(b=>{
     b.classList.toggle('active', b.dataset.view===id);
   });
-  const hideTabsOn = ['view-home','view-siete','view-siete-detail','view-presu','view-presu-hist','view-equipo','view-seguimiento','view-carrera','view-planning','view-presentacion','view-calculadora','view-precios'];
+  const hideTabsOn = ['view-home','view-siete','view-siete-detail','view-presu','view-presu-hist','view-equipo','view-seguimiento','view-carrera','view-planning','view-precios'];
   document.getElementById('tabs').style.display = hideTabsOn.includes(id) ? 'none' : 'flex';
   if(id==='view-history') renderHistory();
   if(id==='view-eval')    renderAreas();
@@ -4343,8 +4249,6 @@ function showView(id){
   if(id==='view-planning') renderPlanningTools();
   if(id==='view-seguimiento') renderSeguimiento();
   if(id==='view-carrera') renderCarrera();
-  if(id==='view-presentacion') renderPresentacion();
-  if(id==='view-calculadora') renderCalculadora();
   if(id==='view-precios') renderPrecios();
   document.body.classList.toggle('evaluar-hint', id === 'view-wheel');
   window.scrollTo({top:0});
@@ -4376,7 +4280,7 @@ document.getElementById('btnBackPresuHist').addEventListener('click', ()=> showV
 document.getElementById('btnBackEquipo').addEventListener('click', ()=> showView('view-home'));
 document.getElementById('btnBackSeguimiento').addEventListener('click', ()=> showView('view-home'));
 document.getElementById('btnBackCarrera').addEventListener('click', ()=> { if(history.length>1){ history.back(); setTimeout(asegurarAcceso,150);} else showView('view-home'); });
-const _bPres=document.getElementById('btnBackPresentacion'); if(_bPres) _bPres.addEventListener('click',()=>showView('view-home'));
+
 const _bCalc=document.getElementById('btnBackCalculadora'); if(_bCalc) _bCalc.addEventListener('click',()=>showView('view-home'));
 const _bPrec=document.getElementById('btnBackPrecios'); if(_bPrec) _bPrec.addEventListener('click',()=>{ if(window.history.length>1) { window.history.back(); setTimeout(asegurarAcceso, 150); } else { showView('view-home'); } });
 document.getElementById('btnBackPlanning').addEventListener('click', ()=> showView('view-home'));
@@ -8035,8 +7939,8 @@ function obtenerProximoPaso(){
   return { icon:'📤', tone:'done', label:'Mes ordenado', title:'Compartí tu informe mensual', desc:'Ya tenés las herramientas principales cargadas. Enviá un resumen por WhatsApp.', btn:'Compartir resumen', run:(e)=>compartirConsolidado(e), done:true };
 }
 
-const CAREER_KEY='carreraPSA';
-const PSA_CATEGORIES=[
+const CAREER_KEY='carrera';
+const CAREER_CATEGORIES=[
   {code:'DJ',name:'Distribuidor Junior',short:'DJ',icon:'🌱',color:'#e8e8ec',textColor:'#1c1c1e',border:'none',level:0,desc:'Primer paso. Aprendizaje de productos y negocio.',req:['Solicitud de adhesión','Kit de acceso','Primer purificador','Reempadronamiento'],pase:'Ingreso con kit. Sin PB previo.',periodo:'Inmediato',mantenimiento:'No aplica en esta etapa',beneficios:['Acceso a productos con descuento base','Capacitación inicial','Acompañamiento del patrocinador'],pbSolido:0,detallePB:'Sin sólido. Objetivo pasar a D con 13 PB personales.',pbNecesario:0},
   {code:'D',name:'Distribuidor',short:'D',icon:'⭐',color:'#ffffff',textColor:'#1c1c1e',border:'solid',level:1,desc:'Primer nivel calificado. Ya podés formar equipo.',req:['13 PB personales','DJ directos calificados','Programa Capacitación Básica'],pase:'13 PB personales + DJ directos. Opciones: Mes Arrastre / Mes Calendario',periodo:'1 mes calendario',mantenimiento:'(A + B) = 2 PB en 2 de 3 meses del trimestre',beneficios:['3% descuento en compras','5% comisión sobre organización DJ','Acceso a Bonus por patrocinios'],pbSolido:0,detallePB:'Mantener con 2 PB',pbNecesario:13},
   {code:'DC',name:'Distribuidor Calificado',short:'DC',icon:'🏆',color:'#f7c630',textColor:'#1c1c1e',border:'none',level:2,desc:'Liderás pequeños equipos. Primeras ganancias sólidas.',req:['(A + B) = 13 PB en 3 organizaciones D','Al menos 2 líneas diferentes','Evaluación de liderazgo'],pase:'(A + B) = 13 PB en 3 org D',periodo:'1 mes calendario',mantenimiento:'(A + B + C) = 17 PB en 2 de 3 meses del trimestre',beneficios:['7% descuento','15% sobre org DJ','10% sobre org D','Sólido de 150 PB'],pbSolido:150,detallePB:'Sólido 150 PB',pbNecesario:13},
@@ -8136,7 +8040,6 @@ function aplicarPreciosOficiales(data){
   }catch(e){}
 
   try{ if(document.getElementById('view-carrera')?.classList.contains('active')) renderGananciasTablas(); }catch(e){}
-  try{ if(document.getElementById('view-calculadora')?.classList.contains('active')) renderCalculadora(); }catch(e){}
   try{ if(document.getElementById('view-precios')?.classList.contains('active')) renderPrecios(); }catch(e){}
 }
 
@@ -8175,7 +8078,7 @@ cargarCalcProductos = function(){
 const CAT_LEVEL={DJ:0,D:1,DC:2,CE:3,L:4,LE:5,EJ:6,E:7};
 
 function obtenerNivelCat(code){ return CAT_LEVEL[(code||'').toUpperCase()] ?? 0; }
-function catPorNivel(n){ return PSA_CATEGORIES.find(c=>c.level===n) || PSA_CATEGORIES[0]; }
+function catPorNivel(n){ return CAREER_CATEGORIES.find(c=>c.level===n) || CAREER_CATEGORIES[0]; }
 
 function cargarCarrera(){try{return JSON.parse(localStorage.getItem(CAREER_KEY)||'{}')}catch(e){return {}}}
 function guardarCarrera(d){localStorage.setItem(CAREER_KEY,JSON.stringify(d));localStorage.setItem('lastUpdate_carrera',Date.now().toString())}
@@ -8208,7 +8111,7 @@ function renderCarrera(){
 
 function renderCareerCategories(selected){
   const list=document.getElementById('careerCategoriesList'); if(!list) return;
-  list.innerHTML=PSA_CATEGORIES.map(c=>{
+  list.innerHTML=CAREER_CATEGORIES.map(c=>{
     const isSel=c.code===selected;
     const textColor=c.textColor||'#fff';
     const border=c.border==='solid'?'border:2px solid #1c1c1e;':(c.color==='#ffffff'?'border:1.5px solid #d0d0d8;':'');
@@ -8221,7 +8124,7 @@ function renderCareerCategories(selected){
 
 function renderCareerCategoryDetail(code){
   const cont=document.getElementById('careerCategoryDetail'); if(!cont) return;
-  const c=PSA_CATEGORIES.find(x=>x.code===code)||PSA_CATEGORIES[0];
+  const c=CAREER_CATEGORIES.find(x=>x.code===code)||CAREER_CATEGORIES[0];
   const textColor=c.textColor||'#fff';
   const border=c.border==='solid'?'border:2px solid #1c1c1e;':(c.color==='#ffffff'?'border:1.5px solid #d0d0d8;':'');
   cont.innerHTML=`<div class="cat-detail-card" style="--catColor:${c.color}">
@@ -8269,7 +8172,7 @@ function renderNextCategoryCard(actualCode,pb){
 
 function renderColorLegend(){
   const cont=document.getElementById('careerColorLegend'); if(!cont) return;
-  cont.innerHTML=PSA_CATEGORIES.map(c=>{
+  cont.innerHTML=CAREER_CATEGORIES.map(c=>{
     const textColor=c.textColor||'#fff';
     const border=c.border==='solid'?'border:1.5px solid #1c1c1e;':(c.color==='#ffffff'?'border:1.5px solid #d0d0d8;':'');
     return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px dashed rgba(80,90,130,.10)"><span style="width:28px;height:28px;border-radius:8px;background:${c.color};color:${textColor};${border};display:grid;place-items:center;font-size:14px;font-weight:900">${c.code}</span><b style="min-width:70px;font-size:13px">${c.name}</b><span style="font-size:11px;color:#6b6b76">${c.color}</span></div>`;
@@ -8285,7 +8188,7 @@ const __trim=document.getElementById('btnCareerTrim'); if(__trim) __trim.onclick
 const __bonus=document.getElementById('btnCareerBonus'); if(__bonus) __bonus.onclick=()=>{const d=cargarCarrera();d.patrocinios=+document.getElementById('careerPatrocinios').value||0;d.organizaciones=+document.getElementById('careerOrganizaciones').value||0;d.patrociniosCalif=Math.min(2,Math.max(0,+document.getElementById('careerPatrociniosCalif').value||0));d.bonusPb=+document.getElementById('careerBonusPb').value||0;guardarCarrera(d);renderCarrera();showToast('Actividad guardada ✅',1800);};
 const __vals=document.getElementById('btnCareerValues'); if(__vals) __vals.onclick=()=>{const d=cargarCarrera();d.valorPb=document.getElementById('careerValorPb').value;d.bonus1=document.getElementById('careerBonus1').value;d.bonus2=document.getElementById('careerBonus2').value;d.moneda=document.getElementById('careerMoneda').value;guardarCarrera(d);showToast('Valores guardados ✅',1800);renderGananciasTablas();};
 
-// Tabs carrera
+// Tabs carrera (presentacion y calculadora removidas)
 document.addEventListener('click',e=>{
   const t=e.target.closest('[data-ctab]'); if(!t) return;
   const wrapCarrera=t.closest('#carreraTabs');
@@ -8301,7 +8204,6 @@ document.addEventListener('click',e=>{
   if(wrapCalc){
     const tab=t.dataset.ctab;
     wrapCalc.querySelectorAll('.calc-tab').forEach(b=>b.classList.remove('active')); t.classList.add('active');
-    document.querySelectorAll('#view-calculadora .carrera-tab-content').forEach(c=>c.classList.remove('active'));
     const target=document.getElementById('calcTab-'+tab); if(target) target.classList.add('active');
     haptic(6);
     return;
@@ -8705,163 +8607,6 @@ if(_origCalcularTotalPB){
 }
 
 
-// ==== PRESENTACION ====
-function renderPresentacion(){ /* nothing heavy */ }
-function openPresentacion(){showView('view-presentacion');}
-const __btnPresComp=document.getElementById('btnPresentCompartir');
-if(__btnPresComp){
-  __btnPresComp.onclick=async()=>{
-    const msg=`💧 *PSA - Oportunidad de Negocio*
-━━━━━━━━━━━━━━━
-🏢 *La Empresa*
-PSA, división de Industrias Pugliese S.A. (desde 1942). Fundada en 1990, pionera en purificación de agua. Líder con +1M hogares, presencia en 8 países, Empresa B.
-
-💰 *El Negocio*
-2 ingresos: Activos (venta directa) y Pasivos (comisiones por equipo). Modelo Flex Marketing Plan®. Vos manejás horarios y zona.
-
-💧 *El Producto*
-Purificadores de agua (Senior, Vero, Mini, Ducha) y aire. Tecnología argentina, 3 años vida útil, filtros de repuesto = clientes fidelizados.
-
-✨ *Vos*
-3 claves: Aprender, Hacer, Enseñar. PSA pone empresa, producto y plan. Vos ponés actitud. Tiempo y dinero a tu ritmo.
-
-¿Te cuento más en 5 min?`;
-    try{ if(navigator.share){ await navigator.share({title:'PSA Presentación', text:msg}); return; } }catch(e){}
-    window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
-  };
-}
-
-// ==== CALCULADORA PB ====
-const CALC_KEY='calcProductos';
-const CALC_DEFAULT=[
-  {id:'senior4',nombre:'PSA Senior 4',pb:5,cat:'Purificador',icon:'🚰'},
-  {id:'senior3',nombre:'PSA Senior 3',pb:4,cat:'Purificador',icon:'🚰'},
-  {id:'vero',nombre:'PSA Vero / Rotoplas',pb:3.5,cat:'Purificador',icon:'💎'},
-  {id:'mini',nombre:'PSA Mini',pb:2,cat:'Purificador',icon:'🔹'},
-  {id:'ducha',nombre:'PSA Ducha',pb:1.5,cat:'Purificador',icon:'🚿'},
-  {id:'aire',nombre:'Purificador de Aire',pb:4,cat:'Aire',icon:'🌬️'},
-  {id:'filtro_s',nombre:'Pack Filtros Senior (x4)',pb:0.8,cat:'Repuesto',icon:'♻️'},
-  {id:'filtro_v',nombre:'Filtro Vero / Mini',pb:0.5,cat:'Repuesto',icon:'♻️'}
-];
-
-function cargarCalcProductos(){
-  try{
-    const raw=localStorage.getItem(CALC_KEY);
-    if(raw){ const a=JSON.parse(raw); if(Array.isArray(a)&&a.length) return a; }
-  }catch(e){}
-  return JSON.parse(JSON.stringify(CALC_DEFAULT));
-}
-function guardarCalcProductos(list){localStorage.setItem(CALC_KEY,JSON.stringify(list));}
-
-let calcCantidades={}; // id -> qty
-
-function renderCalculadora(){
-  const productos=cargarCalcProductos();
-  // init cantidades
-  productos.forEach(p=>{ if(calcCantidades[p.id]===undefined) calcCantidades[p.id]=0; });
-
-  const listEl=document.getElementById('calcProductosList');
-  if(listEl){
-    listEl.innerHTML=productos.map(p=>{
-      const qty=calcCantidades[p.id]||0;
-      return `<div class="calc-prod"><div class="calc-info"><b>${p.icon} ${p.nombre}</b><small>${p.cat} · ${p.pb} PB c/u</small></div><div class="calc-ctrl"><button data-dec="${p.id}">−</button><span class="calc-num">${qty}</span><button data-inc="${p.id}">+</button></div></div>`;
-    }).join('');
-    listEl.querySelectorAll('[data-inc]').forEach(b=>{ b.onclick=()=>{ calcCantidades[b.dataset.inc]=(calcCantidades[b.dataset.inc]||0)+1; renderCalculadora(); calcularTotalPB(); }});
-    listEl.querySelectorAll('[data-dec]').forEach(b=>{ b.onclick=()=>{ const id=b.dataset.dec; calcCantidades[id]=Math.max(0,(calcCantidades[id]||0)-1); renderCalculadora(); calcularTotalPB(); }});
-  }
-
-  const editEl=document.getElementById('calcEditList');
-  if(editEl){
-    editEl.innerHTML=productos.map(p=>`<div style="display:flex;gap:8px;margin-bottom:8px;align-items:center"><input data-editname="${p.id}" value="${p.nombre}" style="flex:1;padding:8px;border-radius:8px;border:1px solid rgba(80,90,130,.15);font:inherit;font-size:12.5px"/><input data-editpb="${p.id}" type="number" step="0.1" value="${p.pb}" style="width:70px;padding:8px;border-radius:8px;border:1px solid rgba(80,90,130,.15);font:inherit;font-size:12.5px"/><button data-delprod="${p.id}" style="border:none;background:rgba(217,83,79,.12);color:#d9534f;border-radius:8px;padding:8px 10px;font-weight:900">✕</button></div>`).join('')+`<div style="display:flex;gap:8px;margin-top:10px"><input id="newProdName" placeholder="Nuevo producto" style="flex:1;padding:8px;border-radius:8px;border:1px dashed rgba(80,90,130,.3);font:inherit;font-size:12.5px"/><input id="newProdPB" type="number" step="0.1" placeholder="PB" style="width:70px;padding:8px;border-radius:8px;border:1px solid rgba(80,90,130,.15);font:inherit;font-size:12.5px"/><button id="btnAddProd" style="padding:8px 14px;border-radius:8px;border:none;background:linear-gradient(135deg,#3ad0a4,#5b8def);color:#fff;font-weight:900">+</button></div>`;
-    editEl.querySelectorAll('[data-delprod]').forEach(b=>{ b.onclick=()=>{ const id=b.dataset.delprod; const filtered=cargarCalcProductos().filter(p=>p.id!==id); guardarCalcProductos(filtered); delete calcCantidades[id]; renderCalculadora(); }});
-    const btnAdd=document.getElementById('btnAddProd');
-    if(btnAdd) btnAdd.onclick=()=>{
-      const name=(document.getElementById('newProdName').value||'').trim();
-      const pb=parseFloat(document.getElementById('newProdPB').value)||0;
-      if(!name||pb<=0){ showToast('Completá nombre y PB',1800); return; }
-      const lista=cargarCalcProductos();
-      const id=name.toLowerCase().replace(/\s+/g,'_')+'_'+Date.now();
-      lista.push({id,nombre:name,pb,cat:'Personalizado',icon:'⭐'});
-      guardarCalcProductos(lista);
-      document.getElementById('newProdName').value=''; document.getElementById('newProdPB').value='';
-      renderCalculadora(); showToast('Producto agregado ✅',1500);
-    };
-    const btnSaveEdit=document.getElementById('btnCalcSaveEdit');
-    if(btnSaveEdit) btnSaveEdit.onclick=()=>{
-      const lista=cargarCalcProductos();
-      lista.forEach(p=>{
-        const inName=document.querySelector(`[data-editname="${p.id}"]`);
-        const inPB=document.querySelector(`[data-editpb="${p.id}"]`);
-        if(inName) p.nombre=inName.value.trim()||p.nombre;
-        if(inPB) p.pb=parseFloat(inPB.value)||p.pb;
-      });
-      guardarCalcProductos(lista);
-      renderCalculadora(); calcularTotalPB(); showToast('Productos guardados ✅',1500);
-    };
-  }
-
-  calcularTotalPB();
-  // calc categoria result bind
-  const inpPB=document.getElementById('calcInputPB');
-  if(inpPB){
-    inpPB.oninput=()=>renderCalcCategoria(+inpPB.value||0);
-    renderCalcCategoria(+inpPB.value||0);
-  }
-
-  // tabs calculadora
-  const ctabs=document.getElementById('calcTabs');
-  if(ctabs){
-    ctabs.querySelectorAll('[data-ctab]').forEach(b=>{
-      b.onclick=()=>{
-        ctabs.querySelectorAll('.calc-tab').forEach(x=>x.classList.remove('active')); b.classList.add('active');
-        document.querySelectorAll('#view-calculadora .carrera-tab-content').forEach(c=>c.classList.remove('active'));
-        const target=document.getElementById('calcTab-'+b.dataset.ctab); if(target) target.classList.add('active');
-        haptic(6);
-      };
-    });
-  }
-}
-
-function calcularTotalPB(){
-  const productos=cargarCalcProductos();
-  let total=0;
-  productos.forEach(p=>{ total+= (calcCantidades[p.id]||0)* (parseFloat(p.pb)||0); });
-  total=Math.round(total*10)/10;
-  const el=document.getElementById('calcTotalPB'); if(el) el.textContent=total;
-  const equiv=document.getElementById('calcEquivCat'); if(equiv){
-    const nivel=obtenerNivelPorPB(total);
-    const cat=catPorNivel(nivel);
-    equiv.innerHTML=`Equivale a <span class="calc-cat-badge" style="background:${cat.color};color:${cat.textColor||'#fff'}">${cat.code} – ${cat.name}</span><br/>${total>0?'Próximo: '+ (catPorNivel(Math.min(7,nivel+1)).name):''}`;
-  }
-  return total;
-}
-
-function obtenerNivelPorPB(pb){
-  // escalon simple por PB personales para indicar nivel aprox
-  if(pb>=1000) return 7;
-  if(pb>=200) return 6;
-  if(pb>=150) return 5;
-  if(pb>=100) return 4;
-  if(pb>=50) return 3;
-  if(pb>=13) return 2;
-  if(pb>=1) return 1;
-  return 0;
-}
-
-function renderCalcCategoria(pb){
-  const cont=document.getElementById('calcCategoriaResult'); if(!cont) return;
-  if(!pb){ cont.innerHTML='<div class="empty">Ingresá PB para ver tu categoría.</div>'; return; }
-  const nivelActual=obtenerNivelPorPB(pb);
-  const catActual=catPorNivel(nivelActual);
-  const catNext=nivelActual<7?catPorNivel(nivelActual+1):null;
-  const faltante=catNext? Math.max(0,(catNext.pbNecesario||0)-pb):0;
-  const pct=catNext&&catNext.pbNecesario? Math.min(100, Math.round(pb/catNext.pbNecesario*100)):100;
-  cont.innerHTML=`
-    <div class="calc-result"><div class="lbl">Tu categoría aproximada</div><div class="big" style="color:${catActual.color};background:${catActual.color};-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">${catActual.code}</div><div class="lbl">${catActual.name}</div><span class="calc-cat-badge" style="background:${catActual.color};color:${catActual.textColor||'#fff'}">${catActual.icon} ${catActual.name}</span></div>
-    ${catNext? `<div class="calc-next"><b>Siguiente: ${catNext.code} – ${catNext.name}</b> (${catNext.pbNecesario} PB)<br/><div style="height:8px;border-radius:999px;background:rgba(80,90,130,.10);margin:8px 0"><div style="height:100%;width:${pct}%;border-radius:999px;background:linear-gradient(90deg,#5b8def,#a06bff)"></div></div>${faltante>0?`<span style="color:#d9534f;font-weight:900">Te faltan ${faltante} PB</span> para el mínimo de ${catNext.code}.`:`<span style="color:#1d7a5c;font-weight:900">¡Ya alcanzaste el PB mínimo para ${catNext.code}!</span>`}<br/><small style="color:#8a8a94">Además necesitás: ${catNext.req.slice(0,2).join(' + ')}</small></div>`:`<div class="calc-next"><b>¡Categoría máxima alcanzada! 🌟</b><br/>Sos ${catActual.name}, máximo nivel del plan.</div>`}
-  `;
-}
-
 const __btnCalcGuardar=document.getElementById('btnCalcGuardar');
 if(__btnCalcGuardar) __btnCalcGuardar.onclick=()=>{
   const total=calcularTotalPB();
@@ -8953,7 +8698,7 @@ renderEquipoDashboard=function(){
 };
 
 // ==== HOME APPS ====
-function openCalculadora(){showView('view-calculadora'); renderCalculadora();}
+
 
 // (home override moved to end)
 
@@ -8968,16 +8713,16 @@ function mostrarTutorialSiNuevo(){
       icon:'🚀',
       iconBg:'linear-gradient(135deg,#5b8def,#a06bff)',
       title:'¡Bienvenido a APPI!',
-      sub:'Tu asistente PSA',
+      sub:'Tu asistente',
       html:`
-        <p><b>APPI</b> es tu tablero para crecer en PSA sin perderte.</p>
+        <p><b>APPI</b> es tu tablero para crecer en tu negocio sin perderte.</p>
         <div style="display:flex;flex-direction:column;gap:8px;margin:12px 0">
           <div style="padding:10px;border-radius:12px;background:rgba(91,141,239,.10)"><b>💰 Presupuesto</b> – Controlá ingresos y gastos del mes</div>
           <div style="padding:10px;border-radius:12px;background:rgba(58,208,164,.10)"><b>🚀 Las 7 P</b> – Tu plan mensual paso a paso</div>
           <div style="padding:10px;border-radius:12px;background:rgba(245,179,1,.10)"><b>🌳 Mi Equipo</b> – Importá Excel y detectá quién está cerca de calificar</div>
-          <div style="padding:10px;border-radius:12px;background:rgba(160,107,255,.10)"><b>🏆 Carrera PSA</b> – 8 categorías, requisitos, ganancias por país</div>
-          <div style="padding:10px;border-radius:12px;background:rgba(255,107,157,.10)"><b>🎤 Presentación</b> – Mostrá el negocio en 2 minutos desde el celular</div>
-          <div style="padding:10px;border-radius:12px;background:rgba(245,179,1,.10)"><b>🧮 Calculadora PB</b> – Convertí productos en puntos y categorías</div>
+          <div style="padding:10px;border-radius:12px;background:rgba(160,107,255,.10)"><b>🏆 Carrera</b> – 8 categorías, requisitos, ganancias por país</div>
+          <div style="padding:10px;border-radius:12px;background:rgba(255,107,157,.10)">
+          <div style="padding:10px;border-radius:12px;background:rgba(245,179,1,.10)">
         </div>
         <div class="tip"><b>Tip:</b> Tocá el botón <b>?</b> en cada pantalla para ver cómo funciona esa herramienta.</div>
       `
@@ -9195,7 +8940,7 @@ function renderToolsList(){
   const carreraCard = `
     <button type="button" class="business-card" onclick="openCarrera()">
       <div class="business-icon">📈</div>
-      <div><h3>Mi carrera PSA</h3><p>${carreraPb}/${carreraObj} PB personales del mes</p></div>
+      <div><h3>Mi carrera</h3><p>${carreraPb}/${carreraObj} PB personales del mes</p></div>
       <div class="business-status">${Math.min(100,Math.round(carreraObj ? carreraPb/carreraObj*100 : 0))}%<small>avance</small></div>
       <div class="business-progress" style="--pct:${Math.min(100,carreraObj ? carreraPb/carreraObj*100 : 0)}%"><span></span></div>
     </button>
@@ -9247,7 +8992,7 @@ function renderHomeCompleto(){
 }
 
 
-// === OVERRIDE HOME TOOLS FINAL (after original definition) - 3 CARDS FIJO ===
+// === OVERRIDE HOME TOOLS FINAL - SOLO LISTA PRECIOS (Presentacion y Calculadora removidas por pedido) ===
 (function(){
   const _origTools = renderToolsList;
   renderToolsList = function(){
@@ -9255,32 +9000,19 @@ function renderHomeCompleto(){
     try{
       const list=document.getElementById('toolsList');
       if(!list) return;
-      // Siempre recrear para evitar que desaparezca al volver atrás
       const existing=document.getElementById('homeExtraTools');
       if(existing) existing.remove();
       const extra=document.createElement('div');
       extra.id='homeExtraTools';
       extra.className='home-section-block';
       extra.innerHTML=`
-        <div class="mini-section-label"><span>🎓</span> Herramientas PSA</div>
+        <div class="mini-section-label"><span>💲</span> Precios</div>
         <div class="home-tool-grid">
-          <button type="button" class="quick-tool-card" style="--accent:linear-gradient(135deg,#5b8def,#a06bff); --pct:100%" onclick="openPresentacion()">
-            <div class="quick-tool-top"><div class="quick-icon" style="background:linear-gradient(135deg,#5b8def,#a06bff)">🎤</div><span class="quick-state pending">Para mostrar</span></div>
-            <h3>Presentación Negocio</h3>
-            <p>4 pilares, empresa, producto, vos</p>
-            <div class="quick-progress-line"><span style="width:100%"></span></div>
-          </button>
-          <button type="button" class="quick-tool-card" style="--accent:linear-gradient(135deg,#f5b301,#ff8f6b); --pct:0%" onclick="openCalculadora()">
-            <div class="quick-tool-top"><div class="quick-icon" style="background:linear-gradient(135deg,#f5b301,#ff8f6b)">🧮</div><span class="quick-state pending">Calculadora</span></div>
-            <h3>Calculadora PB</h3>
-            <p>Productos → PB → Categoría</p>
-            <div class="quick-progress-line"><span style="width:0%"></span></div>
-          </button>
-          <button type="button" class="quick-tool-card" style="--accent:linear-gradient(135deg,#4b7a55,#3ad0a4); --pct:0%" onclick="openPrecios()">
+          <button type="button" class="quick-tool-card" style="--accent:linear-gradient(135deg,#4b7a55,#3ad0a4); --pct:100%;grid-column:1 / -1" onclick="openPrecios()">
             <div class="quick-tool-top"><div class="quick-icon" style="background:linear-gradient(135deg,#4b7a55,#3ad0a4)">💲</div><span class="quick-state pending">Oficial</span></div>
-            <h3>Lista Precios</h3>
-            <p>Distribuidor vs Usuario + ganancia</p>
-            <div class="quick-progress-line"><span style="width:0%"></span></div>
+            <h3>Lista de Precios</h3>
+            <p>Distribuidor vs Usuario + ganancia - Actualizado desde panel admin</p>
+            <div class="quick-progress-line"><span style="width:100%"></span></div>
           </button>
         </div>
       `;
@@ -9448,8 +9180,6 @@ document.getElementById('importInput').onchange = (e)=>{
     const activa = document.querySelector('.view.active');
     if(!activa) return null;
         switch(activa.id){
-      case 'view-presentacion': return 'view-home';
-      case 'view-calculadora': return 'view-home';
       case 'view-precios': return 'view-home';
       case 'view-home': return null;
       case 'view-siete-detail': return 'view-siete';
