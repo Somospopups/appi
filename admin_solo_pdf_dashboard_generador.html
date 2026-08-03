@@ -210,7 +210,7 @@ function updateStatus(){const el=document.getElementById('syncStatus');const tx=
 
 async function githubPut(path,obj,msg){
   const token=loadToken();if(!token) throw new Error('Sin token');
-  const str=JSON.stringify(obj,null,2);const b64=btoa(unescape(encodeURIComponent(str)));
+  const str=JSON.stringify(obj,null,2);let b64=''; try{ b64=btoa(unescape(encodeURIComponent(str))); } catch(e){ b64=btoa(str); } // fallback
   let sha=null;try{const r=await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${path}`,{headers:{'Authorization':`token ${token}`,'Accept':'application/vnd.github.v3+json'}});if(r.ok){const j=await r.json();sha=j.sha;}}catch(e){}
   const url=`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${path}`;
   const body={message:msg,content:b64,sha};if(!sha) delete body.sha;
@@ -224,7 +224,7 @@ document.getElementById('btnSync').onclick=async()=>{
   const btn=document.getElementById('btnSync');btn.disabled=true;btn.textContent='⏳ Subiendo...';
   try{
     const cruz=cruzar();
-    const contenido={version:1,actualizado:new Date().toISOString().split('T')[0],preciosDistribuidor:dist,preciosUsuario:user,preciosCruzados:cruz,productos:cruz.map(c=>({id:c.nombreNorm.replace(/[^a-z0-9]+/g,'_'),nombre:c.nombre,pb:c.pb,precioDist:c.precioDist,precioUser:c.precioUser,ganancia:c.ganancia,margen:c.margen}))};
+    const contenido={version:1,actualizado:new Date().toISOString().split('T')[0],preciosDistribuidor:(dist||[]).map(d=>({nombre:d.nombre||'Sin nombre',nombreNorm:(d.nombreNorm||''),pb:d.pb||0,precio:d.precio||0})),preciosUsuario:(user||[]).map(u=>({nombre:u.nombre||'Sin nombre',nombreNorm:(u.nombreNorm||''),pb:u.pb||0,precio:u.precio||0})),preciosCruzados:(cruz||[]).map(cc=>({nombre:cc.nombre||'Sin nombre',nombreNorm:(cc.nombreNorm||''),pb:cc.pb||0,precioDist:cc.precioDist||0,precioUser:cc.precioUser||0,ganancia:cc.ganancia||0,margen:cc.margen||0})),productos:cruz.map(c=>({id:((c.nombreNorm||c.nombre||'prod').toString().toLowerCase().replace(/[^a-z0-9]+/g,'_')||'prod_'+Math.random().toString(36).substring(2,6)),nombre:c.nombre||'Sin nombre',pb:c.pb||0,precioDist:c.precioDist||0,precioUser:c.precioUser||0,ganancia:c.ganancia||0,margen:c.margen||0}))};
     await githubPut('precios.json',contenido,`Update precios PDF - ${new Date().toISOString()}`);
     showToast('✅ precios.json subido');document.getElementById('syncInfo').textContent='Sincronizado: '+new Date().toLocaleString()+' - https://german1987diaz.github.io/appi/precios.json';
   }catch(e){showToast('Error: '+e.message,'error');document.getElementById('syncInfo').textContent='Error: '+e.message;}
