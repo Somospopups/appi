@@ -8937,7 +8937,8 @@ function renderHomeCompleto(){
       extra.id='homeExtraTools';
       extra.className='home-section-block';
       extra.innerHTML=`
-        <button type="button" class="business-card" style="width:100%;justify-content:center;text-align:center;padding:18px" onclick="openPrecios()">
+        <button type="button" class="business-card" style="width:100%;display:flex;align-items:center;justify-content:center;gap:12px;padding:18px" onclick="openPrecios()">
+          <div class="business-icon" style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#4b7a55,#3ad0a4);display:grid;place-items:center;color:#fff;font-size:22px;box-shadow:0 4px 10px rgba(0,0,0,0.12)">💲</div>
           <h3 style="margin:0;font-size:16px;font-weight:900;letter-spacing:0.5px">LISTA DE PRECIOS</h3>
         </button>
       `;
