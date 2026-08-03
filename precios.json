@@ -1,0 +1,510 @@
+{
+  "version": 1,
+  "actualizado": "2026-08-03",
+  "productos": [
+    {
+      "id": "senior4",
+      "nombre": "PSA Senior 4",
+      "pb": 5,
+      "categoria": "Purificador",
+      "icono": "🚰"
+    },
+    {
+      "id": "senior3",
+      "nombre": "PSA Senior 3",
+      "pb": 4,
+      "categoria": "Purificador",
+      "icono": "🚰"
+    },
+    {
+      "id": "vero",
+      "nombre": "PSA Vero / Rotoplas",
+      "pb": 3.5,
+      "categoria": "Purificador",
+      "icono": "💎"
+    },
+    {
+      "id": "mini",
+      "nombre": "PSA Mini",
+      "pb": 2,
+      "categoria": "Purificador",
+      "icono": "🔹"
+    },
+    {
+      "id": "ducha",
+      "nombre": "PSA Ducha",
+      "pb": 1.5,
+      "categoria": "Purificador",
+      "icono": "🚿"
+    },
+    {
+      "id": "aire",
+      "nombre": "Purificador de Aire",
+      "pb": 4,
+      "categoria": "Aire",
+      "icono": "🌬️"
+    },
+    {
+      "id": "filtro_s",
+      "nombre": "Pack Filtros Senior (x4)",
+      "pb": 0.8,
+      "categoria": "Repuesto",
+      "icono": "♻️"
+    },
+    {
+      "id": "filtro_v",
+      "nombre": "Filtro Vero / Mini",
+      "pb": 0.5,
+      "categoria": "Repuesto",
+      "icono": "♻️"
+    }
+  ],
+  "bonus": {
+    "b1": 28750,
+    "b2": 100000,
+    "moneda": "ARS ($)",
+    "AR": {
+      "1": "28750",
+      "2": "100000",
+      "moneda": "ARS ($)"
+    }
+  },
+  "ganancias": {
+    "DC_150": [
+      {
+        "pais": "Argentina",
+        "valor": "$1.567.500 + $57.750",
+        "codigo": "ARS"
+      },
+      {
+        "pais": "Bolivia",
+        "valor": "Bs 9.900",
+        "codigo": "BOB"
+      },
+      {
+        "pais": "Colombia",
+        "valor": "$1.105.500",
+        "codigo": "COP"
+      },
+      {
+        "pais": "Ecuador",
+        "valor": "$4.587.000",
+        "codigo": "USD"
+      },
+      {
+        "pais": "Paraguay",
+        "valor": "₲ 7.095.000",
+        "codigo": "PYG"
+      },
+      {
+        "pais": "Perú",
+        "valor": "S/ 4.092",
+        "codigo": "PEN"
+      },
+      {
+        "pais": "Uruguay",
+        "valor": "USD 1.089",
+        "codigo": "USD"
+      },
+      {
+        "pais": "Chile",
+        "valor": "1.320 €",
+        "codigo": "EUR"
+      },
+      {
+        "pais": "España",
+        "valor": "USD 3.762 + € 4.560",
+        "codigo": "MIX"
+      }
+    ],
+    "CE_600": [
+      {
+        "pais": "Argentina",
+        "valor": "$5.415.000 + $199.500",
+        "codigo": "ARS"
+      },
+      {
+        "pais": "Bolivia",
+        "valor": "Bs 34.200",
+        "codigo": "BOB"
+      },
+      {
+        "pais": "Colombia",
+        "valor": "$3.819.000",
+        "codigo": "COP"
+      },
+      {
+        "pais": "Ecuador",
+        "valor": "$15.846.000",
+        "codigo": "USD"
+      },
+      {
+        "pais": "Paraguay",
+        "valor": "₲ 24.510.000",
+        "codigo": "PYG"
+      },
+      {
+        "pais": "Perú",
+        "valor": "S/ 14.136",
+        "codigo": "PEN"
+      },
+      {
+        "pais": "Uruguay",
+        "valor": "USD 3.762",
+        "codigo": "USD"
+      },
+      {
+        "pais": "Chile",
+        "valor": "€ 4.560",
+        "codigo": "EUR"
+      },
+      {
+        "pais": "España",
+        "valor": "USD 3.762 + € 4.560",
+        "codigo": "MIX"
+      }
+    ],
+    "DC": [
+      {
+        "pais": "Argentina",
+        "valor": "$1.567.500 + $57.750",
+        "codigo": "ARS"
+      },
+      {
+        "pais": "Bolivia",
+        "valor": "Bs 9.900",
+        "codigo": "BOB"
+      },
+      {
+        "pais": "Colombia",
+        "valor": "$1.105.500",
+        "codigo": "COP"
+      },
+      {
+        "pais": "Ecuador",
+        "valor": "$4.587.000",
+        "codigo": "USD"
+      },
+      {
+        "pais": "Paraguay",
+        "valor": "₲ 7.095.000",
+        "codigo": "PYG"
+      },
+      {
+        "pais": "Perú",
+        "valor": "S/ 4.092",
+        "codigo": "PEN"
+      },
+      {
+        "pais": "Uruguay",
+        "valor": "USD 1.089",
+        "codigo": "USD"
+      },
+      {
+        "pais": "Chile",
+        "valor": "1.320 €",
+        "codigo": "EUR"
+      },
+      {
+        "pais": "España",
+        "valor": "USD 3.762 + € 4.560",
+        "codigo": "MIX"
+      }
+    ],
+    "CE": [
+      {
+        "pais": "Argentina",
+        "valor": "$5.415.000 + $199.500",
+        "codigo": "ARS"
+      },
+      {
+        "pais": "Bolivia",
+        "valor": "Bs 34.200",
+        "codigo": "BOB"
+      },
+      {
+        "pais": "Colombia",
+        "valor": "$3.819.000",
+        "codigo": "COP"
+      },
+      {
+        "pais": "Ecuador",
+        "valor": "$15.846.000",
+        "codigo": "USD"
+      },
+      {
+        "pais": "Paraguay",
+        "valor": "₲ 24.510.000",
+        "codigo": "PYG"
+      },
+      {
+        "pais": "Perú",
+        "valor": "S/ 14.136",
+        "codigo": "PEN"
+      },
+      {
+        "pais": "Uruguay",
+        "valor": "USD 3.762",
+        "codigo": "USD"
+      },
+      {
+        "pais": "Chile",
+        "valor": "€ 4.560",
+        "codigo": "EUR"
+      },
+      {
+        "pais": "España",
+        "valor": "USD 3.762 + € 4.560",
+        "codigo": "MIX"
+      }
+    ]
+  },
+  "lista": [
+    {
+      "id": "senior4",
+      "nombre": "PSA Senior 4",
+      "pb": 5,
+      "categoria": "Purificador",
+      "icono": "🚰"
+    },
+    {
+      "id": "senior3",
+      "nombre": "PSA Senior 3",
+      "pb": 4,
+      "categoria": "Purificador",
+      "icono": "🚰"
+    },
+    {
+      "id": "vero",
+      "nombre": "PSA Vero / Rotoplas",
+      "pb": 3.5,
+      "categoria": "Purificador",
+      "icono": "💎"
+    },
+    {
+      "id": "mini",
+      "nombre": "PSA Mini",
+      "pb": 2,
+      "categoria": "Purificador",
+      "icono": "🔹"
+    },
+    {
+      "id": "ducha",
+      "nombre": "PSA Ducha",
+      "pb": 1.5,
+      "categoria": "Purificador",
+      "icono": "🚿"
+    },
+    {
+      "id": "aire",
+      "nombre": "Purificador de Aire",
+      "pb": 4,
+      "categoria": "Aire",
+      "icono": "🌬️"
+    },
+    {
+      "id": "filtro_s",
+      "nombre": "Pack Filtros Senior (x4)",
+      "pb": 0.8,
+      "categoria": "Repuesto",
+      "icono": "♻️"
+    },
+    {
+      "id": "filtro_v",
+      "nombre": "Filtro Vero / Mini",
+      "pb": 0.5,
+      "categoria": "Repuesto",
+      "icono": "♻️"
+    }
+  ],
+  "preciosDistribuidor": [
+    {
+      "id": "senior4",
+      "nombre": "PSA Senior 4",
+      "nombreNorm": "psa senior 4",
+      "pb": 5,
+      "precio": 175000
+    },
+    {
+      "id": "senior3",
+      "nombre": "PSA Senior 3",
+      "nombreNorm": "psa senior 3",
+      "pb": 4,
+      "precio": 150000
+    },
+    {
+      "id": "vero",
+      "nombre": "PSA Vero / Rotoplas",
+      "nombreNorm": "psa vero / rotoplas",
+      "pb": 3.5,
+      "precio": 137500
+    },
+    {
+      "id": "mini",
+      "nombre": "PSA Mini",
+      "nombreNorm": "psa mini",
+      "pb": 2,
+      "precio": 100000
+    },
+    {
+      "id": "ducha",
+      "nombre": "PSA Ducha",
+      "nombreNorm": "psa ducha",
+      "pb": 1.5,
+      "precio": 87500
+    },
+    {
+      "id": "aire",
+      "nombre": "Purificador de Aire",
+      "nombreNorm": "purificador de aire",
+      "pb": 4,
+      "precio": 150000
+    },
+    {
+      "id": "filtro_s",
+      "nombre": "Pack Filtros Senior (x4)",
+      "nombreNorm": "pack filtros senior (x4)",
+      "pb": 0.8,
+      "precio": 70000
+    },
+    {
+      "id": "filtro_v",
+      "nombre": "Filtro Vero / Mini",
+      "nombreNorm": "filtro vero / mini",
+      "pb": 0.5,
+      "precio": 62500
+    }
+  ],
+  "preciosUsuario": [
+    {
+      "id": "senior4",
+      "nombre": "PSA Senior 4",
+      "nombreNorm": "psa senior 4",
+      "pb": 5,
+      "precio": 280000
+    },
+    {
+      "id": "senior3",
+      "nombre": "PSA Senior 3",
+      "nombreNorm": "psa senior 3",
+      "pb": 4,
+      "precio": 240000
+    },
+    {
+      "id": "vero",
+      "nombre": "PSA Vero / Rotoplas",
+      "nombreNorm": "psa vero / rotoplas",
+      "pb": 3.5,
+      "precio": 220000
+    },
+    {
+      "id": "mini",
+      "nombre": "PSA Mini",
+      "nombreNorm": "psa mini",
+      "pb": 2,
+      "precio": 160000
+    },
+    {
+      "id": "ducha",
+      "nombre": "PSA Ducha",
+      "nombreNorm": "psa ducha",
+      "pb": 1.5,
+      "precio": 140000
+    },
+    {
+      "id": "aire",
+      "nombre": "Purificador de Aire",
+      "nombreNorm": "purificador de aire",
+      "pb": 4,
+      "precio": 240000
+    },
+    {
+      "id": "filtro_s",
+      "nombre": "Pack Filtros Senior (x4)",
+      "nombreNorm": "pack filtros senior (x4)",
+      "pb": 0.8,
+      "precio": 112000
+    },
+    {
+      "id": "filtro_v",
+      "nombre": "Filtro Vero / Mini",
+      "nombreNorm": "filtro vero / mini",
+      "pb": 0.5,
+      "precio": 100000
+    }
+  ],
+  "preciosCruzados": [
+    {
+      "nombre": "PSA Senior 4",
+      "nombreNorm": "psa senior 4",
+      "pb": 5,
+      "precioDist": 175000,
+      "precioUser": 280000,
+      "ganancia": 105000,
+      "margen": 60.0
+    },
+    {
+      "nombre": "PSA Senior 3",
+      "nombreNorm": "psa senior 3",
+      "pb": 4,
+      "precioDist": 150000,
+      "precioUser": 240000,
+      "ganancia": 90000,
+      "margen": 60.0
+    },
+    {
+      "nombre": "PSA Vero / Rotoplas",
+      "nombreNorm": "psa vero / rotoplas",
+      "pb": 3.5,
+      "precioDist": 137500,
+      "precioUser": 220000,
+      "ganancia": 82500,
+      "margen": 60.0
+    },
+    {
+      "nombre": "PSA Mini",
+      "nombreNorm": "psa mini",
+      "pb": 2,
+      "precioDist": 100000,
+      "precioUser": 160000,
+      "ganancia": 60000,
+      "margen": 60.0
+    },
+    {
+      "nombre": "PSA Ducha",
+      "nombreNorm": "psa ducha",
+      "pb": 1.5,
+      "precioDist": 87500,
+      "precioUser": 140000,
+      "ganancia": 52500,
+      "margen": 60.0
+    },
+    {
+      "nombre": "Purificador de Aire",
+      "nombreNorm": "purificador de aire",
+      "pb": 4,
+      "precioDist": 150000,
+      "precioUser": 240000,
+      "ganancia": 90000,
+      "margen": 60.0
+    },
+    {
+      "nombre": "Pack Filtros Senior (x4)",
+      "nombreNorm": "pack filtros senior (x4)",
+      "pb": 0.8,
+      "precioDist": 70000,
+      "precioUser": 112000,
+      "ganancia": 42000,
+      "margen": 60.0
+    },
+    {
+      "nombre": "Filtro Vero / Mini",
+      "nombreNorm": "filtro vero / mini",
+      "pb": 0.5,
+      "precioDist": 62500,
+      "precioUser": 100000,
+      "ganancia": 37500,
+      "margen": 60.0
+    }
+  ]
+}

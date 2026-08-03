@@ -3165,6 +3165,110 @@ body.dark .lock-footer { color: #6b6b76; }
 
   .eq-contact-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 0 12px}.eq-contact-stat{min-height:78px;padding:9px 4px;border-radius:17px;background:rgba(255,255,255,.62);border:1px solid rgba(255,255,255,.78);box-shadow:0 7px 16px rgba(80,90,130,.07);text-align:center;cursor:pointer;font:inherit}.eq-contact-stat span{display:block;font-size:19px;line-height:1}.eq-contact-stat b{display:block;margin-top:3px;color:#3d63c9;font-size:21px;line-height:1}.eq-contact-stat small{display:block;margin-top:5px;color:#777887;font-size:8px;font-weight:950;line-height:1.05}.eq-contact-stat.selected{background:linear-gradient(135deg,rgba(91,141,239,.28),rgba(160,107,255,.24));border-color:rgba(91,141,239,.38);box-shadow:0 7px 17px rgba(91,141,239,.16)}.eq-contact-detail-title{margin:4px 2px 7px;color:#60606d;font-size:10px;font-weight:950;text-transform:uppercase;letter-spacing:.45px}.eq-contact-list{margin-top:0}.eq-contact-filters{display:none}@media(max-width:360px){.eq-contact-stats{gap:6px}.eq-contact-stat{min-height:72px}.eq-contact-stat small{font-size:7px}}
 </style>
+
+<style>
+/* ===== CARRERA PSA MEJORADA ===== */
+.carrera-tabs{display:flex;gap:6px;padding:6px;border-radius:16px;background:rgba(255,255,255,.60);border:1px solid rgba(255,255,255,.75);margin-bottom:14px;overflow-x:auto}
+.carrera-tab{flex:1;min-width:max-content;padding:10px 12px;border-radius:12px;border:none;background:transparent;color:#6b6b76;font:inherit;font-size:12px;font-weight:850;cursor:pointer;white-space:nowrap;transition:all .2s ease}
+.carrera-tab.active{background:linear-gradient(135deg,#5b8def,#a06bff);color:#fff;box-shadow:0 4px 14px rgba(120,100,220,.35)}
+.carrera-tab-content{display:none}
+.carrera-tab-content.active{display:block;animation:fade .25s ease}
+
+.cat-timeline{position:relative;margin:8px 0 16px}
+.cat-step{display:flex;gap:12px;align-items:flex-start;padding:14px 14px;border-radius:18px;margin-bottom:10px;background:rgba(255,255,255,.62);border:1px solid rgba(255,255,255,.82);cursor:pointer;transition:all .2s ease;position:relative;overflow:hidden}
+.cat-step::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--catColor,#5b8def)}
+.cat-step:active{transform:scale(.98)}
+.cat-step.active{border-color:rgba(91,141,239,.35);background:rgba(91,141,239,.10);box-shadow:0 6px 18px rgba(91,141,239,.12)}
+.cat-step .cat-icon{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;font-size:22px;color:#fff;background:var(--catColor,#5b8def);flex:none;box-shadow:0 4px 12px rgba(0,0,0,.15)}
+.cat-step .cat-info{flex:1;min-width:0}
+.cat-step .cat-info h4{margin:0 0 2px;font-size:15px;font-weight:900;letter-spacing:-.2px;display:flex;align-items:center;gap:8px}
+.cat-step .cat-info h4 .badge-code{font-size:10px;padding:3px 8px;border-radius:8px;background:var(--catColor,#5b8def);color:#fff;font-weight:900;letter-spacing:.5px}
+.cat-step .cat-info p{margin:0;font-size:12.5px;color:#5c5c66;line-height:1.35}
+.cat-step .cat-arrow{color:#8a8a94;font-size:18px;line-height:1;margin-top:4px}
+
+.cat-detail-card{padding:16px;border-radius:20px;background:rgba(255,255,255,.68);border:1px solid rgba(255,255,255,.82);margin-bottom:12px}
+.cat-detail-card h3{margin:0 0 10px;font-size:16px;font-weight:900;display:flex;align-items:center;gap:8px}
+.cat-detail-card h4{margin:14px 0 6px;font-size:13px;font-weight:900;color:#3d63c9;text-transform:uppercase;letter-spacing:.4px}
+.cat-detail-card p, .cat-detail-card li{font-size:13px;line-height:1.5;color:#3a3a48}
+.cat-detail-card ul{margin:6px 0 0 18px;padding:0}
+.cat-detail-card .tag{display:inline-flex;padding:4px 10px;border-radius:999px;background:rgba(91,141,239,.12);color:#3d63c9;font-size:11px;font-weight:900;margin:3px 4px 3px 0}
+.cat-detail-card .benef{padding:8px 12px;border-radius:12px;background:rgba(58,208,164,.12);margin-top:6px;font-size:12.5px}
+.cat-detail-card .benef b{color:#1d7a5c}
+
+.ganancias-table{width:100%;border-collapse:collapse;margin-top:8px;font-size:12.5px}
+.ganancias-table th{font-size:11px;text-align:left;padding:8px 6px;color:#5c5c66;background:rgba(80,90,130,.08);font-weight:900;text-transform:uppercase}
+.ganancias-table td{padding:8px 6px;border-top:1px solid rgba(80,90,130,.10);color:#3a3a48}
+.ganancias-table tr:last-child td{border-bottom:none}
+
+.tooltip-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.7);font-size:12px;font-weight:700;color:#3a3a48;margin:4px 6px 4px 0;cursor:pointer}
+.tooltip-chip span{width:20px;height:20px;border-radius:50%;background:linear-gradient(135deg,#5b8def,#a06bff);color:#fff;display:grid;place-items:center;font-size:12px;font-weight:900}
+
+.bonus-highlight{padding:14px;border-radius:16px;background:linear-gradient(135deg,rgba(245,179,1,.18),rgba(255,143,107,.15));border:1px solid rgba(245,179,1,.25);margin-top:10px}
+.bonus-highlight.pos{background:linear-gradient(135deg,rgba(58,208,164,.18),rgba(91,141,239,.12));border-color:rgba(58,208,164,.25)}
+
+/* PRESENTACION NEGOCIO */
+.present-card{padding:18px;border-radius:22px;background:rgba(255,255,255,.62);border:1px solid rgba(255,255,255,.78);margin-bottom:14px;box-shadow:0 8px 22px rgba(80,90,130,.07);position:relative;overflow:hidden}
+.present-card::before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:var(--accent,#5b8def)}
+.present-card h3{margin:0 0 8px;font-size:18px;font-weight:950;letter-spacing:-.3px}
+.present-card p{margin:0 0 8px;color:#4a4a55;font-size:13.5px;line-height:1.5}
+.present-card .present-icon{width:48px;height:48px;border-radius:16px;display:grid;place-items:center;color:#fff;font-size:24px;background:var(--accent,#5b8def);box-shadow:0 6px 16px rgba(0,0,0,.15);margin-bottom:10px}
+.pilar-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.pilar-item{padding:12px;border-radius:14px;background:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.7);text-align:center}
+.pilar-item .p-ico{font-size:26px;margin-bottom:6px}
+.pilar-item b{display:block;font-size:12.5px;color:#1c1c27;margin-bottom:3px}
+.pilar-item small{font-size:11px;color:#6b6b76;line-height:1.3;display:block}
+.prod-list{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.prod-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.7)}
+.prod-item .prod-ico{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,#3ad0a4,#5b8def);color:#fff;font-size:18px;flex:none}
+.prod-item .prod-info b{display:block;font-size:13px;color:#1c1c27}
+.prod-item .prod-info small{font-size:11px;color:#6b6b76}
+
+/* CALCULADORA PB */
+.calc-tabs{display:flex;gap:6px;padding:5px;border-radius:14px;background:rgba(80,90,130,.08);margin-bottom:12px}
+.calc-tab{flex:1;padding:10px;border-radius:10px;border:none;background:transparent;font:inherit;font-size:12px;font-weight:900;color:#6b6b76;cursor:pointer}
+.calc-tab.active{background:linear-gradient(135deg,#5b8def,#a06bff);color:#fff;box-shadow:0 4px 12px rgba(91,141,239,.3)}
+.calc-prod{padding:12px;border-radius:16px;background:rgba(255,255,255,.62);border:1px solid rgba(255,255,255,.75);margin-bottom:8px;display:flex;align-items:center;gap:12px}
+.calc-prod .calc-info{flex:1;min-width:0}
+.calc-prod .calc-info b{display:block;font-size:13.5px;color:#1c1c27}
+.calc-prod .calc-info small{font-size:11px;color:#6b6b76}
+.calc-prod .calc-ctrl{display:flex;align-items:center;gap:8px}
+.calc-prod .calc-ctrl button{width:34px;height:34px;border-radius:50%;border:none;background:linear-gradient(135deg,#5b8def,#a06bff);color:#fff;font-weight:900;font-size:18px;cursor:pointer;box-shadow:0 3px 10px rgba(91,141,239,.35)}
+.calc-prod .calc-ctrl .calc-num{min-width:28px;text-align:center;font-weight:900;color:#3d63c9;font-size:16px}
+.calc-result{padding:16px;border-radius:20px;background:linear-gradient(135deg,rgba(91,141,239,.18),rgba(160,107,255,.14));border:1px solid rgba(255,255,255,.7);text-align:center;margin-top:12px}
+.calc-result .big{font-size:32px;font-weight:1000;color:#3d63c9}
+.calc-result .lbl{font-size:12px;color:#5c5c66;font-weight:800;text-transform:uppercase;letter-spacing:.4px;margin-top:4px}
+.calc-next{margin-top:10px;padding:12px;border-radius:14px;background:rgba(255,255,255,.7);border:1px dashed rgba(91,141,239,.25);font-size:12.5px;line-height:1.45;color:#3a3a48}
+.calc-cat-badge{display:inline-flex;padding:6px 12px;border-radius:999px;color:#fff;font-size:11px;font-weight:900;letter-spacing:.4px;margin-top:6px}
+
+/* ALERTAS EQUIPO */
+.alerta-card{padding:12px 14px;border-radius:16px;margin-bottom:8px;display:flex;gap:10px;align-items:flex-start;background:rgba(255,255,255,.65);border:1px solid rgba(255,255,255,.8);border-left:4px solid var(--alertColor,#f5b301);box-shadow:0 6px 16px rgba(80,90,130,.06)}
+.alerta-card .al-icon{font-size:20px;line-height:1;margin-top:2px}
+.alerta-card .al-info b{display:block;font-size:13px;color:#1c1c27}
+.alerta-card .al-info span{display:block;font-size:11.5px;color:#6b6b76;margin-top:2px;line-height:1.35}
+.alerta-card .al-action{margin-top:8px}
+.alerta-card .al-action button{padding:6px 12px;border-radius:999px;border:none;background:rgba(91,141,239,.14);color:#3d63c9;font:inherit;font-size:11px;font-weight:900;cursor:pointer}
+
+body.dark .carrera-tabs{background:rgba(30,30,50,.55);border-color:rgba(255,255,255,.09)}
+body.dark .carrera-tab{color:#a0a0b0}
+body.dark .cat-step{background:rgba(30,30,50,.55);border-color:rgba(255,255,255,.09)}
+body.dark .cat-step .cat-info p{color:#a0a0b0}
+body.dark .cat-detail-card{background:rgba(30,30,50,.55);border-color:rgba(255,255,255,.09)}
+body.dark .cat-detail-card p, body.dark .cat-detail-card li{color:#d0d0d8}
+body.dark .present-card{background:rgba(30,30,50,.55);border-color:rgba(255,255,255,.09)}
+body.dark .present-card p{color:#a0a0b0}
+body.dark .pilar-item{background:rgba(40,40,60,.55);border-color:rgba(255,255,255,.09)}
+body.dark .pilar-item b{color:#f0f0f5}
+body.dark .prod-item{background:rgba(40,40,60,.55)}
+body.dark .calc-prod{background:rgba(30,30,50,.55);border-color:rgba(255,255,255,.09)}
+body.dark .calc-prod .calc-info b{color:#f0f0f5}
+body.dark .calc-prod .calc-info small{color:#a0a0b0}
+body.dark .calc-result{background:linear-gradient(135deg,rgba(91,141,239,.20),rgba(160,107,255,.16))}
+body.dark .calc-next{background:rgba(30,30,50,.55);color:#d0d0d8}
+body.dark .alerta-card{background:rgba(30,30,50,.55);border-color:rgba(255,255,255,.09)}
+body.dark .ganancias-table th{background:rgba(255,255,255,.06);color:#a0a0b0}
+body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.08)}
+</style>
+
 </head>
 <body>
  <!-- ============ PANTALLA DE ACTIVACIÓN ============ -->
@@ -3490,14 +3594,251 @@ body.dark .lock-footer { color: #6b6b76; }
     <div id="presuHistList"></div>
   </section>
 
-  <!-- CARRERA PSA -->
+  <!-- CARRERA PSA MEJORADA -->
   <section id="view-carrera" class="view">
     <header class="top"><button class="back-btn" id="btnBackCarrera" aria-label="Volver">‹</button><h1>Mi</h1><div class="script">carrera PSA</div><p>Tu avance, explicado de forma simple</p></header>
-    <div class="career-card"><h3>📈 Progreso del mes</h3><div class="career-grid"><div><label class="career-label">Categoría actual</label><select id="careerCategoria"><option value="DJ">Distribuidor Junior (DJ)</option><option value="D">Distribuidor (D)</option><option value="DC">Distribuidor Calificado (DC)</option><option value="CE">Coordinador de Equipo (CE)</option><option value="LE">Líder (LE)</option><option value="EJ">Líder Ejecutivo (EJ)</option><option value="E">Empresario (E)</option></select></div><div><label class="career-label">Objetivo de PB</label><input id="careerObjetivo" type="number" min="0" value="13"></div></div><div class="career-row" style="margin-top:14px"><div><span class="career-small">PB personales cargados</span><strong class="career-big" id="careerPb">0</strong></div><div style="width:48%"><label class="career-label">Cargar PB</label><input id="careerPbInput" type="number" min="0" placeholder="0"></div></div><div class="career-bar"><span id="careerPbBar"></span></div><div class="career-rule" id="careerPbHint">Cargá tus PB para ver tu avance.</div><div class="actions"><button class="btn primary" id="btnCareerSave">Guardar progreso</button></div></div>
-    <div class="career-card"><h3>🗓️ Mantenimiento trimestral</h3><div class="career-grid"><div><label class="career-label">Meses cumplidos</label><input id="careerMeses" type="number" min="0" max="3" value="0"></div><div><label class="career-label">Meses necesarios</label><input id="careerMesesReq" type="number" min="1" max="3" value="2"></div></div><div class="career-rule" id="careerTrimHint" style="margin-top:12px">Todavía no hay datos.</div><div class="actions"><button class="btn primary" id="btnCareerTrim">Guardar trimestre</button></div></div>
-    <div class="career-card"><h3>🤝 Equipo y bonus</h3><div class="career-grid"><div><label class="career-label">Patrocinios personales</label><input id="careerPatrocinios" type="number" min="0" value="0"></div><div><label class="career-label">Organizaciones DJ</label><input id="careerOrganizaciones" type="number" min="0" value="0"></div><div><label class="career-label">Patrocinios con 9 PB o más</label><input id="careerPatrociniosCalif" type="number" min="0" max="2" value="0"></div><div><label class="career-label">PB personales del mes</label><input id="careerBonusPb" type="number" min="0" value="0"></div></div><div class="career-rule" id="careerBonusHint" style="margin-top:12px">Cargá tus datos para ver si alcanzás las condiciones del bonus.</div><div class="actions"><button class="btn primary" id="btnCareerBonus">Guardar actividad</button></div></div>
-    <div class="career-card"><h3>💰 Mis valores</h3><p style="color:#777887;font-size:12px;line-height:1.4;margin-top:0">Cargá tus propios valores. Pueden cambiar según vigencia, país y condición fiscal.</p><div class="career-grid"><div><label class="career-label">Valor de 1 PB</label><input id="careerValorPb" type="number" min="0" placeholder="$"></div><div><label class="career-label">Moneda</label><select id="careerMoneda"><option>ARS ($)</option><option>BOB (Bs)</option><option>CLP ($)</option><option>USD (US$)</option><option>EUR (€)</option></select></div><div><label class="career-label">Bonus 1 patrocinio</label><input id="careerBonus1" type="number" min="0" placeholder="$"></div><div><label class="career-label">Bonus 2 patrocinios</label><input id="careerBonus2" type="number" min="0" placeholder="$"></div></div><div class="actions"><button class="btn primary" id="btnCareerValues">Guardar valores</button></div></div>
+
+    <div class="carrera-tabs" id="carreraTabs">
+      <button class="carrera-tab active" data-ctab="progreso">📈 Progreso</button>
+      <button class="carrera-tab" data-ctab="categorias">🏆 Categorías</button>
+      <button class="carrera-tab" data-ctab="ganancias">💰 Ganancias</button>
+      <button class="carrera-tab" data-ctab="glosario">📘 Ayuda</button>
+    </div>
+
+    <!-- TAB PROGRESO -->
+    <div class="carrera-tab-content active" id="careerTab-progreso">
+      <div class="career-card"><h3>📈 Progreso del mes</h3>
+        <div class="career-grid">
+          <div><label class="career-label">Categoría actual</label>
+            <select id="careerCategoria">
+              <option value="DJ">Distribuidor Junior (DJ)</option>
+              <option value="D">Distribuidor (D)</option>
+              <option value="DC">Distribuidor Calificado (DC)</option>
+              <option value="CE">Coordinador de Equipo (CE)</option>
+              <option value="L">Líder (L)</option>
+              <option value="LE">Líder Ejecutivo (LE)</option>
+              <option value="EJ">Ejecutivo (EJ)</option>
+              <option value="E">Empresa (E)</option>
+            </select>
+          </div>
+          <div><label class="career-label">Objetivo de PB</label><input id="careerObjetivo" type="number" min="0" value="13"></div>
+        </div>
+        <div class="career-row" style="margin-top:14px"><div><span class="career-small">PB personales cargados</span><strong class="career-big" id="careerPb">0</strong></div><div style="width:48%"><label class="career-label">Cargar PB</label><input id="careerPbInput" type="number" min="0" placeholder="0"></div></div>
+        <div class="career-bar"><span id="careerPbBar"></span></div>
+        <div class="career-rule" id="careerPbHint">Cargá tus PB para ver tu avance.</div>
+        <div class="actions"><button class="btn primary" id="btnCareerSave">Guardar progreso</button></div>
+      </div>
+
+      <div class="career-card"><h3>🗓️ Mantenimiento trimestral</h3>
+        <div class="career-grid"><div><label class="career-label">Meses cumplidos</label><input id="careerMeses" type="number" min="0" max="3" value="0"></div><div><label class="career-label">Meses necesarios</label><input id="careerMesesReq" type="number" min="1" max="3" value="2"></div></div>
+        <div class="career-rule" id="careerTrimHint" style="margin-top:12px">Todavía no hay datos.</div>
+        <div class="actions"><button class="btn primary" id="btnCareerTrim">Guardar trimestre</button></div>
+      </div>
+
+      <div class="career-card"><h3>🤝 Equipo y bonus</h3>
+        <div class="career-grid"><div><label class="career-label">Patrocinios personales</label><input id="careerPatrocinios" type="number" min="0" value="0"></div><div><label class="career-label">Organizaciones DJ</label><input id="careerOrganizaciones" type="number" min="0" value="0"></div><div><label class="career-label">Patrocinios con 9 PB o más</label><input id="careerPatrociniosCalif" type="number" min="0" max="2" value="0"></div><div><label class="career-label">PB personales del mes</label><input id="careerBonusPb" type="number" min="0" value="0"></div></div>
+        <div class="career-rule" id="careerBonusHint" style="margin-top:12px">Cargá tus datos para ver si alcanzás las condiciones del bonus.</div>
+        <div class="actions"><button class="btn primary" id="btnCareerBonus">Guardar actividad</button></div>
+      </div>
+
+      <div class="career-card"><h3>💰 Mis valores (editable)</h3><p style="color:#777887;font-size:12px;line-height:1.4;margin-top:0">Cargá tus propios valores. Pueden cambiar según vigencia, país y condición fiscal.</p>
+        <div class="career-grid"><div><label class="career-label">Valor de 1 PB</label><input id="careerValorPb" type="number" min="0" placeholder="$"></div><div><label class="career-label">Moneda</label><select id="careerMoneda"><option>ARS ($)</option><option>BOB (Bs)</option><option>CLP ($)</option><option>USD (US$)</option><option>EUR (€)</option><option>PYG (₲)</option><option>PEN (S/)</option></select></div><div><label class="career-label">Bonus 1 patrocinio</label><input id="careerBonus1" type="number" min="0" placeholder="$"></div><div><label class="career-label">Bonus 2 patrocinios</label><input id="careerBonus2" type="number" min="0" placeholder="$"></div></div>
+        <div class="actions"><button class="btn primary" id="btnCareerValues">Guardar valores</button></div>
+      </div>
+
+      <div id="careerNextCatCard" class="career-card" style="display:none"></div>
+    </div>
+
+    <!-- TAB CATEGORIAS -->
+    <div class="carrera-tab-content" id="careerTab-categorias">
+      <div class="section-hint"><span class="h-emo">🏆</span> Las 8 categorías del plan de carrera PSA. Tocá una para ver requisitos.</div>
+      <div id="careerCategoriesList" class="cat-timeline"></div>
+      <div id="careerCategoryDetail"></div>
+    </div>
+
+    <!-- TAB GANANCIAS -->
+    <div class="carrera-tab-content" id="careerTab-ganancias">
+      <div class="career-card">
+        <h3>💰 Ganancias Sólido por país</h3>
+        <p style="font-size:12px;color:#6b6b76;line-height:1.4;margin:0 0 12px">Valores de referencia según plan. Pueden variar por vigencia y país.</p>
+
+        <h4 style="font-size:13px;font-weight:900;color:#3d63c9;margin:14px 0 6px">DC Sólido – 150 PB</h4>
+        <div style="overflow-x:auto"><table class="ganancias-table" id="tablaDC"></table></div>
+
+        <h4 style="font-size:13px;font-weight:900;color:#7a4bd9;margin:18px 0 6px">CE Sólido – 600 PB</h4>
+        <div style="overflow-x:auto"><table class="ganancias-table" id="tablaCE"></table></div>
+
+        <div class="bonus-highlight" id="bonusBox"></div>
+        <p style="font-size:11px;color:#8a8a94;margin-top:10px;line-height:1.4">💡 Los importes son brutos de referencia. Consultá vigencia con tu línea ascendente.</p>
+      </div>
+    </div>
+
+    <!-- TAB GLOSARIO -->
+    <div class="carrera-tab-content" id="careerTab-glosario">
+      <div class="career-card">
+        <h3>📘 Glosario PSA</h3>
+        <div style="margin-top:10px">
+          <div style="padding:12px;border-radius:12px;background:rgba(255,255,255,.6);margin-bottom:8px"><b style="color:#3d63c9">PB (Puntos Bonificables)</b><br/><span style="font-size:12.5px;color:#5c5c66">Cada producto PSA vale cierta cantidad de PB. Tus PB personales determinan tu categoría y comisiones. Ej: Senior 4 ~ 4-5 PB.</span></div>
+          <div style="padding:12px;border-radius:12px;background:rgba(255,255,255,.6);margin-bottom:8px"><b style="color:#1d7a5c">❤️ Corazón</b><br/><span style="font-size:12.5px;color:#5c5c66">Presentación completa del negocio a un invitado con seguimiento. 5 corazones = requisito para pasar a CE. Representa actividad de patrocinio.</span></div>
+          <div style="padding:12px;border-radius:12px;background:rgba(255,255,255,.6);margin-bottom:8px"><b style="color:#a3670b">🤝 Patrocinio</b><br/><span style="font-size:12.5px;color:#5c5c66">Persona que vos ingresás directamente a PSA. Si hace 9 PB, te ayuda a calificar bonus.</span></div>
+          <div style="padding:12px;border-radius:12px;background:rgba(255,255,255,.6);margin-bottom:8px"><b style="color:#7a4bd9">(A+B) / (A+B+C)</b><br/><span style="font-size:12.5px;color:#5c5c66">A=PB personales del mes, B=PB de organizaciones en mes presente, C=PB mes anterior. Usado para pase y mantenimiento.</span></div>
+          <div style="padding:12px;border-radius:12px;background:rgba(255,255,255,.6);margin-bottom:8px"><b style="color:#d9534f">Mes Arrastre vs Calendario</b><br/><span style="font-size:12.5px;color:#5c5c66">Arrastre: 30 días corridos desde tu fecha de alta. Calendario: mes natural del 1 al 30/31.</span></div>
+          <div style="padding:12px;border-radius:12px;background:rgba(255,255,255,.6);margin-bottom:8px"><b>🎯 PB Sólido</b><br/><span style="font-size:12.5px;color:#5c5c66">PB necesarios para cobrar la ganancia sólida de la categoría (150 PB DC, 600 PB CE, etc). Es un premio extra por alcanzar volumen organizacional.</span></div>
+        </div>
+      </div>
+      <div class="career-card"><h3>🎨 Colores por categoría</h3><p style="font-size:12px;color:#6b6b76;margin:0 0 10px">Actualizado según identidad PSA para coherencia visual.</p><div id="careerColorLegend"></div></div>
+    </div>
   </section>
+
+  <!-- PRESENTACION DEL NEGOCIO -->
+  <section id="view-presentacion" class="view">
+    <header class="top"><button class="back-btn" id="btnBackPresentacion" aria-label="Volver">‹</button><h1>Presentación</h1><div class="script">del Negocio</div><p>Mostrá PSA en 2 minutos</p></header>
+
+    <div class="present-card" style="--accent:linear-gradient(135deg,#5b8def,#a06bff)">
+      <div class="present-icon" style="background:linear-gradient(135deg,#5b8def,#a06bff)">💧</div>
+      <h3>Los 4 Pilares de PSA</h3>
+      <div class="pilar-grid">
+        <div class="pilar-item"><div class="p-ico">🌿</div><b>Salud</b><small>Agua y aire puros para tu familia</small></div>
+        <div class="pilar-item"><div class="p-ico">💼</div><b>Negocio</b><small>Independiente y escalable</small></div>
+        <div class="pilar-item"><div class="p-ico">📚</div><b>Desarrollo</b><small>Crecimiento personal y profesional</small></div>
+        <div class="pilar-item"><div class="p-ico">⏰</div><b>Libertad</b><small>Tiempo y dinero a tu ritmo</small></div>
+      </div>
+    </div>
+
+    <div class="present-card" style="--accent:linear-gradient(135deg,#3ad0a4,#5b8def)">
+      <div class="present-icon" style="background:linear-gradient(135deg,#3ad0a4,#5b8def)">🏢</div>
+      <h3>La Empresa</h3>
+      <p><b>PSA es una división de Industrias Pugliese S.A.</b>, grupo argentino con más de 80 años de trayectoria. Fundada en 1990, pionera en purificación de agua domiciliaria en Argentina.</p>
+      <p>✔️ Líder indiscutida desde 1990<br/>✔️ Presencia en 8+ países LATAM y Europa<br/>✔️ Más de 1 millón de hogares con PSA<br/>✔️ Certificaciones ISO, AIDIS, WQA<br/>✔️ Empresa B certificada, compromiso ambiental<br/>✔️ Tecnología 100% desarrollada en Argentina</p>
+      <div class="tip" style="margin-top:10px">🧊 Dato curioso: PSA instaló purificadores hasta en la Antártida.</div>
+    </div>
+
+    <div class="present-card" style="--accent:linear-gradient(135deg,#f5b301,#ff8f6b)">
+      <div class="present-icon" style="background:linear-gradient(135deg,#f5b301,#ff8f6b)">💰</div>
+      <h3>El Negocio</h3>
+      <p><b>2 tipos de ingresos:</b></p>
+      <div class="pilar-grid">
+        <div class="pilar-item" style="background:rgba(58,208,164,.12)"><div class="p-ico">🛒</div><b>Activos</b><small>Venta directa y posventa de purificadores</small></div>
+        <div class="pilar-item" style="background:rgba(91,141,239,.12)"><div class="p-ico">🌳</div><b>Pasivos</b><small>Comisiones por el equipo que ayudás a formar</small></div>
+      </div>
+      <p style="margin-top:12px">Modelo <b>Flex Marketing Plan®</b>: único, con lo mejor del marketing de redes pero sin sus rigideces. Vos sos dueño de tu negocio, manejás horarios y zona.</p>
+      <div class="prod-list">
+        <div class="prod-item"><div class="prod-ico">💵</div><div class="prod-info"><b>Ganancias inmediatas</b><small>30% promedio por venta directa</small></div></div>
+        <div class="prod-item"><div class="prod-ico">📈</div><div class="prod-info"><b>Crecimiento exponencial</b><small>A medida que tu equipo crece, tu ingreso también</small></div></div>
+        <div class="prod-item"><div class="prod-ico">🏖️</div><div class="prod-info"><b>Viajes y reconocimientos</b><small>Desde CE en adelante</small></div></div>
+      </div>
+    </div>
+
+    <div class="present-card" style="--accent:linear-gradient(135deg,#5b8def,#a06bff)">
+      <div class="present-icon" style="background:linear-gradient(135deg,#a06bff,#ff6b9d)">💧</div>
+      <h3>El Producto</h3>
+      <p>Purificadores de <b>agua</b> y <b>aire</b> con tecnología de vanguardia. Bacteriológicos, eliminan cloro, metales pesados, trihalometanos.</p>
+      <div class="prod-list">
+        <div class="prod-item"><div class="prod-ico">🚰</div><div class="prod-info"><b>Línea Senior</b><small>Senior 2, 3, 4 – Sobre y bajo mesada – 3 años de vida útil</small></div></div>
+        <div class="prod-item"><div class="prod-ico">💎</div><div class="prod-info"><b>Línea Vero / Mini / Rotoplas</b><small>Diferentes necesidades y presupuestos</small></div></div>
+        <div class="prod-item"><div class="prod-ico">🚿</div><div class="prod-info"><b>Ducha PSA</b><small>Ideal para piel y alergias</small></div></div>
+        <div class="prod-item"><div class="prod-ico">🌬️</div><div class="prod-info"><b>Purificador de Aire</b><small>Bacterias, polvo, polen, humo</small></div></div>
+        <div class="prod-item"><div class="prod-ico">♻️</div><div class="prod-info"><b>Posventa sostenible</b><small>Filtros de repuesto cada 3-6 meses, fidelización del cliente</small></div></div>
+      </div>
+    </div>
+
+    <div class="present-card" style="--accent:linear-gradient(135deg,#a06bff,#ff6b9d)">
+      <div class="present-icon" style="background:linear-gradient(135deg,#ff8f6b,#ff6b9d)">✨</div>
+      <h3>Vos: el factor decisivo</h3>
+      <p>PSA pone la empresa, el producto y el plan. <b>Vos ponés la actitud.</b></p>
+      <p>3 claves del éxito:<br/>🔥 <b>Aprender</b> – Sistema de capacitación continuo<br/>🔥 <b>Hacer</b> – Demostraciones, corazones, patrocinios<br/>🔥 <b>Enseñar</b> – Duplicar y formar tu equipo</p>
+      <div style="margin-top:12px;padding:12px;border-radius:14px;background:linear-gradient(135deg,rgba(91,141,239,.12),rgba(255,107,157,.10));border:1px dashed rgba(91,141,239,.2);font-size:13px;line-height:1.45">“Este negocio puede solucionarte dos de los problemas más grandes: tiempo y dinero.”<br/><small style="color:#8a8a94">– Filosofía PSA</small></div>
+      <div class="actions" style="margin-top:14px"><button class="btn whatsapp" id="btnPresentCompartir">📤 Compartir esta presentación</button></div>
+    </div>
+  </section>
+
+  <!-- CALCULADORA PB -->
+  <section id="view-calculadora" class="view">
+    <header class="top"><button class="back-btn" id="btnBackCalculadora" aria-label="Volver">‹</button><h1>Calculadora</h1><div class="script">de PB</div><p>Convertí productos en avance</p></header>
+
+    <div class="calc-tabs" id="calcTabs"><button class="calc-tab active" data-ctab="productos">📦 Productos → PB</button><button class="calc-tab" data-ctab="categoria">🎯 PB → Categoría</button></div>
+
+    <div id="calcTab-productos" class="carrera-tab-content active">
+      <div class="career-card">
+        <h3>📦 Productos del mes</h3>
+        <p style="font-size:12px;color:#6b6b76;margin:0 0 10px;line-height:1.4">Tocá + / –. Los PB se calculan automáticamente. Podés editar los PB por producto.</p>
+        <div id="calcProductosList"></div>
+        <div class="calc-result" id="calcTotalResult"><div class="lbl">PB Totales generados</div><div class="big" id="calcTotalPB">0</div><div class="lbl" id="calcEquivCat">—</div></div>
+        <div class="actions" style="margin-top:12px"><button class="btn primary" id="btnCalcGuardar">💾 Guardar en Carrera</button><button class="btn" id="btnCalcReset">↺ Reset</button></div>
+      </div>
+      <div class="career-card">
+        <h3>⚙️ Editar valores PB</h3>
+        <p style="font-size:12px;color:#777887">Si tu lista cambia, editala. Se guarda local.</p>
+        <div id="calcEditList" style="margin-top:10px"></div>
+        <div class="actions"><button class="btn primary" id="btnCalcSaveEdit">Guardar productos</button></div>
+      </div>
+    </div>
+
+    <div id="calcTab-categoria" class="carrera-tab-content">
+      <div class="career-card">
+        <h3>🎯 ¿Dónde estás?</h3>
+        <label class="career-label">Ingresá tus PB personales actuales</label>
+        <input id="calcInputPB" type="number" min="0" placeholder="Ej: 11" style="width:100%;padding:12px;border-radius:12px;border:1px solid rgba(80,90,130,.16);background:rgba(255,255,255,.75);font:inherit;margin-top:6px"/>
+        <div id="calcCategoriaResult" style="margin-top:14px"></div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- LISTA DE PRECIOS DISTRIBUIDOR / USUARIO -->
+  <section id="view-precios" class="view">
+    <header class="top"><button class="back-btn" id="btnBackPrecios" aria-label="Volver">‹</button><h1>Lista de</h1><div class="script">Precios</div><p>Distribuidor vs Usuario - Cruce automático</p></header>
+
+    <div class="career-card" style="border:1px solid rgba(58,208,164,0.25);background:linear-gradient(135deg,rgba(58,208,164,0.12),rgba(91,141,239,0.08))">
+      <h3>📥 Cargar archivos de precios</h3>
+      <p style="font-size:12px;color:#5c5c66;margin:0 0 12px;line-height:1.4">Cargá los 2 Excel como hacés con Mi Equipo. Columnas detectadas automáticamente: Producto, Modelo, PB, Precio. Formato .xls, .xlsx o .csv</p>
+      
+      <div style="padding:12px;border-radius:14px;background:rgba(91,141,239,0.12);border:1px solid rgba(91,141,239,0.20);margin-bottom:12px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="font-size:22px">☁️</div>
+          <div style="flex:1">
+            <b style="font-size:13px;display:block">Precios oficiales desde tu panel admin</b>
+            <small style="font-size:11px;color:#6b6b76;display:block" id="preciosOficialesStatus">Cargando precios oficiales...</small>
+          </div>
+          <div style="width:10px;height:10px;border-radius:50%;background:#a0a0b0" id="preciosOficialesDot"></div>
+        </div>
+        <div style="font-size:11px;color:#8a8a94;margin-top:8px;line-height:1.4">Solo vos (admin) cargás las 2 planillas en tu panel de claves. APPI las muestra acá automáticamente, ya cruzadas con ganancia. Los clientes no pueden editar.</div>
+      </div>
+      <div id="preciosOficialesMeta" style="display:none"></div>
+      <!-- Mantener inputs ocultos por compatibilidad pero no visibles -->
+      <div style="display:none"><input type="file" id="fileDistribuidor" accept=".xls,.xlsx,.csv" /><input type="file" id="fileUsuario" accept=".xls,.xlsx,.csv" /><span id="statusDistribuidor"></span><span id="statusUsuario"></span></div>
+
+      <div id="preciosResumen" style="display:none">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px">
+          <div class="resumen-box ingresos" style="padding:10px"><div class="lbl">Productos cruzados</div><div class="val" id="statCruzados" style="font-size:18px">0</div></div>
+          <div class="resumen-box" style="padding:10px;background:rgba(58,208,164,0.12)"><div class="lbl" style="color:#1d7a5c">Ganancia prom.</div><div class="val" id="statGanancia" style="font-size:16px;color:#1d7a5c">-</div></div>
+          <div class="resumen-box" style="padding:10px;background:rgba(245,179,1,0.12)"><div class="lbl" style="color:#a3670b">Margen prom.</div><div class="val" id="statMargen" style="font-size:16px;color:#a3670b">-</div></div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-secondary" id="btnPreciosEjemplo">📋 Ver ejemplo formato</button>
+        <button class="btn btn-danger" id="btnPreciosLimpiar" style="display:none">🗑️ Limpiar todo</button>
+      </div>
+    </div>
+
+    <div class="search-box" id="preciosSearchBox" style="display:none">
+      <span class="icon">🔍</span>
+      <input type="text" id="preciosSearchInput" placeholder="Buscar producto..." />
+      <button class="clear-btn" id="preciosSearchClear">✕</button>
+    </div>
+
+    <div class="filter-chips" id="preciosFilterChips" style="display:none"></div>
+
+    <div id="preciosContent"></div>
+
+    <div class="actions" id="preciosShareWrap" style="display:none;margin-top:14px">
+      <button class="btn whatsapp" id="btnPreciosShare">📤 Compartir comparativa</button>
+      <button class="btn" id="btnPreciosExport">💾 Exportar CSV</button>
+    </div>
+  </section>
+
+
 
   <!-- SEGUIMIENTO DE PERSONAS -->
   <section id="view-seguimiento" class="view">
@@ -3993,7 +4334,7 @@ function showView(id){
   document.querySelectorAll('nav.tabs button').forEach(b=>{
     b.classList.toggle('active', b.dataset.view===id);
   });
-  const hideTabsOn = ['view-home','view-siete','view-siete-detail','view-presu','view-presu-hist','view-equipo','view-seguimiento','view-carrera','view-planning'];
+  const hideTabsOn = ['view-home','view-siete','view-siete-detail','view-presu','view-presu-hist','view-equipo','view-seguimiento','view-carrera','view-planning','view-presentacion','view-calculadora','view-precios'];
   document.getElementById('tabs').style.display = hideTabsOn.includes(id) ? 'none' : 'flex';
   if(id==='view-history') renderHistory();
   if(id==='view-eval')    renderAreas();
@@ -4002,6 +4343,9 @@ function showView(id){
   if(id==='view-planning') renderPlanningTools();
   if(id==='view-seguimiento') renderSeguimiento();
   if(id==='view-carrera') renderCarrera();
+  if(id==='view-presentacion') renderPresentacion();
+  if(id==='view-calculadora') renderCalculadora();
+  if(id==='view-precios') renderPrecios();
   document.body.classList.toggle('evaluar-hint', id === 'view-wheel');
   window.scrollTo({top:0});
 }
@@ -4031,7 +4375,10 @@ document.getElementById('btnBackPresu').addEventListener('click', ()=> showView(
 document.getElementById('btnBackPresuHist').addEventListener('click', ()=> showView('view-presu'));
 document.getElementById('btnBackEquipo').addEventListener('click', ()=> showView('view-home'));
 document.getElementById('btnBackSeguimiento').addEventListener('click', ()=> showView('view-home'));
-document.getElementById('btnBackCarrera').addEventListener('click', ()=> showView('view-home'));
+document.getElementById('btnBackCarrera').addEventListener('click', ()=> { if(history.length>1){ history.back(); setTimeout(asegurarAcceso,150);} else showView('view-home'); });
+const _bPres=document.getElementById('btnBackPresentacion'); if(_bPres) _bPres.addEventListener('click',()=>showView('view-home'));
+const _bCalc=document.getElementById('btnBackCalculadora'); if(_bCalc) _bCalc.addEventListener('click',()=>showView('view-home'));
+const _bPrec=document.getElementById('btnBackPrecios'); if(_bPrec) _bPrec.addEventListener('click',()=>{ if(window.history.length>1) { window.history.back(); setTimeout(asegurarAcceso, 150); } else { showView('view-home'); } });
 document.getElementById('btnBackPlanning').addEventListener('click', ()=> showView('view-home'));
 document.querySelectorAll('nav.tabs button').forEach(btn=>btn.addEventListener('click', ()=> showView(btn.dataset.view)));
 document.getElementById('month').addEventListener('change', e => { state.month = +e.target.value; persistDraft(); });
@@ -4924,9 +5271,10 @@ const CAT_INFO = {
   'D':  { name: 'D', color: '#ffffff', textColor: '#1c1c1e', full: 'Distribuidor', border: 'solid' },
   'DC': { name: 'DC', color: '#f7c630', textColor: '#1c1c1e', full: 'Distribuidor Calificado' },
   'CE': { name: 'CE', color: '#4b7a55', textColor: '#ffffff', full: 'Coordinador de Equipo' },
-  'LE': { name: 'LE', color: '#006fb2', textColor: '#ffffff', full: 'Líder' },
-  'EJ': { name: 'EJ', color: '#dd2c33', textColor: '#ffffff', full: 'Líder Ejecutivo' },
-  'E':  { name: 'E', color: '#000000', textColor: '#ffffff', full: 'Empresario' }
+  'L':  { name: 'L', color: '#7a4bd9', textColor: '#ffffff', full: 'Líder' },
+  'LE': { name: 'LE', color: '#006fb2', textColor: '#ffffff', full: 'Líder Ejecutivo' },
+  'EJ': { name: 'EJ', color: '#dd2c33', textColor: '#ffffff', full: 'Ejecutivo' },
+  'E':  { name: 'E', color: '#111111', textColor: '#ffffff', full: 'Empresa' }
 };
 function catInfoOf(catRaw){
   const k = (catRaw||'').toString().trim().toUpperCase();
@@ -7686,15 +8034,992 @@ function obtenerProximoPaso(){
   }
   return { icon:'📤', tone:'done', label:'Mes ordenado', title:'Compartí tu informe mensual', desc:'Ya tenés las herramientas principales cargadas. Enviá un resumen por WhatsApp.', btn:'Compartir resumen', run:(e)=>compartirConsolidado(e), done:true };
 }
+
 const CAREER_KEY='carreraPSA';
+const PSA_CATEGORIES=[
+  {code:'DJ',name:'Distribuidor Junior',short:'DJ',icon:'🌱',color:'#e8e8ec',textColor:'#1c1c1e',border:'none',level:0,desc:'Primer paso. Aprendizaje de productos y negocio.',req:['Solicitud de adhesión','Kit de acceso','Primer purificador','Reempadronamiento'],pase:'Ingreso con kit. Sin PB previo.',periodo:'Inmediato',mantenimiento:'No aplica en esta etapa',beneficios:['Acceso a productos con descuento base','Capacitación inicial','Acompañamiento del patrocinador'],pbSolido:0,detallePB:'Sin sólido. Objetivo pasar a D con 13 PB personales.',pbNecesario:0},
+  {code:'D',name:'Distribuidor',short:'D',icon:'⭐',color:'#ffffff',textColor:'#1c1c1e',border:'solid',level:1,desc:'Primer nivel calificado. Ya podés formar equipo.',req:['13 PB personales','DJ directos calificados','Programa Capacitación Básica'],pase:'13 PB personales + DJ directos. Opciones: Mes Arrastre / Mes Calendario',periodo:'1 mes calendario',mantenimiento:'(A + B) = 2 PB en 2 de 3 meses del trimestre',beneficios:['3% descuento en compras','5% comisión sobre organización DJ','Acceso a Bonus por patrocinios'],pbSolido:0,detallePB:'Mantener con 2 PB',pbNecesario:13},
+  {code:'DC',name:'Distribuidor Calificado',short:'DC',icon:'🏆',color:'#f7c630',textColor:'#1c1c1e',border:'none',level:2,desc:'Liderás pequeños equipos. Primeras ganancias sólidas.',req:['(A + B) = 13 PB en 3 organizaciones D','Al menos 2 líneas diferentes','Evaluación de liderazgo'],pase:'(A + B) = 13 PB en 3 org D',periodo:'1 mes calendario',mantenimiento:'(A + B + C) = 17 PB en 2 de 3 meses del trimestre',beneficios:['7% descuento','15% sobre org DJ','10% sobre org D','Sólido de 150 PB'],pbSolido:150,detallePB:'Sólido 150 PB',pbNecesario:13},
+  {code:'CE',name:'Coordinador de Equipo',short:'CE',icon:'👑',color:'#4b7a55',textColor:'#ffffff',border:'none',level:3,desc:'Coordinás múltiples organizaciones, rol de liderazgo medio.',req:['5 corazones (presentaciones completas)','Carta de Intención','50 PB en 3 org DC'],pase:'5 corazones + Carta + 50 PB en 3 org DC',periodo:'2 meses calendario',mantenimiento:'100 PB grupales + estabilidad trimestral',beneficios:['12% descuento aprox','20% org DJ','15% org D','10% org DC','Sólido 600 PB + viajes'],pbSolido:600,detallePB:'Sólido 600 PB',pbNecesario:50},
+  {code:'L',name:'Líder',short:'L',icon:'💎',color:'#7a4bd9',textColor:'#ffffff',border:'none',level:4,desc:'Líder de organización mediana, formador de CE.',req:['100 PB en 4 org CE','Liderazgo comprobado','Formación continua de líderes'],pase:'100 PB en 4 org CE + evaluación',periodo:'2 meses calendario',mantenimiento:'250 PB grupales en trimestre',beneficios:['Comisiones hasta 5 niveles','Reconocimientos regionales','Sólido 1200 PB aprox'],pbSolido:1200,detallePB:'1200 PB',pbNecesario:100},
+  {code:'LE',name:'Líder Ejecutivo',short:'LE',icon:'🚀',color:'#006fb2',textColor:'#ffffff',border:'none',level:5,desc:'Líder ejecutivo, gestiona grandes organizaciones.',req:['150 PB en 5 org CE/L','Mínimo 2 org L calificadas'],pase:'150 PB en orgs calificadas',periodo:'3 meses calendario',mantenimiento:'400 PB grupales + estabilidad',beneficios:['Alta comisión organizacional','Bono de liderazgo','Participación utilidades regionales'],pbSolido:2500,detallePB:'2500 PB',pbNecesario:150},
+  {code:'EJ',name:'Ejecutivo',short:'EJ',icon:'🏅',color:'#dd2c33',textColor:'#ffffff',border:'none',level:6,desc:'Ejecutivo de la compañía, nivel avanzado y regional.',req:['200 PB en 6 org','Mínimo 1 org LE'],pase:'Requisitos de alto volumen y profundidad',periodo:'3-4 meses calendario',mantenimiento:'600 PB grupales trimestrales',beneficios:['Top comisiones multinivel','Bono ejecutivo anual','Reconocimientos internacionales'],pbSolido:5000,detallePB:'5000 PB',pbNecesario:200},
+  {code:'E',name:'Empresa',short:'E',icon:'🌟',color:'#111111',textColor:'#ffffff',border:'none',level:7,desc:'Máxima categoría, referente de la compañía. Legado.',req:['Volumen organizacional superior','Desarrollo de múltiples líneas EJ','Liderazgo integral y legado'],pase:'Liderazgo integral y evaluación directorio',periodo:'Anual',mantenimiento:'Mantenimiento anual de alto volumen',beneficios:['Máximos porcentajes de toda la red','Participación global','Legado y formación de generaciones'],pbSolido:10000,detallePB:'10000 PB',pbNecesario:1000}
+];
+
+const GANANCIAS_T={
+  DC:[{pais:'Argentina',val:'$1.567.500 + $57.750',cod:'ARS'},{pais:'Bolivia',val:'Bs 9.900',cod:'BOB'},{pais:'Colombia',val:'$1.105.500',cod:'COP'},{pais:'Ecuador',val:'$4.587.000',cod:'USD'},{pais:'Paraguay',val:'₲ 7.095.000',cod:'PYG'},{pais:'Perú',val:'S/ 4.092',cod:'PEN'},{pais:'Uruguay',val:'USD 1.089',cod:'USD'},{pais:'Chile',val:'1.320 €',cod:'EUR'},{pais:'España',val:'USD 3.762 + € 4.560',cod:'MIX'}],
+  CE:[{pais:'Argentina',val:'$5.415.000 + $199.500',cod:'ARS'},{pais:'Bolivia',val:'Bs 34.200',cod:'BOB'},{pais:'Colombia',val:'$3.819.000',cod:'COP'},{pais:'Ecuador',val:'$15.846.000',cod:'USD'},{pais:'Paraguay',val:'₲ 24.510.000',cod:'PYG'},{pais:'Perú',val:'S/ 14.136',cod:'PEN'},{pais:'Uruguay',val:'USD 3.762',cod:'USD'},{pais:'Chile',val:'€ 4.560',cod:'EUR'},{pais:'España',val:'USD 3.762 + € 4.560',cod:'MIX'}]
+};
+
+
+const PRECIOS_URL='https://german1987diaz.github.io/appi/precios.json';
+const PRECIOS_CACHE_KEY='precios_oficiales';
+const PRODUCTOS_OFICIALES_KEY='productos_oficiales';
+
+async function fetchPreciosOficiales(){
+  try{
+    const url=PRECIOS_URL+'?t='+Date.now();
+    const res=await fetch(url,{cache:'no-store'});
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const data=await res.json();
+    // Guardar en localStorage para offline
+    localStorage.setItem(PRECIOS_CACHE_KEY, JSON.stringify(data));
+    localStorage.setItem('precios_oficiales_fecha', new Date().toISOString());
+    aplicarPreciosOficiales(data);
+    console.log('✅ Precios oficiales cargados', data);
+    return data;
+  }catch(e){
+    console.log('⚠️ No se pudo cargar precios.json, usando cache/local', e);
+    try{
+      const cached=localStorage.getItem(PRECIOS_CACHE_KEY);
+      if(cached){ const data=JSON.parse(cached); aplicarPreciosOficiales(data); return data; }
+    }catch(err){}
+    return null;
+  }
+}
+
+function aplicarPreciosOficiales(data){
+  if(!data) return;
+  // Ganancias
+  try{
+    if(data.ganancias){
+      if(data.ganancias.DC_150) GANANCIAS_T.DC = data.ganancias.DC_150.map(g=>({pais:g.pais,valor:g.valor,codigo:g.codigo||'ARS'}));
+      if(data.ganancias.CE_600) GANANCIAS_T.CE = data.ganancias.CE_600.map(g=>({pais:g.pais,valor:g.valor,codigo:g.codigo||'ARS'}));
+      if(data.ganancias.DC) GANANCIAS_T.DC = data.ganancias.DC;
+      if(data.ganancias.CE) GANANCIAS_T.CE = data.ganancias.CE;
+    }
+  }catch(e){ console.log('error ganancias',e); }
+
+  // Productos para calculadora
+  try{
+    if(data.productos && Array.isArray(data.productos) && data.productos.length){
+      localStorage.setItem(PRODUCTOS_OFICIALES_KEY, JSON.stringify(data.productos));
+    }
+    if(data.lista && Array.isArray(data.lista)){ 
+      localStorage.setItem(PRODUCTOS_OFICIALES_KEY, JSON.stringify(data.lista));
+    }
+  }catch(e){ console.log('error productos',e); }
+
+  // Precios cruzados oficiales (distribuidor / usuario)
+  try{
+    if(data.preciosCruzados && Array.isArray(data.preciosCruzados)){
+      localStorage.setItem('preciosCruzadosOficiales', JSON.stringify(data.preciosCruzados));
+    } else if(data.preciosDistribuidor && data.preciosUsuario){
+      // Si vienen separados, guardar
+      localStorage.setItem('preciosDistribuidorOficial', JSON.stringify(data.preciosDistribuidor));
+      localStorage.setItem('preciosUsuarioOficial', JSON.stringify(data.preciosUsuario));
+      if(data.preciosCruzados) localStorage.setItem('preciosCruzadosOficiales', JSON.stringify(data.preciosCruzados));
+    }
+    // Actualizar UI de estado oficial
+    const statusEl=document.getElementById('preciosOficialesStatus');
+    const dotEl=document.getElementById('preciosOficialesDot');
+    const metaEl=document.getElementById('preciosOficialesMeta');
+    if(statusEl){
+      const fecha=data.actualizado||new Date().toISOString().split('T')[0];
+      const totalCruz=(data.preciosCruzados||[]).length;
+      const totalDist=(data.preciosDistribuidor||[]).length;
+      const totalUser=(data.preciosUsuario||[]).length;
+      statusEl.textContent=`✅ Actualizado: ${fecha} · ${totalCruz? totalCruz+' productos cruzados' : (totalDist+totalUser)+' productos'} · ${data.version?'v'+data.version:''}`;
+      if(dotEl) dotEl.style.background='#5eeab5';
+      if(metaEl){ metaEl.style.display='block'; metaEl.innerHTML=`<div style="font-size:11px;color:#5c5c66">Distribuidor: ${totalDist} · Usuario: ${totalUser} · Cruzados: ${totalCruz}</div>`; }
+    }
+  }catch(e){ console.log('error precios cruzados',e); }
+
+  // Bonus
+  try{
+    if(data.bonus && data.bonus.b1!==undefined){
+      localStorage.setItem('bonus_oficial_b1', data.bonus.b1);
+      localStorage.setItem('bonus_oficial_b2', data.bonus.b2);
+      localStorage.setItem('bonus_oficial_moneda', data.bonus.moneda||'ARS ($)');
+    }
+  }catch(e){}
+
+  try{ if(document.getElementById('view-carrera')?.classList.contains('active')) renderGananciasTablas(); }catch(e){}
+  try{ if(document.getElementById('view-calculadora')?.classList.contains('active')) renderCalculadora(); }catch(e){}
+  try{ if(document.getElementById('view-precios')?.classList.contains('active')) renderPrecios(); }catch(e){}
+}
+
+
+// Cargar al iniciar la app, en segundo plano
+setTimeout(()=>{ fetchPreciosOficiales(); }, 1200);
+
+function cargarCalcProductosConOficial(){
+  // Intenta cargar de localStorage de admin, si no, default
+  try{
+    const oficialStr=localStorage.getItem(PRODUCTOS_OFICIALES_KEY);
+    if(oficialStr){
+      const oficial=JSON.parse(oficialStr);
+      if(Array.isArray(oficial) && oficial.length){
+        // Si el usuario nunca personalizó (CALC_KEY no existe), usar oficial
+        const customRaw=localStorage.getItem('calcProductos');
+        if(!customRaw){
+          return JSON.parse(JSON.stringify(oficial));
+        }
+      }
+    }
+  }catch(e){}
+  return null;
+}
+
+// Patch cargarCalcProductos para priorizar oficial si no hay custom
+const _origCargarCalcProductos = cargarCalcProductos;
+cargarCalcProductos = function(){
+  const conOficial=cargarCalcProductosConOficial();
+  if(conOficial) return conOficial;
+  return _origCargarCalcProductos();
+};
+
+
+
+const CAT_LEVEL={DJ:0,D:1,DC:2,CE:3,L:4,LE:5,EJ:6,E:7};
+
+function obtenerNivelCat(code){ return CAT_LEVEL[(code||'').toUpperCase()] ?? 0; }
+function catPorNivel(n){ return PSA_CATEGORIES.find(c=>c.level===n) || PSA_CATEGORIES[0]; }
+
 function cargarCarrera(){try{return JSON.parse(localStorage.getItem(CAREER_KEY)||'{}')}catch(e){return {}}}
 function guardarCarrera(d){localStorage.setItem(CAREER_KEY,JSON.stringify(d));localStorage.setItem('lastUpdate_carrera',Date.now().toString())}
-function renderCarrera(){const d=cargarCarrera(); const pb=+d.pb||0,obj=+d.objetivo||13,mes=+d.meses||0,req=+d.mesesReq||2; const catMap={'Distribuidor Junior':'DJ','Distribuidor':'D','Distribuidor Calificado':'DC','Coordinador':'CE','Coordinador de Equipo':'CE','Líder':'LE','Líder Ejecutivo':'EJ','Empresario':'E'};document.getElementById('careerCategoria').value=catMap[d.categoria]||d.categoria||'DJ';document.getElementById('careerObjetivo').value=obj;document.getElementById('careerPb').textContent=pb;document.getElementById('careerPbInput').value=pb;document.getElementById('careerPbBar').style.width=Math.min(100,obj?pb/obj*100:0)+'%';document.getElementById('careerPbHint').innerHTML=pb>=obj?'<b>Objetivo cumplido 🎉</b>Muy buen avance este mes.':`<b>Próximo paso</b>Te faltan ${Math.max(0,obj-pb)} PB para completar tu objetivo.`;document.getElementById('careerMeses').value=mes;document.getElementById('careerMesesReq').value=req;document.getElementById('careerTrimHint').innerHTML=mes>=req?'<b>Trimestre cumplido ✅</b>Ya alcanzaste el requisito cargado.':`<b>Mantenimiento en progreso</b>${mes} de ${req} meses cumplidos.`;document.getElementById('careerValorPb').value=d.valorPb||'';document.getElementById('careerBonus1').value=d.bonus1||'';document.getElementById('careerBonus2').value=d.bonus2||'';document.getElementById('careerMoneda').value=d.moneda||'ARS ($)';document.getElementById('careerPatrocinios').value=d.patrocinios||0;document.getElementById('careerOrganizaciones').value=d.organizaciones||0;document.getElementById('careerPatrociniosCalif').value=d.patrociniosCalif||0;document.getElementById('careerBonusPb').value=d.bonusPb||0;const bpb=+d.bonusPb||0,bc=+d.patrociniosCalif||0,reqBonus=bpb>=12&&bc>=1;document.getElementById('careerBonusHint').innerHTML=reqBonus?'<b>Condición alcanzada ✅</b>Podés consultar tu bonus según los valores vigentes.':`<b>Bonus en progreso</b>Necesitás 12 PB personales y 1 o 2 patrocinios con 9 PB o más.`}
-function openCarrera(){showView('view-carrera')}
-document.getElementById('btnCareerSave').onclick=()=>{const d=cargarCarrera();d.categoria=document.getElementById('careerCategoria').value;d.objetivo=+document.getElementById('careerObjetivo').value||0;d.pb=+document.getElementById('careerPbInput').value||0;guardarCarrera(d);renderCarrera();showToast('Progreso guardado ✅',1800);renderHomeCompleto()};
-document.getElementById('btnCareerTrim').onclick=()=>{const d=cargarCarrera();d.meses=Math.max(0,Math.min(3,+document.getElementById('careerMeses').value||0));d.mesesReq=Math.max(1,Math.min(3,+document.getElementById('careerMesesReq').value||2));guardarCarrera(d);renderCarrera();showToast('Trimestre guardado ✅',1800)};
-document.getElementById('btnCareerBonus').onclick=()=>{const d=cargarCarrera();d.patrocinios=+document.getElementById('careerPatrocinios').value||0;d.organizaciones=+document.getElementById('careerOrganizaciones').value||0;d.patrociniosCalif=Math.min(2,Math.max(0,+document.getElementById('careerPatrociniosCalif').value||0));d.bonusPb=+document.getElementById('careerBonusPb').value||0;guardarCarrera(d);renderCarrera();showToast('Actividad guardada ✅',1800)};
-document.getElementById('btnCareerValues').onclick=()=>{const d=cargarCarrera();d.valorPb=document.getElementById('careerValorPb').value;d.bonus1=document.getElementById('careerBonus1').value;d.bonus2=document.getElementById('careerBonus2').value;d.moneda=document.getElementById('careerMoneda').value;guardarCarrera(d);showToast('Valores guardados ✅',1800)};
+
+function renderCarrera(){
+  const d=cargarCarrera();
+  const pb=+d.pb||0,obj=+d.objetivo||13,mes=+d.meses||0,req=+d.mesesReq||2;
+  const catMap={'Distribuidor Junior':'DJ','Distribuidor':'D','Distribuidor Calificado':'DC','Coordinador':'CE','Coordinador de Equipo':'CE','Líder':'L','Líder Ejecutivo':'LE','Ejecutivo':'EJ','Empresa':'E','Líder':'LE','Coordinador de Equipo':'CE'};
+  const catActual = catMap[d.categoria]||d.categoria||'DJ';
+  const elCat=document.getElementById('careerCategoria'); if(elCat) elCat.value=catActual;
+  const elObj=document.getElementById('careerObjetivo'); if(elObj) elObj.value=obj;
+  const elPb=document.getElementById('careerPb'); if(elPb) elPb.textContent=pb;
+  const elPbIn=document.getElementById('careerPbInput'); if(elPbIn) elPbIn.value=pb;
+  const elBar=document.getElementById('careerPbBar'); if(elBar) elBar.style.width=Math.min(100,obj?pb/obj*100:0)+'%';
+  const elHint=document.getElementById('careerPbHint'); if(elHint) elHint.innerHTML=pb>=obj?'<b>Objetivo cumplido 🎉</b>Muy buen avance este mes.':'<b>Próximo paso</b>Te faltan '+Math.max(0,obj-pb)+' PB para completar tu objetivo.';
+  const elMeses=document.getElementById('careerMeses'); if(elMeses) elMeses.value=mes;
+  const elMReq=document.getElementById('careerMesesReq'); if(elMReq) elMReq.value=req;
+  const elTrim=document.getElementById('careerTrimHint'); if(elTrim) elTrim.innerHTML=mes>=req?'<b>Trimestre cumplido ✅</b>Ya alcanzaste el requisito cargado.':'<b>Mantenimiento en progreso</b>'+mes+' de '+req+' meses cumplidos.';
+  const ids=[['careerValorPb','valorPb'],['careerBonus1','bonus1'],['careerBonus2','bonus2'],['careerMoneda','moneda'],['careerPatrocinios','patrocinios'],['careerOrganizaciones','organizaciones'],['careerPatrociniosCalif','patrociniosCalif'],['careerBonusPb','bonusPb']];
+  ids.forEach(([elId,key])=>{const el=document.getElementById(elId); if(el){ const v=d[key]; if(v!==undefined) el.value=v; }});
+  const bpb=+d.bonusPb||0,bc=+d.patrociniosCalif||0,reqBonus=bpb>=12&&bc>=1;
+  const elBonusHint=document.getElementById('careerBonusHint'); if(elBonusHint) elBonusHint.innerHTML=reqBonus?'<b>Condición alcanzada ✅</b>Podés consultar tu bonus según los valores vigentes.':'<b>Bonus en progreso</b>Necesitás 12 PB personales y 1 o 2 patrocinios con 9 PB o más.';
+
+  // Render categorias list
+  renderCareerCategories(catActual);
+  renderGananciasTablas();
+  renderNextCategoryCard(catActual,pb);
+  renderColorLegend();
+}
+
+function renderCareerCategories(selected){
+  const list=document.getElementById('careerCategoriesList'); if(!list) return;
+  list.innerHTML=PSA_CATEGORIES.map(c=>{
+    const isSel=c.code===selected;
+    const textColor=c.textColor||'#fff';
+    const border=c.border==='solid'?'border:2px solid #1c1c1e;':(c.color==='#ffffff'?'border:1.5px solid #d0d0d8;':'');
+    return `<div class="cat-step ${isSel?'active':''}" data-cat="${c.code}" style="--catColor:${c.color}"><div class="cat-icon" style="background:${c.color};color:${textColor};${border}">${c.icon}</div><div class="cat-info"><h4>${c.name} <span class="badge-code" style="background:${c.color};color:${textColor};${border}">${c.code}</span></h4><p>${c.desc}</p></div><div class="cat-arrow">›</div></div>`;
+  }).join('');
+  list.querySelectorAll('[data-cat]').forEach(el=>{el.onclick=()=>{ document.querySelectorAll('.cat-step').forEach(s=>s.classList.remove('active')); el.classList.add('active'); renderCareerCategoryDetail(el.dataset.cat); haptic(8); }});
+  // auto detail of selected
+  renderCareerCategoryDetail(selected);
+}
+
+function renderCareerCategoryDetail(code){
+  const cont=document.getElementById('careerCategoryDetail'); if(!cont) return;
+  const c=PSA_CATEGORIES.find(x=>x.code===code)||PSA_CATEGORIES[0];
+  const textColor=c.textColor||'#fff';
+  const border=c.border==='solid'?'border:2px solid #1c1c1e;':(c.color==='#ffffff'?'border:1.5px solid #d0d0d8;':'');
+  cont.innerHTML=`<div class="cat-detail-card" style="--catColor:${c.color}">
+    <h3><span style="width:38px;height:38px;border-radius:12px;background:${c.color};color:${textColor};${border};display:grid;place-items:center;font-size:20px">${c.icon}</span> ${c.name} <span style="font-size:11px;padding:4px 10px;border-radius:8px;background:${c.color};color:${textColor};${border}">${c.code}</span></h3>
+    <p>${c.desc}</p>
+    <h4>🔑 Requisitos</h4><ul>${c.req.map(r=>`<li>${r}</li>`).join('')}</ul>
+    <h4>🚀 Pase</h4><p><b>${c.pase}</b></p>
+    <h4>⏱️ Período</h4><p>${c.periodo}</p>
+    <h4>🗓️ Mantenimiento</h4><p>${c.mantenimiento}</p>
+    <h4>🎁 Beneficios</h4>${c.beneficios.map(b=>`<div class="benef"><b>•</b> ${b}</div>`).join('')}
+    ${c.pbSolido?`<h4>💰 PB para sólido</h4><p><b>${c.pbSolido} PB</b> – ${c.detallePB}</p>`:''}
+    <div style="margin-top:12px"><span class="tag">PB necesarios próx nivel: ${c.pbNecesario||'—'}</span></div>
+    <div class="actions" style="margin-top:12px"><button class="btn primary" onclick="document.getElementById('careerCategoria').value='${c.code}';guardarCarrera(Object.assign(cargarCarrera(),{categoria:'${c.code}'}));renderCarrera();showToast('Categoría seleccionada: ${c.code} ✅',1800);document.getElementById('carreraTabs').querySelector('[data-ctab=\'progreso\']').click()">Usar esta categoría</button></div>
+  </div>`;
+}
+
+function renderGananciasTablas(){
+  const dc=document.getElementById('tablaDC'); if(dc){
+    dc.innerHTML='<tr><th>País</th><th>Ganancia (150 PB)</th></tr>'+GANANCIAS_T.DC.map(r=>`<tr><td><b>${r.pais}</b></td><td>${r.val}</td></tr>`).join('');
+  }
+  const ce=document.getElementById('tablaCE'); if(ce){
+    ce.innerHTML='<tr><th>País</th><th>Ganancia (600 PB)</th></tr>'+GANANCIAS_T.CE.map(r=>`<tr><td><b>${r.pais}</b></td><td>${r.val}</td></tr>`).join('');
+  }
+  const bonusBox=document.getElementById('bonusBox'); if(bonusBox){
+    const d=cargarCarrera(); const tiene1=d.bonus1||'28.750', tiene2=d.bonus2||'100.000'; const moneda=d.moneda||'ARS ($)';
+    bonusBox.innerHTML=`<h4 style="margin:0 0 6px;font-size:14px;font-weight:900">🎯 Bonus por patrocinios calificados</h4><p style="font-size:12.5px;line-height:1.4;margin:0">Requisito: <b>12 PB personales + 1-2 patrocinios con 9 PB c/u</b><br/>Si tenés 1 patrocinio calificado: <b style="color:#a3670b">${moneda} ${tiene1}</b><br/>Si tenés 2: <b style="color:#1d7a5c">${moneda} ${tiene2}</b><br/><small style="color:#8a8a94">Valores Argentina referencia. Consultá vigencia.</small></p>`;
+    bonusBox.className='bonus-highlight '+( (+d.bonusPb>=12 && +d.patrociniosCalif>=1) ? 'pos' : '' );
+  }
+}
+
+function renderNextCategoryCard(actualCode,pb){
+  const cont=document.getElementById('careerNextCatCard'); if(!cont) return;
+  const nivelActual=obtenerNivelCat(actualCode);
+  if(nivelActual>=7){ cont.style.display='none'; return; }
+  const next=catPorNivel(nivelActual+1);
+  const faltante=Math.max(0,(next.pbNecesario||0)-pb);
+  cont.style.display='block';
+  cont.innerHTML=`<h3>➡️ Próximo nivel: ${next.name} (${next.code})</h3>
+    <p style="font-size:12.5px;color:#5c5c66;margin:6px 0 10px;line-height:1.4">Estás en <b>${actualCode}</b>. Para llegar a <b>${next.code}</b> necesitás:</p>
+    <div class="career-bar"><span style="width:${Math.min(100,next.pbNecesario?pb/next.pbNecesario*100:0)}%"></span></div>
+    <div class="career-rule">${faltante>0?`<b>Te faltan ${faltante} PB personales</b> para el mínimo de ${next.code}. Además revisá requisitos de organizaciones y corazones.`:`<b>¡Alcanzaste el PB mínimo para ${next.code}!</b> Revisá que cumplas también requisitos de orgs.`}</div>
+    <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">${next.req.map(r=>`<span class="tag">${r}</span>`).join('')}</div>
+  `;
+}
+
+function renderColorLegend(){
+  const cont=document.getElementById('careerColorLegend'); if(!cont) return;
+  cont.innerHTML=PSA_CATEGORIES.map(c=>{
+    const textColor=c.textColor||'#fff';
+    const border=c.border==='solid'?'border:1.5px solid #1c1c1e;':(c.color==='#ffffff'?'border:1.5px solid #d0d0d8;':'');
+    return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px dashed rgba(80,90,130,.10)"><span style="width:28px;height:28px;border-radius:8px;background:${c.color};color:${textColor};${border};display:grid;place-items:center;font-size:14px;font-weight:900">${c.code}</span><b style="min-width:70px;font-size:13px">${c.name}</b><span style="font-size:11px;color:#6b6b76">${c.color}</span></div>`;
+  }).join('');
+}
+
+function openCarrera(){showView('view-carrera'); renderCarrera();}
+
+document.addEventListener('DOMContentLoaded',()=>{});
+const __origCareer = document.getElementById('btnCareerSave');
+if(__origCareer)__origCareer.onclick=()=>{const d=cargarCarrera();d.categoria=document.getElementById('careerCategoria').value;d.objetivo=+document.getElementById('careerObjetivo').value||0;d.pb=+document.getElementById('careerPbInput').value||0;guardarCarrera(d);renderCarrera();showToast('Progreso guardado ✅',1800);renderHomeCompleto();};
+const __trim=document.getElementById('btnCareerTrim'); if(__trim) __trim.onclick=()=>{const d=cargarCarrera();d.meses=Math.max(0,Math.min(3,+document.getElementById('careerMeses').value||0));d.mesesReq=Math.max(1,Math.min(3,+document.getElementById('careerMesesReq').value||2));guardarCarrera(d);renderCarrera();showToast('Trimestre guardado ✅',1800);};
+const __bonus=document.getElementById('btnCareerBonus'); if(__bonus) __bonus.onclick=()=>{const d=cargarCarrera();d.patrocinios=+document.getElementById('careerPatrocinios').value||0;d.organizaciones=+document.getElementById('careerOrganizaciones').value||0;d.patrociniosCalif=Math.min(2,Math.max(0,+document.getElementById('careerPatrociniosCalif').value||0));d.bonusPb=+document.getElementById('careerBonusPb').value||0;guardarCarrera(d);renderCarrera();showToast('Actividad guardada ✅',1800);};
+const __vals=document.getElementById('btnCareerValues'); if(__vals) __vals.onclick=()=>{const d=cargarCarrera();d.valorPb=document.getElementById('careerValorPb').value;d.bonus1=document.getElementById('careerBonus1').value;d.bonus2=document.getElementById('careerBonus2').value;d.moneda=document.getElementById('careerMoneda').value;guardarCarrera(d);showToast('Valores guardados ✅',1800);renderGananciasTablas();};
+
+// Tabs carrera
+document.addEventListener('click',e=>{
+  const t=e.target.closest('[data-ctab]'); if(!t) return;
+  const wrapCarrera=t.closest('#carreraTabs');
+  if(wrapCarrera){
+    const tab=t.dataset.ctab;
+    wrapCarrera.querySelectorAll('.carrera-tab').forEach(b=>b.classList.remove('active')); t.classList.add('active');
+    document.querySelectorAll('#view-carrera .carrera-tab-content').forEach(c=>c.classList.remove('active'));
+    const target=document.getElementById('careerTab-'+tab); if(target) target.classList.add('active');
+    haptic(6);
+    return;
+  }
+  const wrapCalc=t.closest('#calcTabs');
+  if(wrapCalc){
+    const tab=t.dataset.ctab;
+    wrapCalc.querySelectorAll('.calc-tab').forEach(b=>b.classList.remove('active')); t.classList.add('active');
+    document.querySelectorAll('#view-calculadora .carrera-tab-content').forEach(c=>c.classList.remove('active'));
+    const target=document.getElementById('calcTab-'+tab); if(target) target.classList.add('active');
+    haptic(6);
+    return;
+  }
+});
+
+
+
+
+// ==== LISTA DE PRECIOS DISTRIBUIDOR / USUARIO - IMPORT COMO MI EQUIPO ====
+const PRECIOS_DISTRIB_KEY='preciosDistribuidor';
+const PRECIOS_USUARIO_KEY='preciosUsuario';
+let preciosDistribuidorData=null; // array de objetos {nombre, pb, precio, original}
+let preciosUsuarioData=null;
+let preciosFiltro='all';
+let preciosSearch='';
+
+function loadPreciosFromStorage(){
+  try{
+    const d=localStorage.getItem(PRECIOS_DISTRIBUIDOR_KEY);
+    if(d) preciosDistribuidorData=JSON.parse(d);
+  }catch(e){}
+  try{
+    const u=localStorage.getItem(PRECIOS_USUARIO_KEY);
+    if(u) preciosUsuarioData=JSON.parse(u);
+  }catch(e){}
+}
+function savePreciosDistribuidor(data){ localStorage.setItem(PRECIOS_DISTRIBUIDOR_KEY, JSON.stringify(data)); localStorage.setItem('lastUpdate_precios', Date.now().toString()); }
+function savePreciosUsuario(data){ localStorage.setItem(PRECIOS_USUARIO_KEY, JSON.stringify(data)); localStorage.setItem('lastUpdate_precios', Date.now().toString()); }
+
+function normalizeProducto(str){ return (str||'').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim(); }
+
+function detectarColumnas(headers){
+  // headers: array lowercased
+  const map={};
+  headers.forEach((h,i)=>{
+    const nh=normalizeProducto(h);
+    if(!nh) return;
+    if(/prod|modelo|art|codigo|nombre/.test(nh) && map.nombre===undefined) map.nombre=i;
+    else if(/precio|importe|valor|\$/.test(nh)){
+      // si contiene distri vs usuario no sabemos aún, pero tomamos como precio
+      if(map.precio===undefined) map.precio=i;
+    }
+    if(/pb|punto|p\.b/.test(nh) && map.pb===undefined) map.pb=i;
+  });
+  // fallback: si no detectó nombre, primera columna
+  if(map.nombre===undefined && headers.length>0) map.nombre=0;
+  return map;
+}
+
+function parsePreciosRows(rows){
+  if(!rows || rows.length<2) return [];
+  // Encontrar fila de encabezados (similar a Mi Equipo)
+  let headerRow=-1;
+  for(let i=0;i<Math.min(rows.length,20);i++){
+    const r=rows[i]||[];
+    const count=r.filter(c=>{ const s=(c||'').toString().toLowerCase(); return /prod|modelo|nombre|precio|pb|punto/.test(s); }).length;
+    if(count>=2){ headerRow=i; break; }
+  }
+  if(headerRow===-1) headerRow=0;
+  const headerRaw=rows[headerRow]||[];
+  const headers=headerRaw.map(c=> (c||'').toString().trim());
+  const colMap=detectarColumnas(headers);
+  const data=[];
+  for(let i=headerRow+1;i<rows.length;i++){
+    const r=rows[i]||[];
+    if(r.length===0 || r.every(c=>!c)) continue;
+    const nombreRaw=r[colMap.nombre];
+    const nombre=(nombreRaw||'').toString().trim();
+    if(!nombre || nombre.length<2) continue;
+    let precio=0;
+    if(colMap.precio!==undefined){
+      const pv=r[colMap.precio];
+      if(pv!==undefined && pv!==null && pv!==''){
+        if(typeof pv==='number') precio=pv;
+        else {
+          const s=(''+pv).replace(/[^0-9.,-]/g,'').replace(',', '.');
+          // manejar miles con puntos
+          // si tiene varios puntos, último es decimal
+          // simplificado: quitar puntos de miles si es número grande
+          let clean=s;
+          // si tiene coma y punto, normalizar
+          if(clean.indexOf('.')!==-1 && clean.indexOf(',')!==-1){
+            clean=clean.replace(/\./g,'').replace(',','.');
+          } else if(clean.indexOf(',')!==-1){
+            // si coma y es único, puede ser decimal
+            const parts=clean.split(',');
+            if(parts[1] && parts[1].length<=2) clean=parts[0].replace(/\./g,'')+'.'+parts[1];
+            else clean=clean.replace(/,/g,'');
+          }
+          precio=parseFloat(clean)||0;
+        }
+      }
+    }
+    // buscar otra columna que parezca precio si no encontramos
+    if(precio===0){
+      for(let j=0;j<r.length;j++){
+        if(j===colMap.nombre) continue;
+        const v=r[j];
+        if(typeof v==='number' && v>100){ precio=v; break; }
+        if(typeof v==='string' && /\$|precio/i.test(headers[j]||'')){
+          const num=parseFloat(v.replace(/[^0-9.,-]/g,'').replace(',','.'))||0;
+          if(num>0){ precio=num; break; }
+        }
+      }
+    }
+    let pb=0;
+    if(colMap.pb!==undefined){
+      const pbRaw=r[colMap.pb];
+      if(pbRaw!==undefined) pb=parseFloat(( ''+pbRaw).replace(',', '.'))||0;
+    }
+    // Si pb no detectado, intentar inferir de nombre? dejar 0
+    data.push({ id: normalizeProducto(nombre)+'_'+i, nombre: nombre, nombreNorm: normalizeProducto(nombre), pb: pb, precio: precio, fila: i });
+  }
+  return data;
+}
+
+function cruzarPrecios(){
+  if(!preciosDistribuidorData || !preciosUsuarioData) return [];
+  const mapDist={};
+  preciosDistribuidorData.forEach(d=>{ mapDist[d.nombreNorm]=d; });
+  const cruz=[];
+  const usadosDist=new Set();
+  preciosUsuarioData.forEach(u=>{
+    const norm=u.nombreNorm;
+    const dist=mapDist[norm];
+    if(dist){
+      usadosDist.add(norm);
+      const ganancia=u.precio - dist.precio;
+      const margen=dist.precio>0 ? (ganancia/dist.precio*100) : (u.precio>0?100:0);
+      cruz.push({ nombre:u.nombre, nombreNorm:norm, pb: u.pb||dist.pb||0, precioDist: dist.precio, precioUser: u.precio, ganancia, margen });
+    } else {
+      // Producto solo en usuario, sin distribuidor
+      cruz.push({ nombre:u.nombre, nombreNorm:norm, pb:u.pb||0, precioDist:0, precioUser:u.precio, ganancia:u.precio, margen:100, soloUsuario:true });
+    }
+  });
+  // Productos solo en distribuidor
+  preciosDistribuidorData.forEach(d=>{
+    if(!usadosDist.has(d.nombreNorm) && !cruz.find(x=>x.nombreNorm===d.nombreNorm)){
+      cruz.push({ nombre:d.nombre, nombreNorm:d.nombreNorm, pb:d.pb||0, precioDist:d.precio, precioUser:0, ganancia:-d.precio, margen:-100, soloDist:true });
+    }
+  });
+  return cruz;
+}
+
+function formatPrecio(n){
+  if(n===0) return '-';
+  try{ return '$'+Number(n).toLocaleString('es-AR',{minimumFractionDigits:0, maximumFractionDigits:0}); }catch(e){ return '$'+n; }
+}
+
+function renderPrecios(){
+  // Intentar cargar oficial primero (solo admin carga, clientes solo ven oficial)
+  try{
+    const oficialCruzRaw=localStorage.getItem('preciosCruzadosOficiales');
+    if(oficialCruzRaw){
+      const oficialCruz=JSON.parse(oficialCruzRaw);
+      if(Array.isArray(oficialCruz) && oficialCruz.length>0){
+        // Usar oficial como fuente principal para vista solo lectura
+        preciosDistribuidorData = null;
+        preciosUsuarioData = null;
+        // Guardamos en variable global para render
+        window._preciosCruzadosOficial = oficialCruz;
+        // Si hay oficiales, considerar hasDist y hasUser true para mostrar cruce
+        const hasDistOff = true;
+        const hasUserOff = true;
+        // Llamar a render oficial
+        const hasDist = hasDistOff;
+        const hasUser = hasUserOff;
+        const preciosCruzadosOficial = oficialCruz;
+        // Reimplementación simplificada para oficial
+        const statusDist=document.getElementById('statusDistribuidor');
+        const statusUser=document.getElementById('statusUsuario');
+        // status ya actualizado en aplicarPreciosOficiales
+        const resumen=document.getElementById('preciosResumen');
+        const searchBox=document.getElementById('preciosSearchBox');
+        const filterChips=document.getElementById('preciosFilterChips');
+        const content=document.getElementById('preciosContent');
+        const shareWrap=document.getElementById('preciosShareWrap');
+        const btnLimpiar=document.getElementById('btnPreciosLimpiar');
+        if(btnLimpiar) btnLimpiar.style.display='none'; // clientes no limpian
+
+        const cruz = preciosCruzadosOficial;
+        const filtrados = (typeof preciosSearch!=='undefined' && preciosSearch) ? cruz.filter(cc=> (cc.nombreNorm||'').includes(normalizeProducto(preciosSearch)) || normalizeProducto(cc.nombre).includes(normalizeProducto(preciosSearch))) : cruz;
+        const filtradosCat = (typeof preciosFiltro!=='undefined' && preciosFiltro!=='all') ? (preciosFiltro==='ganancia' ? filtrados.filter(cc=>cc.ganancia>0) : preciosFiltro==='sin_cruce' ? filtrados.filter(cc=>cc.soloDist||cc.soloUsuario) : filtrados) : filtrados;
+
+        if(resumen){
+          resumen.style.display='block';
+          const totalCruz=cruz.filter(cc=>!cc.soloDist&&!cc.soloUsuario).length;
+          const ganProm=filtrados.length? (filtrados.reduce((s,cc)=>s+(cc.ganancia||0),0)/filtrados.length):0;
+          const margProm=filtrados.filter(cc=>cc.precioDist>0).length? (filtrados.filter(cc=>cc.precioDist>0).reduce((s,cc)=>s+(cc.margen||0),0)/Math.max(1,filtrados.filter(cc=>cc.precioDist>0).length)):0;
+          const elCruz=document.getElementById('statCruzados'); if(elCruz) elCruz.textContent=totalCruz;
+          const elGan=document.getElementById('statGanancia'); if(elGan) elGan.textContent=(typeof formatPrecio!=='undefined'?formatPrecio(ganProm):'$'+Math.round(ganProm));
+          const elMarg=document.getElementById('statMargen'); if(elMarg) elMarg.textContent=Math.round(margProm)+'%';
+        }
+        if(searchBox) searchBox.style.display='flex';
+        if(filterChips){
+          filterChips.style.display='flex';
+          filterChips.innerHTML=`<button class="filter-chip ${preciosFiltro==='all'?'active':''}" data-pf="all">Todos (${filtrados.length})</button><button class="filter-chip ${preciosFiltro==='ganancia'?'active':''}" data-pf="ganancia">Con ganancia</button><button class="filter-chip ${preciosFiltro==='sin_cruce'?'active':''}" data-pf="sin_cruce">Sin cruce</button>`;
+          filterChips.querySelectorAll('[data-pf]').forEach(b=>{ b.onclick=()=>{ preciosFiltro=b.dataset.pf; renderPrecios(); try{haptic(6);}catch(e){} }; });
+        }
+        if(content){
+          if(filtradosCat.length===0){
+            content.innerHTML='<div class="empty">Sin resultados.</div>';
+          } else {
+            content.innerHTML=`<div class="cat-chart"><h4>📊 ${filtradosCat.length} productos oficiales cruzados</h4><div style="max-height:60vh;overflow-y:auto">${filtradosCat.map(cc=>{
+              const pbBadge=cc.pb?`<span style="padding:2px 6px;border-radius:6px;background:rgba(91,141,239,0.12);color:#3d63c9;font-size:10px;font-weight:900">${cc.pb} PB</span>`:'';
+              if(cc.soloUsuario) return `<div class="person-item" style="border-left:3px solid #f5b301"><span class="pi-cat" style="background:#f5b301">SOLO USER</span><div class="pi-info"><div class="pi-name">${cc.nombre} ${pbBadge}</div><div class="pi-meta">Usuario: ${(typeof formatPrecio!=='undefined'?formatPrecio(cc.precioUser):cc.precioUser)} · Sin distribuidor</div></div></div>`;
+              if(cc.soloDist) return `<div class="person-item" style="border-left:3px solid #8a8a94"><span class="pi-cat" style="background:#8a8a94">SOLO DIST</span><div class="pi-info"><div class="pi-name">${cc.nombre} ${pbBadge}</div><div class="pi-meta">Dist: ${(typeof formatPrecio!=='undefined'?formatPrecio(cc.precioDist):cc.precioDist)} · Sin usuario</div></div></div>`;
+              const col=cc.ganancia>=0?'#1d7a5c':'#d9534f';
+              return `<div class="person-item" style="border-left:3px solid ${col}"><span class="pi-cat" style="background:${col}">${cc.margen>=0?'+':''}${Math.round(cc.margen)}%</span><div class="pi-info"><div class="pi-name">${cc.nombre} ${pbBadge}</div><div class="pi-meta">Dist: ${(typeof formatPrecio!=='undefined'?formatPrecio(cc.precioDist):cc.precioDist)} · User: ${(typeof formatPrecio!=='undefined'?formatPrecio(cc.precioUser):cc.precioUser)} · <span style="color:${col};font-weight:800">Gana ${(typeof formatPrecio!=='undefined'?formatPrecio(cc.ganancia):cc.ganancia)}</span></div></div></div>`;
+            }).join('')}</div></div>`;
+          }
+        }
+        if(shareWrap) shareWrap.style.display='flex';
+        return;
+      }
+    }
+  }catch(e){ console.log('render oficial error',e); }
+
+  loadPreciosFromStorage();
+  const hasDist=preciosDistribuidorData && preciosDistribuidorData.length>0;
+  const hasUser=preciosUsuarioData && preciosUsuarioData.length>0;
+
+  const statusDist=document.getElementById('statusDistribuidor');
+  const statusUser=document.getElementById('statusUsuario');
+  if(statusDist) statusDist.textContent= hasDist ? `${preciosDistribuidorData.length} productos` : 'Sin cargar';
+  if(statusUser) statusUser.textContent= hasUser ? `${preciosUsuarioData.length} productos` : 'Sin cargar';
+
+  const resumen=document.getElementById('preciosResumen');
+  const searchBox=document.getElementById('preciosSearchBox');
+  const filterChips=document.getElementById('preciosFilterChips');
+  const content=document.getElementById('preciosContent');
+  const shareWrap=document.getElementById('preciosShareWrap');
+  const btnLimpiar=document.getElementById('btnPreciosLimpiar');
+
+  if(!hasDist && !hasUser){
+    if(resumen) resumen.style.display='none';
+    if(searchBox) searchBox.style.display='none';
+    if(filterChips) filterChips.style.display='none';
+    if(content) content.innerHTML=`<div class="empty">📋 Cargá primero los 2 Excel.<br/><br/>Formato esperado:<br/>Columna A: Producto / Modelo<br/>Columna B: PB (opcional)<br/>Columna C: Precio<br/><br/>Podés cargar solo 1 archivo para verlo, pero el cruce necesita los 2.</div>`;
+    if(shareWrap) shareWrap.style.display='none';
+    if(btnLimpiar) btnLimpiar.style.display='none';
+    return;
+  }
+
+  if(btnLimpiar) btnLimpiar.style.display='block';
+
+  if(hasDist && hasUser){
+    const cruz=cruzarPrecios();
+    const filtrados=preciosSearch ? cruz.filter(c=> normalizeProducto(c.nombre).includes(normalizeProducto(preciosSearch))) : cruz;
+    const filtradosCat=preciosFiltro==='all' ? filtrados : preciosFiltro==='ganancia' ? filtrados.filter(c=>c.ganancia>0) : preciosFiltro==='sin_cruce' ? filtrados.filter(c=>c.soloDist||c.soloUsuario) : filtrados;
+
+    const totalCruz=cruz.filter(c=>!c.soloDist && !c.soloUsuario).length;
+    const ganProm= filtrados.length ? (filtrados.reduce((s,c)=>s+(c.ganancia||0),0)/filtrados.length) : 0;
+    const margProm= filtrados.length ? (filtrados.filter(c=>c.precioDist>0).reduce((s,c)=>s+(c.margen||0),0) / Math.max(1,filtrados.filter(c=>c.precioDist>0).length)) : 0;
+
+    if(resumen){
+      resumen.style.display='block';
+      document.getElementById('statCruzados').textContent=totalCruz;
+      document.getElementById('statGanancia').textContent=formatPrecio(ganProm);
+      document.getElementById('statMargen').textContent=Math.round(margProm)+'%';
+    }
+    if(searchBox) searchBox.style.display='flex';
+    if(filterChips){
+      filterChips.style.display='flex';
+      filterChips.innerHTML=`<button class="filter-chip ${preciosFiltro==='all'?'active':''}" data-pf="all">Todos (${filtrados.length})</button><button class="filter-chip ${preciosFiltro==='ganancia'?'active':''}" data-pf="ganancia">Con ganancia</button><button class="filter-chip ${preciosFiltro==='sin_cruce'?'active':''}" data-pf="sin_cruce">Sin cruce</button>`;
+      filterChips.querySelectorAll('[data-pf]').forEach(b=>{ b.onclick=()=>{ preciosFiltro=b.dataset.pf; renderPrecios(); haptic(6); }; });
+    }
+
+    if(content){
+      if(filtradosCat.length===0){
+        content.innerHTML='<div class="empty">Sin resultados para el filtro.</div>';
+      } else {
+        content.innerHTML=`<div class="cat-chart"><h4>📊 ${filtradosCat.length} productos ${preciosSearch?`que coinciden con "${preciosSearch}"`:''}</h4>
+          <div style="max-height:60vh;overflow-y:auto">
+          ${filtradosCat.map(c=>{
+            const pbBadge=c.pb?`<span style="padding:2px 6px;border-radius:6px;background:rgba(91,141,239,0.12);color:#3d63c9;font-size:10px;font-weight:900">${c.pb} PB</span>`:'';
+            if(c.soloUsuario) return `<div class="person-item" style="border-left:3px solid #f5b301"><span class="pi-cat" style="background:#f5b301">SOLO USER</span><div class="pi-info"><div class="pi-name">${c.nombre} ${pbBadge}</div><div class="pi-meta">Usuario: ${formatPrecio(c.precioUser)} · Sin distribuidor</div></div><div class="pi-pts" style="color:#a3670b">${formatPrecio(c.ganancia)}</div></div>`;
+            if(c.soloDist) return `<div class="person-item" style="border-left:3px solid #8a8a94"><span class="pi-cat" style="background:#8a8a94">SOLO DIST</span><div class="pi-info"><div class="pi-name">${c.nombre} ${pbBadge}</div><div class="pi-meta">Dist: ${formatPrecio(c.precioDist)} · Sin usuario</div></div><div class="pi-pts zero">${formatPrecio(c.ganancia)}</div></div>`;
+            const gananciaColor=c.ganancia>=0?'#1d7a5c':'#d9534f';
+            const margenColor=c.margen>=30?'#1d7a5c':c.margen>=15?'#a3670b':'#d9534f';
+            return `<div class="person-item" style="border-left:3px solid ${gananciaColor}">
+              <span class="pi-cat" style="background:${gananciaColor}">${c.margen>=0?'+':''}${Math.round(c.margen)}%</span>
+              <div class="pi-info">
+                <div class="pi-name">${c.nombre} ${pbBadge}</div>
+                <div class="pi-meta">Dist: ${formatPrecio(c.precioDist)} · User: ${formatPrecio(c.precioUser)} · <span style="color:${gananciaColor};font-weight:800">Gana ${formatPrecio(c.ganancia)}</span></div>
+              </div>
+              <div class="pi-pts" style="color:${gananciaColor}">${formatPrecio(c.precioUser)}</div>
+            </div>`;
+          }).join('')}
+          </div></div>`;
+      }
+    }
+    if(shareWrap) shareWrap.style.display='flex';
+  } else {
+    // Solo un archivo cargado, mostrar ese
+    const data= hasDist ? preciosDistribuidorData : preciosUsuarioData;
+    const tipo= hasDist ? 'Distribuidor' : 'Usuario';
+    const filtrados=preciosSearch ? data.filter(c=> normalizeProducto(c.nombre).includes(normalizeProducto(preciosSearch))) : data;
+    if(resumen) resumen.style.display='none';
+    if(searchBox) searchBox.style.display='flex';
+    if(filterChips) filterChips.style.display='none';
+    if(content){
+      content.innerHTML=`<div class="cat-chart"><h4>📋 ${tipo}: ${filtrados.length} productos</h4>${filtrados.map(c=>`<div class="person-item"><span class="pi-cat" style="background:${hasDist?'#4b7a55':'#f5b301'}">${c.pb?c.pb+' PB':'-'}</span><div class="pi-info"><div class="pi-name">${c.nombre}</div><div class="pi-meta">${tipo}: ${formatPrecio(c.precio)}${c.pb?' · '+c.pb+' PB':''}</div></div><div class="pi-pts">${formatPrecio(c.precio)}</div></div>`).join('')}</div>`;
+    }
+    if(shareWrap) shareWrap.style.display='none';
+    if(resumen){
+      resumen.style.display='block';
+      document.getElementById('statCruzados').textContent='0 (falta 1 archivo)';
+      document.getElementById('statGanancia').textContent='-';
+      document.getElementById('statMargen').textContent='-';
+    }
+  }
+}
+
+function procesarArchivoPrecios(file, tipo){
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const data=new Uint8Array(e.target.result);
+      const workbook=XLSX.read(data,{type:'array'});
+      const firstSheet=workbook.SheetNames[0];
+      const worksheet=workbook.Sheets[firstSheet];
+      const rows=XLSX.utils.sheet_to_json(worksheet,{header:1,defval:''});
+      const parsed=parsePreciosRows(rows);
+      if(parsed.length===0){ modal.open({icon:'⚠️',title:'No se detectaron productos',html:'<p>Revisá que el Excel tenga al menos 2 filas y columnas Producto y Precio.</p>'}); return; }
+      if(tipo==='distribuidor'){ preciosDistribuidorData=parsed; savePreciosDistribuidor(parsed); showToast(`Distribuidor: ${parsed.length} productos ✅`,2000); }
+      else { preciosUsuarioData=parsed; savePreciosUsuario(parsed); showToast(`Usuario: ${parsed.length} productos ✅`,2000); }
+      renderPrecios();
+      renderHomeCompleto();
+    }catch(err){
+      console.error(err);
+      modal.open({icon:'⚠️',title:'Error leyendo Excel',html:`<p>No se pudo leer el archivo.</p><div class="tip">${err.message}</div>`});
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function openPrecios(){ showView('view-precios'); renderPrecios(); }
+
+// Bind file inputs
+document.addEventListener('DOMContentLoaded',()=>{
+  const btnDist=document.getElementById('btnCargarDistribuidor');
+  const fileDist=document.getElementById('fileDistribuidor');
+  if(btnDist && fileDist){ btnDist.onclick=()=>fileDist.click(); fileDist.onchange=e=>{ const f=e.target.files[0]; if(f) procesarArchivoPrecios(f,'distribuidor'); e.target.value=''; }; }
+
+  const btnUser=document.getElementById('btnCargarUsuario');
+  const fileUser=document.getElementById('fileUsuario');
+  if(btnUser && fileUser){ btnUser.onclick=()=>fileUser.click(); fileUser.onchange=e=>{ const f=e.target.files[0]; if(f) procesarArchivoPrecios(f,'usuario'); e.target.value=''; }; }
+
+  const searchInput=document.getElementById('preciosSearchInput');
+  const searchClear=document.getElementById('preciosSearchClear');
+  if(searchInput){
+    searchInput.oninput=e=>{ preciosSearch=e.target.value; document.getElementById('preciosSearchBox')?.classList.toggle('has-text', !!preciosSearch); renderPrecios(); };
+  }
+  if(searchClear){ searchClear.onclick=()=>{ preciosSearch=''; if(searchInput) searchInput.value=''; document.getElementById('preciosSearchBox')?.classList.remove('has-text'); renderPrecios(); }; }
+
+  const btnEjemplo=document.getElementById('btnPreciosEjemplo');
+  if(btnEjemplo){ btnEjemplo.onclick=()=>{ modal.open({icon:'📋',iconBg:'linear-gradient(135deg,#3ad0a4,#5b8def)',title:'Formato esperado Excel',html:`<p>Tu Excel debe tener al menos estas columnas (el orden no importa):</p><div style="overflow-x:auto"><table class="ganancias-table"><tr><th>Producto</th><th>PB</th><th>Precio</th></tr><tr><td>Senior 4</td><td>5</td><td>125000</td></tr><tr><td>Vero</td><td>3.5</td><td>98000</td></tr><tr><td>Ducha</td><td>1.5</td><td>45000</td></tr></table></div><div class="tip" style="margin-top:10px"><b>Tip:</b> Podés tener más columnas, se detectan automáticamente. Cargá un archivo para <b>Distribuidor</b> y otro para <b>Usuario</b>. Si el nombre coincide (ej: "Senior 4"), se cruzan y calculan ganancia.</div><p style="font-size:11px;color:#8a8a94">Se aceptan .xls, .xlsx, .csv</p>`}); }; }
+
+  const btnLimpiar=document.getElementById('btnPreciosLimpiar');
+  if(btnLimpiar){ btnLimpiar.onclick=()=>{ confirmarAccion({title:'¿Limpiar precios?',html:'<p>Se borrarán los 2 archivos cargados.</p>',okText:'Limpiar',danger:true,onConfirm:()=>{ localStorage.removeItem(PRECIOS_DISTRIBUIDOR_KEY); localStorage.removeItem(PRECIOS_USUARIO_KEY); preciosDistribuidorData=null; preciosUsuarioData=null; renderPrecios(); renderHomeCompleto(); showToast('Precios limpiados'); }}); }; }
+
+  const btnShare=document.getElementById('btnPreciosShare');
+  if(btnShare){ btnShare.onclick=async()=>{ const cruz=cruzarPrecios(); if(cruz.length===0){ showToast('Cargá los 2 archivos primero',1800); return; } let msg=`💰 *Comparativa Precios APPI*\n📅 ${new Date().toLocaleDateString('es-AR')}\n━━━━━━━━━━━━━━━\n\n`; const top=cruz.filter(c=>!c.soloDist&&!c.soloUsuario).sort((a,b)=>b.ganancia-a.ganancia).slice(0,10); top.forEach(c=>{ msg+=`• ${c.nombre}: Dist ${formatPrecio(c.precioDist)} → User ${formatPrecio(c.precioUser)} = Gana ${formatPrecio(c.ganancia)} (${Math.round(c.margen)}%)\n`; }); msg+=`\n📊 Total cruzados: ${cruz.filter(c=>!c.soloDist&&!c.soloUsuario).length} productos\n💵 Ganancia total potencial: ${formatPrecio(cruz.reduce((s,c)=>s+(c.ganancia>0?c.ganancia:0),0))}\n\nEnviado desde *APPI* 🚀`; try{ if(navigator.share){ await navigator.share({title:'Precios APPI', text:msg}); return; } }catch(e){} window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank'); }; }
+
+  const btnExport=document.getElementById('btnPreciosExport');
+  if(btnExport){ btnExport.onclick=()=>{ const cruz=cruzarPrecios(); if(cruz.length===0){ showToast('Nada para exportar',1500); return; } let csv='Producto,PB,Precio Distribuidor,Precio Usuario,Ganancia,Margen %\n'; cruz.forEach(c=>{ csv+=`"${c.nombre.replace(/"/g,'""')}",${c.pb},${c.precioDist},${c.precioUser},${c.ganancia},${Math.round(c.margen)}\n`; }); const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`comparativa_precios_${new Date().toISOString().split('T')[0]}.csv`; a.click(); URL.revokeObjectURL(url); showToast('CSV exportado 📤'); }; }
+
+  loadPreciosFromStorage();
+});
+
+// Actualizar Home para incluir Precios
+(function(){
+  const _origHomeToolsFinal = window.renderToolsList;
+  // Ya tenemos override final, ahora agregamos Precios a ese override si no está
+  const interval=setInterval(()=>{
+    if(typeof renderToolsList==='function'){
+      const orig=renderToolsList;
+      // Evitar doble wrap
+      if(orig.toString().includes('homeExtraTools')){ clearInterval(interval); 
+        // parchear el innerHTML de homeExtraTools para agregar Precios
+        const check=setInterval(()=>{
+          const el=document.getElementById('homeExtraTools');
+          if(el && !el.innerHTML.includes('Precios')){
+            // Re-render con 3 cards
+            const grid=el.querySelector('.home-tool-grid');
+            if(grid){
+              const preciosCard=`<button type="button" class="quick-tool-card" style="--accent:linear-gradient(135deg,#4b7a55,#3ad0a4); --pct:0%" onclick="openPrecios()">
+                <div class="quick-tool-top"><div class="quick-icon" style="background:linear-gradient(135deg,#4b7a55,#3ad0a4)">💲</div><span class="quick-state pending">2 archivos</span></div>
+                <h3>Lista Precios</h3>
+                <p>Distribuidor vs Usuario + ganancia</p>
+                <div class="quick-progress-line"><span style="width:0%"></span></div>
+              </button>`;
+              grid.innerHTML+=preciosCard;
+            }
+            clearInterval(check);
+          }
+        },1000);
+        clearInterval(interval);
+      }
+    }
+  },500);
+})();
+
+// Integrar con Calculadora: mostrar ganancia si hay precios cargados
+const _origCalcularTotalPB = typeof calcularTotalPB==='function' ? calcularTotalPB : null;
+if(_origCalcularTotalPB){
+  calcularTotalPB = function(){
+    const total=_origCalcularTotalPB();
+    try{
+      // Si hay precios cruzados, mostrar ganancia estimada
+      const cruz=cruzarPrecios();
+      if(cruz.length>0 && typeof calcCantidades!=='undefined'){
+        const productos=cargarCalcProductos();
+        let gananciaTotal=0;
+        productos.forEach(p=>{
+          const qty=calcCantidades[p.id]||0;
+          if(qty>0){
+            const match=cruz.find(c=> normalizeProducto(c.nombre).includes(normalizeProducto(p.nombre)) || normalizeProducto(p.nombre).includes(normalizeProducto(c.nombre)) );
+            if(match) gananciaTotal+= (match.ganancia||0)*qty;
+          }
+        });
+        const equiv=document.getElementById('calcEquivCat');
+        if(equiv && gananciaTotal!==0){
+          equiv.innerHTML+=`<br/><span style="display:inline-flex;margin-top:6px;padding:4px 10px;border-radius:999px;background:rgba(58,208,164,0.15);color:#1d7a5c;font-size:11px;font-weight:900">💵 Ganancia est: ${formatPrecio(gananciaTotal)}</span>`;
+        }
+      }
+    }catch(e){}
+    return total;
+  };
+}
+
+
+// ==== PRESENTACION ====
+function renderPresentacion(){ /* nothing heavy */ }
+function openPresentacion(){showView('view-presentacion');}
+const __btnPresComp=document.getElementById('btnPresentCompartir');
+if(__btnPresComp){
+  __btnPresComp.onclick=async()=>{
+    const msg=`💧 *PSA - Oportunidad de Negocio*
+━━━━━━━━━━━━━━━
+🏢 *La Empresa*
+PSA, división de Industrias Pugliese S.A. (desde 1942). Fundada en 1990, pionera en purificación de agua. Líder con +1M hogares, presencia en 8 países, Empresa B.
+
+💰 *El Negocio*
+2 ingresos: Activos (venta directa) y Pasivos (comisiones por equipo). Modelo Flex Marketing Plan®. Vos manejás horarios y zona.
+
+💧 *El Producto*
+Purificadores de agua (Senior, Vero, Mini, Ducha) y aire. Tecnología argentina, 3 años vida útil, filtros de repuesto = clientes fidelizados.
+
+✨ *Vos*
+3 claves: Aprender, Hacer, Enseñar. PSA pone empresa, producto y plan. Vos ponés actitud. Tiempo y dinero a tu ritmo.
+
+¿Te cuento más en 5 min?`;
+    try{ if(navigator.share){ await navigator.share({title:'PSA Presentación', text:msg}); return; } }catch(e){}
+    window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+  };
+}
+
+// ==== CALCULADORA PB ====
+const CALC_KEY='calcProductos';
+const CALC_DEFAULT=[
+  {id:'senior4',nombre:'PSA Senior 4',pb:5,cat:'Purificador',icon:'🚰'},
+  {id:'senior3',nombre:'PSA Senior 3',pb:4,cat:'Purificador',icon:'🚰'},
+  {id:'vero',nombre:'PSA Vero / Rotoplas',pb:3.5,cat:'Purificador',icon:'💎'},
+  {id:'mini',nombre:'PSA Mini',pb:2,cat:'Purificador',icon:'🔹'},
+  {id:'ducha',nombre:'PSA Ducha',pb:1.5,cat:'Purificador',icon:'🚿'},
+  {id:'aire',nombre:'Purificador de Aire',pb:4,cat:'Aire',icon:'🌬️'},
+  {id:'filtro_s',nombre:'Pack Filtros Senior (x4)',pb:0.8,cat:'Repuesto',icon:'♻️'},
+  {id:'filtro_v',nombre:'Filtro Vero / Mini',pb:0.5,cat:'Repuesto',icon:'♻️'}
+];
+
+function cargarCalcProductos(){
+  try{
+    const raw=localStorage.getItem(CALC_KEY);
+    if(raw){ const a=JSON.parse(raw); if(Array.isArray(a)&&a.length) return a; }
+  }catch(e){}
+  return JSON.parse(JSON.stringify(CALC_DEFAULT));
+}
+function guardarCalcProductos(list){localStorage.setItem(CALC_KEY,JSON.stringify(list));}
+
+let calcCantidades={}; // id -> qty
+
+function renderCalculadora(){
+  const productos=cargarCalcProductos();
+  // init cantidades
+  productos.forEach(p=>{ if(calcCantidades[p.id]===undefined) calcCantidades[p.id]=0; });
+
+  const listEl=document.getElementById('calcProductosList');
+  if(listEl){
+    listEl.innerHTML=productos.map(p=>{
+      const qty=calcCantidades[p.id]||0;
+      return `<div class="calc-prod"><div class="calc-info"><b>${p.icon} ${p.nombre}</b><small>${p.cat} · ${p.pb} PB c/u</small></div><div class="calc-ctrl"><button data-dec="${p.id}">−</button><span class="calc-num">${qty}</span><button data-inc="${p.id}">+</button></div></div>`;
+    }).join('');
+    listEl.querySelectorAll('[data-inc]').forEach(b=>{ b.onclick=()=>{ calcCantidades[b.dataset.inc]=(calcCantidades[b.dataset.inc]||0)+1; renderCalculadora(); calcularTotalPB(); }});
+    listEl.querySelectorAll('[data-dec]').forEach(b=>{ b.onclick=()=>{ const id=b.dataset.dec; calcCantidades[id]=Math.max(0,(calcCantidades[id]||0)-1); renderCalculadora(); calcularTotalPB(); }});
+  }
+
+  const editEl=document.getElementById('calcEditList');
+  if(editEl){
+    editEl.innerHTML=productos.map(p=>`<div style="display:flex;gap:8px;margin-bottom:8px;align-items:center"><input data-editname="${p.id}" value="${p.nombre}" style="flex:1;padding:8px;border-radius:8px;border:1px solid rgba(80,90,130,.15);font:inherit;font-size:12.5px"/><input data-editpb="${p.id}" type="number" step="0.1" value="${p.pb}" style="width:70px;padding:8px;border-radius:8px;border:1px solid rgba(80,90,130,.15);font:inherit;font-size:12.5px"/><button data-delprod="${p.id}" style="border:none;background:rgba(217,83,79,.12);color:#d9534f;border-radius:8px;padding:8px 10px;font-weight:900">✕</button></div>`).join('')+`<div style="display:flex;gap:8px;margin-top:10px"><input id="newProdName" placeholder="Nuevo producto" style="flex:1;padding:8px;border-radius:8px;border:1px dashed rgba(80,90,130,.3);font:inherit;font-size:12.5px"/><input id="newProdPB" type="number" step="0.1" placeholder="PB" style="width:70px;padding:8px;border-radius:8px;border:1px solid rgba(80,90,130,.15);font:inherit;font-size:12.5px"/><button id="btnAddProd" style="padding:8px 14px;border-radius:8px;border:none;background:linear-gradient(135deg,#3ad0a4,#5b8def);color:#fff;font-weight:900">+</button></div>`;
+    editEl.querySelectorAll('[data-delprod]').forEach(b=>{ b.onclick=()=>{ const id=b.dataset.delprod; const filtered=cargarCalcProductos().filter(p=>p.id!==id); guardarCalcProductos(filtered); delete calcCantidades[id]; renderCalculadora(); }});
+    const btnAdd=document.getElementById('btnAddProd');
+    if(btnAdd) btnAdd.onclick=()=>{
+      const name=(document.getElementById('newProdName').value||'').trim();
+      const pb=parseFloat(document.getElementById('newProdPB').value)||0;
+      if(!name||pb<=0){ showToast('Completá nombre y PB',1800); return; }
+      const lista=cargarCalcProductos();
+      const id=name.toLowerCase().replace(/\s+/g,'_')+'_'+Date.now();
+      lista.push({id,nombre:name,pb,cat:'Personalizado',icon:'⭐'});
+      guardarCalcProductos(lista);
+      document.getElementById('newProdName').value=''; document.getElementById('newProdPB').value='';
+      renderCalculadora(); showToast('Producto agregado ✅',1500);
+    };
+    const btnSaveEdit=document.getElementById('btnCalcSaveEdit');
+    if(btnSaveEdit) btnSaveEdit.onclick=()=>{
+      const lista=cargarCalcProductos();
+      lista.forEach(p=>{
+        const inName=document.querySelector(`[data-editname="${p.id}"]`);
+        const inPB=document.querySelector(`[data-editpb="${p.id}"]`);
+        if(inName) p.nombre=inName.value.trim()||p.nombre;
+        if(inPB) p.pb=parseFloat(inPB.value)||p.pb;
+      });
+      guardarCalcProductos(lista);
+      renderCalculadora(); calcularTotalPB(); showToast('Productos guardados ✅',1500);
+    };
+  }
+
+  calcularTotalPB();
+  // calc categoria result bind
+  const inpPB=document.getElementById('calcInputPB');
+  if(inpPB){
+    inpPB.oninput=()=>renderCalcCategoria(+inpPB.value||0);
+    renderCalcCategoria(+inpPB.value||0);
+  }
+
+  // tabs calculadora
+  const ctabs=document.getElementById('calcTabs');
+  if(ctabs){
+    ctabs.querySelectorAll('[data-ctab]').forEach(b=>{
+      b.onclick=()=>{
+        ctabs.querySelectorAll('.calc-tab').forEach(x=>x.classList.remove('active')); b.classList.add('active');
+        document.querySelectorAll('#view-calculadora .carrera-tab-content').forEach(c=>c.classList.remove('active'));
+        const target=document.getElementById('calcTab-'+b.dataset.ctab); if(target) target.classList.add('active');
+        haptic(6);
+      };
+    });
+  }
+}
+
+function calcularTotalPB(){
+  const productos=cargarCalcProductos();
+  let total=0;
+  productos.forEach(p=>{ total+= (calcCantidades[p.id]||0)* (parseFloat(p.pb)||0); });
+  total=Math.round(total*10)/10;
+  const el=document.getElementById('calcTotalPB'); if(el) el.textContent=total;
+  const equiv=document.getElementById('calcEquivCat'); if(equiv){
+    const nivel=obtenerNivelPorPB(total);
+    const cat=catPorNivel(nivel);
+    equiv.innerHTML=`Equivale a <span class="calc-cat-badge" style="background:${cat.color};color:${cat.textColor||'#fff'}">${cat.code} – ${cat.name}</span><br/>${total>0?'Próximo: '+ (catPorNivel(Math.min(7,nivel+1)).name):''}`;
+  }
+  return total;
+}
+
+function obtenerNivelPorPB(pb){
+  // escalon simple por PB personales para indicar nivel aprox
+  if(pb>=1000) return 7;
+  if(pb>=200) return 6;
+  if(pb>=150) return 5;
+  if(pb>=100) return 4;
+  if(pb>=50) return 3;
+  if(pb>=13) return 2;
+  if(pb>=1) return 1;
+  return 0;
+}
+
+function renderCalcCategoria(pb){
+  const cont=document.getElementById('calcCategoriaResult'); if(!cont) return;
+  if(!pb){ cont.innerHTML='<div class="empty">Ingresá PB para ver tu categoría.</div>'; return; }
+  const nivelActual=obtenerNivelPorPB(pb);
+  const catActual=catPorNivel(nivelActual);
+  const catNext=nivelActual<7?catPorNivel(nivelActual+1):null;
+  const faltante=catNext? Math.max(0,(catNext.pbNecesario||0)-pb):0;
+  const pct=catNext&&catNext.pbNecesario? Math.min(100, Math.round(pb/catNext.pbNecesario*100)):100;
+  cont.innerHTML=`
+    <div class="calc-result"><div class="lbl">Tu categoría aproximada</div><div class="big" style="color:${catActual.color};background:${catActual.color};-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">${catActual.code}</div><div class="lbl">${catActual.name}</div><span class="calc-cat-badge" style="background:${catActual.color};color:${catActual.textColor||'#fff'}">${catActual.icon} ${catActual.name}</span></div>
+    ${catNext? `<div class="calc-next"><b>Siguiente: ${catNext.code} – ${catNext.name}</b> (${catNext.pbNecesario} PB)<br/><div style="height:8px;border-radius:999px;background:rgba(80,90,130,.10);margin:8px 0"><div style="height:100%;width:${pct}%;border-radius:999px;background:linear-gradient(90deg,#5b8def,#a06bff)"></div></div>${faltante>0?`<span style="color:#d9534f;font-weight:900">Te faltan ${faltante} PB</span> para el mínimo de ${catNext.code}.`:`<span style="color:#1d7a5c;font-weight:900">¡Ya alcanzaste el PB mínimo para ${catNext.code}!</span>`}<br/><small style="color:#8a8a94">Además necesitás: ${catNext.req.slice(0,2).join(' + ')}</small></div>`:`<div class="calc-next"><b>¡Categoría máxima alcanzada! 🌟</b><br/>Sos ${catActual.name}, máximo nivel del plan.</div>`}
+  `;
+}
+
+const __btnCalcGuardar=document.getElementById('btnCalcGuardar');
+if(__btnCalcGuardar) __btnCalcGuardar.onclick=()=>{
+  const total=calcularTotalPB();
+  if(total<=0){ showToast('Primero cargá productos',1500); return; }
+  const d=cargarCarrera(); d.pb=total; guardarCarrera(d); renderCarrera(); showToast('PB guardados en Carrera: '+total+' ✅',2000);
+};
+const __btnCalcReset=document.getElementById('btnCalcReset');
+if(__btnCalcReset) __btnCalcReset.onclick=()=>{ calcCantidades={}; renderCalculadora(); showToast('Calculadora reseteada',1200); };
+
+// ==== ALERTAS DE EQUIPO ====
+// Genera alertas para equipo cercano a calificar
+function generarAlertasEquipo(){
+  if(!equipoData || !equipoData.personas) return [];
+  const alertas=[];
+  const personas=equipoData.personas.filter(p=>!p.esTitular);
+  const nivelDe=(code)=>CAT_LEVEL[(code||'').toUpperCase()] ?? 0;
+  const reqOrgs={DJ:{need:0,minCat:'D'}, D:{need:3,minCat:'D'}, DC:{need:3,minCat:'DC'}, CE:{need:4,minCat:'CE'}, L:{need:5,minCat:'L'}, LE:{need:5,minCat:'L'}, EJ:{need:6,minCat:'EJ'}};
+  personas.forEach(p=>{
+    const cat=(p.cat||'DJ').toUpperCase();
+    const nivel=nivelDe(cat);
+    const pb=Number(p.pnAct||0);
+    // Alerta PB cercano
+    // Definir umbral PB próximo según categoría actual
+    const umbrales={DJ:13,D:13,DC:50,CE:100,L:150,LE:200,EJ:1000};
+    const proxPB=umbrales[cat];
+    if(proxPB && pb>=proxPB-3 && pb<proxPB){
+      const falt=proxPB-pb;
+      alertas.push({tipo:'pb',prioridad:2,persona:p,msg:`${p.nombre.split(',')[0]} está a ${falt} PB de calificar a ${catPorNivel(nivel+1).code}`,detalle:`Tiene ${pb} PB, necesita ${proxPB}`,color:'#5b8def',icon:'⭐'});
+    }
+    // Alerta orgs
+    const req=reqOrgs[cat];
+    if(req && req.need>0){
+      // contar hijos directos calificados
+      const minNivel=nivelDe(req.minCat);
+      const hijos=(p.hijos||[]);
+      const calificados=hijos.filter(h=> nivelDe(h.cat)>=minNivel).length;
+      if(calificados>=req.need-1 && calificados<req.need){
+        alertas.push({tipo:'org',prioridad:2,persona:p,msg:`${p.nombre.split(',')[0]} está a ${req.need-calificados} org ${req.minCat} de ser ${catPorNivel(nivel+1).code}`,detalle:`Tiene ${calificados}/${req.need} orgs ${req.minCat}`,color:'#a06bff',icon:'🌳'});
+      }
+    }
+    // Alerta bonus
+    const hijos=p.hijos||[];
+    const hijos9=hijos.filter(h=> Number(h.pnAct||0)>=9).length;
+    if(pb>=12){
+      if(hijos9===0){
+        alertas.push({tipo:'bonus',prioridad:1,persona:p,msg:`${p.nombre.split(',')[0]} está a 1 patrocinio de ganar Bonus`,detalle:`Tiene ${pb} PB y necesita 1 patrocinio con 9 PB`,color:'#f5b301',icon:'🎯'});
+      } else if(hijos9===1){
+        alertas.push({tipo:'bonus',prioridad:1,persona:p,msg:`${p.nombre.split(',')[0]} está a 1 patrocinio más del 2do Bonus`,detalle:`Ya tiene 1 patrocinio con 9 PB, le falta 1 para $100k (ref)`,color:'#f5b301',icon:'🎯'});
+      }
+    }
+  });
+  // ordenar por prioridad y nombre
+  alertas.sort((a,b)=> a.prioridad-b.prioridad || a.persona.nombre.localeCompare(b.persona.nombre));
+  return alertas.slice(0,20);
+}
+
+function renderAlertasEquipo(){
+  const cont=document.getElementById('equipoAlertasWrap');
+  if(!cont) return;
+  const alertas=generarAlertasEquipo();
+  if(alertas.length===0){
+    cont.innerHTML='<div style="padding:12px;text-align:center;color:#8a8a94;font-size:12.5px">✅ No hay alertas urgentes. ¡Buen trabajo!</div>';
+    return;
+  }
+  cont.innerHTML=`<div style="margin-bottom:8px;display:flex;align-items:center;justify-content:space-between"><h4 style="margin:0;font-size:13px;font-weight:900;color:#a3670b;text-transform:uppercase;letter-spacing:.4px">⚠️ Cerca de calificar (${alertas.length})</h4><button class="filter-chip" onclick="this.closest('#equipoAlertasWrap').querySelectorAll('.alerta-card').forEach((c,i)=>{if(i>=3)c.style.display=c.style.display==='none'?'flex':'none'}); this.textContent=this.textContent==='Ver todas'?'Ver menos':'Ver todas'" style="font-size:11px">Ver todas</button></div>`+
+    alertas.map((a,i)=>`<div class="alerta-card" style="--alertColor:${a.color};${i>=3?'display:none':''}" data-persona="${a.persona.id}"><div class="al-icon">${a.icon}</div><div class="al-info"><b>${a.msg}</b><span>${a.detalle} · ${catInfoOf(a.persona.cat).name} · ${a.persona.pnAct||0} PB</span><div class="al-action"><button onclick="openPersonaModal(equipoData.personas.find(x=>x.id===${a.persona.id})); haptic(10)">Ver ficha</button></div></div></div>`).join('');
+}
+
+// Hook en dashboard equipo para incluir alertas
+const _origRenderEquipoDashboard=renderEquipoDashboard;
+renderEquipoDashboard=function(){
+  _origRenderEquipoDashboard();
+  try{
+    const cont=document.getElementById('equipoContent');
+    if(cont){
+      const wrapId='equipoAlertasWrap';
+      // if already exists, just re-render
+      if(!document.getElementById(wrapId)){
+        const div=document.createElement('div');
+        div.id=wrapId;
+        div.style.marginBottom='14px';
+        // prepend at top of dashboard (cont may contain dashboard html)
+        if(cont.firstChild) cont.insertBefore(div, cont.firstChild);
+        else cont.appendChild(div);
+      }
+      renderAlertasEquipo();
+    }
+  }catch(e){ console.log('alertas error',e); }
+};
+
+// ==== HOME APPS ====
+function openCalculadora(){showView('view-calculadora'); renderCalculadora();}
+
+// (home override moved to end)
+
+// Also patch planning tools to include carrera extra? keep simple
+
+// ==== TUTORIAL ONBOARDING ====
+const TUTO_KEY='tutoVisto_v2';
+function mostrarTutorialSiNuevo(){
+  if(localStorage.getItem(TUTO_KEY)) return;
+  setTimeout(()=>{
+    modal.open({
+      icon:'🚀',
+      iconBg:'linear-gradient(135deg,#5b8def,#a06bff)',
+      title:'¡Bienvenido a APPI!',
+      sub:'Tu asistente PSA',
+      html:`
+        <p><b>APPI</b> es tu tablero para crecer en PSA sin perderte.</p>
+        <div style="display:flex;flex-direction:column;gap:8px;margin:12px 0">
+          <div style="padding:10px;border-radius:12px;background:rgba(91,141,239,.10)"><b>💰 Presupuesto</b> – Controlá ingresos y gastos del mes</div>
+          <div style="padding:10px;border-radius:12px;background:rgba(58,208,164,.10)"><b>🚀 Las 7 P</b> – Tu plan mensual paso a paso</div>
+          <div style="padding:10px;border-radius:12px;background:rgba(245,179,1,.10)"><b>🌳 Mi Equipo</b> – Importá Excel y detectá quién está cerca de calificar</div>
+          <div style="padding:10px;border-radius:12px;background:rgba(160,107,255,.10)"><b>🏆 Carrera PSA</b> – 8 categorías, requisitos, ganancias por país</div>
+          <div style="padding:10px;border-radius:12px;background:rgba(255,107,157,.10)"><b>🎤 Presentación</b> – Mostrá el negocio en 2 minutos desde el celular</div>
+          <div style="padding:10px;border-radius:12px;background:rgba(245,179,1,.10)"><b>🧮 Calculadora PB</b> – Convertí productos en puntos y categorías</div>
+        </div>
+        <div class="tip"><b>Tip:</b> Tocá el botón <b>?</b> en cada pantalla para ver cómo funciona esa herramienta.</div>
+      `
+    });
+    localStorage.setItem(TUTO_KEY,'1');
+  },800);
+}
+
+setTimeout(mostrarTutorialSiNuevo,1200);
+
+
 const SEG_KEY = 'seguimientoPersonas';
 let seguimientoFiltro = 'pendientes';
 let seguimientoEditId = null;
@@ -7951,6 +9276,42 @@ function renderHomeCompleto(){
   renderNextStep();
   renderToolsList();
 }
+
+
+// === OVERRIDE HOME TOOLS FINAL (after original definition) ===
+(function(){
+  const _origTools = renderToolsList;
+  renderToolsList = function(){
+    _origTools();
+    try{
+      const list=document.getElementById('toolsList');
+      if(!list) return;
+      if(document.getElementById('homeExtraTools')) return;
+      const extra=document.createElement('div');
+      extra.id='homeExtraTools';
+      extra.className='home-section-block';
+      extra.innerHTML=`
+        <div class="mini-section-label"><span>🎓</span> Herramientas PSA</div>
+        <div class="home-tool-grid">
+          <button type="button" class="quick-tool-card" style="--accent:linear-gradient(135deg,#5b8def,#a06bff); --pct:100%" onclick="openPresentacion()">
+            <div class="quick-tool-top"><div class="quick-icon" style="background:linear-gradient(135deg,#5b8def,#a06bff)">🎤</div><span class="quick-state pending">Para mostrar</span></div>
+            <h3>Presentación Negocio</h3>
+            <p>4 pilares, empresa, producto, vos</p>
+            <div class="quick-progress-line"><span style="width:100%"></span></div>
+          </button>
+          <button type="button" class="quick-tool-card" style="--accent:linear-gradient(135deg,#f5b301,#ff8f6b); --pct:0%" onclick="openCalculadora()">
+            <div class="quick-tool-top"><div class="quick-icon" style="background:linear-gradient(135deg,#f5b301,#ff8f6b)">🧮</div><span class="quick-state pending">Calculadora</span></div>
+            <h3>Calculadora PB</h3>
+            <p>Productos → PB → Categoría</p>
+            <div class="quick-progress-line"><span style="width:0%"></span></div>
+          </button>
+        </div>
+      `;
+      list.appendChild(extra);
+    }catch(e){}
+  };
+})();
+
 function renderPlanningTools(){
   const pr = obtenerDatosPresupuestoActual();
   const sp = obtenerProgresoSieteActual();
@@ -8110,6 +9471,9 @@ document.getElementById('importInput').onchange = (e)=>{
     const activa = document.querySelector('.view.active');
     if(!activa) return null;
         switch(activa.id){
+      case 'view-presentacion': return 'view-home';
+      case 'view-calculadora': return 'view-home';
+      case 'view-precios': return 'view-home';
       case 'view-home': return null;
       case 'view-siete-detail': return 'view-siete';
       case 'view-presu-hist': return 'view-presu';
@@ -8136,6 +9500,7 @@ document.getElementById('importInput').onchange = (e)=>{
     const t = getBackTarget();
     if(t){
       _origShow(t);
+      setTimeout(asegurarAcceso, 100);
       if(t === 'view-siete') renderSieteHome();
       if(t === 'view-home') renderHomeCompleto();
       if(t === 'view-presu') renderPresu();
@@ -8281,6 +9646,39 @@ function iniciarApp() {
   showView('view-home');
 }
 
+
+function asegurarAcceso(){
+  try{
+    if(typeof estaActivada==='function' && estaActivada()){
+      const el=document.getElementById('lockScreen');
+      if(el){ el.classList.add('hidden'); el.style.display='none'; }
+      document.body.style.overflow='';
+      return true;
+    }
+  }catch(e){}
+  return false;
+}
+// Llamar cada vez que se cambia de vista
+const _origShowViewParaAcceso = showView;
+showView = function(id){
+  _origShowViewParaAcceso(id);
+  asegurarAcceso();
+};
+
+// También asegurar en popstate y en iniciarApp
+const _origIniciarApp = iniciarApp;
+iniciarApp = function(){
+  _origIniciarApp();
+  asegurarAcceso();
+  // Re-asegurar cada segundo por si algo lo muestra de nuevo (parche para back)
+  let intentos=0;
+  const iv=setInterval(()=>{
+    intentos++;
+    if(asegurarAcceso() || intentos>10) clearInterval(iv);
+  }, 300);
+};
+
+
 // ===========================================================
 // 🚫 CHEQUEO DE LISTA NEGRA (BLOCKLIST)
 // ===========================================================
@@ -8331,6 +9729,23 @@ function mostrarPantallaBloqueado() {
     </div>
   `;
 }
+
+
+// Parche extra para todos los botones atrás - asegurar acceso siempre
+document.addEventListener('click', (e)=>{
+  const btn=e.target.closest('.back-btn');
+  if(btn){
+    setTimeout(()=>{ asegurarAcceso(); }, 200);
+    setTimeout(()=>{ asegurarAcceso(); }, 600);
+  }
+});
+// También asegurar cuando se cierra modal
+const origModalClose = modal.close.bind(modal);
+modal.close = function(){
+  origModalClose();
+  setTimeout(asegurarAcceso, 150);
+};
+
 
 // Verificar al arrancar
 (async function() {

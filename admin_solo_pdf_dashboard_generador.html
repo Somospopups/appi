@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Panel APPI - Solo PDFs + Resumen + Generador</title>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
+<script>try{pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js"}catch(e){}</script>
+<style>
+*{box-sizing:border-box}html,body{margin:0;padding:0;font-family:system-ui,sans-serif;min-height:100vh;background:linear-gradient(160deg,#1a1530 0%,#2a1530 50%,#0f1424 100%);color:#f0f0f5;padding:16px}
+.container{max-width:600px;margin:0 auto}
+.card{background:rgba(30,30,50,0.9);border:1px solid rgba(255,255,255,0.1);border-radius:18px;padding:18px;margin-bottom:14px}
+.header{text-align:center;padding:18px}
+.logo{width:56px;height:56px;margin:0 auto 8px;border-radius:16px;background:linear-gradient(135deg,#4b7a55,#3ad0a4);display:flex;align-items:center;justify-content:center;font-size:26px}
+h1{margin:0;font-size:18px;font-weight:900;background:linear-gradient(90deg,#4b7a55,#3ad0a4);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.sub{font-size:11px;color:#a0a0b0;margin-top:4px}
+.sync{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:10px;background:rgba(40,40,60,0.6);font-size:12px;margin-bottom:12px}
+.sync.ok{background:rgba(58,208,164,0.15);color:#5eeab5}
+.sync.warn{background:rgba(245,179,1,0.15);color:#ffb84d}
+.dot{width:8px;height:8px;border-radius:50%;background:#a0a0b0}
+.sync.ok .dot{background:#5eeab5}
+.sync.warn .dot{background:#ffb84d}
+label{font-size:10px;font-weight:700;color:#a8b8ff;text-transform:uppercase;letter-spacing:0.5px;margin:10px 0 5px;display:block}
+input{width:100%;padding:11px 12px;border-radius:10px;border:2px solid rgba(255,255,255,0.1);background:rgba(40,40,60,0.8);color:#fff;font-size:13px;outline:none}
+input:focus{border-color:#3ad0a4}
+input.mono{font-family:monospace;letter-spacing:2px;text-align:center;text-transform:uppercase}
+.btn{width:100%;padding:12px;border-radius:10px;border:none;font-weight:800;font-size:13px;cursor:pointer;margin-top:8px}
+.btn-primary{background:linear-gradient(135deg,#4b7a55,#3ad0a4);color:#fff}
+.btn-success{background:linear-gradient(135deg,#3ad0a4,#128C7E);color:#fff}
+.btn-secondary{background:rgba(255,255,255,0.08);color:#fff}
+.btn-small{padding:7px 10px;font-size:11px;border-radius:8px;width:auto}
+.btn-row{display:flex;gap:8px;margin-top:10px}
+.upload{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.box{padding:12px;border-radius:12px;background:rgba(255,255,255,0.06);text-align:center;border:1px solid rgba(255,255,255,0.08)}
+.box.dist{border-color:rgba(58,208,164,0.3);background:rgba(58,208,164,0.08)}
+.box.user{border-color:rgba(245,179,1,0.3);background:rgba(245,179,1,0.08)}
+.status{font-size:11px;font-weight:800;margin:5px 0}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}
+.stat{background:rgba(40,40,60,0.6);border-radius:10px;padding:10px;text-align:center}
+.stat b{display:block;font-size:18px;color:#5eeab5}
+.stat small{font-size:9px;color:#a0a0b0;text-transform:uppercase}
+.result{margin-top:12px;padding:14px;background:rgba(58,208,164,0.12);border:1px dashed rgba(58,208,164,0.35);border-radius:12px;text-align:center;display:none}
+.result.show{display:block}
+.result-code{font-family:monospace;font-size:20px;font-weight:900;letter-spacing:2px;word-break:break-all;margin:8px 0}
+.toast{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-100px);background:#3ad0a4;color:#fff;padding:8px 16px;border-radius:999px;font-weight:700;font-size:12px;transition:transform 0.3s;z-index:200}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.error{background:#d9534f}
+.preview{max-height:240px;overflow-y:auto;margin-top:10px;background:rgba(0,0,0,0.2);border-radius:10px;padding:8px}
+table{width:100%;border-collapse:collapse;font-size:11px}
+th{color:#aaa;text-align:left;padding:4px;font-size:10px;text-transform:uppercase;background:rgba(255,255,255,0.05)}
+td{padding:4px;border-top:1px solid rgba(255,255,255,0.06)}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity 0.2s;z-index:100}
+.modal-overlay.open{opacity:1;pointer-events:auto}
+.modal{background:#1e1e32;border-radius:16px;padding:20px;width:100%;max-width:400px;border:1px solid rgba(255,255,255,0.1)}
+</style>
+</head>
+<body>
+<div class="toast" id="toast">OK</div>
+<div class="container">
+  <div class="card header"><div class="logo">💲</div><h1>Admin APPI</h1><div class="sub">PDFs + Resumen + Generador - Solo 3 cosas</div></div>
+
+  <div class="sync" id="syncStatus"><span class="dot"></span><span id="syncText">Sin token</span><button class="btn-small btn-secondary" id="btnToken" style="margin-left:auto">⚙️ Token</button></div>
+
+  <!-- 1. CARGA PDFs -->
+  <div class="card">
+    <div style="font-size:12px;font-weight:800;color:#5eeab5;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px">📂 Cargar listas PDF (Solo Admin)</div>
+    <div class="upload">
+      <div class="box dist"><div style="font-size:22px">🏷️</div><b style="font-size:12px">Distribuidor</b><div id="stD" class="status">Sin cargar</div><button class="btn btn-secondary btn-small" id="btnDist">Cargar PDF Dist</button><input type="file" id="fD" accept=".pdf,.xls,.xlsx,.csv" style="display:none"></div>
+      <div class="box user"><div style="font-size:22px">💰</div><b style="font-size:12px">Usuario</b><div id="stU" class="status">Sin cargar</div><button class="btn btn-secondary btn-small" id="btnUser" style="background:linear-gradient(135deg,#f5b301,#ff8f6b);color:#fff">Cargar PDF Usuario</button><input type="file" id="fU" accept=".pdf,.xls,.xlsx,.csv" style="display:none"></div>
+    </div>
+    <div id="res" style="display:none;margin-top:12px"><b id="stat" style="font-size:11px"></b><div id="preview" class="preview"></div></div>
+    <div class="btn-row"><button class="btn btn-secondary btn-small" id="btnLimpiar">🗑️ Limpiar PDFs</button><button class="btn btn-secondary btn-small" id="btnTest">🧪 Probar ejemplo</button></div>
+  </div>
+
+  <!-- 2. DASHBOARD RESUMEN -->
+  <div class="card">
+    <div style="font-size:12px;font-weight:800;color:#a8b8ff;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px">📊 Dashboard Resumen Cliente</div>
+    <div class="stats"><div class="stat"><b id="cClientes">0</b><small>Clientes</small></div><div class="stat"><b id="cMes">$0</b><small>Este mes</small></div></div>
+    <div class="stats"><div class="stat"><b id="cActivos">0</b><small>Activos</small></div><div class="stat"><b id="cTotal">$0</b><small>Total</small></div></div>
+    <div id="mesesBreak" style="margin-top:8px;font-size:11px"></div>
+    <div style="font-size:10px;color:#666;margin-top:8px">Datos de tu localStorage appi_admin_clientes (tu generador original los guarda)</div>
+  </div>
+
+  <!-- 3. GENERADOR -->
+  <div class="card">
+    <div style="font-size:12px;font-weight:800;color:#ffb84d;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px">⚡ Generador de Códigos</div>
+    <label>ID Dispositivo</label><input class="mono" id="quickId" placeholder="XXXX-XXXX-XXXX" maxlength="14"/>
+    <button class="btn btn-primary" id="btnGen">🔑 Generar código</button>
+    <div class="result" id="resGen"><div style="font-size:10px;color:#5eeab5;text-transform:uppercase">Código</div><div class="result-code" id="codeGen">-</div><button class="btn btn-secondary btn-small" id="btnCopy">📋 Copiar</button></div>
+  </div>
+
+  <div class="card">
+    <button class="btn btn-success" id="btnSync">🚀 Sincronizar precios.json a GitHub (para APPI)</button>
+    <div id="syncInfo" style="font-size:11px;color:#a0a0b0;margin-top:8px"></div>
+    <div style="margin-top:10px;padding:8px;border-radius:8px;background:rgba(91,141,239,0.12);font-size:10px;line-height:1.4">
+      APPI online: <code>https://german1987diaz.github.io/appi/</code><br/>
+      JSON: <code>https://german1987diaz.github.io/appi/precios.json</code>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalToken"><div class="modal"><h3 style="margin:0 0 10px">⚙️ Token GitHub</h3><label>Token ghp_...</label><input type="password" id="tokenIn"/><div class="btn-row"><button class="btn btn-secondary" id="btnCloseToken">Cancelar</button><button class="btn btn-primary" id="btnSaveToken">Guardar</button></div></div></div>
+
+<script>
+const GITHUB_USER='german1987diaz',GITHUB_REPO='appi',PRECIOS_PATH='precios.json';
+const SECRET='APPI-2024-MH-PSA-GERMAN';
+const DIST_KEY='admin_precios_dist_v2',USER_KEY='admin_precios_user_v2';
+let dist=null,user=null;
+
+function hashCode(s){let h=0;for(let i=0;i<s.length;i++){let c=s.charCodeAt(i);h=((h<<5)-h)+c;h=h&h;}return Math.abs(h);}
+function genCode(id){const b=id+SECRET;const h1=hashCode(b).toString(36).toUpperCase().padStart(4,'0').substring(0,4);const h2=hashCode(b+'1').toString(36).toUpperCase().padStart(4,'0').substring(0,4);const h3=hashCode(b+'2').toString(36).toUpperCase().padStart(4,'0').substring(0,4);return `${h1}-${h2}-${h3}`;}
+function loadToken(){return localStorage.getItem('appi_github_token')||'';}
+function tokenOk(){return !!loadToken();}
+function showToast(m,e=''){const t=document.getElementById('toast');t.textContent=m;t.className='toast show '+(e?'error':'');setTimeout(()=>t.classList.remove('show'),2000);}
+function fmt(n){return '$'+Number(n).toLocaleString('es-AR',{maximumFractionDigits:0});}
+function norm(s){return (s||'').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim();}
+function parseNum(str){if(!str) return 0;let s=(''+str).replace(/[^\d.,-]/g,'');if(!s) return 0;if(s.indexOf('.')!==-1&&s.indexOf(',')!==-1){if(s.lastIndexOf(',')>s.lastIndexOf('.')){s=s.replace(/\./g,'').replace(',','.');}else{s=s.replace(/,/g,'');}}else if(s.indexOf(',')!==-1){const p=s.split(',');if(p.length===2&&p[1].length<=2){s=p[0].replace(/\./g,'')+'.'+p[1];}else{s=s.replace(/,/g,'');}}const n=parseFloat(s);return isNaN(n)?0:n;}
+function detectar(headers){const m={};headers.forEach((h,i)=>{const nh=norm(h);if(/prod|modelo|art|nombre|codigo/.test(nh)&&m.nombre===undefined) m.nombre=i;if(/precio|importe|valor/.test(nh)&&m.precio===undefined) m.precio=i;if(/pb|punto/.test(nh)&&m.pb===undefined) m.pb=i;});if(m.nombre===undefined&&headers.length>0) m.nombre=0;return m;}
+function parseRows(rows){
+  if(!rows||rows.length<2) return [];let hr=-1;for(let i=0;i<Math.min(rows.length,20);i++){const r=rows[i]||[];const c=r.filter(v=>/prod|modelo|nombre|precio|pb|punto/i.test((v||'').toString())).length;if(c>=2){hr=i;break;}}if(hr===-1) hr=0;
+  const headers=(rows[hr]||[]).map(v=>(v||'').toString().trim());const map=detectar(headers);const out=[];
+  for(let i=hr+1;i<rows.length;i++){const r=rows[i]||[];if(r.every(v=>!v)) continue;const nomRaw=r[map.nombre];const nom=(nomRaw||'').toString().trim();if(!nom||nom.length<2) continue;let precio=0;if(map.precio!==undefined){const pv=r[map.precio];if(typeof pv==='number') precio=pv;else precio=parseNum(pv);}if(precio===0){for(let j=0;j<r.length;j++){if(j===map.nombre) continue;const v=r[j];if(typeof v==='number'&&v>100){precio=v;break;}}}let pb=0;if(map.pb!==undefined){pb=parseFloat((''+(r[map.pb]||'')).replace(',','.'))||0;}if(precio<100) continue;out.push({nombre:nom,nombreNorm:norm(nom),pb,precio});}
+  return out;
+}
+async function extraerPDF(file){
+  const buf=await file.arrayBuffer();const pdf=await pdfjsLib.getDocument({data:buf}).promise;let txt='';for(let i=1;i<=pdf.numPages;i++){const page=await pdf.getPage(i);const c=await page.getTextContent();let items=c.items.map(it=>({str:it.str,x:it.transform[4],y:it.transform[5]}));items.sort((a,b)=>{if(Math.abs(a.y-b.y)>2) return b.y-a.y;return a.x-b.x;});let curY=null,line='';for(const it of items){if(curY===null) curY=it.y;if(Math.abs(it.y-curY)>3){txt+=line+'\n';line=it.str;curY=it.y;}else{if(line&&!line.endsWith(' ')&&!it.str.startsWith(' ')) line+=' ';line+=it.str;}}if(line) txt+=line+'\n';}return txt;
+}
+function parseTexto(texto){
+  const lines=texto.split(/\r?\n/).map(l=>l.trim()).filter(l=>l.length>3);const out=[];const ign=/^(lista de precios|precio|producto|modelo|catalogo|vigencia|distribuidor|usuario|página|page)/i;
+  for(const raw of lines){
+    if(ign.test(raw)) continue;
+    let pb=0;let line=raw;const m=line.match(/(\d+(?:[.,]\d+)?)\s*PB/i)||line.match(/PB\s*[:\-]?\s*(\d+(?:[.,]\d+)?)/i);if(m){pb=parseFloat(m[1].replace(',','.'))||0;line=line.replace(m[0],'').trim();}
+    let precio=0;let nombre=line;const pm=line.match(/(?:\$\s*)?(\d{1,3}(?:[.,]\d{3})*(?:[.,]\d{2})?|\d{3,})\s*$/);
+    if(pm){precio=parseNum(pm[1]);if(precio>0){nombre=line.substring(0,pm.index).trim().replace(/[-–—·;:]+$/,'').trim();}}
+    if(precio===0){const all=[...raw.matchAll(/(\d{1,3}(?:[.,]\d{3})*(?:[.,]\d{2})?)/g)];if(all.length>=1){const last=all[all.length-1][1];const v=parseNum(last);if(v>=100){precio=v;nombre=raw.substring(0,raw.lastIndexOf(all[all.length-1][1])).trim();}}}
+    if(!nombre||nombre.length<3||precio<100) continue;if(/^\d+$/.test(nombre)) continue;
+    out.push({nombre,nombreNorm:norm(nombre),pb,precio});
+  }
+  return out;
+}
+function cruzar(){if(!dist||!user) return [];const map={};dist.forEach(d=>map[d.nombreNorm]=d);const res=[];const used=new Set();user.forEach(u=>{const d=map[u.nombreNorm];if(d){used.add(u.nombreNorm);const gan=u.precio-d.precio;const marg=d.precio>0?gan/d.precio*100:100;res.push({nombre:u.nombre,pb:u.pb||d.pb||0,precioDist:d.precio,precioUser:u.precio,ganancia:gan,margen:marg});}else{res.push({nombre:u.nombre,pb:u.pb||0,precioDist:0,precioUser:u.precio,ganancia:u.precio,margen:100,soloUser:true});}});dist.forEach(d=>{if(!used.has(d.nombreNorm)&&!res.find(x=>x.nombreNorm===d.nombreNorm)){res.push({nombre:d.nombre,pb:d.pb||0,precioDist:d.precio,precioUser:0,ganancia:-d.precio,margen:-100,soloDist:true});}});return res;}
+function render(){
+  document.getElementById('stD').textContent=dist?`${dist.length} productos`:'Sin cargar';
+  document.getElementById('stU').textContent=user?`${user.length} productos`:'Sin cargar';
+  const resDiv=document.getElementById('res');const prev=document.getElementById('preview');
+  if(dist&&user){
+    const cruz=cruzar();
+    resDiv.style.display='block';
+    document.getElementById('stat').textContent=`Cruzados: ${cruz.filter(c=>!c.soloDist&&!c.soloUser).length} | Total: ${cruz.length}`;
+    prev.innerHTML=`<table><tr><th>Prod</th><th>PB</th><th>Dist</th><th>User</th><th>Gan</th></tr>${cruz.slice(0,40).map(c=>`<tr><td>${c.nombre}</td><td>${c.pb||'-'}</td><td>${fmt(c.precioDist)}</td><td>${fmt(c.precioUser)}</td><td style="color:${c.ganancia>=0?'#5ee':'#f88'}">${fmt(c.ganancia)}</td></tr>`).join('')}</table>`;
+  } else {resDiv.style.display='none';}
+}
+async function procesar(file,tipo){
+  const esPDF=file.name.toLowerCase().endsWith('.pdf');
+  try{
+    let parsed=[];
+    if(esPDF){
+      const texto=await extraerPDF(file);
+      parsed=parseTexto(texto);
+      if(parsed.length===0){alert('No se detectaron productos en PDF. Texto extraído:\\n'+texto.slice(0,1000));return;}
+    } else {
+      const data=new Uint8Array(await file.arrayBuffer());
+      const wb=XLSX.read(data,{type:'array'});
+      const ws=wb.Sheets[wb.SheetNames[0]];
+      const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
+      parsed=parseRows(rows);
+    }
+    if(tipo==='dist'){dist=parsed;localStorage.setItem('admin_precios_dist_v2',JSON.stringify(parsed));showToast(`Dist: ${parsed.length}`);}
+    else{user=parsed;localStorage.setItem('admin_precios_user_v2',JSON.stringify(parsed));showToast(`User: ${parsed.length}`);}
+    render();
+  }catch(e){alert('Error: '+e.message);}
+}
+
+// Dashboard resumen clientes (lee del localStorage de tu generador original)
+function loadClientes(){try{return JSON.parse(localStorage.getItem('appi_admin_clientes')||'[]');}catch(e){return [];}}
+function renderDash(){
+  const clientes=loadClientes();
+  const activos=clientes.filter(c=>c.activo).length;
+  const total=clientes.reduce((s,c)=>s+(Number(c.monto)||0),0);
+  const now=new Date();const mes=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+  const mesTotal=clientes.filter(c=>(c.fecha||'').startsWith(mes)).reduce((s,c)=>s+(Number(c.monto)||0),0);
+  document.getElementById('cClientes').textContent=clientes.length;
+  document.getElementById('cActivos').textContent=activos;
+  document.getElementById('cTotal').textContent='$'+total.toLocaleString('es-AR');
+  document.getElementById('cMes').textContent='$'+mesTotal.toLocaleString('es-AR');
+  const porMes={};clientes.forEach(c=>{if(!c.fecha) return;const k=c.fecha.substring(0,7);if(!porMes[k]) porMes[k]={count:0,total:0};porMes[k].count++;porMes[k].total+=Number(c.monto)||0;});
+  const meses=Object.keys(porMes).sort().reverse().slice(0,4);
+  document.getElementById('mesesBreak').innerHTML=meses.map(m=>`<div style="display:flex;justify-content:space-between;padding:4px 0;border-top:1px solid rgba(255,255,255,0.06);font-size:11px"><span>${m}</span><span>${porMes[m].count} vtas</span><span style="color:#5eeab5">$${porMes[m].total.toLocaleString('es-AR')}</span></div>`).join('');
+}
+
+// Generador
+function autoId(inp){if(!inp) return;inp.addEventListener('input',e=>{let v=e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,'');if(v.length>4&&v.length<=8) v=v.substring(0,4)+'-'+v.substring(4);else if(v.length>8) v=v.substring(0,4)+'-'+v.substring(4,8)+'-'+v.substring(8,12);e.target.value=v;});}
+autoId(document.getElementById('quickId'));
+let lastCode='';
+document.getElementById('btnGen').onclick=()=>{const id=document.getElementById('quickId').value.trim().toUpperCase();if(id.length<14){alert('ID inválido');return;}lastCode=genCode(id);document.getElementById('codeGen').textContent=lastCode;document.getElementById('resGen').style.display='block';};
+document.getElementById('btnCopy').onclick=async()=>{try{await navigator.clipboard.writeText(lastCode);showToast('Copiado');}catch(e){}};
+
+document.getElementById('fD').onchange=e=>{const f=e.target.files[0];if(f) procesar(f,'dist');e.target.value='';};
+document.getElementById('fU').onchange=e=>{const f=e.target.files[0];if(f) procesar(f,'user');e.target.value='';};
+document.getElementById('btnDist').onclick=()=>document.getElementById('fD').click();
+document.getElementById('btnUser').onclick=()=>document.getElementById('fU').click();
+document.getElementById('btnLimpiar').onclick=()=>{if(confirm('¿Limpiar PDFs?')){localStorage.removeItem('admin_precios_dist_v2');localStorage.removeItem('admin_precios_user_v2');dist=null;user=null;render();showToast('Limpiado');}};
+document.getElementById('btnTest').onclick=()=>{dist=[{nombre:'Senior 4',nombreNorm:'senior 4',pb:5,precio:175000},{nombre:'Vero',nombreNorm:'vero',pb:3.5,precio:137500}];user=[{nombre:'Senior 4',nombreNorm:'senior 4',pb:5,precio:280000},{nombre:'Vero',nombreNorm:'vero',pb:3.5,precio:220000}];localStorage.setItem('admin_precios_dist_v2',JSON.stringify(dist));localStorage.setItem('admin_precios_user_v2',JSON.stringify(user));render();};
+
+document.getElementById('btnToken').onclick=()=>{document.getElementById('tokenIn').value=loadToken();document.getElementById('modalToken').classList.add('open');};
+document.getElementById('btnCloseToken').onclick=()=>document.getElementById('modalToken').classList.remove('open');
+document.getElementById('btnSaveToken').onclick=()=>{const t=document.getElementById('tokenIn').value.trim();if(!t){alert('Token');return;}localStorage.setItem('appi_github_token',t);updateStatus();document.getElementById('modalToken').classList.remove('open');showToast('Token guardado');};
+function updateStatus(){const el=document.getElementById('syncStatus');const tx=document.getElementById('syncText');if(loadToken()){el.className='sync ok';tx.textContent='Token configurado';}else{el.className='sync warn';tx.textContent='Sin token';}}
+
+async function githubPut(path,obj,msg){
+  const token=loadToken();if(!token) throw new Error('Sin token');
+  const str=JSON.stringify(obj,null,2);const b64=btoa(unescape(encodeURIComponent(str)));
+  let sha=null;try{const r=await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${path}`,{headers:{'Authorization':`token ${token}`,'Accept':'application/vnd.github.v3+json'}});if(r.ok){const j=await r.json();sha=j.sha;}}catch(e){}
+  const url=`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${path}`;
+  const body={message:msg,content:b64,sha};if(!sha) delete body.sha;
+  const res=await fetch(url,{method:'PUT',headers:{'Authorization':`token ${token}`,'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'},body:JSON.stringify(body)});
+  if(!res.ok){const err=await res.json().catch(()=>({}));throw new Error(err.message||res.status);}
+  return res.json();
+}
+document.getElementById('btnSync').onclick=async()=>{
+  if(!dist||!user){alert('Cargá los 2 PDFs primero');return;}
+  if(!loadToken()){alert('Configurá token');return;}
+  const btn=document.getElementById('btnSync');btn.disabled=true;btn.textContent='⏳ Subiendo...';
+  try{
+    const cruz=cruzar();
+    const contenido={version:1,actualizado:new Date().toISOString().split('T')[0],preciosDistribuidor:dist,preciosUsuario:user,preciosCruzados:cruz,productos:cruz.map(c=>({id:c.nombreNorm.replace(/[^a-z0-9]+/g,'_'),nombre:c.nombre,pb:c.pb,precioDist:c.precioDist,precioUser:c.precioUser,ganancia:c.ganancia,margen:c.margen}))};
+    await githubPut('precios.json',contenido,`Update precios PDF - ${new Date().toISOString()}`);
+    showToast('✅ precios.json subido');document.getElementById('syncInfo').textContent='Sincronizado: '+new Date().toLocaleString()+' - https://german1987diaz.github.io/appi/precios.json';
+  }catch(e){showToast('Error: '+e.message,'error');document.getElementById('syncInfo').textContent='Error: '+e.message;}
+  finally{btn.disabled=false;btn.textContent='🚀 Sincronizar precios.json a GitHub (para APPI)';}
+};
+
+// Init
+try{const d=localStorage.getItem('admin_precios_dist_v2');if(d) dist=JSON.parse(d);}catch(e){}
+try{const u=localStorage.getItem('admin_precios_user_v2');if(u) user=JSON.parse(u);}catch(e){}
+render();renderDash();updateStatus();
+function renderDash(){const clientes=loadClientes();const activos=clientes.filter(c=>c.activo).length;const total=clientes.reduce((s,c)=>s+(Number(c.monto)||0),0);const now=new Date();const mes=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');const mesTotal=clientes.filter(c=>(c.fecha||'').startsWith(mes)).reduce((s,c)=>s+(Number(c.monto)||0),0);document.getElementById('cClientes').textContent=clientes.length;document.getElementById('cActivos').textContent=activos;document.getElementById('cTotal').textContent='$'+total.toLocaleString('es-AR');document.getElementById('cMes').textContent='$'+mesTotal.toLocaleString('es-AR');}
+function loadClientes(){try{return JSON.parse(localStorage.getItem('appi_admin_clientes')||'[]');}catch(e){return [];}}
+</script>
+</body>
+</html>
