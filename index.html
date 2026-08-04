@@ -8507,7 +8507,10 @@ function renderPrecios(){
           if(!nombreLimpio) nombreLimpio=cc.nombre;
           var precio = cc.precioUser||0;
           var precioStr=(typeof formatPrecio!=='undefined'?formatPrecio(precio):'$'+precio);
-          html+='<div class="person-item '+(isCanje?'canje-item':'')+'" data-canje="'+(isCanje?'1':'0')+'" style="padding:12px 14px;display:flex;align-items:center;gap:12px;'+(isCanje?'border-left:3px solid #f5b301;background:rgba(245,179,1,0.06)':'')+'">'
+                    var prodId='';
+          try{ prodId=btoa(encodeURIComponent(cc.nombre||'')).replace(/=/g,''); }catch(e){ prodId=(cc.nombre||'').replace(/[^a-z0-9]/gi,'_'); }
+          var safeNombre=(cc.nombre||'').replace(/"/g,'&quot;');
+          html+='<div class="person-item '+(isCanje?'canje-item':'')+'" data-canje="'+(isCanje?'1':'0')+'" data-prod-id="'+prodId+'" data-nombre="'+safeNombre+'" style="padding:12px 14px;display:flex;align-items:center;gap:12px;'+(isCanje?'border-left:3px solid #f5b301;background:rgba(245,179,1,0.06)':'')+'">'
             +'<div class="pi-info" style="flex:1;min-width:0">'
             +'<div class="pi-name" style="font-size:14px;font-weight:700;word-break:break-word;display:flex;align-items:center;gap:6px;flex-wrap:wrap">'+nombreLimpio+' '+canjeBadge+'</div>'
             +'<div class="pi-meta" style="margin-top:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">'+pbBadge+' '+catBadge+'</div>'
@@ -9435,19 +9438,7 @@ var presupuestoSeleccionados=[]; window.presupuestoSeleccionados=presupuestoSele
 var pressTimer=null;
 var pressTarget=null;
 
-function isProductoSeleccionado(nombre){
-  return presupuestoSeleccionados.some(p=> p.nombre===nombre);
-}
-function toggleProductoSeleccionado(prod){
-  const idx=presupuestoSeleccionados.findIndex(p=> p.nombre===prod.nombre);
-  if(idx>=0){
-    presupuestoSeleccionados.splice(idx,1); window.presupuestoSeleccionados=presupuestoSeleccionados;
-  } else {
-    presupuestoSeleccionados.push({...prod, cantidad:1}); window.presupuestoSeleccionados=presupuestoSeleccionados;
-  }
-  actualizarFabPresupuesto();
-  renderPrecios();
-}
+
 function actualizarFabPresupuesto(){
   const fab=document.getElementById('presupuestoFab');
   const countEl=document.getElementById('presupuestoCount');
