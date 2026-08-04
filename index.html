@@ -8290,6 +8290,24 @@ function cruzarPrecios(){
   return cruz;
 }
 
+
+
+function detectarCategoriaProducto(nombre){
+  const n=(nombre||'').toUpperCase();
+  if(n.includes('GASIFICADOR') || n.includes('GASIFICADORA')) return 'Gasificador';
+  if(n.includes('OSMOSIS') || n.includes('ÓSMOSIS')) return 'Osmosis Inversa';
+  if(n.includes('AIRE') && (n.includes('PURIFICADOR') || n.includes('PURIFICADORA'))) return 'Purificador de Aire';
+  if(n.includes('PURIFICADOR') && n.includes('AIRE')) return 'Purificador de Aire';
+  // Todo lo que es purificador de agua va a Purificadores como solicitado
+  if(n.includes('SENIOR') || n.includes('DOMUS') || n.includes('MINI') || n.includes('VERO') || n.includes('DUCHA') || n.includes('PURIFICADOR') || n.includes('ABLANDADOR')) return 'Purificadores';
+  if(n.includes('KITS') || n.includes('KIT')) return 'Kits';
+  if(n.includes('FILTRO') || n.includes('REPUESTO') || n.includes('TAPA') || n.includes('SOPORTE') || n.includes('ADAPT')) return 'Repuestos';
+  if(n.includes('ACEITE') || n.includes('OLIVARE') || n.includes('PASAS') || n.includes('UVA')) return 'Alimentos';
+  if(n.includes('BOTELLA')) return 'Botellas';
+  if(n.includes('GRIFER') || n.includes('CANILLA') || n.includes('LLAVE') || n.includes('VALVULA')) return 'Grifería';
+  return 'Otros';
+}
+
 function renderPrecios(){
   try{
     let productos=[];
@@ -8299,7 +8317,7 @@ function renderPrecios(){
         const cruz=JSON.parse(cruzRaw);
         if(Array.isArray(cruz)&&cruz.length>0){
           productos=cruz.map(function(cc){
-            return {nombre: cc.nombre||'Sin nombre', nombreNorm: (cc.nombreNorm||cc.nombre||'').toString().toLowerCase(), pb: cc.pb||0, precioUser: cc.precioUser||cc.precio||0, original: cc.original||cc.nombre||''};
+            return {nombre: cc.nombre||'Sin nombre', nombreNorm: (cc.nombreNorm||cc.nombre||'').toString().toLowerCase(), pb: cc.pb||0, precioUser: cc.precioUser||cc.precio||0, original: cc.original||cc.nombre||'', categoria: cc.categoria||detectarCategoriaProducto(cc.nombre)};
           });
         }
       }
@@ -8310,23 +8328,62 @@ function renderPrecios(){
         if(userRaw){
           const arr=JSON.parse(userRaw);
           if(Array.isArray(arr)&&arr.length>0){
-            productos=arr.map(function(u){return {nombre:u.nombre,nombreNorm:(u.nombreNorm||''),pb:u.pb||0,precioUser:u.precio||u.precioUser||0,original:u.original||u.nombre||u.nombre};});
+            productos=arr.map(function(u){return {nombre:u.nombre,nombreNorm:(u.nombreNorm||''),pb:u.pb||0,precioUser:u.precio||u.precioUser||0,original:u.original||u.nombre||u.nombre,categoria:u.categoria||detectarCategoriaProducto(u.nombre)};});
           }
         }
       }catch(e){}
     }
-    var searchBox=document.getElementById('preciosSearchBox');
-    var content=document.getElementById('preciosContent');
-    var shareWrap=document.getElementById('preciosShareWrap');
-    var filtrados = (typeof preciosSearch!=='undefined' && preciosSearch) ? productos.filter(function(cc){ return (cc.nombreNorm||'').includes(normalizeProducto(preciosSearch)) || normalizeProducto(cc.nombre).includes(normalizeProducto(preciosSearch)); }) : productos;
+    if(productos.length===0){
+      try{
+        const prodRaw=localStorage.getItem('productos_oficiales') || localStorage.getItem('precios_oficiales');
+        if(prodRaw){
+          const data=JSON.parse(prodRaw);
+          let arr=[];
+          if(Array.isArray(data)) arr=data;
+          else if(data.productos) arr=data.productos;
+          else if(data.lista) arr=data.lista;
+          else if(data.preciosCruzados) arr=data.preciosCruzados;
+          if(Array.isArray(arr)&&arr.length>0){
+            productos=arr.map(function(p){return {nombre:p.nombre||p.name||'Sin nombre',nombreNorm:((p.nombreNorm||p.nombre||'').toString().toLowerCase()),pb:p.pb||0,precioUser:p.precioUser||p.precio||p.valor||0,original:p.original||p.nombre||'',categoria:p.categoria||detectarCategoriaProducto(p.nombre)};});
+          }
+        }
+      }catch(e){}
+    }
+
+    const searchBox=document.getElementById('preciosSearchBox');
+    const content=document.getElementById('preciosContent');
+    const shareWrap=document.getElementById('preciosShareWrap');
+    const filterDiv=document.getElementById('preciosFilterChips');
+    const catActual = window._preciosCatActual || 'Todos';
+    let filtrados = (typeof preciosSearch!=='undefined' && preciosSearch) ? productos.filter(function(cc){ return (cc.nombreNorm||'').includes(normalizeProducto(preciosSearch)) || normalizeProducto(cc.nombre).includes(normalizeProducto(preciosSearch)); }) : productos;
+    if(catActual!=='Todos'){
+      filtrados=filtrados.filter(function(cc){ return cc.categoria===catActual; });
+    }
 
     if(searchBox) searchBox.style.display = productos.length? 'flex':'none';
+    if(filterDiv){
+      filterDiv.style.display = productos.length? 'flex':'none';
+      const cats={}; productos.forEach(function(p){ cats[p.categoria||'Otros']= (cats[p.categoria||'Otros']||0)+1; });
+      const catsOrden=Object.keys(cats).sort();
+      let html='<button class="filter-chip '+(catActual==='Todos'?'active':'')+'" data-cat="Todos">Todos ('+productos.length+')</button>';
+      catsOrden.forEach(function(cat){
+        html+='<button class="filter-chip '+(catActual===cat?'active':'')+'" data-cat="'+cat+'">'+cat+' ('+cats[cat]+')</button>';
+      });
+      filterDiv.innerHTML=html;
+      filterDiv.querySelectorAll('[data-cat]').forEach(function(btn){
+        btn.onclick=function(){
+          window._preciosCatActual=btn.dataset.cat;
+          renderPrecios();
+          try{haptic(6);}catch(e){}
+        };
+      });
+    }
 
     if(content){
       if(filtrados.length===0){
         content.innerHTML='<div class="empty">Sin productos cargados.<br/><small>El admin debe subir los PDFs en su panel.</small></div>';
       } else {
-        var html='<div class="cat-chart" style="padding:12px"><h4 style="margin:0 0 10px;font-size:13px;font-weight:900">📋 '+filtrados.length+' productos</h4><div style="max-height:70vh;overflow-y:auto;display:flex;flex-direction:column;gap:8px">';
+        var html='<div class="cat-chart" style="padding:12px"><h4 style="margin:0 0 10px;font-size:13px;font-weight:900">📋 '+filtrados.length+' productos'+(catActual!=='Todos'?' - '+catActual:'')+'</h4><div style="max-height:70vh;overflow-y:auto;display:flex;flex-direction:column;gap:8px">';
         for(var i=0;i<filtrados.length;i++){
           var cc=filtrados[i];
           var isCanje = /plan\s*canje/i.test(cc.nombre) || /canje/i.test(cc.original||'');
@@ -8341,6 +8398,7 @@ function renderPrecios(){
           }
           var pbBadge=pbFormatted?'<span style="padding:4px 8px;border-radius:8px;background:rgba(91,141,239,0.12);color:#3d63c9;font-size:11px;font-weight:900">'+pbFormatted+' PB</span>':'';
           var canjeBadge=isCanje?'<span style="padding:3px 7px;border-radius:999px;background:rgba(245,179,1,0.18);color:#a3670b;font-size:10px;font-weight:900;display:inline-flex;align-items:center;gap:3px">🔄 Canje</span>':'';
+          var catBadge='<span style="padding:3px 6px;border-radius:6px;background:rgba(0,0,0,0.06);color:#666;font-size:9px;font-weight:700">'+(cc.categoria||'Otros')+'</span>';
           var nombreLimpio=cc.nombre;
           nombreLimpio=nombreLimpio.replace(/\(\s*Plan\s*canje\s*\)/gi,'').replace(/Plan\s*canje/gi,'').trim();
           nombreLimpio=nombreLimpio.replace(/\s{2,}/g,' ').trim();
@@ -8350,26 +8408,18 @@ function renderPrecios(){
           html+='<div class="person-item '+(isCanje?'canje-item':'')+'" data-canje="'+(isCanje?'1':'0')+'" style="padding:12px 14px;display:flex;align-items:center;gap:12px;'+(isCanje?'border-left:3px solid #f5b301;background:rgba(245,179,1,0.06)':'')+'">'
             +'<div class="pi-info" style="flex:1;min-width:0">'
             +'<div class="pi-name" style="font-size:14px;font-weight:700;word-break:break-word;display:flex;align-items:center;gap:6px;flex-wrap:wrap">'+nombreLimpio+' '+canjeBadge+'</div>'
-            +'<div class="pi-meta" style="margin-top:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">'+pbBadge+'</div>'
+            +'<div class="pi-meta" style="margin-top:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">'+pbBadge+' '+catBadge+'</div>'
             +'</div>'
             +'<div class="pi-pts" style="font-size:15px;font-weight:900;color:#1c1c1e;min-width:95px;text-align:right;flex:none">'+precioStr+'</div>'
             +'</div>';
         }
         html+='</div></div>';
         content.innerHTML=html;
-        // Bind canje filter pills
-        setTimeout(function(){
-          var btnTodos=document.getElementById('chipTodos');
-          var btnCanje=document.getElementById('chipCanje');
-          var items=document.querySelectorAll('#preciosContent .person-item');
-          if(btnTodos) btnTodos.onclick=function(){ items.forEach(function(it){ it.style.display='flex'; }); };
-          if(btnCanje) btnCanje.onclick=function(){ items.forEach(function(it){ it.style.display = it.dataset.canje==='1' ? 'flex' : 'none'; }); };
-        },100);
       }
     }
     if(shareWrap) shareWrap.style.display = filtrados.length? 'flex':'none';
     return;
-  }catch(e){ console.log('renderPrecios simple error',e); }
+  }catch(e){ console.log('renderPrecios error',e); }
   var content=document.getElementById('preciosContent');
   if(content) content.innerHTML='<div class="empty">Sin productos oficiales cargados.</div>';
 }
