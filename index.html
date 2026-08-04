@@ -3740,8 +3740,11 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
     </div>
 
 <style>
+.person-item{ touch-action: pan-y; -webkit-touch-callout: none; }
 .person-item.selected{border:2px solid #4b7a55 !important;background:rgba(75,122,85,0.12) !important;box-shadow:0 4px 12px rgba(75,122,85,0.15)}
 .person-item.selected .pi-name{color:#1d4a2d}
+#preciosContent{ touch-action: pan-y; -webkit-overflow-scrolling: touch; }
+#preciosContent .cat-chart{ touch-action: pan-y; }
 @keyframes pulsePresupuesto{0%,100%{transform:translateX(-50%) scale(1)}50%{transform:translateX(-50%) scale(1.05)}}
 #presupuestoFab.show{display:flex !important;animation:pulsePresupuesto 1.5s ease-in-out}
 .presupuesto-qty{display:flex;align-items:center;gap:6px;margin-top:6px}
@@ -9606,51 +9609,89 @@ var longPressActive=false;
 function attachLongPressHandlers(){
   const container=document.getElementById('preciosContent');
   if(!container) return;
-  container.querySelectorAll('.person-item').forEach(el=>{
+  container.querySelectorAll('.person-item').forEach(function(el){
     if(el.dataset.longPressBound==='1') return;
     el.dataset.longPressBound='1';
-    const nombre=el.querySelector('.pi-name')?.textContent?.trim() || '';
-    const prod=findProductoByNombre(nombre);
-    if(!prod) return;
-    const startPress=(e)=>{
-      e.preventDefault();
+    var prod=findProductoByElement(el);
+    if(!prod){
+      var nombre=el.querySelector('.pi-name')?.textContent?.trim() || el.getAttribute('data-nombre') || '';
+      prod={nombre: nombre, pb:0, precioUser:0, original:nombre};
+    }
+    if(!prod || !prod.nombre) return;
+
+    var startY=0, startX=0, moved=false;
+
+    var startPress=function(e){
+      var touch=e.touches ? e.touches[0] : e;
+      startY=touch.clientY;
+      startX=touch.clientX;
+      moved=false;
       pressTarget=el;
       longPressActive=false;
-      pressTimer=setTimeout(()=>{
+      if(pressTimer) clearTimeout(pressTimer);
+      pressTimer=setTimeout(function(){
+        if(moved) return;
         longPressActive=true;
         try{ if(navigator.vibrate) navigator.vibrate(50); }catch(err){}
         toggleProductoSeleccionado(prod);
-        el.classList.toggle('selected', isProductoSeleccionado(prod.nombre));
+        var pid=el.getAttribute('data-prod-id');
+        var sel=pid ? isProductoSeleccionadoById(pid) : isProductoSeleccionado(prod.nombre);
+        el.classList.toggle('selected', sel);
         try{ haptic(15); }catch(err){}
+        // Prevenir menú contextual y selección de texto después del long-press
+        e.preventDefault();
       }, 500);
     };
-    const cancelPress=()=>{
+
+    var cancelPress=function(){
       if(pressTimer){ clearTimeout(pressTimer); pressTimer=null; }
       pressTarget=null;
-      setTimeout(()=>{ longPressActive=false; }, 100);
+      setTimeout(function(){ longPressActive=false; }, 200);
     };
-    el.addEventListener('touchstart', startPress, {passive:false});
-    el.addEventListener('touchend', cancelPress);
+
+    var moveHandler=function(e){
+      var touch=e.touches ? e.touches[0] : e;
+      var deltaY=Math.abs(touch.clientY - startY);
+      var deltaX=Math.abs(touch.clientX - startX);
+      if(deltaY>10 || deltaX>10){
+        moved=true;
+        cancelPress();
+      }
+    };
+
+    // Touch events con passive:true para permitir scroll, solo preventDefault en long-press
+    el.addEventListener('touchstart', startPress, {passive:true});
+    el.addEventListener('touchend', function(e){
+      if(longPressActive){
+        e.preventDefault();
+      }
+      cancelPress();
+    });
     el.addEventListener('touchcancel', cancelPress);
-    el.addEventListener('touchmove', cancelPress);
-    el.addEventListener('mousedown', startPress);
+    el.addEventListener('touchmove', moveHandler, {passive:true});
+    el.addEventListener('mousedown', function(e){
+      if(e.button!==0) return;
+      startPress(e);
+    });
     el.addEventListener('mouseup', cancelPress);
     el.addEventListener('mouseleave', cancelPress);
-    el.addEventListener('click', (e)=>{
+    el.addEventListener('click', function(e){
       if(e.target.closest('.btn-add-pres')) return;
-      if(longPressActive){ e.preventDefault(); longPressActive=false; return; }
+      if(longPressActive){ e.preventDefault(); e.stopPropagation(); longPressActive=false; return; }
+      // Si hay movimiento, era scroll, no click para seleccionar
+      if(moved) return;
       if(presupuestoSeleccionados.length>0){
         e.preventDefault();
         e.stopPropagation();
         toggleProductoSeleccionado(prod);
-        el.classList.toggle('selected', isProductoSeleccionado(prod.nombre));
+        var pid=el.getAttribute('data-prod-id');
+        var sel=pid ? isProductoSeleccionadoById(pid) : isProductoSeleccionado(prod.nombre);
+        el.classList.toggle('selected', sel);
       }
     });
-    el.addEventListener('contextmenu', (e)=>{
-      if(presupuestoSeleccionados.length>0 || pressTimer){
-        e.preventDefault();
-        return false;
-      }
+    el.addEventListener('contextmenu', function(e){
+      e.preventDefault();
+      return false;
     });
   });
 }
