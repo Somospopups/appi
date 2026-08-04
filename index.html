@@ -8361,13 +8361,84 @@ function renderPrecios(){
     }
 
     if(searchBox) searchBox.style.display = productos.length? 'flex':'none';
-    if(filterDiv){
+        if(filterDiv){
       filterDiv.style.display = productos.length? 'flex':'none';
-      const cats={}; productos.forEach(function(p){ cats[p.categoria||'Otros']= (cats[p.categoria||'Otros']||0)+1; });
-      const catsOrden=Object.keys(cats).sort();
+      // Orden exacto como aparece en planilla: primera aparición de cada categoría
+      const cats={}; const catsOrden=[];
+      productos.forEach(function(p){
+        const cat=p.categoria||'Otros';
+        if(!cats[cat]){
+          cats[cat]=0;
+          catsOrden.push(cat);
+        }
+        cats[cat]++;
+      });
+      // Si el JSON trae categoriasOrden oficial (orden exacto de renglones grises subrayados), usar ese
+      try{
+        const preciosRaw=localStorage.getItem('preciosCruzadosOficiales')||localStorage.getItem('precios_oficiales')||'';
+        if(preciosRaw){
+          const d=JSON.parse(preciosRaw);
+          let ordenOficial=null;
+          if(d.categoriasOrden && Array.isArray(d.categoriasOrden) && d.categoriasOrden.length>0){
+            ordenOficial=d.categoriasOrden;
+          } else {
+            // Intentar desde precios.json completo
+            const fullRaw=localStorage.getItem('precios_oficiales')||'';
+            if(fullRaw){
+              const full=JSON.parse(fullRaw);
+              if(full.categoriasOrden) ordenOficial=full.categoriasOrden;
+            }
+          }
+          if(ordenOficial && ordenOficial.length>0){
+            // Reordenar catsOrden según ordenOficial exacto, manteniendo solo los que existen
+            const nuevoOrden=[];
+            ordenOficial.forEach(function(catOf){
+              // Buscar coincidencia exacta o que contenga
+              const encontrado=catsOrden.find(c=> c.toUpperCase()===catOf.toUpperCase() || catOf.toUpperCase().includes(c.toUpperCase()) || c.toUpperCase().includes(catOf.toUpperCase()));
+              if(encontrado && !nuevoOrden.includes(encontrado)){
+                nuevoOrden.push(encontrado);
+              } else if(catOf && !nuevoOrden.includes(catOf) && cats[catOf]){
+                nuevoOrden.push(catOf);
+              }
+            });
+            // Agregar los que no estaban en ordenOficial al final en orden de aparición
+            catsOrden.forEach(function(c){
+              if(!nuevoOrden.includes(c)) nuevoOrden.push(c);
+            });
+            // Si ordenOficial tiene categorías que no están en productos (ej: GASIFICADOR sin productos), igual mostrarlas si el usuario quiere ver exactamente lo que dice la sección
+            // Para cumplir "nombres y orden exactamente como aparecen en el listado", usamos ordenOficial como base y agregamos cantidades
+            if(ordenOficial.length>catsOrden.length){
+              // Usar ordenOficial tal cual para pills, aunque algunas tengan 0 productos, para mostrar exactamente las secciones del PDF
+              // Pero filtramos solo las que tienen productos o son de las secciones principales
+              const principales=['PURIFICADORES','GASIFICADOR','PURIFICADOR DE OSMOSIS INVERSA','OSMOSIS INVERSA','PURIFICADOR DE AIRE','KITS','ABLANDADORES','REPUESTOS','ALIMENTOS'];
+              // Si ordenOficial contiene alguna de estas, usar ordenOficial completo
+              const tienePrincipal=ordenOficial.some(oo=> principales.some(pp=> oo.toUpperCase().includes(pp) || pp.includes(oo.toUpperCase())));
+              if(tienePrincipal){
+                // Reconstruir catsOrden con nombres exactos de secciones
+                catsOrden.length=0;
+                ordenOficial.forEach(function(sec){
+                  // Normalizar a formato bonito pero mantener mayúsculas si original era mayúsculas
+                  const secTrim=sec.trim();
+                  if(secTrim) catsOrden.push(secTrim);
+                });
+                // Asegurar que cats tenga entrada para cada sección (aunque sea 0)
+                catsOrden.forEach(function(sec){
+                  if(!cats[sec]) cats[sec]=0;
+                });
+              }
+            } else {
+              // Si ordenOficial es más corto, usar nuevoOrden que respeta orden oficial + aparición
+              catsOrden.length=0;
+              nuevoOrden.forEach(function(c){ catsOrden.push(c); });
+            }
+          }
+        }
+      }catch(e){ console.log('orden categorias error',e); }
+
       let html='<button class="filter-chip '+(catActual==='Todos'?'active':'')+'" data-cat="Todos">Todos ('+productos.length+')</button>';
       catsOrden.forEach(function(cat){
-        html+='<button class="filter-chip '+(catActual===cat?'active':'')+'" data-cat="'+cat+'">'+cat+' ('+cats[cat]+')</button>';
+        const count=cats[cat]||0;
+        html+='<button class="filter-chip '+(catActual===cat?'active':'')+'" data-cat="'+cat+'">'+cat+' ('+count+')</button>';
       });
       filterDiv.innerHTML=html;
       filterDiv.querySelectorAll('[data-cat]').forEach(function(btn){
