@@ -3754,13 +3754,45 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
         </div>
         <div class="presu-fields">
           <div class="presu-field">
-            <label class="presu-label">👤 Nombre de quien recibe el presupuesto <span class="req">*</span></label>
+            <label class="presu-label">👤 Cliente <span class="req">*</span></label>
             <input type="text" id="presupuestoCliente" placeholder="Ej: Juan Pérez" autocomplete="name" />
           </div>
           <div class="presu-field">
-            <label class="presu-label">💼 Distribuidor que presupuesta</label>
+            <label class="presu-label">💼 Distribuidor</label>
             <input type="text" id="presupuestoVendedor" placeholder="Ej: Germán Díaz" autocomplete="name" />
           </div>
+        </div>
+        <div class="presu-field" style="margin-top:10px">
+          <label class="presu-label">🔢 Dividir en cuotas</label>
+          <div style="display:flex;gap:8px;align-items:center">
+            <select id="presuCuotasDiv" class="presu-select" style="max-width:220px">
+              <option value="1">1 cuota (contado)</option>
+              <option value="2">2 cuotas</option>
+              <option value="3">3 cuotas</option>
+              <option value="4">4 cuotas</option>
+              <option value="5">5 cuotas</option>
+              <option value="6">6 cuotas</option>
+              <option value="7">7 cuotas</option>
+              <option value="8">8 cuotas</option>
+              <option value="9">9 cuotas</option>
+              <option value="10">10 cuotas</option>
+              <option value="11">11 cuotas</option>
+              <option value="12">12 cuotas</option>
+              <option value="13">13 cuotas</option>
+              <option value="14">14 cuotas</option>
+              <option value="15">15 cuotas</option>
+              <option value="16">16 cuotas</option>
+              <option value="17">17 cuotas</option>
+              <option value="18">18 cuotas</option>
+              <option value="19">19 cuotas</option>
+              <option value="20">20 cuotas</option>
+              <option value="21">21 cuotas</option>
+              <option value="22">22 cuotas</option>
+              <option value="23">23 cuotas</option>
+              <option value="24">24 cuotas</option>
+            </select>
+          </div>
+          <div id="presuCuotasInfo" class="presu-cuotas-info" style="display:none"></div>
         </div>
         <div class="presu-items-title">🛒 Productos seleccionados</div>
         <div id="presupuestoItems" class="presu-items"></div>
@@ -8084,6 +8116,8 @@ const GANANCIAS_T={
 
 
 const PRECIOS_URL='https://german1987diaz.github.io/appi/precios.json';
+const PROMOS_URL='https://german1987diaz.github.io/appi/promociones.json';
+let promocionesData = null; // { version, actualizado, fuente, promociones: [...] }
 
 const PRECIOS_CACHE_KEY='precios_oficiales';
 const PRODUCTOS_OFICIALES_KEY='productos_oficiales';
@@ -8091,6 +8125,7 @@ const PRODUCTOS_OFICIALES_KEY='productos_oficiales';
 async function fetchPreciosOficiales(){
   try{
     const url=PRECIOS_URL+'?t='+Date.now();
+    fetchPromocionesOficiales();
     const res=await fetch(url,{cache:'no-store'});
     if(!res.ok) throw new Error('HTTP '+res.status);
     const data=await res.json();
@@ -8108,6 +8143,28 @@ async function fetchPreciosOficiales(){
     }catch(err){}
     return null;
   }
+}
+
+function fetchPromocionesOficiales(){
+  try{
+    const url=PROMOS_URL+'?t='+Date.now();
+    fetch(url,{cache:'no-store'})
+      .then(r=>{ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+      .then(data=>{
+        if(data && data.promociones && Array.isArray(data.promociones)){
+          promocionesData=data;
+          localStorage.setItem('promos_oficiales', JSON.stringify(data));
+          console.log('✅ Promociones cargadas', data.promociones.length);
+        }
+      })
+      .catch(e=>{
+        console.log('⚠️ No se pudo cargar promociones, usando caché', e);
+        try{
+          const cached=localStorage.getItem('promos_oficiales');
+          if(cached){ promocionesData=JSON.parse(cached); }
+        }catch(err){}
+      });
+  }catch(e){ console.log('promos error', e); }
 }
 
 function aplicarPreciosOficiales(data){
@@ -9663,6 +9720,24 @@ function findProductoByElement(el){
 }
 
 
+function actualizarDivisorCuotas(){
+  const infoEl=document.getElementById('presuCuotasInfo');
+  if(!infoEl) return;
+  const sel=document.getElementById('presuCuotasDiv');
+  const n = sel ? Number(sel.value) : 1;
+  let total=0;
+  (presupuestoSeleccionados||[]).forEach(p=>{ total+=(Number(p.precioUser)||0)*(Number(p.cantidad)||1); });
+  if(total<=0 || n<=1){
+    infoEl.style.display='none';
+    return;
+  }
+  const cuotaValor=total/n;
+  const porDia=total/30; // valor por día (mes de 30 días)
+  const fmt=(v)=> typeof formatPrecio!=='undefined' ? formatPrecio(v) : '$'+Number(v).toFixed(2);
+  infoEl.innerHTML = `<div class="cuota-linea"><span>${n} cuotas de</span><b>${fmt(cuotaValor)}</b></div>`+
+    `<div class="cuota-linea cuota-dia"><span>💰 O valor por día</span><b>${fmt(porDia)}</b></div>`;
+  infoEl.style.display='block';
+}
 function renderPresupuestoModal(){
   const cont=document.getElementById('presupuestoItems');
   const totalEl=document.getElementById('presupuestoTotal');
@@ -9683,16 +9758,16 @@ function renderPresupuestoModal(){
         <div class="presupuesto-qty">
           <button data-dec="${i}">−</button><span>${p.cantidad}</span><button data-inc="${i}">+</button>
           <span class="presu-item-sub">${typeof formatPrecio!=='undefined'?formatPrecio(subtotal):'$'+subtotal}</span>
+          <button class="presu-del" data-del="${i}" title="Quitar producto">🗑️</button>
         </div>
       </div>
-      <button class="presu-del" data-del="${i}" title="Quitar producto">🗑️</button>
     </div>`;
   }).join('');
   if(totalEl) totalEl.textContent= (typeof formatPrecio!=='undefined'?formatPrecio(total):'$'+total);
+  actualizarDivisorCuotas();
   cont.querySelectorAll('[data-inc]').forEach(b=>{ b.onclick=()=>{ const idx=+b.dataset.inc; presupuestoSeleccionados[idx].cantidad=(Number(presupuestoSeleccionados[idx].cantidad)||1)+1; renderPresupuestoModal(); actualizarFabPresupuesto(); }; });
   cont.querySelectorAll('[data-dec]').forEach(b=>{ b.onclick=()=>{ const idx=+b.dataset.dec; const cur=Number(presupuestoSeleccionados[idx].cantidad)||1; if(cur>1){ presupuestoSeleccionados[idx].cantidad=cur-1; } else { presupuestoSeleccionados.splice(idx,1); window.presupuestoSeleccionados=presupuestoSeleccionados; if(presupuestoSeleccionados.length===0){ document.getElementById('modalPresupuesto')?.classList.remove('open'); } } renderPresupuestoModal(); actualizarFabPresupuesto(); renderPrecios(); }; });
-  cont.querySelectorAll('[data-del]').forEach(b=>{ b.onclick=()=>{ presupuestoSeleccionados.splice(+b.dataset.del,1); window.presupuestoSeleccionados=presupuestoSeleccionados; renderPresupuestoModal(); actualizarFabPresupuesto(); renderPrecios(); if(presupuestoSeleccionados.length===0) document.getElementById('modalPresupuesto')?.classList.remove('open'); }; });
-}
+  cont.querySelectorAll('[data-del]').forEach(b=>{ b.onclick=()=>{ presupuestoSeleccionados.splice(+b.dataset.del,1); window.presupuestoSeleccionados=presupuestoSeleccionados; renderPresupuestoModal(); actualizarFabPresupuesto(); renderPrecios(); if(presupuestoSeleccionados.length===0) document.getElementById('modalPresupuesto')?.classList.remove('open'); }; });}
 function generarPDFPresupuesto(){
   const cliente=(document.getElementById('presupuestoCliente')?.value||'').trim();
   const vendedor=(document.getElementById('presupuestoVendedor')?.value||'').trim();
@@ -9703,8 +9778,11 @@ function generarPDFPresupuesto(){
     const doc=new jsPDF({unit:'mm',format:'a4'});
     const pageW=doc.internal.pageSize.getWidth();
     let y=18;
+    // Total general (para el medio de pago, que va en el encabezado)
+    const totalGeneral = presupuestoSeleccionados.reduce((s,p)=> s + ((Number(p.precioUser)||0)*(Number(p.cantidad)||1)), 0);
     doc.setFont('helvetica','bold'); doc.setFontSize(16); doc.text('Presupuesto', 14, y); y+=8;
-    doc.setFont('helvetica','normal'); doc.setFontSize(10); doc.text('Fecha: '+ new Date().toLocaleDateString('es-AR'), 14, y); y+=6; doc.text('Cliente: '+cliente, 14, y); y+=6; doc.text('Distribuidor: '+(vendedor||'___________________'), 14, y); y+=10;
+    doc.setFont('helvetica','normal'); doc.setFontSize(10); doc.text('Fecha: '+ new Date().toLocaleDateString('es-AR'), 14, y); y+=6; doc.text('Cliente: '+cliente, 14, y); y+=6; doc.text('Distribuidor: '+(vendedor||'___________________'), 14, y);
+    y+=10;
         const dibujarEncabezado=()=>{
       doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setFillColor(240,240,240); doc.rect(14, y-5, pageW-28, 8, 'F');
       doc.text('Producto', 16, y); doc.text('Cant.', 110, y, {align:'center'}); doc.text('Precio', 148, y, {align:'right'}); doc.text('Subtotal', 175, y, {align:'right'});
@@ -9726,6 +9804,16 @@ function generarPDFPresupuesto(){
     }
     if(y>275){ doc.addPage(); y=20; }
     y+=6; doc.setFont('helvetica','bold'); doc.setFontSize(13); doc.text('Total estimado: '+(typeof formatPrecio!=='undefined'?formatPrecio(total):'$'+total), pageW-14, y, {align:'right'});
+    // Divisor de cuotas
+    const cuotasDiv = Number((document.getElementById('presuCuotasDiv')?.value)||1);
+    if(cuotasDiv > 1 && total > 0){
+      y+=6; doc.setFont('helvetica','normal'); doc.setFontSize(10);
+      const cuotaValor=total/cuotasDiv;
+      const porDia=total/30;
+      doc.text(cuotasDiv+' cuotas de '+(typeof formatPrecio!=='undefined'?formatPrecio(cuotaValor).replace('$','').trim():cuotaValor.toFixed(2))+' cada una', pageW-14, y, {align:'right'});
+      y+=5;
+      doc.text('O valor por día: '+(typeof formatPrecio!=='undefined'?formatPrecio(porDia).replace('$','').trim():porDia.toFixed(2)), pageW-14, y, {align:'right'});
+    }
     y+=12; doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(120,120,120); doc.text('Presupuesto válido por 7 días. Precios en ARS. Incluye IVA donde corresponda.', 14, y); y+=5; doc.text('Generado desde APPI - Lista de Precios oficial', 14, y);
     const fileName='Presupuesto_'+cliente.replace(/[^a-z0-9]/gi,'_')+'_'+hoyLocal()+'.pdf';
     doc.save(fileName);
@@ -9861,6 +9949,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
   document.getElementById('closePresupuesto')?.addEventListener('click',()=> document.getElementById('modalPresupuesto')?.classList.remove('open'));
   document.getElementById('btnPresupuestoCancelar')?.addEventListener('click',()=> document.getElementById('modalPresupuesto')?.classList.remove('open'));
   document.getElementById('btnPresupuestoPDF')?.addEventListener('click', generarPDFPresupuesto);
+  document.getElementById('presuCuotasDiv')?.addEventListener('change', ()=>{ actualizarDivisorCuotas(); });
   document.getElementById('modalPresupuesto')?.addEventListener('click', (e)=>{
     if(e.target.id==='modalPresupuesto') e.currentTarget.classList.remove('open');
   });
@@ -10055,16 +10144,18 @@ body.dark .pm-org-link{color:#c9a0ff;border-bottom-color:rgba(201,160,255,.4)}
 
 <style>
 /* ===== MODAL PRESUPUESTO REDISEÑADO ===== */
-.presu-modal{overflow:hidden}
-.presu-head{display:flex;align-items:center;gap:12px;padding:16px 18px 14px;background:linear-gradient(135deg,rgba(91,141,239,.14),rgba(160,107,255,.10));border-radius:16px;margin-bottom:14px}
+.presu-modal{overflow:hidden;padding:14px 18px 18px}
+.presu-head{display:flex;align-items:center;gap:12px;padding:16px 18px 14px;background:linear-gradient(135deg,rgba(91,141,239,.14),rgba(160,107,255,.10));border-radius:16px;margin:-14px -18px 14px}
 .presu-head-ico{width:46px;height:46px;border-radius:14px;background:linear-gradient(135deg,#5b8def,#a06bff);display:grid;place-items:center;font-size:22px;box-shadow:0 6px 14px rgba(120,100,220,.3);flex:none}
 .presu-head-sub{margin:2px 0 0;font-size:12px;color:#6b6b76}
 body.dark .presu-head-sub{color:#a0a0b0}
-.presu-fields{display:flex;flex-direction:column;gap:10px}
+.presu-fields{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.presu-field .presu-label{font-size:11px}
+.presu-field input{min-width:0}
 .presu-field label{display:block;font-size:12px;font-weight:800;color:#3a3a48;margin-bottom:5px}
 body.dark .presu-field label{color:#d0d0d8}
 .presu-field .req{color:#d9534f}
-.presu-field input{width:100%;box-sizing:border-box;padding:11px 13px;border:1.5px solid rgba(91,141,239,.25);border-radius:12px;background:rgba(255,255,255,.75);font:inherit;font-size:13.5px;color:#1c1c1e;outline:none;transition:border-color .15s ease,box-shadow .15s ease}
+.presu-field input{width:100%;box-sizing:border-box;padding:8px 11px;border:1.5px solid rgba(91,141,239,.25);border-radius:10px;background:rgba(255,255,255,.75);font:inherit;font-size:13px;color:#1c1c1e;outline:none;transition:border-color .15s ease,box-shadow .15s ease}
 .presu-field input:focus{border-color:#5b8def;box-shadow:0 0 0 3px rgba(91,141,239,.15)}
 body.dark .presu-field input{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:rgba(91,141,239,.35)}
 .presu-items-title{font-size:11px;font-weight:900;color:#777887;text-transform:uppercase;letter-spacing:.5px;margin:14px 0 8px}
@@ -10078,7 +10169,7 @@ body.dark .presu-item-nombre{color:#f0f0f5}
 body.dark .presu-item-meta{color:#a0a0b0}
 .presu-item-sub{margin-left:auto;font-weight:800;color:#1d7a5c;font-size:12px}
 body.dark .presu-item-sub{color:#3ddc9d}
-.presu-del{width:32px;height:32px;border-radius:50%;border:none;background:rgba(217,83,79,.12);display:grid;place-items:center;font-size:14px;cursor:pointer;flex:none;transition:transform .12s ease,background .12s ease}
+.presu-del{width:24px;height:24px;border-radius:50%;border:none;background:rgba(217,83,79,.12);display:grid;place-items:center;font-size:11px;cursor:pointer;flex:none;padding:0;line-height:1;transition:transform .12s ease,background .12s ease}
 .presu-del:active{transform:scale(.88);background:rgba(217,83,79,.25)}
 .presu-total{display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding:14px 16px;border-radius:14px;background:linear-gradient(135deg,rgba(91,141,239,.13),rgba(58,208,164,.13));border:1px solid rgba(91,141,239,.15)}
 .presu-total span{font-size:13px;font-weight:800;color:#3a3a48}
@@ -10100,6 +10191,20 @@ body.dark .presu-btn-cancel{background:rgba(217,83,79,.22);color:#ff8f95;box-sha
 body.dark .presu-btn-share{background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;box-shadow:0 5px 14px rgba(37,211,102,.3)}
 #presupuestoItems::-webkit-scrollbar{width:4px}
 #presupuestoItems::-webkit-scrollbar-thumb{background:rgba(91,141,239,.3);border-radius:4px}
+.presu-cuotas-info{margin-top:8px;padding:11px 13px;border-radius:12px;background:rgba(91,141,239,.10);border:1px solid rgba(91,141,239,.22);display:flex;flex-direction:column;gap:5px}
+.cuota-linea{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;color:#3a3a48}
+.cuota-linea b{color:#3d63c9;font-size:14px}
+.cuota-linea.cuota-dia{border-top:1px dashed rgba(91,141,239,.25);padding-top:5px;color:#6b6b76}
+.cuota-linea.cuota-dia b{color:#7a4bd9}
+body.dark .presu-cuotas-info{background:rgba(91,141,239,.14);border-color:rgba(91,141,239,.35)}
+body.dark .cuota-linea{color:#d0d0d8}
+body.dark .cuota-linea b{color:#a8b8ff}
+body.dark .cuota-linea.cuota-dia{color:#a0a0b0}
+body.dark .cuota-linea.cuota-dia b{color:#c9a0ff}
+.presu-select{width:100%;box-sizing:border-box;padding:8px 11px;border:1.5px solid rgba(91,141,239,.25);border-radius:10px;background:rgba(255,255,255,.75);font:inherit;font-size:13px;color:#1c1c1e;outline:none;transition:border-color .15s ease,box-shadow .15s ease;appearance:auto}
+.presu-select:focus{border-color:#5b8def;box-shadow:0 0 0 3px rgba(91,141,239,.15)}
+body.dark .presu-select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:rgba(91,141,239,.35)}
+
 </style>
 </body>
 </html>
