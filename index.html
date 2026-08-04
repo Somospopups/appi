@@ -3292,6 +3292,26 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
 
 </head>
 <body>
+<!-- ============ SIDEBAR ESCRITORIO / LANDSCAPE ============ -->
+<aside class="desk-sidebar" id="deskSidebar" aria-label="Navegación principal">
+  <div class="ds-brand">
+    <span class="ds-logo">💧</span>
+    <div><b>APPI</b><small>Asistente personal</small></div>
+  </div>
+  <nav class="ds-nav">
+    <button class="ds-btn active" data-ds="view-home" onclick="showView('view-home'); renderHomeCompleto();"><span>🏠</span> Inicio</button>
+    <button class="ds-btn" data-ds="view-precios" onclick="openPrecios()"><span>💰</span> Precios</button>
+    <button class="ds-btn" data-ds="view-presu" onclick="openPresu()"><span>📊</span> Presupuesto Mensual</button>
+    <button class="ds-btn" data-ds="view-equipo" onclick="openEquipo()"><span>🌳</span> Mi Equipo</button>
+    <button class="ds-btn" data-ds="view-seguimiento" onclick="openSeguimiento()"><span>📇</span> Seguimiento</button>
+    <button class="ds-btn" data-ds="view-carrera" onclick="openCarrera()"><span>🏆</span> Carrera</button>
+    <button class="ds-btn" data-ds="view-siete" onclick="openSiete()"><span>🚀</span> Las 7 P</button>
+    <button class="ds-btn" data-ds="view-wheel" onclick="openRueda()"><span>⚖️</span> Rueda</button>
+    <button class="ds-btn" data-ds="view-history" onclick="showView('view-history'); renderHistory();"><span>📜</span> Historial</button>
+    <button class="ds-btn" data-ds="view-planning" onclick="showView('view-planning'); renderPlanningTools();"><span>🗓️</span> Planificación</button>
+  </nav>
+  <div class="ds-foot">APPI · v91</div>
+</aside>
  <!-- ============ PANTALLA DE ACTIVACIÓN ============ -->
 <div id="lockScreen" class="hidden">
   <div class="lock-card">
@@ -4317,6 +4337,12 @@ function showView(id){
   document.getElementById(id).classList.add('active');
   document.querySelectorAll('nav.tabs button').forEach(b=>{
     b.classList.toggle('active', b.dataset.view===id);
+  });
+  // Sidebar escritorio: marcar activo (con equivalencias de sub-vistas)
+  const dsMap = {'view-home':'view-home','view-precios':'view-precios','view-presu':'view-presu','view-presu-hist':'view-presu','view-equipo':'view-equipo','view-seguimiento':'view-seguimiento','view-carrera':'view-carrera','view-siete':'view-siete','view-siete-detail':'view-siete','view-wheel':'view-wheel','view-eval':'view-wheel','view-history':'view-history','view-planning':'view-planning'};
+  const dsTarget = dsMap[id] || '';
+  document.querySelectorAll('#deskSidebar .ds-btn').forEach(b=>{
+    b.classList.toggle('active', b.dataset.ds===dsTarget);
   });
   const hideTabsOn = ['view-home','view-siete','view-siete-detail','view-presu','view-presu-hist','view-equipo','view-seguimiento','view-carrera','view-planning','view-precios'];
   document.getElementById('tabs').style.display = hideTabsOn.includes(id) ? 'none' : 'flex';
@@ -10213,5 +10239,111 @@ body.dark .cuota-linea.cuota-dia b{color:#c9a0ff}
 body.dark .presu-select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:rgba(91,141,239,.35)}
 
 </style>
+
+<style>
+/* ============================================================
+   MODO ESCRITORIO / LANDSCAPE — COLORES ORIGINALES DE LA APP
+   ============================================================ */
+.desk-sidebar{display:none}
+
+@media (min-width: 1024px) {
+  /* --- Fondo: MISMO gradiente de la app (día y noche) --- */
+  html, body{
+    background: linear-gradient(160deg, #eaf1ff 0%, #f5ecff 45%, #ffe9f2 100%) !important;
+    background-attachment: fixed;
+  }
+  body.dark{
+    background: linear-gradient(160deg, #0f1424 0%, #1a1530 45%, #2a1530 100%) !important;
+  }
+  body::before{display:none}
+
+  /* --- Sidebar: glass como las tarjetas de la app --- */
+  .desk-sidebar{
+    display:flex; flex-direction:column;
+    position:fixed; top:0; left:0; bottom:0; width:280px; z-index:150;
+    background:rgba(255,255,255,.65);
+    -webkit-backdrop-filter:blur(24px) saturate(180%); backdrop-filter:blur(24px) saturate(180%);
+    border-right:1px solid rgba(255,255,255,.7);
+    box-shadow:0 0 40px rgba(80,90,130,.12);
+    padding:20px 14px 16px;
+    overflow-y:auto;
+  }
+  body.dark .desk-sidebar{background:rgba(24,24,40,.82); border-right-color:rgba(255,255,255,.09);}
+  .ds-brand{display:flex; align-items:center; gap:11px; padding:4px 8px 18px; border-bottom:1px solid rgba(80,90,130,.15); margin-bottom:14px}
+  body.dark .ds-brand{border-bottom-color:rgba(255,255,255,.12)}
+  .ds-logo{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#5b8def,#a06bff,#ff6b9d);display:grid;place-items:center;font-size:20px;box-shadow:0 4px 14px rgba(120,100,220,.35);flex:none}
+  .ds-brand b{display:block;font-size:17px;font-weight:900;letter-spacing:-.2px;color:#1c1c1e}
+  .ds-brand small{display:block;font-size:11px;color:#6b6b76;font-weight:600;margin-top:1px}
+  body.dark .ds-brand b{color:#f0f0f5}
+  body.dark .ds-brand small{color:#a0a0b0}
+  .ds-nav{display:flex;flex-direction:column;gap:2px}
+  .ds-btn{
+    display:flex; align-items:center; gap:12px; width:100%;
+    padding:11px 12px; border:none; border-radius:12px;
+    background:transparent; color:#3a3a48; font:inherit; font-size:14.5px; font-weight:700;
+    cursor:pointer; text-align:left; transition:background .18s ease,color .18s ease,transform .1s ease;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .ds-btn span{font-size:17px; width:26px; text-align:center; flex:none}
+  .ds-btn:hover{background:rgba(91,141,239,.10); color:#3d63c9}
+  .ds-btn:active{transform:scale(.97)}
+  .ds-btn.active{background:linear-gradient(135deg,rgba(91,141,239,.20),rgba(160,107,255,.16)); color:#3d63c9; box-shadow:inset 0 0 0 1.5px rgba(91,141,239,.28)}
+  body.dark .ds-btn{color:#d0d0d8}
+  body.dark .ds-btn:hover{background:rgba(91,141,239,.20); color:#a8b8ff}
+  body.dark .ds-btn.active{background:linear-gradient(135deg,rgba(91,141,239,.28),rgba(160,107,255,.22)); color:#a8b8ff; box-shadow:inset 0 0 0 1.5px rgba(140,170,255,.35)}
+  .ds-foot{margin-top:auto; padding:16px 8px 4px; font-size:11px; color:#8a8a94; font-weight:600; text-align:center}
+
+  /* --- Contenedor principal --- */
+  .app{
+    max-width:none; width:auto;
+    margin-left:316px; margin-right:0;
+    padding:32px 44px 70px;
+  }
+
+  /* --- Ocultar tabs inferiores (los reemplaza el sidebar) --- */
+  nav.tabs{display:none !important}
+
+  /* --- Grillas adaptativas --- */
+  .home-tool-grid{grid-template-columns:repeat(3, minmax(0,1fr)); gap:14px}
+  .stats-grid{grid-template-columns:repeat(4,1fr); gap:12px}
+  .home-hero-card, .home-month-card, .next-step-card{max-width:none}
+
+  /* Precios: 2 columnas */
+  #preciosContent{display:grid; grid-template-columns:1fr 1fr; gap:8px; align-items:start}
+  #preciosContent .search-box, #preciosContent .filter-chips, #preciosContent .cat-chart,
+  #preciosContent .precios-header, #preciosContent #preciosShareWrap{grid-column:1 / -1}
+  #preciosContent .cat-chart .cat-bar-row{max-width:820px}
+
+  /* Equipo: lista en 2 columnas */
+  #personListWrap{display:grid; grid-template-columns:1fr 1fr; gap:8px; align-items:start}
+  #equipoContent .top-list, #equipoContent .cat-chart{max-width:none}
+
+  /* Seguimiento: tarjetas en 2 columnas */
+  #seguimientoList{display:grid; grid-template-columns:1fr 1fr; gap:10px; align-items:start}
+  #seguimientoList .seguimiento-item, #seguimientoList .seg-card{break-inside:avoid}
+
+  /* Modales más anchos */
+  .modal{max-width:680px}
+  .presu-modal{max-width:640px !important}
+  #presupuestoItems{max-height:52vh}
+  #presuCuotasDiv{max-width:260px}
+
+  /* Headers con menos padding */
+  header.top{padding-top:8px}
+
+  /* Scrollbar fino */
+  ::-webkit-scrollbar{width:8px; height:8px}
+  ::-webkit-scrollbar-thumb{background:rgba(120,120,128,.35); border-radius:99px}
+  ::-webkit-scrollbar-track{background:transparent}
+}
+/* Tablets landscape sin sidebar: app más ancha */
+@media (min-width: 768px) and (max-width: 1023px) and (orientation: landscape){
+  .app{max-width:900px; padding-left:28px; padding-right:28px}
+  .home-tool-grid{grid-template-columns:repeat(3, minmax(0,1fr))}
+  .stats-grid{grid-template-columns:repeat(4,1fr)}
+}
+</style>
+
+
 </body>
 </html>
