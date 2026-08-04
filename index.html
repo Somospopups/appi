@@ -8294,12 +8294,12 @@ function cruzarPrecios(){
 
 function detectarCategoriaProducto(nombre){
   const n=(nombre||'').toUpperCase();
-  if(n.includes('GASIFICADOR') || n.includes('GASIFICADORA')) return 'Gasificador';
-  if(n.includes('OSMOSIS') || n.includes('ÓSMOSIS')) return 'Osmosis Inversa';
-  if(n.includes('AIRE') && (n.includes('PURIFICADOR') || n.includes('PURIFICADORA'))) return 'Purificador de Aire';
-  if(n.includes('PURIFICADOR') && n.includes('AIRE')) return 'Purificador de Aire';
+    if(n.includes('GASIFICADOR') || n.includes('GASIFICADORA') || n.includes('SODA') || n.includes('BURBY')) return 'GASIFICADOR';
+  if(n.includes('OSMOSIS') || n.includes('ÓSMOSIS')) return 'PURIFICADOR DE OSMOSIS INVERSA';
+  if(n.includes('AIRE') && (n.includes('PURIFICADOR') || n.includes('PURIFICADORA'))) return 'PURIFICADOR DE AIRE';
+  if(n.includes('PURIFICADOR') && n.includes('AIRE')) return 'PURIFICADOR DE AIRE';
   // Todo lo que es purificador de agua va a Purificadores como solicitado
-  if(n.includes('SENIOR') || n.includes('DOMUS') || n.includes('MINI') || n.includes('VERO') || n.includes('DUCHA') || n.includes('PURIFICADOR') || n.includes('ABLANDADOR')) return 'Purificadores';
+  if(n.includes('SENIOR') || n.includes('DOMUS') || n.includes('MINI') || n.includes('VERO') || n.includes('DUCHA') || n.includes('PURIFICADOR') || n.includes('ABLANDADOR')) return 'PURIFICADORES';
   if(n.includes('KITS') || n.includes('KIT')) return 'Kits';
   if(n.includes('FILTRO') || n.includes('REPUESTO') || n.includes('TAPA') || n.includes('SOPORTE') || n.includes('ADAPT')) return 'Repuestos';
   if(n.includes('ACEITE') || n.includes('OLIVARE') || n.includes('PASAS') || n.includes('UVA')) return 'Alimentos';

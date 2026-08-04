@@ -8,7 +8,6 @@
     "PURIFICADOR DE AIRE",
     "KITS",
     "ABLANDADORES",
-    "REPUESTOS",
     "OTROS"
   ],
   "preciosCruzados": [
@@ -304,13 +303,13 @@
       "nombre": "SODA BURBY BIANCO",
       "pb": 2.15,
       "precioUser": 438000.0,
-      "categoria": "OTROS"
+      "categoria": "GASIFICADOR"
     },
     {
       "nombre": "SODA BURBY BIANCO Plan canje",
       "pb": 1.9,
       "precioUser": 821700.0,
-      "categoria": "OTROS"
+      "categoria": "GASIFICADOR"
     },
     {
       "nombre": "OSMOSIS ROPOT",
@@ -388,97 +387,97 @@
       "nombre": "( ) ADAPT. UNIVERSAL C/MANGUERA",
       "pb": 0,
       "precioUser": 22250.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "( ) ADAPT. ROSCA (FV TIPO UNIMIX)",
       "pb": 0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "( ) ADAPT. ROSCA CORTA",
       "pb": 0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "( ) ADAPT. ROSCA LARGA",
       "pb": 0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "( ) ADAPT. UNIV.MARIPOSA DIAM",
       "pb": 0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "( ) ADAPT. UNIV.MARIPOSA DIAM",
       "pb": 0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "( ) ADAPT. UNIV.MARIPOSA DIAM",
       "pb": 0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "( ) ADAPT. UNIV.MARIPOSA DIAM",
       "pb": 0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "( ) ADAPT. UNIV.MARIPOSA DIAM",
       "pb": 0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "( ) ADAPT. ROSCA HEMBRA-HEMBRA",
       "pb": 0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "( ) ADAPT. ROSCA HEMBRA O.N",
       "pb": 0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "( ) ADAPT. ROSCA CANILLA TIPO PATIO",
       "pb": 0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "( ) ADAPT. ROSCA MACHO",
       "pb": 18.1,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "( ) ADAPT. ROSCA ESPECIAL",
       "pb": 0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "( ) ADAPT. ROSCA HEMBRA",
       "pb": 20.1,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "( ) ADAPT. ROSCA LARGA PASO FINO",
       "pb": 0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "( ) ADAPT. H-M / C/TUERCA DUCHA II",
@@ -496,127 +495,127 @@
       "nombre": "( ) ADAPT. ROSCA MACHO (FV SWING PLUS)",
       "pb": 0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "( ) ADAPT. ROSCA HEMBRA-HEMBRA DIÁM",
       "pb": 0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "( ) ADAPT. ROSCA CANILLA PIAZZA",
       "pb": 0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "( ) ADAPT. SIN ROSCA DIAM",
       "pb": 0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "( ) ADAPT. ROSCA BSP / X HILOS",
       "pb": 0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "( ) ADAPT. ROSCA MÚLTIPLE",
       "pb": 0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "( ) ADAPT. ROSCA DIAM",
       "pb": 23.5,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "( ) ADAPT. ROSCA MACHO X",
       "pb": 0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "( ) ADAPT. ROSCA HEMBRA BSP /",
       "pb": 0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "( ) ADAPT. ROSCA MACHO FV DIÁM",
       "pb": 18.6,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "( ) ADAPT. ROSCA HEMBRA P/HIDROMET",
       "pb": 0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "( ) ADAPT. ROSCA MACHO X",
       "pb": 0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "( ) ADAPT. ROSCA MACHO . X",
       "pb": 16.3,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "( ) ADAPT. ROSCA MACHO . X",
       "pb": 18.2,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "( ) ADAPT. ROSCA TIPO RACOR M. X",
       "pb": 0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "( ) ADAPT. ROSCA HEMBRA (SWING PLUS) M. X",
       "pb": 0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "( ) ADAPT. ROSCA P/LAVARROPA M X",
       "pb": 0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "( ) ADAPT. S- C/ORING. P/MANOMETRO",
       "pb": 0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "( ) ADAPT. ROSCA MACHO X",
       "pb": 0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "( ) ADAPT. ROSCA AIREADOR M X",
       "pb": 0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "( ) ADAPT. RECTANGULAR P/PEGAR",
       "pb": 0,
       "precioUser": 54550.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "( ) ADAPT. M-H BG / P/ DUCHA CR",
@@ -628,37 +627,37 @@
       "nombre": "( ) ADAPT. OVALADO",
       "pb": 0,
       "precioUser": 54550.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "( ) ADAPT. ROSCA H-H X LARGO",
       "pb": 0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "( ) ADAPT. ROSCA H-M X",
       "pb": 0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "( ) ADAPT. ROSCA MACHO X",
       "pb": 0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "( ) ADAPT. UNIVERSAL C/MANGUERA NERO",
       "pb": 0,
       "precioUser": 22250.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "ADAPT. ESPECIAL KIT °",
       "pb": 0,
       "precioUser": 24800.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "ALCOHOL ISOPROPILICO",
@@ -670,19 +669,19 @@
       "nombre": "ARANDELA ADAPTADOR DIÁM. X",
       "pb": 0,
       "precioUser": 7150.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "ARANDELA ADAPTADOR DIÁM. X",
       "pb": 0,
       "precioUser": 7150.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "ARANDELA ADAPTADOR X",
       "pb": 0,
       "precioUser": 7150.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "BUJE DE DERIVACIÓN CANILLA BM",
@@ -724,7 +723,7 @@
       "nombre": "CONJ.SOPORTE PSA STOPPER",
       "pb": 0,
       "precioUser": 22150.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "FUNDA PSA DOMUS",
@@ -820,7 +819,7 @@
       "nombre": "LLAVE DE AJUSTE P/TAPA PREFILTRO K-D",
       "pb": 0,
       "precioUser": 6250.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "LLAVE DE AJUSTE P/VÁLVULA BY PASS UNIVERSAL",
@@ -892,7 +891,7 @@
       "nombre": "SET ADAPTACION RETRO P/KIT CANILLA",
       "pb": 0,
       "precioUser": 33950.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "TAPON REGULADOR P/DUCHA X UNIDADES",
@@ -928,7 +927,7 @@
       "nombre": "ABRAZADERA ADAPT.UNIVERSAL X UNID",
       "pb": 0,
       "precioUser": 15100.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "ACCESORIO PARA CEBAR MATE",
@@ -1024,7 +1023,7 @@
       "nombre": "CONJ.SOPORTE ESCUADRA P/DISPENSER PIE C/CONECTORES",
       "pb": 0,
       "precioUser": 143000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "ELECTRODO P/IONTRIX",
@@ -1216,7 +1215,7 @@
       "nombre": "O-RING PREFILTRO x",
       "pb": 0,
       "precioUser": 4400.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "ORTOTOLIDINA",
@@ -1258,13 +1257,13 @@
       "nombre": "PREFILTRO ENTRADA PURIF. DE AIRE PSA",
       "pb": 0,
       "precioUser": 1596000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "PREFILTRO P/ KD",
       "pb": 0,
       "precioUser": 19850.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "PROLONGADOR P/ PICO PSA SENIOR",
@@ -1288,7 +1287,7 @@
       "nombre": "RECARGA P/SODA BURBY",
       "pb": 0,
       "precioUser": 28400.0,
-      "categoria": "OTROS"
+      "categoria": "GASIFICADOR"
     },
     {
       "nombre": "RECIPIENTE P/AGUA ENTRADA OSMOSIS PSA ROPOT",
@@ -1300,19 +1299,19 @@
       "nombre": "REPUESTO BACTERIOSTÁTICO MIC S- /QUA/SEN",
       "pb": 0,
       "precioUser": 75950.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "REPUESTO BACTERIOSTÁTICO MIC S- /QUA/SEN",
       "pb": 0,
       "precioUser": 75950.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "REPUESTO BACTERIOSTÁTICO MIC S- /QUA/SEN",
       "pb": 0,
       "precioUser": 75950.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "REPUESTO CUERPO PSA DUCHA BIANCO",
@@ -1366,19 +1365,19 @@
       "nombre": "REPUESTO PSA POLI",
       "pb": 0,
       "precioUser": 280000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "REPUESTO PSA POLI",
       "pb": 0,
       "precioUser": 280000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "REPUESTO PSA PORTÁTIL",
       "pb": 0,
       "precioUser": 21100.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "RESERVORIO COMPLETO P/ECO-D",
@@ -1396,31 +1395,31 @@
       "nombre": "TAPA ACRILICO P/STOPPER/ K-D",
       "pb": 0,
       "precioUser": 77750.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "TAPA CENTRADORA P/IONTRIX",
       "pb": 0,
       "precioUser": 11300.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "TAPA CENTRADORA P/IONTRIX",
       "pb": 0,
       "precioUser": 11300.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "TAPA CON FLOTANTE P/DISPENSER",
       "pb": 0,
       "precioUser": 153000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "TAPA P/BOTELLA PSA TERMICA PICO SPORT",
       "pb": 0,
       "precioUser": 8450.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "TAPA P/CUERPO PSA DUCHA CR MARFIL",
@@ -1438,13 +1437,13 @@
       "nombre": "TAPA PREFILTRO C/AUTOPURGA",
       "pb": 0,
       "precioUser": 18200.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "TAPA PREFILTRO PSA S- II",
       "pb": 0,
       "precioUser": 72250.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "TAPA PREFILTRO SENIOR",
@@ -1774,7 +1773,7 @@
       "nombre": "BOTELLA PSA P/SODA BURBY X ML X REUTILIZ",
       "pb": 0,
       "precioUser": 438000.0,
-      "categoria": "OTROS"
+      "categoria": "GASIFICADOR"
     },
     {
       "nombre": "BOTELLA PSA TÉRMICA CC BLANCA",
@@ -1804,13 +1803,13 @@
       "nombre": "AGENDA PSA TAPA AMARILLA",
       "pb": 0,
       "precioUser": 4800.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "AGENDA PSA TAPA BLANCA",
       "pb": 0,
       "precioUser": 4800.0,
-      "categoria": "REPUESTOS"
+      "categoria": "OTROS"
     },
     {
       "nombre": "BOLSA CHICA PSA RECICLABLE X UNID",
