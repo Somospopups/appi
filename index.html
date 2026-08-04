@@ -8501,13 +8501,13 @@ function renderPrecios(){
           var pbBadge=pbFormatted?'<span style="padding:4px 8px;border-radius:8px;background:rgba(91,141,239,0.12);color:#3d63c9;font-size:11px;font-weight:900">'+pbFormatted+' PB</span>':'';
           var canjeBadge=isCanje?'<span style="padding:3px 7px;border-radius:999px;background:rgba(245,179,1,0.18);color:#a3670b;font-size:10px;font-weight:900;display:inline-flex;align-items:center;gap:3px">🔄 Canje</span>':'';
           var catBadge='<span style="padding:3px 6px;border-radius:6px;background:rgba(0,0,0,0.06);color:#666;font-size:9px;font-weight:700">'+(cc.categoria||'Otros')+'</span>';
-          var nombreLimpio=cc.nombre;
+                    var nombreLimpio=cc.nombre;
           nombreLimpio=nombreLimpio.replace(/\(\s*Plan\s*canje\s*\)/gi,'').replace(/Plan\s*canje/gi,'').trim();
           nombreLimpio=nombreLimpio.replace(/\s{2,}/g,' ').trim();
           if(!nombreLimpio) nombreLimpio=cc.nombre;
           var precio = cc.precioUser||0;
           var precioStr=(typeof formatPrecio!=='undefined'?formatPrecio(precio):'$'+precio);
-                    var prodId='';
+          var prodId='';
           try{ prodId=btoa(encodeURIComponent(cc.nombre||'')).replace(/=/g,''); }catch(e){ prodId=(cc.nombre||'').replace(/[^a-z0-9]/gi,'_'); }
           var safeNombre=(cc.nombre||'').replace(/"/g,'&quot;');
           html+='<div class="person-item '+(isCanje?'canje-item':'')+'" data-canje="'+(isCanje?'1':'0')+'" data-prod-id="'+prodId+'" data-nombre="'+safeNombre+'" style="padding:12px 14px;display:flex;align-items:center;gap:12px;'+(isCanje?'border-left:3px solid #f5b301;background:rgba(245,179,1,0.06)':'')+'">'
@@ -8515,7 +8515,10 @@ function renderPrecios(){
             +'<div class="pi-name" style="font-size:14px;font-weight:700;word-break:break-word;display:flex;align-items:center;gap:6px;flex-wrap:wrap">'+nombreLimpio+' '+canjeBadge+'</div>'
             +'<div class="pi-meta" style="margin-top:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">'+pbBadge+' '+catBadge+'</div>'
             +'</div>'
-            +'<div class="pi-pts" style="font-size:15px;font-weight:900;color:#1c1c1e;min-width:95px;text-align:right;flex:none">'+precioStr+'</div>'
+            +'<div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex:none">'
+            +'<div class="pi-pts" style="font-size:15px;font-weight:900;color:#1c1c1e;min-width:95px;text-align:right">'+precioStr+'</div>'
+            +'<button class="btn-add-pres" data-add-id="'+prodId+'" style="padding:6px 10px;border-radius:8px;border:none;background:linear-gradient(135deg,#4b7a55,#3ad0a4);color:#fff;font-weight:900;font-size:12px;cursor:pointer">+ Agregar</button>'
+            +'</div>'
             +'</div>';
         }
         html+='</div></div>';
@@ -9452,6 +9455,73 @@ function actualizarFabPresupuesto(){
     countEl.textContent=presupuestoSeleccionados.length + ' producto' + (presupuestoSeleccionados.length>1?'s':'');
   }
 }
+
+function isProductoSeleccionado(nombre){
+  return presupuestoSeleccionados.some(function(p){ return p.nombre===nombre; });
+}
+function isProductoSeleccionadoById(prodId){
+  return presupuestoSeleccionados.some(function(p){
+    try{
+      var id=btoa(encodeURIComponent(p.nombre||'')).replace(/=/g,'');
+      return id===prodId;
+    }catch(e){ return false; }
+  });
+}
+function toggleProductoSeleccionado(prod){
+  if(!prod || !prod.nombre) return;
+  var idx=presupuestoSeleccionados.findIndex(function(p){ return p.nombre===prod.nombre; });
+  if(idx>=0){
+    presupuestoSeleccionados.splice(idx,1);
+  } else {
+    presupuestoSeleccionados.push({nombre:prod.nombre, pb:prod.pb||0, precioUser:prod.precioUser||prod.precio||0, original:prod.original||prod.nombre, cantidad:1});
+  }
+  window.presupuestoSeleccionados=presupuestoSeleccionados;
+  // Actualizar visual sin re-render completo para no perder scroll ni seleccionar rango
+  document.querySelectorAll('#preciosContent .person-item').forEach(function(el){
+    var pid=el.getAttribute('data-prod-id');
+    var dnombre=el.getAttribute('data-nombre');
+    var sel=false;
+    if(pid){
+      sel=isProductoSeleccionadoById(pid);
+    } else if(dnombre){
+      sel=isProductoSeleccionado(dnombre);
+    }
+    el.classList.toggle('selected', sel);
+  });
+  actualizarFabPresupuesto();
+}
+function findProductoById(prodId){
+  try{
+    var allRaw=localStorage.getItem('preciosCruzadosOficiales') || localStorage.getItem('preciosUsuarioOficial') || '';
+    if(allRaw){
+      var arr=JSON.parse(allRaw);
+      for(var k=0;k<arr.length;k++){
+        var p=arr[k];
+        try{
+          var id=btoa(encodeURIComponent(p.nombre||'')).replace(/=/g,'');
+          if(id===prodId) return p;
+        }catch(e){}
+      }
+    }
+  }catch(e){}
+  return null;
+}
+function findProductoByElement(el){
+  try{
+    var prodId=el.getAttribute('data-prod-id');
+    if(prodId){
+      var found=findProductoById(prodId);
+      if(found) return found;
+    }
+    var dataNombre=el.getAttribute('data-nombre');
+    if(dataNombre){
+      return {nombre: dataNombre, pb:0, precioUser:0, original:dataNombre};
+    }
+  }catch(e){}
+  return null;
+}
+
+
 function renderPresupuestoModal(){
   const cont=document.getElementById('presupuestoItems');
   const totalEl=document.getElementById('presupuestoTotal');
@@ -9515,21 +9585,23 @@ function generarPDFPresupuesto(){
     if(typeof showToast==='function') showToast('PDF generado 📄');
   }catch(e){ console.error(e); alert('Error generando PDF: '+e.message); }
 }
+
 function findProductoByNombre(nombreVisible){
   try{
     const allRaw=localStorage.getItem('preciosCruzadosOficiales') || localStorage.getItem('preciosUsuarioOficial') || '';
     if(allRaw){
       const arr=JSON.parse(allRaw);
       const limpio=nombreVisible.replace(/🔄 Canje/g,'').trim();
-      for(const p of arr){
-        if(p.nombre && (p.nombre===limpio || p.nombre.includes(limpio) || limpio.includes(p.nombre) || p.nombre.toLowerCase().includes(limpio.toLowerCase()) )){
-          return p;
-        }
+      for(let i=0;i<arr.length;i++){
+        const p=arr[i];
+        if(p.nombre===limpio) return p;
+        if(p.nombre && p.nombre.toLowerCase()===limpio.toLowerCase()) return p;
       }
     }
   }catch(e){}
   return {nombre: nombreVisible, pb:0, precioUser:0, original:nombreVisible};
 }
+
 var longPressActive=false;
 function attachLongPressHandlers(){
   const container=document.getElementById('preciosContent');
@@ -9565,9 +9637,11 @@ function attachLongPressHandlers(){
     el.addEventListener('mouseup', cancelPress);
     el.addEventListener('mouseleave', cancelPress);
     el.addEventListener('click', (e)=>{
+      if(e.target.closest('.btn-add-pres')) return;
       if(longPressActive){ e.preventDefault(); longPressActive=false; return; }
       if(presupuestoSeleccionados.length>0){
         e.preventDefault();
+        e.stopPropagation();
         toggleProductoSeleccionado(prod);
         el.classList.toggle('selected', isProductoSeleccionado(prod.nombre));
       }
@@ -9607,6 +9681,31 @@ document.addEventListener('DOMContentLoaded', ()=>{
   document.getElementById('modalPresupuesto')?.addEventListener('click', (e)=>{
     if(e.target.id==='modalPresupuesto') e.currentTarget.classList.remove('open');
   });
+});
+
+
+
+// Handler para boton + Agregar (fallback si long-press falla)
+document.addEventListener('click', function(e){
+  const btn=e.target.closest('.btn-add-pres');
+  if(!btn) return;
+  e.preventDefault();
+  e.stopPropagation();
+  const item=btn.closest('.person-item');
+  if(!item) return;
+  let prod=null;
+  try{
+    prod=findProductoByElement(item);
+    if(!prod || !prod.nombre){
+      const dataNombre=item.getAttribute('data-nombre');
+      if(dataNombre) prod={nombre:dataNombre, pb:0, precioUser:0, original:dataNombre};
+    }
+  }catch(err){}
+  if(prod && prod.nombre){
+    toggleProductoSeleccionado(prod);
+    item.classList.toggle('selected', isProductoSeleccionado(prod.nombre) || (item.dataset.prodId && isProductoSeleccionadoById(item.dataset.prodId)));
+    try{ haptic(10); }catch(err){}
+  }
 });
 
 
