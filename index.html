@@ -1652,23 +1652,6 @@
   .person-modal-body .pm-row:last-child { border-bottom: none; }
   .person-modal-body .pm-row .pm-lbl { color: #6b6b76; font-weight: 600; }
   .person-modal-body .pm-row .pm-val { color: #1c1c1e; font-weight: 700; text-align: right; word-break: break-word; }
-  .person-modal-body .pm-actions {
-    display: flex; gap: 8px; margin-top: 14px;
-  }
-  .person-modal-body .pm-actions button {
-    flex: 1; padding: 10px; border-radius: 12px; border: none;
-    font-family: inherit; font-weight: 700; font-size: 12.5px;
-    cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px;
-  }
-  .person-modal-body .pm-actions .pm-wa {
-    background: linear-gradient(135deg, #25D366, #128C7E); color: #fff;
-  }
-  .person-modal-body .pm-actions .pm-call {
-    background: linear-gradient(135deg, #5b8def, #a06bff); color: #fff;
-  }
-  .person-modal-body .pm-actions .pm-mail {
-    background: linear-gradient(135deg, #a06bff, #ff6b9d); color: #fff;
-  }
   /* ============ EXPORTAR IMAGEN ============ */
   .share-menu-item {
     display: flex; align-items: center; gap: 12px;
@@ -3146,7 +3129,15 @@ body.dark .lock-footer { color: #6b6b76; }
 
   /* Contacto compacto: misma lógica visual que Listo / Editar / Eliminar */
   .seg-contact-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0 4px}.seg-contact-actions a{min-height:36px;padding:7px 8px;border-radius:10px;font-size:10.5px;font-weight:900;line-height:1.15}.seg-contact-actions .wa-msg{background:rgba(58,208,164,.16);color:#197454}.seg-contact-actions .phone-call{background:rgba(91,141,239,.14);color:#3d63c9}
-  .person-modal-body .pm-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}.person-modal-body .pm-actions button{min-height:38px;padding:7px 6px;border-radius:10px;font-size:11px;font-weight:900;line-height:1.12}.person-modal-body .pm-actions .pm-wa{background:rgba(58,208,164,.16);color:#197454}.person-modal-body .pm-actions .pm-call{background:rgba(91,141,239,.14);color:#3d63c9}.person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.15);color:#c24d7d}
+  .person-modal-body .pm-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.person-modal-body .pm-actions button{flex:1 1 0;min-height:38px;padding:8px 10px;border-radius:10px;border:none;font:inherit;font-size:11px;font-weight:900;line-height:1.2;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:4px}
+.person-modal-body .pm-actions .pm-wa{background:rgba(58,208,164,.16);color:#197454}
+.person-modal-body .pm-actions .pm-call{background:rgba(91,141,239,.14);color:#3d63c9}
+.person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.15);color:#c24d7d}
+
+body.dark .person-modal-body .pm-actions .pm-wa{background:rgba(58,208,164,.18);color:#4fd68f}
+body.dark .person-modal-body .pm-actions .pm-call{background:rgba(91,141,239,.20);color:#a8b8ff}
+body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.18);color:#ff9dbd}
 </style>
 <style>
   .seguimiento-item .seg-item-head .seg-item-phone{display:block;margin-top:4px;text-align:left;font-size:12px;color:#777887;font-weight:750}
@@ -5825,7 +5816,8 @@ function renderEquipoDashboard(){
   const porCat = {};
   personas.forEach(p=>{ const k = p.cat || '?'; porCat[k] = (porCat[k]||0) + 1; });
   const catsOrden = ['E','LE','L','CE','DC','D','DJ'];
-  const catsPresentes = catsOrden.filter(c => porCat[c]).concat(Object.keys(porCat).filter(c => !catsOrden.includes(c)));
+  // Solo mostrar categorías válidas (existentes en CAT_INFO): evita renglones basura del Excel
+  const catsPresentes = catsOrden.filter(c => porCat[c]).concat(Object.keys(porCat).filter(c => !catsOrden.includes(c) && CAT_INFO[c]));
   const maxCat = Math.max(...Object.values(porCat));
     // Top según el modo seleccionado
   const top10Personal = [...personas].sort((a,b)=> (b.pnAct||0) - (a.pnAct||0)).filter(p => (p.pnAct||0) > 0).slice(0, 10);
@@ -5997,7 +5989,6 @@ ${(function(){
       </div>
       <style>#bdayFullList.open{display:block !important}
   .seg-name-line{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.seg-name-line h3{margin:0}.seg-contact-actions{display:flex;align-items:center;gap:4px}.seg-contact-actions a{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;padding:0;border-radius:8px;text-decoration:none;font-size:13px;font-weight:900}.seg-contact-actions .wa-msg{background:rgba(37,211,102,.16);color:#147a43}.seg-contact-actions .wa-call{background:rgba(37,211,102,.10);color:#147a43}.seg-contact-actions .phone-call{background:rgba(91,141,239,.14);color:#3d63c9}
-  .person-modal-body .pm-actions .pm-wa-call{background:linear-gradient(135deg,#31b866,#168b50);color:#fff;border:0;border-radius:10px;font:inherit;font-size:12px;font-weight:850;padding:10px;cursor:pointer;}
 
   /* Dashboard de contactos dentro de Mi Equipo */
   .equipo-contact-dashboard{margin:0 0 14px;padding:14px;border-radius:20px;background:rgba(255,255,255,.55);border:1px solid rgba(255,255,255,.72);box-shadow:0 10px 25px rgba(80,90,130,.08)}.equipo-contact-dashboard h3{margin:0 0 11px;color:#1c1c27;font-size:16px}.eq-status-row,.eq-type-row{display:flex;gap:6px;overflow-x:auto;padding-bottom:3px}.eq-filter,.eq-type{flex:1;min-width:max-content;border:0;border-radius:10px;padding:9px 10px;background:rgba(80,90,130,.08);color:#60606d;font:inherit;font-size:10.5px;font-weight:900;cursor:pointer;white-space:nowrap}.eq-filter.active,.eq-type.active{background:linear-gradient(135deg,#5b8def,#a06bff);color:#fff;box-shadow:0 5px 12px rgba(91,141,239,.22)}.eq-type-row{margin-top:11px}.eq-type{font-size:11px}.eq-contact-counts{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-top:12px}.eq-contact-count{padding:8px 3px;border-radius:10px;background:rgba(255,255,255,.5);text-align:center}.eq-contact-count b{display:block;color:#3d63c9;font-size:17px}.eq-contact-count span{display:block;color:#777887;font-size:8px;font-weight:900;line-height:1.1}.eq-contact-list{margin-top:11px}.eq-contact-person{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 0;border-top:1px solid rgba(80,90,130,.10)}.eq-contact-person strong{display:block;font-size:12px;color:#30303c}.eq-contact-person small{display:block;color:#777887;font-size:10px;margin-top:2px}.eq-contact-person .eq-contact-badge{padding:4px 7px;border-radius:8px;background:rgba(91,141,239,.12);color:#3d63c9;font-size:9px;font-weight:900}.eq-contact-empty{padding:12px 4px;color:#777887;text-align:center;font-size:11px}body.dark .equipo-contact-dashboard{background:rgba(30,30,50,.55);border-color:rgba(255,255,255,.1)}body.dark .equipo-contact-dashboard h3,.dark .eq-contact-person strong{color:#f0f0f5}body.dark .eq-contact-count{background:rgba(30,30,50,.45)}
@@ -6369,12 +6360,44 @@ function llamarWhatsAppDirecto(numero){
   const url='whatsapp://call?phone='+encodeURIComponent(numero);let abierto=false;const onBlur=()=>{abierto=true;window.removeEventListener('blur',onBlur)};window.addEventListener('blur',onBlur);window.location.href=url;setTimeout(()=>{window.removeEventListener('blur',onBlur);if(!abierto)window.open('https://wa.me/'+numero,'_blank')},900);
 }
 
+/* ============ POPUP ELEGIR TELÉFONO ============ */
+function elegirTelefonoPopup(tipo){
+  const data = window._telPicker;
+  if(!data || !data.telefonos || !data.telefonos.length) return;
+  const esWa = tipo === 'wa';
+  const items = data.telefonos.map(t=>`
+    <button class="tel-pick-btn ${esWa?'wa':'call'}" onclick="${esWa?'abrirWaNumero':'llamarNumero'}(${JSON.stringify(t.digits)})">
+      <span class="tel-pick-ico">${esWa?'💬':'📞'}</span>
+      <span class="tel-pick-txt">${escapeXml(t.display)}</span>
+    </button>`).join('');
+  modal.open({
+    icon: esWa ? '💬' : '📞',
+    iconBg: esWa ? 'linear-gradient(135deg,#25D366,#128C7E)' : 'linear-gradient(135deg,#5b8def,#a06bff)',
+    title: esWa ? 'Contactar por WhatsApp' : 'Llamar al contacto',
+    sub: 'Elegí con cuál número',
+    html: `<div class="tel-pick-list">${items}</div>`
+  });
+}
+function abrirWaNumero(digits){
+  const data = window._telPicker;
+  if(data && data.nombre) window.open('https://wa.me/'+digits+'?text='+encodeURIComponent('Hola '+data.nombre+', ¿cómo estás?'),'_blank');
+  else window.open('https://wa.me/'+digits,'_blank');
+  modal.close();
+}
+function llamarNumero(digits){
+  window.open('tel:'+digits,'_self');
+  modal.close();
+}
+
 function openPersonaModal(p){
   const info = catInfoOf(p.cat);
   const telefonos = parseTelefonos(p.tel);
   const totalHijos = contarDescendientes(p);
   
-  // Construir botones de WhatsApp y Llamar según cantidad de teléfonos
+  // Botones SIEMPRE con el mismo diseño limpio:
+  // - 1 teléfono: acción directa
+  // - Varios teléfonos: al presionar se abre un popup para elegir el número
+  window._telPicker = { telefonos, nombre: p.nombre || '' };
   let botonesTel = '';
   if(telefonos.length === 1){
     const t = telefonos[0];
@@ -6383,14 +6406,10 @@ function openPersonaModal(p){
       <button class="pm-call" onclick="window.open('tel:${t.digits}','_self')">📞 Llamar al contacto</button>
     `;
   } else if(telefonos.length > 1){
-    // Múltiples teléfonos: uno por línea con ambos botones
-    botonesTel = telefonos.map((t, i) => `
-      <div style="display:flex; gap:6px; margin-bottom:6px;">
-        <span style="flex:1; font-size:12px; padding:8px 10px; background:rgba(91,141,239,0.10); border-radius:10px; color:#3d63c9; font-weight:700; display:flex; align-items:center;">📱 ${escapeXml(t.display)}</span>
-        <button class="pm-wa" style="flex:none; padding:8px 12px;" title="Contactar por WhatsApp" onclick="window.open('https://wa.me/${t.digits}?text='+encodeURIComponent('Hola ${escapeXml(p.nombre)}, ¿cómo estás?'),'_blank')">💬</button>
-        <button class="pm-call" style="flex:none; padding:8px 12px;" title="Llamar al contacto" onclick="window.open('tel:${t.digits}','_self')">📞</button>
-      </div>
-    `).join('');
+    botonesTel = `
+      <button class="pm-wa" onclick="elegirTelefonoPopup('wa')">💬 Contactar por WhatsApp</button>
+      <button class="pm-call" onclick="elegirTelefonoPopup('call')">📞 Llamar al contacto</button>
+    `;
   }
   
   const html = `<div class="person-modal-body">
@@ -6442,8 +6461,7 @@ function openPersonaModal(p){
 })()}</span></div>
     <div class="pm-row"><span class="pm-lbl">Email</span><span class="pm-val" style="font-size:11px">${escapeXml(p.email||'—')}</span></div>
     <div class="pm-row"><span class="pm-lbl">Descendientes</span><span class="pm-val">${totalHijos}</span></div>
-    ${telefonos.length > 0 ? `<div style="margin-top:14px">${telefonos.length > 1 ? '<div style="font-size:11px; color:#6b6b76; font-weight:700; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.3px;">Contactar:</div>' : ''}<div class="pm-actions" style="${telefonos.length > 1 ? 'flex-direction:column; gap:0;' : ''}">${botonesTel}${p.email && telefonos.length === 1 ? `<button class="pm-mail" onclick="window.open('mailto:${p.email}','_self')">✉️ Email</button>` : ''}</div></div>` : (p.email ? `<div class="pm-actions" style="margin-top:14px"><button class="pm-mail" onclick="window.open('mailto:${p.email}','_self')">✉️ Email</button></div>` : '')}
-    ${telefonos.length > 1 && p.email ? `<div class="pm-actions" style="margin-top:8px"><button class="pm-mail" onclick="window.open('mailto:${p.email}','_self')">✉️ Enviar Email</button></div>` : ''}
+    ${telefonos.length > 0 ? `<div style="margin-top:14px">${telefonos.length > 1 ? '<div style="font-size:11px; color:#6b6b76; font-weight:700; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.3px;">Contactar:</div>' : ''}<div class="pm-actions">${botonesTel}${p.email && telefonos.length === 1 ? `<button class="pm-mail" onclick="window.open('mailto:${p.email}','_self')">✉️ Email</button>` : ''}${telefonos.length > 1 && p.email ? `<button class="pm-mail" onclick="window.open('mailto:${p.email}','_self')">✉️ Enviar Email</button>` : ''}</div></div>` : (p.email ? `<div class="pm-actions" style="margin-top:14px"><button class="pm-mail" onclick="window.open('mailto:${p.email}','_self')">✉️ Email</button></div>` : '')}
   </div>`;
   modal.open({
     icon:'👤', iconBg: `linear-gradient(135deg,${info.color},#5b8def)`,
@@ -9933,6 +9951,25 @@ body.dark .tree-node .tree-name.inactive{color:#ffffff !important}
 body.dark .tree-node .tree-pts{color:#ffffff !important}
 body.dark .tree-node .tree-pts.zero{color:#ffffff !important}
 body.dark .tree-node .tree-org{color:#ffffff !important}
+</style>
+
+<style>
+/* ===== POPUP ELEGIR TELÉFONO ===== */
+.tel-pick-list{display:flex;flex-direction:column;gap:8px;padding:4px 0}
+.tel-pick-btn{display:flex;align-items:center;gap:10px;width:100%;padding:13px 14px;border-radius:14px;border:none;background:rgba(91,141,239,.10);color:#3d63c9;font:inherit;font-size:14px;font-weight:800;cursor:pointer;transition:transform .12s ease;text-align:left}
+.tel-pick-btn:active{transform:scale(.97)}
+.tel-pick-btn.wa{background:rgba(58,208,164,.14);color:#197454}
+.tel-pick-btn.call{background:rgba(91,141,239,.12);color:#3d63c9}
+.tel-pick-ico{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;font-size:17px;background:rgba(91,141,239,.15);flex:none}
+.tel-pick-btn.wa .tel-pick-ico{background:rgba(58,208,164,.18)}
+.tel-pick-btn.call .tel-pick-ico{background:rgba(91,141,239,.18)}
+.tel-pick-txt{flex:1;min-width:0;word-break:break-word}
+body.dark .tel-pick-btn{background:rgba(91,141,239,.16);color:#a8b8ff}
+body.dark .tel-pick-btn.wa{background:rgba(58,208,164,.18);color:#4fd68f}
+body.dark .tel-pick-btn.call{background:rgba(91,141,239,.20);color:#a8b8ff}
+body.dark .tel-pick-ico{background:rgba(91,141,239,.22)}
+body.dark .tel-pick-btn.wa .tel-pick-ico{background:rgba(58,208,164,.24)}
+body.dark .tel-pick-btn.call .tel-pick-ico{background:rgba(91,141,239,.26)}
 </style>
 </body>
 </html>
