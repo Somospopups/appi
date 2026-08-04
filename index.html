@@ -2005,22 +2005,6 @@
   }
   .toast .check-ic { font-size: 15px; }
 
-  .theme-toggle {
-    position: absolute; left: 0; top: 4px;
-    background: rgba(255,255,255,0.6);
-    -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
-    border: 1px solid rgba(255,255,255,0.7);
-    width: 38px; height: 38px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer; font-size: 18px;
-    transition: all 0.3s ease;
-    line-height: 1;
-  }
-  .theme-toggle:active { transform: scale(0.92); }
-
-  body.evaluar-hint nav.tabs button[data-view="view-eval"] {
-    position: relative; overflow: hidden; z-index: 0;
-  }
   body.evaluar-hint nav.tabs button[data-view="view-eval"]::before {
     content: ""; position: absolute; inset: 3px;
     border-radius: 999px;
@@ -2048,7 +2032,6 @@
       radial-gradient(circle at 85% 30%, rgba(160,107,255,0.22), transparent 50%),
       radial-gradient(circle at 50% 90%, rgba(255,107,157,0.22), transparent 55%);
   }
-  body.dark .theme-toggle,
   body.dark .back-btn,
   body.dark .help-btn {
     background: rgba(40,40,60,0.7);
@@ -2476,7 +2459,6 @@ body.dark .lock-footer { color: #6b6b76; }
     margin-bottom: 14px;
     padding-top: 2px;
   }
-  .home-header .theme-toggle,
   .home-header .help-btn { top: 0; }
   .home-brand-row {
     min-height: 42px;
@@ -3297,6 +3279,7 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
   <div class="ds-brand">
     <span class="ds-logo">💧</span>
     <div><b>APPI</b><small>Asistente personal</small></div>
+    <button class="ds-collapse" id="dsCollapseBtn" onclick="toggleSidebar()" title="Ocultar barra lateral" aria-label="Ocultar barra lateral">◀</button>
   </div>
   <nav class="ds-nav">
     <button class="ds-btn active" data-ds="view-home" onclick="showView('view-home'); renderHomeCompleto();"><span>🏠</span> Inicio</button>
@@ -3305,13 +3288,15 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
     <button class="ds-btn" data-ds="view-equipo" onclick="openEquipo()"><span>🌳</span> Mi Equipo</button>
     <button class="ds-btn" data-ds="view-seguimiento" onclick="openSeguimiento()"><span>📇</span> Seguimiento</button>
     <button class="ds-btn" data-ds="view-carrera" onclick="openCarrera()"><span>🏆</span> Carrera</button>
-    <button class="ds-btn" data-ds="view-siete" onclick="openSiete()"><span>🚀</span> Las 7 P</button>
-    <button class="ds-btn" data-ds="view-wheel" onclick="openRueda()"><span>⚖️</span> Rueda</button>
-    <button class="ds-btn" data-ds="view-history" onclick="showView('view-history'); renderHistory();"><span>📜</span> Historial</button>
     <button class="ds-btn" data-ds="view-planning" onclick="showView('view-planning'); renderPlanningTools();"><span>🗓️</span> Planificación</button>
+    <button class="ds-btn" data-ds="view-history" onclick="showView('view-history'); renderHistory();"><span>📜</span> Historial</button>
   </nav>
   <div class="ds-foot">APPI · v91</div>
 </aside>
+<!-- Botón flotante para reabrir la barra (cuando está oculta) -->
+<button class="ds-reopen" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
+<!-- Botón flotante para forzar giro (celular/tablet) -->
+<button class="rot-fab" id="rotFabBtn" onclick="forzarRotacion()" title="Forzar pantalla horizontal" aria-label="Forzar pantalla horizontal">🔄</button>
  <!-- ============ PANTALLA DE ACTIVACIÓN ============ -->
 <div id="lockScreen" class="hidden">
   <div class="lock-card">
@@ -3367,8 +3352,8 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
   <!-- HOME -->
   <section id="view-home" class="view active">
     <header class="top home-header">
-      <button class="theme-toggle" id="btnTheme" aria-label="Cambiar tema" title="Cambiar modo día/noche">🌙</button>
       <button class="help-btn" id="btnHelpHome" aria-label="Ayuda">?</button>
+      <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
 
       <div class="home-brand-row">
         <span class="home-brand-mark">APPI</span>
@@ -3430,6 +3415,7 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
   <section id="view-planning" class="view">
     <header class="top">
       <button class="back-btn" id="btnBackPlanning" aria-label="Volver">‹</button>
+      <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
       <h1>Planificando</h1>
       <div class="script">mi Mes</div>
       <p>Tus 4 herramientas de planificación mensual</p>
@@ -3444,6 +3430,7 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
     <header class="top">
       <button class="back-btn" id="btnBack1" aria-label="Volver">‹</button>
       <button class="help-btn" id="btnHelpWheel" aria-label="Ayuda">?</button>
+      <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
       <h1 id="titleTop">Rueda</h1>
       <div class="script" id="titleScript">de la Vida</div>
       <p>Puntuá cada área del 0 al 10</p>
@@ -3473,6 +3460,7 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
   <section id="view-eval" class="view">
     <header class="top">
       <button class="back-btn" id="btnBack2" aria-label="Volver">‹</button>
+      <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
       <h1>Evaluar áreas</h1>
       <p id="evalSubtitle">—</p>
     </header>
@@ -3483,6 +3471,7 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
   <section id="view-history" class="view">
     <header class="top">
       <button class="back-btn" id="btnBack3" aria-label="Volver">‹</button>
+      <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
       <h1>Historial</h1>
       <p id="histSubtitle">—</p>
     </header>
@@ -3494,6 +3483,7 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
     <header class="top">
       <button class="back-btn" id="btnBackSiete" aria-label="Volver">‹</button>
       <button class="help-btn" id="btnHelpSiete" aria-label="Ayuda">?</button>
+      <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
       <h1>Las</h1>
       <div class="script">7 P</div>
       <p>Tu desafío mensual paso a paso</p>
@@ -3517,6 +3507,7 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
   <section id="view-siete-detail" class="view">
     <header class="top">
       <button class="back-btn" id="btnBackSieteDetail" aria-label="Volver">‹</button>
+      <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
       <h1 id="sieteDetailTitle">Paso</h1>
       <p id="sieteDetailSub">—</p>
     </header>
@@ -3528,6 +3519,7 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
     <header class="top">
       <button class="back-btn" id="btnBackPresu" aria-label="Volver">‹</button>
       <button class="help-btn" id="btnHelpPresu" aria-label="Ayuda">?</button>
+      <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
       <h1>Presupuesto</h1>
       <div class="script">Mensual</div>
       <p>Cargá tus ingresos y gastos del mes</p>
@@ -3629,6 +3621,7 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
   <section id="view-presu-hist" class="view">
     <header class="top">
       <button class="back-btn" id="btnBackPresuHist" aria-label="Volver">‹</button>
+      <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
       <h1>Historial</h1>
       <p>Presupuesto Mensual</p>
     </header>
@@ -3637,7 +3630,7 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
 
   <!-- CARRERA MEJORADA -->
   <section id="view-carrera" class="view">
-    <header class="top"><button class="back-btn" id="btnBackCarrera" aria-label="Volver">‹</button><h1>Mi</h1><div class="script">carrera</div><p>Tu avance, explicado de forma simple</p></header>
+    <header class="top"><button class="back-btn" id="btnBackCarrera" aria-label="Volver">‹</button><button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button><h1>Mi</h1><div class="script">carrera</div><p>Tu avance, explicado de forma simple</p></header>
 
     <div class="carrera-tabs" id="carreraTabs">
       <button class="carrera-tab active" data-ctab="progreso">📈 Progreso</button>
@@ -3734,7 +3727,7 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
 
   <!-- LISTA DE PRECIOS DISTRIBUIDOR / USUARIO -->
   <section id="view-precios" class="view">
-    <header class="top"><button class="back-btn" id="btnBackPrecios" aria-label="Volver">‹</button><h1>Lista de</h1><div class="script">Precios</div><p>Distribuidor vs Usuario - Mantené presionado o tocá un producto para armar presupuesto</p></header>
+    <header class="top"><button class="back-btn" id="btnBackPrecios" aria-label="Volver">‹</button><button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button><h1>Lista de</h1><div class="script">Precios</div><p>Distribuidor vs Usuario - Mantené presionado o tocá un producto para armar presupuesto</p></header>
 
 
 
@@ -3845,6 +3838,7 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
   <section id="view-seguimiento" class="view">
     <header class="top">
       <button class="back-btn" id="btnBackSeguimiento" aria-label="Volver">‹</button>
+      <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
       <h1>Contactos</h1>
       <div class="script">del Mes</div>
       
@@ -3873,6 +3867,7 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
     <header class="top">
       <button class="back-btn" id="btnBackEquipo" aria-label="Volver">‹</button>
       <button class="help-btn" id="btnHelpEquipo" aria-label="Ayuda">?</button>
+      <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
       <h1>Mi</h1>
       <div class="script">Equipo</div>
       <p id="equipoSubtitle">Cargá tu planilla para empezar</p>
@@ -4567,13 +4562,20 @@ document.getElementById('btnShare').addEventListener('click', async ()=>{
    LAS 7 P
 ============================================================ */
 const SIETE_P = [
-  { key:'parar', n:1, title:'PARAR', color:'#5b8def', lead:'Reservá tiempo para vos.', icon:'⏸️' },
-  { key:'pensar', n:2, title:'PENSAR', color:'#7a6bff', lead:'¿Qué querés para tu vida?', icon:'🧠' },
-  { key:'priorizar', n:3, title:'PRIORIZAR', color:'#a06bff', lead:'Tu Meta Estrella del mes.', icon:'⭐' },
-  { key:'planificar', n:4, title:'PLANIFICAR', color:'#c96bff', lead:'Plan de acciones y presupuesto.', icon:'🗂️' },
-  { key:'proteger', n:5, title:'PROTEGER', color:'#ff6bcf', lead:'Tu compromiso protege el plan.', icon:'🛡️' },
-  { key:'perseverar', n:6, title:'PERSEVERAR', color:'#ff6b9d', lead:'Insistí una y otra vez.', icon:'🔥' },
-  { key:'progresar', n:7, title:'PROGRESAR', color:'#ff8f6b', lead:'Medí tu progreso.', icon:'📈' }
+  { key:'parar', n:1, title:'PARAR', color:'#5b8def', lead:'Reservá tiempo para vos.', icon:'⏸️',
+    guia:'Elegí un Espacio de unas 405 horas unos días antes del cierre del mes para PARAR y tener una reunión con vos Mismo. Sin distracciones, familia, u otras tareas posibles alrededor.' },
+  { key:'pensar', n:2, title:'PENSAR', color:'#7a6bff', lead:'¿Qué querés para tu vida?', icon:'🧠',
+    guia:'Detente a PENSAR, que queres para tu vida?, porque te sumaste a este proyecto?, que vision te hizo creer?, como queres que sea tu futuro?, cuanto compromiso queres ponerle a tus sueños?, que habias planificado hacer y lograste? Y que no lograste hacer?, que mejoraras este mes?, etc.' },
+  { key:'priorizar', n:3, title:'PRIORIZAR', color:'#a06bff', lead:'Tu Meta Estrella del mes.', icon:'⭐',
+    guia:'Que será innegociable para vos este mes? Que harás con el 100% de compromiso? Que Meta Estrella será este mes tu motivo de celebración y orgullo?, Qué y quienes serán tu Prioridad este mes? Usa la RUEDA DE LA VIDA pare mirarte luego de analizar tu puntaje de cada área. Si ya transitaste mínimo 1 mes en la actividad, usa la planilla para medir tus puntajes previo a hacer LA RUEDA DEL NEGOCIO, luego colorea la misma.' },
+  { key:'planificar', n:4, title:'PLANIFICAR', color:'#c96bff', lead:'Plan de acciones y presupuesto.', icon:'🗂️',
+    guia:'Trazá tu PLAN DE ACCIONES, con congruencia entre tus recursos de tiempo, productos y contactos. Plasmá tus Metas en la lista de METAS DEL MES para cada área. Elegí poner foco y compromiso total con unas 3 o 4 áreas para lograr aunque sea1 Meta de esas áreas. Actualizá tu Presupuesto sumando un 10% o más para PAGARTE PRIMERO y destinar a INVERTIR en tu colchón de tranquilidad. *Anotá las acciones que planificás realizar cada semana. *Registrá a la izquierda de tu agenda, en cada área de la vida, que acciones harás cada semana para lograr cada Meta. *Usá esta agenda para todas tus actividades, marcando los espacios que destinarás al negocio.' },
+  { key:'proteger', n:5, title:'PROTEGER', color:'#ff6bcf', lead:'Tu compromiso protege el plan.', icon:'🛡️',
+    guia:'Tu nivel de Compromiso con tu Plan y tus sueños te harán reaccionar ante imprevistos, urgencias y distracciones, protegiendo u olvidando tu plan. NIVELES DE COMPROMISO: 1- No me interesa si sucede o no. 2- Me gustaría que suceda (deseo pero no hay acción) 3- Qué puedo hacer para que suceda? (Priorizo y planifico) 4- Estoy comprometido a menos que... (solo me desvío del compromiso por causas mayores o imprevistos) 5- Hago lo que sea necesario (mi compromiso es inquebrantable)' },
+  { key:'perseverar', n:6, title:'PERSEVERAR', color:'#ff6b9d', lead:'Insistí una y otra vez.', icon:'🔥',
+    guia:'Una y otra vez insistí, nadie dice que será fácil... pero te aseguro que valdrá la pena. No te rindas... los obstáculos estarán siempre... pero siempre hay una salida. Concentrate en tomar cada experiencia para tu progreso y evolución.' },
+  { key:'progresar', n:7, title:'PROGRESAR', color:'#ff8f6b', lead:'Medí tu progreso.', icon:'📈',
+    guia:'Medir tu progreso y evolución es clave para ir siendo consciente del proceso e impacto que estás generando. Usá las herramientas de Registro de DEMOS, PP, SEGUIMIENTOS, GANANCIAS, MOVIMIENTOS DE DINERO, LLAMADAS, para poder medir tu efectividad, avances y planificar cada mes y cada año en base a ese registro. SChequealo CADA MES, CADA SEMANA Y CADA DÍA.' }
 ];
 const SIETE_QUOTES = ['Cada día es una nueva oportunidad.','La constancia vence.','No te compares con nadie.','Los grandes logros nacen de pequeñas acciones.'];
 const PROGRESO_ITEMS = [
@@ -4659,7 +4661,8 @@ function renderSieteStepContent(p){
     if(!d.contadores) d.contadores = {};
     body = PROGRESO_ITEMS.map(it=>`<div class="counter-row"><div class="name">${it.name}</div><div class="counter-ctrl"><button data-key="${it.key}" data-op="-1" class="pgMinus">−</button><div class="num" id="pg-${it.key}">${d.contadores[it.key]||0}</div><button data-key="${it.key}" data-op="1" class="pgPlus">+</button></div></div>`).join('');
   }
-  return `<div class="p-detail"><h3>${p.icon} ${p.title}</h3>${body}</div><div class="actions"><button class="btn" id="fMarkPending">Pendiente</button><button class="btn primary" id="fMarkDone">Hecho ✓</button></div>`;
+  const guiaHtml = p.guia ? `<div class="siete-guia">📖 <b>Consigna:</b><br/>${escapeXml(p.guia)}</div>` : '';
+  return `<div class="p-detail"><h3>${p.icon} ${p.title}</h3>${guiaHtml}${body}</div><div class="actions"><button class="btn" id="fMarkPending">Pendiente</button><button class="btn primary" id="fMarkDone">Hecho ✓</button></div>`;
 }
 let sieteInputTimer = null;
 function saveSieteDebounced(){
@@ -9361,22 +9364,16 @@ document.getElementById('importInput').onchange = (e)=>{
   }
 })();
 
-/* ============ MODO DÍA/NOCHE ============ */
+/* ============ MODO DÍA/NOCHE (desde el menú del engranaje ⚙️) ============ */
 (function(){
-  const btn = document.getElementById('btnTheme');
   const applyTheme = (dark)=>{
     document.body.classList.toggle('dark', dark);
-    btn.textContent = dark ? '☀️' : '🌙';
     const meta = document.querySelector('meta[name="theme-color"]');
     if(meta) meta.setAttribute('content', dark ? '#0f1424' : '#eaf1ff');
     if(currentRueda && document.getElementById('view-wheel').classList.contains('active')) renderWheel();
   };
   applyTheme(localStorage.getItem('themeDark') === '1');
-  btn.onclick = ()=>{
-    const isDark = !document.body.classList.contains('dark');
-    localStorage.setItem('themeDark', isDark ? '1' : '0');
-    haptic(10); applyTheme(isDark);
-  };
+  window.applyTheme = applyTheme;
 })();
 
 /* ============ NAVEGACIÓN ATRÁS NATIVA ============ */
@@ -10029,6 +10026,126 @@ document.addEventListener('click', function(e){
 })();
 </script>
 <script>
+  // ===== BARRA LATERAL: ocultar / mostrar =====
+  function toggleSidebar(){
+    const sb=document.getElementById('deskSidebar');
+    if(!sb) return;
+    const colapsar = !sb.classList.contains('collapsed');
+    sb.classList.toggle('collapsed', colapsar);
+    document.body.classList.toggle('sidebar-cerrada', colapsar);
+    try{ localStorage.setItem('appi_sidebar_colapsada', colapsar ? '1' : '0'); }catch(e){}
+    if(typeof haptic==='function') haptic(8);
+  }
+  // Restaurar estado guardado
+  try{
+    if(localStorage.getItem('appi_sidebar_colapsada')==='1'){
+      const sb=document.getElementById('deskSidebar');
+      if(sb){ sb.classList.add('collapsed'); document.body.classList.add('sidebar-cerrada'); }
+    }
+  }catch(e){}
+
+  // ===== TOGGLE ORIENTACIÓN: modo landscape ⇄ modo teléfono =====
+  function toggleOrientacion(){
+    const esLandscape = (screen.orientation && screen.orientation.type && screen.orientation.type.startsWith('landscape')) || (window.innerWidth > window.innerHeight);
+    const destino = esLandscape ? 'portrait' : 'landscape';
+    const label = esLandscape ? 'modo teléfono' : 'modo landscape';
+    try{
+      if(screen.orientation && screen.orientation.lock){
+        screen.orientation.lock(destino).then(()=>{
+          if(typeof showToast==='function') showToast('🔒 Forzando '+label, 1800);
+        }).catch(()=>{
+          if(typeof showToast==='function') showToast('🔄 Girá tu dispositivo para '+label, 2200);
+        });
+      } else {
+        if(typeof showToast==='function') showToast('🔄 Girá tu dispositivo para '+label, 2200);
+      }
+    }catch(e){
+      if(typeof showToast==='function') showToast('🔄 Girá tu dispositivo para '+label, 2200);
+    }
+  }
+
+  // ===== FORZAR GIRO HORIZONTAL =====
+  function forzarRotacion(){
+    const root=document.documentElement;
+    const fsReq = root.requestFullscreen || root.webkitRequestFullscreen || root.mozRequestFullScreen;
+    const doLock = ()=>{
+      try{
+        if(screen.orientation && screen.orientation.lock){
+          screen.orientation.lock('landscape').then(()=>{
+            if(typeof showToast==='function') showToast('🔒 Pantalla en horizontal', 1800);
+          }).catch(()=>{
+            if(typeof showToast==='function') showToast('🔄 Girá tu dispositivo para horizontal', 2200);
+          });
+        } else {
+          if(typeof showToast==='function') showToast('🔄 Girá tu dispositivo para horizontal', 2200);
+        }
+      }catch(e){
+        if(typeof showToast==='function') showToast('🔄 Girá tu dispositivo para horizontal', 2200);
+      }
+    };
+    if(fsReq){
+      try{
+        const p = fsReq.call(root);
+        if(p && typeof p.then==='function'){ p.then(doLock).catch(doLock); }
+        else doLock();
+      }catch(e){ doLock(); }
+    } else {
+      doLock();
+    }
+  }
+
+  // ===== MENÚ DE HERRAMIENTAS (engranaje) =====
+  function toggleToolsMenu(ev){
+    const menu=document.getElementById('toolsMenu');
+    if(!menu) return;
+    const btn=ev.currentTarget;
+    const abrir=!menu.classList.contains('open');
+    // Posicionar el menú justo debajo del engranaje, pegado a la derecha
+    const r=btn.getBoundingClientRect();
+    menu.style.right=(Math.max(10, window.innerWidth - r.right + 2))+'px';
+    menu.style.top=(r.bottom + 8)+'px';
+    // Actualizar estado del botón día/noche
+    const isDark=document.body.classList.contains('dark');
+    const ico=document.getElementById('toolsThemeIco');
+    const txt=document.getElementById('toolsThemeTxt');
+    if(ico) ico.textContent=isDark?'☀️':'🌙';
+    if(txt) txt.textContent=isDark?'Modo día':'Modo noche';
+    // Actualizar estado del botón orientación (landscape/teléfono)
+    const orientIco=document.getElementById('toolsOrientIco');
+    const orientTxt=document.getElementById('toolsOrientTxt');
+    const esLandscape = (screen.orientation && screen.orientation.type && screen.orientation.type.startsWith('landscape')) || (window.innerWidth > window.innerHeight);
+    if(orientIco) orientIco.textContent=esLandscape?'📱':'🖥️';
+    if(orientTxt) orientTxt.textContent=esLandscape?'Volver a modo teléfono':'Forzar modo landscape';
+    if(abrir) menu.classList.add('open'); else menu.classList.remove('open');
+    ev.stopPropagation();
+  }
+  function cerrarToolsMenu(){
+    const menu=document.getElementById('toolsMenu');
+    if(menu) menu.classList.remove('open');
+  }
+  function toggleThemeDesdeMenu(){
+    const isDark=!document.body.classList.contains('dark');
+    try{ localStorage.setItem('themeDark', isDark?'1':'0'); }catch(e){}
+    if(typeof haptic==='function') haptic(10);
+    if(typeof applyTheme==='function'){ applyTheme(isDark); }
+    else { document.body.classList.toggle('dark', isDark); }
+    const ico=document.getElementById('toolsThemeIco');
+    const txt=document.getElementById('toolsThemeTxt');
+    if(ico) ico.textContent=isDark?'☀️':'🌙';
+    if(txt) txt.textContent=isDark?'Modo día':'Modo noche';
+    cerrarToolsMenu();
+  }
+  // Cerrar el menú al tocar fuera o con Escape
+  document.addEventListener('click', (e)=>{
+    const menu=document.getElementById('toolsMenu');
+    if(menu && menu.classList.contains('open') && !menu.contains(e.target) && !e.target.closest('.tools-btn')){
+      menu.classList.remove('open');
+    }
+  });
+  document.addEventListener('keydown', (e)=>{
+    if(e.key==='Escape') cerrarToolsMenu();
+  });
+
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('./service-worker.js')
@@ -10224,6 +10341,10 @@ body.dark .presu-btn-cancel{background:rgba(217,83,79,.22);color:#ff8f95;box-sha
 body.dark .presu-btn-share{background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;box-shadow:0 5px 14px rgba(37,211,102,.3)}
 #presupuestoItems::-webkit-scrollbar{width:4px}
 #presupuestoItems::-webkit-scrollbar-thumb{background:rgba(91,141,239,.3);border-radius:4px}
+.siete-guia{margin:0 0 14px;padding:13px 14px;border-radius:14px;background:linear-gradient(135deg,rgba(91,141,239,.12),rgba(160,107,255,.10));border:1px solid rgba(91,141,239,.22);font-size:12.5px;line-height:1.55;color:#3a3a48}
+.siete-guia b{color:#3d63c9;font-size:11px;text-transform:uppercase;letter-spacing:.4px}
+body.dark .siete-guia{background:linear-gradient(135deg,rgba(91,141,239,.18),rgba(160,107,255,.14));border-color:rgba(140,170,255,.3);color:#d8d8e2}
+body.dark .siete-guia b{color:#a8b8ff}
 .presu-cuotas-info{margin-top:8px;padding:11px 13px;border-radius:12px;background:rgba(91,141,239,.10);border:1px solid rgba(91,141,239,.22);display:flex;flex-direction:column;gap:5px}
 .cuota-linea{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;color:#3a3a48}
 .cuota-linea b{color:#3d63c9;font-size:14px}
@@ -10269,8 +10390,19 @@ body.dark .presu-select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:
     overflow-y:auto;
   }
   body.dark .desk-sidebar{background:rgba(24,24,40,.82); border-right-color:rgba(255,255,255,.09);}
-  .ds-brand{display:flex; align-items:center; gap:11px; padding:4px 8px 18px; border-bottom:1px solid rgba(80,90,130,.15); margin-bottom:14px}
+  .ds-brand{display:flex; align-items:center; gap:11px; padding:4px 8px 18px; border-bottom:1px solid rgba(80,90,130,.15); margin-bottom:14px; position:relative}
   body.dark .ds-brand{border-bottom-color:rgba(255,255,255,.12)}
+  /* Botón ocultar barra */
+  .ds-collapse{
+    position:absolute; top:2px; right:4px;
+    width:30px; height:30px; border:none; border-radius:9px;
+    background:rgba(91,141,239,.12); color:#3d63c9;
+    font-size:12px; font-weight:900; cursor:pointer; line-height:1;
+    display:grid; place-items:center; transition:background .15s ease,transform .1s ease;
+  }
+  .ds-collapse:hover{background:rgba(91,141,239,.22)}
+  .ds-collapse:active{transform:scale(.9)}
+  body.dark .ds-collapse{background:rgba(91,141,239,.22); color:#a8b8ff}
   .ds-logo{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#5b8def,#a06bff,#ff6b9d);display:grid;place-items:center;font-size:20px;box-shadow:0 4px 14px rgba(120,100,220,.35);flex:none}
   .ds-brand b{display:block;font-size:17px;font-weight:900;letter-spacing:-.2px;color:#1c1c1e}
   .ds-brand small{display:block;font-size:11px;color:#6b6b76;font-weight:600;margin-top:1px}
@@ -10298,13 +10430,34 @@ body.dark .presu-select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:
     max-width:none; width:auto;
     margin-left:316px; margin-right:0;
     padding:32px 44px 70px;
+    transition:margin-left .3s ease;
   }
+  /* Barra colapsada: se desliza fuera y la app ocupa todo */
+  .desk-sidebar{transition:transform .3s ease}
+  .desk-sidebar.collapsed{transform:translateX(-105%)}
+  body.sidebar-cerrada .app{margin-left:0}
+  /* Botón flotante para reabrir la barra */
+  .ds-reopen{
+    display:none; position:fixed; top:16px; left:16px; z-index:160;
+    width:42px; height:42px; border:none; border-radius:13px;
+    background:rgba(255,255,255,.75); color:#3d63c9; font-size:17px; cursor:pointer;
+    -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px);
+    box-shadow:0 6px 20px rgba(80,90,130,.22);
+    align-items:center; justify-content:center;
+    transition:background .15s ease,transform .1s ease;
+  }
+  body.dark .ds-reopen{background:rgba(30,30,50,.8); color:#a8b8ff}
+  body.sidebar-cerrada .ds-reopen{display:flex}
+  .ds-reopen:active{transform:scale(.92)}
 
-  /* --- Ocultar tabs inferiores (los reemplaza el sidebar) --- */
-  nav.tabs{display:none !important}
+  /* --- Tabs inferiores: visibles solo donde la app las necesita (Rueda → Evaluar/Historial) ---
+     El JS de showView pone display:flex inline solo para view-wheel/view-eval/view-history.
+     Sin !important, el inline del JS manda. */
+  nav.tabs{position:fixed; left:50%; transform:translateX(-50%); bottom:calc(env(safe-area-inset-bottom) + 14px); z-index:120; max-width:380px}
 
   /* --- Grillas adaptativas --- */
-  .home-tool-grid{grid-template-columns:repeat(3, minmax(0,1fr)); gap:14px}
+  .home-tool-grid{grid-template-columns:repeat(4, minmax(0,1fr)); gap:14px}
+  .home-tool-grid .quick-tool-card{min-height:150px}
   .stats-grid{grid-template-columns:repeat(4,1fr); gap:12px}
   .home-hero-card, .home-month-card, .next-step-card{max-width:none}
 
@@ -10342,8 +10495,91 @@ body.dark .presu-select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:
   .home-tool-grid{grid-template-columns:repeat(3, minmax(0,1fr))}
   .stats-grid{grid-template-columns:repeat(4,1fr)}
 }
+/* Botón flotante de giro: visible en celular/tablet (fuera del modo escritorio) */
+@media (max-width: 1023px){
+  .rot-fab{
+    position:fixed; top:16px; right:16px; z-index:160;
+    width:44px; height:44px; border:none; border-radius:50%;
+    background:rgba(255,255,255,.8); color:#3d63c9; font-size:19px; cursor:pointer;
+    -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px);
+    box-shadow:0 6px 20px rgba(80,90,130,.25);
+    display:flex; align-items:center; justify-content:center;
+    transition:transform .1s ease;
+  }
+  body.dark .rot-fab{background:rgba(30,30,50,.8); color:#a8b8ff}
+  .rot-fab:active{transform:scale(.9)}
+}
+.rot-fab{display:none}
 </style>
 
 
+<!-- ===== MENÚ DE HERRAMIENTAS (engranaje) ===== -->
+<div class="tools-menu" id="toolsMenu" role="menu" aria-label="Herramientas">
+  <button class="tools-item" id="btnToolsTheme" onclick="toggleThemeDesdeMenu()">
+    <span class="ti-ico" id="toolsThemeIco">🌙</span><span id="toolsThemeTxt">Modo noche</span>
+  </button>
+  <button class="tools-item" id="btnToolsOrient" onclick="toggleOrientacion(); cerrarToolsMenu();">
+    <span class="ti-ico" id="toolsOrientIco">🖥️</span><span id="toolsOrientTxt">Forzar modo landscape</span>
+  </button>
+</div>
+
+<style>
+/* ===== BOTÓN HERRAMIENTAS (engranaje) — mismo formato que el ? ===== */
+.tools-btn{
+  position:absolute; right:44px; top:4px;
+  background:rgba(255,255,255,.6);
+  -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px);
+  border:1px solid rgba(255,255,255,.7);
+  width:38px; height:38px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; font-size:17px; line-height:1;
+  transition:transform .15s ease, background .15s ease;
+  color:#3d63c9;
+}
+.tools-btn:hover{background:rgba(255,255,255,.85)}
+.tools-btn:active{transform:scale(.9) rotate(30deg)}
+body.dark .tools-btn{background:rgba(40,40,60,.7); border-color:rgba(255,255,255,.1); color:#a8b8ff}
+.home-header .tools-btn{top:0}
+
+/* ===== MENÚ FLOTANTE DE HERRAMIENTAS ===== */
+.tools-menu{
+  position:fixed; z-index:500;
+  display:flex; flex-direction:column; gap:4px;
+  padding:8px; border-radius:18px;
+  background:rgba(255,255,255,.8);
+  -webkit-backdrop-filter:blur(22px) saturate(180%); backdrop-filter:blur(22px) saturate(180%);
+  border:1px solid rgba(255,255,255,.85);
+  box-shadow:0 14px 44px rgba(80,90,130,.22);
+  opacity:0; pointer-events:none; visibility:hidden;
+  transform:translateY(8px) scale(.96);
+  transform-origin:top right;
+  transition:opacity .22s ease, transform .22s ease, visibility .22s;
+}
+.tools-menu.open{opacity:1; pointer-events:auto; visibility:visible; transform:translateY(0) scale(1)}
+body.dark .tools-menu{background:rgba(28,28,44,.85); border-color:rgba(255,255,255,.12)}
+
+/* Items: aparecen desplazándose desde la derecha hacia el centro, en cascada */
+.tools-item{
+  display:flex; align-items:center; gap:9px; width:100%;
+  padding:9px 12px; border:none; border-radius:12px;
+  background:transparent; color:#3a3a48; font:inherit; font-size:13px; font-weight:700;
+  cursor:pointer; text-align:left; white-space:nowrap;
+  transition:background .15s ease, transform .1s ease;
+}
+.tools-item .ti-ico{font-size:16px; width:22px; text-align:center; flex:none}
+.tools-item:hover{background:rgba(91,141,239,.12); color:#3d63c9}
+.tools-item:active{transform:scale(.96)}
+body.dark .tools-item{color:#e0e0e8}
+body.dark .tools-item:hover{background:rgba(91,141,239,.22); color:#a8b8ff}
+
+/* Animación en cascada: cada icono entra desde la derecha hacia el centro */
+.tools-menu.open .tools-item{opacity:0; animation:toolsIn .32s cubic-bezier(.34,1.56,.64,1) forwards}
+.tools-menu.open .tools-item:nth-child(1){animation-delay:.05s}
+.tools-menu.open .tools-item:nth-child(2){animation-delay:.12s}
+@keyframes toolsIn{
+  from{opacity:0; transform:translateX(26px) scale(.9)}
+  to{opacity:1; transform:translateX(0) scale(1)}
+}
+</style>
 </body>
 </html>
