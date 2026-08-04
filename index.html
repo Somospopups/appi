@@ -3693,7 +3693,7 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
 
   <!-- LISTA DE PRECIOS DISTRIBUIDOR / USUARIO -->
   <section id="view-precios" class="view">
-    <header class="top"><button class="back-btn" id="btnBackPrecios" aria-label="Volver">‹</button><h1>Lista de</h1><div class="script">Precios</div><p>Distribuidor vs Usuario - Mantené presionado o tocá un producto para armar presupuesto</p></header>
+    <header class="top"><button class="back-btn" id="btnBackPrecios" aria-label="Volver">‹</button><h1>Lista de</h1><div class="script">Precios</div><p>Distribuidor vs Usuario - Cruce automático</p></header>
 
 
 
@@ -3712,12 +3712,103 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
 
     <div id="preciosContent"></div>
 
-    </section>
+    <div class="actions" id="preciosShareWrap" style="display:none;margin-top:14px">
+      <button class="btn whatsapp" id="btnPreciosShare">📤 Compartir comparativa</button>
+      <button class="btn" id="btnPreciosExport">💾 Exportar CSV</button>
+    </div>
+  </section>
 
 
 
-  
-        <!-- TABS INFERIORES (solo para vista Rueda) -->
+  <!-- SEGUIMIENTO DE PERSONAS -->
+  <section id="view-seguimiento" class="view">
+    <header class="top">
+      <button class="back-btn" id="btnBackSeguimiento" aria-label="Volver">‹</button>
+      <h1>Contactos</h1>
+      <div class="script">del Mes</div>
+      
+      <p>Tu próximo paso, siempre claro</p>
+    </header>
+    <div class="seguimiento-summary" id="seguimientoSummary"></div>
+    <div class="seguimiento-actions">
+      <button class="btn primary" id="btnNuevoSeguimiento">＋ Nueva persona</button>
+      <button class="btn" id="btnSegFilter">📋 Ver todas</button>
+    </div>
+    <div class="seguimiento-form" id="seguimientoForm" style="display:none">
+      <h3 id="seguimientoFormTitle">Nueva persona</h3>
+      <div class="seg-field"><label for="segNombre">Nombre</label><input id="segNombre" placeholder="Ej: María López" autocomplete="name"></div>
+      <div class="seg-field"><label for="segTelefono">Teléfono</label><input id="segTelefono" placeholder="Ej: 351 555 1234" type="tel"></div>
+      <div class="seg-field"><label for="segInteres">¿Por qué lo llamamos?</label><select id="segInteres"><option>Producto</option><option>Negocio</option><option>Canjes</option><option>Ambas cosas</option></select></div>
+      <div class="seg-field"><label for="segEstado">Estado</label><select id="segEstado"><option>Contactado</option><option>No contactado</option><option>Seguimiento</option><option>Más adelante</option><option>No le interesa</option></select></div>
+      <div class="seg-field"><label for="segFecha">Próximo contacto</label><input id="segFecha" type="date"></div>
+      <div class="seg-field"><label for="segNotas">Notas</label><textarea id="segNotas" placeholder="¿Qué acordaron? ¿Qué tenés que recordar?"></textarea></div>
+      <div class="actions"><button class="btn" id="btnCancelarSeg">Cancelar</button><button class="btn primary" id="btnGuardarSeg">Guardar</button></div>
+    </div>
+    <div id="seguimientoList"></div>
+  </section>
+
+  <!-- 🌳 MI EQUIPO -->
+  <section id="view-equipo" class="view">
+    <header class="top">
+      <button class="back-btn" id="btnBackEquipo" aria-label="Volver">‹</button>
+      <button class="help-btn" id="btnHelpEquipo" aria-label="Ayuda">?</button>
+      <h1>Mi</h1>
+      <div class="script">Equipo</div>
+      <p id="equipoSubtitle">Cargá tu planilla para empezar</p>
+    </header>
+
+    <div class="equipo-tabs" id="equipoTabsWrap" style="display:none">
+      <button class="equipo-tab active" data-eqtab="dashboard">
+        <span class="eq-emo">📊</span>
+        <span>Tablero</span>
+      </button>
+      <button class="equipo-tab" data-eqtab="arbol">
+        <span class="eq-emo">🌳</span>
+        <span>Árbol</span>
+      </button>
+      <button class="equipo-tab" data-eqtab="lista">
+        <span class="eq-emo">📋</span>
+        <span>Lista</span>
+      </button>
+    </div>
+
+    <div id="equipoContent"></div>
+
+    <input type="file" id="equipoFileInput" accept=".xls,.xlsx,.csv" style="display:none"/>
+    <input type="file" id="garantiasFileInput" accept=".xls,.xlsx,.csv" style="display:none"/>
+
+    <div class="actions" id="equipoBottomActions" style="margin-top:14px; display:none">
+      <button class="btn" id="btnEquipoReload">🔄 Actualizar</button>
+      <button class="btn whatsapp" id="btnEquipoShare">Compartir</button>
+    </div>
+    <div id="equipoGarantiasActions" style="display:none">
+      <button id="btnCargarGarantias" style="display:none">📄 Cargar Garantías</button>
+    </div>
+    <div class="actions" id="equipoDangerActions" style="margin-top:10px; display:none">
+      <button class="btn btn-danger-outline" id="btnEquipoDelete">🗑️ Eliminar equipo cargado</button>
+    </div>
+    <div id="equipoFileInfo" style="display:none; text-align:center; font-size:11px; color:#8a8a94; margin-top:14px; padding:0 10px;"></div>
+  </section>
+
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modalBox">
+    <button class="modal-close" id="modalClose" aria-label="Cerrar">✕</button>
+    <div class="modal-head">
+      <div class="modal-icon" id="modalIcon">💡</div>
+      <h3 class="modal-title" id="modalTitle">Ayuda</h3>
+      <p class="modal-sub" id="modalSub"></p>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-footer" id="modalFooter">
+      <button class="btn-ok" id="modalOk">Entendido</button>
+    </div>
+  </div>
+</div>
+
+<!-- TABS INFERIORES (solo para vista Rueda) -->
 <nav class="tabs" id="tabs" style="display:none">
   <button data-view="view-wheel" class="active">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="12" y1="3" x2="12" y2="21"/></svg>
@@ -8199,24 +8290,6 @@ function cruzarPrecios(){
   return cruz;
 }
 
-
-
-function detectarCategoriaProducto(nombre){
-  const n=(nombre||'').toUpperCase();
-    if(n.includes('GASIFICADOR') || n.includes('GASIFICADORA') || n.includes('SODA') || n.includes('BURBY')) return 'GASIFICADOR';
-  if(n.includes('OSMOSIS') || n.includes('ÓSMOSIS')) return 'PURIFICADOR DE OSMOSIS INVERSA';
-  if(n.includes('AIRE') && (n.includes('PURIFICADOR') || n.includes('PURIFICADORA'))) return 'PURIFICADOR DE AIRE';
-  if(n.includes('PURIFICADOR') && n.includes('AIRE')) return 'PURIFICADOR DE AIRE';
-  // Todo lo que es purificador de agua va a Purificadores como solicitado
-  if(n.includes('SENIOR') || n.includes('DOMUS') || n.includes('MINI') || n.includes('VERO') || n.includes('DUCHA') || n.includes('PURIFICADOR') || n.includes('ABLANDADOR')) return 'PURIFICADORES';
-  if(n.includes('KITS') || n.includes('KIT')) return 'Kits';
-  if(n.includes('FILTRO') || n.includes('REPUESTO') || n.includes('TAPA') || n.includes('SOPORTE') || n.includes('ADAPT')) return 'Repuestos';
-  if(n.includes('ACEITE') || n.includes('OLIVARE') || n.includes('PASAS') || n.includes('UVA')) return 'Alimentos';
-  if(n.includes('BOTELLA')) return 'Botellas';
-  if(n.includes('GRIFER') || n.includes('CANILLA') || n.includes('LLAVE') || n.includes('VALVULA')) return 'Grifería';
-  return 'Otros';
-}
-
 function renderPrecios(){
   try{
     let productos=[];
@@ -8226,7 +8299,7 @@ function renderPrecios(){
         const cruz=JSON.parse(cruzRaw);
         if(Array.isArray(cruz)&&cruz.length>0){
           productos=cruz.map(function(cc){
-            return {nombre: cc.nombre||'Sin nombre', nombreNorm: (cc.nombreNorm||cc.nombre||'').toString().toLowerCase(), pb: cc.pb||0, precioUser: cc.precioUser||cc.precio||0, original: cc.original||cc.nombre||'', categoria: cc.categoria||detectarCategoriaProducto(cc.nombre)};
+            return {nombre: cc.nombre||'Sin nombre', nombreNorm: (cc.nombreNorm||cc.nombre||'').toString().toLowerCase(), pb: cc.pb||0, precioUser: cc.precioUser||cc.precio||0, original: cc.original||cc.nombre||''};
           });
         }
       }
@@ -8237,133 +8310,23 @@ function renderPrecios(){
         if(userRaw){
           const arr=JSON.parse(userRaw);
           if(Array.isArray(arr)&&arr.length>0){
-            productos=arr.map(function(u){return {nombre:u.nombre,nombreNorm:(u.nombreNorm||''),pb:u.pb||0,precioUser:u.precio||u.precioUser||0,original:u.original||u.nombre||u.nombre,categoria:u.categoria||detectarCategoriaProducto(u.nombre)};});
+            productos=arr.map(function(u){return {nombre:u.nombre,nombreNorm:(u.nombreNorm||''),pb:u.pb||0,precioUser:u.precio||u.precioUser||0,original:u.original||u.nombre||u.nombre};});
           }
         }
       }catch(e){}
     }
-    if(productos.length===0){
-      try{
-        const prodRaw=localStorage.getItem('productos_oficiales') || localStorage.getItem('precios_oficiales');
-        if(prodRaw){
-          const data=JSON.parse(prodRaw);
-          let arr=[];
-          if(Array.isArray(data)) arr=data;
-          else if(data.productos) arr=data.productos;
-          else if(data.lista) arr=data.lista;
-          else if(data.preciosCruzados) arr=data.preciosCruzados;
-          if(Array.isArray(arr)&&arr.length>0){
-            productos=arr.map(function(p){return {nombre:p.nombre||p.name||'Sin nombre',nombreNorm:((p.nombreNorm||p.nombre||'').toString().toLowerCase()),pb:p.pb||0,precioUser:p.precioUser||p.precio||p.valor||0,original:p.original||p.nombre||'',categoria:p.categoria||detectarCategoriaProducto(p.nombre)};});
-          }
-        }
-      }catch(e){}
-    }
-
-    const searchBox=document.getElementById('preciosSearchBox');
-    const content=document.getElementById('preciosContent');
-    const shareWrap=document.getElementById('preciosShareWrap');
-    const filterDiv=document.getElementById('preciosFilterChips');
-    const catActual = window._preciosCatActual || 'Todos';
-    let filtrados = (typeof preciosSearch!=='undefined' && preciosSearch) ? productos.filter(function(cc){ return (cc.nombreNorm||'').includes(normalizeProducto(preciosSearch)) || normalizeProducto(cc.nombre).includes(normalizeProducto(preciosSearch)); }) : productos;
-    if(catActual!=='Todos'){
-      filtrados=filtrados.filter(function(cc){ return cc.categoria===catActual; });
-    }
+    var searchBox=document.getElementById('preciosSearchBox');
+    var content=document.getElementById('preciosContent');
+    var shareWrap=document.getElementById('preciosShareWrap');
+    var filtrados = (typeof preciosSearch!=='undefined' && preciosSearch) ? productos.filter(function(cc){ return (cc.nombreNorm||'').includes(normalizeProducto(preciosSearch)) || normalizeProducto(cc.nombre).includes(normalizeProducto(preciosSearch)); }) : productos;
 
     if(searchBox) searchBox.style.display = productos.length? 'flex':'none';
-        if(filterDiv){
-      filterDiv.style.display = productos.length? 'flex':'none';
-      // Orden exacto como aparece en planilla: primera aparición de cada categoría
-      const cats={}; const catsOrden=[];
-      productos.forEach(function(p){
-        const cat=p.categoria||'Otros';
-        if(!cats[cat]){
-          cats[cat]=0;
-          catsOrden.push(cat);
-        }
-        cats[cat]++;
-      });
-      // Si el JSON trae categoriasOrden oficial (orden exacto de renglones grises subrayados), usar ese
-      try{
-        const preciosRaw=localStorage.getItem('preciosCruzadosOficiales')||localStorage.getItem('precios_oficiales')||'';
-        if(preciosRaw){
-          const d=JSON.parse(preciosRaw);
-          let ordenOficial=null;
-          if(d.categoriasOrden && Array.isArray(d.categoriasOrden) && d.categoriasOrden.length>0){
-            ordenOficial=d.categoriasOrden;
-          } else {
-            // Intentar desde precios.json completo
-            const fullRaw=localStorage.getItem('precios_oficiales')||'';
-            if(fullRaw){
-              const full=JSON.parse(fullRaw);
-              if(full.categoriasOrden) ordenOficial=full.categoriasOrden;
-            }
-          }
-          if(ordenOficial && ordenOficial.length>0){
-            // Reordenar catsOrden según ordenOficial exacto, manteniendo solo los que existen
-            const nuevoOrden=[];
-            ordenOficial.forEach(function(catOf){
-              // Buscar coincidencia exacta o que contenga
-              const encontrado=catsOrden.find(c=> c.toUpperCase()===catOf.toUpperCase() || catOf.toUpperCase().includes(c.toUpperCase()) || c.toUpperCase().includes(catOf.toUpperCase()));
-              if(encontrado && !nuevoOrden.includes(encontrado)){
-                nuevoOrden.push(encontrado);
-              } else if(catOf && !nuevoOrden.includes(catOf) && cats[catOf]){
-                nuevoOrden.push(catOf);
-              }
-            });
-            // Agregar los que no estaban en ordenOficial al final en orden de aparición
-            catsOrden.forEach(function(c){
-              if(!nuevoOrden.includes(c)) nuevoOrden.push(c);
-            });
-            // Si ordenOficial tiene categorías que no están en productos (ej: GASIFICADOR sin productos), igual mostrarlas si el usuario quiere ver exactamente lo que dice la sección
-            // Para cumplir "nombres y orden exactamente como aparecen en el listado", usamos ordenOficial como base y agregamos cantidades
-            if(ordenOficial.length>catsOrden.length){
-              // Usar ordenOficial tal cual para pills, aunque algunas tengan 0 productos, para mostrar exactamente las secciones del PDF
-              // Pero filtramos solo las que tienen productos o son de las secciones principales
-              const principales=['PURIFICADORES','GASIFICADOR','PURIFICADOR DE OSMOSIS INVERSA','OSMOSIS INVERSA','PURIFICADOR DE AIRE','KITS','ABLANDADORES','REPUESTOS','ALIMENTOS'];
-              // Si ordenOficial contiene alguna de estas, usar ordenOficial completo
-              const tienePrincipal=ordenOficial.some(oo=> principales.some(pp=> oo.toUpperCase().includes(pp) || pp.includes(oo.toUpperCase())));
-              if(tienePrincipal){
-                // Reconstruir catsOrden con nombres exactos de secciones
-                catsOrden.length=0;
-                ordenOficial.forEach(function(sec){
-                  // Normalizar a formato bonito pero mantener mayúsculas si original era mayúsculas
-                  const secTrim=sec.trim();
-                  if(secTrim) catsOrden.push(secTrim);
-                });
-                // Asegurar que cats tenga entrada para cada sección (aunque sea 0)
-                catsOrden.forEach(function(sec){
-                  if(!cats[sec]) cats[sec]=0;
-                });
-              }
-            } else {
-              // Si ordenOficial es más corto, usar nuevoOrden que respeta orden oficial + aparición
-              catsOrden.length=0;
-              nuevoOrden.forEach(function(c){ catsOrden.push(c); });
-            }
-          }
-        }
-      }catch(e){ console.log('orden categorias error',e); }
-
-      let html='<button class="filter-chip '+(catActual==='Todos'?'active':'')+'" data-cat="Todos">Todos ('+productos.length+')</button>';
-      catsOrden.forEach(function(cat){
-        const count=cats[cat]||0;
-        html+='<button class="filter-chip '+(catActual===cat?'active':'')+'" data-cat="'+cat+'">'+cat+' ('+count+')</button>';
-      });
-      filterDiv.innerHTML=html;
-      filterDiv.querySelectorAll('[data-cat]').forEach(function(btn){
-        btn.onclick=function(){
-          window._preciosCatActual=btn.dataset.cat;
-          renderPrecios();
-          try{haptic(6);}catch(e){}
-        };
-      });
-    }
 
     if(content){
       if(filtrados.length===0){
         content.innerHTML='<div class="empty">Sin productos cargados.<br/><small>El admin debe subir los PDFs en su panel.</small></div>';
       } else {
-        var html='<div class="cat-chart" style="padding:12px"><h4 style="margin:0 0 10px;font-size:13px;font-weight:900">📋 '+filtrados.length+' productos'+(catActual!=='Todos'?' - '+catActual:'')+'</h4><div style="max-height:70vh;overflow-y:auto;display:flex;flex-direction:column;gap:8px">';
+        var html='<div class="cat-chart" style="padding:12px"><h4 style="margin:0 0 10px;font-size:13px;font-weight:900">📋 '+filtrados.length+' productos</h4><div style="max-height:70vh;overflow-y:auto;display:flex;flex-direction:column;gap:8px">';
         for(var i=0;i<filtrados.length;i++){
           var cc=filtrados[i];
           var isCanje = /plan\s*canje/i.test(cc.nombre) || /canje/i.test(cc.original||'');
@@ -8378,34 +8341,35 @@ function renderPrecios(){
           }
           var pbBadge=pbFormatted?'<span style="padding:4px 8px;border-radius:8px;background:rgba(91,141,239,0.12);color:#3d63c9;font-size:11px;font-weight:900">'+pbFormatted+' PB</span>':'';
           var canjeBadge=isCanje?'<span style="padding:3px 7px;border-radius:999px;background:rgba(245,179,1,0.18);color:#a3670b;font-size:10px;font-weight:900;display:inline-flex;align-items:center;gap:3px">🔄 Canje</span>':'';
-          var catBadge='<span style="padding:3px 6px;border-radius:6px;background:rgba(0,0,0,0.06);color:#666;font-size:9px;font-weight:700">'+(cc.categoria||'Otros')+'</span>';
-                    var nombreLimpio=cc.nombre;
+          var nombreLimpio=cc.nombre;
           nombreLimpio=nombreLimpio.replace(/\(\s*Plan\s*canje\s*\)/gi,'').replace(/Plan\s*canje/gi,'').trim();
           nombreLimpio=nombreLimpio.replace(/\s{2,}/g,' ').trim();
           if(!nombreLimpio) nombreLimpio=cc.nombre;
           var precio = cc.precioUser||0;
           var precioStr=(typeof formatPrecio!=='undefined'?formatPrecio(precio):'$'+precio);
-          var prodId='';
-          try{ prodId=btoa(encodeURIComponent(cc.nombre||'')).replace(/=/g,''); }catch(e){ prodId=(cc.nombre||'').replace(/[^a-z0-9]/gi,'_'); }
-          var safeNombre=(cc.nombre||'').replace(/"/g,'&quot;');
-          html+='<div class="person-item '+(isCanje?'canje-item':'')+'" data-canje="'+(isCanje?'1':'0')+'" data-prod-id="'+prodId+'" data-nombre="'+safeNombre+'" style="padding:12px 14px;display:flex;align-items:center;gap:12px;'+(isCanje?'border-left:3px solid #f5b301;background:rgba(245,179,1,0.06)':'')+'">'
+          html+='<div class="person-item '+(isCanje?'canje-item':'')+'" data-canje="'+(isCanje?'1':'0')+'" style="padding:12px 14px;display:flex;align-items:center;gap:12px;'+(isCanje?'border-left:3px solid #f5b301;background:rgba(245,179,1,0.06)':'')+'">'
             +'<div class="pi-info" style="flex:1;min-width:0">'
             +'<div class="pi-name" style="font-size:14px;font-weight:700;word-break:break-word;display:flex;align-items:center;gap:6px;flex-wrap:wrap">'+nombreLimpio+' '+canjeBadge+'</div>'
-            +'<div class="pi-meta" style="margin-top:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">'+pbBadge+' '+catBadge+'</div>'
+            +'<div class="pi-meta" style="margin-top:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">'+pbBadge+'</div>'
             +'</div>'
-            +'<div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex:none">'
-            +'<div class="pi-pts" style="font-size:15px;font-weight:900;color:#1c1c1e;min-width:95px;text-align:right">'+precioStr+'</div>'
-            +'<button class="btn-add-pres" data-add-id="'+prodId+'" style="padding:6px 10px;border-radius:8px;border:none;background:linear-gradient(135deg,#4b7a55,#3ad0a4);color:#fff;font-weight:900;font-size:12px;cursor:pointer">+ Agregar</button>'
-            +'</div>'
+            +'<div class="pi-pts" style="font-size:15px;font-weight:900;color:#1c1c1e;min-width:95px;text-align:right;flex:none">'+precioStr+'</div>'
             +'</div>';
         }
         html+='</div></div>';
         content.innerHTML=html;
+        // Bind canje filter pills
+        setTimeout(function(){
+          var btnTodos=document.getElementById('chipTodos');
+          var btnCanje=document.getElementById('chipCanje');
+          var items=document.querySelectorAll('#preciosContent .person-item');
+          if(btnTodos) btnTodos.onclick=function(){ items.forEach(function(it){ it.style.display='flex'; }); };
+          if(btnCanje) btnCanje.onclick=function(){ items.forEach(function(it){ it.style.display = it.dataset.canje==='1' ? 'flex' : 'none'; }); };
+        },100);
       }
     }
     if(shareWrap) shareWrap.style.display = filtrados.length? 'flex':'none';
     return;
-  }catch(e){ console.log('renderPrecios error',e); }
+  }catch(e){ console.log('renderPrecios simple error',e); }
   var content=document.getElementById('preciosContent');
   if(content) content.innerHTML='<div class="empty">Sin productos oficiales cargados.</div>';
 }
@@ -8856,7 +8820,7 @@ function renderHomeCompleto(){
 }
 
 
-// === OVERRIDE HOME TOOLS FINAL - SOLO LISTA PRECIOS - BOTON SIMPLE ===
+// === OVERRIDE HOME TOOLS FINAL - SOLO LISTA PRECIOS ===
 (function(){
   const _origTools = renderToolsList;
   renderToolsList = function(){
@@ -8879,28 +8843,6 @@ function renderHomeCompleto(){
     }catch(e){ console.log('homeExtra error',e); }
   };
 })();
-
-function renderPlanningTools(){
-  const pr = obtenerDatosPresupuestoActual();
-  const sp = obtenerProgresoSieteActual();
-  const rv = obtenerPromedioRuedaActual('vida');
-  const rn = obtenerPromedioRuedaActual('negocio');
-  
-  const presuIcon = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="15" x2="10" y2="15"/><line x1="13" y1="15" x2="17" y2="15"/></svg>`;
-  const sieteIcon = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><path d="M4 4h16M8 4l-2 16M20 4l-8 16"/></svg>`;
-  const vidaIcon = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="9"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="12" y1="3" x2="12" y2="21"/><line x1="5.6" y1="5.6" x2="18.4" y2="18.4"/><line x1="18.4" y1="5.6" x2="5.6" y2="18.4"/></svg>`;
-  const negIcon = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M12 2v20M2 12h20M4 4l16 16M20 4L4 20"/></svg>`;
-  
-  const c1 = renderToolCard({ 
-    icon: presuIcon, iconClass:'presu', title:'Presupuesto Mensual', sub:'Ingresos y gastos del mes', 
-    statusVal: pr.existe ? ((pr.neto>=0?'+':'-')+'$'+formatMoney(Math.abs(pr.neto))) : 'Sin cargar', 
-    statusLbl: pr.existe ? 'Balance' : '', 
-    statusClass: pr.existe ? (pr.neto>=0?'pos':'neg') : 'empty', 
-    progressPct: pr.existe && pr.ing > 0 ? Math.min(100, Math.round((pr.gast / pr.ing) * 100)) : undefined, 
-    progressColor:'linear-gradient(90deg,#f5b301,#ff8f6b)', 
-    timeAgo: lastUpdateFor('presu'), 
-    onClick:'openPresu()', accent:'#f5b301' 
-  });
   const c2 = renderToolCard({ 
     icon: sieteIcon, iconClass:'siete', title:'Las 7 P', sub:'Plan mensual paso a paso', 
     statusVal: sp.existe ? `${sp.done}/${sp.total}` : 'Sin iniciar', 
@@ -9313,319 +9255,6 @@ modal.close = function(){
 };
 
 
-
-// ==== PRESUPUESTO POR LONG PRESS EN LISTA DE PRECIOS ====
-var presupuestoSeleccionados=[]; window.presupuestoSeleccionados=presupuestoSeleccionados;
-var pressTimer=null;
-var pressTarget=null;
-
-
-function actualizarFabPresupuesto(){
-  const fab=document.getElementById('presupuestoFab');
-  const countEl=document.getElementById('presupuestoCount');
-  if(!fab || !countEl) return;
-  if(presupuestoSeleccionados.length===0){
-    fab.classList.remove('show');
-    setTimeout(()=>{ if(presupuestoSeleccionados.length===0) fab.style.display='none'; }, 300);
-  } else {
-    fab.style.display='flex';
-    setTimeout(()=> fab.classList.add('show'), 10);
-    countEl.textContent=presupuestoSeleccionados.length + ' producto' + (presupuestoSeleccionados.length>1?'s':'');
-  }
-}
-
-function isProductoSeleccionado(nombre){
-  return presupuestoSeleccionados.some(function(p){ return p.nombre===nombre; });
-}
-function isProductoSeleccionadoById(prodId){
-  return presupuestoSeleccionados.some(function(p){
-    try{
-      var id=btoa(encodeURIComponent(p.nombre||'')).replace(/=/g,'');
-      return id===prodId;
-    }catch(e){ return false; }
-  });
-}
-function toggleProductoSeleccionado(prod){
-  if(!prod || !prod.nombre) return;
-  var idx=presupuestoSeleccionados.findIndex(function(p){ return p.nombre===prod.nombre; });
-  if(idx>=0){
-    presupuestoSeleccionados.splice(idx,1);
-  } else {
-    presupuestoSeleccionados.push({nombre:prod.nombre, pb:prod.pb||0, precioUser:prod.precioUser||prod.precio||0, original:prod.original||prod.nombre, cantidad:1});
-  }
-  window.presupuestoSeleccionados=presupuestoSeleccionados;
-  // Actualizar visual sin re-render completo para no perder scroll ni seleccionar rango
-  document.querySelectorAll('#preciosContent .person-item').forEach(function(el){
-    var pid=el.getAttribute('data-prod-id');
-    var dnombre=el.getAttribute('data-nombre');
-    var sel=false;
-    if(pid){
-      sel=isProductoSeleccionadoById(pid);
-    } else if(dnombre){
-      sel=isProductoSeleccionado(dnombre);
-    }
-    el.classList.toggle('selected', sel);
-  });
-  actualizarFabPresupuesto();
-}
-function findProductoById(prodId){
-  try{
-    var allRaw=localStorage.getItem('preciosCruzadosOficiales') || localStorage.getItem('preciosUsuarioOficial') || '';
-    if(allRaw){
-      var arr=JSON.parse(allRaw);
-      for(var k=0;k<arr.length;k++){
-        var p=arr[k];
-        try{
-          var id=btoa(encodeURIComponent(p.nombre||'')).replace(/=/g,'');
-          if(id===prodId) return p;
-        }catch(e){}
-      }
-    }
-  }catch(e){}
-  return null;
-}
-function findProductoByElement(el){
-  try{
-    var prodId=el.getAttribute('data-prod-id');
-    if(prodId){
-      var found=findProductoById(prodId);
-      if(found) return found;
-    }
-    var dataNombre=el.getAttribute('data-nombre');
-    if(dataNombre){
-      return {nombre: dataNombre, pb:0, precioUser:0, original:dataNombre};
-    }
-  }catch(e){}
-  return null;
-}
-
-
-function renderPresupuestoModal(){
-  const cont=document.getElementById('presupuestoItems');
-  const totalEl=document.getElementById('presupuestoTotal');
-  if(!cont) return;
-  if(presupuestoSeleccionados.length===0){
-    cont.innerHTML='<div class="empty">No hay productos seleccionados.<br/>Mantené presionado un producto en Lista de Precios para seleccionarlo.</div>';
-    if(totalEl) totalEl.textContent='$0';
-    return;
-  }
-  let total=0;
-  cont.innerHTML=presupuestoSeleccionados.map((p,i)=>{
-    const subtotal=(Number(p.precioUser)||0)*(Number(p.cantidad)||1);
-    total+=subtotal;
-    return `<div class="presupuesto-item-glass">
-      <div style="flex:1;min-width:0">
-        <div style="font-weight:800;font-size:13px;word-break:break-word;letter-spacing:-0.2px">${p.nombre}</div>
-        <div style="font-size:11px;color:#5c5c66;margin-top:3px;display:flex;align-items:center;gap:6px">${p.pb? '<span style="padding:2px 6px;border-radius:6px;background:rgba(91,141,239,0.12);color:#3d63c9;font-size:10px;font-weight:800">'+Number(p.pb).toFixed(2)+' PB</span>':''}<span>${typeof formatPrecio!=='undefined'?formatPrecio(p.precioUser):'$'+p.precioUser} c/u</span></div>
-        <div class="presupuesto-qty">
-          <button data-dec="${i}">−</button><span>${p.cantidad}</span><button data-inc="${i}">+</button>
-          <span style="margin-left:auto;font-weight:900;color:#1d7a5c;font-size:12px">${typeof formatPrecio!=='undefined'?formatPrecio(subtotal):'$'+subtotal}</span>
-        </div>
-      </div>
-      <button class="btn btn-danger btn-small" data-del="${i}" style="width:32px;height:32px;border-radius:50%;padding:0;display:grid;place-items:center">✕</button>
-    </div>`;
-  }).join('');
-  if(totalEl) totalEl.textContent= (typeof formatPrecio!=='undefined'?formatPrecio(total):'$'+total);
-  cont.querySelectorAll('[data-inc]').forEach(b=>{ b.onclick=()=>{ const idx=+b.dataset.inc; presupuestoSeleccionados[idx].cantidad=(Number(presupuestoSeleccionados[idx].cantidad)||1)+1; renderPresupuestoModal(); actualizarFabPresupuesto(); }; });
-  cont.querySelectorAll('[data-dec]').forEach(b=>{ b.onclick=()=>{ const idx=+b.dataset.dec; const cur=Number(presupuestoSeleccionados[idx].cantidad)||1; if(cur>1){ presupuestoSeleccionados[idx].cantidad=cur-1; } else { presupuestoSeleccionados.splice(idx,1); window.presupuestoSeleccionados=presupuestoSeleccionados; if(presupuestoSeleccionados.length===0){ document.getElementById('modalPresupuesto')?.classList.remove('open'); } } renderPresupuestoModal(); actualizarFabPresupuesto(); renderPrecios(); }; });
-  cont.querySelectorAll('[data-del]').forEach(b=>{ b.onclick=()=>{ presupuestoSeleccionados.splice(+b.dataset.del,1); window.presupuestoSeleccionados=presupuestoSeleccionados; renderPresupuestoModal(); actualizarFabPresupuesto(); renderPrecios(); if(presupuestoSeleccionados.length===0) document.getElementById('modalPresupuesto')?.classList.remove('open'); }; });
-}
-function generarPDFPresupuesto(){
-  const cliente=(document.getElementById('presupuestoCliente')?.value||'').trim();
-  const distribuidor=(document.getElementById('presupuestoDistribuidor')?.value||'').trim();
-  if(!cliente){ alert('Ingresá el nombre de la persona que recibe el presupuesto'); document.getElementById('presupuestoCliente')?.focus(); return; }
-  if(presupuestoSeleccionados.length===0){ alert('No hay productos seleccionados'); return; }
-  try{
-    const { jsPDF } = window.jspdf;
-    const doc=new jsPDF({unit:'mm',format:'a4'});
-    const pageW=doc.internal.pageSize.getWidth();
-    let y=18;
-    doc.setFont('helvetica','bold'); doc.setFontSize(16); doc.text('Presupuesto', 14, y); y+=8;
-    doc.setFont('helvetica','normal'); doc.setFontSize(10); doc.text('Fecha: '+ new Date().toLocaleDateString('es-AR'), 14, y); y+=6; doc.text('Cliente: '+cliente, 14, y); y+=6; doc.text('Distribuidor: '+(distribuidor||'___________________'), 14, y); y+=10;
-    doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setFillColor(240,240,240); doc.rect(14, y-5, pageW-28, 8, 'F'); doc.text('Producto', 16, y); doc.text('PB', 110, y); doc.text('Cant.', 125, y); doc.text('Precio', 145, y); doc.text('Subtotal', 170, y); y+=8; doc.setFont('helvetica','normal'); doc.setFontSize(10);
-    let total=0;
-    for(const p of presupuestoSeleccionados){
-      const cant=Number(p.cantidad)||1; const precio=Number(p.precioUser)||0; const sub=cant*precio; total+=sub;
-      if(y>270){ doc.addPage(); y=20; }
-      const nombreLines=doc.splitTextToSize(p.nombre, 85);
-      doc.text(nombreLines, 16, y);
-      const pbText=p.pb? Number(p.pb).toFixed(2)+' PB' : '-';
-      doc.text(pbText, 110, y);
-      doc.text(String(cant), 125, y, {align:'center'});
-      doc.text((typeof formatPrecio!=='undefined'?formatPrecio(precio).replace('$','').trim():String(precio)), 145, y, {align:'right'});
-      doc.text((typeof formatPrecio!=='undefined'?formatPrecio(sub).replace('$','').trim():String(sub)), 175, y, {align:'right'});
-      y+= Math.max(6, nombreLines.length*5);
-      doc.setDrawColor(230,230,230); doc.line(14, y-2, pageW-14, y-2); y+=2;
-    }
-    y+=6; doc.setFont('helvetica','bold'); doc.setFontSize(13); doc.text('Total estimado: '+(typeof formatPrecio!=='undefined'?formatPrecio(total):'$'+total), pageW-14, y, {align:'right'});
-    y+=12; doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(120,120,120); doc.text('Presupuesto válido por 7 días. Precios en ARS. Incluye IVA donde corresponda.', 14, y); y+=5; doc.text('Generado desde APPI - Lista de Precios oficial', 14, y);
-    const fileName='Presupuesto_'+cliente.replace(/[^a-z0-9]/gi,'_')+'_'+new Date().toISOString().split('T')[0]+'.pdf';
-    doc.save(fileName);
-    if(typeof showToast==='function') showToast('PDF generado 📄');
-  }catch(e){ console.error(e); alert('Error generando PDF: '+e.message); }
-}
-
-function findProductoByNombre(nombreVisible){
-  try{
-    const allRaw=localStorage.getItem('preciosCruzadosOficiales') || localStorage.getItem('preciosUsuarioOficial') || '';
-    if(allRaw){
-      const arr=JSON.parse(allRaw);
-      const limpio=nombreVisible.replace(/🔄 Canje/g,'').trim();
-      for(let i=0;i<arr.length;i++){
-        const p=arr[i];
-        if(p.nombre===limpio) return p;
-        if(p.nombre && p.nombre.toLowerCase()===limpio.toLowerCase()) return p;
-      }
-    }
-  }catch(e){}
-  return {nombre: nombreVisible, pb:0, precioUser:0, original:nombreVisible};
-}
-
-var longPressActive=false;
-function attachLongPressHandlers(){
-  const container=document.getElementById('preciosContent');
-  if(!container) return;
-  container.querySelectorAll('.person-item').forEach(function(el){
-    if(el.dataset.longPressBound==='1') return;
-    el.dataset.longPressBound='1';
-    var prod=findProductoByElement(el);
-    if(!prod){
-      var nombre=el.querySelector('.pi-name')?.textContent?.trim() || el.getAttribute('data-nombre') || '';
-      prod={nombre: nombre, pb:0, precioUser:0, original:nombre};
-    }
-    if(!prod || !prod.nombre) return;
-
-    var startY=0, startX=0, moved=false;
-
-    var startPress=function(e){
-      var touch=e.touches ? e.touches[0] : e;
-      startY=touch.clientY;
-      startX=touch.clientX;
-      moved=false;
-      pressTarget=el;
-      longPressActive=false;
-      if(pressTimer) clearTimeout(pressTimer);
-      pressTimer=setTimeout(function(){
-        if(moved) return;
-        longPressActive=true;
-        try{ if(navigator.vibrate) navigator.vibrate(50); }catch(err){}
-        toggleProductoSeleccionado(prod);
-        var pid=el.getAttribute('data-prod-id');
-        var sel=pid ? isProductoSeleccionadoById(pid) : isProductoSeleccionado(prod.nombre);
-        el.classList.toggle('selected', sel);
-        try{ haptic(15); }catch(err){}
-        // Prevenir menú contextual y selección de texto después del long-press
-        e.preventDefault();
-      }, 500);
-    };
-
-    var cancelPress=function(){
-      if(pressTimer){ clearTimeout(pressTimer); pressTimer=null; }
-      pressTarget=null;
-      setTimeout(function(){ longPressActive=false; }, 200);
-    };
-
-    var moveHandler=function(e){
-      var touch=e.touches ? e.touches[0] : e;
-      var deltaY=Math.abs(touch.clientY - startY);
-      var deltaX=Math.abs(touch.clientX - startX);
-      if(deltaY>10 || deltaX>10){
-        moved=true;
-        cancelPress();
-      }
-    };
-
-    // Touch events con passive:true para permitir scroll, solo preventDefault en long-press
-    el.addEventListener('touchstart', startPress, {passive:true});
-    el.addEventListener('touchend', function(e){
-      if(longPressActive){
-        e.preventDefault();
-      }
-      cancelPress();
-    });
-    el.addEventListener('touchcancel', cancelPress);
-    el.addEventListener('touchmove', moveHandler, {passive:true});
-    el.addEventListener('mousedown', function(e){
-      if(e.button!==0) return;
-      startPress(e);
-    });
-    el.addEventListener('mouseup', cancelPress);
-    el.addEventListener('mouseleave', cancelPress);
-    el.addEventListener('click', function(e){
-      if(e.target.closest('.btn-add-pres')) return;
-      if(longPressActive){ e.preventDefault(); e.stopPropagation(); longPressActive=false; return; }
-      // Si hay movimiento, era scroll, no click para seleccionar
-      if(moved) return;
-      if(presupuestoSeleccionados.length>0){
-        e.preventDefault();
-        e.stopPropagation();
-        toggleProductoSeleccionado(prod);
-        var pid=el.getAttribute('data-prod-id');
-        var sel=pid ? isProductoSeleccionadoById(pid) : isProductoSeleccionado(prod.nombre);
-        el.classList.toggle('selected', sel);
-      }
-    });
-    el.addEventListener('contextmenu', function(e){
-      e.preventDefault();
-      return false;
-    });
-  });
-}
-const _origRenderPreciosPresupuesto = renderPrecios;
-renderPrecios = function(){
-  _origRenderPreciosPresupuesto();
-  setTimeout(attachLongPressHandlers, 200);
-  setTimeout(()=>{
-    document.querySelectorAll('#preciosContent .person-item').forEach(el=>{
-      const nombre=el.querySelector('.pi-name')?.textContent?.trim()||'';
-      if(isProductoSeleccionado(nombre) || presupuestoSeleccionados.some(p=> nombre.includes(p.nombre)|| p.nombre.includes(nombre))){
-        el.classList.add('selected');
-      }
-    });
-  }, 300);
-};
-document.addEventListener('DOMContentLoaded', ()=>{
-  const fab=document.getElementById('presupuestoFab');
-  if(fab){
-    fab.onclick=()=>{
-      renderPresupuestoModal();
-      document.getElementById('modalPresupuesto')?.classList.add('open');
-    };
-  }
-  document.getElementById('closePresupuesto')?.addEventListener('click',()=> document.getElementById('modalPresupuesto')?.classList.remove('open'));
-  document.getElementById('btnPresupuestoCancelar')?.addEventListener('click',()=> document.getElementById('modalPresupuesto')?.classList.remove('open'));
-  document.getElementById('btnPresupuestoPDF')?.addEventListener('click', generarPDFPresupuesto);
-  document.getElementById('modalPresupuesto')?.addEventListener('click', (e)=>{
-    if(e.target.id==='modalPresupuesto') e.currentTarget.classList.remove('open');
-  });
-});
-
-
-
-// Handler para boton + Agregar (fallback si long-press falla)
-document.addEventListener('click', function(e){
-  const btn=e.target.closest('.btn-add-pres');
-  if(!btn) return;
-  e.preventDefault();
-  e.stopPropagation();
-  const item=btn.closest('.person-item');
-  if(!item) return;
-  let prod=null;
-  try{
-    prod=findProductoByElement(item);
-    if(!prod || !prod.nombre){
-      const dataNombre=item.getAttribute('data-nombre');
-      if(dataNombre) prod={nombre:dataNombre, pb:0, precioUser:0, original:dataNombre};
-    }
-  }catch(err){}
-  if(prod && prod.nombre){
-    toggleProductoSeleccionado(prod);
-    item.classList.toggle('selected', isProductoSeleccionado(prod.nombre) || (item.dataset.prodId && isProductoSeleccionadoById(item.dataset.prodId)));
-    try{ haptic(10); }catch(err){}
-  }
-});
-
-
 // Verificar al arrancar
 (async function() {
   if (estaActivada()) {
@@ -9650,82 +9279,3 @@ document.addEventListener('click', function(e){
 </script>
 <script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a24f625ad9475777',t:'MTc4NTY5Nzg0Mg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
-
-    <!-- FAB Presupuesto -->
-    <div id="presupuestoFab" style="display:none;position:fixed;bottom:calc(env(safe-area-inset-bottom) + 90px);left:50%;transform:translateX(-50%);z-index:90;background:linear-gradient(135deg,#4b7a55,#3ad0a4);color:#fff;padding:14px 24px;border-radius:999px;box-shadow:0 8px 24px rgba(0,0,0,0.25);font-weight:900;font-size:14px;cursor:pointer;align-items:center;gap:10px;user-select:none;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.2)">
-      <span>📋</span><span id="presupuestoCount">0 productos</span> → Crear Presupuesto
-    </div>
-
-    <!-- Modal Presupuesto Glass Bonito -->
-    <div class="modal-overlay" id="modalPresupuesto">
-      <div class="modal" style="max-width:560px;position:relative;background:rgba(255,255,255,0.86);backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%);border:1px solid rgba(255,255,255,0.75);box-shadow:0 20px 60px rgba(80,90,130,0.20), 0 8px 24px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.9);border-radius:28px;overflow:hidden;padding:0">
-        <div style="height:4px;background:linear-gradient(90deg,#4b7a55,#3ad0a4,#5b8def,#a06bff)"></div>
-        <button class="modal-close" id="closePresupuesto" aria-label="Cerrar" style="top:18px;right:18px;background:rgba(0,0,0,0.06)">✕</button>
-        <div class="modal-head" style="background:transparent;padding:22px 22px 12px;text-align:left">
-          <div style="display:flex;align-items:center;gap:14px">
-            <div class="modal-icon" style="width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,#4b7a55,#3ad0a4);box-shadow:0 6px 18px rgba(75,122,85,0.35);font-size:26px;margin:0">📋</div>
-            <div>
-              <h3 class="modal-title" style="margin:0;font-size:19px;font-weight:900;letter-spacing:-0.3px">Crear Presupuesto</h3>
-              <p class="modal-sub" style="margin:4px 0 0;font-size:13px;color:#5c5c66">Armá un PDF profesional con detalles glass</p>
-            </div>
-          </div>
-        </div>
-        <div class="modal-body" style="padding:12px 22px 20px">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
-            <div class="glass" style="padding:14px;border-radius:16px;background:rgba(255,255,255,0.65);border:1px solid rgba(255,255,255,0.8);backdrop-filter:blur(14px);box-shadow:0 4px 16px rgba(80,90,130,0.06)">
-              <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px"><span style="font-size:14px">👤</span><label style="margin:0;font-size:10px;font-weight:800;color:#5c5c66;letter-spacing:0.5px;text-transform:uppercase">Distribuidor</label></div>
-              <input type="text" id="presupuestoDistribuidor" placeholder="Tu nombre" style="margin-top:0;padding:11px 12px;border-radius:10px;border:1px solid rgba(80,90,130,0.12);background:rgba(255,255,255,0.9);font-size:13px;font-weight:600" />
-            </div>
-            <div class="glass" style="padding:14px;border-radius:16px;background:linear-gradient(135deg,rgba(91,141,239,0.10),rgba(160,107,255,0.08));border:1px solid rgba(91,141,239,0.18);backdrop-filter:blur(14px);box-shadow:0 4px 16px rgba(80,90,130,0.06)">
-              <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px"><span style="font-size:14px">🎯</span><label style="margin:0;font-size:10px;font-weight:800;color:#3d63c9;letter-spacing:0.5px;text-transform:uppercase">Cliente *</label></div>
-              <input type="text" id="presupuestoCliente" placeholder="Ej: Juan Pérez" style="margin-top:0;padding:11px 12px;border-radius:10px;border:1px solid rgba(91,141,239,0.20);background:rgba(255,255,255,0.95);font-size:13px;font-weight:600" />
-            </div>
-          </div>
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-            <span style="font-size:11px;font-weight:800;color:#6b6b76;text-transform:uppercase;letter-spacing:0.5px;display:flex;align-items:center;gap:6px"><span style="width:6px;height:6px;background:#4b7a55;border-radius:50%;display:inline-block"></span>Productos seleccionados</span>
-            <span style="font-size:10px;color:#fff;background:linear-gradient(135deg,#4b7a55,#3ad0a4);padding:4px 10px;border-radius:999px;font-weight:800;box-shadow:0 2px 8px rgba(75,122,85,0.25)" id="presupuestoCountDetalle">0 items</span>
-          </div>
-          <div id="presupuestoItems" style="max-height:38vh;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding:2px"></div>
-          <div class="glass" style="margin-top:16px;padding:16px 18px;border-radius:18px;background:linear-gradient(135deg,rgba(75,122,85,0.14),rgba(58,208,164,0.12),rgba(91,141,239,0.08));border:1px solid rgba(75,122,85,0.20);backdrop-filter:blur(16px);display:flex;justify-content:space-between;align-items:center;box-shadow:0 6px 20px rgba(75,122,85,0.12), inset 0 1px 0 rgba(255,255,255,0.8)">
-            <div>
-              <div style="font-size:11px;font-weight:800;color:#1d7a5c;text-transform:uppercase;letter-spacing:0.6px">Total estimado</div>
-              <div style="font-size:11px;color:#5c5c66;margin-top:3px">Precios en ARS - Contado Débito 1 cuota</div>
-            </div>
-            <b id="presupuestoTotal" style="font-size:24px;color:#1d4a2d;letter-spacing:-0.5px">$0</b>
-          </div>
-          <div class="glass" style="margin-top:12px;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,0.55);border:1px dashed rgba(80,90,130,0.18);backdrop-filter:blur(10px);font-size:11px;color:#5c5c66;line-height:1.5;display:flex;gap:10px">
-            <span style="font-size:16px;flex:none">💡</span>
-            <span>Ajustá cantidades con <b>+</b> y <b>−</b>. El PDF incluye tu nombre como distribuidor, el del cliente, productos con PB, precios y total. Estilo glass profesional.</span>
-          </div>
-        </div>
-        <div class="modal-footer" style="padding:14px 22px 22px;background:rgba(255,255,255,0.4);backdrop-filter:blur(10px);border-top:1px solid rgba(255,255,255,0.6);display:flex;gap:12px">
-          <button class="btn-cancel" id="btnPresupuestoCancelar" style="flex:1;padding:14px;border-radius:14px;border:1px solid rgba(0,0,0,0.08);background:rgba(255,255,255,0.7);backdrop-filter:blur(10px);font-weight:700;cursor:pointer;color:#3a3a48">Cancelar</button>
-          <button class="btn-ok" id="btnPresupuestoPDF" style="flex:2;padding:14px;border-radius:14px;border:none;background:linear-gradient(135deg,#4b7a55,#3ad0a4);color:#fff;font-weight:800;box-shadow:0 8px 20px rgba(75,122,85,0.35), inset 0 1px 0 rgba(255,255,255,0.3);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">📄 Generar PDF</button>
-        </div>
-      </div>
-    </div>
-
-<style>
-.person-item{ touch-action: pan-y; -webkit-touch-callout: none; }
-.person-item.selected{border:2px solid #4b7a55 !important;background:linear-gradient(135deg,rgba(75,122,85,0.14),rgba(58,208,164,0.10)) !important;box-shadow:0 4px 16px rgba(75,122,85,0.18), inset 0 1px 0 rgba(255,255,255,0.8) !important}
-.person-item.selected .pi-name{color:#1d4a2d;font-weight:800}
-#preciosContent{ touch-action: pan-y; -webkit-overflow-scrolling: touch; }
-#preciosContent .cat-chart{ touch-action: pan-y; }
-@keyframes pulsePresupuesto{0%,100%{transform:translateX(-50%) scale(1)}50%{transform:translateX(-50%) scale(1.05)}}
-#presupuestoFab.show{display:flex !important;animation:pulsePresupuesto 1.5s ease-in-out}
-.presupuesto-qty{display:flex;align-items:center;gap:8px;margin-top:8px}
-.presupuesto-qty button{width:32px;height:32px;border-radius:50%;border:none;background:rgba(255,255,255,0.9);color:#1d7a5c;font-weight:900;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.08);border:1px solid rgba(0,0,0,0.06);font-size:14px;transition:transform 0.1s}
-.presupuesto-qty button:active{transform:scale(0.85)}
-.presupuesto-qty span{min-width:28px;text-align:center;font-weight:800;font-size:13px}
-#presupuestoItems .presupuesto-item-glass{
-  padding:14px 16px;border-radius:16px;
-  background:rgba(255,255,255,0.72);
-  backdrop-filter:blur(16px) saturate(170%);
-  -webkit-backdrop-filter:blur(16px) saturate(170%);
-  border:1px solid rgba(255,255,255,0.8);
-  box-shadow:0 6px 20px rgba(80,90,130,0.08), inset 0 1px 0 rgba(255,255,255,0.9);
-  display:flex;gap:12px;align-items:center;
-  transition:all 0.2s ease;
-}
-#presupuestoItems .presupuesto-item-glass:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(80,90,130,0.12), inset 0 1px 0 rgba(255,255,255,0.9);}
-</style>
