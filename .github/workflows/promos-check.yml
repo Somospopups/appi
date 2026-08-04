@@ -1,0 +1,48 @@
+name: "Verificar Promociones PSA"
+
+on:
+  schedule:
+    # 6:00 y 11:00 hora de Argentina (UTC-3) = 09:00 y 14:00 UTC
+    - cron: "0 9 * * *"
+    - cron: "0 14 * * *"
+  workflow_dispatch: # permite ejecutarlo manualmente desde la pestaña Actions
+
+permissions:
+  contents: write
+
+concurrency:
+  group: promos-check
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del repo
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Instalar dependencias
+        run: pip install pypdf
+
+      - name: Ejecutar actualizador de promociones
+        id: promos
+        run: python .github/scripts/update_promos.py
+
+      - name: Commit y push si hubo cambios
+        if: steps.promos.outcome == 'success' && always()
+        run: |
+          git config user.name "bot-promos"
+          git config user.email "bot-promos@users.noreply.github.com"
+          git add promociones.json
+          if git diff --cached --quiet; then
+            echo "Sin cambios en promociones.json"
+          else
+            git commit -m "🤖 Actualizar promociones PSA - $(TZ=America/Argentina/Buenos_Aires date '+%d/%m/%Y %H:%M')"
+            git push
+            echo "✅ Promociones actualizadas y subidas"
+          fi
