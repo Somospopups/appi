@@ -9732,10 +9732,14 @@ function actualizarDivisorCuotas(){
     return;
   }
   const cuotaValor=total/n;
-  const porDia=total/30; // valor por día (mes de 30 días)
-  const fmt=(v)=> typeof formatPrecio!=='undefined' ? formatPrecio(v) : '$'+Number(v).toFixed(2);
+  // Valor por día = total / (días reales del mes × cantidad de cuotas/meses)
+  const ahora=new Date();
+  const diasMes=new Date(ahora.getFullYear(), ahora.getMonth()+1, 0).getDate();
+  const porDia=total/(diasMes*n);
+  // Formato con 2 decimales para que las cuotas sumen el total (el redondeo a 0 decimales descuadraba)
+  const fmt=(v)=> '$'+Number(v).toLocaleString('es-AR',{minimumFractionDigits:0, maximumFractionDigits:2});
   infoEl.innerHTML = `<div class="cuota-linea"><span>${n} cuotas de</span><b>${fmt(cuotaValor)}</b></div>`+
-    `<div class="cuota-linea cuota-dia"><span>💰 O valor por día</span><b>${fmt(porDia)}</b></div>`;
+    `<div class="cuota-linea cuota-dia"><span>💰 O valor por día (${n} meses · ${diasMes} días c/u)</span><b>${fmt(porDia)}</b></div>`;
   infoEl.style.display='block';
 }
 function renderPresupuestoModal(){
@@ -9766,7 +9770,7 @@ function renderPresupuestoModal(){
   if(totalEl) totalEl.textContent= (typeof formatPrecio!=='undefined'?formatPrecio(total):'$'+total);
   actualizarDivisorCuotas();
   cont.querySelectorAll('[data-inc]').forEach(b=>{ b.onclick=()=>{ const idx=+b.dataset.inc; presupuestoSeleccionados[idx].cantidad=(Number(presupuestoSeleccionados[idx].cantidad)||1)+1; renderPresupuestoModal(); actualizarFabPresupuesto(); }; });
-  cont.querySelectorAll('[data-dec]').forEach(b=>{ b.onclick=()=>{ const idx=+b.dataset.dec; const cur=Number(presupuestoSeleccionados[idx].cantidad)||1; if(cur>1){ presupuestoSeleccionados[idx].cantidad=cur-1; } else { presupuestoSeleccionados.splice(idx,1); window.presupuestoSeleccionados=presupuestoSeleccionados; if(presupuestoSeleccionados.length===0){ document.getElementById('modalPresupuesto')?.classList.remove('open'); } } renderPresupuestoModal(); actualizarFabPresupuesto(); renderPrecios(); }; });
+  cont.querySelectorAll('[data-dec]').forEach(b=>{ b.onclick=()=>{ const idx=+b.dataset.dec; const cur=Number(presupuestoSeleccionados[idx].cantidad)||1; if(cur>1){ presupuestoSeleccionados[idx].cantidad=cur-1; } /* mínimo 1: el botón − no elimina, el 🗑️ es para eliminar */ renderPresupuestoModal(); actualizarFabPresupuesto(); renderPrecios(); }; });
   cont.querySelectorAll('[data-del]').forEach(b=>{ b.onclick=()=>{ presupuestoSeleccionados.splice(+b.dataset.del,1); window.presupuestoSeleccionados=presupuestoSeleccionados; renderPresupuestoModal(); actualizarFabPresupuesto(); renderPrecios(); if(presupuestoSeleccionados.length===0) document.getElementById('modalPresupuesto')?.classList.remove('open'); }; });}
 function generarPDFPresupuesto(){
   const cliente=(document.getElementById('presupuestoCliente')?.value||'').trim();
@@ -9809,10 +9813,13 @@ function generarPDFPresupuesto(){
     if(cuotasDiv > 1 && total > 0){
       y+=6; doc.setFont('helvetica','normal'); doc.setFontSize(10);
       const cuotaValor=total/cuotasDiv;
-      const porDia=total/30;
-      doc.text(cuotasDiv+' cuotas de '+(typeof formatPrecio!=='undefined'?formatPrecio(cuotaValor).replace('$','').trim():cuotaValor.toFixed(2))+' cada una', pageW-14, y, {align:'right'});
+      const ahoraPdf=new Date();
+      const diasMesPdf=new Date(ahoraPdf.getFullYear(), ahoraPdf.getMonth()+1, 0).getDate();
+      const porDia=total/(diasMesPdf*cuotasDiv);
+      const fmtC=(v)=> Number(v).toLocaleString('es-AR',{minimumFractionDigits:0, maximumFractionDigits:2});
+      doc.text(cuotasDiv+' cuotas de '+fmtC(cuotaValor)+' cada una', pageW-14, y, {align:'right'});
       y+=5;
-      doc.text('O valor por día: '+(typeof formatPrecio!=='undefined'?formatPrecio(porDia).replace('$','').trim():porDia.toFixed(2)), pageW-14, y, {align:'right'});
+      doc.text('O valor por día ('+cuotasDiv+' meses x '+diasMesPdf+' días): '+fmtC(porDia), pageW-14, y, {align:'right'});
     }
     y+=12; doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(120,120,120); doc.text('Presupuesto válido por 7 días. Precios en ARS. Incluye IVA donde corresponda.', 14, y); y+=5; doc.text('Generado desde APPI - Lista de Precios oficial', 14, y);
     const fileName='Presupuesto_'+cliente.replace(/[^a-z0-9]/gi,'_')+'_'+hoyLocal()+'.pdf';
