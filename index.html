@@ -3712,12 +3712,43 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
 
     <div id="preciosContent"></div>
 
-    <div class="actions" id="preciosShareWrap" style="display:none;margin-top:14px">
-      <button class="btn whatsapp" id="btnPreciosShare">📤 Compartir comparativa</button>
-      <button class="btn" id="btnPreciosExport">💾 Exportar CSV</button>
-    </div>
-  </section>
+    </section>
 
+
+
+  
+    <div id="presupuestoFab" style="display:none;position:fixed;bottom:calc(env(safe-area-inset-bottom) + 90px);left:50%;transform:translateX(-50%);z-index:90;background:linear-gradient(135deg,#4b7a55,#3ad0a4);color:#fff;padding:14px 24px;border-radius:999px;box-shadow:0 8px 24px rgba(0,0,0,0.25);font-weight:900;font-size:14px;cursor:pointer;align-items:center;gap:10px;user-select:none">
+      <span>📋</span><span id="presupuestoCount">0 productos</span> → Crear Presupuesto
+    </div>
+
+    <div class="modal-overlay" id="modalPresupuesto">
+      <div class="modal" style="max-width:520px;position:relative">
+        <button class="modal-close" id="closePresupuesto" aria-label="Cerrar">✕</button>
+        <h2 class="modal-title">📋 Crear Presupuesto</h2>
+        <p style="color:#a0a0b0;font-size:12px;margin:0 0 12px">Seleccionaste productos manteniendo presionado. Ajustá cantidades y generá el PDF.</p>
+        <label>Nombre de la persona que recibe el presupuesto *</label>
+        <input type="text" id="presupuestoCliente" placeholder="Ej: Juan Pérez" />
+        <div id="presupuestoItems" style="margin-top:14px;max-height:45vh;overflow-y:auto;display:flex;flex-direction:column;gap:8px"></div>
+        <div style="margin-top:14px;padding:14px;border-radius:12px;background:linear-gradient(135deg,rgba(91,141,239,0.12),rgba(58,208,164,0.12));display:flex;justify-content:space-between;align-items:center">
+          <b style="font-size:13px">Total estimado:</b><b id="presupuestoTotal" style="font-size:20px;color:#1d7a5c">$0</b>
+        </div>
+        <div class="btn-row" style="margin-top:14px">
+          <button class="btn btn-secondary" id="btnPresupuestoCancelar">Cancelar</button>
+          <button class="btn btn-primary" id="btnPresupuestoPDF">📄 Generar PDF</button>
+        </div>
+      </div>
+    </div>
+
+<style>
+.person-item.selected{border:2px solid #4b7a55 !important;background:rgba(75,122,85,0.12) !important;box-shadow:0 4px 12px rgba(75,122,85,0.15)}
+.person-item.selected .pi-name{color:#1d4a2d}
+@keyframes pulsePresupuesto{0%,100%{transform:translateX(-50%) scale(1)}50%{transform:translateX(-50%) scale(1.05)}}
+#presupuestoFab.show{display:flex !important;animation:pulsePresupuesto 1.5s ease-in-out}
+.presupuesto-qty{display:flex;align-items:center;gap:6px;margin-top:6px}
+.presupuesto-qty button{width:28px;height:28px;border-radius:50%;border:none;background:rgba(91,141,239,0.15);color:#3d63c9;font-weight:900;cursor:pointer}
+.presupuesto-qty button:active{transform:scale(0.9)}
+.presupuesto-qty span{min-width:24px;text-align:center;font-weight:800;font-size:13px}
+</style>
 
 
   <!-- SEGUIMIENTO DE PERSONAS -->
@@ -9396,6 +9427,196 @@ modal.close = function(){
   origModalClose();
   setTimeout(asegurarAcceso, 150);
 };
+
+
+
+// ==== PRESUPUESTO POR LONG PRESS EN LISTA DE PRECIOS ====
+var presupuestoSeleccionados=[]; window.presupuestoSeleccionados=presupuestoSeleccionados;
+var pressTimer=null;
+var pressTarget=null;
+
+function isProductoSeleccionado(nombre){
+  return presupuestoSeleccionados.some(p=> p.nombre===nombre);
+}
+function toggleProductoSeleccionado(prod){
+  const idx=presupuestoSeleccionados.findIndex(p=> p.nombre===prod.nombre);
+  if(idx>=0){
+    presupuestoSeleccionados.splice(idx,1); window.presupuestoSeleccionados=presupuestoSeleccionados;
+  } else {
+    presupuestoSeleccionados.push({...prod, cantidad:1}); window.presupuestoSeleccionados=presupuestoSeleccionados;
+  }
+  actualizarFabPresupuesto();
+  renderPrecios();
+}
+function actualizarFabPresupuesto(){
+  const fab=document.getElementById('presupuestoFab');
+  const countEl=document.getElementById('presupuestoCount');
+  if(!fab || !countEl) return;
+  if(presupuestoSeleccionados.length===0){
+    fab.classList.remove('show');
+    setTimeout(()=>{ if(presupuestoSeleccionados.length===0) fab.style.display='none'; }, 300);
+  } else {
+    fab.style.display='flex';
+    setTimeout(()=> fab.classList.add('show'), 10);
+    countEl.textContent=presupuestoSeleccionados.length + ' producto' + (presupuestoSeleccionados.length>1?'s':'');
+  }
+}
+function renderPresupuestoModal(){
+  const cont=document.getElementById('presupuestoItems');
+  const totalEl=document.getElementById('presupuestoTotal');
+  if(!cont) return;
+  if(presupuestoSeleccionados.length===0){
+    cont.innerHTML='<div class="empty">No hay productos seleccionados.<br/>Mantené presionado un producto en Lista de Precios para seleccionarlo.</div>';
+    if(totalEl) totalEl.textContent='$0';
+    return;
+  }
+  let total=0;
+  cont.innerHTML=presupuestoSeleccionados.map((p,i)=>{
+    const subtotal=(Number(p.precioUser)||0)*(Number(p.cantidad)||1);
+    total+=subtotal;
+    return `<div style="padding:10px;border-radius:10px;background:rgba(255,255,255,0.6);border:1px solid rgba(0,0,0,0.06);display:flex;gap:10px;align-items:center">
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:700;font-size:13px;word-break:break-word">${p.nombre}</div>
+        <div style="font-size:11px;color:#6b6b76;margin-top:2px">${p.pb? Number(p.pb).toFixed(2)+' PB · ':''}${typeof formatPrecio!=='undefined'?formatPrecio(p.precioUser):'$'+p.precioUser} c/u</div>
+        <div class="presupuesto-qty">
+          <button data-dec="${i}">−</button><span>${p.cantidad}</span><button data-inc="${i}">+</button>
+          <span style="margin-left:auto;font-weight:800;color:#1d7a5c;font-size:12px">${typeof formatPrecio!=='undefined'?formatPrecio(subtotal):'$'+subtotal}</span>
+        </div>
+      </div>
+      <button class="btn btn-danger btn-small" data-del="${i}" style="width:30px;padding:6px">✕</button>
+    </div>`;
+  }).join('');
+  if(totalEl) totalEl.textContent= (typeof formatPrecio!=='undefined'?formatPrecio(total):'$'+total);
+  cont.querySelectorAll('[data-inc]').forEach(b=>{ b.onclick=()=>{ const idx=+b.dataset.inc; presupuestoSeleccionados[idx].cantidad=(Number(presupuestoSeleccionados[idx].cantidad)||1)+1; renderPresupuestoModal(); actualizarFabPresupuesto(); }; });
+  cont.querySelectorAll('[data-dec]').forEach(b=>{ b.onclick=()=>{ const idx=+b.dataset.dec; const cur=Number(presupuestoSeleccionados[idx].cantidad)||1; if(cur>1){ presupuestoSeleccionados[idx].cantidad=cur-1; } else { presupuestoSeleccionados.splice(idx,1); window.presupuestoSeleccionados=presupuestoSeleccionados; if(presupuestoSeleccionados.length===0){ document.getElementById('modalPresupuesto')?.classList.remove('open'); } } renderPresupuestoModal(); actualizarFabPresupuesto(); renderPrecios(); }; });
+  cont.querySelectorAll('[data-del]').forEach(b=>{ b.onclick=()=>{ presupuestoSeleccionados.splice(+b.dataset.del,1); window.presupuestoSeleccionados=presupuestoSeleccionados; renderPresupuestoModal(); actualizarFabPresupuesto(); renderPrecios(); if(presupuestoSeleccionados.length===0) document.getElementById('modalPresupuesto')?.classList.remove('open'); }; });
+}
+function generarPDFPresupuesto(){
+  const cliente=(document.getElementById('presupuestoCliente')?.value||'').trim();
+  if(!cliente){ alert('Ingresá el nombre de la persona que recibe el presupuesto'); document.getElementById('presupuestoCliente')?.focus(); return; }
+  if(presupuestoSeleccionados.length===0){ alert('No hay productos seleccionados'); return; }
+  try{
+    const { jsPDF } = window.jspdf;
+    const doc=new jsPDF({unit:'mm',format:'a4'});
+    const pageW=doc.internal.pageSize.getWidth();
+    let y=18;
+    doc.setFont('helvetica','bold'); doc.setFontSize(16); doc.text('Presupuesto', 14, y); y+=8;
+    doc.setFont('helvetica','normal'); doc.setFontSize(10); doc.text('Fecha: '+ new Date().toLocaleDateString('es-AR'), 14, y); y+=6; doc.text('Cliente: '+cliente, 14, y); y+=6; doc.text('Vendedor: ___________________', 14, y); y+=10;
+    doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setFillColor(240,240,240); doc.rect(14, y-5, pageW-28, 8, 'F'); doc.text('Producto', 16, y); doc.text('PB', 110, y); doc.text('Cant.', 125, y); doc.text('Precio', 145, y); doc.text('Subtotal', 170, y); y+=8; doc.setFont('helvetica','normal'); doc.setFontSize(10);
+    let total=0;
+    for(const p of presupuestoSeleccionados){
+      const cant=Number(p.cantidad)||1; const precio=Number(p.precioUser)||0; const sub=cant*precio; total+=sub;
+      if(y>270){ doc.addPage(); y=20; }
+      const nombreLines=doc.splitTextToSize(p.nombre, 85);
+      doc.text(nombreLines, 16, y);
+      const pbText=p.pb? Number(p.pb).toFixed(2)+' PB' : '-';
+      doc.text(pbText, 110, y);
+      doc.text(String(cant), 125, y, {align:'center'});
+      doc.text((typeof formatPrecio!=='undefined'?formatPrecio(precio).replace('$','').trim():String(precio)), 145, y, {align:'right'});
+      doc.text((typeof formatPrecio!=='undefined'?formatPrecio(sub).replace('$','').trim():String(sub)), 175, y, {align:'right'});
+      y+= Math.max(6, nombreLines.length*5);
+      doc.setDrawColor(230,230,230); doc.line(14, y-2, pageW-14, y-2); y+=2;
+    }
+    y+=6; doc.setFont('helvetica','bold'); doc.setFontSize(13); doc.text('Total estimado: '+(typeof formatPrecio!=='undefined'?formatPrecio(total):'$'+total), pageW-14, y, {align:'right'});
+    y+=12; doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(120,120,120); doc.text('Presupuesto válido por 7 días. Precios en ARS. Incluye IVA donde corresponda.', 14, y); y+=5; doc.text('Generado desde APPI - Lista de Precios oficial', 14, y);
+    const fileName='Presupuesto_'+cliente.replace(/[^a-z0-9]/gi,'_')+'_'+new Date().toISOString().split('T')[0]+'.pdf';
+    doc.save(fileName);
+    if(typeof showToast==='function') showToast('PDF generado 📄');
+  }catch(e){ console.error(e); alert('Error generando PDF: '+e.message); }
+}
+function findProductoByNombre(nombreVisible){
+  try{
+    const allRaw=localStorage.getItem('preciosCruzadosOficiales') || localStorage.getItem('preciosUsuarioOficial') || '';
+    if(allRaw){
+      const arr=JSON.parse(allRaw);
+      const limpio=nombreVisible.replace(/🔄 Canje/g,'').trim();
+      for(const p of arr){
+        if(p.nombre && (p.nombre===limpio || p.nombre.includes(limpio) || limpio.includes(p.nombre) || p.nombre.toLowerCase().includes(limpio.toLowerCase()) )){
+          return p;
+        }
+      }
+    }
+  }catch(e){}
+  return {nombre: nombreVisible, pb:0, precioUser:0, original:nombreVisible};
+}
+var longPressActive=false;
+function attachLongPressHandlers(){
+  const container=document.getElementById('preciosContent');
+  if(!container) return;
+  container.querySelectorAll('.person-item').forEach(el=>{
+    if(el.dataset.longPressBound==='1') return;
+    el.dataset.longPressBound='1';
+    const nombre=el.querySelector('.pi-name')?.textContent?.trim() || '';
+    const prod=findProductoByNombre(nombre);
+    if(!prod) return;
+    const startPress=(e)=>{
+      e.preventDefault();
+      pressTarget=el;
+      longPressActive=false;
+      pressTimer=setTimeout(()=>{
+        longPressActive=true;
+        try{ if(navigator.vibrate) navigator.vibrate(50); }catch(err){}
+        toggleProductoSeleccionado(prod);
+        el.classList.toggle('selected', isProductoSeleccionado(prod.nombre));
+        try{ haptic(15); }catch(err){}
+      }, 500);
+    };
+    const cancelPress=()=>{
+      if(pressTimer){ clearTimeout(pressTimer); pressTimer=null; }
+      pressTarget=null;
+      setTimeout(()=>{ longPressActive=false; }, 100);
+    };
+    el.addEventListener('touchstart', startPress, {passive:false});
+    el.addEventListener('touchend', cancelPress);
+    el.addEventListener('touchcancel', cancelPress);
+    el.addEventListener('touchmove', cancelPress);
+    el.addEventListener('mousedown', startPress);
+    el.addEventListener('mouseup', cancelPress);
+    el.addEventListener('mouseleave', cancelPress);
+    el.addEventListener('click', (e)=>{
+      if(longPressActive){ e.preventDefault(); longPressActive=false; return; }
+      if(presupuestoSeleccionados.length>0){
+        e.preventDefault();
+        toggleProductoSeleccionado(prod);
+        el.classList.toggle('selected', isProductoSeleccionado(prod.nombre));
+      }
+    });
+    el.addEventListener('contextmenu', (e)=>{
+      if(presupuestoSeleccionados.length>0 || pressTimer){
+        e.preventDefault();
+        return false;
+      }
+    });
+  });
+}
+const _origRenderPreciosPresupuesto = renderPrecios;
+renderPrecios = function(){
+  _origRenderPreciosPresupuesto();
+  setTimeout(attachLongPressHandlers, 200);
+  setTimeout(()=>{
+    document.querySelectorAll('#preciosContent .person-item').forEach(el=>{
+      const nombre=el.querySelector('.pi-name')?.textContent?.trim()||'';
+      if(isProductoSeleccionado(nombre) || presupuestoSeleccionados.some(p=> nombre.includes(p.nombre)|| p.nombre.includes(nombre))){
+        el.classList.add('selected');
+      }
+    });
+  }, 300);
+};
+document.addEventListener('DOMContentLoaded', ()=>{
+  const fab=document.getElementById('presupuestoFab');
+  if(fab){
+    fab.onclick=()=>{
+      renderPresupuestoModal();
+      document.getElementById('modalPresupuesto')?.classList.add('open');
+    };
+  }
+  document.getElementById('closePresupuesto')?.addEventListener('click',()=> document.getElementById('modalPresupuesto')?.classList.remove('open'));
+  document.getElementById('btnPresupuestoCancelar')?.addEventListener('click',()=> document.getElementById('modalPresupuesto')?.classList.remove('open'));
+  document.getElementById('btnPresupuestoPDF')?.addEventListener('click', generarPDFPresupuesto);
+  document.getElementById('modalPresupuesto')?.addEventListener('click', (e)=>{
+    if(e.target.id==='modalPresupuesto') e.currentTarget.classList.remove('open');
+  });
+});
 
 
 // Verificar al arrancar
