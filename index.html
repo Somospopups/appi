@@ -1277,7 +1277,8 @@
   }
   .cat-bar-row .cb-bar-wrap {
     flex: 1; height: 22px; border-radius: 8px;
-    background: rgba(80,90,130,0.08); overflow: hidden; position: relative;
+    background: rgba(80,90,130,0.14); overflow: hidden; position: relative;
+    box-shadow: inset 0 0 0 1px rgba(80,90,130,0.12);
   }
   .cat-bar-row .cb-bar {
     height: 100%; border-radius: 8px;
@@ -1285,6 +1286,7 @@
     color: #fff; font-size: 11px; font-weight: 800;
     transition: width .6s cubic-bezier(0.34,1.56,0.64,1);
     min-width: 30px;
+    box-shadow: 0 2px 6px rgba(80,90,130,0.18);
   }
   .cat-bar-row .cb-count {
     font-size: 12px; font-weight: 800; color: #3d63c9;
@@ -1424,7 +1426,7 @@
     background: rgba(255,255,255,0.10);
   }
   body.dark .tree-node .tree-name {
-    color: #e8e8ec;
+    color: #f0f0f5;
   }
   body.dark .tree-node .tree-pts {
     color: #a8b8ff;
@@ -1466,7 +1468,7 @@
   }
   .tree-node .tree-name {
     flex: 1; font-size: 13.5px;
-    color: #2a2a34;
+    color: #1c1c1e;
     font-weight: 600;
     min-width: 0;
     white-space: nowrap;
@@ -1492,7 +1494,7 @@
     line-height: 1;
   }
   .tree-node .tree-pts.zero {
-    color: #a0a0b0;
+    color: #b0b0ba;
     background: rgba(160,160,176,0.10);
   }
  .tree-children {
@@ -2267,7 +2269,7 @@
   body.dark .stat-card .st-val.orange { color: #ffb84d; }
   body.dark .stat-card .st-val.purple { color: #c9a0ff; }
   body.dark .cat-bar-row .cb-name { color: #d0d0d8; }
-  body.dark .cat-bar-row .cb-bar-wrap { background: rgba(255,255,255,0.08); }
+  body.dark .cat-bar-row .cb-bar-wrap { background: rgba(255,255,255,0.16); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.14); }
   body.dark .cat-bar-row .cb-count { color: #a8b8ff; }
   body.dark .tree-node:hover { background: rgba(91,141,239,0.10); }
   body.dark .tree-node .tree-arrow { color: #a0a0b0; }
@@ -3242,6 +3244,31 @@ body.dark .lock-footer { color: #6b6b76; }
 
 /* ALERTAS EQUIPO */
 .alerta-card{padding:12px 14px;border-radius:16px;margin-bottom:8px;display:flex;gap:10px;align-items:flex-start;background:rgba(255,255,255,.65);border:1px solid rgba(255,255,255,.8);border-left:4px solid var(--alertColor,#f5b301);box-shadow:0 6px 16px rgba(80,90,130,.06)}
+/* EQUIPO EN CRECIMIENTO: tarjeta única con acordeón animado */
+.eq-crecimiento{border-radius:18px;overflow:hidden;background:rgba(255,255,255,.72);border:1px solid rgba(255,255,255,.85);box-shadow:0 10px 25px rgba(80,90,130,.10);margin-bottom:14px}
+.eqc-head{display:flex;width:100%;align-items:center;gap:11px;padding:14px 15px;border:0;background:linear-gradient(135deg,rgba(245,179,1,.16),rgba(255,143,107,.08));cursor:pointer;text-align:left;font:inherit;-webkit-tap-highlight-color:transparent}
+.eqc-head:active{background:linear-gradient(135deg,rgba(245,179,1,.24),rgba(255,143,107,.14))}
+.eqc-icon{font-size:23px;line-height:1}
+.eqc-titles{flex:1;min-width:0}
+.eqc-titles b{display:block;font-size:13px;font-weight:900;color:#a3670b;letter-spacing:.4px;text-transform:uppercase}
+.eqc-titles small{display:block;font-size:11px;color:#6b6b76;margin-top:2px}
+.eqc-badge{background:#a3670b;color:#fff;font-size:11px;font-weight:900;border-radius:999px;padding:2px 9px;flex-shrink:0}
+.eqc-chev{font-size:19px;color:#a3670b;transition:transform .3s ease;flex-shrink:0;line-height:1}
+.eqc-head.open .eqc-chev{transform:rotate(180deg)}
+.eqc-body{max-height:0;overflow:hidden;transition:max-height .35s ease}
+.eqc-banner{display:flex;gap:10px;align-items:flex-start;padding:12px 15px;border-top:1px solid rgba(80,90,130,.10);cursor:pointer;background:rgba(255,255,255,.4);transition:background .12s ease}
+.eqc-banner:active{background:rgba(255,255,255,.85)}
+.eqc-banner .ab-icon{font-size:20px;line-height:1;margin-top:1px}
+.eqc-banner .ab-info{flex:1;min-width:0}
+.eqc-banner .ab-info b{display:block;font-size:12.5px;color:#1c1c27;line-height:1.3}
+.eqc-banner .ab-info span{display:block;font-size:11px;color:#6b6b76;margin-top:2px;line-height:1.35}
+.eqc-banner .ab-cat{font-size:9px;font-weight:900;padding:3px 7px;border-radius:8px;white-space:nowrap;align-self:flex-start;margin-top:2px;flex-shrink:0}
+body.dark .eq-crecimiento{background:rgba(30,30,50,.62);border-color:rgba(255,255,255,.1)}
+body.dark .eqc-titles b{color:#f0c860}
+body.dark .eqc-titles small,body.dark .eqc-banner .ab-info span{color:#a2a2b0}
+body.dark .eqc-banner{background:rgba(255,255,255,.03)}
+body.dark .eqc-banner:active{background:rgba(255,255,255,.09)}
+body.dark .eqc-banner .ab-info b{color:#f0f0f5}
 .alerta-card .al-icon{font-size:20px;line-height:1;margin-top:2px}
 .alerta-card .al-info b{display:block;font-size:13px;color:#1c1c27}
 .alerta-card .al-info span{display:block;font-size:11.5px;color:#6b6b76;margin-top:2px;line-height:1.35}
@@ -3678,12 +3705,12 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
       <div class="career-card">
         <h3>📘 Glosario</h3>
         <div style="margin-top:10px">
-          <div style="padding:12px;border-radius:12px;background:rgba(255,255,255,.6);margin-bottom:8px"><b style="color:#3d63c9">PB (Puntos Bonificables)</b><br/><span style="font-size:12.5px;color:#5c5c66">Cada producto vale cierta cantidad de PB. Tus PB personales determinan tu categoría y comisiones. Ej: Senior 4 ~ 4-5 PB.</span></div>
-          <div style="padding:12px;border-radius:12px;background:rgba(255,255,255,.6);margin-bottom:8px"><b style="color:#1d7a5c">❤️ Corazón</b><br/><span style="font-size:12.5px;color:#5c5c66">Presentación completa del negocio a un invitado con seguimiento. 5 corazones = requisito para pasar a CE. Representa actividad de patrocinio.</span></div>
-          <div style="padding:12px;border-radius:12px;background:rgba(255,255,255,.6);margin-bottom:8px"><b style="color:#a3670b">🤝 Patrocinio</b><br/><span style="font-size:12.5px;color:#5c5c66">Persona que vos ingresás directamente al equipo. Si hace 9 PB, te ayuda a calificar bonus.</span></div>
-          <div style="padding:12px;border-radius:12px;background:rgba(255,255,255,.6);margin-bottom:8px"><b style="color:#7a4bd9">(A+B) / (A+B+C)</b><br/><span style="font-size:12.5px;color:#5c5c66">A=PB personales del mes, B=PB de organizaciones en mes presente, C=PB mes anterior. Usado para pase y mantenimiento.</span></div>
-          <div style="padding:12px;border-radius:12px;background:rgba(255,255,255,.6);margin-bottom:8px"><b style="color:#d9534f">Mes Arrastre vs Calendario</b><br/><span style="font-size:12.5px;color:#5c5c66">Arrastre: 30 días corridos desde tu fecha de alta. Calendario: mes natural del 1 al 30/31.</span></div>
-          <div style="padding:12px;border-radius:12px;background:rgba(255,255,255,.6);margin-bottom:8px"><b>🎯 PB Sólido</b><br/><span style="font-size:12.5px;color:#5c5c66">PB necesarios para cobrar la ganancia sólida de la categoría (150 PB DC, 600 PB CE, etc). Es un premio extra por alcanzar volumen organizacional.</span></div>
+          <div class="glosario-card"><b class="gl-blue">PB (Puntos Bonificables)</b><br/><span class="gl-desc">Cada producto vale cierta cantidad de PB. Tus PB personales determinan tu categoría y comisiones. Ej: Senior 4 ~ 4-5 PB.</span></div>
+          <div class="glosario-card"><b class="gl-green">❤️ Corazón</b><br/><span class="gl-desc">Presentación completa del negocio a un invitado con seguimiento. 5 corazones = requisito para pasar a CE. Representa actividad de patrocinio.</span></div>
+          <div class="glosario-card"><b class="gl-amber">🤝 Patrocinio</b><br/><span class="gl-desc">Persona que vos ingresás directamente al equipo. Si hace 9 PB, te ayuda a calificar bonus.</span></div>
+          <div class="glosario-card"><b class="gl-purple">(A+B) / (A+B+C)</b><br/><span class="gl-desc">A=PB personales del mes, B=PB de organizaciones en mes presente, C=PB mes anterior. Usado para pase y mantenimiento.</span></div>
+          <div class="glosario-card"><b class="gl-red">Mes Arrastre vs Calendario</b><br/><span class="gl-desc">Arrastre: 30 días corridos desde tu fecha de alta. Calendario: mes natural del 1 al 30/31.</span></div>
+          <div class="glosario-card"><b class="gl-dark">🎯 PB Sólido</b><br/><span class="gl-desc">PB necesarios para cobrar la ganancia sólida de la categoría (150 PB DC, 600 PB CE, etc). Es un premio extra por alcanzar volumen organizacional.</span></div>
         </div>
       </div>
       <div class="career-card"><h3>🎨 Colores por categoría</h3><p style="font-size:12px;color:#6b6b76;margin:0 0 10px">Actualizado según identidad de marca para coherencia visual.</p><div id="careerColorLegend"></div></div>
@@ -3790,6 +3817,9 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
       <div class="script">Equipo</div>
       <p id="equipoSubtitle">Cargá tu planilla para empezar</p>
     </header>
+
+    <!-- EQUIPO EN CRECIMIENTO: panel de notificaciones (arriba de las pestañas) -->
+    <div id="equipoAlertasWrap" style="display:none"></div>
 
     <div class="equipo-tabs" id="equipoTabsWrap" style="display:none">
       <button class="equipo-tab active" data-eqtab="dashboard">
@@ -5457,6 +5487,8 @@ function renderEquipo(){
   const tabsWrap = document.getElementById('equipoTabsWrap');
   const bottomActs = document.getElementById('equipoBottomActions');
   const dangerActs = document.getElementById('equipoDangerActions');
+  // Panel "EQUIPO EN CRECIMIENTO" (arriba de las pestañas, en todas las tabs)
+  renderAlertasEquipo();
   if(!equipoData || !equipoData.personas || equipoData.personas.length === 0){
     tabsWrap.style.display = 'none';
     bottomActs.style.display = 'none';
@@ -5844,13 +5876,17 @@ function renderEquipoDashboard(){
         const info = catInfoOf(c);
         const cnt = porCat[c];
         const pct = maxCat > 0 ? (cnt/maxCat)*100 : 0;
-       const barColor = info.color === '#ffffff' ? '#c0c0c8' : info.color;
+       // Mantener el color de identidad de cada categoría (DJ gris claro, D blanco)
+      const esClara = info.color === '#ffffff' || info.color === '#e8e8ec';
+      const barColor = info.color;
+      const barraBorde = info.color === '#ffffff' ? 'border:1.5px solid #c8c8d4;' : (info.color === '#e8e8ec' ? 'border:1.5px solid #c0c0c8;' : '');
+      const barraShadow = esClara ? 'box-shadow:0 2px 6px rgba(80,90,130,0.22);' : '';
         const barTextColor = info.textColor || '#fff';
         return `
         <div class="cat-bar-row clickable" data-goto="${c}">
           <div class="cb-name">${info.name}</div>
           <div class="cb-bar-wrap">
-            <div class="cb-bar" style="width:${pct}%; background:${barColor}; color:${barTextColor}">${cnt}</div>
+            <div class="cb-bar" style="width:${pct}%; background:${barColor}; color:${barTextColor}; ${barraBorde} ${barraShadow}">${cnt}</div>
           </div>
           <div class="cb-count">${cnt}</div>
         </div>`;
@@ -6068,7 +6104,7 @@ function renderEquipoArbol(){
   const cont = document.getElementById('equipoContent');
   const titulo = `<div style="display:flex;align-items:center;gap:10px;margin:8px 4px 12px">
     <div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(80,90,130,0.25),transparent)"></div>
-    <h3 style="margin:0;font-size:12px;font-weight:800;color:#5c5c66;letter-spacing:2px;text-transform:uppercase">🌳 Equipo Base</h3>
+    <h3 class="eq-base-title">🌳 Equipo Base</h3>
     <div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(80,90,130,0.25),transparent)"></div>
   </div>`;
   cont.innerHTML = titulo + `<div id="treeContainer">${renderTreeListaHTML()}</div>`;
@@ -6081,6 +6117,9 @@ function renderTreeListaHTML(){
   return html;
 }
 function renderTreeNodeLista(p){
+  // Modo noche: nombres y puntajes en BLANCO (inline para que nada los pise)
+  const darkMode = (typeof document!=='undefined') && document.body && document.body.classList.contains('dark');
+  const txtBlanco = darkMode ? 'color:#ffffff !important;' : '';
   const info = catInfoOf(p.cat);
   const hasKids = p.hijos && p.hijos.length > 0;
   const isExpanded = equipoExpanded.has(p.id);
@@ -6089,7 +6128,7 @@ function renderTreeNodeLista(p){
   const tieneEquipo = ptsOrg > pts;
   const g = p.garantias;
   const tieneGarantias = g && (g.presentadas > 0 || g.pendientes > 0);
-  const hijosText = hasKids ? ` <span style="font-size:11px;color:#8a8a94;font-weight:500">(${p.hijos.length})</span>` : '';
+  const hijosText = hasKids ? ` <span class="tree-kids" style="${txtBlanco}">(${p.hijos.length})</span>` : '';
   
   // Estilo del badge según la categoría
   const badgeTextColor = info.textColor || '#fff';
@@ -6103,12 +6142,12 @@ function renderTreeNodeLista(p){
     <span class="tree-arrow">▶</span>
     <span class="tree-cat-badge" style="${badgeStyle}">${info.name}</span>
     <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
-      <span class="tree-name ${pts===0?'inactive':''}">${escapeXml(p.nombre)}${hijosText}</span>
-      ${tieneGarantias ? `<span style="font-size:10.5px;font-weight:600;color:#a3670b;line-height:1.3">📄 ${formatPB(g.presentadas)} · ⚠️ ${formatPB(g.vencidas)} (${formatPB(g.porcVencidas)}%) · ⏳ ${formatPB(g.pendientes)}</span>` : ''}
+      <span class="tree-name ${pts===0?'inactive':''}" style="${txtBlanco}">${escapeXml(p.nombre)}${hijosText}</span>
+      ${tieneGarantias ? `<span class="tree-gar">📄 ${formatPB(g.presentadas)} · ⚠️ ${formatPB(g.vencidas)} (${formatPB(g.porcVencidas)}%) · ⏳ ${formatPB(g.pendientes)}</span>` : ''}
     </div>
     <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex:none">
-      <span class="tree-pts ${pts===0?'zero':''}">👤 ${formatPB(pts)}</span>
-      ${tieneEquipo ? `<span style="font-size:10.5px;font-weight:700;color:#7a4bd9;padding:2px 8px;background:rgba(160,107,255,0.12);border-radius:999px;line-height:1">👥 ${formatPB(ptsOrg)}</span>` : ''}
+      <span class="tree-pts ${pts===0?'zero':''}" style="${txtBlanco}">👤 ${formatPB(pts)}</span>
+      ${tieneEquipo ? `<span class="tree-org" style="${txtBlanco}">👥 ${formatPB(ptsOrg)}</span>` : ''}
     </div>
   </div>`;
   
@@ -8358,7 +8397,7 @@ function renderPrecios(){
     }catch(e){}
     if(productos.length===0){
       try{
-        const userRaw=localStorage.getItem('preciosUsuarioOficial') || localStorage.getItem('preciosUsuario') || localStorage.getItem('test_user');
+        const userRaw=localStorage.getItem('preciosUsuarioOficial') || localStorage.getItem('preciosUsuario');
         if(userRaw){
           const arr=JSON.parse(userRaw);
           if(Array.isArray(arr)&&arr.length>0){
@@ -8561,7 +8600,7 @@ function procesarArchivoPrecios(file, tipo){
       renderHomeCompleto();
     }catch(err){
       console.error(err);
-      modal.open({icon:'⚠️',title:'Error leyendo Excel',html:`<p>No se pudo leer el archivo.</p><div class="tip">${err.message}</div>`});
+      modal.open({icon:'⚠️',title:'Error leyendo Excel',html:`<p>No se pudo leer el archivo.</p><div class="tip">${escapeXml(String(err.message||err))}</div>`});
     }
   };
   reader.readAsArrayBuffer(file);
@@ -8596,7 +8635,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   if(btnShare){ btnShare.onclick=async()=>{ const cruz=cruzarPrecios(); if(cruz.length===0){ showToast('Cargá los 2 archivos primero',1800); return; } let msg=`💰 *Comparativa Precios APPI*\n📅 ${new Date().toLocaleDateString('es-AR')}\n━━━━━━━━━━━━━━━\n\n`; const top=cruz.filter(c=>!c.soloDist&&!c.soloUsuario).sort((a,b)=>b.ganancia-a.ganancia).slice(0,10); top.forEach(c=>{ msg+=`• ${c.nombre}: Dist ${formatPrecio(c.precioDist)} → User ${formatPrecio(c.precioUser)} = Gana ${formatPrecio(c.ganancia)} (${Math.round(c.margen)}%)\n`; }); msg+=`\n📊 Total cruzados: ${cruz.filter(c=>!c.soloDist&&!c.soloUsuario).length} productos\n💵 Ganancia total potencial: ${formatPrecio(cruz.reduce((s,c)=>s+(c.ganancia>0?c.ganancia:0),0))}\n\nEnviado desde *APPI* 🚀`; try{ if(navigator.share){ await navigator.share({title:'Precios APPI', text:msg}); return; } }catch(e){} window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank'); }; }
 
   const btnExport=document.getElementById('btnPreciosExport');
-  if(btnExport){ btnExport.onclick=()=>{ const cruz=cruzarPrecios(); if(cruz.length===0){ showToast('Nada para exportar',1500); return; } let csv='Producto,PB,Precio Distribuidor,Precio Usuario,Ganancia,Margen %\n'; cruz.forEach(c=>{ csv+=`"${c.nombre.replace(/"/g,'""')}",${c.pb},${c.precioDist},${c.precioUser},${c.ganancia},${Math.round(c.margen)}\n`; }); const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`comparativa_precios_${new Date().toISOString().split('T')[0]}.csv`; a.click(); URL.revokeObjectURL(url); showToast('CSV exportado 📤'); }; }
+  if(btnExport){ btnExport.onclick=()=>{ const cruz=cruzarPrecios(); if(cruz.length===0){ showToast('Nada para exportar',1500); return; } let csv='Producto,PB,Precio Distribuidor,Precio Usuario,Ganancia,Margen %\n'; cruz.forEach(c=>{ csv+=`"${c.nombre.replace(/"/g,'""')}",${c.pb},${c.precioDist},${c.precioUser},${c.ganancia},${c.soloUsuario||c.soloDist?'—':Math.round(c.margen)}\n`; }); const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`comparativa_precios_${hoyLocal()}.csv`; a.click(); URL.revokeObjectURL(url); showToast('CSV exportado 📤'); }; }
 
   loadPreciosFromStorage();
 });
@@ -8655,36 +8694,54 @@ function generarAlertasEquipo(){
 function renderAlertasEquipo(){
   const cont=document.getElementById('equipoAlertasWrap');
   if(!cont) return;
+  // Sin equipo cargado o sin alertas: ocultar el panel
+  if(!equipoData || !equipoData.personas || equipoData.personas.length===0){ cont.style.display='none'; return; }
   const alertas=generarAlertasEquipo();
-  if(alertas.length===0){
-    cont.innerHTML='<div style="padding:12px;text-align:center;color:#8a8a94;font-size:12.5px">✅ No hay alertas urgentes. ¡Buen trabajo!</div>';
-    return;
-  }
-  cont.innerHTML=`<div style="margin-bottom:8px;display:flex;align-items:center;justify-content:space-between"><h4 style="margin:0;font-size:13px;font-weight:900;color:#a3670b;text-transform:uppercase;letter-spacing:.4px">⚠️ Cerca de calificar (${alertas.length})</h4><button class="filter-chip" onclick="this.closest('#equipoAlertasWrap').querySelectorAll('.alerta-card').forEach((c,i)=>{if(i>=3)c.style.display=c.style.display==='none'?'flex':'none'}); this.textContent=this.textContent==='Ver todas'?'Ver menos':'Ver todas'" style="font-size:11px">Ver todas</button></div>`+
-    alertas.map((a,i)=>`<div class="alerta-card" style="--alertColor:${a.color};${i>=3?'display:none':''}" data-persona="${a.persona.id}"><div class="al-icon">${a.icon}</div><div class="al-info"><b>${a.msg}</b><span>${a.detalle} · ${catInfoOf(a.persona.cat).name} · ${a.persona.pnAct||0} PB</span><div class="al-action"><button onclick="openPersonaModal(equipoData.personas.find(x=>x.id===${a.persona.id})); haptic(10)">Ver ficha</button></div></div></div>`).join('');
+  if(alertas.length===0){ cont.style.display='none'; return; }
+  cont.style.display='block';
+  const sust=alertas.length===1?'persona está cerca de calificar':'personas están cerca de calificar';
+  cont.innerHTML=`<div class="eq-crecimiento">
+    <button class="eqc-head" id="eqcHead" aria-expanded="false">
+      <span class="eqc-icon">📈</span>
+      <span class="eqc-titles">
+        <b>EQUIPO EN CRECIMIENTO</b>
+        <small>${alertas.length} ${sust}</small>
+      </span>
+      <span class="eqc-badge">${alertas.length}</span>
+      <span class="eqc-chev">⌄</span>
+    </button>
+    <div class="eqc-body" id="eqcBody">
+      ${alertas.map((a)=>{ const info=catInfoOf(a.persona.cat); return `<div class="eqc-banner" data-persona="${a.persona.id}"><div class="ab-icon">${a.icon}</div><div class="ab-info"><b>${a.msg}</b><span>${a.detalle} · ${info.name} · ${a.persona.pnAct||0} PB</span></div><span class="ab-cat" style="${catBadgeStyle(info)}">${info.name}</span></div>`; }).join('')}
+    </div>
+  </div>`;
+  // Acordeón: presionar la cabecera despliega/contrae con animación
+  const head=document.getElementById('eqcHead');
+  const body=document.getElementById('eqcBody');
+  let abierto=false;
+  head.onclick=()=>{
+    abierto=!abierto;
+    if(abierto){
+      body.style.maxHeight=body.scrollHeight+'px';
+      head.setAttribute('aria-expanded','true');
+      head.classList.add('open');
+      haptic(10);
+    } else {
+      body.style.maxHeight='0px';
+      head.setAttribute('aria-expanded','false');
+      head.classList.remove('open');
+    }
+  };
+  // Tap en una notificación → ficha de la persona
+  cont.querySelectorAll('.eqc-banner').forEach(b=>{
+    b.onclick=()=>{
+      const p=equipoData.personas.find(x=>x.id===+b.dataset.persona);
+      if(p){ openPersonaModal(p); haptic(10); }
+    };
+  });
 }
 
-// Hook en dashboard equipo para incluir alertas
-const _origRenderEquipoDashboard=renderEquipoDashboard;
-renderEquipoDashboard=function(){
-  _origRenderEquipoDashboard();
-  try{
-    const cont=document.getElementById('equipoContent');
-    if(cont){
-      const wrapId='equipoAlertasWrap';
-      // if already exists, just re-render
-      if(!document.getElementById(wrapId)){
-        const div=document.createElement('div');
-        div.id=wrapId;
-        div.style.marginBottom='14px';
-        // prepend at top of dashboard (cont may contain dashboard html)
-        if(cont.firstChild) cont.insertBefore(div, cont.firstChild);
-        else cont.appendChild(div);
-      }
-      renderAlertasEquipo();
-    }
-  }catch(e){ console.log('alertas error',e); }
-};
+// (El panel "EQUIPO EN CRECIMIENTO" se renderiza desde renderEquipo,
+//  arriba de las pestañas, para que aparezca en todas las pestañas de Mi Equipo)
 
 // ==== HOME APPS ====
 
@@ -8729,7 +8786,8 @@ let seguimientoEditId = null;
 function cargarSeguimientos(){ try { return JSON.parse(localStorage.getItem(SEG_KEY) || '[]'); } catch(e){ return []; } }
 function guardarSeguimientos(list){ localStorage.setItem(SEG_KEY, JSON.stringify(list)); localStorage.setItem('lastUpdate_seguimiento', Date.now().toString()); }
 function fechaSeg(d){ if(!d) return ''; const [y,m,day]=d.split('-'); return `${day}/${m}/${y}`; }
-function seguimientoVencido(p){ return p.fecha && p.fecha < new Date().toISOString().slice(0,10) && p.estado !== 'No le interesa'; }
+function hoyLocal(){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function seguimientoVencido(p){ return p.fecha && p.fecha < hoyLocal() && p.estado !== 'No le interesa'; }
 function seguimientoPendientes(){ return cargarSeguimientos().filter(p=>p.estado !== 'No le interesa').length; }
 function seguimientoProgreso(){ const a=cargarSeguimientos(); if(!a.length) return 0; return Math.round(a.filter(p=>p.estado==='Cliente').length/a.length*100); }
 function openSeguimiento(){ showView('view-seguimiento'); }
@@ -8739,7 +8797,7 @@ function segDigits(phone){return String(phone||'').replace(/\D/g,'')}
 function segContactActions(p){const d=segDigits(p.telefono);if(!d)return '';const msg=encodeURIComponent(`Hola ${p.nombre}, ¿cómo estás?`);return `<div class="seg-contact-actions"><a class="wa-msg" title="Contactar por WhatsApp" aria-label="Contactar por WhatsApp" href="https://wa.me/${d}?text=${msg}" target="_blank" rel="noopener">💬 Contactar por WhatsApp</a><a class="phone-call" title="Llamar al contacto" aria-label="Llamar al contacto" href="tel:${d}">📞 Llamar por teléfono</a></div>`}
 function renderSeguimiento(){
   const all=cargarSeguimientos();
-  const hoy=new Date().toISOString().slice(0,10);
+  const hoy=hoyLocal();
   const pendientes=all.filter(p=>p.estado !== 'No le interesa');
   const hoyCount=pendientes.filter(p=>p.fecha===hoy).length;
   const vencidos=pendientes.filter(seguimientoVencido).length;
@@ -9566,24 +9624,31 @@ function generarPDFPresupuesto(){
     let y=18;
     doc.setFont('helvetica','bold'); doc.setFontSize(16); doc.text('Presupuesto', 14, y); y+=8;
     doc.setFont('helvetica','normal'); doc.setFontSize(10); doc.text('Fecha: '+ new Date().toLocaleDateString('es-AR'), 14, y); y+=6; doc.text('Cliente: '+cliente, 14, y); y+=6; doc.text('Vendedor: ___________________', 14, y); y+=10;
-    doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setFillColor(240,240,240); doc.rect(14, y-5, pageW-28, 8, 'F'); doc.text('Producto', 16, y); doc.text('PB', 110, y); doc.text('Cant.', 125, y); doc.text('Precio', 145, y); doc.text('Subtotal', 170, y); y+=8; doc.setFont('helvetica','normal'); doc.setFontSize(10);
+        const dibujarEncabezado=()=>{
+      doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setFillColor(240,240,240); doc.rect(14, y-5, pageW-28, 8, 'F');
+      doc.text('Producto', 16, y); doc.text('PB', 110, y, {align:'right'}); doc.text('Cant.', 125, y, {align:'center'}); doc.text('Precio', 145, y, {align:'right'}); doc.text('Subtotal', 175, y, {align:'right'});
+      y+=8; doc.setFont('helvetica','normal'); doc.setFontSize(10);
+    };
+    dibujarEncabezado();
     let total=0;
     for(const p of presupuestoSeleccionados){
       const cant=Number(p.cantidad)||1; const precio=Number(p.precioUser)||0; const sub=cant*precio; total+=sub;
-      if(y>270){ doc.addPage(); y=20; }
       const nombreLines=doc.splitTextToSize(p.nombre, 85);
+      const rowH=Math.max(6, nombreLines.length*5)+2;
+      if(y+rowH>275){ doc.addPage(); y=20; dibujarEncabezado(); }
       doc.text(nombreLines, 16, y);
       const pbText=p.pb? Number(p.pb).toFixed(2)+' PB' : '-';
-      doc.text(pbText, 110, y);
+      doc.text(pbText, 110, y, {align:'right'});
       doc.text(String(cant), 125, y, {align:'center'});
       doc.text((typeof formatPrecio!=='undefined'?formatPrecio(precio).replace('$','').trim():String(precio)), 145, y, {align:'right'});
       doc.text((typeof formatPrecio!=='undefined'?formatPrecio(sub).replace('$','').trim():String(sub)), 175, y, {align:'right'});
       y+= Math.max(6, nombreLines.length*5);
       doc.setDrawColor(230,230,230); doc.line(14, y-2, pageW-14, y-2); y+=2;
     }
+    if(y>275){ doc.addPage(); y=20; }
     y+=6; doc.setFont('helvetica','bold'); doc.setFontSize(13); doc.text('Total estimado: '+(typeof formatPrecio!=='undefined'?formatPrecio(total):'$'+total), pageW-14, y, {align:'right'});
     y+=12; doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(120,120,120); doc.text('Presupuesto válido por 7 días. Precios en ARS. Incluye IVA donde corresponda.', 14, y); y+=5; doc.text('Generado desde APPI - Lista de Precios oficial', 14, y);
-    const fileName='Presupuesto_'+cliente.replace(/[^a-z0-9]/gi,'_')+'_'+new Date().toISOString().split('T')[0]+'.pdf';
+    const fileName='Presupuesto_'+cliente.replace(/[^a-z0-9]/gi,'_')+'_'+hoyLocal()+'.pdf';
     doc.save(fileName);
     if(typeof showToast==='function') showToast('PDF generado 📄');
   }catch(e){ console.error(e); alert('Error generando PDF: '+e.message); }
@@ -9680,14 +9745,12 @@ function attachLongPressHandlers(){
       if(longPressActive){ e.preventDefault(); e.stopPropagation(); longPressActive=false; return; }
       // Si hay movimiento, era scroll, no click para seleccionar
       if(moved) return;
-      if(presupuestoSeleccionados.length>0){
-        e.preventDefault();
+      e.preventDefault();
         e.stopPropagation();
-        toggleProductoSeleccionado(prod);
-        var pid=el.getAttribute('data-prod-id');
-        var sel=pid ? isProductoSeleccionadoById(pid) : isProductoSeleccionado(prod.nombre);
-        el.classList.toggle('selected', sel);
-      }
+      toggleProductoSeleccionado(prod);
+      var pid=el.getAttribute('data-prod-id');
+      var sel=pid ? isProductoSeleccionadoById(pid) : isProductoSeleccionado(prod.nombre);
+      el.classList.toggle('selected', sel);
     });
     el.addEventListener('contextmenu', function(e){
       e.preventDefault();
@@ -9752,12 +9815,13 @@ document.addEventListener('click', function(e){
 
 // Verificar al arrancar
 (async function() {
+  // FIX: verificar blocklist ANTES de arrancar (con timeout por si no hay red)
+  const conTimeout = (p, ms) => Promise.race([p, new Promise(r => setTimeout(() => r(null), ms))]);
+  let bloqueado = false;
+  try { bloqueado = await conTimeout(chequearBlocklist(), 4000); } catch(e){}
+  if (bloqueado === true) { mostrarPantallaBloqueado(); return; }
   if (estaActivada()) {
-    // Iniciar la app inmediatamente
     iniciarApp();
-    // Chequear blocklist en segundo plano
-    const bloqueado = await chequearBlocklist();
-    if (bloqueado) mostrarPantallaBloqueado();
   } else {
     mostrarPantallaBloqueo();
   }
@@ -9772,5 +9836,103 @@ document.addEventListener('click', function(e){
     });
   }
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a24f625ad9475777',t:'MTc4NTY5Nzg0Mg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+
+<style>
+/* ===== FIXES MODO NOCHE: legibilidad y contraste ===== */
+
+/* --- Glosario de Carrera --- */
+.glosario-card{padding:12px;border-radius:12px;background:rgba(255,255,255,.6);margin-bottom:8px}
+.glosario-card .gl-desc{font-size:12.5px;color:#5c5c66}
+.glosario-card b.gl-blue{color:#3d63c9}
+.glosario-card b.gl-green{color:#1d7a5c}
+.glosario-card b.gl-amber{color:#a3670b}
+.glosario-card b.gl-purple{color:#7a4bd9}
+.glosario-card b.gl-red{color:#d9534f}
+.glosario-card b.gl-dark{color:#1c1c1e}
+body.dark .glosario-card{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.09)}
+body.dark .glosario-card .gl-desc{color:#b8b8c4}
+body.dark .glosario-card b.gl-blue{color:#8fb2ff}
+body.dark .glosario-card b.gl-green{color:#3ddc9d}
+body.dark .glosario-card b.gl-amber{color:#f0c860}
+body.dark .glosario-card b.gl-purple{color:#c9a0ff}
+body.dark .glosario-card b.gl-red{color:#ff8f95}
+body.dark .glosario-card b.gl-dark{color:#f0f0f5}
+
+/* --- Carrera --- */
+body.dark .career-rule{background:rgba(91,141,239,.20);color:#d0d8f0}
+body.dark .career-rule b{color:#a8c0ff}
+body.dark .career-big{color:#a8c0ff}
+body.dark .career-small,body.dark .career-label{color:#a0a0b0}
+body.dark .level-desc{color:#b0b0bc}
+body.dark .career-card p{color:#a0a0b0}
+
+/* --- Seguimientos --- */
+body.dark .seg-badge{background:rgba(91,141,239,.22);color:#a8c0ff}
+body.dark .seg-meta,body.dark .seg-card-note-label{color:#a0a0b0}
+body.dark .seg-row-phone,body.dark .seg-item-phone{color:#a0a0b0}
+body.dark .seg-item-actions button{background:rgba(91,141,239,.22);color:#a8c0ff}
+body.dark .seg-contact-actions .phone-call{background:rgba(91,141,239,.20);color:#a8c0ff}
+body.dark .seg-contact-actions .wa-msg{background:rgba(37,211,102,.18);color:#4fd68f}
+body.dark .seg-contact-actions .wa-call{background:rgba(37,211,102,.14);color:#4fd68f}
+
+/* --- Contactos del Equipo --- */
+body.dark .eq-filter,body.dark .eq-type,body.dark .eq-contact-tab{color:#a0a0b0}
+body.dark .eq-contact-badge{background:rgba(91,141,239,.22);color:#a8c0ff}
+body.dark .eq-contact-empty,body.dark .eq-contact-detail-title{color:#a0a0b0}
+body.dark .eq-contact-person small{color:#a0a0b0}
+
+/* --- Ranking / Top --- */
+body.dark .top-item .tp-pts{color:#a8c0ff}
+body.dark .cat-detail-card .tag{background:rgba(91,141,239,.22);color:#a8c0ff}
+
+/* --- Calculadora --- */
+body.dark .calc-tab{color:#a0a0b0}
+body.dark .calc-prod .calc-ctrl .calc-num,body.dark .counter-ctrl .num{color:#a8c0ff}
+body.dark .calc-result .big{color:#a8c0ff}
+
+/* --- Presupuestos --- */
+body.dark .presu-summary .sub,body.dark .presu-income-head .title .sub{color:#a0a0b0}
+
+/* --- EQUIPO EN CRECIMIENTO: flecha y cabecera --- */
+body.dark .eqc-chev{color:#f0c860}
+body.dark .eqc-head{background:linear-gradient(135deg,rgba(245,179,1,.22),rgba(255,143,107,.10))}
+</style>
+
+<style>
+/* ===== V8: TEXTOS CON LOS COLORES DE LA LISTA EN MODO NOCHE ===== */
+
+/* --- Árbol: clases de texto (colores = Lista) --- */
+.eq-base-title{margin:0;font-size:12px;font-weight:800;color:#5c5c66;letter-spacing:2px;text-transform:uppercase}
+body.dark .eq-base-title{color:#a0a0b0}
+.tree-kids{font-size:11px;color:#8a8a94;font-weight:500}
+body.dark .tree-kids{color:#a0a0b0}
+.tree-gar{font-size:10.5px;font-weight:600;color:#a3670b;line-height:1.3}
+body.dark .tree-gar{color:#f0c860}
+.tree-org{font-size:10.5px;font-weight:700;color:#7a4bd9;padding:2px 8px;background:rgba(160,107,255,0.12);border-radius:999px;line-height:1}
+body.dark .tree-org{color:#c9a0ff}
+
+/* --- Overrides globales: aclara textos oscuros en modo noche (todas las páginas) ---
+   Mantiene los colores de identidad de los badges de categoría (usan #1c1c1e/#ffffff) */
+body.dark [style*="color:#5c5c66"]{color:#a0a0b0 !important}
+body.dark [style*="color:#60606d"]{color:#a0a0b0 !important}
+body.dark [style*="color:#6b6b76"]{color:#a0a0b0 !important}
+body.dark [style*="color:#777887"]{color:#a0a0b0 !important}
+body.dark [style*="color:#8a8a94"]{color:#a0a0b0 !important}
+body.dark [style*="color:#50505c"]{color:#b0b0bc !important}
+body.dark [style*="color:#3a3a48"]{color:#d0d0d8 !important}
+body.dark [style*="color:#3d63c9"]{color:#a8b8ff !important}
+body.dark [style*="color:#a3670b"]{color:#f0c860 !important}
+body.dark [style*="color:#7a4bd9"]{color:#c9a0ff !important}
+body.dark [style*="color:#1d7a5c"]{color:#3ddc9d !important}
+</style>
+
+<style>
+/* ===== V9: NOMBRES Y PUNTAJES DEL ÁRBOL EN BLANCO (modo noche) ===== */
+body.dark .tree-node .tree-name{color:#ffffff !important}
+body.dark .tree-node .tree-name.inactive{color:#ffffff !important}
+body.dark .tree-node .tree-pts{color:#ffffff !important}
+body.dark .tree-node .tree-pts.zero{color:#ffffff !important}
+body.dark .tree-node .tree-org{color:#ffffff !important}
+</style>
+</body>
 </html>
