@@ -1,5 +1,5 @@
 // APPI Service Worker - v89 (FIX: caché sin duplicados + precache completo)
-const CACHE_NAME = 'appi-v90';
+const CACHE_NAME = 'appi-v91';
 const ARCHIVOS = [
   './',
   './index.html',
