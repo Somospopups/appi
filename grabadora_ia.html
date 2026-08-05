@@ -84,7 +84,7 @@ header.top .script{font-family:"Snell Roundhand",cursive;font-size:30px;backgrou
   <div style="display:flex;align-items:center;justify-content:space-between;margin:12px 0 6px">
   <label class="label" style="margin:0">📝 Transcripción en vivo</label>
   <label style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;cursor:pointer">
-    <input type="checkbox" id="chkLiveTrans" checked style="width:16px;height:16px"> <span>Activa</span>
+    <input type="checkbox" id="chkLiveTrans" style="width:16px;height:16px"> <span>Transcripción (puede hacer ruido)</span>
   </label>
 </div>
 <div style="font-size:10px;color:#8a8a94;margin-bottom:6px">Si hace ruido cada 4s, desactívala, grabá igual y después resumí</div>
@@ -224,6 +224,7 @@ async function startRecording(){
       stream.getTracks().forEach(t=>t.stop());
     };
     mediaRecorder.start();
+    try{ if(navigator.vibrate) navigator.vibrate(80); }catch(e){}
     startTime=Date.now();
     timerInt=setInterval(updateTimer,500);
     isRecording=true; isPaused=false;
@@ -249,7 +250,7 @@ async function startRecording(){
 function pauseRecording(){
   if(!mediaRecorder) return;
   if(isPaused){
-    mediaRecorder.resume();
+    mediaRecorder.resume(); try{ if(navigator.vibrate) navigator.vibrate([40,30,40]); }catch(e){}
     if(recognition) try{ recognition.start(); }catch(_){}
     isPaused=false;
     elVisual.classList.remove('paused');
@@ -259,7 +260,7 @@ function pauseRecording(){
     startTime=Date.now() - (parseInt(elTimer.textContent.split(':')[0])*60 + parseInt(elTimer.textContent.split(':')[1]))*1000;
     timerInt=setInterval(updateTimer,500);
   }else{
-    mediaRecorder.pause();
+    mediaRecorder.pause(); try{ if(navigator.vibrate) navigator.vibrate(50); }catch(e){}
     if(recognition) try{ recognition.stop(); }catch(_){}
     isPaused=true;
     elVisual.classList.remove('recording');
@@ -272,9 +273,9 @@ function pauseRecording(){
 function stopRecording(){
   if(!mediaRecorder) return;
   mediaRecorder.stop();
+  try{ if(navigator.vibrate) navigator.vibrate([80,50,80]); }catch(e){}
   if(recognition) try{ recognition.stop(); }catch(_){}
-  clearInterval(timerInt);
-  isRecording=false;
+  clearInterval(timerInt); isRecording=false;
   elVisual.classList.remove('recording','paused');
   elVisual.textContent='🎙️';
   elWave.style.display='none';
