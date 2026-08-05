@@ -3287,6 +3287,7 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
     <button class="ds-btn" data-ds="view-presu" onclick="openPresu()"><span>📊</span> Presupuesto Mensual</button>
     <button class="ds-btn" data-ds="view-equipo" onclick="openEquipo()"><span>🌳</span> Mi Equipo</button>
     <button class="ds-btn" data-ds="view-seguimiento" onclick="openSeguimiento()"><span>📇</span> Seguimiento</button>
+    <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora IA</button>
     <button class="ds-btn" data-ds="view-carrera" onclick="openCarrera()"><span>🏆</span> Carrera</button>
     <button class="ds-btn" data-ds="view-planning" onclick="showView('view-planning'); renderPlanningTools();"><span>🗓️</span> Planificación</button>
     <button class="ds-btn" data-ds="view-history" onclick="showView('view-history'); renderHistory();"><span>📜</span> Historial</button>
@@ -3919,6 +3920,23 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
     <div id="equipoFileInfo" style="display:none; text-align:center; font-size:11px; color:#8a8a94; margin-top:14px; padding:0 10px;"></div>
   </section>
 
+  <!-- 🎙️ GRABADORA IA -->
+  <section id="view-grabadora" class="view">
+    <header class="top">
+      <button class="back-btn" id="btnBackGrabadora" aria-label="Volver">‹</button>
+      <button class="help-btn" id="btnHelpGrabadora" aria-label="Ayuda">?</button>
+      <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
+      <h1>Grabadora</h1><div class="script">IA</div>
+      <p>Resúmenes automáticos de reuniones</p>
+    </header>
+    <div style="width:100%;height:75vh;border-radius:18px;overflow:hidden;border:1px solid rgba(255,255,255,0.7);background:rgba(255,255,255,0.5)">
+      <iframe src="./grabadora_ia.html" style="width:100%;height:100%;border:none" allow="microphone"></iframe>
+    </div>
+    <div style="margin-top:12px;padding:12px;border-radius:12px;background:rgba(91,141,239,0.10);font-size:12px;line-height:1.4">
+      💡 <b>Tip:</b> Si el micrófono no funciona en el iframe, abrí la grabadora en pestaña nueva: <a href="./grabadora_ia.html" target="_blank" style="color:#3d63c9;font-weight:800">Abrir grabadora</a>
+    </div>
+  </section>
+
 </div>
 
 <!-- MODAL -->
@@ -4333,7 +4351,17 @@ const HELP = {
   },
   vida: { icon:'⚖️', iconBg:'linear-gradient(135deg,#5b8def,#a06bff)', title:'Rueda de la Vida', sub:'8 áreas personales', html:`<p>8 áreas personales del 0 al 10. Buscá equilibrio.</p>` },
   negocio: { icon:'📊', iconBg:'linear-gradient(135deg,#ff8f6b,#ff6b9d)', title:'Rueda del Negocio', sub:'8 áreas de negocio', html:`<p>8 áreas de negocio del 0 al 10. Hacela con tu línea ascendente.</p>` },
-  equipoTablero: { icon:'📊', iconBg:'linear-gradient(135deg,#5b8def,#a06bff)', title:'Tablero Equipo', sub:'Vista general', html:`<p>Estadísticas, ranking, cumpleaños y garantías de tu equipo.</p>` }
+  equipoTablero: { icon:'📊', iconBg:'linear-gradient(135deg,#5b8def,#a06bff)', title:'Tablero Equipo', sub:'Vista general', html:`<p>Estadísticas, ranking, cumpleaños y garantías de tu equipo.</p>` },
+  grabadora: {
+    icon:'🎙️', iconBg:'linear-gradient(135deg,#ff6b6b,#a06bff)',
+    title:'Grabadora IA', sub:'Resúmenes automáticos de reuniones',
+    html:`<p>Grabá tus reuniones y obtené resumen automático con tareas.</p>
+    <div class="tip"><strong>🎙️ Grabar</strong> – Tocá Grabar, hablá de tu reunión, la transcripción aparece en vivo.</div>
+    <div class="tip"><strong>⏸️ Pausa / Stop</strong> – Pausá si te interrumpen, Stop guarda.</div>
+    <div class="tip"><strong>✨ Resumir</strong> – IA local genera resumen en 3 líneas + puntos clave + tareas detectadas.</div>
+    <div class="tip"><strong>📂 Guardadas</strong> – Todas quedan abajo, podés copiar texto y pegarlo en Seguimiento o WhatsApp.</div>
+    <div class="warn-tip"><strong>🔒 Privacidad:</strong> Audio queda en tu dispositivo, no se sube a servidor.</div>`
+  }
 };
 
 function showHelp(key){ const h = HELP[key]; if(h) modal.open(h); }
@@ -4415,12 +4443,12 @@ function showView(id){
     b.classList.toggle('active', b.dataset.view===id);
   });
   // Sidebar escritorio: marcar activo (con equivalencias de sub-vistas)
-  const dsMap = {'view-home':'view-home','view-precios':'view-precios','view-presu':'view-presu','view-presu-hist':'view-presu','view-equipo':'view-equipo','view-seguimiento':'view-seguimiento','view-carrera':'view-carrera','view-siete':'view-siete','view-siete-detail':'view-siete','view-wheel':'view-wheel','view-eval':'view-wheel','view-history':'view-history','view-planning':'view-planning'};
+  const dsMap = {'view-home':'view-home','view-precios':'view-precios','view-presu':'view-presu','view-presu-hist':'view-presu','view-equipo':'view-equipo','view-seguimiento':'view-seguimiento','view-grabadora':'view-grabadora','view-carrera':'view-carrera','view-siete':'view-siete','view-siete-detail':'view-siete','view-wheel':'view-wheel','view-eval':'view-wheel','view-history':'view-history','view-planning':'view-planning'};
   const dsTarget = dsMap[id] || '';
   document.querySelectorAll('#deskSidebar .ds-btn').forEach(b=>{
     b.classList.toggle('active', b.dataset.ds===dsTarget);
   });
-  const hideTabsOn = ['view-home','view-siete','view-siete-detail','view-presu','view-presu-hist','view-equipo','view-seguimiento','view-carrera','view-planning','view-precios'];
+  const hideTabsOn = ['view-home','view-siete','view-siete-detail','view-presu','view-presu-hist','view-equipo','view-seguimiento','view-carrera','view-planning','view-precios','view-grabadora'];
   document.getElementById('tabs').style.display = hideTabsOn.includes(id) ? 'none' : 'flex';
   if(id==='view-history') renderHistory();
   if(id==='view-eval')    renderAreas();
@@ -9252,6 +9280,18 @@ function renderToolsList(){
     </button>
   `;
 
+  const grabadoraCard = `
+    <button type="button" class="business-card" onclick="openGrabadora()" style="border:1.5px solid rgba(91,141,239,0.25)">
+      <div class="business-icon" style="background:linear-gradient(135deg,#ff6b6b,#a06bff)">🎙️</div>
+      <div>
+        <h3>Grabadora IA</h3>
+        <p>Grabá reuniones y obtené resumen automático con tareas</p>
+      </div>
+      <div class="business-status">IA<small>reuniones</small></div>
+      <div class="business-progress" style="--pct:100%"><span style="background:linear-gradient(90deg,#ff6b6b,#a06bff)"></span></div>
+    </button>
+  `;
+
   document.getElementById('toolsList').innerHTML = `
     <div class="home-section-block">
       <div class="mini-section-label"><span>📅</span> Mi mes</div>
@@ -9260,9 +9300,18 @@ function renderToolsList(){
     <div class="home-section-block">
       <div class="mini-section-label"><span>🌱</span> Mi negocio</div>
       ${equipoCard}
+      ${grabadoraCard}
       ${seguimientoCard}
     </div>
   `;
+}
+function openGrabadora(){
+  // Abrir grabadora en nueva pestaña o dentro de APPI si existe view
+  if(document.getElementById('view-grabadora')){
+    showView('view-grabadora');
+  }else{
+    window.open('./grabadora_ia.html','_blank');
+  }
 }
 async function compartirConsolidado(e){
   if(e) e.stopPropagation();
@@ -9464,6 +9513,7 @@ document.getElementById('importInput').onchange = (e)=>{
     if(!activa) return null;
         switch(activa.id){
       case 'view-precios': return 'view-home';
+      case 'view-grabadora': return 'view-home';
       case 'view-home': return null;
       case 'view-siete-detail': return 'view-siete';
       case 'view-presu-hist': return 'view-presu';
