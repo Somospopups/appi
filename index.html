@@ -3357,7 +3357,7 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
   <!-- HOME -->
   <section id="view-home" class="view active">
     <header class="top home-header">
-      <button class="menu-reopen-btn" id="btnMenuReopen" onclick="toggleSidebar()" title="Abrir menú lateral" aria-label="Abrir menú lateral"><span style="font-size:14px">☰</span> Menú</button>
+      <button class="menu-reopen-btn" id="btnMenuReopen" onclick="toggleSidebar()" title="Abrir menú lateral" aria-label="Abrir menú lateral">☰</button>
       <button class="help-btn" id="btnHelpHome" aria-label="Ayuda">?</button>
       <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
 
@@ -10719,21 +10719,19 @@ body.dark .tools-item:hover{background:rgba(91,141,239,.22); color:#a8b8ff}
 /* ===== FIX BOTÓN MENÚ - SIEMPRE VISIBLE CUANDO SIDEBAR CERRADA - MISMA LÍNEA QUE APPI ===== */
 .menu-reopen-btn{
   position:absolute; left:0; top:0;
-  display:none;
-  padding:0 14px; height:38px; border-radius:999px;
+  display:flex !important;
+  width:38px; height:38px; border-radius:50%;
   background:rgba(255,255,255,0.60);
   -webkit-backdrop-filter:blur(14px) saturate(180%); backdrop-filter:blur(14px) saturate(180%);
   border:1px solid rgba(255,255,255,0.70);
   box-shadow:0 4px 16px rgba(80,90,130,0.10);
-  font-family:inherit; font-weight:800; font-size:12px; color:#1c1c1e;
-  cursor:pointer; align-items:center; gap:6px;
+  font-family:inherit; font-weight:800; font-size:18px; color:#3d63c9;
+  cursor:pointer; align-items:center; justify-content:center;
   z-index:20;
   transition:transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease;
-  letter-spacing:0.3px;
 }
-.menu-reopen-btn:active{ transform:scale(0.94); }
+.menu-reopen-btn:active{ transform:scale(0.90); }
 .menu-reopen-btn:hover{ background:rgba(255,255,255,0.85); box-shadow:0 6px 20px rgba(80,90,130,0.15); }
-body.sidebar-cerrada .menu-reopen-btn{ display:flex !important; }
 body.dark .menu-reopen-btn{ background:rgba(40,40,60,0.75); border-color:rgba(255,255,255,0.12); color:#f0f0f5; }
 body.dark .menu-reopen-btn:hover{ background:rgba(50,50,70,0.85); }
 
@@ -10814,7 +10812,7 @@ body.dark #preciosContent .person-item.selected{ background:rgba(91,141,239,0.18
 <script>
 // Bump cache version for fix
 try{
-  if(window.localStorage){ localStorage.setItem('appi_fix_menu_v92','1'); }
+  if(window.localStorage){ localStorage.setItem('appi_fix_menu_v93','1'); }
 }catch(e){}
 </script>
 
