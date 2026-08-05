@@ -10016,6 +10016,96 @@ document.addEventListener('click', function(e){
 });
 
 
+
+function abrirBackupDesdeMenu(){
+  try{ cerrarToolsMenu(); }catch(e){}
+  setTimeout(()=>{
+    modal.open({
+      icon:'💾',
+      iconBg:'linear-gradient(135deg,#5b8def,#a06bff)',
+      title:'Backup',
+      sub:'Guardá o restaurá tus datos',
+      html:`
+        <p style="font-size:13px;color:#5c5c66;margin:0 0 12px">Hacé una copia de seguridad de todos tus datos o restaurá una copia anterior.</p>
+        <button class="share-menu-item" id="btnBackupExportar" style="margin-bottom:8px">
+          <div class="sm-ico" style="background:linear-gradient(135deg,#3ad0a4,#5b8def)">📤</div>
+          <div class="sm-txt"><div class="sm-title">Exportar backup</div><div class="sm-desc">Descargá un archivo .json con todos tus datos</div></div>
+          <span class="sm-arrow">›</span>
+        </button>
+        <button class="share-menu-item" id="btnBackupRestaurar">
+          <div class="sm-ico" style="background:linear-gradient(135deg,#f5b301,#ff8f6b)">📥</div>
+          <div class="sm-txt"><div class="sm-title">Restaurar backup</div><div class="sm-desc">Cargá un archivo .json para restaurar</div></div>
+          <span class="sm-arrow">›</span>
+        </button>
+        <div style="margin-top:14px;padding:10px 12px;border-radius:12px;background:rgba(245,179,1,0.10);border:1px solid rgba(245,179,1,0.20);font-size:11px;color:#a3670b;line-height:1.4">💡 Guardá tu backup en un lugar seguro. No lo compartas, contiene todos tus datos.</div>
+      `
+    });
+    setTimeout(()=>{
+      const btnExp=document.getElementById('btnBackupExportar');
+      const btnRes=document.getElementById('btnBackupRestaurar');
+      if(btnExp){
+        btnExp.onclick=()=>{
+          modal.close();
+          // Usar lógica existente de exportar
+          const data = {};
+          for(let i=0; i<localStorage.length; i++){
+            const k = localStorage.key(i);
+            if(k.startsWith('rueda') || k.startsWith('siete_') || k.startsWith('presu_') || k==='welcomeSeen' || k==='themeDark' || k.startsWith('lastUpdate_') || k === 'equipoData' || k.startsWith('precios') || k==='carrera' || k==='seguimientoPersonas' || k==='appi_activada' || k==='appi_device_id'){
+              data[k] = localStorage.getItem(k);
+            }
+          }
+          const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          const now = new Date();
+          a.download = `backup_appi_${now.getFullYear()}_${now.getMonth()+1}.json`;
+          a.click();
+          URL.revokeObjectURL(url);
+          try{ haptic(15); showToast('Backup descargado 📤'); }catch(e){}
+        };
+      }
+      if(btnRes){
+        btnRes.onclick=()=>{
+          modal.close();
+          // Crear input file temporal
+          const input=document.createElement('input');
+          input.type='file';
+          input.accept='.json';
+          input.onchange=(e)=>{
+            const file=e.target.files[0]; if(!file) return;
+            const reader=new FileReader();
+            reader.onload=(evt)=>{
+              try{
+                const data=JSON.parse(evt.target.result);
+                if(typeof data==='object'){
+                  modal.open({
+                    icon:'⚠️',
+                    title:'¿Restaurar backup?',
+                    sub:'Se reemplazarán todos los datos actuales',
+                    html:'<p>¿Estás seguro? Esta acción no se puede deshacer.</p>',
+                    confirm:true,
+                    okText:'Restaurar',
+                    danger:true,
+                    onConfirm:()=>{
+                      Object.keys(data).forEach(k=> localStorage.setItem(k, data[k]));
+                      try{ haptic(20); showToast('Restaurado 🎉'); }catch(e){}
+                      setTimeout(()=> location.reload(), 800);
+                    }
+                  });
+                }
+              }catch(err){ modal.open({ icon:'⚠️', title:'Error', html:'<p>Archivo inválido.</p>' }); }
+            };
+            reader.readAsText(file);
+          };
+          input.click();
+        };
+      }
+    },100);
+  },150);
+}
+
+
 // Verificar al arrancar
 (async function() {
   // FIX: verificar blocklist ANTES de arrancar (con timeout por si no hay red)
@@ -10456,25 +10546,26 @@ body.dark .presu-select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:
   .ds-reopen:active{transform:scale(.92)}
   .ds-reopen-new{
     display:none;
-    position:fixed;
-    top:16px;
+    position:absolute;
+    top:8px;
     left:16px;
-    z-index:155;
-    padding:12px 18px;
+    z-index:5;
+    padding:0 14px;
+    height:38px;
     border-radius:999px;
-    background:rgba(255,255,255,0.85);
+    background:rgba(255,255,255,0.6);
     -webkit-backdrop-filter:blur(14px) saturate(180%);
     backdrop-filter:blur(14px) saturate(180%);
-    border:1px solid rgba(255,255,255,0.75);
-    box-shadow:0 8px 24px rgba(80,90,130,0.15), 0 4px 12px rgba(0,0,0,0.08);
+    border:1px solid rgba(255,255,255,0.7);
+    box-shadow:0 4px 16px rgba(80,90,130,0.10);
     font-family:inherit;
     font-weight:800;
-    font-size:13px;
+    font-size:12px;
     color:#1c1c1e;
     cursor:pointer;
     align-items:center;
-    gap:8px;
-    transition:transform 0.2s ease, box-shadow 0.2s ease;
+    gap:6px;
+    transition:transform 0.15s ease, box-shadow 0.2s ease;
   }
   .ds-reopen-new:hover{
     transform:translateY(-2px);
@@ -10545,6 +10636,9 @@ body.dark .presu-select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:
 }
 .rot-fab{display:none}
 </style>
+<style>
+#backupCollapsible{display:none !important}
+</style>
 
 
 <!-- ===== MENÚ DE HERRAMIENTAS (engranaje) ===== -->
@@ -10554,6 +10648,9 @@ body.dark .presu-select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:
   </button>
   <button class="tools-item" id="btnToolsOrient" onclick="toggleOrientacion(); cerrarToolsMenu();">
     <span class="ti-ico" id="toolsOrientIco">🖥️</span><span id="toolsOrientTxt">Forzar modo landscape</span>
+  </button>
+  <button class="tools-item" id="btnToolsBackup" onclick="abrirBackupDesdeMenu()">
+    <span class="ti-ico">💾</span><span>Backup</span>
   </button>
 </div>
 
