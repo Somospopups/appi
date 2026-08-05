@@ -3288,6 +3288,7 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
     <button class="ds-btn" data-ds="view-equipo" onclick="openEquipo()"><span>🌳</span> Mi Equipo</button>
     <button class="ds-btn" data-ds="view-seguimiento" onclick="openSeguimiento()"><span>📇</span> Seguimiento</button>
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora IA</button>
+    <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
     <button class="ds-btn" data-ds="view-carrera" onclick="openCarrera()"><span>🏆</span> Carrera</button>
     <button class="ds-btn" data-ds="view-planning" onclick="showView('view-planning'); renderPlanningTools();"><span>🗓️</span> Planificación</button>
     <button class="ds-btn" data-ds="view-history" onclick="showView('view-history'); renderHistory();"><span>📜</span> Historial</button>
@@ -3920,7 +3921,7 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
     <div id="equipoFileInfo" style="display:none; text-align:center; font-size:11px; color:#8a8a94; margin-top:14px; padding:0 10px;"></div>
   </section>
 
-  <!-- 🎙️ GRABADORA IA -->
+  <!-- 🎙️ GRABADORA IA NATIVA - como resto de pantallas -->
   <section id="view-grabadora" class="view">
     <header class="top">
       <button class="back-btn" id="btnBackGrabadora" aria-label="Volver">‹</button>
@@ -3929,12 +3930,76 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
       <h1>Grabadora</h1><div class="script">IA</div>
       <p>Resúmenes automáticos de reuniones</p>
     </header>
-    <div style="width:100%;height:75vh;border-radius:18px;overflow:hidden;border:1px solid rgba(255,255,255,0.7);background:rgba(255,255,255,0.5)">
-      <iframe src="./grabadora_ia.html" style="width:100%;height:100%;border:none" allow="microphone"></iframe>
+
+    <div class="glass card rec-card">
+      <div class="rec-visual" id="recVisual">🎙️</div>
+      <div class="timer" id="timer">00:00</div>
+      <div class="timer-label" id="timerLabel">Listo para grabar</div>
+      <div class="wave" id="wave" style="display:none"><span></span><span></span><span></span><span></span><span></span></div>
+      <div class="controls">
+        <button class="btn btn-primary" id="btnRecord">🎙️ Grabar</button>
+        <button class="btn btn-secondary" id="btnPause" disabled>⏸️ Pausa</button>
+        <button class="btn btn-secondary" id="btnStop" disabled>⏹️ Stop</button>
+      </div>
+      <div class="status" id="status"></div>
     </div>
-    <div style="margin-top:12px;padding:12px;border-radius:12px;background:rgba(91,141,239,0.10);font-size:12px;line-height:1.4">
-      💡 <b>Tip:</b> Si el micrófono no funciona en el iframe, abrí la grabadora en pestaña nueva: <a href="./grabadora_ia.html" target="_blank" style="color:#3d63c9;font-weight:800">Abrir grabadora</a>
+
+    <div class="glass card">
+      <label class="label">📝 Transcripción en vivo</label>
+      <textarea class="transcript-area" id="transcript" placeholder="Acá aparece lo que vas diciendo... Tocá Grabar y empezá a hablar de tu reunión. Ej: Hoy hablé con Juan sobre Senior 4..."></textarea>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button class="btn btn-secondary" id="btnCopyTrans" style="flex:1">📋 Copiar texto</button>
+        <button class="btn btn-secondary" id="btnClearTrans" style="flex:1">🗑️ Borrar</button>
+      </div>
+      <label class="label">🤖 Resumen automático con IA</label>
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <button class="btn btn-success" id="btnSummarize" style="flex:1">✨ Resumir reunión</button>
+        <button class="btn btn-secondary" id="btnClearSum" style="flex:0 0 auto">🗑️</button>
+      </div>
+      <div id="summary" class="summary-box" style="display:none"></div>
+      <div id="summaryEmpty" class="empty">Tocá "Resumir reunión" después de grabar para obtener resumen, puntos clave y tareas</div>
     </div>
+
+    <div class="glass card">
+      <label class="label">📂 Grabaciones guardadas</label>
+      <div id="recList" class="rec-list">
+        <div class="empty">Todavía no hay grabaciones. Grabá tu primera reunión arriba.</div>
+      </div>
+      <button class="btn btn-secondary" id="btnClearAll" style="width:100%;margin-top:10px">🗑️ Borrar todo</button>
+    </div>
+  </section>
+
+  <!-- 📝 NOTAS KEEP -->
+  <section id="view-notas" class="view">
+    <header class="top">
+      <button class="back-btn" id="btnBackNotas" aria-label="Volver">‹</button>
+      <button class="help-btn" id="btnHelpNotas" aria-label="Ayuda">?</button>
+      <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
+      <h1>Notas</h1><div class="script">Keep</div>
+      <p>Anotá cualquier cosa, color y a mano</p>
+    </header>
+
+    <div class="glass card keep-add">
+      <input type="text" id="keepTitle" class="k-title-input" placeholder="Título..." style="width:100%;border:none;background:transparent;outline:none;font-family:inherit">
+      <textarea id="keepText" placeholder="Escribí tu nota..." style="width:100%;border:none;background:transparent;outline:none;font-family:inherit;resize:none;min-height:60px"></textarea>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div id="keepColorPreview" style="width:22px;height:22px;border-radius:50%;background:#fff475;border:1px solid rgba(0,0,0,0.1)"></div>
+          <div id="keepColors" class="keep-colors"></div>
+          <input type="hidden" id="keepColor" value="#fff475">
+        </div>
+        <button class="btn btn-primary" style="padding:8px 14px;font-size:12px" onclick="window.addKeep && window.addKeep()">💾 Guardar</button>
+      </div>
+    </div>
+
+    <div style="margin:12px 0">
+      <div class="search-box" style="margin-bottom:8px">
+        <span class="icon">🔍</span>
+        <input type="text" id="keepSearch" placeholder="Buscar notas...">
+      </div>
+    </div>
+
+    <div id="keepGrid" class="keep-grid"></div>
   </section>
 
 </div>
@@ -4361,6 +4426,16 @@ const HELP = {
     <div class="tip"><strong>✨ Resumir</strong> – IA local genera resumen en 3 líneas + puntos clave + tareas detectadas.</div>
     <div class="tip"><strong>📂 Guardadas</strong> – Todas quedan abajo, podés copiar texto y pegarlo en Seguimiento o WhatsApp.</div>
     <div class="warn-tip"><strong>🔒 Privacidad:</strong> Audio queda en tu dispositivo, no se sube a servidor.</div>`
+  },
+  notas: {
+    icon:'📝', iconBg:'linear-gradient(135deg,#fbbf24,#f59e0b)',
+    title:'Notas Keep', sub:'Stick de colores',
+    html:`<p>Tu Google Keep dentro de APPI, con post-its de colores.</p>
+    <div class="tip"><strong>＋ Nueva nota</strong> – Título + texto + color. Guardá.</div>
+    <div class="tip"><strong>🎨 Colores</strong> – Elegí entre 8 colores para categorizar (amarillo, verde, rosa, celeste...).</div>
+    <div class="tip"><strong>📌 Fijar / Borrar</strong> – Tocá la nota para editar, 📌 para fijar arriba, 🗑️ para borrar.</div>
+    <div class="tip"><strong>🔍 Buscar</strong> – Filtrá por texto en el buscador arriba.</div>
+    <div class="tip"><strong>💾 Todo local</strong> – Queda en tu dispositivo, no se sube.</div>`
   }
 };
 
@@ -4387,6 +4462,10 @@ document.getElementById('btnHelpPresuHist')?.addEventListener('click', ()=>showH
 document.getElementById('btnHelpCarrera')?.addEventListener('click', ()=>showHelp('carrera'));
 document.getElementById('btnHelpPrecios')?.addEventListener('click', ()=>showHelp('precios'));
 document.getElementById('btnHelpSeguimiento')?.addEventListener('click', ()=>showHelp('seguimiento'));
+document.getElementById('btnHelpGrabadora')?.addEventListener('click', ()=>showHelp('grabadora'));
+document.getElementById('btnHelpNotas')?.addEventListener('click', ()=>showHelp('notas'));
+document.getElementById('btnBackGrabadora')?.addEventListener('click', ()=>{ showView('view-home'); renderHomeCompleto(); });
+document.getElementById('btnBackNotas')?.addEventListener('click', ()=>{ showView('view-home'); renderHomeCompleto(); });
 
 /* ============================================================
    RUEDAS
@@ -4443,12 +4522,12 @@ function showView(id){
     b.classList.toggle('active', b.dataset.view===id);
   });
   // Sidebar escritorio: marcar activo (con equivalencias de sub-vistas)
-  const dsMap = {'view-home':'view-home','view-precios':'view-precios','view-presu':'view-presu','view-presu-hist':'view-presu','view-equipo':'view-equipo','view-seguimiento':'view-seguimiento','view-grabadora':'view-grabadora','view-carrera':'view-carrera','view-siete':'view-siete','view-siete-detail':'view-siete','view-wheel':'view-wheel','view-eval':'view-wheel','view-history':'view-history','view-planning':'view-planning'};
+  const dsMap = {'view-home':'view-home','view-precios':'view-precios','view-presu':'view-presu','view-presu-hist':'view-presu','view-equipo':'view-equipo','view-seguimiento':'view-seguimiento','view-grabadora':'view-grabadora','view-notas':'view-notas','view-carrera':'view-carrera','view-siete':'view-siete','view-siete-detail':'view-siete','view-wheel':'view-wheel','view-eval':'view-wheel','view-history':'view-history','view-planning':'view-planning'};
   const dsTarget = dsMap[id] || '';
   document.querySelectorAll('#deskSidebar .ds-btn').forEach(b=>{
     b.classList.toggle('active', b.dataset.ds===dsTarget);
   });
-  const hideTabsOn = ['view-home','view-siete','view-siete-detail','view-presu','view-presu-hist','view-equipo','view-seguimiento','view-carrera','view-planning','view-precios','view-grabadora'];
+  const hideTabsOn = ['view-home','view-siete','view-siete-detail','view-presu','view-presu-hist','view-equipo','view-seguimiento','view-carrera','view-planning','view-precios','view-grabadora','view-notas'];
   document.getElementById('tabs').style.display = hideTabsOn.includes(id) ? 'none' : 'flex';
   if(id==='view-history') renderHistory();
   if(id==='view-eval')    renderAreas();
@@ -9335,7 +9414,7 @@ function renderHomeCompleto(){
 }
 
 
-// === OVERRIDE HOME TOOLS FINAL - SOLO LISTA PRECIOS - BOTON SIMPLE ===
+// === OVERRIDE HOME TOOLS - LISTA PRECIOS + 2 CUADRADITOS ABAJO (GRABADORA + NOTAS) ===
 (function(){
   const _origTools = renderToolsList;
   renderToolsList = function(){
@@ -9345,6 +9424,9 @@ function renderHomeCompleto(){
       if(!list) return;
       const existing=document.getElementById('homeExtraTools');
       if(existing) existing.remove();
+      const existing2=document.getElementById('homeExtraKeep');
+      if(existing2) existing2.remove();
+      
       const extra=document.createElement('div');
       extra.id='homeExtraTools';
       extra.className='home-section-block';
@@ -9355,6 +9437,27 @@ function renderHomeCompleto(){
         </button>
       `;
       list.appendChild(extra);
+
+      // Dos cuadraditos en un mismo renglon abajo de todo - Grabadora + Notas Keep
+      const extraKeep=document.createElement('div');
+      extraKeep.id='homeExtraKeep';
+      extraKeep.className='home-section-block';
+      extraKeep.innerHTML=`
+        <div class="mini-section-label"><span>⚡</span> Herramientas rápidas</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <button type="button" class="business-card" style="flex-direction:column;align-items:center;justify-content:center;padding:18px 12px;min-height:120px;text-align:center" onclick="openGrabadora()">
+            <div class="business-icon" style="width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,#ff6b6b,#a06bff);display:grid;place-items:center;color:#fff;font-size:24px;box-shadow:0 4px 10px rgba(0,0,0,0.12);margin-bottom:8px">🎙️</div>
+            <h3 style="margin:0;font-size:13px;font-weight:900">Grabadora IA</h3>
+            <small style="font-size:11px;color:#6b6b76;margin-top:4px">Resúmenes reuniones</small>
+          </button>
+          <button type="button" class="business-card" style="flex-direction:column;align-items:center;justify-content:center;padding:18px 12px;min-height:120px;text-align:center" onclick="showView('view-notas')">
+            <div class="business-icon" style="width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,#fbbf24,#f59e0b);display:grid;place-items:center;color:#fff;font-size:24px;box-shadow:0 4px 10px rgba(0,0,0,0.12);margin-bottom:8px">📝</div>
+            <h3 style="margin:0;font-size:13px;font-weight:900">Notas Keep</h3>
+            <small style="font-size:11px;color:#6b6b76;margin-top:4px">Stick de colores</small>
+          </button>
+        </div>
+      `;
+      list.appendChild(extraKeep);
     }catch(e){ console.log('homeExtra error',e); }
   };
 })();
@@ -9514,6 +9617,7 @@ document.getElementById('importInput').onchange = (e)=>{
         switch(activa.id){
       case 'view-precios': return 'view-home';
       case 'view-grabadora': return 'view-home';
+      case 'view-notas': return 'view-home';
       case 'view-home': return null;
       case 'view-siete-detail': return 'view-siete';
       case 'view-presu-hist': return 'view-presu';
@@ -10856,6 +10960,56 @@ header.top .back-btn{ z-index:21; }
 @media (min-width: 768px) and (orientation: landscape){
   .top-menu-btn{ display:flex !important; }
 }
+
+/* ===== GRABADORA IA NATIVA - como resto de pantallas ===== */
+.rec-card{text-align:center;padding:24px 18px}
+.rec-visual{width:120px;height:120px;margin:0 auto 16px;border-radius:50%;background:linear-gradient(135deg,#5b8def,#a06bff);display:grid;place-items:center;color:#fff;font-size:48px;position:relative;box-shadow:0 12px 30px rgba(120,100,220,0.35);transition:all 0.3s}
+.rec-visual.recording{animation:pulseRec 1.5s infinite;background:linear-gradient(135deg,#ff6b6b,#ff8f6b);box-shadow:0 12px 30px rgba(255,107,107,0.4)}
+.rec-visual.paused{background:linear-gradient(135deg,#f5b301,#ff8f6b)}
+@keyframes pulseRec{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+.rec-visual::after{content:"";position:absolute;inset:-8px;border-radius:50%;border:2px solid rgba(91,141,239,0.3);opacity:0}
+.rec-visual.recording::after{animation:rippleRec 1.5s infinite}
+@keyframes rippleRec{0%{transform:scale(1);opacity:1}100%{transform:scale(1.3);opacity:0}}
+.timer{font-size:36px;font-weight:900;letter-spacing:-1px;margin:8px 0;font-variant-numeric:tabular-nums}
+.timer-label{font-size:11px;font-weight:800;color:#8a8a94;text-transform:uppercase;letter-spacing:0.5px}
+.controls{display:flex;gap:10px;justify-content:center;margin-top:18px;flex-wrap:wrap}
+.transcript-area{width:100%;min-height:120px;padding:12px;border-radius:12px;border:1.5px solid rgba(80,90,130,0.15);background:rgba(255,255,255,0.8);font-family:inherit;font-size:14px;line-height:1.5;resize:vertical;outline:none;transition:border-color 0.2s}
+.transcript-area:focus{border-color:#5b8def;box-shadow:0 0 0 3px rgba(91,141,239,0.15)}
+.label{font-size:11px;font-weight:900;color:#5c5c66;text-transform:uppercase;letter-spacing:0.5px;margin:12px 0 6px;display:block}
+.summary-box{padding:14px;border-radius:16px;background:linear-gradient(135deg,rgba(91,141,239,0.12),rgba(160,107,255,0.10));border:1px solid rgba(91,141,239,0.18);font-size:13px;line-height:1.5}
+.summary-box h4{margin:0 0 8px;font-size:13px;font-weight:900}
+.summary-box ul{margin:6px 0;padding-left:18px}
+.summary-box li{margin:4px 0}
+.rec-list{display:flex;flex-direction:column;gap:10px}
+.rec-item{padding:14px;border-radius:16px;background:rgba(255,255,255,0.6);border:1px solid rgba(255,255,255,0.7);display:flex;align-items:center;gap:12px;cursor:pointer;transition:transform 0.15s}
+.rec-item:active{transform:scale(0.98)}
+.rec-item .ico{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#5b8def,#a06bff);display:grid;place-items:center;color:#fff;font-size:18px;flex:none}
+.rec-item .info{flex:1;min-width:0}
+.rec-item .info b{display:block;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rec-item .info small{font-size:11px;color:#6b6b76}
+.wave{display:flex;align-items:center;justify-content:center;gap:3px;height:30px;margin:10px 0}
+.wave span{width:4px;height:12px;background:#5b8def;border-radius:999px;animation:waveRec 0.8s infinite ease-in-out}
+.wave span:nth-child(2){animation-delay:0.1s}.wave span:nth-child(3){animation-delay:0.2s}.wave span:nth-child(4){animation-delay:0.3s}.wave span:nth-child(5){animation-delay:0.1s}
+@keyframes waveRec{0%,100%{height:12px}50%{height:28px}}
+body.dark .transcript-area{background:rgba(30,30,50,0.7);color:#f0f0f5;border-color:rgba(255,255,255,0.12)}
+body.dark .rec-item{background:rgba(30,30,50,0.6);border-color:rgba(255,255,255,0.08)}
+body.dark .rec-item .info small{color:#a0a0b0}
+
+/* ===== NOTAS KEEP - sticky notes colores ===== */
+.keep-grid{columns:2;column-gap:10px}
+@media (min-width: 600px){ .keep-grid{columns:3} }
+.keep-note{break-inside:avoid;padding:14px;border-radius:16px;margin-bottom:10px;position:relative;box-shadow:0 4px 12px rgba(0,0,0,0.08);transition:transform 0.15s,box-shadow 0.2s;cursor:pointer;border:1px solid rgba(0,0,0,0.06)}
+.keep-note:active{transform:scale(0.98)}
+.keep-note .k-title{font-weight:800;font-size:14px;margin:0 0 6px;word-break:break-word}
+.keep-note .k-text{font-size:13px;line-height:1.4;white-space:pre-wrap;word-break:break-word;opacity:0.9}
+.keep-note .k-foot{margin-top:8px;display:flex;justify-content:space-between;align-items:center;font-size:10px;opacity:0.6}
+.keep-note .k-actions{position:absolute;top:8px;right:8px;display:flex;gap:4px;opacity:0;transition:opacity 0.2s}
+.keep-note:hover .k-actions{opacity:1}
+.k-color-dot{width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,255,255,0.8);cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,0.15)}
+.keep-colors{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.keep-add{padding:14px;border-radius:18px;background:rgba(255,255,255,0.7);border:1.5px dashed rgba(80,90,130,0.25);cursor:text}
+.keep-add textarea{width:100%;border:none;background:transparent;resize:none;outline:none;font-family:inherit;font-size:14px;min-height:60px}
+.keep-add .k-title-input{font-weight:800;font-size:15px;margin-bottom:6px}
 </style>
 
 <script>
@@ -10880,6 +11034,317 @@ header.top .back-btn{ z-index:21; }
   // Por si las vistas se crean dinamico
   setTimeout(injectMenuButtons, 800);
   setTimeout(injectMenuButtons, 2000);
+})();
+</script>
+
+<script>
+// ===== GRABADORA IA NATIVA LOGICA =====
+(function(){
+let mediaRecorder=null, audioChunks=[], startTime=null, timerInt=null, isPaused=false;
+let recognition=null, finalTranscript='', isRecording=false;
+
+function el(id){ return document.getElementById(id); }
+
+function showStatus(msg,type='ok'){
+  const e=el('status'); if(!e) return;
+  e.textContent=msg;
+  e.className='status show '+type;
+  setTimeout(()=>e.classList.remove('show'),3000);
+}
+function fmtTime(sec){
+  const m=Math.floor(sec/60).toString().padStart(2,'0');
+  const s=(sec%60).toString().padStart(2,'0');
+  return `${m}:${s}`;
+}
+function updateTimer(){
+  if(!startTime) return;
+  const ec=Math.floor((Date.now()-startTime)/1000);
+  const tEl=el('timer'); if(tEl) tEl.textContent=fmtTime(ec);
+}
+function initRecognition(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){ showStatus('Navegador sin transcripción en vivo, igual podés grabar','warn'); return null; }
+  const rec=new SR(); rec.lang='es-AR'; rec.continuous=true; rec.interimResults=true;
+  rec.onresult=(e)=>{
+    let interim='';
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      const t=e.results[i][0].transcript;
+      if(e.results[i].isFinal) finalTranscript+=' '+t;
+      else interim+=t;
+    }
+    const tr=el('transcript'); if(tr) tr.value=(finalTranscript+' '+interim).trim();
+  };
+  rec.onend=()=>{ if(isRecording && !isPaused){ try{ rec.start(); }catch(_){}}};
+  return rec;
+}
+async function startRecording(){
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+    mediaRecorder=new MediaRecorder(stream);
+    audioChunks=[];
+    mediaRecorder.ondataavailable=e=>{ if(e.data.size>0) audioChunks.push(e.data); };
+    mediaRecorder.onstop=()=>{
+      const blob=new Blob(audioChunks,{type:'audio/webm'});
+      saveRecording(blob);
+      stream.getTracks().forEach(t=>t.stop());
+    };
+    mediaRecorder.start();
+    startTime=Date.now();
+    timerInt=setInterval(updateTimer,500);
+    isRecording=true; isPaused=false;
+    const v=el('recVisual'); if(v){ v.classList.add('recording'); v.textContent='🔴'; }
+    const w=el('wave'); if(w) w.style.display='flex';
+    const l=el('timerLabel'); if(l) l.textContent='Grabando... hablá de tu reunión';
+    const br=el('btnRecord'); if(br) br.disabled=true;
+    const bp=el('btnPause'); if(bp) bp.disabled=false;
+    const bs=el('btnStop'); if(bs) bs.disabled=false;
+    recognition=initRecognition();
+    finalTranscript=(el('transcript')?.value)||'';
+    if(recognition){ try{ recognition.start(); }catch(_){} }
+    showStatus('🎙️ Grabando reunión...','ok');
+  }catch(err){ showStatus('Micrófono error: '+err.message,'error'); }
+}
+function pauseRecording(){
+  if(!mediaRecorder) return;
+  const bp=el('btnPause');
+  if(isPaused){
+    mediaRecorder.resume(); if(recognition) try{ recognition.start(); }catch(_){}
+    isPaused=false;
+    const v=el('recVisual'); if(v){ v.classList.remove('paused'); v.classList.add('recording'); }
+    const l=el('timerLabel'); if(l) l.textContent='Grabando...';
+    if(bp) bp.textContent='⏸️ Pausa';
+    startTime=Date.now() - (parseInt((el('timer')?.textContent||'00:00').split(':')[0])*60 + parseInt((el('timer')?.textContent||'00:00').split(':')[1]))*1000;
+    timerInt=setInterval(updateTimer,500);
+  }else{
+    mediaRecorder.pause(); if(recognition) try{ recognition.stop(); }catch(_){}
+    isPaused=true;
+    const v=el('recVisual'); if(v){ v.classList.remove('recording'); v.classList.add('paused'); }
+    const l=el('timerLabel'); if(l) l.textContent='En pausa';
+    if(bp) bp.textContent='▶️ Reanudar';
+    clearInterval(timerInt);
+  }
+}
+function stopRecording(){
+  if(!mediaRecorder) return;
+  mediaRecorder.stop();
+  if(recognition) try{ recognition.stop(); }catch(_){}
+  clearInterval(timerInt); isRecording=false;
+  const v=el('recVisual'); if(v){ v.classList.remove('recording','paused'); v.textContent='🎙️'; }
+  const w=el('wave'); if(w) w.style.display='none';
+  const l=el('timerLabel'); if(l) l.textContent='Grabación terminada';
+  const br=el('btnRecord'); if(br) br.disabled=false;
+  const bp=el('btnPause'); if(bp){ bp.disabled=true; bp.textContent='⏸️ Pausa'; }
+  const bs=el('btnStop'); if(bs) bs.disabled=true;
+  showStatus('✅ Reunión guardada','ok');
+}
+function saveRecording(blob){
+  const id=Date.now();
+  const trEl=el('transcript');
+  const transcript=(trEl?.value)||finalTranscript||'';
+  const recLight={id, date:new Date().toLocaleString('es-AR'), duration:el('timer')?.textContent||'00:00', transcript, summary:''};
+  const prev=JSON.parse(localStorage.getItem('grabadora_reuniones_light')||'[]');
+  prev.unshift(recLight);
+  localStorage.setItem('grabadora_reuniones_light', JSON.stringify(prev));
+  renderList();
+}
+function renderList(){
+  const listEl=el('recList'); if(!listEl) return;
+  const list=JSON.parse(localStorage.getItem('grabadora_reuniones_light')||'[]');
+  if(list.length===0){ listEl.innerHTML='<div class="empty">Todavía no hay grabaciones</div>'; return; }
+  listEl.innerHTML=list.map(r=>`
+    <div class="rec-item" onclick="window.loadRecGrab && window.loadRecGrab(${r.id})">
+      <div class="ico">🎙️</div>
+      <div class="info"><b>${r.date} - ${r.duration}</b><small>${(r.transcript||'').slice(0,60)}...</small></div>
+      <div class="actions"><button class="icon-btn" onclick="event.stopPropagation(); window.deleteRecGrab && window.deleteRecGrab(${r.id})">🗑️</button></div>
+    </div>
+  `).join('');
+}
+window.loadRecGrab=function(id){
+  const list=JSON.parse(localStorage.getItem('grabadora_reuniones_light')||'[]');
+  const rec=list.find(x=>x.id===id);
+  if(rec){
+    const tr=el('transcript'); if(tr) tr.value=rec.transcript;
+    if(rec.summary){
+      const sumEl=el('summary'); if(sumEl){ sumEl.innerHTML=rec.summary; sumEl.style.display='block'; const emp=el('summaryEmpty'); if(emp) emp.style.display='none'; }
+    }
+    showStatus('Cargada reunión del '+rec.date,'ok');
+  }
+};
+window.deleteRecGrab=function(id){
+  if(!confirm('¿Borrar esta grabación?')) return;
+  let list=JSON.parse(localStorage.getItem('grabadora_reuniones_light')||'[]');
+  list=list.filter(x=>x.id!==id);
+  localStorage.setItem('grabadora_reuniones_light', JSON.stringify(list));
+  renderList();
+};
+function summarize(text){
+  if(!text || text.trim().length<20){ return {resumen:"Texto muy corto para resumir.", puntos:[], tareas:[]}; }
+  const sentences=text.split(/(?<=[.!?])\s+/).filter(s=>s.trim().length>10);
+  const words=text.toLowerCase().split(/\W+/).filter(w=>w.length>3);
+  const freq={}; words.forEach(w=>{ freq[w]=(freq[w]||0)+1; });
+  const stop=new Set(['para','esta','esto','pero','como','cuando','donde','porque','entonces','tambien','sobre','entre','hasta','desde','tiene','tienen']);
+  let scored=sentences.map((s,idx)=>{
+    let score=0; const ws=s.toLowerCase().split(/\W+/); ws.forEach(w=>{ if(!stop.has(w) && freq[w]) score+=freq[w]; });
+    if(/(venta|vender|precio|presupuesto|reunión|reunion|cliente|llamar|contactar|tarea|hacer|enviar|pasar|quedamos|acordamos)/i.test(s)) score+=5;
+    if(s.length>200) score*=0.8;
+    return {s,score,idx};
+  });
+  scored.sort((a,b)=>b.score-a.score);
+  const top=scored.slice(0,3).sort((a,b)=>a.idx-b.idx).map(x=>x.s.trim());
+  const tareas=sentences.filter(s=>/(tengo que|tenemos que|hay que|voy a|va a|quedé en|quedamos en|llamar|enviar|pasar|contactar|hacer|agendar|recordar)/i.test(s)).slice(0,5);
+  const puntos=scored.slice(0,5).map(x=>'• '+x.s.trim());
+  return {resumen: top.join(' '), puntos, tareas: tareas.length? tareas.map(t=>'→ '+t.trim()) : ['No se detectaron tareas claras.']};
+}
+function showSummary(data){
+  const sumEl=el('summary'); const emp=el('summaryEmpty');
+  if(!sumEl) return;
+  if(typeof data==='string'){ sumEl.innerHTML=data; sumEl.style.display='block'; if(emp) emp.style.display='none'; return; }
+  sumEl.innerHTML=`
+    <h4>📝 Resumen</h4><p>${data.resumen}</p>
+    <h4>📌 Puntos clave</h4><ul>${data.puntos.map(p=>`<li>${p}</li>`).join('')}</ul>
+    <h4>✅ Tareas detectadas</h4><ul>${data.tareas.map(t=>`<li>${t}</li>`).join('')}</ul>
+  `;
+  sumEl.style.display='block'; if(emp) emp.style.display='none';
+}
+function initGrabadora(){
+  const br=el('btnRecord'); if(br) br.onclick=startRecording;
+  const bp=el('btnPause'); if(bp) bp.onclick=pauseRecording;
+  const bs=el('btnStop'); if(bs) bs.onclick=stopRecording;
+  const bc=el('btnCopyTrans'); if(bc) bc.onclick=async()=>{ try{ await navigator.clipboard.writeText(el('transcript')?.value||''); showStatus('Texto copiado','ok'); }catch(e){ showStatus('Copiá manual','warn'); } };
+  const bct=el('btnClearTrans'); if(bct) bct.onclick=()=>{ if(confirm('¿Borrar transcripción?')){ const tr=el('transcript'); if(tr) tr.value=''; finalTranscript=''; const s=el('summary'); if(s) s.style.display='none'; const se=el('summaryEmpty'); if(se) se.style.display='block'; } };
+  const bsum=el('btnSummarize'); if(bsum) bsum.onclick=()=>{
+    const txt=(el('transcript')?.value||'').trim();
+    if(!txt){ showStatus('Primero grabá o escribí texto','warn'); return; }
+    const res=summarize(txt);
+    showSummary(res);
+    let list=JSON.parse(localStorage.getItem('grabadora_reuniones_light')||'[]');
+    if(list[0]){ list[0].summary=`<h4>📝 Resumen</h4><p>${res.resumen}</p>`; localStorage.setItem('grabadora_reuniones_light', JSON.stringify(list)); }
+    showStatus('Resumen generado ✅','ok');
+  };
+  const bcs=el('btnClearSum'); if(bcs) bcs.onclick=()=>{ const s=el('summary'); if(s) s.style.display='none'; const se=el('summaryEmpty'); if(se) se.style.display='block'; };
+  const bca=el('btnClearAll'); if(bca) bca.onclick=()=>{ if(confirm('¿Borrar todas?')){ localStorage.removeItem('grabadora_reuniones_light'); renderList(); showStatus('Borrado','ok'); } };
+  renderList();
+}
+document.addEventListener('DOMContentLoaded', initGrabadora);
+setTimeout(initGrabadora, 1000);
+})();
+
+// ===== KEEP NOTAS =====
+(function(){
+const LS_KEY='appi_keep_notas';
+const COLORS=['#fff475','#fbbc04','#f28b82','#aecbfa','#ccff90','#d7aefb','#ffcc80','#e8eaed'];
+function loadNotas(){ try{ return JSON.parse(localStorage.getItem(LS_KEY)||'[]'); }catch(e){ return []; } }
+function saveNotas(n){ localStorage.setItem(LS_KEY, JSON.stringify(n)); }
+function renderKeep(){
+  const cont=document.getElementById('keepGrid'); if(!cont) return;
+  const notas=loadNotas();
+  const q=(document.getElementById('keepSearch')?.value||'').toLowerCase();
+  const filtradas=q? notas.filter(n=> (n.title+' '+n.text).toLowerCase().includes(q)) : notas;
+  if(filtradas.length===0){ cont.innerHTML='<div class="empty" style="column-span:all">Sin notas. ¡Creá la primera!</div>'; return; }
+  cont.innerHTML=filtradas.map(n=>`
+    <div class="keep-note" style="background:${n.color}" onclick="window.openKeepModal && window.openKeepModal('${n.id}')">
+      ${n.pinned?'<div style="position:absolute;top:6px;left:8px;font-size:10px">📌</div>':''}
+      ${n.title?`<div class="k-title">${n.title.replace(/</g,'&lt;')}</div>`:''}
+      <div class="k-text">${(n.text||'').replace(/</g,'&lt;').slice(0,280)}</div>
+      <div class="k-foot"><span>${new Date(parseInt(n.id)).toLocaleDateString('es-AR')}</span><span>${n.color!='#fff475'?'●':''} ${n.pinned?'📌':''}</span></div>
+    </div>
+  `).join('');
+}
+function openKeepModal(id){
+  const notas=loadNotas();
+  const n=notas.find(x=>x.id===id);
+  if(!n) return;
+  const colors=['#fff475','#fbbc04','#f28b82','#aecbfa','#ccff90','#d7aefb','#ffcc80','#e8eaed'];
+  const colorsHtml=colors.map(c=>`<div class="k-color-dot" style="background:${c}; width:26px;height:26px; border:${n.color===c?'3px solid #1c1c1e':'2px solid rgba(255,255,255,0.8)'}" onclick="window.changeKeepColor && window.changeKeepColor('${n.id}','${c}')"></div>`).join('');
+  const html=`
+    <div style="text-align:left">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">${colorsHtml}</div>
+      <label style="font-size:11px;font-weight:900;color:#5c5c66;text-transform:uppercase">Título</label>
+      <input id="keepModalTitle" value="${(n.title||'').replace(/"/g,'&quot;')}" style="width:100%;padding:10px;border-radius:10px;border:1.5px solid rgba(0,0,0,0.12);font-weight:800;font-size:15px;margin:6px 0 12px">
+      <label style="font-size:11px;font-weight:900;color:#5c5c66;text-transform:uppercase">Nota</label>
+      <textarea id="keepModalText" style="width:100%;min-height:180px;padding:12px;border-radius:12px;border:1.5px solid rgba(0,0,0,0.12);font-size:14px;line-height:1.5;resize:vertical;margin:6px 0 16px">${(n.text||'').replace(/</g,'&lt;')}</textarea>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <button class="btn btn-secondary" onclick="window.saveKeepModal && window.saveKeepModal('${n.id}')">💾 Guardar</button>
+        <button class="btn btn-secondary" onclick="window.pinKeep && window.pinKeep('${n.id}'); window.openKeepModal('${n.id}')">📌 ${n.pinned?'Desfijar':'Fijar'}</button>
+        <button class="btn btn-secondary" onclick="window.shareKeep && window.shareKeep('${n.id}')">📤 Enviar</button>
+        <button class="btn" style="background:rgba(217,83,79,0.12);color:#d9534f" onclick="window.delKeep && window.delKeep('${n.id}'); modal.close();">🗑️ Borrar</button>
+      </div>
+      <div style="margin-top:12px;font-size:11px;color:#8a8a94;text-align:center">Creada: ${new Date(parseInt(n.id)).toLocaleString('es-AR')}</div>
+    </div>
+  `;
+  if(typeof modal!=='undefined' && modal.open){
+    modal.open({icon:'📝', iconBg:'linear-gradient(135deg,#fbbf24,#f59e0b)', title:'Nota', sub:n.title||'Sin título', html});
+    // Focus text after open
+    setTimeout(()=>{ const ta=document.getElementById('keepModalText'); if(ta) ta.focus(); },200);
+  }
+}
+
+window.addKeep=function(){
+  const titleEl=document.getElementById('keepTitle');
+  const textEl=document.getElementById('keepText');
+  const title=titleEl?.value?.trim()||'';
+  const text=textEl?.value?.trim()||'';
+  if(!title && !text){ alert('Escribí algo'); return; }
+  const color=document.getElementById('keepColor')?.value||'#fff475';
+  const notas=loadNotas();
+  notas.unshift({id:Date.now().toString(), title, text, color, pinned:false});
+  saveNotas(notas);
+  if(titleEl) titleEl.value=''; if(textEl) textEl.value='';
+  renderKeep();
+  if(typeof showToast==='function') showToast('Nota guardada 📝');
+};
+window.editKeep=function(id){ window.openKeepModal(id); };
+window.openKeepModal=function(id){ openKeepModal(id); };
+window.delKeep=function(id){
+  if(!confirm('¿Borrar nota?')) return;
+  let notas=loadNotas();
+  notas=notas.filter(x=>x.id!==id);
+  saveNotas(notas); renderKeep();
+  if(typeof modal!=='undefined') try{ modal.close(); }catch(e){}
+};
+window.pinKeep=function(id){
+  let notas=loadNotas();
+  const n=notas.find(x=>x.id===id);
+  if(n){ n.pinned=!n.pinned; notas.sort((a,b)=> (b.pinned?1:0)-(a.pinned?1:0)); saveNotas(notas); renderKeep(); }
+};
+window.changeKeepColor=function(id,color){
+  let notas=loadNotas();
+  const n=notas.find(x=>x.id===id);
+  if(n){ n.color=color; saveNotas(notas); renderKeep(); openKeepModal(id); }
+};
+window.saveKeepModal=function(id){
+  const notas=loadNotas();
+  const n=notas.find(x=>x.id===id);
+  if(!n) return;
+  const tEl=document.getElementById('keepModalTitle');
+  const txEl=document.getElementById('keepModalText');
+  if(tEl) n.title=tEl.value;
+  if(txEl) n.text=txEl.value;
+  saveNotas(notas); renderKeep();
+  if(typeof showToast==='function') showToast('Nota guardada ✅');
+};
+window.shareKeep=function(id){
+  const notas=loadNotas();
+  const n=notas.find(x=>x.id===id);
+  if(!n) return;
+  const txt=(n.title? n.title+'\n\n':'')+n.text;
+  if(navigator.share){ navigator.share({title:n.title||'Nota', text:txt}).catch(()=>{}); }
+  else { window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank'); }
+};
+
+function initKeep(){
+  const search=document.getElementById('keepSearch');
+  if(search) search.addEventListener('input', renderKeep);
+  // color picker
+  const wrap=document.getElementById('keepColors');
+  if(wrap){
+    wrap.innerHTML=COLORS.map(c=>`<div class="k-color-dot" style="background:${c}" onclick="document.getElementById('keepColor').value='${c}'; document.getElementById('keepColorPreview').style.background='${c}'"></div>`).join('');
+  }
+  renderKeep();
+}
+document.addEventListener('DOMContentLoaded', initKeep);
+setTimeout(initKeep, 1200);
+window.renderKeep=renderKeep;
 })();
 </script>
 
