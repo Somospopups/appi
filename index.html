@@ -3948,7 +3948,7 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
       <div style="display:flex;align-items:center;justify-content:space-between;margin:12px 0 6px">
   <label class="label" style="margin:0">📝 Transcripción en vivo</label>
   <label style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;cursor:pointer">
-    <input type="checkbox" id="chkLiveTrans" checked style="width:16px;height:16px"> <span>Activa</span>
+    <input type="checkbox" id="chkLiveTrans" style="width:16px;height:16px"> <span>Transcripción (puede hacer ruido)</span>
   </label>
 </div>
 <div style="font-size:10px;color:#8a8a94;margin-bottom:6px">Si hace ruido cada 4s, desactívala, grabá igual y después resumí</div>
@@ -11132,6 +11132,7 @@ async function startRecording(){
       stream.getTracks().forEach(t=>t.stop());
     };
     mediaRecorder.start();
+    try{ if(navigator.vibrate) navigator.vibrate(80); }catch(e){}
     startTime=Date.now();
     timerInt=setInterval(updateTimer,500);
     isRecording=true; isPaused=false;
@@ -11151,7 +11152,7 @@ function pauseRecording(){
   if(!mediaRecorder) return;
   const bp=el('btnPause');
   if(isPaused){
-    mediaRecorder.resume(); if(recognition) try{ recognition.start(); }catch(_){}
+    mediaRecorder.resume(); try{ if(navigator.vibrate) navigator.vibrate([40,30,40]); }catch(e){} if(recognition) try{ recognition.start(); }catch(_){}
     isPaused=false;
     const v=el('recVisual'); if(v){ v.classList.remove('paused'); v.classList.add('recording'); }
     const l=el('timerLabel'); if(l) l.textContent='Grabando...';
@@ -11159,7 +11160,7 @@ function pauseRecording(){
     startTime=Date.now() - (parseInt((el('timer')?.textContent||'00:00').split(':')[0])*60 + parseInt((el('timer')?.textContent||'00:00').split(':')[1]))*1000;
     timerInt=setInterval(updateTimer,500);
   }else{
-    mediaRecorder.pause(); if(recognition) try{ recognition.stop(); }catch(_){}
+    mediaRecorder.pause(); try{ if(navigator.vibrate) navigator.vibrate(50); }catch(e){} if(recognition) try{ recognition.stop(); }catch(_){}
     isPaused=true;
     const v=el('recVisual'); if(v){ v.classList.remove('recording'); v.classList.add('paused'); }
     const l=el('timerLabel'); if(l) l.textContent='En pausa';
@@ -11170,6 +11171,7 @@ function pauseRecording(){
 function stopRecording(){
   if(!mediaRecorder) return;
   mediaRecorder.stop();
+  try{ if(navigator.vibrate) navigator.vibrate([80,50,80]); }catch(e){}
   if(recognition) try{ recognition.stop(); }catch(_){}
   clearInterval(timerInt); isRecording=false;
   const v=el('recVisual'); if(v){ v.classList.remove('recording','paused'); v.textContent='🎙️'; }
