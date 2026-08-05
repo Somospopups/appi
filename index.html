@@ -3357,6 +3357,7 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
   <!-- HOME -->
   <section id="view-home" class="view active">
     <header class="top home-header">
+      <button class="menu-reopen-btn" id="btnMenuReopen" onclick="toggleSidebar()" title="Abrir menú lateral" aria-label="Abrir menú lateral"><span style="font-size:14px">☰</span> Menú</button>
       <button class="help-btn" id="btnHelpHome" aria-label="Ayuda">?</button>
       <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
 
@@ -10567,6 +10568,13 @@ body.dark .presu-select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:
     gap:6px;
     transition:transform 0.15s ease, box-shadow 0.2s ease;
   }
+  /* Cuando sidebar está cerrada, ocultar theme-toggle (luna) para no solapar con Menú y mostrar Menú en su lugar, todo en misma línea */
+  body.sidebar-cerrada .theme-toggle{ display:none !important; }
+  body.sidebar-cerrada .ds-reopen-new{ display:flex !important; }
+  /* Asegurar que en modo escritorio con sidebar cerrada, el header mantiene misma altura y alineación */
+  body.sidebar-cerrada header.top.home-header{ position:relative; }
+  /* En dark mode, mismo estilo que otros botones header */
+  body.dark .ds-reopen-new{ background:rgba(255,255,255,0.1); color:#f0f0f5; border-color:rgba(255,255,255,0.15); }
   body.dark .ds-reopen-new{background:rgba(30,30,50,0.85);color:#f0f0f5;border-color:rgba(255,255,255,0.1)}
   .home-header .ds-reopen-new{ top:0; }
 
@@ -10702,10 +10710,113 @@ body.dark .tools-item:hover{background:rgba(91,141,239,.22); color:#a8b8ff}
 .tools-menu.open .tools-item{opacity:0; animation:toolsIn .32s cubic-bezier(.34,1.56,.64,1) forwards}
 .tools-menu.open .tools-item:nth-child(1){animation-delay:.05s}
 .tools-menu.open .tools-item:nth-child(2){animation-delay:.12s}
+.tools-menu.open .tools-item:nth-child(3){animation-delay:.18s}
 @keyframes toolsIn{
   from{opacity:0; transform:translateX(26px) scale(.9)}
   to{opacity:1; transform:translateX(0) scale(1)}
 }
+
+/* ===== FIX BOTÓN MENÚ - SIEMPRE VISIBLE CUANDO SIDEBAR CERRADA - MISMA LÍNEA QUE APPI ===== */
+.menu-reopen-btn{
+  position:absolute; left:0; top:0;
+  display:none;
+  padding:0 14px; height:38px; border-radius:999px;
+  background:rgba(255,255,255,0.60);
+  -webkit-backdrop-filter:blur(14px) saturate(180%); backdrop-filter:blur(14px) saturate(180%);
+  border:1px solid rgba(255,255,255,0.70);
+  box-shadow:0 4px 16px rgba(80,90,130,0.10);
+  font-family:inherit; font-weight:800; font-size:12px; color:#1c1c1e;
+  cursor:pointer; align-items:center; gap:6px;
+  z-index:20;
+  transition:transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease;
+  letter-spacing:0.3px;
+}
+.menu-reopen-btn:active{ transform:scale(0.94); }
+.menu-reopen-btn:hover{ background:rgba(255,255,255,0.85); box-shadow:0 6px 20px rgba(80,90,130,0.15); }
+body.sidebar-cerrada .menu-reopen-btn{ display:flex !important; }
+body.dark .menu-reopen-btn{ background:rgba(40,40,60,0.75); border-color:rgba(255,255,255,0.12); color:#f0f0f5; }
+body.dark .menu-reopen-btn:hover{ background:rgba(50,50,70,0.85); }
+
+/* ds-reopen-new global - backup flotante para todas las pantallas */
+.ds-reopen-new{
+  position:fixed !important;
+  left:16px !important; bottom:22px !important; top:auto !important;
+  display:none !important;
+  padding:0 18px !important; height:46px !important; border-radius:999px !important;
+  background:rgba(255,255,255,0.88) !important;
+  -webkit-backdrop-filter:blur(18px) saturate(180%) !important; backdrop-filter:blur(18px) saturate(180%) !important;
+  border:1px solid rgba(255,255,255,0.85) !important;
+  box-shadow:0 10px 28px rgba(80,90,130,0.22) !important;
+  font-weight:900 !important; font-size:13px !important; color:#1c1c1e !important;
+  cursor:pointer !important; align-items:center !important; gap:8px !important; z-index:200 !important;
+  transition:transform 0.15s ease !important;
+}
+.ds-reopen-new:active{ transform:scale(0.94) !important; }
+body.sidebar-cerrada .ds-reopen-new{ display:flex !important; }
+body.dark .ds-reopen-new{ background:rgba(30,30,50,0.90) !important; color:#f0f0f5 !important; border-color:rgba(255,255,255,0.15) !important; }
+
+/* En escritorio, el botón de header es el principal, el flotante se oculta si estamos en home */
+@media (min-width: 1024px){
+  body.sidebar-cerrada #view-home.active ~ .ds-reopen-new,
+  body.sidebar-cerrada .ds-reopen-new#dsReopenNewBtn{ 
+    /* en home dejamos solo el botón de header para no duplicar */
+    display:none !important;
+  }
+  body.sidebar-cerrada .home-header .menu-reopen-btn{ display:flex !important; }
+}
+
+/* Cuando sidebar cerrada, ocultar el pill APPI no, pero asegurar espacio */
+body.sidebar-cerrada header.top.home-header{ padding-left:0; }
+body.sidebar-cerrada header.top.home-header .home-brand-row{ pointer-events:none; }
+
+/* FIX LISTA DE PRECIOS - scroll y selección */
+#preciosContent{ 
+  -webkit-overflow-scrolling:touch; 
+  touch-action: pan-y !important;
+  overscroll-behavior:contain;
+}
+#preciosContent .person-item{
+  touch-action: pan-y !important;
+  user-select:none;
+  -webkit-user-select:none;
+  position:relative;
+}
+#preciosContent .person-item.selected{
+  background:rgba(91,141,239,0.12) !important;
+  border-color:rgba(91,141,239,0.25) !important;
+  box-shadow:inset 0 0 0 1.5px rgba(91,141,239,0.35);
+}
+#preciosContent .person-item.selected .pi-name{ color:#3d63c9; font-weight:900; }
+body.dark #preciosContent .person-item.selected{ background:rgba(91,141,239,0.18) !important; border-color:rgba(91,141,239,0.30) !important; }
+
+/* Categorías pills pequeñas orden exacto */
+#preciosFilterChips{ 
+  display:flex; flex-wrap:wrap; gap:6px; 
+  padding:8px 0; 
+  overflow-x:auto; 
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+}
+#preciosFilterChips::-webkit-scrollbar{ display:none; }
+#preciosFilterChips .filter-chip{
+  font-size:10.5px !important; padding:5px 10px !important; white-space:nowrap;
+  font-weight:800; letter-spacing:0.3px;
+}
+
+/* Pill canje diferenciada */
+.canje-item{ border-left:3px solid #f5b301 !important; background:rgba(245,179,1,0.06) !important; }
+
+/* PB 3.30 formato */
+.pi-meta span{ font-variant-numeric: tabular-nums; }
 </style>
+
+<!-- FIX BUMP SW v92 - fuerza refresh -->
+<script>
+// Bump cache version for fix
+try{
+  if(window.localStorage){ localStorage.setItem('appi_fix_menu_v92','1'); }
+}catch(e){}
+</script>
+
 </body>
 </html>
