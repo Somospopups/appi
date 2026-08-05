@@ -3296,10 +3296,8 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
 
-<!-- Nuevo botón para reabrir menú lateral cuando está cerrado - abajo a la izquierda, no molesta arriba -->
-<button class="ds-reopen-new" id="dsReopenNewBtn" onclick="toggleSidebar()" title="Abrir menú lateral" aria-label="Abrir menú lateral">
-  <span style="font-size:18px">☰</span> Menú
-</button>
+<!-- Botón Menú ELIMINADO por pedido - no debe existir en la app -->
+<!-- <button class="ds-reopen-new" id="dsReopenNewBtn" style="display:none !important">Menú</button> -->
 <!-- Botón flotante para forzar giro (celular/tablet) -->
 <button class="rot-fab" id="rotFabBtn" onclick="forzarRotacion()" title="Forzar pantalla horizontal" aria-label="Forzar pantalla horizontal">🔄</button>
  <!-- ============ PANTALLA DE ACTIVACIÓN ============ -->
@@ -3357,6 +3355,7 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
   <!-- HOME -->
   <section id="view-home" class="view active">
     <header class="top home-header">
+      <button class="top-menu-btn" id="btnTopMenu" onclick="toggleSidebar()" title="Menú" aria-label="Menú">☰ Menú</button>
       <button class="help-btn" id="btnHelpHome" aria-label="Ayuda">?</button>
       <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
 
@@ -10545,35 +10544,9 @@ body.dark .presu-select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:
   body.sidebar-cerrada .ds-reopen{display:none !important}
   .ds-reopen:active{transform:scale(.92)}
   .ds-reopen-new{
-    display:none;
-    position:absolute;
-    top:8px;
-    left:16px;
-    z-index:5;
-    padding:0 14px;
-    height:38px;
-    border-radius:999px;
-    background:rgba(255,255,255,0.6);
-    -webkit-backdrop-filter:blur(14px) saturate(180%);
-    backdrop-filter:blur(14px) saturate(180%);
-    border:1px solid rgba(255,255,255,0.7);
-    box-shadow:0 4px 16px rgba(80,90,130,0.10);
-    font-family:inherit;
-    font-weight:800;
-    font-size:12px;
-    color:#1c1c1e;
-    cursor:pointer;
-    align-items:center;
-    gap:6px;
-    transition:transform 0.15s ease, box-shadow 0.2s ease;
+    display:none !important;
   }
-  .ds-reopen-new:hover{
-    transform:translateY(-2px);
-    box-shadow:0 12px 28px rgba(80,90,130,0.20);
-  }
-  .ds-reopen-new:active{transform:scale(0.95)}
-  body.sidebar-cerrada .ds-reopen-new{display:flex}
-  body.dark .ds-reopen-new{background:rgba(30,30,50,0.85);color:#f0f0f5;border-color:rgba(255,255,255,0.1)}
+  body.sidebar-cerrada .ds-reopen-new{display:none !important}
 
   /* --- Tabs inferiores: visibles solo donde la app las necesita (Rueda → Evaluar/Historial) ---
      El JS de showView pone display:flex inline solo para view-wheel/view-eval/view-history.
@@ -10724,6 +10697,64 @@ body.dark #preciosContent .person-item .pi-pts,
 body.dark #preciosContent .person-item .pi-pts-precio{
   color:#ffffff !important;
 }
+
+/* ===== BOTON MENU COMO EN CAPTURA - pill oscuro arriba izquierda - SOLO LANDSCAPE PC ===== */
+.top-menu-btn{
+  position:absolute; left:0; top:0;
+  height:32px; padding:0 12px; border-radius:999px;
+  background:rgba(0,0,0,0.35);
+  -webkit-backdrop-filter:blur(14px) saturate(180%); backdrop-filter:blur(14px) saturate(180%);
+  border:1px solid rgba(255,255,255,0.15);
+  color:#fff; font-family:inherit; font-weight:800; font-size:12px;
+  display:none !important; /* OCULTO POR DEFECTO - solo landscape */
+  align-items:center; gap:6px; cursor:pointer;
+  z-index:20; letter-spacing:0.3px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.15);
+  transition:transform 0.15s ease, background 0.2s ease;
+}
+.top-menu-btn:active{ transform:scale(0.94); }
+.top-menu-btn:hover{ background:rgba(0,0,0,0.5); }
+body.dark .top-menu-btn{ background:rgba(255,255,255,0.12); border-color:rgba(255,255,255,0.15); color:#f0f0f5; }
+body.dark .top-menu-btn:hover{ background:rgba(255,255,255,0.18); }
+/* En pantallas internas, back + menu lado a lado */
+header.top .back-btn + .top-menu-btn{
+  left:44px;
+}
+.home-header .top-menu-btn{ top:0; }
+header.top .back-btn{ z-index:21; }
+/* SOLO visible en modo PC / Landscape */
+@media (min-width: 1024px){
+  .top-menu-btn{ display:flex !important; }
+}
+@media (min-width: 768px) and (orientation: landscape){
+  .top-menu-btn{ display:flex !important; }
+}
 </style>
+
+<script>
+// Inyectar boton Menu al costadito del boton atras en todas las pantallas internas
+(function(){
+  function injectMenuButtons(){
+    document.querySelectorAll('header.top').forEach(h=>{
+      if(h.querySelector('.top-menu-btn')) return; // ya tiene (home)
+      const back=h.querySelector('.back-btn');
+      if(back){
+        const btn=document.createElement('button');
+        btn.className='top-menu-btn';
+        btn.title='Menú';
+        btn.setAttribute('aria-label','Menú');
+        btn.innerHTML='☰ Menú';
+        btn.onclick=()=>{ if(typeof toggleSidebar==='function') toggleSidebar(); };
+        back.after(btn);
+      }
+    });
+  }
+  document.addEventListener('DOMContentLoaded', injectMenuButtons);
+  // Por si las vistas se crean dinamico
+  setTimeout(injectMenuButtons, 800);
+  setTimeout(injectMenuButtons, 2000);
+})();
+</script>
+
 </body>
 </html>
