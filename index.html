@@ -10547,8 +10547,8 @@ body.dark .presu-select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:
   .ds-reopen-new{
     display:none;
     position:absolute;
-    top:8px;
-    left:16px;
+    top:4px;
+    left:0;
     z-index:5;
     padding:0 14px;
     height:38px;
@@ -10567,13 +10567,8 @@ body.dark .presu-select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:
     gap:6px;
     transition:transform 0.15s ease, box-shadow 0.2s ease;
   }
-  .ds-reopen-new:hover{
-    transform:translateY(-2px);
-    box-shadow:0 12px 28px rgba(80,90,130,0.20);
-  }
-  .ds-reopen-new:active{transform:scale(0.95)}
-  body.sidebar-cerrada .ds-reopen-new{display:flex}
   body.dark .ds-reopen-new{background:rgba(30,30,50,0.85);color:#f0f0f5;border-color:rgba(255,255,255,0.1)}
+  .home-header .ds-reopen-new{ top:0; }
 
   /* --- Tabs inferiores: visibles solo donde la app las necesita (Rueda → Evaluar/Historial) ---
      El JS de showView pone display:flex inline solo para view-wheel/view-eval/view-history.
