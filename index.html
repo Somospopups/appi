@@ -11046,10 +11046,29 @@ let recognition=null, finalTranscript='', isRecording=false;
 function el(id){ return document.getElementById(id); }
 
 function showStatus(msg,type='ok'){
-  const e=el('status'); if(!e) return;
-  e.textContent=msg;
-  e.className='status show '+type;
-  setTimeout(()=>e.classList.remove('show'),3000);
+  const e=el('status'); if(e){
+    e.textContent=msg;
+    e.className='status show '+type;
+    setTimeout(()=>e.classList.remove('show'),4000);
+  }
+  // Popup como APPI - todas las notificaciones en modal
+  try{
+    if(typeof modal!=='undefined' && modal.open){
+      const icons={ok:'✅', warn:'💡', error:'⚠️'};
+      const titles={ok:'Listo', warn:'Aviso', error:'Error'};
+      // Solo popup para mensajes importantes, no para "Grabando..."
+      if(type!=='ok' || /error|no se pudo|borrar|soporta/i.test(msg)){
+        modal.open({
+          icon: icons[type]||'💡',
+          iconBg: type==='error' ? 'linear-gradient(135deg,#d9534f,#ff6b6b)' : type==='warn' ? 'linear-gradient(135deg,#f5b301,#ff8f6b)' : 'linear-gradient(135deg,#3ad0a4,#5b8def)',
+          title: titles[type]||'Aviso',
+          html:`<p>${msg}</p>`
+        });
+      } else if(typeof showToast==='function' && !/Grabando/.test(msg)){
+        showToast(msg);
+      }
+    }
+  }catch(e){ console.log('popup fail',e); }
 }
 function fmtTime(sec){
   const m=Math.floor(sec/60).toString().padStart(2,'0');
