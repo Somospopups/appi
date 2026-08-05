@@ -3294,7 +3294,7 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
   <div class="ds-foot">APPI · v91</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) -->
-<button class="ds-reopen" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
+<button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
 <!-- Botón flotante para forzar giro (celular/tablet) -->
 <button class="rot-fab" id="rotFabBtn" onclick="forzarRotacion()" title="Forzar pantalla horizontal" aria-label="Forzar pantalla horizontal">🔄</button>
  <!-- ============ PANTALLA DE ACTIVACIÓN ============ -->
@@ -10447,7 +10447,7 @@ body.dark .presu-select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:
     transition:background .15s ease,transform .1s ease;
   }
   body.dark .ds-reopen{background:rgba(30,30,50,.8); color:#a8b8ff}
-  body.sidebar-cerrada .ds-reopen{display:flex}
+  body.sidebar-cerrada .ds-reopen{display:none !important}
   .ds-reopen:active{transform:scale(.92)}
 
   /* --- Tabs inferiores: visibles solo donde la app las necesita (Rueda → Evaluar/Historial) ---
