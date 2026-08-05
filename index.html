@@ -10698,24 +10698,24 @@ body.dark #preciosContent .person-item .pi-pts-precio{
   color:#ffffff !important;
 }
 
-/* ===== BOTON MENU COMO EN CAPTURA - pill oscuro arriba izquierda - SOLO LANDSCAPE PC ===== */
+/* ===== BOTON MENU COMO EN CAPTURA - pill oscuro arriba izquierda - SOLO LANDSCAPE PC - GLASS COMO APPI ===== */
 .top-menu-btn{
   position:absolute; left:0; top:0;
-  height:32px; padding:0 12px; border-radius:999px;
-  background:rgba(0,0,0,0.35);
+  height:38px; padding:0 14px; border-radius:999px;
+  background:rgba(255,255,255,0.60);
   -webkit-backdrop-filter:blur(14px) saturate(180%); backdrop-filter:blur(14px) saturate(180%);
-  border:1px solid rgba(255,255,255,0.15);
-  color:#fff; font-family:inherit; font-weight:800; font-size:12px;
+  border:1px solid rgba(255,255,255,0.70);
+  color:#3d63c9; font-family:inherit; font-weight:800; font-size:12px;
   display:none !important; /* OCULTO POR DEFECTO - solo landscape */
   align-items:center; gap:6px; cursor:pointer;
   z-index:20; letter-spacing:0.3px;
-  box-shadow:0 4px 12px rgba(0,0,0,0.15);
-  transition:transform 0.15s ease, background 0.2s ease;
+  box-shadow:0 4px 16px rgba(80,90,130,0.10);
+  transition:transform 0.15s ease, background 0.2s ease, box-shadow 0.2s ease;
 }
 .top-menu-btn:active{ transform:scale(0.94); }
-.top-menu-btn:hover{ background:rgba(0,0,0,0.5); }
-body.dark .top-menu-btn{ background:rgba(255,255,255,0.12); border-color:rgba(255,255,255,0.15); color:#f0f0f5; }
-body.dark .top-menu-btn:hover{ background:rgba(255,255,255,0.18); }
+.top-menu-btn:hover{ background:rgba(255,255,255,0.85); box-shadow:0 6px 20px rgba(80,90,130,0.15); }
+body.dark .top-menu-btn{ background:rgba(40,40,60,0.75); border-color:rgba(255,255,255,0.12); color:#a8b8ff; box-shadow:0 4px 16px rgba(0,0,0,0.15); }
+body.dark .top-menu-btn:hover{ background:rgba(50,50,70,0.85); }
 /* En pantallas internas, back + menu lado a lado */
 header.top .back-btn + .top-menu-btn{
   left:44px;
