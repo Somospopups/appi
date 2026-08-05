@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Grabadora IA - Resúmenes de Reuniones</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",Segoe UI,Roboto,sans-serif;min-height:100vh;background:linear-gradient(160deg,#eaf1ff 0%,#f5ecff 45%,#ffe9f2 100%);background-attachment:fixed;color:#1c1c1e}
+body::before{content:"";position:fixed;inset:0;background:radial-gradient(circle at 20% 15%,rgba(120,170,255,0.35),transparent 45%),radial-gradient(circle at 85% 30%,rgba(200,150,255,0.30),transparent 50%),radial-gradient(circle at 50% 90%,rgba(255,170,210,0.30),transparent 55%);z-index:-1;pointer-events:none}
+.app{max-width:520px;margin:0 auto;padding:16px 12px 100px}
+header.top{text-align:center;margin-bottom:20px;position:relative}
+header.top h1{margin:0;font-size:26px;font-weight:900}
+header.top .script{font-family:"Snell Roundhand",cursive;font-size:30px;background:linear-gradient(90deg,#5b8def,#a06bff,#ff6b9d);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.glass{background:rgba(255,255,255,0.62);-webkit-backdrop-filter:blur(20px) saturate(180%);backdrop-filter:blur(20px) saturate(180%);border:1px solid rgba(255,255,255,0.75);border-radius:22px;box-shadow:0 8px 30px rgba(80,90,130,0.10)}
+.card{padding:18px;margin-bottom:14px}
+.rec-card{text-align:center;padding:24px 18px}
+.rec-visual{width:120px;height:120px;margin:0 auto 16px;border-radius:50%;background:linear-gradient(135deg,#5b8def,#a06bff);display:grid;place-items:center;color:#fff;font-size:48px;position:relative;box-shadow:0 12px 30px rgba(120,100,220,0.35);transition:all 0.3s}
+.rec-visual.recording{animation:pulse 1.5s infinite;background:linear-gradient(135deg,#ff6b6b,#ff8f6b);box-shadow:0 12px 30px rgba(255,107,107,0.4)}
+.rec-visual.paused{background:linear-gradient(135deg,#f5b301,#ff8f6b)}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+.rec-visual::after{content:"";position:absolute;inset:-8px;border-radius:50%;border:2px solid rgba(91,141,239,0.3);opacity:0}
+.rec-visual.recording::after{animation:ripple 1.5s infinite}
+@keyframes ripple{0%{transform:scale(1);opacity:1}100%{transform:scale(1.3);opacity:0}}
+.timer{font-size:36px;font-weight:900;letter-spacing:-1px;margin:8px 0;font-variant-numeric:tabular-nums}
+.timer-label{font-size:11px;font-weight:800;color:#8a8a94;text-transform:uppercase;letter-spacing:0.5px}
+.controls{display:flex;gap:10px;justify-content:center;margin-top:18px;flex-wrap:wrap}
+.btn{padding:14px 22px;border-radius:14px;border:none;font-family:inherit;font-weight:800;font-size:14px;cursor:pointer;transition:transform 0.15s,box-shadow 0.2s;display:inline-flex;align-items:center;gap:8px}
+.btn:active{transform:scale(0.96)}
+.btn-primary{background:linear-gradient(135deg,#ff6b6b,#ff8f6b);color:#fff;box-shadow:0 6px 18px rgba(255,107,107,0.35)}
+.btn-secondary{background:rgba(255,255,255,0.7);color:#1c1c1e;border:1px solid rgba(255,255,255,0.8)}
+.btn-success{background:linear-gradient(135deg,#3ad0a4,#5b8def);color:#fff;box-shadow:0 6px 18px rgba(58,208,164,0.35)}
+.btn:disabled{opacity:0.4;cursor:not-allowed}
+.status{margin-top:12px;padding:10px 14px;border-radius:12px;font-size:12px;font-weight:700;display:none}
+.status.show{display:block}
+.status.ok{background:rgba(58,208,164,0.15);color:#1d7a5c}
+.status.warn{background:rgba(245,179,1,0.15);color:#a3670b}
+.status.error{background:rgba(217,83,79,0.12);color:#d9534f}
+.transcript-area{width:100%;min-height:120px;padding:12px;border-radius:12px;border:1.5px solid rgba(80,90,130,0.15);background:rgba(255,255,255,0.8);font-family:inherit;font-size:14px;line-height:1.5;resize:vertical;outline:none;transition:border-color 0.2s}
+.transcript-area:focus{border-color:#5b8def;box-shadow:0 0 0 3px rgba(91,141,239,0.15)}
+.label{font-size:11px;font-weight:900;color:#5c5c66;text-transform:uppercase;letter-spacing:0.5px;margin:12px 0 6px;display:block}
+.summary-box{padding:14px;border-radius:16px;background:linear-gradient(135deg,rgba(91,141,239,0.12),rgba(160,107,255,0.10));border:1px solid rgba(91,141,239,0.18);font-size:13px;line-height:1.5}
+.summary-box h4{margin:0 0 8px;font-size:13px;font-weight:900}
+.summary-box ul{margin:6px 0;padding-left:18px}
+.summary-box li{margin:4px 0}
+.rec-list{display:flex;flex-direction:column;gap:10px}
+.rec-item{padding:14px;border-radius:16px;background:rgba(255,255,255,0.6);border:1px solid rgba(255,255,255,0.7);display:flex;align-items:center;gap:12px;cursor:pointer;transition:transform 0.15s}
+.rec-item:active{transform:scale(0.98)}
+.rec-item .ico{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#5b8def,#a06bff);display:grid;place-items:center;color:#fff;font-size:18px;flex:none}
+.rec-item .info{flex:1;min-width:0}
+.rec-item .info b{display:block;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rec-item .info small{font-size:11px;color:#6b6b76}
+.rec-item .actions{display:flex;gap:6px;flex:none}
+.icon-btn{width:32px;height:32px;border-radius:8px;border:none;background:rgba(0,0,0,0.06);cursor:pointer;display:grid;place-items:center;font-size:14px}
+.wave{display:flex;align-items:center;justify-content:center;gap:3px;height:30px;margin:10px 0}
+.wave span{width:4px;height:12px;background:#5b8def;border-radius:999px;animation:wave 0.8s infinite ease-in-out}
+.wave span:nth-child(2){animation-delay:0.1s}.wave span:nth-child(3){animation-delay:0.2s}.wave span:nth-child(4){animation-delay:0.3s}.wave span:nth-child(5){animation-delay:0.1s}
+@keyframes wave{0%,100%{height:12px}50%{height:28px}}
+.empty{text-align:center;padding:24px;color:#6b6b76;font-size:13px}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <h1>Grabadora</h1><div class="script">IA Reuniones</div>
+  <p style="font-size:12px;color:#5c5c66;margin:6px 0 0">Grabá tu reunión y obtené resumen automático</p>
+</header>
+
+<div class="glass card rec-card">
+  <div class="rec-visual" id="recVisual">🎙️</div>
+  <div class="timer" id="timer">00:00</div>
+  <div class="timer-label" id="timerLabel">Listo para grabar</div>
+  <div class="wave" id="wave" style="display:none"><span></span><span></span><span></span><span></span><span></span></div>
+  
+  <div class="controls">
+    <button class="btn btn-primary" id="btnRecord">🎙️ Grabar</button>
+    <button class="btn btn-secondary" id="btnPause" disabled>⏸️ Pausa</button>
+    <button class="btn btn-secondary" id="btnStop" disabled>⏹️ Stop</button>
+  </div>
+  <div class="status" id="status"></div>
+</div>
+
+<div class="glass card">
+  <label class="label">📝 Transcripción en vivo</label>
+  <textarea class="transcript-area" id="transcript" placeholder="Acá aparece lo que vas diciendo... Tocá Grabar y empezá a hablar de tu reunión. Ej: Hoy hablé con Juan sobre Senior 4..."></textarea>
+  <div style="display:flex;gap:8px;margin-top:10px">
+    <button class="btn btn-secondary" id="btnCopyTrans" style="flex:1">📋 Copiar texto</button>
+    <button class="btn btn-secondary" id="btnClearTrans" style="flex:1">🗑️ Borrar</button>
+  </div>
+  
+  <label class="label">🤖 Resumen automático con IA</label>
+  <div style="display:flex;gap:8px;margin-bottom:10px">
+    <button class="btn btn-success" id="btnSummarize" style="flex:1">✨ Resumir reunión</button>
+    <button class="btn btn-secondary" id="btnClearSum" style="flex:0 0 auto">🗑️</button>
+  </div>
+  <div id="summary" class="summary-box" style="display:none"></div>
+  <div id="summaryEmpty" class="empty">Tocá "Resumir reunión" después de grabar para obtener resumen, puntos clave y tareas</div>
+</div>
+
+<div class="glass card">
+  <label class="label">📂 Grabaciones guardadas</label>
+  <div id="recList" class="rec-list">
+    <div class="empty">Todavía no hay grabaciones. Grabá tu primera reunión arriba.</div>
+  </div>
+  <button class="btn btn-secondary" id="btnClearAll" style="width:100%;margin-top:10px">🗑️ Borrar todo</button>
+</div>
+
+<div class="glass card">
+  <label class="label">💡 Cómo usar para reuniones</label>
+  <div style="font-size:12px;line-height:1.5;color:#3a3a48">
+    <p><b>1.</b> Tocá <b>Grabar</b> y hablale a tu celular como si tomaras notas: "Hoy me reuní con María, interesada en Purificador Senior 4, le pareció caro pero quiere canje, quedó en que la llamo mañana..."</p>
+    <p><b>2.</b> Mientras hablás, la transcripción aparece abajo en vivo.</p>
+    <p><b>3.</b> Al terminar, tocá <b>Stop</b> → <b>Resumir reunión</b> → IA te da resumen + tareas.</p>
+    <p><b>4.</b> Copiá y pegalo en WhatsApp o en tu Seguimiento de APPI.</p>
+    <div style="padding:8px 10px;border-radius:10px;background:rgba(245,179,1,0.12);font-size:11px;margin-top:8px">🔒 Todo queda en tu dispositivo. El audio no se sube a ningún servidor a menos que actives Whisper API.</div>
+  </div>
+</div>
+
+</div>
+
+<script>
+// Estado
+let mediaRecorder=null, audioChunks=[], startTime=null, timerInt=null, isPaused=false;
+let recognition=null, finalTranscript='', isRecording=false;
+let recordings=JSON.parse(localStorage.getItem('grabadora_reuniones')||'[]');
+
+const elVisual=document.getElementById('recVisual');
+const elTimer=document.getElementById('timer');
+const elLabel=document.getElementById('timerLabel');
+const elWave=document.getElementById('wave');
+const elStatus=document.getElementById('status');
+const elTrans=document.getElementById('transcript');
+const elSummary=document.getElementById('summary');
+const elSummaryEmpty=document.getElementById('summaryEmpty');
+const elList=document.getElementById('recList');
+
+function showStatus(msg,type='ok'){
+  elStatus.textContent=msg;
+  elStatus.className='status show '+type;
+  setTimeout(()=>elStatus.classList.remove('show'),3000);
+}
+function fmtTime(sec){
+  const m=Math.floor(sec/60).toString().padStart(2,'0');
+  const s=(sec%60).toString().padStart(2,'0');
+  return `${m}:${s}`;
+}
+function updateTimer(){
+  if(!startTime) return;
+  const elapsed=Math.floor((Date.now()-startTime)/1000);
+  elTimer.textContent=fmtTime(elapsed);
+}
+
+// Transcripción en vivo con Web Speech API
+function initRecognition(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){
+    showStatus('Tu navegador no soporta transcripción en vivo, pero podés grabar audio igual','warn');
+    return null;
+  }
+  const rec=new SR();
+  rec.lang='es-AR';
+  rec.continuous=true;
+  rec.interimResults=true;
+  rec.onresult=(e)=>{
+    let interim='';
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      const t=e.results[i][0].transcript;
+      if(e.results[i].isFinal) finalTranscript+=' '+t;
+      else interim+=t;
+    }
+    elTrans.value=(finalTranscript+' '+interim).trim();
+  };
+  rec.onerror=(e)=>{ console.log('rec error',e); };
+  rec.onend=()=>{
+    if(isRecording && !isPaused){
+      try{ rec.start(); }catch(_){}
+    }
+  };
+  return rec;
+}
+
+async function startRecording(){
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+    mediaRecorder=new MediaRecorder(stream);
+    audioChunks=[];
+    mediaRecorder.ondataavailable=e=>{ if(e.data.size>0) audioChunks.push(e.data); };
+    mediaRecorder.onstop=()=>{
+      const blob=new Blob(audioChunks,{type:'audio/webm'});
+      saveRecording(blob, elTrans.value, finalTranscript);
+      stream.getTracks().forEach(t=>t.stop());
+    };
+    mediaRecorder.start();
+    startTime=Date.now();
+    timerInt=setInterval(updateTimer,500);
+    isRecording=true; isPaused=false;
+    elVisual.classList.add('recording');
+    elVisual.textContent='🔴';
+    elWave.style.display='flex';
+    elLabel.textContent='Grabando... hablá de tu reunión';
+    document.getElementById('btnRecord').disabled=true;
+    document.getElementById('btnPause').disabled=false;
+    document.getElementById('btnStop').disabled=false;
+    // iniciar transcripción
+    recognition=initRecognition();
+    finalTranscript=elTrans.value||'';
+    if(recognition){
+      try{ recognition.start(); }catch(_){}
+    }
+    showStatus('🎙️ Grabando reunión...','ok');
+  }catch(err){
+    showStatus('No se pudo acceder al micrófono: '+err.message,'error');
+    console.error(err);
+  }
+}
+function pauseRecording(){
+  if(!mediaRecorder) return;
+  if(isPaused){
+    mediaRecorder.resume();
+    if(recognition) try{ recognition.start(); }catch(_){}
+    isPaused=false;
+    elVisual.classList.remove('paused');
+    elVisual.classList.add('recording');
+    elLabel.textContent='Grabando...';
+    document.getElementById('btnPause').textContent='⏸️ Pausa';
+    startTime=Date.now() - (parseInt(elTimer.textContent.split(':')[0])*60 + parseInt(elTimer.textContent.split(':')[1]))*1000;
+    timerInt=setInterval(updateTimer,500);
+  }else{
+    mediaRecorder.pause();
+    if(recognition) try{ recognition.stop(); }catch(_){}
+    isPaused=true;
+    elVisual.classList.remove('recording');
+    elVisual.classList.add('paused');
+    elLabel.textContent='En pausa';
+    document.getElementById('btnPause').textContent='▶️ Reanudar';
+    clearInterval(timerInt);
+  }
+}
+function stopRecording(){
+  if(!mediaRecorder) return;
+  mediaRecorder.stop();
+  if(recognition) try{ recognition.stop(); }catch(_){}
+  clearInterval(timerInt);
+  isRecording=false;
+  elVisual.classList.remove('recording','paused');
+  elVisual.textContent='🎙️';
+  elWave.style.display='none';
+  elLabel.textContent='Grabación terminada';
+  document.getElementById('btnRecord').disabled=false;
+  document.getElementById('btnPause').disabled=true;
+  document.getElementById('btnStop').disabled=true;
+  document.getElementById('btnPause').textContent='⏸️ Pausa';
+  showStatus('✅ Reunión guardada','ok');
+}
+
+function saveRecording(blob, transcript, finalText){
+  const id=Date.now();
+  const reader=new FileReader();
+  reader.onload=()=>{
+    const rec={
+      id, date:new Date().toLocaleString('es-AR'),
+      duration:elTimer.textContent,
+      audio:reader.result, // base64
+      transcript:finalText||transcript,
+      summary:''
+    };
+    recordings.unshift(rec);
+    localStorage.setItem('grabadora_reuniones', JSON.stringify(recordings.map(r=>({...r, audio:r.audio.slice(0,100000)})))); // limitar audio para no explotar localStorage, en real guardamos blob url? simplificado
+    // Para demo, guardamos sin audio base64 largo, solo metadata + transcript
+    renderList();
+  };
+  reader.readAsDataURL(blob);
+  // Guardar versión ligera sin audio para localStorage
+  const recLight={id, date:new Date().toLocaleString('es-AR'), duration:elTimer.textContent, transcript:finalText||transcript, summary:''};
+  const prev=JSON.parse(localStorage.getItem('grabadora_reuniones_light')||'[]');
+  prev.unshift(recLight);
+  localStorage.setItem('grabadora_reuniones_light', JSON.stringify(prev));
+}
+
+function renderList(){
+  const list=JSON.parse(localStorage.getItem('grabadora_reuniones_light')||'[]');
+  if(list.length===0){
+    elList.innerHTML='<div class="empty">Todavía no hay grabaciones</div>';
+    return;
+  }
+  elList.innerHTML=list.map(r=>`
+    <div class="rec-item" onclick="loadRec(${r.id})">
+      <div class="ico">🎙️</div>
+      <div class="info"><b>${r.date} - ${r.duration}</b><small>${(r.transcript||'').slice(0,60)}...</small></div>
+      <div class="actions">
+        <button class="icon-btn" onclick="event.stopPropagation(); deleteRec(${r.id})">🗑️</button>
+      </div>
+    </div>
+  `).join('');
+}
+function loadRec(id){
+  const list=JSON.parse(localStorage.getItem('grabadora_reuniones_light')||'[]');
+  const rec=list.find(x=>x.id===id);
+  if(rec){
+    elTrans.value=rec.transcript;
+    if(rec.summary){
+      showSummary(rec.summary);
+    }
+    showStatus('Cargada reunión del '+rec.date,'ok');
+  }
+}
+function deleteRec(id){
+  if(!confirm('¿Borrar esta grabación?')) return;
+  let list=JSON.parse(localStorage.getItem('grabadora_reuniones_light')||'[]');
+  list=list.filter(x=>x.id!==id);
+  localStorage.setItem('grabadora_reuniones_light', JSON.stringify(list));
+  renderList();
+}
+
+// Resumen automático con IA local (sin API)
+function summarize(text){
+  if(!text || text.trim().length<20){
+    return {resumen:"Texto muy corto para resumir.", puntos:[], tareas:[]};
+  }
+  const sentences=text.split(/(?<=[.!?])\s+/).filter(s=>s.trim().length>10);
+  // Score por frecuencia de palabras
+  const words=text.toLowerCase().split(/\W+/).filter(w=>w.length>3);
+  const freq={};
+  words.forEach(w=>{ freq[w]=(freq[w]||0)+1; });
+  // Stopwords simples es
+  const stop=new Set(['para','esta','esto','esta','pero','como','cuando','donde','porque','entonces','tambien','sobre','entre','hasta','desde','tiene','tienen']);
+  let scored=sentences.map((s,idx)=>{
+    let score=0;
+    const ws=s.toLowerCase().split(/\W+/);
+    ws.forEach(w=>{ if(!stop.has(w) && freq[w]) score+=freq[w]; });
+    // Bonus si contiene palabras clave de reunión
+    if(/(venta|vender|precio|presupuesto|reunión|reunion|cliente|llamar|contactar|tarea|hacer|enviar|pasar|quedamos|acordamos)/i.test(s)) score+=5;
+    // Penalizar muy largas
+    if(s.length>200) score*=0.8;
+    return {s,score,idx};
+  });
+  scored.sort((a,b)=>b.score-a.score);
+  const top=scored.slice(0,3).sort((a,b)=>a.idx-b.idx).map(x=>x.s.trim());
+  // Tareas: buscar oraciones con verbos de acción
+  const tareas=sentences.filter(s=>/(tengo que|tenemos que|hay que|voy a|va a|quedé en|quedamos en|llamar|enviar|pasar|contactar|hacer|agendar|recordar)/i.test(s)).slice(0,5);
+  // Puntos clave: top 5 con más score
+  const puntos=scored.slice(0,5).map(x=>'• '+x.s.trim());
+
+  return {
+    resumen: top.join(' '),
+    puntos,
+    tareas: tareas.length? tareas.map(t=>'→ '+t.trim()) : ['No se detectaron tareas claras, revisá el texto.']
+  };
+}
+
+function showSummary(data){
+  if(typeof data==='string'){
+    elSummary.innerHTML=data;
+    elSummary.style.display='block';
+    elSummaryEmpty.style.display='none';
+    return;
+  }
+  elSummary.innerHTML=`
+    <h4>📝 Resumen</h4>
+    <p>${data.resumen}</p>
+    <h4>📌 Puntos clave</h4>
+    <ul>${data.puntos.map(p=>`<li>${p}</li>`).join('')}</ul>
+    <h4>✅ Tareas detectadas</h4>
+    <ul>${data.tareas.map(t=>`<li>${t}</li>`).join('')}</ul>
+    <div style="margin-top:10px;padding:8px 10px;border-radius:10px;background:rgba(58,208,164,0.12);font-size:11px">💡 Copiá esto y pegalo en tu Seguimiento de APPI o WhatsApp</div>
+  `;
+  elSummary.style.display='block';
+  elSummaryEmpty.style.display='none';
+}
+
+document.getElementById('btnRecord').onclick=startRecording;
+document.getElementById('btnPause').onclick=pauseRecording;
+document.getElementById('btnStop').onclick=stopRecording;
+
+document.getElementById('btnCopyTrans').onclick=async()=>{
+  try{ await navigator.clipboard.writeText(elTrans.value); showStatus('Texto copiado','ok'); }catch(e){ showStatus('Seleccioná y copiá manual','warn'); }
+};
+document.getElementById('btnClearTrans').onclick=()=>{
+  if(confirm('¿Borrar transcripción?')){ elTrans.value=''; finalTranscript=''; elSummary.style.display='none'; elSummaryEmpty.style.display='block'; }
+};
+document.getElementById('btnSummarize').onclick=()=>{
+  const txt=elTrans.value.trim();
+  if(!txt){ showStatus('Primero grabá o escribí texto de la reunión','warn'); return; }
+  const res=summarize(txt);
+  showSummary(res);
+  // Guardar resumen en última grabación
+  let list=JSON.parse(localStorage.getItem('grabadora_reuniones_light')||'[]');
+  if(list[0]){ list[0].summary=res.resumen; localStorage.setItem('grabadora_reuniones_light', JSON.stringify(list)); }
+  showStatus('Resumen generado con IA local ✅','ok');
+};
+document.getElementById('btnClearSum').onclick=()=>{ elSummary.style.display='none'; elSummaryEmpty.style.display='block'; };
+document.getElementById('btnClearAll').onclick=()=>{
+  if(confirm('¿Borrar todas las grabaciones?')){ localStorage.removeItem('grabadora_reuniones_light'); renderList(); showStatus('Borrado','ok'); }
+};
+
+renderList();
+
+// Aviso si no hay micro
+if(!navigator.mediaDevices){ showStatus('Tu navegador no soporta grabación, probá en Chrome en HTTPS','error'); }
+</script>
+</body>
+</html>
