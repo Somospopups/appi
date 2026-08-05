@@ -135,9 +135,23 @@ const elSummaryEmpty=document.getElementById('summaryEmpty');
 const elList=document.getElementById('recList');
 
 function showStatus(msg,type='ok'){
-  elStatus.textContent=msg;
-  elStatus.className='status show '+type;
-  setTimeout(()=>elStatus.classList.remove('show'),3000);
+  const e=elStatus;
+  if(e){
+    e.textContent=msg;
+    e.className='status show '+type;
+    setTimeout(()=>e.classList.remove('show'),4000);
+  }
+  // Popup como APPI
+  try{
+    const icons={ok:'✅', warn:'💡', error:'⚠️'};
+    const titles={ok:'Listo', warn:'Aviso', error:'Error'};
+    if(typeof modal!=='undefined' && modal.open){
+      // Mostrar popup para errores, warnings y confirmaciones importantes
+      if(type!=='ok' || /error|no se pudo|borrar|soporta|guardada|Borrado|copiado|Transcripción/i.test(msg)){
+        modal.open({icon: icons[type]||'💡', title: titles[type]||'Aviso', html:`<p>${msg}</p>`});
+      }
+    }
+  }catch(e){}
 }
 function fmtTime(sec){
   const m=Math.floor(sec/60).toString().padStart(2,'0');
@@ -403,6 +417,34 @@ renderList();
 
 // Aviso si no hay micro
 if(!navigator.mediaDevices){ showStatus('Tu navegador no soporta grabación, probá en Chrome en HTTPS','error'); }
+</script>
+
+<!-- MODAL POPUP COMO APPI -->
+<div class="modal-overlay" id="modalOverlay" style="position:fixed;inset:0;background:rgba(20,20,30,0.55);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity 0.25s;z-index:200">
+  <div class="modal" id="modalBox" style="background:rgba(255,255,255,0.98);backdrop-filter:blur(20px);border-radius:24px;width:100%;max-width:400px;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3);transform:translateY(20px);transition:transform 0.3s;padding:22px;text-align:center">
+    <div id="modalIcon" style="width:56px;height:56px;border-radius:18px;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:28px;color:#fff;background:linear-gradient(135deg,#5b8def,#a06bff)">💡</div>
+    <h3 id="modalTitle" style="margin:0;font-size:18px;font-weight:800">Aviso</h3>
+    <div id="modalBody" style="margin:12px 0;font-size:14px;line-height:1.5;color:#3a3a48"></div>
+    <button id="modalOk" style="width:100%;padding:12px;border-radius:12px;border:none;background:linear-gradient(135deg,#5b8def,#a06bff);color:#fff;font-weight:800;cursor:pointer">Entendido</button>
+  </div>
+</div>
+<script>
+const modal={
+  el: document.getElementById('modalOverlay'),
+  open({icon='💡', title='Aviso', html=''}){
+    document.getElementById('modalIcon').textContent=icon;
+    document.getElementById('modalTitle').textContent=title;
+    document.getElementById('modalBody').innerHTML=html;
+    this.el.style.opacity='1'; this.el.style.pointerEvents='auto';
+    this.el.querySelector('.modal').style.transform='translateY(0)';
+  },
+  close(){
+    this.el.style.opacity='0'; this.el.style.pointerEvents='none';
+    this.el.querySelector('.modal').style.transform='translateY(20px)';
+  }
+};
+document.getElementById('modalOverlay').addEventListener('click', e=>{ if(e.target.id==='modalOverlay') modal.close(); });
+document.getElementById('modalOk').addEventListener('click', ()=>modal.close());
 </script>
 </body>
 </html>
