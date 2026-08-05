@@ -3945,7 +3945,13 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
     </div>
 
     <div class="glass card">
-      <label class="label">📝 Transcripción en vivo</label>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin:12px 0 6px">
+  <label class="label" style="margin:0">📝 Transcripción en vivo</label>
+  <label style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;cursor:pointer">
+    <input type="checkbox" id="chkLiveTrans" checked style="width:16px;height:16px"> <span>Activa</span>
+  </label>
+</div>
+<div style="font-size:10px;color:#8a8a94;margin-bottom:6px">Si hace ruido cada 4s, desactívala, grabá igual y después resumí</div>
       <textarea class="transcript-area" id="transcript" placeholder="Acá aparece lo que vas diciendo... Tocá Grabar y empezá a hablar de tu reunión. Ej: Hoy hablé con Juan sobre Senior 4..."></textarea>
       <div style="display:flex;gap:8px;margin-top:10px">
         <button class="btn btn-secondary" id="btnCopyTrans" style="flex:1">📋 Copiar texto</button>
@@ -10972,7 +10978,7 @@ header.top .back-btn{ z-index:21; }
 @keyframes rippleRec{0%{transform:scale(1);opacity:1}100%{transform:scale(1.3);opacity:0}}
 .timer{font-size:36px;font-weight:900;letter-spacing:-1px;margin:8px 0;font-variant-numeric:tabular-nums}
 .timer-label{font-size:11px;font-weight:800;color:#8a8a94;text-transform:uppercase;letter-spacing:0.5px}
-.controls{display:flex;gap:10px;justify-content:center;margin-top:18px;flex-wrap:wrap}
+.controls{display:flex;gap:10px;justify-content:center;margin-top:18px;margin-bottom:16px;flex-wrap:wrap;position:relative;z-index:2}
 .transcript-area{width:100%;min-height:120px;padding:12px;border-radius:12px;border:1.5px solid rgba(80,90,130,0.15);background:rgba(255,255,255,0.8);font-family:inherit;font-size:14px;line-height:1.5;resize:vertical;outline:none;transition:border-color 0.2s}
 .transcript-area:focus{border-color:#5b8def;box-shadow:0 0 0 3px rgba(91,141,239,0.15)}
 .label{font-size:11px;font-weight:900;color:#5c5c66;text-transform:uppercase;letter-spacing:0.5px;margin:12px 0 6px;display:block}
@@ -11088,17 +11094,26 @@ function initRecognition(){
     let interim='';
     for(let i=e.resultIndex;i<e.results.length;i++){
       const t=e.results[i][0].transcript;
-      if(e.results[i].isFinal) finalTranscript+=' '+t;
+      if(e.results[i].isFinal){ finalTranscript+=' '+t; window._lastSpeech=Date.now(); }
       else interim+=t;
     }
     const tr=el('transcript'); if(tr) tr.value=(finalTranscript+' '+interim).trim();
+    window._lastSpeech=Date.now();
   };
   rec.onend=()=>{
-    if(isRecording && !isPaused){
-      // Evitar reinicio inmediato que hace ruido cada segundos - delay 1.2s
-      setTimeout(()=>{ if(isRecording && !isPaused){ try{ rec.start(); }catch(e){ console.log('rec restart fail',e); } } }, 1200);
+    // Fix: no reiniciar automáticamente para evitar loop cada 4s y ruido
+    // Solo reiniciar si sigue grabando, no pausado, y el usuario tiene activada transcripción en vivo
+    const chkLive=document.getElementById('chkLiveTrans');
+    const liveEnabled=chkLive ? chkLive.checked : true;
+    if(isRecording && !isPaused && liveEnabled){
+      // Solo reiniciar si hubo actividad reciente (evita loop infinito en silencio)
+      const now=Date.now();
+      if(window._lastSpeech && (now - window._lastSpeech) < 8000){
+        setTimeout(()=>{ if(isRecording && !isPaused && (document.getElementById('chkLiveTrans')?.checked ?? true)){ try{ rec.start(); }catch(e){} } }, 1500);
+      }
     }
   };
+  rec.onspeechstart=()=>{ window._lastSpeech=Date.now(); };
   return rec;
 }
 async function startRecording(){
