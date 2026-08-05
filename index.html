@@ -3357,7 +3357,6 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
   <!-- HOME -->
   <section id="view-home" class="view active">
     <header class="top home-header">
-      <button class="menu-reopen-btn" id="btnMenuReopen" onclick="toggleSidebar()" title="Menú" aria-label="Abrir menú">☰</button>
       <button class="help-btn" id="btnHelpHome" aria-label="Ayuda">?</button>
       <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
 
@@ -10709,39 +10708,15 @@ body.dark .tools-item:hover{background:rgba(91,141,239,.22); color:#a8b8ff}
   to{opacity:1; transform:translateX(0) scale(1)}
 }
 
-/* ===== FIX BOTON MENU - redondito glass izquierda misma linea APPI ===== */
-.menu-reopen-btn{
-  position:absolute; left:0; top:0;
-  width:38px; height:38px; border-radius:50%;
-  background:rgba(255,255,255,0.60);
-  -webkit-backdrop-filter:blur(14px) saturate(180%); backdrop-filter:blur(14px) saturate(180%);
-  border:1px solid rgba(255,255,255,0.70);
-  box-shadow:0 4px 16px rgba(80,90,130,0.10);
-  font-family:inherit; font-weight:800; font-size:18px; color:#3d63c9;
-  cursor:pointer; display:flex; align-items:center; justify-content:center;
-  z-index:20; transition:transform 0.15s ease, background 0.2s ease;
+/* ===== FIX PRECIOS MODO NOCHE - blanco ===== */
+#preciosContent .person-item .pi-pts-precio{
+  color:#1c1c1e; font-size:15px; font-weight:900; min-width:95px; text-align:right;
 }
-.menu-reopen-btn:active{ transform:scale(0.90); }
-.menu-reopen-btn:hover{ background:rgba(255,255,255,0.85); }
-body.dark .menu-reopen-btn{ background:rgba(40,40,60,0.75); border-color:rgba(255,255,255,0.12); color:#f0f0f5; }
-
-/* ===== FIX LISTA PRECIOS - modo noche precios en blanco ===== */
-#preciosContent .person-item .pi-pts-precio{ color:#1c1c1e; font-size:15px; font-weight:900; min-width:95px; text-align:right; }
 body.dark #preciosContent .person-item .pi-pts,
 body.dark #preciosContent .person-item .pi-pts-precio{
   color:#ffffff !important;
 }
-body.dark #preciosContent .person-item .pi-name{
-  color:#f0f0f5 !important;
-}
-body.dark #preciosContent .person-item{
-  background:rgba(40,40,60,0.6);
-  border-color:rgba(255,255,255,0.08);
-}
-#preciosContent .person-item.selected{ 
-  background:rgba(91,141,239,0.12) !important; 
-  border-color:rgba(91,141,239,0.25) !important; 
-}
+body.dark #preciosContent .person-item .pi-name{ color:#f0f0f5 !important; }
 </style>
 </body>
 </html>
