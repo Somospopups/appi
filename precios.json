@@ -2,13 +2,19 @@
   "version": 5,
   "actualizado": "2026-08-05",
   "categoriasOrden": [
-    "PURIFICADORES",
-    "GASIFICADOR",
-    "PURIFICADOR DE OSMOSIS INVERSA",
-    "PURIFICADOR DE AIRE",
-    "KITS",
-    "REPUESTOS",
-    "OTROS"
+    "Purificadores",
+    "Gasificador",
+    "Purificador Osmosis Inversa",
+    "Purificador de Aire",
+    "Kits",
+    "Accesorios para la instalación",
+    "Reposiciones",
+    "Repuestos/mantenim. productos",
+    "Servicios",
+    "Botellas",
+    "Material Promocional",
+    "Análisis de laboratorio",
+    "Olivare"
   ],
   "preciosCruzados": [
     {
@@ -16,1890 +22,1890 @@
       "nombreNorm": "ablandador psa domus",
       "pb": 3.8,
       "precioUser": 2782000.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "ABLANDADOR PSA DOMUS + INSTALACION",
       "nombreNorm": "ablandador psa domus + instalacion",
       "pb": 3.8,
       "precioUser": 2961000.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "ABLANDADOR PSA MINI DOMUS",
       "nombreNorm": "ablandador psa mini domus",
       "pb": 3.5,
       "precioUser": 2198000.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "ABLANDADOR PSA MINI DOMUS + INSTALACION",
       "nombreNorm": "ablandador psa mini domus + instalacion",
       "pb": 3.5,
       "precioUser": 2369000.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA SENIOR 4 BIANCO + KIT POSV.",
       "nombreNorm": "psa senior 4 bianco + kit posv.",
       "pb": 3.3,
       "precioUser": 913000.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA SENIOR 4 BIANCO + KIT POSV. Plan canje",
       "nombreNorm": "psa senior 4 bianco + kit posv. plan canje",
       "pb": 2.95,
       "precioUser": 821700.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA SENIOR 4 BM + KIT POSV",
       "nombreNorm": "psa senior 4 bm + kit posv",
       "pb": 2.9,
       "precioUser": 808000.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA SENIOR 4 BM + KIT POSV Plan canje",
       "nombreNorm": "psa senior 4 bm + kit posv plan canje",
       "pb": 2.6,
       "precioUser": 727200.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA SENIOR 4 GRIGIO + KIT POSV",
       "nombreNorm": "psa senior 4 grigio + kit posv",
       "pb": 3.3,
       "precioUser": 913000.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA SENIOR 4 GRIGIO + KIT POSV Plan canje",
       "nombreNorm": "psa senior 4 grigio + kit posv plan canje",
       "pb": 2.95,
       "precioUser": 821700.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA SENIOR 4 NERO + KIT POSV.",
       "nombreNorm": "psa senior 4 nero + kit posv.",
       "pb": 3.3,
       "precioUser": 913000.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA SENIOR 4 NERO + KIT POSV. Plan canje",
       "nombreNorm": "psa senior 4 nero + kit posv. plan canje",
       "pb": 2.95,
       "precioUser": 821700.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA SENIOR BIANCO + KIT POSV.",
       "nombreNorm": "psa senior bianco + kit posv.",
       "pb": 2.7,
       "precioUser": 751000.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA SENIOR BIANCO + KIT POSV. Plan canje",
       "nombreNorm": "psa senior bianco + kit posv. plan canje",
       "pb": 2.4,
       "precioUser": 675900.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA 1-P PORTATÍL",
       "nombreNorm": "psa 1-p portatíl",
       "pb": 0.35,
       "precioUser": 122000.0,
-      "categoria": "OTROS"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA C3 GRIGIO",
       "nombreNorm": "psa c3 grigio",
       "pb": 0.55,
       "precioUser": 208000.0,
-      "categoria": "OTROS"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA C3 GRIGIO Plan canje",
       "nombreNorm": "psa c3 grigio plan canje",
       "pb": 0.4,
       "precioUser": 187200.0,
-      "categoria": "OTROS"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA DUCHA BIANCO C/KDF",
       "nombreNorm": "psa ducha bianco c/kdf",
       "pb": 1.15,
       "precioUser": 296000.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA DUCHA BIANCO C/KDF Plan canje",
       "nombreNorm": "psa ducha bianco c/kdf plan canje",
       "pb": 0.95,
       "precioUser": 266400.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA DUCHA BIANCO C/KDF-POLI",
       "nombreNorm": "psa ducha bianco c/kdf-poli",
       "pb": 1.15,
       "precioUser": 296000.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA DUCHA BIANCO C/KDF-POLI Plan canje",
       "nombreNorm": "psa ducha bianco c/kdf-poli plan canje",
       "pb": 0.95,
       "precioUser": 266400.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA DUCHA GRIGIO C/KDF",
       "nombreNorm": "psa ducha grigio c/kdf",
       "pb": 1.15,
       "precioUser": 296000.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA DUCHA GRIGIO C/KDF Plan canje",
       "nombreNorm": "psa ducha grigio c/kdf plan canje",
       "pb": 0.95,
       "precioUser": 266400.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA DUCHA GRIGIO C/KDF-POLI",
       "nombreNorm": "psa ducha grigio c/kdf-poli",
       "pb": 1.15,
       "precioUser": 296000.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA DUCHA GRIGIO C/KDF-POLI Plan canje",
       "nombreNorm": "psa ducha grigio c/kdf-poli plan canje",
       "pb": 0.95,
       "precioUser": 266400.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA IONTRIX 3",
       "nombreNorm": "psa iontrix 3",
       "pb": 3.1,
       "precioUser": 1176000.0,
-      "categoria": "OTROS"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA IONTRIX 3 Plan canje",
       "nombreNorm": "psa iontrix 3 plan canje",
       "pb": 2.3,
       "precioUser": 1058400.0,
-      "categoria": "OTROS"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA MINI BIANCO + KIT POSV.",
       "nombreNorm": "psa mini bianco + kit posv.",
       "pb": 1.15,
       "precioUser": 411000.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA MINI BIANCO + KIT POSV. Plan canje",
       "nombreNorm": "psa mini bianco + kit posv. plan canje",
       "pb": 1.05,
       "precioUser": 369900.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA MINI NERO + KIT POSV.",
       "nombreNorm": "psa mini nero + kit posv.",
       "pb": 1.15,
       "precioUser": 411000.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA MINI NERO + KIT POSV. Plan canje",
       "nombreNorm": "psa mini nero + kit posv. plan canje",
       "pb": 1.05,
       "precioUser": 369900.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA POLI 2 BIANCO",
       "nombreNorm": "psa poli 2 bianco",
       "pb": 0.85,
       "precioUser": 280000.0,
-      "categoria": "OTROS"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA QUANTUM BM BIANCO + POSV",
       "nombreNorm": "psa quantum bm bianco + posv",
       "pb": 3.5,
       "precioUser": 1271000.0,
-      "categoria": "OTROS"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA QUANTUM BM BIANCO + POSV Plan canje",
       "nombreNorm": "psa quantum bm bianco + posv plan canje",
       "pb": 3.0,
       "precioUser": 1143900.0,
-      "categoria": "OTROS"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA QUANTUM SM BIANCO + POSV.",
       "nombreNorm": "psa quantum sm bianco + posv.",
       "pb": 3.5,
       "precioUser": 1271000.0,
-      "categoria": "OTROS"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA QUANTUM SM BIANCO + POSV. Plan canje",
       "nombreNorm": "psa quantum sm bianco + posv. plan canje",
       "pb": 3.0,
       "precioUser": 1143900.0,
-      "categoria": "OTROS"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA S-1000 2 BM BIANCO + POSV.",
       "nombreNorm": "psa s-1000 2 bm bianco + posv.",
       "pb": 3.45,
       "precioUser": 1079000.0,
-      "categoria": "OTROS"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA S-1000 2 BM BIANCO + POSV. Plan canje",
       "nombreNorm": "psa s-1000 2 bm bianco + posv. plan canje",
       "pb": 3.0,
       "precioUser": 971100.0,
-      "categoria": "OTROS"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA S-1000 2 SM BIANCO + POSV.",
       "nombreNorm": "psa s-1000 2 sm bianco + posv.",
       "pb": 3.45,
       "precioUser": 1079000.0,
-      "categoria": "OTROS"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA S-1000 2 SM BIANCO + POSV. Plan canje",
       "nombreNorm": "psa s-1000 2 sm bianco + posv. plan canje",
       "pb": 3.0,
       "precioUser": 971100.0,
-      "categoria": "OTROS"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA S-1000 2 SM NERO + POSV.",
       "nombreNorm": "psa s-1000 2 sm nero + posv.",
       "pb": 3.45,
       "precioUser": 1079000.0,
-      "categoria": "OTROS"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA S-1000 2 SM NERO + POSV. Plan canje",
       "nombreNorm": "psa s-1000 2 sm nero + posv. plan canje",
       "pb": 3.0,
       "precioUser": 971100.0,
-      "categoria": "OTROS"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA SENIK BM BIANCO + POSV.",
       "nombreNorm": "psa senik bm bianco + posv.",
       "pb": 3.75,
       "precioUser": 1248000.0,
-      "categoria": "OTROS"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA SENIK BM BIANCO + POSV. Plan canje",
       "nombreNorm": "psa senik bm bianco + posv. plan canje",
       "pb": 3.0,
       "precioUser": 1123200.0,
-      "categoria": "OTROS"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA SENIK SM BIANCO + POSV.",
       "nombreNorm": "psa senik sm bianco + posv.",
       "pb": 3.75,
       "precioUser": 1248000.0,
-      "categoria": "OTROS"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA SENIK SM BIANCO + POSV. Plan canje",
       "nombreNorm": "psa senik sm bianco + posv. plan canje",
       "pb": 3.0,
       "precioUser": 1123200.0,
-      "categoria": "OTROS"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA VERO BIANCO + KIT POSV.",
       "nombreNorm": "psa vero bianco + kit posv.",
       "pb": 1.45,
       "precioUser": 528000.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA VERO BIANCO + KIT POSV. Plan canje",
       "nombreNorm": "psa vero bianco + kit posv. plan canje",
       "pb": 1.35,
       "precioUser": 475200.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA SODA BURBY BIANCO",
       "nombreNorm": "psa soda burby bianco",
       "pb": 2.15,
       "precioUser": 438000.0,
-      "categoria": "GASIFICADOR"
+      "categoria": "Gasificador"
     },
     {
       "nombre": "PSA SODA BURBY BIANCO Plan canje",
       "nombreNorm": "psa soda burby bianco plan canje",
       "pb": 1.9,
       "precioUser": 394200.0,
-      "categoria": "GASIFICADOR"
+      "categoria": "Gasificador"
     },
     {
       "nombre": "PSA OSMOSIS ROPOT",
       "nombreNorm": "psa osmosis ropot",
       "pb": 3.5,
       "precioUser": 1937000.0,
-      "categoria": "PURIFICADOR DE OSMOSIS INVERSA"
+      "categoria": "Purificador Osmosis Inversa"
     },
     {
       "nombre": "PSA OSMOSIS ROPOT Plan canje",
       "nombreNorm": "psa osmosis ropot plan canje",
       "pb": 2.5,
       "precioUser": 1743300.0,
-      "categoria": "PURIFICADOR DE OSMOSIS INVERSA"
+      "categoria": "Purificador Osmosis Inversa"
     },
     {
       "nombre": "PSA PURIFICADOR DE AIRE",
       "nombreNorm": "psa purificador de aire",
       "pb": 4.5,
       "precioUser": 1596000.0,
-      "categoria": "PURIFICADOR DE AIRE"
+      "categoria": "Purificador de Aire"
     },
     {
       "nombre": "(001) ADAPT. UNIVERSAL C/MANGUERA",
       "nombreNorm": "(001) adapt. universal c/manguera",
       "pb": 0.0,
       "precioUser": 22250.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "(002) ADAPT. ROSCA (FV TIPO UNIMIX)",
       "nombreNorm": "(002) adapt. rosca (fv tipo unimix)",
       "pb": 0.0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "(003) ADAPT. ROSCA CORTA",
       "nombreNorm": "(003) adapt. rosca corta",
       "pb": 0.0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "(004) ADAPT. ROSCA LARGA",
       "nombreNorm": "(004) adapt. rosca larga",
       "pb": 0.0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "(005) ADAPT. UNIV.MARIPOSA DIAM.11-12",
       "nombreNorm": "(005) adapt. univ.mariposa diam.11-12",
       "pb": 0.0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "(006) ADAPT. UNIV.MARIPOSA DIAM.14",
       "nombreNorm": "(006) adapt. univ.mariposa diam.14",
       "pb": 0.0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "(007) ADAPT. UNIV.MARIPOSA DIAM.16",
       "nombreNorm": "(007) adapt. univ.mariposa diam.16",
       "pb": 0.0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "(008) ADAPT. UNIV.MARIPOSA DIAM.18",
       "nombreNorm": "(008) adapt. univ.mariposa diam.18",
       "pb": 0.0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "(009) ADAPT. UNIV.MARIPOSA DIAM.20",
       "nombreNorm": "(009) adapt. univ.mariposa diam.20",
       "pb": 0.0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "(010) ADAPT. ROSCA HEMBRA-HEMBRA",
       "nombreNorm": "(010) adapt. rosca hembra-hembra",
       "pb": 0.0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "(016) ADAPT. ROSCA HEMBRA O.N.",
       "nombreNorm": "(016) adapt. rosca hembra o.n.",
       "pb": 0.0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "(018) ADAPT. ROSCA CANILLA TIPO PATIO",
       "nombreNorm": "(018) adapt. rosca canilla tipo patio",
       "pb": 0.0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "(020) ADAPT. ROSCA ESPECIAL",
       "nombreNorm": "(020) adapt. rosca especial",
       "pb": 0.0,
       "precioUser": 24800.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "(027) ADAPT. ROSCA LARGA PASO FINO",
       "nombreNorm": "(027) adapt. rosca larga paso fino",
       "pb": 0.0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "(030) ADAPT. H-M 1/2 C/TUERCA DUCHA II",
       "nombreNorm": "(030) adapt. h-m 1/2 c/tuerca ducha ii",
       "pb": 0.0,
       "precioUser": 35800.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "(036) ADAPT. M-M 3/4 BG DUCHA II",
       "nombreNorm": "(036) adapt. m-m 3/4 bg ducha ii",
       "pb": 0.0,
       "precioUser": 35800.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "(037) ADAPT. ROSCA MACHO (FV SWING PLUS)",
       "nombreNorm": "(037) adapt. rosca macho (fv swing plus)",
       "pb": 0.0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "(039) ADAPT. ROSCA HEMBRA-HEMBRA DIÁM.22",
       "nombreNorm": "(039) adapt. rosca hembra-hembra diám.22",
       "pb": 0.0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "(041) ADAPT. ROSCA CANILLA PIAZZA",
       "nombreNorm": "(041) adapt. rosca canilla piazza",
       "pb": 0.0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "(053) ADAPT. ROSCA BSP 3/4 X 14 HILOS",
       "nombreNorm": "(053) adapt. rosca bsp 3/4 x 14 hilos",
       "pb": 0.0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "(073) ADAPT. ROSCA MÚLTIPLE",
       "nombreNorm": "(073) adapt. rosca múltiple",
       "pb": 0.0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "(100) ADAPT. ROSCA HEMBRA BSP 1/2",
       "nombreNorm": "(100) adapt. rosca hembra bsp 1/2",
       "pb": 0.0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "(103) ADAPT. ROSCA HEMBRA P/HIDROMET",
       "nombreNorm": "(103) adapt. rosca hembra p/hidromet",
       "pb": 0.0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "(148) ADAPT. ROSCA HEMBRA (SWING PLUS) M. 24X1",
       "nombreNorm": "(148) adapt. rosca hembra (swing plus) m. 24x1",
       "pb": 0.0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "(155) ADAPT. S-1000 C/ORING. P/MANOMETRO",
       "nombreNorm": "(155) adapt. s-1000 c/oring. p/manometro",
       "pb": 0.0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "(177) ADAPT. RECTANGULAR P/PEGAR",
       "nombreNorm": "(177) adapt. rectangular p/pegar",
       "pb": 0.0,
       "precioUser": 54550.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "(20) ADAPT. M-H BG 3/4 P/ DUCHA CR",
       "nombreNorm": "(20) adapt. m-h bg 3/4 p/ ducha cr",
       "pb": 0.0,
       "precioUser": 35800.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "(228) ADAPT. OVALADO",
       "nombreNorm": "(228) adapt. ovalado",
       "pb": 0.0,
       "precioUser": 54550.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "(229) ADAPT. ROSCA H-H 22 X 1 LARGO",
       "nombreNorm": "(229) adapt. rosca h-h 22 x 1 largo",
       "pb": 0.0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "(573) ADAPT. UNIVERSAL C/MANGUERA NERO",
       "nombreNorm": "(573) adapt. universal c/manguera nero",
       "pb": 0.0,
       "precioUser": 22250.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "ADAPT. ESPECIAL KIT 90°",
       "nombreNorm": "adapt. especial kit 90°",
       "pb": 0.0,
       "precioUser": 80000.0,
-      "categoria": "KITS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "BUJE DE DERIVACIÓN CANILLA BM",
       "nombreNorm": "buje de derivación canilla bm",
       "pb": 0.0,
       "precioUser": 10550.0,
-      "categoria": "OTROS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "CONECT.COCODRILO S-1000 X 5 UNID",
       "nombreNorm": "conect.cocodrilo s-1000 x 5 unid",
       "pb": 0.0,
       "precioUser": 15100.0,
-      "categoria": "OTROS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "CONECTOR RAPIDO DE SALIDA PSA 10KD",
       "nombreNorm": "conector rapido de salida psa 10kd",
       "pb": 0.0,
       "precioUser": 33950.0,
-      "categoria": "OTROS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "CONJ.SOPORTE ACRILICO P/MINI",
       "nombreNorm": "conj.soporte acrilico p/mini",
       "pb": 0.0,
       "precioUser": 22150.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "CONJ.SOPORTE ACRILICO SENIOR/VERO",
       "nombreNorm": "conj.soporte acrilico senior/vero",
       "pb": 0.0,
       "precioUser": 27450.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "CONJ.SOPORTE PSA STOPPER",
       "nombreNorm": "conj.soporte psa stopper",
       "pb": 0.0,
       "precioUser": 22150.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "FUNDA PSA DOMUS",
       "nombreNorm": "funda psa domus",
       "pb": 0.0,
       "precioUser": 69700.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "FUNDA PSA MINI DOMUS",
       "nombreNorm": "funda psa mini domus",
       "pb": 0.0,
       "precioUser": 58850.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "GRIFERÍA PSA BICOMANDO",
       "nombreNorm": "grifería psa bicomando",
       "pb": 0.0,
       "precioUser": 517000.0,
-      "categoria": "OTROS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "GRIFERÍA PSA BICOMANDO NERO",
       "nombreNorm": "grifería psa bicomando nero",
       "pb": 0.0,
       "precioUser": 517000.0,
-      "categoria": "OTROS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "GRIFERÍA PSA BM",
       "nombreNorm": "grifería psa bm",
       "pb": 0.0,
       "precioUser": 211000.0,
-      "categoria": "OTROS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "GRIFERÍA PSA BM NERO",
       "nombreNorm": "grifería psa bm nero",
       "pb": 0.0,
       "precioUser": 211000.0,
-      "categoria": "OTROS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "KIT ADAPT.P/CANILLA NO TRADICIONAL DUCHA II",
       "nombreNorm": "kit adapt.p/canilla no tradicional ducha ii",
       "pb": 0.0,
       "precioUser": 54550.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "KIT ADAPT.RECTOS P/CANILLAS PSA DUCHA II",
       "nombreNorm": "kit adapt.rectos p/canillas psa ducha ii",
       "pb": 0.0,
       "precioUser": 72250.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "KIT PARA BAJA PRESION UNIVERSAL",
       "nombreNorm": "kit para baja presion universal",
       "pb": 0.0,
       "precioUser": 22250.0,
-      "categoria": "KITS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "LAP DUCHA 1/2 X 1/2",
       "nombreNorm": "lap ducha 1/2 x 1/2",
       "pb": 0.0,
       "precioUser": 59250.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "LAP DUCHA II MACHO-MACHO 1/2 X 1/2",
       "nombreNorm": "lap ducha ii macho-macho 1/2 x 1/2",
       "pb": 0.0,
       "precioUser": 59250.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "LAP SM P/ MANGUERA BY PASS",
       "nombreNorm": "lap sm p/ manguera by pass",
       "pb": 0.0,
       "precioUser": 93550.0,
-      "categoria": "OTROS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "LLAVE DE AJUSTE P/TAPA PREFILTRO 40K-D",
       "nombreNorm": "llave de ajuste p/tapa prefiltro 40k-d",
       "pb": 0.0,
       "precioUser": 6250.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "LLAVE DE CORTE S-1000 MACHO/HEMBRA",
       "nombreNorm": "llave de corte s-1000 macho/hembra",
       "pb": 0.0,
       "precioUser": 37000.0,
-      "categoria": "OTROS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "LLAVE DE CORTE S-1000 MACHO/MACHO",
       "nombreNorm": "llave de corte s-1000 macho/macho",
       "pb": 0.0,
       "precioUser": 37000.0,
-      "categoria": "OTROS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "PROLONGADOR DE 3/4 PSA POLI",
       "nombreNorm": "prolongador de 3/4 psa poli",
       "pb": 0.0,
       "precioUser": 19850.0,
-      "categoria": "OTROS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "PROLONGADOR PSA DUCHA II",
       "nombreNorm": "prolongador psa ducha ii",
       "pb": 0.0,
       "precioUser": 41350.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "REGULADOR DE CAUDAL",
       "nombreNorm": "regulador de caudal",
       "pb": 0.0,
       "precioUser": 108000.0,
-      "categoria": "OTROS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "SET ADAPTACION RETRO P/KIT CANILLA",
       "nombreNorm": "set adaptacion retro p/kit canilla",
       "pb": 0.0,
       "precioUser": 33950.0,
-      "categoria": "KITS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "TAPON REGULADOR P/DUCHA X 5 UNIDADES",
       "nombreNorm": "tapon regulador p/ducha x 5 unidades",
       "pb": 0.0,
       "precioUser": 8700.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "TE C/LLAVE DE CORTE P/GRIFERÍA PSA Y ECO-D",
       "nombreNorm": "te c/llave de corte p/grifería psa y eco-d",
       "pb": 0.0,
       "precioUser": 80550.0,
-      "categoria": "OTROS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "VARILLA INST. ECO-D SM",
       "nombreNorm": "varilla inst. eco-d sm",
       "pb": 0.0,
       "precioUser": 55600.0,
-      "categoria": "OTROS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "REPOSICION PSA 10K-D",
       "nombreNorm": "reposicion psa 10k-d",
       "pb": 0.8,
       "precioUser": 260000.0,
-      "categoria": "OTROS"
+      "categoria": "Reposiciones"
     },
     {
       "nombre": "REPOSICION PSA 40K-D",
       "nombreNorm": "reposicion psa 40k-d",
       "pb": 1.3,
       "precioUser": 403000.0,
-      "categoria": "OTROS"
+      "categoria": "Reposiciones"
     },
     {
       "nombre": "ACCESORIO PARA CEBAR MATE",
       "nombreNorm": "accesorio para cebar mate",
       "pb": 0.0,
       "precioUser": 5100.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "BUJE DE CONEXION P/CANILLA DISPENSER",
       "nombreNorm": "buje de conexion p/canilla dispenser",
       "pb": 0.0,
       "precioUser": 55550.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "CAMPANA P/PSA DUCHA",
       "nombreNorm": "campana p/psa ducha",
       "pb": 0.0,
       "precioUser": 5950.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "CANILLA AGUA CALIENTE DISPENSER DS",
       "nombreNorm": "canilla agua caliente dispenser ds",
       "pb": 0.0,
       "precioUser": 37000.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "CANILLA AGUA CALIENTE DISPENSER MESA/PIE",
       "nombreNorm": "canilla agua caliente dispenser mesa/pie",
       "pb": 0.0,
       "precioUser": 37000.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "CANILLA AGUA CALIENTE P/ECO-D PIE Y SM",
       "nombreNorm": "canilla agua caliente p/eco-d pie y sm",
       "pb": 0.0,
       "precioUser": 39850.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "CANILLA AGUA FRIA DISPENSER DS",
       "nombreNorm": "canilla agua fria dispenser ds",
       "pb": 0.0,
       "precioUser": 37000.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "CANILLA AGUA FRIA DISPENSER MESA/PIE",
       "nombreNorm": "canilla agua fria dispenser mesa/pie",
       "pb": 0.0,
       "precioUser": 37000.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "CANILLA AGUA FRIA P/ECO-D PIE Y SM",
       "nombreNorm": "canilla agua fria p/eco-d pie y sm",
       "pb": 0.0,
       "precioUser": 39850.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "CANULA P/BOTELLA TERMICA X 5 UNID",
       "nombreNorm": "canula p/botella termica x 5 unid",
       "pb": 0.0,
       "precioUser": 8450.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "CEPILLO DE ACERO P/IONTRIX",
       "nombreNorm": "cepillo de acero p/iontrix",
       "pb": 0.0,
       "precioUser": 22150.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "CONJ.SOPORTE ESCUADRA P/DISPENSER PIE C/CONECTORES",
       "nombreNorm": "conj.soporte escuadra p/dispenser pie c/conectores",
       "pb": 0.0,
       "precioUser": 143000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "ELECTRODO P/IONTRIX",
       "nombreNorm": "electrodo p/iontrix",
       "pb": 0.0,
       "precioUser": 175000.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "FIPOR N° 3 X 8 UNIDADES",
       "nombreNorm": "fipor n° 3 x 8 unidades",
       "pb": 0.0,
       "precioUser": 99100.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "FLOR PSA DUCHA BLANCO/BIANCO C/CODO CROMADO",
       "nombreNorm": "flor psa ducha blanco/bianco c/codo cromado",
       "pb": 0.0,
       "precioUser": 30100.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "FLOR PSA DUCHA GRIGIO C/CODO CROMADO",
       "nombreNorm": "flor psa ducha grigio c/codo cromado",
       "pb": 0.0,
       "precioUser": 30100.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "FUENTE DE ALIMENTACION P/IONTRIX",
       "nombreNorm": "fuente de alimentacion p/iontrix",
       "pb": 0.0,
       "precioUser": 178000.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "FUENTE DE ALIMENTACION OSMOSIS PSA ROPOT",
       "nombreNorm": "fuente de alimentacion osmosis psa ropot",
       "pb": 0.0,
       "precioUser": 72000.0,
-      "categoria": "PURIFICADOR DE OSMOSIS INVERSA"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "FUENTE DE ALIMENTACION P/DOMUS-MINI DOMUS",
       "nombreNorm": "fuente de alimentacion p/domus-mini domus",
       "pb": 0.0,
       "precioUser": 56100.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "GATILLO P/CANILLA BAJO MESADA PSA",
       "nombreNorm": "gatillo p/canilla bajo mesada psa",
       "pb": 0.0,
       "precioUser": 15100.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "JARRA AGUA OSMOSIS PSA ROPOT",
       "nombreNorm": "jarra agua osmosis psa ropot",
       "pb": 0.0,
       "precioUser": 61800.0,
-      "categoria": "PURIFICADOR DE OSMOSIS INVERSA"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "KIT P/DETERMINACIÓN DUREZA (10 TIRAS)",
       "nombreNorm": "kit p/determinación dureza (10 tiras)",
       "pb": 0.0,
       "precioUser": 26100.0,
-      "categoria": "KITS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "KIT P/MEDICION DE CLORO P/IONTRIX",
       "nombreNorm": "kit p/medicion de cloro p/iontrix",
       "pb": 0.0,
       "precioUser": 10850.0,
-      "categoria": "KITS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "KIT P/MEDICION DE IONES P/IONTRIX",
       "nombreNorm": "kit p/medicion de iones p/iontrix",
       "pb": 0.0,
       "precioUser": 38100.0,
-      "categoria": "KITS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "KIT P/MEDICION DE PH P/IONTRIX",
       "nombreNorm": "kit p/medicion de ph p/iontrix",
       "pb": 0.0,
       "precioUser": 19850.0,
-      "categoria": "KITS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "KIT POSVENTA 1 AÑO OSMOSIS PSA ROPOT",
       "nombreNorm": "kit posventa 1 año osmosis psa ropot",
       "pb": 0.0,
       "precioUser": 310000.0,
-      "categoria": "PURIFICADOR DE OSMOSIS INVERSA"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "KIT POSVENTA PURIF. AIRE PSA",
       "nombreNorm": "kit posventa purif. aire psa",
       "pb": 0.25,
       "precioUser": 159000.0,
-      "categoria": "KITS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "KIT PSA LAB P/IONTRIX",
       "nombreNorm": "kit psa lab p/iontrix",
       "pb": 0.0,
       "precioUser": 109000.0,
-      "categoria": "KITS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "MANG. BLACK DIÁM. 8,5 X 1600 C/CONEC. SEN4/S1000",
       "nombreNorm": "mang. black diám. 8,5 x 1600 c/conec. sen4/s1000",
       "pb": 0.0,
       "precioUser": 13550.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "MANG. BLACK DIÁM. 8,5 X 700 C/CONEC. SEN4/S1000",
       "nombreNorm": "mang. black diám. 8,5 x 700 c/conec. sen4/s1000",
       "pb": 0.0,
       "precioUser": 10550.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "MANG. SEMIRRÍGIDA AZUL DIÁM.8 (X METRO)",
       "nombreNorm": "mang. semirrígida azul diám.8 (x metro)",
       "pb": 0.0,
       "precioUser": 7500.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "MANG. SEMIRRÍGIDA BLANCA DIÁM.8 (X METRO)",
       "nombreNorm": "mang. semirrígida blanca diám.8 (x metro)",
       "pb": 0.0,
       "precioUser": 7500.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "MANG. SEMIRRÍGIDA VERDE DIÁM.8 (X METRO)",
       "nombreNorm": "mang. semirrígida verde diám.8 (x metro)",
       "pb": 0.0,
       "precioUser": 7500.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "MANG.PLATA DIÁM. 8,5 X 1000 CONEC. SEN/VERO/S1000",
       "nombreNorm": "mang.plata diám. 8,5 x 1000 conec. sen/vero/s1000",
       "pb": 0.0,
       "precioUser": 10550.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "MANG.PLATA DIÁM. 8,5 X 1600 CONEC. SEN/VERO/S1000",
       "nombreNorm": "mang.plata diám. 8,5 x 1600 conec. sen/vero/s1000",
       "pb": 0.0,
       "precioUser": 10550.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "MANG.PLATA DIÁM. 8.5 X 1600 CONEC. P/MINI",
       "nombreNorm": "mang.plata diám. 8.5 x 1600 conec. p/mini",
       "pb": 0.0,
       "precioUser": 8700.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "MANG.PLATA DIÁM. 8.5 X 700 CONEC. P/MINI",
       "nombreNorm": "mang.plata diám. 8.5 x 700 conec. p/mini",
       "pb": 0.0,
       "precioUser": 4700.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "MARIPOSA DE FIJACION P/IONTRIX",
       "nombreNorm": "mariposa de fijacion p/iontrix",
       "pb": 0.0,
       "precioUser": 8700.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "MARIPOSA DE FIJACION P/IONTRIX",
       "nombreNorm": "mariposa de fijacion p/iontrix",
       "pb": 3.0,
       "precioUser": 8700.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "MATERIAL REGENERANTE X 2.5 KG P/DOMUS",
       "nombreNorm": "material regenerante x 2.5 kg p/domus",
       "pb": 0.0,
       "precioUser": 31900.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "O-RING INTERNO TAPA CUERPO PSA DUCHA (JUEGO)",
       "nombreNorm": "o-ring interno tapa cuerpo psa ducha (juego)",
       "pb": 0.0,
       "precioUser": 4800.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "ORTOTOLIDINA",
       "nombreNorm": "ortotolidina",
       "pb": 0.0,
       "precioUser": 6400.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "PASTILLA HIDROSENSIBLE P/ECO-D",
       "nombreNorm": "pastilla hidrosensible p/eco-d",
       "pb": 0.0,
       "precioUser": 33000.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "PASTILLA SANITIZANTE MAX X 8 UNID.",
       "nombreNorm": "pastilla sanitizante max x 8 unid.",
       "pb": 0.0,
       "precioUser": 4700.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "PAÑO ALTA TURBIDEZ 24 X 21 X 3 UNID.",
       "nombreNorm": "paño alta turbidez 24 x 21 x 3 unid.",
       "pb": 0.0,
       "precioUser": 26000.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "PICO DE DESCARGA GRIFERIA NERO",
       "nombreNorm": "pico de descarga griferia nero",
       "pb": 0.0,
       "precioUser": 94800.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "PICO DESCARGA CANILLA BM2/GRIFERIA PSA",
       "nombreNorm": "pico descarga canilla bm2/griferia psa",
       "pb": 0.0,
       "precioUser": 94800.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "PREFILTRO ENTRADA PURIF. DE AIRE PSA",
       "nombreNorm": "prefiltro entrada purif. de aire psa",
       "pb": 0.0,
       "precioUser": 48600.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "PREFILTRO P/10 KD",
       "nombreNorm": "prefiltro p/10 kd",
       "pb": 0.0,
       "precioUser": 19850.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "PROLONGADOR P/PICO PSA SENIOR",
       "nombreNorm": "prolongador p/pico psa senior",
       "pb": 0.0,
       "precioUser": 19850.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "PROMO CILINDRO + PACK RENDIMIENTO II",
       "nombreNorm": "promo cilindro + pack rendimiento ii",
       "pb": 0.0,
       "precioUser": 112000.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "RECARGA P/SODA BURBY",
       "nombreNorm": "recarga p/soda burby",
       "pb": 0.0,
       "precioUser": 28400.0,
-      "categoria": "GASIFICADOR"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "RECIPIENTE P/AGUA ENTRADA OSMOSIS PSA ROPOT",
       "nombreNorm": "recipiente p/agua entrada osmosis psa ropot",
       "pb": 0.0,
       "precioUser": 48900.0,
-      "categoria": "PURIFICADOR DE OSMOSIS INVERSA"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "REPUESTO BACTERIOSTÁTICO 25 MIC S-1000/QUA/SEN",
       "nombreNorm": "repuesto bacteriostático 25 mic s-1000/qua/sen",
       "pb": 0.17,
       "precioUser": 75950.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "REPUESTO BACTERIOSTÁTICO 5 MIC S-1000/QUA/SEN",
       "nombreNorm": "repuesto bacteriostático 5 mic s-1000/qua/sen",
       "pb": 0.17,
       "precioUser": 75950.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "REPUESTO BACTERIOSTÁTICO 50 MIC S-1000/QUA/SEN",
       "nombreNorm": "repuesto bacteriostático 50 mic s-1000/qua/sen",
       "pb": 0.17,
       "precioUser": 75950.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "REPUESTO CUERPO PSA DUCHA BIANCO",
       "nombreNorm": "repuesto cuerpo psa ducha bianco",
       "pb": 0.0,
       "precioUser": 21100.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "REPUESTO CUERPO PSA DUCHA GRIGIO",
       "nombreNorm": "repuesto cuerpo psa ducha grigio",
       "pb": 0.0,
       "precioUser": 21100.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "REPUESTO N°1 SEDIMENTOS OSMOSIS PSA ROPOT",
       "nombreNorm": "repuesto n°1 sedimentos osmosis psa ropot",
       "pb": 0.15,
       "precioUser": 48600.0,
-      "categoria": "PURIFICADOR DE OSMOSIS INVERSA"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "REPUESTO N°2 CARBON BLOQUE OSMOSIS PSA ROPOT",
       "nombreNorm": "repuesto n°2 carbon bloque osmosis psa ropot",
       "pb": 0.15,
       "precioUser": 54550.0,
-      "categoria": "PURIFICADOR DE OSMOSIS INVERSA"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "REPUESTO N°3 MEMBRANA OSMOSIS PSA ROPOT",
       "nombreNorm": "repuesto n°3 membrana osmosis psa ropot",
       "pb": 0.25,
       "precioUser": 158000.0,
-      "categoria": "PURIFICADOR DE OSMOSIS INVERSA"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "REPUESTO N°4 POST MEMBRANA OSMOSIS PSA ROPOT",
       "nombreNorm": "repuesto n°4 post membrana osmosis psa ropot",
       "pb": 0.15,
       "precioUser": 55600.0,
-      "categoria": "PURIFICADOR DE OSMOSIS INVERSA"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "REPUESTO PSA DUCHA C/KDF",
       "nombreNorm": "repuesto psa ducha c/kdf",
       "pb": 0.23,
       "precioUser": 143000.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "REPUESTO PSA DUCHA C/KDF/POLIFOSFATO",
       "nombreNorm": "repuesto psa ducha c/kdf/polifosfato",
       "pb": 0.23,
       "precioUser": 143000.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "REPUESTO PSA POLI",
       "nombreNorm": "repuesto psa poli",
       "pb": 0.17,
       "precioUser": 83150.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "REPUESTO PSA POLI 2",
       "nombreNorm": "repuesto psa poli 2",
       "pb": 0.17,
       "precioUser": 83150.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "REPUESTO PSA PORTÁTIL",
       "nombreNorm": "repuesto psa portátil",
       "pb": 0.17,
       "precioUser": 88450.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "RESERVORIO COMPLETO P/ECO-D",
       "nombreNorm": "reservorio completo p/eco-d",
       "pb": 0.0,
       "precioUser": 35800.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "TAPA ACRILICO P/STOPPER/40K-D",
       "nombreNorm": "tapa acrilico p/stopper/40k-d",
       "pb": 0.0,
       "precioUser": 77750.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "TAPA CENTRADORA P/IONTRIX",
       "nombreNorm": "tapa centradora p/iontrix",
       "pb": 0.0,
       "precioUser": 11300.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "TAPA CENTRADORA P/IONTRIX",
       "nombreNorm": "tapa centradora p/iontrix",
       "pb": 3.0,
       "precioUser": 11300.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "TAPA CON FLOTANTE P/DISPENSER",
       "nombreNorm": "tapa con flotante p/dispenser",
       "pb": 0.0,
       "precioUser": 153000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "TAPA P/BOTELLA PSA TERMICA PICO SPORT",
       "nombreNorm": "tapa p/botella psa termica pico sport",
       "pb": 0.0,
       "precioUser": 8450.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "TAPA P/CUERPO PSA DUCHA CR MARFIL",
       "nombreNorm": "tapa p/cuerpo psa ducha cr marfil",
       "pb": 0.0,
       "precioUser": 21100.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "TAPA P/CUERPO PSA DUCHA PLATA",
       "nombreNorm": "tapa p/cuerpo psa ducha plata",
       "pb": 0.0,
       "precioUser": 21100.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "TAPA PREFILTRO C/AUTOPURGA",
       "nombreNorm": "tapa prefiltro c/autopurga",
       "pb": 0.0,
       "precioUser": 18200.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "TAPA PREFILTRO PSA S-1000 II",
       "nombreNorm": "tapa prefiltro psa s-1000 ii",
       "pb": 0.0,
       "precioUser": 25550.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "TAPON P/CONECTOR DE RECARGA P/IONTRIX",
       "nombreNorm": "tapon p/conector de recarga p/iontrix",
       "pb": 0.0,
       "precioUser": 11300.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "TERMOSTATO AGUA CALIENTE 85° P/DISPENSER",
       "nombreNorm": "termostato agua caliente 85° p/dispenser",
       "pb": 0.0,
       "precioUser": 37000.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "TUBO CONEXION PSA DUCHA C/O-RING",
       "nombreNorm": "tubo conexion psa ducha c/o-ring",
       "pb": 0.0,
       "precioUser": 35800.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "VÁLVULA BY PASS C3 GRIGIO",
       "nombreNorm": "válvula by pass c3 grigio",
       "pb": 0.0,
       "precioUser": 22250.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "VÁLVULA BY PASS NERO",
       "nombreNorm": "válvula by pass nero",
       "pb": 0.0,
       "precioUser": 22250.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "VÁLVULA BY PASS UNIVERSAL",
       "nombreNorm": "válvula by pass universal",
       "pb": 0.0,
       "precioUser": 22250.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "ADICIONAL INST. HASTA 60 KM (PSA POLI X 2)",
       "nombreNorm": "adicional inst. hasta 60 km (psa poli x 2)",
       "pb": 0.0,
       "precioUser": 229000.0,
-      "categoria": "OTROS"
+      "categoria": "Servicios"
     },
     {
       "nombre": "ADICIONAL INST. HASTA 60 KM (PSA POLI)",
       "nombreNorm": "adicional inst. hasta 60 km (psa poli)",
       "pb": 0.0,
       "precioUser": 167000.0,
-      "categoria": "OTROS"
+      "categoria": "Servicios"
     },
     {
       "nombre": "ADICIONAL INSTAL. HASTA 60 KM",
       "nombreNorm": "adicional instal. hasta 60 km",
       "pb": 0.0,
       "precioUser": 147000.0,
-      "categoria": "OTROS"
+      "categoria": "Servicios"
     },
     {
       "nombre": "ADICIONAL POR KILOMETRAJE EXCEDIDO",
       "nombreNorm": "adicional por kilometraje excedido",
       "pb": 0.0,
       "precioUser": 4650.0,
-      "categoria": "OTROS"
+      "categoria": "Servicios"
     },
     {
       "nombre": "GRIFERÍA PSA BICOMANDO + INST.",
       "nombreNorm": "grifería psa bicomando + inst.",
       "pb": 0.0,
       "precioUser": 664000.0,
-      "categoria": "OTROS"
+      "categoria": "Servicios"
     },
     {
       "nombre": "GRIFERÍA PSA BICOMANDO NERO + INST.",
       "nombreNorm": "grifería psa bicomando nero + inst.",
       "pb": 0.0,
       "precioUser": 664000.0,
-      "categoria": "OTROS"
+      "categoria": "Servicios"
     },
     {
       "nombre": "GRIFERÍA PSA BM + INST.",
       "nombreNorm": "grifería psa bm + inst.",
       "pb": 0.0,
       "precioUser": 358000.0,
-      "categoria": "OTROS"
+      "categoria": "Servicios"
     },
     {
       "nombre": "GRIFERÍA PSA BM NERO + INST.",
       "nombreNorm": "grifería psa bm nero + inst.",
       "pb": 0.0,
       "precioUser": 358000.0,
-      "categoria": "OTROS"
+      "categoria": "Servicios"
     },
     {
       "nombre": "INSTALACION DISPENSER PSA (HASTA 60 KM)",
       "nombreNorm": "instalacion dispenser psa (hasta 60 km)",
       "pb": 0.0,
       "precioUser": 190000.0,
-      "categoria": "OTROS"
+      "categoria": "Servicios"
     },
     {
       "nombre": "INSTALACION PSA DOMUS/MINI DOMUS (HASTA 60 KM)",
       "nombreNorm": "instalacion psa domus/mini domus (hasta 60 km)",
       "pb": 0.0,
       "precioUser": 190000.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Servicios"
     },
     {
       "nombre": "MANTENIMIENTO ANUAL DISPENSER PSA",
       "nombreNorm": "mantenimiento anual dispenser psa",
       "pb": 0.0,
       "precioUser": 164000.0,
-      "categoria": "OTROS"
+      "categoria": "Servicios"
     },
     {
       "nombre": "MODULO REPARACION DE PRODUCTO",
       "nombreNorm": "modulo reparacion de producto",
       "pb": 0.0,
       "precioUser": 12000.0,
-      "categoria": "OTROS"
+      "categoria": "Servicios"
     },
     {
       "nombre": "SERVICE CON INSTALADOR HASTA 60 KM.",
       "nombreNorm": "service con instalador hasta 60 km.",
       "pb": 0.0,
       "precioUser": 113000.0,
-      "categoria": "OTROS"
+      "categoria": "Servicios"
     },
     {
       "nombre": "TRANSF.SM/BM + GRIF.PSA BICOMANDO",
       "nombreNorm": "transf.sm/bm + grif.psa bicomando",
       "pb": 0.0,
       "precioUser": 541000.0,
-      "categoria": "OTROS"
+      "categoria": "Servicios"
     },
     {
       "nombre": "TRANSF.SM/BM + GRIF.PSA BICOMANDO + INST.",
       "nombreNorm": "transf.sm/bm + grif.psa bicomando + inst.",
       "pb": 0.0,
       "precioUser": 688000.0,
-      "categoria": "OTROS"
+      "categoria": "Servicios"
     },
     {
       "nombre": "TRANSF.SM/BM + GRIF.PSA BICOMANDO NERO",
       "nombreNorm": "transf.sm/bm + grif.psa bicomando nero",
       "pb": 0.0,
       "precioUser": 541000.0,
-      "categoria": "OTROS"
+      "categoria": "Servicios"
     },
     {
       "nombre": "TRANSF.SM/BM + GRIF.PSA BICOMANDO NERO + INST.",
       "nombreNorm": "transf.sm/bm + grif.psa bicomando nero + inst.",
       "pb": 0.0,
       "precioUser": 688000.0,
-      "categoria": "OTROS"
+      "categoria": "Servicios"
     },
     {
       "nombre": "TRANSF.SM/BM + GRIFERÍA PSA BM",
       "nombreNorm": "transf.sm/bm + grifería psa bm",
       "pb": 0.0,
       "precioUser": 221000.0,
-      "categoria": "OTROS"
+      "categoria": "Servicios"
     },
     {
       "nombre": "TRANSF.SM/BM + GRIFERÍA PSA BM + INSTAL.",
       "nombreNorm": "transf.sm/bm + grifería psa bm + instal.",
       "pb": 0.0,
       "precioUser": 368000.0,
-      "categoria": "OTROS"
+      "categoria": "Servicios"
     },
     {
       "nombre": "TRANSF.SM/BM + GRIFERÍA PSA BM NERO",
       "nombreNorm": "transf.sm/bm + grifería psa bm nero",
       "pb": 0.0,
       "precioUser": 221000.0,
-      "categoria": "OTROS"
+      "categoria": "Servicios"
     },
     {
       "nombre": "TRANSF.SM/BM + GRIFERÍA PSA BM NERO + INSTAL.",
       "nombreNorm": "transf.sm/bm + grifería psa bm nero + instal.",
       "pb": 0.0,
       "precioUser": 368000.0,
-      "categoria": "OTROS"
+      "categoria": "Servicios"
     },
     {
       "nombre": "BOTELLA 600 CC NO GASF AMAR-AMAR 100 % RECICLADA",
       "nombreNorm": "botella 600 cc no gasf amar-amar 100 % reciclada",
       "pb": 0.0,
       "precioUser": 37150.0,
-      "categoria": "OTROS"
+      "categoria": "Botellas"
     },
     {
       "nombre": "BOTELLA 600 CC NO GASF AMAR-AQUA % RECICLADA",
       "nombreNorm": "botella 600 cc no gasf amar-aqua % reciclada",
       "pb": 0.0,
       "precioUser": 37150.0,
-      "categoria": "OTROS"
+      "categoria": "Botellas"
     },
     {
       "nombre": "BOTELLA 600 CC NO GASF AMAR-ROS 100 % RECICLADA",
       "nombreNorm": "botella 600 cc no gasf amar-ros 100 % reciclada",
       "pb": 0.0,
       "precioUser": 37150.0,
-      "categoria": "OTROS"
+      "categoria": "Botellas"
     },
     {
       "nombre": "BOTELLA 600 CC NO GASF AMAR-VER 100 % RECICLADA",
       "nombreNorm": "botella 600 cc no gasf amar-ver 100 % reciclada",
       "pb": 0.0,
       "precioUser": 37150.0,
-      "categoria": "OTROS"
+      "categoria": "Botellas"
     },
     {
       "nombre": "BOTELLA 600 CC NO GASF AQUA-AMAR 100 % RECICLADA",
       "nombreNorm": "botella 600 cc no gasf aqua-amar 100 % reciclada",
       "pb": 0.0,
       "precioUser": 37150.0,
-      "categoria": "OTROS"
+      "categoria": "Botellas"
     },
     {
       "nombre": "BOTELLA 600 CC NO GASF AQUA-AQUA 100 % RECICLADA",
       "nombreNorm": "botella 600 cc no gasf aqua-aqua 100 % reciclada",
       "pb": 0.0,
       "precioUser": 37150.0,
-      "categoria": "OTROS"
+      "categoria": "Botellas"
     },
     {
       "nombre": "BOTELLA 600 CC NO GASF AQUA-ROSA 100% RECICLADA",
       "nombreNorm": "botella 600 cc no gasf aqua-rosa 100% reciclada",
       "pb": 0.0,
       "precioUser": 37150.0,
-      "categoria": "OTROS"
+      "categoria": "Botellas"
     },
     {
       "nombre": "BOTELLA 600 CC NO GASF AQUA-VERDE 100% RECICLADA",
       "nombreNorm": "botella 600 cc no gasf aqua-verde 100% reciclada",
       "pb": 0.0,
       "precioUser": 37150.0,
-      "categoria": "OTROS"
+      "categoria": "Botellas"
     },
     {
       "nombre": "BOTELLA 600 CC NO GASF ROS-AMAR 100 % RECICLADA",
       "nombreNorm": "botella 600 cc no gasf ros-amar 100 % reciclada",
       "pb": 0.0,
       "precioUser": 37150.0,
-      "categoria": "OTROS"
+      "categoria": "Botellas"
     },
     {
       "nombre": "BOTELLA 600 CC NO GASF ROS-AQUA 100 % RECICLADA",
       "nombreNorm": "botella 600 cc no gasf ros-aqua 100 % reciclada",
       "pb": 0.0,
       "precioUser": 37150.0,
-      "categoria": "OTROS"
+      "categoria": "Botellas"
     },
     {
       "nombre": "BOTELLA 600 CC NO GASF ROS-ROS 100 % RECICLADA",
       "nombreNorm": "botella 600 cc no gasf ros-ros 100 % reciclada",
       "pb": 0.0,
       "precioUser": 37150.0,
-      "categoria": "OTROS"
+      "categoria": "Botellas"
     },
     {
       "nombre": "BOTELLA 600 CC NO GASF ROS-VER 100 % RECICLADA",
       "nombreNorm": "botella 600 cc no gasf ros-ver 100 % reciclada",
       "pb": 0.0,
       "precioUser": 37150.0,
-      "categoria": "OTROS"
+      "categoria": "Botellas"
     },
     {
       "nombre": "BOTELLA 600 CC NO GASF VER-AMAR 100 % RECICLADA",
       "nombreNorm": "botella 600 cc no gasf ver-amar 100 % reciclada",
       "pb": 0.0,
       "precioUser": 37150.0,
-      "categoria": "OTROS"
+      "categoria": "Botellas"
     },
     {
       "nombre": "BOTELLA 600 CC NO GASF VER-AQUA 100 % RECICLADA",
       "nombreNorm": "botella 600 cc no gasf ver-aqua 100 % reciclada",
       "pb": 0.0,
       "precioUser": 37150.0,
-      "categoria": "OTROS"
+      "categoria": "Botellas"
     },
     {
       "nombre": "BOTELLA 600 CC NO GASF VER-ROS 100 % RECICLADA",
       "nombreNorm": "botella 600 cc no gasf ver-ros 100 % reciclada",
       "pb": 0.0,
       "precioUser": 37150.0,
-      "categoria": "OTROS"
+      "categoria": "Botellas"
     },
     {
       "nombre": "BOTELLA 600 CC NO GASF VER-VER 100 % RECICLADA",
       "nombreNorm": "botella 600 cc no gasf ver-ver 100 % reciclada",
       "pb": 0.0,
       "precioUser": 37150.0,
-      "categoria": "OTROS"
+      "categoria": "Botellas"
     },
     {
       "nombre": "BOTELLA DE VIDRIO 1 LT. PSA",
       "nombreNorm": "botella de vidrio 1 lt. psa",
       "pb": 0.0,
       "precioUser": 42800.0,
-      "categoria": "OTROS"
+      "categoria": "Botellas"
     },
     {
       "nombre": "BOTELLA NEO AQUA-AQUA REUTILIZ.",
       "nombreNorm": "botella neo aqua-aqua reutiliz.",
       "pb": 0.0,
       "precioUser": 64200.0,
-      "categoria": "OTROS"
+      "categoria": "Botellas"
     },
     {
       "nombre": "BOTELLA PSA NO GAS. 1 LITRO X 1 REUTILIZABLE",
       "nombreNorm": "botella psa no gas. 1 litro x 1 reutilizable",
       "pb": 0.0,
       "precioUser": 12000.0,
-      "categoria": "OTROS"
+      "categoria": "Botellas"
     },
     {
       "nombre": "BOTELLA PSA NO GAS. X 1000 ML PACK X2 REUTILIZ.",
       "nombreNorm": "botella psa no gas. x 1000 ml pack x2 reutiliz.",
       "pb": 0.0,
       "precioUser": 19150.0,
-      "categoria": "OTROS"
+      "categoria": "Botellas"
     },
     {
       "nombre": "BOTELLA PSA P/SODA BURBY X 1100 ML X2 REUTILIZ.",
       "nombreNorm": "botella psa p/soda burby x 1100 ml x2 reutiliz.",
       "pb": 0.0,
       "precioUser": 25150.0,
-      "categoria": "GASIFICADOR"
+      "categoria": "Botellas"
     },
     {
       "nombre": "BOTELLA PSA TÉRMICA 500 CC BLANCA",
       "nombreNorm": "botella psa térmica 500 cc blanca",
       "pb": 0.0,
       "precioUser": 61200.0,
-      "categoria": "OTROS"
+      "categoria": "Botellas"
     },
     {
       "nombre": "BOTELLA PSA TÉRMICA 500 CC NEGRA",
       "nombreNorm": "botella psa térmica 500 cc negra",
       "pb": 0.0,
       "precioUser": 61200.0,
-      "categoria": "OTROS"
+      "categoria": "Botellas"
     },
     {
       "nombre": "BOTELLA PSA TÉRMICA 750 CC BLANCA",
       "nombreNorm": "botella psa térmica 750 cc blanca",
       "pb": 0.0,
       "precioUser": 71150.0,
-      "categoria": "OTROS"
+      "categoria": "Botellas"
     },
     {
       "nombre": "BOTELLA PSA TÉRMICA 750 CC NEGRA",
       "nombreNorm": "botella psa térmica 750 cc negra",
       "pb": 0.0,
       "precioUser": 71150.0,
-      "categoria": "OTROS"
+      "categoria": "Botellas"
     },
     {
       "nombre": "KIT MATE 2 PSA BIANCO (MATE+BOMBILLA)",
       "nombreNorm": "kit mate 2 psa bianco (mate+bombilla)",
       "pb": 0.0,
       "precioUser": 38500.0,
-      "categoria": "KITS"
+      "categoria": "Material Promocional"
     },
     {
       "nombre": "KIT MATE 2 PSA NERO (MATE+BOMBILLA)",
       "nombreNorm": "kit mate 2 psa nero (mate+bombilla)",
       "pb": 0.0,
       "precioUser": 38500.0,
-      "categoria": "KITS"
+      "categoria": "Material Promocional"
     },
     {
       "nombre": "LAPIZ GRAFITO NEGRO PSA X 10 UNID.",
       "nombreNorm": "lapiz grafito negro psa x 10 unid.",
       "pb": 0.0,
       "precioUser": 4250.0,
-      "categoria": "OTROS"
+      "categoria": "Material Promocional"
     },
     {
       "nombre": "REJILLEX BLANCO",
       "nombreNorm": "rejillex blanco",
       "pb": 0.01,
       "precioUser": 8700.0,
-      "categoria": "OTROS"
+      "categoria": "Material Promocional"
     },
     {
       "nombre": "REJILLEX GRIGIO",
       "nombreNorm": "rejillex grigio",
       "pb": 0.01,
       "precioUser": 8700.0,
-      "categoria": "OTROS"
+      "categoria": "Material Promocional"
     },
     {
       "nombre": "SET MATE 2 PSA BIANCO (TERMO+MATE+BOMBILLA)",
       "nombreNorm": "set mate 2 psa bianco (termo+mate+bombilla)",
       "pb": 0.0,
       "precioUser": 131000.0,
-      "categoria": "OTROS"
+      "categoria": "Material Promocional"
     },
     {
       "nombre": "TERMO 2 PSA BLANCO",
       "nombreNorm": "termo 2 psa blanco",
       "pb": 0.0,
       "precioUser": 92550.0,
-      "categoria": "OTROS"
+      "categoria": "Material Promocional"
     },
     {
       "nombre": "ANALISIS ESPECIFICOS",
       "nombreNorm": "analisis especificos",
       "pb": 0.0,
       "precioUser": 78400.0,
-      "categoria": "OTROS"
+      "categoria": "Análisis de laboratorio"
     },
     {
       "nombre": "BOTELLA P/ANALISIS DE AGUA",
       "nombreNorm": "botella p/analisis de agua",
       "pb": 0.0,
       "precioUser": 4700.0,
-      "categoria": "OTROS"
+      "categoria": "Análisis de laboratorio"
     },
     {
       "nombre": "MODULO A. FISICO QUIMICO BASICO",
       "nombreNorm": "modulo a. fisico quimico basico",
       "pb": 0.0,
       "precioUser": 126000.0,
-      "categoria": "OTROS"
+      "categoria": "Análisis de laboratorio"
     },
     {
       "nombre": "MODULO B. FISICO QUIMICO INTERMEDIO",
       "nombreNorm": "modulo b. fisico quimico intermedio",
       "pb": 0.0,
       "precioUser": 285000.0,
-      "categoria": "OTROS"
+      "categoria": "Análisis de laboratorio"
     },
     {
       "nombre": "MODULO C. FISICO QUIMICO COMPLETO",
       "nombreNorm": "modulo c. fisico quimico completo",
       "pb": 0.0,
       "precioUser": 421000.0,
-      "categoria": "OTROS"
+      "categoria": "Análisis de laboratorio"
     },
     {
       "nombre": "MODULO D. BACTERIOLOGICO",
       "nombreNorm": "modulo d. bacteriologico",
       "pb": 0.0,
       "precioUser": 126000.0,
-      "categoria": "OTROS"
+      "categoria": "Análisis de laboratorio"
     },
     {
       "nombre": "MODULO E. SOLIDOS EN SUSPENSION",
       "nombreNorm": "modulo e. solidos en suspension",
       "pb": 0.0,
       "precioUser": 60650.0,
-      "categoria": "OTROS"
+      "categoria": "Análisis de laboratorio"
     },
     {
       "nombre": "RECIPIENTE P/ANALISIS DE AGUA",
       "nombreNorm": "recipiente p/analisis de agua",
       "pb": 0.0,
       "precioUser": 10850.0,
-      "categoria": "OTROS"
+      "categoria": "Análisis de laboratorio"
     },
     {
       "nombre": "ACEIT. NEGRA FRASCO X 220 GRS PREMIUM",
       "nombreNorm": "aceit. negra frasco x 220 grs premium",
       "pb": 0.0,
       "precioUser": 9400.0,
-      "categoria": "OTROS"
+      "categoria": "Olivare"
     },
     {
       "nombre": "ACEIT. VERDES FRASCO X 220 GRS",
       "nombreNorm": "aceit. verdes frasco x 220 grs",
       "pb": 0.0,
       "precioUser": 8250.0,
-      "categoria": "OTROS"
+      "categoria": "Olivare"
     },
     {
       "nombre": "ACEITE DE OLIVA NININA X 500 CC",
       "nombreNorm": "aceite de oliva ninina x 500 cc",
       "pb": 0.0,
       "precioUser": 40000.0,
-      "categoria": "OTROS"
+      "categoria": "Olivare"
     },
     {
       "nombre": "ACEITE OLIVA EX. V. 250 CC",
       "nombreNorm": "aceite oliva ex. v. 250 cc",
       "pb": 0.0,
       "precioUser": 11250.0,
-      "categoria": "OTROS"
+      "categoria": "Olivare"
     },
     {
       "nombre": "ACEITE OLIVA EX. V. 5 L CAJA X 2 UNID.",
       "nombreNorm": "aceite oliva ex. v. 5 l caja x 2 unid.",
       "pb": 0.0,
       "precioUser": 278000.0,
-      "categoria": "OTROS"
+      "categoria": "Olivare"
     },
     {
       "nombre": "ACEITE OLIVA EX. V. 5 LTS",
       "nombreNorm": "aceite oliva ex. v. 5 lts",
       "pb": 0.0,
       "precioUser": 139000.0,
-      "categoria": "OTROS"
+      "categoria": "Olivare"
     },
     {
       "nombre": "ACEITE OLIVA EX. V. 500 CC",
       "nombreNorm": "aceite oliva ex. v. 500 cc",
       "pb": 0.0,
       "precioUser": 17950.0,
-      "categoria": "OTROS"
+      "categoria": "Olivare"
     },
     {
       "nombre": "ACEITE OLIVA GOURMET 250 CC CAJA X 12 UNID.",
       "nombreNorm": "aceite oliva gourmet 250 cc caja x 12 unid.",
       "pb": 0.35,
       "precioUser": 121500.0,
-      "categoria": "OTROS"
+      "categoria": "Olivare"
     },
     {
       "nombre": "ACEITE OLIVA GOURMET 500 CC CAJA X 12 UNID.",
       "nombreNorm": "aceite oliva gourmet 500 cc caja x 12 unid.",
       "pb": 0.55,
       "precioUser": 193900.0,
-      "categoria": "OTROS"
+      "categoria": "Olivare"
     },
     {
       "nombre": "ACEITE OLIVARE BOTELLA X 1 LITRO",
       "nombreNorm": "aceite olivare botella x 1 litro",
       "pb": 0.0,
       "precioUser": 34250.0,
-      "categoria": "OTROS"
+      "categoria": "Olivare"
     },
     {
       "nombre": "ACEITE OLIVA 500 CC ESTUCHE PACK X 2 UNID",
       "nombreNorm": "aceite oliva 500 cc estuche pack x 2 unid",
       "pb": 0.0,
       "precioUser": 34250.0,
-      "categoria": "OTROS"
+      "categoria": "Olivare"
     },
     {
       "nombre": "PASAS DE UVA NININA PACK X 5 UNID. 150 GM C/U",
       "nombreNorm": "pasas de uva ninina pack x 5 unid. 150 gm c/u",
       "pb": 0.0,
       "precioUser": 18000.0,
-      "categoria": "OTROS"
+      "categoria": "Olivare"
     }
   ],
   "preciosDistribuidor": [
@@ -5764,1890 +5770,1890 @@
       "nombreNorm": "ablandador psa domus",
       "pb": 3.8,
       "precioUser": 2782000.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "ABLANDADOR PSA DOMUS + INSTALACION",
       "nombreNorm": "ablandador psa domus + instalacion",
       "pb": 3.8,
       "precioUser": 2961000.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "ABLANDADOR PSA MINI DOMUS",
       "nombreNorm": "ablandador psa mini domus",
       "pb": 3.5,
       "precioUser": 2198000.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "ABLANDADOR PSA MINI DOMUS + INSTALACION",
       "nombreNorm": "ablandador psa mini domus + instalacion",
       "pb": 3.5,
       "precioUser": 2369000.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA SENIOR 4 BIANCO + KIT POSV.",
       "nombreNorm": "psa senior 4 bianco + kit posv.",
       "pb": 3.3,
       "precioUser": 913000.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA SENIOR 4 BIANCO + KIT POSV. Plan canje",
       "nombreNorm": "psa senior 4 bianco + kit posv. plan canje",
       "pb": 2.95,
       "precioUser": 821700.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA SENIOR 4 BM + KIT POSV",
       "nombreNorm": "psa senior 4 bm + kit posv",
       "pb": 2.9,
       "precioUser": 808000.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA SENIOR 4 BM + KIT POSV Plan canje",
       "nombreNorm": "psa senior 4 bm + kit posv plan canje",
       "pb": 2.6,
       "precioUser": 727200.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA SENIOR 4 GRIGIO + KIT POSV",
       "nombreNorm": "psa senior 4 grigio + kit posv",
       "pb": 3.3,
       "precioUser": 913000.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA SENIOR 4 GRIGIO + KIT POSV Plan canje",
       "nombreNorm": "psa senior 4 grigio + kit posv plan canje",
       "pb": 2.95,
       "precioUser": 821700.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA SENIOR 4 NERO + KIT POSV.",
       "nombreNorm": "psa senior 4 nero + kit posv.",
       "pb": 3.3,
       "precioUser": 913000.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA SENIOR 4 NERO + KIT POSV. Plan canje",
       "nombreNorm": "psa senior 4 nero + kit posv. plan canje",
       "pb": 2.95,
       "precioUser": 821700.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA SENIOR BIANCO + KIT POSV.",
       "nombreNorm": "psa senior bianco + kit posv.",
       "pb": 2.7,
       "precioUser": 751000.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA SENIOR BIANCO + KIT POSV. Plan canje",
       "nombreNorm": "psa senior bianco + kit posv. plan canje",
       "pb": 2.4,
       "precioUser": 675900.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA 1-P PORTATÍL",
       "nombreNorm": "psa 1-p portatíl",
       "pb": 0.35,
       "precioUser": 122000.0,
-      "categoria": "OTROS"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA C3 GRIGIO",
       "nombreNorm": "psa c3 grigio",
       "pb": 0.55,
       "precioUser": 208000.0,
-      "categoria": "OTROS"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA C3 GRIGIO Plan canje",
       "nombreNorm": "psa c3 grigio plan canje",
       "pb": 0.4,
       "precioUser": 187200.0,
-      "categoria": "OTROS"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA DUCHA BIANCO C/KDF",
       "nombreNorm": "psa ducha bianco c/kdf",
       "pb": 1.15,
       "precioUser": 296000.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA DUCHA BIANCO C/KDF Plan canje",
       "nombreNorm": "psa ducha bianco c/kdf plan canje",
       "pb": 0.95,
       "precioUser": 266400.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA DUCHA BIANCO C/KDF-POLI",
       "nombreNorm": "psa ducha bianco c/kdf-poli",
       "pb": 1.15,
       "precioUser": 296000.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA DUCHA BIANCO C/KDF-POLI Plan canje",
       "nombreNorm": "psa ducha bianco c/kdf-poli plan canje",
       "pb": 0.95,
       "precioUser": 266400.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA DUCHA GRIGIO C/KDF",
       "nombreNorm": "psa ducha grigio c/kdf",
       "pb": 1.15,
       "precioUser": 296000.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA DUCHA GRIGIO C/KDF Plan canje",
       "nombreNorm": "psa ducha grigio c/kdf plan canje",
       "pb": 0.95,
       "precioUser": 266400.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA DUCHA GRIGIO C/KDF-POLI",
       "nombreNorm": "psa ducha grigio c/kdf-poli",
       "pb": 1.15,
       "precioUser": 296000.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA DUCHA GRIGIO C/KDF-POLI Plan canje",
       "nombreNorm": "psa ducha grigio c/kdf-poli plan canje",
       "pb": 0.95,
       "precioUser": 266400.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA IONTRIX 3",
       "nombreNorm": "psa iontrix 3",
       "pb": 3.1,
       "precioUser": 1176000.0,
-      "categoria": "OTROS"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA IONTRIX 3 Plan canje",
       "nombreNorm": "psa iontrix 3 plan canje",
       "pb": 2.3,
       "precioUser": 1058400.0,
-      "categoria": "OTROS"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA MINI BIANCO + KIT POSV.",
       "nombreNorm": "psa mini bianco + kit posv.",
       "pb": 1.15,
       "precioUser": 411000.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA MINI BIANCO + KIT POSV. Plan canje",
       "nombreNorm": "psa mini bianco + kit posv. plan canje",
       "pb": 1.05,
       "precioUser": 369900.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA MINI NERO + KIT POSV.",
       "nombreNorm": "psa mini nero + kit posv.",
       "pb": 1.15,
       "precioUser": 411000.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA MINI NERO + KIT POSV. Plan canje",
       "nombreNorm": "psa mini nero + kit posv. plan canje",
       "pb": 1.05,
       "precioUser": 369900.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA POLI 2 BIANCO",
       "nombreNorm": "psa poli 2 bianco",
       "pb": 0.85,
       "precioUser": 280000.0,
-      "categoria": "OTROS"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA QUANTUM BM BIANCO + POSV",
       "nombreNorm": "psa quantum bm bianco + posv",
       "pb": 3.5,
       "precioUser": 1271000.0,
-      "categoria": "OTROS"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA QUANTUM BM BIANCO + POSV Plan canje",
       "nombreNorm": "psa quantum bm bianco + posv plan canje",
       "pb": 3.0,
       "precioUser": 1143900.0,
-      "categoria": "OTROS"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA QUANTUM SM BIANCO + POSV.",
       "nombreNorm": "psa quantum sm bianco + posv.",
       "pb": 3.5,
       "precioUser": 1271000.0,
-      "categoria": "OTROS"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA QUANTUM SM BIANCO + POSV. Plan canje",
       "nombreNorm": "psa quantum sm bianco + posv. plan canje",
       "pb": 3.0,
       "precioUser": 1143900.0,
-      "categoria": "OTROS"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA S-1000 2 BM BIANCO + POSV.",
       "nombreNorm": "psa s-1000 2 bm bianco + posv.",
       "pb": 3.45,
       "precioUser": 1079000.0,
-      "categoria": "OTROS"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA S-1000 2 BM BIANCO + POSV. Plan canje",
       "nombreNorm": "psa s-1000 2 bm bianco + posv. plan canje",
       "pb": 3.0,
       "precioUser": 971100.0,
-      "categoria": "OTROS"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA S-1000 2 SM BIANCO + POSV.",
       "nombreNorm": "psa s-1000 2 sm bianco + posv.",
       "pb": 3.45,
       "precioUser": 1079000.0,
-      "categoria": "OTROS"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA S-1000 2 SM BIANCO + POSV. Plan canje",
       "nombreNorm": "psa s-1000 2 sm bianco + posv. plan canje",
       "pb": 3.0,
       "precioUser": 971100.0,
-      "categoria": "OTROS"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA S-1000 2 SM NERO + POSV.",
       "nombreNorm": "psa s-1000 2 sm nero + posv.",
       "pb": 3.45,
       "precioUser": 1079000.0,
-      "categoria": "OTROS"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA S-1000 2 SM NERO + POSV. Plan canje",
       "nombreNorm": "psa s-1000 2 sm nero + posv. plan canje",
       "pb": 3.0,
       "precioUser": 971100.0,
-      "categoria": "OTROS"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA SENIK BM BIANCO + POSV.",
       "nombreNorm": "psa senik bm bianco + posv.",
       "pb": 3.75,
       "precioUser": 1248000.0,
-      "categoria": "OTROS"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA SENIK BM BIANCO + POSV. Plan canje",
       "nombreNorm": "psa senik bm bianco + posv. plan canje",
       "pb": 3.0,
       "precioUser": 1123200.0,
-      "categoria": "OTROS"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA SENIK SM BIANCO + POSV.",
       "nombreNorm": "psa senik sm bianco + posv.",
       "pb": 3.75,
       "precioUser": 1248000.0,
-      "categoria": "OTROS"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA SENIK SM BIANCO + POSV. Plan canje",
       "nombreNorm": "psa senik sm bianco + posv. plan canje",
       "pb": 3.0,
       "precioUser": 1123200.0,
-      "categoria": "OTROS"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA VERO BIANCO + KIT POSV.",
       "nombreNorm": "psa vero bianco + kit posv.",
       "pb": 1.45,
       "precioUser": 528000.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA VERO BIANCO + KIT POSV. Plan canje",
       "nombreNorm": "psa vero bianco + kit posv. plan canje",
       "pb": 1.35,
       "precioUser": 475200.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Purificadores"
     },
     {
       "nombre": "PSA SODA BURBY BIANCO",
       "nombreNorm": "psa soda burby bianco",
       "pb": 2.15,
       "precioUser": 438000.0,
-      "categoria": "GASIFICADOR"
+      "categoria": "Gasificador"
     },
     {
       "nombre": "PSA SODA BURBY BIANCO Plan canje",
       "nombreNorm": "psa soda burby bianco plan canje",
       "pb": 1.9,
       "precioUser": 394200.0,
-      "categoria": "GASIFICADOR"
+      "categoria": "Gasificador"
     },
     {
       "nombre": "PSA OSMOSIS ROPOT",
       "nombreNorm": "psa osmosis ropot",
       "pb": 3.5,
       "precioUser": 1937000.0,
-      "categoria": "PURIFICADOR DE OSMOSIS INVERSA"
+      "categoria": "Purificador Osmosis Inversa"
     },
     {
       "nombre": "PSA OSMOSIS ROPOT Plan canje",
       "nombreNorm": "psa osmosis ropot plan canje",
       "pb": 2.5,
       "precioUser": 1743300.0,
-      "categoria": "PURIFICADOR DE OSMOSIS INVERSA"
+      "categoria": "Purificador Osmosis Inversa"
     },
     {
       "nombre": "PSA PURIFICADOR DE AIRE",
       "nombreNorm": "psa purificador de aire",
       "pb": 4.5,
       "precioUser": 1596000.0,
-      "categoria": "PURIFICADOR DE AIRE"
+      "categoria": "Purificador de Aire"
     },
     {
       "nombre": "(001) ADAPT. UNIVERSAL C/MANGUERA",
       "nombreNorm": "(001) adapt. universal c/manguera",
       "pb": 0.0,
       "precioUser": 22250.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "(002) ADAPT. ROSCA (FV TIPO UNIMIX)",
       "nombreNorm": "(002) adapt. rosca (fv tipo unimix)",
       "pb": 0.0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "(003) ADAPT. ROSCA CORTA",
       "nombreNorm": "(003) adapt. rosca corta",
       "pb": 0.0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "(004) ADAPT. ROSCA LARGA",
       "nombreNorm": "(004) adapt. rosca larga",
       "pb": 0.0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "(005) ADAPT. UNIV.MARIPOSA DIAM.11-12",
       "nombreNorm": "(005) adapt. univ.mariposa diam.11-12",
       "pb": 0.0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "(006) ADAPT. UNIV.MARIPOSA DIAM.14",
       "nombreNorm": "(006) adapt. univ.mariposa diam.14",
       "pb": 0.0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "(007) ADAPT. UNIV.MARIPOSA DIAM.16",
       "nombreNorm": "(007) adapt. univ.mariposa diam.16",
       "pb": 0.0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "(008) ADAPT. UNIV.MARIPOSA DIAM.18",
       "nombreNorm": "(008) adapt. univ.mariposa diam.18",
       "pb": 0.0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "(009) ADAPT. UNIV.MARIPOSA DIAM.20",
       "nombreNorm": "(009) adapt. univ.mariposa diam.20",
       "pb": 0.0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "(010) ADAPT. ROSCA HEMBRA-HEMBRA",
       "nombreNorm": "(010) adapt. rosca hembra-hembra",
       "pb": 0.0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "(016) ADAPT. ROSCA HEMBRA O.N.",
       "nombreNorm": "(016) adapt. rosca hembra o.n.",
       "pb": 0.0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "(018) ADAPT. ROSCA CANILLA TIPO PATIO",
       "nombreNorm": "(018) adapt. rosca canilla tipo patio",
       "pb": 0.0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "(020) ADAPT. ROSCA ESPECIAL",
       "nombreNorm": "(020) adapt. rosca especial",
       "pb": 0.0,
       "precioUser": 24800.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "(027) ADAPT. ROSCA LARGA PASO FINO",
       "nombreNorm": "(027) adapt. rosca larga paso fino",
       "pb": 0.0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "(030) ADAPT. H-M 1/2 C/TUERCA DUCHA II",
       "nombreNorm": "(030) adapt. h-m 1/2 c/tuerca ducha ii",
       "pb": 0.0,
       "precioUser": 35800.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "(036) ADAPT. M-M 3/4 BG DUCHA II",
       "nombreNorm": "(036) adapt. m-m 3/4 bg ducha ii",
       "pb": 0.0,
       "precioUser": 35800.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "(037) ADAPT. ROSCA MACHO (FV SWING PLUS)",
       "nombreNorm": "(037) adapt. rosca macho (fv swing plus)",
       "pb": 0.0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "(039) ADAPT. ROSCA HEMBRA-HEMBRA DIÁM.22",
       "nombreNorm": "(039) adapt. rosca hembra-hembra diám.22",
       "pb": 0.0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "(041) ADAPT. ROSCA CANILLA PIAZZA",
       "nombreNorm": "(041) adapt. rosca canilla piazza",
       "pb": 0.0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "(053) ADAPT. ROSCA BSP 3/4 X 14 HILOS",
       "nombreNorm": "(053) adapt. rosca bsp 3/4 x 14 hilos",
       "pb": 0.0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "(073) ADAPT. ROSCA MÚLTIPLE",
       "nombreNorm": "(073) adapt. rosca múltiple",
       "pb": 0.0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "(100) ADAPT. ROSCA HEMBRA BSP 1/2",
       "nombreNorm": "(100) adapt. rosca hembra bsp 1/2",
       "pb": 0.0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "(103) ADAPT. ROSCA HEMBRA P/HIDROMET",
       "nombreNorm": "(103) adapt. rosca hembra p/hidromet",
       "pb": 0.0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "(148) ADAPT. ROSCA HEMBRA (SWING PLUS) M. 24X1",
       "nombreNorm": "(148) adapt. rosca hembra (swing plus) m. 24x1",
       "pb": 0.0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "(155) ADAPT. S-1000 C/ORING. P/MANOMETRO",
       "nombreNorm": "(155) adapt. s-1000 c/oring. p/manometro",
       "pb": 0.0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "(177) ADAPT. RECTANGULAR P/PEGAR",
       "nombreNorm": "(177) adapt. rectangular p/pegar",
       "pb": 0.0,
       "precioUser": 54550.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "(20) ADAPT. M-H BG 3/4 P/ DUCHA CR",
       "nombreNorm": "(20) adapt. m-h bg 3/4 p/ ducha cr",
       "pb": 0.0,
       "precioUser": 35800.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "(228) ADAPT. OVALADO",
       "nombreNorm": "(228) adapt. ovalado",
       "pb": 0.0,
       "precioUser": 54550.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "(229) ADAPT. ROSCA H-H 22 X 1 LARGO",
       "nombreNorm": "(229) adapt. rosca h-h 22 x 1 largo",
       "pb": 0.0,
       "precioUser": 18000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "(573) ADAPT. UNIVERSAL C/MANGUERA NERO",
       "nombreNorm": "(573) adapt. universal c/manguera nero",
       "pb": 0.0,
       "precioUser": 22250.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "ADAPT. ESPECIAL KIT 90°",
       "nombreNorm": "adapt. especial kit 90°",
       "pb": 0.0,
       "precioUser": 80000.0,
-      "categoria": "KITS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "BUJE DE DERIVACIÓN CANILLA BM",
       "nombreNorm": "buje de derivación canilla bm",
       "pb": 0.0,
       "precioUser": 10550.0,
-      "categoria": "OTROS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "CONECT.COCODRILO S-1000 X 5 UNID",
       "nombreNorm": "conect.cocodrilo s-1000 x 5 unid",
       "pb": 0.0,
       "precioUser": 15100.0,
-      "categoria": "OTROS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "CONECTOR RAPIDO DE SALIDA PSA 10KD",
       "nombreNorm": "conector rapido de salida psa 10kd",
       "pb": 0.0,
       "precioUser": 33950.0,
-      "categoria": "OTROS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "CONJ.SOPORTE ACRILICO P/MINI",
       "nombreNorm": "conj.soporte acrilico p/mini",
       "pb": 0.0,
       "precioUser": 22150.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "CONJ.SOPORTE ACRILICO SENIOR/VERO",
       "nombreNorm": "conj.soporte acrilico senior/vero",
       "pb": 0.0,
       "precioUser": 27450.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "CONJ.SOPORTE PSA STOPPER",
       "nombreNorm": "conj.soporte psa stopper",
       "pb": 0.0,
       "precioUser": 22150.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "FUNDA PSA DOMUS",
       "nombreNorm": "funda psa domus",
       "pb": 0.0,
       "precioUser": 69700.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "FUNDA PSA MINI DOMUS",
       "nombreNorm": "funda psa mini domus",
       "pb": 0.0,
       "precioUser": 58850.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "GRIFERÍA PSA BICOMANDO",
       "nombreNorm": "grifería psa bicomando",
       "pb": 0.0,
       "precioUser": 517000.0,
-      "categoria": "OTROS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "GRIFERÍA PSA BICOMANDO NERO",
       "nombreNorm": "grifería psa bicomando nero",
       "pb": 0.0,
       "precioUser": 517000.0,
-      "categoria": "OTROS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "GRIFERÍA PSA BM",
       "nombreNorm": "grifería psa bm",
       "pb": 0.0,
       "precioUser": 211000.0,
-      "categoria": "OTROS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "GRIFERÍA PSA BM NERO",
       "nombreNorm": "grifería psa bm nero",
       "pb": 0.0,
       "precioUser": 211000.0,
-      "categoria": "OTROS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "KIT ADAPT.P/CANILLA NO TRADICIONAL DUCHA II",
       "nombreNorm": "kit adapt.p/canilla no tradicional ducha ii",
       "pb": 0.0,
       "precioUser": 54550.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "KIT ADAPT.RECTOS P/CANILLAS PSA DUCHA II",
       "nombreNorm": "kit adapt.rectos p/canillas psa ducha ii",
       "pb": 0.0,
       "precioUser": 72250.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "KIT PARA BAJA PRESION UNIVERSAL",
       "nombreNorm": "kit para baja presion universal",
       "pb": 0.0,
       "precioUser": 22250.0,
-      "categoria": "KITS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "LAP DUCHA 1/2 X 1/2",
       "nombreNorm": "lap ducha 1/2 x 1/2",
       "pb": 0.0,
       "precioUser": 59250.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "LAP DUCHA II MACHO-MACHO 1/2 X 1/2",
       "nombreNorm": "lap ducha ii macho-macho 1/2 x 1/2",
       "pb": 0.0,
       "precioUser": 59250.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "LAP SM P/ MANGUERA BY PASS",
       "nombreNorm": "lap sm p/ manguera by pass",
       "pb": 0.0,
       "precioUser": 93550.0,
-      "categoria": "OTROS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "LLAVE DE AJUSTE P/TAPA PREFILTRO 40K-D",
       "nombreNorm": "llave de ajuste p/tapa prefiltro 40k-d",
       "pb": 0.0,
       "precioUser": 6250.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "LLAVE DE CORTE S-1000 MACHO/HEMBRA",
       "nombreNorm": "llave de corte s-1000 macho/hembra",
       "pb": 0.0,
       "precioUser": 37000.0,
-      "categoria": "OTROS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "LLAVE DE CORTE S-1000 MACHO/MACHO",
       "nombreNorm": "llave de corte s-1000 macho/macho",
       "pb": 0.0,
       "precioUser": 37000.0,
-      "categoria": "OTROS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "PROLONGADOR DE 3/4 PSA POLI",
       "nombreNorm": "prolongador de 3/4 psa poli",
       "pb": 0.0,
       "precioUser": 19850.0,
-      "categoria": "OTROS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "PROLONGADOR PSA DUCHA II",
       "nombreNorm": "prolongador psa ducha ii",
       "pb": 0.0,
       "precioUser": 41350.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "REGULADOR DE CAUDAL",
       "nombreNorm": "regulador de caudal",
       "pb": 0.0,
       "precioUser": 108000.0,
-      "categoria": "OTROS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "SET ADAPTACION RETRO P/KIT CANILLA",
       "nombreNorm": "set adaptacion retro p/kit canilla",
       "pb": 0.0,
       "precioUser": 33950.0,
-      "categoria": "KITS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "TAPON REGULADOR P/DUCHA X 5 UNIDADES",
       "nombreNorm": "tapon regulador p/ducha x 5 unidades",
       "pb": 0.0,
       "precioUser": 8700.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "TE C/LLAVE DE CORTE P/GRIFERÍA PSA Y ECO-D",
       "nombreNorm": "te c/llave de corte p/grifería psa y eco-d",
       "pb": 0.0,
       "precioUser": 80550.0,
-      "categoria": "OTROS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "VARILLA INST. ECO-D SM",
       "nombreNorm": "varilla inst. eco-d sm",
       "pb": 0.0,
       "precioUser": 55600.0,
-      "categoria": "OTROS"
+      "categoria": "Accesorios para la instalación"
     },
     {
       "nombre": "REPOSICION PSA 10K-D",
       "nombreNorm": "reposicion psa 10k-d",
       "pb": 0.8,
       "precioUser": 260000.0,
-      "categoria": "OTROS"
+      "categoria": "Reposiciones"
     },
     {
       "nombre": "REPOSICION PSA 40K-D",
       "nombreNorm": "reposicion psa 40k-d",
       "pb": 1.3,
       "precioUser": 403000.0,
-      "categoria": "OTROS"
+      "categoria": "Reposiciones"
     },
     {
       "nombre": "ACCESORIO PARA CEBAR MATE",
       "nombreNorm": "accesorio para cebar mate",
       "pb": 0.0,
       "precioUser": 5100.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "BUJE DE CONEXION P/CANILLA DISPENSER",
       "nombreNorm": "buje de conexion p/canilla dispenser",
       "pb": 0.0,
       "precioUser": 55550.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "CAMPANA P/PSA DUCHA",
       "nombreNorm": "campana p/psa ducha",
       "pb": 0.0,
       "precioUser": 5950.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "CANILLA AGUA CALIENTE DISPENSER DS",
       "nombreNorm": "canilla agua caliente dispenser ds",
       "pb": 0.0,
       "precioUser": 37000.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "CANILLA AGUA CALIENTE DISPENSER MESA/PIE",
       "nombreNorm": "canilla agua caliente dispenser mesa/pie",
       "pb": 0.0,
       "precioUser": 37000.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "CANILLA AGUA CALIENTE P/ECO-D PIE Y SM",
       "nombreNorm": "canilla agua caliente p/eco-d pie y sm",
       "pb": 0.0,
       "precioUser": 39850.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "CANILLA AGUA FRIA DISPENSER DS",
       "nombreNorm": "canilla agua fria dispenser ds",
       "pb": 0.0,
       "precioUser": 37000.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "CANILLA AGUA FRIA DISPENSER MESA/PIE",
       "nombreNorm": "canilla agua fria dispenser mesa/pie",
       "pb": 0.0,
       "precioUser": 37000.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "CANILLA AGUA FRIA P/ECO-D PIE Y SM",
       "nombreNorm": "canilla agua fria p/eco-d pie y sm",
       "pb": 0.0,
       "precioUser": 39850.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "CANULA P/BOTELLA TERMICA X 5 UNID",
       "nombreNorm": "canula p/botella termica x 5 unid",
       "pb": 0.0,
       "precioUser": 8450.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "CEPILLO DE ACERO P/IONTRIX",
       "nombreNorm": "cepillo de acero p/iontrix",
       "pb": 0.0,
       "precioUser": 22150.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "CONJ.SOPORTE ESCUADRA P/DISPENSER PIE C/CONECTORES",
       "nombreNorm": "conj.soporte escuadra p/dispenser pie c/conectores",
       "pb": 0.0,
       "precioUser": 143000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "ELECTRODO P/IONTRIX",
       "nombreNorm": "electrodo p/iontrix",
       "pb": 0.0,
       "precioUser": 175000.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "FIPOR N° 3 X 8 UNIDADES",
       "nombreNorm": "fipor n° 3 x 8 unidades",
       "pb": 0.0,
       "precioUser": 99100.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "FLOR PSA DUCHA BLANCO/BIANCO C/CODO CROMADO",
       "nombreNorm": "flor psa ducha blanco/bianco c/codo cromado",
       "pb": 0.0,
       "precioUser": 30100.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "FLOR PSA DUCHA GRIGIO C/CODO CROMADO",
       "nombreNorm": "flor psa ducha grigio c/codo cromado",
       "pb": 0.0,
       "precioUser": 30100.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "FUENTE DE ALIMENTACION P/IONTRIX",
       "nombreNorm": "fuente de alimentacion p/iontrix",
       "pb": 0.0,
       "precioUser": 178000.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "FUENTE DE ALIMENTACION OSMOSIS PSA ROPOT",
       "nombreNorm": "fuente de alimentacion osmosis psa ropot",
       "pb": 0.0,
       "precioUser": 72000.0,
-      "categoria": "PURIFICADOR DE OSMOSIS INVERSA"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "FUENTE DE ALIMENTACION P/DOMUS-MINI DOMUS",
       "nombreNorm": "fuente de alimentacion p/domus-mini domus",
       "pb": 0.0,
       "precioUser": 56100.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "GATILLO P/CANILLA BAJO MESADA PSA",
       "nombreNorm": "gatillo p/canilla bajo mesada psa",
       "pb": 0.0,
       "precioUser": 15100.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "JARRA AGUA OSMOSIS PSA ROPOT",
       "nombreNorm": "jarra agua osmosis psa ropot",
       "pb": 0.0,
       "precioUser": 61800.0,
-      "categoria": "PURIFICADOR DE OSMOSIS INVERSA"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "KIT P/DETERMINACIÓN DUREZA (10 TIRAS)",
       "nombreNorm": "kit p/determinación dureza (10 tiras)",
       "pb": 0.0,
       "precioUser": 26100.0,
-      "categoria": "KITS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "KIT P/MEDICION DE CLORO P/IONTRIX",
       "nombreNorm": "kit p/medicion de cloro p/iontrix",
       "pb": 0.0,
       "precioUser": 10850.0,
-      "categoria": "KITS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "KIT P/MEDICION DE IONES P/IONTRIX",
       "nombreNorm": "kit p/medicion de iones p/iontrix",
       "pb": 0.0,
       "precioUser": 38100.0,
-      "categoria": "KITS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "KIT P/MEDICION DE PH P/IONTRIX",
       "nombreNorm": "kit p/medicion de ph p/iontrix",
       "pb": 0.0,
       "precioUser": 19850.0,
-      "categoria": "KITS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "KIT POSVENTA 1 AÑO OSMOSIS PSA ROPOT",
       "nombreNorm": "kit posventa 1 año osmosis psa ropot",
       "pb": 0.0,
       "precioUser": 310000.0,
-      "categoria": "PURIFICADOR DE OSMOSIS INVERSA"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "KIT POSVENTA PURIF. AIRE PSA",
       "nombreNorm": "kit posventa purif. aire psa",
       "pb": 0.25,
       "precioUser": 159000.0,
-      "categoria": "KITS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "KIT PSA LAB P/IONTRIX",
       "nombreNorm": "kit psa lab p/iontrix",
       "pb": 0.0,
       "precioUser": 109000.0,
-      "categoria": "KITS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "MANG. BLACK DIÁM. 8,5 X 1600 C/CONEC. SEN4/S1000",
       "nombreNorm": "mang. black diám. 8,5 x 1600 c/conec. sen4/s1000",
       "pb": 0.0,
       "precioUser": 13550.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "MANG. BLACK DIÁM. 8,5 X 700 C/CONEC. SEN4/S1000",
       "nombreNorm": "mang. black diám. 8,5 x 700 c/conec. sen4/s1000",
       "pb": 0.0,
       "precioUser": 10550.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "MANG. SEMIRRÍGIDA AZUL DIÁM.8 (X METRO)",
       "nombreNorm": "mang. semirrígida azul diám.8 (x metro)",
       "pb": 0.0,
       "precioUser": 7500.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "MANG. SEMIRRÍGIDA BLANCA DIÁM.8 (X METRO)",
       "nombreNorm": "mang. semirrígida blanca diám.8 (x metro)",
       "pb": 0.0,
       "precioUser": 7500.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "MANG. SEMIRRÍGIDA VERDE DIÁM.8 (X METRO)",
       "nombreNorm": "mang. semirrígida verde diám.8 (x metro)",
       "pb": 0.0,
       "precioUser": 7500.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "MANG.PLATA DIÁM. 8,5 X 1000 CONEC. SEN/VERO/S1000",
       "nombreNorm": "mang.plata diám. 8,5 x 1000 conec. sen/vero/s1000",
       "pb": 0.0,
       "precioUser": 10550.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "MANG.PLATA DIÁM. 8,5 X 1600 CONEC. SEN/VERO/S1000",
       "nombreNorm": "mang.plata diám. 8,5 x 1600 conec. sen/vero/s1000",
       "pb": 0.0,
       "precioUser": 10550.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "MANG.PLATA DIÁM. 8.5 X 1600 CONEC. P/MINI",
       "nombreNorm": "mang.plata diám. 8.5 x 1600 conec. p/mini",
       "pb": 0.0,
       "precioUser": 8700.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "MANG.PLATA DIÁM. 8.5 X 700 CONEC. P/MINI",
       "nombreNorm": "mang.plata diám. 8.5 x 700 conec. p/mini",
       "pb": 0.0,
       "precioUser": 4700.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "MARIPOSA DE FIJACION P/IONTRIX",
       "nombreNorm": "mariposa de fijacion p/iontrix",
       "pb": 0.0,
       "precioUser": 8700.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "MARIPOSA DE FIJACION P/IONTRIX",
       "nombreNorm": "mariposa de fijacion p/iontrix",
       "pb": 3.0,
       "precioUser": 8700.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "MATERIAL REGENERANTE X 2.5 KG P/DOMUS",
       "nombreNorm": "material regenerante x 2.5 kg p/domus",
       "pb": 0.0,
       "precioUser": 31900.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "O-RING INTERNO TAPA CUERPO PSA DUCHA (JUEGO)",
       "nombreNorm": "o-ring interno tapa cuerpo psa ducha (juego)",
       "pb": 0.0,
       "precioUser": 4800.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "ORTOTOLIDINA",
       "nombreNorm": "ortotolidina",
       "pb": 0.0,
       "precioUser": 6400.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "PASTILLA HIDROSENSIBLE P/ECO-D",
       "nombreNorm": "pastilla hidrosensible p/eco-d",
       "pb": 0.0,
       "precioUser": 33000.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "PASTILLA SANITIZANTE MAX X 8 UNID.",
       "nombreNorm": "pastilla sanitizante max x 8 unid.",
       "pb": 0.0,
       "precioUser": 4700.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "PAÑO ALTA TURBIDEZ 24 X 21 X 3 UNID.",
       "nombreNorm": "paño alta turbidez 24 x 21 x 3 unid.",
       "pb": 0.0,
       "precioUser": 26000.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "PICO DE DESCARGA GRIFERIA NERO",
       "nombreNorm": "pico de descarga griferia nero",
       "pb": 0.0,
       "precioUser": 94800.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "PICO DESCARGA CANILLA BM2/GRIFERIA PSA",
       "nombreNorm": "pico descarga canilla bm2/griferia psa",
       "pb": 0.0,
       "precioUser": 94800.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "PREFILTRO ENTRADA PURIF. DE AIRE PSA",
       "nombreNorm": "prefiltro entrada purif. de aire psa",
       "pb": 0.0,
       "precioUser": 48600.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "PREFILTRO P/10 KD",
       "nombreNorm": "prefiltro p/10 kd",
       "pb": 0.0,
       "precioUser": 19850.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "PROLONGADOR P/PICO PSA SENIOR",
       "nombreNorm": "prolongador p/pico psa senior",
       "pb": 0.0,
       "precioUser": 19850.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "PROMO CILINDRO + PACK RENDIMIENTO II",
       "nombreNorm": "promo cilindro + pack rendimiento ii",
       "pb": 0.0,
       "precioUser": 112000.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "RECARGA P/SODA BURBY",
       "nombreNorm": "recarga p/soda burby",
       "pb": 0.0,
       "precioUser": 28400.0,
-      "categoria": "GASIFICADOR"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "RECIPIENTE P/AGUA ENTRADA OSMOSIS PSA ROPOT",
       "nombreNorm": "recipiente p/agua entrada osmosis psa ropot",
       "pb": 0.0,
       "precioUser": 48900.0,
-      "categoria": "PURIFICADOR DE OSMOSIS INVERSA"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "REPUESTO BACTERIOSTÁTICO 25 MIC S-1000/QUA/SEN",
       "nombreNorm": "repuesto bacteriostático 25 mic s-1000/qua/sen",
       "pb": 0.17,
       "precioUser": 75950.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "REPUESTO BACTERIOSTÁTICO 5 MIC S-1000/QUA/SEN",
       "nombreNorm": "repuesto bacteriostático 5 mic s-1000/qua/sen",
       "pb": 0.17,
       "precioUser": 75950.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "REPUESTO BACTERIOSTÁTICO 50 MIC S-1000/QUA/SEN",
       "nombreNorm": "repuesto bacteriostático 50 mic s-1000/qua/sen",
       "pb": 0.17,
       "precioUser": 75950.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "REPUESTO CUERPO PSA DUCHA BIANCO",
       "nombreNorm": "repuesto cuerpo psa ducha bianco",
       "pb": 0.0,
       "precioUser": 21100.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "REPUESTO CUERPO PSA DUCHA GRIGIO",
       "nombreNorm": "repuesto cuerpo psa ducha grigio",
       "pb": 0.0,
       "precioUser": 21100.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "REPUESTO N°1 SEDIMENTOS OSMOSIS PSA ROPOT",
       "nombreNorm": "repuesto n°1 sedimentos osmosis psa ropot",
       "pb": 0.15,
       "precioUser": 48600.0,
-      "categoria": "PURIFICADOR DE OSMOSIS INVERSA"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "REPUESTO N°2 CARBON BLOQUE OSMOSIS PSA ROPOT",
       "nombreNorm": "repuesto n°2 carbon bloque osmosis psa ropot",
       "pb": 0.15,
       "precioUser": 54550.0,
-      "categoria": "PURIFICADOR DE OSMOSIS INVERSA"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "REPUESTO N°3 MEMBRANA OSMOSIS PSA ROPOT",
       "nombreNorm": "repuesto n°3 membrana osmosis psa ropot",
       "pb": 0.25,
       "precioUser": 158000.0,
-      "categoria": "PURIFICADOR DE OSMOSIS INVERSA"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "REPUESTO N°4 POST MEMBRANA OSMOSIS PSA ROPOT",
       "nombreNorm": "repuesto n°4 post membrana osmosis psa ropot",
       "pb": 0.15,
       "precioUser": 55600.0,
-      "categoria": "PURIFICADOR DE OSMOSIS INVERSA"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "REPUESTO PSA DUCHA C/KDF",
       "nombreNorm": "repuesto psa ducha c/kdf",
       "pb": 0.23,
       "precioUser": 143000.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "REPUESTO PSA DUCHA C/KDF/POLIFOSFATO",
       "nombreNorm": "repuesto psa ducha c/kdf/polifosfato",
       "pb": 0.23,
       "precioUser": 143000.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "REPUESTO PSA POLI",
       "nombreNorm": "repuesto psa poli",
       "pb": 0.17,
       "precioUser": 83150.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "REPUESTO PSA POLI 2",
       "nombreNorm": "repuesto psa poli 2",
       "pb": 0.17,
       "precioUser": 83150.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "REPUESTO PSA PORTÁTIL",
       "nombreNorm": "repuesto psa portátil",
       "pb": 0.17,
       "precioUser": 88450.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "RESERVORIO COMPLETO P/ECO-D",
       "nombreNorm": "reservorio completo p/eco-d",
       "pb": 0.0,
       "precioUser": 35800.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "TAPA ACRILICO P/STOPPER/40K-D",
       "nombreNorm": "tapa acrilico p/stopper/40k-d",
       "pb": 0.0,
       "precioUser": 77750.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "TAPA CENTRADORA P/IONTRIX",
       "nombreNorm": "tapa centradora p/iontrix",
       "pb": 0.0,
       "precioUser": 11300.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "TAPA CENTRADORA P/IONTRIX",
       "nombreNorm": "tapa centradora p/iontrix",
       "pb": 3.0,
       "precioUser": 11300.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "TAPA CON FLOTANTE P/DISPENSER",
       "nombreNorm": "tapa con flotante p/dispenser",
       "pb": 0.0,
       "precioUser": 153000.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "TAPA P/BOTELLA PSA TERMICA PICO SPORT",
       "nombreNorm": "tapa p/botella psa termica pico sport",
       "pb": 0.0,
       "precioUser": 8450.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "TAPA P/CUERPO PSA DUCHA CR MARFIL",
       "nombreNorm": "tapa p/cuerpo psa ducha cr marfil",
       "pb": 0.0,
       "precioUser": 21100.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "TAPA P/CUERPO PSA DUCHA PLATA",
       "nombreNorm": "tapa p/cuerpo psa ducha plata",
       "pb": 0.0,
       "precioUser": 21100.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "TAPA PREFILTRO C/AUTOPURGA",
       "nombreNorm": "tapa prefiltro c/autopurga",
       "pb": 0.0,
       "precioUser": 18200.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "TAPA PREFILTRO PSA S-1000 II",
       "nombreNorm": "tapa prefiltro psa s-1000 ii",
       "pb": 0.0,
       "precioUser": 25550.0,
-      "categoria": "REPUESTOS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "TAPON P/CONECTOR DE RECARGA P/IONTRIX",
       "nombreNorm": "tapon p/conector de recarga p/iontrix",
       "pb": 0.0,
       "precioUser": 11300.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "TERMOSTATO AGUA CALIENTE 85° P/DISPENSER",
       "nombreNorm": "termostato agua caliente 85° p/dispenser",
       "pb": 0.0,
       "precioUser": 37000.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "TUBO CONEXION PSA DUCHA C/O-RING",
       "nombreNorm": "tubo conexion psa ducha c/o-ring",
       "pb": 0.0,
       "precioUser": 35800.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "VÁLVULA BY PASS C3 GRIGIO",
       "nombreNorm": "válvula by pass c3 grigio",
       "pb": 0.0,
       "precioUser": 22250.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "VÁLVULA BY PASS NERO",
       "nombreNorm": "válvula by pass nero",
       "pb": 0.0,
       "precioUser": 22250.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "VÁLVULA BY PASS UNIVERSAL",
       "nombreNorm": "válvula by pass universal",
       "pb": 0.0,
       "precioUser": 22250.0,
-      "categoria": "OTROS"
+      "categoria": "Repuestos/mantenim. productos"
     },
     {
       "nombre": "ADICIONAL INST. HASTA 60 KM (PSA POLI X 2)",
       "nombreNorm": "adicional inst. hasta 60 km (psa poli x 2)",
       "pb": 0.0,
       "precioUser": 229000.0,
-      "categoria": "OTROS"
+      "categoria": "Servicios"
     },
     {
       "nombre": "ADICIONAL INST. HASTA 60 KM (PSA POLI)",
       "nombreNorm": "adicional inst. hasta 60 km (psa poli)",
       "pb": 0.0,
       "precioUser": 167000.0,
-      "categoria": "OTROS"
+      "categoria": "Servicios"
     },
     {
       "nombre": "ADICIONAL INSTAL. HASTA 60 KM",
       "nombreNorm": "adicional instal. hasta 60 km",
       "pb": 0.0,
       "precioUser": 147000.0,
-      "categoria": "OTROS"
+      "categoria": "Servicios"
     },
     {
       "nombre": "ADICIONAL POR KILOMETRAJE EXCEDIDO",
       "nombreNorm": "adicional por kilometraje excedido",
       "pb": 0.0,
       "precioUser": 4650.0,
-      "categoria": "OTROS"
+      "categoria": "Servicios"
     },
     {
       "nombre": "GRIFERÍA PSA BICOMANDO + INST.",
       "nombreNorm": "grifería psa bicomando + inst.",
       "pb": 0.0,
       "precioUser": 664000.0,
-      "categoria": "OTROS"
+      "categoria": "Servicios"
     },
     {
       "nombre": "GRIFERÍA PSA BICOMANDO NERO + INST.",
       "nombreNorm": "grifería psa bicomando nero + inst.",
       "pb": 0.0,
       "precioUser": 664000.0,
-      "categoria": "OTROS"
+      "categoria": "Servicios"
     },
     {
       "nombre": "GRIFERÍA PSA BM + INST.",
       "nombreNorm": "grifería psa bm + inst.",
       "pb": 0.0,
       "precioUser": 358000.0,
-      "categoria": "OTROS"
+      "categoria": "Servicios"
     },
     {
       "nombre": "GRIFERÍA PSA BM NERO + INST.",
       "nombreNorm": "grifería psa bm nero + inst.",
       "pb": 0.0,
       "precioUser": 358000.0,
-      "categoria": "OTROS"
+      "categoria": "Servicios"
     },
     {
       "nombre": "INSTALACION DISPENSER PSA (HASTA 60 KM)",
       "nombreNorm": "instalacion dispenser psa (hasta 60 km)",
       "pb": 0.0,
       "precioUser": 190000.0,
-      "categoria": "OTROS"
+      "categoria": "Servicios"
     },
     {
       "nombre": "INSTALACION PSA DOMUS/MINI DOMUS (HASTA 60 KM)",
       "nombreNorm": "instalacion psa domus/mini domus (hasta 60 km)",
       "pb": 0.0,
       "precioUser": 190000.0,
-      "categoria": "PURIFICADORES"
+      "categoria": "Servicios"
     },
     {
       "nombre": "MANTENIMIENTO ANUAL DISPENSER PSA",
       "nombreNorm": "mantenimiento anual dispenser psa",
       "pb": 0.0,
       "precioUser": 164000.0,
-      "categoria": "OTROS"
+      "categoria": "Servicios"
     },
     {
       "nombre": "MODULO REPARACION DE PRODUCTO",
       "nombreNorm": "modulo reparacion de producto",
       "pb": 0.0,
       "precioUser": 12000.0,
-      "categoria": "OTROS"
+      "categoria": "Servicios"
     },
     {
       "nombre": "SERVICE CON INSTALADOR HASTA 60 KM.",
       "nombreNorm": "service con instalador hasta 60 km.",
       "pb": 0.0,
       "precioUser": 113000.0,
-      "categoria": "OTROS"
+      "categoria": "Servicios"
     },
     {
       "nombre": "TRANSF.SM/BM + GRIF.PSA BICOMANDO",
       "nombreNorm": "transf.sm/bm + grif.psa bicomando",
       "pb": 0.0,
       "precioUser": 541000.0,
-      "categoria": "OTROS"
+      "categoria": "Servicios"
     },
     {
       "nombre": "TRANSF.SM/BM + GRIF.PSA BICOMANDO + INST.",
       "nombreNorm": "transf.sm/bm + grif.psa bicomando + inst.",
       "pb": 0.0,
       "precioUser": 688000.0,
-      "categoria": "OTROS"
+      "categoria": "Servicios"
     },
     {
       "nombre": "TRANSF.SM/BM + GRIF.PSA BICOMANDO NERO",
       "nombreNorm": "transf.sm/bm + grif.psa bicomando nero",
       "pb": 0.0,
       "precioUser": 541000.0,
-      "categoria": "OTROS"
+      "categoria": "Servicios"
     },
     {
       "nombre": "TRANSF.SM/BM + GRIF.PSA BICOMANDO NERO + INST.",
       "nombreNorm": "transf.sm/bm + grif.psa bicomando nero + inst.",
       "pb": 0.0,
       "precioUser": 688000.0,
-      "categoria": "OTROS"
+      "categoria": "Servicios"
     },
     {
       "nombre": "TRANSF.SM/BM + GRIFERÍA PSA BM",
       "nombreNorm": "transf.sm/bm + grifería psa bm",
       "pb": 0.0,
       "precioUser": 221000.0,
-      "categoria": "OTROS"
+      "categoria": "Servicios"
     },
     {
       "nombre": "TRANSF.SM/BM + GRIFERÍA PSA BM + INSTAL.",
       "nombreNorm": "transf.sm/bm + grifería psa bm + instal.",
       "pb": 0.0,
       "precioUser": 368000.0,
-      "categoria": "OTROS"
+      "categoria": "Servicios"
     },
     {
       "nombre": "TRANSF.SM/BM + GRIFERÍA PSA BM NERO",
       "nombreNorm": "transf.sm/bm + grifería psa bm nero",
       "pb": 0.0,
       "precioUser": 221000.0,
-      "categoria": "OTROS"
+      "categoria": "Servicios"
     },
     {
       "nombre": "TRANSF.SM/BM + GRIFERÍA PSA BM NERO + INSTAL.",
       "nombreNorm": "transf.sm/bm + grifería psa bm nero + instal.",
       "pb": 0.0,
       "precioUser": 368000.0,
-      "categoria": "OTROS"
+      "categoria": "Servicios"
     },
     {
       "nombre": "BOTELLA 600 CC NO GASF AMAR-AMAR 100 % RECICLADA",
       "nombreNorm": "botella 600 cc no gasf amar-amar 100 % reciclada",
       "pb": 0.0,
       "precioUser": 37150.0,
-      "categoria": "OTROS"
+      "categoria": "Botellas"
     },
     {
       "nombre": "BOTELLA 600 CC NO GASF AMAR-AQUA % RECICLADA",
       "nombreNorm": "botella 600 cc no gasf amar-aqua % reciclada",
       "pb": 0.0,
       "precioUser": 37150.0,
-      "categoria": "OTROS"
+      "categoria": "Botellas"
     },
     {
       "nombre": "BOTELLA 600 CC NO GASF AMAR-ROS 100 % RECICLADA",
       "nombreNorm": "botella 600 cc no gasf amar-ros 100 % reciclada",
       "pb": 0.0,
       "precioUser": 37150.0,
-      "categoria": "OTROS"
+      "categoria": "Botellas"
     },
     {
       "nombre": "BOTELLA 600 CC NO GASF AMAR-VER 100 % RECICLADA",
       "nombreNorm": "botella 600 cc no gasf amar-ver 100 % reciclada",
       "pb": 0.0,
       "precioUser": 37150.0,
-      "categoria": "OTROS"
+      "categoria": "Botellas"
     },
     {
       "nombre": "BOTELLA 600 CC NO GASF AQUA-AMAR 100 % RECICLADA",
       "nombreNorm": "botella 600 cc no gasf aqua-amar 100 % reciclada",
       "pb": 0.0,
       "precioUser": 37150.0,
-      "categoria": "OTROS"
+      "categoria": "Botellas"
     },
     {
       "nombre": "BOTELLA 600 CC NO GASF AQUA-AQUA 100 % RECICLADA",
       "nombreNorm": "botella 600 cc no gasf aqua-aqua 100 % reciclada",
       "pb": 0.0,
       "precioUser": 37150.0,
-      "categoria": "OTROS"
+      "categoria": "Botellas"
     },
     {
       "nombre": "BOTELLA 600 CC NO GASF AQUA-ROSA 100% RECICLADA",
       "nombreNorm": "botella 600 cc no gasf aqua-rosa 100% reciclada",
       "pb": 0.0,
       "precioUser": 37150.0,
-      "categoria": "OTROS"
+      "categoria": "Botellas"
     },
     {
       "nombre": "BOTELLA 600 CC NO GASF AQUA-VERDE 100% RECICLADA",
       "nombreNorm": "botella 600 cc no gasf aqua-verde 100% reciclada",
       "pb": 0.0,
       "precioUser": 37150.0,
-      "categoria": "OTROS"
+      "categoria": "Botellas"
     },
     {
       "nombre": "BOTELLA 600 CC NO GASF ROS-AMAR 100 % RECICLADA",
       "nombreNorm": "botella 600 cc no gasf ros-amar 100 % reciclada",
       "pb": 0.0,
       "precioUser": 37150.0,
-      "categoria": "OTROS"
+      "categoria": "Botellas"
     },
     {
       "nombre": "BOTELLA 600 CC NO GASF ROS-AQUA 100 % RECICLADA",
       "nombreNorm": "botella 600 cc no gasf ros-aqua 100 % reciclada",
       "pb": 0.0,
       "precioUser": 37150.0,
-      "categoria": "OTROS"
+      "categoria": "Botellas"
     },
     {
       "nombre": "BOTELLA 600 CC NO GASF ROS-ROS 100 % RECICLADA",
       "nombreNorm": "botella 600 cc no gasf ros-ros 100 % reciclada",
       "pb": 0.0,
       "precioUser": 37150.0,
-      "categoria": "OTROS"
+      "categoria": "Botellas"
     },
     {
       "nombre": "BOTELLA 600 CC NO GASF ROS-VER 100 % RECICLADA",
       "nombreNorm": "botella 600 cc no gasf ros-ver 100 % reciclada",
       "pb": 0.0,
       "precioUser": 37150.0,
-      "categoria": "OTROS"
+      "categoria": "Botellas"
     },
     {
       "nombre": "BOTELLA 600 CC NO GASF VER-AMAR 100 % RECICLADA",
       "nombreNorm": "botella 600 cc no gasf ver-amar 100 % reciclada",
       "pb": 0.0,
       "precioUser": 37150.0,
-      "categoria": "OTROS"
+      "categoria": "Botellas"
     },
     {
       "nombre": "BOTELLA 600 CC NO GASF VER-AQUA 100 % RECICLADA",
       "nombreNorm": "botella 600 cc no gasf ver-aqua 100 % reciclada",
       "pb": 0.0,
       "precioUser": 37150.0,
-      "categoria": "OTROS"
+      "categoria": "Botellas"
     },
     {
       "nombre": "BOTELLA 600 CC NO GASF VER-ROS 100 % RECICLADA",
       "nombreNorm": "botella 600 cc no gasf ver-ros 100 % reciclada",
       "pb": 0.0,
       "precioUser": 37150.0,
-      "categoria": "OTROS"
+      "categoria": "Botellas"
     },
     {
       "nombre": "BOTELLA 600 CC NO GASF VER-VER 100 % RECICLADA",
       "nombreNorm": "botella 600 cc no gasf ver-ver 100 % reciclada",
       "pb": 0.0,
       "precioUser": 37150.0,
-      "categoria": "OTROS"
+      "categoria": "Botellas"
     },
     {
       "nombre": "BOTELLA DE VIDRIO 1 LT. PSA",
       "nombreNorm": "botella de vidrio 1 lt. psa",
       "pb": 0.0,
       "precioUser": 42800.0,
-      "categoria": "OTROS"
+      "categoria": "Botellas"
     },
     {
       "nombre": "BOTELLA NEO AQUA-AQUA REUTILIZ.",
       "nombreNorm": "botella neo aqua-aqua reutiliz.",
       "pb": 0.0,
       "precioUser": 64200.0,
-      "categoria": "OTROS"
+      "categoria": "Botellas"
     },
     {
       "nombre": "BOTELLA PSA NO GAS. 1 LITRO X 1 REUTILIZABLE",
       "nombreNorm": "botella psa no gas. 1 litro x 1 reutilizable",
       "pb": 0.0,
       "precioUser": 12000.0,
-      "categoria": "OTROS"
+      "categoria": "Botellas"
     },
     {
       "nombre": "BOTELLA PSA NO GAS. X 1000 ML PACK X2 REUTILIZ.",
       "nombreNorm": "botella psa no gas. x 1000 ml pack x2 reutiliz.",
       "pb": 0.0,
       "precioUser": 19150.0,
-      "categoria": "OTROS"
+      "categoria": "Botellas"
     },
     {
       "nombre": "BOTELLA PSA P/SODA BURBY X 1100 ML X2 REUTILIZ.",
       "nombreNorm": "botella psa p/soda burby x 1100 ml x2 reutiliz.",
       "pb": 0.0,
       "precioUser": 25150.0,
-      "categoria": "GASIFICADOR"
+      "categoria": "Botellas"
     },
     {
       "nombre": "BOTELLA PSA TÉRMICA 500 CC BLANCA",
       "nombreNorm": "botella psa térmica 500 cc blanca",
       "pb": 0.0,
       "precioUser": 61200.0,
-      "categoria": "OTROS"
+      "categoria": "Botellas"
     },
     {
       "nombre": "BOTELLA PSA TÉRMICA 500 CC NEGRA",
       "nombreNorm": "botella psa térmica 500 cc negra",
       "pb": 0.0,
       "precioUser": 61200.0,
-      "categoria": "OTROS"
+      "categoria": "Botellas"
     },
     {
       "nombre": "BOTELLA PSA TÉRMICA 750 CC BLANCA",
       "nombreNorm": "botella psa térmica 750 cc blanca",
       "pb": 0.0,
       "precioUser": 71150.0,
-      "categoria": "OTROS"
+      "categoria": "Botellas"
     },
     {
       "nombre": "BOTELLA PSA TÉRMICA 750 CC NEGRA",
       "nombreNorm": "botella psa térmica 750 cc negra",
       "pb": 0.0,
       "precioUser": 71150.0,
-      "categoria": "OTROS"
+      "categoria": "Botellas"
     },
     {
       "nombre": "KIT MATE 2 PSA BIANCO (MATE+BOMBILLA)",
       "nombreNorm": "kit mate 2 psa bianco (mate+bombilla)",
       "pb": 0.0,
       "precioUser": 38500.0,
-      "categoria": "KITS"
+      "categoria": "Material Promocional"
     },
     {
       "nombre": "KIT MATE 2 PSA NERO (MATE+BOMBILLA)",
       "nombreNorm": "kit mate 2 psa nero (mate+bombilla)",
       "pb": 0.0,
       "precioUser": 38500.0,
-      "categoria": "KITS"
+      "categoria": "Material Promocional"
     },
     {
       "nombre": "LAPIZ GRAFITO NEGRO PSA X 10 UNID.",
       "nombreNorm": "lapiz grafito negro psa x 10 unid.",
       "pb": 0.0,
       "precioUser": 4250.0,
-      "categoria": "OTROS"
+      "categoria": "Material Promocional"
     },
     {
       "nombre": "REJILLEX BLANCO",
       "nombreNorm": "rejillex blanco",
       "pb": 0.01,
       "precioUser": 8700.0,
-      "categoria": "OTROS"
+      "categoria": "Material Promocional"
     },
     {
       "nombre": "REJILLEX GRIGIO",
       "nombreNorm": "rejillex grigio",
       "pb": 0.01,
       "precioUser": 8700.0,
-      "categoria": "OTROS"
+      "categoria": "Material Promocional"
     },
     {
       "nombre": "SET MATE 2 PSA BIANCO (TERMO+MATE+BOMBILLA)",
       "nombreNorm": "set mate 2 psa bianco (termo+mate+bombilla)",
       "pb": 0.0,
       "precioUser": 131000.0,
-      "categoria": "OTROS"
+      "categoria": "Material Promocional"
     },
     {
       "nombre": "TERMO 2 PSA BLANCO",
       "nombreNorm": "termo 2 psa blanco",
       "pb": 0.0,
       "precioUser": 92550.0,
-      "categoria": "OTROS"
+      "categoria": "Material Promocional"
     },
     {
       "nombre": "ANALISIS ESPECIFICOS",
       "nombreNorm": "analisis especificos",
       "pb": 0.0,
       "precioUser": 78400.0,
-      "categoria": "OTROS"
+      "categoria": "Análisis de laboratorio"
     },
     {
       "nombre": "BOTELLA P/ANALISIS DE AGUA",
       "nombreNorm": "botella p/analisis de agua",
       "pb": 0.0,
       "precioUser": 4700.0,
-      "categoria": "OTROS"
+      "categoria": "Análisis de laboratorio"
     },
     {
       "nombre": "MODULO A. FISICO QUIMICO BASICO",
       "nombreNorm": "modulo a. fisico quimico basico",
       "pb": 0.0,
       "precioUser": 126000.0,
-      "categoria": "OTROS"
+      "categoria": "Análisis de laboratorio"
     },
     {
       "nombre": "MODULO B. FISICO QUIMICO INTERMEDIO",
       "nombreNorm": "modulo b. fisico quimico intermedio",
       "pb": 0.0,
       "precioUser": 285000.0,
-      "categoria": "OTROS"
+      "categoria": "Análisis de laboratorio"
     },
     {
       "nombre": "MODULO C. FISICO QUIMICO COMPLETO",
       "nombreNorm": "modulo c. fisico quimico completo",
       "pb": 0.0,
       "precioUser": 421000.0,
-      "categoria": "OTROS"
+      "categoria": "Análisis de laboratorio"
     },
     {
       "nombre": "MODULO D. BACTERIOLOGICO",
       "nombreNorm": "modulo d. bacteriologico",
       "pb": 0.0,
       "precioUser": 126000.0,
-      "categoria": "OTROS"
+      "categoria": "Análisis de laboratorio"
     },
     {
       "nombre": "MODULO E. SOLIDOS EN SUSPENSION",
       "nombreNorm": "modulo e. solidos en suspension",
       "pb": 0.0,
       "precioUser": 60650.0,
-      "categoria": "OTROS"
+      "categoria": "Análisis de laboratorio"
     },
     {
       "nombre": "RECIPIENTE P/ANALISIS DE AGUA",
       "nombreNorm": "recipiente p/analisis de agua",
       "pb": 0.0,
       "precioUser": 10850.0,
-      "categoria": "OTROS"
+      "categoria": "Análisis de laboratorio"
     },
     {
       "nombre": "ACEIT. NEGRA FRASCO X 220 GRS PREMIUM",
       "nombreNorm": "aceit. negra frasco x 220 grs premium",
       "pb": 0.0,
       "precioUser": 9400.0,
-      "categoria": "OTROS"
+      "categoria": "Olivare"
     },
     {
       "nombre": "ACEIT. VERDES FRASCO X 220 GRS",
       "nombreNorm": "aceit. verdes frasco x 220 grs",
       "pb": 0.0,
       "precioUser": 8250.0,
-      "categoria": "OTROS"
+      "categoria": "Olivare"
     },
     {
       "nombre": "ACEITE DE OLIVA NININA X 500 CC",
       "nombreNorm": "aceite de oliva ninina x 500 cc",
       "pb": 0.0,
       "precioUser": 40000.0,
-      "categoria": "OTROS"
+      "categoria": "Olivare"
     },
     {
       "nombre": "ACEITE OLIVA EX. V. 250 CC",
       "nombreNorm": "aceite oliva ex. v. 250 cc",
       "pb": 0.0,
       "precioUser": 11250.0,
-      "categoria": "OTROS"
+      "categoria": "Olivare"
     },
     {
       "nombre": "ACEITE OLIVA EX. V. 5 L CAJA X 2 UNID.",
       "nombreNorm": "aceite oliva ex. v. 5 l caja x 2 unid.",
       "pb": 0.0,
       "precioUser": 278000.0,
-      "categoria": "OTROS"
+      "categoria": "Olivare"
     },
     {
       "nombre": "ACEITE OLIVA EX. V. 5 LTS",
       "nombreNorm": "aceite oliva ex. v. 5 lts",
       "pb": 0.0,
       "precioUser": 139000.0,
-      "categoria": "OTROS"
+      "categoria": "Olivare"
     },
     {
       "nombre": "ACEITE OLIVA EX. V. 500 CC",
       "nombreNorm": "aceite oliva ex. v. 500 cc",
       "pb": 0.0,
       "precioUser": 17950.0,
-      "categoria": "OTROS"
+      "categoria": "Olivare"
     },
     {
       "nombre": "ACEITE OLIVA GOURMET 250 CC CAJA X 12 UNID.",
       "nombreNorm": "aceite oliva gourmet 250 cc caja x 12 unid.",
       "pb": 0.35,
       "precioUser": 121500.0,
-      "categoria": "OTROS"
+      "categoria": "Olivare"
     },
     {
       "nombre": "ACEITE OLIVA GOURMET 500 CC CAJA X 12 UNID.",
       "nombreNorm": "aceite oliva gourmet 500 cc caja x 12 unid.",
       "pb": 0.55,
       "precioUser": 193900.0,
-      "categoria": "OTROS"
+      "categoria": "Olivare"
     },
     {
       "nombre": "ACEITE OLIVARE BOTELLA X 1 LITRO",
       "nombreNorm": "aceite olivare botella x 1 litro",
       "pb": 0.0,
       "precioUser": 34250.0,
-      "categoria": "OTROS"
+      "categoria": "Olivare"
     },
     {
       "nombre": "ACEITE OLIVA 500 CC ESTUCHE PACK X 2 UNID",
       "nombreNorm": "aceite oliva 500 cc estuche pack x 2 unid",
       "pb": 0.0,
       "precioUser": 34250.0,
-      "categoria": "OTROS"
+      "categoria": "Olivare"
     },
     {
       "nombre": "PASAS DE UVA NININA PACK X 5 UNID. 150 GM C/U",
       "nombreNorm": "pasas de uva ninina pack x 5 unid. 150 gm c/u",
       "pb": 0.0,
       "precioUser": 18000.0,
-      "categoria": "OTROS"
+      "categoria": "Olivare"
     }
   ]
 }
