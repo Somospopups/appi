@@ -8729,7 +8729,7 @@ function renderPrecios(){
             +'<div class="pi-meta" style="margin-top:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">'+pbBadge+' '+catBadge+'</div>'
             +'</div>'
             +'<div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex:none">'
-            +'<div class="pi-pts" style="font-size:15px;font-weight:900;color:#1c1c1e;min-width:95px;text-align:right">'+precioStr+'</div>'
+            +'<div class="pi-pts pi-pts-precio">'+precioStr+'</div>'
             +'<button class="btn-add-pres" data-add-id="'+prodId+'" style="padding:6px 10px;border-radius:8px;border:none;background:linear-gradient(135deg,#4b7a55,#3ad0a4);color:#fff;font-weight:900;font-size:12px;cursor:pointer">+ Agregar</button>'
             +'</div>'
             +'</div>';
@@ -10707,9 +10707,22 @@ body.dark .tools-item:hover{background:rgba(91,141,239,.22); color:#a8b8ff}
 .tools-menu.open .tools-item{opacity:0; animation:toolsIn .32s cubic-bezier(.34,1.56,.64,1) forwards}
 .tools-menu.open .tools-item:nth-child(1){animation-delay:.05s}
 .tools-menu.open .tools-item:nth-child(2){animation-delay:.12s}
+.tools-menu.open .tools-item:nth-child(3){animation-delay:.18s}
 @keyframes toolsIn{
   from{opacity:0; transform:translateX(26px) scale(.9)}
   to{opacity:1; transform:translateX(0) scale(1)}
+}
+
+/* ===== FIX MODO NOCHE LISTA PRECIOS - nombre y precio en BLANCO pedido ===== */
+#preciosContent .person-item .pi-pts-precio{
+  color:#1c1c1e; font-size:15px; font-weight:900; min-width:95px; text-align:right;
+}
+body.dark #preciosContent .person-item .pi-name{
+  color:#ffffff !important;
+}
+body.dark #preciosContent .person-item .pi-pts,
+body.dark #preciosContent .person-item .pi-pts-precio{
+  color:#ffffff !important;
 }
 </style>
 </body>
