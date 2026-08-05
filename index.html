@@ -3419,6 +3419,7 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
   <section id="view-planning" class="view">
     <header class="top">
       <button class="back-btn" id="btnBackPlanning" aria-label="Volver">‹</button>
+      <button class="help-btn" id="btnHelpPlanning" aria-label="Ayuda">?</button>
       <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
       <h1>Planificando</h1>
       <div class="script">mi Mes</div>
@@ -3464,6 +3465,7 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
   <section id="view-eval" class="view">
     <header class="top">
       <button class="back-btn" id="btnBack2" aria-label="Volver">‹</button>
+      <button class="help-btn" id="btnHelpEval" aria-label="Ayuda">?</button>
       <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
       <h1>Evaluar áreas</h1>
       <p id="evalSubtitle">—</p>
@@ -3475,6 +3477,7 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
   <section id="view-history" class="view">
     <header class="top">
       <button class="back-btn" id="btnBack3" aria-label="Volver">‹</button>
+      <button class="help-btn" id="btnHelpHistory" aria-label="Ayuda">?</button>
       <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
       <h1>Historial</h1>
       <p id="histSubtitle">—</p>
@@ -3511,6 +3514,7 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
   <section id="view-siete-detail" class="view">
     <header class="top">
       <button class="back-btn" id="btnBackSieteDetail" aria-label="Volver">‹</button>
+      <button class="help-btn" id="btnHelpSieteDetail" aria-label="Ayuda">?</button>
       <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
       <h1 id="sieteDetailTitle">Paso</h1>
       <p id="sieteDetailSub">—</p>
@@ -3625,6 +3629,7 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
   <section id="view-presu-hist" class="view">
     <header class="top">
       <button class="back-btn" id="btnBackPresuHist" aria-label="Volver">‹</button>
+      <button class="help-btn" id="btnHelpPresuHist" aria-label="Ayuda">?</button>
       <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
       <h1>Historial</h1>
       <p>Presupuesto Mensual</p>
@@ -3634,7 +3639,7 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
 
   <!-- CARRERA MEJORADA -->
   <section id="view-carrera" class="view">
-    <header class="top"><button class="back-btn" id="btnBackCarrera" aria-label="Volver">‹</button><button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button><h1>Mi</h1><div class="script">carrera</div><p>Tu avance, explicado de forma simple</p></header>
+    <header class="top"><button class="back-btn" id="btnBackCarrera" aria-label="Volver">‹</button><button class="help-btn" id="btnHelpCarrera" aria-label="Ayuda">?</button><button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button><h1>Mi</h1><div class="script">carrera</div><p>Tu avance, explicado de forma simple</p></header>
 
     <div class="carrera-tabs" id="carreraTabs">
       <button class="carrera-tab active" data-ctab="progreso">📈 Progreso</button>
@@ -3731,7 +3736,7 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
 
   <!-- LISTA DE PRECIOS DISTRIBUIDOR / USUARIO -->
   <section id="view-precios" class="view">
-    <header class="top"><button class="back-btn" id="btnBackPrecios" aria-label="Volver">‹</button><button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button><h1>Lista de</h1><div class="script">Precios</div><p>Distribuidor vs Usuario - Mantené presionado o tocá un producto para armar presupuesto</p></header>
+    <header class="top"><button class="back-btn" id="btnBackPrecios" aria-label="Volver">‹</button><button class="help-btn" id="btnHelpPrecios" aria-label="Ayuda">?</button><button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button><h1>Lista de</h1><div class="script">Precios</div><p>Distribuidor vs Usuario - Mantené presionado o tocá un producto para armar presupuesto</p></header>
 
 
 
@@ -3842,6 +3847,7 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
   <section id="view-seguimiento" class="view">
     <header class="top">
       <button class="back-btn" id="btnBackSeguimiento" aria-label="Volver">‹</button>
+      <button class="help-btn" id="btnHelpSeguimiento" aria-label="Ayuda">?</button>
       <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
       <h1>Contactos</h1>
       <div class="script">del Mes</div>
@@ -4254,17 +4260,80 @@ const HELP = {
     
     <div class="tip"><strong>💡 TIP:</strong> desde el detalle podés contactar por WhatsApp, llamar o enviar email en un toque.</div>`
   },
-  score: { icon:'🌟', iconBg:'linear-gradient(135deg,#5b8def,#a06bff,#ff6b9d)', title:'Score del mes', sub:'Cómo leerlo y compartirlo', html:`<p>El <strong>Score del mes</strong> es un número de 0 a 100 que resume cómo viene tu mes. Cuanto más alto sea, mayor es tu nivel de avance y carga en las herramientas.</p>
-    <div class="tip"><strong>📖 CÓMO LEERLO</strong><br/>
-    Mirá el número y la barra de progreso para tener una visión rápida de tu avance. El Score se actualiza cuando completás o modificás la información de tus herramientas.</div>
-    <div class="tip"><strong>🧮 CÓMO SE CALCULA</strong><br/>
-    Combina estas 4 áreas personales:<br/>
-    • ⚖️ 30% Rueda de la Vida<br/>
-    • 📊 30% Rueda del Negocio<br/>
-    • 🚀 25% Las 7 P<br/>
-    • 💰 15% Salud financiera</div>
-    <div class="tip"><strong>📤 COMPARTÍ TU INFORME</strong><br/>
-    Tocá el botón de compartir para enviar tu informe del mes por WhatsApp y mostrar tu progreso.</div>` }
+  score: { icon:'🌟', iconBg:'linear-gradient(135deg,#5b8def,#a06bff,#ff6b9d)', title:'Score del mes', sub:'Cómo leerlo y compartirlo', html:`<p>El <strong>Score del mes</strong> es un número de 0 a 100 que resume cómo viene tu mes.</p>
+    <div class="tip"><strong>📖 CÓMO LEERLO</strong><br/>Mirá el número y la barra para visión rápida. Se actualiza cuando completás herramientas.</div>
+    <div class="tip"><strong>🧮 CÓMO SE CALCULA</strong><br/>• ⚖️ 30% Rueda Vida<br/>• 📊 30% Rueda Negocio<br/>• 🚀 25% Las 7 P<br/>• 💰 15% Finanzas</div>` },
+  planning: {
+    icon:'🗓️', iconBg:'linear-gradient(135deg,#5b8def,#a06bff)',
+    title:'Planificando mi Mes', sub:'Tus 4 herramientas mensuales',
+    html:`<p>Acá tenés las 4 herramientas que usás todos los meses, juntas.</p>
+    <div class="tip"><strong>💰 Presupuesto</strong> – Control ingresos y gastos, balance y gráfico.</div>
+    <div class="tip"><strong>🚀 Las 7 P</strong> – 7 pasos para planificar tu mes, de Parar a Progresar.</div>
+    <div class="tip"><strong>⚖️ Rueda Vida</strong> – 8 áreas personales del 0 al 10.</div>
+    <div class="tip"><strong>📊 Rueda Negocio</strong> – 8 áreas de negocio del 0 al 10.</div>
+    <div class="tip"><strong>💡 TIP</strong> – Tocá cada card para entrar, y usá el ? para guía de cada una.</div>`
+  },
+  eval: {
+    icon:'📝', iconBg:'linear-gradient(135deg,#5b8def,#a06bff)',
+    title:'Evaluar Áreas', sub:'Puntuate del 0 al 10',
+    html:`<p>Mové cada deslizador según cómo te sentís hoy en esa área.</p>
+    <div class="tip"><strong>0</strong> = muy bajo / nada satisfecho<br/><strong>10</strong> = excelente</div>
+    <div class="tip"><strong>💡 TIP</strong> – Sé honesto, es solo para vos. Al terminar volvé con ‹ y tocá Guardar mes.</div>`
+  },
+  history: {
+    icon:'📜', iconBg:'linear-gradient(135deg,#7a6bff,#a06bff)',
+    title:'Historial', sub:'Tus evaluaciones anteriores',
+    html:`<p>Acá ves todos los meses que guardaste de esta Rueda.</p>
+    <div class="tip"><strong>Qué podés hacer</strong><br/>• Ver promedio por mes<br/>• Borrar un mes<br/>• Comparar evolución</div>`
+  },
+  sieteDetail: {
+    icon:'📋', iconBg:'linear-gradient(135deg,#3ad0a4,#5b8def)',
+    title:'Detalle del Paso', sub:'Completá este paso de las 7 P',
+    html:`<p>Completá los campos de este paso.</p>
+    <div class="tip"><strong>Pasos</strong><br/>• Escribí tus ideas, metas, tareas<br/>• Usá + para agregar ítems<br/>• Tildá Hecho cuando termines</div>`
+  },
+  presuHist: {
+    icon:'📊', iconBg:'linear-gradient(135deg,#f5b301,#ff8f6b)',
+    title:'Historial Presupuesto', sub:'Tus meses guardados',
+    html:`<p>Todos los presupuestos mensuales que guardaste.</p>
+    <div class="tip"><strong>Qué ves</strong><br/>• Fecha, balance, ingresos vs gastos<br/>• Tocá para ver detalle y copiar al mes actual</div>`
+  },
+  carrera: {
+    icon:'🏆', iconBg:'linear-gradient(135deg,#f5b301,#3ad0a4)',
+    title:'Mi Carrera', sub:'Tu avance, explicado simple',
+    html:`<p>8 categorías: DJ, D, DC, CE, L, LE, EJ, E con requisitos y ganancias por país.</p>
+    <div class="tip"><strong>📈 Progreso</strong> – Cargá tu categoría actual y PB del mes, ves barra y % a próximo nivel.</div>
+    <div class="tip"><strong>🏆 Categorías</strong> – Tocá cada categoría para ver requisitos, pase, mantenimiento y beneficios, colores oficiales.</div>
+    <div class="tip"><strong>💰 Ganancias</strong> – Tabla por país para DC 150 PB y CE 600 PB + Bonus por patrocinios calificados.</div>
+    <div class="tip"><strong>📘 Ayuda</strong> – Glosario de términos.</div>`
+  },
+  precios: {
+    icon:'💲', iconBg:'linear-gradient(135deg,#4b7a55,#3ad0a4)',
+    title:'Lista de Precios', sub:'Distribuidor vs Usuario',
+    html:`<p>Lista oficial de productos con PB y precio público. Los productos de canje tienen pill naranja 🔄 Canje.</p>
+    <div class="tip"><strong>🔍 Buscador</strong> – Escribí para filtrar por nombre.</div>
+    <div class="tip"><strong>🏷️ Píldoras grises</strong> – Son las categorías exactas de la planilla (Purificadores, Gasificador, Osmosis Inversa, Aire, Kits, Accesorios, Repuestos, Servicios, Botellas, etc) en orden exacto. Tocá una para filtrar.</div>
+    <div class="tip"><strong>📋 Productos</strong> – Ves Nombre exacto + PB (3.30 no 3.3) + Precio público a la derecha. Nombre y precio en blanco en modo noche.</div>
+    <div class="tip"><strong>🛒 Presupuesto</strong> – Mantené presionado o tocá + Agregar para armar presupuesto. Botón verde abajo → modal con Distribuidor + Cliente, cantidades +/-, cuotas y PDF.</div>
+    <div class="warn-tip"><strong>⚠️ Orden:</strong> Nunca toco esta pantalla sin avisarte antes, como acordamos.</div>`
+  },
+  seguimiento: {
+    icon:'📇', iconBg:'linear-gradient(135deg,#5b8def,#a06bff)',
+    title:'Contactos del Mes', sub:'Personas para contactar',
+    html:`<p>Tu lista de seguimiento mensual.</p>
+    <div class="tip"><strong>＋ Nueva persona</strong> – Nombre, teléfono, interés (Producto/Negocio), estado (No contactado, Seguimiento...), fecha próximo contacto y notas.</div>
+    <div class="tip"><strong>📋 Ver todas vs Pendientes</strong> – Filtrá por estado.</div>
+    <div class="tip"><strong>💬 Contactar</strong> – Botones WhatsApp y Llamar directo.</div>
+    <div class="tip"><strong>✅ Listo / Editar / Eliminar</strong> – Actualizá el estado rápido.</div>`
+  },
+  wheel: {
+    icon:'⚖️', iconBg:'linear-gradient(135deg,#5b8def,#a06bff)',
+    title:'Rueda', sub:'Equilibrio',
+    html:`<p>Evaluá 8 áreas del 0 al 10. Guardá por mes y compartí.</p><div class="tip"><strong>Tip</strong> – La clave es equilibrio, no todo 10.</div>`
+  },
+  vida: { icon:'⚖️', iconBg:'linear-gradient(135deg,#5b8def,#a06bff)', title:'Rueda de la Vida', sub:'8 áreas personales', html:`<p>8 áreas personales del 0 al 10. Buscá equilibrio.</p>` },
+  negocio: { icon:'📊', iconBg:'linear-gradient(135deg,#ff8f6b,#ff6b9d)', title:'Rueda del Negocio', sub:'8 áreas de negocio', html:`<p>8 áreas de negocio del 0 al 10. Hacela con tu línea ascendente.</p>` },
+  equipoTablero: { icon:'📊', iconBg:'linear-gradient(135deg,#5b8def,#a06bff)', title:'Tablero Equipo', sub:'Vista general', html:`<p>Estadísticas, ranking, cumpleaños y garantías de tu equipo.</p>` }
 };
 
 function showHelp(key){ const h = HELP[key]; if(h) modal.open(h); }
@@ -4282,6 +4351,14 @@ document.getElementById('btnHelpEquipo').addEventListener('click', ()=>{
   else if(equipoActiveTab === 'lista') showHelp('equipoLista');
   else showHelp('equipo');
 });
+document.getElementById('btnHelpPlanning')?.addEventListener('click', ()=>showHelp('planning'));
+document.getElementById('btnHelpEval')?.addEventListener('click', ()=>showHelp('eval'));
+document.getElementById('btnHelpHistory')?.addEventListener('click', ()=>showHelp('history'));
+document.getElementById('btnHelpSieteDetail')?.addEventListener('click', ()=>showHelp('sieteDetail'));
+document.getElementById('btnHelpPresuHist')?.addEventListener('click', ()=>showHelp('presuHist'));
+document.getElementById('btnHelpCarrera')?.addEventListener('click', ()=>showHelp('carrera'));
+document.getElementById('btnHelpPrecios')?.addEventListener('click', ()=>showHelp('precios'));
+document.getElementById('btnHelpSeguimiento')?.addEventListener('click', ()=>showHelp('seguimiento'));
 
 /* ============================================================
    RUEDAS
