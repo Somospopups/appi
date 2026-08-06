@@ -452,16 +452,16 @@
       <div class="upload-icon">📂</div>
       <h2 class="upload-title">Cargar archivo de Garantías</h2>
       <p class="upload-desc">Excel con columnas Usuario, Teléf., Domicilio, C.P., Localidad, F. Vence, Producto, etc. Detecta formato con fila "Garantias" y C.P. con punto.</p>
-      <div class="drop-zone" id="dropZone" tabindex="0" role="button" aria-label="Cargar Excel">
+      <label class="drop-zone" id="dropZone" for="fileInput" tabindex="0" role="button" aria-label="Cargar Excel" style="display:block">
         <div style="font-size:22px">📤</div>
         <b>Arrastrá tu archivo acá o hacé clic</b>
         <small>Soporta .xls, .xlsx, .csv, .ods · Hasta 5k filas · Procesado local, no se sube a ningún servidor</small>
         <div class="upload-actions">
-          <button class="btn btn-primary" id="btnChoose">Elegir archivo</button>
-          <button class="btn btn-secondary" id="btnDemo">Probar con ejemplo</button>
+          <button type="button" class="btn btn-primary" id="btnChoose" onclick="document.getElementById('fileInput').click(); return false;">Elegir archivo</button>
+          <button type="button" class="btn btn-secondary" id="btnDemo">Probar con ejemplo</button>
         </div>
-      </div>
-      <input type="file" id="fileInput" accept=".xls,.xlsx,.csv,.ods" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
+      </label>
+      <input type="file" id="fileInput" accept=".xls,.xlsx,.csv,.ods" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;pointer-events:none">
       <div class="file-info" id="fileInfo" style="display:none"></div>
       <div style="margin-top:10px; font-size:11px; color:var(--text3); line-height:1.4">
         Tip: <b>⌘K</b> para buscar · Geocodificación exacta con <b>CP → Provincia</b> (X=Córdoba, Y=Jujuy...) + structured street/city/state
@@ -990,12 +990,15 @@ function cargarArchivo(file){
 // ===== INIT =====
 function init(){
   const fileInput=$('#fileInput'); const choose=$('#btnChoose'); const drop=$('#dropZone');
-  const trigger=()=>{ try{ fileInput.click(); }catch(e){} };
-  choose&&choose.addEventListener('click',e=>{ e.preventDefault(); trigger(); });
-  drop&&drop.addEventListener('click', trigger);
-  drop&&drop.addEventListener('dragover',e=>{ e.preventDefault(); drop.classList.add('dragover'); });
-  drop&&drop.addEventListener('dragleave',()=>drop.classList.remove('dragover'));
-  drop&&drop.addEventListener('drop',e=>{ e.preventDefault(); drop.classList.remove('dragover'); const f=e.dataTransfer.files[0]; if(f) cargarArchivo(f); });
+  // Label nativo <label for="fileInput"> abre el picker sin JS - solo drag & drop necesita JS
+  // Botón elegir también usa label for via onclick fallback
+  if(drop){
+    drop.addEventListener('dragover',e=>{ e.preventDefault(); drop.classList.add('dragover'); });
+    drop.addEventListener('dragleave',()=>drop.classList.remove('dragover'));
+    drop.addEventListener('dragenter',e=>{ e.preventDefault(); drop.classList.add('dragover'); });
+    drop.addEventListener('drop',e=>{ e.preventDefault(); drop.classList.remove('dragover'); const f=e.dataTransfer.files[0]; if(f) cargarArchivo(f); });
+    drop.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); fileInput.click(); } });
+  }
   fileInput&&fileInput.addEventListener('change',e=>{ const f=e.target.files[0]; if(f) cargarArchivo(f); setTimeout(()=>{ e.target.value=''; },600); });
 
   $('#btnDemo').onclick=()=>{
