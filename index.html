@@ -11181,6 +11181,9 @@ function pauseRecording(){
 }
 function stopRecording(){
   if(!mediaRecorder) return;
+  // Guardar duración antes de resetear a cero (pedido usuario)
+  const currentDuration=document.getElementById('timer')?.textContent||'00:00';
+  window._lastRecordingDuration=currentDuration;
   mediaRecorder.stop();
   try{ if(navigator.vibrate) navigator.vibrate([80,50,80]); }catch(e){}
   if(recognition) try{ recognition.stop(); }catch(_){}
@@ -11188,6 +11191,8 @@ function stopRecording(){
   const v=el('recVisual'); if(v){ v.classList.remove('recording','paused'); v.textContent='🎙️'; }
   const w=el('wave'); if(w) w.style.display='none';
   const l=el('timerLabel'); if(l) l.textContent='Grabación terminada';
+  const t=el('timer'); if(t) t.textContent='00:00';
+  startTime=null;
   const br=el('btnRecord'); if(br) br.disabled=false;
   const bp=el('btnPause'); if(bp){ bp.disabled=true; bp.textContent='⏸️ Pausa'; }
   const bs=el('btnStop'); if(bs) bs.disabled=true;
@@ -11508,7 +11513,7 @@ window.saveRecording=function(blob){
   const id=Date.now();
   const trEl=document.getElementById('transcript');
   const transcript=(trEl?.value)||'';
-  const rec={id, date:new Date().toLocaleString('es-AR'), duration:document.getElementById('timer')?.textContent||'00:00', transcript, summary:''};
+  const rec={id, date:new Date().toLocaleString('es-AR'), duration:window._lastRecordingDuration||document.getElementById('timer')?.textContent||'00:00', transcript, summary:''};
   const prev=JSON.parse(localStorage.getItem('grabadora_reuniones_light')||'[]');
   prev.unshift(rec);
   localStorage.setItem('grabadora_reuniones_light', JSON.stringify(prev));
