@@ -3303,7 +3303,7 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
     <button class="ds-btn" data-ds="view-planning" onclick="showView('view-planning'); renderPlanningTools();"><span>🗓️</span> Planificación</button>
     <button class="ds-btn" data-ds="view-history" onclick="showView('view-history'); renderHistory();"><span>📜</span> Historial</button>
   </nav>
-  <div class="ds-foot">APPI · v111 · boton volver listado completo + volver atras vecinos</div>
+  <div class="ds-foot">APPI · v112 · whatsapp en tarjetas usuarios + apple + preciso</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -12355,6 +12355,7 @@ function renderListU(){
       <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">
         <button class="action-btn map" onclick="window.verMapaU && window.verMapaU('${(u.domicilio+' '+(u.localidad||'')+' '+(u.cp||'')).replace(/'/g,'')}')">📍 Mapa</button>
         <button class="action-btn neighbors" onclick="window.verVecinosU && window.verVecinosU('${(u.localidad||'').replace(/'/g,'')}')">👥 Vecinos</button>
+        ${u.telf?`<button class="action-btn call" style="background:rgba(37,211,102,0.14);color:#128C7E;border-color:rgba(37,211,102,0.20)" onclick="const link=getWhatsAppLinkU({usuario:u.usuario, telf:u.telf, domicilio:u.domicilio, producto:u.producto}); if(link) window.open(link,'_blank'); else alert('Sin teléfono válido')">💬 WhatsApp</button>`:''}
         ${u.telf?`<button class="action-btn call" onclick="window.open('tel:${u.telf.replace(/\\D/g,'')}')">📞 Llamar</button>`:''}
         <button class="action-btn mail" onclick="window.open('https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((u.domicilio||'')+' '+(u.localidad||''))}', '_blank')">🗺️ Google</button>
       </div>
@@ -12395,6 +12396,34 @@ function setGeoCacheU(cache){
   try{ localStorage.setItem(GEO_CACHE_KEY_U, JSON.stringify(cache)); }catch(e){}
 }
 function normCacheKeyU(s){ return (s||'').toString().toLowerCase().trim().replace(/\s+/g,' '); }
+
+function formatWhatsAppNumberU(telf){
+  if(!telf) return '';
+  let digits=(telf||'').toString().replace(/\D/g,'');
+  if(!digits) return '';
+  if(digits.startsWith('0')) digits=digits.substring(1);
+  if(digits.startsWith('54')){
+    if(!digits.startsWith('549') && digits.length>=12){
+      digits='549'+digits.substring(2);
+    }
+    return digits;
+  }
+  if(digits.length>=11 && digits.indexOf('15')===3){
+    digits=digits[:3]+digits[5:];
+  }
+  if(digits.length>=10){
+    return '549'+digits.slice(-10);
+  }
+  return '54'+digits;
+}
+function getWhatsAppLinkU(u){
+  const num=formatWhatsAppNumberU(u.telf||'');
+  if(!num) return '';
+  const nombre=(u.usuario||'').split(',')[0].trim();
+  const texto=`Hola ${nombre}! Soy de APPI - Garantías. Te contacto por tu equipo ${u.producto||''} de ${u.domicilio||''}. ¿Cómo está funcionando?`;
+  return `https://wa.me/${num}?text=${encodeURIComponent(texto)}`;
+}
+
 function provinciaPorCP(cp){
   if(!cp) return '';
   const letra=(cp||'').toString().trim().toUpperCase().charAt(0);
