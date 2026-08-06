@@ -573,6 +573,44 @@ function estadoVenc(fecha){
   if(diff<=30) return 'porVencer';
   return 'vigente';
 }
+function formatWhatsAppNumber(telf){
+  if(!telf) return '';
+  let digits=(telf||'').toString().replace(/\D/g,'');
+  if(!digits) return '';
+  // Argentina: si empieza con 0, sacarlo
+  if(digits.startsWith('0')) digits=digits.substring(1);
+  // Si ya empieza con 54, dejarlo
+  if(digits.startsWith('54')){
+    // Asegurar que tenga 9 después de 54 si es celular y no lo tiene
+    // Ej 543514552272 -> ya tiene 549?
+    // Si tiene 54 + 351... (sin 9), agregar 9
+    if(digits.startsWith('54') && !digits.startsWith('549') && digits.length>=12){
+      // Insertar 9 después de 54
+      digits='549'+digits.substring(2);
+    }
+    return digits;
+  }
+  // Si no tiene 54, agregar 549 (formato movil AR)
+  // Si es 10 digitos (3514552272) -> 5493514552272
+  // Si es 11 digitos con 15? 351 15 4552272 -> digits 351154552272 (12?) -> normalizar
+  // Quitar 15 intercalado (característica de marcado nacional)
+  if(digits.length>=11 && digits.indexOf('15')===3){
+    // 351 15 4552272 -> 3514552272
+    digits=digits[:3]+digits[5:];
+  }
+  if(digits.length>=10){
+    return '549'+digits.slice(-10);
+  }
+  return '54'+digits;
+}
+function getWhatsAppLink(u){
+  const num=formatWhatsAppNumber(u.telf||'');
+  if(!num) return '';
+  const nombre=(u.usuario||'').split(',')[0].trim();
+  const texto=`Hola ${nombre}! Soy de APPI - Garantías. Te contacto por tu equipo ${u.producto||''} de ${u.domicilio||''}. ¿Cómo está funcionando?`;
+  return `https://wa.me/${num}?text=${encodeURIComponent(texto)}`;
+}
+
 function provinciaPorCP(cp){
   if(!cp) return '';
   const letra=cp.toString().trim().toUpperCase().charAt(0);
@@ -821,9 +859,10 @@ function renderList(){
       <div class="detail-actions">
         <button class="action primary" onclick="verMapa('${(u.domicilio+' '+(u.localidad||'')+' '+(u.cp||'')).replace(/'/g,'')}')">📍 Ver en mapa</button>
         <button class="action" onclick="verVecinos('${(u.localidad||'').replace(/'/g,'')}')">👥 Vecinos en ${u.localidad||'zona'}</button>
+        ${u.telf? `<button class="action" style="background:#25D366;color:#fff;border-color:#25D366" onclick="window.open(getWhatsAppLink({usuario:'${u.usuario.replace(/'/g, "\'")}', telf:'${u.telf.replace(/'/g, "\'")}', domicilio:'${(u.domicilio||'').replace(/'/g, "\'")}', producto:'${(u.producto||'').replace(/'/g, "\'")}'}),'_blank')">💬 WhatsApp</button>` : ''}
         <button class="action" onclick="window.open('https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((u.domicilio||'')+' '+(u.localidad||''))}','_blank')">🗺️ Google Maps</button>
         ${u.telf? `<button class="action" onclick="window.open('tel:${u.telf.replace(/\\D/g,'')}')">📞 Llamar</button>` : ''}
-        <button class="action" onclick="navigator.clipboard&&navigator.clipboard.writeText('${(u.domicilio+' '+(u.localidad||'')).replace(/'/g,'')}');">⎘ Copiar dirección</button>
+        <button class="action" onclick="navigator.clipboard&&navigator.clipboard.writeText('${(u.domicilio+' '+(u.localidad||'')).replace(/'/g,'')}'); haptic(8);">⎘ Copiar dirección</button>
       </div>
     </div>`;
   }).join('');
