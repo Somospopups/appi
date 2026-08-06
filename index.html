@@ -3303,7 +3303,7 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
     <button class="ds-btn" data-ds="view-planning" onclick="showView('view-planning'); renderPlanningTools();"><span>🗓️</span> Planificación</button>
     <button class="ds-btn" data-ds="view-history" onclick="showView('view-history'); renderHistory();"><span>📜</span> Historial</button>
   </nav>
-  <div class="ds-foot">APPI · v115 · FIX MENU alineado 4px todas pantallas + upload 100% funcional con feedback + textos borrados</div>
+  <div class="ds-foot">APPI · v116 · FIX upload no arroja datos - debug + feedback + XLSX check + robust parser</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -12705,58 +12705,90 @@ window.mostrarEnMapaU=async function(query, lista=null){
 
 
 function cargarArchivoU(file){
+  const infoEl=document.getElementById('usuariosFileInfo');
+  const dbgEl=document.getElementById('usuariosDebug');
   try{
-    const infoEl=document.getElementById('usuariosFileInfo');
-    if(infoEl){ infoEl.style.display='block'; infoEl.innerHTML=`⏳ Leyendo <b>${file.name}</b> (${(file.size/1024).toFixed(1)} KB)...`; }
+    if(infoEl){ infoEl.style.display='block'; infoEl.innerHTML=`⏳ Leyendo <b>${file.name}</b> (${(file.size/1024).toFixed(1)} KB) ...<br/><small>Si no avanza, revisá consola (F12)</small>`; }
     if(typeof XLSX==='undefined'){
-      alert('⚠️ Librería Excel no cargada. Recargá la página con internet.');
-      if(infoEl) infoEl.innerHTML=`❌ Error: librería XLSX no cargada - recargá con internet`;
+      alert('⚠️ Librería Excel no cargada. Recargá la página con internet.\n\nTip: Desactivá bloqueador de anuncios para cdn.jsdelivr.net');
+      if(infoEl) infoEl.innerHTML=`❌ Error: librería XLSX no cargada - recargá con internet y desactivá AdBlock para cdn.jsdelivr.net`;
       return;
     }
+    console.log('📂 Archivo seleccionado:', file.name, file.size, file.type);
     const reader=new FileReader();
-    reader.onerror=(e)=>{ alert('Error leyendo archivo'); console.error(e); };
+    reader.onerror=(e)=>{ 
+      console.error('FileReader error', e);
+      alert('❌ Error leyendo archivo: '+ (e.target.error?.message||'desconocido'));
+      if(infoEl) infoEl.innerHTML=`❌ Error leyendo archivo`;
+    };
     reader.onload=e=>{
       try{
+        console.log('📖 ArrayBuffer listo, bytes:', e.target.result.byteLength);
+        if(infoEl) infoEl.innerHTML=`⏳ Procesando <b>${file.name}</b>...<br/><small>Leyendo hojas Excel</small>`;
         const data=new Uint8Array(e.target.result);
-        const wb=XLSX.read(data,{type:'array'});
+        let wb;
+        try{
+          wb=XLSX.read(data,{type:'array', cellDates:false, raw:true});
+        }catch(err){
+          console.error('XLSX.read array fail, probando binary', err);
+          // Fallback intentar como binary string
+          let binary=''; for(let i=0;i<data.length;i++) binary+=String.fromCharCode(data[i]);
+          wb=XLSX.read(binary,{type:'binary'});
+        }
+        console.log('📑 Hojas encontradas:', wb.SheetNames);
+        if(infoEl) infoEl.innerHTML=`⏳ Hojas: <b>${wb.SheetNames.join(', ')}</b> - analizando...`;
         let mejor={data:[], debug:''};
+        let debugAll=[];
         wb.SheetNames.forEach(name=>{
-          const ws=wb.Sheets[name];
-          const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
-          const res=parseRowsU(rows);
-          if(res.data.length>mejor.data.length) mejor=res;
+          try{
+            const ws=wb.Sheets[name];
+            const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:'', blankrows:false});
+            console.log(`Hoja ${name}: ${rows.length} filas`, rows.slice(0,3));
+            const res=parseRowsU(rows);
+            debugAll.push(`Hoja "${name}": ${rows.length} filas, ${res.data.length} usuarios detectados | Header: ${res.debug.substring(0,120)}`);
+            if(res.data.length>mejor.data.length) mejor=res;
+          }catch(err){
+            console.error('Error procesando hoja', name, err);
+            debugAll.push(`Hoja "${name}" ERROR: ${err.message}`);
+          }
         });
+        const fullDebug=debugAll.join('\n\n') + '\n\n' + (mejor.debug||'');
+        if(dbgEl) dbgEl.textContent=fullDebug;
         const parsed=mejor.data;
-        const debug=mejor.debug;
-        const dbgEl=document.getElementById('usuariosDebug');
-        if(dbgEl) dbgEl.textContent=debug;
+        console.log('✅ Total usuarios parseados:', parsed.length);
         if(parsed.length===0){
-          alert('No se detectaron usuarios. Revisá formato\n\nDebug:\n'+debug);
-          if(infoEl) infoEl.innerHTML=`❌ No se detectaron usuarios en <b>${file.name}</b><br/><small>${debug.substring(0,200)}</small>`;
+          const msg='No se detectaron usuarios. Revisá que el Excel tenga columnas Usuario, Domicilio, etc.\n\n'+fullDebug.substring(0,800);
+          alert(msg);
+          if(infoEl) infoEl.innerHTML=`❌ No se detectaron usuarios en <b>${file.name}</b><br/><small>${fullDebug.substring(0,400).replace(/\n/g,'<br/>')}</small><br/><button onclick="document.getElementById('usuariosDebug').style.display='block'" style="margin-top:8px;padding:6px 10px;border-radius:8px;border:1px solid #ccc;background:#fff;font-size:11px;cursor:pointer">Ver debug completo</button>`;
           if(dbgEl) dbgEl.style.display='block';
           return;
         }
         usuariosU=parsed;
-        try{ localStorage.setItem('usuarios_garantias', JSON.stringify(usuariosU.map(u=>({...u, fVence:u.fVence?u.fVence.toISOString():null})))); }catch(err){ console.log('localStorage fail',err); }
+        try{ 
+          localStorage.setItem('usuarios_garantias', JSON.stringify(usuariosU.map(u=>({...u, fVence:u.fVence?u.fVence.toISOString():null}))));
+          console.log('💾 Guardado en localStorage', usuariosU.length);
+        }catch(err){ console.log('localStorage fail',err); }
         mostrarDashboardU();
         const info=document.getElementById('usuariosFileInfo');
-        if(info){ info.style.display='block'; info.innerHTML=`✅ <b>${parsed.length} usuarios</b> cargados de <b>${file.name}</b> · ${new Date().toLocaleString('es-AR')}`; }
+        if(info){ info.style.display='block'; info.innerHTML=`✅ <b>${parsed.length} usuarios</b> cargados de <b>${file.name}</b> · ${new Date().toLocaleString('es-AR')}<br/><small>Hojas analizadas: ${wb.SheetNames.join(', ')}</small>`; }
         const btnClear=document.getElementById('usuariosBtnClear');
         if(btnClear) btnClear.style.display='inline-flex';
         if(dbgEl) dbgEl.style.display='none';
         if(typeof haptic==='function') haptic(20);
         if(typeof showToast==='function') showToast(`✅ ${parsed.length} usuarios cargados`);
       }catch(err){
-        console.error(err);
-        alert('Error procesando Excel: '+err.message+'\n\nProbá con otro archivo o revisá que sea .xls/.xlsx válido');
+        console.error('Error procesando Excel', err);
+        alert('❌ Error procesando Excel: '+err.message+'\n\nProbá con otro archivo o revisá que sea .xls/.xlsx válido\n\nTip: Si es .csv, guardalo como .xlsx');
         const info=document.getElementById('usuariosFileInfo');
-        if(info) info.innerHTML=`❌ Error: ${err.message}`;
+        if(info) info.innerHTML=`❌ Error: ${err.message}<br/><small>Revisá consola F12</small>`;
+        if(dbgEl){ dbgEl.textContent='Error: '+err.stack; dbgEl.style.display='block'; }
       }
     };
     reader.readAsArrayBuffer(file);
   }catch(err){
+    console.error('Error inesperado cargarArchivoU', err);
     alert('Error inesperado: '+err.message);
-    console.error(err);
+    if(infoEl) infoEl.innerHTML=`❌ Error inesperado: ${err.message}`;
   }
 }
 function mostrarDashboardU(){
