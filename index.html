@@ -3303,7 +3303,7 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
     <button class="ds-btn" data-ds="view-planning" onclick="showView('view-planning'); renderPlanningTools();"><span>🗓️</span> Planificación</button>
     <button class="ds-btn" data-ds="view-history" onclick="showView('view-history'); renderHistory();"><span>📜</span> Historial</button>
   </nav>
-  <div class="ds-foot">APPI · v118 · FIX URGENTE upload con input onchange inline + backup input emergencia + feedback + menu bloqueado</div>
+  <div class="ds-foot">APPI · v119 · FIX DEFINITIVO upload - label input covering + backup visible + XLSX check + debug + menu bloqueado</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -12798,6 +12798,7 @@ function cargarArchivoU(file){
     if(infoEl) infoEl.innerHTML=`❌ Error inesperado: ${err.message}`;
   }
 }
+window.cargarArchivoU = cargarArchivoU;
 function mostrarDashboardU(){
   const dash=document.getElementById('usuariosDashboard');
   if(dash) dash.style.display='block';
