@@ -14,6 +14,8 @@
 <link rel="manifest" href="./manifest.json" />
 
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
@@ -3293,6 +3295,7 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
     <button class="ds-btn" data-ds="view-precios" onclick="openPrecios()"><span>💰</span> Precios</button>
     <button class="ds-btn" data-ds="view-presu" onclick="openPresu()"><span>📊</span> Presupuesto Mensual</button>
     <button class="ds-btn" data-ds="view-equipo" onclick="openEquipo()"><span>🌳</span> Mi Equipo</button>
+    <button class="ds-btn" data-ds="view-usuarios" onclick="showView('view-usuarios')"><span>📍</span> Usuarios</button>
     <button class="ds-btn" data-ds="view-seguimiento" onclick="openSeguimiento()"><span>📇</span> Seguimiento</button>
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora IA</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
@@ -4011,6 +4014,68 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
     <div id="keepGrid" class="keep-grid"></div>
   </section>
 
+  <!-- 👥 USUARIOS GARANTIAS -->
+  <section id="view-usuarios" class="view">
+    <header class="top">
+      <button class="back-btn" id="btnBackUsuarios" aria-label="Volver">‹</button>
+      <button class="help-btn" id="btnHelpUsuarios" aria-label="Ayuda">?</button>
+      <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
+      <h1>Usuarios</h1><div class="script">Garantías</div>
+      <p>Gestión por zona y vencimiento - Estilo Mi Equipo</p>
+    </header>
+
+    <div class="glass" id="usuariosUploadCard">
+      <div style="text-align:center;margin-bottom:12px">
+        <div style="font-size:32px">📂</div>
+        <h3 style="margin:8px 0 4px">Cargar archivo de Garantías / Usuarios</h3>
+        <p style="font-size:12px;color:#6b6b76;margin:0">Excel con Usuario, Teléf., Domicilio, C.P., Localidad, F. Vence, etc.</p>
+      </div>
+      <div class="upload-zone" id="usuariosDropZone">
+        <div style="font-size:22px">📤</div>
+        <b>Arrastrá tu archivo acá o clic para elegir</b><br/>
+        <small style="color:#6b6b76">Soporta .xls, .xlsx, .csv - Fix formato con fila Garantias</small>
+        <div style="margin-top:10px"><button class="btn btn-primary" id="usuariosBtnChoose">Elegir archivo</button></div>
+      </div>
+      <input type="file" id="usuariosFileInput" accept=".xls,.xlsx,.csv" style="display:none">
+      <div id="usuariosFileInfo" style="display:none;margin-top:12px;padding:10px;border-radius:10px;background:rgba(58,208,164,0.12);font-size:12px"></div>
+      <div id="usuariosDebug" style="display:none;margin-top:8px;padding:10px;border-radius:10px;background:rgba(0,0,0,0.06);font-size:11px;font-family:monospace;white-space:pre-wrap;max-height:200px;overflow:auto"></div>
+      <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-secondary" id="usuariosBtnDemo">🧪 Datos ejemplo</button>
+        <button class="btn btn-secondary" id="usuariosBtnToggleDebug">🐛 Debug</button>
+        <button class="btn btn-secondary" id="usuariosBtnClear" style="display:none">🗑️ Limpiar</button>
+      </div>
+    </div>
+
+    <div id="usuariosDashboard" style="display:none">
+      <div class="stats">
+        <div class="stat"><b id="usuariosStTotal">0</b><small>Total</small></div>
+        <div class="stat"><b id="usuariosStVencidas" style="color:#d9534f">0</b><small>Vencidas</small></div>
+        <div class="stat"><b id="usuariosStPorVencer" style="color:#a3670b">0</b><small>Por vencer</small></div>
+        <div class="stat"><b id="usuariosStZonas">0</b><small>Zonas</small></div>
+      </div>
+      <div class="glass">
+        <div class="search-box">
+          <span>🔍</span><input type="text" id="usuariosSearch" placeholder="Buscar por nombre, domicilio, localidad...">
+          <button id="usuariosClearSearch" style="border:none;background:none;cursor:pointer">✕</button>
+        </div>
+        <div class="filters" id="usuariosFilterVenc">
+          <button class="filter active" data-f="all">Todos</button>
+          <button class="filter" data-f="vencidas">🔴 Vencidas</button>
+          <button class="filter" data-f="porVencer">🟡 Por vencer 30d</button>
+          <button class="filter" data-f="vigentes">🟢 Vigentes</button>
+        </div>
+        <div class="filters" id="usuariosFilterZonas" style="max-height:120px;overflow-y:auto"></div>
+        <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+          <button class="btn btn-secondary" id="usuariosBtnOrdenVence">📅 Ordenar por Vence</button>
+          <button class="btn btn-secondary" id="usuariosBtnMapAll">🗺️ Mapa general</button>
+          <button class="btn btn-secondary" id="usuariosBtnExport">📤 Exportar CSV</button>
+        </div>
+        <div id="usuariosMap" class="map-wrap"></div>
+      </div>
+      <div id="usuariosList"></div>
+    </div>
+  </section>
+
 </div>
 
 <!-- MODAL -->
@@ -4441,10 +4506,22 @@ const HELP = {
     title:'Notas Keep', sub:'Stick de colores',
     html:`<p>Tu Google Keep dentro de APPI, con post-its de colores.</p>
     <div class="tip"><strong>＋ Nueva nota</strong> – Título + texto + color. Guardá.</div>
-    <div class="tip"><strong>🎨 Colores</strong> – Elegí entre 8 colores para categorizar (amarillo, verde, rosa, celeste...).</div>
-    <div class="tip"><strong>📌 Fijar / Borrar</strong> – Tocá la nota para editar, 📌 para fijar arriba, 🗑️ para borrar.</div>
+    <div class="tip"><strong>🎨 Colores</strong> – Al guardar te pide elegir color.</div>
+    <div class="tip"><strong>📌 Popup grande</strong> – Tocá la nota para abrir popup grande con opciones Editar, Fijar, Enviar, Borrar.</div>
     <div class="tip"><strong>🔍 Buscar</strong> – Filtrá por texto en el buscador arriba.</div>
-    <div class="tip"><strong>💾 Todo local</strong> – Queda en tu dispositivo, no se sube.</div>`
+    <div class="tip"><strong>💾 Todo local</strong> – Queda en tu dispositivo.</div>`
+  },
+  usuarios: {
+    icon:'📍', iconBg:'linear-gradient(135deg,#3ad0a4,#5b8def)',
+    title:'Usuarios Garantías', sub:'Gestión por zona y vencimiento',
+    html:`<p>Contenedor estilo Mi Equipo para cargar tu planilla de usuarios con garantías.</p>
+    <div class="tip"><strong>📂 Cargar archivo</strong> – Arrastrá o elegí tu Excel (.xls, .xlsx, .csv) con columnas Usuario, Teléf., Domicilio, C.P., Localidad, Producto, F. Compra, F. Vence.</div>
+    <div class="tip"><strong>📊 Dashboard</strong> – Total, vencidas 🔴, por vencer 30 días 🟡, cantidad de zonas.</div>
+    <div class="tip"><strong>🔍 Filtros</strong> – Buscador + filtros por vencimiento + píldoras por zona (Localidad) + ordenar por Vence.</div>
+    <div class="tip"><strong>👤 Listado</strong> – Cards con nombre, teléfono, domicilio, CP, localidad, producto, F. Compra y F. Vence exactos como en tu Excel (ej: 17/10/2003), días restantes/vencida, y badges.</div>
+    <div class="tip"><strong>📍 Mapa</strong> – Botón Ver en mapa abre Google Maps con domicilio+localidad+CP. Botón Vecinos filtra por misma Localidad y muestra marcadores <span style="color:#d9534f">rojos</span> en mapa interno (uno por cada vecino en esa zona).</div>
+    <div class="tip"><strong>📞 Acciones</strong> – Llamar, ver detalle, exportar CSV filtrado.</div>
+    <div class="warn-tip"><strong>🔒 Privacidad:</strong> Todo queda local, similar a Mi Equipo.</div>`
   }
 };
 
@@ -4473,8 +4550,10 @@ document.getElementById('btnHelpPrecios')?.addEventListener('click', ()=>showHel
 document.getElementById('btnHelpSeguimiento')?.addEventListener('click', ()=>showHelp('seguimiento'));
 document.getElementById('btnHelpGrabadora')?.addEventListener('click', ()=>showHelp('grabadora'));
 document.getElementById('btnHelpNotas')?.addEventListener('click', ()=>showHelp('notas'));
+document.getElementById('btnHelpUsuarios')?.addEventListener('click', ()=>showHelp('usuarios'));
 document.getElementById('btnBackGrabadora')?.addEventListener('click', ()=>{ showView('view-home'); renderHomeCompleto(); });
 document.getElementById('btnBackNotas')?.addEventListener('click', ()=>{ showView('view-home'); renderHomeCompleto(); });
+document.getElementById('btnBackUsuarios')?.addEventListener('click', ()=>{ showView('view-home'); renderHomeCompleto(); });
 
 /* ============================================================
    RUEDAS
@@ -9368,15 +9447,15 @@ function renderToolsList(){
     </button>
   `;
 
-  const grabadoraCard = `
-    <button type="button" class="business-card" onclick="openGrabadora()" style="border:1.5px solid rgba(91,141,239,0.25)">
-      <div class="business-icon" style="background:linear-gradient(135deg,#ff6b6b,#a06bff)">🎙️</div>
+  const usuariosCard = `
+    <button type="button" class="business-card" onclick="showView('view-usuarios')" style="border:1.5px solid rgba(58,208,164,0.25)">
+      <div class="business-icon" style="background:linear-gradient(135deg,#3ad0a4,#5b8def)">📍</div>
       <div>
-        <h3>Grabadora IA</h3>
-        <p>Grabá reuniones y obtené resumen automático con tareas</p>
+        <h3>Usuarios</h3>
+        <p>Gestión por zona y vencimiento con mapa</p>
       </div>
-      <div class="business-status">IA<small>reuniones</small></div>
-      <div class="business-progress" style="--pct:100%"><span style="background:linear-gradient(90deg,#ff6b6b,#a06bff)"></span></div>
+      <div class="business-status">Garantías<small>mapa</small></div>
+      <div class="business-progress" style="--pct:100%"><span style="background:linear-gradient(90deg,#3ad0a4,#5b8def)"></span></div>
     </button>
   `;
 
@@ -9388,7 +9467,7 @@ function renderToolsList(){
     <div class="home-section-block">
       <div class="mini-section-label"><span>🌱</span> Mi negocio</div>
       ${equipoCard}
-      ${grabadoraCard}
+      ${usuariosCard}
       ${seguimientoCard}
     </div>
   `;
@@ -11577,6 +11656,383 @@ document.addEventListener('DOMContentLoaded', ()=>{
   // Precargar modelo en background para que sea universal
   setTimeout(loadModelUniversal, 2000);
 });
+</script>
+
+
+// ===== USUARIOS GARANTIAS - INTEGRADO EN MI NEGOCIO =====
+(function(){
+const LS_KEY_U='usuarios_garantias';
+let usuariosU=[], filtradosU=[], filtroVencU='all', filtroZonaU='all', ordenAscU=true;
+let mapU=null, markersU=[];
+
+function normU(s){ return (s||'').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim(); }
+function normNoSpaceU(s){ return normU(s).replace(/\s/g,''); }
+function parseFechaU(str){
+  if(!str) return null;
+  str=str.toString().trim();
+  let m=str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/);
+  if(m){
+    let d=parseInt(m[1]), mo=parseInt(m[2])-1, y=parseInt(m[3]);
+    if(y<100) y+=2000;
+    return new Date(y,mo,d);
+  }
+  m=str.match(/^(\d{1,2})[\s\-]+([a-z]{3,})$/i);
+  if(m){
+    const meses={ene:0,feb:1,mar:2,abr:3,may:4,jun:5,jul:6,ago:7,sept:8,oct:9,nov:10,dic:11};
+    let d=parseInt(m[1]);
+    let mesStr=m[2].substring(0,3).toLowerCase();
+    let mo=meses[mesStr];
+    if(mo===undefined) return null;
+    return new Date(new Date().getFullYear(),mo,d);
+  }
+  return null;
+}
+function estadoVencU(fecha){
+  if(!fecha) return 'vigente';
+  const hoy=new Date();
+  const diff=(fecha-hoy)/(1000*60*60*24);
+  if(diff<0) return 'vencida';
+  if(diff<=30) return 'porVencer';
+  return 'vigente';
+}
+function detectarColumnasU(headers){
+  const map={}; const debug=[];
+  headers.forEach((h,i)=>{
+    const nh=normU(h);
+    const nhNoSpace=normNoSpaceU(h);
+    if(!nh) return;
+    if(/usuario|nombre|cliente/.test(nh) && map.usuario===undefined){ map.usuario=i; debug.push(`Usuario -> col ${i}`); }
+    else if(/tel/.test(nh) && map.telf===undefined){ map.telf=i; }
+    else if(/domicilio|direccion|dire/.test(nh) && map.domicilio===undefined){ map.domicilio=i; }
+    else if((nh.includes('c p') || nhNoSpace.includes('cp')) && map.cp===undefined){ map.cp=i; }
+    else if(/localidad|barrio|zona/.test(nh) && map.localidad===undefined){ map.localidad=i; }
+    else if(/producto|equipo/.test(nh) && map.producto===undefined){ map.producto=i; }
+    else if(/f.*compra/.test(nh) && map.fCompra===undefined){ map.fCompra=i; }
+    else if(/f.*vence|vencimiento/.test(nh) && map.fVence===undefined){ map.fVence=i; }
+  });
+  if(map.usuario===undefined) map.usuario=0;
+  return {map, debug};
+}
+function parseRowsU(rows){
+  if(!rows||rows.length<2) return {data:[], debug:'Sin filas'};
+  let hr=-1, bestScore=-1;
+  for(let i=0;i<Math.min(rows.length,15);i++){
+    const r=rows[i]||[];
+    const rowStr=r.join(' ').toLowerCase();
+    let score=0;
+    if(/usuario/.test(rowStr)) score+=3;
+    if(/domicilio/.test(rowStr)) score+=2;
+    if(/localidad/.test(rowStr)) score+=2;
+    if(/f.*vence|vence/.test(rowStr)) score+=2;
+    if(/tel/.test(rowStr)) score+=1;
+    if(score>bestScore){ bestScore=score; hr=i; }
+  }
+  if(hr===-1) hr=0;
+  if(bestScore<=0){
+    for(let i=0;i<Math.min(rows.length,10);i++){
+      const r=rows[i]||[];
+      if(r.join('').toLowerCase().includes('usuario') && r.join('').toLowerCase().includes('domicilio')){ hr=i; break; }
+    }
+  }
+  const headers=(rows[hr]||[]).map(v=>(v||'').toString().trim());
+  const {map, debug}=detectarColumnasU(headers);
+  let debugText=`Fila encabezado: ${hr} (score ${bestScore})\nHeaders: ${JSON.stringify(headers)}\n`;
+  const out=[];
+  for(let i=hr+1;i<rows.length;i++){
+    const r=rows[i]||[];
+    if(r.length===0) continue;
+    if(r.every(v=>!v||!v.toString().trim())) continue;
+    const get=(k)=>{ const idx=map[k]; if(idx===undefined) return ''; return (r[idx]||'').toString().trim(); };
+    const usuario=get('usuario');
+    if(!usuario||usuario.length<3) continue;
+    const low=usuario.toLowerCase();
+    if(low.includes('usuario') && low.includes('domicilio')) continue;
+    if(low==='garantias') continue;
+    const telf=get('telf');
+    const domicilio=get('domicilio');
+    const cp=get('cp');
+    const localidad=get('localidad');
+    const producto=get('producto');
+    const fCompra=get('fCompra');
+    const fVenceRaw=get('fVence');
+    const fVence=parseFechaU(fVenceRaw);
+    let domFinal=domicilio;
+    if(!domFinal){
+      for(let j=0;j<r.length;j++){
+        const v=(r[j]||'').toString();
+        if(/\d{2,5}/.test(v) && /[a-zA-Z]{4,}/.test(v) && v.length>8 && v.length<80){
+          if(j!==map.usuario){ domFinal=v.trim(); break; }
+        }
+      }
+    }
+    const estado=fVence? estadoVencU(fVence) : 'vigente';
+    out.push({id:i, usuario, telf, domicilio:domFinal, cp, localidad, producto, fCompra, fVenceRaw, fVence, estado, nombreNorm:normU(usuario)});
+  }
+  debugText+=`Filas totales: ${rows.length}, Usuarios: ${out.length}`;
+  return {data:out, debug:debugText};
+}
+
+// Render
+function renderZonasU(){
+  const zonas=[...new Set(usuariosU.map(u=>u.localidad).filter(Boolean))].sort();
+  const cont=document.getElementById('usuariosFilterZonas');
+  if(!cont) return;
+  cont.innerHTML='<button class="filter active" data-z="all">📍 Todas ('+zonas.length+')</button>' + zonas.map(z=>`<button class="filter" data-z="${z.replace(/"/g,'&quot;')}">${z}</button>`).join('');
+  cont.querySelectorAll('[data-z]').forEach(b=>{
+    b.onclick=()=>{
+      cont.querySelectorAll('[data-z]').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');
+      filtroZonaU=b.dataset.z;
+      aplicarFiltrosU();
+    };
+  });
+  const st=document.getElementById('usuariosStZonas'); if(st) st.textContent=zonas.length;
+}
+function aplicarFiltrosU(){
+  const qEl=document.getElementById('usuariosSearch');
+  const q=qEl? normU(qEl.value) : '';
+  filtradosU=usuariosU.filter(u=>{
+    if(filtroVencU!=='all' && u.estado!==filtroVencU) return false;
+    if(filtroZonaU!=='all' && u.localidad!==filtroZonaU) return false;
+    if(q){
+      const txt=(u.usuario+' '+u.domicilio+' '+u.localidad+' '+u.producto+' '+(u.cp||'')).toLowerCase();
+      if(!normU(txt).includes(q)) return false;
+    }
+    return true;
+  });
+  if(window.ordenPorVenceU){
+    filtradosU.sort((a,b)=>{
+      if(!a.fVence) return 1;
+      if(!b.fVence) return -1;
+      return ordenAscU? a.fVence - b.fVence : b.fVence - a.fVence;
+    });
+  }
+  renderListU();
+}
+function renderListU(){
+  const cont=document.getElementById('usuariosList');
+  if(!cont) return;
+  if(filtradosU.length===0){
+    cont.innerHTML='<div class="empty">Sin usuarios con esos filtros</div>';
+    return;
+  }
+  cont.innerHTML=filtradosU.map(u=>{
+    const venceRaw=u.fVenceRaw||'—';
+    const compraRaw=u.fCompra||'—';
+    const diasNum=u.fVence? Math.ceil((u.fVence-new Date())/(1000*60*60*24)) : null;
+    const diasLabel=diasNum!==null? (diasNum<0? `${Math.abs(diasNum)} días vencida` : `${diasNum} días restantes`) : '';
+    return `<div class="user-card ${u.estado}">
+      <div class="user-head">
+        <div class="user-avatar">${u.usuario.charAt(0).toUpperCase()}</div>
+        <div class="user-name">
+          <b>${u.usuario} ${u.estado==='vencida'?'<span class="badge vencida">VENCIDA</span>':''}${u.estado==='porVencer'?'<span class="badge por-vencer">POR VENCER</span>':''}${u.estado==='vigente'?'<span class="badge vigente">VIGENTE</span>':''}</b>
+          <small>${u.localidad||''} ${u.cp? '· CP '+u.cp:''}</small>
+        </div>
+      </div>
+      <div class="user-meta">
+        <div>📞 <b>${u.telf||'—'}</b></div>
+        <div>🏠 <b>${u.domicilio||'—'}</b></div>
+        <div>📦 <b>${u.producto||'—'}</b></div>
+        <div>🛒 Compra: <b>${compraRaw}</b></div>
+        <div>📅 Vence: <b>${venceRaw}</b> <small>${diasLabel}</small></div>
+      </div>
+      <div class="user-actions">
+        <button class="action-btn map" onclick="window.verMapaU && window.verMapaU('${(u.domicilio+' '+(u.localidad||'')+' '+(u.cp||'')).replace(/'/g,'')}')">📍 Mapa</button>
+        <button class="action-btn neighbors" onclick="window.verVecinosU && window.verVecinosU('${(u.localidad||'').replace(/'/g,'')}')">👥 Vecinos</button>
+        ${u.telf?`<button class="action-btn call" onclick="window.open('tel:${u.telf.replace(/\D/g,'')}')">📞 Llamar</button>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+window.verMapaU=function(query){
+  if(!query.trim()){ alert('Sin domicilio'); return; }
+  const url='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(query);
+  window.open(url,'_blank');
+  window.mostrarEnMapaU(query);
+};
+window.verVecinosU=function(localidad){
+  if(!localidad || localidad==='all'){ alert('Elegí una zona'); return; }
+  const cont=document.getElementById('usuariosFilterZonas');
+  if(cont){
+    cont.querySelectorAll('[data-z]').forEach(b=>{ b.classList.toggle('active', b.dataset.z===localidad); });
+  }
+  filtroZonaU=localidad;
+  aplicarFiltrosU();
+  const lista=usuariosU.filter(u=>u.localidad===localidad);
+  if(lista.length>0){
+    const primera=lista[0];
+    const q=primera.localidad+' '+(primera.cp||'')+' '+primera.domicilio;
+    window.mostrarEnMapaU(q, lista);
+    const mapDiv=document.getElementById('usuariosMap');
+    if(mapDiv) window.scrollTo({top:mapDiv.offsetTop-20, behavior:'smooth'});
+  }
+};
+window.mostrarEnMapaU=function(query, lista=null){
+  const mapDiv=document.getElementById('usuariosMap');
+  if(!mapDiv) return;
+  mapDiv.classList.add('show');
+  if(!mapU){
+    mapU=L.map('usuariosMap').setView([-31.4201,-64.1888], 11);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap'}).addTo(mapU);
+  }
+  markersU.forEach(m=>mapU.removeLayer(m));
+  markersU=[];
+  const redIcon = L.icon({
+    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+    iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41]
+  });
+  if(lista && lista.length){
+    const baseLat=mapU.getCenter().lat;
+    const baseLng=mapU.getCenter().lng;
+    lista.forEach(u=>{
+      const offsetLat=(Math.random()-0.5)*0.02;
+      const offsetLng=(Math.random()-0.5)*0.02;
+      const marker=L.marker([baseLat+offsetLat, baseLng+offsetLng], {icon:redIcon}).addTo(mapU);
+      marker.bindPopup(`<b>${u.usuario}</b><br/>${u.domicilio||''}<br/>${u.localidad||''}<br/><a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((u.domicilio||'')+' '+(u.localidad||''))}" target="_blank">📍 Maps</a>`);
+      markersU.push(marker);
+    });
+    if(markersU.length>0){
+      const group=new L.featureGroup(markersU);
+      mapU.fitBounds(group.getBounds().pad(0.2));
+    }
+    const texto=lista.map(u=>`🔴 ${u.usuario} - ${u.domicilio}`).slice(0,10).join('<br/>');
+    L.popup().setLatLng(mapU.getCenter()).setContent(`<b>📍 ${query}</b><br/>${lista.length} usuarios - 🔴 rojos<br/><br/>${texto}`).openOn(mapU);
+  }else{
+    const marker=L.marker(mapU.getCenter(), {icon:redIcon}).addTo(mapU);
+    markersU.push(marker);
+    L.popup().setLatLng(mapU.getCenter()).setContent(`<b>${query}</b><br/><a target=_blank href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}">Ver en Google Maps</a>`).openOn(mapU);
+  }
+  setTimeout(()=>{ mapU.invalidateSize(); },300);
+};
+
+function cargarArchivoU(file){
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const data=new Uint8Array(e.target.result);
+      const wb=XLSX.read(data,{type:'array'});
+      let mejor={data:[], debug:''};
+      wb.SheetNames.forEach(name=>{
+        const ws=wb.Sheets[name];
+        const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
+        const res=parseRowsU(rows);
+        if(res.data.length>mejor.data.length) mejor=res;
+      });
+      const parsed=mejor.data;
+      const debug=mejor.debug;
+      const dbgEl=document.getElementById('usuariosDebug');
+      if(dbgEl) dbgEl.textContent=debug;
+      if(parsed.length===0){
+        alert('No se detectaron usuarios. Revisá formato');
+        if(dbgEl) dbgEl.classList.add('show');
+        return;
+      }
+      usuariosU=parsed;
+      localStorage.setItem('usuarios_garantias', JSON.stringify(usuariosU.map(u=>({...u, fVence:u.fVence?u.fVence.toISOString():null}))));
+      mostrarDashboardU();
+      const info=document.getElementById('usuariosFileInfo');
+      if(info){ info.style.display='block'; info.innerHTML=`✅ <b>${parsed.length} usuarios</b> cargados`; }
+      const btnClear=document.getElementById('usuariosBtnClear');
+      if(btnClear) btnClear.style.display='inline-flex';
+      if(dbgEl) dbgEl.classList.remove('show');
+    }catch(err){
+      alert('Error: '+err.message);
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+function mostrarDashboardU(){
+  const dash=document.getElementById('usuariosDashboard');
+  if(dash) dash.style.display='block';
+  const totalEl=document.getElementById('usuariosStTotal');
+  if(totalEl) totalEl.textContent=usuariosU.length;
+  const vencEl=document.getElementById('usuariosStVencidas');
+  if(vencEl) vencEl.textContent=usuariosU.filter(u=>u.estado==='vencida').length;
+  const porVEl=document.getElementById('usuariosStPorVencer');
+  if(porVEl) porVEl.textContent=usuariosU.filter(u=>u.estado==='porVencer').length;
+  renderZonasU();
+  aplicarFiltrosU();
+}
+function initUsuarios(){
+  const btnChoose=document.getElementById('usuariosBtnChoose');
+  if(btnChoose) btnChoose.onclick=()=>document.getElementById('usuariosFileInput').click();
+  const fileInput=document.getElementById('usuariosFileInput');
+  if(fileInput) fileInput.onchange=e=>{ const f=e.target.files[0]; if(f) cargarArchivoU(f); e.target.value=''; };
+  const dz=document.getElementById('usuariosDropZone');
+  if(dz){
+    dz.onclick=()=>document.getElementById('usuariosFileInput').click();
+    dz.ondragover=e=>{ e.preventDefault(); dz.classList.add('dragover'); };
+    dz.ondragleave=()=>dz.classList.remove('dragover');
+    dz.ondrop=e=>{ e.preventDefault(); dz.classList.remove('dragover'); const f=e.dataTransfer.files[0]; if(f) cargarArchivoU(f); };
+  }
+  const btnDemo=document.getElementById('usuariosBtnDemo');
+  if(btnDemo) btnDemo.onclick=()=>{
+    const ejemplo=[
+      {id:1, usuario:'ALONSO, ARTURO', telf:'0351-4552272', domicilio:'ANDALUCIA 1936', cp:'X5014', localidad:'BARRIO COLON', producto:'PSA VERO', fCompra:'17/4/2002', fVenceRaw:'17/10/2003', fVence:new Date(2003,9,17), estado:'vencida'},
+    ];
+    usuariosU=ejemplo;
+    mostrarDashboardU();
+  };
+  const btnClear=document.getElementById('usuariosBtnClear');
+  if(btnClear) btnClear.onclick=()=>{
+    if(confirm('¿Borrar?')){ localStorage.removeItem('usuarios_garantias'); usuariosU=[]; const dash=document.getElementById('usuariosDashboard'); if(dash) dash.style.display='none'; }
+  };
+  const search=document.getElementById('usuariosSearch');
+  if(search) search.oninput=()=>aplicarFiltrosU();
+  const clearSearch=document.getElementById('usuariosClearSearch');
+  if(clearSearch) clearSearch.onclick=()=>{ const s=document.getElementById('usuariosSearch'); if(s) s.value=''; aplicarFiltrosU(); };
+  const filterVenc=document.getElementById('usuariosFilterVenc');
+  if(filterVenc){
+    filterVenc.querySelectorAll('[data-f]').forEach(b=>{
+      b.onclick=()=>{
+        filterVenc.querySelectorAll('[data-f]').forEach(x=>x.classList.remove('active'));
+        b.classList.add('active');
+        filtroVencU=b.dataset.f;
+        aplicarFiltrosU();
+      };
+    });
+  }
+  const btnOrden=document.getElementById('usuariosBtnOrdenVence');
+  if(btnOrden) btnOrden.onclick=()=>{
+    window.ordenPorVenceU=true;
+    ordenAscU=!ordenAscU;
+    aplicarFiltrosU();
+    btnOrden.textContent=ordenAscU?'📅 Vence ↑':'📅 Vence ↓';
+  };
+  const btnMapAll=document.getElementById('usuariosBtnMapAll');
+  if(btnMapAll) btnMapAll.onclick=()=>{
+    const mapDiv=document.getElementById('usuariosMap');
+    if(mapDiv){ mapDiv.classList.toggle('show'); if(mapDiv.classList.contains('show') && !mapU){ mapU=L.map('usuariosMap').setView([-31.4201,-64.1888],11); L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapU); setTimeout(()=>mapU.invalidateSize(),200); } }
+  };
+  const btnExport=document.getElementById('usuariosBtnExport');
+  if(btnExport) btnExport.onclick=()=>{
+    if(usuariosU.length===0){ alert('Nada'); return; }
+    let csv='Usuario,Telefono,Domicilio,CP,Localidad,Producto,F.Vence,Estado\n';
+    filtradosU.forEach(u=>{ csv+=`"${u.usuario}","${u.telf}","${u.domicilio}","${u.cp}","${u.localidad}","${u.producto}","${u.fVenceRaw||''}","${u.estado}"\n`; });
+    const blob=new Blob([csv],{type:'text/csv'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a'); a.href=url; a.download='usuarios.csv'; a.click(); URL.revokeObjectURL(url);
+  };
+  const btnDebug=document.getElementById('usuariosBtnToggleDebug');
+  if(btnDebug) btnDebug.onclick=()=>{ const d=document.getElementById('usuariosDebug'); if(d) d.classList.toggle('show'); };
+
+  // Cargar de localStorage
+  try{
+    const saved=JSON.parse(localStorage.getItem('usuarios_garantias')||'[]');
+    if(saved.length>0){
+      usuariosU=saved.map(u=>({...u, fVence:u.fVence? new Date(u.fVence):null, estado:u.fVence? ( (new Date(u.fVence)-new Date())/(1000*60*60*24)<0?'vencida': ( (new Date(u.fVence)-new Date())/(1000*60*60*24)<=30?'porVencer':'vigente')):'vigente'}));
+      mostrarDashboardU();
+      const info=document.getElementById('usuariosFileInfo');
+      if(info){ info.style.display='block'; info.innerHTML=`💾 ${usuariosU.length} usuarios recuperados`; }
+      const bc=document.getElementById('usuariosBtnClear');
+      if(bc) bc.style.display='inline-flex';
+    }
+  }catch(e){}
+}
+document.addEventListener('DOMContentLoaded', initUsuarios);
+setTimeout(initUsuarios, 1000);
+})();
 </script>
 
 </body>
