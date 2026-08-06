@@ -3303,7 +3303,7 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
     <button class="ds-btn" data-ds="view-planning" onclick="showView('view-planning'); renderPlanningTools();"><span>🗓️</span> Planificación</button>
     <button class="ds-btn" data-ds="view-history" onclick="showView('view-history'); renderHistory();"><span>📜</span> Historial</button>
   </nav>
-  <div class="ds-foot">APPI · v91</div>
+  <div class="ds-foot">APPI · v106 · mapa fix + glass</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -9895,6 +9895,33 @@ const _origShowViewParaAcceso = showView;
 showView = function(id){
   _origShowViewParaAcceso(id);
   asegurarAcceso();
+  // FIX MAPA: si entra a usuarios y mapa ya existe, invalidar para que se vea
+  try{
+    if(id==='view-usuarios'){
+      setTimeout(()=>{ 
+        const md=document.getElementById('usuariosMap');
+        if(md && md.classList.contains('show')){
+          md.style.display='block';
+          md.style.height='420px';
+        }
+        if(typeof mapU!=='undefined' && mapU && md && md.classList.contains('show')){
+          mapU.invalidateSize(true);
+          setTimeout(()=>mapU.invalidateSize(true),400);
+          setTimeout(()=>mapU.invalidateSize(true),1000);
+        }
+      },250);
+      setTimeout(()=>{
+        const md=document.getElementById('usuariosMap');
+        if(typeof mapU!=='undefined' && mapU && md && md.classList.contains('show')){
+          try{ mapU.invalidateSize(true); }catch(e){}
+        }
+      },800);
+    }
+    // Fix también para grabadora / notas: re-render keep
+    if(id==='view-notas' && typeof window.renderKeep==='function'){
+      setTimeout(()=>{ try{ window.renderKeep(); }catch(e){} },200);
+    }
+  }catch(e){ console.log('fix view error',e); }
 };
 
 // También asegurar en popstate y en iniciarApp
@@ -11107,6 +11134,430 @@ body.dark .keep-note{border-color:rgba(255,255,255,0.12);color:#ffffff}
 body.dark .keep-note .k-foot{color:rgba(255,255,255,0.6)}
 body.dark .search-box input{color:#ffffff !important}
 
+/* ====== FIX GLASS GENERAL - USUARIOS / GRABADORA / KEEP - MAPA VISIBLE ====== */
+#view-usuarios .glass{padding:16px 14px}
+#view-usuarios .upload-zone{
+  border:2px dashed rgba(91,141,239,0.30);
+  border-radius:18px;
+  padding:22px 16px;
+  text-align:center;
+  background:rgba(91,141,239,0.06);
+  -webkit-backdrop-filter:blur(12px);
+  backdrop-filter:blur(12px);
+  cursor:pointer;
+  transition:all .22s cubic-bezier(.34,1.56,.64,1);
+}
+#view-usuarios .upload-zone:hover{
+  background:rgba(91,141,239,0.10);
+  border-color:#5b8def;
+  transform:translateY(-1px);
+  box-shadow:0 8px 20px rgba(91,141,239,0.15);
+}
+#view-usuarios .upload-zone:active{transform:scale(0.98)}
+#view-usuarios .upload-zone b{font-size:13.5px; display:block; margin-top:6px}
+#view-usuarios .upload-zone small{font-size:11px}
+
+/* stats glass */
+#view-usuarios .stats{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin:14px 0;
+}
+@media(min-width:600px){ #view-usuarios .stats{grid-template-columns:repeat(4,1fr)} }
+#view-usuarios .stat{
+  padding:14px 10px;
+  border-radius:16px;
+  background:rgba(255,255,255,0.60);
+  -webkit-backdrop-filter:blur(20px) saturate(180%);
+  backdrop-filter:blur(20px) saturate(180%);
+  border:1px solid rgba(255,255,255,0.70);
+  box-shadow:0 6px 22px rgba(80,90,130,0.08), inset 0 1px 0 rgba(255,255,255,0.8);
+  text-align:center;
+  position:relative;
+  overflow:hidden;
+  transition:transform .15s ease;
+}
+#view-usuarios .stat:active{transform:scale(0.96)}
+#view-usuarios .stat b{
+  display:block;
+  font-size:22px;
+  font-weight:900;
+  letter-spacing:-0.4px;
+  color:#3d63c9;
+  line-height:1;
+}
+#view-usuarios .stat small{
+  display:block;
+  margin-top:5px;
+  font-size:10px;
+  font-weight:800;
+  text-transform:uppercase;
+  letter-spacing:0.4px;
+  color:#6b6b76;
+}
+body.dark #view-usuarios .stat{
+  background:rgba(30,30,50,0.55);
+  border-color:rgba(255,255,255,0.08);
+  box-shadow:0 6px 22px rgba(0,0,0,0.15);
+}
+body.dark #view-usuarios .stat b{color:#a8b8ff}
+body.dark #view-usuarios .stat small{color:#a0a0b0}
+
+/* filters glass pills */
+#view-usuarios .filters{
+  display:flex;
+  flex-wrap:wrap;
+  gap:7px;
+  margin:10px 0;
+}
+#view-usuarios .filter{
+  padding:7px 13px;
+  border-radius:999px;
+  background:rgba(255,255,255,0.68);
+  -webkit-backdrop-filter:blur(12px) saturate(180%);
+  backdrop-filter:blur(12px) saturate(180%);
+  border:1px solid rgba(255,255,255,0.70);
+  font:inherit;
+  font-size:11.5px;
+  font-weight:800;
+  color:#6b6b76;
+  cursor:pointer;
+  transition:all .20s cubic-bezier(.34,1.56,.64,1);
+  box-shadow:0 2px 8px rgba(80,90,130,0.06);
+  letter-spacing:0.2px;
+}
+#view-usuarios .filter.active{
+  background:linear-gradient(135deg,#5b8def,#a06bff);
+  color:#fff;
+  border-color:transparent;
+  box-shadow:0 4px 14px rgba(91,141,239,0.32);
+}
+#view-usuarios .filter:hover{transform:translateY(-1px); box-shadow:0 4px 12px rgba(80,90,130,0.10)}
+#view-usuarios .filter:active{transform:scale(0.94)}
+body.dark #view-usuarios .filter{
+  background:rgba(40,40,60,0.55);
+  border-color:rgba(255,255,255,0.08);
+  color:#a0a0b0;
+}
+body.dark #view-usuarios .filter.active{
+  background:linear-gradient(135deg,#7ba3ff,#b98fff);
+  color:#fff;
+}
+
+/* MAPA FIX - altura y glass */
+#usuariosMap.map-wrap{
+  height:420px;
+  min-height:400px;
+  width:100%;
+  border-radius:20px;
+  overflow:hidden;
+  background:rgba(255,255,255,0.62);
+  -webkit-backdrop-filter:blur(20px) saturate(180%);
+  backdrop-filter:blur(20px) saturate(180%);
+  border:1px solid rgba(255,255,255,0.75);
+  box-shadow:0 12px 32px rgba(80,90,130,0.14), inset 0 1px 0 rgba(255,255,255,0.8);
+  margin-top:16px;
+  display:none;
+  position:relative;
+  z-index:1;
+}
+#usuariosMap.map-wrap.show{
+  display:block;
+  animation:mapIn .35s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes mapIn{
+  from{opacity:0; transform:translateY(12px) scale(0.97)}
+  to{opacity:1; transform:translateY(0) scale(1)}
+}
+#usuariosMap .leaflet-container{
+  height:100% !important;
+  width:100% !important;
+  border-radius:20px;
+  background:#e6ecff;
+  font-family:inherit;
+}
+#usuariosMap .leaflet-tile-pane{filter:saturate(1.1)}
+body.dark #usuariosMap.map-wrap{
+  background:rgba(30,30,50,0.62);
+  border-color:rgba(255,255,255,0.10);
+  box-shadow:0 12px 32px rgba(0,0,0,0.25);
+}
+body.dark #usuariosMap .leaflet-container{background:#1a1f3a}
+body.dark .leaflet-control-attribution{
+  background:rgba(30,30,50,0.75) !important;
+  color:rgba(255,255,255,0.6) !important;
+}
+.leaflet-popup-content-wrapper{
+  background:rgba(255,255,255,0.92) !important;
+  backdrop-filter:blur(16px) saturate(180%);
+  border:1px solid rgba(255,255,255,0.7);
+  border-radius:14px !important;
+  box-shadow:0 8px 22px rgba(80,90,130,0.18) !important;
+  font-family:inherit;
+  font-size:12.5px;
+}
+.leaflet-popup-tip{background:rgba(255,255,255,0.92) !important}
+body.dark .leaflet-popup-content-wrapper{
+  background:rgba(35,35,55,0.92) !important;
+  border-color:rgba(255,255,255,0.12);
+  color:#f0f0f5;
+}
+body.dark .leaflet-popup-tip{background:rgba(35,35,55,0.92) !important}
+
+/* lista arbol glass mejorado */
+#usuariosList{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  margin-top:16px;
+}
+#view-usuarios .tree-node{
+  background:rgba(255,255,255,0.60);
+  -webkit-backdrop-filter:blur(20px) saturate(180%);
+  backdrop-filter:blur(20px) saturate(180%);
+  border:1px solid rgba(255,255,255,0.72);
+  box-shadow:0 6px 18px rgba(80,90,130,0.08), inset 0 1px 0 rgba(255,255,255,0.8);
+  border-radius:16px;
+  padding:13px 14px;
+}
+#view-usuarios .tree-node:hover{
+  background:rgba(255,255,255,0.78);
+  transform:translateY(-1px);
+  box-shadow:0 8px 22px rgba(80,90,130,0.12);
+}
+#view-usuarios .tree-node:active{transform:scale(0.98)}
+#view-usuarios .tree-children{
+  background:rgba(255,255,255,0.62);
+  -webkit-backdrop-filter:blur(20px) saturate(180%);
+  backdrop-filter:blur(20px) saturate(180%);
+  border:1px solid rgba(255,255,255,0.70);
+  box-shadow:0 8px 24px rgba(80,90,130,0.08), inset 0 1px 0 rgba(255,255,255,0.8);
+  border-radius:18px;
+  margin-top:8px;
+  margin-bottom:14px;
+  padding:14px;
+  animation:treeIn .28s ease;
+}
+@keyframes treeIn{
+  from{opacity:0; transform:translateY(-6px)}
+  to{opacity:1; transform:translateY(0)}
+}
+#view-usuarios .action-btn{
+  padding:8px 13px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,0.65);
+  font:inherit;
+  font-size:11.5px;
+  font-weight:800;
+  cursor:pointer;
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  transition:all .16s cubic-bezier(.34,1.56,.64,1);
+  backdrop-filter:blur(10px);
+  letter-spacing:0.2px;
+}
+#view-usuarios .action-btn:active{transform:scale(0.92)}
+#view-usuarios .action-btn.map{
+  background:linear-gradient(135deg,#5b8def,#a06bff);
+  color:#fff;
+  border-color:transparent;
+  box-shadow:0 4px 12px rgba(91,141,239,0.30);
+}
+#view-usuarios .action-btn.neighbors{
+  background:rgba(160,107,255,0.14);
+  color:#7a4bd9;
+  border-color:rgba(160,107,255,0.18);
+}
+#view-usuarios .action-btn.call{
+  background:rgba(37,211,102,0.14);
+  color:#128C7E;
+  border-color:rgba(37,211,102,0.18);
+}
+#view-usuarios .action-btn.mail{
+  background:rgba(255,255,255,0.72);
+  color:#3d63c9;
+}
+body.dark #view-usuarios .tree-node{
+  background:rgba(35,35,55,0.62);
+  border-color:rgba(255,255,255,0.10);
+  box-shadow:0 6px 18px rgba(0,0,0,0.18);
+}
+body.dark #view-usuarios .tree-node:hover{
+  background:rgba(45,45,65,0.72);
+}
+body.dark #view-usuarios .tree-children{
+  background:rgba(35,35,55,0.62);
+  border-color:rgba(255,255,255,0.08);
+  box-shadow:0 8px 24px rgba(0,0,0,0.22);
+}
+body.dark #view-usuarios .action-btn.mail{
+  background:rgba(50,50,70,0.72);
+  color:#a8b8ff;
+  border-color:rgba(255,255,255,0.08);
+}
+body.dark #view-usuarios .action-btn.neighbors{
+  background:rgba(160,107,255,0.20);
+  color:#c9a0ff;
+  border-color:rgba(160,107,255,0.22);
+}
+body.dark #view-usuarios .action-btn.call{
+  background:rgba(37,211,102,0.18);
+  color:#5eeab5;
+  border-color:rgba(37,211,102,0.22);
+}
+
+/* busqueda glass */
+#view-usuarios .search-box{
+  background:rgba(255,255,255,0.68);
+  backdrop-filter:blur(14px) saturate(180%);
+  border:1px solid rgba(255,255,255,0.75);
+  border-radius:14px;
+  box-shadow:0 4px 12px rgba(80,90,130,0.06), inset 0 1px 0 rgba(255,255,255,0.8);
+}
+body.dark #view-usuarios .search-box{
+  background:rgba(40,40,60,0.62);
+  border-color:rgba(255,255,255,0.08);
+}
+body.dark #view-usuarios .search-box input{color:#fff !important}
+
+/* file info y debug glass */
+#usuariosFileInfo{
+  background:rgba(58,208,164,0.14) !important;
+  backdrop-filter:blur(10px);
+  border:1px solid rgba(58,208,164,0.18);
+  border-radius:14px !important;
+  padding:12px 14px !important;
+  font-weight:600;
+}
+#usuariosDebug{
+  background:rgba(0,0,0,0.05) !important;
+  backdrop-filter:blur(10px);
+  border:1px solid rgba(0,0,0,0.06);
+  border-radius:12px !important;
+}
+body.dark #usuariosFileInfo{
+  background:rgba(58,208,164,0.18) !important;
+  border-color:rgba(58,208,164,0.25);
+}
+body.dark #usuariosDebug{
+  background:rgba(255,255,255,0.06) !important;
+  border-color:rgba(255,255,255,0.08);
+  color:#d0d0d8;
+}
+
+/* ===== GRABADORA GLASS DETALLES ===== */
+#view-grabadora .glass.card{
+  background:rgba(255,255,255,0.62) !important;
+  backdrop-filter:blur(20px) saturate(180%) !important;
+  border:1px solid rgba(255,255,255,0.72) !important;
+  box-shadow:0 8px 30px rgba(80,90,130,0.10), inset 0 1px 0 rgba(255,255,255,0.8) !important;
+  border-radius:22px !important;
+}
+#view-grabadora .rec-visual{
+  background:linear-gradient(135deg,#5b8def,#a06bff) !important;
+  box-shadow:0 12px 30px rgba(91,141,239,0.35), 0 0 0 1px rgba(255,255,255,0.4) inset !important;
+}
+#view-grabadora .transcript-area,
+#view-grabadora .status,
+#view-grabadora .summary-box{
+  background:rgba(255,255,255,0.68) !important;
+  backdrop-filter:blur(14px) saturate(180%) !important;
+  border:1px solid rgba(255,255,255,0.70) !important;
+  box-shadow:0 4px 14px rgba(80,90,130,0.06) !important;
+}
+#view-grabadora .controls .btn{
+  border-radius:14px !important;
+  font-weight:800 !important;
+  min-height:44px;
+  backdrop-filter:blur(14px);
+  box-shadow:0 4px 14px rgba(80,90,130,0.10);
+}
+#view-grabadora .btn-primary{
+  background:linear-gradient(135deg,#5b8def,#a06bff) !important;
+  color:#fff !important;
+  border:none !important;
+  box-shadow:0 6px 18px rgba(91,141,239,0.35) !important;
+}
+body.dark #view-grabadora .glass.card,
+body.dark #view-grabadora .transcript-area,
+body.dark #view-grabadora .summary-box{
+  background:rgba(35,35,55,0.62) !important;
+  border-color:rgba(255,255,255,0.08) !important;
+}
+body.dark #view-grabadora .transcript-area{color:#f0f0f5 !important}
+body.dark #modelStatus{
+  background:rgba(30,30,50,0.6) !important;
+  border-color:rgba(255,255,255,0.08) !important;
+  color:#d0d0d8 !important;
+}
+
+/* ===== NOTAS KEEP GLASS ===== */
+#view-notas .glass{
+  background:rgba(255,255,255,0.62) !important;
+  backdrop-filter:blur(20px) saturate(180%) !important;
+  border:1px solid rgba(255,255,255,0.72) !important;
+  box-shadow:0 8px 30px rgba(80,90,130,0.10) !important;
+}
+#view-notas .keep-add{
+  background:rgba(255,255,255,0.68) !important;
+  backdrop-filter:blur(14px) saturate(180%) !important;
+  border:1.5px dashed rgba(91,141,239,0.25) !important;
+  border-radius:18px !important;
+  box-shadow:0 6px 18px rgba(80,90,130,0.06), inset 0 1px 0 rgba(255,255,255,0.8) !important;
+}
+#view-notas .keep-add:focus-within{
+  border-color:#5b8def !important;
+  box-shadow:0 8px 22px rgba(91,141,239,0.15), 0 0 0 3px rgba(91,141,239,0.12) !important;
+}
+#view-notas .keep-grid{
+  gap:12px;
+}
+#view-notas .keep-note{
+  background: #fff475; /* color dinámico se mantiene */
+  backdrop-filter:blur(12px) saturate(150%);
+  border:1px solid rgba(255,255,255,0.5);
+  border-radius:16px !important;
+  box-shadow:0 6px 18px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.6) !important;
+  transform:translateZ(0);
+  transition:transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .20s ease !important;
+}
+#view-notas .keep-note:hover{
+  transform:translateY(-2px) scale(1.01);
+  box-shadow:0 10px 28px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.8) !important;
+}
+#view-notas .keep-note:active{transform:scale(0.98)}
+body.dark #view-notas .glass,
+body.dark #view-notas .keep-add{
+  background:rgba(35,35,55,0.62) !important;
+  border-color:rgba(255,255,255,0.08) !important;
+}
+body.dark #view-notas .search-box{
+  background:rgba(40,40,60,0.62) !important;
+  border-color:rgba(255,255,255,0.08) !important;
+}
+
+/* fix botones secundarios en usuarios */
+#view-usuarios .btn{
+  backdrop-filter:blur(14px);
+  border-radius:12px;
+  font-weight:700;
+}
+#view-usuarios .btn-secondary{
+  background:rgba(255,255,255,0.68) !important;
+  border:1px solid rgba(255,255,255,0.70) !important;
+  box-shadow:0 4px 12px rgba(80,90,130,0.06) !important;
+}
+body.dark #view-usuarios .btn-secondary{
+  background:rgba(45,45,65,0.62) !important;
+  border-color:rgba(255,255,255,0.08) !important;
+  color:#e0e0e8 !important;
+}
+
+/* mejora visual general para evitar que se vea apagado */
+#view-usuarios .glass .search-box span{font-size:14px}
+
 </style>
 
 <script>
@@ -11892,10 +12343,20 @@ window.mostrarEnMapaU=async function(query, lista=null){
   const mapDiv=document.getElementById('usuariosMap');
   if(!mapDiv) return;
   mapDiv.classList.add('show');
+  mapDiv.style.display='block';
+  mapDiv.style.height='420px';
   if(!mapU){
-    mapU=L.map('usuariosMap').setView([-31.4201,-64.1888], 11);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap'}).addTo(mapU);
+    try{
+      mapU=L.map('usuariosMap',{zoomControl:true}).setView([-31.4201,-64.1888], 12);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap', maxZoom:19}).addTo(mapU);
+    }catch(e){ console.log('L.map init fail',e); }
   }
+  // Fix visual: invalidar tamaño varias veces por si el contenedor estaba oculto
+  const doInvalidate=()=>{ try{ if(mapU) mapU.invalidateSize(true); }catch(e){} };
+  setTimeout(doInvalidate,100);
+  setTimeout(doInvalidate,350);
+  setTimeout(doInvalidate,800);
+  setTimeout(doInvalidate,1500);
   markersU.forEach(m=>mapU.removeLayer(m));
   markersU=[];
   const redIcon = L.icon({
@@ -11982,9 +12443,13 @@ window.mostrarEnMapaU=async function(query, lista=null){
       marker.bindPopup(`<b>${query}</b><br/><a target=_blank href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}">Ver en Google Maps</a>`);
       mapU.setView(latLng, 14);
       L.popup().setLatLng(latLng).setContent(`<b>${query}</b><br/>📍 Ubicación exacta<br/><a target=_blank href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}">Ver en Google Maps</a>`).openOn(mapU);
+      setTimeout(()=>{ try{ mapU.invalidateSize(); }catch(e){} },400);
+      setTimeout(()=>{ try{ mapU.invalidateSize(); }catch(e){} },1000);
     })();
   }
-  setTimeout(()=>{ mapU.invalidateSize(); },300);
+  // ultimo fix tamaño
+  setTimeout(()=>{ try{ if(mapU) mapU.invalidateSize(true); }catch(e){} },500);
+  setTimeout(()=>{ try{ if(mapU) mapU.invalidateSize(true); }catch(e){} },1200);
 };
 
 function cargarArchivoU(file){
@@ -12084,7 +12549,24 @@ function initUsuarios(){
   const btnMapAll=document.getElementById('usuariosBtnMapAll');
   if(btnMapAll) btnMapAll.onclick=()=>{
     const mapDiv=document.getElementById('usuariosMap');
-    if(mapDiv){ mapDiv.classList.toggle('show'); if(mapDiv.classList.contains('show') && !mapU){ mapU=L.map('usuariosMap').setView([-31.4201,-64.1888],11); L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapU); setTimeout(()=>mapU.invalidateSize(),200); } }
+    if(mapDiv){
+      const willShow=!mapDiv.classList.contains('show');
+      mapDiv.classList.toggle('show');
+      if(willShow){
+        mapDiv.style.display='block';
+        mapDiv.style.height='420px';
+        if(!mapU){
+          try{
+            mapU=L.map('usuariosMap',{zoomControl:true}).setView([-31.4201,-64.1888],12);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap', maxZoom:19}).addTo(mapU);
+          }catch(e){ console.log('map init fail',e); }
+        }
+        setTimeout(()=>{ try{ if(mapU) mapU.invalidateSize(true); }catch(e){} },150);
+        setTimeout(()=>{ try{ if(mapU) mapU.invalidateSize(true); }catch(e){} },500);
+        setTimeout(()=>{ try{ if(mapU) mapU.invalidateSize(true); }catch(e){} },1200);
+      }
+    }
+  };
   };
   const btnExport=document.getElementById('usuariosBtnExport');
   if(btnExport) btnExport.onclick=()=>{
