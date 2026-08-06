@@ -3303,7 +3303,7 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
     <button class="ds-btn" data-ds="view-planning" onclick="showView('view-planning'); renderPlanningTools();"><span>🗓️</span> Planificación</button>
     <button class="ds-btn" data-ds="view-history" onclick="showView('view-history'); renderHistory();"><span>📜</span> Historial</button>
   </nav>
-  <div class="ds-foot">APPI · v110 · geocode ULTRA preciso CP->Provincia + structured + exacto calle</div>
+  <div class="ds-foot">APPI · v111 · boton volver listado completo + volver atras vecinos</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4063,7 +4063,9 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
           <button class="filter" data-f="vigentes">🟢 Vigentes</button>
         </div>
         <div class="filters" id="usuariosFilterZonas" style="max-height:120px;overflow-y:auto"></div>
-        <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+        <div id="usuariosActiveFilters" style="display:none;margin-top:10px;padding:10px 14px;border-radius:12px;background:rgba(91,141,239,0.10);border:1px solid rgba(91,141,239,0.18);font-size:12px;font-weight:600;color:#3a3a48"></div>
+        <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+          <button class="btn btn-primary" id="usuariosBtnVerTodos" style="display:none;background:linear-gradient(135deg,#5b8def,#a06bff);color:#fff;border:none;box-shadow:0 4px 12px rgba(91,141,239,0.30)">📋 Ver listado completo</button>
           <button class="btn btn-secondary" id="usuariosBtnOrdenVence">📅 Ordenar por Vence</button>
           <button class="btn btn-secondary" id="usuariosBtnMapAll">🗺️ Mapa general</button>
           <button class="btn btn-secondary" id="usuariosBtnExport">📤 Exportar CSV</button>
@@ -12243,6 +12245,38 @@ function renderZonasU(){
   });
   const st=document.getElementById('usuariosStZonas'); if(st) st.textContent=zonas.length;
 }
+function resetFiltrosU(){
+  filtroVencU='all';
+  filtroZonaU='all';
+  ordenAscU=true;
+  window.ordenPorVenceU=false;
+  const qEl=document.getElementById('usuariosSearch');
+  if(qEl) qEl.value='';
+  const fv=document.getElementById('usuariosFilterVenc');
+  if(fv){
+    fv.querySelectorAll('[data-f]').forEach(x=>x.classList.remove('active'));
+    const all=fv.querySelector('[data-f="all"]');
+    if(all) all.classList.add('active');
+  }
+  const fz=document.getElementById('usuariosFilterZonas');
+  if(fz){
+    fz.querySelectorAll('[data-z]').forEach(x=>x.classList.remove('active'));
+    const allZ=fz.querySelector('[data-z="all"]');
+    if(allZ) allZ.classList.add('active');
+  }
+  const btnOrden=document.getElementById('usuariosBtnOrdenVence');
+  if(btnOrden) btnOrden.textContent='📅 Ordenar por Vence';
+  aplicarFiltrosU();
+  // Ocultar mapa si estaba mostrando vecinos
+  const mapDiv=document.getElementById('usuariosMap');
+  if(mapDiv && markersU.length>0){
+    // No ocultamos mapa automaticamente, pero limpiamos marcadores si quiere ver todo
+    // Dejamos que el usuario decida, solo reseteamos lista
+  }
+  if(typeof haptic==='function') haptic(10);
+  if(typeof showToast==='function') showToast('📋 Listado completo');
+}
+
 function aplicarFiltrosU(){
   const qEl=document.getElementById('usuariosSearch');
   const q=qEl? normU(qEl.value) : '';
@@ -12261,6 +12295,28 @@ function aplicarFiltrosU(){
       if(!b.fVence) return -1;
       return ordenAscU? a.fVence - b.fVence : b.fVence - a.fVence;
     });
+  }
+  // Mostrar banner de filtros activos y boton Ver Todos
+  const activeDiv=document.getElementById('usuariosActiveFilters');
+  const btnVerTodos=document.getElementById('usuariosBtnVerTodos');
+  const isFiltered = filtroVencU!=='all' || filtroZonaU!=='all' || q;
+  if(activeDiv){
+    if(isFiltered){
+      const parts=[];
+      if(filtroZonaU!=='all') parts.push(`📍 Zona: <b>${filtroZonaU}</b>`);
+      if(filtroVencU!=='all'){
+        const labels={vencidas:'🔴 Vencidas', porVencer:'🟡 Por vencer', vigentes:'🟢 Vigentes'};
+        parts.push(labels[filtroVencU]||filtroVencU);
+      }
+      if(q) parts.push(`🔍 "${qEl.value}"`);
+      activeDiv.innerHTML=`🔎 Filtrando ${filtradosU.length} de ${usuariosU.length} usuarios → ${parts.join(' · ')} <button onclick="resetFiltrosU()" style="margin-left:8px;border:none;background:#fff;padding:4px 10px;border-radius:999px;font-weight:800;font-size:11px;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,0.10)">✕ Limpiar</button>`;
+      activeDiv.style.display='block';
+    }else{
+      activeDiv.style.display='none';
+    }
+  }
+  if(btnVerTodos){
+    btnVerTodos.style.display=isFiltered?'inline-flex':'none';
   }
   renderListU();
 }
@@ -12774,6 +12830,9 @@ function initUsuarios(){
       }
     }
   };
+  const btnVerTodos=document.getElementById('usuariosBtnVerTodos');
+  if(btnVerTodos) btnVerTodos.onclick=()=>{ resetFiltrosU(); };
+
   const btnExport=document.getElementById('usuariosBtnExport');
   if(btnExport) btnExport.onclick=()=>{
     if(usuariosU.length===0){ alert('Nada para exportar'); return; }
