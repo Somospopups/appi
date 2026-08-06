@@ -11142,9 +11142,13 @@ async function startRecording(){
     const br=el('btnRecord'); if(br) br.disabled=true;
     const bp=el('btnPause'); if(bp) bp.disabled=false;
     const bs=el('btnStop'); if(bs) bs.disabled=false;
-    recognition=initRecognition();
-    finalTranscript=(el('transcript')?.value)||'';
-    if(recognition){ try{ recognition.start(); }catch(_){} }
+        recognition=initRecognition();
+    finalTranscript=(el('transcript')?.value||elTrans?.value||'')||'';
+    const chk=document.getElementById('chkLiveTrans');
+    const shouldTranscribe=chk ? chk.checked : false;
+    if(shouldTranscribe && recognition){
+      try{ recognition.start(); }catch(_){}
+    }
     showStatus('🎙️ Grabando reunión...','ok');
   }catch(err){ showStatus('Micrófono error: '+err.message,'error'); }
 }
