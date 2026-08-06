@@ -3303,7 +3303,7 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
     <button class="ds-btn" data-ds="view-planning" onclick="showView('view-planning'); renderPlanningTools();"><span>🗓️</span> Planificación</button>
     <button class="ds-btn" data-ds="view-history" onclick="showView('view-history'); renderHistory();"><span>📜</span> Historial</button>
   </nav>
-  <div class="ds-foot">APPI · v106 · mapa fix + glass</div>
+  <div class="ds-foot">APPI · v108 · fix upload + sin demo-debug + sin tabs</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4030,19 +4030,17 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
         <h3 style="margin:8px 0 4px">Cargar archivo de Garantías / Usuarios</h3>
         <p style="font-size:12px;color:#6b6b76;margin:0">Excel con Usuario, Teléf., Domicilio, C.P., Localidad, F. Vence, etc.</p>
       </div>
-      <div class="upload-zone" id="usuariosDropZone">
-        <div style="font-size:22px">📤</div>
+      <div class="upload-zone" id="usuariosDropZone" role="button" tabindex="0" aria-label="Cargar archivo Excel">
+        <div style="font-size:26px">📤</div>
         <b>Arrastrá tu archivo acá o clic para elegir</b><br/>
-        <small style="color:#6b6b76">Soporta .xls, .xlsx, .csv - Fix formato con fila Garantias</small>
-        <div style="margin-top:10px"><button class="btn btn-primary" id="usuariosBtnChoose">Elegir archivo</button></div>
+        <small style="color:#6b6b76">Soporta .xls, .xlsx, .csv - Detecta C.P., Teléf., Domicilio, F. Vence</small>
+        <div style="margin-top:14px"><button type="button" class="btn btn-primary" id="usuariosBtnChoose" style="pointer-events:none">Elegir archivo</button></div>
       </div>
-      <input type="file" id="usuariosFileInput" accept=".xls,.xlsx,.csv" style="display:none">
-      <div id="usuariosFileInfo" style="display:none;margin-top:12px;padding:10px;border-radius:10px;background:rgba(58,208,164,0.12);font-size:12px"></div>
-      <div id="usuariosDebug" style="display:none;margin-top:8px;padding:10px;border-radius:10px;background:rgba(0,0,0,0.06);font-size:11px;font-family:monospace;white-space:pre-wrap;max-height:200px;overflow:auto"></div>
+      <input type="file" id="usuariosFileInput" accept=".xls,.xlsx,.csv,.ods" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;pointer-events:none">
+      <div id="usuariosFileInfo" style="display:none;margin-top:12px;padding:12px;border-radius:14px;background:rgba(58,208,164,0.14);backdrop-filter:blur(10px);border:1px solid rgba(58,208,164,0.18);font-size:12px;font-weight:600"></div>
+      <div id="usuariosDebug" style="display:none;margin-top:8px;padding:10px;border-radius:12px;background:rgba(0,0,0,0.05);font-size:11px;font-family:monospace;white-space:pre-wrap;max-height:200px;overflow:auto"></div>
       <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
-        <button class="btn btn-secondary" id="usuariosBtnDemo">🧪 Datos ejemplo</button>
-        <button class="btn btn-secondary" id="usuariosBtnToggleDebug">🐛 Debug</button>
-        <button class="btn btn-secondary" id="usuariosBtnClear" style="display:none">🗑️ Limpiar</button>
+        <button type="button" class="btn btn-secondary" id="usuariosBtnClear" style="display:none">🗑️ Limpiar lista</button>
       </div>
     </div>
 
@@ -4615,7 +4613,7 @@ function showView(id){
   document.querySelectorAll('#deskSidebar .ds-btn').forEach(b=>{
     b.classList.toggle('active', b.dataset.ds===dsTarget);
   });
-  const hideTabsOn = ['view-home','view-siete','view-siete-detail','view-presu','view-presu-hist','view-equipo','view-seguimiento','view-carrera','view-planning','view-precios','view-grabadora','view-notas'];
+  const hideTabsOn = ['view-home','view-siete','view-siete-detail','view-presu','view-presu-hist','view-equipo','view-seguimiento','view-carrera','view-planning','view-precios','view-grabadora','view-notas','view-usuarios'];
   document.getElementById('tabs').style.display = hideTabsOn.includes(id) ? 'none' : 'flex';
   if(id==='view-history') renderHistory();
   if(id==='view-eval')    renderAreas();
@@ -11153,6 +11151,12 @@ body.dark .search-box input{color:#ffffff !important}
   transform:translateY(-1px);
   box-shadow:0 8px 20px rgba(91,141,239,0.15);
 }
+#view-usuarios .upload-zone.dragover{
+  background:rgba(91,141,239,0.14);
+  border-color:#5b8def;
+  transform:scale(1.02);
+  box-shadow:0 12px 28px rgba(91,141,239,0.22);
+}
 #view-usuarios .upload-zone:active{transform:scale(0.98)}
 #view-usuarios .upload-zone b{font-size:13.5px; display:block; margin-top:6px}
 #view-usuarios .upload-zone small{font-size:11px}
@@ -12501,28 +12505,78 @@ function mostrarDashboardU(){
   aplicarFiltrosU();
 }
 function initUsuarios(){
-  const btnChoose=document.getElementById('usuariosBtnChoose');
-  if(btnChoose) btnChoose.onclick=()=>document.getElementById('usuariosFileInput').click();
   const fileInput=document.getElementById('usuariosFileInput');
-  if(fileInput) fileInput.onchange=e=>{ const f=e.target.files[0]; if(f) cargarArchivoU(f); e.target.value=''; };
+  const btnChoose=document.getElementById('usuariosBtnChoose');
   const dz=document.getElementById('usuariosDropZone');
-  if(dz){
-    dz.onclick=()=>document.getElementById('usuariosFileInput').click();
-    dz.ondragover=e=>{ e.preventDefault(); dz.classList.add('dragover'); };
-    dz.ondragleave=()=>dz.classList.remove('dragover');
-    dz.ondrop=e=>{ e.preventDefault(); dz.classList.remove('dragover'); const f=e.dataTransfer.files[0]; if(f) cargarArchivoU(f); };
-  }
-  const btnDemo=document.getElementById('usuariosBtnDemo');
-  if(btnDemo) btnDemo.onclick=()=>{
-    const ejemplo=[
-      {id:1, usuario:'ALONSO, ARTURO', telf:'0351-4552272', domicilio:'ANDALUCIA 1936', cp:'X5014', localidad:'BARRIO COLON', producto:'PSA VERO', fCompra:'17/4/2002', fVenceRaw:'17/10/2003', fVence:new Date(2003,9,17), estado:'vencida'},
-    ];
-    usuariosU=ejemplo;
-    mostrarDashboardU();
+
+  const triggerFile=()=>{
+    try{
+      if(fileInput){
+        // No reseteamos antes, reseteamos después para asegurar onchange
+        fileInput.click();
+      }
+    }catch(e){ console.log('trigger file fail',e); }
   };
+
+  if(btnChoose){
+    btnChoose.addEventListener('click', (e)=>{
+      e.preventDefault(); e.stopPropagation();
+      triggerFile();
+    });
+  }
+  if(fileInput){
+    fileInput.addEventListener('change', (e)=>{
+      const f=e.target.files && e.target.files[0];
+      if(f){
+        console.log('Archivo elegido',f.name, f.size);
+        try{ cargarArchivoU(f); }catch(err){ console.error(err); alert('Error leyendo: '+err.message); }
+      }
+      setTimeout(()=>{ try{ e.target.value=''; }catch(_){} },600);
+    });
+  }
+  if(dz){
+    dz.addEventListener('click', (e)=>{
+      if(e.target && e.target.id==='usuariosFileInput') return;
+      triggerFile();
+    });
+    dz.addEventListener('keydown', (e)=>{
+      if(e.key==='Enter' || e.key===' '){
+        e.preventDefault();
+        triggerFile();
+      }
+    });
+    dz.addEventListener('dragover', (e)=>{
+      e.preventDefault();
+      dz.classList.add('dragover');
+    });
+    dz.addEventListener('dragleave', ()=>{
+      dz.classList.remove('dragover');
+    });
+    dz.addEventListener('dragenter', (e)=>{
+      e.preventDefault();
+      dz.classList.add('dragover');
+    });
+    dz.addEventListener('drop', (e)=>{
+      e.preventDefault();
+      dz.classList.remove('dragover');
+      const f=e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+      if(f){ try{ cargarArchivoU(f); }catch(err){ console.error(err); } }
+    });
+  }
+
   const btnClear=document.getElementById('usuariosBtnClear');
   if(btnClear) btnClear.onclick=()=>{
-    if(confirm('¿Borrar?')){ localStorage.removeItem('usuarios_garantias'); usuariosU=[]; const dash=document.getElementById('usuariosDashboard'); if(dash) dash.style.display='none'; }
+    if(confirm('¿Borrar lista de usuarios cargados?')){
+      try{ localStorage.removeItem('usuarios_garantias'); }catch(_){}
+      usuariosU=[]; filtradosU=[];
+      const dash=document.getElementById('usuariosDashboard');
+      if(dash) dash.style.display='none';
+      const info=document.getElementById('usuariosFileInfo');
+      if(info) info.style.display='none';
+      btnClear.style.display='none';
+      const list=document.getElementById('usuariosList');
+      if(list) list.innerHTML='';
+    }
   };
   const search=document.getElementById('usuariosSearch');
   if(search) search.oninput=()=>aplicarFiltrosU();
@@ -12567,18 +12621,15 @@ function initUsuarios(){
       }
     }
   };
-  };
   const btnExport=document.getElementById('usuariosBtnExport');
   if(btnExport) btnExport.onclick=()=>{
-    if(usuariosU.length===0){ alert('Nada'); return; }
+    if(usuariosU.length===0){ alert('Nada para exportar'); return; }
     let csv='Usuario,Telefono,Domicilio,CP,Localidad,Producto,F.Vence,Estado\n';
-    filtradosU.forEach(u=>{ csv+=`"${u.usuario}","${u.telf}","${u.domicilio}","${u.cp}","${u.localidad}","${u.producto}","${u.fVenceRaw||''}","${u.estado}"\n`; });
+    (filtradosU.length?filtradosU:usuariosU).forEach(u=>{ csv+=`"${u.usuario}","${u.telf}","${u.domicilio}","${u.cp}","${u.localidad}","${u.producto}","${u.fVenceRaw||''}","${u.estado}"\n`; });
     const blob=new Blob([csv],{type:'text/csv'});
     const url=URL.createObjectURL(blob);
     const a=document.createElement('a'); a.href=url; a.download='usuarios.csv'; a.click(); URL.revokeObjectURL(url);
   };
-  const btnDebug=document.getElementById('usuariosBtnToggleDebug');
-  if(btnDebug) btnDebug.onclick=()=>{ const d=document.getElementById('usuariosDebug'); if(d) d.classList.toggle('show'); };
 
   // Cargar de localStorage
   try{
@@ -12587,15 +12638,16 @@ function initUsuarios(){
       usuariosU=saved.map(u=>({...u, fVence:u.fVence? new Date(u.fVence):null, estado:u.fVence? ( (new Date(u.fVence)-new Date())/(1000*60*60*24)<0?'vencida': ( (new Date(u.fVence)-new Date())/(1000*60*60*24)<=30?'porVencer':'vigente')):'vigente'}));
       mostrarDashboardU();
       const info=document.getElementById('usuariosFileInfo');
-      if(info){ info.style.display='block'; info.innerHTML=`💾 ${usuariosU.length} usuarios recuperados`; }
+      if(info){ info.style.display='block'; info.innerHTML=`💾 ${usuariosU.length} usuarios recuperados de memoria`; }
       const bc=document.getElementById('usuariosBtnClear');
       if(bc) bc.style.display='inline-flex';
     }
-  }catch(e){}
+  }catch(e){ console.log('load usuarios fail',e); }
 }
 document.addEventListener('DOMContentLoaded', initUsuarios);
-setTimeout(initUsuarios, 1000);
+setTimeout(initUsuarios, 1200);
 })();
+
 </script>
 
 </body>
