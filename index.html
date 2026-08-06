@@ -3303,7 +3303,7 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
     <button class="ds-btn" data-ds="view-planning" onclick="showView('view-planning'); renderPlanningTools();"><span>🗓️</span> Planificación</button>
     <button class="ds-btn" data-ds="view-history" onclick="showView('view-history'); renderHistory();"><span>📜</span> Historial</button>
   </nav>
-  <div class="ds-foot">APPI · v112 · whatsapp en tarjetas usuarios + apple + preciso</div>
+  <div class="ds-foot">APPI · v113 · fix cargar archivo label nativo + whatsapp + volver listado</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4030,12 +4030,12 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
         <h3 style="margin:8px 0 4px">Cargar archivo de Garantías / Usuarios</h3>
         <p style="font-size:12px;color:#6b6b76;margin:0">Excel con Usuario, Teléf., Domicilio, C.P., Localidad, F. Vence, etc.</p>
       </div>
-      <div class="upload-zone" id="usuariosDropZone" role="button" tabindex="0" aria-label="Cargar archivo Excel">
+      <label class="upload-zone" id="usuariosDropZone" for="usuariosFileInput" role="button" tabindex="0" aria-label="Cargar archivo Excel" style="display:block;cursor:pointer">
         <div style="font-size:26px">📤</div>
         <b>Arrastrá tu archivo acá o clic para elegir</b><br/>
         <small style="color:#6b6b76">Soporta .xls, .xlsx, .csv - Detecta C.P., Teléf., Domicilio, F. Vence</small>
-        <div style="margin-top:14px"><button type="button" class="btn btn-primary" id="usuariosBtnChoose" style="pointer-events:none">Elegir archivo</button></div>
-      </div>
+        <div style="margin-top:14px"><button type="button" class="btn btn-primary" id="usuariosBtnChoose" onclick="document.getElementById('usuariosFileInput').click(); return false;">Elegir archivo</button></div>
+      </label>
       <input type="file" id="usuariosFileInput" accept=".xls,.xlsx,.csv,.ods" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;pointer-events:none">
       <div id="usuariosFileInfo" style="display:none;margin-top:12px;padding:12px;border-radius:14px;background:rgba(58,208,164,0.14);backdrop-filter:blur(10px);border:1px solid rgba(58,208,164,0.18);font-size:12px;font-weight:600"></div>
       <div id="usuariosDebug" style="display:none;margin-top:8px;padding:10px;border-radius:12px;background:rgba(0,0,0,0.05);font-size:11px;font-family:monospace;white-space:pre-wrap;max-height:200px;overflow:auto"></div>
@@ -12773,14 +12773,11 @@ function initUsuarios(){
     });
   }
   if(dz){
-    dz.addEventListener('click', (e)=>{
-      if(e.target && e.target.id==='usuariosFileInput') return;
-      triggerFile();
-    });
+    // Click nativo manejado por <label for="usuariosFileInput"> - no need trigger, solo teclado
     dz.addEventListener('keydown', (e)=>{
       if(e.key==='Enter' || e.key===' '){
         e.preventDefault();
-        triggerFile();
+        try{ document.getElementById('usuariosFileInput').click(); }catch(_){}
       }
     });
     dz.addEventListener('dragover', (e)=>{
@@ -12798,7 +12795,7 @@ function initUsuarios(){
       e.preventDefault();
       dz.classList.remove('dragover');
       const f=e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
-      if(f){ try{ cargarArchivoU(f); }catch(err){ console.error(err); } }
+      if(f){ try{ cargarArchivoU(f); }catch(err){ console.error(err); haptic(20); } }
     });
   }
 
