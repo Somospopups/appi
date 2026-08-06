@@ -11658,7 +11658,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
 });
 </script>
 
-
+<script>
 // ===== USUARIOS GARANTIAS - INTEGRADO EN MI NEGOCIO =====
 (function(){
 const LS_KEY_U='usuarios_garantias';
@@ -11816,32 +11816,39 @@ function renderListU(){
     cont.innerHTML='<div class="empty">Sin usuarios con esos filtros</div>';
     return;
   }
+  // Estilo arbol: un solo renglon y desplegable
   cont.innerHTML=filtradosU.map(u=>{
     const venceRaw=u.fVenceRaw||'—';
     const compraRaw=u.fCompra||'—';
     const diasNum=u.fVence? Math.ceil((u.fVence-new Date())/(1000*60*60*24)) : null;
-    const diasLabel=diasNum!==null? (diasNum<0? `${Math.abs(diasNum)} días vencida` : `${diasNum} días restantes`) : '';
-    return `<div class="user-card ${u.estado}">
-      <div class="user-head">
-        <div class="user-avatar">${u.usuario.charAt(0).toUpperCase()}</div>
-        <div class="user-name">
-          <b>${u.usuario} ${u.estado==='vencida'?'<span class="badge vencida">VENCIDA</span>':''}${u.estado==='porVencer'?'<span class="badge por-vencer">POR VENCER</span>':''}${u.estado==='vigente'?'<span class="badge vigente">VIGENTE</span>':''}</b>
-          <small>${u.localidad||''} ${u.cp? '· CP '+u.cp:''}</small>
-        </div>
-      </div>
-      <div class="user-meta">
+    const diasLabel=diasNum!==null? (diasNum<0? `${Math.abs(diasNum)}d vencida` : `${diasNum}d`) : '';
+    const estadoColor=u.estado==='vencida'?'#d9534f':(u.estado==='porVencer'?'#f5b301':'#3ad0a4');
+    const estadoTxt=u.estado==='vencida'?'VENC':(u.estado==='porVencer'?'POR VENC':'VIG');
+    return `
+    <div class="tree-node" onclick="this.classList.toggle('expanded'); const ch=this.nextElementSibling; if(ch) ch.classList.toggle('open');">
+      <span class="tree-arrow">›</span>
+      <span class="tree-cat-badge" style="background:${estadoColor}">${estadoTxt}</span>
+      <span class="tree-name" title="${u.usuario} - ${u.domicilio}">${u.usuario}</span>
+      <span class="tree-pts" style="background:rgba(0,0,0,0.06);color:#1c1c1e">${u.localidad||''}</span>
+      <span class="tree-pts" style="min-width:70px;text-align:right">${venceRaw}</span>
+    </div>
+    <div class="tree-children" style="padding:8px;background:rgba(255,255,255,0.5);border-radius:12px;margin-bottom:8px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:11px">
         <div>📞 <b>${u.telf||'—'}</b></div>
         <div>🏠 <b>${u.domicilio||'—'}</b></div>
+        <div>📍 <b>${u.localidad||''} ${u.cp? 'CP '+u.cp:''}</b></div>
         <div>📦 <b>${u.producto||'—'}</b></div>
         <div>🛒 Compra: <b>${compraRaw}</b></div>
         <div>📅 Vence: <b>${venceRaw}</b> <small>${diasLabel}</small></div>
       </div>
-      <div class="user-actions">
+      <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">
         <button class="action-btn map" onclick="window.verMapaU && window.verMapaU('${(u.domicilio+' '+(u.localidad||'')+' '+(u.cp||'')).replace(/'/g,'')}')">📍 Mapa</button>
         <button class="action-btn neighbors" onclick="window.verVecinosU && window.verVecinosU('${(u.localidad||'').replace(/'/g,'')}')">👥 Vecinos</button>
-        ${u.telf?`<button class="action-btn call" onclick="window.open('tel:${u.telf.replace(/\D/g,'')}')">📞 Llamar</button>`:''}
+        ${u.telf?`<button class="action-btn call" onclick="window.open('tel:${u.telf.replace(/\\D/g,'')}')">📞 Llamar</button>`:''}
+        <button class="action-btn mail" onclick="window.open('https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((u.domicilio||'')+' '+(u.localidad||''))}', '_blank')">🗺️ Google</button>
       </div>
-    </div>`;
+    </div>
+    `;
   }).join('');
 }
 window.verMapaU=function(query){
@@ -11867,7 +11874,21 @@ window.verVecinosU=function(localidad){
     if(mapDiv) window.scrollTo({top:mapDiv.offsetTop-20, behavior:'smooth'});
   }
 };
-window.mostrarEnMapaU=function(query, lista=null){
+
+async function geocodeAddressU(query){
+  try{
+    const url='https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=ar&q='+encodeURIComponent(query);
+    const res=await fetch(url, {headers:{'Accept-Language':'es'}});
+    if(!res.ok) return null;
+    const data=await res.json();
+    if(data && data.length>0){
+      return {lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon)};
+    }
+  }catch(e){ console.log('Geocode fail',e); }
+  return null;
+}
+
+window.mostrarEnMapaU=async function(query, lista=null){
   const mapDiv=document.getElementById('usuariosMap');
   if(!mapDiv) return;
   mapDiv.classList.add('show');
@@ -11882,26 +11903,86 @@ window.mostrarEnMapaU=function(query, lista=null){
     shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
     iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41]
   });
+  const greenIcon = L.icon({
+    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+    iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41]
+  });
+  const yellowIcon = L.icon({
+    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-yellow.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+    iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41]
+  });
+  function getIconForEstado(estado){
+    if(estado==='vencida') return redIcon;
+    if(estado==='porVencer') return yellowIcon;
+    return greenIcon;
+  }
   if(lista && lista.length){
+    // Mostrar cargando
+    L.popup().setLatLng(mapU.getCenter()).setContent(`<b>📍 ${query}</b><br/>${lista.length} usuarios<br/>🔴 Vencidas | 🟡 Por vencer | 🟢 Vigentes<br/><br/>Geocodificando direcciones para ubicación exacta...<br/><small>Esto puede tardar unos segundos</small>`).openOn(mapU);
+    
     const baseLat=mapU.getCenter().lat;
     const baseLng=mapU.getCenter().lng;
-    lista.forEach(u=>{
-      const offsetLat=(Math.random()-0.5)*0.02;
-      const offsetLng=(Math.random()-0.5)*0.02;
-      const marker=L.marker([baseLat+offsetLat, baseLng+offsetLng], {icon:redIcon}).addTo(mapU);
-      marker.bindPopup(`<b>${u.usuario}</b><br/>${u.domicilio||''}<br/>${u.localidad||''}<br/><a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((u.domicilio||'')+' '+(u.localidad||''))}" target="_blank">📍 Maps</a>`);
+    let geocodedCount=0;
+    
+    // Geocodificar cada dirección de forma secuencial para respetar rate limit de Nominatim (1 req/s)
+    for(let i=0;i<lista.length;i++){
+      const u=lista[i];
+      const fullAddr=`${u.domicilio||''} ${u.localidad||''} ${u.cp||''} Argentina`;
+      let pos=null;
+      try{
+        // Pequeño delay para no saturar Nominatim
+        if(i>0) await new Promise(r=>setTimeout(r, 1100));
+        pos=await geocodeAddressU(fullAddr);
+      }catch(e){ console.log('Geocode error',e); }
+      
+      let lat, lng;
+      if(pos){
+        lat=pos.lat;
+        lng=pos.lng;
+      }else{
+        // Fallback: offset aleatorio cerca del centro si no se pudo geocodificar
+        const offsetLat=(Math.random()-0.5)*0.02;
+        const offsetLng=(Math.random()-0.5)*0.02;
+        lat=baseLat+offsetLat;
+        lng=baseLng+offsetLng;
+      }
+      
+      const iconForEstado=getIconForEstado(u.estado);
+      const marker=L.marker([lat, lng], {icon:iconForEstado}).addTo(mapU);
+      const emoji=u.estado==='vencida'?'🔴':(u.estado==='porVencer'?'🟡':'🟢');
+      marker.bindPopup(`<b>${emoji} ${u.usuario}</b><br/>${u.domicilio||''}<br/>${u.localidad||''} ${u.cp||''}<br/>Vence: ${u.fVenceRaw||''}<br/>${u.producto||''}<br/><br/><a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((u.domicilio||'')+' '+(u.localidad||''))}" target="_blank">📍 Abrir en Google Maps</a>`);
       markersU.push(marker);
-    });
-    if(markersU.length>0){
-      const group=new L.featureGroup(markersU);
-      mapU.fitBounds(group.getBounds().pad(0.2));
+      geocodedCount++;
+      
+      // Ajustar vista cada 5 marcadores
+      if(geocodedCount%5===0 || geocodedCount===lista.length){
+        try{
+          const group=new L.featureGroup(markersU);
+          mapU.fitBounds(group.getBounds().pad(0.3));
+        }catch(e){}
+      }
     }
-    const texto=lista.map(u=>`🔴 ${u.usuario} - ${u.domicilio}`).slice(0,10).join('<br/>');
-    L.popup().setLatLng(mapU.getCenter()).setContent(`<b>📍 ${query}</b><br/>${lista.length} usuarios - 🔴 rojos<br/><br/>${texto}`).openOn(mapU);
+    
+    const texto=lista.map(u=>{
+      const emoji=u.estado==='vencida'?'🔴':(u.estado==='porVencer'?'🟡':'🟢');
+      return `${emoji} ${u.usuario} - ${u.domicilio} (${u.estado})`;
+    }).slice(0,10).join('<br/>');
+    L.popup().setLatLng(mapU.getCenter()).setContent(`<b>📍 ${query}</b><br/>${lista.length} usuarios<br/>🔴 Vencidas | 🟡 Por vencer | 🟢 Vigentes<br/><br/>${texto}${lista.length>10?'<br/>... y '+(lista.length-10)+' más':''}<br/><br/><small>📍 Direcciones geocodificadas con OSM para ubicación exacta (puede haber pequeñas variaciones)</small>`).openOn(mapU);
   }else{
-    const marker=L.marker(mapU.getCenter(), {icon:redIcon}).addTo(mapU);
-    markersU.push(marker);
-    L.popup().setLatLng(mapU.getCenter()).setContent(`<b>${query}</b><br/><a target=_blank href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}">Ver en Google Maps</a>`).openOn(mapU);
+    // Geocodificar dirección individual
+    (async()=>{
+      let pos=null;
+      try{ pos=await geocodeAddressU(query); }catch(e){}
+      let latLng=mapU.getCenter();
+      if(pos) latLng=[pos.lat, pos.lng];
+      const marker=L.marker(latLng, {icon:redIcon}).addTo(mapU);
+      markersU.push(marker);
+      marker.bindPopup(`<b>${query}</b><br/><a target=_blank href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}">Ver en Google Maps</a>`);
+      mapU.setView(latLng, 14);
+      L.popup().setLatLng(latLng).setContent(`<b>${query}</b><br/>📍 Ubicación exacta<br/><a target=_blank href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}">Ver en Google Maps</a>`).openOn(mapU);
+    })();
   }
   setTimeout(()=>{ mapU.invalidateSize(); },300);
 };
