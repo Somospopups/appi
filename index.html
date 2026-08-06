@@ -3303,7 +3303,7 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
     <button class="ds-btn" data-ds="view-planning" onclick="showView('view-planning'); renderPlanningTools();"><span>🗓️</span> Planificación</button>
     <button class="ds-btn" data-ds="view-history" onclick="showView('view-history'); renderHistory();"><span>📜</span> Historial</button>
   </nav>
-  <div class="ds-foot">APPI · v114 · fix boton menu alineado todas pantallas + textos borrados-movidos + upload label nativo 100% funcional</div>
+  <div class="ds-foot">APPI · v115 · FIX MENU alineado 4px todas pantallas + upload 100% funcional con feedback + textos borrados</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -12705,40 +12705,59 @@ window.mostrarEnMapaU=async function(query, lista=null){
 
 
 function cargarArchivoU(file){
-  const reader=new FileReader();
-  reader.onload=e=>{
-    try{
-      const data=new Uint8Array(e.target.result);
-      const wb=XLSX.read(data,{type:'array'});
-      let mejor={data:[], debug:''};
-      wb.SheetNames.forEach(name=>{
-        const ws=wb.Sheets[name];
-        const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
-        const res=parseRowsU(rows);
-        if(res.data.length>mejor.data.length) mejor=res;
-      });
-      const parsed=mejor.data;
-      const debug=mejor.debug;
-      const dbgEl=document.getElementById('usuariosDebug');
-      if(dbgEl) dbgEl.textContent=debug;
-      if(parsed.length===0){
-        alert('No se detectaron usuarios. Revisá formato');
-        if(dbgEl) dbgEl.classList.add('show');
-        return;
-      }
-      usuariosU=parsed;
-      localStorage.setItem('usuarios_garantias', JSON.stringify(usuariosU.map(u=>({...u, fVence:u.fVence?u.fVence.toISOString():null}))));
-      mostrarDashboardU();
-      const info=document.getElementById('usuariosFileInfo');
-      if(info){ info.style.display='block'; info.innerHTML=`✅ <b>${parsed.length} usuarios</b> cargados`; }
-      const btnClear=document.getElementById('usuariosBtnClear');
-      if(btnClear) btnClear.style.display='inline-flex';
-      if(dbgEl) dbgEl.classList.remove('show');
-    }catch(err){
-      alert('Error: '+err.message);
+  try{
+    const infoEl=document.getElementById('usuariosFileInfo');
+    if(infoEl){ infoEl.style.display='block'; infoEl.innerHTML=`⏳ Leyendo <b>${file.name}</b> (${(file.size/1024).toFixed(1)} KB)...`; }
+    if(typeof XLSX==='undefined'){
+      alert('⚠️ Librería Excel no cargada. Recargá la página con internet.');
+      if(infoEl) infoEl.innerHTML=`❌ Error: librería XLSX no cargada - recargá con internet`;
+      return;
     }
-  };
-  reader.readAsArrayBuffer(file);
+    const reader=new FileReader();
+    reader.onerror=(e)=>{ alert('Error leyendo archivo'); console.error(e); };
+    reader.onload=e=>{
+      try{
+        const data=new Uint8Array(e.target.result);
+        const wb=XLSX.read(data,{type:'array'});
+        let mejor={data:[], debug:''};
+        wb.SheetNames.forEach(name=>{
+          const ws=wb.Sheets[name];
+          const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
+          const res=parseRowsU(rows);
+          if(res.data.length>mejor.data.length) mejor=res;
+        });
+        const parsed=mejor.data;
+        const debug=mejor.debug;
+        const dbgEl=document.getElementById('usuariosDebug');
+        if(dbgEl) dbgEl.textContent=debug;
+        if(parsed.length===0){
+          alert('No se detectaron usuarios. Revisá formato\n\nDebug:\n'+debug);
+          if(infoEl) infoEl.innerHTML=`❌ No se detectaron usuarios en <b>${file.name}</b><br/><small>${debug.substring(0,200)}</small>`;
+          if(dbgEl) dbgEl.style.display='block';
+          return;
+        }
+        usuariosU=parsed;
+        try{ localStorage.setItem('usuarios_garantias', JSON.stringify(usuariosU.map(u=>({...u, fVence:u.fVence?u.fVence.toISOString():null})))); }catch(err){ console.log('localStorage fail',err); }
+        mostrarDashboardU();
+        const info=document.getElementById('usuariosFileInfo');
+        if(info){ info.style.display='block'; info.innerHTML=`✅ <b>${parsed.length} usuarios</b> cargados de <b>${file.name}</b> · ${new Date().toLocaleString('es-AR')}`; }
+        const btnClear=document.getElementById('usuariosBtnClear');
+        if(btnClear) btnClear.style.display='inline-flex';
+        if(dbgEl) dbgEl.style.display='none';
+        if(typeof haptic==='function') haptic(20);
+        if(typeof showToast==='function') showToast(`✅ ${parsed.length} usuarios cargados`);
+      }catch(err){
+        console.error(err);
+        alert('Error procesando Excel: '+err.message+'\n\nProbá con otro archivo o revisá que sea .xls/.xlsx válido');
+        const info=document.getElementById('usuariosFileInfo');
+        if(info) info.innerHTML=`❌ Error: ${err.message}`;
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  }catch(err){
+    alert('Error inesperado: '+err.message);
+    console.error(err);
+  }
 }
 function mostrarDashboardU(){
   const dash=document.getElementById('usuariosDashboard');
