@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+<script>window._pendingFile=null; window.cargarArchivoU = function(f){ console.log('cargarArchivoU early stub, queuing', f?.name); window._pendingFile=f; if(window._pendingFile) setTimeout(()=>{ if(window.cargarArchivoUReal && window._pendingFile){ const file=window._pendingFile; window._pendingFile=null; window.cargarArchivoUReal(file); } }, 800); };</script>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -3303,7 +3304,7 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
     <button class="ds-btn" data-ds="view-planning" onclick="showView('view-planning'); renderPlanningTools();"><span>🗓️</span> Planificación</button>
     <button class="ds-btn" data-ds="view-history" onclick="showView('view-history'); renderHistory();"><span>📜</span> Historial</button>
   </nav>
-  <div class="ds-foot">APPI · v121 · Tip F5 file chooser no actualizado es cache del sistema - arrastrar siempre actualizado + upload 100% + menu bloqueado</div>
+  <div class="ds-foot">APPI · v122 · FIX DEFINITIVO MOBILE cargarArchivoU not defined - window.cargarArchivoU + stub + pending + inline window</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4030,7 +4031,7 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
         <h3 style="margin:8px 0 4px">Cargar archivo de Garantías / Usuarios</h3>
       </div>
       <label class="upload-zone" id="usuariosDropZone" for="usuariosFileInput" role="button" tabindex="0" aria-label="Cargar archivo Excel" style="display:block;cursor:pointer;position:relative;overflow:hidden">
-        <input type="file" id="usuariosFileInput" accept=".xls,.xlsx,.csv,.ods" onchange="console.log('📂 onchange inline', this.files[0]?.name); try{ if(this.files[0]) cargarArchivoU(this.files[0]); }catch(e){ console.error(e); alert('Error: '+e.message); }" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;z-index:2">
+        <input type="file" id="usuariosFileInput" accept=".xls,.xlsx,.csv,.ods" onchange="console.log('📂 onchange inline', this.files[0]?.name); try{ if(this.files[0]){ if(window.cargarArchivoU) window.window.window.cargarArchivoU(this.files[0]); else if(window.cargarArchivoU) window.window.window.cargarArchivoU(this.files[0]); else alert('App cargando... esperá 2 seg y probá de nuevo'); } }catch(e){ console.error(e); alert('Error: '+e.message+'\n\nProbá con el botón de emergencia de abajo'); }" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;z-index:2">
         <div style="position:relative;z-index:1;pointer-events:none">
           <div style="font-size:26px">📤</div>
           <b>Arrastrá tu archivo acá o clic para elegir</b>
@@ -4041,7 +4042,7 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
       <div id="usuariosFileInfo" style="display:none;margin-top:12px;padding:12px;border-radius:14px;background:rgba(58,208,164,0.14);backdrop-filter:blur(10px);border:1px solid rgba(58,208,164,0.18);font-size:12px;font-weight:600"></div>
       <div style="margin-top:12px;padding:10px;border-radius:10px;background:rgba(0,113,227,0.06);border:1px dashed rgba(0,113,227,0.20);text-align:center">
         <small style="color:#3d63c9;font-weight:600">¿No abre? Probá con este botón de emergencia:</small><br/>
-        <input type="file" id="usuariosFileInputBackup" accept=".xls,.xlsx,.csv,.ods" onchange="console.log('📂 backup onchange', this.files[0]?.name); try{ if(this.files[0]) cargarArchivoU(this.files[0]); }catch(e){ alert(e.message); }" style="margin-top:8px;font-size:12px">
+        <input type="file" id="usuariosFileInputBackup" accept=".xls,.xlsx,.csv,.ods" onchange="console.log('📂 backup onchange', this.files[0]?.name); try{ if(this.files[0]) window.window.cargarArchivoU(this.files[0]); }catch(e){ alert(e.message); }" style="margin-top:8px;font-size:12px">
       </div>
       <div id="usuariosDebug" style="display:none;margin-top:8px;padding:10px;border-radius:12px;background:rgba(0,0,0,0.05);font-size:11px;font-family:monospace;white-space:pre-wrap;max-height:200px;overflow:auto"></div>
       <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
@@ -12799,6 +12800,12 @@ function cargarArchivoU(file){
   }
 }
 window.cargarArchivoU = cargarArchivoU;
+window.cargarArchivoUReal = cargarArchivoU;
+if(window._pendingFile){
+  console.log('Procesando archivo pendiente', window._pendingFile.name);
+  const pf=window._pendingFile; window._pendingFile=null;
+  setTimeout(()=>{ try{ cargarArchivoU(pf); }catch(e){ console.error(e); } }, 300);
+}
 function mostrarDashboardU(){
   const dash=document.getElementById('usuariosDashboard');
   if(dash) dash.style.display='block';
