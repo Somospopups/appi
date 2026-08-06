@@ -3994,14 +3994,10 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
 
     <div class="glass card keep-add">
       <input type="text" id="keepTitle" class="k-title-input" placeholder="Título..." style="width:100%;border:none;background:transparent;outline:none;font-family:inherit">
-      <textarea id="keepText" placeholder="Escribí tu nota..." style="width:100%;border:none;background:transparent;outline:none;font-family:inherit;resize:none;min-height:60px"></textarea>
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px">
-        <div style="display:flex;align-items:center;gap:8px">
-          <div id="keepColorPreview" style="width:22px;height:22px;border-radius:50%;background:#fff475;border:1px solid rgba(0,0,0,0.1)"></div>
-          <div id="keepColors" class="keep-colors"></div>
-          <input type="hidden" id="keepColor" value="#fff475">
-        </div>
-        <button class="btn btn-primary" style="padding:8px 14px;font-size:12px" onclick="window.addKeep && window.addKeep()">💾 Guardar</button>
+      <textarea id="keepText" placeholder="Escribí tu nota..." style="width:100%;border:none;background:transparent;outline:none;font-family:inherit;resize:none;min-height:70px"></textarea>
+      <div style="display:flex;justify-content:flex-end;margin-top:10px">
+        <input type="hidden" id="keepColor" value="#fff475">
+        <button class="btn btn-primary" style="padding:10px 18px;font-size:13px" onclick="window.addKeep && window.addKeep()">💾 Guardar</button>
       </div>
     </div>
 
@@ -11023,6 +11019,15 @@ body.dark .rec-item .info small{color:#a0a0b0}
 .keep-add{padding:14px;border-radius:18px;background:rgba(255,255,255,0.7);border:1.5px dashed rgba(80,90,130,0.25);cursor:text}
 .keep-add textarea{width:100%;border:none;background:transparent;resize:none;outline:none;font-family:inherit;font-size:14px;min-height:60px}
 .keep-add .k-title-input{font-weight:800;font-size:15px;margin-bottom:6px}
+
+body.dark .keep-add{background:rgba(30,30,50,0.6);border-color:rgba(255,255,255,0.08)}
+body.dark .keep-add textarea, body.dark .keep-add .k-title-input{color:#ffffff !important}
+body.dark .keep-add textarea::placeholder, body.dark .keep-add .k-title-input::placeholder{color:rgba(255,255,255,0.5)}
+body.dark .keep-note .k-title, body.dark .keep-note .k-text{color:#ffffff !important}
+body.dark .keep-note{border-color:rgba(255,255,255,0.12);color:#ffffff}
+body.dark .keep-note .k-foot{color:rgba(255,255,255,0.6)}
+body.dark .search-box input{color:#ffffff !important}
+
 </style>
 
 <script>
@@ -11376,15 +11381,49 @@ window.addKeep=function(){
   const textEl=document.getElementById('keepText');
   const title=titleEl?.value?.trim()||'';
   const text=textEl?.value?.trim()||'';
-  if(!title && !text){ alert('Escribí algo'); return; }
-  const color=document.getElementById('keepColor')?.value||'#fff475';
+  if(!title && !text){ 
+    if(typeof modal!=='undefined' && modal.open){
+      modal.open({icon:'⚠️', title:'Falta contenido', html:'<p>Escribí título o nota para guardar</p>'});
+    } else { alert('Escribí algo'); }
+    return; 
+  }
+  // Guardar temporal y mostrar popup de color
+  window._pendingKeepTitle=title;
+  window._pendingKeepText=text;
+  window._selectedKeepColor=document.getElementById('keepColor')?.value||'#fff475';
+  const COLORS=['#fff475','#fbbc04','#f28b82','#aecbfa','#ccff90','#d7aefb','#ffcc80','#e8eaed','#ff8f6b','#a0a0b0'];
+  const colorsHtml=COLORS.map(c=>`<div class="k-color-dot" style="background:${c}; width:36px;height:36px; border:${(window._selectedKeepColor===c?'3px solid #1c1c1e':'2px solid rgba(255,255,255,0.9)')}; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.15)" onclick="window._selectedKeepColor='${c}'; document.querySelectorAll('#colorPickerPopup .k-color-dot').forEach(d=>d.style.border='2px solid rgba(255,255,255,0.9)'); this.style.border='3px solid #1c1c1e';"></div>`).join('');
+  const htmlPopup=`
+    <div style="text-align:center">
+      <p style="font-size:13px;color:#5c5c66;margin:0 0 12px">Elegí un color para tu nota:</p>
+      <div id="colorPickerPopup" style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:16px 0">${colorsHtml}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px">
+        <button class="btn btn-secondary" onclick="modal.close()" style="padding:12px">Cancelar</button>
+        <button class="btn btn-primary" onclick="window.confirmKeepColor && window.confirmKeepColor()" style="padding:12px">💾 Guardar</button>
+      </div>
+    </div>
+  `;
+  if(typeof modal!=='undefined' && modal.open){
+    modal.open({icon:'🎨', iconBg:'linear-gradient(135deg,#fbbf24,#f59e0b)', title:'Color de nota', sub:'Elegí un color', html:htmlPopup});
+  } else {
+    // Fallback directo
+    window.confirmKeepColor();
+  }
+};
+window.confirmKeepColor=function(){
+  const title=window._pendingKeepTitle||'';
+  const text=window._pendingKeepText||'';
+  const color=window._selectedKeepColor||'#fff475';
   const notas=loadNotas();
   notas.unshift({id:Date.now().toString(), title, text, color, pinned:false});
   saveNotas(notas);
-  if(titleEl) titleEl.value=''; if(textEl) textEl.value='';
+  const titleEl=document.getElementById('keepTitle'); if(titleEl) titleEl.value='';
+  const textEl=document.getElementById('keepText'); if(textEl) textEl.value='';
   renderKeep();
+  try{ modal.close(); }catch(e){}
   if(typeof showToast==='function') showToast('Nota guardada 📝');
 };
+
 window.editKeep=function(id){ window.openKeepModal(id); };
 window.openKeepModal=function(id){ openKeepModal(id); };
 window.delKeep=function(id){
