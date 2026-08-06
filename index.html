@@ -3303,7 +3303,7 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
     <button class="ds-btn" data-ds="view-planning" onclick="showView('view-planning'); renderPlanningTools();"><span>🗓️</span> Planificación</button>
     <button class="ds-btn" data-ds="view-history" onclick="showView('view-history'); renderHistory();"><span>📜</span> Historial</button>
   </nav>
-  <div class="ds-foot">APPI · v116 · FIX upload no arroja datos - debug + feedback + XLSX check + robust parser</div>
+  <div class="ds-foot">APPI · v117 · FIX URGENTE upload con input covering label 100% nativo + feedback inmediato + debug visible</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4029,11 +4029,14 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
         <div style="font-size:32px">📂</div>
         <h3 style="margin:8px 0 4px">Cargar archivo de Garantías / Usuarios</h3>
       </div>
-      <label class="upload-zone" id="usuariosDropZone" for="usuariosFileInput" role="button" tabindex="0" aria-label="Cargar archivo Excel" style="display:block;cursor:pointer">
-        <input type="file" id="usuariosFileInput" accept=".xls,.xlsx,.csv,.ods" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0">
-        <div style="font-size:26px">📤</div>
-        <b>Arrastrá tu archivo acá o clic para elegir</b>
-        <div style="margin-top:14px"><span class="btn btn-secondary" style="pointer-events:none">Elegir archivo</span></div>
+      <label class="upload-zone" id="usuariosDropZone" for="usuariosFileInput" role="button" tabindex="0" aria-label="Cargar archivo Excel" style="display:block;cursor:pointer;position:relative;overflow:hidden">
+        <input type="file" id="usuariosFileInput" accept=".xls,.xlsx,.csv,.ods" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;z-index:2">
+        <div style="position:relative;z-index:1;pointer-events:none">
+          <div style="font-size:26px">📤</div>
+          <b>Arrastrá tu archivo acá o clic para elegir</b>
+          <div style="margin-top:14px"><span class="btn btn-secondary">Elegir archivo</span></div>
+          <small style="display:block;margin-top:8px;color:#6b6b76;font-size:11px">Si no abre, probá desactivar bloqueador de anuncios</small>
+        </div>
       </label>
       <div id="usuariosFileInfo" style="display:none;margin-top:12px;padding:12px;border-radius:14px;background:rgba(58,208,164,0.14);backdrop-filter:blur(10px);border:1px solid rgba(58,208,164,0.18);font-size:12px;font-weight:600"></div>
       <div id="usuariosDebug" style="display:none;margin-top:8px;padding:10px;border-radius:12px;background:rgba(0,0,0,0.05);font-size:11px;font-family:monospace;white-space:pre-wrap;max-height:200px;overflow:auto"></div>
