@@ -3303,7 +3303,7 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
     <button class="ds-btn" data-ds="view-planning" onclick="showView('view-planning'); renderPlanningTools();"><span>🗓️</span> Planificación</button>
     <button class="ds-btn" data-ds="view-history" onclick="showView('view-history'); renderHistory();"><span>📜</span> Historial</button>
   </nav>
-  <div class="ds-foot">APPI · v117 · FIX URGENTE upload con input covering label 100% nativo + feedback inmediato + debug visible</div>
+  <div class="ds-foot">APPI · v118 · FIX URGENTE upload con input onchange inline + backup input emergencia + feedback + menu bloqueado</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4030,7 +4030,7 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
         <h3 style="margin:8px 0 4px">Cargar archivo de Garantías / Usuarios</h3>
       </div>
       <label class="upload-zone" id="usuariosDropZone" for="usuariosFileInput" role="button" tabindex="0" aria-label="Cargar archivo Excel" style="display:block;cursor:pointer;position:relative;overflow:hidden">
-        <input type="file" id="usuariosFileInput" accept=".xls,.xlsx,.csv,.ods" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;z-index:2">
+        <input type="file" id="usuariosFileInput" accept=".xls,.xlsx,.csv,.ods" onchange="console.log('📂 onchange inline', this.files[0]?.name); try{ if(this.files[0]) cargarArchivoU(this.files[0]); }catch(e){ console.error(e); alert('Error: '+e.message); }" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;z-index:2">
         <div style="position:relative;z-index:1;pointer-events:none">
           <div style="font-size:26px">📤</div>
           <b>Arrastrá tu archivo acá o clic para elegir</b>
@@ -4039,6 +4039,10 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
         </div>
       </label>
       <div id="usuariosFileInfo" style="display:none;margin-top:12px;padding:12px;border-radius:14px;background:rgba(58,208,164,0.14);backdrop-filter:blur(10px);border:1px solid rgba(58,208,164,0.18);font-size:12px;font-weight:600"></div>
+      <div style="margin-top:12px;padding:10px;border-radius:10px;background:rgba(0,113,227,0.06);border:1px dashed rgba(0,113,227,0.20);text-align:center">
+        <small style="color:#3d63c9;font-weight:600">¿No abre? Probá con este botón de emergencia:</small><br/>
+        <input type="file" id="usuariosFileInputBackup" accept=".xls,.xlsx,.csv,.ods" onchange="console.log('📂 backup onchange', this.files[0]?.name); try{ if(this.files[0]) cargarArchivoU(this.files[0]); }catch(e){ alert(e.message); }" style="margin-top:8px;font-size:12px">
+      </div>
       <div id="usuariosDebug" style="display:none;margin-top:8px;padding:10px;border-radius:12px;background:rgba(0,0,0,0.05);font-size:11px;font-family:monospace;white-space:pre-wrap;max-height:200px;overflow:auto"></div>
       <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
         <button type="button" class="btn btn-secondary" id="usuariosBtnClear" style="display:none">🗑️ Limpiar lista</button>
