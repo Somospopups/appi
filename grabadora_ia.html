@@ -237,8 +237,10 @@ async function startRecording(){
     document.getElementById('btnStop').disabled=false;
     // iniciar transcripción
     recognition=initRecognition();
-    finalTranscript=elTrans.value||'';
-    if(recognition){
+    finalTranscript=(el('transcript')?.value||elTrans?.value||'')||'';
+    const chk=document.getElementById('chkLiveTrans');
+    const shouldTranscribe=chk ? chk.checked : false;
+    if(shouldTranscribe && recognition){
       try{ recognition.start(); }catch(_){}
     }
     showStatus('🎙️ Grabando reunión...','ok');
