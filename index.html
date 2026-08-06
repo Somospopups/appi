@@ -3303,7 +3303,7 @@ body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.0
     <button class="ds-btn" data-ds="view-planning" onclick="showView('view-planning'); renderPlanningTools();"><span>🗓️</span> Planificación</button>
     <button class="ds-btn" data-ds="view-history" onclick="showView('view-history'); renderHistory();"><span>📜</span> Historial</button>
   </nav>
-  <div class="ds-foot">APPI · v108 · fix upload + sin demo-debug + sin tabs</div>
+  <div class="ds-foot">APPI · v109 · geocode preciso sin offset aleatorio + cache + exacto</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -12330,16 +12330,78 @@ window.verVecinosU=function(localidad){
   }
 };
 
-async function geocodeAddressU(query){
+// ===== GEOCODIFICACION PRECISA - CACHE + MULTIPLES INTENTOS - SIN OFFSET ALEATORIO =====
+const GEO_CACHE_KEY_U='geo_cache_usuarios_v2';
+function getGeoCacheU(){
+  try{ return JSON.parse(localStorage.getItem(GEO_CACHE_KEY_U)||'{}'); }catch(e){ return {}; }
+}
+function setGeoCacheU(cache){
+  try{ localStorage.setItem(GEO_CACHE_KEY_U, JSON.stringify(cache)); }catch(e){}
+}
+function normCacheKeyU(s){ return (s||'').toString().toLowerCase().trim().replace(/\s+/g,' '); }
+
+async function geocodeTryU(q){
+  const key=normCacheKeyU(q);
+  const cache=getGeoCacheU();
+  if(cache[key]){
+    return cache[key];
+  }
   try{
-    const url='https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=ar&q='+encodeURIComponent(query);
-    const res=await fetch(url, {headers:{'Accept-Language':'es'}});
+    const url='https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=ar&addressdetails=1&q='+encodeURIComponent(q);
+    const res=await fetch(url, {headers:{'Accept-Language':'es-AR,es', 'Accept':'application/json'}});
     if(!res.ok) return null;
     const data=await res.json();
     if(data && data.length>0){
-      return {lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon)};
+      const r={lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon), display_name: data[0].display_name, precise: true, query: q};
+      cache[key]=r;
+      setGeoCacheU(cache);
+      return r;
     }
-  }catch(e){ console.log('Geocode fail',e); }
+  }catch(e){ console.log('Geocode try fail',q,e); }
+  return null;
+}
+
+async function geocodeAddressU(query){
+  if(!query) return null;
+  let res=await geocodeTryU(query);
+  if(res) return res;
+  if(!/c[oó]rdoba/i.test(query)){
+    res=await geocodeTryU(query+', Córdoba, Argentina');
+    if(res) return res;
+  }
+  res=await geocodeTryU(query+', Argentina');
+  return res;
+}
+
+async function geocodePreciseForUser(u){
+  const dom=(u.domicilio||'').trim();
+  const loc=(u.localidad||'').trim();
+  const cp=(u.cp||'').trim();
+  const queries=[];
+  const hasDom=dom.length>3;
+  const hasLoc=loc.length>2;
+  const hasCp=cp.length>2;
+  const isBarrio=/barrio/i.test(loc);
+
+  if(hasDom && hasLoc && hasCp) queries.push(`${dom}, ${loc}, ${cp}, Argentina`);
+  if(hasDom && hasLoc) queries.push(`${dom}, ${loc}, Argentina`);
+  if(hasDom && hasLoc && isBarrio) queries.push(`${dom}, ${loc}, Córdoba, Argentina`);
+  if(hasDom && hasCp) queries.push(`${dom}, ${cp}, Argentina`);
+  if(hasDom) queries.push(`${dom}, ${loc? loc+', ':''}Córdoba, Argentina`);
+  if(hasDom) queries.push(`${dom}, Argentina`);
+  if(hasLoc && hasCp) queries.push(`${loc}, ${cp}, Argentina`);
+  if(hasLoc && isBarrio) queries.push(`${loc}, Córdoba, Argentina`);
+  if(hasLoc) queries.push(`${loc}, Argentina`);
+
+  for(const q of queries){
+    if(q.length<8) continue;
+    const r=await geocodeTryU(q);
+    if(r){
+      const precise = hasDom && q.toLowerCase().includes(dom.toLowerCase().substring(0,8));
+      return {...r, precise: !!precise, query: q, fallback: !precise};
+    }
+    await new Promise(res=>setTimeout(res, 200));
+  }
   return null;
 }
 
@@ -12353,9 +12415,8 @@ window.mostrarEnMapaU=async function(query, lista=null){
     try{
       mapU=L.map('usuariosMap',{zoomControl:true}).setView([-31.4201,-64.1888], 12);
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap', maxZoom:19}).addTo(mapU);
-    }catch(e){ console.log('L.map init fail',e); }
+    }catch(e){ console.log('map init fail',e); }
   }
-  // Fix visual: invalidar tamaño varias veces por si el contenedor estaba oculto
   const doInvalidate=()=>{ try{ if(mapU) mapU.invalidateSize(true); }catch(e){} };
   setTimeout(doInvalidate,100);
   setTimeout(doInvalidate,350);
@@ -12384,77 +12445,79 @@ window.mostrarEnMapaU=async function(query, lista=null){
     return greenIcon;
   }
   if(lista && lista.length){
-    // Mostrar cargando
-    L.popup().setLatLng(mapU.getCenter()).setContent(`<b>📍 ${query}</b><br/>${lista.length} usuarios<br/>🔴 Vencidas | 🟡 Por vencer | 🟢 Vigentes<br/><br/>Geocodificando direcciones para ubicación exacta...<br/><small>Esto puede tardar unos segundos</small>`).openOn(mapU);
-    
-    const baseLat=mapU.getCenter().lat;
-    const baseLng=mapU.getCenter().lng;
-    let geocodedCount=0;
-    
-    // Geocodificar cada dirección de forma secuencial para respetar rate limit de Nominatim (1 req/s)
+    try{
+      L.popup().setLatLng(mapU.getCenter()).setContent(`<b>📍 ${query}</b><br/>${lista.length} usuarios<br/>🔴 Vencidas | 🟡 Por vencer | 🟢 Vigentes<br/><br/>⏳ Geocodificando preciso 0/${lista.length}...<br/><small>OSM Nominatim - ubicación exacta con cache</small>`).openOn(mapU);
+    }catch(e){}
+    let geoOk=0, geoFail=0, geoAprox=0;
     for(let i=0;i<lista.length;i++){
       const u=lista[i];
-      const fullAddr=`${u.domicilio||''} ${u.localidad||''} ${u.cp||''} Argentina`;
       let pos=null;
       try{
-        // Pequeño delay para no saturar Nominatim
         if(i>0) await new Promise(r=>setTimeout(r, 1100));
-        pos=await geocodeAddressU(fullAddr);
-      }catch(e){ console.log('Geocode error',e); }
-      
-      let lat, lng;
-      if(pos){
-        lat=pos.lat;
-        lng=pos.lng;
-      }else{
-        // Fallback: offset aleatorio cerca del centro si no se pudo geocodificar
-        const offsetLat=(Math.random()-0.5)*0.02;
-        const offsetLng=(Math.random()-0.5)*0.02;
-        lat=baseLat+offsetLat;
-        lng=baseLng+offsetLng;
+        pos=await geocodePreciseForUser(u);
+      }catch(e){ console.log('Geocode precise error',e); }
+      if(!pos){
+        geoFail++;
+        try{
+          L.popup().setLatLng(mapU.getCenter()).setContent(`<b>📍 ${query}</b><br/>${lista.length} usuarios<br/>🔴 ${lista.filter(x=>x.estado==='vencida').length} venc | 🟡 ${lista.filter(x=>x.estado==='porVencer').length} por venc | 🟢 ${lista.filter(x=>x.estado==='vigente').length} vig<br/><br/>⏳ ${i+1}/${lista.length}... ✅ ${geoOk} exactas | 🟡 ${geoAprox} barrio | ❌ ${geoFail} sin ubic<br/><small>${u.domicilio||''}</small>`).openOn(mapU);
+        }catch(e){}
+        continue;
       }
-      
+      if(pos.fallback) geoAprox++; else geoOk++;
       const iconForEstado=getIconForEstado(u.estado);
-      const marker=L.marker([lat, lng], {icon:iconForEstado}).addTo(mapU);
+      const marker=L.marker([pos.lat, pos.lng], {icon:iconForEstado}).addTo(mapU);
       const emoji=u.estado==='vencida'?'🔴':(u.estado==='porVencer'?'🟡':'🟢');
-      marker.bindPopup(`<b>${emoji} ${u.usuario}</b><br/>${u.domicilio||''}<br/>${u.localidad||''} ${u.cp||''}<br/>Vence: ${u.fVenceRaw||''}<br/>${u.producto||''}<br/><br/><a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((u.domicilio||'')+' '+(u.localidad||''))}" target="_blank">📍 Abrir en Google Maps</a>`);
+      const precisionTxt=pos.fallback? '<small style="color:#a3670b">📍 Aproximada (solo barrio)</small>' : '<small style="color:#1d7a5c">✅ Exacta</small>';
+      const queryTxt=pos.query? `<small style="color:#6b6b76">🔍 ${pos.query}</small>`:'';
+      marker.bindPopup(`<b>${emoji} ${u.usuario}</b><br/>${u.domicilio||''}<br/>${u.localidad||''} ${u.cp||''}<br/>Vence: ${u.fVenceRaw||''}<br/>${u.producto||''}<br/>${precisionTxt}<br/>${queryTxt}<br/><small>${pos.display_name||''}</small><br/><br/><a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((u.domicilio||'')+' '+(u.localidad||''))}" target="_blank">📍 Google</a> | <a href="https://www.google.com/maps/dir/?api=1&destination=${pos.lat},${pos.lng}" target="_blank">🧭 Llegar</a>`);
       markersU.push(marker);
-      geocodedCount++;
-      
-      // Ajustar vista cada 5 marcadores
-      if(geocodedCount%5===0 || geocodedCount===lista.length){
+      if(markersU.length%3===0 || i===lista.length-1){
         try{
           const group=new L.featureGroup(markersU);
-          mapU.fitBounds(group.getBounds().pad(0.3));
+          mapU.fitBounds(group.getBounds().pad(0.25));
         }catch(e){}
       }
+      try{
+        L.popup().setLatLng(mapU.getCenter()).setContent(`<b>📍 ${query}</b><br/>${lista.length} usuarios<br/>⏳ ${i+1}/${lista.length}... ✅ ${geoOk} | 🟡 ${geoAprox} | ❌ ${geoFail}<br/><small>OSM cache + preciso</small>`).openOn(mapU);
+      }catch(e){}
     }
-    
-    const texto=lista.map(u=>{
+    const texto=lista.slice(0,8).map(u=>{
       const emoji=u.estado==='vencida'?'🔴':(u.estado==='porVencer'?'🟡':'🟢');
-      return `${emoji} ${u.usuario} - ${u.domicilio} (${u.estado})`;
-    }).slice(0,10).join('<br/>');
-    L.popup().setLatLng(mapU.getCenter()).setContent(`<b>📍 ${query}</b><br/>${lista.length} usuarios<br/>🔴 Vencidas | 🟡 Por vencer | 🟢 Vigentes<br/><br/>${texto}${lista.length>10?'<br/>... y '+(lista.length-10)+' más':''}<br/><br/><small>📍 Direcciones geocodificadas con OSM para ubicación exacta (puede haber pequeñas variaciones)</small>`).openOn(mapU);
+      return `${emoji} ${u.usuario} - ${u.domicilio||''}`;
+    }).join('<br/>');
+    try{
+      L.popup().setLatLng(mapU.getCenter()).setContent(`<b>📍 ${query}</b><br/>${lista.length} usuarios | ✅ ${geoOk} exactas | 🟡 ${geoAprox} aprox | ❌ ${geoFail} fallos<br/><br/>${texto}${lista.length>8?'<br/>... y '+(lista.length-8)+' más':''}<br/><br/><small>✅ = calle exacta | 🟡 = barrio | Sin offset aleatorio</small>`).openOn(mapU);
+    }catch(e){}
   }else{
-    // Geocodificar dirección individual
-    (async()=>{
-      let pos=null;
-      try{ pos=await geocodeAddressU(query); }catch(e){}
-      let latLng=mapU.getCenter();
-      if(pos) latLng=[pos.lat, pos.lng];
+    let pos=null;
+    try{ pos=await geocodeAddressU(query); }catch(e){}
+    if(!pos){
+      try{ pos=await geocodeTryU(query+', Córdoba, Argentina'); }catch(e){}
+    }
+    if(!pos){
+      try{ pos=await geocodeTryU(query+', Argentina'); }catch(e){}
+    }
+    let latLng;
+    if(pos){
+      latLng=[pos.lat, pos.lng];
       const marker=L.marker(latLng, {icon:redIcon}).addTo(mapU);
       markersU.push(marker);
-      marker.bindPopup(`<b>${query}</b><br/><a target=_blank href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}">Ver en Google Maps</a>`);
-      mapU.setView(latLng, 14);
-      L.popup().setLatLng(latLng).setContent(`<b>${query}</b><br/>📍 Ubicación exacta<br/><a target=_blank href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}">Ver en Google Maps</a>`).openOn(mapU);
-      setTimeout(()=>{ try{ mapU.invalidateSize(); }catch(e){} },400);
-      setTimeout(()=>{ try{ mapU.invalidateSize(); }catch(e){} },1000);
-    })();
+      marker.bindPopup(`<b>${query}</b><br/>✅ Exacta<br/><small>${pos.display_name||''}</small><br/><a target=_blank href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}">Google</a> | <a target=_blank href="https://www.google.com/maps/dir/?api=1&destination=${pos.lat},${pos.lng}">Llegar</a>`);
+      mapU.setView(latLng, 17);
+      try{ L.popup().setLatLng(latLng).setContent(`<b>${query}</b><br/>✅ ${pos.display_name||'Exacta'}<br/><a target=_blank href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}">Google</a> | <a target=_blank href="https://www.google.com/maps/dir/?api=1&destination=${pos.lat},${pos.lng}">Llegar</a>`).openOn(mapU); }catch(e){}
+    }else{
+      latLng=mapU.getCenter();
+      const marker=L.marker(latLng, {icon:redIcon}).addTo(mapU);
+      markersU.push(marker);
+      marker.bindPopup(`<b>${query}</b><br/>⚠️ Sin geocodificación<br/><a target=_blank href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}">Buscar en Google</a>`);
+      mapU.setView(latLng, 13);
+      try{ L.popup().setLatLng(latLng).setContent(`<b>${query}</b><br/>⚠️ Sin geocodificación exacta<br/><a target=_blank href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}">Google</a>`).openOn(mapU); }catch(e){}
+    }
   }
-  // ultimo fix tamaño
   setTimeout(()=>{ try{ if(mapU) mapU.invalidateSize(true); }catch(e){} },500);
   setTimeout(()=>{ try{ if(mapU) mapU.invalidateSize(true); }catch(e){} },1200);
 };
+
 
 function cargarArchivoU(file){
   const reader=new FileReader();
