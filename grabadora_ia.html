@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grabadora IA Universal - Sin ruido</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;padding:0;font-family:system-ui,sans-serif;min-height:100vh;background:linear-gradient(160deg,#eaf1ff 0%,#f5ecff 45%,#ffe9f2 100%);background-attachment:fixed;color:#1c1c1e}
+.app{max-width:520px;margin:0 auto;padding:16px 12px 100px}
+.glass{background:rgba(255,255,255,0.62);backdrop-filter:blur(20px) saturate(180%);border:1px solid rgba(255,255,255,0.75);border-radius:22px;box-shadow:0 8px 30px rgba(80,90,130,0.10)}
+.card{padding:18px;margin-bottom:14px}
+.rec-card{text-align:center;padding:24px 18px}
+.rec-visual{width:120px;height:120px;margin:0 auto 16px;border-radius:50%;background:linear-gradient(135deg,#5b8def,#a06bff);display:grid;place-items:center;color:#fff;font-size:48px;position:relative;box-shadow:0 12px 30px rgba(120,100,220,0.35)}
+.rec-visual.recording{background:linear-gradient(135deg,#ff6b6b,#ff8f6b);animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+.timer{font-size:36px;font-weight:900;margin:8px 0}
+.controls{display:flex;gap:10px;justify-content:center;margin:18px 0 16px;flex-wrap:wrap}
+.btn{padding:14px 22px;border-radius:14px;border:none;font-weight:800;font-size:14px;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.btn:active{transform:scale(0.96)}
+.btn-primary{background:linear-gradient(135deg,#ff6b6b,#ff8f6b);color:#fff}
+.btn-secondary{background:rgba(255,255,255,0.7);color:#1c1c1e;border:1px solid rgba(255,255,255,0.8)}
+.btn-success{background:linear-gradient(135deg,#3ad0a4,#5b8def);color:#fff}
+.btn:disabled{opacity:0.4}
+.status{margin-top:16px;padding:10px 14px;border-radius:12px;font-size:12px;font-weight:700;display:none}
+.status.show{display:block}
+.status.ok{background:rgba(58,208,164,0.15);color:#1d7a5c}
+.status.warn{background:rgba(245,179,1,0.15);color:#a3670b}
+.status.error{background:rgba(217,83,79,0.12);color:#d9534f}
+.transcript-area{width:100%;min-height:120px;padding:12px;border-radius:12px;border:1.5px solid rgba(80,90,130,0.15);background:rgba(255,255,255,0.8);font-size:14px;line-height:1.5;resize:vertical;outline:none}
+.summary-box{padding:14px;border-radius:16px;background:linear-gradient(135deg,rgba(91,141,239,0.12),rgba(160,107,255,0.10));border:1px solid rgba(91,141,239,0.18);font-size:13px;line-height:1.5;margin-top:10px}
+.label{font-size:11px;font-weight:900;color:#5c5c66;text-transform:uppercase;letter-spacing:0.5px;margin:12px 0 6px;display:block}
+.rec-list{display:flex;flex-direction:column;gap:10px}
+.rec-item{padding:14px;border-radius:16px;background:rgba(255,255,255,0.6);border:1px solid rgba(255,255,255,0.7);display:flex;align-items:center;gap:12px;cursor:pointer}
+.rec-item .ico{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#5b8def,#a06bff);display:grid;place-items:center;color:#fff}
+.rec-item .info{flex:1;min-width:0}
+.empty{text-align:center;padding:24px;color:#6b6b76;font-size:13px}
+.modal-overlay{position:fixed;inset:0;background:rgba(20,20,30,0.55);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity 0.25s;z-index:200}
+.modal-overlay.show{opacity:1;pointer-events:auto}
+.modal{background:rgba(255,255,255,0.98);border-radius:24px;width:100%;max-width:400px;padding:22px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.3)}
+</style>
+</head>
+<body>
+<div class="app">
+<h1 style="text-align:center">🎙️ Grabadora IA Universal</h1>
+<p style="text-align:center;font-size:12px;color:#5c5c66">Funciona en cualquier celular/navegador - Sin ruido - Solo vibra</p>
+
+<div class="glass card rec-card">
+  <div class="rec-visual" id="recVisual">🎙️</div>
+  <div class="timer" id="timer">00:00</div>
+  <div id="timerLabel" style="font-size:11px;font-weight:800;color:#8a8a94;text-transform:uppercase">Listo para grabar</div>
+  <div class="controls">
+    <button class="btn btn-primary" id="btnRecord">🎙️ Grabar</button>
+    <button class="btn btn-secondary" id="btnPause" disabled>⏸️ Pausa</button>
+    <button class="btn btn-secondary" id="btnStop" disabled>⏹️ Stop</button>
+  </div>
+  <div class="status" id="status"></div>
+  <div style="margin-top:10px;font-size:11px;color:#6b6b76">🔇 Cero sonido, solo vibración al iniciar/pausar/parar</div>
+</div>
+
+<div class="glass card">
+  <label class="label">📝 Transcripción</label>
+  <textarea class="transcript-area" id="transcript" placeholder="Acá aparece la transcripción automática después de grabar. También podés escribir manual..."></textarea>
+  <div style="display:flex;gap:8px;margin-top:10px">
+    <button class="btn btn-secondary" id="btnCopyTrans" style="flex:1">📋 Copiar</button>
+    <button class="btn btn-secondary" id="btnClearTrans" style="flex:1">🗑️ Borrar</button>
+  </div>
+  <label class="label">🤖 Resumen automático</label>
+  <div style="display:flex;gap:8px;margin-bottom:10px">
+    <button class="btn btn-success" id="btnTranscribe" style="flex:1">🎙️ Transcribir con IA Universal</button>
+    <button class="btn btn-success" id="btnSummarize" style="flex:1">✨ Resumir</button>
+  </div>
+  <div id="modelStatus" style="font-size:11px;color:#5c5c66;margin:6px 0;display:none">Cargando modelo IA...</div>
+  <div id="summary" class="summary-box" style="display:none"></div>
+  <div id="summaryEmpty" class="empty">Grabá, luego tocá Transcribir y Resumir para obtener resumen y tareas</div>
+</div>
+
+<div class="glass card">
+  <label class="label">📂 Grabaciones guardadas</label>
+  <div id="recList" class="rec-list"><div class="empty">Sin grabaciones</div></div>
+  <button class="btn btn-secondary" id="btnClearAll" style="width:100%;margin-top:10px">🗑️ Borrar todo</button>
+</div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div id="modalIcon" style="width:56px;height:56px;border-radius:18px;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:28px;background:linear-gradient(135deg,#5b8def,#a06bff);color:#fff">💡</div>
+    <h3 id="modalTitle">Aviso</h3>
+    <div id="modalBody"></div>
+    <button id="modalOk" style="width:100%;padding:12px;border-radius:12px;border:none;background:linear-gradient(135deg,#5b8def,#a06bff);color:#fff;font-weight:800;margin-top:12px">Entendido</button>
+  </div>
+</div>
+
+<script type="module">
+import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2/dist/transformers.min.js';
+env.allowLocalModels=false;
+env.useBrowserCache=true;
+
+let mediaRecorder=null, audioChunks=[], startTime=null, timerInt=null, isPaused=false, isRecording=false, finalTranscript='';
+let transcriber=null, modelLoading=false;
+
+function el(id){return document.getElementById(id);}
+function showStatus(msg,type='ok'){
+  const e=el('status'); if(e){ e.textContent=msg; e.className='status show '+type; setTimeout(()=>e.classList.remove('show'),4000); }
+  const icons={ok:'✅',warn:'💡',error:'⚠️'};
+  const mOverlay=el('modalOverlay');
+  if((type==='error' || /error|no se pudo|soporta/i.test(msg)) && mOverlay){
+    el('modalBody').innerHTML='<p>'+msg+'</p>';
+    mOverlay.classList.add('show');
+  }
+}
+function fmtTime(sec){ const m=Math.floor(sec/60).toString().padStart(2,'0'); const s=(sec%60).toString().padStart(2,'0'); return m+':'+s; }
+function updateTimer(){
+  if(!startTime) return;
+  const ec=Math.floor((Date.now()-startTime)/1000);
+  const tEl=el('timer'); if(tEl) tEl.textContent=fmtTime(ec);
+}
+
+async function loadModel(){
+  if(transcriber || modelLoading) return;
+  modelLoading=true;
+  const ms=el('modelStatus');
+  if(ms){ ms.style.display='block'; ms.textContent='📥 Descargando modelo IA universal (primera vez, ~40MB)...'; }
+  try{
+    // Usamos whisper-tiny que es liviano y universal, multilingual incluye es
+    transcriber=await pipeline('automatic-speech-recognition','Xenova/whisper-tiny',{quantized:true});
+    if(ms) ms.textContent='✅ Modelo IA listo - transcripción 100% local, sin servidor, sin API key';
+    setTimeout(()=>{ if(ms) ms.style.display='none'; },3000);
+    showStatus('Modelo IA universal cargado ✅','ok');
+  }catch(e){
+    console.error(e);
+    if(ms) ms.textContent='❌ Error cargando modelo: '+e.message;
+    showStatus('Error cargando modelo IA: '+e.message,'error');
+  }finally{ modelLoading=false; }
+}
+
+async function startRecording(){
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true, noiseSuppression:true, autoGainControl:true}});
+    let mime='audio/webm;codecs=opus';
+    if(!MediaRecorder.isTypeSupported(mime)) mime='audio/webm';
+    if(!MediaRecorder.isTypeSupported(mime)) mime='audio/mp4';
+    if(!MediaRecorder.isTypeSupported(mime)) mime='';
+    mediaRecorder=mime? new MediaRecorder(stream,{mimeType:mime}) : new MediaRecorder(stream);
+    audioChunks=[];
+    mediaRecorder.ondataavailable=e=>{ if(e.data.size>0) audioChunks.push(e.data); };
+    mediaRecorder.onstop=()=>{ const blob=new Blob(audioChunks,{type: mime||'audio/webm'}); saveRecording(blob); stream.getTracks().forEach(t=>t.stop()); };
+    mediaRecorder.start();
+    try{ if(navigator.vibrate) navigator.vibrate(80); }catch(e){}
+    startTime=Date.now();
+    timerInt=setInterval(updateTimer,500);
+    isRecording=true; isPaused=false;
+    const v=el('recVisual'); if(v){ v.classList.add('recording'); v.textContent='🔴'; }
+    const l=el('timerLabel'); if(l) l.textContent='Grabando... solo vibra, cero sonido';
+    el('btnRecord').disabled=true; el('btnPause').disabled=false; el('btnStop').disabled=false;
+    showStatus('🎙️ Grabando... vibración al iniciar, sin sonido','ok');
+  }catch(err){
+    showStatus('Micrófono error: '+err.message,'error');
+  }
+}
+function pauseRecording(){
+  if(!mediaRecorder) return;
+  const bp=el('btnPause');
+  if(isPaused){
+    mediaRecorder.resume(); try{ if(navigator.vibrate) navigator.vibrate([40,30,40]); }catch(e){}
+    isPaused=false;
+    const v=el('recVisual'); if(v){ v.classList.remove('paused'); v.classList.add('recording'); }
+    el('timerLabel').textContent='Grabando...';
+    if(bp) bp.textContent='⏸️ Pausa';
+    startTime=Date.now() - (parseInt((el('timer')?.textContent||'00:00').split(':')[0])*60 + parseInt((el('timer')?.textContent||'00:00').split(':')[1]))*1000;
+    timerInt=setInterval(updateTimer,500);
+  }else{
+    mediaRecorder.pause(); try{ if(navigator.vibrate) navigator.vibrate(50); }catch(e){}
+    isPaused=true;
+    const v=el('recVisual'); if(v){ v.classList.remove('recording'); v.classList.add('paused'); }
+    el('timerLabel').textContent='En pausa';
+    if(bp) bp.textContent='▶️ Reanudar';
+    clearInterval(timerInt);
+  }
+}
+function stopRecording(){
+  if(!mediaRecorder) return;
+  // Guardar duración antes de resetear a cero (pedido usuario)
+  const currentDuration=document.getElementById('timer')?.textContent||'00:00';
+  window._lastRecordingDuration=currentDuration;
+  mediaRecorder.stop();
+  try{ if(navigator.vibrate) navigator.vibrate([80,50,80]); }catch(e){}
+  clearInterval(timerInt); isRecording=false;
+  const v=el('recVisual'); if(v){ v.classList.remove('recording','paused'); v.textContent='🎙️'; }
+  const l=el('timerLabel'); if(l) l.textContent='Grabación terminada - lista para transcribir';
+  const t=el('timer'); if(t) t.textContent='00:00';
+  startTime=null;
+  el('btnRecord').disabled=false; el('btnPause').disabled=true; el('btnStop').disabled=true;
+  el('btnPause').textContent='⏸️ Pausa';
+  showStatus('✅ Audio guardado. Tocá Transcribir con IA Universal','ok');
+}
+
+let lastBlob=null;
+function saveRecording(blob){
+  lastBlob=blob;
+  const id=Date.now();
+  const trEl=el('transcript');
+  const transcript=(trEl?.value)||'';
+  const rec={id, date:new Date().toLocaleString('es-AR'), duration:window._lastRecordingDuration||el('timer')?.textContent||'00:00', transcript, summary:''};
+  const prev=JSON.parse(localStorage.getItem('grabadora_reuniones_light')||'[]');
+  prev.unshift(rec);
+  localStorage.setItem('grabadora_reuniones_light', JSON.stringify(prev));
+  renderList();
+}
+
+function renderList(){
+  const listEl=el('recList'); if(!listEl) return;
+  const list=JSON.parse(localStorage.getItem('grabadora_reuniones_light')||'[]');
+  if(list.length===0){ listEl.innerHTML='<div class="empty">Sin grabaciones</div>'; return; }
+  listEl.innerHTML=list.map(r=>`
+    <div class="rec-item" onclick="window.loadRec && window.loadRec(${r.id})">
+      <div class="ico">🎙️</div>
+      <div class="info"><b>${r.date} - ${r.duration}</b><small>${(r.transcript||'').slice(0,60)}...</small></div>
+      <div><button class="btn btn-secondary" style="padding:6px 10px;font-size:11px" onclick="event.stopPropagation(); window.deleteRec(${r.id})">🗑️</button></div>
+    </div>
+  `).join('');
+}
+window.loadRec=function(id){
+  const list=JSON.parse(localStorage.getItem('grabadora_reuniones_light')||'[]');
+  const rec=list.find(x=>x.id===id);
+  if(rec){ const tr=el('transcript'); if(tr) tr.value=rec.transcript; showStatus('Cargada '+rec.date,'ok'); }
+};
+window.deleteRec=function(id){
+  if(!confirm('¿Borrar?')) return;
+  let list=JSON.parse(localStorage.getItem('grabadora_reuniones_light')||'[]');
+  list=list.filter(x=>x.id!==id);
+  localStorage.setItem('grabadora_reuniones_light', JSON.stringify(list));
+  renderList();
+};
+
+async function transcribeUniversal(){
+  if(!lastBlob){
+    // Intentar usar último blob de la lista? No tenemos audio guardado como blob en localStorage ligero
+    showStatus('Primero grabá algo para transcribir','warn');
+    return;
+  }
+  await loadModel();
+  if(!transcriber){ showStatus('Modelo no cargado','error'); return; }
+  try{
+    const ms=el('modelStatus');
+    if(ms){ ms.style.display='block'; ms.textContent='🎙️ Transcribiendo con IA universal (puede tardar 30-60s la primera vez)...'; }
+    // Convertir blob a Float32Array via AudioContext
+    const audioCtx=new (window.AudioContext||window.webkitAudioContext)({sampleRate:16000});
+    const arrayBuffer=await lastBlob.arrayBuffer();
+    const audioBuffer=await audioCtx.decodeAudioData(arrayBuffer);
+    // Tomar canal 0 y resamplear si es necesario (whisper espera 16k)
+    let audioData=audioBuffer.getChannelData(0);
+    // Si sampleRate no es 16000, ya lo forzamos al crear AudioContext con 16000, pero decode puede dar otro? Simplificamos
+    const result=await transcriber(audioData, {language:'spanish', task:'transcribe'});
+    const texto=result.text||'';
+    const tr=el('transcript');
+    if(tr){ tr.value=(tr.value? tr.value+'\n':'')+texto; }
+    if(ms) ms.textContent='✅ Transcripción universal completada';
+    showStatus('Transcripción universal lista ✅','ok');
+    // Auto resumir
+    setTimeout(()=>{ const btn=document.getElementById('btnSummarize'); if(btn) btn.click(); },500);
+  }catch(e){
+    console.error(e);
+    showStatus('Error transcribiendo: '+e.message,'error');
+  }
+}
+
+function summarize(text){
+  if(!text || text.trim().length<20) return {resumen:"Texto corto", puntos:[], tareas:[]};
+  const sentences=text.split(/(?<=[.!?])\s+/).filter(s=>s.trim().length>10);
+  const words=text.toLowerCase().split(/\W+/).filter(w=>w.length>3);
+  const freq={}; words.forEach(w=>{ freq[w]=(freq[w]||0)+1; });
+  const stop=new Set(['para','esta','esto','pero','como','cuando','donde','porque','entonces','tambien']);
+  let scored=sentences.map((s,idx)=>{
+    let score=0; const ws=s.toLowerCase().split(/\W+/); ws.forEach(w=>{ if(!stop.has(w) && freq[w]) score+=freq[w]; });
+    if(/(venta|vender|precio|presupuesto|reunión|reunion|cliente|llamar|contactar|tarea|hacer|enviar|pasar|quedamos)/i.test(s)) score+=5;
+    return {s,score,idx};
+  });
+  scored.sort((a,b)=>b.score-a.score);
+  const top=scored.slice(0,3).sort((a,b)=>a.idx-b.idx).map(x=>x.s.trim());
+  const tareas=sentences.filter(s=>/(tengo que|tenemos que|hay que|voy a|va a|quedé en|llamar|enviar|pasar|contactar|hacer|agendar)/i.test(s)).slice(0,5);
+  const puntos=scored.slice(0,5).map(x=>'• '+x.s.trim());
+  return {resumen: top.join(' '), puntos, tareas: tareas.length? tareas.map(t=>'→ '+t.trim()) : ['No se detectaron tareas']};
+}
+
+function init(){
+  el('btnRecord').onclick=startRecording;
+  el('btnPause').onclick=pauseRecording;
+  el('btnStop').onclick=stopRecording;
+  el('btnCopyTrans').onclick=async()=>{ try{ await navigator.clipboard.writeText(el('transcript').value); showStatus('Copiado','ok'); }catch(e){} };
+  el('btnClearTrans').onclick=()=>{ if(confirm('¿Borrar?')){ el('transcript').value=''; } };
+  const btnTrans=el('btnTranscribe');
+  if(btnTrans) btnTrans.onclick=transcribeUniversal;
+  const btnSum=el('btnSummarize');
+  if(btnSum) btnSum.onclick=()=>{
+    const txt=(el('transcript').value||'').trim();
+    if(!txt){ showStatus('Sin texto para resumir','warn'); return; }
+    const res=summarize(txt);
+    const sumEl=el('summary');
+    if(sumEl){
+      sumEl.innerHTML=`<h4>📝 Resumen</h4><p>${res.resumen}</p><h4>📌 Puntos</h4><ul>${res.puntos.map(p=>'<li>'+p+'</li>').join('')}</ul><h4>✅ Tareas</h4><ul>${res.tareas.map(t=>'<li>'+t+'</li>').join('')}</ul>`;
+      sumEl.style.display='block';
+      const emp=el('summaryEmpty'); if(emp) emp.style.display='none';
+    }
+  };
+  el('btnClearAll').onclick=()=>{ if(confirm('¿Borrar todo?')){ localStorage.removeItem('grabadora_reuniones_light'); renderList(); } };
+  el('modalOk').onclick=()=>{ el('modalOverlay').classList.remove('show'); };
+  el('modalOverlay').addEventListener('click', e=>{ if(e.target.id==='modalOverlay') e.target.classList.remove('show'); });
+  renderList();
+  // Precargar modelo en background
+  setTimeout(loadModel, 1000);
+}
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
