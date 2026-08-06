@@ -2,210 +2,135 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Grabadora IA - Resúmenes de Reuniones</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grabadora IA Universal - Sin ruido</title>
 <style>
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",Segoe UI,Roboto,sans-serif;min-height:100vh;background:linear-gradient(160deg,#eaf1ff 0%,#f5ecff 45%,#ffe9f2 100%);background-attachment:fixed;color:#1c1c1e}
-body::before{content:"";position:fixed;inset:0;background:radial-gradient(circle at 20% 15%,rgba(120,170,255,0.35),transparent 45%),radial-gradient(circle at 85% 30%,rgba(200,150,255,0.30),transparent 50%),radial-gradient(circle at 50% 90%,rgba(255,170,210,0.30),transparent 55%);z-index:-1;pointer-events:none}
+*{box-sizing:border-box}html,body{margin:0;padding:0;font-family:system-ui,sans-serif;min-height:100vh;background:linear-gradient(160deg,#eaf1ff 0%,#f5ecff 45%,#ffe9f2 100%);background-attachment:fixed;color:#1c1c1e}
 .app{max-width:520px;margin:0 auto;padding:16px 12px 100px}
-header.top{text-align:center;margin-bottom:20px;position:relative}
-header.top h1{margin:0;font-size:26px;font-weight:900}
-header.top .script{font-family:"Snell Roundhand",cursive;font-size:30px;background:linear-gradient(90deg,#5b8def,#a06bff,#ff6b9d);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-.glass{background:rgba(255,255,255,0.62);-webkit-backdrop-filter:blur(20px) saturate(180%);backdrop-filter:blur(20px) saturate(180%);border:1px solid rgba(255,255,255,0.75);border-radius:22px;box-shadow:0 8px 30px rgba(80,90,130,0.10)}
+.glass{background:rgba(255,255,255,0.62);backdrop-filter:blur(20px) saturate(180%);border:1px solid rgba(255,255,255,0.75);border-radius:22px;box-shadow:0 8px 30px rgba(80,90,130,0.10)}
 .card{padding:18px;margin-bottom:14px}
 .rec-card{text-align:center;padding:24px 18px}
-.rec-visual{width:120px;height:120px;margin:0 auto 16px;border-radius:50%;background:linear-gradient(135deg,#5b8def,#a06bff);display:grid;place-items:center;color:#fff;font-size:48px;position:relative;box-shadow:0 12px 30px rgba(120,100,220,0.35);transition:all 0.3s}
-.rec-visual.recording{animation:pulse 1.5s infinite;background:linear-gradient(135deg,#ff6b6b,#ff8f6b);box-shadow:0 12px 30px rgba(255,107,107,0.4)}
-.rec-visual.paused{background:linear-gradient(135deg,#f5b301,#ff8f6b)}
+.rec-visual{width:120px;height:120px;margin:0 auto 16px;border-radius:50%;background:linear-gradient(135deg,#5b8def,#a06bff);display:grid;place-items:center;color:#fff;font-size:48px;position:relative;box-shadow:0 12px 30px rgba(120,100,220,0.35)}
+.rec-visual.recording{background:linear-gradient(135deg,#ff6b6b,#ff8f6b);animation:pulse 1.5s infinite}
 @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
-.rec-visual::after{content:"";position:absolute;inset:-8px;border-radius:50%;border:2px solid rgba(91,141,239,0.3);opacity:0}
-.rec-visual.recording::after{animation:ripple 1.5s infinite}
-@keyframes ripple{0%{transform:scale(1);opacity:1}100%{transform:scale(1.3);opacity:0}}
-.timer{font-size:36px;font-weight:900;letter-spacing:-1px;margin:8px 0;font-variant-numeric:tabular-nums}
-.timer-label{font-size:11px;font-weight:800;color:#8a8a94;text-transform:uppercase;letter-spacing:0.5px}
-.controls{display:flex;gap:10px;justify-content:center;margin-top:18px;margin-bottom:16px;flex-wrap:wrap;position:relative;z-index:2}
-.btn{padding:14px 22px;border-radius:14px;border:none;font-family:inherit;font-weight:800;font-size:14px;cursor:pointer;transition:transform 0.15s,box-shadow 0.2s;display:inline-flex;align-items:center;gap:8px}
+.timer{font-size:36px;font-weight:900;margin:8px 0}
+.controls{display:flex;gap:10px;justify-content:center;margin:18px 0 16px;flex-wrap:wrap}
+.btn{padding:14px 22px;border-radius:14px;border:none;font-weight:800;font-size:14px;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
 .btn:active{transform:scale(0.96)}
-.btn-primary{background:linear-gradient(135deg,#ff6b6b,#ff8f6b);color:#fff;box-shadow:0 6px 18px rgba(255,107,107,0.35)}
+.btn-primary{background:linear-gradient(135deg,#ff6b6b,#ff8f6b);color:#fff}
 .btn-secondary{background:rgba(255,255,255,0.7);color:#1c1c1e;border:1px solid rgba(255,255,255,0.8)}
-.btn-success{background:linear-gradient(135deg,#3ad0a4,#5b8def);color:#fff;box-shadow:0 6px 18px rgba(58,208,164,0.35)}
-.btn:disabled{opacity:0.4;cursor:not-allowed}
-.status{margin-top:16px;padding:10px 14px;border-radius:12px;font-size:12px;font-weight:700;display:none;clear:both;position:relative;z-index:2}
+.btn-success{background:linear-gradient(135deg,#3ad0a4,#5b8def);color:#fff}
+.btn:disabled{opacity:0.4}
+.status{margin-top:16px;padding:10px 14px;border-radius:12px;font-size:12px;font-weight:700;display:none}
 .status.show{display:block}
 .status.ok{background:rgba(58,208,164,0.15);color:#1d7a5c}
 .status.warn{background:rgba(245,179,1,0.15);color:#a3670b}
 .status.error{background:rgba(217,83,79,0.12);color:#d9534f}
-.transcript-area{width:100%;min-height:120px;padding:12px;border-radius:12px;border:1.5px solid rgba(80,90,130,0.15);background:rgba(255,255,255,0.8);font-family:inherit;font-size:14px;line-height:1.5;resize:vertical;outline:none;transition:border-color 0.2s}
-.transcript-area:focus{border-color:#5b8def;box-shadow:0 0 0 3px rgba(91,141,239,0.15)}
+.transcript-area{width:100%;min-height:120px;padding:12px;border-radius:12px;border:1.5px solid rgba(80,90,130,0.15);background:rgba(255,255,255,0.8);font-size:14px;line-height:1.5;resize:vertical;outline:none}
+.summary-box{padding:14px;border-radius:16px;background:linear-gradient(135deg,rgba(91,141,239,0.12),rgba(160,107,255,0.10));border:1px solid rgba(91,141,239,0.18);font-size:13px;line-height:1.5;margin-top:10px}
 .label{font-size:11px;font-weight:900;color:#5c5c66;text-transform:uppercase;letter-spacing:0.5px;margin:12px 0 6px;display:block}
-.summary-box{padding:14px;border-radius:16px;background:linear-gradient(135deg,rgba(91,141,239,0.12),rgba(160,107,255,0.10));border:1px solid rgba(91,141,239,0.18);font-size:13px;line-height:1.5}
-.summary-box h4{margin:0 0 8px;font-size:13px;font-weight:900}
-.summary-box ul{margin:6px 0;padding-left:18px}
-.summary-box li{margin:4px 0}
 .rec-list{display:flex;flex-direction:column;gap:10px}
-.rec-item{padding:14px;border-radius:16px;background:rgba(255,255,255,0.6);border:1px solid rgba(255,255,255,0.7);display:flex;align-items:center;gap:12px;cursor:pointer;transition:transform 0.15s}
-.rec-item:active{transform:scale(0.98)}
-.rec-item .ico{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#5b8def,#a06bff);display:grid;place-items:center;color:#fff;font-size:18px;flex:none}
+.rec-item{padding:14px;border-radius:16px;background:rgba(255,255,255,0.6);border:1px solid rgba(255,255,255,0.7);display:flex;align-items:center;gap:12px;cursor:pointer}
+.rec-item .ico{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#5b8def,#a06bff);display:grid;place-items:center;color:#fff}
 .rec-item .info{flex:1;min-width:0}
-.rec-item .info b{display:block;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.rec-item .info small{font-size:11px;color:#6b6b76}
-.rec-item .actions{display:flex;gap:6px;flex:none}
-.icon-btn{width:32px;height:32px;border-radius:8px;border:none;background:rgba(0,0,0,0.06);cursor:pointer;display:grid;place-items:center;font-size:14px}
-.wave{display:flex;align-items:center;justify-content:center;gap:3px;height:30px;margin:10px 0}
-.wave span{width:4px;height:12px;background:#5b8def;border-radius:999px;animation:wave 0.8s infinite ease-in-out}
-.wave span:nth-child(2){animation-delay:0.1s}.wave span:nth-child(3){animation-delay:0.2s}.wave span:nth-child(4){animation-delay:0.3s}.wave span:nth-child(5){animation-delay:0.1s}
-@keyframes wave{0%,100%{height:12px}50%{height:28px}}
 .empty{text-align:center;padding:24px;color:#6b6b76;font-size:13px}
+.modal-overlay{position:fixed;inset:0;background:rgba(20,20,30,0.55);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity 0.25s;z-index:200}
+.modal-overlay.show{opacity:1;pointer-events:auto}
+.modal{background:rgba(255,255,255,0.98);border-radius:24px;width:100%;max-width:400px;padding:22px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.3)}
 </style>
 </head>
 <body>
 <div class="app">
-<header class="top">
-  <h1>Grabadora</h1><div class="script">IA Reuniones</div>
-  <p style="font-size:12px;color:#5c5c66;margin:6px 0 0">Grabá tu reunión y obtené resumen automático</p>
-</header>
+<h1 style="text-align:center">🎙️ Grabadora IA Universal</h1>
+<p style="text-align:center;font-size:12px;color:#5c5c66">Funciona en cualquier celular/navegador - Sin ruido - Solo vibra</p>
 
 <div class="glass card rec-card">
   <div class="rec-visual" id="recVisual">🎙️</div>
   <div class="timer" id="timer">00:00</div>
-  <div class="timer-label" id="timerLabel">Listo para grabar</div>
-  <div class="wave" id="wave" style="display:none"><span></span><span></span><span></span><span></span><span></span></div>
-  
+  <div id="timerLabel" style="font-size:11px;font-weight:800;color:#8a8a94;text-transform:uppercase">Listo para grabar</div>
   <div class="controls">
     <button class="btn btn-primary" id="btnRecord">🎙️ Grabar</button>
     <button class="btn btn-secondary" id="btnPause" disabled>⏸️ Pausa</button>
     <button class="btn btn-secondary" id="btnStop" disabled>⏹️ Stop</button>
   </div>
   <div class="status" id="status"></div>
+  <div style="margin-top:10px;font-size:11px;color:#6b6b76">🔇 Cero sonido, solo vibración al iniciar/pausar/parar</div>
 </div>
 
 <div class="glass card">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin:12px 0 6px">
-  <label class="label" style="margin:0">📝 Transcripción en vivo</label>
-  <label style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;cursor:pointer">
-    <input type="checkbox" id="chkLiveTrans" style="width:16px;height:16px"> <span>Transcripción (puede hacer ruido)</span>
-  </label>
-</div>
-<div style="font-size:10px;color:#8a8a94;margin-bottom:6px">Si hace ruido cada 4s, desactívala, grabá igual y después resumí</div>
-  <textarea class="transcript-area" id="transcript" placeholder="Acá aparece lo que vas diciendo... Tocá Grabar y empezá a hablar de tu reunión. Ej: Hoy hablé con Juan sobre Senior 4..."></textarea>
+  <label class="label">📝 Transcripción</label>
+  <textarea class="transcript-area" id="transcript" placeholder="Acá aparece la transcripción automática después de grabar. También podés escribir manual..."></textarea>
   <div style="display:flex;gap:8px;margin-top:10px">
-    <button class="btn btn-secondary" id="btnCopyTrans" style="flex:1">📋 Copiar texto</button>
+    <button class="btn btn-secondary" id="btnCopyTrans" style="flex:1">📋 Copiar</button>
     <button class="btn btn-secondary" id="btnClearTrans" style="flex:1">🗑️ Borrar</button>
   </div>
-  
-  <label class="label">🤖 Resumen automático con IA</label>
+  <label class="label">🤖 Resumen automático</label>
   <div style="display:flex;gap:8px;margin-bottom:10px">
-    <button class="btn btn-success" id="btnSummarize" style="flex:1">✨ Resumir reunión</button>
-    <button class="btn btn-secondary" id="btnClearSum" style="flex:0 0 auto">🗑️</button>
+    <button class="btn btn-success" id="btnTranscribe" style="flex:1">🎙️ Transcribir con IA Universal</button>
+    <button class="btn btn-success" id="btnSummarize" style="flex:1">✨ Resumir</button>
   </div>
+  <div id="modelStatus" style="font-size:11px;color:#5c5c66;margin:6px 0;display:none">Cargando modelo IA...</div>
   <div id="summary" class="summary-box" style="display:none"></div>
-  <div id="summaryEmpty" class="empty">Tocá "Resumir reunión" después de grabar para obtener resumen, puntos clave y tareas</div>
+  <div id="summaryEmpty" class="empty">Grabá, luego tocá Transcribir y Resumir para obtener resumen y tareas</div>
 </div>
 
 <div class="glass card">
   <label class="label">📂 Grabaciones guardadas</label>
-  <div id="recList" class="rec-list">
-    <div class="empty">Todavía no hay grabaciones. Grabá tu primera reunión arriba.</div>
-  </div>
+  <div id="recList" class="rec-list"><div class="empty">Sin grabaciones</div></div>
   <button class="btn btn-secondary" id="btnClearAll" style="width:100%;margin-top:10px">🗑️ Borrar todo</button>
 </div>
+</div>
 
-<div class="glass card">
-  <label class="label">💡 Cómo usar para reuniones</label>
-  <div style="font-size:12px;line-height:1.5;color:#3a3a48">
-    <p><b>1.</b> Tocá <b>Grabar</b> y hablale a tu celular como si tomaras notas: "Hoy me reuní con María, interesada en Purificador Senior 4, le pareció caro pero quiere canje, quedó en que la llamo mañana..."</p>
-    <p><b>2.</b> Mientras hablás, la transcripción aparece abajo en vivo.</p>
-    <p><b>3.</b> Al terminar, tocá <b>Stop</b> → <b>Resumir reunión</b> → IA te da resumen + tareas.</p>
-    <p><b>4.</b> Copiá y pegalo en WhatsApp o en tu Seguimiento de APPI.</p>
-    <div style="padding:8px 10px;border-radius:10px;background:rgba(245,179,1,0.12);font-size:11px;margin-top:8px">🔒 Todo queda en tu dispositivo. El audio no se sube a ningún servidor a menos que actives Whisper API.</div>
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div id="modalIcon" style="width:56px;height:56px;border-radius:18px;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:28px;background:linear-gradient(135deg,#5b8def,#a06bff);color:#fff">💡</div>
+    <h3 id="modalTitle">Aviso</h3>
+    <div id="modalBody"></div>
+    <button id="modalOk" style="width:100%;padding:12px;border-radius:12px;border:none;background:linear-gradient(135deg,#5b8def,#a06bff);color:#fff;font-weight:800;margin-top:12px">Entendido</button>
   </div>
 </div>
 
-</div>
+<script type="module">
+import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2/dist/transformers.min.js';
+env.allowLocalModels=false;
+env.useBrowserCache=true;
 
-<script>
-// Estado
-let mediaRecorder=null, audioChunks=[], startTime=null, timerInt=null, isPaused=false;
-let recognition=null, finalTranscript='', isRecording=false;
-let recordings=JSON.parse(localStorage.getItem('grabadora_reuniones')||'[]');
+let mediaRecorder=null, audioChunks=[], startTime=null, timerInt=null, isPaused=false, isRecording=false, finalTranscript='';
+let transcriber=null, modelLoading=false;
 
-const elVisual=document.getElementById('recVisual');
-const elTimer=document.getElementById('timer');
-const elLabel=document.getElementById('timerLabel');
-const elWave=document.getElementById('wave');
-const elStatus=document.getElementById('status');
-const elTrans=document.getElementById('transcript');
-const elSummary=document.getElementById('summary');
-const elSummaryEmpty=document.getElementById('summaryEmpty');
-const elList=document.getElementById('recList');
-
+function el(id){return document.getElementById(id);}
 function showStatus(msg,type='ok'){
-  const e=elStatus;
-  if(e){
-    e.textContent=msg;
-    e.className='status show '+type;
-    setTimeout(()=>e.classList.remove('show'),4000);
+  const e=el('status'); if(e){ e.textContent=msg; e.className='status show '+type; setTimeout(()=>e.classList.remove('show'),4000); }
+  const icons={ok:'✅',warn:'💡',error:'⚠️'};
+  const mOverlay=el('modalOverlay');
+  if((type==='error' || /error|no se pudo|soporta/i.test(msg)) && mOverlay){
+    el('modalBody').innerHTML='<p>'+msg+'</p>';
+    mOverlay.classList.add('show');
   }
-  // Popup como APPI
-  try{
-    const icons={ok:'✅', warn:'💡', error:'⚠️'};
-    const titles={ok:'Listo', warn:'Aviso', error:'Error'};
-    if(typeof modal!=='undefined' && modal.open){
-      // Mostrar popup para errores, warnings y confirmaciones importantes
-      if(type!=='ok' || /error|no se pudo|borrar|soporta|guardada|Borrado|copiado|Transcripción/i.test(msg)){
-        modal.open({icon: icons[type]||'💡', title: titles[type]||'Aviso', html:`<p>${msg}</p>`});
-      }
-    }
-  }catch(e){}
 }
-function fmtTime(sec){
-  const m=Math.floor(sec/60).toString().padStart(2,'0');
-  const s=(sec%60).toString().padStart(2,'0');
-  return `${m}:${s}`;
-}
+function fmtTime(sec){ const m=Math.floor(sec/60).toString().padStart(2,'0'); const s=(sec%60).toString().padStart(2,'0'); return m+':'+s; }
 function updateTimer(){
   if(!startTime) return;
-  const elapsed=Math.floor((Date.now()-startTime)/1000);
-  elTimer.textContent=fmtTime(elapsed);
+  const ec=Math.floor((Date.now()-startTime)/1000);
+  const tEl=el('timer'); if(tEl) tEl.textContent=fmtTime(ec);
 }
 
-// Transcripción en vivo con Web Speech API
-function initRecognition(){
-  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(!SR){
-    showStatus('Transcripción en vivo no soportada, grabá y escribí manual','warn');
-    const tr=document.getElementById('transcript');
-    if(tr) tr.placeholder='Tu navegador no transcribe. Grabá y escribí resumen manual...';
-    return null;
-  }
-  const rec=new SR();
-  rec.lang='es-AR';
-  rec.continuous=true;
-  rec.interimResults=true;
-  rec.onresult=(e)=>{
-    let interim='';
-    for(let i=e.resultIndex;i<e.results.length;i++){
-      const t=e.results[i][0].transcript;
-      if(e.results[i].isFinal){ finalTranscript+=' '+t; window._lastSpeech=Date.now(); }
-      else interim+=t;
-    }
-    elTrans.value=(finalTranscript+' '+interim).trim();
-    window._lastSpeech=Date.now();
-  };
-  rec.onerror=(e)=>{ console.log('rec error',e); };
-  rec.onend=()=>{
-    const chkLive=document.getElementById('chkLiveTrans');
-    const liveEnabled=chkLive ? chkLive.checked : true;
-    if(isRecording && !isPaused && liveEnabled){
-      const now=Date.now();
-      if(window._lastSpeech && (now - window._lastSpeech) < 8000){
-        setTimeout(()=>{ if(isRecording && !isPaused && (document.getElementById('chkLiveTrans')?.checked ?? true)){ try{ rec.start(); }catch(e){} } }, 1500);
-      }
-    }
-  };
-  rec.onspeechstart=()=>{ window._lastSpeech=Date.now(); };
-  return rec;
+async function loadModel(){
+  if(transcriber || modelLoading) return;
+  modelLoading=true;
+  const ms=el('modelStatus');
+  if(ms){ ms.style.display='block'; ms.textContent='📥 Descargando modelo IA universal (primera vez, ~40MB)...'; }
+  try{
+    // Usamos whisper-tiny que es liviano y universal, multilingual incluye es
+    transcriber=await pipeline('automatic-speech-recognition','Xenova/whisper-tiny',{quantized:true});
+    if(ms) ms.textContent='✅ Modelo IA listo - transcripción 100% local, sin servidor, sin API key';
+    setTimeout(()=>{ if(ms) ms.style.display='none'; },3000);
+    showStatus('Modelo IA universal cargado ✅','ok');
+  }catch(e){
+    console.error(e);
+    if(ms) ms.textContent='❌ Error cargando modelo: '+e.message;
+    showStatus('Error cargando modelo IA: '+e.message,'error');
+  }finally{ modelLoading=false; }
 }
 
 async function startRecording(){
@@ -218,57 +143,37 @@ async function startRecording(){
     mediaRecorder=mime? new MediaRecorder(stream,{mimeType:mime}) : new MediaRecorder(stream);
     audioChunks=[];
     mediaRecorder.ondataavailable=e=>{ if(e.data.size>0) audioChunks.push(e.data); };
-    mediaRecorder.onstop=()=>{
-      const blob=new Blob(audioChunks,{type:'audio/webm'});
-      saveRecording(blob, elTrans.value, finalTranscript);
-      stream.getTracks().forEach(t=>t.stop());
-    };
+    mediaRecorder.onstop=()=>{ const blob=new Blob(audioChunks,{type: mime||'audio/webm'}); saveRecording(blob); stream.getTracks().forEach(t=>t.stop()); };
     mediaRecorder.start();
     try{ if(navigator.vibrate) navigator.vibrate(80); }catch(e){}
     startTime=Date.now();
     timerInt=setInterval(updateTimer,500);
     isRecording=true; isPaused=false;
-    elVisual.classList.add('recording');
-    elVisual.textContent='🔴';
-    elWave.style.display='flex';
-    elLabel.textContent='Grabando... hablá de tu reunión';
-    document.getElementById('btnRecord').disabled=true;
-    document.getElementById('btnPause').disabled=false;
-    document.getElementById('btnStop').disabled=false;
-    // iniciar transcripción
-    recognition=initRecognition();
-    finalTranscript=(el('transcript')?.value||elTrans?.value||'')||'';
-    const chk=document.getElementById('chkLiveTrans');
-    const shouldTranscribe=chk ? chk.checked : false;
-    if(shouldTranscribe && recognition){
-      try{ recognition.start(); }catch(_){}
-    }
-    showStatus('🎙️ Grabando reunión...','ok');
+    const v=el('recVisual'); if(v){ v.classList.add('recording'); v.textContent='🔴'; }
+    const l=el('timerLabel'); if(l) l.textContent='Grabando... solo vibra, cero sonido';
+    el('btnRecord').disabled=true; el('btnPause').disabled=false; el('btnStop').disabled=false;
+    showStatus('🎙️ Grabando... vibración al iniciar, sin sonido','ok');
   }catch(err){
-    showStatus('No se pudo acceder al micrófono: '+err.message,'error');
-    console.error(err);
+    showStatus('Micrófono error: '+err.message,'error');
   }
 }
 function pauseRecording(){
   if(!mediaRecorder) return;
+  const bp=el('btnPause');
   if(isPaused){
     mediaRecorder.resume(); try{ if(navigator.vibrate) navigator.vibrate([40,30,40]); }catch(e){}
-    if(recognition) try{ recognition.start(); }catch(_){}
     isPaused=false;
-    elVisual.classList.remove('paused');
-    elVisual.classList.add('recording');
-    elLabel.textContent='Grabando...';
-    document.getElementById('btnPause').textContent='⏸️ Pausa';
-    startTime=Date.now() - (parseInt(elTimer.textContent.split(':')[0])*60 + parseInt(elTimer.textContent.split(':')[1]))*1000;
+    const v=el('recVisual'); if(v){ v.classList.remove('paused'); v.classList.add('recording'); }
+    el('timerLabel').textContent='Grabando...';
+    if(bp) bp.textContent='⏸️ Pausa';
+    startTime=Date.now() - (parseInt((el('timer')?.textContent||'00:00').split(':')[0])*60 + parseInt((el('timer')?.textContent||'00:00').split(':')[1]))*1000;
     timerInt=setInterval(updateTimer,500);
   }else{
     mediaRecorder.pause(); try{ if(navigator.vibrate) navigator.vibrate(50); }catch(e){}
-    if(recognition) try{ recognition.stop(); }catch(_){}
     isPaused=true;
-    elVisual.classList.remove('recording');
-    elVisual.classList.add('paused');
-    elLabel.textContent='En pausa';
-    document.getElementById('btnPause').textContent='▶️ Reanudar';
+    const v=el('recVisual'); if(v){ v.classList.remove('recording'); v.classList.add('paused'); }
+    el('timerLabel').textContent='En pausa';
+    if(bp) bp.textContent='▶️ Reanudar';
     clearInterval(timerInt);
   }
 }
@@ -276,222 +181,130 @@ function stopRecording(){
   if(!mediaRecorder) return;
   mediaRecorder.stop();
   try{ if(navigator.vibrate) navigator.vibrate([80,50,80]); }catch(e){}
-  if(recognition) try{ recognition.stop(); }catch(_){}
   clearInterval(timerInt); isRecording=false;
-  elVisual.classList.remove('recording','paused');
-  elVisual.textContent='🎙️';
-  elWave.style.display='none';
-  elLabel.textContent='Grabación terminada';
-  document.getElementById('btnRecord').disabled=false;
-  document.getElementById('btnPause').disabled=true;
-  document.getElementById('btnStop').disabled=true;
-  document.getElementById('btnPause').textContent='⏸️ Pausa';
-  showStatus('✅ Reunión guardada','ok');
+  const v=el('recVisual'); if(v){ v.classList.remove('recording','paused'); v.textContent='🎙️'; }
+  const l=el('timerLabel'); if(l) l.textContent='Grabación terminada - lista para transcribir';
+  el('btnRecord').disabled=false; el('btnPause').disabled=true; el('btnStop').disabled=true;
+  el('btnPause').textContent='⏸️ Pausa';
+  showStatus('✅ Audio guardado. Tocá Transcribir con IA Universal','ok');
 }
 
-
-async function transcribeWithWhisper(blob){
-  const apiKey=localStorage.getItem('openai_api_key')||'';
-  if(!apiKey){
-    showStatus('Sin API Key, no se puede transcribir automático. Poné tu key en Configuración o activá transcripción en vivo','warn');
-    return null;
-  }
-  try{
-    showStatus('Transcribiendo con IA Whisper...','ok');
-    const form=new FormData();
-    form.append('file', blob, 'audio.webm');
-    form.append('model','whisper-1');
-    form.append('language','es');
-    const res=await fetch('https://api.openai.com/v1/audio/transcriptions',{
-      method:'POST',
-      headers:{'Authorization':'Bearer '+apiKey},
-      body:form
-    });
-    if(!res.ok){
-      const err=await res.text();
-      throw new Error('Whisper error: '+res.status+' '+err.slice(0,200));
-    }
-    const data=await res.json();
-    return data.text||'';
-  }catch(e){
-    showStatus('Error Whisper: '+e.message,'error');
-    console.error(e);
-    return null;
-  }
-}
-
-function saveRecording(blob, transcript, finalText){
+let lastBlob=null;
+function saveRecording(blob){
+  lastBlob=blob;
   const id=Date.now();
-  const reader=new FileReader();
-  reader.onload=()=>{
-    const rec={
-      id, date:new Date().toLocaleString('es-AR'),
-      duration:elTimer.textContent,
-      audio:reader.result, // base64
-      transcript:finalText||transcript,
-      summary:''
-    };
-    recordings.unshift(rec);
-    localStorage.setItem('grabadora_reuniones', JSON.stringify(recordings.map(r=>({...r, audio:r.audio.slice(0,100000)})))); // limitar audio para no explotar localStorage, en real guardamos blob url? simplificado
-    // Para demo, guardamos sin audio base64 largo, solo metadata + transcript
-    renderList();
-  };
-  reader.readAsDataURL(blob);
-  // Guardar versión ligera sin audio para localStorage
-  const recLight={id, date:new Date().toLocaleString('es-AR'), duration:elTimer.textContent, transcript:finalText||transcript, summary:''};
+  const trEl=el('transcript');
+  const transcript=(trEl?.value)||'';
+  const rec={id, date:new Date().toLocaleString('es-AR'), duration:el('timer')?.textContent||'00:00', transcript, summary:''};
   const prev=JSON.parse(localStorage.getItem('grabadora_reuniones_light')||'[]');
-  prev.unshift(recLight);
+  prev.unshift(rec);
   localStorage.setItem('grabadora_reuniones_light', JSON.stringify(prev));
+  renderList();
 }
 
 function renderList(){
+  const listEl=el('recList'); if(!listEl) return;
   const list=JSON.parse(localStorage.getItem('grabadora_reuniones_light')||'[]');
-  if(list.length===0){
-    elList.innerHTML='<div class="empty">Todavía no hay grabaciones</div>';
-    return;
-  }
-  elList.innerHTML=list.map(r=>`
-    <div class="rec-item" onclick="loadRec(${r.id})">
+  if(list.length===0){ listEl.innerHTML='<div class="empty">Sin grabaciones</div>'; return; }
+  listEl.innerHTML=list.map(r=>`
+    <div class="rec-item" onclick="window.loadRec && window.loadRec(${r.id})">
       <div class="ico">🎙️</div>
       <div class="info"><b>${r.date} - ${r.duration}</b><small>${(r.transcript||'').slice(0,60)}...</small></div>
-      <div class="actions">
-        <button class="icon-btn" onclick="event.stopPropagation(); deleteRec(${r.id})">🗑️</button>
-      </div>
+      <div><button class="btn btn-secondary" style="padding:6px 10px;font-size:11px" onclick="event.stopPropagation(); window.deleteRec(${r.id})">🗑️</button></div>
     </div>
   `).join('');
 }
-function loadRec(id){
+window.loadRec=function(id){
   const list=JSON.parse(localStorage.getItem('grabadora_reuniones_light')||'[]');
   const rec=list.find(x=>x.id===id);
-  if(rec){
-    elTrans.value=rec.transcript;
-    if(rec.summary){
-      showSummary(rec.summary);
-    }
-    showStatus('Cargada reunión del '+rec.date,'ok');
-  }
-}
-function deleteRec(id){
-  if(!confirm('¿Borrar esta grabación?')) return;
+  if(rec){ const tr=el('transcript'); if(tr) tr.value=rec.transcript; showStatus('Cargada '+rec.date,'ok'); }
+};
+window.deleteRec=function(id){
+  if(!confirm('¿Borrar?')) return;
   let list=JSON.parse(localStorage.getItem('grabadora_reuniones_light')||'[]');
   list=list.filter(x=>x.id!==id);
   localStorage.setItem('grabadora_reuniones_light', JSON.stringify(list));
   renderList();
+};
+
+async function transcribeUniversal(){
+  if(!lastBlob){
+    // Intentar usar último blob de la lista? No tenemos audio guardado como blob en localStorage ligero
+    showStatus('Primero grabá algo para transcribir','warn');
+    return;
+  }
+  await loadModel();
+  if(!transcriber){ showStatus('Modelo no cargado','error'); return; }
+  try{
+    const ms=el('modelStatus');
+    if(ms){ ms.style.display='block'; ms.textContent='🎙️ Transcribiendo con IA universal (puede tardar 30-60s la primera vez)...'; }
+    // Convertir blob a Float32Array via AudioContext
+    const audioCtx=new (window.AudioContext||window.webkitAudioContext)({sampleRate:16000});
+    const arrayBuffer=await lastBlob.arrayBuffer();
+    const audioBuffer=await audioCtx.decodeAudioData(arrayBuffer);
+    // Tomar canal 0 y resamplear si es necesario (whisper espera 16k)
+    let audioData=audioBuffer.getChannelData(0);
+    // Si sampleRate no es 16000, ya lo forzamos al crear AudioContext con 16000, pero decode puede dar otro? Simplificamos
+    const result=await transcriber(audioData, {language:'spanish', task:'transcribe'});
+    const texto=result.text||'';
+    const tr=el('transcript');
+    if(tr){ tr.value=(tr.value? tr.value+'\n':'')+texto; }
+    if(ms) ms.textContent='✅ Transcripción universal completada';
+    showStatus('Transcripción universal lista ✅','ok');
+    // Auto resumir
+    setTimeout(()=>{ const btn=document.getElementById('btnSummarize'); if(btn) btn.click(); },500);
+  }catch(e){
+    console.error(e);
+    showStatus('Error transcribiendo: '+e.message,'error');
+  }
 }
 
-// Resumen automático con IA local (sin API)
 function summarize(text){
-  if(!text || text.trim().length<20){
-    return {resumen:"Texto muy corto para resumir.", puntos:[], tareas:[]};
-  }
+  if(!text || text.trim().length<20) return {resumen:"Texto corto", puntos:[], tareas:[]};
   const sentences=text.split(/(?<=[.!?])\s+/).filter(s=>s.trim().length>10);
-  // Score por frecuencia de palabras
   const words=text.toLowerCase().split(/\W+/).filter(w=>w.length>3);
-  const freq={};
-  words.forEach(w=>{ freq[w]=(freq[w]||0)+1; });
-  // Stopwords simples es
-  const stop=new Set(['para','esta','esto','esta','pero','como','cuando','donde','porque','entonces','tambien','sobre','entre','hasta','desde','tiene','tienen']);
+  const freq={}; words.forEach(w=>{ freq[w]=(freq[w]||0)+1; });
+  const stop=new Set(['para','esta','esto','pero','como','cuando','donde','porque','entonces','tambien']);
   let scored=sentences.map((s,idx)=>{
-    let score=0;
-    const ws=s.toLowerCase().split(/\W+/);
-    ws.forEach(w=>{ if(!stop.has(w) && freq[w]) score+=freq[w]; });
-    // Bonus si contiene palabras clave de reunión
-    if(/(venta|vender|precio|presupuesto|reunión|reunion|cliente|llamar|contactar|tarea|hacer|enviar|pasar|quedamos|acordamos)/i.test(s)) score+=5;
-    // Penalizar muy largas
-    if(s.length>200) score*=0.8;
+    let score=0; const ws=s.toLowerCase().split(/\W+/); ws.forEach(w=>{ if(!stop.has(w) && freq[w]) score+=freq[w]; });
+    if(/(venta|vender|precio|presupuesto|reunión|reunion|cliente|llamar|contactar|tarea|hacer|enviar|pasar|quedamos)/i.test(s)) score+=5;
     return {s,score,idx};
   });
   scored.sort((a,b)=>b.score-a.score);
   const top=scored.slice(0,3).sort((a,b)=>a.idx-b.idx).map(x=>x.s.trim());
-  // Tareas: buscar oraciones con verbos de acción
-  const tareas=sentences.filter(s=>/(tengo que|tenemos que|hay que|voy a|va a|quedé en|quedamos en|llamar|enviar|pasar|contactar|hacer|agendar|recordar)/i.test(s)).slice(0,5);
-  // Puntos clave: top 5 con más score
+  const tareas=sentences.filter(s=>/(tengo que|tenemos que|hay que|voy a|va a|quedé en|llamar|enviar|pasar|contactar|hacer|agendar)/i.test(s)).slice(0,5);
   const puntos=scored.slice(0,5).map(x=>'• '+x.s.trim());
+  return {resumen: top.join(' '), puntos, tareas: tareas.length? tareas.map(t=>'→ '+t.trim()) : ['No se detectaron tareas']};
+}
 
-  return {
-    resumen: top.join(' '),
-    puntos,
-    tareas: tareas.length? tareas.map(t=>'→ '+t.trim()) : ['No se detectaron tareas claras, revisá el texto.']
+function init(){
+  el('btnRecord').onclick=startRecording;
+  el('btnPause').onclick=pauseRecording;
+  el('btnStop').onclick=stopRecording;
+  el('btnCopyTrans').onclick=async()=>{ try{ await navigator.clipboard.writeText(el('transcript').value); showStatus('Copiado','ok'); }catch(e){} };
+  el('btnClearTrans').onclick=()=>{ if(confirm('¿Borrar?')){ el('transcript').value=''; } };
+  const btnTrans=el('btnTranscribe');
+  if(btnTrans) btnTrans.onclick=transcribeUniversal;
+  const btnSum=el('btnSummarize');
+  if(btnSum) btnSum.onclick=()=>{
+    const txt=(el('transcript').value||'').trim();
+    if(!txt){ showStatus('Sin texto para resumir','warn'); return; }
+    const res=summarize(txt);
+    const sumEl=el('summary');
+    if(sumEl){
+      sumEl.innerHTML=`<h4>📝 Resumen</h4><p>${res.resumen}</p><h4>📌 Puntos</h4><ul>${res.puntos.map(p=>'<li>'+p+'</li>').join('')}</ul><h4>✅ Tareas</h4><ul>${res.tareas.map(t=>'<li>'+t+'</li>').join('')}</ul>`;
+      sumEl.style.display='block';
+      const emp=el('summaryEmpty'); if(emp) emp.style.display='none';
+    }
   };
+  el('btnClearAll').onclick=()=>{ if(confirm('¿Borrar todo?')){ localStorage.removeItem('grabadora_reuniones_light'); renderList(); } };
+  el('modalOk').onclick=()=>{ el('modalOverlay').classList.remove('show'); };
+  el('modalOverlay').addEventListener('click', e=>{ if(e.target.id==='modalOverlay') e.target.classList.remove('show'); });
+  renderList();
+  // Precargar modelo en background
+  setTimeout(loadModel, 1000);
 }
-
-function showSummary(data){
-  if(typeof data==='string'){
-    elSummary.innerHTML=data;
-    elSummary.style.display='block';
-    elSummaryEmpty.style.display='none';
-    return;
-  }
-  elSummary.innerHTML=`
-    <h4>📝 Resumen</h4>
-    <p>${data.resumen}</p>
-    <h4>📌 Puntos clave</h4>
-    <ul>${data.puntos.map(p=>`<li>${p}</li>`).join('')}</ul>
-    <h4>✅ Tareas detectadas</h4>
-    <ul>${data.tareas.map(t=>`<li>${t}</li>`).join('')}</ul>
-    <div style="margin-top:10px;padding:8px 10px;border-radius:10px;background:rgba(58,208,164,0.12);font-size:11px">💡 Copiá esto y pegalo en tu Seguimiento de APPI o WhatsApp</div>
-  `;
-  elSummary.style.display='block';
-  elSummaryEmpty.style.display='none';
-}
-
-document.getElementById('btnRecord').onclick=startRecording;
-document.getElementById('btnPause').onclick=pauseRecording;
-document.getElementById('btnStop').onclick=stopRecording;
-
-document.getElementById('btnCopyTrans').onclick=async()=>{
-  try{ await navigator.clipboard.writeText(elTrans.value); showStatus('Texto copiado','ok'); }catch(e){ showStatus('Seleccioná y copiá manual','warn'); }
-};
-document.getElementById('btnClearTrans').onclick=()=>{
-  if(confirm('¿Borrar transcripción?')){ elTrans.value=''; finalTranscript=''; elSummary.style.display='none'; elSummaryEmpty.style.display='block'; }
-};
-document.getElementById('btnSummarize').onclick=()=>{
-  const txt=elTrans.value.trim();
-  if(!txt){ showStatus('Primero grabá o escribí texto de la reunión','warn'); return; }
-  const res=summarize(txt);
-  showSummary(res);
-  // Guardar resumen en última grabación
-  let list=JSON.parse(localStorage.getItem('grabadora_reuniones_light')||'[]');
-  if(list[0]){ list[0].summary=res.resumen; localStorage.setItem('grabadora_reuniones_light', JSON.stringify(list)); }
-  showStatus('Resumen generado con IA local ✅','ok');
-};
-document.getElementById('btnClearSum').onclick=()=>{ elSummary.style.display='none'; elSummaryEmpty.style.display='block'; };
-document.getElementById('btnClearAll').onclick=()=>{
-  if(confirm('¿Borrar todas las grabaciones?')){ localStorage.removeItem('grabadora_reuniones_light'); renderList(); showStatus('Borrado','ok'); }
-};
-
-renderList();
-
-// Aviso si no hay micro
-if(!navigator.mediaDevices){ showStatus('Tu navegador no soporta grabación, probá en Chrome en HTTPS','error'); }
-</script>
-
-<!-- MODAL POPUP COMO APPI -->
-<div class="modal-overlay" id="modalOverlay" style="position:fixed;inset:0;background:rgba(20,20,30,0.55);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity 0.25s;z-index:200">
-  <div class="modal" id="modalBox" style="background:rgba(255,255,255,0.98);backdrop-filter:blur(20px);border-radius:24px;width:100%;max-width:400px;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3);transform:translateY(20px);transition:transform 0.3s;padding:22px;text-align:center">
-    <div id="modalIcon" style="width:56px;height:56px;border-radius:18px;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:28px;color:#fff;background:linear-gradient(135deg,#5b8def,#a06bff)">💡</div>
-    <h3 id="modalTitle" style="margin:0;font-size:18px;font-weight:800">Aviso</h3>
-    <div id="modalBody" style="margin:12px 0;font-size:14px;line-height:1.5;color:#3a3a48"></div>
-    <button id="modalOk" style="width:100%;padding:12px;border-radius:12px;border:none;background:linear-gradient(135deg,#5b8def,#a06bff);color:#fff;font-weight:800;cursor:pointer">Entendido</button>
-  </div>
-</div>
-<script>
-const modal={
-  el: document.getElementById('modalOverlay'),
-  open({icon='💡', title='Aviso', html=''}){
-    document.getElementById('modalIcon').textContent=icon;
-    document.getElementById('modalTitle').textContent=title;
-    document.getElementById('modalBody').innerHTML=html;
-    this.el.style.opacity='1'; this.el.style.pointerEvents='auto';
-    this.el.querySelector('.modal').style.transform='translateY(0)';
-  },
-  close(){
-    this.el.style.opacity='0'; this.el.style.pointerEvents='none';
-    this.el.querySelector('.modal').style.transform='translateY(20px)';
-  }
-};
-document.getElementById('modalOverlay').addEventListener('click', e=>{ if(e.target.id==='modalOverlay') modal.close(); });
-document.getElementById('modalOk').addEventListener('click', ()=>modal.close());
+document.addEventListener('DOMContentLoaded', init);
 </script>
 </body>
 </html>
