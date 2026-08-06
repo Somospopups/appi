@@ -17,6 +17,13 @@
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<script type="importmap">
+{
+  "imports": {
+    "@xenova/transformers": "https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2/dist/transformers.min.js"
+  }
+}
+</script>
  
 <style>
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -11426,6 +11433,106 @@ document.addEventListener('DOMContentLoaded', initKeep);
 setTimeout(initKeep, 1200);
 window.renderKeep=renderKeep;
 })();
+</script>
+
+
+<script type="module">
+// ===== GRABADORA UNIVERSAL - TRANSCRIPCION LOCAL SIN RUIDO - Xenova Whisper tiny =====
+import { pipeline, env } from '@xenova/transformers';
+env.allowLocalModels=false;
+env.useBrowserCache=true;
+
+let transcriber=null, modelLoading=false;
+let lastBlobUniversal=null;
+
+async function loadModelUniversal(){
+  if(transcriber || modelLoading) return;
+  modelLoading=true;
+  const ms=document.getElementById('modelStatus');
+  if(ms){ ms.style.display='block'; ms.textContent='📥 Descargando modelo IA universal (primera vez ~40MB)...'; }
+  try{
+    transcriber=await pipeline('automatic-speech-recognition','Xenova/whisper-tiny',{quantized:true});
+    if(ms) ms.textContent='✅ Modelo IA listo - transcripción 100% local, sin servidor, sin API key, sin ruido';
+    setTimeout(()=>{ if(ms) ms.style.display='none'; },3000);
+    console.log('Modelo Whisper tiny cargado');
+  }catch(e){
+    console.error(e);
+    if(ms) ms.textContent='❌ Error modelo: '+e.message;
+  }finally{ modelLoading=false; }
+}
+
+async function transcribeUniversal(blob){
+  if(!blob){
+    if(typeof showStatus==='function') showStatus('Primero grabá','warn');
+    return;
+  }
+  await loadModelUniversal();
+  if(!transcriber){ 
+    if(typeof showStatus==='function') showStatus('Modelo no cargado','error');
+    return;
+  }
+  try{
+    const ms=document.getElementById('modelStatus');
+    if(ms){ ms.style.display='block'; ms.textContent='🎙️ Transcribiendo con IA universal (30-60s)...'; }
+    const audioCtx=new (window.AudioContext||window.webkitAudioContext)({sampleRate:16000});
+    const arrayBuffer=await blob.arrayBuffer();
+    const audioBuffer=await audioCtx.decodeAudioData(arrayBuffer);
+    let audioData=audioBuffer.getChannelData(0);
+    const result=await transcriber(audioData,{language:'spanish', task:'transcribe'});
+    const texto=result.text||'';
+    const tr=document.getElementById('transcript');
+    if(tr){ tr.value=(tr.value? tr.value+'\n':'')+texto; window.finalTranscript=tr.value; }
+    if(ms) ms.textContent='✅ Transcripción universal completada';
+    if(typeof showStatus==='function') showStatus('Transcripción universal lista ✅','ok');
+    setTimeout(()=>{
+      const btn=document.getElementById('btnSummarize');
+      if(btn) btn.click();
+    },500);
+  }catch(e){
+    console.error(e);
+    if(typeof showStatus==='function') showStatus('Error transcribiendo: '+e.message,'error');
+  }
+}
+
+// Exponer global para que saveRecording lo use
+window.transcribeUniversal=transcribeUniversal;
+window.loadModelUniversal=loadModelUniversal;
+window._lastBlobUniversal=null;
+
+// Sobrescribir saveRecording para guardar blob y transcribir automático sin ruido
+const origSave=window.saveRecording;
+window.saveRecording=function(blob){
+  window._lastBlobUniversal=blob;
+  lastBlobUniversal=blob;
+  // Guardar como antes
+  const id=Date.now();
+  const trEl=document.getElementById('transcript');
+  const transcript=(trEl?.value)||'';
+  const rec={id, date:new Date().toLocaleString('es-AR'), duration:document.getElementById('timer')?.textContent||'00:00', transcript, summary:''};
+  const prev=JSON.parse(localStorage.getItem('grabadora_reuniones_light')||'[]');
+  prev.unshift(rec);
+  localStorage.setItem('grabadora_reuniones_light', JSON.stringify(prev));
+  if(typeof renderList==='function') renderList();
+  // Auto-transcribir con IA universal sin ruido
+  setTimeout(()=>{ transcribeUniversal(blob); },800);
+};
+
+// Boton transcribir
+document.addEventListener('DOMContentLoaded', ()=>{
+  const btnTrans=document.getElementById('btnTranscribe');
+  if(btnTrans){
+    btnTrans.onclick=()=>{
+      if(window._lastBlobUniversal){
+        transcribeUniversal(window._lastBlobUniversal);
+      }else{
+        const ms=document.getElementById('modelStatus');
+        if(ms){ ms.style.display='block'; ms.textContent='⚠️ Grabá primero para transcribir con IA universal'; }
+      }
+    };
+  }
+  // Precargar modelo en background para que sea universal
+  setTimeout(loadModelUniversal, 2000);
+});
 </script>
 
 </body>
