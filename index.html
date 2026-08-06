@@ -3282,6 +3282,19 @@ body.dark .ganancias-table th{background:rgba(255,255,255,.06);color:#a0a0b0}
 body.dark .ganancias-table td{color:#d0d0d8;border-top-color:rgba(255,255,255,.08)}
 </style>
 
+
+<style id="appi-final-navigation-modes">
+/* Navegación glass: botones alineados y modo PC/teléfono */
+#dsCollapseBtn,.top-menu-btn,.help-btn,.tools-btn,.back-btn{-webkit-backdrop-filter:blur(16px) saturate(170%) !important;backdrop-filter:blur(16px) saturate(170%) !important;background:rgba(255,255,255,.58) !important;border:1px solid rgba(255,255,255,.82) !important;box-shadow:0 8px 22px rgba(80,90,130,.13),inset 0 1px 1px rgba(255,255,255,.8) !important;color:#3d63c9 !important}
+#dsCollapseBtn{position:absolute;top:12px !important;right:4px;width:38px !important;height:38px !important;border-radius:50% !important;padding:0 !important;font-size:0 !important;display:grid !important;place-items:center !important}
+#dsCollapseBtn::before{content:'‹';font-size:24px;line-height:1;font-weight:800;transform:translateY(-1px)}
+#dsCollapseBtn:hover,.top-menu-btn:hover,.help-btn:hover,.tools-btn:hover,.back-btn:hover{background:rgba(255,255,255,.78) !important;transform:translateY(-1px)}
+#dsCollapseBtn:active,.top-menu-btn:active,.help-btn:active,.tools-btn:active,.back-btn:active{transform:scale(.94) !important}
+.ds-logo{display:none !important}.ds-brand{padding-left:8px !important;gap:0 !important}
+header.top .back-btn + .top-menu-btn{left:48px !important;top:0 !important}header.top .back-btn{top:0 !important}header.top .help-btn{top:0 !important}header.top .tools-btn{top:0 !important}.home-header .top-menu-btn{left:0 !important;top:0 !important}
+body.modo-telefono .desk-sidebar{display:none !important}body.modo-telefono .app{margin-left:0 !important;width:100% !important;max-width:520px !important;padding-left:14px !important;padding-right:14px !important;margin-right:auto !important;margin-left:auto !important}body.modo-telefono .top-menu-btn{display:none !important}body.modo-telefono .view{max-width:100% !important}body.modo-telefono .home-tool-grid{grid-template-columns:repeat(2,minmax(0,1fr)) !important}body.modo-telefono .business-card{grid-template-columns:48px 1fr auto !important}body.modo-telefono .home-header{padding-top:8px !important}body.modo-telefono .rot-fab{display:none !important}
+body.dark #dsCollapseBtn,body.dark .top-menu-btn,body.dark .help-btn,body.dark .tools-btn,body.dark .back-btn{background:rgba(30,35,60,.62) !important;border-color:rgba(255,255,255,.14) !important;color:#a8b8ff !important}
+</style>
 </head>
 <body>
 <!-- ============ SIDEBAR ESCRITORIO / LANDSCAPE ============ -->
@@ -11631,5 +11644,15 @@ document.addEventListener('DOMContentLoaded', ()=>{
 
 </script>
 
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a26ffdbddeb0d7ef',t:'MTc4NjAzOTc1MQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>
+(function(){
+ const KEY='appi_modo_visual';
+ function actualizarModoVisual(){const tel=document.body.classList.contains('modo-telefono');const i=document.getElementById('toolsOrientIco'),t=document.getElementById('toolsOrientTxt');if(i)i.textContent=tel?'🖥️':'📱';if(t)t.textContent=tel?'MODO PC':'MODO TELÉFONO'}
+ function cambiarModo(){const tel=!document.body.classList.contains('modo-telefono');document.body.classList.toggle('modo-telefono',tel);try{localStorage.setItem(KEY,tel?'telefono':'pc')}catch(e){}actualizarModoVisual();if(typeof cerrarToolsMenu==='function')cerrarToolsMenu();if(typeof showToast==='function')showToast(tel?'📱 Modo teléfono activado':'🖥️ Modo PC activado',1800)}
+ window.toggleOrientacion=cambiarModo;window.forzarRotacion=cambiarModo;
+ try{if(localStorage.getItem(KEY)==='telefono')document.body.classList.add('modo-telefono')}catch(e){}
+ document.addEventListener('DOMContentLoaded',actualizarModoVisual);setTimeout(actualizarModoVisual,500);
+})();
+</script>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a27086390bc53580',t:'MTc4NjA0NTM0MQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
