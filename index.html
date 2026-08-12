@@ -7229,10 +7229,10 @@ document.getElementById('btnEquipoShare').onclick = ()=>{
       <span class="sm-arrow">›</span>
     </button>
     <button class="share-menu-item" id="smImage">
-      <div class="sm-ico" style="background:linear-gradient(135deg,#5b8def,#a06bff)">🖼️</div>
+      <div class="sm-ico" style="background:linear-gradient(135deg,#5b8def,#a06bff)">🧭</div>
       <div class="sm-txt">
-        <div class="sm-title">Imagen del árbol</div>
-        <div class="sm-desc">Organigrama en imagen</div>
+        <div class="sm-title">Organigrama interactivo</div>
+        <div class="sm-desc">Lienzo navegable para explorar, imprimir y exportar</div>
       </div>
       <span class="sm-arrow">›</span>
     </button>
@@ -7246,7 +7246,7 @@ document.getElementById('btnEquipoShare').onclick = ()=>{
     const bd = document.getElementById('smDatos');
     const bi = document.getElementById('smImage');
     if(bd) bd.onclick = ()=>{ modal.close(); haptic(10); abrirSelectorParaCompartirDatos(); };
-    if(bi) bi.onclick = ()=>{ modal.close(); haptic(10); abrirSelectorPersona(); };
+    if(bi) bi.onclick = ()=>{ modal.close(); haptic(10); if(typeof abrirOrganigramaInteractivo==='function') abrirOrganigramaInteractivo(); };
   }, 50);
 };
 
@@ -10541,6 +10541,28 @@ function abrirBackupDesdeMenu(){
 
 // Verificar al arrancar
 (async function() {
+  // === PREVIEW / LOCAL / DEMO LINK: auto-activación + equipo de ejemplo ===
+  const esPreview = location.hostname.indexOf('e2b.app') !== -1 || location.protocol === 'file:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.search.indexOf('demo') !== -1;
+  if(esPreview && !localStorage.getItem('appi_activada')){
+    try{
+      const _did=generarDeviceId();
+      localStorage.setItem('appi_activada', JSON.stringify({codigo:generarCodigoActivacion(_did),fecha:Date.now(),deviceId:_did}));
+    }catch(e){}
+  }
+  function cargarEquipoDemo(){
+    let _id=1;
+    const nodo=(nombre,cat,pnAct,hijos)=>({id:_id++,nombre:nombre,cat:cat,codigo:String(_id-1),pnAct:pnAct||0,m1:0,m2:0,m3:0,tel:'',email:'',alta:'',cumple:'',estado:(pnAct&&pnAct>0)?'Activo':'Inactivo',hijos:hijos||[]});
+    const tree=[
+      nodo('MARIA GONZALEZ','L',22,[nodo('JUAN PEREZ','DC',12,[nodo('LUCIA DIAZ','D',5),nodo('PEDRO LOPEZ','DJ',0)]),nodo('CARLOS RUIZ','CE',8,[nodo('ANA TORRES','D',3)])]),
+      nodo('ROBERTO SANCHEZ','LE',30,[nodo('PATRICIA GOMEZ','L',15,[nodo('DIEGO FERNANDEZ','DC',6),nodo('SILVINA MARTINEZ','DC',4,[nodo('MARTIN SUAREZ','D',2)]),nodo('EZEQUIEL ROSSI','DJ',0)]),nodo('FERNANDA ACOSTA','CE',11,[nodo('GUSTAVO BRAVO','D',3),nodo('ROMINA CASTRO','D',5)])]),
+      nodo('ADRIAN MOLINA','L',9,[nodo('VANESA SOTA','DC',6,[nodo('NICOLAS RIOS','DJ',1)]),nodo('LEANDRO ORTIZ','DJ',1)])
+    ];
+    const personas=[];
+    (function f(a){a.forEach(p=>{personas.push({id:p.id,nombre:p.nombre,cat:p.cat,codigo:p.codigo,pnAct:p.pnAct,estado:p.estado});if(p.hijos&&p.hijos.length)f(p.hijos);});})(tree);
+    equipoData={titular:{nombre:'EQUIPO DE EJEMPLO',dip:'0',categoria:'LE'},personas:personas,raices:tree};
+    try{localStorage.setItem('equipoData',JSON.stringify(equipoData));}catch(e){}
+  }
+  // === fin preview ===
   // FIX: verificar blocklist ANTES de arrancar (con timeout por si no hay red)
   const conTimeout = (p, ms) => Promise.race([p, new Promise(r => setTimeout(() => r(null), ms))]);
   let bloqueado = false;
@@ -10548,6 +10570,23 @@ function abrirBackupDesdeMenu(){
   if (bloqueado === true) { mostrarPantallaBloqueado(); return; }
   if (estaActivada()) {
     iniciarApp();
+    if(esPreview){
+      setTimeout(()=>{
+        let cargoDemo=false;
+        try{ if(!equipoData || !equipoData.personas || !equipoData.personas.length){ cargarEquipoDemo(); loadEquipoFromStorage(); cargoDemo=true; } }catch(e){}
+        if(cargoDemo){
+          try{
+            modal.open({
+              icon:'🌱', iconBg:'linear-gradient(135deg,#3ad0a4,#a06bff)',
+              title:'Equipo de ejemplo cargado', sub:'Modo preview',
+              html:'<p>Cargué un equipo de prueba para que veas el organigrama interactivo en acción.</p><div class="tip"><b>Tip:</b> después podés cargar tu Excel real desde <b>Mi Equipo</b>.</div>',
+              confirm:true, okText:'🌳 Ver organigrama',
+              onConfirm:()=>{ try{ showView('view-equipo'); loadEquipoFromStorage(); renderEquipo(); }catch(e){} setTimeout(()=>{ if(typeof abrirOrganigramaInteractivo==='function') abrirOrganigramaInteractivo(); }, 450); }
+            });
+          }catch(e){}
+        }
+      }, 500);
+    }
   } else {
     mostrarPantallaBloqueo();
   }
@@ -11046,6 +11085,563 @@ body.dark .presu-select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:
 <style>
 #backupCollapsible{display:none !important}
 </style>
+
+
+<!-- ============================================================
+     ORGANIGRAMA INTERACTIVO — Lienzo infinito (pan/zoom/imprimible)
+     ============================================================ -->
+<style>
+  #orgCanvas{
+    position:fixed; inset:0; z-index:180;
+    background:#f4f6fb;
+    display:none;
+    flex-direction:column;
+    overscroll-behavior:none;
+  }
+  #orgCanvas.open{ display:flex; }
+  body.dark #orgCanvas{ background:#0c1020; }
+
+  .oc-topbar{
+    position:absolute; top:calc(env(safe-area-inset-top) + 10px); left:10px; right:10px;
+    display:flex; gap:8px; align-items:center; flex-wrap:wrap;
+    z-index:5;
+  }
+  .oc-btn{
+    height:40px; min-width:40px; padding:0 12px; border-radius:12px; border:1px solid rgba(120,130,170,0.25);
+    background:rgba(255,255,255,0.92); backdrop-filter:blur(14px);
+    font:inherit; font-weight:800; font-size:13px; color:#3d63c9; cursor:pointer;
+    display:inline-flex; align-items:center; justify-content:center; gap:6px;
+    box-shadow:0 4px 14px rgba(60,70,110,0.12);
+    transition:transform .12s ease, background .15s ease;
+    user-select:none;
+  }
+  .oc-btn:active{ transform:scale(0.94); }
+  .oc-btn .ico{ font-size:16px; line-height:1; }
+  .oc-btn.ghost{ background:rgba(255,255,255,0.7); }
+  body.dark .oc-btn{ background:rgba(40,44,64,0.92); color:#a8b8ff; border-color:rgba(255,255,255,0.12); }
+
+  .oc-search{
+    position:absolute; top:calc(env(safe-area-inset-top) + 58px); left:10px;
+    width:min(320px, 70vw); z-index:5;
+    background:rgba(255,255,255,0.96); border:1px solid rgba(120,130,170,0.22);
+    border-radius:14px; box-shadow:0 8px 26px rgba(60,70,110,0.18);
+    overflow:hidden; display:none;
+  }
+  .oc-search.open{ display:block; }
+  .oc-search input{
+    width:100%; box-sizing:border-box; border:none; outline:none; padding:12px 14px;
+    font:inherit; font-size:14px; background:transparent; color:#1c1c1e;
+  }
+  body.dark .oc-search{ background:rgba(34,38,56,0.97); }
+  body.dark .oc-search input{ color:#f0f0f5; }
+  .oc-search-res{ max-height:260px; overflow:auto; }
+  .oc-search-item{
+    display:flex; align-items:center; gap:8px; padding:9px 12px; cursor:pointer;
+    border-top:1px solid rgba(120,130,170,0.12);
+  }
+  .oc-search-item:active{ background:rgba(91,141,239,0.14); }
+  .oc-search-item .si-cat{ font-size:9px; font-weight:800; padding:2px 7px; border-radius:6px; color:#fff; flex:none; }
+  .oc-search-item .si-name{ font-size:12.5px; font-weight:700; color:#1c1c1e; flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  body.dark .oc-search-item .si-name{ color:#f0f0f5; }
+  .oc-search-item .si-meta{ font-size:10px; color:#8a8a94; }
+
+  #ocViewport{
+    position:absolute; inset:0; overflow:hidden; touch-action:none; cursor:grab;
+  }
+  #ocViewport.grabbing{ cursor:grabbing; }
+  #ocWorld{ position:absolute; top:0; left:0; transform-origin:0 0; will-change:transform; }
+  .oc-svg{ position:absolute; top:0; left:0; pointer-events:none; overflow:visible; }
+  .oc-svg .oc-line{ stroke:#aab2c6; stroke-width:1.6; fill:none; stroke-linecap:round; stroke-linejoin:round; }
+  body.dark .oc-svg .oc-line{ stroke:#454c68; }
+
+  .oc-node{
+    position:absolute; box-sizing:border-box;
+    background:rgba(255,255,255,0.97); border-radius:12px;
+    border:1.5px solid var(--nc,#c9d2e6);
+    border-left:5px solid var(--nc,#c9d2e6);
+    padding:7px 9px; cursor:pointer; overflow:hidden;
+    display:flex; flex-direction:column; justify-content:center;
+    box-shadow:0 3px 10px rgba(60,70,110,0.16);
+    transition:transform .12s ease, box-shadow .15s ease, outline-color .15s ease;
+    -webkit-user-select:none; user-select:none;
+  }
+  .oc-node:hover{ box-shadow:0 8px 20px rgba(60,70,110,0.26); transform:translateY(-1px); z-index:2; }
+  .oc-node.inactive{ opacity:0.5; }
+  .oc-node.hit{ outline:3px solid #5b8def; outline-offset:2px; z-index:3; }
+  .oc-node .oc-cat{ align-self:flex-start; font-size:9px; font-weight:800; padding:2px 7px; border-radius:6px; margin-bottom:3px; letter-spacing:0.3px; }
+  .oc-node .oc-name{ font-size:11px; font-weight:800; color:#1c1c1e; line-height:1.15; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+  .oc-node .oc-pts{ font-size:10px; font-weight:700; color:#3d63c9; margin-top:3px; }
+  .oc-node .oc-count{ position:absolute; top:-7px; right:-7px; min-width:20px; height:20px; padding:0 5px; border-radius:999px; background:linear-gradient(135deg,#5b8def,#a06bff); color:#fff; font-size:10px; font-weight:800; display:grid; place-items:center; box-shadow:0 2px 6px rgba(91,141,239,0.4); }
+  body.dark .oc-node{ background:rgba(40,44,64,0.96); box-shadow:0 3px 10px rgba(0,0,0,0.4); }
+  body.dark .oc-node .oc-name{ color:#f0f0f5; }
+  body.dark .oc-node .oc-pts{ color:#a8b8ff; }
+
+  .oc-minimap{
+    position:absolute; right:12px; bottom:calc(env(safe-area-inset-bottom) + 12px);
+    width:170px; height:120px; z-index:5;
+    background:rgba(255,255,255,0.9); border:1px solid rgba(120,130,170,0.25);
+    border-radius:12px; box-shadow:0 8px 26px rgba(60,70,110,0.18);
+    overflow:hidden; cursor:pointer;
+  }
+  body.dark .oc-minimap{ background:rgba(34,38,56,0.9); border-color:rgba(255,255,255,0.12); }
+  .oc-mm-view{ position:absolute; border:2px solid #5b8def; background:rgba(91,141,239,0.12); border-radius:3px; pointer-events:none; }
+
+  .oc-hint{
+    position:absolute; left:50%; transform:translateX(-50%);
+    bottom:calc(env(safe-area-inset-bottom) + 14px); z-index:4;
+    background:rgba(30,34,52,0.82); color:#fff; font-size:11.5px; font-weight:700;
+    padding:7px 14px; border-radius:999px; backdrop-filter:blur(8px);
+    pointer-events:none; opacity:0; transition:opacity .3s ease;
+  }
+  .oc-hint.show{ opacity:1; }
+
+  #orgPrint{ position:fixed; left:-99999px; top:0; }
+  @media print{
+    body * { visibility:hidden !important; }
+    #orgPrint, #orgPrint * { visibility:visible !important; }
+    #orgPrint{ position:absolute; left:0; top:0; width:100%; }
+    #orgPrint svg{ width:100%; height:auto; display:block; }
+    @page{ margin:8mm; }
+  }
+</style>
+
+<div id="orgCanvas" aria-hidden="true">
+  <div class="oc-topbar">
+    <button class="oc-btn" id="ocClose" title="Volver"><span class="ico">‹</span><span>Volver</span></button>
+    <button class="oc-btn ghost" id="ocSearchBtn" title="Buscar persona"><span class="ico">🔍</span><span>Buscar</span></button>
+    <button class="oc-btn ghost" id="ocZoomOut" title="Alejar">－</button>
+    <button class="oc-btn ghost" id="ocZoomIn" title="Acercar">＋</button>
+    <button class="oc-btn ghost" id="ocFit" title="Ajustar a pantalla"><span class="ico">⤢</span></button>
+    <div style="flex:1"></div>
+    <button class="oc-btn ghost" id="ocPrint" title="Imprimir"><span class="ico">🖨️</span><span>Imprimir</span></button>
+    <button class="oc-btn ghost" id="ocPdfA4" title="PDF en hojas A4"><span class="ico">📄</span><span>A4</span></button>
+    <button class="oc-btn ghost" id="ocPdfPoster" title="PDF poster gigante"><span class="ico">🗺️</span><span>Poster</span></button>
+  </div>
+
+  <div class="oc-search" id="ocSearch">
+    <input type="text" id="ocSearchInput" placeholder="Buscar persona o N°…" autocomplete="off" />
+    <div class="oc-search-res" id="ocSearchRes"></div>
+  </div>
+
+  <div id="ocViewport">
+    <div id="ocWorld"></div>
+  </div>
+
+  <div class="oc-minimap" id="ocMinimap">
+    <div class="oc-mm-view" id="ocMmView"></div>
+  </div>
+
+  <div class="oc-hint" id="ocHint">Arrastrá para mover · pellizcá o usá ＋/－ para zoom</div>
+</div>
+
+<div id="orgPrint"></div>
+
+<script>
+// ===== ORGANIGRAMA INTERACTIVO (lienzo infinito) =====
+(function(){
+  if(window.__orgCanvasInit) return; window.__orgCanvasInit=true;
+
+  const NODE_W=172, NODE_H=98, GAP_X=30, GAP_Y=112;
+  const S={
+    root:null, layout:{}, bounds:{w:1,h:1}, scale:1, tx:0, ty:0,
+    minScale:0.08, maxScale:2.4, moved:false,
+    vp:null, world:null, minimap:null, mmView:null, mm_s:1, mm_ox:0, mm_oy:0
+  };
+
+  function $(id){ return document.getElementById(id); }
+  function init(){
+    S.vp=$('ocViewport'); S.world=$('ocWorld');
+    S.minimap=$('ocMinimap'); S.mmView=$('ocMmView');
+    bindControls(); bindPointer(); bindWheel(); bindMinimap();
+  }
+
+  function ensureTitular(){
+    if(!equipoData) loadEquipoFromStorage();
+    if(!equipoData || !equipoData.personas || !equipoData.personas.length) return null;
+    const tit=equipoData.titular||{};
+    if(equipoData.nodoTitular && equipoData.nodoTitular.hijos && equipoData.nodoTitular.hijos.length){
+      return equipoData.nodoTitular;
+    }
+    equipoData.nodoTitular={
+      id:999999,
+      nombre:(tit.nombre||'MI EQUIPO').toUpperCase(),
+      cat:(tit.categoria||'E').toUpperCase(),
+      codigo:tit.dip||'',
+      hijos:equipoData.raices||[],
+      pnAct:0, esTitular:true
+    };
+    return equipoData.nodoTitular;
+  }
+
+  // ---- Layout tipo tidy-tree (centra cada nodo sobre su subárbol) ----
+  function buildLayout(root){
+    let cursor=0; S.layout={};
+    function rec(p,depth){
+      const kids=p.hijos||[];
+      if(!kids.length){
+        p._x=cursor; p._y=depth*(NODE_H+GAP_Y); p._w=NODE_W; cursor+=NODE_W+GAP_X;
+      } else {
+        kids.forEach(k=>rec(k,depth+1));
+        const f=kids[0], l=kids[kids.length-1];
+        p._x=(f._x + (l._x+l._w))/2 - NODE_W/2; p._y=depth*(NODE_H+GAP_Y); p._w=(l._x+l._w)-f._x;
+      }
+      p._depth=depth; S.layout[p.id]=p;
+    }
+    rec(root,0);
+    let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;
+    (function walk(p){
+      minX=Math.min(minX,p._x); maxX=Math.max(maxX,p._x+NODE_W);
+      minY=Math.min(minY,p._y); maxY=Math.max(maxY,p._y+NODE_H);
+      (p.hijos||[]).forEach(walk);
+    })(root);
+    (function shift(p){ p._x-=minX; p._y-=minY; (p.hijos||[]).forEach(shift); })(root);
+    S.bounds={w:Math.max(1,maxX-minX), h:Math.max(1,maxY-minY)};
+    S.root=root;
+  }
+
+  function nodesHTML(root){
+    let h='';
+    (function walk(p){
+      const info=catInfoOf(p.cat);
+      const desc=contarDescendientes(p);
+      const pts=p.pnAct||0;
+      const inactive = !p.esTitular && pts===0;
+      h+=`<div class="oc-node ${inactive?'inactive':''}" data-pid="${p.id}" style="left:${p._x}px;top:${p._y}px;width:${NODE_W}px;height:${NODE_H}px;--nc:${info.color}">
+        ${desc>0?`<span class="oc-count">${desc}</span>`:''}
+        <span class="oc-cat" style="background:${info.color};color:${info.textColor||'#1c1c1e'}">${info.name}</span>
+        <div class="oc-name">${escapeXml(p.nombre)}</div>
+        <div class="oc-pts">${p.esTitular?(equipoData.personas.length+' personas'):(formatPB(pts)+' PB')}</div>
+      </div>`;
+      (p.hijos||[]).forEach(walk);
+    })(root);
+    return h;
+  }
+
+  function connectorsSVG(root){
+    let d='';
+    (function walk(p){
+      (p.hijos||[]).forEach(c=>{
+        const px=p._x+NODE_W/2, py=p._y+NODE_H, cx=c._x+NODE_W/2, cy=c._y, mid=(py+cy)/2;
+        d+=`M ${px} ${py} V ${mid} H ${cx} V ${cy} `;
+        walk(c);
+      });
+    })(root);
+    const b=S.bounds;
+    return `<svg class="oc-svg" width="${b.w}" height="${b.h}" viewBox="0 0 ${b.w} ${b.h}"><path class="oc-line" d="${d}"/></svg>`;
+  }
+
+  function bindNodeClicks(){
+    S.world.querySelectorAll('.oc-node').forEach(el=>{
+      el.addEventListener('click',()=>{
+        if(S.moved) return;
+        const p=S.layout[+el.dataset.pid];
+        if(p && !p.esTitular){ try{haptic(10);}catch(e){} openPersonaModal(p); }
+      });
+    });
+  }
+
+  function applyTransform(){
+    S.world.style.transform=`translate(${S.tx}px,${S.ty}px) scale(${S.scale})`;
+    updateMinimapViewport();
+  }
+
+  function vRect(){ return S.vp.getBoundingClientRect(); }
+
+  function zoomAt(cx,cy,factor){
+    let ns=S.scale*factor; ns=Math.max(S.minScale,Math.min(S.maxScale,ns));
+    if(ns===S.scale) return;
+    const k=ns/S.scale;
+    S.tx=cx-(cx-S.tx)*k; S.ty=cy-(cy-S.ty)*k; S.scale=ns; applyTransform();
+  }
+
+  function fitToScreen(pad){
+    pad=pad||48; const r=vRect();
+    const s=Math.min((r.width-pad*2)/S.bounds.w,(r.height-pad*2)/S.bounds.h,S.maxScale);
+    S.scale=Math.max(S.minScale,s);
+    S.tx=(r.width-S.bounds.w*S.scale)/2;
+    S.ty=(r.height-S.bounds.h*S.scale)/2;
+    applyTransform();
+  }
+
+  function centerOn(pid){
+    const p=S.layout[pid]; if(!p) return;
+    const r=vRect();
+    S.scale=Math.min(S.maxScale, Math.max(S.scale, 1));
+    S.tx=r.width/2-(p._x+NODE_W/2)*S.scale;
+    S.ty=r.height/2-(p._y+NODE_H/2)*S.scale;
+    applyTransform();
+    S.world.querySelectorAll('.oc-node').forEach(n=>n.classList.remove('hit'));
+    const el=S.world.querySelector(`.oc-node[data-pid="${pid}"]`);
+    if(el){ el.classList.add('hit'); setTimeout(()=>el.classList.remove('hit'),2200); }
+  }
+
+  // ---- Pointer (mouse + touch + pellizco unificado) ----
+  function bindPointer(){
+    const ptrs=new Map(); let panLast=null, pinch=null;
+    const distP=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
+    const midP=(a,b)=>({x:(a.x+b.x)/2,y:(a.y+b.y)/2});
+    function vals(){ return [...ptrs.values()]; }
+    S.vp.addEventListener('pointerdown',e=>{
+      try{S.vp.setPointerCapture(e.pointerId);}catch(_){}
+      ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
+      if(ptrs.size===1){ panLast={x:e.clientX,y:e.clientY}; S.moved=false; }
+      else if(ptrs.size===2){ const v=vals(); pinch={d:distP(v[0],v[1])}; panLast=null; }
+    });
+    S.vp.addEventListener('pointermove',e=>{
+      if(!ptrs.has(e.pointerId)) return;
+      ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
+      if(ptrs.size>=2 && pinch){
+        const v=vals(); const nd=distP(v[0],v[1]); const m=midP(v[0],v[1]); const r=vRect();
+        zoomAt(m.x-r.left,m.y-r.top, nd/pinch.d); pinch.d=nd; S.moved=true;
+      } else if(panLast){
+        const dx=e.clientX-panLast.x, dy=e.clientY-panLast.y;
+        if(Math.abs(dx)+Math.abs(dy)>4) S.moved=true;
+        S.tx+=dx; S.ty+=dy; panLast={x:e.clientX,y:e.clientY}; applyTransform();
+      }
+    });
+    function end(e){
+      ptrs.delete(e.pointerId);
+      if(ptrs.size<2) pinch=null;
+      if(ptrs.size===1){ const v=vals()[0]; panLast={x:v.x,y:v.y}; }
+      if(ptrs.size===0) panLast=null;
+    }
+    S.vp.addEventListener('pointerup',end);
+    S.vp.addEventListener('pointercancel',end);
+    S.vp.addEventListener('pointerleave',end);
+  }
+
+  function bindWheel(){
+    S.vp.addEventListener('wheel',e=>{
+      e.preventDefault();
+      const r=vRect();
+      const f=e.deltaY<0?1.12:1/1.12;
+      zoomAt(e.clientX-r.left,e.clientY-r.top,f);
+    },{passive:false});
+  }
+
+  // ---- Mini-mapa ----
+  function drawMinimap(){
+    const mm=S.minimap, ctx=mm.getContext('2d');
+    const W=mm.clientWidth||170, H=mm.clientHeight||120;
+    mm.width=W; mm.height=H;
+    ctx.clearRect(0,0,W,H);
+    const b=S.bounds, s=Math.min(W/b.w,H/b.h)*0.92;
+    const ox=(W-b.w*s)/2, oy=(H-b.h*s)/2;
+    ctx.fillStyle=document.body.classList.contains('dark')?'rgba(168,184,255,0.55)':'rgba(91,141,239,0.55)';
+    Object.values(S.layout).forEach(p=>{
+      ctx.fillRect(ox+p._x*s, oy+p._y*s, Math.max(2.2,NODE_W*s), Math.max(2.2,NODE_H*s*0.32));
+    });
+    S.mm_s=s; S.mm_ox=ox; S.mm_oy=oy;
+    updateMinimapViewport();
+  }
+  function updateMinimapViewport(){
+    if(!S.mm_s) return; const r=vRect(), s=S.mm_s, ox=S.mm_ox, oy=S.mm_oy;
+    const vw=r.width/S.scale, vh=r.height/S.scale;
+    const vx=(-S.tx/S.scale), vy=(-S.ty/S.scale);
+    S.mmView.style.left=(ox+vx*s)+'px'; S.mmView.style.top=(oy+vy*s)+'px';
+    S.mmView.style.width=(vw*s)+'px'; S.mmView.style.height=(vh*s)+'px';
+  }
+  function bindMinimap(){
+    let mmDrag=false;
+    const moveTo=(e)=>{
+      const rb=S.minimap.getBoundingClientRect();
+      const x=(e.clientX!==undefined?e.clientX:(e.touches&&e.touches[0].clientX))-rb.left;
+      const y=(e.clientY!==undefined?e.clientY:(e.touches&&e.touches[0].clientY))-rb.top;
+      // world coord under cursor
+      const wx=(x-S.mm_ox)/S.mm_s, wy=(y-S.mm_oy)/S.mm_s;
+      const r=vRect();
+      S.tx=r.width/2-wx*S.scale; S.ty=r.height/2-wy*S.scale; applyTransform();
+    };
+    S.minimap.addEventListener('pointerdown',e=>{ try{S.minimap.setPointerCapture(e.pointerId);}catch(_){} mmDrag=true; moveTo(e); });
+    S.minimap.addEventListener('pointermove',e=>{ if(mmDrag) moveTo(e); });
+    S.minimap.addEventListener('pointerup',()=>mmDrag=false);
+    S.minimap.addEventListener('pointercancel',()=>mmDrag=false);
+  }
+
+  // ---- Buscador ----
+  function openSearch(){
+    const box=$('ocSearch'); box.classList.add('open');
+    const inp=$('ocSearchInput'); inp.value=''; inp.focus(); renderSearch('');
+  }
+  function renderSearch(q){
+    const cont=$('ocSearchRes');
+    const f=(q||'').toLowerCase().trim();
+    let list=(equipoData?equipoData.personas:[]).filter(p=>!p.esTitular);
+    if(f) list=list.filter(p=>(p.nombre||'').toLowerCase().includes(f)||String(p.codigo||'').toLowerCase().includes(f));
+    list=list.slice(0,60);
+    if(!list.length){ cont.innerHTML='<div class="oc-search-item"><span class="si-name" style="color:#8a8a94">Sin resultados</span></div>'; return; }
+    cont.innerHTML=list.map(p=>{
+      const info=catInfoOf(p.cat);
+      return `<div class="oc-search-item" data-pid="${p.id}">
+        <span class="si-cat" style="background:${info.color};color:${info.textColor||'#fff'}">${info.name}</span>
+        <span class="si-name">${escapeXml(p.nombre)}</span>
+        <span class="si-meta">#${escapeXml(p.codigo||'')}</span>
+      </div>`;
+    }).join('');
+    cont.querySelectorAll('.oc-search-item[data-pid]').forEach(el=>{
+      el.onclick=()=>{ $('ocSearch').classList.remove('open'); try{haptic(12);}catch(e){} centerOn(+el.dataset.pid); };
+    });
+  }
+  function bindSearch(){
+    const inp=$('ocSearchInput');
+    inp.addEventListener('input',()=>renderSearch(inp.value));
+    inp.addEventListener('keydown',e=>{ if(e.key==='Escape') $('ocSearch').classList.remove('open'); });
+    document.addEventListener('pointerdown',e=>{
+      const box=$('ocSearch');
+      if(box.classList.contains('open') && !box.contains(e.target) && e.target.id!=='ocSearchBtn'){
+        box.classList.remove('open');
+      }
+    },true);
+  }
+
+  // ---- Exportación: SVG vectorial del árbol (nítido a cualquier escala) ----
+  function buildExportSVG(){
+    const pad=46, b=S.bounds, W=b.w+pad*2, H=b.h+pad*2;
+    let lines='';
+    (function wl(p){
+      (p.hijos||[]).forEach(c=>{
+        const px=p._x+NODE_W/2+pad, py=p._y+NODE_H+pad, cx=c._x+NODE_W/2+pad, cy=c._y+pad, mid=(py+cy)/2;
+        lines+=`<path d="M${px.toFixed(1)} ${py.toFixed(1)} V${mid.toFixed(1)} H${cx.toFixed(1)} V${cy.toFixed(1)}" stroke="#9aa3b5" stroke-width="1.6" fill="none"/>`;
+        wl(c);
+      });
+    })(S.root);
+    let nodes='';
+    (function wn(p){
+      const info=catInfoOf(p.cat); const x=p._x+pad, y=p._y+pad;
+      const desc=contarDescendientes(p); const pts=p.pnAct||0;
+      const nombre=(p.nombre||'').replace(/\s+/g,' ').slice(0,28);
+      nodes+=`<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${NODE_W}" height="${NODE_H}" rx="11" fill="#ffffff" stroke="${info.color}" stroke-width="2"/>
+        <rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="6" height="${NODE_H}" rx="3" fill="${info.color}"/>
+        <text x="${x+14}" y="${y+18}" font-family="-apple-system,Segoe UI,Roboto,sans-serif" font-size="10" font-weight="800" fill="${info.color}">${escapeXml(info.name)}</text>
+        <text x="${x+14}" y="${y+40}" font-family="-apple-system,Segoe UI,Roboto,sans-serif" font-size="12" font-weight="800" fill="#1c1c1e">${escapeXml(nombre)}</text>
+        <text x="${x+14}" y="${y+62}" font-family="-apple-system,Segoe UI,Roboto,sans-serif" font-size="11" font-weight="700" fill="#3d63c9">${p.esTitular?(equipoData.personas.length+' personas'):(formatPB(pts)+' PB')}${desc>0?(' · '+desc+' desc.'):''}</text>`;
+      (p.hijos||[]).forEach(wn);
+    })(S.root);
+    const tit=(equipoData.titular&&equipoData.titular.nombre)?equipoData.titular.nombre:'Mi equipo';
+    const fecha=new Date().toLocaleDateString('es-AR',{day:'numeric',month:'long',year:'numeric'});
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="${Math.round(W)}" height="${Math.round(H)}" viewBox="0 0 ${W} ${H}">
+      <rect width="${W}" height="${H}" fill="#ffffff"/>
+      <text x="${W/2}" y="26" text-anchor="middle" font-family="-apple-system,Segoe UI,Roboto,sans-serif" font-size="20" font-weight="900" fill="#3d63c9">🌳 Organigrama — ${escapeXml(tit)}</text>
+      <text x="${W/2}" y="44" text-anchor="middle" font-family="-apple-system,Segoe UI,Roboto,sans-serif" font-size="12" font-weight="600" fill="#8a8a94">${fecha} · ${equipoData.personas.length} personas</text>
+      <g transform="translate(0,16)">${lines}${nodes}</g>
+      <text x="${W/2}" y="${H-12}" text-anchor="middle" font-family="-apple-system,Segoe UI,Roboto,sans-serif" font-size="11" fill="#aab2c6">Generado desde APPI 🚀</text>
+    </svg>`;
+  }
+
+  function svgToCanvas(svg,pxW,pxH){
+    return new Promise((res,rej)=>{
+      const blob=new Blob([svg],{type:'image/svg+xml;charset=utf-8'});
+      const url=URL.createObjectURL(blob);
+      const img=new Image();
+      img.onload=()=>{
+        const c=document.createElement('canvas'); c.width=Math.round(pxW); c.height=Math.round(pxH);
+        const ctx=c.getContext('2d'); ctx.fillStyle='#fff'; ctx.fillRect(0,0,c.width,c.height);
+        ctx.drawImage(img,0,0,c.width,c.height); URL.revokeObjectURL(url); res(c);
+      };
+      img.onerror=(e)=>{ URL.revokeObjectURL(url); rej(e); };
+      img.src=url;
+    });
+  }
+
+  function loading(msg){
+    let el=document.querySelector('.export-loading.show');
+    if(!el){ el=document.createElement('div'); el.className='export-loading show'; document.body.appendChild(el); }
+    el.innerHTML=`<div class="spinner"></div><div class="msg">${msg||'Generando…'}</div>`;
+    return el;
+  }
+
+  async function exportarPoster(){
+    if(!S.root) return;
+    const lk=loading('Generando poster…');
+    try{
+      const svg=buildExportSVG(), b=S.bounds;
+      const longEdge=4200; const ratio=b.h/b.w;
+      let pw,ph; if(b.w>=b.h){ pw=longEdge; ph=longEdge*ratio; } else { ph=longEdge; pw=longEdge/ratio; }
+      const canvas=await svgToCanvas(svg,pw,ph);
+      const {jsPDF}=window.jspdf;
+      const pdf=new jsPDF({unit:'pt',format:[Math.round(pw/2),Math.round(ph/2)],orientation:pw>=ph?'l':'p'});
+      pdf.addImage(canvas.toDataURL('image/png'),'PNG',0,0,Math.round(pw/2),Math.round(ph/2));
+      pdf.save('organigrama_poster.pdf');
+      try{haptic(18);}catch(e){}
+    }catch(err){ console.error(err); try{showToast('No se pudo generar el poster',2500);}catch(e){} }
+    finally{ lk.remove(); }
+  }
+
+  async function exportarA4(){
+    if(!S.root) return;
+    const lk=loading('Generando PDF A4…');
+    try{
+      const svg=buildExportSVG(), b=S.bounds;
+      const A4W=1654; // 210mm @ ~200dpi
+      const scaleA=A4W/b.w;
+      const totalH=b.h*scaleA;
+      const canvas=await svgToCanvas(svg,A4W,totalH);
+      const {jsPDF}=window.jspdf;
+      const pdf=new jsPDF({unit:'pt',format:'a4',orientation:'p'});
+      const pageW=595, pageH=842;
+      const pxPerPage=Math.round(pageH/pageW*A4W); // px de alto por página A4 a esa resolución
+      let y=0, first=true;
+      while(y<canvas.height){
+        const sliceH=Math.min(pxPerPage,canvas.height-y);
+        const pc=document.createElement('canvas'); pc.width=A4W; pc.height=sliceH;
+        pc.getContext('2d').drawImage(canvas,0,y,A4W,sliceH,0,0,A4W,sliceH);
+        if(!first) pdf.addPage();
+        const imgH=sliceH/A4W*pageW;
+        pdf.addImage(pc.toDataURL('image/png'),'PNG',0,0,pageW,Math.min(imgH,pageH));
+        y+=sliceH; first=false;
+      }
+      pdf.save('organigrama_a4.pdf');
+      try{haptic(18);}catch(e){}
+    }catch(err){ console.error(err); try{showToast('No se pudo generar el PDF',2500);}catch(e){} }
+    finally{ lk.remove(); }
+  }
+
+  function imprimir(){
+    if(!S.root) return;
+    $('orgPrint').innerHTML=buildExportSVG();
+    try{haptic(15);}catch(e){}
+    window.print();
+  }
+
+  // ---- Controles ----
+  function bindControls(){
+    $('ocClose').onclick=()=>cerrar();
+    $('ocSearchBtn').onclick=()=>{ $('ocSearch').classList.contains('open')?$('ocSearch').classList.remove('open'):openSearch(); };
+    $('ocZoomIn').onclick=()=>{ const r=vRect(); zoomAt(r.width/2,r.height/2,1.2); };
+    $('ocZoomOut').onclick=()=>{ const r=vRect(); zoomAt(r.width/2,r.height/2,1/1.2); };
+    $('ocFit').onclick=()=>fitToScreen();
+    $('ocPrint').onclick=imprimir;
+    $('ocPdfA4').onclick=exportarA4;
+    $('ocPdfPoster').onclick=exportarPoster;
+    bindSearch();
+    window.addEventListener('resize',()=>{ if($('orgCanvas').classList.contains('open')){ updateMinimapViewport(); } });
+  }
+
+  function abrir(){
+    const root=ensureTitular();
+    if(!root){ try{showToast('Cargá tu equipo primero',2000);}catch(e){} return; }
+    buildLayout(root);
+    S.world.innerHTML='';
+    S.world.insertAdjacentHTML('beforeend', connectorsSVG(root));
+    S.world.insertAdjacentHTML('beforeend', nodesHTML(root));
+    S.world.style.width=S.bounds.w+'px'; S.world.style.height=S.bounds.h+'px';
+    S.scale=1; S.tx=0; S.ty=0;
+    bindNodeClicks();
+    $('orgCanvas').classList.add('open'); $('orgCanvas').setAttribute('aria-hidden','false');
+    // esperar layout del DOM
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{ drawMinimap(); fitToScreen(); }));
+    const hint=$('ocHint'); hint.classList.add('show'); setTimeout(()=>hint.classList.remove('show'),4200);
+  }
+  function cerrar(){ $('orgCanvas').classList.remove('open'); $('orgCanvas').setAttribute('aria-hidden','true'); $('ocSearch').classList.remove('open'); }
+
+  window.abrirOrganigramaInteractivo=abrir;
+  window.cerrarOrganigramaInteractivo=cerrar;
+
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init);
+  else init();
+  setTimeout(init,1500);
+})();
+</script>
 
 
 <!-- ===== MENÚ DE HERRAMIENTAS (engranaje) ===== -->
