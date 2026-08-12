@@ -11126,7 +11126,7 @@ body.dark .presu-select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:
     position:absolute; box-sizing:border-box;
     background:var(--nc,#e8e8ec); border-radius:12px;
     border:1.5px solid rgba(0,0,0,0.12);
-    padding:7px 9px; cursor:pointer; overflow:hidden;
+    padding:7px 9px; cursor:pointer; overflow:visible;
     display:flex; flex-direction:column; justify-content:center;
     color:var(--nt,#1c1c1e);
     box-shadow:0 3px 10px rgba(60,70,110,0.16);
@@ -11140,6 +11140,12 @@ body.dark .presu-select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:
   .oc-node .oc-cat{ align-self:flex-start; font-size:9px; font-weight:800; padding:2px 7px; border-radius:6px; margin-bottom:3px; letter-spacing:0.3px; background:rgba(0,0,0,0.12); color:inherit; }
   .oc-node .oc-name{ font-size:11px; font-weight:800; color:inherit; line-height:1.15; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
   .oc-node .oc-pts{ font-size:10px; font-weight:700; color:inherit; margin-top:3px; opacity:0.88; }
+  .oc-node .oc-garantias{
+    width:100%; box-sizing:border-box; margin-top:4px; padding-top:3px;
+    border-top:1px solid rgba(0,0,0,0.14); display:flex; justify-content:space-between; gap:3px;
+    font-size:8.5px; font-weight:800; line-height:1; color:inherit; opacity:0.9;
+  }
+  .oc-node .oc-garantias span{ white-space:nowrap; }
   .oc-node .oc-count{ position:absolute; top:-7px; right:-7px; min-width:20px; height:20px; padding:0 5px; border-radius:999px; background:linear-gradient(135deg,#5b8def,#a06bff); color:#fff; font-size:10px; font-weight:800; display:grid; place-items:center; box-shadow:0 2px 6px rgba(91,141,239,0.4); }
   body.dark .oc-node{ box-shadow:0 3px 10px rgba(0,0,0,0.4); }
 
@@ -11211,7 +11217,7 @@ body.dark .presu-select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:
 (function(){
   if(window.__orgCanvasInit) return; window.__orgCanvasInit=true;
 
-  const NODE_W=172, NODE_H=98, GAP_X=30, GAP_Y=112;
+  const NODE_W=172, NODE_H=98, GAP_X=30, GAP_Y=112, LAYOUT_PAD=12;
   const S={
     root:null, layout:{}, bounds:{w:1,h:1}, scale:1, tx:0, ty:0,
     minScale:0.08, maxScale:2.4, moved:false, initialized:false,
@@ -11286,8 +11292,9 @@ body.dark .presu-select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:
       minY=Math.min(minY,p._y); maxY=Math.max(maxY,p._y+NODE_H);
       (p.hijos||[]).forEach(walk);
     })(root);
-    (function shift(p){ p._x-=minX; p._y-=minY; (p.hijos||[]).forEach(shift); })(root);
-    S.bounds={w:Math.max(1,maxX-minX), h:Math.max(1,maxY-minY)};
+    // El margen también incluye los badges que sobresalen con top/right negativos.
+    (function shift(p){ p._x=p._x-minX+LAYOUT_PAD; p._y=p._y-minY+LAYOUT_PAD; (p.hijos||[]).forEach(shift); })(root);
+    S.bounds={w:Math.max(1,maxX-minX+LAYOUT_PAD*2), h:Math.max(1,maxY-minY+LAYOUT_PAD*2)};
     S.root=root;
   }
 
@@ -11299,11 +11306,17 @@ body.dark .presu-select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:
       const pts=p.pnAct||0;
       const inactive = !p.esTitular && pts===0;
       const catKey=(p.cat||'').toString().trim().toUpperCase();
+      const g=p.garantias;
       h+=`<div class="oc-node ${inactive?'inactive':''} ${catKey==='D'?'oc-cat-d':''}" data-pid="${p.id}" style="left:${p._x}px;top:${p._y}px;width:${NODE_W}px;height:${NODE_H}px;--nc:${info.color};--nt:${info.textColor||'#1c1c1e'}">
         ${desc>0?`<span class="oc-count">${desc}</span>`:''}
         <span class="oc-cat">${info.name}</span>
         <div class="oc-name">${escapeXml(p.nombre)}</div>
         <div class="oc-pts">${p.esTitular?(rootPersonCount(p)+' personas'):(formatPB(pts)+' PB')}</div>
+        ${g?`<div class="oc-garantias" aria-label="Purificadores: ${formatPB(g.presentadas)} vendidos o presentados, ${formatPB(g.vencidas)} vencidos y ${formatPB(g.pendientes)} adeudados o pendientes">
+          <span title="Vendidos / presentados">📄 ${formatPB(g.presentadas)}</span>
+          <span title="Vencidos">⚠️ ${formatPB(g.vencidas)}</span>
+          <span title="Adeudados / pendientes">⏳ ${formatPB(g.pendientes)}</span>
+        </div>`:''}
       </div>`;
       (p.hijos||[]).forEach(walk);
     })(root);
@@ -11578,10 +11591,13 @@ body.dark .presu-select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:
       const catKey=(p.cat||'').toString().trim().toUpperCase();
       const stroke=catKey==='D'?'#1c1c1e':'rgba(0,0,0,0.18)';
       const sw=catKey==='D'?'2.4':'1.4';
+      const g=p.garantias;
       nodes+=`<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${NODE_W}" height="${NODE_H}" rx="11" fill="${info.color}" stroke="${stroke}" stroke-width="${sw}"/>
         <text x="${x+14}" y="${y+22}" font-family="-apple-system,Segoe UI,Roboto,sans-serif" font-size="10" font-weight="800" fill="${ink}">${escapeXml(info.name)}</text>
         <text x="${x+14}" y="${y+44}" font-family="-apple-system,Segoe UI,Roboto,sans-serif" font-size="12" font-weight="800" fill="${ink}">${escapeXml(nombre)}</text>
-        <text x="${x+14}" y="${y+66}" font-family="-apple-system,Segoe UI,Roboto,sans-serif" font-size="11" font-weight="700" fill="${ink}">${p.esTitular?(rootPersonCount(p)+' personas'):(formatPB(pts)+' PB')}${desc>0?(' · '+desc+' desc.'):''}</text>`;
+        <text x="${x+14}" y="${y+66}" font-family="-apple-system,Segoe UI,Roboto,sans-serif" font-size="11" font-weight="700" fill="${ink}">${p.esTitular?(rootPersonCount(p)+' personas'):(formatPB(pts)+' PB')}${desc>0?(' · '+desc+' desc.'):''}</text>
+        ${g?`<line x1="${x+10}" y1="${y+74}" x2="${x+NODE_W-10}" y2="${y+74}" stroke="${ink}" stroke-opacity="0.16"/>
+        <text x="${x+12}" y="${y+88}" font-family="-apple-system,Segoe UI Emoji,Roboto,sans-serif" font-size="9" font-weight="700" fill="${ink}">📄 ${formatPB(g.presentadas)} · ⚠️ ${formatPB(g.vencidas)} · ⏳ ${formatPB(g.pendientes)}</text>`:''}`;
       (p.hijos||[]).forEach(wn);
     })(S.root);
     const tit=(equipoData.titular&&equipoData.titular.nombre)?equipoData.titular.nombre:'Mi equipo';
@@ -11643,20 +11659,20 @@ body.dark .presu-select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:
     const lk=loading('Generando PDF A4…');
     try{
       const svg=buildExportSVG(), b=S.bounds;
-      const A4W=1654; // 210mm @ ~200dpi
+      const A4W=1684; // 842pt a 2 px/pt (A4 horizontal)
       const scaleA=A4W/b.w;
       const totalH=b.h*scaleA;
       const canvas=await svgToCanvas(svg,A4W,totalH);
       const {jsPDF}=window.jspdf;
-      const pdf=new jsPDF({unit:'pt',format:'a4',orientation:'p'});
-      const pageW=595, pageH=842;
-      const pxPerPage=Math.round(pageH/pageW*A4W); // px de alto por página A4 a esa resolución
+      const pageW=842, pageH=595;
+      const pdf=new jsPDF({unit:'pt',format:[pageW,pageH],orientation:'l'});
+      const pxPerPage=Math.round(pageH/pageW*A4W); // px de alto por página A4 horizontal
       let y=0, first=true;
       while(y<canvas.height){
         const sliceH=Math.min(pxPerPage,canvas.height-y);
         const pc=document.createElement('canvas'); pc.width=A4W; pc.height=sliceH;
         pc.getContext('2d').drawImage(canvas,0,y,A4W,sliceH,0,0,A4W,sliceH);
-        if(!first) pdf.addPage();
+        if(!first) pdf.addPage([pageW,pageH], 'l');
         const imgH=sliceH/A4W*pageW;
         pdf.addImage(pc.toDataURL('image/png'),'PNG',0,0,pageW,Math.min(imgH,pageH));
         y+=sliceH; first=false;
