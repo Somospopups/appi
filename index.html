@@ -11124,25 +11124,24 @@ body.dark .presu-select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:
 
   .oc-node{
     position:absolute; box-sizing:border-box;
-    background:rgba(255,255,255,0.97); border-radius:12px;
-    border:1.5px solid var(--nc,#c9d2e6);
-    border-left:5px solid var(--nc,#c9d2e6);
+    background:var(--nc,#e8e8ec); border-radius:12px;
+    border:1.5px solid rgba(0,0,0,0.12);
     padding:7px 9px; cursor:pointer; overflow:hidden;
     display:flex; flex-direction:column; justify-content:center;
+    color:var(--nt,#1c1c1e);
     box-shadow:0 3px 10px rgba(60,70,110,0.16);
     transition:transform .12s ease, box-shadow .15s ease, outline-color .15s ease;
     -webkit-user-select:none; user-select:none;
   }
+  .oc-node.oc-cat-d{ border:2px solid #1c1c1e; }
   .oc-node:hover{ box-shadow:0 8px 20px rgba(60,70,110,0.26); transform:translateY(-1px); z-index:2; }
-  .oc-node.inactive{ opacity:0.5; }
+  .oc-node.inactive{ opacity:0.72; }
   .oc-node.hit{ outline:3px solid #5b8def; outline-offset:2px; z-index:3; }
-  .oc-node .oc-cat{ align-self:flex-start; font-size:9px; font-weight:800; padding:2px 7px; border-radius:6px; margin-bottom:3px; letter-spacing:0.3px; }
-  .oc-node .oc-name{ font-size:11px; font-weight:800; color:#1c1c1e; line-height:1.15; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
-  .oc-node .oc-pts{ font-size:10px; font-weight:700; color:#3d63c9; margin-top:3px; }
+  .oc-node .oc-cat{ align-self:flex-start; font-size:9px; font-weight:800; padding:2px 7px; border-radius:6px; margin-bottom:3px; letter-spacing:0.3px; background:rgba(0,0,0,0.12); color:inherit; }
+  .oc-node .oc-name{ font-size:11px; font-weight:800; color:inherit; line-height:1.15; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+  .oc-node .oc-pts{ font-size:10px; font-weight:700; color:inherit; margin-top:3px; opacity:0.88; }
   .oc-node .oc-count{ position:absolute; top:-7px; right:-7px; min-width:20px; height:20px; padding:0 5px; border-radius:999px; background:linear-gradient(135deg,#5b8def,#a06bff); color:#fff; font-size:10px; font-weight:800; display:grid; place-items:center; box-shadow:0 2px 6px rgba(91,141,239,0.4); }
-  body.dark .oc-node{ background:rgba(40,44,64,0.96); box-shadow:0 3px 10px rgba(0,0,0,0.4); }
-  body.dark .oc-node .oc-name{ color:#f0f0f5; }
-  body.dark .oc-node .oc-pts{ color:#a8b8ff; }
+  body.dark .oc-node{ box-shadow:0 3px 10px rgba(0,0,0,0.4); }
 
   .oc-minimap{
     position:absolute; right:12px; bottom:calc(env(safe-area-inset-bottom) + 12px);
@@ -11299,9 +11298,10 @@ body.dark .presu-select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:
       const desc=contarDescendientes(p);
       const pts=p.pnAct||0;
       const inactive = !p.esTitular && pts===0;
-      h+=`<div class="oc-node ${inactive?'inactive':''}" data-pid="${p.id}" style="left:${p._x}px;top:${p._y}px;width:${NODE_W}px;height:${NODE_H}px;--nc:${info.color}">
+      const catKey=(p.cat||'').toString().trim().toUpperCase();
+      h+=`<div class="oc-node ${inactive?'inactive':''} ${catKey==='D'?'oc-cat-d':''}" data-pid="${p.id}" style="left:${p._x}px;top:${p._y}px;width:${NODE_W}px;height:${NODE_H}px;--nc:${info.color};--nt:${info.textColor||'#1c1c1e'}">
         ${desc>0?`<span class="oc-count">${desc}</span>`:''}
-        <span class="oc-cat" style="background:${info.color};color:${info.textColor||'#1c1c1e'}">${info.name}</span>
+        <span class="oc-cat">${info.name}</span>
         <div class="oc-name">${escapeXml(p.nombre)}</div>
         <div class="oc-pts">${p.esTitular?(rootPersonCount(p)+' personas'):(formatPB(pts)+' PB')}</div>
       </div>`;
@@ -11420,9 +11420,15 @@ body.dark .presu-select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:
     ctx.clearRect(0,0,W,H);
     const b=S.bounds, s=Math.min(W/b.w,H/b.h)*0.92;
     const ox=(W-b.w*s)/2, oy=(H-b.h*s)/2;
-    ctx.fillStyle=document.body.classList.contains('dark')?'rgba(168,184,255,0.55)':'rgba(91,141,239,0.55)';
     Object.values(S.layout).forEach(p=>{
-      ctx.fillRect(ox+p._x*s, oy+p._y*s, Math.max(2.2,NODE_W*s), Math.max(2.2,NODE_H*s*0.32));
+      const info=catInfoOf(p.cat);
+      ctx.fillStyle=info.color||'#6b6b76';
+      ctx.fillRect(ox+p._x*s, oy+p._y*s, Math.max(2.2,NODE_W*s), Math.max(2.2,NODE_H*s*0.42));
+      if((p.cat||'').toString().toUpperCase()==='D'){
+        ctx.strokeStyle='#1c1c1e';
+        ctx.lineWidth=1;
+        ctx.strokeRect(ox+p._x*s, oy+p._y*s, Math.max(2.2,NODE_W*s), Math.max(2.2,NODE_H*s*0.42));
+      }
     });
     S.mm_s=s; S.mm_ox=ox; S.mm_oy=oy;
     updateMinimapViewport();
@@ -11568,11 +11574,14 @@ body.dark .presu-select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:
       const info=catInfoOf(p.cat); const x=p._x+pad, y=p._y+pad;
       const desc=contarDescendientes(p); const pts=p.pnAct||0;
       const nombre=(p.nombre||'').replace(/\s+/g,' ').slice(0,28);
-      nodes+=`<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${NODE_W}" height="${NODE_H}" rx="11" fill="#ffffff" stroke="${info.color}" stroke-width="2"/>
-        <rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="6" height="${NODE_H}" rx="3" fill="${info.color}"/>
-        <text x="${x+14}" y="${y+18}" font-family="-apple-system,Segoe UI,Roboto,sans-serif" font-size="10" font-weight="800" fill="${info.color}">${escapeXml(info.name)}</text>
-        <text x="${x+14}" y="${y+40}" font-family="-apple-system,Segoe UI,Roboto,sans-serif" font-size="12" font-weight="800" fill="#1c1c1e">${escapeXml(nombre)}</text>
-        <text x="${x+14}" y="${y+62}" font-family="-apple-system,Segoe UI,Roboto,sans-serif" font-size="11" font-weight="700" fill="#3d63c9">${p.esTitular?(rootPersonCount(p)+' personas'):(formatPB(pts)+' PB')}${desc>0?(' · '+desc+' desc.'):''}</text>`;
+      const ink=info.textColor||'#1c1c1e';
+      const catKey=(p.cat||'').toString().trim().toUpperCase();
+      const stroke=catKey==='D'?'#1c1c1e':'rgba(0,0,0,0.18)';
+      const sw=catKey==='D'?'2.4':'1.4';
+      nodes+=`<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${NODE_W}" height="${NODE_H}" rx="11" fill="${info.color}" stroke="${stroke}" stroke-width="${sw}"/>
+        <text x="${x+14}" y="${y+22}" font-family="-apple-system,Segoe UI,Roboto,sans-serif" font-size="10" font-weight="800" fill="${ink}">${escapeXml(info.name)}</text>
+        <text x="${x+14}" y="${y+44}" font-family="-apple-system,Segoe UI,Roboto,sans-serif" font-size="12" font-weight="800" fill="${ink}">${escapeXml(nombre)}</text>
+        <text x="${x+14}" y="${y+66}" font-family="-apple-system,Segoe UI,Roboto,sans-serif" font-size="11" font-weight="700" fill="${ink}">${p.esTitular?(rootPersonCount(p)+' personas'):(formatPB(pts)+' PB')}${desc>0?(' · '+desc+' desc.'):''}</text>`;
       (p.hijos||[]).forEach(wn);
     })(S.root);
     const tit=(equipoData.titular&&equipoData.titular.nombre)?equipoData.titular.nombre:'Mi equipo';
