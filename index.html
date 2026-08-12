@@ -7246,7 +7246,12 @@ document.getElementById('btnEquipoShare').onclick = ()=>{
     const bd = document.getElementById('smDatos');
     const bi = document.getElementById('smImage');
     if(bd) bd.onclick = ()=>{ modal.close(); haptic(10); abrirSelectorParaCompartirDatos(); };
-    if(bi) bi.onclick = ()=>{ modal.close(); haptic(10); if(typeof abrirOrganigramaInteractivo==='function') abrirOrganigramaInteractivo(); };
+    if(bi) bi.onclick = ()=>{
+      modal.close();
+      haptic(10);
+      if(typeof abrirSelectorOrganigrama==='function') abrirSelectorOrganigrama();
+      else if(typeof abrirOrganigramaInteractivo==='function') abrirOrganigramaInteractivo();
+    };
   }, 50);
 };
 
@@ -10539,54 +10544,15 @@ function abrirBackupDesdeMenu(){
 }
 
 
-// Verificar al arrancar
+// Verificar licencia y blocklist al arrancar
 (async function() {
-  // === PREVIEW / LOCAL / DEMO LINK: auto-activación + equipo de ejemplo ===
-  const esPreview = location.hostname.indexOf('e2b.app') !== -1 || location.protocol === 'file:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.search.indexOf('demo') !== -1;
-  if(esPreview && !localStorage.getItem('appi_activada')){
-    try{
-      const _did=generarDeviceId();
-      localStorage.setItem('appi_activada', JSON.stringify({codigo:generarCodigoActivacion(_did),fecha:Date.now(),deviceId:_did}));
-    }catch(e){}
-  }
-  function cargarEquipoDemo(){
-    let _id=1;
-    const nodo=(nombre,cat,pnAct,hijos)=>({id:_id++,nombre:nombre,cat:cat,codigo:String(_id-1),pnAct:pnAct||0,m1:0,m2:0,m3:0,tel:'',email:'',alta:'',cumple:'',estado:(pnAct&&pnAct>0)?'Activo':'Inactivo',hijos:hijos||[]});
-    const tree=[
-      nodo('MARIA GONZALEZ','L',22,[nodo('JUAN PEREZ','DC',12,[nodo('LUCIA DIAZ','D',5),nodo('PEDRO LOPEZ','DJ',0)]),nodo('CARLOS RUIZ','CE',8,[nodo('ANA TORRES','D',3)])]),
-      nodo('ROBERTO SANCHEZ','LE',30,[nodo('PATRICIA GOMEZ','L',15,[nodo('DIEGO FERNANDEZ','DC',6),nodo('SILVINA MARTINEZ','DC',4,[nodo('MARTIN SUAREZ','D',2)]),nodo('EZEQUIEL ROSSI','DJ',0)]),nodo('FERNANDA ACOSTA','CE',11,[nodo('GUSTAVO BRAVO','D',3),nodo('ROMINA CASTRO','D',5)])]),
-      nodo('ADRIAN MOLINA','L',9,[nodo('VANESA SOTA','DC',6,[nodo('NICOLAS RIOS','DJ',1)]),nodo('LEANDRO ORTIZ','DJ',1)])
-    ];
-    const personas=[];
-    (function f(a){a.forEach(p=>{personas.push({id:p.id,nombre:p.nombre,cat:p.cat,codigo:p.codigo,pnAct:p.pnAct,estado:p.estado});if(p.hijos&&p.hijos.length)f(p.hijos);});})(tree);
-    equipoData={titular:{nombre:'EQUIPO DE EJEMPLO',dip:'0',categoria:'LE'},personas:personas,raices:tree};
-    try{localStorage.setItem('equipoData',JSON.stringify(equipoData));}catch(e){}
-  }
-  // === fin preview ===
-  // FIX: verificar blocklist ANTES de arrancar (con timeout por si no hay red)
+  // Verificar blocklist ANTES de arrancar (con timeout por si no hay red)
   const conTimeout = (p, ms) => Promise.race([p, new Promise(r => setTimeout(() => r(null), ms))]);
   let bloqueado = false;
   try { bloqueado = await conTimeout(chequearBlocklist(), 4000); } catch(e){}
   if (bloqueado === true) { mostrarPantallaBloqueado(); return; }
   if (estaActivada()) {
     iniciarApp();
-    if(esPreview){
-      setTimeout(()=>{
-        let cargoDemo=false;
-        try{ if(!equipoData || !equipoData.personas || !equipoData.personas.length){ cargarEquipoDemo(); loadEquipoFromStorage(); cargoDemo=true; } }catch(e){}
-        if(cargoDemo){
-          try{
-            modal.open({
-              icon:'🌱', iconBg:'linear-gradient(135deg,#3ad0a4,#a06bff)',
-              title:'Equipo de ejemplo cargado', sub:'Modo preview',
-              html:'<p>Cargué un equipo de prueba para que veas el organigrama interactivo en acción.</p><div class="tip"><b>Tip:</b> después podés cargar tu Excel real desde <b>Mi Equipo</b>.</div>',
-              confirm:true, okText:'🌳 Ver organigrama',
-              onConfirm:()=>{ try{ showView('view-equipo'); loadEquipoFromStorage(); renderEquipo(); }catch(e){} setTimeout(()=>{ if(typeof abrirOrganigramaInteractivo==='function') abrirOrganigramaInteractivo(); }, 450); }
-            });
-          }catch(e){}
-        }
-      }, 500);
-    }
   } else {
     mostrarPantallaBloqueo();
   }
@@ -11118,6 +11084,8 @@ body.dark .presu-select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:
   .oc-btn:active{ transform:scale(0.94); }
   .oc-btn .ico{ font-size:16px; line-height:1; }
   .oc-btn.ghost{ background:rgba(255,255,255,0.7); }
+  .oc-person-btn{ max-width:min(280px,38vw); }
+  .oc-person-label{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   body.dark .oc-btn{ background:rgba(40,44,64,0.92); color:#a8b8ff; border-color:rgba(255,255,255,0.12); }
 
   .oc-search{
@@ -11184,7 +11152,8 @@ body.dark .presu-select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:
     overflow:hidden; cursor:pointer;
   }
   body.dark .oc-minimap{ background:rgba(34,38,56,0.9); border-color:rgba(255,255,255,0.12); }
-  .oc-mm-view{ position:absolute; border:2px solid #5b8def; background:rgba(91,141,239,0.12); border-radius:3px; pointer-events:none; }
+  .oc-minimap canvas{ display:block; width:100%; height:100%; cursor:pointer; }
+  .oc-mm-view{ position:absolute; border:2px solid #5b8def; background:rgba(91,141,239,0.12); border-radius:3px; pointer-events:none; box-sizing:border-box; }
 
   .oc-hint{
     position:absolute; left:50%; transform:translateX(-50%);
@@ -11208,7 +11177,8 @@ body.dark .presu-select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:
 <div id="orgCanvas" aria-hidden="true">
   <div class="oc-topbar">
     <button class="oc-btn" id="ocClose" title="Volver"><span class="ico">‹</span><span>Volver</span></button>
-    <button class="oc-btn ghost" id="ocSearchBtn" title="Buscar persona"><span class="ico">🔍</span><span>Buscar</span></button>
+    <button class="oc-btn ghost oc-person-btn" id="ocPersonBtn" title="Elegir desde qué persona ver el organigrama"><span class="ico">👤</span><span class="oc-person-label" id="ocPersonLabel">Todo el equipo</span></button>
+    <button class="oc-btn ghost" id="ocSearchBtn" title="Buscar dentro del organigrama"><span class="ico">🔍</span><span>Buscar</span></button>
     <button class="oc-btn ghost" id="ocZoomOut" title="Alejar">－</button>
     <button class="oc-btn ghost" id="ocZoomIn" title="Acercar">＋</button>
     <button class="oc-btn ghost" id="ocFit" title="Ajustar a pantalla"><span class="ico">⤢</span></button>
@@ -11227,7 +11197,8 @@ body.dark .presu-select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:
     <div id="ocWorld"></div>
   </div>
 
-  <div class="oc-minimap" id="ocMinimap">
+  <div class="oc-minimap">
+    <canvas id="ocMinimap" aria-label="Mini mapa del organigrama"></canvas>
     <div class="oc-mm-view" id="ocMmView"></div>
   </div>
 
@@ -11244,14 +11215,17 @@ body.dark .presu-select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:
   const NODE_W=172, NODE_H=98, GAP_X=30, GAP_Y=112;
   const S={
     root:null, layout:{}, bounds:{w:1,h:1}, scale:1, tx:0, ty:0,
-    minScale:0.08, maxScale:2.4, moved:false,
+    minScale:0.08, maxScale:2.4, moved:false, initialized:false,
     vp:null, world:null, minimap:null, mmView:null, mm_s:1, mm_ox:0, mm_oy:0
   };
 
   function $(id){ return document.getElementById(id); }
   function init(){
+    if(S.initialized) return;
     S.vp=$('ocViewport'); S.world=$('ocWorld');
     S.minimap=$('ocMinimap'); S.mmView=$('ocMmView');
+    if(!S.vp || !S.world || !S.minimap || !S.mmView) return;
+    S.initialized=true;
     bindControls(); bindPointer(); bindWheel(); bindMinimap();
   }
 
@@ -11271,6 +11245,25 @@ body.dark .presu-select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:
       pnAct:0, esTitular:true
     };
     return equipoData.nodoTitular;
+  }
+
+  function treeNodes(root){
+    const list=[];
+    (function walk(p){
+      if(!p) return;
+      list.push(p);
+      (p.hijos||[]).forEach(walk);
+    })(root);
+    return list;
+  }
+
+  function findTreeNode(root, id){
+    const wanted=String(id);
+    return treeNodes(root).find(p=>String(p.id)===wanted)||null;
+  }
+
+  function rootPersonCount(root){
+    return root ? contarDescendientes(root) + (root.esTitular ? 0 : 1) : 0;
   }
 
   // ---- Layout tipo tidy-tree (centra cada nodo sobre su subárbol) ----
@@ -11310,7 +11303,7 @@ body.dark .presu-select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:
         ${desc>0?`<span class="oc-count">${desc}</span>`:''}
         <span class="oc-cat" style="background:${info.color};color:${info.textColor||'#1c1c1e'}">${info.name}</span>
         <div class="oc-name">${escapeXml(p.nombre)}</div>
-        <div class="oc-pts">${p.esTitular?(equipoData.personas.length+' personas'):(formatPB(pts)+' PB')}</div>
+        <div class="oc-pts">${p.esTitular?(rootPersonCount(p)+' personas'):(formatPB(pts)+' PB')}</div>
       </div>`;
       (p.hijos||[]).forEach(walk);
     })(root);
@@ -11458,7 +11451,72 @@ body.dark .presu-select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:
     S.minimap.addEventListener('pointercancel',()=>mmDrag=false);
   }
 
-  // ---- Buscador ----
+  // ---- Selector de persona / raíz del organigrama ----
+  function abrirSelector(){
+    const titular=ensureTitular();
+    if(!titular){ try{showToast('Cargá tu equipo primero',2000);}catch(e){} return; }
+
+    const personas=[titular, ...treeNodes(titular).filter(p=>!p.esTitular).sort((a,b)=>{
+      const descDiff=contarDescendientes(b)-contarDescendientes(a);
+      return descDiff || String(a.nombre||'').localeCompare(String(b.nombre||''),'es');
+    })];
+    const normalizar=(value)=>String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
+
+    const renderLista=(filtro='')=>{
+      const term=normalizar(filtro);
+      const lista=personas.filter(p=>!term || normalizar(p.nombre).includes(term) || normalizar(p.codigo).includes(term)).slice(0,150);
+      if(!lista.length) return '<div class="empty" style="padding:20px">🔍 Sin coincidencias</div>';
+      return lista.map(p=>{
+        const info=catInfoOf(p.cat);
+        const esTitular=!!p.esTitular;
+        const seleccionada=S.root && String(S.root.id)===String(p.id);
+        const badge=esTitular
+          ? '<span class="pp-cat" style="background:linear-gradient(135deg,#f5b301,#ff8f6b)">👑 TITULAR</span>'
+          : `<span class="pp-cat" style="background:${info.color};color:${info.textColor||'#1c1c1e'}">${info.name}</span>`;
+        const detalle=esTitular
+          ? 'Todo el equipo completo'
+          : `${escapeXml(p.codigo||'Sin N°')} · ${contarDescendientes(p)} descendiente${contarDescendientes(p)===1?'':'s'}`;
+        return `<div class="person-picker-item" data-org-pid="${p.id}" style="${seleccionada?'border:2px solid rgba(91,141,239,.55);background:rgba(91,141,239,.10)':''}">
+          ${badge}
+          <div class="pp-info">
+            <div class="pp-name">${escapeXml(p.nombre)}</div>
+            <div class="pp-meta">${detalle}</div>
+          </div>
+          <span class="pp-count">${rootPersonCount(p)} pers</span>
+        </div>`;
+      }).join('');
+    };
+
+    modal.open({
+      icon:'👤', iconBg:'linear-gradient(135deg,#5b8def,#a06bff)',
+      title:'Elegí una persona', sub:'Definí desde dónde ver el organigrama',
+      html:`
+        <p style="margin:0 0 12px;font-size:13px;color:#5c5c66">El lienzo, la impresión y los PDF se generarán desde la persona que elijas.</p>
+        <div class="person-picker-search">
+          <span style="color:#8a8a94">🔍</span>
+          <input type="text" id="orgPickerSearch" placeholder="Buscar por nombre o N° de Distribuidor…" autocomplete="off" />
+        </div>
+        <div class="person-picker-list" id="orgPickerList">${renderLista()}</div>`
+    });
+
+    setTimeout(()=>{
+      const inp=$('orgPickerSearch'), cont=$('orgPickerList');
+      if(!inp || !cont) return;
+      inp.oninput=()=>{ cont.innerHTML=renderLista(inp.value); };
+      cont.onclick=(event)=>{
+        const item=event.target.closest('[data-org-pid]');
+        if(!item) return;
+        const persona=findTreeNode(titular,item.dataset.orgPid);
+        if(!persona) return;
+        modal.close();
+        try{haptic(12);}catch(e){}
+        abrir(persona);
+      };
+      inp.focus();
+    },50);
+  }
+
+  // ---- Buscador dentro del organigrama visible ----
   function openSearch(){
     const box=$('ocSearch'); box.classList.add('open');
     const inp=$('ocSearchInput'); inp.value=''; inp.focus(); renderSearch('');
@@ -11466,7 +11524,7 @@ body.dark .presu-select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:
   function renderSearch(q){
     const cont=$('ocSearchRes');
     const f=(q||'').toLowerCase().trim();
-    let list=(equipoData?equipoData.personas:[]).filter(p=>!p.esTitular);
+    let list=Object.values(S.layout).filter(p=>!p.esTitular);
     if(f) list=list.filter(p=>(p.nombre||'').toLowerCase().includes(f)||String(p.codigo||'').toLowerCase().includes(f));
     list=list.slice(0,60);
     if(!list.length){ cont.innerHTML='<div class="oc-search-item"><span class="si-name" style="color:#8a8a94">Sin resultados</span></div>'; return; }
@@ -11514,15 +11572,19 @@ body.dark .presu-select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:
         <rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="6" height="${NODE_H}" rx="3" fill="${info.color}"/>
         <text x="${x+14}" y="${y+18}" font-family="-apple-system,Segoe UI,Roboto,sans-serif" font-size="10" font-weight="800" fill="${info.color}">${escapeXml(info.name)}</text>
         <text x="${x+14}" y="${y+40}" font-family="-apple-system,Segoe UI,Roboto,sans-serif" font-size="12" font-weight="800" fill="#1c1c1e">${escapeXml(nombre)}</text>
-        <text x="${x+14}" y="${y+62}" font-family="-apple-system,Segoe UI,Roboto,sans-serif" font-size="11" font-weight="700" fill="#3d63c9">${p.esTitular?(equipoData.personas.length+' personas'):(formatPB(pts)+' PB')}${desc>0?(' · '+desc+' desc.'):''}</text>`;
+        <text x="${x+14}" y="${y+62}" font-family="-apple-system,Segoe UI,Roboto,sans-serif" font-size="11" font-weight="700" fill="#3d63c9">${p.esTitular?(rootPersonCount(p)+' personas'):(formatPB(pts)+' PB')}${desc>0?(' · '+desc+' desc.'):''}</text>`;
       (p.hijos||[]).forEach(wn);
     })(S.root);
     const tit=(equipoData.titular&&equipoData.titular.nombre)?equipoData.titular.nombre:'Mi equipo';
+    const esEquipoCompleto=!!S.root.esTitular;
+    const nombreRaiz=esEquipoCompleto?tit:(S.root.nombre||tit);
+    const totalRaiz=rootPersonCount(S.root);
+    const contexto=esEquipoCompleto?`${totalRaiz} personas`:`${totalRaiz} personas · Equipo de ${tit}`;
     const fecha=new Date().toLocaleDateString('es-AR',{day:'numeric',month:'long',year:'numeric'});
     return `<svg xmlns="http://www.w3.org/2000/svg" width="${Math.round(W)}" height="${Math.round(H)}" viewBox="0 0 ${W} ${H}">
       <rect width="${W}" height="${H}" fill="#ffffff"/>
-      <text x="${W/2}" y="26" text-anchor="middle" font-family="-apple-system,Segoe UI,Roboto,sans-serif" font-size="20" font-weight="900" fill="#3d63c9">🌳 Organigrama — ${escapeXml(tit)}</text>
-      <text x="${W/2}" y="44" text-anchor="middle" font-family="-apple-system,Segoe UI,Roboto,sans-serif" font-size="12" font-weight="600" fill="#8a8a94">${fecha} · ${equipoData.personas.length} personas</text>
+      <text x="${W/2}" y="26" text-anchor="middle" font-family="-apple-system,Segoe UI,Roboto,sans-serif" font-size="20" font-weight="900" fill="#3d63c9">🌳 Organigrama — ${escapeXml(nombreRaiz)}</text>
+      <text x="${W/2}" y="44" text-anchor="middle" font-family="-apple-system,Segoe UI,Roboto,sans-serif" font-size="12" font-weight="600" fill="#8a8a94">${fecha} · ${escapeXml(contexto)}</text>
       <g transform="translate(0,16)">${lines}${nodes}</g>
       <text x="${W/2}" y="${H-12}" text-anchor="middle" font-family="-apple-system,Segoe UI,Roboto,sans-serif" font-size="11" fill="#aab2c6">Generado desde APPI 🚀</text>
     </svg>`;
@@ -11606,6 +11668,7 @@ body.dark .presu-select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:
   // ---- Controles ----
   function bindControls(){
     $('ocClose').onclick=()=>cerrar();
+    $('ocPersonBtn').onclick=()=>abrirSelector();
     $('ocSearchBtn').onclick=()=>{ $('ocSearch').classList.contains('open')?$('ocSearch').classList.remove('open'):openSearch(); };
     $('ocZoomIn').onclick=()=>{ const r=vRect(); zoomAt(r.width/2,r.height/2,1.2); };
     $('ocZoomOut').onclick=()=>{ const r=vRect(); zoomAt(r.width/2,r.height/2,1/1.2); };
@@ -11617,9 +11680,12 @@ body.dark .presu-select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:
     window.addEventListener('resize',()=>{ if($('orgCanvas').classList.contains('open')){ updateMinimapViewport(); } });
   }
 
-  function abrir(){
-    const root=ensureTitular();
-    if(!root){ try{showToast('Cargá tu equipo primero',2000);}catch(e){} return; }
+  function abrir(personaRef){
+    init();
+    const titular=ensureTitular();
+    if(!titular){ try{showToast('Cargá tu equipo primero',2000);}catch(e){} return; }
+    const refId=personaRef && typeof personaRef==='object' ? personaRef.id : personaRef;
+    const root=(refId===undefined || refId===null) ? titular : (findTreeNode(titular,refId)||titular);
     buildLayout(root);
     S.world.innerHTML='';
     S.world.insertAdjacentHTML('beforeend', connectorsSVG(root));
@@ -11627,6 +11693,8 @@ body.dark .presu-select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:
     S.world.style.width=S.bounds.w+'px'; S.world.style.height=S.bounds.h+'px';
     S.scale=1; S.tx=0; S.ty=0;
     bindNodeClicks();
+    $('ocPersonLabel').textContent=root.esTitular?'Todo el equipo':String(root.nombre||'Persona').split(',')[0].trim();
+    $('ocSearch').classList.remove('open');
     $('orgCanvas').classList.add('open'); $('orgCanvas').setAttribute('aria-hidden','false');
     // esperar layout del DOM
     requestAnimationFrame(()=>requestAnimationFrame(()=>{ drawMinimap(); fitToScreen(); }));
@@ -11634,6 +11702,7 @@ body.dark .presu-select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:
   }
   function cerrar(){ $('orgCanvas').classList.remove('open'); $('orgCanvas').setAttribute('aria-hidden','true'); $('ocSearch').classList.remove('open'); }
 
+  window.abrirSelectorOrganigrama=abrirSelector;
   window.abrirOrganigramaInteractivo=abrir;
   window.cerrarOrganigramaInteractivo=cerrar;
 
