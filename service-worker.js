@@ -1,7 +1,9 @@
-const CACHE_NAME = 'appi-v126';
+const CACHE_NAME = 'appi-v153-resumen-anual-pdf';
 const ARCHIVOS = [
   './',
   './index.html',
+  './historico.css',
+  './historico.js',
   './manifest.json'
 ];
 

@@ -1,0 +1,642 @@
+/* APPI v146 · Histórico mensual local-first */
+(function(){
+'use strict';
+
+const DB_NAME='appi-historico-v1';
+const DB_VERSION=1;
+const MONTHS_H=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+const SHORT_H=['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'];
+const FILE_TYPES={
+  equipo:{label:'Línea Descendente',icon:'LD',input:'histFileEquipo'},
+  garantias:{label:'Garantías por Organización',icon:'GO',input:'histFileGarantias'},
+  ingresos:{label:'Ingresos',icon:'IN',input:'histFileIngresos'}
+};
+const H={
+  db:null,periods:[],reports:[],tab:'dashboard',ready:false,rendering:false,
+  uploadYear:new Date().getFullYear(),uploads:{},fileTarget:null,
+  selected:new Set(),openMenu:'',personSearch:'',lastReport:null,syncing:false,syncLog:[]
+};
+
+const $=id=>document.getElementById(id);
+const esc=value=>String(value==null?'':value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const num=value=>Number(value)||0;
+const fmt=value=>new Intl.NumberFormat('es-AR',{maximumFractionDigits:1}).format(num(value));
+const pct=(a,b)=>b?Math.round(a/b*100):0;
+const periodId=(year,month)=>`${year}-${String(month+1).padStart(2,'0')}`;
+const labelPeriod=p=>`${MONTHS_H[p.month]} ${p.year}`;
+const normalize=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+const codeNorm=s=>String(s||'').trim().replace(/\s+/g,'').toUpperCase();
+const cloneClean=obj=>JSON.parse(JSON.stringify(obj));
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+
+function toast(message,duration=2200){
+  try{ if(typeof showToast==='function') showToast(message,duration); else console.log(message); }catch(e){ console.log(message); }
+}
+function humanBytes(bytes){
+  const n=num(bytes);if(n<1024)return `${n} B`;if(n<1048576)return `${(n/1024).toFixed(1)} KB`;return `${(n/1048576).toFixed(1)} MB`;
+}
+function deltaText(current,previous,suffix=''){
+  if(previous==null) return {text:'Primer cierre',cls:'neutral'};
+  const d=current-previous;if(Math.abs(d)<.001)return {text:'Sin cambios',cls:'neutral'};
+  return {text:`${d>0?'+':''}${fmt(d)}${suffix}`,cls:d>0?'up':'down'};
+}
+function safeFileName(name){return String(name||'archivo').replace(/[^a-zA-Z0-9._-]+/g,'_').slice(0,120)}
+function notifyDbChange(){
+  const sorted=[...H.periods].sort((a,b)=>a.id.localeCompare(b.id));
+  const latest=sorted[sorted.length-1];
+  localStorage.setItem('hist_resumen_cache',JSON.stringify({count:sorted.length,lastLabel:latest?labelPeriod(latest):'Sin cierres'}));
+}
+
+function openDB(){
+  if(H.db)return Promise.resolve(H.db);
+  return new Promise((resolve,reject)=>{
+    const req=indexedDB.open(DB_NAME,DB_VERSION);
+    req.onupgradeneeded=()=>{
+      const db=req.result;
+      if(!db.objectStoreNames.contains('periods')){
+        const s=db.createObjectStore('periods',{keyPath:'id'});s.createIndex('year','year');s.createIndex('updatedAt','updatedAt');
+      }
+      if(!db.objectStoreNames.contains('files')){
+        const s=db.createObjectStore('files',{keyPath:'key'});s.createIndex('periodId','periodId');
+      }
+      if(!db.objectStoreNames.contains('reports')){
+        const s=db.createObjectStore('reports',{keyPath:'id'});s.createIndex('createdAt','createdAt');
+      }
+    };
+    req.onsuccess=()=>{H.db=req.result;resolve(H.db)};
+    req.onerror=()=>reject(req.error||new Error('No se pudo abrir IndexedDB'));
+  });
+}
+function dbGetAll(store,index,query){
+  return openDB().then(db=>new Promise((resolve,reject)=>{
+    const tx=db.transaction(store,'readonly'),os=tx.objectStore(store);const req=index?os.index(index).getAll(query):os.getAll();
+    req.onsuccess=()=>resolve(req.result||[]);req.onerror=()=>reject(req.error);
+  }));
+}
+function dbGet(store,key){
+  return openDB().then(db=>new Promise((resolve,reject)=>{const req=db.transaction(store,'readonly').objectStore(store).get(key);req.onsuccess=()=>resolve(req.result||null);req.onerror=()=>reject(req.error)}));
+}
+function dbPut(store,value){
+  return openDB().then(db=>new Promise((resolve,reject)=>{const tx=db.transaction(store,'readwrite');tx.objectStore(store).put(value);tx.oncomplete=()=>resolve(value);tx.onerror=()=>reject(tx.error)}));
+}
+function dbDelete(store,key){
+  return openDB().then(db=>new Promise((resolve,reject)=>{const tx=db.transaction(store,'readwrite');tx.objectStore(store).delete(key);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)}));
+}
+async function deletePeriod(id){
+  const files=await dbGetAll('files','periodId',id);const db=await openDB();
+  await new Promise((resolve,reject)=>{const tx=db.transaction(['periods','files'],'readwrite');tx.objectStore('periods').delete(id);for(const f of files)tx.objectStore('files').delete(f.key);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)});
+  H.periods=H.periods.filter(p=>p.id!==id);H.selected.delete(id);notifyDbChange();
+}
+async function refreshData(){
+  H.periods=(await dbGetAll('periods')).sort((a,b)=>a.id.localeCompare(b.id));
+  // v147: el archivo único de Usuarios / Garantías deja de formar parte de los cierres.
+  for(const p of H.periods){
+    let changed=false;
+    if(Object.prototype.hasOwnProperty.call(p,'users')){delete p.users;changed=true}
+    if(p.summary&&Object.prototype.hasOwnProperty.call(p.summary,'users')){delete p.summary.users;delete p.summary.userStates;changed=true}
+    if(Array.isArray(p.filesMeta)&&p.filesMeta.some(f=>f.type==='usuarios')){p.filesMeta=p.filesMeta.filter(f=>f.type!=='usuarios');changed=true}
+    if(changed){p.updatedAt=new Date().toISOString();p.syncStatus='pending';await dbPut('periods',p);await dbDelete('files',`${p.id}:usuarios`)}
+  }
+  H.reports=(await dbGetAll('reports')).sort((a,b)=>String(b.createdAt).localeCompare(String(a.createdAt)));
+  H.lastReport=H.reports[0]||null;notifyDbChange();
+  if(!H.selected.size&&H.periods.length){
+    const last=H.periods.slice(-Math.min(2,H.periods.length));last.forEach(p=>H.selected.add(p.id));
+  }
+}
+
+async function sha256(file){
+  try{const hash=await crypto.subtle.digest('SHA-256',await file.arrayBuffer());return [...new Uint8Array(hash)].map(b=>b.toString(16).padStart(2,'0')).join('')}catch(e){return ''}
+}
+async function readSheets(file){
+  if(typeof XLSX==='undefined')throw new Error('La librería Excel no está disponible. Abrí APPI con conexión y recargá.');
+  const buffer=await file.arrayBuffer(),uint8=new Uint8Array(buffer);
+  const first=new TextDecoder('utf-8').decode(uint8.slice(0,700)).toLowerCase();
+  const isHtml=first.includes('<html')||first.includes('<!doctype')||first.includes('<table');
+  if(isHtml){
+    let text;try{text=new TextDecoder('windows-1252').decode(uint8)}catch(e){text=new TextDecoder('utf-8').decode(uint8)}
+    const doc=new DOMParser().parseFromString(text,'text/html'),tables=[...doc.querySelectorAll('table')];
+    if(!tables.length)throw new Error('El archivo no contiene tablas reconocibles.');
+    const rows=[];tables.forEach(table=>[...table.querySelectorAll('tr')].forEach(tr=>{
+      const cells=[...tr.children].filter(td=>/^(TD|TH)$/.test(td.tagName)).map(td=>td.querySelector('table')?'':td.textContent.trim().replace(/\s+/g,' '));if(cells.length)rows.push(cells);
+    }));
+    return [{name:'HTML',rows}];
+  }
+  const wb=XLSX.read(uint8,{type:'array',cellDates:false,raw:true});
+  return wb.SheetNames.map(name=>({name,rows:XLSX.utils.sheet_to_json(wb.Sheets[name],{header:1,defval:'',raw:true,blankrows:false})}));
+}
+function histIsoDate(value){
+  const text=String(value||'').trim();if(!text)return '';
+  const m=text.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/);if(!m)return text;
+  let year=m[3];if(year.length===2)year='20'+year;return `${year}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;
+}
+function histDaysBetween(a,b){const da=new Date(a+'T12:00:00'),db=new Date(b+'T12:00:00');return !a||!b||isNaN(da)||isNaN(db)?null:Math.round((db-da)/86400000)}
+function parseIngresosRows(rows){
+  let headerRow=-1;
+  for(let i=0;i<rows.length;i++){
+    const cells=(rows[i]||[]).map(c=>normalize(c));
+    if(cells.includes('dip')&&cells.filter(c=>c==='nombre').length>=2&&cells.some(c=>c.includes('fecha alta'))&&cells.some(c=>c.includes('patrocinante'))){headerRow=i;break}
+  }
+  if(headerRow<0)throw new Error('No se encontró la tabla principal del archivo Ingresos.');
+  const rawHeaders=rows[headerRow]||[],headers=rawHeaders.map(c=>normalize(c));
+  const first=(terms,from=0)=>{for(let i=from;i<headers.length;i++)if(terms.some(t=>headers[i]===t||headers[i].includes(t)))return i;return -1};
+  const idxDip=first(['dip']),idxName=first(['nombre'],idxDip+1),idxCat=first(['cat'],idxName+1),idxPhone=first(['telefono']),idxEmail=first(['e mail','email']),idxAlta=first(['fecha alta']),idxLast=first(['ult compra']),idxSponsor=first(['patrocinante']),idxSponsorName=first(['nombre'],idxSponsor+1),idxSponsorCat=first(['cat'],idxSponsorName+1);
+  const ingresos=[],subtotales=[];let totalReportado=0,periodo='';
+  const monthMap={enero:1,febrero:2,marzo:3,abril:4,mayo:5,junio:6,julio:7,agosto:8,septiembre:9,setiembre:9,octubre:10,noviembre:11,diciembre:12};
+  for(const row of rows){
+    const joined=row.join(' ').replace(/\s+/g,' ').trim(),norm=normalize(joined);
+    const pm=norm.match(/(?:periodo consultado\s*)?(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|setiembre|octubre|noviembre|diciembre)[ -](20\d{2})/);if(pm)periodo=`${pm[2]}-${String(monthMap[pm[1]]).padStart(2,'0')}`;
+    const tm=norm.match(/total de\s+(\d+)\s+incorporaciones/);if(tm)totalReportado=+tm[1];
+    if(/^sub total/.test(norm)||norm==='lider '+String(row[1]||'').trim()){const count=num(row[row.length-1]||row[1]);if(count)subtotales.push({label:joined.replace(/\s+\d+$/,'').trim(),count});if(norm.startsWith('lider')&&count)totalReportado=count;continue}
+    const dip=String(row[idxDip]||'').trim();if(!/^\d{1,2}-\d{5,}$/.test(dip))continue;
+    const alta=histIsoDate(row[idxAlta]),ultimaCompra=histIsoDate(row[idxLast]),dias=histDaysBetween(alta,ultimaCompra),lastValue=row.length?row[row.length-1]:'';
+    ingresos.push({
+      id:ingresos.length+1,dip,nombre:String(row[idxName]||'').trim(),cat:String(row[idxCat]||'').trim().toUpperCase(),telefono:String(row[idxPhone]||'').trim(),email:String(row[idxEmail]||'').trim(),fechaAlta:alta,ultimaCompra,
+      patrocinanteDip:String(row[idxSponsor]||'').trim(),patrocinanteNombre:String(row[idxSponsorName]||'').trim(),patrocinanteCat:String(row[idxSponsorCat]||'').trim().toUpperCase(),capacitacion:num(lastValue),diasHastaCompra:dias,compraPosterior:dias!==null&&dias>0,contactoCompleto:!!String(row[idxPhone]||'').trim()&&!!String(row[idxEmail]||'').trim()
+    });
+  }
+  if(!ingresos.length)throw new Error('No se encontraron personas dentro del archivo Ingresos.');
+  if(totalReportado&&totalReportado!==ingresos.length)throw new Error(`El archivo informa ${totalReportado} ingresos, pero se detectaron ${ingresos.length}.`);
+  return {ingresos,subtotales,totalReportado:totalReportado||ingresos.length,periodo,headerRow};
+}
+async function parseHistoricalFile(type,file){
+  const sheets=await readSheets(file);
+  if(type==='equipo'){
+    const result=typeof procesarExcel==='function'?procesarExcel(sheets[0].rows):null;
+    if(!result||!result.personas||!result.personas.length)throw new Error('No se pudo reconocer la Línea Descendente.');
+    return {result,detail:`${result.personas.length} personas detectadas`};
+  }
+  if(type==='garantias'){
+    const result=typeof procesarGarantias==='function'?procesarGarantias(sheets[0].rows):null;
+    const count=result?Object.keys(result.garantiasMap||{}).length:0;if(!count)throw new Error('No se reconocieron datos de Garantías por Organización.');
+    return {result,detail:`${count} registros de garantías`};
+  }
+  if(type==='ingresos'){
+    const result=parseIngresosRows(sheets[0].rows);
+    return {result,detail:`${result.ingresos.length} ingresos · ${result.periodo||'período detectado'}`};
+  }
+  throw new Error('Tipo de archivo desconocido.');
+}
+
+function makePersonKey(p,index,used){
+  const matchKey=p.codigo?`c:${codeNorm(p.codigo)}`:`n:${normalize(p.nombre)}`;let key=matchKey||`fila:${index}`;let n=2;while(used.has(key))key=`${matchKey}#${n++}`;used.add(key);return {key,matchKey};
+}
+function normalizePeriod(teamData,guarantees,incomeData,year,month){
+  const used=new Set(),sourceToKey=new Map();
+  const people=teamData.personas.map((p,index)=>{const keys=makePersonKey(p,index,used);sourceToKey.set(String(p.id),keys.key);return {
+    key:keys.key,matchKey:keys.matchKey,sourceId:String(p.id),codigo:String(p.codigo||''),nombre:String(p.nombre||'Sin nombre'),cat:String(p.cat||''),nivel:num(p.nivel),
+    parentSource:p.padreId==null?'':String(p.padreId),parentKey:'',pnAct:num(p.pnAct),m1:num(p.m1),m2:num(p.m2),m3:num(p.m3),estado:String(p.estado||''),
+    alta:String(p.alta||''),cumple:String(p.cumple||''),tel:String(p.tel||''),email:String(p.email||''),teamPB:0,totalPB:0,branchKey:'',
+    garantias:{presentadas:0,vencidas:0,porcVencidas:0,pendientes:0}
+  }});
+  const byKey=new Map(people.map(p=>[p.key,p]));
+  for(const p of people){
+    p.parentKey=sourceToKey.get(p.parentSource)||'';
+    const g=(guarantees.garantiasMap||{})[p.codigo]||(guarantees.garantiasMap||{})[codeNorm(p.codigo)];
+    if(g)p.garantias={presentadas:num(g.presentadas),vencidas:num(g.vencidas),porcVencidas:num(g.porcVencidas),pendientes:num(g.pendientes)};
+  }
+  const sorted=[...people].sort((a,b)=>b.nivel-a.nivel);const totals=new Map(people.map(p=>[p.key,p.pnAct]));
+  for(const p of sorted){const total=totals.get(p.key)||0;p.totalPB=total;p.teamPB=Math.max(0,total-p.pnAct);if(p.parentKey)totals.set(p.parentKey,(totals.get(p.parentKey)||0)+total)}
+  for(const p of people){let current=p,guard=0;while(current.parentKey&&byKey.has(current.parentKey)&&guard++<40)current=byKey.get(current.parentKey);p.branchKey=current.key}
+  const incomeRecords=(incomeData.ingresos||[]).map(item=>{const matchKey=`c:${codeNorm(item.dip)}`,linked=people.find(p=>p.matchKey===matchKey);if(linked)linked.isIncome=true;return {...cloneClean(item),matchKey,linkedPersonKey:linked?linked.key:''}});
+  return {people,incomes:incomeRecords,incomeValidation:{totalReportado:incomeData.totalReportado,subtotales:incomeData.subtotales||[],periodo:incomeData.periodo||''},titular:cloneClean(teamData.titular||{}),summary:buildSummary(people,incomeRecords)};
+}
+function buildSummary(people,incomes=[]){
+  const active=people.filter(p=>p.pnAct>0).length,categories={},branches={},incomeCategories={},incomeSponsors={};
+  let presented=0,expired=0,pending=0,pb=0;
+  for(const p of people){pb+=p.pnAct;categories[p.cat||'?']=(categories[p.cat||'?']||0)+1;presented+=p.garantias.presentadas;expired+=p.garantias.vencidas;pending+=p.garantias.pendientes;const b=p.branchKey||p.key;if(!branches[b])branches[b]={key:b,name:p.nombre,pb:0,people:0};branches[b].pb+=p.pnAct;branches[b].people++}
+  for(const item of incomes){incomeCategories[item.cat||'?']=(incomeCategories[item.cat||'?']||0)+1;const key=item.patrocinanteDip||item.patrocinanteNombre||'Sin patrocinante';if(!incomeSponsors[key])incomeSponsors[key]={key,name:item.patrocinanteNombre||item.patrocinanteDip||'Sin patrocinante',dip:item.patrocinanteDip||'',cat:item.patrocinanteCat||'',count:0};incomeSponsors[key].count++}
+  const days=incomes.map(i=>i.diasHastaCompra).filter(d=>d!==null&&d>0);
+  return {people:people.length,active,inactive:people.length-active,activePct:pct(active,people.length),pbPersonal:pb,pbOrganization:pb,presented,expired,pending,expiredPct:pct(expired,presented),categories,branches:Object.values(branches).sort((a,b)=>b.pb-a.pb),incomeCount:incomes.length,incomeCategories,incomeSponsors:Object.values(incomeSponsors).sort((a,b)=>b.count-a.count),incomeNoPurchase:incomes.filter(i=>!i.compraPosterior).length,incomeContactIncomplete:incomes.filter(i=>!i.contactoCompleto).length,incomeAvgDays:days.length?Math.round(days.reduce((a,b)=>a+b,0)/days.length):0,incomeMatched:incomes.filter(i=>i.linkedPersonKey).length,incomeTraining:incomes.filter(i=>i.capacitacion>0).length};
+}
+
+function getMonthDraft(year,month){
+  const id=periodId(year,month);
+  if(!H.uploads[id])H.uploads[id]={id,year,month,files:{},parsed:{},status:{},changed:false};
+  return H.uploads[id];
+}
+async function hydrateDraftFromSaved(draft){
+  const existing=H.periods.find(p=>p.id===draft.id);if(!existing)return;
+  for(const type of Object.keys(FILE_TYPES)){
+    if(draft.parsed[type]&&draft.files[type])continue;
+    const stored=await dbGet('files',`${draft.id}:${type}`);if(!stored||!stored.blob)continue;
+    const file=new File([stored.blob],stored.name||`${type}_${draft.id}.xlsx`,{type:stored.mime||stored.blob.type||'application/octet-stream',lastModified:stored.lastModified||Date.now()});
+    draft.files[type]=file;draft.parsed[type]=await parseHistoricalFile(type,file);draft.status[type]='saved';
+  }
+}
+async function buildPeriodRecord(draft){
+  const existing=H.periods.find(p=>p.id===draft.id);
+  const normalized=normalizePeriod(draft.parsed.equipo.result,draft.parsed.garantias.result,draft.parsed.ingresos.result,draft.year,draft.month);
+  const filesMeta=[];for(const type of Object.keys(FILE_TYPES)){const file=draft.files[type];filesMeta.push({type,name:file.name,size:file.size,mime:file.type||'application/octet-stream',lastModified:file.lastModified||0,hash:await sha256(file)})}
+  return {id:draft.id,year:draft.year,month:draft.month,label:`${MONTHS_H[draft.month]} ${draft.year}`,version:existing?num(existing.version)+1:1,createdAt:existing?existing.createdAt:new Date().toISOString(),updatedAt:new Date().toISOString(),syncStatus:'pending',filesMeta,...normalized};
+}
+async function saveMonthPeriod(id){
+  const draft=H.uploads[id],existing=H.periods.find(p=>p.id===id);if(!draft)return;
+  const btn=document.querySelector(`[data-save-month="${id}"]`);if(btn){btn.disabled=true;btn.textContent='Guardando…'}
+  try{
+    await hydrateDraftFromSaved(draft);
+    if(!draft.parsed.equipo||!draft.parsed.garantias||!draft.parsed.ingresos){toast(`Falta completar ${MONTHS_H[draft.month]}`,2600);render();return}
+    const reportPeriod=draft.parsed.ingresos.result.periodo;if(reportPeriod&&reportPeriod!==draft.id){toast(`Ingresos corresponde a ${reportPeriod}, no a ${draft.id}`,3600);render();return}
+    if(existing&&!confirm(`${MONTHS_H[draft.month]} ${draft.year} ya está guardado. ¿Querés actualizar ese cierre?`)){render();return}
+    const record=await buildPeriodRecord(draft),db=await openDB();
+    await new Promise((resolve,reject)=>{const tx=db.transaction(['periods','files'],'readwrite');tx.objectStore('periods').put(record);for(const type of Object.keys(FILE_TYPES)){const file=draft.files[type];tx.objectStore('files').put({key:`${record.id}:${type}`,periodId:record.id,type,name:file.name,size:file.size,mime:file.type||'',lastModified:file.lastModified||0,blob:file})}tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)});
+    delete H.uploads[id];await refreshData();H.selected=new Set(H.periods.slice(-Math.min(2,H.periods.length)).map(p=>p.id));render();toast(`✓ ${record.label} guardado`,2400);try{haptic(20)}catch(e){}
+    if(navigator.onLine&&cloudReady())setTimeout(()=>syncAll(false),800);
+  }catch(e){console.error('Histórico guardar',e);toast(`No se pudo guardar: ${e.message}`,3500);render()}
+}
+
+function setActiveTab(){document.querySelectorAll('.hist-tabs [data-hist-tab]').forEach(b=>b.classList.toggle('active',b.dataset.histTab===H.tab))}
+function openTab(tab){H.tab=tab;setActiveTab();render()}
+function render(){
+  const c=$('historicoContent');if(!c||H.rendering)return;H.rendering=true;
+  try{
+    if(H.tab==='cargar')renderUpload(c);else if(H.tab==='analizar')renderAnalyze(c);else if(H.tab==='meses')renderPeriods(c);else if(H.tab==='nube')renderCloud(c);else renderDashboard(c);
+  }finally{H.rendering=false}
+  updateSyncStatus();
+}
+function latestPair(){const p=H.periods;return {latest:p[p.length-1]||null,previous:p[p.length-2]||null}}
+function kpi(icon,value,label,delta,type=''){const tag=type?'button':'div';return `<${tag} class="hist-kpi ${type?'hist-kpi-click':''}" ${type?`data-hist-drill="${type}"`:''}><div class="k-icon">${icon}</div><strong>${esc(value)}</strong><span>${esc(label)}</span>${delta?`<small class="hist-delta ${delta.cls}">${esc(delta.text)}</small>`:''}${type?'<em>Ver datos ›</em>':''}</${tag}>`}
+const HIST_CAT_RANK={DJ:0,D:1,DC:2,CE:3,L:4,LE:5,EJ:6,E:7};
+function categoryPB(period,category){return period.people.filter(p=>p.cat===category).reduce((sum,p)=>sum+num(p.pnAct),0)}
+const HIST_CAT_LABEL={DJ:'Org. Distribuidor Junior',D:'Org. Distribuidores',DC:'Org. Distribuidor Calificado',CE:'Org. Coordinador',L:'Org. Líder',LE:'Org. Líder Ejecutivo',EJ:'Org. Ejecutivo',E:'Org. Empresa'};
+function incomePersonalList(period){const titular=codeNorm(period.titular&&period.titular.dip);return (period.incomes||[]).filter(i=>titular&&codeNorm(i.patrocinanteDip)===titular)}
+function passList(period,previous,target){if(!previous)return [];const before=new Map(previous.people.map(p=>[p.matchKey,p]));return period.people.filter(p=>{const old=before.get(p.matchKey);return old&&p.cat===target&&(HIST_CAT_RANK[old.cat]??-1)<(HIST_CAT_RANK[target]??0)})}
+function bonusQualifications(period){const peopleByMatch=new Map(period.people.map(p=>[p.matchKey,p])),groups=new Map();for(const income of period.incomes||[]){const sponsor=peopleByMatch.get(`c:${codeNorm(income.patrocinanteDip)}`),entrant=peopleByMatch.get(income.matchKey);if(!sponsor||!entrant||(HIST_CAT_RANK[sponsor.cat]??-1)<HIST_CAT_RANK.D||sponsor.pnAct<12||entrant.pnAct<9)continue;if(!groups.has(sponsor.key))groups.set(sponsor.key,{sponsor,incomes:[]});groups.get(sponsor.key).incomes.push({income,entrant})}return [...groups.values()]}
+function bonusWinners(period,level){return bonusQualifications(period).filter(g=>level===1?g.incomes.length===1:g.incomes.length>=2).map(g=>g.sponsor)}
+function annualValue(row,period,previous){
+  if(!period)return 0;if(row.startsWith('orgcat:'))return categoryPB(period,row.split(':')[1]);
+  if(row==='incomePersonal')return incomePersonalList(period).length;if(row==='incomeOrg')return Math.max(0,period.summary.incomeCount-incomePersonalList(period).length);if(row==='purged')return previous?Math.max(0,previous.summary.people-period.summary.people):0;
+  if(row.startsWith('pass:'))return passList(period,previous,row.split(':')[1]).length;if(row==='bonus1')return bonusWinners(period,1).length;if(row==='bonus2')return bonusWinners(period,2).length;return 0;
+}
+function annualRows(year){const present=new Set(H.periods.filter(p=>p.year===year).flatMap(p=>p.people.map(x=>x.cat)).filter(Boolean)),categoryRows=Object.keys(HIST_CAT_RANK).filter(cat=>present.has(cat)).map(cat=>({id:`orgcat:${cat}`,label:HIST_CAT_LABEL[cat]||`Org. ${cat}`,unit:'pb',category:cat}));return [
+  {section:'Resumen de acumulación'},
+  ...categoryRows,
+  {section:'Ingresos'},
+  {id:'incomeOrg',label:'Ing. por Organización'},
+  {id:'incomePersonal',label:'Ing. Personales'},
+  {id:'purged',label:'Depurados'},
+  {section:'Pases'},
+  {id:'pass:D',label:'Pases a Distribuidor'},
+  {id:'pass:DC',label:'Pases a DC'},
+  {id:'pass:CE',label:'Pases a Coordinador'},
+  {id:'pass:L',label:'Pases a Líder'},
+  {id:'pass:LE',label:'Pases a Líder Ejecutivo'},
+  {section:'Bonus'},
+  {id:'bonus1',label:'Personas con Bonus 1'},
+  {id:'bonus2',label:'Personas con Bonus 2'}
+]}
+function annualMatrix(year){const periods=H.periods.filter(p=>p.year===year).sort((a,b)=>a.id.localeCompare(b.id)),byMonth=new Map(periods.map(p=>[p.month,p])),rows=annualRows(year),values=new Map();let previous=null;for(let m=0;m<12;m++){const period=byMonth.get(m);for(const row of rows.filter(r=>r.id))values.set(`${row.id}:${m}`,annualValue(row.id,period,previous));if(period)previous=period}return {periods,byMonth,rows,values}}
+function renderAnnualSummary(year){const {periods,byMonth,rows,values}=annualMatrix(year),body=rows.map(row=>{if(row.section)return `<tr class="hist-annual-section"><th colspan="14">${esc(row.section)}</th></tr>`;const vals=Array.from({length:12},(_,m)=>values.get(`${row.id}:${m}`)||0),total=vals.reduce((a,b)=>a+b,0);return `<tr><th>${esc(row.label)}</th>${vals.map((v,m)=>{const period=byMonth.get(m);return `<td>${period?`<button data-hist-annual="${row.id}" data-period-id="${period.id}">${row.unit==='pb'?fmt(v):Math.round(v)}</button>`:'—'}</td>`}).join('')}<td><button data-hist-annual="${row.id}" data-period-id="all" data-year="${year}">${row.unit==='pb'?fmt(total):Math.round(total)}</button></td></tr>`}).join('');
+  return `<div class="hist-card hist-annual-summary"><div class="hist-card-head"><div><h3>Resumen anual ${year}</h3><p>Los valores se calculan automáticamente. Tocá cualquier número para ver su origen.</p></div><div class="hist-annual-head-actions"><span class="hist-badge">${periods.length}/12 meses</span><button type="button" class="hist-share-pdf" data-hist-share-pdf="${year}"><span>PDF</span> Compartir</button></div></div><div class="hist-annual-table-wrap"><table><thead><tr><th>Indicador</th>${SHORT_H.map(m=>`<th>${m}</th>`).join('')}<th>Total</th></tr></thead><tbody>${body}</tbody></table></div></div>`}
+async function shareAnnualPdf(year){const jsPDF=window.jspdf&&window.jspdf.jsPDF;if(!jsPDF){toast('No se pudo cargar el generador de PDF. Revisá tu conexión.',3500);return}const matrix=annualMatrix(year);if(!matrix.periods.length){toast('No hay cierres para generar el PDF.',2600);return}const pdf=new jsPDF({orientation:'landscape',unit:'pt',format:'a4',compress:true}),pageW=pdf.internal.pageSize.getWidth(),pageH=pdf.internal.pageSize.getHeight(),margin=25,tableW=pageW-margin*2,indicatorW=166,dataW=(tableW-indicatorW)/13,last=matrix.periods[matrix.periods.length-1],titular=last.titular||{},fileName=`APPI-Resumen-Anual-${year}.pdf`;
+  pdf.setFillColor(52,62,105);pdf.roundedRect(margin,22,tableW,52,8,8,'F');pdf.setTextColor(255,255,255);pdf.setFont('helvetica','bold');pdf.setFontSize(18);pdf.text('APPI',margin+15,45);pdf.setFontSize(12);pdf.text(`Resumen anual ${year}`,margin+15,63);pdf.setFont('helvetica','normal');pdf.setFontSize(8);const owner=[titular.nombre,titular.dip&&`DIP ${titular.dip}`].filter(Boolean).join(' · ');pdf.text(owner||'Histórico anual',pageW-margin-15,45,{align:'right'});pdf.text(`${matrix.periods.length} de 12 cierres cargados`,pageW-margin-15,61,{align:'right'});
+  let y=85;const headerH=23;pdf.setFillColor(224,229,244);pdf.rect(margin,y,tableW,headerH,'F');pdf.setDrawColor(191,198,218);pdf.setLineWidth(.45);pdf.setTextColor(52,57,76);pdf.setFont('helvetica','bold');pdf.setFontSize(7.3);pdf.text('INDICADOR',margin+7,y+15);[...SHORT_H,'TOTAL'].forEach((label,i)=>pdf.text(label,margin+indicatorW+dataW*i+dataW/2,y+15,{align:'center'}));pdf.rect(margin,y,tableW,headerH);for(let i=0;i<=13;i++){const x=margin+indicatorW+dataW*i;pdf.line(x,y,x,y+headerH)}y+=headerH;
+  const sections=matrix.rows.filter(r=>r.section).length,dataRows=matrix.rows.length-sections,available=pageH-y-49,scale=Math.min(1,available/(sections*16+dataRows*20)),sectionH=16*scale,rowH=20*scale;let stripe=0;
+  for(const row of matrix.rows){if(row.section){pdf.setFillColor(104,108,127);pdf.rect(margin,y,tableW,sectionH,'F');pdf.setTextColor(255,255,255);pdf.setFont('helvetica','bold');pdf.setFontSize(Math.max(6.2,7*scale));pdf.text(String(row.section).toUpperCase(),pageW/2,y+sectionH*.69,{align:'center'});y+=sectionH;continue}const vals=Array.from({length:12},(_,m)=>matrix.values.get(`${row.id}:${m}`)||0),total=vals.reduce((a,b)=>a+b,0);pdf.setFillColor(stripe++%2?248:242,stripe%2?249:245,252);pdf.rect(margin,y,tableW,rowH,'F');pdf.setFillColor(235,239,250);pdf.rect(margin+indicatorW+dataW*12,y,dataW,rowH,'F');pdf.setDrawColor(208,213,228);pdf.setTextColor(47,50,67);pdf.setFont('helvetica','bold');pdf.setFontSize(Math.max(6,7.2*scale));pdf.text(row.label,margin+7,y+rowH*.67);pdf.setFont('helvetica','normal');pdf.setFontSize(Math.max(5.8,7*scale));vals.forEach((value,m)=>{const text=matrix.byMonth.has(m)?(row.unit==='pb'?fmt(value):String(Math.round(value))):'-';pdf.text(text,margin+indicatorW+dataW*m+dataW/2,y+rowH*.67,{align:'center'})});pdf.setFont('helvetica','bold');pdf.text(row.unit==='pb'?fmt(total):String(Math.round(total)),margin+indicatorW+dataW*12+dataW/2,y+rowH*.67,{align:'center'});pdf.rect(margin,y,tableW,rowH);for(let i=0;i<=13;i++){const x=margin+indicatorW+dataW*i;pdf.line(x,y,x,y+rowH)}y+=rowH}
+  const stamp=new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'});pdf.setTextColor(99,103,120);pdf.setFont('helvetica','normal');pdf.setFontSize(6.7);pdf.text('PB por categoría: suma de los PB personales de quienes integran esa categoría. No incluye el PB personal del titular.',margin,pageH-26);pdf.text(`Generado por APPI · ${stamp}`,pageW-margin,pageH-26,{align:'right'});const blob=pdf.output('blob'),file=new File([blob],fileName,{type:'application/pdf'});if(navigator.canShare&&navigator.canShare({files:[file]})){try{await navigator.share({files:[file],title:`Resumen anual APPI ${year}`,text:`Resumen anual ${year} generado por APPI`});toast('PDF compartido',2200);return}catch(error){if(error&&error.name==='AbortError'){toast('Se canceló el envío del PDF.',2200);return}}}pdf.save(fileName);toast('PDF horizontal descargado. Ya podés compartirlo.',3200)}
+function renderDashboard(c){
+  const {latest,previous}=latestPair();
+  if(!latest){c.innerHTML=`<div class="hist-hero"><div class="eyebrow">Nuevo módulo</div><h2>Tu evolución, mes a mes</h2><p>Guardá los tres archivos de cada cierre y convertí todo el año en indicadores, comparaciones y acciones concretas.</p><div class="hist-hero-actions"><button data-go="cargar">Cargar primer mes</button><button class="secondary" data-go="nube">Preparar la nube</button></div></div><div class="hist-empty"><div class="ico">▦</div><h3>Todavía no hay cierres mensuales</h3><p>Para comenzar necesitás Línea Descendente, Garantías por Organización e Ingresos del mismo período.</p><button class="hist-primary" data-go="cargar">Crear primer cierre</button></div>`;bindGo(c);return}
+  const s=latest.summary,ps=previous&&previous.summary,dActive=deltaText(s.activePct,ps&&ps.activePct,' pp'),dPb=deltaText(s.pbPersonal,ps&&ps.pbPersonal,' PB'),dPending=deltaText(s.pending,ps&&ps.pending),dIncome=deltaText(s.incomeCount,ps&&ps.incomeCount);
+  const yearPeriods=H.periods.filter(p=>p.year===latest.year),strategies=buildStrategies(H.periods.slice(-Math.min(6,H.periods.length))),topBranch=(s.branches||[])[0],branchShare=topBranch&&s.pbPersonal?pct(topBranch.pb,s.pbPersonal):0;
+  const previousPeople=new Map((previous&&previous.people||[]).map(p=>[p.matchKey,p])),inactive2=latest.people.filter(p=>p.pnAct===0&&previousPeople.get(p.matchKey)&&previousPeople.get(p.matchKey).pnAct===0),highPending=latest.people.filter(p=>num(p.garantias&&p.garantias.pendientes)>=10);
+  c.innerHTML=`
+    <div class="hist-hero"><div class="eyebrow">Último cierre · ${esc(latest.label)}</div><h2>¿Cómo estamos?</h2><p>${s.people} personas · ${s.active} activas · ${fmt(s.pbPersonal)} PB · ${s.incomeCount} ingresos. Tocá cualquier tarjeta para abrir el dato exacto.</p><div class="hist-hero-actions"><button data-go="cargar">＋ Cargar otro mes</button><button class="secondary" data-go="analizar">Comparar períodos</button></div></div>
+    <div class="hist-section-title"><div><h3>Resumen fácil</h3><p>Números grandes y explicados</p></div><span>Todo es presionable</span></div>
+    <div class="hist-kpi-grid hist-kpi-main">${kpi('◆',`${fmt(s.pbPersonal)} PB`,'PB del equipo',dPb,'pb')}${kpi('●',`${s.active} de ${s.people}`,'Personas activas',dActive,'active')}${kpi('＋',fmt(s.incomeCount),'Ingresos del mes',dIncome,'incomes')}${kpi('!',fmt(s.pending),'Garantías pendientes',dPending,'pending')}</div>
+    <div class="hist-section-title"><div><h3>Atención requerida</h3><p>Qué conviene revisar primero</p></div></div>
+    <div class="hist-attention-grid">
+      ${previous?histAttention('#d9535a','!',`${inactive2.length} personas con dos meses sin actividad`,'Ver las personas y abrir cada ficha','inactive2'):'<div class="hist-attention hist-info-attention" style="--tone:#5b8def"><span>i</span><div><strong>La comparación comienza con el próximo cierre</strong><small>Con dos meses podremos detectar inactividad consecutiva.</small></div></div>'}
+      ${histAttention('#e99a20','◷',`${s.incomeNoPurchase} ingresos sin compra posterior`,'Revisar acompañamiento inicial','incomeNoPurchase')}
+      ${histAttention('#8a63e6','▤',`${highPending.length} personas con muchos pendientes`,'Ordenadas por cantidad de garantías','highPending')}
+      ${histAttention('#5b8def','↗',`${branchShare}% del PB está en la rama principal`,'Ver la rama y sus integrantes','topBranch')}
+    </div>
+    <div class="hist-two-cols">
+      <div class="hist-card"><div class="hist-card-head"><div><h3>Ingresos por patrocinante</h3><p>Tocá un nombre para ver sus ingresos</p></div><span class="hist-badge">${s.incomeCount} total</span></div><div class="hist-sponsor-list">${(s.incomeSponsors||[]).map(sp=>`<button data-hist-sponsor="${esc(sp.key)}"><strong>${esc(sp.name)}</strong><small>${esc(sp.dip)} · ${esc(sp.cat||'Sin categoría')}</small><b>${sp.count} ›</b></button>`).join('')||'<div class="hist-empty">Sin ingresos</div>'}</div></div>
+      <div class="hist-card"><div class="hist-card-head"><div><h3>Lectura rápida de Ingresos</h3><p>Información calculada del archivo real</p></div></div><div class="hist-mini-stats"><button data-hist-drill="incomeNoPurchase"><b>${s.incomeNoPurchase}</b><span>Sin compra posterior</span></button><button data-hist-drill="incomeTraining"><b>${s.incomeTraining}</b><span>En capacitación</span></button><button data-hist-drill="incomeIncomplete"><b>${s.incomeContactIncomplete}</b><span>Contacto incompleto</span></button><button data-hist-drill="incomes"><b>${s.incomeMatched}/${s.incomeCount}</b><span>Cruzados con LD</span></button></div></div>
+    </div>
+    ${renderAnnualSummary(latest.year)}
+    <div class="hist-card"><div class="hist-card-head"><div><h3>Evolución ${latest.year}</h3><p>PB del equipo registrado en cada cierre</p></div><span class="hist-badge">${yearPeriods.length}/12 cierres</span></div>${lineChart(yearPeriods,'pbPersonal','#5b8def','PB')}</div>
+    <div class="hist-card"><div class="hist-card-head"><div><h3>Próximas acciones</h3><p>Recomendaciones basadas en los datos</p></div><button class="hist-mini-btn" data-go="analizar">Ver análisis completo</button></div><div class="hist-strategies">${strategies.slice(0,3).map(strategyHtml).join('')}</div></div>`;
+  bindGo(c);bindDashboardDrill(c,latest,previous,topBranch);
+}
+function histAttention(tone,icon,title,desc,type){return `<button class="hist-attention" style="--tone:${tone}" data-hist-drill="${type}"><span>${icon}</span><div><strong>${esc(title)}</strong><small>${esc(desc)}</small></div><em>Ver datos ›</em></button>`}
+function bindDashboardDrill(root,period,previous,topBranch){
+  root.querySelectorAll('[data-hist-drill]').forEach(btn=>btn.onclick=()=>openHistDrill(btn.dataset.histDrill,period,previous,topBranch));
+  root.querySelectorAll('[data-hist-sponsor]').forEach(btn=>btn.onclick=()=>openHistSponsor(btn.dataset.histSponsor,period));
+  root.querySelectorAll('[data-hist-annual]').forEach(btn=>btn.onclick=()=>openAnnualDrill(btn.dataset.histAnnual,btn.dataset.periodId,+btn.dataset.year||period.year));
+  root.querySelectorAll('[data-hist-share-pdf]').forEach(btn=>btn.onclick=async()=>{const original=btn.innerHTML;btn.disabled=true;btn.innerHTML='<span>PDF</span> Generando…';try{await shareAnnualPdf(+btn.dataset.histSharePdf)}catch(error){console.error('PDF anual',error);toast('No se pudo generar el PDF anual.',3200)}finally{btn.disabled=false;btn.innerHTML=original}});
+}
+function previousPeriodFor(period){return H.periods.filter(p=>p.id<period.id).sort((a,b)=>b.id.localeCompare(a.id))[0]||null}
+function openAnnualDrill(rowId,periodId,year){const def=annualRows(year).find(r=>r.id===rowId)||{label:'Detalle'};
+  if(periodId==='all'){const periods=H.periods.filter(p=>p.year===year).sort((a,b)=>a.id.localeCompare(b.id));let previous=null;const html=periods.map(p=>{const value=annualValue(rowId,p,previous);previous=p;return `<button class="hist-data-row hist-month-data" data-annual-open="${p.id}"><span class="hist-data-avatar">${SHORT_H[p.month]}</span><span><strong>${esc(p.label)}</strong><small>${esc(def.label)}</small></span><b>${def.unit==='pb'?fmt(value):Math.round(value)} ›</b></button>`}).join('');openHistDrawer(`${def.label} · Total anual`,`${year} · Tocá un mes para ver el detalle`,`<div class="hist-data-list">${html||'<div class="hist-empty">Sin cierres</div>'}</div>`);document.querySelectorAll('#histDetailBody [data-annual-open]').forEach(b=>b.onclick=()=>openAnnualDrill(rowId,b.dataset.annualOpen,year));return}
+  const period=H.periods.find(p=>p.id===periodId);if(!period)return;const previous=previousPeriodFor(period);let html='',sub=period.label,people=[],bindPeriod=period;
+  if(rowId.startsWith('orgcat:')){const cat=rowId.split(':')[1],all=period.people.filter(p=>p.cat===cat),sellers=[...all].sort((a,b)=>b.pnAct-a.pnAct).slice(0,10),organizations=(HIST_CAT_RANK[cat]??-1)>=HIST_CAT_RANK.CE?[...all].sort((a,b)=>b.totalPB-a.totalPB).slice(0,10):[];sub=`${fmt(categoryPB(period,cat))} PB · ${all.length} personas`;html=`<h3 class="hist-ranking-title">Top 10 vendedores</h3>${sellers.map(p=>histPersonRow(p,`${fmt(p.pnAct)} PB`)).join('')||'<div class="hist-empty">Sin vendedores con PB.</div>'}${organizations.length?`<h3 class="hist-ranking-title second">Top 10 organizaciones</h3>${organizations.map(p=>histPersonRow(p,`${fmt(p.totalPB)} PB org.`)).join('')}`:''}`}
+  else if(rowId==='incomePersonal'||rowId==='incomeOrg'){ const personal=new Set(incomePersonalList(period).map(i=>i.matchKey)),items=(period.incomes||[]).filter(i=>rowId==='incomePersonal'?personal.has(i.matchKey):!personal.has(i.matchKey));html=items.map(histIncomeRow).join('')}
+  else if(rowId==='purged'){const before=new Map((previous&&previous.people||[]).map(p=>[p.matchKey,p])),current=new Set(period.people.map(p=>p.matchKey)),missing=[...before.values()].filter(p=>!current.has(p.matchKey)),net=annualValue(rowId,period,previous);sub=`${net} depurados netos · ${missing.length} DIPs dejaron de aparecer`;bindPeriod=previous||period;html=`<div class="hist-drill-note">El valor mensual es la disminución neta entre ${previous?previous.summary.people:0} y ${period.summary.people} personas.</div>${missing.map(p=>histPersonRow(p,'No aparece')).join('')}`}
+  else if(rowId.startsWith('pass:')){people=passList(period,previous,rowId.split(':')[1]);html=people.map(p=>histPersonRow(p,`Pasó a ${p.cat}`)).join('')}
+  else if(rowId==='bonus1'||rowId==='bonus2'){const level=rowId==='bonus1'?1:2,groups=bonusQualifications(period).filter(g=>level===1?g.incomes.length===1:g.incomes.length>=2);html=groups.map(g=>`<section class="hist-bonus-winner"><button data-hist-person="${esc(g.sponsor.key)}"><span><strong>${esc(g.sponsor.nombre)}</strong><small>${esc(g.sponsor.codigo)} · ${esc(g.sponsor.cat)} · ${fmt(g.sponsor.pnAct)} PB personales</small></span><b>Bonus ${level} ›</b></button><div><h4>Ingresos que calificaron</h4>${g.incomes.map(item=>`<button class="hist-bonus-income" data-hist-person="${esc(item.entrant.key)}"><span><strong>${esc(item.entrant.nombre)}</strong><small>${esc(item.entrant.codigo)}</small></span><b>${fmt(item.entrant.pnAct)} PB ›</b></button>`).join('')}</div></section>`).join('')}
+  if(!html)html='<div class="hist-empty">No hay datos para este indicador en el mes.</div>';openHistDrawer(def.label,sub,`<div class="hist-drill-note">El número se calculó automáticamente con los archivos de este cierre.</div><div class="hist-data-list">${html}</div>`);bindHistRows(bindPeriod)}
+function ensureHistDrawer(){
+  let overlay=document.getElementById('histDetailOverlay');if(overlay)return overlay;
+  overlay=document.createElement('div');overlay.id='histDetailOverlay';overlay.className='hist-detail-overlay';overlay.innerHTML='<aside class="hist-detail-drawer" role="dialog" aria-modal="true"><div class="hist-detail-head"><div><h2 id="histDetailTitle">Detalle</h2><p id="histDetailSub"></p></div><button type="button" id="histDetailClose" aria-label="Cerrar">×</button></div><div id="histDetailBody"></div></aside>';document.body.appendChild(overlay);
+  overlay.onclick=e=>{if(e.target===overlay)closeHistDrawer()};overlay.querySelector('#histDetailClose').onclick=closeHistDrawer;document.addEventListener('keydown',e=>{if(e.key==='Escape')closeHistDrawer()});return overlay;
+}
+function openHistDrawer(title,sub,html){const overlay=ensureHistDrawer();overlay.querySelector('#histDetailTitle').textContent=title;overlay.querySelector('#histDetailSub').textContent=sub||'';overlay.querySelector('#histDetailBody').innerHTML=html;overlay.classList.add('open');overlay.querySelector('#histDetailClose').focus()}
+function closeHistDrawer(){document.getElementById('histDetailOverlay')?.classList.remove('open')}
+function histPersonRow(p,value){return `<button class="hist-data-row" data-hist-person="${esc(p.key)}"><span class="hist-data-avatar">${esc(String(p.nombre||'?').split(/[ ,]+/).filter(Boolean).slice(0,2).map(x=>x[0]).join(''))}</span><span><strong>${esc(p.nombre)}</strong><small>${esc(p.codigo||'Sin DIP')} · ${esc(p.cat||'Sin categoría')}</small></span><b>${esc(value||`${fmt(p.pnAct)} PB`)} ›</b></button>`}
+function histIncomeRow(item){return `<button class="hist-data-row" data-hist-income="${esc(item.matchKey)}"><span class="hist-data-avatar income">IN</span><span><strong>${esc(item.nombre)}</strong><small>${esc(item.dip)} · Patrocina ${esc(item.patrocinanteNombre||'—')}</small></span><b>${item.compraPosterior?`${item.diasHastaCompra} días`:'Sin compra'} ›</b></button>`}
+function openHistDrill(type,period,previous,topBranch){
+  let title='Detalle',sub=`Cierre ${period.label}`,html='',people=[...period.people],incomes=[...(period.incomes||[])];
+  if(type==='pb'){title='Aporte de PB';people.sort((a,b)=>b.pnAct-a.pnAct);html=people.map(p=>histPersonRow(p,`${fmt(p.pnAct)} PB`)).join('')}
+  else if(type==='active'){title='Personas activas';people=people.filter(p=>p.pnAct>0).sort((a,b)=>b.pnAct-a.pnAct);sub=`${people.length} de ${period.people.length} personas`;html=people.map(p=>histPersonRow(p,`${fmt(p.pnAct)} PB`)).join('')}
+  else if(type==='pending'){title='Garantías pendientes';people=people.filter(p=>num(p.garantias&&p.garantias.pendientes)>0).sort((a,b)=>num(b.garantias.pendientes)-num(a.garantias.pendientes));html=people.map(p=>histPersonRow(p,`${fmt(p.garantias.pendientes)} pend.`)).join('')}
+  else if(type==='inactive2'){title='Inactividad consecutiva';const prev=new Map((previous&&previous.people||[]).map(p=>[p.matchKey,p]));people=people.filter(p=>p.pnAct===0&&prev.get(p.matchKey)&&prev.get(p.matchKey).pnAct===0);sub='Cero PB en los dos últimos cierres';html=people.map(p=>histPersonRow(p,'2 meses')).join('')}
+  else if(type==='highPending'){title='Pendientes prioritarios';people=people.filter(p=>num(p.garantias&&p.garantias.pendientes)>=10).sort((a,b)=>num(b.garantias.pendientes)-num(a.garantias.pendientes));html=people.map(p=>histPersonRow(p,`${fmt(p.garantias.pendientes)} pend.`)).join('')}
+  else if(type==='topBranch'){title=topBranch?`Rama de ${topBranch.name}`:'Rama principal';people=people.filter(p=>(p.branchKey||p.key)===(topBranch&&topBranch.key));sub=topBranch?`${fmt(topBranch.pb)} PB · ${topBranch.people} personas`:sub;html=people.map(p=>histPersonRow(p)).join('')}
+  else {if(type==='incomeNoPurchase'){title='Ingresos sin compra posterior';incomes=incomes.filter(i=>!i.compraPosterior)}else if(type==='incomeTraining'){title='Ingresos en capacitación';incomes=incomes.filter(i=>i.capacitacion>0)}else if(type==='incomeIncomplete'){title='Contactos incompletos';incomes=incomes.filter(i=>!i.contactoCompleto)}else title='Ingresos del mes';sub=`${incomes.length} personas del archivo Ingresos`;html=incomes.map(histIncomeRow).join('')}
+  if(!html)html='<div class="hist-empty">No hay personas en esta condición.</div>';openHistDrawer(title,sub,`<div class="hist-drill-note">Esta lista contiene exactamente los datos que originaron el indicador.</div><div class="hist-data-list">${html}</div>`);bindHistRows(period)
+}
+function openHistSponsor(key,period){const sponsor=(period.summary.incomeSponsors||[]).find(s=>s.key===key),items=(period.incomes||[]).filter(i=>(i.patrocinanteDip||i.patrocinanteNombre||'Sin patrocinante')===key);openHistDrawer(sponsor?sponsor.name:'Patrocinante',`${items.length} ingresos · ${sponsor&&sponsor.dip||''}`,`<div class="hist-data-list">${items.map(histIncomeRow).join('')}</div>`);bindHistRows(period)}
+function bindHistRows(period){document.querySelectorAll('#histDetailBody [data-hist-person]').forEach(b=>b.onclick=()=>openHistPerson(b.dataset.histPerson,period));document.querySelectorAll('#histDetailBody [data-hist-income]').forEach(b=>b.onclick=()=>{const item=(period.incomes||[]).find(i=>i.matchKey===b.dataset.histIncome);if(item&&item.linkedPersonKey)openHistPerson(item.linkedPersonKey,period);else if(item)openHistIncome(item,period)})}
+function openHistPerson(key,period){const p=period.people.find(x=>x.key===key);if(!p)return;const income=(period.incomes||[]).find(i=>i.matchKey===p.matchKey),digits=String(p.tel||income&&income.telefono||'').replace(/\D/g,'');openHistDrawer(p.nombre,`${p.codigo||'Sin DIP'} · Categoría ${p.cat||'—'}`,`<div class="hist-person-kpis"><div><b>${fmt(p.pnAct)} PB</b><span>PB Personal</span></div><div><b>${fmt(p.teamPB)} PB</b><span>PB de Equipo</span></div><div><b>${fmt(p.garantias&&p.garantias.pendientes)}</b><span>Pendientes</span></div><div><b>${income?'Sí':'No'}</b><span>Ingreso del mes</span></div></div>${income?`<div class="hist-drill-note"><b>Fecha de alta:</b> ${esc(income.fechaAlta||'—')}<br><b>Última compra:</b> ${esc(income.ultimaCompra||'—')}<br><b>Patrocinante:</b> ${esc(income.patrocinanteNombre||'—')}</div>`:''}<div class="hist-contact-actions"><a class="wa" href="${digits?`https://wa.me/${digits}`:'#'}" ${digits?'target="_blank"':''}>WhatsApp</a><a class="call" href="${digits?`tel:${digits}`:'#'}">Llamar</a></div>`)}
+function openHistIncome(item,period){const digits=String(item.telefono||'').replace(/\D/g,'');openHistDrawer(item.nombre,`${item.dip} · Ingreso de ${period.label}`,`<div class="hist-person-kpis"><div><b>${esc(item.cat||'—')}</b><span>Categoría</span></div><div><b>${item.compraPosterior?'Sí':'No'}</b><span>Compra posterior</span></div><div><b>${item.diasHastaCompra===null?'—':item.diasHastaCompra}</b><span>Días hasta compra</span></div><div><b>${item.capacitacion?'Sí':'No'}</b><span>Capacitación</span></div></div><div class="hist-drill-note"><b>Alta:</b> ${esc(item.fechaAlta||'—')}<br><b>Última compra:</b> ${esc(item.ultimaCompra||'—')}<br><b>Patrocinante:</b> ${esc(item.patrocinanteNombre||'—')} · ${esc(item.patrocinanteDip||'')}</div><div class="hist-contact-actions"><a class="wa" href="${digits?`https://wa.me/${digits}`:'#'}" ${digits?'target="_blank"':''}>WhatsApp</a><a class="call" href="${digits?`tel:${digits}`:'#'}">Llamar</a></div>`)}
+function bindGo(root){root.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>openTab(b.dataset.go))}
+
+function renderUpload(c){
+  const year=H.uploadYear,saved=H.periods.filter(p=>p.year===year).length;
+  c.innerHTML=`<div class="hist-card hist-year-card"><div class="hist-card-head"><div><h3>Cierres mensuales ${year}</h3><p>Cada mes tiene un casillero para cada archivo.</p></div><span class="hist-badge">${saved}/12 guardados</span></div>
+    <div class="hist-year-nav"><button id="histPrevYear" aria-label="Año anterior">‹</button><select id="histAnnualYear">${yearOptions(year)}</select><button id="histNextYear" aria-label="Año siguiente">›</button></div>
+    <div class="hist-annual-progress"><span style="width:${Math.round(saved/12*100)}%"></span></div>
+    <div class="hist-annual-help"><b>Cómo cargar:</b> elegí los tres archivos dentro del mes correspondiente. Cada archivo correcto mostrará un check verde. Después guardá ese mes.</div>
+  </div>
+  <div class="hist-annual-grid">${MONTHS_H.map((_,month)=>monthUploadCard(year,month)).join('')}</div>
+  <div class="hist-card"><div class="hist-card-head"><div><h3>Datos actuales de APPI</h3><p>Podés convertir Mi Equipo y sus garantías ya cargadas en el cierre del mes actual.</p></div></div><button class="hist-secondary" id="histUseCurrent">Usar datos actuales en ${MONTHS_H[new Date().getMonth()]}</button></div>`;
+  $('histAnnualYear').onchange=e=>{H.uploadYear=+e.target.value;render()};$('histPrevYear').onclick=()=>{H.uploadYear--;render()};$('histNextYear').onclick=()=>{H.uploadYear++;render()};
+  c.querySelectorAll('[data-file-slot]').forEach(slot=>{
+    const id=slot.dataset.periodId,type=slot.dataset.type;
+    slot.onclick=()=>{H.fileTarget={id,type};$(FILE_TYPES[type].input).click()};
+    slot.ondragover=e=>{e.preventDefault();slot.classList.add('drag')};slot.ondragleave=()=>slot.classList.remove('drag');slot.ondrop=e=>{e.preventDefault();slot.classList.remove('drag');const f=e.dataTransfer.files&&e.dataTransfer.files[0];if(f)handleFile(type,f,id)};
+  });
+  c.querySelectorAll('[data-save-month]').forEach(btn=>btn.onclick=()=>saveMonthPeriod(btn.dataset.saveMonth));
+  $('histUseCurrent').onclick=useCurrentData;
+}
+function monthUploadCard(year,month){
+  const id=periodId(year,month),existing=H.periods.find(p=>p.id===id),draft=H.uploads[id],changed=!!(draft&&draft.changed);
+  const fileState=type=>{
+    const status=draft&&draft.status[type],parsed=draft&&draft.parsed[type],file=draft&&draft.files[type],saved=!!(existing&&existing.filesMeta&&existing.filesMeta.some(f=>f.type===type));
+    if(status==='loading')return {kind:'loading',label:'Procesando…',detail:file&&file.name||'Leyendo archivo'};
+    if(status&&status.error)return {kind:'error',label:'Reintentar',detail:status.error};
+    if(parsed)return {kind:'ready',label:'✓ Archivo correcto',detail:file&&file.name||'Validado'};
+    if(saved){const meta=existing.filesMeta.find(f=>f.type===type);return {kind:'saved',label:'✓ Guardado',detail:meta&&meta.name||'Archivo del cierre'}};
+    return {kind:'empty',label:'Cargar archivo',detail:'Excel o CSV'};
+  };
+  const states=Object.fromEntries(Object.keys(FILE_TYPES).map(t=>[t,fileState(t)])),count=Object.values(states).filter(x=>x.kind==='ready'||x.kind==='saved').length;
+  const canSave=changed&&count===3,complete=!!existing&&count===3&&!changed,incompleteSaved=!!existing&&count<3;
+  return `<article class="hist-month-card ${complete?'complete':''} ${changed||incompleteSaved?'editing':''}" data-month-card="${id}">
+    <div class="hist-month-head"><div><span>${SHORT_H[month]}</span><h3>${MONTHS_H[month]}</h3></div><strong class="hist-month-count ${count===3?'done':''}">${count}/3</strong></div>
+    <div class="hist-month-files">${Object.entries(FILE_TYPES).map(([type,cfg])=>monthFileSlot(id,type,cfg,states[type])).join('')}</div>
+    <div class="hist-month-foot"><small>${complete?'Cierre guardado':incompleteSaved?'Cierre anterior: falta Ingresos':changed?(count===3?'Listo para guardar':'Carga en progreso'):'Sin cargar'}</small><button class="${canSave?'hist-primary':'hist-secondary'}" data-save-month="${id}" ${canSave?'':'disabled'}>${complete?'Guardado':existing?'Completar mes':'Guardar mes'}</button></div>
+  </article>`;
+}
+function monthFileSlot(id,type,cfg,state){
+  const icon=state.kind==='ready'||state.kind==='saved'?'✓':state.kind==='loading'?'…':state.kind==='error'?'!':cfg.icon;
+  return `<button type="button" class="hist-file-slot ${state.kind}" data-file-slot data-period-id="${id}" data-type="${type}"><span class="hist-file-check">${icon}</span><span><b>${esc(cfg.label)}</b><small>${esc(state.label)} · ${esc(state.detail)}</small></span></button>`;
+}
+function yearOptions(selected){const y=new Date().getFullYear(),values=new Set([selected]);for(let n=y+2;n>=y-12;n--)values.add(n);return [...values].sort((a,b)=>b-a).map(n=>`<option value="${n}" ${n===selected?'selected':''}>${n}</option>`).join('')}
+async function handleFile(type,file,id){
+  if(!file||!id)return;const [year,mo]=id.split('-').map(Number),draft=getMonthDraft(year,mo-1);draft.files[type]=file;draft.status[type]='loading';draft.changed=true;delete draft.parsed[type];render();
+  try{draft.parsed[type]=await parseHistoricalFile(type,file);draft.status[type]='ready';toast(`✓ ${FILE_TYPES[type].label} · ${MONTHS_H[draft.month]}`,1800)}catch(e){console.error('Histórico archivo',type,e);draft.status[type]={error:e.message};delete draft.parsed[type];toast(e.message,3200)}render();
+}
+async function useCurrentData(){
+  const currentTeam=(()=>{try{return JSON.parse(localStorage.getItem('equipoData')||'null')}catch(e){return null}})();
+  if(!currentTeam||!currentTeam.personas||!currentTeam.personas.length){toast('No hay una Línea Descendente cargada actualmente',3000);return}
+  if(!currentTeam.personas.some(p=>p.garantias)){toast('Los datos actuales no incluyen Garantías por Organización',3000);return}
+  const month=new Date().getMonth(),year=H.uploadYear,id=periodId(year,month),draft=getMonthDraft(year,month),map={};currentTeam.personas.forEach(p=>{if(p.codigo&&p.garantias)map[p.codigo]=cloneClean(p.garantias)});
+  draft.parsed={equipo:{result:currentTeam,detail:`${currentTeam.personas.length} personas de APPI`},garantias:{result:{garantiasMap:map},detail:`${Object.keys(map).length} garantías de APPI`}};
+  const makeVirtual=(name,type)=>new File([JSON.stringify({source:'APPI actual',type})],name,{type:'application/json',lastModified:Date.now()});
+  draft.files={equipo:makeVirtual('linea_actual_APPI.json','equipo'),garantias:makeVirtual('garantias_actual_APPI.json','garantias')};draft.status={equipo:'ready',garantias:'ready'};draft.changed=true;render();toast(`LD y GO listos en ${MONTHS_H[month]}. Falta Ingresos.`,2600);
+}
+
+function periodRow(p){
+  const s=p.summary||{},open=H.openMenu===p.id;return `<div class="hist-period" data-period="${p.id}"><div class="hist-period-date"><div><b>${SHORT_H[p.month]}</b><small>${p.year}</small></div></div><div class="hist-period-info"><h4>${esc(p.label)}</h4><p>${fmt(s.people)} personas · ${s.activePct||0}% activas · ${fmt(s.pbPersonal)} PB</p><div class="file-flags"><span>LD</span><span>GO</span><span>IN</span><span>${p.syncStatus==='synced'?'Nube':'Local'}</span></div></div><div class="hist-period-actions"><button class="hist-more" data-more="${p.id}" aria-label="Opciones">⋯</button></div>${open?`<div class="hist-action-menu"><button data-pa="analyze">Analizar</button><button data-pa="equipo">Descargar LD</button><button data-pa="garantias">Descargar GO</button><button data-pa="ingresos">Descargar IN</button><button data-pa="zip">ZIP del mes</button><button data-pa="delete" class="danger">Eliminar</button></div>`:''}</div>`;
+}
+function renderPeriods(c){
+  c.innerHTML=`<div class="hist-card"><div class="hist-card-head"><div><h3>Biblioteca de cierres</h3><p>${H.periods.length} períodos guardados con sus archivos originales</p></div><button class="hist-mini-btn" data-go="cargar">＋ Nuevo</button></div>${H.periods.length?`<div class="hist-period-list">${[...H.periods].reverse().map(periodRow).join('')}</div>`:`<div class="hist-empty"><h3>Sin cierres</h3><p>Cargá el primer mes para comenzar.</p><button class="hist-primary" data-go="cargar">Cargar mes</button></div>`}</div>
+  <div class="hist-card"><div class="hist-card-head"><div><h3>Respaldo completo</h3><p>Incluye estadísticas y los tres archivos originales de cada mes.</p></div></div><div class="hist-actions"><button class="hist-primary" id="histBackupAll" ${H.periods.length?'':'disabled'}>Descargar backup ZIP</button><button class="hist-secondary" id="histRestore">Restaurar ZIP</button></div></div>`;
+  bindGo(c);bindPeriodRows(c);$('histBackupAll').onclick=exportAllZip;$('histRestore').onclick=()=>$('histRestoreInput').click();
+}
+function bindPeriodRows(root){
+  root.querySelectorAll('[data-more]').forEach(b=>b.onclick=e=>{e.stopPropagation();H.openMenu=H.openMenu===b.dataset.more?'':b.dataset.more;render()});
+  root.querySelectorAll('.hist-action-menu').forEach(menu=>menu.querySelectorAll('[data-pa]').forEach(b=>b.onclick=async()=>{
+    const row=b.closest('[data-period]'),id=row.dataset.period,action=b.dataset.pa;
+    if(action==='analyze'){H.selected=new Set([id]);H.openMenu='';openTab('analizar')}
+    else if(['equipo','garantias','ingresos'].includes(action))await downloadOriginal(id,action);
+    else if(action==='zip')await exportPeriodZip(id);
+    else if(action==='delete'&&confirm(`¿Eliminar ${H.periods.find(p=>p.id===id)?.label||id} y sus tres archivos?`)){await deletePeriod(id);H.openMenu='';render();toast('Cierre eliminado')}
+  }));
+}
+async function downloadOriginal(id,type){
+  let f=await dbGet('files',`${id}:${type}`);
+  if((!f||!f.blob)&&cloudReady()&&getSession()){
+    try{toast('Recuperando archivo desde la nube…',1800);f=await cloudDownloadFile(id,type)}catch(e){console.error('Descarga nube',e)}
+  }
+  if(!f||!f.blob){toast('El archivo original no está disponible en este dispositivo',2800);return}
+  downloadBlob(f.blob,f.name)
+}
+function downloadBlob(blob,name){const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name||'archivo';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500)}
+
+function selectedPeriods(){return H.periods.filter(p=>H.selected.has(p.id)).sort((a,b)=>a.id.localeCompare(b.id))}
+function renderAnalyze(c){
+  if(!H.periods.length){c.innerHTML=`<div class="hist-empty"><div class="ico">↗</div><h3>Necesitás al menos un cierre</h3><p>Después de cargarlo aparecerán estadísticas, alertas y estrategias.</p><button class="hist-primary" data-go="cargar">Cargar mes</button></div>`;bindGo(c);return}
+  let periods=selectedPeriods();if(!periods.length){H.selected.add(H.periods[H.periods.length-1].id);periods=selectedPeriods()}
+  const a=analyzePeriods(periods),latest=periods[periods.length-1],first=periods[0],strategies=buildStrategies(periods);
+  const report=H.lastReport&&H.lastReport.periodIds&&H.lastReport.periodIds.join('|')===periods.map(p=>p.id).join('|')?H.lastReport:null;
+  c.innerHTML=`<div class="hist-card"><div class="hist-card-head"><div><h3>Elegí los meses</h3><p>Podés seleccionar períodos consecutivos o separados.</p></div><span class="hist-badge">${periods.length} seleccionados</span></div><div class="hist-picker-tools"><button data-pick="latest">Último</button><button data-pick="last2">Últimos 2</button><button data-pick="last6">Últimos 6</button><button data-pick="year">Año ${latest.year}</button><button data-pick="all">Todos</button></div><div class="hist-month-picker">${H.periods.map(p=>`<label class="hist-month-option"><input type="checkbox" value="${p.id}" ${H.selected.has(p.id)?'checked':''}><span>${SHORT_H[p.month]} ${String(p.year).slice(-2)}</span></label>`).join('')}</div></div>
+    <div class="hist-kpi-grid">${kpi('◆',`${fmt(latest.summary.pbPersonal)} PB`,'PB del equipo',a.pbDelta)}${kpi('●',`${latest.summary.activePct}%`,'Actividad',a.activeDelta)}${kpi('＋',fmt(latest.summary.incomeCount),'Ingresos',a.incomeDelta)}${kpi('!',fmt(latest.summary.pending),'Pendientes',a.pendingDelta)}</div>
+    <div class="hist-card"><div class="hist-card-head"><div><h3>PB del equipo por mes</h3><p>${esc(first.label)} — ${esc(latest.label)}</p></div></div>${lineChart(periods,'pbPersonal','#5b8def','PB')}</div>
+    <div class="hist-card"><div class="hist-card-head"><div><h3>Porcentaje de actividad</h3><p>Personas con PB Personal mayor a cero</p></div></div>${lineChart(periods,'activePct','#3ad0a4','%')}</div>
+    <div class="hist-card"><div class="hist-card-head"><div><h3>Garantías pendientes</h3><p>Evolución de los registros pendientes</p></div></div>${lineChart(periods,'pending','#f5b301','')}</div>
+    <div class="hist-card"><div class="hist-card-head"><div><h3>Evolución por categoría</h3><p>Distribución inicial y final de las personas</p></div></div><div class="hist-table-wrap"><table class="hist-table" style="min-width:420px"><thead><tr><th>Categoría</th><th>${esc(SHORT_H[first.month])} ${first.year}</th><th>${esc(SHORT_H[latest.month])} ${latest.year}</th><th>Cambio</th></tr></thead><tbody>${categoryRows(first,latest)}</tbody></table></div></div>
+    <div class="hist-card"><div class="hist-card-head"><div><h3>Cambios individuales</h3><p>${a.changes.length?`${a.improved} mejoraron · ${a.declined} bajaron · ${a.newPeople} nuevos`:'Se necesita más de un mes para comparar'}</p></div><span class="hist-badge">${a.changes.length} personas</span></div><div class="hist-search"><input id="histPersonSearch" value="${esc(H.personSearch)}" placeholder="Buscar persona o código…"></div><div class="hist-table-wrap"><table class="hist-table"><thead><tr><th>Persona</th><th>Categoría</th><th>PB inicial</th><th>PB final</th><th>Cambio</th><th>Equipo</th></tr></thead><tbody id="histPersonRows">${personRows(a.changes,H.personSearch)}</tbody></table></div></div>
+    <div class="hist-card"><div class="hist-card-head"><div><h3>Estrategias recomendadas</h3><p>Basadas en datos reales de los períodos seleccionados</p></div><span class="hist-badge">Motor local</span></div><div class="hist-strategies">${strategies.map(strategyHtml).join('')}</div></div>
+    <div class="hist-card"><div class="hist-card-head"><div><h3>Análisis profundo</h3><p>Guardá un informe local o consultá la IA online cuando la nube esté conectada.</p></div></div><label class="hist-ai-consent"><input type="checkbox" id="histAiConsent"> Autorizo enviar a la IA nombres, categorías y resultados de los períodos seleccionados. No se enviarán teléfonos, domicilios, correos ni cumpleaños.</label><div class="hist-actions"><button class="hist-primary" id="histLocalReport">Generar informe local</button><button class="hist-secondary" id="histOnlineReport">Análisis con IA</button></div><div id="histReportArea">${report?reportHtml(report):''}</div></div>`;
+  c.querySelectorAll('.hist-month-option input').forEach(input=>input.onchange=()=>{input.checked?H.selected.add(input.value):H.selected.delete(input.value);render()});
+  c.querySelectorAll('[data-pick]').forEach(b=>b.onclick=()=>pickPeriods(b.dataset.pick));
+  $('histPersonSearch').oninput=e=>{H.personSearch=e.target.value;$('histPersonRows').innerHTML=personRows(a.changes,H.personSearch)};
+  $('histLocalReport').onclick=()=>createLocalReport(periods,strategies,a);
+  $('histOnlineReport').onclick=()=>createOnlineReport(periods,strategies,a);
+}
+function pickPeriods(mode){
+  H.selected.clear();const all=H.periods,latest=all[all.length-1];let list=[];
+  if(mode==='latest')list=all.slice(-1);else if(mode==='last2')list=all.slice(-2);else if(mode==='last6')list=all.slice(-6);else if(mode==='year')list=all.filter(p=>p.year===latest.year);else list=all;
+  list.forEach(p=>H.selected.add(p.id));render();
+}
+function metricValue(p,metric){return num((p.summary||{})[metric])}
+function lineChart(periods,metric,color,suffix){
+  if(!periods.length)return '<div class="hist-empty">Sin datos</div>';
+  if(periods.length===1){const value=metricValue(periods[0],metric);return `<div class="hist-single-chart"><span style="--tone:${color}"></span><strong>${fmt(value)}${suffix}</strong><b>${esc(periods[0].label)}</b><small>Cargá otro mes para ver la evolución y las diferencias.</small></div>`}
+  const vals=periods.map(p=>metricValue(p,metric));let min=Math.min(...vals),max=Math.max(...vals);if(min===max){min=Math.max(0,min-1);max+=1}const W=620,Ht=170,left=46,right=14,top=14,bottom=31,cw=W-left-right,ch=Ht-top-bottom;
+  const point=(v,i)=>({x:left+(periods.length===1?cw/2:i*cw/(periods.length-1)),y:top+(max-v)/(max-min)*ch});const pts=vals.map(point);const poly=pts.map(p=>`${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');const area=`${left},${top+ch} ${poly} ${left+cw},${top+ch}`;const grids=[0,.25,.5,.75,1].map(t=>{const y=top+t*ch,v=max-t*(max-min);return `<line x1="${left}" y1="${y}" x2="${left+cw}" y2="${y}" stroke="#9aa3b5" stroke-opacity=".18"/><text x="${left-7}" y="${y+3}" text-anchor="end" font-size="9" fill="#8a8a94">${esc(fmt(v))}${suffix}</text>`}).join('');
+  const labels=periods.map((p,i)=>`<text x="${pts[i].x}" y="${Ht-8}" text-anchor="middle" font-size="9" font-weight="700" fill="#777887">${SHORT_H[p.month]} ${String(p.year).slice(-2)}</text>`).join('');
+  return `<div class="hist-chart"><svg viewBox="0 0 ${W} ${Ht}" role="img" aria-label="Gráfico de ${esc(metric)}">${grids}<polygon points="${area}" fill="${color}" fill-opacity=".09"/><polyline points="${poly}" fill="none" stroke="${color}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>${pts.map((p,i)=>`<circle cx="${p.x}" cy="${p.y}" r="4" fill="${color}" stroke="#fff" stroke-width="2"><title>${periods[i].label}: ${fmt(vals[i])}${suffix}</title></circle>`).join('')}${labels}</svg></div>`;
+}
+function analyzePeriods(periods){
+  const first=periods[0],last=periods[periods.length-1],fs=first.summary,ls=last.summary;
+  const start=new Map(first.people.map(p=>[p.matchKey,p])),end=new Map(last.people.map(p=>[p.matchKey,p])),keys=new Set([...start.keys(),...end.keys()]);const changes=[];
+  for(const key of keys){const a=start.get(key),b=end.get(key),old=a?num(a.pnAct):0,current=b?num(b.pnAct):0;changes.push({key,name:(b||a).nombre,code:(b||a).codigo,cat:(b||a).cat,old,current,delta:current-old,teamOld:a?num(a.teamPB):0,teamCurrent:b?num(b.teamPB):0,status:!a?'new':!b?'left':'same'})}
+  changes.sort((a,b)=>Math.abs(b.delta)-Math.abs(a.delta));
+  return {first,last,changes,improved:changes.filter(x=>x.status==='same'&&x.delta>0).length,declined:changes.filter(x=>x.status==='same'&&x.delta<0).length,newPeople:changes.filter(x=>x.status==='new').length,leftPeople:changes.filter(x=>x.status==='left').length,pbDelta:deltaText(ls.pbPersonal,periods.length>1?fs.pbPersonal:null,' PB'),activeDelta:deltaText(ls.activePct,periods.length>1?fs.activePct:null,' pp'),peopleDelta:deltaText(ls.people,periods.length>1?fs.people:null),incomeDelta:deltaText(ls.incomeCount,periods.length>1?fs.incomeCount:null),pendingDelta:deltaText(ls.pending,periods.length>1?fs.pending:null)};
+}
+function categoryRows(first,last){
+  const a=first.summary.categories||{},b=last.summary.categories||{},order=['DJ','D','DC','CE','L','LE','EJ','E'],keys=[...new Set([...order,...Object.keys(a),...Object.keys(b)])].filter(k=>a[k]||b[k]);
+  if(!keys.length)return '<tr><td colspan="4">Sin categorías registradas.</td></tr>';
+  return keys.map(k=>{const d=num(b[k])-num(a[k]),cls=d>0?'up':d<0?'down':'neutral';return `<tr><td><strong>${esc(k)}</strong></td><td>${fmt(a[k])}</td><td>${fmt(b[k])}</td><td class="${cls}">${d>0?'+':''}${fmt(d)}</td></tr>`}).join('');
+}
+function personRows(changes,search){
+  const q=normalize(search);let list=changes.filter(x=>!q||normalize(`${x.name} ${x.code}`).includes(q)).slice(0,100);if(!list.length)return '<tr><td colspan="6">Sin coincidencias.</td></tr>';
+  return list.map(x=>{const cls=x.delta>0?'up':x.delta<0?'down':'neutral',sign=x.delta>0?'+':'';return `<tr><td><strong>${esc(x.name)}</strong><br><small>${esc(x.code||x.status)}</small></td><td>${esc(x.cat||'—')}</td><td>${fmt(x.old)}</td><td>${fmt(x.current)}</td><td class="${cls}">${sign}${fmt(x.delta)}</td><td>${fmt(x.teamCurrent)} PB</td></tr>`}).join('');
+}
+function buildStrategies(periods){
+  if(!periods.length)return [];const first=periods[0],last=periods[periods.length-1],fs=first.summary,ls=last.summary,out=[];const add=(priority,title,evidence,action,tone)=>out.push({priority,title,evidence,action,tone});
+  if(periods.length>1){const pbChange=fs.pbPersonal?(ls.pbPersonal-fs.pbPersonal)/fs.pbPersonal*100:0;if(pbChange<=-10)add('Alta','Recuperar el volumen de puntos',`El PB cayó ${Math.abs(Math.round(pbChange))}% entre ${first.label} y ${last.label}.`,'Separar la caída por ramas, hablar primero con quienes más retrocedieron y definir objetivos semanales medibles.','#d9534f');else if(pbChange>=10)add('Oportunidad','Sostener el crecimiento de puntos',`El PB creció ${Math.round(pbChange)}% en el período seleccionado.`,'Identificar las tres acciones que impulsaron el crecimiento y repetirlas con las ramas secundarias.','#168765');
+    const activeDiff=ls.activePct-fs.activePct;if(activeDiff<=-5)add('Alta','Reactivar personas inactivas',`La actividad bajó ${Math.abs(activeDiff)} puntos porcentuales y terminó en ${ls.activePct}%.`,'Crear una lista de inactividad consecutiva, asignar un contacto y acordar un primer objetivo pequeño.','#d9534f');else if(activeDiff>=5)add('Positiva','Consolidar la mejora de actividad',`La actividad aumentó ${activeDiff} puntos porcentuales.`,'Reconocer a quienes se reactivaron y acompañarlos para sostener un segundo mes activo.','#168765');
+    const pendChange=fs.pending?(ls.pending-fs.pending)/fs.pending*100:0;if(pendChange>=15)add('Alta','Reducir garantías pendientes',`Los pendientes aumentaron ${Math.round(pendChange)}% y llegaron a ${fmt(ls.pending)}.`,'Ordenar por cantidad, trabajar primero el 20% de personas con mayor pendiente y revisar avances cada semana.','#e18a18');
+  }
+  if(periods.length>=2){const p1=periods[periods.length-2],p2=last,m1=new Map(p1.people.map(p=>[p.matchKey,p]));const consecutive=p2.people.filter(p=>p.pnAct===0&&m1.get(p.matchKey)&&m1.get(p.matchKey).pnAct===0);if(consecutive.length)add('Media','Atender inactividad consecutiva',`${consecutive.length} personas registran cero PB en los dos últimos cierres.`,'Preparar un seguimiento diferenciado: reconexión, diagnóstico de obstáculo y fecha concreta para la próxima acción.','#a06bff')}
+  if(ls.incomeNoPurchase>0)add('Alta','Acompañar ingresos sin compra posterior',`${ls.incomeNoPurchase} de ${ls.incomeCount} ingresos todavía no registran una compra posterior al alta.`,'Abrir la lista de ingresos, contactar a cada persona y acordar una primera acción concreta.','#d9534f');
+  if(ls.incomeContactIncomplete>0)add('Media','Completar datos de contacto',`${ls.incomeContactIncomplete} ingresos tienen teléfono o correo incompleto.`,'Actualizar esos datos para no perder posibilidades de seguimiento.','#e18a18');
+  const branches=(ls.branches||[]).sort((a,b)=>b.pb-a.pb),top=branches[0];if(top&&ls.pbPersonal&&top.pb/ls.pbPersonal>=.55)add('Media','Diversificar el aporte de las ramas',`${top.name} concentra ${pct(top.pb,ls.pbPersonal)}% del PB del período.`,'Definir un plan de crecimiento para las dos ramas siguientes y reducir la dependencia de un solo origen.','#5b8def');
+  if(ls.expiredPct>=25)add('Media','Revisar la tasa de vencimiento',`${ls.expiredPct}% de las garantías presentadas aparecen vencidas.`,'Revisar causas, fechas y responsables; usar una rutina de control antes de cada cierre.','#e18a18');
+  if(!out.length)add('Seguimiento','Mantener control mensual',`El cierre muestra ${ls.activePct}% de actividad y ${fmt(ls.pbPersonal)} PB.`,'Conservar la carga mensual y fijar un objetivo verificable para actividad, puntos y pendientes.','#5b8def');
+  return out.sort((a,b)=>({Alta:0,Media:1,Oportunidad:2,Positiva:2,Seguimiento:3}[a.priority]-({Alta:0,Media:1,Oportunidad:2,Positiva:2,Seguimiento:3}[b.priority])));
+}
+function strategyHtml(s){return `<article class="hist-strategy" style="--tone:${s.tone}"><div class="s-top"><span class="s-priority">${esc(s.priority)}</span></div><h4>${esc(s.title)}</h4><p>${esc(s.evidence)}</p><div class="action"><b>Acción:</b> ${esc(s.action)}</div></article>`}
+function localReportText(periods,strategies,a){
+  const first=periods[0],last=periods[periods.length-1],s=last.summary,lines=[];lines.push(`INFORME ESTRATÉGICO · ${first.label}${first.id===last.id?'':` a ${last.label}`}`,'',`Resumen: ${s.people} personas, ${s.activePct}% activas, ${fmt(s.pbPersonal)} PB, ${fmt(s.pending)} garantías pendientes y ${s.incomeCount} ingresos.`);
+  if(periods.length>1)lines.push(`Evolución: ${a.pbDelta.text}; actividad ${a.activeDelta.text}; personas ${a.peopleDelta.text}; ingresos ${a.incomeDelta.text}.`,`${a.improved} personas mejoraron sus PB, ${a.declined} bajaron, ${a.newPeople} se incorporaron y ${a.leftPeople} dejaron de aparecer.`);
+  lines.push('','PRIORIDADES');strategies.forEach((x,i)=>lines.push(`${i+1}. ${x.title}. ${x.evidence} Acción: ${x.action}`));
+  const topUp=a.changes.filter(x=>x.delta>0).slice(0,5),topDown=a.changes.filter(x=>x.delta<0).slice(0,5);if(topUp.length)lines.push('','MAYORES MEJORAS',...topUp.map(x=>`• ${x.name}: +${fmt(x.delta)} PB`));if(topDown.length)lines.push('','SEGUIMIENTOS PRIORITARIOS',...topDown.map(x=>`• ${x.name}: ${fmt(x.delta)} PB`));
+  lines.push('','PLAN DE 30 DÍAS','Semana 1: validar causas y ordenar las personas prioritarias.','Semana 2: ejecutar contactos y acordar objetivos individuales.','Semana 3: revisar actividad, pendientes y avances por rama.','Semana 4: cerrar resultados y preparar el próximo archivo mensual.');return lines.join('\n');
+}
+function reportHtml(report){return `<div class="hist-report"><b>${report.source==='online'?'Análisis con IA':'Informe local'}</b> · ${new Date(report.createdAt).toLocaleString('es-AR')}\n\n${esc(report.text)}</div>`}
+async function saveReport(text,periods,source){const r={id:`${Date.now()}-${Math.random().toString(36).slice(2,7)}`,createdAt:new Date().toISOString(),periodIds:periods.map(p=>p.id),source,text};await dbPut('reports',r);H.lastReport=r;H.reports.unshift(r);return r}
+async function createLocalReport(periods,strategies,a){const area=$('histReportArea'),btn=$('histLocalReport');btn.disabled=true;btn.textContent='Analizando…';await sleep(250);const r=await saveReport(localReportText(periods,strategies,a),periods,'local');area.innerHTML=reportHtml(r);btn.disabled=false;btn.textContent='Generar informe local';toast('Informe local guardado')}
+async function createOnlineReport(periods,strategies,a){
+  if(!$('histAiConsent').checked){toast('Confirmá la autorización antes de enviar datos a la IA',3000);return}
+  if(!cloudReady()||!getSession()){toast('Conectá la nube e iniciá sesión para usar la IA online',3200);openTab('nube');return}
+  const area=$('histReportArea'),btn=$('histOnlineReport');btn.disabled=true;btn.textContent='Consultando IA…';area.innerHTML='<div class="hist-loading"><span></span>Preparando análisis profundo…</div>';
+  try{const text=await callOnlineAI(periods,strategies,a),r=await saveReport(text,periods,'online');H.lastReport=r;area.innerHTML=reportHtml(r);toast('Análisis profundo guardado',2200)}catch(e){console.error('IA histórico',e);area.innerHTML=`<div class="hist-toast-inline error">${esc(e.message)}</div>`;toast('No se pudo completar el análisis online',2800)}finally{btn.disabled=false;btn.textContent='Análisis con IA'}
+}
+
+async function makeBackupZip(periods,fileName){
+  if(typeof JSZip==='undefined')throw new Error('El generador ZIP no está disponible.');const zip=new JSZip(),ids=new Set(periods.map(p=>p.id)),files=[];
+  for(const p of periods){const stored=await dbGetAll('files','periodId',p.id);for(const f of stored){const path=`archivos/${p.id}/${f.type}-${safeFileName(f.name)}`;zip.file(path,f.blob);files.push({path,key:f.key,periodId:f.periodId,type:f.type,name:f.name,size:f.size,mime:f.mime,lastModified:f.lastModified})}}
+  const reports=H.reports.filter(r=>(r.periodIds||[]).some(id=>ids.has(id)));zip.file('historico.json',JSON.stringify({format:'APPI-HISTORICO',schema:1,exportedAt:new Date().toISOString(),periods:cloneClean(periods),reports:cloneClean(reports),files},null,2));
+  const blob=await zip.generateAsync({type:'blob',compression:'DEFLATE',compressionOptions:{level:6}});downloadBlob(blob,fileName);return blob;
+}
+async function exportAllZip(){
+  const btn=$('histBackupAll');if(btn){btn.disabled=true;btn.textContent='Preparando ZIP…'}try{await makeBackupZip(H.periods,`APPI_historico_completo_${new Date().toISOString().slice(0,10)}.zip`);toast('Backup completo descargado',2300)}catch(e){toast(e.message,3200)}finally{if(btn){btn.disabled=false;btn.textContent='Descargar backup ZIP'}}
+}
+async function exportPeriodZip(id){const p=H.periods.find(x=>x.id===id);if(!p)return;try{await makeBackupZip([p],`APPI_cierre_${id}.zip`);toast('ZIP del mes descargado')}catch(e){toast(e.message,3000)}}
+async function restoreBackup(file){
+  if(!file)return;toast('Revisando backup…',1800);
+  try{const zip=await JSZip.loadAsync(file),entry=zip.file('historico.json');if(!entry)throw new Error('El ZIP no contiene historico.json');const data=JSON.parse(await entry.async('string'));if(data.format!=='APPI-HISTORICO'||!Array.isArray(data.periods))throw new Error('El backup no pertenece al Histórico de APPI.');if(!confirm(`Se restaurarán ${data.periods.length} cierres. Los meses coincidentes serán reemplazados. ¿Continuar?`))return;
+    const db=await openDB();for(const p of data.periods)await dbPut('periods',p);for(const r of data.reports||[])await dbPut('reports',r);for(const meta of data.files||[]){const zf=zip.file(meta.path);if(!zf)continue;const blob=await zf.async('blob');await dbPut('files',{...meta,blob})}await refreshData();render();toast(`${data.periods.length} cierres restaurados`,2600)
+  }catch(e){console.error('Restaurar histórico',e);toast(`No se pudo restaurar: ${e.message}`,3500)}finally{$('histRestoreInput').value=''}
+}
+
+const CLOUD_CONFIG_KEY='hist_cloud_config_v1',CLOUD_SESSION_KEY='hist_cloud_session_v1';
+function getCloudConfig(){try{return JSON.parse(localStorage.getItem(CLOUD_CONFIG_KEY)||'{}')}catch(e){return {}}}
+function saveCloudConfigValue(value){localStorage.setItem(CLOUD_CONFIG_KEY,JSON.stringify(value))}
+function getSession(){try{return JSON.parse(localStorage.getItem(CLOUD_SESSION_KEY)||'null')}catch(e){return null}}
+function setSession(value){if(value)localStorage.setItem(CLOUD_SESSION_KEY,JSON.stringify(value));else localStorage.removeItem(CLOUD_SESSION_KEY)}
+function cloudReady(){const c=getCloudConfig();return /^https:\/\//.test(c.url||'')&&String(c.anonKey||'').length>20}
+function jwtPayload(token){try{return JSON.parse(atob(token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')))}catch(e){return {}}}
+function sessionUser(){const s=getSession();return s?jwtPayload(s.access_token||''):null}
+function sessionExpired(s){const p=s?jwtPayload(s.access_token||''):{};return !p.exp||p.exp*1000<Date.now()+60000}
+function logSync(message){H.syncLog.push(`${new Date().toLocaleTimeString('es-AR')} · ${message}`);H.syncLog=H.syncLog.slice(-30);const el=$('histSyncLog');if(el)el.textContent=H.syncLog.join('\n')}
+async function refreshCloudSession(){
+  let s=getSession();if(!s)return null;if(!sessionExpired(s))return s;const cfg=getCloudConfig();if(!s.refresh_token)return null;
+  const r=await fetch(`${cfg.url.replace(/\/$/,'')}/auth/v1/token?grant_type=refresh_token`,{method:'POST',headers:{apikey:cfg.anonKey,'Content-Type':'application/json'},body:JSON.stringify({refresh_token:s.refresh_token})});if(!r.ok){setSession(null);return null}s=await r.json();setSession(s);return s;
+}
+async function cloudFetch(path,options={},auth=true){
+  const cfg=getCloudConfig();if(!cloudReady())throw new Error('Completá la URL y la clave pública de Supabase.');let session=auth?await refreshCloudSession():null;if(auth&&!session)throw new Error('Iniciá sesión por correo para continuar.');
+  const headers={apikey:cfg.anonKey,...(options.headers||{})};if(session)headers.Authorization=`Bearer ${session.access_token}`;
+  const r=await fetch(`${cfg.url.replace(/\/$/,'')}${path}`,{...options,headers});if(!r.ok){let message=`Error de nube ${r.status}`;try{const data=await r.json();message=data.message||data.msg||data.error_description||data.error||message}catch(e){}throw new Error(message)}return r;
+}
+async function sendMagicLink(email){
+  const cfg=getCloudConfig();if(!cloudReady())throw new Error('Primero guardá la configuración de Supabase.');if(!/^[^@]+@[^@]+\.[^@]+$/.test(email))throw new Error('Ingresá un correo válido.');
+  const redirect=location.href.split('#')[0];const r=await cloudFetch('/auth/v1/otp',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,create_user:true,options:{email_redirect_to:redirect}})},false);await r.text();localStorage.setItem('hist_cloud_email',email);return true;
+}
+function handleAuthHash(){
+  if(!location.hash||!location.hash.includes('access_token='))return false;const q=new URLSearchParams(location.hash.slice(1)),access=q.get('access_token');if(!access)return false;setSession({access_token:access,refresh_token:q.get('refresh_token'),expires_in:+q.get('expires_in')||3600,token_type:q.get('token_type')||'bearer'});history.replaceState(null,'',location.pathname+location.search);toast('Nube conectada correctamente',2400);return true;
+}
+async function upsertCloudPeriod(p){
+  const user=sessionUser();if(!user||!user.sub)throw new Error('No se pudo identificar la cuenta.');const data=cloneClean(p);data.syncStatus='synced';
+  await cloudFetch('/rest/v1/historico_periodos?on_conflict=user_id,period_id',{method:'POST',headers:{'Content-Type':'application/json',Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify([{user_id:user.sub,period_id:p.id,data,updated_at:p.updatedAt}])});
+  const files=await dbGetAll('files','periodId',p.id);for(const f of files){const path=`${encodeURIComponent(user.sub)}/${encodeURIComponent(p.id)}/${encodeURIComponent(f.type)}/${encodeURIComponent(safeFileName(f.name))}`;await cloudFetch(`/storage/v1/object/historico-files/${path}`,{method:'POST',headers:{'Content-Type':f.mime||'application/octet-stream','x-upsert':'true'},body:f.blob})}
+  p.syncStatus='synced';p.syncedAt=new Date().toISOString();await dbPut('periods',p);
+}
+async function pullCloud(){
+  const r=await cloudFetch('/rest/v1/historico_periodos?select=period_id,data,updated_at&order=period_id.asc'),rows=await r.json();let added=0;
+  for(const row of rows){const remote=row.data;if(!remote||!remote.id)continue;remote.syncStatus='synced';const local=H.periods.find(p=>p.id===remote.id);if(!local||String(remote.updatedAt||row.updated_at)>String(local.updatedAt||'')){await dbPut('periods',remote);added++}}
+  if(added)await refreshData();return added;
+}
+async function syncAll(showResult=true){
+  if(H.syncing)return;if(!navigator.onLine){if(showResult)toast('Sin conexión: los datos siguen guardados localmente',2800);return}if(!cloudReady()){if(showResult)openTab('nube');return}if(!getSession()){if(showResult){toast('Iniciá sesión para sincronizar',2300);openTab('nube')}return}
+  H.syncing=true;updateSyncStatus();logSync('Inicio de sincronización');
+  try{await refreshData();const pending=H.periods.filter(p=>p.syncStatus!=='synced');for(const p of pending){logSync(`Subiendo ${p.label}`);await upsertCloudPeriod(p)}const pulled=await pullCloud();await refreshData();logSync(`Sincronización completa${pulled?` · ${pulled} cierres recuperados`:''}`);if(showResult)toast('Histórico sincronizado',2200);render()}
+  catch(e){console.error('Sincronización histórico',e);logSync(`ERROR · ${e.message}`);if(showResult)toast(`No se pudo sincronizar: ${e.message}`,3500);updateSyncStatus(true)}finally{H.syncing=false;updateSyncStatus()}
+}
+async function cloudDownloadFile(id,type){
+  const p=H.periods.find(x=>x.id===id),meta=p&&p.filesMeta&&p.filesMeta.find(f=>f.type===type),user=sessionUser();if(!meta||!user)return null;const path=`${encodeURIComponent(user.sub)}/${encodeURIComponent(id)}/${encodeURIComponent(type)}/${encodeURIComponent(safeFileName(meta.name))}`;const r=await cloudFetch(`/storage/v1/object/authenticated/historico-files/${path}`);const blob=await r.blob(),record={key:`${id}:${type}`,periodId:id,type,name:meta.name,size:meta.size,mime:meta.mime,lastModified:meta.lastModified,blob};await dbPut('files',record);return record;
+}
+async function callOnlineAI(periods,strategies,a){
+  const payload={periods:periods.map(p=>({id:p.id,label:p.label,summary:p.summary,people:p.people.map(x=>({nombre:x.nombre,codigo:x.codigo,categoria:x.cat,pbPersonal:x.pnAct,pbEquipo:x.teamPB,garantias:x.garantias,rama:x.branchKey})),incomes:(p.incomes||[]).map(i=>({nombre:i.nombre,dip:i.dip,categoria:i.cat,fechaAlta:i.fechaAlta,ultimaCompra:i.ultimaCompra,diasHastaCompra:i.diasHastaCompra,compraPosterior:i.compraPosterior,patrocinante:i.patrocinanteNombre,patrocinanteDip:i.patrocinanteDip,capacitacion:i.capacitacion}))})),localStrategies:strategies,comparison:{improved:a.improved,declined:a.declined,newPeople:a.newPeople,leftPeople:a.leftPeople}};
+  const r=await cloudFetch('/functions/v1/historico-analisis',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}),data=await r.json();if(!data.analysis)throw new Error(data.error||'La IA no devolvió un análisis.');return data.analysis;
+}
+function updateSyncStatus(forceError=false){
+  const dot=$('histSyncDot'),title=$('histSyncTitle'),detail=$('histSyncDetail'),quick=$('histSyncQuick');if(!dot||!title)return;const pending=H.periods.filter(p=>p.syncStatus!=='synced').length,session=getSession();dot.className='hist-status-dot';
+  if(forceError){dot.classList.add('error');title.textContent='Error de sincronización';detail.textContent='Los datos locales están seguros'}else if(H.syncing){dot.classList.add('local');title.textContent='Sincronizando…';detail.textContent='No cierres APPI durante el proceso'}else if(cloudReady()&&session&&pending===0&&H.periods.length){dot.classList.add('online');title.textContent='Nube actualizada';detail.textContent=`${H.periods.length} cierres sincronizados`}else{dot.classList.add('local');title.textContent=pending?`${pending} cierre${pending===1?'':'s'} solo local`:'Datos locales protegidos';detail.textContent=cloudReady()?(session?'Listo para sincronizar':'Falta iniciar sesión'):'Disponible sin conexión'}
+  quick.textContent=H.syncing?'Sincronizando':(cloudReady()&&session?'Sincronizar':'Configurar nube');quick.disabled=H.syncing;
+}
+function renderCloud(c){
+  const cfg=getCloudConfig(),session=getSession(),user=sessionUser(),pending=H.periods.filter(p=>p.syncStatus!=='synced').length,email=localStorage.getItem('hist_cloud_email')||'';
+  c.innerHTML=`<div class="hist-cloud-grid">
+    <div class="hist-card"><div class="hist-card-head"><div><h3>Estado de la nube</h3><p>Copia segura y acceso desde otros dispositivos</p></div><span class="hist-badge">${session?'Conectada':'Sin conectar'}</span></div><div class="hist-cloud-state"><div class="c-icon">☁</div><div><b>${session?`Sesión activa${user&&user.email?` · ${esc(user.email)}`:''}`:'Acceso por enlace de correo'}</b><p>${session?`${pending} cierres pendientes de sincronizar.`:'No necesitás recordar una contraseña.'}</p></div></div>${session?`<div class="hist-actions"><button class="hist-primary" id="histSyncNow">Sincronizar ahora</button><button class="hist-secondary" id="histPullCloud">Recuperar nube</button><button class="hist-danger" id="histLogout">Cerrar sesión</button></div>`:`<label class="hist-field" style="margin-top:11px"><span>Correo de acceso</span><input id="histCloudEmail" type="email" value="${esc(email)}" placeholder="tu@correo.com"></label><button class="hist-primary" id="histMagicLink">Enviar enlace de acceso</button>`}</div>
+    <div class="hist-card"><div class="hist-card-head"><div><h3>Configuración</h3><p>Supabase reúne acceso, base de datos, archivos e IA segura.</p></div></div><div class="hist-cloud-note">Para la prueba local no hace falta completar esto. Para activar la nube se debe crear el proyecto con el archivo <b>SUPABASE_SETUP.sql</b> incluido en el paquete.</div><details class="hist-config-details" ${cloudReady()?'':'open'}><summary>${cloudReady()?'Configuración guardada':'Completar conexión'}</summary><div><label class="hist-field"><span>URL de Supabase</span><input id="histCloudUrl" type="url" value="${esc(cfg.url||'')}" placeholder="https://proyecto.supabase.co"></label><label class="hist-field"><span>Clave pública (anon)</span><input id="histCloudKey" type="password" value="${esc(cfg.anonKey||'')}" placeholder="eyJ…"></label><button class="hist-secondary" id="histSaveCloud">Guardar configuración</button></div></details></div>
+    <div class="hist-card wide"><div class="hist-card-head"><div><h3>Registro de sincronización</h3><p>Los errores nunca eliminan la copia local.</p></div></div><div class="hist-sync-log" id="histSyncLog">${esc(H.syncLog.join('\n')||'Sin actividad todavía.')}</div></div>
+    <div class="hist-card wide"><div class="hist-card-head"><div><h3>Privacidad del análisis con IA</h3><p>Detalle individual sin datos de contacto innecesarios</p></div></div><div class="hist-preview">La IA puede recibir nombres, códigos, categorías, puntos, ramas y garantías. APPI excluye teléfonos, domicilios, correos y cumpleaños. El envío solo ocurre después de marcar la autorización en la pantalla Analizar.</div></div>
+  </div>`;
+  const save=$('histSaveCloud');if(save)save.onclick=()=>{const url=$('histCloudUrl').value.trim().replace(/\/$/,''),anonKey=$('histCloudKey').value.trim();saveCloudConfigValue({url,anonKey});toast(cloudReady()?'Configuración de nube guardada':'Revisá la URL y la clave pública',2600);render()};
+  const magic=$('histMagicLink');if(magic)magic.onclick=async()=>{magic.disabled=true;magic.textContent='Enviando…';try{await sendMagicLink($('histCloudEmail').value.trim());toast('Revisá tu correo y abrí el enlace de acceso',3800);magic.textContent='Enlace enviado'}catch(e){toast(e.message,3500);magic.disabled=false;magic.textContent='Enviar enlace de acceso'}};
+  if($('histSyncNow'))$('histSyncNow').onclick=()=>syncAll(true);if($('histPullCloud'))$('histPullCloud').onclick=async()=>{try{const n=await pullCloud();render();toast(n?`${n} cierres recuperados`:'La copia local ya está actualizada')}catch(e){toast(e.message,3200)}};if($('histLogout'))$('histLogout').onclick=()=>{setSession(null);render();toast('Sesión cerrada')};
+}
+
+function showHelp(){
+  const html=`<p>El Histórico guarda una fotografía independiente de cada cierre mensual.</p><div class="tip"><b>Necesitás tres archivos del mismo período:</b><br>1. Línea Descendente.<br>2. Garantías por Organización.<br>3. Ingresos.</div><p><b>Resumen:</b> muestra el último cierre y permite tocar cada indicador.<br><b>Analizar:</b> compara cualquier combinación de meses.<br><b>Meses:</b> permite descargar originales, respaldar o eliminar.<br><b>Nube:</b> sincroniza entre dispositivos cuando se configura Supabase.</p><p style="font-size:11px;color:#777887">El archivo único de Usuarios / Garantías continúa administrándose en su sección habitual y no forma parte de los cierres históricos.</p>`;
+  try{modal.open({icon:'📈',iconBg:'linear-gradient(135deg,#5b8def,#a06bff)',title:'Cómo usar el Histórico',sub:'Control mensual y anual',html})}catch(e){alert('Cargá los tres archivos de cada mes, guardá el cierre y usá Analizar para comparar períodos.')}
+}
+async function openHistorico(){
+  showView('view-historico');const c=$('historicoContent');if(c)c.innerHTML='<div class="hist-loading"><span></span>Abriendo cierres mensuales…</div>';
+  try{await refreshData();H.ready=true;render()}catch(e){console.error('Abrir histórico',e);if(c)c.innerHTML=`<div class="hist-toast-inline error">No se pudo abrir el almacenamiento: ${esc(e.message)}</div>`}
+}
+async function initHistorico(){
+  if(H._initialized)return;H._initialized=true;
+  try{await openDB();handleAuthHash();await refreshData();H.ready=true}catch(e){console.error('Inicialización histórico',e)}
+  document.querySelectorAll('.hist-tabs [data-hist-tab]').forEach(b=>b.onclick=()=>openTab(b.dataset.histTab));
+  const back=$('btnBackHistorico');if(back)back.onclick=()=>{showView('view-home');try{renderHomeCompleto()}catch(e){}};
+  const help=$('btnHelpHistorico');if(help)help.onclick=showHelp;
+  for(const [type,cfg] of Object.entries(FILE_TYPES)){const input=$(cfg.input);if(input)input.onchange=e=>{const f=e.target.files&&e.target.files[0],target=H.fileTarget;if(f&&target&&target.type===type)handleFile(type,f,target.id);H.fileTarget=null;e.target.value=''}}
+  const restore=$('histRestoreInput');if(restore)restore.onchange=e=>restoreBackup(e.target.files&&e.target.files[0]);
+  const quick=$('histSyncQuick');if(quick)quick.onclick=()=>cloudReady()&&getSession()?syncAll(true):openTab('nube');
+  window.addEventListener('online',()=>{updateSyncStatus();if(cloudReady()&&getSession())syncAll(false)});window.addEventListener('offline',()=>updateSyncStatus());
+  updateSyncStatus();
+  if(window.__histOpenRequested) setTimeout(openHistorico,0);
+}
+window.openHistorico=openHistorico;
+window.__APPI_HISTORICO__={state:H,open:openHistorico,refresh:refreshData,parseFile:parseHistoricalFile,saveMonth:saveMonthPeriod,analyze:analyzePeriods,strategies:buildStrategies,dbGetAll};
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initHistorico);else initHistorico();
+setTimeout(initHistorico,1200);
+
+})();
