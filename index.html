@@ -3340,7 +3340,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
     <button class="ds-btn" data-ds="view-planning" onclick="showView('view-planning'); renderPlanningTools();"><span>🗓️</span> Planificación</button>
   </nav>
-  <div class="ds-foot">APPI · v162 · Invitados de patrocinio</div>
+  <div class="ds-foot">APPI · v163 · Orden Mi mes</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -8541,7 +8541,7 @@ function renderToolsList(){
   document.getElementById('toolsList').innerHTML = `
     <div class="home-section-block">
       <div class="mini-section-label"><span>📅</span> Mi mes</div>
-      <div class="home-tool-grid">${c1 + c2 + c3 + c4}</div>
+      <div class="home-tool-grid">${c2 + c1 + c3 + c4}</div>
     </div>
     <div class="home-section-block">
       <div class="mini-section-label"><span>🌱</span> Mi negocio</div>
