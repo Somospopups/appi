@@ -3426,7 +3426,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
     <button class="ds-btn" data-ds="view-planning" onclick="showView('view-planning'); renderPlanningTools();"><span>🗓️</span> Planificación</button>
   </nav>
-  <div class="ds-foot">APPI · v176 · Cultura de crecimiento</div>
+  <div class="ds-foot">APPI · v177 · Cultura de crecimiento</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4385,7 +4385,7 @@ const HELP = {
   },
   score: { icon:'🌟', iconBg:'linear-gradient(135deg,#5b8def,#a06bff,#ff6b9d)', title:'Score del mes', sub:'Cómo leerlo y compartirlo', html:`<p>El <strong>Score del mes</strong> es un número de 0 a 100 que resume cómo viene tu mes.</p>
     <div class="tip"><strong>📖 CÓMO LEERLO</strong><br/>Mirá el número y la barra para visión rápida. Se actualiza cuando completás herramientas.</div>
-    <div class="tip"><strong>🧮 CÓMO SE CALCULA</strong><br/>• ⚖️ 30% Rueda Vida<br/>• 📊 30% Rueda Negocio<br/>• 🚀 25% Las 7 P<br/>• 💰 15% Finanzas</div>` },
+    <div class="tip"><strong>🧮 CÓMO SE CALCULA</strong><br/>• 🚀 25% Las 7 P<br/>• 💰 25% Presupuesto<br/>• ⚖️ 25% Rueda Vida<br/>• 📊 25% Rueda Negocio</div>` },
   planning: {
     icon:'🗓️', iconBg:'linear-gradient(135deg,#5b8def,#a06bff)',
     title:'Planificando mi Mes', sub:'Tus 4 herramientas mensuales',
@@ -8288,10 +8288,10 @@ function obtenerDatosEquipo(){
 }
 function calcularScoreGeneral(){
   let total = 0, peso = 0;
-  const rv = obtenerPromedioRuedaActual('vida'); if(rv){ total += (rv.avg/10)*30; peso += 30; }
-  const rn = obtenerPromedioRuedaActual('negocio'); if(rn){ total += (rn.avg/10)*30; peso += 30; }
   const sp = obtenerProgresoSieteActual(); if(sp.existe){ total += (sp.pct/100)*25; peso += 25; }
-  const pr = obtenerDatosPresupuestoActual(); if(pr.existe && pr.ing>0){ total += Math.max(0, Math.min(1, pr.neto/pr.ing))*15; peso += 15; }
+  const pr = obtenerDatosPresupuestoActual(); if(pr.existe && pr.ing>0){ total += Math.max(0, Math.min(1, pr.neto/pr.ing))*25; peso += 25; }
+  const rv = obtenerPromedioRuedaActual('vida'); if(rv){ total += (rv.avg/10)*25; peso += 25; }
+  const rn = obtenerPromedioRuedaActual('negocio'); if(rn){ total += (rn.avg/10)*25; peso += 25; }
   return { score: peso>0 ? Math.round((total/peso)*100) : 0, peso };
 }
 function timeAgo(ts){
@@ -8611,12 +8611,13 @@ function renderScoreCompact(){
   const sc = calcularScoreGeneral();
   const { conDatos, total } = estadoHomeMensual();
   const deg = Math.max(0, Math.min(100, sc.score)) * 3.6;
-  let msg = 'Todavía no hay datos. Empezá cargando tu presupuesto para activar el tablero.';
+  const step = (typeof obtenerProximoPaso==='function') ? obtenerProximoPaso() : null;
+  let msg = 'Todavía no hay datos. Empezá por Las 7 P para activar el tablero.';
   if(sc.peso > 0){
-    msg = sc.score >= 80 ? 'Excelente ritmo. Mantené el foco y compartí tu avance.' :
-          sc.score >= 60 ? 'Buen mes. Revisá el próximo paso para seguir subiendo.' :
-          sc.score >= 40 ? 'Hay base para mejorar. Elegí una herramienta y avanzá hoy.' :
-          'Momento ideal para ordenar prioridades y tomar una acción simple.';
+    msg = (step && !step.done) ? step.desc :
+          sc.score >= 80 ? 'Excelente ritmo. El mes ya está planificado.' :
+          sc.score >= 60 ? 'Buen mes. Revisá el próximo paso en Mi mes.' :
+          'Hay base. Seguí el orden: 7 P, presupuesto y las ruedas.';
   }
   const actionLabel = sc.peso > 0 ? 'Compartir' : 'Empezar';
   const actionClass = sc.peso > 0 ? '' : 'start';
@@ -8644,6 +8645,7 @@ function renderScoreCompact(){
       e.stopPropagation();
       haptic(10);
       if(sc.peso > 0) compartirConsolidado(e);
+      else if(typeof openSiete==='function') openSiete();
       else { showView('view-planning'); renderPlanningTools(); }
     };
   }
@@ -8798,7 +8800,7 @@ async function compartirConsolidado(e){
   const rv = obtenerPromedioRuedaActual('vida');
   const rn = obtenerPromedioRuedaActual('negocio');
   const eq = obtenerDatosEquipo();
-  let msg = `🎯 *INFORME MENSUAL*\n📅 ${MONTHS[now.getMonth()]} ${now.getFullYear()}\n━━━━━━━━━━━━━━━\n\n⭐ Score: *${sc.score}/100*\n\n💰 Finanzas: ${pr.existe ? (pr.neto>=0?'+':'-')+'$'+formatMoney(Math.abs(pr.neto)) : 'Sin datos'}\n🚀 7 P: ${sp.existe ? sp.done+'/7 ('+sp.pct+'%)' : 'Sin datos'}\n⚖️ Rueda Vida: ${rv ? rv.avg.toFixed(1)+'/10' : 'Sin datos'}\n📊 Rueda Negocio: ${rn ? rn.avg.toFixed(1)+'/10' : 'Sin datos'}\n🌳 Equipo: ${eq.existe ? eq.total+' pers ('+eq.pctActivos+'% activos)' : 'Sin datos'}\n\n━━━━━━━━━━━━━━━\nEnviado desde *APPI* 🚀`;
+  let msg = `🎯 *INFORME MENSUAL*\n📅 ${MONTHS[now.getMonth()]} ${now.getFullYear()}\n━━━━━━━━━━━━━━━\n\n⭐ Score: *${sc.score}/100*\n\n🚀 7 P: ${sp.existe ? sp.done+'/7 ('+sp.pct+'%)' : 'Sin datos'}\n💰 Finanzas: ${pr.existe ? (pr.neto>=0?'+':'-')+'$'+formatMoney(Math.abs(pr.neto)) : 'Sin datos'}\n⚖️ Rueda Vida: ${rv ? rv.avg.toFixed(1)+'/10' : 'Sin datos'}\n📊 Rueda Negocio: ${rn ? rn.avg.toFixed(1)+'/10' : 'Sin datos'}\n🌳 Equipo: ${eq.existe ? eq.total+' pers ('+eq.pctActivos+'% activos)' : 'Sin datos'}\n\n━━━━━━━━━━━━━━━\nEnviado desde *APPI* 🚀`;
   try { if(navigator.share){ await navigator.share({ title:'Informe Consolidado', text: msg }); return; } } catch(e){}
   window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
 }
@@ -9780,10 +9782,10 @@ function abrirBackupDesdeMenu(){
       if (evt.data && evt.data.type === 'appi-reload') location.reload();
     });
     window.addEventListener('load', () => {
-      const bustKey = 'appi_cache_v176';
+      const bustKey = 'appi_cache_v177';
       const already = localStorage.getItem(bustKey) === '1';
       const finish = () => {
-        navigator.serviceWorker.register('./service-worker.js?v=176').catch(() => {});
+        navigator.serviceWorker.register('./service-worker.js?v=177').catch(() => {});
       };
       if (already) { finish(); return; }
       localStorage.setItem(bustKey, '1');
@@ -9791,7 +9793,7 @@ function abrirBackupDesdeMenu(){
         caches.keys().then((keys) => Promise.all(keys.map((k) => caches.delete(k)))).catch(() => {}),
         navigator.serviceWorker.getRegistrations().then((rs) => Promise.all(rs.map((r) => r.unregister()))).catch(() => {})
       ]).then(() => {
-        location.replace(location.pathname + '?v=176' + location.hash);
+        location.replace(location.pathname + '?v=177' + location.hash);
       }).catch(finish);
     });
   }
