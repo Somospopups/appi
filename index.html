@@ -3453,7 +3453,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
     <button class="ds-btn" data-ds="view-planning" onclick="showView('view-planning'); renderPlanningTools();"><span>🗓️</span> Planificación</button>
   </nav>
-  <div class="ds-foot">APPI · v182 · Cultura de crecimiento</div>
+  <div class="ds-foot">APPI · v183 · Cultura de crecimiento</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -3570,7 +3570,6 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
         <span>Herramientas</span>
         <h2>Accesos rápidos</h2>
       </div>
-      <button type="button" onclick="showView('view-planning'); renderPlanningTools();">Ver todo</button>
     </div>
 
     <div class="tools-list home-tools-grid" id="toolsList"></div>
@@ -9781,10 +9780,10 @@ function abrirBackupDesdeMenu(){
       if (evt.data && evt.data.type === 'appi-reload') location.reload();
     });
     window.addEventListener('load', () => {
-      const bustKey = 'appi_cache_v182';
+      const bustKey = 'appi_cache_v183';
       const already = localStorage.getItem(bustKey) === '1';
       const finish = () => {
-        navigator.serviceWorker.register('./service-worker.js?v=182').catch(() => {});
+        navigator.serviceWorker.register('./service-worker.js?v=183').catch(() => {});
       };
       if (already) { finish(); return; }
       localStorage.setItem(bustKey, '1');
@@ -9792,7 +9791,7 @@ function abrirBackupDesdeMenu(){
         caches.keys().then((keys) => Promise.all(keys.map((k) => caches.delete(k)))).catch(() => {}),
         navigator.serviceWorker.getRegistrations().then((rs) => Promise.all(rs.map((r) => r.unregister()))).catch(() => {})
       ]).then(() => {
-        location.replace(location.pathname + '?v=182' + location.hash);
+        location.replace(location.pathname + '?v=183' + location.hash);
       }).catch(finish);
     });
   }

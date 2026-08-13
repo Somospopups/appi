@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v182-mini-tools';
+const CACHE_NAME = 'appi-v183-sin-ver-todo';
 const ARCHIVOS = [
   './',
   './index.html',
