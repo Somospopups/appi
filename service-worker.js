@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v154-ingresos-vacios-validos';
+const CACHE_NAME = 'appi-v155-informe-profesional';
 const ARCHIVOS = [
   './',
   './index.html',
