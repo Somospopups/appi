@@ -3426,7 +3426,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
     <button class="ds-btn" data-ds="view-planning" onclick="showView('view-planning'); renderPlanningTools();"><span>🗓️</span> Planificación</button>
   </nav>
-  <div class="ds-foot">APPI · v179 · Cultura de crecimiento</div>
+  <div class="ds-foot">APPI · v180 · Cultura de crecimiento</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -9752,10 +9752,10 @@ function abrirBackupDesdeMenu(){
       if (evt.data && evt.data.type === 'appi-reload') location.reload();
     });
     window.addEventListener('load', () => {
-      const bustKey = 'appi_cache_v179';
+      const bustKey = 'appi_cache_v180';
       const already = localStorage.getItem(bustKey) === '1';
       const finish = () => {
-        navigator.serviceWorker.register('./service-worker.js?v=179').catch(() => {});
+        navigator.serviceWorker.register('./service-worker.js?v=180').catch(() => {});
       };
       if (already) { finish(); return; }
       localStorage.setItem(bustKey, '1');
@@ -9763,7 +9763,7 @@ function abrirBackupDesdeMenu(){
         caches.keys().then((keys) => Promise.all(keys.map((k) => caches.delete(k)))).catch(() => {}),
         navigator.serviceWorker.getRegistrations().then((rs) => Promise.all(rs.map((r) => r.unregister()))).catch(() => {})
       ]).then(() => {
-        location.replace(location.pathname + '?v=179' + location.hash);
+        location.replace(location.pathname + '?v=180' + location.hash);
       }).catch(finish);
     });
   }
@@ -11545,6 +11545,22 @@ body.dark #view-grabadora .rec-audio-actions button.danger{background:rgba(217,8
 #view-grabadora .rec-audio-actions{display:flex;gap:8px;margin-top:8px}
 #view-grabadora .rec-audio-actions button{flex:1;min-height:36px;border:0;border-radius:11px;background:rgba(91,141,239,.12);color:#3d63c9;font:inherit;font-size:12px;font-weight:800;cursor:pointer}
 #view-grabadora .rec-audio-actions button.danger{background:rgba(217,83,79,.12);color:#b94440}
+.rec-name-box{display:grid;gap:10px}
+.rec-name-box label{display:flex;flex-direction:column;gap:6px;margin:0;color:#6b6b76;font-size:10.5px;font-weight:900;letter-spacing:.35px;text-transform:uppercase}
+.rec-name-box input{
+  width:100%;height:46px;box-sizing:border-box;border:1.5px solid rgba(91,141,239,.22);border-radius:14px;
+  background:rgba(255,255,255,.86);padding:0 14px;color:#1c1c1e;font:inherit;font-size:15px;font-weight:750;outline:none;
+}
+.rec-name-box input:focus{border-color:#5b8def;box-shadow:0 0 0 3px rgba(91,141,239,.15)}
+.rec-name-preview{
+  padding:11px 13px;border-radius:14px;
+  background:linear-gradient(135deg,rgba(91,141,239,.10),rgba(160,107,255,.08));
+  color:#161620;font-size:13px;font-weight:800;line-height:1.35;word-break:break-word;
+}
+.rec-name-tip{margin:0;color:#777887;font-size:12px;font-weight:700;line-height:1.35}
+body.dark .rec-name-box label,body.dark .rec-name-tip{color:#b7b8c4}
+body.dark .rec-name-box input{background:rgba(20,22,36,.9);border-color:rgba(255,255,255,.1);color:#f0f0f5}
+body.dark .rec-name-preview{color:#f0f0f5}
 body.dark #view-grabadora .rec-studio{border-color:rgba(255,255,255,.08)}
 body.dark #view-grabadora .rec-library-card,body.dark #view-grabadora .rec-item,body.dark #view-grabadora .rec-current-audio{background:rgba(28,29,46,.58);border-color:rgba(255,255,255,.08)}
 body.dark #view-grabadora .rec-library-head b,body.dark #view-grabadora .rec-item-head .info b,body.dark #view-grabadora .timer{color:#f0f0f5}
@@ -11648,20 +11664,59 @@ async function startRecording(){if(isRecording)return;if(!navigator.mediaDevices
 function pauseRecording(){if(!mediaRecorder||!isRecording)return;try{if(isPaused){mediaRecorder.resume();isPaused=false;segmentStartedAt=Date.now();timerInt=setInterval(updateTimer,250);updateRecordControls('recording');el('timerLabel').textContent='Grabando';showStatus('Grabación reanudada.','ok')}else{mediaRecorder.pause();elapsedMs+=Date.now()-segmentStartedAt;isPaused=true;clearInterval(timerInt);updateTimer();updateRecordControls('paused');el('timerLabel').textContent='En pausa';showStatus('Grabación en pausa.','warn',true)}}catch(error){showStatus('No pude cambiar la pausa: '+error.message,'error')}}
 function stopRecording(){if(!mediaRecorder||!isRecording)return;try{if(!isPaused)elapsedMs+=Date.now()-segmentStartedAt;window._lastRecordingDuration=fmtTime(elapsedMs);isRecording=false;isPaused=false;clearInterval(timerInt);updateTimer();updateRecordControls('saving');el('timerLabel').textContent='Guardando audio';showStatus('Guardando el audio…','ok',true);try{mediaRecorder.requestData()}catch(e){}mediaRecorder.stop();try{navigator.vibrate?.([60,35,60])}catch(e){}}catch(error){showStatus('No pude finalizar la grabación: '+error.message,'error',true);updateRecordControls('idle')}}
 function setCurrentPlayer(blob){const wrap=el('currentAudioWrap'),audio=el('currentAudio');if(!wrap||!audio)return;if(currentAudioUrl)URL.revokeObjectURL(currentAudioUrl);currentAudioUrl=URL.createObjectURL(blob);audio.src=currentAudioUrl;wrap.hidden=false}
-async function saveRecording(blob){if(!blob||blob.size<150){updateRecordControls('idle');el('timerLabel').textContent='No se guardó audio';showStatus('El audio quedó vacío. Volvé a grabar y hablá cerca del micrófono.','error',true);return}const id=Date.now(),record={id,date:new Date().toLocaleString('es-AR'),duration:window._lastRecordingDuration||fmtTime(elapsedMs),transcript:'',summary:'',summaryData:null,mime:blob.type||'audio/webm',size:blob.size,hasAudio:true,transcribing:false};const list=listaGrabaciones();list.unshift(record);guardarListaGrabaciones(list);window._lastBlobUniversal=blob;window._lastRecordingId=id;setCurrentPlayer(blob);try{await guardarAudioBlob(id,blob)}catch(error){record.hasAudio=false;record.transcribing=false;guardarListaGrabaciones(list);renderList();updateRecordControls('idle');el('timerLabel').textContent='Audio no guardado';showStatus('El navegador no pudo conservar el audio. Revisá el espacio disponible.','error',true);return}renderList();updateRecordControls('idle');el('timerLabel').textContent='Audio guardado';showStatus('Audio guardado. Ya lo podés escuchar.','ok',true);setTimeout(()=>showStatus('', 'ok', false),2800)}
+async function saveRecording(blob){if(!blob||blob.size<150){updateRecordControls('idle');el('timerLabel').textContent='No se guardó audio';showStatus('El audio quedó vacío. Volvé a grabar y hablá cerca del micrófono.','error',true);return}const id=Date.now(),record={id,date:new Date().toLocaleString('es-AR'),duration:window._lastRecordingDuration||fmtTime(elapsedMs),transcript:'',summary:'',summaryData:null,mime:blob.type||'audio/webm',size:blob.size,hasAudio:true,transcribing:false,name:''};const list=listaGrabaciones();list.unshift(record);guardarListaGrabaciones(list);window._lastBlobUniversal=blob;window._lastRecordingId=id;setCurrentPlayer(blob);try{await guardarAudioBlob(id,blob)}catch(error){record.hasAudio=false;record.transcribing=false;guardarListaGrabaciones(list);renderList();updateRecordControls('idle');el('timerLabel').textContent='Audio no guardado';showStatus('El navegador no pudo conservar el audio. Revisá el espacio disponible.','error',true);return}renderList();updateRecordControls('idle');el('timerLabel').textContent='Audio guardado';showStatus('Audio guardado. Ponéle un nombre.','ok',true);setTimeout(()=>{showStatus('', 'ok', false);openRecNameModal(id)},350)}
 function summaryHtml(data){if(!data)return'';return`<h3>Resumen de la reunión</h3><p>${safe(data.resumen||'Sin resumen.')}</p><h4>Puntos importantes</h4><ul>${(data.puntos||[]).map(item=>`<li>${safe(item)}</li>`).join('')||'<li>No se detectaron puntos adicionales.</li>'}</ul><h4>Próximas acciones</h4><ul>${(data.tareas||[]).map(item=>`<li>${safe(item)}</li>`).join('')||'<li>No se detectaron tareas claras.</li>'}</ul>${data.decisiones?.length?`<h4>Decisiones</h4><ul>${data.decisiones.map(item=>`<li>${safe(item)}</li>`).join('')}</ul>`:''}`}
 function showSummary(data){const box=el('summary'),empty=el('summaryEmpty');if(!box)return;if(typeof data==='string'){box.innerHTML=data}else box.innerHTML=summaryHtml(data);box.hidden=false;if(empty)empty.hidden=true;setBadge('summaryBadge','Listo','done');setStep(3,'done')}
 function sentenceList(text){let normalized=String(text||'').replace(/\s+/g,' ').trim(),sentences=normalized.split(/(?<=[.!?])\s+/).map(s=>s.trim()).filter(s=>s.length>12);if(sentences.length<2&&normalized.length>180){const words=normalized.split(' ');sentences=[];for(let i=0;i<words.length;i+=28)sentences.push(words.slice(i,i+28).join(' '))}return sentences}
 function summarize(text){const sentences=sentenceList(text);if(!sentences.length)return{resumen:'La transcripción es demasiado corta para preparar un resumen útil.',puntos:[],tareas:[],decisiones:[]};const stop=new Set('para esta este esto pero como cuando donde porque entonces tambien también sobre entre hasta desde tiene tienen una uno unos unas que con por del las los sus fue son ser muy más mas hay'.split(' ')),freq={};String(text).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').split(/[^a-z0-9]+/).filter(w=>w.length>3&&!stop.has(w)).forEach(w=>freq[w]=(freq[w]||0)+1);const scored=sentences.map((sentence,index)=>{let score=0;sentence.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').split(/[^a-z0-9]+/).forEach(w=>score+=freq[w]||0);if(/acord|decid|importante|objetivo|cliente|venta|seguimiento|problema|resultado/i.test(sentence))score+=6;return{sentence,index,score:score/Math.max(8,sentence.split(' ').length)}}).sort((a,b)=>b.score-a.score);const main=scored.slice(0,3).sort((a,b)=>a.index-b.index).map(x=>x.sentence),points=scored.slice(0,5).map(x=>x.sentence),tasks=sentences.filter(s=>/(tenemos que|hay que|voy a|vamos a|debo|queda pendiente|próximo paso|llamar|enviar|contactar|agendar|revisar|preparar|hacer|confirmar)/i.test(s)).slice(0,6),decisions=sentences.filter(s=>/(acordamos|decidimos|se decidió|se definió|queda definido|resolvimos)/i.test(s)).slice(0,5);return{resumen:main.join(' '),puntos:points,tareas:tasks,decisiones:decisions}}
 function generateSummary(id=window._lastRecordingId){const text=(el('transcript')?.value||'').trim();if(text.length<20){showStatus('Necesito una transcripción un poco más larga para crear el resumen.','warn');return null}setBadge('summaryBadge','Preparando','working');setStep(3,'active');const data=summarize(text);showSummary(data);const list=listaGrabaciones(),record=list.find(item=>Number(item.id)===Number(id))||list[0];if(record){record.transcript=text;record.summaryData=data;record.summary=summaryHtml(data);guardarListaGrabaciones(list)}renderList();showStatus('Transcripción y resumen listos.','ok');return data}
 window.generateGrabadoraSummary=generateSummary;
+function recTitle(record){const fecha=String(record&&record.date||'Grabación').trim(),name=String(record&&record.name||'').trim();return name?fecha+' - '+name:fecha}
+function recSafeName(value){return String(value||'').replace(/[\\/:*?"<>|]+/g,' ').replace(/\s+/g,' ').trim()}
+function openRecNameModal(id){
+  const list=listaGrabaciones(),record=list.find(item=>Number(item.id)===Number(id));
+  if(!record) return;
+  const fecha=String(record.date||'Grabación').trim();
+  const esc=typeof escapeXml==='function'?escapeXml:(s)=>String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  modal.open({
+    icon:'🎧',
+    iconBg:'linear-gradient(135deg,#5b8def,#a06bff)',
+    title:'Nombre de la grabación',
+    sub:fecha,
+    confirm:true,
+    okText:'Guardar',
+    cancelText:'Ahora no',
+    html:`<div class="rec-name-box">
+      <label>Nombre<input id="recNameInput" type="text" maxlength="80" value="${esc(record.name||'')}" placeholder="Ej. Reunión con Ana" autocomplete="off"></label>
+      <div class="rec-name-preview" id="recNamePreview">${esc(record.name?fecha+' - '+record.name:fecha)}</div>
+      <p class="rec-name-tip">Primero va la fecha, después el nombre que elijas.</p>
+    </div>`,
+    onConfirm:()=>{
+      const name=(document.getElementById('recNameInput')?.value||'').trim();
+      const next=listaGrabaciones().map(item=>Number(item.id)===Number(id)?{...item,name}:item);
+      guardarListaGrabaciones(next);
+      renderList();
+      showStatus(name?'Nombre guardado.':'Se mantiene solo la fecha.','ok');
+    }
+  });
+  setTimeout(()=>{
+    const input=document.getElementById('recNameInput'),preview=document.getElementById('recNamePreview');
+    if(!input) return;
+    input.focus();
+    input.select();
+    const paint=()=>{const name=input.value.trim();if(preview)preview.textContent=name?fecha+' - '+name:fecha};
+    input.addEventListener('input',paint);
+    input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();document.getElementById('modalConfirmBtn')?.click()}});
+  },40);
+}
+window.renameRecGrab=openRecNameModal;
 function recordState(record){return[record.hasAudio===false?'Sin audio':'Listo',record.hasAudio===false?'error':'done']}
-function renderList(){const root=el('recList'),count=el('recLibraryCount');if(!root)return;const list=listaGrabaciones();if(count)count.textContent=`${list.length} ${list.length===1?'audio':'audios'}`;if(!list.length){root.innerHTML='<div class="empty">Todavía no hay grabaciones.</div>';return}root.innerHTML=list.map(record=>`<article class="rec-item" data-rec-id="${record.id}"><div class="rec-item-head"><div class="ico">🎧</div><div class="info"><b>${safe(record.date||'Grabación')}</b><small>${safe(record.duration||'00:00')}</small></div></div><div class="rec-player-wrap" id="audioWrap-${record.id}"><div class="rec-player-status">${record.hasAudio===false?'Audio no disponible':'Preparando reproductor…'}</div></div><div class="rec-audio-actions"><button type="button" onclick="window.downloadRecGrab(${record.id})" ${record.hasAudio===false?'disabled':''}>Descargar</button><button type="button" class="danger" onclick="window.deleteRecGrab(${record.id})">Borrar</button></div></article>`).join('');requestAnimationFrame(()=>hydratePlayers(list))}
+function renderList(){const root=el('recList'),count=el('recLibraryCount');if(!root)return;const list=listaGrabaciones();if(count)count.textContent=`${list.length} ${list.length===1?'audio':'audios'}`;if(!list.length){root.innerHTML='<div class="empty">Todavía no hay grabaciones.</div>';return}root.innerHTML=list.map(record=>`<article class="rec-item" data-rec-id="${record.id}"><div class="rec-item-head"><div class="ico">🎧</div><div class="info"><b>${safe(recTitle(record))}</b><small>${safe(record.duration||'00:00')}</small></div></div><div class="rec-player-wrap" id="audioWrap-${record.id}"><div class="rec-player-status">${record.hasAudio===false?'Audio no disponible':'Preparando reproductor…'}</div></div><div class="rec-audio-actions"><button type="button" onclick="window.renameRecGrab(${record.id})">Nombre</button><button type="button" onclick="window.downloadRecGrab(${record.id})" ${record.hasAudio===false?'disabled':''}>Descargar</button><button type="button" class="danger" onclick="window.deleteRecGrab(${record.id})">Borrar</button></div></article>`).join('');requestAnimationFrame(()=>hydratePlayers(list))}
 async function hydratePlayers(list){for(const record of list){const wrap=el(`audioWrap-${record.id}`);if(!wrap||record.hasAudio===false)continue;try{const blob=await obtenerAudioBlob(record.id);if(!blob){wrap.innerHTML='<div class="rec-player-status">Audio no disponible</div>';continue}const url=URL.createObjectURL(blob);wrap._audioUrl=url;wrap.innerHTML=`<audio class="rec-player" controls preload="metadata" src="${url}">Tu navegador no puede reproducir este audio.</audio>`}catch(error){wrap.innerHTML='<div class="rec-player-status">No se pudo cargar el audio</div>'}}}
 window.loadRecGrab=async id=>{const record=listaGrabaciones().find(item=>Number(item.id)===Number(id));if(!record)return;window._lastRecordingId=Number(id);const tr=el('transcript');if(tr)tr.value=record.transcript||'';setBadge('transcriptBadge',record.transcript?'Lista':'Pendiente',record.transcript?'done':'');if(record.summaryData)showSummary(record.summaryData);else if(record.summary)showSummary(record.summary);else resetSummary();const summaryButton=el('btnSummarize');if(summaryButton)summaryButton.disabled=(record.transcript||'').trim().length<20;try{const blob=await obtenerAudioBlob(id);if(blob){window._lastBlobUniversal=blob;setCurrentPlayer(blob);el('btnTranscribe').disabled=false}}catch(e){}setStep(record.summaryData||record.summary?3:record.transcript?2:1,record.summaryData||record.summary?'done':record.transcript?'done':'active');showStatus('Grabación abierta.','ok')};
 window.transcribeRecGrab=async id=>{try{const blob=await obtenerAudioBlob(id);if(!blob){showStatus('Esta grabación no tiene audio.','warn');return}window._lastBlobUniversal=blob;window._lastRecordingId=Number(id);setCurrentPlayer(blob);setBadge('transcriptBadge','Transcribiendo','working');setStep(2,'active');await window.transcribeUniversal?.(blob,Number(id))}catch(error){showStatus('No pude abrir el audio.','error')}};
-window.downloadRecGrab=async id=>{try{const blob=await obtenerAudioBlob(id);if(!blob)return;const ext=blob.type.includes('mp4')?'m4a':blob.type.includes('ogg')?'ogg':'webm',url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`reunion_${id}.${ext}`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1200)}catch(error){showStatus('No pude descargar el audio.','error')}};
-window.deleteRecGrab=async id=>{if(!confirm('¿Borrar esta grabación, su transcripción y su resumen?'))return;guardarListaGrabaciones(listaGrabaciones().filter(item=>Number(item.id)!==Number(id)));try{await eliminarAudioBlob(id)}catch(e){}if(Number(window._lastRecordingId)===Number(id)){resetWorkspace();el('currentAudioWrap').hidden=true}renderList();showStatus('Grabación borrada.','ok')};
+window.downloadRecGrab=async id=>{try{const blob=await obtenerAudioBlob(id);if(!blob)return;const ext=blob.type.includes('mp4')?'m4a':blob.type.includes('ogg')?'ogg':'webm',url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;const rec=listaGrabaciones().find(item=>Number(item.id)===Number(id));a.download=`${recSafeName(recTitle(rec||{date:'grabacion',name:''}))||('grabacion_'+id)}.${ext}`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1200)}catch(error){showStatus('No pude descargar el audio.','error')}};
+window.deleteRecGrab=async id=>{if(!confirm('¿Borrar esta grabación?'))return;guardarListaGrabaciones(listaGrabaciones().filter(item=>Number(item.id)!==Number(id)));try{await eliminarAudioBlob(id)}catch(e){}if(Number(window._lastRecordingId)===Number(id)){resetWorkspace();el('currentAudioWrap').hidden=true}renderList();showStatus('Grabación borrada.','ok')};
 window.finishGrabadoraTranscription=(id,text)=>{const cleaned=String(text||'').trim(),list=listaGrabaciones(),record=list.find(item=>Number(item.id)===Number(id));if(record){record.transcript=cleaned;record.transcribing=false;record.transcriptionError='';record.summary='';record.summaryData=null;guardarListaGrabaciones(list)}if(Number(window._lastRecordingId)===Number(id)){const tr=el('transcript');if(tr)tr.value=cleaned;setBadge('transcriptBadge','Lista','done');el('btnSummarize').disabled=cleaned.length<20;setStep(2,'done')}renderList();if(cleaned.length>=20)setTimeout(()=>generateSummary(id),180)};
 window.failGrabadoraTranscription=(id,message)=>{const list=listaGrabaciones(),record=list.find(item=>Number(item.id)===Number(id));if(record){record.transcribing=false;record.transcriptionError=message;guardarListaGrabaciones(list)}if(Number(window._lastRecordingId)===Number(id)){setBadge('transcriptBadge','Reintentar','error');setStep(2,'active')}renderList();showStatus(message||'No pude transcribir el audio. Podés reintentar.','error',true)};
 window.updateGrabadoraTranscript=window.finishGrabadoraTranscription;window.markGrabadoraTranscriptionDone=id=>{const record=listaGrabaciones().find(item=>Number(item.id)===Number(id));if(record?.transcribing)window.failGrabadoraTranscription(id,'La transcripción no pudo completarse. Tocá Transcribir para reintentar.')};window.getGrabadoraAudioBlob=obtenerAudioBlob;window.saveGrabadoraAudioBlob=guardarAudioBlob;window.renderGrabadoraList=renderList;
