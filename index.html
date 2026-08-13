@@ -3426,7 +3426,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
     <button class="ds-btn" data-ds="view-planning" onclick="showView('view-planning'); renderPlanningTools();"><span>🗓️</span> Planificación</button>
   </nav>
-  <div class="ds-foot">APPI · v178 · Cultura de crecimiento</div>
+  <div class="ds-foot">APPI · v179 · Cultura de crecimiento</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -3867,7 +3867,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
         </button>
         <div class="timer" id="timer">00:00</div>
         <div class="timer-label" id="timerLabel">Lista para grabar</div>
-        <div class="wave rec-wave-mini" id="wave" hidden><span></span><span></span><span></span><span></span><span></span></div>
+        <div class="wave rec-wave-mini" id="wave"><span></span><span></span><span></span><span></span><span></span></div>
         <div class="rec-controls-compact">
           <button class="btn btn-primary" id="btnRecord">Grabar</button>
           <button class="btn btn-secondary" id="btnPause" disabled>Pausar</button>
@@ -9752,10 +9752,10 @@ function abrirBackupDesdeMenu(){
       if (evt.data && evt.data.type === 'appi-reload') location.reload();
     });
     window.addEventListener('load', () => {
-      const bustKey = 'appi_cache_v178';
+      const bustKey = 'appi_cache_v179';
       const already = localStorage.getItem(bustKey) === '1';
       const finish = () => {
-        navigator.serviceWorker.register('./service-worker.js?v=178').catch(() => {});
+        navigator.serviceWorker.register('./service-worker.js?v=179').catch(() => {});
       };
       if (already) { finish(); return; }
       localStorage.setItem(bustKey, '1');
@@ -9763,7 +9763,7 @@ function abrirBackupDesdeMenu(){
         caches.keys().then((keys) => Promise.all(keys.map((k) => caches.delete(k)))).catch(() => {}),
         navigator.serviceWorker.getRegistrations().then((rs) => Promise.all(rs.map((r) => r.unregister()))).catch(() => {})
       ]).then(() => {
-        location.replace(location.pathname + '?v=178' + location.hash);
+        location.replace(location.pathname + '?v=179' + location.hash);
       }).catch(finish);
     });
   }
@@ -11516,9 +11516,9 @@ body.dark #view-grabadora .rec-audio-actions button{background:rgba(91,141,239,.
 body.dark #view-grabadora .rec-audio-actions button.danger{background:rgba(217,83,79,.18);color:#ff9c97}
 @media(max-width:390px){#view-grabadora .rec-audio-actions{grid-template-columns:1fr 1fr}}
 /* ===== GRABADORA V156: COMPACTA Y GUIADA ===== */
-#view-grabadora .recorder-simple{max-width:520px;margin:0 auto 24px}
+#view-grabadora .recorder-simple{max-width:520px;margin:8px auto 28px;padding:0 4px}
 #view-grabadora .rec-studio{
-  position:relative;overflow:hidden;padding:26px 20px 20px;border-radius:28px;text-align:center;
+  position:relative;overflow:hidden;padding:34px 22px 26px;border-radius:28px;text-align:center;
   background:
     radial-gradient(circle at 18% 0%, rgba(255,255,255,.78), transparent 36%),
     linear-gradient(145deg, rgba(91,141,239,.22), rgba(160,107,255,.16) 55%, rgba(255,107,157,.14));
@@ -11526,12 +11526,13 @@ body.dark #view-grabadora .rec-audio-actions button.danger{background:rgba(217,8
   box-shadow:0 16px 36px rgba(80,90,130,.12);
 }
 #view-grabadora .rec-studio .rec-mic{margin:0 auto}
-#view-grabadora .rec-studio .timer{margin-top:14px}
-#view-grabadora .rec-controls-compact{justify-content:center;margin-top:16px}
-#view-grabadora .rec-current-audio{margin-top:16px;padding:12px;border-radius:16px;background:rgba(255,255,255,.55);text-align:left}
+#view-grabadora .rec-studio .timer{margin-top:20px}
+#view-grabadora .rec-studio .timer-label{margin-top:8px}
+#view-grabadora .rec-controls-compact{justify-content:center;margin-top:22px;gap:10px}
+#view-grabadora .rec-current-audio{display:block;margin-top:20px;padding:14px;border-radius:16px;background:rgba(255,255,255,.55);text-align:left}
 #view-grabadora .rec-current-audio span{display:block;margin-bottom:6px;color:#6b6b76;font-size:10px;font-weight:900;letter-spacing:.4px;text-transform:uppercase}
 #view-grabadora .rec-current-audio audio{width:100%}
-#view-grabadora .rec-library-card{margin-top:12px;padding:14px;border-radius:22px;background:rgba(255,255,255,.58);border:1px solid rgba(255,255,255,.75);box-shadow:0 10px 24px rgba(80,90,130,.08)}
+#view-grabadora .rec-library-card{margin-top:18px;padding:18px;border-radius:22px;background:rgba(255,255,255,.58);border:1px solid rgba(255,255,255,.75);box-shadow:0 10px 24px rgba(80,90,130,.08)}
 #view-grabadora .rec-library-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
 #view-grabadora .rec-library-head b{display:block;color:#1c1c27;font-size:14px}
 #view-grabadora .rec-library-head small{display:block;margin-top:2px;color:#8a8a94;font-size:11px;font-weight:700}
@@ -11565,8 +11566,12 @@ body.dark #view-grabadora .rec-library-head b,body.dark #view-grabadora .rec-ite
 #view-grabadora .rec-controls-compact .btn{min-width:92px;min-height:42px;margin:0;padding:9px 12px;border-radius:12px;font-size:10px;font-weight:900}
 #view-grabadora .rec-stop{border:1px solid rgba(217,83,90,.18);background:rgba(217,83,90,.09);color:#b9444c}
 #view-grabadora .rec-controls-compact button:disabled,#view-grabadora .rec-result-actions button:disabled{opacity:.42;cursor:not-allowed;filter:saturate(.4)}
-#view-grabadora .rec-wave-mini{height:16px;margin:8px 0 0;justify-content:flex-start;padding-left:82px}
-#view-grabadora .rec-wave-mini span{width:3px;height:7px;background:#e04e58;animation-duration:.72s}
+#view-grabadora .rec-wave-mini{height:28px;margin:16px 0 0;justify-content:center;padding-left:0;gap:5px}
+#view-grabadora .rec-wave-mini span{width:4px;height:10px;background:rgba(91,141,239,.38);animation:none}
+#view-grabadora .rec-wave-mini.live span{background:#e04e58;animation:waveRec .8s infinite ease-in-out}
+#view-grabadora .rec-mic{width:78px;height:78px;border-radius:26px}
+#view-grabadora .rec-mic:hover{transform:none}
+#view-grabadora .rec-mic.recording{animation:recCompactPulse 1.35s ease-in-out infinite}
 #view-grabadora .rec-current-audio{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:center;margin-top:11px;padding:7px 10px;border-radius:13px;background:rgba(91,141,239,.07);border:1px solid rgba(91,141,239,.1)}
 #view-grabadora .rec-current-audio[hidden]{display:none}
 #view-grabadora .rec-current-audio span{color:#555765;font-size:9px;font-weight:900;text-transform:uppercase}
@@ -11636,7 +11641,7 @@ function setModelStatus(message,type='ok',visible=true){const node=el('modelStat
 window.grabadoraShowStatus=showStatus;window.grabadoraModelStatus=setModelStatus;
 function resetSummary(){const box=el('summary'),empty=el('summaryEmpty');if(box){box.hidden=true;box.innerHTML=''}if(empty){empty.hidden=false;empty.textContent='El resumen se crea automáticamente cuando termina la transcripción.'}setBadge('summaryBadge','Pendiente');const button=el('btnSummarize');if(button)button.disabled=true}
 function resetWorkspace(){const tr=el('transcript');if(tr)tr.value='';setBadge('transcriptBadge','Pendiente');const tb=el('btnTranscribe');if(tb)tb.disabled=true;resetSummary();const wrap=el('currentAudioWrap'),audio=el('currentAudio');if(wrap)wrap.hidden=true;if(audio){audio.pause();audio.removeAttribute('src');audio.load()}window._lastBlobUniversal=null;window._lastRecordingId=null}
-function updateRecordControls(mode){const record=el('btnRecord'),pause=el('btnPause'),stop=el('btnStop'),mic=el('recVisual'),wave=el('wave');if(mode==='recording'){record.disabled=true;pause.disabled=false;stop.disabled=false;pause.textContent='Pausar';mic.className='rec-mic recording';mic.setAttribute('aria-label','Grabación en curso');wave.hidden=false}else if(mode==='paused'){record.disabled=true;pause.disabled=false;stop.disabled=false;pause.textContent='Continuar';mic.className='rec-mic paused';mic.setAttribute('aria-label','Grabación en pausa');wave.hidden=true}else if(mode==='saving'){record.disabled=true;pause.disabled=true;stop.disabled=true;mic.className='rec-mic';wave.hidden=true}else{record.disabled=false;pause.disabled=true;stop.disabled=true;pause.textContent='Pausar';mic.className='rec-mic';mic.setAttribute('aria-label','Comenzar grabación');wave.hidden=true}}
+function updateRecordControls(mode){const record=el('btnRecord'),pause=el('btnPause'),stop=el('btnStop'),mic=el('recVisual'),wave=el('wave');const live=mode==='recording';if(wave){wave.hidden=false;wave.classList.toggle('live',live)}if(mode==='recording'){record.disabled=true;pause.disabled=false;stop.disabled=false;pause.textContent='Pausar';mic.className='rec-mic recording';mic.setAttribute('aria-label','Grabación en curso')}else if(mode==='paused'){record.disabled=true;pause.disabled=false;stop.disabled=false;pause.textContent='Continuar';mic.className='rec-mic paused';mic.setAttribute('aria-label','Grabación en pausa')}else if(mode==='saving'){record.disabled=true;pause.disabled=true;stop.disabled=true;mic.className='rec-mic'}else{record.disabled=false;pause.disabled=true;stop.disabled=true;pause.textContent='Pausar';mic.className='rec-mic';mic.setAttribute('aria-label','Comenzar grabación')}}
 function chooseMime(){const choices=['audio/webm;codecs=opus','audio/webm','audio/ogg;codecs=opus','audio/mp4'];return choices.find(type=>window.MediaRecorder&&MediaRecorder.isTypeSupported(type))||''}
 function friendlyMicError(error){if(error?.name==='NotAllowedError'||error?.name==='SecurityError')return'Necesito permiso para usar el micrófono. Habilitalo en el candado del navegador y volvé a intentar.';if(error?.name==='NotFoundError')return'No encontré un micrófono conectado.';if(error?.name==='NotReadableError')return'El micrófono está siendo usado por otra aplicación.';return`No pude iniciar el micrófono: ${error?.message||'error desconocido'}`}
 async function startRecording(){if(isRecording)return;if(!navigator.mediaDevices?.getUserMedia||!window.MediaRecorder){showStatus('Este navegador no permite grabar audio. Usá Chrome, Edge o Safari actualizado.','error',true);return}try{resetWorkspace();setModelStatus('', 'ok', false);currentStream=await navigator.mediaDevices.getUserMedia({audio:{channelCount:1,echoCancellation:true,noiseSuppression:true,autoGainControl:true,sampleRate:{ideal:48000}}});const mime=chooseMime();mediaRecorder=mime?new MediaRecorder(currentStream,{mimeType:mime,audioBitsPerSecond:128000}):new MediaRecorder(currentStream);audioChunks=[];mediaRecorder.ondataavailable=event=>{if(event.data&&event.data.size)audioChunks.push(event.data)};mediaRecorder.onerror=event=>showStatus(`La grabación tuvo un problema: ${event.error?.message||'error de audio'}`,'error',true);mediaRecorder.onstop=async()=>{const type=mediaRecorder?.mimeType||mime||'audio/webm',blob=new Blob(audioChunks,{type});currentStream?.getTracks().forEach(track=>track.stop());currentStream=null;mediaRecorder=null;await saveRecording(blob)};mediaRecorder.start(1000);isRecording=true;isPaused=false;elapsedMs=0;segmentStartedAt=Date.now();timerInt=setInterval(updateTimer,250);updateTimer();updateRecordControls('recording');el('timerLabel').textContent='Grabando';setStep(1,'active');showStatus('Grabando. Podés pausar o finalizar cuando quieras.','ok',true);try{navigator.vibrate?.(50)}catch(e){}}catch(error){currentStream?.getTracks().forEach(track=>track.stop());currentStream=null;isRecording=false;updateRecordControls('idle');showStatus(friendlyMicError(error),'error',true)}}
