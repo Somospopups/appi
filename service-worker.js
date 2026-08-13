@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v171-bonus-notif';
+const CACHE_NAME = 'appi-v172-bonus-accion';
 const ARCHIVOS = [
   './',
   './index.html',

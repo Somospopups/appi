@@ -292,16 +292,18 @@ body.dark .hist-section-title h3,body.dark .hist-attention strong,body.dark .his
   .bonus-notif p{margin:0;color:#3a3a48;font-size:12.5px;font-weight:650;line-height:1.4}
   .bonus-notif p strong{color:#161620;font-weight:900}
   .bonus-notif-pb{display:inline-flex;margin-top:7px;padding:3px 8px;border-radius:999px;background:rgba(255,255,255,.62);color:#3d63c9;font-size:10.5px;font-weight:900}
-  .bonus-notif-x{
-    position:absolute;top:8px;right:8px;width:28px;height:28px;border:0;border-radius:50%;
-    background:rgba(255,255,255,.55);color:#6b6b76;font:inherit;font-size:15px;font-weight:800;cursor:pointer;line-height:1;
+  .bonus-notif-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}
+  .bonus-notif-actions button{
+    min-height:38px;border:0;border-radius:12px;font:inherit;font-size:12px;font-weight:900;cursor:pointer;
   }
+  .bonus-notif-actions .bn-wa{background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;box-shadow:0 6px 14px rgba(18,140,126,.25)}
+  .bonus-notif-actions .bn-call{background:rgba(91,141,239,.14);color:#3d63c9}
   body.dark .bonus-notif{background:linear-gradient(135deg,rgba(245,179,1,.12),rgba(160,107,255,.14) 55%,rgba(91,141,239,.12));border-color:rgba(255,255,255,.08)}
   body.dark .bonus-notif-kicker{color:#d4b3ff}
   body.dark .bonus-notif p{color:#d0d0d8}
   body.dark .bonus-notif p strong{color:#f0f0f5}
   body.dark .bonus-notif-pb{background:rgba(28,29,46,.62);color:#c5d4ff}
-  body.dark .bonus-notif-x{background:rgba(255,255,255,.08);color:#a0a0b0}
+  body.dark .bonus-notif-actions .bn-call{background:rgba(91,141,239,.20);color:#a8b8ff}
 
   .score-compact {
     padding: 14px 16px; border-radius: 18px; margin-bottom: 14px;
@@ -3410,7 +3412,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
     <button class="ds-btn" data-ds="view-planning" onclick="showView('view-planning'); renderPlanningTools();"><span>🗓️</span> Planificación</button>
   </nav>
-  <div class="ds-foot">APPI · v171 · Cultura de crecimiento</div>
+  <div class="ds-foot">APPI · v172 · Cultura de crecimiento</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -6623,15 +6625,23 @@ function elegirTelefonoPopup(tipo){
     });
   });
 }
+function bonusAfterContact(){
+  const id=window._bonusPendingDismiss;
+  if(id==null) return;
+  window._bonusPendingDismiss=null;
+  try{ bonusDismiss(id); renderBonusNotifs(); }catch(e){}
+}
 function abrirWaNumero(digits){
   const data = window._telPicker;
   if(data && data.nombre) window.open('https://wa.me/'+digits+'?text='+encodeURIComponent('Hola '+data.nombre+', ¿cómo estás?'),'_blank');
   else window.open('https://wa.me/'+digits,'_blank');
   modal.close();
+  bonusAfterContact();
 }
 function llamarNumero(digits){
   window.open('tel:'+digits,'_self');
   modal.close();
+  bonusAfterContact();
 }
 
 /* ============ DESCENDENCIA: POPUP CON LA LISTA QUE COMPONE EL PB DE ORG ============ */
@@ -8410,25 +8420,44 @@ function renderBonusNotifs(){
         <div class="bonus-notif-kicker">Oportunidad de Bonus</div>
         <p>${text}</p>
         <span class="bonus-notif-pb">${near?(yo?'Te faltan ':'Le faltan ')+falta+' PB para los 12':'Listo para patrocinar'}</span>
+        <div class="bonus-notif-actions">
+          <button type="button" class="bn-wa" data-bonus-act="wa">💬 WhatsApp</button>
+          <button type="button" class="bn-call" data-bonus-act="call">📞 Llamar</button>
+        </div>
       </div>
-      <button type="button" class="bonus-notif-x" data-bonus-dismiss="${p.id}" aria-label="Ocultar">×</button>
     </div>`;
   }).join('')+'</div>';
   wrap.querySelectorAll('[data-bonus-id]').forEach(card=>{
+    const id=+card.dataset.bonusId;
+    const persona=()=>equipoData&&equipoData.personas&&equipoData.personas.find(x=>x.id===id);
     card.onclick=e=>{
-      if(e.target.closest('[data-bonus-dismiss]')) return;
-      const id=+card.dataset.bonusId;
-      const persona=equipoData&&equipoData.personas&&equipoData.personas.find(x=>x.id===id);
-      if(persona&&typeof openPersonaModal==='function') openPersonaModal(persona);
+      if(e.target.closest('[data-bonus-act]')) return;
+      const p=persona();
+      window._bonusPendingDismiss=id;
+      if(p&&typeof openPersonaModal==='function') openPersonaModal(p);
       else if(typeof openEquipo==='function') openEquipo();
     };
-  });
-  wrap.querySelectorAll('[data-bonus-dismiss]').forEach(btn=>{
-    btn.onclick=e=>{
-      e.stopPropagation();
-      bonusDismiss(+btn.dataset.bonusDismiss);
-      renderBonusNotifs();
-    };
+    card.querySelectorAll('[data-bonus-act]').forEach(btn=>{
+      btn.onclick=e=>{
+        e.stopPropagation();
+        const p=persona();
+        if(!p) return;
+        const tels=typeof parseTelefonos==='function'?parseTelefonos(p.tel):[];
+        window._telPicker={telefonos:tels,nombre:p.nombre||''};
+        window._bonusPendingDismiss=id;
+        if(!tels.length){
+          window._bonusPendingDismiss=null;
+          if(typeof showToast==='function') showToast('Esta persona no tiene teléfono',1800);
+          return;
+        }
+        if(tels.length===1){
+          if(btn.dataset.bonusAct==='wa') abrirWaNumero(tels[0].digits);
+          else llamarNumero(tels[0].digits);
+        } else {
+          elegirTelefonoPopup(btn.dataset.bonusAct==='wa'?'wa':'call');
+        }
+      };
+    });
   });
 }
 function estadoHomeMensual(){
@@ -9735,10 +9764,10 @@ function abrirBackupDesdeMenu(){
       if (evt.data && evt.data.type === 'appi-reload') location.reload();
     });
     window.addEventListener('load', () => {
-      const bustKey = 'appi_cache_v171';
+      const bustKey = 'appi_cache_v172';
       const already = localStorage.getItem(bustKey) === '1';
       const finish = () => {
-        navigator.serviceWorker.register('./service-worker.js?v=171').catch(() => {});
+        navigator.serviceWorker.register('./service-worker.js?v=172').catch(() => {});
       };
       if (already) { finish(); return; }
       localStorage.setItem(bustKey, '1');
@@ -9746,7 +9775,7 @@ function abrirBackupDesdeMenu(){
         caches.keys().then((keys) => Promise.all(keys.map((k) => caches.delete(k)))).catch(() => {}),
         navigator.serviceWorker.getRegistrations().then((rs) => Promise.all(rs.map((r) => r.unregister()))).catch(() => {})
       ]).then(() => {
-        location.replace(location.pathname + '?v=171' + location.hash);
+        location.replace(location.pathname + '?v=172' + location.hash);
       }).catch(finish);
     });
   }
