@@ -3340,7 +3340,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
     <button class="ds-btn" data-ds="view-planning" onclick="showView('view-planning'); renderPlanningTools();"><span>🗓️</span> Planificación</button>
   </nav>
-  <div class="ds-foot">APPI · v165 · Cultura de crecimiento</div>
+  <div class="ds-foot">APPI · v166 · Cultura de crecimiento</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -13228,84 +13228,6 @@ async function initHistorico(){
 }
 window.openHistorico=openHistorico;
 window.__APPI_HISTORICO__={state:H,open:openHistorico,refresh:refreshData,parseFile:parseHistoricalFile,saveMonth:saveMonthPeriod,analyze:analyzePeriods,strategies:buildStrategies,dbGetAll};
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initHistorico);else initHistorico();
-setTimeout(initHistorico,1200);
-
-})();
-
-</script>
-
-</body>
-</html>
-ata,parseFile:parseHistoricalFile,saveMonth:saveMonthPeriod,analyze:analyzePeriods,strategies:buildStrategies,dbGetAll};
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initHistorico);else initHistorico();
-setTimeout(initHistorico,1200);
-
-})();
-
-</script>
-
-</body>
-</html>
-ntías. APPI excluye teléfonos, domicilios, correos y cumpleaños. El envío solo ocurre después de marcar la autorización en la pantalla Analizar.</div></div>
-  </div>`;
-  const save=$('histSaveCloud');if(save)save.onclick=()=>{const url=$('histCloudUrl').value.trim().replace(/\/$/,''),anonKey=$('histCloudKey').value.trim();saveCloudConfigValue({url,anonKey});toast(cloudReady()?'Configuración de nube guardada':'Revisá la URL y la clave pública',2600);render()};
-  const magic=$('histMagicLink');if(magic)magic.onclick=async()=>{magic.disabled=true;magic.textContent='Enviando…';try{await sendMagicLink($('histCloudEmail').value.trim());toast('Revisá tu correo y abrí el enlace de acceso',3800);magic.textContent='Enlace enviado'}catch(e){toast(e.message,3500);magic.disabled=false;magic.textContent='Enviar enlace de acceso'}};
-  if($('histSyncNow'))$('histSyncNow').onclick=()=>syncAll(true);if($('histPullCloud'))$('histPullCloud').onclick=async()=>{try{const n=await pullCloud();render();toast(n?`${n} cierres recuperados`:'La copia local ya está actualizada')}catch(e){toast(e.message,3200)}};if($('histLogout'))$('histLogout').onclick=()=>{setSession(null);render();toast('Sesión cerrada')};
-}
-
-function showHelp(){
-  const html=`<p>El Histórico guarda una fotografía independiente de cada cierre mensual.</p><div class="tip"><b>Necesitás tres archivos del mismo período:</b><br>1. Línea Descendente.<br>2. Garantías por Organización.<br>3. Ingresos.</div><p><b>Resumen y análisis:</b> reúne el Resumen Anual, los gráficos, las comparaciones y las estrategias.<br><b>Cargar y administrar:</b> permite cargar meses, descargar originales, respaldar o eliminar cierres.</p><p style="font-size:11px;color:#777887">Un archivo de Ingresos sin personas es válido y representa cero ingresos. El archivo único de Usuarios / Garantías continúa en su sección habitual.</p>`;
-  try{modal.open({icon:'📈',iconBg:'linear-gradient(135deg,#5b8def,#a06bff)',title:'Cómo usar el Histórico',sub:'Control mensual y anual',html})}catch(e){alert('Cargá los tres archivos de cada mes y compará los cierres dentro de Resumen y análisis.')}
-}
-async function openHistorico(){
-  showView('view-historico');const c=$('historicoContent');if(c)c.innerHTML='<div class="hist-loading"><span></span>Abriendo cierres mensuales…</div>';
-  try{await refreshData();H.ready=true;render()}catch(e){console.error('Abrir histórico',e);if(c)c.innerHTML=`<div class="hist-toast-inline error">No se pudo abrir el almacenamiento: ${esc(e.message)}</div>`}
-}
-async function initHistorico(){
-  if(H._initialized)return;H._initialized=true;
-  try{await openDB();handleAuthHash();await refreshData();H.ready=true}catch(e){console.error('Inicialización histórico',e)}
-  document.querySelectorAll('.hist-tabs [data-hist-tab]').forEach(b=>b.onclick=()=>openTab(b.dataset.histTab));
-  const back=$('btnBackHistorico');if(back)back.onclick=()=>{showView('view-home');try{renderHomeCompleto()}catch(e){}};
-  const help=$('btnHelpHistorico');if(help)help.onclick=showHelp;
-  for(const [type,cfg] of Object.entries(FILE_TYPES)){const input=$(cfg.input);if(input)input.onchange=e=>{const f=e.target.files&&e.target.files[0],target=H.fileTarget;if(f&&target&&target.type===type)handleFile(type,f,target.id);H.fileTarget=null;e.target.value=''}}
-  const restore=$('histRestoreInput');if(restore)restore.onchange=e=>restoreBackup(e.target.files&&e.target.files[0]);
-  const quick=$('histSyncQuick');if(quick)quick.onclick=()=>cloudReady()&&getSession()?syncAll(true):openTab('nube');
-  window.addEventListener('online',()=>{updateSyncStatus();if(cloudReady()&&getSession())syncAll(false)});window.addEventListener('offline',()=>updateSyncStatus());
-  updateSyncStatus();
-  if(window.__histOpenRequested) setTimeout(openHistorico,0);
-}
-window.openHistorico=openHistorico;
-window.__APPI_HISTORICO__={state:H,open:openHistorico,refresh:refreshData,parseFile:parseHistoricalFile,saveMonth:saveMonthPeriod,analyze:analyzePeriods,strategies:buildStrategies,dbGetAll};
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initHistorico);else initHistorico();
-setTimeout(initHistorico,1200);
-
-})();
-
-</script>
-
-</body>
-</html>
-ata,parseFile:parseHistoricalFile,saveMonth:saveMonthPeriod,analyze:analyzePeriods,strategies:buildStrategies,dbGetAll};
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initHistorico);else initHistorico();
-setTimeout(initHistorico,1200);
-
-})();
-
-</script>
-
-</body>
-</html>
-();
-setTimeout(initHistorico,1200);
-
-})();
-
-</script>
-
-</body>
-</html>
-ata,parseFile:parseHistoricalFile,saveMonth:saveMonthPeriod,analyze:analyzePeriods,strategies:buildStrategies,dbGetAll};
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initHistorico);else initHistorico();
 setTimeout(initHistorico,1200);
 

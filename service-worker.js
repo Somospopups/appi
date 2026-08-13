@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v165-cultura-ok';
+const CACHE_NAME = 'appi-v166-sin-codigos';
 const ARCHIVOS = [
   './',
   './index.html',
