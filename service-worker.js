@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v174-botones-libres';
+const CACHE_NAME = 'appi-v175-secciones-plegables';
 const ARCHIVOS = [
   './',
   './index.html',

@@ -3078,7 +3078,7 @@ body.dark .lock-footer { color: #6b6b76; }
   #toolsList.home-tools-grid {
     display: block;
   }
-  .home-section-block + .home-section-block { margin-top: 14px; }
+  .home-section-block + .home-section-block { margin-top: 10px; }
   .mini-section-label {
     display: flex;
     align-items: center;
@@ -3090,6 +3090,20 @@ body.dark .lock-footer { color: #6b6b76; }
     text-transform: uppercase;
     letter-spacing: .45px;
   }
+  .home-section-block > summary.mini-section-label{
+    list-style:none;cursor:pointer;user-select:none;width:100%;box-sizing:border-box;
+    margin:0;padding:11px 12px;border-radius:16px;
+    background:rgba(255,255,255,.55);border:1px solid rgba(255,255,255,.72);
+    box-shadow:0 6px 16px rgba(80,90,130,.06);
+  }
+  .home-section-block > summary.mini-section-label::-webkit-details-marker{display:none}
+  .home-section-block > summary.mini-section-label em{
+    margin-left:auto;color:#8a8a94;font-size:16px;font-style:normal;font-weight:900;line-height:1;
+    transition:transform .2s ease;
+  }
+  .home-section-block[open] > summary.mini-section-label{margin-bottom:9px}
+  .home-section-block[open] > summary.mini-section-label em{transform:rotate(180deg)}
+  body.dark .home-section-block > summary.mini-section-label{background:rgba(28,29,46,.55);border-color:rgba(255,255,255,.08);color:#c5c6d0}
   .home-tool-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -3412,7 +3426,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
     <button class="ds-btn" data-ds="view-planning" onclick="showView('view-planning'); renderPlanningTools();"><span>🗓️</span> Planificación</button>
   </nav>
-  <div class="ds-foot">APPI · v174 · Cultura de crecimiento</div>
+  <div class="ds-foot">APPI · v175 · Cultura de crecimiento</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -8753,16 +8767,23 @@ function renderToolsList(){
     onClick:`showView('view-usuarios')`, accent:'#3ad0a4', gradient:'linear-gradient(135deg,#3ad0a4,#5b8def)'
   });
 
+  const openMes=localStorage.getItem('home_sec_mes')==='1';
+  const openNeg=localStorage.getItem('home_sec_neg')==='1';
   document.getElementById('toolsList').innerHTML = `
-    <div class="home-section-block">
-      <div class="mini-section-label"><span>📅</span> Mi mes</div>
+    <details class="home-section-block" data-home-sec="mes" ${openMes?'open':''}>
+      <summary class="mini-section-label"><span>📅</span> Mi mes<em>⌄</em></summary>
       <div class="home-tool-grid">${c2 + c1 + c3 + c4}</div>
-    </div>
-    <div class="home-section-block">
-      <div class="mini-section-label"><span>🌱</span> Mi negocio</div>
+    </details>
+    <details class="home-section-block" data-home-sec="neg" ${openNeg?'open':''}>
+      <summary class="mini-section-label"><span>🌱</span> Mi negocio<em>⌄</em></summary>
       <div class="home-tool-grid">${equipoCard + historicoCard + usuariosCard + seguimientoCard}</div>
-    </div>
+    </details>
   `;
+  document.querySelectorAll('#toolsList [data-home-sec]').forEach(el=>{
+    el.addEventListener('toggle',()=>{
+      localStorage.setItem('home_sec_'+el.dataset.homeSec, el.open?'1':'0');
+    });
+  });
 }
 function openGrabadora(){
   // Abrir grabadora en nueva pestaña o dentro de APPI si existe view
@@ -9764,10 +9785,10 @@ function abrirBackupDesdeMenu(){
       if (evt.data && evt.data.type === 'appi-reload') location.reload();
     });
     window.addEventListener('load', () => {
-      const bustKey = 'appi_cache_v174';
+      const bustKey = 'appi_cache_v175';
       const already = localStorage.getItem(bustKey) === '1';
       const finish = () => {
-        navigator.serviceWorker.register('./service-worker.js?v=174').catch(() => {});
+        navigator.serviceWorker.register('./service-worker.js?v=175').catch(() => {});
       };
       if (already) { finish(); return; }
       localStorage.setItem(bustKey, '1');
@@ -9775,7 +9796,7 @@ function abrirBackupDesdeMenu(){
         caches.keys().then((keys) => Promise.all(keys.map((k) => caches.delete(k)))).catch(() => {}),
         navigator.serviceWorker.getRegistrations().then((rs) => Promise.all(rs.map((r) => r.unregister()))).catch(() => {})
       ]).then(() => {
-        location.replace(location.pathname + '?v=174' + location.hash);
+        location.replace(location.pathname + '?v=175' + location.hash);
       }).catch(finish);
     });
   }
