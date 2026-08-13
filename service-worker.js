@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v167-limpio';
+const CACHE_NAME = 'appi-v168-cultura-ui';
 const ARCHIVOS = [
   './',
   './index.html',

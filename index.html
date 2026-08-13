@@ -2697,42 +2697,65 @@ body.dark .lock-footer { color: #6b6b76; }
 
   .cultura-card{
     position:relative;overflow:hidden;
-    margin:0 0 14px;padding:16px 15px 14px;
+    margin:0 0 14px;padding:15px 14px 13px;
     border-radius:26px;
     background:
-      radial-gradient(circle at 12% 0%, rgba(255,255,255,.72), transparent 36%),
-      linear-gradient(145deg, rgba(58,208,164,.22), rgba(91,141,239,.16) 55%, rgba(160,107,255,.16));
+      radial-gradient(circle at 12% 0%, rgba(255,255,255,.78), transparent 34%),
+      linear-gradient(145deg, rgba(58,208,164,.22), rgba(91,141,239,.16) 52%, rgba(160,107,255,.16));
     border:1px solid rgba(255,255,255,.78);
-    box-shadow:0 14px 34px rgba(80,90,130,.12);
+    box-shadow:0 14px 34px rgba(80,90,130,.12), inset 0 1px 0 rgba(255,255,255,.8);
   }
   .cultura-card::after{
-    content:"";position:absolute;width:140px;height:140px;right:-52px;top:-60px;
-    border-radius:50%;background:rgba(255,255,255,.28);pointer-events:none;
+    content:"";position:absolute;width:130px;height:130px;right:-48px;top:-56px;
+    border-radius:50%;background:linear-gradient(135deg,rgba(255,255,255,.48),rgba(255,255,255,.06));pointer-events:none;
   }
-  .cultura-head{position:relative;z-index:1;display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px}
-  .cultura-kicker{display:inline-flex;align-items:center;gap:6px;padding:4px 9px;border-radius:999px;background:rgba(255,255,255,.62);color:#168765;font-size:10px;font-weight:900;letter-spacing:.5px;text-transform:uppercase}
-  .cultura-head h3{margin:7px 0 4px;color:#161620;font-size:20px;line-height:1.1;letter-spacing:-.4px}
-  .cultura-head p{margin:0;max-width:240px;color:#4e5161;font-size:12px;line-height:1.4;font-weight:600}
-  .cultura-week{flex:0 0 auto;padding:7px 9px;border-radius:12px;background:rgba(255,255,255,.56);color:#3d63c9;font-size:10px;font-weight:900;text-align:right;line-height:1.25}
+  .cultura-head{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:11px}
+  .cultura-kicker{display:inline-flex;align-items:center;gap:5px;padding:4px 9px;border-radius:999px;background:rgba(255,255,255,.62);color:#168765;font-size:10px;font-weight:900;letter-spacing:.5px;text-transform:uppercase}
+  .cultura-kicker::before{content:"✦";font-size:9px}
+  .cultura-head h3{margin:6px 0 0;color:#161620;font-size:18px;line-height:1.1;letter-spacing:-.35px;font-weight:950}
+  .cultura-week{flex:0 0 auto;padding:7px 9px;border-radius:14px;background:rgba(255,255,255,.58);border:1px solid rgba(255,255,255,.7);color:#3d63c9;font-size:10px;font-weight:900;text-align:right;line-height:1.25;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
   .cultura-week small{display:block;color:#777887;font-size:9px;font-weight:800}
-  .cultura-tasks{position:relative;z-index:1;display:grid;gap:8px}
-  .cultura-task{padding:12px;border-radius:18px;background:rgba(255,255,255,.62);border:1px solid rgba(255,255,255,.8)}
-  .cultura-task.done{background:rgba(58,208,164,.14);border-color:rgba(58,208,164,.28)}
-  .cultura-task-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
-  .cultura-task-top strong{color:#1c1c27;font-size:13px}
-  .cultura-task-top span{color:#3d63c9;font-size:12px;font-weight:900}
+  .cultura-tasks{position:relative;z-index:1;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .cultura-task{
+    min-width:0;padding:11px 10px 10px;border-radius:18px;
+    background:rgba(255,255,255,.62);border:1px solid rgba(255,255,255,.82);
+    box-shadow:0 8px 18px rgba(80,90,130,.07);
+    display:flex;flex-direction:column;gap:8px;
+  }
+  .cultura-task.done{background:rgba(58,208,164,.16);border-color:rgba(58,208,164,.28)}
+  .cultura-task-top{display:flex;flex-direction:column;align-items:flex-start;gap:2px}
+  .cultura-task-top strong{color:#5c5c66;font-size:10.5px;font-weight:900;letter-spacing:.15px}
+  .cultura-task-top span{color:#3d63c9;font-size:15px;font-weight:950;letter-spacing:-.3px;line-height:1.15}
   .cultura-task.done .cultura-task-top span,.cultura-over{color:#168765}
-  .cultura-bar{height:7px;margin:8px 0 10px;border-radius:999px;background:rgba(80,90,130,.12);overflow:hidden}
-  .cultura-bar i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#3ad0a4,#5b8def);transition:width .3s ease}
-  .cultura-step{display:grid;grid-template-columns:42px 1fr 42px;gap:8px;align-items:center}
-  .cultura-step button{height:38px;border:0;border-radius:12px;background:rgba(91,141,239,.12);color:#3d63c9;font:inherit;font-size:20px;font-weight:900;cursor:pointer}
-  .cultura-step input{width:100%;height:38px;border:1px solid rgba(80,90,130,.12);border-radius:12px;background:rgba(255,255,255,.86);color:#161620;font:inherit;font-size:16px;font-weight:900;text-align:center;outline:none}
-  .cultura-add{display:grid;grid-template-columns:1fr auto;gap:6px;margin-top:8px}
-  .cultura-add input{height:36px;border:1px solid rgba(80,90,130,.12);border-radius:11px;background:rgba(255,255,255,.86);padding:0 10px;color:#161620;font:inherit;font-size:12px;outline:none}
-  .cultura-add button{height:36px;padding:0 12px;border:0;border-radius:11px;background:linear-gradient(135deg,#5b8def,#875fdd);color:#fff;font:inherit;font-size:11px;font-weight:900;cursor:pointer}
-  .cultura-actions{display:grid;gap:5px;margin-top:8px}
-  .cultura-action{display:grid;grid-template-columns:minmax(0,1fr) 28px;gap:6px;align-items:center;min-height:34px;padding:6px 8px;border-radius:10px;background:rgba(91,141,239,.07);color:#30303d;font-size:12px;font-weight:700}
-  .cultura-action button{width:28px;height:28px;border:0;border-radius:8px;background:transparent;color:#c63c46;font-size:16px;cursor:pointer}
+  .cultura-bar{height:6px;border-radius:999px;background:rgba(80,90,130,.12);overflow:hidden}
+  .cultura-bar i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#3ad0a4,#5b8def,#a06bff);box-shadow:0 0 10px rgba(91,141,239,.28);transition:width .3s ease}
+  .cultura-step{display:grid;grid-template-columns:32px minmax(0,1fr) 32px;gap:5px;align-items:center}
+  .cultura-step button{
+    height:34px;border:0;border-radius:11px;background:rgba(91,141,239,.12);color:#3d63c9;
+    font:inherit;font-size:18px;font-weight:900;cursor:pointer;line-height:1;
+  }
+  .cultura-step button:active{transform:scale(.94)}
+  .cultura-step input{
+    width:100%;height:34px;border:1px solid rgba(80,90,130,.12);border-radius:11px;
+    background:rgba(255,255,255,.88);color:#161620;font:inherit;font-size:15px;font-weight:950;text-align:center;outline:none;
+  }
+  .cultura-pills{display:flex;flex-wrap:wrap;gap:5px;align-items:center;min-height:34px}
+  .cultura-pill{
+    width:32px;height:32px;border:0;border-radius:50%;
+    background:rgba(255,255,255,.82);color:#3d63c9;
+    font:inherit;font-size:10px;font-weight:950;letter-spacing:-.2px;
+    box-shadow:0 4px 10px rgba(80,90,130,.10);cursor:pointer;
+    display:grid;place-items:center;line-height:1;
+  }
+  .cultura-pill:active{transform:scale(.92)}
+  .cultura-pill.filled{
+    background:linear-gradient(135deg,#22b887,#3ad0a4);color:#fff;
+    box-shadow:0 6px 14px rgba(34,184,135,.32);
+  }
+  .cultura-pill.plus{
+    background:linear-gradient(135deg,#5b8def,#a06bff);color:#fff;font-size:18px;font-weight:800;
+    box-shadow:0 6px 14px rgba(91,141,239,.28);
+  }
   .cultura-foot{position:relative;z-index:1;margin-top:10px;color:#4e5161;font-size:11px;font-weight:800}
   .cultura-history-title{position:relative;z-index:1;margin:14px 2px 8px;color:#3a3a48;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.4px}
   .cultura-history{position:relative;z-index:1;display:grid;gap:8px}
@@ -2744,20 +2767,33 @@ body.dark .lock-footer { color: #6b6b76; }
   .cultura-past summary em{color:#8a8a94;font-size:16px;font-style:normal;font-weight:900}
   .cultura-past[open] summary em{transform:rotate(180deg)}
   .cultura-past-body{margin-top:10px;padding-top:10px;border-top:1px dashed rgba(80,90,130,.14);display:grid;gap:6px}
-  .cultura-past-kpi{display:flex;justify-content:space-between;gap:8px;color:#3a3a48;font-size:12px;font-weight:800}
-  .cultura-past-kpi b{color:#3d63c9}
+  .cultura-past-kpis{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .cultura-past-kpi{display:flex;flex-direction:column;gap:2px;padding:8px 9px;border-radius:12px;background:rgba(255,255,255,.55);color:#6b6b76;font-size:10px;font-weight:800}
+  .cultura-past-kpi b{color:#3d63c9;font-size:13px}
   .cultura-past-kpi b.ok{color:#168765}
+  .cultura-action{display:flex;align-items:center;min-height:30px;padding:6px 8px;border-radius:10px;background:rgba(91,141,239,.07);color:#30303d;font-size:12px;font-weight:700}
+  .cultura-inv-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .cultura-inv-grid label{display:flex;flex-direction:column;gap:6px;margin:0;color:#6b6b76;font-size:10.5px;font-weight:900;letter-spacing:.35px;text-transform:uppercase}
+  .cultura-inv-grid input{
+    width:100%;height:44px;box-sizing:border-box;border:1.5px solid rgba(91,141,239,.22);border-radius:14px;
+    background:rgba(255,255,255,.86);padding:0 12px;color:#1c1c1e;font:inherit;font-size:14px;font-weight:750;outline:none;
+  }
+  .cultura-inv-grid input:focus{border-color:#5b8def;box-shadow:0 0 0 3px rgba(91,141,239,.15)}
+  .cultura-inv-grid .cultura-inv-remove{grid-column:1/-1;margin-top:2px;min-height:40px;border:0;border-radius:12px;background:rgba(217,83,79,.12);color:#b94440;font:inherit;font-size:13px;font-weight:800;cursor:pointer}
+  .cultura-inv-tip{grid-column:1/-1;margin:0;padding:10px 12px;border-radius:12px;background:linear-gradient(135deg,rgba(91,141,239,.10),rgba(160,107,255,.08));color:#3d63c9;font-size:12px;font-weight:700;line-height:1.35}
   body.dark .cultura-card{background:linear-gradient(145deg,rgba(58,208,164,.12),rgba(91,141,239,.12) 55%,rgba(160,107,255,.12));border-color:rgba(255,255,255,.08)}
-  body.dark .cultura-head h3,body.dark .cultura-task-top strong,body.dark .cultura-action,body.dark .cultura-history-title,body.dark .cultura-past summary strong,body.dark .cultura-past-kpi{color:#f0f0f5}
-  body.dark .cultura-head p,body.dark .cultura-foot,body.dark .cultura-past summary small{color:#b7b8c4}
-  body.dark .cultura-week,body.dark .cultura-task,body.dark .cultura-kicker,body.dark .cultura-past{background:rgba(28,29,46,.62);border-color:rgba(255,255,255,.08)}
-  body.dark .cultura-week,body.dark .cultura-task-top span{color:#a8c0ff}
+  body.dark .cultura-head h3,body.dark .cultura-action,body.dark .cultura-history-title,body.dark .cultura-past summary strong{color:#f0f0f5}
+  body.dark .cultura-foot,body.dark .cultura-past summary small,body.dark .cultura-task-top strong{color:#b7b8c4}
+  body.dark .cultura-week,body.dark .cultura-task,body.dark .cultura-kicker,body.dark .cultura-past,body.dark .cultura-past-kpi{background:rgba(28,29,46,.62);border-color:rgba(255,255,255,.08)}
+  body.dark .cultura-week,body.dark .cultura-task-top span,body.dark .cultura-past-kpi b{color:#a8c0ff}
   body.dark .cultura-step button{background:rgba(91,141,239,.18);color:#c5d4ff}
-  body.dark .cultura-step input,body.dark .cultura-add input{background:rgba(20,22,36,.86);border-color:rgba(255,255,255,.08);color:#f0f0f5}
+  body.dark .cultura-step input{background:rgba(20,22,36,.86);border-color:rgba(255,255,255,.08);color:#f0f0f5}
   body.dark .cultura-action{background:rgba(91,141,239,.12)}
   body.dark .cultura-pill{background:rgba(91,141,239,.18);color:#c5d4ff}
+  body.dark .cultura-pill.filled{color:#fff}
   body.dark .cultura-inv-grid label{color:#b7b8c4}
   body.dark .cultura-inv-grid input{background:rgba(20,22,36,.9);border-color:rgba(255,255,255,.1);color:#f0f0f5}
+  body.dark .cultura-inv-tip{color:#c5d4ff}
 
   .score-compact.score-dashboard {
     margin-bottom: 14px;
@@ -3340,7 +3376,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
     <button class="ds-btn" data-ds="view-planning" onclick="showView('view-planning'); renderPlanningTools();"><span>🗓️</span> Planificación</button>
   </nav>
-  <div class="ds-foot">APPI · v167 · Cultura de crecimiento</div>
+  <div class="ds-foot">APPI · v168 · Cultura de crecimiento</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -8679,8 +8715,10 @@ function renderCulturaCrecimiento(){
         <em>⌄</em>
       </summary>
       <div class="cultura-past-body">
-        <div class="cultura-past-kpi"><span>PB personales</span><b class="${okPb?'ok':''}">${culturaFmt(data.pb)} / ${CULTURA_PB_META}${extraPast?` · +${culturaFmt(extraPast)} extra`:''}</b></div>
-        <div class="cultura-past-kpi"><span>Invitados</span><b>${guests.length}</b></div>
+        <div class="cultura-past-kpis">
+          <div class="cultura-past-kpi"><span>PB personales</span><b class="${okPb?'ok':''}">${culturaFmt(data.pb)} / ${CULTURA_PB_META}${extraPast?` · +${culturaFmt(extraPast)}`:''}</b></div>
+          <div class="cultura-past-kpi"><span>Invitados</span><b>${guests.length}</b></div>
+        </div>
         ${guests.map(a=>`<div class="cultura-action"><span>${culturaEsc(culturaInvitadoNombre(a)||a.text||'Invitado')}</span><span></span></div>`).join('')}
       </div>
     </details>`;
@@ -8691,13 +8729,12 @@ function renderCulturaCrecimiento(){
         <div>
           <div class="cultura-kicker">Semanal</div>
           <h3>Cultura de crecimiento</h3>
-          <p>Ventas personales y acciones de patrocinio todas las semanas.</p>
         </div>
         <div class="cultura-week"><small>Esta semana</small>${culturaWeekLabel()}</div>
       </div>
       <div class="cultura-tasks">
         <article class="cultura-task ${pbDone?'done':''}">
-          <div class="cultura-task-top"><strong>💎 PB personales</strong><span class="${extra?'cultura-over':''}">${culturaFmt(week.pb)} · meta ${CULTURA_PB_META}${extra?` · +${culturaFmt(extra)}`:''}</span></div>
+          <div class="cultura-task-top"><strong>💎 PB personales</strong><span class="${extra?'cultura-over':''}">${culturaFmt(week.pb)} / ${CULTURA_PB_META}${extra?` · +${culturaFmt(extra)}`:''}</span></div>
           <div class="cultura-bar"><i style="width:${pbPct}%"></i></div>
           <div class="cultura-step">
             <button type="button" data-cultura-pb="-1" aria-label="Restar PB">−</button>
@@ -8706,7 +8743,7 @@ function renderCulturaCrecimiento(){
           </div>
         </article>
         <article class="cultura-task ${accDone?'done':''}">
-          <div class="cultura-task-top"><strong>🤝 Acciones de patrocinio</strong><span>${week.invitados.length} invitado${week.invitados.length===1?'':'s'}</span></div>
+          <div class="cultura-task-top"><strong>🤝 Patrocinio</strong><span>${week.invitados.length} invitado${week.invitados.length===1?'':'s'}</span></div>
           <div class="cultura-pills">
             ${Array.from({length:week.slots},(_,slot)=>{
               const guest=week.invitados.find(p=>Number(p.slot)===slot);
@@ -8758,11 +8795,12 @@ function openCulturaInvitado(weekId,slot){
     okText: 'Guardar',
     cancelText: 'Cancelar',
     html: `<div class="cultura-inv-grid">
-      <label>Nombre<input id="invNombre" value="${culturaEsc(guest.nombre||'')}" autocomplete="given-name"></label>
-      <label>Apellido<input id="invApellido" value="${culturaEsc(guest.apellido||'')}" autocomplete="family-name"></label>
-      <label>Teléfono<input id="invTelefono" value="${culturaEsc(guest.telefono||'')}" inputmode="tel" autocomplete="tel"></label>
-      <label>Fecha de presentación<input id="invFecha" type="date" value="${culturaEsc(guest.fechaPresentacion||hoyLocal())}"></label>
-      ${editing?'<button type="button" id="invQuitar" class="btn-cancel" style="margin-top:4px">Quitar de esta semana</button>':''}
+      <label>Nombre<input id="invNombre" value="${culturaEsc(guest.nombre||'')}" autocomplete="given-name" placeholder="Ana"></label>
+      <label>Apellido<input id="invApellido" value="${culturaEsc(guest.apellido||'')}" autocomplete="family-name" placeholder="Pérez"></label>
+      <label>Teléfono<input id="invTelefono" value="${culturaEsc(guest.telefono||'')}" inputmode="tel" autocomplete="tel" placeholder="351..."></label>
+      <label>Presentación<input id="invFecha" type="date" value="${culturaEsc(guest.fechaPresentacion||hoyLocal())}"></label>
+      <p class="cultura-inv-tip">Se guarda también en tu agenda de contactos.</p>
+      ${editing?'<button type="button" id="invQuitar" class="cultura-inv-remove">Quitar de esta semana</button>':''}
     </div>`,
     onConfirm: ()=>{
       const nombre=capitalizarNombreSeg(document.getElementById('invNombre')?.value||'').trim();
@@ -9553,10 +9591,10 @@ function abrirBackupDesdeMenu(){
       if (evt.data && evt.data.type === 'appi-reload') location.reload();
     });
     window.addEventListener('load', () => {
-      const bustKey = 'appi_cache_v167';
+      const bustKey = 'appi_cache_v168';
       const already = localStorage.getItem(bustKey) === '1';
       const finish = () => {
-        navigator.serviceWorker.register('./service-worker.js?v=167').catch(() => {});
+        navigator.serviceWorker.register('./service-worker.js?v=168').catch(() => {});
       };
       if (already) { finish(); return; }
       localStorage.setItem(bustKey, '1');
@@ -9564,7 +9602,7 @@ function abrirBackupDesdeMenu(){
         caches.keys().then((keys) => Promise.all(keys.map((k) => caches.delete(k)))).catch(() => {}),
         navigator.serviceWorker.getRegistrations().then((rs) => Promise.all(rs.map((r) => r.unregister()))).catch(() => {})
       ]).then(() => {
-        location.replace(location.pathname + '?v=167' + location.hash);
+        location.replace(location.pathname + '?v=168' + location.hash);
       }).catch(finish);
     });
   }
