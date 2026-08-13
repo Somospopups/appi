@@ -2600,36 +2600,36 @@ body.dark .lock-footer { color: #6b6b76; }
   /* ============ HOME DASHBOARD 2026 ============ */
   header.top.home-header {
     text-align: left;
-    margin-bottom: 14px;
-    padding-top: 2px;
+    margin-bottom: 10px;
+    padding-top: 0;
   }
   .home-header .help-btn { top: 0; }
   .home-brand-row {
-    min-height: 42px;
+    min-height: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
   }
   .home-brand-mark {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 8px 16px;
+    padding: 4px 11px;
     border-radius: 999px;
     background: rgba(255,255,255,0.52);
     border: 1px solid rgba(255,255,255,0.76);
-    box-shadow: 0 10px 26px rgba(80,90,130,0.10);
+    box-shadow: 0 6px 16px rgba(80,90,130,0.08);
     color: #15151d;
-    font-size: 15px;
+    font-size: 11px;
     font-weight: 950;
-    letter-spacing: 1.4px;
+    letter-spacing: 1.2px;
   }
   .home-hero-card {
     position: relative;
     overflow: hidden;
-    border-radius: 30px;
-    padding: 20px 18px 18px;
+    border-radius: 22px;
+    padding: 12px 13px 11px;
     background:
       radial-gradient(circle at 14% 12%, rgba(255,255,255,0.70), transparent 35%),
       linear-gradient(135deg, rgba(91,141,239,0.26), rgba(160,107,255,0.20) 52%, rgba(255,107,157,0.18));
@@ -2650,41 +2650,41 @@ body.dark .lock-footer { color: #6b6b76; }
     z-index: 1;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 5px 10px;
+    gap: 5px;
+    padding: 3px 8px;
     border-radius: 999px;
     background: rgba(255,255,255,0.58);
     color: #3d63c9;
-    font-size: 11px;
+    font-size: 9.5px;
     font-weight: 850;
     text-transform: uppercase;
-    letter-spacing: 0.55px;
+    letter-spacing: 0.45px;
   }
-  .home-kicker::before { content: "✦"; font-size: 10px; }
+  .home-kicker::before { content: "✦"; font-size: 8px; }
   header.top.home-header h1#homeGreeting {
     position: relative;
     z-index: 1;
-    margin: 14px 0 0;
+    margin: 6px 0 0;
     color: #161620;
-    font-size: 30px;
-    line-height: 1.05;
+    font-size: 20px;
+    line-height: 1.1;
     font-weight: 950;
-    letter-spacing: -0.8px;
+    letter-spacing: -0.4px;
   }
   header.top.home-header .home-subtitle {
     position: relative;
     z-index: 1;
-    margin: 7px 0 16px;
+    margin: 2px 0 8px;
     color: #4e5161;
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 650;
     text-transform: none;
   }
   .home-month-card {
     position: relative;
     z-index: 1;
-    padding: 12px 13px;
-    border-radius: 20px;
+    padding: 8px 10px;
+    border-radius: 14px;
     background: rgba(255,255,255,0.58);
     border: 1px solid rgba(255,255,255,0.75);
     -webkit-backdrop-filter: blur(14px) saturate(170%);
@@ -2694,22 +2694,22 @@ body.dark .lock-footer { color: #6b6b76; }
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 10px;
-    margin-bottom: 9px;
+    gap: 8px;
+    margin-bottom: 6px;
   }
   .home-month-row span {
     color: #3a3a48;
-    font-size: 13px;
+    font-size: 11.5px;
     font-weight: 850;
   }
   .home-month-row strong {
     color: #3d63c9;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 850;
   }
   .home-month-progress {
     width: 100%;
-    height: 8px;
+    height: 6px;
     border-radius: 999px;
     background: rgba(80,90,130,0.12);
     overflow: hidden;
@@ -2722,7 +2722,7 @@ body.dark .lock-footer { color: #6b6b76; }
     transition: width .55s ease;
   }
   .home-month-caption {
-    margin-top: 7px;
+    margin-top: 4px;
     color: #777887;
     font-size: 11.5px;
     font-weight: 650;
@@ -3412,7 +3412,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
     <button class="ds-btn" data-ds="view-planning" onclick="showView('view-planning'); renderPlanningTools();"><span>🗓️</span> Planificación</button>
   </nav>
-  <div class="ds-foot">APPI · v172 · Cultura de crecimiento</div>
+  <div class="ds-foot">APPI · v173 · Cultura de crecimiento</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -9764,10 +9764,10 @@ function abrirBackupDesdeMenu(){
       if (evt.data && evt.data.type === 'appi-reload') location.reload();
     });
     window.addEventListener('load', () => {
-      const bustKey = 'appi_cache_v172';
+      const bustKey = 'appi_cache_v173';
       const already = localStorage.getItem(bustKey) === '1';
       const finish = () => {
-        navigator.serviceWorker.register('./service-worker.js?v=172').catch(() => {});
+        navigator.serviceWorker.register('./service-worker.js?v=173').catch(() => {});
       };
       if (already) { finish(); return; }
       localStorage.setItem(bustKey, '1');
@@ -9775,7 +9775,7 @@ function abrirBackupDesdeMenu(){
         caches.keys().then((keys) => Promise.all(keys.map((k) => caches.delete(k)))).catch(() => {}),
         navigator.serviceWorker.getRegistrations().then((rs) => Promise.all(rs.map((r) => r.unregister()))).catch(() => {})
       ]).then(() => {
-        location.replace(location.pathname + '?v=172' + location.hash);
+        location.replace(location.pathname + '?v=173' + location.hash);
       }).catch(finish);
     });
   }
