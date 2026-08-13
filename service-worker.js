@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v175-secciones-plegables';
+const CACHE_NAME = 'appi-v176-paso-en-mes';
 const ARCHIVOS = [
   './',
   './index.html',

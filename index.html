@@ -2966,9 +2966,9 @@ body.dark .lock-footer { color: #6b6b76; }
   .next-step-card {
     position: relative;
     overflow: hidden;
-    margin-bottom: 16px;
-    padding: 16px;
-    border-radius: 24px;
+    margin: 0 0 10px;
+    padding: 13px 13px 12px;
+    border-radius: 20px;
     background: linear-gradient(135deg, rgba(21,25,39,0.92), rgba(61,99,201,0.86));
     color: #fff;
     box-shadow: 0 14px 36px rgba(61,99,201,0.22);
@@ -3426,7 +3426,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
     <button class="ds-btn" data-ds="view-planning" onclick="showView('view-planning'); renderPlanningTools();"><span>🗓️</span> Planificación</button>
   </nav>
-  <div class="ds-foot">APPI · v175 · Cultura de crecimiento</div>
+  <div class="ds-foot">APPI · v176 · Cultura de crecimiento</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -3537,7 +3537,6 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <div id="bonusNotifWrap"></div>
     <div id="bdayBannerWrap"></div>
     <div id="scoreCompactWrap"></div>
-    <div id="nextStepWrap"></div>
 
     <div class="home-section-head">
       <div>
@@ -8483,30 +8482,25 @@ function estadoHomeMensual(){
 }
 function obtenerProximoPaso(){
   const { pr, sp, rv, rn } = estadoHomeMensual();
-  const eq = obtenerDatosEquipo();
-  const equipoCargado = eq.existe && (eq.total || 0) > 0;
-  if(!pr.existe){
-    return { icon:'💰', tone:'presu', label:'Próximo paso', title:'Cargá tu presupuesto mensual', desc:'Empezá por ingresos y gastos para que APPI pueda medir la salud de tu mes.', btn:'Ir a Presupuesto', run:()=>openPresu() };
-  }
-  if(pr.existe && pr.ing <= 0){
-    return { icon:'💵', tone:'presu', label:'Completar datos', title:'Agregá tus ingresos del mes', desc:'Tenés movimientos cargados, pero falta el ingreso para calcular mejor tu balance.', btn:'Completar presupuesto', run:()=>openPresu() };
-  }
   if(!sp.existe){
-    return { icon:'🚀', tone:'siete', label:'Próximo paso', title:'Iniciá Las 7 P', desc:'Definí tu plan mensual paso a paso y convertí tus objetivos en acciones concretas.', btn:'Abrir Las 7 P', run:()=>openSiete() };
+    return { icon:'🚀', tone:'siete', label:'Paso 1 de 4', title:'Empezá Las 7 P', desc:'Primero el plan del mes. Definí tus 7 pasos y después seguimos con el resto.', btn:'Abrir Las 7 P', run:()=>openSiete() };
   }
   if(sp.done < sp.total){
-    return { icon:'✅', tone:'siete', label:'Seguir avanzando', title:`Completá Las 7 P (${sp.done}/${sp.total})`, desc:'Te quedan puntos por cerrar. Terminarlos ayuda a ordenar el foco del mes.', btn:'Continuar Las 7 P', run:()=>openSiete() };
+    return { icon:'✅', tone:'siete', label:'Paso 1 de 4', title:`Completá Las 7 P (${sp.done}/${sp.total})`, desc:'Cuando termines las 7, pasamos al presupuesto.', btn:'Continuar Las 7 P', run:()=>openSiete() };
+  }
+  if(!pr.existe){
+    return { icon:'💰', tone:'presu', label:'Paso 2 de 4', title:'Cargá tu presupuesto', desc:'Las 7 P están listas. Ahora ordená ingresos y gastos del mes.', btn:'Ir a Presupuesto', run:()=>openPresu() };
+  }
+  if(pr.existe && pr.ing <= 0){
+    return { icon:'💵', tone:'presu', label:'Paso 2 de 4', title:'Agregá tus ingresos', desc:'Falta el ingreso del mes para cerrar el presupuesto.', btn:'Completar presupuesto', run:()=>openPresu() };
   }
   if(!rv){
-    return { icon:'⚖️', tone:'vida', label:'Próximo paso', title:'Evaluá tu Rueda de la Vida', desc:'Medí tus áreas personales para detectar dónde conviene poner energía esta semana.', btn:'Evaluar vida', run:()=>openRueda('vida') };
+    return { icon:'⚖️', tone:'vida', label:'Paso 3 de 4', title:'Evaluá tu Rueda de la Vida', desc:'Presupuesto listo. Medí tus 8 áreas personales.', btn:'Evaluar vida', run:()=>openRueda('vida') };
   }
   if(!rn){
-    return { icon:'📊', tone:'negocio', label:'Próximo paso', title:'Evaluá tu Rueda del Negocio', desc:'Revisá tus áreas profesionales y encontrá oportunidades concretas de mejora.', btn:'Evaluar negocio', run:()=>openRueda('negocio') };
+    return { icon:'📊', tone:'negocio', label:'Paso 4 de 4', title:'Evaluá tu Rueda del Negocio', desc:'Último paso de la planificación. Cerrá las 8 áreas profesionales.', btn:'Evaluar negocio', run:()=>openRueda('negocio') };
   }
-  if(!equipoCargado){
-    return { icon:'🌳', tone:'equipo', label:'Potenciá tu negocio', title:'Cargá tu equipo', desc:'Importá tu línea descendente para ver actividad, cumpleaños y datos clave.', btn:'Ir a Mi Equipo', run:()=>openEquipo() };
-  }
-  return { icon:'📤', tone:'done', label:'Mes ordenado', title:'Compartí tu informe mensual', desc:'Ya tenés las herramientas principales cargadas. Enviá un resumen por WhatsApp.', btn:'Compartir resumen', run:(e)=>compartirConsolidado(e), done:true };
+  return { icon:'🎉', tone:'done', label:'Plan del mes', title:'¡Felicitaciones!', desc:'Completaste Las 7 P, el presupuesto y las dos ruedas. Tu mes ya está planificado.', btn:'Compartir el mes', run:(e)=>compartirConsolidado(e), done:true };
 }
 
 // ==== HOME APPS ====
@@ -8772,6 +8766,7 @@ function renderToolsList(){
   document.getElementById('toolsList').innerHTML = `
     <details class="home-section-block" data-home-sec="mes" ${openMes?'open':''}>
       <summary class="mini-section-label"><span>📅</span> Mi mes<em>⌄</em></summary>
+      <div id="nextStepWrap"></div>
       <div class="home-tool-grid">${c2 + c1 + c3 + c4}</div>
     </details>
     <details class="home-section-block" data-home-sec="neg" ${openNeg?'open':''}>
@@ -8784,6 +8779,7 @@ function renderToolsList(){
       localStorage.setItem('home_sec_'+el.dataset.homeSec, el.open?'1':'0');
     });
   });
+  try{ renderNextStep(); }catch(e){}
 }
 function openGrabadora(){
   // Abrir grabadora en nueva pestaña o dentro de APPI si existe view
@@ -9057,7 +9053,6 @@ function renderHomeCompleto(){
   try{ renderBdayBanner(); }catch(e){ console.error(e); }
   try{ renderBonusNotifs(); }catch(e){ console.error(e); }
   try{ renderScoreCompact(); }catch(e){ console.error(e); }
-  try{ renderNextStep(); }catch(e){ console.error(e); }
   try{ renderToolsList(); }catch(e){ console.error(e); }
 }
 
@@ -9785,10 +9780,10 @@ function abrirBackupDesdeMenu(){
       if (evt.data && evt.data.type === 'appi-reload') location.reload();
     });
     window.addEventListener('load', () => {
-      const bustKey = 'appi_cache_v175';
+      const bustKey = 'appi_cache_v176';
       const already = localStorage.getItem(bustKey) === '1';
       const finish = () => {
-        navigator.serviceWorker.register('./service-worker.js?v=175').catch(() => {});
+        navigator.serviceWorker.register('./service-worker.js?v=176').catch(() => {});
       };
       if (already) { finish(); return; }
       localStorage.setItem(bustKey, '1');
@@ -9796,7 +9791,7 @@ function abrirBackupDesdeMenu(){
         caches.keys().then((keys) => Promise.all(keys.map((k) => caches.delete(k)))).catch(() => {}),
         navigator.serviceWorker.getRegistrations().then((rs) => Promise.all(rs.map((r) => r.unregister()))).catch(() => {})
       ]).then(() => {
-        location.replace(location.pathname + '?v=175' + location.hash);
+        location.replace(location.pathname + '?v=176' + location.hash);
       }).catch(finish);
     });
   }
