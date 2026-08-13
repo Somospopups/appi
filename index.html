@@ -2506,6 +2506,13 @@ body.dark .lock-btn.copy {
 body.dark .lock-divider::before, body.dark .lock-divider::after {
   background: rgba(255,255,255,0.10);
 }
+.lock-field{text-align:left;margin-bottom:12px}
+.lock-field span{display:block;margin:0 0 6px;color:#5c5c66;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.4px}
+body.dark .lock-field span{color:#a0a0b0}
+.lock-pass-row{display:grid;grid-template-columns:1fr 46px;gap:8px}
+.lock-pass-row button{border:0;border-radius:14px;background:rgba(91,141,239,.14);color:#3d63c9;font:inherit;font-size:12px;font-weight:900;cursor:pointer}
+body.dark .lock-pass-row button{background:rgba(91,141,239,.22);color:#a8b8ff}
+.lock-input.login-input{letter-spacing:.4px;text-transform:none;font-family:inherit;text-align:left;margin-bottom:0}
 .lock-input {
   width: 100%; padding: 14px 16px;
   border-radius: 14px;
@@ -2687,6 +2694,70 @@ body.dark .lock-footer { color: #6b6b76; }
     font-weight: 650;
   }
   .home-month-caption span { color: #3d63c9; font-weight: 900; }
+
+  .cultura-card{
+    position:relative;overflow:hidden;
+    margin:0 0 14px;padding:16px 15px 14px;
+    border-radius:26px;
+    background:
+      radial-gradient(circle at 12% 0%, rgba(255,255,255,.72), transparent 36%),
+      linear-gradient(145deg, rgba(58,208,164,.22), rgba(91,141,239,.16) 55%, rgba(160,107,255,.16));
+    border:1px solid rgba(255,255,255,.78);
+    box-shadow:0 14px 34px rgba(80,90,130,.12);
+  }
+  .cultura-card::after{
+    content:"";position:absolute;width:140px;height:140px;right:-52px;top:-60px;
+    border-radius:50%;background:rgba(255,255,255,.28);pointer-events:none;
+  }
+  .cultura-head{position:relative;z-index:1;display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px}
+  .cultura-kicker{display:inline-flex;align-items:center;gap:6px;padding:4px 9px;border-radius:999px;background:rgba(255,255,255,.62);color:#168765;font-size:10px;font-weight:900;letter-spacing:.5px;text-transform:uppercase}
+  .cultura-head h3{margin:7px 0 4px;color:#161620;font-size:20px;line-height:1.1;letter-spacing:-.4px}
+  .cultura-head p{margin:0;max-width:240px;color:#4e5161;font-size:12px;line-height:1.4;font-weight:600}
+  .cultura-week{flex:0 0 auto;padding:7px 9px;border-radius:12px;background:rgba(255,255,255,.56);color:#3d63c9;font-size:10px;font-weight:900;text-align:right;line-height:1.25}
+  .cultura-week small{display:block;color:#777887;font-size:9px;font-weight:800}
+  .cultura-tasks{position:relative;z-index:1;display:grid;gap:8px}
+  .cultura-task{padding:12px;border-radius:18px;background:rgba(255,255,255,.62);border:1px solid rgba(255,255,255,.8)}
+  .cultura-task.done{background:rgba(58,208,164,.14);border-color:rgba(58,208,164,.28)}
+  .cultura-task-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .cultura-task-top strong{color:#1c1c27;font-size:13px}
+  .cultura-task-top span{color:#3d63c9;font-size:12px;font-weight:900}
+  .cultura-task.done .cultura-task-top span,.cultura-over{color:#168765}
+  .cultura-bar{height:7px;margin:8px 0 10px;border-radius:999px;background:rgba(80,90,130,.12);overflow:hidden}
+  .cultura-bar i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#3ad0a4,#5b8def);transition:width .3s ease}
+  .cultura-step{display:grid;grid-template-columns:42px 1fr 42px;gap:8px;align-items:center}
+  .cultura-step button{height:38px;border:0;border-radius:12px;background:rgba(91,141,239,.12);color:#3d63c9;font:inherit;font-size:20px;font-weight:900;cursor:pointer}
+  .cultura-step input{width:100%;height:38px;border:1px solid rgba(80,90,130,.12);border-radius:12px;background:rgba(255,255,255,.86);color:#161620;font:inherit;font-size:16px;font-weight:900;text-align:center;outline:none}
+  .cultura-add{display:grid;grid-template-columns:1fr auto;gap:6px;margin-top:8px}
+  .cultura-add input{height:36px;border:1px solid rgba(80,90,130,.12);border-radius:11px;background:rgba(255,255,255,.86);padding:0 10px;color:#161620;font:inherit;font-size:12px;outline:none}
+  .cultura-add button{height:36px;padding:0 12px;border:0;border-radius:11px;background:linear-gradient(135deg,#5b8def,#875fdd);color:#fff;font:inherit;font-size:11px;font-weight:900;cursor:pointer}
+  .cultura-actions{display:grid;gap:5px;margin-top:8px}
+  .cultura-action{display:grid;grid-template-columns:minmax(0,1fr) 28px;gap:6px;align-items:center;min-height:34px;padding:6px 8px;border-radius:10px;background:rgba(91,141,239,.07);color:#30303d;font-size:12px;font-weight:700}
+  .cultura-action button{width:28px;height:28px;border:0;border-radius:8px;background:transparent;color:#c63c46;font-size:16px;cursor:pointer}
+  .cultura-foot{position:relative;z-index:1;margin-top:10px;color:#4e5161;font-size:11px;font-weight:800}
+  .cultura-history-title{position:relative;z-index:1;margin:14px 2px 8px;color:#3a3a48;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.4px}
+  .cultura-history{position:relative;z-index:1;display:grid;gap:8px}
+  .cultura-past{padding:11px 12px;border-radius:16px;background:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.72)}
+  .cultura-past summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center}
+  .cultura-past summary::-webkit-details-marker{display:none}
+  .cultura-past summary strong{display:block;color:#1c1c27;font-size:13px}
+  .cultura-past summary small{display:block;margin-top:3px;color:#6b6b76;font-size:11px;font-weight:700}
+  .cultura-past summary em{color:#8a8a94;font-size:16px;font-style:normal;font-weight:900}
+  .cultura-past[open] summary em{transform:rotate(180deg)}
+  .cultura-past-body{margin-top:10px;padding-top:10px;border-top:1px dashed rgba(80,90,130,.14);display:grid;gap:6px}
+  .cultura-past-kpi{display:flex;justify-content:space-between;gap:8px;color:#3a3a48;font-size:12px;font-weight:800}
+  .cultura-past-kpi b{color:#3d63c9}
+  .cultura-past-kpi b.ok{color:#168765}
+  body.dark .cultura-card{background:linear-gradient(145deg,rgba(58,208,164,.12),rgba(91,141,239,.12) 55%,rgba(160,107,255,.12));border-color:rgba(255,255,255,.08)}
+  body.dark .cultura-head h3,body.dark .cultura-task-top strong,body.dark .cultura-action,body.dark .cultura-history-title,body.dark .cultura-past summary strong,body.dark .cultura-past-kpi{color:#f0f0f5}
+  body.dark .cultura-head p,body.dark .cultura-foot,body.dark .cultura-past summary small{color:#b7b8c4}
+  body.dark .cultura-week,body.dark .cultura-task,body.dark .cultura-kicker,body.dark .cultura-past{background:rgba(28,29,46,.62);border-color:rgba(255,255,255,.08)}
+  body.dark .cultura-week,body.dark .cultura-task-top span{color:#a8c0ff}
+  body.dark .cultura-step button{background:rgba(91,141,239,.18);color:#c5d4ff}
+  body.dark .cultura-step input,body.dark .cultura-add input{background:rgba(20,22,36,.86);border-color:rgba(255,255,255,.08);color:#f0f0f5}
+  body.dark .cultura-action{background:rgba(91,141,239,.12)}
+  body.dark .cultura-pill{background:rgba(91,141,239,.18);color:#c5d4ff}
+  body.dark .cultura-inv-grid label{color:#b7b8c4}
+  body.dark .cultura-inv-grid input{background:rgba(20,22,36,.9);border-color:rgba(255,255,255,.1);color:#f0f0f5}
 
   .score-compact.score-dashboard {
     margin-bottom: 14px;
@@ -3269,7 +3340,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
     <button class="ds-btn" data-ds="view-planning" onclick="showView('view-planning'); renderPlanningTools();"><span>🗓️</span> Planificación</button>
   </nav>
-  <div class="ds-foot">APPI · v159 · Distribución verificable</div>
+  <div class="ds-foot">APPI · v162 · Invitados de patrocinio</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -3359,6 +3430,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
       </div>
     </header>
 
+    <div id="culturaWrap"></div>
     <div id="bdayBannerWrap"></div>
     <div id="scoreCompactWrap"></div>
     <div id="nextStepWrap"></div>
@@ -3944,8 +4016,11 @@ const modal = {
         if(opts.onCancel) opts.onCancel();
       };
       document.getElementById('modalConfirmBtn').onclick = ()=>{
+        if(opts.onConfirm){
+          const ok = opts.onConfirm();
+          if(ok === false) return;
+        }
         this.close();
-        if(opts.onConfirm) opts.onConfirm();
       };
     } else {
       this.footer.innerHTML = `<button class="btn-ok" id="modalOkBtn">${opts.okText || 'Entendido'}</button>`;
@@ -4345,6 +4420,8 @@ const RUEDAS = {
       { key:'prospeccion',  name:'Prospección',  color:'#c96bff', desc:'¿Cuánto tiempo estoy dedicando a la actualización de mi Lista de Contactos? ¿Agrego diariamente nuevos nombres? ¿Pido referidos?' },
       { key:'presentacion', name:'Presentación', color:'#ff6bcf', desc:'¿Cuándo fue la última vez que invité y cómo lo hice? Cuando presento el negocio, ¿lo hago escuchando a la otra persona, enfocándome en ella o sólo pensando en mi resultado? ¿Estoy llevando adelante las demostraciones pensando en la venta o en la concientización? ¿Estoy ofreciendo un sistema de purificación o sólo un purificador?' },
       { key:'patrocinio',   name:'Patrocinio',   color:'#ff6b9d', desc:'Después de haber presentado el negocio, ¿le hago un seguimiento al invitado? ¿Me aseguro de que pueda ver lo que lograría con esta actividad? ¿Me enfoco en la importancia de que se deje guiar para hacer el negocio? Luego de comercializar un producto, ¿me desentiendo del usuario o me aseguro de que el producto esté en funcionamiento? ¿Realizo la carga de garantía?' },
+      { key:'chequeo',      name:'Chequeo',      color:'#ff8f6b', desc:'¿Cómo vengo con mis metas? ¿Cumplo mis planificaciones? ¿Analizo por qué llegué o no a un resultado? ¿Lo hago solo o consulto a mi línea ascendente?' },
+   ,   color:'#ff6b9d', desc:'Después de haber presentado el negocio, ¿le hago un seguimiento al invitado? ¿Me aseguro de que pueda ver lo que lograría con esta actividad? ¿Me enfoco en la importancia de que se deje guiar para hacer el negocio? Luego de comercializar un producto, ¿me desentiendo del usuario o me aseguro de que el producto esté en funcionamiento? ¿Realizo la carga de garantía?' },
       { key:'chequeo',      name:'Chequeo',      color:'#ff8f6b', desc:'¿Cómo vengo con mis metas? ¿Cumplo mis planificaciones? ¿Analizo por qué llegué o no a un resultado? ¿Lo hago solo o consulto a mi línea ascendente?' },
       { key:'duplicacion',  name:'Duplicación',  color:'#ffb26b', desc:'¿Estoy duplicando en mis patrocinados lo que duplicaron en mí? ¿Me mantengo actualizado en lo referido al negocio? ¿Comparto con mi equipo mis experiencias que pudieran sumar a otro?' }
     ]
@@ -8493,8 +8570,244 @@ async function compartirConsolidado(e){
   try { if(navigator.share){ await navigator.share({ title:'Informe Consolidado', text: msg }); return; } } catch(e){}
   window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
 }
+const CULTURA_KEY='cultura_crecimiento_v1';
+const CULTURA_PB_META=15;
+function culturaWeekStart(date=new Date()){
+  const d=new Date(date.getFullYear(),date.getMonth(),date.getDate());
+  const day=d.getDay();
+  d.setDate(d.getDate()+(day===0?-6:1-day));
+  d.setHours(0,0,0,0);
+  return d;
+}
+function culturaWeekId(date){
+  const start=culturaWeekStart(date);
+  return `${start.getFullYear()}-${String(start.getMonth()+1).padStart(2,'0')}-${String(start.getDate()).padStart(2,'0')}`;
+}
+function culturaWeekLabel(date){
+  const start=culturaWeekStart(date);
+  const end=new Date(start);end.setDate(start.getDate()+6);
+  const short=['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'];
+  return `${start.getDate()} ${short[start.getMonth()]} – ${end.getDate()} ${short[end.getMonth()]}`;
+}
+function culturaDateFromId(id){
+  const p=String(id||'').split('-').map(Number);
+  if(p.length<3||!p[0]||!p[1]||!p[2]) return null;
+  return new Date(p[0],p[1]-1,p[2]);
+}
+function culturaFmt(n){return Number(n||0).toLocaleString('es-AR',{maximumFractionDigits:1})}
+function culturaPastWeeks(currentId){
+  const all=loadCulturaAll();
+  return Object.keys(all).filter(id=>{
+    if(id>=currentId) return false;
+    const w=all[id]||{};
+    return (Number(w.pb)||0)>0 || (Array.isArray(w.acciones)&&w.acciones.length);
+  }).sort((a,b)=>b.localeCompare(a));
+}
+function loadCulturaAll(){
+  try{const data=JSON.parse(localStorage.getItem(CULTURA_KEY)||'{}');return data&&typeof data==='object'?data:{}}catch(e){return {}}
+}
+function getCulturaWeek(id){
+  const all=loadCulturaAll();
+  const row=all[id]||{};
+  const invitados=Array.isArray(row.invitados)?row.invitados:[];
+  const maxSlot=invitados.reduce((m,p)=>Math.max(m,Number(p.slot)||0),-1);
+  return {
+    pb:Math.max(0,Number(row.pb)||0),
+    slots:Math.max(4,Number(row.slots)||4,maxSlot+1),
+    invitados,
+    acciones:Array.isArray(row.acciones)?row.acciones:[]
+  };
+}
+function saveCulturaWeek(id,value){
+  const all=loadCulturaAll();
+  const invitados=Array.isArray(value.invitados)?value.invitados:[];
+  const maxSlot=invitados.reduce((m,p)=>Math.max(m,Number(p.slot)||0),-1);
+  all[id]={
+    pb:Math.max(0,Number(value.pb)||0),
+    slots:Math.max(4,Number(value.slots)||4,maxSlot+1),
+    invitados,
+    acciones:Array.isArray(value.acciones)?value.acciones:[]
+  };
+  localStorage.setItem(CULTURA_KEY,JSON.stringify(all));
+}
+function culturaInvitadoNombre(p){return [p&&p.nombre,p&&p.apellido].filter(Boolean).join(' ').trim()}
+function culturaIniciales(p){
+  const n=(p&&p.nombre||'').trim(), a=(p&&p.apellido||'').trim();
+  const letters=((n[0]||'')+(a[0]||n[1]||'')).toUpperCase();
+  return letters||'👤';
+}
+function culturaEsc(value){return String(value==null?'':value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function renderCulturaCrecimiento(){
+  const wrap=document.getElementById('culturaWrap');
+  if(!wrap) return;
+  const openPast=[...wrap.querySelectorAll('details.cultura-past[open]')].map(el=>el.dataset.week);
+  const id=culturaWeekId();
+  const week=getCulturaWeek(id);
+  const pbDone=week.pb>=CULTURA_PB_META;
+  const accDone=week.invitados.length>0;
+  const doneCount=(pbDone?1:0)+(accDone?1:0);
+  const extra=Math.max(0,Math.round((week.pb-CULTURA_PB_META)*10)/10);
+  const pbPct=Math.max(0,Math.min(100,Math.round(week.pb/CULTURA_PB_META*100)));
+  const past=culturaPastWeeks(id);
+  const pastHtml=past.map(weekId=>{
+    const date=culturaDateFromId(weekId);
+    const data=getCulturaWeek(weekId);
+    const okPb=data.pb>=CULTURA_PB_META;
+    const extraPast=Math.max(0,Math.round((data.pb-CULTURA_PB_META)*10)/10);
+    const guests=data.invitados.length?data.invitados:data.acciones.map(a=>({nombre:a.text}));
+    return `<details class="cultura-past" data-week="${weekId}" ${openPast.includes(weekId)?'open':''}>
+      <summary>
+        <div>
+          <strong>${date?culturaWeekLabel(date):weekId}</strong>
+          <small>${culturaFmt(data.pb)} PB · ${guests.length} invitado${guests.length===1?'':'s'}${okPb?' · meta cumplida':''}</small>
+        </div>
+        <em>⌄</em>
+      </summary>
+      <div class="cultura-past-body">
+        <div class="cultura-past-kpi"><span>PB personales</span><b class="${okPb?'ok':''}">${culturaFmt(data.pb)} / ${CULTURA_PB_META}${extraPast?` · +${culturaFmt(extraPast)} extra`:''}</b></div>
+        <div class="cultura-past-kpi"><span>Invitados</span><b>${guests.length}</b></div>
+        ${guests.map(a=>`<div class="cultura-action"><span>${culturaEsc(culturaInvitadoNombre(a)||a.text||'Invitado')}</span><span></span></div>`).join('')}
+      </div>
+    </details>`;
+  }).join('');
+  wrap.innerHTML=`
+    <section class="cultura-card">
+      <div class="cultura-head">
+        <div>
+          <div class="cultura-kicker">Semanal</div>
+          <h3>Cultura de crecimiento</h3>
+          <p>Ventas personales y acciones de patrocinio todas las semanas.</p>
+        </div>
+        <div class="cultura-week"><small>Esta semana</small>${culturaWeekLabel()}</div>
+      </div>
+      <div class="cultura-tasks">
+        <article class="cultura-task ${pbDone?'done':''}">
+          <div class="cultura-task-top"><strong>💎 PB personales</strong><span class="${extra?'cultura-over':''}">${culturaFmt(week.pb)} · meta ${CULTURA_PB_META}${extra?` · +${culturaFmt(extra)}`:''}</span></div>
+          <div class="cultura-bar"><i style="width:${pbPct}%"></i></div>
+          <div class="cultura-step">
+            <button type="button" data-cultura-pb="-1" aria-label="Restar PB">−</button>
+            <input id="culturaPbInput" type="text" inputmode="decimal" value="${String(week.pb).replace('.',',')}" aria-label="PB personales de la semana">
+            <button type="button" data-cultura-pb="1" aria-label="Sumar PB">+</button>
+          </div>
+        </article>
+        <article class="cultura-task ${accDone?'done':''}">
+          <div class="cultura-task-top"><strong>🤝 Acciones de patrocinio</strong><span>${week.acciones.length}</span></div>
+          <div class="cultura-add">
+            <input id="culturaAccionInput" type="text" maxlength="80" placeholder="Ej: Llamé a una candidata">
+            <button type="button" id="culturaAddAccion">Sumar</button>
+          </div>
+          <div class="cultura-actions">
+            ${week.acciones.length?week.acciones.map(a=>`<div class="cultura-action"><span>${culturaEsc(a.text)}</span><button type="button" data-cultura-del="${culturaEsc(a.id)}" aria-label="Borrar">×</button></div>`).join(''):'<div class="cultura-action"><span>Todavía no cargaste acciones esta semana.</span><span></span></div>'}
+          </div>
+        </article>
+      </div>
+      <div class="cultura-foot">${week.pb>CULTURA_PB_META?'✓ Objetivo personal cumplido y superado.':doneCount===2?'✓ Semana completa: las dos tareas están hechas.':`${doneCount} de 2 tareas de la semana · los 15 PB son la meta, se pueden pasar`}</div>
+      ${past.length?`<div class="cultura-history-title">Semanas anteriores</div><div class="cultura-history">${pastHtml}</div>`:''}
+    </section>`;
+  const persistPb=raw=>{
+    const n=Math.max(0,Number(String(raw).replace(',','.'))||0);
+    saveCulturaWeek(id,{...getCulturaWeek(id),pb:Math.round(n*10)/10});
+    renderCulturaCrecimiento();
+  };
+  wrap.querySelectorAll('[data-cultura-pb]').forEach(btn=>btn.onclick=()=>{
+    const next=Math.max(0,Math.round((getCulturaWeek(id).pb+(+btn.dataset.culturaPb))*10)/10);
+    saveCulturaWeek(id,{...getCulturaWeek(id),pb:next});
+    try{haptic(10)}catch(e){}
+    renderCulturaCrecimiento();
+  });
+  const pbInput=document.getElementById('culturaPbInput');
+  if(pbInput){
+    pbInput.onchange=()=>persistPb(pbInput.value);
+    pbInput.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();pbInput.blur()}}
+  }
+  wrap.querySelectorAll('[data-cultura-slot]').forEach(btn=>btn.onclick=()=>openCulturaInvitado(id,+btn.dataset.culturaSlot));
+  const addSlot=document.getElementById('culturaAddSlot');
+  if(addSlot) addSlot.onclick=()=>{
+    const current=getCulturaWeek(id);
+    const nextSlot=current.slots;
+    current.slots=nextSlot+1;
+    saveCulturaWeek(id,current);
+    openCulturaInvitado(id,nextSlot);
+  };
+}
+function openCulturaInvitado(weekId,slot){
+  const week=getCulturaWeek(weekId);
+  const guest=week.invitados.find(p=>Number(p.slot)===slot)||{};
+  const editing=!!guest.id;
+  modal.open({
+    icon: editing ? '👤' : '＋',
+    iconBg: editing ? 'linear-gradient(135deg,#22b887,#3ad0a4)' : 'linear-gradient(135deg,#5b8def,#875fdd)',
+    title: editing ? 'Editar invitado' : 'Nuevo invitado',
+    sub: 'Se guarda también en tu agenda',
+    confirm: true,
+    okText: 'Guardar',
+    cancelText: 'Cancelar',
+    html: `<div class="cultura-inv-grid">
+      <label>Nombre<input id="invNombre" value="${culturaEsc(guest.nombre||'')}" autocomplete="given-name"></label>
+      <label>Apellido<input id="invApellido" value="${culturaEsc(guest.apellido||'')}" autocomplete="family-name"></label>
+      <label>Teléfono<input id="invTelefono" value="${culturaEsc(guest.telefono||'')}" inputmode="tel" autocomplete="tel"></label>
+      <label>Fecha de presentación<input id="invFecha" type="date" value="${culturaEsc(guest.fechaPresentacion||hoyLocal())}"></label>
+      ${editing?'<button type="button" id="invQuitar" class="btn-cancel" style="margin-top:4px">Quitar de esta semana</button>':''}
+    </div>`,
+    onConfirm: ()=>{
+      const nombre=capitalizarNombreSeg(document.getElementById('invNombre')?.value||'').trim();
+      const apellido=capitalizarNombreSeg(document.getElementById('invApellido')?.value||'').trim();
+      const telefono=(document.getElementById('invTelefono')?.value||'').trim();
+      const fecha=document.getElementById('invFecha')?.value||hoyLocal();
+      if(!nombre){ showToast('Escribí el nombre',1800); document.getElementById('invNombre')?.focus(); return false; }
+      const fullName=capitalizarNombreSeg([nombre,apellido].filter(Boolean).join(' '));
+      const agenda=cargarSeguimientos();
+      let agendaId=guest.agendaId;
+      const item={
+        id: agendaId || Date.now(),
+        nombre: fullName,
+        telefono,
+        interes: guest.interes || 'Negocio',
+        estado: guest.estado || 'No contactado',
+        fecha,
+        notas: guest.notas || 'Invitado desde Cultura de crecimiento'
+      };
+      const idx=agenda.findIndex(x=>x.id===item.id);
+      if(idx>=0){
+        agenda[idx]={...agenda[idx],nombre:fullName,telefono,fecha};
+      } else {
+        agenda.unshift(item);
+      }
+      agendaId=item.id;
+      guardarSeguimientos(agenda);
+      const current=getCulturaWeek(weekId);
+      const next={id:guest.id||`${Date.now()}`,slot,nombre,apellido,telefono,fechaPresentacion:fecha,agendaId,at:new Date().toISOString()};
+      const pos=current.invitados.findIndex(p=>Number(p.slot)===slot);
+      if(pos>=0) current.invitados[pos]=next; else current.invitados.push(next);
+      saveCulturaWeek(weekId,current);
+      try{haptic(16)}catch(e){}
+      showToast('Invitado guardado en la agenda ✅',1800);
+      renderCulturaCrecimiento();
+      try{renderSeguimiento()}catch(e){}
+    }
+  });
+  setTimeout(()=>{
+    const nombreInput=document.getElementById('invNombre');
+    if(nombreInput){
+      nombreInput.focus();
+      nombreInput.addEventListener('input',e=>{const pos=e.target.selectionStart;e.target.value=capitalizarNombreSeg(e.target.value);try{e.target.setSelectionRange(pos,pos)}catch(err){}});
+    }
+    const ape=document.getElementById('invApellido');
+    if(ape) ape.addEventListener('input',e=>{const pos=e.target.selectionStart;e.target.value=capitalizarNombreSeg(e.target.value);try{e.target.setSelectionRange(pos,pos)}catch(err){}});
+    const quitar=document.getElementById('invQuitar');
+    if(quitar) quitar.onclick=()=>{
+      const current=getCulturaWeek(weekId);
+      current.invitados=current.invitados.filter(p=>Number(p.slot)!==slot);
+      saveCulturaWeek(weekId,current);
+      modal.close();
+      renderCulturaCrecimiento();
+      showToast('Invitado quitado de la semana',1600);
+    };
+  },40);
+}
 function renderHomeCompleto(){
   renderDateContext();
+  renderCulturaCrecimiento();
   renderBdayBanner();
   renderScoreCompact();
   renderNextStep();
@@ -8599,7 +8912,7 @@ document.getElementById('btnExport').onclick = ()=>{
   const data = {};
   for(let i=0; i<localStorage.length; i++){
     const k = localStorage.key(i);
-    if(k.startsWith('rueda') || k.startsWith('siete_') || k.startsWith('presu_') || k==='welcomeSeen' || k==='themeDark' || k.startsWith('lastUpdate_') || k === 'equipoData'){
+    if(k.startsWith('rueda') || k.startsWith('siete_') || k.startsWith('presu_') || k==='welcomeSeen' || k==='themeDark' || k.startsWith('lastUpdate_') || k === 'equipoData' || k==='cultura_crecimiento_v1'){
       data[k] = localStorage.getItem(k);
     }
   }
@@ -9029,7 +9342,7 @@ function abrirBackupDesdeMenu(){
           const data = {};
           for(let i=0; i<localStorage.length; i++){
             const k = localStorage.key(i);
-            if(k.startsWith('rueda') || k.startsWith('siete_') || k.startsWith('presu_') || k==='welcomeSeen' || k==='themeDark' || k.startsWith('lastUpdate_') || k === 'equipoData' || k==='seguimientoPersonas' || k==='appi_activada' || k==='appi_device_id'){
+            if(k.startsWith('rueda') || k.startsWith('siete_') || k.startsWith('presu_') || k==='welcomeSeen' || k==='themeDark' || k.startsWith('lastUpdate_') || k === 'equipoData' || k==='seguimientoPersonas' || k==='appi_activada' || k==='appi_device_id' || k==='cultura_crecimiento_v1'){
               data[k] = localStorage.getItem(k);
             }
           }
@@ -10377,6 +10690,7 @@ body.dark .tools-item:hover{background:rgba(91,141,239,.22); color:#a8b8ff}
 .tools-menu.open .tools-item:nth-child(1){animation-delay:.05s}
 .tools-menu.open .tools-item:nth-child(2){animation-delay:.12s}
 .tools-menu.open .tools-item:nth-child(3){animation-delay:.18s}
+.tools-menu.open .tools-item:nth-child(4){animation-delay:.24s}
 @keyframes toolsIn{
   from{opacity:0; transform:translateX(26px) scale(.9)}
   to{opacity:1; transform:translateX(0) scale(1)}
@@ -12899,6 +13213,84 @@ async function initHistorico(){
 }
 window.openHistorico=openHistorico;
 window.__APPI_HISTORICO__={state:H,open:openHistorico,refresh:refreshData,parseFile:parseHistoricalFile,saveMonth:saveMonthPeriod,analyze:analyzePeriods,strategies:buildStrategies,dbGetAll};
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initHistorico);else initHistorico();
+setTimeout(initHistorico,1200);
+
+})();
+
+</script>
+
+</body>
+</html>
+ata,parseFile:parseHistoricalFile,saveMonth:saveMonthPeriod,analyze:analyzePeriods,strategies:buildStrategies,dbGetAll};
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initHistorico);else initHistorico();
+setTimeout(initHistorico,1200);
+
+})();
+
+</script>
+
+</body>
+</html>
+ntías. APPI excluye teléfonos, domicilios, correos y cumpleaños. El envío solo ocurre después de marcar la autorización en la pantalla Analizar.</div></div>
+  </div>`;
+  const save=$('histSaveCloud');if(save)save.onclick=()=>{const url=$('histCloudUrl').value.trim().replace(/\/$/,''),anonKey=$('histCloudKey').value.trim();saveCloudConfigValue({url,anonKey});toast(cloudReady()?'Configuración de nube guardada':'Revisá la URL y la clave pública',2600);render()};
+  const magic=$('histMagicLink');if(magic)magic.onclick=async()=>{magic.disabled=true;magic.textContent='Enviando…';try{await sendMagicLink($('histCloudEmail').value.trim());toast('Revisá tu correo y abrí el enlace de acceso',3800);magic.textContent='Enlace enviado'}catch(e){toast(e.message,3500);magic.disabled=false;magic.textContent='Enviar enlace de acceso'}};
+  if($('histSyncNow'))$('histSyncNow').onclick=()=>syncAll(true);if($('histPullCloud'))$('histPullCloud').onclick=async()=>{try{const n=await pullCloud();render();toast(n?`${n} cierres recuperados`:'La copia local ya está actualizada')}catch(e){toast(e.message,3200)}};if($('histLogout'))$('histLogout').onclick=()=>{setSession(null);render();toast('Sesión cerrada')};
+}
+
+function showHelp(){
+  const html=`<p>El Histórico guarda una fotografía independiente de cada cierre mensual.</p><div class="tip"><b>Necesitás tres archivos del mismo período:</b><br>1. Línea Descendente.<br>2. Garantías por Organización.<br>3. Ingresos.</div><p><b>Resumen y análisis:</b> reúne el Resumen Anual, los gráficos, las comparaciones y las estrategias.<br><b>Cargar y administrar:</b> permite cargar meses, descargar originales, respaldar o eliminar cierres.</p><p style="font-size:11px;color:#777887">Un archivo de Ingresos sin personas es válido y representa cero ingresos. El archivo único de Usuarios / Garantías continúa en su sección habitual.</p>`;
+  try{modal.open({icon:'📈',iconBg:'linear-gradient(135deg,#5b8def,#a06bff)',title:'Cómo usar el Histórico',sub:'Control mensual y anual',html})}catch(e){alert('Cargá los tres archivos de cada mes y compará los cierres dentro de Resumen y análisis.')}
+}
+async function openHistorico(){
+  showView('view-historico');const c=$('historicoContent');if(c)c.innerHTML='<div class="hist-loading"><span></span>Abriendo cierres mensuales…</div>';
+  try{await refreshData();H.ready=true;render()}catch(e){console.error('Abrir histórico',e);if(c)c.innerHTML=`<div class="hist-toast-inline error">No se pudo abrir el almacenamiento: ${esc(e.message)}</div>`}
+}
+async function initHistorico(){
+  if(H._initialized)return;H._initialized=true;
+  try{await openDB();handleAuthHash();await refreshData();H.ready=true}catch(e){console.error('Inicialización histórico',e)}
+  document.querySelectorAll('.hist-tabs [data-hist-tab]').forEach(b=>b.onclick=()=>openTab(b.dataset.histTab));
+  const back=$('btnBackHistorico');if(back)back.onclick=()=>{showView('view-home');try{renderHomeCompleto()}catch(e){}};
+  const help=$('btnHelpHistorico');if(help)help.onclick=showHelp;
+  for(const [type,cfg] of Object.entries(FILE_TYPES)){const input=$(cfg.input);if(input)input.onchange=e=>{const f=e.target.files&&e.target.files[0],target=H.fileTarget;if(f&&target&&target.type===type)handleFile(type,f,target.id);H.fileTarget=null;e.target.value=''}}
+  const restore=$('histRestoreInput');if(restore)restore.onchange=e=>restoreBackup(e.target.files&&e.target.files[0]);
+  const quick=$('histSyncQuick');if(quick)quick.onclick=()=>cloudReady()&&getSession()?syncAll(true):openTab('nube');
+  window.addEventListener('online',()=>{updateSyncStatus();if(cloudReady()&&getSession())syncAll(false)});window.addEventListener('offline',()=>updateSyncStatus());
+  updateSyncStatus();
+  if(window.__histOpenRequested) setTimeout(openHistorico,0);
+}
+window.openHistorico=openHistorico;
+window.__APPI_HISTORICO__={state:H,open:openHistorico,refresh:refreshData,parseFile:parseHistoricalFile,saveMonth:saveMonthPeriod,analyze:analyzePeriods,strategies:buildStrategies,dbGetAll};
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initHistorico);else initHistorico();
+setTimeout(initHistorico,1200);
+
+})();
+
+</script>
+
+</body>
+</html>
+ata,parseFile:parseHistoricalFile,saveMonth:saveMonthPeriod,analyze:analyzePeriods,strategies:buildStrategies,dbGetAll};
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initHistorico);else initHistorico();
+setTimeout(initHistorico,1200);
+
+})();
+
+</script>
+
+</body>
+</html>
+();
+setTimeout(initHistorico,1200);
+
+})();
+
+</script>
+
+</body>
+</html>
+ata,parseFile:parseHistoricalFile,saveMonth:saveMonthPeriod,analyze:analyzePeriods,strategies:buildStrategies,dbGetAll};
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initHistorico);else initHistorico();
 setTimeout(initHistorico,1200);
 

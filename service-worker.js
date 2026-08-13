@@ -1,7 +1,8 @@
-const CACHE_NAME = 'appi-v159-distribucion-verificable';
+const CACHE_NAME = 'appi-v162-invitados-patrocinio';
 const ARCHIVOS = [
   './',
   './index.html',
+  './auth-config.js',
   './historico.css',
   './historico.js',
   './manifest.json'
