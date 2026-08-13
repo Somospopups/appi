@@ -131,22 +131,22 @@ function histIsoDate(value){
 }
 function histDaysBetween(a,b){const da=new Date(a+'T12:00:00'),db=new Date(b+'T12:00:00');return !a||!b||isNaN(da)||isNaN(db)?null:Math.round((db-da)/86400000)}
 function parseIngresosRows(rows){
+  const monthMap={enero:1,febrero:2,marzo:3,abril:4,mayo:5,junio:6,julio:7,agosto:8,septiembre:9,setiembre:9,octubre:10,noviembre:11,diciembre:12};
+  let periodo='',totalReportado=0,totalDetectado=false,explicitamenteVacio=false;
+  for(const row of rows){const norm=normalize((row||[]).join(' ').replace(/\s+/g,' ').trim()),pm=norm.match(/(?:periodo consultado\s*)?(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|setiembre|octubre|noviembre|diciembre)\s*[ -]\s*(20\d{2})/),tm=norm.match(/total de\s+(\d+)\s+(?:incorporaciones|ingresos)/);if(pm)periodo=`${pm[2]}-${String(monthMap[pm[1]]).padStart(2,'0')}`;if(tm){totalDetectado=true;totalReportado=+tm[1];if(totalReportado===0)explicitamenteVacio=true}if(/(?:sin|no (?:se )?(?:encontraron|registraron)) (?:personas|ingresos|incorporaciones)/.test(norm))explicitamenteVacio=true}
   let headerRow=-1;
   for(let i=0;i<rows.length;i++){
     const cells=(rows[i]||[]).map(c=>normalize(c));
     if(cells.includes('dip')&&cells.filter(c=>c==='nombre').length>=2&&cells.some(c=>c.includes('fecha alta'))&&cells.some(c=>c.includes('patrocinante'))){headerRow=i;break}
   }
-  if(headerRow<0)throw new Error('No se encontró la tabla principal del archivo Ingresos.');
+  if(headerRow<0){if(explicitamenteVacio)return {ingresos:[],subtotales:[],totalReportado:0,periodo,headerRow:-1,empty:true};throw new Error('No se encontró la tabla principal del archivo Ingresos.');}
   const rawHeaders=rows[headerRow]||[],headers=rawHeaders.map(c=>normalize(c));
   const first=(terms,from=0)=>{for(let i=from;i<headers.length;i++)if(terms.some(t=>headers[i]===t||headers[i].includes(t)))return i;return -1};
   const idxDip=first(['dip']),idxName=first(['nombre'],idxDip+1),idxCat=first(['cat'],idxName+1),idxPhone=first(['telefono']),idxEmail=first(['e mail','email']),idxAlta=first(['fecha alta']),idxLast=first(['ult compra']),idxSponsor=first(['patrocinante']),idxSponsorName=first(['nombre'],idxSponsor+1),idxSponsorCat=first(['cat'],idxSponsorName+1);
-  const ingresos=[],subtotales=[];let totalReportado=0,periodo='';
-  const monthMap={enero:1,febrero:2,marzo:3,abril:4,mayo:5,junio:6,julio:7,agosto:8,septiembre:9,setiembre:9,octubre:10,noviembre:11,diciembre:12};
+  const ingresos=[],subtotales=[];
   for(const row of rows){
     const joined=row.join(' ').replace(/\s+/g,' ').trim(),norm=normalize(joined);
-    const pm=norm.match(/(?:periodo consultado\s*)?(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|setiembre|octubre|noviembre|diciembre)[ -](20\d{2})/);if(pm)periodo=`${pm[2]}-${String(monthMap[pm[1]]).padStart(2,'0')}`;
-    const tm=norm.match(/total de\s+(\d+)\s+incorporaciones/);if(tm)totalReportado=+tm[1];
-    if(/^sub total/.test(norm)||norm==='lider '+String(row[1]||'').trim()){const count=num(row[row.length-1]||row[1]);if(count)subtotales.push({label:joined.replace(/\s+\d+$/,'').trim(),count});if(norm.startsWith('lider')&&count)totalReportado=count;continue}
+    if(/^sub total/.test(norm)||norm==='lider '+String(row[1]||'').trim()){const count=num(row[row.length-1]||row[1]);if(count)subtotales.push({label:joined.replace(/\s+\d+$/,'').trim(),count});if(norm.startsWith('lider')&&count){totalReportado=count;totalDetectado=true;}continue}
     const dip=String(row[idxDip]||'').trim();if(!/^\d{1,2}-\d{5,}$/.test(dip))continue;
     const alta=histIsoDate(row[idxAlta]),ultimaCompra=histIsoDate(row[idxLast]),dias=histDaysBetween(alta,ultimaCompra),lastValue=row.length?row[row.length-1]:'';
     ingresos.push({
@@ -154,9 +154,8 @@ function parseIngresosRows(rows){
       patrocinanteDip:String(row[idxSponsor]||'').trim(),patrocinanteNombre:String(row[idxSponsorName]||'').trim(),patrocinanteCat:String(row[idxSponsorCat]||'').trim().toUpperCase(),capacitacion:num(lastValue),diasHastaCompra:dias,compraPosterior:dias!==null&&dias>0,contactoCompleto:!!String(row[idxPhone]||'').trim()&&!!String(row[idxEmail]||'').trim()
     });
   }
-  if(!ingresos.length)throw new Error('No se encontraron personas dentro del archivo Ingresos.');
-  if(totalReportado&&totalReportado!==ingresos.length)throw new Error(`El archivo informa ${totalReportado} ingresos, pero se detectaron ${ingresos.length}.`);
-  return {ingresos,subtotales,totalReportado:totalReportado||ingresos.length,periodo,headerRow};
+  if(totalDetectado&&totalReportado!==ingresos.length)throw new Error(`El archivo informa ${totalReportado} ingresos, pero se detectaron ${ingresos.length}.`);
+  return {ingresos,subtotales,totalReportado:totalReportado||ingresos.length,periodo,headerRow,empty:ingresos.length===0};
 }
 async function parseHistoricalFile(type,file){
   const sheets=await readSheets(file);
@@ -172,7 +171,7 @@ async function parseHistoricalFile(type,file){
   }
   if(type==='ingresos'){
     const result=parseIngresosRows(sheets[0].rows);
-    return {result,detail:`${result.ingresos.length} ingresos · ${result.periodo||'período detectado'}`};
+    return {result,detail:result.ingresos.length?`${result.ingresos.length} ingresos · ${result.periodo||'período detectado'}`:`No hubo ingresos · ${result.periodo||'período detectado'}`};
   }
   throw new Error('Tipo de archivo desconocido.');
 }
@@ -311,7 +310,7 @@ function renderDashboard(c){
       ${histAttention('#5b8def','↗',`${branchShare}% del PB está en la rama principal`,'Ver la rama y sus integrantes','topBranch')}
     </div>
     <div class="hist-two-cols">
-      <div class="hist-card"><div class="hist-card-head"><div><h3>Ingresos por patrocinante</h3><p>Tocá un nombre para ver sus ingresos</p></div><span class="hist-badge">${s.incomeCount} total</span></div><div class="hist-sponsor-list">${(s.incomeSponsors||[]).map(sp=>`<button data-hist-sponsor="${esc(sp.key)}"><strong>${esc(sp.name)}</strong><small>${esc(sp.dip)} · ${esc(sp.cat||'Sin categoría')}</small><b>${sp.count} ›</b></button>`).join('')||'<div class="hist-empty">Sin ingresos</div>'}</div></div>
+      <div class="hist-card"><div class="hist-card-head"><div><h3>Ingresos por patrocinante</h3><p>Tocá un nombre para ver sus ingresos</p></div><span class="hist-badge">${s.incomeCount} total</span></div><div class="hist-sponsor-list">${(s.incomeSponsors||[]).map(sp=>`<button data-hist-sponsor="${esc(sp.key)}"><strong>${esc(sp.name)}</strong><small>${esc(sp.dip)} · ${esc(sp.cat||'Sin categoría')}</small><b>${sp.count} ›</b></button>`).join('')||'<div class="hist-empty">No hubo ingresos</div>'}</div></div>
       <div class="hist-card"><div class="hist-card-head"><div><h3>Lectura rápida de Ingresos</h3><p>Información calculada del archivo real</p></div></div><div class="hist-mini-stats"><button data-hist-drill="incomeNoPurchase"><b>${s.incomeNoPurchase}</b><span>Sin compra posterior</span></button><button data-hist-drill="incomeTraining"><b>${s.incomeTraining}</b><span>En capacitación</span></button><button data-hist-drill="incomeIncomplete"><b>${s.incomeContactIncomplete}</b><span>Contacto incompleto</span></button><button data-hist-drill="incomes"><b>${s.incomeMatched}/${s.incomeCount}</b><span>Cruzados con LD</span></button></div></div>
     </div>
     ${renderAnnualSummary(latest.year)}
@@ -353,7 +352,7 @@ function openHistDrill(type,period,previous,topBranch){
   else if(type==='inactive2'){title='Inactividad consecutiva';const prev=new Map((previous&&previous.people||[]).map(p=>[p.matchKey,p]));people=people.filter(p=>p.pnAct===0&&prev.get(p.matchKey)&&prev.get(p.matchKey).pnAct===0);sub='Cero PB en los dos últimos cierres';html=people.map(p=>histPersonRow(p,'2 meses')).join('')}
   else if(type==='highPending'){title='Pendientes prioritarios';people=people.filter(p=>num(p.garantias&&p.garantias.pendientes)>=10).sort((a,b)=>num(b.garantias.pendientes)-num(a.garantias.pendientes));html=people.map(p=>histPersonRow(p,`${fmt(p.garantias.pendientes)} pend.`)).join('')}
   else if(type==='topBranch'){title=topBranch?`Rama de ${topBranch.name}`:'Rama principal';people=people.filter(p=>(p.branchKey||p.key)===(topBranch&&topBranch.key));sub=topBranch?`${fmt(topBranch.pb)} PB · ${topBranch.people} personas`:sub;html=people.map(p=>histPersonRow(p)).join('')}
-  else {if(type==='incomeNoPurchase'){title='Ingresos sin compra posterior';incomes=incomes.filter(i=>!i.compraPosterior)}else if(type==='incomeTraining'){title='Ingresos en capacitación';incomes=incomes.filter(i=>i.capacitacion>0)}else if(type==='incomeIncomplete'){title='Contactos incompletos';incomes=incomes.filter(i=>!i.contactoCompleto)}else title='Ingresos del mes';sub=`${incomes.length} personas del archivo Ingresos`;html=incomes.map(histIncomeRow).join('')}
+  else {if(type==='incomeNoPurchase'){title='Ingresos sin compra posterior';incomes=incomes.filter(i=>!i.compraPosterior)}else if(type==='incomeTraining'){title='Ingresos en capacitación';incomes=incomes.filter(i=>i.capacitacion>0)}else if(type==='incomeIncomplete'){title='Contactos incompletos';incomes=incomes.filter(i=>!i.contactoCompleto)}else title='Ingresos del mes';sub=incomes.length?`${incomes.length} personas del archivo Ingresos`:'No hubo ingresos en este cierre';html=incomes.map(histIncomeRow).join('')||'<div class="hist-empty">No hubo ingresos.</div>'}
   if(!html)html='<div class="hist-empty">No hay personas en esta condición.</div>';openHistDrawer(title,sub,`<div class="hist-drill-note">Esta lista contiene exactamente los datos que originaron el indicador.</div><div class="hist-data-list">${html}</div>`);bindHistRows(period)
 }
 function openHistSponsor(key,period){const sponsor=(period.summary.incomeSponsors||[]).find(s=>s.key===key),items=(period.incomes||[]).filter(i=>(i.patrocinanteDip||i.patrocinanteNombre||'Sin patrocinante')===key);openHistDrawer(sponsor?sponsor.name:'Patrocinante',`${items.length} ingresos · ${sponsor&&sponsor.dip||''}`,`<div class="hist-data-list">${items.map(histIncomeRow).join('')}</div>`);bindHistRows(period)}
@@ -386,8 +385,8 @@ function monthUploadCard(year,month){
     const status=draft&&draft.status[type],parsed=draft&&draft.parsed[type],file=draft&&draft.files[type],saved=!!(existing&&existing.filesMeta&&existing.filesMeta.some(f=>f.type===type));
     if(status==='loading')return {kind:'loading',label:'Procesando…',detail:file&&file.name||'Leyendo archivo'};
     if(status&&status.error)return {kind:'error',label:'Reintentar',detail:status.error};
-    if(parsed)return {kind:'ready',label:'✓ Archivo correcto',detail:file&&file.name||'Validado'};
-    if(saved){const meta=existing.filesMeta.find(f=>f.type===type);return {kind:'saved',label:'✓ Guardado',detail:meta&&meta.name||'Archivo del cierre'}};
+    if(parsed){const noIncome=type==='ingresos'&&parsed.result&&parsed.result.ingresos.length===0;return {kind:'ready',label:noIncome?'✓ Recibido · No hubo ingresos':'✓ Archivo correcto',detail:file&&file.name||'Validado'}}
+    if(saved){const meta=existing.filesMeta.find(f=>f.type===type),noIncome=type==='ingresos'&&existing.summary&&existing.summary.incomeCount===0;return {kind:'saved',label:noIncome?'✓ Recibido · No hubo ingresos':'✓ Guardado',detail:meta&&meta.name||'Archivo del cierre'}};
     return {kind:'empty',label:'Cargar archivo',detail:'Excel o CSV'};
   };
   const states=Object.fromEntries(Object.keys(FILE_TYPES).map(t=>[t,fileState(t)])),count=Object.values(states).filter(x=>x.kind==='ready'||x.kind==='saved').length;
@@ -405,7 +404,7 @@ function monthFileSlot(id,type,cfg,state){
 function yearOptions(selected){const y=new Date().getFullYear(),values=new Set([selected]);for(let n=y+2;n>=y-12;n--)values.add(n);return [...values].sort((a,b)=>b-a).map(n=>`<option value="${n}" ${n===selected?'selected':''}>${n}</option>`).join('')}
 async function handleFile(type,file,id){
   if(!file||!id)return;const [year,mo]=id.split('-').map(Number),draft=getMonthDraft(year,mo-1);draft.files[type]=file;draft.status[type]='loading';draft.changed=true;delete draft.parsed[type];render();
-  try{draft.parsed[type]=await parseHistoricalFile(type,file);draft.status[type]='ready';toast(`✓ ${FILE_TYPES[type].label} · ${MONTHS_H[draft.month]}`,1800)}catch(e){console.error('Histórico archivo',type,e);draft.status[type]={error:e.message};delete draft.parsed[type];toast(e.message,3200)}render();
+  try{draft.parsed[type]=await parseHistoricalFile(type,file);draft.status[type]='ready';const emptyIncome=type==='ingresos'&&draft.parsed[type].result.ingresos.length===0;toast(emptyIncome?`✓ Ingresos recibido · No hubo ingresos`:`✓ ${FILE_TYPES[type].label} · ${MONTHS_H[draft.month]}`,emptyIncome?2600:1800)}catch(e){console.error('Histórico archivo',type,e);draft.status[type]={error:e.message};delete draft.parsed[type];toast(e.message,3200)}render();
 }
 async function useCurrentData(){
   const currentTeam=(()=>{try{return JSON.parse(localStorage.getItem('equipoData')||'null')}catch(e){return null}})();
