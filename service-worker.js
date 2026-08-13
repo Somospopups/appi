@@ -1,32 +1,28 @@
-const CACHE_NAME = 'appi-v164-fix-arranque';
+const CACHE_NAME = 'appi-v165-cultura-ok';
 const ARCHIVOS = [
   './',
   './index.html',
-  './auth-config.js',
   './historico.css',
   './historico.js',
   './manifest.json'
 ];
 
-// Instalar: guardar archivos en caché
 self.addEventListener('install', (evt) => {
   evt.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(ARCHIVOS))
+    caches.open(CACHE_NAME).then((cache) =>
+      Promise.all(ARCHIVOS.map((u) => cache.add(u).catch(() => null)))
+    ).then(() => self.skipWaiting())
   );
-  self.skipWaiting();
 });
 
-// Activar: limpiar cachés viejos
 self.addEventListener('activate', (evt) => {
   evt.waitUntil(
     caches.keys().then((keys) =>
       Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
-    )
+    ).then(() => self.clients.claim())
   );
-  self.clients.claim();
 });
 
-// Fetch: servir desde caché si no hay internet
 self.addEventListener('fetch', (evt) => {
   if (evt.request.method !== 'GET') return;
   evt.respondWith(

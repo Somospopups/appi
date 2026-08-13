@@ -3340,7 +3340,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
     <button class="ds-btn" data-ds="view-planning" onclick="showView('view-planning'); renderPlanningTools();"><span>🗓️</span> Planificación</button>
   </nav>
-  <div class="ds-foot">APPI · v164 · Fix arranque</div>
+  <div class="ds-foot">APPI · v165 · Cultura de crecimiento</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -3397,6 +3397,23 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     </div>
   </div>
 </div>
+<script>
+(function(){
+  try{
+    var el=document.getElementById('deviceIdDisplay');
+    if(el){
+      var id=localStorage.getItem('appi_device_id');
+      if(!id){
+        var t=Date.now().toString(36).toUpperCase();
+        var r=Math.random().toString(36).substring(2,8).toUpperCase();
+        id=(t.substring(0,4)+r.substring(0,2)).substring(0,4)+'-'+(r.substring(2,6)+t.substring(4,6)).substring(0,4)+'-'+(t.substring(6)+r).substring(0,4).padEnd(4,'X');
+        localStorage.setItem('appi_device_id', id);
+      }
+      el.textContent=id;
+    }
+  }catch(e){}
+})();
+</script>
 <div class="toast" id="toast"><span class="check-ic">✓</span><span id="toastTxt">Guardado</span></div>
 
 <div class="app">
@@ -4452,11 +4469,11 @@ function showView(id){
   });
   const hideTabsOn = ['view-home','view-siete','view-siete-detail','view-presu','view-presu-hist','view-equipo','view-historico','view-seguimiento','view-planning','view-grabadora','view-notas','view-usuarios'];
   document.getElementById('tabs').style.display = hideTabsOn.includes(id) ? 'none' : 'flex';
-  if(id==='view-eval')    renderAreas();
-  if(id==='view-wheel')   renderWheel();
-  if(id==='view-home')    renderHomeCompleto();
-  if(id==='view-planning') renderPlanningTools();
-  if(id==='view-seguimiento') renderSeguimiento();
+  if(id==='view-eval')    try{ renderAreas(); }catch(e){ console.error(e); }
+  if(id==='view-wheel')   try{ renderWheel(); }catch(e){ console.error(e); }
+  if(id==='view-home')    try{ if(typeof renderHomeCompleto==='function') renderHomeCompleto(); }catch(e){ console.error(e); }
+  if(id==='view-planning') try{ renderPlanningTools(); }catch(e){ console.error(e); }
+  if(id==='view-seguimiento') try{ renderSeguimiento(); }catch(e){ console.error(e); }
   document.body.classList.toggle('evaluar-hint', id === 'view-wheel');
   window.scrollTo({top:0});
 }
@@ -8598,7 +8615,7 @@ function culturaPastWeeks(currentId){
   return Object.keys(all).filter(id=>{
     if(id>=currentId) return false;
     const w=all[id]||{};
-    return (Number(w.pb)||0)>0 || (Array.isArray(w.acciones)&&w.acciones.length);
+    return (Number(w.pb)||0)>0 || (Array.isArray(w.invitados)&&w.invitados.length) || (Array.isArray(w.acciones)&&w.acciones.length);
   }).sort((a,b)=>b.localeCompare(a));
 }
 function loadCulturaAll(){
@@ -8689,13 +8706,13 @@ function renderCulturaCrecimiento(){
           </div>
         </article>
         <article class="cultura-task ${accDone?'done':''}">
-          <div class="cultura-task-top"><strong>🤝 Acciones de patrocinio</strong><span>${week.acciones.length}</span></div>
-          <div class="cultura-add">
-            <input id="culturaAccionInput" type="text" maxlength="80" placeholder="Ej: Llamé a una candidata">
-            <button type="button" id="culturaAddAccion">Sumar</button>
-          </div>
-          <div class="cultura-actions">
-            ${week.acciones.length?week.acciones.map(a=>`<div class="cultura-action"><span>${culturaEsc(a.text)}</span><button type="button" data-cultura-del="${culturaEsc(a.id)}" aria-label="Borrar">×</button></div>`).join(''):'<div class="cultura-action"><span>Todavía no cargaste acciones esta semana.</span><span></span></div>'}
+          <div class="cultura-task-top"><strong>🤝 Acciones de patrocinio</strong><span>${week.invitados.length} invitado${week.invitados.length===1?'':'s'}</span></div>
+          <div class="cultura-pills">
+            ${Array.from({length:week.slots},(_,slot)=>{
+              const guest=week.invitados.find(p=>Number(p.slot)===slot);
+              return `<button type="button" class="cultura-pill ${guest?'filled':''}" data-cultura-slot="${slot}" aria-label="${guest?culturaEsc(culturaInvitadoNombre(guest)):'Cargar invitado'}">${guest?culturaEsc(culturaIniciales(guest)):'👤'}</button>`;
+            }).join('')}
+            <button type="button" class="cultura-pill plus" id="culturaAddSlot" aria-label="Agregar invitado">+</button>
           </div>
         </article>
       </div>
@@ -8804,12 +8821,12 @@ function openCulturaInvitado(weekId,slot){
   },40);
 }
 function renderHomeCompleto(){
-  renderDateContext();
-  renderCulturaCrecimiento();
-  renderBdayBanner();
-  renderScoreCompact();
-  renderNextStep();
-  renderToolsList();
+  try{ renderDateContext(); }catch(e){ console.error(e); }
+  try{ renderCulturaCrecimiento(); }catch(e){ console.error(e); }
+  try{ renderBdayBanner(); }catch(e){ console.error(e); }
+  try{ renderScoreCompact(); }catch(e){ console.error(e); }
+  try{ renderNextStep(); }catch(e){ console.error(e); }
+  try{ renderToolsList(); }catch(e){ console.error(e); }
 }
 
 
