@@ -1330,6 +1330,15 @@ body.dark .hist-section-title h3,body.dark .hist-attention strong,body.dark .his
   .stats-grid {
     display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;
   }
+  .eq-garantias{width:100%}
+  .eq-garantias-kpis{
+    display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;
+  }
+  .eq-garantias-kpis .stat-card:last-child{grid-column:1/-1}
+  @media (min-width:768px){
+    .eq-garantias-kpis{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .eq-garantias-kpis .stat-card:last-child{grid-column:auto}
+  }
   .stat-card {
     padding: 14px 12px; border-radius: 16px; text-align: center;
     background: rgba(255,255,255,0.7);
@@ -3426,7 +3435,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
     <button class="ds-btn" data-ds="view-planning" onclick="showView('view-planning'); renderPlanningTools();"><span>🗓️</span> Planificación</button>
   </nav>
-  <div class="ds-foot">APPI · v180 · Cultura de crecimiento</div>
+  <div class="ds-foot">APPI · v181 · Cultura de crecimiento</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -6101,22 +6110,20 @@ ${(function(){
         .sort((a,b)=> (b.garantias.pendientes||0) - (a.garantias.pendientes||0))
         .slice(0, 5);
       return `
-        <div class="top-list" style="background:linear-gradient(135deg,rgba(245,179,1,0.10),rgba(255,143,107,0.06));border:1px solid rgba(245,179,1,0.25)">
+        <div class="top-list eq-garantias" style="background:linear-gradient(135deg,rgba(245,179,1,0.10),rgba(255,143,107,0.06));border:1px solid rgba(245,179,1,0.25)">
           <h4 style="color:#a3670b">Garantías del Equipo</h4>
-          <div class="stats-grid" style="margin-bottom:14px">
+          <div class="eq-garantias-kpis">
             <div class="stat-card">
-  <span class="st-emo" style="font-size:10px;font-weight:900;letter-spacing:.4px">VEND.</span>
-  <div class="st-val" style="color:#a3670b">${formatPB(totalPres)}</div>
-  <div class="st-lbl">Presentadas</div>
-</div>
+              <span class="st-emo" style="font-size:10px;font-weight:900;letter-spacing:.4px">VEND.</span>
+              <div class="st-val" style="color:#a3670b">${formatPB(totalPres)}</div>
+              <div class="st-lbl">Presentadas</div>
+            </div>
             <div class="stat-card">
               <span class="st-emo" style="font-size:10px;font-weight:900;letter-spacing:.4px">VENC.</span>
               <div class="st-val" style="color:#d9534f">${formatPB(totalVenc)}</div>
               <div class="st-lbl">Vencidas (${pctVenc}%)</div>
             </div>
-          </div>
-          <div class="stats-grid" style="margin-bottom:14px">
-            <div class="stat-card" style="grid-column:span 2">
+            <div class="stat-card">
               <span class="st-emo" style="font-size:10px;font-weight:900;letter-spacing:.4px">PEND.</span>
               <div class="st-val" style="color:#f5b301">${formatPB(totalPend)}</div>
               <div class="st-lbl">Pendientes por presentar</div>
@@ -9752,10 +9759,10 @@ function abrirBackupDesdeMenu(){
       if (evt.data && evt.data.type === 'appi-reload') location.reload();
     });
     window.addEventListener('load', () => {
-      const bustKey = 'appi_cache_v180';
+      const bustKey = 'appi_cache_v181';
       const already = localStorage.getItem(bustKey) === '1';
       const finish = () => {
-        navigator.serviceWorker.register('./service-worker.js?v=180').catch(() => {});
+        navigator.serviceWorker.register('./service-worker.js?v=181').catch(() => {});
       };
       if (already) { finish(); return; }
       localStorage.setItem(bustKey, '1');
@@ -9763,7 +9770,7 @@ function abrirBackupDesdeMenu(){
         caches.keys().then((keys) => Promise.all(keys.map((k) => caches.delete(k)))).catch(() => {}),
         navigator.serviceWorker.getRegistrations().then((rs) => Promise.all(rs.map((r) => r.unregister()))).catch(() => {})
       ]).then(() => {
-        location.replace(location.pathname + '?v=180' + location.hash);
+        location.replace(location.pathname + '?v=181' + location.hash);
       }).catch(finish);
     });
   }
@@ -10043,10 +10050,13 @@ body.dark .presu-select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:
   .home-tool-grid .quick-tool-card{min-height:150px}
   .stats-grid{grid-template-columns:repeat(4,1fr); gap:12px}
   .home-hero-card, .home-month-card, .next-step-card{max-width:none}
+  .eq-garantias,.eq-garantias-kpis{width:100%;max-width:none}
+  .eq-garantias-kpis{grid-template-columns:repeat(3,minmax(0,1fr)) !important;gap:14px}
+  .eq-garantias-kpis .stat-card:last-child{grid-column:auto}
 
   /* Equipo: lista en 2 columnas */
   #personListWrap{display:grid; grid-template-columns:1fr 1fr; gap:8px; align-items:start}
-  #equipoContent .top-list, #equipoContent .cat-chart{max-width:none}
+  #equipoContent .top-list, #equipoContent .cat-chart, #equipoContent .eq-garantias{max-width:none}
 
   /* Seguimiento: tarjetas en 2 columnas */
   #seguimientoList{display:grid; grid-template-columns:1fr 1fr; gap:10px; align-items:start}
@@ -10071,6 +10081,8 @@ body.dark .presu-select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:
   .app{max-width:900px; padding-left:28px; padding-right:28px}
   .home-tool-grid{grid-template-columns:repeat(3, minmax(0,1fr))}
   .stats-grid{grid-template-columns:repeat(4,1fr)}
+  .eq-garantias-kpis{grid-template-columns:repeat(3,minmax(0,1fr)) !important}
+  .eq-garantias-kpis .stat-card:last-child{grid-column:auto}
 }
 /* Botón flotante de giro: visible en celular/tablet (fuera del modo escritorio) */
 @media (max-width: 1023px){

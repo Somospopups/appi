@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v180-nombre-audio';
+const CACHE_NAME = 'appi-v181-garantias-ancho';
 const ARCHIVOS = [
   './',
   './index.html',
