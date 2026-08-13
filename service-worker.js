@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v157-historico-unificado';
+const CACHE_NAME = 'appi-v158-historico-plegable';
 const ARCHIVOS = [
   './',
   './index.html',
