@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v173-hero-chico';
+const CACHE_NAME = 'appi-v174-botones-libres';
 const ARCHIVOS = [
   './',
   './index.html',
