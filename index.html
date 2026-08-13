@@ -3340,7 +3340,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
     <button class="ds-btn" data-ds="view-planning" onclick="showView('view-planning'); renderPlanningTools();"><span>🗓️</span> Planificación</button>
   </nav>
-  <div class="ds-foot">APPI · v166 · Cultura de crecimiento</div>
+  <div class="ds-foot">APPI · v167 · Cultura de crecimiento</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -9549,10 +9549,23 @@ function abrirBackupDesdeMenu(){
   });
 
   if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.addEventListener('message', (evt) => {
+      if (evt.data && evt.data.type === 'appi-reload') location.reload();
+    });
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./service-worker.js')
-        .then(reg => console.log('✅ Service Worker registrado'))
-        .catch(err => console.log('❌ Error SW:', err));
+      const bustKey = 'appi_cache_v167';
+      const already = localStorage.getItem(bustKey) === '1';
+      const finish = () => {
+        navigator.serviceWorker.register('./service-worker.js?v=167').catch(() => {});
+      };
+      if (already) { finish(); return; }
+      localStorage.setItem(bustKey, '1');
+      Promise.all([
+        caches.keys().then((keys) => Promise.all(keys.map((k) => caches.delete(k)))).catch(() => {}),
+        navigator.serviceWorker.getRegistrations().then((rs) => Promise.all(rs.map((r) => r.unregister()))).catch(() => {})
+      ]).then(() => {
+        location.replace(location.pathname + '?v=167' + location.hash);
+      }).catch(finish);
     });
   }
 </script>
@@ -13235,5 +13248,26 @@ setTimeout(initHistorico,1200);
 
 </script>
 
+<script>
+(function(){
+  function limpiarRestos(){
+    try{
+      const kids = Array.prototype.slice.call(document.body.childNodes);
+      kids.forEach(function(n){
+        if(n.nodeType === 3){
+          const t = n.textContent || '';
+          if(/initHistorico|parseHistoricalFile|<\/script>|<\/html>/.test(t)){
+            n.parentNode && n.parentNode.removeChild(n);
+          }
+        }
+      });
+    }catch(e){}
+  }
+  limpiarRestos();
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', limpiarRestos);
+  setTimeout(limpiarRestos, 0);
+  setTimeout(limpiarRestos, 400);
+})();
+</script>
 </body>
 </html>
