@@ -3453,7 +3453,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
     <button class="ds-btn" data-ds="view-planning" onclick="showView('view-planning'); renderPlanningTools();"><span>🗓️</span> Planificación</button>
   </nav>
-  <div class="ds-foot">APPI · v184 · Cultura de crecimiento</div>
+  <div class="ds-foot">APPI · v185 · Cultura de crecimiento</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4076,6 +4076,14 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
 ============================================================ */
 function haptic(ms = 10){
   try { if(navigator.vibrate) navigator.vibrate(ms); } catch(e){}
+}
+function nombreDePila(nombre){
+  const raw=String(nombre||'').trim();
+  if(!raw) return '';
+  const parte=raw.includes(',')?raw.split(',')[1].trim():raw;
+  const first=(parte.split(/\s+/)[0]||raw).replace(/[.,;:]+$/,'');
+  if(!first) return raw;
+  return first.charAt(0).toUpperCase()+first.slice(1).toLowerCase();
 }
 
 let toastTimer = null;
@@ -6199,7 +6207,7 @@ ${(function(){
       e.stopPropagation();
       const tel = b.dataset.tel.replace(/\D/g,'');
       const nom = b.dataset.nom;
-      const msg = `¡Feliz cumpleaños ${nom}! 🎂🎉 Te deseo un año maravilloso.`;
+      const msg = `¡Feliz cumpleaños ${nombreDePila(nom)||nom}! 🎂🎉 Te deseo un año maravilloso.`;
       window.open(`https://wa.me/${tel}?text=${encodeURIComponent(msg)}`, '_blank');
     };
   });
@@ -6213,7 +6221,7 @@ ${(function(){
       if(!persona) return;
       const tels = parseTelefonos(persona.tel);
       const nom = b.dataset.nom;
-      const msg = `¡Feliz cumpleaños ${nom}! 🎂🎉 Te deseo un año maravilloso.`;
+      const msg = `¡Feliz cumpleaños ${nombreDePila(nom)||nom}! 🎂🎉 Te deseo un año maravilloso.`;
       
       // Mostrar modal para elegir qué teléfono usar
       const html = `
@@ -6570,7 +6578,7 @@ function bonusAfterContact(){
 }
 function abrirWaNumero(digits){
   const data = window._telPicker;
-  if(data && data.nombre) window.open('https://wa.me/'+digits+'?text='+encodeURIComponent('Hola '+data.nombre+', ¿cómo estás?'),'_blank');
+  if(data && data.nombre) window.open('https://wa.me/'+digits+'?text='+encodeURIComponent('Hola '+(nombreDePila(data.nombre)||data.nombre)+', ¿cómo estás?'),'_blank');
   else window.open('https://wa.me/'+digits,'_blank');
   modal.close();
   bonusAfterContact();
@@ -6638,7 +6646,7 @@ function openPersonaModal(p){
   if(telefonos.length === 1){
     const t = telefonos[0];
     botonesTel = `
-      <button class="pm-wa" onclick="window.open('https://wa.me/${t.digits}?text='+encodeURIComponent('Hola ${escapeXml(p.nombre)}, ¿cómo estás?'),'_blank')">💬 Contactar por WhatsApp</button>
+      <button class="pm-wa" onclick="window.open('https://wa.me/${t.digits}?text='+encodeURIComponent('Hola ${escapeXml(nombreDePila(p.nombre)||p.nombre)}, ¿cómo estás?'),'_blank')">💬 Contactar por WhatsApp</button>
       <button class="pm-call" onclick="window.open('tel:${t.digits}','_self')">📞 Llamar al contacto</button>
     `;
   } else if(telefonos.length > 1){
@@ -8282,11 +8290,7 @@ const BONUS_CAT_OK={D:1,DC:1,CE:1,L:1,LE:1,EJ:1,E:1};
 const BONUS_PB_SPONSOR=12;
 const BONUS_PB_INVITADO=9;
 function bonusPrimerNombre(p){
-  const raw=String(p&&p.nombre||'').trim();
-  if(!raw) return 'Esta persona';
-  const parte=raw.includes(',')?raw.split(',')[1].trim():raw;
-  const first=(parte.split(/\s+/)[0]||raw);
-  return first.charAt(0).toUpperCase()+first.slice(1).toLowerCase();
+  return nombreDePila(p&&p.nombre)||'Esta persona';
 }
 function bonusEsTitular(p){
   if(!p||!equipoData) return false;
@@ -8475,7 +8479,7 @@ function openSeguimiento(){ showView('view-seguimiento'); }
 function capitalizarNombreSeg(valor){ return String(valor||'').toLocaleLowerCase('es-AR').replace(/(^|[\s'-])(\p{L})/gu,(m,sep,letra)=>sep+letra.toLocaleUpperCase('es-AR')).replace(/\s{2,}/g,' '); }
 function limpiarFormularioSeg(){ ['segNombre','segTelefono','segFecha','segNotas'].forEach(id=>document.getElementById(id).value=''); document.getElementById('segInteres').value='Producto'; document.getElementById('segEstado').value='No contactado'; seguimientoEditId=null; }
 function segDigits(phone){return String(phone||'').replace(/\D/g,'')}
-function segContactActions(p){const d=segDigits(p.telefono);if(!d)return '';const msg=encodeURIComponent(`Hola ${p.nombre}, ¿cómo estás?`);return `<div class="seg-contact-actions"><a class="wa-msg" title="Contactar por WhatsApp" aria-label="Contactar por WhatsApp" href="https://wa.me/${d}?text=${msg}" target="_blank" rel="noopener">💬 Contactar por WhatsApp</a><a class="phone-call" title="Llamar al contacto" aria-label="Llamar al contacto" href="tel:${d}">📞 Llamar por teléfono</a></div>`}
+function segContactActions(p){const d=segDigits(p.telefono);if(!d)return '';const msg=encodeURIComponent(`Hola ${nombreDePila(p.nombre)||p.nombre}, ¿cómo estás?`);return `<div class="seg-contact-actions"><a class="wa-msg" title="Contactar por WhatsApp" aria-label="Contactar por WhatsApp" href="https://wa.me/${d}?text=${msg}" target="_blank" rel="noopener">💬 Contactar por WhatsApp</a><a class="phone-call" title="Llamar al contacto" aria-label="Llamar al contacto" href="tel:${d}">📞 Llamar por teléfono</a></div>`}
 function renderSeguimiento(){
   const all=cargarSeguimientos();
   const hoy=hoyLocal();
@@ -9710,10 +9714,10 @@ function abrirBackupDesdeMenu(){
       if (evt.data && evt.data.type === 'appi-reload') location.reload();
     });
     window.addEventListener('load', () => {
-      const bustKey = 'appi_cache_v184';
+      const bustKey = 'appi_cache_v185';
       const already = localStorage.getItem(bustKey) === '1';
       const finish = () => {
-        navigator.serviceWorker.register('./service-worker.js?v=184').catch(() => {});
+        navigator.serviceWorker.register('./service-worker.js?v=185').catch(() => {});
       };
       if (already) { finish(); return; }
       localStorage.setItem(bustKey, '1');
@@ -9721,7 +9725,7 @@ function abrirBackupDesdeMenu(){
         caches.keys().then((keys) => Promise.all(keys.map((k) => caches.delete(k)))).catch(() => {}),
         navigator.serviceWorker.getRegistrations().then((rs) => Promise.all(rs.map((r) => r.unregister()))).catch(() => {})
       ]).then(() => {
-        location.replace(location.pathname + '?v=184' + location.hash);
+        location.replace(location.pathname + '?v=185' + location.hash);
       }).catch(finish);
     });
   }
@@ -12227,7 +12231,7 @@ function formatWhatsAppNumberU(telf){
 function getWhatsAppLinkU(u){
   const num=formatWhatsAppNumberU(u.telf||'');
   if(!num) return '';
-  const nombre=(u.usuario||'').split(',')[0].trim();
+  const nombre=nombreDePila(u.usuario)||(u.usuario||'').split(',')[0].trim();
   const texto=`Hola ${nombre}! Soy de APPI - Garantías. Te contacto por tu equipo ${u.producto||''} de ${u.domicilio||''}. ¿Cómo está funcionando?`;
   return `https://wa.me/${num}?text=${encodeURIComponent(texto)}`;
 }
