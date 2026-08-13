@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v169-barra-unica';
+const CACHE_NAME = 'appi-v170-tres-pills';
 const ARCHIVOS = [
   './',
   './index.html',
