@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v181-garantias-ancho';
+const CACHE_NAME = 'appi-v182-mini-tools';
 const ARCHIVOS = [
   './',
   './index.html',

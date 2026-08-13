@@ -3126,6 +3126,24 @@ body.dark .lock-footer { color: #6b6b76; }
     -webkit-appearance: none;
     appearance: none;
   }
+  .home-mini-tools{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .home-mini-tool{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+    min-height:128px;padding:16px 12px;border:1px solid rgba(255,255,255,.78);border-radius:22px;
+    background:linear-gradient(135deg,rgba(58,208,164,.16),rgba(91,141,239,.12) 55%,rgba(160,107,255,.10));
+    box-shadow:0 10px 24px rgba(80,90,130,.08);cursor:pointer;font:inherit;text-align:center;
+  }
+  .home-mini-ico{
+    width:48px;height:48px;border-radius:16px;display:grid;place-items:center;color:#fff;font-size:22px;
+    box-shadow:0 6px 14px rgba(80,90,130,.16);
+  }
+  .home-mini-txt{display:flex;flex-direction:column;align-items:center;gap:3px}
+  .home-mini-txt strong{display:block;color:#1c1c27;font-size:14px;font-weight:950;line-height:1.15}
+  .home-mini-txt small{display:block;color:#6b6b76;font-size:11px;font-weight:700;line-height:1.25}
+  .home-mini-tool:active{transform:scale(.98)}
+  body.dark .home-mini-tool{border-color:rgba(255,255,255,.08);background:linear-gradient(135deg,rgba(58,208,164,.10),rgba(91,141,239,.10) 55%,rgba(160,107,255,.10))}
+  body.dark .home-mini-txt strong{color:#f0f0f5}
+  body.dark .home-mini-txt small{color:#a0a0b0}
   .quick-tool-card {
     width: 100%;
     display: block;
@@ -3435,7 +3453,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
     <button class="ds-btn" data-ds="view-planning" onclick="showView('view-planning'); renderPlanningTools();"><span>🗓️</span> Planificación</button>
   </nav>
-  <div class="ds-foot">APPI · v181 · Cultura de crecimiento</div>
+  <div class="ds-foot">APPI · v182 · Cultura de crecimiento</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -9055,16 +9073,20 @@ function renderHomeCompleto(){
       extraKeep.className='home-section-block';
       extraKeep.innerHTML=`
         <div class="mini-section-label"><span>⚡</span> Herramientas rápidas</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-          <button type="button" class="business-card" style="flex-direction:column;align-items:center;justify-content:center;padding:18px 12px;min-height:120px;text-align:center" onclick="openGrabadora()">
-            <div class="business-icon" style="width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,#ff6b6b,#a06bff);display:grid;place-items:center;color:#fff;font-size:24px;box-shadow:0 4px 10px rgba(0,0,0,0.12);margin-bottom:8px">🎙️</div>
-            <h3 style="margin:0;font-size:13px;font-weight:900">Grabadora</h3>
-            <small style="font-size:11px;color:#6b6b76;margin-top:4px">Grabá y escuchá</small>
+        <div class="home-mini-tools">
+          <button type="button" class="home-mini-tool" onclick="openGrabadora()">
+            <div class="home-mini-ico" style="background:linear-gradient(135deg,#ff6b6b,#a06bff)">🎙️</div>
+            <div class="home-mini-txt">
+              <strong>Grabadora</strong>
+              <small>Grabá y escuchá</small>
+            </div>
           </button>
-          <button type="button" class="business-card" style="flex-direction:column;align-items:center;justify-content:center;padding:18px 12px;min-height:120px;text-align:center" onclick="showView('view-notas')">
-            <div class="business-icon" style="width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,#fbbf24,#f59e0b);display:grid;place-items:center;color:#fff;font-size:24px;box-shadow:0 4px 10px rgba(0,0,0,0.12);margin-bottom:8px">📝</div>
-            <h3 style="margin:0;font-size:13px;font-weight:900">Notas Keep</h3>
-            <small style="font-size:11px;color:#6b6b76;margin-top:4px">Stick de colores</small>
+          <button type="button" class="home-mini-tool" onclick="showView('view-notas')">
+            <div class="home-mini-ico" style="background:linear-gradient(135deg,#fbbf24,#f59e0b)">📝</div>
+            <div class="home-mini-txt">
+              <strong>Notas Keep</strong>
+              <small>Stick de colores</small>
+            </div>
           </button>
         </div>
       `;
@@ -9759,10 +9781,10 @@ function abrirBackupDesdeMenu(){
       if (evt.data && evt.data.type === 'appi-reload') location.reload();
     });
     window.addEventListener('load', () => {
-      const bustKey = 'appi_cache_v181';
+      const bustKey = 'appi_cache_v182';
       const already = localStorage.getItem(bustKey) === '1';
       const finish = () => {
-        navigator.serviceWorker.register('./service-worker.js?v=181').catch(() => {});
+        navigator.serviceWorker.register('./service-worker.js?v=182').catch(() => {});
       };
       if (already) { finish(); return; }
       localStorage.setItem(bustKey, '1');
@@ -9770,7 +9792,7 @@ function abrirBackupDesdeMenu(){
         caches.keys().then((keys) => Promise.all(keys.map((k) => caches.delete(k)))).catch(() => {}),
         navigator.serviceWorker.getRegistrations().then((rs) => Promise.all(rs.map((r) => r.unregister()))).catch(() => {})
       ]).then(() => {
-        location.replace(location.pathname + '?v=181' + location.hash);
+        location.replace(location.pathname + '?v=182' + location.hash);
       }).catch(finish);
     });
   }
