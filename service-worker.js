@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v168-cultura-ui';
+const CACHE_NAME = 'appi-v169-barra-unica';
 const ARCHIVOS = [
   './',
   './index.html',

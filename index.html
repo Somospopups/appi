@@ -2727,18 +2727,20 @@ body.dark .lock-footer { color: #6b6b76; }
   .cultura-task-top strong{color:#5c5c66;font-size:10.5px;font-weight:900;letter-spacing:.15px}
   .cultura-task-top span{color:#3d63c9;font-size:15px;font-weight:950;letter-spacing:-.3px;line-height:1.15}
   .cultura-task.done .cultura-task-top span,.cultura-over{color:#168765}
-  .cultura-bar{height:6px;border-radius:999px;background:rgba(80,90,130,.12);overflow:hidden}
-  .cultura-bar i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#3ad0a4,#5b8def,#a06bff);box-shadow:0 0 10px rgba(91,141,239,.28);transition:width .3s ease}
-  .cultura-step{display:grid;grid-template-columns:32px minmax(0,1fr) 32px;gap:5px;align-items:center}
-  .cultura-step button{
-    height:34px;border:0;border-radius:11px;background:rgba(91,141,239,.12);color:#3d63c9;
-    font:inherit;font-size:18px;font-weight:900;cursor:pointer;line-height:1;
-  }
-  .cultura-step button:active{transform:scale(.94)}
+  .cultura-meter{position:relative;z-index:1;margin-top:10px}
+  .cultura-meter-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}
+  .cultura-meter-top span{color:#5c5c66;font-size:10.5px;font-weight:900;letter-spacing:.2px}
+  .cultura-meter-top b{color:#3d63c9;font-size:13px;font-weight:950}
+  .cultura-meter.done .cultura-meter-top b{color:#168765}
+  .cultura-bar{height:9px;border-radius:999px;background:rgba(80,90,130,.12);overflow:hidden}
+  .cultura-bar i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#3ad0a4,#5b8def,#a06bff);box-shadow:0 0 12px rgba(91,141,239,.30);transition:width .35s ease}
+  .cultura-step{display:block}
   .cultura-step input{
-    width:100%;height:34px;border:1px solid rgba(80,90,130,.12);border-radius:11px;
-    background:rgba(255,255,255,.88);color:#161620;font:inherit;font-size:15px;font-weight:950;text-align:center;outline:none;
+    width:100%;height:42px;border:1.5px solid rgba(91,141,239,.22);border-radius:13px;
+    background:rgba(255,255,255,.90);color:#161620;font:inherit;font-size:20px;font-weight:950;text-align:center;outline:none;letter-spacing:-.3px;
   }
+  .cultura-step input:focus{border-color:#5b8def;box-shadow:0 0 0 3px rgba(91,141,239,.16)}
+  .cultura-task-hint{color:#8a8a94;font-size:10px;font-weight:800}
   .cultura-pills{display:flex;flex-wrap:wrap;gap:5px;align-items:center;min-height:34px}
   .cultura-pill{
     width:32px;height:32px;border:0;border-radius:50%;
@@ -2785,8 +2787,8 @@ body.dark .lock-footer { color: #6b6b76; }
   body.dark .cultura-head h3,body.dark .cultura-action,body.dark .cultura-history-title,body.dark .cultura-past summary strong{color:#f0f0f5}
   body.dark .cultura-foot,body.dark .cultura-past summary small,body.dark .cultura-task-top strong{color:#b7b8c4}
   body.dark .cultura-week,body.dark .cultura-task,body.dark .cultura-kicker,body.dark .cultura-past,body.dark .cultura-past-kpi{background:rgba(28,29,46,.62);border-color:rgba(255,255,255,.08)}
-  body.dark .cultura-week,body.dark .cultura-task-top span,body.dark .cultura-past-kpi b{color:#a8c0ff}
-  body.dark .cultura-step button{background:rgba(91,141,239,.18);color:#c5d4ff}
+  body.dark .cultura-week,body.dark .cultura-task-top span,body.dark .cultura-past-kpi b,body.dark .cultura-meter-top b{color:#a8c0ff}
+  body.dark .cultura-meter-top span,body.dark .cultura-task-hint{color:#9aa0b4}
   body.dark .cultura-step input{background:rgba(20,22,36,.86);border-color:rgba(255,255,255,.08);color:#f0f0f5}
   body.dark .cultura-action{background:rgba(91,141,239,.12)}
   body.dark .cultura-pill{background:rgba(91,141,239,.18);color:#c5d4ff}
@@ -3376,7 +3378,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
     <button class="ds-btn" data-ds="view-planning" onclick="showView('view-planning'); renderPlanningTools();"><span>🗓️</span> Planificación</button>
   </nav>
-  <div class="ds-foot">APPI · v168 · Cultura de crecimiento</div>
+  <div class="ds-foot">APPI · v169 · Cultura de crecimiento</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -8623,6 +8625,7 @@ async function compartirConsolidado(e){
 }
 const CULTURA_KEY='cultura_crecimiento_v1';
 const CULTURA_PB_META=15;
+const CULTURA_INV_META=2;
 function culturaWeekStart(date=new Date()){
   const d=new Date(date.getFullYear(),date.getMonth(),date.getDate());
   const day=d.getDay();
@@ -8695,29 +8698,33 @@ function renderCulturaCrecimiento(){
   const id=culturaWeekId();
   const week=getCulturaWeek(id);
   const pbDone=week.pb>=CULTURA_PB_META;
-  const accDone=week.invitados.length>0;
+  const accDone=week.invitados.length>=CULTURA_INV_META;
   const doneCount=(pbDone?1:0)+(accDone?1:0);
-  const extra=Math.max(0,Math.round((week.pb-CULTURA_PB_META)*10)/10);
-  const pbPct=Math.max(0,Math.min(100,Math.round(week.pb/CULTURA_PB_META*100)));
+  const extra=Math.max(0,Math.round((week.pb-CULTURA_PB_META)*100)/100);
+  const weekPct=Math.max(0,Math.min(100,Math.round(
+    Math.min(week.pb,CULTURA_PB_META)/CULTURA_PB_META*50 +
+    Math.min(week.invitados.length,CULTURA_INV_META)/CULTURA_INV_META*50
+  )));
   const past=culturaPastWeeks(id);
   const pastHtml=past.map(weekId=>{
     const date=culturaDateFromId(weekId);
     const data=getCulturaWeek(weekId);
-    const okPb=data.pb>=CULTURA_PB_META;
-    const extraPast=Math.max(0,Math.round((data.pb-CULTURA_PB_META)*10)/10);
     const guests=data.invitados.length?data.invitados:data.acciones.map(a=>({nombre:a.text}));
+    const okPb=data.pb>=CULTURA_PB_META;
+    const okInv=guests.length>=CULTURA_INV_META;
+    const extraPast=Math.max(0,Math.round((data.pb-CULTURA_PB_META)*100)/100);
     return `<details class="cultura-past" data-week="${weekId}" ${openPast.includes(weekId)?'open':''}>
       <summary>
         <div>
           <strong>${date?culturaWeekLabel(date):weekId}</strong>
-          <small>${culturaFmt(data.pb)} PB · ${guests.length} invitado${guests.length===1?'':'s'}${okPb?' · meta cumplida':''}</small>
+          <small>${culturaFmt(data.pb)} PB · ${guests.length} invitado${guests.length===1?'':'s'}${okPb&&okInv?' · meta cumplida':''}</small>
         </div>
         <em>⌄</em>
       </summary>
       <div class="cultura-past-body">
         <div class="cultura-past-kpis">
           <div class="cultura-past-kpi"><span>PB personales</span><b class="${okPb?'ok':''}">${culturaFmt(data.pb)} / ${CULTURA_PB_META}${extraPast?` · +${culturaFmt(extraPast)}`:''}</b></div>
-          <div class="cultura-past-kpi"><span>Invitados</span><b>${guests.length}</b></div>
+          <div class="cultura-past-kpi"><span>Invitados</span><b class="${okInv?'ok':''}">${guests.length} / ${CULTURA_INV_META}</b></div>
         </div>
         ${guests.map(a=>`<div class="cultura-action"><span>${culturaEsc(culturaInvitadoNombre(a)||a.text||'Invitado')}</span><span></span></div>`).join('')}
       </div>
@@ -8734,16 +8741,13 @@ function renderCulturaCrecimiento(){
       </div>
       <div class="cultura-tasks">
         <article class="cultura-task ${pbDone?'done':''}">
-          <div class="cultura-task-top"><strong>💎 PB personales</strong><span class="${extra?'cultura-over':''}">${culturaFmt(week.pb)} / ${CULTURA_PB_META}${extra?` · +${culturaFmt(extra)}`:''}</span></div>
-          <div class="cultura-bar"><i style="width:${pbPct}%"></i></div>
+          <div class="cultura-task-top"><strong>💎 PB personales</strong><span class="cultura-task-hint">meta ${CULTURA_PB_META}${extra?` · +${culturaFmt(extra)}`:''}</span></div>
           <div class="cultura-step">
-            <button type="button" data-cultura-pb="-1" aria-label="Restar PB">−</button>
-            <input id="culturaPbInput" type="text" inputmode="decimal" value="${String(week.pb).replace('.',',')}" aria-label="PB personales de la semana">
-            <button type="button" data-cultura-pb="1" aria-label="Sumar PB">+</button>
+            <input id="culturaPbInput" type="text" inputmode="decimal" enterkeyhint="done" value="${week.pb?String(week.pb).replace('.',','):''}" placeholder="0" aria-label="PB personales de la semana">
           </div>
         </article>
         <article class="cultura-task ${accDone?'done':''}">
-          <div class="cultura-task-top"><strong>🤝 Patrocinio</strong><span>${week.invitados.length} invitado${week.invitados.length===1?'':'s'}</span></div>
+          <div class="cultura-task-top"><strong>🤝 Patrocinio</strong><span>${week.invitados.length} / ${CULTURA_INV_META}</span></div>
           <div class="cultura-pills">
             ${Array.from({length:week.slots},(_,slot)=>{
               const guest=week.invitados.find(p=>Number(p.slot)===slot);
@@ -8753,23 +8757,23 @@ function renderCulturaCrecimiento(){
           </div>
         </article>
       </div>
-      <div class="cultura-foot">${week.pb>CULTURA_PB_META?'✓ Objetivo personal cumplido y superado.':doneCount===2?'✓ Semana completa: las dos tareas están hechas.':`${doneCount} de 2 tareas de la semana · los 15 PB son la meta, se pueden pasar`}</div>
+      <div class="cultura-meter ${weekPct>=100?'done':''}">
+        <div class="cultura-meter-top"><span>Progreso de la semana</span><b>${weekPct}%</b></div>
+        <div class="cultura-bar"><i style="width:${weekPct}%"></i></div>
+      </div>
+      <div class="cultura-foot">${weekPct>=100?(extra?'✓ Semana completa y superaste los 15 PB.':'✓ Semana completa: 15 PB y 2 invitados.'):`15 PB + 2 invitados = 100% · se pueden pasar`}</div>
       ${past.length?`<div class="cultura-history-title">Semanas anteriores</div><div class="cultura-history">${pastHtml}</div>`:''}
     </section>`;
   const persistPb=raw=>{
     const n=Math.max(0,Number(String(raw).replace(',','.'))||0);
-    saveCulturaWeek(id,{...getCulturaWeek(id),pb:Math.round(n*10)/10});
+    saveCulturaWeek(id,{...getCulturaWeek(id),pb:Math.round(n*100)/100});
     renderCulturaCrecimiento();
   };
-  wrap.querySelectorAll('[data-cultura-pb]').forEach(btn=>btn.onclick=()=>{
-    const next=Math.max(0,Math.round((getCulturaWeek(id).pb+(+btn.dataset.culturaPb))*10)/10);
-    saveCulturaWeek(id,{...getCulturaWeek(id),pb:next});
-    try{haptic(10)}catch(e){}
-    renderCulturaCrecimiento();
-  });
   const pbInput=document.getElementById('culturaPbInput');
   if(pbInput){
+    pbInput.onfocus=()=>{ try{ pbInput.select(); }catch(e){} };
     pbInput.onchange=()=>persistPb(pbInput.value);
+    pbInput.onblur=()=>persistPb(pbInput.value);
     pbInput.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();pbInput.blur()}}
   }
   wrap.querySelectorAll('[data-cultura-slot]').forEach(btn=>btn.onclick=()=>openCulturaInvitado(id,+btn.dataset.culturaSlot));
@@ -9591,10 +9595,10 @@ function abrirBackupDesdeMenu(){
       if (evt.data && evt.data.type === 'appi-reload') location.reload();
     });
     window.addEventListener('load', () => {
-      const bustKey = 'appi_cache_v168';
+      const bustKey = 'appi_cache_v169';
       const already = localStorage.getItem(bustKey) === '1';
       const finish = () => {
-        navigator.serviceWorker.register('./service-worker.js?v=168').catch(() => {});
+        navigator.serviceWorker.register('./service-worker.js?v=169').catch(() => {});
       };
       if (already) { finish(); return; }
       localStorage.setItem(bustKey, '1');
@@ -9602,7 +9606,7 @@ function abrirBackupDesdeMenu(){
         caches.keys().then((keys) => Promise.all(keys.map((k) => caches.delete(k)))).catch(() => {}),
         navigator.serviceWorker.getRegistrations().then((rs) => Promise.all(rs.map((r) => r.unregister()))).catch(() => {})
       ]).then(() => {
-        location.replace(location.pathname + '?v=168' + location.hash);
+        location.replace(location.pathname + '?v=169' + location.hash);
       }).catch(finish);
     });
   }
