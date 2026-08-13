@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v177-score-orden';
+const CACHE_NAME = 'appi-v178-grabadora-simple';
 const ARCHIVOS = [
   './',
   './index.html',
