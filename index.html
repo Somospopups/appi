@@ -271,6 +271,38 @@ body.dark .hist-section-title h3,body.dark .hist-attention strong,body.dark .his
   .bday-banner .btxt p strong { color: #1c1c1e; }
   .bday-banner .barrow { color: #a03631; font-size: 20px; font-weight: 700; }
 
+  .bonus-notif-list{display:grid;gap:8px;margin:0 0 14px}
+  .bonus-notif{
+    position:relative;overflow:hidden;padding:13px 14px 12px;border-radius:20px;
+    background:
+      radial-gradient(circle at 12% 0%, rgba(255,255,255,.72), transparent 36%),
+      linear-gradient(135deg, rgba(245,179,1,.20), rgba(160,107,255,.16) 55%, rgba(91,141,239,.16));
+    border:1px solid rgba(255,255,255,.78);
+    box-shadow:0 10px 24px rgba(80,90,130,.10);
+    display:grid;grid-template-columns:42px minmax(0,1fr);gap:11px;align-items:start;
+    cursor:pointer;text-align:left;font:inherit;width:100%;
+  }
+  .bonus-notif:active{transform:scale(.985)}
+  .bonus-notif-ico{
+    width:42px;height:42px;border-radius:14px;display:grid;place-items:center;
+    background:linear-gradient(135deg,#f5b301,#a06bff);color:#fff;font-size:20px;
+    box-shadow:0 6px 14px rgba(160,107,255,.28);
+  }
+  .bonus-notif-kicker{margin:0 0 3px;color:#7a4bd9;font-size:10px;font-weight:950;letter-spacing:.45px;text-transform:uppercase}
+  .bonus-notif p{margin:0;color:#3a3a48;font-size:12.5px;font-weight:650;line-height:1.4}
+  .bonus-notif p strong{color:#161620;font-weight:900}
+  .bonus-notif-pb{display:inline-flex;margin-top:7px;padding:3px 8px;border-radius:999px;background:rgba(255,255,255,.62);color:#3d63c9;font-size:10.5px;font-weight:900}
+  .bonus-notif-x{
+    position:absolute;top:8px;right:8px;width:28px;height:28px;border:0;border-radius:50%;
+    background:rgba(255,255,255,.55);color:#6b6b76;font:inherit;font-size:15px;font-weight:800;cursor:pointer;line-height:1;
+  }
+  body.dark .bonus-notif{background:linear-gradient(135deg,rgba(245,179,1,.12),rgba(160,107,255,.14) 55%,rgba(91,141,239,.12));border-color:rgba(255,255,255,.08)}
+  body.dark .bonus-notif-kicker{color:#d4b3ff}
+  body.dark .bonus-notif p{color:#d0d0d8}
+  body.dark .bonus-notif p strong{color:#f0f0f5}
+  body.dark .bonus-notif-pb{background:rgba(28,29,46,.62);color:#c5d4ff}
+  body.dark .bonus-notif-x{background:rgba(255,255,255,.08);color:#a0a0b0}
+
   .score-compact {
     padding: 14px 16px; border-radius: 18px; margin-bottom: 14px;
     background: linear-gradient(135deg, rgba(91,141,239,0.18), rgba(160,107,255,0.15), rgba(255,107,157,0.12));
@@ -3378,7 +3410,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
     <button class="ds-btn" data-ds="view-planning" onclick="showView('view-planning'); renderPlanningTools();"><span>🗓️</span> Planificación</button>
   </nav>
-  <div class="ds-foot">APPI · v170 · Cultura de crecimiento</div>
+  <div class="ds-foot">APPI · v171 · Cultura de crecimiento</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -3486,6 +3518,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     </header>
 
     <div id="culturaWrap"></div>
+    <div id="bonusNotifWrap"></div>
     <div id="bdayBannerWrap"></div>
     <div id="scoreCompactWrap"></div>
     <div id="nextStepWrap"></div>
@@ -8298,6 +8331,106 @@ function renderBdayBanner(){
   `;
   document.getElementById('bdayBannerClick').onclick = ()=>{ openEquipo(); };
 }
+const BONUS_CAT_OK={D:1,DC:1,CE:1,L:1,LE:1,EJ:1,E:1};
+const BONUS_PB_SPONSOR=12;
+const BONUS_PB_INVITADO=9;
+function bonusPrimerNombre(p){
+  const raw=String(p&&p.nombre||'').trim();
+  if(!raw) return 'Esta persona';
+  const parte=raw.includes(',')?raw.split(',')[1].trim():raw;
+  const first=(parte.split(/\s+/)[0]||raw);
+  return first.charAt(0).toUpperCase()+first.slice(1).toLowerCase();
+}
+function bonusEsTitular(p){
+  if(!p||!equipoData) return false;
+  if(p.esTitular) return true;
+  const dip=String(equipoData.titular&&equipoData.titular.dip||'').replace(/\s+/g,'').toUpperCase();
+  const cod=String(p.codigo||'').replace(/\s+/g,'').toUpperCase();
+  return !!(dip&&cod&&dip===cod);
+}
+function bonusNotifKey(){
+  const d=new Date();
+  return 'bonus_notif_'+d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+}
+function bonusNotifDismissed(){
+  try{return JSON.parse(localStorage.getItem(bonusNotifKey())||'[]')}catch(e){return []}
+}
+function bonusDismiss(id){
+  const list=bonusNotifDismissed();
+  if(!list.includes(id)) list.push(id);
+  localStorage.setItem(bonusNotifKey(),JSON.stringify(list));
+}
+function bonusFmt(n){
+  if(typeof culturaFmt==='function') return culturaFmt(n);
+  return Number(n||0).toLocaleString('es-AR',{maximumFractionDigits:1});
+}
+function bonusEsc(s){
+  if(typeof culturaEsc==='function') return culturaEsc(s);
+  return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function personasOportunidadBonus(){
+  if(!equipoData) loadEquipoFromStorage();
+  if(!equipoData||!equipoData.personas) return [];
+  const hidden=new Set(bonusNotifDismissed());
+  const near=[], ready=[];
+  equipoData.personas.forEach(p=>{
+    if(hidden.has(p.id)) return;
+    const cat=String(p.cat||'').trim().toUpperCase();
+    if(!BONUS_CAT_OK[cat]) return;
+    const pb=Number(p.pnAct)||0;
+    if(pb>=BONUS_PB_INVITADO && pb<BONUS_PB_SPONSOR) near.push(p);
+    else if(pb>=BONUS_PB_SPONSOR && pb<BONUS_PB_SPONSOR+3) ready.push(p);
+  });
+  near.sort((a,b)=>(b.pnAct||0)-(a.pnAct||0));
+  ready.sort((a,b)=>(a.pnAct||0)-(b.pnAct||0));
+  return near.concat(ready).slice(0,2);
+}
+function renderBonusNotifs(){
+  const wrap=document.getElementById('bonusNotifWrap');
+  if(!wrap) return;
+  const list=personasOportunidadBonus();
+  if(!list.length){ wrap.innerHTML=''; return; }
+  wrap.innerHTML='<div class="bonus-notif-list">'+list.map(p=>{
+    const pb=Number(p.pnAct)||0;
+    const near=pb<BONUS_PB_SPONSOR;
+    const yo=bonusEsTitular(p);
+    const nombre=bonusPrimerNombre(p);
+    const pbTxt=bonusFmt(pb);
+    const falta=bonusFmt(Math.max(0,Math.round((BONUS_PB_SPONSOR-pb)*10)/10));
+    const text=near
+      ?(yo
+        ?`Estás en <strong>${pbTxt} PB</strong>. ¿Invitás a alguien y lo acompañás a <strong>9 PB</strong> para ganar el Bonus?`
+        :`<strong>${bonusEsc(nombre)}</strong> está en <strong>${pbTxt} PB</strong>. ¿Le proponemos invitar a alguien y trabajar juntos para que llegue a <strong>9 PB</strong> y gane el Bonus?`)
+      :(yo
+        ?`Ya llegaste a <strong>${pbTxt} PB</strong>. ¿Invitás a alguien y lo acompañás a <strong>9 PB</strong> para cerrar el Bonus?`
+        :`<strong>${bonusEsc(nombre)}</strong> ya llegó a <strong>${pbTxt} PB</strong>. ¿Le proponemos invitar a alguien y acompañarlo a <strong>9 PB</strong> para cerrar el Bonus?`);
+    return `<div class="bonus-notif" data-bonus-id="${p.id}">
+      <div class="bonus-notif-ico">🎯</div>
+      <div>
+        <div class="bonus-notif-kicker">Oportunidad de Bonus</div>
+        <p>${text}</p>
+        <span class="bonus-notif-pb">${near?(yo?'Te faltan ':'Le faltan ')+falta+' PB para los 12':'Listo para patrocinar'}</span>
+      </div>
+      <button type="button" class="bonus-notif-x" data-bonus-dismiss="${p.id}" aria-label="Ocultar">×</button>
+    </div>`;
+  }).join('')+'</div>';
+  wrap.querySelectorAll('[data-bonus-id]').forEach(card=>{
+    card.onclick=e=>{
+      if(e.target.closest('[data-bonus-dismiss]')) return;
+      const id=+card.dataset.bonusId;
+      const persona=equipoData&&equipoData.personas&&equipoData.personas.find(x=>x.id===id);
+      if(persona&&typeof openPersonaModal==='function') openPersonaModal(persona);
+      else if(typeof openEquipo==='function') openEquipo();
+    };
+  });
+  wrap.querySelectorAll('[data-bonus-dismiss]').forEach(btn=>{
+    btn.onclick=e=>{
+      e.stopPropagation();
+      bonusDismiss(+btn.dataset.bonusDismiss);
+      renderBonusNotifs();
+    };
+  });
+}
 function estadoHomeMensual(){
   const pr = obtenerDatosPresupuestoActual();
   const sp = obtenerProgresoSieteActual();
@@ -8872,6 +9005,7 @@ function renderHomeCompleto(){
   try{ renderDateContext(); }catch(e){ console.error(e); }
   try{ renderCulturaCrecimiento(); }catch(e){ console.error(e); }
   try{ renderBdayBanner(); }catch(e){ console.error(e); }
+  try{ renderBonusNotifs(); }catch(e){ console.error(e); }
   try{ renderScoreCompact(); }catch(e){ console.error(e); }
   try{ renderNextStep(); }catch(e){ console.error(e); }
   try{ renderToolsList(); }catch(e){ console.error(e); }
@@ -9601,10 +9735,10 @@ function abrirBackupDesdeMenu(){
       if (evt.data && evt.data.type === 'appi-reload') location.reload();
     });
     window.addEventListener('load', () => {
-      const bustKey = 'appi_cache_v170';
+      const bustKey = 'appi_cache_v171';
       const already = localStorage.getItem(bustKey) === '1';
       const finish = () => {
-        navigator.serviceWorker.register('./service-worker.js?v=170').catch(() => {});
+        navigator.serviceWorker.register('./service-worker.js?v=171').catch(() => {});
       };
       if (already) { finish(); return; }
       localStorage.setItem(bustKey, '1');
@@ -9612,7 +9746,7 @@ function abrirBackupDesdeMenu(){
         caches.keys().then((keys) => Promise.all(keys.map((k) => caches.delete(k)))).catch(() => {}),
         navigator.serviceWorker.getRegistrations().then((rs) => Promise.all(rs.map((r) => r.unregister()))).catch(() => {})
       ]).then(() => {
-        location.replace(location.pathname + '?v=170' + location.hash);
+        location.replace(location.pathname + '?v=171' + location.hash);
       }).catch(finish);
     });
   }

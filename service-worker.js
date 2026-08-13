@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v170-tres-pills';
+const CACHE_NAME = 'appi-v171-bonus-notif';
 const ARCHIVOS = [
   './',
   './index.html',
