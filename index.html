@@ -3453,7 +3453,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
     <button class="ds-btn" data-ds="view-planning" onclick="showView('view-planning'); renderPlanningTools();"><span>🗓️</span> Planificación</button>
   </nav>
-  <div class="ds-foot">APPI · v183 · Cultura de crecimiento</div>
+  <div class="ds-foot">APPI · v184 · Cultura de crecimiento</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4153,312 +4153,242 @@ const HELP = {
     icon:'🏠', iconBg:'linear-gradient(135deg,#5b8def,#a06bff,#ff6b9d)',
     title:'Pantalla principal',
     sub:'Tu tablero de acción',
-    html:`<p>Tu pantalla principal es un tablero para ver rápidamente cómo viene tu mes y decidir qué hacer a continuación.</p>
+    html:`<p>El Inicio te muestra cómo viene tu semana y tu mes, y te lleva a la siguiente acción.</p>
 
-    <div class="tip"><strong>👋 SALUDO Y PROGRESO DEL MES</strong><br/>
-    Encontrá tu saludo y el avance general de lo que cargaste y completaste durante el mes.</div>
+    <div class="tip"><strong>🌱 CULTURA DE CRECIMIENTO</strong><br/>
+    Cada semana: cargá tus PB personales (con decimales) y tus invitados de patrocinio. La barra llega a 100% con 15 PB y al menos 2 invitados.</div>
+
+    <div class="tip"><strong>🎯 OPORTUNIDAD DE BONUS</strong><br/>
+    Si alguien de Mi Equipo (categoría D o más) está cerca de 12 PB, APPI te propone escribirle o llamarlo para invitar y llevar al nuevo a 9 PB. El aviso se saca al tocar WhatsApp o Llamar.</div>
 
     <div class="tip"><strong>🌟 SCORE DEL MES</strong><br/>
-    Un número de 0 a 100 que resume tu progreso. Tocá el Score para conocer cómo leerlo, cómo se calcula y compartir tu informe.</div>
+    Un número de 0 a 100. Se calcula en este orden, 25% cada uno: Las 7 P, Presupuesto, Rueda Vida y Rueda Negocio.</div>
 
-    <div class="tip"><strong>🎯 PRÓXIMO PASO RECOMENDADO</strong><br/>
-    APPI te sugiere qué cargar o revisar primero para que puedas avanzar sin perder el foco.</div>
+    <div class="tip"><strong>📅 MI MES</strong><br/>
+    Arranca plegado. Adentro está el <b>próximo paso</b>, en este orden: Las 7 P → Presupuesto → Rueda Vida → Rueda Negocio. Al terminar las cuatro, te felicita la planificación del mes.</div>
 
-    <p><strong>⚡ ACCESOS RÁPIDOS</strong></p>
-    <p>Desde el Home podés entrar directamente a tus herramientas:</p>
-    <ul>
-      <li>💰 <strong>Presupuesto</strong></li>
-      <li>🚀 <strong>Las 7 P</strong></li>
-      <li>⚖️ <strong>Rueda Vida</strong></li>
-      <li>📊 <strong>Rueda Negocio</strong></li>
-      <li>🌳 <strong>Mi Equipo</strong></li>
-    </ul>
+    <div class="tip"><strong>🌱 MI NEGOCIO</strong><br/>
+    También arranca plegado. Ahí están Mi Equipo, Histórico, Usuarios y Contactos.</div>
+
+    <div class="tip"><strong>⚡ HERRAMIENTAS RÁPIDAS</strong><br/>
+    Grabadora (grabá y escuchá) y Notas Keep (notas de colores).</div>
 
     <div class="tip"><strong>🎂 CUMPLEAÑOS</strong><br/>
-    Si cargaste "Mi Equipo", vas a ver un aviso cuando alguien de tu equipo cumpla años ese día.</div>
+    Si cargaste Mi Equipo, aparece un aviso cuando alguien cumple años hoy.</div>
 
-    <div class="tip"><strong>💾 BACKUP Y DATOS</strong><br/>
-    Podés hacer backup de todos tus datos desde la pantalla principal. Todo se guarda en tu dispositivo y podés restaurarlo cuando lo necesites.</div>
-
-    <div class="tip"><strong>💡 TIP</strong><br/>
-    Usá el botón ? cuando necesites una explicación de cada herramienta y compartí tu informe del mes por WhatsApp.</div>`
+    <div class="tip"><strong>💾 BACKUP</strong><br/>
+    Abajo podés exportar o restaurar todos tus datos. Quedan en tu dispositivo.</div>`
   },
   presu: {
     icon:'💰', iconBg:'linear-gradient(135deg,#f5b301,#ff8f6b)',
     title:'Presupuesto Mensual',
     sub:'Tomá el control de tu dinero',
-    html:`<p>Cargá todo, clasificalo y descubrí cuánto te queda.</p>
-    
-    <div class="tip"><strong>💵 PASO 1: Cargar tus INGRESOS</strong><br/>
-    1) Tocá el ícono ✏️ para editar el nombre del ingreso<br/>
-    2) Escribí el monto<br/>
-    3) Tocá "+" si tenés más de una fuente de ingreso</div>
-    
-    <div class="tip"><strong>💸 PASO 2: Cargar tus GASTOS</strong><br/>
-    En la pestaña <strong>📋 Lista</strong> vas a ver TODAS las categorías de gastos posibles (como una checklist).<br/><br/>
-    Para cada gasto:<br/>
-    1) Escribí el monto<br/>
-    2) Tocá una de estas opciones:<br/>
-    • 👤 <strong>Personal</strong> — es un gasto tuyo<br/>
-    • 💼 <strong>Negocio</strong> — es un gasto del trabajo<br/>
-    • ➗ <strong>Dividir</strong> — es de los dos (personal + negocio)</div>
-    
-    <p><strong>📊 LAS 3 PESTAÑAS</strong></p>
+    html:`<p>Cargá ingresos y gastos, clasificalos y descubrí cuánto te queda.</p>
+
+    <div class="tip"><strong>💵 PASO 1: INGRESOS</strong><br/>
+    Editá el nombre, cargá el monto y usá + si tenés más de una fuente.</div>
+
+    <div class="tip"><strong>💸 PASO 2: GASTOS</strong><br/>
+    En <b>Lista</b> están todas las categorías. Escribí el monto y clasificá:<br/>
+    • 👤 Personal · 💼 Negocio · ➗ Dividir</div>
+
+    <p><strong>📊 PESTAÑAS</strong></p>
     <ul>
-      <li>📋 <strong>Lista</strong> — cargá y clasificá tus gastos</li>
-      <li>👤 <strong>Personal</strong> — ver solo los gastos personales</li>
-      <li>💼 <strong>Negocio</strong> — ver solo los gastos del negocio</li>
+      <li>📋 <strong>Lista</strong> — cargar y clasificar</li>
+      <li>👤 <strong>Personal</strong> — solo gastos personales</li>
+      <li>💼 <strong>Negocio</strong> — solo gastos del negocio</li>
     </ul>
-    
-    <div class="tip"><strong>💡 TIPS ÚTILES</strong><br/>
-    • 🔍 Usá el buscador si tenés muchos gastos<br/>
-    • 🧽 Tocá la gomita para borrar un monto<br/>
-    • ✕ Tocá la X para eliminar un ítem que agregaste<br/>
-    • 📋 "Copiar del mes anterior" te ahorra tiempo<br/>
-    • 📊 El historial guarda todos tus meses<br/>
-    • 📤 Podés compartir tu resumen por WhatsApp</div>
-    
-    <div class="tip"><strong>🎨 BALANCE VISUAL</strong><br/>
-    El balance cambia de color según tu situación:<br/>
-    • 🟢 Verde = te sobra plata<br/>
-    • 🟡 Amarillo = sin cargar aún<br/>
-    • 🔴 Rojo = te falta<br/>
-    • 🟣 Violeta = estás en equilibrio</div>`
+
+    <div class="tip"><strong>💡 TIPS</strong><br/>
+    Buscá con 🔍, borré un monto con la gomita, copiá el mes anterior y compartí el resumen por WhatsApp.</div>
+
+    <div class="tip"><strong>🎨 BALANCE</strong><br/>
+    🟢 te sobra · 🟡 sin cargar · 🔴 te falta · 🟣 en equilibrio</div>`
   },
   siete: {
     icon:'🚀', iconBg:'linear-gradient(135deg,#3ad0a4,#5b8def)',
     title:'Las 7 P',
     sub:'Tu plan mensual paso a paso',
-    html:`<p>El método probado para planificar tu mes como un profesional. 7 pasos simples que te van a cambiar la forma de trabajar.</p>
-    
-    <div class="tip"><strong>📋 QUÉ SON LAS 7 P</strong><br/>
-    Son 7 pasos que se completan una vez por mes, en orden:<br/><br/>
-    1. ⏸️ <strong>PARAR</strong> — Reservate tiempo para vos<br/>
-    2. 🧠 <strong>PENSAR</strong> — Reflexioná qué querés<br/>
-    3. ⭐ <strong>PRIORIZAR</strong> — Definí tu Meta Estrella del mes<br/>
-    4. 🗂️ <strong>PLANIFICAR</strong> — Armá el plan de acciones<br/>
-    5. 🛡️ <strong>PROTEGER</strong> — Comprometete a cumplir<br/>
-    6. 🔥 <strong>PERSEVERAR</strong> — No aflojes ante los obstáculos<br/>
-    7. 📈 <strong>PROGRESAR</strong> — Medí tu avance</div>
-    
-    <div class="tip"><strong>✅ CÓMO COMPLETAR CADA PASO</strong><br/>
-    1) Tocá el paso que querés trabajar<br/>
-    2) Completá los datos que te pide<br/>
-    3) Al final tocá <strong>"Hecho ✓"</strong> para marcarlo como completo<br/>
-    4) Volvé a la lista y seguí con el próximo</div>
-    
-    <div class="tip"><strong>📊 TU PROGRESO</strong><br/>
-    Arriba vas a ver una barra con tu porcentaje completado.<br/>
-    El objetivo es llegar al <strong>100%</strong> cada mes.</div>
-    
-    <div class="tip"><strong>💡 TIPS ÚTILES</strong><br/>
-    • 💾 Se guarda solo automáticamente<br/>
-    • 📅 Podés navegar entre meses distintos<br/>
-    • 🔥 Los pasos completados quedan en verde<br/>
-    • 📤 Compartí tu resumen del mes por WhatsApp<br/>
-    • 🔄 Podés volver a cualquier paso para editarlo</div>
-    
-    <div class="tip"><strong>🎯 EL SECRETO</strong><br/>
-    No se trata de completar por completar.<br/>
-    Se trata de reflexionar honestamente en cada paso.<br/>
-    Cuanto más te comprometas, mejores resultados vas a tener.</div>`
+    html:`<p>Es el primer paso de la planificación del mes. Completá los 7 en orden.</p>
+
+    <div class="tip"><strong>LAS 7 P</strong><br/>
+    1. ⏸️ Parar · 2. 🧠 Pensar · 3. ⭐ Priorizar<br/>
+    4. 🗂️ Planificar · 5. 🛡️ Proteger · 6. 🔥 Perseverar · 7. 📈 Progresar</div>
+
+    <div class="tip"><strong>CÓMO COMPLETAR</strong><br/>
+    Entrá a cada paso, cargá lo que te pide y tocá <b>Hecho ✓</b>. Después APPI te lleva al presupuesto.</div>
+
+    <div class="tip"><strong>PROGRESO</strong><br/>
+    La barra de arriba muestra el % del mes. Se guarda solo. Podés cambiar de mes y compartir el resumen.</div>`
   },
- wheel: {
+  wheel: {
     icon:'⚖️', iconBg:'linear-gradient(135deg,#5b8def,#a06bff)',
     title:'Rueda de la Vida / del Negocio',
     sub:'Encontrá tu equilibrio',
-    html:`<p>Una herramienta poderosa para ver el equilibrio de tu vida o tu negocio, de forma visual y honesta.</p>
-    
-    <div class="tip"><strong>🎯 CÓMO FUNCIONA</strong><br/>
-    Se evalúan 8 áreas del 0 al 10 según tu grado de satisfacción o compromiso actual. La app arma una rueda con esos puntajes.</div>
-    
-    <div class="tip"><strong>✅ PASO A PASO</strong><br/>
-    1) Elegí el mes y año arriba<br/>
-    2) Tocá <strong>"Evaluar"</strong> abajo (en la barra de navegación)<br/>
-    3) Movés cada deslizador según cómo te sentís del 0 al 10<br/>
-    4) Volvé y guardá el mes con <strong>"Guardar mes"</strong></div>
-    
-    <div class="tip"><strong>🎨 EL SECRETO DEL EQUILIBRIO</strong><br/>
-    El objetivo <strong>NO</strong> es que todas las áreas estén en 10.<br/>
-    El objetivo es lograr <strong>EQUILIBRIO</strong> entre las áreas.<br/><br/>
-    Una rueda con todo 10 pero desequilibrada, no rueda.<br/>
-    Una rueda con todo 6 pero pareja, rueda perfecto.</div>
-    
-    <div class="tip"><strong>💡 TIPS ÚTILES</strong><br/>
-    • 📅 Podés guardar un puntaje diferente cada mes<br/>
-    • 📊 El historial guarda todas tus evaluaciones<br/>
-    • 🔄 Podés reiniciar los puntajes cuando quieras<br/>
-    • 📤 Compartí tu rueda por WhatsApp<br/>
-    • 🌟 Sumado a las otras herramientas, ayuda a calcular tu Score</div>
-    
-    <div class="tip"><strong>💭 CONSEJO FINAL</strong><br/>
-    Sé lo más sincero/a posible al puntuarte.<br/>
-    La rueda es tuya, para vos.<br/>
-    Cuanto más honesto, más útil te va a resultar.<br/><br/>
-    Te recomendamos hacer la <strong>Rueda del Negocio</strong> junto con tu línea ascendente.</div>`
+    html:`<p>Evaluá 8 áreas del 0 al 10. La app arma la rueda con tus puntajes.</p>
+
+    <div class="tip"><strong>CÓMO USARLA</strong><br/>
+    1) Elegí mes y año<br/>
+    2) Tocá <b>Evaluar</b> en la barra de abajo<br/>
+    3) Mové cada deslizador del 0 al 10<br/>
+    4) Volvé y guardá el mes</div>
+
+    <div class="tip"><strong>EL SECRETO</strong><br/>
+    No hace falta que todo esté en 10. Lo importante es el <b>equilibrio</b>. Una rueda pareja rueda mejor.</div>
+
+    <div class="tip"><strong>EN EL MES</strong><br/>
+    Van después de Las 7 P y el Presupuesto: primero Rueda Vida, después Rueda Negocio.</div>
+
+    <div class="tip"><strong>CONSEJO</strong><br/>
+    Sé honesto. La Rueda del Negocio conviene hacerla con tu línea ascendente.</div>`
   },
   equipo: {
     icon:'🌳', iconBg:'linear-gradient(135deg,#3ad0a4,#a06bff)',
     title:'Mi Equipo',
     sub:'Tu equipo, siempre a mano',
-    html:`<p>Cargá el reporte de tu empresa y accedé a toda la info de tu línea descendente en segundos.</p>
-    
-    <div class="tip"><strong>📥 PASO 1: Cargar tu equipo</strong><br/>
-    1) Descargá el reporte de <strong>Línea Descendente</strong> desde tu empresa<br/>
-    2) Tocá "Elegir archivo" y seleccioná el .xls o .xlsx<br/>
-    3) La app te mostrará cuántas personas se cargaron<br/><br/>
-    💡 Podés actualizarlo cada mes con el reporte nuevo.</div>
-    
-    <div class="tip"><strong>📄 PASO 2: Cargar Garantías (opcional pero MUY recomendado)</strong><br/>
-    Después de cargar el equipo, la app te va a preguntar si querés cargar el archivo de <strong>"Garantías por Organización"</strong>.<br/><br/>
-    Al hacerlo, vas a ver en cada persona:<br/>
-    • Garantías presentadas<br/>
-    • Vencidas (con %)<br/>
-    • Pendientes por presentar</div>
-    
-    <p><strong>🗂️ LAS 3 VISTAS</strong></p>
+    html:`<p>Cargá el reporte de tu empresa y tené toda tu línea a mano.</p>
+
+    <div class="tip"><strong>1. CARGAR EQUIPO</strong><br/>
+    Descargá <b>Línea Descendente</b> y elegí el Excel. Podés actualizarlo cada mes.</div>
+
+    <div class="tip"><strong>2. CARGAR GARANTÍAS</strong><br/>
+    Después te pregunta por <b>Garantías por Organización</b>. Así ves presentadas, vencidas y pendientes en cada persona.</div>
+
+    <p><strong>3 VISTAS</strong></p>
     <ul>
-      <li>📊 <strong>Tablero:</strong> vista general con estadísticas, ranking, cumpleañeros y garantías.</li>
-      <li>🌳 <strong>Árbol:</strong> estructura jerárquica de tu equipo con PB y garantías.</li>
-      <li>📋 <strong>Lista:</strong> buscador de personas con filtros por categoría y estado.</li>
+      <li>📊 <strong>Tablero</strong> — números, ranking, cumpleaños y garantías</li>
+      <li>🌳 <strong>Árbol</strong> — quién está debajo de quién</li>
+      <li>📋 <strong>Lista</strong> — buscador y filtros</li>
     </ul>
-    
-    <div class="tip"><strong>💡 TIPS AVANZADOS</strong><br/>
-    • 🎂 Los cumpleañeros del día aparecen en la Home<br/>
-    • 💬 Tocá cualquier persona para ver detalles y contactarla<br/>
-    • 📤 Podés compartir el árbol como imagen<br/>
-    • 🔍 En la Lista podés buscar por nombre o código<br/>
-    • 🌙 La app se adapta al modo día/noche<br/>
-    • 👉 Tocá cada persona en el Árbol para ver quiénes están debajo</div>
-    
-    <div class="warn-tip"><strong>🔒 Privacidad:</strong> Toda esta información queda SOLO en tu dispositivo. No se sube a ningún servidor. Nadie más puede verla, ni siquiera nosotros.</div>`
+
+    <div class="tip"><strong>TIPS</strong><br/>
+    Tocá una persona para ver ficha, WhatsApp o llamada. Los cumpleañeros de hoy aparecen en el Inicio. En PC, Garantías del Equipo ocupa todo el ancho.</div>
+
+    <div class="warn-tip"><strong>🔒 Privacidad:</strong> Todo queda solo en tu dispositivo.</div>`
   },
- equipoTablero: {
+  equipoTablero: {
     icon:'📊', iconBg:'linear-gradient(135deg,#5b8def,#a06bff)',
     title:'Tablero',
     sub:'Vista general de tu equipo',
     html:`<p>Todo tu equipo en un vistazo.</p>
-    
-    <div class="tip"><strong>📈 QUÉ VAS A VER</strong><br/>
-    • Total de personas y activos (%)<br/>
-    • PB totales del equipo<br/>
-    • Distribución por categoría (DJ, D, DC, CE, L, LE, E)<br/>
-    • Ranking de Ventas (Personal y de Organización)<br/>
-    • Cumpleañeros de HOY (destacados)<br/>
-    • Cumpleañeros del mes (desplegable)<br/>
-    • Garantías del equipo (presentadas, vencidas, pendientes)<br/>
-    • Top con más pendientes por presentar</div>
-    
-    <div class="tip"><strong>💡 TIP:</strong> tocá cualquier estadística o persona para ver más detalles.</div>`
+    <div class="tip"><strong>QUÉ VAS A VER</strong><br/>
+    Personas, activos, PB, categorías, ranking (personal u organización), cumpleaños de hoy y del mes, y Garantías del Equipo (vendidas, vencidas y pendientes).</div>
+    <div class="tip"><strong>TIP:</strong> tocá una estadística o una persona para ver más.</div>`
   },
   equipoArbol: {
     icon:'🌳', iconBg:'linear-gradient(135deg,#3ad0a4,#5b8def)',
     title:'Árbol',
     sub:'La estructura de tu equipo',
-    html:`<p>La estructura completa de tu equipo, visualizada.</p>
-    
-    <div class="tip"><strong>🔍 QUÉ PODÉS HACER</strong><br/>
-    • Ver la jerarquía completa (quién está debajo de quién)<br/>
-    • Tocá cada persona para ver quiénes están bajo su línea<br/>
-    • Ver PB Personal (👤) y de Organización (👥)<br/>
-    • Ver garantías: presentadas, vencidas y pendientes<br/>
-    • Los colores de las categorías te ayudan a identificar niveles</div>
-    
-    <div class="tip"><strong>💡 TIP:</strong> podés exportar el árbol como imagen para compartirlo por WhatsApp.</div>`
+    html:`<p>La jerarquía completa de tu equipo.</p>
+    <div class="tip"><strong>QUÉ PODÉS HACER</strong><br/>
+    Ver quién está debajo de quién, PB personal y de organización, garantías y categorías por color.</div>
+    <div class="tip"><strong>TIP:</strong> podés exportar el árbol como imagen o abrir el organigrama grande.</div>`
   },
   equipoLista: {
     icon:'📋', iconBg:'linear-gradient(135deg,#ff8f6b,#ff6b9d)',
     title:'Lista',
     sub:'Todas las personas de tu equipo',
-    html:`<p>Todas las personas de tu equipo en un solo lugar.</p>
-    
-    <div class="tip"><strong>🔍 QUÉ PODÉS HACER</strong><br/>
-    • Buscá por nombre o número de distribuidor<br/>
-    • Filtrá por categoría (DJ, D, DC, CE, etc.)<br/>
-    • Filtrá por estado (Activos o Inactivos)<br/>
-    • Ver el PB Personal y de Organización de cada uno<br/>
-    • Tocá cualquier persona para ver detalles completos</div>
-    
-    <div class="tip"><strong>💡 TIP:</strong> desde el detalle podés contactar por WhatsApp, llamar o enviar email en un toque.</div>`
+    html:`<p>Todas las personas en un solo listado.</p>
+    <div class="tip"><strong>QUÉ PODÉS HACER</strong><br/>
+    Buscá por nombre o código, filtrá por categoría o activos/inactivos, y tocá a alguien para ver ficha, WhatsApp o llamada.</div>`
   },
-  score: { icon:'🌟', iconBg:'linear-gradient(135deg,#5b8def,#a06bff,#ff6b9d)', title:'Score del mes', sub:'Cómo leerlo y compartirlo', html:`<p>El <strong>Score del mes</strong> es un número de 0 a 100 que resume cómo viene tu mes.</p>
-    <div class="tip"><strong>📖 CÓMO LEERLO</strong><br/>Mirá el número y la barra para visión rápida. Se actualiza cuando completás herramientas.</div>
-    <div class="tip"><strong>🧮 CÓMO SE CALCULA</strong><br/>• 🚀 25% Las 7 P<br/>• 💰 25% Presupuesto<br/>• ⚖️ 25% Rueda Vida<br/>• 📊 25% Rueda Negocio</div>` },
+  score: {
+    icon:'🌟', iconBg:'linear-gradient(135deg,#5b8def,#a06bff,#ff6b9d)',
+    title:'Score del mes',
+    sub:'Cómo leerlo',
+    html:`<p>El <strong>Score del mes</strong> va de 0 a 100 y resume tu planificación.</p>
+    <div class="tip"><strong>CÓMO SE CALCULA</strong><br/>
+    • 🚀 25% Las 7 P<br/>
+    • 💰 25% Presupuesto<br/>
+    • ⚖️ 25% Rueda Vida<br/>
+    • 📊 25% Rueda Negocio</div>
+    <div class="tip"><strong>CÓMO AVANZAR</strong><br/>
+    Seguí el próximo paso dentro de <b>Mi mes</b>. Cuando no hay datos, el Score te invita a empezar por Las 7 P.</div>`
+  },
   planning: {
     icon:'🗓️', iconBg:'linear-gradient(135deg,#5b8def,#a06bff)',
-    title:'Planificando mi Mes', sub:'Tus 4 herramientas mensuales',
-    html:`<p>Acá tenés las 4 herramientas que usás todos los meses, juntas.</p>
-    <div class="tip"><strong>💰 Presupuesto</strong> – Control ingresos y gastos, balance y gráfico.</div>
-    <div class="tip"><strong>🚀 Las 7 P</strong> – 7 pasos para planificar tu mes, de Parar a Progresar.</div>
-    <div class="tip"><strong>⚖️ Rueda Vida</strong> – 8 áreas personales del 0 al 10.</div>
-    <div class="tip"><strong>📊 Rueda Negocio</strong> – 8 áreas de negocio del 0 al 10.</div>
-    <div class="tip"><strong>💡 TIP</strong> – Tocá cada card para entrar, y usá el ? para guía de cada una.</div>`
+    title:'Planificando mi Mes',
+    sub:'Tus 4 herramientas mensuales',
+    html:`<p>Las 4 herramientas del mes, en el orden en que conviene usarlas.</p>
+    <div class="tip"><strong>🚀 Las 7 P</strong> — el plan, primero.</div>
+    <div class="tip"><strong>💰 Presupuesto</strong> — ingresos y gastos.</div>
+    <div class="tip"><strong>⚖️ Rueda Vida</strong> — 8 áreas personales.</div>
+    <div class="tip"><strong>📊 Rueda Negocio</strong> — 8 áreas profesionales.</div>`
   },
   eval: {
     icon:'📝', iconBg:'linear-gradient(135deg,#5b8def,#a06bff)',
-    title:'Evaluar Áreas', sub:'Puntuate del 0 al 10',
+    title:'Evaluar Áreas',
+    sub:'Puntuate del 0 al 10',
     html:`<p>Mové cada deslizador según cómo te sentís hoy en esa área.</p>
-    <div class="tip"><strong>0</strong> = muy bajo / nada satisfecho<br/><strong>10</strong> = excelente</div>
-    <div class="tip"><strong>💡 TIP</strong> – Sé honesto: esta evaluación es privada y se guarda automáticamente en el dispositivo.</div>`
+    <div class="tip"><strong>0</strong> = muy bajo · <strong>10</strong> = excelente</div>
+    <div class="tip"><strong>TIP</strong> — Sé honesto. Se guarda solo en tu dispositivo.</div>`
   },
   sieteDetail: {
     icon:'📋', iconBg:'linear-gradient(135deg,#3ad0a4,#5b8def)',
-    title:'Detalle del Paso', sub:'Completá este paso de las 7 P',
-    html:`<p>Completá los campos de este paso.</p>
-    <div class="tip"><strong>Pasos</strong><br/>• Escribí tus ideas, metas, tareas<br/>• Usá + para agregar ítems<br/>• Tildá Hecho cuando termines</div>`
+    title:'Detalle del Paso',
+    sub:'Completá este paso de las 7 P',
+    html:`<p>Completá los campos de este paso y tocá <b>Hecho ✓</b> cuando termines.</p>
+    <div class="tip">Podés agregar ítems con + y volver a editarlo cuando quieras.</div>`
   },
   presuHist: {
     icon:'📊', iconBg:'linear-gradient(135deg,#f5b301,#ff8f6b)',
-    title:'Historial Presupuesto', sub:'Tus meses guardados',
-    html:`<p>Todos los presupuestos mensuales que guardaste.</p>
-    <div class="tip"><strong>Qué ves</strong><br/>• Fecha, balance, ingresos vs gastos<br/>• Tocá para ver detalle y copiar al mes actual</div>`
+    title:'Historial Presupuesto',
+    sub:'Tus meses guardados',
+    html:`<p>Los presupuestos que ya cerraste.</p>
+    <div class="tip">Vas a ver fecha, balance e ingresos vs gastos. Tocá un mes para verlo o copiarlo al actual.</div>`
   },
   seguimiento: {
     icon:'📇', iconBg:'linear-gradient(135deg,#5b8def,#a06bff)',
-    title:'Contactos del Mes', sub:'Personas para contactar',
-    html:`<p>Tu lista de seguimiento mensual.</p>
-    <div class="tip"><strong>＋ Nueva persona</strong> – Nombre, teléfono, interés (Producto/Negocio), estado (No contactado, Seguimiento...), fecha próximo contacto y notas.</div>
-    <div class="tip"><strong>📋 Ver todas vs Pendientes</strong> – Filtrá por estado.</div>
-    <div class="tip"><strong>💬 Contactar</strong> – Botones WhatsApp y Llamar directo.</div>
-    <div class="tip"><strong>✅ Listo / Editar / Eliminar</strong> – Actualizá el estado rápido.</div>`
+    title:'Contactos del Mes',
+    sub:'Personas para contactar',
+    html:`<p>Tu agenda de seguimiento. Los invitados de Cultura de crecimiento también se guardan acá.</p>
+    <div class="tip"><strong>＋ Nueva persona</strong> — nombre, teléfono, interés, estado, fecha y notas.</div>
+    <div class="tip"><strong>💬 Contactar</strong> — WhatsApp o llamada directa.</div>
+    <div class="tip"><strong>✅ Listo / Editar / Eliminar</strong> — actualizá rápido el estado.</div>`
   },
-  wheel: {
+  vida: {
     icon:'⚖️', iconBg:'linear-gradient(135deg,#5b8def,#a06bff)',
-    title:'Rueda', sub:'Equilibrio',
-    html:`<p>Evaluá 8 áreas del 0 al 10. Los cambios se guardan automáticamente y podés compartir el resultado.</p><div class="tip"><strong>Tip</strong> – La clave es equilibrio, no todo 10.</div>`
+    title:'Rueda de la Vida',
+    sub:'8 áreas personales',
+    html:`<p>Evaluá 8 áreas personales del 0 al 10. Es el tercer paso de la planificación del mes, después de Las 7 P y el Presupuesto.</p>
+    <div class="tip">Buscá equilibrio, no un 10 en todo.</div>`
   },
-  vida: { icon:'⚖️', iconBg:'linear-gradient(135deg,#5b8def,#a06bff)', title:'Rueda de la Vida', sub:'8 áreas personales', html:`<p>8 áreas personales del 0 al 10. Buscá equilibrio.</p>` },
-  negocio: { icon:'📊', iconBg:'linear-gradient(135deg,#ff8f6b,#ff6b9d)', title:'Rueda del Negocio', sub:'8 áreas de negocio', html:`<p>8 áreas de negocio del 0 al 10. Hacela con tu línea ascendente.</p>` },
-  equipoTablero: { icon:'📊', iconBg:'linear-gradient(135deg,#5b8def,#a06bff)', title:'Tablero Equipo', sub:'Vista general', html:`<p>Estadísticas, ranking, cumpleaños y garantías de tu equipo.</p>` },
+  negocio: {
+    icon:'📊', iconBg:'linear-gradient(135deg,#ff8f6b,#ff6b9d)',
+    title:'Rueda del Negocio',
+    sub:'8 áreas profesionales',
+    html:`<p>Evaluá 8 áreas de tu negocio del 0 al 10. Es el último paso de la planificación del mes.</p>
+    <div class="tip">Conviene hacerla con tu línea ascendente. Al terminarla, APPI te felicita el plan del mes.</div>`
+  },
   grabadora: {
     icon:'🎙️', iconBg:'linear-gradient(135deg,#5b8def,#a06bff)',
-    title:'Grabadora', sub:'Audio simple',
+    title:'Grabadora',
+    sub:'Grabá y escuchá',
     html:`<p>Grabá una idea, una reunión o un recado y escuchalo cuando quieras.</p>
-    <div class="tip"><strong>Grabar</strong> – Tocá el micrófono o Grabar. Permití el micrófono la primera vez.</div>
-    <div class="tip"><strong>Pausar / Finalizar</strong> – Pausá si necesitás y finalizá para guardar.</div>
-    <div class="tip"><strong>Escuchar</strong> – El audio queda en Tus grabaciones, con reproductor, descarga y borrar.</div>`
+    <div class="tip"><strong>Grabar</strong> — tocá el micrófono o Grabar. La primera vez pedí permiso al micrófono.</div>
+    <div class="tip"><strong>Pausar / Finalizar</strong> — las barritas se animan solo mientras grabás.</div>
+    <div class="tip"><strong>Nombre</strong> — al terminar se abre un popup. Queda: fecha - el nombre que elijas. Después lo podés cambiar.</div>
+    <div class="tip"><strong>Escuchar</strong> — cada audio tiene reproductor, descarga y borrar.</div>`
   },
   notas: {
     icon:'📝', iconBg:'linear-gradient(135deg,#fbbf24,#f59e0b)',
-    title:'Notas Keep', sub:'Stick de colores',
-    html:`<p>Tu Google Keep dentro de APPI, con post-its de colores.</p>
-    <div class="tip"><strong>＋ Nueva nota</strong> – Título + texto + color. Guardá.</div>
-    <div class="tip"><strong>🎨 Colores</strong> – Al guardar te pide elegir color.</div>
-    <div class="tip"><strong>📌 Popup grande</strong> – Tocá la nota para abrir popup grande con opciones Editar, Fijar, Enviar, Borrar.</div>
-    <div class="tip"><strong>🔍 Buscar</strong> – Filtrá por texto en el buscador arriba.</div>
-    <div class="tip"><strong>💾 Todo local</strong> – Queda en tu dispositivo.</div>`
+    title:'Notas Keep',
+    sub:'Notas de colores',
+    html:`<p>Tus notas rápidas, con color, como post-its.</p>
+    <div class="tip"><strong>Nueva nota</strong> — título + texto y elegí un color al guardar.</div>
+    <div class="tip"><strong>Abrir</strong> — tocá una nota para editar, fijar, enviar o borrar.</div>
+    <div class="tip"><strong>Buscar</strong> — filtrá por texto arriba. Todo queda en tu dispositivo.</div>`
   },
   usuarios: {
     icon:'📍', iconBg:'linear-gradient(135deg,#3ad0a4,#5b8def)',
-    title:'Usuarios Garantías', sub:'Gestión por zona y vencimiento',
-    html:`<p>Contenedor estilo Mi Equipo para cargar tu planilla de usuarios con garantías.</p>
-    <div class="tip"><strong>📂 Cargar archivo</strong> – Arrastrá o elegí tu Excel (.xls, .xlsx, .csv) con columnas Usuario, Teléf., Domicilio, C.P., Localidad, Producto, F. Compra, F. Vence.</div>
-    <div class="tip"><strong>📊 Dashboard</strong> – Total, vencidas 🔴, por vencer 30 días 🟡, cantidad de zonas.</div>
-    <div class="tip"><strong>🔍 Filtros</strong> – Buscador + filtros por vencimiento + píldoras por zona (Localidad) + ordenar por Vence.</div>
-    <div class="tip"><strong>👤 Listado</strong> – Cards con nombre, teléfono, domicilio, CP, localidad, producto, F. Compra y F. Vence exactos como en tu Excel (ej: 17/10/2003), días restantes/vencida, y badges.</div>
-    <div class="tip"><strong>📍 Mapa</strong> – Botón Ver en mapa abre Google Maps con domicilio+localidad+CP. Botón Vecinos filtra por misma Localidad y muestra marcadores <span style="color:#d9534f">rojos</span> en mapa interno (uno por cada vecino en esa zona).</div>
-    <div class="tip"><strong>📞 Acciones</strong> – Llamar, ver detalle, exportar CSV filtrado.</div>
-    <div class="warn-tip"><strong>🔒 Privacidad:</strong> Todo queda local, similar a Mi Equipo.</div>`
+    title:'Usuarios / Garantías',
+    sub:'Zona y vencimiento',
+    html:`<p>Cargá tu planilla de usuarios con garantías para ver vencimientos y zonas.</p>
+    <div class="tip"><strong>Cargar</strong> — Excel o CSV con Usuario, teléfono, domicilio, localidad, producto y fechas.</div>
+    <div class="tip"><strong>Dashboard</strong> — total, vencidas, por vencer y vigentes.</div>
+    <div class="tip"><strong>Filtros</strong> — buscador, zona y orden por vencimiento.</div>
+    <div class="tip"><strong>Mapa</strong> — ver domicilio o vecinos de la misma zona.</div>
+    <div class="warn-tip"><strong>🔒 Privacidad:</strong> Todo queda local, como Mi Equipo.</div>`
   }
 };
 
@@ -9780,10 +9710,10 @@ function abrirBackupDesdeMenu(){
       if (evt.data && evt.data.type === 'appi-reload') location.reload();
     });
     window.addEventListener('load', () => {
-      const bustKey = 'appi_cache_v183';
+      const bustKey = 'appi_cache_v184';
       const already = localStorage.getItem(bustKey) === '1';
       const finish = () => {
-        navigator.serviceWorker.register('./service-worker.js?v=183').catch(() => {});
+        navigator.serviceWorker.register('./service-worker.js?v=184').catch(() => {});
       };
       if (already) { finish(); return; }
       localStorage.setItem(bustKey, '1');
@@ -9791,7 +9721,7 @@ function abrirBackupDesdeMenu(){
         caches.keys().then((keys) => Promise.all(keys.map((k) => caches.delete(k)))).catch(() => {}),
         navigator.serviceWorker.getRegistrations().then((rs) => Promise.all(rs.map((r) => r.unregister()))).catch(() => {})
       ]).then(() => {
-        location.replace(location.pathname + '?v=183' + location.hash);
+        location.replace(location.pathname + '?v=184' + location.hash);
       }).catch(finish);
     });
   }
