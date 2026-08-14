@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v189-admin-seguro';
+const CACHE_NAME = 'appi-v190-pulido';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

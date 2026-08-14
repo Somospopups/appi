@@ -12,12 +12,16 @@ function randomPassword(){
   for(let index=chars.length-1;index>0;index--){const target=crypto.getRandomValues(new Uint32Array(1))[0]%(index+1);[chars[index],chars[target]]=[chars[target],chars[index]]}
   return chars.join('');
 }
-async function callAdmin(body){
+async function callAdmin(body,retry=true){
   const configuration=cfg(),token=window.APPIAuth.accessToken();
   let response;
   try{response=await fetch(String(configuration.url).replace(/\/$/,'')+'/functions/v1/admin-distribuidores',{method:'POST',headers:{apikey:configuration.anonKey,Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body:JSON.stringify(body)})}
   catch(error){throw new Error('No se pudo conectar con el panel administrador.')}
   const data=await response.json().catch(()=>({}));
+  if(response.status===401&&retry){
+    try{await window.APPIAuth.refresh();return callAdmin(body,false)}
+    catch(error){await window.APPIDataSync.logoutAndLock({removeCache:false}).catch(()=>{});setTimeout(()=>location.reload(),100);throw new Error('La sesión anterior venció. Volvé a ingresar desde el candado.')}
+  }
   if(response.status===404)throw new Error('Falta instalar la función admin-distribuidores en Supabase.');
   if(!response.ok)throw new Error(data.error||'No se pudo completar la operación.');
   return data;

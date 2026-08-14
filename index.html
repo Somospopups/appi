@@ -2626,7 +2626,7 @@ body.dark .lock-error.login-info{background:rgba(91,141,239,.16);color:#a8b8ff}
 .admin-login-overlay{position:fixed;inset:0;z-index:10020;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(21,22,37,.52);backdrop-filter:blur(9px)}
 .admin-login-overlay[hidden]{display:none!important}
 .admin-login-card{position:relative;width:min(100%,380px);padding:27px 24px 24px;border-radius:25px;background:rgba(255,255,255,.97);box-shadow:0 24px 70px rgba(24,26,55,.32);text-align:center}
-.admin-login-card h2{margin:8px 0 5px;font-size:21px;color:#252633}.admin-login-card>p{margin:0 0 19px;color:#6d6e7c;font-size:13px}.admin-login-icon{width:58px;height:58px;margin:auto;border-radius:17px;display:grid;place-items:center;background:linear-gradient(135deg,#5b8def,#8b63e8);font-size:25px;box-shadow:0 9px 23px rgba(91,112,210,.25)}
+.admin-login-card h2{margin:9px 0 20px;font-size:21px;color:#252633}.admin-login-card .lock-field{margin-bottom:14px}.admin-login-card .lock-input.login-input{min-height:52px;margin:0}.admin-login-card .lock-activate-btn{min-height:50px}.admin-login-icon{width:58px;height:58px;margin:auto;border-radius:17px;display:grid;place-items:center;background:linear-gradient(135deg,#5b8def,#8b63e8);font-size:25px;box-shadow:0 9px 23px rgba(91,112,210,.25)}
 .admin-login-close{position:absolute;top:12px;right:12px;width:34px;height:34px;border:0;border-radius:50%;background:rgba(80,90,130,.08);color:#555665;font-size:22px;cursor:pointer}
 body.dark .admin-login-lock{background:rgba(91,141,239,.18);color:#b6c8ff;border-color:rgba(255,255,255,.1)}
 body.dark .admin-login-card{background:#242638}body.dark .admin-login-card h2{color:#f2f2f7}body.dark .admin-login-card>p{color:#b6b7c4}
@@ -3481,7 +3481,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
     <button class="ds-btn" data-ds="view-planning" onclick="showView('view-planning'); renderPlanningTools();"><span>🗓️</span> Planificación</button>
   </nav>
-  <div class="ds-foot">APPI · v189 · Panel administrador</div>
+  <div class="ds-foot">APPI · v190 · Panel administrador</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -3540,7 +3540,6 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
       <button type="button" class="admin-login-close" id="btnAdminLoginClose" aria-label="Cerrar">×</button>
       <div class="admin-login-icon">🔒</div>
       <h2 id="adminLoginTitle">Panel administrador</h2>
-      <p>Ingresá la contraseña de POPUPS.</p>
       <label class="lock-field"><span>Contraseña</span><input type="password" class="lock-input login-input" id="adminLoginPassword" autocomplete="current-password" placeholder="Contraseña de administrador"></label>
       <button type="button" class="lock-activate-btn" id="btnAdminLoginSubmit">Ingresar al panel</button>
       <div class="lock-error" id="adminLoginError" role="alert"></div>
@@ -9953,7 +9952,7 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./service-worker.js?v=189').catch(error => {
+      navigator.serviceWorker.register('./service-worker.js?v=190').catch(error => {
         console.warn('No se pudo registrar el modo offline de APPI', error);
       });
     });
@@ -13857,21 +13856,6 @@ setTimeout(initHistorico,1200);
         if(n.nodeType === 3){
           const t = n.textContent || '';
           if(/initHistorico|parseHistoricalFile|<\/script>|<\/html>/.test(t)){
-            n.parentNode && n.parentNode.removeChild(n);
-          }
-        }
-      });
-    }catch(e){}
-  }
-  limpiarRestos();
-  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', limpiarRestos);
-  setTimeout(limpiarRestos, 0);
-  setTimeout(limpiarRestos, 400);
-})();
-</script>
-</body>
-</html>
-)){
             n.parentNode && n.parentNode.removeChild(n);
           }
         }
