@@ -4080,10 +4080,10 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
       <section class="glass admin-card">
         <div class="admin-card-head"><div><h2>Nueva cuenta</h2><p>Creá el acceso temporal de un distribuidor.</p></div><button type="button" class="btn btn-secondary" id="adminGeneratePassword">Generar contraseña</button></div>
         <div class="admin-form-grid">
-          <label><span>Sucursal</span><input id="adminSucursal" inputmode="numeric" maxlength="2" placeholder="02"></label>
-          <label><span>Número de distribuidor</span><input id="adminNumero" inputmode="numeric" maxlength="12" placeholder="9802014"></label>
-          <label class="wide"><span>Nombre</span><input id="adminNombre" maxlength="120" placeholder="Nombre y apellido"></label>
-          <label class="wide"><span>Contraseña temporal</span><input id="adminTempPassword" type="text" maxlength="80" placeholder="Generá o escribí una contraseña"></label>
+          <label><span>Sucursal</span><input id="adminSucursal" inputmode="numeric" maxlength="2" placeholder="02" autocomplete="off"></label>
+          <label><span>Número de distribuidor</span><input id="adminNumero" inputmode="numeric" maxlength="12" placeholder="9802014" autocomplete="off"></label>
+          <label class="wide"><span>Nombre</span><input id="adminNombre" maxlength="120" placeholder="Nombre y apellido" autocomplete="off"></label>
+          <label class="wide"><span>Contraseña temporal</span><input id="adminTempPassword" type="text" maxlength="80" placeholder="Generá o escribí una contraseña" autocomplete="new-password"></label>
         </div>
         <button type="button" class="btn btn-primary admin-create-btn" id="adminCreateUser">Crear cuenta</button>
         <div class="admin-inline-status" id="adminCreateStatus" role="status"></div>

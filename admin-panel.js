@@ -68,6 +68,7 @@ async function logout(){
 }
 function bind(){
   if(state.bound)return;state.bound=true;
+  ['adminSucursal','adminNumero','adminNombre','adminTempPassword'].forEach(id=>{const input=$(id);if(input)input.value=''});
   $('adminGeneratePassword').onclick=()=>$('adminTempPassword').value=randomPassword();
   $('adminCreateUser').onclick=create;$('adminRefreshUsers').onclick=load;$('btnAdminPanelLogout').onclick=logout;$('btnAdminPanelPassword').onclick=()=>window.abrirCambioPasswordAPPI();
   $('adminUserSearch').oninput=event=>{state.filter=event.target.value;render()};
