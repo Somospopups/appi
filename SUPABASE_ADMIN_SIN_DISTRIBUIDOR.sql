@@ -13,6 +13,11 @@ alter column sucursal drop not null;
 alter table public.appi_perfiles
 alter column numero_distribuidor drop not null;
 
+-- Elimina únicamente el perfil administrador anterior que estaba ligado a un DIP.
+-- Las cuentas de distribuidores no se modifican.
+delete from public.appi_perfiles
+where rol = 'admin';
+
 alter table public.appi_perfiles
 drop constraint if exists appi_perfiles_dip_formato;
 
