@@ -13,8 +13,8 @@ async function mockSupabase(page) {
   const cloud = new Map([[USER_A, new Map()], [USER_B, new Map()]]);
   let offline = false;
   const profiles = {
-    [USER_A]: { user_id: USER_A, dip: '1001', nombre: 'Distribuidor A', rol: 'usuario', activo: true },
-    [USER_B]: { user_id: USER_B, dip: '2002', nombre: 'Distribuidor B', rol: 'usuario', activo: true }
+    [USER_A]: { user_id: USER_A, dip: '02-9802014', sucursal: '02', numero_distribuidor: '9802014', nombre: 'Distribuidor A', rol: 'usuario', activo: true },
+    [USER_B]: { user_id: USER_B, dip: '03-1234567', sucursal: '03', numero_distribuidor: '1234567', nombre: 'Distribuidor B', rol: 'usuario', activo: true }
   };
   const cors = { 'access-control-allow-origin': '*', 'content-type': 'application/json' };
 
@@ -34,7 +34,7 @@ async function mockSupabase(page) {
 
     if (url.pathname === '/auth/v1/token' && url.searchParams.get('grant_type') === 'password') {
       const body = request.postDataJSON();
-      const target = body.email.startsWith('dip-1001@') ? USER_A : body.email.startsWith('dip-2002@') ? USER_B : '';
+      const target = body.email.startsWith('dip-02-9802014@') ? USER_A : body.email.startsWith('dip-03-1234567@') ? USER_B : '';
       if (!target || body.password !== 'Clave1234') return route.fulfill({ status: 400, headers: cors, body: JSON.stringify({ error: 'Credenciales incorrectas' }) });
       return route.fulfill({ status: 200, headers: cors, body: JSON.stringify({ access_token: tokenFor(target), refresh_token: `refresh-${target}`, expires_in: 3600, token_type: 'bearer', user: { id: target } }) });
     }
@@ -81,7 +81,7 @@ test('cada distribuidor sincroniza y ve únicamente sus datos', async ({ page })
 
   await expect(page.locator('#distributorLoginPanel')).toBeVisible();
   await expect(page.locator('#legacyActivationPanel')).toBeHidden();
-  await login(page, '1001');
+  await login(page, '029802014');
 
   await page.evaluate(() => {
     localStorage.setItem('presu_2026_7', JSON.stringify({ ingresos: 1000, propietario: 'A' }));
@@ -99,9 +99,9 @@ test('cada distribuidor sincroniza y ve únicamente sus datos', async ({ page })
   await page.evaluate(() => APPIDataSync.logoutAndLock({ removeCache: false }));
   expect(await page.evaluate(() => localStorage.getItem('presu_2026_7'))).toBeNull();
   await page.reload({ waitUntil: 'networkidle' });
-  await login(page, '2002');
+  await login(page, '03-1234567');
 
   expect(await page.evaluate(() => localStorage.getItem('presu_2026_7'))).toBeNull();
   expect(cloud.get(USER_B).has('presu_2026_7')).toBe(false);
-  expect(await page.evaluate(() => APPIAuth.currentProfile().dip)).toBe('2002');
+  expect(await page.evaluate(() => APPIAuth.currentProfile().dip)).toBe('03-1234567');
 });

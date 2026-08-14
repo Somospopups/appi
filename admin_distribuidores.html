@@ -17,7 +17,7 @@
   <section class="card" id="loginCard">
     <h2 style="margin:0;font-size:17px">Ingreso de administrador</h2>
     <div class="grid">
-      <div><label for="adminDip">Número de distribuidor</label><input id="adminDip" autocomplete="username"></div>
+      <div><label for="adminDip">Sucursal y distribuidor</label><input id="adminDip" autocomplete="username" placeholder="02-9802014" maxlength="15"></div>
       <div><label for="adminPassword">Contraseña</label><input id="adminPassword" type="password" autocomplete="current-password"></div>
     </div>
     <div class="actions"><button class="primary" id="login">Ingresar</button></div>
@@ -28,7 +28,7 @@
     <section class="card">
       <div class="topline"><div><h2>Nueva cuenta</h2><p class="muted" id="adminIdentity"></p></div><button id="logout">Cerrar sesión</button></div>
       <div class="grid">
-        <div><label for="newDip">Número de distribuidor</label><input id="newDip" maxlength="30"></div>
+        <div><label for="newDip">Sucursal y distribuidor</label><input id="newDip" maxlength="15" placeholder="02-9802014"></div>
         <div><label for="newName">Nombre</label><input id="newName" maxlength="120"></div>
         <div><label for="newPassword">Contraseña inicial</label><input id="newPassword" type="text" minlength="8"></div>
         <div><label for="newRole">Rol</label><select id="newRole"><option value="usuario">Usuario</option><option value="admin">Administrador</option></select></div>
@@ -59,7 +59,7 @@ function showAdmin(){const profile=APPIAuth.currentProfile();if(!profile||profil
 async function login(){const button=$('login');button.disabled=true;status('loginStatus','Ingresando…');try{await APPIAuth.login($('adminDip').value,$('adminPassword').value);if(!showAdmin()){await APPIAuth.logout()}}catch(error){status('loginStatus',error.message,true)}finally{button.disabled=false}}
 async function loadUsers(){const list=$('list');list.innerHTML='<div class="empty">Cargando…</div>';try{const data=await callAdmin({action:'list'}),users=data.users||[];if(!users.length){list.innerHTML='<div class="empty">Todavía no hay cuentas.</div>';return}list.innerHTML=users.map(user=>`<article class="item" data-user-id="${esc(user.user_id)}"><div><b>${esc(user.nombre||'Sin nombre')}</b><small>DIP ${esc(user.dip)} · ${esc(user.rol)}</small><span class="badge ${user.activo?'':'off'}">${user.activo?'ACTIVA':'BLOQUEADA'}</span></div><div class="item-actions"><button data-action="password">Contraseña</button><button class="${user.activo?'danger':'good'}" data-action="active" data-active="${user.activo?'0':'1'}">${user.activo?'Bloquear':'Activar'}</button></div></article>`).join('');list.querySelectorAll('[data-action]').forEach(button=>button.onclick=()=>handleAction(button))}catch(error){list.innerHTML=`<div class="status show error">${esc(error.message)}</div>`}}
 async function handleAction(button){const item=button.closest('[data-user-id]'),user_id=item.dataset.userId,action=button.dataset.action;button.disabled=true;try{if(action==='password'){const password=prompt('Nueva contraseña (mínimo 8 caracteres, letras y números):');if(!password)return;await callAdmin({action:'set_password',user_id,password});alert('Contraseña actualizada.')}else{const activo=button.dataset.active==='1';if(!confirm(activo?'¿Activar esta cuenta?':'¿Bloquear esta cuenta?'))return;await callAdmin({action:'set_active',user_id,activo});await loadUsers()}}catch(error){alert(error.message)}finally{button.disabled=false}}
-$('login').onclick=login;$('adminPassword').onkeydown=event=>{if(event.key==='Enter')login()};$('generate').onclick=()=>$('newPassword').value=randomPassword();$('refresh').onclick=loadUsers;
+$('login').onclick=login;$('adminDip').oninput=event=>event.target.value=APPIAuth.normalizeDip(event.target.value);$('newDip').oninput=event=>event.target.value=APPIAuth.normalizeDip(event.target.value);$('adminPassword').onkeydown=event=>{if(event.key==='Enter')login()};$('generate').onclick=()=>$('newPassword').value=randomPassword();$('refresh').onclick=loadUsers;
 $('create').onclick=async()=>{const button=$('create');button.disabled=true;status('createStatus','Creando cuenta…');try{await callAdmin({action:'create',dip:$('newDip').value,nombre:$('newName').value,password:$('newPassword').value,rol:$('newRole').value});status('createStatus','Cuenta creada correctamente.');$('newDip').value='';$('newName').value='';$('newPassword').value='';await loadUsers()}catch(error){status('createStatus',error.message,true)}finally{button.disabled=false}};
 $('logout').onclick=async()=>{await APPIAuth.logout();location.reload()};
 (async()=>{if(!APPIAuth.isConfigured()){status('loginStatus','Primero configurá auth-config.js con la URL y la clave pública de Supabase.',true);$('login').disabled=true;return}const result=await APPIAuth.authorize();if(result.ok)showAdmin()})();

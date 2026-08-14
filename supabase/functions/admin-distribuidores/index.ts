@@ -10,12 +10,18 @@ const jsonHeaders = { ...corsHeaders, 'Content-Type': 'application/json; charset
 function json(data: unknown, status = 200) {
   return new Response(JSON.stringify(data), { status, headers: jsonHeaders });
 }
-function normalizeDip(value: unknown) {
-  return String(value || '').trim().toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 30);
+function parseDip(value: unknown) {
+  const digits = String(value || '').replace(/\D/g, '').slice(0, 14);
+  if (digits.length < 3) return null;
+  return {
+    canonical: `${digits.slice(0, 2)}-${digits.slice(2)}`,
+    sucursal: digits.slice(0, 2),
+    numero: digits.slice(2),
+  };
 }
 function emailForDip(dip: string) {
   const domain = Deno.env.get('DISTRIBUTOR_EMAIL_DOMAIN') || 'distribuidores.appi.invalid';
-  return `dip-${dip.toLowerCase()}@${domain}`;
+  return `dip-${dip}@${domain}`;
 }
 function validPassword(password: unknown) {
   const text = String(password || '');
@@ -43,7 +49,7 @@ Deno.serve(async (request) => {
 
   const { data: profile, error: profileError } = await admin
     .from('appi_perfiles')
-    .select('user_id,dip,nombre,rol,activo')
+    .select('user_id,dip,sucursal,numero_distribuidor,nombre,rol,activo')
     .eq('user_id', authData.user.id)
     .maybeSingle();
   if (profileError || !profile || profile.rol !== 'admin' || profile.activo !== true) {
@@ -57,18 +63,19 @@ Deno.serve(async (request) => {
     if (action === 'list') {
       const { data, error } = await admin
         .from('appi_perfiles')
-        .select('user_id,dip,nombre,rol,activo,created_at,updated_at')
+        .select('user_id,dip,sucursal,numero_distribuidor,nombre,rol,activo,created_at,updated_at')
         .order('dip', { ascending: true });
       if (error) throw error;
       return json({ users: data || [] });
     }
 
     if (action === 'create') {
-      const dip = normalizeDip(body?.dip);
+      const parsedDip = parseDip(body?.dip);
       const nombre = String(body?.nombre || '').trim().slice(0, 120);
       const password = String(body?.password || '');
       const role = body?.rol === 'admin' ? 'admin' : 'usuario';
-      if (dip.length < 3) return json({ error: 'Número de distribuidor inválido.' }, 400);
+      if (!parsedDip) return json({ error: 'Ingresá una sucursal de 2 dígitos y el número de distribuidor.' }, 400);
+      const dip = parsedDip.canonical;
       if (!validPassword(password)) return json({ error: 'La contraseña necesita 8 caracteres, letras y números.' }, 400);
 
       const { data: created, error: createError } = await admin.auth.admin.createUser({
@@ -82,6 +89,8 @@ Deno.serve(async (request) => {
       const { error: insertError } = await admin.from('appi_perfiles').insert({
         user_id: created.user.id,
         dip,
+        sucursal: parsedDip.sucursal,
+        numero_distribuidor: parsedDip.numero,
         nombre,
         rol: role,
         activo: true,
@@ -90,7 +99,7 @@ Deno.serve(async (request) => {
         await admin.auth.admin.deleteUser(created.user.id).catch(() => null);
         return json({ error: insertError.message }, 400);
       }
-      return json({ user: { user_id: created.user.id, dip, nombre, rol: role, activo: true } }, 201);
+      return json({ user: { user_id: created.user.id, dip, sucursal: parsedDip.sucursal, numero_distribuidor: parsedDip.numero, nombre, rol: role, activo: true } }, 201);
     }
 
     const targetId = String(body?.user_id || '');
@@ -113,7 +122,7 @@ Deno.serve(async (request) => {
         .from('appi_perfiles')
         .update({ activo })
         .eq('user_id', targetId)
-        .select('user_id,dip,nombre,rol,activo')
+        .select('user_id,dip,sucursal,numero_distribuidor,nombre,rol,activo')
         .single();
       if (error) throw error;
       const { error: authUpdateError } = await admin.auth.admin.updateUserById(targetId, {
@@ -129,7 +138,7 @@ Deno.serve(async (request) => {
         .from('appi_perfiles')
         .update({ nombre })
         .eq('user_id', targetId)
-        .select('user_id,dip,nombre,rol,activo')
+        .select('user_id,dip,sucursal,numero_distribuidor,nombre,rol,activo')
         .single();
       if (error) throw error;
       return json({ user: data });

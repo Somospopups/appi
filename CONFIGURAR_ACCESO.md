@@ -27,18 +27,22 @@ Nunca colocar la clave `service_role` en `auth-config.js`, HTML ni JavaScript de
 
 El primer administrador se crea una sola vez desde Supabase.
 
-1. Elegir su número de distribuidor y normalizarlo dejando solo letras y números en mayúsculas. Ejemplo: `12-345` pasa a `12345`.
+1. Usar el formato `SS-NÚMERO`, donde `SS` son los 2 dígitos de la sucursal y el resto es el número del distribuidor. Ejemplo: `02-9802014`.
 2. En **Authentication → Users**, crear un usuario confirmado con:
-   - Email: `dip-12345@distribuidores.appi.invalid`
+   - Email: `dip-02-9802014@distribuidores.appi.invalid`
    - Password: una contraseña segura de al menos 8 caracteres, con letras y números.
 3. Copiar el UUID del usuario.
 4. Ejecutar en SQL Editor, reemplazando los valores:
 
 ```sql
-insert into public.appi_perfiles (user_id, dip, nombre, rol, activo)
+insert into public.appi_perfiles (
+  user_id, dip, sucursal, numero_distribuidor, nombre, rol, activo
+)
 values (
   'UUID_DEL_USUARIO',
-  '12345',
+  '02-9802014',
+  '02',
+  '9802014',
   'Nombre del administrador',
   'admin',
   true

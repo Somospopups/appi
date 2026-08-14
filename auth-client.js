@@ -18,13 +18,19 @@ function isConfigured(){
   const cfg=config();
   return isEnabled()&&/^https:\/\//i.test(cfg.url||'')&&String(cfg.anonKey||'').length>20;
 }
+function dipDigits(value){return String(value||'').replace(/\D/g,'').slice(0,14)}
 function normalizeDip(value){
-  return String(value||'').trim().toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,30);
+  const digits=dipDigits(value);
+  return digits.length>2?`${digits.slice(0,2)}-${digits.slice(2)}`:digits;
+}
+function parseDip(value){
+  const digits=dipDigits(value);
+  if(digits.length<3||digits.length>14)throw authError('Ingresá la sucursal de 2 dígitos y el número de distribuidor.','invalid_dip');
+  return {canonical:`${digits.slice(0,2)}-${digits.slice(2)}`,sucursal:digits.slice(0,2),numero:digits.slice(2),compact:digits};
 }
 function emailForDip(value){
-  const dip=normalizeDip(value);
-  if(dip.length<3)throw authError('Ingresá un número de distribuidor válido.','invalid_dip');
-  return `dip-${dip.toLowerCase()}@${config().distributorEmailDomain}`;
+  const dip=parseDip(value).canonical;
+  return `dip-${dip}@${config().distributorEmailDomain}`;
 }
 function jwtPayload(token){
   try{
@@ -86,7 +92,7 @@ async function request(path,options={},token=''){
 async function fetchProfile(session){
   const payload=jwtPayload(session&&session.access_token);
   if(!payload||!payload.sub)throw authError('La sesión recibida no es válida.','invalid_session');
-  const query=`/rest/v1/appi_perfiles?select=user_id,dip,nombre,rol,activo&user_id=eq.${encodeURIComponent(payload.sub)}&limit=1`;
+  const query=`/rest/v1/appi_perfiles?select=user_id,dip,sucursal,numero_distribuidor,nombre,rol,activo&user_id=eq.${encodeURIComponent(payload.sub)}&limit=1`;
   const rows=await request(query,{headers:{Accept:'application/json'}},session.access_token);
   const profile=Array.isArray(rows)?rows[0]:null;
   if(!profile)throw authError('La cuenta no tiene un perfil de distribuidor.','profile_missing',403);
@@ -105,8 +111,7 @@ function normalizeSession(data){
   };
 }
 async function login(dip,password){
-  const normalized=normalizeDip(dip);
-  if(normalized.length<3)throw authError('Ingresá tu número de distribuidor.','invalid_dip');
+  const parsed=parseDip(dip),normalized=parsed.canonical;
   if(String(password||'').length<6)throw authError('La contraseña debe tener al menos 6 caracteres.','invalid_password');
   const data=await request('/auth/v1/token?grant_type=password',{
     method:'POST',
@@ -114,7 +119,7 @@ async function login(dip,password){
     body:JSON.stringify({email:emailForDip(normalized),password:String(password)})
   });
   const session=normalizeSession(data),profile=await fetchProfile(session);
-  if(normalizeDip(profile.dip)!==normalized)throw authError('La cuenta no coincide con el distribuidor ingresado.','profile_mismatch',403);
+  if(parseDip(profile.dip).canonical!==normalized)throw authError('La cuenta no coincide con el distribuidor ingresado.','profile_mismatch',403);
   return save({session,profile,lastValidatedAt:Date.now(),offline:false});
 }
 async function refresh(saved=load()){
@@ -166,7 +171,7 @@ function status(){
 }
 
 window.APPIAuth={
-  SESSION_KEY,config,isEnabled,isConfigured,normalizeDip,emailForDip,login,authorize,refresh,validate,logout,
+  SESSION_KEY,config,isEnabled,isConfigured,normalizeDip,parseDip,emailForDip,login,authorize,refresh,validate,logout,
   load,clear,offlineEligible,isLocallyAuthorized,accessToken,userId,currentProfile,status
 };
 })();
