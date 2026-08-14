@@ -2,8 +2,15 @@
 (function(){
 'use strict';
 
-const DB_NAME='appi-historico-v1';
+const BASE_DB_NAME='appi-historico-v1';
 const DB_VERSION=1;
+function historicalDbName(){
+  if(window.APPIAuth&&window.APPIAuth.isEnabled()){
+    const userId=window.APPIAuth.userId();
+    return userId?`${BASE_DB_NAME}-${userId}`:`${BASE_DB_NAME}-locked`;
+  }
+  return BASE_DB_NAME;
+}
 const MONTHS_H=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 const SHORT_H=['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'];
 const FILE_TYPES={
@@ -47,10 +54,34 @@ function notifyDbChange(){
   localStorage.setItem('hist_resumen_cache',JSON.stringify({count:sorted.length,lastLabel:latest?labelPeriod(latest):'Sin cierres'}));
 }
 
+async function claimLegacyHistoricalDatabase(targetDb){
+  if(!(window.APPIAuth&&window.APPIAuth.isEnabled()))return;
+  const userId=window.APPIAuth.userId();if(!userId)return;
+  const markerKey='appi_hist_legacy_claimed_by',claimed=localStorage.getItem(markerKey);
+  if(claimed&&claimed!==userId)return;
+  const targetCount=await new Promise(resolve=>{const req=targetDb.transaction('periods','readonly').objectStore('periods').count();req.onsuccess=()=>resolve(req.result||0);req.onerror=()=>resolve(0)});
+  if(targetCount>0){if(!claimed)localStorage.setItem(markerKey,userId);return}
+  const legacy=await new Promise(resolve=>{
+    let created=false;const req=indexedDB.open(BASE_DB_NAME);
+    req.onupgradeneeded=()=>{created=true};
+    req.onsuccess=()=>{if(created){req.result.close();indexedDB.deleteDatabase(BASE_DB_NAME);resolve(null)}else resolve(req.result)};
+    req.onerror=()=>resolve(null);
+  });
+  if(!legacy)return;
+  const names=['periods','files','reports'].filter(name=>legacy.objectStoreNames.contains(name));
+  if(!names.length){legacy.close();return}
+  const records={};
+  for(const name of names){records[name]=await new Promise(resolve=>{const req=legacy.transaction(name,'readonly').objectStore(name).getAll();req.onsuccess=()=>resolve(req.result||[]);req.onerror=()=>resolve([])})}
+  legacy.close();
+  if(!names.some(name=>records[name].length))return;
+  await new Promise((resolve,reject)=>{const tx=targetDb.transaction(names,'readwrite');for(const name of names)for(const value of records[name])tx.objectStore(name).put(value);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)});
+  localStorage.setItem(markerKey,userId);
+}
+
 function openDB(){
   if(H.db)return Promise.resolve(H.db);
   return new Promise((resolve,reject)=>{
-    const req=indexedDB.open(DB_NAME,DB_VERSION);
+    const req=indexedDB.open(historicalDbName(),DB_VERSION);
     req.onupgradeneeded=()=>{
       const db=req.result;
       if(!db.objectStoreNames.contains('periods')){
@@ -63,7 +94,7 @@ function openDB(){
         const s=db.createObjectStore('reports',{keyPath:'id'});s.createIndex('createdAt','createdAt');
       }
     };
-    req.onsuccess=()=>{H.db=req.result;resolve(H.db)};
+    req.onsuccess=async()=>{H.db=req.result;try{await claimLegacyHistoricalDatabase(H.db)}catch(error){console.warn('Migración de Histórico',error)}resolve(H.db)};
     req.onerror=()=>reject(req.error||new Error('No se pudo abrir IndexedDB'));
   });
 }
@@ -582,29 +613,34 @@ async function restoreBackup(file){
 }
 
 const CLOUD_CONFIG_KEY='hist_cloud_config_v1',CLOUD_SESSION_KEY='hist_cloud_session_v1';
-function getCloudConfig(){try{return JSON.parse(localStorage.getItem(CLOUD_CONFIG_KEY)||'{}')}catch(e){return {}}}
-function saveCloudConfigValue(value){localStorage.setItem(CLOUD_CONFIG_KEY,JSON.stringify(value))}
-function getSession(){try{return JSON.parse(localStorage.getItem(CLOUD_SESSION_KEY)||'null')}catch(e){return null}}
-function setSession(value){if(value)localStorage.setItem(CLOUD_SESSION_KEY,JSON.stringify(value));else localStorage.removeItem(CLOUD_SESSION_KEY)}
+const accountAuthEnabled=()=>!!(window.APPIAuth&&window.APPIAuth.isEnabled());
+function getCloudConfig(){if(accountAuthEnabled()){const c=window.APPIAuth.config();return {url:c.url,anonKey:c.anonKey}}try{return JSON.parse(localStorage.getItem(CLOUD_CONFIG_KEY)||'{}')}catch(e){return {}}}
+function saveCloudConfigValue(value){if(!accountAuthEnabled())localStorage.setItem(CLOUD_CONFIG_KEY,JSON.stringify(value))}
+function getSession(){if(accountAuthEnabled()){const value=window.APPIAuth.load();return value&&value.session||null}try{return JSON.parse(localStorage.getItem(CLOUD_SESSION_KEY)||'null')}catch(e){return null}}
+function setSession(value){if(accountAuthEnabled())return;if(value)localStorage.setItem(CLOUD_SESSION_KEY,JSON.stringify(value));else localStorage.removeItem(CLOUD_SESSION_KEY)}
 function cloudReady(){const c=getCloudConfig();return /^https:\/\//.test(c.url||'')&&String(c.anonKey||'').length>20}
 function jwtPayload(token){try{return JSON.parse(atob(token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')))}catch(e){return {}}}
 function sessionUser(){const s=getSession();return s?jwtPayload(s.access_token||''):null}
 function sessionExpired(s){const p=s?jwtPayload(s.access_token||''):{};return !p.exp||p.exp*1000<Date.now()+60000}
 function logSync(message){H.syncLog.push(`${new Date().toLocaleTimeString('es-AR')} · ${message}`);H.syncLog=H.syncLog.slice(-30);const el=$('histSyncLog');if(el)el.textContent=H.syncLog.join('\n')}
 async function refreshCloudSession(){
-  let s=getSession();if(!s)return null;if(!sessionExpired(s))return s;const cfg=getCloudConfig();if(!s.refresh_token)return null;
+  let s=getSession();if(!s)return null;if(!sessionExpired(s))return s;
+  if(accountAuthEnabled()){try{const value=await window.APPIAuth.refresh();return value&&value.session||null}catch(e){return null}}
+  const cfg=getCloudConfig();if(!s.refresh_token)return null;
   const r=await fetch(`${cfg.url.replace(/\/$/,'')}/auth/v1/token?grant_type=refresh_token`,{method:'POST',headers:{apikey:cfg.anonKey,'Content-Type':'application/json'},body:JSON.stringify({refresh_token:s.refresh_token})});if(!r.ok){setSession(null);return null}s=await r.json();setSession(s);return s;
 }
 async function cloudFetch(path,options={},auth=true){
-  const cfg=getCloudConfig();if(!cloudReady())throw new Error('Completá la URL y la clave pública de Supabase.');let session=auth?await refreshCloudSession():null;if(auth&&!session)throw new Error('Iniciá sesión por correo para continuar.');
+  const cfg=getCloudConfig();if(!cloudReady())throw new Error('La conexión con Supabase todavía no está configurada.');let session=auth?await refreshCloudSession():null;if(auth&&!session)throw new Error(accountAuthEnabled()?'Volvé a iniciar sesión para continuar.':'Iniciá sesión por correo para continuar.');
   const headers={apikey:cfg.anonKey,...(options.headers||{})};if(session)headers.Authorization=`Bearer ${session.access_token}`;
   const r=await fetch(`${cfg.url.replace(/\/$/,'')}${path}`,{...options,headers});if(!r.ok){let message=`Error de nube ${r.status}`;try{const data=await r.json();message=data.message||data.msg||data.error_description||data.error||message}catch(e){}throw new Error(message)}return r;
 }
 async function sendMagicLink(email){
+  if(accountAuthEnabled())throw new Error('La nube usa tu cuenta de distribuidor.');
   const cfg=getCloudConfig();if(!cloudReady())throw new Error('Primero guardá la configuración de Supabase.');if(!/^[^@]+@[^@]+\.[^@]+$/.test(email))throw new Error('Ingresá un correo válido.');
   const redirect=location.href.split('#')[0];const r=await cloudFetch('/auth/v1/otp',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,create_user:true,options:{email_redirect_to:redirect}})},false);await r.text();localStorage.setItem('hist_cloud_email',email);return true;
 }
 function handleAuthHash(){
+  if(accountAuthEnabled())return false;
   if(!location.hash||!location.hash.includes('access_token='))return false;const q=new URLSearchParams(location.hash.slice(1)),access=q.get('access_token');if(!access)return false;setSession({access_token:access,refresh_token:q.get('refresh_token'),expires_in:+q.get('expires_in')||3600,token_type:q.get('token_type')||'bearer'});history.replaceState(null,'',location.pathname+location.search);toast('Nube conectada correctamente',2400);return true;
 }
 async function upsertCloudPeriod(p){
@@ -637,16 +673,16 @@ function updateSyncStatus(forceError=false){
   quick.textContent=H.syncing?'Sincronizando':(cloudReady()&&session?'Sincronizar':'Configurar nube');quick.disabled=H.syncing;
 }
 function renderCloud(c){
-  const cfg=getCloudConfig(),session=getSession(),user=sessionUser(),pending=H.periods.filter(p=>p.syncStatus!=='synced').length,email=localStorage.getItem('hist_cloud_email')||'';
+  const cfg=getCloudConfig(),session=getSession(),user=sessionUser(),pending=H.periods.filter(p=>p.syncStatus!=='synced').length,email=localStorage.getItem('hist_cloud_email')||'',accountMode=accountAuthEnabled(),profile=accountMode?window.APPIAuth.currentProfile():null;
   c.innerHTML=`<div class="hist-cloud-grid">
-    <div class="hist-card"><div class="hist-card-head"><div><h3>Estado de la nube</h3><p>Copia segura y acceso desde otros dispositivos</p></div><span class="hist-badge">${session?'Conectada':'Sin conectar'}</span></div><div class="hist-cloud-state"><div class="c-icon">☁</div><div><b>${session?`Sesión activa${user&&user.email?` · ${esc(user.email)}`:''}`:'Acceso por enlace de correo'}</b><p>${session?`${pending} cierres pendientes de sincronizar.`:'No necesitás recordar una contraseña.'}</p></div></div>${session?`<div class="hist-actions"><button class="hist-primary" id="histSyncNow">Sincronizar ahora</button><button class="hist-secondary" id="histPullCloud">Recuperar nube</button><button class="hist-danger" id="histLogout">Cerrar sesión</button></div>`:`<label class="hist-field" style="margin-top:11px"><span>Correo de acceso</span><input id="histCloudEmail" type="email" value="${esc(email)}" placeholder="tu@correo.com"></label><button class="hist-primary" id="histMagicLink">Enviar enlace de acceso</button>`}</div>
-    <div class="hist-card"><div class="hist-card-head"><div><h3>Configuración</h3><p>Supabase reúne acceso, base de datos, archivos e IA segura.</p></div></div><div class="hist-cloud-note">Para la prueba local no hace falta completar esto. Para activar la nube se debe crear el proyecto con el archivo <b>SUPABASE_SETUP.sql</b> incluido en el paquete.</div><details class="hist-config-details" ${cloudReady()?'':'open'}><summary>${cloudReady()?'Configuración guardada':'Completar conexión'}</summary><div><label class="hist-field"><span>URL de Supabase</span><input id="histCloudUrl" type="url" value="${esc(cfg.url||'')}" placeholder="https://proyecto.supabase.co"></label><label class="hist-field"><span>Clave pública (anon)</span><input id="histCloudKey" type="password" value="${esc(cfg.anonKey||'')}" placeholder="eyJ…"></label><button class="hist-secondary" id="histSaveCloud">Guardar configuración</button></div></details></div>
+    <div class="hist-card"><div class="hist-card-head"><div><h3>Estado de la nube</h3><p>Copia segura y acceso desde otros dispositivos</p></div><span class="hist-badge">${session?'Conectada':'Sin conectar'}</span></div><div class="hist-cloud-state"><div class="c-icon">☁</div><div><b>${session?(accountMode?`Cuenta ${esc(profile&&profile.dip||'')}`:`Sesión activa${user&&user.email?` · ${esc(user.email)}`:''}`):(accountMode?'Volvé a iniciar sesión':'Acceso por enlace de correo')}</b><p>${session?`${pending} cierres pendientes de sincronizar.`:(accountMode?'La sesión de distribuidor no está disponible.':'No necesitás recordar una contraseña.')}</p></div></div>${session?`<div class="hist-actions"><button class="hist-primary" id="histSyncNow">Sincronizar ahora</button><button class="hist-secondary" id="histPullCloud">Recuperar nube</button>${accountMode?'<button class="hist-secondary" id="histAccount">Mi cuenta</button>':'<button class="hist-danger" id="histLogout">Cerrar sesión</button>'}</div>`:(accountMode?'<button class="hist-primary" id="histRelogin">Volver a ingresar</button>':`<label class="hist-field" style="margin-top:11px"><span>Correo de acceso</span><input id="histCloudEmail" type="email" value="${esc(email)}" placeholder="tu@correo.com"></label><button class="hist-primary" id="histMagicLink">Enviar enlace de acceso</button>`)}</div>
+    <div class="hist-card"><div class="hist-card-head"><div><h3>Configuración</h3><p>Supabase reúne acceso, base de datos, archivos e IA segura.</p></div></div>${accountMode?'<div class="hist-cloud-note"><b>Administrada por APPI.</b><br>El Histórico usa automáticamente la misma cuenta de distribuidor. No necesitás configurar otra sesión.</div>':`<div class="hist-cloud-note">Para la prueba local no hace falta completar esto. Para activar la nube se debe crear el proyecto con el archivo <b>SUPABASE_SETUP.sql</b> incluido en el paquete.</div><details class="hist-config-details" ${cloudReady()?'':'open'}><summary>${cloudReady()?'Configuración guardada':'Completar conexión'}</summary><div><label class="hist-field"><span>URL de Supabase</span><input id="histCloudUrl" type="url" value="${esc(cfg.url||'')}" placeholder="https://proyecto.supabase.co"></label><label class="hist-field"><span>Clave pública (anon)</span><input id="histCloudKey" type="password" value="${esc(cfg.anonKey||'')}" placeholder="eyJ…"></label><button class="hist-secondary" id="histSaveCloud">Guardar configuración</button></div></details>`}</div>
     <div class="hist-card wide"><div class="hist-card-head"><div><h3>Registro de sincronización</h3><p>Los errores nunca eliminan la copia local.</p></div></div><div class="hist-sync-log" id="histSyncLog">${esc(H.syncLog.join('\n')||'Sin actividad todavía.')}</div></div>
     <div class="hist-card wide"><div class="hist-card-head"><div><h3>Privacidad del análisis con IA</h3><p>Detalle individual sin datos de contacto innecesarios</p></div></div><div class="hist-preview">La IA puede recibir nombres, códigos, categorías, puntos, ramas y garantías. APPI excluye teléfonos, domicilios, correos y cumpleaños. El envío solo ocurre después de marcar la autorización en la pantalla Analizar.</div></div>
   </div>`;
   const save=$('histSaveCloud');if(save)save.onclick=()=>{const url=$('histCloudUrl').value.trim().replace(/\/$/,''),anonKey=$('histCloudKey').value.trim();saveCloudConfigValue({url,anonKey});toast(cloudReady()?'Configuración de nube guardada':'Revisá la URL y la clave pública',2600);render()};
   const magic=$('histMagicLink');if(magic)magic.onclick=async()=>{magic.disabled=true;magic.textContent='Enviando…';try{await sendMagicLink($('histCloudEmail').value.trim());toast('Revisá tu correo y abrí el enlace de acceso',3800);magic.textContent='Enlace enviado'}catch(e){toast(e.message,3500);magic.disabled=false;magic.textContent='Enviar enlace de acceso'}};
-  if($('histSyncNow'))$('histSyncNow').onclick=()=>syncAll(true);if($('histPullCloud'))$('histPullCloud').onclick=async()=>{try{const n=await pullCloud();render();toast(n?`${n} cierres recuperados`:'La copia local ya está actualizada')}catch(e){toast(e.message,3200)}};if($('histLogout'))$('histLogout').onclick=()=>{setSession(null);render();toast('Sesión cerrada')};
+  if($('histSyncNow'))$('histSyncNow').onclick=()=>syncAll(true);if($('histPullCloud'))$('histPullCloud').onclick=async()=>{try{const n=await pullCloud();render();toast(n?`${n} cierres recuperados`:'La copia local ya está actualizada')}catch(e){toast(e.message,3200)}};if($('histLogout'))$('histLogout').onclick=()=>{setSession(null);render();toast('Sesión cerrada')};if($('histAccount'))$('histAccount').onclick=()=>{try{abrirCuentaDesdeMenu()}catch(e){}};if($('histRelogin'))$('histRelogin').onclick=()=>location.reload();
 }
 
 function showHelp(){
@@ -658,6 +694,7 @@ async function openHistorico(){
   try{await refreshData();H.ready=true;render()}catch(e){console.error('Abrir histórico',e);if(c)c.innerHTML=`<div class="hist-toast-inline error">No se pudo abrir el almacenamiento: ${esc(e.message)}</div>`}
 }
 async function initHistorico(){
+  if(window.APPIAuth&&window.APPIAuth.isEnabled()&&!window.APPIAuth.isLocallyAuthorized())return;
   if(H._initialized)return;H._initialized=true;
   try{await openDB();handleAuthHash();await refreshData();H.ready=true}catch(e){console.error('Inicialización histórico',e)}
   document.querySelectorAll('.hist-tabs [data-hist-tab]').forEach(b=>b.onclick=()=>openTab(b.dataset.histTab));
@@ -671,6 +708,7 @@ async function initHistorico(){
   if(window.__histOpenRequested) setTimeout(openHistorico,0);
 }
 window.openHistorico=openHistorico;
+window.initHistoricoAPPI=initHistorico;
 window.__APPI_HISTORICO__={state:H,open:openHistorico,refresh:refreshData,parseFile:parseHistoricalFile,saveMonth:saveMonthPeriod,analyze:analyzePeriods,strategies:buildStrategies,dbGetAll};
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initHistorico);else initHistorico();
 setTimeout(initHistorico,1200);

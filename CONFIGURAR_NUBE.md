@@ -1,6 +1,8 @@
 # Configurar la nube y la IA del Histórico
 
-El Histórico funciona completamente en forma local sin realizar estos pasos. La configuración siguiente activa acceso por correo, sincronización de cierres, respaldo de los archivos originales y análisis online con IA.
+> **Nueva instalación:** primero seguí `CONFIGURAR_ACCESO.md`. Cuando el acceso por número de distribuidor está habilitado, Histórico reutiliza automáticamente esa misma cuenta y ya no necesita un enlace de correo separado.
+
+El Histórico funciona completamente en forma local sin realizar estos pasos. La configuración siguiente conserva el procedimiento anterior por correo mientras `APPI_AUTH.enabled` continúe en `false`, además de activar sincronización de cierres, respaldo de los archivos originales y análisis online con IA.
 
 ## 1. Crear el proyecto
 

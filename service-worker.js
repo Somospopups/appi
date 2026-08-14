@@ -1,53 +1,91 @@
-const CACHE_NAME = 'appi-v186-icono';
-const ARCHIVOS = [
+const CACHE_NAME = 'appi-v187-cuentas';
+const CACHE_PREFIX = 'appi-';
+const APP_SHELL = [
   './',
   './index.html',
+  './auth-config.js',
+  './auth-client.js',
+  './data-sync.js',
   './historico.css',
   './historico.js',
-  './manifest.json'
+  './manifest.json',
+  './icon-192.png',
+  './icon-512.png',
+  './icon-192-maskable.png',
+  './icon-512-maskable.png',
+  './apple-touch-icon.png'
 ];
 
-self.addEventListener('install', (evt) => {
-  evt.waitUntil(
-    caches.open(CACHE_NAME).then((cache) =>
-      Promise.all(ARCHIVOS.map((u) =>
-        fetch(u, { cache: 'no-store' }).then((res) => {
-          if (res && res.ok) return cache.put(u, res);
-        }).catch(() => null)
+self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then(cache => Promise.all(APP_SHELL.map(async url => {
+        try {
+          const response = await fetch(url, { cache: 'no-store' });
+          if (response.ok) await cache.put(url, response);
+        } catch (error) {
+          // Un recurso opcional no debe impedir instalar el resto de la app.
+        }
+      })))
+      .then(() => self.skipWaiting())
+  );
+});
+
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys()
+      .then(keys => Promise.all(
+        keys
+          .filter(key => key.startsWith(CACHE_PREFIX) && key !== CACHE_NAME)
+          .map(key => caches.delete(key))
       ))
-    ).then(() => self.skipWaiting())
+      .then(() => self.clients.claim())
   );
 });
 
-self.addEventListener('activate', (evt) => {
-  evt.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
-    ).then(() => self.clients.claim())
-    .then(() => self.clients.matchAll({ type: 'window', includeUncontrolled: true }))
-    .then((clients) => {
-      clients.forEach((c) => {
-        try { c.navigate(c.url); } catch (e) {
-          try { c.postMessage({ type: 'appi-reload', v: CACHE_NAME }); } catch (e2) {}
-        }
-      });
-    })
-  );
-});
+self.addEventListener('fetch', event => {
+  if (event.request.method !== 'GET') return;
+  const url = new URL(event.request.url);
 
-self.addEventListener('fetch', (evt) => {
-  if (evt.request.method !== 'GET') return;
-  const url = new URL(evt.request.url);
-  const sameOrigin = url.origin === self.location.origin;
-  evt.respondWith(
-    fetch(evt.request, { cache: 'no-store' })
-      .then((res) => {
-        if (sameOrigin && res && res.ok) {
-          const clone = res.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(evt.request, clone));
+  // Los CDN, Supabase, mapas y APIs conservan su comportamiento de red normal.
+  if (url.origin !== self.location.origin) return;
+
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request, { cache: 'no-store' })
+        .then(response => {
+          if (response.ok) {
+            const copy = response.clone();
+            caches.open(CACHE_NAME).then(cache => cache.put('./index.html', copy));
+          }
+          return response;
+        })
+        .catch(() => caches.match('./index.html'))
+    );
+    return;
+  }
+
+  // La lista de revocación anterior nunca se sirve desde una caché persistente.
+  if (url.pathname.endsWith('/blocklist.json')) {
+    event.respondWith(fetch(event.request, { cache: 'no-store' }));
+    return;
+  }
+
+  event.respondWith(
+    fetch(event.request, { cache: 'no-store' })
+      .then(response => {
+        if (response.ok) {
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
         }
-        return res;
+        return response;
       })
-      .catch(() => caches.match(evt.request).then((r) => r || caches.match('./index.html')))
+      .catch(async () => {
+        const cached = await caches.match(event.request);
+        return cached || new Response('Recurso no disponible sin conexión.', {
+          status: 503,
+          headers: { 'Content-Type': 'text/plain; charset=utf-8' }
+        });
+      })
   );
 });

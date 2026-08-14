@@ -78,6 +78,35 @@ test('trata el contenido importado como texto y no ejecuta HTML', async ({ page 
   expect(await page.evaluate(() => window.__xssProof || null)).toBeNull();
 });
 
+test('el backup excluye credenciales y restaura solo claves permitidas', async ({ page }) => {
+  await abrirAppActivada(page);
+  const result = await page.evaluate(() => {
+    localStorage.setItem('equipoData', JSON.stringify({ personas: [{ nombre: 'Equipo seguro' }] }));
+    localStorage.setItem('appi_auth_session_v1', 'NO-DEBE-SALIR');
+    localStorage.setItem('appi_device_id', 'NO-DEBE-SALIR');
+    const backup = crearBackupLocalAPPI();
+    localStorage.removeItem('equipoData');
+    const count = aplicarBackupLocalAPPI({
+      format: 'APPI-BACKUP',
+      schema: 2,
+      data: { ...backup.data, appi_auth_session_v1: 'ATAQUE', appi_device_id: 'ATAQUE' }
+    });
+    return {
+      count,
+      exportedKeys: Object.keys(backup.data),
+      equipo: JSON.parse(localStorage.getItem('equipoData')),
+      auth: localStorage.getItem('appi_auth_session_v1'),
+      device: localStorage.getItem('appi_device_id')
+    };
+  });
+  expect(result.exportedKeys).toContain('equipoData');
+  expect(result.exportedKeys).not.toContain('appi_auth_session_v1');
+  expect(result.exportedKeys).not.toContain('appi_device_id');
+  expect(result.equipo.personas[0].nombre).toBe('Equipo seguro');
+  expect(result.auth).toBe('NO-DEBE-SALIR');
+  expect(result.device).not.toBe('ATAQUE');
+});
+
 test('Contactos distingue pendientes de cerrados', async ({ page }) => {
   await abrirAppActivada(page);
   const result = await page.evaluate(() => {

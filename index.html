@@ -31,6 +31,9 @@ window.openHistorico=function(){
 <link rel="icon" href="./icon-192.png" />
 <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
 <link rel="manifest" href="./manifest.json" />
+<script src="./auth-config.js"></script>
+<script src="./auth-client.js"></script>
+<script src="./data-sync.js"></script>
 <style id="historico-inline-css">
 /* APPI · Histórico mensual */
 .hist-view{padding-bottom:calc(34px + env(safe-area-inset-bottom));}
@@ -2603,6 +2606,10 @@ body.dark .lock-input {
   color: #8a8a94; line-height: 1.5;
 }
 body.dark .lock-footer { color: #6b6b76; }
+.auth-panel[hidden]{display:none!important}
+.lock-error.login-info{background:rgba(91,141,239,.10);border-color:rgba(91,141,239,.22);color:#3d63c9}
+.lock-activate-btn:disabled{opacity:.6;cursor:wait;transform:none}
+body.dark .lock-error.login-info{background:rgba(91,141,239,.16);color:#a8b8ff}
 </style> 
 
 <style>
@@ -3453,7 +3460,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
     <button class="ds-btn" data-ds="view-planning" onclick="showView('view-planning'); renderPlanningTools();"><span>🗓️</span> Planificación</button>
   </nav>
-  <div class="ds-foot">APPI · v186 · Cultura de crecimiento</div>
+  <div class="ds-foot">APPI · v187 · Cuentas por distribuidor</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -3466,47 +3473,44 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
 <div id="lockScreen" class="hidden">
   <div class="lock-card">
     <div class="lock-logo"><img src="./icon-192.png" alt="APPI" /></div>
-    <h1 class="lock-title">APPI necesita activación</h1>
-    <p class="lock-subtitle">
-      Para usar APPI necesitás una licencia.<br/>
-      Enviá tu ID de dispositivo junto al comprobante de pago.
-    </p>
-    
-    <div class="lock-id-box">
-  <div class="lock-id-label">Tu ID de dispositivo</div>
-  <div class="lock-id-row">
-    <span class="lock-id-value" id="deviceIdDisplay">Cargando...</span>
-    <button class="lock-copy-icon" id="btnCopyId" title="Copiar ID">📋</button>
-  </div>
-</div>
 
-<button class="lock-btn whatsapp lock-btn-full" id="btnWhatsappActivate">
-  💬 Enviar por WhatsApp
-</button>
-    
-    <div class="lock-divider">Ya tenés tu código?</div>
-    
-    <input 
-      type="text" 
-      class="lock-input" 
-      id="activationInput" 
-      placeholder="XXXX-XXXX-XXXX"
-      maxlength="14"
-      autocomplete="off"
-      autocapitalize="characters"
-      spellcheck="false"
-    />
-    
-    <button class="lock-activate-btn" id="btnActivate">
-      Activar APPI
-    </button>
-    
-    <div class="lock-error" id="activationError">
-      ⚠️ Código incorrecto. Verificalo e intentá de nuevo.
+    <div id="distributorLoginPanel" class="auth-panel" hidden>
+      <h1 class="lock-title">Ingresá a APPI</h1>
+      <p class="lock-subtitle">Usá tu número de distribuidor y la contraseña que te entregó el administrador.</p>
+      <label class="lock-field">
+        <span>Número de distribuidor</span>
+        <input type="text" class="lock-input login-input" id="distributorInput" inputmode="text" autocomplete="username" autocapitalize="characters" spellcheck="false" placeholder="Ej: 123456" maxlength="30" />
+      </label>
+      <label class="lock-field">
+        <span>Contraseña</span>
+        <div class="lock-pass-row">
+          <input type="password" class="lock-input login-input" id="distributorPassword" autocomplete="current-password" placeholder="Tu contraseña" />
+          <button type="button" id="toggleDistributorPassword" aria-label="Mostrar contraseña">Ver</button>
+        </div>
+      </label>
+      <button type="button" class="lock-activate-btn" id="btnDistributorLogin">Ingresar</button>
+      <div class="lock-error" id="loginError" role="alert"></div>
+      <div class="lock-error login-info" id="loginOfflineInfo" role="status"></div>
+      <button type="button" class="lock-btn whatsapp lock-btn-full" id="btnLoginSupport" style="margin-top:12px">💬 Necesito ayuda</button>
+      <div class="lock-footer">La sesión queda recordada y APPI puede funcionar hasta 7 días sin conexión. Tus datos se sincronizan en tu espacio privado; los audios quedan solo en este dispositivo.</div>
     </div>
-    
-    <div class="lock-footer">
-      Una vez activada, no vas a necesitar volver a ingresar el código en este dispositivo.
+
+    <div id="legacyActivationPanel" class="auth-panel">
+      <h1 class="lock-title">APPI necesita activación</h1>
+      <p class="lock-subtitle">Para usar APPI necesitás una licencia.<br/>Enviá tu ID de dispositivo junto al comprobante de pago.</p>
+      <div class="lock-id-box">
+        <div class="lock-id-label">Tu ID de dispositivo</div>
+        <div class="lock-id-row">
+          <span class="lock-id-value" id="deviceIdDisplay">Cargando...</span>
+          <button class="lock-copy-icon" id="btnCopyId" title="Copiar ID">📋</button>
+        </div>
+      </div>
+      <button class="lock-btn whatsapp lock-btn-full" id="btnWhatsappActivate">💬 Enviar por WhatsApp</button>
+      <div class="lock-divider">¿Ya tenés tu código?</div>
+      <input type="text" class="lock-input" id="activationInput" placeholder="XXXX-XXXX-XXXX" maxlength="14" autocomplete="off" autocapitalize="characters" spellcheck="false" />
+      <button class="lock-activate-btn" id="btnActivate">Activar APPI</button>
+      <div class="lock-error" id="activationError">⚠️ Código incorrecto. Verificalo e intentá de nuevo.</div>
+      <div class="lock-footer">Una vez activada, no vas a necesitar volver a ingresar el código en este dispositivo.</div>
     </div>
   </div>
 </div>
@@ -4396,7 +4400,7 @@ const HELP = {
     <div class="tip"><strong>Dashboard</strong> — total, vencidas, por vencer y vigentes.</div>
     <div class="tip"><strong>Filtros</strong> — buscador, zona y orden por vencimiento.</div>
     <div class="tip"><strong>Mapa</strong> — ver domicilio o vecinos de la misma zona.</div>
-    <div class="warn-tip"><strong>🔒 Privacidad:</strong> Todo queda local, como Mi Equipo.</div>`
+    <div class="warn-tip"><strong>🔒 Privacidad:</strong> Con una cuenta activa, tus datos se guardan en tu espacio privado de Supabase. Al usar el mapa, la dirección se consulta en OpenStreetMap/Nominatim.</div>`
   }
 };
 
@@ -9085,23 +9089,26 @@ function renderPlanningTools(){
   document.getElementById('planningToolsList').innerHTML = c1 + c2 + c3 + c4;
 }
 /* ============ BACKUP ============ */
+function crearBackupLocalAPPI(){
+  const data=window.APPIDataSync?window.APPIDataSync.collect():{};
+  return {format:'APPI-BACKUP',schema:2,exportedAt:new Date().toISOString(),data,audioLocalOnly:true};
+}
+function datosRestaurablesAPPI(payload){
+  const data=payload&&payload.format==='APPI-BACKUP'?payload.data:payload;
+  if(!data||typeof data!=='object'||Array.isArray(data))throw new Error('Archivo de backup inválido.');
+  const safe={};
+  Object.entries(data).forEach(([key,value])=>{if(window.APPIDataSync&&window.APPIDataSync.isDataKey(key)&&typeof value==='string')safe[key]=value});
+  if(!Object.keys(safe).length)throw new Error('El backup no contiene datos compatibles.');
+  return safe;
+}
+function descargarBackupLocalAPPI(){
+  const blob=new Blob([JSON.stringify(crearBackupLocalAPPI(),null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a'),now=new Date();
+  a.href=url;a.download=`backup_appi_${now.getFullYear()}_${now.getMonth()+1}.json`;a.click();URL.revokeObjectURL(url);
+}
+function aplicarBackupLocalAPPI(payload){const data=datosRestaurablesAPPI(payload);Object.entries(data).forEach(([key,value])=>localStorage.setItem(key,value));return Object.keys(data).length}
 document.getElementById('backupHead').onclick = ()=>{ document.getElementById('backupCollapsible').classList.toggle('open'); };
 document.getElementById('btnExport').onclick = ()=>{
-  const data = {};
-  for(let i=0; i<localStorage.length; i++){
-    const k = localStorage.key(i);
-    if(k.startsWith('rueda') || k.startsWith('siete_') || k.startsWith('presu_') || k==='welcomeSeen' || k==='themeDark' || k.startsWith('lastUpdate_') || k === 'equipoData' || k==='cultura_crecimiento_v1'){
-      data[k] = localStorage.getItem(k);
-    }
-  }
-  const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  const now = new Date();
-  a.download = `backup_appi_${now.getFullYear()}_${now.getMonth()+1}.json`;
-  a.click();
-  URL.revokeObjectURL(url);
+  descargarBackupLocalAPPI();
   haptic(15); showToast('Backup descargado 📤');
 };
 document.getElementById('btnImport').onclick = ()=> document.getElementById('importInput').click();
@@ -9114,8 +9121,8 @@ document.getElementById('importInput').onchange = (e)=>{
       if(typeof data === 'object'){
         confirmarAccion({ title:'¿Restaurar backup?', html:'<p>Se reemplazarán todos los datos actuales.</p>', okText:'Restaurar', danger:true,
           onConfirm: ()=>{
-            Object.keys(data).forEach(k=> localStorage.setItem(k, data[k]));
-            haptic(20); showToast('Restaurado 🎉');
+            const count=aplicarBackupLocalAPPI(data);
+            haptic(20); showToast(`${count} datos restaurados 🎉`);
             setTimeout(()=> location.reload(), 800);
           }
         });
@@ -9270,6 +9277,7 @@ function validarCodigo(deviceId, codigoIngresado) {
 
 // ¿La app está activada?
 function estaActivada() {
+  if(window.APPIAuth && window.APPIAuth.isEnabled()) return window.APPIAuth.isLocallyAuthorized();
   const activacion = localStorage.getItem('appi_activada');
   if (!activacion) return false;
   try {
@@ -9281,8 +9289,75 @@ function estaActivada() {
   }
 }
 
+function mostrarErrorLogin(message,type='error'){
+  const error=document.getElementById('loginError'),info=document.getElementById('loginOfflineInfo');
+  if(error){error.textContent=type==='error'?String(message||''):'';error.classList.toggle('show',type==='error'&&!!message)}
+  if(info){info.textContent=type==='info'?String(message||''):'';info.classList.toggle('show',type==='info'&&!!message)}
+}
+function mostrarPantallaLoginDistribuidor(reason=''){
+  const lock=document.getElementById('lockScreen'),login=document.getElementById('distributorLoginPanel'),legacy=document.getElementById('legacyActivationPanel');
+  if(legacy)legacy.hidden=true;if(login)login.hidden=false;
+  if(lock){lock.style.display='flex';lock.classList.remove('hidden')}
+  document.body.style.overflow='hidden';
+  const dip=document.getElementById('distributorInput'),password=document.getElementById('distributorPassword'),button=document.getElementById('btnDistributorLogin'),toggle=document.getElementById('toggleDistributorPassword'),support=document.getElementById('btnLoginSupport');
+  if(!window.APPIAuth||!window.APPIAuth.isConfigured()){
+    mostrarErrorLogin('El acceso por distribuidor todavía no está configurado. El administrador debe conectar Supabase.');
+    if(button)button.disabled=true;
+  }else{
+    if(button)button.disabled=false;
+    if(reason==='account_disabled')mostrarErrorLogin('Esta cuenta está desactivada. Contactá al administrador.');
+    else if(reason==='offline_expired')mostrarErrorLogin('Pasaron más de 7 días sin validar la cuenta. Conectate a internet para volver a ingresar.');
+    else mostrarErrorLogin('');
+  }
+  if(dip&&!dip.dataset.bound){
+    dip.dataset.bound='1';
+    dip.addEventListener('input',()=>{dip.value=window.APPIAuth.normalizeDip(dip.value);mostrarErrorLogin('')});
+    dip.addEventListener('keydown',event=>{if(event.key==='Enter')password.focus()});
+  }
+  if(password&&!password.dataset.bound){
+    password.dataset.bound='1';
+    password.addEventListener('input',()=>mostrarErrorLogin(''));
+    password.addEventListener('keydown',event=>{if(event.key==='Enter')button.click()});
+  }
+  if(toggle&&!toggle.dataset.bound){
+    toggle.dataset.bound='1';
+    toggle.onclick=()=>{const visible=password.type==='text';password.type=visible?'password':'text';toggle.textContent=visible?'Ver':'Ocultar';toggle.setAttribute('aria-label',visible?'Mostrar contraseña':'Ocultar contraseña')};
+  }
+  if(button&&!button.dataset.bound){
+    button.dataset.bound='1';
+    button.onclick=async()=>{
+      const original=button.textContent;button.disabled=true;button.textContent='Ingresando…';mostrarErrorLogin('');
+      try{
+        const value=await window.APPIAuth.login(dip.value,password.value);
+        button.textContent='Preparando tus datos…';
+        const sync=window.APPIDataSync?await window.APPIDataSync.start({claimLegacy:true}):null;
+        localStorage.removeItem('appi_activada');
+        password.value='';
+        if(lock){lock.classList.add('hidden');lock.style.display='none'}
+        document.body.style.overflow='';
+        iniciarApp();
+        if(sync&&sync.claimedLegacy)setTimeout(()=>showToast('Tus datos de este dispositivo quedaron asociados a tu cuenta',3600),500);
+      }catch(error){
+        mostrarErrorLogin(error.message||'No se pudo iniciar sesión.');
+        try{haptic(20)}catch(e){}
+      }finally{button.disabled=false;button.textContent=original}
+    };
+  }
+  if(support&&!support.dataset.bound){
+    support.dataset.bound='1';
+    support.onclick=()=>{const numero=dip&&dip.value?dip.value:'sin completar';const msg=`Hola, necesito ayuda para ingresar a APPI. Mi número de distribuidor es: ${numero}`;window.open(`https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(msg)}`,'_blank','noopener')};
+  }
+  setTimeout(()=>{if(dip&&!dip.value)dip.focus();else if(password)password.focus()},80);
+}
+
 // Muestra la pantalla de bloqueo
 function mostrarPantallaBloqueo() {
+  if(window.APPIAuth&&window.APPIAuth.isEnabled()){
+    mostrarPantallaLoginDistribuidor();
+    return;
+  }
+  const login=document.getElementById('distributorLoginPanel'),legacy=document.getElementById('legacyActivationPanel');
+  if(login)login.hidden=true;if(legacy)legacy.hidden=false;
   const deviceId = generarDeviceId();
   document.getElementById('deviceIdDisplay').textContent = deviceId;
   document.getElementById('lockScreen').classList.remove('hidden');
@@ -9355,6 +9430,9 @@ function mostrarPantallaBloqueo() {
 function iniciarApp() {
   loadEquipoFromStorage();
   showView('view-home');
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',actualizarCuentaUI,{once:true});
+  else actualizarCuentaUI();
+  if(window.initHistoricoAPPI)setTimeout(()=>window.initHistoricoAPPI(),0);
 }
 
 
@@ -9487,6 +9565,35 @@ modal.close = function(){
 
 
 
+function actualizarCuentaUI(){
+  const button=document.getElementById('btnToolsAccount');
+  if(button)button.hidden=!(window.APPIAuth&&window.APPIAuth.isEnabled()&&window.APPIAuth.currentProfile());
+}
+function abrirCuentaDesdeMenu(){
+  try{cerrarToolsMenu()}catch(e){}
+  if(!window.APPIAuth||!window.APPIAuth.isEnabled())return;
+  const profile=window.APPIAuth.currentProfile()||{},authStatus=window.APPIAuth.status(),syncStatus=window.APPIDataSync?window.APPIDataSync.status():{};
+  const last=authStatus.lastValidatedAt?new Date(authStatus.lastValidatedAt).toLocaleString('es-AR'):'Sin validar';
+  modal.open({
+    icon:'👤',iconBg:'linear-gradient(135deg,#5b8def,#a06bff)',title:'Mi cuenta',sub:profile.nombre||`Distribuidor ${profile.dip||''}`,
+    html:`<div style="display:grid;gap:9px;text-align:left">
+      <div class="tip"><b>Número de distribuidor:</b> ${escapeXml(profile.dip||'—')}<br><b>Última validación:</b> ${escapeXml(last)}<br><b>Estado:</b> ${authStatus.offline?'Modo offline':'Conectada'}</div>
+      <div class="tip"><b>Sincronización:</b> ${syncStatus.syncing?'En curso':syncStatus.dirty?`${syncStatus.dirty} cambios pendientes`:'Actualizada'}${syncStatus.lastError?`<br><span style="color:#b13e47">${escapeXml(syncStatus.lastError)}</span>`:''}</div>
+      <div class="warn-tip"><b>🎙️ Importante:</b> las grabaciones de audio quedan únicamente en el dispositivo donde se hicieron. El resto de los datos se sincroniza con tu cuenta.</div>
+      <button type="button" class="btn btn-primary" id="btnAccountSync">☁️ Sincronizar ahora</button>
+      <button type="button" class="btn btn-secondary" id="btnAccountLogout">Cerrar sesión</button>
+      <button type="button" class="btn btn-danger-outline" id="btnAccountLogoutErase">Cerrar y borrar la copia de este dispositivo</button>
+      <small style="color:#777887;line-height:1.4">Cerrar sesión quita tus datos de la vista y los deja separados por cuenta. Usá “borrar la copia” solamente en un equipo compartido y con conexión.</small>
+    </div>`
+  });
+  setTimeout(()=>{
+    const sync=document.getElementById('btnAccountSync'),logout=document.getElementById('btnAccountLogout'),erase=document.getElementById('btnAccountLogoutErase');
+    if(sync)sync.onclick=async()=>{sync.disabled=true;sync.textContent='Sincronizando…';try{await window.APPIDataSync.syncNow(true);showToast('Cuenta sincronizada ☁️',2200);modal.close()}catch(error){showToast(error.message||'No se pudo sincronizar',3500);sync.disabled=false;sync.textContent='☁️ Sincronizar ahora'}};
+    if(logout)logout.onclick=async()=>{if(!confirm('¿Cerrar sesión en este dispositivo?'))return;logout.disabled=true;try{await window.APPIDataSync.logoutAndLock({removeCache:false});location.reload()}catch(error){showToast(error.message,3500);logout.disabled=false}};
+    if(erase)erase.onclick=async()=>{if(!confirm('Se sincronizarán los datos y después se borrará la copia local, incluidos los audios de esta cuenta en este dispositivo. ¿Continuar?'))return;erase.disabled=true;try{await window.APPIDataSync.logoutAndLock({removeCache:true});location.reload()}catch(error){showToast(error.message,3800);erase.disabled=false}};
+  },80);
+}
+
 function abrirBackupDesdeMenu(){
   try{ cerrarToolsMenu(); }catch(e){}
   setTimeout(()=>{
@@ -9496,10 +9603,10 @@ function abrirBackupDesdeMenu(){
       title:'Backup',
       sub:'Guardá o restaurá tus datos',
       html:`
-        <p style="font-size:13px;color:#5c5c66;margin:0 0 12px">Hacé una copia de seguridad de todos tus datos o restaurá una copia anterior.</p>
+        <p style="font-size:13px;color:#5c5c66;margin:0 0 12px">Guardá o restaurá planificación, equipo, usuarios, contactos, cultura y notas.</p>
         <button class="share-menu-item" id="btnBackupExportar" style="margin-bottom:8px">
           <div class="sm-ico" style="background:linear-gradient(135deg,#3ad0a4,#5b8def)">📤</div>
-          <div class="sm-txt"><div class="sm-title">Exportar backup</div><div class="sm-desc">Descargá un archivo .json con todos tus datos</div></div>
+          <div class="sm-txt"><div class="sm-title">Exportar backup</div><div class="sm-desc">No incluye credenciales ni grabaciones de audio</div></div>
           <span class="sm-arrow">›</span>
         </button>
         <button class="share-menu-item" id="btnBackupRestaurar">
@@ -9507,7 +9614,7 @@ function abrirBackupDesdeMenu(){
           <div class="sm-txt"><div class="sm-title">Restaurar backup</div><div class="sm-desc">Cargá un archivo .json para restaurar</div></div>
           <span class="sm-arrow">›</span>
         </button>
-        <div style="margin-top:14px;padding:10px 12px;border-radius:12px;background:rgba(245,179,1,0.10);border:1px solid rgba(245,179,1,0.20);font-size:11px;color:#a3670b;line-height:1.4">💡 Guardá tu backup en un lugar seguro. No lo compartas, contiene todos tus datos.</div>
+        <div style="margin-top:14px;padding:10px 12px;border-radius:12px;background:rgba(245,179,1,0.10);border:1px solid rgba(245,179,1,0.20);font-size:11px;color:#a3670b;line-height:1.4">💡 Histórico mantiene su propio backup ZIP con los archivos originales. Los audios permanecen solo en este dispositivo.</div>
       `
     });
     setTimeout(()=>{
@@ -9516,22 +9623,7 @@ function abrirBackupDesdeMenu(){
       if(btnExp){
         btnExp.onclick=()=>{
           modal.close();
-          // Usar lógica existente de exportar
-          const data = {};
-          for(let i=0; i<localStorage.length; i++){
-            const k = localStorage.key(i);
-            if(k.startsWith('rueda') || k.startsWith('siete_') || k.startsWith('presu_') || k==='welcomeSeen' || k==='themeDark' || k.startsWith('lastUpdate_') || k === 'equipoData' || k==='seguimientoPersonas' || k==='appi_activada' || k==='appi_device_id' || k==='cultura_crecimiento_v1'){
-              data[k] = localStorage.getItem(k);
-            }
-          }
-          const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          const now = new Date();
-          a.download = `backup_appi_${now.getFullYear()}_${now.getMonth()+1}.json`;
-          a.click();
-          URL.revokeObjectURL(url);
+          descargarBackupLocalAPPI();
           try{ haptic(15); showToast('Backup descargado 📤'); }catch(e){}
         };
       }
@@ -9558,8 +9650,8 @@ function abrirBackupDesdeMenu(){
                     okText:'Restaurar',
                     danger:true,
                     onConfirm:()=>{
-                      Object.keys(data).forEach(k=> localStorage.setItem(k, data[k]));
-                      try{ haptic(20); showToast('Restaurado 🎉'); }catch(e){}
+                      const count=aplicarBackupLocalAPPI(data);
+                      try{ haptic(20); showToast(`${count} datos restaurados 🎉`); }catch(e){}
                       setTimeout(()=> location.reload(), 800);
                     }
                   });
@@ -9576,18 +9668,29 @@ function abrirBackupDesdeMenu(){
 }
 
 
-// Verificar licencia y blocklist al arrancar
+// Verificar acceso al arrancar
 (async function() {
-  // Verificar blocklist ANTES de arrancar (con timeout por si no hay red)
+  if(window.APPIAuth&&window.APPIAuth.isEnabled()){
+    const result=await window.APPIAuth.authorize();
+    if(result.ok){
+      try{if(window.APPIDataSync)await window.APPIDataSync.start({claimLegacy:true})}catch(error){console.error('Preparar datos de cuenta',error)}
+      localStorage.removeItem('appi_activada');
+      iniciarApp();
+      if(result.offline)setTimeout(()=>showToast('Modo offline · conectate antes de 7 días',3200),500);
+    }else{
+      const saved=window.APPIAuth.load();
+      const reason=result.reason==='account_disabled'?'account_disabled':(saved&&!window.APPIAuth.offlineEligible(saved)?'offline_expired':result.reason);
+      mostrarPantallaLoginDistribuidor(reason);
+    }
+    return;
+  }
+  // Sistema anterior durante la etapa de preparación de Supabase.
   const conTimeout = (p, ms) => Promise.race([p, new Promise(r => setTimeout(() => r(null), ms))]);
   let bloqueado = false;
   try { bloqueado = await conTimeout(chequearBlocklist(), 4000); } catch(e){}
   if (bloqueado === true) { mostrarPantallaBloqueado(); return; }
-  if (estaActivada()) {
-    iniciarApp();
-  } else {
-    mostrarPantallaBloqueo();
-  }
+  if (estaActivada()) iniciarApp();
+  else mostrarPantallaBloqueo();
 })();
 </script>
 <script>
@@ -9712,23 +9815,10 @@ function abrirBackupDesdeMenu(){
   });
 
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.addEventListener('message', (evt) => {
-      if (evt.data && evt.data.type === 'appi-reload') location.reload();
-    });
     window.addEventListener('load', () => {
-      const bustKey = 'appi_cache_v186';
-      const already = localStorage.getItem(bustKey) === '1';
-      const finish = () => {
-        navigator.serviceWorker.register('./service-worker.js?v=186').catch(() => {});
-      };
-      if (already) { finish(); return; }
-      localStorage.setItem(bustKey, '1');
-      Promise.all([
-        caches.keys().then((keys) => Promise.all(keys.map((k) => caches.delete(k)))).catch(() => {}),
-        navigator.serviceWorker.getRegistrations().then((rs) => Promise.all(rs.map((r) => r.unregister()))).catch(() => {})
-      ]).then(() => {
-        location.replace(location.pathname + '?v=186' + location.hash);
-      }).catch(finish);
+      navigator.serviceWorker.register('./service-worker.js?v=187').catch(error => {
+        console.warn('No se pudo registrar el modo offline de APPI', error);
+      });
     });
   }
 </script>
@@ -10830,6 +10920,9 @@ body.dark .presu-select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:
   <button class="tools-item" id="btnToolsBackup" onclick="abrirBackupDesdeMenu()">
     <span class="ti-ico">💾</span><span>Backup</span>
   </button>
+  <button class="tools-item" id="btnToolsAccount" onclick="abrirCuentaDesdeMenu()" hidden>
+    <span class="ti-ico">👤</span><span>Mi cuenta</span>
+  </button>
 </div>
 
 <style>
@@ -11614,7 +11707,23 @@ const el=id=>document.getElementById(id),safe=value=>typeof escapeXml==='functio
 function listaGrabaciones(){try{return JSON.parse(localStorage.getItem('grabadora_reuniones_light')||'[]')}catch(e){return []}}
 function guardarListaGrabaciones(list){localStorage.setItem('grabadora_reuniones_light',JSON.stringify(list))}
 function abrirAudioDB(){return new Promise((resolve,reject)=>{if(!('indexedDB'in window)){reject(new Error('El navegador no permite guardar audios'));return}const req=indexedDB.open(AUDIO_DB_NAME,1);req.onupgradeneeded=()=>{if(!req.result.objectStoreNames.contains(AUDIO_STORE))req.result.createObjectStore(AUDIO_STORE,{keyPath:'id'})};req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error||new Error('No se pudo abrir el almacenamiento de audio'))})}
-async function audioDB(action,id,blob){const db=await abrirAudioDB();return new Promise((resolve,reject)=>{const tx=db.transaction(AUDIO_STORE,action==='get'?'readonly':'readwrite'),store=tx.objectStore(AUDIO_STORE);let req;if(action==='put')req=store.put({id:Number(id),blob,mime:blob.type||'audio/webm',fecha:Date.now()});else if(action==='get')req=store.get(Number(id));else if(action==='delete')req=store.delete(Number(id));else req=store.clear();if(action==='get'){req.onsuccess=()=>resolve(req.result?.blob||null);req.onerror=()=>reject(req.error)}else{tx.oncomplete=()=>resolve(true);tx.onerror=()=>reject(tx.error)}tx.oncomplete=()=>{if(action==='get')db.close();else{db.close();resolve(true)}}})}
+function audioOwnerId(){return window.APPIAuth&&window.APPIAuth.isEnabled()?window.APPIAuth.userId()||'locked':'legacy'}
+async function audioDB(action,id,blob){
+  const db=await abrirAudioDB(),owner=audioOwnerId();
+  return new Promise((resolve,reject)=>{
+    const tx=db.transaction(AUDIO_STORE,'readwrite'),store=tx.objectStore(AUDIO_STORE);let result=true;
+    tx.onerror=()=>{db.close();reject(tx.error)};
+    tx.oncomplete=()=>{db.close();resolve(result)};
+    if(action==='put')store.put({id:Number(id),blob,mime:blob.type||'audio/webm',fecha:Date.now(),userId:owner});
+    else if(action==='get'){
+      const req=store.get(Number(id));req.onerror=()=>reject(req.error);req.onsuccess=()=>{const record=req.result;if(!record){result=null;return}if(owner!=='legacy'&&record.userId&&record.userId!==owner){result=null;return}if(owner!=='legacy'&&!record.userId)store.put({...record,userId:owner});result=record.blob||null};
+    }else if(action==='delete')store.delete(Number(id));
+    else if(action==='clear'){
+      if(owner==='legacy')store.clear();
+      else{const req=store.openCursor();req.onsuccess=event=>{const cursor=event.target.result;if(!cursor)return;const record=cursor.value;if(record.userId===owner||!record.userId)cursor.delete();cursor.continue()}}
+    }
+  });
+}
 const guardarAudioBlob=(id,blob)=>audioDB('put',id,blob),obtenerAudioBlob=id=>audioDB('get',id),eliminarAudioBlob=id=>audioDB('delete',id),limpiarAudios=()=>audioDB('clear');
 function fmtTime(ms){const total=Math.max(0,Math.floor(ms/1000)),m=String(Math.floor(total/60)).padStart(2,'0'),s=String(total%60).padStart(2,'0');return `${m}:${s}`}
 function currentElapsed(){return elapsedMs+(isRecording&&!isPaused?Date.now()-segmentStartedAt:0)}
@@ -11688,7 +11797,7 @@ window.downloadRecGrab=async id=>{try{const blob=await obtenerAudioBlob(id);if(!
 window.deleteRecGrab=async id=>{if(!confirm('¿Borrar esta grabación?'))return;guardarListaGrabaciones(listaGrabaciones().filter(item=>Number(item.id)!==Number(id)));try{await eliminarAudioBlob(id)}catch(e){}if(Number(window._lastRecordingId)===Number(id)){resetWorkspace();el('currentAudioWrap').hidden=true}renderList();showStatus('Grabación borrada.','ok')};
 window.finishGrabadoraTranscription=(id,text)=>{const cleaned=String(text||'').trim(),list=listaGrabaciones(),record=list.find(item=>Number(item.id)===Number(id));if(record){record.transcript=cleaned;record.transcribing=false;record.transcriptionError='';record.summary='';record.summaryData=null;guardarListaGrabaciones(list)}if(Number(window._lastRecordingId)===Number(id)){const tr=el('transcript');if(tr)tr.value=cleaned;setBadge('transcriptBadge','Lista','done');el('btnSummarize').disabled=cleaned.length<20;setStep(2,'done')}renderList();if(cleaned.length>=20)setTimeout(()=>generateSummary(id),180)};
 window.failGrabadoraTranscription=(id,message)=>{const list=listaGrabaciones(),record=list.find(item=>Number(item.id)===Number(id));if(record){record.transcribing=false;record.transcriptionError=message;guardarListaGrabaciones(list)}if(Number(window._lastRecordingId)===Number(id)){setBadge('transcriptBadge','Reintentar','error');setStep(2,'active')}renderList();showStatus(message||'No pude transcribir el audio. Podés reintentar.','error',true)};
-window.updateGrabadoraTranscript=window.finishGrabadoraTranscription;window.markGrabadoraTranscriptionDone=id=>{const record=listaGrabaciones().find(item=>Number(item.id)===Number(id));if(record?.transcribing)window.failGrabadoraTranscription(id,'La transcripción no pudo completarse. Tocá Transcribir para reintentar.')};window.getGrabadoraAudioBlob=obtenerAudioBlob;window.saveGrabadoraAudioBlob=guardarAudioBlob;window.renderGrabadoraList=renderList;
+window.updateGrabadoraTranscript=window.finishGrabadoraTranscription;window.markGrabadoraTranscriptionDone=id=>{const record=listaGrabaciones().find(item=>Number(item.id)===Number(id));if(record?.transcribing)window.failGrabadoraTranscription(id,'La transcripción no pudo completarse. Tocá Transcribir para reintentar.')};window.getGrabadoraAudioBlob=obtenerAudioBlob;window.saveGrabadoraAudioBlob=guardarAudioBlob;window.clearGrabadoraAudios=limpiarAudios;window.renderGrabadoraList=renderList;
 function initGrabadora(){const record=el('btnRecord'),pause=el('btnPause'),stop=el('btnStop'),mic=el('recVisual');if(record)record.onclick=startRecording;if(mic)mic.onclick=()=>{if(!isRecording)startRecording()};if(pause)pause.onclick=pauseRecording;if(stop)stop.onclick=stopRecording;const clearAll=el('btnClearAll');if(clearAll)clearAll.onclick=async()=>{if(!confirm('¿Borrar todas las grabaciones?'))return;localStorage.removeItem('grabadora_reuniones_light');try{await limpiarAudios()}catch(e){}resetWorkspace();const wrap=el('currentAudioWrap');if(wrap)wrap.hidden=true;renderList();showStatus('Se borraron todas las grabaciones.','ok')};updateRecordControls('idle');renderList()}
 window.addEventListener('beforeunload',event=>{if(isRecording){event.preventDefault();event.returnValue=''}});document.addEventListener('DOMContentLoaded',initGrabadora);setTimeout(initGrabadora,900);
 })();
@@ -12884,8 +12993,15 @@ setTimeout(initUsuarios, 1200);
 (function(){
 'use strict';
 
-const DB_NAME='appi-historico-v1';
+const BASE_DB_NAME='appi-historico-v1';
 const DB_VERSION=1;
+function historicalDbName(){
+  if(window.APPIAuth&&window.APPIAuth.isEnabled()){
+    const userId=window.APPIAuth.userId();
+    return userId?`${BASE_DB_NAME}-${userId}`:`${BASE_DB_NAME}-locked`;
+  }
+  return BASE_DB_NAME;
+}
 const MONTHS_H=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 const SHORT_H=['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'];
 const FILE_TYPES={
@@ -12929,10 +13045,34 @@ function notifyDbChange(){
   localStorage.setItem('hist_resumen_cache',JSON.stringify({count:sorted.length,lastLabel:latest?labelPeriod(latest):'Sin cierres'}));
 }
 
+async function claimLegacyHistoricalDatabase(targetDb){
+  if(!(window.APPIAuth&&window.APPIAuth.isEnabled()))return;
+  const userId=window.APPIAuth.userId();if(!userId)return;
+  const markerKey='appi_hist_legacy_claimed_by',claimed=localStorage.getItem(markerKey);
+  if(claimed&&claimed!==userId)return;
+  const targetCount=await new Promise(resolve=>{const req=targetDb.transaction('periods','readonly').objectStore('periods').count();req.onsuccess=()=>resolve(req.result||0);req.onerror=()=>resolve(0)});
+  if(targetCount>0){if(!claimed)localStorage.setItem(markerKey,userId);return}
+  const legacy=await new Promise(resolve=>{
+    let created=false;const req=indexedDB.open(BASE_DB_NAME);
+    req.onupgradeneeded=()=>{created=true};
+    req.onsuccess=()=>{if(created){req.result.close();indexedDB.deleteDatabase(BASE_DB_NAME);resolve(null)}else resolve(req.result)};
+    req.onerror=()=>resolve(null);
+  });
+  if(!legacy)return;
+  const names=['periods','files','reports'].filter(name=>legacy.objectStoreNames.contains(name));
+  if(!names.length){legacy.close();return}
+  const records={};
+  for(const name of names){records[name]=await new Promise(resolve=>{const req=legacy.transaction(name,'readonly').objectStore(name).getAll();req.onsuccess=()=>resolve(req.result||[]);req.onerror=()=>resolve([])})}
+  legacy.close();
+  if(!names.some(name=>records[name].length))return;
+  await new Promise((resolve,reject)=>{const tx=targetDb.transaction(names,'readwrite');for(const name of names)for(const value of records[name])tx.objectStore(name).put(value);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)});
+  localStorage.setItem(markerKey,userId);
+}
+
 function openDB(){
   if(H.db)return Promise.resolve(H.db);
   return new Promise((resolve,reject)=>{
-    const req=indexedDB.open(DB_NAME,DB_VERSION);
+    const req=indexedDB.open(historicalDbName(),DB_VERSION);
     req.onupgradeneeded=()=>{
       const db=req.result;
       if(!db.objectStoreNames.contains('periods')){
@@ -12945,7 +13085,7 @@ function openDB(){
         const s=db.createObjectStore('reports',{keyPath:'id'});s.createIndex('createdAt','createdAt');
       }
     };
-    req.onsuccess=()=>{H.db=req.result;resolve(H.db)};
+    req.onsuccess=async()=>{H.db=req.result;try{await claimLegacyHistoricalDatabase(H.db)}catch(error){console.warn('Migración de Histórico',error)}resolve(H.db)};
     req.onerror=()=>reject(req.error||new Error('No se pudo abrir IndexedDB'));
   });
 }
@@ -13464,29 +13604,34 @@ async function restoreBackup(file){
 }
 
 const CLOUD_CONFIG_KEY='hist_cloud_config_v1',CLOUD_SESSION_KEY='hist_cloud_session_v1';
-function getCloudConfig(){try{return JSON.parse(localStorage.getItem(CLOUD_CONFIG_KEY)||'{}')}catch(e){return {}}}
-function saveCloudConfigValue(value){localStorage.setItem(CLOUD_CONFIG_KEY,JSON.stringify(value))}
-function getSession(){try{return JSON.parse(localStorage.getItem(CLOUD_SESSION_KEY)||'null')}catch(e){return null}}
-function setSession(value){if(value)localStorage.setItem(CLOUD_SESSION_KEY,JSON.stringify(value));else localStorage.removeItem(CLOUD_SESSION_KEY)}
+const accountAuthEnabled=()=>!!(window.APPIAuth&&window.APPIAuth.isEnabled());
+function getCloudConfig(){if(accountAuthEnabled()){const c=window.APPIAuth.config();return {url:c.url,anonKey:c.anonKey}}try{return JSON.parse(localStorage.getItem(CLOUD_CONFIG_KEY)||'{}')}catch(e){return {}}}
+function saveCloudConfigValue(value){if(!accountAuthEnabled())localStorage.setItem(CLOUD_CONFIG_KEY,JSON.stringify(value))}
+function getSession(){if(accountAuthEnabled()){const value=window.APPIAuth.load();return value&&value.session||null}try{return JSON.parse(localStorage.getItem(CLOUD_SESSION_KEY)||'null')}catch(e){return null}}
+function setSession(value){if(accountAuthEnabled())return;if(value)localStorage.setItem(CLOUD_SESSION_KEY,JSON.stringify(value));else localStorage.removeItem(CLOUD_SESSION_KEY)}
 function cloudReady(){const c=getCloudConfig();return /^https:\/\//.test(c.url||'')&&String(c.anonKey||'').length>20}
 function jwtPayload(token){try{return JSON.parse(atob(token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')))}catch(e){return {}}}
 function sessionUser(){const s=getSession();return s?jwtPayload(s.access_token||''):null}
 function sessionExpired(s){const p=s?jwtPayload(s.access_token||''):{};return !p.exp||p.exp*1000<Date.now()+60000}
 function logSync(message){H.syncLog.push(`${new Date().toLocaleTimeString('es-AR')} · ${message}`);H.syncLog=H.syncLog.slice(-30);const el=$('histSyncLog');if(el)el.textContent=H.syncLog.join('\n')}
 async function refreshCloudSession(){
-  let s=getSession();if(!s)return null;if(!sessionExpired(s))return s;const cfg=getCloudConfig();if(!s.refresh_token)return null;
+  let s=getSession();if(!s)return null;if(!sessionExpired(s))return s;
+  if(accountAuthEnabled()){try{const value=await window.APPIAuth.refresh();return value&&value.session||null}catch(e){return null}}
+  const cfg=getCloudConfig();if(!s.refresh_token)return null;
   const r=await fetch(`${cfg.url.replace(/\/$/,'')}/auth/v1/token?grant_type=refresh_token`,{method:'POST',headers:{apikey:cfg.anonKey,'Content-Type':'application/json'},body:JSON.stringify({refresh_token:s.refresh_token})});if(!r.ok){setSession(null);return null}s=await r.json();setSession(s);return s;
 }
 async function cloudFetch(path,options={},auth=true){
-  const cfg=getCloudConfig();if(!cloudReady())throw new Error('Completá la URL y la clave pública de Supabase.');let session=auth?await refreshCloudSession():null;if(auth&&!session)throw new Error('Iniciá sesión por correo para continuar.');
+  const cfg=getCloudConfig();if(!cloudReady())throw new Error('La conexión con Supabase todavía no está configurada.');let session=auth?await refreshCloudSession():null;if(auth&&!session)throw new Error(accountAuthEnabled()?'Volvé a iniciar sesión para continuar.':'Iniciá sesión por correo para continuar.');
   const headers={apikey:cfg.anonKey,...(options.headers||{})};if(session)headers.Authorization=`Bearer ${session.access_token}`;
   const r=await fetch(`${cfg.url.replace(/\/$/,'')}${path}`,{...options,headers});if(!r.ok){let message=`Error de nube ${r.status}`;try{const data=await r.json();message=data.message||data.msg||data.error_description||data.error||message}catch(e){}throw new Error(message)}return r;
 }
 async function sendMagicLink(email){
+  if(accountAuthEnabled())throw new Error('La nube usa tu cuenta de distribuidor.');
   const cfg=getCloudConfig();if(!cloudReady())throw new Error('Primero guardá la configuración de Supabase.');if(!/^[^@]+@[^@]+\.[^@]+$/.test(email))throw new Error('Ingresá un correo válido.');
   const redirect=location.href.split('#')[0];const r=await cloudFetch('/auth/v1/otp',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,create_user:true,options:{email_redirect_to:redirect}})},false);await r.text();localStorage.setItem('hist_cloud_email',email);return true;
 }
 function handleAuthHash(){
+  if(accountAuthEnabled())return false;
   if(!location.hash||!location.hash.includes('access_token='))return false;const q=new URLSearchParams(location.hash.slice(1)),access=q.get('access_token');if(!access)return false;setSession({access_token:access,refresh_token:q.get('refresh_token'),expires_in:+q.get('expires_in')||3600,token_type:q.get('token_type')||'bearer'});history.replaceState(null,'',location.pathname+location.search);toast('Nube conectada correctamente',2400);return true;
 }
 async function upsertCloudPeriod(p){
@@ -13519,16 +13664,16 @@ function updateSyncStatus(forceError=false){
   quick.textContent=H.syncing?'Sincronizando':(cloudReady()&&session?'Sincronizar':'Configurar nube');quick.disabled=H.syncing;
 }
 function renderCloud(c){
-  const cfg=getCloudConfig(),session=getSession(),user=sessionUser(),pending=H.periods.filter(p=>p.syncStatus!=='synced').length,email=localStorage.getItem('hist_cloud_email')||'';
+  const cfg=getCloudConfig(),session=getSession(),user=sessionUser(),pending=H.periods.filter(p=>p.syncStatus!=='synced').length,email=localStorage.getItem('hist_cloud_email')||'',accountMode=accountAuthEnabled(),profile=accountMode?window.APPIAuth.currentProfile():null;
   c.innerHTML=`<div class="hist-cloud-grid">
-    <div class="hist-card"><div class="hist-card-head"><div><h3>Estado de la nube</h3><p>Copia segura y acceso desde otros dispositivos</p></div><span class="hist-badge">${session?'Conectada':'Sin conectar'}</span></div><div class="hist-cloud-state"><div class="c-icon">☁</div><div><b>${session?`Sesión activa${user&&user.email?` · ${esc(user.email)}`:''}`:'Acceso por enlace de correo'}</b><p>${session?`${pending} cierres pendientes de sincronizar.`:'No necesitás recordar una contraseña.'}</p></div></div>${session?`<div class="hist-actions"><button class="hist-primary" id="histSyncNow">Sincronizar ahora</button><button class="hist-secondary" id="histPullCloud">Recuperar nube</button><button class="hist-danger" id="histLogout">Cerrar sesión</button></div>`:`<label class="hist-field" style="margin-top:11px"><span>Correo de acceso</span><input id="histCloudEmail" type="email" value="${esc(email)}" placeholder="tu@correo.com"></label><button class="hist-primary" id="histMagicLink">Enviar enlace de acceso</button>`}</div>
-    <div class="hist-card"><div class="hist-card-head"><div><h3>Configuración</h3><p>Supabase reúne acceso, base de datos, archivos e IA segura.</p></div></div><div class="hist-cloud-note">Para la prueba local no hace falta completar esto. Para activar la nube se debe crear el proyecto con el archivo <b>SUPABASE_SETUP.sql</b> incluido en el paquete.</div><details class="hist-config-details" ${cloudReady()?'':'open'}><summary>${cloudReady()?'Configuración guardada':'Completar conexión'}</summary><div><label class="hist-field"><span>URL de Supabase</span><input id="histCloudUrl" type="url" value="${esc(cfg.url||'')}" placeholder="https://proyecto.supabase.co"></label><label class="hist-field"><span>Clave pública (anon)</span><input id="histCloudKey" type="password" value="${esc(cfg.anonKey||'')}" placeholder="eyJ…"></label><button class="hist-secondary" id="histSaveCloud">Guardar configuración</button></div></details></div>
+    <div class="hist-card"><div class="hist-card-head"><div><h3>Estado de la nube</h3><p>Copia segura y acceso desde otros dispositivos</p></div><span class="hist-badge">${session?'Conectada':'Sin conectar'}</span></div><div class="hist-cloud-state"><div class="c-icon">☁</div><div><b>${session?(accountMode?`Cuenta ${esc(profile&&profile.dip||'')}`:`Sesión activa${user&&user.email?` · ${esc(user.email)}`:''}`):(accountMode?'Volvé a iniciar sesión':'Acceso por enlace de correo')}</b><p>${session?`${pending} cierres pendientes de sincronizar.`:(accountMode?'La sesión de distribuidor no está disponible.':'No necesitás recordar una contraseña.')}</p></div></div>${session?`<div class="hist-actions"><button class="hist-primary" id="histSyncNow">Sincronizar ahora</button><button class="hist-secondary" id="histPullCloud">Recuperar nube</button>${accountMode?'<button class="hist-secondary" id="histAccount">Mi cuenta</button>':'<button class="hist-danger" id="histLogout">Cerrar sesión</button>'}</div>`:(accountMode?'<button class="hist-primary" id="histRelogin">Volver a ingresar</button>':`<label class="hist-field" style="margin-top:11px"><span>Correo de acceso</span><input id="histCloudEmail" type="email" value="${esc(email)}" placeholder="tu@correo.com"></label><button class="hist-primary" id="histMagicLink">Enviar enlace de acceso</button>`)}</div>
+    <div class="hist-card"><div class="hist-card-head"><div><h3>Configuración</h3><p>Supabase reúne acceso, base de datos, archivos e IA segura.</p></div></div>${accountMode?'<div class="hist-cloud-note"><b>Administrada por APPI.</b><br>El Histórico usa automáticamente la misma cuenta de distribuidor. No necesitás configurar otra sesión.</div>':`<div class="hist-cloud-note">Para la prueba local no hace falta completar esto. Para activar la nube se debe crear el proyecto con el archivo <b>SUPABASE_SETUP.sql</b> incluido en el paquete.</div><details class="hist-config-details" ${cloudReady()?'':'open'}><summary>${cloudReady()?'Configuración guardada':'Completar conexión'}</summary><div><label class="hist-field"><span>URL de Supabase</span><input id="histCloudUrl" type="url" value="${esc(cfg.url||'')}" placeholder="https://proyecto.supabase.co"></label><label class="hist-field"><span>Clave pública (anon)</span><input id="histCloudKey" type="password" value="${esc(cfg.anonKey||'')}" placeholder="eyJ…"></label><button class="hist-secondary" id="histSaveCloud">Guardar configuración</button></div></details>`}</div>
     <div class="hist-card wide"><div class="hist-card-head"><div><h3>Registro de sincronización</h3><p>Los errores nunca eliminan la copia local.</p></div></div><div class="hist-sync-log" id="histSyncLog">${esc(H.syncLog.join('\n')||'Sin actividad todavía.')}</div></div>
     <div class="hist-card wide"><div class="hist-card-head"><div><h3>Privacidad del análisis con IA</h3><p>Detalle individual sin datos de contacto innecesarios</p></div></div><div class="hist-preview">La IA puede recibir nombres, códigos, categorías, puntos, ramas y garantías. APPI excluye teléfonos, domicilios, correos y cumpleaños. El envío solo ocurre después de marcar la autorización en la pantalla Analizar.</div></div>
   </div>`;
   const save=$('histSaveCloud');if(save)save.onclick=()=>{const url=$('histCloudUrl').value.trim().replace(/\/$/,''),anonKey=$('histCloudKey').value.trim();saveCloudConfigValue({url,anonKey});toast(cloudReady()?'Configuración de nube guardada':'Revisá la URL y la clave pública',2600);render()};
   const magic=$('histMagicLink');if(magic)magic.onclick=async()=>{magic.disabled=true;magic.textContent='Enviando…';try{await sendMagicLink($('histCloudEmail').value.trim());toast('Revisá tu correo y abrí el enlace de acceso',3800);magic.textContent='Enlace enviado'}catch(e){toast(e.message,3500);magic.disabled=false;magic.textContent='Enviar enlace de acceso'}};
-  if($('histSyncNow'))$('histSyncNow').onclick=()=>syncAll(true);if($('histPullCloud'))$('histPullCloud').onclick=async()=>{try{const n=await pullCloud();render();toast(n?`${n} cierres recuperados`:'La copia local ya está actualizada')}catch(e){toast(e.message,3200)}};if($('histLogout'))$('histLogout').onclick=()=>{setSession(null);render();toast('Sesión cerrada')};
+  if($('histSyncNow'))$('histSyncNow').onclick=()=>syncAll(true);if($('histPullCloud'))$('histPullCloud').onclick=async()=>{try{const n=await pullCloud();render();toast(n?`${n} cierres recuperados`:'La copia local ya está actualizada')}catch(e){toast(e.message,3200)}};if($('histLogout'))$('histLogout').onclick=()=>{setSession(null);render();toast('Sesión cerrada')};if($('histAccount'))$('histAccount').onclick=()=>{try{abrirCuentaDesdeMenu()}catch(e){}};if($('histRelogin'))$('histRelogin').onclick=()=>location.reload();
 }
 
 function showHelp(){
@@ -13540,6 +13685,7 @@ async function openHistorico(){
   try{await refreshData();H.ready=true;render()}catch(e){console.error('Abrir histórico',e);if(c)c.innerHTML=`<div class="hist-toast-inline error">No se pudo abrir el almacenamiento: ${esc(e.message)}</div>`}
 }
 async function initHistorico(){
+  if(window.APPIAuth&&window.APPIAuth.isEnabled()&&!window.APPIAuth.isLocallyAuthorized())return;
   if(H._initialized)return;H._initialized=true;
   try{await openDB();handleAuthHash();await refreshData();H.ready=true}catch(e){console.error('Inicialización histórico',e)}
   document.querySelectorAll('.hist-tabs [data-hist-tab]').forEach(b=>b.onclick=()=>openTab(b.dataset.histTab));
@@ -13553,6 +13699,7 @@ async function initHistorico(){
   if(window.__histOpenRequested) setTimeout(openHistorico,0);
 }
 window.openHistorico=openHistorico;
+window.initHistoricoAPPI=initHistorico;
 window.__APPI_HISTORICO__={state:H,open:openHistorico,refresh:refreshData,parseFile:parseHistoricalFile,saveMonth:saveMonthPeriod,analyze:analyzePeriods,strategies:buildStrategies,dbGetAll};
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initHistorico);else initHistorico();
 setTimeout(initHistorico,1200);
