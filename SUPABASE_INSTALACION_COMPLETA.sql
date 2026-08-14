@@ -104,9 +104,10 @@ on public.historico_periodos (user_id, updated_at desc);
 
 create table if not exists public.appi_perfiles (
   user_id uuid primary key references auth.users(id) on delete cascade,
-  dip text not null unique,
-  sucursal text not null,
-  numero_distribuidor text not null,
+  username text unique,
+  dip text unique,
+  sucursal text,
+  numero_distribuidor text,
   nombre text not null default '',
   rol text not null default 'usuario' check (rol in ('usuario','admin')),
   activo boolean not null default true,
@@ -115,21 +116,37 @@ create table if not exists public.appi_perfiles (
 );
 
 -- Compatibilidad para proyectos que ejecutaron una versión anterior del instalador.
+alter table public.appi_perfiles add column if not exists username text;
 alter table public.appi_perfiles add column if not exists sucursal text;
 alter table public.appi_perfiles add column if not exists numero_distribuidor text;
+alter table public.appi_perfiles alter column dip drop not null;
+alter table public.appi_perfiles alter column sucursal drop not null;
+alter table public.appi_perfiles alter column numero_distribuidor drop not null;
 update public.appi_perfiles
 set
   sucursal = coalesce(sucursal, left(regexp_replace(dip, '\\D', '', 'g'), 2)),
   numero_distribuidor = coalesce(numero_distribuidor, substring(regexp_replace(dip, '\\D', '', 'g') from 3))
-where sucursal is null or numero_distribuidor is null;
-alter table public.appi_perfiles alter column sucursal set not null;
-alter table public.appi_perfiles alter column numero_distribuidor set not null;
+where dip is not null and (sucursal is null or numero_distribuidor is null);
 alter table public.appi_perfiles drop constraint if exists appi_perfiles_dip_formato;
 alter table public.appi_perfiles add constraint appi_perfiles_dip_formato check (
-  sucursal ~ '^[0-9]{2}$'
-  and numero_distribuidor ~ '^[0-9]{1,12}$'
-  and dip = sucursal || '-' || numero_distribuidor
+  (
+    rol = 'admin'
+    and username ~ '^[a-z0-9._-]{3,30}$'
+    and dip is null
+    and sucursal is null
+    and numero_distribuidor is null
+  )
+  or
+  (
+    rol = 'usuario'
+    and dip = sucursal || '-' || numero_distribuidor
+    and sucursal ~ '^[0-9]{2}$'
+    and numero_distribuidor ~ '^[0-9]{1,12}$'
+  )
 );
+create unique index if not exists appi_perfiles_username_lower_idx
+on public.appi_perfiles (lower(username))
+where username is not null;
 
 alter table public.appi_perfiles enable row level security;
 grant select on public.appi_perfiles to authenticated;

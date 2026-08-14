@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v187-cuentas';
+const CACHE_NAME = 'appi-v188-admin';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
@@ -6,6 +6,7 @@ const APP_SHELL = [
   './auth-config.js',
   './auth-client.js',
   './data-sync.js',
+  './admin-panel.js',
   './historico.css',
   './historico.js',
   './manifest.json',

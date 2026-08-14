@@ -2,6 +2,7 @@ const { test, expect } = require('@playwright/test');
 
 const USER_A = '11111111-1111-4111-8111-111111111111';
 const USER_B = '22222222-2222-4222-8222-222222222222';
+const USER_ADMIN = '33333333-3333-4333-8333-333333333333';
 
 function tokenFor(sub) {
   const header = Buffer.from(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).toString('base64url');
@@ -10,18 +11,19 @@ function tokenFor(sub) {
 }
 
 async function mockSupabase(page) {
-  const cloud = new Map([[USER_A, new Map()], [USER_B, new Map()]]);
+  const cloud = new Map([[USER_A, new Map()], [USER_B, new Map()], [USER_ADMIN, new Map()]]);
   const passwordChanges = [];
   let offline = false;
   const profiles = {
-    [USER_A]: { user_id: USER_A, dip: '02-9802014', sucursal: '02', numero_distribuidor: '9802014', nombre: 'Distribuidor A', rol: 'usuario', activo: true },
-    [USER_B]: { user_id: USER_B, dip: '03-1234567', sucursal: '03', numero_distribuidor: '1234567', nombre: 'Distribuidor B', rol: 'usuario', activo: true }
+    [USER_A]: { user_id: USER_A, username: null, dip: '02-9802014', sucursal: '02', numero_distribuidor: '9802014', nombre: 'Distribuidor A', rol: 'usuario', activo: true },
+    [USER_B]: { user_id: USER_B, username: null, dip: '03-1234567', sucursal: '03', numero_distribuidor: '1234567', nombre: 'Distribuidor B', rol: 'usuario', activo: true },
+    [USER_ADMIN]: { user_id: USER_ADMIN, username: 'popups', dip: null, sucursal: null, numero_distribuidor: null, nombre: 'POPUPS', rol: 'admin', activo: true }
   };
   const cors = { 'access-control-allow-origin': '*', 'content-type': 'application/json' };
 
   await page.route('**/auth-config.js', route => route.fulfill({
     contentType: 'application/javascript',
-    body: `window.APPI_AUTH={enabled:true,url:'https://mock.supabase.co',anonKey:'anon-key-publica-de-prueba-1234567890',distributorEmailDomain:'distribuidores.appi.invalid',loginAliases:{popups:'02-9802014'},offlineDays:7};`
+    body: `window.APPI_AUTH={enabled:true,url:'https://mock.supabase.co',anonKey:'anon-key-publica-de-prueba-1234567890',distributorEmailDomain:'distribuidores.appi.invalid',adminLogin:{username:'popups',email:'admin-popups@appi.invalid'},loginAliases:{},offlineDays:7};`
   }));
 
   await page.route('https://mock.supabase.co/**', async route => {
@@ -35,7 +37,7 @@ async function mockSupabase(page) {
 
     if (url.pathname === '/auth/v1/token' && url.searchParams.get('grant_type') === 'password') {
       const body = request.postDataJSON();
-      const target = body.email.startsWith('dip-02-9802014@') ? USER_A : body.email.startsWith('dip-03-1234567@') ? USER_B : '';
+      const target = body.email.startsWith('dip-02-9802014@') ? USER_A : body.email.startsWith('dip-03-1234567@') ? USER_B : body.email === 'admin-popups@appi.invalid' ? USER_ADMIN : '';
       if (!target || body.password !== 'Clave1234') return route.fulfill({ status: 400, headers: cors, body: JSON.stringify({ error: 'Credenciales incorrectas' }) });
       return route.fulfill({ status: 200, headers: cors, body: JSON.stringify({ access_token: tokenFor(target), refresh_token: `refresh-${target}`, expires_in: 3600, token_type: 'bearer', user: { id: target } }) });
     }
@@ -45,6 +47,13 @@ async function mockSupabase(page) {
       return route.fulfill({ status: 200, headers: cors, body: JSON.stringify({ id: sub }) });
     }
     if (url.pathname === '/auth/v1/logout') return route.fulfill({ status: 204, headers: { 'access-control-allow-origin': '*' }, body: '' });
+
+    if (url.pathname === '/functions/v1/admin-distribuidores') {
+      const body = request.postDataJSON();
+      if (sub !== USER_ADMIN) return route.fulfill({ status: 403, headers: cors, body: JSON.stringify({ error: 'Se requiere una cuenta administradora.' }) });
+      if (body.action === 'list') return route.fulfill({ status: 200, headers: cors, body: JSON.stringify({ users: Object.values(profiles) }) });
+      return route.fulfill({ status: 200, headers: cors, body: JSON.stringify({ ok: true }) });
+    }
 
     if (url.pathname === '/rest/v1/appi_perfiles') {
       return route.fulfill({ status: 200, headers: cors, body: JSON.stringify(profiles[sub] ? [profiles[sub]] : []) });
@@ -86,7 +95,7 @@ test('cada distribuidor sincroniza y ve únicamente sus datos', async ({ page })
 
   await expect(page.locator('#distributorLoginPanel')).toBeVisible();
   await expect(page.locator('#legacyActivationPanel')).toBeHidden();
-  await login(page, 'popups');
+  await login(page, '029802014');
   await page.evaluate(() => APPIAuth.changePassword('NuevaClave2026!'));
   expect(backend.passwordChanges).toEqual(['NuevaClave2026!']);
 
@@ -111,4 +120,19 @@ test('cada distribuidor sincroniza y ve únicamente sus datos', async ({ page })
   expect(await page.evaluate(() => localStorage.getItem('presu_2026_7'))).toBeNull();
   expect(cloud.get(USER_B).has('presu_2026_7')).toBe(false);
   expect(await page.evaluate(() => APPIAuth.currentProfile().dip)).toBe('03-1234567');
+});
+
+test('POPUPS ingresa por el candado y no tiene distribuidor asociado', async ({ page }) => {
+  await mockSupabase(page);
+  await page.goto('/index.html', { waitUntil: 'networkidle' });
+  await page.locator('#btnAdminLoginOpen').click();
+  await expect(page.locator('#adminLoginOverlay')).toBeVisible();
+  await page.locator('#adminLoginPassword').fill('Clave1234');
+  await page.locator('#btnAdminLoginSubmit').click();
+  await expect(page.locator('#view-admin')).toHaveClass(/active/);
+  await expect(page.locator('#adminPanelIdentity')).toContainText('popups');
+  await expect(page.locator('#adminUserList')).toContainText('Distribuidor A');
+  const profile=await page.evaluate(()=>APPIAuth.currentProfile());
+  expect(profile).toMatchObject({username:'popups',dip:null,rol:'admin'});
+  await expect(page.locator('#btnAdminPanelLogout')).toBeVisible();
 });

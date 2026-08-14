@@ -34,6 +34,7 @@ window.openHistorico=function(){
 <script src="./auth-config.js"></script>
 <script src="./auth-client.js"></script>
 <script src="./data-sync.js"></script>
+<script src="./admin-panel.js"></script>
 <style id="historico-inline-css">
 /* APPI · Histórico mensual */
 .hist-view{padding-bottom:calc(34px + env(safe-area-inset-bottom));}
@@ -2440,6 +2441,7 @@ body.dark #lockScreen {
   padding: 32px 26px;
   max-width: 420px; width: 100%;
   text-align: center;
+  position: relative;
 }
 body.dark .lock-card {
   background: rgba(30,30,50,0.75);
@@ -2610,6 +2612,25 @@ body.dark .lock-footer { color: #6b6b76; }
 .lock-error.login-info{background:rgba(91,141,239,.10);border-color:rgba(91,141,239,.22);color:#3d63c9}
 .lock-activate-btn:disabled{opacity:.6;cursor:wait;transform:none}
 body.dark .lock-error.login-info{background:rgba(91,141,239,.16);color:#a8b8ff}
+#distributorLoginPanel .lock-title{margin-top:2px;font-size:25px}
+#distributorLoginPanel .lock-subtitle{max-width:330px;margin:0 auto 24px}
+#distributorLoginPanel .lock-field{margin-bottom:14px}
+#distributorLoginPanel .lock-field>span{margin-bottom:7px}
+#distributorLoginPanel .lock-input.login-input{min-height:52px;padding:14px 15px;border-radius:15px;background:rgba(255,255,255,.82)}
+#distributorLoginPanel .lock-pass-row{grid-template-columns:minmax(0,1fr) 54px}
+#distributorLoginPanel .lock-pass-row button{min-height:52px}
+#btnDistributorLogin{min-height:52px;margin-top:2px}
+.admin-login-lock{position:absolute;top:15px;right:15px;width:40px;height:40px;border:1px solid rgba(91,141,239,.18);border-radius:50%;display:grid;place-items:center;background:rgba(91,141,239,.10);color:#3d63c9;font-size:17px;cursor:pointer;box-shadow:0 5px 16px rgba(80,90,130,.10);transition:.18s}
+.admin-login-lock:hover{background:rgba(91,141,239,.18);transform:translateY(-1px)}
+.admin-login-lock:active{transform:scale(.92)}
+.admin-login-overlay{position:fixed;inset:0;z-index:10020;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(21,22,37,.52);backdrop-filter:blur(9px)}
+.admin-login-overlay[hidden]{display:none!important}
+.admin-login-card{position:relative;width:min(100%,380px);padding:27px 24px 24px;border-radius:25px;background:rgba(255,255,255,.97);box-shadow:0 24px 70px rgba(24,26,55,.32);text-align:center}
+.admin-login-card h2{margin:8px 0 5px;font-size:21px;color:#252633}.admin-login-card>p{margin:0 0 19px;color:#6d6e7c;font-size:13px}.admin-login-icon{width:58px;height:58px;margin:auto;border-radius:17px;display:grid;place-items:center;background:linear-gradient(135deg,#5b8def,#8b63e8);font-size:25px;box-shadow:0 9px 23px rgba(91,112,210,.25)}
+.admin-login-close{position:absolute;top:12px;right:12px;width:34px;height:34px;border:0;border-radius:50%;background:rgba(80,90,130,.08);color:#555665;font-size:22px;cursor:pointer}
+body.dark .admin-login-lock{background:rgba(91,141,239,.18);color:#b6c8ff;border-color:rgba(255,255,255,.1)}
+body.dark .admin-login-card{background:#242638}body.dark .admin-login-card h2{color:#f2f2f7}body.dark .admin-login-card>p{color:#b6b7c4}
+@media(max-width:480px){.lock-card{padding:27px 18px}.admin-login-lock{top:12px;right:12px}#distributorLoginPanel .lock-title{font-size:23px}}
 </style> 
 
 <style>
@@ -3460,7 +3481,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
     <button class="ds-btn" data-ds="view-planning" onclick="showView('view-planning'); renderPlanningTools();"><span>🗓️</span> Planificación</button>
   </nav>
-  <div class="ds-foot">APPI · v187 · Cuentas por distribuidor</div>
+  <div class="ds-foot">APPI · v188 · Panel administrador</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -3472,14 +3493,15 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
  <!-- ============ PANTALLA DE ACTIVACIÓN ============ -->
 <div id="lockScreen" class="hidden">
   <div class="lock-card">
+    <button type="button" class="admin-login-lock" id="btnAdminLoginOpen" aria-label="Acceso administrador" title="Acceso administrador">🔒</button>
     <div class="lock-logo"><img src="./icon-192.png" alt="APPI" /></div>
 
     <div id="distributorLoginPanel" class="auth-panel" hidden>
       <h1 class="lock-title">Ingresá a APPI</h1>
-      <p class="lock-subtitle">Usá tu usuario o número de distribuidor y la contraseña que te entregó el administrador.</p>
+      <p class="lock-subtitle">Usá tu número de distribuidor y la contraseña que te entregó el administrador.</p>
       <label class="lock-field">
-        <span>Usuario o número de distribuidor</span>
-        <input type="text" class="lock-input login-input" id="distributorInput" inputmode="text" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="popups o 02-9802014" maxlength="30" />
+        <span>Número de distribuidor</span>
+        <input type="text" class="lock-input login-input" id="distributorInput" inputmode="numeric" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="Ej: 02-9802014" maxlength="15" />
       </label>
       <label class="lock-field">
         <span>Contraseña</span>
@@ -3511,6 +3533,17 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
       <button class="lock-activate-btn" id="btnActivate">Activar APPI</button>
       <div class="lock-error" id="activationError">⚠️ Código incorrecto. Verificalo e intentá de nuevo.</div>
       <div class="lock-footer">Una vez activada, no vas a necesitar volver a ingresar el código en este dispositivo.</div>
+    </div>
+  </div>
+  <div class="admin-login-overlay" id="adminLoginOverlay" hidden>
+    <div class="admin-login-card" role="dialog" aria-modal="true" aria-labelledby="adminLoginTitle">
+      <button type="button" class="admin-login-close" id="btnAdminLoginClose" aria-label="Cerrar">×</button>
+      <div class="admin-login-icon">🔒</div>
+      <h2 id="adminLoginTitle">Panel administrador</h2>
+      <p>Ingresá la contraseña de POPUPS.</p>
+      <label class="lock-field"><span>Contraseña</span><input type="password" class="lock-input login-input" id="adminLoginPassword" autocomplete="current-password" placeholder="Contraseña de administrador"></label>
+      <button type="button" class="lock-activate-btn" id="btnAdminLoginSubmit">Ingresar al panel</button>
+      <div class="lock-error" id="adminLoginError" role="alert"></div>
     </div>
   </div>
 </div>
@@ -4019,6 +4052,50 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     </div>
   </section>
 
+  <style>
+  .admin-view{padding-bottom:42px}.admin-top{position:relative}.admin-top-lock{width:54px;height:54px;margin:0 auto 8px;border-radius:17px;display:grid;place-items:center;background:linear-gradient(135deg,#5b8def,#8b63e8);font-size:24px;box-shadow:0 10px 24px rgba(91,112,210,.23)}
+  .admin-round-logout{position:absolute;right:0;top:4px;width:40px;height:40px;border:1px solid rgba(217,83,79,.16);border-radius:50%;display:grid;place-items:center;background:rgba(217,83,79,.09);color:#c94750;font:900 18px inherit;cursor:pointer}.admin-round-logout:hover{background:rgba(217,83,79,.16)}
+  .admin-dashboard{max-width:940px;margin:auto}.admin-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px}.admin-stat{padding:16px;border-radius:18px;text-align:center;background:rgba(255,255,255,.66);border:1px solid rgba(255,255,255,.82);box-shadow:0 7px 20px rgba(65,75,120,.07)}.admin-stat strong{display:block;color:#3d63c9;font-size:26px}.admin-stat span{display:block;margin-top:3px;color:#777887;font-size:10px;font-weight:850;text-transform:uppercase}.admin-stat.good strong{color:#168765}.admin-stat.warn strong{color:#c34c53}
+  .admin-card{padding:18px!important;margin-bottom:12px}.admin-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:15px}.admin-card-head h2{margin:0;color:#292938;font-size:17px}.admin-card-head p{margin:4px 0 0;color:#777887;font-size:11px}.admin-form-grid{display:grid;grid-template-columns:1fr 2fr;gap:10px}.admin-form-grid label{display:flex;flex-direction:column;gap:6px}.admin-form-grid label.wide{grid-column:1/-1}.admin-form-grid label>span{color:#666776;font-size:10px;font-weight:900;text-transform:uppercase}.admin-form-grid input{width:100%;min-height:45px;padding:11px 12px;border:1px solid rgba(80,90,130,.14);border-radius:13px;background:rgba(255,255,255,.76);color:#292938;font:inherit;font-size:13px;outline:none}.admin-form-grid input:focus{border-color:#5b8def;box-shadow:0 0 0 3px rgba(91,141,239,.1)}.admin-create-btn{width:100%;margin-top:13px;min-height:46px}.admin-inline-status{display:none;margin-top:10px;padding:10px 12px;border-radius:11px;background:rgba(58,208,164,.1);color:#168765;font-size:12px;font-weight:750}.admin-inline-status.show{display:block}.admin-inline-status.error{background:rgba(217,83,79,.1);color:#c34c53}
+  .admin-user-list{display:grid;gap:8px;margin-top:12px}.admin-user-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;padding:13px;border-radius:15px;background:rgba(255,255,255,.62);border:1px solid rgba(80,90,130,.08)}.admin-user-row h3{margin:0;color:#292938;font-size:13px}.admin-user-row p{margin:4px 0 0;color:#777887;font-size:10px}.admin-user-badge{display:inline-block;margin-top:6px;padding:4px 7px;border-radius:999px;background:rgba(58,208,164,.12);color:#168765;font-size:8px;font-weight:900}.admin-user-badge.blocked{background:rgba(217,83,79,.11);color:#c34c53}.admin-row-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.admin-row-actions button{min-height:34px;padding:7px 9px;border:0;border-radius:10px;background:rgba(91,141,239,.1);color:#3d63c9;font:inherit;font-size:10px;font-weight:850;cursor:pointer}.admin-row-actions button.danger{background:rgba(217,83,79,.1);color:#c34c53}.admin-row-actions button.good{background:rgba(58,208,164,.1);color:#168765}
+  body.dark .admin-stat,body.dark .admin-user-row{background:rgba(31,32,49,.74);border-color:rgba(255,255,255,.08)}body.dark .admin-card-head h2,body.dark .admin-user-row h3{color:#f1f1f6}body.dark .admin-form-grid input{background:rgba(31,32,49,.8);border-color:rgba(255,255,255,.1);color:#f1f1f6}body.dark .admin-form-grid label>span{color:#b7b8c4}
+  @media(max-width:600px){.admin-stats{gap:6px}.admin-stat{padding:12px 6px}.admin-stat strong{font-size:22px}.admin-form-grid{grid-template-columns:1fr 2fr}.admin-card-head{flex-direction:column}.admin-card-head .btn{width:100%}.admin-user-row{grid-template-columns:1fr}.admin-row-actions{justify-content:stretch}.admin-row-actions button{flex:1}}
+  </style>
+
+  <!-- PANEL ADMINISTRADOR -->
+  <section id="view-admin" class="view admin-view">
+    <header class="top admin-top">
+      <button type="button" class="admin-round-logout" id="btnAdminPanelLogout" aria-label="Cerrar sesión" title="Cerrar sesión">↪</button>
+      <div class="admin-top-lock">🔒</div>
+      <h1>Panel</h1>
+      <div class="script">Administrador</div>
+      <p id="adminPanelIdentity">Cuenta POPUPS</p>
+    </header>
+    <div class="admin-dashboard">
+      <div class="admin-stats">
+        <div class="admin-stat"><strong id="adminStatTotal">0</strong><span>Cuentas</span></div>
+        <div class="admin-stat good"><strong id="adminStatActive">0</strong><span>Activas</span></div>
+        <div class="admin-stat warn"><strong id="adminStatBlocked">0</strong><span>Bloqueadas</span></div>
+      </div>
+      <section class="glass admin-card">
+        <div class="admin-card-head"><div><h2>Nueva cuenta</h2><p>Creá el acceso temporal de un distribuidor.</p></div><button type="button" class="btn btn-secondary" id="adminGeneratePassword">Generar contraseña</button></div>
+        <div class="admin-form-grid">
+          <label><span>Sucursal</span><input id="adminSucursal" inputmode="numeric" maxlength="2" placeholder="02"></label>
+          <label><span>Número de distribuidor</span><input id="adminNumero" inputmode="numeric" maxlength="12" placeholder="9802014"></label>
+          <label class="wide"><span>Nombre</span><input id="adminNombre" maxlength="120" placeholder="Nombre y apellido"></label>
+          <label class="wide"><span>Contraseña temporal</span><input id="adminTempPassword" type="text" maxlength="80" placeholder="Generá o escribí una contraseña"></label>
+        </div>
+        <button type="button" class="btn btn-primary admin-create-btn" id="adminCreateUser">Crear cuenta</button>
+        <div class="admin-inline-status" id="adminCreateStatus" role="status"></div>
+      </section>
+      <section class="glass admin-card">
+        <div class="admin-card-head"><div><h2>Distribuidores</h2><p>Activá, bloqueá o restablecé contraseñas.</p></div><button type="button" class="btn btn-secondary" id="adminRefreshUsers">Actualizar</button></div>
+        <div class="search-box"><span>🔍</span><input id="adminUserSearch" placeholder="Buscar por nombre, sucursal o número"></div>
+        <div class="admin-user-list" id="adminUserList"><div class="empty">Cargando cuentas…</div></div>
+      </section>
+    </div>
+  </section>
+
   <!-- HISTÓRICO MENSUAL -->
   <section id="view-historico" class="view hist-view">
     <header class="top hist-header">
@@ -4491,7 +4568,7 @@ function showView(id){
   document.querySelectorAll('#deskSidebar .ds-btn').forEach(b=>{
     b.classList.toggle('active', b.dataset.ds===dsTarget);
   });
-  const hideTabsOn = ['view-home','view-siete','view-siete-detail','view-presu','view-presu-hist','view-equipo','view-historico','view-seguimiento','view-planning','view-grabadora','view-notas','view-usuarios'];
+  const hideTabsOn = ['view-home','view-siete','view-siete-detail','view-presu','view-presu-hist','view-equipo','view-historico','view-seguimiento','view-planning','view-grabadora','view-notas','view-usuarios','view-admin'];
   document.getElementById('tabs').style.display = hideTabsOn.includes(id) ? 'none' : 'flex';
   if(id==='view-eval')    try{ renderAreas(); }catch(e){ console.error(e); }
   if(id==='view-wheel')   try{ renderWheel(); }catch(e){ console.error(e); }
@@ -9289,6 +9366,24 @@ function estaActivada() {
   }
 }
 
+function mostrarAdminLoginPopup(){
+  const overlay=document.getElementById('adminLoginOverlay'),input=document.getElementById('adminLoginPassword'),submit=document.getElementById('btnAdminLoginSubmit'),close=document.getElementById('btnAdminLoginClose'),error=document.getElementById('adminLoginError');
+  if(!overlay)return;overlay.hidden=false;error.textContent='';error.classList.remove('show');input.value='';
+  const hide=()=>{overlay.hidden=true;input.value='';error.textContent='';error.classList.remove('show')};
+  close.onclick=hide;
+  overlay.onclick=event=>{if(event.target===overlay)hide()};
+  submit.onclick=async()=>{
+    const original=submit.textContent;submit.disabled=true;submit.textContent='Ingresando…';error.textContent='';error.classList.remove('show');
+    try{
+      await window.APPIAuth.loginAdmin(input.value);
+      if(window.APPIDataSync)await window.APPIDataSync.start({claimLegacy:false});
+      hide();const lock=document.getElementById('lockScreen');if(lock){lock.classList.add('hidden');lock.style.display='none'}document.body.style.overflow='';iniciarApp();
+    }catch(reason){error.textContent=reason.message||'No se pudo ingresar al panel.';error.classList.add('show')}
+    finally{submit.disabled=false;submit.textContent=original}
+  };
+  input.onkeydown=event=>{if(event.key==='Enter')submit.click();if(event.key==='Escape')hide()};
+  setTimeout(()=>input.focus(),60);
+}
 function mostrarErrorLogin(message,type='error'){
   const error=document.getElementById('loginError'),info=document.getElementById('loginOfflineInfo');
   if(error){error.textContent=type==='error'?String(message||''):'';error.classList.toggle('show',type==='error'&&!!message)}
@@ -9299,7 +9394,7 @@ function mostrarPantallaLoginDistribuidor(reason=''){
   if(legacy)legacy.hidden=true;if(login)login.hidden=false;
   if(lock){lock.style.display='flex';lock.classList.remove('hidden')}
   document.body.style.overflow='hidden';
-  const dip=document.getElementById('distributorInput'),password=document.getElementById('distributorPassword'),button=document.getElementById('btnDistributorLogin'),toggle=document.getElementById('toggleDistributorPassword'),support=document.getElementById('btnLoginSupport');
+  const dip=document.getElementById('distributorInput'),password=document.getElementById('distributorPassword'),button=document.getElementById('btnDistributorLogin'),toggle=document.getElementById('toggleDistributorPassword'),support=document.getElementById('btnLoginSupport'),adminOpen=document.getElementById('btnAdminLoginOpen');
   if(!window.APPIAuth||!window.APPIAuth.isConfigured()){
     mostrarErrorLogin('El acceso por distribuidor todavía no está configurado. El administrador debe conectar Supabase.');
     if(button)button.disabled=true;
@@ -9311,7 +9406,7 @@ function mostrarPantallaLoginDistribuidor(reason=''){
   }
   if(dip&&!dip.dataset.bound){
     dip.dataset.bound='1';
-    dip.addEventListener('input',()=>{dip.value=window.APPIAuth.normalizeLoginIdentifier(dip.value);mostrarErrorLogin('')});
+    dip.addEventListener('input',()=>{dip.value=window.APPIAuth.normalizeDip(dip.value);mostrarErrorLogin('')});
     dip.addEventListener('keydown',event=>{if(event.key==='Enter')password.focus()});
   }
   if(password&&!password.dataset.bound){
@@ -9347,6 +9442,7 @@ function mostrarPantallaLoginDistribuidor(reason=''){
     support.dataset.bound='1';
     support.onclick=()=>{const numero=dip&&dip.value?dip.value:'sin completar';const msg=`Hola, necesito ayuda para ingresar a APPI. Mi número de distribuidor es: ${numero}`;window.open(`https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(msg)}`,'_blank','noopener')};
   }
+  if(adminOpen&&!adminOpen.dataset.bound){adminOpen.dataset.bound='1';adminOpen.onclick=mostrarAdminLoginPopup}
   setTimeout(()=>{if(dip&&!dip.value)dip.focus();else if(password)password.focus()},80);
 }
 
@@ -9428,11 +9524,17 @@ function mostrarPantallaBloqueo() {
 
 // Inicia la app normalmente
 function iniciarApp() {
-  loadEquipoFromStorage();
-  showView('view-home');
+  const profile=window.APPIAuth&&window.APPIAuth.isEnabled()?window.APPIAuth.currentProfile():null;
+  if(profile&&profile.rol==='admin'){
+    showView('view-admin');
+    setTimeout(()=>{if(window.APPIAdminPanel)window.APPIAdminPanel.open()},0);
+  }else{
+    loadEquipoFromStorage();
+    showView('view-home');
+    if(window.initHistoricoAPPI)setTimeout(()=>window.initHistoricoAPPI(),0);
+  }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',actualizarCuentaUI,{once:true});
   else actualizarCuentaUI();
-  if(window.initHistoricoAPPI)setTimeout(()=>window.initHistoricoAPPI(),0);
 }
 
 
@@ -9566,8 +9668,15 @@ modal.close = function(){
 
 
 function actualizarCuentaUI(){
-  const button=document.getElementById('btnToolsAccount');
-  if(button)button.hidden=!(window.APPIAuth&&window.APPIAuth.isEnabled()&&window.APPIAuth.currentProfile());
+  const account=document.getElementById('btnToolsAccount'),logout=document.getElementById('btnToolsLogout'),profile=window.APPIAuth&&window.APPIAuth.isEnabled()?window.APPIAuth.currentProfile():null;
+  if(account)account.hidden=!profile||profile.rol==='admin';
+  if(logout)logout.hidden=!profile||profile.rol==='admin';
+}
+async function cerrarSesionSeguraAPPI(){
+  try{cerrarToolsMenu()}catch(e){}
+  if(!confirm('¿Cerrar sesión y borrar los datos locales de esta cuenta en este dispositivo? Los datos sincronizados seguirán seguros en la nube.'))return;
+  try{await window.APPIDataSync.logoutAndLock({removeCache:true});location.reload()}
+  catch(error){showToast(error.message||'No se pudo cerrar la sesión',3600)}
 }
 function abrirCambioPasswordAPPI(){
   modal.open({
@@ -9699,7 +9808,7 @@ function abrirBackupDesdeMenu(){
   if(window.APPIAuth&&window.APPIAuth.isEnabled()){
     const result=await window.APPIAuth.authorize();
     if(result.ok){
-      try{if(window.APPIDataSync)await window.APPIDataSync.start({claimLegacy:true})}catch(error){console.error('Preparar datos de cuenta',error)}
+      try{if(window.APPIDataSync){const profile=window.APPIAuth.currentProfile();await window.APPIDataSync.start({claimLegacy:!(profile&&profile.rol==='admin')})}}catch(error){console.error('Preparar datos de cuenta',error)}
       localStorage.removeItem('appi_activada');
       iniciarApp();
       if(result.offline)setTimeout(()=>showToast('Modo offline · conectate antes de 7 días',3200),500);
@@ -9842,7 +9951,7 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./service-worker.js?v=187').catch(error => {
+      navigator.serviceWorker.register('./service-worker.js?v=188').catch(error => {
         console.warn('No se pudo registrar el modo offline de APPI', error);
       });
     });
@@ -10948,6 +11057,9 @@ body.dark .presu-select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:
   </button>
   <button class="tools-item" id="btnToolsAccount" onclick="abrirCuentaDesdeMenu()" hidden>
     <span class="ti-ico">👤</span><span>Mi cuenta</span>
+  </button>
+  <button class="tools-item" id="btnToolsLogout" onclick="cerrarSesionSeguraAPPI()" hidden>
+    <span class="ti-ico">↪</span><span>Cerrar sesión</span>
   </button>
 </div>
 

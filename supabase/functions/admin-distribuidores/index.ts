@@ -49,7 +49,7 @@ Deno.serve(async (request) => {
 
   const { data: profile, error: profileError } = await admin
     .from('appi_perfiles')
-    .select('user_id,dip,sucursal,numero_distribuidor,nombre,rol,activo')
+    .select('user_id,username,dip,sucursal,numero_distribuidor,nombre,rol,activo')
     .eq('user_id', authData.user.id)
     .maybeSingle();
   if (profileError || !profile || profile.rol !== 'admin' || profile.activo !== true) {
@@ -63,7 +63,7 @@ Deno.serve(async (request) => {
     if (action === 'list') {
       const { data, error } = await admin
         .from('appi_perfiles')
-        .select('user_id,dip,sucursal,numero_distribuidor,nombre,rol,activo,created_at,updated_at')
+        .select('user_id,username,dip,sucursal,numero_distribuidor,nombre,rol,activo,created_at,updated_at')
         .order('dip', { ascending: true });
       if (error) throw error;
       return json({ users: data || [] });
@@ -73,7 +73,7 @@ Deno.serve(async (request) => {
       const parsedDip = parseDip(body?.dip);
       const nombre = String(body?.nombre || '').trim().slice(0, 120);
       const password = String(body?.password || '');
-      const role = body?.rol === 'admin' ? 'admin' : 'usuario';
+      const role = 'usuario';
       if (!parsedDip) return json({ error: 'Ingresá una sucursal de 2 dígitos y el número de distribuidor.' }, 400);
       const dip = parsedDip.canonical;
       if (!validPassword(password)) return json({ error: 'La contraseña necesita 8 caracteres, letras y números.' }, 400);
@@ -122,7 +122,7 @@ Deno.serve(async (request) => {
         .from('appi_perfiles')
         .update({ activo })
         .eq('user_id', targetId)
-        .select('user_id,dip,sucursal,numero_distribuidor,nombre,rol,activo')
+        .select('user_id,username,dip,sucursal,numero_distribuidor,nombre,rol,activo')
         .single();
       if (error) throw error;
       const { error: authUpdateError } = await admin.auth.admin.updateUserById(targetId, {
@@ -138,7 +138,7 @@ Deno.serve(async (request) => {
         .from('appi_perfiles')
         .update({ nombre })
         .eq('user_id', targetId)
-        .select('user_id,dip,sucursal,numero_distribuidor,nombre,rol,activo')
+        .select('user_id,username,dip,sucursal,numero_distribuidor,nombre,rol,activo')
         .single();
       if (error) throw error;
       return json({ user: data });

@@ -27,27 +27,16 @@ Nunca colocar la clave `service_role` en `auth-config.js`, HTML ni JavaScript de
 
 El primer administrador se crea una sola vez desde Supabase.
 
-1. Usar el formato `SS-NÚMERO`, donde `SS` son los 2 dígitos de la sucursal y el resto es el número del distribuidor. Ejemplo: `02-9802014`.
-2. En **Authentication → Users**, crear un usuario confirmado con:
-   - Email: `dip-02-9802014@distribuidores.appi.invalid`
-   - Password: una contraseña segura de al menos 8 caracteres, con letras y números.
-3. Copiar el UUID del usuario.
-4. Ejecutar en SQL Editor, reemplazando los valores:
+1. En **Authentication → Users**, crear un usuario confirmado con:
+   - Email interno: `admin-popups@appi.invalid`
+   - Password: una contraseña segura de al menos 12 caracteres, con mayúscula, minúscula y números.
+2. Ejecutar `SUPABASE_ADMIN_SIN_DISTRIBUIDOR.sql`.
+3. Verificar que el perfil tenga:
+   - `username`: `popups`
+   - `rol`: `admin`
+   - `dip`, `sucursal` y `numero_distribuidor`: `NULL`
 
-```sql
-insert into public.appi_perfiles (
-  user_id, dip, sucursal, numero_distribuidor, nombre, rol, activo
-)
-values (
-  'UUID_DEL_USUARIO',
-  '02-9802014',
-  '02',
-  '9802014',
-  'Nombre del administrador',
-  'admin',
-  true
-);
-```
+El administrador entra desde el candado de la pantalla de acceso y solo escribe su contraseña. No se lo asocia a una sucursal ni a un número de distribuidor.
 
 ## 3. Desplegar el panel administrador
 
@@ -65,11 +54,7 @@ Si se cambia el dominio sintético de las cuentas, configurar el mismo valor en 
 supabase secrets set DISTRIBUTOR_EMAIL_DOMAIN="distribuidores.appi.invalid"
 ```
 
-Luego abrir:
-
-```text
-https://TU_SITIO/appi/admin_distribuidores.html
-```
+El acceso se realiza desde el botón redondo con candado de la pantalla principal de login. Después de validar la contraseña, APPI abre el panel administrador integrado.
 
 El administrador puede:
 
@@ -89,7 +74,8 @@ window.APPI_AUTH = {
   url: 'https://TU-PROYECTO.supabase.co',
   anonKey: 'TU_CLAVE_PUBLICA_ANON',
   distributorEmailDomain: 'distribuidores.appi.invalid',
-  loginAliases: { popups: '02-9802014' },
+  adminLogin: { username: 'popups', email: 'admin-popups@appi.invalid' },
+  loginAliases: {},
   offlineDays: 7
 };
 ```
