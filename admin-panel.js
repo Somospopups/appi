@@ -65,7 +65,7 @@ async function logout(){
 function bind(){
   if(state.bound)return;state.bound=true;
   $('adminGeneratePassword').onclick=()=>$('adminTempPassword').value=randomPassword();
-  $('adminCreateUser').onclick=create;$('adminRefreshUsers').onclick=load;$('btnAdminPanelLogout').onclick=logout;
+  $('adminCreateUser').onclick=create;$('adminRefreshUsers').onclick=load;$('btnAdminPanelLogout').onclick=logout;$('btnAdminPanelPassword').onclick=()=>window.abrirCambioPasswordAPPI();
   $('adminUserSearch').oninput=event=>{state.filter=event.target.value;render()};
   $('adminSucursal').oninput=event=>event.target.value=event.target.value.replace(/\D/g,'').slice(0,2);
   $('adminNumero').oninput=event=>event.target.value=event.target.value.replace(/\D/g,'').slice(0,12);

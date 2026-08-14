@@ -135,4 +135,6 @@ test('POPUPS ingresa por el candado y no tiene distribuidor asociado', async ({ 
   const profile=await page.evaluate(()=>APPIAuth.currentProfile());
   expect(profile).toMatchObject({username:'popups',dip:null,rol:'admin'});
   await expect(page.locator('#btnAdminPanelLogout')).toBeVisible();
+  await page.locator('#btnAdminPanelPassword').click();
+  await expect(page.locator('#accountNewPassword')).toBeVisible();
 });
