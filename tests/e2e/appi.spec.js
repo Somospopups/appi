@@ -1,0 +1,105 @@
+const { test, expect } = require('@playwright/test');
+
+async function abrirAppActivada(page) {
+  await page.addInitScript(() => {
+    localStorage.setItem('appi_cache_v186', '1');
+    localStorage.setItem('tutoVisto_v2', '1');
+    localStorage.setItem('welcomeSeen', '1');
+  });
+  await page.goto('/index.html', { waitUntil: 'networkidle' });
+  await page.evaluate(() => {
+    const deviceId = generarDeviceId();
+    const codigo = generarCodigoActivacion(deviceId);
+    localStorage.setItem('appi_activada', JSON.stringify({ codigo, deviceId, fecha: Date.now() }));
+  });
+  await page.reload({ waitUntil: 'networkidle' });
+  await expect(page.locator('#view-home')).toHaveClass(/active/);
+  await expect(page.locator('#lockScreen')).toHaveClass(/hidden/);
+}
+
+test('arranca, navega e importa Garantías una sola vez', async ({ page }) => {
+  const pageErrors = [];
+  const importLogs = [];
+  page.on('pageerror', error => pageErrors.push(String(error)));
+  page.on('console', message => {
+    if (message.text().includes('📂 Archivo seleccionado:')) importLogs.push(message.text());
+  });
+
+  await abrirAppActivada(page);
+
+  for (const [expression, expectedView] of [
+    ["openSiete()", 'view-siete'],
+    ["openPresu()", 'view-presu'],
+    ["openRueda('vida')", 'view-wheel'],
+    ["openEquipo()", 'view-equipo'],
+    ["openSeguimiento()", 'view-seguimiento'],
+    ["openGrabadora()", 'view-grabadora'],
+    ["showView('view-notas')", 'view-notas'],
+    ["showView('view-usuarios')", 'view-usuarios']
+  ]) {
+    await page.evaluate(expression);
+    await expect(page.locator(`#${expectedView}`)).toHaveClass(/active/);
+  }
+
+  await page.setInputFiles('#usuariosFileInput', 'test_garantias.xlsx');
+  await expect(page.locator('#usuariosStTotal')).toHaveText('4');
+  await expect(page.locator('#usuariosList .tree-node')).toHaveCount(4);
+  expect(importLogs).toHaveLength(1);
+
+  await page.evaluate(() => {
+    window.__appiLastOpen = null;
+    window.open = (...args) => { window.__appiLastOpen = args; return null; };
+  });
+  await page.locator('#usuariosList .tree-node').first().click();
+  await page.locator('#usuariosList [data-u-action="whatsapp"]').first().click();
+  const opened = await page.evaluate(() => window.__appiLastOpen);
+  expect(opened[0]).toMatch(/^https:\/\/wa\.me\//);
+  expect(pageErrors).toEqual([]);
+});
+
+test('trata el contenido importado como texto y no ejecuta HTML', async ({ page }) => {
+  await abrirAppActivada(page);
+  await page.evaluate(() => showView('view-usuarios'));
+
+  const csv = [
+    'Usuario,Teléf.,Domicilio,C.P.,Localidad,Producto,F.Compra,F.Vence',
+    '"<img src=x onerror=""window.__xssProof=\'executed\'"">",3515555555,Calle 123,X5000,Centro,PSA VERO,1/1/2026,1/1/2027'
+  ].join('\n');
+
+  await page.setInputFiles('#usuariosFileInput', {
+    name: 'usuarios-seguridad.csv',
+    mimeType: 'text/csv',
+    buffer: Buffer.from(csv, 'utf8')
+  });
+
+  await expect(page.locator('#usuariosStTotal')).toHaveText('1');
+  await expect(page.locator('#usuariosList img')).toHaveCount(0);
+  await expect(page.locator('#usuariosList .tree-name')).toContainText('<img src=x');
+  expect(await page.evaluate(() => window.__xssProof || null)).toBeNull();
+});
+
+test('Contactos distingue pendientes de cerrados', async ({ page }) => {
+  await abrirAppActivada(page);
+  const result = await page.evaluate(() => {
+    const ayer = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+    const contactos = [
+      { id: 1, nombre: 'Terminado', estado: 'Contactado', fecha: ayer },
+      { id: 2, nombre: 'Pendiente', estado: 'Seguimiento', fecha: ayer },
+      { id: 3, nombre: 'Descartado', estado: 'No le interesa', fecha: ayer }
+    ];
+    localStorage.setItem('seguimientoPersonas', JSON.stringify(contactos));
+    return {
+      pendientes: seguimientoPendientes(),
+      progreso: seguimientoProgreso(),
+      terminadoVencido: seguimientoVencido(contactos[0]),
+      pendienteVencido: seguimientoVencido(contactos[1])
+    };
+  });
+
+  expect(result).toEqual({
+    pendientes: 1,
+    progreso: 67,
+    terminadoVencido: false,
+    pendienteVencido: true
+  });
+});

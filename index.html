@@ -3964,7 +3964,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
         <h3 style="margin:8px 0 4px">Cargar archivo de Garantías / Usuarios</h3>
       </div>
       <label class="upload-zone" id="usuariosDropZone" for="usuariosFileInput" role="button" tabindex="0" aria-label="Cargar archivo Excel" style="display:block;cursor:pointer;position:relative;overflow:hidden">
-        <input type="file" id="usuariosFileInput" accept=".xls,.xlsx,.csv,.ods" onchange="console.log('📂 onchange inline', this.files[0]?.name); try{ if(this.files[0]){ if(window.cargarArchivoU) window.cargarArchivoU(this.files[0]); else if(window.cargarArchivoU) window.cargarArchivoU(this.files[0]); else alert('App cargando... esperá 2 seg y probá de nuevo'); } }catch(e){ console.error(e); alert('Error: '+e.message+'\n\nProbá con el botón de emergencia de abajo'); }" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;z-index:2">
+        <input type="file" id="usuariosFileInput" accept=".xls,.xlsx,.csv,.ods" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;z-index:2">
         <div style="position:relative;z-index:1;pointer-events:none">
           <div style="font-size:26px">📤</div>
           <b>Arrastrá tu archivo acá o clic para elegir</b>
@@ -3975,7 +3975,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
       <div id="usuariosFileInfo" style="display:none;margin-top:12px;padding:12px;border-radius:14px;background:rgba(58,208,164,0.14);backdrop-filter:blur(10px);border:1px solid rgba(58,208,164,0.18);font-size:12px;font-weight:600"></div>
       <div style="margin-top:12px;padding:10px;border-radius:10px;background:rgba(0,113,227,0.06);border:1px dashed rgba(0,113,227,0.20);text-align:center">
         <small style="color:#3d63c9;font-weight:600">¿No abre? Probá con este botón de emergencia:</small><br/>
-        <input type="file" id="usuariosFileInputBackup" accept=".xls,.xlsx,.csv,.ods" onchange="console.log('📂 backup onchange', this.files[0]?.name); try{ if(this.files[0]) window.cargarArchivoU(this.files[0]); }catch(e){ alert(e.message); }" style="margin-top:8px;font-size:12px">
+        <input type="file" id="usuariosFileInputBackup" accept=".xls,.xlsx,.csv,.ods" style="margin-top:8px;font-size:12px">
       </div>
       <div id="usuariosDebug" style="display:none;margin-top:8px;padding:10px;border-radius:12px;background:rgba(0,0,0,0.05);font-size:11px;font-family:monospace;white-space:pre-wrap;max-height:200px;overflow:auto"></div>
       <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
@@ -8472,9 +8472,11 @@ function cargarSeguimientos(){ try { return JSON.parse(localStorage.getItem(SEG_
 function guardarSeguimientos(list){ localStorage.setItem(SEG_KEY, JSON.stringify(list)); localStorage.setItem('lastUpdate_seguimiento', Date.now().toString()); }
 function fechaSeg(d){ if(!d) return ''; const [y,m,day]=d.split('-'); return `${day}/${m}/${y}`; }
 function hoyLocal(){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
-function seguimientoVencido(p){ return p.fecha && p.fecha < hoyLocal() && p.estado !== 'No le interesa'; }
-function seguimientoPendientes(){ return cargarSeguimientos().filter(p=>p.estado !== 'No le interesa').length; }
-function seguimientoProgreso(){ const a=cargarSeguimientos(); if(!a.length) return 0; return Math.round(a.filter(p=>p.estado==='Cliente').length/a.length*100); }
+const SEG_ESTADOS_CERRADOS = new Set(['Contactado','Cliente','No le interesa','No interesado']);
+function seguimientoCerrado(p){ return !!p && SEG_ESTADOS_CERRADOS.has(p.estado); }
+function seguimientoVencido(p){ return !!(p && p.fecha && p.fecha < hoyLocal() && !seguimientoCerrado(p)); }
+function seguimientoPendientes(){ return cargarSeguimientos().filter(p=>!seguimientoCerrado(p)).length; }
+function seguimientoProgreso(){ const a=cargarSeguimientos(); if(!a.length) return 0; return Math.round(a.filter(seguimientoCerrado).length/a.length*100); }
 function openSeguimiento(){ showView('view-seguimiento'); }
 function capitalizarNombreSeg(valor){ return String(valor||'').toLocaleLowerCase('es-AR').replace(/(^|[\s'-])(\p{L})/gu,(m,sep,letra)=>sep+letra.toLocaleUpperCase('es-AR')).replace(/\s{2,}/g,' '); }
 function limpiarFormularioSeg(){ ['segNombre','segTelefono','segFecha','segNotas'].forEach(id=>document.getElementById(id).value=''); document.getElementById('segInteres').value='Producto'; document.getElementById('segEstado').value='No contactado'; seguimientoEditId=null; }
@@ -8483,7 +8485,7 @@ function segContactActions(p){const d=segDigits(p.telefono);if(!d)return '';cons
 function renderSeguimiento(){
   const all=cargarSeguimientos();
   const hoy=hoyLocal();
-  const pendientes=all.filter(p=>p.estado !== 'No le interesa');
+  const pendientes=all.filter(p=>!seguimientoCerrado(p));
   const hoyCount=pendientes.filter(p=>p.fecha===hoy).length;
   const vencidos=pendientes.filter(seguimientoVencido).length;
   document.getElementById('seguimientoSummary').innerHTML=`<div class="seguimiento-stat"><strong>${hoyCount}</strong><span>Para hoy</span></div><div class="seguimiento-stat"><strong>${vencidos}</strong><span>Vencidos</span></div><div class="seguimiento-stat"><strong>${pendientes.length}</strong><span>Pendientes</span></div>`;
@@ -11870,6 +11872,15 @@ const LS_KEY_U='usuarios_garantias';
 let usuariosU=[], filtradosU=[], filtroVencU='all', filtroZonaU='all', ordenAscU=true;
 let mapU=null, markersU=[];
 
+function escU(value){
+  return String(value==null?'':value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function csvCellU(value){
+  let text=String(value==null?'':value);
+  if(/^[=+\-@]/.test(text)) text="'"+text;
+  return '"'+text.replace(/"/g,'""')+'"';
+}
+
 function normU(s){ return (s||'').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim(); }
 function normNoSpaceU(s){ return normU(s).replace(/\s/g,''); }
 function parseFechaU(str){
@@ -11982,8 +11993,9 @@ function renderZonasU(){
   const zonas=[...new Set(usuariosU.map(u=>u.localidad).filter(Boolean))].sort();
   const select=document.getElementById('usuariosSelectZona');
   if(select){
-    const current=select.value||'all';
-    select.innerHTML='<option value="all">📍 Todas las zonas ('+zonas.length+')</option>' + zonas.map(z=>`<option value="${z.replace(/"/g,'&quot;')}">${z}</option>`).join('');
+    select.replaceChildren();
+    select.add(new Option(`📍 Todas las zonas (${zonas.length})`,'all'));
+    zonas.forEach(z=>select.add(new Option(String(z),String(z))));
     // Restaurar valor si existe
     if(zonas.includes(filtroZonaU) || filtroZonaU==='all'){
       select.value=filtroZonaU;
@@ -12060,16 +12072,16 @@ function aplicarFiltrosU(){
   if(activeDiv){
     if(isFiltered){
       const parts=[];
-      if(filtroZonaU!=='all') parts.push(`📍 Zona: <b>${filtroZonaU}</b>`);
+      if(filtroZonaU!=='all') parts.push(`📍 Zona: ${filtroZonaU}`);
       if(filtroVencU!=='all'){
-        const labels={vencidas:'🔴 Vencidas', porVencer:'🟡 Por vencer', vigentes:'🟢 Vigentes'};
+        const labels={vencida:'🔴 Vencidas',porVencer:'🟡 Por vencer',vigente:'🟢 Vigentes'};
         parts.push(labels[filtroVencU]||filtroVencU);
       }
       if(q) parts.push(`🔍 "${qEl.value}"`);
-      // Sin boton Limpiar interno (pedido: quitalo, no funciona) - solo texto
-      activeDiv.innerHTML=`🔎 Filtrando ${filtradosU.length} de ${usuariosU.length} → ${parts.join(' · ')}`;
+      activeDiv.textContent=`🔎 Filtrando ${filtradosU.length} de ${usuariosU.length} → ${parts.join(' · ')}`;
       activeDiv.style.display='block';
     }else{
+      activeDiv.textContent='';
       activeDiv.style.display='none';
     }
   }
@@ -12134,41 +12146,76 @@ function renderListU(){
     cont.innerHTML='<div class="empty">Sin usuarios con esos filtros</div>';
     return;
   }
-  // Estilo arbol: un solo renglon y desplegable
-  cont.innerHTML=filtradosU.map(u=>{
+  // Los datos importados se escapan y los eventos se vinculan fuera del HTML.
+  cont.innerHTML=filtradosU.map((u,index)=>{
     const venceRaw=u.fVenceRaw||'—';
     const compraRaw=u.fCompra||'—';
     const diasNum=u.fVence? Math.ceil((u.fVence-new Date())/(1000*60*60*24)) : null;
     const diasLabel=diasNum!==null? (diasNum<0? `${Math.abs(diasNum)}d vencida` : `${diasNum}d`) : '';
     const estadoColor=u.estado==='vencida'?'#d9534f':(u.estado==='porVencer'?'#f5b301':'#3ad0a4');
     const estadoTxt=u.estado==='vencida'?'VENC':(u.estado==='porVencer'?'POR VENC':'VIG');
+    const zonaCp=[u.localidad,u.cp?'CP '+u.cp:''].filter(Boolean).join(' ');
     return `
-    <div class="tree-node" onclick="this.classList.toggle('expanded'); const ch=this.nextElementSibling; if(ch) ch.classList.toggle('open');">
+    <div class="tree-node" data-u-toggle="${index}" role="button" tabindex="0" aria-expanded="false">
       <span class="tree-arrow">›</span>
       <span class="tree-cat-badge" style="background:${estadoColor}">${estadoTxt}</span>
-      <span class="tree-name" title="${u.usuario} - ${u.domicilio}">${u.usuario}</span>
-      <span class="tree-pts" style="background:rgba(0,0,0,0.06);color:#1c1c1e">${u.localidad||''}</span>
-      <span class="tree-pts" style="min-width:70px;text-align:right">${venceRaw}</span>
+      <span class="tree-name" title="${escU(`${u.usuario||''} - ${u.domicilio||''}`)}">${escU(u.usuario)}</span>
+      <span class="tree-pts" style="background:rgba(0,0,0,0.06);color:#1c1c1e">${escU(u.localidad||'')}</span>
+      <span class="tree-pts" style="min-width:70px;text-align:right">${escU(venceRaw)}</span>
     </div>
     <div class="tree-children" style="padding:8px;background:rgba(255,255,255,0.5);border-radius:12px;margin-bottom:8px">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:11px">
-        <div>📞 <b>${u.telf||'—'}</b></div>
-        <div>🏠 <b>${u.domicilio||'—'}</b></div>
-        <div>📍 <b>${u.localidad||''} ${u.cp? 'CP '+u.cp:''}</b></div>
-        <div>📦 <b>${u.producto||'—'}</b></div>
-        <div>🛒 Compra: <b>${compraRaw}</b></div>
-        <div>📅 Vence: <b>${venceRaw}</b> <small>${diasLabel}</small></div>
+        <div>📞 <b>${escU(u.telf||'—')}</b></div>
+        <div>🏠 <b>${escU(u.domicilio||'—')}</b></div>
+        <div>📍 <b>${escU(zonaCp)}</b></div>
+        <div>📦 <b>${escU(u.producto||'—')}</b></div>
+        <div>🛒 Compra: <b>${escU(compraRaw)}</b></div>
+        <div>📅 Vence: <b>${escU(venceRaw)}</b> <small>${escU(diasLabel)}</small></div>
       </div>
       <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">
-        <button class="action-btn map" onclick="window.verMapaU && window.verMapaU('${(u.domicilio+' '+(u.localidad||'')+' '+(u.cp||'')).replace(/'/g,'')}')">📍 Mapa</button>
-        <button class="action-btn neighbors" onclick="window.verVecinosU && window.verVecinosU('${(u.localidad||'').replace(/'/g,'')}')">👥 Vecinos</button>
-        ${u.telf?`<button class="action-btn call" style="background:rgba(37,211,102,0.14);color:#128C7E;border-color:rgba(37,211,102,0.20)" onclick="const link=getWhatsAppLinkU({usuario:u.usuario, telf:u.telf, domicilio:u.domicilio, producto:u.producto}); if(link) window.open(link,'_blank'); else alert('Sin teléfono válido')">💬 WhatsApp</button>`:''}
-        ${u.telf?`<button class="action-btn call" onclick="window.open('tel:${u.telf.replace(/\\D/g,'')}')">📞 Llamar</button>`:''}
-        <button class="action-btn mail" onclick="window.open('https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((u.domicilio||'')+' '+(u.localidad||''))}', '_blank')">🗺️ Google</button>
+        <button type="button" class="action-btn map" data-u-action="map" data-u-index="${index}">📍 Mapa</button>
+        <button type="button" class="action-btn neighbors" data-u-action="neighbors" data-u-index="${index}">👥 Vecinos</button>
+        ${u.telf?`<button type="button" class="action-btn call" style="background:rgba(37,211,102,0.14);color:#128C7E;border-color:rgba(37,211,102,0.20)" data-u-action="whatsapp" data-u-index="${index}">💬 WhatsApp</button>`:''}
+        ${u.telf?`<button type="button" class="action-btn call" data-u-action="call" data-u-index="${index}">📞 Llamar</button>`:''}
+        <button type="button" class="action-btn mail" data-u-action="google" data-u-index="${index}">🗺️ Google</button>
       </div>
-    </div>
-    `;
+    </div>`;
   }).join('');
+
+  const toggleNode=node=>{
+    const children=node.nextElementSibling;
+    const open=!node.classList.contains('expanded');
+    node.classList.toggle('expanded',open);
+    node.setAttribute('aria-expanded',String(open));
+    if(children) children.classList.toggle('open',open);
+  };
+  cont.querySelectorAll('[data-u-toggle]').forEach(node=>{
+    node.onclick=()=>toggleNode(node);
+    node.onkeydown=event=>{
+      if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleNode(node)}
+    };
+  });
+  cont.querySelectorAll('[data-u-action]').forEach(button=>{
+    button.onclick=()=>{
+      const u=filtradosU[Number(button.dataset.uIndex)];
+      if(!u) return;
+      const action=button.dataset.uAction;
+      if(action==='map'){
+        window.verMapaU([u.domicilio,u.localidad,u.cp].filter(Boolean).join(' '));
+      }else if(action==='neighbors'){
+        window.verVecinosU(u.localidad||'');
+      }else if(action==='whatsapp'){
+        const link=getWhatsAppLinkU(u);
+        if(link) window.open(link,'_blank','noopener'); else alert('Sin teléfono válido');
+      }else if(action==='call'){
+        const digits=String(u.telf||'').replace(/\D/g,'');
+        if(digits) window.location.href='tel:'+digits;
+      }else if(action==='google'){
+        const query=[u.domicilio,u.localidad].filter(Boolean).join(' ');
+        window.open('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(query),'_blank','noopener');
+      }
+    };
+  });
 }
 window.verMapaU=function(query){
   if(!query.trim()){ alert('Sin domicilio'); return; }
@@ -12431,7 +12478,7 @@ window.mostrarEnMapaU=async function(query, lista=null){
   }
   if(lista && lista.length){
     try{
-      L.popup().setLatLng(mapU.getCenter()).setContent(`<b>📍 ${query}</b><br/>${lista.length} usuarios<br/>🔴 Vencidas | 🟡 Por vencer | 🟢 Vigentes<br/><br/>⏳ Geocodificando ultra-preciso 0/${lista.length}...<br/><small>OSM Nominatim structured + CP→Provincia + cache v3</small>`).openOn(mapU);
+      L.popup().setLatLng(mapU.getCenter()).setContent(`<b>📍 ${escU(query)}</b><br/>${lista.length} usuarios<br/>🔴 Vencidas | 🟡 Por vencer | 🟢 Vigentes<br/><br/>⏳ Geocodificando ultra-preciso 0/${lista.length}...<br/><small>OSM Nominatim structured + CP→Provincia + cache v3</small>`).openOn(mapU);
     }catch(e){}
     let geoOk=0, geoFail=0, geoAprox=0;
     const posicionesPorDireccion=new Map();
@@ -12452,7 +12499,7 @@ window.mostrarEnMapaU=async function(query, lista=null){
       if(!pos){
         geoFail++;
         try{
-          L.popup().setLatLng(mapU.getCenter()).setContent(`<b>📍 ${query}</b><br/>${lista.length} usuarios<br/>⏳ ${i+1}/${lista.length}... ✅ ${geoOk} exactas | 🟡 ${geoAprox} barrio | ❌ ${geoFail} sin ubic<br/><small>Prov: ${provinciaPorCP(u.cp)||'?'} | ${u.domicilio||''}</small>`).openOn(mapU);
+          L.popup().setLatLng(mapU.getCenter()).setContent(`<b>📍 ${escU(query)}</b><br/>${lista.length} usuarios<br/>⏳ ${i+1}/${lista.length}... ✅ ${geoOk} exactas | 🟡 ${geoAprox} barrio | ❌ ${geoFail} sin ubic<br/><small>Prov: ${escU(provinciaPorCP(u.cp)||'?')} | ${escU(u.domicilio||'')}</small>`).openOn(mapU);
         }catch(e){}
         continue;
       }
@@ -12462,9 +12509,9 @@ window.mostrarEnMapaU=async function(query, lista=null){
       const emoji=u.estado==='vencida'?'🔴':(u.estado==='porVencer'?'🟡':'🟢');
       const provTxt=provinciaPorCP(u.cp)? `CP ${u.cp} → ${provinciaPorCP(u.cp)}` : '';
       const precisionTxt=pos.fallback? '<small style="color:#a3670b">📍 Aproximada (solo barrio/localidad)</small>' : '<small style="color:#1d7a5c">✅ Exacta calle + altura</small>';
-      const queryTxt=pos.query? `<small style="color:#6b6b76">🔍 ${pos.query}</small>`:'';
-      const displayTxt=pos.display_name? `<small style="color:#3a3a48">${pos.display_name}</small>`:'';
-      marker.bindPopup(`<b>${emoji} ${u.usuario}</b><br/>${u.domicilio||''}<br/>${u.localidad||''} ${u.cp||''} ${provTxt? '('+provTxt+')':''}<br/>Vence: ${u.fVenceRaw||''}<br/>${u.producto||''}<br/>${precisionTxt}<br/>${queryTxt}<br/>${displayTxt}<br/><br/><a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((u.domicilio||'')+' '+(u.localidad||''))}" target="_blank">📍 Google</a> | <a href="https://www.google.com/maps/dir/?api=1&destination=${pos.lat},${pos.lng}" target="_blank">🧭 Llegar</a>`);
+      const queryTxt=pos.query? `<small style="color:#6b6b76">🔍 ${escU(pos.query)}</small>`:'';
+      const displayTxt=pos.display_name? `<small style="color:#3a3a48">${escU(pos.display_name)}</small>`:'';
+      marker.bindPopup(`<b>${emoji} ${escU(u.usuario)}</b><br/>${escU(u.domicilio||'')}<br/>${escU(u.localidad||'')} ${escU(u.cp||'')} ${provTxt? '('+escU(provTxt)+')':''}<br/>Vence: ${escU(u.fVenceRaw||'')}<br/>${escU(u.producto||'')}<br/>${precisionTxt}<br/>${queryTxt}<br/>${displayTxt}<br/><br/><a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((u.domicilio||'')+' '+(u.localidad||''))}" target="_blank" rel="noopener">📍 Google</a> | <a href="https://www.google.com/maps/dir/?api=1&destination=${pos.lat},${pos.lng}" target="_blank" rel="noopener">🧭 Llegar</a>`);
       markersU.push(marker);
       if(markersU.length%3===0 || i===lista.length-1){
         try{
@@ -12473,15 +12520,15 @@ window.mostrarEnMapaU=async function(query, lista=null){
         }catch(e){}
       }
       try{
-        L.popup().setLatLng(mapU.getCenter()).setContent(`<b>📍 ${query}</b><br/>${lista.length} usuarios<br/>⏳ ${i+1}/${lista.length}... ✅ ${geoOk} exactas | 🟡 ${geoAprox} barrio | ❌ ${geoFail} sin<br/><small>CP→Prov + cache + direcciones agrupadas</small>`).openOn(mapU);
+        L.popup().setLatLng(mapU.getCenter()).setContent(`<b>📍 ${escU(query)}</b><br/>${lista.length} usuarios<br/>⏳ ${i+1}/${lista.length}... ✅ ${geoOk} exactas | 🟡 ${geoAprox} barrio | ❌ ${geoFail} sin<br/><small>CP→Prov + cache + direcciones agrupadas</small>`).openOn(mapU);
       }catch(e){}
     }
     const texto=lista.slice(0,8).map(u=>{
       const emoji=u.estado==='vencida'?'🔴':(u.estado==='porVencer'?'🟡':'🟢');
-      return `${emoji} ${u.usuario} - ${u.domicilio||''}`;
+      return `${emoji} ${escU(u.usuario)} - ${escU(u.domicilio||'')}`;
     }).join('<br/>');
     try{
-      L.popup().setLatLng(mapU.getCenter()).setContent(`<b>📍 ${query}</b><br/>${lista.length} usuarios | ✅ ${geoOk} exactas | 🟡 ${geoAprox} aprox | ❌ ${geoFail} fallos<br/><br/>${texto}${lista.length>8?'<br/>... y '+(lista.length-8)+' más':''}<br/><br/><small>✅ = calle + altura exacta OSM | 🟡 = barrio | Sin offset aleatorio | Cache v3</small>`).openOn(mapU);
+      L.popup().setLatLng(mapU.getCenter()).setContent(`<b>📍 ${escU(query)}</b><br/>${lista.length} usuarios | ✅ ${geoOk} exactas | 🟡 ${geoAprox} aprox | ❌ ${geoFail} fallos<br/><br/>${texto}${lista.length>8?'<br/>... y '+(lista.length-8)+' más':''}<br/><br/><small>✅ = calle + altura exacta OSM | 🟡 = barrio | Sin offset aleatorio | Cache v3</small>`).openOn(mapU);
     }catch(e){}
   }else{
     let pos=null;
@@ -12497,16 +12544,16 @@ window.mostrarEnMapaU=async function(query, lista=null){
       latLng=[pos.lat, pos.lng];
       const marker=L.marker(latLng, {icon:redIcon}).addTo(mapU);
       markersU.push(marker);
-      marker.bindPopup(`<b>${query}</b><br/>✅ Exacta<br/><small>${pos.display_name||''}</small><br/><a target=_blank href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}">Google</a> | <a target=_blank href="https://www.google.com/maps/dir/?api=1&destination=${pos.lat},${pos.lng}">Llegar</a>`);
+      marker.bindPopup(`<b>${escU(query)}</b><br/>✅ Exacta<br/><small>${escU(pos.display_name||'')}</small><br/><a target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}">Google</a> | <a target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=${pos.lat},${pos.lng}">Llegar</a>`);
       mapU.setView(latLng, 18);
-      try{ L.popup().setLatLng(latLng).setContent(`<b>${query}</b><br/>✅ ${pos.display_name||'Exacta'}<br/><small>Cache v3 + structured</small><br/><a target=_blank href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}">Google</a>`).openOn(mapU); }catch(e){}
+      try{ L.popup().setLatLng(latLng).setContent(`<b>${escU(query)}</b><br/>✅ ${escU(pos.display_name||'Exacta')}<br/><small>Cache v3 + structured</small><br/><a target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}">Google</a>`).openOn(mapU); }catch(e){}
     }else{
       latLng=mapU.getCenter();
       const marker=L.marker(latLng, {icon:redIcon}).addTo(mapU);
       markersU.push(marker);
-      marker.bindPopup(`<b>${query}</b><br/>⚠️ Sin geocodificación<br/><a target=_blank href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}">Buscar en Google</a>`);
+      marker.bindPopup(`<b>${escU(query)}</b><br/>⚠️ Sin geocodificación<br/><a target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}">Buscar en Google</a>`);
       mapU.setView(latLng, 13);
-      try{ L.popup().setLatLng(latLng).setContent(`<b>${query}</b><br/>⚠️ Sin geocodificación exacta v3<br/><a target=_blank href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}">Google</a>`).openOn(mapU); }catch(e){}
+      try{ L.popup().setLatLng(latLng).setContent(`<b>${escU(query)}</b><br/>⚠️ Sin geocodificación exacta v3<br/><a target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}">Google</a>`).openOn(mapU); }catch(e){}
     }
   }
   setTimeout(()=>{ try{ if(mapU) mapU.invalidateSize(true); }catch(e){} },500);
@@ -12518,7 +12565,7 @@ function cargarArchivoU(file){
   const infoEl=document.getElementById('usuariosFileInfo');
   const dbgEl=document.getElementById('usuariosDebug');
   try{
-    if(infoEl){ infoEl.style.display='block'; infoEl.innerHTML=`⏳ Leyendo <b>${file.name}</b> (${(file.size/1024).toFixed(1)} KB) ...<br/><small>Si no avanza, revisá consola (F12)</small>`; }
+    if(infoEl){ infoEl.style.display='block'; infoEl.innerHTML=`⏳ Leyendo <b>${escU(file.name)}</b> (${(file.size/1024).toFixed(1)} KB) ...<br/><small>Si no avanza, revisá consola (F12)</small>`; }
     if(typeof XLSX==='undefined'){
       alert('⚠️ Librería Excel no cargada. Recargá la página con internet.\n\nTip: Desactivá bloqueador de anuncios para cdn.jsdelivr.net');
       if(infoEl) infoEl.innerHTML=`❌ Error: librería XLSX no cargada - recargá con internet y desactivá AdBlock para cdn.jsdelivr.net`;
@@ -12534,7 +12581,7 @@ function cargarArchivoU(file){
     reader.onload=e=>{
       try{
         console.log('📖 ArrayBuffer listo, bytes:', e.target.result.byteLength);
-        if(infoEl) infoEl.innerHTML=`⏳ Procesando <b>${file.name}</b>...<br/><small>Leyendo hojas Excel</small>`;
+        if(infoEl) infoEl.innerHTML=`⏳ Procesando <b>${escU(file.name)}</b>...<br/><small>Leyendo hojas Excel</small>`;
         const data=new Uint8Array(e.target.result);
         let wb;
         try{
@@ -12546,7 +12593,7 @@ function cargarArchivoU(file){
           wb=XLSX.read(binary,{type:'binary'});
         }
         console.log('📑 Hojas encontradas:', wb.SheetNames);
-        if(infoEl) infoEl.innerHTML=`⏳ Hojas: <b>${wb.SheetNames.join(', ')}</b> - analizando...`;
+        if(infoEl) infoEl.innerHTML=`⏳ Hojas: <b>${escU(wb.SheetNames.join(', '))}</b> - analizando...`;
         let mejor={data:[], debug:''};
         let debugAll=[];
         wb.SheetNames.forEach(name=>{
@@ -12569,7 +12616,11 @@ function cargarArchivoU(file){
         if(parsed.length===0){
           const msg='No se detectaron usuarios. Revisá que el Excel tenga columnas Usuario, Domicilio, etc.\n\n'+fullDebug.substring(0,800);
           alert(msg);
-          if(infoEl) infoEl.innerHTML=`❌ No se detectaron usuarios en <b>${file.name}</b><br/><small>${fullDebug.substring(0,400).replace(/\n/g,'<br/>')}</small><br/><button onclick="document.getElementById('usuariosDebug').style.display='block'" style="margin-top:8px;padding:6px 10px;border-radius:8px;border:1px solid #ccc;background:#fff;font-size:11px;cursor:pointer">Ver debug completo</button>`;
+          if(infoEl){
+            infoEl.innerHTML=`❌ No se detectaron usuarios en <b>${escU(file.name)}</b><br/><small>${escU(fullDebug.substring(0,400)).replace(/\n/g,'<br/>')}</small><br/><button type="button" id="usuariosShowDebug" style="margin-top:8px;padding:6px 10px;border-radius:8px;border:1px solid #ccc;background:#fff;font-size:11px;cursor:pointer">Ver debug completo</button>`;
+            const showDebug=document.getElementById('usuariosShowDebug');
+            if(showDebug) showDebug.onclick=()=>{if(dbgEl) dbgEl.style.display='block'};
+          }
           if(dbgEl) dbgEl.style.display='block';
           return;
         }
@@ -12580,7 +12631,7 @@ function cargarArchivoU(file){
         }catch(err){ console.log('localStorage fail',err); }
         mostrarDashboardU();
         const info=document.getElementById('usuariosFileInfo');
-        if(info){ info.style.display='block'; info.innerHTML=`✅ <b>${parsed.length} usuarios</b> cargados de <b>${file.name}</b> · ${new Date().toLocaleString('es-AR')}<br/><small>Hojas analizadas: ${wb.SheetNames.join(', ')}</small>`; }
+        if(info){ info.style.display='block'; info.innerHTML=`✅ <b>${parsed.length} usuarios</b> cargados de <b>${escU(file.name)}</b> · ${new Date().toLocaleString('es-AR')}<br/><small>Hojas analizadas: ${escU(wb.SheetNames.join(', '))}</small>`; }
         const btnClear=document.getElementById('usuariosBtnClear');
         if(btnClear) btnClear.style.display='inline-flex';
         if(dbgEl) dbgEl.style.display='none';
@@ -12590,7 +12641,7 @@ function cargarArchivoU(file){
         console.error('Error procesando Excel', err);
         alert('❌ Error procesando Excel: '+err.message+'\n\nProbá con otro archivo o revisá que sea .xls/.xlsx válido\n\nTip: Si es .csv, guardalo como .xlsx');
         const info=document.getElementById('usuariosFileInfo');
-        if(info) info.innerHTML=`❌ Error: ${err.message}<br/><small>Revisá consola F12</small>`;
+        if(info) info.innerHTML=`❌ Error: ${escU(err.message)}<br/><small>Revisá consola F12</small>`;
         if(dbgEl){ dbgEl.textContent='Error: '+err.stack; dbgEl.style.display='block'; }
       }
     };
@@ -12598,7 +12649,7 @@ function cargarArchivoU(file){
   }catch(err){
     console.error('Error inesperado cargarArchivoU', err);
     alert('Error inesperado: '+err.message);
-    if(infoEl) infoEl.innerHTML=`❌ Error inesperado: ${err.message}`;
+    if(infoEl) infoEl.innerHTML=`❌ Error inesperado: ${escU(err.message)}`;
   }
 }
 window.cargarArchivoU = cargarArchivoU;
@@ -12627,7 +12678,10 @@ function mostrarDashboardU(){
   aplicarFiltrosU();
 }
 function initUsuarios(){
+  if(initUsuarios._initialized) return;
+  initUsuarios._initialized=true;
   const fileInput=document.getElementById('usuariosFileInput');
+  const backupInput=document.getElementById('usuariosFileInputBackup');
   const btnChoose=document.getElementById('usuariosBtnChoose');
   const dz=document.getElementById('usuariosDropZone');
 
@@ -12646,16 +12700,16 @@ function initUsuarios(){
       triggerFile();
     });
   }
-  if(fileInput){
-    fileInput.addEventListener('change', (e)=>{
-      const f=e.target.files && e.target.files[0];
-      if(f){
-        console.log('Archivo elegido',f.name, f.size);
-        try{ cargarArchivoU(f); }catch(err){ console.error(err); alert('Error leyendo: '+err.message); }
-      }
-      setTimeout(()=>{ try{ e.target.value=''; }catch(_){} },600);
-    });
-  }
+  const onFileSelected=e=>{
+    const f=e.target.files && e.target.files[0];
+    if(f){
+      console.log('Archivo elegido',f.name,f.size);
+      try{ cargarArchivoU(f); }catch(err){ console.error(err); alert('Error leyendo: '+err.message); }
+    }
+    setTimeout(()=>{ try{ e.target.value=''; }catch(_){} },600);
+  };
+  if(fileInput) fileInput.addEventListener('change',onFileSelected);
+  if(backupInput) backupInput.addEventListener('change',onFileSelected);
   if(dz){
     // Click nativo manejado por <label for="usuariosFileInput"> - no need trigger, solo teclado
     dz.addEventListener('keydown', (e)=>{
@@ -12799,8 +12853,10 @@ function initUsuarios(){
   if(btnExport) btnExport.onclick=()=>{
     if(usuariosU.length===0){ alert('Nada para exportar'); return; }
     let csv='Usuario,Telefono,Domicilio,CP,Localidad,Producto,F.Vence,Estado\n';
-    (filtradosU.length?filtradosU:usuariosU).forEach(u=>{ csv+=`"${u.usuario}","${u.telf}","${u.domicilio}","${u.cp}","${u.localidad}","${u.producto}","${u.fVenceRaw||''}","${u.estado}"\n`; });
-    const blob=new Blob([csv],{type:'text/csv'});
+    (filtradosU.length?filtradosU:usuariosU).forEach(u=>{
+      csv += [u.usuario,u.telf,u.domicilio,u.cp,u.localidad,u.producto,u.fVenceRaw||'',u.estado].map(csvCellU).join(',')+'\n';
+    });
+    const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
     const url=URL.createObjectURL(blob);
     const a=document.createElement('a'); a.href=url; a.download='usuarios.csv'; a.click(); URL.revokeObjectURL(url);
   };
@@ -13514,6 +13570,21 @@ setTimeout(initHistorico,1200);
         if(n.nodeType === 3){
           const t = n.textContent || '';
           if(/initHistorico|parseHistoricalFile|<\/script>|<\/html>/.test(t)){
+            n.parentNode && n.parentNode.removeChild(n);
+          }
+        }
+      });
+    }catch(e){}
+  }
+  limpiarRestos();
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', limpiarRestos);
+  setTimeout(limpiarRestos, 0);
+  setTimeout(limpiarRestos, 400);
+})();
+</script>
+</body>
+</html>
+)){
             n.parentNode && n.parentNode.removeChild(n);
           }
         }
