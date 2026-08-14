@@ -2634,7 +2634,7 @@ body.dark .login-tabs{background:rgba(255,255,255,.07)}body.dark .login-tabs but
 .admin-login-overlay{position:fixed;inset:0;z-index:10020;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(21,22,37,.52);backdrop-filter:blur(9px)}
 .admin-login-overlay[hidden]{display:none!important}
 .admin-login-card{position:relative;width:min(100%,380px);padding:27px 24px 24px;border-radius:25px;background:rgba(255,255,255,.97);box-shadow:0 24px 70px rgba(24,26,55,.32);text-align:center}
-.admin-login-card h2{margin:9px 0 20px;font-size:21px;color:#252633}.admin-login-card .lock-field{margin-bottom:14px}.admin-login-card .lock-input.login-input{min-height:52px;margin:0}.admin-login-card .lock-activate-btn{min-height:50px;margin-top:8px}.admin-login-icon{width:58px;height:58px;margin:auto;border-radius:17px;display:grid;place-items:center;background:linear-gradient(135deg,#5b8def,#8b63e8);font-size:25px;box-shadow:0 9px 23px rgba(91,112,210,.25)}
+.admin-login-card h2{margin:9px 0 20px;font-size:21px;color:#252633}.admin-login-card .lock-field{margin-bottom:14px}.admin-login-card .lock-input.login-input{min-height:52px;margin:0}.admin-login-card .lock-activate-btn{min-height:50px;margin-top:8px}.forced-password-copy{margin:-10px 0 18px;color:#6d6e7c;font-size:12px;line-height:1.45}.forced-password-rules{margin:-3px 0 12px;padding:9px 10px;border-radius:10px;background:rgba(91,141,239,.08);color:#5b6685;font-size:10px;font-weight:750}.admin-login-icon{width:58px;height:58px;margin:auto;border-radius:17px;display:grid;place-items:center;background:linear-gradient(135deg,#5b8def,#8b63e8);font-size:25px;box-shadow:0 9px 23px rgba(91,112,210,.25)}
 .admin-login-close{position:absolute;top:12px;right:12px;width:34px;height:34px;border:0;border-radius:50%;background:rgba(80,90,130,.08);color:#555665;font-size:22px;cursor:pointer}
 body.dark .admin-login-lock{background:rgba(91,141,239,.18);color:#b6c8ff;border-color:rgba(255,255,255,.1)}
 body.dark .admin-login-card{background:#242638}body.dark .admin-login-card h2{color:#f2f2f7}body.dark .admin-login-card>p{color:#b6b7c4}
@@ -3489,7 +3489,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
     <button class="ds-btn" data-ds="view-planning" onclick="showView('view-planning'); renderPlanningTools();"><span>🗓️</span> Planificación</button>
   </nav>
-  <div class="ds-foot">APPI · v191 · Solicitudes de cuenta</div>
+  <div class="ds-foot">APPI · v192 · Contraseña personal</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -3567,6 +3567,18 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
       <label class="lock-field"><span>Contraseña</span><input type="password" class="lock-input login-input" id="adminLoginPassword" autocomplete="current-password" placeholder="Contraseña de administrador"></label>
       <button type="button" class="lock-activate-btn" id="btnAdminLoginSubmit">Ingresar al panel</button>
       <div class="lock-error" id="adminLoginError" role="alert"></div>
+    </div>
+  </div>
+  <div class="admin-login-overlay" id="forcedPasswordOverlay" hidden>
+    <div class="admin-login-card" role="dialog" aria-modal="true" aria-labelledby="forcedPasswordTitle">
+      <div class="admin-login-icon">🔑</div>
+      <h2 id="forcedPasswordTitle">Creá tu contraseña</h2>
+      <p class="forced-password-copy">Antes de ingresar, reemplazá la contraseña temporal por una personal.</p>
+      <label class="lock-field"><span>Nueva contraseña</span><input type="password" class="lock-input login-input" id="forcedNewPassword" autocomplete="new-password" placeholder="Mínimo 12 caracteres"></label>
+      <label class="lock-field"><span>Repetir contraseña</span><input type="password" class="lock-input login-input" id="forcedConfirmPassword" autocomplete="new-password" placeholder="Repetí la contraseña"></label>
+      <div class="forced-password-rules">Usá una mayúscula, una minúscula y un número.</div>
+      <button type="button" class="lock-activate-btn" id="btnForcedPasswordSave">Guardar y entrar</button>
+      <div class="lock-error" id="forcedPasswordError" role="alert"></div>
     </div>
   </div>
 </div>
@@ -9450,6 +9462,25 @@ async function enviarSolicitudCuenta(){
   }catch(reason){error.textContent=reason.message||'No se pudo enviar la solicitud.';error.classList.add('show')}
   finally{button.disabled=false;button.textContent='Enviar solicitud'}
 }
+async function completarIngresoDistribuidor(){
+  const sync=window.APPIDataSync?await window.APPIDataSync.start({claimLegacy:true}):null,lock=document.getElementById('lockScreen');
+  localStorage.removeItem('appi_activada');
+  if(lock){lock.classList.add('hidden');lock.style.display='none'}
+  document.body.style.overflow='';iniciarApp();
+  if(sync&&sync.claimedLegacy)setTimeout(()=>showToast('Tus datos de este dispositivo quedaron asociados a tu cuenta',3600),500);
+}
+function mostrarCambioPasswordObligatorio(){
+  const lock=document.getElementById('lockScreen'),overlay=document.getElementById('forcedPasswordOverlay'),first=document.getElementById('forcedNewPassword'),confirmation=document.getElementById('forcedConfirmPassword'),save=document.getElementById('btnForcedPasswordSave'),error=document.getElementById('forcedPasswordError');
+  if(lock){lock.style.display='flex';lock.classList.remove('hidden')}document.body.style.overflow='hidden';overlay.hidden=false;first.value='';confirmation.value='';error.textContent='';error.classList.remove('show');
+  save.onclick=async()=>{
+    error.textContent='';error.classList.remove('show');
+    if(first.value!==confirmation.value){error.textContent='Las contraseñas no coinciden.';error.classList.add('show');return}
+    save.disabled=true;save.textContent='Guardando…';
+    try{await window.APPIAuth.changePassword(first.value);overlay.hidden=true;await completarIngresoDistribuidor()}
+    catch(reason){error.textContent=reason.message||'No se pudo cambiar la contraseña.';error.classList.add('show');save.disabled=false;save.textContent='Guardar y entrar'}
+  };
+  confirmation.onkeydown=event=>{if(event.key==='Enter')save.click()};setTimeout(()=>first.focus(),60);
+}
 function mostrarPantallaLoginDistribuidor(reason=''){
   const lock=document.getElementById('lockScreen'),login=document.getElementById('distributorLoginPanel'),legacy=document.getElementById('legacyActivationPanel');
   if(legacy)legacy.hidden=true;if(login)login.hidden=false;
@@ -9486,14 +9517,10 @@ function mostrarPantallaLoginDistribuidor(reason=''){
       const original=button.textContent;button.disabled=true;button.textContent='Ingresando…';mostrarErrorLogin('');
       try{
         const value=await window.APPIAuth.login(dip.value,password.value);
-        button.textContent='Preparando tus datos…';
-        const sync=window.APPIDataSync?await window.APPIDataSync.start({claimLegacy:true}):null;
-        localStorage.removeItem('appi_activada');
         password.value='';
-        if(lock){lock.classList.add('hidden');lock.style.display='none'}
-        document.body.style.overflow='';
-        iniciarApp();
-        if(sync&&sync.claimedLegacy)setTimeout(()=>showToast('Tus datos de este dispositivo quedaron asociados a tu cuenta',3600),500);
+        if(value&&value.profile&&value.profile.debe_cambiar_password){mostrarCambioPasswordObligatorio();return}
+        button.textContent='Preparando tus datos…';
+        await completarIngresoDistribuidor();
       }catch(error){
         mostrarErrorLogin(error.message||'No se pudo iniciar sesión.');
         try{haptic(20)}catch(e){}
@@ -9876,7 +9903,9 @@ function abrirBackupDesdeMenu(){
   if(window.APPIAuth&&window.APPIAuth.isEnabled()){
     const result=await window.APPIAuth.authorize();
     if(result.ok){
-      try{if(window.APPIDataSync){const profile=window.APPIAuth.currentProfile();await window.APPIDataSync.start({claimLegacy:!(profile&&profile.rol==='admin')})}}catch(error){console.error('Preparar datos de cuenta',error)}
+      const profile=window.APPIAuth.currentProfile();
+      if(profile&&profile.rol!=='admin'&&profile.debe_cambiar_password){mostrarCambioPasswordObligatorio();return}
+      try{if(window.APPIDataSync)await window.APPIDataSync.start({claimLegacy:!(profile&&profile.rol==='admin')})}catch(error){console.error('Preparar datos de cuenta',error)}
       localStorage.removeItem('appi_activada');
       iniciarApp();
       if(result.offline)setTimeout(()=>showToast('Modo offline · conectate antes de 7 días',3200),500);
@@ -10019,7 +10048,7 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./service-worker.js?v=191').catch(error => {
+      navigator.serviceWorker.register('./service-worker.js?v=192').catch(error => {
         console.warn('No se pudo registrar el modo offline de APPI', error);
       });
     });

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v191-solicitudes';
+const CACHE_NAME = 'appi-v192-password-inicial';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

@@ -46,7 +46,7 @@ Deno.serve(async request => {
     if (existing) throw new Error('Ese distribuidor ya tiene una cuenta.');
     const { data: created, error: createError } = await admin.auth.admin.createUser({ email: emailForDip(dip.canonical), password, email_confirm: true, user_metadata: { dip: dip.canonical, nombre } });
     if (createError || !created.user) throw new Error(createError?.message || 'No se pudo crear la cuenta.');
-    const user = { user_id: created.user.id, username: null, dip: dip.canonical, sucursal: dip.sucursal, numero_distribuidor: dip.numero, nombre, rol: 'usuario', activo: true };
+    const user = { user_id: created.user.id, username: null, dip: dip.canonical, sucursal: dip.sucursal, numero_distribuidor: dip.numero, nombre, rol: 'usuario', activo: true, debe_cambiar_password: true };
     const { error: insertError } = await admin.from('appi_perfiles').insert(user);
     if (insertError) { await admin.auth.admin.deleteUser(created.user.id).catch(() => null); throw new Error(insertError.message); }
     return user;
@@ -55,7 +55,7 @@ Deno.serve(async request => {
   try {
     const body = await request.json(), action = String(body?.action || '');
     if (action === 'list') {
-      const { data, error } = await admin.from('appi_perfiles').select('user_id,username,dip,sucursal,numero_distribuidor,nombre,rol,activo,created_at,updated_at').order('dip', { ascending: true });
+      const { data, error } = await admin.from('appi_perfiles').select('user_id,username,dip,sucursal,numero_distribuidor,nombre,rol,activo,debe_cambiar_password,created_at,updated_at').order('dip', { ascending: true });
       if (error) throw error; return json({ users: data || [] });
     }
     if (action === 'list_requests') {
@@ -90,7 +90,9 @@ Deno.serve(async request => {
     if (targetId === authData.user.id && action === 'set_active') return json({ error: 'No podés desactivar tu propia cuenta administradora.' }, 400);
     if (action === 'set_password') {
       if (!validPassword(body?.password)) return json({ error: 'La contraseña necesita 8 caracteres, letras y números.' }, 400);
-      const { error } = await admin.auth.admin.updateUserById(targetId, { password: String(body.password) }); if (error) throw error; return json({ ok: true });
+      const { error } = await admin.auth.admin.updateUserById(targetId, { password: String(body.password) }); if (error) throw error;
+      const { error: profileError } = await admin.from('appi_perfiles').update({ debe_cambiar_password: true }).eq('user_id', targetId); if (profileError) throw profileError;
+      return json({ ok: true });
     }
     if (action === 'set_active') {
       const activo = body?.activo === true;

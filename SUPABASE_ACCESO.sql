@@ -10,12 +10,14 @@ create table if not exists public.appi_perfiles (
   nombre text not null default '',
   rol text not null default 'usuario' check (rol in ('usuario','admin')),
   activo boolean not null default true,
+  debe_cambiar_password boolean not null default false,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
 
 -- Compatibilidad para proyectos que ejecutaron una versión anterior del instalador.
 alter table public.appi_perfiles add column if not exists username text;
+alter table public.appi_perfiles add column if not exists debe_cambiar_password boolean not null default false;
 alter table public.appi_perfiles add column if not exists sucursal text;
 alter table public.appi_perfiles add column if not exists numero_distribuidor text;
 alter table public.appi_perfiles alter column dip drop not null;
@@ -71,6 +73,20 @@ $$;
 
 revoke all on function public.appi_cuenta_activa() from public;
 grant execute on function public.appi_cuenta_activa() to authenticated;
+
+create or replace function public.appi_confirmar_cambio_password()
+returns void
+language sql
+security definer
+set search_path = public
+as $$
+  update public.appi_perfiles
+  set debe_cambiar_password = false, updated_at = now()
+  where user_id = auth.uid();
+$$;
+
+revoke all on function public.appi_confirmar_cambio_password() from public;
+grant execute on function public.appi_confirmar_cambio_password() to authenticated;
 
 create table if not exists public.appi_datos (
   user_id uuid not null references auth.users(id) on delete cascade,

@@ -109,7 +109,7 @@ async function request(path,options={},token=''){
 async function fetchProfile(session){
   const payload=jwtPayload(session&&session.access_token);
   if(!payload||!payload.sub)throw authError('La sesión recibida no es válida.','invalid_session');
-  const query=`/rest/v1/appi_perfiles?select=user_id,username,dip,sucursal,numero_distribuidor,nombre,rol,activo&user_id=eq.${encodeURIComponent(payload.sub)}&limit=1`;
+  const query=`/rest/v1/appi_perfiles?select=user_id,username,dip,sucursal,numero_distribuidor,nombre,rol,activo,debe_cambiar_password&user_id=eq.${encodeURIComponent(payload.sub)}&limit=1`;
   const rows=await request(query,{headers:{Accept:'application/json'}},session.access_token);
   const profile=Array.isArray(rows)?rows[0]:null;
   if(!profile)throw authError('La cuenta no tiene un perfil de distribuidor.','profile_missing',403);
@@ -154,7 +154,11 @@ async function changePassword(newPassword){
   const user=await request('/auth/v1/user',{
     method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({password})
   },saved.session.access_token);
-  return save({...saved,session:{...saved.session,user},lastValidatedAt:Date.now(),offline:false});
+  await request('/rest/v1/rpc/appi_confirmar_cambio_password',{
+    method:'POST',headers:{'Content-Type':'application/json'},body:'{}'
+  },saved.session.access_token);
+  const profile={...(saved.profile||{}),debe_cambiar_password:false};
+  return save({...saved,profile,session:{...saved.session,user},lastValidatedAt:Date.now(),offline:false});
 }
 async function refresh(saved=load()){
   if(!saved||!saved.session||!saved.session.refresh_token)throw authError('No hay una sesión para renovar.','no_session',401);

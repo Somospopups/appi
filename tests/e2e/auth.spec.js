@@ -17,9 +17,9 @@ async function mockSupabase(page) {
   let whatsapp = '5493515551234';
   let offline = false;
   const profiles = {
-    [USER_A]: { user_id: USER_A, username: null, dip: '02-9802014', sucursal: '02', numero_distribuidor: '9802014', nombre: 'Distribuidor A', rol: 'usuario', activo: true },
-    [USER_B]: { user_id: USER_B, username: null, dip: '03-1234567', sucursal: '03', numero_distribuidor: '1234567', nombre: 'Distribuidor B', rol: 'usuario', activo: true },
-    [USER_ADMIN]: { user_id: USER_ADMIN, username: 'popups', dip: null, sucursal: null, numero_distribuidor: null, nombre: 'POPUPS', rol: 'admin', activo: true }
+    [USER_A]: { user_id: USER_A, username: null, dip: '02-9802014', sucursal: '02', numero_distribuidor: '9802014', nombre: 'Distribuidor A', rol: 'usuario', activo: true, debe_cambiar_password: false },
+    [USER_B]: { user_id: USER_B, username: null, dip: '03-1234567', sucursal: '03', numero_distribuidor: '1234567', nombre: 'Distribuidor B', rol: 'usuario', activo: true, debe_cambiar_password: false },
+    [USER_ADMIN]: { user_id: USER_ADMIN, username: 'popups', dip: null, sucursal: null, numero_distribuidor: null, nombre: 'POPUPS', rol: 'admin', activo: true, debe_cambiar_password: false }
   };
   const cors = { 'access-control-allow-origin': '*', 'content-type': 'application/json' };
 
@@ -71,6 +71,10 @@ async function mockSupabase(page) {
     if (url.pathname === '/rest/v1/appi_perfiles') {
       return route.fulfill({ status: 200, headers: cors, body: JSON.stringify(profiles[sub] ? [profiles[sub]] : []) });
     }
+    if (url.pathname === '/rest/v1/rpc/appi_confirmar_cambio_password') {
+      if(profiles[sub])profiles[sub].debe_cambiar_password=false;
+      return route.fulfill({ status: 200, headers: cors, body: '{}' });
+    }
 
     if (url.pathname === '/rest/v1/appi_datos' && request.method() === 'GET') {
       const rows = [...(cloud.get(sub) || new Map()).entries()].map(([data_key, data]) => ({ data_key, data, updated_at: new Date().toISOString() }));
@@ -90,7 +94,7 @@ async function mockSupabase(page) {
 
     return route.fulfill({ status: 404, headers: cors, body: JSON.stringify({ error: 'Ruta simulada no encontrada' }) });
   });
-  return { cloud, passwordChanges, pendingRequests, setOffline(value) { offline = value; } };
+  return { cloud, profiles, passwordChanges, pendingRequests, setOffline(value) { offline = value; } };
 }
 
 async function login(page, dip) {
@@ -133,6 +137,24 @@ test('cada distribuidor sincroniza y ve únicamente sus datos', async ({ page })
   expect(await page.evaluate(() => localStorage.getItem('presu_2026_7'))).toBeNull();
   expect(cloud.get(USER_B).has('presu_2026_7')).toBe(false);
   expect(await page.evaluate(() => APPIAuth.currentProfile().dip)).toBe('03-1234567');
+});
+
+test('la contraseña temporal obliga a crear una contraseña personal', async ({ page }) => {
+  const backend=await mockSupabase(page);
+  backend.profiles[USER_A].debe_cambiar_password=true;
+  await page.goto('/index.html',{waitUntil:'networkidle'});
+  await page.locator('#distributorInput').fill('02-9802014');
+  await page.locator('#distributorPassword').fill('Clave1234');
+  await page.locator('#btnDistributorLogin').click();
+  await expect(page.locator('#forcedPasswordOverlay')).toBeVisible();
+  await expect(page.locator('#lockScreen')).not.toHaveClass(/hidden/);
+  await page.locator('#forcedNewPassword').fill('NuevaClave2026!');
+  await page.locator('#forcedConfirmPassword').fill('NuevaClave2026!');
+  await page.locator('#btnForcedPasswordSave').click();
+  await expect(page.locator('#lockScreen')).toHaveClass(/hidden/);
+  await expect(page.locator('#view-home')).toHaveClass(/active/);
+  expect(backend.passwordChanges).toContain('NuevaClave2026!');
+  expect(backend.profiles[USER_A].debe_cambiar_password).toBe(false);
 });
 
 test('una solicitud nueva abre WhatsApp y queda pendiente', async ({ page }) => {
