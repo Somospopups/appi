@@ -1,6 +1,10 @@
 const { test, expect } = require('@playwright/test');
 
 async function abrirAppActivada(page) {
+  await page.route('**/auth-config.js', route => route.fulfill({
+    contentType: 'application/javascript',
+    body: "window.APPI_AUTH={enabled:false,url:'',anonKey:'',distributorEmailDomain:'distribuidores.appi.invalid',loginAliases:{},offlineDays:7};"
+  }));
   await page.addInitScript(() => {
     localStorage.setItem('appi_cache_v186', '1');
     localStorage.setItem('tutoVisto_v2', '1');
