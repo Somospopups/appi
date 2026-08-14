@@ -35,6 +35,7 @@ window.openHistorico=function(){
 <script src="./auth-client.js"></script>
 <script src="./data-sync.js"></script>
 <script src="./admin-panel.js"></script>
+<script src="./account-request.js"></script>
 <style id="historico-inline-css">
 /* APPI · Histórico mensual */
 .hist-view{padding-bottom:calc(34px + env(safe-area-inset-bottom));}
@@ -2422,7 +2423,7 @@ body.dark .hist-section-title h3,body.dark .hist-attention strong,body.dark .his
 #lockScreen {
   position: fixed; inset: 0; z-index: 9999;
   background: linear-gradient(160deg, #eaf1ff 0%, #f5ecff 45%, #ffe9f2 100%);
-  display: flex; align-items: center; justify-content: center;
+  display: flex; align-items: flex-start; justify-content: center;
   padding: 20px;
   overflow-y: auto;
 }
@@ -2442,6 +2443,7 @@ body.dark #lockScreen {
   max-width: 420px; width: 100%;
   text-align: center;
   position: relative;
+  margin: auto;
 }
 body.dark .lock-card {
   background: rgba(30,30,50,0.75);
@@ -2554,7 +2556,7 @@ body.dark .lock-btn.copy {
 body.dark .lock-divider::before, body.dark .lock-divider::after {
   background: rgba(255,255,255,0.10);
 }
-.lock-field{text-align:left;margin-bottom:12px}
+.lock-field{display:block;text-align:left;margin-bottom:16px}
 .lock-field span{display:block;margin:0 0 6px;color:#5c5c66;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.4px}
 body.dark .lock-field span{color:#a0a0b0}
 .lock-pass-row{display:grid;grid-template-columns:1fr 46px;gap:8px}
@@ -2619,14 +2621,20 @@ body.dark .lock-error.login-info{background:rgba(91,141,239,.16);color:#a8b8ff}
 #distributorLoginPanel .lock-input.login-input{min-height:52px;padding:14px 15px;border-radius:15px;background:rgba(255,255,255,.82)}
 #distributorLoginPanel .lock-pass-row{grid-template-columns:minmax(0,1fr) 54px}
 #distributorLoginPanel .lock-pass-row button{min-height:52px}
-#btnDistributorLogin{min-height:52px;margin-top:2px}
+#btnDistributorLogin,#btnRequestAccount{min-height:52px;margin:8px 0 14px}
+#btnLoginSupport,.request-whatsapp-link{margin-top:12px;text-decoration:none}
+.login-tabs{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin:0 0 20px;padding:4px;border-radius:14px;background:rgba(80,90,130,.07)}
+.login-tabs button{min-height:42px;border:0;border-radius:11px;background:transparent;color:#747583;font:inherit;font-size:12px;font-weight:850;cursor:pointer}.login-tabs button.active{background:#fff;color:#3d63c9;box-shadow:0 5px 14px rgba(66,74,115,.10)}
+.login-pane[hidden]{display:none!important}.login-pane{animation:loginPaneIn .18s ease}@keyframes loginPaneIn{from{opacity:.25;transform:translateY(3px)}to{opacity:1;transform:none}}
+.login-honeypot{position:fixed!important;left:-9999px!important;opacity:0!important;pointer-events:none!important}.request-whatsapp-link{display:flex}.request-whatsapp-link[hidden]{display:none!important}
+body.dark .login-tabs{background:rgba(255,255,255,.07)}body.dark .login-tabs button.active{background:#313349;color:#b9c9ff}
 .admin-login-lock{position:absolute;top:15px;right:15px;width:40px;height:40px;border:1px solid rgba(91,141,239,.18);border-radius:50%;display:grid;place-items:center;background:rgba(91,141,239,.10);color:#3d63c9;font-size:17px;cursor:pointer;box-shadow:0 5px 16px rgba(80,90,130,.10);transition:.18s}
 .admin-login-lock:hover{background:rgba(91,141,239,.18);transform:translateY(-1px)}
 .admin-login-lock:active{transform:scale(.92)}
 .admin-login-overlay{position:fixed;inset:0;z-index:10020;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(21,22,37,.52);backdrop-filter:blur(9px)}
 .admin-login-overlay[hidden]{display:none!important}
 .admin-login-card{position:relative;width:min(100%,380px);padding:27px 24px 24px;border-radius:25px;background:rgba(255,255,255,.97);box-shadow:0 24px 70px rgba(24,26,55,.32);text-align:center}
-.admin-login-card h2{margin:9px 0 20px;font-size:21px;color:#252633}.admin-login-card .lock-field{margin-bottom:14px}.admin-login-card .lock-input.login-input{min-height:52px;margin:0}.admin-login-card .lock-activate-btn{min-height:50px}.admin-login-icon{width:58px;height:58px;margin:auto;border-radius:17px;display:grid;place-items:center;background:linear-gradient(135deg,#5b8def,#8b63e8);font-size:25px;box-shadow:0 9px 23px rgba(91,112,210,.25)}
+.admin-login-card h2{margin:9px 0 20px;font-size:21px;color:#252633}.admin-login-card .lock-field{margin-bottom:14px}.admin-login-card .lock-input.login-input{min-height:52px;margin:0}.admin-login-card .lock-activate-btn{min-height:50px;margin-top:8px}.admin-login-icon{width:58px;height:58px;margin:auto;border-radius:17px;display:grid;place-items:center;background:linear-gradient(135deg,#5b8def,#8b63e8);font-size:25px;box-shadow:0 9px 23px rgba(91,112,210,.25)}
 .admin-login-close{position:absolute;top:12px;right:12px;width:34px;height:34px;border:0;border-radius:50%;background:rgba(80,90,130,.08);color:#555665;font-size:22px;cursor:pointer}
 body.dark .admin-login-lock{background:rgba(91,141,239,.18);color:#b6c8ff;border-color:rgba(255,255,255,.1)}
 body.dark .admin-login-card{background:#242638}body.dark .admin-login-card h2{color:#f2f2f7}body.dark .admin-login-card>p{color:#b6b7c4}
@@ -3481,7 +3489,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
     <button class="ds-btn" data-ds="view-planning" onclick="showView('view-planning'); renderPlanningTools();"><span>🗓️</span> Planificación</button>
   </nav>
-  <div class="ds-foot">APPI · v190 · Panel administrador</div>
+  <div class="ds-foot">APPI · v191 · Solicitudes de cuenta</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -3497,24 +3505,40 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <div class="lock-logo"><img src="./icon-192.png" alt="APPI" /></div>
 
     <div id="distributorLoginPanel" class="auth-panel" hidden>
-      <h1 class="lock-title">Ingresá a APPI</h1>
-      <p class="lock-subtitle">Usá tu número de distribuidor y la contraseña que te entregó el administrador.</p>
-      <label class="lock-field">
-        <span>Número de distribuidor</span>
-        <input type="text" class="lock-input login-input" id="distributorInput" inputmode="numeric" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="Ej: 02-9802014" maxlength="15" />
-      </label>
-      <label class="lock-field">
-        <span>Contraseña</span>
-        <div class="lock-pass-row">
-          <input type="password" class="lock-input login-input" id="distributorPassword" autocomplete="current-password" placeholder="Tu contraseña" />
-          <button type="button" id="toggleDistributorPassword" aria-label="Mostrar contraseña">Ver</button>
-        </div>
-      </label>
-      <button type="button" class="lock-activate-btn" id="btnDistributorLogin">Ingresar</button>
-      <div class="lock-error" id="loginError" role="alert"></div>
-      <div class="lock-error login-info" id="loginOfflineInfo" role="status"></div>
-      <button type="button" class="lock-btn whatsapp lock-btn-full" id="btnLoginSupport" style="margin-top:12px">💬 Necesito ayuda</button>
-      <div class="lock-footer">La sesión queda recordada y APPI puede funcionar hasta 7 días sin conexión. Tus datos se sincronizan en tu espacio privado; los audios quedan solo en este dispositivo.</div>
+      <h1 class="lock-title">Bienvenido a APPI</h1>
+      <p class="lock-subtitle" id="loginPanelSubtitle">Ingresá con tu número de distribuidor.</p>
+      <div class="login-tabs" role="tablist" aria-label="Acceso a APPI">
+        <button type="button" class="active" id="loginTabSignIn" role="tab" aria-selected="true">Ingresar</button>
+        <button type="button" id="loginTabCreate" role="tab" aria-selected="false">Crear una cuenta</button>
+      </div>
+      <div id="loginSignInPane" class="login-pane">
+        <label class="lock-field">
+          <span>Número de distribuidor</span>
+          <input type="text" class="lock-input login-input" id="distributorInput" inputmode="numeric" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="Ej: 02-9802014" maxlength="15" />
+        </label>
+        <label class="lock-field">
+          <span>Contraseña</span>
+          <div class="lock-pass-row">
+            <input type="password" class="lock-input login-input" id="distributorPassword" autocomplete="current-password" placeholder="Tu contraseña" />
+            <button type="button" id="toggleDistributorPassword" aria-label="Mostrar contraseña">Ver</button>
+          </div>
+        </label>
+        <button type="button" class="lock-activate-btn" id="btnDistributorLogin">Ingresar</button>
+        <div class="lock-error" id="loginError" role="alert"></div>
+        <div class="lock-error login-info" id="loginOfflineInfo" role="status"></div>
+        <button type="button" class="lock-btn whatsapp lock-btn-full" id="btnLoginSupport">💬 Necesito ayuda</button>
+      </div>
+      <div id="loginCreatePane" class="login-pane" hidden>
+        <label class="lock-field"><span>Nombre y apellido</span><input type="text" class="lock-input login-input" id="requestFullName" autocomplete="name" maxlength="120" placeholder="Tu nombre completo"></label>
+        <label class="lock-field"><span>Número de distribuidor</span><input type="text" class="lock-input login-input" id="requestDip" inputmode="numeric" autocomplete="off" maxlength="15" placeholder="Ej: 02-9802014"></label>
+        <label class="lock-field"><span>Teléfono</span><input type="tel" class="lock-input login-input" id="requestPhone" autocomplete="tel" maxlength="24" placeholder="Ej: 351 555 1234"></label>
+        <input type="text" id="requestWebsite" tabindex="-1" autocomplete="off" aria-hidden="true" class="login-honeypot">
+        <button type="button" class="lock-activate-btn" id="btnRequestAccount">Enviar solicitud</button>
+        <div class="lock-error" id="requestAccountError" role="alert"></div>
+        <div class="lock-error login-info" id="requestAccountSuccess" role="status"></div>
+        <a class="lock-btn whatsapp lock-btn-full request-whatsapp-link" id="requestWhatsappLink" href="#" target="_blank" rel="noopener" hidden>💬 Abrir WhatsApp</a>
+      </div>
+      <div class="lock-footer">Las cuentas nuevas quedan pendientes hasta que POPUPS las apruebe. Los audios permanecen únicamente en el dispositivo donde se grabaron.</div>
     </div>
 
     <div id="legacyActivationPanel" class="auth-panel">
@@ -4054,11 +4078,12 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
   <style>
   .admin-view{padding-bottom:42px}.admin-top{position:relative}.admin-top-lock{width:54px;height:54px;margin:0 auto 8px;border-radius:17px;display:grid;place-items:center;background:linear-gradient(135deg,#5b8def,#8b63e8);font-size:24px;box-shadow:0 10px 24px rgba(91,112,210,.23)}
   .admin-round-logout,.admin-round-password{position:absolute;top:4px;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font:900 18px inherit;cursor:pointer}.admin-round-logout{right:0;border:1px solid rgba(217,83,79,.16);background:rgba(217,83,79,.09);color:#c94750}.admin-round-password{right:48px;border:1px solid rgba(91,141,239,.16);background:rgba(91,141,239,.09);color:#3d63c9}.admin-round-logout:hover{background:rgba(217,83,79,.16)}.admin-round-password:hover{background:rgba(91,141,239,.16)}
-  .admin-dashboard{max-width:940px;margin:auto}.admin-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px}.admin-stat{padding:16px;border-radius:18px;text-align:center;background:rgba(255,255,255,.66);border:1px solid rgba(255,255,255,.82);box-shadow:0 7px 20px rgba(65,75,120,.07)}.admin-stat strong{display:block;color:#3d63c9;font-size:26px}.admin-stat span{display:block;margin-top:3px;color:#777887;font-size:10px;font-weight:850;text-transform:uppercase}.admin-stat.good strong{color:#168765}.admin-stat.warn strong{color:#c34c53}
+  .admin-dashboard{max-width:940px;margin:auto}.admin-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}.admin-stat{padding:16px;border-radius:18px;text-align:center;background:rgba(255,255,255,.66);border:1px solid rgba(255,255,255,.82);box-shadow:0 7px 20px rgba(65,75,120,.07)}.admin-stat strong{display:block;color:#3d63c9;font-size:26px}.admin-stat span{display:block;margin-top:3px;color:#777887;font-size:10px;font-weight:850;text-transform:uppercase}.admin-stat.good strong{color:#168765}.admin-stat.warn strong{color:#c34c53}
   .admin-card{padding:18px!important;margin-bottom:12px}.admin-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:15px}.admin-card-head h2{margin:0;color:#292938;font-size:17px}.admin-card-head p{margin:4px 0 0;color:#777887;font-size:11px}.admin-form-grid{display:grid;grid-template-columns:1fr 2fr;gap:10px}.admin-form-grid label{display:flex;flex-direction:column;gap:6px}.admin-form-grid label.wide{grid-column:1/-1}.admin-form-grid label>span{color:#666776;font-size:10px;font-weight:900;text-transform:uppercase}.admin-form-grid input{width:100%;min-height:45px;padding:11px 12px;border:1px solid rgba(80,90,130,.14);border-radius:13px;background:rgba(255,255,255,.76);color:#292938;font:inherit;font-size:13px;outline:none}.admin-form-grid input:focus{border-color:#5b8def;box-shadow:0 0 0 3px rgba(91,141,239,.1)}.admin-create-btn{width:100%;margin-top:13px;min-height:46px}.admin-inline-status{display:none;margin-top:10px;padding:10px 12px;border-radius:11px;background:rgba(58,208,164,.1);color:#168765;font-size:12px;font-weight:750}.admin-inline-status.show{display:block}.admin-inline-status.error{background:rgba(217,83,79,.1);color:#c34c53}
-  .admin-user-list{display:grid;gap:8px;margin-top:12px}.admin-user-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;padding:13px;border-radius:15px;background:rgba(255,255,255,.62);border:1px solid rgba(80,90,130,.08)}.admin-user-row h3{margin:0;color:#292938;font-size:13px}.admin-user-row p{margin:4px 0 0;color:#777887;font-size:10px}.admin-user-badge{display:inline-block;margin-top:6px;padding:4px 7px;border-radius:999px;background:rgba(58,208,164,.12);color:#168765;font-size:8px;font-weight:900}.admin-user-badge.blocked{background:rgba(217,83,79,.11);color:#c34c53}.admin-row-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.admin-row-actions button{min-height:34px;padding:7px 9px;border:0;border-radius:10px;background:rgba(91,141,239,.1);color:#3d63c9;font:inherit;font-size:10px;font-weight:850;cursor:pointer}.admin-row-actions button.danger{background:rgba(217,83,79,.1);color:#c34c53}.admin-row-actions button.good{background:rgba(58,208,164,.1);color:#168765}
+  .admin-user-list{display:grid;gap:8px;margin-top:12px}.admin-user-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;padding:13px;border-radius:15px;background:rgba(255,255,255,.62);border:1px solid rgba(80,90,130,.08)}.admin-user-row h3{margin:0;color:#292938;font-size:13px}.admin-user-row p{margin:4px 0 0;color:#777887;font-size:10px}.admin-user-badge{display:inline-block;margin-top:6px;padding:4px 7px;border-radius:999px;background:rgba(58,208,164,.12);color:#168765;font-size:8px;font-weight:900}.admin-user-badge.blocked{background:rgba(217,83,79,.11);color:#c34c53}.admin-row-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.admin-row-actions button{min-height:34px;padding:7px 9px;border:0;border-radius:10px;background:rgba(91,141,239,.1);color:#3d63c9;font:inherit;font-size:10px;font-weight:850;cursor:pointer}.admin-row-actions button.danger{background:rgba(217,83,79,.1);color:#c34c53}.admin-row-actions button.good{background:rgba(58,208,164,.1);color:#168765}.admin-row-actions button.wa{background:rgba(37,211,102,.12);color:#128c7e}
+  .admin-setting-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:9px}.admin-setting-row input{min-height:45px;padding:11px 12px;border:1px solid rgba(80,90,130,.14);border-radius:13px;background:rgba(255,255,255,.76);font:inherit}.admin-setting-row button{min-width:135px}.admin-pending-list{display:grid;gap:8px}.admin-pending-empty{padding:18px;text-align:center;color:#777887;font-size:12px}
   body.dark .admin-stat,body.dark .admin-user-row{background:rgba(31,32,49,.74);border-color:rgba(255,255,255,.08)}body.dark .admin-card-head h2,body.dark .admin-user-row h3{color:#f1f1f6}body.dark .admin-form-grid input{background:rgba(31,32,49,.8);border-color:rgba(255,255,255,.1);color:#f1f1f6}body.dark .admin-form-grid label>span{color:#b7b8c4}
-  @media(max-width:600px){.admin-stats{gap:6px}.admin-stat{padding:12px 6px}.admin-stat strong{font-size:22px}.admin-form-grid{grid-template-columns:1fr 2fr}.admin-card-head{flex-direction:column}.admin-card-head .btn{width:100%}.admin-user-row{grid-template-columns:1fr}.admin-row-actions{justify-content:stretch}.admin-row-actions button{flex:1}}
+  @media(max-width:600px){.admin-stats{grid-template-columns:repeat(2,1fr);gap:6px}.admin-setting-row{grid-template-columns:1fr}.admin-setting-row button{width:100%}.admin-stat{padding:12px 6px}.admin-stat strong{font-size:22px}.admin-form-grid{grid-template-columns:1fr 2fr}.admin-card-head{flex-direction:column}.admin-card-head .btn{width:100%}.admin-user-row{grid-template-columns:1fr}.admin-row-actions{justify-content:stretch}.admin-row-actions button{flex:1}}
   </style>
 
   <!-- PANEL ADMINISTRADOR -->
@@ -4076,7 +4101,17 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
         <div class="admin-stat"><strong id="adminStatTotal">0</strong><span>Cuentas</span></div>
         <div class="admin-stat good"><strong id="adminStatActive">0</strong><span>Activas</span></div>
         <div class="admin-stat warn"><strong id="adminStatBlocked">0</strong><span>Bloqueadas</span></div>
+        <div class="admin-stat warn"><strong id="adminStatPending">0</strong><span>Pendientes</span></div>
       </div>
+      <section class="glass admin-card">
+        <div class="admin-card-head"><div><h2>WhatsApp de POPUPS</h2><p>Este número recibe ayuda y solicitudes nuevas.</p></div></div>
+        <div class="admin-setting-row"><input id="adminWhatsappNumber" inputmode="tel" autocomplete="off" placeholder="Ej: 5493515551234"><button type="button" class="btn btn-primary" id="adminSaveWhatsapp">Guardar número</button></div>
+        <div class="admin-inline-status" id="adminWhatsappStatus" role="status"></div>
+      </section>
+      <section class="glass admin-card">
+        <div class="admin-card-head"><div><h2>Solicitudes pendientes</h2><p>Revisá los datos antes de crear la cuenta.</p></div><button type="button" class="btn btn-secondary" id="adminRefreshRequests">Actualizar</button></div>
+        <div class="admin-pending-list" id="adminPendingList"><div class="admin-pending-empty">No hay solicitudes pendientes.</div></div>
+      </section>
       <section class="glass admin-card">
         <div class="admin-card-head"><div><h2>Nueva cuenta</h2><p>Creá el acceso temporal de un distribuidor.</p></div><button type="button" class="btn btn-secondary" id="adminGeneratePassword">Generar contraseña</button></div>
         <div class="admin-form-grid">
@@ -8521,6 +8556,10 @@ function obtenerProximoPaso(){
 // ==== TUTORIAL ONBOARDING ====
 const TUTO_KEY='tutoVisto_v2';
 function mostrarTutorialSiNuevo(){
+  if(window.APPIAuth&&window.APPIAuth.isEnabled()){
+    const profile=window.APPIAuth.currentProfile();
+    if(!window.APPIAuth.isLocallyAuthorized()||!profile||profile.rol==='admin')return;
+  }
   if(localStorage.getItem(TUTO_KEY)) return;
   setTimeout(()=>{
     modal.open({
@@ -9389,12 +9428,35 @@ function mostrarErrorLogin(message,type='error'){
   if(error){error.textContent=type==='error'?String(message||''):'';error.classList.toggle('show',type==='error'&&!!message)}
   if(info){info.textContent=type==='info'?String(message||''):'';info.classList.toggle('show',type==='info'&&!!message)}
 }
+function setLoginAccessTab(mode){
+  const signButton=document.getElementById('loginTabSignIn'),createButton=document.getElementById('loginTabCreate'),signPane=document.getElementById('loginSignInPane'),createPane=document.getElementById('loginCreatePane'),subtitle=document.getElementById('loginPanelSubtitle'),creating=mode==='create';
+  if(!signButton||!createButton)return;
+  signButton.classList.toggle('active',!creating);createButton.classList.toggle('active',creating);signButton.setAttribute('aria-selected',String(!creating));createButton.setAttribute('aria-selected',String(creating));signPane.hidden=creating;createPane.hidden=!creating;
+  if(subtitle)subtitle.textContent=creating?'Completá tus datos para solicitar acceso.':'Ingresá con tu número de distribuidor.';
+  const target=document.getElementById(creating?'requestFullName':'distributorInput');requestAnimationFrame(()=>{if(target&&!/^(INPUT|TEXTAREA)$/.test(document.activeElement&&document.activeElement.tagName||''))target.focus()});
+}
+async function enviarSolicitudCuenta(){
+  const button=document.getElementById('btnRequestAccount'),nombre=document.getElementById('requestFullName').value.trim(),dip=document.getElementById('requestDip').value.trim(),telefono=document.getElementById('requestPhone').value.trim(),website=document.getElementById('requestWebsite').value,error=document.getElementById('requestAccountError'),success=document.getElementById('requestAccountSuccess'),link=document.getElementById('requestWhatsappLink');
+  error.textContent='';error.classList.remove('show');success.textContent='';success.classList.remove('show');link.hidden=true;
+  if(nombre.length<3){error.textContent='Ingresá tu nombre y apellido.';error.classList.add('show');return}
+  if(String(dip).replace(/\D/g,'').length<3){error.textContent='Ingresá tu número de distribuidor.';error.classList.add('show');return}
+  if(String(telefono).replace(/\D/g,'').length<8){error.textContent='Ingresá un teléfono válido.';error.classList.add('show');return}
+  button.disabled=true;button.textContent='Enviando solicitud…';
+  try{
+    const result=await window.APPIAccountRequest.submit({nombre,dip,telefono,website});
+    success.textContent='Solicitud registrada. Quedó pendiente de aprobación.';success.classList.add('show');
+    if(result.whatsapp_url){link.href=result.whatsapp_url;link.hidden=false;window.open(result.whatsapp_url,'_blank','noopener')}
+    document.getElementById('requestFullName').value='';document.getElementById('requestDip').value='';document.getElementById('requestPhone').value='';
+  }catch(reason){error.textContent=reason.message||'No se pudo enviar la solicitud.';error.classList.add('show')}
+  finally{button.disabled=false;button.textContent='Enviar solicitud'}
+}
 function mostrarPantallaLoginDistribuidor(reason=''){
   const lock=document.getElementById('lockScreen'),login=document.getElementById('distributorLoginPanel'),legacy=document.getElementById('legacyActivationPanel');
   if(legacy)legacy.hidden=true;if(login)login.hidden=false;
   if(lock){lock.style.display='flex';lock.classList.remove('hidden')}
   document.body.style.overflow='hidden';
-  const dip=document.getElementById('distributorInput'),password=document.getElementById('distributorPassword'),button=document.getElementById('btnDistributorLogin'),toggle=document.getElementById('toggleDistributorPassword'),support=document.getElementById('btnLoginSupport'),adminOpen=document.getElementById('btnAdminLoginOpen');
+  setLoginAccessTab('signin');
+  const dip=document.getElementById('distributorInput'),password=document.getElementById('distributorPassword'),button=document.getElementById('btnDistributorLogin'),toggle=document.getElementById('toggleDistributorPassword'),support=document.getElementById('btnLoginSupport'),adminOpen=document.getElementById('btnAdminLoginOpen'),tabSign=document.getElementById('loginTabSignIn'),tabCreate=document.getElementById('loginTabCreate'),requestDip=document.getElementById('requestDip'),requestButton=document.getElementById('btnRequestAccount');
   if(!window.APPIAuth||!window.APPIAuth.isConfigured()){
     mostrarErrorLogin('El acceso por distribuidor todavía no está configurado. El administrador debe conectar Supabase.');
     if(button)button.disabled=true;
@@ -9438,9 +9500,13 @@ function mostrarPantallaLoginDistribuidor(reason=''){
       }finally{button.disabled=false;button.textContent=original}
     };
   }
+  if(tabSign&&!tabSign.dataset.bound){tabSign.dataset.bound='1';tabSign.onclick=()=>setLoginAccessTab('signin')}
+  if(tabCreate&&!tabCreate.dataset.bound){tabCreate.dataset.bound='1';tabCreate.onclick=()=>setLoginAccessTab('create')}
+  if(requestDip&&!requestDip.dataset.bound){requestDip.dataset.bound='1';requestDip.oninput=()=>requestDip.value=window.APPIAuth.normalizeDip(requestDip.value)}
+  if(requestButton&&!requestButton.dataset.bound){requestButton.dataset.bound='1';requestButton.onclick=enviarSolicitudCuenta}
   if(support&&!support.dataset.bound){
     support.dataset.bound='1';
-    support.onclick=()=>{const numero=dip&&dip.value?dip.value:'sin completar';const msg=`Hola, necesito ayuda para ingresar a APPI. Mi número de distribuidor es: ${numero}`;window.open(`https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(msg)}`,'_blank','noopener')};
+    support.onclick=async()=>{const numero=dip&&dip.value?dip.value:'sin completar';const msg=`Hola POPUPS, necesito ayuda para ingresar a APPI. Mi número de distribuidor es: ${numero}`;try{await window.APPIAccountRequest.openSupport(msg)}catch(error){mostrarErrorLogin(error.message)}};
   }
   if(adminOpen&&!adminOpen.dataset.bound){adminOpen.dataset.bound='1';adminOpen.onclick=mostrarAdminLoginPopup}
   setTimeout(()=>{if(dip&&!dip.value)dip.focus();else if(password)password.focus()},80);
@@ -9532,6 +9598,7 @@ function iniciarApp() {
     loadEquipoFromStorage();
     showView('view-home');
     if(window.initHistoricoAPPI)setTimeout(()=>window.initHistoricoAPPI(),0);
+    if(typeof mostrarTutorialSiNuevo==='function')setTimeout(mostrarTutorialSiNuevo,700);
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',actualizarCuentaUI,{once:true});
   else actualizarCuentaUI();
@@ -9952,7 +10019,7 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./service-worker.js?v=190').catch(error => {
+      navigator.serviceWorker.register('./service-worker.js?v=191').catch(error => {
         console.warn('No se pudo registrar el modo offline de APPI', error);
       });
     });

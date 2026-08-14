@@ -13,6 +13,8 @@ function tokenFor(sub) {
 async function mockSupabase(page) {
   const cloud = new Map([[USER_A, new Map()], [USER_B, new Map()], [USER_ADMIN, new Map()]]);
   const passwordChanges = [];
+  const pendingRequests = [];
+  let whatsapp = '5493515551234';
   let offline = false;
   const profiles = {
     [USER_A]: { user_id: USER_A, username: null, dip: '02-9802014', sucursal: '02', numero_distribuidor: '9802014', nombre: 'Distribuidor A', rol: 'usuario', activo: true },
@@ -48,10 +50,21 @@ async function mockSupabase(page) {
     }
     if (url.pathname === '/auth/v1/logout') return route.fulfill({ status: 204, headers: { 'access-control-allow-origin': '*' }, body: '' });
 
+    if (url.pathname === '/functions/v1/solicitud-cuenta') {
+      const body = request.postDataJSON();
+      if (body.action === 'config') return route.fulfill({ status: 200, headers: cors, body: JSON.stringify({ whatsapp }) });
+      const created = { id: `request-${pendingRequests.length+1}`, nombre: body.nombre, dip: '04-7654321', sucursal: '04', numero_distribuidor: '7654321', telefono: String(body.telefono).replace(/\D/g,''), estado: 'pendiente', created_at: new Date().toISOString() };
+      pendingRequests.push(created);
+      return route.fulfill({ status: 201, headers: cors, body: JSON.stringify({ ok: true, request_id: created.id, whatsapp_url: `https://wa.me/${whatsapp}?text=solicitud` }) });
+    }
+
     if (url.pathname === '/functions/v1/admin-distribuidores') {
       const body = request.postDataJSON();
       if (sub !== USER_ADMIN) return route.fulfill({ status: 403, headers: cors, body: JSON.stringify({ error: 'Se requiere una cuenta administradora.' }) });
       if (body.action === 'list') return route.fulfill({ status: 200, headers: cors, body: JSON.stringify({ users: Object.values(profiles) }) });
+      if (body.action === 'list_requests') return route.fulfill({ status: 200, headers: cors, body: JSON.stringify({ requests: pendingRequests }) });
+      if (body.action === 'get_settings') return route.fulfill({ status: 200, headers: cors, body: JSON.stringify({ whatsapp }) });
+      if (body.action === 'set_whatsapp') { whatsapp=body.numero; return route.fulfill({ status: 200, headers: cors, body: JSON.stringify({ whatsapp }) }); }
       return route.fulfill({ status: 200, headers: cors, body: JSON.stringify({ ok: true }) });
     }
 
@@ -77,7 +90,7 @@ async function mockSupabase(page) {
 
     return route.fulfill({ status: 404, headers: cors, body: JSON.stringify({ error: 'Ruta simulada no encontrada' }) });
   });
-  return { cloud, passwordChanges, setOffline(value) { offline = value; } };
+  return { cloud, passwordChanges, pendingRequests, setOffline(value) { offline = value; } };
 }
 
 async function login(page, dip) {
@@ -122,9 +135,30 @@ test('cada distribuidor sincroniza y ve únicamente sus datos', async ({ page })
   expect(await page.evaluate(() => APPIAuth.currentProfile().dip)).toBe('03-1234567');
 });
 
+test('una solicitud nueva abre WhatsApp y queda pendiente', async ({ page }) => {
+  const backend=await mockSupabase(page);
+  await page.goto('/index.html',{waitUntil:'networkidle'});
+  await page.evaluate(()=>{window.__lastOpen='';window.open=url=>{window.__lastOpen=url;return null}});
+  await page.locator('#loginTabCreate').click();
+  await page.locator('#requestFullName').fill('Persona Nueva');
+  await page.locator('#requestDip').fill('04-7654321');
+  await page.locator('#requestPhone').fill('3515551234');
+  await page.locator('#btnRequestAccount').click();
+  await expect(page.locator('#requestAccountSuccess')).toContainText('pendiente');
+  expect(backend.pendingRequests).toHaveLength(1);
+  expect(await page.evaluate(()=>window.__lastOpen)).toContain('wa.me');
+});
+
 test('POPUPS ingresa por el candado y no tiene distribuidor asociado', async ({ page }) => {
   await mockSupabase(page);
   await page.goto('/index.html', { waitUntil: 'networkidle' });
+  await page.evaluate(()=>{window.open=()=>null});
+  await page.locator('#loginTabCreate').click();
+  await page.locator('#requestFullName').fill('Solicitud Pendiente');
+  await page.locator('#requestDip').fill('04-7654321');
+  await page.locator('#requestPhone').fill('3515551234');
+  await page.locator('#btnRequestAccount').click();
+  await expect(page.locator('#requestAccountSuccess')).toContainText('pendiente');
   await page.locator('#btnAdminLoginOpen').click();
   await expect(page.locator('#adminLoginOverlay')).toBeVisible();
   await page.locator('#adminLoginPassword').fill('Clave1234');
@@ -132,6 +166,8 @@ test('POPUPS ingresa por el candado y no tiene distribuidor asociado', async ({ 
   await expect(page.locator('#view-admin')).toHaveClass(/active/);
   await expect(page.locator('#adminPanelIdentity')).toContainText('popups');
   await expect(page.locator('#adminUserList')).toContainText('Distribuidor A');
+  await expect(page.locator('#adminPendingList')).toContainText('Solicitud Pendiente');
+  await expect(page.locator('#adminStatPending')).toHaveText('1');
   const profile=await page.evaluate(()=>APPIAuth.currentProfile());
   expect(profile).toMatchObject({username:'popups',dip:null,rol:'admin'});
   await expect(page.locator('#btnAdminPanelLogout')).toBeVisible();
