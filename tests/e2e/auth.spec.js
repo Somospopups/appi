@@ -11,6 +11,7 @@ function tokenFor(sub) {
 
 async function mockSupabase(page) {
   const cloud = new Map([[USER_A, new Map()], [USER_B, new Map()]]);
+  const passwordChanges = [];
   let offline = false;
   const profiles = {
     [USER_A]: { user_id: USER_A, dip: '02-9802014', sucursal: '02', numero_distribuidor: '9802014', nombre: 'Distribuidor A', rol: 'usuario', activo: true },
@@ -20,7 +21,7 @@ async function mockSupabase(page) {
 
   await page.route('**/auth-config.js', route => route.fulfill({
     contentType: 'application/javascript',
-    body: `window.APPI_AUTH={enabled:true,url:'https://mock.supabase.co',anonKey:'anon-key-publica-de-prueba-1234567890',distributorEmailDomain:'distribuidores.appi.invalid',offlineDays:7};`
+    body: `window.APPI_AUTH={enabled:true,url:'https://mock.supabase.co',anonKey:'anon-key-publica-de-prueba-1234567890',distributorEmailDomain:'distribuidores.appi.invalid',loginAliases:{popups:'02-9802014'},offlineDays:7};`
   }));
 
   await page.route('https://mock.supabase.co/**', async route => {
@@ -39,6 +40,10 @@ async function mockSupabase(page) {
       return route.fulfill({ status: 200, headers: cors, body: JSON.stringify({ access_token: tokenFor(target), refresh_token: `refresh-${target}`, expires_in: 3600, token_type: 'bearer', user: { id: target } }) });
     }
 
+    if (url.pathname === '/auth/v1/user' && request.method() === 'PUT') {
+      passwordChanges.push(request.postDataJSON().password);
+      return route.fulfill({ status: 200, headers: cors, body: JSON.stringify({ id: sub }) });
+    }
     if (url.pathname === '/auth/v1/logout') return route.fulfill({ status: 204, headers: { 'access-control-allow-origin': '*' }, body: '' });
 
     if (url.pathname === '/rest/v1/appi_perfiles') {
@@ -63,7 +68,7 @@ async function mockSupabase(page) {
 
     return route.fulfill({ status: 404, headers: cors, body: JSON.stringify({ error: 'Ruta simulada no encontrada' }) });
   });
-  return { cloud, setOffline(value) { offline = value; } };
+  return { cloud, passwordChanges, setOffline(value) { offline = value; } };
 }
 
 async function login(page, dip) {
@@ -81,7 +86,9 @@ test('cada distribuidor sincroniza y ve únicamente sus datos', async ({ page })
 
   await expect(page.locator('#distributorLoginPanel')).toBeVisible();
   await expect(page.locator('#legacyActivationPanel')).toBeHidden();
-  await login(page, '029802014');
+  await login(page, 'popups');
+  await page.evaluate(() => APPIAuth.changePassword('NuevaClave2026!'));
+  expect(backend.passwordChanges).toEqual(['NuevaClave2026!']);
 
   await page.evaluate(() => {
     localStorage.setItem('presu_2026_7', JSON.stringify({ ingresos: 1000, propietario: 'A' }));

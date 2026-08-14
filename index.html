@@ -3476,10 +3476,10 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
 
     <div id="distributorLoginPanel" class="auth-panel" hidden>
       <h1 class="lock-title">Ingresá a APPI</h1>
-      <p class="lock-subtitle">Usá tu número de distribuidor y la contraseña que te entregó el administrador.</p>
+      <p class="lock-subtitle">Usá tu usuario o número de distribuidor y la contraseña que te entregó el administrador.</p>
       <label class="lock-field">
-        <span>Número de distribuidor</span>
-        <input type="text" class="lock-input login-input" id="distributorInput" inputmode="text" autocomplete="username" autocapitalize="characters" spellcheck="false" placeholder="Ej: 02-9802014" maxlength="15" />
+        <span>Usuario o número de distribuidor</span>
+        <input type="text" class="lock-input login-input" id="distributorInput" inputmode="text" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="popups o 02-9802014" maxlength="30" />
       </label>
       <label class="lock-field">
         <span>Contraseña</span>
@@ -9311,7 +9311,7 @@ function mostrarPantallaLoginDistribuidor(reason=''){
   }
   if(dip&&!dip.dataset.bound){
     dip.dataset.bound='1';
-    dip.addEventListener('input',()=>{dip.value=window.APPIAuth.normalizeDip(dip.value);mostrarErrorLogin('')});
+    dip.addEventListener('input',()=>{dip.value=window.APPIAuth.normalizeLoginIdentifier(dip.value);mostrarErrorLogin('')});
     dip.addEventListener('keydown',event=>{if(event.key==='Enter')password.focus()});
   }
   if(password&&!password.dataset.bound){
@@ -9569,6 +9569,30 @@ function actualizarCuentaUI(){
   const button=document.getElementById('btnToolsAccount');
   if(button)button.hidden=!(window.APPIAuth&&window.APPIAuth.isEnabled()&&window.APPIAuth.currentProfile());
 }
+function abrirCambioPasswordAPPI(){
+  modal.open({
+    icon:'🔐',iconBg:'linear-gradient(135deg,#5b8def,#a06bff)',title:'Cambiar contraseña',sub:'Elegí una clave personal y segura',
+    html:`<div style="display:grid;gap:10px;text-align:left">
+      <label class="lock-field"><span>Nueva contraseña</span><input class="lock-input login-input" id="accountNewPassword" type="password" autocomplete="new-password" placeholder="Mínimo 12 caracteres"></label>
+      <label class="lock-field"><span>Repetir contraseña</span><input class="lock-input login-input" id="accountConfirmPassword" type="password" autocomplete="new-password" placeholder="Repetí la contraseña"></label>
+      <div class="tip">Debe incluir al menos 12 caracteres, una mayúscula, una minúscula y un número.</div>
+      <button type="button" class="btn btn-primary" id="btnAccountSavePassword">Guardar contraseña</button>
+      <div class="lock-error" id="accountPasswordError" role="alert"></div>
+    </div>`
+  });
+  setTimeout(()=>{
+    const first=document.getElementById('accountNewPassword'),confirmInput=document.getElementById('accountConfirmPassword'),save=document.getElementById('btnAccountSavePassword'),error=document.getElementById('accountPasswordError');
+    if(first)first.focus();
+    if(save)save.onclick=async()=>{
+      const value=first.value,confirmation=confirmInput.value;
+      error.classList.remove('show');error.textContent='';
+      if(value!==confirmation){error.textContent='Las contraseñas no coinciden.';error.classList.add('show');return}
+      save.disabled=true;save.textContent='Guardando…';
+      try{await window.APPIAuth.changePassword(value);modal.close();showToast('Contraseña actualizada 🔐',2600)}
+      catch(reason){error.textContent=reason.message||'No se pudo cambiar la contraseña.';error.classList.add('show');save.disabled=false;save.textContent='Guardar contraseña'}
+    };
+  },80);
+}
 function abrirCuentaDesdeMenu(){
   try{cerrarToolsMenu()}catch(e){}
   if(!window.APPIAuth||!window.APPIAuth.isEnabled())return;
@@ -9581,14 +9605,16 @@ function abrirCuentaDesdeMenu(){
       <div class="tip"><b>Sincronización:</b> ${syncStatus.syncing?'En curso':syncStatus.dirty?`${syncStatus.dirty} cambios pendientes`:'Actualizada'}${syncStatus.lastError?`<br><span style="color:#b13e47">${escapeXml(syncStatus.lastError)}</span>`:''}</div>
       <div class="warn-tip"><b>🎙️ Importante:</b> las grabaciones de audio quedan únicamente en el dispositivo donde se hicieron. El resto de los datos se sincroniza con tu cuenta.</div>
       <button type="button" class="btn btn-primary" id="btnAccountSync">☁️ Sincronizar ahora</button>
+      <button type="button" class="btn btn-secondary" id="btnAccountPassword">🔐 Cambiar contraseña</button>
       <button type="button" class="btn btn-secondary" id="btnAccountLogout">Cerrar sesión</button>
       <button type="button" class="btn btn-danger-outline" id="btnAccountLogoutErase">Cerrar y borrar la copia de este dispositivo</button>
       <small style="color:#777887;line-height:1.4">Cerrar sesión quita tus datos de la vista y los deja separados por cuenta. Usá “borrar la copia” solamente en un equipo compartido y con conexión.</small>
     </div>`
   });
   setTimeout(()=>{
-    const sync=document.getElementById('btnAccountSync'),logout=document.getElementById('btnAccountLogout'),erase=document.getElementById('btnAccountLogoutErase');
+    const sync=document.getElementById('btnAccountSync'),password=document.getElementById('btnAccountPassword'),logout=document.getElementById('btnAccountLogout'),erase=document.getElementById('btnAccountLogoutErase');
     if(sync)sync.onclick=async()=>{sync.disabled=true;sync.textContent='Sincronizando…';try{await window.APPIDataSync.syncNow(true);showToast('Cuenta sincronizada ☁️',2200);modal.close()}catch(error){showToast(error.message||'No se pudo sincronizar',3500);sync.disabled=false;sync.textContent='☁️ Sincronizar ahora'}};
+    if(password)password.onclick=abrirCambioPasswordAPPI;
     if(logout)logout.onclick=async()=>{if(!confirm('¿Cerrar sesión en este dispositivo?'))return;logout.disabled=true;try{await window.APPIDataSync.logoutAndLock({removeCache:false});location.reload()}catch(error){showToast(error.message,3500);logout.disabled=false}};
     if(erase)erase.onclick=async()=>{if(!confirm('Se sincronizarán los datos y después se borrará la copia local, incluidos los audios de esta cuenta en este dispositivo. ¿Continuar?'))return;erase.disabled=true;try{await window.APPIDataSync.logoutAndLock({removeCache:true});location.reload()}catch(error){showToast(error.message,3800);erase.disabled=false}};
   },80);

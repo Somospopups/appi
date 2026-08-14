@@ -7,6 +7,7 @@ const DEFAULTS={
   url:'',
   anonKey:'',
   distributorEmailDomain:'distribuidores.appi.invalid',
+  loginAliases:{},
   offlineDays:7
 };
 
@@ -27,6 +28,16 @@ function parseDip(value){
   const digits=dipDigits(value);
   if(digits.length<3||digits.length>14)throw authError('Ingresá la sucursal de 2 dígitos y el número de distribuidor.','invalid_dip');
   return {canonical:`${digits.slice(0,2)}-${digits.slice(2)}`,sucursal:digits.slice(0,2),numero:digits.slice(2),compact:digits};
+}
+function normalizeLoginIdentifier(value){
+  const raw=String(value||'').trim().toLowerCase();
+  if(/[a-z]/.test(raw))return raw.replace(/[^a-z0-9._-]/g,'').slice(0,30);
+  return normalizeDip(raw);
+}
+function resolveLoginIdentifier(value){
+  const identifier=normalizeLoginIdentifier(value),aliases=config().loginAliases||{};
+  const target=Object.prototype.hasOwnProperty.call(aliases,identifier)?aliases[identifier]:identifier;
+  return {identifier,...parseDip(target)};
 }
 function emailForDip(value){
   const dip=parseDip(value).canonical;
@@ -110,8 +121,8 @@ function normalizeSession(data){
     user:data.user||null
   };
 }
-async function login(dip,password){
-  const parsed=parseDip(dip),normalized=parsed.canonical;
+async function login(identifier,password){
+  const parsed=resolveLoginIdentifier(identifier),normalized=parsed.canonical;
   if(String(password||'').length<6)throw authError('La contraseña debe tener al menos 6 caracteres.','invalid_password');
   const data=await request('/auth/v1/token?grant_type=password',{
     method:'POST',
@@ -121,6 +132,18 @@ async function login(dip,password){
   const session=normalizeSession(data),profile=await fetchProfile(session);
   if(parseDip(profile.dip).canonical!==normalized)throw authError('La cuenta no coincide con el distribuidor ingresado.','profile_mismatch',403);
   return save({session,profile,lastValidatedAt:Date.now(),offline:false});
+}
+async function changePassword(newPassword){
+  const password=String(newPassword||'');
+  if(password.length<12||!/[A-Z]/.test(password)||!/[a-z]/.test(password)||!/[0-9]/.test(password)){
+    throw authError('La contraseña necesita 12 caracteres, mayúscula, minúscula y número.','weak_password');
+  }
+  const saved=load();
+  if(!saved||!saved.session||!saved.session.access_token)throw authError('Volvé a iniciar sesión para cambiar la contraseña.','no_session',401);
+  const user=await request('/auth/v1/user',{
+    method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({password})
+  },saved.session.access_token);
+  return save({...saved,session:{...saved.session,user},lastValidatedAt:Date.now(),offline:false});
 }
 async function refresh(saved=load()){
   if(!saved||!saved.session||!saved.session.refresh_token)throw authError('No hay una sesión para renovar.','no_session',401);
@@ -171,7 +194,7 @@ function status(){
 }
 
 window.APPIAuth={
-  SESSION_KEY,config,isEnabled,isConfigured,normalizeDip,parseDip,emailForDip,login,authorize,refresh,validate,logout,
+  SESSION_KEY,config,isEnabled,isConfigured,normalizeDip,normalizeLoginIdentifier,resolveLoginIdentifier,parseDip,emailForDip,login,changePassword,authorize,refresh,validate,logout,
   load,clear,offlineEligible,isLocallyAuthorized,accessToken,userId,currentProfile,status
 };
 })();

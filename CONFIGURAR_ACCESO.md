@@ -89,6 +89,7 @@ window.APPI_AUTH = {
   url: 'https://TU-PROYECTO.supabase.co',
   anonKey: 'TU_CLAVE_PUBLICA_ANON',
   distributorEmailDomain: 'distribuidores.appi.invalid',
+  loginAliases: { popups: '02-9802014' },
   offlineDays: 7
 };
 ```
