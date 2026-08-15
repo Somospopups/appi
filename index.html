@@ -3490,7 +3490,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
     <button class="ds-btn" data-ds="view-planning" onclick="showView('view-planning'); renderPlanningTools();"><span>🗓️</span> Planificación</button>
   </nav>
-  <div class="ds-foot">APPI · v194 · Sincronización automática</div>
+  <div class="ds-foot">APPI · v195 · Planificación ordenada</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -9217,7 +9217,7 @@ function renderPlanningTools(){
     onClick:`openRueda('negocio')`, accent:'#ff6b9d' 
   });
   
-  document.getElementById('planningToolsList').innerHTML = c1 + c2 + c3 + c4;
+  document.getElementById('planningToolsList').innerHTML = c2 + c1 + c3 + c4;
 }
 /* ============ BACKUP ============ */
 function crearBackupLocalAPPI(){
@@ -10061,7 +10061,7 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./service-worker.js?v=194').catch(error => {
+      navigator.serviceWorker.register('./service-worker.js?v=195').catch(error => {
         console.warn('No se pudo registrar el modo offline de APPI', error);
       });
     });

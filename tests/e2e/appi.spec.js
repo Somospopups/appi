@@ -45,6 +45,14 @@ test('arranca, navega e importa Garantías una sola vez', async ({ page }) => {
     await expect(page.locator(`#${expectedView}`)).toHaveClass(/active/);
   }
 
+  await page.evaluate(() => { showView('view-planning'); renderPlanningTools(); });
+  await expect(page.locator('#planningToolsList .tool-title-block h3')).toHaveText([
+    'Las 7 P',
+    'Presupuesto Mensual',
+    'Rueda de la Vida',
+    'Rueda del Negocio'
+  ]);
+
   await page.setInputFiles('#usuariosFileInput', 'test_garantias.xlsx');
   await expect(page.locator('#usuariosStTotal')).toHaveText('4');
   await expect(page.locator('#usuariosList .tree-node')).toHaveCount(4);
