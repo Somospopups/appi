@@ -20,15 +20,17 @@ jobs:
       - name: Verificar credencial temporal
         run: test -n "$SUPABASE_ACCESS_TOKEN" || (echo "Falta el secret SUPABASE_ACCESS_TOKEN" && exit 1)
 
-      - name: Instalar titular, socio y teléfonos por persona
+      - name: Instalar migraciones de titular y socio
         run: |
-          jq -Rs '{query: ., read_only: false}' SUPABASE_PERSONAS_CUENTA.sql > /tmp/personas-cuenta.json
-          curl --fail-with-body --silent --show-error \
-            --request POST \
-            --url "https://api.supabase.com/v1/projects/$SUPABASE_PROJECT_ID/database/query" \
-            --header "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
-            --header "Content-Type: application/json" \
-            --data-binary @/tmp/personas-cuenta.json
+          for migration in SUPABASE_PERSONAS_CUENTA.sql SUPABASE_INVITACIONES_PERSONA.sql; do
+            jq -Rs '{query: ., read_only: false}' "$migration" > /tmp/migration.json
+            curl --fail-with-body --silent --show-error \
+              --request POST \
+              --url "https://api.supabase.com/v1/projects/$SUPABASE_PROJECT_ID/database/query" \
+              --header "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+              --header "Content-Type: application/json" \
+              --data-binary @/tmp/migration.json
+          done
 
       - uses: supabase/setup-cli@v1
         with:
