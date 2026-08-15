@@ -3480,17 +3480,22 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-collapse" id="dsCollapseBtn" onclick="toggleSidebar()" title="Ocultar barra lateral" aria-label="Ocultar barra lateral">◀</button>
   </div>
   <nav class="ds-nav">
-    <button class="ds-btn active" data-ds="view-home" onclick="showView('view-home'); renderHomeCompleto();"><span>🏠</span> Inicio</button>
-    <button class="ds-btn" data-ds="view-presu" onclick="openPresu()"><span>📊</span> Presupuesto Mensual</button>
+    <button class="ds-btn active" data-ds="view-home" onclick="showView('view-home'); renderHomeCompleto();"><span>🏠</span> Home</button>
+    <div class="ds-section-label">Mi mes</div>
+    <button class="ds-btn" data-ds="view-siete" onclick="openSiete()"><span>🚀</span> Las 7 P</button>
+    <button class="ds-btn" data-ds="view-presu" onclick="openPresu()"><span>💰</span> Presupuesto</button>
+    <button class="ds-btn" data-ds="rueda-vida" onclick="openRueda('vida')"><span>⚖️</span> Rueda de la Vida</button>
+    <button class="ds-btn" data-ds="rueda-negocio" onclick="openRueda('negocio')"><span>📊</span> Rueda del Negocio</button>
+    <div class="ds-section-label">Mi negocio</div>
     <button class="ds-btn" data-ds="view-equipo" onclick="openEquipo()"><span>🌳</span> Mi Equipo</button>
     <button class="ds-btn" data-ds="view-historico" onclick="openHistorico()"><span>📈</span> Histórico</button>
     <button class="ds-btn" data-ds="view-usuarios" onclick="showView('view-usuarios')"><span>📍</span> Usuarios</button>
-    <button class="ds-btn" data-ds="view-seguimiento" onclick="openSeguimiento()"><span>📇</span> Seguimiento</button>
+    <button class="ds-btn" data-ds="view-seguimiento" onclick="openSeguimiento()"><span>📇</span> Contactos</button>
+    <div class="ds-section-label">Mis herramientas</div>
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
-    <button class="ds-btn" data-ds="view-planning" onclick="showView('view-planning'); renderPlanningTools();"><span>🗓️</span> Planificación</button>
   </nav>
-  <div class="ds-foot">APPI · v196 · Planilla protegida</div>
+  <div class="ds-foot">APPI · v197 · Menú y notas</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4613,8 +4618,8 @@ function showView(id){
     b.classList.toggle('active', b.dataset.view===id);
   });
   // Sidebar escritorio: marcar activo (con equivalencias de sub-vistas)
-  const dsMap = {'view-home':'view-home','view-presu':'view-presu','view-presu-hist':'view-presu','view-equipo':'view-equipo','view-historico':'view-historico','view-seguimiento':'view-seguimiento','view-grabadora':'view-grabadora','view-notas':'view-notas','view-siete':'view-siete','view-siete-detail':'view-siete','view-wheel':'view-wheel','view-eval':'view-wheel','view-planning':'view-planning'};
-  const dsTarget = dsMap[id] || '';
+  const dsMap = {'view-home':'view-home','view-presu':'view-presu','view-presu-hist':'view-presu','view-equipo':'view-equipo','view-historico':'view-historico','view-usuarios':'view-usuarios','view-seguimiento':'view-seguimiento','view-grabadora':'view-grabadora','view-notas':'view-notas','view-siete':'view-siete','view-siete-detail':'view-siete'};
+  const dsTarget = (id==='view-wheel'||id==='view-eval') ? `rueda-${currentRueda||'vida'}` : (dsMap[id] || '');
   document.querySelectorAll('#deskSidebar .ds-btn').forEach(b=>{
     b.classList.toggle('active', b.dataset.ds===dsTarget);
   });
@@ -10078,7 +10083,7 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./service-worker.js?v=196').catch(error => {
+      navigator.serviceWorker.register('./service-worker.js?v=197').catch(error => {
         console.warn('No se pudo registrar el modo offline de APPI', error);
       });
     });
@@ -10304,6 +10309,9 @@ body.dark .presu-select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:
   body.dark .ds-brand b{color:#f0f0f5}
   body.dark .ds-brand small{color:#a0a0b0}
   .ds-nav{display:flex;flex-direction:column;gap:2px}
+  .ds-section-label{margin:12px 10px 4px;padding-top:8px;border-top:1px solid rgba(80,90,130,.10);color:#81828f;font-size:9px;font-weight:950;letter-spacing:.8px;text-transform:uppercase}
+  .ds-nav>.ds-section-label:first-of-type{margin-top:8px}
+  body.dark .ds-section-label{border-top-color:rgba(255,255,255,.08);color:#8f90a0}
   .ds-btn{
     display:flex; align-items:center; gap:12px; width:100%;
     padding:11px 12px; border:none; border-radius:12px;
@@ -11331,7 +11339,8 @@ body.dark .rec-item .info small{color:#a0a0b0}
 /* ===== NOTAS KEEP - sticky notes colores ===== */
 .keep-grid{columns:2;column-gap:10px}
 @media (min-width: 600px){ .keep-grid{columns:3} }
-.keep-note{break-inside:avoid;padding:14px;border-radius:16px;margin-bottom:10px;position:relative;box-shadow:0 4px 12px rgba(0,0,0,0.08);transition:transform 0.15s,box-shadow 0.2s;cursor:pointer;border:1px solid rgba(0,0,0,0.06)}
+.keep-note{break-inside:avoid;padding:19px 14px 14px;border-radius:16px;margin:7px 0 10px;position:relative;box-shadow:0 4px 12px rgba(0,0,0,0.08);transition:transform 0.15s,box-shadow 0.2s;cursor:pointer;border:1px solid rgba(0,0,0,0.06)}
+.keep-pin{position:absolute;z-index:3;top:-8px;left:50%;width:16px;height:16px;transform:translateX(-50%);border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff 0 9%,#ff8a8a 12%,#e23f4d 62%,#9f1f2a 100%);box-shadow:0 3px 7px rgba(95,25,35,.35)}.keep-pin:after{content:"";position:absolute;left:7px;top:12px;width:2px;height:9px;border-radius:2px;background:linear-gradient(#a8a8b2,#555761);transform:rotate(7deg);transform-origin:top}.keep-note.is-pinned .keep-pin{background:radial-gradient(circle at 35% 30%,#fff 0 9%,#8fb6ff 12%,#526ee8 62%,#2e3e9f 100%)}
 .keep-note:active{transform:scale(0.98)}
 .keep-note .k-title{font-weight:800;font-size:14px;margin:0 0 6px;word-break:break-word}
 .keep-note .k-text{font-size:13px;line-height:1.4;white-space:pre-wrap;word-break:break-word;opacity:0.9}
@@ -12080,8 +12089,8 @@ function renderKeep(){
   const filtradas=q? notas.filter(n=> (n.title+' '+n.text).toLowerCase().includes(q)) : notas;
   if(filtradas.length===0){ cont.innerHTML='<div class="empty" style="column-span:all">Sin notas. ¡Creá la primera!</div>'; return; }
   cont.innerHTML=filtradas.map(n=>`
-    <div class="keep-note" style="background:${n.color}" onclick="window.openKeepModal && window.openKeepModal('${n.id}')">
-      ${n.pinned?'<div style="position:absolute;top:6px;left:8px;font-size:10px">📌</div>':''}
+    <div class="keep-note ${n.pinned?'is-pinned':''}" style="background:${n.color}" onclick="window.openKeepModal && window.openKeepModal('${n.id}')">
+      <div class="keep-pin" aria-hidden="true"></div>
       ${n.title?`<div class="k-title">${n.title.replace(/</g,'&lt;')}</div>`:''}
       <div class="k-text">${(n.text||'').replace(/</g,'&lt;').slice(0,280)}</div>
       <div class="k-foot"><span>${new Date(parseInt(n.id)).toLocaleDateString('es-AR')}</span><span>${n.color!='#fff475'?'●':''} ${n.pinned?'📌':''}</span></div>

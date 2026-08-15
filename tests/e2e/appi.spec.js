@@ -30,6 +30,12 @@ test('arranca, navega e importa Garantías una sola vez', async ({ page }) => {
   });
 
   await abrirAppActivada(page);
+  const sidebarLabels=await page.locator('#deskSidebar .ds-section-label').allTextContents();
+  expect(sidebarLabels.map(text=>text.trim())).toEqual(['Mi mes','Mi negocio','Mis herramientas']);
+  const sidebarButtons=await page.locator('#deskSidebar .ds-btn').allTextContents();
+  expect(sidebarButtons.map(text=>text.replace(/^[^\p{L}]+/u,'').trim())).toEqual([
+    'Home','Las 7 P','Presupuesto','Rueda de la Vida','Rueda del Negocio','Mi Equipo','Histórico','Usuarios','Contactos','Grabadora','Notas Keep'
+  ]);
 
   for (const [expression, expectedView] of [
     ["openSiete()", 'view-siete'],
@@ -52,6 +58,7 @@ test('arranca, navega e importa Garantías una sola vez', async ({ page }) => {
     'Rueda de la Vida',
     'Rueda del Negocio'
   ]);
+  await page.evaluate(() => showView('view-usuarios'));
 
   await page.setInputFiles('#usuariosFileInput', 'test_garantias.xlsx');
   await expect(page.locator('#usuariosStTotal')).toHaveText('4');
@@ -117,6 +124,16 @@ test('el backup excluye credenciales y restaura solo claves permitidas', async (
   expect(result.equipo.personas[0].nombre).toBe('Equipo seguro');
   expect(result.auth).toBe('NO-DEBE-SALIR');
   expect(result.device).not.toBe('ATAQUE');
+});
+
+test('las notas Keep se muestran sujetas con un pin', async ({ page }) => {
+  await abrirAppActivada(page);
+  await page.evaluate(()=>{
+    localStorage.setItem('appi_keep_notas',JSON.stringify([{id:String(Date.now()),title:'Nota con pin',text:'Contenido',color:'#fff475',pinned:false}]));
+    showView('view-notas');window.renderKeep();
+  });
+  await expect(page.locator('#keepGrid .keep-note')).toHaveCount(1);
+  await expect(page.locator('#keepGrid .keep-pin')).toHaveCount(1);
 });
 
 test('Contactos distingue pendientes de cerrados', async ({ page }) => {

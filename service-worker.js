@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v196-planilla-protegida';
+const CACHE_NAME = 'appi-v197-sidebar-notas';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
