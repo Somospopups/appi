@@ -1,4 +1,6 @@
 const { test, expect } = require('@playwright/test');
+const fs = require('fs');
+const vm = require('vm');
 
 const USER_ID = '11111111-1111-4111-8111-111111111111';
 const DEVICE_ID = 'dddddddd-dddd-4ddd-8ddd-dddddddddddd';
@@ -21,9 +23,87 @@ test('el Service Worker escucha notificaciones y su apertura', async ({ request 
   expect(source).toContain("icon: './icon-192.png'");
   expect(source).toContain("badge: './notification-badge.png'");
   expect(source).toContain('call_request');
+  expect(source).toContain('notificationTarget');
+  expect(source).toContain('focusOrOpenNotification');
+  expect(source).toContain('APPI_OPEN_COMMAND');
+  expect(source).toContain('self.clients.openWindow');
+  const bridge = await request.get('/device-bridge.js');
+  expect(bridge.ok()).toBe(true);
+  const bridgeSource = await bridge.text();
+  expect(bridgeSource).toContain("navigator.serviceWorker.addEventListener('message'");
+  expect(bridgeSource).toContain('handleServiceWorkerMessage');
+  expect(bridgeSource).toContain("url.searchParams.set('bridge_call'");
   const badge = await request.get('/notification-badge.png');
   expect(badge.ok()).toBe(true);
   expect(badge.headers()['content-type']).toContain('image/png');
+});
+
+test('al tocar la notificación abre APPI cerrada o enfoca la ventana existente', async () => {
+  const source = fs.readFileSync('service-worker.js', 'utf8');
+  const commandId = '34343434-3434-4434-8434-343434343434';
+
+  function workerWith(clientApi) {
+    const handlers = {};
+    const context = {
+      URL,
+      Promise,
+      console,
+      self: {
+        location: { href: 'https://somospopups.github.io/appi/service-worker.js?v=215' },
+        registration: { scope: 'https://somospopups.github.io/appi/', showNotification: async () => {} },
+        clients: clientApi,
+        addEventListener: (type, handler) => { handlers[type] = handler; }
+      }
+    };
+    vm.createContext(context);
+    vm.runInContext(source, context);
+    return handlers;
+  }
+
+  let openedUrl = '';
+  const openedMessages = [];
+  const openedClient = {
+    url: 'https://somospopups.github.io/appi/',
+    postMessage: message => openedMessages.push(message),
+    focus: async function () { return this; }
+  };
+  const closedHandlers = workerWith({
+    matchAll: async () => [],
+    openWindow: async url => { openedUrl = url; return openedClient; }
+  });
+  let closed = 0;
+  let work;
+  closedHandlers.notificationclick({
+    action: '',
+    notification: { data: { type: 'call_request', command_id: commandId, url: `./?bridge_call=${commandId}` }, close: () => { closed += 1; } },
+    waitUntil: promise => { work = promise; }
+  });
+  await work;
+  expect(openedUrl).toBe(`https://somospopups.github.io/appi/?bridge_call=${commandId}`);
+  expect(openedMessages).toContainEqual({ type: 'APPI_OPEN_COMMAND', url: openedUrl, command_id: commandId });
+  expect(closed).toBe(1);
+
+  const focusedMessages = [];
+  let openedExisting = false;
+  const existingClient = {
+    url: 'https://somospopups.github.io/appi/',
+    postMessage: message => focusedMessages.push(message),
+    focus: async function () { this.focused = true; return this; }
+  };
+  const existingHandlers = workerWith({
+    matchAll: async () => [existingClient],
+    openWindow: async () => { openedExisting = true; return null; }
+  });
+  existingHandlers.notificationclick({
+    action: 'open',
+    notification: { data: { type: 'call_request', command_id: commandId, url: './' }, close: () => {} },
+    waitUntil: promise => { work = promise; }
+  });
+  await work;
+  expect(existingClient.focused).toBe(true);
+  expect(openedExisting).toBe(false);
+  expect(focusedMessages[0]).toMatchObject({ type: 'APPI_OPEN_COMMAND', command_id: commandId });
+  expect(focusedMessages[0].url).toBe(`https://somospopups.github.io/appi/?bridge_call=${commandId}`);
 });
 
 test('vincula por QR y envía una llamada de la PC al teléfono', async ({ page }) => {
@@ -74,6 +154,8 @@ test('vincula por QR y envía una llamada de la PC al teléfono', async ({ page 
       if (body.action === 'create_pairing') return route.fulfill({ status: 201, headers: cors, body: JSON.stringify({ pairing: { id: '12121212-1212-4212-8212-121212121212', token: PAIR_TOKEN, codigo: '321654', expires_at: new Date(Date.now() + 300000).toISOString() } }) });
       if (body.action === 'pair_status') return route.fulfill({ status: 200, headers: cors, body: JSON.stringify({ claimed: false, expired: false, cancelled: false, device: null }) });
       if (body.action === 'send_call') return route.fulfill({ status: 200, headers: cors, body: JSON.stringify({ ok: true, command_id: '34343434-3434-4434-8434-343434343434', device, expires_at: new Date(Date.now() + 120000).toISOString() }) });
+      if (body.action === 'get_command') return route.fulfill({ status: 200, headers: cors, body: JSON.stringify({ command: { id: '34343434-3434-4434-8434-343434343434', tipo: 'llamada', estado: 'abierto', expires_at: new Date(Date.now() + 120000).toISOString(), payload: { nombre: 'Carolina Martínez', telefono: '351 555 1234', contact_id: CONTACT_ID } } }) });
+      if (body.action === 'cancel_command') return route.fulfill({ status: 200, headers: cors, body: '{"ok":true}' });
       if (body.action === 'ping') return route.fulfill({ status: 200, headers: cors, body: '{"ok":true}' });
       return route.fulfill({ status: 400, headers: cors, body: JSON.stringify({ error: 'Acción simulada no disponible' }) });
     }
@@ -91,6 +173,16 @@ test('vincula por QR y envía una llamada de la PC al teléfono', async ({ page 
   await page.locator('#btnDistributorLogin').click();
   await expect(page.locator('#lockScreen')).toHaveClass(/hidden/);
   await expect.poll(() => page.evaluate(() => APPIAuth.currentProfile()?.dip || '')).toBe('02-9802014');
+
+  await page.evaluate(commandId => APPIDeviceBridge.handleServiceWorkerMessage({ data: { type: 'APPI_OPEN_COMMAND', command_id: commandId } }), '34343434-3434-4434-8434-343434343434');
+  await expect(page).toHaveURL(/bridge_call=34343434-3434-4434-8434-343434343434/);
+  await expect(page.locator('#appiDeviceOverlay')).toBeVisible();
+  await expect(page.locator('.appi-call-request h2')).toHaveText('Carolina Martínez');
+  await expect(page.locator('.appi-call-number')).toHaveText('351 555 1234');
+  await expect(page.locator('#appiAcceptCall')).toHaveAttribute('href', 'tel:3515551234');
+  await page.locator('#appiDeviceClose').click();
+  await expect(page.locator('#appiDeviceOverlay')).toBeHidden();
+  await expect.poll(() => page.url().includes('bridge_call')).toBe(false);
 
   await page.locator('#view-home .tools-btn').click();
   await expect(page.locator('#toolsMenu')).toHaveClass(/open/);

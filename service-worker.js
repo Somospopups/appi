@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v214-notificaciones-appi';
+const CACHE_NAME = 'appi-v215-notificaciones-accionables';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
@@ -120,18 +120,54 @@ self.addEventListener('push', event => {
   event.waitUntil(self.registration.showNotification(title, options));
 });
 
+function notificationTarget(data = {}) {
+  const scope = self.registration.scope || new URL('./', self.location.href).href;
+  const scopeUrl = new URL(scope);
+  let target;
+  try { target = new URL(data.url || './', scopeUrl); } catch (error) { target = new URL('./', scopeUrl); }
+  if (target.origin !== scopeUrl.origin || !target.href.startsWith(scopeUrl.href)) target = new URL('./', scopeUrl);
+  const commandId = String(data.command_id || '');
+  if (/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(commandId) && !target.searchParams.get('bridge_call')) {
+    target.searchParams.set('bridge_call', commandId);
+  }
+  return target.href;
+}
+
+async function focusOrOpenNotification(target, data = {}) {
+  const commandId = String(data.command_id || '');
+  const message = { type: 'APPI_OPEN_COMMAND', url: target, command_id: commandId };
+  const windows = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+  const scoped = windows.filter(client => String(client.url || '').startsWith(self.registration.scope));
+  for (const client of scoped) {
+    try {
+      client.postMessage(message);
+      const focused = await client.focus();
+      if (focused) return focused;
+    } catch (error) {}
+  }
+  const opened = await self.clients.openWindow(target);
+  if (opened) {
+    try { opened.postMessage(message); } catch (error) {}
+    try { return await opened.focus(); } catch (error) { return opened; }
+  }
+  return null;
+}
+
 self.addEventListener('notificationclick', event => {
-  event.notification.close();
-  if (event.action === 'dismiss') return;
-  const target = new URL(event.notification.data?.url || './', self.location.href).href;
+  const data = event.notification.data || {};
+  if (event.action === 'dismiss') {
+    event.notification.close();
+    return;
+  }
+  const target = notificationTarget(data);
   event.waitUntil((async () => {
-    const windows = await clients.matchAll({ type: 'window', includeUncontrolled: true });
-    for (const client of windows) {
-      try {
-        if ('navigate' in client) await client.navigate(target);
-        return client.focus();
-      } catch (error) {}
+    try {
+      const client = await focusOrOpenNotification(target, data);
+      event.notification.close();
+      return client;
+    } catch (error) {
+      event.notification.close();
+      throw error;
     }
-    return clients.openWindow(target);
   })());
 });
