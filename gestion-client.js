@@ -119,7 +119,7 @@ function isAdmin(){return profile()&&profile().rol==='admin'}
 async function createSurveyInvitation(renderAfter=true){
   if(!authorized())throw new Error('Iniciá sesión para compartir una encuesta.');
   if(isAdmin())throw new Error('Las invitaciones pertenecen a las cuentas distribuidoras.');
-  const rows=await cloudFetch('/rest/v1/rpc/appi_crear_invitacion_encuesta',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});
+  const person=window.APPIAuth&&window.APPIAuth.activePerson?window.APPIAuth.activePerson():null,rows=await cloudFetch('/rest/v1/rpc/appi_crear_invitacion_encuesta',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({p_persona_tipo:person?.tipo==='socio'?'socio':'titular'})});
   const invitation=Array.isArray(rows)?rows[0]:rows;
   if(!invitation||!invitation.token)throw new Error('No pudimos crear la invitación privada.');
   state.link=invitation;if(renderAfter)renderSurveyTool();return invitation;

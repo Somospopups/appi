@@ -131,6 +131,11 @@ function merge(local,remote,preferLocal=false){
   }
   return {values,changedAt,dirty};
 }
+async function pullLatest(){
+  const remote=await pullCloud(state.personType),merged=merge({values:state.values,changedAt:state.changedAt},remote,false);
+  state.values={...(merged.values||{})};state.changedAt={...(merged.changedAt||{})};merged.dirty.forEach(key=>state.dirty.add(key));
+  applyValues(state.values);await cachePut(cacheRecord()).catch(()=>{});return true;
+}
 async function start({claimLegacy=true}={}){
   if(!window.APPIAuth||!window.APPIAuth.isEnabled()||!window.APPIAuth.isLocallyAuthorized())return {ready:false};
   const userId=window.APPIAuth.userId();if(!userId)throw new Error('La cuenta no tiene un identificador válido.');
@@ -164,9 +169,9 @@ async function start({claimLegacy=true}={}){
 async function syncNow(force=false){
   if(!state.ready||state.syncing||!navigator.onLine)return false;
   const userId=state.userId||window.APPIAuth.userId();if(!userId)return false;
-  const keys=force?Object.keys(state.values):[...state.dirty];
+  const keys=[...state.dirty];
   const deleted=[...state.deleted];
-  if(!keys.length&&!deleted.length)return true;
+  if(!keys.length&&!deleted.length){if(force)await pullLatest();return true;}
   state.syncing=true;
   try{
     if(keys.length){
@@ -175,7 +180,7 @@ async function syncNow(force=false){
       if(rows.length)await cloudFetch('/rest/v1/appi_datos?on_conflict=user_id,data_key',{method:'POST',headers:{'Content-Type':'application/json',Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify(rows)});
     }
     for(const key of deleted)await cloudFetch(`/rest/v1/appi_datos?user_id=eq.${encodeURIComponent(userId)}&data_key=eq.${encodeURIComponent(cloudDataKey(key))}` ,{method:'DELETE'});
-    keys.forEach(key=>state.dirty.delete(key));deleted.forEach(key=>state.deleted.delete(key));state.lastError='';await cachePut(cacheRecord()).catch(()=>{});return true;
+    keys.forEach(key=>state.dirty.delete(key));deleted.forEach(key=>state.deleted.delete(key));state.lastError='';if(force)await pullLatest();else await cachePut(cacheRecord()).catch(()=>{});return true;
   }catch(error){state.lastError=error.message;throw error}
   finally{state.syncing=false}
 }

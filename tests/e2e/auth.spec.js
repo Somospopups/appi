@@ -199,6 +199,10 @@ test('titular y socio eligen su identidad y separan el espacio personal', async 
   await page.evaluate(()=>APPIDataSync.syncNow(true));
   expect(backend.cloud.get(USER_A).has('persona_socio__appi_keep_notas')).toBe(true);
   expect(backend.cloud.get(USER_A).has('equipoData')).toBe(true);
+  backend.cloud.get(USER_A).set('equipoData',{value:JSON.stringify({titular:{nombre:'Excel actualizado'},personas:[],raices:[]})});
+  await page.waitForTimeout(10);
+  await page.evaluate(()=>APPIDataSync.syncNow(true));
+  expect(await page.evaluate(()=>JSON.parse(localStorage.getItem('equipoData')).titular.nombre)).toBe('Excel actualizado');
   const devices=await page.evaluate(()=>{
     APPIDeviceBridge.state.devices=[
       {id:'1',persona_tipo:'titular',activo:true,nombre:'Teléfono de María'},

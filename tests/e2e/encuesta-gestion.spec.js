@@ -144,6 +144,7 @@ test('Mi Encuesta y Mi Gestión usan la cuenta autenticada y guardan el seguimie
   const nativeDialogs = [];
   const patches = [];
   const activities = [];
+  const invitationPeople = [];
   page.on('dialog', dialog => { nativeDialogs.push(dialog.type()); dialog.dismiss(); });
 
   const accessToken = tokenFor(USER_ID);
@@ -152,7 +153,7 @@ test('Mi Encuesta y Mi Gestión usan la cuenta autenticada y guardan el seguimie
   let invitationIndex = 0;
   const profile = {
     user_id: USER_ID, username: null, dip: '02-9802014', sucursal: '02', numero_distribuidor: '9802014',
-    nombre: 'María Pérez', rol: 'usuario', activo: true, debe_cambiar_password: false,
+    nombre: 'María Pérez', socio_nombre: 'Juan Gómez', rol: 'usuario', activo: true, debe_cambiar_password: false,
     membresia_meses: 1, membresia_inicio: now, membresia_vence: new Date(Date.now() + 30 * 86400000).toISOString()
   };
   const contacts = [
@@ -182,6 +183,7 @@ test('Mi Encuesta y Mi Gestión usan la cuenta autenticada y guardan el seguimie
     if (url.pathname === '/rest/v1/appi_perfiles') return route.fulfill({ status: 200, headers: cors, body: JSON.stringify([profile]) });
     if (url.pathname === '/rest/v1/appi_datos' && request.method() === 'GET') return route.fulfill({ status: 200, headers: cors, body: '[]' });
     if (url.pathname === '/rest/v1/rpc/appi_crear_invitacion_encuesta') {
+      invitationPeople.push(request.postDataJSON()?.p_persona_tipo || 'titular');
       const issued = invitationTokens[Math.min(invitationIndex++, invitationTokens.length - 1)];
       return route.fulfill({ status: 200, headers: cors, body: JSON.stringify([{ token: issued, expires_at: new Date(Date.now() + 86400000).toISOString() }]) });
     }
@@ -208,6 +210,8 @@ test('Mi Encuesta y Mi Gestión usan la cuenta autenticada y guardan el seguimie
   await page.locator('#distributorInput').fill('02-9802014');
   await page.locator('#distributorPassword').fill('Clave1234');
   await page.locator('#btnDistributorLogin').click();
+  await expect(page.locator('#personChoiceOverlay')).toBeVisible();
+  await page.locator('[data-person-type="socio"]').click();
   await expect(page.locator('#lockScreen')).toHaveClass(/hidden/);
   await expect.poll(() => page.evaluate(() => APPIAuth.currentProfile()?.dip || '')).toBe('02-9802014');
   await expect(page.locator('#view-home')).toHaveClass(/active/);
@@ -218,7 +222,8 @@ test('Mi Encuesta y Mi Gestión usan la cuenta autenticada y guardan el seguimie
   await page.evaluate(() => APPIGestion.createInvitation());
   await expect(page.locator('.survey-link-value')).toContainText(LINK_TOKEN);
   const friendlyMessage = await page.evaluate(() => APPIGestion.shareMessage(APPIGestion.surveyUrl()));
-  expect(friendlyMessage).toContain('Soy María');
+  expect(friendlyMessage).toContain('Soy Juan');
+  expect(invitationPeople).toContain('socio');
   expect(friendlyMessage).not.toContain('Pérez');
   expect(friendlyMessage).not.toContain('APPI');
   expect(friendlyMessage).toContain(LINK_TOKEN);
