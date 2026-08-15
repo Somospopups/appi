@@ -3500,7 +3500,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v205 · Llamadas vinculadas</div>
+  <div class="ds-foot">APPI · v206 · Dispositivos y planillas estables</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -5607,16 +5607,58 @@ function parseNombreCodigo(cell){
   if(m) return { codigo: m[1].trim(), nombre: m[2].trim() };
   return { codigo: '', nombre: s };
 }
-
+function digitosIdentidad(value){return String(value==null?'':value).replace(/\D/g,'')}
+function numeroIdentidadComparable(value){const digits=digitosIdentidad(value);return digits?digits.replace(/^0+(?=\d)/,''):''}
+function extraerDipTitular(value,nextValue=''){
+  const text=String(value==null?'':value).replace(/\s+/g,' ').trim();
+  const label=text.match(/\bD\.?\s*I\.?\s*P\.?\s*(?:(?:N(?:RO|UM|ÚM)|N[°º])\.?)?\s*[:#-]?\s*(.*)$/i);
+  if(!label)return '';
+  const source=label[1].trim()||String(nextValue==null?'':nextValue).trim();
+  const segment=source.split(/\s+(?=(?:Nombre|Socio|Sucursal|Categor[íi]a|Pa[íi]s)\b)/i)[0];
+  const match=segment.match(/[0-9](?:[0-9\s./-]{1,30}[0-9])?/);
+  return match?match[0].trim():'';
+}
+function identidadDistribuidorPerfil(profile={}){
+  const dip=digitosIdentidad(profile.dip),branch=digitosIdentidad(profile.sucursal),number=digitosIdentidad(profile.numero_distribuidor);
+  // El DIP usado para iniciar sesión es la identidad canónica. Los campos separados
+  // pueden haber quedado desactualizados en cuentas creadas antes de la migración.
+  const branchFromDip=dip.length>2?dip.slice(0,2):'';
+  const numberFromDip=dip.length>2?dip.slice(2):'';
+  const resolvedBranch=branchFromDip||branch;
+  const resolvedNumber=numberFromDip||number;
+  return {
+    branch:resolvedBranch,
+    branchComparable:numeroIdentidadComparable(resolvedBranch),
+    number:resolvedNumber,
+    numberComparable:numeroIdentidadComparable(resolvedNumber),
+    full:dip||(resolvedBranch+resolvedNumber),
+    fullComparable:numeroIdentidadComparable(dip||(resolvedBranch+resolvedNumber))
+  };
+}
+function compararTitularConPerfil(titular={},profile={}){
+  const expected=identidadDistribuidorPerfil(profile),detected=digitosIdentidad(titular.dip),detectedComparable=numeroIdentidadComparable(detected),detectedBranchComparable=numeroIdentidadComparable(titular.sucursal);
+  if(!detected)return {ok:false,reason:'missing',expected,detected:''};
+  const fullMatch=!!expected.fullComparable&&detectedComparable===expected.fullComparable;
+  const numberOnlyMatch=!!expected.numberComparable&&detectedComparable===expected.numberComparable;
+  let prefixedMatch=false;
+  if(!fullMatch&&!numberOnlyMatch&&expected.number&&detected.endsWith(expected.number)){
+    const prefix=detected.slice(0,-expected.number.length);
+    prefixedMatch=!!prefix&&numeroIdentidadComparable(prefix)===expected.branchComparable;
+  }
+  if(!fullMatch&&!numberOnlyMatch&&!prefixedMatch)return {ok:false,reason:'dip_mismatch',expected,detected};
+  // Si el DIP completo coincide, es la fuente más confiable. Algunos reportes usan
+  // “Sucursal” para otra clasificación o la imprimen con ceros adicionales.
+  if(numberOnlyMatch&&detectedBranchComparable&&expected.branchComparable&&detectedBranchComparable!==expected.branchComparable){
+    return {ok:false,reason:'branch_mismatch',expected,detected};
+  }
+  return {ok:true,reason:fullMatch?'full_match':prefixedMatch?'prefixed_match':'number_match',expected,detected};
+}
 function validarTitularContraCuenta(titular){
   const profile=window.APPIAuth&&window.APPIAuth.isEnabled()?window.APPIAuth.currentProfile():null;
   if(!profile||profile.rol==='admin'||!profile.dip)return true;
-  const expectedBranch=String(profile.sucursal||'').replace(/\D/g,''),expectedNumber=String(profile.numero_distribuidor||'').replace(/\D/g,''),expectedFull=expectedBranch+expectedNumber,detected=String(titular&&titular.dip||'').replace(/\D/g,''),detectedBranch=String(titular&&titular.sucursal||'').replace(/\D/g,'');
-  if(!detected)throw new Error('No pude verificar el titular de la planilla. Descargá nuevamente tu Línea Descendente desde la empresa.');
-  const numberMatches=detected===expectedNumber||detected===expectedFull||detected.endsWith(expectedNumber);
-  const branchInDip=detected.length>expectedNumber.length?detected.slice(0,detected.length-expectedNumber.length):'';
-  const branchMismatch=(branchInDip&&branchInDip!==expectedBranch)||(detectedBranch.length>=2&&!detectedBranch.includes(expectedBranch));
-  if(!numberMatches||branchMismatch)throw new Error(`Esta planilla pertenece a otro distribuidor. Tu cuenta solo permite cargar información de ${profile.dip}.`);
+  const comparison=compararTitularConPerfil(titular,profile);
+  if(comparison.reason==='missing')throw new Error('No pude verificar el titular de la planilla. Descargá nuevamente tu Línea Descendente desde la empresa.');
+  if(!comparison.ok)throw new Error(`Esta planilla pertenece a otro distribuidor. Se detectó ${titular.dip||'un DIP diferente'} y tu cuenta es ${profile.dip}.`);
   return true;
 }
 function procesarExcel(rows){
@@ -5660,11 +5702,12 @@ function procesarExcel(rows){
   let titular = { dip:'', nombre:'', socio:'', sucursal:'', categoria:'' };
   for(let i = 0; i < headerRow; i++){
     const r = rows[i] || [];
-    r.forEach((cellVal) => {
+    r.forEach((cellVal,cellIndex) => {
       const cell = (cellVal==null?'':cellVal).toString().trim();
       if(!cell) return;
-      const dipMatch = cell.match(/DIP\s*(?:Nro)?[:\s]*([\d\-]+)/i);
-      if(dipMatch && !titular.dip) titular.dip = dipMatch[1];
+      const nextValue=r.slice(cellIndex+1).find(value=>String(value==null?'':value).trim())||'';
+      const dipDetectado = extraerDipTitular(cell,nextValue);
+      if(dipDetectado && !titular.dip) titular.dip = dipDetectado;
       const nomMatch = cell.match(/Nombre\s*y?\s*Apellido[:\s]*([^]+?)(?=\s+(?:Socio|Sucursal|Categor|País|Pais|DIP|$))/i);
       if(nomMatch && !titular.nombre) titular.nombre = nomMatch[1].trim();
       const socMatch = cell.match(/Socio[:\s]*([^]+?)(?=\s+(?:Sucursal|Categor|País|Pais|Nombre|DIP|$))/i);

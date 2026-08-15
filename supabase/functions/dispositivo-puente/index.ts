@@ -196,10 +196,21 @@ Deno.serve(async request => {
     if (action === 'remove_device') {
       const deviceId = String(body?.device_id || '');
       if (!validUuid(deviceId)) return json({ error: 'Dispositivo inválido.' }, 400);
-      const { error } = await admin.from('appi_dispositivos_vinculados').update({ activo: false, notificaciones: false })
-        .eq('id', deviceId).eq('user_id', userId);
+      const { data: removed, error } = await admin.from('appi_dispositivos_vinculados').update({
+        activo: false,
+        notificaciones: false,
+        push_endpoint: null,
+        push_p256dh: null,
+        push_auth: null,
+      }).eq('id', deviceId).eq('user_id', userId).select('id').maybeSingle();
       if (error) throw error;
-      return json({ ok: true });
+      if (!removed) return json({ error: 'El dispositivo ya no está vinculado a esta cuenta.' }, 404);
+      await admin.from('appi_comandos_dispositivo')
+        .update({ estado: 'cancelado' })
+        .eq('target_device_id', deviceId)
+        .eq('user_id', userId)
+        .in('estado', ['pendiente', 'notificado', 'abierto']);
+      return json({ ok: true, device_id: removed.id });
     }
 
     if (action === 'send_call') {

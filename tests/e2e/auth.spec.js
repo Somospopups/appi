@@ -116,10 +116,36 @@ test('cada distribuidor sincroniza y ve únicamente sus datos', async ({ page })
   await expect(page.locator('#legacyActivationPanel')).toBeHidden();
   await login(page, '029802014');
   const ownership=await page.evaluate(()=>{
-    let blocked=false;try{validarTitularContraCuenta({dip:'7654321',sucursal:'04'})}catch(error){blocked=true}
-    return {own:validarTitularContraCuenta({dip:'9802014',sucursal:'02'}),blocked};
+    const check=value=>{try{return validarTitularContraCuenta(value)}catch(error){return false}};
+    return {
+      ownNumber:check({dip:'9802014',sucursal:'02'}),
+      ownFull:check({dip:'02-9802014',sucursal:'Sucursal comercial 77'}),
+      ownEquivalentBranch:check({dip:'9802014',sucursal:'002'}),
+      wrongNumber:check({dip:'7654321',sucursal:'04'}),
+      wrongBranch:check({dip:'9802014',sucursal:'03'}),
+      parsedDip:digitosIdentidad(extraerDipTitular('D.I.P. Nro.: 02 / 9802014 Nombre y Apellido: María Pérez')),
+      parsedSplitDip:digitosIdentidad(extraerDipTitular('DIP N°:', '02-9802014')),
+      staleProfileFields:compararTitularConPerfil(
+        {dip:'9802014',sucursal:'02'},
+        {dip:'02-9802014',sucursal:'99',numero_distribuidor:'029802014'}
+      ).ok,
+      realReportFormat:compararTitularConPerfil(
+        {dip:'2-98020174',sucursal:'2 - CORDOBA'},
+        {dip:'02-98020174',sucursal:'02',numero_distribuidor:'98020174'}
+      ).ok
+    };
   });
-  expect(ownership).toEqual({own:true,blocked:true});
+  expect(ownership).toEqual({
+    ownNumber:true,
+    ownFull:true,
+    ownEquivalentBranch:true,
+    wrongNumber:false,
+    wrongBranch:false,
+    parsedDip:'029802014',
+    parsedSplitDip:'029802014',
+    staleProfileFields:true,
+    realReportFormat:true
+  });
   await page.evaluate(() => APPIAuth.changePassword('NuevaClave2026!'));
   expect(backend.passwordChanges).toEqual(['NuevaClave2026!']);
 

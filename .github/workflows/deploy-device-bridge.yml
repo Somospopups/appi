@@ -1,0 +1,27 @@
+name: Publicar puente de dispositivos
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'supabase/functions/dispositivo-puente/**'
+      - '.github/workflows/deploy-device-bridge.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_PROJECT_ID: tqwnjfnaywjmyfplvatm
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - name: Publicar dispositivo-puente
+        run: supabase functions deploy dispositivo-puente --project-ref "$SUPABASE_PROJECT_ID"
