@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v195-planificacion';
+const CACHE_NAME = 'appi-v196-planilla-protegida';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

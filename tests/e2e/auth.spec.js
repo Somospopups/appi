@@ -115,6 +115,11 @@ test('cada distribuidor sincroniza y ve únicamente sus datos', async ({ page })
   await expect(page.locator('#distributorLoginPanel')).toBeVisible();
   await expect(page.locator('#legacyActivationPanel')).toBeHidden();
   await login(page, '029802014');
+  const ownership=await page.evaluate(()=>{
+    let blocked=false;try{validarTitularContraCuenta({dip:'7654321',sucursal:'04'})}catch(error){blocked=true}
+    return {own:validarTitularContraCuenta({dip:'9802014',sucursal:'02'}),blocked};
+  });
+  expect(ownership).toEqual({own:true,blocked:true});
   await page.evaluate(() => APPIAuth.changePassword('NuevaClave2026!'));
   expect(backend.passwordChanges).toEqual(['NuevaClave2026!']);
 

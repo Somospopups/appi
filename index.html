@@ -3490,7 +3490,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
     <button class="ds-btn" data-ds="view-planning" onclick="showView('view-planning'); renderPlanningTools();"><span>🗓️</span> Planificación</button>
   </nav>
-  <div class="ds-foot">APPI · v195 · Planificación ordenada</div>
+  <div class="ds-foot">APPI · v196 · Planilla protegida</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -5531,8 +5531,13 @@ let equipoTopMode = 'personal'; // 'personal' o 'organizacion'
 function loadEquipoFromStorage(){
   try {
     const raw = localStorage.getItem('equipoData');
-    if(raw){ equipoData = JSON.parse(raw); return true; }
-  } catch(e){}
+    if(raw){
+      const parsed=JSON.parse(raw);validarTitularContraCuenta(parsed.titular||{});equipoData=parsed;return true;
+    }
+  } catch(error){
+    equipoData=null;localStorage.removeItem('equipoData');
+    if(error&&error.message)window.APPIDialog.alert(error.message,{title:'Planilla no autorizada',icon:'🔒'});
+  }
   return false;
 }
 function saveEquipoToStorage(){
@@ -5591,6 +5596,17 @@ function parseNombreCodigo(cell){
   return { codigo: '', nombre: s };
 }
 
+function validarTitularContraCuenta(titular){
+  const profile=window.APPIAuth&&window.APPIAuth.isEnabled()?window.APPIAuth.currentProfile():null;
+  if(!profile||profile.rol==='admin'||!profile.dip)return true;
+  const expectedBranch=String(profile.sucursal||'').replace(/\D/g,''),expectedNumber=String(profile.numero_distribuidor||'').replace(/\D/g,''),expectedFull=expectedBranch+expectedNumber,detected=String(titular&&titular.dip||'').replace(/\D/g,''),detectedBranch=String(titular&&titular.sucursal||'').replace(/\D/g,'');
+  if(!detected)throw new Error('No pude verificar el titular de la planilla. Descargá nuevamente tu Línea Descendente desde la empresa.');
+  const numberMatches=detected===expectedNumber||detected===expectedFull||detected.endsWith(expectedNumber);
+  const branchInDip=detected.length>expectedNumber.length?detected.slice(0,detected.length-expectedNumber.length):'';
+  const branchMismatch=(branchInDip&&branchInDip!==expectedBranch)||(detectedBranch.length>=2&&!detectedBranch.includes(expectedBranch));
+  if(!numberMatches||branchMismatch)throw new Error(`Esta planilla pertenece a otro distribuidor. Tu cuenta solo permite cargar información de ${profile.dip}.`);
+  return true;
+}
 function procesarExcel(rows){
   console.log('📊 Total de filas leídas:', rows.length);
   console.log('📊 Primeras 20 filas:', rows.slice(0, 20));
@@ -5648,6 +5664,7 @@ function procesarExcel(rows){
     });
   }
   console.log('👤 Titular detectado:', titular);
+  validarTitularContraCuenta(titular);
 
   const headerRawRow = rows[headerRow] || [];
   const headers = headerRawRow.map(c => (c==null?'':c).toString().toLowerCase().trim());
@@ -10061,7 +10078,7 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./service-worker.js?v=195').catch(error => {
+      navigator.serviceWorker.register('./service-worker.js?v=196').catch(error => {
         console.warn('No se pudo registrar el modo offline de APPI', error);
       });
     });
