@@ -27,6 +27,7 @@ function safeDevice(row: any) {
   return {
     id: row.id,
     device_key: row.device_key,
+    persona_tipo: row.persona_tipo || 'titular',
     nombre: row.nombre,
     plataforma: row.plataforma,
     notificaciones: row.notificaciones === true,
@@ -63,7 +64,7 @@ Deno.serve(async request => {
     const userId = authData.user.id;
     const { data: profile, error: profileError } = await admin
       .from('appi_perfiles')
-      .select('user_id,nombre,rol,activo,membresia_vence')
+      .select('user_id,nombre,socio_nombre,rol,activo,membresia_vence')
       .eq('user_id', userId)
       .maybeSingle();
     const expires = profile?.membresia_vence ? new Date(profile.membresia_vence).getTime() : 0;
@@ -73,6 +74,8 @@ Deno.serve(async request => {
 
     const body = await request.json();
     const action = String(body?.action || '');
+    const requestedPerson = String(body?.persona_tipo || 'titular');
+    const personAllowed = requestedPerson === 'titular' || (requestedPerson === 'socio' && Boolean(String(profile.socio_nombre || '').trim()));
 
     if (action === 'config') {
       const publicKey = Deno.env.get('VAPID_PUBLIC_KEY') || '';
@@ -85,7 +88,10 @@ Deno.serve(async request => {
     }
 
     if (action === 'create_pairing') {
+      if (!personAllowed) return json({ error: 'La persona seleccionada no pertenece a esta cuenta.' }, 400);
       const sourceDeviceKey = validUuid(body?.source_device_key) ? String(body.source_device_key) : null;
+      const { data: linked } = await admin.from('appi_dispositivos_vinculados').select('id').eq('user_id', userId).eq('persona_tipo', requestedPerson).eq('activo', true).maybeSingle();
+      if (linked) return json({ error: 'Esta persona ya tiene un teléfono vinculado. Desvinculalo antes de registrar otro.' }, 409);
       await admin.from('appi_vinculaciones_dispositivo')
         .update({ cancelled_at: new Date().toISOString() })
         .eq('user_id', userId)
@@ -103,8 +109,9 @@ Deno.serve(async request => {
           token,
           codigo,
           source_device_key: sourceDeviceKey,
+          persona_tipo: requestedPerson,
           expires_at: expiresAt,
-        }).select('id,token,codigo,expires_at').single();
+        }).select('id,token,codigo,persona_tipo,expires_at').single();
         if (!error) created = data;
         else if (error.code !== '23505') throw error;
       }
@@ -124,11 +131,16 @@ Deno.serve(async request => {
       const { data: pairing, error: pairError } = await query.is('claimed_at', null).is('cancelled_at', null).maybeSingle();
       if (pairError || !pairing) return json({ error: 'El código no existe o ya fue utilizado.' }, 404);
       if (new Date(pairing.expires_at).getTime() <= Date.now()) return json({ error: 'El código venció. Generá uno nuevo desde la PC.' }, 410);
+      const pairingPerson = String(pairing.persona_tipo || 'titular');
+      if (!personAllowed || requestedPerson !== pairingPerson) return json({ error: 'Este código corresponde a la otra persona de la cuenta. Volvé a ingresar y elegí el nombre correcto.' }, 409);
+      const { data: linked } = await admin.from('appi_dispositivos_vinculados').select('id,device_key').eq('user_id', userId).eq('persona_tipo', pairingPerson).eq('activo', true).maybeSingle();
+      if (linked && linked.device_key !== deviceKey) return json({ error: 'Esta persona ya tiene un teléfono vinculado. Desvinculalo antes de registrar otro.' }, 409);
 
       const push = pushParts(body?.subscription);
       const row = {
         user_id: userId,
         device_key: deviceKey,
+        persona_tipo: pairingPerson,
         nombre: cleanText(body?.nombre, 80) || 'Mi teléfono',
         plataforma: platform(body?.plataforma),
         user_agent: cleanText(body?.user_agent, 500),
@@ -180,7 +192,7 @@ Deno.serve(async request => {
     if (action === 'register_push') {
       const deviceKey = String(body?.device_key || '');
       const push = pushParts(body?.subscription);
-      if (!validUuid(deviceKey) || !push) return json({ error: 'La suscripción no es válida.' }, 400);
+      if (!validUuid(deviceKey) || !push || !personAllowed) return json({ error: 'La suscripción no es válida.' }, 400);
       const { data, error } = await admin.from('appi_dispositivos_vinculados').update({
         push_endpoint: push.endpoint,
         push_p256dh: push.p256dh,
@@ -188,21 +200,21 @@ Deno.serve(async request => {
         notificaciones: true,
         activo: true,
         last_seen: new Date().toISOString(),
-      }).eq('user_id', userId).eq('device_key', deviceKey).select('*').maybeSingle();
+      }).eq('user_id', userId).eq('device_key', deviceKey).eq('persona_tipo', requestedPerson).select('*').maybeSingle();
       if (error || !data) return json({ error: 'Este teléfono todavía no está vinculado.' }, 404);
       return json({ device: safeDevice(data) });
     }
 
     if (action === 'remove_device') {
       const deviceId = String(body?.device_id || '');
-      if (!validUuid(deviceId)) return json({ error: 'Dispositivo inválido.' }, 400);
+      if (!validUuid(deviceId) || !personAllowed) return json({ error: 'Dispositivo inválido.' }, 400);
       const { data: removed, error } = await admin.from('appi_dispositivos_vinculados').update({
         activo: false,
         notificaciones: false,
         push_endpoint: null,
         push_p256dh: null,
         push_auth: null,
-      }).eq('id', deviceId).eq('user_id', userId).select('id').maybeSingle();
+      }).eq('id', deviceId).eq('user_id', userId).eq('persona_tipo', requestedPerson).select('id').maybeSingle();
       if (error) throw error;
       if (!removed) return json({ error: 'El dispositivo ya no está vinculado a esta cuenta.' }, 404);
       await admin.from('appi_comandos_dispositivo')
@@ -219,9 +231,9 @@ Deno.serve(async request => {
       const contactId = validUuid(body?.contact_id) ? String(body.contact_id) : null;
       const telefono = cleanPhone(body?.telefono);
       const nombre = cleanText(body?.nombre, 120) || 'Contacto';
-      if (!validUuid(deviceId) || telefono.length < 8) return json({ error: 'Elegí un teléfono vinculado y un número válido.' }, 400);
+      if (!validUuid(deviceId) || telefono.length < 8 || !personAllowed) return json({ error: 'Elegí un teléfono vinculado y un número válido.' }, 400);
       const { data: device } = await admin.from('appi_dispositivos_vinculados').select('*')
-        .eq('id', deviceId).eq('user_id', userId).eq('activo', true).maybeSingle();
+        .eq('id', deviceId).eq('user_id', userId).eq('persona_tipo', requestedPerson).eq('activo', true).maybeSingle();
       if (!device) return json({ error: 'El teléfono vinculado ya no está disponible.' }, 404);
       if (!device.notificaciones || !device.push_endpoint || !device.push_p256dh || !device.push_auth) {
         return json({ error: 'Ese teléfono no tiene notificaciones activadas. Volvé a vincularlo desde Mi cuenta.' }, 409);

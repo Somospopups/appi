@@ -109,6 +109,7 @@ create table if not exists public.appi_perfiles (
   sucursal text,
   numero_distribuidor text,
   nombre text not null default '',
+  socio_nombre text,
   rol text not null default 'usuario' check (rol in ('usuario','admin')),
   activo boolean not null default true,
   debe_cambiar_password boolean not null default false,
@@ -121,6 +122,7 @@ create table if not exists public.appi_perfiles (
 
 -- Compatibilidad para proyectos que ejecutaron una versión anterior del instalador.
 alter table public.appi_perfiles add column if not exists username text;
+alter table public.appi_perfiles add column if not exists socio_nombre text;
 alter table public.appi_perfiles add column if not exists debe_cambiar_password boolean not null default false;
 alter table public.appi_perfiles add column if not exists membresia_meses integer;
 alter table public.appi_perfiles add column if not exists membresia_inicio timestamptz;
@@ -361,6 +363,7 @@ on conflict (config_key) do nothing;
 create table if not exists public.appi_solicitudes (
   id uuid primary key default gen_random_uuid(),
   nombre text not null,
+  socio_nombre text,
   dip text not null,
   sucursal text not null,
   numero_distribuidor text not null,
@@ -378,6 +381,8 @@ create table if not exists public.appi_solicitudes (
 
 alter table public.appi_solicitudes enable row level security;
 revoke all on public.appi_solicitudes from anon, authenticated;
+
+alter table public.appi_solicitudes add column if not exists socio_nombre text;
 
 create index if not exists appi_solicitudes_estado_fecha_idx
 on public.appi_solicitudes (estado, created_at desc);
@@ -1226,6 +1231,7 @@ create table if not exists public.appi_dispositivos_vinculados (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users(id) on delete cascade,
   device_key uuid not null,
+  persona_tipo text not null default 'titular' check (persona_tipo in ('titular','socio')),
   nombre text not null,
   plataforma text not null default 'otro' check (plataforma in ('android','ios','otro')),
   user_agent text not null default '',
@@ -1242,6 +1248,8 @@ create table if not exists public.appi_dispositivos_vinculados (
   unique (user_id, device_key)
 );
 
+alter table public.appi_dispositivos_vinculados add column if not exists persona_tipo text not null default 'titular';
+
 create unique index if not exists appi_dispositivos_push_endpoint_uidx
 on public.appi_dispositivos_vinculados (push_endpoint)
 where push_endpoint is not null;
@@ -1249,12 +1257,27 @@ where push_endpoint is not null;
 create index if not exists appi_dispositivos_user_activos_idx
 on public.appi_dispositivos_vinculados (user_id, activo, last_seen desc);
 
+with ranked as (
+  select id, row_number() over (partition by user_id, persona_tipo order by last_seen desc nulls last, created_at desc, id) as position
+  from public.appi_dispositivos_vinculados
+  where activo = true
+)
+update public.appi_dispositivos_vinculados as device
+set activo = false, notificaciones = false, push_endpoint = null, push_p256dh = null, push_auth = null
+from ranked
+where device.id = ranked.id and ranked.position > 1;
+
+create unique index if not exists appi_dispositivos_persona_activa_uidx
+on public.appi_dispositivos_vinculados (user_id, persona_tipo)
+where activo = true;
+
 create table if not exists public.appi_vinculaciones_dispositivo (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users(id) on delete cascade,
   token uuid not null unique default gen_random_uuid(),
   codigo text not null,
   source_device_key uuid,
+  persona_tipo text not null default 'titular' check (persona_tipo in ('titular','socio')),
   claimed_device_id uuid references public.appi_dispositivos_vinculados(id) on delete set null,
   expires_at timestamptz not null default (now() + interval '5 minutes'),
   claimed_at timestamptz,
@@ -1263,6 +1286,8 @@ create table if not exists public.appi_vinculaciones_dispositivo (
   constraint appi_vinculacion_codigo check (codigo ~ '^[0-9]{6}$'),
   constraint appi_vinculacion_fechas check (expires_at > created_at)
 );
+
+alter table public.appi_vinculaciones_dispositivo add column if not exists persona_tipo text not null default 'titular';
 
 create unique index if not exists appi_vinculaciones_codigo_activo_uidx
 on public.appi_vinculaciones_dispositivo (codigo)

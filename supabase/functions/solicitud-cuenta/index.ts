@@ -41,8 +41,9 @@ Deno.serve(async request => {
     if (action !== 'create') return json({ error: 'Acción desconocida.' }, 400);
     if (String(body?.website || '').trim()) return json({ ok: true, whatsapp_url: '' });
 
-    const nombre = cleanName(body?.nombre), dip = parseDip(body?.dip), telefono = cleanPhone(body?.telefono);
-    if (nombre.length < 3) return json({ error: 'Ingresá nombre y apellido.' }, 400);
+    const nombre = cleanName(body?.nombre), socioNombre = cleanName(body?.socio_nombre), dip = parseDip(body?.dip), telefono = cleanPhone(body?.telefono);
+    if (nombre.length < 3) return json({ error: 'Ingresá el nombre y apellido del titular.' }, 400);
+    if (socioNombre && socioNombre.length < 3) return json({ error: 'Ingresá el nombre y apellido del socio/a.' }, 400);
     if (!dip) return json({ error: 'Ingresá la sucursal y el número de distribuidor.' }, 400);
     if (telefono.length < 8) return json({ error: 'Ingresá un teléfono válido.' }, 400);
 
@@ -52,10 +53,10 @@ Deno.serve(async request => {
     if (pending) return json({ error: 'Ya existe una solicitud pendiente para ese distribuidor.' }, 409);
 
     const { data: created, error } = await admin.from('appi_solicitudes').insert({
-      nombre, dip: dip.canonical, sucursal: dip.sucursal, numero_distribuidor: dip.numero, telefono, estado: 'pendiente'
+      nombre, socio_nombre: socioNombre || null, dip: dip.canonical, sucursal: dip.sucursal, numero_distribuidor: dip.numero, telefono, estado: 'pendiente'
     }).select('id,created_at').single();
     if (error) throw error;
-    const message = `Hola POPUPS, quiero solicitar acceso a APPI.\n\nNombre: ${nombre}\nDistribuidor: ${dip.canonical}\nTeléfono: ${telefono}\n\nLa solicitud ya quedó registrada como pendiente en el panel administrador.`;
+    const message = `Hola POPUPS, quiero solicitar acceso a APPI.\n\nTitular: ${nombre}${socioNombre ? `\nSocio/a: ${socioNombre}` : ''}\nDistribuidor: ${dip.canonical}\nTeléfono: ${telefono}\n\nLa solicitud ya quedó registrada como pendiente en el panel administrador.`;
     return json({ ok: true, request_id: created.id, whatsapp_url: whatsappUrl(whatsapp, message) }, 201);
   } catch (error) {
     return json({ error: error instanceof Error ? error.message : 'Error inesperado.' }, 500);

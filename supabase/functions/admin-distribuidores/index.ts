@@ -20,6 +20,7 @@ function validPassword(value: unknown) {
   const password = String(value || '');
   return password.length >= 8 && /[A-Za-z]/.test(password) && /\d/.test(password);
 }
+function cleanName(value: unknown) { return String(value || '').trim().replace(/\s+/g, ' ').slice(0, 120); }
 function cleanWhatsapp(value: unknown) {
   return String(value || '').replace(/\D/g, '').slice(0, 15);
 }
@@ -37,18 +38,19 @@ Deno.serve(async request => {
   const { data: profile } = await admin.from('appi_perfiles').select('user_id,username,nombre,rol,activo').eq('user_id', authData.user.id).maybeSingle();
   if (!profile || profile.rol !== 'admin' || profile.activo !== true) return json({ error: 'Se requiere una cuenta administradora.' }, 403);
 
-  async function createDistributor(dipValue: unknown, nameValue: unknown, passwordValue: unknown, membershipValue: unknown) {
-    const dip = parseDip(dipValue), nombre = String(nameValue || '').trim().replace(/\s+/g, ' ').slice(0, 120), password = String(passwordValue || ''), membership = Number(membershipValue);
+  async function createDistributor(dipValue: unknown, nameValue: unknown, partnerValue: unknown, passwordValue: unknown, membershipValue: unknown) {
+    const dip = parseDip(dipValue), nombre = cleanName(nameValue), socioNombre = cleanName(partnerValue), password = String(passwordValue || ''), membership = Number(membershipValue);
     if (!dip) throw new Error('Ingresá una sucursal de 2 dígitos y el número de distribuidor.');
-    if (nombre.length < 2) throw new Error('Ingresá el nombre del distribuidor.');
+    if (nombre.length < 2) throw new Error('Ingresá el nombre del titular.');
+    if (socioNombre && socioNombre.length < 2) throw new Error('Ingresá el nombre completo del socio/a.');
     if (!validPassword(password)) throw new Error('La contraseña necesita 8 caracteres, letras y números.');
     if (![1,3,6].includes(membership)) throw new Error('Elegí una membresía de 1, 3 o 6 meses.');
     const { data: existing } = await admin.from('appi_perfiles').select('user_id').eq('dip', dip.canonical).maybeSingle();
     if (existing) throw new Error('Ese distribuidor ya tiene una cuenta.');
-    const { data: created, error: createError } = await admin.auth.admin.createUser({ email: emailForDip(dip.canonical), password, email_confirm: true, user_metadata: { dip: dip.canonical, nombre } });
+    const { data: created, error: createError } = await admin.auth.admin.createUser({ email: emailForDip(dip.canonical), password, email_confirm: true, user_metadata: { dip: dip.canonical, nombre, socio_nombre: socioNombre || null } });
     if (createError || !created.user) throw new Error(createError?.message || 'No se pudo crear la cuenta.');
     const startedAt = new Date(), expiresAt = new Date(startedAt); expiresAt.setUTCMonth(expiresAt.getUTCMonth() + membership);
-    const user = { user_id: created.user.id, username: null, dip: dip.canonical, sucursal: dip.sucursal, numero_distribuidor: dip.numero, nombre, rol: 'usuario', activo: true, debe_cambiar_password: true, membresia_meses: membership, membresia_inicio: startedAt.toISOString(), membresia_vence: expiresAt.toISOString() };
+    const user = { user_id: created.user.id, username: null, dip: dip.canonical, sucursal: dip.sucursal, numero_distribuidor: dip.numero, nombre, socio_nombre: socioNombre || null, rol: 'usuario', activo: true, debe_cambiar_password: true, membresia_meses: membership, membresia_inicio: startedAt.toISOString(), membresia_vence: expiresAt.toISOString() };
     const { error: insertError } = await admin.from('appi_perfiles').insert(user);
     if (insertError) { await admin.auth.admin.deleteUser(created.user.id).catch(() => null); throw new Error(insertError.message); }
     return user;
@@ -57,11 +59,11 @@ Deno.serve(async request => {
   try {
     const body = await request.json(), action = String(body?.action || '');
     if (action === 'list') {
-      const { data, error } = await admin.from('appi_perfiles').select('user_id,username,dip,sucursal,numero_distribuidor,nombre,rol,activo,debe_cambiar_password,membresia_meses,membresia_inicio,membresia_vence,created_at,updated_at').order('dip', { ascending: true });
+      const { data, error } = await admin.from('appi_perfiles').select('user_id,username,dip,sucursal,numero_distribuidor,nombre,socio_nombre,rol,activo,debe_cambiar_password,membresia_meses,membresia_inicio,membresia_vence,created_at,updated_at').order('dip', { ascending: true });
       if (error) throw error; return json({ users: data || [] });
     }
     if (action === 'list_requests') {
-      const { data, error } = await admin.from('appi_solicitudes').select('id,nombre,dip,sucursal,numero_distribuidor,telefono,estado,created_at').eq('estado', 'pendiente').order('created_at', { ascending: false });
+      const { data, error } = await admin.from('appi_solicitudes').select('id,nombre,socio_nombre,dip,sucursal,numero_distribuidor,telefono,estado,created_at').eq('estado', 'pendiente').order('created_at', { ascending: false });
       if (error) throw error; return json({ requests: data || [] });
     }
     if (action === 'get_settings') {
@@ -73,12 +75,12 @@ Deno.serve(async request => {
       const { error } = await admin.from('appi_configuracion').upsert({ config_key: 'whatsapp_soporte', config_value: { numero }, updated_at: new Date().toISOString() });
       if (error) throw error; return json({ whatsapp: numero });
     }
-    if (action === 'create') return json({ user: await createDistributor(body?.dip, body?.nombre, body?.password, body?.membership_months) }, 201);
+    if (action === 'create') return json({ user: await createDistributor(body?.dip, body?.nombre, body?.socio_nombre, body?.password, body?.membership_months) }, 201);
     if (action === 'approve_request') {
       const requestId = String(body?.request_id || '');
       const { data: pending, error: pendingError } = await admin.from('appi_solicitudes').select('*').eq('id', requestId).eq('estado', 'pendiente').maybeSingle();
       if (pendingError || !pending) return json({ error: 'La solicitud ya no está pendiente.' }, 404);
-      const user = await createDistributor(pending.dip, pending.nombre, body?.password, body?.membership_months);
+      const user = await createDistributor(pending.dip, pending.nombre, pending.socio_nombre, body?.password, body?.membership_months);
       const { error } = await admin.from('appi_solicitudes').update({ estado: 'aprobada', reviewed_at: new Date().toISOString(), reviewed_by: authData.user.id }).eq('id', requestId);
       if (error) throw error; return json({ user, request: { id: pending.id, telefono: pending.telefono, nombre: pending.nombre } });
     }
@@ -90,6 +92,13 @@ Deno.serve(async request => {
     const targetId = String(body?.user_id || '');
     if (!/^[0-9a-f-]{36}$/i.test(targetId)) return json({ error: 'Usuario inválido.' }, 400);
     if (targetId === authData.user.id && ['set_active','delete_user'].includes(action)) return json({ error: 'No podés modificar o eliminar tu propia cuenta administradora.' }, 400);
+    if (action === 'update_people') {
+      const nombre = cleanName(body?.nombre), socioNombre = cleanName(body?.socio_nombre);
+      if (nombre.length < 2) return json({ error: 'Ingresá el nombre del titular.' }, 400);
+      if (socioNombre && socioNombre.length < 2) return json({ error: 'Ingresá el nombre completo del socio/a.' }, 400);
+      const { data, error } = await admin.from('appi_perfiles').update({ nombre, socio_nombre: socioNombre || null }).eq('user_id', targetId).eq('rol', 'usuario').select('user_id,dip,nombre,socio_nombre').maybeSingle();
+      if (error) throw error;if (!data) return json({ error: 'La cuenta no existe.' }, 404);return json({ user: data });
+    }
     if (action === 'set_password') {
       if (!validPassword(body?.password)) return json({ error: 'La contraseña necesita 8 caracteres, letras y números.' }, 400);
       const { error } = await admin.auth.admin.updateUserById(targetId, { password: String(body.password) }); if (error) throw error;
@@ -109,7 +118,7 @@ Deno.serve(async request => {
     }
     if (action === 'set_active') {
       const activo = body?.activo === true;
-      const { data, error } = await admin.from('appi_perfiles').update({ activo }).eq('user_id', targetId).select('user_id,username,dip,sucursal,numero_distribuidor,nombre,rol,activo').single(); if (error) throw error;
+      const { data, error } = await admin.from('appi_perfiles').update({ activo }).eq('user_id', targetId).select('user_id,username,dip,sucursal,numero_distribuidor,nombre,socio_nombre,rol,activo').single(); if (error) throw error;
       const { error: authUpdateError } = await admin.auth.admin.updateUserById(targetId, { ban_duration: activo ? 'none' : '876000h' }); if (authUpdateError) throw authUpdateError;
       return json({ user: data });
     }

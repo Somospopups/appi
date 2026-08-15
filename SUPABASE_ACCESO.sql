@@ -8,6 +8,7 @@ create table if not exists public.appi_perfiles (
   sucursal text,
   numero_distribuidor text,
   nombre text not null default '',
+  socio_nombre text,
   rol text not null default 'usuario' check (rol in ('usuario','admin')),
   activo boolean not null default true,
   debe_cambiar_password boolean not null default false,
@@ -20,6 +21,7 @@ create table if not exists public.appi_perfiles (
 
 -- Compatibilidad para proyectos que ejecutaron una versión anterior del instalador.
 alter table public.appi_perfiles add column if not exists username text;
+alter table public.appi_perfiles add column if not exists socio_nombre text;
 alter table public.appi_perfiles add column if not exists debe_cambiar_password boolean not null default false;
 alter table public.appi_perfiles add column if not exists membresia_meses integer;
 alter table public.appi_perfiles add column if not exists membresia_inicio timestamptz;

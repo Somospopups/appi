@@ -16,6 +16,7 @@ on conflict (config_key) do nothing;
 create table if not exists public.appi_solicitudes (
   id uuid primary key default gen_random_uuid(),
   nombre text not null,
+  socio_nombre text,
   dip text not null,
   sucursal text not null,
   numero_distribuidor text not null,
@@ -33,6 +34,8 @@ create table if not exists public.appi_solicitudes (
 
 alter table public.appi_solicitudes enable row level security;
 revoke all on public.appi_solicitudes from anon, authenticated;
+
+alter table public.appi_solicitudes add column if not exists socio_nombre text;
 
 create index if not exists appi_solicitudes_estado_fecha_idx
 on public.appi_solicitudes (estado, created_at desc);
