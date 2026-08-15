@@ -4,7 +4,7 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
-- Versión: **v203 · Encuestas privadas**.
+- Versión: **v204 · Gestión inteligente**.
 - Publicación: [https://somospopups.github.io/appi/](https://somospopups.github.io/appi/)
 - Acceso por número de distribuidor y contraseña.
 - Acceso administrador POPUPS mediante el candado, sin DIP ni número de distribuidor.
@@ -19,13 +19,17 @@ Desde **Mis herramientas → Mi Encuesta**, cada distribuidor genera una invitac
 
 Mi Gestión incluye:
 
+- Vista **Hoy** con nuevos, seguimientos, vencidos y presentaciones.
+- Prioridad automática y motivos visibles basados en estado y respuestas.
+- Embudo comercial y resultados mensuales.
 - Encuestados y referidos.
+- Mensajes de WhatsApp preparados según cada situación.
+- Registro del resultado al volver de WhatsApp o una llamada.
+- Historial cronológico de actividades.
+- Seguimientos y presentaciones programadas.
+- Búsqueda, filtros, notas, llamada, WhatsApp y exportación CSV.
 - Selección de referidos desde la agenda en navegadores compatibles, con carga manual como alternativa.
-- Estados: Nuevo, Contactado, Seguimiento, Presentación, Convertido y No interesado.
-- Búsqueda y filtros.
-- Notas y próximo contacto.
-- Llamada y WhatsApp.
-- Exportación CSV.
+- Cola de invitaciones privadas individuales para varios destinatarios.
 - Copia local y cola de cambios cuando no hay conexión.
 - Aislamiento mediante RLS por `user_id`.
 

@@ -143,10 +143,13 @@ test('permite elegir varios referidos desde la agenda sin duplicarlos', async ({
 test('Mi Encuesta y Mi Gestión usan la cuenta autenticada y guardan el seguimiento', async ({ page }) => {
   const nativeDialogs = [];
   const patches = [];
+  const activities = [];
   page.on('dialog', dialog => { nativeDialogs.push(dialog.type()); dialog.dismiss(); });
 
   const accessToken = tokenFor(USER_ID);
   const now = new Date().toISOString();
+  const invitationTokens = [LINK_TOKEN, '88888888-8888-4888-8888-888888888888', '77777777-7777-4777-8777-777777777777'];
+  let invitationIndex = 0;
   const profile = {
     user_id: USER_ID, username: null, dip: '02-9802014', sucursal: '02', numero_distribuidor: '9802014',
     nombre: 'María Pérez', rol: 'usuario', activo: true, debe_cambiar_password: false,
@@ -178,10 +181,18 @@ test('Mi Encuesta y Mi Gestión usan la cuenta autenticada y guardan el seguimie
     if (url.pathname === '/auth/v1/token') return route.fulfill({ status: 200, headers: cors, body: JSON.stringify({ access_token: accessToken, refresh_token: 'refresh', expires_in: 3600, user: { id: USER_ID } }) });
     if (url.pathname === '/rest/v1/appi_perfiles') return route.fulfill({ status: 200, headers: cors, body: JSON.stringify([profile]) });
     if (url.pathname === '/rest/v1/appi_datos' && request.method() === 'GET') return route.fulfill({ status: 200, headers: cors, body: '[]' });
-    if (url.pathname === '/rest/v1/rpc/appi_crear_invitacion_encuesta') return route.fulfill({ status: 200, headers: cors, body: JSON.stringify([{ token: LINK_TOKEN, expires_at: new Date(Date.now() + 86400000).toISOString() }]) });
+    if (url.pathname === '/rest/v1/rpc/appi_crear_invitacion_encuesta') {
+      const issued = invitationTokens[Math.min(invitationIndex++, invitationTokens.length - 1)];
+      return route.fulfill({ status: 200, headers: cors, body: JSON.stringify([{ token: issued, expires_at: new Date(Date.now() + 86400000).toISOString() }]) });
+    }
     if (url.pathname === '/rest/v1/appi_gestion_contactos' && request.method() === 'GET') return route.fulfill({ status: 200, headers: cors, body: JSON.stringify(contacts) });
     if (url.pathname === '/rest/v1/appi_gestion_contactos' && request.method() === 'PATCH') {
       patches.push(request.postDataJSON());
+      return route.fulfill({ status: 204, headers: { 'access-control-allow-origin': '*' }, body: '' });
+    }
+    if (url.pathname === '/rest/v1/appi_gestion_actividades' && request.method() === 'GET') return route.fulfill({ status: 200, headers: cors, body: JSON.stringify(activities) });
+    if (url.pathname === '/rest/v1/appi_gestion_actividades' && request.method() === 'POST') {
+      activities.push(request.postDataJSON());
       return route.fulfill({ status: 204, headers: { 'access-control-allow-origin': '*' }, body: '' });
     }
     if (url.pathname === '/rest/v1/appi_encuestas') return route.fulfill({ status: 200, headers: cors, body: JSON.stringify([{ id: SURVEY_ID, user_id: USER_ID, nombre: 'Persona Encuestada', telefono: '351 555 1234', respuestas: completeAnswers(), referidos: [], created_at: now }]) });
@@ -211,26 +222,55 @@ test('Mi Encuesta y Mi Gestión usan la cuenta autenticada y guardan el seguimie
   expect(friendlyMessage).not.toContain('Pérez');
   expect(friendlyMessage).not.toContain('APPI');
   expect(friendlyMessage).toContain(LINK_TOKEN);
+  await page.evaluate(() => { void APPIGestion.prepareBulk([{ nombre: 'Ana Uno', telefono: '3515551001' }, { nombre: 'Bruno Dos', telefono: '3515551002' }]); });
+  await expect(page.locator('.survey-bulk-item')).toHaveCount(2);
+  await expect(page.locator('.survey-bulk-item').first()).toContainText('Ana Uno');
+  await expect(page.locator('#appiDialogTitle')).toHaveText('Envíos preparados');
+  await page.locator('#appiDialogOk').click();
 
   await page.evaluate(() => openMiGestion());
   await expect(page.locator('#view-gestion')).toHaveClass(/active/);
+  await expect(page.locator('.gestion-main-tab')).toHaveCount(4);
   await expect(page.locator('.gestion-contact')).toHaveCount(2);
+  await expect(page.locator(`.gestion-contact[data-contact-id="${CONTACT_ID}"]`)).toHaveClass(/priority-high/);
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(390);
-  await expect(page.locator('.gestion-stat').nth(1).locator('b')).toHaveText('1');
-  await expect(page.locator('#gestionSidebarBadge')).toHaveText('1');
+  await expect(page.locator('.gestion-stat').first().locator('b')).toHaveText('1');
+  await expect(page.locator('#gestionSidebarBadge')).toHaveText('2');
+  await page.locator('[data-gestion-view="embudo"]').click();
+  await expect(page.locator('.gestion-funnel-stage')).toHaveCount(5);
+  await page.locator('[data-gestion-view="resultados"]').click();
+  await expect(page.locator('.gestion-result')).toHaveCount(7);
+  await page.locator('[data-gestion-view="hoy"]').click();
 
   await page.locator(`[data-open-contact="${CONTACT_ID}"]`).click();
   await expect(page.locator('#gestionDetailOverlay')).toBeVisible();
+  await expect(page.locator('.gestion-message-link')).toHaveCount(4);
+  await expect(page.locator('.gestion-timeline')).toContainText('Contacto creado');
   await page.locator('[data-detail-status="convertido"]').click();
   await page.locator('#gestionNotes').fill('Presentación realizada. Quiere avanzar.');
   await page.locator('#gestionNextDate').fill('2026-08-20');
   await page.locator('#gestionSaveContact').click();
 
-  await expect.poll(() => patches.length).toBe(1);
-  expect(patches[0]).toMatchObject({
+  await expect.poll(() => patches.length).toBeGreaterThanOrEqual(1);
+  const convertedPatch = patches.find(item => item.estado === 'convertido');
+  expect(convertedPatch).toMatchObject({
     estado: 'convertido',
     notas: 'Presentación realizada. Quiere avanzar.',
     proximo_contacto: '2026-08-20'
   });
+  await expect.poll(() => activities.length).toBeGreaterThanOrEqual(2);
+  expect(activities.map(item => item.tipo)).toContain('estado_cambiado');
+  expect(activities.map(item => item.tipo)).toContain('nota');
+
+  await page.evaluate(() => {
+    localStorage.setItem(`appi_gestion_resultado_pendiente_${APPIAuth.userId()}`, JSON.stringify({ contactId: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb', channel: 'whatsapp', at: Date.now() - 3000 }));
+    void APPIGestion.processPendingOutcome();
+  });
+  await expect(page.locator('#appiDialogTitle')).toHaveText('Resultado de WhatsApp');
+  await page.locator('#appiDialogChoices button', { hasText: 'No respondió' }).click();
+  await expect(page.locator('#appiDialogTitle')).toHaveText('No respondió');
+  await page.locator('#appiDialogChoices button', { hasText: 'Mañana' }).click();
+  await expect.poll(() => patches.some(item => item.estado === 'seguimiento' && item.proximo_contacto)).toBe(true);
+  await expect.poll(() => activities.some(item => item.tipo === 'resultado_contacto')).toBe(true);
   expect(nativeDialogs).toEqual([]);
 });

@@ -296,6 +296,33 @@ where proximo_contacto is not null;
 alter table public.appi_gestion_contactos enable row level security;
 grant select, insert, update, delete on public.appi_gestion_contactos to authenticated;
 
+-- Historial de acciones para que cada contacto tenga una línea de tiempo.
+create table if not exists public.appi_gestion_actividades (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  contacto_id uuid not null references public.appi_gestion_contactos(id) on delete cascade,
+  tipo text not null check (tipo in (
+    'encuesta_recibida','referido_recibido','contacto_creado',
+    'whatsapp_abierto','llamada_iniciada','resultado_contacto',
+    'estado_cambiado','nota','seguimiento_programado','presentacion_programada'
+  )),
+  detalle text not null default '',
+  metadata jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now(),
+  constraint appi_gestion_actividad_detalle_length check (char_length(detalle) <= 1000),
+  constraint appi_gestion_actividad_metadata_object check (jsonb_typeof(metadata) = 'object')
+);
+
+create index if not exists appi_gestion_actividades_contacto_idx
+on public.appi_gestion_actividades (contacto_id, created_at desc);
+
+create index if not exists appi_gestion_actividades_user_fecha_idx
+on public.appi_gestion_actividades (user_id, created_at desc);
+
+alter table public.appi_gestion_actividades enable row level security;
+grant select, insert, delete on public.appi_gestion_actividades to authenticated;
+revoke update on public.appi_gestion_actividades from anon, authenticated;
+
 -- ============================================================
 -- 5. Políticas por distribuidor
 -- ============================================================
@@ -364,6 +391,40 @@ using (
   or public.appi_es_admin()
 );
 
+drop policy if exists "appi_gestion_actividades_select_own" on public.appi_gestion_actividades;
+create policy "appi_gestion_actividades_select_own"
+on public.appi_gestion_actividades for select
+to authenticated
+using (
+  (auth.uid() = user_id and public.appi_cuenta_activa())
+  or public.appi_es_admin()
+);
+
+drop policy if exists "appi_gestion_actividades_insert_own" on public.appi_gestion_actividades;
+create policy "appi_gestion_actividades_insert_own"
+on public.appi_gestion_actividades for insert
+to authenticated
+with check (
+  (
+    auth.uid() = user_id
+    and public.appi_cuenta_activa()
+    and exists (
+      select 1 from public.appi_gestion_contactos c
+      where c.id = contacto_id and c.user_id = auth.uid()
+    )
+  )
+  or public.appi_es_admin()
+);
+
+drop policy if exists "appi_gestion_actividades_delete_own" on public.appi_gestion_actividades;
+create policy "appi_gestion_actividades_delete_own"
+on public.appi_gestion_actividades for delete
+to authenticated
+using (
+  (auth.uid() = user_id and public.appi_cuenta_activa())
+  or public.appi_es_admin()
+);
+
 -- ============================================================
 -- 6. Actualización automática de fechas
 -- ============================================================
@@ -405,6 +466,7 @@ declare
   invitation public.appi_encuesta_invitaciones%rowtype;
   owner_id uuid;
   response_id uuid;
+  contact_id uuid;
   person_name text;
   person_phone text;
   person_phone_norm text;
@@ -535,7 +597,11 @@ begin
     telefono = excluded.telefono,
     cantidad_origenes = public.appi_gestion_contactos.cantidad_origenes + 1,
     metadata = public.appi_gestion_contactos.metadata || excluded.metadata,
-    updated_at = now();
+    updated_at = now()
+  returning id into contact_id;
+
+  insert into public.appi_gestion_actividades (user_id, contacto_id, tipo, detalle, metadata)
+  values (owner_id, contact_id, 'encuesta_recibida', 'Respondió Mi Encuesta.', jsonb_build_object('encuesta_id',response_id));
   contact_count := contact_count + 1;
 
   for referral in select value from jsonb_array_elements(referrals_data)
@@ -577,7 +643,11 @@ begin
       referido_por = excluded.referido_por,
       cantidad_origenes = public.appi_gestion_contactos.cantidad_origenes + 1,
       metadata = public.appi_gestion_contactos.metadata || excluded.metadata,
-      updated_at = now();
+      updated_at = now()
+    returning id into contact_id;
+
+    insert into public.appi_gestion_actividades (user_id, contacto_id, tipo, detalle, metadata)
+    values (owner_id, contact_id, 'referido_recibido', 'Fue recomendado por ' || person_name || '.', jsonb_build_object('encuesta_id',response_id,'referido_por',person_name));
 
     referral_count := referral_count + 1;
     contact_count := contact_count + 1;
@@ -609,4 +679,5 @@ select
   to_regclass('public.appi_encuesta_links') is not null as links_anteriores_listos,
   to_regclass('public.appi_encuesta_invitaciones') is not null as invitaciones_privadas_listas,
   to_regclass('public.appi_encuestas') is not null as encuestas_listas,
-  to_regclass('public.appi_gestion_contactos') is not null as gestion_lista;
+  to_regclass('public.appi_gestion_contactos') is not null as gestion_lista,
+  to_regclass('public.appi_gestion_actividades') is not null as actividades_listas;

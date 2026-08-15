@@ -20,6 +20,7 @@ El script crea:
 - `appi_encuesta_invitaciones` — invitaciones privadas de 24 horas y un solo uso
 - `appi_encuestas`
 - `appi_gestion_contactos`
+- `appi_gestion_actividades` — historial de WhatsApp, llamadas, estados, notas y seguimientos
 - políticas RLS por distribuidor
 - índices y validaciones
 - un enlace para cada distribuidor existente
