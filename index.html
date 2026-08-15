@@ -32,6 +32,7 @@ window.openHistorico=function(){
 <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
 <link rel="manifest" href="./manifest.json" />
 <script src="./auth-config.js"></script>
+<script src="./appi-dialog.js"></script>
 <script src="./auth-client.js"></script>
 <script src="./data-sync.js"></script>
 <script src="./admin-panel.js"></script>
@@ -3489,7 +3490,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
     <button class="ds-btn" data-ds="view-planning" onclick="showView('view-planning'); renderPlanningTools();"><span>🗓️</span> Planificación</button>
   </nav>
-  <div class="ds-foot">APPI · v192 · Contraseña personal</div>
+  <div class="ds-foot">APPI · v193 · Membresías</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4091,7 +4092,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
   .admin-view{padding-bottom:42px}.admin-top{position:relative}.admin-top-lock{width:54px;height:54px;margin:0 auto 8px;border-radius:17px;display:grid;place-items:center;background:linear-gradient(135deg,#5b8def,#8b63e8);font-size:24px;box-shadow:0 10px 24px rgba(91,112,210,.23)}
   .admin-round-logout,.admin-round-password{position:absolute;top:4px;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font:900 18px inherit;cursor:pointer}.admin-round-logout{right:0;border:1px solid rgba(217,83,79,.16);background:rgba(217,83,79,.09);color:#c94750}.admin-round-password{right:48px;border:1px solid rgba(91,141,239,.16);background:rgba(91,141,239,.09);color:#3d63c9}.admin-round-logout:hover{background:rgba(217,83,79,.16)}.admin-round-password:hover{background:rgba(91,141,239,.16)}
   .admin-dashboard{max-width:940px;margin:auto}.admin-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}.admin-stat{padding:16px;border-radius:18px;text-align:center;background:rgba(255,255,255,.66);border:1px solid rgba(255,255,255,.82);box-shadow:0 7px 20px rgba(65,75,120,.07)}.admin-stat strong{display:block;color:#3d63c9;font-size:26px}.admin-stat span{display:block;margin-top:3px;color:#777887;font-size:10px;font-weight:850;text-transform:uppercase}.admin-stat.good strong{color:#168765}.admin-stat.warn strong{color:#c34c53}
-  .admin-card{padding:18px!important;margin-bottom:12px}.admin-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:15px}.admin-card-head h2{margin:0;color:#292938;font-size:17px}.admin-card-head p{margin:4px 0 0;color:#777887;font-size:11px}.admin-form-grid{display:grid;grid-template-columns:1fr 2fr;gap:10px}.admin-form-grid label{display:flex;flex-direction:column;gap:6px}.admin-form-grid label.wide{grid-column:1/-1}.admin-form-grid label>span{color:#666776;font-size:10px;font-weight:900;text-transform:uppercase}.admin-form-grid input{width:100%;min-height:45px;padding:11px 12px;border:1px solid rgba(80,90,130,.14);border-radius:13px;background:rgba(255,255,255,.76);color:#292938;font:inherit;font-size:13px;outline:none}.admin-form-grid input:focus{border-color:#5b8def;box-shadow:0 0 0 3px rgba(91,141,239,.1)}.admin-create-btn{width:100%;margin-top:13px;min-height:46px}.admin-inline-status{display:none;margin-top:10px;padding:10px 12px;border-radius:11px;background:rgba(58,208,164,.1);color:#168765;font-size:12px;font-weight:750}.admin-inline-status.show{display:block}.admin-inline-status.error{background:rgba(217,83,79,.1);color:#c34c53}
+  .admin-card{padding:18px!important;margin-bottom:12px}.admin-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:15px}.admin-card-head h2{margin:0;color:#292938;font-size:17px}.admin-card-head p{margin:4px 0 0;color:#777887;font-size:11px}.admin-form-grid{display:grid;grid-template-columns:1fr 2fr;gap:10px}.admin-form-grid label{display:flex;flex-direction:column;gap:6px}.admin-form-grid label.wide{grid-column:1/-1}.admin-form-grid label>span{color:#666776;font-size:10px;font-weight:900;text-transform:uppercase}.admin-form-grid input{width:100%;min-height:45px;padding:11px 12px;border:1px solid rgba(80,90,130,.14);border-radius:13px;background:rgba(255,255,255,.76);color:#292938;font:inherit;font-size:13px;outline:none}.admin-form-grid input:focus{border-color:#5b8def;box-shadow:0 0 0 3px rgba(91,141,239,.1)}.admin-membership-label{grid-column:1/-1;color:#666776;font-size:10px;font-weight:900;text-transform:uppercase}.admin-membership-pills{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.admin-membership-pills button{min-height:42px;border:1px solid rgba(91,141,239,.15);border-radius:12px;background:rgba(91,141,239,.07);color:#3d63c9;font:inherit;font-size:11px;font-weight:900;cursor:pointer}.admin-membership-pills button.active{background:linear-gradient(135deg,#5b8def,#8b63e8);color:#fff;box-shadow:0 6px 15px rgba(91,112,210,.2)}.membership-state{display:inline-block;margin-left:6px;padding:4px 7px;border-radius:999px;background:rgba(91,141,239,.1);color:#3d63c9;font-size:8px;font-weight:900}.membership-state.soon{background:rgba(245,179,1,.14);color:#a3670b}.membership-state.expired{background:rgba(217,83,79,.12);color:#c34c53}.admin-create-btn{width:100%;margin-top:13px;min-height:46px}.admin-inline-status{display:none;margin-top:10px;padding:10px 12px;border-radius:11px;background:rgba(58,208,164,.1);color:#168765;font-size:12px;font-weight:750}.admin-inline-status.show{display:block}.admin-inline-status.error{background:rgba(217,83,79,.1);color:#c34c53}
   .admin-user-list{display:grid;gap:8px;margin-top:12px}.admin-user-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;padding:13px;border-radius:15px;background:rgba(255,255,255,.62);border:1px solid rgba(80,90,130,.08)}.admin-user-row h3{margin:0;color:#292938;font-size:13px}.admin-user-row p{margin:4px 0 0;color:#777887;font-size:10px}.admin-user-badge{display:inline-block;margin-top:6px;padding:4px 7px;border-radius:999px;background:rgba(58,208,164,.12);color:#168765;font-size:8px;font-weight:900}.admin-user-badge.blocked{background:rgba(217,83,79,.11);color:#c34c53}.admin-row-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.admin-row-actions button{min-height:34px;padding:7px 9px;border:0;border-radius:10px;background:rgba(91,141,239,.1);color:#3d63c9;font:inherit;font-size:10px;font-weight:850;cursor:pointer}.admin-row-actions button.danger{background:rgba(217,83,79,.1);color:#c34c53}.admin-row-actions button.good{background:rgba(58,208,164,.1);color:#168765}.admin-row-actions button.wa{background:rgba(37,211,102,.12);color:#128c7e}
   .admin-setting-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:9px}.admin-setting-row input{min-height:45px;padding:11px 12px;border:1px solid rgba(80,90,130,.14);border-radius:13px;background:rgba(255,255,255,.76);font:inherit}.admin-setting-row button{min-width:135px}.admin-pending-list{display:grid;gap:8px}.admin-pending-empty{padding:18px;text-align:center;color:#777887;font-size:12px}
   body.dark .admin-stat,body.dark .admin-user-row{background:rgba(31,32,49,.74);border-color:rgba(255,255,255,.08)}body.dark .admin-card-head h2,body.dark .admin-user-row h3{color:#f1f1f6}body.dark .admin-form-grid input{background:rgba(31,32,49,.8);border-color:rgba(255,255,255,.1);color:#f1f1f6}body.dark .admin-form-grid label>span{color:#b7b8c4}
@@ -4131,6 +4132,8 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
           <label><span>Número de distribuidor</span><input id="adminNumero" inputmode="numeric" maxlength="12" placeholder="9802014" autocomplete="off"></label>
           <label class="wide"><span>Nombre</span><input id="adminNombre" maxlength="120" placeholder="Nombre y apellido" autocomplete="off"></label>
           <label class="wide"><span>Contraseña temporal</span><input id="adminTempPassword" type="text" maxlength="80" placeholder="Generá o escribí una contraseña" autocomplete="new-password"></label>
+          <div class="admin-membership-label">Membresía inicial</div>
+          <div class="admin-membership-pills" id="adminCreateMembership"><button type="button" class="active" data-create-membership="1">1 mes</button><button type="button" data-create-membership="3">3 meses</button><button type="button" data-create-membership="6">6 meses</button></div>
         </div>
         <button type="button" class="btn btn-primary admin-create-btn" id="adminCreateUser">Crear cuenta</button>
         <div class="admin-inline-status" id="adminCreateStatus" role="status"></div>
@@ -8633,7 +8636,7 @@ function renderSeguimiento(){
 function editarSeguimiento(id){ const p=cargarSeguimientos().find(x=>x.id===id); if(!p) return; seguimientoEditId=id; document.getElementById('segNombre').value=capitalizarNombreSeg(p.nombre); document.getElementById('segTelefono').value=p.telefono||''; document.getElementById('segInteres').value=p.interes==='Ambas'?'Ambas cosas':(p.interes||'Producto'); const estados={ 'Sin contactar':'No contactado','Presentación realizada':'Seguimiento','Demostración realizada':'Seguimiento','Seguimiento pendiente':'Seguimiento','Cliente':'Contactado','Invitado':'Más adelante','No interesado':'No le interesa' }; document.getElementById('segEstado').value=estados[p.estado]||p.estado||'No contactado'; document.getElementById('segFecha').value=p.fecha||''; document.getElementById('segNotas').value=p.notas||''; document.getElementById('seguimientoFormTitle').textContent='Editar persona'; document.getElementById('seguimientoForm').style.display='block'; window.scrollTo({top:0,behavior:'smooth'}); }
 function actualizarSeguimiento(id,estado){ const a=cargarSeguimientos(); const p=a.find(x=>x.id===id); if(p){p.estado=estado; guardarSeguimientos(a); renderSeguimiento(); renderHomeCompleto(); showToast('Seguimiento actualizado ✅',1800);} }
 function guardarNotaSeg(id,nota){ const a=cargarSeguimientos(); const p=a.find(x=>x.id===id); if(p){p.notas=nota.trim(); guardarSeguimientos(a); showToast('Nota guardada ✅',1400);} }
-function eliminarSeguimiento(id){ if(!confirm('¿Eliminar esta persona?')) return; guardarSeguimientos(cargarSeguimientos().filter(p=>p.id!==id)); renderSeguimiento(); renderHomeCompleto(); }
+async function eliminarSeguimiento(id){ if(!await window.APPIDialog.confirm('Se eliminará esta persona del seguimiento.',{title:'Eliminar persona',icon:'🗑️',okText:'Eliminar',danger:true})) return; guardarSeguimientos(cargarSeguimientos().filter(p=>p.id!==id)); renderSeguimiento(); renderHomeCompleto(); }
 
 document.getElementById('segNombre').addEventListener('input',e=>{ const pos=e.target.selectionStart; e.target.value=capitalizarNombreSeg(e.target.value); try{e.target.setSelectionRange(pos,pos)}catch(err){} });
 document.getElementById('btnNuevoSeguimiento').addEventListener('click',()=>{ limpiarFormularioSeg(); document.getElementById('seguimientoFormTitle').textContent='Nueva persona'; document.getElementById('seguimientoForm').style.display='block'; document.getElementById('segNombre').focus(); });
@@ -8850,7 +8853,7 @@ function openGrabadora(){
   if(document.getElementById('view-grabadora')){
     showView('view-grabadora');
   }else{
-    window.open('./grabadora_ia.html','_blank');
+    window.APPIDialog.alert('La grabadora no está disponible en esta versión.',{title:'Grabadora',icon:'🎙️'});
   }
 }
 async function compartirConsolidado(e){
@@ -9494,6 +9497,8 @@ function mostrarPantallaLoginDistribuidor(reason=''){
   }else{
     if(button)button.disabled=false;
     if(reason==='account_disabled')mostrarErrorLogin('Esta cuenta está desactivada. Contactá al administrador.');
+    else if(reason==='membership_expired')mostrarErrorLogin('Tu membresía de APPI venció. Contactá a POPUPS para renovarla.');
+    else if(reason==='membership_missing')mostrarErrorLogin('Tu cuenta todavía no tiene una membresía activa. Contactá a POPUPS.');
     else if(reason==='offline_expired')mostrarErrorLogin('Pasaron más de 7 días sin validar la cuenta. Conectate a internet para volver a ingresar.');
     else mostrarErrorLogin('');
   }
@@ -9615,6 +9620,13 @@ function mostrarPantallaBloqueo() {
   });
 }
 
+function avisarMembresiaUsuario(){
+  const profile=window.APPIAuth&&window.APPIAuth.currentProfile?window.APPIAuth.currentProfile():null;if(!profile||profile.rol==='admin'||!profile.membresia_vence)return;
+  const days=Math.max(0,Math.ceil((new Date(profile.membresia_vence).getTime()-Date.now())/86400000));if(days>7)return;
+  const today=new Date().toISOString().slice(0,10),key=`appi_membresia_aviso_${profile.user_id}_${today}`;if(localStorage.getItem(key))return;localStorage.setItem(key,'1');
+  window.APPIDialog.alert(days===0?'Tu membresía vence hoy.':`Tu membresía de APPI vence en ${days} día${days===1?'':'s'}.`,{title:'Membresía por vencer',icon:'⏳',okText:'Entendido'});
+}
+
 // Inicia la app normalmente
 function iniciarApp() {
   const profile=window.APPIAuth&&window.APPIAuth.isEnabled()?window.APPIAuth.currentProfile():null;
@@ -9626,6 +9638,7 @@ function iniciarApp() {
     showView('view-home');
     if(window.initHistoricoAPPI)setTimeout(()=>window.initHistoricoAPPI(),0);
     if(typeof mostrarTutorialSiNuevo==='function')setTimeout(mostrarTutorialSiNuevo,700);
+    setTimeout(avisarMembresiaUsuario,1000);
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',actualizarCuentaUI,{once:true});
   else actualizarCuentaUI();
@@ -9768,7 +9781,7 @@ function actualizarCuentaUI(){
 }
 async function cerrarSesionSeguraAPPI(){
   try{cerrarToolsMenu()}catch(e){}
-  if(!confirm('¿Cerrar sesión y borrar los datos locales de esta cuenta en este dispositivo? Los datos sincronizados seguirán seguros en la nube.'))return;
+  if(!await window.APPIDialog.confirm('Se cerrará la sesión y se borrarán los datos locales de esta cuenta. Los datos sincronizados seguirán seguros en la nube.',{title:'Cerrar sesión',icon:'↪',okText:'Cerrar sesión'}))return;
   try{await window.APPIDataSync.logoutAndLock({removeCache:true});location.reload()}
   catch(error){showToast(error.message||'No se pudo cerrar la sesión',3600)}
 }
@@ -9819,8 +9832,8 @@ function abrirCuentaDesdeMenu(){
     const sync=document.getElementById('btnAccountSync'),password=document.getElementById('btnAccountPassword'),logout=document.getElementById('btnAccountLogout'),erase=document.getElementById('btnAccountLogoutErase');
     if(sync)sync.onclick=async()=>{sync.disabled=true;sync.textContent='Sincronizando…';try{await window.APPIDataSync.syncNow(true);showToast('Cuenta sincronizada ☁️',2200);modal.close()}catch(error){showToast(error.message||'No se pudo sincronizar',3500);sync.disabled=false;sync.textContent='☁️ Sincronizar ahora'}};
     if(password)password.onclick=abrirCambioPasswordAPPI;
-    if(logout)logout.onclick=async()=>{if(!confirm('¿Cerrar sesión en este dispositivo?'))return;logout.disabled=true;try{await window.APPIDataSync.logoutAndLock({removeCache:false});location.reload()}catch(error){showToast(error.message,3500);logout.disabled=false}};
-    if(erase)erase.onclick=async()=>{if(!confirm('Se sincronizarán los datos y después se borrará la copia local, incluidos los audios de esta cuenta en este dispositivo. ¿Continuar?'))return;erase.disabled=true;try{await window.APPIDataSync.logoutAndLock({removeCache:true});location.reload()}catch(error){showToast(error.message,3800);erase.disabled=false}};
+    if(logout)logout.onclick=async()=>{if(!await window.APPIDialog.confirm('¿Cerrar sesión en este dispositivo?',{title:'Cerrar sesión',icon:'↪',okText:'Cerrar sesión'}))return;logout.disabled=true;try{await window.APPIDataSync.logoutAndLock({removeCache:false});location.reload()}catch(error){showToast(error.message,3500);logout.disabled=false}};
+    if(erase)erase.onclick=async()=>{if(!await window.APPIDialog.confirm('Se sincronizarán los datos y después se borrará la copia local, incluidos los audios de esta cuenta.',{title:'Borrar copia del dispositivo',icon:'🗑️',okText:'Sincronizar y borrar',danger:true}))return;erase.disabled=true;try{await window.APPIDataSync.logoutAndLock({removeCache:true});location.reload()}catch(error){showToast(error.message,3800);erase.disabled=false}};
   },80);
 }
 
@@ -10048,7 +10061,7 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./service-worker.js?v=192').catch(error => {
+      navigator.serviceWorker.register('./service-worker.js?v=193').catch(error => {
         console.warn('No se pudo registrar el modo offline de APPI', error);
       });
     });
@@ -12029,11 +12042,11 @@ async function hydratePlayers(list){for(const record of list){const wrap=el(`aud
 window.loadRecGrab=async id=>{const record=listaGrabaciones().find(item=>Number(item.id)===Number(id));if(!record)return;window._lastRecordingId=Number(id);const tr=el('transcript');if(tr)tr.value=record.transcript||'';setBadge('transcriptBadge',record.transcript?'Lista':'Pendiente',record.transcript?'done':'');if(record.summaryData)showSummary(record.summaryData);else if(record.summary)showSummary(record.summary);else resetSummary();const summaryButton=el('btnSummarize');if(summaryButton)summaryButton.disabled=(record.transcript||'').trim().length<20;try{const blob=await obtenerAudioBlob(id);if(blob){window._lastBlobUniversal=blob;setCurrentPlayer(blob);el('btnTranscribe').disabled=false}}catch(e){}setStep(record.summaryData||record.summary?3:record.transcript?2:1,record.summaryData||record.summary?'done':record.transcript?'done':'active');showStatus('Grabación abierta.','ok')};
 window.transcribeRecGrab=async id=>{try{const blob=await obtenerAudioBlob(id);if(!blob){showStatus('Esta grabación no tiene audio.','warn');return}window._lastBlobUniversal=blob;window._lastRecordingId=Number(id);setCurrentPlayer(blob);setBadge('transcriptBadge','Transcribiendo','working');setStep(2,'active');await window.transcribeUniversal?.(blob,Number(id))}catch(error){showStatus('No pude abrir el audio.','error')}};
 window.downloadRecGrab=async id=>{try{const blob=await obtenerAudioBlob(id);if(!blob)return;const ext=blob.type.includes('mp4')?'m4a':blob.type.includes('ogg')?'ogg':'webm',url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;const rec=listaGrabaciones().find(item=>Number(item.id)===Number(id));a.download=`${recSafeName(recTitle(rec||{date:'grabacion',name:''}))||('grabacion_'+id)}.${ext}`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1200)}catch(error){showStatus('No pude descargar el audio.','error')}};
-window.deleteRecGrab=async id=>{if(!confirm('¿Borrar esta grabación?'))return;guardarListaGrabaciones(listaGrabaciones().filter(item=>Number(item.id)!==Number(id)));try{await eliminarAudioBlob(id)}catch(e){}if(Number(window._lastRecordingId)===Number(id)){resetWorkspace();el('currentAudioWrap').hidden=true}renderList();showStatus('Grabación borrada.','ok')};
+window.deleteRecGrab=async id=>{if(!await window.APPIDialog.confirm('La grabación se eliminará de este dispositivo.',{title:'Borrar grabación',icon:'🎙️',okText:'Borrar',danger:true}))return;guardarListaGrabaciones(listaGrabaciones().filter(item=>Number(item.id)!==Number(id)));try{await eliminarAudioBlob(id)}catch(e){}if(Number(window._lastRecordingId)===Number(id)){resetWorkspace();el('currentAudioWrap').hidden=true}renderList();showStatus('Grabación borrada.','ok')};
 window.finishGrabadoraTranscription=(id,text)=>{const cleaned=String(text||'').trim(),list=listaGrabaciones(),record=list.find(item=>Number(item.id)===Number(id));if(record){record.transcript=cleaned;record.transcribing=false;record.transcriptionError='';record.summary='';record.summaryData=null;guardarListaGrabaciones(list)}if(Number(window._lastRecordingId)===Number(id)){const tr=el('transcript');if(tr)tr.value=cleaned;setBadge('transcriptBadge','Lista','done');el('btnSummarize').disabled=cleaned.length<20;setStep(2,'done')}renderList();if(cleaned.length>=20)setTimeout(()=>generateSummary(id),180)};
 window.failGrabadoraTranscription=(id,message)=>{const list=listaGrabaciones(),record=list.find(item=>Number(item.id)===Number(id));if(record){record.transcribing=false;record.transcriptionError=message;guardarListaGrabaciones(list)}if(Number(window._lastRecordingId)===Number(id)){setBadge('transcriptBadge','Reintentar','error');setStep(2,'active')}renderList();showStatus(message||'No pude transcribir el audio. Podés reintentar.','error',true)};
 window.updateGrabadoraTranscript=window.finishGrabadoraTranscription;window.markGrabadoraTranscriptionDone=id=>{const record=listaGrabaciones().find(item=>Number(item.id)===Number(id));if(record?.transcribing)window.failGrabadoraTranscription(id,'La transcripción no pudo completarse. Tocá Transcribir para reintentar.')};window.getGrabadoraAudioBlob=obtenerAudioBlob;window.saveGrabadoraAudioBlob=guardarAudioBlob;window.clearGrabadoraAudios=limpiarAudios;window.renderGrabadoraList=renderList;
-function initGrabadora(){const record=el('btnRecord'),pause=el('btnPause'),stop=el('btnStop'),mic=el('recVisual');if(record)record.onclick=startRecording;if(mic)mic.onclick=()=>{if(!isRecording)startRecording()};if(pause)pause.onclick=pauseRecording;if(stop)stop.onclick=stopRecording;const clearAll=el('btnClearAll');if(clearAll)clearAll.onclick=async()=>{if(!confirm('¿Borrar todas las grabaciones?'))return;localStorage.removeItem('grabadora_reuniones_light');try{await limpiarAudios()}catch(e){}resetWorkspace();const wrap=el('currentAudioWrap');if(wrap)wrap.hidden=true;renderList();showStatus('Se borraron todas las grabaciones.','ok')};updateRecordControls('idle');renderList()}
+function initGrabadora(){const record=el('btnRecord'),pause=el('btnPause'),stop=el('btnStop'),mic=el('recVisual');if(record)record.onclick=startRecording;if(mic)mic.onclick=()=>{if(!isRecording)startRecording()};if(pause)pause.onclick=pauseRecording;if(stop)stop.onclick=stopRecording;const clearAll=el('btnClearAll');if(clearAll)clearAll.onclick=async()=>{if(!await window.APPIDialog.confirm('Se borrarán todas las grabaciones de este dispositivo.',{title:'Borrar grabaciones',icon:'🎙️',okText:'Borrar todo',danger:true}))return;localStorage.removeItem('grabadora_reuniones_light');try{await limpiarAudios()}catch(e){}resetWorkspace();const wrap=el('currentAudioWrap');if(wrap)wrap.hidden=true;renderList();showStatus('Se borraron todas las grabaciones.','ok')};updateRecordControls('idle');renderList()}
 window.addEventListener('beforeunload',event=>{if(isRecording){event.preventDefault();event.returnValue=''}});document.addEventListener('DOMContentLoaded',initGrabadora);setTimeout(initGrabadora,900);
 })();
 
@@ -12137,8 +12150,8 @@ window.confirmKeepColor=function(){
 
 window.editKeep=function(id){ window.openKeepModal(id); };
 window.openKeepModal=function(id){ openKeepModal(id); };
-window.delKeep=function(id){
-  if(!confirm('¿Borrar nota?')) return;
+window.delKeep=async function(id){
+  if(!await window.APPIDialog.confirm('La nota se eliminará definitivamente.',{title:'Borrar nota',icon:'📝',okText:'Borrar',danger:true})) return;
   let notas=loadNotas();
   notas=notas.filter(x=>x.id!==id);
   saveNotas(notas); renderKeep();
@@ -13082,8 +13095,8 @@ function initUsuarios(){
   }
 
   const btnClear=document.getElementById('usuariosBtnClear');
-  if(btnClear) btnClear.onclick=()=>{
-    if(confirm('¿Borrar lista de usuarios cargados?')){
+  if(btnClear) btnClear.onclick=async()=>{
+    if(await window.APPIDialog.confirm('Se borrará la lista de usuarios cargada en este dispositivo.',{title:'Limpiar lista',icon:'🗑️',okText:'Borrar',danger:true})){
       try{ localStorage.removeItem('usuarios_garantias'); }catch(_){}
       usuariosU=[]; filtradosU=[];
       const dash=document.getElementById('usuariosDashboard');
@@ -13492,7 +13505,7 @@ async function saveMonthPeriod(id){
     await hydrateDraftFromSaved(draft);
     if(!draft.parsed.equipo||!draft.parsed.garantias||!draft.parsed.ingresos){toast(`Falta completar ${MONTHS_H[draft.month]}`,2600);render();return}
     const reportPeriod=draft.parsed.ingresos.result.periodo;if(reportPeriod&&reportPeriod!==draft.id){toast(`Ingresos corresponde a ${reportPeriod}, no a ${draft.id}`,3600);render();return}
-    if(existing&&!confirm(`${MONTHS_H[draft.month]} ${draft.year} ya está guardado. ¿Querés actualizar ese cierre?`)){render();return}
+    if(existing&&!await window.APPIDialog.confirm(`${MONTHS_H[draft.month]} ${draft.year} ya está guardado.`,{title:'Actualizar cierre',icon:'📈',okText:'Actualizar'})){render();return}
     const record=await buildPeriodRecord(draft),db=await openDB();
     await new Promise((resolve,reject)=>{const tx=db.transaction(['periods','files'],'readwrite');tx.objectStore('periods').put(record);for(const type of Object.keys(FILE_TYPES)){const file=draft.files[type];tx.objectStore('files').put({key:`${record.id}:${type}`,periodId:record.id,type,name:file.name,size:file.size,mime:file.type||'',lastModified:file.lastModified||0,blob:file})}tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)});
     delete H.uploads[id];await refreshData();H.selected=new Set(H.periods.slice(-Math.min(2,H.periods.length)).map(p=>p.id));render();toast(`✓ ${record.label} guardado`,2400);try{haptic(20)}catch(e){}
@@ -13723,7 +13736,7 @@ function bindPeriodRows(root){
     if(action==='analyze'){H.selected=new Set([id]);H.openMenu='';openTab('analizar')}
     else if(['equipo','garantias','ingresos'].includes(action))await downloadOriginal(id,action);
     else if(action==='zip')await exportPeriodZip(id);
-    else if(action==='delete'&&confirm(`¿Eliminar ${H.periods.find(p=>p.id===id)?.label||id} y sus tres archivos?`)){await deletePeriod(id);H.openMenu='';render();toast('Cierre eliminado')}
+    else if(action==='delete'&&await window.APPIDialog.confirm(`Se eliminarán ${H.periods.find(p=>p.id===id)?.label||id} y sus tres archivos.`,{title:'Eliminar cierre',icon:'📈',okText:'Eliminar',danger:true})){await deletePeriod(id);H.openMenu='';render();toast('Cierre eliminado')}
   }));
 }
 async function downloadOriginal(id,type){
@@ -13833,7 +13846,7 @@ async function exportAllZip(){
 async function exportPeriodZip(id){const p=H.periods.find(x=>x.id===id);if(!p)return;try{await makeBackupZip([p],`APPI_cierre_${id}.zip`);toast('ZIP del mes descargado')}catch(e){toast(e.message,3000)}}
 async function restoreBackup(file){
   if(!file)return;toast('Revisando backup…',1800);
-  try{const zip=await JSZip.loadAsync(file),entry=zip.file('historico.json');if(!entry)throw new Error('El ZIP no contiene historico.json');const data=JSON.parse(await entry.async('string'));if(data.format!=='APPI-HISTORICO'||!Array.isArray(data.periods))throw new Error('El backup no pertenece al Histórico de APPI.');if(!confirm(`Se restaurarán ${data.periods.length} cierres. Los meses coincidentes serán reemplazados. ¿Continuar?`))return;
+  try{const zip=await JSZip.loadAsync(file),entry=zip.file('historico.json');if(!entry)throw new Error('El ZIP no contiene historico.json');const data=JSON.parse(await entry.async('string'));if(data.format!=='APPI-HISTORICO'||!Array.isArray(data.periods))throw new Error('El backup no pertenece al Histórico de APPI.');if(!await window.APPIDialog.confirm(`Se restaurarán ${data.periods.length} cierres. Los meses coincidentes serán reemplazados.`,{title:'Restaurar backup',icon:'📦',okText:'Restaurar'}))return;
     const db=await openDB();for(const p of data.periods)await dbPut('periods',p);for(const r of data.reports||[])await dbPut('reports',r);for(const meta of data.files||[]){const zf=zip.file(meta.path);if(!zf)continue;const blob=await zf.async('blob');await dbPut('files',{...meta,blob})}await refreshData();render();toast(`${data.periods.length} cierres restaurados`,2600)
   }catch(e){console.error('Restaurar histórico',e);toast(`No se pudo restaurar: ${e.message}`,3500)}finally{$('histRestoreInput').value=''}
 }

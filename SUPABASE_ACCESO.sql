@@ -11,6 +11,9 @@ create table if not exists public.appi_perfiles (
   rol text not null default 'usuario' check (rol in ('usuario','admin')),
   activo boolean not null default true,
   debe_cambiar_password boolean not null default false,
+  membresia_meses integer check (membresia_meses is null or membresia_meses in (1,3,6)),
+  membresia_inicio timestamptz,
+  membresia_vence timestamptz,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -18,6 +21,9 @@ create table if not exists public.appi_perfiles (
 -- Compatibilidad para proyectos que ejecutaron una versión anterior del instalador.
 alter table public.appi_perfiles add column if not exists username text;
 alter table public.appi_perfiles add column if not exists debe_cambiar_password boolean not null default false;
+alter table public.appi_perfiles add column if not exists membresia_meses integer;
+alter table public.appi_perfiles add column if not exists membresia_inicio timestamptz;
+alter table public.appi_perfiles add column if not exists membresia_vence timestamptz;
 alter table public.appi_perfiles add column if not exists sucursal text;
 alter table public.appi_perfiles add column if not exists numero_distribuidor text;
 alter table public.appi_perfiles alter column dip drop not null;
@@ -67,7 +73,12 @@ set search_path = public
 as $$
   select exists (
     select 1 from public.appi_perfiles
-    where user_id = auth.uid() and activo = true
+    where user_id = auth.uid()
+      and activo = true
+      and (
+        rol = 'admin'
+        or (membresia_vence is not null and membresia_vence > now())
+      )
   );
 $$;
 

@@ -95,7 +95,7 @@ on public.historico_periodos (user_id, updated_at desc);
 -- ============================================================
 
 
--- 2. Acceso por distribuidor y sincronización por cuenta
+-- 2. Acceso, cuentas y sincronización
 
 
 -- ============================================================
@@ -111,12 +111,20 @@ create table if not exists public.appi_perfiles (
   nombre text not null default '',
   rol text not null default 'usuario' check (rol in ('usuario','admin')),
   activo boolean not null default true,
+  debe_cambiar_password boolean not null default false,
+  membresia_meses integer check (membresia_meses is null or membresia_meses in (1,3,6)),
+  membresia_inicio timestamptz,
+  membresia_vence timestamptz,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
 
 -- Compatibilidad para proyectos que ejecutaron una versión anterior del instalador.
 alter table public.appi_perfiles add column if not exists username text;
+alter table public.appi_perfiles add column if not exists debe_cambiar_password boolean not null default false;
+alter table public.appi_perfiles add column if not exists membresia_meses integer;
+alter table public.appi_perfiles add column if not exists membresia_inicio timestamptz;
+alter table public.appi_perfiles add column if not exists membresia_vence timestamptz;
 alter table public.appi_perfiles add column if not exists sucursal text;
 alter table public.appi_perfiles add column if not exists numero_distribuidor text;
 alter table public.appi_perfiles alter column dip drop not null;
@@ -166,12 +174,31 @@ set search_path = public
 as $$
   select exists (
     select 1 from public.appi_perfiles
-    where user_id = auth.uid() and activo = true
+    where user_id = auth.uid()
+      and activo = true
+      and (
+        rol = 'admin'
+        or (membresia_vence is not null and membresia_vence > now())
+      )
   );
 $$;
 
 revoke all on function public.appi_cuenta_activa() from public;
 grant execute on function public.appi_cuenta_activa() to authenticated;
+
+create or replace function public.appi_confirmar_cambio_password()
+returns void
+language sql
+security definer
+set search_path = public
+as $$
+  update public.appi_perfiles
+  set debe_cambiar_password = false, updated_at = now()
+  where user_id = auth.uid();
+$$;
+
+revoke all on function public.appi_confirmar_cambio_password() from public;
+grant execute on function public.appi_confirmar_cambio_password() to authenticated;
 
 create table if not exists public.appi_datos (
   user_id uuid not null references auth.users(id) on delete cascade,
@@ -312,7 +339,63 @@ for each row execute function public.appi_touch_updated_at();
 -- ============================================================
 
 
--- 3. Verificación final
+-- 3. Solicitudes y WhatsApp
+
+
+-- ============================================================
+-- APPI · Solicitudes públicas de cuenta y configuración de WhatsApp
+
+create table if not exists public.appi_configuracion (
+  config_key text primary key,
+  config_value jsonb not null default '{}'::jsonb,
+  updated_at timestamptz not null default now()
+);
+
+alter table public.appi_configuracion enable row level security;
+revoke all on public.appi_configuracion from anon, authenticated;
+
+insert into public.appi_configuracion (config_key, config_value)
+values ('whatsapp_soporte', jsonb_build_object('numero', '5493515638843'))
+on conflict (config_key) do nothing;
+
+create table if not exists public.appi_solicitudes (
+  id uuid primary key default gen_random_uuid(),
+  nombre text not null,
+  dip text not null,
+  sucursal text not null,
+  numero_distribuidor text not null,
+  telefono text not null,
+  estado text not null default 'pendiente' check (estado in ('pendiente','aprobada','rechazada')),
+  created_at timestamptz not null default now(),
+  reviewed_at timestamptz,
+  reviewed_by uuid references auth.users(id) on delete set null,
+  constraint appi_solicitud_nombre check (char_length(nombre) between 3 and 120),
+  constraint appi_solicitud_sucursal check (sucursal ~ '^[0-9]{2}$'),
+  constraint appi_solicitud_numero check (numero_distribuidor ~ '^[0-9]{1,12}$'),
+  constraint appi_solicitud_dip check (dip = sucursal || '-' || numero_distribuidor),
+  constraint appi_solicitud_telefono check (telefono ~ '^[0-9]{8,15}$')
+);
+
+alter table public.appi_solicitudes enable row level security;
+revoke all on public.appi_solicitudes from anon, authenticated;
+
+create index if not exists appi_solicitudes_estado_fecha_idx
+on public.appi_solicitudes (estado, created_at desc);
+
+create unique index if not exists appi_solicitud_pendiente_dip_idx
+on public.appi_solicitudes (dip)
+where estado = 'pendiente';
+
+select
+  'Solicitudes y WhatsApp configurados' as resultado,
+  to_regclass('public.appi_solicitudes') is not null as solicitudes_listas,
+  to_regclass('public.appi_configuracion') is not null as configuracion_lista;
+
+
+-- ============================================================
+
+
+-- 4. Verificación final
 
 
 -- ============================================================
@@ -320,4 +403,5 @@ select
   'APPI instalada correctamente' as resultado,
   to_regclass('public.historico_periodos') is not null as historico_listo,
   to_regclass('public.appi_perfiles') is not null as perfiles_listos,
-  to_regclass('public.appi_datos') is not null as datos_listos;
+  to_regclass('public.appi_datos') is not null as datos_listos,
+  to_regclass('public.appi_solicitudes') is not null as solicitudes_listas;

@@ -109,11 +109,17 @@ async function request(path,options={},token=''){
 async function fetchProfile(session){
   const payload=jwtPayload(session&&session.access_token);
   if(!payload||!payload.sub)throw authError('La sesión recibida no es válida.','invalid_session');
-  const query=`/rest/v1/appi_perfiles?select=user_id,username,dip,sucursal,numero_distribuidor,nombre,rol,activo,debe_cambiar_password&user_id=eq.${encodeURIComponent(payload.sub)}&limit=1`;
+  const query=`/rest/v1/appi_perfiles?select=user_id,username,dip,sucursal,numero_distribuidor,nombre,rol,activo,debe_cambiar_password,membresia_meses,membresia_inicio,membresia_vence&user_id=eq.${encodeURIComponent(payload.sub)}&limit=1`;
   const rows=await request(query,{headers:{Accept:'application/json'}},session.access_token);
   const profile=Array.isArray(rows)?rows[0]:null;
   if(!profile)throw authError('La cuenta no tiene un perfil de distribuidor.','profile_missing',403);
   if(profile.activo===false)throw authError('Esta cuenta está desactivada. Contactá al administrador.','account_disabled',403);
+  if(profile.rol!=='admin'){
+    const expires=profile.membresia_vence?new Date(profile.membresia_vence).getTime():0;
+    if(!expires)throw authError('Tu cuenta todavía no tiene una membresía activa. Contactá a POPUPS.','membership_missing',403);
+    if(expires<=Date.now())throw authError('Tu membresía de APPI venció. Contactá a POPUPS para renovarla.','membership_expired',403);
+    profile.membresia_dias_restantes=Math.max(0,Math.ceil((expires-Date.now())/86400000));
+  }
   return profile;
 }
 function normalizeSession(data){

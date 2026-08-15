@@ -266,7 +266,7 @@ async function saveMonthPeriod(id){
     await hydrateDraftFromSaved(draft);
     if(!draft.parsed.equipo||!draft.parsed.garantias||!draft.parsed.ingresos){toast(`Falta completar ${MONTHS_H[draft.month]}`,2600);render();return}
     const reportPeriod=draft.parsed.ingresos.result.periodo;if(reportPeriod&&reportPeriod!==draft.id){toast(`Ingresos corresponde a ${reportPeriod}, no a ${draft.id}`,3600);render();return}
-    if(existing&&!confirm(`${MONTHS_H[draft.month]} ${draft.year} ya está guardado. ¿Querés actualizar ese cierre?`)){render();return}
+    if(existing&&!await window.APPIDialog.confirm(`${MONTHS_H[draft.month]} ${draft.year} ya está guardado.`,{title:'Actualizar cierre',icon:'📈',okText:'Actualizar'})){render();return}
     const record=await buildPeriodRecord(draft),db=await openDB();
     await new Promise((resolve,reject)=>{const tx=db.transaction(['periods','files'],'readwrite');tx.objectStore('periods').put(record);for(const type of Object.keys(FILE_TYPES)){const file=draft.files[type];tx.objectStore('files').put({key:`${record.id}:${type}`,periodId:record.id,type,name:file.name,size:file.size,mime:file.type||'',lastModified:file.lastModified||0,blob:file})}tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)});
     delete H.uploads[id];await refreshData();H.selected=new Set(H.periods.slice(-Math.min(2,H.periods.length)).map(p=>p.id));render();toast(`✓ ${record.label} guardado`,2400);try{haptic(20)}catch(e){}
@@ -497,7 +497,7 @@ function bindPeriodRows(root){
     if(action==='analyze'){H.selected=new Set([id]);H.openMenu='';openTab('analizar')}
     else if(['equipo','garantias','ingresos'].includes(action))await downloadOriginal(id,action);
     else if(action==='zip')await exportPeriodZip(id);
-    else if(action==='delete'&&confirm(`¿Eliminar ${H.periods.find(p=>p.id===id)?.label||id} y sus tres archivos?`)){await deletePeriod(id);H.openMenu='';render();toast('Cierre eliminado')}
+    else if(action==='delete'&&await window.APPIDialog.confirm(`Se eliminarán ${H.periods.find(p=>p.id===id)?.label||id} y sus tres archivos.`,{title:'Eliminar cierre',icon:'📈',okText:'Eliminar',danger:true})){await deletePeriod(id);H.openMenu='';render();toast('Cierre eliminado')}
   }));
 }
 async function downloadOriginal(id,type){
@@ -607,7 +607,7 @@ async function exportAllZip(){
 async function exportPeriodZip(id){const p=H.periods.find(x=>x.id===id);if(!p)return;try{await makeBackupZip([p],`APPI_cierre_${id}.zip`);toast('ZIP del mes descargado')}catch(e){toast(e.message,3000)}}
 async function restoreBackup(file){
   if(!file)return;toast('Revisando backup…',1800);
-  try{const zip=await JSZip.loadAsync(file),entry=zip.file('historico.json');if(!entry)throw new Error('El ZIP no contiene historico.json');const data=JSON.parse(await entry.async('string'));if(data.format!=='APPI-HISTORICO'||!Array.isArray(data.periods))throw new Error('El backup no pertenece al Histórico de APPI.');if(!confirm(`Se restaurarán ${data.periods.length} cierres. Los meses coincidentes serán reemplazados. ¿Continuar?`))return;
+  try{const zip=await JSZip.loadAsync(file),entry=zip.file('historico.json');if(!entry)throw new Error('El ZIP no contiene historico.json');const data=JSON.parse(await entry.async('string'));if(data.format!=='APPI-HISTORICO'||!Array.isArray(data.periods))throw new Error('El backup no pertenece al Histórico de APPI.');if(!await window.APPIDialog.confirm(`Se restaurarán ${data.periods.length} cierres. Los meses coincidentes serán reemplazados.`,{title:'Restaurar backup',icon:'📦',okText:'Restaurar'}))return;
     const db=await openDB();for(const p of data.periods)await dbPut('periods',p);for(const r of data.reports||[])await dbPut('reports',r);for(const meta of data.files||[]){const zf=zip.file(meta.path);if(!zf)continue;const blob=await zf.async('blob');await dbPut('files',{...meta,blob})}await refreshData();render();toast(`${data.periods.length} cierres restaurados`,2600)
   }catch(e){console.error('Restaurar histórico',e);toast(`No se pudo restaurar: ${e.message}`,3500)}finally{$('histRestoreInput').value=''}
 }

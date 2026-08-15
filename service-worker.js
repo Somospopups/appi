@@ -1,9 +1,10 @@
-const CACHE_NAME = 'appi-v192-password-inicial';
+const CACHE_NAME = 'appi-v193-membresias';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
   './index.html',
   './auth-config.js',
+  './appi-dialog.js',
   './auth-client.js',
   './data-sync.js',
   './admin-panel.js',

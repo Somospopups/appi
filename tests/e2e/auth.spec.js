@@ -17,8 +17,8 @@ async function mockSupabase(page) {
   let whatsapp = '5493515551234';
   let offline = false;
   const profiles = {
-    [USER_A]: { user_id: USER_A, username: null, dip: '02-9802014', sucursal: '02', numero_distribuidor: '9802014', nombre: 'Distribuidor A', rol: 'usuario', activo: true, debe_cambiar_password: false },
-    [USER_B]: { user_id: USER_B, username: null, dip: '03-1234567', sucursal: '03', numero_distribuidor: '1234567', nombre: 'Distribuidor B', rol: 'usuario', activo: true, debe_cambiar_password: false },
+    [USER_A]: { user_id: USER_A, username: null, dip: '02-9802014', sucursal: '02', numero_distribuidor: '9802014', nombre: 'Distribuidor A', rol: 'usuario', activo: true, debe_cambiar_password: false, membresia_meses: 1, membresia_inicio: new Date().toISOString(), membresia_vence: new Date(Date.now()+30*86400000).toISOString() },
+    [USER_B]: { user_id: USER_B, username: null, dip: '03-1234567', sucursal: '03', numero_distribuidor: '1234567', nombre: 'Distribuidor B', rol: 'usuario', activo: true, debe_cambiar_password: false, membresia_meses: 3, membresia_inicio: new Date().toISOString(), membresia_vence: new Date(Date.now()+90*86400000).toISOString() },
     [USER_ADMIN]: { user_id: USER_ADMIN, username: 'popups', dip: null, sucursal: null, numero_distribuidor: null, nombre: 'POPUPS', rol: 'admin', activo: true, debe_cambiar_password: false }
   };
   const cors = { 'access-control-allow-origin': '*', 'content-type': 'application/json' };
@@ -65,6 +65,8 @@ async function mockSupabase(page) {
       if (body.action === 'list_requests') return route.fulfill({ status: 200, headers: cors, body: JSON.stringify({ requests: pendingRequests }) });
       if (body.action === 'get_settings') return route.fulfill({ status: 200, headers: cors, body: JSON.stringify({ whatsapp }) });
       if (body.action === 'set_whatsapp') { whatsapp=body.numero; return route.fulfill({ status: 200, headers: cors, body: JSON.stringify({ whatsapp }) }); }
+      if (body.action === 'set_membership') { const user=profiles[body.user_id];user.membresia_meses=body.membership_months;user.membresia_vence=new Date(Date.now()+body.membership_months*30*86400000).toISOString();return route.fulfill({status:200,headers:cors,body:JSON.stringify({user})}); }
+      if (body.action === 'delete_user') { delete profiles[body.user_id];return route.fulfill({status:200,headers:cors,body:'{"ok":true}'}); }
       return route.fulfill({ status: 200, headers: cors, body: JSON.stringify({ ok: true }) });
     }
 
@@ -157,6 +159,15 @@ test('la contraseña temporal obliga a crear una contraseña personal', async ({
   expect(backend.profiles[USER_A].debe_cambiar_password).toBe(false);
 });
 
+test('avisa al distribuidor una semana antes del vencimiento', async ({ page }) => {
+  const backend=await mockSupabase(page);
+  backend.profiles[USER_A].membresia_vence=new Date(Date.now()+6*86400000).toISOString();
+  await page.goto('/index.html',{waitUntil:'networkidle'});
+  await login(page,'02-9802014');
+  await expect(page.locator('#appiDialogTitle')).toHaveText('Membresía por vencer');
+  await expect(page.locator('#appiDialogMessage')).toContainText('6 días');
+});
+
 test('una solicitud nueva abre WhatsApp y queda pendiente', async ({ page }) => {
   const backend=await mockSupabase(page);
   await page.goto('/index.html',{waitUntil:'networkidle'});
@@ -172,6 +183,7 @@ test('una solicitud nueva abre WhatsApp y queda pendiente', async ({ page }) => 
 });
 
 test('POPUPS ingresa por el candado y no tiene distribuidor asociado', async ({ page }) => {
+  const nativeDialogs=[];page.on('dialog',dialog=>{nativeDialogs.push(dialog.type());dialog.dismiss()});
   await mockSupabase(page);
   await page.goto('/index.html', { waitUntil: 'networkidle' });
   await page.evaluate(()=>{window.open=()=>null});
@@ -190,6 +202,13 @@ test('POPUPS ingresa por el candado y no tiene distribuidor asociado', async ({ 
   await expect(page.locator('#adminUserList')).toContainText('Distribuidor A');
   await expect(page.locator('#adminPendingList')).toContainText('Solicitud Pendiente');
   await expect(page.locator('#adminStatPending')).toHaveText('1');
+  await expect(page.locator('[data-admin-action="membership"]').first()).toBeVisible();
+  await expect(page.locator('[data-admin-action="delete"]').first()).toBeVisible();
+  await page.locator('[data-admin-action="membership"]').first().click();
+  await expect(page.locator('#appiDialogTitle')).toHaveText('Activar membresía');
+  await page.locator('#appiDialogOk').click();
+  await expect(page.locator('#appiDialogTitle')).toBeHidden();
+  expect(nativeDialogs).toEqual([]);
   const profile=await page.evaluate(()=>APPIAuth.currentProfile());
   expect(profile).toMatchObject({username:'popups',dip:null,rol:'admin'});
   await expect(page.locator('#btnAdminPanelLogout')).toBeVisible();
