@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v204-gestion-inteligente';
+const CACHE_NAME = 'appi-v205-llamadas-vinculadas';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
@@ -9,7 +9,9 @@ const APP_SHELL = [
   './data-sync.js',
   './admin-panel.js',
   './account-request.js',
+  './qr-code.js',
   './gestion-client.js',
+  './device-bridge.js',
   './encuesta.html',
   './historico.css',
   './historico.js',
@@ -93,4 +95,42 @@ self.addEventListener('fetch', event => {
         });
       })
   );
+});
+
+
+// Solicitudes enviadas desde una PC o tablet a un teléfono vinculado.
+self.addEventListener('push', event => {
+  let data = {};
+  try { data = event.data ? event.data.json() : {}; } catch (error) {}
+  const title = data.title || 'APPI';
+  const options = {
+    body: data.body || 'Tenés una nueva solicitud.',
+    icon: './icon-192.png',
+    badge: './icon-192.png',
+    tag: data.command_id ? `appi-command-${data.command_id}` : 'appi-device-command',
+    renotify: true,
+    requireInteraction: true,
+    data: { url: data.url || './', command_id: data.command_id || '', type: data.type || '' },
+    actions: [
+      { action: 'open', title: data.type === 'call_request' ? 'Abrir llamada' : 'Abrir APPI' },
+      { action: 'dismiss', title: 'Ahora no' }
+    ]
+  };
+  event.waitUntil(self.registration.showNotification(title, options));
+});
+
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+  if (event.action === 'dismiss') return;
+  const target = new URL(event.notification.data?.url || './', self.location.href).href;
+  event.waitUntil((async () => {
+    const windows = await clients.matchAll({ type: 'window', includeUncontrolled: true });
+    for (const client of windows) {
+      try {
+        if ('navigate' in client) await client.navigate(target);
+        return client.focus();
+      } catch (error) {}
+    }
+    return clients.openWindow(target);
+  })());
 });

@@ -4,7 +4,7 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
-- Versión: **v204 · Gestión inteligente**.
+- Versión: **v205 · Llamadas vinculadas**.
 - Publicación: [https://somospopups.github.io/appi/](https://somospopups.github.io/appi/)
 - Acceso por número de distribuidor y contraseña.
 - Acceso administrador POPUPS mediante el candado, sin DIP ni número de distribuidor.
@@ -44,6 +44,27 @@ supabase functions deploy encuesta-publica --no-verify-jwt
 
 La función valida el enlace, la membresía, el contenido, el consentimiento y los referidos antes de registrar los datos.
 
+## Puente de llamadas entre dispositivos
+
+Desde **Mi cuenta → Teléfonos vinculados**, una PC o tablet puede generar un QR y un código de seis dígitos. El teléfono inicia sesión con la misma cuenta, autoriza notificaciones y queda disponible como destino de llamadas.
+
+Al tocar **Llamar** desde Mi Gestión en PC o tablet:
+
+- se envía una notificación privada al teléfono elegido;
+- la solicitud vence en dos minutos;
+- el teléfono muestra el contacto y requiere confirmación;
+- al aceptar, abre el marcador nativo;
+- la actividad y su resultado quedan registrados en Mi Gestión.
+
+En iPhone, APPI debe instalarse en la pantalla de inicio para recibir Web Push. En Android funciona como PWA o desde Chrome con notificaciones autorizadas.
+
+Archivos relacionados:
+
+- `device-bridge.js`
+- `qr-code.js`
+- `SUPABASE_DISPOSITIVOS.sql`
+- `supabase/functions/dispositivo-puente/index.ts`
+
 ## Desarrollo y pruebas
 
 Requisitos: Node.js 20+, Python 3 y Chromium de Playwright.
@@ -61,6 +82,8 @@ La suite cubre la aplicación, autenticación, aislamiento por cuenta, solicitud
 - `index.html`: aplicación principal.
 - `encuesta.html`: formulario público responsive.
 - `gestion-client.js`: Mi Encuesta y Mi Gestión dentro de APPI.
+- `device-bridge.js`: vinculación y solicitudes de llamada entre dispositivos.
+- `qr-code.js`: QR local para vincular teléfonos (MIT).
 - `auth-config.js`: configuración pública de Supabase.
 - `auth-client.js`: login y sesión.
 - `data-sync.js`: sincronización local/nube.

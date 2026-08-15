@@ -37,7 +37,9 @@ window.openHistorico=function(){
 <script src="./data-sync.js"></script>
 <script src="./admin-panel.js"></script>
 <script src="./account-request.js"></script>
+<script src="./qr-code.js"></script>
 <script src="./gestion-client.js"></script>
+<script src="./device-bridge.js"></script>
 <style id="historico-inline-css">
 /* APPI · Histórico mensual */
 .hist-view{padding-bottom:calc(34px + env(safe-area-inset-bottom));}
@@ -3498,7 +3500,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v204 · Gestión inteligente</div>
+  <div class="ds-foot">APPI · v205 · Llamadas vinculadas</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -9867,6 +9869,7 @@ function abrirCuentaDesdeMenu(){
       <div class="tip"><b>Sincronización:</b> ${syncStatus.syncing?'En curso':syncStatus.dirty?`${syncStatus.dirty} cambios pendientes`:'Actualizada'}${syncStatus.lastError?`<br><span style="color:#b13e47">${escapeXml(syncStatus.lastError)}</span>`:''}</div>
       <div class="warn-tip"><b>🎙️ Importante:</b> las grabaciones de audio quedan únicamente en el dispositivo donde se hicieron. El resto de los datos se sincroniza con tu cuenta.</div>
       <button type="button" class="btn btn-primary" id="btnAccountSync">☁️ Sincronizar ahora</button>
+      <button type="button" class="btn btn-secondary" id="btnAccountDevices">📲 Teléfonos vinculados</button>
       <button type="button" class="btn btn-secondary" id="btnAccountPassword">🔐 Cambiar contraseña</button>
       <button type="button" class="btn btn-secondary" id="btnAccountLogout">Cerrar sesión</button>
       <button type="button" class="btn btn-danger-outline" id="btnAccountLogoutErase">Cerrar y borrar la copia de este dispositivo</button>
@@ -9874,8 +9877,9 @@ function abrirCuentaDesdeMenu(){
     </div>`
   });
   setTimeout(()=>{
-    const sync=document.getElementById('btnAccountSync'),password=document.getElementById('btnAccountPassword'),logout=document.getElementById('btnAccountLogout'),erase=document.getElementById('btnAccountLogoutErase');
+    const sync=document.getElementById('btnAccountSync'),devices=document.getElementById('btnAccountDevices'),password=document.getElementById('btnAccountPassword'),logout=document.getElementById('btnAccountLogout'),erase=document.getElementById('btnAccountLogoutErase');
     if(sync)sync.onclick=async()=>{sync.disabled=true;sync.textContent='Sincronizando…';try{await window.APPIDataSync.syncNow(true);showToast('Cuenta sincronizada ☁️',2200);modal.close()}catch(error){showToast(error.message||'No se pudo sincronizar',3500);sync.disabled=false;sync.textContent='☁️ Sincronizar ahora'}};
+    if(devices)devices.onclick=()=>window.APPIDeviceBridge&&window.APPIDeviceBridge.openManager();
     if(password)password.onclick=abrirCambioPasswordAPPI;
     if(logout)logout.onclick=async()=>{if(!await window.APPIDialog.confirm('¿Cerrar sesión en este dispositivo?',{title:'Cerrar sesión',icon:'↪',okText:'Cerrar sesión'}))return;logout.disabled=true;try{await window.APPIDataSync.logoutAndLock({removeCache:false});location.reload()}catch(error){showToast(error.message,3500);logout.disabled=false}};
     if(erase)erase.onclick=async()=>{if(!await window.APPIDialog.confirm('Se sincronizarán los datos y después se borrará la copia local, incluidos los audios de esta cuenta.',{title:'Borrar copia del dispositivo',icon:'🗑️',okText:'Sincronizar y borrar',danger:true}))return;erase.disabled=true;try{await window.APPIDataSync.logoutAndLock({removeCache:true});location.reload()}catch(error){showToast(error.message,3800);erase.disabled=false}};
