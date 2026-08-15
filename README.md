@@ -4,7 +4,7 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
-- Versión: **v213 · Datos compartidos seguros**.
+- Versión: **v214 · Notificaciones APPI**.
 - Publicación: [https://somospopups.github.io/appi/](https://somospopups.github.io/appi/)
 - Acceso por número de distribuidor y contraseña.
 - Acceso administrador POPUPS mediante el candado, sin DIP ni número de distribuidor.
@@ -62,7 +62,8 @@ Desde el **engranaje → Vincular teléfono**, una PC o tablet muestra automáti
 
 Al tocar **Llamar** desde Mi Gestión en PC o tablet:
 
-- se envía una notificación privada al teléfono elegido;
+- se envía una notificación privada identificada con el ícono de APPI;
+- en Android, la insignia pequeña utiliza una “A” blanca sobre fondo transparente para evitar el cuadrado blanco;
 - la solicitud vence en dos minutos;
 - el teléfono muestra el contacto y requiere confirmación;
 - al aceptar, abre el marcador nativo;

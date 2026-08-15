@@ -18,7 +18,12 @@ test('el Service Worker escucha notificaciones y su apertura', async ({ request 
   const source = await response.text();
   expect(source).toContain("addEventListener('push'");
   expect(source).toContain("addEventListener('notificationclick'");
+  expect(source).toContain("icon: './icon-192.png'");
+  expect(source).toContain("badge: './notification-badge.png'");
   expect(source).toContain('call_request');
+  const badge = await request.get('/notification-badge.png');
+  expect(badge.ok()).toBe(true);
+  expect(badge.headers()['content-type']).toContain('image/png');
 });
 
 test('vincula por QR y envía una llamada de la PC al teléfono', async ({ page }) => {

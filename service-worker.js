@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v213-datos-compartidos-seguros';
+const CACHE_NAME = 'appi-v214-notificaciones-appi';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
@@ -17,6 +17,7 @@ const APP_SHELL = [
   './historico.js',
   './manifest.json',
   './icon-192.png',
+  './notification-badge.png',
   './icon-512.png',
   './icon-192-maskable.png',
   './icon-512-maskable.png',
@@ -106,7 +107,7 @@ self.addEventListener('push', event => {
   const options = {
     body: data.body || 'Tenés una nueva solicitud.',
     icon: './icon-192.png',
-    badge: './icon-192.png',
+    badge: './notification-badge.png',
     tag: data.command_id ? `appi-command-${data.command_id}` : 'appi-device-command',
     renotify: true,
     requireInteraction: true,
