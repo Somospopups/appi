@@ -1,11 +1,8 @@
 name: Publicar puente de dispositivos
 
+# Ejecución manual: requiere SUPABASE_ACCESS_TOKEN guardado como secret.
+# No se inicia en cada push para evitar publicaciones incompletas sin credenciales.
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'supabase/functions/dispositivo-puente/**'
-      - '.github/workflows/deploy-device-bridge.yml'
   workflow_dispatch:
 
 permissions:

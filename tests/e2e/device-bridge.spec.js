@@ -96,6 +96,28 @@ test('vincula por QR y envía una llamada de la PC al teléfono', async ({ page 
   await expect(page.locator('.appi-pair-code')).toContainText('321 654');
   await page.locator('#appiDeviceClose').click();
 
+  await page.evaluate(() => {
+    const person = {
+      id: 77, codigo: '02-7777777', nombre: 'Persona de Mi Equipo', cat: 'D', tel: '351 444 7788',
+      estado: 'Activo', pnAct: 12, m1: 10, m2: 9, m3: 8, alta: '2025-01-01', cumple: '', email: '', hijos: []
+    };
+    equipoData = { titular: { dip: '02-9802014', nombre: 'María Pérez', sucursal: '02' }, personas: [person], raices: [person] };
+    openPersonaModal(person);
+  });
+  const teamCallButton = page.locator('.person-modal-body [data-appi-call-phone]');
+  await expect(teamCallButton).toHaveText('📲 Llamar en teléfono');
+  await teamCallButton.click();
+  await expect(page.locator('#appiDialogTitle')).toHaveText('Llamada enviada');
+  const teamCall = bridgeCalls.find(item => item.action === 'send_call' && item.nombre === 'Persona de Mi Equipo');
+  expect(teamCall).toMatchObject({
+    device_id: DEVICE_ID,
+    contact_id: '',
+    nombre: 'Persona de Mi Equipo',
+    telefono: '3514447788'
+  });
+  await page.locator('#appiDialogOk').click();
+  await page.evaluate(() => modal.close());
+
   await page.evaluate(() => openMiGestion());
   await expect(page.locator('.gestion-contact')).toHaveCount(1);
   const callButton = page.locator(`[data-contact-channel="llamada"][data-contact-id="${CONTACT_ID}"]`).first();
@@ -103,7 +125,7 @@ test('vincula por QR y envía una llamada de la PC al teléfono', async ({ page 
   await callButton.click();
   await expect(page.locator('#appiDialogTitle')).toHaveText('Llamada enviada');
 
-  const sent = bridgeCalls.find(item => item.action === 'send_call');
+  const sent = bridgeCalls.find(item => item.action === 'send_call' && item.contact_id === CONTACT_ID);
   expect(sent).toMatchObject({
     device_id: DEVICE_ID,
     contact_id: CONTACT_ID,

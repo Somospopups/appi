@@ -40,7 +40,7 @@ Es idempotente y reemplaza las funciones/triggers anteriores.
 
 ### 2. Desvinculación completa de dispositivos
 
-La revisión incluye `.github/workflows/deploy-device-bridge.yml`. Al publicar en `main`, GitHub desplegará automáticamente la Edge Function autenticada si el repositorio tiene configurado este secreto:
+La revisión incluye `.github/workflows/deploy-device-bridge.yml`. El flujo se ejecuta manualmente desde GitHub Actions y utiliza este secreto cuando está configurado:
 
 ```text
 SUPABASE_ACCESS_TOKEN
