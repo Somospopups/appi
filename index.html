@@ -3495,7 +3495,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v198 · Notas pinchadas</div>
+  <div class="ds-foot">APPI · v199 · Notas legibles</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -10085,7 +10085,7 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./service-worker.js?v=198').catch(error => {
+      navigator.serviceWorker.register('./service-worker.js?v=199').catch(error => {
         console.warn('No se pudo registrar el modo offline de APPI', error);
       });
     });
@@ -11342,7 +11342,7 @@ body.dark .rec-item .info small{color:#a0a0b0}
 .keep-grid{columns:2;column-gap:10px}
 @media (min-width: 600px){ .keep-grid{columns:3} }
 .keep-note{break-inside:avoid;padding:19px 14px 14px;border-radius:16px;margin:7px 0 10px;position:relative;box-shadow:0 4px 12px rgba(0,0,0,0.08);transition:transform 0.15s,box-shadow 0.2s;cursor:pointer;border:1px solid rgba(0,0,0,0.06)}
-.keep-pin{position:absolute;z-index:3;top:-9px;left:52%;width:18px;height:18px;transform:translateX(-50%) rotate(-5deg);border-radius:50%;background:radial-gradient(circle at 34% 28%,#fffbd0 0 10%,#fff047 13%,#ffd400 58%,#d79d00 100%);box-shadow:0 4px 8px rgba(110,82,0,.34)}.keep-pin:before{content:"";position:absolute;left:4px;right:4px;bottom:-3px;height:6px;border-radius:50%;background:#e5b400}.keep-pin:after{content:"";position:absolute;left:8px;top:14px;width:2px;height:10px;border-radius:2px;background:linear-gradient(#c9cad0,#5e6069);transform:rotate(8deg);transform-origin:top}.keep-note:nth-child(3n+2) .keep-pin{left:59%;transform:translateX(-50%) rotate(4deg)}.keep-note:nth-child(3n) .keep-pin{left:46%;transform:translateX(-50%) rotate(-2deg)}.keep-note.is-pinned .keep-pin{box-shadow:0 0 0 4px rgba(91,141,239,.26),0 4px 8px rgba(110,82,0,.34)}
+.keep-pin{position:absolute;z-index:3;top:-8px;left:52%;width:18px;height:18px;transform:translateX(-50%) rotate(-5deg);border-radius:50%;background:radial-gradient(circle at 34% 28%,#fffbd0 0 10%,#fff047 13%,#ffd400 58%,#d79d00 100%);box-shadow:0 4px 8px rgba(110,82,0,.34)}.keep-pin:after{content:"";position:absolute;left:8px;top:15px;width:2px;height:9px;border-radius:2px;background:linear-gradient(#d5d6da,#5e6069);transform:rotate(7deg);transform-origin:top}.keep-note:nth-child(3n+2) .keep-pin{left:59%;transform:translateX(-50%) rotate(4deg)}.keep-note:nth-child(3n) .keep-pin{left:46%;transform:translateX(-50%) rotate(-2deg)}.keep-note.is-pinned .keep-pin{box-shadow:0 0 0 3px rgba(91,141,239,.24),0 4px 8px rgba(110,82,0,.34)}
 .keep-note:active{transform:scale(0.98)}
 .keep-note .k-title{font-weight:800;font-size:14px;margin:0 0 6px;word-break:break-word}
 .keep-note .k-text{font-size:13px;line-height:1.4;white-space:pre-wrap;word-break:break-word;opacity:0.9}
@@ -11360,9 +11360,10 @@ body.dark .rec-item .info small{color:#a0a0b0}
 body.dark .keep-add{background:rgba(30,30,50,0.6);border-color:rgba(255,255,255,0.08)}
 body.dark .keep-add textarea, body.dark .keep-add .k-title-input{color:#ffffff !important}
 body.dark .keep-add textarea::placeholder, body.dark .keep-add .k-title-input::placeholder{color:rgba(255,255,255,0.5)}
-body.dark .keep-note .k-title, body.dark .keep-note .k-text{color:#ffffff !important}
-body.dark .keep-note{border-color:rgba(255,255,255,0.12);color:#ffffff}
-body.dark .keep-note .k-foot{color:rgba(255,255,255,0.6)}
+.keep-note .k-title,.keep-note .k-text{color:#202124 !important;text-shadow:none!important}.keep-note .k-foot{color:rgba(32,33,36,.68)!important;opacity:1}.keep-note{color:#202124!important}
+body.dark .keep-note .k-title,body.dark .keep-note .k-text{color:#202124 !important}
+body.dark .keep-note{border-color:rgba(255,255,255,0.22);color:#202124!important}
+body.dark .keep-note .k-foot{color:rgba(32,33,36,.68)!important}
 body.dark .search-box input{color:#ffffff !important}
 
 /* ====== FIX GLASS GENERAL - USUARIOS / GRABADORA / KEEP - MAPA VISIBLE ====== */
@@ -11766,7 +11767,9 @@ body.dark #modelStatus{
 }
 #view-notas .keep-note{
   background: #fff475; /* color dinámico se mantiene */
-  backdrop-filter:blur(12px) saturate(150%);
+  -webkit-backdrop-filter:none !important;
+  backdrop-filter:none !important;
+  overflow:visible;
   border:1px solid rgba(255,255,255,0.5);
   border-radius:9px !important;
   box-shadow:0 10px 22px rgba(35,38,55,0.14), inset 0 1px 0 rgba(255,255,255,0.65) !important;
