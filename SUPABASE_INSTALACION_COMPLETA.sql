@@ -628,6 +628,133 @@ alter table public.appi_encuestas enable row level security;
 grant select, delete on public.appi_encuestas to authenticated;
 revoke insert, update on public.appi_encuestas from anon, authenticated;
 
+-- Cada vez que el distribuidor comparte se crea una invitación privada.
+-- Es válida por 24 horas, queda ligada al primer dispositivo que la abre
+-- y acepta una sola encuesta.
+create table if not exists public.appi_encuesta_invitaciones (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  token uuid not null unique default gen_random_uuid(),
+  claim_id uuid,
+  opened_at timestamptz,
+  expires_at timestamptz not null default (now() + interval '24 hours'),
+  used_at timestamptz,
+  encuesta_id uuid references public.appi_encuestas(id) on delete set null,
+  revoked_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  constraint appi_encuesta_invitacion_fechas check (expires_at > created_at)
+);
+
+create index if not exists appi_encuesta_invitaciones_user_idx
+on public.appi_encuesta_invitaciones (user_id, created_at desc);
+
+create index if not exists appi_encuesta_invitaciones_vigentes_idx
+on public.appi_encuesta_invitaciones (expires_at)
+where used_at is null and revoked_at is null;
+
+alter table public.appi_encuesta_invitaciones enable row level security;
+grant select on public.appi_encuesta_invitaciones to authenticated;
+revoke insert, update, delete on public.appi_encuesta_invitaciones from anon, authenticated;
+
+create or replace function public.appi_crear_invitacion_encuesta()
+returns table(token uuid, expires_at timestamptz)
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  owner_id uuid;
+  new_token uuid;
+  new_expires timestamptz;
+begin
+  select p.user_id into owner_id
+  from public.appi_perfiles p
+  where p.user_id = auth.uid()
+    and p.rol = 'usuario'
+    and p.activo = true
+    and p.membresia_vence is not null
+    and p.membresia_vence > now();
+
+  if owner_id is null then
+    raise exception 'Necesitás una cuenta distribuidora activa para compartir la encuesta.' using errcode = 'P0001';
+  end if;
+
+  -- Evita acumular invitaciones abiertas indefinidamente.
+  update public.appi_encuesta_invitaciones
+  set revoked_at = now(), updated_at = now()
+  where user_id = owner_id
+    and used_at is null
+    and revoked_at is null
+    and expires_at <= now();
+
+  insert into public.appi_encuesta_invitaciones as created (user_id)
+  values (owner_id)
+  returning created.token, created.expires_at
+  into new_token, new_expires;
+
+  return query select new_token, new_expires;
+end;
+$$;
+
+revoke all on function public.appi_crear_invitacion_encuesta() from public, anon;
+grant execute on function public.appi_crear_invitacion_encuesta() to authenticated;
+
+create or replace function public.appi_reclamar_invitacion_encuesta(
+  p_token uuid,
+  p_claim_id uuid
+)
+returns table(user_id uuid, nombre text, expires_at timestamptz)
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  invitation public.appi_encuesta_invitaciones%rowtype;
+  owner_profile public.appi_perfiles%rowtype;
+begin
+  select * into invitation
+  from public.appi_encuesta_invitaciones
+  where token = p_token
+  for update;
+
+  if not found or invitation.revoked_at is not null then
+    raise exception 'Esta invitación no está disponible.' using errcode = 'P0001';
+  end if;
+  if invitation.used_at is not null then
+    raise exception 'Esta invitación ya fue utilizada.' using errcode = 'P0001';
+  end if;
+  if invitation.expires_at <= now() then
+    raise exception 'Esta invitación venció. Pedí un enlace nuevo.' using errcode = 'P0001';
+  end if;
+  if invitation.claim_id is null then
+    update public.appi_encuesta_invitaciones
+    set claim_id = p_claim_id, opened_at = now(), updated_at = now()
+    where id = invitation.id;
+    invitation.claim_id := p_claim_id;
+  elsif invitation.claim_id <> p_claim_id then
+    raise exception 'Esta invitación ya fue abierta en otro dispositivo.' using errcode = 'P0001';
+  end if;
+
+  select * into owner_profile
+  from public.appi_perfiles
+  where appi_perfiles.user_id = invitation.user_id
+    and rol = 'usuario'
+    and activo = true
+    and membresia_vence is not null
+    and membresia_vence > now();
+
+  if not found then
+    raise exception 'Esta encuesta no está disponible en este momento.' using errcode = 'P0001';
+  end if;
+
+  return query select invitation.user_id, owner_profile.nombre, invitation.expires_at;
+end;
+$$;
+
+revoke all on function public.appi_reclamar_invitacion_encuesta(uuid,uuid) from public, anon, authenticated;
+grant execute on function public.appi_reclamar_invitacion_encuesta(uuid,uuid) to service_role;
+
 -- ============================================================
 -- 4. Contactos de Mi Gestión
 -- ============================================================
@@ -693,6 +820,15 @@ using (
   or public.appi_es_admin()
 );
 
+drop policy if exists "appi_encuesta_invitaciones_select_own" on public.appi_encuesta_invitaciones;
+create policy "appi_encuesta_invitaciones_select_own"
+on public.appi_encuesta_invitaciones for select
+to authenticated
+using (
+  (auth.uid() = user_id and public.appi_cuenta_activa())
+  or public.appi_es_admin()
+);
+
 drop policy if exists "appi_gestion_select_own" on public.appi_gestion_contactos;
 create policy "appi_gestion_select_own"
 on public.appi_gestion_contactos for select
@@ -739,6 +875,11 @@ create trigger appi_encuesta_links_touch
 before update on public.appi_encuesta_links
 for each row execute function public.appi_touch_updated_at();
 
+drop trigger if exists appi_encuesta_invitaciones_touch on public.appi_encuesta_invitaciones;
+create trigger appi_encuesta_invitaciones_touch
+before update on public.appi_encuesta_invitaciones
+for each row execute function public.appi_touch_updated_at();
+
 drop trigger if exists appi_gestion_contactos_touch on public.appi_gestion_contactos;
 create trigger appi_gestion_contactos_touch
 before update on public.appi_gestion_contactos
@@ -749,8 +890,11 @@ for each row execute function public.appi_touch_updated_at();
 -- Sólo puede ejecutarla la Edge Function con service_role.
 -- ============================================================
 
+drop function if exists public.appi_registrar_encuesta_publica(uuid,uuid,jsonb);
+
 create or replace function public.appi_registrar_encuesta_publica(
   p_token uuid,
+  p_claim_id uuid,
   p_submission_id uuid,
   p_payload jsonb
 )
@@ -760,6 +904,7 @@ security definer
 set search_path = public
 as $$
 declare
+  invitation public.appi_encuesta_invitaciones%rowtype;
   owner_id uuid;
   response_id uuid;
   person_name text;
@@ -777,18 +922,56 @@ declare
   contact_count integer := 0;
   daily_count integer := 0;
 begin
-  select l.user_id into owner_id
-  from public.appi_encuesta_links l
-  join public.appi_perfiles p on p.user_id = l.user_id
-  where l.token = p_token
-    and l.activo = true
+  select * into invitation
+  from public.appi_encuesta_invitaciones
+  where token = p_token
+  for update;
+
+  if not found then
+    raise exception 'Esta invitación no está disponible.' using errcode = 'P0001';
+  end if;
+  if invitation.claim_id is null or invitation.claim_id <> p_claim_id then
+    raise exception 'Esta invitación pertenece a otro dispositivo.' using errcode = 'P0001';
+  end if;
+
+  owner_id := invitation.user_id;
+
+  -- Reintentar el mismo envío es seguro aunque la invitación ya esté usada.
+  if invitation.used_at is not null then
+    select id, jsonb_array_length(referidos) into response_id, referral_count
+    from public.appi_encuestas
+    where user_id = owner_id
+      and link_token = p_token
+      and client_submission_id = p_submission_id;
+    if response_id is not null then
+      return jsonb_build_object(
+        'ok', true,
+        'duplicada', true,
+        'encuesta_id', response_id,
+        'contactos', 0,
+        'referidos', referral_count
+      );
+    end if;
+    raise exception 'Esta invitación ya fue utilizada.' using errcode = 'P0001';
+  end if;
+
+  if invitation.revoked_at is not null then
+    raise exception 'Esta invitación fue cancelada.' using errcode = 'P0001';
+  end if;
+  if invitation.expires_at <= now() then
+    raise exception 'Esta invitación venció. Pedí un enlace nuevo.' using errcode = 'P0001';
+  end if;
+
+  select p.user_id into owner_id
+  from public.appi_perfiles p
+  where p.user_id = invitation.user_id
     and p.rol = 'usuario'
     and p.activo = true
     and p.membresia_vence is not null
     and p.membresia_vence > now();
 
   if owner_id is null then
-    raise exception 'El enlace de encuesta no está disponible.' using errcode = 'P0001';
+    raise exception 'Esta encuesta no está disponible en este momento.' using errcode = 'P0001';
   end if;
 
   select count(*) into daily_count
@@ -834,22 +1017,7 @@ begin
     person_phone_norm, answer_data, referrals_data, true,
     coalesce((p_payload->>'autorizacion_referidos')::boolean, false)
   )
-  on conflict (user_id, client_submission_id) do nothing
   returning id into response_id;
-
-  -- Un doble toque en Enviar devuelve la misma respuesta sin duplicarla.
-  if response_id is null then
-    select id, jsonb_array_length(referidos) into response_id, referral_count
-    from public.appi_encuestas
-    where user_id = owner_id and client_submission_id = p_submission_id;
-    return jsonb_build_object(
-      'ok', true,
-      'duplicada', true,
-      'encuesta_id', response_id,
-      'contactos', 0,
-      'referidos', referral_count
-    );
-  end if;
 
   insert into public.appi_gestion_contactos (
     user_id, encuesta_id, tipo, nombre, telefono, telefono_normalizado,
@@ -917,6 +1085,10 @@ begin
     contact_count := contact_count + 1;
   end loop;
 
+  update public.appi_encuesta_invitaciones
+  set used_at = now(), encuesta_id = response_id, updated_at = now()
+  where id = invitation.id;
+
   return jsonb_build_object(
     'ok', true,
     'duplicada', false,
@@ -927,8 +1099,8 @@ begin
 end;
 $$;
 
-revoke all on function public.appi_registrar_encuesta_publica(uuid,uuid,jsonb) from public, anon, authenticated;
-grant execute on function public.appi_registrar_encuesta_publica(uuid,uuid,jsonb) to service_role;
+revoke all on function public.appi_registrar_encuesta_publica(uuid,uuid,uuid,jsonb) from public, anon, authenticated;
+grant execute on function public.appi_registrar_encuesta_publica(uuid,uuid,uuid,jsonb) to service_role;
 
 -- ============================================================
 -- 8. Verificación final
@@ -936,10 +1108,7 @@ grant execute on function public.appi_registrar_encuesta_publica(uuid,uuid,jsonb
 
 select
   'Mi Encuesta y Mi Gestión instaladas' as resultado,
-  to_regclass('public.appi_encuesta_links') is not null as links_listos,
+  to_regclass('public.appi_encuesta_links') is not null as links_anteriores_listos,
+  to_regclass('public.appi_encuesta_invitaciones') is not null as invitaciones_privadas_listas,
   to_regclass('public.appi_encuestas') is not null as encuestas_listas,
-  to_regclass('public.appi_gestion_contactos') is not null as gestion_lista,
-  (
-    select count(*)
-    from public.appi_encuesta_links
-  ) as enlaces_creados;
+  to_regclass('public.appi_gestion_contactos') is not null as gestion_lista;

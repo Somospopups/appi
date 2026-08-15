@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no">
   <meta name="theme-color" content="#edf3ff">
   <meta name="format-detection" content="telephone=no">
-  <title>Mi Encuesta · APPI</title>
+  <title>Mi Encuesta</title>
   <link rel="icon" href="./icon-192.png">
   <link rel="apple-touch-icon" href="./apple-touch-icon.png">
   <script src="./auth-config.js"></script>
@@ -57,7 +57,7 @@
     .ref-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}.ref-head b{color:var(--blue2);font-size:11px}.ref-remove{border:0;border-radius:9px;padding:6px 9px;background:rgba(217,83,89,.09);color:#bb444b;font-size:9px;font-weight:900}
     .ref-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.ref-grid .text-input{min-height:43px;font-size:14px}.ref-grid .wide{grid-column:1/-1}
     .agenda-box{padding:13px;margin-bottom:11px;border-radius:17px;background:linear-gradient(135deg,rgba(91,141,239,.10),rgba(160,107,255,.08));border:1px solid rgba(91,141,239,.14);text-align:center}.agenda-btn{width:100%;min-height:47px;border:0;border-radius:14px;color:#fff;background:linear-gradient(135deg,#5b8def,#875fdd);box-shadow:0 7px 16px rgba(91,112,210,.22);font-size:11px;font-weight:950}.agenda-box small{display:block;margin-top:7px;color:#6d6e7a;font-size:8.8px;line-height:1.4}.agenda-divider{display:flex;align-items:center;gap:9px;margin:12px 0 9px;color:#92939e;font-size:8.5px;font-weight:900;text-transform:uppercase;letter-spacing:.4px}.agenda-divider:before,.agenda-divider:after{content:"";height:1px;flex:1;background:rgba(80,90,130,.11)}
-    .add-ref{width:100%;min-height:44px;margin-top:10px;border:1px dashed rgba(91,141,239,.34);border-radius:14px;background:rgba(91,141,239,.07);color:var(--blue2);font-size:11px;font-weight:900}
+    .add-ref{width:100%;min-height:48px;margin-top:10px;border:0;border-radius:14px;background:linear-gradient(135deg,#2fbd96,#5b8def);color:#fff;font-size:11px;font-weight:950;box-shadow:0 7px 16px rgba(54,164,151,.2)}.add-ref:disabled{opacity:.5;box-shadow:none}
     .referidos-callout{display:grid;grid-template-columns:42px 1fr;gap:11px;align-items:center;padding:13px;border-radius:16px;background:linear-gradient(135deg,rgba(91,141,239,.11),rgba(160,107,255,.09));border:1px solid rgba(91,141,239,.13);margin-bottom:12px}.referidos-callout span{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;background:linear-gradient(135deg,#3ad0a4,#5b8def);color:#fff;font-size:19px}.referidos-callout b{display:block;font-size:11px}.referidos-callout small{display:block;margin-top:3px;color:var(--muted);font-size:9.5px;line-height:1.35}
     .review-grid{display:grid;gap:9px}.review-section{padding:14px;border-radius:17px;background:rgba(255,255,255,.58);border:1px solid rgba(255,255,255,.78)}.review-section h3{margin:0 0 9px;font-size:12px;color:var(--blue2)}
     .review-row{display:grid;grid-template-columns:44% 1fr;gap:10px;padding:7px 0;border-bottom:1px solid rgba(80,90,130,.08);font-size:10px;line-height:1.35}.review-row:last-child{border-bottom:0}.review-row span:first-child{color:var(--muted);font-weight:750}.review-row span:last-child{text-align:right;font-weight:850;overflow-wrap:anywhere}
@@ -72,7 +72,6 @@
 </head>
 <body>
   <main class="shell">
-    <div class="brand"><img src="./icon-192.png" alt="APPI"><span>APPI · Mi Encuesta</span></div>
     <section class="hero">
       <div class="hero-row">
         <div class="hero-icon" id="heroIcon">💧</div>
@@ -85,7 +84,7 @@
     </section>
     <div id="content"><section class="status-card"><div class="spinner"></div><h2>Preparando la encuesta</h2><p>Estamos verificando el enlace seguro.</p></section></div>
     <div id="actions"></div>
-    <div class="footer">Tus respuestas se envían de forma segura al distribuidor que compartió este enlace.</div>
+    <div class="footer">Tus respuestas se envían de forma segura a la persona que compartió esta invitación.</div>
   </main>
   <script>
   (function(){
@@ -98,7 +97,7 @@
       {title:'Agua y hábitos',sub:'Cómo consumís y valorás el agua.',icon:'💧'},
       {title:'Calidad y ambiente',sub:'Tu mirada sobre el agua y el entorno.',icon:'🌿'},
       {title:'Actividad laboral',sub:'Qué valorás y qué te gustaría cambiar.',icon:'💼'},
-      {title:'Referidos',sub:'Personas a las que también podría interesarles.',icon:'👥'},
+      {title:'¡Gracias por tu tiempo!',progress:'Referidos',sub:'Tu ayuda puede acercar esta oportunidad a las personas que querés.',icon:'💙'},
       {title:'Revisar y enviar',sub:'Confirmá que todo esté correcto.',icon:'✓'}
     ];
     const OPTIONS={
@@ -137,6 +136,8 @@
     };
     const requiredByStep=[[],['agua_tipo','agua_cantidad','agua_importancia','agua_calidad'],['agua_calidad_como','agua_proviene','agua_anomalias','agua_turbidez','agua_potabilizadores','evitar_sustancias','alternativas_evitar','ambiente'],['laboral_dedica','laboral_gusta','laboral_mejorar','conoces','oportunidad'],[],[]];
     function uuidV4(){if(crypto.randomUUID)return crypto.randomUUID();const bytes=new Uint8Array(16);crypto.getRandomValues(bytes);bytes[6]=(bytes[6]&15)|64;bytes[8]=(bytes[8]&63)|128;const h=[...bytes].map(v=>v.toString(16).padStart(2,'0')).join('');return `${h.slice(0,8)}-${h.slice(8,12)}-${h.slice(12,16)}-${h.slice(16,20)}-${h.slice(20)}`}
+    const uuidPattern=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i,claimStorageKey=`encuesta_claim_${token}`;
+    let claimId=new URLSearchParams(location.search).get('c')||'';if(!uuidPattern.test(claimId)){try{claimId=sessionStorage.getItem(claimStorageKey)||''}catch(e){}}if(!uuidPattern.test(claimId))claimId=uuidV4();try{sessionStorage.setItem(claimStorageKey,claimId)}catch(e){}
     const fresh=()=>({step:0,nombre:'',telefono:'',answers:{},referidos:[],consentimiento:false,autorizacion_referidos:false,website:'',submission_id:uuidV4(),promptedRefs:false});
     const storageKey=`appi_encuesta_draft_${token}`;
     let data=fresh(),config=null,submitting=false,finished=false;
@@ -160,30 +161,34 @@
     function personalHTML(){return `<div class="field" data-field-wrap="nombre"><label class="field-label">Nombre y apellido <span class="required">*</span></label><input class="text-input" id="surveyName" autocomplete="name" maxlength="120" placeholder="Tu nombre completo" value="${esc(data.nombre)}"><div class="error-text">Ingresá tu nombre y apellido.</div></div><div class="field" data-field-wrap="telefono"><label class="field-label">Teléfono o WhatsApp <span class="required">*</span><small>Lo usaremos únicamente para poder contactarte.</small></label><input class="text-input" id="surveyPhone" type="tel" inputmode="tel" autocomplete="tel" maxlength="30" placeholder="Ej: 351 555 1234" value="${esc(data.telefono)}"><div class="error-text">Ingresá un teléfono válido.</div></div><label class="honeypot">Sitio web<input id="surveyWebsite" tabindex="-1" autocomplete="off" value="${esc(data.website)}"></label>`}
     function refsHTML(){
       const cards=data.referidos.map((r,i)=>`<div class="ref-card" data-ref="${i}"><div class="ref-head"><b>Referido ${i+1}</b><button type="button" class="ref-remove" data-remove-ref="${i}">Quitar</button></div><div class="ref-grid"><input class="text-input" data-ref-field="nombre" data-ref-index="${i}" maxlength="120" placeholder="Nombre y apellido" value="${esc(r.nombre||'')}"><input class="text-input" type="tel" inputmode="tel" data-ref-field="telefono" data-ref-index="${i}" maxlength="30" placeholder="Teléfono / WhatsApp" value="${esc(r.telefono||'')}"><input class="text-input" data-ref-field="relacion" data-ref-index="${i}" maxlength="80" placeholder="Relación (amigo, familiar…)" value="${esc(r.relacion||'')}"><input class="text-input" data-ref-field="zona" data-ref-index="${i}" maxlength="120" placeholder="Barrio / ciudad" value="${esc(r.zona||'')}"></div><div class="error-text">Completá nombre y teléfono o quitá este referido.</div></div>`).join('');
-      return `<div class="referidos-callout"><span>👥</span><div><b>Una recomendación puede abrir una puerta</b><small>Los referidos son opcionales. Si conocés a alguien a quien pueda interesarle, podés sumarlo acá.</small></div></div><div class="agenda-box"><button type="button" class="agenda-btn" id="pickContacts">📇 Elegir desde mi agenda</button><small id="agendaSupport">Elegís qué personas compartir. APPI nunca accede al resto de tu agenda.</small></div><div class="agenda-divider">o cargalos manualmente</div><div class="ref-list" id="refList">${cards}</div><button type="button" class="add-ref" id="addRef" ${data.referidos.length>=10?'disabled':''}>+ Agregar un referido manualmente</button><div class="privacy">🔒 Los datos sólo serán entregados al distribuidor que te compartió esta encuesta. Si agregás referidos, al final te pediremos confirmar que te autorizaron a compartirlos.</div>`
+      return `<div class="referidos-callout"><span>💙</span><div><b>¡Gracias por llegar hasta acá!</b><small>Tu tiempo y tus respuestas son muy valiosos. Si querés, podés regalarles esta misma oportunidad a las personas que más querés. Puede ser una, dos o diez: la cantidad no es lo importante, sino la posibilidad de ayudarlas a cuidarse junto a toda su familia.</small></div></div><div class="agenda-box"><button type="button" class="agenda-btn" id="pickContacts">📇 Elegir desde mi agenda</button><small id="agendaSupport">Vos elegís qué personas compartir. La encuesta nunca puede ver el resto de tu agenda.</small></div><div class="agenda-divider">también podés cargarlos vos</div><div class="ref-list" id="refList">${cards}</div><button type="button" class="add-ref" id="addRef" ${data.referidos.length>=10?'disabled':''}>✍️ Agregar un referido manualmente</button><div class="privacy">🔒 Los datos sólo serán entregados a la persona que te compartió esta encuesta. Si agregás referidos, al final te pediremos confirmar que te autorizaron a compartirlos.</div>`
     }
     const pretty=value=>Array.isArray(value)?value.join(', '):(value===undefined||value===null||value===''?'-':String(value));
     function reviewRows(keys){return keys.map(key=>{const f=fields[key];let value=data.answers[key];if(Array.isArray(value)&&value.includes('Otros')&&data.answers[key+'_otros'])value=value.map(v=>v==='Otros'?data.answers[key+'_otros']:v);return `<div class="review-row"><span>${esc(f.label)}</span><span>${esc(pretty(value))}</span></div>`}).join('')}
     function reviewHTML(){
       const refs=data.referidos.filter(r=>r.nombre||r.telefono);
-      return `<div class="review-grid"><section class="review-section"><h3>👤 Tus datos</h3><div class="review-row"><span>Nombre</span><span>${esc(data.nombre)}</span></div><div class="review-row"><span>Teléfono</span><span>${esc(data.telefono)}</span></div></section><section class="review-section"><h3>💧 Agua y ambiente</h3>${reviewRows([...requiredByStep[1],...requiredByStep[2]])}</section><section class="review-section"><h3>💼 Actividad laboral</h3>${reviewRows(requiredByStep[3])}</section><section class="review-section"><h3>👥 Referidos</h3>${refs.length?refs.map((r,i)=>`<div class="review-row"><span>Referido ${i+1}</span><span>${esc(r.nombre)} · ${esc(r.telefono)}${r.zona?' · '+esc(r.zona):''}</span></div>`).join(''):'<div class="review-row"><span>Referidos cargados</span><span>Ninguno</span></div>'}</section></div><label class="consent"><input type="checkbox" id="consentMain" ${data.consentimiento?'checked':''}><span><strong>Autorizo el envío de mis datos y respuestas</strong> al distribuidor que compartió esta encuesta para que pueda contactarme.</span></label>${refs.length?`<label class="consent"><input type="checkbox" id="consentRefs" ${data.autorizacion_referidos?'checked':''}><span><strong>Confirmo que las personas referidas me autorizaron</strong> a compartir sus datos para que puedan ser contactadas.</span></label>`:''}<div class="privacy">APPI guarda la respuesta en una cuenta protegida. El distribuidor que te envió el enlace será el único que podrá verla y gestionarla dentro de Mi Gestión.</div>`
+      return `<div class="review-grid"><section class="review-section"><h3>👤 Tus datos</h3><div class="review-row"><span>Nombre</span><span>${esc(data.nombre)}</span></div><div class="review-row"><span>Teléfono</span><span>${esc(data.telefono)}</span></div></section><section class="review-section"><h3>💧 Agua y ambiente</h3>${reviewRows([...requiredByStep[1],...requiredByStep[2]])}</section><section class="review-section"><h3>💼 Actividad laboral</h3>${reviewRows(requiredByStep[3])}</section><section class="review-section"><h3>👥 Referidos</h3>${refs.length?refs.map((r,i)=>`<div class="review-row"><span>Referido ${i+1}</span><span>${esc(r.nombre)} · ${esc(r.telefono)}${r.zona?' · '+esc(r.zona):''}</span></div>`).join(''):'<div class="review-row"><span>Referidos cargados</span><span>Ninguno</span></div>'}</section></div><label class="consent"><input type="checkbox" id="consentMain" ${data.consentimiento?'checked':''}><span><strong>Autorizo el envío de mis datos y respuestas</strong> a la persona que compartió esta encuesta para que pueda contactarme.</span></label>${refs.length?`<label class="consent"><input type="checkbox" id="consentRefs" ${data.autorizacion_referidos?'checked':''}><span><strong>Confirmo que las personas referidas me autorizaron</strong> a compartir sus datos para que puedan ser contactadas.</span></label>`:''}<div class="privacy">La respuesta se guarda de forma protegida. La persona que te envió esta invitación será la única que podrá verla y gestionarla.</div>`
     }
     function stepBody(){if(data.step===0)return personalHTML();if(data.step===1)return ['agua_tipo','agua_cantidad','agua_importancia','agua_calidad'].map(fieldHTML).join('');if(data.step===2)return ['agua_calidad_como','agua_proviene','agua_anomalias','agua_turbidez','agua_potabilizadores','evitar_sustancias','alternativas_evitar','ambiente'].map(fieldHTML).join('');if(data.step===3)return ['laboral_dedica','laboral_gusta','laboral_mejorar','conoces','oportunidad'].map(fieldHTML).join('');if(data.step===4)return refsHTML();return reviewHTML()}
     function render(){
       if(finished)return;
-      const s=steps[data.step];$('heroIcon').textContent=s.icon;$('heroTitle').textContent='Mi Encuesta';$('heroEyebrow').textContent=config&&config.distribuidor?`Compartida por ${config.distribuidor}`:'Encuesta compartida';$('heroSubtitle').textContent=s.sub;$('progressWrap').hidden=false;$('progressTitle').textContent=s.title;$('progressCount').textContent=`${data.step+1} de ${steps.length}`;$('progressFill').style.width=`${((data.step+1)/steps.length)*100}%`;
+      const s=steps[data.step];$('heroIcon').textContent=s.icon;$('heroTitle').textContent='Mi Encuesta';$('heroEyebrow').textContent=config&&config.distribuidor?`Compartida por ${config.distribuidor}`:'Encuesta compartida';$('heroSubtitle').textContent=s.sub;$('progressWrap').hidden=false;$('progressTitle').textContent=s.progress||s.title;$('progressCount').textContent=`${data.step+1} de ${steps.length}`;$('progressFill').style.width=`${((data.step+1)/steps.length)*100}%`;
       $('content').innerHTML=`<section class="step-card"><div class="step-head"><div class="step-number">${s.icon}</div><div><h2>${esc(s.title)}</h2><p>${esc(s.sub)}</p></div></div>${stepBody()}</section>`;
       $('actions').innerHTML=`<div class="nav-actions ${data.step===0?'single':''}">${data.step?'<button type="button" class="nav-btn nav-back" id="prevStep">← Atrás</button>':''}<button type="button" class="nav-btn ${data.step===steps.length-1?'nav-submit':'nav-next'}" id="nextStep" ${submitting?'disabled':''}>${submitting?'Enviando…':data.step===steps.length-1?'Enviar encuesta':'Continuar →'}</button></div>`;
       bind();window.scrollTo({top:0,behavior:'smooth'});
     }
     function contactValue(value){if(Array.isArray(value))return String(value.find(Boolean)||'').trim();return String(value||'').trim()}
     function normalizedPhone(value){return String(value||'').replace(/\D/g,'').slice(0,15)}
+    function currentClaimedUrl(){const url=new URL(location.href);url.searchParams.set('c',claimId);return url.toString()}
+    function openInChrome(){const url=currentClaimedUrl(),withoutScheme=url.replace(/^https?:\/\//,'');location.href=`intent://${withoutScheme}#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=${encodeURIComponent(url)};end`}
     async function chooseContacts(){
       if(!navigator.contacts||typeof navigator.contacts.select!=='function'){
-        await window.APPIDialog.alert('En Android podés abrir la agenda usando Chrome. En iPhone y otros navegadores esta función todavía no está habilitada; igualmente podés agregar los referidos manualmente.',{title:'Agenda no disponible',icon:'📇',okText:'Entendido'});return;
+        const ua=navigator.userAgent||'',android=/Android/i.test(ua),inApp=/;\s*wv\)|WhatsApp|FBAN|FBAV|Instagram/i.test(ua);
+        if(android&&inApp){const open=await window.APPIDialog.confirm('El navegador interno de WhatsApp no permite abrir la agenda. ¿Querés continuar esta misma invitación en Chrome?',{title:'Abrir la agenda',icon:'📇',okText:'Abrir en Chrome',cancelText:'Cargar manualmente'});if(open)openInChrome();return}
+        await window.APPIDialog.alert(android?'Este navegador no permite abrir la agenda. Podés continuar agregando los referidos manualmente.':'En iPhone y algunos navegadores la agenda no está disponible desde una encuesta web. Podés agregar los referidos manualmente.',{title:'Agenda no disponible',icon:'📇',okText:'Continuar manualmente'});return;
       }
       try{
-        const selected=await navigator.contacts.select(['name','tel'],{multiple:true});
+        let selected;try{selected=await navigator.contacts.select(['name','tel'],{multiple:true})}catch(firstError){if(firstError&&firstError.name==='TypeError'){const one=await navigator.contacts.select(['name','tel'],{multiple:false});selected=Array.isArray(one)?one:[one]}else throw firstError}
         if(!Array.isArray(selected)||!selected.length)return;
         const respondent=normalizedPhone(data.telefono),existing=new Set(data.referidos.map(ref=>normalizedPhone(ref.telefono)).filter(Boolean));let added=0,duplicates=0;
         for(const contact of selected){
@@ -203,7 +208,7 @@
     function bind(){
       const name=$('surveyName'),phone=$('surveyPhone'),web=$('surveyWebsite');if(name)name.oninput=e=>{data.nombre=e.target.value;save()};if(phone)phone.oninput=e=>{data.telefono=e.target.value;save()};if(web)web.oninput=e=>{data.website=e.target.value;save()};
       document.querySelectorAll('[data-field]').forEach(button=>button.onclick=()=>selectChip(button));
-      document.querySelectorAll('[data-rate]').forEach(button=>button.onclick=()=>{data.answers.agua_importancia=Number(button.dataset.rate);save();render()});
+      document.querySelectorAll('[data-rate]').forEach(button=>button.onclick=()=>{data.answers.agua_importancia=Number(button.dataset.rate);save();button.closest('.rating').querySelectorAll('[data-rate]').forEach(item=>item.classList.toggle('selected',item===button));button.closest('.field')?.classList.remove('error')});
       document.querySelectorAll('[data-other]').forEach(input=>input.oninput=e=>{data.answers[input.dataset.other+'_otros']=e.target.value;save()});
       document.querySelectorAll('[data-ref-field]').forEach(input=>input.oninput=e=>{const i=Number(input.dataset.refIndex);data.referidos[i][input.dataset.refField]=e.target.value;save()});
       document.querySelectorAll('[data-remove-ref]').forEach(button=>button.onclick=()=>{data.referidos.splice(Number(button.dataset.removeRef),1);save();render()});
@@ -212,10 +217,19 @@
       if($('consentMain'))$('consentMain').onchange=e=>{data.consentimiento=e.target.checked;save()};if($('consentRefs'))$('consentRefs').onchange=e=>{data.autorizacion_referidos=e.target.checked;save()};
       if($('prevStep'))$('prevStep').onclick=()=>{capture();data.step=Math.max(0,data.step-1);save();render()};$('nextStep').onclick=next;
     }
+    function syncChoiceField(key){
+      const wrap=document.querySelector(`[data-field-wrap="${key}"]`),current=values(key),f=fields[key];if(!wrap)return;
+      wrap.querySelectorAll(`[data-field="${key}"]`).forEach(item=>item.classList.toggle('selected',current.includes(item.dataset.value)));
+      const oldOther=wrap.querySelector('.other-wrap');
+      if(f.other&&current.includes('Otros')){
+        if(!oldOther){const error=wrap.querySelector('.error-text');error.insertAdjacentHTML('beforebegin',`<div class="other-wrap"><input class="other-input" data-other="${key}" maxlength="160" placeholder="Contanos un poco más…" value="${esc(data.answers[key+'_otros']||'')}"></div>`);const input=wrap.querySelector(`[data-other="${key}"]`);input.oninput=e=>{data.answers[key+'_otros']=e.target.value;save()};setTimeout(()=>input.focus(),0)}
+      }else if(oldOther)oldOther.remove();
+      wrap.classList.remove('error');
+    }
     function selectChip(button){
       const key=button.dataset.field,value=button.dataset.value,f=fields[key];let current=values(key);
       if(f.single)current=current.includes(value)?[]:[value];else if(current.includes(value))current=current.filter(v=>v!==value);else{if(f.exclusive&&value===f.exclusive)current=[value];else{current=current.filter(v=>v!==f.exclusive);current.push(value)}}
-      data.answers[key]=current;if(value==='Otros'&&!current.includes('Otros'))data.answers[key+'_otros']='';save();render();
+      data.answers[key]=current;if(value==='Otros'&&!current.includes('Otros'))data.answers[key+'_otros']='';save();syncChoiceField(key);
     }
     function capture(){const name=$('surveyName'),phone=$('surveyPhone'),web=$('surveyWebsite');if(name)data.nombre=name.value;if(phone)data.telefono=phone.value;if(web)data.website=web.value;document.querySelectorAll('[data-other]').forEach(input=>data.answers[input.dataset.other+'_otros']=input.value);document.querySelectorAll('[data-ref-field]').forEach(input=>{const i=Number(input.dataset.refIndex);if(data.referidos[i])data.referidos[i][input.dataset.refField]=input.value});if($('consentMain'))data.consentimiento=$('consentMain').checked;if($('consentRefs'))data.autorizacion_referidos=$('consentRefs').checked;save()}
     function markError(key){const el=document.querySelector(`[data-field-wrap="${key}"]`);if(el)el.classList.add('error');return el}
@@ -233,13 +247,13 @@
       if(data.step<steps.length-1){data.step++;save();render();return}await submit();
     }
     async function submit(){
-      submitting=true;render();try{const result=await request('/functions/v1/encuesta-publica',{method:'POST',body:JSON.stringify({token,submission_id:data.submission_id,nombre:data.nombre,telefono:data.telefono,respuestas:data.answers,referidos:data.referidos,consentimiento:data.consentimiento,autorizacion_referidos:data.autorizacion_referidos,website:data.website})});finished=true;sessionStorage.removeItem(storageKey);$('progressWrap').hidden=true;$('heroIcon').textContent='✓';$('heroEyebrow').textContent='Envío confirmado';$('heroSubtitle').textContent='La información ya está disponible en Mi Gestión.';$('content').innerHTML=`<section class="step-card success"><div class="success-mark">✓</div><h2>¡Gracias por responder!</h2><p>Tu encuesta fue recibida correctamente y ya se encuentra en la cuenta de ${esc(config.distribuidor||'tu distribuidor')}.</p>${Number(result.referidos)>0?`<div class="privacy">También registramos ${Number(result.referidos)} referido${Number(result.referidos)===1?'':'s'} para que pueda${Number(result.referidos)===1?'':'n'} ser contactado${Number(result.referidos)===1?'':'s'}.</div>`:'<div class="privacy">No se cargaron referidos. Gracias por completar todas las respuestas.</div>'}</section>`;$('actions').innerHTML='';window.scrollTo({top:0,behavior:'smooth'})}catch(error){submitting=false;render();await window.APPIDialog.alert(error.message,{title:'No pudimos enviar la encuesta',icon:'!',okText:'Reintentar'})}
+      submitting=true;render();try{const result=await request('/functions/v1/encuesta-publica',{method:'POST',body:JSON.stringify({token,claim_id:claimId,submission_id:data.submission_id,nombre:data.nombre,telefono:data.telefono,respuestas:data.answers,referidos:data.referidos,consentimiento:data.consentimiento,autorizacion_referidos:data.autorizacion_referidos,website:data.website})});finished=true;sessionStorage.removeItem(storageKey);sessionStorage.removeItem(claimStorageKey);$('progressWrap').hidden=true;$('heroIcon').textContent='✓';$('heroEyebrow').textContent='Envío confirmado';$('heroSubtitle').textContent='Tus respuestas fueron enviadas correctamente.';$('content').innerHTML=`<section class="step-card success"><div class="success-mark">✓</div><h2>¡Gracias por responder!</h2><p>Tu encuesta fue recibida correctamente por ${esc(config.distribuidor||'la persona que te invitó')}.</p>${Number(result.referidos)>0?`<div class="privacy">También registramos ${Number(result.referidos)} referido${Number(result.referidos)===1?'':'s'} para que pueda${Number(result.referidos)===1?'':'n'} ser contactado${Number(result.referidos)===1?'':'s'}.</div>`:'<div class="privacy">No se cargaron referidos. Gracias por completar todas las respuestas.</div>'}</section>`;$('actions').innerHTML='';window.scrollTo({top:0,behavior:'smooth'})}catch(error){submitting=false;render();await window.APPIDialog.alert(error.message,{title:'No pudimos enviar la encuesta',icon:'!',okText:'Reintentar'})}
     }
     async function init(){
       if(!token||!cfg().url||!cfg().anonKey){showUnavailable('El enlace no tiene la información necesaria.');return}
-      try{config=await request(`/functions/v1/encuesta-publica?token=${encodeURIComponent(token)}`,{method:'GET'});render()}catch(error){showUnavailable(error.message)}
+      try{config=await request(`/functions/v1/encuesta-publica?token=${encodeURIComponent(token)}&claim_id=${encodeURIComponent(claimId)}`,{method:'GET'});render()}catch(error){showUnavailable(error.message)}
     }
-    function showUnavailable(message){$('progressWrap').hidden=true;$('heroSubtitle').textContent='El enlace no está disponible.';$('content').innerHTML=`<section class="status-card"><div class="ico">🔒</div><h2>No podemos abrir esta encuesta</h2><p>${esc(message)} Pedile al distribuidor que te envíe nuevamente su enlace desde APPI.</p></section>`;$('actions').innerHTML=''}
+    function showUnavailable(message){$('progressWrap').hidden=true;$('heroSubtitle').textContent='El enlace no está disponible.';$('content').innerHTML=`<section class="status-card"><div class="ico">🔒</div><h2>No podemos abrir esta encuesta</h2><p>${esc(message)} Pedile a la persona que te invitó que te envíe un enlace nuevo.</p></section>`;$('actions').innerHTML=''}
     window.APPIEncuesta={getData:()=>JSON.parse(JSON.stringify(data)),setData:value=>{data={...data,...value};save();render()},submit};
     init();
   })();

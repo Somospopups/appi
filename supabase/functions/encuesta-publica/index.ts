@@ -99,31 +99,28 @@ Deno.serve(async request => {
     if (request.method === 'GET') {
       const requestUrl = new URL(request.url);
       const token = requestUrl.searchParams.get('token') || '';
-      if (!validUuid(token)) return json({ error: 'El enlace de encuesta no es válido.' }, 400);
+      const claimId = requestUrl.searchParams.get('claim_id') || '';
+      if (!validUuid(token) || !validUuid(claimId)) return json({ error: 'La invitación no es válida.' }, 400);
 
-      const { data: linkRow, error: linkError } = await admin
-        .from('appi_encuesta_links')
-        .select('user_id,activo')
-        .eq('token', token)
-        .eq('activo', true)
-        .maybeSingle();
-      if (linkError || !linkRow) return json({ error: 'Esta encuesta no está disponible en este momento.' }, 404);
-
-      const { data: profile, error: profileError } = await admin
-        .from('appi_perfiles')
-        .select('nombre,rol,activo,membresia_vence')
-        .eq('user_id', linkRow.user_id)
-        .maybeSingle();
-      const expires = profile?.membresia_vence ? new Date(profile.membresia_vence).getTime() : 0;
-      if (profileError || !profile || profile.rol !== 'usuario' || profile.activo !== true || expires <= Date.now()) {
-        return json({ error: 'Esta encuesta no está disponible en este momento.' }, 404);
+      const { data, error } = await admin.rpc('appi_reclamar_invitacion_encuesta', {
+        p_token: token,
+        p_claim_id: claimId,
+      });
+      if (error) {
+        const message = String(error.message || 'Esta invitación no está disponible.');
+        const status = /venció/i.test(message) ? 410 : /utilizada|otro dispositivo/i.test(message) ? 409 : 404;
+        return json({ error: message }, status);
       }
+      const invitation = Array.isArray(data) ? data[0] : data;
+      if (!invitation) return json({ error: 'Esta invitación no está disponible.' }, 404);
+      const firstName = cleanText(invitation.nombre, 80).split(/\s+/)[0] || '';
 
       return json({
         ok: true,
         encuesta: 'Mi Encuesta',
-        distribuidor: cleanText(profile.nombre, 80),
-        privacidad: 'Las respuestas se entregan únicamente al distribuidor que compartió este enlace.'
+        distribuidor: firstName,
+        expires_at: invitation.expires_at,
+        privacidad: 'Esta invitación es privada, vence en 24 horas y admite una sola respuesta.'
       });
     }
 
@@ -135,8 +132,9 @@ Deno.serve(async request => {
     if (cleanText(body?.website, 100)) return json({ ok: true, recibida: true }, 201);
 
     const token = String(body?.token || '');
+    const claimId = String(body?.claim_id || '');
     const submissionId = String(body?.submission_id || '');
-    if (!validUuid(token) || !validUuid(submissionId)) return json({ error: 'El enlace o envío no es válido.' }, 400);
+    if (!validUuid(token) || !validUuid(claimId) || !validUuid(submissionId)) return json({ error: 'La invitación o el envío no es válido.' }, 400);
 
     const nombre = cleanText(body?.nombre, 120);
     const telefono = cleanPhone(body?.telefono);
@@ -176,13 +174,14 @@ Deno.serve(async request => {
 
     const { data, error } = await admin.rpc('appi_registrar_encuesta_publica', {
       p_token: token,
+      p_claim_id: claimId,
       p_submission_id: submissionId,
       p_payload: payload,
     });
 
     if (error) {
       console.error('encuesta-publica rpc', error);
-      const known = /enlace|consentimiento|teléfono|nombre|referidos|formato|límite/i.test(error.message || '');
+      const known = /invitación|enlace|dispositivo|utilizada|venció|cancelada|consentimiento|teléfono|nombre|referidos|formato|límite/i.test(error.message || '');
       return json({ error: known ? error.message : 'No pudimos guardar la encuesta. Intentá nuevamente.' }, known ? 400 : 500);
     }
 

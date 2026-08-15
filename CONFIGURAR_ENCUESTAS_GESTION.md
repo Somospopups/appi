@@ -1,6 +1,6 @@
 # Configurar Mi Encuesta y Mi Gestión
 
-Este módulo agrega un enlace de encuesta permanente por distribuidor y un CRM privado dentro de APPI.
+Este módulo agrega invitaciones privadas de encuesta —una por envío, válidas por 24 horas y para una sola respuesta— y un CRM privado dentro de APPI.
 
 ## 1. Instalar las tablas y políticas
 
@@ -16,7 +16,8 @@ SUPABASE_ENCUESTAS_GESTION.sql
 
 El script crea:
 
-- `appi_encuesta_links`
+- `appi_encuesta_links` — compatibilidad con la versión anterior
+- `appi_encuesta_invitaciones` — invitaciones privadas de 24 horas y un solo uso
 - `appi_encuestas`
 - `appi_gestion_contactos`
 - políticas RLS por distribuidor
@@ -42,13 +43,13 @@ supabase functions deploy encuesta-publica --no-verify-jwt
 
 1. Ingresar a APPI con un distribuidor.
 2. Abrir `Mis herramientas → Mi Encuesta`.
-3. Confirmar que aparezca un enlace con esta forma:
+3. Tocar `Copiar invitación` y confirmar que se genere un enlace con esta forma:
 
 ```text
 https://somospopups.github.io/appi/encuesta.html?t=TOKEN
 ```
 
-4. Abrirlo en una ventana privada.
+4. Abrirlo en una ventana privada y comprobar que una segunda ventana o dispositivo quede bloqueado.
 5. En Android con Chrome, probar `Elegir desde mi agenda`; en iPhone debe mantenerse disponible la carga manual.
 6. Completar una encuesta de prueba.
 7. Volver a APPI y abrir `Mi Gestión`.

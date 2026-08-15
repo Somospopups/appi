@@ -35,6 +35,7 @@ function completeAnswers() {
 
 test('la encuesta pública se abre sin login y entrega la respuesta al enlace correcto', async ({ page }) => {
   let submitted = null;
+  let claimed = null;
   await page.route('**/auth-config.js', route => route.fulfill({
     contentType: 'application/javascript',
     body: "window.APPI_AUTH={url:'https://mock.supabase.co',anonKey:'anon-key-publica-de-prueba-1234567890'};"
@@ -42,6 +43,7 @@ test('la encuesta pública se abre sin login y entrega la respuesta al enlace co
   await page.route('https://mock.supabase.co/functions/v1/encuesta-publica**', route => {
     const request = route.request();
     if (request.method() === 'GET') {
+      claimed = new URL(request.url()).searchParams.get('claim_id');
       return route.fulfill({
         status: 200,
         headers: { 'access-control-allow-origin': '*' },
@@ -64,6 +66,14 @@ test('la encuesta pública se abre sin login y entrega la respuesta al enlace co
   await expect(page.locator('.step-head h2')).toHaveText('Tus datos');
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(360);
 
+  await page.evaluate(() => APPIEncuesta.setData({ step: 2, answers: {} }));
+  const stableOption = page.locator('[data-field="agua_turbidez"][data-value="No"]');
+  await stableOption.scrollIntoViewIfNeeded();
+  const scrollBefore = await page.evaluate(() => window.scrollY);
+  await stableOption.click();
+  const scrollAfter = await page.evaluate(() => window.scrollY);
+  expect(Math.abs(scrollAfter - scrollBefore)).toBeLessThanOrEqual(2);
+
   await page.evaluate(({ answers }) => {
     APPIEncuesta.setData({
       step: 5,
@@ -85,6 +95,8 @@ test('la encuesta pública se abre sin login y entrega la respuesta al enlace co
     consentimiento: true,
     autorizacion_referidos: true
   });
+  expect(submitted.claim_id).toBe(claimed);
+  expect(submitted.claim_id).toMatch(/^[0-9a-f-]{36}$/i);
   expect(submitted.referidos).toHaveLength(1);
   expect(submitted.respuestas.oportunidad).toEqual(['Quiero más info']);
 });
@@ -137,7 +149,7 @@ test('Mi Encuesta y Mi Gestión usan la cuenta autenticada y guardan el seguimie
   const now = new Date().toISOString();
   const profile = {
     user_id: USER_ID, username: null, dip: '02-9802014', sucursal: '02', numero_distribuidor: '9802014',
-    nombre: 'Distribuidor A', rol: 'usuario', activo: true, debe_cambiar_password: false,
+    nombre: 'María Pérez', rol: 'usuario', activo: true, debe_cambiar_password: false,
     membresia_meses: 1, membresia_inicio: now, membresia_vence: new Date(Date.now() + 30 * 86400000).toISOString()
   };
   const contacts = [
@@ -166,7 +178,7 @@ test('Mi Encuesta y Mi Gestión usan la cuenta autenticada y guardan el seguimie
     if (url.pathname === '/auth/v1/token') return route.fulfill({ status: 200, headers: cors, body: JSON.stringify({ access_token: accessToken, refresh_token: 'refresh', expires_in: 3600, user: { id: USER_ID } }) });
     if (url.pathname === '/rest/v1/appi_perfiles') return route.fulfill({ status: 200, headers: cors, body: JSON.stringify([profile]) });
     if (url.pathname === '/rest/v1/appi_datos' && request.method() === 'GET') return route.fulfill({ status: 200, headers: cors, body: '[]' });
-    if (url.pathname === '/rest/v1/appi_encuesta_links') return route.fulfill({ status: 200, headers: cors, body: JSON.stringify([{ token: LINK_TOKEN, activo: true }]) });
+    if (url.pathname === '/rest/v1/rpc/appi_crear_invitacion_encuesta') return route.fulfill({ status: 200, headers: cors, body: JSON.stringify([{ token: LINK_TOKEN, expires_at: new Date(Date.now() + 86400000).toISOString() }]) });
     if (url.pathname === '/rest/v1/appi_gestion_contactos' && request.method() === 'GET') return route.fulfill({ status: 200, headers: cors, body: JSON.stringify(contacts) });
     if (url.pathname === '/rest/v1/appi_gestion_contactos' && request.method() === 'PATCH') {
       patches.push(request.postDataJSON());
@@ -191,7 +203,14 @@ test('Mi Encuesta y Mi Gestión usan la cuenta autenticada y guardan el seguimie
 
   await page.evaluate(() => openEncuestaTool());
   await expect(page.locator('#view-encuesta')).toHaveClass(/active/);
+  await expect(page.locator('#surveyToolContent')).toContainText('vence en 24 horas');
+  await page.evaluate(() => APPIGestion.createInvitation());
   await expect(page.locator('.survey-link-value')).toContainText(LINK_TOKEN);
+  const friendlyMessage = await page.evaluate(() => APPIGestion.shareMessage(APPIGestion.surveyUrl()));
+  expect(friendlyMessage).toContain('Soy María');
+  expect(friendlyMessage).not.toContain('Pérez');
+  expect(friendlyMessage).not.toContain('APPI');
+  expect(friendlyMessage).toContain(LINK_TOKEN);
 
   await page.evaluate(() => openMiGestion());
   await expect(page.locator('#view-gestion')).toHaveClass(/active/);

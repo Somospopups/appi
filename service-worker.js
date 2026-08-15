@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v202-referidos-agenda';
+const CACHE_NAME = 'appi-v203-encuestas-privadas';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

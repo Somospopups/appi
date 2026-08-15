@@ -4,7 +4,7 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
-- Versión: **v202 · Referidos desde agenda**.
+- Versión: **v203 · Encuestas privadas**.
 - Publicación: [https://somospopups.github.io/appi/](https://somospopups.github.io/appi/)
 - Acceso por número de distribuidor y contraseña.
 - Acceso administrador POPUPS mediante el candado, sin DIP ni número de distribuidor.
@@ -15,7 +15,7 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Mi Encuesta y Mi Gestión
 
-Cada distribuidor tiene un enlace público permanente en **Mis herramientas → Mi Encuesta**. Puede compartirlo por WhatsApp. La persona responde sin crear una cuenta y la respuesta se registra automáticamente en **Mi Gestión** del distribuidor propietario del enlace.
+Desde **Mis herramientas → Mi Encuesta**, cada distribuidor genera una invitación privada diferente para cada envío por WhatsApp. La invitación vence en 24 horas, queda ligada al primer dispositivo que la abre y acepta una sola respuesta. La persona responde sin crear una cuenta y los datos se registran automáticamente en **Mi Gestión** del distribuidor que la invitó.
 
 Mi Gestión incluye:
 
@@ -69,6 +69,7 @@ La suite cubre la aplicación, autenticación, aislamiento por cuenta, solicitud
 
 - Los distribuidores sólo acceden a sus propios registros.
 - Las respuestas públicas ingresan mediante una Edge Function; el navegador anónimo no escribe directamente en las tablas.
+- Cada invitación vence en 24 horas, se reclama desde un solo dispositivo y queda inutilizada después del envío.
 - Los referidos son opcionales y requieren confirmación de autorización.
 - Se normalizan teléfonos y se evitan contactos duplicados por distribuidor.
 - La clave `service_role`, los tokens personales y claves de proveedores externos nunca deben incluirse en el frontend ni en GitHub.
