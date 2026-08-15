@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v197-sidebar-notas';
+const CACHE_NAME = 'appi-v198-notas-pinchadas';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

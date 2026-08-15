@@ -134,6 +134,14 @@ test('las notas Keep se muestran sujetas con un pin', async ({ page }) => {
   });
   await expect(page.locator('#keepGrid .keep-note')).toHaveCount(1);
   await expect(page.locator('#keepGrid .keep-pin')).toHaveCount(1);
+  await page.locator('#keepTitle').fill('Nueva nota');
+  await page.locator('#keepText').fill('Texto');
+  await page.evaluate(()=>window.addKeep());
+  await expect(page.locator('#colorPickerPopup .create-color-dot')).toHaveCount(10);
+  await expect(page.locator('#modalFooter button')).toHaveCount(0);
+  await page.setViewportSize({width:390,height:844});
+  const columns=await page.locator('#colorPickerPopup').evaluate(node=>getComputedStyle(node).gridTemplateColumns.split(' ').filter(Boolean).length);
+  expect(columns).toBe(5);
 });
 
 test('Contactos distingue pendientes de cerrados', async ({ page }) => {

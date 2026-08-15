@@ -3495,7 +3495,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v197 · Menú y notas</div>
+  <div class="ds-foot">APPI · v198 · Notas pinchadas</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4251,7 +4251,9 @@ const modal = {
     this.title.textContent = opts.title || '';
     this.sub.textContent = opts.sub || '';
     this.body.innerHTML = opts.html || '';
-    if(opts.confirm){
+    if(opts.hideFooter){
+      this.footer.innerHTML = '';
+    } else if(opts.confirm){
       this.footer.innerHTML = `
         <button class="btn-cancel" id="modalCancelBtn">${opts.cancelText || 'Cancelar'}</button>
         <button class="${opts.danger ? 'btn-danger' : 'btn-ok'}" id="modalConfirmBtn">${opts.okText || 'Aceptar'}</button>
@@ -10083,7 +10085,7 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./service-worker.js?v=197').catch(error => {
+      navigator.serviceWorker.register('./service-worker.js?v=198').catch(error => {
         console.warn('No se pudo registrar el modo offline de APPI', error);
       });
     });
@@ -11340,7 +11342,7 @@ body.dark .rec-item .info small{color:#a0a0b0}
 .keep-grid{columns:2;column-gap:10px}
 @media (min-width: 600px){ .keep-grid{columns:3} }
 .keep-note{break-inside:avoid;padding:19px 14px 14px;border-radius:16px;margin:7px 0 10px;position:relative;box-shadow:0 4px 12px rgba(0,0,0,0.08);transition:transform 0.15s,box-shadow 0.2s;cursor:pointer;border:1px solid rgba(0,0,0,0.06)}
-.keep-pin{position:absolute;z-index:3;top:-8px;left:50%;width:16px;height:16px;transform:translateX(-50%);border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff 0 9%,#ff8a8a 12%,#e23f4d 62%,#9f1f2a 100%);box-shadow:0 3px 7px rgba(95,25,35,.35)}.keep-pin:after{content:"";position:absolute;left:7px;top:12px;width:2px;height:9px;border-radius:2px;background:linear-gradient(#a8a8b2,#555761);transform:rotate(7deg);transform-origin:top}.keep-note.is-pinned .keep-pin{background:radial-gradient(circle at 35% 30%,#fff 0 9%,#8fb6ff 12%,#526ee8 62%,#2e3e9f 100%)}
+.keep-pin{position:absolute;z-index:3;top:-9px;left:52%;width:18px;height:18px;transform:translateX(-50%) rotate(-5deg);border-radius:50%;background:radial-gradient(circle at 34% 28%,#fffbd0 0 10%,#fff047 13%,#ffd400 58%,#d79d00 100%);box-shadow:0 4px 8px rgba(110,82,0,.34)}.keep-pin:before{content:"";position:absolute;left:4px;right:4px;bottom:-3px;height:6px;border-radius:50%;background:#e5b400}.keep-pin:after{content:"";position:absolute;left:8px;top:14px;width:2px;height:10px;border-radius:2px;background:linear-gradient(#c9cad0,#5e6069);transform:rotate(8deg);transform-origin:top}.keep-note:nth-child(3n+2) .keep-pin{left:59%;transform:translateX(-50%) rotate(4deg)}.keep-note:nth-child(3n) .keep-pin{left:46%;transform:translateX(-50%) rotate(-2deg)}.keep-note.is-pinned .keep-pin{box-shadow:0 0 0 4px rgba(91,141,239,.26),0 4px 8px rgba(110,82,0,.34)}
 .keep-note:active{transform:scale(0.98)}
 .keep-note .k-title{font-weight:800;font-size:14px;margin:0 0 6px;word-break:break-word}
 .keep-note .k-text{font-size:13px;line-height:1.4;white-space:pre-wrap;word-break:break-word;opacity:0.9}
@@ -11348,6 +11350,8 @@ body.dark .rec-item .info small{color:#a0a0b0}
 .keep-note .k-actions{position:absolute;top:8px;right:8px;display:flex;gap:4px;opacity:0;transition:opacity 0.2s}
 .keep-note:hover .k-actions{opacity:1}
 .k-color-dot{width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,255,255,0.8);cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,0.15)}
+.k-color-dot.create-color-dot{width:36px;height:36px;box-shadow:0 2px 6px rgba(0,0,0,.15)}.k-color-dot.edit-color-dot{width:26px;height:26px}.k-color-dot.selected{outline:3px solid #242632;outline-offset:2px;box-shadow:0 0 0 5px rgba(255,255,255,.8),0 4px 10px rgba(0,0,0,.2)}body.dark .k-color-dot.selected{outline-color:#fff;box-shadow:0 0 0 5px rgba(255,255,255,.34),0 0 16px rgba(255,255,255,.45)}
+@media(max-width:560px){#colorPickerPopup{display:grid!important;grid-template-columns:repeat(5,36px);gap:12px 10px!important;justify-content:center!important;max-width:250px;margin:16px auto!important}}
 .keep-colors{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
 .keep-add{padding:14px;border-radius:18px;background:rgba(255,255,255,0.7);border:1.5px dashed rgba(80,90,130,0.25);cursor:text}
 .keep-add textarea{width:100%;border:none;background:transparent;resize:none;outline:none;font-family:inherit;font-size:14px;min-height:60px}
@@ -11764,13 +11768,15 @@ body.dark #modelStatus{
   background: #fff475; /* color dinámico se mantiene */
   backdrop-filter:blur(12px) saturate(150%);
   border:1px solid rgba(255,255,255,0.5);
-  border-radius:16px !important;
-  box-shadow:0 6px 18px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.6) !important;
-  transform:translateZ(0);
+  border-radius:9px !important;
+  box-shadow:0 10px 22px rgba(35,38,55,0.14), inset 0 1px 0 rgba(255,255,255,0.65) !important;
+  transform:rotate(-0.8deg) translateZ(0);
   transition:transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .20s ease !important;
 }
+#view-notas .keep-note:nth-child(even){transform:rotate(.8deg) translateZ(0)}
+#view-notas .keep-note:nth-child(3n){transform:rotate(-.35deg) translateZ(0)}
 #view-notas .keep-note:hover{
-  transform:translateY(-2px) scale(1.01);
+  transform:translateY(-3px) rotate(0deg) scale(1.01);
   box-shadow:0 10px 28px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.8) !important;
 }
 #view-notas .keep-note:active{transform:scale(0.98)}
@@ -12102,7 +12108,7 @@ function openKeepModal(id){
   const n=notas.find(x=>x.id===id);
   if(!n) return;
   const colors=['#fff475','#fbbc04','#f28b82','#aecbfa','#ccff90','#d7aefb','#ffcc80','#e8eaed'];
-  const colorsHtml=colors.map(c=>`<div class="k-color-dot" style="background:${c}; width:26px;height:26px; border:${n.color===c?'3px solid #1c1c1e':'2px solid rgba(255,255,255,0.8)'}" onclick="window.changeKeepColor && window.changeKeepColor('${n.id}','${c}')"></div>`).join('');
+  const colorsHtml=colors.map(c=>`<div class="k-color-dot edit-color-dot ${n.color===c?'selected':''}" style="background:${c}" onclick="window.changeKeepColor && window.changeKeepColor('${n.id}','${c}')"></div>`).join('');
   const html=`
     <div style="text-align:left">
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">${colorsHtml}</div>
@@ -12120,7 +12126,7 @@ function openKeepModal(id){
     </div>
   `;
   if(typeof modal!=='undefined' && modal.open){
-    modal.open({icon:'📝', iconBg:'linear-gradient(135deg,#fbbf24,#f59e0b)', title:'Nota', sub:n.title||'Sin título', html});
+    modal.open({icon:'📝', iconBg:'linear-gradient(135deg,#fbbf24,#f59e0b)', title:'Nota', sub:n.title||'Sin título', html, hideFooter:true});
     // Focus text after open
     setTimeout(()=>{ const ta=document.getElementById('keepModalText'); if(ta) ta.focus(); },200);
   }
@@ -12142,7 +12148,7 @@ window.addKeep=function(){
   window._pendingKeepText=text;
   window._selectedKeepColor=document.getElementById('keepColor')?.value||'#fff475';
   const COLORS=['#fff475','#fbbc04','#f28b82','#aecbfa','#ccff90','#d7aefb','#ffcc80','#e8eaed','#ff8f6b','#a0a0b0'];
-  const colorsHtml=COLORS.map(c=>`<div class="k-color-dot" style="background:${c}; width:36px;height:36px; border:${(window._selectedKeepColor===c?'3px solid #1c1c1e':'2px solid rgba(255,255,255,0.9)')}; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.15)" onclick="window._selectedKeepColor='${c}'; document.querySelectorAll('#colorPickerPopup .k-color-dot').forEach(d=>d.style.border='2px solid rgba(255,255,255,0.9)'); this.style.border='3px solid #1c1c1e';"></div>`).join('');
+  const colorsHtml=COLORS.map(c=>`<div class="k-color-dot create-color-dot ${window._selectedKeepColor===c?'selected':''}" style="background:${c}" onclick="window._selectedKeepColor='${c}'; document.querySelectorAll('#colorPickerPopup .k-color-dot').forEach(d=>d.classList.remove('selected')); this.classList.add('selected');"></div>`).join('');
   const htmlPopup=`
     <div style="text-align:center">
       <p style="font-size:13px;color:#5c5c66;margin:0 0 12px">Elegí un color para tu nota:</p>
@@ -12154,7 +12160,7 @@ window.addKeep=function(){
     </div>
   `;
   if(typeof modal!=='undefined' && modal.open){
-    modal.open({icon:'🎨', iconBg:'linear-gradient(135deg,#fbbf24,#f59e0b)', title:'Color de nota', sub:'Elegí un color', html:htmlPopup});
+    modal.open({icon:'🎨', iconBg:'linear-gradient(135deg,#fbbf24,#f59e0b)', title:'Color de nota', sub:'Elegí un color', html:htmlPopup, hideFooter:true});
   } else {
     // Fallback directo
     window.confirmKeepColor();
