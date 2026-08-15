@@ -3,7 +3,7 @@
 
 const $=id=>document.getElementById(id);
 const esc=value=>String(value==null?'':value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const state={devices:[],loading:false,lastError:'',overlay:null,pairTimer:null,initialized:false};
+const state={devices:[],loading:false,lastError:'',overlay:null,pairTimer:null,managerVersion:0,initialized:false};
 const DEVICE_KEY='appi_bridge_device_key_v1';
 
 function config(){return window.APPIAuth&&window.APPIAuth.config?window.APPIAuth.config():window.APPI_AUTH||{}}
@@ -23,11 +23,62 @@ async function callBridge(body,retry=true){
   const text=await response.text(),data=readJson(text);if(!response.ok)throw new Error(data.error||data.message||`Error ${response.status}`);return data
 }
 function installStyles(){if($('appiDeviceBridgeStyles'))return;const style=document.createElement('style');style.id='appiDeviceBridgeStyles';style.textContent=`
-.appi-device-overlay{position:fixed;inset:0;z-index:29000;display:flex;align-items:center;justify-content:center;padding:15px;background:rgba(20,22,38,.56);backdrop-filter:blur(11px)}.appi-device-overlay[hidden]{display:none!important}.appi-device-card{width:min(100%,520px);max-height:min(92vh,760px);overflow-y:auto;padding:20px;border-radius:26px;background:linear-gradient(150deg,#eff5ff,#faf8ff 58%,#eef9f6);box-shadow:0 28px 90px rgba(24,27,61,.38);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#292938}.appi-device-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:15px}.appi-device-head h2{margin:0;font-size:20px}.appi-device-head p{margin:4px 0 0;color:#777887;font-size:10.5px;line-height:1.4}.appi-device-close{width:36px;height:36px;border:0;border-radius:12px;background:rgba(80,90,130,.08);color:#666776;font-size:20px}.appi-device-hero{padding:16px;border-radius:20px;color:#fff;background:linear-gradient(135deg,#4d78dd,#785bd9 65%,#a06bff);box-shadow:0 12px 28px rgba(76,82,184,.2);margin-bottom:11px}.appi-device-hero b{display:block;font-size:15px}.appi-device-hero p{margin:5px 0 0;font-size:10.5px;line-height:1.45;opacity:.88}.appi-device-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:11px}.appi-device-btn{min-height:43px;border:0;border-radius:13px;padding:9px 11px;font:inherit;font-size:9.5px;font-weight:950;cursor:pointer}.appi-device-btn.primary{color:#fff;background:linear-gradient(135deg,#5b8def,#875fdd);box-shadow:0 6px 15px rgba(91,112,210,.2)}.appi-device-btn.secondary{color:#3d63c9;background:rgba(91,141,239,.1)}.appi-device-btn.success{color:#fff;background:linear-gradient(135deg,#2eb98f,#5b8def)}.appi-device-btn.danger{color:#bd4149;background:rgba(217,83,89,.09)}.appi-device-btn:disabled{opacity:.48;box-shadow:none}.appi-device-list{display:grid;gap:8px}.appi-device-list-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:14px 2px 8px}.appi-device-list-head b{font-size:11px}.appi-device-refresh{border:0;border-radius:10px;padding:7px 10px;background:rgba(91,141,239,.1);color:#3d63c9;font:inherit;font-size:8.5px;font-weight:900;cursor:pointer}.appi-device-item{display:grid;grid-template-columns:42px minmax(0,1fr) auto;gap:8px 10px;align-items:center;padding:12px;border-radius:17px;background:rgba(255,255,255,.65);border:1px solid rgba(255,255,255,.82)}.appi-device-icon{width:42px;height:42px;grid-row:1 / span 2;border-radius:13px;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,#3ad0a4,#5b8def);font-size:18px}.appi-device-item b{display:block;font-size:11px}.appi-device-item small{display:block;margin-top:3px;color:#777887;font-size:8.5px;line-height:1.3}.appi-device-state{padding:5px 8px;border-radius:999px;background:rgba(58,208,164,.11);color:#238060;font-size:7.5px;font-weight:950;white-space:nowrap}.appi-device-state.off{background:rgba(217,83,89,.08);color:#b3454c}.appi-device-remove{grid-column:2 / -1;min-height:36px;width:100%;border:1px solid rgba(217,83,89,.14);border-radius:11px;padding:8px 11px;background:rgba(217,83,89,.08);color:#a83d45;font:inherit;font-size:9px;font-weight:900;cursor:pointer}.appi-device-remove:disabled,.appi-device-refresh:disabled{opacity:.5;cursor:wait}.appi-device-error{padding:11px;border-radius:14px;background:rgba(217,83,89,.08);border:1px solid rgba(217,83,89,.16);color:#a83d45;font-size:9.5px;line-height:1.4;text-align:center}.appi-pair-box{padding:15px;border-radius:19px;background:rgba(255,255,255,.68);border:1px solid rgba(255,255,255,.82);text-align:center}.appi-pair-qr{width:min(100%,250px);margin:0 auto}.appi-pair-qr svg{display:block;width:100%;height:auto;border-radius:12px;background:#fff}.appi-pair-code{margin:11px 0 4px;color:#3d63c9;font-size:28px;font-weight:950;letter-spacing:6px}.appi-pair-expire{color:#777887;font-size:9px}.appi-device-field{display:grid;gap:5px;margin:10px 0}.appi-device-field label{color:#666776;font-size:9px;font-weight:950;text-transform:uppercase}.appi-device-field input{width:100%;min-height:45px;border:1px solid rgba(80,90,130,.14);border-radius:13px;background:rgba(255,255,255,.78);padding:10px 12px;color:#292938;font:inherit;font-size:15px;outline:none}.appi-device-field input:focus{border-color:#5b8def;box-shadow:0 0 0 3px rgba(91,141,239,.1)}.appi-device-note{padding:11px;border-radius:14px;background:rgba(245,179,1,.08);border:1px solid rgba(245,179,1,.16);color:#795d20;font-size:9.5px;line-height:1.45;margin-top:10px}.appi-device-status{min-height:20px;margin-top:9px;color:#666776;font-size:9.5px;font-weight:800;text-align:center}.appi-call-request{text-align:center}.appi-call-icon{width:78px;height:78px;margin:4px auto 12px;border-radius:25px;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,#25d366,#128c7e);font-size:34px;box-shadow:0 14px 34px rgba(18,140,126,.25)}.appi-call-request h2{margin:0 0 6px;font-size:22px}.appi-call-number{margin:9px 0 17px;color:#3d63c9;font-size:18px;font-weight:900}.appi-call-actions{display:grid;grid-template-columns:1.4fr 1fr;gap:8px}.appi-call-actions a,.appi-call-actions button{min-height:50px;border:0;border-radius:14px;display:flex;align-items:center;justify-content:center;text-decoration:none;font:inherit;font-size:11px;font-weight:950}.appi-call-actions a{color:#fff;background:linear-gradient(135deg,#25d366,#128c7e)}.appi-call-actions button{color:#666776;background:rgba(80,90,130,.08)}body.dark .appi-device-card{background:linear-gradient(150deg,#171827,#25213a 58%,#162b2a);color:#f0f0f5}body.dark .appi-device-item,body.dark .appi-pair-box{background:rgba(30,30,50,.66);border-color:rgba(255,255,255,.08)}body.dark .appi-device-field input{background:#1d1f31;color:#f0f0f5;border-color:rgba(255,255,255,.1)}@media(max-width:480px){.appi-device-card{padding:16px}.appi-device-actions,.appi-call-actions{grid-template-columns:1fr}.appi-device-item{grid-template-columns:38px minmax(0,1fr)}.appi-device-icon{width:38px;height:38px}.appi-device-state{grid-column:2;justify-self:start}.appi-device-remove{grid-column:1 / -1}.appi-pair-code{font-size:24px;letter-spacing:4px}}
+.appi-device-overlay{position:fixed;inset:0;z-index:29000;display:flex;align-items:center;justify-content:center;padding:15px;background:rgba(20,22,38,.56);backdrop-filter:blur(11px)}
+.appi-device-overlay[hidden]{display:none!important}
+.appi-device-card{width:min(100%,640px);max-height:min(94vh,820px);overflow-y:auto;padding:20px;border-radius:26px;background:linear-gradient(150deg,#eff5ff,#faf8ff 58%,#eef9f6);box-shadow:0 28px 90px rgba(24,27,61,.38);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#292938}
+.appi-device-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:16px}
+.appi-device-head h2{margin:0;font-size:24px;line-height:1.15}
+.appi-device-head p{margin:6px 0 0;color:#666776;font-size:14px;line-height:1.45}
+.appi-device-close{width:42px;height:42px;flex:0 0 42px;border:0;border-radius:13px;background:rgba(80,90,130,.09);color:#5d5e6c;font-size:24px;cursor:pointer}
+.appi-device-close:focus-visible,.appi-device-btn:focus-visible,.appi-device-remove:focus-visible,.appi-device-refresh:focus-visible{outline:3px solid rgba(61,99,201,.35);outline-offset:2px}
+.appi-device-hero{padding:17px;border-radius:20px;color:#fff;background:linear-gradient(135deg,#4d78dd,#785bd9 65%,#a06bff);box-shadow:0 12px 28px rgba(76,82,184,.2);margin-bottom:12px}
+.appi-device-hero b{display:block;font-size:17px}.appi-device-hero p{margin:6px 0 0;font-size:13px;line-height:1.45;opacity:.9}
+.appi-device-actions{display:grid;grid-template-columns:1fr;gap:8px;margin:8px 0 13px}
+.appi-device-btn{min-height:48px;border:0;border-radius:14px;padding:11px 14px;font:inherit;font-size:14px;font-weight:850;cursor:pointer}
+.appi-device-btn.primary{color:#fff;background:linear-gradient(135deg,#5b8def,#875fdd);box-shadow:0 8px 20px rgba(91,112,210,.24)}
+.appi-device-btn.secondary{color:#3d63c9;background:rgba(91,141,239,.1)}
+.appi-device-btn.success{min-height:58px;color:#fff;background:linear-gradient(135deg,#159d77,#397ed7);box-shadow:0 11px 25px rgba(35,137,139,.28);font-size:17px;letter-spacing:.1px}
+.appi-device-btn.danger{color:#bd4149;background:rgba(217,83,89,.09)}
+.appi-device-btn:disabled{opacity:.48;box-shadow:none}
+.appi-pair-box{padding:17px;border-radius:21px;background:rgba(255,255,255,.76);border:1px solid rgba(255,255,255,.9);text-align:center;box-shadow:0 8px 24px rgba(50,58,100,.07)}
+.appi-pair-loading{display:grid;place-items:center;min-height:210px;color:#666776;font-size:14px;font-weight:750}
+.appi-pair-kicker{display:inline-block;margin-bottom:7px;padding:5px 9px;border-radius:999px;color:#3d63c9;background:rgba(91,141,239,.11);font-size:11px;font-weight:900;letter-spacing:.5px}
+.appi-pair-title{max-width:390px;margin:0 auto 11px;font-size:18px;font-weight:850;line-height:1.3}
+.appi-pair-content{display:grid;grid-template-columns:180px minmax(0,1fr);align-items:center;gap:22px;max-width:520px;margin:0 auto}.appi-pair-details{min-width:0}.appi-pair-qr{width:180px;margin:0 auto}
+.appi-pair-qr svg{display:block;width:100%;height:auto;border-radius:13px;background:#fff}
+.appi-pair-code-label{margin-top:0;color:#666776;font-size:13px;font-weight:700}
+.appi-pair-code{margin:5px 0 4px;color:#315dbd;font-size:34px;line-height:1.1;font-weight:950;letter-spacing:6px;font-variant-numeric:tabular-nums}
+.appi-pair-expire{color:#777887;font-size:12px}
+.appi-main-prompt{margin:12px 2px 0;text-align:center}
+.appi-main-prompt .appi-pair-kicker{display:inline-block;margin-bottom:6px}
+.appi-main-prompt b{display:block;font-size:15px;line-height:1.35}
+.appi-main-prompt span{display:block;margin-top:4px;color:#666776;font-size:12.5px;line-height:1.4}
+.appi-device-list{display:grid;gap:9px}
+.appi-device-list-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:14px 2px 8px}
+.appi-device-list-head b{font-size:15px}
+.appi-device-auto{color:#667085;font-size:11px;font-weight:750}
+.appi-device-refresh{border:0;border-radius:10px;padding:8px 11px;background:rgba(91,141,239,.1);color:#3d63c9;font:inherit;font-size:12px;font-weight:850;cursor:pointer}
+.appi-device-item{display:grid;grid-template-columns:46px minmax(0,1fr) auto;gap:8px 11px;align-items:center;padding:12px;border-radius:18px;background:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.88)}
+.appi-device-icon{width:42px;height:42px;grid-row:1 / span 2;border-radius:14px;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,#3ad0a4,#5b8def);font-size:20px}
+.appi-device-item b{display:block;font-size:14px;line-height:1.25}
+.appi-device-item small{display:block;margin-top:4px;color:#6e7080;font-size:11px;line-height:1.35}
+.appi-device-state{padding:6px 9px;border-radius:999px;background:rgba(58,208,164,.12);color:#207659;font-size:10px;font-weight:900;white-space:nowrap}
+.appi-device-state.off{background:rgba(217,83,89,.09);color:#a83d45}
+.appi-device-remove{grid-column:2 / -1;justify-self:start;min-height:36px;width:auto;border:0;padding:7px 2px;background:transparent;color:#ad3942;font:inherit;font-size:13px;font-weight:800;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.appi-device-remove:disabled,.appi-device-refresh:disabled{opacity:.5;cursor:wait}
+.appi-device-error{padding:14px;border-radius:14px;background:rgba(217,83,89,.08);border:1px solid rgba(217,83,89,.16);color:#a83d45;font-size:13px;line-height:1.45;text-align:center}
+.appi-device-field{display:grid;gap:6px;margin:11px 0}.appi-device-field label{color:#666776;font-size:12px;font-weight:900;text-transform:uppercase}.appi-device-field input{width:100%;min-height:48px;border:1px solid rgba(80,90,130,.14);border-radius:13px;background:rgba(255,255,255,.78);padding:10px 12px;color:#292938;font:inherit;font-size:16px;outline:none}.appi-device-field input:focus{border-color:#5b8def;box-shadow:0 0 0 3px rgba(91,141,239,.1)}
+.appi-device-note{padding:10px 12px;border-radius:14px;background:rgba(245,179,1,.08);border:1px solid rgba(245,179,1,.17);color:#71561d;font-size:12px;line-height:1.45;margin-top:9px}
+.appi-device-status{min-height:21px;margin-top:10px;color:#5f6170;font-size:13px;font-weight:750;text-align:center}
+.appi-device-status.success{color:#177656;font-weight:900}
+.appi-call-request{text-align:center}.appi-call-icon{width:78px;height:78px;margin:4px auto 12px;border-radius:25px;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,#25d366,#128c7e);font-size:34px;box-shadow:0 14px 34px rgba(18,140,126,.25)}.appi-call-request h2{margin:0 0 6px;font-size:22px}.appi-call-number{margin:9px 0 17px;color:#3d63c9;font-size:18px;font-weight:900}.appi-call-actions{display:grid;grid-template-columns:1.4fr 1fr;gap:8px}.appi-call-actions a,.appi-call-actions button{min-height:50px;border:0;border-radius:14px;display:flex;align-items:center;justify-content:center;text-decoration:none;font:inherit;font-size:12px;font-weight:900}.appi-call-actions a{color:#fff;background:linear-gradient(135deg,#25d366,#128c7e)}.appi-call-actions button{color:#666776;background:rgba(80,90,130,.08)}
+body.dark .appi-device-card{background:linear-gradient(150deg,#171827,#25213a 58%,#162b2a);color:#f0f0f5}body.dark .appi-device-item,body.dark .appi-pair-box{background:rgba(30,30,50,.72);border-color:rgba(255,255,255,.08)}body.dark .appi-device-field input{background:#1d1f31;color:#f0f0f5;border-color:rgba(255,255,255,.1)}body.dark .appi-main-prompt span,body.dark .appi-device-head p,body.dark .appi-pair-code-label,body.dark .appi-device-auto{color:#bbbcca}
+@media(max-width:480px){.appi-device-overlay{padding:8px}.appi-device-card{padding:17px;border-radius:21px;max-height:96vh}.appi-device-head{margin-bottom:13px}.appi-device-head h2{font-size:21px}.appi-device-head p{font-size:12.5px}.appi-device-close{width:40px;height:40px;flex-basis:40px}.appi-pair-box{padding:15px}.appi-pair-loading{min-height:220px}.appi-pair-content{grid-template-columns:1fr;gap:12px}.appi-pair-qr{width:min(100%,210px)}.appi-pair-title{font-size:16px}.appi-pair-code{font-size:31px;letter-spacing:5px}.appi-device-btn.success{min-height:58px;font-size:16px}.appi-call-actions{grid-template-columns:1fr}.appi-device-item{grid-template-columns:42px minmax(0,1fr)}.appi-device-icon{width:42px;height:42px}.appi-device-state{grid-column:2;justify-self:start}.appi-device-remove{grid-column:1 / -1}.appi-device-list-head{align-items:flex-end}.appi-device-auto{max-width:120px;text-align:right}}
 `;document.head.appendChild(style)}
 function ensureOverlay(){if(state.overlay)return state.overlay;state.overlay=document.createElement('div');state.overlay.className='appi-device-overlay';state.overlay.id='appiDeviceOverlay';state.overlay.hidden=true;state.overlay.innerHTML='<section class="appi-device-card" id="appiDeviceCard" role="dialog" aria-modal="true"></section>';document.body.appendChild(state.overlay);state.overlay.onclick=e=>{if(e.target===state.overlay)closeOverlay()};return state.overlay}
-function openOverlay(html){ensureOverlay();$('appiDeviceCard').innerHTML=html;state.overlay.hidden=false;document.body.style.overflow='hidden';const close=$('appiDeviceClose');if(close)close.onclick=closeOverlay}
-function closeOverlay(){if(state.pairTimer){clearInterval(state.pairTimer);state.pairTimer=null}if(state.overlay)state.overlay.hidden=true;document.body.style.overflow=''}
+function stopPairTimer(){if(state.pairTimer){clearInterval(state.pairTimer);state.pairTimer=null}}
+function openOverlay(html){stopPairTimer();state.managerVersion++;ensureOverlay();$('appiDeviceCard').innerHTML=html;state.overlay.hidden=false;document.body.style.overflow='hidden';const close=$('appiDeviceClose');if(close)close.onclick=closeOverlay;return state.managerVersion}
+function closeOverlay(){stopPairTimer();state.managerVersion++;if(state.overlay)state.overlay.hidden=true;document.body.style.overflow=''}
 function head(title,sub){return `<div class="appi-device-head"><div><h2>${esc(title)}</h2><p>${esc(sub)}</p></div><button type="button" class="appi-device-close" id="appiDeviceClose" aria-label="Cerrar">×</button></div>`}
 function subscriptionJSON(subscription){const data=subscription.toJSON();return {endpoint:data.endpoint,keys:{p256dh:data.keys&&data.keys.p256dh||'',auth:data.keys&&data.keys.auth||''}}}
 function applicationServerKey(value){const padding='='.repeat((4-value.length%4)%4),base64=(value+padding).replace(/-/g,'+').replace(/_/g,'/'),raw=atob(base64),array=new Uint8Array(raw.length);for(let i=0;i<raw.length;i++)array[i]=raw.charCodeAt(i);return array}
@@ -52,17 +103,15 @@ async function loadDevices(){
   }finally{state.loading=false}
 }
 function deviceRows(){
-  if(state.loading)return '<div class="appi-device-status">Cargando dispositivos…</div>';
-  if(state.lastError)return `<div class="appi-device-error">${esc(state.lastError)}<br><button type="button" class="appi-device-refresh" data-refresh-devices style="margin-top:8px">Reintentar</button></div>`;
-  if(!state.devices.length)return '<div class="appi-device-note">Todavía no hay teléfonos vinculados. Generá un QR en la PC o ingresá el código desde el teléfono.</div>';
+  if(state.loading)return '<div class="appi-device-status">Cargando teléfonos…</div>';
+  if(state.lastError)return `<div class="appi-device-error">${esc(state.lastError)}<br><button type="button" class="appi-device-refresh" data-refresh-devices style="margin-top:9px">Reintentar</button></div>`;
+  if(!state.devices.length)return '<div class="appi-device-note">Todavía no hay teléfonos vinculados.</div>';
   return `<div class="appi-device-list">${state.devices.map(device=>`<article class="appi-device-item" data-device-id="${esc(device.id)}"><span class="appi-device-icon">${device.plataforma==='ios'?'📱':'📲'}</span><span><b>${esc(device.nombre)}</b><small>${device.plataforma==='ios'?'iPhone':device.plataforma==='android'?'Android':'Teléfono'} · visto ${esc(new Date(device.last_seen).toLocaleString('es-AR'))}</small></span><span class="appi-device-state ${device.notificaciones?'':'off'}">${device.notificaciones?'Notificaciones activas':'Sin notificaciones'}</span><button type="button" class="appi-device-remove" data-remove-device="${esc(device.id)}">Desvincular dispositivo</button></article>`).join('')}</div>`;
 }
 function renderDeviceList(){const list=$('appiDeviceList');if(list)list.innerHTML=deviceRows()}
 function bindManagerActions(){
-  const create=$('appiCreatePair'),claim=$('appiClaimCode'),refresh=$('appiRefreshDevices');
-  if(create)create.onclick=createPairing;
+  const claim=$('appiClaimCode');
   if(claim)claim.onclick=claimByCode;
-  if(refresh)refresh.onclick=refreshDevices;
   const list=$('appiDeviceList');
   if(list)list.onclick=event=>{
     const remove=event.target.closest('[data-remove-device]');
@@ -70,11 +119,7 @@ function bindManagerActions(){
     if(event.target.closest('[data-refresh-devices]'))refreshDevices();
   };
 }
-async function refreshDevices(){
-  const button=$('appiRefreshDevices');if(button){button.disabled=true;button.textContent='Actualizando…'}
-  state.loading=true;renderDeviceList();await loadDevices();renderDeviceList();
-  if(button){button.disabled=false;button.textContent='Actualizar lista'}
-}
+async function refreshDevices(){state.loading=true;renderDeviceList();await loadDevices();renderDeviceList()}
 function closeAccountModal(){
   const accountModal=document.getElementById('modalOverlay');
   if(accountModal&&accountModal.classList.contains('open'))accountModal.classList.remove('open');
@@ -82,13 +127,40 @@ function closeAccountModal(){
 }
 async function openManager(){
   closeAccountModal();
-  openOverlay(`${head('Teléfonos vinculados','Llamá desde la PC o tablet usando tu teléfono.')}<div class="appi-device-hero"><b>Puente de llamadas APPI</b><p>La PC envía una notificación privada. El teléfono confirma y abre su marcador nativo.</p></div><div class="appi-device-actions"><button type="button" class="appi-device-btn primary" id="appiCreatePair">Mostrar QR y código</button><button type="button" class="appi-device-btn success" id="appiClaimCode">Vincular este teléfono</button></div><div class="appi-device-list-head"><b>Dispositivos de tu cuenta</b><button type="button" class="appi-device-refresh" id="appiRefreshDevices">Actualizar lista</button></div><div id="appiDeviceList"><div class="appi-device-status">Cargando dispositivos…</div></div><div class="appi-device-note">En iPhone, instalá APPI en la pantalla de inicio para recibir notificaciones aunque esté cerrada. En Android, autorizá las notificaciones cuando se solicite.</div>`);
+  const version=openOverlay(`${head('Teléfonos vinculados','Conectá un teléfono para hacer llamadas desde APPI en tu PC o tablet.')}<div class="appi-pair-box" id="appiPairArea" aria-live="polite"><div class="appi-pair-loading"><span><span class="spinner"></span><br><br>Preparando el QR y el código…</span></div></div><div class="appi-main-prompt"><span class="appi-pair-kicker">OPCIÓN 2</span><b>¿Estás usando el teléfono que querés vincular?</b><span>Tocá el botón e ingresá el código que aparece en tu PC.</span></div><div class="appi-device-actions"><button type="button" class="appi-device-btn success" id="appiClaimCode" data-primary-action>Vincular este teléfono</button></div><section aria-label="Teléfonos de tu cuenta"><div class="appi-device-list-head"><b>Teléfonos de tu cuenta</b><span class="appi-device-auto">Actualización automática</span></div><div id="appiDeviceList"><div class="appi-device-status">Cargando teléfonos…</div></div></section><div class="appi-device-note">Permití las notificaciones. En iPhone, abrí APPI desde el ícono de la pantalla de inicio.</div>`);
   bindManagerActions();
-  state.loading=true;renderDeviceList();await loadDevices();renderDeviceList();
+  state.loading=true;state.lastError='';renderDeviceList();
+  const devicesPromise=loadDevices().then(()=>{if(version===state.managerVersion)renderDeviceList()});
+  const pairingPromise=createPairing(version);
+  await Promise.allSettled([devicesPromise,pairingPromise]);
 }
 function pairUrl(token){const url=new URL('./',location.href);url.search='';url.hash='';url.searchParams.set('pair',token);return url.toString()}
 function qrSvg(value){try{const qr=window.qrcode(0,'M');qr.addData(value);qr.make();return qr.createSvgTag({cellSize:5,margin:2,scalable:true})}catch(e){return '<div class="appi-device-note">No se pudo dibujar el QR. Usá el código de seis dígitos.</div>'}}
-async function createPairing(){const button=$('appiCreatePair');if(button){button.disabled=true;button.textContent='Generando…'}try{const result=await callBridge({action:'create_pairing',source_device_key:deviceKey()}),pair=result.pairing,url=pairUrl(pair.token);openOverlay(`${head('Escaneá con tu teléfono','El código vence en cinco minutos.')}<div class="appi-pair-box"><div class="appi-pair-qr">${qrSvg(url)}</div><div class="appi-pair-code">${esc(pair.codigo.slice(0,3))} ${esc(pair.codigo.slice(3))}</div><div class="appi-pair-expire">También podés ingresar este código desde Mi cuenta en el teléfono.</div><div class="appi-device-status" id="appiPairStatus">Esperando al teléfono…</div></div><div class="appi-device-note">El teléfono debe iniciar sesión con la misma cuenta distribuidora y autorizar las notificaciones.</div>`);let checks=0;state.pairTimer=setInterval(async()=>{if(++checks>125){clearInterval(state.pairTimer);state.pairTimer=null;const status=$('appiPairStatus');if(status)status.textContent='El código venció. Generá uno nuevo.';return}try{const status=await callBridge({action:'pair_status',token:pair.token});if(status.claimed&&status.device){clearInterval(state.pairTimer);state.pairTimer=null;state.devices=[status.device,...state.devices.filter(d=>d.id!==status.device.id)];$('appiPairStatus').textContent=`${status.device.nombre} quedó vinculado ✓`;setTimeout(openManager,1200)}else if(status.expired){clearInterval(state.pairTimer);state.pairTimer=null;$('appiPairStatus').textContent='El código venció. Generá uno nuevo.'}}catch(e){}},2400)}catch(error){await window.APPIDialog.alert(error.message,{title:'No pudimos vincular',icon:'!' });openManager()}}
+async function createPairing(version=state.managerVersion){
+  try{
+    const result=await callBridge({action:'create_pairing',source_device_key:deviceKey()}),pair=result.pairing,url=pairUrl(pair.token);
+    if(version!==state.managerVersion||!state.overlay||state.overlay.hidden)return;
+    const area=$('appiPairArea');if(!area)return;
+    area.innerHTML=`<span class="appi-pair-kicker">OPCIÓN 1</span><div class="appi-pair-title">Escaneá este QR con el teléfono que querés vincular</div><div class="appi-pair-content"><div class="appi-pair-qr">${qrSvg(url)}</div><div class="appi-pair-details"><div class="appi-pair-code-label">O ingresá este código en el teléfono</div><div class="appi-pair-code" aria-label="Código ${esc(pair.codigo)}">${esc(pair.codigo.slice(0,3))} ${esc(pair.codigo.slice(3))}</div><div class="appi-pair-expire">El código vence en cinco minutos.</div><div class="appi-device-status" id="appiPairStatus">Esperando al teléfono…</div></div></div>`;
+    let checks=0;
+    state.pairTimer=setInterval(async()=>{
+      if(version!==state.managerVersion){stopPairTimer();return}
+      if(++checks>125){stopPairTimer();const status=$('appiPairStatus');if(status)status.textContent='El código venció. Cerrá esta pantalla y volvé a abrirla.';return}
+      try{
+        const pairState=await callBridge({action:'pair_status',token:pair.token});
+        if(version!==state.managerVersion)return;
+        if(pairState.claimed&&pairState.device){
+          stopPairTimer();state.devices=[pairState.device,...state.devices.filter(d=>d.id!==pairState.device.id)];renderDeviceList();decorateCallButtons();
+          const status=$('appiPairStatus');if(status){status.classList.add('success');status.textContent=`¡${pairState.device.nombre} quedó vinculado correctamente!`}
+        }else if(pairState.expired){stopPairTimer();const status=$('appiPairStatus');if(status)status.textContent='El código venció. Cerrá esta pantalla y volvé a abrirla.'}
+      }catch(e){}
+    },2400);
+  }catch(error){
+    if(version!==state.managerVersion||!state.overlay||state.overlay.hidden)return;
+    const area=$('appiPairArea');if(area)area.innerHTML=`<div class="appi-device-error">No pudimos preparar el QR.<br>${esc(error.message)}<br><button type="button" class="appi-device-refresh" id="appiRetryPair" style="margin-top:9px">Reintentar</button></div>`;
+    const retry=$('appiRetryPair');if(retry)retry.onclick=()=>{const current=$('appiPairArea');if(current)current.innerHTML='<div class="appi-pair-loading"><span><span class="spinner"></span><br><br>Preparando el QR y el código…</span></div>';createPairing(version)};
+  }
+}
 async function claimByCode(){const code=await window.APPIDialog.prompt('Ingresá el código de seis dígitos que aparece en la PC.','',{title:'Vincular este teléfono',icon:'📲',placeholder:'000000',okText:'Continuar'});if(!code)return;return claimPairing({codigo:String(code).replace(/\D/g,'').slice(0,6)})}
 async function claimPairing({token='',codigo=''}={}){if(!isPhone()&&platform()==='otro'){const ok=await window.APPIDialog.confirm('Este dispositivo no parece ser un teléfono. ¿Querés vincularlo de todos modos?',{title:'Confirmar dispositivo',icon:'📲',okText:'Continuar'});if(!ok)return}const nombre=await window.APPIDialog.prompt('¿Qué nombre querés darle a este teléfono?',defaultDeviceName(),{title:'Nombre del dispositivo',icon:'📱',placeholder:'Mi teléfono',okText:'Activar notificaciones'});if(!nombre)return;openOverlay(`${head('Activando teléfono','Autorizá las notificaciones cuando el sistema lo solicite.')}<div class="appi-device-status"><span class="spinner"></span><br>Preparando notificaciones…</div><div class="appi-device-note">APPI sólo enviará solicitudes de llamada de tu propia cuenta.</div>`);try{const subscription=await enablePush(),result=await callBridge({action:'claim_pairing',token,codigo,device_key:deviceKey(),nombre,plataforma:platform(),user_agent:navigator.userAgent,subscription});state.devices=[result.device,...state.devices.filter(d=>d.id!==result.device.id)];openOverlay(`${head('Teléfono vinculado','La conexión quedó lista.')}<div class="appi-call-request"><div class="appi-call-icon">✓</div><h2>${esc(result.device.nombre)}</h2><p>Ya puede recibir llamadas enviadas desde APPI en una PC o tablet.</p><button type="button" class="appi-device-btn primary" id="appiPairDone" style="width:100%;margin-top:14px">Listo</button></div>`);$('appiPairDone').onclick=()=>{closeOverlay();clearPairQuery()}}catch(error){openOverlay(`${head('No pudimos activar','Revisá los requisitos e intentá nuevamente.')}<div class="appi-device-note">${esc(error.message)}</div><button type="button" class="appi-device-btn primary" id="appiPairRetry" style="width:100%;margin-top:12px">Reintentar</button>`);$('appiPairRetry').onclick=()=>claimPairing({token,codigo})}}
 function clearPairQuery(){const url=new URL(location.href);url.searchParams.delete('pair');history.replaceState(history.state,'',url.pathname+url.search+url.hash)}

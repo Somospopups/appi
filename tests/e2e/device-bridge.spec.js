@@ -95,11 +95,16 @@ test('vincula por QR y envía una llamada de la PC al teléfono', async ({ page 
   await expect(page.locator('#btnToolsBackup')).toHaveCount(0);
   await page.locator('#btnToolsDevices').click();
   await expect(page.locator('#appiDeviceOverlay')).toBeVisible();
+  await expect(page.locator('#appiCreatePair')).toHaveCount(0);
+  await expect(page.locator('#appiRefreshDevices')).toHaveCount(0);
+  await expect(page.locator('[data-primary-action]')).toBeVisible();
+  await expect(page.locator('[data-primary-action]')).toHaveText('Vincular este teléfono');
   await expect(page.locator('#appiDeviceList')).toContainText('Mi teléfono Android');
   await expect(page.locator('[data-remove-device]')).toHaveText('Desvincular dispositivo');
-  await page.locator('#appiCreatePair').click();
   await expect(page.locator('.appi-pair-qr svg')).toBeVisible();
   await expect(page.locator('.appi-pair-code')).toContainText('321 654');
+  await expect(page.locator('.appi-pair-title')).toHaveText('Escaneá este QR con el teléfono que querés vincular');
+  expect(bridgeCalls.some(item => item.action === 'create_pairing')).toBe(true);
   await page.locator('#appiDeviceClose').click();
 
   await page.evaluate(() => {
