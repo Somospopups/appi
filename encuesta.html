@@ -56,6 +56,7 @@
     .ref-list{display:grid;gap:10px}.ref-card{padding:14px;border-radius:17px;background:rgba(247,248,255,.76);border:1px solid var(--line)}
     .ref-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}.ref-head b{color:var(--blue2);font-size:11px}.ref-remove{border:0;border-radius:9px;padding:6px 9px;background:rgba(217,83,89,.09);color:#bb444b;font-size:9px;font-weight:900}
     .ref-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.ref-grid .text-input{min-height:43px;font-size:14px}.ref-grid .wide{grid-column:1/-1}
+    .agenda-box{padding:13px;margin-bottom:11px;border-radius:17px;background:linear-gradient(135deg,rgba(91,141,239,.10),rgba(160,107,255,.08));border:1px solid rgba(91,141,239,.14);text-align:center}.agenda-btn{width:100%;min-height:47px;border:0;border-radius:14px;color:#fff;background:linear-gradient(135deg,#5b8def,#875fdd);box-shadow:0 7px 16px rgba(91,112,210,.22);font-size:11px;font-weight:950}.agenda-box small{display:block;margin-top:7px;color:#6d6e7a;font-size:8.8px;line-height:1.4}.agenda-divider{display:flex;align-items:center;gap:9px;margin:12px 0 9px;color:#92939e;font-size:8.5px;font-weight:900;text-transform:uppercase;letter-spacing:.4px}.agenda-divider:before,.agenda-divider:after{content:"";height:1px;flex:1;background:rgba(80,90,130,.11)}
     .add-ref{width:100%;min-height:44px;margin-top:10px;border:1px dashed rgba(91,141,239,.34);border-radius:14px;background:rgba(91,141,239,.07);color:var(--blue2);font-size:11px;font-weight:900}
     .referidos-callout{display:grid;grid-template-columns:42px 1fr;gap:11px;align-items:center;padding:13px;border-radius:16px;background:linear-gradient(135deg,rgba(91,141,239,.11),rgba(160,107,255,.09));border:1px solid rgba(91,141,239,.13);margin-bottom:12px}.referidos-callout span{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;background:linear-gradient(135deg,#3ad0a4,#5b8def);color:#fff;font-size:19px}.referidos-callout b{display:block;font-size:11px}.referidos-callout small{display:block;margin-top:3px;color:var(--muted);font-size:9.5px;line-height:1.35}
     .review-grid{display:grid;gap:9px}.review-section{padding:14px;border-radius:17px;background:rgba(255,255,255,.58);border:1px solid rgba(255,255,255,.78)}.review-section h3{margin:0 0 9px;font-size:12px;color:var(--blue2)}
@@ -159,7 +160,7 @@
     function personalHTML(){return `<div class="field" data-field-wrap="nombre"><label class="field-label">Nombre y apellido <span class="required">*</span></label><input class="text-input" id="surveyName" autocomplete="name" maxlength="120" placeholder="Tu nombre completo" value="${esc(data.nombre)}"><div class="error-text">Ingresá tu nombre y apellido.</div></div><div class="field" data-field-wrap="telefono"><label class="field-label">Teléfono o WhatsApp <span class="required">*</span><small>Lo usaremos únicamente para poder contactarte.</small></label><input class="text-input" id="surveyPhone" type="tel" inputmode="tel" autocomplete="tel" maxlength="30" placeholder="Ej: 351 555 1234" value="${esc(data.telefono)}"><div class="error-text">Ingresá un teléfono válido.</div></div><label class="honeypot">Sitio web<input id="surveyWebsite" tabindex="-1" autocomplete="off" value="${esc(data.website)}"></label>`}
     function refsHTML(){
       const cards=data.referidos.map((r,i)=>`<div class="ref-card" data-ref="${i}"><div class="ref-head"><b>Referido ${i+1}</b><button type="button" class="ref-remove" data-remove-ref="${i}">Quitar</button></div><div class="ref-grid"><input class="text-input" data-ref-field="nombre" data-ref-index="${i}" maxlength="120" placeholder="Nombre y apellido" value="${esc(r.nombre||'')}"><input class="text-input" type="tel" inputmode="tel" data-ref-field="telefono" data-ref-index="${i}" maxlength="30" placeholder="Teléfono / WhatsApp" value="${esc(r.telefono||'')}"><input class="text-input" data-ref-field="relacion" data-ref-index="${i}" maxlength="80" placeholder="Relación (amigo, familiar…)" value="${esc(r.relacion||'')}"><input class="text-input" data-ref-field="zona" data-ref-index="${i}" maxlength="120" placeholder="Barrio / ciudad" value="${esc(r.zona||'')}"></div><div class="error-text">Completá nombre y teléfono o quitá este referido.</div></div>`).join('');
-      return `<div class="referidos-callout"><span>👥</span><div><b>Una recomendación puede abrir una puerta</b><small>Los referidos son opcionales. Si conocés a alguien a quien pueda interesarle, podés sumarlo acá.</small></div></div><div class="ref-list" id="refList">${cards}</div><button type="button" class="add-ref" id="addRef" ${data.referidos.length>=10?'disabled':''}>+ Agregar un referido</button><div class="privacy">🔒 Los datos sólo serán entregados al distribuidor que te compartió esta encuesta. Si agregás referidos, al final te pediremos confirmar que te autorizaron a compartirlos.</div>`
+      return `<div class="referidos-callout"><span>👥</span><div><b>Una recomendación puede abrir una puerta</b><small>Los referidos son opcionales. Si conocés a alguien a quien pueda interesarle, podés sumarlo acá.</small></div></div><div class="agenda-box"><button type="button" class="agenda-btn" id="pickContacts">📇 Elegir desde mi agenda</button><small id="agendaSupport">Elegís qué personas compartir. APPI nunca accede al resto de tu agenda.</small></div><div class="agenda-divider">o cargalos manualmente</div><div class="ref-list" id="refList">${cards}</div><button type="button" class="add-ref" id="addRef" ${data.referidos.length>=10?'disabled':''}>+ Agregar un referido manualmente</button><div class="privacy">🔒 Los datos sólo serán entregados al distribuidor que te compartió esta encuesta. Si agregás referidos, al final te pediremos confirmar que te autorizaron a compartirlos.</div>`
     }
     const pretty=value=>Array.isArray(value)?value.join(', '):(value===undefined||value===null||value===''?'-':String(value));
     function reviewRows(keys){return keys.map(key=>{const f=fields[key];let value=data.answers[key];if(Array.isArray(value)&&value.includes('Otros')&&data.answers[key+'_otros'])value=value.map(v=>v==='Otros'?data.answers[key+'_otros']:v);return `<div class="review-row"><span>${esc(f.label)}</span><span>${esc(pretty(value))}</span></div>`}).join('')}
@@ -175,6 +176,30 @@
       $('actions').innerHTML=`<div class="nav-actions ${data.step===0?'single':''}">${data.step?'<button type="button" class="nav-btn nav-back" id="prevStep">← Atrás</button>':''}<button type="button" class="nav-btn ${data.step===steps.length-1?'nav-submit':'nav-next'}" id="nextStep" ${submitting?'disabled':''}>${submitting?'Enviando…':data.step===steps.length-1?'Enviar encuesta':'Continuar →'}</button></div>`;
       bind();window.scrollTo({top:0,behavior:'smooth'});
     }
+    function contactValue(value){if(Array.isArray(value))return String(value.find(Boolean)||'').trim();return String(value||'').trim()}
+    function normalizedPhone(value){return String(value||'').replace(/\D/g,'').slice(0,15)}
+    async function chooseContacts(){
+      if(!navigator.contacts||typeof navigator.contacts.select!=='function'){
+        await window.APPIDialog.alert('En Android podés abrir la agenda usando Chrome. En iPhone y otros navegadores esta función todavía no está habilitada; igualmente podés agregar los referidos manualmente.',{title:'Agenda no disponible',icon:'📇',okText:'Entendido'});return;
+      }
+      try{
+        const selected=await navigator.contacts.select(['name','tel'],{multiple:true});
+        if(!Array.isArray(selected)||!selected.length)return;
+        const respondent=normalizedPhone(data.telefono),existing=new Set(data.referidos.map(ref=>normalizedPhone(ref.telefono)).filter(Boolean));let added=0,duplicates=0;
+        for(const contact of selected){
+          if(data.referidos.length>=10)break;
+          const phone=contactValue(contact.tel),phoneKey=normalizedPhone(phone),name=contactValue(contact.name)||'Contacto de agenda';
+          if(!phoneKey||phoneKey===respondent||existing.has(phoneKey)){duplicates++;continue}
+          existing.add(phoneKey);data.referidos.push({nombre:name.slice(0,120),telefono:phone.slice(0,30),relacion:'',zona:''});added++;
+        }
+        save();render();
+        if(added)await window.APPIDialog.alert(`${added} contacto${added===1?'':'s'} agregado${added===1?'':'s'} desde tu agenda.${duplicates?' Los repetidos no se volvieron a cargar.':''}`,{title:'Referidos agregados',icon:'✓',okText:'Continuar'});
+        else if(duplicates)await window.APPIDialog.alert('Esos contactos ya estaban cargados o coinciden con tu propio teléfono.',{title:'Sin contactos nuevos',icon:'📇'});
+      }catch(error){
+        if(error&&['AbortError','NotAllowedError'].includes(error.name))return;
+        await window.APPIDialog.alert('No pudimos abrir la agenda en este dispositivo. Podés continuar cargando los datos manualmente.',{title:'Agenda no disponible',icon:'📇'});
+      }
+    }
     function bind(){
       const name=$('surveyName'),phone=$('surveyPhone'),web=$('surveyWebsite');if(name)name.oninput=e=>{data.nombre=e.target.value;save()};if(phone)phone.oninput=e=>{data.telefono=e.target.value;save()};if(web)web.oninput=e=>{data.website=e.target.value;save()};
       document.querySelectorAll('[data-field]').forEach(button=>button.onclick=()=>selectChip(button));
@@ -182,6 +207,7 @@
       document.querySelectorAll('[data-other]').forEach(input=>input.oninput=e=>{data.answers[input.dataset.other+'_otros']=e.target.value;save()});
       document.querySelectorAll('[data-ref-field]').forEach(input=>input.oninput=e=>{const i=Number(input.dataset.refIndex);data.referidos[i][input.dataset.refField]=e.target.value;save()});
       document.querySelectorAll('[data-remove-ref]').forEach(button=>button.onclick=()=>{data.referidos.splice(Number(button.dataset.removeRef),1);save();render()});
+      if($('pickContacts'))$('pickContacts').onclick=chooseContacts;
       if($('addRef'))$('addRef').onclick=()=>{if(data.referidos.length<10)data.referidos.push({nombre:'',telefono:'',relacion:'',zona:''});save();render()};
       if($('consentMain'))$('consentMain').onchange=e=>{data.consentimiento=e.target.checked;save()};if($('consentRefs'))$('consentRefs').onchange=e=>{data.autorizacion_referidos=e.target.checked;save()};
       if($('prevStep'))$('prevStep').onclick=()=>{capture();data.step=Math.max(0,data.step-1);save();render()};$('nextStep').onclick=next;

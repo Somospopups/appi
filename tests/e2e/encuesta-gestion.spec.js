@@ -89,6 +89,45 @@ test('la encuesta pública se abre sin login y entrega la respuesta al enlace co
   expect(submitted.respuestas.oportunidad).toEqual(['Quiero más info']);
 });
 
+test('permite elegir varios referidos desde la agenda sin duplicarlos', async ({ page }) => {
+  const nativeDialogs = [];
+  page.on('dialog', dialog => { nativeDialogs.push(dialog.type()); dialog.dismiss(); });
+  await page.addInitScript(() => {
+    const picker = {
+      select: async () => [
+        { name: ['Ana Agenda'], tel: ['351 555 1001'] },
+        { name: ['Bruno Agenda'], tel: ['351 555 1002'] },
+        { name: ['Ana repetida'], tel: ['351 555 1001'] },
+        { name: ['La persona encuestada'], tel: ['351 555 0000'] }
+      ]
+    };
+    Object.defineProperty(Navigator.prototype, 'contacts', { configurable: true, get: () => picker });
+  });
+  await page.route('**/auth-config.js', route => route.fulfill({
+    contentType: 'application/javascript',
+    body: "window.APPI_AUTH={url:'https://mock.supabase.co',anonKey:'anon-key-publica-de-prueba-1234567890'};"
+  }));
+  await page.route('https://mock.supabase.co/functions/v1/encuesta-publica**', route => route.fulfill({
+    status: 200,
+    headers: { 'access-control-allow-origin': '*' },
+    contentType: 'application/json',
+    body: JSON.stringify({ ok: true, distribuidor: 'Distribuidor A' })
+  }));
+
+  await page.setViewportSize({ width: 360, height: 800 });
+  await page.goto(`/encuesta.html?t=${LINK_TOKEN}`, { waitUntil: 'networkidle' });
+  await page.evaluate(() => APPIEncuesta.setData({ step: 4, nombre: 'Persona Encuestada', telefono: '351 555 0000', referidos: [] }));
+  await page.locator('#pickContacts').click();
+
+  await expect(page.locator('.ref-card')).toHaveCount(2);
+  await expect(page.locator('#appiDialogTitle')).toHaveText('Referidos agregados');
+  const referrals = await page.evaluate(() => APPIEncuesta.getData().referidos);
+  expect(referrals.map(item => item.nombre)).toEqual(['Ana Agenda', 'Bruno Agenda']);
+  expect(new Set(referrals.map(item => item.telefono.replace(/\D/g, ''))).size).toBe(2);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(360);
+  expect(nativeDialogs).toEqual([]);
+});
+
 test('Mi Encuesta y Mi Gestión usan la cuenta autenticada y guardan el seguimiento', async ({ page }) => {
   const nativeDialogs = [];
   const patches = [];

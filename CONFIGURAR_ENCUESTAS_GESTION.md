@@ -49,11 +49,12 @@ https://somospopups.github.io/appi/encuesta.html?t=TOKEN
 ```
 
 4. Abrirlo en una ventana privada.
-5. Completar una encuesta de prueba.
-6. Volver a APPI y abrir `Mi Gestión`.
-7. Confirmar que aparezcan el encuestado y sus referidos.
-8. Cambiar estado, notas y próximo contacto.
-9. Abrir APPI en otro dispositivo y verificar los cambios.
+5. En Android con Chrome, probar `Elegir desde mi agenda`; en iPhone debe mantenerse disponible la carga manual.
+6. Completar una encuesta de prueba.
+7. Volver a APPI y abrir `Mi Gestión`.
+8. Confirmar que aparezcan el encuestado y sus referidos.
+9. Cambiar estado, notas y próximo contacto.
+10. Abrir APPI en otro dispositivo y verificar los cambios.
 
 ## 4. Seguridad
 

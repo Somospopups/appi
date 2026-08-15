@@ -4,7 +4,7 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
-- Versión: **v201 · Encuestas y gestión**.
+- Versión: **v202 · Referidos desde agenda**.
 - Publicación: [https://somospopups.github.io/appi/](https://somospopups.github.io/appi/)
 - Acceso por número de distribuidor y contraseña.
 - Acceso administrador POPUPS mediante el candado, sin DIP ni número de distribuidor.
@@ -20,6 +20,7 @@ Cada distribuidor tiene un enlace público permanente en **Mis herramientas → 
 Mi Gestión incluye:
 
 - Encuestados y referidos.
+- Selección de referidos desde la agenda en navegadores compatibles, con carga manual como alternativa.
 - Estados: Nuevo, Contactado, Seguimiento, Presentación, Convertido y No interesado.
 - Búsqueda y filtros.
 - Notas y próximo contacto.
