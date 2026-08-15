@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v205-llamadas-vinculadas';
+const CACHE_NAME = 'appi-v206-dispositivos-planillas';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

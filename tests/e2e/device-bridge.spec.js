@@ -36,6 +36,7 @@ test('vincula por QR y envía una llamada de la PC al teléfono', async ({ page 
     id: DEVICE_ID, device_key: DEVICE_KEY, nombre: 'Mi teléfono Android', plataforma: 'android',
     notificaciones: true, activo: true, last_seen: now, created_at: now
   };
+  let deviceLinked = true;
   const contact = {
     id: CONTACT_ID, user_id: USER_ID, encuesta_id: null, tipo: 'referido', nombre: 'Carolina Martínez',
     telefono: '351 555 1234', telefono_normalizado: '3515551234', relacion: 'Amiga', zona: 'Córdoba', referido_por: 'Persona Encuestada',
@@ -60,7 +61,11 @@ test('vincula por QR y envía una llamada de la PC al teléfono', async ({ page 
     if (url.pathname === '/functions/v1/dispositivo-puente') {
       const body = request.postDataJSON();
       bridgeCalls.push(body);
-      if (body.action === 'list_devices') return route.fulfill({ status: 200, headers: cors, body: JSON.stringify({ devices: [device] }) });
+      if (body.action === 'list_devices') return route.fulfill({ status: 200, headers: cors, body: JSON.stringify({ devices: deviceLinked ? [device] : [] }) });
+      if (body.action === 'remove_device') {
+        deviceLinked = false;
+        return route.fulfill({ status: 200, headers: cors, body: JSON.stringify({ ok: true, device_id: DEVICE_ID }) });
+      }
       if (body.action === 'create_pairing') return route.fulfill({ status: 201, headers: cors, body: JSON.stringify({ pairing: { id: '12121212-1212-4212-8212-121212121212', token: PAIR_TOKEN, codigo: '321654', expires_at: new Date(Date.now() + 300000).toISOString() } }) });
       if (body.action === 'pair_status') return route.fulfill({ status: 200, headers: cors, body: JSON.stringify({ claimed: false, expired: false, cancelled: false, device: null }) });
       if (body.action === 'send_call') return route.fulfill({ status: 200, headers: cors, body: JSON.stringify({ ok: true, command_id: '34343434-3434-4434-8434-343434343434', device, expires_at: new Date(Date.now() + 120000).toISOString() }) });
@@ -85,6 +90,7 @@ test('vincula por QR y envía una llamada de la PC al teléfono', async ({ page 
   await page.evaluate(() => APPIDeviceBridge.openManager());
   await expect(page.locator('#appiDeviceOverlay')).toBeVisible();
   await expect(page.locator('#appiDeviceList')).toContainText('Mi teléfono Android');
+  await expect(page.locator('[data-remove-device]')).toHaveText('Desvincular dispositivo');
   await page.locator('#appiCreatePair').click();
   await expect(page.locator('.appi-pair-qr svg')).toBeVisible();
   await expect(page.locator('.appi-pair-code')).toContainText('321 654');
@@ -104,5 +110,22 @@ test('vincula por QR y envía una llamada de la PC al teléfono', async ({ page 
     nombre: 'Carolina Martínez',
     telefono: '351 555 1234'
   });
+  await page.locator('#appiDialogOk').click();
+
+  await page.evaluate(() => APPIDeviceBridge.openManager());
+  const unlink = page.locator('[data-remove-device]');
+  await expect(unlink).toHaveText('Desvincular dispositivo');
+  await unlink.click();
+  await expect(page.locator('#appiDialogTitle')).toHaveText('Desvincular dispositivo');
+  const layerOrder = await page.evaluate(() => ({
+    manager: Number(getComputedStyle(document.getElementById('appiDeviceOverlay')).zIndex),
+    dialog: Number(getComputedStyle(document.querySelector('.appi-dialog-overlay')).zIndex)
+  }));
+  expect(layerOrder.dialog).toBeGreaterThan(layerOrder.manager);
+  await page.locator('#appiDialogOk').click();
+  await expect(page.locator('#appiDialogTitle')).toHaveText('Dispositivo desvinculado');
+  await expect(page.locator('[data-remove-device]')).toHaveCount(0);
+  await page.locator('#appiDialogOk').click();
+  expect(bridgeCalls.find(item => item.action === 'remove_device')).toMatchObject({ device_id: DEVICE_ID });
   expect(nativeDialogs).toEqual([]);
 });
