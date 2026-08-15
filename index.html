@@ -2631,6 +2631,7 @@ body.dark .lock-error.login-info{background:rgba(91,141,239,.16);color:#a8b8ff}
 .login-tabs button{min-height:42px;border:0;border-radius:11px;background:transparent;color:#747583;font:inherit;font-size:12px;font-weight:850;cursor:pointer}.login-tabs button.active{background:#fff;color:#3d63c9;box-shadow:0 5px 14px rgba(66,74,115,.10)}
 .login-pane[hidden]{display:none!important}.login-pane{animation:loginPaneIn .18s ease}@keyframes loginPaneIn{from{opacity:.25;transform:translateY(3px)}to{opacity:1;transform:none}}
 .login-honeypot{position:fixed!important;left:-9999px!important;opacity:0!important;pointer-events:none!important}.request-whatsapp-link{display:flex}.request-whatsapp-link[hidden]{display:none!important}
+.person-partner-toggle{display:grid!important;grid-template-columns:24px 1fr!important;align-items:center;gap:10px!important;padding:11px 12px;border:1px solid rgba(91,141,239,.15);border-radius:14px;background:rgba(91,141,239,.07);text-align:left;cursor:pointer}.person-partner-toggle input{width:20px!important;height:20px!important;min-height:0!important;accent-color:#5b8def}.person-partner-toggle b{display:block;color:#3d3e4c;font-size:13px}.person-partner-toggle small{display:block;margin-top:2px;color:#777887;font-size:10px;line-height:1.35}.person-partner-toggle[hidden],#requestPartnerField[hidden],#adminPartnerField[hidden]{display:none!important}body.dark .person-partner-toggle{background:rgba(91,141,239,.13);border-color:rgba(255,255,255,.08)}body.dark .person-partner-toggle b{color:#f1f1f6}
 body.dark .login-tabs{background:rgba(255,255,255,.07)}body.dark .login-tabs button.active{background:#313349;color:#b9c9ff}
 .admin-login-lock{position:absolute;top:15px;right:15px;width:40px;height:40px;border:1px solid rgba(91,141,239,.18);border-radius:50%;display:grid;place-items:center;background:rgba(91,141,239,.10);color:#3d63c9;font-size:17px;cursor:pointer;box-shadow:0 5px 16px rgba(80,90,130,.10);transition:.18s}
 .admin-login-lock:hover{background:rgba(91,141,239,.18);transform:translateY(-1px)}
@@ -2642,6 +2643,7 @@ body.dark .login-tabs{background:rgba(255,255,255,.07)}body.dark .login-tabs but
 .admin-login-close{position:absolute;top:12px;right:12px;width:34px;height:34px;border:0;border-radius:50%;background:rgba(80,90,130,.08);color:#555665;font-size:22px;cursor:pointer}
 body.dark .admin-login-lock{background:rgba(91,141,239,.18);color:#b6c8ff;border-color:rgba(255,255,255,.1)}
 body.dark .admin-login-card{background:#242638}body.dark .admin-login-card h2{color:#f2f2f7}body.dark .admin-login-card>p{color:#b6b7c4}
+.person-choice-card{width:min(100%,460px)}.person-choice-copy{margin:-10px 0 18px;color:#6d6e7c;font-size:13px;line-height:1.5}.person-choice-list{display:grid;gap:10px}.person-choice-option{width:100%;min-height:70px;display:grid;grid-template-columns:48px 1fr auto;align-items:center;gap:12px;padding:11px 14px;border:1px solid rgba(91,141,239,.16);border-radius:17px;background:rgba(91,141,239,.07);color:#292938;text-align:left;font:inherit;cursor:pointer}.person-choice-option:hover{background:rgba(91,141,239,.13);transform:translateY(-1px)}.person-choice-avatar{width:48px;height:48px;border-radius:15px;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,#3ad0a4,#5b8def);font-size:22px}.person-choice-option strong{display:block;font-size:15px}.person-choice-option small{display:block;margin-top:3px;color:#717381;font-size:11px;font-weight:700}.person-choice-arrow{color:#5b8def;font-size:24px;font-weight:900}body.dark .person-choice-option{background:rgba(91,141,239,.13);border-color:rgba(255,255,255,.09);color:#f2f2f7}body.dark .person-choice-option small{color:#b6b7c4}
 @media(max-width:480px){.lock-card{padding:27px 18px}.admin-login-lock{top:12px;right:12px}#distributorLoginPanel .lock-title{font-size:23px}}
 </style> 
 
@@ -3500,7 +3502,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v211 · Desvinculación directa</div>
+  <div class="ds-foot">APPI · v212 · Titular y socio</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -3538,7 +3540,9 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
         <button type="button" class="lock-btn whatsapp lock-btn-full" id="btnLoginSupport">💬 Necesito ayuda</button>
       </div>
       <div id="loginCreatePane" class="login-pane" hidden>
-        <label class="lock-field"><span>Nombre y apellido</span><input type="text" class="lock-input login-input" id="requestFullName" autocomplete="name" maxlength="120" placeholder="Tu nombre completo"></label>
+        <label class="lock-field"><span>Nombre del titular</span><input type="text" class="lock-input login-input" id="requestFullName" autocomplete="name" maxlength="120" placeholder="Nombre y apellido del titular"></label>
+        <label class="person-partner-toggle"><input type="checkbox" id="requestHasPartner"><span><b>¿Tenés socio/a?</b><small>Podrá ingresar con la misma cuenta y tendrá su espacio personal.</small></span></label>
+        <label class="lock-field" id="requestPartnerField" hidden><span>Nombre del socio/a</span><input type="text" class="lock-input login-input" id="requestPartnerName" autocomplete="off" maxlength="120" placeholder="Nombre y apellido del socio/a"></label>
         <label class="lock-field"><span>Número de distribuidor</span><input type="text" class="lock-input login-input" id="requestDip" inputmode="numeric" autocomplete="off" maxlength="15" placeholder="Ej: 02-9802014"></label>
         <label class="lock-field"><span>Teléfono</span><input type="tel" class="lock-input login-input" id="requestPhone" autocomplete="tel" maxlength="24" placeholder="Ej: 351 555 1234"></label>
         <input type="text" id="requestWebsite" tabindex="-1" autocomplete="off" aria-hidden="true" class="login-honeypot">
@@ -3588,6 +3592,14 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
       <div class="forced-password-rules">Usá una mayúscula, una minúscula y un número.</div>
       <button type="button" class="lock-activate-btn" id="btnForcedPasswordSave">Guardar y entrar</button>
       <div class="lock-error" id="forcedPasswordError" role="alert"></div>
+    </div>
+  </div>
+  <div class="admin-login-overlay" id="personChoiceOverlay" hidden>
+    <div class="admin-login-card person-choice-card" role="dialog" aria-modal="true" aria-labelledby="personChoiceTitle">
+      <div class="admin-login-icon">👋</div>
+      <h2 id="personChoiceTitle">¿Quién sos?</h2>
+      <p class="person-choice-copy">Elegí tu nombre para abrir tu espacio personal.</p>
+      <div class="person-choice-list" id="personChoiceList"></div>
     </div>
   </div>
 </div>
@@ -4138,7 +4150,9 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
         <div class="admin-form-grid">
           <label><span>Sucursal</span><input id="adminSucursal" inputmode="numeric" maxlength="2" placeholder="02" autocomplete="off"></label>
           <label><span>Número de distribuidor</span><input id="adminNumero" inputmode="numeric" maxlength="12" placeholder="9802014" autocomplete="off"></label>
-          <label class="wide"><span>Nombre</span><input id="adminNombre" maxlength="120" placeholder="Nombre y apellido" autocomplete="off"></label>
+          <label class="wide"><span>Nombre del titular</span><input id="adminNombre" maxlength="120" placeholder="Nombre y apellido del titular" autocomplete="off"></label>
+          <label class="wide person-partner-toggle"><input type="checkbox" id="adminHasPartner"><span><b>¿Tiene socio/a?</b><small>Ambos ingresarán con la misma cuenta.</small></span></label>
+          <label class="wide" id="adminPartnerField" hidden><span>Nombre del socio/a</span><input id="adminPartnerName" maxlength="120" placeholder="Nombre y apellido del socio/a" autocomplete="off"></label>
           <label class="wide"><span>Contraseña temporal</span><input id="adminTempPassword" type="text" maxlength="80" placeholder="Generá o escribí una contraseña" autocomplete="new-password"></label>
           <div class="admin-membership-label">Membresía inicial</div>
           <div class="admin-membership-pills" id="adminCreateMembership"><button type="button" class="active" data-create-membership="1">1 mes</button><button type="button" data-create-membership="3">3 meses</button><button type="button" data-create-membership="6">6 meses</button></div>
@@ -8460,7 +8474,9 @@ function renderDateContext(){
   const progress = document.getElementById('monthProgressFill');
   const pctText = document.getElementById('monthProgressPct');
   const dayInfo = document.getElementById('dayInfo');
-  if(greeting) greeting.textContent = `${saludo} 👋`;
+  const activePerson=window.APPIAuth&&window.APPIAuth.activePerson?window.APPIAuth.activePerson():null;
+  const activeFirstName=activePerson?String(activePerson.nombre||'').trim().split(/\s+/)[0]:'';
+  if(greeting) greeting.textContent = activeFirstName?`Hola ${activeFirstName} 👋`:`${saludo} 👋`;
   if(today) today.textContent = fecha;
   if(monthName) monthName.textContent = `${MONTHS[now.getMonth()]} ${now.getFullYear()}`;
   if(progress) progress.style.width = pct + '%';
@@ -9546,21 +9562,39 @@ function setLoginAccessTab(mode){
   const target=document.getElementById(creating?'requestFullName':'distributorInput');requestAnimationFrame(()=>{if(target&&!/^(INPUT|TEXTAREA)$/.test(document.activeElement&&document.activeElement.tagName||''))target.focus()});
 }
 async function enviarSolicitudCuenta(){
-  const button=document.getElementById('btnRequestAccount'),nombre=document.getElementById('requestFullName').value.trim(),dip=document.getElementById('requestDip').value.trim(),telefono=document.getElementById('requestPhone').value.trim(),website=document.getElementById('requestWebsite').value,error=document.getElementById('requestAccountError'),success=document.getElementById('requestAccountSuccess'),link=document.getElementById('requestWhatsappLink');
+  const button=document.getElementById('btnRequestAccount'),nombre=document.getElementById('requestFullName').value.trim(),hasPartner=document.getElementById('requestHasPartner').checked,socioNombre=hasPartner?document.getElementById('requestPartnerName').value.trim():'',dip=document.getElementById('requestDip').value.trim(),telefono=document.getElementById('requestPhone').value.trim(),website=document.getElementById('requestWebsite').value,error=document.getElementById('requestAccountError'),success=document.getElementById('requestAccountSuccess'),link=document.getElementById('requestWhatsappLink');
   error.textContent='';error.classList.remove('show');success.textContent='';success.classList.remove('show');link.hidden=true;
-  if(nombre.length<3){error.textContent='Ingresá tu nombre y apellido.';error.classList.add('show');return}
+  if(nombre.length<3){error.textContent='Ingresá el nombre y apellido del titular.';error.classList.add('show');return}
+  if(hasPartner&&socioNombre.length<3){error.textContent='Ingresá el nombre y apellido del socio/a.';error.classList.add('show');return}
   if(String(dip).replace(/\D/g,'').length<3){error.textContent='Ingresá tu número de distribuidor.';error.classList.add('show');return}
   if(String(telefono).replace(/\D/g,'').length<8){error.textContent='Ingresá un teléfono válido.';error.classList.add('show');return}
   button.disabled=true;button.textContent='Enviando solicitud…';
   try{
-    const result=await window.APPIAccountRequest.submit({nombre,dip,telefono,website});
+    const result=await window.APPIAccountRequest.submit({nombre,socio_nombre:socioNombre,dip,telefono,website});
     success.textContent='Solicitud registrada. Quedó pendiente de aprobación.';success.classList.add('show');
     if(result.whatsapp_url){link.href=result.whatsapp_url;link.hidden=false;window.open(result.whatsapp_url,'_blank','noopener')}
-    document.getElementById('requestFullName').value='';document.getElementById('requestDip').value='';document.getElementById('requestPhone').value='';
+    document.getElementById('requestFullName').value='';document.getElementById('requestHasPartner').checked=false;document.getElementById('requestPartnerName').value='';document.getElementById('requestPartnerField').hidden=true;document.getElementById('requestDip').value='';document.getElementById('requestPhone').value='';
   }catch(reason){error.textContent=reason.message||'No se pudo enviar la solicitud.';error.classList.add('show')}
   finally{button.disabled=false;button.textContent='Enviar solicitud'}
 }
+async function asegurarPersonaActiva(){
+  if(!window.APPIAuth)return null;
+  const profile=window.APPIAuth.currentProfile(),people=window.APPIAuth.accountPeople?window.APPIAuth.accountPeople(profile):[];
+  if(!profile||profile.rol==='admin'||!people.length)return null;
+  const current=window.APPIAuth.activePerson&&window.APPIAuth.activePerson();if(current)return current;
+  if(people.length===1)return window.APPIAuth.selectPerson(people[0].tipo);
+  const lock=document.getElementById('lockScreen'),overlay=document.getElementById('personChoiceOverlay'),list=document.getElementById('personChoiceList'),requestedPerson=new URLSearchParams(location.search).get('persona');
+  const ordered=people.slice().sort((a,b)=>Number(b.tipo===requestedPerson)-Number(a.tipo===requestedPerson));
+  if(lock){lock.style.display='flex';lock.classList.remove('hidden')}document.body.style.overflow='hidden';
+  list.innerHTML=ordered.map(person=>`<button type="button" class="person-choice-option" data-person-type="${person.tipo}"><span class="person-choice-avatar">${person.tipo==='titular'?'👤':'🤝'}</span><span><strong>${escapeXml(person.nombre)}</strong><small>${person.tipo==='titular'?'Titular':'Socio/a'}${person.tipo===requestedPerson?' · Teléfono a vincular':''}</small></span><span class="person-choice-arrow">›</span></button>`).join('');
+  overlay.hidden=false;
+  return new Promise(resolve=>{
+    list.querySelectorAll('[data-person-type]').forEach(button=>button.onclick=()=>{const selected=window.APPIAuth.selectPerson(button.dataset.personType);overlay.hidden=true;resolve(selected)});
+    setTimeout(()=>list.querySelector('[data-person-type]')?.focus(),50);
+  });
+}
 async function completarIngresoDistribuidor(){
+  await asegurarPersonaActiva();
   const sync=window.APPIDataSync?await window.APPIDataSync.start({claimLegacy:true}):null,lock=document.getElementById('lockScreen');
   localStorage.removeItem('appi_activada');
   if(lock){lock.classList.add('hidden');lock.style.display='none'}
@@ -9631,6 +9665,8 @@ function mostrarPantallaLoginDistribuidor(reason=''){
   if(tabCreate&&!tabCreate.dataset.bound){tabCreate.dataset.bound='1';tabCreate.onclick=()=>setLoginAccessTab('create')}
   if(requestDip&&!requestDip.dataset.bound){requestDip.dataset.bound='1';requestDip.oninput=()=>requestDip.value=window.APPIAuth.normalizeDip(requestDip.value)}
   if(requestButton&&!requestButton.dataset.bound){requestButton.dataset.bound='1';requestButton.onclick=enviarSolicitudCuenta}
+  const requestHasPartner=document.getElementById('requestHasPartner'),requestPartnerField=document.getElementById('requestPartnerField');
+  if(requestHasPartner&&!requestHasPartner.dataset.bound){requestHasPartner.dataset.bound='1';requestHasPartner.onchange=()=>{requestPartnerField.hidden=!requestHasPartner.checked;if(requestHasPartner.checked)setTimeout(()=>document.getElementById('requestPartnerName').focus(),40);else document.getElementById('requestPartnerName').value=''}}
   if(support&&!support.dataset.bound){
     support.dataset.bound='1';
     support.onclick=async()=>{const numero=dip&&dip.value?dip.value:'sin completar';const msg=`Hola POPUPS, necesito ayuda para ingresar a APPI. Mi número de distribuidor es: ${numero}`;try{await window.APPIAccountRequest.openSupport(msg)}catch(error){mostrarErrorLogin(error.message)}};
@@ -9874,7 +9910,7 @@ function actualizarCuentaUI(){
   const distributor=!!profile&&profile.rol!=='admin';
   const updateDeviceText=()=>{
     if(!deviceText)return;
-    const linked=!!(window.APPIDeviceBridge&&window.APPIDeviceBridge.state&&window.APPIDeviceBridge.state.devices.some(device=>device.activo!==false));
+    const linked=!!(window.APPIDeviceBridge&&window.APPIDeviceBridge.devicesForActivePerson&&window.APPIDeviceBridge.devicesForActivePerson().length);
     deviceText.textContent=linked?'Desvincular teléfono':'Vincular teléfono';
   };
   if(account)account.hidden=!distributor;
@@ -9924,12 +9960,12 @@ window.abrirCambioPasswordAPPI=abrirCambioPasswordAPPI;
 function abrirCuentaDesdeMenu(){
   try{cerrarToolsMenu()}catch(e){}
   if(!window.APPIAuth||!window.APPIAuth.isEnabled())return;
-  const profile=window.APPIAuth.currentProfile()||{},authStatus=window.APPIAuth.status(),syncStatus=window.APPIDataSync?window.APPIDataSync.status():{};
+  const profile=window.APPIAuth.currentProfile()||{},activePerson=window.APPIAuth.activePerson?window.APPIAuth.activePerson():null,authStatus=window.APPIAuth.status(),syncStatus=window.APPIDataSync?window.APPIDataSync.status():{};
   const last=authStatus.lastValidatedAt?new Date(authStatus.lastValidatedAt).toLocaleString('es-AR'):'Sin validar';
   modal.open({
-    icon:'👤',iconBg:'linear-gradient(135deg,#5b8def,#a06bff)',title:'Mi cuenta',sub:profile.nombre||`Distribuidor ${profile.dip||''}`,
+    icon:'👤',iconBg:'linear-gradient(135deg,#5b8def,#a06bff)',title:'Mi cuenta',sub:activePerson?.nombre||profile.nombre||`Distribuidor ${profile.dip||''}`,
     html:`<div style="display:grid;gap:9px;text-align:left">
-      <div class="tip"><b>Número de distribuidor:</b> ${escapeXml(profile.dip||'—')}<br><b>Última validación:</b> ${escapeXml(last)}<br><b>Estado:</b> ${authStatus.offline?'Modo offline':'Conectada'}</div>
+      <div class="tip"><b>Persona activa:</b> ${escapeXml(activePerson?.nombre||profile.nombre||'—')} · ${activePerson?.tipo==='socio'?'Socio/a':'Titular'}<br><b>Número de distribuidor:</b> ${escapeXml(profile.dip||'—')}<br><b>Última validación:</b> ${escapeXml(last)}<br><b>Estado:</b> ${authStatus.offline?'Modo offline':'Conectada'}</div>
       <div class="tip"><b>Sincronización:</b> ${syncStatus.syncing?'En curso':syncStatus.dirty?`${syncStatus.dirty} cambios pendientes`:'Actualizada'}${syncStatus.lastError?`<br><span style="color:#b13e47">${escapeXml(syncStatus.lastError)}</span>`:''}</div>
       <div class="warn-tip"><b>🎙️ Importante:</b> las grabaciones de audio quedan únicamente en el dispositivo donde se hicieron. El resto de los datos se sincroniza con tu cuenta.</div>
       <button type="button" class="btn btn-primary" id="btnAccountSync">☁️ Sincronizar ahora</button>
@@ -10031,7 +10067,7 @@ function abrirBackupDesdeMenu(){
     if(result.ok){
       const profile=window.APPIAuth.currentProfile();
       if(profile&&profile.rol!=='admin'&&profile.debe_cambiar_password){mostrarCambioPasswordObligatorio();return}
-      try{if(window.APPIDataSync)await window.APPIDataSync.start({claimLegacy:!(profile&&profile.rol==='admin')})}catch(error){console.error('Preparar datos de cuenta',error)}
+      try{if(profile&&profile.rol!=='admin')await asegurarPersonaActiva();if(window.APPIDataSync)await window.APPIDataSync.start({claimLegacy:!(profile&&profile.rol==='admin')})}catch(error){console.error('Preparar datos de cuenta',error)}
       localStorage.removeItem('appi_activada');
       iniciarApp();
       if(result.offline)setTimeout(()=>showToast('Modo offline · conectate antes de 7 días',3200),500);
@@ -13295,10 +13331,11 @@ setTimeout(initUsuarios, 1200);
 
 const BASE_DB_NAME='appi-historico-v1';
 const DB_VERSION=1;
+function historicalPersonType(){const person=window.APPIAuth&&window.APPIAuth.activePerson?window.APPIAuth.activePerson():null;return person&&person.tipo==='socio'?'socio':'titular'}
 function historicalDbName(){
   if(window.APPIAuth&&window.APPIAuth.isEnabled()){
-    const userId=window.APPIAuth.userId();
-    return userId?`${BASE_DB_NAME}-${userId}`:`${BASE_DB_NAME}-locked`;
+    const userId=window.APPIAuth.userId(),personType=historicalPersonType();
+    return userId?(personType==='socio'?`${BASE_DB_NAME}-${userId}-socio`:`${BASE_DB_NAME}-${userId}`):`${BASE_DB_NAME}-locked`;
   }
   return BASE_DB_NAME;
 }
@@ -13912,6 +13949,9 @@ function setSession(value){if(accountAuthEnabled())return;if(value)localStorage.
 function cloudReady(){const c=getCloudConfig();return /^https:\/\//.test(c.url||'')&&String(c.anonKey||'').length>20}
 function jwtPayload(token){try{return JSON.parse(atob(token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')))}catch(e){return {}}}
 function sessionUser(){const s=getSession();return s?jwtPayload(s.access_token||''):null}
+function cloudPeriodId(id){return accountAuthEnabled()&&historicalPersonType()==='socio'?`socio__${id}`:String(id||'')}
+function localPeriodId(id){const value=String(id||'');if(!accountAuthEnabled())return value;if(historicalPersonType()==='socio')return value.startsWith('socio__')?value.slice(7):'';return value.startsWith('socio__')?'':value}
+function historicalFilePath(userId,id,type,name){const person=accountAuthEnabled()&&historicalPersonType()==='socio'?'socio/':'';return `${encodeURIComponent(userId)}/${person}${encodeURIComponent(id)}/${encodeURIComponent(type)}/${encodeURIComponent(safeFileName(name))}`}
 function sessionExpired(s){const p=s?jwtPayload(s.access_token||''):{};return !p.exp||p.exp*1000<Date.now()+60000}
 function logSync(message){H.syncLog.push(`${new Date().toLocaleTimeString('es-AR')} · ${message}`);H.syncLog=H.syncLog.slice(-30);const el=$('histSyncLog');if(el)el.textContent=H.syncLog.join('\n')}
 async function refreshCloudSession(){
@@ -13936,13 +13976,13 @@ function handleAuthHash(){
 }
 async function upsertCloudPeriod(p){
   const user=sessionUser();if(!user||!user.sub)throw new Error('No se pudo identificar la cuenta.');const data=cloneClean(p);data.syncStatus='synced';
-  await cloudFetch('/rest/v1/historico_periodos?on_conflict=user_id,period_id',{method:'POST',headers:{'Content-Type':'application/json',Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify([{user_id:user.sub,period_id:p.id,data,updated_at:p.updatedAt}])});
-  const files=await dbGetAll('files','periodId',p.id);for(const f of files){const path=`${encodeURIComponent(user.sub)}/${encodeURIComponent(p.id)}/${encodeURIComponent(f.type)}/${encodeURIComponent(safeFileName(f.name))}`;await cloudFetch(`/storage/v1/object/historico-files/${path}`,{method:'POST',headers:{'Content-Type':f.mime||'application/octet-stream','x-upsert':'true'},body:f.blob})}
+  await cloudFetch('/rest/v1/historico_periodos?on_conflict=user_id,period_id',{method:'POST',headers:{'Content-Type':'application/json',Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify([{user_id:user.sub,period_id:cloudPeriodId(p.id),data,updated_at:p.updatedAt}])});
+  const files=await dbGetAll('files','periodId',p.id);for(const f of files){const path=historicalFilePath(user.sub,p.id,f.type,f.name);await cloudFetch(`/storage/v1/object/historico-files/${path}`,{method:'POST',headers:{'Content-Type':f.mime||'application/octet-stream','x-upsert':'true'},body:f.blob})}
   p.syncStatus='synced';p.syncedAt=new Date().toISOString();await dbPut('periods',p);
 }
 async function pullCloud(){
   const r=await cloudFetch('/rest/v1/historico_periodos?select=period_id,data,updated_at&order=period_id.asc'),rows=await r.json();let added=0;
-  for(const row of rows){const remote=row.data;if(!remote||!remote.id)continue;remote.syncStatus='synced';const local=H.periods.find(p=>p.id===remote.id);if(!local||String(remote.updatedAt||row.updated_at)>String(local.updatedAt||'')){await dbPut('periods',remote);added++}}
+  for(const row of rows){const visibleId=localPeriodId(row.period_id);if(!visibleId)continue;const remote=row.data;if(!remote||!remote.id)continue;remote.id=visibleId;remote.syncStatus='synced';const local=H.periods.find(p=>p.id===remote.id);if(!local||String(remote.updatedAt||row.updated_at)>String(local.updatedAt||'')){await dbPut('periods',remote);added++}}
   if(added)await refreshData();return added;
 }
 async function syncAll(showResult=true){
@@ -13952,7 +13992,7 @@ async function syncAll(showResult=true){
   catch(e){console.error('Sincronización histórico',e);logSync(`ERROR · ${e.message}`);if(showResult)toast(`No se pudo sincronizar: ${e.message}`,3500);updateSyncStatus(true)}finally{H.syncing=false;updateSyncStatus()}
 }
 async function cloudDownloadFile(id,type){
-  const p=H.periods.find(x=>x.id===id),meta=p&&p.filesMeta&&p.filesMeta.find(f=>f.type===type),user=sessionUser();if(!meta||!user)return null;const path=`${encodeURIComponent(user.sub)}/${encodeURIComponent(id)}/${encodeURIComponent(type)}/${encodeURIComponent(safeFileName(meta.name))}`;const r=await cloudFetch(`/storage/v1/object/authenticated/historico-files/${path}`);const blob=await r.blob(),record={key:`${id}:${type}`,periodId:id,type,name:meta.name,size:meta.size,mime:meta.mime,lastModified:meta.lastModified,blob};await dbPut('files',record);return record;
+  const p=H.periods.find(x=>x.id===id),meta=p&&p.filesMeta&&p.filesMeta.find(f=>f.type===type),user=sessionUser();if(!meta||!user)return null;const path=historicalFilePath(user.sub,id,type,meta.name);const r=await cloudFetch(`/storage/v1/object/authenticated/historico-files/${path}`);const blob=await r.blob(),record={key:`${id}:${type}`,periodId:id,type,name:meta.name,size:meta.size,mime:meta.mime,lastModified:meta.lastModified,blob};await dbPut('files',record);return record;
 }
 async function callOnlineAI(periods,strategies,a){
   const payload={periods:periods.map(p=>({id:p.id,label:p.label,summary:p.summary,people:p.people.map(x=>({nombre:x.nombre,codigo:x.codigo,categoria:x.cat,pbPersonal:x.pnAct,pbEquipo:x.teamPB,garantias:x.garantias,rama:x.branchKey})),incomes:(p.incomes||[]).map(i=>({nombre:i.nombre,dip:i.dip,categoria:i.cat,fechaAlta:i.fechaAlta,ultimaCompra:i.ultimaCompra,diasHastaCompra:i.diasHastaCompra,compraPosterior:i.compraPosterior,patrocinante:i.patrocinanteNombre,patrocinanteDip:i.patrocinanteDip,capacitacion:i.capacitacion}))})),localStrategies:strategies,comparison:{improved:a.improved,declined:a.declined,newPeople:a.newPeople,leftPeople:a.leftPeople}};
@@ -13985,7 +14025,7 @@ async function openHistorico(){
   try{await refreshData();H.ready=true;render()}catch(e){console.error('Abrir histórico',e);if(c)c.innerHTML=`<div class="hist-toast-inline error">No se pudo abrir el almacenamiento: ${esc(e.message)}</div>`}
 }
 async function initHistorico(){
-  if(window.APPIAuth&&window.APPIAuth.isEnabled()&&!window.APPIAuth.isLocallyAuthorized())return;
+  if(window.APPIAuth&&window.APPIAuth.isEnabled()&&(!window.APPIAuth.isLocallyAuthorized()||window.APPIAuth.needsPersonChoice&&window.APPIAuth.needsPersonChoice()))return;
   if(H._initialized)return;H._initialized=true;
   try{await openDB();handleAuthHash();await refreshData();H.ready=true}catch(e){console.error('Inicialización histórico',e)}
   document.querySelectorAll('.hist-tabs [data-hist-tab]').forEach(b=>b.onclick=()=>openTab(b.dataset.histTab));

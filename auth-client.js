@@ -2,6 +2,7 @@
 'use strict';
 
 const SESSION_KEY='appi_auth_session_v1';
+const ACTIVE_PERSON_KEY='appi_active_person_v1';
 const DEFAULTS={
   enabled:false,
   url:'',
@@ -69,7 +70,8 @@ function save(value){
   window.dispatchEvent(new CustomEvent('appi-auth-change',{detail:value}));
   return value;
 }
-function clear(){save(null)}
+function clearActivePerson(){try{sessionStorage.removeItem(ACTIVE_PERSON_KEY)}catch(e){}}
+function clear(){clearActivePerson();save(null)}
 function offlineLimitMs(){return Math.max(1,Number(config().offlineDays)||7)*86400000}
 function offlineEligible(value=load()){
   return !!(value&&value.profile&&value.profile.activo!==false&&value.lastValidatedAt&&Date.now()-Number(value.lastValidatedAt)<=offlineLimitMs());
@@ -109,7 +111,7 @@ async function request(path,options={},token=''){
 async function fetchProfile(session){
   const payload=jwtPayload(session&&session.access_token);
   if(!payload||!payload.sub)throw authError('La sesión recibida no es válida.','invalid_session');
-  const query=`/rest/v1/appi_perfiles?select=user_id,username,dip,sucursal,numero_distribuidor,nombre,rol,activo,debe_cambiar_password,membresia_meses,membresia_inicio,membresia_vence&user_id=eq.${encodeURIComponent(payload.sub)}&limit=1`;
+  const query=`/rest/v1/appi_perfiles?select=user_id,username,dip,sucursal,numero_distribuidor,nombre,socio_nombre,rol,activo,debe_cambiar_password,membresia_meses,membresia_inicio,membresia_vence&user_id=eq.${encodeURIComponent(payload.sub)}&limit=1`;
   const rows=await request(query,{headers:{Accept:'application/json'}},session.access_token);
   const profile=Array.isArray(rows)?rows[0]:null;
   if(!profile)throw authError('La cuenta no tiene un perfil de distribuidor.','profile_missing',403);
@@ -147,6 +149,7 @@ async function login(identifier,password){
   }else if(parseDip(profile.dip).canonical!==parsed.canonical){
     throw authError('La cuenta no coincide con el distribuidor ingresado.','profile_mismatch',403);
   }
+  clearActivePerson();
   return save({session,profile,lastValidatedAt:Date.now(),offline:false});
 }
 function loginAdmin(password){return login(config().adminLogin&&config().adminLogin.username||'popups',password)}
@@ -209,13 +212,29 @@ async function logout(){
 function accessToken(){const value=load();return value&&value.session&&value.session.access_token||''}
 function userId(){const value=load(),payload=jwtPayload(value&&value.session&&value.session.access_token);return payload&&payload.sub||''}
 function currentProfile(){const value=load();return value&&value.profile||null}
+function accountPeople(profile=currentProfile()){
+  if(!profile||profile.rol==='admin')return [];
+  const people=[{tipo:'titular',nombre:String(profile.nombre||'Titular').trim()||'Titular'}];
+  const partner=String(profile.socio_nombre||'').trim();if(partner)people.push({tipo:'socio',nombre:partner});
+  return people;
+}
+function activePerson(){
+  const profile=currentProfile(),people=accountPeople(profile);if(!people.length)return null;if(people.length===1)return people[0];
+  try{const saved=JSON.parse(sessionStorage.getItem(ACTIVE_PERSON_KEY)||'null'),person=people.find(item=>item.tipo===saved?.tipo);return saved&&saved.userId===userId()&&person?person:null}catch(e){return null}
+}
+function selectPerson(tipo){
+  const person=accountPeople().find(item=>item.tipo===String(tipo||''));if(!person)throw authError('Elegí una persona válida para continuar.','invalid_person');
+  try{sessionStorage.setItem(ACTIVE_PERSON_KEY,JSON.stringify({userId:userId(),tipo:person.tipo}))}catch(e){}
+  window.dispatchEvent(new CustomEvent('appi-person-change',{detail:person}));return person;
+}
+function needsPersonChoice(){return accountPeople().length>1&&!activePerson()}
 function status(){
   const saved=load();
   return {enabled:isEnabled(),configured:isConfigured(),authorized:isLocallyAuthorized(),offline:!!(saved&&saved.offline),profile:saved&&saved.profile||null,lastValidatedAt:saved&&saved.lastValidatedAt||0};
 }
 
 window.APPIAuth={
-  SESSION_KEY,config,isEnabled,isConfigured,normalizeDip,normalizeLoginIdentifier,resolveLoginIdentifier,parseDip,emailForDip,login,loginAdmin,changePassword,authorize,refresh,validate,logout,
-  load,clear,offlineEligible,isLocallyAuthorized,accessToken,userId,currentProfile,status
+  SESSION_KEY,ACTIVE_PERSON_KEY,config,isEnabled,isConfigured,normalizeDip,normalizeLoginIdentifier,resolveLoginIdentifier,parseDip,emailForDip,login,loginAdmin,changePassword,authorize,refresh,validate,logout,
+  load,clear,clearActivePerson,offlineEligible,isLocallyAuthorized,accessToken,userId,currentProfile,accountPeople,activePerson,selectPerson,needsPersonChoice,status
 };
 })();

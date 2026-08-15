@@ -29,11 +29,11 @@ test('vincula por QR y envía una llamada de la PC al teléfono', async ({ page 
   const accessToken = tokenFor(USER_ID);
   const profile = {
     user_id: USER_ID, username: null, dip: '02-9802014', sucursal: '02', numero_distribuidor: '9802014',
-    nombre: 'María Pérez', rol: 'usuario', activo: true, debe_cambiar_password: false,
+    nombre: 'María Pérez', socio_nombre: null, rol: 'usuario', activo: true, debe_cambiar_password: false,
     membresia_meses: 1, membresia_inicio: now, membresia_vence: new Date(Date.now() + 30 * 86400000).toISOString()
   };
   const device = {
-    id: DEVICE_ID, device_key: DEVICE_KEY, nombre: 'Mi teléfono Android', plataforma: 'android',
+    id: DEVICE_ID, device_key: DEVICE_KEY, persona_tipo: 'titular', nombre: 'Mi teléfono Android', plataforma: 'android',
     notificaciones: true, activo: true, last_seen: now, created_at: now
   };
   let deviceLinked = true;
@@ -108,7 +108,7 @@ test('vincula por QR y envía una llamada de la PC al teléfono', async ({ page 
   await page.locator('#appiDialogOk').click();
   await expect(page.locator('.appi-dialog-overlay')).toBeHidden();
   await expect.poll(() => bridgeCalls.filter(item => item.action === 'remove_device').length).toBe(1);
-  expect(bridgeCalls.find(item => item.action === 'remove_device')).toMatchObject({ device_id: DEVICE_ID });
+  expect(bridgeCalls.find(item => item.action === 'remove_device')).toMatchObject({ device_id: DEVICE_ID, persona_tipo: 'titular' });
 
   await page.locator('#view-home .tools-btn').click();
   await expect(page.locator('#toolsDevicesTxt')).toHaveText('Vincular teléfono');
@@ -139,7 +139,7 @@ test('vincula por QR y envía una llamada de la PC al teléfono', async ({ page 
 
   await page.evaluate(() => { void APPIDeviceBridge.claimByCode(); });
   await expect(page.locator('#appiDialogTitle')).toHaveText('Ya hay un teléfono vinculado');
-  await expect(page.locator('#appiDialogMessage')).toHaveText('Esta cuenta ya tiene un teléfono vinculado. Para usar otro, primero desvinculá el actual.');
+  await expect(page.locator('#appiDialogMessage')).toHaveText('María Pérez ya tiene un teléfono vinculado. Para usar otro, primero desvinculá el actual.');
   await page.locator('#appiDialogOk').click();
 
   await page.evaluate(() => {
@@ -157,6 +157,7 @@ test('vincula por QR y envía una llamada de la PC al teléfono', async ({ page 
   const teamCall = bridgeCalls.find(item => item.action === 'send_call' && item.nombre === 'Persona de Mi Equipo');
   expect(teamCall).toMatchObject({
     device_id: DEVICE_ID,
+    persona_tipo: 'titular',
     contact_id: '',
     nombre: 'Persona de Mi Equipo',
     telefono: '3514447788'
@@ -174,6 +175,7 @@ test('vincula por QR y envía una llamada de la PC al teléfono', async ({ page 
   const sent = bridgeCalls.find(item => item.action === 'send_call' && item.contact_id === CONTACT_ID);
   expect(sent).toMatchObject({
     device_id: DEVICE_ID,
+    persona_tipo: 'titular',
     contact_id: CONTACT_ID,
     nombre: 'Carolina Martínez',
     telefono: '351 555 1234'

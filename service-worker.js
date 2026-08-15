@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v211-desvinculacion-directa';
+const CACHE_NAME = 'appi-v212-titular-y-socio';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

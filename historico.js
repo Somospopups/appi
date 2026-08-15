@@ -4,10 +4,11 @@
 
 const BASE_DB_NAME='appi-historico-v1';
 const DB_VERSION=1;
+function historicalPersonType(){const person=window.APPIAuth&&window.APPIAuth.activePerson?window.APPIAuth.activePerson():null;return person&&person.tipo==='socio'?'socio':'titular'}
 function historicalDbName(){
   if(window.APPIAuth&&window.APPIAuth.isEnabled()){
-    const userId=window.APPIAuth.userId();
-    return userId?`${BASE_DB_NAME}-${userId}`:`${BASE_DB_NAME}-locked`;
+    const userId=window.APPIAuth.userId(),personType=historicalPersonType();
+    return userId?(personType==='socio'?`${BASE_DB_NAME}-${userId}-socio`:`${BASE_DB_NAME}-${userId}`):`${BASE_DB_NAME}-locked`;
   }
   return BASE_DB_NAME;
 }
@@ -621,6 +622,9 @@ function setSession(value){if(accountAuthEnabled())return;if(value)localStorage.
 function cloudReady(){const c=getCloudConfig();return /^https:\/\//.test(c.url||'')&&String(c.anonKey||'').length>20}
 function jwtPayload(token){try{return JSON.parse(atob(token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')))}catch(e){return {}}}
 function sessionUser(){const s=getSession();return s?jwtPayload(s.access_token||''):null}
+function cloudPeriodId(id){return accountAuthEnabled()&&historicalPersonType()==='socio'?`socio__${id}`:String(id||'')}
+function localPeriodId(id){const value=String(id||'');if(!accountAuthEnabled())return value;if(historicalPersonType()==='socio')return value.startsWith('socio__')?value.slice(7):'';return value.startsWith('socio__')?'':value}
+function historicalFilePath(userId,id,type,name){const person=accountAuthEnabled()&&historicalPersonType()==='socio'?'socio/':'';return `${encodeURIComponent(userId)}/${person}${encodeURIComponent(id)}/${encodeURIComponent(type)}/${encodeURIComponent(safeFileName(name))}`}
 function sessionExpired(s){const p=s?jwtPayload(s.access_token||''):{};return !p.exp||p.exp*1000<Date.now()+60000}
 function logSync(message){H.syncLog.push(`${new Date().toLocaleTimeString('es-AR')} · ${message}`);H.syncLog=H.syncLog.slice(-30);const el=$('histSyncLog');if(el)el.textContent=H.syncLog.join('\n')}
 async function refreshCloudSession(){
@@ -645,13 +649,13 @@ function handleAuthHash(){
 }
 async function upsertCloudPeriod(p){
   const user=sessionUser();if(!user||!user.sub)throw new Error('No se pudo identificar la cuenta.');const data=cloneClean(p);data.syncStatus='synced';
-  await cloudFetch('/rest/v1/historico_periodos?on_conflict=user_id,period_id',{method:'POST',headers:{'Content-Type':'application/json',Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify([{user_id:user.sub,period_id:p.id,data,updated_at:p.updatedAt}])});
-  const files=await dbGetAll('files','periodId',p.id);for(const f of files){const path=`${encodeURIComponent(user.sub)}/${encodeURIComponent(p.id)}/${encodeURIComponent(f.type)}/${encodeURIComponent(safeFileName(f.name))}`;await cloudFetch(`/storage/v1/object/historico-files/${path}`,{method:'POST',headers:{'Content-Type':f.mime||'application/octet-stream','x-upsert':'true'},body:f.blob})}
+  await cloudFetch('/rest/v1/historico_periodos?on_conflict=user_id,period_id',{method:'POST',headers:{'Content-Type':'application/json',Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify([{user_id:user.sub,period_id:cloudPeriodId(p.id),data,updated_at:p.updatedAt}])});
+  const files=await dbGetAll('files','periodId',p.id);for(const f of files){const path=historicalFilePath(user.sub,p.id,f.type,f.name);await cloudFetch(`/storage/v1/object/historico-files/${path}`,{method:'POST',headers:{'Content-Type':f.mime||'application/octet-stream','x-upsert':'true'},body:f.blob})}
   p.syncStatus='synced';p.syncedAt=new Date().toISOString();await dbPut('periods',p);
 }
 async function pullCloud(){
   const r=await cloudFetch('/rest/v1/historico_periodos?select=period_id,data,updated_at&order=period_id.asc'),rows=await r.json();let added=0;
-  for(const row of rows){const remote=row.data;if(!remote||!remote.id)continue;remote.syncStatus='synced';const local=H.periods.find(p=>p.id===remote.id);if(!local||String(remote.updatedAt||row.updated_at)>String(local.updatedAt||'')){await dbPut('periods',remote);added++}}
+  for(const row of rows){const visibleId=localPeriodId(row.period_id);if(!visibleId)continue;const remote=row.data;if(!remote||!remote.id)continue;remote.id=visibleId;remote.syncStatus='synced';const local=H.periods.find(p=>p.id===remote.id);if(!local||String(remote.updatedAt||row.updated_at)>String(local.updatedAt||'')){await dbPut('periods',remote);added++}}
   if(added)await refreshData();return added;
 }
 async function syncAll(showResult=true){
@@ -661,7 +665,7 @@ async function syncAll(showResult=true){
   catch(e){console.error('Sincronización histórico',e);logSync(`ERROR · ${e.message}`);if(showResult)toast(`No se pudo sincronizar: ${e.message}`,3500);updateSyncStatus(true)}finally{H.syncing=false;updateSyncStatus()}
 }
 async function cloudDownloadFile(id,type){
-  const p=H.periods.find(x=>x.id===id),meta=p&&p.filesMeta&&p.filesMeta.find(f=>f.type===type),user=sessionUser();if(!meta||!user)return null;const path=`${encodeURIComponent(user.sub)}/${encodeURIComponent(id)}/${encodeURIComponent(type)}/${encodeURIComponent(safeFileName(meta.name))}`;const r=await cloudFetch(`/storage/v1/object/authenticated/historico-files/${path}`);const blob=await r.blob(),record={key:`${id}:${type}`,periodId:id,type,name:meta.name,size:meta.size,mime:meta.mime,lastModified:meta.lastModified,blob};await dbPut('files',record);return record;
+  const p=H.periods.find(x=>x.id===id),meta=p&&p.filesMeta&&p.filesMeta.find(f=>f.type===type),user=sessionUser();if(!meta||!user)return null;const path=historicalFilePath(user.sub,id,type,meta.name);const r=await cloudFetch(`/storage/v1/object/authenticated/historico-files/${path}`);const blob=await r.blob(),record={key:`${id}:${type}`,periodId:id,type,name:meta.name,size:meta.size,mime:meta.mime,lastModified:meta.lastModified,blob};await dbPut('files',record);return record;
 }
 async function callOnlineAI(periods,strategies,a){
   const payload={periods:periods.map(p=>({id:p.id,label:p.label,summary:p.summary,people:p.people.map(x=>({nombre:x.nombre,codigo:x.codigo,categoria:x.cat,pbPersonal:x.pnAct,pbEquipo:x.teamPB,garantias:x.garantias,rama:x.branchKey})),incomes:(p.incomes||[]).map(i=>({nombre:i.nombre,dip:i.dip,categoria:i.cat,fechaAlta:i.fechaAlta,ultimaCompra:i.ultimaCompra,diasHastaCompra:i.diasHastaCompra,compraPosterior:i.compraPosterior,patrocinante:i.patrocinanteNombre,patrocinanteDip:i.patrocinanteDip,capacitacion:i.capacitacion}))})),localStrategies:strategies,comparison:{improved:a.improved,declined:a.declined,newPeople:a.newPeople,leftPeople:a.leftPeople}};
@@ -694,7 +698,7 @@ async function openHistorico(){
   try{await refreshData();H.ready=true;render()}catch(e){console.error('Abrir histórico',e);if(c)c.innerHTML=`<div class="hist-toast-inline error">No se pudo abrir el almacenamiento: ${esc(e.message)}</div>`}
 }
 async function initHistorico(){
-  if(window.APPIAuth&&window.APPIAuth.isEnabled()&&!window.APPIAuth.isLocallyAuthorized())return;
+  if(window.APPIAuth&&window.APPIAuth.isEnabled()&&(!window.APPIAuth.isLocallyAuthorized()||window.APPIAuth.needsPersonChoice&&window.APPIAuth.needsPersonChoice()))return;
   if(H._initialized)return;H._initialized=true;
   try{await openDB();handleAuthHash();await refreshData();H.ready=true}catch(e){console.error('Inicialización histórico',e)}
   document.querySelectorAll('.hist-tabs [data-hist-tab]').forEach(b=>b.onclick=()=>openTab(b.dataset.histTab));

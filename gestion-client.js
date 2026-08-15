@@ -109,7 +109,7 @@ function surveyUrl(invitation=state.link){
   if(!invitation||!invitation.token)return '';
   const base=new URL('./encuesta.html',location.href);base.search='';base.hash='';base.searchParams.set('t',invitation.token);return base.toString();
 }
-function distributorFirstName(){const full=String(profile()?.nombre||'').trim();return full.split(/\s+/)[0]||''}
+function distributorFirstName(){const active=window.APPIAuth&&window.APPIAuth.activePerson?window.APPIAuth.activePerson():null,full=String(active?.nombre||profile()?.nombre||'').trim();return full.split(/\s+/)[0]||''}
 function shareMessage(url,recipientName=''){
   const name=distributorFirstName(),recipient=String(recipientName||'').trim().split(/\s+/)[0]||'';
   return `¡Hola${recipient?', '+recipient:''}! 😊 Soy ${name}.\n\nQuería contarte que estoy realizando una pequeña encuesta que es muy importante para mí. Gracias a tu apoyo puedo seguir concientizando a más familias a través de demostraciones y compartiendo información que puede ayudarlas a cuidar su bienestar.\n\nCuando llegues al final, si te nace, podés regalarles esta misma oportunidad a algunos de tus seres queridos. Tus referidos son muy importantes para mí porque me permiten continuar con esta tarea. Puede ser una persona, dos o diez: la cantidad no es lo importante; lo valioso es poder acercarles la posibilidad de cuidarse y cuidar a toda su familia.\n\n¿Me ayudás completándola? Te va a llevar sólo unos minutos:\n${url}\n\n¡Muchas gracias por tu tiempo y por acompañarme! 💙`;

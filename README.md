@@ -4,7 +4,7 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
-- Versión: **v211 · Desvinculación directa**.
+- Versión: **v212 · Titular y socio**.
 - Publicación: [https://somospopups.github.io/appi/](https://somospopups.github.io/appi/)
 - Acceso por número de distribuidor y contraseña.
 - Acceso administrador POPUPS mediante el candado, sin DIP ni número de distribuidor.
@@ -44,9 +44,21 @@ supabase functions deploy encuesta-publica --no-verify-jwt
 
 La función valida el enlace, la membresía, el contenido, el consentimiento y los referidos antes de registrar los datos.
 
+## Titular y socio
+
+Una cuenta puede tener un titular y, opcionalmente, un socio. Ambos usan el mismo número de distribuidor, contraseña y membresía. Después de ingresar, APPI pregunta **¿Quién sos?** y abre el espacio de la persona elegida.
+
+- El Home saluda con **Hola + nombre**.
+- Planificación, presupuesto, Siete Pasos, ruedas, contactos, notas e Histórico son personales.
+- Mi Equipo y Garantías cargados mediante Excel se comparten.
+- Mi Encuesta y Mi Gestión también se comparten.
+- La Grabadora continúa siendo local en cada dispositivo.
+- Cada persona puede vincular un teléfono; las llamadas van al teléfono de la persona activa.
+- Las cuentas sin socio ingresan directamente como titular.
+
 ## Puente de llamadas entre dispositivos
 
-Desde el **engranaje → Vincular teléfono**, una PC o tablet muestra automáticamente un QR y un código de seis dígitos. APPI admite un solo teléfono vinculado por cuenta. Cuando ya existe uno, el engranaje muestra **Desvincular teléfono** y solicita una confirmación simple con **Sí** o **No**.
+Desde el **engranaje → Vincular teléfono**, una PC o tablet muestra automáticamente un QR y un código de seis dígitos. Cada integrante de la cuenta puede vincular su propio teléfono. Cuando la persona activa ya tiene uno, el engranaje muestra **Desvincular teléfono** y solicita una confirmación simple con **Sí** o **No**.
 
 Al tocar **Llamar** desde Mi Gestión en PC o tablet:
 

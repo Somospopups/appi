@@ -17,9 +17,9 @@ async function mockSupabase(page) {
   let whatsapp = '5493515551234';
   let offline = false;
   const profiles = {
-    [USER_A]: { user_id: USER_A, username: null, dip: '02-9802014', sucursal: '02', numero_distribuidor: '9802014', nombre: 'Distribuidor A', rol: 'usuario', activo: true, debe_cambiar_password: false, membresia_meses: 1, membresia_inicio: new Date().toISOString(), membresia_vence: new Date(Date.now()+30*86400000).toISOString() },
-    [USER_B]: { user_id: USER_B, username: null, dip: '03-1234567', sucursal: '03', numero_distribuidor: '1234567', nombre: 'Distribuidor B', rol: 'usuario', activo: true, debe_cambiar_password: false, membresia_meses: 3, membresia_inicio: new Date().toISOString(), membresia_vence: new Date(Date.now()+90*86400000).toISOString() },
-    [USER_ADMIN]: { user_id: USER_ADMIN, username: 'popups', dip: null, sucursal: null, numero_distribuidor: null, nombre: 'POPUPS', rol: 'admin', activo: true, debe_cambiar_password: false }
+    [USER_A]: { user_id: USER_A, username: null, dip: '02-9802014', sucursal: '02', numero_distribuidor: '9802014', nombre: 'Distribuidor A', socio_nombre: null, rol: 'usuario', activo: true, debe_cambiar_password: false, membresia_meses: 1, membresia_inicio: new Date().toISOString(), membresia_vence: new Date(Date.now()+30*86400000).toISOString() },
+    [USER_B]: { user_id: USER_B, username: null, dip: '03-1234567', sucursal: '03', numero_distribuidor: '1234567', nombre: 'Distribuidor B', socio_nombre: null, rol: 'usuario', activo: true, debe_cambiar_password: false, membresia_meses: 3, membresia_inicio: new Date().toISOString(), membresia_vence: new Date(Date.now()+90*86400000).toISOString() },
+    [USER_ADMIN]: { user_id: USER_ADMIN, username: 'popups', dip: null, sucursal: null, numero_distribuidor: null, nombre: 'POPUPS', socio_nombre: null, rol: 'admin', activo: true, debe_cambiar_password: false }
   };
   const cors = { 'access-control-allow-origin': '*', 'content-type': 'application/json' };
 
@@ -53,7 +53,7 @@ async function mockSupabase(page) {
     if (url.pathname === '/functions/v1/solicitud-cuenta') {
       const body = request.postDataJSON();
       if (body.action === 'config') return route.fulfill({ status: 200, headers: cors, body: JSON.stringify({ whatsapp }) });
-      const created = { id: `request-${pendingRequests.length+1}`, nombre: body.nombre, dip: '04-7654321', sucursal: '04', numero_distribuidor: '7654321', telefono: String(body.telefono).replace(/\D/g,''), estado: 'pendiente', created_at: new Date().toISOString() };
+      const created = { id: `request-${pendingRequests.length+1}`, nombre: body.nombre, socio_nombre: body.socio_nombre || null, dip: '04-7654321', sucursal: '04', numero_distribuidor: '7654321', telefono: String(body.telefono).replace(/\D/g,''), estado: 'pendiente', created_at: new Date().toISOString() };
       pendingRequests.push(created);
       return route.fulfill({ status: 201, headers: cors, body: JSON.stringify({ ok: true, request_id: created.id, whatsapp_url: `https://wa.me/${whatsapp}?text=solicitud` }) });
     }
@@ -172,6 +172,43 @@ test('cada distribuidor sincroniza y ve únicamente sus datos', async ({ page })
   expect(await page.evaluate(() => APPIAuth.currentProfile().dip)).toBe('03-1234567');
 });
 
+test('titular y socio eligen su identidad y separan el espacio personal', async ({ page }) => {
+  const backend=await mockSupabase(page);
+  backend.profiles[USER_A].nombre='María Pérez';
+  backend.profiles[USER_A].socio_nombre='Juan Gómez';
+  backend.cloud.get(USER_A).set('presu_2099_0',{value:JSON.stringify({propietario:'titular'})});
+  backend.cloud.get(USER_A).set('persona_socio__presu_2099_0',{value:JSON.stringify({propietario:'socio'})});
+  await page.goto('/index.html',{waitUntil:'networkidle'});
+  await page.locator('#distributorInput').fill('02-9802014');
+  await page.locator('#distributorPassword').fill('Clave1234');
+  await page.locator('#btnDistributorLogin').click();
+  await expect(page.locator('#personChoiceOverlay')).toBeVisible();
+  await expect(page.locator('[data-person-type="titular"]')).toContainText('María Pérez');
+  await expect(page.locator('[data-person-type="socio"]')).toContainText('Juan Gómez');
+  await page.locator('[data-person-type="socio"]').click();
+  await expect(page.locator('#lockScreen')).toHaveClass(/hidden/);
+  await expect(page.locator('#homeGreeting')).toHaveText('Hola Juan 👋');
+  expect(await page.evaluate(()=>APPIAuth.activePerson())).toEqual({tipo:'socio',nombre:'Juan Gómez'});
+  await expect.poll(()=>page.evaluate(async()=>{const dbs=await indexedDB.databases();return dbs.map(db=>db.name).includes(`appi-historico-v1-${APPIAuth.userId()}-socio`)})).toBe(true);
+  expect(await page.evaluate(()=>JSON.parse(localStorage.getItem('presu_2099_0')).propietario)).toBe('socio');
+  expect(await page.evaluate(()=>({personal:APPIDataSync.cloudDataKey('appi_keep_notas'),shared:APPIDataSync.cloudDataKey('equipoData')}))).toEqual({personal:'persona_socio__appi_keep_notas',shared:'equipoData'});
+  await page.evaluate(()=>{
+    localStorage.setItem('appi_keep_notas',JSON.stringify([{id:1,texto:'Nota del socio'}]));
+    localStorage.setItem('equipoData',JSON.stringify({titular:null,personas:[],raices:[]}));
+  });
+  await page.evaluate(()=>APPIDataSync.syncNow(true));
+  expect(backend.cloud.get(USER_A).has('persona_socio__appi_keep_notas')).toBe(true);
+  expect(backend.cloud.get(USER_A).has('equipoData')).toBe(true);
+  const devices=await page.evaluate(()=>{
+    APPIDeviceBridge.state.devices=[
+      {id:'1',persona_tipo:'titular',activo:true,nombre:'Teléfono de María'},
+      {id:'2',persona_tipo:'socio',activo:true,nombre:'Teléfono de Juan'}
+    ];
+    return APPIDeviceBridge.devicesForActivePerson().map(device=>device.nombre);
+  });
+  expect(devices).toEqual(['Teléfono de Juan']);
+});
+
 test('la contraseña temporal obliga a crear una contraseña personal', async ({ page }) => {
   const backend=await mockSupabase(page);
   backend.profiles[USER_A].debe_cambiar_password=true;
@@ -205,11 +242,15 @@ test('una solicitud nueva abre WhatsApp y queda pendiente', async ({ page }) => 
   await page.evaluate(()=>{window.__lastOpen='';window.open=url=>{window.__lastOpen=url;return null}});
   await page.locator('#loginTabCreate').click();
   await page.locator('#requestFullName').fill('Persona Nueva');
+  await page.locator('#requestHasPartner').check();
+  await expect(page.locator('#requestPartnerField')).toBeVisible();
+  await page.locator('#requestPartnerName').fill('Socio Nuevo');
   await page.locator('#requestDip').fill('04-7654321');
   await page.locator('#requestPhone').fill('3515551234');
   await page.locator('#btnRequestAccount').click();
   await expect(page.locator('#requestAccountSuccess')).toContainText('pendiente');
   expect(backend.pendingRequests).toHaveLength(1);
+  expect(backend.pendingRequests[0].socio_nombre).toBe('Socio Nuevo');
   expect(await page.evaluate(()=>window.__lastOpen)).toContain('wa.me');
 });
 
@@ -233,6 +274,7 @@ test('POPUPS ingresa por el candado y no tiene distribuidor asociado', async ({ 
   await expect(page.locator('#adminUserList')).toContainText('Distribuidor A');
   await expect(page.locator('#adminPendingList')).toContainText('Solicitud Pendiente');
   await expect(page.locator('#adminStatPending')).toHaveText('1');
+  await expect(page.locator('[data-admin-action="people"]').first()).toBeVisible();
   await expect(page.locator('[data-admin-action="membership"]').first()).toBeVisible();
   await expect(page.locator('[data-admin-action="delete"]').first()).toBeVisible();
   await page.locator('[data-admin-action="membership"]').first().click();
