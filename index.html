@@ -3495,7 +3495,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v199 · Notas legibles</div>
+  <div class="ds-foot">APPI · v200 · Pines estables</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -10085,7 +10085,7 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./service-worker.js?v=199').catch(error => {
+      navigator.serviceWorker.register('./service-worker.js?v=200').catch(error => {
         console.warn('No se pudo registrar el modo offline de APPI', error);
       });
     });
@@ -11339,9 +11339,9 @@ body.dark .rec-item{background:rgba(30,30,50,0.6);border-color:rgba(255,255,255,
 body.dark .rec-item .info small{color:#a0a0b0}
 
 /* ===== NOTAS KEEP - sticky notes colores ===== */
-.keep-grid{columns:2;column-gap:10px}
-@media (min-width: 600px){ .keep-grid{columns:3} }
-.keep-note{break-inside:avoid;padding:19px 14px 14px;border-radius:16px;margin:7px 0 10px;position:relative;box-shadow:0 4px 12px rgba(0,0,0,0.08);transition:transform 0.15s,box-shadow 0.2s;cursor:pointer;border:1px solid rgba(0,0,0,0.06)}
+.keep-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 12px;align-items:start}
+@media (min-width: 600px){ .keep-grid{grid-template-columns:repeat(3,minmax(0,1fr))} }
+.keep-note{padding:19px 14px 14px;border-radius:16px;margin:7px 0 0;position:relative;width:100%;min-width:0;align-self:start;box-shadow:0 4px 12px rgba(0,0,0,0.08);transition:transform 0.15s,box-shadow 0.2s;cursor:pointer;border:1px solid rgba(0,0,0,0.06)}
 .keep-pin{position:absolute;z-index:3;top:-8px;left:52%;width:18px;height:18px;transform:translateX(-50%) rotate(-5deg);border-radius:50%;background:radial-gradient(circle at 34% 28%,#fffbd0 0 10%,#fff047 13%,#ffd400 58%,#d79d00 100%);box-shadow:0 4px 8px rgba(110,82,0,.34)}.keep-pin:after{content:"";position:absolute;left:8px;top:15px;width:2px;height:9px;border-radius:2px;background:linear-gradient(#d5d6da,#5e6069);transform:rotate(7deg);transform-origin:top}.keep-note:nth-child(3n+2) .keep-pin{left:59%;transform:translateX(-50%) rotate(4deg)}.keep-note:nth-child(3n) .keep-pin{left:46%;transform:translateX(-50%) rotate(-2deg)}.keep-note.is-pinned .keep-pin{box-shadow:0 0 0 3px rgba(91,141,239,.24),0 4px 8px rgba(110,82,0,.34)}
 .keep-note:active{transform:scale(0.98)}
 .keep-note .k-title{font-weight:800;font-size:14px;margin:0 0 6px;word-break:break-word}

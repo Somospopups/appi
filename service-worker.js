@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v199-notas-legibles';
+const CACHE_NAME = 'appi-v200-pines-estables';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
