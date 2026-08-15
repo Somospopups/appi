@@ -57,7 +57,7 @@ function saveCacheSoon(){
 function scheduleSync(){
   saveCacheSoon();
   clearTimeout(state.syncTimer);
-  state.syncTimer=setTimeout(()=>syncNow(false).catch(error=>console.warn('Sincronización APPI',error)),1800);
+  state.syncTimer=setTimeout(()=>syncNow(false).catch(error=>console.warn('Sincronización APPI',error)),800);
 }
 function markSet(key,value){
   if(!state.ready)return;
@@ -176,6 +176,11 @@ async function logoutAndLock({removeCache=false}={}){
   return {synced,cacheRemoved:removeCache};
 }
 function status(){return {ready:state.ready,userId:state.userId,dirty:state.dirty.size,deleted:state.deleted.size,syncing:state.syncing,lastError:state.lastError,audioLocalOnly:true}}
+
+window.addEventListener('online',()=>{if(state.ready)syncNow(false).catch(error=>console.warn('Sincronización al reconectar',error))});
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'&&state.ready)syncNow(false).catch(()=>{})});
+window.addEventListener('pagehide',()=>{if(state.ready)syncNow(false).catch(()=>{})});
+setInterval(()=>{if(state.ready&&navigator.onLine&&(state.dirty.size||state.deleted.size))syncNow(false).catch(()=>{})},30000);
 
 window.APPIDataSync={isDataKey,collect,start,syncNow,logoutAndLock,status,cacheDelete};
 })();

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v193-membresias';
+const CACHE_NAME = 'appi-v194-sync-automatica';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
