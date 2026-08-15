@@ -3500,7 +3500,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v206 · Dispositivos y planillas estables</div>
+  <div class="ds-foot">APPI · v207 · Llamadas desde toda APPI</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -6786,10 +6786,15 @@ function abrirWaNumero(digits){
   modal.close();
   bonusAfterContact();
 }
-function llamarNumero(digits){
-  window.open('tel:'+digits,'_self');
+async function llamarNumero(digits){
+  const data=window._telPicker||{};
   modal.close();
   bonusAfterContact();
+  if(window.APPIDeviceBridge&&window.APPIDeviceBridge.callPhone){
+    await window.APPIDeviceBridge.callPhone({nombre:data.nombre||'Contacto',telefono:digits});
+    return;
+  }
+  window.location.href='tel:'+digits;
 }
 
 /* ============ DESCENDENCIA: POPUP CON LA LISTA QUE COMPONE EL PB DE ORG ============ */
@@ -6850,7 +6855,7 @@ function openPersonaModal(p){
     const t = telefonos[0];
     botonesTel = `
       <button class="pm-wa" onclick="window.open('https://wa.me/${t.digits}?text='+encodeURIComponent('Hola ${escapeXml(nombreDePila(p.nombre)||p.nombre)}, ¿cómo estás?'),'_blank')">💬 Contactar por WhatsApp</button>
-      <button class="pm-call" onclick="window.open('tel:${t.digits}','_self')">📞 Llamar al contacto</button>
+      <button type="button" class="pm-call" data-appi-call-phone="${t.digits}" data-appi-call-name="${escapeXml(p.nombre||'Contacto')}" data-appi-call-label="1">📲 Llamar en teléfono</button>
     `;
   } else if(telefonos.length > 1){
     botonesTel = `
@@ -6915,6 +6920,7 @@ function openPersonaModal(p){
     title: p.nombre, sub: info.full,
     html
   });
+  if(window.APPIDeviceBridge)window.APPIDeviceBridge.decorateCallButtons();
 }
 /* ============ COMPARTIR MI EQUIPO ============ */
 
@@ -8688,7 +8694,7 @@ function openSeguimiento(){ showView('view-seguimiento'); }
 function capitalizarNombreSeg(valor){ return String(valor||'').toLocaleLowerCase('es-AR').replace(/(^|[\s'-])(\p{L})/gu,(m,sep,letra)=>sep+letra.toLocaleUpperCase('es-AR')).replace(/\s{2,}/g,' '); }
 function limpiarFormularioSeg(){ ['segNombre','segTelefono','segFecha','segNotas'].forEach(id=>document.getElementById(id).value=''); document.getElementById('segInteres').value='Producto'; document.getElementById('segEstado').value='No contactado'; seguimientoEditId=null; }
 function segDigits(phone){return String(phone||'').replace(/\D/g,'')}
-function segContactActions(p){const d=segDigits(p.telefono);if(!d)return '';const msg=encodeURIComponent(`Hola ${nombreDePila(p.nombre)||p.nombre}, ¿cómo estás?`);return `<div class="seg-contact-actions"><a class="wa-msg" title="Contactar por WhatsApp" aria-label="Contactar por WhatsApp" href="https://wa.me/${d}?text=${msg}" target="_blank" rel="noopener">💬 Contactar por WhatsApp</a><a class="phone-call" title="Llamar al contacto" aria-label="Llamar al contacto" href="tel:${d}">📞 Llamar por teléfono</a></div>`}
+function segContactActions(p){const d=segDigits(p.telefono);if(!d)return '';const msg=encodeURIComponent(`Hola ${nombreDePila(p.nombre)||p.nombre}, ¿cómo estás?`);return `<div class="seg-contact-actions"><a class="wa-msg" title="Contactar por WhatsApp" aria-label="Contactar por WhatsApp" href="https://wa.me/${d}?text=${msg}" target="_blank" rel="noopener">💬 Contactar por WhatsApp</a><a class="phone-call" title="Llamar al contacto" aria-label="Llamar al contacto" href="tel:${d}" data-appi-call-phone="${d}" data-appi-call-name="${escapeXml(p.nombre||'Contacto')}" data-appi-call-label="1">📲 Llamar en teléfono</a></div>`}
 function renderSeguimiento(){
   const all=cargarSeguimientos();
   const hoy=hoyLocal();
@@ -8704,6 +8710,7 @@ function renderSeguimiento(){
   cont.querySelectorAll('[data-seg-edit]').forEach(b=>b.onclick=()=>editarSeguimiento(+b.dataset.segEdit));
   cont.querySelectorAll('[data-seg-delete]').forEach(b=>b.onclick=()=>eliminarSeguimiento(+b.dataset.segDelete));
   bindEquipoContactPanel(cont);
+  if(window.APPIDeviceBridge)window.APPIDeviceBridge.decorateCallButtons();
 }
 function editarSeguimiento(id){ const p=cargarSeguimientos().find(x=>x.id===id); if(!p) return; seguimientoEditId=id; document.getElementById('segNombre').value=capitalizarNombreSeg(p.nombre); document.getElementById('segTelefono').value=p.telefono||''; document.getElementById('segInteres').value=p.interes==='Ambas'?'Ambas cosas':(p.interes||'Producto'); const estados={ 'Sin contactar':'No contactado','Presentación realizada':'Seguimiento','Demostración realizada':'Seguimiento','Seguimiento pendiente':'Seguimiento','Cliente':'Contactado','Invitado':'Más adelante','No interesado':'No le interesa' }; document.getElementById('segEstado').value=estados[p.estado]||p.estado||'No contactado'; document.getElementById('segFecha').value=p.fecha||''; document.getElementById('segNotas').value=p.notas||''; document.getElementById('seguimientoFormTitle').textContent='Editar persona'; document.getElementById('seguimientoForm').style.display='block'; window.scrollTo({top:0,behavior:'smooth'}); }
 function actualizarSeguimiento(id,estado){ const a=cargarSeguimientos(); const p=a.find(x=>x.id===id); if(p){p.estado=estado; guardarSeguimientos(a); renderSeguimiento(); renderHomeCompleto(); showToast('Seguimiento actualizado ✅',1800);} }
@@ -12636,7 +12643,7 @@ function renderListU(){
         <button type="button" class="action-btn map" data-u-action="map" data-u-index="${index}">📍 Mapa</button>
         <button type="button" class="action-btn neighbors" data-u-action="neighbors" data-u-index="${index}">👥 Vecinos</button>
         ${u.telf?`<button type="button" class="action-btn call" style="background:rgba(37,211,102,0.14);color:#128C7E;border-color:rgba(37,211,102,0.20)" data-u-action="whatsapp" data-u-index="${index}">💬 WhatsApp</button>`:''}
-        ${u.telf?`<button type="button" class="action-btn call" data-u-action="call" data-u-index="${index}">📞 Llamar</button>`:''}
+        ${u.telf?`<button type="button" class="action-btn call" data-u-action="call" data-u-index="${index}" data-appi-call-phone="${escU(String(u.telf||'').replace(/\D/g,''))}" data-appi-call-name="${escU(u.usuario||'Contacto')}" data-appi-call-label="1">📲 Llamar en teléfono</button>`:''}
         <button type="button" class="action-btn mail" data-u-action="google" data-u-index="${index}">🗺️ Google</button>
       </div>
     </div>`;
@@ -12676,6 +12683,7 @@ function renderListU(){
       }
     };
   });
+  if(window.APPIDeviceBridge)window.APPIDeviceBridge.decorateCallButtons();
 }
 window.verMapaU=function(query){
   if(!query.trim()){ alert('Sin domicilio'); return; }

@@ -107,14 +107,38 @@ async function removeDevice(id,button=null){
   }
 }
 function shouldBridge(){return !isPhone()}
-function decorateCallButtons(){document.querySelectorAll('[data-contact-channel="llamada"]').forEach(link=>{if(!isPhone())link.textContent=state.devices.some(d=>d.activo&&d.notificaciones)?'📲 Llamar en teléfono':'📲 Vincular teléfono'})}
+function decorateCallButtons(){
+  document.querySelectorAll('[data-contact-channel="llamada"]').forEach(link=>{if(!isPhone())link.textContent=state.devices.some(d=>d.activo&&d.notificaciones)?'📲 Llamar en teléfono':'📲 Vincular teléfono'});
+  document.querySelectorAll('[data-appi-call-label]').forEach(button=>{if(!isPhone())button.textContent=state.devices.some(d=>d.activo&&d.notificaciones)?'📲 Llamar en teléfono':'📲 Vincular teléfono'});
+}
 async function handleCall(contact){if(isPhone())return false;if(!state.devices.length)await loadDevices();const devices=state.devices.filter(d=>d.activo&&d.notificaciones);if(!devices.length){const open=await window.APPIDialog.confirm('No hay un teléfono con notificaciones activas. ¿Querés vincular uno ahora?',{title:'Vincular teléfono',icon:'📲',okText:'Vincular'});if(open)openManager();return true}let device=devices[0];if(devices.length>1){const selected=await window.APPIDialog.choose('¿En qué teléfono querés llamar?',devices.map(d=>({label:d.nombre,value:d.id})),{title:'Elegir teléfono',icon:'📲'});if(!selected)return true;device=devices.find(d=>d.id===selected)||device}try{const result=await callBridge({action:'send_call',device_id:device.id,source_device_key:deviceKey(),contact_id:contact.id,nombre:contact.nombre,telefono:contact.telefono});await window.APPIDialog.alert(`La solicitud llegó a ${device.nombre}. Tenés dos minutos para aceptarla desde el teléfono.`,{title:'Llamada enviada',icon:'📲',okText:'Entendido'});return Boolean(result.ok)}catch(error){await window.APPIDialog.alert(error.message,{title:'No pudimos enviar la llamada',icon:'!' });return true}}
+async function callPhone(contact={}){
+  const telefono=String(contact.telefono||contact.phone||'').replace(/\D/g,'').slice(0,15);
+  const nombre=String(contact.nombre||contact.name||'Contacto').trim().slice(0,120)||'Contacto';
+  if(telefono.length<8){await window.APPIDialog.alert('El contacto no tiene un número válido.',{title:'No se puede llamar',icon:'!'});return false}
+  if(isPhone()){location.href=`tel:${telefono}`;return true}
+  return handleCall({id:contact.id||'',nombre,telefono});
+}
+function installUniversalCallHandler(){
+  if(window.__appiUniversalCallBridge)return;window.__appiUniversalCallBridge=true;
+  document.addEventListener('click',event=>{
+    const trigger=event.target.closest('[data-appi-call-phone],a[href^="tel:"]');
+    if(!trigger||trigger.closest('#appiDeviceOverlay')||trigger.matches('[data-contact-channel]'))return;
+    const href=trigger.getAttribute('href')||'';
+    const telefono=trigger.dataset.appiCallPhone||href.replace(/^tel:/i,'');
+    if(!telefono)return;
+    if(isPhone()&&trigger.tagName==='A'&&!trigger.dataset.appiCallPhone)return;
+    event.preventDefault();event.stopImmediatePropagation();
+    const nombre=trigger.dataset.appiCallName||document.getElementById('histDetailTitle')?.textContent||document.getElementById('modalTitle')?.textContent||'Contacto';
+    void callPhone({id:trigger.dataset.appiCallId||'',nombre,telefono});
+  },true);
+}
 async function showCommand(commandId){try{const result=await callBridge({action:'get_command',command_id:commandId}),command=result.command,payload=command.payload||{},phone=String(payload.telefono||'').replace(/\D/g,'');openOverlay(`<div class="appi-call-request"><button type="button" class="appi-device-close" id="appiDeviceClose" aria-label="Cerrar" style="float:right">×</button><div style="clear:both"></div><div class="appi-call-icon">📞</div><h2>${esc(payload.nombre||'Contacto')}</h2><div class="appi-call-number">${esc(payload.telefono||phone)}</div><p>Solicitud enviada desde tu PC o tablet.</p><div class="appi-call-actions"><a href="tel:${esc(phone)}" id="appiAcceptCall">📞 Llamar ahora</a><button type="button" id="appiCancelCall">Cancelar</button></div><div class="appi-device-note">El teléfono siempre te pide confirmar antes de abrir el marcador.</div></div>`);$('appiDeviceClose').onclick=()=>cancelCommand(commandId);$('appiCancelCall').onclick=()=>cancelCommand(commandId);$('appiAcceptCall').onclick=async event=>{event.preventDefault();try{const accepted=await callBridge({action:'accept_call',command_id:commandId});if(accepted.contact_id){localStorage.setItem(`appi_gestion_resultado_pendiente_${window.APPIAuth.userId()}`,JSON.stringify({contactId:accepted.contact_id,channel:'llamada',at:Date.now()}))}clearCommandQuery();closeOverlay();location.href=`tel:${accepted.telefono}`}catch(error){await window.APPIDialog.alert(error.message,{title:'No pudimos iniciar la llamada',icon:'!'})}}}catch(error){openOverlay(`${head('Solicitud no disponible','La llamada no puede iniciarse.')}<div class="appi-device-note">${esc(error.message)}</div><button type="button" class="appi-device-btn primary" id="appiCommandDone" style="width:100%;margin-top:12px">Cerrar</button>`);$('appiCommandDone').onclick=()=>{clearCommandQuery();closeOverlay()}}}
 async function cancelCommand(id){try{await callBridge({action:'cancel_command',command_id:id})}catch(e){}clearCommandQuery();closeOverlay()}
 function clearCommandQuery(){const url=new URL(location.href);url.searchParams.delete('bridge_call');history.replaceState(history.state,'',url.pathname+url.search+url.hash)}
 function handlePendingLinks(){if(!authorized())return;const params=new URLSearchParams(location.search),pair=params.get('pair'),command=params.get('bridge_call');if(pair&&validUuid(pair))claimPairing({token:pair});else if(command&&validUuid(command))showCommand(command)}
 function validUuid(value){return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(value||''))}
-function init(){if(state.initialized)return;state.initialized=true;installStyles();ensureOverlay();deviceKey();window.addEventListener('appi-auth-change',()=>setTimeout(()=>{if(authorized()){loadDevices();handlePendingLinks()}},180));if(authorized()){setTimeout(loadDevices,1500);setTimeout(handlePendingLinks,500)}setInterval(()=>{if(authorized()&&isPhone())callBridge({action:'ping',device_key:deviceKey()}).catch(()=>{})},120000)}
-window.APPIDeviceBridge={openManager,loadDevices,shouldBridge,handleCall,decorateCallButtons,isPhone,claimByCode,deviceKey,state};
+function init(){if(state.initialized)return;state.initialized=true;installStyles();ensureOverlay();installUniversalCallHandler();deviceKey();window.addEventListener('appi-auth-change',()=>setTimeout(()=>{if(authorized()){loadDevices();handlePendingLinks()}},180));if(authorized()){setTimeout(loadDevices,1500);setTimeout(handlePendingLinks,500)}setInterval(()=>{if(authorized()&&isPhone())callBridge({action:'ping',device_key:deviceKey()}).catch(()=>{})},120000)}
+window.APPIDeviceBridge={openManager,loadDevices,shouldBridge,handleCall,callPhone,decorateCallButtons,isPhone,claimByCode,deviceKey,state};
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
