@@ -97,7 +97,12 @@ Deno.serve(async request => {
       if (nombre.length < 2) return json({ error: 'Ingresá el nombre del titular.' }, 400);
       if (socioNombre && socioNombre.length < 2) return json({ error: 'Ingresá el nombre completo del socio/a.' }, 400);
       const { data, error } = await admin.from('appi_perfiles').update({ nombre, socio_nombre: socioNombre || null }).eq('user_id', targetId).eq('rol', 'usuario').select('user_id,dip,nombre,socio_nombre').maybeSingle();
-      if (error) throw error;if (!data) return json({ error: 'La cuenta no existe.' }, 404);return json({ user: data });
+      if (error) throw error;if (!data) return json({ error: 'La cuenta no existe.' }, 404);
+      if (!socioNombre) {
+        await admin.from('appi_dispositivos_vinculados').update({ activo: false, notificaciones: false, push_endpoint: null, push_p256dh: null, push_auth: null }).eq('user_id', targetId).eq('persona_tipo', 'socio');
+        await admin.from('appi_vinculaciones_dispositivo').update({ cancelled_at: new Date().toISOString() }).eq('user_id', targetId).eq('persona_tipo', 'socio').is('claimed_at', null).is('cancelled_at', null);
+      }
+      return json({ user: data });
     }
     if (action === 'set_password') {
       if (!validPassword(body?.password)) return json({ error: 'La contraseña necesita 8 caracteres, letras y números.' }, 400);
