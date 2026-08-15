@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v207-llamadas-globales';
+const CACHE_NAME = 'appi-v208-menu-practico';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

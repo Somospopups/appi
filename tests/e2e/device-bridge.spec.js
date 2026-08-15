@@ -87,7 +87,13 @@ test('vincula por QR y envía una llamada de la PC al teléfono', async ({ page 
   await expect(page.locator('#lockScreen')).toHaveClass(/hidden/);
   await expect.poll(() => page.evaluate(() => APPIAuth.currentProfile()?.dip || '')).toBe('02-9802014');
 
-  await page.evaluate(() => APPIDeviceBridge.openManager());
+  await page.locator('#view-home .tools-btn').click();
+  await expect(page.locator('#toolsMenu')).toHaveClass(/open/);
+  await expect(page.locator('#btnToolsDevices')).toBeVisible();
+  await expect(page.locator('#btnToolsDevices')).toContainText('Teléfonos vinculados');
+  await expect(page.locator('#btnToolsOrient')).toHaveCount(0);
+  await expect(page.locator('#btnToolsBackup')).toHaveCount(0);
+  await page.locator('#btnToolsDevices').click();
   await expect(page.locator('#appiDeviceOverlay')).toBeVisible();
   await expect(page.locator('#appiDeviceList')).toContainText('Mi teléfono Android');
   await expect(page.locator('[data-remove-device]')).toHaveText('Desvincular dispositivo');

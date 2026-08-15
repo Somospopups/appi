@@ -3500,15 +3500,13 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v207 · Llamadas desde toda APPI</div>
+  <div class="ds-foot">APPI · v208 · Menú práctico</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
 
 <!-- Botón Menú ELIMINADO por pedido - no debe existir en la app -->
 <!-- <button class="ds-reopen-new" id="dsReopenNewBtn" style="display:none !important">Menú</button> -->
-<!-- Botón flotante para forzar giro (celular/tablet) -->
-<button class="rot-fab" id="rotFabBtn" onclick="forzarRotacion()" title="Forzar pantalla horizontal" aria-label="Forzar pantalla horizontal">🔄</button>
  <!-- ============ PANTALLA DE ACTIVACIÓN ============ -->
 <div id="lockScreen" class="hidden">
   <div class="lock-card">
@@ -9872,9 +9870,16 @@ modal.close = function(){
 
 
 function actualizarCuentaUI(){
-  const account=document.getElementById('btnToolsAccount'),logout=document.getElementById('btnToolsLogout'),profile=window.APPIAuth&&window.APPIAuth.isEnabled()?window.APPIAuth.currentProfile():null;
-  if(account)account.hidden=!profile||profile.rol==='admin';
-  if(logout)logout.hidden=!profile||profile.rol==='admin';
+  const account=document.getElementById('btnToolsAccount'),devices=document.getElementById('btnToolsDevices'),logout=document.getElementById('btnToolsLogout'),profile=window.APPIAuth&&window.APPIAuth.isEnabled()?window.APPIAuth.currentProfile():null;
+  const distributor=!!profile&&profile.rol!=='admin';
+  if(account)account.hidden=!distributor;
+  if(devices)devices.hidden=!distributor;
+  if(logout)logout.hidden=!distributor;
+}
+function abrirDispositivosDesdeMenu(){
+  try{cerrarToolsMenu()}catch(e){}
+  if(window.APPIDeviceBridge&&window.APPIDeviceBridge.openManager){window.APPIDeviceBridge.openManager();return}
+  window.APPIDialog.alert('No pudimos abrir los teléfonos vinculados. Recargá APPI e intentá nuevamente.',{title:'Teléfonos vinculados',icon:'📲'});
 }
 async function cerrarSesionSeguraAPPI(){
   try{cerrarToolsMenu()}catch(e){}
@@ -10056,60 +10061,11 @@ function abrirBackupDesdeMenu(){
     }
   }catch(e){}
 
-  // ===== TOGGLE ORIENTACIÓN: modo landscape ⇄ modo teléfono =====
-  function toggleOrientacion(){
-    const esLandscape = (screen.orientation && screen.orientation.type && screen.orientation.type.startsWith('landscape')) || (window.innerWidth > window.innerHeight);
-    const destino = esLandscape ? 'portrait' : 'landscape';
-    const label = esLandscape ? 'modo teléfono' : 'modo landscape';
-    try{
-      if(screen.orientation && screen.orientation.lock){
-        screen.orientation.lock(destino).then(()=>{
-          if(typeof showToast==='function') showToast('🔒 Forzando '+label, 1800);
-        }).catch(()=>{
-          if(typeof showToast==='function') showToast('🔄 Girá tu dispositivo para '+label, 2200);
-        });
-      } else {
-        if(typeof showToast==='function') showToast('🔄 Girá tu dispositivo para '+label, 2200);
-      }
-    }catch(e){
-      if(typeof showToast==='function') showToast('🔄 Girá tu dispositivo para '+label, 2200);
-    }
-  }
-
-  // ===== FORZAR GIRO HORIZONTAL =====
-  function forzarRotacion(){
-    const root=document.documentElement;
-    const fsReq = root.requestFullscreen || root.webkitRequestFullscreen || root.mozRequestFullScreen;
-    const doLock = ()=>{
-      try{
-        if(screen.orientation && screen.orientation.lock){
-          screen.orientation.lock('landscape').then(()=>{
-            if(typeof showToast==='function') showToast('🔒 Pantalla en horizontal', 1800);
-          }).catch(()=>{
-            if(typeof showToast==='function') showToast('🔄 Girá tu dispositivo para horizontal', 2200);
-          });
-        } else {
-          if(typeof showToast==='function') showToast('🔄 Girá tu dispositivo para horizontal', 2200);
-        }
-      }catch(e){
-        if(typeof showToast==='function') showToast('🔄 Girá tu dispositivo para horizontal', 2200);
-      }
-    };
-    if(fsReq){
-      try{
-        const p = fsReq.call(root);
-        if(p && typeof p.then==='function'){ p.then(doLock).catch(doLock); }
-        else doLock();
-      }catch(e){ doLock(); }
-    } else {
-      doLock();
-    }
-  }
-
   // ===== MENÚ DE HERRAMIENTAS (engranaje) =====
   function toggleToolsMenu(ev){
     const menu=document.getElementById('toolsMenu');
     if(!menu) return;
+    if(typeof actualizarCuentaUI==='function')actualizarCuentaUI();
     const btn=ev.currentTarget;
     const abrir=!menu.classList.contains('open');
     // Posicionar el menú justo debajo del engranaje, pegado a la derecha
@@ -10122,12 +10078,6 @@ function abrirBackupDesdeMenu(){
     const txt=document.getElementById('toolsThemeTxt');
     if(ico) ico.textContent=isDark?'☀️':'🌙';
     if(txt) txt.textContent=isDark?'Modo día':'Modo noche';
-    // Actualizar estado del botón orientación (landscape/teléfono)
-    const orientIco=document.getElementById('toolsOrientIco');
-    const orientTxt=document.getElementById('toolsOrientTxt');
-    const esLandscape = (screen.orientation && screen.orientation.type && screen.orientation.type.startsWith('landscape')) || (window.innerWidth > window.innerHeight);
-    if(orientIco) orientIco.textContent=esLandscape?'📱':'🖥️';
-    if(orientTxt) orientTxt.textContent=esLandscape?'Volver a modo teléfono':'Forzar modo landscape';
     if(abrir) menu.classList.add('open'); else menu.classList.remove('open');
     ev.stopPropagation();
   }
@@ -10478,21 +10428,6 @@ body.dark .presu-select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:
   .eq-garantias-kpis{grid-template-columns:repeat(3,minmax(0,1fr)) !important}
   .eq-garantias-kpis .stat-card:last-child{grid-column:auto}
 }
-/* Botón flotante de giro: visible en celular/tablet (fuera del modo escritorio) */
-@media (max-width: 1023px){
-  .rot-fab{
-    position:fixed; top:16px; right:16px; z-index:160;
-    width:44px; height:44px; border:none; border-radius:50%;
-    background:rgba(255,255,255,.8); color:#3d63c9; font-size:19px; cursor:pointer;
-    -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px);
-    box-shadow:0 6px 20px rgba(80,90,130,.25);
-    display:flex; align-items:center; justify-content:center;
-    transition:transform .1s ease;
-  }
-  body.dark .rot-fab{background:rgba(30,30,50,.8); color:#a8b8ff}
-  .rot-fab:active{transform:scale(.9)}
-}
-.rot-fab{display:none}
 </style>
 <style>
 #backupCollapsible{display:none !important}
@@ -11261,11 +11196,8 @@ body.dark .presu-select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:
   <button class="tools-item" id="btnToolsTheme" onclick="toggleThemeDesdeMenu()">
     <span class="ti-ico" id="toolsThemeIco">🌙</span><span id="toolsThemeTxt">Modo noche</span>
   </button>
-  <button class="tools-item" id="btnToolsOrient" onclick="toggleOrientacion(); cerrarToolsMenu();">
-    <span class="ti-ico" id="toolsOrientIco">🖥️</span><span id="toolsOrientTxt">Forzar modo landscape</span>
-  </button>
-  <button class="tools-item" id="btnToolsBackup" onclick="abrirBackupDesdeMenu()">
-    <span class="ti-ico">💾</span><span>Backup</span>
+  <button class="tools-item" id="btnToolsDevices" onclick="abrirDispositivosDesdeMenu()" hidden>
+    <span class="ti-ico">📲</span><span>Teléfonos vinculados</span>
   </button>
   <button class="tools-item" id="btnToolsAccount" onclick="abrirCuentaDesdeMenu()" hidden>
     <span class="ti-ico">👤</span><span>Mi cuenta</span>
