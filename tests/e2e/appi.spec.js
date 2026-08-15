@@ -34,7 +34,7 @@ test('arranca, navega e importa Garantías una sola vez', async ({ page }) => {
   expect(sidebarLabels.map(text=>text.trim())).toEqual(['Mi mes','Mi negocio','Mis herramientas']);
   const sidebarButtons=await page.locator('#deskSidebar .ds-btn').allTextContents();
   expect(sidebarButtons.map(text=>text.replace(/^[^\p{L}]+/u,'').trim())).toEqual([
-    'Home','Las 7 P','Presupuesto','Rueda de la Vida','Rueda del Negocio','Mi Equipo','Histórico','Usuarios','Contactos','Grabadora','Notas Keep'
+    'Home','Las 7 P','Presupuesto','Rueda de la Vida','Rueda del Negocio','Mi Equipo','Histórico','Usuarios','Contactos','Mi Encuesta','Mi Gestión 0','Grabadora','Notas Keep'
   ]);
 
   for (const [expression, expectedView] of [
@@ -43,6 +43,8 @@ test('arranca, navega e importa Garantías una sola vez', async ({ page }) => {
     ["openRueda('vida')", 'view-wheel'],
     ["openEquipo()", 'view-equipo'],
     ["openSeguimiento()", 'view-seguimiento'],
+    ["openEncuestaTool()", 'view-encuesta'],
+    ["openMiGestion()", 'view-gestion'],
     ["openGrabadora()", 'view-grabadora'],
     ["showView('view-notas')", 'view-notas'],
     ["showView('view-usuarios')", 'view-usuarios']

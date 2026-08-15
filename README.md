@@ -1,12 +1,43 @@
 # APPI
 
-PWA local-first para planificación, presupuesto, equipo, garantías, contactos, notas, grabadora e Histórico mensual.
+PWA local-first para planificación mensual, presupuesto, equipo, garantías, contactos, notas, grabadora, Histórico, encuestas y gestión de referidos.
 
 ## Estado actual
 
-La versión v187 incorpora una base de acceso por número de distribuidor, aislamiento por cuenta y sincronización mediante Supabase. El nuevo acceso permanece deshabilitado en `auth-config.js` hasta completar la configuración del servidor.
+- Versión: **v201 · Encuestas y gestión**.
+- Publicación: [https://somospopups.github.io/appi/](https://somospopups.github.io/appi/)
+- Acceso por número de distribuidor y contraseña.
+- Acceso administrador POPUPS mediante el candado, sin DIP ni número de distribuidor.
+- Autenticación, datos, membresías, solicitudes y archivos mediante Supabase.
+- Sincronización automática por cuenta.
+- Funcionamiento offline por hasta 7 días desde la última validación.
+- Grabaciones de audio locales: no se suben a la nube.
 
-No activar `APPI_AUTH.enabled` en producción sin seguir primero [`CONFIGURAR_ACCESO.md`](./CONFIGURAR_ACCESO.md).
+## Mi Encuesta y Mi Gestión
+
+Cada distribuidor tiene un enlace público permanente en **Mis herramientas → Mi Encuesta**. Puede compartirlo por WhatsApp. La persona responde sin crear una cuenta y la respuesta se registra automáticamente en **Mi Gestión** del distribuidor propietario del enlace.
+
+Mi Gestión incluye:
+
+- Encuestados y referidos.
+- Estados: Nuevo, Contactado, Seguimiento, Presentación, Convertido y No interesado.
+- Búsqueda y filtros.
+- Notas y próximo contacto.
+- Llamada y WhatsApp.
+- Exportación CSV.
+- Copia local y cola de cambios cuando no hay conexión.
+- Aislamiento mediante RLS por `user_id`.
+
+Instalación del backend:
+
+1. Ejecutar `SUPABASE_ENCUESTAS_GESTION.sql` en el SQL Editor.
+2. Desplegar `encuesta-publica` sin verificación JWT:
+
+```bash
+supabase functions deploy encuesta-publica --no-verify-jwt
+```
+
+La función valida el enlace, la membresía, el contenido, el consentimiento y los referidos antes de registrar los datos.
 
 ## Desarrollo y pruebas
 
@@ -18,41 +49,35 @@ npx playwright install --with-deps chromium
 npm test
 ```
 
-Las pruebas cubren:
+La suite cubre la aplicación, autenticación, aislamiento por cuenta, solicitudes, membresías, planillas, Mi Encuesta y Mi Gestión.
 
-- Arranque y navegación principal.
-- Importación única de Garantías.
-- Protección frente a XSS importado.
-- WhatsApp de Usuarios.
-- Estados de Contactos.
-- Backup sin credenciales.
-- Login por número de distribuidor.
-- Separación de datos entre cuentas.
-- Sesión dentro del período offline.
+## Archivos principales
 
-## Supabase
+- `index.html`: aplicación principal.
+- `encuesta.html`: formulario público responsive.
+- `gestion-client.js`: Mi Encuesta y Mi Gestión dentro de APPI.
+- `auth-config.js`: configuración pública de Supabase.
+- `auth-client.js`: login y sesión.
+- `data-sync.js`: sincronización local/nube.
+- `appi-dialog.js`: diálogos visuales APPI.
+- `SUPABASE_INSTALACION_COMPLETA.sql`: instalación consolidada.
+- `SUPABASE_ENCUESTAS_GESTION.sql`: módulo de encuestas y CRM.
+- `supabase/functions/encuesta-publica/index.ts`: recepción pública segura.
 
-1. Ejecutar `SUPABASE_SETUP.sql`.
-2. Ejecutar `SUPABASE_ACCESO.sql`.
-3. Desplegar las funciones:
+## Seguridad y privacidad
 
-```bash
-supabase functions deploy admin-distribuidores
-supabase functions deploy historico-analisis
-```
+- Los distribuidores sólo acceden a sus propios registros.
+- Las respuestas públicas ingresan mediante una Edge Function; el navegador anónimo no escribe directamente en las tablas.
+- Los referidos son opcionales y requieren confirmación de autorización.
+- Se normalizan teléfonos y se evitan contactos duplicados por distribuidor.
+- La clave `service_role`, los tokens personales y claves de proveedores externos nunca deben incluirse en el frontend ni en GitHub.
+- No deben agregarse `alert()`, `confirm()` ni `prompt()` nativos. Usar siempre `APPIDialog`.
 
-4. Crear el primer administrador siguiendo `CONFIGURAR_ACCESO.md`.
-5. Configurar la URL y clave pública en `auth-config.js`.
+## Publicación
 
-La clave `service_role` y las claves privadas de IA deben existir solamente como secretos de Supabase.
+La rama `main` se publica mediante GitHub Pages. En cada release:
 
-## Datos y privacidad
-
-- Los datos estructurados se sincronizan por `user_id` con políticas RLS.
-- Histórico guarda sus archivos originales en un bucket privado.
-- Las grabaciones de audio quedan únicamente en el dispositivo donde fueron creadas.
-- La geocodificación de mapas consulta OpenStreetMap/Nominatim.
-
-## Despliegue
-
-La aplicación sigue siendo estática y compatible con GitHub Pages. `service-worker.js` limita sus operaciones a cachés con prefijo `appi-` y usa fallback HTML únicamente para navegación.
+1. Actualizar la versión visible y `package.json`.
+2. Cambiar `CACHE_NAME` en `service-worker.js`.
+3. Ejecutar `npm test`.
+4. Integrar a `main` y revisar GitHub Actions.

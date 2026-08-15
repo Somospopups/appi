@@ -37,6 +37,7 @@ window.openHistorico=function(){
 <script src="./data-sync.js"></script>
 <script src="./admin-panel.js"></script>
 <script src="./account-request.js"></script>
+<script src="./gestion-client.js"></script>
 <style id="historico-inline-css">
 /* APPI · Histórico mensual */
 .hist-view{padding-bottom:calc(34px + env(safe-area-inset-bottom));}
@@ -3168,7 +3169,7 @@ body.dark .admin-login-card{background:#242638}body.dark .admin-login-card h2{co
     display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
     min-height:128px;padding:16px 12px;border:1px solid rgba(255,255,255,.78);border-radius:22px;
     background:linear-gradient(135deg,rgba(58,208,164,.16),rgba(91,141,239,.12) 55%,rgba(160,107,255,.10));
-    box-shadow:0 10px 24px rgba(80,90,130,.08);cursor:pointer;font:inherit;text-align:center;
+    box-shadow:0 10px 24px rgba(80,90,130,.08);cursor:pointer;font:inherit;text-align:center;position:relative;
   }
   .home-mini-ico{
     width:48px;height:48px;border-radius:16px;display:grid;place-items:center;color:#fff;font-size:22px;
@@ -3492,10 +3493,12 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-usuarios" onclick="showView('view-usuarios')"><span>📍</span> Usuarios</button>
     <button class="ds-btn" data-ds="view-seguimiento" onclick="openSeguimiento()"><span>📇</span> Contactos</button>
     <div class="ds-section-label">Mis herramientas</div>
+    <button class="ds-btn" data-ds="view-encuesta" onclick="openEncuestaTool()"><span>📋</span> Mi Encuesta</button>
+    <button class="ds-btn" data-ds="view-gestion" onclick="openMiGestion()"><span>🤝</span> Mi Gestión <span class="gestion-sidebar-badge" id="gestionSidebarBadge" hidden>0</span></button>
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v200 · Pines estables</div>
+  <div class="ds-foot">APPI · v201 · Encuestas y gestión</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4620,12 +4623,12 @@ function showView(id){
     b.classList.toggle('active', b.dataset.view===id);
   });
   // Sidebar escritorio: marcar activo (con equivalencias de sub-vistas)
-  const dsMap = {'view-home':'view-home','view-presu':'view-presu','view-presu-hist':'view-presu','view-equipo':'view-equipo','view-historico':'view-historico','view-usuarios':'view-usuarios','view-seguimiento':'view-seguimiento','view-grabadora':'view-grabadora','view-notas':'view-notas','view-siete':'view-siete','view-siete-detail':'view-siete'};
+  const dsMap = {'view-home':'view-home','view-presu':'view-presu','view-presu-hist':'view-presu','view-equipo':'view-equipo','view-historico':'view-historico','view-usuarios':'view-usuarios','view-seguimiento':'view-seguimiento','view-encuesta':'view-encuesta','view-gestion':'view-gestion','view-grabadora':'view-grabadora','view-notas':'view-notas','view-siete':'view-siete','view-siete-detail':'view-siete'};
   const dsTarget = (id==='view-wheel'||id==='view-eval') ? `rueda-${currentRueda||'vida'}` : (dsMap[id] || '');
   document.querySelectorAll('#deskSidebar .ds-btn').forEach(b=>{
     b.classList.toggle('active', b.dataset.ds===dsTarget);
   });
-  const hideTabsOn = ['view-home','view-siete','view-siete-detail','view-presu','view-presu-hist','view-equipo','view-historico','view-seguimiento','view-planning','view-grabadora','view-notas','view-usuarios','view-admin'];
+  const hideTabsOn = ['view-home','view-siete','view-siete-detail','view-presu','view-presu-hist','view-equipo','view-historico','view-seguimiento','view-planning','view-encuesta','view-gestion','view-grabadora','view-notas','view-usuarios','view-admin'];
   document.getElementById('tabs').style.display = hideTabsOn.includes(id) ? 'none' : 'flex';
   if(id==='view-eval')    try{ renderAreas(); }catch(e){ console.error(e); }
   if(id==='view-wheel')   try{ renderWheel(); }catch(e){ console.error(e); }
@@ -9161,13 +9164,28 @@ function renderHomeCompleto(){
       const existing2=document.getElementById('homeExtraKeep');
       if(existing2) existing2.remove();
 
-      // Dos accesos complementarios: Grabadora + Notas Keep
+      // Cuatro herramientas complementarias: Encuesta + Gestión + Grabadora + Notas
       const extraKeep=document.createElement('div');
       extraKeep.id='homeExtraKeep';
       extraKeep.className='home-section-block';
       extraKeep.innerHTML=`
-        <div class="mini-section-label"><span>⚡</span> Herramientas rápidas</div>
+        <div class="mini-section-label"><span>⚡</span> Mis herramientas</div>
         <div class="home-mini-tools">
+          <button type="button" class="home-mini-tool" onclick="openEncuestaTool()">
+            <div class="home-mini-ico" style="background:linear-gradient(135deg,#5b8def,#875fdd)">📋</div>
+            <div class="home-mini-txt">
+              <strong>Mi Encuesta</strong>
+              <small>Compartí tu enlace</small>
+            </div>
+          </button>
+          <button type="button" class="home-mini-tool" onclick="openMiGestion()">
+            <span class="home-tool-badge" id="homeGestionBadge" hidden>0</span>
+            <div class="home-mini-ico" style="background:linear-gradient(135deg,#3ad0a4,#5b8def)">🤝</div>
+            <div class="home-mini-txt">
+              <strong>Mi Gestión</strong>
+              <small>Referidos y seguimiento</small>
+            </div>
+          </button>
           <button type="button" class="home-mini-tool" onclick="openGrabadora()">
             <div class="home-mini-ico" style="background:linear-gradient(135deg,#ff6b6b,#a06bff)">🎙️</div>
             <div class="home-mini-txt">
@@ -9185,6 +9203,7 @@ function renderHomeCompleto(){
         </div>
       `;
       list.appendChild(extraKeep);
+      if(window.APPIGestion&&window.APPIGestion.updateBadges)window.APPIGestion.updateBadges();
     }catch(e){ console.log('homeExtra error',e); }
   };
 })();
@@ -9345,6 +9364,8 @@ document.getElementById('importInput').onchange = (e)=>{
     const activa = document.querySelector('.view.active');
     if(!activa) return null;
         switch(activa.id){
+      case 'view-encuesta': return 'view-home';
+      case 'view-gestion': if(window.closeGestionDetail)window.closeGestionDetail(); return 'view-home';
       case 'view-grabadora': return 'view-home';
       case 'view-notas': return 'view-home';
       case 'view-home': return null;
