@@ -3500,7 +3500,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v208 · Menú práctico</div>
+  <div class="ds-foot">APPI · v209 · Vinculación contextual</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -9870,11 +9870,20 @@ modal.close = function(){
 
 
 function actualizarCuentaUI(){
-  const account=document.getElementById('btnToolsAccount'),devices=document.getElementById('btnToolsDevices'),logout=document.getElementById('btnToolsLogout'),profile=window.APPIAuth&&window.APPIAuth.isEnabled()?window.APPIAuth.currentProfile():null;
+  const account=document.getElementById('btnToolsAccount'),devices=document.getElementById('btnToolsDevices'),deviceText=document.getElementById('toolsDevicesTxt'),logout=document.getElementById('btnToolsLogout'),profile=window.APPIAuth&&window.APPIAuth.isEnabled()?window.APPIAuth.currentProfile():null;
   const distributor=!!profile&&profile.rol!=='admin';
+  const updateDeviceText=()=>{
+    if(!deviceText)return;
+    const linked=!!(window.APPIDeviceBridge&&window.APPIDeviceBridge.state&&window.APPIDeviceBridge.state.devices.some(device=>device.activo!==false));
+    deviceText.textContent=linked?'Desvincular teléfono':'Vincular teléfono';
+  };
   if(account)account.hidden=!distributor;
   if(devices)devices.hidden=!distributor;
   if(logout)logout.hidden=!distributor;
+  updateDeviceText();
+  if(distributor&&window.APPIDeviceBridge&&!window.APPIDeviceBridge.state.loading){
+    window.APPIDeviceBridge.loadDevices().then(updateDeviceText).catch(()=>{});
+  }
 }
 function abrirDispositivosDesdeMenu(){
   try{cerrarToolsMenu()}catch(e){}
@@ -11197,7 +11206,7 @@ body.dark .presu-select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:
     <span class="ti-ico" id="toolsThemeIco">🌙</span><span id="toolsThemeTxt">Modo noche</span>
   </button>
   <button class="tools-item" id="btnToolsDevices" onclick="abrirDispositivosDesdeMenu()" hidden>
-    <span class="ti-ico">📲</span><span>Teléfonos vinculados</span>
+    <span class="ti-ico">📲</span><span id="toolsDevicesTxt">Vincular teléfono</span>
   </button>
   <button class="tools-item" id="btnToolsAccount" onclick="abrirCuentaDesdeMenu()" hidden>
     <span class="ti-ico">👤</span><span>Mi cuenta</span>

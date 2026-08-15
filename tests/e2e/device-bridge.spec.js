@@ -90,7 +90,7 @@ test('vincula por QR y envía una llamada de la PC al teléfono', async ({ page 
   await page.locator('#view-home .tools-btn').click();
   await expect(page.locator('#toolsMenu')).toHaveClass(/open/);
   await expect(page.locator('#btnToolsDevices')).toBeVisible();
-  await expect(page.locator('#btnToolsDevices')).toContainText('Teléfonos vinculados');
+  await expect(page.locator('#toolsDevicesTxt')).toHaveText('Desvincular teléfono');
   await expect(page.locator('#btnToolsOrient')).toHaveCount(0);
   await expect(page.locator('#btnToolsBackup')).toHaveCount(0);
   await page.locator('#btnToolsDevices').click();
@@ -155,5 +155,8 @@ test('vincula por QR y envía una llamada de la PC al teléfono', async ({ page 
   await expect(page.locator('[data-remove-device]')).toHaveCount(0);
   await page.locator('#appiDialogOk').click();
   expect(bridgeCalls.find(item => item.action === 'remove_device')).toMatchObject({ device_id: DEVICE_ID });
+  await page.locator('#appiDeviceClose').click();
+  await page.locator('.view.active .tools-btn').click();
+  await expect(page.locator('#toolsDevicesTxt')).toHaveText('Vincular teléfono');
   expect(nativeDialogs).toEqual([]);
 });
