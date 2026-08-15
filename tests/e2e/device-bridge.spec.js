@@ -94,18 +94,53 @@ test('vincula por QR y envía una llamada de la PC al teléfono', async ({ page 
   await expect(page.locator('#btnToolsOrient')).toHaveCount(0);
   await expect(page.locator('#btnToolsBackup')).toHaveCount(0);
   await page.locator('#btnToolsDevices').click();
+  await expect(page.locator('#appiDeviceOverlay')).toBeHidden();
+  await expect(page.locator('#appiDialogTitle')).toHaveText('Desvincular teléfono');
+  await expect(page.locator('#appiDialogMessage')).toHaveText('¿Deseás desvincular tu teléfono de la cuenta?\n\nPodrás volver a vincularlo en cualquier momento.');
+  await expect(page.locator('#appiDialogCancel')).toHaveText('No');
+  await expect(page.locator('#appiDialogOk')).toHaveText('Sí');
+  await page.locator('#appiDialogCancel').click();
+  expect(bridgeCalls.filter(item => item.action === 'remove_device')).toHaveLength(0);
+
+  await page.locator('#view-home .tools-btn').click();
+  await page.locator('#btnToolsDevices').click();
+  await expect(page.locator('#appiDialogTitle')).toHaveText('Desvincular teléfono');
+  await page.locator('#appiDialogOk').click();
+  await expect(page.locator('.appi-dialog-overlay')).toBeHidden();
+  await expect.poll(() => bridgeCalls.filter(item => item.action === 'remove_device').length).toBe(1);
+  expect(bridgeCalls.find(item => item.action === 'remove_device')).toMatchObject({ device_id: DEVICE_ID });
+
+  await page.locator('#view-home .tools-btn').click();
+  await expect(page.locator('#toolsDevicesTxt')).toHaveText('Vincular teléfono');
+  await page.locator('#btnToolsDevices').click();
   await expect(page.locator('#appiDeviceOverlay')).toBeVisible();
+  await expect(page.locator('.appi-device-head h2')).toHaveText('Vincular teléfono');
   await expect(page.locator('#appiCreatePair')).toHaveCount(0);
   await expect(page.locator('#appiRefreshDevices')).toHaveCount(0);
   await expect(page.locator('[data-primary-action]')).toBeVisible();
   await expect(page.locator('[data-primary-action]')).toHaveText('Vincular este teléfono');
-  await expect(page.locator('#appiDeviceList')).toContainText('Mi teléfono Android');
-  await expect(page.locator('[data-remove-device]')).toHaveText('Desvincular dispositivo');
+  await expect(page.locator('[data-remove-device]')).toHaveCount(0);
   await expect(page.locator('.appi-pair-qr svg')).toBeVisible();
   await expect(page.locator('.appi-pair-code')).toContainText('321 654');
   await expect(page.locator('.appi-pair-title')).toHaveText('Escaneá este QR con el teléfono que querés vincular');
   expect(bridgeCalls.some(item => item.action === 'create_pairing')).toBe(true);
   await page.locator('#appiDeviceClose').click();
+
+  deviceLinked = true;
+  await page.evaluate(() => APPIDeviceBridge.loadDevices());
+  await page.evaluate(() => APPIDeviceBridge.openManager());
+  await expect(page.locator('#appiDeviceOverlay')).toBeVisible();
+  await expect(page.locator('.appi-device-head h2')).toHaveText('Teléfono vinculado');
+  await expect(page.locator('#appiDeviceList')).toContainText('Mi teléfono Android');
+  await expect(page.locator('.appi-pair-qr')).toHaveCount(0);
+  await expect(page.locator('[data-primary-action]')).toHaveCount(0);
+  await expect(page.locator('[data-remove-device]')).toHaveText('Desvincular dispositivo');
+  await page.locator('#appiDeviceClose').click();
+
+  await page.evaluate(() => { void APPIDeviceBridge.claimByCode(); });
+  await expect(page.locator('#appiDialogTitle')).toHaveText('Ya hay un teléfono vinculado');
+  await expect(page.locator('#appiDialogMessage')).toHaveText('Esta cuenta ya tiene un teléfono vinculado. Para usar otro, primero desvinculá el actual.');
+  await page.locator('#appiDialogOk').click();
 
   await page.evaluate(() => {
     const person = {
@@ -145,23 +180,7 @@ test('vincula por QR y envía una llamada de la PC al teléfono', async ({ page 
   });
   await page.locator('#appiDialogOk').click();
 
-  await page.evaluate(() => APPIDeviceBridge.openManager());
-  const unlink = page.locator('[data-remove-device]');
-  await expect(unlink).toHaveText('Desvincular dispositivo');
-  await unlink.click();
-  await expect(page.locator('#appiDialogTitle')).toHaveText('Desvincular dispositivo');
-  const layerOrder = await page.evaluate(() => ({
-    manager: Number(getComputedStyle(document.getElementById('appiDeviceOverlay')).zIndex),
-    dialog: Number(getComputedStyle(document.querySelector('.appi-dialog-overlay')).zIndex)
-  }));
-  expect(layerOrder.dialog).toBeGreaterThan(layerOrder.manager);
-  await page.locator('#appiDialogOk').click();
-  await expect(page.locator('#appiDialogTitle')).toHaveText('Dispositivo desvinculado');
-  await expect(page.locator('[data-remove-device]')).toHaveCount(0);
-  await page.locator('#appiDialogOk').click();
-  expect(bridgeCalls.find(item => item.action === 'remove_device')).toMatchObject({ device_id: DEVICE_ID });
-  await page.locator('#appiDeviceClose').click();
   await page.locator('.view.active .tools-btn').click();
-  await expect(page.locator('#toolsDevicesTxt')).toHaveText('Vincular teléfono');
+  await expect(page.locator('#toolsDevicesTxt')).toHaveText('Desvincular teléfono');
   expect(nativeDialogs).toEqual([]);
 });

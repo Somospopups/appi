@@ -4,7 +4,7 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
-- Versión: **v210 · Vinculación clara**.
+- Versión: **v211 · Desvinculación directa**.
 - Publicación: [https://somospopups.github.io/appi/](https://somospopups.github.io/appi/)
 - Acceso por número de distribuidor y contraseña.
 - Acceso administrador POPUPS mediante el candado, sin DIP ni número de distribuidor.
@@ -46,7 +46,7 @@ La función valida el enlace, la membresía, el contenido, el consentimiento y l
 
 ## Puente de llamadas entre dispositivos
 
-Desde el **engranaje → Vincular teléfono** —o **Desvincular teléfono** cuando ya existe uno—, una PC o tablet muestra automáticamente un QR y un código de seis dígitos. El teléfono inicia sesión con la misma cuenta, autoriza notificaciones y queda disponible como destino de llamadas.
+Desde el **engranaje → Vincular teléfono**, una PC o tablet muestra automáticamente un QR y un código de seis dígitos. APPI admite un solo teléfono vinculado por cuenta. Cuando ya existe uno, el engranaje muestra **Desvincular teléfono** y solicita una confirmación simple con **Sí** o **No**.
 
 Al tocar **Llamar** desde Mi Gestión en PC o tablet:
 

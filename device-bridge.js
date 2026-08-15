@@ -127,12 +127,23 @@ function closeAccountModal(){
 }
 async function openManager(){
   closeAccountModal();
-  const version=openOverlay(`${head('Teléfonos vinculados','Conectá un teléfono para hacer llamadas desde APPI en tu PC o tablet.')}<div class="appi-pair-box" id="appiPairArea" aria-live="polite"><div class="appi-pair-loading"><span><span class="spinner"></span><br><br>Preparando el QR y el código…</span></div></div><div class="appi-main-prompt"><span class="appi-pair-kicker">OPCIÓN 2</span><b>¿Estás usando el teléfono que querés vincular?</b><span>Tocá el botón e ingresá el código que aparece en tu PC.</span></div><div class="appi-device-actions"><button type="button" class="appi-device-btn success" id="appiClaimCode" data-primary-action>Vincular este teléfono</button></div><section aria-label="Teléfonos de tu cuenta"><div class="appi-device-list-head"><b>Teléfonos de tu cuenta</b><span class="appi-device-auto">Actualización automática</span></div><div id="appiDeviceList"><div class="appi-device-status">Cargando teléfonos…</div></div></section><div class="appi-device-note">Permití las notificaciones. En iPhone, abrí APPI desde el ícono de la pantalla de inicio.</div>`);
+  let version=openOverlay(`${head('Teléfonos vinculados','Comprobando el estado de tu cuenta…')}<div class="appi-pair-loading"><span><span class="spinner"></span><br><br>Cargando teléfono…</span></div>`);
+  await loadDevices();
+  if(version!==state.managerVersion)return;
+  if(state.lastError){
+    version=openOverlay(`${head('Teléfonos vinculados','No pudimos comprobar el estado de tu cuenta.')}<div class="appi-device-error">${esc(state.lastError)}<br><button type="button" class="appi-device-refresh" id="appiRetryManager" style="margin-top:9px">Reintentar</button></div>`);
+    const retry=$('appiRetryManager');if(retry)retry.onclick=openManager;
+    return;
+  }
+  const active=state.devices.filter(device=>device.activo!==false);
+  if(active.length){
+    openOverlay(`${head('Teléfono vinculado','Esta cuenta admite un solo teléfono a la vez.')}<section aria-label="Teléfono de tu cuenta"><div class="appi-device-list-head"><b>Teléfono de tu cuenta</b><span class="appi-device-auto">Actualizado</span></div><div id="appiDeviceList">${deviceRows()}</div></section><div class="appi-device-note">Para vincular otro teléfono, primero desvinculá el actual.</div>`);
+    bindManagerActions();
+    return;
+  }
+  version=openOverlay(`${head('Vincular teléfono','Conectá un teléfono para hacer llamadas desde APPI en tu PC o tablet.')}<div class="appi-pair-box" id="appiPairArea" aria-live="polite"><div class="appi-pair-loading"><span><span class="spinner"></span><br><br>Preparando el QR y el código…</span></div></div><div class="appi-main-prompt"><span class="appi-pair-kicker">OPCIÓN 2</span><b>¿Estás usando el teléfono que querés vincular?</b><span>Tocá el botón e ingresá el código que aparece en tu PC.</span></div><div class="appi-device-actions"><button type="button" class="appi-device-btn success" id="appiClaimCode" data-primary-action>Vincular este teléfono</button></div><div class="appi-device-note">Permití las notificaciones. En iPhone, abrí APPI desde el ícono de la pantalla de inicio.</div>`);
   bindManagerActions();
-  state.loading=true;state.lastError='';renderDeviceList();
-  const devicesPromise=loadDevices().then(()=>{if(version===state.managerVersion)renderDeviceList()});
-  const pairingPromise=createPairing(version);
-  await Promise.allSettled([devicesPromise,pairingPromise]);
+  await createPairing(version);
 }
 function pairUrl(token){const url=new URL('./',location.href);url.search='';url.hash='';url.searchParams.set('pair',token);return url.toString()}
 function qrSvg(value){try{const qr=window.qrcode(0,'M');qr.addData(value);qr.make();return qr.createSvgTag({cellSize:5,margin:2,scalable:true})}catch(e){return '<div class="appi-device-note">No se pudo dibujar el QR. Usá el código de seis dígitos.</div>'}}
@@ -161,22 +172,44 @@ async function createPairing(version=state.managerVersion){
     const retry=$('appiRetryPair');if(retry)retry.onclick=()=>{const current=$('appiPairArea');if(current)current.innerHTML='<div class="appi-pair-loading"><span><span class="spinner"></span><br><br>Preparando el QR y el código…</span></div>';createPairing(version)};
   }
 }
-async function claimByCode(){const code=await window.APPIDialog.prompt('Ingresá el código de seis dígitos que aparece en la PC.','',{title:'Vincular este teléfono',icon:'📲',placeholder:'000000',okText:'Continuar'});if(!code)return;return claimPairing({codigo:String(code).replace(/\D/g,'').slice(0,6)})}
-async function claimPairing({token='',codigo=''}={}){if(!isPhone()&&platform()==='otro'){const ok=await window.APPIDialog.confirm('Este dispositivo no parece ser un teléfono. ¿Querés vincularlo de todos modos?',{title:'Confirmar dispositivo',icon:'📲',okText:'Continuar'});if(!ok)return}const nombre=await window.APPIDialog.prompt('¿Qué nombre querés darle a este teléfono?',defaultDeviceName(),{title:'Nombre del dispositivo',icon:'📱',placeholder:'Mi teléfono',okText:'Activar notificaciones'});if(!nombre)return;openOverlay(`${head('Activando teléfono','Autorizá las notificaciones cuando el sistema lo solicite.')}<div class="appi-device-status"><span class="spinner"></span><br>Preparando notificaciones…</div><div class="appi-device-note">APPI sólo enviará solicitudes de llamada de tu propia cuenta.</div>`);try{const subscription=await enablePush(),result=await callBridge({action:'claim_pairing',token,codigo,device_key:deviceKey(),nombre,plataforma:platform(),user_agent:navigator.userAgent,subscription});state.devices=[result.device,...state.devices.filter(d=>d.id!==result.device.id)];openOverlay(`${head('Teléfono vinculado','La conexión quedó lista.')}<div class="appi-call-request"><div class="appi-call-icon">✓</div><h2>${esc(result.device.nombre)}</h2><p>Ya puede recibir llamadas enviadas desde APPI en una PC o tablet.</p><button type="button" class="appi-device-btn primary" id="appiPairDone" style="width:100%;margin-top:14px">Listo</button></div>`);$('appiPairDone').onclick=()=>{closeOverlay();clearPairQuery()}}catch(error){openOverlay(`${head('No pudimos activar','Revisá los requisitos e intentá nuevamente.')}<div class="appi-device-note">${esc(error.message)}</div><button type="button" class="appi-device-btn primary" id="appiPairRetry" style="width:100%;margin-top:12px">Reintentar</button>`);$('appiPairRetry').onclick=()=>claimPairing({token,codigo})}}
+async function ensureSinglePhoneAvailable(){
+  await loadDevices();
+  if(state.lastError){await window.APPIDialog.alert('No pudimos comprobar si ya existe un teléfono vinculado. Revisá internet e intentá nuevamente.',{title:'No pudimos verificar la cuenta',icon:'!'});return false}
+  if(state.devices.some(device=>device.activo!==false)){
+    await window.APPIDialog.alert('Esta cuenta ya tiene un teléfono vinculado. Para usar otro, primero desvinculá el actual.',{title:'Ya hay un teléfono vinculado',icon:'📲',okText:'Entendido'});
+    clearPairQuery();return false;
+  }
+  return true;
+}
+async function claimByCode(){if(!await ensureSinglePhoneAvailable())return;const code=await window.APPIDialog.prompt('Ingresá el código de seis dígitos que aparece en la PC.','',{title:'Vincular este teléfono',icon:'📲',placeholder:'000000',okText:'Continuar'});if(!code)return;return claimPairing({codigo:String(code).replace(/\D/g,'').slice(0,6)},true)}
+async function claimPairing({token='',codigo=''}={},availabilityChecked=false){if(!availabilityChecked&&!await ensureSinglePhoneAvailable())return;if(!isPhone()&&platform()==='otro'){const ok=await window.APPIDialog.confirm('Este dispositivo no parece ser un teléfono. ¿Querés vincularlo de todos modos?',{title:'Confirmar dispositivo',icon:'📲',okText:'Continuar'});if(!ok)return}const nombre=await window.APPIDialog.prompt('¿Qué nombre querés darle a este teléfono?',defaultDeviceName(),{title:'Nombre del dispositivo',icon:'📱',placeholder:'Mi teléfono',okText:'Activar notificaciones'});if(!nombre)return;openOverlay(`${head('Activando teléfono','Autorizá las notificaciones cuando el sistema lo solicite.')}<div class="appi-device-status"><span class="spinner"></span><br>Preparando notificaciones…</div><div class="appi-device-note">APPI sólo enviará solicitudes de llamada de tu propia cuenta.</div>`);try{const subscription=await enablePush(),result=await callBridge({action:'claim_pairing',token,codigo,device_key:deviceKey(),nombre,plataforma:platform(),user_agent:navigator.userAgent,subscription});state.devices=[result.device];openOverlay(`${head('Teléfono vinculado','La conexión quedó lista.')}<div class="appi-call-request"><div class="appi-call-icon">✓</div><h2>${esc(result.device.nombre)}</h2><p>Ya puede recibir llamadas enviadas desde APPI en una PC o tablet.</p><button type="button" class="appi-device-btn primary" id="appiPairDone" style="width:100%;margin-top:14px">Listo</button></div>`);$('appiPairDone').onclick=()=>{closeOverlay();clearPairQuery()}}catch(error){openOverlay(`${head('No pudimos activar','Revisá los requisitos e intentá nuevamente.')}<div class="appi-device-note">${esc(error.message)}</div><button type="button" class="appi-device-btn primary" id="appiPairRetry" style="width:100%;margin-top:12px">Reintentar</button>`);$('appiPairRetry').onclick=()=>claimPairing({token,codigo})}}
+
 function clearPairQuery(){const url=new URL(location.href);url.searchParams.delete('pair');history.replaceState(history.state,'',url.pathname+url.search+url.hash)}
-async function removeDevice(id,button=null){
-  const device=state.devices.find(item=>item.id===id);if(!device)return;
-  const ok=await window.APPIDialog.confirm(`Se desvinculará “${device.nombre}” de tu cuenta. Este teléfono dejará de recibir solicitudes de llamada.`,{title:'Desvincular dispositivo',icon:'📲',okText:'Desvincular',danger:true});
-  if(!ok)return;
+async function confirmAndRemoveDevice(device,button=null,{closeAfter=false}={}){
+  const confirmed=await window.APPIDialog.confirm('¿Deseás desvincular tu teléfono de la cuenta?\n\nPodrás volver a vincularlo en cualquier momento.',{title:'Desvincular teléfono',icon:'📲',okText:'Sí',cancelText:'No',danger:true,dismissible:false});
+  if(!confirmed)return false;
   if(button){button.disabled=true;button.textContent='Desvinculando…'}
   try{
-    await callBridge({action:'remove_device',device_id:id});
-    state.devices=state.devices.filter(item=>item.id!==id);state.lastError='';renderDeviceList();decorateCallButtons();
-    await window.APPIDialog.alert(`${device.nombre} fue desvinculado correctamente.`,{title:'Dispositivo desvinculado',icon:'✓',okText:'Listo'});
+    await callBridge({action:'remove_device',device_id:device.id});
+    state.devices=state.devices.filter(item=>item.id!==device.id);state.lastError='';renderDeviceList();decorateCallButtons();
+    if(closeAfter)closeOverlay();
+    return true;
   }catch(error){
     if(button){button.disabled=false;button.textContent='Desvincular dispositivo'}
-    await window.APPIDialog.alert(error.message,{title:'No pudimos desvincular',icon:'!'});
+    await window.APPIDialog.alert(error.message,{title:'No pudimos desvincular',icon:'!'});return false;
   }
+}
+async function removeDevice(id,button=null){
+  const device=state.devices.find(item=>item.id===id);if(!device)return false;
+  return confirmAndRemoveDevice(device,button,{closeAfter:state.devices.length<=1});
+}
+async function unlinkFromMenu(){
+  await loadDevices();
+  if(state.lastError){await window.APPIDialog.alert('No pudimos comprobar el teléfono vinculado. Revisá internet e intentá nuevamente.',{title:'No pudimos verificar la cuenta',icon:'!'});return false}
+  const active=state.devices.filter(device=>device.activo!==false);
+  if(!active.length){openManager();return false}
+  if(active.length>1){openManager();return false}
+  return confirmAndRemoveDevice(active[0]);
 }
 function shouldBridge(){return !isPhone()}
 function decorateCallButtons(){
@@ -211,6 +244,6 @@ function clearCommandQuery(){const url=new URL(location.href);url.searchParams.d
 function handlePendingLinks(){if(!authorized())return;const params=new URLSearchParams(location.search),pair=params.get('pair'),command=params.get('bridge_call');if(pair&&validUuid(pair))claimPairing({token:pair});else if(command&&validUuid(command))showCommand(command)}
 function validUuid(value){return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(value||''))}
 function init(){if(state.initialized)return;state.initialized=true;installStyles();ensureOverlay();installUniversalCallHandler();deviceKey();window.addEventListener('appi-auth-change',()=>setTimeout(()=>{if(authorized()){loadDevices();handlePendingLinks()}},180));if(authorized()){setTimeout(loadDevices,1500);setTimeout(handlePendingLinks,500)}setInterval(()=>{if(authorized()&&isPhone())callBridge({action:'ping',device_key:deviceKey()}).catch(()=>{})},120000)}
-window.APPIDeviceBridge={openManager,loadDevices,shouldBridge,handleCall,callPhone,decorateCallButtons,isPhone,claimByCode,deviceKey,state};
+window.APPIDeviceBridge={openManager,unlinkFromMenu,loadDevices,shouldBridge,handleCall,callPhone,decorateCallButtons,isPhone,claimByCode,deviceKey,state};
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();

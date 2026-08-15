@@ -3500,7 +3500,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v210 · Vinculación clara</div>
+  <div class="ds-foot">APPI · v211 · Desvinculación directa</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -9885,9 +9885,9 @@ function actualizarCuentaUI(){
     window.APPIDeviceBridge.loadDevices().then(updateDeviceText).catch(()=>{});
   }
 }
-function abrirDispositivosDesdeMenu(){
+async function abrirDispositivosDesdeMenu(){
   try{cerrarToolsMenu()}catch(e){}
-  if(window.APPIDeviceBridge&&window.APPIDeviceBridge.openManager){window.APPIDeviceBridge.openManager();return}
+  if(window.APPIDeviceBridge&&window.APPIDeviceBridge.unlinkFromMenu){await window.APPIDeviceBridge.unlinkFromMenu();return}
   window.APPIDialog.alert('No pudimos abrir los teléfonos vinculados. Recargá APPI e intentá nuevamente.',{title:'Teléfonos vinculados',icon:'📲'});
 }
 async function cerrarSesionSeguraAPPI(){
