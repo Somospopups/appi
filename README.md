@@ -17,7 +17,9 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 La pantalla tiene un solo control principal: el botón del micrófono. Se toca, se habla y se vuelve a tocar; APPI escribe la nota, le pone título y color, y la guarda sola. El título sale de la primera oración cuando el dictado es largo; si es corto, la nota queda sin título. El color rota por la paleta.
 
-El texto se obtiene con el dictado del navegador cuando está disponible, que además lo muestra en vivo mientras se habla. Si el navegador no lo soporta o el dictado falla, APPI graba el audio y lo transcribe con la IA local de la Grabadora. El audio es solo un paso intermedio: no se guarda.
+El texto se obtiene con el dictado del navegador, que lo muestra en vivo mientras se habla. El dictado usa el micrófono en exclusiva: mientras funciona no se graba audio en paralelo, porque en Android eso impide que arranque. Si el navegador no lo soporta, si falla o si queda mudo más de 1,5 segundos, APPI graba el audio y lo transcribe con la IA local de la Grabadora (`Xenova/whisper-base`). El audio es solo un paso intermedio: no se guarda.
+
+Si se carga una clave de OpenAI en `openai_api_key`, la transcripción de respaldo la resuelve Whisper online, que es más preciso.
 
 La grabación se corta sola a los 3 minutos, los toques de menos de 0,7 segundos se descartan y los errores de micrófono se explican en pantalla. El enlace **Escribir a mano** crea una nota en blanco y abre el editor. Todo queda en el dispositivo.
 

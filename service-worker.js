@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v218-nota-de-voz';
+const CACHE_NAME = 'appi-v219-dictado-fiel';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

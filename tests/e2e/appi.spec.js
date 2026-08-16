@@ -223,6 +223,14 @@ test('un toque accidental no crea notas vacías', async ({ page }) => {
   await page.evaluate(() => {
     localStorage.removeItem('appi_keep_notas');
     navigator.mediaDevices.getUserMedia = async () => ({ getTracks: () => [{ stop() {} }] });
+    // Sin dictado en vivo: el respaldo por audio tiene que arrancar igual.
+    class FakeRec {
+      constructor(){ this.state='recording'; this.mimeType='audio/webm'; this.ondataavailable=null; this.onstop=null; }
+      start(){ setTimeout(()=> this.ondataavailable && this.ondataavailable({data:new Blob(['x'.repeat(2048)],{type:'audio/webm'})}), 30); }
+      stop(){ this.state='inactive'; this.onstop && this.onstop(); }
+    }
+    FakeRec.isTypeSupported = () => true;
+    window.MediaRecorder = FakeRec;
     delete window.SpeechRecognition; delete window.webkitSpeechRecognition;
     showView('view-notas');
     window.renderKeep();
@@ -236,10 +244,110 @@ test('un toque accidental no crea notas vacías', async ({ page }) => {
   await expect(page.locator('#keepRecBtn')).not.toHaveClass(/is-recording/);
 });
 
+test('con dictado disponible no se le pelea el micrófono al grabador', async ({ page }) => {
+  await abrirAppActivada(page);
+  await page.evaluate(() => {
+    localStorage.removeItem('appi_keep_notas');
+    window.__gum = 0;
+    navigator.mediaDevices.getUserMedia = async () => { window.__gum++; return { getTracks: () => [{ stop(){} }] }; };
+    class R {
+      constructor(){ this.onresult=null; this.onerror=null; this.onend=null; this.onstart=null; }
+      start(){
+        this.onstart && this.onstart();
+        setTimeout(() => this.onresult && this.onresult({
+          resultIndex: 0,
+          results: [Object.assign([{ transcript: 'pasar por el depósito antes del mediodía' }], { isFinal: true })]
+        }), 80);
+      }
+      stop(){ this.onend && this.onend(); }
+      abort(){}
+    }
+    window.SpeechRecognition = R;
+    showView('view-notas'); window.renderKeep();
+  });
+
+  await page.locator('#keepRecBtn').click();
+  await expect(page.locator('#keepRecLive')).toContainText('pasar por el depósito');
+  // El dictado maneja el micrófono solo: no abrimos un segundo stream en paralelo.
+  expect(await page.evaluate(() => window.__gum)).toBe(0);
+
+  await page.waitForTimeout(800);
+  await page.locator('#keepRecBtn').click();
+  await expect(page.locator('#keepGrid .k-text')).toContainText('Pasar por el depósito antes del mediodía.');
+  expect(await page.evaluate(() => window.__gum)).toBe(0);
+});
+
+test('si el dictado se cae, el respaldo por audio salva la nota', async ({ page }) => {
+  await abrirAppActivada(page);
+  await page.evaluate(() => {
+    localStorage.removeItem('appi_keep_notas');
+    navigator.mediaDevices.getUserMedia = async () => ({ getTracks: () => [{ stop(){} }] });
+    class FakeRec {
+      constructor(){ this.state='recording'; this.mimeType='audio/webm'; this.ondataavailable=null; this.onstop=null; }
+      start(){ setTimeout(()=> this.ondataavailable && this.ondataavailable({data:new Blob(['x'.repeat(4096)],{type:'audio/webm'})}), 30); }
+      stop(){ this.state='inactive'; this.onstop && this.onstop(); }
+    }
+    FakeRec.isTypeSupported = () => true;
+    window.MediaRecorder = FakeRec;
+    // El dictado arranca pero se rompe enseguida (caso típico de Android sin datos).
+    class RotoR {
+      constructor(){ this.onresult=null; this.onerror=null; this.onend=null; this.onstart=null; }
+      start(){ setTimeout(()=> this.onerror && this.onerror({ error:'audio-capture' }), 40); }
+      stop(){ this.onend && this.onend(); }
+      abort(){}
+    }
+    window.SpeechRecognition = RotoR;
+    window.transcribeBlobToText = async () => 'llevar los folletos nuevos a la reunión del viernes';
+    showView('view-notas'); window.renderKeep();
+  });
+
+  await page.locator('#keepRecBtn').click();
+  await expect(page.locator('#keepRecBtn')).toHaveClass(/is-recording/);
+  await page.waitForTimeout(1000);
+  await page.locator('#keepRecBtn').click();
+
+  await expect(page.locator('#keepGrid .keep-note')).toHaveCount(1);
+  await expect(page.locator('#keepGrid .k-text')).toContainText('Llevar los folletos nuevos a la reunión del viernes.');
+  await expect(page.locator('#keepRecBtn')).toBeEnabled();
+});
+
+test('si el dictado queda mudo, el audio de respaldo rescata la nota', async ({ page }) => {
+  await abrirAppActivada(page);
+  await page.evaluate(() => {
+    localStorage.removeItem('appi_keep_notas');
+    navigator.mediaDevices.getUserMedia = async () => ({ getTracks: () => [{ stop(){} }] });
+    class FakeRec {
+      constructor(){ this.state='recording'; this.mimeType='audio/webm'; this.ondataavailable=null; this.onstop=null; }
+      start(){ setTimeout(()=> this.ondataavailable && this.ondataavailable({data:new Blob(['x'.repeat(4096)],{type:'audio/webm'})}), 30); }
+      stop(){ this.state='inactive'; this.onstop && this.onstop(); }
+    }
+    FakeRec.isTypeSupported = () => true;
+    window.MediaRecorder = FakeRec;
+    // Caso Android: el dictado arranca, no da error, pero nunca entrega texto.
+    class MudoR {
+      constructor(){ this.onresult=null; this.onerror=null; this.onend=null; this.onstart=null; }
+      start(){ this.onstart && this.onstart(); }
+      stop(){ this.onend && this.onend(); }
+      abort(){}
+    }
+    window.SpeechRecognition = MudoR;
+    window.transcribeBlobToText = async () => 'confirmar el turno del lunes a las nueve';
+    showView('view-notas'); window.renderKeep();
+  });
+
+  await page.locator('#keepRecBtn').click();
+  await page.waitForTimeout(2400);   // pasa el umbral de "mudo"
+  await page.locator('#keepRecBtn').click();
+
+  await expect(page.locator('#keepGrid .k-text')).toContainText('Confirmar el turno del lunes a las nueve.');
+  await expect(page.locator('#keepRecBtn')).toBeEnabled();
+});
+
 test('sin permiso de micrófono avisa cómo solucionarlo', async ({ page }) => {
   await abrirAppActivada(page);
   await page.evaluate(() => {
     navigator.mediaDevices.getUserMedia = async () => { const e = new Error('denied'); e.name = 'NotAllowedError'; throw e; };
+    delete window.SpeechRecognition; delete window.webkitSpeechRecognition;
     showView('view-notas');
   });
   await page.locator('#keepRecBtn').click();

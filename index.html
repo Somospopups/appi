@@ -3502,7 +3502,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v218 · Nota de voz</div>
+  <div class="ds-foot">APPI · v219 · Dictado fiel</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -12264,7 +12264,7 @@ const VOICE_MIN_MS=700;                 // toques accidentales
 let vState='idle';                      // idle | recording | working
 let vRec=null, vStream=null, vChunks=[], vRecognition=null;
 let vFinalText='', vPartialText='', vStartedAt=0, vTimer=null, vStopTimer=null;
-let vWantsStop=false, vRecogFailed=false;
+let vWantsStop=false, vRecogFailed=false, vRecogAlive=false, vRecogRetries=0, vWatchdog=null, vUsedFallback=false, vLastMicError='', vRecogDenied=false, vArrancandoRespaldo=false;
 
 function vEl(id){ return document.getElementById(id); }
 function vSetLabel(text){ const n=vEl('keepRecLabel'); if(n) n.textContent=text; }
@@ -12303,6 +12303,7 @@ function vCleanupMedia(){
   vStream=null;
   if(vTimer){ clearInterval(vTimer); vTimer=null; }
   if(vStopTimer){ clearTimeout(vStopTimer); vStopTimer=null; }
+  if(vWatchdog){ clearInterval(vWatchdog); vWatchdog=null; }
 }
 function vResetUI(msg,isError){
   vSetMode('idle');
@@ -12352,11 +12353,14 @@ function keepSaveVoiceNote(rawText){
 
 function vStartRecognition(){
   const Reco=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(!Reco) return false;
+  if(!Reco) return null;
   try{
     const reco=new Reco();
-    reco.lang='es-AR'; reco.continuous=true; reco.interimResults=true; reco.maxAlternatives=1;
+    reco.lang=(navigator.language&&/^es/i.test(navigator.language))?navigator.language:'es-AR';
+    reco.continuous=true; reco.interimResults=true; reco.maxAlternatives=1;
+    reco.onstart=()=>{ vRecogAlive=true; };
     reco.onresult=event=>{
+      vRecogAlive=true; vRecogFailed=false; vRecogRetries=0;
       let partial='';
       for(let i=event.resultIndex;i<event.results.length;i++){
         const res=event.results[i];
@@ -12364,60 +12368,117 @@ function vStartRecognition(){
         else partial+=res[0].transcript;
       }
       vPartialText=partial;
+      if(vState==='recording' && (vFinalText||partial)) vSetStatus('Te escucho. Tocá el botón cuando termines.');
       vSetLive();
     };
     reco.onerror=event=>{
       const code=event&&event.error;
-      if(code==='no-speech'||code==='aborted') return;   // se resuelve al finalizar
-      vRecogFailed=true;                                  // caemos a la transcripción del audio
+      if(code==='no-speech'||code==='aborted') return;     // se resuelve al finalizar
+      if(code==='network' && vRecogRetries<3){ vRecogRetries++; return; }  // onend reintenta
+      vRecogFailed=true;                                    // caemos al respaldo por audio
+      if(code==='not-allowed'||code==='service-not-allowed'){
+        // Sin permiso no hay respaldo posible: cortamos y explicamos.
+        vRecogDenied=true;
+        vAbortVoiceNote(vMicError({name:'NotAllowedError'}));
+      }
     };
     reco.onend=()=>{
+      vRecogAlive=false;
       // Chrome corta solo tras un silencio: reanudamos mientras el usuario siga grabando.
       if(vState==='recording' && !vWantsStop && !vRecogFailed){
-        try{ reco.start(); }catch(e){}
+        try{ reco.start(); vRecogAlive=true; }
+        catch(e){ setTimeout(()=>{ if(vState==='recording'&&!vWantsStop){ try{ reco.start(); }catch(e2){ vRecogFailed=true; } } },220); }
       }
     };
     reco.start();
     vRecognition=reco;
+    return reco;
+  }catch(e){ return null; }
+}
+
+// Corta la nota de voz en curso y explica el motivo.
+function vAbortVoiceNote(mensaje){
+  if(vState==='idle') return;
+  vWantsStop=true;
+  try{ vRec&&vRec.state!=='inactive'&&vRec.stop(); }catch(e){}
+  vCleanupMedia();
+  vRec=null; vChunks=[];
+  vResetUI(mensaje, true);
+}
+
+// Graba audio como respaldo. En Android el dictado necesita el micrófono para él solo,
+// así que solo grabamos cuando el dictado no está disponible o se cayó.
+async function vStartBackupRecorder(){
+  if(vRec||!window.MediaRecorder||!navigator.mediaDevices?.getUserMedia) return false;
+  try{
+    vStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}});
+    const mimes=['audio/webm;codecs=opus','audio/webm','audio/ogg;codecs=opus','audio/mp4'];
+    const mime=mimes.find(m=>MediaRecorder.isTypeSupported(m))||'';
+    vRec=mime?new MediaRecorder(vStream,{mimeType:mime}):new MediaRecorder(vStream);
+    vChunks=[];
+    vRec.ondataavailable=ev=>{ if(ev.data&&ev.data.size) vChunks.push(ev.data); };
+    vRec.start(1000);
     return true;
-  }catch(e){ return false; }
+  }catch(error){
+    try{ vStream&&vStream.getTracks().forEach(t=>t.stop()); }catch(e){}
+    vStream=null; vRec=null;
+    vLastMicError=vMicError(error);
+    return false;
+  }
 }
 
 async function keepStartVoiceNote(){
   if(vState!=='idle') return;
-  if(!navigator.mediaDevices?.getUserMedia){
-    vResetUI('Este navegador no permite grabar. Usá Chrome, Edge o Safari actualizado.', true);
+  const Reco=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!Reco && !navigator.mediaDevices?.getUserMedia){
+    vResetUI('Este navegador no permite dictar notas. Usá Chrome, Edge o Safari actualizado.', true);
     return;
   }
-  vWantsStop=false; vRecogFailed=false; vFinalText=''; vPartialText=''; vChunks=[];
+  vWantsStop=false; vRecogFailed=false; vRecogAlive=false; vRecogRetries=0; vRecogDenied=false; vArrancandoRespaldo=false; vLastMicError='';
+  vFinalText=''; vPartialText=''; vChunks=[]; vUsedFallback=false;
   vSetStatus('Pidiendo permiso al micrófono…');
-  try{
-    vStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}});
-  }catch(error){
-    vCleanupMedia();
-    vResetUI(vMicError(error), true);
-    return;
-  }
-  // El audio queda como respaldo por si el dictado en vivo no está o falla.
-  try{
-    if(window.MediaRecorder){
-      const mimes=['audio/webm;codecs=opus','audio/webm','audio/ogg;codecs=opus','audio/mp4'];
-      const mime=mimes.find(m=>MediaRecorder.isTypeSupported(m))||'';
-      vRec=mime?new MediaRecorder(vStream,{mimeType:mime}):new MediaRecorder(vStream);
-      vRec.ondataavailable=ev=>{ if(ev.data&&ev.data.size) vChunks.push(ev.data); };
-      vRec.start(1000);
-    } else { vRec=null; }
-  }catch(e){ vRec=null; }
 
-  const live=vStartRecognition();
+  // 1) El dictado va primero y con el micrófono para él solo: es el que mejor entiende.
+  //    Arranca de forma sincrónica, así capturamos desde la primera palabra.
+  const reco=vStartRecognition();
+
+  if(!reco){
+    // 2) Sin dictado en el navegador: grabamos el audio y lo transcribimos al final.
+    const ok=await vStartBackupRecorder();
+    if(!ok){
+      vCleanupMedia();
+      vResetUI(vLastMicError||'No pude usar el micrófono. Revisá el permiso y probá de nuevo.', true);
+      return;
+    }
+    vUsedFallback=true;
+  }
+
+  // El botón pasa a rojo en el acto: nada de esperar handshakes con el micrófono.
   vSetMode('recording');
   vStartedAt=Date.now();
   vTick();
   vTimer=setInterval(vTick,250);
-  vSetStatus(live?'Te escucho. Tocá el botón cuando termines.':'Grabando. Al terminar transcribo lo que dijiste.');
+  vSetStatus(reco?'Te escucho. Tocá el botón cuando termines.':'Grabando. Al terminar transcribo lo que dijiste.');
   vSetLive();
   try{ navigator.vibrate?.(45); }catch(e){}
   vStopTimer=setTimeout(()=>{ if(vState==='recording') keepStopVoiceNote(); }, VOICE_MAX_MS);
+
+  // Si el dictado no llega a arrancar o se cae a mitad, grabamos audio para no perder la nota.
+  if(reco){
+    vWatchdog=setInterval(async ()=>{
+      if(vState!=='recording'){ clearInterval(vWatchdog); vWatchdog=null; return; }
+      if(vRecogDenied || vRec || vArrancandoRespaldo) return;
+      // Motivos para grabar audio de respaldo: el dictado falló, o dice estar vivo
+      // pero no entregó una sola palabra en el primer segundo y medio (pasa en Android).
+      const mudo = !vRecogFailed && !vFinalText && !vPartialText && (Date.now()-vStartedAt)>1500;
+      if(!vRecogFailed && !mudo) return;
+      vArrancandoRespaldo=true;
+      const ok=await vStartBackupRecorder();
+      vArrancandoRespaldo=false;
+      if(ok){ vUsedFallback=true; if(vRecogFailed) vSetStatus('Grabando. Al terminar transcribo lo que dijiste.'); }
+      else if(vState==='recording' && vRecogFailed){ vAbortVoiceNote(vLastMicError||'No pude usar el micrófono. Revisá el permiso y probá de nuevo.'); }
+    },500);
+  }
 }
 
 async function keepStopVoiceNote(){
@@ -12426,6 +12487,7 @@ async function keepStopVoiceNote(){
   vWantsStop=true;
   if(vTimer){ clearInterval(vTimer); vTimer=null; }
   if(vStopTimer){ clearTimeout(vStopTimer); vStopTimer=null; }
+  if(vWatchdog){ clearInterval(vWatchdog); vWatchdog=null; }
 
   if(duration<VOICE_MIN_MS){
     try{ vRec&&vRec.state!=='inactive'&&vRec.stop(); }catch(e){}
@@ -12438,7 +12500,16 @@ async function keepStopVoiceNote(){
   vSetLabel('Creando la nota…');
   vSetStatus('Un segundo…');
 
-  // Esperamos el último tramo del dictado en vivo antes de decidir.
+  // Cerramos el dictado y esperamos su último tramo (Chrome lo entrega en el 'end').
+  const cierreDictado=new Promise(resolve=>{
+    if(!vRecognition){ resolve(); return; }
+    const reco=vRecognition;
+    const listo=()=>resolve();
+    reco.onend=listo;
+    try{ reco.stop(); }catch(e){ resolve(); }
+    setTimeout(resolve,1600);
+  });
+
   const blob=await new Promise(resolve=>{
     if(!vRec||vRec.state==='inactive'){ resolve(null); return; }
     const done=()=>resolve(new Blob(vChunks,{type:vRec?.mimeType||'audio/webm'}));
@@ -12446,17 +12517,16 @@ async function keepStopVoiceNote(){
     try{ vRec.stop(); }catch(e){ resolve(null); }
     setTimeout(()=>resolve(new Blob(vChunks,{type:'audio/webm'})),4000);
   });
-  try{ vRecognition&&vRecognition.stop&&vRecognition.stop(); }catch(e){}
-  await new Promise(r=>setTimeout(r,320));
+  await cierreDictado;
   vCleanupMedia();
   vRec=null;
 
   const dictado=(vFinalText+' '+vPartialText).replace(/\s+/g,' ').trim();
-  if(dictado.length>=2 && !vRecogFailed){ vChunks=[]; keepSaveVoiceNote(dictado); return; }
+  if(dictado.length>=2){ vChunks=[]; keepSaveVoiceNote(dictado); return; }
 
   if(!blob||blob.size<600){
     vChunks=[];
-    vResetUI('No escuché nada. Revisá el micrófono y probá otra vez.', true);
+    vResetUI('No escuché nada. Revisá que el micrófono no esté silenciado y probá otra vez.', true);
     return;
   }
   vSetStatus('Transcribiendo lo que dijiste… puede tardar unos segundos.');
@@ -12523,10 +12593,12 @@ import { pipeline, env } from '@xenova/transformers';
 env.allowLocalModels=false;
 env.useBrowserCache=true;
 let transcriber=null,modelLoading=false,transcriptionRunning=false;
+// whisper-base entiende bastante mejor el español que whisper-tiny (~145 MB, se cachea la primera vez).
+const MODELO_ASR='Xenova/whisper-base';
 const node=id=>document.getElementById(id);
 function status(message,type='ok',visible=true){window.grabadoraModelStatus?.(message,type,visible);if(type==='error')window.grabadoraShowStatus?.(message,'error',true)}
 function setBusy(busy){window.grabadoraTranscriptionBusy=busy;const transcribe=node('btnTranscribe'),record=node('btnRecord'),mic=node('recVisual');if(transcribe){transcribe.disabled=busy||!window._lastBlobUniversal;transcribe.textContent=busy?'Transcribiendo…':'Transcribir audio'}if(record)record.disabled=busy;if(mic)mic.disabled=busy;const badge=node('transcriptBadge');if(badge&&busy){badge.textContent='Transcribiendo';badge.className='working'}if(busy){const summary=node('summary');if(summary){summary.hidden=true;summary.innerHTML=''}const empty=node('summaryEmpty');if(empty){empty.hidden=false;empty.textContent='El resumen se creará cuando termine la transcripción.'}const sumButton=node('btnSummarize');if(sumButton)sumButton.disabled=true}}
-async function loadModelUniversal(){if(transcriber)return transcriber;if(modelLoading){while(modelLoading)await new Promise(resolve=>setTimeout(resolve,250));return transcriber}modelLoading=true;status('Preparando la IA local para transcribir…','ok',true);try{transcriber=await pipeline('automatic-speech-recognition','Xenova/whisper-tiny',{quantized:true,progress_callback:progress=>{if(progress?.status==='progress'&&Number.isFinite(progress.progress))status(`Preparando IA local · ${Math.round(progress.progress)}%`,'ok',true)}});status('IA local lista. Procesando el audio…','ok',true);return transcriber}catch(error){console.error('Modelo local de transcripción',error);status('No pude preparar la transcripción local. Revisá la conexión e intentá nuevamente.','error',true);return null}finally{modelLoading=false}}
+async function loadModelUniversal(){if(transcriber)return transcriber;if(modelLoading){while(modelLoading)await new Promise(resolve=>setTimeout(resolve,250));return transcriber}modelLoading=true;status('Preparando la IA local para transcribir…','ok',true);try{transcriber=await pipeline('automatic-speech-recognition',MODELO_ASR,{quantized:true,progress_callback:progress=>{if(progress?.status==='progress'&&Number.isFinite(progress.progress))status(`Preparando IA local · ${Math.round(progress.progress)}%`,'ok',true)}});status('IA local lista. Procesando el audio…','ok',true);return transcriber}catch(error){console.error('Modelo local de transcripción',error);status('No pude preparar la transcripción local. Revisá la conexión e intentá nuevamente.','error',true);return null}finally{modelLoading=false}}
 async function audioA16k(blob){const AudioCtx=window.AudioContext||window.webkitAudioContext;if(!AudioCtx)throw new Error('El navegador no permite procesar audio');const context=new AudioCtx();try{const raw=await blob.arrayBuffer(),buffer=await context.decodeAudioData(raw.slice(0)),channels=buffer.numberOfChannels,length=buffer.length,mono=new Float32Array(length);for(let channel=0;channel<channels;channel++){const data=buffer.getChannelData(channel);for(let i=0;i<length;i++)mono[i]+=data[i]/channels}let output=mono;if(buffer.sampleRate!==16000){const newLength=Math.max(1,Math.round(mono.length*16000/buffer.sampleRate)),resampled=new Float32Array(newLength),scale=(mono.length-1)/Math.max(1,newLength-1);for(let i=0;i<newLength;i++){const position=i*scale,a=Math.floor(position),b=Math.min(mono.length-1,a+1),mix=position-a;resampled[i]=mono[a]*(1-mix)+mono[b]*mix}output=resampled}let peak=0,energy=0;for(let i=0;i<output.length;i++){const abs=Math.abs(output[i]);peak=Math.max(peak,abs);energy+=output[i]*output[i]}const rms=Math.sqrt(energy/Math.max(1,output.length));if(peak<.0025||rms<.00035)throw new Error('No se detectó voz con suficiente volumen');const gain=Math.min(5,.92/peak);if(gain>1.08)for(let i=0;i<output.length;i++)output[i]=Math.max(-1,Math.min(1,output[i]*gain));return output}finally{try{await context.close()}catch(e){}}}
 function cleanTranscript(value){let text=String(value||'').replace(/\[(?:música|music|aplausos|silencio|ruido)\]/gi,' ').replace(/\s+/g,' ').trim();text=text.replace(/\b([^\s]+(?:\s+[^\s]+){0,3})(?:\s+\1){2,}\b/gi,'$1');if(text){text=text.charAt(0).toUpperCase()+text.slice(1);if(!/[.!?]$/.test(text))text+='.'}return text}
 async function transcribeOnline(blob){const apiKey=localStorage.getItem('openai_api_key')||'';if(!apiKey)return'';status('Transcribiendo con IA online…','ok',true);const ext=blob.type.includes('mp4')?'m4a':blob.type.includes('ogg')?'ogg':'webm',form=new FormData();form.append('file',blob,`audio.${ext}`);form.append('model','whisper-1');form.append('language','es');form.append('response_format','json');const response=await fetch('https://api.openai.com/v1/audio/transcriptions',{method:'POST',headers:{Authorization:`Bearer ${apiKey}`},body:form});if(!response.ok)throw new Error(`IA online ${response.status}`);const data=await response.json();return cleanTranscript(data.text)}
