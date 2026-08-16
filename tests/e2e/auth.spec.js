@@ -258,7 +258,7 @@ test('una solicitud nueva abre WhatsApp y queda pendiente', async ({ page }) => 
   expect(await page.evaluate(()=>window.__lastOpen)).toContain('wa.me');
 });
 
-test('POPUPS ingresa por el candado y no tiene distribuidor asociado', async ({ page }) => {
+test('administración ingresa por el candado y no tiene distribuidor asociado', async ({ page }) => {
   const nativeDialogs=[];page.on('dialog',dialog=>{nativeDialogs.push(dialog.type());dialog.dismiss()});
   await mockSupabase(page);
   await page.goto('/index.html', { waitUntil: 'networkidle' });
@@ -274,7 +274,7 @@ test('POPUPS ingresa por el candado y no tiene distribuidor asociado', async ({ 
   await page.locator('#adminLoginPassword').fill('Clave1234');
   await page.locator('#btnAdminLoginSubmit').click();
   await expect(page.locator('#view-admin')).toHaveClass(/active/);
-  await expect(page.locator('#adminPanelIdentity')).toContainText('popups');
+  await expect(page.locator('#adminPanelIdentity')).toContainText('Administración del equipo');
   await expect(page.locator('#adminUserList')).toContainText('Distribuidor A');
   await expect(page.locator('#adminPendingList')).toContainText('Solicitud Pendiente');
   await expect(page.locator('#adminStatPending')).toHaveText('1');

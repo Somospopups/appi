@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#ff5a36">
-<title>POPUPS · Contanos tu proyecto</title>
+<title>Contanos tu proyecto · APPI</title>
 <style>
   :root{ --coal:#171615; --ink-soft:#514940; --orange:#ff5a36; --paper:#FFFDF9; }
   *{box-sizing:border-box}
@@ -29,7 +29,7 @@
 </head>
 <body>
 <div class="wrap">
-  <h1>✳ POPUPS</h1>
+  <h1>✳ El equipo</h1>
   <p class="sub">Contanos qué querés ordenar, delegar o preparar. Te leemos y te escribimos para dar el primer paso.</p>
 
   <form id="leadForm" autocomplete="on">
@@ -78,8 +78,8 @@
 </div>
 
 <script>
-// Número de POPUPS al que llegan los leads (mismo número que usa APPI).
-var NUMERO_POPUPS = '5493515638843';
+// Número del equipo al que llegan los leads (mismo número que usa APPI).
+var NUMERO_EQUIPO = '5493515638843';
 
 function datos(){
   var f = document.getElementById('leadForm');
@@ -96,7 +96,7 @@ function datos(){
   };
 }
 function resumen(d){
-  var msg = '✳ Nuevo lead POPUPS\n';
+  var msg = '✳ Nuevo lead\n';
   msg += 'Nombre: ' + d.nombre + '\n';
   msg += 'Negocio: ' + d.negocio + '\n';
   if (d.equipo) msg += 'Equipo: ' + d.equipo + '\n';
@@ -110,7 +110,7 @@ function resumen(d){
 document.getElementById('leadForm').addEventListener('submit', function(ev){
   ev.preventDefault();
   if (!this.reportValidity()) return;
-  var url = 'https://wa.me/' + NUMERO_POPUPS + '?text=' + encodeURIComponent(resumen(datos()));
+  var url = 'https://wa.me/' + NUMERO_EQUIPO + '?text=' + encodeURIComponent(resumen(datos()));
   window.open(url, '_blank', 'noopener');
   document.getElementById('estado').textContent = 'Se abrió WhatsApp con tu resumen listo para enviar. ¡Gracias!';
 });

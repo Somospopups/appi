@@ -104,8 +104,8 @@ test('la carrera avisa mantenimiento, anchura y Pareto', async ({ page }) => {
   await expect(card).toContainText('el 20% más fuerte genera el 40% del PB');
 });
 
-test('el formulario POPUPS arma el lead por WhatsApp con todos los datos', async ({ page }) => {
-  await page.goto('/formulario-popups.html');
+test('el formulario del equipo arma el lead por WhatsApp con todos los datos', async ({ page }) => {
+  await page.goto('/formulario-equipo.html');
   await page.fill('#f-nombre', 'Carla');
   await page.fill('#f-negocio', 'Panadería El Sol');
   await page.check('input[name="motivo_principal"][value="Recuperar tiempo y energía"]');
@@ -119,7 +119,7 @@ test('el formulario POPUPS arma el lead por WhatsApp con todos los datos', async
   await page.click('.send');
   const url = (await page.evaluate(() => window.__abiertos))[0] || '';
   expect(url).toContain('wa.me/5493515638843');
-  expect(decodeURIComponent(url)).toContain('Nuevo lead POPUPS');
+  expect(decodeURIComponent(url)).toContain('Nuevo lead');
   expect(decodeURIComponent(url)).toContain('Panadería El Sol');
   expect(decodeURIComponent(url)).toContain('Recuperar tiempo y energía');
 });

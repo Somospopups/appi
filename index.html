@@ -3506,7 +3506,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v230 · Sueños, demos y organización</div>
+  <div class="ds-foot">APPI · v231 · Sin nombres</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -3555,7 +3555,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
         <div class="lock-error login-info" id="requestAccountSuccess" role="status"></div>
         <a class="lock-btn whatsapp lock-btn-full request-whatsapp-link" id="requestWhatsappLink" href="#" target="_blank" rel="noopener" hidden>💬 Abrir WhatsApp</a>
       </div>
-      <div class="lock-footer">Las cuentas nuevas quedan pendientes hasta que POPUPS las apruebe. Los audios permanecen únicamente en el dispositivo donde se grabaron.</div>
+      <div class="lock-footer">Las cuentas nuevas quedan pendientes hasta que administración las apruebe. Los audios permanecen únicamente en el dispositivo donde se grabaron.</div>
     </div>
 
     <div id="legacyActivationPanel" class="auth-panel">
@@ -3811,7 +3811,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
       <div class="script">del Negocio</div>
     </header>
     <div class="ocho-wrap">
-      <p class="ocho-intro">El camino que propone la formación de POPUPS. <b>Es cíclico:</b> no se vive una sola vez, se recorre todos los meses. Tocá cada paso para ir a su herramienta.</p>
+      <p class="ocho-intro">El camino que propone la formación del equipo. <b>Es cíclico:</b> no se vive una sola vez, se recorre todos los meses. Tocá cada paso para ir a su herramienta.</p>
       <div id="ochoSteps"></div>
     </div>
   </section>
@@ -4180,7 +4180,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
       <div class="admin-top-lock">🔒</div>
       <h1>Panel</h1>
       <div class="script">Administrador</div>
-      <p id="adminPanelIdentity">Cuenta POPUPS</p>
+      <p id="adminPanelIdentity">Cuenta de administración</p>
     </header>
     <div class="admin-dashboard">
       <div class="admin-stats">
@@ -4190,7 +4190,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
         <div class="admin-stat warn"><strong id="adminStatPending">0</strong><span>Pendientes</span></div>
       </div>
       <section class="glass admin-card">
-        <div class="admin-card-head"><div><h2>WhatsApp de POPUPS</h2><p>Este número recibe ayuda y solicitudes nuevas.</p></div></div>
+        <div class="admin-card-head"><div><h2>WhatsApp del equipo</h2><p>Este número recibe ayuda y solicitudes nuevas.</p></div></div>
         <div class="admin-setting-row"><input id="adminWhatsappNumber" inputmode="tel" autocomplete="off" placeholder="Ej: 5493515551234"><button type="button" class="btn btn-primary" id="adminSaveWhatsapp">Guardar número</button></div>
         <div class="admin-inline-status" id="adminWhatsappStatus" role="status"></div>
       </section>
@@ -9720,8 +9720,8 @@ function mostrarPantallaLoginDistribuidor(reason=''){
   }else{
     if(button)button.disabled=false;
     if(reason==='account_disabled')mostrarErrorLogin('Esta cuenta está desactivada. Contactá al administrador.');
-    else if(reason==='membership_expired')mostrarErrorLogin('Tu membresía de APPI venció. Contactá a POPUPS para renovarla.');
-    else if(reason==='membership_missing')mostrarErrorLogin('Tu cuenta todavía no tiene una membresía activa. Contactá a POPUPS.');
+    else if(reason==='membership_expired')mostrarErrorLogin('Tu membresía de APPI venció. Contactá a administración para renovarla.');
+    else if(reason==='membership_missing')mostrarErrorLogin('Tu cuenta todavía no tiene una membresía activa. Contactá a administración.');
     else if(reason==='offline_expired')mostrarErrorLogin('Pasaron más de 7 días sin validar la cuenta. Conectate a internet para volver a ingresar.');
     else mostrarErrorLogin('');
   }
@@ -9763,7 +9763,7 @@ function mostrarPantallaLoginDistribuidor(reason=''){
   if(requestHasPartner&&!requestHasPartner.dataset.bound){requestHasPartner.dataset.bound='1';requestHasPartner.onchange=()=>{requestPartnerField.hidden=!requestHasPartner.checked;if(requestHasPartner.checked)setTimeout(()=>document.getElementById('requestPartnerName').focus(),40);else document.getElementById('requestPartnerName').value=''}}
   if(support&&!support.dataset.bound){
     support.dataset.bound='1';
-    support.onclick=async()=>{const numero=dip&&dip.value?dip.value:'sin completar';const msg=`Hola POPUPS, necesito ayuda para ingresar a APPI. Mi número de distribuidor es: ${numero}`;try{await window.APPIAccountRequest.openSupport(msg)}catch(error){mostrarErrorLogin(error.message)}};
+    support.onclick=async()=>{const numero=dip&&dip.value?dip.value:'sin completar';const msg=`Hola, necesito ayuda para ingresar a APPI. Mi número de distribuidor es: ${numero}`;try{await window.APPIAccountRequest.openSupport(msg)}catch(error){mostrarErrorLogin(error.message)}};
   }
   if(adminOpen&&!adminOpen.dataset.bound){adminOpen.dataset.bound='1';adminOpen.onclick=mostrarAdminLoginPopup}
   setTimeout(()=>{if(dip&&!dip.value)dip.focus();else if(password)password.focus()},80);

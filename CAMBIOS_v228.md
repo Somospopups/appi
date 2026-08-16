@@ -1,6 +1,6 @@
 # APPI v228 · Mi carrera
 
-La carrera empresarial oficial de PSA, en primera persona y en el inicio.
+La carrera empresarial oficial del negocio, en primera persona y en el inicio.
 
 ## Cambios
 

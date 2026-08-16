@@ -240,7 +240,7 @@ function markBulkSent(id,rerender=true){const item=state.bulkQueue.find(row=>row
 function renderSurveyTool(){
   const c=$('surveyToolContent');if(!c)return;
   if(isAdmin()){
-    c.innerHTML=`<div class="gestion-empty"><div class="ico">🔒</div><h3>Herramienta para distribuidores</h3><p>POPUPS administra APPI, pero no tiene número de distribuidor. Cada distribuidor genera sus propias invitaciones privadas.</p></div>`;return;
+    c.innerHTML=`<div class="gestion-empty"><div class="ico">🔒</div><h3>Herramienta para distribuidores</h3><p>Administración gestiona APPI, pero no tiene número de distribuidor. Cada persona genera sus propias invitaciones privadas.</p></div>`;return;
   }
   // Una sola acción visible. Los tokens, vencimientos y URLs son detalles de
   // implementación que el distribuidor no necesita ver.

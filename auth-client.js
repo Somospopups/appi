@@ -118,8 +118,8 @@ async function fetchProfile(session){
   if(profile.activo===false)throw authError('Esta cuenta está desactivada. Contactá al administrador.','account_disabled',403);
   if(profile.rol!=='admin'){
     const expires=profile.membresia_vence?new Date(profile.membresia_vence).getTime():0;
-    if(!expires)throw authError('Tu cuenta todavía no tiene una membresía activa. Contactá a POPUPS.','membership_missing',403);
-    if(expires<=Date.now())throw authError('Tu membresía de APPI venció. Contactá a POPUPS para renovarla.','membership_expired',403);
+    if(!expires)throw authError('Tu cuenta todavía no tiene una membresía activa. Contactá a administración.','membership_missing',403);
+    if(expires<=Date.now())throw authError('Tu membresía de APPI venció. Contactá a administración para renovarla.','membership_expired',403);
     profile.membresia_dias_restantes=Math.max(0,Math.ceil((expires-Date.now())/86400000));
   }
   return profile;
