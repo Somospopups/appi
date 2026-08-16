@@ -8,8 +8,7 @@ const MIGRACIONES = [
   'SUPABASE_INSTALACION_COMPLETA.sql',
   'SUPABASE_RECORDATORIOS.sql',
   'SUPABASE_PERSONAS_CUENTA.sql',
-  'SUPABASE_MI_GENTE.sql',
-  'SUPABASE_LINEA_ASCENDENTE.sql'
+  'SUPABASE_MI_GENTE.sql'
 ];
 
 // Los comentarios de línea esconden el inicio real de cada sentencia y hacen
