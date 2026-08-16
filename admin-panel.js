@@ -69,7 +69,7 @@ async function handleUserAction(button){
 }
 async function handleRequestAction(button){
   const row=button.closest('[data-request-id]'),id=row&&row.dataset.requestId,item=state.requests.find(request=>request.id===id);if(!item)return;const action=button.dataset.requestAction;
-  if(action==='whatsapp'){const phone=whatsappPhone(item.telefono);window.open(`https://wa.me/${phone}?text=${encodeURIComponent(`Hola ${item.nombre}, recibimos tu solicitud de acceso a APPI para el distribuidor ${item.dip}.`)}`,'_blank','noopener');return}
+  if(action==='whatsapp'){const phone=whatsappPhone(item.telefono);window.APPIWhatsApp.abrir(`https://wa.me/${phone}?text=${encodeURIComponent(`Hola ${item.nombre}, recibimos tu solicitud de acceso a APPI para el distribuidor ${item.dip}.`)}`);return}
   button.disabled=true;
   try{
     if(action==='reject'){
@@ -80,7 +80,7 @@ async function handleRequestAction(button){
     const password=await window.APPIDialog.prompt('La persona deberá cambiarla obligatoriamente en su primer ingreso.',randomPassword(),{title:'Contraseña temporal',icon:'🔐',inputType:'text',okText:'Crear cuenta'});if(!password)return;
     const result=await callAdmin({action:'approve_request',request_id:id,password,membership_months:months}),text=`APPI\nDistribuidor: ${result.user.dip}\nTitular: ${result.user.nombre}${result.user.socio_nombre?`\nSocio/a: ${result.user.socio_nombre}`:''}\nContraseña temporal: ${password}`;await navigator.clipboard.writeText(text).catch(()=>{});
     const send=await window.APPIDialog.confirm('La cuenta fue creada y las credenciales se copiaron. ¿Querés enviarlas por WhatsApp?',{title:'Cuenta aprobada',icon:'✓',okText:'Abrir WhatsApp'});
-    if(send){const phone=whatsappPhone(item.telefono);window.open(`https://wa.me/${phone}?text=${encodeURIComponent(`Hola ${item.nombre}, tu cuenta de APPI fue aprobada por ${months} mes${months===1?'':'es'}.\n\nDistribuidor: ${result.user.dip}\nTitular: ${result.user.nombre}${result.user.socio_nombre?`\nSocio/a: ${result.user.socio_nombre}`:''}\nContraseña temporal: ${password}\n\nAl ingresar, APPI te pedirá crear tu contraseña personal.`)}`,'_blank','noopener')}
+    if(send){const phone=whatsappPhone(item.telefono);window.APPIWhatsApp.abrir(`https://wa.me/${phone}?text=${encodeURIComponent(`Hola ${item.nombre}, tu cuenta de APPI fue aprobada por ${months} mes${months===1?'':'es'}.\n\nDistribuidor: ${result.user.dip}\nTitular: ${result.user.nombre}${result.user.socio_nombre?`\nSocio/a: ${result.user.socio_nombre}`:''}\nContraseña temporal: ${password}\n\nAl ingresar, APPI te pedirá crear tu contraseña personal.`)}`)}
     await load();
   }catch(error){await window.APPIDialog.alert(error.message,{title:'No se pudo completar',icon:'!'})}finally{button.disabled=false}
 }

@@ -33,6 +33,7 @@ window.openHistorico=function(){
 <link rel="manifest" href="./manifest.json" />
 <script src="./auth-config.js"></script>
 <script src="./appi-dialog.js"></script>
+<script src="./whatsapp-app.js"></script>
 <script src="./auth-client.js"></script>
 <script src="./data-sync.js"></script>
 <script src="./admin-panel.js"></script>
@@ -3502,7 +3503,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v220 · Notas escritas</div>
+  <div class="ds-foot">APPI · v221 · Elegir WhatsApp</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4799,7 +4800,7 @@ document.getElementById('btnShare').addEventListener('click', async ()=>{
   const avg = (vals.reduce((s,v)=>s+v,0)/r.areas.length).toFixed(1);
   const texto = `🎯 ${r.title} ${r.script}\n📅 ${MONTHS[state.month]} ${state.year}\n\n${r.areas.map(a=>`• ${a.name}: ${state.scores[a.key]||0}/10`).join('\n')}\n\n⭐ Promedio: ${avg}/10`;
   try { if(navigator.share){ await navigator.share({ title: r.title, text: texto }); return; } } catch(e){}
-  window.open('https://wa.me/?text=' + encodeURIComponent(texto), '_blank');
+  window.APPIWhatsApp.abrir('https://wa.me/?text=' + encodeURIComponent(texto));
 });
 
 /* ============================================================
@@ -4954,7 +4955,7 @@ document.getElementById('btnShareSiete').addEventListener('click', async ()=>{
   let msg = `🚀 *Mis 7 P — ${MONTHS[s.month]} ${s.year}*\n\n`;
   SIETE_P.forEach(p=>{ msg += `${s[p.key].done?'✅':'⬜'} *${p.n}. ${p.title}*\n`; });
   try { if(navigator.share){ await navigator.share({ title:'Las 7 P', text: msg }); return; } } catch(e){}
-  window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+  window.APPIWhatsApp.abrir('https://wa.me/?text=' + encodeURIComponent(msg));
 });
 </script>
 <script>
@@ -5515,7 +5516,7 @@ document.getElementById('btnPresuShare').onclick = async ()=>{
   const neto = ing - gast;
   let msg = `💰 *Presupuesto — ${MONTHS[s.month]} ${s.year}*\n\n💵 INGRESOS: $${formatMoney(ing)}\n💸 GASTOS: $${formatMoney(gast)}\n👤 Personal: $${formatMoney(gastPer)}\n💼 Negocio: $${formatMoney(gastNeg)}\n\n${neto>=0?'✅':'⚠️'} BALANCE: ${neto>=0?'+':'-'}$${formatMoney(Math.abs(neto))}`;
   try { if(navigator.share){ await navigator.share({ title:'Presupuesto', text: msg }); return; } } catch(e){}
-  window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+  window.APPIWhatsApp.abrir('https://wa.me/?text=' + encodeURIComponent(msg));
 };
 
 /* ============================================================
@@ -6419,7 +6420,7 @@ ${(function(){
       const tel = b.dataset.tel.replace(/\D/g,'');
       const nom = b.dataset.nom;
       const msg = `¡Feliz cumpleaños ${nombreDePila(nom)||nom}! 🎂🎉 Te deseo un año maravilloso.`;
-      window.open(`https://wa.me/${tel}?text=${encodeURIComponent(msg)}`, '_blank');
+      window.APPIWhatsApp.abrir(`https://wa.me/${tel}?text=${encodeURIComponent(msg)}`);
     };
   });
   
@@ -6462,7 +6463,7 @@ ${(function(){
             const tel = btn.dataset.teltarget;
             modal.close();
             haptic(15);
-            window.open(`https://wa.me/${tel}?text=${encodeURIComponent(msg)}`, '_blank');
+            window.APPIWhatsApp.abrir(`https://wa.me/${tel}?text=${encodeURIComponent(msg)}`);
           };
         });
       }, 50);
@@ -6743,7 +6744,7 @@ function parseTelefonos(telStr){
 }
 
 function llamarWhatsAppDirecto(numero){
-  const url='whatsapp://call?phone='+encodeURIComponent(numero);let abierto=false;const onBlur=()=>{abierto=true;window.removeEventListener('blur',onBlur)};window.addEventListener('blur',onBlur);window.location.href=url;setTimeout(()=>{window.removeEventListener('blur',onBlur);if(!abierto)window.open('https://wa.me/'+numero,'_blank')},900);
+  const url='whatsapp://call?phone='+encodeURIComponent(numero);let abierto=false;const onBlur=()=>{abierto=true;window.removeEventListener('blur',onBlur)};window.addEventListener('blur',onBlur);window.location.href=url;setTimeout(()=>{window.removeEventListener('blur',onBlur);if(!abierto)window.APPIWhatsApp.abrir('https://wa.me/'+numero)},900);
 }
 
 /* ============ POPUP ELEGIR TELÉFONO ============ */
@@ -6789,8 +6790,8 @@ function bonusAfterContact(){
 }
 function abrirWaNumero(digits){
   const data = window._telPicker;
-  if(data && data.nombre) window.open('https://wa.me/'+digits+'?text='+encodeURIComponent('Hola '+(nombreDePila(data.nombre)||data.nombre)+', ¿cómo estás?'),'_blank');
-  else window.open('https://wa.me/'+digits,'_blank');
+  if(data && data.nombre) window.APPIWhatsApp.abrir('https://wa.me/'+digits+'?text='+encodeURIComponent('Hola '+(nombreDePila(data.nombre)||data.nombre)+', ¿cómo estás?'));
+  else window.APPIWhatsApp.abrir('https://wa.me/'+digits);
   modal.close();
   bonusAfterContact();
 }
@@ -6862,7 +6863,7 @@ function openPersonaModal(p){
   if(telefonos.length === 1){
     const t = telefonos[0];
     botonesTel = `
-      <button class="pm-wa" onclick="window.open('https://wa.me/${t.digits}?text='+encodeURIComponent('Hola ${escapeXml(nombreDePila(p.nombre)||p.nombre)}, ¿cómo estás?'),'_blank')">💬 Contactar por WhatsApp</button>
+      <button class="pm-wa" onclick="window.APPIWhatsApp.abrir('https://wa.me/${t.digits}?text='+encodeURIComponent('Hola ${escapeXml(nombreDePila(p.nombre)||p.nombre)}, ¿cómo estás?'))">💬 Contactar por WhatsApp</button>
       <button type="button" class="pm-call" data-appi-call-phone="${t.digits}" data-appi-call-name="${escapeXml(p.nombre||'Contacto')}" data-appi-call-label="1">📲 Llamar en teléfono</button>
     `;
   } else if(telefonos.length > 1){
@@ -7161,7 +7162,7 @@ async function enviarMensajeWhatsApp(mensaje, titulo){
       return;
     }
   } catch(e){}
-  window.open('https://wa.me/?text=' + encodeURIComponent(mensaje), '_blank');
+  window.APPIWhatsApp.abrir('https://wa.me/?text=' + encodeURIComponent(mensaje));
 }
 
 // Menú principal: compartir datos unificado + imagen
@@ -8956,7 +8957,7 @@ async function compartirConsolidado(e){
   const eq = obtenerDatosEquipo();
   let msg = `🎯 *INFORME MENSUAL*\n📅 ${MONTHS[now.getMonth()]} ${now.getFullYear()}\n━━━━━━━━━━━━━━━\n\n⭐ Score: *${sc.score}/100*\n\n🚀 7 P: ${sp.existe ? sp.done+'/7 ('+sp.pct+'%)' : 'Sin datos'}\n💰 Finanzas: ${pr.existe ? (pr.neto>=0?'+':'-')+'$'+formatMoney(Math.abs(pr.neto)) : 'Sin datos'}\n⚖️ Rueda Vida: ${rv ? rv.avg.toFixed(1)+'/10' : 'Sin datos'}\n📊 Rueda Negocio: ${rn ? rn.avg.toFixed(1)+'/10' : 'Sin datos'}\n🌳 Equipo: ${eq.existe ? eq.total+' pers ('+eq.pctActivos+'% activos)' : 'Sin datos'}\n\n━━━━━━━━━━━━━━━\nEnviado desde *APPI* 🚀`;
   try { if(navigator.share){ await navigator.share({ title:'Informe Consolidado', text: msg }); return; } } catch(e){}
-  window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+  window.APPIWhatsApp.abrir('https://wa.me/?text=' + encodeURIComponent(msg));
 }
 const CULTURA_KEY='cultura_crecimiento_v1';
 const CULTURA_PB_META=15;
@@ -9695,7 +9696,7 @@ function mostrarPantallaBloqueo() {
     // Botón: WhatsApp
   document.getElementById('btnWhatsappActivate').onclick = () => {
     const mensaje = `¡Hola! 👋 Bienvenido/a a APPI 💧\n\nEstoy iniciando mi activación en la aplicación.\n\n📋 Mi ID de dispositivo es:\n\n${deviceId}\n\n¡Gracias! Quedo a la espera de mi código de activación para empezar a usar APPI. 🚀`;
-    window.open(`https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(mensaje)}`, '_blank');
+    window.APPIWhatsApp.abrir(`https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(mensaje)}`);
     haptic(10);
   };
   
@@ -10119,9 +10120,21 @@ function abrirBackupDesdeMenu(){
     const txt=document.getElementById('toolsThemeTxt');
     if(ico) ico.textContent=isDark?'☀️':'🌙';
     if(txt) txt.textContent=isDark?'Modo día':'Modo noche';
+    if(typeof actualizarWhatsAppMenuUI==='function') actualizarWhatsAppMenuUI();
     if(abrir) menu.classList.add('open'); else menu.classList.remove('open');
     ev.stopPropagation();
   }
+  // El item de WhatsApp solo tiene sentido en Android, donde conviven las dos apps.
+  function actualizarWhatsAppMenuUI(){
+    const item=document.getElementById('btnToolsWhatsApp');
+    if(!item||!window.APPIWhatsApp) return;
+    if(!window.APPIWhatsApp.esAndroid()){ item.hidden=true; return; }
+    item.hidden=false;
+    const txt=document.getElementById('toolsWhatsAppTxt');
+    const elegida=window.APPIWhatsApp.preferencia();
+    if(txt) txt.textContent=elegida?('Enviar por '+window.APPIWhatsApp.nombre(elegida)):'WhatsApp para enviar';
+  }
+  window.actualizarWhatsAppMenuUI=actualizarWhatsAppMenuUI;
   function cerrarToolsMenu(){
     const menu=document.getElementById('toolsMenu');
     if(menu) menu.classList.remove('open');
@@ -11240,6 +11253,9 @@ body.dark .presu-select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:
   <button class="tools-item" id="btnToolsDevices" onclick="abrirDispositivosDesdeMenu()" hidden>
     <span class="ti-ico">📲</span><span id="toolsDevicesTxt">Vincular teléfono</span>
   </button>
+  <button class="tools-item" id="btnToolsWhatsApp" onclick="cerrarToolsMenu(); window.APPIWhatsApp && window.APPIWhatsApp.elegirDesdeAjustes()" hidden>
+    <span class="ti-ico">💬</span><span id="toolsWhatsAppTxt">WhatsApp para enviar</span>
+  </button>
   <button class="tools-item" id="btnToolsAccount" onclick="abrirCuentaDesdeMenu()" hidden>
     <span class="ti-ico">👤</span><span>Mi cuenta</span>
   </button>
@@ -12267,7 +12283,7 @@ window.shareKeep=function(id){
   if(!n) return;
   const txt=(n.title? n.title+'\n\n':'')+n.text;
   if(navigator.share){ navigator.share({title:n.title||'Nota', text:txt}).catch(()=>{}); }
-  else { window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank'); }
+  else { window.APPIWhatsApp.abrir('https://wa.me/?text='+encodeURIComponent(txt)); }
 };
 
 function initKeep(){

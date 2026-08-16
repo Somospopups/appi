@@ -13,6 +13,14 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 - Funcionamiento offline por hasta 7 días desde la última validación.
 - Grabaciones de audio locales: no se suben a la nube.
 
+## Con qué WhatsApp se envía
+
+Los enlaces `wa.me` son enlaces web, así que en Android los abre la aplicación marcada como predeterminada: en un teléfono con WhatsApp y WhatsApp Business puede no ser la deseada.
+
+APPI nombra la aplicación de forma explícita mediante un enlace `intent://` con el paquete `com.whatsapp` o `com.whatsapp.w4b`. La primera vez que se envía un mensaje en Android, la app pregunta cuál usar y lo recuerda; se cambia desde el menú ⚙️ → **Enviar por WhatsApp**. En iPhone y computadora se usa `wa.me` normal.
+
+Todo pasa por `whatsapp-app.js` (`window.APPIWhatsApp`), que además intercepta los clics en cualquier enlace a `wa.me` o `api.whatsapp.com`. Para excluir un enlace puntual se le agrega `data-no-wa-intent`.
+
 ## Mi Encuesta y Mi Gestión
 
 Desde **Mis herramientas → Mi Encuesta**, la pantalla es un solo botón: **Enviar encuesta**. Al tocarlo, APPI crea la invitación, muestra la animación de envío y abre WhatsApp con el mensaje listo, donde el distribuidor elige el contacto desde su propia agenda. Cada toque genera una invitación privada diferente, que vence en 24 horas, queda ligada al primer dispositivo que la abre y acepta una sola respuesta.
@@ -121,6 +129,7 @@ La suite cubre la aplicación, autenticación, aislamiento por cuenta, solicitud
 - `index.html`: aplicación principal.
 - `encuesta.html`: formulario público responsive.
 - `gestion-client.js`: Mi Encuesta y Mi Gestión dentro de APPI.
+- `whatsapp-app.js`: elige entre WhatsApp y WhatsApp Business al abrir mensajes en Android.
 - `device-bridge.js`: vinculación y solicitudes de llamada entre dispositivos.
 - `qr-code.js`: QR local para vincular teléfonos (MIT).
 - `auth-config.js`: configuración pública de Supabase.

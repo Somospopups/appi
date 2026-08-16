@@ -1,10 +1,11 @@
-const CACHE_NAME = 'appi-v220-notas-escritas';
+const CACHE_NAME = 'appi-v221-elegir-whatsapp';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
   './index.html',
   './auth-config.js',
   './appi-dialog.js',
+  './whatsapp-app.js',
   './auth-client.js',
   './data-sync.js',
   './admin-panel.js',

@@ -233,7 +233,9 @@ async function startShareFlow(){
     const invitation=await createSurveyInvitation(false),url=surveyUrl(invitation);
     await playShareAnimation(button);
     const wa=`https://wa.me/?text=${encodeURIComponent(shareMessage(url))}`;
-    if(popup)popup.location.href=wa;else location.href=wa;
+    // El popup ya está abierto dentro del gesto; APPIWhatsApp lo redirige a la app elegida.
+    if(window.APPIWhatsApp) await window.APPIWhatsApp.abrir(wa,{popup});
+    else if(popup)popup.location.href=wa;else location.href=wa;
   }catch(error){
     if(popup)popup.close();
     button.classList.remove('sending','done');

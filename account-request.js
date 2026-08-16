@@ -16,7 +16,7 @@ async function submit({nombre,socio_nombre='',dip,telefono,website=''}){return c
 async function openSupport(message){
   const config=await getConfig(),number=String(config.whatsapp||'').replace(/\D/g,'');
   if(!number)throw new Error('El WhatsApp de soporte todavía no está configurado.');
-  window.open(`https://wa.me/${number}?text=${encodeURIComponent(message||'Hola POPUPS, necesito ayuda para ingresar a APPI.')}`,'_blank','noopener');
+  window.APPIWhatsApp.abrir(`https://wa.me/${number}?text=${encodeURIComponent(message||'Hola POPUPS, necesito ayuda para ingresar a APPI.')}`);
 }
 window.APPIAccountRequest={getConfig,submit,openSupport};
 })();
