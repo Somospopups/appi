@@ -47,12 +47,15 @@ begin
     raise exception 'La cuenta no tiene un socio configurado.' using errcode = 'P0001';
   end if;
 
-  update public.appi_encuesta_invitaciones
+  -- El alias evita el choque con la columna de salida `expires_at` declarada
+  -- en `returns table(...)`: sin calificar, Postgres no sabe si se refiere a la
+  -- columna de la tabla o a la variable, y aborta con 42702 (ambiguous).
+  update public.appi_encuesta_invitaciones as vigente
   set revoked_at = now(), updated_at = now()
-  where user_id = owner_profile.user_id
-    and used_at is null
-    and revoked_at is null
-    and expires_at <= now();
+  where vigente.user_id = owner_profile.user_id
+    and vigente.used_at is null
+    and vigente.revoked_at is null
+    and vigente.expires_at <= now();
 
   insert into public.appi_encuesta_invitaciones as created (user_id, persona_tipo)
   values (owner_profile.user_id, requested_person)
