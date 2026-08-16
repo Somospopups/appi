@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v228-mi-carrera';
+const CACHE_NAME = 'appi-v229-los-8-pasos';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

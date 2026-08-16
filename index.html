@@ -3499,10 +3499,11 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-usuarios" onclick="showView('view-usuarios')"><span>📍</span> Usuarios</button>
     <button class="ds-btn" data-ds="view-gestion" onclick="openMiGestion()"><span>📇</span> Panel de Contactos <span class="gestion-sidebar-badge" id="gestionSidebarBadge" hidden>0</span></button>
     <div class="ds-section-label">Mis herramientas</div>
+    <button class="ds-btn" data-ds="view-ocho" onclick="openOcho()"><span>🧭</span> Los 8 Pasos</button>
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v228 · Mi carrera</div>
+  <div class="ds-foot">APPI · v229 · Los 8 Pasos</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -3779,6 +3780,37 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
       <p id="sieteDetailSub">—</p>
     </header>
     <div id="sieteDetailContent"></div>
+  </section>
+
+  <!-- LOS 8 PASOS DEL NEGOCIO -->
+  <section id="view-ocho" class="view">
+    <style>
+      .ocho-wrap{padding:14px}
+      .ocho-intro{margin:4px 2px 12px;font-size:12px;font-weight:700;color:#686977;line-height:1.5}
+      body.dark .ocho-intro{color:#b8b9c5}
+      .ocho-card{margin:0 0 10px;padding:14px;border-radius:18px;background:rgba(255,255,255,.62);border:1px solid rgba(255,255,255,.78)}
+      body.dark .ocho-card{background:#25273a;border-color:rgba(255,255,255,.08)}
+      .ocho-head{display:flex;align-items:center;gap:8px}
+      .ocho-num{width:24px;height:24px;border-radius:8px;display:grid;place-items:center;color:#fff;font-size:12px;font-weight:950}
+      .ocho-ico{font-size:17px}
+      .ocho-head h3{margin:0;font-size:13.5px;color:#343441}
+      body.dark .ocho-head h3{color:#f2f2f7}
+      .ocho-card p{margin:8px 0 10px;font-size:11.5px;font-weight:650;color:#556277;line-height:1.5}
+      body.dark .ocho-card p{color:#b8b9c5}
+      .ocho-acciones{display:flex;gap:7px;flex-wrap:wrap}
+      .ocho-btn{border:1px solid rgba(91,141,239,.25);border-radius:11px;padding:8px 11px;background:rgba(91,141,239,.08);color:#3d63c9;font:inherit;font-size:11px;font-weight:850;cursor:pointer}
+      body.dark .ocho-btn{background:rgba(91,141,239,.15);color:#a8c0ff}
+    </style>
+    <header class="top">
+      <button class="back-btn" onclick="showView('view-home')" aria-label="Volver">‹</button>
+      <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
+      <h1>Los 8 Pasos</h1>
+      <div class="script">del Negocio</div>
+    </header>
+    <div class="ocho-wrap">
+      <p class="ocho-intro">El camino que propone la formación de POPUPS. <b>Es cíclico:</b> no se vive una sola vez, se recorre todos los meses. Tocá cada paso para ir a su herramienta.</p>
+      <div id="ochoSteps"></div>
+    </div>
   </section>
 
   <!-- PRESUPUESTO MENSUAL -->
@@ -4633,12 +4665,12 @@ function showView(id){
     b.classList.toggle('active', b.dataset.view===id);
   });
   // Sidebar escritorio: marcar activo (con equivalencias de sub-vistas)
-  const dsMap = {'view-home':'view-home','view-presu':'view-presu','view-presu-hist':'view-presu','view-equipo':'view-equipo','view-historico':'view-historico','view-usuarios':'view-usuarios','view-seguimiento':'view-seguimiento','view-encuesta':'view-encuesta','view-gestion':'view-gestion','view-grabadora':'view-grabadora','view-notas':'view-notas','view-siete':'view-siete','view-siete-detail':'view-siete'};
+  const dsMap = {'view-home':'view-home','view-presu':'view-presu','view-presu-hist':'view-presu','view-equipo':'view-equipo','view-historico':'view-historico','view-usuarios':'view-usuarios','view-seguimiento':'view-seguimiento','view-encuesta':'view-encuesta','view-gestion':'view-gestion','view-grabadora':'view-grabadora','view-notas':'view-notas','view-siete':'view-siete','view-siete-detail':'view-siete','view-ocho':'view-ocho'};
   const dsTarget = (id==='view-wheel'||id==='view-eval') ? `rueda-${currentRueda||'vida'}` : (dsMap[id] || '');
   document.querySelectorAll('#deskSidebar .ds-btn').forEach(b=>{
     b.classList.toggle('active', b.dataset.ds===dsTarget);
   });
-  const hideTabsOn = ['view-home','view-siete','view-siete-detail','view-presu','view-presu-hist','view-equipo','view-historico','view-seguimiento','view-planning','view-encuesta','view-gestion','view-grabadora','view-notas','view-usuarios','view-admin'];
+  const hideTabsOn = ['view-home','view-siete','view-siete-detail','view-ocho','view-presu','view-presu-hist','view-equipo','view-historico','view-seguimiento','view-planning','view-encuesta','view-gestion','view-grabadora','view-notas','view-usuarios','view-admin'];
   document.getElementById('tabs').style.display = hideTabsOn.includes(id) ? 'none' : 'flex';
   if(id==='view-eval')    try{ renderAreas(); }catch(e){ console.error(e); }
   if(id==='view-wheel')   try{ renderWheel(); }catch(e){ console.error(e); }
@@ -4827,6 +4859,49 @@ const PROGRESO_ITEMS = [
   { key:'ganancias', name:'Ganancias' }, { key:'movimientos', name:'Movimientos' }, { key:'llamadas', name:'Llamadas' }
 ];
 let sieteState = null;
+
+// ============ LOS 8 PASOS DEL NEGOCIO (v229) ============
+// El ciclo que enseña el material de acompañamiento POPUPS.
+// Cada paso enlaza a la herramienta de APPI que lo ejecuta.
+// (Las 7 P quedan aparte: son el método mensual, no este ciclo.)
+const OCHO_PASOS = [
+  { n:1, title:'Propósito, sueños y metas', icon:'🧭', color:'#5b8def',
+    desc:'Definí tu “para qué” y animáte a soñar: la rueda y tu escalera de sueños son el combustible del negocio.',
+    acciones:[['Abrir la Rueda de la Vida',"openRueda('vida')"]] },
+  { n:2, title:'Compromiso', icon:'🤝', color:'#7a6bff',
+    desc:'El compromiso es con vos y con tu “para qué”. No es cumplir: es comprometerte a que suceda.',
+    acciones:[['Trabajarlo en Las 7 P','openSiete()']] },
+  { n:3, title:'Banco de datos', icon:'📇', color:'#a06bff',
+    desc:'Tu lista de contactos es la materia prima: actualizala a diario y pedí referidos.',
+    acciones:[['Abrir el Panel de Contactos','openMiGestion()']] },
+  { n:4, title:'Contacto e invitación', icon:'📨', color:'#c96bff',
+    desc:'Conectá cada contacto con una invitación: la encuesta es tu herramienta de retorno.',
+    acciones:[['Ir a Mi Encuesta',"showView('view-encuesta')"]] },
+  { n:5, title:'Presentación', icon:'🎤', color:'#ff6bcf',
+    desc:'La demostración genera el contacto de verdad: presentá escuchando a la otra persona.',
+    acciones:[['Registrar en el Panel','openMiGestion()']] },
+  { n:6, title:'Seguimiento', icon:'🔁', color:'#ff6b9d',
+    desc:'Nadie que levantó la mano queda sin seguimiento: hoy, vencidos y presentaciones en un lugar.',
+    acciones:[['Ver lo pendiente de hoy','openMiGestion()']] },
+  { n:7, title:'Chequeo de resultados', icon:'📊', color:'#ff8f6b',
+    desc:'Revisá números y cierres: qué funcionó, qué no, y qué ajustás la próxima.',
+    acciones:[['Resultados del Panel','openMiGestion()'],['Historial de cierres','openHistorico()']] },
+  { n:8, title:'Evolución y duplicación', icon:'🌱', color:'#ffb26b',
+    desc:'Duplicá en otros lo que duplicaron en vos: tu equipo es el negocio.',
+    acciones:[['Abrir Mi Equipo',"showView('view-equipo')"]] }
+];
+function renderOcho(){
+  const cont=document.getElementById('ochoSteps');
+  if(!cont)return;
+  cont.innerHTML=OCHO_PASOS.map(p=>`
+    <div class="ocho-card">
+      <div class="ocho-head"><span class="ocho-num" style="background:${p.color}">${p.n}</span><span class="ocho-ico">${p.icon}</span><h3>${p.title}</h3></div>
+      <p>${p.desc}</p>
+      <div class="ocho-acciones">${p.acciones.map(a=>`<button type="button" class="ocho-btn" onclick="${a[1]}">${a[0]}</button>`).join('')}</div>
+    </div>`).join('');
+}
+function openOcho(){ showView('view-ocho'); renderOcho(); }
+
 function sieteDefaultState(){
   return {
     month: new Date().getMonth(), year: new Date().getFullYear(),
@@ -9239,6 +9314,13 @@ function renderHomeCompleto(){
       extraKeep.innerHTML=`
         <div class="mini-section-label"><span>⚡</span> Mis herramientas</div>
         <div class="home-mini-tools">
+          <button type="button" class="home-mini-tool" onclick="openOcho()">
+            <div class="home-mini-ico" style="background:linear-gradient(135deg,#5b8def,#3ad0a4)">🧭</div>
+            <div class="home-mini-txt">
+              <strong>Los 8 Pasos</strong>
+              <small>El ciclo del negocio</small>
+            </div>
+          </button>
           <button type="button" class="home-mini-tool" onclick="openGrabadora()">
             <div class="home-mini-ico" style="background:linear-gradient(135deg,#ff6b6b,#a06bff)">🎙️</div>
             <div class="home-mini-txt">
