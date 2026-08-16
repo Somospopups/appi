@@ -100,6 +100,10 @@ test('la primera vez pregunta, después ya no', async ({ browser }) => {
   const page = await ctx.newPage();
   await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => !!window.APPIWhatsApp && !!window.APPIDialog);
+  // El intent no se puede navegar de verdad en el test: lo bloqueamos y espiamos el destino.
+  await page.route('**/*', route => route.request().url().startsWith('intent:') ? route.abort() : route.continue());
+  page.on('request', req => { if (req.url().startsWith('intent:')) intentos.push(req.url()); });
+  const intentos = [];
   await page.evaluate(() => {
     localStorage.removeItem('appi_whatsapp_app');
     window.__destinos = [];
@@ -114,16 +118,66 @@ test('la primera vez pregunta, después ya no', async ({ browser }) => {
   await page.evaluate(() => window.__p);
 
   expect(await page.evaluate(() => window.APPIWhatsApp.preferencia())).toBe('normal');
-  let destinos = await page.evaluate(() => window.__destinos);
-  expect(destinos.join(' ')).toContain('package=com.whatsapp;');
+  await expect.poll(() => intentos.length).toBeGreaterThan(0);
+  expect(intentos[0]).toContain('intent://send');
+  expect(intentos[0]).toContain('phone=549351');
+  // El intent nunca sale por una pestaña nueva.
+  expect(await page.evaluate(() => window.__destinos)).toHaveLength(0);
 
   // Segundo envío: ya no pregunta y usa la app elegida.
-  await page.evaluate(() => { window.__destinos = []; return window.APPIWhatsApp.abrir('https://wa.me/549352?text=Chau'); });
+  await page.evaluate(() => window.APPIWhatsApp.abrir('https://wa.me/549352?text=Chau'));
   await expect(page.locator('.appi-dialog-overlay')).toBeHidden();
-  destinos = await page.evaluate(() => window.__destinos);
-  expect(destinos).toHaveLength(1);
-  expect(destinos[0]).toContain('package=com.whatsapp;');
-  expect(destinos[0]).toContain('phone=549352');
+  await expect.poll(() => intentos.length).toBe(2);
+  expect(intentos[1]).toContain('intent://send');
+  expect(intentos[1]).toContain('phone=549352');
+  await ctx.close();
+});
+
+test('el intent se navega en la pestaña actual, nunca en una nueva', async ({ browser }) => {
+  // Un intent:// abierto con window.open deja una pestaña en blanco: el navegador
+  // no sabe renderizarlo. Tiene que viajar por la pestaña actual.
+  const ctx = await browser.newContext({ userAgent: UA_ANDROID });
+  const page = await ctx.newPage();
+  await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
+  await page.waitForFunction(() => !!window.APPIWhatsApp);
+
+  // La navegación real al intent:// se bloquea para que el test siga vivo.
+  await page.route('**/*', route => route.request().url().startsWith('intent:') ? route.abort() : route.continue());
+
+  const r = await page.evaluate(async () => {
+    window.APPIWhatsApp.setPreferencia('normal');
+    const reg = { open: [], popupHref: [], popupCerrado: false };
+    window.open = url => { reg.open.push(String(url)); return { closed:false, close(){}, location:{ set href(v){ reg.popupHref.push(String(v)); } } }; };
+    const popup = { closed:false, close(){ reg.popupCerrado = true; this.closed = true; }, location:{ set href(v){ reg.popupHref.push(String(v)); } } };
+    await window.APPIWhatsApp.abrir('https://wa.me/549351?text=Hola', { popup });
+    return reg;
+  });
+
+  // No se abrió pestaña nueva ni se mandó el intent a un popup: ahí estaba el blanco.
+  expect(r.open).toHaveLength(0);
+  expect(r.popupHref).toHaveLength(0);
+  // El popup que venía del gesto se cierra para no dejar una pestaña vacía.
+  expect(r.popupCerrado).toBe(true);
+  // Y la app sigue en una sola pestaña, viva.
+  expect(ctx.pages()).toHaveLength(1);
+  await expect(page.locator('body')).toBeVisible();
+  await ctx.close();
+});
+
+test('un enlace wa.me normal (sin intent) sí puede ir a otra pestaña', async ({ browser }) => {
+  // Fuera de Android no hay intent, y ahí el comportamiento de siempre es correcto.
+  const ctx = await browser.newContext({ userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120' });
+  const page = await ctx.newPage();
+  await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
+  await page.waitForFunction(() => !!window.APPIWhatsApp);
+  const r = await page.evaluate(async () => {
+    const reg = { open: [], popupHref: [] };
+    window.open = url => { reg.open.push(String(url)); return { closed:false, close(){}, location:{ set href(v){ reg.popupHref.push(String(v)); } } }; };
+    await window.APPIWhatsApp.abrir('https://wa.me/549351?text=Hola');
+    return reg;
+  });
+  expect(r.open).toHaveLength(1);
+  expect(r.open[0]).toBe('https://wa.me/549351?text=Hola');
   await ctx.close();
 });
 
@@ -153,6 +207,9 @@ test('los enlaces de WhatsApp de la app se interceptan solos', async ({ browser 
   const page = await ctx.newPage();
   await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => !!window.APPIWhatsApp);
+  await page.route('**/*', route => route.request().url().startsWith('intent:') ? route.abort() : route.continue());
+  const intentos = [];
+  page.on('request', req => { if (req.url().startsWith('intent:')) intentos.push(req.url()); });
   await page.evaluate(() => {
     window.APPIWhatsApp.setPreferencia('business');
     window.__destinos = [];
@@ -168,10 +225,10 @@ test('los enlaces de WhatsApp de la app se interceptan solos', async ({ browser 
   });
 
   await page.locator('#linkWa').click();
-  const destinos = await page.evaluate(() => window.__destinos);
-  expect(destinos).toHaveLength(1);
-  expect(destinos[0]).toContain('package=com.whatsapp.w4b;');
-  expect(destinos[0]).toContain('phone=5493511234567');
+  await expect.poll(() => intentos.length).toBe(1);
+  expect(intentos[0]).toContain('intent://send');
+  expect(intentos[0]).toContain('phone=5493511234567');
+  expect(await page.evaluate(() => window.__destinos)).toHaveLength(0);
 
   // Un enlace que no es de WhatsApp no se toca.
   expect(await page.evaluate(() => {

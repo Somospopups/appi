@@ -21,6 +21,8 @@ APPI nombra la aplicación de forma explícita mediante un enlace `intent://` co
 
 Todo pasa por `whatsapp-app.js` (`window.APPIWhatsApp`), que además intercepta los clics en cualquier enlace a `wa.me` o `api.whatsapp.com`. Para excluir un enlace puntual se le agrega `data-no-wa-intent`.
 
+Los enlaces `intent://` se navegan **en la pestaña actual**, nunca con `window.open`: el navegador no puede dibujar un intent y dejaría una pantalla en blanco. Los `wa.me` comunes sí se abren en otra pestaña.
+
 ## Mi Encuesta y Mi Gestión
 
 Desde **Mis herramientas → Mi Encuesta**, la pantalla es un solo botón: **Enviar encuesta**. Al tocarlo, APPI crea la invitación, muestra la animación de envío y abre WhatsApp con el mensaje listo, donde el distribuidor elige el contacto desde su propia agenda. Cada toque genera una invitación privada diferente, que vence en 24 horas, queda ligada al primer dispositivo que la abre y acepta una sola respuesta.

@@ -141,3 +141,29 @@ test('si falla la creación se avisa y se cierra la pestaña abierta', async ({ 
   await expect(page.locator('#surveyShareBtn')).toBeEnabled();
   await expect(page.locator('#surveyShareBtn')).not.toHaveClass(/sending/);
 });
+
+test('en Android el envío no deja una pestaña en blanco', async ({ browser }) => {
+  // El intent:// se navega en la pestaña actual, así que Mi Encuesta no debe
+  // abrir un about:blank que quedaría vacío detrás de WhatsApp.
+  const ctx = await browser.newContext({ userAgent: 'Mozilla/5.0 (Linux; Android 13; Pixel 7) Chrome/120 Mobile' });
+  const page = await ctx.newPage();
+  const intentos = [];
+  // Se registra antes que los mocks del helper para no pisarlos.
+  await page.route('intent:**', route => { intentos.push(route.request().url()); return route.abort(); });
+  page.on('request', req => { if (req.url().startsWith('intent:') && !intentos.includes(req.url())) intentos.push(req.url()); });
+  await abrirComoDistribuidor(page, [{ id: 'inv-1', token: 'tok-1' }]);
+  await page.evaluate(() => {
+    window.APPIWhatsApp.setPreferencia('normal');
+    window.__aperturas = [];
+    window.open = url => { window.__aperturas.push(String(url)); return { closed:false, close(){}, location:{ set href(v){} } }; };
+  });
+
+  await page.locator('#surveyShareBtn').click();
+
+  await expect.poll(() => intentos.length).toBe(1);
+  expect(intentos[0]).toContain('intent://send');
+  // Ni about:blank ni ninguna otra pestaña.
+  expect(await page.evaluate(() => window.__aperturas)).toHaveLength(0);
+  expect(ctx.pages()).toHaveLength(1);
+  await ctx.close();
+});

@@ -224,9 +224,12 @@ async function startShareFlow(){
   const button=$('surveyShareBtn');
   if(!button||button.disabled)return;
 
-  // La ventana se abre en el mismo gesto del usuario; si se pidiera después de
-  // esperar al servidor, el navegador la bloquearía como popup.
-  const popup=window.open('about:blank','_blank');
+  // En Android el envío viaja por un intent:// en la pestaña actual, así que no
+  // hace falta (ni conviene) abrir una ventana: quedaría un about:blank vacío.
+  // En el resto de las plataformas seguimos abriéndola dentro del gesto del
+  // usuario, porque pedirla después de esperar al servidor la bloquearía.
+  const usaIntent=!!(window.APPIWhatsApp&&window.APPIWhatsApp.esAndroid());
+  const popup=usaIntent?null:window.open('about:blank','_blank');
   button.disabled=true;
   try{
     // La invitación se crea primero: la animación confirma un envío real.

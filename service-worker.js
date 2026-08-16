@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v221-elegir-whatsapp';
+const CACHE_NAME = 'appi-v222-enviar-sin-blanco';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

@@ -93,11 +93,21 @@
      - opts.popup: pestaña ya abierta dentro del gesto del usuario
        (para no perder el permiso de ventana emergente).
      Nunca lanza: si algo falla, cae al wa.me original. */
+  function esIntent(destino){ return /^intent:/i.test(String(destino || '')); }
+
   function abrir(url, opts){
     opts = opts || {};
     var popup = opts.popup || null;
 
     function ir(destino){
+      // Un intent:// NO se puede abrir en una pestaña nueva: el navegador no
+      // sabe dibujarlo y queda una pantalla en blanco. Va siempre en la pestaña
+      // actual; Chrome lanza la app y APPI se mantiene atrás intacta.
+      if(esIntent(destino)){
+        try{ if(popup && !popup.closed) popup.close(); }catch(e){}
+        try{ window.location.href = destino; return true; }catch(e){}
+        return false;
+      }
       try{
         if(popup && !popup.closed){ popup.location.href = destino; return true; }
       }catch(e){}
@@ -164,6 +174,7 @@
 
   window.APPIWhatsApp = {
     esEnlaceWhatsApp: esEnlaceWhatsApp,
+    esIntent: esIntent,
     abrir: abrir,
     construir: construir,
     partirEnlace: partirEnlace,
