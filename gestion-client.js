@@ -35,7 +35,7 @@ async function cloudFetch(path,options={},retry=true){
   let response;
   try{
     response=await fetch(api(path),{...options,cache:'no-store',headers:{apikey:config().anonKey,Authorization:`Bearer ${token()}`,...(options.headers||{})}});
-  }catch(error){const e=new Error('Sin conexión. Mi Gestión mostrará la última copia guardada.');e.network=true;throw e}
+  }catch(error){const e=new Error('Sin conexión. El panel mostrará la última copia guardada.');e.network=true;throw e}
   if(response.status===401&&retry&&window.APPIAuth&&window.APPIAuth.refresh){await window.APPIAuth.refresh();return cloudFetch(path,options,false)}
   const text=await response.text(),body=readJson(text);
   if(!response.ok){const e=new Error(body&&body.message||body&&body.error||text||`Error ${response.status}`);e.status=response.status;throw e}
@@ -145,11 +145,38 @@ function installShareStyles(){
 function installGenteStyles(){
   if(document.getElementById('appiGenteStyles'))return;
   const style=document.createElement('style');style.id='appiGenteStyles';style.textContent=`
-  .gente-acciones{display:grid;gap:10px;margin:0 0 14px}
-  .gente-acciones .share-stage{margin:0}
-  .gente-add{width:100%;border:1.5px dashed #c9b7f5;background:#faf7ff;color:#6b4bb8;font-weight:700;font-size:15px;padding:13px 14px;border-radius:14px;cursor:pointer;transition:background .15s,border-color .15s}
+  .gente-acciones{display:grid;gap:11px;margin:2px 0 14px}
+  /* Los dos accesos principales, mismo ancho y misma altura. */
+  .gente-par{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:stretch}
+  .gente-par>*{min-width:0}
+  .gente-acciones .share-stage{margin:0;height:100%;padding:0;display:block}
+  .gente-acciones .share-btn{width:100%;height:100%;min-height:118px}
+  .gente-add{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;width:100%;min-height:118px;padding:14px 12px;border:1.5px dashed #c9b7f5;border-radius:22px;background:#faf7ff;color:#6b4bb8;cursor:pointer;text-align:center;transition:background .15s,border-color .15s}
+  .gente-add .gente-add-ico{font-size:23px;line-height:1;font-weight:700}
+  .gente-add strong{font-size:15px;font-weight:850}
+  .gente-add small{font-size:11px;opacity:.75}
   .gente-add:hover,.gente-add:focus-visible{background:#f3ecff;border-color:#a06bff}
+  .gente-add.abierto{background:#efe6ff;border-style:solid;border-color:#a06bff}
   .gente-add:active{transform:scale(.99)}
+  .gente-nota{margin:0;padding:10px 13px;border-radius:13px;background:#f4f7ff;border:1px solid rgba(91,141,239,.16);color:#4b5573;font-size:12px;line-height:1.5}
+  .gente-nota b{color:#3d63c9}
+  /* Formulario de alta */
+  .gente-form{display:grid;gap:9px;padding:15px 14px 16px;border-radius:19px;background:#fff;border:1px solid rgba(91,141,239,.17);box-shadow:0 10px 30px rgba(60,70,120,.09)}
+  .gente-form[hidden]{display:none}
+  .gente-form-head{display:flex;align-items:center;justify-content:space-between}
+  .gente-form-head h3{margin:0;font-size:16px;color:#292938}
+  .gente-form-x{border:0;background:rgba(80,90,130,.09);color:#666776;width:30px;height:30px;border-radius:50%;font-size:19px;line-height:1;cursor:pointer}
+  .gente-campo{display:grid;gap:4px}
+  .gente-campo span{font-size:11.5px;font-weight:800;color:#6a6b7a;letter-spacing:.2px}
+  .gente-campo input,.gente-campo select,.gente-campo textarea{width:100%;padding:11px 12px;border:1px solid rgba(80,90,130,.16);border-radius:12px;background:#f8f9ff;color:#292938;font:inherit;font-size:14px;outline:none;box-sizing:border-box}
+  .gente-campo input:focus,.gente-campo select:focus,.gente-campo textarea:focus{border-color:#5b8def;box-shadow:0 0 0 3px rgba(91,141,239,.12)}
+  .gente-campo input.mal,.gente-campo textarea.mal{border-color:#d9534f;box-shadow:0 0 0 3px rgba(217,83,79,.13)}
+  .gente-campo textarea{resize:vertical;min-height:52px}
+  .gente-error{margin:0;padding:9px 11px;border-radius:11px;background:rgba(217,83,79,.09);color:#b8433f;font-size:12.5px;line-height:1.45;font-weight:600}
+  .gente-error[hidden]{display:none}
+  .gente-guardar{margin-top:2px;border:0;border-radius:13px;padding:13px;background:linear-gradient(135deg,#5b8def,#8b63e8);color:#fff;font-weight:850;font-size:15px;cursor:pointer}
+  .gente-guardar:disabled{opacity:.6;cursor:default}
+  @media(max-width:359px){.gente-par{grid-template-columns:1fr}}
   .gente-pendientes{margin:0 0 13px}
   .gente-completar{display:block;width:100%;margin:10px 0 0;border:0;border-radius:12px;padding:11px 12px;background:linear-gradient(135deg,#f59e0b,#f97316);color:#fff;font-weight:800;font-size:14px;cursor:pointer}
   .gente-completar:active{transform:scale(.99)}
@@ -158,7 +185,7 @@ function installGenteStyles(){
 function installV204Styles(){
   if($('appiGestionV204Styles'))return;
   const style=document.createElement('style');style.id='appiGestionV204Styles';style.textContent=`
-  .gestion-main-tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin:0 0 11px;padding:5px;border-radius:17px;background:rgba(255,255,255,.62);border:1px solid rgba(255,255,255,.78);box-shadow:0 8px 22px rgba(68,76,118,.06)}
+  .gestion-main-tabs{display:flex;justify-content:center;gap:5px;margin:0 0 11px;padding:5px;border-radius:17px;background:rgba(255,255,255,.62);border:1px solid rgba(255,255,255,.78);box-shadow:0 8px 22px rgba(68,76,118,.06)}.gestion-main-tabs>.gestion-main-tab{flex:1 1 0;min-width:0;max-width:170px}
   .gestion-main-tab{min-height:43px;border:0;border-radius:12px;background:transparent;color:#70717e;font:inherit;font-size:8.8px;font-weight:950;cursor:pointer;display:grid;place-items:center;gap:2px}.gestion-main-tab span{font-size:15px;line-height:1}.gestion-main-tab.active{color:#fff;background:linear-gradient(135deg,#5b8def,#875fdd);box-shadow:0 5px 13px rgba(91,112,210,.22)}
   .gestion-section-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:14px 3px 8px}.gestion-section-title h3{margin:0;color:#343441;font-size:13px}.gestion-section-title small{color:#858692;font-size:8.5px;font-weight:850}
   .gestion-contact.priority-high{border-left:4px solid #e05b78}.gestion-contact.priority-medium{border-left:4px solid #7b68df}.gestion-contact.overdue{box-shadow:0 9px 24px rgba(217,83,89,.11)}
@@ -227,7 +254,7 @@ function renderSurveyTool(){
         <span class="share-done" aria-hidden="true"><span class="tick">✓</span><b>¡Lista para enviar!</b></span>
       </button>
     </div>
-    <p class="share-hint">Cada envío crea una encuesta nueva. Las respuestas aparecen solas en <b>Mi Gestión</b>.</p>`;
+    <p class="share-hint">Cada envío crea una encuesta nueva. Las respuestas aparecen solas acá abajo.</p>`;
   if($('surveyShareBtn'))$('surveyShareBtn').onclick=startShareFlow;
 }
 
@@ -279,7 +306,7 @@ async function copyText(text){
 function showToastSafe(message,duration=1800){if(typeof window.showToast==='function')window.showToast(message,duration);else window.APPIDialog.alert(message,{title:'APPI',icon:'✓'})}
 
 async function openEncuestaTool(){
-  // Mi Encuesta se unificó en Mi Gente: el botón de enviar vive arriba de todo.
+  // Mi Encuesta se unificó en el Panel de Contactos: el botón vive arriba de todo.
   return openMiGestion();
 }
 function statusInfo(value){return STATUSES[value]||STATUSES.nuevo}
@@ -340,7 +367,7 @@ function logActivity(contactId,type,detail='',metadata={}){if(!contactId||!userI
 async function persistContact(contact,payload){Object.assign(contact,payload,{updated_at:new Date().toISOString()});saveCache();updateBadges();try{if(!navigator.onLine)throw Object.assign(new Error('offline'),{network:true});await cloudFetch(`/rest/v1/appi_gestion_contactos?id=eq.${encodeURIComponent(contact.id)}`,{method:'PATCH',headers:{'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify(payload)});return true}catch(error){if(error.network){queueMutation(contact.id,'PATCH',payload);return false}throw error}}
 function contactCard(c){const s=statusInfo(c.estado),telDigits=phoneDigits(c.telefono),priority=priorityFor(c),next=nextActionFor(c),type=c.tipo==='referido'?'Referido':c.tipo==='encuestado'?'Encuestado':'Manual',wa=whatsappUrlFor(c),overdue=isOverdueContact(c);return `<article class="gestion-contact priority-${priority.level} ${overdue?'overdue':''}" data-contact-id="${esc(c.id)}"><div class="gestion-contact-top"><div class="gestion-avatar">${c.tipo==='referido'?'👥':'👤'}</div><div><h3>${esc(c.nombre||'Sin nombre')}</h3><div class="gestion-contact-line">📱 ${esc(c.telefono||'Sin teléfono')}</div>${c.zona?`<div class="gestion-contact-line">📍 ${esc(c.zona)}</div>`:''}</div><span class="gestion-status" style="color:${s.color};background:${s.color}18">${s.icon} ${esc(s.label)}</span></div><div class="gestion-priority-row"><span class="gestion-priority-pill ${priority.level}">${esc(priority.label)}</span><span class="gestion-priority-reason">${esc(priority.reasons.join(' · ')||type)}</span></div><div class="gestion-tags"><span class="gestion-tag source">${esc(type)}</span>${c.referido_por?`<span class="gestion-tag">Referido por ${esc(c.referido_por)}</span>`:''}${Number(c.cantidad_origenes)>1?`<span class="gestion-tag">${Number(c.cantidad_origenes)} orígenes</span>`:''}</div><div class="gestion-next-action ${next.due?'due':''}">${esc(next.text)}</div><div class="gestion-contact-actions"><a class="wa" href="${esc(wa)}" target="_blank" rel="noopener" data-contact-channel="whatsapp" data-contact-id="${esc(c.id)}">💬 WhatsApp</a><a class="call" href="tel:${telDigits}" data-contact-channel="llamada" data-contact-id="${esc(c.id)}">📞 Llamar</a><button type="button" class="detail" data-open-contact="${esc(c.id)}">Ver y gestionar</button></div></article>`}
 
-// ── Mi Gente: alta manual e importación de los Contactos viejos ────────────
+// ── Panel de Contactos: alta manual e importación de los Contactos viejos ──
 // Las dos pasan por la misma función de la base (appi_gente_importar_contacto),
 // así que un teléfono repetido nunca genera dos fichas.
 async function importarPersona(datos){
@@ -359,19 +386,55 @@ async function importarPersona(datos){
 
 function telefonoValido(valor){const d=phoneDigits(valor);return d.length>=8&&d.length<=15}
 
+function genteFormError(mensaje,foco){
+  const caja=$('genteError');
+  if(caja){caja.textContent=mensaje||'';caja.hidden=!mensaje}
+  if(foco&&$(foco)){$(foco).focus();$(foco).classList.add('mal');setTimeout(()=>$(foco)&&$(foco).classList.remove('mal'),1800)}
+}
+function abrirFormularioGente(abrir){
+  const form=$('genteForm'),boton=$('genteNuevo');
+  if(!form)return;
+  form.hidden=!abrir;
+  if(boton)boton.classList.toggle('abierto',!!abrir);
+  if(!abrir&&state.reRender){state.reRender=false;setTimeout(renderManagement,0);return}
+  if(abrir){genteFormError('');if($('genteNombre'))setTimeout(()=>$('genteNombre').focus(),60)}
+}
 async function nuevaPersonaManual(){
-  if(!authorized()){await window.APPIDialog.alert('Necesitás iniciar sesión para agregar personas.',{title:'Mi Gente',icon:'🔒'});return}
-  const nombre=await window.APPIDialog.prompt('¿Cómo se llama?','',{title:'Agregar persona',icon:'👤'});
-  if(nombre===null)return;
-  if(String(nombre).trim().length<2){await window.APPIDialog.alert('Escribí al menos el nombre.',{title:'Falta el nombre',icon:'!'});return}
-  const telefono=await window.APPIDialog.prompt('¿Cuál es su teléfono? Con característica, sin el 0 ni el 15.','',{title:'Agregar persona',icon:'📱'});
-  if(telefono===null)return;
-  if(!telefonoValido(telefono)){await window.APPIDialog.alert('El teléfono tiene que tener entre 8 y 15 números. Sin teléfono no podemos escribirle ni llamarla.',{title:'Revisá el teléfono',icon:'📱'});return}
+  if(!authorized()){await window.APPIDialog.alert('Necesitás iniciar sesión con tu cuenta de distribuidor para agregar contactos.',{title:'Panel de Contactos',icon:'🔒'});return}
+  abrirFormularioGente($('genteForm')&&$('genteForm').hidden);
+}
+async function guardarPersonaManual(){
+  if(!authorized()){genteFormError('Necesitás iniciar sesión para guardar.');return}
+  const nombre=String($('genteNombre')?$('genteNombre').value:'').trim();
+  const telefono=String($('genteTelefono')?$('genteTelefono').value:'').trim();
+  const interes=String($('genteInteres')?$('genteInteres').value:'');
+  const notas=String($('genteNotas')?$('genteNotas').value:'').trim();
+  if(nombre.length<2){genteFormError('Escribí el nombre (al menos 2 letras).','genteNombre');return}
+  if(!telefonoValido(telefono)){genteFormError('El teléfono necesita entre 8 y 15 números, con característica y sin el 0 ni el 15.','genteTelefono');return}
+  const boton=$('genteGuardar');
+  if(boton){boton.disabled=true;boton.textContent='Guardando…'}
+  genteFormError('');
   try{
-    await importarPersona({nombre,telefono,estado:'nuevo'});
-    showToastSafe('Persona agregada ✓');
+    await importarPersona({nombre,telefono,interes,estado:'nuevo',notas});
+    // Se limpia recién cuando la nube confirmó: si falla, no se pierde lo escrito.
+    for(const id of ['genteNombre','genteTelefono','genteNotas'])if($(id))$(id).value='';
+    if($('genteInteres'))$('genteInteres').value='';
+    abrirFormularioGente(false);
+    showToastSafe(`${nombre.split(/\s+/)[0]} ya está en tu panel ✓`);
     await refreshManagement(false);
-  }catch(error){await window.APPIDialog.alert(error.message,{title:'No pudimos agregar',icon:'!'})}
+  }catch(error){
+    genteFormError(mensajeDeAlta(error,nombre));
+  }finally{if($('genteGuardar')){$('genteGuardar').disabled=false;$('genteGuardar').textContent='Guardar contacto'}}
+}
+// La base habla en técnico; acá se traduce a algo accionable.
+function mensajeDeAlta(error,nombre){
+  const crudo=String(error&&error.message||'');
+  if(error&&error.network)return 'Sin internet. Conectate y probá de nuevo.';
+  if(/duplicate key|already exists|uidx/i.test(crudo))return 'Ya tenés a alguien con ese teléfono. Buscalo en la solapa Todos.';
+  if(/teléfono válido|telefono/i.test(crudo))return 'Revisá el teléfono: necesita entre 8 y 15 números.';
+  if(/iniciar sesión|JWT|401/i.test(crudo))return 'Se cerró la sesión. Volvé a entrar y probá otra vez.';
+  if(/function .*does not exist|PGRST202|404/i.test(crudo))return 'Falta correr la migración de la base (SUPABASE_MI_GENTE.sql) en Supabase.';
+  return crudo||`No pudimos guardar a ${nombre}. Probá de nuevo.`;
 }
 
 // Los Contactos viejos vivían solo en este teléfono (localStorage). Se suben
@@ -394,7 +457,7 @@ async function migrarContactosLocales(){
   // se avisan con un cartel fijo en la pantalla, no con una pregunta cada vez.
   if(!conTel.length)return false;
   const detalle=sinTel.length?`\n\nOjo: ${sinTel.length} no tienen teléfono cargado (${sinTel.slice(0,3).map(f=>f.nombre).join(', ')}${sinTel.length>3?'…':''}). Esas quedan en este teléfono hasta que les pongas el número.`:'';
-  const ok=await window.APPIDialog.confirm(`Encontramos ${conTel.length} contacto${conTel.length===1?'':'s'} guardado${conTel.length===1?'':'s'} en este teléfono. ¿Los subimos a Mi Gente para que no se pierdan?${detalle}`,{title:'Traer mis Contactos',icon:'📥',okText:'Sí, subirlos'});
+  const ok=await window.APPIDialog.confirm(`Encontramos ${conTel.length} contacto${conTel.length===1?'':'s'} guardado${conTel.length===1?'':'s'} en este teléfono. ¿Los subimos a tu Panel de Contactos para que no se pierdan?${detalle}`,{title:'Traer mis Contactos',icon:'📥',okText:'Sí, subirlos'});
   if(!ok)return false;
   let subidos=0,fallados=[];
   for(const fila of conTel){
@@ -407,7 +470,7 @@ async function migrarContactosLocales(){
   await refreshManagement(false);
   const resto=fallados.length?`\n\nNo pudimos subir: ${fallados.join(', ')}. Probá de nuevo más tarde.`:'';
   const pendiente=sinTel.length?`\n\nQuedaron ${sinTel.length} sin teléfono. Cargales el número y volvé a entrar para subirlas.`:'';
-  await window.APPIDialog.alert(`Subimos ${subidos} contacto${subidos===1?'':'s'} a Mi Gente.${pendiente}${resto}`,{title:'Listo',icon:'✓'});
+  await window.APPIDialog.alert(`Subimos ${subidos} contacto${subidos===1?'':'s'} a tu panel.${pendiente}${resto}`,{title:'Listo',icon:'✓'});
   return true;
 }
 
@@ -420,17 +483,39 @@ function gentePendientesHTML(){
 function gentePrimaryActionsHTML(){
   if(isAdmin())return '';
   return `<div class="gente-acciones">
-    <div class="share-stage">
-      <button type="button" class="share-btn" id="surveyShareBtn">
-        <span class="glow"></span>
-        <span class="share-face"><span class="plane">📨</span><strong>Enviar encuesta</strong><small>Se abre WhatsApp para elegir el contacto</small></span>
-        <span class="share-fly" aria-hidden="true">✈️</span>
-        <span class="share-trail" aria-hidden="true"><i></i><i></i><i></i></span>
-        <span class="share-done" aria-hidden="true"><span class="tick">✓</span><b>¡Lista para enviar!</b></span>
+    <div class="gente-par">
+      <div class="share-stage">
+        <button type="button" class="share-btn" id="surveyShareBtn">
+          <span class="glow"></span>
+          <span class="share-face"><span class="plane">📨</span><strong>Enviar encuesta</strong><small>Se abre WhatsApp</small></span>
+          <span class="share-fly" aria-hidden="true">✈️</span>
+          <span class="share-trail" aria-hidden="true"><i></i><i></i><i></i></span>
+          <span class="share-done" aria-hidden="true"><span class="tick">✓</span><b>¡Lista!</b></span>
+        </button>
+      </div>
+      <button type="button" class="gente-add" id="genteNuevo">
+        <span class="gente-add-ico">＋</span>
+        <strong>Agregar contacto</strong>
+        <small>Cargalo a mano</small>
       </button>
     </div>
-    <button type="button" class="gente-add" id="genteNuevo">＋ Agregar persona a mano</button>
+    <p class="gente-nota">💡 <b>La encuesta es una herramienta de retorno</b>, no reemplaza el trabajo cara a cara: el contacto de verdad se genera en la demostración.</p>
+    ${genteFormHTML()}
   </div>`;
+}
+
+// Un formulario a la vista, sin ventanitas encadenadas: se ve lo que se carga
+// y el error aparece al lado del campo que lo causó.
+function genteFormHTML(){
+  return `<form class="gente-form" id="genteForm" hidden autocomplete="off">
+    <div class="gente-form-head"><h3>Nuevo contacto</h3><button type="button" class="gente-form-x" id="genteFormCerrar" aria-label="Cerrar">×</button></div>
+    <label class="gente-campo"><span>Nombre y apellido</span><input id="genteNombre" type="text" placeholder="Ej: María López" autocomplete="name" maxlength="120"></label>
+    <label class="gente-campo"><span>Teléfono</span><input id="genteTelefono" type="tel" inputmode="tel" placeholder="Ej: 351 555 1234" autocomplete="tel" maxlength="25"></label>
+    <label class="gente-campo"><span>¿Por qué lo contactamos? (opcional)</span><select id="genteInteres"><option value="">Sin definir</option><option>Producto</option><option>Negocio</option><option>Canjes</option><option>Ambas cosas</option></select></label>
+    <label class="gente-campo"><span>Notas (opcional)</span><textarea id="genteNotas" rows="2" maxlength="1000" placeholder="¿Dónde lo conociste? ¿Qué le interesó?"></textarea></label>
+    <p class="gente-error" id="genteError" hidden></p>
+    <button type="submit" class="gente-guardar" id="genteGuardar">Guardar contacto</button>
+  </form>`;
 }
 function managementTabsHTML(){return `<div class="gestion-main-tabs">${[{id:'hoy',icon:'☀️',label:'Hoy'},{id:'todos',icon:'👥',label:'Todos'},{id:'resultados',icon:'📈',label:'Resultados'}].map(tab=>`<button type="button" class="gestion-main-tab ${state.view===tab.id?'active':''}" data-gestion-view="${tab.id}"><span>${tab.icon}</span>${tab.label}</button>`).join('')}</div>`}
 function emptyManagement(icon,title,text,button=''){return `<div class="gestion-empty"><div class="ico">${icon}</div><h3>${esc(title)}</h3><p>${esc(text)}</p>${button}</div>`}
@@ -439,12 +524,14 @@ function renderFunnelView(){const stages=['nuevo','contactado','seguimiento','pr
 function renderAllView(){const list=filteredContacts();return `<div class="gestion-toolbar"><div class="gestion-search"><input id="gestionSearch" type="search" autocomplete="off" placeholder="Buscar por nombre, teléfono, zona…" value="${esc(state.search)}"><span>⌕</span></div><div class="gestion-filters">${[{id:'todos',label:'Todos'},...Object.entries(STATUSES).map(([id,v])=>({id,label:v.label}))].map(item=>`<button type="button" class="gestion-filter ${state.filter===item.id?'active':''}" data-gestion-filter="${item.id}">${esc(item.label)}${item.id==='todos'?` · ${state.contacts.length}`:` · ${countStatus(item.id)}`}</button>`).join('')}</div></div><div class="gestion-refresh-row"><span>${state.lastLoaded?`Actualizado ${esc(formatDate(state.lastLoaded,true))}`:'Sin actualizar'}${loadQueue().length?` · ${loadQueue().length} pendiente${loadQueue().length===1?'':'s'}`:''}</span><div><button type="button" id="gestionExport">Exportar CSV</button><button type="button" id="gestionRefresh">Actualizar</button></div></div><div class="gestion-list">${list.length?list.map(contactCard).join(''):emptyManagement('📭',state.contacts.length?'No hay coincidencias':'Todavía no hay contactos',state.contacts.length?'Probá otro nombre o estado.':'Compartí una invitación desde Mi Encuesta.')}</div>`}
 function firstContactHours(){const values=[];for(const c of state.contacts){const action=activitiesFor(c.id).filter(a=>['whatsapp_abierto','llamada_iniciada'].includes(a.tipo)).sort((a,b)=>new Date(a.created_at)-new Date(b.created_at))[0];if(action){const diff=(new Date(action.created_at)-new Date(c.created_at))/3600000;if(diff>=0&&diff<720)values.push(diff)}}return values.length?values.reduce((a,b)=>a+b,0)/values.length:null}
 function renderResultsView(){const now=new Date(),monthStart=new Date(now.getFullYear(),now.getMonth(),1),surveys=[...state.surveys.values()].filter(row=>new Date(row.created_at)>=monthStart),newContacts=state.contacts.filter(row=>new Date(row.created_at)>=monthStart),refs=newContacts.filter(row=>row.tipo==='referido').length,converted=newContacts.filter(row=>row.estado==='convertido').length,presentations=newContacts.filter(row=>['presentacion','convertido'].includes(row.estado)).length,rate=newContacts.length?Math.round(converted/newContacts.length*100):0,avgRefs=surveys.length?(surveys.reduce((sum,row)=>sum+(Array.isArray(row.referidos)?row.referidos.length:0),0)/surveys.length).toFixed(1):'0',hours=firstContactHours();return `<section class="gestion-card"><div class="gestion-card-head"><div><h3>Resultados del mes</h3><p>${new Intl.DateTimeFormat('es-AR',{month:'long',year:'numeric'}).format(now)}</p></div><button type="button" class="gestion-secondary" id="gestionExport">Exportar CSV</button></div><div class="gestion-result-grid"><div class="gestion-result"><span>📋</span><b>${surveys.length}</b><small>Encuestas</small></div><div class="gestion-result"><span>👥</span><b>${refs}</b><small>Referidos</small></div><div class="gestion-result"><span>🎯</span><b>${presentations}</b><small>Presentaciones</small></div><div class="gestion-result"><span>✓</span><b>${converted}</b><small>Conversiones</small></div><div class="gestion-result"><span>📈</span><b>${rate}%</b><small>Conversión mensual</small></div><div class="gestion-result"><span>🤝</span><b>${avgRefs}</b><small>Referidos por encuesta</small></div><div class="gestion-result wide"><span>⏱️</span><b>${hours==null?'Sin datos':hours<1?`${Math.round(hours*60)} minutos`:hours<24?`${hours.toFixed(1)} horas`:`${(hours/24).toFixed(1)} días`}</b><small>Tiempo promedio hasta el primer intento de contacto</small></div></div></section>${renderFunnelView()}`}
-function renderManagement(){const c=$('gestionContent');if(!c)return;const abierto=$('gestionDetailOverlay');if(state.enviando||(abierto&&!abierto.hidden)){state.reRender=true;return}if(state.loading&&!state.contacts.length){c.innerHTML=emptyManagement('⏳','Cargando Mi Gente','Estamos recuperando tus contactos, encuestas y actividades.');return}if(state.view==='embudo')state.view='resultados';const title=state.view==='hoy'?'Tu trabajo de hoy':state.view==='resultados'?'Tus resultados':'Toda tu gente',sub=state.view==='hoy'?'APPI ordena primero lo que necesita una acción.':state.view==='resultados'?'Medí actividad, seguimiento y conversión.':'Buscá, filtrá y gestioná cada persona.';c.innerHTML=`<div class="gestion-hero"><div class="eyebrow">Tu gente, en un solo lugar</div><h2>${esc(title)}</h2><p>${esc(sub)}</p></div>${gentePrimaryActionsHTML()}${gentePendientesHTML()}<div class="gestion-offline" id="gestionOffline" ${navigator.onLine?'hidden':''}>Sin conexión: estás viendo la última copia guardada. Los cambios se sincronizarán al reconectar.</div>${managementTabsHTML()}${state.view==='hoy'?renderTodayView():state.view==='embudo'?renderFunnelView():state.view==='resultados'?renderResultsView():renderAllView()}<div class="gestion-detail-overlay" id="gestionDetailOverlay" hidden><aside class="gestion-drawer" id="gestionDrawer" role="dialog" aria-modal="true" aria-label="Detalle del contacto"></aside></div>`;bindManagement();updateBadges();if(state.currentId)openContactDetail(state.currentId,false)}
+function renderManagement(){const c=$('gestionContent');if(!c)return;const abierto=$('gestionDetailOverlay'),form=$('genteForm');if(state.enviando||(abierto&&!abierto.hidden)||(form&&!form.hidden)){state.reRender=true;return}if(state.loading&&!state.contacts.length){c.innerHTML=emptyManagement('⏳','Cargando tus contactos','Estamos recuperando tus contactos, encuestas y actividades.');return}if(state.view==='embudo')state.view='resultados';c.innerHTML=`${gentePrimaryActionsHTML()}${gentePendientesHTML()}<div class="gestion-offline" id="gestionOffline" ${navigator.onLine?'hidden':''}>Sin conexión: estás viendo la última copia guardada. Los cambios se sincronizarán al reconectar.</div>${managementTabsHTML()}${state.view==='hoy'?renderTodayView():state.view==='embudo'?renderFunnelView():state.view==='resultados'?renderResultsView():renderAllView()}<div class="gestion-detail-overlay" id="gestionDetailOverlay" hidden><aside class="gestion-drawer" id="gestionDrawer" role="dialog" aria-modal="true" aria-label="Detalle del contacto"></aside></div>`;bindManagement();updateBadges();if(state.currentId)openContactDetail(state.currentId,false)}
 function setManagementView(view){state.view=view;state.currentId='';renderManagement();window.scrollTo({top:0,behavior:'smooth'})}
 function pendingOutcomeKey(){return `appi_gestion_resultado_pendiente_${userId()}`}
 function setPendingOutcome(contactId,channel){try{localStorage.setItem(pendingOutcomeKey(),JSON.stringify({contactId,channel,at:Date.now()}))}catch(e){}}
 function bindExternalActions(){document.querySelectorAll('[data-contact-channel]').forEach(link=>link.onclick=event=>{const id=link.dataset.contactId,channel=link.dataset.contactChannel,contact=state.contacts.find(item=>item.id===id);if(channel==='llamada'&&window.APPIDeviceBridge&&window.APPIDeviceBridge.shouldBridge()){event.preventDefault();window.APPIDeviceBridge.handleCall(contact);return}setPendingOutcome(id,channel);logActivity(id,channel==='whatsapp'?'whatsapp_abierto':'llamada_iniciada',channel==='whatsapp'?'Se abrió WhatsApp.':'Se inició una llamada.',{canal:channel})});if(window.APPIDeviceBridge)window.APPIDeviceBridge.decorateCallButtons()}
-function bindManagement(){document.querySelectorAll('[data-gestion-view]').forEach(button=>button.onclick=()=>setManagementView(button.dataset.gestionView));if($('gestionSearch'))$('gestionSearch').oninput=e=>{state.search=e.target.value;const pos=e.target.selectionStart;renderManagement();const input=$('gestionSearch');if(input){input.focus();try{input.setSelectionRange(pos,pos)}catch(err){}}};document.querySelectorAll('[data-gestion-filter]').forEach(button=>button.onclick=()=>{state.filter=button.dataset.gestionFilter;renderManagement()});document.querySelectorAll('[data-funnel-status]').forEach(button=>button.onclick=()=>{state.filter=button.dataset.funnelStatus;setManagementView('todos')});document.querySelectorAll('[data-open-contact]').forEach(button=>button.onclick=()=>openContactDetail(button.dataset.openContact));if($('gestionRefresh'))$('gestionRefresh').onclick=()=>refreshManagement(true);if($('gestionExport'))$('gestionExport').onclick=exportCsv;if($('gestionGoSurvey'))$('gestionGoSurvey').onclick=openEncuestaTool;if($('surveyShareBtn'))$('surveyShareBtn').onclick=startShareFlow;if($('genteNuevo'))$('genteNuevo').onclick=nuevaPersonaManual;if($('genteCompletar'))$('genteCompletar').onclick=()=>{if(typeof window.openSeguimiento==='function')window.openSeguimiento()};const overlay=$('gestionDetailOverlay');if(overlay)overlay.onclick=e=>{if(e.target===overlay)closeContactDetail()};bindExternalActions()}
+function bindManagement(){document.querySelectorAll('[data-gestion-view]').forEach(button=>button.onclick=()=>setManagementView(button.dataset.gestionView));if($('gestionSearch'))$('gestionSearch').oninput=e=>{state.search=e.target.value;const pos=e.target.selectionStart;renderManagement();const input=$('gestionSearch');if(input){input.focus();try{input.setSelectionRange(pos,pos)}catch(err){}}};document.querySelectorAll('[data-gestion-filter]').forEach(button=>button.onclick=()=>{state.filter=button.dataset.gestionFilter;renderManagement()});document.querySelectorAll('[data-funnel-status]').forEach(button=>button.onclick=()=>{state.filter=button.dataset.funnelStatus;setManagementView('todos')});document.querySelectorAll('[data-open-contact]').forEach(button=>button.onclick=()=>openContactDetail(button.dataset.openContact));if($('gestionRefresh'))$('gestionRefresh').onclick=()=>refreshManagement(true);if($('gestionExport'))$('gestionExport').onclick=exportCsv;if($('gestionGoSurvey'))$('gestionGoSurvey').onclick=openEncuestaTool;if($('surveyShareBtn'))$('surveyShareBtn').onclick=startShareFlow;if($('genteNuevo'))$('genteNuevo').onclick=nuevaPersonaManual;
+  if($('genteForm'))$('genteForm').onsubmit=e=>{e.preventDefault();guardarPersonaManual()};
+  if($('genteFormCerrar'))$('genteFormCerrar').onclick=()=>abrirFormularioGente(false);if($('genteCompletar'))$('genteCompletar').onclick=()=>{if(typeof window.openSeguimiento==='function')window.openSeguimiento()};const overlay=$('gestionDetailOverlay');if(overlay)overlay.onclick=e=>{if(e.target===overlay)closeContactDetail()};bindExternalActions()}
 function answerValue(value){if(Array.isArray(value))return value.length?value.join(', '):'-';if(value===undefined||value===null||value==='')return '-';return String(value)}
 function surveyDetails(survey){if(!survey)return '<div class="gestion-notice">La respuesta completa no está disponible en esta copia.</div>';const answers=survey.respuestas||{};return Object.entries(ANSWER_LABELS).map(([key,label])=>{let value=answers[key];if(Array.isArray(value)&&value.includes('Otros')&&answers[key+'_otros'])value=value.map(item=>item==='Otros'?answers[key+'_otros']:item);return `<div class="gestion-answer"><span>${esc(label)}</span><span>${esc(answerValue(value))}${key==='agua_importancia'&&value!=='-'?'/10':''}</span></div>`}).join('')}
 function activityInfo(type){return ({encuesta_recibida:['📋','Encuesta recibida'],referido_recibido:['👥','Referido recibido'],contacto_creado:['＋','Contacto creado'],whatsapp_abierto:['💬','WhatsApp abierto'],llamada_iniciada:['📞','Llamada iniciada'],resultado_contacto:['✓','Resultado del contacto'],estado_cambiado:['↻','Estado actualizado'],nota:['📝','Nota guardada'],seguimiento_programado:['📅','Seguimiento programado'],presentacion_programada:['🎯','Presentación programada']})[type]||['•','Actividad']}
@@ -453,7 +540,7 @@ function messageLinksHTML(contact){return `<div class="gestion-message-grid">${[
 function openContactDetail(id,rerender=true){const contact=state.contacts.find(c=>c.id===id);if(!contact)return;state.currentId=id;const overlay=$('gestionDetailOverlay'),drawer=$('gestionDrawer');if(!overlay||!drawer){if(rerender){renderManagement();openContactDetail(id,false)}return}const survey=surveyFor(contact),s=statusInfo(contact.estado),telDigits=phoneDigits(contact.telefono),priority=priorityFor(contact);drawer.innerHTML=`<div class="gestion-drawer-head"><div><h2>${esc(contact.nombre)}</h2><p>${contact.tipo==='referido'?'Referido':contact.tipo==='encuestado'?'Respondió la encuesta':'Contacto manual'} · ${s.icon} ${esc(s.label)}</p></div><button type="button" class="gestion-close" id="gestionDetailClose" aria-label="Cerrar">×</button></div><section class="gestion-detail-section"><div class="gestion-priority-detail"><b>${esc(priority.label)} · ${priority.score} puntos</b><p>${esc(priority.reasons.join(' · ')||'Sin acciones urgentes.')}</p></div></section><section class="gestion-detail-section"><h3>Información de contacto</h3><div class="gestion-detail-row"><span>Teléfono</span><span>${esc(contact.telefono)}</span></div>${contact.referido_por?`<div class="gestion-detail-row"><span>Referido por</span><span>${esc(contact.referido_por)}</span></div>`:''}${contact.relacion?`<div class="gestion-detail-row"><span>Relación</span><span>${esc(contact.relacion)}</span></div>`:''}${contact.zona?`<div class="gestion-detail-row"><span>Zona</span><span>${esc(contact.zona)}</span></div>`:''}<div class="gestion-detail-row"><span>Ingresó</span><span>${esc(formatDate(contact.created_at,true))}</span></div><div class="gestion-contact-actions"><a class="wa" href="${esc(whatsappUrlFor(contact))}" target="_blank" rel="noopener" data-contact-channel="whatsapp" data-contact-id="${esc(contact.id)}">💬 WhatsApp</a><a class="call" href="tel:${telDigits}" data-contact-channel="llamada" data-contact-id="${esc(contact.id)}">📞 Llamar</a><button type="button" class="detail" id="gestionCopyPhone">Copiar teléfono</button></div></section><section class="gestion-detail-section"><h3>Mensajes preparados</h3>${messageLinksHTML(contact)}</section><section class="gestion-detail-section"><h3>Etapa comercial</h3><div class="gestion-status-grid">${Object.entries(STATUSES).map(([sid,v])=>`<button type="button" class="gestion-status-btn ${contact.estado===sid?'active':''}" data-detail-status="${sid}">${v.icon} ${esc(v.label)}</button>`).join('')}</div><div class="gestion-field"><label>Próximo contacto</label><input type="date" id="gestionNextDate" value="${esc(contact.proximo_contacto||'')}"></div><div class="gestion-field"><label>Hora de la presentación (opcional)</label><input type="time" id="gestionNextTime" value="${esc(shortTime(contact.proximo_contacto_hora))}"><small style="color:#777887;font-size:9px;line-height:1.35">Si cargás la hora, APPI te avisa 30 minutos antes en el teléfono vinculado.</small></div><div class="gestion-field"><label>Notas</label><textarea id="gestionNotes" maxlength="5000" placeholder="¿Qué hablaron? ¿Qué tenés que recordar?">${esc(contact.notas||'')}</textarea></div><div class="gestion-detail-actions"><button type="button" class="gestion-primary" id="gestionSaveContact">Guardar cambios</button><button type="button" class="gestion-danger" id="gestionDeleteContact">Eliminar</button></div></section>${contact.tipo==='encuestado'?`<section class="gestion-detail-section"><h3>Respuestas de Mi Encuesta</h3>${surveyDetails(survey)}</section>`:''}<section class="gestion-detail-section"><h3>Historial de actividades</h3>${timelineHTML(contact)}</section>`;overlay.hidden=false;document.body.style.overflow='hidden';$('gestionDetailClose').onclick=closeContactDetail;$('gestionCopyPhone').onclick=()=>copyText(contact.telefono);document.querySelectorAll('[data-detail-status]').forEach(button=>button.onclick=()=>{document.querySelectorAll('[data-detail-status]').forEach(b=>b.classList.remove('active'));button.classList.add('active')});$('gestionSaveContact').onclick=saveCurrentContact;$('gestionDeleteContact').onclick=deleteCurrentContact;bindExternalActions()}
 function closeContactDetail(){const overlay=$('gestionDetailOverlay');if(overlay)overlay.hidden=true;document.body.style.overflow='';state.currentId='';if(state.reRender){state.reRender=false;renderManagement()}}
 async function saveCurrentContact(){const contact=state.contacts.find(c=>c.id===state.currentId);if(!contact)return;const old={estado:contact.estado,notas:contact.notas||'',fecha:contact.proximo_contacto||'',hora:shortTime(contact.proximo_contacto_hora)},selected=document.querySelector('[data-detail-status].active'),payload={estado:selected?selected.dataset.detailStatus:contact.estado,notas:$('gestionNotes').value.trim().slice(0,5000),proximo_contacto:$('gestionNextDate').value||null};payload.proximo_contacto_hora=payload.proximo_contacto?(shortTime($('gestionNextTime')&&$('gestionNextTime').value)||null):null;if(payload.estado!==old.estado&&payload.estado!=='nuevo')payload.ultimo_contacto=new Date().toISOString();const button=$('gestionSaveContact');if(button){button.disabled=true;button.textContent='Guardando…'};try{const online=await persistContact(contact,payload);if(payload.estado!==old.estado)logActivity(contact.id,'estado_cambiado',`Pasó de ${statusInfo(old.estado).label} a ${statusInfo(payload.estado).label}.`,{anterior:old.estado,nuevo:payload.estado});if(payload.notas&&payload.notas!==old.notas)logActivity(contact.id,'nota',payload.notas.slice(0,240));if(((payload.proximo_contacto||'')!==old.fecha||(payload.proximo_contacto_hora||'')!==old.hora)&&payload.proximo_contacto)logActivity(contact.id,payload.estado==='presentacion'?'presentacion_programada':'seguimiento_programado',`Próximo contacto: ${formatDate(payload.proximo_contacto)}${payload.proximo_contacto_hora?` a las ${payload.proximo_contacto_hora}`:''}.`,{fecha:payload.proximo_contacto,hora:payload.proximo_contacto_hora||''});showToastSafe(online?'Cambios guardados ✓':'Guardado en este dispositivo. Se sincronizará al volver internet.',online?1800:3000);closeContactDetail();renderManagement()}catch(error){if(button){button.disabled=false;button.textContent='Guardar cambios'}await window.APPIDialog.alert(error.message,{title:'No pudimos guardar',icon:'!'})}}
-async function deleteCurrentContact(){const contact=state.contacts.find(c=>c.id===state.currentId);if(!contact)return;const ok=await window.APPIDialog.confirm(`Se eliminará a ${contact.nombre} de Mi Gestión.`,{title:'Eliminar contacto',icon:'🗑️',okText:'Eliminar',danger:true});if(!ok)return;state.contacts=state.contacts.filter(c=>c.id!==contact.id);state.activities.delete(contact.id);saveCache();updateBadges();closeContactDetail();renderManagement();try{if(!navigator.onLine)throw Object.assign(new Error('offline'),{network:true});await cloudFetch(`/rest/v1/appi_gestion_contactos?id=eq.${encodeURIComponent(contact.id)}`,{method:'DELETE',headers:{Prefer:'return=minimal'}});showToastSafe('Contacto eliminado')}catch(error){if(error.network){queueMutation(contact.id,'DELETE',null);showToastSafe('Se eliminará de la nube al volver internet.',2600)}else await window.APPIDialog.alert(error.message,{title:'No pudimos eliminar',icon:'!'})}}
+async function deleteCurrentContact(){const contact=state.contacts.find(c=>c.id===state.currentId);if(!contact)return;const ok=await window.APPIDialog.confirm(`Se eliminará a ${contact.nombre} de tu Panel de Contactos.`,{title:'Eliminar contacto',icon:'🗑️',okText:'Eliminar',danger:true});if(!ok)return;state.contacts=state.contacts.filter(c=>c.id!==contact.id);state.activities.delete(contact.id);saveCache();updateBadges();closeContactDetail();renderManagement();try{if(!navigator.onLine)throw Object.assign(new Error('offline'),{network:true});await cloudFetch(`/rest/v1/appi_gestion_contactos?id=eq.${encodeURIComponent(contact.id)}`,{method:'DELETE',headers:{Prefer:'return=minimal'}});showToastSafe('Contacto eliminado')}catch(error){if(error.network){queueMutation(contact.id,'DELETE',null);showToastSafe('Se eliminará de la nube al volver internet.',2600)}else await window.APPIDialog.alert(error.message,{title:'No pudimos eliminar',icon:'!'})}}
 async function chooseFollowupDate(title='Próximo contacto'){const choice=await window.APPIDialog.choose('¿Cuándo querés retomarlo?',[{label:'Mañana',value:1},{label:'En 2 días',value:2},{label:'En una semana',value:7},{label:'Sin fecha',value:0}],{title,icon:'📅'});return choice?addDaysISO(choice):null}
 async function applyContactOutcome(contact,result,channel){const oldStatus=contact.estado;let payload={ultimo_contacto:new Date().toISOString()},detail='';if(result==='no_response'){payload.estado='seguimiento';payload.proximo_contacto=await chooseFollowupDate('No respondió');detail='No respondió; quedó en seguimiento.'}else if(result==='talked'){payload.estado='contactado';detail='Conversación realizada.';const note=await window.APPIDialog.prompt('¿Querés dejar una nota breve?','',{title:'Conversación realizada',icon:'📝',placeholder:'Qué hablaron o qué acordaron…',okText:'Guardar'});if(note)payload.notas=[contact.notas,note.trim()].filter(Boolean).join('\n').slice(0,5000)}else if(result==='presentation'){payload.estado='presentacion';payload.proximo_contacto=await chooseFollowupDate('Programar presentación');detail='Presentación acordada.'}else if(result==='followup'){payload.estado='seguimiento';payload.proximo_contacto=await chooseFollowupDate('Programar seguimiento');detail='Necesita seguimiento.'}else if(result==='converted'){payload.estado='convertido';payload.proximo_contacto=null;detail='Marcado como convertido.'}else if(result==='not_interested'){payload.estado='no_interesado';payload.proximo_contacto=null;detail='Indicó que no está interesado.'}try{await persistContact(contact,payload);logActivity(contact.id,'resultado_contacto',detail,{resultado:result,canal:channel});if(payload.estado!==oldStatus)logActivity(contact.id,'estado_cambiado',`Pasó de ${statusInfo(oldStatus).label} a ${statusInfo(payload.estado).label}.`,{anterior:oldStatus,nuevo:payload.estado});renderManagement();showToastSafe('Resultado guardado ✓')}catch(error){await window.APPIDialog.alert(error.message,{title:'No pudimos guardar el resultado',icon:'!'})}}
 async function maybeAskPendingOutcome(){if(state.outcomeOpen||!authorized())return;let pending;try{pending=JSON.parse(localStorage.getItem(pendingOutcomeKey())||'null')}catch(e){}if(!pending||Date.now()-Number(pending.at)<1200||Date.now()-Number(pending.at)>48*3600000)return;const contact=state.contacts.find(c=>c.id===pending.contactId);localStorage.removeItem(pendingOutcomeKey());if(!contact)return;state.outcomeOpen=true;try{const result=await window.APPIDialog.choose(`¿Qué pasó con ${contact.nombre}?`,[{label:'No respondió',value:'no_response'},{label:'Conversamos',value:'talked'},{label:'Presentación',value:'presentation'},{label:'Seguimiento',value:'followup'},{label:'Convertido',value:'converted'},{label:'No interesado',value:'not_interested'}],{title:pending.channel==='whatsapp'?'Resultado de WhatsApp':'Resultado de la llamada',icon:pending.channel==='whatsapp'?'💬':'📞'});if(result)await applyContactOutcome(contact,result,pending.channel)}finally{state.outcomeOpen=false}}
@@ -473,9 +560,9 @@ async function applyNotificationIntent(intent){if(!intent||!authorized())return 
 function handleNotificationMessage(event){const data=event&&event.data||{};if(data.type!=='APPI_OPEN_COMMAND')return;const kind=String(data.notification||'');if(kind!=='daily_summary'&&kind!=='presentation_reminder')return;const intent={view:'hoy',contacto:String(data.contacto_id||'')};rememberNotification(intent);setTimeout(()=>{applyNotificationIntent(intent)},60)}
 function handleNotificationLink(){const params=new URLSearchParams(location.search),view=params.get('gestion');if(!view)return;const intent={view:'hoy',contacto:String(params.get('contacto')||'')};rememberNotification(intent);setTimeout(()=>{applyNotificationIntent(intent)},60)}
 function resumePendingNotification(){const intent=readNotification();if(intent)setTimeout(()=>{applyNotificationIntent(intent)},80)}
-function notifyDueOnce(){const count=actionCount();if(!count)return;const key=`appi_gestion_aviso_${userId()}_${localISODate()}`;if(localStorage.getItem(key))return;localStorage.setItem(key,'1');if(!$('view-gestion')?.classList.contains('active'))showToastSafe(`Mi Gestión: tenés ${count} acción${count===1?'':'es'} para hoy`,3000)}
+function notifyDueOnce(){const count=actionCount();if(!count)return;const key=`appi_gestion_aviso_${userId()}_${localISODate()}`;if(localStorage.getItem(key))return;localStorage.setItem(key,'1');if(!$('view-gestion')?.classList.contains('active'))showToastSafe(`Panel de Contactos: tenés ${count} acción${count===1?'':'es'} para hoy`,3000)}
 async function refreshManagement(showLoading=false){if(state.loading)return;state.loading=true;if(showLoading)renderManagement();try{await flushQueue();await fetchManagement()}catch(error){state.lastError=error.message;if(!state.contacts.length)loadCache();if(showLoading&&!state.contacts.length){const c=$('gestionContent');if(c)c.innerHTML=`${emptyManagement('⚠️','No pudimos cargar Mi Gestión',error.message,'<button type="button" class="gestion-primary" id="gestionRetry" style="margin-top:12px">Reintentar</button>')}`;if($('gestionRetry'))$('gestionRetry').onclick=()=>refreshManagement(true);state.loading=false;return}}state.loading=false;renderManagement()}
-async function openMiGestion(){if(typeof window.showView==='function')window.showView('view-gestion');if(!authorized()){const c=$('gestionContent');if(c)c.innerHTML=emptyManagement('🔒','Iniciá sesión','Mi Gente necesita una cuenta para identificar tus contactos.');return}if(!state.contacts.length)loadCache();renderManagement();await refreshManagement(!state.contacts.length);const current=document.querySelector('.view.active')?.id;if(current==='view-home'&&typeof window.showView==='function')window.showView('view-gestion');if(navigator.onLine)setTimeout(()=>{migrarContactosLocales().catch(()=>{})},700)}
+async function openMiGestion(){if(typeof window.showView==='function')window.showView('view-gestion');if(!authorized()){const c=$('gestionContent');if(c)c.innerHTML=emptyManagement('🔒','Iniciá sesión','El Panel de Contactos necesita una cuenta para identificar tus contactos.');return}if(!state.contacts.length)loadCache();renderManagement();await refreshManagement(!state.contacts.length);const current=document.querySelector('.view.active')?.id;if(current==='view-home'&&typeof window.showView==='function')window.showView('view-gestion');if(navigator.onLine)setTimeout(()=>{migrarContactosLocales().catch(()=>{})},700)}
 
 function csvCell(value){const text=String(value==null?'':value).replace(/"/g,'""');return `"${text}"`}
 function exportCsv(){
@@ -488,11 +575,11 @@ function injectSections(){
   const grab=$('view-grabadora');if(!grab||$('view-encuesta'))return;
   const wrapper=document.createElement('div');wrapper.innerHTML=`
   <section id="view-encuesta" class="view"><header class="top"><button class="back-btn" id="btnBackEncuesta" aria-label="Volver">‹</button><button class="help-btn" id="btnHelpEncuesta" aria-label="Ayuda">?</button><button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button><h1>Mi</h1><div class="script">Encuesta</div><p>Enviala y seguí las respuestas</p></header><div class="gestion-shell" id="surveyToolContent"></div></section>
-  <section id="view-gestion" class="view"><header class="top"><button class="back-btn" id="btnBackGestion" aria-label="Volver">‹</button><button class="help-btn" id="btnHelpGestion" aria-label="Ayuda">?</button><button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button><h1>Mi</h1><div class="script">Gente</div><p>Enviá encuestas y seguí a cada persona</p></header><div class="gestion-shell" id="gestionContent"></div></section>`;
+  <section id="view-gestion" class="view"><header class="top"><button class="back-btn" id="btnBackGestion" aria-label="Volver">‹</button><button class="help-btn" id="btnHelpGestion" aria-label="Ayuda">?</button><button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button><h1>Panel de</h1><div class="script">Contactos</div><p>Enviá encuestas y seguí a cada persona</p></header><div class="gestion-shell" id="gestionContent"></div></section>`;
   const sections=[...wrapper.children];sections.forEach(section=>grab.parentNode.insertBefore(section,grab));
   $('btnBackEncuesta').onclick=()=>{window.showView('view-home');if(window.renderHomeCompleto)window.renderHomeCompleto()};$('btnBackGestion').onclick=()=>{closeContactDetail();window.showView('view-home');if(window.renderHomeCompleto)window.renderHomeCompleto()};
-  $('btnHelpEncuesta').onclick=()=>window.APPIDialog.alert('Tocá Enviar encuesta y elegí a quién se la mandás. Se abre WhatsApp con el mensaje listo. Cuando la persona responde, aparece sola en Mi Gestión.',{title:'Cómo usar Mi Encuesta',icon:'📨'});
-  $('btnHelpGestion').onclick=()=>window.APPIDialog.alert('Acá está toda tu gente en un solo lugar. Arriba mandás la encuesta por WhatsApp o agregás a alguien a mano. En Hoy ves lo que necesita una acción, en Todos buscás a cualquiera, y en Resultados mirás cómo venís. Al volver de WhatsApp o de una llamada, registrá el resultado.',{title:'Cómo usar Mi Gente',icon:'🤝'});
+  $('btnHelpEncuesta').onclick=()=>window.APPIDialog.alert('Tocá Enviar encuesta y elegí a quién se la mandás. Se abre WhatsApp con el mensaje listo. Cuando la persona responde, aparece sola en tu Panel de Contactos.',{title:'Cómo usar Mi Encuesta',icon:'📨'});
+  $('btnHelpGestion').onclick=()=>window.APPIDialog.alert('Acá están todos tus contactos en un solo lugar. Arriba mandás la encuesta por WhatsApp o cargás a alguien a mano. Recordá que la encuesta es una herramienta de retorno: el contacto de verdad se genera en la demostración. En Hoy ves lo que necesita una acción, en Todos buscás a cualquiera, y en Resultados mirás cómo venís.',{title:'Cómo usar el Panel de Contactos',icon:'📇'});
 }
 
 function startPolling(){clearInterval(state.pollTimer);state.pollTimer=setInterval(()=>{const active=document.getElementById('view-gestion')?.classList.contains('active');if(active&&authorized()&&navigator.onLine&&!state.loading)refreshManagement(false)},30000)}
@@ -513,6 +600,6 @@ function init(){
 window.openEncuestaTool=openEncuestaTool;
 window.openMiGestion=openMiGestion;
 window.closeGestionDetail=closeContactDetail;
-window.APPIGestion={state,open:openMiGestion,importarPersona,migrarContactosLocales,contactosPendientes,telefonoValido,nuevaPersonaManual,refresh:refreshManagement,createInvitation:createSurveyInvitation,surveyUrl,shareMessage,flushQueue,updateBadges,priorityFor,messageFor,actionableContacts,logActivity,setView:setManagementView,prepareBulk:addBulkRecipients,processPendingOutcome:maybeAskPendingOutcome};
+window.APPIGestion={state,open:openMiGestion,importarPersona,guardarPersonaManual,migrarContactosLocales,contactosPendientes,telefonoValido,nuevaPersonaManual,refresh:refreshManagement,createInvitation:createSurveyInvitation,surveyUrl,shareMessage,flushQueue,updateBadges,priorityFor,messageFor,actionableContacts,logActivity,setView:setManagementView,prepareBulk:addBulkRecipients,processPendingOutcome:maybeAskPendingOutcome};
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();

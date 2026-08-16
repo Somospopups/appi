@@ -3496,12 +3496,12 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-equipo" onclick="openEquipo()"><span>🌳</span> Mi Equipo</button>
     <button class="ds-btn" data-ds="view-historico" onclick="openHistorico()"><span>📈</span> Histórico</button>
     <button class="ds-btn" data-ds="view-usuarios" onclick="showView('view-usuarios')"><span>📍</span> Usuarios</button>
+    <button class="ds-btn" data-ds="view-gestion" onclick="openMiGestion()"><span>📇</span> Panel de Contactos <span class="gestion-sidebar-badge" id="gestionSidebarBadge" hidden>0</span></button>
     <div class="ds-section-label">Mis herramientas</div>
-    <button class="ds-btn" data-ds="view-gestion" onclick="openMiGestion()"><span>🤝</span> Mi Gente <span class="gestion-sidebar-badge" id="gestionSidebarBadge" hidden>0</span></button>
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v223 · Mi Gente</div>
+  <div class="ds-foot">APPI · v224 · Panel de Contactos</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -8903,7 +8903,7 @@ function renderToolsList(){
   });
 
   const seguimientoCard = renderHomeQuickCard({
-    icon:'👥', title:'Mi Gente', sub:'Encuestas y seguimiento',
+    icon:'📇', title:'Panel de Contactos', sub:'Encuestas y seguimiento',
     statusVal: `${seguimientoPendientes()}`,
     statusClass: seguimientoPendientes()>0 ? 'pending' : 'empty',
     progressPct: seguimientoProgreso(),
@@ -9229,7 +9229,7 @@ function renderHomeCompleto(){
       const existing2=document.getElementById('homeExtraKeep');
       if(existing2) existing2.remove();
 
-      // Tres herramientas complementarias: Mi Gente + Grabadora + Notas
+      // Tres herramientas complementarias: Panel de Contactos + Grabadora + Notas
       const extraKeep=document.createElement('div');
       extraKeep.id='homeExtraKeep';
       extraKeep.className='home-section-block';
@@ -9240,7 +9240,7 @@ function renderHomeCompleto(){
             <span class="home-tool-badge" id="homeGestionBadge" hidden>0</span>
             <div class="home-mini-ico" style="background:linear-gradient(135deg,#3ad0a4,#5b8def)">🤝</div>
             <div class="home-mini-txt">
-              <strong>Mi Gente</strong>
+              <strong>Panel de Contactos</strong>
               <small>Encuestas, contactos y seguimiento</small>
             </div>
           </button>

@@ -67,13 +67,13 @@ async function abrirComoDistribuidor(page, invitaciones) {
   await expect(page.locator('#surveyShareBtn')).toBeVisible();
 }
 
-test('Mi Gente muestra el botón de enviar arriba, sin datos técnicos', async ({ page }) => {
+test('el Panel de Contactos muestra el botón de enviar arriba, sin datos técnicos', async ({ page }) => {
   await abrirComoDistribuidor(page, []);
 
   const boton = page.locator('#surveyShareBtn');
   await expect(boton).toBeVisible();
   await expect(boton).toContainText('Enviar encuesta');
-  await expect(boton).toContainText('Se abre WhatsApp para elegir el contacto');
+  await expect(boton).toContainText('Se abre WhatsApp');
 
   // Un solo botón para enviar: nada de controles duplicados.
   await expect(page.locator('#surveyShareBtn')).toHaveCount(1);

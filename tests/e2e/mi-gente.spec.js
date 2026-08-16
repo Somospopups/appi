@@ -10,7 +10,7 @@ function tokenFor(sub) {
 
 // Abre APPI con la cuenta de prueba y devuelve las llamadas que llegaron a la
 // función de importar, que es la única puerta de entrada a Mi Gente.
-async function abrirMiGente(page, { contactosLocales = [], yaMigrado = false } = {}) {
+async function abrirMiGente(page, { contactosLocales = [], yaMigrado = false, fallaAlta = '' } = {}) {
   const importados = [];
   const accessToken = tokenFor(USER_ID);
   const now = new Date().toISOString();
@@ -32,6 +32,7 @@ async function abrirMiGente(page, { contactosLocales = [], yaMigrado = false } =
     if (url.pathname === '/rest/v1/appi_perfiles') return route.fulfill({ status: 200, headers: cors, body: JSON.stringify([profile]) });
     if (url.pathname === '/rest/v1/rpc/appi_gente_importar_contacto') {
       const cuerpo = request.postDataJSON();
+      if (fallaAlta) return route.fulfill({ status: 400, headers: cors, body: JSON.stringify({ message: fallaAlta }) });
       importados.push(cuerpo);
       // La base rechaza los teléfonos que no tienen entre 8 y 15 números.
       const digitos = String(cuerpo.p_telefono || '').replace(/\D/g, '');
@@ -60,7 +61,7 @@ async function abrirMiGente(page, { contactosLocales = [], yaMigrado = false } =
   return importados;
 }
 
-test('Mi Gente reúne el envío de encuestas y los contactos en una sola pantalla', async ({ page }) => {
+test('el Panel de Contactos reúne el envío de encuestas y los contactos en una sola pantalla', async ({ page }) => {
   await abrirMiGente(page);
   await page.evaluate(() => openMiGestion());
   await expect(page.locator('#view-gestion')).toHaveClass(/active/);
@@ -74,9 +75,52 @@ test('Mi Gente reúne el envío de encuestas y los contactos en una sola pantall
 
   // El menú lateral ya no ofrece las tres entradas viejas.
   const menu = await page.locator('#deskSidebar').innerText();
-  expect(menu).toContain('Mi Gente');
+  expect(menu).toContain('Panel de Contactos');
   expect(menu).not.toContain('Mi Gestión');
   expect(menu).not.toContain('Mi Encuesta');
+  expect(menu).not.toContain('Mi Gente');
+
+  // Vive en "Mi negocio", no en "Mis herramientas".
+  const negocio = page.locator('#deskSidebar .ds-section-label', { hasText: 'Mi negocio' });
+  const entrada = page.locator('#deskSidebar [data-ds="view-gestion"]');
+  const orden = await page.evaluate(() => {
+    const nodos = [...document.querySelectorAll('#deskSidebar .ds-section-label, #deskSidebar .ds-btn')];
+    return nodos.map(n => n.className.includes('ds-section-label') ? `SECCION:${n.textContent.trim()}` : `BOTON:${n.dataset.ds}`);
+  });
+  const iNegocio = orden.indexOf('SECCION:Mi negocio');
+  const iHerramientas = orden.indexOf('SECCION:Mis herramientas');
+  const iPanel = orden.indexOf('BOTON:view-gestion');
+  expect(iNegocio).toBeGreaterThanOrEqual(0);
+  expect(iPanel).toBeGreaterThan(iNegocio);
+  expect(iPanel).toBeLessThan(iHerramientas);
+  await expect(negocio).toBeVisible();
+  await expect(entrada).toContainText('Panel de Contactos');
+
+  // El cartel "Tu gente en un solo lugar" se sacó.
+  await expect(page.locator('.gestion-hero')).toHaveCount(0);
+  const pantalla = await page.locator('#gestionContent').innerText();
+  expect(pantalla).not.toContain('Tu gente, en un solo lugar');
+  expect(pantalla).not.toContain('Tu trabajo de hoy');
+
+  // La encuesta se presenta como herramienta de retorno, no como el contacto real.
+  const nota = await page.locator('.gente-nota').innerText();
+  expect(nota.toLowerCase()).toContain('herramienta de retorno');
+  expect(nota.toLowerCase()).toContain('demostración');
+
+  // Los dos accesos comparten fila y miden lo mismo.
+  const enviar = await page.locator('#surveyShareBtn').boundingBox();
+  const agregar = await page.locator('#genteNuevo').boundingBox();
+  expect(Math.abs(enviar.width - agregar.width)).toBeLessThanOrEqual(2);
+  expect(Math.abs(enviar.height - agregar.height)).toBeLessThanOrEqual(2);
+  expect(Math.abs(enviar.y - agregar.y)).toBeLessThanOrEqual(2);
+
+  // Las tres solapas quedan centradas respecto del contenedor.
+  const caja = await page.locator('.gestion-main-tabs').boundingBox();
+  const primera = await page.locator('.gestion-main-tab').first().boundingBox();
+  const ultima = await page.locator('.gestion-main-tab').last().boundingBox();
+  const izquierda = primera.x - caja.x;
+  const derecha = (caja.x + caja.width) - (ultima.x + ultima.width);
+  expect(Math.abs(izquierda - derecha)).toBeLessThanOrEqual(2);
 });
 
 test('los Contactos guardados en el teléfono se ofrecen para subir una sola vez', async ({ page }) => {
@@ -129,30 +173,61 @@ test('un contacto sin teléfono no se pierde en silencio: se avisa y se lo deja 
   expect(guardados).toHaveLength(3);
 });
 
-test('agregar a mano exige un teléfono usable antes de guardar', async ({ page }) => {
+test('agregar un contacto a mano exige un teléfono usable y avisa sin perder lo escrito', async ({ page }) => {
   const importados = await abrirMiGente(page, { yaMigrado: true });
   await page.evaluate(() => openMiGestion());
   await expect(page.locator('#genteNuevo')).toBeVisible();
 
-  // Primer intento: teléfono demasiado corto, no se guarda nada.
+  // El formulario aparece recién al pedirlo.
+  await expect(page.locator('#genteForm')).toBeHidden();
   await page.locator('#genteNuevo').click();
-  await page.locator('#appiDialogInput').fill('Carla Prueba');
-  await page.locator('#appiDialogOk').click();
-  await page.locator('#appiDialogInput').fill('123');
-  await page.locator('#appiDialogOk').click();
-  await expect(page.locator('#appiDialogTitle')).toHaveText('Revisá el teléfono');
-  await expect(page.locator('#appiDialogMessage')).toContainText('entre 8 y 15');
-  await page.locator('#appiDialogOk').click();
+  await expect(page.locator('#genteForm')).toBeVisible();
+
+  // Sin nombre no se guarda nada.
+  await page.locator('#genteGuardar').click();
+  await expect(page.locator('#genteError')).toContainText('nombre');
   expect(importados).toHaveLength(0);
 
-  // Segundo intento con un número real: ahora sí viaja a la nube.
-  await page.locator('#genteNuevo').click();
-  await page.locator('#appiDialogInput').fill('Carla Prueba');
-  await page.locator('#appiDialogOk').click();
-  await page.locator('#appiDialogInput').fill('351 555 4321');
-  await page.locator('#appiDialogOk').click();
+  // Con teléfono corto tampoco, y el error explica qué falta.
+  await page.locator('#genteNombre').fill('Carla Prueba');
+  await page.locator('#genteTelefono').fill('123');
+  await page.locator('#genteGuardar').click();
+  await expect(page.locator('#genteError')).toContainText('entre 8 y 15');
+  expect(importados).toHaveLength(0);
+  // Lo ya escrito sigue ahí: no se pierde el trabajo.
+  await expect(page.locator('#genteNombre')).toHaveValue('Carla Prueba');
+
+  // Con un número real se guarda y el formulario se cierra limpio.
+  await page.locator('#genteTelefono').fill('351 555 4321');
+  await page.locator('#genteNotas').fill('La conocí en la demo del martes.');
+  await page.locator('#genteGuardar').click();
   await expect.poll(() => importados.length).toBe(1);
-  expect(importados[0]).toMatchObject({ p_nombre: 'Carla Prueba', p_telefono: '351 555 4321', p_estado: 'nuevo' });
+  expect(importados[0]).toMatchObject({
+    p_nombre: 'Carla Prueba', p_telefono: '351 555 4321', p_estado: 'nuevo',
+    p_notas: 'La conocí en la demo del martes.'
+  });
+  await expect(page.locator('#genteForm')).toBeHidden();
+  await page.locator('#genteNuevo').click();
+  await expect(page.locator('#genteNombre')).toHaveValue('');
+});
+
+test('si la base rechaza el alta, se explica en criollo y no se pierde lo cargado', async ({ page }) => {
+  await abrirMiGente(page, { yaMigrado: true, fallaAlta: 'duplicate key value violates unique constraint "appi_gestion_contacto_telefono_uidx"' });
+  await page.evaluate(() => openMiGestion());
+  await page.locator('#genteNuevo').click();
+  await page.locator('#genteNombre').fill('Repetida Ok');
+  await page.locator('#genteTelefono').fill('3515559999');
+  await page.locator('#genteGuardar').click();
+
+  // Nada de jerga de base de datos.
+  const error = page.locator('#genteError');
+  await expect(error).toContainText('Ya tenés a alguien con ese teléfono');
+  await expect(error).not.toContainText('constraint');
+  await expect(error).not.toContainText('uidx');
+  // El formulario queda abierto con los datos para corregir.
+  await expect(page.locator('#genteForm')).toBeVisible();
+  await expect(page.locator('#genteNombre')).toHaveValue('Repetida Ok');
+  await expect(page.locator('#genteGuardar')).toBeEnabled();
 });
 
 test('los que quedaron sin teléfono se avisan en pantalla y no se pregunta de nuevo', async ({ page }) => {
