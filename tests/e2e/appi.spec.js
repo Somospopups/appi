@@ -140,14 +140,112 @@ test('las notas Keep se muestran sujetas con un pin', async ({ page }) => {
   });
   await expect(page.locator('#keepGrid .keep-note')).toHaveCount(1);
   await expect(page.locator('#keepGrid .keep-pin')).toHaveCount(1);
-  await page.locator('#keepTitle').fill('Nueva nota');
-  await page.locator('#keepText').fill('Texto');
-  await page.evaluate(()=>window.addKeep());
-  await expect(page.locator('#colorPickerPopup .create-color-dot')).toHaveCount(10);
-  await expect(page.locator('#modalFooter button')).toHaveCount(0);
-  await page.setViewportSize({width:390,height:844});
-  const columns=await page.locator('#colorPickerPopup').evaluate(node=>getComputedStyle(node).gridTemplateColumns.split(' ').filter(Boolean).length);
-  expect(columns).toBe(5);
+});
+
+test('Notas Keep ofrece un solo control principal: grabar', async ({ page }) => {
+  await abrirAppActivada(page);
+  await page.evaluate(() => showView('view-notas'));
+  await expect(page.locator('#keepRecBtn')).toBeVisible();
+  // El formulario viejo (título + texto + guardar) ya no existe.
+  await expect(page.locator('#keepTitle')).toHaveCount(0);
+  await expect(page.locator('#keepText')).toHaveCount(0);
+  // Único botón grande dentro de la tarjeta de voz, más el enlace de escribir a mano.
+  await expect(page.locator('.keep-voice button')).toHaveCount(2);
+  expect(await page.evaluate(() => typeof window.keepToggleVoiceNote)).toBe('function');
+});
+
+test('la nota dictada se arma sola con título y texto', async ({ page }) => {
+  await abrirAppActivada(page);
+  await page.evaluate(() => { localStorage.removeItem('appi_keep_notas'); showView('view-notas'); window.renderKeep(); });
+
+  // Frase corta: va entera al cuerpo, sin título inventado.
+  const corta = await page.evaluate(() => window.keepNoteFromSpeech('comprar pilas para el control'));
+  expect(corta).toEqual({ title: '', text: 'Comprar pilas para el control.' });
+
+  // Frase larga: la primera oración se convierte en título.
+  const larga = await page.evaluate(() => window.keepNoteFromSpeech(
+    'Llamar a Marcela el jueves. Quiere el catálogo nuevo y consultar por la promo de fin de mes.'));
+  expect(larga.title).toBe('Llamar a Marcela el jueves');
+  expect(larga.text).toContain('promo de fin de mes.');
+
+  // Guardar crea la nota, la pinta y le pone color solo.
+  const nota = await page.evaluate(() => window.keepSaveVoiceNote('recordar pedir la factura del pedido de agosto'));
+  expect(nota.origen).toBe('voz');
+  expect(nota.color).toMatch(/^#[0-9a-f]{6}$/i);
+  await expect(page.locator('#keepGrid .keep-note')).toHaveCount(1);
+  await expect(page.locator('#keepGrid .k-text')).toContainText('Recordar pedir la factura');
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem('appi_keep_notas')).length)).toBe(1);
+
+  // Dictado vacío: no crea nota y avisa.
+  const vacia = await page.evaluate(() => window.keepSaveVoiceNote('   '));
+  expect(vacia).toBe(null);
+  await expect(page.locator('#keepGrid .keep-note')).toHaveCount(1);
+  await expect(page.locator('#keepRecStatus')).toHaveClass(/is-error/);
+});
+
+test('el botón de grabar cambia de estado y crea la nota al terminar', async ({ page }) => {
+  await abrirAppActivada(page);
+  await page.evaluate(() => {
+    localStorage.removeItem('appi_keep_notas');
+    // Micrófono y dictado simulados: no hay hardware en el navegador de pruebas.
+    navigator.mediaDevices.getUserMedia = async () => ({ getTracks: () => [{ stop() {} }] });
+    class FakeRecognition {
+      constructor(){ this.onresult=null; this.onerror=null; this.onend=null; }
+      start(){
+        setTimeout(() => this.onresult && this.onresult({
+          resultIndex: 0,
+          results: [Object.assign([{ transcript: 'avisarle a Juan que el pedido llega el martes' }], { isFinal: true })]
+        }), 60);
+      }
+      stop(){ this.onend && this.onend(); }
+      abort(){}
+    }
+    window.SpeechRecognition = FakeRecognition;
+    showView('view-notas');
+    window.renderKeep();
+  });
+
+  await page.locator('#keepRecBtn').click();
+  await expect(page.locator('#keepRecBtn')).toHaveClass(/is-recording/);
+  await expect(page.locator('#keepRecLive')).toContainText('avisarle a Juan');
+
+  await page.waitForTimeout(900);
+  await page.locator('#keepRecBtn').click();
+
+  await expect(page.locator('#keepGrid .keep-note')).toHaveCount(1);
+  await expect(page.locator('#keepGrid .k-text')).toContainText('Avisarle a Juan que el pedido llega el martes.');
+  await expect(page.locator('#keepRecBtn')).not.toHaveClass(/is-recording/);
+  await expect(page.locator('#keepRecLabel')).toHaveText('Grabar nota');
+});
+
+test('un toque accidental no crea notas vacías', async ({ page }) => {
+  await abrirAppActivada(page);
+  await page.evaluate(() => {
+    localStorage.removeItem('appi_keep_notas');
+    navigator.mediaDevices.getUserMedia = async () => ({ getTracks: () => [{ stop() {} }] });
+    delete window.SpeechRecognition; delete window.webkitSpeechRecognition;
+    showView('view-notas');
+    window.renderKeep();
+  });
+  await page.locator('#keepRecBtn').click();
+  await expect(page.locator('#keepRecBtn')).toHaveClass(/is-recording/);
+  await page.locator('#keepRecBtn').click();   // corte inmediato
+  await expect(page.locator('#keepRecStatus')).toContainText('muy cortito');
+  await expect(page.locator('#keepRecStatus')).toHaveClass(/is-error/);
+  await expect(page.locator('#keepGrid .keep-note')).toHaveCount(0);
+  await expect(page.locator('#keepRecBtn')).not.toHaveClass(/is-recording/);
+});
+
+test('sin permiso de micrófono avisa cómo solucionarlo', async ({ page }) => {
+  await abrirAppActivada(page);
+  await page.evaluate(() => {
+    navigator.mediaDevices.getUserMedia = async () => { const e = new Error('denied'); e.name = 'NotAllowedError'; throw e; };
+    showView('view-notas');
+  });
+  await page.locator('#keepRecBtn').click();
+  await expect(page.locator('#keepRecStatus')).toContainText('permiso');
+  await expect(page.locator('#keepRecBtn')).not.toHaveClass(/is-recording/);
+  await expect(page.locator('#keepRecBtn')).toBeEnabled();
 });
 
 test('Contactos distingue pendientes de cerrados', async ({ page }) => {
