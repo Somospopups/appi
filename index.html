@@ -26,7 +26,7 @@ window.openHistorico=function(){
 <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 <meta name="apple-mobile-web-app-title" content="APPI" />
 <meta name="mobile-web-app-capable" content="yes" />
-<meta name="theme-color" content="#eaf1ff" />
+<meta name="theme-color" content="#0e2a60" />
 <title>APPI</title>
 <link rel="icon" href="./icon-192.png" />
 <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
@@ -3536,7 +3536,7 @@ body.dark #bootScreen{background:#101322}
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v234 · Arranque de agua</div>
+  <div class="ds-foot">APPI · v235 · Splash de marca</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -9574,7 +9574,7 @@ document.getElementById('importInput').onchange = (e)=>{
   const applyTheme = (dark)=>{
     document.body.classList.toggle('dark', dark);
     const meta = document.querySelector('meta[name="theme-color"]');
-    if(meta) meta.setAttribute('content', dark ? '#0f1424' : '#eaf1ff');
+    if(meta) meta.setAttribute('content', dark ? '#0f1424' : '#0e2a60');
     if(currentRueda && document.getElementById('view-wheel').classList.contains('active')) renderWheel();
   };
   applyTheme(localStorage.getItem('themeDark') === '1');

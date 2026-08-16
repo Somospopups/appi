@@ -1,14 +1,14 @@
 {
   "id": "/appi/",
-  "name": "APPI - Tu asistente personal",
+  "name": "APPI",
   "short_name": "APPI",
-  "description": "Tu asistente personal de crecimiento y planificación",
+  "description": "Tu negocio, en tu mano: planificación, contactos, equipo y carrera.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#eaf1ff",
-  "theme_color": "#eaf1ff",
+  "background_color": "#0e2a60",
+  "theme_color": "#0e2a60",
   "lang": "es",
   "icons": [
     {
