@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v229-los-8-pasos';
+const CACHE_NAME = 'appi-v230-suenos-demos';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

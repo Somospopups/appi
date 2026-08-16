@@ -41,6 +41,8 @@ window.openHistorico=function(){
 <script src="./qr-code.js"></script>
 <script src="./gestion-client.js"></script>
 <script src="./carrera-empresarial.js"></script>
+<script src="./escalera-suenos.js"></script>
+<script src="./demo-guia.js"></script>
 <script src="./device-bridge.js"></script>
 <style id="historico-inline-css">
 /* APPI · Histórico mensual */
@@ -3500,10 +3502,11 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-gestion" onclick="openMiGestion()"><span>📇</span> Panel de Contactos <span class="gestion-sidebar-badge" id="gestionSidebarBadge" hidden>0</span></button>
     <div class="ds-section-label">Mis herramientas</div>
     <button class="ds-btn" data-ds="view-ocho" onclick="openOcho()"><span>🧭</span> Los 8 Pasos</button>
+    <button class="ds-btn" data-ds="view-suenos" onclick="openSuenos()"><span>🪜</span> Escalera de Sueños</button>
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v229 · Los 8 Pasos</div>
+  <div class="ds-foot">APPI · v230 · Sueños, demos y organización</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -3811,6 +3814,28 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
       <p class="ocho-intro">El camino que propone la formación de POPUPS. <b>Es cíclico:</b> no se vive una sola vez, se recorre todos los meses. Tocá cada paso para ir a su herramienta.</p>
       <div id="ochoSteps"></div>
     </div>
+  </section>
+
+  <!-- ESCALERA DE SUEÑOS -->
+  <section id="view-suenos" class="view">
+    <header class="top">
+      <button class="back-btn" onclick="openOcho()" aria-label="Volver">‹</button>
+      <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
+      <h1>Escalera de Sueños</h1>
+      <div class="script">tu combustible</div>
+    </header>
+    <div id="suenosCont"></div>
+  </section>
+
+  <!-- GUÍA DE DEMOSTRACIÓN -->
+  <section id="view-demo" class="view">
+    <header class="top">
+      <button class="back-btn" onclick="openOcho()" aria-label="Volver">‹</button>
+      <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
+      <h1>Guía de Demo</h1>
+      <div class="script">el contacto de verdad</div>
+    </header>
+    <div id="demoCont"></div>
   </section>
 
   <!-- PRESUPUESTO MENSUAL -->
@@ -4665,12 +4690,12 @@ function showView(id){
     b.classList.toggle('active', b.dataset.view===id);
   });
   // Sidebar escritorio: marcar activo (con equivalencias de sub-vistas)
-  const dsMap = {'view-home':'view-home','view-presu':'view-presu','view-presu-hist':'view-presu','view-equipo':'view-equipo','view-historico':'view-historico','view-usuarios':'view-usuarios','view-seguimiento':'view-seguimiento','view-encuesta':'view-encuesta','view-gestion':'view-gestion','view-grabadora':'view-grabadora','view-notas':'view-notas','view-siete':'view-siete','view-siete-detail':'view-siete','view-ocho':'view-ocho'};
+  const dsMap = {'view-home':'view-home','view-presu':'view-presu','view-presu-hist':'view-presu','view-equipo':'view-equipo','view-historico':'view-historico','view-usuarios':'view-usuarios','view-seguimiento':'view-seguimiento','view-encuesta':'view-encuesta','view-gestion':'view-gestion','view-grabadora':'view-grabadora','view-notas':'view-notas','view-siete':'view-siete','view-siete-detail':'view-siete','view-ocho':'view-ocho','view-suenos':'view-ocho','view-demo':'view-ocho'};
   const dsTarget = (id==='view-wheel'||id==='view-eval') ? `rueda-${currentRueda||'vida'}` : (dsMap[id] || '');
   document.querySelectorAll('#deskSidebar .ds-btn').forEach(b=>{
     b.classList.toggle('active', b.dataset.ds===dsTarget);
   });
-  const hideTabsOn = ['view-home','view-siete','view-siete-detail','view-ocho','view-presu','view-presu-hist','view-equipo','view-historico','view-seguimiento','view-planning','view-encuesta','view-gestion','view-grabadora','view-notas','view-usuarios','view-admin'];
+  const hideTabsOn = ['view-home','view-siete','view-siete-detail','view-ocho','view-suenos','view-demo','view-presu','view-presu-hist','view-equipo','view-historico','view-seguimiento','view-planning','view-encuesta','view-gestion','view-grabadora','view-notas','view-usuarios','view-admin'];
   document.getElementById('tabs').style.display = hideTabsOn.includes(id) ? 'none' : 'flex';
   if(id==='view-eval')    try{ renderAreas(); }catch(e){ console.error(e); }
   if(id==='view-wheel')   try{ renderWheel(); }catch(e){ console.error(e); }
@@ -4867,7 +4892,7 @@ let sieteState = null;
 const OCHO_PASOS = [
   { n:1, title:'Propósito, sueños y metas', icon:'🧭', color:'#5b8def',
     desc:'Definí tu “para qué” y animáte a soñar: la rueda y tu escalera de sueños son el combustible del negocio.',
-    acciones:[['Abrir la Rueda de la Vida',"openRueda('vida')"]] },
+    acciones:[['Abrir la Rueda de la Vida',"openRueda('vida')"],['Escalera de Sueños','openSuenos()']] },
   { n:2, title:'Compromiso', icon:'🤝', color:'#7a6bff',
     desc:'El compromiso es con vos y con tu “para qué”. No es cumplir: es comprometerte a que suceda.',
     acciones:[['Trabajarlo en Las 7 P','openSiete()']] },
@@ -4879,7 +4904,7 @@ const OCHO_PASOS = [
     acciones:[['Ir a Mi Encuesta',"showView('view-encuesta')"]] },
   { n:5, title:'Presentación', icon:'🎤', color:'#ff6bcf',
     desc:'La demostración genera el contacto de verdad: presentá escuchando a la otra persona.',
-    acciones:[['Registrar en el Panel','openMiGestion()']] },
+    acciones:[['Guía de demostración','openDemo()'],['Registrar en el Panel','openMiGestion()']] },
   { n:6, title:'Seguimiento', icon:'🔁', color:'#ff6b9d',
     desc:'Nadie que levantó la mano queda sin seguimiento: hoy, vencidos y presentaciones en un lugar.',
     acciones:[['Ver lo pendiente de hoy','openMiGestion()']] },

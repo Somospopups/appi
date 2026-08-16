@@ -81,10 +81,27 @@
       if (cat === 'D') { C += v; if (v >= 13) orgsD13++; }
       if (cat === 'DC') { Dvol += v; if (v >= 50) orgsDC50++; }
     });
+    // Mantenimiento: PB personales de los últimos 3 meses (planilla).
+    var meses = [Number(raiz.m2) || 0, Number(raiz.m1) || 0, A];
+    // Anchura: patrocinios directos dados de alta este mes.
+    var inicio = new Date(); inicio.setDate(1); inicio.setHours(0, 0, 0, 0);
+    var anchura = (raiz.hijos || []).filter(function(h){
+      return h.alta && new Date(h.alta) >= inicio;
+    }).length;
+    // Pareto: cuánto aporta el 20% más fuerte de la organización.
+    var todas = [];
+    (function juntar(p){ (p.hijos || []).forEach(function(h){ todas.push(h); juntar(h); }); })(raiz);
+    var suma = todas.reduce(function(s, p){ return s + (Number(p.pnAct) || 0); }, 0);
+    var orden = todas.slice().sort(function(a, b){ return (Number(b.pnAct) || 0) - (Number(a.pnAct) || 0); });
+    var top = orden.slice(0, Math.max(1, Math.ceil(orden.length * 0.2)));
+    var sumaTop = top.reduce(function(s, p){ return s + (Number(p.pnAct) || 0); }, 0);
     return {
       A: A, B: B, C: C,
       orgsD13: orgsD13, orgsDC50: orgsDC50,
-      categoria: normalizarCat(eq.titular && eq.titular.categoria) || normalizarCat(raiz.cat) || 'DJ'
+      categoria: normalizarCat(eq.titular && eq.titular.categoria) || normalizarCat(raiz.cat) || 'DJ',
+      meses: meses, anchura: anchura,
+      pareto: suma ? Math.round(sumaTop / suma * 100) : 0,
+      gente: todas.length
     };
   }
 
@@ -157,6 +174,23 @@
     document.head.appendChild(s);
   }
 
+  // Mantenimiento de categoría: 2 de 3 meses con el PB mínimo.
+  function htmlMantenimiento(m){
+    var umbral = m.categoria === 'D' ? 2 : (m.categoria === 'DC' ? 17 : 0);
+    if (!umbral) return '';
+    var nombres = ['hace 2 meses', 'mes pasado', 'este mes'];
+    var cumples = m.meses.filter(function(v){ return v >= umbral; }).length;
+    var detalle = m.meses.map(function(v, i){
+      return nombres[i] + ' ' + (v >= umbral ? '✓' : '·') + ' ' + v + ' PB';
+    }).join(' · ');
+    var alerta = (cumples === 0)
+      ? ' ⚠️ Todavía no cumpliste ningún mes: este mes es clave para conservar la categoría.'
+      : (cumples === 1 ? ' Te falta un mes cumplido más.' : ' ¡Mantenimiento asegurado!');
+    return '<div class="carrera-texto" style="margin-top:7px"><b>Mantenimiento (' +
+      (m.categoria === 'D' ? '(A+B) ≥ 2 PB' : '(A+B+C) ≥ 17 PB') +
+      ', 2 de 3 meses):</b> ' + detalle + '.' + alerta + '</div>';
+  }
+
   function htmlCard(){
     estilo();
     var m = metricas();
@@ -194,6 +228,11 @@
       '<div class="carrera-card">' +
         '<div class="carrera-top"><span class="ico">' + (ICONOS[p.cat] || '🌱') + '</span>' + (NOMBRES[p.cat] || p.cat) + '</div>' +
         '<div class="carrera-vol">(A) ' + m.A + ' PB personal · (B) ' + m.B + ' · (C) ' + m.C + '</div>' +
+        '<div class="carrera-texto" style="margin-top:9px"><b>Lectura de tu organización:</b> ' +
+          (m.gente
+            ? 'anchura ' + m.anchura + ' patrocinio' + (m.anchura === 1 ? '' : 's') + ' nuevo' + (m.anchura === 1 ? '' : 's') + ' este mes · el 20% más fuerte genera el ' + m.pareto + '% del PB.'
+            : 'cargá tu Línea Descendente para ver anchura y Pareto.') + '</div>' +
+        htmlMantenimiento(m) +
         (p.siguiente
           ? '<div class="carrera-texto"><b>Próximo pase: ' + NOMBRES[p.siguiente] + '.</b> ' + p.texto + '</div>' + barras +
             (checklist ? '<div class="carrera-check">' + checklist + '</div>' : '')

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#ff5a36">
+<title>POPUPS · Contanos tu proyecto</title>
+<style>
+  :root{ --coal:#171615; --ink-soft:#514940; --orange:#ff5a36; --paper:#FFFDF9; }
+  *{box-sizing:border-box}
+  body{margin:0;padding:22px 14px 60px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--paper);color:var(--coal)}
+  .wrap{max-width:560px;margin:0 auto}
+  h1{font-size:24px;margin:0 0 6px}
+  .sub{font-size:13px;color:var(--ink-soft);font-weight:650;line-height:1.5;margin:0 0 20px}
+  .field{display:grid;gap:7px;margin-bottom:15px}
+  .field label{font-size:12px;font-weight:850;color:var(--ink-soft)}
+  .field input,.field select,.field textarea{width:100%;padding:13px 14px;border:1px solid #D9CFC4;border-radius:12px;outline:0;color:var(--coal);background:#fff;font:inherit;font-size:14px}
+  .field textarea{min-height:110px;resize:vertical}
+  .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--orange);box-shadow:0 0 0 4px rgba(255,90,54,.13)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:480px){.grid2{grid-template-columns:1fr}}
+  .choices{display:grid;gap:8px}
+  .choice{display:flex;gap:9px;align-items:center;border:1px solid #D9CFC4;border-radius:12px;padding:11px 12px;font-size:13px;font-weight:700;background:#fff;cursor:pointer}
+  .choice input{accent-color:var(--orange)}
+  .send{width:100%;min-height:52px;margin-top:6px;border:0;border-radius:14px;background:var(--orange);color:#fff;font:inherit;font-size:15px;font-weight:950;cursor:pointer}
+  .copy{width:100%;min-height:46px;margin-top:9px;border:1px solid #D9CFC4;border-radius:14px;background:#fff;color:var(--ink-soft);font:inherit;font-size:13px;font-weight:850;cursor:pointer}
+  .ok{margin-top:12px;font-size:13px;font-weight:850;color:#1f9d61;text-align:center;min-height:18px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>✳ POPUPS</h1>
+  <p class="sub">Contanos qué querés ordenar, delegar o preparar. Te leemos y te escribimos para dar el primer paso.</p>
+
+  <form id="leadForm" autocomplete="on">
+    <div class="grid2">
+      <div class="field"><label for="f-nombre">¿Cómo te llamás? *</label><input id="f-nombre" name="nombre" type="text" autocomplete="name" placeholder="Tu nombre" required></div>
+      <div class="field"><label for="f-negocio">¿Cómo se llama tu negocio? *</label><input id="f-negocio" name="negocio" type="text" autocomplete="organization" placeholder="Nombre del negocio" required></div>
+    </div>
+
+    <div class="field"><label for="f-equipo">¿Cuántas personas forman parte del equipo?</label>
+      <select id="f-equipo" name="tamano_equipo">
+        <option value="">Elegí una opción (si querés)</option>
+        <option>Solo yo / todavía no tengo equipo</option>
+        <option>De 2 a 5 personas</option>
+        <option>De 6 a 15 personas</option>
+        <option>De 16 a 40 personas</option>
+        <option>Más de 40 personas</option>
+      </select>
+    </div>
+
+    <div class="field"><label>¿Qué te gustaría resolver? *</label>
+      <div class="choices" role="radiogroup" aria-label="Motivo principal">
+        <label class="choice"><input type="radio" name="motivo_principal" value="Ordenar el desorden cotidiano" required><span>Ordenar el desorden cotidiano</span></label>
+        <label class="choice"><input type="radio" name="motivo_principal" value="Delegar con más tranquilidad"><span>Delegar sin que todo vuelva a mí</span></label>
+        <label class="choice"><input type="radio" name="motivo_principal" value="Preparar una nueva etapa"><span>Preparar una nueva etapa o proyecto</span></label>
+        <label class="choice"><input type="radio" name="motivo_principal" value="Recuperar tiempo y energía"><span>Recuperar tiempo y energía</span></label>
+      </div>
+    </div>
+
+    <div class="field"><label for="f-proyecto">Contanos con tus palabras *</label><textarea id="f-proyecto" name="proyecto_o_idea" placeholder="Por ejemplo: abrir una nueva sede, delegar operaciones, lanzar algo nuevo o recuperar aire para pensar…" required></textarea></div>
+
+    <div class="grid2">
+      <div class="field"><label for="f-email">Tu email *</label><input id="f-email" name="email" type="email" autocomplete="email" placeholder="nombre@negocio.com" required></div>
+      <div class="field"><label for="f-whatsapp">Tu WhatsApp</label><input id="f-whatsapp" name="whatsapp" type="tel" autocomplete="tel" placeholder="+54 …"></div>
+    </div>
+
+    <div class="field"><label for="f-contacto">¿Cómo preferís que te contactemos?</label>
+      <select id="f-contacto" name="preferencia_contacto">
+        <option>Por email</option><option>Por WhatsApp</option><option>Cualquiera de los dos</option>
+      </select>
+    </div>
+
+    <button class="send" type="submit">📨 Enviar por WhatsApp</button>
+    <button class="copy" type="button" id="btnCopiar">📋 Copiar resumen</button>
+    <div class="ok" id="estado"></div>
+  </form>
+</div>
+
+<script>
+// Número de POPUPS al que llegan los leads (mismo número que usa APPI).
+var NUMERO_POPUPS = '5493515638843';
+
+function datos(){
+  var f = document.getElementById('leadForm');
+  var motivo = f.querySelector('input[name="motivo_principal"]:checked');
+  return {
+    nombre: f.nombre.value.trim(),
+    negocio: f.negocio.value.trim(),
+    equipo: f.tamano_equipo.value,
+    motivo: motivo ? motivo.value : '',
+    proyecto: f.proyecto_o_idea.value.trim(),
+    email: f.email.value.trim(),
+    whatsapp: f.whatsapp.value.trim(),
+    contacto: f.preferencia_contacto.value
+  };
+}
+function resumen(d){
+  var msg = '✳ Nuevo lead POPUPS\n';
+  msg += 'Nombre: ' + d.nombre + '\n';
+  msg += 'Negocio: ' + d.negocio + '\n';
+  if (d.equipo) msg += 'Equipo: ' + d.equipo + '\n';
+  msg += 'Motivo: ' + d.motivo + '\n';
+  msg += 'Proyecto: ' + d.proyecto + '\n';
+  msg += 'Email: ' + d.email + '\n';
+  if (d.whatsapp) msg += 'WhatsApp: ' + d.whatsapp + '\n';
+  msg += 'Contacto: ' + d.contacto;
+  return msg;
+}
+document.getElementById('leadForm').addEventListener('submit', function(ev){
+  ev.preventDefault();
+  if (!this.reportValidity()) return;
+  var url = 'https://wa.me/' + NUMERO_POPUPS + '?text=' + encodeURIComponent(resumen(datos()));
+  window.open(url, '_blank', 'noopener');
+  document.getElementById('estado').textContent = 'Se abrió WhatsApp con tu resumen listo para enviar. ¡Gracias!';
+});
+document.getElementById('btnCopiar').onclick = function(){
+  var txt = resumen(datos());
+  var estado = document.getElementById('estado');
+  function fin(){ estado.textContent = 'Resumen copiado. Pegalo donde quieras.'; }
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(txt).then(fin, function(){ manual(); });
+  } else { manual(); }
+  function manual(){
+    var caja = document.createElement('textarea');
+    caja.value = txt; document.body.appendChild(caja);
+    caja.focus(); caja.select();
+    try{ document.execCommand('copy'); fin(); }catch(e){ estado.textContent = 'No se pudo copiar solo: el texto quedó en WhatsApp igual.'; }
+    caja.remove();
+  }
+};
+</script>
+</body>
+</html>
