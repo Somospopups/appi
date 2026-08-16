@@ -71,10 +71,12 @@ test('ningún botón visible muere en silencio', async ({ page }) => {
       if (/salir|eliminar|cerrar sesión/i.test(texto)) continue;
       await boton.click({ timeout: 1500, trial: false }).catch(() => {});
       await page.waitForTimeout(150);
-      // Si se abrió un diálogo, se cierra para seguir recorriendo.
+      // Si se abrió un diálogo o el modal de ayuda, se cierra para seguir recorriendo.
       await page.evaluate(() => {
         const o = document.querySelector('.appi-dialog-overlay');
         if (o) o.hidden = true;
+        const m = document.getElementById('modalOverlay');
+        if (m) m.dispatchEvent(new MouseEvent('click', { bubbles: true }));
       });
     }
   }

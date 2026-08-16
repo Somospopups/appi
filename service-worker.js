@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v232-botones-vivos';
+const CACHE_NAME = 'appi-v233-arranque-limpio';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

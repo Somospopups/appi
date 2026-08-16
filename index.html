@@ -3481,6 +3481,17 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
 
 </head>
 <body>
+<div id="bootScreen"><div class="boot-card"><div class="boot-logo">APPI</div><div class="boot-spin"></div><p>Preparando tu negocio…</p></div></div>
+<style>
+#bootScreen{position:fixed;inset:0;z-index:9990;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,#eef0ff,#fdf0f5)}
+body.dark #bootScreen{background:#171827}
+#bootScreen.gone{opacity:0;pointer-events:none;transition:opacity .35s}
+.boot-card{text-align:center}
+.boot-logo{width:84px;height:84px;margin:0 auto 14px;border-radius:24px;display:grid;place-items:center;background:linear-gradient(135deg,#5b8def,#8b63e8,#ff6bcf);color:#fff;font-size:22px;font-weight:950;box-shadow:0 14px 40px rgba(91,112,210,.35)}
+.boot-spin{width:34px;height:34px;margin:0 auto 10px;border-radius:50%;border:4px solid rgba(91,141,239,.25);border-top-color:#5b8def;animation:bootgirar .9s linear infinite}
+@keyframes bootgirar{to{transform:rotate(360deg)}}
+#bootScreen p{margin:0;font-size:12px;font-weight:850;color:#556277}
+</style>
 <!-- ============ SIDEBAR ESCRITORIO / LANDSCAPE ============ -->
 <aside class="desk-sidebar" id="deskSidebar" aria-label="Navegación principal">
   <div class="ds-brand">
@@ -3506,7 +3517,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v232 · Botones vivos</div>
+  <div class="ds-foot">APPI · v233 · Arranque limpio</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -3806,6 +3817,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     </style>
     <header class="top">
       <button class="back-btn" onclick="showView('view-home')" aria-label="Volver">‹</button>
+      <button class="help-btn" id="btnHelpOcho" aria-label="Ayuda">?</button>
       <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
       <h1>Los 8 Pasos</h1>
       <div class="script">del Negocio</div>
@@ -3820,6 +3832,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
   <section id="view-suenos" class="view">
     <header class="top">
       <button class="back-btn" onclick="openOcho()" aria-label="Volver">‹</button>
+      <button class="help-btn" id="btnHelpSuenos" aria-label="Ayuda">?</button>
       <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
       <h1>Escalera de Sueños</h1>
       <div class="script">tu combustible</div>
@@ -3831,6 +3844,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
   <section id="view-demo" class="view">
     <header class="top">
       <button class="back-btn" onclick="openOcho()" aria-label="Volver">‹</button>
+      <button class="help-btn" id="btnHelpDemo" aria-label="Ayuda">?</button>
       <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
       <h1>Guía de Demo</h1>
       <div class="script">el contacto de verdad</div>
@@ -4365,6 +4379,27 @@ function confirmarAccion({title, sub, html, okText, cancelText, danger, onConfir
 }
 
 const HELP = {
+  ocho: {
+    icon:'🧭', iconBg:'linear-gradient(135deg,#5b8def,#3ad0a4)',
+    title:'Los 8 Pasos', sub:'El ciclo de tu negocio',
+    html:`<p>El camino de la formación, convertido en acciones: propósito y sueños, compromiso, banco de datos, contacto e invitación, presentación, seguimiento, chequeo y evolución.</p>
+    <div class="tip"><strong>CÍCLICO</strong><br/>No se vive una sola vez: se recorre todos los meses.</div>
+    <div class="tip"><strong>CADA PASO, SU HERRAMIENTA</strong><br/>Tocá los botones de cada paso: la rueda, Las 7 P, el Panel, la encuesta, la guía de demo o tu equipo.</div>`
+  },
+  suenos: {
+    icon:'🪜', iconBg:'linear-gradient(135deg,#8b63e8,#ff6bcf)',
+    title:'Escalera de Sueños', sub:'Tu combustible',
+    html:`<p>Escribí tu "para qué" y hasta siete sueños, del más cercano al más grande.</p>
+    <div class="tip"><strong>SE GUARDA SOLO</strong><br/>Queda en tu dispositivo y podés volver cuando quieras.</div>
+    <div class="tip"><strong>COMPARTILA</strong><br/>Con el botón de WhatsApp, compartila con quien te acompaña en el negocio.</div>`
+  },
+  demo: {
+    icon:'🎤', iconBg:'linear-gradient(135deg,#ff6bcf,#ff8f6b)',
+    title:'Guía de Demostración', sub:'El contacto de verdad',
+    html:`<p>Te acompaña en la presentación: conciencia, comparativa, sistema, ficha del equipo y cierre.</p>
+    <div class="tip"><strong>FICHAS</strong><br/>Elegí el purificador y mirá sus beneficios y garantía antes de mostrarlo.</div>
+    <div class="tip"><strong>CIERRE</strong><br/>Al terminar, registrá la presentación en el Panel y el seguimiento queda a la vista.</div>`
+  },
   home: {
     icon:'🏠', iconBg:'linear-gradient(135deg,#5b8def,#a06bff,#ff6b9d)',
     title:'Pantalla principal',
@@ -4383,8 +4418,14 @@ const HELP = {
     <div class="tip"><strong>📅 MI MES</strong><br/>
     Arranca plegado. Adentro está el <b>próximo paso</b>, en este orden: Las 7 P → Presupuesto → Rueda Vida → Rueda Negocio. Al terminar las cuatro, te felicita la planificación del mes.</div>
 
+    <div class="tip"><strong>🏅 MI CARRERA</strong><br/>
+    Tu categoría oficial, lo que falta para el próximo pase, el mantenimiento de categoría y la lectura de tu organización: anchura y Pareto.</div>
+
     <div class="tip"><strong>🌱 MI NEGOCIO</strong><br/>
-    También arranca plegado. Ahí están Mi Equipo, Histórico, Usuarios y Contactos.</div>
+    Ahí están Mi Equipo, Histórico, Usuarios y el Panel de Contactos.</div>
+
+    <div class="tip"><strong>🧭 LOS 8 PASOS Y 🪜 SUEÑOS</strong><br/>
+    En Mis herramientas: el ciclo del negocio con una herramienta por paso, y tu escalera de sueños con el para qué.</div>
 
     <div class="tip"><strong>⚡ HERRAMIENTAS RÁPIDAS</strong><br/>
     Grabadora (grabá y escuchá) y Notas Keep (notas de colores).</div>
@@ -4631,6 +4672,9 @@ document.getElementById('btnHelpSeguimiento')?.addEventListener('click', ()=>sho
 document.getElementById('btnHelpGrabadora')?.addEventListener('click', ()=>showHelp('grabadora'));
 document.getElementById('btnHelpNotas')?.addEventListener('click', ()=>showHelp('notas'));
 document.getElementById('btnHelpUsuarios')?.addEventListener('click', ()=>showHelp('usuarios'));
+document.getElementById('btnHelpOcho')?.addEventListener('click', ()=>showHelp('ocho'));
+document.getElementById('btnHelpSuenos')?.addEventListener('click', ()=>showHelp('suenos'));
+document.getElementById('btnHelpDemo')?.addEventListener('click', ()=>showHelp('demo'));
 document.getElementById('btnBackGrabadora')?.addEventListener('click', ()=>{ showView('view-home'); renderHomeCompleto(); });
 document.getElementById('btnBackNotas')?.addEventListener('click', ()=>{ showView('view-home'); renderHomeCompleto(); });
 document.getElementById('btnBackUsuarios')?.addEventListener('click', ()=>{ showView('view-home'); renderHomeCompleto(); });
@@ -9679,7 +9723,10 @@ async function asegurarPersonaActiva(){
   if(people.length===1)return window.APPIAuth.selectPerson(people[0].tipo);
   const lock=document.getElementById('lockScreen'),overlay=document.getElementById('personChoiceOverlay'),list=document.getElementById('personChoiceList'),requestedPerson=new URLSearchParams(location.search).get('persona');
   const ordered=people.slice().sort((a,b)=>Number(b.tipo===requestedPerson)-Number(a.tipo===requestedPerson));
-  if(lock){lock.style.display='flex';lock.classList.remove('hidden')}document.body.style.overflow='hidden';
+  // El overlay vivía dentro del login; lo sacamos para poder mostrarlo
+  // sin flashear la pantalla de ingreso detrás.
+  if(overlay.parentElement&&overlay.parentElement.id==='lockScreen')document.body.appendChild(overlay);
+  document.body.style.overflow='hidden';
   list.innerHTML=ordered.map(person=>`<button type="button" class="person-choice-option" data-person-type="${person.tipo}"><span class="person-choice-avatar">${person.tipo==='titular'?'👤':'🤝'}</span><span><strong>${escapeXml(person.nombre)}</strong><small>${person.tipo==='titular'?'Titular':'Socio/a'}${person.tipo===requestedPerson?' · Teléfono a vincular':''}</small></span><span class="person-choice-arrow">›</span></button>`).join('');
   overlay.hidden=false;
   return new Promise(resolve=>{
@@ -9697,7 +9744,7 @@ async function completarIngresoDistribuidor(){
 }
 function mostrarCambioPasswordObligatorio(){
   const lock=document.getElementById('lockScreen'),overlay=document.getElementById('forcedPasswordOverlay'),first=document.getElementById('forcedNewPassword'),confirmation=document.getElementById('forcedConfirmPassword'),save=document.getElementById('btnForcedPasswordSave'),error=document.getElementById('forcedPasswordError');
-  if(lock){lock.style.display='flex';lock.classList.remove('hidden')}document.body.style.overflow='hidden';overlay.hidden=false;first.value='';confirmation.value='';error.textContent='';error.classList.remove('show');
+  ocultarBoot();if(lock){lock.style.display='flex';lock.classList.remove('hidden')}document.body.style.overflow='hidden';overlay.hidden=false;first.value='';confirmation.value='';error.textContent='';error.classList.remove('show');
   save.onclick=async()=>{
     error.textContent='';error.classList.remove('show');
     if(first.value!==confirmation.value){error.textContent='Las contraseñas no coinciden.';error.classList.add('show');return}
@@ -9708,6 +9755,7 @@ function mostrarCambioPasswordObligatorio(){
   confirmation.onkeydown=event=>{if(event.key==='Enter')save.click()};setTimeout(()=>first.focus(),60);
 }
 function mostrarPantallaLoginDistribuidor(reason=''){
+  ocultarBoot();
   const lock=document.getElementById('lockScreen'),login=document.getElementById('distributorLoginPanel'),legacy=document.getElementById('legacyActivationPanel');
   if(legacy)legacy.hidden=true;if(login)login.hidden=false;
   if(lock){lock.style.display='flex';lock.classList.remove('hidden')}
@@ -9771,6 +9819,7 @@ function mostrarPantallaLoginDistribuidor(reason=''){
 
 // Muestra la pantalla de bloqueo
 function mostrarPantallaBloqueo() {
+  ocultarBoot();
   if(window.APPIAuth&&window.APPIAuth.isEnabled()){
     mostrarPantallaLoginDistribuidor();
     return;
@@ -9852,8 +9901,12 @@ function avisarMembresiaUsuario(){
   window.APPIDialog.alert(days===0?'Tu membresía vence hoy.':`Tu membresía de APPI vence en ${days} día${days===1?'':'s'}.`,{title:'Membresía por vencer',icon:'⏳',okText:'Entendido'});
 }
 
+function ocultarBoot(){const b=document.getElementById('bootScreen');if(!b||b.classList.contains('gone'))return;b.classList.add('gone');setTimeout(()=>{try{b.remove()}catch(e){}},450);}
+setTimeout(ocultarBoot,6000);
+
 // Inicia la app normalmente
 function iniciarApp() {
+  ocultarBoot();
   const profile=window.APPIAuth&&window.APPIAuth.isEnabled()?window.APPIAuth.currentProfile():null;
   if(profile&&profile.rol==='admin'){
     showView('view-admin');
