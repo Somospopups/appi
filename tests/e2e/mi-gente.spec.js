@@ -61,6 +61,15 @@ async function abrirMiGente(page, { contactosLocales = [], yaMigrado = false, fa
   return importados;
 }
 
+test('el home muestra Panel de Contactos una sola vez, dentro de Mi negocio', async ({ page }) => {
+  await abrirMiGente(page);
+  const negocio = page.locator('#toolsList [data-home-sec="neg"]');
+  await expect(negocio).toContainText('Panel de Contactos');
+  const herramientas = page.locator('#homeExtraKeep');
+  await expect(herramientas).toContainText('Grabadora');
+  await expect(herramientas).not.toContainText('Panel de Contactos');
+});
+
 test('el Panel de Contactos reúne el envío de encuestas y los contactos en una sola pantalla', async ({ page }) => {
   await abrirMiGente(page);
   await page.evaluate(() => openMiGestion());

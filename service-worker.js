@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v225-dialogos-propios';
+const CACHE_NAME = 'appi-v226-que-whatsapp-utilizas';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

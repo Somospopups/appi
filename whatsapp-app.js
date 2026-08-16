@@ -75,13 +75,13 @@
   // Diálogo de elección. Devuelve 'normal' | 'business' | '' (cancelado).
   function preguntar(opts){
     opts = opts || {};
-    var titulo = opts.titulo || '¿Con cuál WhatsApp?';
+    var titulo = opts.titulo || '¿Qué WhatsApp utilizás?';
     var mensaje = opts.mensaje || 'Tenés WhatsApp y WhatsApp Business en este teléfono. Elegí con cuál querés enviar los mensajes de APPI.';
     if(window.APPIDialog && typeof window.APPIDialog.choose === 'function'){
       return window.APPIDialog.choose(mensaje, [
         { value: 'normal',   label: '💬 WhatsApp' },
         { value: 'business', label: '💼 WhatsApp Business' }
-      ], { title: titulo, icon: '📱', cancelText: 'Cancelar' }).then(function(r){
+      ], { title: titulo, icon: '📱', cancelText: 'Cancelar', active: preferencia() || undefined }).then(function(r){
         return (r === 'normal' || r === 'business') ? r : '';
       });
     }
@@ -144,7 +144,7 @@
     var mensaje = actual
       ? 'Ahora los mensajes de APPI se abren en ' + NOMBRE[actual] + '. ¿Con cuál querés enviarlos?'
       : 'Elegí con qué aplicación querés que APPI abra los mensajes de WhatsApp.';
-    return preguntar({ titulo: 'WhatsApp para enviar', mensaje: mensaje }).then(function(elegida){
+    return preguntar({ titulo: '¿Qué WhatsApp utilizás?', mensaje: mensaje }).then(function(elegida){
       if(!elegida) return actual;
       setPreferencia(elegida);
       if(typeof window.showToast === 'function') window.showToast('Se enviará por ' + NOMBRE[elegida]);

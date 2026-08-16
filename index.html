@@ -3501,7 +3501,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v225 · Diálogos propios</div>
+  <div class="ds-foot">APPI · v226 · ¿Qué WhatsApp utilizás?</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -9229,21 +9229,14 @@ function renderHomeCompleto(){
       const existing2=document.getElementById('homeExtraKeep');
       if(existing2) existing2.remove();
 
-      // Tres herramientas complementarias: Panel de Contactos + Grabadora + Notas
+      // Dos herramientas complementarias: Grabadora + Notas.
+      // Panel de Contactos vive solamente en la sección Mi negocio.
       const extraKeep=document.createElement('div');
       extraKeep.id='homeExtraKeep';
       extraKeep.className='home-section-block';
       extraKeep.innerHTML=`
         <div class="mini-section-label"><span>⚡</span> Mis herramientas</div>
         <div class="home-mini-tools">
-          <button type="button" class="home-mini-tool" onclick="openMiGestion()">
-            <span class="home-tool-badge" id="homeGestionBadge" hidden>0</span>
-            <div class="home-mini-ico" style="background:linear-gradient(135deg,#3ad0a4,#5b8def)">🤝</div>
-            <div class="home-mini-txt">
-              <strong>Panel de Contactos</strong>
-              <small>Encuestas, contactos y seguimiento</small>
-            </div>
-          </button>
           <button type="button" class="home-mini-tool" onclick="openGrabadora()">
             <div class="home-mini-ico" style="background:linear-gradient(135deg,#ff6b6b,#a06bff)">🎙️</div>
             <div class="home-mini-txt">
@@ -10127,7 +10120,7 @@ function abrirBackupDesdeMenu(){
     item.hidden=false;
     const txt=document.getElementById('toolsWhatsAppTxt');
     const elegida=window.APPIWhatsApp.preferencia();
-    if(txt) txt.textContent=elegida?('Enviar por '+window.APPIWhatsApp.nombre(elegida)):'WhatsApp para enviar';
+    if(txt) txt.textContent=elegida?('¿Qué WhatsApp utilizás? · '+window.APPIWhatsApp.nombre(elegida)):'¿Qué WhatsApp utilizás?';
   }
   window.actualizarWhatsAppMenuUI=actualizarWhatsAppMenuUI;
   function cerrarToolsMenu(){
@@ -11249,7 +11242,7 @@ body.dark .presu-select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:
     <span class="ti-ico">📲</span><span id="toolsDevicesTxt">Vincular teléfono</span>
   </button>
   <button class="tools-item" id="btnToolsWhatsApp" onclick="cerrarToolsMenu(); window.APPIWhatsApp && window.APPIWhatsApp.elegirDesdeAjustes()" hidden>
-    <span class="ti-ico">💬</span><span id="toolsWhatsAppTxt">WhatsApp para enviar</span>
+    <span class="ti-ico">💬</span><span id="toolsWhatsAppTxt">¿Qué WhatsApp utilizás?</span>
   </button>
   <button class="tools-item" id="btnToolsAccount" onclick="abrirCuentaDesdeMenu()" hidden>
     <span class="ti-ico">👤</span><span>Mi cuenta</span>

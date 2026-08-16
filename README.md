@@ -4,7 +4,7 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
-- Versión: **v225 · Diálogos propios**.
+- Versión: **v226 · ¿Qué WhatsApp utilizás?**.
 - Publicación: [https://somospopups.github.io/appi/](https://somospopups.github.io/appi/)
 - Acceso por número de distribuidor y contraseña.
 - Acceso administrador POPUPS mediante el candado, sin DIP ni número de distribuidor.
@@ -17,7 +17,7 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 Los enlaces `wa.me` son enlaces web, así que en Android los abre la aplicación marcada como predeterminada: en un teléfono con WhatsApp y WhatsApp Business puede no ser la deseada.
 
-APPI nombra la aplicación de forma explícita mediante un enlace `intent://` con el paquete `com.whatsapp` o `com.whatsapp.w4b`. La primera vez que se envía un mensaje en Android, la app pregunta cuál usar y lo recuerda; se cambia desde el menú ⚙️ → **Enviar por WhatsApp**. En iPhone y computadora se usa `wa.me` normal.
+APPI nombra la aplicación de forma explícita mediante un enlace `intent://` con el paquete `com.whatsapp` o `com.whatsapp.w4b`. La primera vez que se envía un mensaje en Android, la app pregunta cuál usar y lo recuerda; se cambia desde el menú ⚙️ → **¿Qué WhatsApp utilizás?**. En iPhone y computadora se usa `wa.me` normal.
 
 Todo pasa por `whatsapp-app.js` (`window.APPIWhatsApp`), que además intercepta los clics en cualquier enlace a `wa.me` o `api.whatsapp.com`. Para excluir un enlace puntual se le agrega `data-no-wa-intent`.
 

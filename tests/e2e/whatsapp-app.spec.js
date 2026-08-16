@@ -240,6 +240,40 @@ test('los enlaces de WhatsApp de la app se interceptan solos', async ({ browser 
   await ctx.close();
 });
 
+test('las dos opciones quedan centradas, parejas y la vigente marcada', async ({ browser }) => {
+  const ctx = await browser.newContext({ userAgent: UA_ANDROID });
+  const page = await ctx.newPage();
+  await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
+  await page.waitForFunction(() => !!window.APPIWhatsApp && !!window.APPIDialog);
+  await page.evaluate(() => window.APPIWhatsApp.setPreferencia('business'));
+
+  await page.evaluate(() => { window.APPIWhatsApp.elegirDesdeAjustes(); });
+  const botones = page.locator('#appiDialogChoices button');
+  await expect(botones).toHaveCount(2);
+
+  // La opción vigente queda marcada; la otra no.
+  await expect(botones.nth(1)).toHaveClass(/active/);
+  await expect(botones.nth(0)).not.toHaveClass(/active/);
+
+  // Mismo tamaño y par centrado respecto de la tarjeta del diálogo.
+  const card = await page.locator('.appi-dialog-card').boundingBox();
+  const b0 = await botones.nth(0).boundingBox();
+  const b1 = await botones.nth(1).boundingBox();
+  expect(Math.abs(b0.width - b1.width)).toBeLessThan(2);
+  const centroPar = (b0.x + b1.x + b1.width) / 2;
+  expect(Math.abs(centroPar - (card.x + card.width / 2))).toBeLessThan(3);
+
+  // Cambiar en el momento: tocar la otra opción queda guardada al instante.
+  await botones.nth(0).click();
+  expect(await page.evaluate(() => window.APPIWhatsApp.preferencia())).toBe('normal');
+
+  // Al reabrir, la nueva elección aparece marcada.
+  await page.evaluate(() => { window.APPIWhatsApp.elegirDesdeAjustes(); });
+  await expect(page.locator('#appiDialogChoices button').nth(0)).toHaveClass(/active/);
+  await page.locator('#appiDialogCancel').click();
+  await ctx.close();
+});
+
 test('fuera de Android no se intercepta nada', async ({ browser }) => {
   const ctx = await browser.newContext({ userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) Safari' });
   const page = await ctx.newPage();
