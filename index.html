@@ -4066,10 +4066,6 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
         </div>
       </label>
       <div id="usuariosFileInfo" style="display:none;margin-top:12px;padding:12px;border-radius:14px;background:rgba(58,208,164,0.14);backdrop-filter:blur(10px);border:1px solid rgba(58,208,164,0.18);font-size:12px;font-weight:600"></div>
-      <div style="margin-top:12px;padding:10px;border-radius:10px;background:rgba(0,113,227,0.06);border:1px dashed rgba(0,113,227,0.20);text-align:center">
-        <small style="color:#3d63c9;font-weight:600">¿No abre? Probá con este botón de emergencia:</small><br/>
-        <input type="file" id="usuariosFileInputBackup" accept=".xls,.xlsx,.csv,.ods" style="margin-top:8px;font-size:12px">
-      </div>
       <div id="usuariosDebug" style="display:none;margin-top:8px;padding:10px;border-radius:12px;background:rgba(0,0,0,0.05);font-size:11px;font-family:monospace;white-space:pre-wrap;max-height:200px;overflow:auto"></div>
       <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
         <button type="button" class="btn btn-secondary" id="usuariosBtnClear" style="display:none">🗑️ Limpiar lista</button>
@@ -13126,7 +13122,6 @@ function initUsuarios(){
   if(initUsuarios._initialized) return;
   initUsuarios._initialized=true;
   const fileInput=document.getElementById('usuariosFileInput');
-  const backupInput=document.getElementById('usuariosFileInputBackup');
   const btnChoose=document.getElementById('usuariosBtnChoose');
   const dz=document.getElementById('usuariosDropZone');
 
@@ -13154,7 +13149,6 @@ function initUsuarios(){
     setTimeout(()=>{ try{ e.target.value=''; }catch(_){} },600);
   };
   if(fileInput) fileInput.addEventListener('change',onFileSelected);
-  if(backupInput) backupInput.addEventListener('change',onFileSelected);
   if(dz){
     // Click nativo manejado por <label for="usuariosFileInput"> - no need trigger, solo teclado
     dz.addEventListener('keydown', (e)=>{

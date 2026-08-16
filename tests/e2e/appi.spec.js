@@ -62,6 +62,10 @@ test('arranca, navega e importa Garantías una sola vez', async ({ page }) => {
   ]);
   await page.evaluate(() => showView('view-usuarios'));
 
+  // Un solo selector de archivo a la vista: el de emergencia quedó eliminado.
+  await expect(page.locator('#usuariosUploadCard input[type="file"]')).toHaveCount(1);
+  await expect(page.locator('#usuariosUploadCard')).not.toContainText('emergencia');
+
   await page.setInputFiles('#usuariosFileInput', 'test_garantias.xlsx');
   await expect(page.locator('#usuariosStTotal')).toHaveText('4');
   await expect(page.locator('#usuariosList .tree-node')).toHaveCount(4);

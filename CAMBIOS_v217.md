@@ -52,6 +52,12 @@ Nada de esto cambió por dentro: las invitaciones siguen siendo privadas, vencie
 - Suite completa de Playwright: **27 aprobadas**.
 - Sintaxis JavaScript y `git diff --check`: correctas.
 
+## Limpieza en Usuarios / Garantías
+
+- Se eliminó el selector de archivo "de emergencia" (`¿No abre? Probá con este botón de emergencia`) de la tarjeta de carga: era un segundo `input[type=file]` que compartía el mismo manejador que la zona principal.
+- Ahora hay un único control visible para elegir el archivo: la zona de arrastrar/`Elegir archivo`.
+- Regresión cubierta en `tests/e2e/appi.spec.js`: la tarjeta tiene exactamente un `input[type=file]`, no menciona "emergencia" y la importación de `test_garantias.xlsx` sigue dando 4 usuarios.
+
 ## Pendiente para la próxima versión
 
 - Horario configurable del resumen diario de Mi Gestión.
