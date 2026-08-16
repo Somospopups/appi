@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v233-arranque-limpio';
+const CACHE_NAME = 'appi-v234-arranque-de-agua';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
