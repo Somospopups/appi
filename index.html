@@ -3507,14 +3507,13 @@ body.dark #bootScreen{background:#101322}
 .boot-burb.b3{left:72%;width:11px;height:11px;animation-delay:.6s}
 @keyframes bootBurbuja{0%{transform:translateY(0);opacity:0}12%{opacity:.9}100%{transform:translateY(-105vh);opacity:0}}
 .boot-card{position:relative;z-index:2;text-align:center}
-.boot-logo{width:88px;height:88px;margin:0 auto 14px;border-radius:26px;display:grid;place-items:center;background:linear-gradient(135deg,#5b8def,#8b63e8,#ff6bcf);color:#fff;font-size:23px;font-weight:950;box-shadow:0 14px 40px rgba(31,80,160,.35);animation:bootFlotar 2.6s ease-in-out infinite}
-@keyframes bootFlotar{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+.boot-logo{width:96px;height:96px;margin:0 auto 16px;border-radius:28px;display:grid;place-items:center;background:linear-gradient(135deg,#5b8def,#8b63e8,#ff6bcf);color:#fff;font-size:25px;font-weight:950;box-shadow:0 14px 40px rgba(31,80,160,.35);animation:bootFlotar 3s ease-in-out infinite}
+@keyframes bootFlotar{0%,100%{transform:translateY(4px) rotate(-1deg);box-shadow:0 10px 26px rgba(20,40,90,.28)}50%{transform:translateY(-12px) rotate(1deg);box-shadow:0 26px 44px rgba(20,40,90,.38)}}
 #bootScreen p{margin:0;display:inline-block;padding:8px 16px;border-radius:999px;background:rgba(255,255,255,.9);font-size:12px;font-weight:850;color:#3d63c9;box-shadow:0 6px 18px rgba(31,80,160,.18)}
 </style>
 <!-- ============ SIDEBAR ESCRITORIO / LANDSCAPE ============ -->
 <aside class="desk-sidebar" id="deskSidebar" aria-label="Navegación principal">
   <div class="ds-brand">
-    <span class="ds-logo">💧</span>
     <div><b>APPI</b><small>Asistente personal</small></div>
     <button class="ds-collapse" id="dsCollapseBtn" onclick="toggleSidebar()" title="Ocultar barra lateral" aria-label="Ocultar barra lateral">◀</button>
   </div>
@@ -3536,7 +3535,7 @@ body.dark #bootScreen{background:#101322}
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v236 · El rosa de siempre</div>
+  <div class="ds-foot">APPI · v237 · Solo el nombre</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
