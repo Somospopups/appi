@@ -1,0 +1,58 @@
+name: Verificar recordatorios de Mi Gestión
+
+# Ejecución manual y de solo lectura. No modifica la base ni imprime secretos:
+# de Vault sólo muestra los nombres, nunca el contenido descifrado.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_PROJECT_ID: tqwnjfnaywjmyfplvatm
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verificar credencial temporal
+        run: test -n "$SUPABASE_ACCESS_TOKEN" || (echo "Falta el secret SUPABASE_ACCESS_TOKEN" && exit 1)
+
+      - name: Consultar estado de la instalación
+        run: |
+          consulta() {
+            echo "::group::$1"
+            jq -Rn --arg q "$2" '{query: $q, read_only: true}' > /tmp/q.json
+            curl --fail-with-body --silent --show-error \
+              --request POST \
+              --url "https://api.supabase.com/v1/projects/$SUPABASE_PROJECT_ID/database/query" \
+              --header "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+              --header "Content-Type: application/json" \
+              --data-binary @/tmp/q.json | jq .
+            echo ""
+            echo "::endgroup::"
+          }
+
+          consulta "1. Extensiones y su schema" \
+            "select e.extname, n.nspname as schema from pg_extension e join pg_namespace n on n.oid = e.extnamespace where e.extname in ('pg_cron','pg_net','pgcrypto','supabase_vault') order by e.extname;"
+
+          consulta "2. Donde vive http_post" \
+            "select n.nspname as schema, p.proname from pg_proc p join pg_namespace n on n.oid = p.pronamespace where p.proname in ('http_post') order by 1;"
+
+          consulta "3. Tareas programadas" \
+            "select jobname, schedule, active from cron.job order by jobname;"
+
+          consulta "4. Nombres de secretos en Vault" \
+            "select name from vault.secrets order by name;"
+
+          consulta "5. Objetos de la migracion" \
+            "select to_regclass('public.appi_recordatorios_enviados') is not null as tabla_recordatorios, exists(select 1 from information_schema.columns where table_name='appi_gestion_contactos' and column_name='proximo_contacto_hora') as columna_hora, exists(select 1 from information_schema.columns where table_name='appi_dispositivos_vinculados' and column_name='recordatorios') as columna_preferencia, to_regprocedure('public.appi_pendientes_resumen(date)') is not null as f_resumen, to_regprocedure('public.appi_presentaciones_proximas(integer)') is not null as f_presentaciones, to_regprocedure('public.appi_disparar_recordatorios(text)') is not null as f_disparador;"
+
+          consulta "6. Ultimas ejecuciones del cron" \
+            "select j.jobname, d.status, d.return_message, d.start_time from cron.job_run_details d join cron.job j on j.jobid = d.jobid order by d.start_time desc limit 8;"
+
+          consulta "7. Dispositivos que podrian recibir avisos" \
+            "select count(*) filter (where activo) as activos, count(*) filter (where activo and notificaciones) as con_push, count(*) filter (where activo and notificaciones and recordatorios) as con_recordatorios from public.appi_dispositivos_vinculados;"
