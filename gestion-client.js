@@ -19,7 +19,7 @@ const ANSWER_LABELS={
   laboral_dedica:'Actividad laboral',laboral_gusta:'Qué valora',laboral_mejorar:'Qué cambiaría',
   conoces:'Conoce personas buscando cambio',oportunidad:'Interés en una oportunidad'
 };
-const state={link:null,contacts:[],surveys:new Map(),activities:new Map(),filter:'todos',search:'',view:'hoy',loading:false,lastError:'',currentId:'',lastLoaded:0,initialized:false,pollTimer:null,bulkQueue:[]};
+const state={link:null,enviando:false,contacts:[],surveys:new Map(),activities:new Map(),filter:'todos',search:'',view:'hoy',loading:false,lastError:'',currentId:'',lastLoaded:0,initialized:false,pollTimer:null,bulkQueue:[]};
 
 function config(){return window.APPIAuth&&window.APPIAuth.config?window.APPIAuth.config():window.APPI_AUTH||{}}
 function profile(){return window.APPIAuth&&window.APPIAuth.currentProfile?window.APPIAuth.currentProfile():null}
@@ -142,6 +142,19 @@ function installShareStyles(){
   document.head.appendChild(style);
 }
 
+function installGenteStyles(){
+  if(document.getElementById('appiGenteStyles'))return;
+  const style=document.createElement('style');style.id='appiGenteStyles';style.textContent=`
+  .gente-acciones{display:grid;gap:10px;margin:0 0 14px}
+  .gente-acciones .share-stage{margin:0}
+  .gente-add{width:100%;border:1.5px dashed #c9b7f5;background:#faf7ff;color:#6b4bb8;font-weight:700;font-size:15px;padding:13px 14px;border-radius:14px;cursor:pointer;transition:background .15s,border-color .15s}
+  .gente-add:hover,.gente-add:focus-visible{background:#f3ecff;border-color:#a06bff}
+  .gente-add:active{transform:scale(.99)}
+  .gente-pendientes{margin:0 0 13px}
+  .gente-completar{display:block;width:100%;margin:10px 0 0;border:0;border-radius:12px;padding:11px 12px;background:linear-gradient(135deg,#f59e0b,#f97316);color:#fff;font-weight:800;font-size:14px;cursor:pointer}
+  .gente-completar:active{transform:scale(.99)}
+  `;document.head.appendChild(style);
+}
 function installV204Styles(){
   if($('appiGestionV204Styles'))return;
   const style=document.createElement('style');style.id='appiGestionV204Styles';style.textContent=`
@@ -231,6 +244,8 @@ async function startShareFlow(){
   const usaIntent=!!(window.APPIWhatsApp&&window.APPIWhatsApp.esAndroid());
   const popup=usaIntent?null:window.open('about:blank','_blank');
   button.disabled=true;
+  // Mientras vuela el avión, un refresco automático no puede borrar el botón.
+  state.enviando=true;
   try{
     // La invitación se crea primero: la animación confirma un envío real.
     const invitation=await createSurveyInvitation(false),url=surveyUrl(invitation);
@@ -243,7 +258,10 @@ async function startShareFlow(){
     if(popup)popup.close();
     button.classList.remove('sending','done');
     await window.APPIDialog.alert(error.message,{title:'No pudimos crear la invitación',icon:'!'});
-  }finally{button.disabled=false}
+  }finally{
+    button.disabled=false;state.enviando=false;
+    if(state.reRender){state.reRender=false;renderManagement()}
+  }
 }
 
 // El avión cruza la tarjeta y deja el tilde de confirmación.
@@ -261,13 +279,9 @@ async function copyText(text){
 function showToastSafe(message,duration=1800){if(typeof window.showToast==='function')window.showToast(message,duration);else window.APPIDialog.alert(message,{title:'APPI',icon:'✓'})}
 
 async function openEncuestaTool(){
-  if(typeof window.showView==='function')window.showView('view-encuesta');
-  // Los envíos recientes viven en el dispositivo: se recargan al abrir para
-  // que la lista refleje lo que realmente quedó pendiente.
-  loadBulkQueue();
-  renderSurveyTool();
+  // Mi Encuesta se unificó en Mi Gente: el botón de enviar vive arriba de todo.
+  return openMiGestion();
 }
-
 function statusInfo(value){return STATUSES[value]||STATUSES.nuevo}
 function phoneDigits(value){return String(value||'').replace(/\D/g,'').slice(0,15)}
 function whatsappDigits(value){let digits=phoneDigits(value);if(digits.startsWith('00'))digits=digits.slice(2);if(digits.length===10&&!digits.startsWith('54'))return `549${digits}`;if(digits.startsWith('54')&&digits.length===12&&!digits.startsWith('549'))return `549${digits.slice(2)}`;return digits}
@@ -325,19 +339,112 @@ function addActivityLocal(activity){const list=state.activities.get(activity.con
 function logActivity(contactId,type,detail='',metadata={}){if(!contactId||!userId())return;const owner=state.contacts.find(contact=>contact.id===contactId)?.user_id||userId(),activity={id:uuidV4(),user_id:owner,contacto_id:contactId,tipo:type,detalle:String(detail||'').slice(0,1000),metadata:metadata||{},created_at:new Date().toISOString()};addActivityLocal(activity);queueActivity(activity);if(navigator.onLine)flushQueue().catch(()=>{});return activity}
 async function persistContact(contact,payload){Object.assign(contact,payload,{updated_at:new Date().toISOString()});saveCache();updateBadges();try{if(!navigator.onLine)throw Object.assign(new Error('offline'),{network:true});await cloudFetch(`/rest/v1/appi_gestion_contactos?id=eq.${encodeURIComponent(contact.id)}`,{method:'PATCH',headers:{'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify(payload)});return true}catch(error){if(error.network){queueMutation(contact.id,'PATCH',payload);return false}throw error}}
 function contactCard(c){const s=statusInfo(c.estado),telDigits=phoneDigits(c.telefono),priority=priorityFor(c),next=nextActionFor(c),type=c.tipo==='referido'?'Referido':c.tipo==='encuestado'?'Encuestado':'Manual',wa=whatsappUrlFor(c),overdue=isOverdueContact(c);return `<article class="gestion-contact priority-${priority.level} ${overdue?'overdue':''}" data-contact-id="${esc(c.id)}"><div class="gestion-contact-top"><div class="gestion-avatar">${c.tipo==='referido'?'👥':'👤'}</div><div><h3>${esc(c.nombre||'Sin nombre')}</h3><div class="gestion-contact-line">📱 ${esc(c.telefono||'Sin teléfono')}</div>${c.zona?`<div class="gestion-contact-line">📍 ${esc(c.zona)}</div>`:''}</div><span class="gestion-status" style="color:${s.color};background:${s.color}18">${s.icon} ${esc(s.label)}</span></div><div class="gestion-priority-row"><span class="gestion-priority-pill ${priority.level}">${esc(priority.label)}</span><span class="gestion-priority-reason">${esc(priority.reasons.join(' · ')||type)}</span></div><div class="gestion-tags"><span class="gestion-tag source">${esc(type)}</span>${c.referido_por?`<span class="gestion-tag">Referido por ${esc(c.referido_por)}</span>`:''}${Number(c.cantidad_origenes)>1?`<span class="gestion-tag">${Number(c.cantidad_origenes)} orígenes</span>`:''}</div><div class="gestion-next-action ${next.due?'due':''}">${esc(next.text)}</div><div class="gestion-contact-actions"><a class="wa" href="${esc(wa)}" target="_blank" rel="noopener" data-contact-channel="whatsapp" data-contact-id="${esc(c.id)}">💬 WhatsApp</a><a class="call" href="tel:${telDigits}" data-contact-channel="llamada" data-contact-id="${esc(c.id)}">📞 Llamar</a><button type="button" class="detail" data-open-contact="${esc(c.id)}">Ver y gestionar</button></div></article>`}
-function managementTabsHTML(){return `<div class="gestion-main-tabs">${[{id:'hoy',icon:'☀️',label:'Hoy'},{id:'embudo',icon:'📊',label:'Embudo'},{id:'todos',icon:'👥',label:'Todos'},{id:'resultados',icon:'📈',label:'Resultados'}].map(tab=>`<button type="button" class="gestion-main-tab ${state.view===tab.id?'active':''}" data-gestion-view="${tab.id}"><span>${tab.icon}</span>${tab.label}</button>`).join('')}</div>`}
+
+// ── Mi Gente: alta manual e importación de los Contactos viejos ────────────
+// Las dos pasan por la misma función de la base (appi_gente_importar_contacto),
+// así que un teléfono repetido nunca genera dos fichas.
+async function importarPersona(datos){
+  const filas=await cloudFetch('/rest/v1/rpc/appi_gente_importar_contacto',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+    p_nombre:String(datos.nombre||'').trim(),
+    p_telefono:String(datos.telefono||''),
+    p_interes:String(datos.interes||''),
+    p_estado:String(datos.estado||'nuevo'),
+    p_notas:String(datos.notas||''),
+    p_proximo:datos.proximo||null,
+    p_local_id:String(datos.localId||''),
+    p_zona:String(datos.zona||'')
+  })});
+  return Array.isArray(filas)?filas[0]:filas;
+}
+
+function telefonoValido(valor){const d=phoneDigits(valor);return d.length>=8&&d.length<=15}
+
+async function nuevaPersonaManual(){
+  if(!authorized()){await window.APPIDialog.alert('Necesitás iniciar sesión para agregar personas.',{title:'Mi Gente',icon:'🔒'});return}
+  const nombre=await window.APPIDialog.prompt('¿Cómo se llama?','',{title:'Agregar persona',icon:'👤'});
+  if(nombre===null)return;
+  if(String(nombre).trim().length<2){await window.APPIDialog.alert('Escribí al menos el nombre.',{title:'Falta el nombre',icon:'!'});return}
+  const telefono=await window.APPIDialog.prompt('¿Cuál es su teléfono? Con característica, sin el 0 ni el 15.','',{title:'Agregar persona',icon:'📱'});
+  if(telefono===null)return;
+  if(!telefonoValido(telefono)){await window.APPIDialog.alert('El teléfono tiene que tener entre 8 y 15 números. Sin teléfono no podemos escribirle ni llamarla.',{title:'Revisá el teléfono',icon:'📱'});return}
+  try{
+    await importarPersona({nombre,telefono,estado:'nuevo'});
+    showToastSafe('Persona agregada ✓');
+    await refreshManagement(false);
+  }catch(error){await window.APPIDialog.alert(error.message,{title:'No pudimos agregar',icon:'!'})}
+}
+
+// Los Contactos viejos vivían solo en este teléfono (localStorage). Se suben
+// una vez y queda la marca para no volver a preguntar.
+const SEG_KEY_LOCAL='seguimientoPersonas';
+function migradoKey(){return `appi_gente_migrado_v1_${userId()}`}
+function leerContactosLocales(){try{const filas=JSON.parse(localStorage.getItem(SEG_KEY_LOCAL)||'[]');return Array.isArray(filas)?filas:[]}catch(e){return []}}
+function contactosPendientes(){
+  const filas=leerContactosLocales(),conTel=[],sinTel=[],yaMigro=!!localStorage.getItem(migradoKey());
+  for(const fila of filas){
+    if(!fila||!String(fila.nombre||'').trim())continue;
+    if(telefonoValido(fila.telefono)){if(!yaMigro)conTel.push(fila)}
+    else sinTel.push(fila);
+  }
+  return {conTel,sinTel,total:filas.length};
+}
+async function migrarContactosLocales(){
+  const {conTel,sinTel}=contactosPendientes();
+  // Sin nada para subir no se molesta al usuario: los que no tienen teléfono ya
+  // se avisan con un cartel fijo en la pantalla, no con una pregunta cada vez.
+  if(!conTel.length)return false;
+  const detalle=sinTel.length?`\n\nOjo: ${sinTel.length} no tienen teléfono cargado (${sinTel.slice(0,3).map(f=>f.nombre).join(', ')}${sinTel.length>3?'…':''}). Esas quedan en este teléfono hasta que les pongas el número.`:'';
+  const ok=await window.APPIDialog.confirm(`Encontramos ${conTel.length} contacto${conTel.length===1?'':'s'} guardado${conTel.length===1?'':'s'} en este teléfono. ¿Los subimos a Mi Gente para que no se pierdan?${detalle}`,{title:'Traer mis Contactos',icon:'📥',okText:'Sí, subirlos'});
+  if(!ok)return false;
+  let subidos=0,fallados=[];
+  for(const fila of conTel){
+    try{
+      await importarPersona({nombre:fila.nombre,telefono:fila.telefono,interes:fila.interes||'',estado:fila.estado||'',notas:fila.notas||'',proximo:fila.fecha||null,localId:String(fila.id||'')});
+      subidos++;
+    }catch(error){fallados.push(fila.nombre)}
+  }
+  if(subidos&&!fallados.length)localStorage.setItem(migradoKey(),new Date().toISOString());
+  await refreshManagement(false);
+  const resto=fallados.length?`\n\nNo pudimos subir: ${fallados.join(', ')}. Probá de nuevo más tarde.`:'';
+  const pendiente=sinTel.length?`\n\nQuedaron ${sinTel.length} sin teléfono. Cargales el número y volvé a entrar para subirlas.`:'';
+  await window.APPIDialog.alert(`Subimos ${subidos} contacto${subidos===1?'':'s'} a Mi Gente.${pendiente}${resto}`,{title:'Listo',icon:'✓'});
+  return true;
+}
+
+function gentePendientesHTML(){
+  const {sinTel}=contactosPendientes();
+  if(!sinTel.length)return '';
+  const nombres=sinTel.slice(0,3).map(f=>String(f.nombre||'').trim()).filter(Boolean).join(', ');
+  return `<div class="gestion-notice gente-pendientes"><b>📱 ${sinTel.length} contacto${sinTel.length===1?'':'s'} sin teléfono.</b> ${esc(nombres)}${sinTel.length>3?'…':''} ${sinTel.length===1?'quedó':'quedaron'} en este teléfono porque sin número no se le puede escribir ni llamar. Cargales el número y se suben solos.<button type="button" class="gente-completar" id="genteCompletar">Completar los que faltan</button></div>`;
+}
+function gentePrimaryActionsHTML(){
+  if(isAdmin())return '';
+  return `<div class="gente-acciones">
+    <div class="share-stage">
+      <button type="button" class="share-btn" id="surveyShareBtn">
+        <span class="glow"></span>
+        <span class="share-face"><span class="plane">📨</span><strong>Enviar encuesta</strong><small>Se abre WhatsApp para elegir el contacto</small></span>
+        <span class="share-fly" aria-hidden="true">✈️</span>
+        <span class="share-trail" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="share-done" aria-hidden="true"><span class="tick">✓</span><b>¡Lista para enviar!</b></span>
+      </button>
+    </div>
+    <button type="button" class="gente-add" id="genteNuevo">＋ Agregar persona a mano</button>
+  </div>`;
+}
+function managementTabsHTML(){return `<div class="gestion-main-tabs">${[{id:'hoy',icon:'☀️',label:'Hoy'},{id:'todos',icon:'👥',label:'Todos'},{id:'resultados',icon:'📈',label:'Resultados'}].map(tab=>`<button type="button" class="gestion-main-tab ${state.view===tab.id?'active':''}" data-gestion-view="${tab.id}"><span>${tab.icon}</span>${tab.label}</button>`).join('')}</div>`}
 function emptyManagement(icon,title,text,button=''){return `<div class="gestion-empty"><div class="ico">${icon}</div><h3>${esc(title)}</h3><p>${esc(text)}</p>${button}</div>`}
 function renderTodayView(){const actions=actionableContacts(),newCount=countStatus('nuevo'),today=state.contacts.filter(isTodayContact).length,overdue=state.contacts.filter(isOverdueContact).length,presentations=countStatus('presentacion'),withoutDate=state.contacts.filter(c=>c.estado==='seguimiento'&&!c.proximo_contacto).length;return `<div class="gestion-stats"><div class="gestion-stat"><span>✨</span><b>${newCount}</b><small>Nuevos</small></div><div class="gestion-stat"><span>☀️</span><b>${today}</b><small>Para hoy</small></div><div class="gestion-stat"><span>⚠️</span><b>${overdue}</b><small>Vencidos</small></div><div class="gestion-stat"><span>🎯</span><b>${presentations}</b><small>Presentaciones</small></div></div><div class="gestion-section-title"><h3>Prioridad de hoy</h3><small>${actions.length} acción${actions.length===1?'':'es'}</small></div><div class="gestion-list">${actions.length?actions.map(contactCard).join(''):emptyManagement('🎉','Todo al día','No tenés contactos pendientes para hoy.')}</div>${withoutDate?`<div class="gestion-notice" style="margin-top:11px"><b>📅 ${withoutDate} seguimiento${withoutDate===1?'':'s'} sin fecha.</b> Abrí cada contacto y programá el próximo paso para que no quede olvidado.</div>`:''}`}
 function renderFunnelView(){const stages=['nuevo','contactado','seguimiento','presentacion','convertido'],total=Math.max(1,state.contacts.filter(c=>c.estado!=='no_interesado').length),max=Math.max(1,...stages.map(countStatus)),converted=countStatus('convertido'),rate=Math.round(converted/total*100);return `<section class="gestion-card"><div class="gestion-card-head"><div><h3>Embudo comercial</h3><p>Tocá una etapa para ver sus contactos.</p></div><span class="gestion-badge">${rate}% conversión</span></div><div class="gestion-funnel">${stages.map(id=>{const info=statusInfo(id),count=countStatus(id),pct=Math.max(5,Math.round(count/max*100));return `<button type="button" class="gestion-funnel-stage" data-funnel-status="${id}"><span class="gestion-funnel-icon" style="background:${info.color}">${info.icon}</span><span><strong>${esc(info.label)}</strong><small>${Math.round(count/total*100)}% de los contactos activos</small><span class="gestion-funnel-bar"><i style="width:${pct}%;background:${info.color}"></i></span></span><b>${count}</b></button>`}).join('')}</div></section><div class="gestion-notice"><b>${countStatus('no_interesado')} no interesado${countStatus('no_interesado')===1?'':'s'}.</b> Se conserva el historial pero no aparece entre las prioridades diarias.</div>`}
 function renderAllView(){const list=filteredContacts();return `<div class="gestion-toolbar"><div class="gestion-search"><input id="gestionSearch" type="search" autocomplete="off" placeholder="Buscar por nombre, teléfono, zona…" value="${esc(state.search)}"><span>⌕</span></div><div class="gestion-filters">${[{id:'todos',label:'Todos'},...Object.entries(STATUSES).map(([id,v])=>({id,label:v.label}))].map(item=>`<button type="button" class="gestion-filter ${state.filter===item.id?'active':''}" data-gestion-filter="${item.id}">${esc(item.label)}${item.id==='todos'?` · ${state.contacts.length}`:` · ${countStatus(item.id)}`}</button>`).join('')}</div></div><div class="gestion-refresh-row"><span>${state.lastLoaded?`Actualizado ${esc(formatDate(state.lastLoaded,true))}`:'Sin actualizar'}${loadQueue().length?` · ${loadQueue().length} pendiente${loadQueue().length===1?'':'s'}`:''}</span><div><button type="button" id="gestionExport">Exportar CSV</button><button type="button" id="gestionRefresh">Actualizar</button></div></div><div class="gestion-list">${list.length?list.map(contactCard).join(''):emptyManagement('📭',state.contacts.length?'No hay coincidencias':'Todavía no hay contactos',state.contacts.length?'Probá otro nombre o estado.':'Compartí una invitación desde Mi Encuesta.')}</div>`}
 function firstContactHours(){const values=[];for(const c of state.contacts){const action=activitiesFor(c.id).filter(a=>['whatsapp_abierto','llamada_iniciada'].includes(a.tipo)).sort((a,b)=>new Date(a.created_at)-new Date(b.created_at))[0];if(action){const diff=(new Date(action.created_at)-new Date(c.created_at))/3600000;if(diff>=0&&diff<720)values.push(diff)}}return values.length?values.reduce((a,b)=>a+b,0)/values.length:null}
 function renderResultsView(){const now=new Date(),monthStart=new Date(now.getFullYear(),now.getMonth(),1),surveys=[...state.surveys.values()].filter(row=>new Date(row.created_at)>=monthStart),newContacts=state.contacts.filter(row=>new Date(row.created_at)>=monthStart),refs=newContacts.filter(row=>row.tipo==='referido').length,converted=newContacts.filter(row=>row.estado==='convertido').length,presentations=newContacts.filter(row=>['presentacion','convertido'].includes(row.estado)).length,rate=newContacts.length?Math.round(converted/newContacts.length*100):0,avgRefs=surveys.length?(surveys.reduce((sum,row)=>sum+(Array.isArray(row.referidos)?row.referidos.length:0),0)/surveys.length).toFixed(1):'0',hours=firstContactHours();return `<section class="gestion-card"><div class="gestion-card-head"><div><h3>Resultados del mes</h3><p>${new Intl.DateTimeFormat('es-AR',{month:'long',year:'numeric'}).format(now)}</p></div><button type="button" class="gestion-secondary" id="gestionExport">Exportar CSV</button></div><div class="gestion-result-grid"><div class="gestion-result"><span>📋</span><b>${surveys.length}</b><small>Encuestas</small></div><div class="gestion-result"><span>👥</span><b>${refs}</b><small>Referidos</small></div><div class="gestion-result"><span>🎯</span><b>${presentations}</b><small>Presentaciones</small></div><div class="gestion-result"><span>✓</span><b>${converted}</b><small>Conversiones</small></div><div class="gestion-result"><span>📈</span><b>${rate}%</b><small>Conversión mensual</small></div><div class="gestion-result"><span>🤝</span><b>${avgRefs}</b><small>Referidos por encuesta</small></div><div class="gestion-result wide"><span>⏱️</span><b>${hours==null?'Sin datos':hours<1?`${Math.round(hours*60)} minutos`:hours<24?`${hours.toFixed(1)} horas`:`${(hours/24).toFixed(1)} días`}</b><small>Tiempo promedio hasta el primer intento de contacto</small></div></div></section>${renderFunnelView()}`}
-function renderManagement(){const c=$('gestionContent');if(!c)return;if(state.loading&&!state.contacts.length){c.innerHTML=emptyManagement('⏳','Cargando Mi Gestión','Estamos recuperando tus encuestas, referidos y actividades.');return}const title=state.view==='hoy'?'Tu trabajo de hoy':state.view==='embudo'?'Tu proceso comercial':state.view==='resultados'?'Tus resultados':'Todos tus contactos',sub=state.view==='hoy'?'APPI ordena primero lo que necesita una acción.':state.view==='embudo'?'Visualizá dónde está cada oportunidad.':state.view==='resultados'?'Medí actividad, seguimiento y conversión.':'Buscá, filtrá y gestioná cada persona.';c.innerHTML=`<div class="gestion-hero"><div class="eyebrow">Prospección y seguimiento</div><h2>${esc(title)}</h2><p>${esc(sub)}</p></div><div class="gestion-offline" id="gestionOffline" ${navigator.onLine?'hidden':''}>Sin conexión: estás viendo la última copia guardada. Los cambios se sincronizarán al reconectar.</div>${managementTabsHTML()}${state.view==='hoy'?renderTodayView():state.view==='embudo'?renderFunnelView():state.view==='resultados'?renderResultsView():renderAllView()}<div class="gestion-detail-overlay" id="gestionDetailOverlay" hidden><aside class="gestion-drawer" id="gestionDrawer" role="dialog" aria-modal="true" aria-label="Detalle del contacto"></aside></div>`;bindManagement();updateBadges();if(state.currentId)openContactDetail(state.currentId,false)}
+function renderManagement(){const c=$('gestionContent');if(!c)return;if(state.enviando){state.reRender=true;return}if(state.loading&&!state.contacts.length){c.innerHTML=emptyManagement('⏳','Cargando Mi Gente','Estamos recuperando tus contactos, encuestas y actividades.');return}if(state.view==='embudo')state.view='resultados';const title=state.view==='hoy'?'Tu trabajo de hoy':state.view==='resultados'?'Tus resultados':'Toda tu gente',sub=state.view==='hoy'?'APPI ordena primero lo que necesita una acción.':state.view==='resultados'?'Medí actividad, seguimiento y conversión.':'Buscá, filtrá y gestioná cada persona.';c.innerHTML=`<div class="gestion-hero"><div class="eyebrow">Tu gente, en un solo lugar</div><h2>${esc(title)}</h2><p>${esc(sub)}</p></div>${gentePrimaryActionsHTML()}${gentePendientesHTML()}<div class="gestion-offline" id="gestionOffline" ${navigator.onLine?'hidden':''}>Sin conexión: estás viendo la última copia guardada. Los cambios se sincronizarán al reconectar.</div>${managementTabsHTML()}${state.view==='hoy'?renderTodayView():state.view==='embudo'?renderFunnelView():state.view==='resultados'?renderResultsView():renderAllView()}<div class="gestion-detail-overlay" id="gestionDetailOverlay" hidden><aside class="gestion-drawer" id="gestionDrawer" role="dialog" aria-modal="true" aria-label="Detalle del contacto"></aside></div>`;bindManagement();updateBadges();if(state.currentId)openContactDetail(state.currentId,false)}
 function setManagementView(view){state.view=view;state.currentId='';renderManagement();window.scrollTo({top:0,behavior:'smooth'})}
 function pendingOutcomeKey(){return `appi_gestion_resultado_pendiente_${userId()}`}
 function setPendingOutcome(contactId,channel){try{localStorage.setItem(pendingOutcomeKey(),JSON.stringify({contactId,channel,at:Date.now()}))}catch(e){}}
 function bindExternalActions(){document.querySelectorAll('[data-contact-channel]').forEach(link=>link.onclick=event=>{const id=link.dataset.contactId,channel=link.dataset.contactChannel,contact=state.contacts.find(item=>item.id===id);if(channel==='llamada'&&window.APPIDeviceBridge&&window.APPIDeviceBridge.shouldBridge()){event.preventDefault();window.APPIDeviceBridge.handleCall(contact);return}setPendingOutcome(id,channel);logActivity(id,channel==='whatsapp'?'whatsapp_abierto':'llamada_iniciada',channel==='whatsapp'?'Se abrió WhatsApp.':'Se inició una llamada.',{canal:channel})});if(window.APPIDeviceBridge)window.APPIDeviceBridge.decorateCallButtons()}
-function bindManagement(){document.querySelectorAll('[data-gestion-view]').forEach(button=>button.onclick=()=>setManagementView(button.dataset.gestionView));if($('gestionSearch'))$('gestionSearch').oninput=e=>{state.search=e.target.value;const pos=e.target.selectionStart;renderManagement();const input=$('gestionSearch');if(input){input.focus();try{input.setSelectionRange(pos,pos)}catch(err){}}};document.querySelectorAll('[data-gestion-filter]').forEach(button=>button.onclick=()=>{state.filter=button.dataset.gestionFilter;renderManagement()});document.querySelectorAll('[data-funnel-status]').forEach(button=>button.onclick=()=>{state.filter=button.dataset.funnelStatus;setManagementView('todos')});document.querySelectorAll('[data-open-contact]').forEach(button=>button.onclick=()=>openContactDetail(button.dataset.openContact));if($('gestionRefresh'))$('gestionRefresh').onclick=()=>refreshManagement(true);if($('gestionExport'))$('gestionExport').onclick=exportCsv;if($('gestionGoSurvey'))$('gestionGoSurvey').onclick=openEncuestaTool;const overlay=$('gestionDetailOverlay');if(overlay)overlay.onclick=e=>{if(e.target===overlay)closeContactDetail()};bindExternalActions()}
+function bindManagement(){document.querySelectorAll('[data-gestion-view]').forEach(button=>button.onclick=()=>setManagementView(button.dataset.gestionView));if($('gestionSearch'))$('gestionSearch').oninput=e=>{state.search=e.target.value;const pos=e.target.selectionStart;renderManagement();const input=$('gestionSearch');if(input){input.focus();try{input.setSelectionRange(pos,pos)}catch(err){}}};document.querySelectorAll('[data-gestion-filter]').forEach(button=>button.onclick=()=>{state.filter=button.dataset.gestionFilter;renderManagement()});document.querySelectorAll('[data-funnel-status]').forEach(button=>button.onclick=()=>{state.filter=button.dataset.funnelStatus;setManagementView('todos')});document.querySelectorAll('[data-open-contact]').forEach(button=>button.onclick=()=>openContactDetail(button.dataset.openContact));if($('gestionRefresh'))$('gestionRefresh').onclick=()=>refreshManagement(true);if($('gestionExport'))$('gestionExport').onclick=exportCsv;if($('gestionGoSurvey'))$('gestionGoSurvey').onclick=openEncuestaTool;if($('surveyShareBtn'))$('surveyShareBtn').onclick=startShareFlow;if($('genteNuevo'))$('genteNuevo').onclick=nuevaPersonaManual;if($('genteCompletar'))$('genteCompletar').onclick=()=>{if(typeof window.openSeguimiento==='function')window.openSeguimiento()};const overlay=$('gestionDetailOverlay');if(overlay)overlay.onclick=e=>{if(e.target===overlay)closeContactDetail()};bindExternalActions()}
 function answerValue(value){if(Array.isArray(value))return value.length?value.join(', '):'-';if(value===undefined||value===null||value==='')return '-';return String(value)}
 function surveyDetails(survey){if(!survey)return '<div class="gestion-notice">La respuesta completa no está disponible en esta copia.</div>';const answers=survey.respuestas||{};return Object.entries(ANSWER_LABELS).map(([key,label])=>{let value=answers[key];if(Array.isArray(value)&&value.includes('Otros')&&answers[key+'_otros'])value=value.map(item=>item==='Otros'?answers[key+'_otros']:item);return `<div class="gestion-answer"><span>${esc(label)}</span><span>${esc(answerValue(value))}${key==='agua_importancia'&&value!=='-'?'/10':''}</span></div>`}).join('')}
 function activityInfo(type){return ({encuesta_recibida:['📋','Encuesta recibida'],referido_recibido:['👥','Referido recibido'],contacto_creado:['＋','Contacto creado'],whatsapp_abierto:['💬','WhatsApp abierto'],llamada_iniciada:['📞','Llamada iniciada'],resultado_contacto:['✓','Resultado del contacto'],estado_cambiado:['↻','Estado actualizado'],nota:['📝','Nota guardada'],seguimiento_programado:['📅','Seguimiento programado'],presentacion_programada:['🎯','Presentación programada']})[type]||['•','Actividad']}
@@ -368,7 +475,7 @@ function handleNotificationLink(){const params=new URLSearchParams(location.sear
 function resumePendingNotification(){const intent=readNotification();if(intent)setTimeout(()=>{applyNotificationIntent(intent)},80)}
 function notifyDueOnce(){const count=actionCount();if(!count)return;const key=`appi_gestion_aviso_${userId()}_${localISODate()}`;if(localStorage.getItem(key))return;localStorage.setItem(key,'1');if(!$('view-gestion')?.classList.contains('active'))showToastSafe(`Mi Gestión: tenés ${count} acción${count===1?'':'es'} para hoy`,3000)}
 async function refreshManagement(showLoading=false){if(state.loading)return;state.loading=true;if(showLoading)renderManagement();try{await flushQueue();await fetchManagement()}catch(error){state.lastError=error.message;if(!state.contacts.length)loadCache();if(showLoading&&!state.contacts.length){const c=$('gestionContent');if(c)c.innerHTML=`${emptyManagement('⚠️','No pudimos cargar Mi Gestión',error.message,'<button type="button" class="gestion-primary" id="gestionRetry" style="margin-top:12px">Reintentar</button>')}`;if($('gestionRetry'))$('gestionRetry').onclick=()=>refreshManagement(true);state.loading=false;return}}state.loading=false;renderManagement()}
-async function openMiGestion(){if(typeof window.showView==='function')window.showView('view-gestion');if(!authorized()){const c=$('gestionContent');if(c)c.innerHTML=emptyManagement('🔒','Iniciá sesión','Mi Gestión necesita una cuenta para identificar tus contactos.');return}if(!state.contacts.length)loadCache();renderManagement();await refreshManagement(!state.contacts.length);const current=document.querySelector('.view.active')?.id;if(current==='view-home'&&typeof window.showView==='function')window.showView('view-gestion')}
+async function openMiGestion(){if(typeof window.showView==='function')window.showView('view-gestion');if(!authorized()){const c=$('gestionContent');if(c)c.innerHTML=emptyManagement('🔒','Iniciá sesión','Mi Gente necesita una cuenta para identificar tus contactos.');return}if(!state.contacts.length)loadCache();renderManagement();await refreshManagement(!state.contacts.length);const current=document.querySelector('.view.active')?.id;if(current==='view-home'&&typeof window.showView==='function')window.showView('view-gestion');if(navigator.onLine)setTimeout(()=>{migrarContactosLocales().catch(()=>{})},700)}
 
 function csvCell(value){const text=String(value==null?'':value).replace(/"/g,'""');return `"${text}"`}
 function exportCsv(){
@@ -381,17 +488,17 @@ function injectSections(){
   const grab=$('view-grabadora');if(!grab||$('view-encuesta'))return;
   const wrapper=document.createElement('div');wrapper.innerHTML=`
   <section id="view-encuesta" class="view"><header class="top"><button class="back-btn" id="btnBackEncuesta" aria-label="Volver">‹</button><button class="help-btn" id="btnHelpEncuesta" aria-label="Ayuda">?</button><button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button><h1>Mi</h1><div class="script">Encuesta</div><p>Enviala y seguí las respuestas</p></header><div class="gestion-shell" id="surveyToolContent"></div></section>
-  <section id="view-gestion" class="view"><header class="top"><button class="back-btn" id="btnBackGestion" aria-label="Volver">‹</button><button class="help-btn" id="btnHelpGestion" aria-label="Ayuda">?</button><button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button><h1>Mi</h1><div class="script">Gestión</div><p>Encuestados, referidos y seguimiento</p></header><div class="gestion-shell" id="gestionContent"></div></section>`;
+  <section id="view-gestion" class="view"><header class="top"><button class="back-btn" id="btnBackGestion" aria-label="Volver">‹</button><button class="help-btn" id="btnHelpGestion" aria-label="Ayuda">?</button><button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button><h1>Mi</h1><div class="script">Gente</div><p>Enviá encuestas y seguí a cada persona</p></header><div class="gestion-shell" id="gestionContent"></div></section>`;
   const sections=[...wrapper.children];sections.forEach(section=>grab.parentNode.insertBefore(section,grab));
   $('btnBackEncuesta').onclick=()=>{window.showView('view-home');if(window.renderHomeCompleto)window.renderHomeCompleto()};$('btnBackGestion').onclick=()=>{closeContactDetail();window.showView('view-home');if(window.renderHomeCompleto)window.renderHomeCompleto()};
   $('btnHelpEncuesta').onclick=()=>window.APPIDialog.alert('Tocá Enviar encuesta y elegí a quién se la mandás. Se abre WhatsApp con el mensaje listo. Cuando la persona responde, aparece sola en Mi Gestión.',{title:'Cómo usar Mi Encuesta',icon:'📨'});
-  $('btnHelpGestion').onclick=()=>window.APPIDialog.alert('Empezá por Hoy: APPI ordena nuevos, seguimientos y presentaciones según prioridad. Al volver de WhatsApp o de una llamada, registrá el resultado para mantener el historial actualizado.',{title:'Cómo usar Mi Gestión',icon:'🤝'});
+  $('btnHelpGestion').onclick=()=>window.APPIDialog.alert('Acá está toda tu gente en un solo lugar. Arriba mandás la encuesta por WhatsApp o agregás a alguien a mano. En Hoy ves lo que necesita una acción, en Todos buscás a cualquiera, y en Resultados mirás cómo venís. Al volver de WhatsApp o de una llamada, registrá el resultado.',{title:'Cómo usar Mi Gente',icon:'🤝'});
 }
 
 function startPolling(){clearInterval(state.pollTimer);state.pollTimer=setInterval(()=>{const active=document.getElementById('view-gestion')?.classList.contains('active');if(active&&authorized()&&navigator.onLine&&!state.loading)refreshManagement(false)},30000)}
 function resetForAccount(){state.link=null;state.contacts=[];state.surveys=new Map();state.activities=new Map();state.filter='todos';state.search='';state.view='hoy';state.currentId='';state.lastLoaded=0;state.bulkQueue=[];updateBadges()}
 function init(){
-  if(state.initialized)return;state.initialized=true;installStyles();installV204Styles();installShareStyles();injectSections();startPolling();
+  if(state.initialized)return;state.initialized=true;installStyles();installV204Styles();installShareStyles();installGenteStyles();injectSections();startPolling();
   window.addEventListener('online',()=>{const bar=$('gestionOffline');if(bar)bar.hidden=true;flushQueue().then(()=>refreshManagement(false))});
   window.addEventListener('offline',()=>{const bar=$('gestionOffline');if(bar)bar.hidden=false});
   window.addEventListener('focus',()=>setTimeout(maybeAskPendingOutcome,350));
@@ -406,6 +513,6 @@ function init(){
 window.openEncuestaTool=openEncuestaTool;
 window.openMiGestion=openMiGestion;
 window.closeGestionDetail=closeContactDetail;
-window.APPIGestion={state,open:openMiGestion,refresh:refreshManagement,createInvitation:createSurveyInvitation,surveyUrl,shareMessage,flushQueue,updateBadges,priorityFor,messageFor,actionableContacts,logActivity,setView:setManagementView,prepareBulk:addBulkRecipients,processPendingOutcome:maybeAskPendingOutcome};
+window.APPIGestion={state,open:openMiGestion,importarPersona,migrarContactosLocales,contactosPendientes,telefonoValido,nuevaPersonaManual,refresh:refreshManagement,createInvitation:createSurveyInvitation,surveyUrl,shareMessage,flushQueue,updateBadges,priorityFor,messageFor,actionableContacts,logActivity,setView:setManagementView,prepareBulk:addBulkRecipients,processPendingOutcome:maybeAskPendingOutcome};
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();

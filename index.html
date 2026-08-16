@@ -3496,14 +3496,12 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-equipo" onclick="openEquipo()"><span>🌳</span> Mi Equipo</button>
     <button class="ds-btn" data-ds="view-historico" onclick="openHistorico()"><span>📈</span> Histórico</button>
     <button class="ds-btn" data-ds="view-usuarios" onclick="showView('view-usuarios')"><span>📍</span> Usuarios</button>
-    <button class="ds-btn" data-ds="view-seguimiento" onclick="openSeguimiento()"><span>📇</span> Contactos</button>
     <div class="ds-section-label">Mis herramientas</div>
-    <button class="ds-btn" data-ds="view-encuesta" onclick="openEncuestaTool()"><span>📋</span> Mi Encuesta</button>
-    <button class="ds-btn" data-ds="view-gestion" onclick="openMiGestion()"><span>🤝</span> Mi Gestión <span class="gestion-sidebar-badge" id="gestionSidebarBadge" hidden>0</span></button>
+    <button class="ds-btn" data-ds="view-gestion" onclick="openMiGestion()"><span>🤝</span> Mi Gente <span class="gestion-sidebar-badge" id="gestionSidebarBadge" hidden>0</span></button>
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v222 · Enviar sin pantalla en blanco</div>
+  <div class="ds-foot">APPI · v223 · Mi Gente</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -8699,8 +8697,12 @@ function hoyLocal(){ const d=new Date(); return d.getFullYear()+'-'+String(d.get
 const SEG_ESTADOS_CERRADOS = new Set(['Contactado','Cliente','No le interesa','No interesado']);
 function seguimientoCerrado(p){ return !!p && SEG_ESTADOS_CERRADOS.has(p.estado); }
 function seguimientoVencido(p){ return !!(p && p.fecha && p.fecha < hoyLocal() && !seguimientoCerrado(p)); }
-function seguimientoPendientes(){ return cargarSeguimientos().filter(p=>!seguimientoCerrado(p)).length; }
-function seguimientoProgreso(){ const a=cargarSeguimientos(); if(!a.length) return 0; return Math.round(a.filter(seguimientoCerrado).length/a.length*100); }
+// Los contactos ahora viven en la nube (Mi Gente). Mientras queden algunos sin
+// migrar en este teléfono, se suman para que la tarjeta del inicio no mienta.
+function genteNube(){ return (window.APPIGestion&&Array.isArray(window.APPIGestion.state?.contacts))?window.APPIGestion.state.contacts:[]; }
+function genteNubeCerrado(c){ return ['convertido','no_interesado'].includes(c&&c.estado); }
+function seguimientoPendientes(){ const nube=genteNube(); if(nube.length) return nube.filter(c=>!genteNubeCerrado(c)).length; return cargarSeguimientos().filter(p=>!seguimientoCerrado(p)).length; }
+function seguimientoProgreso(){ const nube=genteNube(); if(nube.length) return Math.round(nube.filter(genteNubeCerrado).length/nube.length*100); const a=cargarSeguimientos(); if(!a.length) return 0; return Math.round(a.filter(seguimientoCerrado).length/a.length*100); }
 function openSeguimiento(){ showView('view-seguimiento'); }
 function capitalizarNombreSeg(valor){ return String(valor||'').toLocaleLowerCase('es-AR').replace(/(^|[\s'-])(\p{L})/gu,(m,sep,letra)=>sep+letra.toLocaleUpperCase('es-AR')).replace(/\s{2,}/g,' '); }
 function limpiarFormularioSeg(){ ['segNombre','segTelefono','segFecha','segNotas'].forEach(id=>document.getElementById(id).value=''); document.getElementById('segInteres').value='Producto'; document.getElementById('segEstado').value='No contactado'; seguimientoEditId=null; }
@@ -8901,12 +8903,12 @@ function renderToolsList(){
   });
 
   const seguimientoCard = renderHomeQuickCard({
-    icon:'👥', title:'Contactos', sub:'Del mes - pendientes',
+    icon:'👥', title:'Mi Gente', sub:'Encuestas y seguimiento',
     statusVal: `${seguimientoPendientes()}`,
     statusClass: seguimientoPendientes()>0 ? 'pending' : 'empty',
     progressPct: seguimientoProgreso(),
     timeAgo: seguimientoPendientes()>0 ? `${seguimientoPendientes()} pend.` : 'Al día',
-    onClick:'openSeguimiento()', accent:'#a06bff', gradient:'linear-gradient(135deg,#a06bff,#5b8def)'
+    onClick:'openMiGestion()', accent:'#a06bff', gradient:'linear-gradient(135deg,#a06bff,#5b8def)'
   });
 
   const usuariosCard = renderHomeQuickCard({
@@ -9227,26 +9229,19 @@ function renderHomeCompleto(){
       const existing2=document.getElementById('homeExtraKeep');
       if(existing2) existing2.remove();
 
-      // Cuatro herramientas complementarias: Encuesta + Gestión + Grabadora + Notas
+      // Tres herramientas complementarias: Mi Gente + Grabadora + Notas
       const extraKeep=document.createElement('div');
       extraKeep.id='homeExtraKeep';
       extraKeep.className='home-section-block';
       extraKeep.innerHTML=`
         <div class="mini-section-label"><span>⚡</span> Mis herramientas</div>
         <div class="home-mini-tools">
-          <button type="button" class="home-mini-tool" onclick="openEncuestaTool()">
-            <div class="home-mini-ico" style="background:linear-gradient(135deg,#5b8def,#875fdd)">📋</div>
-            <div class="home-mini-txt">
-              <strong>Mi Encuesta</strong>
-              <small>Invitaciones privadas</small>
-            </div>
-          </button>
           <button type="button" class="home-mini-tool" onclick="openMiGestion()">
             <span class="home-tool-badge" id="homeGestionBadge" hidden>0</span>
             <div class="home-mini-ico" style="background:linear-gradient(135deg,#3ad0a4,#5b8def)">🤝</div>
             <div class="home-mini-txt">
-              <strong>Mi Gestión</strong>
-              <small>Referidos y seguimiento</small>
+              <strong>Mi Gente</strong>
+              <small>Encuestas, contactos y seguimiento</small>
             </div>
           </button>
           <button type="button" class="home-mini-tool" onclick="openGrabadora()">

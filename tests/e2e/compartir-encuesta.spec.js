@@ -63,10 +63,11 @@ async function abrirComoDistribuidor(page, invitaciones) {
   await page.locator('#btnDistributorLogin').click();
   await expect(page.locator('#lockScreen')).toHaveClass(/hidden/);
   await page.evaluate(() => openEncuestaTool());
-  await expect(page.locator('#view-encuesta')).toHaveClass(/active/);
+  await expect(page.locator('#view-gestion')).toHaveClass(/active/);
+  await expect(page.locator('#surveyShareBtn')).toBeVisible();
 }
 
-test('Mi Encuesta muestra un solo botón, sin datos técnicos', async ({ page }) => {
+test('Mi Gente muestra el botón de enviar arriba, sin datos técnicos', async ({ page }) => {
   await abrirComoDistribuidor(page, []);
 
   const boton = page.locator('#surveyShareBtn');
@@ -74,11 +75,11 @@ test('Mi Encuesta muestra un solo botón, sin datos técnicos', async ({ page })
   await expect(boton).toContainText('Enviar encuesta');
   await expect(boton).toContainText('Se abre WhatsApp para elegir el contacto');
 
-  // Una sola acción en toda la pantalla.
-  await expect(page.locator('#surveyToolContent button')).toHaveCount(1);
+  // Un solo botón para enviar: nada de controles duplicados.
+  await expect(page.locator('#surveyShareBtn')).toHaveCount(1);
 
   // Nada de jerga interna ni enlaces a la vista del distribuidor.
-  const texto = await page.locator('#surveyToolContent').innerText();
+  const texto = await page.locator('.gente-acciones').innerText();
   for (const prohibido of ['token', 'http', '24 horas', 'dispositivo', 'vence', 'Copiar', 'cola']) {
     expect(texto.toLowerCase()).not.toContain(prohibido.toLowerCase());
   }

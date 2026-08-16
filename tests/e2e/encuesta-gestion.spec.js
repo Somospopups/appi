@@ -217,10 +217,11 @@ test('Mi Encuesta y Mi Gestión usan la cuenta autenticada y guardan el seguimie
   await expect(page.locator('#view-home')).toHaveClass(/active/);
 
   await page.evaluate(() => openEncuestaTool());
-  await expect(page.locator('#view-encuesta')).toHaveClass(/active/);
-  // La pantalla se reduce a un botón: sin URLs, tokens ni vencimientos a la vista.
+  // Mi Encuesta se unificó en Mi Gente: el atajo viejo cae en la pantalla nueva.
+  await expect(page.locator('#view-gestion')).toHaveClass(/active/);
+  // El envío se reduce a un botón: sin URLs, tokens ni vencimientos a la vista.
   await expect(page.locator('#surveyShareBtn')).toContainText('Enviar encuesta');
-  const textoVisible = await page.locator('#surveyToolContent').innerText();
+  const textoVisible = await page.locator('.gente-acciones').innerText();
   expect(textoVisible).not.toContain('token');
   expect(textoVisible).not.toContain('http');
   expect(textoVisible).not.toContain('24 horas');
@@ -243,16 +244,18 @@ test('Mi Encuesta y Mi Gestión usan la cuenta autenticada y guardan el seguimie
 
   await page.evaluate(() => openMiGestion());
   await expect(page.locator('#view-gestion')).toHaveClass(/active/);
-  await expect(page.locator('.gestion-main-tab')).toHaveCount(4);
+  // Mi Gente tiene tres solapas: Hoy, Todos y Resultados.
+  await expect(page.locator('.gestion-main-tab')).toHaveCount(3);
+  await expect(page.locator('.gestion-main-tab')).toHaveText([/Hoy/, /Todos/, /Resultados/]);
   await expect(page.locator('.gestion-contact')).toHaveCount(2);
   await expect(page.locator(`.gestion-contact[data-contact-id="${CONTACT_ID}"]`)).toHaveClass(/priority-high/);
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(390);
   await expect(page.locator('.gestion-stat').first().locator('b')).toHaveText('1');
   await expect(page.locator('#gestionSidebarBadge')).toHaveText('2');
-  await page.locator('[data-gestion-view="embudo"]').click();
-  await expect(page.locator('.gestion-funnel-stage')).toHaveCount(5);
+  // El embudo dejó de ser una solapa propia: ahora se ve dentro de Resultados.
   await page.locator('[data-gestion-view="resultados"]').click();
   await expect(page.locator('.gestion-result')).toHaveCount(7);
+  await expect(page.locator('.gestion-funnel-stage')).toHaveCount(5);
   await page.locator('[data-gestion-view="hoy"]').click();
 
   await page.locator(`[data-open-contact="${CONTACT_ID}"]`).click();
