@@ -237,9 +237,9 @@ test('Mi Encuesta y Mi Gestión usan la cuenta autenticada y guardan el seguimie
   await expect(page.locator('#appiDialogTitle')).toHaveText('Envíos preparados');
   await page.locator('#appiDialogOk').click();
   // Los envíos recientes muestran a quién le falta, no el enlace.
-  await expect(page.locator('.share-row')).toHaveCount(2);
-  await expect(page.locator('.share-row').first()).toContainText('Bruno Dos');
-  await expect(page.locator('.share-row').first()).toContainText('Falta enviar');
+  // La carga múltiple sigue disponible por API y genera una invitación por persona.
+  expect(await page.evaluate(() => APPIGestion.state.bulkQueue.length)).toBe(2);
+  expect(await page.evaluate(() => APPIGestion.state.bulkQueue.map(row => row.nombre))).toEqual(['Ana Uno', 'Bruno Dos']);
 
   await page.evaluate(() => openMiGestion());
   await expect(page.locator('#view-gestion')).toHaveClass(/active/);

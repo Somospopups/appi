@@ -40,10 +40,22 @@ async function abrirComoDistribuidor(page, invitaciones) {
   await page.addInitScript(() => {
     localStorage.setItem('welcomeSeen', '1');
     localStorage.setItem('tutoVisto_v2', '1');
-    // Sin agenda del navegador, el botón pide los datos directamente.
-    delete navigator.contacts;
-    window.__ventanas = [];
-    window.open = url => { window.__ventanas.push(url); return null; };
+    // Se registra la pestaña que APPI abre y a dónde termina navegando,
+    // sin dejar que el navegador de pruebas salga hacia WhatsApp.
+    window.__destinos = [];
+    window.open = () => {
+      const ventana = {
+        closed: false,
+        close() { this.closed = true; },
+        // APPI asigna `popup.location.href`: se registra sin navegar.
+        location: {
+          set href(valor) { window.__destinos.push(String(valor)); },
+          get href() { return ''; }
+        }
+      };
+      window.__ultimaVentana = ventana;
+      return ventana;
+    };
   });
   await page.goto('/index.html', { waitUntil: 'networkidle' });
   await page.locator('#distributorInput').fill('02-9802014');
@@ -60,85 +72,72 @@ test('Mi Encuesta muestra un solo botón, sin datos técnicos', async ({ page })
   const boton = page.locator('#surveyShareBtn');
   await expect(boton).toBeVisible();
   await expect(boton).toContainText('Enviar encuesta');
+  await expect(boton).toContainText('Se abre WhatsApp para elegir el contacto');
 
-  // Una sola acción principal en toda la pantalla.
+  // Una sola acción en toda la pantalla.
   await expect(page.locator('#surveyToolContent button')).toHaveCount(1);
 
-  // Nada de jerga interna a la vista del distribuidor.
+  // Nada de jerga interna ni enlaces a la vista del distribuidor.
   const texto = await page.locator('#surveyToolContent').innerText();
   for (const prohibido of ['token', 'http', '24 horas', 'dispositivo', 'vence', 'Copiar', 'cola']) {
     expect(texto.toLowerCase()).not.toContain(prohibido.toLowerCase());
   }
+  await expect(page.locator('.survey-link-value')).toHaveCount(0);
 });
 
-test('cada envío pide un destinatario nuevo y anima el viaje', async ({ page }) => {
+test('el botón crea la encuesta, la anima y deja elegir el contacto en WhatsApp', async ({ page }) => {
   const invitaciones = [];
   await abrirComoDistribuidor(page, invitaciones);
 
   const boton = page.locator('#surveyShareBtn');
   await boton.click();
 
-  // Primer paso: a quién.
-  await expect(page.locator('#appiDialogTitle')).toHaveText('Enviar encuesta');
-  await page.locator('#appiDialogInput').fill('Ana Gómez');
-  await page.locator('#appiDialogOk').click();
-
-  // Segundo paso: su teléfono.
-  await page.locator('#appiDialogInput').fill('3515551001');
-  await page.locator('#appiDialogOk').click();
+  // No se pide destinatario dentro de APPI: eso lo resuelve WhatsApp.
+  await expect(page.locator('#appiDialogTitle')).not.toBeVisible();
 
   // La animación se dispara sólo después de crear la invitación real.
   await expect(boton).toHaveClass(/sending/, { timeout: 5000 });
-  await expect(page.locator('.share-done b')).toHaveText('Para Ana');
   await expect(boton).not.toHaveClass(/sending/, { timeout: 5000 });
 
-  // Se abrió WhatsApp con el enlace de esa invitación.
-  const ventanas = await page.evaluate(() => window.__ventanas);
-  expect(ventanas).toHaveLength(1);
-  // APPI antepone el código de Argentina para que WhatsApp resuelva el número.
-  expect(ventanas[0]).toContain('wa.me/5493515551001');
-  expect(decodeURIComponent(ventanas[0])).toContain('encuesta.html?t=');
+  const destinos = await page.evaluate(() => window.__destinos);
+  expect(destinos).toHaveLength(1);
+  // Sin número: WhatsApp abre su propio selector de contactos.
+  expect(destinos[0].startsWith('https://wa.me/?text=')).toBe(true);
+  expect(decodeURIComponent(destinos[0])).toContain('encuesta.html?t=');
   expect(invitaciones).toHaveLength(1);
 
-  // Queda registrado como enviado.
-  await expect(page.locator('.share-row')).toHaveCount(1);
-  await expect(page.locator('.share-row').first()).toContainText('Ana Gómez');
-  await expect(page.locator('.share-row').first()).toContainText('Enviada');
-
-  // Segundo envío: vuelve a preguntar, no reutiliza el destinatario anterior.
+  // Segundo toque: otra encuesta distinta, mismo flujo.
   await boton.click();
-  await expect(page.locator('#appiDialogTitle')).toHaveText('Enviar encuesta');
-  await expect(page.locator('#appiDialogInput')).toHaveValue('');
-  await page.locator('#appiDialogInput').fill('Bruno Díaz');
-  await page.locator('#appiDialogOk').click();
-  await page.locator('#appiDialogInput').fill('3515552002');
-  await page.locator('#appiDialogOk').click();
+  await expect(boton).toHaveClass(/sending/, { timeout: 5000 });
+  await expect(boton).not.toHaveClass(/sending/, { timeout: 5000 });
 
-  await expect(page.locator('.share-row')).toHaveCount(2, { timeout: 6000 });
-  await expect(page.locator('.share-row').first()).toContainText('Bruno Díaz');
-
-  // Cada persona recibió una invitación distinta.
+  const finales = await page.evaluate(() => window.__destinos);
+  expect(finales).toHaveLength(2);
   expect(invitaciones).toHaveLength(2);
-  const ventanasFinales = await page.evaluate(() => window.__ventanas);
-  expect(ventanasFinales).toHaveLength(2);
-  expect(ventanasFinales[0]).not.toBe(ventanasFinales[1]);
+  expect(finales[0]).not.toBe(finales[1]);
 });
 
-test('un número incompleto no genera invitación', async ({ page }) => {
+test('si falla la creación se avisa y se cierra la pestaña abierta', async ({ page }) => {
   const invitaciones = [];
   await abrirComoDistribuidor(page, invitaciones);
 
+  // La siguiente creación falla en el servidor.
+  await page.route('https://mock.supabase.co/rest/v1/rpc/appi_crear_invitacion_encuesta', route => route.fulfill({
+    status: 500,
+    headers: { 'access-control-allow-origin': '*', 'content-type': 'application/json' },
+    body: JSON.stringify({ message: 'Servidor no disponible' })
+  }));
+
   await page.locator('#surveyShareBtn').click();
-  await page.locator('#appiDialogInput').fill('Carlos Corto');
-  await page.locator('#appiDialogOk').click();
-  await page.locator('#appiDialogInput').fill('351');
+  await expect(page.locator('#appiDialogTitle')).toHaveText('No pudimos crear la invitación');
   await page.locator('#appiDialogOk').click();
 
-  await expect(page.locator('#appiDialogTitle')).toHaveText('Número inválido');
-  await page.locator('#appiDialogOk').click();
+  // No se navega a WhatsApp y la pestaña en blanco se cierra.
+  const destinos = await page.evaluate(() => window.__destinos);
+  expect(destinos).toHaveLength(0);
+  expect(await page.evaluate(() => window.__ultimaVentana.closed)).toBe(true);
 
-  expect(invitaciones).toHaveLength(0);
-  await expect(page.locator('.share-row')).toHaveCount(0);
-  const ventanas = await page.evaluate(() => window.__ventanas);
-  expect(ventanas).toHaveLength(0);
+  // El botón vuelve a quedar utilizable.
+  await expect(page.locator('#surveyShareBtn')).toBeEnabled();
+  await expect(page.locator('#surveyShareBtn')).not.toHaveClass(/sending/);
 });

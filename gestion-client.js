@@ -203,90 +203,47 @@ function renderSurveyTool(){
     c.innerHTML=`<div class="gestion-empty"><div class="ico">🔒</div><h3>Herramienta para distribuidores</h3><p>POPUPS administra APPI, pero no tiene número de distribuidor. Cada distribuidor genera sus propias invitaciones privadas.</p></div>`;return;
   }
   // Una sola acción visible. Los tokens, vencimientos y URLs son detalles de
-  // implementación: el distribuidor solo elige a quién le manda la encuesta.
+  // implementación que el distribuidor no necesita ver.
   c.innerHTML=`
     <div class="share-stage">
       <button type="button" class="share-btn" id="surveyShareBtn">
         <span class="glow"></span>
-        <span class="share-face"><span class="plane">📨</span><strong>Enviar encuesta</strong><small>Elegí a quién se la mandás</small></span>
+        <span class="share-face"><span class="plane">📨</span><strong>Enviar encuesta</strong><small>Se abre WhatsApp para elegir el contacto</small></span>
         <span class="share-fly" aria-hidden="true">✈️</span>
         <span class="share-trail" aria-hidden="true"><i></i><i></i><i></i></span>
-        <span class="share-done" aria-hidden="true"><span class="tick">✓</span><b id="surveyDoneName">¡Enviada!</b></span>
+        <span class="share-done" aria-hidden="true"><span class="tick">✓</span><b>¡Lista para enviar!</b></span>
       </button>
     </div>
-    <p class="share-hint">Cada persona recibe su propia encuesta. Las respuestas aparecen solas en <b>Mi Gestión</b>.</p>
-    ${recentSharesHTML()}`;
+    <p class="share-hint">Cada envío crea una encuesta nueva. Las respuestas aparecen solas en <b>Mi Gestión</b>.</p>`;
   if($('surveyShareBtn'))$('surveyShareBtn').onclick=startShareFlow;
-  document.querySelectorAll('[data-bulk-send]').forEach(link=>link.onclick=()=>markBulkSent(link.dataset.bulkSend));
 }
 
-// Muestra sólo lo accionable: a quién le falta recibir la encuesta.
-function recentSharesHTML(){
-  const rows=state.bulkQueue.slice(-6).reverse();
-  if(!rows.length)return '';
-  return `<section class="share-recent"><h3>Envíos recientes</h3>${rows.map(row=>{
-    const wa=`https://wa.me/${whatsappDigits(row.telefono)}?text=${encodeURIComponent(shareMessage(row.url,row.nombre))}`;
-    return `<div class="share-row ${row.sent?'sent':''}"><span class="who">${row.sent?'✓':'👤'}</span><span class="txt"><b>${esc(row.nombre)}</b><small>${row.sent?'Enviada':'Falta enviar'}</small></span><a href="${esc(wa)}" target="_blank" rel="noopener" data-bulk-send="${esc(row.id)}">${row.sent?'Reenviar':'Enviar'}</a></div>`;
-  }).join('')}</section>`;
-}
-
-// Cada pulsación arranca de cero: primero se elige el destinatario.
+// Un solo toque: se crea la invitación, vuela el avión y WhatsApp abre su
+// propio selector de contactos. Elegir a la persona es tarea de WhatsApp.
 async function startShareFlow(){
   const button=$('surveyShareBtn');
   if(!button||button.disabled)return;
-  let person;
-  try{person=await pickShareRecipient()}
-  catch(error){await window.APPIDialog.alert(error.message,{title:'No pudimos abrir la agenda',icon:'!'});return}
-  if(!person)return;
 
+  // La ventana se abre en el mismo gesto del usuario; si se pidiera después de
+  // esperar al servidor, el navegador la bloquearía como popup.
+  const popup=window.open('about:blank','_blank');
   button.disabled=true;
   try{
     // La invitación se crea primero: la animación confirma un envío real.
     const invitation=await createSurveyInvitation(false),url=surveyUrl(invitation);
-    const entry={id:uuidV4(),nombre:person.nombre,telefono:person.telefono,token:invitation.token,expires_at:invitation.expires_at,url,sent:false,created_at:new Date().toISOString()};
-    state.bulkQueue.push(entry);saveBulkQueue();
-
-    await playShareAnimation(button,person.nombre);
-    markBulkSent(entry.id,false);
-    const wa=`https://wa.me/${whatsappDigits(person.telefono)}?text=${encodeURIComponent(shareMessage(url,person.nombre))}`;
-    window.open(wa,'_blank','noopener');
-    setTimeout(renderSurveyTool,260);
+    await playShareAnimation(button);
+    const wa=`https://wa.me/?text=${encodeURIComponent(shareMessage(url))}`;
+    if(popup)popup.location.href=wa;else location.href=wa;
   }catch(error){
+    if(popup)popup.close();
     button.classList.remove('sending','done');
     await window.APPIDialog.alert(error.message,{title:'No pudimos crear la invitación',icon:'!'});
   }finally{button.disabled=false}
 }
 
-// Agenda del teléfono cuando existe; carga manual como alternativa siempre.
-async function pickShareRecipient(){
-  const puedeAgenda=Boolean(navigator.contacts&&typeof navigator.contacts.select==='function');
-  if(puedeAgenda){
-    const opcion=await window.APPIDialog.choose('¿A quién le enviás la encuesta?',[{label:'📇 Elegir de mi agenda',value:'agenda'},{label:'✎ Escribir el contacto',value:'manual'}],{title:'Enviar encuesta',icon:'📨'});
-    if(!opcion)return null;
-    if(opcion==='agenda'){
-      let seleccion;
-      try{seleccion=await navigator.contacts.select(['name','tel'],{multiple:false})}
-      catch(error){if(error&&['AbortError','NotAllowedError'].includes(error.name))return null;throw new Error('No pudimos abrir la agenda. Probá escribiendo el contacto.')}
-      const elegido=(seleccion||[])[0];
-      if(!elegido)return null;
-      const nombre=contactPickerValue(elegido.name),telefono=contactPickerValue(elegido.tel);
-      if(!nombre||phoneDigits(telefono).length<8){await window.APPIDialog.alert('Ese contacto no tiene nombre y número completos.',{title:'Faltan datos',icon:'📇'});return null}
-      return {nombre:nombre.slice(0,120),telefono:telefono.slice(0,30)};
-    }
-  }
-  const nombre=await window.APPIDialog.prompt('¿A quién le enviás la encuesta?','',{title:'Enviar encuesta',icon:'👤',placeholder:'Nombre',okText:'Continuar'});
-  if(!nombre||!nombre.trim())return null;
-  const telefono=await window.APPIDialog.prompt('¿Cuál es su WhatsApp?','',{title:esc(nombre.trim().split(/\s+/)[0]),icon:'📱',placeholder:'Ej: 351 555 1234',inputType:'tel',okText:'Enviar'});
-  if(!telefono)return null;
-  if(phoneDigits(telefono).length<8){await window.APPIDialog.alert('Revisá el número: parece incompleto.',{title:'Número inválido',icon:'📱'});return null}
-  return {nombre:nombre.trim().slice(0,120),telefono:telefono.trim().slice(0,30)};
-}
-
 // El avión cruza la tarjeta y deja el tilde de confirmación.
-function playShareAnimation(button,nombre){
+function playShareAnimation(button){
   return new Promise(resolve=>{
-    const etiqueta=$('surveyDoneName');
-    if(etiqueta)etiqueta.textContent=`Para ${String(nombre||'').trim().split(/\s+/)[0]||'tu contacto'}`;
     const reducido=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     button.classList.remove('done');button.classList.add('sending');
     setTimeout(()=>{button.classList.add('done');setTimeout(()=>{button.classList.remove('sending','done');resolve()},reducido?60:620)},reducido?60:980);
