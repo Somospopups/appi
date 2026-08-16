@@ -34,20 +34,24 @@ end$$;
 --    'no_contactado' (aún no lo llamé) y 'mas_adelante' (rebote suave).
 --    Se amplía el check sin tocar los estados que ya se usan.
 -- ---------------------------------------------------------------------
+-- Cuidado: Postgres normaliza `in (...)` a `= ANY (ARRAY[...])` en
+-- pg_get_constraintdef, así que buscar con un patrón "%...%in%" nunca
+-- encuentra el check viejo y el constraint anterior queda vivo,
+-- restringiendo más que la lista nueva. Se compara contra la definición
+-- normalizada y se borra TODO check de estado, tenga el nombre que tenga.
 do $$
 declare
-  nombre_check text;
+  viejo record;
 begin
-  select conname into nombre_check
-  from pg_constraint
-  where conrelid = 'public.appi_gestion_contactos'::regclass
-    and contype = 'c'
-    and pg_get_constraintdef(oid) ilike '%estado%in%'
-  limit 1;
-
-  if nombre_check is not null then
-    execute format('alter table public.appi_gestion_contactos drop constraint %I', nombre_check);
-  end if;
+  for viejo in
+    select conname
+    from pg_constraint
+    where conrelid = 'public.appi_gestion_contactos'::regclass
+      and contype = 'c'
+      and pg_get_constraintdef(oid) ~* '\(estado (=|in)'
+  loop
+    execute format('alter table public.appi_gestion_contactos drop constraint %I', viejo.conname);
+  end loop;
 
   alter table public.appi_gestion_contactos
     add constraint appi_gestion_estado_valido
@@ -76,20 +80,21 @@ where origen_local_id <> '';
 -- 4. 'manual' sigue siendo un tipo válido; agregamos 'contacto' para los
 --    que llegan desde la agenda local, sin romper los tipos existentes.
 -- ---------------------------------------------------------------------
+-- Misma regla que en el bloque de estados: se borra todo check de tipo
+-- (el automático de la instalación y cualquier repetición) y se deja uno solo.
 do $$
 declare
-  nombre_check text;
+  viejo record;
 begin
-  select conname into nombre_check
-  from pg_constraint
-  where conrelid = 'public.appi_gestion_contactos'::regclass
-    and contype = 'c'
-    and pg_get_constraintdef(oid) ilike '%tipo%in%'
-  limit 1;
-
-  if nombre_check is not null then
-    execute format('alter table public.appi_gestion_contactos drop constraint %I', nombre_check);
-  end if;
+  for viejo in
+    select conname
+    from pg_constraint
+    where conrelid = 'public.appi_gestion_contactos'::regclass
+      and contype = 'c'
+      and pg_get_constraintdef(oid) ~* '\(tipo (=|in)'
+  loop
+    execute format('alter table public.appi_gestion_contactos drop constraint %I', viejo.conname);
+  end loop;
 
   alter table public.appi_gestion_contactos
     add constraint appi_gestion_tipo_valido
@@ -144,13 +149,20 @@ begin
     raise exception 'El contacto % necesita un teléfono válido', p_nombre;
   end if;
 
+  -- Acepta tanto las etiquetas con espacio que venían de Contactos
+  -- como los ids con guion bajo que ya usa la nube.
   v_estado := case lower(coalesce(p_estado, ''))
     when 'contactado'     then 'contactado'
     when 'no contactado'  then 'no_contactado'
+    when 'no_contactado'  then 'no_contactado'
     when 'seguimiento'    then 'seguimiento'
     when 'más adelante'   then 'mas_adelante'
     when 'mas adelante'   then 'mas_adelante'
+    when 'mas_adelante'   then 'mas_adelante'
     when 'no le interesa' then 'no_interesado'
+    when 'no_interesado'  then 'no_interesado'
+    when 'presentacion'   then 'presentacion'
+    when 'convertido'     then 'convertido'
     else 'nuevo'
   end;
 

@@ -142,6 +142,22 @@ test('la migración de Mi Gente se puede correr dos veces sin romper', () => {
   }
 });
 
+test('ninguna migración busca checks con el patrón "%in%" que Postgres nunca almacena', () => {
+  // pg_get_constraintdef normaliza `check (x in (...))` a
+  // `CHECK (x = ANY (ARRAY[...]))`, así que un ilike '%...%in%' nunca
+  // encuentra el constraint viejo: la migración choca al repetirse o deja
+  // checks apilados que siguen restringiendo a la lista vieja.
+  const problemas = [];
+  for (const archivo of MIGRACIONES) {
+    if (!fs.existsSync(archivo)) continue;
+    const sql = sinComentarios(fs.readFileSync(archivo, 'utf8'));
+    if (/pg_get_constraintdef\(oid\)\s+ilike\s+'[^']*%in%'/i.test(sql)) {
+      problemas.push(archivo);
+    }
+  }
+  expect(problemas, `Patrón frágil en: ${problemas.join(', ')}`).toEqual([]);
+});
+
 test('la migración no borra ni vacía datos existentes', () => {
   // Una migración de unificación jamás debería tener estas sentencias.
   expect(MI_GENTE_LIMPIO).not.toMatch(/\bdrop\s+table\b/i);
