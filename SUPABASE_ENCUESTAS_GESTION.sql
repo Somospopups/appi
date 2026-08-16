@@ -699,6 +699,7 @@ alter table public.appi_encuesta_invitaciones
   check (persona_tipo in ('titular', 'socio'));
 
 drop function if exists public.appi_crear_invitacion_encuesta();
+drop function if exists public.appi_crear_invitacion_encuesta(text);
 
 create function public.appi_crear_invitacion_encuesta(
   p_persona_tipo text default 'titular'

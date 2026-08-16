@@ -20,17 +20,33 @@ jobs:
       - name: Verificar credencial temporal
         run: test -n "$SUPABASE_ACCESS_TOKEN" || (echo "Falta el secret SUPABASE_ACCESS_TOKEN" && exit 1)
 
-      - name: Instalar migraciones de titular y socio
+      - name: Instalar migraciones de titular, socio y recordatorios
         run: |
+          # Cada migración informa su propio resultado. Sin esto, un error
+          # temprano corta el paso sin decir cuál de los archivos falló.
+          fallidas=""
           for migration in SUPABASE_PERSONAS_CUENTA.sql SUPABASE_INVITACIONES_PERSONA.sql SUPABASE_RECORDATORIOS.sql; do
+            echo "::group::$migration"
             jq -Rs '{query: ., read_only: false}' "$migration" > /tmp/migration.json
-            curl --fail-with-body --silent --show-error \
+            if curl --fail-with-body --silent --show-error \
               --request POST \
               --url "https://api.supabase.com/v1/projects/$SUPABASE_PROJECT_ID/database/query" \
               --header "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
               --header "Content-Type: application/json" \
-              --data-binary @/tmp/migration.json
+              --data-binary @/tmp/migration.json; then
+              echo ""
+              echo "OK: $migration"
+            else
+              echo ""
+              echo "::error::Falló la migración $migration"
+              fallidas="$fallidas $migration"
+            fi
+            echo "::endgroup::"
           done
+          if [ -n "$fallidas" ]; then
+            echo "Migraciones con error:$fallidas"
+            exit 1
+          fi
 
       - uses: supabase/setup-cli@v1
         with:

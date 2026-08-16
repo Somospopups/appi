@@ -12,7 +12,11 @@ alter table public.appi_encuesta_invitaciones
   add constraint appi_encuesta_invitaciones_persona_tipo_check
   check (persona_tipo in ('titular', 'socio'));
 
+-- Se eliminan ambas firmas: la original sin argumentos y la de esta versión.
+-- Sin esto, repetir la migración falla con 42723 (la función ya existe) y
+-- corta el resto del despliegue.
 drop function if exists public.appi_crear_invitacion_encuesta();
+drop function if exists public.appi_crear_invitacion_encuesta(text);
 
 create function public.appi_crear_invitacion_encuesta(
   p_persona_tipo text default 'titular'
