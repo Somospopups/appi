@@ -4,7 +4,7 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
-- Versión: **v215 · Notificaciones accionables**.
+- Versión: **v216 · Recordatorios de Mi Gestión**.
 - Publicación: [https://somospopups.github.io/appi/](https://somospopups.github.io/appi/)
 - Acceso por número de distribuidor y contraseña.
 - Acceso administrador POPUPS mediante el candado, sin DIP ni número de distribuidor.
@@ -70,6 +70,30 @@ Al tocar **Llamar** desde Mi Gestión en PC o tablet:
 - la actividad y su resultado quedan registrados en Mi Gestión.
 
 En iPhone, APPI debe instalarse en la pantalla de inicio para recibir Web Push. En Android funciona como PWA o desde Chrome con notificaciones autorizadas.
+
+## Recordatorios de Mi Gestión
+
+El mismo teléfono vinculado recibe dos avisos automáticos, sin permisos ni vinculaciones adicionales:
+
+- **Resumen diario a las 9:00**: nuevos, seguimientos del día, vencidos, presentaciones y encuestas recibidas el día anterior, en una sola notificación. Si no hay nada pendiente, no llega nada.
+- **Aviso 30 minutos antes de cada presentación** que tenga hora cargada.
+
+Al tocar el resumen se abre Mi Gestión en la vista **Hoy**; al tocar un aviso de presentación se abre ese contacto. El destino se conserva durante el ingreso y la elección de titular o socio.
+
+La hora de la presentación es un campo opcional dentro del detalle del contacto. Titular y socio reciben el resumen de la cuenta en su propio teléfono.
+
+Instalación del backend:
+
+1. Ejecutar `SUPABASE_RECORDATORIOS.sql` en el SQL Editor.
+2. Guardar `appi_project_url` y `appi_service_role_key` en Vault.
+3. Desplegar `recordatorios-gestion`.
+
+Archivos relacionados:
+
+- `SUPABASE_RECORDATORIOS.sql`
+- `supabase/functions/recordatorios-gestion/index.ts`
+- `service-worker.js`
+- `gestion-client.js`
 
 Archivos relacionados:
 

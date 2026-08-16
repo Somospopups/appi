@@ -22,7 +22,7 @@ jobs:
 
       - name: Instalar migraciones de titular y socio
         run: |
-          for migration in SUPABASE_PERSONAS_CUENTA.sql SUPABASE_INVITACIONES_PERSONA.sql; do
+          for migration in SUPABASE_PERSONAS_CUENTA.sql SUPABASE_INVITACIONES_PERSONA.sql SUPABASE_RECORDATORIOS.sql; do
             jq -Rs '{query: ., read_only: false}' "$migration" > /tmp/migration.json
             curl --fail-with-body --silent --show-error \
               --request POST \
@@ -44,3 +44,6 @@ jobs:
 
       - name: Publicar teléfonos por persona
         run: supabase functions deploy dispositivo-puente --project-ref "$SUPABASE_PROJECT_ID"
+
+      - name: Publicar recordatorios de Mi Gestión
+        run: supabase functions deploy recordatorios-gestion --project-ref "$SUPABASE_PROJECT_ID"

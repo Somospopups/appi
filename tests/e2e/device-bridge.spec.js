@@ -80,7 +80,7 @@ test('al tocar la notificación abre APPI cerrada o enfoca la ventana existente'
   });
   await work;
   expect(openedUrl).toBe(`https://somospopups.github.io/appi/?bridge_call=${commandId}`);
-  expect(openedMessages).toContainEqual({ type: 'APPI_OPEN_COMMAND', url: openedUrl, command_id: commandId });
+  expect(openedMessages[0]).toMatchObject({ type: 'APPI_OPEN_COMMAND', url: openedUrl, command_id: commandId, notification: 'call_request' });
   expect(closed).toBe(1);
 
   const focusedMessages = [];

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v215-notificaciones-accionables';
+const CACHE_NAME = 'appi-v216-recordatorios-gestion';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
@@ -99,21 +99,47 @@ self.addEventListener('fetch', event => {
 });
 
 
-// Solicitudes enviadas desde una PC o tablet a un teléfono vinculado.
+// Cada tipo de aviso se agrupa con su propia etiqueta para que un recordatorio
+// nunca reemplace una solicitud de llamada en la bandeja del teléfono.
+function notificationTag(data) {
+  if (data.command_id) return 'appi-command-' + data.command_id;
+  if (data.type === 'daily_summary') return 'appi-daily-summary';
+  if (data.type === 'presentation_reminder') return 'appi-presentation-' + (data.contacto_id || 'proxima');
+  return 'appi-device-command';
+}
+
+function notificationLabel(type) {
+  if (type === 'call_request') return 'Abrir llamada';
+  if (type === 'daily_summary') return 'Ver Mi Gestión';
+  if (type === 'presentation_reminder') return 'Ver contacto';
+  return 'Abrir APPI';
+}
+
+// Solicitudes de llamada desde una PC o tablet y recordatorios de Mi Gestión.
 self.addEventListener('push', event => {
   let data = {};
   try { data = event.data ? event.data.json() : {}; } catch (error) {}
+  const type = data.type || '';
+  // Una llamada exige atención inmediata; un recordatorio puede esperar en la
+  // bandeja sin bloquear la pantalla.
+  const urgent = type === 'call_request';
   const title = data.title || 'APPI';
   const options = {
     body: data.body || 'Tenés una nueva solicitud.',
     icon: './icon-192.png',
     badge: './notification-badge.png',
-    tag: data.command_id ? `appi-command-${data.command_id}` : 'appi-device-command',
+    tag: notificationTag(data),
     renotify: true,
-    requireInteraction: true,
-    data: { url: data.url || './', command_id: data.command_id || '', type: data.type || '' },
+    requireInteraction: urgent,
+    silent: false,
+    data: {
+      url: data.url || './',
+      command_id: data.command_id || '',
+      contacto_id: data.contacto_id || '',
+      type: type
+    },
     actions: [
-      { action: 'open', title: data.type === 'call_request' ? 'Abrir llamada' : 'Abrir APPI' },
+      { action: 'open', title: notificationLabel(type) },
       { action: 'dismiss', title: 'Ahora no' }
     ]
   };
@@ -135,7 +161,13 @@ function notificationTarget(data = {}) {
 
 async function focusOrOpenNotification(target, data = {}) {
   const commandId = String(data.command_id || '');
-  const message = { type: 'APPI_OPEN_COMMAND', url: target, command_id: commandId };
+  const message = {
+    type: 'APPI_OPEN_COMMAND',
+    url: target,
+    command_id: commandId,
+    notification: String(data.type || ''),
+    contacto_id: String(data.contacto_id || '')
+  };
   const windows = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
   const scoped = windows.filter(client => String(client.url || '').startsWith(self.registration.scope));
   for (const client of scoped) {
