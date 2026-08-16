@@ -4,7 +4,7 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
-- Versión: **v226 · ¿Qué WhatsApp utilizás?**.
+- Versión: **v227 · Línea Ascendente**.
 - Publicación: [https://somospopups.github.io/appi/](https://somospopups.github.io/appi/)
 - Acceso por número de distribuidor y contraseña.
 - Acceso administrador POPUPS mediante el candado, sin DIP ni número de distribuidor.
@@ -58,6 +58,10 @@ supabase functions deploy encuesta-publica --no-verify-jwt
 ```
 
 La función valida el enlace, la membresía, el contenido, el consentimiento y los referidos antes de registrar los datos.
+
+## Línea Ascendente
+
+Desde v227, el home muestra la línea de crecimiento del distribuidor: categoría actual (Arranque, Constructor, Líder o Director), métricas vivas del equipo y del Panel, y lo que falta para la próxima categoría en criollo. Las primeras diez cuentas reclaman el cupo de **Fundador** con insignia permanente y precio congelado; el backend vive en `SUPABASE_LINEA_ASCENDENTE.sql`.
 
 ## Titular y socio
 

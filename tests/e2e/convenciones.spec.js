@@ -6,7 +6,7 @@ const fs = require('fs');
 // como último recurso y define la API APPIDialog.
 const ARCHIVOS = [
   'index.html', 'encuesta.html', 'revisar-contactos.html',
-  'gestion-client.js', 'historico.js', 'data-sync.js', 'auth-client.js',
+  'gestion-client.js', 'historico.js', 'data-sync.js', 'auth-client.js', 'linea-ascendente.js',
   'admin-panel.js', 'account-request.js', 'device-bridge.js', 'whatsapp-app.js'
 ];
 
