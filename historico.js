@@ -691,7 +691,7 @@ function renderCloud(c){
 
 function showHelp(){
   const html=`<p>El Histórico guarda una fotografía independiente de cada cierre mensual.</p><div class="tip"><b>Necesitás tres archivos del mismo período:</b><br>1. Línea Descendente.<br>2. Garantías por Organización.<br>3. Ingresos.</div><p><b>Resumen y análisis:</b> reúne el Resumen Anual, los gráficos, las comparaciones y las estrategias.<br><b>Cargar y administrar:</b> permite cargar meses, descargar originales, respaldar o eliminar cierres.</p><p style="font-size:11px;color:#777887">Un archivo de Ingresos sin personas es válido y representa cero ingresos. El archivo único de Usuarios / Garantías continúa en su sección habitual.</p>`;
-  try{modal.open({icon:'📈',iconBg:'linear-gradient(135deg,#5b8def,#a06bff)',title:'Cómo usar el Histórico',sub:'Control mensual y anual',html})}catch(e){alert('Cargá los tres archivos de cada mes y compará los cierres dentro de Resumen y análisis.')}
+  try{modal.open({icon:'📈',iconBg:'linear-gradient(135deg,#5b8def,#a06bff)',title:'Cómo usar el Histórico',sub:'Control mensual y anual',html})}catch(e){window.APPIDialog.alert('Cargá los tres archivos de cada mes y compará los cierres dentro de Resumen y análisis.',{title:'Cómo usar el Histórico',icon:'📈'})}
 }
 async function openHistorico(){
   showView('view-historico');const c=$('historicoContent');if(c)c.innerHTML='<div class="hist-loading"><span></span>Abriendo cierres mensuales…</div>';

@@ -30,6 +30,7 @@
   button{width:100%;min-height:48px;margin-top:12px;border:0;border-radius:14px;font:inherit;font-size:14px;
          font-weight:900;color:#fff;background:linear-gradient(135deg,#5b8def,#8b63e8);cursor:pointer}
   .copiado{text-align:center;font-size:12px;color:#1f9d61;font-weight:800;min-height:18px;margin-top:6px}
+  .copiar-manual{width:100%;min-height:96px;margin-top:10px;padding:10px;border:1px solid rgba(80,90,130,.25);border-radius:12px;font:inherit;font-size:12px;background:#f8f9ff;color:#292938}
   code{background:rgba(80,90,130,.09);padding:1px 5px;border-radius:5px;font-size:12px}
 </style>
 </head>
@@ -68,6 +69,7 @@
   <div class="card">
     <div class="aviso" id="avisoFinal">Cargando…</div>
     <button id="btnCopiar">📋 Copiar este resumen</button>
+    <textarea class="copiar-manual" id="copiarManual" hidden readonly aria-label="Resumen para copiar"></textarea>
     <div class="copiado" id="copiado"></div>
   </div>
 </div>
@@ -123,9 +125,16 @@
     var txt = 'Mis contactos: ' + lista.length + ' en total · ' + ok.length + ' con teléfono · ' + sin.length + ' sin teléfono.';
     if (sin.length) txt += '\nSin teléfono: ' + sin.map(function(p){ return (p && p.nombre) || 'Sin nombre'; }).join(', ') + '.';
     function fin(){ document.getElementById('copiado').textContent = '¡Copiado! Pegámelo en el chat.'; }
+    // Sin clipboard disponible: se muestra el resumen en un cuadro de texto
+    // ya seleccionado, listo para copiar a mano. Nunca un diálogo nativo.
+    function manual(){
+      var caja = document.getElementById('copiarManual');
+      caja.hidden = false; caja.value = txt; caja.focus(); caja.select();
+      document.getElementById('copiado').textContent = 'No se pudo copiar solo: el texto quedó seleccionado abajo.';
+    }
     if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(txt).then(fin, function(){ prompt('Copiá este texto:', txt); });
-    } else { prompt('Copiá este texto:', txt); }
+      navigator.clipboard.writeText(txt).then(fin, manual);
+    } else { manual(); }
   });
 })();
 </script>

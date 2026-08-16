@@ -4,7 +4,7 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
-- Versión: **v217 · Enviar encuesta**.
+- Versión: **v225 · Diálogos propios**.
 - Publicación: [https://somospopups.github.io/appi/](https://somospopups.github.io/appi/)
 - Acceso por número de distribuidor y contraseña.
 - Acceso administrador POPUPS mediante el candado, sin DIP ni número de distribuidor.
@@ -23,9 +23,11 @@ Todo pasa por `whatsapp-app.js` (`window.APPIWhatsApp`), que además intercepta 
 
 Los enlaces `intent://` se navegan **en la pestaña actual**, nunca con `window.open`: el navegador no puede dibujar un intent y dejaría una pantalla en blanco. Los `wa.me` comunes sí se abren en otra pestaña.
 
-## Mi Encuesta y Mi Gestión
+## Panel de Contactos (Mi Encuesta y Mi Gestión)
 
-Desde **Mis herramientas → Mi Encuesta**, la pantalla es un solo botón: **Enviar encuesta**. Al tocarlo, APPI crea la invitación, muestra la animación de envío y abre WhatsApp con el mensaje listo, donde el distribuidor elige el contacto desde su propia agenda. Cada toque genera una invitación privada diferente, que vence en 24 horas, queda ligada al primer dispositivo que la abre y acepta una sola respuesta.
+Vive en **Mi negocio** y reúne encuestas y seguimiento en una sola pantalla, con las solapas **Hoy**, **Todos** y **Resultados**. Arriba, dos accesos del mismo tamaño: **Enviar encuesta** y **Agregar contacto** (formulario a la vista, con errores traducidos al lado de cada campo). La encuesta es una **herramienta de retorno**, no reemplaza el trabajo cara a cara: el contacto de verdad se genera en la demostración.
+
+Al tocar **Enviar encuesta**, APPI crea la invitación, muestra la animación de envío y abre WhatsApp con el mensaje listo, donde el distribuidor elige el contacto desde su propia agenda. Cada toque genera una invitación privada diferente, que vence en 24 horas, queda ligada al primer dispositivo que la abre y acepta una sola respuesta.
 
 La persona responde sin crear una cuenta y los datos se registran automáticamente en **Mi Gestión** del distribuidor que la invitó.
 
@@ -48,7 +50,8 @@ Mi Gestión incluye:
 Instalación del backend:
 
 1. Ejecutar `SUPABASE_ENCUESTAS_GESTION.sql` en el SQL Editor.
-2. Desplegar `encuesta-publica` sin verificación JWT:
+2. Ejecutar `SUPABASE_MI_GENTE.sql` (v223+): agrega el interés, los estados de Contactos, el origen y la función de importación que usa **Agregar contacto**. En bases ya instaladas antes de v223, `ARREGLO_CHECKS_PANEL_CONTACTOS.sql` limpia los checks viejos que quedan apilados.
+3. Desplegar `encuesta-publica` sin verificación JWT:
 
 ```bash
 supabase functions deploy encuesta-publica --no-verify-jwt

@@ -3501,7 +3501,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v224 · Panel de Contactos</div>
+  <div class="ds-foot">APPI · v225 · Diálogos propios</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -12202,7 +12202,7 @@ window.addKeep=function(){
   if(!title && !text){ 
     if(typeof modal!=='undefined' && modal.open){
       modal.open({icon:'⚠️', title:'Falta contenido', html:'<p>Escribí título o nota para guardar</p>'});
-    } else { alert('Escribí algo'); }
+    } else { window.APPIDialog.alert('Escribí un título o una nota antes de guardar.',{title:'Falta contenido',icon:'⚠️'}); }
     return; 
   }
   // Guardar temporal y mostrar popup de color
@@ -12657,7 +12657,7 @@ function renderListU(){
         window.verVecinosU(u.localidad||'');
       }else if(action==='whatsapp'){
         const link=getWhatsAppLinkU(u);
-        if(link) window.open(link,'_blank','noopener'); else alert('Sin teléfono válido');
+        if(link) window.open(link,'_blank','noopener'); else window.APPIDialog.alert('Este usuario no tiene un teléfono válido cargado.',{title:'Sin teléfono',icon:'📵'});
       }else if(action==='call'){
         const digits=String(u.telf||'').replace(/\D/g,'');
         if(digits) window.location.href='tel:'+digits;
@@ -12670,13 +12670,13 @@ function renderListU(){
   if(window.APPIDeviceBridge)window.APPIDeviceBridge.decorateCallButtons();
 }
 window.verMapaU=function(query){
-  if(!query.trim()){ alert('Sin domicilio'); return; }
+  if(!query.trim()){ window.APPIDialog.alert('Este usuario no tiene domicilio cargado.',{title:'Sin domicilio',icon:'📍'}); return; }
   const url='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(query);
   window.open(url,'_blank');
   window.mostrarEnMapaU(query);
 };
 window.verVecinosU=function(localidad){
-  if(!localidad || localidad==='all'){ alert('Elegí una zona'); return; }
+  if(!localidad || localidad==='all'){ window.APPIDialog.alert('Elegí primero una zona para ver los vecinos.',{title:'Elegí una zona',icon:'🗺️'}); return; }
   // Compatibilidad vieja pills
   const cont=document.getElementById('usuariosFilterZonas');
   if(cont){
@@ -13019,7 +13019,7 @@ function cargarArchivoU(file){
   try{
     if(infoEl){ infoEl.style.display='block'; infoEl.innerHTML=`⏳ Leyendo <b>${escU(file.name)}</b> (${(file.size/1024).toFixed(1)} KB) ...<br/><small>Si no avanza, revisá consola (F12)</small>`; }
     if(typeof XLSX==='undefined'){
-      alert('⚠️ Librería Excel no cargada. Recargá la página con internet.\n\nTip: Desactivá bloqueador de anuncios para cdn.jsdelivr.net');
+      window.APPIDialog.alert('Librería Excel no cargada. Recargá la página con internet.\n\nTip: desactivá el bloqueador de anuncios para cdn.jsdelivr.net.',{title:'Librería Excel no cargada',icon:'⚠️'});
       if(infoEl) infoEl.innerHTML=`❌ Error: librería XLSX no cargada - recargá con internet y desactivá AdBlock para cdn.jsdelivr.net`;
       return;
     }
@@ -13027,7 +13027,7 @@ function cargarArchivoU(file){
     const reader=new FileReader();
     reader.onerror=(e)=>{ 
       console.error('FileReader error', e);
-      alert('❌ Error leyendo archivo: '+ (e.target.error?.message||'desconocido'));
+      window.APPIDialog.alert('Error leyendo el archivo: '+(e.target.error?.message||'desconocido'),{title:'Error al leer el archivo',icon:'❌'});
       if(infoEl) infoEl.innerHTML=`❌ Error leyendo archivo`;
     };
     reader.onload=e=>{
@@ -13067,7 +13067,7 @@ function cargarArchivoU(file){
         console.log('✅ Total usuarios parseados:', parsed.length);
         if(parsed.length===0){
           const msg='No se detectaron usuarios. Revisá que el Excel tenga columnas Usuario, Domicilio, etc.\n\n'+fullDebug.substring(0,800);
-          alert(msg);
+          window.APPIDialog.alert(msg,{title:'No se detectaron usuarios',icon:'🤔'});
           if(infoEl){
             infoEl.innerHTML=`❌ No se detectaron usuarios en <b>${escU(file.name)}</b><br/><small>${escU(fullDebug.substring(0,400)).replace(/\n/g,'<br/>')}</small><br/><button type="button" id="usuariosShowDebug" style="margin-top:8px;padding:6px 10px;border-radius:8px;border:1px solid #ccc;background:#fff;font-size:11px;cursor:pointer">Ver debug completo</button>`;
             const showDebug=document.getElementById('usuariosShowDebug');
@@ -13091,7 +13091,7 @@ function cargarArchivoU(file){
         if(typeof showToast==='function') showToast(`✅ ${parsed.length} usuarios cargados`);
       }catch(err){
         console.error('Error procesando Excel', err);
-        alert('❌ Error procesando Excel: '+err.message+'\n\nProbá con otro archivo o revisá que sea .xls/.xlsx válido\n\nTip: Si es .csv, guardalo como .xlsx');
+        window.APPIDialog.alert('Error procesando Excel: '+err.message+'\n\nProbá con otro archivo o revisá que sea .xls/.xlsx válido.\n\nTip: si es .csv, guardalo como .xlsx.',{title:'Error procesando Excel',icon:'❌'});
         const info=document.getElementById('usuariosFileInfo');
         if(info) info.innerHTML=`❌ Error: ${escU(err.message)}<br/><small>Revisá consola F12</small>`;
         if(dbgEl){ dbgEl.textContent='Error: '+err.stack; dbgEl.style.display='block'; }
@@ -13100,7 +13100,7 @@ function cargarArchivoU(file){
     reader.readAsArrayBuffer(file);
   }catch(err){
     console.error('Error inesperado cargarArchivoU', err);
-    alert('Error inesperado: '+err.message);
+    window.APPIDialog.alert('Error inesperado: '+err.message,{title:'Error',icon:'⚠️'});
     if(infoEl) infoEl.innerHTML=`❌ Error inesperado: ${escU(err.message)}`;
   }
 }
@@ -13155,7 +13155,7 @@ function initUsuarios(){
     const f=e.target.files && e.target.files[0];
     if(f){
       console.log('Archivo elegido',f.name,f.size);
-      try{ cargarArchivoU(f); }catch(err){ console.error(err); alert('Error leyendo: '+err.message); }
+      try{ cargarArchivoU(f); }catch(err){ console.error(err); window.APPIDialog.alert('Error al leer el archivo: '+err.message,{title:'Error',icon:'⚠️'}); }
     }
     setTimeout(()=>{ try{ e.target.value=''; }catch(_){} },600);
   };
@@ -13301,7 +13301,7 @@ function initUsuarios(){
 
   const btnExport=document.getElementById('usuariosBtnExport');
   if(btnExport) btnExport.onclick=()=>{
-    if(usuariosU.length===0){ alert('Nada para exportar'); return; }
+    if(usuariosU.length===0){ window.APPIDialog.alert('Todavía no hay usuarios para exportar.',{title:'Nada para exportar',icon:'📭'}); return; }
     let csv='Usuario,Telefono,Domicilio,CP,Localidad,Producto,F.Vence,Estado\n';
     (filtradosU.length?filtradosU:usuariosU).forEach(u=>{
       csv += [u.usuario,u.telf,u.domicilio,u.cp,u.localidad,u.producto,u.fVenceRaw||'',u.estado].map(csvCellU).join(',')+'\n';
@@ -14023,7 +14023,7 @@ function renderCloud(c){
 
 function showHelp(){
   const html=`<p>El Histórico guarda una fotografía independiente de cada cierre mensual.</p><div class="tip"><b>Necesitás tres archivos del mismo período:</b><br>1. Línea Descendente.<br>2. Garantías por Organización.<br>3. Ingresos.</div><p><b>Resumen y análisis:</b> reúne el Resumen Anual, los gráficos, las comparaciones y las estrategias.<br><b>Cargar y administrar:</b> permite cargar meses, descargar originales, respaldar o eliminar cierres.</p><p style="font-size:11px;color:#777887">Un archivo de Ingresos sin personas es válido y representa cero ingresos. El archivo único de Usuarios / Garantías continúa en su sección habitual.</p>`;
-  try{modal.open({icon:'📈',iconBg:'linear-gradient(135deg,#5b8def,#a06bff)',title:'Cómo usar el Histórico',sub:'Control mensual y anual',html})}catch(e){alert('Cargá los tres archivos de cada mes y compará los cierres dentro de Resumen y análisis.')}
+  try{modal.open({icon:'📈',iconBg:'linear-gradient(135deg,#5b8def,#a06bff)',title:'Cómo usar el Histórico',sub:'Control mensual y anual',html})}catch(e){window.APPIDialog.alert('Cargá los tres archivos de cada mes y compará los cierres dentro de Resumen y análisis.',{title:'Cómo usar el Histórico',icon:'📈'})}
 }
 async function openHistorico(){
   showView('view-historico');const c=$('historicoContent');if(c)c.innerHTML='<div class="hist-loading"><span></span>Abriendo cierres mensuales…</div>';
