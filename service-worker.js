@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v237-solo-el-nombre';
+const CACHE_NAME = 'appi-v238-zona-segura';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
