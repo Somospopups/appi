@@ -56,3 +56,6 @@ jobs:
 
           consulta "7. Dispositivos que podrian recibir avisos" \
             "select count(*) filter (where activo) as activos, count(*) filter (where activo and notificaciones) as con_push, count(*) filter (where activo and notificaciones and recordatorios) as con_recordatorios from public.appi_dispositivos_vinculados;"
+
+          consulta "Definicion vigente de crear_invitacion" \
+            "select case when prosrc like '%vigente.expires_at%' then 'CORREGIDA' else 'CON BUG' end as estado from pg_proc where proname = 'appi_crear_invitacion_encuesta';"
