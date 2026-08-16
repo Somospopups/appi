@@ -47,3 +47,14 @@ Cuando se les carga el número, se suben solos.
 mutación: se rompió a propósito el filtro de teléfono, el reparto de los sin
 número, la marca de "ya migrado", la cantidad de solapas, el menú lateral y el
 cartel de pendientes, y en cada caso la prueba correspondiente falló.
+
+## Arreglo posterior (mismo release)
+
+Al unificar las pantallas apareció una carrera que existía desde antes y que
+ahora se hacía visible: el refresco automático de la nube (cada 30 segundos)
+volvía a dibujar la pantalla **aunque hubiera una ficha abierta**, y se perdía
+lo que la persona estaba escribiendo — la nota, la fecha y la etapa elegida.
+
+Ahora, mientras haya una ficha abierta o una encuesta en pleno envío, el
+refresco espera; se aplica solo al cerrar. Hay una prueba que lo cubre y que
+falla si se saca la protección.

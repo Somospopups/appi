@@ -176,3 +176,36 @@ test('los que quedaron sin teléfono se avisan en pantalla y no se pregunta de n
   await page.locator('#genteCompletar').click();
   await expect(page.locator('#view-seguimiento')).toHaveClass(/active/);
 });
+
+test('un refresco automático no borra lo que se está escribiendo en una ficha', async ({ page }) => {
+  await abrirMiGente(page, { yaMigrado: true });
+  await page.evaluate(() => openMiGestion());
+  await expect(page.locator('#view-gestion')).toHaveClass(/active/);
+
+  // Se siembra un contacto y se abre su ficha.
+  await page.evaluate(() => {
+    APPIGestion.state.contacts = [{
+      id: 'dddddddd-dddd-4ddd-8ddd-dddddddddddd', user_id: '11111111-1111-4111-8111-111111111111',
+      encuesta_id: null, tipo: 'contacto', nombre: 'Elena Prueba', telefono: '3515550001',
+      telefono_normalizado: '3515550001', relacion: '', zona: '', referido_por: '', estado: 'nuevo',
+      notas: '', proximo_contacto: null, ultimo_contacto: null, cantidad_origenes: 1, metadata: {},
+      created_at: new Date().toISOString(), updated_at: new Date().toISOString()
+    }];
+    APPIGestion.setView('todos');
+  });
+  await page.locator('[data-open-contact="dddddddd-dddd-4ddd-8ddd-dddddddddddd"]').click();
+  await expect(page.locator('#gestionDetailOverlay')).toBeVisible();
+
+  // La persona escribe una nota larga y elige una etapa.
+  await page.locator('[data-detail-status="seguimiento"]').click();
+  await page.locator('#gestionNotes').fill('Quedamos en hablar el jueves a la tarde.');
+
+  // Justo entonces entra un refresco de la nube, como pasa cada 30 segundos.
+  await page.evaluate(() => APPIGestion.refresh(false));
+  await page.waitForTimeout(600);
+
+  // La ficha sigue abierta y no se perdió nada de lo escrito.
+  await expect(page.locator('#gestionDetailOverlay')).toBeVisible();
+  await expect(page.locator('#gestionNotes')).toHaveValue('Quedamos en hablar el jueves a la tarde.');
+  await expect(page.locator('[data-detail-status="seguimiento"]')).toHaveClass(/active/);
+});
