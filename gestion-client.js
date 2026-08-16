@@ -85,6 +85,63 @@ function installStyles(){
   `;document.head.appendChild(style);
 }
 
+// v217 · Mi Encuesta se reduce a un solo botón. La animación acompaña el envío
+// real: el avión sale cuando la invitación ya se creó en el servidor.
+function installShareStyles(){
+  if($('appiShareStyles'))return;
+  const style=document.createElement('style');style.id='appiShareStyles';style.textContent=`
+  .share-stage{display:grid;place-items:center;padding:6px 0 2px}
+  .share-btn{position:relative;width:min(100%,330px);min-height:130px;border:0;border-radius:28px;cursor:pointer;overflow:hidden;color:#fff;font:inherit;background:linear-gradient(135deg,#3c67ca 0%,#725bd6 62%,#a06bff 100%);box-shadow:0 16px 34px rgba(72,82,180,.3);transition:transform .18s ease,box-shadow .18s ease;-webkit-tap-highlight-color:transparent}
+  .share-btn:hover{transform:translateY(-2px);box-shadow:0 20px 40px rgba(72,82,180,.36)}
+  .share-btn:active{transform:scale(.975)}
+  .share-btn:disabled{cursor:default}
+  .share-btn:focus-visible{outline:3px solid #fff;outline-offset:3px}
+  .share-btn .glow{position:absolute;width:210px;height:210px;right:-84px;top:-104px;border-radius:50%;background:rgba(255,255,255,.14)}
+  .share-face{position:relative;z-index:2;display:grid;place-items:center;gap:7px;padding:20px 16px;transition:opacity .22s ease,transform .22s ease}
+  .share-face .plane{font-size:34px;line-height:1;filter:drop-shadow(0 5px 10px rgba(20,24,70,.28))}
+  .share-face strong{font-size:16.5px;letter-spacing:-.3px}
+  .share-face small{font-size:10.5px;opacity:.9;font-weight:700}
+  .share-btn.sending .share-face,.share-btn.done .share-face{opacity:0;transform:scale(.92)}
+  /* El avión cruza la tarjeta: refuerza la idea de que la encuesta viaja. */
+  .share-fly{position:absolute;z-index:3;left:50%;top:50%;font-size:32px;opacity:0;pointer-events:none;transform:translate(-50%,-50%)}
+  .share-btn.sending .share-fly{animation:shareFly 1s cubic-bezier(.5,0,.75,.2) forwards}
+  @keyframes shareFly{
+    0%{opacity:0;transform:translate(-50%,-50%) scale(.6) rotate(-12deg)}
+    22%{opacity:1;transform:translate(-50%,-50%) scale(1.06) rotate(-6deg)}
+    100%{opacity:0;transform:translate(190%,-235%) scale(.5) rotate(16deg)}
+  }
+  /* Estela: tres puntos que persiguen al avión. */
+  .share-trail{position:absolute;z-index:2;left:50%;top:50%;display:flex;gap:6px;opacity:0;transform:translate(-160%,-50%)}
+  .share-trail i{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.85)}
+  .share-btn.sending .share-trail{animation:shareTrail 1s ease-out forwards}
+  .share-btn.sending .share-trail i:nth-child(2){animation:shareDot .5s .1s ease-out}
+  .share-btn.sending .share-trail i:nth-child(3){animation:shareDot .5s .2s ease-out}
+  @keyframes shareTrail{0%{opacity:0}30%{opacity:.9}100%{opacity:0;transform:translate(60%,-120%)}}
+  @keyframes shareDot{0%{transform:scale(.4)}50%{transform:scale(1.25)}100%{transform:scale(.4)}}
+  .share-done{position:absolute;z-index:4;inset:0;display:grid;place-items:center;gap:6px;align-content:center;opacity:0;transform:scale(.9);pointer-events:none}
+  .share-btn.done .share-done{animation:shareDone .34s cubic-bezier(.2,1.5,.5,1) forwards}
+  @keyframes shareDone{to{opacity:1;transform:scale(1)}}
+  .share-done .tick{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.2);font-size:25px}
+  .share-done b{font-size:14px}
+  .share-hint{margin:11px auto 0;max-width:330px;text-align:center;color:#777887;font-size:10.5px;line-height:1.5}
+  .share-recent{margin-top:13px}
+  .share-recent h3{margin:0 0 9px;color:#3d63c9;font-size:10px;text-transform:uppercase;letter-spacing:.4px}
+  .share-row{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:14px;background:rgba(255,255,255,.62);border:1px solid rgba(255,255,255,.8);margin-bottom:6px}
+  .share-row .who{width:32px;height:32px;flex:none;border-radius:11px;display:grid;place-items:center;color:#fff;font-size:14px;background:linear-gradient(135deg,#5b8def,#a06bff)}
+  .share-row .txt{min-width:0;flex:1}
+  .share-row b{display:block;color:#292938;font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .share-row small{color:#777887;font-size:9px}
+  .share-row a{flex:none;padding:7px 11px;border-radius:10px;text-decoration:none;color:#197454;background:rgba(58,208,164,.16);font-size:9px;font-weight:950}
+  .share-row.sent a{color:#6a6b78;background:rgba(80,90,130,.08)}
+  body.dark .share-row{background:rgba(30,30,50,.58);border-color:rgba(255,255,255,.08)}
+  body.dark .share-row b{color:#f0f0f5}
+  @media (prefers-reduced-motion:reduce){
+    .share-btn,.share-face{transition:none}
+    .share-btn.sending .share-fly,.share-btn.sending .share-trail,.share-btn.done .share-done{animation-duration:.01ms}
+  }`;
+  document.head.appendChild(style);
+}
+
 function installV204Styles(){
   if($('appiGestionV204Styles'))return;
   const style=document.createElement('style');style.id='appiGestionV204Styles';style.textContent=`
@@ -125,16 +182,6 @@ async function createSurveyInvitation(renderAfter=true){
   state.link=invitation;if(renderAfter)renderSurveyTool();return invitation;
 }
 
-async function sharePrivateSurvey(){
-  const popup=window.open('about:blank','_blank');
-  try{const invitation=await createSurveyInvitation(),url=surveyUrl(invitation),wa=`https://wa.me/?text=${encodeURIComponent(shareMessage(url))}`;if(popup)popup.location.href=wa;else location.href=wa}
-  catch(error){if(popup)popup.close();await window.APPIDialog.alert(error.message,{title:'No pudimos crear la invitación',icon:'!'})}
-}
-async function copyPrivateSurvey(){
-  try{const invitation=await createSurveyInvitation();await copyText(surveyUrl(invitation));await window.APPIDialog.alert('Creaste una invitación privada válida por 24 horas y para una sola respuesta.',{title:'Invitación copiada',icon:'🔒',okText:'Entendido'})}
-  catch(error){await window.APPIDialog.alert(error.message,{title:'No pudimos crear la invitación',icon:'!'})}
-}
-
 function bulkKey(){return `appi_encuesta_cola_v1_${userId()}`}
 function loadBulkQueue(){try{const rows=JSON.parse(localStorage.getItem(bulkKey())||'[]');state.bulkQueue=Array.isArray(rows)?rows.filter(row=>new Date(row.expires_at||0).getTime()>Date.now()):[]}catch(e){state.bulkQueue=[]}}
 function saveBulkQueue(){try{localStorage.setItem(bulkKey(),JSON.stringify(state.bulkQueue))}catch(e){}}
@@ -149,42 +196,101 @@ async function addBulkRecipients(recipients){
     saveBulkQueue();renderSurveyTool();await window.APPIDialog.alert(`${valid.length} invitación${valid.length===1?'':'es'} privada${valid.length===1?'':'s'} lista${valid.length===1?'':'s'} para enviar una por una.`,{title:'Envíos preparados',icon:'✓',okText:'Comenzar'});
   }catch(error){saveBulkQueue();renderSurveyTool();await window.APPIDialog.alert(error.message,{title:'No pudimos completar la cola',icon:'!'})}
 }
-async function prepareBulkFromAgenda(){
-  if(!navigator.contacts||typeof navigator.contacts.select!=='function'){await window.APPIDialog.alert('Este navegador no permite seleccionar varios destinatarios desde la agenda. Podés agregarlos manualmente a la cola.',{title:'Agenda no disponible',icon:'📇'});return addBulkManual()}
-  try{const selected=await navigator.contacts.select(['name','tel'],{multiple:true});await addBulkRecipients((selected||[]).map(item=>({nombre:contactPickerValue(item.name),telefono:contactPickerValue(item.tel)})))}catch(error){if(error&&['AbortError','NotAllowedError'].includes(error.name))return;await window.APPIDialog.alert('No pudimos abrir la agenda. Podés preparar los envíos manualmente.',{title:'Agenda no disponible',icon:'📇'})}
-}
-async function addBulkManual(){
-  const nombre=await window.APPIDialog.prompt('¿A quién querés enviarle la invitación?','',{title:'Agregar destinatario',icon:'👤',placeholder:'Nombre y apellido',okText:'Continuar'});if(!nombre)return;
-  const telefono=await window.APPIDialog.prompt('Ingresá su número de WhatsApp.','',{title:'Agregar destinatario',icon:'📱',placeholder:'Ej: 351 555 1234',inputType:'tel',okText:'Crear invitación'});if(!telefono)return;
-  await addBulkRecipients([{nombre,telefono}]);
-}
-function markBulkSent(id){const item=state.bulkQueue.find(row=>row.id===id);if(item){item.sent=true;item.sent_at=new Date().toISOString();saveBulkQueue();setTimeout(renderSurveyTool,400)}}
-async function clearBulkQueue(){if(!state.bulkQueue.length)return;const ok=await window.APPIDialog.confirm('Se quitarán las invitaciones de esta lista. Los enlaces ya enviados conservarán su vencimiento.',{title:'Limpiar cola',icon:'🗑️',okText:'Limpiar',danger:true});if(ok){state.bulkQueue=[];saveBulkQueue();renderSurveyTool()}}
-function bulkQueueHTML(){
-  if(!state.bulkQueue.length)return '';
-  const pending=state.bulkQueue.filter(row=>!row.sent).length;
-  return `<section class="gestion-card"><div class="gestion-card-head"><div><h3>Cola de invitaciones</h3><p>${pending} pendiente${pending===1?'':'s'} · cada persona recibe un enlace diferente.</p></div><button type="button" class="gestion-secondary" id="bulkClear">Limpiar</button></div><div class="survey-bulk-list">${state.bulkQueue.map((row,index)=>{const wa=`https://wa.me/${whatsappDigits(row.telefono)}?text=${encodeURIComponent(shareMessage(row.url,row.nombre))}`;return `<div class="survey-bulk-item ${row.sent?'sent':''}"><div><b>${index+1}. ${esc(row.nombre)}</b><small>${esc(row.telefono)} · vence ${esc(formatDate(row.expires_at,true))}</small></div><a href="${esc(wa)}" target="_blank" rel="noopener" data-bulk-send="${esc(row.id)}">${row.sent?'Enviado ✓':'Enviar'}</a></div>`}).join('')}</div></section>`
-}
-
+function markBulkSent(id,rerender=true){const item=state.bulkQueue.find(row=>row.id===id);if(item){item.sent=true;item.sent_at=new Date().toISOString();saveBulkQueue();if(rerender)setTimeout(renderSurveyTool,400)}}
 function renderSurveyTool(){
   const c=$('surveyToolContent');if(!c)return;
   if(isAdmin()){
     c.innerHTML=`<div class="gestion-empty"><div class="ico">🔒</div><h3>Herramienta para distribuidores</h3><p>POPUPS administra APPI, pero no tiene número de distribuidor. Cada distribuidor genera sus propias invitaciones privadas.</p></div>`;return;
   }
-  const lastUrl=surveyUrl(),lastExpiry=state.link?.expires_at?formatDate(state.link.expires_at,true):'';
+  // Una sola acción visible. Los tokens, vencimientos y URLs son detalles de
+  // implementación: el distribuidor solo elige a quién le manda la encuesta.
   c.innerHTML=`
-    <div class="gestion-hero"><div class="eyebrow">Invitaciones privadas</div><h2>Compartí. Recibí. Gestioná.</h2><p>Cada envío crea una invitación nueva que vence en 24 horas y se cierra después de una sola respuesta.</p></div>
-    <section class="gestion-card"><div class="gestion-card-head"><div><h3>Crear una invitación</h3><p>No existe un enlace permanente para reenviar. Cada persona recibe uno diferente.</p></div><span class="gestion-badge">🔒 24 horas</span></div>${lastUrl?`<div class="survey-link-box"><label>Última invitación generada · vence ${esc(lastExpiry)}</label><div class="survey-link-value">${esc(lastUrl)}</div></div>`:'<div class="survey-link-box"><label>Privacidad</label><div class="survey-link-value">Un dispositivo · una respuesta · vencimiento automático</div></div>'}<div class="survey-actions"><button type="button" class="wa" id="surveyShareWa">💬 Compartir por WhatsApp</button><button type="button" class="copy" id="surveyCopy">🔗 Copiar invitación</button></div></section>
-    <section class="gestion-card"><div class="gestion-card-head"><div><h3>Preparar varios envíos</h3><p>Cada persona recibe su propia invitación privada.</p></div><span class="gestion-badge">Uno por uno</span></div><div class="survey-bulk-actions"><button type="button" class="agenda" id="surveyBulkAgenda">📇 Elegir de la agenda</button><button type="button" class="manual" id="surveyBulkManual">＋ Agregar manualmente</button></div></section>
-    ${bulkQueueHTML()}
-    <section class="gestion-card"><div class="gestion-card-head"><div><h3>Así funciona</h3><p>No necesitás importar mensajes ni copiar respuestas.</p></div></div><div class="survey-flow"><div><b>1</b><strong>Generás</strong><small>Se crea una invitación privada.</small></div><div><b>2</b><strong>Responden</strong><small>Queda ligada al primer dispositivo.</small></div><div><b>3</b><strong>Se cierra</strong><small>No admite una segunda respuesta.</small></div></div></section>
-    <div class="gestion-notice"><b>Privacidad:</b> la invitación vence a las 24 horas, queda ligada al primer dispositivo que la abre y deja de funcionar al enviar la encuesta. Si vence, generá una nueva desde este mismo botón.</div>`;
-  if($('surveyShareWa'))$('surveyShareWa').onclick=sharePrivateSurvey;
-  if($('surveyCopy'))$('surveyCopy').onclick=copyPrivateSurvey;
-  if($('surveyBulkAgenda'))$('surveyBulkAgenda').onclick=prepareBulkFromAgenda;
-  if($('surveyBulkManual'))$('surveyBulkManual').onclick=addBulkManual;
-  if($('bulkClear'))$('bulkClear').onclick=clearBulkQueue;
+    <div class="share-stage">
+      <button type="button" class="share-btn" id="surveyShareBtn">
+        <span class="glow"></span>
+        <span class="share-face"><span class="plane">📨</span><strong>Enviar encuesta</strong><small>Elegí a quién se la mandás</small></span>
+        <span class="share-fly" aria-hidden="true">✈️</span>
+        <span class="share-trail" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="share-done" aria-hidden="true"><span class="tick">✓</span><b id="surveyDoneName">¡Enviada!</b></span>
+      </button>
+    </div>
+    <p class="share-hint">Cada persona recibe su propia encuesta. Las respuestas aparecen solas en <b>Mi Gestión</b>.</p>
+    ${recentSharesHTML()}`;
+  if($('surveyShareBtn'))$('surveyShareBtn').onclick=startShareFlow;
   document.querySelectorAll('[data-bulk-send]').forEach(link=>link.onclick=()=>markBulkSent(link.dataset.bulkSend));
+}
+
+// Muestra sólo lo accionable: a quién le falta recibir la encuesta.
+function recentSharesHTML(){
+  const rows=state.bulkQueue.slice(-6).reverse();
+  if(!rows.length)return '';
+  return `<section class="share-recent"><h3>Envíos recientes</h3>${rows.map(row=>{
+    const wa=`https://wa.me/${whatsappDigits(row.telefono)}?text=${encodeURIComponent(shareMessage(row.url,row.nombre))}`;
+    return `<div class="share-row ${row.sent?'sent':''}"><span class="who">${row.sent?'✓':'👤'}</span><span class="txt"><b>${esc(row.nombre)}</b><small>${row.sent?'Enviada':'Falta enviar'}</small></span><a href="${esc(wa)}" target="_blank" rel="noopener" data-bulk-send="${esc(row.id)}">${row.sent?'Reenviar':'Enviar'}</a></div>`;
+  }).join('')}</section>`;
+}
+
+// Cada pulsación arranca de cero: primero se elige el destinatario.
+async function startShareFlow(){
+  const button=$('surveyShareBtn');
+  if(!button||button.disabled)return;
+  let person;
+  try{person=await pickShareRecipient()}
+  catch(error){await window.APPIDialog.alert(error.message,{title:'No pudimos abrir la agenda',icon:'!'});return}
+  if(!person)return;
+
+  button.disabled=true;
+  try{
+    // La invitación se crea primero: la animación confirma un envío real.
+    const invitation=await createSurveyInvitation(false),url=surveyUrl(invitation);
+    const entry={id:uuidV4(),nombre:person.nombre,telefono:person.telefono,token:invitation.token,expires_at:invitation.expires_at,url,sent:false,created_at:new Date().toISOString()};
+    state.bulkQueue.push(entry);saveBulkQueue();
+
+    await playShareAnimation(button,person.nombre);
+    markBulkSent(entry.id,false);
+    const wa=`https://wa.me/${whatsappDigits(person.telefono)}?text=${encodeURIComponent(shareMessage(url,person.nombre))}`;
+    window.open(wa,'_blank','noopener');
+    setTimeout(renderSurveyTool,260);
+  }catch(error){
+    button.classList.remove('sending','done');
+    await window.APPIDialog.alert(error.message,{title:'No pudimos crear la invitación',icon:'!'});
+  }finally{button.disabled=false}
+}
+
+// Agenda del teléfono cuando existe; carga manual como alternativa siempre.
+async function pickShareRecipient(){
+  const puedeAgenda=Boolean(navigator.contacts&&typeof navigator.contacts.select==='function');
+  if(puedeAgenda){
+    const opcion=await window.APPIDialog.choose('¿A quién le enviás la encuesta?',[{label:'📇 Elegir de mi agenda',value:'agenda'},{label:'✎ Escribir el contacto',value:'manual'}],{title:'Enviar encuesta',icon:'📨'});
+    if(!opcion)return null;
+    if(opcion==='agenda'){
+      let seleccion;
+      try{seleccion=await navigator.contacts.select(['name','tel'],{multiple:false})}
+      catch(error){if(error&&['AbortError','NotAllowedError'].includes(error.name))return null;throw new Error('No pudimos abrir la agenda. Probá escribiendo el contacto.')}
+      const elegido=(seleccion||[])[0];
+      if(!elegido)return null;
+      const nombre=contactPickerValue(elegido.name),telefono=contactPickerValue(elegido.tel);
+      if(!nombre||phoneDigits(telefono).length<8){await window.APPIDialog.alert('Ese contacto no tiene nombre y número completos.',{title:'Faltan datos',icon:'📇'});return null}
+      return {nombre:nombre.slice(0,120),telefono:telefono.slice(0,30)};
+    }
+  }
+  const nombre=await window.APPIDialog.prompt('¿A quién le enviás la encuesta?','',{title:'Enviar encuesta',icon:'👤',placeholder:'Nombre',okText:'Continuar'});
+  if(!nombre||!nombre.trim())return null;
+  const telefono=await window.APPIDialog.prompt('¿Cuál es su WhatsApp?','',{title:esc(nombre.trim().split(/\s+/)[0]),icon:'📱',placeholder:'Ej: 351 555 1234',inputType:'tel',okText:'Enviar'});
+  if(!telefono)return null;
+  if(phoneDigits(telefono).length<8){await window.APPIDialog.alert('Revisá el número: parece incompleto.',{title:'Número inválido',icon:'📱'});return null}
+  return {nombre:nombre.trim().slice(0,120),telefono:telefono.trim().slice(0,30)};
+}
+
+// El avión cruza la tarjeta y deja el tilde de confirmación.
+function playShareAnimation(button,nombre){
+  return new Promise(resolve=>{
+    const etiqueta=$('surveyDoneName');
+    if(etiqueta)etiqueta.textContent=`Para ${String(nombre||'').trim().split(/\s+/)[0]||'tu contacto'}`;
+    const reducido=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    button.classList.remove('done');button.classList.add('sending');
+    setTimeout(()=>{button.classList.add('done');setTimeout(()=>{button.classList.remove('sending','done');resolve()},reducido?60:620)},reducido?60:980);
+  });
 }
 
 async function copyText(text){
@@ -194,6 +300,9 @@ function showToastSafe(message,duration=1800){if(typeof window.showToast==='func
 
 async function openEncuestaTool(){
   if(typeof window.showView==='function')window.showView('view-encuesta');
+  // Los envíos recientes viven en el dispositivo: se recargan al abrir para
+  // que la lista refleje lo que realmente quedó pendiente.
+  loadBulkQueue();
   renderSurveyTool();
 }
 
@@ -309,18 +418,18 @@ function exportCsv(){
 function injectSections(){
   const grab=$('view-grabadora');if(!grab||$('view-encuesta'))return;
   const wrapper=document.createElement('div');wrapper.innerHTML=`
-  <section id="view-encuesta" class="view"><header class="top"><button class="back-btn" id="btnBackEncuesta" aria-label="Volver">‹</button><button class="help-btn" id="btnHelpEncuesta" aria-label="Ayuda">?</button><button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button><h1>Mi</h1><div class="script">Encuesta</div><p>Compartí invitaciones privadas</p></header><div class="gestion-shell" id="surveyToolContent"></div></section>
+  <section id="view-encuesta" class="view"><header class="top"><button class="back-btn" id="btnBackEncuesta" aria-label="Volver">‹</button><button class="help-btn" id="btnHelpEncuesta" aria-label="Ayuda">?</button><button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button><h1>Mi</h1><div class="script">Encuesta</div><p>Enviala y seguí las respuestas</p></header><div class="gestion-shell" id="surveyToolContent"></div></section>
   <section id="view-gestion" class="view"><header class="top"><button class="back-btn" id="btnBackGestion" aria-label="Volver">‹</button><button class="help-btn" id="btnHelpGestion" aria-label="Ayuda">?</button><button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button><h1>Mi</h1><div class="script">Gestión</div><p>Encuestados, referidos y seguimiento</p></header><div class="gestion-shell" id="gestionContent"></div></section>`;
   const sections=[...wrapper.children];sections.forEach(section=>grab.parentNode.insertBefore(section,grab));
   $('btnBackEncuesta').onclick=()=>{window.showView('view-home');if(window.renderHomeCompleto)window.renderHomeCompleto()};$('btnBackGestion').onclick=()=>{closeContactDetail();window.showView('view-home');if(window.renderHomeCompleto)window.renderHomeCompleto()};
-  $('btnHelpEncuesta').onclick=()=>window.APPIDialog.alert('Cada envío genera una invitación privada distinta, válida por 24 horas y para una sola respuesta. También podés preparar una cola de invitaciones individuales.',{title:'Cómo usar Mi Encuesta',icon:'📋'});
+  $('btnHelpEncuesta').onclick=()=>window.APPIDialog.alert('Tocá Enviar encuesta y elegí a quién se la mandás. Se abre WhatsApp con el mensaje listo. Cuando la persona responde, aparece sola en Mi Gestión.',{title:'Cómo usar Mi Encuesta',icon:'📨'});
   $('btnHelpGestion').onclick=()=>window.APPIDialog.alert('Empezá por Hoy: APPI ordena nuevos, seguimientos y presentaciones según prioridad. Al volver de WhatsApp o de una llamada, registrá el resultado para mantener el historial actualizado.',{title:'Cómo usar Mi Gestión',icon:'🤝'});
 }
 
 function startPolling(){clearInterval(state.pollTimer);state.pollTimer=setInterval(()=>{const active=document.getElementById('view-gestion')?.classList.contains('active');if(active&&authorized()&&navigator.onLine&&!state.loading)refreshManagement(false)},30000)}
 function resetForAccount(){state.link=null;state.contacts=[];state.surveys=new Map();state.activities=new Map();state.filter='todos';state.search='';state.view='hoy';state.currentId='';state.lastLoaded=0;state.bulkQueue=[];updateBadges()}
 function init(){
-  if(state.initialized)return;state.initialized=true;installStyles();installV204Styles();injectSections();startPolling();
+  if(state.initialized)return;state.initialized=true;installStyles();installV204Styles();installShareStyles();injectSections();startPolling();
   window.addEventListener('online',()=>{const bar=$('gestionOffline');if(bar)bar.hidden=true;flushQueue().then(()=>refreshManagement(false))});
   window.addEventListener('offline',()=>{const bar=$('gestionOffline');if(bar)bar.hidden=false});
   window.addEventListener('focus',()=>setTimeout(maybeAskPendingOutcome,350));

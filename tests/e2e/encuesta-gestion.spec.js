@@ -218,9 +218,15 @@ test('Mi Encuesta y Mi Gestión usan la cuenta autenticada y guardan el seguimie
 
   await page.evaluate(() => openEncuestaTool());
   await expect(page.locator('#view-encuesta')).toHaveClass(/active/);
-  await expect(page.locator('#surveyToolContent')).toContainText('vence en 24 horas');
+  // La pantalla se reduce a un botón: sin URLs, tokens ni vencimientos a la vista.
+  await expect(page.locator('#surveyShareBtn')).toContainText('Enviar encuesta');
+  const textoVisible = await page.locator('#surveyToolContent').innerText();
+  expect(textoVisible).not.toContain('token');
+  expect(textoVisible).not.toContain('http');
+  expect(textoVisible).not.toContain('24 horas');
+  expect(textoVisible).not.toContain('dispositivo');
+  await expect(page.locator('.survey-link-value')).toHaveCount(0);
   await page.evaluate(() => APPIGestion.createInvitation());
-  await expect(page.locator('.survey-link-value')).toContainText(LINK_TOKEN);
   const friendlyMessage = await page.evaluate(() => APPIGestion.shareMessage(APPIGestion.surveyUrl()));
   expect(friendlyMessage).toContain('Soy Juan');
   expect(invitationPeople).toContain('socio');
@@ -228,10 +234,12 @@ test('Mi Encuesta y Mi Gestión usan la cuenta autenticada y guardan el seguimie
   expect(friendlyMessage).not.toContain('APPI');
   expect(friendlyMessage).toContain(LINK_TOKEN);
   await page.evaluate(() => { void APPIGestion.prepareBulk([{ nombre: 'Ana Uno', telefono: '3515551001' }, { nombre: 'Bruno Dos', telefono: '3515551002' }]); });
-  await expect(page.locator('.survey-bulk-item')).toHaveCount(2);
-  await expect(page.locator('.survey-bulk-item').first()).toContainText('Ana Uno');
   await expect(page.locator('#appiDialogTitle')).toHaveText('Envíos preparados');
   await page.locator('#appiDialogOk').click();
+  // Los envíos recientes muestran a quién le falta, no el enlace.
+  await expect(page.locator('.share-row')).toHaveCount(2);
+  await expect(page.locator('.share-row').first()).toContainText('Bruno Dos');
+  await expect(page.locator('.share-row').first()).toContainText('Falta enviar');
 
   await page.evaluate(() => openMiGestion());
   await expect(page.locator('#view-gestion')).toHaveClass(/active/);

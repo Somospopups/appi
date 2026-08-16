@@ -4,7 +4,7 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
-- Versión: **v216 · Recordatorios de Mi Gestión**.
+- Versión: **v217 · Enviar encuesta**.
 - Publicación: [https://somospopups.github.io/appi/](https://somospopups.github.io/appi/)
 - Acceso por número de distribuidor y contraseña.
 - Acceso administrador POPUPS mediante el candado, sin DIP ni número de distribuidor.
@@ -15,7 +15,9 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Mi Encuesta y Mi Gestión
 
-Desde **Mis herramientas → Mi Encuesta**, cada distribuidor genera una invitación privada diferente para cada envío por WhatsApp. La invitación vence en 24 horas, queda ligada al primer dispositivo que la abre y acepta una sola respuesta. La persona responde sin crear una cuenta y los datos se registran automáticamente en **Mi Gestión** del distribuidor que la invitó.
+Desde **Mis herramientas → Mi Encuesta**, la pantalla es un solo botón: **Enviar encuesta**. Al tocarlo, APPI pregunta a quién —desde la agenda del teléfono o escribiendo nombre y WhatsApp—, anima el envío y abre WhatsApp con el mensaje listo. Cada pulsación genera una invitación privada diferente, que vence en 24 horas, queda ligada al primer dispositivo que la abre y acepta una sola respuesta.
+
+Debajo del botón, **Envíos recientes** muestra a quién le falta recibirla. La persona responde sin crear una cuenta y los datos se registran automáticamente en **Mi Gestión** del distribuidor que la invitó.
 
 Mi Gestión incluye:
 

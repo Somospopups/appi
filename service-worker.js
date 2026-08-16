@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v216-recordatorios-gestion';
+const CACHE_NAME = 'appi-v217-enviar-encuesta';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
