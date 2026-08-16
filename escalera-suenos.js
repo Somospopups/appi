@@ -90,5 +90,6 @@
     render();
   }
 
+  window.openSuenos = openSuenos;
   window.APPIEscaleraSuenos = { leer: leer, guardar: guardar, render: render, open: openSuenos };
 })();

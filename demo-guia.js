@@ -79,5 +79,6 @@
     render();
   }
 
+  window.openDemo = openDemo;
   window.APPIDemoGuia = { productos: PRODUCTOS, pasos: PASOS_DEMO, render: render, open: openDemo };
 })();
