@@ -75,7 +75,7 @@ test('las pantallas nuevas tienen su ayuda y abre al tocarla', async ({ page }) 
   for (const [abrir, boton, titulo] of [
     ['openOcho()', '#btnHelpOcho', 'Los 8 Pasos'],
     ['openSuenos()', '#btnHelpSuenos', 'Escalera de Sueños'],
-    ['openDemo()', '#btnHelpDemo', 'Guía de Demostración']
+    ['openDemo()', '#btnHelpDemo', 'Coach Comercial de Demo']
   ]) {
     await page.evaluate(a => window[a.replace('()', '')](), abrir);
     await page.locator(boton).click();

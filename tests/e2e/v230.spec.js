@@ -78,15 +78,48 @@ test('la escalera de sueños se guarda y se puede compartir', async ({ page }) =
   await expect(page.locator('#suenosShare')).toBeVisible();
 });
 
-test('la guía de demo tiene cuatro pasos y no muestra la ficha del equipo', async ({ page }) => {
+test('el Coach de Demo conserva cuatro pasos sin ficha ni registro en el Panel', async ({ page }) => {
   await entrar(page);
 
   await page.evaluate(() => window.APPIDemoGuia.open());
   await expect(page.locator('#demoCont .demo-paso')).toHaveCount(4);
+  await expect(page.locator('#demoCoachTitle')).toHaveText('APPI te dice qué hacer en cada momento');
+  await expect(page.locator('#demoCont')).toContainText('COACH COMERCIAL EN VIVO');
   await expect(page.locator('#demoCont')).not.toContainText('Ficha del equipo');
   await expect(page.locator('#demoProducto')).toHaveCount(0);
   await expect(page.locator('#demoFin')).toHaveCount(0);
   await expect(page.locator('#demoCont')).not.toContainText('Registrar presentación');
+});
+
+test('el Coach de Demo adapta preguntas, avance, decisión y objeciones', async ({ page }) => {
+  await entrar(page);
+  await page.evaluate(() => window.APPIDemoGuia.open());
+
+  await page.locator('[data-demo-focus="sarro"]').click();
+  await expect(page.locator('.demo-coach-now')).toContainText('Explorá dónde lo observa');
+  await expect(page.locator('#demoStepBody0 .demo-bridge')).toContainText('molestia visible');
+
+  const firstQuestion = await page.locator('#demoQuestion0').textContent();
+  await page.locator('[data-next-question="0"]').click();
+  await expect(page.locator('#demoQuestion0')).not.toHaveText(firstQuestion);
+
+  await page.locator('[data-complete-step="0"]').click();
+  await expect(page.locator('[data-demo-step="0"]')).toHaveClass(/done/);
+  await expect(page.locator('[data-open-step="1"]')).toHaveAttribute('aria-expanded', 'true');
+  await expect(page.locator('[data-demo-bottle]')).toBeVisible();
+
+  await page.locator('[data-open-step="3"]').click();
+  await page.locator('[data-demo-readiness="4"]').click();
+  await expect(page.locator('.demo-ready-answer')).toContainText('No sigas explicando todo');
+
+  await page.locator('[data-demo-objections]').first().click();
+  await expect(page.locator('#demoObjectionSheet')).toBeVisible();
+  await page.locator('[data-demo-objection="precio"]').click();
+  await expect(page.locator('#demoAnswerTitle')).toHaveText('Volvé del precio al valor');
+  await expect(page.locator('#demoAnswerSay')).toContainText('monto total');
+  await expect(page.locator('#demoAnswerFollow')).toContainText('gasto actual');
+  await page.locator('[data-demo-sheet-close]').click();
+  await expect(page.locator('#demoObjectionSheet')).toBeHidden();
 });
 
 test('el formulario del equipo arma el lead por WhatsApp con todos los datos', async ({ page }) => {

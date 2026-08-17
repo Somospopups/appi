@@ -4721,12 +4721,13 @@ const HELP = {
     • Hasta 7 sueños, del más cercano al más grande<br/>
     Se guarda solo en tu dispositivo. Compartila con quien te acompaña en el negocio.</div>
 
-    <div class="tip"><strong>🎤 GUÍA DE DEMO</strong><br/>
-    Te acompaña paso a paso en la presentación:<br/>
-    1. Conciencia (el problema del agua)<br/>
-    2. Comparativa (botellas vs sistema)<br/>
-    3. Sistema (cómo funciona)<br/>
-    4. Cierre y seguimiento</div>
+    <div class="tip"><strong>🎤 COACH COMERCIAL DE DEMO</strong><br/>
+    Tu asistente en vivo para cada presentación:<br/>
+    • Guiones claros para cada momento<br/>
+    • Preguntas que se adaptan a la conversación<br/>
+    • Señales de interés y tips para escuchar mejor<br/>
+    • Termómetro de decisión y laboratorio de objeciones<br/>
+    Mantiene los 4 momentos: conciencia, comparativa, sistema, cierre y seguimiento. No registra la presentación ni datos de la persona.</div>
 
     <div class="tip"><strong>🍶 LA BOTELLA</strong><br/>
     Herramienta de conciencia para la demo. Mostrá cuánto gasta una familia en botellas de 2L:<br/>
@@ -4776,9 +4777,12 @@ const HELP = {
   },
   demo: {
     icon:'🎤', iconBg:'linear-gradient(135deg,#ff6bcf,#ff8f6b)',
-    title:'Guía de Demostración', sub:'El contacto de verdad',
-    html:`<p>Te acompaña en la presentación: conciencia, comparativa, sistema, cierre y seguimiento.</p>
-    <div class="tip"><strong>CIERRE</strong><br/>Acordá el próximo paso y cuándo volver a conversar.</div>`
+    title:'Coach Comercial de Demo', sub:'Tu asistente en vivo',
+    html:`<p>APPI te acompaña durante una conversación real con guiones, preguntas, señales de interés y respuestas para objeciones.</p>
+    <div class="tip"><strong>RADAR DE NECESIDAD</strong><br/>Marcá lo que aparece en la charla y el coach adapta la recomendación sin elegir productos por vos.</div>
+    <div class="tip"><strong>AYUDA INMEDIATA</strong><br/>Si te trabás, pedí la próxima pregunta o abrí el laboratorio de objeciones.</div>
+    <div class="tip"><strong>CIERRE CON CLARIDAD</strong><br/>Usá el termómetro de decisión para descubrir qué falta y acordar el próximo paso sin presionar.</div>
+    <div class="tip"><strong>PRIVACIDAD</strong><br/>La herramienta no registra la presentación ni datos de la persona.</div>`
   },
   home: {
     icon:'🏠', iconBg:'linear-gradient(135deg,#5b8def,#a06bff,#ff6b9d)',
@@ -4828,7 +4832,7 @@ const HELP = {
     Tu caja de herramientas para el día a día:<br/>
     • <strong>Los 8 Pasos</strong> — el ciclo completo del negocio<br/>
     • <strong>Escalera de Sueños</strong> — tu combustible emocional<br/>
-    • <strong>Guía de Demo</strong> — te acompaña en la presentación<br/>
+    • <strong>Coach Comercial de Demo</strong> — guiones, preguntas y objeciones en vivo<br/>
     • <strong>La Botella</strong> — herramienta de conciencia para la demo<br/>
     • <strong>Simulador</strong> — calculá cuánto podés ganar<br/>
     • <strong>Grabadora</strong> — grabá ideas y reuniones<br/>
@@ -9553,9 +9557,9 @@ function renderToolsList(){
       timeAgo:'Plan de vida', onClick:'openSuenos()', accent:'#a06bff', gradient:'linear-gradient(135deg,#a06bff,#ff6bcf)'
     });
     const h3 = renderHomeQuickCard({
-      icon:'🎯', title:'Guía de Demo', sub:'Presentaciones paso a paso',
-      statusVal:'Guía', statusClass:'pending', progressPct:100,
-      timeAgo:'Asistente', onClick:'openDemo()', accent:'#ff6b9d', gradient:'linear-gradient(135deg,#ff8f6b,#ff6b9d)'
+      icon:'🎯', title:'Coach de Demo', sub:'Tu asistente comercial en vivo',
+      statusVal:'Coach', statusClass:'pending', progressPct:100,
+      timeAgo:'Guiones + objeciones', onClick:'openDemo()', accent:'#ff6b9d', gradient:'linear-gradient(135deg,#ff8f6b,#ff6b9d)'
     });
     const h4 = renderHomeQuickCard({
       icon:'🍾', title:'Botella', sub:'Dinámica de presentación',
