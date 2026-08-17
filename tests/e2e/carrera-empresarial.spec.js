@@ -59,7 +59,7 @@ async function entrar(page, { conEquipo = true } = {}) {
   await page.locator('#distributorPassword').fill('Clave1234');
   await page.locator('#btnDistributorLogin').click();
   await expect(page.locator('#lockScreen')).toHaveClass(/hidden/);
-  await page.evaluate(() => window.showView('view-resumen'));
+  await page.evaluate(() => window.showView('view-negocio'));
 }
 
 test('los volúmenes A, B y C respetan el lenguaje del Flex', async ({ page }) => {

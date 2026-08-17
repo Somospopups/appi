@@ -3539,7 +3539,7 @@ body.dark #bootScreen{background:#101322}
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v245 · Home limpio</div>
+  <div class="ds-foot">APPI · v246 · Páginas</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -3547,6 +3547,21 @@ body.dark #bootScreen{background:#101322}
 <!-- Botón Menú ELIMINADO por pedido - no debe existir en la app -->
 <!-- <button class="ds-reopen-new" id="dsReopenNewBtn" style="display:none !important">Menú</button> -->
  <!-- ============ PANTALLA DE ACTIVACIÓN ============ -->
+<nav id="pageTabs" aria-label="Páginas">
+  <button type="button" data-view="view-home" class="active" onclick="showView('view-home')">Home</button>
+  <button type="button" data-view="view-mes" onclick="showView('view-mes')">Mi mes</button>
+  <button type="button" data-view="view-negocio" onclick="showView('view-negocio')">Mi negocio</button>
+  <button type="button" data-view="view-herramientas" onclick="showView('view-herramientas')">Herram.</button>
+</nav>
+<style>
+#pageTabs{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);z-index:60;display:none;gap:4px;padding:5px;border-radius:999px;background:rgba(255,255,255,.94);box-shadow:0 12px 32px rgba(40,50,110,.22);backdrop-filter:blur(8px)}
+body.dark #pageTabs{background:rgba(37,39,58,.96)}
+#pageTabs button{border:0;border-radius:999px;padding:10px 13px;font:inherit;font-size:11px;font-weight:900;color:#5a6082;background:transparent;cursor:pointer}
+#pageTabs button.active{background:rgba(91,141,239,.18);color:#3d63c9}
+body.dark #pageTabs button{color:#b8b9c5}
+body.dark #pageTabs button.active{background:rgba(91,141,239,.28);color:#a8c0ff}
+@media (min-width:1024px){#pageTabs{display:none!important}}
+</style>
 <div id="lockScreen" class="hidden">
   <div class="lock-card">
     <button type="button" class="admin-login-lock" id="btnAdminLoginOpen" aria-label="Acceso administrador" title="Acceso administrador">🔒</button>
@@ -3782,6 +3797,42 @@ body.dark #bootScreen{background:#101322}
   </section>
 
   <!-- 7 P -->
+  <section id="view-mes" class="view">
+    <header class="top">
+      <button class="back-btn" onclick="showView('view-home')" aria-label="Volver">‹</button>
+      <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
+      <h1>Mi mes</h1>
+      <div class="script">tu planificación</div>
+    </header>
+    <div id="culturaWrap"></div>
+    <div id="scoreCompactWrap"></div>
+    <div class="home-tool-grid" id="mesGrid" style="padding:0 14px"></div>
+  </section>
+
+  <section id="view-negocio" class="view">
+    <header class="top">
+      <button class="back-btn" onclick="showView('view-home')" aria-label="Volver">‹</button>
+      <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
+      <h1>Mi negocio</h1>
+      <div class="script">tu gente y tus números</div>
+    </header>
+    <div id="bonusNotifWrap"></div>
+    <div id="bdayBannerWrap"></div>
+    <div class="home-tool-grid" id="negGrid" style="padding:0 14px"></div>
+    <div id="negWrap"></div>
+  </section>
+
+  <section id="view-herramientas" class="view">
+    <header class="top">
+      <button class="back-btn" onclick="showView('view-home')" aria-label="Volver">‹</button>
+      <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
+      <h1>Mis herramientas</h1>
+      <div class="script">tu caja de apoyo</div>
+    </header>
+    <div id="herrWrap"></div>
+    <div class="home-tool-grid" id="herrGrid" style="padding:0 14px"></div>
+  </section>
+
   <section id="view-siete" class="view">
     <header class="top">
       <button class="back-btn" id="btnBackSiete" aria-label="Volver">‹</button>
@@ -4762,7 +4813,9 @@ function showView(id){
     b.classList.toggle('active', b.dataset.ds===dsTarget);
   });
   const hideTabsOn = ['view-home','view-siete','view-siete-detail','view-ocho','view-suenos','view-demo','view-presu','view-presu-hist','view-equipo','view-historico','view-seguimiento','view-planning','view-encuesta','view-gestion','view-grabadora','view-notas','view-usuarios','view-admin'];
-  document.getElementById('tabs').style.display = hideTabsOn.includes(id) ? 'none' : 'flex';
+  document.getElementById('tabs').style.display = (id==='view-wheel'||id==='view-eval') ? 'flex' : 'none';
+  const pt=document.getElementById('pageTabs'); if(pt) pt.style.display = ['view-home','view-mes','view-negocio','view-herramientas'].includes(id) ? 'flex' : 'none';
+  document.querySelectorAll('#pageTabs button').forEach(b=>b.classList.toggle('active', b.dataset.view===id));
   if(id==='view-eval')    try{ renderAreas(); }catch(e){ console.error(e); }
   if(id==='view-wheel')   try{ renderWheel(); }catch(e){ console.error(e); }
   if(id==='view-home')    try{ if(typeof renderHomeCompleto==='function') renderHomeCompleto(); }catch(e){ console.error(e); }
@@ -9089,7 +9142,11 @@ function renderToolsList(){
 
   const openMes=localStorage.getItem('home_sec_mes')==='1';
   const openNeg=localStorage.getItem('home_sec_neg')==='1';
-  document.getElementById('toolsList').innerHTML = `
+  const mesHost=document.getElementById('mesGrid');
+  const negHost=document.getElementById('negGrid');
+  if(mesHost) mesHost.innerHTML = `<div id="nextStepWrap"></div>` + c2 + c1 + c3 + c4;
+  if(negHost) negHost.innerHTML = seguimientoCard + equipoCard + historicoCard + usuariosCard;
+  if(!mesHost) document.getElementById('toolsList').innerHTML = `
     <details class="home-section-block" data-home-sec="mes" ${openMes?'open':''}>
       <summary class="mini-section-label"><span>📅</span> Mi mes<em>⌄</em></summary>
       <div id="nextStepWrap"></div>
@@ -9390,7 +9447,7 @@ function renderHomeCompleto(){
   renderToolsList = function(){
     _origTools();
     try{
-      const list=document.getElementById('toolsList');
+      const list=document.getElementById('herrWrap')||document.getElementById('herrGrid')||document.getElementById('toolsList');
       if(!list) return;
       const existing=document.getElementById('homeExtraTools');
       if(existing) existing.remove();

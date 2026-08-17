@@ -265,7 +265,7 @@
   }
 
   function render(){
-    var list = document.getElementById('toolsList');
+    var list = document.getElementById('negWrap') || document.getElementById('toolsList');
     if (!list || !uid()) return;
     var viejo = document.getElementById('carreraBlock');
     if (viejo) viejo.remove();

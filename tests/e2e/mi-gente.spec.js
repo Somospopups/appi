@@ -61,11 +61,12 @@ async function abrirMiGente(page, { contactosLocales = [], yaMigrado = false, fa
   return importados;
 }
 
-test('el home muestra Panel de Contactos una sola vez, dentro de Mi negocio', async ({ page }) => {
+test('la página Mi negocio tiene el Panel una sola vez; Herramientas no lo duplica', async ({ page }) => {
   await abrirMiGente(page);
-  const negocio = page.locator('#toolsList [data-home-sec="neg"]');
+  await page.evaluate(() => window.showView('view-negocio'));
+  const negocio = page.locator('#negGrid');
   await expect(negocio).toContainText('Panel de Contactos');
-  const herramientas = page.locator('#homeExtraKeep');
+  const herramientas = page.locator('#view-herramientas');
   await expect(herramientas).toContainText('Grabadora');
   await expect(herramientas).not.toContainText('Panel de Contactos');
 });

@@ -101,7 +101,7 @@
       (pq ? '<p class="hl-porque">💙 ' + esc(pq) + '</p>' : '') +
       '<div class="hl-nums">' +
       '<button type="button" class="hl-num" onclick="openMiGestion()"><b>' + acts.length + '</b><span>PARA HOY</span></button>' +
-      '<button type="button" class="hl-num" onclick="showView(\'view-resumen\')"><b>' + m.A + '/12</b><span>PB DEL MES</span></button>' +
+      '<button type="button" class="hl-num" onclick="showView(\'view-negocio\')"><b>' + m.A + '/12</b><span>PB DEL MES</span></button>' +
       '<button type="button" class="hl-num" onclick="showView(\'view-usuarios\')"><b>' + venc + '</b><span>VISITAS RENACEN</span></button>' +
       '</div>' +
       '<div class="hl-titulo">¿Quién te espera hoy?</div>' +
@@ -110,7 +110,6 @@
       '<button type="button" class="hl-enc" id="hlEncuesta">📨 Enviar encuesta</button>' +
       '<button type="button" class="hl-add" id="hlAgregar">＋ Agregar contacto</button>' +
       '</div>' +
-      '<button type="button" class="hl-resumen" onclick="showView(\'view-resumen\')">Ver mi resumen completo ›</button>' +
       '</div>';
   }
 
@@ -142,24 +141,14 @@
     });
   }
 
-  /* -------- mudar lo mensual a "Tu resumen" -------- */
+  /* -------- el home limpio no necesita el home viejo -------- */
   function mudar(){
-    if ($('view-resumen')) return;
     var host = $('view-home');
-    var sec = document.createElement('section');
-    sec.id = 'view-resumen';
-    sec.className = 'view';
-    sec.innerHTML = '<header class="top"><button class="back-btn" onclick="showView(\'view-home\')" aria-label="Volver">‹</button>' +
-      '<button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>' +
-      '<h1>Tu resumen</h1><div class="script">lo mensual, junto</div></header>';
-    host.parentElement.insertBefore(sec, host.nextSibling);
-    ['culturaWrap', 'bonusNotifWrap', 'bdayBannerWrap', 'scoreCompactWrap'].forEach(function(id){
-      var n = $(id); if (n) sec.appendChild(n);
-    });
-    var head = host.querySelector('.home-section-head'); if (head) sec.appendChild(head);
-    var tools = $('toolsList'); if (tools) sec.appendChild(tools);
-    var backup = $('backupCollapsible'); if (backup) sec.appendChild(backup);
-    if (window.hideTabsOn) window.hideTabsOn.push('view-resumen');
+    if (!host) return;
+    var head = host.querySelector('.home-section-head'); if (head) head.remove();
+    var tools = $('toolsList'); if (tools) tools.remove();
+    var backup = $('backupCollapsible');
+    if (backup && $('view-herramientas')) $('view-herramientas').appendChild(backup);
   }
 
   function envolver(){
@@ -172,7 +161,7 @@
       var r = orig.apply(this, arguments);
       try{
         if (id === 'view-home') render();
-        if (id === 'view-resumen' && typeof window.renderHomeCompleto === 'function') window.renderHomeCompleto();
+        if (['view-mes','view-negocio','view-herramientas'].indexOf(id) >= 0 && typeof window.renderHomeCompleto === 'function') window.renderHomeCompleto();
       }catch(e){}
       return r;
     };

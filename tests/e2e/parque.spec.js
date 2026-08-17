@@ -48,7 +48,7 @@ async function entrar(page, { sinTour = false } = {}) {
   await page.locator('#distributorPassword').fill('Clave1234');
   await page.locator('#btnDistributorLogin').click();
   await expect(page.locator('#lockScreen')).toHaveClass(/hidden/);
-  await page.evaluate(() => window.showView('view-resumen'));
+  await page.evaluate(() => window.showView('view-negocio'));
 }
 
 test('la tarjeta del parque suma hogares y garantías de todo el equipo', async ({ page }) => {
@@ -77,7 +77,7 @@ test('el mini tour arranca solo la primera vez y recorre los 3 pasos', async ({ 
   await expect(page.locator('.pq-bubble')).toHaveCount(0);
 
   // Pero el botón lo relanza cuando la persona quiere (vive en Tu resumen).
-  await page.evaluate(() => window.showView('view-resumen'));
+  await page.evaluate(() => window.showView('view-negocio'));
   await page.locator('#pqTourBtn').click();
   await expect(page.locator('.pq-bubble')).toContainText('PARQUE 1/3');
 });

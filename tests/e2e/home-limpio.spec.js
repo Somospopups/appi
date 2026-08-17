@@ -48,6 +48,7 @@ async function entrar(page) {
     localStorage.setItem('equipoData', JSON.stringify(equipo));
     localStorage.setItem(`appi_gestion_cache_v1_${uid}`, JSON.stringify({ contacts: contactos, surveys: [], activities: [], savedAt: Date.now() }));
     localStorage.setItem(`appi_porque_v1_${uid}`, JSON.stringify({ niveles: ['Ganar dinero', 'Que mi familia viva tranquila'] }));
+    localStorage.setItem(`appi_tour_parque_v1_${uid}`, '1');
   }, [USER_ID, EQUIPO, CONTACTOS]);
   await page.goto('/index.html', { waitUntil: 'networkidle' });
   await page.locator('#distributorInput').fill('02-9802014');
@@ -72,18 +73,33 @@ test('el home limpio muestra porqué, números claros y a quién escribir hoy', 
   await expect(home).toContainText('Agregar contacto');
 });
 
-test('el resumen completo vive en segundo nivel y no se perdió nada', async ({ page }) => {
+test('el selector de páginas navega y cada página tiene lo suyo', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 840 });
   await entrar(page);
 
-  await page.locator('.hl-resumen').click();
-  await expect(page.locator('#view-resumen')).toHaveClass(/active/);
-  await expect(page.locator('#view-resumen')).toContainText('Accesos rápidos');
-  await expect(page.locator('#toolsList')).toBeVisible();
-  await expect(page.locator('#carreraBlock')).toBeVisible();
+  await expect(page.locator('#pageTabs')).toBeVisible();
 
-  // Y se vuelve al home limpio.
-  await page.locator('#view-resumen .back-btn').click();
+  await page.locator('#pageTabs button[data-view="view-negocio"]').click();
+  await expect(page.locator('#view-negocio')).toHaveClass(/active/);
+  await expect(page.locator('#carreraBlock')).toBeVisible();
+  await expect(page.locator('#negGrid')).toContainText('Panel de Contactos');
+
+  await page.locator('#pageTabs button[data-view="view-mes"]').click();
+  await expect(page.locator('#mesGrid')).toContainText('Las 7 P');
+  await expect(page.locator('#mesGrid')).toContainText('Presupuesto');
+
+  await page.locator('#pageTabs button[data-view="view-herramientas"]').click();
+  await expect(page.locator('#view-herramientas')).toContainText('Grabadora');
+  await expect(page.locator('#view-herramientas')).toContainText('Los 8 Pasos');
+
+  await page.locator('#pageTabs button[data-view="view-home"]').click();
   await expect(page.locator('#homeLimpio')).toBeVisible();
+});
+
+test('en pantalla de PC el selector se esconde y manda la sidebar', async ({ page }) => {
+  await entrar(page);
+  await expect(page.locator('#pageTabs')).toBeHidden();
+  await expect(page.locator('#deskSidebar')).toBeVisible();
 });
 
 test('Agregar contacto desde el home abre el panel con el formulario', async ({ page }) => {
