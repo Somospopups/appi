@@ -1,5 +1,5 @@
 /* ============================================================
-   APPI · Home limpio (v245)
+   APPI · Home limpio (v247)
    ------------------------------------------------------------
    La primera pantalla responde una sola pregunta: ¿qué hago
    hoy? Acciones claras, tres números grandes y tu porqué en
