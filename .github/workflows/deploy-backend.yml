@@ -1,14 +1,21 @@
 name: Publicar backend completo de APPI
 
-# Ejecución manual: requiere SUPABASE_ACCESS_TOKEN guardado como secret.
+# Se puede ejecutar manualmente y también después de que la suite de main quede verde.
+# Requiere SUPABASE_ACCESS_TOKEN guardado como secret del repositorio.
 on:
   workflow_dispatch:
+  workflow_run:
+    workflows: ["Pruebas de APPI"]
+    types: [completed]
 
 permissions:
   contents: read
 
 jobs:
   deploy:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main')
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
