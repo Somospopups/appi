@@ -1,5 +1,6 @@
 /* ============================================
    APPI · Panel de Administración de Precios
+   (Usa REST API de Supabase directamente)
    ============================================ */
 
 (function(){
@@ -11,6 +12,31 @@
   let pricingConfig = {
     monthly: 5000
   };
+
+  // ============================================
+  // Helper para hacer requests a Supabase
+  // ============================================
+  async function supabaseRequest(endpoint, options = {}) {
+    const url = `${window.APPI_AUTH.url}/rest/v1/${endpoint}`;
+    const headers = {
+      'Content-Type': 'application/json',
+      'apikey': window.APPI_AUTH.anonKey,
+      'Authorization': `Bearer ${window.APPI_AUTH.anonKey}`,
+      ...options.headers
+    };
+
+    const response = await fetch(url, {
+      ...options,
+      headers
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Error en la request');
+    }
+
+    return response.json();
+  }
 
   // ============================================
   // Inicialización
@@ -25,16 +51,9 @@
   // ============================================
   async function loadPricingConfig() {
     try {
-      const { data, error } = await supabase
-        .from('pricing_config')
-        .select('*')
-        .eq('active', true)
-        .eq('plan_type', 'monthly');
-
-      if (error) {
-        console.error('Error cargando configuración de precios:', error);
-        return;
-      }
+      const data = await supabaseRequest(
+        'pricing_config?select=*&active=eq.true&plan_type=eq.monthly'
+      );
 
       if (data && data.length > 0) {
         pricingConfig.monthly = parseFloat(data[0].price);
@@ -237,15 +256,15 @@
         }
       ];
 
-      // Guardar cada plan
+      // Guardar cada plan usando UPSERT
       for (const plan of plansToSave) {
-        const { error } = await supabase
-          .from('pricing_config')
-          .upsert(plan, { onConflict: 'plan_type' });
-
-        if (error) {
-          throw new Error(error.message);
-        }
+        await supabaseRequest('pricing_config', {
+          method: 'POST',
+          headers: {
+            'Prefer': 'resolution=merge-duplicates'
+          },
+          body: JSON.stringify(plan)
+        });
       }
 
       // Actualizar estado local
