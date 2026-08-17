@@ -129,6 +129,7 @@
     paso1();
   }
   window.arrancarTourParque = arrancarTour;
+  window.APPIParque = totals;
 
   function inyectar(){
     estilo();

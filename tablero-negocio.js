@@ -252,6 +252,7 @@
     calcSimulador();
   }
   window.abrirBotella = abrirBotella;
+  window.APPIGPS = datosGps;
   window.__inyectarHome = inyectarHome;
   window.abrirSimulador = abrirSimulador;
 

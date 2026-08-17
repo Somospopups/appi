@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v243-porque-vivo';
+const CACHE_NAME = 'appi-v244-home-slider';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
