@@ -78,15 +78,13 @@ test('la escalera de sueños se guarda y se puede compartir', async ({ page }) =
   await expect(page.locator('#suenosShare')).toBeVisible();
 });
 
-test('la guía de demo tiene los 5 pasos y las fichas de producto', async ({ page }) => {
+test('la guía de demo tiene cuatro pasos y no muestra la ficha del equipo', async ({ page }) => {
   await entrar(page);
 
   await page.evaluate(() => window.APPIDemoGuia.open());
-  await expect(page.locator('#demoCont .demo-paso')).toHaveCount(5);
-  await expect(page.locator('#demoProducto option')).toHaveCount(10);
-
-  await page.locator('#demoProducto').selectOption('SodaBurby');
-  await expect(page.locator('#demoFicha')).toContainText('gasificada');
+  await expect(page.locator('#demoCont .demo-paso')).toHaveCount(4);
+  await expect(page.locator('#demoCont')).not.toContainText('Ficha del equipo');
+  await expect(page.locator('#demoProducto')).toHaveCount(0);
 
   await page.locator('#demoFin').click();
   await expect(page.locator('#view-gestion')).toHaveClass(/active/);

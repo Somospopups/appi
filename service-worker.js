@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v250-home-spacing';
+const CACHE_NAME = 'appi-v250-demo-sin-ficha';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
