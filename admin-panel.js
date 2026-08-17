@@ -20,7 +20,7 @@ function updateStats(){const users=state.users.filter(user=>user.rol!=='admin');
 function filteredUsers(){const term=state.filter.toLowerCase().trim();return state.users.filter(user=>user.rol!=='admin'&&(!term||`${user.nombre} ${user.socio_nombre||''} ${user.dip} ${user.sucursal} ${user.numero_distribuidor}`.toLowerCase().includes(term)))}
 function renderUsers(){
   const list=$('adminUserList'),users=filteredUsers();if(!list)return;if(!users.length){list.innerHTML='<div class="empty">No hay distribuidores para mostrar.</div>';return}
-  list.innerHTML=users.map(user=>{const membership=membershipInfo(user),expires=user.membresia_vence?new Date(user.membresia_vence).toLocaleDateString('es-AR'):'—';return `<article class="admin-user-row" data-admin-user="${esc(user.user_id)}"><div><h3>${esc(user.nombre||'Sin nombre')}${user.socio_nombre?` + ${esc(user.socio_nombre)}`:''}</h3><p>${esc(user.dip||'Sin número')} · Vence ${esc(expires)}<br>Titular: ${esc(user.nombre||'—')}${user.socio_nombre?` · Socio/a: ${esc(user.socio_nombre)}`:' · Sin socio/a'}</p><span class="admin-user-badge ${user.activo?'':'blocked'}">${user.activo?'ACTIVA':'BLOQUEADA'}</span><span class="membership-state ${membership.cls}">${membership.label}</span></div><div class="admin-row-actions"><button type="button" data-admin-action="people">Personas</button><button type="button" data-admin-action="password">Nueva contraseña</button><button type="button" data-admin-action="membership" data-months="1">1 mes</button><button type="button" data-admin-action="membership" data-months="3">3 meses</button><button type="button" data-admin-action="membership" data-months="6">6 meses</button><button type="button" class="${user.activo?'danger':'good'}" data-admin-action="active" data-active="${user.activo?'0':'1'}">${user.activo?'Bloquear':'Activar'}</button><button type="button" class="danger" data-admin-action="delete">Eliminar</button></div></article>`}).join('');
+  list.innerHTML=users.map(user=>{const membership=membershipInfo(user),expires=user.membresia_vence?new Date(user.membresia_vence).toLocaleDateString('es-AR'):'—';return `<article class="admin-user-row" data-admin-user="${esc(user.user_id)}"><div><h3>${esc(user.nombre||'Sin nombre')}${user.socio_nombre?` + ${esc(user.socio_nombre)}`:''}</h3><p>${esc(user.dip||'Sin número')} · Vence ${esc(expires)}<br>Titular: ${esc(user.nombre||'—')}${user.socio_nombre?` · Socio/a: ${esc(user.socio_nombre)}`:' · Sin socio/a'}</p><span class="admin-user-badge ${user.activo?'':'blocked'}">${user.activo?'ACTIVA':'BLOQUEADA'}</span><span class="membership-state ${membership.cls}">${membership.label}</span></div><div class="admin-row-actions"><button type="button" data-admin-action="people">Personas</button><button type="button" data-admin-action="password">Nueva contraseña</button><button type="button" data-admin-action="membership" data-months="1">1 mes</button><button type="button" data-admin-action="membership" data-months="3">3 meses</button><button type="button" data-admin-action="membership" data-months="6">6 meses</button><button type="button" class="btn-grace-period" data-admin-action="grace_period">📅 Prórroga</button><button type="button" class="btn-payment" data-admin-action="payment">💳 Registrar Pago</button><button type="button" class="${user.activo?'danger':'good'}" data-admin-action="active" data-active="${user.activo?'0':'1'}">${user.activo?'Bloquear':'Activar'}</button><button type="button" class="danger" data-admin-action="delete">Eliminar</button></div></article>`}).join('');
   list.querySelectorAll('[data-admin-action]').forEach(button=>button.onclick=()=>handleUserAction(button));
 }
 function renderRequests(){const list=$('adminPendingList');if(!list)return;if(!state.requests.length){list.innerHTML='<div class="admin-pending-empty">No hay solicitudes pendientes.</div>';return}list.innerHTML=state.requests.map(item=>`<article class="admin-user-row" data-request-id="${esc(item.id)}"><div><h3>${esc(item.nombre)}${item.socio_nombre?` + ${esc(item.socio_nombre)}`:''}</h3><p>${item.socio_nombre?`Socio/a: ${esc(item.socio_nombre)}<br>`:''}${esc(item.dip)} · ${esc(item.telefono)}<br>${new Date(item.created_at).toLocaleString('es-AR')}</p><span class="admin-user-badge blocked">PENDIENTE</span></div><div class="admin-row-actions"><button type="button" class="wa" data-request-action="whatsapp">WhatsApp</button><button type="button" class="good" data-request-action="approve">Aprobar</button><button type="button" class="danger" data-request-action="reject">Rechazar</button></div></article>`).join('');list.querySelectorAll('[data-request-action]').forEach(button=>button.onclick=()=>handleRequestAction(button))}
@@ -36,10 +36,28 @@ async function create(){
   const button=$('adminCreateUser');button.disabled=true;button.textContent='Creando…';setStatus('adminCreateStatus','Creando cuenta…');
   try{
     const data=await callAdmin({action:'create',dip:`${sucursal}-${numero}`,nombre,socio_nombre:socioNombre,password,membership_months:state.createMembership});
+    
+    // Crear membresía en el sistema de gestión
+    if(window.APPIAdminMembership&&window.APPIAdminMembership.createMembershipForUser){
+      try{
+        await window.APPIAdminMembership.createMembershipForUser(data.user.user_id,5000);
+        console.log('✅ Membresía creada en sistema de gestión');
+      }catch(error){
+        console.error('⚠️ Error creando membresía en sistema de gestión:',error);
+      }
+    }
+    
     setStatus('adminCreateStatus',`Cuenta creada: ${data.user.dip} · contraseña temporal lista.`);
     await navigator.clipboard.writeText(`APPI\nDistribuidor: ${data.user.dip}\nTitular: ${nombre}${socioNombre?`\nSocio/a: ${socioNombre}`:''}\nContraseña temporal: ${password}`).catch(()=>{});
     ['adminSucursal','adminNumero','adminNombre','adminPartnerName','adminTempPassword'].forEach(id=>$(id).value='');$('adminHasPartner').checked=false;$('adminPartnerField').hidden=true;
-    await load();if(typeof showToast==='function')showToast('Cuenta creada y datos copiados 📋',2800);
+    await load();
+    
+    // Actualizar estadísticas de ganancias
+    if(window.APPIAdminMembership&&window.APPIAdminMembership.renderRevenuePanel){
+      window.APPIAdminMembership.renderRevenuePanel();
+    }
+    
+    if(typeof showToast==='function')showToast('Cuenta creada y datos copiados 📋',2800);
   }catch(error){setStatus('adminCreateStatus',error.message,true)}finally{button.disabled=false;button.textContent='Crear cuenta'}
 }
 async function handleUserAction(button){
@@ -58,6 +76,22 @@ async function handleUserAction(button){
     if(action==='membership'){
       const months=Number(button.dataset.months),ok=await window.APPIDialog.confirm(`La membresía de ${user.nombre||user.dip} comenzará hoy y durará ${months} mes${months===1?'':'es'}.`,{title:'Activar membresía',icon:'📅',okText:'Activar'});if(!ok)return;
       await callAdmin({action:'set_membership',user_id:userId,membership_months:months});await load();return;
+    }
+    if(action==='grace_period'){
+      if(window.APPIAdminMembership&&window.APPIAdminMembership.showGracePeriodModal){
+        window.APPIAdminMembership.showGracePeriodModal(userId,user.nombre||user.dip);
+      }else{
+        await window.APPIDialog.alert('El sistema de membresías no está disponible.',{title:'Error',icon:'!'});
+      }
+      return;
+    }
+    if(action==='payment'){
+      if(window.APPIAdminMembership&&window.APPIAdminMembership.showPaymentModal){
+        window.APPIAdminMembership.showPaymentModal(userId,user.nombre||user.dip);
+      }else{
+        await window.APPIDialog.alert('El sistema de membresías no está disponible.',{title:'Error',icon:'!'});
+      }
+      return;
     }
     if(action==='delete'){
       const ok=await window.APPIDialog.confirm(`Se eliminará definitivamente la cuenta de ${user.nombre||user.dip} y sus datos asociados.`,{title:'Eliminar cuenta',icon:'🗑️',okText:'Eliminar',danger:true});if(!ok)return;
@@ -87,6 +121,11 @@ async function handleRequestAction(button){
 async function saveWhatsapp(){const button=$('adminSaveWhatsapp'),numero=String($('adminWhatsappNumber').value||'').replace(/\D/g,'');button.disabled=true;try{const data=await callAdmin({action:'set_whatsapp',numero});state.whatsapp=data.whatsapp||numero;setStatus('adminWhatsappStatus','Número de WhatsApp actualizado.');await window.APPIAccountRequest.getConfig(true).catch(()=>{})}catch(error){setStatus('adminWhatsappStatus',error.message,true)}finally{button.disabled=false}}
 async function logout(){const ok=await window.APPIDialog.confirm('Se cerrará la sesión administradora y se limpiarán los datos locales de este dispositivo.',{title:'Cerrar sesión',icon:'↪',okText:'Cerrar sesión'});if(!ok)return;const button=$('btnAdminPanelLogout');button.disabled=true;try{await window.APPIDataSync.logoutAndLock({removeCache:true});location.reload()}catch(error){button.disabled=false;await window.APPIDialog.alert(error.message,{title:'No se pudo cerrar',icon:'!'})}}
 function bind(){if(state.bound)return;state.bound=true;['adminSucursal','adminNumero','adminNombre','adminPartnerName','adminTempPassword'].forEach(id=>{const input=$(id);if(input)input.value=''});document.querySelectorAll('[data-create-membership]').forEach(button=>button.onclick=()=>{state.createMembership=Number(button.dataset.createMembership);document.querySelectorAll('[data-create-membership]').forEach(item=>item.classList.toggle('active',item===button))});$('adminHasPartner').onchange=()=>{$('adminPartnerField').hidden=!$('adminHasPartner').checked;if($('adminHasPartner').checked)setTimeout(()=>$('adminPartnerName').focus(),40);else $('adminPartnerName').value=''};$('adminGeneratePassword').onclick=()=>$('adminTempPassword').value=randomPassword();$('adminCreateUser').onclick=create;$('adminRefreshUsers').onclick=load;$('adminRefreshRequests').onclick=load;$('adminSaveWhatsapp').onclick=saveWhatsapp;$('btnAdminPanelLogout').onclick=logout;$('btnAdminPanelPassword').onclick=()=>window.abrirCambioPasswordAPPI();$('adminUserSearch').oninput=event=>{state.filter=event.target.value;renderUsers()};$('adminSucursal').oninput=event=>event.target.value=event.target.value.replace(/\D/g,'').slice(0,2);$('adminNumero').oninput=event=>event.target.value=event.target.value.replace(/\D/g,'').slice(0,12);$('adminWhatsappNumber').oninput=event=>event.target.value=event.target.value.replace(/\D/g,'').slice(0,15)}
-function open(){const profile=window.APPIAuth.currentProfile();if(!profile||profile.rol!=='admin')return;bind();$('adminPanelIdentity').textContent='Administración del equipo';load()}
+function open(){const profile=window.APPIAuth.currentProfile();if(!profile||profile.rol!=='admin')return;bind();$('adminPanelIdentity').textContent='Administración del equipo';load();
+  // Cargar estadísticas de ganancias
+  if(window.APPIAdminMembership&&window.APPIAdminMembership.renderRevenuePanel){
+    setTimeout(()=>window.APPIAdminMembership.renderRevenuePanel(),500);
+  }
+}
 window.APPIAdminPanel={open,load};
 })();

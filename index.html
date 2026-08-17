@@ -37,6 +37,8 @@ window.openHistorico=function(){
 <script src="./auth-client.js"></script>
 <script src="./data-sync.js"></script>
 <script src="./admin-panel.js"></script>
+<script src="./js/membership-admin.js"></script>
+<link rel="stylesheet" href="./css/membership-admin.css">
 <script src="./account-request.js"></script>
 <script src="./qr-code.js"></script>
 <script src="./gestion-client.js"></script>
@@ -4463,6 +4465,12 @@ body.dark #pageTabs button.active{color:#a8c0ff}
         <div class="admin-stat warn"><strong id="adminStatBlocked">0</strong><span>Bloqueadas</span></div>
         <div class="admin-stat warn"><strong id="adminStatPending">0</strong><span>Pendientes</span></div>
       </div>
+      
+      <!-- Panel de estadísticas de ganancias -->
+      <section class="glass admin-card">
+        <div id="revenueStatsContainer"></div>
+      </section>
+      
       <section class="glass admin-card">
         <div class="admin-card-head"><div><h2>WhatsApp del equipo</h2><p>Este número recibe ayuda y solicitudes nuevas.</p></div></div>
         <div class="admin-setting-row"><input id="adminWhatsappNumber" inputmode="tel" autocomplete="off" placeholder="Ej: 5493515551234"><button type="button" class="btn btn-primary" id="adminSaveWhatsapp">Guardar número</button></div>
