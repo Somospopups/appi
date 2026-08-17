@@ -122,6 +122,27 @@ test('el Coach de Demo adapta preguntas, avance, decisión y objeciones', async 
   await expect(page.locator('#demoObjectionSheet')).toBeHidden();
 });
 
+test('el Coach de Demo nunca bloquea el scroll de APPI', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 650 });
+  await entrar(page);
+  await page.evaluate(() => window.APPIDemoGuia.open());
+
+  await page.locator('[data-demo-objections]').first().click();
+  await expect(page.locator('#demoObjectionSheet')).toBeVisible();
+  expect(await page.evaluate(() => getComputedStyle(document.body).overflow)).not.toBe('hidden');
+  await page.locator('[data-demo-sheet-close]').click();
+
+  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(100);
+
+  await page.evaluate(() => {
+    document.body.classList.add('demo-sheet-open');
+    window.APPIDemoGuia.open();
+  });
+  await expect(page.locator('body')).not.toHaveClass(/demo-sheet-open/);
+  expect(await page.evaluate(() => getComputedStyle(document.body).overflow)).not.toBe('hidden');
+});
+
 test('el formulario del equipo arma el lead por WhatsApp con todos los datos', async ({ page }) => {
   await page.goto('/formulario-equipo.html');
   await page.fill('#f-nombre', 'Carla');
