@@ -9497,12 +9497,7 @@ function renderToolsList(){
       statusVal:'Notas', statusClass:'pending', progressPct:100,
       timeAgo:'Tus ideas', onClick:"showView('view-notas')", accent:'#fbbf24', gradient:'linear-gradient(135deg,#fbbf24,#f59e0b)'
     });
-    const h8 = renderHomeQuickCard({
-      icon:'💾', title:'Backup', sub:'Exportar y restaurar datos',
-      statusVal:'Datos', statusClass:'pending', progressPct:100,
-      timeAgo:'Seguridad', onClick:'openBackup()', accent:'#6b7280', gradient:'linear-gradient(135deg,#6b7280,#3d63c9)'
-    });
-    herrHost.innerHTML = h1 + h2 + h3 + h4 + h5 + h6 + h7 + h8;
+    herrHost.innerHTML = h1 + h2 + h3 + h4 + h5 + h6 + h7;
   }
   if(!mesHost) document.getElementById('toolsList').innerHTML = `
     <details class="home-section-block" data-home-sec="mes" ${openMes?'open':''}>
