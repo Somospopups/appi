@@ -3981,6 +3981,7 @@ body.dark #pageTabs button.active{color:#a8c0ff}
   <section id="view-mes" class="view">
     <header class="top">
       <button class="back-btn" onclick="showView('view-home')" aria-label="Volver">‹</button>
+      <button class="help-btn" id="btnHelpMes" aria-label="Ayuda">?</button>
       <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
       <h1>Mi mes</h1>
       <div class="script">tu planificación</div>
@@ -3994,6 +3995,7 @@ body.dark #pageTabs button.active{color:#a8c0ff}
   <section id="view-negocio" class="view">
     <header class="top">
       <button class="back-btn" onclick="showView('view-home')" aria-label="Volver">‹</button>
+      <button class="help-btn" id="btnHelpNegocio" aria-label="Ayuda">?</button>
       <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
       <h1>Mi negocio</h1>
       <div class="script">tu gente y tus números</div>
@@ -4007,6 +4009,7 @@ body.dark #pageTabs button.active{color:#a8c0ff}
   <section id="view-herramientas" class="view">
     <header class="top">
       <button class="back-btn" onclick="showView('view-home')" aria-label="Volver">‹</button>
+      <button class="help-btn" id="btnHelpHerramientas" aria-label="Ayuda">?</button>
       <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
       <h1>Mis herramientas</h1>
       <div class="script">tu caja de apoyo</div>
@@ -4634,6 +4637,140 @@ function confirmarAccion({title, sub, html, okText, cancelText, danger, onConfir
 }
 
 const HELP = {
+  mes: {
+    icon:'📅', iconBg:'linear-gradient(135deg,#5b8def,#a06bff)',
+    title:'Mi Mes', sub:'Tu planificación mensual completa',
+    html:`<p>Esta pantalla es tu <strong>centro de planificación mensual</strong>. Acá tenés todo lo que necesitás para organizar tu mes de principio a fin.</p>
+
+    <div class="tip"><strong>🌟 SCORE DEL MES</strong><br/>
+    El número grande de arriba (0 a 100) te dice cómo va tu planificación. Se calcula así:<br/>
+    • 🚀 25% Las 7 P<br/>
+    • 💰 25% Presupuesto<br/>
+    • ⚖️ 25% Rueda de la Vida<br/>
+    • 📊 25% Rueda del Negocio<br/>
+    <strong>Objetivo:</strong> llegar a 80+ para tener un mes bien planificado.</div>
+
+    <div class="tip"><strong>🎯 PRÓXIMO PASO</strong><br/>
+    El bloque "Paso X de 4" te dice qué hacer ahora. El orden es:<br/>
+    1️⃣ Las 7 P → 2️⃣ Presupuesto → 3️⃣ Rueda Vida → 4️⃣ Rueda Negocio<br/>
+    Cuando terminás uno, automáticamente te lleva al siguiente.</div>
+
+    <div class="tip"><strong>🚀 LAS 7 P</strong><br/>
+    Tu plan mensual en 7 pasos: Parar, Pensar, Priorizar, Planificar, Proteger, Perseverar, Progresar. Completá cada uno y tocá "Hecho ✓".</div>
+
+    <div class="tip"><strong>💰 PRESUPUESTO</strong><br/>
+    Cargá ingresos y gastos, clasificalos (Personal/Negocio/Dividir) y descubrí cuánto te queda. El balance te dice si te sobra (🟢), te falta (🔴) o estás en equilibrio (🟣).</div>
+
+    <div class="tip"><strong>⚖️ RUEDA DE LA VIDA</strong><br/>
+    Evaluá 8 áreas personales del 0 al 10: salud, familia, amigos, etc. No busques un 10 en todo, buscá <strong>equilibrio</strong>. Una rueda pareja rueda mejor.</div>
+
+    <div class="tip"><strong>📊 RUEDA DEL NEGOCIO</strong><br/>
+    Evaluá 8 áreas de tu negocio del 0 al 10: ventas, equipo, formación, etc. Conviene hacerla con tu línea ascendente para tener una visión completa.</div>
+
+    <div class="tip"><strong>💡 CONSEJO</strong><br/>
+    Hacé las 4 herramientas en orden, una por semana. Al terminar las cuatro, APPI te felicita y tu Score llega a 100. ¡Eso es un mes bien planificado!</div>`
+  },
+  negocio: {
+    icon:'💼', iconBg:'linear-gradient(135deg,#3ad0a4,#5b8def)',
+    title:'Mi Negocio', sub:'Tu gente, tus números y tu evolución',
+    html:`<p>Esta pantalla es tu <strong>centro de gestión del negocio</strong>. Acá tenés todo lo relacionado con tu equipo, tus contactos y tu evolución mensual.</p>
+
+    <div class="tip"><strong>🛰️ GPS DEL MES</strong><br/>
+    Tu brújula para llegar al bonus. Te muestra:<br/>
+    • <strong>Bonus:</strong> necesitás 12 PB personales<br/>
+    • <strong>Patrocinios:</strong> necesitás 2 personas con 9+ PB<br/>
+    • <strong>Ritmo:</strong> cuántas demos llevás (meta: 30)<br/>
+    • <strong>Cierres:</strong> cuántas ventas cerraste (meta: 10)<br/>
+    Las barras te dicen cuánto te falta. ¡Verde = objetivo cumplido!</div>
+
+    <div class="tip"><strong>📇 PANEL DE CONTACTOS</strong><br/>
+    Tu CRM personal. Acá están todas las personas que contactaste:<br/>
+    • <strong>Nuevos:</strong> sin contactar todavía<br/>
+    • <strong>Seguimiento:</strong> en proceso<br/>
+    • <strong>Presentación:</strong> listos para la demo<br/>
+    • <strong>Cerrados:</strong> ventas concretadas<br/>
+    Tocá el botón de WhatsApp o Llamar para contactar directo.</div>
+
+    <div class="tip"><strong>🌳 MI EQUIPO</strong><br/>
+    Toda tu línea descendente en un solo lugar:<br/>
+    • <strong>Tablero:</strong> números, ranking, cumpleaños, garantías<br/>
+    • <strong>Árbol:</strong> quién está debajo de quién<br/>
+    • <strong>Lista:</strong> buscador y filtros<br/>
+    Cargá el Excel de Línea Descendente y tené todo actualizado.</div>
+
+    <div class="tip"><strong>📈 HISTÓRICO</strong><br/>
+    Tu evolución mes a mes. Cargá los 3 archivos cada mes (Línea Descendente, Garantías, Ingresos) y mirá cómo crece tu negocio. Podés comparar meses y ver tendencias.</div>
+
+    <div class="tip"><strong>📍 USUARIOS / GARANTÍAS</strong><br/>
+    El parque instalado: todos los hogares que tienen un equipo tuyo. Cargá las garantías, mirá cuáles vencen pronto y planificá visitas de mantenimiento. ¡Es tu tesoro!</div>
+
+    <div class="tip"><strong>💡 CONSEJO</strong><br/>
+    Revisá el GPS todos los días. Si estás lejos del bonus, enfocá tus esfuerzos en patrocinios y demos. El Panel te dice a quién contactar hoy.</div>`
+  },
+  herramientas: {
+    icon:'🧰', iconBg:'linear-gradient(135deg,#8b63e8,#ff6bcf)',
+    title:'Mis Herramientas', sub:'Tu caja de apoyo para el negocio',
+    html:`<p>Esta pantalla es tu <strong>caja de herramientas</strong>. Acá tenés todas las herramientas que te acompañan en el día a día del negocio.</p>
+
+    <div class="tip"><strong>🧭 LOS 8 PASOS</strong><br/>
+    El ciclo completo del negocio en 8 pasos:<br/>
+    1️⃣ <strong>Propósito y Sueños</strong> — tu porqué<br/>
+    2️⃣ <strong>Compromiso</strong> — tu decisión<br/>
+    3️⃣ <strong>Banco de Datos</strong> — tu lista de contactos<br/>
+    4️⃣ <strong>Contacto e Invitación</strong> — el primer paso<br/>
+    5️⃣ <strong>Presentación</strong> — la demo<br/>
+    6️⃣ <strong>Seguimiento</strong> — acompañar al prospecto<br/>
+    7️⃣ <strong>Chequeo</strong> — evaluar resultados<br/>
+    8️⃣ <strong>Evolución</strong> — crecer y duplicar<br/>
+    <strong>Es cíclico:</strong> se recorre todos los meses.</div>
+
+    <div class="tip"><strong>🪜 ESCALERA DE SUEÑOS</strong><br/>
+    Tu combustible emocional. Escribí:<br/>
+    • Tu <strong>"para qué"</strong> profundo<br/>
+    • Hasta 7 sueños, del más cercano al más grande<br/>
+    Se guarda solo en tu dispositivo. Compartila con quien te acompaña en el negocio.</div>
+
+    <div class="tip"><strong>🎤 GUÍA DE DEMO</strong><br/>
+    Te acompaña paso a paso en la presentación:<br/>
+    1. Conciencia (el problema del agua)<br/>
+    2. Comparativa (botellas vs sistema)<br/>
+    3. Sistema (cómo funciona)<br/>
+    4. Ficha del equipo (elegí el purificador)<br/>
+    5. Cierre (registrá la presentación)<br/>
+    Al terminar, el seguimiento queda automático en el Panel.</div>
+
+    <div class="tip"><strong>🍶 LA BOTELLA</strong><br/>
+    Herramienta de conciencia para la demo. Mostrá cuánto gasta una familia en botellas de 2L:<br/>
+    • Por día, por mes, por año, en 3 años<br/>
+    • Comparalo con el sistema de purificación<br/>
+    Compartilo por WhatsApp para que lo piensen.</div>
+
+    <div class="tip"><strong>🧮 SIMULADOR</strong><br/>
+    Calculá cuánto podés ganar según tu actividad:<br/>
+    • <strong>Demos por mes:</strong> cuántas presentaciones hacés<br/>
+    • <strong>Cierres:</strong> cuántas ventas concretás<br/>
+    • <strong>Red:</strong> PB de tu equipo<br/>
+    Te muestra comercialización + red + total. Ajustá los valores del plan según tu categoría.</div>
+
+    <div class="tip"><strong>🎙️ GRABADORA</strong><br/>
+    Grabá ideas, reuniones o recados:<br/>
+    • Tocá el micrófono para grabar<br/>
+    • Pausá y retomá cuando quieras<br/>
+    • Ponéle nombre al terminar<br/>
+    • Escuchá, descargá o borrá cuando necesites<br/>
+    La primera vez pedí permiso al micrófono.</div>
+
+    <div class="tip"><strong>📝 NOTAS KEEP</strong><br/>
+    Tus notas rápidas, como post-its de colores:<br/>
+    • Creá notas con título + texto<br/>
+    • Elegí un color al guardar<br/>
+    • Tocá para editar, fijar, enviar o borrar<br/>
+    • Buscá por texto arriba<br/>
+    Todo queda en tu dispositivo.</div>
+
+    <div class="tip"><strong>💡 CONSEJO</strong><br/>
+    Usá Los 8 Pasos como guía mensual. La Escalera de Sueños releela cuando el día se ponga difícil. La Guía de Demo y La Botella son tus mejores aliadas en las presentaciones.</div>`
+  },
   ocho: {
     icon:'🧭', iconBg:'linear-gradient(135deg,#5b8def,#3ad0a4)',
     title:'Los 8 Pasos', sub:'El ciclo de tu negocio',
@@ -4906,6 +5043,9 @@ const HELP = {
 
 function showHelp(key){ const h = HELP[key]; if(h) modal.open(h); }
 document.getElementById('btnHelpHome').addEventListener('click', ()=>showHelp('home'));
+document.getElementById('btnHelpMes')?.addEventListener('click', ()=>showHelp('mes'));
+document.getElementById('btnHelpNegocio')?.addEventListener('click', ()=>showHelp('negocio'));
+document.getElementById('btnHelpHerramientas')?.addEventListener('click', ()=>showHelp('herramientas'));
 document.getElementById('btnHelpPresu').addEventListener('click', ()=>showHelp('presu'));
 document.getElementById('btnHelpSiete').addEventListener('click', ()=>showHelp('siete'));
 document.getElementById('btnHelpWheel').addEventListener('click', ()=>showHelp('wheel'));
