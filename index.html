@@ -9527,10 +9527,18 @@ function openGrabadora(){
   }
 }
 function openBotella(){
-  if(typeof showToast==='function') showToast('🍾 Botella — próximamente', 2000);
+  if(typeof window.abrirBotella === 'function') {
+    window.abrirBotella();
+  } else {
+    if(typeof showToast==='function') showToast('🍾 Botella no disponible', 2000);
+  }
 }
 function openCalculadora(){
-  if(typeof showToast==='function') showToast('🧮 Simulador — próximamente', 2000);
+  if(typeof window.abrirSimulador === 'function') {
+    window.abrirSimulador();
+  } else {
+    if(typeof showToast==='function') showToast('🧮 Simulador no disponible', 2000);
+  }
 }
 function openBackup(){
   // Ir al home y abrir el colapsable de backup

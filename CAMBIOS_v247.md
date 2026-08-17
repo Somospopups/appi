@@ -42,3 +42,32 @@
 
 ## Tests
 - 81/82 tests en verde.
+
+## Navegación atrás con historial real
+
+**Commit:** `6944f8f`
+
+### Problema
+Al usar el gesto de "atrás" del teléfono, la app siempre volvía al Home directamente, sin importar desde qué pantalla venías.
+
+### Solución
+Implementada una pila de navegación real que recuerda el historial completo:
+
+- **Navegación entre las 4 páginas principales:** Al ir Home → Mi Mes → Mi Negocio → Herramientas y presionar atrás, vuelve en orden inverso (Herramientas → Mi Negocio → Mi Mes → Home).
+
+- **Sub-vistas vuelven a su padre:**
+  - Rueda/Evaluar → Mi Mes
+  - 7P/Detalle → 7P
+  - Presupuesto/Histórico → Presupuesto
+  - Equipo/Histórico/Usuarios/Panel → Mi Negocio
+  - 8 Pasos/Sueños/Demo/Grabadora/Notas → Herramientas
+
+- **Pila limitada a 20 entradas** para evitar memory leaks en sesiones largas.
+
+- **Tests actualizados:** 6/6 tests de home-limpio pasando.
+
+### Comportamiento
+1. Cada vez que llamás `showView()`, se agrega la vista a la pila
+2. Al presionar atrás (gesto o botón), se hace pop de la pila
+3. Si la pila está vacía o estás en Home, no hace nada (evita salir de la app)
+4. Los modales se cierran primero antes de navegar atrás
