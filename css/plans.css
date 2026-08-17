@@ -1,0 +1,792 @@
+/* ============================================
+   APPI · Estilos para Sistema de Planes
+   ============================================ */
+
+/* ============================================
+   Contenedor principal
+   ============================================ */
+#plansContainer {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+/* ============================================
+   Lista de planes
+   ============================================ */
+.plans-list {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.plans-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.plans-header h1 {
+  font-size: 32px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 12px;
+}
+
+.plans-header p {
+  font-size: 18px;
+  color: #666;
+  margin: 0;
+}
+
+.plans-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+  margin-bottom: 60px;
+}
+
+/* ============================================
+   Tarjeta de plan
+   ============================================ */
+.plan-card {
+  background: white;
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border: 2px solid #e0e0e0;
+  transition: all 0.3s ease;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.plan-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  border-color: #5b8def;
+}
+
+.plan-card-featured {
+  border-color: #5b8def;
+  box-shadow: 0 8px 24px rgba(91, 141, 239, 0.2);
+}
+
+.plan-card-badge {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #5b8def, #8b63e8);
+  color: white;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.plan-card-header h3 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 8px 0;
+}
+
+.plan-card-header p {
+  font-size: 14px;
+  color: #666;
+  margin: 0 0 24px 0;
+  line-height: 1.5;
+}
+
+.plan-card-price {
+  margin-bottom: 24px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.plan-card-amount {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-bottom: 4px;
+}
+
+.plan-card-currency {
+  font-size: 24px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.plan-card-value {
+  font-size: 48px;
+  font-weight: 700;
+  color: #1a1a1a;
+  line-height: 1;
+}
+
+.plan-card-period {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 8px;
+}
+
+.plan-card-savings {
+  display: inline-block;
+  background: #e8f5e9;
+  color: #2e7d32;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: 8px;
+}
+
+.plan-card-features {
+  flex: 1;
+  margin-bottom: 24px;
+}
+
+.plan-card-features h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0 0 12px 0;
+}
+
+.plan-card-features ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.plan-card-features li {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+
+.plan-card-button {
+  width: 100%;
+  padding: 14px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: #5b8def;
+  color: white;
+}
+
+.plan-card-button:hover {
+  background: #4a7cdd;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(91, 141, 239, 0.3);
+}
+
+.plan-card-button:active {
+  transform: translateY(0);
+}
+
+/* ============================================
+   FAQ
+   ============================================ */
+.plans-faq {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.plans-faq h2 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.plans-faq-item {
+  background: white;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+}
+
+.plans-faq-item summary {
+  padding: 20px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1a1a1a;
+  cursor: pointer;
+  list-style: none;
+  position: relative;
+  padding-right: 48px;
+}
+
+.plans-faq-item summary::-webkit-details-marker {
+  display: none;
+}
+
+.plans-faq-item summary::after {
+  content: '+';
+  position: absolute;
+  right: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 24px;
+  font-weight: 300;
+  color: #5b8def;
+  transition: transform 0.2s ease;
+}
+
+.plans-faq-item[open] summary::after {
+  content: '−';
+}
+
+.plans-faq-item p {
+  padding: 0 24px 20px 24px;
+  font-size: 14px;
+  color: #666;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ============================================
+   Instrucciones de pago
+   ============================================ */
+.payment-instructions {
+  max-width: 700px;
+  margin: 0 auto;
+  animation: fadeIn 0.3s ease-in;
+}
+
+.payment-instructions-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.payment-instructions-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.payment-instructions-header h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 8px 0;
+}
+
+.payment-instructions-header p {
+  font-size: 16px;
+  color: #666;
+  margin: 0;
+}
+
+.payment-code-card {
+  background: linear-gradient(135deg, #5b8def, #8b63e8);
+  color: white;
+  padding: 32px;
+  border-radius: 16px;
+  text-align: center;
+  margin-bottom: 24px;
+  box-shadow: 0 8px 24px rgba(91, 141, 239, 0.3);
+}
+
+.payment-code-label {
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+  opacity: 0.9;
+}
+
+.payment-code-value {
+  font-size: 32px;
+  font-weight: 700;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 2px;
+  margin-bottom: 16px;
+  word-break: break-all;
+}
+
+.payment-code-help {
+  font-size: 14px;
+  line-height: 1.5;
+  opacity: 0.95;
+}
+
+.payment-amount-card {
+  background: white;
+  padding: 24px;
+  border-radius: 12px;
+  text-align: center;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.payment-amount-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #666;
+  margin-bottom: 8px;
+}
+
+.payment-amount-value {
+  font-size: 36px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.payment-bank-card {
+  background: white;
+  padding: 24px;
+  border-radius: 12px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.payment-bank-card h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 20px 0;
+}
+
+.payment-bank-detail {
+  display: flex;
+  align-items: center;
+  padding: 16px 0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.payment-bank-detail:last-child {
+  border-bottom: none;
+}
+
+.payment-bank-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #666;
+  width: 120px;
+  flex-shrink: 0;
+}
+
+.payment-bank-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a1a1a;
+  flex: 1;
+  font-family: 'Courier New', monospace;
+}
+
+.payment-bank-copy {
+  background: #f5f5f5;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #5b8def;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.payment-bank-copy:hover {
+  background: #e0e0e0;
+}
+
+.payment-steps-card {
+  background: white;
+  padding: 24px;
+  border-radius: 12px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.payment-steps-card h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 16px 0;
+}
+
+.payment-steps-card ol {
+  margin: 0;
+  padding-left: 24px;
+}
+
+.payment-steps-card li {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+
+.payment-status-card {
+  background: #fff3cd;
+  border: 2px solid #ffc107;
+  padding: 24px;
+  border-radius: 12px;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.payment-status-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.payment-status-card h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #856404;
+  margin: 0 0 12px 0;
+}
+
+.payment-status-card p {
+  font-size: 14px;
+  color: #856404;
+  line-height: 1.6;
+  margin: 0 0 8px 0;
+}
+
+.payment-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+/* ============================================
+   Suscripción activa
+   ============================================ */
+.plans-active {
+  max-width: 700px;
+  margin: 0 auto;
+  animation: fadeIn 0.3s ease-in;
+}
+
+.plans-active-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.plans-active-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+}
+
+.plans-active-header h2 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.plans-active-card {
+  background: white;
+  padding: 32px;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  margin-bottom: 24px;
+}
+
+.plans-active-plan {
+  padding-bottom: 24px;
+  border-bottom: 1px solid #e0e0e0;
+  margin-bottom: 24px;
+}
+
+.plans-active-plan h3 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 8px 0;
+}
+
+.plans-active-plan p {
+  font-size: 14px;
+  color: #666;
+  margin: 0;
+}
+
+.plans-active-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.plans-active-detail {
+  text-align: center;
+}
+
+.plans-active-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.plans-active-value {
+  display: block;
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.plans-active-status {
+  color: #4caf50;
+}
+
+.plans-active-warning {
+  color: #ff9800;
+}
+
+.plans-active-features h4 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 12px 0;
+}
+
+.plans-active-features ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.plans-active-features li {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+
+.plans-renewal-notice {
+  background: #fff3cd;
+  border: 2px solid #ffc107;
+  padding: 24px;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.plans-renewal-notice p {
+  font-size: 16px;
+  color: #856404;
+  margin: 0 0 16px 0;
+}
+
+/* ============================================
+   Banner de renovación
+   ============================================ */
+.renewal-banner {
+  background: linear-gradient(135deg, #ff9800, #f57c00);
+  color: white;
+  padding: 16px 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  position: relative;
+  z-index: 1000;
+}
+
+.renewal-banner-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.renewal-banner-icon {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.renewal-banner-text {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.renewal-banner-text a {
+  color: white;
+  text-decoration: underline;
+  font-weight: 700;
+}
+
+.renewal-banner-close {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.2s ease;
+}
+
+.renewal-banner-close:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* ============================================
+   Loading
+   ============================================ */
+.plans-loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+}
+
+.plans-loader-spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.plans-loader-message {
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* ============================================
+   Botones
+   ============================================ */
+.btn {
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn-primary {
+  background: #5b8def;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #4a7cdd;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(91, 141, 239, 0.3);
+}
+
+.btn-secondary {
+  background: #f5f5f5;
+  color: #1a1a1a;
+}
+
+.btn-secondary:hover {
+  background: #e0e0e0;
+}
+
+/* ============================================
+   Error
+   ============================================ */
+.plans-error {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.plans-error p {
+  font-size: 16px;
+  color: #d32f2f;
+}
+
+/* ============================================
+   Responsive
+   ============================================ */
+@media (max-width: 768px) {
+  #plansContainer {
+    padding: 16px;
+  }
+
+  .plans-header h1 {
+    font-size: 24px;
+  }
+
+  .plans-header p {
+    font-size: 16px;
+  }
+
+  .plans-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .plan-card {
+    padding: 24px;
+  }
+
+  .plan-card-value {
+    font-size: 36px;
+  }
+
+  .payment-code-value {
+    font-size: 24px;
+  }
+
+  .payment-actions {
+    flex-direction: column;
+  }
+
+  .payment-actions .btn {
+    width: 100%;
+  }
+
+  .renewal-banner-content {
+    flex-wrap: wrap;
+  }
+
+  .renewal-banner-text {
+    order: 3;
+    width: 100%;
+    margin-top: 8px;
+  }
+}
