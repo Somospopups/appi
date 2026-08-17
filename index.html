@@ -3987,6 +3987,7 @@ body.dark #pageTabs button.active{color:#a8c0ff}
     </header>
     <div id="culturaWrap"></div>
     <div id="scoreCompactWrap"></div>
+    <div id="nextStepWrap"></div>
     <div class="home-tool-grid" id="mesGrid" style="padding:0 14px"></div>
   </section>
 
@@ -9371,7 +9372,7 @@ function renderToolsList(){
   const openNeg=localStorage.getItem('home_sec_neg')==='1';
   const mesHost=document.getElementById('mesGrid');
   const negHost=document.getElementById('negGrid');
-  if(mesHost) mesHost.innerHTML = `<div id="nextStepWrap"></div>` + c2 + c1 + c3 + c4;
+  if(mesHost) mesHost.innerHTML = c2 + c1 + c3 + c4;
   if(negHost) negHost.innerHTML = seguimientoCard + equipoCard + historicoCard + usuariosCard;
   
   // === HERRAMIENTAS GRID ===
