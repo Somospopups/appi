@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v241-tablero-comando';
+const CACHE_NAME = 'appi-v242-parque-amigo';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
