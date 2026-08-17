@@ -1,10 +1,14 @@
 /* ============================================
    APPI · Panel de Administración de Precios
    (Usa REST API de Supabase directamente)
+   Versión: 2.0 - Con console.log para debugging
    ============================================ */
 
 (function(){
   'use strict';
+
+  console.log('🔍 pricing-admin.js cargado - Versión 2.0');
+  console.log('🔍 window.APPI_AUTH:', window.APPI_AUTH);
 
   // ============================================
   // Estado global
@@ -256,15 +260,21 @@
         }
       ];
 
-      // Guardar cada plan usando UPSERT
+      // Guardar cada plan usando PATCH (UPDATE)
       for (const plan of plansToSave) {
-        await supabaseRequest('pricing_config', {
-          method: 'POST',
-          headers: {
-            'Prefer': 'resolution=merge-duplicates'
-          },
-          body: JSON.stringify(plan)
+        console.log(`🔍 Actualizando plan: ${plan.plan_type}`, plan);
+        
+        await supabaseRequest(`pricing_config?plan_type=eq.${plan.plan_type}`, {
+          method: 'PATCH',
+          body: JSON.stringify({
+            price: plan.price,
+            description: plan.description,
+            features: plan.features,
+            active: plan.active
+          })
         });
+        
+        console.log(`✅ Plan ${plan.plan_type} actualizado`);
       }
 
       // Actualizar estado local

@@ -1,0 +1,20 @@
+-- ============================================
+-- Arreglar RLS: Agregar política de INSERT para pricing_config
+-- ============================================
+
+-- Eliminar política anterior si existe
+DROP POLICY IF EXISTS "Allow update on pricing_config" ON pricing_config;
+
+-- Crear política para UPDATE (actualizar rows existentes)
+CREATE POLICY "Allow update on pricing_config"
+  ON pricing_config FOR UPDATE
+  USING (true)
+  WITH CHECK (true);
+
+-- Crear política para INSERT (insertar nuevos rows)
+CREATE POLICY "Allow insert on pricing_config"
+  ON pricing_config FOR INSERT
+  WITH CHECK (true);
+
+-- Comentario
+COMMENT ON TABLE pricing_config IS 'Configuración de precios: monthly (mensual), half-yearly (6 meses), yearly (anual). Permite SELECT, INSERT y UPDATE para todos.';
