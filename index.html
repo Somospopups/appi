@@ -9966,48 +9966,112 @@ document.getElementById('importInput').onchange = (e)=>{
   window.applyTheme = applyTheme;
 })();
 
-/* ============ NAVEGACIÓN ATRÁS NATIVA ============ */
+/* ============ NAVEGACIÓN ATRÁS NATIVA — PILA REAL ============ */
 (function(){
-  function getBackTarget(){
-    const activa = document.querySelector('.view.active');
-    if(!activa) return null;
-        switch(activa.id){
-      case 'view-encuesta': return 'view-home';
-      case 'view-gestion': if(window.closeGestionDetail)window.closeGestionDetail(); return 'view-home';
-      case 'view-grabadora': return 'view-home';
-      case 'view-notas': return 'view-home';
-      case 'view-home': return null;
+  const PAGE_VIEWS = ['view-home','view-mes','view-negocio','view-herramientas'];
+  // Pila de navegación: recuerda de dónde veniste
+  const navStack = ['view-home'];
+
+  function pushNav(id){
+    // No apilar la misma vista dos veces seguidas
+    if(navStack[navStack.length-1] === id) return;
+    navStack.push(id);
+    // Limitar la pila a 20 entradas
+    if(navStack.length > 20) navStack.splice(0, navStack.length - 20);
+  }
+
+  function popNav(){
+    if(navStack.length > 1){
+      navStack.pop();
+      return navStack[navStack.length - 1];
+    }
+    return null;
+  }
+
+  // Back target para sub-vistas que tienen padre fijo
+  function getSubViewBack(id){
+    switch(id){
       case 'view-siete-detail': return 'view-siete';
       case 'view-presu-hist': return 'view-presu';
-      case 'view-planning': return 'view-home';
-      default: return activa.id === 'view-wheel' || activa.id === 'view-siete' || activa.id === 'view-presu' ? 'view-planning' : 'view-home';
+      case 'view-wheel':
+      case 'view-eval': return 'view-mes';
+      case 'view-siete':
+      case 'view-presu': return 'view-mes';
+      case 'view-planning': return 'view-mes';
+      case 'view-equipo':
+      case 'view-historico':
+      case 'view-usuarios':
+      case 'view-gestion':
+      case 'view-seguimiento': return 'view-negocio';
+      case 'view-encuesta': return 'view-negocio';
+      case 'view-ocho':
+      case 'view-suenos':
+      case 'view-demo':
+      case 'view-grabadora':
+      case 'view-notas': return 'view-herramientas';
+      default: return null;
     }
   }
+
   const _origShow = showView;
   showView = function(id){
     _origShow(id);
+    pushNav(id);
     if(id !== 'view-home') history.pushState({ view: id }, '');
     else history.replaceState({ view: 'view-home' }, '');
   };
   history.replaceState({ view: 'view-home' }, '');
+
   window.addEventListener('popstate', function(){
+    // Si hay un modal abierto, cerrarlo primero
     if(modal.el.classList.contains('open')){
       modal.close();
       const a = document.querySelector('.view.active');
-      if(a && a.id !== 'view-home') history.pushState({ view: a.id }, '');
+      if(a) history.pushState({ view: a.id }, '');
       return;
     }
-    const a = document.querySelector('.view.active');
-    if(!a || a.id === 'view-home'){ history.pushState({ view:'view-home' }, ''); return; }
-    const t = getBackTarget();
-    if(t){
-      _origShow(t);
+
+    const activa = document.querySelector('.view.active');
+    if(!activa){ history.pushState({ view:'view-home' }, ''); return; }
+    const currentId = activa.id;
+
+    // 1. Si es una sub-vista con padre fijo, volver al padre
+    const subBack = getSubViewBack(currentId);
+    if(subBack){
+      popNav(); // sacar la sub-vista de la pila
+      _origShow(subBack);
       setTimeout(asegurarAcceso, 100);
-      if(t === 'view-siete') renderSieteHome();
-      if(t === 'view-home') renderHomeCompleto();
-      if(t === 'view-presu') renderPresu();
-    } else history.pushState({ view:'view-home' }, '');
+      if(subBack === 'view-siete') try{ renderSieteHome(); }catch(e){}
+      if(subBack === 'view-home') try{ renderHomeCompleto(); }catch(e){}
+      if(subBack === 'view-presu') try{ renderPresu(); }catch(e){}
+      if(subBack === 'view-mes' || subBack === 'view-negocio' || subBack === 'view-herramientas') try{ renderHomeCompleto(); }catch(e){}
+      return;
+    }
+
+    // 2. Si es una de las 4 páginas principales, volver a la anterior en la pila
+    if(PAGE_VIEWS.includes(currentId)){
+      const prev = popNav();
+      if(prev && prev !== currentId){
+        _origShow(prev);
+        setTimeout(asegurarAcceso, 100);
+        if(prev === 'view-home') try{ renderHomeCompleto(); }catch(e){}
+        if(PAGE_VIEWS.includes(prev)) try{ renderHomeCompleto(); }catch(e){}
+        return;
+      }
+    }
+
+    // 3. Fallback: si estamos en home, no ir a ningún lado
+    if(currentId === 'view-home'){
+      history.pushState({ view:'view-home' }, '');
+      return;
+    }
+
+    // 4. Fallback general: volver al home
+    popNav();
+    _origShow('view-home');
+    try{ renderHomeCompleto(); }catch(e){}
   });
+
   const _origOpen = modal.open.bind(modal);
   modal.open = function(opts){ _origOpen(opts); history.pushState({ modal: true }, ''); };
 })();

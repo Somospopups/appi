@@ -112,7 +112,7 @@ test('Agregar contacto desde el home abre el panel con el formulario', async ({ 
 test('el indicador glass del selector sigue a la pagina activa', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 840 });
   await entrar(page);
-  const ind = page.locator('#pageTabsInd');
+  const ind = page.locator('#ptIndicator');
   expect(await ind.evaluate(e => e.offsetWidth)).toBeGreaterThan(0);
   const l0 = await ind.evaluate(e => e.offsetLeft);
   await page.locator('#pageTabs button[data-view="view-negocio"]').click();
@@ -125,5 +125,5 @@ test('los titulos entran animados desde arriba al cambiar de pantalla', async ({
   await entrar(page);
   await page.evaluate(() => window.showView('view-negocio'));
   const name = await page.evaluate(() => getComputedStyle(document.querySelector('#view-negocio header h1')).animationName);
-  expect(name).toContain('titBaja');
+  expect(name).toContain('titleSlideDown');
 });
