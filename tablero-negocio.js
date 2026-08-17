@@ -355,8 +355,16 @@
   /* ---------------- hooks ---------------- */
   function inyectarHome(){
     estilo();
-    if (!$('gpsBlock') && $('carreraBlock')) $('carreraBlock').insertAdjacentHTML('afterend', htmlGps());
-    else if ($('gpsBlock')) { var g = $('gpsBlock'); g.outerHTML = htmlGps(); }
+    // Inyectar GPS después del scoreCompactWrap o en negWrap
+    if (!$('gpsBlock')) {
+      var scoreWrap = $('scoreCompactWrap');
+      var negWrap = $('negWrap');
+      if (scoreWrap) scoreWrap.insertAdjacentHTML('afterend', htmlGps());
+      else if (negWrap) negWrap.insertAdjacentHTML('beforebegin', htmlGps());
+    } else {
+      var g = $('gpsBlock');
+      g.outerHTML = htmlGps();
+    }
     var extra = $('homeExtraKeep');
     if (extra && !$('miniBotella')) {
       var grid = extra.querySelector('.home-mini-tools');
