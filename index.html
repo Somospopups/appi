@@ -10016,7 +10016,9 @@ document.getElementById('importInput').onchange = (e)=>{
       case 'view-suenos':
       case 'view-demo':
       case 'view-grabadora':
-      case 'view-notas': return 'view-herramientas';
+      case 'view-notas':
+      case 'view-botella':
+      case 'view-simulador': return 'view-herramientas';
       default: return null;
     }
   }

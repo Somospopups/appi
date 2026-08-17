@@ -123,24 +123,58 @@
 
   /* ---------------- 3 · SIMULADOR DE GANANCIAS ---------------- */
   function htmlSimulador(){
-    return '<div class="tb-card" style="margin:10px 2px">' +
-      '<div class="tb-title">🧮 Simulador del negocio</div>' +
-      '<div class="tb-sub">Mové los números y mirá qué puede generar tu mes</div>' +
-      '<div class="tb-row"><span>Demos por mes: <b id="simDemosV">30</b></span><input type="range" id="simDemos" min="0" max="60" value="30" style="flex:1"></div>' +
-      '<div class="tb-row"><span>Cierres: <b id="simCierresV">10</b></span><input type="range" id="simCierres" min="0" max="30" value="10" style="flex:1"></div>' +
-      '<div class="tb-row"><span>Productos de tu red: <b id="simRedV">100</b></span><input type="range" id="simRed" min="0" max="300" value="100" style="flex:1"></div>' +
-      '<div id="simResult"></div>' +
-      '<div class="tb-sub" style="margin-top:6px">Valores de referencia del plan de negocio; pueden variar según condición fiscal y percepciones.</div></div>';
+    return '<div class="tb-card" style="margin:16px 8px; padding:20px 16px;">' +
+      '<div class="tb-title" style="font-size:20px; margin-bottom:4px;">🧮 Simulador del negocio</div>' +
+      '<div class="tb-sub" style="margin-bottom:20px; line-height:1.5;">Ajustá los números según tu realidad y mirá qué puede generar tu mes.</div>' +
+
+      '<div style="margin-bottom:24px;">' +
+        '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">' +
+          '<label style="font-weight:600; font-size:15px;">Demos por mes</label>' +
+          '<input type="number" id="simDemos" min="0" max="60" value="30" style="width:70px; padding:8px; font-size:16px; text-align:center; border:1px solid #ddd; border-radius:8px;">' +
+        '</div>' +
+        '<div style="background:#f5f5f5; padding:12px; border-radius:8px; font-size:13px; line-height:1.6; color:#666;">' +
+          '<b>¿Qué son?</b> Las presentaciones del sistema que hacés cada mes.<br>' +
+          '<b>¿Cómo contarlos?</b> Sumá todas las demos que mostrás: en casas, por Zoom, en eventos. Si hacés 1 demo por día hábil, son ~22 al mes.' +
+        '</div>' +
+      '</div>' +
+
+      '<div style="margin-bottom:24px;">' +
+        '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">' +
+          '<label style="font-weight:600; font-size:15px;">Cierres</label>' +
+          '<input type="number" id="simCierres" min="0" max="30" value="10" style="width:70px; padding:8px; font-size:16px; text-align:center; border:1px solid #ddd; border-radius:8px;">' +
+        '</div>' +
+        '<div style="background:#f5f5f5; padding:12px; border-radius:8px; font-size:13px; line-height:1.6; color:#666;">' +
+          '<b>¿Qué son?</b> Las ventas que concretás (sistemas instalados).<br>' +
+          '<b>Referencia:</b> En promedio, de cada 3 demos se cierra 1 venta (33% de conversión). Si hacés 30 demos, esperarías ~10 cierres.' +
+        '</div>' +
+      '</div>' +
+
+      '<div style="margin-bottom:24px;">' +
+        '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">' +
+          '<label style="font-weight:600; font-size:15px;">Productos de tu red</label>' +
+          '<input type="number" id="simRed" min="0" max="300" value="100" style="width:70px; padding:8px; font-size:16px; text-align:center; border:1px solid #ddd; border-radius:8px;">' +
+        '</div>' +
+        '<div style="background:#f5f5f5; padding:12px; border-radius:8px; font-size:13px; line-height:1.6; color:#666;">' +
+          '<b>¿Qué son?</b> Los productos que compra toda tu red de clientes y distribuidores cada mes.<br>' +
+          '<b>¿Dónde verlo?</b> En Mi Negocio → Mi Equipo, sumá los PB (Puntos de Bonificación) de toda tu organización. Cada PB equivale aproximadamente a 1 producto.' +
+        '</div>' +
+      '</div>' +
+
+      '<div id="simResult" style="margin-top:24px; padding:16px; background:linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-radius:12px; border:2px solid #3b82f6;"></div>' +
+      '<div class="tb-sub" style="margin-top:16px; font-size:12px; line-height:1.5;">💡 Valores de referencia del plan de negocio. Los montos pueden variar según tu condición fiscal y percepciones.</div></div>';
   }
   function calcSimulador(){
-    var demos = Number($('simDemos').value), cierres = Math.min(demos, Number($('simCierres').value)), red = Number($('simRed').value);
-    $('simDemosV').textContent = demos; $('simCierresV').textContent = cierres; $('simRedV').textContent = red;
+    var demos = Math.max(0, Number($('simDemos').value) || 0);
+    var cierres = Math.min(demos, Math.max(0, Number($('simCierres').value) || 0));
+    var red = Math.max(0, Number($('simRed').value) || 0);
     var com = cierres * 324000, net = red * 37620;
     var f = function(n){ return '$' + Math.round(n).toLocaleString('es-AR'); };
+    var conv = demos > 0 ? Math.round((cierres / demos) * 100) : 0;
     $('simResult').innerHTML =
-      '<div class="tb-row"><span>Comercialización (' + cierres + ' cierres)</span><span>' + f(com) + '</span></div>' +
-      '<div class="tb-row"><span>Red (' + red + ' productos)</span><span>' + f(net) + '</span></div>' +
-      '<div class="tb-row"><span>Total del mes</span><span class="tb-big tb-ok">' + f(com + net) + '</span></div>';
+      '<div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid rgba(59,130,246,0.2);"><span style="font-size:14px;">Comercialización (' + cierres + ' cierres)</span><span style="font-weight:700; font-size:15px; color:#1e40af;">' + f(com) + '</span></div>' +
+      '<div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid rgba(59,130,246,0.2);"><span style="font-size:14px;">Red (' + red + ' productos)</span><span style="font-weight:700; font-size:15px; color:#1e40af;">' + f(net) + '</span></div>' +
+      '<div style="display:flex; justify-content:space-between; padding:14px 0 8px;"><span style="font-size:16px; font-weight:700;">Total del mes</span><span style="font-size:22px; font-weight:800; color:#059669;">' + f(com + net) + '</span></div>' +
+      '<div style="text-align:center; font-size:12px; color:#666; padding-top:8px; border-top:1px solid rgba(59,130,246,0.15);">Conversión: ' + conv + '% (' + cierres + ' de ' + demos + ' demos)</div>';
   }
 
   /* ---------------- 4 · STOCK PERSONAL ---------------- */
@@ -220,13 +254,12 @@
     if ($('view-botella')) return;
     var s1 = document.createElement('section');
     s1.id = 'view-botella'; s1.className = 'view';
-    s1.innerHTML = '<header class="top"><button class="back-btn" onclick="showView(\'view-home\')" aria-label="Volver">‹</button><h1>La botella</h1><div class="script">conciencia</div></header><div id="botellaCont"></div>';
+    s1.innerHTML = '<header class="top"><button class="back-btn" onclick="history.back()" aria-label="Volver">‹</button><button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button><h1>La botella</h1><div class="script">conciencia</div></header><div id="botellaCont"></div>';
     document.body.appendChild(s1);
     var s2 = document.createElement('section');
     s2.id = 'view-simulador'; s2.className = 'view';
-    s2.innerHTML = '<header class="top"><button class="back-btn" onclick="showView(\'view-home\')" aria-label="Volver">‹</button><h1>Simulador</h1><div class="script">tu mes soñado</div></header><div id="simCont"></div>';
+    s2.innerHTML = '<header class="top"><button class="back-btn" onclick="history.back()" aria-label="Volver">‹</button><button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button><h1>Simulador</h1><div class="script">tu mes soñado</div></header><div id="simCont"></div>';
     document.body.appendChild(s2);
-    // sin tabs de abajo en estas vistas
     window.__tableroSinTabs = true;
   }
   function abrirBotella(){
@@ -248,7 +281,10 @@
     showView('view-simulador');
     var t2=$('tabs'); if(t2) t2.style.display='none';
     $('simCont').innerHTML = htmlSimulador();
-    ['simDemos', 'simCierres', 'simRed'].forEach(function(id){ $(id).oninput = calcSimulador; });
+    ['simDemos', 'simCierres', 'simRed'].forEach(function(id){
+      var el = $(id);
+      if(el){ el.oninput = calcSimulador; el.onchange = calcSimulador; }
+    });
     calcSimulador();
   }
   window.abrirBotella = abrirBotella;
