@@ -1,0 +1,47 @@
+-- ============================================
+-- Actualización: Agregar plan de 6 meses
+-- ============================================
+
+-- Agregar plan de 6 meses a pricing_config
+INSERT INTO pricing_config (plan_type, price, description, features) VALUES
+(
+  'half-yearly',
+  27000.00,
+  'Acceso completo a APPI por 6 meses (10% descuento)',
+  '["Todo lo del Plan Mensual", "Ahorrás $3.000", "Precio congelado por 6 meses", "Soporte prioritario"]'
+)
+ON CONFLICT (plan_type) DO UPDATE SET
+  price = EXCLUDED.price,
+  description = EXCLUDED.description,
+  features = EXCLUDED.features;
+
+-- Actualizar plan anual con 20% de descuento
+UPDATE pricing_config 
+SET 
+  price = 48000.00,
+  description = 'Acceso completo a APPI por 12 meses (20% descuento)',
+  features = '["Todo lo del Plan Mensual", "Ahorrás $12.000", "Precio congelado por 1 año", "Soporte VIP"]'
+WHERE plan_type = 'yearly';
+
+-- Agregar plan de 6 meses a plans
+INSERT INTO plans (name, description, price_monthly, price_yearly, features) VALUES
+(
+  'Plan 6 Meses',
+  'Acceso completo a APPI por 6 meses (10% descuento)',
+  5000.00,
+  27000.00,
+  '["Todo lo del Plan Mensual", "Ahorrás $3.000", "Precio congelado por 6 meses", "Soporte prioritario"]'
+)
+ON CONFLICT DO NOTHING;
+
+-- Actualizar plan anual en plans
+UPDATE plans 
+SET 
+  name = 'Plan Anual',
+  description = 'Acceso completo a APPI por 12 meses (20% descuento)',
+  price_yearly = 48000.00,
+  features = '["Todo lo del Plan Mensual", "Ahorrás $12.000", "Precio congelado por 1 año", "Soporte VIP"]'
+WHERE name = 'Plan Anual';
+
+-- Comentarios
+COMMENT ON TABLE pricing_config IS 'Configuración de precios: monthly (mensual), half-yearly (6 meses), yearly (anual)';
