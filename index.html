@@ -5126,53 +5126,249 @@ function showView(id){
     if(Math.abs(dx) < 50 || Math.abs(dy) > Math.abs(dx) * 0.7) return;
     go(dx < 0 ? 1 : -1);
   }, {passive:true});
-  /* Drag en el selector de páginas para navegar sin levantar el dedo */
+  /* Drag fluido en el selector de páginas */
   let tabDragging = false;
-  let tabDragMoved = false;
-  let tabLastX = 0;
-  const TAB_THRESHOLD = 40; // píxeles para cambiar de página
+  let tabStartX = 0;
+  let tabCurrentX = 0;
+  let tabStartPage = -1;
+  const TAB_COMPLETE_THRESHOLD = 60; // píxeles para completar el cambio
+  
+  function startTabDrag(x) {
+    tabDragging = true;
+    tabStartX = x;
+    tabCurrentX = x;
+    tabStartPage = currentPage();
+    
+    // Preparar las páginas adyacentes
+    const idx = tabStartPage;
+    if (idx < 0) return;
+    
+    // Mostrar página anterior si existe
+    if (idx > 0) {
+      const prevEl = document.getElementById(pages[idx - 1]);
+      if (prevEl) {
+        prevEl.style.display = 'block';
+        prevEl.style.transition = 'none';
+        prevEl.style.transform = 'translateX(-100%)';
+        prevEl.style.opacity = '1';
+      }
+    }
+    
+    // Mostrar página siguiente si existe
+    if (idx < pages.length - 1) {
+      const nextEl = document.getElementById(pages[idx + 1]);
+      if (nextEl) {
+        nextEl.style.display = 'block';
+        nextEl.style.transition = 'none';
+        nextEl.style.transform = 'translateX(100%)';
+        nextEl.style.opacity = '1';
+      }
+    }
+  }
+  
+  function moveTabDrag(x) {
+    if (!tabDragging || tabStartPage < 0) return;
+    tabCurrentX = x;
+    const dx = x - tabStartX;
+    const percent = dx / window.innerWidth;
+    
+    const curEl = document.getElementById(pages[tabStartPage]);
+    if (curEl) {
+      curEl.style.transition = 'none';
+      curEl.style.transform = `translateX(${dx}px)`;
+    }
+    
+    // Mover página anterior
+    if (tabStartPage > 0) {
+      const prevEl = document.getElementById(pages[tabStartPage - 1]);
+      if (prevEl) {
+        const prevDx = dx + window.innerWidth;
+        prevEl.style.transition = 'none';
+        prevEl.style.transform = `translateX(${prevDx}px)`;
+      }
+    }
+    
+    // Mover página siguiente
+    if (tabStartPage < pages.length - 1) {
+      const nextEl = document.getElementById(pages[tabStartPage + 1]);
+      if (nextEl) {
+        const nextDx = dx - window.innerWidth;
+        nextEl.style.transition = 'none';
+        nextEl.style.transform = `translateX(${nextDx}px)`;
+      }
+    }
+    
+    // Actualizar indicador del selector
+    const tab = document.getElementById('pageTabs');
+    const ind = document.getElementById('ptIndicator');
+    if (tab && ind) {
+      const btns = tab.querySelectorAll('button');
+      const startBtn = btns[tabStartPage];
+      if (startBtn) {
+        const tabRect = tab.getBoundingClientRect();
+        const btnRect = startBtn.getBoundingClientRect();
+        const btnWidth = btnRect.width;
+        const indicatorX = btnRect.left - tabRect.left + dx * (btnWidth / window.innerWidth);
+        ind.style.transition = 'none';
+        ind.style.left = indicatorX + 'px';
+        ind.style.width = btnWidth + 'px';
+      }
+    }
+  }
+  
+  function endTabDrag() {
+    if (!tabDragging || tabStartPage < 0) {
+      tabDragging = false;
+      return;
+    }
+    
+    const dx = tabCurrentX - tabStartX;
+    let targetPage = tabStartPage;
+    
+    // Decidir si completar el cambio
+    if (dx < -TAB_COMPLETE_THRESHOLD && tabStartPage < pages.length - 1) {
+      targetPage = tabStartPage + 1;
+    } else if (dx > TAB_COMPLETE_THRESHOLD && tabStartPage > 0) {
+      targetPage = tabStartPage - 1;
+    }
+    
+    // Animar al destino
+    const curEl = document.getElementById(pages[tabStartPage]);
+    const targetEl = document.getElementById(pages[targetPage]);
+    
+    if (targetPage !== tabStartPage) {
+      // Completar el cambio
+      if (curEl) {
+        curEl.style.transition = 'transform 0.3s cubic-bezier(0.4,0,0.2,1), opacity 0.3s';
+        curEl.style.transform = `translateX(${dx > 0 ? 100 : -100}%)`;
+        curEl.style.opacity = '0';
+      }
+      if (targetEl) {
+        targetEl.style.transition = 'transform 0.3s cubic-bezier(0.4,0,0.2,1)';
+        targetEl.style.transform = 'translateX(0)';
+      }
+      
+      // Limpiar la página opuesta
+      const oppositePage = targetPage > tabStartPage ? tabStartPage - 1 : tabStartPage + 1;
+      if (oppositePage >= 0 && oppositePage < pages.length) {
+        const oppositeEl = document.getElementById(pages[oppositePage]);
+        if (oppositeEl) {
+          oppositeEl.style.transition = 'opacity 0.2s';
+          oppositeEl.style.opacity = '0';
+          setTimeout(() => {
+            oppositeEl.style.display = '';
+            oppositeEl.style.transform = '';
+            oppositeEl.style.opacity = '';
+            oppositeEl.style.transition = '';
+          }, 200);
+        }
+      }
+      
+      setTimeout(() => {
+        if (curEl) {
+          curEl.classList.remove('active');
+          curEl.style.display = '';
+          curEl.style.transform = '';
+          curEl.style.opacity = '';
+          curEl.style.transition = '';
+        }
+        if (targetEl) {
+          targetEl.classList.add('active');
+          targetEl.style.display = '';
+          targetEl.style.transform = '';
+          targetEl.style.transition = '';
+        }
+        
+        // Actualizar estado
+        moveIndicator(targetPage);
+        document.querySelectorAll('#pageTabs button').forEach(b => 
+          b.classList.toggle('active', b.dataset.view === pages[targetPage])
+        );
+        animateTitle(pages[targetPage]);
+        
+        // Ejecutar lógica de renderizado
+        try {
+          if(pages[targetPage]==='view-home' && typeof renderHomeCompleto==='function') renderHomeCompleto();
+          if(pages[targetPage]==='view-mes' || pages[targetPage]==='view-negocio' || pages[targetPage]==='view-herramientas') {
+            if(typeof renderHomeCompleto==='function') renderHomeCompleto();
+          }
+        } catch(e) {}
+        
+        window.scrollTo({top:0});
+      }, 300);
+      
+      try { if(navigator.vibrate) navigator.vibrate(10); } catch(e) {}
+    } else {
+      // Volver a la página original
+      if (curEl) {
+        curEl.style.transition = 'transform 0.3s cubic-bezier(0.4,0,0.2,1)';
+        curEl.style.transform = 'translateX(0)';
+      }
+      
+      // Ocultar páginas adyacentes
+      if (tabStartPage > 0) {
+        const prevEl = document.getElementById(pages[tabStartPage - 1]);
+        if (prevEl) {
+          prevEl.style.transition = 'transform 0.3s cubic-bezier(0.4,0,0.2,1), opacity 0.2s';
+          prevEl.style.transform = 'translateX(-100%)';
+          prevEl.style.opacity = '0';
+          setTimeout(() => {
+            prevEl.style.display = '';
+            prevEl.style.transform = '';
+            prevEl.style.opacity = '';
+            prevEl.style.transition = '';
+          }, 300);
+        }
+      }
+      
+      if (tabStartPage < pages.length - 1) {
+        const nextEl = document.getElementById(pages[tabStartPage + 1]);
+        if (nextEl) {
+          nextEl.style.transition = 'transform 0.3s cubic-bezier(0.4,0,0.2,1), opacity 0.2s';
+          nextEl.style.transform = 'translateX(100%)';
+          nextEl.style.opacity = '0';
+          setTimeout(() => {
+            nextEl.style.display = '';
+            nextEl.style.transform = '';
+            nextEl.style.opacity = '';
+            nextEl.style.transition = '';
+          }, 300);
+        }
+      }
+      
+      // Restaurar indicador
+      moveIndicator(tabStartPage);
+    }
+    
+    tabDragging = false;
+  }
   
   document.addEventListener('touchstart', function(e){
     if(window.innerWidth >= 1024) return;
     const tab = e.target.closest('#pageTabs');
     if(!tab) return;
-    tabDragging = true;
-    tabDragMoved = false;
-    tabLastX = e.touches[0].clientX;
+    startTabDrag(e.touches[0].clientX);
   }, {passive:true});
   
   document.addEventListener('touchmove', function(e){
     if(!tabDragging || window.innerWidth >= 1024) return;
-    const x = e.touches[0].clientX;
-    const dx = x - tabLastX;
-    if(Math.abs(dx) >= TAB_THRESHOLD){
-      tabDragMoved = true;
-      go(dx > 0 ? -1 : 1);
-      tabLastX = x; // reset para permitir múltiples cambios
-    }
+    moveTabDrag(e.touches[0].clientX);
   }, {passive:true});
   
   document.addEventListener('touchend', function(e){
-    if(tabDragging && tabDragMoved){
-      // Si se hizo drag, prevenir el click del botón
-      e.preventDefault();
+    if(tabDragging){
+      endTabDrag();
+      // Prevenir click si hubo drag significativo
+      const dx = Math.abs(tabCurrentX - tabStartX);
+      if(dx > 10){
+        e.preventDefault();
+      }
     }
-    tabDragging = false;
-    tabDragMoved = false;
   }, {passive:false});
   
   document.addEventListener('touchcancel', function(e){
-    tabDragging = false;
-    tabDragMoved = false;
+    if(tabDragging) endTabDrag();
   }, {passive:true});
-  
-  // Prevenir clicks en botones del selector después de un drag
-  document.addEventListener('click', function(e){
-    if(tabDragMoved && e.target.closest('#pageTabs button')){
-      e.preventDefault();
-      e.stopPropagation();
-    }
-  }, true);
   
   /* Inicializar cuando la app esté lista */
   function tryInit(){
