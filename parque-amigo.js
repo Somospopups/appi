@@ -114,6 +114,7 @@
   function arrancarTour(){
     estilo();
     var card = $('parqueBlock');
+    if (card && card.offsetParent === null && typeof window.showView === 'function') window.showView('view-resumen');
     var paso1 = function(){
       paso(1, 3, 'Este es tu <b>parque</b>: cada equipo que pusiste en un hogar. No son números, son relaciones vivas que ya confían en vos. 🏡', card, function(){
         var acceso = document.querySelector('[onclick*="view-usuarios"], [data-ds="view-usuarios"]');

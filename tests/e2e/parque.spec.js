@@ -48,6 +48,7 @@ async function entrar(page, { sinTour = false } = {}) {
   await page.locator('#distributorPassword').fill('Clave1234');
   await page.locator('#btnDistributorLogin').click();
   await expect(page.locator('#lockScreen')).toHaveClass(/hidden/);
+  await page.evaluate(() => window.showView('view-resumen'));
 }
 
 test('la tarjeta del parque suma hogares y garantías de todo el equipo', async ({ page }) => {

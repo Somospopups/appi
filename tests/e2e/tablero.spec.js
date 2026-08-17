@@ -55,6 +55,7 @@ async function entrar(page) {
   await page.locator('#distributorPassword').fill('Clave1234');
   await page.locator('#btnDistributorLogin').click();
   await expect(page.locator('#lockScreen')).toHaveClass(/hidden/);
+  await page.evaluate(() => window.showView('view-resumen'));
 }
 
 test('el GPS del mes lee la Línea y el Panel', async ({ page }) => {
