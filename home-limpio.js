@@ -42,11 +42,6 @@
       '.hl-porque{margin:0 4px 14px;font-size:12px;font-weight:800;color:#8b63e8;line-height:1.4}' +
       '.hl-titulo{margin:0 4px 10px;font-size:15px;font-weight:950;color:#343441}' +
       'body.dark .hl-titulo{color:#f2f2f7}' +
-      '.hl-nums{display:flex;gap:9px;margin-bottom:14px}' +
-      '.hl-num{flex:1;border:0;background:rgba(255,255,255,.8);border-radius:18px;padding:13px 6px;text-align:center;box-shadow:0 8px 22px rgba(50,60,120,.09);cursor:pointer;font:inherit}' +
-      'body.dark .hl-num{background:#25273a}' +
-      '.hl-num b{display:block;font-size:21px;color:#3d63c9}' +
-      '.hl-num span{font-size:8.5px;font-weight:950;letter-spacing:.5px;color:#7a7f9a}' +
       '.hl-card{background:rgba(255,255,255,.85);border-radius:22px;padding:16px;box-shadow:0 12px 30px rgba(50,60,120,.10);margin-bottom:13px}' +
       'body.dark .hl-card{background:#25273a}' +
       '.hl-accion{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(80,90,130,.08)}' +
@@ -61,32 +56,104 @@
       '.hl-duo .hl-enc{background:linear-gradient(135deg,#5b8def,#8b63e8,#ff6bcf);color:#fff;box-shadow:0 10px 24px rgba(140,90,220,.30)}' +
       '.hl-duo .hl-add{background:rgba(255,255,255,.85);color:#6b4bb8;border:1.5px dashed #c9b7f5;box-shadow:0 8px 20px rgba(50,60,120,.08)}' +
       'body.dark .hl-duo .hl-add{background:#25273a}' +
-      '.hl-resumen{width:100%;border:0;background:transparent;color:#7a7f9a;font:inherit;font-size:12.5px;font-weight:900;padding:10px;cursor:pointer}' +
-      '.hl-vacio{text-align:center;padding:18px 10px;font-size:13px;font-weight:850;color:#168765}';
+      '.hl-vacio{text-align:center;padding:18px 10px;font-size:13px;font-weight:850;color:#168765}' +
+      /* Timeline / Agenda de hoy */
+      '.hl-kicker{font-size:9.5px;font-weight:900;letter-spacing:.8px;color:#168765;margin-bottom:10px;text-transform:uppercase}' +
+      '.hl-timeline{position:relative;padding-left:24px}' +
+      '.hl-timeline::before{content:"";position:absolute;left:8px;top:8px;bottom:8px;width:2px;background:#e8ebf7;border-radius:2px}' +
+      'body.dark .hl-timeline::before{background:rgba(255,255,255,.1)}' +
+      '.hl-ev{position:relative;padding:10px 0}' +
+      '.hl-ev-dot{position:absolute;left:-20px;top:14px;width:12px;height:12px;border-radius:50%;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.12)}' +
+      'body.dark .hl-ev-dot{border-color:#25273a}' +
+      '.hl-ev-time{font-size:12.5px;font-weight:800;color:#23263a;margin-bottom:2px}' +
+      'body.dark .hl-ev-time{color:#f2f2f7}' +
+      '.hl-ev-desc{font-size:11.5px;color:#7a7f9a;font-weight:600;margin:0;line-height:1.4}' +
+      '.hl-ev-actions{display:flex;gap:8px;margin-top:8px}' +
+      '.hl-ev-btn{border:0;border-radius:12px;padding:9px 14px;font:inherit;font-size:11.5px;font-weight:900;cursor:pointer}' +
+      '.hl-ev-btn.verde{background:linear-gradient(135deg,#3ad0a4,#25c46a);color:#fff;box-shadow:0 6px 14px rgba(37,208,164,.3)}' +
+      '.hl-ev-btn.suave{background:#eef1fa;color:#5a6082}' +
+      'body.dark .hl-ev-btn.suave{background:rgba(255,255,255,.1);color:#c6cbea}' +
+      '.hl-link{width:100%;border:0;background:rgba(255,255,255,.85);border-radius:18px;padding:14px;font:inherit;font-size:13px;font-weight:900;color:#5a6082;box-shadow:0 8px 20px rgba(50,60,120,.08);cursor:pointer;text-align:center}' +
+      'body.dark .hl-link{background:#25273a;color:#c6cbea}';
     document.head.appendChild(s);
   }
 
   function html(){
     var acts = acciones();
     var pq = porQue();
+    var hoy = new Date();
+    var hora = hoy.getHours();
+    var minutos = hoy.getMinutes();
+    var horaStr = hora + ':' + (minutos < 10 ? '0' : '') + minutos;
 
-    var lista = acts.length
-      ? acts.map(function(c){
-          return '<div class="hl-accion"><div class="hl-info"><b>' + esc(c.nombre) + '</b><small>' +
-            (c.estado === 'presentacion' ? '🎤 Presentación' : c.estado === 'nuevo' ? '✨ Nuevo, sin llamar' : '🔁 Seguimiento') +
-            (c.proximo_contacto ? ' · ' + esc(c.proximo_contacto) : ' · hoy') + '</small></div>' +
-            '<button type="button" class="hl-wa" data-wa="' + esc(c.telefono || '') + '">WhatsApp</button></div>';
-        }).join('')
-      : '<div class="hl-vacio">🎉 Todo al día. Buen momento para mandar una encuesta.</div>';
+    // Construir eventos de la timeline
+    var eventos = [];
+
+    // Evento 1: Resumen de la mañana (siempre visible)
+    eventos.push({
+      hora: '9:00',
+      titulo: 'Resumen en tu teléfono',
+      desc: 'Ya enviado: tus acciones del día.',
+      color: '#25d0a4',
+      acciones: []
+    });
+
+    // Evento 2: Contactos pendientes (si hay)
+    if (acts.length > 0) {
+      var primer = acts[0];
+      eventos.push({
+        hora: 'Ahora',
+        titulo: primer.nombre + ' espera tu mensaje',
+        desc: primer.estado === 'presentacion' ? '🎤 Presentación programada' : primer.estado === 'nuevo' ? '✨ Contacto nuevo sin llamar' : '🔁 Seguimiento pendiente',
+        color: '#f5b301',
+        acciones: [
+          { texto: 'Escribir', clase: 'verde', wa: primer.telefono },
+          { texto: 'Llamar', clase: 'suave', tel: primer.telefono }
+        ]
+      });
+    }
+
+    // Evento 3: Si hay más contactos, mostrar el siguiente
+    if (acts.length > 1) {
+      var segundo = acts[1];
+      eventos.push({
+        hora: '20:00',
+        titulo: segundo.nombre,
+        desc: segundo.estado === 'presentacion' ? '🎤 Demo programada' : '📇 Seguimiento programado',
+        color: '#8b63e8',
+        acciones: []
+      });
+    }
+
+    // Renderizar timeline
+    var timelineHtml = '<div class="hl-timeline">';
+    eventos.forEach(function(ev) {
+      timelineHtml += '<div class="hl-ev">' +
+        '<div class="hl-ev-dot" style="background:' + ev.color + '"></div>' +
+        '<div class="hl-ev-time">' + ev.hora + ' · ' + esc(ev.titulo) + '</div>' +
+        '<p class="hl-ev-desc">' + esc(ev.desc) + '</p>';
+      if (ev.acciones.length > 0) {
+        timelineHtml += '<div class="hl-ev-actions">';
+        ev.acciones.forEach(function(acc) {
+          if (acc.wa) {
+            timelineHtml += '<button class="hl-ev-btn ' + acc.clase + '" data-wa="' + esc(acc.wa) + '">' + esc(acc.texto) + '</button>';
+          } else if (acc.tel) {
+            timelineHtml += '<button class="hl-ev-btn ' + acc.clase + '" data-tel="' + esc(acc.tel) + '">' + esc(acc.texto) + '</button>';
+          }
+        });
+        timelineHtml += '</div>';
+      }
+      timelineHtml += '</div>';
+    });
+    timelineHtml += '</div>';
 
     return '<div id="homeLimpio">' +
       (pq ? '<p class="hl-porque">💙 ' + esc(pq) + '</p>' : '') +
-      '<div class="hl-titulo">¿Quién te espera hoy?</div>' +
-      '<div class="hl-card">' + lista + '</div>' +
-      '<div class="hl-duo">' +
-      '<button type="button" class="hl-enc" id="hlEncuesta">📨 Enviar encuesta</button>' +
-      '<button type="button" class="hl-add" id="hlAgregar">＋ Agregar contacto</button>' +
+      '<div class="hl-card">' +
+        '<div class="hl-kicker">Tu jornada</div>' +
+        timelineHtml +
       '</div>' +
+      (acts.length > 0 ? '<button class="hl-link" onclick="openMiGestion()">Ver todo el Panel ›</button>' : '') +
       '</div>';
   }
 
@@ -98,22 +165,20 @@
     if (viejo) viejo.remove();
     var header = host.querySelector('header');
     header.insertAdjacentHTML('afterend', html());
-    function esperarYClicar(id){
-      var t0 = Date.now();
-      (function loop(){
-        var b = $(id);
-        if (b) { b.click(); return; }
-        if (Date.now() - t0 < 2500) setTimeout(loop, 120);
-      })();
-    }
-    $('hlEncuesta').onclick = function(){ window.openMiGestion(); esperarYClicar('surveyShareBtn'); };
-    $('hlAgregar').onclick = function(){ window.openMiGestion(); esperarYClicar('genteNuevo'); };
+    // WhatsApp buttons
     host.querySelectorAll('[data-wa]').forEach(function(b){
       b.onclick = function(){
         var tel = String(b.dataset.wa || '').replace(/\D/g, '');
         var url = 'https://wa.me/' + tel + '?text=' + encodeURIComponent('¡Hola! Soy ' + (window.APPIAuth && window.APPIAuth.currentProfile ? String(window.APPIAuth.currentProfile().nombre || '').split(/\s+/)[0] : '') + ' 😊 ¿Cómo estás? Quería retomarte, ¿te viene bien que charlemos hoy?');
         if (window.APPIWhatsApp && window.APPIWhatsApp.abrir) window.APPIWhatsApp.abrir(url);
         else window.open(url, '_blank', 'noopener');
+      };
+    });
+    // Llamar buttons
+    host.querySelectorAll('[data-tel]').forEach(function(b){
+      b.onclick = function(){
+        var tel = String(b.dataset.tel || '').replace(/\D/g, '');
+        if (tel) window.open('tel:' + tel, '_self');
       };
     });
   }
