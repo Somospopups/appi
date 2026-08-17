@@ -68,6 +68,13 @@ test('el home muestra el porqué y prioriza la jornada de hoy', async ({ page })
   await expect(home).toContainText('Lucía Vega');
   await expect(home.locator('[data-wa]')).toHaveCount(1);
   await expect(home).toContainText('Ver todo el Panel');
+
+  const spacing=await page.evaluate(()=>({
+    heroTop:parseFloat(getComputedStyle(document.querySelector('.home-hero-card')).marginTop),
+    greetingBottom:parseFloat(getComputedStyle(document.querySelector('.home-greeting-row')).marginBottom)
+  }));
+  expect(spacing.heroTop).toBeGreaterThanOrEqual(12);
+  expect(spacing.greetingBottom).toBeGreaterThanOrEqual(10);
 });
 
 test('el selector de páginas navega y cada página tiene lo suyo', async ({ page }) => {
