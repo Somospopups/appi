@@ -170,6 +170,7 @@
             '<label style="font-weight:600; font-size:15px;">Demos por mes</label>' +
             '<input type="number" id="simDemos" min="0" max="60" value="30" style="width:70px; padding:8px; font-size:16px; text-align:center; border:1px solid #ddd; border-radius:8px;">' +
           '</div>' +
+          '<input type="range" id="simDemosSlider" min="0" max="60" value="30" style="width:100%; margin:8px 0;">' +
           '<div style="background:#f5f5f5; padding:12px; border-radius:8px; font-size:13px; line-height:1.6; color:#666;">' +
             '<b>¿Qué son?</b> Las presentaciones del sistema que hacés cada mes.<br>' +
             '<b>¿Cómo contarlos?</b> Sumá todas las demos que mostrás: en casas, por Zoom, en eventos. Si hacés 1 demo por día hábil, son ~22 al mes.' +
@@ -181,6 +182,7 @@
             '<label style="font-weight:600; font-size:15px;">Cierres</label>' +
             '<input type="number" id="simCierres" min="0" max="30" value="10" style="width:70px; padding:8px; font-size:16px; text-align:center; border:1px solid #ddd; border-radius:8px;">' +
           '</div>' +
+          '<input type="range" id="simCierresSlider" min="0" max="30" value="10" style="width:100%; margin:8px 0;">' +
           '<div style="background:#f5f5f5; padding:12px; border-radius:8px; font-size:13px; line-height:1.6; color:#666;">' +
             '<b>¿Qué son?</b> Las ventas que concretás (sistemas instalados).<br>' +
             '<b>Referencia:</b> En promedio, de cada 3 demos se cierra 1 venta (33% de conversión). Si hacés 30 demos, esperarías ~10 cierres.' +
@@ -192,6 +194,7 @@
             '<label style="font-weight:600; font-size:15px;">Productos de tu red</label>' +
             '<input type="number" id="simRed" min="0" max="300" value="100" style="width:70px; padding:8px; font-size:16px; text-align:center; border:1px solid #ddd; border-radius:8px;">' +
           '</div>' +
+          '<input type="range" id="simRedSlider" min="0" max="300" value="100" style="width:100%; margin:8px 0;">' +
           '<div style="background:#f5f5f5; padding:12px; border-radius:8px; font-size:13px; line-height:1.6; color:#666;">' +
             '<b>¿Qué son?</b> Los productos que compra toda tu red de clientes y distribuidores cada mes.<br>' +
             '<b>¿Dónde verlo?</b> En Mi Negocio → Mi Equipo, sumá los PB (Puntos de Bonificación) de toda tu organización. Cada PB equivale aproximadamente a 1 producto.' +
@@ -323,10 +326,21 @@
     showView('view-simulador');
     var t2=$('tabs'); if(t2) t2.style.display='none';
     $('simCont').innerHTML = htmlSimulador();
+    // Campos numéricos principales
     ['simDemos', 'simCierres', 'simRed', 'simValorCierre', 'simValorRed'].forEach(function(id){
       var el = $(id);
       if(el){ el.oninput = calcSimulador; el.onchange = calcSimulador; }
     });
+    // Sincronización slider ↔ número
+    function syncSlider(numId, sliderId){
+      var num = $(numId), slider = $(sliderId);
+      if(!num || !slider) return;
+      num.addEventListener('input', function(){ slider.value = num.value; });
+      slider.addEventListener('input', function(){ num.value = slider.value; calcSimulador(); });
+    }
+    syncSlider('simDemos', 'simDemosSlider');
+    syncSlider('simCierres', 'simCierresSlider');
+    syncSlider('simRed', 'simRedSlider');
     calcSimulador();
   }
   window.abrirBotella = abrirBotella;
