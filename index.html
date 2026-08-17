@@ -10508,18 +10508,17 @@ async function checkSubscriptionAndRedirect() {
       return;
     }
 
-    // Verificar si tiene suscripción activa
-    const { data: subscription } = await supabase
-      .from('subscriptions')
+    // Verificar si tiene suscripción activa en user_subscriptions
+    const { data: userSubscription } = await supabase
+      .from('user_subscriptions')
       .select('*')
       .eq('user_id', user.id)
-      .eq('status', 'active')
-      .gte('expires_at', new Date().toISOString())
-      .order('expires_at', { ascending: false })
-      .limit(1)
       .single();
 
-    if (subscription) {
+    // Si tiene suscripción activa y no está vencida
+    if (userSubscription && 
+        userSubscription.subscription_status === 'active' && 
+        new Date(userSubscription.subscription_expires_at) > new Date()) {
       // Tiene suscripción activa, mostrar home
       showView('view-home');
     } else {

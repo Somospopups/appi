@@ -28,20 +28,18 @@
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // Verificar si tiene suscripción activa
-      const { data: subscription } = await supabase
-        .from('subscriptions')
+      // Verificar si tiene suscripción activa en user_subscriptions
+      const { data: userSubscription } = await supabase
+        .from('user_subscriptions')
         .select('*')
         .eq('user_id', user.id)
-        .eq('status', 'active')
-        .gte('expires_at', new Date().toISOString())
-        .order('expires_at', { ascending: false })
-        .limit(1)
         .single();
 
-      if (subscription) {
+      if (userSubscription && 
+          userSubscription.subscription_status === 'active' && 
+          new Date(userSubscription.subscription_expires_at) > new Date()) {
         subscriptionStatus = 'active';
-        const expiresAt = new Date(subscription.expires_at);
+        const expiresAt = new Date(userSubscription.subscription_expires_at);
         const daysRemaining = Math.ceil((expiresAt - new Date()) / (1000 * 60 * 60 * 24));
         
         console.log(`✅ Suscripción activa. Vence en ${daysRemaining} días`);
