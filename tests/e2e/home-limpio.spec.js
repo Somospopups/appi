@@ -57,15 +57,12 @@ async function entrar(page) {
   await expect(page.locator('#lockScreen')).toHaveClass(/hidden/);
 }
 
-test('el home limpio muestra porqué, números claros y a quién escribir hoy', async ({ page }) => {
+test('el home limpio muestra porqué y a quién escribir hoy', async ({ page }) => {
   await entrar(page);
 
   const home = page.locator('#homeLimpio');
   await expect(home).toBeVisible();
   await expect(home).toContainText('Que mi familia viva tranquila');   // porqué en una línea
-  await expect(home).toContainText('3');                                // para hoy
-  await expect(home).toContainText('9/12');                             // PB del mes
-  await expect(home).toContainText('4');                                // visitas que renacen
   await expect(home).toContainText('¿Quién te espera hoy?');
   await expect(home).toContainText('Jorge Salas');
   await expect(home.locator('[data-wa]')).toHaveCount(3);               // WhatsApp directo

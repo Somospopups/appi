@@ -1,9 +1,8 @@
 /* ============================================================
    APPI · Home limpio (v247)
    ------------------------------------------------------------
-   La primera pantalla responde una sola pregunta: ¿qué hago
-   hoy? Acciones claras, tres números grandes y tu porqué en
-   una línea. Todo lo mensual vive en "Tu resumen", a un toque.
+   La primera pantalla muestra las notificaciones y acciones
+   del día. Sin números grandes, sin ruido. Solo lo que importa.
    ============================================================ */
 (function(){
   'use strict';
@@ -32,21 +31,6 @@
       if (s && s.para_que) return s.para_que;
     }catch(e){}
     return '';
-  }
-  function datosMes(){
-    var eq = null;
-    try{ eq = JSON.parse(localStorage.getItem('equipoData') || 'null'); }catch(e){}
-    var raiz = eq && Array.isArray(eq.personas) ? (eq.personas.find(function(p){ return p.nivel === 0; }) || eq.personas[0]) : null;
-    return { A: raiz ? (Number(raiz.pnAct) || 0) : 0 };
-  }
-  function parqueVencidas(){
-    var t = 0;
-    function sumar(p){ t += Number((p.garantias || {}).vencidas) || 0; (p.hijos || []).forEach(sumar); }
-    try{
-      var eq = JSON.parse(localStorage.getItem('equipoData') || 'null');
-      if (eq && Array.isArray(eq.personas)) eq.personas.forEach(sumar);
-    }catch(e){}
-    return t;
   }
 
   function css(){
@@ -84,8 +68,6 @@
 
   function html(){
     var acts = acciones();
-    var m = datosMes();
-    var venc = parqueVencidas();
     var pq = porQue();
 
     var lista = acts.length
@@ -99,11 +81,6 @@
 
     return '<div id="homeLimpio">' +
       (pq ? '<p class="hl-porque">💙 ' + esc(pq) + '</p>' : '') +
-      '<div class="hl-nums">' +
-      '<button type="button" class="hl-num" onclick="openMiGestion()"><b>' + acts.length + '</b><span>PARA HOY</span></button>' +
-      '<button type="button" class="hl-num" onclick="showView(\'view-negocio\')"><b>' + m.A + '/12</b><span>PB DEL MES</span></button>' +
-      '<button type="button" class="hl-num" onclick="showView(\'view-usuarios\')"><b>' + venc + '</b><span>VISITAS RENACEN</span></button>' +
-      '</div>' +
       '<div class="hl-titulo">¿Quién te espera hoy?</div>' +
       '<div class="hl-card">' + lista + '</div>' +
       '<div class="hl-duo">' +
