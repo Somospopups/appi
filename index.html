@@ -4795,38 +4795,68 @@ const HELP = {
   home: {
     icon:'🏠', iconBg:'linear-gradient(135deg,#5b8def,#a06bff,#ff6b9d)',
     title:'Pantalla principal',
-    sub:'Tu tablero de acción',
-    html:`<p>El Inicio te muestra cómo viene tu semana y tu mes, y te lleva a la siguiente acción.</p>
+    sub:'Tu tablero de acción diaria',
+    html:`<p>El Inicio es tu <strong>centro de comando diario</strong>. Acá ves lo más importante del día y accedés rápido a todo lo que necesitás.</p>
+
+    <div class="tip"><strong>📱 TU JORNADA</strong><br/>
+    La tarjeta principal te muestra tu agenda del día como una línea de tiempo:<br/>
+    • <strong>Resumen de la mañana</strong> — tus tareas y contactos pendientes<br/>
+    • <strong>Contactos de ahora</strong> — a quién escribir o llamar ya<br/>
+    • <strong>Próximas acciones</strong> — demos o seguimientos programados<br/>
+    <strong>Tip:</strong> tocá la tarjeta para abrir el calendario mensual y agregar tareas a cualquier día.</div>
 
     <div class="tip"><strong>🌱 CULTURA DE CRECIMIENTO</strong><br/>
-    Cada semana: cargá tus PB personales (con decimales) y tus invitados de patrocinio. La barra llega a 100% con 15 PB y al menos 2 invitados.</div>
+    Tu rutina semanal para crecer en el negocio:<br/>
+    • Cargá tus <strong>PB personales</strong> (con decimales si hace falta)<br/>
+    • Agregá tus <strong>invitados de patrocinio</strong><br/>
+    • La barra llega a 100% con 15 PB y al menos 2 invitados<br/>
+    <strong>Objetivo:</strong> hacer esto todas las semanas para mantener el ritmo.</div>
 
     <div class="tip"><strong>🎯 OPORTUNIDAD DE BONUS</strong><br/>
-    Si alguien de Mi Equipo (categoría D o más) está cerca de 12 PB, APPI te propone escribirle o llamarlo para invitar y llevar al nuevo a 9 PB. El aviso se saca al tocar WhatsApp o Llamar.</div>
-
-    <div class="tip"><strong>🌟 SCORE DEL MES</strong><br/>
-    Un número de 0 a 100. Se calcula en este orden, 25% cada uno: Las 7 P, Presupuesto, Rueda Vida y Rueda Negocio.</div>
-
-    <div class="tip"><strong>📅 MI MES</strong><br/>
-    Arranca plegado. Adentro está el <b>próximo paso</b>, en este orden: Las 7 P → Presupuesto → Rueda Vida → Rueda Negocio. Al terminar las cuatro, te felicita la planificación del mes.</div>
-
-    <div class="tip"><strong>🏅 MI CARRERA</strong><br/>
-    Tu categoría oficial, lo que falta para el próximo pase, el mantenimiento de categoría y la lectura de tu organización: anchura y Pareto.</div>
-
-    <div class="tip"><strong>🌱 MI NEGOCIO</strong><br/>
-    Ahí están Mi Equipo, Histórico, Usuarios y el Panel de Contactos.</div>
-
-    <div class="tip"><strong>🧭 LOS 8 PASOS Y 🪜 SUEÑOS</strong><br/>
-    En Mis herramientas: el ciclo del negocio con una herramienta por paso, y tu escalera de sueños con el para qué.</div>
-
-    <div class="tip"><strong>⚡ HERRAMIENTAS RÁPIDAS</strong><br/>
-    Grabadora (grabá y escuchá) y Notas Keep (notas de colores).</div>
+    Si alguien de Mi Equipo (categoría D o más) está cerca de 12 PB, APPI te avisa y te propone:<br/>
+    • Escribirle por WhatsApp<br/>
+    • Llamarlo directo<br/>
+    El objetivo: ayudarlo a llegar al bonus y vos también ganas puntos. El aviso desaparece cuando contactás a la persona.</div>
 
     <div class="tip"><strong>🎂 CUMPLEAÑOS</strong><br/>
-    Si cargaste Mi Equipo, aparece un aviso cuando alguien cumple años hoy.</div>
+    Si cargaste Mi Equipo, aparece un aviso cuando alguien cumple años hoy. Es tu oportunidad perfecta para contactar y fortalecer la relación.</div>
+
+    <div class="tip"><strong>📅 MI MES</strong><br/>
+    Tu centro de planificación mensual. Acá tenés:<br/>
+    • <strong>Score del mes</strong> (0 a 100) — cómo va tu planificación<br/>
+    • <strong>Próximo paso</strong> — qué hacer ahora (Las 7 P → Presupuesto → Rueda Vida → Rueda Negocio)<br/>
+    • <strong>4 herramientas</strong> — Las 7 P, Presupuesto, Rueda Vida, Rueda Negocio<br/>
+    <strong>Objetivo:</strong> completar las 4 herramientas para llegar a Score 100.</div>
+
+    <div class="tip"><strong>💼 MI NEGOCIO</strong><br/>
+    Tu centro de gestión del negocio. Acá tenés:<br/>
+    • <strong>GPS del mes</strong> — tu brújula para llegar al bonus (12 PB, 2 patrocinios, 30 demos, 10 cierres)<br/>
+    • <strong>Panel de Contactos</strong> — tu CRM con nuevos, seguimientos, presentaciones y cerrados<br/>
+    • <strong>Mi Equipo</strong> — toda tu línea descendente con tablero, árbol y lista<br/>
+    • <strong>Histórico</strong> — tu evolución mes a mes<br/>
+    • <strong>Usuarios</strong> — el parque instalado y garantías vencidas</div>
+
+    <div class="tip"><strong>🧰 MIS HERRAMIENTAS</strong><br/>
+    Tu caja de herramientas para el día a día:<br/>
+    • <strong>Los 8 Pasos</strong> — el ciclo completo del negocio<br/>
+    • <strong>Escalera de Sueños</strong> — tu combustible emocional<br/>
+    • <strong>Guía de Demo</strong> — te acompaña en la presentación<br/>
+    • <strong>La Botella</strong> — herramienta de conciencia para la demo<br/>
+    • <strong>Simulador</strong> — calculá cuánto podés ganar<br/>
+    • <strong>Grabadora</strong> — grabá ideas y reuniones<br/>
+    • <strong>Notas Keep</strong> — notas rápidas de colores</div>
+
+    <div class="tip"><strong>🔔 NOTIFICACIONES</strong><br/>
+    Arriba del calendario pueden aparecer:<br/>
+    • <strong>Bonus</strong> — oportunidades de ayudar a tu equipo<br/>
+    • <strong>Cumpleaños</strong> — quién cumple años hoy<br/>
+    Tocá cualquier notificación para actuar rápido.</div>
 
     <div class="tip"><strong>💾 BACKUP</strong><br/>
-    Abajo podés exportar o restaurar todos tus datos. Quedan en tu dispositivo.</div>`
+    En la sección Herramientas podés exportar o restaurar todos tus datos. Quedan solo en tu dispositivo, nadie más los ve.</div>
+
+    <div class="tip"><strong>❓ AYUDA</strong><br/>
+    El botón <strong>?</strong> arriba a la derecha te explica cada pantalla en detalle. Tocálo cuando quieras saber más.</div>`
   },
   presu: {
     icon:'💰', iconBg:'linear-gradient(135deg,#f5b301,#ff8f6b)',
