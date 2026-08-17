@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v248-sin-carrera-parque';
+const CACHE_NAME = 'appi-v249-gps-en-negocio';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
