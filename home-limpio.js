@@ -147,8 +147,9 @@
     if (!host) return;
     var head = host.querySelector('.home-section-head'); if (head) head.remove();
     var tools = $('toolsList'); if (tools) tools.remove();
+    // v247: el backup ya no se mueve a herramientas, queda oculto en el home
     var backup = $('backupCollapsible');
-    if (backup && $('view-herramientas')) $('view-herramientas').appendChild(backup);
+    if (backup) backup.style.display = 'none';
   }
 
   function envolver(){

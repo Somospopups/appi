@@ -9542,7 +9542,8 @@ function openBackup(){
   showView('view-home');
   setTimeout(()=>{
     const bc = document.getElementById('backupCollapsible');
-    if(bc && !bc.classList.contains('open')){
+    if(bc){
+      bc.style.display = '';
       bc.classList.add('open');
       bc.scrollIntoView({behavior:'smooth', block:'center'});
     }
