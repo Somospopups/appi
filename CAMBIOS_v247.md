@@ -1,73 +1,72 @@
-# APPI v247 · Motion
+# APPI v247 · Motion + Agenda de hoy
+
+## Home: Agenda de hoy (Timeline)
+
+**Commit:** `4190879`
+
+El Home ahora muestra tu jornada como una línea de tiempo (Opción E del probador):
+
+```
+💙 Tu porqué
+
+┌─────────────────────────────────┐
+│ TU JORNADA                      │
+│                                 │
+│ ● 9:00 · Resumen en tu teléfono │
+│ │   Ya enviado: tus acciones    │
+│ │                               │
+│ ● Ahora · Jorge espera tu       │
+│ │   mensaje                     │
+│ │   [Escribir] [Llamar]         │
+│ │                               │
+│ ● 20:00 · Lucía Vega            │
+│     🎤 Demo programada          │
+└─────────────────────────────────┘
+
+[Ver todo el Panel ›]
+```
+
+### Características
+- Timeline visual con línea conectora y puntos de colores
+- Botones de acción inline (WhatsApp y Llamar)
+- Datos reales del Panel de Contactos
+- Si no hay contactos, solo muestra el resumen
 
 ## Animaciones y Motion Graphics
 
 ### Selector de páginas — Glass Morphism
-- **Fondo glass**: `backdrop-filter: blur(24px) saturate(200%)` con
-  transparencia sutil, bordes luminosos y sombras multicapa.
-- **Indicador deslizante**: pastilla sólida que se desliza con easing
-  `cubic-bezier(.4,0,.2,1)` al botón activo — como un tab indicator
-  de Material Motion.
-- **Aparece animado**: entrada con `scale(.9) → scale(1)` + bounce
-  suave al cargar la app.
-- **Íconos activos**: escalan a `1.1` con bounce y se iluminan.
-- **Íconos inactivos**: opacidad reducida y escala normal.
-- **Tap feedback**: el botón no activo se encoge a `.92` al presionar.
+- Fondo glass con `backdrop-filter: blur(24px) saturate(200%)`
+- Indicador deslizante con easing `cubic-bezier(.4,0,.2,1)`
+- Íconos SVG con animaciones de escala y opacidad
+- Ancho casi completo (520px)
 
 ### Transiciones entre páginas — Slide suave
-- **Salida**: la página actual se desliza 35% en la dirección del swipe
-  con fade out y `cubic-bezier(.4,0,1,1)`.
-- **Entrada**: la página nueva entra desde el lado opuesto con
-  `cubic-bezier(0,0,.2,1)` (decelerate).
-- **Duración**: 320ms salida + 380ms entrada = transición fluida.
-- **Feedback háptico**: vibración sutil (10ms) al cambiar.
+- Salida 320ms + Entrada 380ms con cubic-bezier
+- Swipe con feedback visual en tiempo real (±60px)
+- Vibración háptica sutil (10ms)
 
 ### Títulos animados — Entrada desde arriba
-- **h1/título**: baja 24px con fade + blur(4px) → blur(0), con
-  bounce suave en `cubic-bezier(.34,1.3,.64,1)`.
-- **Subtítulo/script**: baja 16px con 100ms de delay (stagger).
-- **Descripción/mes**: baja 16px con 180ms de delay.
-- **Contenido** (cards, grids, números): sube 20px con fade up y
-  120ms de delay.
+- h1 baja con fade + blur → nítido + bounce
+- Subtítulo con 100ms de delay (stagger)
+- Contenido sube con fade up
 
-### Swipe con feedback en tiempo real
-- Mientras arrastrás el dedo, la página actual se mueve proporcionalmente
-  (máximo ±60px, 30% del gesto) — como un carrusel nativo.
-- Al soltar, vuelve suavemente si no alcanza el threshold de 50px.
-- Al superar el threshold, ejecuta la transición completa.
+## Navegación atrás con historial real (`6944f8f`)
+- Pila de navegación que recuerda hasta 20 vistas
+- Sub-vistas vuelven a su padre correspondiente
+- Las 4 páginas principales navegan en orden inverso
 
-### PC sin cambios
-- La sidebar sigue siendo la navegación principal.
-- El selector y las animaciones de página no aparecen en ≥ 1024px.
+## Simulador mejorado
+- **Valores editables** del plan de negocio (`f4fd684`)
+- **Sliders sincronizados** con labels inline (`6b87018`)
+- **Explicaciones claras** de cada métrica (`02bcbe7`)
+
+## Botella y Simulador conectados (`1553721`)
+- Las tarjetas llaman a `abrirBotella()` y `abrirSimulador()`
+
+## Home compacto (`fd67279`, `34e7355`)
+- Saludo y fecha en una línea
+- Sin "Tu tablero personal", sin Score, sin 3 números grandes
+- Widget de bienvenida reducido
 
 ## Tests
-- 81/82 tests en verde.
-
-## Navegación atrás con historial real
-
-**Commit:** `6944f8f`
-
-### Problema
-Al usar el gesto de "atrás" del teléfono, la app siempre volvía al Home directamente, sin importar desde qué pantalla venías.
-
-### Solución
-Implementada una pila de navegación real que recuerda el historial completo:
-
-- **Navegación entre las 4 páginas principales:** Al ir Home → Mi Mes → Mi Negocio → Herramientas y presionar atrás, vuelve en orden inverso (Herramientas → Mi Negocio → Mi Mes → Home).
-
-- **Sub-vistas vuelven a su padre:**
-  - Rueda/Evaluar → Mi Mes
-  - 7P/Detalle → 7P
-  - Presupuesto/Histórico → Presupuesto
-  - Equipo/Histórico/Usuarios/Panel → Mi Negocio
-  - 8 Pasos/Sueños/Demo/Grabadora/Notas → Herramientas
-
-- **Pila limitada a 20 entradas** para evitar memory leaks en sesiones largas.
-
-- **Tests actualizados:** 6/6 tests de home-limpio pasando.
-
-### Comportamiento
-1. Cada vez que llamás `showView()`, se agrega la vista a la pila
-2. Al presionar atrás (gesto o botón), se hace pop de la pila
-3. Si la pila está vacía o estás en Home, no hace nada (evita salir de la app)
-4. Los modales se cierran primero antes de navegar atrás
+- 81/82 tests en verde
