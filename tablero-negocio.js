@@ -312,14 +312,15 @@
   /* ---------------- vistas y accesos ---------------- */
   function crearVistas(){
     if ($('view-botella')) return;
+    var app = document.querySelector('.app');
     var s1 = document.createElement('section');
     s1.id = 'view-botella'; s1.className = 'view';
     s1.innerHTML = '<header class="top"><button class="back-btn" onclick="history.back()" aria-label="Volver">‹</button><button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button><h1>La botella</h1><div class="script">conciencia</div></header><div id="botellaCont"></div>';
-    document.body.appendChild(s1);
+    app.appendChild(s1);
     var s2 = document.createElement('section');
     s2.id = 'view-simulador'; s2.className = 'view';
     s2.innerHTML = '<header class="top"><button class="back-btn" onclick="history.back()" aria-label="Volver">‹</button><button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button><h1>Simulador</h1><div class="script">tu mes soñado</div></header><div id="simCont"></div>';
-    document.body.appendChild(s2);
+    app.appendChild(s2);
     window.__tableroSinTabs = true;
   }
   function abrirBotella(){
