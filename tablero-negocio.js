@@ -161,49 +161,61 @@
         '</div>' +
       '</div>' +
 
-      // SECCIÓN 2: TUS NÚMEROS
+      // SECCIÓN 2: EXPLICACIONES
       '<div style="background:#f9fafb; padding:16px; border-radius:12px; margin-bottom:24px; border:1px solid #e5e7eb;">' +
-        '<div style="font-weight:700; font-size:16px; margin-bottom:16px; color:#111827;">📊 Tus números del mes</div>' +
+        '<div style="font-weight:700; font-size:16px; margin-bottom:16px; color:#111827;">📖 ¿Qué significa cada número?</div>' +
 
-        '<div style="margin-bottom:20px;">' +
-          '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">' +
-            '<label style="font-weight:600; font-size:15px;">Demos por mes</label>' +
-            '<input type="number" id="simDemos" min="0" max="60" value="30" style="width:70px; padding:8px; font-size:16px; text-align:center; border:1px solid #ddd; border-radius:8px;">' +
-          '</div>' +
-          '<input type="range" id="simDemosSlider" min="0" max="60" value="30" style="width:100%; margin:8px 0;">' +
+        '<div style="margin-bottom:16px;">' +
+          '<div style="font-weight:600; font-size:14px; margin-bottom:6px;">🎯 Demos por mes</div>' +
           '<div style="background:#f5f5f5; padding:12px; border-radius:8px; font-size:13px; line-height:1.6; color:#666;">' +
-            '<b>¿Qué son?</b> Las presentaciones del sistema que hacés cada mes.<br>' +
-            '<b>¿Cómo contarlos?</b> Sumá todas las demos que mostrás: en casas, por Zoom, en eventos. Si hacés 1 demo por día hábil, son ~22 al mes.' +
+            'Las presentaciones del sistema que hacés cada mes. Sumá todas: en casas, por Zoom, en eventos. Si hacés 1 demo por día hábil, son ~22 al mes.' +
           '</div>' +
         '</div>' +
 
-        '<div style="margin-bottom:20px;">' +
-          '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">' +
-            '<label style="font-weight:600; font-size:15px;">Cierres</label>' +
-            '<input type="number" id="simCierres" min="0" max="30" value="10" style="width:70px; padding:8px; font-size:16px; text-align:center; border:1px solid #ddd; border-radius:8px;">' +
-          '</div>' +
-          '<input type="range" id="simCierresSlider" min="0" max="30" value="10" style="width:100%; margin:8px 0;">' +
+        '<div style="margin-bottom:16px;">' +
+          '<div style="font-weight:600; font-size:14px; margin-bottom:6px;">✅ Cierres</div>' +
           '<div style="background:#f5f5f5; padding:12px; border-radius:8px; font-size:13px; line-height:1.6; color:#666;">' +
-            '<b>¿Qué son?</b> Las ventas que concretás (sistemas instalados).<br>' +
-            '<b>Referencia:</b> En promedio, de cada 3 demos se cierra 1 venta (33% de conversión). Si hacés 30 demos, esperarías ~10 cierres.' +
+            'Las ventas que concretás (sistemas instalados). En promedio, de cada 3 demos se cierra 1 venta (33% de conversión).' +
           '</div>' +
         '</div>' +
 
         '<div>' +
-          '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">' +
-            '<label style="font-weight:600; font-size:15px;">Productos de tu red</label>' +
-            '<input type="number" id="simRed" min="0" max="300" value="100" style="width:70px; padding:8px; font-size:16px; text-align:center; border:1px solid #ddd; border-radius:8px;">' +
-          '</div>' +
-          '<input type="range" id="simRedSlider" min="0" max="300" value="100" style="width:100%; margin:8px 0;">' +
+          '<div style="font-weight:600; font-size:14px; margin-bottom:6px;">🌳 Productos de tu red</div>' +
           '<div style="background:#f5f5f5; padding:12px; border-radius:8px; font-size:13px; line-height:1.6; color:#666;">' +
-            '<b>¿Qué son?</b> Los productos que compra toda tu red de clientes y distribuidores cada mes.<br>' +
-            '<b>¿Dónde verlo?</b> En Mi Negocio → Mi Equipo, sumá los PB (Puntos de Bonificación) de toda tu organización. Cada PB equivale aproximadamente a 1 producto.' +
+            'Los productos que compra toda tu red de clientes y distribuidores cada mes. En Mi Negocio → Mi Equipo, sumá los PB de toda tu organización.' +
           '</div>' +
         '</div>' +
       '</div>' +
 
-      '<div id="simResult" style="margin-top:24px; padding:16px; background:linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-radius:12px; border:2px solid #3b82f6;"></div>' +
-      '<div class="tb-sub" style="margin-top:16px; font-size:12px; line-height:1.5;">💡 Los valores del plan pueden variar según tu condición fiscal y percepciones. Ajustalos arriba si es necesario.</div></div>';
+      // SECCIÓN 3: SLIDERS + RESULTADO
+      '<div style="background:linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); padding:16px; border-radius:12px; border:2px solid #3b82f6; margin-bottom:16px;">' +
+        '<div style="font-weight:700; font-size:16px; margin-bottom:16px; color:#1e40af;">🎛️ Ajustá tus números</div>' +
+
+        '<div style="margin-bottom:14px;">' +
+          '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">' +
+            '<span style="font-size:14px; font-weight:600; color:#374151;">Demos por mes: <b id="simDemosV" style="color:#1e40af;">30</b></span>' +
+          '</div>' +
+          '<input type="range" id="simDemos" min="0" max="60" value="30" style="width:100%; margin:0;">' +
+        '</div>' +
+
+        '<div style="margin-bottom:14px;">' +
+          '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">' +
+            '<span style="font-size:14px; font-weight:600; color:#374151;">Cierres: <b id="simCierresV" style="color:#1e40af;">10</b></span>' +
+          '</div>' +
+          '<input type="range" id="simCierres" min="0" max="30" value="10" style="width:100%; margin:0;">' +
+        '</div>' +
+
+        '<div style="margin-bottom:14px;">' +
+          '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">' +
+            '<span style="font-size:14px; font-weight:600; color:#374151;">Productos de tu red: <b id="simRedV" style="color:#1e40af;">100</b></span>' +
+          '</div>' +
+          '<input type="range" id="simRed" min="0" max="300" value="100" style="width:100%; margin:0;">' +
+        '</div>' +
+
+        '<div id="simResult" style="margin-top:16px; padding-top:16px; border-top:2px solid rgba(59,130,246,0.3);"></div>' +
+      '</div>' +
+
+      '<div class="tb-sub" style="font-size:12px; line-height:1.5;">💡 Los valores del plan pueden variar según tu condición fiscal y percepciones. Ajustalos arriba si es necesario.</div></div>';
   }
   function calcSimulador(){
     var demos = Math.max(0, Number($('simDemos').value) || 0);
@@ -211,15 +223,18 @@
     var red = Math.max(0, Number($('simRed').value) || 0);
     var valorCierre = Math.max(0, Number($('simValorCierre').value) || 324000);
     var valorRed = Math.max(0, Number($('simValorRed').value) || 37620);
+    // Actualizar labels de los sliders
+    var dv = $('simDemosV'); if(dv) dv.textContent = demos;
+    var cv = $('simCierresV'); if(cv) cv.textContent = cierres;
+    var rv = $('simRedV'); if(rv) rv.textContent = red;
     var com = cierres * valorCierre, net = red * valorRed;
     var f = function(n){ return '$' + Math.round(n).toLocaleString('es-AR'); };
     var conv = demos > 0 ? Math.round((cierres / demos) * 100) : 0;
     $('simResult').innerHTML =
-      '<div style="font-weight:700; font-size:16px; margin-bottom:12px; color:#1e40af;">📈 Resultado del mes</div>' +
-      '<div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid rgba(59,130,246,0.2);"><span style="font-size:14px;">Comercialización<br><small style="color:#666;">' + cierres + ' cierres × ' + f(valorCierre) + '</small></span><span style="font-weight:700; font-size:15px; color:#1e40af;">' + f(com) + '</span></div>' +
-      '<div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid rgba(59,130,246,0.2);"><span style="font-size:14px;">Red<br><small style="color:#666;">' + red + ' productos × ' + f(valorRed) + '</small></span><span style="font-weight:700; font-size:15px; color:#1e40af;">' + f(net) + '</span></div>' +
-      '<div style="display:flex; justify-content:space-between; padding:14px 0 8px;"><span style="font-size:16px; font-weight:700;">Total del mes</span><span style="font-size:22px; font-weight:800; color:#059669;">' + f(com + net) + '</span></div>' +
-      '<div style="text-align:center; font-size:12px; color:#666; padding-top:8px; border-top:1px solid rgba(59,130,246,0.15);">Conversión: ' + conv + '% (' + cierres + ' de ' + demos + ' demos)</div>';
+      '<div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid rgba(59,130,246,0.15);"><span style="font-size:13px;">Comercialización<br><small style="color:#666;">' + cierres + ' cierres × ' + f(valorCierre) + '</small></span><span style="font-weight:700; font-size:14px; color:#1e40af;">' + f(com) + '</span></div>' +
+      '<div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid rgba(59,130,246,0.15);"><span style="font-size:13px;">Red<br><small style="color:#666;">' + red + ' productos × ' + f(valorRed) + '</small></span><span style="font-weight:700; font-size:14px; color:#1e40af;">' + f(net) + '</span></div>' +
+      '<div style="display:flex; justify-content:space-between; padding:12px 0 6px;"><span style="font-size:15px; font-weight:700;">Total del mes</span><span style="font-size:20px; font-weight:800; color:#059669;">' + f(com + net) + '</span></div>' +
+      '<div style="text-align:center; font-size:11px; color:#666; padding-top:6px; border-top:1px solid rgba(59,130,246,0.1);">Conversión: ' + conv + '% (' + cierres + ' de ' + demos + ' demos)</div>';
   }
 
   /* ---------------- 4 · STOCK PERSONAL ---------------- */
@@ -326,21 +341,10 @@
     showView('view-simulador');
     var t2=$('tabs'); if(t2) t2.style.display='none';
     $('simCont').innerHTML = htmlSimulador();
-    // Campos numéricos principales
     ['simDemos', 'simCierres', 'simRed', 'simValorCierre', 'simValorRed'].forEach(function(id){
       var el = $(id);
       if(el){ el.oninput = calcSimulador; el.onchange = calcSimulador; }
     });
-    // Sincronización slider ↔ número
-    function syncSlider(numId, sliderId){
-      var num = $(numId), slider = $(sliderId);
-      if(!num || !slider) return;
-      num.addEventListener('input', function(){ slider.value = num.value; });
-      slider.addEventListener('input', function(){ num.value = slider.value; calcSimulador(); });
-    }
-    syncSlider('simDemos', 'simDemosSlider');
-    syncSlider('simCierres', 'simCierresSlider');
-    syncSlider('simRed', 'simRedSlider');
     calcSimulador();
   }
   window.abrirBotella = abrirBotella;
