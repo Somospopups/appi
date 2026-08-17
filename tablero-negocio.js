@@ -355,13 +355,12 @@
   /* ---------------- hooks ---------------- */
   function inyectarHome(){
     estilo();
-    // Inyectar GPS después del scoreCompactWrap o en negWrap
-    if (!$('gpsBlock')) {
-      var scoreWrap = $('scoreCompactWrap');
-      var negWrap = $('negWrap');
-      if (scoreWrap) scoreWrap.insertAdjacentHTML('afterend', htmlGps());
-      else if (negWrap) negWrap.insertAdjacentHTML('beforebegin', htmlGps());
-    } else {
+    // Inyectar GPS en view-negocio
+    var negocioView = $('view-negocio');
+    if (negocioView && !$('gpsBlock')) {
+      var header = negocioView.querySelector('header');
+      if (header) header.insertAdjacentHTML('afterend', htmlGps());
+    } else if ($('gpsBlock')) {
       var g = $('gpsBlock');
       g.outerHTML = htmlGps();
     }
