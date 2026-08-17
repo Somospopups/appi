@@ -49,7 +49,6 @@ async function entrar(page, { conEquipo = true } = {}) {
   await page.addInitScript(([uid, equipo]) => {
     localStorage.setItem('welcomeSeen', '1');
     localStorage.setItem('tutoVisto_v2', '1');
-    localStorage.setItem(`appi_estilo_actual_v1_${uid}`, 'clasico');
     localStorage.setItem('seguimientoPersonas', '[]');
     if (equipo) localStorage.setItem('equipoData', JSON.stringify(equipo));
     window.open = () => ({ closed: false, close() {}, location: { set href(v) {}, get href() { return ''; } } });
