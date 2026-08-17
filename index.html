@@ -5126,53 +5126,6 @@ function showView(id){
     if(Math.abs(dx) < 50 || Math.abs(dy) > Math.abs(dx) * 0.7) return;
     go(dx < 0 ? 1 : -1);
   }, {passive:true});
-  /* Drag en el selector de páginas para navegar sin levantar el dedo */
-  let tabDragging = false;
-  let tabDragMoved = false;
-  let tabLastX = 0;
-  const TAB_THRESHOLD = 40; // píxeles para cambiar de página
-  
-  document.addEventListener('touchstart', function(e){
-    if(window.innerWidth >= 1024) return;
-    const tab = e.target.closest('#pageTabs');
-    if(!tab) return;
-    tabDragging = true;
-    tabDragMoved = false;
-    tabLastX = e.touches[0].clientX;
-  }, {passive:true});
-  
-  document.addEventListener('touchmove', function(e){
-    if(!tabDragging || window.innerWidth >= 1024) return;
-    const x = e.touches[0].clientX;
-    const dx = x - tabLastX;
-    if(Math.abs(dx) >= TAB_THRESHOLD){
-      tabDragMoved = true;
-      go(dx > 0 ? -1 : 1);
-      tabLastX = x; // reset para permitir múltiples cambios
-    }
-  }, {passive:true});
-  
-  document.addEventListener('touchend', function(e){
-    if(tabDragging && tabDragMoved){
-      e.preventDefault();
-    }
-    tabDragging = false;
-    tabDragMoved = false;
-  }, {passive:false});
-  
-  document.addEventListener('touchcancel', function(e){
-    tabDragging = false;
-    tabDragMoved = false;
-  }, {passive:true});
-  
-  // Prevenir clicks en botones del selector después de un drag
-  document.addEventListener('click', function(e){
-    if(tabDragMoved && e.target.closest('#pageTabs button')){
-      e.preventDefault();
-      e.stopPropagation();
-    }
-  }, true);
-  
   /* Inicializar cuando la app esté lista */
   function tryInit(){
     const pt = document.getElementById('pageTabs');
