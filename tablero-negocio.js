@@ -86,7 +86,7 @@
     }
     var bonus = g.A >= 12 && g.patrocinios9 >= 1;
     var bonusFull = g.A >= 12 && g.patrocinios9 >= 2;
-    return '<details class="home-section-block" id="gpsBlock" open><summary class="mini-section-label"><span>🛰️</span> GPS del mes<em>⌄</em></summary><div class="tb-card">' +
+    return '<div class="tb-card" id="gpsBlock" style="margin:0 0 12px">' +
       '<div class="tb-title">🛰️ GPS del mes</div>' +
       '<div class="tb-sub">Las reglas oficiales, en metas de hoy' + (g.conLinea ? '' : ' · cargá tu Línea para leer tus PB') + '</div>' +
       '<div class="tb-row"><span>Bonus: 12 PB personales</span><span class="' + (g.A >= 12 ? 'tb-ok' : 'tb-no') + '">' + g.A + ' / 12</span></div>' + barra(g.A, 12) +
@@ -94,7 +94,7 @@
       '<div class="tb-row"><span>Ritmo: demos del mes</span><span>' + g.demos + ' / 30</span></div>' + barra(g.demos, 30) +
       '<div class="tb-row"><span>Cierres del mes</span><span>' + g.cierres + ' / 10</span></div>' + barra(g.cierres, 10) +
       '<div class="tb-sub" style="margin:6px 0 0">' + (bonusFull ? '🎉 Bonus completo este mes.' : bonus ? 'Vas encaminado: te falta un patrocinio más para el bonus completo.' : 'Hoy es un buen día para sumar PB y escribirle a alguien.') + '</div>' +
-      '</div></details>';
+      '</div>';
   }
 
   /* ---------------- 2 · COMPARATIVA DE LA BOTELLA ---------------- */
