@@ -3488,7 +3488,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
 
 
 
-<link rel="stylesheet" href="css/plans.css">
+
 
 </head>
 <body>
@@ -3858,11 +3858,6 @@ body.dark #pageTabs button.active{color:#a8c0ff}
 <div class="toast" id="toast"><span class="check-ic">✓</span><span id="toastTxt">Guardado</span></div>
 
 <div class="app">
-
-  <!-- PLANS -->
-  <section id="view-plans" class="view">
-    <div id="plansContainer"></div>
-  </section>
 
   <!-- HOME -->
   <section id="view-home" class="view active">
@@ -10488,8 +10483,8 @@ function iniciarApp() {
   }else{
     loadEquipoFromStorage();
     
-    // Verificar suscripción antes de mostrar home
-    checkSubscriptionAndRedirect();
+    // Mostrar home directamente
+    showView('view-home');
     
     if(window.initHistoricoAPPI)setTimeout(()=>window.initHistoricoAPPI(),0);
     if(typeof mostrarTutorialSiNuevo==='function')setTimeout(mostrarTutorialSiNuevo,700);
@@ -10497,42 +10492,6 @@ function iniciarApp() {
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',actualizarCuentaUI,{once:true});
   else actualizarCuentaUI();
-}
-
-// Verificar suscripción y redirigir
-async function checkSubscriptionAndRedirect() {
-  try {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      showView('view-home');
-      return;
-    }
-
-    // Verificar si tiene suscripción activa en user_subscriptions
-    const { data: userSubscription } = await supabase
-      .from('user_subscriptions')
-      .select('*')
-      .eq('user_id', user.id)
-      .single();
-
-    // Si tiene suscripción activa y no está vencida
-    if (userSubscription && 
-        userSubscription.subscription_status === 'active' && 
-        new Date(userSubscription.subscription_expires_at) > new Date()) {
-      // Tiene suscripción activa, mostrar home
-      showView('view-home');
-    } else {
-      // No tiene suscripción, mostrar planes
-      showView('view-plans');
-      if (window.APPIPlans) {
-        window.APPIPlans.init();
-      }
-    }
-  } catch (error) {
-    console.error('Error verificando suscripción:', error);
-    // En caso de error, mostrar home igual
-    showView('view-home');
-  }
 }
 
 
@@ -14843,7 +14802,6 @@ setTimeout(initHistorico,1200);
   setTimeout(limpiarRestos, 400);
 })();
 </script>
-<script src="js/plans.js"></script>
 
 </body>
 </html>

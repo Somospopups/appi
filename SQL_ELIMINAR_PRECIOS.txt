@@ -1,0 +1,24 @@
+-- ============================================
+-- Eliminar todas las tablas relacionadas con precios y pagos
+-- ============================================
+
+-- Eliminar tablas en orden (por dependencias)
+DROP TABLE IF EXISTS bank_statements CASCADE;
+DROP TABLE IF EXISTS payments CASCADE;
+DROP TABLE IF EXISTS user_subscriptions CASCADE;
+DROP TABLE IF EXISTS subscriptions CASCADE;
+DROP TABLE IF EXISTS plans CASCADE;
+DROP TABLE IF EXISTS pricing_config CASCADE;
+
+-- Eliminar funciones
+DROP FUNCTION IF EXISTS generate_payment_code(UUID, TEXT) CASCADE;
+DROP FUNCTION IF EXISTS has_active_subscription(UUID) CASCADE;
+DROP FUNCTION IF EXISTS get_subscription_days_remaining(UUID) CASCADE;
+
+-- Eliminar columnas agregadas a auth.users (si existen)
+-- Nota: esto puede requerir permisos de superusuario
+-- ALTER TABLE auth.users DROP COLUMN IF EXISTS subscription_status;
+-- ALTER TABLE auth.users DROP COLUMN IF EXISTS subscription_expires_at;
+
+-- Comentarios
+COMMENT ON DATABASE postgres IS 'Tablas de precios y pagos eliminadas. El sistema de pagos se manejará de manera privada.';
