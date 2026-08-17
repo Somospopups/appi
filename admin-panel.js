@@ -36,17 +36,6 @@ async function create(){
   const button=$('adminCreateUser');button.disabled=true;button.textContent='Creando…';setStatus('adminCreateStatus','Creando cuenta…');
   try{
     const data=await callAdmin({action:'create',dip:`${sucursal}-${numero}`,nombre,socio_nombre:socioNombre,password,membership_months:state.createMembership});
-    
-    // Crear membresía en el sistema de gestión
-    if(window.APPIAdminMembership&&window.APPIAdminMembership.createMembershipForUser){
-      try{
-        await window.APPIAdminMembership.createMembershipForUser(data.user.user_id,5000);
-        console.log('✅ Membresía creada en sistema de gestión');
-      }catch(error){
-        console.error('⚠️ Error creando membresía en sistema de gestión:',error);
-      }
-    }
-    
     setStatus('adminCreateStatus',`Cuenta creada: ${data.user.dip} · contraseña temporal lista.`);
     await navigator.clipboard.writeText(`APPI\nDistribuidor: ${data.user.dip}\nTitular: ${nombre}${socioNombre?`\nSocio/a: ${socioNombre}`:''}\nContraseña temporal: ${password}`).catch(()=>{});
     ['adminSucursal','adminNumero','adminNombre','adminPartnerName','adminTempPassword'].forEach(id=>$(id).value='');$('adminHasPartner').checked=false;$('adminPartnerField').hidden=true;
@@ -72,10 +61,6 @@ async function handleUserAction(button){
     if(action==='password'){
       const password=await window.APPIDialog.prompt('Se copiará al portapapeles y el distribuidor deberá cambiarla al ingresar.',randomPassword(),{title:'Nueva contraseña temporal',icon:'🔐',inputType:'text',okText:'Actualizar'});if(!password)return;
       await callAdmin({action:'set_password',user_id:userId,password});await navigator.clipboard.writeText(password).catch(()=>{});await window.APPIDialog.alert('Contraseña actualizada y copiada.',{title:'Listo',icon:'✓'});return;
-    }
-    if(action==='membership'){
-      const months=Number(button.dataset.months),ok=await window.APPIDialog.confirm(`La membresía de ${user.nombre||user.dip} comenzará hoy y durará ${months} mes${months===1?'':'es'}.`,{title:'Activar membresía',icon:'📅',okText:'Activar'});if(!ok)return;
-      await callAdmin({action:'set_membership',user_id:userId,membership_months:months});await load();return;
     }
     if(action==='grace_period'){
       if(window.APPIAdminMembership&&window.APPIAdminMembership.showGracePeriodModal){

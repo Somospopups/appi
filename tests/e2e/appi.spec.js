@@ -1,22 +1,41 @@
 const { test, expect } = require('@playwright/test');
 
+const USER_ID='11111111-1111-4111-8111-111111111111';
+function tokenFor(sub){
+  const header=Buffer.from(JSON.stringify({alg:'HS256',typ:'JWT'})).toString('base64url');
+  const payload=Buffer.from(JSON.stringify({sub,exp:Math.floor(Date.now()/1000)+3600})).toString('base64url');
+  return `${header}.${payload}.firma`;
+}
+
 async function abrirAppActivada(page) {
+  const now=new Date().toISOString(),accessToken=tokenFor(USER_ID);
+  const profile={
+    user_id:USER_ID,username:null,dip:'02-9802014',sucursal:'02',numero_distribuidor:'9802014',
+    nombre:'Distribuidor de prueba',socio_nombre:null,rol:'usuario',activo:true,debe_cambiar_password:false,
+    membresia_meses:1,membresia_inicio:now,membresia_vence:new Date(Date.now()+30*86400000).toISOString()
+  };
   await page.route('**/auth-config.js', route => route.fulfill({
-    contentType: 'application/javascript',
-    body: "window.APPI_AUTH={enabled:false,url:'',anonKey:'',distributorEmailDomain:'distribuidores.appi.invalid',loginAliases:{},offlineDays:7};"
+    contentType:'application/javascript',
+    body:"window.APPI_AUTH={enabled:true,url:'https://mock.supabase.co',anonKey:'anon-key-publica-de-prueba-1234567890',distributorEmailDomain:'distribuidores.appi.invalid',adminLogin:{username:'popups',email:'admin-popups@appi.invalid'},loginAliases:{},offlineDays:7};"
   }));
-  await page.addInitScript(() => {
-    localStorage.setItem('appi_cache_v186', '1');
-    localStorage.setItem('tutoVisto_v2', '1');
-    localStorage.setItem('welcomeSeen', '1');
+  await page.route('https://mock.supabase.co/**', route => {
+    const url=new URL(route.request().url());
+    const cors={'access-control-allow-origin':'*','content-type':'application/json'};
+    if(url.pathname==='/rest/v1/appi_perfiles')return route.fulfill({status:200,headers:cors,body:JSON.stringify([profile])});
+    if(url.pathname==='/rest/v1/appi_datos')return route.fulfill({status:200,headers:cors,body:'[]'});
+    if(url.pathname==='/functions/v1/dispositivo-puente')return route.fulfill({status:200,headers:cors,body:JSON.stringify({devices:[]})});
+    return route.fulfill({status:200,headers:cors,body:'[]'});
   });
-  await page.goto('/index.html', { waitUntil: 'networkidle' });
-  await page.evaluate(() => {
-    const deviceId = generarDeviceId();
-    const codigo = generarCodigoActivacion(deviceId);
-    localStorage.setItem('appi_activada', JSON.stringify({ codigo, deviceId, fecha: Date.now() }));
-  });
-  await page.reload({ waitUntil: 'networkidle' });
+  await page.addInitScript(([userId,token,profileValue]) => {
+    localStorage.setItem('appi_cache_v186','1');
+    localStorage.setItem('tutoVisto_v2','1');
+    localStorage.setItem('welcomeSeen','1');
+    localStorage.setItem('appi_auth_session_v1',JSON.stringify({
+      session:{access_token:token,refresh_token:'refresh-test',token_type:'bearer',expires_in:3600,expires_at:Math.floor(Date.now()/1000)+3600,user:{id:userId}},
+      profile:profileValue,lastValidatedAt:Date.now(),offline:false
+    }));
+  },[USER_ID,accessToken,profile]);
+  await page.goto('/index.html',{waitUntil:'networkidle'});
   await expect(page.locator('#view-home')).toHaveClass(/active/);
   await expect(page.locator('#lockScreen')).toHaveClass(/hidden/);
 }
@@ -76,7 +95,9 @@ test('arranca, navega e importa Garantías una sola vez', async ({ page }) => {
   await page.evaluate(() => {
     window.__appiLastOpen = null;
     window.open = (...args) => { window.__appiLastOpen = args; return null; };
+    showView('view-usuarios');
   });
+  await expect(page.locator('#view-usuarios')).toBeVisible();
   await page.locator('#usuariosList .tree-node').first().click();
   await page.locator('#usuariosList [data-u-action="whatsapp"]').first().click();
   const opened = await page.evaluate(() => window.__appiLastOpen);
@@ -138,8 +159,9 @@ test('las notas Keep se muestran sujetas con un pin', async ({ page }) => {
   await abrirAppActivada(page);
   await page.evaluate(()=>{
     localStorage.setItem('appi_keep_notas',JSON.stringify([{id:String(Date.now()),title:'Nota con pin',text:'Contenido',color:'#fff475',pinned:false}]));
-    showView('view-notas');window.renderKeep();
+    window.renderKeep();showView('view-notas');
   });
+  await expect(page.locator('#view-notas')).toBeVisible();
   await expect(page.locator('#keepGrid .keep-note')).toHaveCount(1);
   await expect(page.locator('#keepGrid .keep-pin')).toHaveCount(1);
   await page.locator('#keepTitle').fill('Nueva nota');

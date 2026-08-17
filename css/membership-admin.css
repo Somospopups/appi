@@ -71,7 +71,15 @@
   color: #721c24;
 }
 
-/* Modales */
+/* Modales. La clase específica evita que el modal reutilizable de index.html
+   los deje transparentes hasta recibir una clase .open. */
+.membership-modal-overlay {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  visibility: visible !important;
+  z-index: 30000 !important;
+}
+.membership-modal-overlay .modal { transform: none !important; }
 .modal-overlay {
   position: fixed;
   top: 0;

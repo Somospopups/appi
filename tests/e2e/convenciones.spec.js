@@ -6,8 +6,9 @@ const fs = require('fs');
 // como último recurso y define la API APPIDialog.
 const ARCHIVOS = [
   'index.html', 'encuesta.html', 'revisar-contactos.html',
-  'gestion-client.js', 'historico.js', 'data-sync.js', 'auth-client.js', 'carrera-empresarial.js', 'escalera-suenos.js', 'demo-guia.js',
-  'admin-panel.js', 'account-request.js', 'device-bridge.js', 'whatsapp-app.js'
+  'gestion-client.js', 'historico.js', 'data-sync.js', 'auth-client.js',
+  'escalera-suenos.js', 'demo-guia.js', 'tablero-negocio.js', 'porque-vivo.js', 'home-limpio.js',
+  'admin-panel.js', 'js/membership-admin.js', 'account-request.js', 'device-bridge.js', 'whatsapp-app.js'
 ];
 
 test('no hay alert/confirm/prompt nativos: siempre APPIDialog', () => {

@@ -1,5 +1,5 @@
 /* ============================================================
-   APPI · Home limpio (v247) — Agenda + Calendario
+   APPI · Home limpio (v250) — Agenda + Calendario
    ------------------------------------------------------------
    La primera pantalla muestra tu jornada como timeline.
    Al tocar la card se abre un calendario mensual donde
@@ -9,7 +9,11 @@
   'use strict';
   function $(id){ return document.getElementById(id); }
   function uid(){ return window.APPIAuth && window.APPIAuth.userId ? window.APPIAuth.userId() : ''; }
-  function esc(s){ return String(s == null ? '' : s).replace(/</g, '&lt;'); }
+  function esc(s){
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
 
   var MONTHS = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
   var DAYS = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
@@ -54,9 +58,20 @@
   }
   function acciones(){
     var hoy = new Date().toISOString().slice(0, 10);
+    var ordenEstado = { seguimiento: 0, presentacion: 1, nuevo: 2 };
     return contactos()
       .filter(function(c){ return ['nuevo', 'seguimiento', 'presentacion'].indexOf(c.estado) >= 0; })
-      .sort(function(a, b){ return String(a.proximo_contacto || hoy) <= String(b.proximo_contacto || hoy) ? -1 : 1; })
+      .sort(function(a, b){
+        // Primero lo que tiene fecha vencida o para hoy; los contactos nuevos sin
+        // fecha quedan después. En igualdad, seguimiento precede presentación.
+        var fechaA = String(a.proximo_contacto || '9999-12-31');
+        var fechaB = String(b.proximo_contacto || '9999-12-31');
+        if(fechaA !== fechaB) return fechaA.localeCompare(fechaB);
+        var estadoA = Object.prototype.hasOwnProperty.call(ordenEstado, a.estado) ? ordenEstado[a.estado] : 9;
+        var estadoB = Object.prototype.hasOwnProperty.call(ordenEstado, b.estado) ? ordenEstado[b.estado] : 9;
+        if(estadoA !== estadoB) return estadoA - estadoB;
+        return String(a.created_at || hoy).localeCompare(String(b.created_at || hoy));
+      })
       .slice(0, 3);
   }
   function porQue(){

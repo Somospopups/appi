@@ -12,7 +12,12 @@ const EXACT_KEYS=new Set([
   'equipoData','usuarios_garantias','seguimientoPersonas','cultura_crecimiento_v1','appi_keep_notas',
   'themeDark','home_sec_mes','home_sec_neg'
 ]);
-const PREFIXES=['rueda','siete_','presu_','lastUpdate_','bonus_notif_'];
+// Los módulos nuevos también forman parte del espacio personal de la cuenta.
+// Mantenerlos en esta lista garantiza nube, backup y separación titular/socio.
+const PREFIXES=[
+  'rueda','siete_','presu_','lastUpdate_','bonus_notif_',
+  'appi_suenos_v1_','appi_porque_v1_','appi_stock_v1_','appi_cal_tareas_v1_'
+];
 const state={ready:false,userId:'',workspaceId:'',personType:'titular',values:{},changedAt:{},dirty:new Set(),deleted:new Set(),cacheTimer:null,syncTimer:null,syncing:false,lastError:''};
 const nativeSet=Storage.prototype.setItem;
 const nativeRemove=Storage.prototype.removeItem;

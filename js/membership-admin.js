@@ -1,398 +1,182 @@
 /* ============================================
    APPI · Panel de Administración de Membresías
+   Todas las escrituras pasan por la Edge Function administradora.
+   Nunca se usa la anon key como si fuera una sesión de administrador.
    ============================================ */
-
 (function(){
   'use strict';
 
-  console.log('🔍 membership-admin.js cargado');
+  const $=id=>document.getElementById(id);
+  const esc=value=>String(value==null?'':value).replace(/[&<>"']/g,char=>({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[char]));
 
-  // ============================================
-  // Helper para hacer requests a Supabase
-  // ============================================
-  async function supabaseRequest(endpoint, options = {}) {
-    const url = `${window.APPI_AUTH.url}/rest/v1/${endpoint}`;
-    const headers = {
-      'Content-Type': 'application/json',
-      'apikey': window.APPI_AUTH.anonKey,
-      'Authorization': `Bearer ${window.APPI_AUTH.anonKey}`,
-      'Prefer': 'return=representation',
-      ...options.headers
-    };
+  function config(){
+    return window.APPIAuth&&window.APPIAuth.config?window.APPIAuth.config():(window.APPI_AUTH||{});
+  }
 
-    console.log(`🔍 Request: ${options.method || 'GET'} ${url}`);
-    
-    const response = await fetch(url, {
-      ...options,
-      headers
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error(`❌ Error ${response.status}:`, errorText);
-      throw new Error(`Error ${response.status}: ${errorText}`);
+  async function callAdmin(body,retry=true){
+    const cfg=config();
+    const token=window.APPIAuth&&window.APPIAuth.accessToken?window.APPIAuth.accessToken():'';
+    if(!cfg.url||!cfg.anonKey||!token)throw new Error('La sesión administradora no está disponible.');
+    let response;
+    try{
+      response=await fetch(String(cfg.url).replace(/\/$/,'')+'/functions/v1/admin-distribuidores',{
+        method:'POST',
+        cache:'no-store',
+        headers:{apikey:cfg.anonKey,Authorization:`Bearer ${token}`,'Content-Type':'application/json'},
+        body:JSON.stringify(body||{})
+      });
+    }catch(error){
+      throw new Error('No se pudo conectar con la administración de membresías.');
     }
-
-    const data = await response.json();
-    console.log(`✅ Response:`, data);
+    if(response.status===401&&retry&&window.APPIAuth&&window.APPIAuth.refresh){
+      await window.APPIAuth.refresh();
+      return callAdmin(body,false);
+    }
+    const data=await response.json().catch(()=>({}));
+    if(!response.ok)throw new Error(data.error||'No se pudo completar la operación.');
     return data;
   }
 
-  // ============================================
-  // Cargar estadísticas de ganancias
-  // ============================================
-  async function loadRevenueStats() {
-    try {
-      console.log('🔍 Cargando estadísticas de ganancias...');
-      
-      // Obtener todos los pagos
-      const payments = await supabaseRequest('membership_payments?select=amount,payment_date');
-      
-      // Calcular estadísticas
-      const totalRevenue = payments.reduce((sum, p) => sum + parseFloat(p.amount), 0);
-      
-      const now = new Date();
-      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-      const monthlyRevenue = payments
-        .filter(p => new Date(p.payment_date) >= startOfMonth)
-        .reduce((sum, p) => sum + parseFloat(p.amount), 0);
-      
-      // Obtener membresías
-      const memberships = await supabaseRequest('user_memberships?select=status');
-      
-      const activeUsers = memberships.filter(m => m.status === 'active').length;
-      const gracePeriodUsers = memberships.filter(m => m.status === 'grace_period').length;
-      const expiredUsers = memberships.filter(m => m.status === 'expired').length;
-      
-      const stats = {
-        totalRevenue,
-        monthlyRevenue,
-        activeUsers,
-        gracePeriodUsers,
-        expiredUsers
-      };
-      
-      console.log('✅ Estadísticas cargadas:', stats);
-      return stats;
-      
-    } catch (error) {
-      console.error('❌ Error cargando estadísticas:', error);
-      return null;
-    }
+  function money(value){
+    return '$'+Number(value||0).toLocaleString('es-AR',{maximumFractionDigits:2});
   }
 
-  // ============================================
-  // Renderizar panel de estadísticas
-  // ============================================
-  async function renderRevenuePanel() {
-    const container = document.getElementById('revenueStatsContainer');
-    if (!container) return;
-
-    container.innerHTML = '<div class="loading">Cargando estadísticas...</div>';
-    
-    const stats = await loadRevenueStats();
-    
-    if (!stats) {
-      container.innerHTML = '<div class="error">Error cargando estadísticas</div>';
-      return;
-    }
-
-    container.innerHTML = `
-      <div class="revenue-stats">
-        <h2>💰 Estadísticas de Ganancias</h2>
-        
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-label">Ganancias Totales</div>
-            <div class="stat-value">$${stats.totalRevenue.toLocaleString('es-AR')}</div>
-          </div>
-          
-          <div class="stat-card">
-            <div class="stat-label">Ganancias del Mes</div>
-            <div class="stat-value">$${stats.monthlyRevenue.toLocaleString('es-AR')}</div>
-          </div>
-          
-          <div class="stat-card">
-            <div class="stat-label">Usuarios Activos</div>
-            <div class="stat-value">${stats.activeUsers}</div>
-          </div>
-          
-          <div class="stat-card warning">
-            <div class="stat-label">En Prórroga</div>
-            <div class="stat-value">${stats.gracePeriodUsers}</div>
-          </div>
-          
-          <div class="stat-card danger">
-            <div class="stat-label">Vencidos</div>
-            <div class="stat-value">${stats.expiredUsers}</div>
-          </div>
-        </div>
-      </div>
-    `;
-  }
-
-  // ============================================
-  // Crear membresía para nuevo usuario
-  // ============================================
-  async function createMembershipForUser(userId, monthlyFee = 5000) {
-    try {
-      console.log(`🔍 Creando membresía para usuario ${userId}...`);
-      
-      const now = new Date();
-      const expiresAt = new Date(now.getFullYear(), now.getMonth() + 1, now.getDate());
-      
-      const membership = {
-        user_id: userId,
-        status: 'active',
-        starts_at: now.toISOString(),
-        expires_at: expiresAt.toISOString(),
-        monthly_fee: monthlyFee
-      };
-      
-      const result = await supabaseRequest('user_memberships', {
-        method: 'POST',
-        body: JSON.stringify(membership)
-      });
-      
-      console.log('✅ Membresía creada:', result);
-      return result[0];
-      
-    } catch (error) {
-      console.error('❌ Error creando membresía:', error);
-      return null;
-    }
-  }
-
-  // ============================================
-  // Configurar prórroga
-  // ============================================
-  async function setGracePeriod(userId, gracePeriodUntil, notes) {
-    try {
-      console.log(`🔍 Configurando prórroga para usuario ${userId}...`);
-      
-      const update = {
-        status: 'grace_period',
-        grace_period_until: gracePeriodUntil,
-        grace_period_notes: notes
-      };
-      
-      const result = await supabaseRequest(`user_memberships?user_id=eq.${userId}`, {
-        method: 'PATCH',
-        body: JSON.stringify(update)
-      });
-      
-      console.log('✅ Prórroga configurada:', result);
-      return result[0];
-      
-    } catch (error) {
-      console.error('❌ Error configurando prórroga:', error);
-      return null;
-    }
-  }
-
-  // ============================================
-  // Registrar pago
-  // ============================================
-  async function registerPayment(userId, amount, paymentMethod, notes) {
-    try {
-      console.log(`🔍 Registrando pago para usuario ${userId}...`);
-      
-      // Obtener membresía actual
-      const memberships = await supabaseRequest(`user_memberships?user_id=eq.${userId}&select=id`);
-      if (!memberships || memberships.length === 0) {
-        throw new Error('No se encontró membresía para el usuario');
-      }
-      
-      const membershipId = memberships[0].id;
-      
-      // Registrar pago
-      const payment = {
-        user_id: userId,
-        membership_id: membershipId,
-        amount: amount,
-        payment_method: paymentMethod,
-        notes: notes
-      };
-      
-      const paymentResult = await supabaseRequest('membership_payments', {
-        method: 'POST',
-        body: JSON.stringify(payment)
-      });
-      
-      // Actualizar membresía a activa y extender fecha
-      const now = new Date();
-      const expiresAt = new Date(now.getFullYear(), now.getMonth() + 1, now.getDate());
-      
-      const membershipUpdate = {
-        status: 'active',
-        starts_at: now.toISOString(),
-        expires_at: expiresAt.toISOString(),
-        grace_period_until: null,
-        grace_period_notes: null
-      };
-      
-      await supabaseRequest(`user_memberships?user_id=eq.${userId}`, {
-        method: 'PATCH',
-        body: JSON.stringify(membershipUpdate)
-      });
-      
-      console.log('✅ Pago registrado:', paymentResult);
-      return paymentResult[0];
-      
-    } catch (error) {
-      console.error('❌ Error registrando pago:', error);
-      return null;
-    }
-  }
-
-  // ============================================
-  // Mostrar modal de prórroga
-  // ============================================
-  function showGracePeriodModal(userId, userName) {
-    const modal = document.createElement('div');
-    modal.className = 'modal-overlay';
-    modal.innerHTML = `
-      <div class="modal grace-period-modal">
-        <div class="modal-header">
-          <h2>📅 Configurar Prórroga</h2>
-          <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">×</button>
-        </div>
-        
-        <div class="modal-body">
-          <p>Configurar prórroga de pago para <strong>${userName}</strong></p>
-          
-          <div class="form-group">
-            <label>Fecha límite de prórroga:</label>
-            <input type="date" id="gracePeriodDate" class="form-input" />
-          </div>
-          
-          <div class="form-group">
-            <label>Notas del acuerdo:</label>
-            <textarea id="gracePeriodNotes" class="form-input" rows="3" placeholder="Ej: Acordó pagar el 15/09"></textarea>
-          </div>
-        </div>
-        
-        <div class="modal-footer">
-          <button class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">Cancelar</button>
-          <button class="btn btn-primary" id="btnSaveGracePeriod">Guardar Prórroga</button>
-        </div>
-      </div>
-    `;
-    
-    document.body.appendChild(modal);
-    
-    // Configurar fecha mínima (hoy)
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('gracePeriodDate').min = today;
-    
-    // Event listener para guardar
-    document.getElementById('btnSaveGracePeriod').onclick = async () => {
-      const date = document.getElementById('gracePeriodDate').value;
-      const notes = document.getElementById('gracePeriodNotes').value;
-      
-      if (!date) {
-        alert('Por favor seleccioná una fecha');
-        return;
-      }
-      
-      const result = await setGracePeriod(userId, date, notes);
-      
-      if (result) {
-        alert('✅ Prórroga configurada correctamente');
-        modal.remove();
-        renderRevenuePanel(); // Actualizar estadísticas
-      } else {
-        alert('❌ Error configurando prórroga');
-      }
+  async function loadRevenueStats(){
+    const data=await callAdmin({action:'membership_stats'});
+    return {
+      totalRevenue:Number(data.total_revenue)||0,
+      monthlyRevenue:Number(data.monthly_revenue)||0,
+      activeUsers:Number(data.active_users)||0,
+      gracePeriodUsers:Number(data.grace_period_users)||0,
+      expiredUsers:Number(data.expired_users)||0
     };
   }
 
-  // ============================================
-  // Mostrar modal de pago
-  // ============================================
-  function showPaymentModal(userId, userName) {
-    const modal = document.createElement('div');
-    modal.className = 'modal-overlay';
-    modal.innerHTML = `
-      <div class="modal payment-modal">
-        <div class="modal-header">
-          <h2>💳 Registrar Pago</h2>
-          <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">×</button>
-        </div>
-        
+  async function renderRevenuePanel(){
+    const container=$('revenueStatsContainer');
+    if(!container)return;
+    container.innerHTML='<div class="loading">Cargando estadísticas…</div>';
+    try{
+      const stats=await loadRevenueStats();
+      container.innerHTML=`
+        <div class="revenue-stats">
+          <h2>💰 Estadísticas de membresías</h2>
+          <div class="stats-grid">
+            <div class="stat-card"><div class="stat-label">Ingresos registrados</div><div class="stat-value">${money(stats.totalRevenue)}</div></div>
+            <div class="stat-card"><div class="stat-label">Ingresos del mes</div><div class="stat-value">${money(stats.monthlyRevenue)}</div></div>
+            <div class="stat-card"><div class="stat-label">Usuarios activos</div><div class="stat-value">${stats.activeUsers}</div></div>
+            <div class="stat-card warning"><div class="stat-label">En prórroga</div><div class="stat-value">${stats.gracePeriodUsers}</div></div>
+            <div class="stat-card danger"><div class="stat-label">Vencidos</div><div class="stat-value">${stats.expiredUsers}</div></div>
+          </div>
+        </div>`;
+    }catch(error){
+      container.innerHTML=`<div class="error">${esc(error.message)}</div>`;
+    }
+  }
+
+  async function createMembershipForUser(userId,monthlyFee=5000){
+    const data=await callAdmin({action:'ensure_membership',user_id:userId,monthly_fee:Number(monthlyFee)||5000});
+    return data.membership||null;
+  }
+
+  async function setGracePeriod(userId,gracePeriodUntil,notes=''){
+    const data=await callAdmin({
+      action:'set_grace_period',
+      user_id:userId,
+      grace_period_until:gracePeriodUntil,
+      notes:String(notes||'').trim().slice(0,1000)
+    });
+    return data.membership||null;
+  }
+
+  async function registerPayment(userId,amount,paymentMethod,notes=''){
+    const data=await callAdmin({
+      action:'register_membership_payment',
+      user_id:userId,
+      amount:Number(amount),
+      payment_method:String(paymentMethod||''),
+      notes:String(notes||'').trim().slice(0,1000)
+    });
+    return data;
+  }
+
+  function closeModal(modal){if(modal&&modal.remove)modal.remove()}
+
+  function showGracePeriodModal(userId,userName){
+    const modal=document.createElement('div');
+    modal.className='modal-overlay membership-modal-overlay';
+    modal.innerHTML=`
+      <div class="modal grace-period-modal" role="dialog" aria-modal="true" aria-labelledby="membershipGraceTitle">
+        <div class="modal-header"><h2 id="membershipGraceTitle">📅 Configurar prórroga</h2><button type="button" class="modal-close" aria-label="Cerrar">×</button></div>
         <div class="modal-body">
-          <p>Registrar pago de <strong>${userName}</strong></p>
-          
-          <div class="form-group">
-            <label>Monto ($):</label>
-            <input type="number" id="paymentAmount" class="form-input" value="5000" min="0" step="100" />
-          </div>
-          
-          <div class="form-group">
-            <label>Método de pago:</label>
-            <select id="paymentMethod" class="form-input">
-              <option value="transferencia">Transferencia</option>
-              <option value="efectivo">Efectivo</option>
-              <option value="mercadopago">Mercado Pago</option>
-              <option value="otro">Otro</option>
-            </select>
-          </div>
-          
-          <div class="form-group">
-            <label>Notas:</label>
-            <textarea id="paymentNotes" class="form-input" rows="2" placeholder="Notas opcionales"></textarea>
-          </div>
+          <p>Configurar prórroga de pago para <strong>${esc(userName)}</strong></p>
+          <div class="form-group"><label for="gracePeriodDate">Fecha límite de prórroga</label><input type="date" id="gracePeriodDate" class="form-input"></div>
+          <div class="form-group"><label for="gracePeriodNotes">Notas del acuerdo</label><textarea id="gracePeriodNotes" class="form-input" rows="3" maxlength="1000" placeholder="Ej: Acordó pagar el 15/09"></textarea></div>
+          <div class="admin-inline-status" id="gracePeriodStatus" role="status"></div>
         </div>
-        
-        <div class="modal-footer">
-          <button class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">Cancelar</button>
-          <button class="btn btn-primary" id="btnSavePayment">Registrar Pago</button>
-        </div>
-      </div>
-    `;
-    
+        <div class="modal-footer"><button type="button" class="btn btn-secondary" data-membership-cancel>Cancelar</button><button type="button" class="btn btn-primary" id="btnSaveGracePeriod">Guardar prórroga</button></div>
+      </div>`;
     document.body.appendChild(modal);
-    
-    // Event listener para guardar
-    document.getElementById('btnSavePayment').onclick = async () => {
-      const amount = parseFloat(document.getElementById('paymentAmount').value);
-      const method = document.getElementById('paymentMethod').value;
-      const notes = document.getElementById('paymentNotes').value;
-      
-      if (!amount || amount <= 0) {
-        alert('Por favor ingresá un monto válido');
-        return;
-      }
-      
-      const result = await registerPayment(userId, amount, method, notes);
-      
-      if (result) {
-        alert('✅ Pago registrado correctamente');
-        modal.remove();
-        renderRevenuePanel(); // Actualizar estadísticas
-      } else {
-        alert('❌ Error registrando pago');
-      }
+    const date=$('gracePeriodDate');
+    date.min=new Date().toISOString().slice(0,10);
+    const suggested=new Date();suggested.setDate(suggested.getDate()+7);date.value=suggested.toISOString().slice(0,10);
+    modal.querySelector('.modal-close').onclick=()=>closeModal(modal);
+    modal.querySelector('[data-membership-cancel]').onclick=()=>closeModal(modal);
+    $('btnSaveGracePeriod').onclick=async()=>{
+      const button=$('btnSaveGracePeriod'),status=$('gracePeriodStatus');
+      if(!date.value){status.textContent='Seleccioná una fecha.';status.className='admin-inline-status show error';date.focus();return}
+      button.disabled=true;button.textContent='Guardando…';status.className='admin-inline-status';status.textContent='';
+      try{
+        await setGracePeriod(userId,date.value,$('gracePeriodNotes').value);
+        closeModal(modal);
+        await renderRevenuePanel();
+        if(window.APPIAdminPanel&&window.APPIAdminPanel.load)await window.APPIAdminPanel.load();
+        if(typeof window.showToast==='function')window.showToast('Prórroga actualizada ✓',2200);
+      }catch(error){status.textContent=error.message;status.className='admin-inline-status show error';button.disabled=false;button.textContent='Guardar prórroga'}
     };
   }
 
-  // ============================================
-  // Exponer funciones globales
-  // ============================================
-  window.APPIAdminMembership = {
+  function showPaymentModal(userId,userName){
+    const modal=document.createElement('div');
+    modal.className='modal-overlay membership-modal-overlay';
+    modal.innerHTML=`
+      <div class="modal payment-modal" role="dialog" aria-modal="true" aria-labelledby="membershipPaymentTitle">
+        <div class="modal-header"><h2 id="membershipPaymentTitle">💳 Registrar pago</h2><button type="button" class="modal-close" aria-label="Cerrar">×</button></div>
+        <div class="modal-body">
+          <p>Registrar pago de <strong>${esc(userName)}</strong></p>
+          <div class="form-group"><label for="paymentAmount">Monto ($)</label><input type="number" id="paymentAmount" class="form-input" value="5000" min="1" max="1000000000" step="100"></div>
+          <div class="form-group"><label for="paymentMethod">Método de pago</label><select id="paymentMethod" class="form-input"><option value="transferencia">Transferencia</option><option value="efectivo">Efectivo</option><option value="mercadopago">Mercado Pago</option><option value="otro">Otro</option></select></div>
+          <div class="form-group"><label for="paymentNotes">Notas</label><textarea id="paymentNotes" class="form-input" rows="2" maxlength="1000" placeholder="Notas opcionales"></textarea></div>
+          <div class="admin-inline-status" id="paymentStatus" role="status"></div>
+        </div>
+        <div class="modal-footer"><button type="button" class="btn btn-secondary" data-membership-cancel>Cancelar</button><button type="button" class="btn btn-primary" id="btnSavePayment">Registrar pago</button></div>
+      </div>`;
+    document.body.appendChild(modal);
+    modal.querySelector('.modal-close').onclick=()=>closeModal(modal);
+    modal.querySelector('[data-membership-cancel]').onclick=()=>closeModal(modal);
+    $('btnSavePayment').onclick=async()=>{
+      const amount=Number($('paymentAmount').value),button=$('btnSavePayment'),status=$('paymentStatus');
+      if(!Number.isFinite(amount)||amount<=0){status.textContent='Ingresá un monto válido.';status.className='admin-inline-status show error';$('paymentAmount').focus();return}
+      button.disabled=true;button.textContent='Registrando…';status.className='admin-inline-status';status.textContent='';
+      try{
+        await registerPayment(userId,amount,$('paymentMethod').value,$('paymentNotes').value);
+        closeModal(modal);
+        await renderRevenuePanel();
+        if(window.APPIAdminPanel&&window.APPIAdminPanel.load)await window.APPIAdminPanel.load();
+        if(typeof window.showToast==='function')window.showToast('Pago registrado y membresía extendida ✓',2600);
+      }catch(error){status.textContent=error.message;status.className='admin-inline-status show error';button.disabled=false;button.textContent='Registrar pago'}
+    };
+  }
+
+  window.APPIAdminMembership={
     renderRevenuePanel,
+    loadRevenueStats,
     createMembershipForUser,
+    setGracePeriod,
+    registerPayment,
     showGracePeriodModal,
     showPaymentModal
   };
-
-  // ============================================
-  // Inicializar cuando el DOM esté listo
-  // ============================================
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-      console.log('🔍 DOM listo, inicializando membership-admin');
-    });
-  }
-
 })();

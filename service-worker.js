@@ -1,21 +1,43 @@
-const CACHE_NAME = 'appi-v249-gps-en-negocio';
+const CACHE_NAME = 'appi-v250-pre-release-hardening';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
   './index.html',
+  './encuesta.html',
+  './formulario-equipo.html',
+  './revisar-contactos.html',
   './auth-config.js',
   './appi-dialog.js',
   './whatsapp-app.js',
   './auth-client.js',
   './data-sync.js',
+  './js/membership-admin.js',
   './admin-panel.js',
   './account-request.js',
   './qr-code.js',
   './gestion-client.js',
+  './escalera-suenos.js',
+  './demo-guia.js',
+  './tablero-negocio.js',
+  './porque-vivo.js',
+  './home-limpio.js',
   './device-bridge.js',
-  './encuesta.html',
+  './css/membership-admin.css',
   './historico.css',
   './historico.js',
+  './vendor/xlsx.full.min.js',
+  './vendor/leaflet.css',
+  './vendor/leaflet.js',
+  './vendor/html2canvas.min.js',
+  './vendor/jspdf.umd.min.js',
+  './vendor/svg2pdf.umd.min.js',
+  './vendor/jszip.min.js',
+  './vendor/transformers.min.js',
+  './vendor/images/layers.png',
+  './vendor/images/layers-2x.png',
+  './vendor/images/marker-icon.png',
+  './vendor/images/marker-icon-2x.png',
+  './vendor/images/marker-shadow.png',
   './manifest.json',
   './icon-192.png',
   './notification-badge.png',
@@ -71,12 +93,6 @@ self.addEventListener('fetch', event => {
         })
         .catch(() => caches.match('./index.html'))
     );
-    return;
-  }
-
-  // La lista de revocación anterior nunca se sirve desde una caché persistente.
-  if (url.pathname.endsWith('/blocklist.json')) {
-    event.respondWith(fetch(event.request, { cache: 'no-store' }));
     return;
   }
 

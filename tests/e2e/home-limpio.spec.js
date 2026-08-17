@@ -57,17 +57,17 @@ async function entrar(page) {
   await expect(page.locator('#lockScreen')).toHaveClass(/hidden/);
 }
 
-test('el home limpio muestra porqué y a quién escribir hoy', async ({ page }) => {
+test('el home muestra el porqué y prioriza la jornada de hoy', async ({ page }) => {
   await entrar(page);
 
   const home = page.locator('#homeLimpio');
   await expect(home).toBeVisible();
-  await expect(home).toContainText('Que mi familia viva tranquila');   // porqué en una línea
-  await expect(home).toContainText('¿Quién te espera hoy?');
+  await expect(home).toContainText('Que mi familia viva tranquila');
+  await expect(home).toContainText('Tu jornada');
   await expect(home).toContainText('Jorge Salas');
-  await expect(home.locator('[data-wa]')).toHaveCount(3);               // WhatsApp directo
-  await expect(home).toContainText('Enviar encuesta');
-  await expect(home).toContainText('Agregar contacto');
+  await expect(home).toContainText('Lucía Vega');
+  await expect(home.locator('[data-wa]')).toHaveCount(1);
+  await expect(home).toContainText('Ver todo el Panel');
 });
 
 test('el selector de páginas navega y cada página tiene lo suyo', async ({ page }) => {
@@ -78,7 +78,7 @@ test('el selector de páginas navega y cada página tiene lo suyo', async ({ pag
 
   await page.locator('#pageTabs button[data-view="view-negocio"]').click();
   await expect(page.locator('#view-negocio')).toHaveClass(/active/);
-  await expect(page.locator('#carreraBlock')).toBeVisible();
+  await expect(page.locator('#gpsBlock')).toBeVisible();
   await expect(page.locator('#negGrid')).toContainText('Panel de Contactos');
 
   await page.locator('#pageTabs button[data-view="view-mes"]').click();
@@ -99,11 +99,16 @@ test('en pantalla de PC el selector se esconde y manda la sidebar', async ({ pag
   await expect(page.locator('#deskSidebar')).toBeVisible();
 });
 
-test('Agregar contacto desde el home abre el panel con el formulario', async ({ page }) => {
+test('la tarjeta de la jornada abre el calendario y guarda tareas', async ({ page }) => {
   await entrar(page);
-  await page.locator('#hlAgregar').click();
-  await expect(page.locator('#view-gestion')).toHaveClass(/active/);
-  await expect(page.locator('#genteForm')).toBeVisible();
+  await page.locator('#hlCardOpen').click();
+  await expect(page.locator('#calOverlay')).toHaveClass(/open/);
+  await page.locator('#calNewTask').fill('Preparar demostración');
+  await page.locator('#calAddBtn').click();
+  await expect(page.locator('#calModal')).toContainText('Preparar demostración');
+  await page.locator('#calClose').click();
+  await expect(page.locator('#calOverlay')).not.toHaveClass(/open/);
+  await expect(page.locator('#homeLimpio')).toContainText('Preparar demostración');
 });
 
 test('el indicador glass del selector sigue a la pagina activa', async ({ page }) => {

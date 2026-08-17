@@ -17,7 +17,11 @@
   function clave(){ return 'appi_porque_v1_' + uid(); }
   function leer(){ try{ return JSON.parse(localStorage.getItem(clave()) || 'null'); }catch(e){ return null; } }
   function guardar(v){ try{ localStorage.setItem(clave(), JSON.stringify(v)); }catch(e){} }
-  function esc(s){ return String(s == null ? '' : s).replace(/</g, '&lt;'); }
+  function esc(s){
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
 
   var PREGUNTAS = [
     '¿Qué querés lograr con esta actividad?',

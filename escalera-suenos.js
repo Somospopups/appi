@@ -12,6 +12,11 @@
     return window.APPIAuth && window.APPIAuth.userId ? window.APPIAuth.userId() : '';
   }
   function clave(){ return 'appi_suenos_v1_' + uid(); }
+  function esc(value){
+    return String(value == null ? '' : value).replace(/[&<>"']/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
 
   function leer(){
     try{
@@ -52,10 +57,10 @@
     // El sueño 1 va abajo, como en la escalera de papel.
     for (var i = 6; i >= 0; i--) {
       filas += '<div class="sueno-item"><span class="sueno-num">' + (i + 1) + '</span>' +
-        '<input data-sueno="' + i + '" maxlength="90" placeholder="' + (i === 0 ? 'Tu primer sueño, el más cercano' : 'Sueño ' + (i + 1)) + '" value="' + String(v.suenos[i] || '').replace(/"/g, '&quot;') + '"></div>';
+        '<input data-sueno="' + i + '" maxlength="90" placeholder="' + (i === 0 ? 'Tu primer sueño, el más cercano' : 'Sueño ' + (i + 1)) + '" value="' + esc(v.suenos[i] || '') + '"></div>';
     }
     cont.innerHTML = '<div class="suenos-wrap">' +
-      '<div class="suenos-pq"><h3>💙 Tu “para qué”</h3><textarea id="suenosParaQue" maxlength="400" placeholder="Para qué hacés esta actividad…">' + String(v.para_que || '').replace(/</g, '&lt;') + '</textarea></div>' +
+      '<div class="suenos-pq"><h3>💙 Tu “para qué”</h3><textarea id="suenosParaQue" maxlength="400" placeholder="Para qué hacés esta actividad…">' + esc(v.para_que || '') + '</textarea></div>' +
       '<h3 style="margin:0 0 10px;font-size:13px;color:#343441">🪜 La escalera (1 = el más cercano)</h3>' + filas +
       '<div class="suenos-acciones"><button type="button" class="suenos-share" id="suenosShare">📤 Compartir por WhatsApp</button></div>' +
       '</div>';

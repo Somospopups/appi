@@ -1,0 +1,3 @@
+# Los artefactos de terceros se conservan byte por byte para que coincidan con
+# sus hashes SRI. No normalizar ni corregir espacios de archivos vendorizados.
+vendor/** -text -whitespace

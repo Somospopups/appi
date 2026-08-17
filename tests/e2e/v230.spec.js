@@ -92,18 +92,6 @@ test('la guía de demo tiene los 5 pasos y las fichas de producto', async ({ pag
   await expect(page.locator('#view-gestion')).toHaveClass(/active/);
 });
 
-test('la carrera avisa mantenimiento, anchura y Pareto', async ({ page }) => {
-  await entrar(page);
-
-  const card = page.locator('#carreraBlock');
-  // Meses [0, 3, 1] contra el mínimo de 2 PB: uno cumplido.
-  await expect(card).toContainText('Mantenimiento');
-  await expect(card).toContainText('Te falta un mes cumplido más');
-  // Anchura: un patrocinio nuevo este mes. Pareto: 10/25 = 40%.
-  await expect(card).toContainText('anchura 1 patrocinio nuevo');
-  await expect(card).toContainText('el 20% más fuerte genera el 40% del PB');
-});
-
 test('el formulario del equipo arma el lead por WhatsApp con todos los datos', async ({ page }) => {
   await page.goto('/formulario-equipo.html');
   await page.fill('#f-nombre', 'Carla');

@@ -70,9 +70,10 @@ test('el ciclo se avisa cíclico y convive con Las 7 P', async ({ page }) => {
   await expect(page.locator('#sieteSteps')).toContainText('PARAR');
 });
 
-test('el home y el menú ofrecen el acceso a Los 8 Pasos', async ({ page }) => {
+test('Herramientas y el menú ofrecen el acceso a Los 8 Pasos', async ({ page }) => {
   await entrar(page);
 
-  await expect(page.locator('#homeExtraKeep')).toContainText('Los 8 Pasos');
+  await page.evaluate(() => window.showView('view-herramientas'));
+  await expect(page.locator('#view-herramientas')).toContainText('Los 8 Pasos');
   await expect(page.locator('#deskSidebar')).toContainText('Los 8 Pasos');
 });

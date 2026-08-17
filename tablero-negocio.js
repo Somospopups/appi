@@ -37,7 +37,11 @@
     }catch(e){ return { pb: 0, invitados: 0 }; }
   }
   function mesActual(d){ var i = new Date(); i.setDate(1); i.setHours(0,0,0,0); return new Date(d) >= i; }
-  function esc(s){ return String(s == null ? '' : s).replace(/</g, '&lt;'); }
+  function esc(s){
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
 
   function estilo(){
     if ($('tableroStyle')) return;
@@ -364,13 +368,8 @@
       var g = $('gpsBlock');
       g.outerHTML = htmlGps();
     }
-    var extra = $('homeExtraKeep');
-    if (extra && !$('miniBotella')) {
-      var grid = extra.querySelector('.home-mini-tools');
-      if (grid) grid.insertAdjacentHTML('beforeend',
-        '<button type="button" class="home-mini-tool" id="miniBotella" onclick="abrirBotella()"><div class="home-mini-ico" style="background:linear-gradient(135deg,#5b8def,#3ad0a4)">🍶</div><div class="home-mini-txt"><strong>La botella</strong><small>Conciencia en la demo</small></div></button>' +
-        '<button type="button" class="home-mini-tool" id="miniSim" onclick="abrirSimulador()"><div class="home-mini-ico" style="background:linear-gradient(135deg,#f5b301,#ff8f6b)">🧮</div><div class="home-mini-txt"><strong>Simulador</strong><small>Tu mes soñado</small></div></button>');
-    }
+    // La botella y el simulador viven en Herramientas. El Home ya no mantiene
+    // la grilla antigua homeExtraKeep, eliminada con el timeline de v247.
   }
 
   // Enganches suaves: este script vive en el <head> y las funciones del

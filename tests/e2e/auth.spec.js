@@ -64,6 +64,10 @@ async function mockSupabase(page) {
       if (body.action === 'list') return route.fulfill({ status: 200, headers: cors, body: JSON.stringify({ users: Object.values(profiles) }) });
       if (body.action === 'list_requests') return route.fulfill({ status: 200, headers: cors, body: JSON.stringify({ requests: pendingRequests }) });
       if (body.action === 'get_settings') return route.fulfill({ status: 200, headers: cors, body: JSON.stringify({ whatsapp }) });
+      if (body.action === 'membership_stats') return route.fulfill({ status: 200, headers: cors, body: JSON.stringify({ total_revenue: 15000, monthly_revenue: 5000, active_users: 2, grace_period_users: 0, expired_users: 0 }) });
+      if (body.action === 'ensure_membership') return route.fulfill({ status: 200, headers: cors, body: JSON.stringify({ membership: { user_id: body.user_id, status: 'active' } }) });
+      if (body.action === 'set_grace_period') return route.fulfill({ status: 200, headers: cors, body: JSON.stringify({ membership: { user_id: body.user_id, status: 'grace_period', grace_period_until: body.grace_period_until } }) });
+      if (body.action === 'register_membership_payment') return route.fulfill({ status: 200, headers: cors, body: JSON.stringify({ ok: true, expires_at: new Date(Date.now()+30*86400000).toISOString() }) });
       if (body.action === 'set_whatsapp') { whatsapp=body.numero; return route.fulfill({ status: 200, headers: cors, body: JSON.stringify({ whatsapp }) }); }
       if (body.action === 'set_membership') { const user=profiles[body.user_id];user.membresia_meses=body.membership_months;user.membresia_vence=new Date(Date.now()+body.membership_months*30*86400000).toISOString();return route.fulfill({status:200,headers:cors,body:JSON.stringify({user})}); }
       if (body.action === 'delete_user') { delete profiles[body.user_id];return route.fulfill({status:200,headers:cors,body:'{"ok":true}'}); }
@@ -113,7 +117,7 @@ test('cada distribuidor sincroniza y ve únicamente sus datos', async ({ page })
   await page.goto('/index.html', { waitUntil: 'networkidle' });
 
   await expect(page.locator('#distributorLoginPanel')).toBeVisible();
-  await expect(page.locator('#legacyActivationPanel')).toBeHidden();
+  await expect(page.locator('#legacyActivationPanel')).toHaveCount(0);
   await login(page, '029802014');
   const ownership=await page.evaluate(()=>{
     const check=value=>{try{return validarTitularContraCuenta(value)}catch(error){return false}};
@@ -149,11 +153,15 @@ test('cada distribuidor sincroniza y ve únicamente sus datos', async ({ page })
   await page.evaluate(() => APPIAuth.changePassword('NuevaClave2026!'));
   expect(backend.passwordChanges).toEqual(['NuevaClave2026!']);
 
-  await page.evaluate(() => {
+  await page.evaluate(userId => {
     localStorage.setItem('presu_2026_7', JSON.stringify({ ingresos: 1000, propietario: 'A' }));
-  });
+    localStorage.setItem(`appi_cal_tareas_v1_${userId}`, JSON.stringify({ '2026-08-17': [{ id: 1, texto: 'Demo', done: false }] }));
+    localStorage.setItem(`appi_porque_v1_${userId}`, JSON.stringify({ niveles: ['Mi familia'] }));
+  }, USER_A);
   await page.evaluate(() => APPIDataSync.syncNow(true));
   expect(cloud.get(USER_A).has('presu_2026_7')).toBe(true);
+  expect(cloud.get(USER_A).has(`appi_cal_tareas_v1_${USER_A}`)).toBe(true);
+  expect(cloud.get(USER_A).has(`appi_porque_v1_${USER_A}`)).toBe(true);
 
   backend.setOffline(true);
   await page.reload({ waitUntil: 'networkidle' });
@@ -279,12 +287,14 @@ test('administración ingresa por el candado y no tiene distribuidor asociado', 
   await expect(page.locator('#adminPendingList')).toContainText('Solicitud Pendiente');
   await expect(page.locator('#adminStatPending')).toHaveText('1');
   await expect(page.locator('[data-admin-action="people"]').first()).toBeVisible();
-  await expect(page.locator('[data-admin-action="membership"]').first()).toBeVisible();
+  await expect(page.locator('[data-admin-action="grace_period"]').first()).toBeVisible();
+  await expect(page.locator('[data-admin-action="payment"]').first()).toBeVisible();
   await expect(page.locator('[data-admin-action="delete"]').first()).toBeVisible();
-  await page.locator('[data-admin-action="membership"]').first().click();
-  await expect(page.locator('#appiDialogTitle')).toHaveText('Activar membresía');
-  await page.locator('#appiDialogOk').click();
-  await expect(page.locator('#appiDialogTitle')).toBeHidden();
+  await expect(page.locator('#revenueStatsContainer')).toContainText('Ingresos registrados');
+  await page.locator('[data-admin-action="grace_period"]').first().click();
+  await expect(page.locator('.grace-period-modal')).toBeVisible();
+  await page.locator('.grace-period-modal .modal-close').click();
+  await expect(page.locator('.grace-period-modal')).toHaveCount(0);
   expect(nativeDialogs).toEqual([]);
   const profile=await page.evaluate(()=>APPIAuth.currentProfile());
   expect(profile).toMatchObject({username:'popups',dip:null,rol:'admin'});

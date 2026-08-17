@@ -4,14 +4,14 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
-- Versión: **v247 · Motion**.
+- Versión candidata: **v250 · Pre-publicación segura**.
 - Publicación: [https://somospopups.github.io/appi/](https://somospopups.github.io/appi/)
 - Acceso por número de distribuidor y contraseña.
 - Acceso administrador POPUPS mediante el candado, sin DIP ni número de distribuidor.
 - Autenticación, datos, membresías, solicitudes y archivos mediante Supabase.
 - Sincronización automática por cuenta.
 - Funcionamiento offline por hasta 7 días desde la última validación.
-- Grabaciones de audio locales: no se suben a la nube.
+- Grabaciones y transcripciones de audio locales: no se suben a la nube.
 
 ## Con qué WhatsApp se envía
 
@@ -141,9 +141,13 @@ La suite cubre la aplicación, autenticación, aislamiento por cuenta, solicitud
 - `auth-client.js`: login y sesión.
 - `data-sync.js`: sincronización local/nube.
 - `appi-dialog.js`: diálogos visuales APPI.
+- `service-worker.js`: caché offline y notificaciones Push.
+- `vendor/`: bibliotecas fijadas localmente y licencias de terceros.
 - `SUPABASE_INSTALACION_COMPLETA.sql`: instalación consolidada.
 - `SUPABASE_ENCUESTAS_GESTION.sql`: módulo de encuestas y CRM.
+- `SUPABASE_MEMBRESIAS.sql`: acceso, prórrogas y registro seguro de pagos.
 - `supabase/functions/encuesta-publica/index.ts`: recepción pública segura.
+- `.github/workflows/deploy-backend.yml`: migraciones y despliegue de las Edge Functions.
 
 ## Seguridad y privacidad
 
@@ -152,7 +156,10 @@ La suite cubre la aplicación, autenticación, aislamiento por cuenta, solicitud
 - Cada invitación vence en 24 horas, se reclama desde un solo dispositivo y queda inutilizada después del envío.
 - Los referidos son opcionales y requieren confirmación de autorización.
 - Se normalizan teléfonos y se evitan contactos duplicados por distribuidor.
+- Supabase es el único mecanismo de acceso; no existe una activación calculada en el navegador.
+- `appi_perfiles.membresia_vence` es la fuente de verdad del acceso, incluso cuando se registra un pago o una prórroga.
 - La clave `service_role`, los tokens personales y claves de proveedores externos nunca deben incluirse en el frontend ni en GitHub.
+- Las grabaciones y transcripciones permanecen en el dispositivo; APPI no acepta claves privadas de IA en el navegador.
 - No deben agregarse `alert()`, `confirm()` ni `prompt()` nativos. Usar siempre `APPIDialog`.
 
 ## Publicación
@@ -161,5 +168,6 @@ La rama `main` se publica mediante GitHub Pages. En cada release:
 
 1. Actualizar la versión visible y `package.json`.
 2. Cambiar `CACHE_NAME` en `service-worker.js`.
-3. Ejecutar `npm test`.
-4. Integrar a `main` y revisar GitHub Actions.
+3. Ejecutar `npm test` y confirmar que la suite completa esté en verde.
+4. Ejecutar manualmente **Publicar backend completo de APPI** si hay migraciones o Edge Functions nuevas.
+5. Integrar a `main`, revisar GitHub Actions y verificar GitHub Pages.

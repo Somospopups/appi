@@ -1,4 +1,4 @@
-name: Publicar backend de cuentas y teléfonos
+name: Publicar backend completo de APPI
 
 # Ejecución manual: requiere SUPABASE_ACCESS_TOKEN guardado como secret.
 on:
@@ -20,12 +20,12 @@ jobs:
       - name: Verificar credencial temporal
         run: test -n "$SUPABASE_ACCESS_TOKEN" || (echo "Falta el secret SUPABASE_ACCESS_TOKEN" && exit 1)
 
-      - name: Instalar migraciones de titular, socio y recordatorios
+      - name: Instalar esquema y migraciones
         run: |
-          # Cada migración informa su propio resultado. Sin esto, un error
-          # temprano corta el paso sin decir cuál de los archivos falló.
+          # El instalador consolidado crea la base; las migraciones posteriores
+          # completan módulos agregados después y son seguras al reejecutarse.
           fallidas=""
-          for migration in SUPABASE_PERSONAS_CUENTA.sql SUPABASE_INVITACIONES_PERSONA.sql SUPABASE_RECORDATORIOS.sql; do
+          for migration in SUPABASE_INSTALACION_COMPLETA.sql SUPABASE_MI_GENTE.sql SUPABASE_MEMBRESIAS.sql SUPABASE_PERSONAS_CUENTA.sql SUPABASE_INVITACIONES_PERSONA.sql SUPABASE_RECORDATORIOS.sql; do
             echo "::group::$migration"
             jq -Rs '{query: ., read_only: false}' "$migration" > /tmp/migration.json
             if curl --fail-with-body --silent --show-error \
@@ -58,8 +58,14 @@ jobs:
       - name: Publicar solicitudes de cuenta
         run: supabase functions deploy solicitud-cuenta --no-verify-jwt --project-ref "$SUPABASE_PROJECT_ID"
 
+      - name: Publicar recepción segura de encuestas
+        run: supabase functions deploy encuesta-publica --no-verify-jwt --project-ref "$SUPABASE_PROJECT_ID"
+
       - name: Publicar teléfonos por persona
         run: supabase functions deploy dispositivo-puente --project-ref "$SUPABASE_PROJECT_ID"
+
+      - name: Publicar análisis de Histórico
+        run: supabase functions deploy historico-analisis --project-ref "$SUPABASE_PROJECT_ID"
 
       - name: Publicar recordatorios de Mi Gestión
         run: supabase functions deploy recordatorios-gestion --project-ref "$SUPABASE_PROJECT_ID"
