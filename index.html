@@ -9817,54 +9817,8 @@ function renderHomeCompleto(){
 
 
 // === OVERRIDE HOME TOOLS - accesos rápidos complementarios ===
-(function(){
-  const _origTools = renderToolsList;
-  renderToolsList = function(){
-    _origTools();
-    try{
-      const list=document.getElementById('herrWrap')||document.getElementById('herrGrid')||document.getElementById('toolsList');
-      if(!list) return;
-      const existing=document.getElementById('homeExtraTools');
-      if(existing) existing.remove();
-      const existing2=document.getElementById('homeExtraKeep');
-      if(existing2) existing2.remove();
-
-      // Dos herramientas complementarias: Grabadora + Notas.
-      // Panel de Contactos vive solamente en la sección Mi negocio.
-      const extraKeep=document.createElement('div');
-      extraKeep.id='homeExtraKeep';
-      extraKeep.className='home-section-block';
-      extraKeep.innerHTML=`
-        <div class="mini-section-label"><span>⚡</span> Mis herramientas</div>
-        <div class="home-mini-tools">
-          <button type="button" class="home-mini-tool" onclick="openOcho()">
-            <div class="home-mini-ico" style="background:linear-gradient(135deg,#5b8def,#3ad0a4)">🧭</div>
-            <div class="home-mini-txt">
-              <strong>Los 8 Pasos</strong>
-              <small>El ciclo del negocio</small>
-            </div>
-          </button>
-          <button type="button" class="home-mini-tool" onclick="openGrabadora()">
-            <div class="home-mini-ico" style="background:linear-gradient(135deg,#ff6b6b,#a06bff)">🎙️</div>
-            <div class="home-mini-txt">
-              <strong>Grabadora</strong>
-              <small>Grabá y escuchá</small>
-            </div>
-          </button>
-          <button type="button" class="home-mini-tool" onclick="showView('view-notas')">
-            <div class="home-mini-ico" style="background:linear-gradient(135deg,#fbbf24,#f59e0b)">📝</div>
-            <div class="home-mini-txt">
-              <strong>Notas Keep</strong>
-              <small>Stick de colores</small>
-            </div>
-          </button>
-        </div>
-      `;
-      list.appendChild(extraKeep);
-      if(window.APPIGestion&&window.APPIGestion.updateBadges)window.APPIGestion.updateBadges();
-    }catch(e){ console.log('homeExtra error',e); }
-  };
-})();
+// v247: Las herramientas ahora se renderizan directamente en herrGrid
+// sin duplicar el override de renderToolsList
 
 function renderPlanningTools(){
   const pr = obtenerDatosPresupuestoActual();
