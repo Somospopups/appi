@@ -3027,12 +3027,12 @@ body.dark .admin-login-card{background:#242638}body.dark .admin-login-card h2{co
   .next-step-card {
     position: relative;
     overflow: hidden;
-    margin: 0 0 12px;
+    margin: 0 0 14px;
     padding: 14px 16px;
-    border-radius: 20px;
+    border-radius: 18px;
     background: linear-gradient(135deg, rgba(21,25,39,0.92), rgba(61,99,201,0.86));
     color: #fff;
-    box-shadow: 0 14px 36px rgba(61,99,201,0.22);
+    box-shadow: 0 6px 22px rgba(80,90,130,0.10);
   }
   .next-step-card::after {
     content: "";
@@ -3170,6 +3170,9 @@ body.dark .admin-login-card{background:#242638}body.dark .admin-login-card h2{co
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 10px;
   }
+  .home-tool-grid .quick-tool-card {
+    min-height: 120px;
+  }
   .quick-tool-card,
   .business-card {
     font-family: inherit;
@@ -3201,12 +3204,12 @@ body.dark .admin-login-card{background:#242638}body.dark .admin-login-card h2{co
     display: block;
     position: relative;
     overflow: hidden;
-    min-height: 154px;
-    padding: 13px;
-    border-radius: 22px;
+    min-height: 120px;
+    padding: 11px;
+    border-radius: 18px;
     border: 1px solid rgba(255,255,255,0.75);
     background: rgba(255,255,255,0.58);
-    box-shadow: 0 10px 28px rgba(80,90,130,0.09);
+    box-shadow: 0 8px 20px rgba(80,90,130,0.08);
     text-align: left;
     transition: transform .15s ease, box-shadow .15s ease;
   }
@@ -3226,19 +3229,19 @@ body.dark .admin-login-card{background:#242638}body.dark .admin-login-card h2{co
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    gap: 8px;
-    margin-bottom: 14px;
+    gap: 6px;
+    margin-bottom: 8px;
   }
   .quick-icon {
-    width: 42px;
-    height: 42px;
-    border-radius: 15px;
+    width: 34px;
+    height: 34px;
+    border-radius: 12px;
     display: grid;
     place-items: center;
     color: #fff;
-    font-size: 21px;
+    font-size: 17px;
     background: var(--accent);
-    box-shadow: 0 8px 18px color-mix(in srgb, var(--accent) 28%, transparent);
+    box-shadow: 0 6px 14px color-mix(in srgb, var(--accent) 28%, transparent);
   }
   .quick-state {
     max-width: 86px;
@@ -3259,19 +3262,19 @@ body.dark .admin-login-card{background:#242638}body.dark .admin-login-card h2{co
   .quick-tool-card h3 {
     position: relative;
     z-index: 1;
-    margin: 0 0 4px;
+    margin: 0 0 3px;
     color: #1c1c27;
-    font-size: 15px;
+    font-size: 13px;
     font-weight: 950;
     letter-spacing: -0.2px;
   }
   .quick-tool-card p {
     position: relative;
     z-index: 1;
-    margin: 0 0 12px;
+    margin: 0 0 6px;
     color: #777887;
-    font-size: 11.5px;
-    line-height: 1.28;
+    font-size: 10px;
+    line-height: 1.25;
     font-weight: 650;
   }
   .quick-progress-line {
