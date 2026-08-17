@@ -46,4 +46,4 @@ El workflow `.github/workflows/deploy-backend.yml` ahora:
 
 - Sintaxis JavaScript comprobada con `node --check`.
 - Suite Playwright: **84/84 pruebas en verde**.
-- La publicación queda pendiente de revisión visual y autorización explícita.
+- Publicación validada en GitHub Pages y backend desplegado correctamente mediante GitHub Actions.

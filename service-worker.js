@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v250-pre-release-hardening';
+const CACHE_NAME = 'appi-v250-segura';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
