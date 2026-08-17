@@ -85,9 +85,8 @@ test('la guía de demo tiene cuatro pasos y no muestra la ficha del equipo', asy
   await expect(page.locator('#demoCont .demo-paso')).toHaveCount(4);
   await expect(page.locator('#demoCont')).not.toContainText('Ficha del equipo');
   await expect(page.locator('#demoProducto')).toHaveCount(0);
-
-  await page.locator('#demoFin').click();
-  await expect(page.locator('#view-gestion')).toHaveClass(/active/);
+  await expect(page.locator('#demoFin')).toHaveCount(0);
+  await expect(page.locator('#demoCont')).not.toContainText('Registrar presentación');
 });
 
 test('el formulario del equipo arma el lead por WhatsApp con todos los datos', async ({ page }) => {
