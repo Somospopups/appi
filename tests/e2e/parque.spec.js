@@ -40,6 +40,7 @@ async function entrar(page, { sinTour = false } = {}) {
   await page.addInitScript(([uid, equipo, noTour]) => {
     localStorage.setItem('welcomeSeen', '1');
     localStorage.setItem('tutoVisto_v2', '1');
+    localStorage.setItem(`appi_estilo_actual_v1_${uid}`, 'clasico');
     localStorage.setItem('equipoData', JSON.stringify(equipo));
     if (noTour) localStorage.setItem(`appi_tour_parque_v1_${uid}`, '1');
   }, [USER_ID, EQUIPO, sinTour]);

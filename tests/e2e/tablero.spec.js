@@ -47,6 +47,7 @@ async function entrar(page) {
   await page.addInitScript(([uid, equipo, contactos]) => {
     localStorage.setItem('welcomeSeen', '1');
     localStorage.setItem('tutoVisto_v2', '1');
+    localStorage.setItem(`appi_estilo_actual_v1_${uid}`, 'clasico');
     localStorage.setItem('equipoData', JSON.stringify(equipo));
     localStorage.setItem(`appi_gestion_cache_v1_${uid}`, JSON.stringify({ contacts: contactos, surveys: [], activities: [], savedAt: Date.now() }));
   }, [USER_ID, EQUIPO, CONTACTOS]);
