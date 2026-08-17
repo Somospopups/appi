@@ -3539,7 +3539,7 @@ body.dark #bootScreen{background:#101322}
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v246 · Páginas</div>
+  <div class="ds-foot">APPI · v247 · Motion</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -3548,19 +3548,39 @@ body.dark #bootScreen{background:#101322}
 <!-- <button class="ds-reopen-new" id="dsReopenNewBtn" style="display:none !important">Menú</button> -->
  <!-- ============ PANTALLA DE ACTIVACIÓN ============ -->
 <nav id="pageTabs" aria-label="Páginas">
+  <i id="pageTabsInd" aria-hidden="true"></i>
   <button type="button" data-view="view-home" class="active" onclick="showView('view-home')">Home</button>
   <button type="button" data-view="view-mes" onclick="showView('view-mes')">Mi mes</button>
   <button type="button" data-view="view-negocio" onclick="showView('view-negocio')">Mi negocio</button>
   <button type="button" data-view="view-herramientas" onclick="showView('view-herramientas')">Herram.</button>
 </nav>
 <style>
-#pageTabs{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);z-index:60;display:none;gap:4px;padding:5px;border-radius:999px;background:rgba(255,255,255,.94);box-shadow:0 12px 32px rgba(40,50,110,.22);backdrop-filter:blur(8px)}
-body.dark #pageTabs{background:rgba(37,39,58,.96)}
-#pageTabs button{border:0;border-radius:999px;padding:10px 13px;font:inherit;font-size:11px;font-weight:900;color:#5a6082;background:transparent;cursor:pointer}
-#pageTabs button.active{background:rgba(91,141,239,.18);color:#3d63c9}
+#pageTabs{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);z-index:60;display:none;gap:4px;padding:5px;border-radius:999px;background:rgba(255,255,255,.55);border:1px solid rgba(255,255,255,.7);box-shadow:0 14px 40px rgba(40,50,110,.28), inset 0 1px 0 rgba(255,255,255,.85);backdrop-filter:blur(18px) saturate(1.6);-webkit-backdrop-filter:blur(18px) saturate(1.6)}
+body.dark #pageTabs{background:rgba(30,32,52,.55);border-color:rgba(255,255,255,.14);box-shadow:0 14px 40px rgba(0,0,0,.5)}
+#pageTabsInd{position:absolute;top:5px;bottom:5px;left:5px;width:0;border-radius:999px;background:linear-gradient(135deg,rgba(91,141,239,.28),rgba(139,99,232,.28));box-shadow:inset 0 0 0 1px rgba(91,141,239,.25);transition:left .38s cubic-bezier(.3,1.3,.4,1), width .38s cubic-bezier(.3,1.3,.4,1)}
+#pageTabs button{position:relative;z-index:1;border:0;border-radius:999px;padding:10px 13px;font:inherit;font-size:11px;font-weight:900;color:#5a6082;background:transparent;cursor:pointer;transition:color .25s}
+#pageTabs button.active{color:#2f5bd6}
 body.dark #pageTabs button{color:#b8b9c5}
-body.dark #pageTabs button.active{background:rgba(91,141,239,.28);color:#a8c0ff}
+body.dark #pageTabs button.active{color:#a8c0ff}
+#pageTabs.pop{animation:pillPop .38s cubic-bezier(.3,1.6,.4,1)}
+@keyframes pillPop{0%{transform:translateX(-50%) scale(.94)}100%{transform:translateX(-50%) scale(1)}}
 @media (min-width:1024px){#pageTabs{display:none!important}}
+/* ---- motion v247: títulos que bajan y pantallas que se deslizan ---- */
+.view.active>header h1{animation:titBaja .5s cubic-bezier(.2,.9,.3,1.15) both}
+.view.active>header .script{animation:titBaja .5s .07s cubic-bezier(.2,.9,.3,1.15) both}
+@keyframes titBaja{from{transform:translateY(-18px);opacity:0}to{transform:translateY(0);opacity:1}}
+.view header .tools-btn,.view header .help-btn,.view header .back-btn{position:relative;z-index:3}
+.anim-in-r{animation:pgInR .32s cubic-bezier(.25,.9,.3,1) both}
+.anim-in-l{animation:pgInL .32s cubic-bezier(.25,.9,.3,1) both}
+@keyframes pgInR{from{transform:translateX(9%);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes pgInL{from{transform:translateX(-9%);opacity:0}to{transform:translateX(0);opacity:1}}
+.anim-hold{position:fixed;inset:0;z-index:35;overflow:hidden;pointer-events:none;background:linear-gradient(160deg,#eef0ff,#fdf0f5)}
+body.dark .anim-hold{background:#101322}
+.anim-out-l{animation:pgOutL .3s ease both}
+.anim-out-r{animation:pgOutR .3s ease both}
+@keyframes pgOutL{to{transform:translateX(-12%);opacity:0}}
+@keyframes pgOutR{to{transform:translateX(12%);opacity:0}}
+@media (prefers-reduced-motion: reduce){.view.active>header h1,.view.active>header .script,#pageTabs.pop,.anim-in-r,.anim-in-l,.anim-out-l,.anim-out-r{animation:none!important}}
 </style>
 <div id="lockScreen" class="hidden">
   <div class="lock-card">
@@ -4816,6 +4836,27 @@ function showView(id){
   document.getElementById('tabs').style.display = (id==='view-wheel'||id==='view-eval') ? 'flex' : 'none';
   const pt=document.getElementById('pageTabs'); if(pt) pt.style.display = ['view-home','view-mes','view-negocio','view-herramientas'].includes(id) ? 'flex' : 'none';
   document.querySelectorAll('#pageTabs button').forEach(b=>b.classList.toggle('active', b.dataset.view===id));
+  // ---- motion v247 ----
+  try{
+    var PAGES=['view-home','view-mes','view-negocio','view-herramientas'];
+    var prev=window.__vActual;
+    if(prev && prev!==id && PAGES.indexOf(id)>=0 && PAGES.indexOf(prev)>=0){
+      var from=document.getElementById(prev), to=document.getElementById(id);
+      var dir=PAGES.indexOf(id)>PAGES.indexOf(prev)?1:-1;
+      if(from&&to&&window.matchMedia('(prefers-reduced-motion: no-preference)').matches){
+        to.classList.add(dir>0?'anim-in-r':'anim-in-l');
+        from.classList.add('anim-hold', dir>0?'anim-out-l':'anim-out-r');
+        setTimeout(function(){ from.classList.remove('anim-hold','anim-out-l','anim-out-r'); to.classList.remove('anim-in-r','anim-in-l'); },360);
+      }
+    }
+    window.__vActual=id;
+    if(typeof pt!=='undefined'&&pt&&pt.style.display!=='none'){
+      pt.classList.remove('pop'); void pt.offsetWidth; pt.classList.add('pop');
+      var ind=document.getElementById('pageTabsInd');
+      var act=pt.querySelector('button.active');
+      if(ind&&act){ ind.style.left=act.offsetLeft+'px'; ind.style.width=act.offsetWidth+'px'; }
+    }
+  }catch(e){}
   if(id==='view-eval')    try{ renderAreas(); }catch(e){ console.error(e); }
   if(id==='view-wheel')   try{ renderWheel(); }catch(e){ console.error(e); }
   if(id==='view-home')    try{ if(typeof renderHomeCompleto==='function') renderHomeCompleto(); }catch(e){ console.error(e); }
