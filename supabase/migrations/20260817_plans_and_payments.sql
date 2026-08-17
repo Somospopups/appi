@@ -2,7 +2,35 @@
 -- Sistema de planes y pagos por transferencia
 -- ============================================
 
--- Tabla de planes disponibles
+-- Tabla de configuración de precios (editable desde panel admin)
+CREATE TABLE IF NOT EXISTS pricing_config (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  plan_type TEXT NOT NULL UNIQUE, -- 'monthly', 'yearly'
+  price DECIMAL(10,2) NOT NULL,
+  description TEXT,
+  features JSONB DEFAULT '[]',
+  active BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Insertar configuración inicial de precios
+INSERT INTO pricing_config (plan_type, price, description, features) VALUES
+(
+  'monthly',
+  5000.00,
+  'Acceso completo a APPI por 30 días',
+  '["Acceso completo a todas las funcionalidades", "Soporte por WhatsApp", "Actualizaciones incluidas", "Cancelás cuando quieras"]'
+),
+(
+  'yearly',
+  50000.00,
+  'Acceso completo a APPI por 12 meses (2 meses gratis)',
+  '["Todo lo del Plan Mensual", "Ahorrás $10.000", "Precio congelado por 1 año", "Soporte prioritario"]'
+)
+ON CONFLICT (plan_type) DO NOTHING;
+
+-- Tabla de planes disponibles (vista dinámica desde pricing_config)
 CREATE TABLE IF NOT EXISTS plans (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   name TEXT NOT NULL,
@@ -14,7 +42,7 @@ CREATE TABLE IF NOT EXISTS plans (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Insertar planes por defecto
+-- Insertar planes por defecto (usando precios de pricing_config)
 INSERT INTO plans (name, description, price_monthly, price_yearly, features) VALUES
 (
   'Plan Mensual',
@@ -188,6 +216,7 @@ ALTER TABLE plans ENABLE ROW LEVEL SECURITY;
 ALTER TABLE subscriptions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE payments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE bank_statements ENABLE ROW LEVEL SECURITY;
+ALTER TABLE pricing_config ENABLE ROW LEVEL SECURITY;
 
 -- Políticas para plans (lectura pública)
 CREATE POLICY "Plans are viewable by everyone"
@@ -218,6 +247,24 @@ CREATE POLICY "Allow all operations on bank_statements"
   ON bank_statements FOR ALL
   USING (true)
   WITH CHECK (true);
+
+-- Políticas para pricing_config (lectura pública, escritura solo admins)
+CREATE POLICY "Pricing config is viewable by everyone"
+  ON pricing_config FOR SELECT
+  USING (active = true);
+
+-- Por ahora, permitir escritura a todos (ajustar después para solo admins)
+CREATE POLICY "Allow update on pricing_config"
+  ON pricing_config FOR UPDATE
+  USING (true)
+  WITH CHECK (true);
+
+-- Aplicar trigger a pricing_config
+DROP TRIGGER IF EXISTS update_pricing_config_updated_at ON pricing_config;
+CREATE TRIGGER update_pricing_config_updated_at
+  BEFORE UPDATE ON pricing_config
+  FOR EACH ROW
+  EXECUTE FUNCTION update_updated_at_column();
 
 -- ============================================
 -- Comentarios

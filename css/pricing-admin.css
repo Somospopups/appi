@@ -1,0 +1,235 @@
+/* ============================================
+   APPI · Estilos para Panel de Administración de Precios
+   ============================================ */
+
+/* ============================================
+   Contenedor principal
+   ============================================ */
+.pricing-admin {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+.pricing-admin-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.pricing-admin-header h2 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 8px 0;
+}
+
+.pricing-admin-header p {
+  font-size: 16px;
+  color: #666;
+  margin: 0;
+}
+
+/* ============================================
+   Grid de tarjetas
+   ============================================ */
+.pricing-admin-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 24px;
+  margin-bottom: 40px;
+}
+
+.pricing-admin-card {
+  background: white;
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border: 2px solid #e0e0e0;
+  transition: all 0.3s ease;
+}
+
+.pricing-admin-card:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  border-color: #5b8def;
+}
+
+.pricing-admin-card-header {
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.pricing-admin-card-header h3 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 8px 0;
+}
+
+.pricing-admin-savings {
+  display: inline-block;
+  background: #e8f5e9;
+  color: #2e7d32;
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  margin-top: 8px;
+}
+
+/* ============================================
+   Campos del formulario
+   ============================================ */
+.pricing-admin-field {
+  margin-bottom: 20px;
+}
+
+.pricing-admin-field label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 8px;
+}
+
+.pricing-admin-input {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 18px;
+  font-weight: 600;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  font-family: 'Courier New', monospace;
+}
+
+.pricing-admin-input:focus {
+  outline: none;
+  border-color: #5b8def;
+  box-shadow: 0 0 0 3px rgba(91, 141, 239, 0.1);
+}
+
+.pricing-admin-textarea {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 14px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  resize: vertical;
+  font-family: inherit;
+  line-height: 1.5;
+}
+
+.pricing-admin-textarea:focus {
+  outline: none;
+  border-color: #5b8def;
+  box-shadow: 0 0 0 3px rgba(91, 141, 239, 0.1);
+}
+
+/* ============================================
+   Botón guardar
+   ============================================ */
+.pricing-admin-save {
+  width: 100%;
+  padding: 14px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  margin-top: 8px;
+}
+
+.pricing-admin-save:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ============================================
+   Vista previa
+   ============================================ */
+.pricing-admin-preview {
+  background: #f5f5f5;
+  border-radius: 16px;
+  padding: 32px;
+  margin-top: 40px;
+}
+
+.pricing-admin-preview h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 8px 0;
+}
+
+.pricing-admin-preview > p {
+  font-size: 14px;
+  color: #666;
+  margin: 0 0 24px 0;
+}
+
+.pricing-admin-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.pricing-admin-preview-card {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.preview-plan-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 12px;
+}
+
+.preview-plan-price {
+  font-size: 36px;
+  font-weight: 700;
+  color: #5b8def;
+  margin-bottom: 4px;
+}
+
+.preview-plan-period {
+  font-size: 14px;
+  color: #666;
+}
+
+/* ============================================
+   Responsive
+   ============================================ */
+@media (max-width: 768px) {
+  .pricing-admin {
+    padding: 16px;
+  }
+
+  .pricing-admin-header h2 {
+    font-size: 24px;
+  }
+
+  .pricing-admin-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .pricing-admin-card {
+    padding: 24px;
+  }
+
+  .pricing-admin-card-header h3 {
+    font-size: 20px;
+  }
+
+  .pricing-admin-input {
+    font-size: 16px;
+  }
+
+  .preview-plan-price {
+    font-size: 28px;
+  }
+}

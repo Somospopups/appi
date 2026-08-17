@@ -3489,6 +3489,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
 
 
 <link rel="stylesheet" href="css/plans.css">
+<link rel="stylesheet" href="css/pricing-admin.css">
 </head>
 <body>
 <div id="bootScreen">
@@ -4495,6 +4496,10 @@ body.dark #pageTabs button.active{color:#a8c0ff}
         <div class="admin-card-head"><div><h2>Distribuidores</h2><p>Activá, bloqueá o restablecé contraseñas.</p></div><button type="button" class="btn btn-secondary" id="adminRefreshUsers">Actualizar</button></div>
         <div class="search-box"><span>🔍</span><input id="adminUserSearch" placeholder="Buscar por nombre, sucursal o número"></div>
         <div class="admin-user-list" id="adminUserList"><div class="empty">Cargando cuentas…</div></div>
+      </section>
+      <section class="glass admin-card">
+        <div class="admin-card-head"><div><h2>Configuración de Precios</h2><p>Editá los precios de las membresías.</p></div></div>
+        <div id="pricingAdminContainer"></div>
       </section>
     </div>
   </section>
@@ -14840,5 +14845,6 @@ setTimeout(initHistorico,1200);
 })();
 </script>
 <script src="js/plans.js"></script>
+<script src="js/pricing-admin.js"></script>
 </body>
 </html>

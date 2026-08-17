@@ -162,13 +162,13 @@
   // Renderizar lista de planes
   // ============================================
   async function renderPlansList(container) {
-    const { data: plans, error } = await supabase
-      .from('plans')
+    // Cargar precios desde pricing_config
+    const { data: pricingData, error: pricingError } = await supabase
+      .from('pricing_config')
       .select('*')
-      .eq('active', true)
-      .order('price_monthly', { ascending: true });
+      .eq('active', true);
 
-    if (error || !plans || plans.length === 0) {
+    if (pricingError || !pricingData || pricingData.length === 0) {
       container.innerHTML = `
         <div class="plans-error">
           <p>Error cargando planes. Por favor, recargá la página.</p>
@@ -176,6 +176,22 @@
       `;
       return;
     }
+
+    // Convertir pricing_config a formato de planes
+    const plans = pricingData.map(item => ({
+      id: item.id,
+      name: item.plan_type === 'monthly' ? 'Plan Mensual' : 'Plan Anual',
+      description: item.description,
+      price_monthly: item.plan_type === 'monthly' ? item.price : 0,
+      price_yearly: item.plan_type === 'yearly' ? item.price : 0,
+      features: item.features
+    }));
+
+    // Agrupar por tipo
+    const monthlyPlan = plans.find(p => p.name === 'Plan Mensual');
+    const yearlyPlan = plans.find(p => p.name === 'Plan Anual');
+    
+    const finalPlans = [monthlyPlan, yearlyPlan].filter(p => p);
 
     container.innerHTML = `
       <div class="plans-list">
@@ -185,7 +201,7 @@
         </div>
         
         <div class="plans-grid">
-          ${plans.map(plan => renderPlanCard(plan)).join('')}
+          ${finalPlans.map(plan => renderPlanCard(plan)).join('')}
         </div>
         
         <div class="plans-faq">
