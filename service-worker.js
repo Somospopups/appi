@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v247-widgets';
+const CACHE_NAME = 'appi-v248-sin-carrera-parque';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
