@@ -65,7 +65,7 @@ El workflow `.github/workflows/deploy-backend.yml` ahora:
 ## Simulador
 
 - **Por cada cierre:** ganancia por cada producto comercializado.
-- **Por cada producto de red:** compensación económica por cada producto que compra tu red de distribuidores.
+- **Por cada producto de red:** compensación económica asociada a las adquisiciones realizadas por la red de distribuidores.
 
 ## La botella
 

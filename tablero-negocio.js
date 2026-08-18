@@ -228,7 +228,7 @@
             '</div>' +
           '</div>' +
           '<div style="font-size:11px; color:#78350f; line-height:1.5;">' +
-            'Compensación económica por cada producto que compra tu red de distribuidores.' +
+            'Compensación económica asociada a las adquisiciones realizadas por la red de distribuidores.' +
           '</div>' +
         '</div>' +
       '</div>' +
@@ -254,7 +254,7 @@
         '<div>' +
           '<div style="font-weight:600; font-size:14px; margin-bottom:6px;">🌳 Productos de tu red</div>' +
           '<div style="background:#f5f5f5; padding:12px; border-radius:8px; font-size:13px; line-height:1.6; color:#666;">' +
-            'Los productos que compra toda tu red de clientes y distribuidores cada mes. En Mi Negocio → Mi Equipo, sumá los PB de toda tu organización.' +
+            'Compensación económica asociada a las adquisiciones realizadas por la red de distribuidores. En Mi Negocio → Mi Equipo, sumá los PB de toda tu organización.' +
           '</div>' +
         '</div>' +
       '</div>' +
