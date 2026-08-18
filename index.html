@@ -3642,15 +3642,15 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <i class="boot-wave w1"></i><i class="boot-wave w2"></i><i class="boot-wave w3"></i>
   </div>
   <i class="boot-burb b1"></i><i class="boot-burb b2"></i><i class="boot-burb b3"></i>
-  <div class="boot-card"><div class="boot-logo">APPI</div><p>Preparando tu negocio…</p></div>
+  <div class="boot-card"><div class="boot-logo">APPI</div></div>
+  <p class="boot-pill">Preparando tu negocio…</p>
 </div>
 <script>requestAnimationFrame(()=>{const b=document.getElementById('bootScreen');if(b)b.classList.add('fill')});</script>
 <style>
-#bootScreen{position:fixed;inset:0;z-index:9990;overflow:hidden;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,#eaf1ff 0%,#f5ecff 45%,#ffe9f2 100%)}
-body.dark #bootScreen{background:linear-gradient(160deg,#0f1424,#1a1530 45%,#2a1530)}
+#bootScreen{position:fixed;inset:0;z-index:9990;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#0e2a60}
 #bootScreen.gone{pointer-events:none;display:none!important}
-#bootScreen.gone .boot-card{opacity:0;transition:opacity .3s}
-.boot-water{position:absolute;left:0;right:0;bottom:0;height:0%;background:linear-gradient(160deg,rgba(234,241,255,.55),rgba(245,236,255,.45) 45%,rgba(255,233,242,.4));transition:height 2.8s cubic-bezier(.3,.7,.3,1)}
+#bootScreen.gone .boot-card,#bootScreen.gone .boot-pill{opacity:0;transition:opacity .3s}
+.boot-water{position:absolute;left:0;right:0;bottom:0;height:0%;background:url('splash/agua-llena.jpg') center bottom/cover no-repeat;transition:height 2.8s cubic-bezier(.3,.7,.3,1);will-change:height}
 #bootScreen.fill .boot-water{height:100%}
 #bootScreen.drain .boot-water{height:0%;transition:height .8s cubic-bezier(.5,0,.7,.4)}
 .boot-wave{position:absolute;top:-11px;left:0;width:200%;height:22px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 12' preserveAspectRatio='none'%3E%3Cpath d='M0 6 Q 15 0 30 6 T 60 6 T 90 6 T 120 6 V 12 H 0 Z' fill='rgba(255,255,255,.40)'/%3E%3C/svg%3E") repeat-x;background-size:120px 22px;animation:bootOlaX 2.8s linear infinite}
@@ -3663,9 +3663,9 @@ body.dark #bootScreen{background:linear-gradient(160deg,#0f1424,#1a1530 45%,#2a1
 .boot-burb.b3{left:72%;width:11px;height:11px;animation-delay:.6s}
 @keyframes bootBurbuja{0%{transform:translateY(0);opacity:0}12%{opacity:.9}100%{transform:translateY(-105vh);opacity:0}}
 .boot-card{position:relative;z-index:2;text-align:center}
-.boot-logo{margin:0 auto 16px;display:inline-block;background:linear-gradient(90deg,#5b8def,#a06bff,#ff6b9d);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;font-size:42px;font-weight:800;letter-spacing:-.6px;line-height:1;animation:bootFlotar 3s ease-in-out infinite}
+.boot-logo{margin:0 auto;display:inline-block;color:#fff;font-size:56px;font-weight:800;letter-spacing:-.6px;line-height:1;text-shadow:0 6px 30px rgba(4,32,76,.55);animation:bootFlotar 3s ease-in-out infinite}
 @keyframes bootFlotar{0%,100%{transform:translateY(3px)}50%{transform:translateY(-8px)}}
-#bootScreen p{margin:0;display:inline-block;padding:8px 16px;border-radius:999px;background:rgba(255,255,255,.9);font-size:12px;font-weight:850;color:#3d63c9;box-shadow:0 6px 18px rgba(31,80,160,.18)}
+.boot-pill{position:absolute;left:50%;bottom:max(26px,calc(env(safe-area-inset-bottom) + 12px));transform:translateX(-50%);z-index:3;margin:0;display:inline-block;padding:10px 20px;border-radius:999px;background:#fff;font-size:13px;font-weight:850;color:#0e3d78;box-shadow:0 10px 28px rgba(3,26,64,.38);white-space:nowrap}
 </style>
 <!-- ============ SIDEBAR ESCRITORIO / LANDSCAPE ============ -->
 <aside class="desk-sidebar" id="deskSidebar" aria-label="Navegación principal">
@@ -11074,7 +11074,7 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./service-worker.js?v=251').catch(error => {
+      navigator.serviceWorker.register('./service-worker.js?v=252').catch(error => {
         console.warn('No se pudo registrar el modo offline de APPI', error);
       });
     });
