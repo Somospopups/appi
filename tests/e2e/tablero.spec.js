@@ -158,12 +158,10 @@ test('en el Árbol el nombre abre la ficha y la categoría abre la organización
   await expect(page.locator('#modalOverlay')).not.toHaveClass(/open/);
 });
 
-test('la duplicación cuenta activos y duplicantes', async ({ page }) => {
+test('Mi Equipo ya no muestra la tarjeta de Duplicación de este mes', async ({ page }) => {
   await entrar(page);
   await page.evaluate(() => window.showView('view-equipo'));
-  const dup = page.locator('#dupCard');
-  await expect(dup).toContainText('1 de 2 patrocinados directos activos');
-  await expect(dup).toContainText('1 ya duplican');
-  await expect(dup).toContainText('duplica');
-  await expect(dup).toContainText('en pausa');
+  await expect(page.locator('#dupCard')).toHaveCount(0);
+  await expect(page.locator('#dupCardWrap')).toHaveCount(0);
+  await expect(page.locator('#view-equipo')).not.toContainText('Duplicación de este mes');
 });

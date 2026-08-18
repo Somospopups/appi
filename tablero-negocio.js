@@ -1,7 +1,7 @@
 /* ============================================================
    APPI · Tablero de comando (v241)
    ------------------------------------------------------------
-   Cinco piezas que convierten los números oficiales del
+   Cuatro piezas que convierten los números oficiales del
    negocio en metas diarias:
 
    1. GPS del mes: bonus oficial (12 PB + patrocinios de 9 PB)
@@ -9,7 +9,6 @@
    2. Comparativa de la botella: conciencia interactiva.
    3. Simulador de ganancias del plan de negocio.
    4. Stock personal dentro del presupuesto.
-   5. Duplicación del equipo leída de la Línea.
    ============================================================ */
 (function(){
   'use strict';
@@ -375,37 +374,6 @@
     wrap.querySelectorAll('[data-stock-del]').forEach(function(b){ b.onclick = function(){ var it = leerStock(); it.splice(+b.dataset.stockDel, 1); localStorage.setItem(stockKey(), JSON.stringify(it)); renderStock(); }; });
   }
 
-  /* ---------------- 5 · DUPLICACIÓN DEL EQUIPO ---------------- */
-  function htmlDuplicacion(){
-    var eq = equipo();
-    if (!eq || !Array.isArray(eq.personas)) return '';
-    var raiz = eq.personas.find(function(p){ return p.nivel === 0; }) || eq.personas[0];
-    var hijos = raiz ? (raiz.hijos || []) : [];
-    if (!hijos.length) return '';
-    var activos = hijos.filter(function(h){ return (Number(h.pnAct) || 0) > 0; });
-    var duplican = hijos.filter(function(h){ return (h.hijos || []).length > 0 && (Number(h.pnAct) || 0) > 0; });
-    var filas = hijos.map(function(h){
-      var pb = Number(h.pnAct) || 0;
-      var tag = pb > 0 && (h.hijos || []).length ? '🌱 duplica' : pb > 0 ? '⚡ activo' : '💤 en pausa';
-      return '<div class="tb-row"><span>' + esc(h.nombre) + ' · ' + esc(h.cat || '') + '</span><span>' + pb + ' PB · ' + tag + '</span></div>';
-    }).join('');
-    return '<div class="tb-card" id="dupCard" style="margin:12px"><div class="tb-title">🌱 Duplicación de este mes</div>' +
-      '<div class="tb-sub">' + activos.length + ' de ' + hijos.length + ' patrocinados directos activos · ' + duplican.length + ' ya duplican</div>' + filas + '</div>';
-  }
-  function renderDuplicacion(){
-    var host = $('view-equipo');
-    if (!host) return;
-    var viejo = $('dupCardWrap');
-    if (viejo) viejo.remove();
-    var html = htmlDuplicacion();
-    if (!html) return;
-    var wrap = document.createElement('div');
-    wrap.id = 'dupCardWrap';
-    wrap.innerHTML = html;
-    var first = host.querySelector('.tb-card') || host.firstElementChild;
-    host.insertBefore(wrap, host.children[1] || null);
-  }
-
   /* ---------------- vistas y accesos ---------------- */
   function crearVistas(){
     if ($('view-botella')) return;
@@ -478,7 +446,6 @@
     var origShow = window.showView;
     window.showView = function(id){ var r = origShow.apply(this, arguments); try{
       if (id === 'view-presu') renderStock();
-      if (id === 'view-equipo') renderDuplicacion();
       if (id === 'view-home') inyectarHome();
     }catch(e){} return r; };
     try{ inyectarHome(); }catch(e){}

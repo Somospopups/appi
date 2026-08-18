@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v250-arbol-toque';
+const CACHE_NAME = 'appi-v250-sin-dup';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

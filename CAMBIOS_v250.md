@@ -62,6 +62,10 @@ El workflow `.github/workflows/deploy-backend.yml` ahora:
 
 - Se recortó basura duplicada después de `</html>` que se veía como código suelto al pie de la página.
 
+## Mi Equipo
+
+- Se quitó la tarjeta **Duplicación de este mes** (patrocinados directos activos / quiénes ya duplican). No aportaba y ocupaba el tablero.
+
 ## Árbol del equipo
 
 - En el listado, tocar el **nombre** abre la ficha. Tocar desde la izquierda hasta la píldora de categoría abre o cierra la organización, si tiene gente debajo.
