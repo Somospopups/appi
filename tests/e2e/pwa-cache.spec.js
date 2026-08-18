@@ -12,9 +12,10 @@ test('la versión visible, el paquete y el Service Worker están alineados', () 
   expect(html).toContain('await registration.update()');
   expect(sw).toContain("CACHE_NAME = 'appi-v256-");
   const manifest=JSON.parse(read('manifest.json'));
-  expect(manifest.background_color).toBe('#eef4ff');
-  expect(manifest.theme_color).toBe('#eef4ff');
-  expect(html).toContain('theme-color" content="#eef4ff"');
+  expect(manifest.background_color).toBe('#06172d');
+  expect(manifest.theme_color).toBe('#06172d');
+  expect(html).toContain('theme-color" content="#06172d"');
+  expect(sw).toContain("CACHE_NAME = 'appi-v256-arranque-sin-borde'");
   expect(html).toContain('apple-touch-startup-image');
   expect(html).toContain('class="boot-water"');
   expect(html).not.toContain('boot-water-caustic');
@@ -39,6 +40,7 @@ test('el agua de carga se anima con CSS y no pide fotos estáticas', async ({ pa
   await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
   const water = page.locator('#bootScreen .boot-water');
   await expect(water).toBeVisible();
+  await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute('content', '#06172d');
   await expect(page.locator('#bootScreen .boot-wave')).toHaveCount(2);
   await expect(page.locator('#bootScreen .boot-bubble')).toHaveCount(6);
   const fondo = await water.evaluate(el => getComputedStyle(el).backgroundImage);

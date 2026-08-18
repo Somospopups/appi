@@ -60,6 +60,7 @@ test('el arranque completa una secuencia fluida antes de mostrar el acceso', asy
   await expect(page.locator('.boot-message-label')).toHaveText('Todo listo');
   await expect(page.locator('.boot-ready-mark')).toBeVisible();
   await expect(boot).toHaveCount(0, { timeout: 1600 });
+  await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute('content', '#eef4ff');
 
   const timing = await page.evaluate(() => ({
     start: window.__appiBootStartedAt,

@@ -68,7 +68,8 @@ test('los íconos del manifiesto llevan el mismo logo de vidrio que usa Android 
     const archivo = icono.src.replace('./', '');
     expect(fs.existsSync(archivo), `Falta el ícono ${archivo}`).toBe(true);
   }
-  expect(manifest.background_color).toBe('#eef4ff');
+  expect(manifest.background_color).toBe('#06172d');
+  expect(manifest.theme_color).toBe('#06172d');
   // El generador único mantiene splash e íconos con el mismo dibujo.
   const generador = read('scripts/logo_vidrio.py');
   expect(generador).toContain('def paint_glass_wordmark');

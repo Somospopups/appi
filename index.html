@@ -62,7 +62,7 @@ window.openStock=function(){
 <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 <meta name="apple-mobile-web-app-title" content="APPI" />
 <meta name="mobile-web-app-capable" content="yes" />
-<meta name="theme-color" content="#eef4ff" />
+<meta name="theme-color" content="#06172d" />
 <title>APPI</title>
 <link rel="icon" href="./icon-192.png" />
 <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
@@ -10510,13 +10510,19 @@ document.getElementById('importInput').onchange = (e)=>{
 
 /* ============ MODO DÍA/NOCHE (desde el menú del engranaje ⚙️) ============ */
 (function(){
+  let darkTheme=localStorage.getItem('themeDark') === '1';
+  const syncBrowserTheme = ()=>{
+    const meta=document.querySelector('meta[name="theme-color"]');
+    if(meta)meta.setAttribute('content',document.getElementById('bootScreen')?'#06172d':(darkTheme?'#0f1424':'#eef4ff'));
+  };
   const applyTheme = (dark)=>{
-    document.body.classList.toggle('dark', dark);
-    const meta = document.querySelector('meta[name="theme-color"]');
-    if(meta) meta.setAttribute('content', dark ? '#0f1424' : '#eef4ff');
+    darkTheme=!!dark;
+    document.body.classList.toggle('dark', darkTheme);
+    syncBrowserTheme();
     if(currentRueda && document.getElementById('view-wheel').classList.contains('active')) renderWheel();
   };
-  applyTheme(localStorage.getItem('themeDark') === '1');
+  window.__appiSyncBrowserTheme=syncBrowserTheme;
+  applyTheme(darkTheme);
   window.applyTheme = applyTheme;
 })();
 
@@ -10821,7 +10827,7 @@ function ocultarBoot(force){
       b.setAttribute('aria-busy','false');
       b.classList.add('leaving');
       window.__appiBootRemovedAt=performance.now();
-      setTimeout(()=>{try{b.classList.add('gone');b.remove()}catch(e){}},560);
+      setTimeout(()=>{try{b.classList.add('gone');b.remove();if(typeof window.__appiSyncBrowserTheme==='function')window.__appiSyncBrowserTheme()}catch(e){}},560);
     },hold);
   },wait);
 }
