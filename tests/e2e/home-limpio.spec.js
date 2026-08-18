@@ -106,6 +106,23 @@ test('en pantalla de PC el selector se esconde y manda la sidebar', async ({ pag
   await expect(page.locator('#deskSidebar')).toBeVisible();
 });
 
+test('en PC la barra trae las mismas herramientas que el celular', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await entrar(page);
+  const sidebar = page.locator('#deskSidebar');
+  await expect(sidebar).toBeVisible();
+  for (const nombre of ['Los 8 Pasos', 'Escalera de Sueños', 'Coach de Demo', 'Botella', 'Simulador', 'Grabadora', 'Notas Keep']) {
+    await expect(sidebar).toContainText(nombre);
+  }
+  await page.locator('#deskSidebar [data-ds="view-demo"]').click();
+  await expect(page.locator('#view-demo')).toHaveClass(/active/);
+  await page.locator('#deskSidebar [data-ds="view-botella"]').click();
+  await expect(page.locator('#view-botella')).toHaveClass(/active/);
+  await page.locator('#deskSidebar [data-ds="view-simulador"]').click();
+  await expect(page.locator('#view-simulador')).toHaveClass(/active/);
+  await expect(page.locator('#deskSidebar [data-ds="view-simulador"]')).toHaveClass(/active/);
+});
+
 test('la tarjeta de la jornada abre el calendario y guarda tareas', async ({ page }) => {
   await entrar(page);
   await page.locator('#hlCardOpen').click();

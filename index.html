@@ -23,19 +23,25 @@ window.openHistorico=function(){
 <script>
 /* APPI · overlays cerrados no pueden tapar el dedo */
 (function(){
-  function hide(el){ if(!el) return; el.style.setProperty('display','none','important'); el.style.setProperty('pointer-events','none','important'); }
+  function clearInlineTrap(el){
+    if(!el) return;
+    el.style.removeProperty('display');
+    el.style.removeProperty('pointer-events');
+    el.style.removeProperty('visibility');
+    el.style.removeProperty('z-index');
+  }
   function tidy(){
     try{
-      var modal=document.getElementById('modalOverlay');
-      if(modal && !modal.classList.contains('open')) hide(modal);
+      // No pegar display/pointer-events inline: después no se pueden abrir login ni modales en PC.
+      clearInlineTrap(document.getElementById('modalOverlay'));
+      clearInlineTrap(document.getElementById('lockScreen'));
       var boot=document.getElementById('bootScreen');
-      if(boot && boot.classList.contains('gone')) hide(boot);
-      var lock=document.getElementById('lockScreen');
-      if(lock && lock.classList.contains('hidden')) hide(lock);
-      document.querySelectorAll('.export-loading:not(.show), .cal-overlay:not(.open)').forEach(hide);
+      if(boot && boot.classList.contains('gone')) clearInlineTrap(boot);
+      document.querySelectorAll('.export-loading:not(.show), .cal-overlay:not(.open)').forEach(clearInlineTrap);
     }catch(e){}
   }
   window.__appiUnlockScroll=tidy;
+  window.__appiClearOverlayTrap=clearInlineTrap;
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', tidy);
   else tidy();
   window.addEventListener('pageshow', tidy);
@@ -197,6 +203,33 @@ body.dark .hist-section-title h3,body.dark .hist-attention strong,body.dark .his
     visibility: hidden !important;
     pointer-events: none !important;
     z-index: -1 !important;
+  }
+  #lockScreen:not(.hidden) {
+    display: flex !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    z-index: 9999 !important;
+  }
+  /* Si un estilo viejo deja el overlay en none, los botones igual reciben el clic. */
+  #lockScreen:not(.hidden) .lock-card,
+  #lockScreen:not(.hidden) .lock-card *,
+  #lockScreen:not(.hidden) .admin-login-lock,
+  #lockScreen:not(.hidden) .admin-login-overlay,
+  #lockScreen:not(.hidden) .admin-login-overlay * {
+    pointer-events: auto !important;
+  }
+  body.appi-login-abierto .desk-sidebar,
+  body.appi-login-abierto .ds-reopen,
+  body.appi-login-abierto #pageTabs,
+  body.appi-login-abierto .top-menu-btn {
+    pointer-events: none !important;
+  }
+  #modalOverlay.open,
+  .modal-overlay.open {
+    display: flex !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    z-index: 10000 !important;
   }
 
   header.top { text-align: center; margin-bottom: 20px; position: relative; }
@@ -3610,6 +3643,9 @@ body.dark #bootScreen{background:#101322}
     <div class="ds-section-label">Mis herramientas</div>
     <button class="ds-btn" data-ds="view-ocho" onclick="openOcho()"><span>🧭</span> Los 8 Pasos</button>
     <button class="ds-btn" data-ds="view-suenos" onclick="openSuenos()"><span>🪜</span> Escalera de Sueños</button>
+    <button class="ds-btn" data-ds="view-demo" onclick="openDemo()"><span>🎯</span> Coach de Demo</button>
+    <button class="ds-btn" data-ds="view-botella" onclick="openBotella()"><span>🍾</span> Botella</button>
+    <button class="ds-btn" data-ds="view-simulador" onclick="openCalculadora()"><span>🧮</span> Simulador</button>
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
@@ -4662,6 +4698,7 @@ const modal = {
       this.footer.innerHTML = `<button class="btn-ok" id="modalOkBtn">${opts.okText || 'Entendido'}</button>`;
       document.getElementById('modalOkBtn').onclick = ()=> this.close();
     }
+    if(window.__appiClearOverlayTrap) window.__appiClearOverlayTrap(this.el);
     this.el.classList.add('open');
     bloquearScrollCuerpo();
   },
@@ -5226,9 +5263,24 @@ function liberarScrollCuerpo(){
   if(overlayDeScrollAbierto())return;
   aplicarEstadoScrollCuerpo(false);
 }
-function forzarScrollLibre(){
+function limpiarEstilosLock(el){
+  if(!el) return;
+  ['display','pointer-events','visibility','z-index'].forEach(function(p){ el.style.removeProperty(p); });
+}
+function mostrarLockScreen(){
   const lock=document.getElementById('lockScreen');
-  if(lock){lock.classList.add('hidden');lock.style.display='none'}
+  if(!lock) return;
+  lock.classList.remove('hidden');
+  limpiarEstilosLock(lock);
+}
+function ocultarLockScreen(){
+  const lock=document.getElementById('lockScreen');
+  if(!lock) return;
+  lock.classList.add('hidden');
+  limpiarEstilosLock(lock);
+}
+function forzarScrollLibre(){
+  ocultarLockScreen();
   const person=document.getElementById('personChoiceOverlay');
   if(person)person.hidden=true;
   aplicarEstadoScrollCuerpo(false);
@@ -5236,6 +5288,8 @@ function forzarScrollLibre(){
 window.liberarScrollCuerpo=liberarScrollCuerpo;
 window.bloquearScrollCuerpo=bloquearScrollCuerpo;
 window.forzarScrollLibre=forzarScrollLibre;
+window.mostrarLockScreen=mostrarLockScreen;
+window.ocultarLockScreen=ocultarLockScreen;
 window.addEventListener('pageshow',()=>{if(document.getElementById('lockScreen')?.classList.contains('hidden'))forzarScrollLibre()});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&document.getElementById('lockScreen')?.classList.contains('hidden'))liberarScrollCuerpo()});
 
@@ -5253,12 +5307,12 @@ function showView(id){
     b.classList.toggle('active', b.dataset.view===id);
   });
   // Sidebar escritorio: marcar activo (con equivalencias de sub-vistas)
-  const dsMap = {'view-home':'view-home','view-presu':'view-presu','view-presu-hist':'view-presu','view-equipo':'view-equipo','view-historico':'view-historico','view-usuarios':'view-usuarios','view-seguimiento':'view-seguimiento','view-encuesta':'view-encuesta','view-gestion':'view-gestion','view-grabadora':'view-grabadora','view-notas':'view-notas','view-siete':'view-siete','view-siete-detail':'view-siete','view-ocho':'view-ocho','view-suenos':'view-ocho','view-demo':'view-ocho'};
+  const dsMap = {'view-home':'view-home','view-presu':'view-presu','view-presu-hist':'view-presu','view-equipo':'view-equipo','view-historico':'view-historico','view-usuarios':'view-usuarios','view-seguimiento':'view-seguimiento','view-encuesta':'view-encuesta','view-gestion':'view-gestion','view-grabadora':'view-grabadora','view-notas':'view-notas','view-siete':'view-siete','view-siete-detail':'view-siete','view-ocho':'view-ocho','view-suenos':'view-suenos','view-demo':'view-demo','view-botella':'view-botella','view-simulador':'view-simulador'};
   const dsTarget = (id==='view-wheel'||id==='view-eval') ? `rueda-${currentRueda||'vida'}` : (dsMap[id] || '');
   document.querySelectorAll('#deskSidebar .ds-btn').forEach(b=>{
     b.classList.toggle('active', b.dataset.ds===dsTarget);
   });
-  const hideTabsOn = ['view-home','view-siete','view-siete-detail','view-ocho','view-suenos','view-demo','view-presu','view-presu-hist','view-equipo','view-historico','view-seguimiento','view-planning','view-encuesta','view-gestion','view-grabadora','view-notas','view-usuarios','view-admin'];
+  const hideTabsOn = ['view-home','view-siete','view-siete-detail','view-ocho','view-suenos','view-demo','view-botella','view-simulador','view-presu','view-presu-hist','view-equipo','view-historico','view-seguimiento','view-planning','view-encuesta','view-gestion','view-grabadora','view-notas','view-usuarios','view-admin'];
   document.getElementById('tabs').style.display = (id==='view-wheel'||id==='view-eval') ? 'flex' : 'none';
   const _isPage = ['view-home','view-mes','view-negocio','view-herramientas'].includes(id);
   const pt=document.getElementById('pageTabs'); if(pt) pt.style.display = _isPage ? 'flex' : 'none';
@@ -10400,7 +10454,7 @@ function mostrarAdminLoginPopup(){
     try{
       await window.APPIAuth.loginAdmin(input.value);
       if(window.APPIDataSync)await window.APPIDataSync.start({claimLegacy:false});
-      hide();const lock=document.getElementById('lockScreen');if(lock){lock.classList.add('hidden');lock.style.display='none'}liberarScrollCuerpo();iniciarApp();
+      hide();ocultarLockScreen();liberarScrollCuerpo();iniciarApp();
     }catch(reason){error.textContent=reason.message||'No se pudo ingresar al panel.';error.classList.add('show')}
     finally{submit.disabled=false;submit.textContent=original}
   };
@@ -10463,13 +10517,13 @@ async function completarIngresoDistribuidor(){
   await asegurarPersonaActiva();
   const sync=window.APPIDataSync?await window.APPIDataSync.start({claimLegacy:true}):null,lock=document.getElementById('lockScreen');
   localStorage.removeItem('appi_activada');
-  if(lock){lock.classList.add('hidden');lock.style.display='none'}
+  ocultarLockScreen();
   liberarScrollCuerpo();iniciarApp();
   if(sync&&sync.claimedLegacy)setTimeout(()=>showToast('Tus datos de este dispositivo quedaron asociados a tu cuenta',3600),500);
 }
 function mostrarCambioPasswordObligatorio(){
   const lock=document.getElementById('lockScreen'),overlay=document.getElementById('forcedPasswordOverlay'),first=document.getElementById('forcedNewPassword'),confirmation=document.getElementById('forcedConfirmPassword'),save=document.getElementById('btnForcedPasswordSave'),error=document.getElementById('forcedPasswordError');
-  ocultarBoot();if(lock){lock.style.display='flex';lock.classList.remove('hidden')}bloquearScrollCuerpo();overlay.hidden=false;first.value='';confirmation.value='';error.textContent='';error.classList.remove('show');
+  ocultarBoot();mostrarLockScreen();bloquearScrollCuerpo();overlay.hidden=false;first.value='';confirmation.value='';error.textContent='';error.classList.remove('show');
   save.onclick=async()=>{
     error.textContent='';error.classList.remove('show');
     if(first.value!==confirmation.value){error.textContent='Las contraseñas no coinciden.';error.classList.add('show');return}
@@ -10483,7 +10537,7 @@ function mostrarPantallaLoginDistribuidor(reason=''){
   ocultarBoot();
   const lock=document.getElementById('lockScreen'),login=document.getElementById('distributorLoginPanel');
   if(login)login.hidden=false;
-  if(lock){lock.style.display='flex';lock.classList.remove('hidden')}
+  mostrarLockScreen();
   bloquearScrollCuerpo();
   setLoginAccessTab('signin');
   const dip=document.getElementById('distributorInput'),password=document.getElementById('distributorPassword'),button=document.getElementById('btnDistributorLogin'),toggle=document.getElementById('toggleDistributorPassword'),support=document.getElementById('btnLoginSupport'),adminOpen=document.getElementById('btnAdminLoginOpen'),tabSign=document.getElementById('loginTabSignIn'),tabCreate=document.getElementById('loginTabCreate'),requestDip=document.getElementById('requestDip'),requestButton=document.getElementById('btnRequestAccount');
@@ -11055,11 +11109,11 @@ body.dark .presu-select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:
     -webkit-backdrop-filter:blur(24px) saturate(180%); backdrop-filter:blur(24px) saturate(180%);
     border-right:1px solid rgba(255,255,255,.7);
     box-shadow:0 0 40px rgba(80,90,130,.12);
-    padding:20px 14px 16px;
-    overflow-y:auto;
+    padding:16px 12px 12px;
+    overflow:hidden;
   }
   body.dark .desk-sidebar{background:rgba(24,24,40,.82); border-right-color:rgba(255,255,255,.09);}
-  .ds-brand{display:flex; align-items:center; gap:11px; padding:4px 8px 18px; border-bottom:1px solid rgba(80,90,130,.15); margin-bottom:14px; position:relative}
+  .ds-brand{display:flex; align-items:center; gap:11px; padding:4px 8px 14px; border-bottom:1px solid rgba(80,90,130,.15); margin-bottom:10px; position:relative; flex:none}
   body.dark .ds-brand{border-bottom-color:rgba(255,255,255,.12)}
   /* Botón ocultar barra */
   .ds-collapse{
@@ -11083,8 +11137,8 @@ body.dark .presu-select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:
   body.dark .ds-section-label{border-top-color:rgba(255,255,255,.08);color:#8f90a0}
   .ds-btn{
     display:flex; align-items:center; gap:12px; width:100%;
-    padding:11px 12px; border:none; border-radius:12px;
-    background:transparent; color:#3a3a48; font:inherit; font-size:14.5px; font-weight:700;
+    padding:8px 10px; border:none; border-radius:12px;
+    background:transparent; color:#3a3a48; font:inherit; font-size:13.5px; font-weight:700;
     cursor:pointer; text-align:left; transition:background .18s ease,color .18s ease,transform .1s ease;
     -webkit-tap-highlight-color:transparent;
   }
@@ -11095,7 +11149,7 @@ body.dark .presu-select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:
   body.dark .ds-btn{color:#d0d0d8}
   body.dark .ds-btn:hover{background:rgba(91,141,239,.20); color:#a8b8ff}
   body.dark .ds-btn.active{background:linear-gradient(135deg,rgba(91,141,239,.28),rgba(160,107,255,.22)); color:#a8b8ff; box-shadow:inset 0 0 0 1.5px rgba(140,170,255,.35)}
-  .ds-foot{margin-top:auto; padding:16px 8px 4px; font-size:11px; color:#8a8a94; font-weight:600; text-align:center}
+  .ds-foot{flex:none; margin-top:8px; padding:10px 8px 2px; font-size:11px; color:#8a8a94; font-weight:600; text-align:center}
 
   /* --- Contenedor principal --- */
   .app{
@@ -14770,3 +14824,34 @@ setTimeout(initHistorico,1200);
 
 </body>
 </html>
+n.parentNode && n.parentNode.removeChild(n);
+          }
+        }
+      });
+    }catch(e){}
+  }
+  limpiarRestos();
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', limpiarRestos);
+  setTimeout(limpiarRestos, 0);
+  setTimeout(limpiarRestos, 400);
+})();
+</script>
+
+</body>
+</html>
+os, 0);
+  setTimeout(limpiarRestos, 400);
+})();
+</script>
+
+</body>
+</html>
+/html>
+os, 0);
+  setTimeout(limpiarRestos, 400);
+})();
+</script>
+
+</body>
+</html>
+

@@ -111,6 +111,48 @@ async function login(page, dip) {
   await expect(page.locator('#lockScreen')).toHaveClass(/hidden/);
 }
 
+test('en escritorio los botones del login reciben el clic', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await mockSupabase(page);
+  await page.goto('/index.html', { waitUntil: 'networkidle' });
+  await expect(page.locator('#distributorLoginPanel')).toBeVisible();
+  await expect(page.locator('#btnDistributorLogin')).toBeVisible();
+
+  const hit = await page.evaluate(() => {
+    const btn = document.getElementById('btnDistributorLogin');
+    const lock = document.getElementById('lockScreen');
+    const r = btn.getBoundingClientRect();
+    const el = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+    return {
+      pointerEvents: getComputedStyle(lock).pointerEvents,
+      hitIsButton: !!(el && (el.id === 'btnDistributorLogin' || el.closest('#btnDistributorLogin')))
+    };
+  });
+  expect(hit.pointerEvents).toBe('auto');
+  expect(hit.hitIsButton).toBe(true);
+
+  // Aunque un estilo viejo deje el overlay en none, el botón tiene que seguir vivo.
+  await page.evaluate(() => {
+    const lock = document.getElementById('lockScreen');
+    lock.style.setProperty('pointer-events', 'none', 'important');
+  });
+  const stillHits = await page.evaluate(() => {
+    const btn = document.getElementById('btnDistributorLogin');
+    const r = btn.getBoundingClientRect();
+    const el = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+    return !!(el && (el.id === 'btnDistributorLogin' || el.closest('#btnDistributorLogin')));
+  });
+  expect(stillHits).toBe(true);
+
+  await page.locator('#btnDistributorLogin').click();
+  await expect(page.locator('#loginError')).toBeVisible();
+  await expect(page.locator('#loginError')).toContainText(/sucursal|contraseña|distribuidor/i);
+
+  await page.locator('#loginTabCreate').click();
+  await expect(page.locator('#loginCreatePane')).toBeVisible();
+  await expect(page.locator('#btnRequestAccount')).toBeVisible();
+});
+
 test('cada distribuidor sincroniza y ve únicamente sus datos', async ({ page }) => {
   const backend = await mockSupabase(page);
   const { cloud } = backend;
@@ -300,5 +342,6 @@ test('administración ingresa por el candado y no tiene distribuidor asociado', 
   expect(profile).toMatchObject({username:'popups',dip:null,rol:'admin'});
   await expect(page.locator('#btnAdminPanelLogout')).toBeVisible();
   await page.locator('#btnAdminPanelPassword').click();
+  await expect(page.locator('#modalOverlay')).toHaveClass(/open/);
   await expect(page.locator('#accountNewPassword')).toBeVisible();
 });
