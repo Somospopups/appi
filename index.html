@@ -4854,11 +4854,11 @@ const HELP = {
     <strong>Tip:</strong> tocá la tarjeta para abrir el calendario mensual y agregar tareas a cualquier día.</div>
 
     <div class="tip"><strong>🌱 CULTURA DE CRECIMIENTO</strong><br/>
-    Tu rutina semanal para crecer en el negocio:<br/>
-    • Cargá tus <strong>PB personales</strong> (con decimales si hace falta)<br/>
-    • Agregá tus <strong>invitados de patrocinio</strong><br/>
-    • La barra llega a 100% con 15 PB y al menos 2 invitados<br/>
-    <strong>Objetivo:</strong> hacer esto todas las semanas para mantener el ritmo.</div>
+    Tu rutina del mes para crecer en el negocio:<br/>
+    • Cargá tus <strong>PB personales</strong> del mes (con decimales si hace falta)<br/>
+    • Agregá tus <strong>invitados</strong><br/>
+    • La barra llega a 100% con 15 PB y al menos 2 invitados en el mes<br/>
+    <strong>Objetivo:</strong> completar 15 PB y 2 invitados cada mes.</div>
 
     <div class="tip"><strong>🎯 OPORTUNIDAD DE BONUS</strong><br/>
     Si alguien de Mi Equipo (categoría D o más) está cerca de 12 PB, APPI te avisa y te propone:<br/>
@@ -9440,7 +9440,7 @@ function renderSeguimiento(){
 function editarSeguimiento(id){ const p=cargarSeguimientos().find(x=>x.id===id); if(!p) return; seguimientoEditId=id; document.getElementById('segNombre').value=capitalizarNombreSeg(p.nombre); document.getElementById('segTelefono').value=p.telefono||''; document.getElementById('segInteres').value=p.interes==='Ambas'?'Ambas cosas':(p.interes||'Producto'); const estados={ 'Sin contactar':'No contactado','Presentación realizada':'Seguimiento','Demostración realizada':'Seguimiento','Seguimiento pendiente':'Seguimiento','Cliente':'Contactado','Invitado':'Más adelante','No interesado':'No le interesa' }; document.getElementById('segEstado').value=estados[p.estado]||p.estado||'No contactado'; document.getElementById('segFecha').value=p.fecha||''; document.getElementById('segNotas').value=p.notas||''; document.getElementById('seguimientoFormTitle').textContent='Editar persona'; document.getElementById('seguimientoForm').style.display='block'; window.scrollTo({top:0,behavior:'smooth'}); }
 function actualizarSeguimiento(id,estado){ const a=cargarSeguimientos(); const p=a.find(x=>x.id===id); if(p){p.estado=estado; guardarSeguimientos(a); renderSeguimiento(); renderHomeCompleto(); showToast('Seguimiento actualizado ✅',1800);} }
 function guardarNotaSeg(id,nota){ const a=cargarSeguimientos(); const p=a.find(x=>x.id===id); if(p){p.notas=nota.trim(); guardarSeguimientos(a); showToast('Nota guardada ✅',1400);} }
-async function eliminarSeguimiento(id){ if(!await window.APPIDialog.confirm('Se eliminará esta persona del seguimiento.',{title:'Eliminar persona',icon:'🗑️',okText:'Eliminar',danger:true})) return; guardarSeguimientos(cargarSeguimientos().filter(p=>p.id!==id)); renderSeguimiento(); renderHomeCompleto(); }
+async function eliminarSeguimiento(id){ if(!await window.APPIDialog.confirm('Se eliminará esta persona del seguimiento.',{title:'Eliminar persona',icon:'🗑️',okText:'Eliminar',danger:true})) return; const prev=cargarSeguimientos().find(p=>p.id===id); guardarSeguimientos(cargarSeguimientos().filter(p=>p.id!==id)); if(typeof culturaQuitarPorContacto==='function') culturaQuitarPorContacto({id,agendaId:id,telefono:prev&&prev.telefono,nombre:prev&&prev.nombre}); renderSeguimiento(); renderHomeCompleto(); }
 
 document.getElementById('segNombre').addEventListener('input',e=>{ const pos=e.target.selectionStart; e.target.value=capitalizarNombreSeg(e.target.value); try{e.target.setSelectionRange(pos,pos)}catch(err){} });
 document.getElementById('btnNuevoSeguimiento').addEventListener('click',()=>{ limpiarFormularioSeg(); document.getElementById('seguimientoFormTitle').textContent='Nueva persona'; document.getElementById('seguimientoForm').style.display='block'; document.getElementById('segNombre').focus(); });
@@ -9748,6 +9748,15 @@ const CULTURA_KEY='cultura_crecimiento_v1';
 const CULTURA_PB_META=15;
 const CULTURA_INV_META=2;
 const CULTURA_SLOTS_BASE=3;
+function culturaMonthId(date=new Date()){
+  const d=date instanceof Date?date:new Date(date);
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+}
+function culturaMonthLabel(date=new Date()){
+  const d=date instanceof Date?date:new Date(date);
+  const months=typeof MONTHS!=='undefined'?MONTHS:['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  return `${months[d.getMonth()]} ${d.getFullYear()}`;
+}
 function culturaWeekStart(date=new Date()){
   const d=new Date(date.getFullYear(),date.getMonth(),date.getDate());
   const day=d.getDay();
@@ -9755,32 +9764,44 @@ function culturaWeekStart(date=new Date()){
   d.setHours(0,0,0,0);
   return d;
 }
-function culturaWeekId(date){
-  const start=culturaWeekStart(date);
-  return `${start.getFullYear()}-${String(start.getMonth()+1).padStart(2,'0')}-${String(start.getDate()).padStart(2,'0')}`;
-}
-function culturaWeekLabel(date){
-  const start=culturaWeekStart(date);
-  const end=new Date(start);end.setDate(start.getDate()+6);
-  const short=['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'];
-  return `${start.getDate()} ${short[start.getMonth()]} – ${end.getDate()} ${short[end.getMonth()]}`;
-}
+function culturaIsMonthId(id){return /^\d{4}-\d{2}$/.test(String(id||''))}
+function culturaIsWeekId(id){return /^\d{4}-\d{2}-\d{2}$/.test(String(id||''))}
 function culturaDateFromId(id){
   const p=String(id||'').split('-').map(Number);
-  if(p.length<3||!p[0]||!p[1]||!p[2]) return null;
-  return new Date(p[0],p[1]-1,p[2]);
+  if(p.length<2||!p[0]||!p[1]) return null;
+  return new Date(p[0],p[1]-1,p[2]||1);
+}
+function culturaMonthOfKey(id){
+  if(culturaIsMonthId(id)) return id;
+  const d=culturaDateFromId(id);
+  return d?culturaMonthId(d):'';
 }
 function culturaFmt(n){return Number(n||0).toLocaleString('es-AR',{maximumFractionDigits:1})}
-function culturaPastWeeks(currentId){
-  const all=loadCulturaAll();
-  return Object.keys(all).filter(id=>{
-    if(id>=currentId) return false;
-    const w=all[id]||{};
-    return (Number(w.pb)||0)>0 || (Array.isArray(w.invitados)&&w.invitados.length) || (Array.isArray(w.acciones)&&w.acciones.length);
-  }).sort((a,b)=>b.localeCompare(a));
-}
 function loadCulturaAll(){
   try{const data=JSON.parse(localStorage.getItem(CULTURA_KEY)||'{}');return data&&typeof data==='object'?data:{}}catch(e){return {}}
+}
+function persistCulturaAll(all){localStorage.setItem(CULTURA_KEY,JSON.stringify(all))}
+function culturaInvitadoNombre(p){return [p&&p.nombre,p&&p.apellido].filter(Boolean).join(' ').trim()}
+function culturaInvitadoClave(p){
+  if(p&&p.agendaId) return 'a:'+String(p.agendaId);
+  const tel=String(p&&p.telefono||'').replace(/\D/g,'');
+  if(tel) return 't:'+tel;
+  const nom=culturaInvitadoNombre(p).toLowerCase();
+  if(nom) return 'n:'+nom;
+  if(p&&p.id) return 'i:'+String(p.id);
+  return '';
+}
+function culturaMergeInvitados(lists){
+  const seen=new Set(),out=[];
+  for(const list of lists){
+    for(const p of (Array.isArray(list)?list:[])){
+      const key=culturaInvitadoClave(p)||('x:'+out.length);
+      if(seen.has(key)) continue;
+      seen.add(key);
+      out.push({...p,slot:out.length});
+    }
+  }
+  return out;
 }
 function culturaSlotCount(row){
   const invitados=Array.isArray(row&&row.invitados)?row.invitados:[];
@@ -9789,7 +9810,43 @@ function culturaSlotCount(row){
   const legacy=saved===4 && maxSlot<3;
   return Math.max(CULTURA_SLOTS_BASE, maxSlot+1, legacy?CULTURA_SLOTS_BASE:saved);
 }
-function getCulturaWeek(id){
+function migrarCulturaAMeses(){
+  const all=loadCulturaAll();
+  const weekKeys=Object.keys(all).filter(culturaIsWeekId);
+  if(!weekKeys.length) return;
+  const buckets={};
+  for(const key of weekKeys){
+    const mid=culturaMonthOfKey(key); if(!mid) continue;
+    if(!buckets[mid]) buckets[mid]={pb:0,invitados:[],acciones:[],slots:0};
+    const w=all[key]||{};
+    buckets[mid].pb=Math.max(buckets[mid].pb,Number(w.pb)||0);
+    buckets[mid].invitados.push(Array.isArray(w.invitados)?w.invitados:[]);
+    if(Array.isArray(w.acciones)) buckets[mid].acciones.push(...w.acciones);
+    delete all[key];
+  }
+  for(const mid of Object.keys(buckets)){
+    const b=buckets[mid], prev=all[mid]||{};
+    const invitados=culturaMergeInvitados([prev.invitados,...b.invitados]);
+    all[mid]={
+      pb:Math.max(Number(prev.pb)||0,b.pb),
+      invitados,
+      acciones:Array.isArray(prev.acciones)?prev.acciones.concat(b.acciones):b.acciones,
+      slots:Math.max(culturaSlotCount(prev),invitados.length,CULTURA_SLOTS_BASE)
+    };
+  }
+  persistCulturaAll(all);
+}
+function culturaPastMonths(currentId){
+  migrarCulturaAMeses();
+  const all=loadCulturaAll();
+  return Object.keys(all).filter(id=>{
+    if(!culturaIsMonthId(id)||id>=currentId) return false;
+    const w=all[id]||{};
+    return (Number(w.pb)||0)>0 || (Array.isArray(w.invitados)&&w.invitados.length) || (Array.isArray(w.acciones)&&w.acciones.length);
+  }).sort((a,b)=>b.localeCompare(a));
+}
+function getCulturaMonth(id){
+  migrarCulturaAMeses();
   const all=loadCulturaAll();
   const row=all[id]||{};
   const invitados=Array.isArray(row.invitados)?row.invitados:[];
@@ -9800,7 +9857,8 @@ function getCulturaWeek(id){
     acciones:Array.isArray(row.acciones)?row.acciones:[]
   };
 }
-function saveCulturaWeek(id,value){
+function saveCulturaMonth(id,value){
+  migrarCulturaAMeses();
   const all=loadCulturaAll();
   const invitados=Array.isArray(value.invitados)?value.invitados:[];
   all[id]={
@@ -9809,41 +9867,72 @@ function saveCulturaWeek(id,value){
     invitados,
     acciones:Array.isArray(value.acciones)?value.acciones:[]
   };
-  localStorage.setItem(CULTURA_KEY,JSON.stringify(all));
+  persistCulturaAll(all);
 }
-function culturaInvitadoNombre(p){return [p&&p.nombre,p&&p.apellido].filter(Boolean).join(' ').trim()}
 function culturaIniciales(p){
   const n=(p&&p.nombre||'').trim(), a=(p&&p.apellido||'').trim();
   const letters=((n[0]||'')+(a[0]||n[1]||'')).toUpperCase();
   return letters||'👤';
 }
 function culturaEsc(value){return String(value==null?'':value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function culturaQuitarPorContacto(ref={}){
+  const id=ref.id!=null?String(ref.id):'';
+  const agendaId=ref.agendaId!=null?String(ref.agendaId):'';
+  const tel=String(ref.telefono||'').replace(/\D/g,'');
+  const nom=String(ref.nombre||'').trim().toLowerCase();
+  if(!id&&!agendaId&&!tel&&!nom) return false;
+  const all=loadCulturaAll();
+  let changed=false;
+  for(const key of Object.keys(all)){
+    const row=all[key];
+    if(!row||!Array.isArray(row.invitados)||!row.invitados.length) continue;
+    const next=row.invitados.filter(p=>{
+      if(id&&(String(p.id)===id||String(p.agendaId)===id)) return false;
+      if(agendaId&&String(p.agendaId)===agendaId) return false;
+      const pTel=String(p.telefono||'').replace(/\D/g,'');
+      if(tel&&pTel&&pTel===tel) return false;
+      const pNom=culturaInvitadoNombre(p).toLowerCase();
+      if(nom&&pNom&&pNom===nom) return false;
+      return true;
+    }).map((p,idx)=>({...p,slot:idx}));
+    if(next.length!==row.invitados.length){
+      row.invitados=next;
+      row.slots=culturaSlotCount(row);
+      changed=true;
+    }
+  }
+  if(changed){
+    persistCulturaAll(all);
+    try{renderCulturaCrecimiento()}catch(e){}
+  }
+  return changed;
+}
+window.culturaQuitarPorContacto=culturaQuitarPorContacto;
 function renderCulturaCrecimiento(){
   const wrap=document.getElementById('culturaWrap');
   if(!wrap) return;
   const openPast=[...wrap.querySelectorAll('details.cultura-past[open]')].map(el=>el.dataset.week);
-  const id=culturaWeekId();
-  const week=getCulturaWeek(id);
+  const id=culturaMonthId();
+  const week=getCulturaMonth(id);
   const pbDone=week.pb>=CULTURA_PB_META;
   const accDone=week.invitados.length>=CULTURA_INV_META;
-  const doneCount=(pbDone?1:0)+(accDone?1:0);
   const extra=Math.max(0,Math.round((week.pb-CULTURA_PB_META)*100)/100);
   const weekPct=Math.max(0,Math.min(100,Math.round(
     Math.min(week.pb,CULTURA_PB_META)/CULTURA_PB_META*50 +
     Math.min(week.invitados.length,CULTURA_INV_META)/CULTURA_INV_META*50
   )));
-  const past=culturaPastWeeks(id);
-  const pastHtml=past.map(weekId=>{
-    const date=culturaDateFromId(weekId);
-    const data=getCulturaWeek(weekId);
+  const past=culturaPastMonths(id);
+  const pastHtml=past.map(monthId=>{
+    const date=culturaDateFromId(monthId);
+    const data=getCulturaMonth(monthId);
     const guests=data.invitados.length?data.invitados:data.acciones.map(a=>({nombre:a.text}));
     const okPb=data.pb>=CULTURA_PB_META;
     const okInv=guests.length>=CULTURA_INV_META;
     const extraPast=Math.max(0,Math.round((data.pb-CULTURA_PB_META)*100)/100);
-    return `<details class="cultura-past" data-week="${weekId}" ${openPast.includes(weekId)?'open':''}>
+    return `<details class="cultura-past" data-week="${monthId}" ${openPast.includes(monthId)?'open':''}>
       <summary>
         <div>
-          <strong>${date?culturaWeekLabel(date):weekId}</strong>
+          <strong>${date?culturaMonthLabel(date):monthId}</strong>
           <small>${culturaFmt(data.pb)} PB · ${guests.length} invitado${guests.length===1?'':'s'}${okPb&&okInv?' · meta cumplida':''}</small>
         </div>
         <em>⌄</em>
@@ -9861,20 +9950,20 @@ function renderCulturaCrecimiento(){
     <section class="cultura-card">
       <div class="cultura-head">
         <div>
-          <div class="cultura-kicker">Semanal</div>
+          <div class="cultura-kicker">Mensual</div>
           <h3>Cultura de crecimiento</h3>
         </div>
-        <div class="cultura-week"><small>Esta semana</small>${culturaWeekLabel()}</div>
+        <div class="cultura-week"><small>Este mes</small>${culturaMonthLabel()}</div>
       </div>
       <div class="cultura-tasks">
         <article class="cultura-task ${pbDone?'done':''}">
           <div class="cultura-task-top"><strong>💎 PB personales</strong><span class="cultura-task-hint">meta ${CULTURA_PB_META}${extra?` · +${culturaFmt(extra)}`:''}</span></div>
           <div class="cultura-step">
-            <input id="culturaPbInput" type="text" inputmode="decimal" enterkeyhint="done" value="${week.pb?String(week.pb).replace('.',','):''}" placeholder="0" aria-label="PB personales de la semana">
+            <input id="culturaPbInput" type="text" inputmode="decimal" enterkeyhint="done" value="${week.pb?String(week.pb).replace('.',','):''}" placeholder="0" aria-label="PB personales del mes">
           </div>
         </article>
         <article class="cultura-task ${accDone?'done':''}">
-          <div class="cultura-task-top"><strong>🤝 Patrocinio</strong><span>${week.invitados.length} / ${CULTURA_INV_META}</span></div>
+          <div class="cultura-task-top"><strong>🤝 Invitados</strong><span>${week.invitados.length} / ${CULTURA_INV_META}</span></div>
           <div class="cultura-pills">
             ${Array.from({length:week.slots},(_,slot)=>{
               const guest=week.invitados.find(p=>Number(p.slot)===slot);
@@ -9885,15 +9974,15 @@ function renderCulturaCrecimiento(){
         </article>
       </div>
       <div class="cultura-meter ${weekPct>=100?'done':''}">
-        <div class="cultura-meter-top"><span>Progreso de la semana</span><b>${weekPct}%</b></div>
+        <div class="cultura-meter-top"><span>Progreso del mes</span><b>${weekPct}%</b></div>
         <div class="cultura-bar"><i style="width:${weekPct}%"></i></div>
       </div>
-      <div class="cultura-foot">${weekPct>=100?(extra?'✓ Semana completa y superaste los 15 PB.':'✓ Semana completa: 15 PB y 2 invitados.'):`15 PB + 2 invitados = 100% · se pueden pasar`}</div>
-      ${past.length?`<div class="cultura-history-title">Semanas anteriores</div><div class="cultura-history">${pastHtml}</div>`:''}
+      <div class="cultura-foot">${weekPct>=100?(extra?'✓ Mes completo y superaste los 15 PB.':'✓ Mes completo: 15 PB y 2 invitados.'):`15 PB + 2 invitados en el mes = 100% · se pueden pasar`}</div>
+      ${past.length?`<div class="cultura-history-title">Meses anteriores</div><div class="cultura-history">${pastHtml}</div>`:''}
     </section>`;
   const persistPb=raw=>{
     const n=Math.max(0,Number(String(raw).replace(',','.'))||0);
-    saveCulturaWeek(id,{...getCulturaWeek(id),pb:Math.round(n*100)/100});
+    saveCulturaMonth(id,{...getCulturaMonth(id),pb:Math.round(n*100)/100});
     renderCulturaCrecimiento();
   };
   const pbInput=document.getElementById('culturaPbInput');
@@ -9906,15 +9995,15 @@ function renderCulturaCrecimiento(){
   wrap.querySelectorAll('[data-cultura-slot]').forEach(btn=>btn.onclick=()=>openCulturaInvitado(id,+btn.dataset.culturaSlot));
   const addSlot=document.getElementById('culturaAddSlot');
   if(addSlot) addSlot.onclick=()=>{
-    const current=getCulturaWeek(id);
+    const current=getCulturaMonth(id);
     const nextSlot=current.slots;
     current.slots=nextSlot+1;
-    saveCulturaWeek(id,current);
+    saveCulturaMonth(id,current);
     openCulturaInvitado(id,nextSlot);
   };
 }
-function openCulturaInvitado(weekId,slot){
-  const week=getCulturaWeek(weekId);
+function openCulturaInvitado(monthId,slot){
+  const week=getCulturaMonth(monthId);
   const guest=week.invitados.find(p=>Number(p.slot)===slot)||{};
   const editing=!!guest.id;
   modal.open({
@@ -9931,7 +10020,7 @@ function openCulturaInvitado(weekId,slot){
       <label>Teléfono<input id="invTelefono" value="${culturaEsc(guest.telefono||'')}" inputmode="tel" autocomplete="tel" placeholder="351..."></label>
       <label>Presentación<input id="invFecha" type="date" value="${culturaEsc(guest.fechaPresentacion||hoyLocal())}"></label>
       <p class="cultura-inv-tip">Se guarda también en tu agenda de contactos.</p>
-      ${editing?'<button type="button" id="invQuitar" class="cultura-inv-remove">Quitar de esta semana</button>':''}
+      ${editing?'<button type="button" id="invQuitar" class="cultura-inv-remove">Quitar de este mes</button>':''}
     </div>`,
     onConfirm: ()=>{
       const nombre=capitalizarNombreSeg(document.getElementById('invNombre')?.value||'').trim();
@@ -9959,11 +10048,11 @@ function openCulturaInvitado(weekId,slot){
       }
       agendaId=item.id;
       guardarSeguimientos(agenda);
-      const current=getCulturaWeek(weekId);
+      const current=getCulturaMonth(monthId);
       const next={id:guest.id||`${Date.now()}`,slot,nombre,apellido,telefono,fechaPresentacion:fecha,agendaId,at:new Date().toISOString()};
       const pos=current.invitados.findIndex(p=>Number(p.slot)===slot);
       if(pos>=0) current.invitados[pos]=next; else current.invitados.push(next);
-      saveCulturaWeek(weekId,current);
+      saveCulturaMonth(monthId,current);
       try{haptic(16)}catch(e){}
       showToast('Invitado guardado en la agenda ✅',1800);
       renderCulturaCrecimiento();
@@ -9980,12 +10069,12 @@ function openCulturaInvitado(weekId,slot){
     if(ape) ape.addEventListener('input',e=>{const pos=e.target.selectionStart;e.target.value=capitalizarNombreSeg(e.target.value);try{e.target.setSelectionRange(pos,pos)}catch(err){}});
     const quitar=document.getElementById('invQuitar');
     if(quitar) quitar.onclick=()=>{
-      const current=getCulturaWeek(weekId);
-      current.invitados=current.invitados.filter(p=>Number(p.slot)!==slot);
-      saveCulturaWeek(weekId,current);
+      const current=getCulturaMonth(monthId);
+      current.invitados=current.invitados.filter(p=>Number(p.slot)!==slot).map((p,idx)=>({...p,slot:idx}));
+      saveCulturaMonth(monthId,current);
       modal.close();
       renderCulturaCrecimiento();
-      showToast('Invitado quitado de la semana',1600);
+      showToast('Invitado quitado del mes',1600);
     };
   },40);
 }

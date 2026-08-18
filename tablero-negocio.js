@@ -26,12 +26,17 @@
   function culturaMes(){
     try{
       var data = JSON.parse(localStorage.getItem('cultura_crecimiento_v1') || '{}');
-      var inicio = new Date(); inicio.setDate(1); inicio.setHours(0,0,0,0);
-      var pb = 0, invitados = 0;
+      var now = new Date();
+      var id = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0');
+      var row = data[id] || {};
+      var invitados = Array.isArray(row.invitados) ? row.invitados.length : Number(row.invitados) || 0;
+      var pb = Number(row.pb) || 0;
       Object.keys(data).forEach(function(k){
+        if(!/^\d{4}-\d{2}-\d{2}$/.test(k)) return;
+        if(k.slice(0,7) !== id) return;
         var w = data[k] || {};
-        var f = w.fecha ? new Date(w.fecha) : null;
-        if (f && f >= inicio) { pb += Number(w.pb) || 0; invitados += Number(w.invitados) || 0; }
+        pb = Math.max(pb, Number(w.pb) || 0);
+        if(Array.isArray(w.invitados)) invitados = Math.max(invitados, w.invitados.length);
       });
       return { pb: pb, invitados: invitados };
     }catch(e){ return { pb: 0, invitados: 0 }; }
