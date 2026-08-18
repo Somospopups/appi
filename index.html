@@ -11074,7 +11074,7 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./service-worker.js?v=251').catch(error => {
+      navigator.serviceWorker.register('./service-worker.js?v=252').catch(error => {
         console.warn('No se pudo registrar el modo offline de APPI', error);
       });
     });
