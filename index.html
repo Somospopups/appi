@@ -1627,7 +1627,7 @@ body.dark .hist-section-title h3,body.dark .hist-attention strong,body.dark .his
     padding: 12px 14px;
     border-radius: 14px;
     transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-    cursor: pointer;
+    cursor: default;
     position: relative;
     margin-bottom: 4px;
     background: rgba(255,255,255,0.4);
@@ -1665,12 +1665,22 @@ body.dark .hist-section-title h3,body.dark .hist-attention strong,body.dark .his
   body.dark .tree-children {
     border-left-color: rgba(255,255,255,0.15);
   }
+  .tree-node .tree-expand {
+    display: flex; align-items: center; gap: 8px;
+    flex: none; align-self: stretch;
+    margin: -12px 0 -12px -14px;
+    padding: 12px 10px 12px 14px;
+    cursor: pointer;
+    border-radius: 14px 0 0 14px;
+  }
+  .tree-node.leaf .tree-expand { cursor: default; }
   .tree-node .tree-arrow {
     width: 18px; text-align: center;
     font-size: 11px;
     color: #6b6b76; flex: none;
     transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    margin-left: 4px;
+    margin-left: 0;
+    pointer-events: none;
   }
   .tree-node.expanded .tree-arrow {
     transform: rotate(90deg);
@@ -1687,16 +1697,24 @@ body.dark .hist-section-title h3,body.dark .hist-attention strong,body.dark .his
     letter-spacing: 0.4px;
     box-shadow: 0 2px 6px rgba(0,0,0,0.15);
     text-transform: uppercase;
+    pointer-events: none;
+  }
+  .tree-node .tree-main {
+    flex: 1; min-width: 0;
+    display: flex; flex-direction: column; gap: 2px;
   }
   .tree-node .tree-name {
-    flex: 1; font-size: 13.5px;
+    display: inline-block;
+    max-width: 100%;
+    font-size: 13.5px;
     color: #1c1c1e;
     font-weight: 600;
-    min-width: 0;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     letter-spacing: -0.1px;
+    cursor: pointer;
+    border-radius: 6px;
   }
   .tree-node .tree-name.inactive {
     opacity: 0.5;
@@ -7245,9 +7263,14 @@ function renderEquipoArbol(){
   cont.innerHTML = titulo + `<div id="treeContainer">${renderTreeListaHTML()}</div>`;
   bindTreeEvents();
 }
+function raicesDelEquipo(){
+  if(equipoData && Array.isArray(equipoData.raices) && equipoData.raices.length) return equipoData.raices;
+  const personas = (equipoData && equipoData.personas) || [];
+  return personas.filter(p => !p.padreId && (!p.nivel || p.nivel <= 1));
+}
 function renderTreeListaHTML(){
   let html = '<div class="tree-list">';
-  equipoData.raices.forEach(p=>{ html += renderTreeNodeLista(p); });
+  raicesDelEquipo().forEach(p=>{ html += renderTreeNodeLista(p); });
   html += '</div>';
   return html;
 }
@@ -7274,10 +7297,12 @@ function renderTreeNodeLista(p){
   const barColor = info.color === '#ffffff' ? '#c0c0c8' : info.color;
   
   let html = `<div class="tree-node ${hasKids?'':'leaf'} ${isExpanded?'expanded':''}" data-pid="${p.id}" style="--nodeColor:${barColor}">
-    <span class="tree-arrow">▶</span>
-    <span class="tree-cat-badge" style="${badgeStyle}">${info.name}</span>
-    <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
-      <span class="tree-name ${pts===0?'inactive':''}" style="${txtBlanco}">${escapeXml(p.nombre)}${hijosText}</span>
+    <span class="tree-expand" data-tree-expand="${hasKids?'1':'0'}" title="${hasKids?'Abrir o cerrar la organización':''}">
+      <span class="tree-arrow">▶</span>
+      <span class="tree-cat-badge" style="${badgeStyle}">${info.name}</span>
+    </span>
+    <div class="tree-main">
+      <span class="tree-name ${pts===0?'inactive':''}" style="${txtBlanco}" data-tree-card="1">${escapeXml(p.nombre)}${hijosText}</span>
       ${tieneGarantias ? `<span class="tree-gar">Vend. ${formatPB(g.presentadas)} · Venc. ${formatPB(g.vencidas)} (${formatPB(g.porcVencidas)}%) · Pend. ${formatPB(g.pendientes)}</span>` : ''}
     </div>
     <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex:none">
@@ -7355,23 +7380,39 @@ function calcOrgMesRec(p, campo){
   return total;
 }
 
+function personaDeNodo(n){
+  if(!n || !equipoData || !equipoData.personas) return null;
+  const wanted=String(n.dataset.pid||'');
+  return equipoData.personas.find(x => String(x.id) === wanted);
+}
+function toggleRamaArbol(p){
+  if(!p || !p.hijos || !p.hijos.length) return;
+  if(equipoExpanded.has(p.id)) equipoExpanded.delete(p.id);
+  else equipoExpanded.add(p.id);
+  haptic(6);
+  renderEquipoArbol();
+}
 function bindTreeEvents(){
+  document.querySelectorAll('#treeContainer .tree-expand[data-tree-expand="1"]').forEach(el=>{
+    el.onclick = (e)=>{
+      e.preventDefault();
+      e.stopPropagation();
+      toggleRamaArbol(personaDeNodo(el.closest('.tree-node')));
+    };
+  });
+  document.querySelectorAll('#treeContainer .tree-name[data-tree-card]').forEach(el=>{
+    el.onclick = (e)=>{
+      e.preventDefault();
+      e.stopPropagation();
+      const p = personaDeNodo(el.closest('.tree-node'));
+      if(p) openPersonaModal(p);
+    };
+  });
   document.querySelectorAll('.tree-node, .org-node').forEach(n=>{
     n.onclick = (e)=>{
-      const wanted=String(n.dataset.pid||'');
-      const p = equipoData.personas.find(x => String(x.id) === wanted);
-      if(!p) return;
-      const hasKids = p.hijos && p.hijos.length > 0;
-      // En la lista, la flecha despliega la rama. Tocar el resto de la
-      // tarjeta vuelve a abrir la ficha de contacto, como en la versión original.
-      if(n.classList.contains('tree-node') && hasKids && e.target.closest('.tree-arrow')){
-        if(equipoExpanded.has(p.id)) equipoExpanded.delete(p.id);
-        else equipoExpanded.add(p.id);
-        haptic(6);
-        renderEquipoArbol();
-        return;
-      }
-      openPersonaModal(p);
+      if(n.classList.contains('tree-node')) return;
+      const p = personaDeNodo(n);
+      if(p) openPersonaModal(p);
     };
     n.oncontextmenu = (e)=>{
       e.preventDefault();

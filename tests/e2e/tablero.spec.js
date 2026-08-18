@@ -19,6 +19,7 @@ const EQUIPO = {
     ]
   }]
 };
+EQUIPO.raices = EQUIPO.personas;
 const CONTACTOS = [
   { id: 'c1', estado: 'presentacion', nombre: 'Lucía Vega', telefono: '1', telefono_normalizado: '3515550003', tipo: 'contacto', created_at: hoy, updated_at: hoy },
   { id: 'c2', estado: 'convertido', nombre: 'Raúl Paredes', telefono: '2', telefono_normalizado: '3515550004', tipo: 'contacto', created_at: hoy, updated_at: hoy }
@@ -130,6 +131,31 @@ test('el stock se carga y sobrevive el refresco', async ({ page }) => {
   await page.reload({ waitUntil: 'networkidle' });
   await page.evaluate(() => window.showView('view-presu'));
   await expect(page.locator('#stockCard')).toContainText('Iontrix 2');
+});
+
+test('en el Árbol el nombre abre la ficha y la categoría abre la organización', async ({ page }) => {
+  await entrar(page);
+  await page.evaluate(() => window.openEquipo());
+  await page.locator('.equipo-tab[data-eqtab="arbol"]').click();
+  const raiz = page.locator('#treeContainer .tree-node').first();
+  await expect(raiz).toBeVisible();
+  await expect(page.locator('#treeContainer .tree-children').first()).not.toHaveClass(/open/);
+
+  await raiz.locator('.tree-name').click();
+  await expect(page.locator('#modalOverlay')).toHaveClass(/open/);
+  await expect(page.locator('#modalTitle')).toContainText('María Pérez');
+  await page.evaluate(() => {
+    const el = document.getElementById('modalOverlay');
+    el.classList.remove('open');
+    if (window.liberarScrollCuerpo) window.liberarScrollCuerpo();
+  });
+  await expect(page.locator('#modalOverlay')).not.toHaveClass(/open/);
+
+  await page.locator('#treeContainer .tree-expand').first().click();
+  await expect(page.locator('#treeContainer .tree-node').first()).toHaveClass(/expanded/);
+  await expect(page.locator('#treeContainer .tree-children').first()).toHaveClass(/open/);
+  await expect(page.locator('#treeContainer')).toContainText('Ana Gómez');
+  await expect(page.locator('#modalOverlay')).not.toHaveClass(/open/);
 });
 
 test('la duplicación cuenta activos y duplicantes', async ({ page }) => {
