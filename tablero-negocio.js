@@ -215,7 +215,7 @@
             '</div>' +
           '</div>' +
           '<div style="font-size:11px; color:#78350f; line-height:1.5;">' +
-            'Comisión por cada sistema vendido. Incluye bono de comercialización + bono de instalación.' +
+            'Ganancia por cada producto comercializado.' +
           '</div>' +
         '</div>' +
 
