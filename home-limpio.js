@@ -600,7 +600,12 @@
     if (typeof origH === 'function') {
       window.renderHomeCompleto = function(){ var r = origH.apply(this, arguments); try{ if ($('view-home') && $('view-home').classList.contains('active')) render(); }catch(e){} return r; };
     }
-    setTimeout(function(){ mudar(); if ($('view-home').classList.contains('active')) render(); }, 900);
+    if ($('view-home') && $('view-home').classList.contains('active')) render();
+    setTimeout(function(){
+      if (!cuentaLista()) return;
+      mudar();
+      if ($('view-home') && $('view-home').classList.contains('active') && !$('homeLimpio')) render();
+    }, 900);
   }
   if (document.readyState === 'complete') envolver();
   else window.addEventListener('load', envolver);

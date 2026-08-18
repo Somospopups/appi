@@ -5367,6 +5367,16 @@ function forzarScrollLibre(){
   if(person)person.hidden=true;
   aplicarEstadoScrollCuerpo(false);
 }
+function marcarInicioCubierto(on){
+  window.__appiCubriendoInicio=!!on;
+}
+function revelarAppLista(){
+  window.__appiCubriendoInicio=false;
+  const overlay=document.getElementById('personChoiceOverlay');
+  if(overlay)overlay.hidden=true;
+  ocultarBoot(true);
+  if(typeof liberarScrollCuerpo==='function')liberarScrollCuerpo();
+}
 window.liberarScrollCuerpo=liberarScrollCuerpo;
 window.bloquearScrollCuerpo=bloquearScrollCuerpo;
 window.forzarScrollLibre=forzarScrollLibre;
@@ -9851,7 +9861,7 @@ function renderToolsList(){
     });
     herrHost.innerHTML = h1 + h2 + h3 + h4 + h5 + hStock + h6 + h7;
   }
-  if(!mesHost) document.getElementById('toolsList').innerHTML = `
+  if(!mesHost){const toolsList=document.getElementById('toolsList');if(toolsList)toolsList.innerHTML = `
     <details class="home-section-block" data-home-sec="mes" ${openMes?'open':''}>
       <summary class="mini-section-label"><span>📅</span> Mi mes<em>⌄</em></summary>
       <div id="nextStepWrap"></div>
@@ -9861,7 +9871,7 @@ function renderToolsList(){
       <summary class="mini-section-label"><span>🌱</span> Mi negocio<em>⌄</em></summary>
       <div class="home-tool-grid">${equipoCard + historicoCard + usuariosCard + seguimientoCard}</div>
     </details>
-  `;
+  `;}
   document.querySelectorAll('#toolsList [data-home-sec]').forEach(el=>{
     el.addEventListener('toggle',()=>{
       localStorage.setItem('home_sec_'+el.dataset.homeSec, el.open?'1':'0');
@@ -10620,15 +10630,19 @@ async function asegurarPersonaActiva(){
   // Fuera del login y con el lock tapado: en el celular pageshow no puede
   // esconder "¿Quién sos?" ni dejar un Home a medias.
   ocultarLockScreen();
-  ocultarBoot();
+  marcarInicioCubierto(true);
   bloquearScrollCuerpo();
   list.innerHTML=ordered.map(person=>`<button type="button" class="person-choice-option" data-person-type="${person.tipo}"><span class="person-choice-avatar">${person.tipo==='titular'?'👤':'🤝'}</span><span><strong>${escapeXml(person.nombre)}</strong><small>${person.tipo==='titular'?'Titular':'Socio/a'}${person.tipo===requestedPerson?' · Teléfono a vincular':''}</small></span><span class="person-choice-arrow">›</span></button>`).join('');
   overlay.hidden=false;
   return new Promise(resolve=>{
     list.querySelectorAll('[data-person-type]').forEach(button=>button.onclick=()=>{
       const selected=window.APPIAuth.selectPerson(button.dataset.personType);
-      overlay.hidden=true;
-      liberarScrollCuerpo();
+      list.querySelectorAll('button').forEach(item=>{item.disabled=true;item.setAttribute('aria-busy','true')});
+      const title=document.getElementById('personChoiceTitle');
+      const copy=overlay.querySelector('.person-choice-copy');
+      if(title)title.textContent='Entrando…';
+      if(copy)copy.textContent='Estamos abriendo tu espacio.';
+      marcarInicioCubierto(true);
       resolve(selected);
     });
     setTimeout(()=>list.querySelector('[data-person-type]')?.focus(),50);
@@ -10724,7 +10738,10 @@ function avisarMembresiaUsuario(){
   window.APPIDialog.alert(days===0?'Tu membresía vence hoy.':`Tu membresía de APPI vence en ${days} día${days===1?'':'s'}.`,{title:'Membresía por vencer',icon:'⏳',okText:'Entendido'});
 }
 
-function ocultarBoot(){const b=document.getElementById('bootScreen');if(!b||b.classList.contains('gone'))return;b.classList.remove('fill');b.classList.add('drain','gone');setTimeout(()=>{try{b.remove()}catch(e){}},900);}
+function ocultarBoot(force){
+  if(!force&&(window.__appiCubriendoInicio||overlayPersonaVisible()))return;
+  const b=document.getElementById('bootScreen');if(!b||b.classList.contains('gone'))return;b.classList.remove('fill');b.classList.add('drain','gone');setTimeout(()=>{try{b.remove()}catch(e){}},900);
+}
 setTimeout(ocultarBoot,6000);
 
 // Inicia la app normalmente
@@ -10741,8 +10758,6 @@ function iniciarApp() {
     });
     return;
   }
-  ocultarBoot();
-  forzarScrollLibre();
   const profile=window.APPIAuth&&window.APPIAuth.isEnabled()?window.APPIAuth.currentProfile():null;
   if(profile&&profile.rol==='admin'){
     showView('view-admin');
@@ -10759,6 +10774,12 @@ function iniciarApp() {
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',actualizarCuentaUI,{once:true});
   else actualizarCuentaUI();
+  const descubrir=function(){
+    revelarAppLista();
+    forzarScrollLibre();
+  };
+  if(typeof requestAnimationFrame==='function')requestAnimationFrame(function(){requestAnimationFrame(descubrir)});
+  else setTimeout(descubrir,32);
 }
 
 
@@ -10944,7 +10965,7 @@ function abrirBackupDesdeMenu(){
     if(result.ok){
       const profile=window.APPIAuth.currentProfile();
       if(profile&&profile.rol!=='admin'&&profile.debe_cambiar_password){mostrarCambioPasswordObligatorio();return}
-      try{if(profile&&profile.rol!=='admin')await asegurarPersonaActiva();if(window.APPIDataSync)await window.APPIDataSync.start({claimLegacy:!(profile&&profile.rol==='admin')})}catch(error){console.error('Preparar datos de cuenta',error)}
+      try{if(profile&&profile.rol!=='admin')await asegurarPersonaActiva();marcarInicioCubierto(true);if(window.APPIDataSync)await window.APPIDataSync.start({claimLegacy:!(profile&&profile.rol==='admin')})}catch(error){console.error('Preparar datos de cuenta',error)}
       localStorage.removeItem('appi_activada');
       iniciarApp();
       if(result.offline)setTimeout(()=>showToast('Modo offline · conectate antes de 7 días',3200),500);

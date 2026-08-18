@@ -111,7 +111,8 @@ El workflow `.github/workflows/deploy-backend.yml` ahora:
 
 - El diálogo **¿Quién sos?** salió de `#lockScreen`. En el teléfono, `pageshow` (PWA / bfcache) llamaba a `forzarScrollLibre()`, tapaba la elección y dejaba un Home a medias.
 - Si falta elegir titular o socio, el overlay se mantiene visible y la app no arranca el Home ni limpia las herramientas.
-- Caché PWA: `appi-v250-login-persona`. Recargar o borrar datos del sitio si quedó el Service Worker viejo.
+- Caché PWA: `appi-v250-home-listo`. Recargar o borrar datos del sitio si quedó el Service Worker viejo.
+- Después de elegir titular o socio ya no hay un pantallazo de Home roto: el diálogo se queda en **Entrando…** hasta que el Home está pintado.
 
 ## Verificación
 

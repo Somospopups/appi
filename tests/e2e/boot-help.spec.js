@@ -49,8 +49,11 @@ test('sin pantallazos: boot mientras elegís persona, y directo al home', async 
 
   await page.locator('[data-person-type="titular"]').click();
 
-  // Después de elegir: sin boot y directo al home, sin pasar por el login.
+  // Después de elegir: sin boot y directo al home listo, sin pasar por el login.
   await expect(page.locator('#view-home')).toHaveClass(/active/);
+  await expect(page.locator('#homeLimpio')).toBeVisible();
+  await expect(page.locator('#homeGreeting')).toHaveText('Hola María 👋');
+  await expect(page.locator('#personChoiceOverlay')).toBeHidden();
   await expect(page.locator('#bootScreen')).toHaveCount(0, { timeout: 3000 });
   await expect(page.locator('#lockScreen')).toBeHidden();
 });
@@ -64,6 +67,10 @@ test('en el celular pageshow no saltea titular/socio ni deja un home a medias', 
     membresia_meses: 1, membresia_inicio: now, membresia_vence: new Date(Date.now() + 30 * 86400000).toISOString()
   };
   await mockBase(page, profile);
+  await page.route('https://mock.supabase.co/**', async route => {
+    await new Promise(resolve => setTimeout(resolve, 500));
+    await route.fallback();
+  });
   await page.addInitScript(([uid, perf]) => {
     localStorage.setItem('welcomeSeen', '1');
     localStorage.setItem('tutoVisto_v2', '1');
@@ -100,6 +107,14 @@ test('en el celular pageshow no saltea titular/socio ni deja un home a medias', 
   })).toEqual({ parent: 'BODY', hidden: false, display: 'flex', needs: true });
 
   await page.locator('[data-person-type="socio"]').click();
+  expect(await page.evaluate(() => {
+    const overlay = document.getElementById('personChoiceOverlay');
+    const home = document.getElementById('homeLimpio');
+    const greeting = document.getElementById('homeGreeting');
+    const covered = !!(overlay && !overlay.hidden);
+    const listo = !!(home && greeting && /Hola Juan/.test(greeting.textContent || ''));
+    return { covered, listo, title: overlay && overlay.querySelector('h2') && overlay.querySelector('h2').textContent };
+  })).toEqual({ covered: true, listo: false, title: 'Entrando…' });
   await expect(page.locator('#personChoiceOverlay')).toBeHidden();
   await expect(page.locator('#view-home')).toHaveClass(/active/);
   await expect(page.locator('#homeGreeting')).toHaveText('Hola Juan 👋');
