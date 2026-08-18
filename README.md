@@ -4,7 +4,7 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
-- Versión: **v255 · Segura**.
+- Versión: **v256 · Segura**.
 - Publicación: [https://somospopups.github.io/appi/](https://somospopups.github.io/appi/)
 - Acceso por número de distribuidor y contraseña.
 - Acceso administrador POPUPS mediante el candado, sin DIP ni número de distribuidor.
@@ -12,6 +12,17 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 - Sincronización automática por cuenta.
 - Funcionamiento offline por hasta 7 días desde la última validación.
 - Grabaciones y transcripciones de audio locales: no se suben a la nube.
+
+## Arranque con el logo de vidrio
+
+Desde v256, todos los dispositivos abren APPI con el mismo logo de vidrio.
+
+- `scripts/logo_vidrio.py` dibuja el logo una sola vez: fondo pastel, cartel de vidrio esmerilado y el wordmark APPI en letras heladas.
+- `python3 scripts/make-splash.py` genera las 26 imágenes de arranque de iPhone y iPad, verticales y apaisadas, dentro de `splash/`.
+- `python3 scripts/make-icons.py` genera los íconos del manifiesto y `apple-touch-icon.png`; Android usa el ícono para su pantalla de arranque, así que ve el mismo logo.
+- Dentro de la app, la animación de carga muestra el mismo cartel de vidrio dibujado con CSS, sin descargar imágenes, en celular, tablet y PC.
+
+Al cambiar el logo hay que regenerar ambos juegos y volver a correr `npm test`: `tests/e2e/logo-vidrio.spec.js` verifica que cada dispositivo tenga su imagen y que el arranque muestre el vidrio.
 
 ## Con qué WhatsApp se envía
 
@@ -142,6 +153,8 @@ La suite cubre la aplicación, autenticación, aislamiento por cuenta, solicitud
 - `data-sync.js`: sincronización local/nube.
 - `appi-dialog.js`: diálogos visuales APPI.
 - `service-worker.js`: caché offline y notificaciones Push.
+- `scripts/logo_vidrio.py`: generador único del logo de vidrio del arranque.
+- `splash/`: imágenes de arranque de iPhone y iPad con el logo de vidrio.
 - `vendor/`: bibliotecas fijadas localmente y licencias de terceros.
 - `SUPABASE_INSTALACION_COMPLETA.sql`: instalación consolidada.
 - `SUPABASE_ENCUESTAS_GESTION.sql`: módulo de encuestas y CRM.
