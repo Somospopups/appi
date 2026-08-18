@@ -111,7 +111,12 @@ El workflow `.github/workflows/deploy-backend.yml` ahora:
 
 - El diálogo **¿Quién sos?** salió de `#lockScreen`. En el teléfono, `pageshow` (PWA / bfcache) llamaba a `forzarScrollLibre()`, tapaba la elección y dejaba un Home a medias.
 - Si falta elegir titular o socio, el overlay se mantiene visible y la app no arranca el Home ni limpia las herramientas.
-- Caché PWA: `appi-v250-home-listo`. Recargar o borrar datos del sitio si quedó el Service Worker viejo.
+- Caché PWA: `appi-v250-splash`. Recargar o borrar datos del sitio si quedó el Service Worker viejo.
+
+## Apertura en el celular
+
+- Al abrir la PWA ya no sale la pantalla azul oscura con el ícono cuadrado. El splash usa el mismo fondo claro que la carga (`#eef4ff`) y el ícono redondeado de APPI.
+- En iPhone se agregaron imágenes de arranque (`apple-touch-startup-image`) para que no aparezca un recuadro feo antes del boot.
 - Después de elegir titular o socio ya no hay un pantallazo de Home roto: el diálogo se queda en **Entrando…** hasta que el Home está pintado.
 
 ## Verificación

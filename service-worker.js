@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v250-home-listo';
+const CACHE_NAME = 'appi-v250-splash';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

@@ -9,6 +9,13 @@ test('la versión visible, el paquete y el Service Worker están alineados', () 
   expect(html).toContain('APPI · v250 · Segura');
   expect(html).toContain("service-worker.js?v=250");
   expect(sw).toContain("CACHE_NAME = 'appi-v250-");
+  const manifest=JSON.parse(read('manifest.json'));
+  expect(manifest.background_color).toBe('#eef4ff');
+  expect(manifest.theme_color).toBe('#eef4ff');
+  expect(html).toContain('theme-color" content="#eef4ff"');
+  expect(html).toContain('apple-touch-startup-image');
+  expect(fs.existsSync('splash/apple-splash-1170x2532.png')).toBe(true);
+  expect(fs.existsSync('icon-512.png')).toBe(true);
 });
 
 test('el App Shell sólo referencia archivos existentes e incluye los módulos activos', () => {
