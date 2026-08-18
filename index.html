@@ -3651,17 +3651,13 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
 <body>
 
 <div id="bootScreen" role="status" aria-live="polite" aria-busy="true" aria-label="APPI se está preparando">
-  <div class="boot-sky" aria-hidden="true">
-    <i class="boot-sun"></i>
-    <i class="boot-cloud cloud-one"></i>
-    <i class="boot-cloud cloud-two"></i>
+  <div class="boot-ambience" aria-hidden="true">
+    <i class="boot-orb orb-one"></i>
+    <i class="boot-orb orb-two"></i>
   </div>
   <div class="boot-water" aria-hidden="true">
-    <div class="boot-water-depth"></div>
-    <div class="boot-water-caustic"></div>
-    <div class="boot-water-light"></div>
-    <div class="boot-surface surface-back"></div>
-    <div class="boot-surface surface-front"></div>
+    <div class="boot-wave wave-back"><svg viewBox="0 0 500 60" preserveAspectRatio="none"><path d="M0 35 C45 8 86 9 128 34 C171 59 212 58 255 31 C298 5 340 8 382 35 C424 62 463 57 500 28 L500 60 L0 60 Z"/></svg></div>
+    <div class="boot-wave wave-front"><svg viewBox="0 0 500 60" preserveAspectRatio="none"><path d="M0 29 C38 53 77 53 116 28 C155 3 194 4 233 30 C273 55 312 55 351 29 C390 4 429 4 468 29 C480 37 490 40 500 39 L500 60 L0 60 Z"/></svg></div>
     <i class="boot-bubble b1"></i><i class="boot-bubble b2"></i>
     <i class="boot-bubble b3"></i><i class="boot-bubble b4"></i>
     <i class="boot-bubble b5"></i><i class="boot-bubble b6"></i>
@@ -3671,6 +3667,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <div class="boot-glass"><span class="boot-logo">APPI</span></div>
     <p class="boot-message"><span class="boot-message-label">Preparando tu negocio</span><span class="boot-dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="boot-ready-mark" aria-hidden="true">✓</span></p>
   </div>
+  <div class="boot-footer" aria-hidden="true">Simple · Claro · Siempre con vos</div>
 </div>
 <script>
 (function iniciarCargaAnimada(){
@@ -3686,57 +3683,34 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
 })();
 </script>
 <style>
-#bootScreen{position:fixed;inset:0;z-index:9990;overflow:hidden;display:flex;align-items:center;justify-content:center;min-height:100vh;min-height:100dvh;isolation:isolate;opacity:1;background:linear-gradient(180deg,#082b55 0%,#245d7d 48%,#ef9a77 100%);transition:opacity .52s ease,visibility 0s linear 0s}
+#bootScreen{position:fixed;inset:0;z-index:9990;overflow:hidden;display:flex;align-items:center;justify-content:center;min-height:100vh;min-height:100dvh;isolation:isolate;opacity:1;background:linear-gradient(180deg,#06172d 0%,#0a2946 44%,#12526b 100%);transition:opacity .52s ease,visibility 0s linear 0s}
 #bootScreen.gone{pointer-events:none;display:none!important}
-.boot-sky{position:absolute;inset:0;z-index:0;overflow:hidden;background:radial-gradient(circle at 50% 76%,rgba(255,218,144,.9) 0 2%,rgba(255,151,100,.34) 12%,transparent 37%),linear-gradient(180deg,rgba(2,23,55,.3),transparent 60%)}
-.boot-sun{position:absolute;left:50%;top:73%;width:38px;height:38px;border-radius:50%;transform:translate(-50%,-50%);background:#fff4c2;box-shadow:0 0 28px 12px rgba(255,190,112,.6),0 0 90px 40px rgba(255,123,90,.3);animation:bootSunGlow 2.6s ease-in-out infinite}
-.boot-cloud{position:absolute;width:250px;height:54px;border-radius:50%;opacity:.18;filter:blur(16px);background:#d8edff;animation:bootCloud 10s ease-in-out infinite alternate}
-.boot-cloud.cloud-one{top:13%;left:-80px}.boot-cloud.cloud-two{top:31%;right:-105px;width:300px;opacity:.12;animation-delay:-4s;animation-direction:alternate-reverse}
-@keyframes bootSunGlow{50%{box-shadow:0 0 38px 16px rgba(255,205,126,.7),0 0 110px 48px rgba(255,123,90,.36)}}
-@keyframes bootCloud{to{transform:translateX(42px) scale(1.08)}}
-.boot-water{position:absolute;z-index:2;inset:-1px 0 0;transform:translate3d(0,105%,0);will-change:transform;background:linear-gradient(180deg,rgba(214,255,255,.62) 0 2%,#4fd4e4 5%,#1aa8bc 16%,#0d7f96 34%,#0a5d7c 56%,#06415c 78%,#022536 100%);box-shadow:0 -16px 45px rgba(143,229,255,.28);transition:transform 1.55s cubic-bezier(.18,.76,.22,1)}
-#bootScreen.fill .boot-water{transform:translate3d(0,6%,0)}
-.boot-water-depth{position:absolute;inset:0;pointer-events:none;background:radial-gradient(120% 55% at 50% -5%,rgba(255,176,96,.4),transparent 46%),radial-gradient(90% 40% at 18% 62%,rgba(20,200,210,.16),transparent 58%),radial-gradient(80% 45% at 85% 80%,rgba(1,28,48,.45),transparent 62%),repeating-linear-gradient(180deg,transparent 0 11px,rgba(255,255,255,.04) 12px,transparent 18px)}
-.boot-water-caustic{position:absolute;inset:-30% -20% -10%;pointer-events:none;opacity:.5;mix-blend-mode:screen;background:radial-gradient(ellipse 28% 12% at 22% 18%,rgba(255,236,190,.55),transparent 70%),radial-gradient(ellipse 34% 14% at 68% 26%,rgba(170,245,255,.35),transparent 72%),repeating-linear-gradient(118deg,transparent 0 16px,rgba(255,255,255,.11) 20px,transparent 28px 46px),repeating-linear-gradient(242deg,transparent 0 22px,rgba(120,230,255,.12) 28px,transparent 40px 70px);background-size:100% 100%,100% 100%,240px 170px,300px 200px;animation:bootCaustics 6.4s linear infinite}
-.boot-water::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,rgba(255,255,255,.1),transparent 28%,rgba(255,180,114,.11) 48%,transparent 72%);mix-blend-mode:screen;animation:bootWaterGlow 4.8s ease-in-out infinite alternate}
-.boot-water-light{position:absolute;z-index:1;left:50%;top:0;width:48%;height:100%;transform:translateX(-50%);opacity:.34;filter:blur(12px);background:linear-gradient(180deg,rgba(255,205,129,.6),rgba(96,224,242,.12) 35%,transparent 72%);clip-path:polygon(43% 0,57% 0,92% 100%,8% 100%);animation:bootReflejo 3.4s ease-in-out infinite alternate}
-@keyframes bootWaterGlow{to{transform:translateX(2.5%) scale(1.03)}}
-@keyframes bootReflejo{to{opacity:.52;transform:translateX(-50%) scaleX(1.16)}}
-@keyframes bootCaustics{0%{transform:translate3d(0,0,0) scale(1);opacity:.42}50%{transform:translate3d(-36px,14px,0) scale(1.06);opacity:.62}100%{transform:translate3d(-80px,8px,0) scale(1.02);opacity:.48}}
-.boot-surface{position:absolute;z-index:3;left:-25%;width:150%;height:38px;background-repeat:repeat-x;will-change:transform}
-.boot-surface.surface-back{top:-20px;opacity:.46;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 24' preserveAspectRatio='none'%3E%3Cpath d='M0 14 C20 2 38 3 58 14 S96 25 118 13 S158 2 180 14 V24 H0Z' fill='%239eefff'/%3E%3C/svg%3E");background-size:180px 38px;animation:bootWaveBack 5.6s linear infinite}
-.boot-surface.surface-front{top:-12px;opacity:.76;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 140 22' preserveAspectRatio='none'%3E%3Cpath d='M0 11 C16 20 31 20 47 10 S78 1 94 11 S124 20 140 10 V22 H0Z' fill='%23d9fbff'/%3E%3C/svg%3E");background-size:140px 34px;filter:drop-shadow(0 -3px 6px rgba(255,255,255,.24));animation:bootWaveFront 3.8s linear infinite}
-@keyframes bootWaveBack{to{transform:translateX(-180px)}}
-@keyframes bootWaveFront{to{transform:translateX(140px)}}
-.boot-bubble{position:absolute;z-index:2;bottom:-34px;width:10px;height:10px;border:1.5px solid rgba(224,252,255,.75);border-radius:50%;box-shadow:inset 2px 2px 4px rgba(255,255,255,.26),0 0 8px rgba(111,230,255,.18);opacity:0;animation:bootBubble 4.4s linear infinite}
-.boot-bubble::after{content:"";position:absolute;left:20%;top:15%;width:30%;height:30%;border-radius:50%;background:rgba(255,255,255,.8)}
-.boot-bubble.b1{left:12%;width:15px;height:15px;animation-delay:.1s;animation-duration:4.8s}.boot-bubble.b2{left:29%;width:7px;height:7px;animation-delay:1.4s;animation-duration:3.7s}.boot-bubble.b3{left:44%;width:12px;height:12px;animation-delay:2.2s;animation-duration:5.2s}.boot-bubble.b4{left:63%;width:8px;height:8px;animation-delay:.7s;animation-duration:3.9s}.boot-bubble.b5{left:78%;width:17px;height:17px;animation-delay:1.8s;animation-duration:5.5s}.boot-bubble.b6{left:91%;width:6px;height:6px;animation-delay:2.8s;animation-duration:3.5s}
-@keyframes bootBubble{0%{transform:translate3d(0,0,0) scale(.75);opacity:0}10%{opacity:.8}50%{transform:translate3d(13px,-48vh,0) scale(1)}100%{transform:translate3d(-9px,-102vh,0) scale(1.12);opacity:0}}
-.boot-brand{position:relative;z-index:4;width:min(82vw,360px);padding:28px 24px 24px;border:1px solid rgba(255,255,255,.25);border-radius:28px;text-align:center;color:#fff;background:linear-gradient(145deg,rgba(4,35,69,.3),rgba(6,66,94,.16));box-shadow:0 24px 70px rgba(2,25,53,.26),inset 0 1px 0 rgba(255,255,255,.18);-webkit-backdrop-filter:blur(7px);backdrop-filter:blur(7px);animation:bootBrandIn .7s cubic-bezier(.2,.8,.2,1) both}
-.boot-kicker{display:block;margin-bottom:8px;font-size:10px;font-weight:800;letter-spacing:2.8px;color:rgba(235,250,255,.8)}
-.boot-logo{display:block;font-size:64px;font-weight:900;letter-spacing:-2px;line-height:1;color:rgba(255,255,255,.94);text-shadow:0 1px 0 rgba(255,255,255,.75),0 10px 26px rgba(0,29,66,.5);-webkit-text-stroke:1.5px rgba(255,255,255,.55);animation:bootFloat 3.4s .7s ease-in-out infinite}
-/* Cartel de vidrio esmerilado: el mismo logo que muestran las pantallas de arranque nativas. */
-.boot-glass{position:relative;display:inline-block;margin:2px auto 0;padding:14px 30px 16px;border-radius:26px;overflow:hidden;border:1px solid rgba(255,255,255,.62);background:linear-gradient(160deg,rgba(255,255,255,.42),rgba(255,255,255,.16) 58%,rgba(255,255,255,.28));box-shadow:0 16px 38px rgba(2,25,53,.28),inset 0 1px 0 rgba(255,255,255,.85),inset 0 -1px 0 rgba(255,255,255,.28);-webkit-backdrop-filter:blur(9px) saturate(150%);backdrop-filter:blur(9px) saturate(150%)}
-.boot-glass::before{content:"";position:absolute;left:-18%;top:-72%;width:52%;height:210%;transform:rotate(24deg);background:linear-gradient(90deg,rgba(255,255,255,.34),rgba(255,255,255,0));pointer-events:none}
-.boot-glass::after{content:"";position:absolute;left:8%;right:8%;top:1px;height:2px;border-radius:2px;background:rgba(255,255,255,.8);pointer-events:none}
-.boot-message{min-height:24px;margin:14px 0 0;font-size:14px;font-weight:750;color:rgba(255,255,255,.92)}
-.boot-dots{display:inline-flex;align-items:flex-end;gap:3px;width:25px;margin-left:5px;opacity:1;transition:opacity .18s ease,transform .18s ease}
-.boot-dots i{width:5px;height:5px;border-radius:50%;background:#fff;animation:bootDot 1.15s ease-in-out infinite}.boot-dots i:nth-child(2){animation-delay:.16s}.boot-dots i:nth-child(3){animation-delay:.32s}
-.boot-ready-mark{width:22px;height:22px;margin-left:7px;display:inline-grid;place-items:center;border-radius:50%;vertical-align:-4px;background:rgba(112,243,195,.2);border:1px solid rgba(157,255,220,.72);color:#d9fff1;font-size:12px;font-weight:950;opacity:0;transform:scale(.45) rotate(-12deg);transition:opacity .22s ease,transform .32s cubic-bezier(.34,1.56,.64,1)}
-#bootScreen.ready .boot-dots{width:0;margin-left:0;opacity:0;transform:translateY(4px);overflow:hidden}
-#bootScreen.ready .boot-ready-mark{opacity:1;transform:scale(1) rotate(0)}
-#bootScreen.ready .boot-glass{border-color:rgba(180,255,232,.82);box-shadow:0 18px 44px rgba(2,25,53,.3),0 0 30px rgba(112,243,195,.14),inset 0 1px 0 rgba(255,255,255,.9)}
-#bootScreen.ready .boot-water{transform:translate3d(0,3%,0);transition-duration:.28s}
-@keyframes bootBrandIn{from{opacity:0;transform:translateY(16px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
-@keyframes bootFloat{50%{transform:translateY(-8px)}}
-@keyframes bootDot{0%,70%,100%{transform:translateY(0);opacity:.38}35%{transform:translateY(-5px);opacity:1}}
-#bootScreen.leaving{opacity:0;visibility:hidden;pointer-events:none;transition:opacity .52s ease,visibility 0s linear .52s}
-#bootScreen.leaving .boot-water{transform:translate3d(0,-2%,0);transition-duration:.52s}
-#bootScreen.leaving .boot-brand{animation:none;transform:translateY(-5px) scale(1.035);opacity:0;transition:transform .52s cubic-bezier(.2,.8,.2,1),opacity .32s ease}
-@media(max-width:390px){.boot-brand{width:min(84vw,330px);padding:24px 18px 21px;border-radius:24px}.boot-glass{padding:12px 24px 14px;border-radius:22px}.boot-logo{font-size:56px}.boot-message{font-size:13px}}
-@media(max-width:330px){.boot-glass{padding:10px 18px 12px}.boot-logo{font-size:46px}}
-@supports not ((-webkit-backdrop-filter:blur(2px)) or (backdrop-filter:blur(2px))){.boot-glass{background:linear-gradient(160deg,rgba(255,255,255,.5),rgba(255,255,255,.26) 58%,rgba(255,255,255,.36))}}
-@media(prefers-reduced-motion:reduce){#bootScreen,.boot-water,.boot-brand{transition-duration:.01ms!important}.boot-sun,.boot-cloud,.boot-water::after,.boot-water-depth,.boot-water-caustic,.boot-water-light,.boot-surface,.boot-bubble,.boot-brand,.boot-logo,.boot-dots i{animation:none!important}#bootScreen .boot-water{transform:translate3d(0,6%,0)}}
+.boot-ambience{position:absolute;inset:0;z-index:0;overflow:hidden;background:radial-gradient(circle at 18% 18%,rgba(66,157,196,.16),transparent 34%),radial-gradient(circle at 83% 35%,rgba(81,212,202,.11),transparent 32%),radial-gradient(circle at 50% 82%,rgba(22,148,167,.18),transparent 43%)}
+.boot-orb{position:absolute;border-radius:50%;filter:blur(28px);opacity:.2;animation:bootOrb 5.8s ease-in-out infinite alternate}.boot-orb.orb-one{width:170px;height:170px;left:-90px;top:21%;background:#4ecddd}.boot-orb.orb-two{width:190px;height:190px;right:-105px;bottom:12%;background:#2485c4;animation-delay:-2.4s}
+@keyframes bootOrb{to{transform:translate3d(13px,-9px,0) scale(1.08);opacity:.26}}
+.boot-water{position:absolute;z-index:2;inset:-1px 0 0;transform:translate3d(0,105%,0);will-change:transform;background:linear-gradient(180deg,#5ee0df 0%,#27b5c4 8%,#12809c 29%,#0b5878 58%,#063652 82%,#041f37 100%);box-shadow:0 -18px 48px rgba(93,228,229,.2);transition:transform 1.55s cubic-bezier(.18,.76,.22,1)}
+.boot-water::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.08),transparent 24%,rgba(0,22,42,.14));pointer-events:none}
+#bootScreen.fill .boot-water{transform:translate3d(0,11%,0)}
+.boot-wave{position:absolute;z-index:3;left:-12%;width:124%;height:52px;top:-28px;will-change:transform}.boot-wave svg{display:block;width:100%;height:100%}.boot-wave.wave-back{opacity:.48;animation:bootWaveBack 5.8s ease-in-out infinite alternate}.boot-wave.wave-back path{fill:rgba(157,245,240,.62)}.boot-wave.wave-front{top:-19px;opacity:.88;animation:bootWaveFront 4.4s ease-in-out infinite alternate}.boot-wave.wave-front path{fill:rgba(218,255,251,.83)}
+@keyframes bootWaveBack{to{transform:translateX(18px)}}@keyframes bootWaveFront{to{transform:translateX(-21px)}}
+.boot-bubble{position:absolute;z-index:4;bottom:-34px;width:10px;height:10px;border:1.3px solid rgba(221,255,253,.68);border-radius:50%;box-shadow:inset 1px 1px 3px rgba(255,255,255,.34),0 0 9px rgba(75,220,221,.12);opacity:0;animation:bootBubble 4.6s linear infinite}.boot-bubble::before{content:"";position:absolute;left:22%;top:17%;width:27%;height:27%;border-radius:50%;background:rgba(255,255,255,.76)}
+.boot-bubble.b1{left:12%;width:14px;height:14px;animation-delay:.1s}.boot-bubble.b2{left:77%;width:8px;height:8px;animation-delay:1.1s;animation-duration:3.8s}.boot-bubble.b3{left:89%;width:11px;height:11px;animation-delay:2s;animation-duration:4.9s}.boot-bubble.b4{left:25%;width:6px;height:6px;animation-delay:.8s;animation-duration:3.5s}.boot-bubble.b5{left:68%;width:17px;height:17px;animation-delay:1.7s;animation-duration:5.3s}.boot-bubble.b6{left:44%;width:7px;height:7px;animation-delay:2.7s;animation-duration:4.1s}
+@keyframes bootBubble{0%{transform:translate3d(0,0,0) scale(.75);opacity:0}12%{opacity:.75}55%{transform:translate3d(9px,-45vh,0) scale(1)}100%{transform:translate3d(-7px,-98vh,0) scale(1.08);opacity:0}}
+.boot-brand{position:absolute;z-index:6;left:50%;top:48%;width:min(80vw,320px);transform:translate(-50%,-50%);text-align:center;color:#fff;animation:bootBrandIn .65s cubic-bezier(.2,.8,.2,1) both}
+.boot-kicker{display:block;margin-bottom:16px;font-size:10px;font-weight:850;letter-spacing:3.2px;color:rgba(221,255,253,.78)}
+.boot-glass{position:relative;display:inline-grid;place-items:center;min-width:190px;height:112px;padding:0 28px;overflow:hidden;border:1px solid rgba(223,255,253,.6);border-radius:32px;background:linear-gradient(145deg,rgba(255,255,255,.24),rgba(255,255,255,.08) 58%,rgba(100,224,221,.15));box-shadow:0 24px 55px rgba(0,22,43,.34),inset 0 1px 0 rgba(255,255,255,.68),inset 0 -1px 0 rgba(255,255,255,.12);-webkit-backdrop-filter:blur(11px) saturate(145%);backdrop-filter:blur(11px) saturate(145%)}
+.boot-glass::before{content:"";position:absolute;inset:9px;border:1px solid rgba(255,255,255,.12);border-radius:24px;pointer-events:none}
+.boot-logo{display:block;font-size:58px;line-height:1;font-weight:950;letter-spacing:-2px;color:rgba(255,255,255,.96);text-shadow:0 3px 0 rgba(255,255,255,.28),0 13px 28px rgba(0,31,55,.42);animation:bootFloat 3.2s .65s ease-in-out infinite}
+.boot-message{min-height:24px;display:flex;align-items:center;justify-content:center;margin:20px 0 0;font-size:14px;font-weight:750;color:rgba(235,255,253,.93)}
+.boot-dots{display:inline-flex;align-items:flex-end;gap:4px;width:25px;margin-left:7px;opacity:1;transition:opacity .18s ease,transform .18s ease}.boot-dots i{width:5px;height:5px;border-radius:50%;background:#a8fff0;animation:bootDot 1.15s ease-in-out infinite}.boot-dots i:nth-child(2){opacity:.65;animation-delay:.16s}.boot-dots i:nth-child(3){opacity:.35;animation-delay:.32s}
+.boot-ready-mark{width:22px;height:22px;margin-left:7px;display:inline-grid;place-items:center;border-radius:50%;background:rgba(112,243,195,.18);border:1px solid rgba(157,255,220,.62);color:#d9fff1;font-size:12px;font-weight:950;opacity:0;transform:scale(.45) rotate(-12deg);transition:opacity .22s ease,transform .32s cubic-bezier(.34,1.56,.64,1)}
+.boot-footer{position:absolute;z-index:6;left:0;right:0;bottom:36px;text-align:center;color:rgba(220,247,248,.5);font-size:9px;font-weight:750;letter-spacing:1.5px;text-transform:uppercase}
+#bootScreen.ready .boot-dots{width:0;margin-left:0;opacity:0;transform:translateY(4px);overflow:hidden}#bootScreen.ready .boot-ready-mark{opacity:1;transform:scale(1) rotate(0)}#bootScreen.ready .boot-glass{border-color:rgba(180,255,232,.82);box-shadow:0 25px 58px rgba(0,22,43,.36),0 0 28px rgba(112,243,195,.1),inset 0 1px 0 rgba(255,255,255,.72)}#bootScreen.ready .boot-water{transform:translate3d(0,9%,0);transition-duration:.28s}
+@keyframes bootBrandIn{from{opacity:0;transform:translate(-50%,calc(-50% + 14px)) scale(.97)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}@keyframes bootFloat{50%{transform:translateY(-6px)}}@keyframes bootDot{0%,70%,100%{transform:translateY(0);opacity:.35}35%{transform:translateY(-4px);opacity:1}}
+#bootScreen.leaving{opacity:0;visibility:hidden;pointer-events:none;transition:opacity .52s ease,visibility 0s linear .52s}#bootScreen.leaving .boot-water{transform:translate3d(0,7%,0);transition-duration:.52s}#bootScreen.leaving .boot-brand{animation:none;transform:translate(-50%,calc(-50% - 5px)) scale(1.025);opacity:0;transition:transform .52s cubic-bezier(.2,.8,.2,1),opacity .32s ease}
+@media(max-width:390px){.boot-brand{width:min(82vw,320px)}.boot-glass{min-width:190px;height:112px}.boot-logo{font-size:58px}.boot-message{font-size:14px}}@media(max-width:340px){.boot-glass{min-width:165px;height:100px}.boot-logo{font-size:50px}.boot-brand{top:49%}}
+@supports not ((-webkit-backdrop-filter:blur(2px)) or (backdrop-filter:blur(2px))){.boot-glass{background:linear-gradient(145deg,rgba(255,255,255,.31),rgba(255,255,255,.12) 58%,rgba(100,224,221,.2))}}
+@media(prefers-reduced-motion:reduce){#bootScreen,.boot-water,.boot-brand{transition-duration:.01ms!important}.boot-orb,.boot-wave,.boot-bubble,.boot-brand,.boot-logo,.boot-dots i{animation:none!important}#bootScreen .boot-water{transform:translate3d(0,11%,0)}}
 </style>
 <!-- ============ SIDEBAR ESCRITORIO / LANDSCAPE ============ -->
 <aside class="desk-sidebar" id="deskSidebar" aria-label="Navegación principal">

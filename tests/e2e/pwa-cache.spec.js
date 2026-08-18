@@ -17,7 +17,9 @@ test('la versión visible, el paquete y el Service Worker están alineados', () 
   expect(html).toContain('theme-color" content="#eef4ff"');
   expect(html).toContain('apple-touch-startup-image');
   expect(html).toContain('class="boot-water"');
-  expect(html).toContain('class="boot-water-caustic"');
+  expect(html).not.toContain('boot-water-caustic');
+  expect(html).not.toContain('boot-water-light');
+  expect(html).not.toContain('repeating-linear-gradient');
   expect(html).not.toMatch(/splash\/agua-(textura|llena)\.(jpg|jpeg|png|webp)/);
   expect(html).not.toMatch(/url\(['\"]?splash\/[^)'\"]+\.(jpg|jpeg|png|webp)/);
   expect(sw).not.toMatch(/splash\/agua-/);
@@ -37,7 +39,8 @@ test('el agua de carga se anima con CSS y no pide fotos estáticas', async ({ pa
   await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
   const water = page.locator('#bootScreen .boot-water');
   await expect(water).toBeVisible();
-  await expect(page.locator('#bootScreen .boot-water-caustic')).toBeVisible();
+  await expect(page.locator('#bootScreen .boot-wave')).toHaveCount(2);
+  await expect(page.locator('#bootScreen .boot-bubble')).toHaveCount(6);
   const fondo = await water.evaluate(el => getComputedStyle(el).backgroundImage);
   expect(fondo).not.toMatch(/url\(/);
   await expect.poll(() => page.locator('#bootScreen').evaluate(el => el.classList.contains('fill'))).toBe(true);
