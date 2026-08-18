@@ -3646,8 +3646,8 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
 </div>
 <script>requestAnimationFrame(()=>{const b=document.getElementById('bootScreen');if(b)b.classList.add('fill')});</script>
 <style>
-#bootScreen{position:fixed;inset:0;z-index:9990;overflow:hidden;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,#eef4ff,#f6fbff)}
-body.dark #bootScreen{background:#101322}
+#bootScreen{position:fixed;inset:0;z-index:9990;overflow:hidden;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,#eaf1ff 0%,#f5ecff 45%,#ffe9f2 100%)}
+body.dark #bootScreen{background:linear-gradient(160deg,#0f1424,#1a1530 45%,#2a1530)}
 #bootScreen.gone{pointer-events:none;display:none!important}
 #bootScreen.gone .boot-card{opacity:0;transition:opacity .3s}
 .boot-water{position:absolute;left:0;right:0;bottom:0;height:0%;background:linear-gradient(180deg,rgba(91,141,239,.78),rgba(38,166,154,.86) 60%,rgba(23,111,140,.92));transition:height 2.8s cubic-bezier(.3,.7,.3,1)}
@@ -3663,8 +3663,8 @@ body.dark #bootScreen{background:#101322}
 .boot-burb.b3{left:72%;width:11px;height:11px;animation-delay:.6s}
 @keyframes bootBurbuja{0%{transform:translateY(0);opacity:0}12%{opacity:.9}100%{transform:translateY(-105vh);opacity:0}}
 .boot-card{position:relative;z-index:2;text-align:center}
-.boot-logo{width:96px;height:96px;margin:0 auto 16px;border-radius:28px;display:grid;place-items:center;background:linear-gradient(135deg,#5b8def,#8b63e8,#ff6bcf);color:#fff;font-size:25px;font-weight:950;box-shadow:0 14px 40px rgba(31,80,160,.35);animation:bootFlotar 3s ease-in-out infinite}
-@keyframes bootFlotar{0%,100%{transform:translateY(4px) rotate(-1deg);box-shadow:0 10px 26px rgba(20,40,90,.28)}50%{transform:translateY(-12px) rotate(1deg);box-shadow:0 26px 44px rgba(20,40,90,.38)}}
+.boot-logo{margin:0 auto 16px;display:inline-block;background:linear-gradient(90deg,#5b8def,#a06bff,#ff6b9d);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;font-size:42px;font-weight:800;letter-spacing:-.6px;line-height:1;animation:bootFlotar 3s ease-in-out infinite}
+@keyframes bootFlotar{0%,100%{transform:translateY(3px)}50%{transform:translateY(-8px)}}
 #bootScreen p{margin:0;display:inline-block;padding:8px 16px;border-radius:999px;background:rgba(255,255,255,.9);font-size:12px;font-weight:850;color:#3d63c9;box-shadow:0 6px 18px rgba(31,80,160,.18)}
 </style>
 <!-- ============ SIDEBAR ESCRITORIO / LANDSCAPE ============ -->
@@ -3695,7 +3695,7 @@ body.dark #bootScreen{background:#101322}
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v250 · Segura</div>
+  <div class="ds-foot">APPI · v251 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -11074,7 +11074,7 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./service-worker.js?v=250').catch(error => {
+      navigator.serviceWorker.register('./service-worker.js?v=251').catch(error => {
         console.warn('No se pudo registrar el modo offline de APPI', error);
       });
     });
