@@ -42,6 +42,12 @@ El workflow `.github/workflows/deploy-backend.yml` ahora:
 3. mantiene `encuesta-publica` y `solicitud-cuenta` como funciones públicas con validación interna;
 4. conserva autenticación JWT para las funciones privadas.
 
+## Scroll
+
+- Tras elegir titular o socio, el `overflow: hidden` del login ya no queda pegado al `body`.
+- El overlay de diálogos y el calendario dejan de tapar la página cuando están cerrados (`display: none`).
+- En el celular el desplazamiento vive en `.app`, para que iOS/Android no queden trabados por capas `position: fixed`.
+
 ## Verificación
 
 - Sintaxis JavaScript comprobada con `node --check`.

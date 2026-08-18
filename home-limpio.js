@@ -115,8 +115,8 @@
       'body.dark .hl-link{background:#25273a;color:#c6cbea}' +
 
       /* Calendario modal */
-      '.cal-overlay{position:fixed;inset:0;z-index:200;background:rgba(20,20,30,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);display:flex;align-items:flex-end;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .25s ease}' +
-      '.cal-overlay.open{opacity:1;pointer-events:auto}' +
+      '.cal-overlay{position:fixed;inset:0;z-index:200;background:rgba(20,20,30,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);display:none;align-items:flex-end;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .25s ease}' +
+      '.cal-overlay.open{display:flex;opacity:1;pointer-events:auto}' +
       '.cal-modal{background:rgba(255,255,255,.98);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);border-radius:24px 24px 0 0;width:100%;max-width:480px;max-height:85vh;overflow-y:auto;box-shadow:0 -10px 40px rgba(0,0,0,.2);transform:translateY(20px);transition:transform .3s cubic-bezier(.34,1.56,.64,1);padding-bottom:calc(env(safe-area-inset-bottom) + 12px)}' +
       '.cal-overlay.open .cal-modal{transform:translateY(0)}' +
       'body.dark .cal-modal{background:rgba(30,30,50,.98)}' +
@@ -280,11 +280,16 @@
     initCalState();
     ensureCalOverlay();
     renderCal();
-    setTimeout(function(){ $('calOverlay').classList.add('open'); }, 10);
+    setTimeout(function(){
+      var ov = $('calOverlay');
+      if(ov) ov.classList.add('open');
+      if(window.bloquearScrollCuerpo) window.bloquearScrollCuerpo();
+    }, 10);
   }
   function closeCal(){
     var ov = $('calOverlay');
     if(ov) ov.classList.remove('open');
+    if(window.liberarScrollCuerpo) window.liberarScrollCuerpo();
     render(); // re-render home to show updated tasks
   }
 

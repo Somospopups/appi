@@ -20,6 +20,27 @@ window.openHistorico=function(){
   abrir();
 };
 </script>
+<script>
+/* APPI · overlays cerrados no pueden tapar el dedo */
+(function(){
+  function hide(el){ if(!el) return; el.style.setProperty('display','none','important'); el.style.setProperty('pointer-events','none','important'); }
+  function tidy(){
+    try{
+      var modal=document.getElementById('modalOverlay');
+      if(modal && !modal.classList.contains('open')) hide(modal);
+      var boot=document.getElementById('bootScreen');
+      if(boot && boot.classList.contains('gone')) hide(boot);
+      var lock=document.getElementById('lockScreen');
+      if(lock && lock.classList.contains('hidden')) hide(lock);
+      document.querySelectorAll('.export-loading:not(.show), .cal-overlay:not(.open)').forEach(hide);
+    }catch(e){}
+  }
+  window.__appiUnlockScroll=tidy;
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', tidy);
+  else tidy();
+  window.addEventListener('pageshow', tidy);
+})();
+</script>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -131,10 +152,15 @@ body.dark .hist-section-title h3,body.dark .hist-attention strong,body.dark .his
     margin: 0; padding: 0;
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Inter, sans-serif;
     color: #1c1c1e;
-    min-height: 100vh; min-height: 100dvh;
+    height: 100%;
+    min-height: 100%;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+    overscroll-behavior-y: auto;
     background: linear-gradient(160deg, #eaf1ff 0%, #f5ecff 45%, #ffe9f2 100%);
-    background-attachment: fixed;
-    overscroll-behavior-y: none;
+    background-attachment: scroll;
     -webkit-font-smoothing: antialiased;
   }
   body::before {
@@ -145,10 +171,34 @@ body.dark .hist-section-title h3,body.dark .hist-attention strong,body.dark .his
       radial-gradient(circle at 50% 90%, rgba(255,170,210,0.30), transparent 55%);
     z-index: -1; pointer-events: none;
   }
+  #appScroll {
+    position: static;
+    overflow: visible;
+    height: auto;
+    min-height: 100%;
+    touch-action: pan-y;
+  }
   .app {
     max-width: 520px; margin: 0 auto;
     padding: calc(env(safe-area-inset-top) + 16px) 12px calc(env(safe-area-inset-bottom) + 100px);
+    overflow: visible;
+    height: auto;
+    position: relative;
+    touch-action: pan-y;
   }
+  body.appi-scroll-lock { overflow: hidden !important; }
+  #modalOverlay:not(.open),
+  .modal-overlay:not(.open):not(.membership-modal-overlay),
+  .export-loading:not(.show),
+  .cal-overlay:not(.open),
+  #bootScreen.gone,
+  #lockScreen.hidden {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    z-index: -1 !important;
+  }
+
   header.top { text-align: center; margin-bottom: 20px; position: relative; }
   header.top h1 { margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -0.5px; }
   header.top .script {
@@ -2018,12 +2068,12 @@ body.dark .hist-section-title h3,body.dark .hist-attention strong,body.dark .his
     position: fixed; inset: 0; z-index: 400;
     background: rgba(20,20,30,0.75);
     -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
-    display: flex; align-items: center; justify-content: center;
+    display: none; align-items: center; justify-content: center;
     flex-direction: column; gap: 16px;
     color: #fff; opacity: 0; pointer-events: none;
     transition: opacity .2s ease;
   }
-  .export-loading.show { opacity: 1; pointer-events: auto; }
+  .export-loading.show { display: flex; opacity: 1; pointer-events: auto; }
   .export-loading .spinner {
     width: 50px; height: 50px; border-radius: 50%;
     border: 4px solid rgba(255,255,255,0.2);
@@ -2057,12 +2107,13 @@ body.dark .hist-section-title h3,body.dark .hist-attention strong,body.dark .his
     position: fixed; inset: 0; z-index: 200;
     background: rgba(20,20,30,0.55);
     -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
-    display: flex; align-items: flex-end; justify-content: center;
+    display: none;
+    align-items: flex-end; justify-content: center;
     padding: 20px;
     opacity: 0; pointer-events: none;
     transition: opacity .25s ease;
   }
-  .modal-overlay.open { opacity: 1; pointer-events: auto; }
+  .modal-overlay.open { display: flex; opacity: 1; pointer-events: auto; }
   @media (min-height: 700px) { .modal-overlay { align-items: center; } }
   /* Modal de presupuesto: SIEMPRE centrado (aunque la ventana sea baja) */
   .modal {
@@ -2439,7 +2490,10 @@ body.dark .hist-section-title h3,body.dark .hist-attention strong,body.dark .his
   background: linear-gradient(160deg, #eaf1ff 0%, #f5ecff 45%, #ffe9f2 100%);
   display: flex; align-items: flex-start; justify-content: center;
   padding: 20px;
+  overflow-x: hidden;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
 #lockScreen.hidden { display: none; }
 body.dark #lockScreen {
@@ -3504,6 +3558,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
 
 </head>
 <body>
+
 <div id="bootScreen">
   <div class="boot-water">
     <i class="boot-wave w1"></i><i class="boot-wave w2"></i><i class="boot-wave w3"></i>
@@ -3515,7 +3570,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
 <style>
 #bootScreen{position:fixed;inset:0;z-index:9990;overflow:hidden;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,#eef4ff,#f6fbff)}
 body.dark #bootScreen{background:#101322}
-#bootScreen.gone{pointer-events:none}
+#bootScreen.gone{pointer-events:none;display:none!important}
 #bootScreen.gone .boot-card{opacity:0;transition:opacity .3s}
 .boot-water{position:absolute;left:0;right:0;bottom:0;height:0%;background:linear-gradient(180deg,rgba(91,141,239,.78),rgba(38,166,154,.86) 60%,rgba(23,111,140,.92));transition:height 2.8s cubic-bezier(.3,.7,.3,1)}
 #bootScreen.fill .boot-water{height:100%}
@@ -3836,7 +3891,7 @@ body.dark #pageTabs button.active{color:#a8c0ff}
 
 <div class="toast" id="toast"><span class="check-ic">✓</span><span id="toastTxt">Guardado</span></div>
 
-<div class="app">
+<div id="appScroll"><div class="app">
 
   <!-- HOME -->
   <section id="view-home" class="view active">
@@ -4511,6 +4566,7 @@ body.dark #pageTabs button.active{color:#a8c0ff}
   </section>
 
 </div>
+</div>
 
 <!-- MODAL -->
 <div class="modal-overlay" id="modalOverlay">
@@ -4607,11 +4663,11 @@ const modal = {
       document.getElementById('modalOkBtn').onclick = ()=> this.close();
     }
     this.el.classList.add('open');
-    document.body.style.overflow = 'hidden';
+    bloquearScrollCuerpo();
   },
   close(){
     this.el.classList.remove('open');
-    document.body.style.overflow = '';
+    liberarScrollCuerpo();
   }
 };
 document.getElementById('modalClose').addEventListener('click', ()=>modal.close());
@@ -5144,6 +5200,45 @@ function initStateFor(id){
   loadDraft();
 }
 
+function overlayDeScrollAbierto(){
+  return !!(
+    document.querySelector('.modal-overlay.open') ||
+    document.querySelector('.membership-modal-overlay') ||
+    document.querySelector('.appi-dialog-overlay:not([hidden])') ||
+    document.querySelector('.appi-device-overlay:not([hidden])') ||
+    document.querySelector('#gestionDetailOverlay:not([hidden])') ||
+    document.querySelector('#demoObjectionSheet:not([hidden])') ||
+    document.querySelector('#calOverlay.open') ||
+    document.querySelector('#histDetailOverlay.open') ||
+    document.querySelector('#orgCanvas.open') ||
+    document.querySelector('#adminLoginOverlay:not([hidden])') ||
+    document.querySelector('#forcedPasswordOverlay:not([hidden])') ||
+    document.querySelector('#personChoiceOverlay:not([hidden])') ||
+    document.querySelector('#lockScreen:not(.hidden)')
+  );
+}
+function aplicarEstadoScrollCuerpo(lock){
+  document.body.classList.toggle('appi-scroll-lock', !!lock);
+  document.body.style.overflow=lock?'hidden':'';
+}
+function bloquearScrollCuerpo(){aplicarEstadoScrollCuerpo(true)}
+function liberarScrollCuerpo(){
+  if(overlayDeScrollAbierto())return;
+  aplicarEstadoScrollCuerpo(false);
+}
+function forzarScrollLibre(){
+  const lock=document.getElementById('lockScreen');
+  if(lock){lock.classList.add('hidden');lock.style.display='none'}
+  const person=document.getElementById('personChoiceOverlay');
+  if(person)person.hidden=true;
+  aplicarEstadoScrollCuerpo(false);
+}
+window.liberarScrollCuerpo=liberarScrollCuerpo;
+window.bloquearScrollCuerpo=bloquearScrollCuerpo;
+window.forzarScrollLibre=forzarScrollLibre;
+window.addEventListener('pageshow',()=>{if(document.getElementById('lockScreen')?.classList.contains('hidden'))forzarScrollLibre()});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&document.getElementById('lockScreen')?.classList.contains('hidden'))liberarScrollCuerpo()});
+
 function showView(id){
   const target=document.getElementById(id);
   // Una llamada tardía de un módulo no debe dejar toda la aplicación en blanco.
@@ -5151,6 +5246,7 @@ function showView(id){
     console.warn('Vista APPI inexistente:',id);
     return false;
   }
+  liberarScrollCuerpo();
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   target.classList.add('active');
   document.querySelectorAll('nav.tabs button').forEach(b=>{
@@ -10179,7 +10275,7 @@ function mostrarAdminLoginPopup(){
     try{
       await window.APPIAuth.loginAdmin(input.value);
       if(window.APPIDataSync)await window.APPIDataSync.start({claimLegacy:false});
-      hide();const lock=document.getElementById('lockScreen');if(lock){lock.classList.add('hidden');lock.style.display='none'}document.body.style.overflow='';iniciarApp();
+      hide();const lock=document.getElementById('lockScreen');if(lock){lock.classList.add('hidden');lock.style.display='none'}liberarScrollCuerpo();iniciarApp();
     }catch(reason){error.textContent=reason.message||'No se pudo ingresar al panel.';error.classList.add('show')}
     finally{submit.disabled=false;submit.textContent=original}
   };
@@ -10225,11 +10321,16 @@ async function asegurarPersonaActiva(){
   // El overlay vivía dentro del login; lo sacamos para poder mostrarlo
   // sin flashear la pantalla de ingreso detrás.
   if(overlay.parentElement&&overlay.parentElement.id==='lockScreen')document.body.appendChild(overlay);
-  document.body.style.overflow='hidden';
+  bloquearScrollCuerpo();
   list.innerHTML=ordered.map(person=>`<button type="button" class="person-choice-option" data-person-type="${person.tipo}"><span class="person-choice-avatar">${person.tipo==='titular'?'👤':'🤝'}</span><span><strong>${escapeXml(person.nombre)}</strong><small>${person.tipo==='titular'?'Titular':'Socio/a'}${person.tipo===requestedPerson?' · Teléfono a vincular':''}</small></span><span class="person-choice-arrow">›</span></button>`).join('');
   overlay.hidden=false;
   return new Promise(resolve=>{
-    list.querySelectorAll('[data-person-type]').forEach(button=>button.onclick=()=>{const selected=window.APPIAuth.selectPerson(button.dataset.personType);overlay.hidden=true;resolve(selected)});
+    list.querySelectorAll('[data-person-type]').forEach(button=>button.onclick=()=>{
+      const selected=window.APPIAuth.selectPerson(button.dataset.personType);
+      overlay.hidden=true;
+      liberarScrollCuerpo();
+      resolve(selected);
+    });
     setTimeout(()=>list.querySelector('[data-person-type]')?.focus(),50);
   });
 }
@@ -10238,12 +10339,12 @@ async function completarIngresoDistribuidor(){
   const sync=window.APPIDataSync?await window.APPIDataSync.start({claimLegacy:true}):null,lock=document.getElementById('lockScreen');
   localStorage.removeItem('appi_activada');
   if(lock){lock.classList.add('hidden');lock.style.display='none'}
-  document.body.style.overflow='';iniciarApp();
+  liberarScrollCuerpo();iniciarApp();
   if(sync&&sync.claimedLegacy)setTimeout(()=>showToast('Tus datos de este dispositivo quedaron asociados a tu cuenta',3600),500);
 }
 function mostrarCambioPasswordObligatorio(){
   const lock=document.getElementById('lockScreen'),overlay=document.getElementById('forcedPasswordOverlay'),first=document.getElementById('forcedNewPassword'),confirmation=document.getElementById('forcedConfirmPassword'),save=document.getElementById('btnForcedPasswordSave'),error=document.getElementById('forcedPasswordError');
-  ocultarBoot();if(lock){lock.style.display='flex';lock.classList.remove('hidden')}document.body.style.overflow='hidden';overlay.hidden=false;first.value='';confirmation.value='';error.textContent='';error.classList.remove('show');
+  ocultarBoot();if(lock){lock.style.display='flex';lock.classList.remove('hidden')}bloquearScrollCuerpo();overlay.hidden=false;first.value='';confirmation.value='';error.textContent='';error.classList.remove('show');
   save.onclick=async()=>{
     error.textContent='';error.classList.remove('show');
     if(first.value!==confirmation.value){error.textContent='Las contraseñas no coinciden.';error.classList.add('show');return}
@@ -10258,7 +10359,7 @@ function mostrarPantallaLoginDistribuidor(reason=''){
   const lock=document.getElementById('lockScreen'),login=document.getElementById('distributorLoginPanel');
   if(login)login.hidden=false;
   if(lock){lock.style.display='flex';lock.classList.remove('hidden')}
-  document.body.style.overflow='hidden';
+  bloquearScrollCuerpo();
   setLoginAccessTab('signin');
   const dip=document.getElementById('distributorInput'),password=document.getElementById('distributorPassword'),button=document.getElementById('btnDistributorLogin'),toggle=document.getElementById('toggleDistributorPassword'),support=document.getElementById('btnLoginSupport'),adminOpen=document.getElementById('btnAdminLoginOpen'),tabSign=document.getElementById('loginTabSignIn'),tabCreate=document.getElementById('loginTabCreate'),requestDip=document.getElementById('requestDip'),requestButton=document.getElementById('btnRequestAccount');
   if(!window.APPIAuth||!window.APPIAuth.isConfigured()){
@@ -10329,6 +10430,7 @@ setTimeout(ocultarBoot,6000);
 // Inicia la app normalmente
 function iniciarApp() {
   ocultarBoot();
+  forzarScrollLibre();
   const profile=window.APPIAuth&&window.APPIAuth.isEnabled()?window.APPIAuth.currentProfile():null;
   if(profile&&profile.rol==='admin'){
     showView('view-admin');

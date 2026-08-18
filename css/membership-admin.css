@@ -74,6 +74,7 @@
 /* Modales. La clase específica evita que el modal reutilizable de index.html
    los deje transparentes hasta recibir una clase .open. */
 .membership-modal-overlay {
+  display: flex !important;
   opacity: 1 !important;
   pointer-events: auto !important;
   visibility: visible !important;
@@ -87,7 +88,7 @@
   right: 0;
   bottom: 0;
   background: rgba(0, 0, 0, 0.5);
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: center;
   z-index: 10000;

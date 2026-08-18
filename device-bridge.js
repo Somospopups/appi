@@ -82,8 +82,10 @@ body.dark .appi-device-card{background:linear-gradient(150deg,#171827,#25213a 58
 `;document.head.appendChild(style)}
 function ensureOverlay(){if(state.overlay)return state.overlay;state.overlay=document.createElement('div');state.overlay.className='appi-device-overlay';state.overlay.id='appiDeviceOverlay';state.overlay.hidden=true;state.overlay.innerHTML='<section class="appi-device-card" id="appiDeviceCard" role="dialog" aria-modal="true"></section>';document.body.appendChild(state.overlay);state.overlay.onclick=e=>{if(e.target===state.overlay)closeOverlay()};return state.overlay}
 function stopPairTimer(){if(state.pairTimer){clearInterval(state.pairTimer);state.pairTimer=null}}
-function openOverlay(html){stopPairTimer();state.managerVersion++;ensureOverlay();$('appiDeviceCard').innerHTML=html;state.overlay.hidden=false;document.body.style.overflow='hidden';const close=$('appiDeviceClose');if(close)close.onclick=closeOverlay;return state.managerVersion}
-function closeOverlay(){stopPairTimer();state.managerVersion++;if(state.overlay)state.overlay.hidden=true;document.body.style.overflow=''}
+function lockBody(){if(window.bloquearScrollCuerpo)window.bloquearScrollCuerpo();else document.body.style.overflow='hidden'}
+function unlockBody(){if(window.liberarScrollCuerpo)window.liberarScrollCuerpo();else document.body.style.overflow=''}
+function openOverlay(html){stopPairTimer();state.managerVersion++;ensureOverlay();$('appiDeviceCard').innerHTML=html;state.overlay.hidden=false;lockBody();const close=$('appiDeviceClose');if(close)close.onclick=closeOverlay;return state.managerVersion}
+function closeOverlay(){stopPairTimer();state.managerVersion++;if(state.overlay)state.overlay.hidden=true;unlockBody()}
 function head(title,sub){return `<div class="appi-device-head"><div><h2>${esc(title)}</h2><p>${esc(sub)}</p></div><button type="button" class="appi-device-close" id="appiDeviceClose" aria-label="Cerrar">×</button></div>`}
 function subscriptionJSON(subscription){const data=subscription.toJSON();return {endpoint:data.endpoint,keys:{p256dh:data.keys&&data.keys.p256dh||'',auth:data.keys&&data.keys.auth||''}}}
 function applicationServerKey(value){const padding='='.repeat((4-value.length%4)%4),base64=(value+padding).replace(/-/g,'+').replace(/_/g,'/'),raw=atob(base64),array=new Uint8Array(raw.length);for(let i=0;i<raw.length;i++)array[i]=raw.charCodeAt(i);return array}
@@ -128,7 +130,8 @@ async function refreshDevices(){state.loading=true;renderDeviceList();await load
 function closeAccountModal(){
   const accountModal=document.getElementById('modalOverlay');
   if(accountModal&&accountModal.classList.contains('open'))accountModal.classList.remove('open');
-  document.body.style.overflow='';
+  if(window.liberarScrollCuerpo)window.liberarScrollCuerpo();
+  else document.body.style.overflow='';
 }
 async function openManager(){
   closeAccountModal();
