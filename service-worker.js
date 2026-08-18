@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v250-scroll-ok';
+const CACHE_NAME = 'appi-v250-cultura-mes';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
