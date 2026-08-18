@@ -62,6 +62,10 @@ El workflow `.github/workflows/deploy-backend.yml` ahora:
 
 - Se recortó basura duplicada después de `</html>` que se veía como código suelto al pie de la página.
 
+## Árbol del equipo
+
+- En el listado, tocar el **nombre** abre la ficha. Tocar desde la izquierda hasta la píldora de categoría abre o cierra la organización, si tiene gente debajo.
+
 ## Impulso y avisos
 
 - En el Home aparece **Tu impulso**: una sola acción del día, racha y el avance de Cultura (15 PB + 2 invitados).
