@@ -271,7 +271,7 @@ async function saveMonthPeriod(id){
     const record=await buildPeriodRecord(draft),db=await openDB();
     await new Promise((resolve,reject)=>{const tx=db.transaction(['periods','files'],'readwrite');tx.objectStore('periods').put(record);for(const type of Object.keys(FILE_TYPES)){const file=draft.files[type];tx.objectStore('files').put({key:`${record.id}:${type}`,periodId:record.id,type,name:file.name,size:file.size,mime:file.type||'',lastModified:file.lastModified||0,blob:file})}tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)});
     delete H.uploads[id];await refreshData();H.selected=new Set(H.periods.slice(-Math.min(2,H.periods.length)).map(p=>p.id));render();toast(`✓ ${record.label} guardado`,2400);try{haptic(20)}catch(e){}
-    if(navigator.onLine&&cloudReady())setTimeout(()=>syncAll(false),800);
+    if(navigator.onLine&&cloudReady()&&getSession())setTimeout(()=>syncAll(false),400);
   }catch(e){console.error('Histórico guardar',e);toast(`No se pudo guardar: ${e.message}`,3500);render()}
 }
 
@@ -695,7 +695,13 @@ function showHelp(){
 }
 async function openHistorico(){
   showView('view-historico');const c=$('historicoContent');if(c)c.innerHTML='<div class="hist-loading"><span></span>Abriendo cierres mensuales…</div>';
-  try{await refreshData();H.ready=true;render()}catch(e){console.error('Abrir histórico',e);if(c)c.innerHTML=`<div class="hist-toast-inline error">No se pudo abrir el almacenamiento: ${esc(e.message)}</div>`}
+  try{
+    await refreshData();H.ready=true;render();
+    if(navigator.onLine&&cloudReady()&&getSession()){
+      if(c)c.innerHTML='<div class="hist-loading"><span></span>Sincronizando Histórico…</div>';
+      await syncAll(false);
+    }
+  }catch(e){console.error('Abrir histórico',e);if(c)c.innerHTML=`<div class="hist-toast-inline error">No se pudo abrir el almacenamiento: ${esc(e.message)}</div>`}
 }
 async function initHistorico(){
   if(window.APPIAuth&&window.APPIAuth.isEnabled()&&(!window.APPIAuth.isLocallyAuthorized()||window.APPIAuth.needsPersonChoice&&window.APPIAuth.needsPersonChoice()))return;
@@ -708,6 +714,7 @@ async function initHistorico(){
   const restore=$('histRestoreInput');if(restore)restore.onchange=e=>restoreBackup(e.target.files&&e.target.files[0]);
   const quick=$('histSyncQuick');if(quick)quick.onclick=()=>cloudReady()&&getSession()?syncAll(true):openTab('nube');
   window.addEventListener('online',()=>{updateSyncStatus();if(cloudReady()&&getSession())syncAll(false)});window.addEventListener('offline',()=>updateSyncStatus());
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden&&navigator.onLine&&cloudReady()&&getSession())syncAll(false)});
   updateSyncStatus();
   if(window.__histOpenRequested) setTimeout(openHistorico,0);
 }
