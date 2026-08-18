@@ -14,6 +14,10 @@ test('la versión visible, el paquete y el Service Worker están alineados', () 
   expect(manifest.theme_color).toBe('#eef4ff');
   expect(html).toContain('theme-color" content="#eef4ff"');
   expect(html).toContain('apple-touch-startup-image');
+  expect(html).toContain('class="boot-water"');
+  expect(html).toContain("url('splash/agua-textura.jpg')");
+  expect(sw).toContain("'./splash/agua-textura.jpg'");
+  expect(fs.existsSync('splash/agua-textura.jpg')).toBe(true);
   expect(fs.existsSync('splash/apple-splash-1170x2532.png')).toBe(true);
   expect(fs.existsSync('icon-512.png')).toBe(true);
 });
