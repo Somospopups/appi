@@ -5,12 +5,12 @@ const read = file => fs.readFileSync(file, 'utf8');
 
 test('la versión visible, el paquete y el Service Worker están alineados', () => {
   const html=read('index.html'),sw=read('service-worker.js'),pkg=JSON.parse(read('package.json'));
-  expect(pkg.version).toBe('254.0.0');
-  expect(html).toContain('APPI · v254 · Segura');
-  expect(html).toContain("const swVersion='254'");
+  expect(pkg.version).toBe('255.0.0');
+  expect(html).toContain('APPI · v255 · Segura');
+  expect(html).toContain("const swVersion='255'");
   expect(html).toContain("{updateViaCache:'none'}");
   expect(html).toContain('await registration.update()');
-  expect(sw).toContain("CACHE_NAME = 'appi-v254-");
+  expect(sw).toContain("CACHE_NAME = 'appi-v255-");
   const manifest=JSON.parse(read('manifest.json'));
   expect(manifest.background_color).toBe('#eef4ff');
   expect(manifest.theme_color).toBe('#eef4ff');
