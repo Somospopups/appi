@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v250-sin-dup';
+const CACHE_NAME = 'appi-v250-tarjetas';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
@@ -16,6 +16,7 @@ const APP_SHELL = [
   './account-request.js',
   './qr-code.js',
   './gestion-client.js',
+  './tarjetas-promos.js',
   './escalera-suenos.js',
   './demo-guia.js',
   './tablero-negocio.js',

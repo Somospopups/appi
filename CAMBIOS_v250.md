@@ -62,6 +62,12 @@ El workflow `.github/workflows/deploy-backend.yml` ahora:
 
 - Se recortó basura duplicada después de `</html>` que se veía como código suelto al pie de la página.
 
+## Tarjetas y promos
+
+- En **Usuarios** y en el **Panel de Contactos** se puede cargar, por persona, una o varias tarjetas (marca + banco: Visa Galicia, Naranja, etc.).
+- El dato se guarda aparte de la planilla: recargar el Excel no borra las tarjetas. Si hay teléfono, se comparte entre Usuarios y Contactos.
+- Filtro **Promos con tarjeta** para avisar de a uno por WhatsApp. En el texto se pueden usar `{nombre}` y `{tarjeta}`.
+
 ## Mi Equipo
 
 - Se quitó la tarjeta **Duplicación de este mes** (patrocinados directos activos / quiénes ya duplican). No aportaba y ocupaba el tablero.
