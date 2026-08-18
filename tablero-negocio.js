@@ -211,7 +211,7 @@
           '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">' +
             '<span style="font-size:14px; font-weight:600; color:#374151;">Cierres: <b id="simCierresV" style="color:#1e40af;">10</b></span>' +
           '</div>' +
-          '<input type="range" id="simCierres" min="0" max="30" value="10" style="width:100%; margin:0;">' +
+          '<input type="range" id="simCierres" min="0" max="30" step="1" value="10" style="width:100%; margin:0;">' +
         '</div>' +
 
         '<div style="margin-bottom:14px;">' +
@@ -226,9 +226,34 @@
 
       '<div class="tb-sub" style="font-size:12px; line-height:1.5;">💡 Los valores del plan pueden variar según tu condición fiscal y percepciones. Ajustalos arriba si es necesario.</div></div>';
   }
-  function calcSimulador(){
+  function aplicarReglaDemosCierres(origen){
+    var demosEl = $('simDemos');
+    var cierresEl = $('simCierres');
+    if (!demosEl || !cierresEl) return;
+    if (origen === 'demos') {
+      var demos = Math.max(0, Number(demosEl.value) || 0);
+      demos = Math.round(demos / 3) * 3;
+      if (demos > 90) demos = 90;
+      if (demos < 0) demos = 0;
+      var cierres = Math.floor(demos / 3);
+      if (cierres > 30) cierres = 30;
+      demosEl.value = String(demos);
+      cierresEl.value = String(cierres);
+    } else if (origen === 'cierres') {
+      var cierres = Math.max(0, Math.round(Number(cierresEl.value) || 0));
+      if (cierres > 30) cierres = 30;
+      var demos = cierres * 3;
+      if (demos > 90) { demos = 90; cierres = 30; }
+      cierresEl.value = String(cierres);
+      demosEl.value = String(demos);
+    }
+  }
+  function calcSimulador(e){
+    var origen = e && e.target ? e.target.id : '';
+    if (origen === 'simDemos') aplicarReglaDemosCierres('demos');
+    else if (origen === 'simCierres') aplicarReglaDemosCierres('cierres');
     var demos = Math.max(0, Number($('simDemos').value) || 0);
-    var cierres = Math.min(demos, Math.max(0, Number($('simCierres').value) || 0));
+    var cierres = Math.max(0, Number($('simCierres').value) || 0);
     var red = Math.max(0, Number($('simRed').value) || 0);
     var valorCierre = Math.max(0, Number($('simValorCierre').value) || 324000);
     var valorRed = Math.max(0, Number($('simValorRed').value) || 37620);

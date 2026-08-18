@@ -90,12 +90,26 @@ test('el simulador suma comercialización y red', async ({ page }) => {
 test('demos y cierres se mueven con la regla 3 a 1', async ({ page }) => {
   await entrar(page);
   await page.evaluate(() => window.abrirSimulador());
+  await expect(page.locator('#simDemos')).toHaveValue('30');
+  await expect(page.locator('#simCierres')).toHaveValue('10');
+
   await page.locator('#simDemos').evaluate(el => { el.value = '15'; el.dispatchEvent(new Event('input', { bubbles: true })); });
+  await expect(page.locator('#simDemos')).toHaveValue('15');
+  await expect(page.locator('#simCierres')).toHaveValue('5');
   await expect(page.locator('#simDemosV')).toHaveText('15');
   await expect(page.locator('#simCierresV')).toHaveText('5');
+  await expect(page.locator('#simResult')).toContainText('1.620.000');
+
   await page.locator('#simCierres').evaluate(el => { el.value = '8'; el.dispatchEvent(new Event('input', { bubbles: true })); });
+  await expect(page.locator('#simCierres')).toHaveValue('8');
+  await expect(page.locator('#simDemos')).toHaveValue('24');
   await expect(page.locator('#simCierresV')).toHaveText('8');
   await expect(page.locator('#simDemosV')).toHaveText('24');
+  await expect(page.locator('#simResult')).toContainText('2.592.000');
+
+  await page.locator('#simCierres').evaluate(el => { el.value = '0'; el.dispatchEvent(new Event('input', { bubbles: true })); });
+  await expect(page.locator('#simDemos')).toHaveValue('0');
+  await expect(page.locator('#simCierres')).toHaveValue('0');
 });
 
 test('el stock se carga y sobrevive el refresco', async ({ page }) => {

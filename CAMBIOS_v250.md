@@ -48,6 +48,10 @@ El workflow `.github/workflows/deploy-backend.yml` ahora:
 - El overlay de diálogos y el calendario dejan de tapar la página cuando están cerrados (`display: none`).
 - En el celular el desplazamiento vive en `.app`, para que iOS/Android no queden trabados por capas `position: fixed`.
 
+## Simulador
+
+- Las barras de **Demos por mes** y **Cierres** quedan atadas: 3 demos = 1 cierre. Mover una mueve la otra (el número y el pulgar de la barra).
+
 ## Verificación
 
 - Sintaxis JavaScript comprobada con `node --check`.
