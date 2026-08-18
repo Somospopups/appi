@@ -63,6 +63,7 @@ test('el home muestra el porqué y prioriza la jornada de hoy', async ({ page })
   const home = page.locator('#homeLimpio');
   await expect(home).toBeVisible();
   await expect(home).toContainText('Que mi familia viva tranquila');
+  await expect(home).toContainText('Tu impulso');
   await expect(home).toContainText('Tu jornada');
   await expect(home).toContainText('Jorge Salas');
   await expect(home).toContainText('Lucía Vega');

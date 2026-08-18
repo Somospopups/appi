@@ -62,6 +62,12 @@ El workflow `.github/workflows/deploy-backend.yml` ahora:
 
 - Se recortó basura duplicada después de `</html>` que se veía como código suelto al pie de la página.
 
+## Impulso y avisos
+
+- En el Home aparece **Tu impulso**: una sola acción del día, racha y el avance de Cultura (15 PB + 2 invitados).
+- En el engranaje, **Activar avisos del día** pide permiso y manda un aviso local si hay algo urgente.
+- El teléfono vinculado sigue recibiendo el resumen de las 9:00 y el aviso 30 minutos antes de una demo.
+
 ## Simulador
 
 - **Por cada cierre:** ganancia por cada producto comercializado.
