@@ -62,6 +62,10 @@ El workflow `.github/workflows/deploy-backend.yml` ahora:
 
 - Se recortó basura duplicada después de `</html>` que se veía como código suelto al pie de la página.
 
+## La botella
+
+- Además de la plata, la demo muestra el impacto ambiental: kilos de plástico, metros cuadrados, años de descomposición y petróleo evitado. Los números se mueven con las botellas por día.
+
 ## Simulador
 
 - Las barras de **Demos por mes** y **Cierres** quedan atadas: 3 demos = 1 cierre. Mover una mueve la otra (el número y el pulgar de la barra).

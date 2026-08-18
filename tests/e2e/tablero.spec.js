@@ -76,6 +76,15 @@ test('la botella calcula conciencia y se comparte', async ({ page }) => {
   await page.locator('#botPrecio').fill('1000');
   await expect(page.locator('#botResult')).toContainText('90.000');      // por mes
   await expect(page.locator('#botResult')).toContainText('3.240.000');   // en 3 años
+  await expect(page.locator('#botEco')).toContainText('plástico');
+  await expect(page.locator('#botEco')).toContainText('kg');
+  await expect(page.locator('#botEco')).toContainText('m²');
+  await expect(page.locator('#botEco')).toContainText('450 años');
+  await expect(page.locator('#botEco')).toContainText('petróleo');
+  const kg3 = await page.locator('#botEco').innerText();
+  expect(kg3).toMatch(/48[.,]2/); // 3 botellas × 365 × 44 g
+  await page.locator('#botPorDia').fill('2');
+  await expect(page.locator('#botEco')).toContainText(/32[.,]1/);
   await expect(page.locator('#botShare')).toBeVisible();
 });
 

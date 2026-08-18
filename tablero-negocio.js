@@ -69,7 +69,26 @@
       '.tb-big{font-size:20px;font-weight:950;color:#3d63c9}' +
       '.tb-btn{border:0;border-radius:12px;padding:10px 14px;background:linear-gradient(135deg,#3ad0a4,#5b8def);color:#fff;font:inherit;font-size:12px;font-weight:900;cursor:pointer}' +
       '.tb-mini{border:1px solid rgba(91,141,239,.25);border-radius:10px;padding:6px 10px;background:rgba(91,141,239,.08);color:#3d63c9;font:inherit;font-size:11px;font-weight:850;cursor:pointer}' +
-      'body.dark .tb-mini{background:rgba(91,141,239,.15);color:#a8c0ff}';
+      'body.dark .tb-mini{background:rgba(91,141,239,.15);color:#a8c0ff}' +
+      '.bot-eco{margin-top:14px;padding:14px;border-radius:16px;background:linear-gradient(160deg,rgba(34,168,120,.12),rgba(91,141,239,.10) 55%,rgba(58,208,164,.08));border:1px solid rgba(34,168,120,.22)}' +
+      'body.dark .bot-eco{background:linear-gradient(160deg,rgba(34,168,120,.16),rgba(91,141,239,.12));border-color:rgba(58,208,164,.22)}' +
+      '.bot-eco-kicker{margin:0 0 4px;color:#168765;font-size:10px;font-weight:950;letter-spacing:.6px;text-transform:uppercase}' +
+      'body.dark .bot-eco-kicker{color:#5ee0b0}' +
+      '.bot-eco h3{margin:0 0 4px;color:#1c3d32;font-size:16px;font-weight:950}' +
+      'body.dark .bot-eco h3{color:#e8fff6}' +
+      '.bot-eco-lead{margin:0 0 12px;color:#4a675c;font-size:11.5px;font-weight:700;line-height:1.4}' +
+      'body.dark .bot-eco-lead{color:#b7d4c8}' +
+      '.bot-eco-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}' +
+      '.bot-eco-item{min-height:92px;padding:10px;border-radius:14px;background:rgba(255,255,255,.72);border:1px solid rgba(255,255,255,.8)}' +
+      'body.dark .bot-eco-item{background:rgba(20,28,32,.55);border-color:rgba(255,255,255,.08)}' +
+      '.bot-eco-item span{display:block;font-size:16px;line-height:1}' +
+      '.bot-eco-item b{display:block;margin-top:6px;color:#146b4d;font-size:18px;line-height:1.1}' +
+      'body.dark .bot-eco-item b{color:#7ef0c2}' +
+      '.bot-eco-item small{display:block;margin-top:4px;color:#5d7269;font-size:10px;font-weight:750;line-height:1.3}' +
+      'body.dark .bot-eco-item small{color:#a9c4b8}' +
+      '.bot-eco-nota{margin:12px 0 0;color:#2d4a3e;font-size:12px;font-weight:750;line-height:1.45}' +
+      'body.dark .bot-eco-nota{color:#cfe8dc}' +
+      '@media (min-width:1024px){.bot-eco-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}';
     document.head.appendChild(s);
   }
 
@@ -107,27 +126,71 @@
   }
 
   /* ---------------- 2 · COMPARATIVA DE LA BOTELLA ---------------- */
+  // Promedios para la demo: botella PET 2 L vacía ~44 g; 450 años en
+  // descomponerse (se cita 450 a 1.000); huella aplastada 18×10 cm;
+  // ~1,9 L de petróleo y ~2,3 kg de CO2 por kilo de PET.
+  var BOT_G = 44;
+  var BOT_ANIOS = 450;
+  var BOT_M2 = 0.018;
+  var BOT_PETROLEO = 1.9;
+  var BOT_CO2 = 2.3;
+  var BOT_ARBOL = 21;
+  function botFmt(n, dec){
+    return Number(n).toLocaleString('es-AR', {minimumFractionDigits: dec || 0, maximumFractionDigits: dec || 0});
+  }
+  function botKgTxt(n){ return n >= 100 ? botFmt(Math.round(n)) : botFmt(n, 1); }
+  function botEquivArea(m2){
+    if (m2 < 2) return 'como una mesa de café';
+    if (m2 < 10) return 'como una habitación chica';
+    if (m2 < 16) return 'como una plaza de estacionamiento';
+    if (m2 < 50) return 'como un living comedor';
+    if (m2 < 261) return 'como un departamento de ' + Math.round(m2) + ' m²';
+    if (m2 < 7140) return 'como ' + botFmt(m2 / 261, 1) + ' canchas de tenis';
+    return 'como ' + botFmt(m2 / 7140, 1) + ' canchas de fútbol';
+  }
   function htmlBotella(){
     return '<div class="tb-card" style="margin:10px 2px">' +
       '<div class="tb-title"> La comparativa de la botella</div>' +
-      '<div class="tb-sub">Mostrala en la demo: los números despiertan conciencia</div>' +
+      '<div class="tb-sub">Mostrala en la demo: la plata y el planeta despiertan conciencia</div>' +
       '<div class="tb-row"><span>Botellas de 2 L por día</span><input class="tb-input" style="max-width:90px" id="botPorDia" type="number" min="1" max="40" value="2"></div>' +
       '<div class="tb-row"><span>Precio por botella ($)</span><input class="tb-input" style="max-width:120px" id="botPrecio" type="number" min="0" step="50" value="1500"></div>' +
       '<div id="botResult"></div>' +
-      '<button type="button" class="tb-btn" id="botShare" style="width:100%;margin-top:8px">📤 Compartirla por WhatsApp</button></div>';
+      '<div class="bot-eco" id="botEco"></div>' +
+      '<button type="button" class="tb-btn" id="botShare" style="width:100%;margin-top:12px">📤 Compartirla por WhatsApp</button></div>';
   }
   function calcBotella(){
     var d = Math.max(1, Number($('botPorDia').value) || 2);
     var p = Math.max(0, Number($('botPrecio').value) || 0);
     var dia = d * p, mes = dia * 30, anio = mes * 12, tres = anio * 3;
     var f = function(n){ return '$' + Math.round(n).toLocaleString('es-AR'); };
+    var botellasAnio = d * 365;
+    var botellasTres = botellasAnio * 3;
+    var kgAnio = botellasAnio * BOT_G / 1000;
+    var kgTres = kgAnio * 3;
+    var m2Anio = botellasAnio * BOT_M2;
+    var petroleo = kgAnio * BOT_PETROLEO;
+    var arboles = (kgAnio * BOT_CO2) / BOT_ARBOL;
+    var horizonte = new Date().getFullYear() + BOT_ANIOS;
+    var areaTxt = botEquivArea(m2Anio);
     $('botResult').innerHTML =
       '<div class="tb-row"><span>Por día</span><span>' + f(dia) + '</span></div>' +
       '<div class="tb-row"><span>Por mes (30 días)</span><span>' + f(mes) + '</span></div>' +
       '<div class="tb-row"><span>Por año</span><span class="tb-big">' + f(anio) + '</span></div>' +
       '<div class="tb-row"><span>En 3 años</span><span class="tb-big tb-no">' + f(tres) + '</span></div>' +
       '<div class="tb-sub" style="margin-top:6px">Con el sistema, ese dinero vuelve a tu bolsillo: ' + f(anio) + ' por año que hoy se van en botellas.</div>';
-    window.__botTexto = '🍶 Comparativa de la botella (2 L):\n' + d + ' botellas por día a ' + f(p) + ' cada una.\nPor mes: ' + f(mes) + '\nPor año: ' + f(anio) + '\nEn 3 años: ' + f(tres) + '\nCon el sistema de purificación, ese dinero vuelve a tu bolsillo.';
+    var eco = $('botEco');
+    if (eco) eco.innerHTML =
+      '<div class="bot-eco-kicker">Impacto ambiental</div>' +
+      '<h3>Lo que le ahorrás al planeta</h3>' +
+      '<p class="bot-eco-lead">Si esa familia deja las botellas, este plástico no se fabrica. Los números se mueven con lo que cargaste arriba.</p>' +
+      '<div class="bot-eco-grid">' +
+        '<div class="bot-eco-item"><span>♻️</span><b>' + botKgTxt(kgAnio) + ' kg</b><small>de plástico PET por año</small></div>' +
+        '<div class="bot-eco-item"><span>📐</span><b>' + botFmt(m2Anio, 1) + ' m²</b><small>si las tirás al piso · ' + esc(areaTxt) + '</small></div>' +
+        '<div class="bot-eco-item"><span>⏳</span><b>' + botFmt(BOT_ANIOS) + ' años</b><small>tarda cada botella en descomponerse</small></div>' +
+        '<div class="bot-eco-item"><span>🛢️</span><b>' + botFmt(petroleo, 0) + ' L</b><small>de petróleo que no se usan</small></div>' +
+      '</div>' +
+      '<p class="bot-eco-nota">En 3 años son <b>' + botFmt(botellasTres) + ' botellas</b> y <b>' + botKgTxt(kgTres) + ' kg</b> de plástico. Ese material seguiría en la Tierra en el <b>año ' + horizonte + '</b>. Dejarlas equivale a plantar unos <b>' + botFmt(arboles, 1) + ' árboles</b> en absorción de CO₂.</p>';
+    window.__botTexto = '🍶 Comparativa de la botella (2 L):\n' + d + ' botellas por día a ' + f(p) + ' cada una.\nPor mes: ' + f(mes) + '\nPor año: ' + f(anio) + '\nEn 3 años: ' + f(tres) + '\nCon el sistema de purificación, ese dinero vuelve a tu bolsillo.\n\n🌍 Lo que le ahorrás al planeta:\n• ' + botKgTxt(kgAnio) + ' kg de plástico por año\n• ' + botFmt(m2Anio, 1) + ' m² si las tirás al piso (' + areaTxt + ')\n• Cada botella tarda ' + BOT_ANIOS + ' años en descomponerse\n• ' + botFmt(petroleo, 0) + ' litros de petróleo que no se usan\nEn 3 años: ' + botKgTxt(kgTres) + ' kg. Ese plástico seguiría en la Tierra en el año ' + horizonte + '.';
   }
 
   /* ---------------- 3 · SIMULADOR DE GANANCIAS ---------------- */
