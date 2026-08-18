@@ -108,6 +108,8 @@ test('elegir titular o socio no deja overflow hidden', async ({ page }) => {
   await login(page);
   await expect(page.locator('#personChoiceOverlay')).toBeVisible();
   await page.locator('[data-person-type="titular"]').click();
+  await expect(page.locator('#personChoiceOverlay')).toBeHidden();
+  await expect(page.locator('#bootScreen')).toHaveCount(0, { timeout: 3500 });
   await expect(page.locator('#lockScreen')).toHaveClass(/hidden/);
   await expect(page.locator('#view-home')).toHaveClass(/active/);
   const state = await scrollMetrics(page);

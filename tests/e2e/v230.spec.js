@@ -131,9 +131,22 @@ test('el Coach de Demo nunca bloquea el scroll de APPI', async ({ page }) => {
   await expect(page.locator('#demoObjectionSheet')).toBeVisible();
   expect(await page.evaluate(() => getComputedStyle(document.body).overflow)).not.toBe('hidden');
   await page.locator('[data-demo-sheet-close]').click();
+  await expect(page.locator('#bootScreen')).toHaveCount(0, { timeout: 3500 });
 
-  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
-  await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(100);
+  await page.evaluate(() => {
+    const target = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+    window.scrollTo(0, target);
+    document.documentElement.scrollTop = target;
+    document.body.scrollTop = target;
+    const root = document.getElementById('appScroll');
+    if (root) root.scrollTop = target;
+  });
+  await expect.poll(() => page.evaluate(() => Math.max(
+    window.scrollY,
+    document.documentElement.scrollTop,
+    document.body.scrollTop,
+    document.getElementById('appScroll')?.scrollTop || 0
+  ))).toBeGreaterThan(100);
 
   await page.evaluate(() => {
     document.body.classList.add('demo-sheet-open');

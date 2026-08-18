@@ -3669,18 +3669,24 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
   <div class="boot-brand">
     <span class="boot-kicker">ASISTENTE PERSONAL</span>
     <div class="boot-glass"><span class="boot-logo">APPI</span></div>
-    <p class="boot-message">Preparando tu negocio<span class="boot-dots" aria-hidden="true"><i></i><i></i><i></i></span></p>
+    <p class="boot-message"><span class="boot-message-label">Preparando tu negocio</span><span class="boot-dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="boot-ready-mark" aria-hidden="true">✓</span></p>
   </div>
 </div>
 <script>
 (function iniciarCargaAnimada(){
   const boot=document.getElementById('bootScreen');
   if(!boot)return;
+  const reduced=!!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  window.__appiBootStartedAt=performance.now();
+  window.__appiBootMinimumMs=reduced?80:1650;
+  window.__appiBootReadyHoldMs=reduced?0:320;
+  window.__appiBootExitTimer=0;
+  boot.dataset.phase='loading';
   requestAnimationFrame(()=>requestAnimationFrame(()=>boot.classList.add('fill')));
 })();
 </script>
 <style>
-#bootScreen{position:fixed;inset:0;z-index:9990;overflow:hidden;display:flex;align-items:center;justify-content:center;min-height:100vh;min-height:100dvh;isolation:isolate;opacity:1;background:linear-gradient(180deg,#082b55 0%,#245d7d 48%,#ef9a77 100%);transition:opacity .48s ease,visibility 0s linear 0s}
+#bootScreen{position:fixed;inset:0;z-index:9990;overflow:hidden;display:flex;align-items:center;justify-content:center;min-height:100vh;min-height:100dvh;isolation:isolate;opacity:1;background:linear-gradient(180deg,#082b55 0%,#245d7d 48%,#ef9a77 100%);transition:opacity .52s ease,visibility 0s linear 0s}
 #bootScreen.gone{pointer-events:none;display:none!important}
 .boot-sky{position:absolute;inset:0;z-index:0;overflow:hidden;background:radial-gradient(circle at 50% 76%,rgba(255,218,144,.9) 0 2%,rgba(255,151,100,.34) 12%,transparent 37%),linear-gradient(180deg,rgba(2,23,55,.3),transparent 60%)}
 .boot-sun{position:absolute;left:50%;top:73%;width:38px;height:38px;border-radius:50%;transform:translate(-50%,-50%);background:#fff4c2;box-shadow:0 0 28px 12px rgba(255,190,112,.6),0 0 90px 40px rgba(255,123,90,.3);animation:bootSunGlow 2.6s ease-in-out infinite}
@@ -3688,7 +3694,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
 .boot-cloud.cloud-one{top:13%;left:-80px}.boot-cloud.cloud-two{top:31%;right:-105px;width:300px;opacity:.12;animation-delay:-4s;animation-direction:alternate-reverse}
 @keyframes bootSunGlow{50%{box-shadow:0 0 38px 16px rgba(255,205,126,.7),0 0 110px 48px rgba(255,123,90,.36)}}
 @keyframes bootCloud{to{transform:translateX(42px) scale(1.08)}}
-.boot-water{position:absolute;z-index:2;inset:-1px 0 0;transform:translate3d(0,105%,0);will-change:transform;background:linear-gradient(180deg,rgba(214,255,255,.62) 0 2%,#4fd4e4 5%,#1aa8bc 16%,#0d7f96 34%,#0a5d7c 56%,#06415c 78%,#022536 100%);box-shadow:0 -16px 45px rgba(143,229,255,.28);transition:transform 3.7s cubic-bezier(.2,.72,.24,1)}
+.boot-water{position:absolute;z-index:2;inset:-1px 0 0;transform:translate3d(0,105%,0);will-change:transform;background:linear-gradient(180deg,rgba(214,255,255,.62) 0 2%,#4fd4e4 5%,#1aa8bc 16%,#0d7f96 34%,#0a5d7c 56%,#06415c 78%,#022536 100%);box-shadow:0 -16px 45px rgba(143,229,255,.28);transition:transform 1.55s cubic-bezier(.18,.76,.22,1)}
 #bootScreen.fill .boot-water{transform:translate3d(0,6%,0)}
 .boot-water-depth{position:absolute;inset:0;pointer-events:none;background:radial-gradient(120% 55% at 50% -5%,rgba(255,176,96,.4),transparent 46%),radial-gradient(90% 40% at 18% 62%,rgba(20,200,210,.16),transparent 58%),radial-gradient(80% 45% at 85% 80%,rgba(1,28,48,.45),transparent 62%),repeating-linear-gradient(180deg,transparent 0 11px,rgba(255,255,255,.04) 12px,transparent 18px)}
 .boot-water-caustic{position:absolute;inset:-30% -20% -10%;pointer-events:none;opacity:.5;mix-blend-mode:screen;background:radial-gradient(ellipse 28% 12% at 22% 18%,rgba(255,236,190,.55),transparent 70%),radial-gradient(ellipse 34% 14% at 68% 26%,rgba(170,245,255,.35),transparent 72%),repeating-linear-gradient(118deg,transparent 0 16px,rgba(255,255,255,.11) 20px,transparent 28px 46px),repeating-linear-gradient(242deg,transparent 0 22px,rgba(120,230,255,.12) 28px,transparent 40px 70px);background-size:100% 100%,100% 100%,240px 170px,300px 200px;animation:bootCaustics 6.4s linear infinite}
@@ -3714,14 +3720,19 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
 .boot-glass::before{content:"";position:absolute;left:-18%;top:-72%;width:52%;height:210%;transform:rotate(24deg);background:linear-gradient(90deg,rgba(255,255,255,.34),rgba(255,255,255,0));pointer-events:none}
 .boot-glass::after{content:"";position:absolute;left:8%;right:8%;top:1px;height:2px;border-radius:2px;background:rgba(255,255,255,.8);pointer-events:none}
 .boot-message{min-height:24px;margin:14px 0 0;font-size:14px;font-weight:750;color:rgba(255,255,255,.92)}
-.boot-dots{display:inline-flex;align-items:flex-end;gap:3px;width:25px;margin-left:5px}
+.boot-dots{display:inline-flex;align-items:flex-end;gap:3px;width:25px;margin-left:5px;opacity:1;transition:opacity .18s ease,transform .18s ease}
 .boot-dots i{width:5px;height:5px;border-radius:50%;background:#fff;animation:bootDot 1.15s ease-in-out infinite}.boot-dots i:nth-child(2){animation-delay:.16s}.boot-dots i:nth-child(3){animation-delay:.32s}
+.boot-ready-mark{width:22px;height:22px;margin-left:7px;display:inline-grid;place-items:center;border-radius:50%;vertical-align:-4px;background:rgba(112,243,195,.2);border:1px solid rgba(157,255,220,.72);color:#d9fff1;font-size:12px;font-weight:950;opacity:0;transform:scale(.45) rotate(-12deg);transition:opacity .22s ease,transform .32s cubic-bezier(.34,1.56,.64,1)}
+#bootScreen.ready .boot-dots{width:0;margin-left:0;opacity:0;transform:translateY(4px);overflow:hidden}
+#bootScreen.ready .boot-ready-mark{opacity:1;transform:scale(1) rotate(0)}
+#bootScreen.ready .boot-glass{border-color:rgba(180,255,232,.82);box-shadow:0 18px 44px rgba(2,25,53,.3),0 0 30px rgba(112,243,195,.14),inset 0 1px 0 rgba(255,255,255,.9)}
+#bootScreen.ready .boot-water{transform:translate3d(0,3%,0);transition-duration:.28s}
 @keyframes bootBrandIn{from{opacity:0;transform:translateY(16px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
 @keyframes bootFloat{50%{transform:translateY(-8px)}}
 @keyframes bootDot{0%,70%,100%{transform:translateY(0);opacity:.38}35%{transform:translateY(-5px);opacity:1}}
-#bootScreen.leaving{opacity:0;visibility:hidden;pointer-events:none;transition:opacity .48s ease,visibility 0s linear .48s}
-#bootScreen.leaving .boot-water{transform:translate3d(0,-2%,0);transition-duration:.48s}
-#bootScreen.leaving .boot-brand{animation:none;transform:scale(1.04);opacity:0;transition:transform .48s ease,opacity .3s ease}
+#bootScreen.leaving{opacity:0;visibility:hidden;pointer-events:none;transition:opacity .52s ease,visibility 0s linear .52s}
+#bootScreen.leaving .boot-water{transform:translate3d(0,-2%,0);transition-duration:.52s}
+#bootScreen.leaving .boot-brand{animation:none;transform:translateY(-5px) scale(1.035);opacity:0;transition:transform .52s cubic-bezier(.2,.8,.2,1),opacity .32s ease}
 @media(max-width:390px){.boot-brand{width:min(84vw,330px);padding:24px 18px 21px;border-radius:24px}.boot-glass{padding:12px 24px 14px;border-radius:22px}.boot-logo{font-size:56px}.boot-message{font-size:13px}}
 @media(max-width:330px){.boot-glass{padding:10px 18px 12px}.boot-logo{font-size:46px}}
 @supports not ((-webkit-backdrop-filter:blur(2px)) or (backdrop-filter:blur(2px))){.boot-glass{background:linear-gradient(160deg,rgba(255,255,255,.5),rgba(255,255,255,.26) 58%,rgba(255,255,255,.36))}}
@@ -10816,10 +10827,29 @@ function avisarMembresiaUsuario(){
 function ocultarBoot(force){
   if(!force&&(window.__appiCubriendoInicio||overlayPersonaVisible()))return;
   const b=document.getElementById('bootScreen');
-  if(!b||b.classList.contains('gone')||b.classList.contains('leaving'))return;
-  b.setAttribute('aria-busy','false');
-  b.classList.add('leaving');
-  setTimeout(()=>{try{b.classList.add('gone');b.remove()}catch(e){}},520);
+  if(!b||b.classList.contains('gone')||b.classList.contains('leaving')||b.dataset.exitRequested==='1')return;
+  b.dataset.exitRequested='1';
+  const started=Number(window.__appiBootStartedAt||performance.now());
+  const minimum=Math.max(0,Number(window.__appiBootMinimumMs||0));
+  const elapsed=Math.max(0,performance.now()-started);
+  const wait=Math.max(0,minimum-elapsed);
+  clearTimeout(window.__appiBootExitTimer);
+  window.__appiBootExitTimer=setTimeout(()=>{
+    if(!b.isConnected)return;
+    b.dataset.phase='ready';
+    b.classList.add('ready');
+    const label=b.querySelector('.boot-message-label');
+    if(label)label.textContent='Todo listo';
+    const hold=Math.max(0,Number(window.__appiBootReadyHoldMs||0));
+    setTimeout(()=>{
+      if(!b.isConnected)return;
+      b.dataset.phase='leaving';
+      b.setAttribute('aria-busy','false');
+      b.classList.add('leaving');
+      window.__appiBootRemovedAt=performance.now();
+      setTimeout(()=>{try{b.classList.add('gone');b.remove()}catch(e){}},560);
+    },hold);
+  },wait);
 }
 setTimeout(ocultarBoot,6000);
 
@@ -10837,6 +10867,12 @@ function iniciarApp() {
     });
     return;
   }
+  // La aplicación ya puede mostrarse: ocultamos la elección resuelta y
+  // liberamos el scroll antes de activar cualquier vista, aunque la salida
+  // visual del splash continúe por encima.
+  const personOverlay=document.getElementById('personChoiceOverlay');
+  if(personOverlay)personOverlay.hidden=true;
+  if(typeof forzarScrollLibre==='function')forzarScrollLibre();
   const profile=window.APPIAuth&&window.APPIAuth.isEnabled()?window.APPIAuth.currentProfile():null;
   if(profile&&profile.rol==='admin'){
     showView('view-admin');

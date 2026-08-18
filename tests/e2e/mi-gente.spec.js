@@ -58,6 +58,7 @@ async function abrirMiGente(page, { contactosLocales = [], yaMigrado = false, fa
   await page.locator('#distributorPassword').fill('Clave1234');
   await page.locator('#btnDistributorLogin').click();
   await expect(page.locator('#lockScreen')).toHaveClass(/hidden/);
+  await expect(page.locator('#bootScreen')).toHaveCount(0, { timeout: 3500 });
   return importados;
 }
 
