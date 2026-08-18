@@ -121,6 +121,18 @@ test('en PC la barra trae las mismas herramientas que el celular', async ({ page
   await page.locator('#deskSidebar [data-ds="view-simulador"]').click();
   await expect(page.locator('#view-simulador')).toHaveClass(/active/);
   await expect(page.locator('#deskSidebar [data-ds="view-simulador"]')).toHaveClass(/active/);
+
+  await page.setViewportSize({ width: 1366, height: 768 });
+  await page.locator('#deskSidebar [data-ds="view-notas"]').scrollIntoViewIfNeeded();
+  await expect(page.locator('#deskSidebar [data-ds="view-notas"]')).toBeVisible();
+  await expect(page.locator('#deskSidebar [data-ds="view-grabadora"]')).toBeVisible();
+  const leaked = await page.evaluate(() => {
+    return [...document.body.childNodes]
+      .filter(n => n.nodeType === 3)
+      .map(n => n.textContent || '')
+      .join(' ');
+  });
+  expect(leaked).not.toMatch(/limpiarRestos|initHistorico|<\/html>/);
 });
 
 test('la tarjeta de la jornada abre el calendario y guarda tareas', async ({ page }) => {

@@ -58,6 +58,10 @@ El workflow `.github/workflows/deploy-backend.yml` ahora:
 - El menú lateral de escritorio no tenía Coach de Demo, Botella ni Simulador. En el celular están en la pestaña Herramientas; en la PC ahora aparecen en **Mis herramientas**.
 - La barra lateral scrollea el listado y deja fijos el logo y la versión, para que no se corten ítems en pantallas bajas.
 
+## HTML
+
+- Se recortó basura duplicada después de `</html>` que se veía como código suelto al pie de la página.
+
 ## Simulador
 
 - Las barras de **Demos por mes** y **Cierres** quedan atadas: 3 demos = 1 cierre. Mover una mueve la otra (el número y el pulgar de la barra).

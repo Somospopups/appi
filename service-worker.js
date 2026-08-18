@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v250-login-pc';
+const CACHE_NAME = 'appi-v250-html-limpio';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
