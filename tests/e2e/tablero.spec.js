@@ -149,9 +149,13 @@ test('prestar saca una unidad y devolverla la vuelve al stock', async ({ page })
   await page.locator('#stSavePrestamo').click();
   await expect(page.locator('#stockCont')).toContainText('Prestado a Laura Gómez');
   await expect(page.locator('#stockCont')).toContainText('Senior 4');
-  await page.locator('[data-st-tab="stock"]').click();
+  if (await page.locator('[data-st-tab="stock"]').count()) {
+    await page.locator('[data-st-tab="stock"]').click();
+  }
   await expect(page.locator('#stockCont')).toContainText('1 unidad');
-  await page.locator('[data-st-tab="prestados"]').click();
+  if (await page.locator('[data-st-tab="prestados"]').count()) {
+    await page.locator('[data-st-tab="prestados"]').click();
+  }
   await page.locator('[data-st-dev]').click();
   await expect(page.locator('#stockCont')).toContainText('2 unidades');
 });
@@ -167,7 +171,9 @@ test('eliminar un préstamo no devuelve la unidad al stock', async ({ page }) =>
   await page.evaluate(() => { window.APPIDialog.confirm = async () => true; });
   await page.locator('[data-st-kill]').click();
   await expect(page.locator('#stockCont')).toContainText('Nada prestado');
-  await page.locator('[data-st-tab="stock"]').click();
+  if (await page.locator('[data-st-tab="stock"]').count()) {
+    await page.locator('[data-st-tab="stock"]').click();
+  }
   await expect(page.locator('#stockCont')).toContainText('Todavía no cargaste productos');
 });
 

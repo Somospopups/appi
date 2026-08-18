@@ -10,6 +10,11 @@
 
   var tab = 'stock';
   var prestarIdx = -1;
+  var bound = false;
+
+  function esEscritorio(){
+    return !!(window.matchMedia && window.matchMedia('(min-width: 1024px)').matches);
+  }
 
   function uid(){ return window.APPIAuth && window.APPIAuth.userId ? window.APPIAuth.userId() : 'local'; }
   function $(id){ return document.getElementById(id); }
@@ -98,6 +103,8 @@
       '.st-ok{background:rgba(58,208,164,.16);color:#1d7a5c}' +
       '.st-del{background:rgba(217,83,79,.12);color:#b94440}' +
       '.st-wa{background:linear-gradient(135deg,#25D366,#128C7E);color:#fff}' +
+      '.st-desk{display:grid;gap:14px;align-items:start}' +
+      '@media(min-width:1024px){.st-desk{grid-template-columns:1fr 1fr;gap:18px}.st-wrap{max-width:1100px;margin:0 auto;padding:4px 8px 28px}.st-ov{align-items:center!important}.st-sheet{border-radius:22px!important;width:min(440px,100%)}}' +
       '.st-ov{position:fixed;inset:0;z-index:26000;display:none;align-items:flex-end;justify-content:center;background:rgba(20,22,38,.5);padding:16px}' +
       '.st-ov.open{display:flex}' +
       '.st-sheet{width:min(520px,100%);border-radius:22px 22px 16px 16px;background:#fff;padding:16px 16px 20px}' +
@@ -114,19 +121,25 @@
   }
 
   function crearVista(){
-    if ($('view-stock')) return;
-    var app = document.querySelector('.app');
-    if (!app) return;
-    var sec = document.createElement('section');
-    sec.id = 'view-stock';
-    sec.className = 'view';
-    sec.innerHTML = '<header class="top"><button class="back-btn" id="btnBackStock" aria-label="Volver">‹</button><button class="help-btn" id="btnHelpStock" aria-label="Ayuda">?</button><button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button><h1>Mi</h1><div class="script">stock</div><p>Lo que tenés y lo que prestaste</p></header><div class="st-wrap" id="stockCont"></div>';
-    app.appendChild(sec);
-    $('btnBackStock').onclick = function(){
-      if (typeof showView === 'function') showView('view-herramientas');
+    var sec = $('view-stock');
+    if (!sec) {
+      var app = document.querySelector('.app');
+      if (!app) return;
+      sec = document.createElement('section');
+      sec.id = 'view-stock';
+      sec.className = 'view';
+      sec.innerHTML = '<header class="top"><button class="back-btn" id="btnBackStock" aria-label="Volver">‹</button><button class="help-btn" id="btnHelpStock" aria-label="Ayuda">?</button><button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button><h1>Mi</h1><div class="script">stock</div><p>Lo que tenés y lo que prestaste</p></header><div class="st-wrap" id="stockCont"></div>';
+      app.appendChild(sec);
+    }
+    if (bound) return;
+    bound = true;
+    var back = $('btnBackStock');
+    if (back) back.onclick = function(){
+      if (typeof showView === 'function') showView(esEscritorio() ? 'view-home' : 'view-herramientas');
       if (typeof renderHomeCompleto === 'function') renderHomeCompleto();
     };
-    $('btnHelpStock').onclick = function(){
+    var help = $('btnHelpStock');
+    if (help) help.onclick = function(){
       if (window.APPIDialog) window.APPIDialog.alert('En Stock personal cargás lo que tenés en casa. PRESTAR saca 1 unidad, te pregunta a quién y pone la fecha de hoy. En Prestados: YA ME LO DEVOLVIÓ vuelve esa unidad al stock. ELIMINAR borra el préstamo y no toca el stock (por si se perdió o se lo regalaste).', { title:'Cómo usar Mi stock', icon:'📦' });
     };
   }
@@ -152,8 +165,9 @@
 
   function htmlPrestamos(){
     var rows = leerPrestamos().slice().sort(function(a,b){ return String(b.fecha||'').localeCompare(String(a.fecha||'')); });
-    if (!rows.length) return '<div class="st-card"><div class="st-empty">Nada prestado. En Stock personal tocá PRESTAR.</div></div>';
-    return rows.map(function(p){
+    var cabeza = '<div class="st-card"><div class="st-name">🤝 Prestados</div><div class="st-meta" style="margin:4px 0 0">' + rows.length + ' préstamo' + (rows.length === 1 ? '' : 's') + '</div></div>';
+    if (!rows.length) return cabeza + '<div class="st-card"><div class="st-empty">Nada prestado. En Stock personal tocá PRESTAR.</div></div>';
+    return cabeza + rows.map(function(p){
       var tel = last10(p.telefono);
       return '<div class="st-card" data-st-loan="' + esc(p.id) + '">' +
         '<div class="st-name">' + esc(p.producto) + '</div>' +
@@ -173,12 +187,16 @@
     var host = $('stockCont');
     if (!host) return;
     var prestados = leerPrestamos().length;
-    host.innerHTML =
-      '<div class="st-tabs">' +
-        '<button type="button" class="st-tab' + (tab === 'stock' ? ' active' : '') + '" data-st-tab="stock">Stock personal</button>' +
-        '<button type="button" class="st-tab' + (tab === 'prestados' ? ' active' : '') + '" data-st-tab="prestados">Prestados' + (prestados ? ' · ' + prestados : '') + '</button>' +
-      '</div>' +
-      (tab === 'prestados' ? htmlPrestamos() : htmlStock());
+    if (esEscritorio()) {
+      host.innerHTML = '<div class="st-desk"><div>' + htmlStock() + '</div><div>' + htmlPrestamos() + '</div></div>';
+    } else {
+      host.innerHTML =
+        '<div class="st-tabs">' +
+          '<button type="button" class="st-tab' + (tab === 'stock' ? ' active' : '') + '" data-st-tab="stock">Stock personal</button>' +
+          '<button type="button" class="st-tab' + (tab === 'prestados' ? ' active' : '') + '" data-st-tab="prestados">Prestados' + (prestados ? ' · ' + prestados : '') + '</button>' +
+        '</div>' +
+        (tab === 'prestados' ? htmlPrestamos() : htmlStock());
+    }
     bind();
   }
 

@@ -65,6 +65,8 @@ El workflow `.github/workflows/deploy-backend.yml` ahora:
 ## Mi stock
 
 - El stock personal salió de Presupuesto y vive en **Mis herramientas** (celular y menú de PC).
+- En PC el ítem **📦 Mi stock** va primero en la barra lateral (para no quedar abajo, fuera de vista). Tocá **Mis herramientas** y se abre la grilla con el icono.
+- En escritorio la pantalla muestra **En casa** y **Prestados** lado a lado; el popup de prestar queda centrado.
 - Se pueden cargar productos a mano y prestar de a una unidad: pide a quién y el teléfono, y pone la fecha de hoy.
 - En Prestados: **YA ME LO DEVOLVIÓ** vuelve al stock. **ELIMINAR** borra el préstamo y no toca el stock (pide confirmación).
 

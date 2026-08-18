@@ -19,6 +19,15 @@ window.openHistorico=function(){
   };
   abrir();
 };
+window.openStock=function(){
+  window.__stockOpenRequested=true;
+  const abrir=()=>{
+    if(window.APPIStock&&typeof window.APPIStock.open==='function'){
+      window.APPIStock.open();
+    }else setTimeout(abrir,80);
+  };
+  abrir();
+};
 </script>
 <script>
 /* APPI · overlays cerrados no pueden tapar el dedo */
@@ -3660,13 +3669,13 @@ body.dark #bootScreen{background:#101322}
     <button class="ds-btn" data-ds="view-historico" onclick="openHistorico()"><span>📈</span> Histórico</button>
     <button class="ds-btn" data-ds="view-usuarios" onclick="showView('view-usuarios')"><span>📍</span> Usuarios</button>
     <button class="ds-btn" data-ds="view-gestion" onclick="openMiGestion()"><span>📇</span> Panel de Contactos <span class="gestion-sidebar-badge" id="gestionSidebarBadge" hidden>0</span></button>
-    <div class="ds-section-label">Mis herramientas</div>
+    <button type="button" class="ds-section-label ds-section-go" onclick="showView('view-herramientas'); if(typeof renderHomeCompleto==='function') renderHomeCompleto();">Mis herramientas</button>
+    <button class="ds-btn" data-ds="view-stock" onclick="openStock()"><span>📦</span> Mi stock</button>
     <button class="ds-btn" data-ds="view-ocho" onclick="openOcho()"><span>🧭</span> Los 8 Pasos</button>
     <button class="ds-btn" data-ds="view-suenos" onclick="openSuenos()"><span>🪜</span> Escalera de Sueños</button>
     <button class="ds-btn" data-ds="view-demo" onclick="openDemo()"><span>🎯</span> Coach de Demo</button>
     <button class="ds-btn" data-ds="view-botella" onclick="openBotella()"><span>🍾</span> Botella</button>
     <button class="ds-btn" data-ds="view-simulador" onclick="openCalculadora()"><span>🧮</span> Simulador</button>
-    <button class="ds-btn" data-ds="view-stock" onclick="openStock()"><span>📦</span> Mi stock</button>
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
@@ -4109,6 +4118,18 @@ body.dark #pageTabs button.active{color:#a8c0ff}
     </header>
     <div id="herrWrap"></div>
     <div class="home-tool-grid" id="herrGrid" style="padding:0 14px"></div>
+  </section>
+
+  <section id="view-stock" class="view">
+    <header class="top">
+      <button class="back-btn" id="btnBackStock" aria-label="Volver">‹</button>
+      <button class="help-btn" id="btnHelpStock" aria-label="Ayuda">?</button>
+      <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
+      <h1>Mi</h1>
+      <div class="script">stock</div>
+      <p>Lo que tenés y lo que prestaste</p>
+    </header>
+    <div class="st-wrap" id="stockCont"></div>
   </section>
 
   <section id="view-siete" class="view">
@@ -11188,12 +11209,15 @@ body.dark .presu-select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:
   body.dark .ds-brand b{color:#f0f0f5}
   body.dark .ds-brand small{color:#a0a0b0}
   .ds-nav{display:flex;flex-direction:column;gap:1px;flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;padding-right:2px;overscroll-behavior:contain}
-  .ds-section-label{margin:8px 10px 2px;padding-top:6px;border-top:1px solid rgba(80,90,130,.10);color:#81828f;font-size:9px;font-weight:950;letter-spacing:.8px;text-transform:uppercase}
+  .ds-section-label{margin:6px 10px 2px;padding-top:4px;border-top:1px solid rgba(80,90,130,.10);color:#81828f;font-size:9px;font-weight:950;letter-spacing:.8px;text-transform:uppercase}
+  .ds-section-go{display:block;width:calc(100% - 8px);margin-left:4px;margin-right:4px;text-align:left;background:transparent;border:0;border-top:1px solid rgba(80,90,130,.10);cursor:pointer;font:inherit}
+  .ds-section-go:hover{color:#3d63c9}
   .ds-nav>.ds-section-label:first-of-type{margin-top:8px}
   body.dark .ds-section-label{border-top-color:rgba(255,255,255,.08);color:#8f90a0}
+  body.dark .ds-section-go:hover{color:#a8b8ff}
   .ds-btn{
     display:flex; align-items:center; gap:12px; width:100%;
-    padding:8px 10px; border:none; border-radius:12px;
+    padding:6px 10px; border:none; border-radius:12px;
     background:transparent; color:#3a3a48; font:inherit; font-size:13.5px; font-weight:700;
     cursor:pointer; text-align:left; transition:background .18s ease,color .18s ease,transform .1s ease;
     -webkit-tap-highlight-color:transparent;
