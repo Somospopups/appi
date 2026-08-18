@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""Splash nativo de APPI: mismo fondo de la app, wordmark sin recuadro."""
+"""Splash nativo de APPI v255: el logo APPI sobre vidrio esmerilado.
+
+Mismo fondo degradé de la app, con un cartel de vidrio esmerilado
+(panel translúcido con reflejo superior) que sostiene el wordmark APPI
+en letras con brillo helado, sombra suave y borde de luz.
+"""
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
@@ -51,35 +56,92 @@ def paint_background(w, h):
     return Image.alpha_composite(img.convert("RGBA"), glow)
 
 
-def paint_wordmark(img):
-    w, h = img.size
+def paint_glass_wordmark(base):
+    w, h = base.size
     size = max(56, int(min(w, h) * 0.085))
     font = ImageFont.truetype(FONT, size)
     text = "APPI"
-    draw = ImageDraw.Draw(img)
-    bbox = draw.textbbox((0, 0), text, font=font)
+
+    # --- medidas del texto ---
+    probe = ImageDraw.Draw(base)
+    bbox = probe.textbbox((0, 0), text, font=font)
     tw, th = bbox[2] - bbox[0], bbox[3] - bbox[1]
-    x = (w - tw) // 2 - bbox[0]
-    y = int(h * 0.46) - th // 2 - bbox[1]
-    mask = Image.new("L", (w, h), 0)
-    ImageDraw.Draw(mask).text((x, y), text, font=font, fill=255)
-    grad = Image.new("RGBA", (w, h))
-    gp = grad.load()
-    c1, c2, c3 = (91, 141, 239, 255), (160, 107, 255, 255), (255, 107, 157, 255)
-    for i in range(w):
-        t = i / max(w - 1, 1)
-        color = lerp(c1[:3], c2[:3], t / 0.5) + (255,) if t < 0.5 else lerp(c2[:3], c3[:3], (t - 0.5) / 0.5) + (255,)
-        for j in range(h):
-            gp[i, j] = color
-    colored = Image.new("RGBA", (w, h), (0, 0, 0, 0))
-    colored.paste(grad, mask=mask)
-    return Image.alpha_composite(img, colored)
+    cx = w // 2
+    ty = int(h * 0.46) - th // 2 - bbox[1]
+    tx = (w - tw) // 2 - bbox[0]
+
+    # --- cartel de vidrio (panel translúcido redondeado) ---
+    pad_x = int(tw * 0.16)
+    pad_top = int(th * 0.62)
+    pad_bot = int(th * 0.70)
+    x0 = cx - tw // 2 - pad_x
+    x1 = cx + tw // 2 + pad_x
+    y0 = ty + bbox[1] - pad_top
+    y1 = ty + bbox[1] + th + pad_bot
+    chip_w, chip_h = x1 - x0, y1 - y0
+    radius = int(chip_h * 0.34)
+
+    chip = Image.new("RGBA", (chip_w, chip_h), (0, 0, 0, 0))
+    cd = ImageDraw.Draw(chip)
+    for y in range(chip_h):
+        t = y / max(chip_h - 1, 1)
+        r = int(255)
+        g = int(255 - t * 26)
+        b = int(255 - t * 32)
+        a = int(168 - t * 44)
+        cd.line([(0, y), (chip_w, y)], fill=(r, g, b, a))
+    border_w = max(2, int(chip_w * 0.004))
+    cd.rounded_rectangle([0, 0, chip_w - 1, chip_h - 1], radius=radius,
+                         outline=(255, 255, 255, 215), width=border_w)
+    # reflejo superior del vidrio
+    cd.line([(int(chip_w * 0.07), 1), (int(chip_w * 0.93), 1)],
+            fill=(255, 255, 255, 205), width=max(1, int(chip_h * 0.03)))
+
+    glass = Image.new("RGBA", base.size, (0, 0, 0, 0))
+    glass.paste(chip, (x0, y0))
+
+    # --- reflejo diagonal que cruza el vidrio ---
+    sheen = Image.new("RGBA", base.size, (0, 0, 0, 0))
+    sd = ImageDraw.Draw(sheen)
+    band = int(chip_w * 0.34)
+    pts = [(x0 - int(chip_h * 0.15), y0 + int(chip_h * 0.30)),
+           (x0 + band, y0 - int(chip_h * 0.05)),
+           (x0 + band, y0 - int(chip_h * 0.05) - int(chip_h * 0.30)),
+           (x0 - int(chip_h * 0.15), y0 + int(chip_h * 0.30) - int(chip_h * 0.30))]
+    sd.polygon(pts, fill=(255, 255, 255, 60))
+
+    # --- wordmark APPI en letras de vidrio esmerilado ---
+    text_layer = Image.new("RGBA", base.size, (0, 0, 0, 0))
+    # sombra suave detrás de las letras
+    shadow = Image.new("RGBA", base.size, (0, 0, 0, 0))
+    sh = ImageDraw.Draw(shadow)
+    sh.text((tx, ty), text, font=font, fill=(70, 78, 130, 255),
+            stroke_width=max(1, int(size * 0.04)), stroke_fill=(70, 78, 130, 255))
+    shadow = shadow.filter(ImageFilter.GaussianBlur(radius=max(2, int(size * 0.05))))
+    text_layer.alpha_composite(shadow, (0, int(size * 0.05)))
+
+    # cuerpo esmerilado: blanco translúcido
+    fill_mask = Image.new("L", base.size, 0)
+    ImageDraw.Draw(fill_mask).text((tx, ty), text, font=font, fill=255,
+                                   stroke_width=max(1, int(size * 0.045)), stroke_fill=255)
+    white = Image.new("RGBA", base.size, (235, 241, 255, 200))
+    text_layer.paste(white, (0, 0), fill_mask)
+    # borde de luz
+    edge = Image.new("RGBA", base.size, (0, 0, 0, 0))
+    ImageDraw.Draw(edge).text((tx, ty), text, font=font, fill=(255, 255, 255, 235),
+                              stroke_width=max(1, int(size * 0.055)), stroke_fill=(255, 255, 255, 235))
+    text_layer.alpha_composite(edge)
+
+    result = Image.alpha_composite(base, glass)
+    result = Image.alpha_composite(result, sheen)
+    result = Image.alpha_composite(result, text_layer)
+    return result
 
 
 def main():
     OUT.mkdir(exist_ok=True)
     for w, h in SIZES:
-        frame = paint_wordmark(paint_background(w, h))
+        frame = paint_glass_wordmark(paint_background(w, h))
         dest = OUT / f"apple-splash-{w}x{h}.png"
         frame.convert("RGB").save(dest, "PNG", optimize=True)
         print(dest.name)

@@ -3736,7 +3736,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v254 · Segura</div>
+  <div class="ds-foot">APPI · v255 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -11119,12 +11119,12 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='254';
+      const swVersion='255';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 
       // Si el splash arrancó bajo un Service Worker viejo, recargar una sola vez
-      // apenas v254 toma el control. Así no queda visible la animación anterior.
+      // apenas v255 toma el control. Así no queda visible la animación anterior.
       navigator.serviceWorker.addEventListener('controllerchange', () => {
         const boot=document.getElementById('bootScreen');
         const reloadKey='appi-sw-reloaded-'+swVersion;
