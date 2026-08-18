@@ -64,7 +64,7 @@ El workflow `.github/workflows/deploy-backend.yml` ahora:
 
 ## La botella
 
-- Además de la plata, la demo muestra el impacto ambiental: kilos de plástico, metros cuadrados, años de descomposición y petróleo evitado. Los números se mueven con las botellas por día.
+- Además de la plata, la demo muestra el impacto ambiental: kilos de plástico, metros cuadrados, años de descomposición y petróleo para fabricar el PET. Los números se mueven con las botellas por día.
 
 ## Simulador
 

@@ -184,13 +184,13 @@
       '<h3>Lo que le ahorrás al planeta</h3>' +
       '<p class="bot-eco-lead">Si esa familia deja las botellas, este plástico no se fabrica. Los números se mueven con lo que cargaste arriba.</p>' +
       '<div class="bot-eco-grid">' +
-        '<div class="bot-eco-item"><span>♻️</span><b>' + botKgTxt(kgAnio) + ' kg</b><small>de plástico PET por año</small></div>' +
+        '<div class="bot-eco-item"><span>♻️</span><b>' + botKgTxt(kgAnio) + ' kg</b><small>de plástico por año</small></div>' +
         '<div class="bot-eco-item"><span>📐</span><b>' + botFmt(m2Anio, 1) + ' m²</b><small>si las tirás al piso · ' + esc(areaTxt) + '</small></div>' +
         '<div class="bot-eco-item"><span>⏳</span><b>' + botFmt(BOT_ANIOS) + ' años</b><small>tarda cada botella en descomponerse</small></div>' +
-        '<div class="bot-eco-item"><span>🛢️</span><b>' + botFmt(petroleo, 0) + ' L</b><small>de petróleo que no se usan</small></div>' +
+        '<div class="bot-eco-item"><span>🛢️</span><b>' + botFmt(petroleo, 0) + ' L</b><small>de petróleo para fabricar ese plástico</small></div>' +
       '</div>' +
-      '<p class="bot-eco-nota">En 3 años son <b>' + botFmt(botellasTres) + ' botellas</b> y <b>' + botKgTxt(kgTres) + ' kg</b> de plástico. Ese material seguiría en la Tierra en el <b>año ' + horizonte + '</b>. Dejarlas equivale a plantar unos <b>' + botFmt(arboles, 1) + ' árboles</b> en absorción de CO₂.</p>';
-    window.__botTexto = '🍶 Comparativa de la botella (2 L):\n' + d + ' botellas por día a ' + f(p) + ' cada una.\nPor mes: ' + f(mes) + '\nPor año: ' + f(anio) + '\nEn 3 años: ' + f(tres) + '\nCon el sistema de purificación, ese dinero vuelve a tu bolsillo.\n\n🌍 Lo que le ahorrás al planeta:\n• ' + botKgTxt(kgAnio) + ' kg de plástico por año\n• ' + botFmt(m2Anio, 1) + ' m² si las tirás al piso (' + areaTxt + ')\n• Cada botella tarda ' + BOT_ANIOS + ' años en descomponerse\n• ' + botFmt(petroleo, 0) + ' litros de petróleo que no se usan\nEn 3 años: ' + botKgTxt(kgTres) + ' kg. Ese plástico seguiría en la Tierra en el año ' + horizonte + '.';
+      '<p class="bot-eco-nota">La botella no crece en un árbol: el plástico PET se hace con petróleo. Evitar <b>' + botKgTxt(kgAnio) + ' kg</b> es no usar unos <b>' + botFmt(petroleo, 0) + ' litros</b> (más o menos un tanque de nafta). En 3 años son <b>' + botFmt(botellasTres) + ' botellas</b> y <b>' + botKgTxt(kgTres) + ' kg</b> de plástico, que seguirían en la Tierra en el <b>año ' + horizonte + '</b>. Dejarlas equivale a plantar unos <b>' + botFmt(arboles, 1) + ' árboles</b> en absorción de CO₂.</p>';
+    window.__botTexto = '🍶 Comparativa de la botella (2 L):\n' + d + ' botellas por día a ' + f(p) + ' cada una.\nPor mes: ' + f(mes) + '\nPor año: ' + f(anio) + '\nEn 3 años: ' + f(tres) + '\nCon el sistema de purificación, ese dinero vuelve a tu bolsillo.\n\n🌍 Lo que le ahorrás al planeta:\n• ' + botKgTxt(kgAnio) + ' kg de plástico por año\n• ' + botFmt(m2Anio, 1) + ' m² si las tirás al piso (' + areaTxt + ')\n• Cada botella tarda ' + BOT_ANIOS + ' años en descomponerse\n• El PET se fabrica con petróleo: ' + botFmt(petroleo, 0) + ' litros para hacer ese plástico (un tanque de nafta)\nEn 3 años: ' + botKgTxt(kgTres) + ' kg. Ese plástico seguiría en la Tierra en el año ' + horizonte + '.';
   }
 
   /* ---------------- 3 · SIMULADOR DE GANANCIAS ---------------- */

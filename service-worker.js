@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v250-botella-planeta';
+const CACHE_NAME = 'appi-v250-botella-petroleo';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
