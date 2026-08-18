@@ -74,6 +74,7 @@ window.openHistorico=function(){
 <script src="./escalera-suenos.js"></script>
 <script src="./demo-guia.js"></script>
 <script src="./tablero-negocio.js"></script>
+<script src="./stock-personal.js"></script>
 
 <script src="./porque-vivo.js"></script>
 <script src="./home-limpio.js"></script>
@@ -3665,6 +3666,7 @@ body.dark #bootScreen{background:#101322}
     <button class="ds-btn" data-ds="view-demo" onclick="openDemo()"><span>🎯</span> Coach de Demo</button>
     <button class="ds-btn" data-ds="view-botella" onclick="openBotella()"><span>🍾</span> Botella</button>
     <button class="ds-btn" data-ds="view-simulador" onclick="openCalculadora()"><span>🧮</span> Simulador</button>
+    <button class="ds-btn" data-ds="view-stock" onclick="openStock()"><span>📦</span> Mi stock</button>
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
@@ -4856,6 +4858,9 @@ const HELP = {
     • <strong>Red:</strong> PB de tu equipo<br/>
     Las barras de demos y cierres se mueven juntas. Te muestra comercialización + red + total.</div>
 
+    <div class="tip"><strong>📦 MI STOCK</strong><br/>
+    Lo que tenés en casa y lo que prestaste. PRESTAR saca 1 unidad y anota a quién. YA ME LO DEVOLVIÓ lo vuelve al stock. ELIMINAR borra el préstamo sin tocar el stock.</div>
+
     <div class="tip"><strong>🎙️ GRABADORA</strong><br/>
     Grabá ideas, reuniones o recados:<br/>
     • Tocá el micrófono para grabar<br/>
@@ -4949,6 +4954,7 @@ const HELP = {
     • <strong>Coach Comercial de Demo</strong> — guiones, preguntas y objeciones en vivo<br/>
     • <strong>La Botella</strong> — herramienta de conciencia para la demo<br/>
     • <strong>Simulador</strong> — calculá cuánto podés ganar<br/>
+    • <strong>Mi stock</strong> — lo que tenés en casa y lo que prestaste<br/>
     • <strong>Grabadora</strong> — grabá ideas y reuniones<br/>
     • <strong>Notas Keep</strong> — notas rápidas de colores</div>
 
@@ -5329,12 +5335,12 @@ function showView(id){
     b.classList.toggle('active', b.dataset.view===id);
   });
   // Sidebar escritorio: marcar activo (con equivalencias de sub-vistas)
-  const dsMap = {'view-home':'view-home','view-presu':'view-presu','view-presu-hist':'view-presu','view-equipo':'view-equipo','view-historico':'view-historico','view-usuarios':'view-usuarios','view-seguimiento':'view-seguimiento','view-encuesta':'view-encuesta','view-gestion':'view-gestion','view-grabadora':'view-grabadora','view-notas':'view-notas','view-siete':'view-siete','view-siete-detail':'view-siete','view-ocho':'view-ocho','view-suenos':'view-suenos','view-demo':'view-demo','view-botella':'view-botella','view-simulador':'view-simulador'};
+  const dsMap = {'view-home':'view-home','view-presu':'view-presu','view-presu-hist':'view-presu','view-equipo':'view-equipo','view-historico':'view-historico','view-usuarios':'view-usuarios','view-seguimiento':'view-seguimiento','view-encuesta':'view-encuesta','view-gestion':'view-gestion','view-grabadora':'view-grabadora','view-notas':'view-notas','view-siete':'view-siete','view-siete-detail':'view-siete','view-ocho':'view-ocho','view-suenos':'view-suenos','view-demo':'view-demo','view-botella':'view-botella','view-simulador':'view-simulador','view-stock':'view-stock'};
   const dsTarget = (id==='view-wheel'||id==='view-eval') ? `rueda-${currentRueda||'vida'}` : (dsMap[id] || '');
   document.querySelectorAll('#deskSidebar .ds-btn').forEach(b=>{
     b.classList.toggle('active', b.dataset.ds===dsTarget);
   });
-  const hideTabsOn = ['view-home','view-siete','view-siete-detail','view-ocho','view-suenos','view-demo','view-botella','view-simulador','view-presu','view-presu-hist','view-equipo','view-historico','view-seguimiento','view-planning','view-encuesta','view-gestion','view-grabadora','view-notas','view-usuarios','view-admin'];
+  const hideTabsOn = ['view-home','view-siete','view-siete-detail','view-ocho','view-suenos','view-demo','view-botella','view-simulador','view-stock','view-presu','view-presu-hist','view-equipo','view-historico','view-seguimiento','view-planning','view-encuesta','view-gestion','view-grabadora','view-notas','view-usuarios','view-admin'];
   document.getElementById('tabs').style.display = (id==='view-wheel'||id==='view-eval') ? 'flex' : 'none';
   const _isPage = ['view-home','view-mes','view-negocio','view-herramientas'].includes(id);
   const pt=document.getElementById('pageTabs'); if(pt) pt.style.display = _isPage ? 'flex' : 'none';
@@ -9766,6 +9772,11 @@ function renderToolsList(){
       statusVal:'Calc', statusClass:'pending', progressPct:100,
       timeAgo:'Proyecciones', onClick:'openCalculadora()', accent:'#f5b301', gradient:'linear-gradient(135deg,#f5b301,#ff8f6b)'
     });
+    const hStock = renderHomeQuickCard({
+      icon:'📦', title:'Mi stock', sub:'Lo que tenés y lo que prestaste',
+      statusVal:'Stock', statusClass:'pending', progressPct:100,
+      timeAgo:'Casa y préstamos', onClick:'openStock()', accent:'#3d63c9', gradient:'linear-gradient(135deg,#5b8def,#3ad0a4)'
+    });
     const h6 = renderHomeQuickCard({
       icon:'🎙️', title:'Grabadora', sub:'Grabá y escuchá',
       statusVal:'Audio', statusClass:'pending', progressPct:100,
@@ -9776,7 +9787,7 @@ function renderToolsList(){
       statusVal:'Notas', statusClass:'pending', progressPct:100,
       timeAgo:'Tus ideas', onClick:"showView('view-notas')", accent:'#fbbf24', gradient:'linear-gradient(135deg,#fbbf24,#f59e0b)'
     });
-    herrHost.innerHTML = h1 + h2 + h3 + h4 + h5 + h6 + h7;
+    herrHost.innerHTML = h1 + h2 + h3 + h4 + h5 + hStock + h6 + h7;
   }
   if(!mesHost) document.getElementById('toolsList').innerHTML = `
     <details class="home-section-block" data-home-sec="mes" ${openMes?'open':''}>
@@ -10421,7 +10432,8 @@ document.getElementById('importInput').onchange = (e)=>{
       case 'view-grabadora':
       case 'view-notas':
       case 'view-botella':
-      case 'view-simulador': return 'view-herramientas';
+      case 'view-simulador':
+      case 'view-stock': return 'view-herramientas';
       default: return null;
     }
   }
@@ -10918,8 +10930,7 @@ function abrirBackupDesdeMenu(){
     if(!window.APPIWhatsApp.esAndroid()){ item.hidden=true; return; }
     item.hidden=false;
     const txt=document.getElementById('toolsWhatsAppTxt');
-    const elegida=window.APPIWhatsApp.preferencia();
-    if(txt) txt.textContent=elegida?('¿Qué WhatsApp utilizás? · '+window.APPIWhatsApp.nombre(elegida)):'¿Qué WhatsApp utilizás?';
+    if(txt) txt.textContent='¿Qué WhatsApp utilizás?';
   }
   window.actualizarWhatsAppMenuUI=actualizarWhatsAppMenuUI;
   function cerrarToolsMenu(){

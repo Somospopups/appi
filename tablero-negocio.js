@@ -8,7 +8,7 @@
       y ritmo 30 demos → 10 cierres.
    2. Comparativa de la botella: conciencia interactiva.
    3. Simulador de ganancias del plan de negocio.
-   4. Stock personal dentro del presupuesto.
+   4. (El stock personal vive en Mis herramientas.)
    ============================================================ */
 (function(){
   'use strict';
@@ -333,47 +333,6 @@
       '<div style="text-align:center; font-size:11px; color:#666; padding-top:6px; border-top:1px solid rgba(59,130,246,0.1);">Conversión: ' + conv + '% (' + cierres + ' de ' + demos + ' demos)</div>';
   }
 
-  /* ---------------- 4 · STOCK PERSONAL ---------------- */
-  function stockKey(){ return 'appi_stock_v1_' + uid(); }
-  function leerStock(){ try{ return JSON.parse(localStorage.getItem(stockKey()) || '[]'); }catch(e){ return []; } }
-  function htmlStock(){
-    var items = leerStock();
-    var filas = items.map(function(it, i){
-      return '<div class="tb-row"><span>' + esc(it.nombre) + '</span><span style="display:flex;gap:6px;align-items:center">' +
-        '<button type="button" class="tb-mini" data-stock-menos="' + i + '">−</button><b>' + it.cant + '</b>' +
-        '<button type="button" class="tb-mini" data-stock-mas="' + i + '">+</button>' +
-        '<button type="button" class="tb-mini" data-stock-del="' + i + '">✕</button></span></div>';
-    }).join('');
-    var total = items.reduce(function(s, it){ return s + (Number(it.cant) || 0); }, 0);
-    return '<div class="tb-card" id="stockCard" style="margin:12px"><div class="tb-title">📦 Stock personal</div>' +
-      '<div class="tb-sub">Lo que tenés en casa, a la vista · ' + total + ' unidad' + (total === 1 ? '' : 'es') + '</div>' +
-      (filas || '<div class="tb-sub">Sin stock cargado.</div>') +
-      '<div style="display:flex;gap:8px;margin-top:8px"><input class="tb-input" id="stockNombre" placeholder="Producto (ej: Iontrix 2)">' +
-      '<input class="tb-input" id="stockCant" type="number" min="1" value="1" style="max-width:70px">' +
-      '<button type="button" class="tb-btn" id="stockAdd">＋</button></div></div>';
-  }
-  function renderStock(){
-    var host = document.querySelector('#view-presu .view-content') || $('view-presu');
-    if (!host) return;
-    var viejo = $('stockCardWrap');
-    if (viejo) viejo.remove();
-    var wrap = document.createElement('div');
-    wrap.id = 'stockCardWrap';
-    wrap.innerHTML = htmlStock();
-    host.appendChild(wrap);
-    wrap.querySelector('#stockAdd').onclick = function(){
-      var nombre = $('stockNombre').value.trim();
-      if (!nombre) return;
-      var items = leerStock();
-      items.push({ nombre: nombre, cant: Math.max(1, Number($('stockCant').value) || 1) });
-      localStorage.setItem(stockKey(), JSON.stringify(items));
-      renderStock();
-    };
-    wrap.querySelectorAll('[data-stock-mas]').forEach(function(b){ b.onclick = function(){ var it = leerStock(); it[+b.dataset.stockMas].cant++; localStorage.setItem(stockKey(), JSON.stringify(it)); renderStock(); }; });
-    wrap.querySelectorAll('[data-stock-menos]').forEach(function(b){ b.onclick = function(){ var it = leerStock(); it[+b.dataset.stockMenos].cant = Math.max(0, it[+b.dataset.stockMenos].cant - 1); localStorage.setItem(stockKey(), JSON.stringify(it)); renderStock(); }; });
-    wrap.querySelectorAll('[data-stock-del]').forEach(function(b){ b.onclick = function(){ var it = leerStock(); it.splice(+b.dataset.stockDel, 1); localStorage.setItem(stockKey(), JSON.stringify(it)); renderStock(); }; });
-  }
-
   /* ---------------- vistas y accesos ---------------- */
   function crearVistas(){
     if ($('view-botella')) return;
@@ -445,7 +404,6 @@
     }
     var origShow = window.showView;
     window.showView = function(id){ var r = origShow.apply(this, arguments); try{
-      if (id === 'view-presu') renderStock();
       if (id === 'view-home') inyectarHome();
     }catch(e){} return r; };
     try{ inyectarHome(); }catch(e){}

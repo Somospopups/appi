@@ -122,15 +122,53 @@ test('demos y cierres se mueven con la regla 3 a 1', async ({ page }) => {
   await expect(page.locator('#simCierres')).toHaveValue('0');
 });
 
-test('el stock se carga y sobrevive el refresco', async ({ page }) => {
+test('el stock se carga en Mis herramientas y sobrevive el refresco', async ({ page }) => {
   await entrar(page);
-  await page.evaluate(() => window.showView('view-presu'));
-  await page.locator('#stockNombre').fill('Iontrix 2');
-  await page.locator('#stockAdd').click();
-  await expect(page.locator('#stockCard')).toContainText('Iontrix 2');
+  await page.evaluate(() => window.openStock());
+  await expect(page.locator('#view-stock')).toHaveClass(/active/);
+  await expect(page.locator('#view-presu #stockCard')).toHaveCount(0);
+  await page.locator('#stNombre').fill('Iontrix 2');
+  await page.locator('#stAdd').click();
+  await expect(page.locator('#stockCont')).toContainText('Iontrix 2');
   await page.reload({ waitUntil: 'networkidle' });
-  await page.evaluate(() => window.showView('view-presu'));
-  await expect(page.locator('#stockCard')).toContainText('Iontrix 2');
+  await page.evaluate(() => window.openStock());
+  await expect(page.locator('#stockCont')).toContainText('Iontrix 2');
+});
+
+test('prestar saca una unidad y devolverla la vuelve al stock', async ({ page }) => {
+  await entrar(page);
+  await page.evaluate(() => window.openStock());
+  await page.locator('#stNombre').fill('Senior 4');
+  await page.locator('#stCant').fill('2');
+  await page.locator('#stAdd').click();
+  await expect(page.locator('#stockCont')).toContainText('2 unidades');
+  await page.locator('[data-st-prestar]').click();
+  await expect(page.locator('#stOverlay')).toHaveClass(/open/);
+  await page.locator('#stQuien').fill('Laura Gómez');
+  await page.locator('#stTel').fill('3515551234');
+  await page.locator('#stSavePrestamo').click();
+  await expect(page.locator('#stockCont')).toContainText('Prestado a Laura Gómez');
+  await expect(page.locator('#stockCont')).toContainText('Senior 4');
+  await page.locator('[data-st-tab="stock"]').click();
+  await expect(page.locator('#stockCont')).toContainText('1 unidad');
+  await page.locator('[data-st-tab="prestados"]').click();
+  await page.locator('[data-st-dev]').click();
+  await expect(page.locator('#stockCont')).toContainText('2 unidades');
+});
+
+test('eliminar un préstamo no devuelve la unidad al stock', async ({ page }) => {
+  await entrar(page);
+  await page.evaluate(() => window.openStock());
+  await page.locator('#stNombre').fill('Iontrix 2');
+  await page.locator('#stAdd').click();
+  await page.locator('[data-st-prestar]').click();
+  await page.locator('#stQuien').fill('Pedro');
+  await page.locator('#stSavePrestamo').click();
+  await page.evaluate(() => { window.APPIDialog.confirm = async () => true; });
+  await page.locator('[data-st-kill]').click();
+  await expect(page.locator('#stockCont')).toContainText('Nada prestado');
+  await page.locator('[data-st-tab="stock"]').click();
+  await expect(page.locator('#stockCont')).toContainText('Todavía no cargaste productos');
 });
 
 test('en el Árbol el nombre abre la ficha y la categoría abre la organización', async ({ page }) => {

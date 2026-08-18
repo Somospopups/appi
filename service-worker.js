@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v250-tarjetas';
+const CACHE_NAME = 'appi-v250-stock';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
@@ -20,6 +20,7 @@ const APP_SHELL = [
   './escalera-suenos.js',
   './demo-guia.js',
   './tablero-negocio.js',
+  './stock-personal.js',
   './porque-vivo.js',
   './home-limpio.js',
   './device-bridge.js',

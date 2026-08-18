@@ -62,6 +62,12 @@ El workflow `.github/workflows/deploy-backend.yml` ahora:
 
 - Se recortó basura duplicada después de `</html>` que se veía como código suelto al pie de la página.
 
+## Mi stock
+
+- El stock personal salió de Presupuesto y vive en **Mis herramientas** (celular y menú de PC).
+- Se pueden cargar productos a mano y prestar de a una unidad: pide a quién y el teléfono, y pone la fecha de hoy.
+- En Prestados: **YA ME LO DEVOLVIÓ** vuelve al stock. **ELIMINAR** borra el préstamo y no toca el stock (pide confirmación).
+
 ## Tarjetas y promos
 
 - En **Usuarios** y en el **Panel de Contactos** se puede cargar, por persona, una o varias tarjetas (marca + banco: Visa Galicia, Naranja, etc.).
@@ -75,6 +81,10 @@ El workflow `.github/workflows/deploy-backend.yml` ahora:
 ## Árbol del equipo
 
 - En el listado, tocar el **nombre** abre la ficha. Tocar desde la izquierda hasta la píldora de categoría abre o cierra la organización, si tiene gente debajo.
+
+## Engranaje · WhatsApp
+
+- El ítem **¿Qué WhatsApp utilizás?** ya no agrega «· WhatsApp» / «· WhatsApp Business» al final. La pregunta alcanza; la app elegida se ve al abrir el diálogo.
 
 ## Impulso y avisos
 

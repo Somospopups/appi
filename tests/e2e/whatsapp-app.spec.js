@@ -274,6 +274,26 @@ test('las dos opciones quedan centradas, parejas y la vigente marcada', async ({
   await ctx.close();
 });
 
+test('el ítem del engranaje no repite WhatsApp al final', async ({ browser }) => {
+  const ctx = await browser.newContext({ userAgent: UA_ANDROID });
+  const page = await ctx.newPage();
+  await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
+  await page.waitForFunction(() => !!window.APPIWhatsApp && typeof window.actualizarWhatsAppMenuUI === 'function');
+
+  await page.evaluate(() => {
+    window.APPIWhatsApp.setPreferencia('normal');
+    window.actualizarWhatsAppMenuUI();
+  });
+  await expect(page.locator('#toolsWhatsAppTxt')).toHaveText('¿Qué WhatsApp utilizás?');
+
+  await page.evaluate(() => {
+    window.APPIWhatsApp.setPreferencia('business');
+    window.actualizarWhatsAppMenuUI();
+  });
+  await expect(page.locator('#toolsWhatsAppTxt')).toHaveText('¿Qué WhatsApp utilizás?');
+  await ctx.close();
+});
+
 test('fuera de Android no se intercepta nada', async ({ browser }) => {
   const ctx = await browser.newContext({ userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) Safari' });
   const page = await ctx.newPage();

@@ -112,7 +112,7 @@ test('en PC la barra trae las mismas herramientas que el celular', async ({ page
   await entrar(page);
   const sidebar = page.locator('#deskSidebar');
   await expect(sidebar).toBeVisible();
-  for (const nombre of ['Los 8 Pasos', 'Escalera de Sueños', 'Coach de Demo', 'Botella', 'Simulador', 'Grabadora', 'Notas Keep']) {
+  for (const nombre of ['Los 8 Pasos', 'Escalera de Sueños', 'Coach de Demo', 'Botella', 'Simulador', 'Mi stock', 'Grabadora', 'Notas Keep']) {
     await expect(sidebar).toContainText(nombre);
   }
   await page.locator('#deskSidebar [data-ds="view-demo"]').click();
