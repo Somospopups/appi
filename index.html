@@ -9782,6 +9782,40 @@ function loadCulturaAll(){
 }
 function persistCulturaAll(all){localStorage.setItem(CULTURA_KEY,JSON.stringify(all))}
 function culturaInvitadoNombre(p){return [p&&p.nombre,p&&p.apellido].filter(Boolean).join(' ').trim()}
+function culturaNombreNorm(value){return String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim()}
+function culturaTelNorm(value){return String(value||'').replace(/\D/g,'')}
+function culturaMismoContacto(p,c){
+  if(!p||!c) return false;
+  if(p.agendaId!=null&&(String(c.id)===String(p.agendaId)||String(c.local_id||c.localId||'')===String(p.agendaId))) return true;
+  if(p.id!=null&&String(c.id)===String(p.id)) return true;
+  const tel=culturaTelNorm(p.telefono), cTel=culturaTelNorm(c.telefono);
+  if(tel&&cTel&&(tel===cTel||tel.endsWith(cTel)||cTel.endsWith(tel))) return true;
+  const nom=culturaNombreNorm(culturaInvitadoNombre(p)||p.nombre), cNom=culturaNombreNorm(c.nombre);
+  return !!(nom&&cNom&&(nom===cNom||nom.includes(cNom)||cNom.includes(nom)));
+}
+function culturaInvitadoSigueVivo(p){
+  const panel=window.APPIGestion&&window.APPIGestion.state&&Array.isArray(window.APPIGestion.state.contacts)?window.APPIGestion.state.contacts:null;
+  const panelListo=!!(panel&&Number(window.APPIGestion.state.lastLoaded)>0);
+  if(panelListo) return panel.some(c=>culturaMismoContacto(p,c));
+  const segs=typeof cargarSeguimientos==='function'?cargarSeguimientos():[];
+  return segs.some(c=>culturaMismoContacto(p,c));
+}
+function culturaReconciliarInvitados(){
+  const all=loadCulturaAll();
+  let changed=false;
+  for(const key of Object.keys(all)){
+    const row=all[key];
+    if(!row||!Array.isArray(row.invitados)||!row.invitados.length) continue;
+    const next=row.invitados.filter(culturaInvitadoSigueVivo).map((p,idx)=>({...p,slot:idx}));
+    if(next.length!==row.invitados.length){
+      row.invitados=next;
+      row.slots=culturaSlotCount(row);
+      changed=true;
+    }
+  }
+  if(changed) persistCulturaAll(all);
+  return changed;
+}
 function culturaInvitadoClave(p){
   if(p&&p.agendaId) return 'a:'+String(p.agendaId);
   const tel=String(p&&p.telefono||'').replace(/\D/g,'');
@@ -9891,8 +9925,8 @@ function culturaQuitarPorContacto(ref={}){
       if(agendaId&&String(p.agendaId)===agendaId) return false;
       const pTel=String(p.telefono||'').replace(/\D/g,'');
       if(tel&&pTel&&pTel===tel) return false;
-      const pNom=culturaInvitadoNombre(p).toLowerCase();
-      if(nom&&pNom&&pNom===nom) return false;
+      const pNom=culturaNombreNorm(culturaInvitadoNombre(p));
+      if(nom&&pNom&&(pNom===culturaNombreNorm(nom)||pNom.includes(culturaNombreNorm(nom))||culturaNombreNorm(nom).includes(pNom))) return false;
       return true;
     }).map((p,idx)=>({...p,slot:idx}));
     if(next.length!==row.invitados.length){
@@ -9908,9 +9942,11 @@ function culturaQuitarPorContacto(ref={}){
   return changed;
 }
 window.culturaQuitarPorContacto=culturaQuitarPorContacto;
+window.renderCulturaCrecimiento=renderCulturaCrecimiento;
 function renderCulturaCrecimiento(){
   const wrap=document.getElementById('culturaWrap');
   if(!wrap) return;
+  culturaReconciliarInvitados();
   const openPast=[...wrap.querySelectorAll('details.cultura-past[open]')].map(el=>el.dataset.week);
   const id=culturaMonthId();
   const week=getCulturaMonth(id);
