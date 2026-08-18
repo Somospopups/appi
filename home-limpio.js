@@ -574,9 +574,17 @@
     if (backup) backup.style.display = 'none';
   }
 
+  function cuentaLista(){
+    try{
+      if (window.APPIAuth && window.APPIAuth.needsPersonChoice && window.APPIAuth.needsPersonChoice()) return false;
+    }catch(e){}
+    return true;
+  }
+
   function envolver(){
     if (window.__homeLimpioWrapped) return;
     if (typeof window.showView !== 'function') return;
+    if (!cuentaLista()) return;
     window.__homeLimpioWrapped = true;
     mudar();
     var orig = window.showView;
@@ -597,6 +605,10 @@
   if (document.readyState === 'complete') envolver();
   else window.addEventListener('load', envolver);
   setTimeout(envolver, 1300);
+  window.addEventListener('appi-person-change', function(){
+    envolver();
+    try{ if ($('view-home') && $('view-home').classList.contains('active') && cuentaLista()) render(); }catch(e){}
+  });
 
   // Exponer para uso global
   window.APPICalendario = { open: openCal, close: closeCal, tareas: leerTareas, agregar: agregarTarea };

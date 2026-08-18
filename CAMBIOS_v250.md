@@ -107,6 +107,12 @@ El workflow `.github/workflows/deploy-backend.yml` ahora:
 
 - Las barras de **Demos por mes** y **Cierres** quedan atadas: 3 demos = 1 cierre. Mover una mueve la otra (el número y el pulgar de la barra).
 
+## Ingreso en celular · titular y socio
+
+- El diálogo **¿Quién sos?** salió de `#lockScreen`. En el teléfono, `pageshow` (PWA / bfcache) llamaba a `forzarScrollLibre()`, tapaba la elección y dejaba un Home a medias.
+- Si falta elegir titular o socio, el overlay se mantiene visible y la app no arranca el Home ni limpia las herramientas.
+- Caché PWA: `appi-v250-login-persona`. Recargar o borrar datos del sitio si quedó el Service Worker viejo.
+
 ## Verificación
 
 - Sintaxis JavaScript comprobada con `node --check`.

@@ -2764,6 +2764,7 @@ body.dark .login-tabs{background:rgba(255,255,255,.07)}body.dark .login-tabs but
 .admin-login-lock:active{transform:scale(.92)}
 .admin-login-overlay{position:fixed;inset:0;z-index:10020;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(21,22,37,.52);backdrop-filter:blur(9px)}
 .admin-login-overlay[hidden]{display:none!important}
+#personChoiceOverlay:not([hidden]){display:flex!important;visibility:visible!important;pointer-events:auto!important;z-index:10050!important}
 .admin-login-card{position:relative;width:min(100%,380px);padding:27px 24px 24px;border-radius:25px;background:rgba(255,255,255,.97);box-shadow:0 24px 70px rgba(24,26,55,.32);text-align:center}
 .admin-login-card h2{margin:9px 0 20px;font-size:21px;color:#252633}.admin-login-card .lock-field{margin-bottom:14px}.admin-login-card .lock-input.login-input{min-height:52px;margin:0}.admin-login-card .lock-activate-btn{min-height:50px;margin-top:8px}.forced-password-copy{margin:-10px 0 18px;color:#6d6e7c;font-size:12px;line-height:1.45}.forced-password-rules{margin:-3px 0 12px;padding:9px 10px;border-radius:10px;background:rgba(91,141,239,.08);color:#5b6685;font-size:10px;font-weight:750}.admin-login-icon{width:58px;height:58px;margin:auto;border-radius:17px;display:grid;place-items:center;background:linear-gradient(135deg,#5b8def,#8b63e8);font-size:25px;box-shadow:0 9px 23px rgba(91,112,210,.25)}
 .admin-login-close{position:absolute;top:12px;right:12px;width:34px;height:34px;border:0;border-radius:50%;background:rgba(80,90,130,.08);color:#555665;font-size:22px;cursor:pointer}
@@ -3945,13 +3946,14 @@ body.dark #pageTabs button.active{color:#a8c0ff}
       <div class="lock-error" id="forcedPasswordError" role="alert"></div>
     </div>
   </div>
-  <div class="admin-login-overlay" id="personChoiceOverlay" hidden>
-    <div class="admin-login-card person-choice-card" role="dialog" aria-modal="true" aria-labelledby="personChoiceTitle">
-      <div class="admin-login-icon">👋</div>
-      <h2 id="personChoiceTitle">¿Quién sos?</h2>
-      <p class="person-choice-copy">Elegí tu nombre para abrir tu espacio personal.</p>
-      <div class="person-choice-list" id="personChoiceList"></div>
-    </div>
+</div>
+
+<div class="admin-login-overlay" id="personChoiceOverlay" hidden>
+  <div class="admin-login-card person-choice-card" role="dialog" aria-modal="true" aria-labelledby="personChoiceTitle">
+    <div class="admin-login-icon">👋</div>
+    <h2 id="personChoiceTitle">¿Quién sos?</h2>
+    <p class="person-choice-copy">Elegí tu nombre para abrir tu espacio personal.</p>
+    <div class="person-choice-list" id="personChoiceList"></div>
   </div>
 </div>
 
@@ -5328,8 +5330,39 @@ function ocultarLockScreen(){
   lock.classList.add('hidden');
   limpiarEstilosLock(lock);
 }
+function necesitaElegirPersona(){
+  try{return !!(window.APPIAuth&&window.APPIAuth.needsPersonChoice&&window.APPIAuth.needsPersonChoice())}catch(e){return false}
+}
+function overlayPersonaVisible(){
+  const person=document.getElementById('personChoiceOverlay');
+  return !!(person&&!person.hidden);
+}
+function colocarOverlayPersona(){
+  const overlay=document.getElementById('personChoiceOverlay');
+  if(!overlay)return null;
+  if(overlay.parentElement!==document.body)document.body.appendChild(overlay);
+  return overlay;
+}
+function restaurarEleccionPersona(){
+  if(overlayPersonaVisible()){
+    colocarOverlayPersona();
+    aplicarEstadoScrollCuerpo(true);
+    return true;
+  }
+  if(!necesitaElegirPersona())return false;
+  const overlay=colocarOverlayPersona();
+  const list=document.getElementById('personChoiceList');
+  if(!overlay||!list||!list.children.length){
+    aplicarEstadoScrollCuerpo(true);
+    return true;
+  }
+  overlay.hidden=false;
+  aplicarEstadoScrollCuerpo(true);
+  return true;
+}
 function forzarScrollLibre(){
   ocultarLockScreen();
+  if(restaurarEleccionPersona())return;
   const person=document.getElementById('personChoiceOverlay');
   if(person)person.hidden=true;
   aplicarEstadoScrollCuerpo(false);
@@ -5339,8 +5372,16 @@ window.bloquearScrollCuerpo=bloquearScrollCuerpo;
 window.forzarScrollLibre=forzarScrollLibre;
 window.mostrarLockScreen=mostrarLockScreen;
 window.ocultarLockScreen=ocultarLockScreen;
-window.addEventListener('pageshow',()=>{if(document.getElementById('lockScreen')?.classList.contains('hidden'))forzarScrollLibre()});
-document.addEventListener('visibilitychange',()=>{if(!document.hidden&&document.getElementById('lockScreen')?.classList.contains('hidden'))liberarScrollCuerpo()});
+window.necesitaElegirPersona=necesitaElegirPersona;
+window.addEventListener('pageshow',()=>{
+  if(restaurarEleccionPersona())return;
+  if(document.getElementById('lockScreen')?.classList.contains('hidden'))forzarScrollLibre();
+});
+document.addEventListener('visibilitychange',()=>{
+  if(document.hidden)return;
+  if(restaurarEleccionPersona())return;
+  if(document.getElementById('lockScreen')?.classList.contains('hidden'))liberarScrollCuerpo();
+});
 
 function showView(id){
   const target=document.getElementById(id);
@@ -10573,11 +10614,13 @@ async function asegurarPersonaActiva(){
   if(!profile||profile.rol==='admin'||!people.length)return null;
   const current=window.APPIAuth.activePerson&&window.APPIAuth.activePerson();if(current)return current;
   if(people.length===1)return window.APPIAuth.selectPerson(people[0].tipo);
-  const lock=document.getElementById('lockScreen'),overlay=document.getElementById('personChoiceOverlay'),list=document.getElementById('personChoiceList'),requestedPerson=new URLSearchParams(location.search).get('persona');
+  const overlay=colocarOverlayPersona()||document.getElementById('personChoiceOverlay'),list=document.getElementById('personChoiceList'),requestedPerson=new URLSearchParams(location.search).get('persona');
+  if(!overlay||!list)return null;
   const ordered=people.slice().sort((a,b)=>Number(b.tipo===requestedPerson)-Number(a.tipo===requestedPerson));
-  // El overlay vivía dentro del login; lo sacamos para poder mostrarlo
-  // sin flashear la pantalla de ingreso detrás.
-  if(overlay.parentElement&&overlay.parentElement.id==='lockScreen')document.body.appendChild(overlay);
+  // Fuera del login y con el lock tapado: en el celular pageshow no puede
+  // esconder "¿Quién sos?" ni dejar un Home a medias.
+  ocultarLockScreen();
+  ocultarBoot();
   bloquearScrollCuerpo();
   list.innerHTML=ordered.map(person=>`<button type="button" class="person-choice-option" data-person-type="${person.tipo}"><span class="person-choice-avatar">${person.tipo==='titular'?'👤':'🤝'}</span><span><strong>${escapeXml(person.nombre)}</strong><small>${person.tipo==='titular'?'Titular':'Socio/a'}${person.tipo===requestedPerson?' · Teléfono a vincular':''}</small></span><span class="person-choice-arrow">›</span></button>`).join('');
   overlay.hidden=false;
@@ -10686,6 +10729,18 @@ setTimeout(ocultarBoot,6000);
 
 // Inicia la app normalmente
 function iniciarApp() {
+  if(necesitaElegirPersona()){
+    if(window.__appiIniciandoPersona)return;
+    window.__appiIniciandoPersona=true;
+    asegurarPersonaActiva().then(function(person){
+      window.__appiIniciandoPersona=false;
+      if(person||!necesitaElegirPersona())iniciarApp();
+    }).catch(function(error){
+      window.__appiIniciandoPersona=false;
+      console.error('Elegir persona',error);
+    });
+    return;
+  }
   ocultarBoot();
   forzarScrollLibre();
   const profile=window.APPIAuth&&window.APPIAuth.isEnabled()?window.APPIAuth.currentProfile():null;
@@ -14887,6 +14942,37 @@ async function initHistorico(){
 window.openHistorico=openHistorico;
 window.initHistoricoAPPI=initHistorico;
 window.__APPI_HISTORICO__={state:H,open:openHistorico,refresh:refreshData,parseFile:parseHistoricalFile,saveMonth:saveMonthPeriod,analyze:analyzePeriods,strategies:buildStrategies,dbGetAll};
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initHistorico);else initHistorico();
+setTimeout(initHistorico,1200);
+
+})();
+
+</script>
+
+<script>
+(function(){
+  function limpiarRestos(){
+    try{
+      const kids = Array.prototype.slice.call(document.body.childNodes);
+      kids.forEach(function(n){
+        if(n.nodeType === 3){
+          const t = n.textContent || '';
+          if(/initHistorico|parseHistoricalFile|<\/script>|<\/html>/.test(t)){
+            n.parentNode && n.parentNode.removeChild(n);
+          }
+        }
+      });
+    }catch(e){}
+  }
+  limpiarRestos();
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', limpiarRestos);
+  setTimeout(limpiarRestos, 0);
+  setTimeout(limpiarRestos, 400);
+})();
+</script>
+
+</body>
+</html>
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initHistorico);else initHistorico();
 setTimeout(initHistorico,1200);
 

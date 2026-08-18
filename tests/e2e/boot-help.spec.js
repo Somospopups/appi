@@ -55,6 +55,58 @@ test('sin pantallazos: boot mientras elegís persona, y directo al home', async 
   await expect(page.locator('#lockScreen')).toBeHidden();
 });
 
+test('en el celular pageshow no saltea titular/socio ni deja un home a medias', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  const now = new Date().toISOString();
+  const profile = {
+    user_id: USER_ID, username: null, dip: '02-9802014', sucursal: '02', numero_distribuidor: '9802014',
+    nombre: 'María Pérez', socio_nombre: 'Juan Pérez', rol: 'usuario', activo: true, debe_cambiar_password: false,
+    membresia_meses: 1, membresia_inicio: now, membresia_vence: new Date(Date.now() + 30 * 86400000).toISOString()
+  };
+  await mockBase(page, profile);
+  await page.addInitScript(([uid, perf]) => {
+    localStorage.setItem('welcomeSeen', '1');
+    localStorage.setItem('tutoVisto_v2', '1');
+    const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    const payload = btoa(JSON.stringify({ sub: uid, exp: Math.floor(Date.now() / 1000) + 3600 })).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    localStorage.setItem('appi_auth_session_v1', JSON.stringify({ session: { access_token: header + '.' + payload + '.firma', expires_at: Math.floor(Date.now() / 1000) + 3600, refresh_token: 'r' }, profile: perf, lastValidatedAt: Date.now() }));
+  }, [USER_ID, profile]);
+
+  await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
+  await expect(page.locator('#personChoiceOverlay')).toBeVisible();
+  await expect(page.locator('#personChoiceOverlay')).toContainText('¿Quién sos?');
+  await expect(page.locator('[data-person-type="titular"]')).toContainText('María Pérez');
+  await expect(page.locator('[data-person-type="socio"]')).toContainText('Juan Pérez');
+  await expect(page.locator('#lockScreen')).toBeHidden();
+  expect(await page.evaluate(() => APPIAuth.needsPersonChoice())).toBe(true);
+
+  await page.evaluate(() => {
+    try { window.dispatchEvent(new PageTransitionEvent('pageshow', { persisted: true })); }
+    catch (e) { window.dispatchEvent(new Event('pageshow')); }
+    if (typeof forzarScrollLibre === 'function') forzarScrollLibre();
+    document.dispatchEvent(new Event('visibilitychange'));
+  });
+
+  await expect(page.locator('#personChoiceOverlay')).toBeVisible();
+  await expect(page.locator('[data-person-type="socio"]')).toBeVisible();
+  expect(await page.evaluate(() => {
+    const overlay = document.getElementById('personChoiceOverlay');
+    return {
+      parent: overlay && overlay.parentElement && overlay.parentElement.tagName,
+      hidden: overlay && overlay.hidden,
+      display: overlay ? getComputedStyle(overlay).display : 'none',
+      needs: window.APPIAuth.needsPersonChoice()
+    };
+  })).toEqual({ parent: 'BODY', hidden: false, display: 'flex', needs: true });
+
+  await page.locator('[data-person-type="socio"]').click();
+  await expect(page.locator('#personChoiceOverlay')).toBeHidden();
+  await expect(page.locator('#view-home')).toHaveClass(/active/);
+  await expect(page.locator('#homeGreeting')).toHaveText('Hola Juan 👋');
+  await expect(page.locator('#homeLimpio')).toBeVisible();
+  await expect(page.locator('#lockScreen')).toBeHidden();
+});
+
 test('las pantallas nuevas tienen su ayuda y abre al tocarla', async ({ page }) => {
   const now = new Date().toISOString();
   await mockBase(page, {
