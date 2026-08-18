@@ -177,14 +177,14 @@
         '<div style="margin-bottom:16px;">' +
           '<div style="font-weight:600; font-size:14px; margin-bottom:6px;">🎯 Demos por mes</div>' +
           '<div style="background:#f5f5f5; padding:12px; border-radius:8px; font-size:13px; line-height:1.6; color:#666;">' +
-            'Las presentaciones del sistema que hacés cada mes. Sumá todas: en casas, por Zoom, en eventos. Si hacés 1 demo por día hábil, son ~22 al mes.' +
+            'Las presentaciones del sistema que hacés cada mes. Van atadas a los cierres: 3 demos = 1 cierre. Si movés esta barra, la de cierres se mueve sola.' +
           '</div>' +
         '</div>' +
 
         '<div style="margin-bottom:16px;">' +
           '<div style="font-weight:600; font-size:14px; margin-bottom:6px;">✅ Cierres</div>' +
           '<div style="background:#f5f5f5; padding:12px; border-radius:8px; font-size:13px; line-height:1.6; color:#666;">' +
-            'Las ventas que concretás (sistemas instalados). En promedio, de cada 3 demos se cierra 1 venta (33% de conversión).' +
+            'Las ventas que concretás (sistemas instalados). Regla: 1 cierre = 3 demos. Si movés esta barra, la de demos se ajusta sola.' +
           '</div>' +
         '</div>' +
 
@@ -204,7 +204,7 @@
           '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">' +
             '<span style="font-size:14px; font-weight:600; color:#374151;">Demos por mes: <b id="simDemosV" style="color:#1e40af;">30</b></span>' +
           '</div>' +
-          '<input type="range" id="simDemos" min="0" max="60" value="30" style="width:100%; margin:0;">' +
+          '<input type="range" id="simDemos" min="0" max="90" step="3" value="30" style="width:100%; margin:0;">' +
         '</div>' +
 
         '<div style="margin-bottom:14px;">' +
