@@ -3644,6 +3644,8 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <i class="boot-cloud cloud-two"></i>
   </div>
   <div class="boot-water" aria-hidden="true">
+    <div class="boot-water-depth"></div>
+    <div class="boot-water-caustic"></div>
     <div class="boot-water-light"></div>
     <div class="boot-surface surface-back"></div>
     <div class="boot-surface surface-front"></div>
@@ -3673,12 +3675,15 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
 .boot-cloud.cloud-one{top:13%;left:-80px}.boot-cloud.cloud-two{top:31%;right:-105px;width:300px;opacity:.12;animation-delay:-4s;animation-direction:alternate-reverse}
 @keyframes bootSunGlow{50%{box-shadow:0 0 38px 16px rgba(255,205,126,.7),0 0 110px 48px rgba(255,123,90,.36)}}
 @keyframes bootCloud{to{transform:translateX(42px) scale(1.08)}}
-.boot-water{position:absolute;z-index:2;inset:-1px 0 0;transform:translate3d(0,105%,0);will-change:transform;background:linear-gradient(180deg,rgba(17,132,167,.08),rgba(0,48,79,.42)),url('splash/agua-textura.jpg') center/cover no-repeat;box-shadow:0 -16px 45px rgba(143,229,255,.2);transition:transform 3.7s cubic-bezier(.2,.72,.24,1)}
+.boot-water{position:absolute;z-index:2;inset:-1px 0 0;transform:translate3d(0,105%,0);will-change:transform;background:linear-gradient(180deg,rgba(214,255,255,.62) 0 2%,#4fd4e4 5%,#1aa8bc 16%,#0d7f96 34%,#0a5d7c 56%,#06415c 78%,#022536 100%);box-shadow:0 -16px 45px rgba(143,229,255,.28);transition:transform 3.7s cubic-bezier(.2,.72,.24,1)}
 #bootScreen.fill .boot-water{transform:translate3d(0,6%,0)}
+.boot-water-depth{position:absolute;inset:0;pointer-events:none;background:radial-gradient(120% 55% at 50% -5%,rgba(255,176,96,.4),transparent 46%),radial-gradient(90% 40% at 18% 62%,rgba(20,200,210,.16),transparent 58%),radial-gradient(80% 45% at 85% 80%,rgba(1,28,48,.45),transparent 62%),repeating-linear-gradient(180deg,transparent 0 11px,rgba(255,255,255,.04) 12px,transparent 18px)}
+.boot-water-caustic{position:absolute;inset:-30% -20% -10%;pointer-events:none;opacity:.5;mix-blend-mode:screen;background:radial-gradient(ellipse 28% 12% at 22% 18%,rgba(255,236,190,.55),transparent 70%),radial-gradient(ellipse 34% 14% at 68% 26%,rgba(170,245,255,.35),transparent 72%),repeating-linear-gradient(118deg,transparent 0 16px,rgba(255,255,255,.11) 20px,transparent 28px 46px),repeating-linear-gradient(242deg,transparent 0 22px,rgba(120,230,255,.12) 28px,transparent 40px 70px);background-size:100% 100%,100% 100%,240px 170px,300px 200px;animation:bootCaustics 6.4s linear infinite}
 .boot-water::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,rgba(255,255,255,.1),transparent 28%,rgba(255,180,114,.11) 48%,transparent 72%);mix-blend-mode:screen;animation:bootWaterGlow 4.8s ease-in-out infinite alternate}
 .boot-water-light{position:absolute;z-index:1;left:50%;top:0;width:48%;height:100%;transform:translateX(-50%);opacity:.34;filter:blur(12px);background:linear-gradient(180deg,rgba(255,205,129,.6),rgba(96,224,242,.12) 35%,transparent 72%);clip-path:polygon(43% 0,57% 0,92% 100%,8% 100%);animation:bootReflejo 3.4s ease-in-out infinite alternate}
 @keyframes bootWaterGlow{to{transform:translateX(2.5%) scale(1.03)}}
 @keyframes bootReflejo{to{opacity:.52;transform:translateX(-50%) scaleX(1.16)}}
+@keyframes bootCaustics{0%{transform:translate3d(0,0,0) scale(1);opacity:.42}50%{transform:translate3d(-36px,14px,0) scale(1.06);opacity:.62}100%{transform:translate3d(-80px,8px,0) scale(1.02);opacity:.48}}
 .boot-surface{position:absolute;z-index:3;left:-25%;width:150%;height:38px;background-repeat:repeat-x;will-change:transform}
 .boot-surface.surface-back{top:-20px;opacity:.46;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 24' preserveAspectRatio='none'%3E%3Cpath d='M0 14 C20 2 38 3 58 14 S96 25 118 13 S158 2 180 14 V24 H0Z' fill='%239eefff'/%3E%3C/svg%3E");background-size:180px 38px;animation:bootWaveBack 5.6s linear infinite}
 .boot-surface.surface-front{top:-12px;opacity:.76;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 140 22' preserveAspectRatio='none'%3E%3Cpath d='M0 11 C16 20 31 20 47 10 S78 1 94 11 S124 20 140 10 V22 H0Z' fill='%23d9fbff'/%3E%3C/svg%3E");background-size:140px 34px;filter:drop-shadow(0 -3px 6px rgba(255,255,255,.24));animation:bootWaveFront 3.8s linear infinite}
@@ -3701,7 +3706,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
 #bootScreen.leaving .boot-water{transform:translate3d(0,-2%,0);transition-duration:.48s}
 #bootScreen.leaving .boot-brand{animation:none;transform:scale(1.04);opacity:0;transition:transform .48s ease,opacity .3s ease}
 @media(max-width:390px){.boot-brand{width:min(84vw,330px);padding:24px 18px 21px;border-radius:24px}.boot-logo{font-size:56px}.boot-message{font-size:13px}}
-@media(prefers-reduced-motion:reduce){#bootScreen,.boot-water,.boot-brand{transition-duration:.01ms!important}.boot-sun,.boot-cloud,.boot-water::after,.boot-water-light,.boot-surface,.boot-bubble,.boot-brand,.boot-logo,.boot-dots i{animation:none!important}#bootScreen .boot-water{transform:translate3d(0,6%,0)}}
+@media(prefers-reduced-motion:reduce){#bootScreen,.boot-water,.boot-brand{transition-duration:.01ms!important}.boot-sun,.boot-cloud,.boot-water::after,.boot-water-depth,.boot-water-caustic,.boot-water-light,.boot-surface,.boot-bubble,.boot-brand,.boot-logo,.boot-dots i{animation:none!important}#bootScreen .boot-water{transform:translate3d(0,6%,0)}}
 </style>
 <!-- ============ SIDEBAR ESCRITORIO / LANDSCAPE ============ -->
 <aside class="desk-sidebar" id="deskSidebar" aria-label="Navegación principal">
@@ -3731,7 +3736,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v252 · Segura</div>
+  <div class="ds-foot">APPI · v253 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -11114,7 +11119,7 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./service-worker.js?v=252').catch(error => {
+      navigator.serviceWorker.register('./service-worker.js?v=253').catch(error => {
         console.warn('No se pudo registrar el modo offline de APPI', error);
       });
     });

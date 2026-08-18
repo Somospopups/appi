@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v252-splash-agua-animada';
+const CACHE_NAME = 'appi-v253-splash-agua-css';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
@@ -46,9 +46,7 @@ const APP_SHELL = [
   './icon-512.png',
   './icon-192-maskable.png',
   './icon-512-maskable.png',
-  './apple-touch-icon.png',
-  './splash/agua-llena.jpg',
-  './splash/agua-textura.jpg'
+  './apple-touch-icon.png'
 ];
 
 self.addEventListener('install', event => {
