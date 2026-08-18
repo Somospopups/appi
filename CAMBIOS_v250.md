@@ -62,6 +62,11 @@ El workflow `.github/workflows/deploy-backend.yml` ahora:
 
 - Se recortó basura duplicada después de `</html>` que se veía como código suelto al pie de la página.
 
+## Simulador
+
+- **Por cada cierre:** ganancia por cada producto comercializado.
+- **Por cada producto de red:** compensación económica por cada producto que compra tu red de distribuidores.
+
 ## La botella
 
 - Además de la plata, la demo muestra el impacto ambiental: kilos de plástico, metros cuadrados, años de descomposición y petróleo para fabricar el PET. Los números se mueven con las botellas por día.

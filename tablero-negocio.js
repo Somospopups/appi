@@ -228,7 +228,7 @@
             '</div>' +
           '</div>' +
           '<div style="font-size:11px; color:#78350f; line-height:1.5;">' +
-            'Bono mensual por cada producto que compra tu red de clientes y distribuidores.' +
+            'Compensación económica por cada producto que compra tu red de distribuidores.' +
           '</div>' +
         '</div>' +
       '</div>' +
