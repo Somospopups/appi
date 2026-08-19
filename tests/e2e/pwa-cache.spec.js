@@ -15,7 +15,7 @@ test('la versión visible, el paquete y el Service Worker están alineados', () 
   expect(manifest.background_color).toBe('#06172d');
   expect(manifest.theme_color).toBe('#06172d');
   expect(html).toContain('theme-color" content="#06172d"');
-  expect(sw).toContain("CACHE_NAME = 'appi-v256-arranque-sin-borde'");
+  expect(sw).toContain("CACHE_NAME = 'appi-v256-archivo-aesthetic-copa'");
   expect(html).toContain('apple-touch-startup-image');
   expect(html).toContain('class="boot-water"');
   expect(html).not.toContain('boot-water-caustic');
