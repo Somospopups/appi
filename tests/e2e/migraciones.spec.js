@@ -2,14 +2,26 @@ const { test, expect } = require('@playwright/test');
 const fs = require('fs');
 
 // Archivos que el workflow de backend vuelve a ejecutar en cada despliegue.
-const MIGRACIONES = [
-  'SUPABASE_INVITACIONES_PERSONA.sql',
-  'SUPABASE_ENCUESTAS_GESTION.sql',
-  'SUPABASE_INSTALACION_COMPLETA.sql',
-  'SUPABASE_RECORDATORIOS.sql',
-  'SUPABASE_PERSONAS_CUENTA.sql',
-  'SUPABASE_MI_GENTE.sql'
-];
+// Se leen de la carpeta en vez de anotarse a mano: así una migración nueva
+// queda revisada desde el día que se agrega, sin que nadie se acuerde de nada.
+const MIGRACIONES = fs.readdirSync('.')
+  .filter(nombre => /^SUPABASE_.+\.sql$/.test(nombre))
+  .sort();
+
+test('la lista de migraciones revisadas cubre todos los SQL del repo', () => {
+  // Red de seguridad de la red de seguridad: si el filtro de arriba dejara de
+  // encontrar archivos, las demás pruebas pasarían en vacío sin avisar.
+  expect(MIGRACIONES.length).toBeGreaterThanOrEqual(15);
+  for (const imprescindible of [
+    'SUPABASE_MI_GENTE.sql',
+    'SUPABASE_INSTALACION_COMPLETA.sql',
+    'SUPABASE_ACCESO.sql',
+    'SUPABASE_DISPOSITIVOS.sql',
+    'SUPABASE_MEMBRESIAS.sql'
+  ]) {
+    expect(MIGRACIONES).toContain(imprescindible);
+  }
+});
 
 // Los comentarios de línea esconden el inicio real de cada sentencia y hacen
 // que un `-- nota\n update ...` no se reconozca como UPDATE.

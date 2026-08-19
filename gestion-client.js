@@ -70,7 +70,7 @@ async function flushQueue(){
         if(item.kind==='activity')await cloudFetch('/rest/v1/appi_gestion_actividades',{method:'POST',headers:{'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify(item.payload)});
         else if(item.kind==='historico_import'){
           const imported=await importarPersona(item.payload),realId=imported&&imported.id;
-          if(realId){const tempId=item.id,local=state.contacts.find(contact=>contact.id===tempId);if(local)Object.assign(local,imported,{id:realId});const rewritten=loadQueue().map(current=>{if(current.id===tempId)current.id=realId;if(current.payload&&current.payload.contacto_id===tempId)current.payload.contacto_id=realId;return current});saveQueue(rewritten);item.id=realId;saveCache()}
+          if(realId){const tempId=item.id,local=state.contacts.find(contact=>contact.id===tempId);if(local){Object.assign(local,imported,{id:realId});delete local.pendiente_de_subir}const rewritten=loadQueue().map(current=>{if(current.id===tempId)current.id=realId;if(current.payload&&current.payload.contacto_id===tempId)current.payload.contacto_id=realId;return current});saveQueue(rewritten);item.id=realId;saveCache()}
         }else await cloudFetch(`/rest/v1/appi_gestion_contactos?id=eq.${encodeURIComponent(item.id)}`,{method:item.method,headers:{'Content-Type':'application/json',Prefer:'return=minimal'},body:item.method==='DELETE'?undefined:JSON.stringify(item.payload)});
         saveQueue(loadQueue().filter(current=>!(current.kind===item.kind&&current.id===item.id)));
       }catch(error){return false}
@@ -374,7 +374,42 @@ function contactCard(c){const s=statusInfo(c.estado),telDigits=phoneDigits(c.tel
 // ── Panel de Contactos: alta manual e importación de los Contactos viejos ──
 // Las dos pasan por la misma función de la base (appi_gente_importar_contacto),
 // así que un teléfono repetido nunca genera dos fichas.
+// Alta sin internet: se guarda igual en el teléfono y se sube sola después.
+// Devuelve el contacto que ya se puede mostrar, con un id provisorio que
+// flushQueue reemplaza por el real cuando vuelve la conexión.
+function altaLocalPendiente(datos){
+  const now=new Date().toISOString();
+  const contact={
+    id:`local-alta-${uuidV4()}`,
+    user_id:userId(),
+    tipo:'manual',
+    nombre:String(datos.nombre||'').trim(),
+    telefono:String(datos.telefono||''),
+    telefono_normalizado:phoneDigits(datos.telefono),
+    interes:String(datos.interes||''),
+    estado:String(datos.estado||'nuevo'),
+    notas:String(datos.notas||''),
+    proximo_contacto:datos.proximo||null,
+    origen_local_id:String(datos.localId||''),
+    metadata:{origen:'alta_offline'},
+    cantidad_origenes:1,
+    pendiente_de_subir:true,
+    created_at:now,
+    updated_at:now
+  };
+  // Si ya está en el teléfono con el mismo número, no se agrega dos veces.
+  const repetido=contact.telefono_normalizado&&state.contacts.find(c=>phoneDigits(c.telefono)===contact.telefono_normalizado);
+  if(repetido)return repetido;
+  state.contacts.unshift(contact);
+  saveCache();
+  updateBadges();
+  queueHistoricoImport(contact.id,{...datos,localId:datos.localId||contact.id});
+  return contact;
+}
+
 async function importarPersona(datos){
+  // Sin conexión no se pierde el contacto: entra a la cola y se sube al volver.
+  if(!navigator.onLine)return altaLocalPendiente(datos);
   const filas=await cloudFetch('/rest/v1/rpc/appi_gente_importar_contacto',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
     p_nombre:String(datos.nombre||'').trim(),
     p_telefono:String(datos.telefono||''),
@@ -384,8 +419,18 @@ async function importarPersona(datos){
     p_proximo:datos.proximo||null,
     p_local_id:String(datos.localId||''),
     p_zona:String(datos.zona||'')
-  })});
-  return Array.isArray(filas)?filas[0]:filas;
+  })}).catch(error=>{
+    // Se cortó justo al enviar: mismo camino que si nunca hubo internet.
+    if(error&&(error.network||!navigator.onLine))return null;
+    throw error;
+  });
+  if(filas===null)return altaLocalPendiente(datos);
+  // La función de la base devuelve sólo el id (un uuid suelto). Quien llama
+  // espera un contacto con .id, así que se normaliza acá una sola vez.
+  const cruda=Array.isArray(filas)?filas[0]:filas;
+  if(cruda&&typeof cruda==='object')return cruda;
+  if(typeof cruda==='string'&&cruda)return {id:cruda,nombre:String(datos.nombre||'').trim(),telefono:String(datos.telefono||''),telefono_normalizado:phoneDigits(datos.telefono)};
+  return cruda;
 }
 
 function telefonoValido(valor){const d=phoneDigits(valor);return d.length>=8&&d.length<=15}
@@ -419,13 +464,16 @@ async function guardarPersonaManual(){
   if(boton){boton.disabled=true;boton.textContent='Guardando…'}
   genteFormError('');
   try{
-    await importarPersona({nombre,telefono,interes,estado:'nuevo',notas});
-    // Se limpia recién cuando la nube confirmó: si falla, no se pierde lo escrito.
+    const guardado=await importarPersona({nombre,telefono,interes,estado:'nuevo',notas});
+    // Se limpia recién cuando quedó guardado: si falla, no se pierde lo escrito.
     for(const id of ['genteNombre','genteTelefono','genteNotas'])if($(id))$(id).value='';
     if($('genteInteres'))$('genteInteres').value='';
     abrirFormularioGente(false);
-    showToastSafe(`${nombre.split(/\s+/)[0]} ya está en tu panel ✓`);
-    await refreshManagement(false);
+    const primerNombre=nombre.split(/\s+/)[0];
+    if(guardado&&guardado.pendiente_de_subir)showToastSafe(`${primerNombre} quedó guardado. Se sube solo al volver internet ✓`,3000);
+    else showToastSafe(`${primerNombre} ya está en tu panel ✓`);
+    if(navigator.onLine)await refreshManagement(false);
+    else renderManagement();
   }catch(error){
     genteFormError(mensajeDeAlta(error,nombre));
   }finally{if($('genteGuardar')){$('genteGuardar').disabled=false;$('genteGuardar').textContent='Guardar contacto'}}
@@ -548,7 +596,18 @@ async function deleteCurrentContact(){const contact=state.contacts.find(c=>c.id=
 async function chooseFollowupDate(title='Próximo contacto'){const choice=await window.APPIDialog.choose('¿Cuándo querés retomarlo?',[{label:'Mañana',value:1},{label:'En 2 días',value:2},{label:'En una semana',value:7},{label:'Sin fecha',value:0}],{title,icon:'📅'});return choice?addDaysISO(choice):null}
 async function applyContactOutcome(contact,result,channel){const oldStatus=contact.estado;let payload={ultimo_contacto:new Date().toISOString()},detail='';if(result==='no_response'){payload.estado='seguimiento';payload.proximo_contacto=await chooseFollowupDate('No respondió');detail='No respondió; quedó en seguimiento.'}else if(result==='talked'){payload.estado='contactado';detail='Conversación realizada.';const note=await window.APPIDialog.prompt('¿Querés dejar una nota breve?','',{title:'Conversación realizada',icon:'📝',placeholder:'Qué hablaron o qué acordaron…',okText:'Guardar'});if(note)payload.notas=[contact.notas,note.trim()].filter(Boolean).join('\n').slice(0,5000)}else if(result==='presentation'){payload.estado='presentacion';payload.proximo_contacto=await chooseFollowupDate('Programar presentación');detail='Presentación acordada.'}else if(result==='followup'){payload.estado='seguimiento';payload.proximo_contacto=await chooseFollowupDate('Programar seguimiento');detail='Necesita seguimiento.'}else if(result==='converted'){payload.estado='convertido';payload.proximo_contacto=null;detail='Marcado como convertido.'}else if(result==='not_interested'){payload.estado='no_interesado';payload.proximo_contacto=null;detail='Indicó que no está interesado.'}try{await persistContact(contact,payload);logActivity(contact.id,'resultado_contacto',detail,{resultado:result,canal:channel});if(payload.estado!==oldStatus)logActivity(contact.id,'estado_cambiado',`Pasó de ${statusInfo(oldStatus).label} a ${statusInfo(payload.estado).label}.`,{anterior:oldStatus,nuevo:payload.estado});renderManagement();showToastSafe('Resultado guardado ✓')}catch(error){await window.APPIDialog.alert(error.message,{title:'No pudimos guardar el resultado',icon:'!'})}}
 async function maybeAskPendingOutcome(){if(state.outcomeOpen||!authorized())return;let pending;try{pending=JSON.parse(localStorage.getItem(pendingOutcomeKey())||'null')}catch(e){}if(!pending||Date.now()-Number(pending.at)<1200||Date.now()-Number(pending.at)>48*3600000)return;const contact=state.contacts.find(c=>c.id===pending.contactId);localStorage.removeItem(pendingOutcomeKey());if(!contact)return;state.outcomeOpen=true;try{const result=await window.APPIDialog.choose(`¿Qué pasó con ${contact.nombre}?`,[{label:'No respondió',value:'no_response'},{label:'Conversamos',value:'talked'},{label:'Presentación',value:'presentation'},{label:'Seguimiento',value:'followup'},{label:'Convertido',value:'converted'},{label:'No interesado',value:'not_interested'}],{title:pending.channel==='whatsapp'?'Resultado de WhatsApp':'Resultado de la llamada',icon:pending.channel==='whatsapp'?'💬':'📞'});if(result)await applyContactOutcome(contact,result,pending.channel)}finally{state.outcomeOpen=false}}
-async function fetchManagement(){const contacts=await cloudFetch('/rest/v1/appi_gestion_contactos?select=id,user_id,encuesta_id,tipo,nombre,telefono,telefono_normalizado,relacion,zona,referido_por,estado,notas,proximo_contacto,proximo_contacto_hora,ultimo_contacto,cantidad_origenes,metadata,created_at,updated_at&order=updated_at.desc&limit=2000'),surveys=await cloudFetch('/rest/v1/appi_encuestas?select=id,user_id,nombre,telefono,respuestas,referidos,created_at&order=created_at.desc&limit=1000'),activities=await cloudFetch('/rest/v1/appi_gestion_actividades?select=id,user_id,contacto_id,tipo,detalle,metadata,created_at&order=created_at.desc&limit=5000');state.contacts=Array.isArray(contacts)?contacts:[];state.surveys=new Map((Array.isArray(surveys)?surveys:[]).map(row=>[row.id,row]));state.activities=new Map();for(const row of Array.isArray(activities)?activities:[]){const list=state.activities.get(row.contacto_id)||[];list.push(row);state.activities.set(row.contacto_id,list)}state.lastLoaded=Date.now();state.lastError='';saveCache();updateBadges();notifyDueOnce()}
+// Lo que todavía no subió no está en la nube: si se copiara tal cual la
+// respuesta del servidor, un contacto cargado sin internet desaparecería de
+// la pantalla aunque siga esperando en la cola.
+function conservarPendientes(desdeLaNube){
+  const pendientes=state.contacts.filter(c=>c&&c.pendiente_de_subir);
+  if(!pendientes.length)return desdeLaNube;
+  const enLaNube=new Set(desdeLaNube.map(c=>c.telefono_normalizado).filter(Boolean));
+  const siguenFaltando=pendientes.filter(c=>!enLaNube.has(c.telefono_normalizado));
+  return [...siguenFaltando,...desdeLaNube];
+}
+
+async function fetchManagement(){const contacts=await cloudFetch('/rest/v1/appi_gestion_contactos?select=id,user_id,encuesta_id,tipo,nombre,telefono,telefono_normalizado,relacion,zona,referido_por,estado,notas,proximo_contacto,proximo_contacto_hora,ultimo_contacto,cantidad_origenes,metadata,created_at,updated_at&order=updated_at.desc&limit=2000'),surveys=await cloudFetch('/rest/v1/appi_encuestas?select=id,user_id,nombre,telefono,respuestas,referidos,created_at&order=created_at.desc&limit=1000'),activities=await cloudFetch('/rest/v1/appi_gestion_actividades?select=id,user_id,contacto_id,tipo,detalle,metadata,created_at&order=created_at.desc&limit=5000');state.contacts=conservarPendientes(Array.isArray(contacts)?contacts:[]);state.surveys=new Map((Array.isArray(surveys)?surveys:[]).map(row=>[row.id,row]));state.activities=new Map();for(const row of Array.isArray(activities)?activities:[]){const list=state.activities.get(row.contacto_id)||[];list.push(row);state.activities.set(row.contacto_id,list)}state.lastLoaded=Date.now();state.lastError='';saveCache();updateBadges();notifyDueOnce()}
 // Una notificación tocada en el teléfono debe llevar a la pantalla correcta,
 // incluso si APPI todavía está cargando o pidiendo quién es la persona activa.
 function pendingNotificationKey(){return 'appi_gestion_notificacion_pendiente'}
