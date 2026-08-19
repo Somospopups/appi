@@ -116,15 +116,26 @@ test('en Usuarios se carga Visa Galicia, se filtra y se arma el WhatsApp', async
   const store = await page.evaluate(uid => JSON.parse(localStorage.getItem('appi_tarjetas_v1_' + uid) || '{}'), USER_ID);
   expect(store.byKey['tel:3515551234']).toEqual([{ marca: 'visa', banco: 'galicia' }]);
 
-  await page.locator('#tpUMarca').selectOption('visa');
-  await expect(page.locator('#usuariosList .tree-node')).toHaveCount(1);
-  await expect(page.locator('#usuariosList')).toContainText('Laura Gómez');
-  await expect(page.locator('#usuariosList')).not.toContainText('Carlos Ruiz');
-  await expect(page.locator('#tpUCount')).toContainText('1 persona');
+  // En Usuarios se mira por tarjeta con los botones: cada uno abre su listado
+  // en un popup y deja el listado grande como estaba.
+  const botonVisa = page.locator('[data-ub-marca="visa"][data-ub-banco="galicia"]');
+  await expect(botonVisa).toBeVisible();
+  await expect(botonVisa).toContainText('Visa Galicia');
+  await botonVisa.click();
+  await expect(page.locator('#ubCuerpo')).toContainText('Laura Gómez');
+  await expect(page.locator('#ubCuerpo')).not.toContainText('Carlos Ruiz');
+  await page.locator('#ubCerrar').click();
+  await expect(page.locator('#usuariosList .tree-node')).toHaveCount(2);
 
   await page.locator('#tpUMsg').fill('Hola {nombre}, hay una promo con {tarjeta}');
-  await page.locator('#usuariosList .tree-node').first().click();
-  await page.locator('[data-tp-wa]').click();
+  // El listado ya no se recorta al filtrar, así que hay un "Avisar promo" por
+  // persona: se toma el de Laura, que es la que tiene la Visa Galicia. Su ficha
+  // quedó abierta de cuando se le cargó la tarjeta.
+  const fichaLaura = page.locator('#usuariosList .tree-node').first();
+  if (!(await fichaLaura.evaluate(n => n.classList.contains('expanded')))) {
+    await fichaLaura.click();
+  }
+  await page.locator('.tp-slot[data-tp-scope="usuarios"]').first().locator('[data-tp-wa]').click();
   const opened = await page.evaluate(() => window.__appiLastOpen);
   expect(opened).toMatch(/^https:\/\/wa\.me\/5493515551234\?text=/);
   const text = decodeURIComponent(opened.split('text=')[1]);

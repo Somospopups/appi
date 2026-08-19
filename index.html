@@ -107,6 +107,7 @@ window.openStock=function(){
 <script src="./qr-code.js"></script>
 <script src="./gestion-client.js"></script>
 <script src="./tarjetas-promos.js"></script>
+<script src="./usuarios-botones.js"></script>
 
 <script src="./escalera-suenos.js"></script>
 <script src="./demo-guia.js"></script>
@@ -4112,7 +4113,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v269 · Segura</div>
+  <div class="ds-foot">APPI · v270 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4961,12 +4962,8 @@ body.dark #pageTabs button.active{color:#a8c0ff}
           <span>🔍</span><input type="text" id="usuariosSearch" placeholder="Buscar por nombre, domicilio, localidad...">
           <button id="usuariosClearSearch" style="border:none;background:none;cursor:pointer">✕</button>
         </div>
-        <div style="margin-top:12px">
-          <label style="font-size:10.5px;font-weight:800;color:#6b6b76;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;display:block">Filtrar por zona</label>
-          <select id="usuariosSelectZona" class="presu-select" style="width:100%;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,0.75);border:1px solid rgba(80,90,130,0.14);font-weight:600;font-size:13px;backdrop-filter:blur(14px)">
-            <option value="all">📍 Todas las zonas</option>
-          </select>
-        </div>
+        <div id="usuariosZonasBotones"></div>
+        <div id="usuariosTarjetasBotones"></div>
         <div id="usuariosTarjetasBar"></div>
         <div id="usuariosActiveFilters" style="display:none;margin-top:12px;padding:10px 14px;border-radius:12px;background:rgba(91,141,239,0.10);border:1px solid rgba(91,141,239,0.18);font-size:12px;font-weight:600;color:#3a3a48"></div>
         <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
@@ -11536,7 +11533,7 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='269';
+      const swVersion='270';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 
@@ -13860,6 +13857,9 @@ function parseRowsU(rows){
 // Render
 function renderZonasU(){
   const zonas=[...new Set(usuariosU.map(u=>u.localidad).filter(Boolean))].sort();
+  // Los barrios y las tarjetas se eligen con botones: cada uno abre el listado
+  // de su grupo en un popup, sin tocar el listado grande de la pantalla.
+  if(window.APPIUsuariosBotones) window.APPIUsuariosBotones.pintar();
   const select=document.getElementById('usuariosSelectZona');
   if(select){
     select.replaceChildren();
@@ -14096,6 +14096,9 @@ function renderListU(){
 }
 window.aplicarFiltrosU=aplicarFiltrosU;
 window.usuariosFiltradosActual=function(){ return filtradosU.slice(); };
+// Los botones de barrios y tarjetas viven en otro archivo y necesitan la lista
+// completa, no la filtrada: cada botón muestra su grupo entero.
+window.usuariosTodosActual=function(){ return usuariosU.slice(); };
 window.verMapaU=function(query){
   if(!query.trim()){ window.APPIDialog.alert('Este usuario no tiene domicilio cargado.',{title:'Sin domicilio',icon:'📍'}); return; }
   const url='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(query);

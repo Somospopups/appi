@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v269-mapa-sin-internet';
+const CACHE_NAME = 'appi-v270-botones-barrios-tarjetas';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
@@ -17,6 +17,7 @@ const APP_SHELL = [
   './qr-code.js',
   './gestion-client.js',
   './tarjetas-promos.js',
+  './usuarios-botones.js',
   './escalera-suenos.js',
   './demo-guia.js',
   './tablero-negocio.js',

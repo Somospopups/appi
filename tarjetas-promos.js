@@ -113,6 +113,12 @@
     var data = leer();
     data.byKey[key] = cards.slice();
     guardar(data);
+    // Los botones de tarjeta de Usuarios se arman con lo que la gente tiene
+    // cargado. Se rehacen acá, en el momento del guardado, porque los repintados
+    // de la lista pueden correr antes de que el dato exista.
+    if (window.APPIUsuariosBotones) {
+      try { window.APPIUsuariosBotones.pintarTarjetas(); } catch (e) {}
+    }
     if (p && typeof p.id === 'string' && window.APPIGestion && typeof window.APPIGestion.guardarMetadata === 'function'){
       try{ window.APPIGestion.guardarMetadata(p, { tarjetas: cards }); }catch(e){}
     }
@@ -174,6 +180,8 @@
       '.tp-bar p{margin:0 0 10px;font-size:11px;font-weight:700;color:#686977;line-height:1.4}' +
       'body.dark .tp-bar p{color:#b8b9c5}' +
       '.tp-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}' +
+      // display:grid le gana al atributo hidden, así que hay que decirlo aparte.
+      '.tp-bar [hidden]{display:none!important}' +
       '.tp-row select,.tp-msg{width:100%;min-height:40px;border:1px solid rgba(80,90,130,.16);border-radius:12px;padding:8px 10px;font:inherit;font-size:12px;background:rgba(255,255,255,.88);color:#292938}' +
       'body.dark .tp-row select,body.dark .tp-msg{background:#1d1f31;color:#f2f2f7;border-color:rgba(255,255,255,.1)}' +
       '.tp-msg{min-height:72px;resize:vertical;margin-top:8px}' +
@@ -209,18 +217,26 @@
     });
     return html;
   }
-  function barraHtml(idPrefix){
+  // `sinFiltros` deja los controles de filtrado fuera de la vista sin quitarlos
+  // del DOM. Se usa en Usuarios, donde filtrar es tarea de los botones de
+  // barrio y tarjeta (cada uno abre su listado en un popup). El mensaje y el
+  // envío por WhatsApp siguen a la vista, que es lo que se usa ahí.
+  function barraHtml(idPrefix, opciones){
+    var sinFiltros = !!(opciones && opciones.sinFiltros);
+    var oculto = sinFiltros ? ' hidden' : '';
     return '<div class="tp-bar" id="' + idPrefix + 'Bar">' +
       '<h3>💳 Promos con tarjeta</h3>' +
-      '<p>Filtrá por marca y banco. Escribí el mensaje (podés usar {nombre} y {tarjeta}) y avisá de a uno por WhatsApp.</p>' +
-      '<div class="tp-row">' +
+      '<p>' + (sinFiltros
+        ? 'Elegí una tarjeta arriba para ver quiénes la tienen. Escribí el mensaje (podés usar {nombre} y {tarjeta}) y avisá de a uno por WhatsApp.'
+        : 'Filtrá por marca y banco. Escribí el mensaje (podés usar {nombre} y {tarjeta}) y avisá de a uno por WhatsApp.') + '</p>' +
+      '<div class="tp-row"' + oculto + '>' +
         '<select id="' + idPrefix + 'Marca"><option value="">Todas las marcas</option>' + optionsHtml(MARCAS, filtro.marca) + '</select>' +
         '<select id="' + idPrefix + 'Banco"><option value="">Todos los bancos</option>' + optionsHtml(BANCOS, filtro.banco) + '</select>' +
       '</div>' +
       '<textarea class="tp-msg" id="' + idPrefix + 'Msg" placeholder="Hola {nombre}, hay una promo con {tarjeta}…">' + esc(mensajePromo) + '</textarea>' +
       '<div class="tp-tools">' +
-        '<button type="button" class="tp-chip' + (filtro.sin ? ' on' : '') + '" id="' + idPrefix + 'Sin">Sin tarjeta cargada</button>' +
-        '<button type="button" class="tp-chip" id="' + idPrefix + 'Clear">Limpiar filtro</button>' +
+        '<button type="button" class="tp-chip' + (filtro.sin ? ' on' : '') + '" id="' + idPrefix + 'Sin"' + oculto + '>Sin tarjeta cargada</button>' +
+        '<button type="button" class="tp-chip" id="' + idPrefix + 'Clear"' + oculto + '>Limpiar filtro</button>' +
         '<span class="tp-count" id="' + idPrefix + 'Count"></span>' +
       '</div></div>';
   }
@@ -340,13 +356,16 @@
     css();
     var host = document.getElementById('usuariosTarjetasBar');
     if (!host) return;
-    host.innerHTML = barraHtml('tpU');
+    host.innerHTML = barraHtml('tpU', { sinFiltros: true });
     bindBarra('tpU', function(){
       if (typeof window.aplicarFiltrosU === 'function') window.aplicarFiltrosU();
       montarBarraUsuarios();
     });
     var lista = window.usuariosFiltradosActual ? window.usuariosFiltradosActual() : [];
     actualizarConteo('tpU', lista.length);
+    // Los botones de tarjeta salen de lo que la gente tiene cargado: si se
+    // agrega o se quita una, tienen que reflejarlo en el momento.
+    if (window.APPIUsuariosBotones) window.APPIUsuariosBotones.pintarTarjetas();
   }
   function pintarListaUsuarios(cont, lista){
     css();
@@ -373,6 +392,9 @@
       });
     });
     actualizarConteo('tpU', lista.length);
+    // Agregar o quitar una tarjeta cambia las combinaciones que existen, así
+    // que los botones se rehacen junto con la lista.
+    if (window.APPIUsuariosBotones) window.APPIUsuariosBotones.pintarTarjetas();
   }
 
   function montarBarraGestion(){
