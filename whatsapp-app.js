@@ -16,6 +16,15 @@
   var LS_KEY = 'appi_whatsapp_app';       // 'normal' | 'business' | 'preguntar'
   var PKG = { normal: 'com.whatsapp', business: 'com.whatsapp.w4b' };
   var NOMBRE = { normal: 'WhatsApp', business: 'WhatsApp Business' };
+  var APPI_LANDING_URL = 'https://somospopups.github.io/appi-landing/';
+  var APPI_SHARE_MESSAGE = [
+    '¡Hola! 😊 Quiero compartirte APPI, una app pensada para ayudar a organizar el negocio, planificar el mes y tener siempre claro cuál es el próximo paso.',
+    '',
+    'Es simple, práctica y acompaña la actividad diaria.',
+    '',
+    'Conocela acá:',
+    APPI_LANDING_URL
+  ].join('\n');
 
   function esAndroid(){
     return /android/i.test(navigator.userAgent || '');
@@ -138,6 +147,16 @@
     });
   }
 
+  // Abre el selector de contactos de WhatsApp, sin destinatario fijo.
+  // El usuario elige una conversación y WhatsApp muestra el mensaje listo.
+  function enlaceCompartirAPPI(){
+    return 'https://wa.me/?text=' + encodeURIComponent(APPI_SHARE_MESSAGE);
+  }
+
+  function compartirAPPI(){
+    return abrir(enlaceCompartirAPPI());
+  }
+
   // Cambiar la preferencia desde el menú de herramientas.
   function elegirDesdeAjustes(){
     var actual = preferencia();
@@ -181,6 +200,10 @@
     preferencia: preferencia,
     setPreferencia: setPreferencia,
     elegirDesdeAjustes: elegirDesdeAjustes,
+    compartirAPPI: compartirAPPI,
+    enlaceCompartirAPPI: enlaceCompartirAPPI,
+    mensajeCompartirAPPI: function(){ return APPI_SHARE_MESSAGE; },
+    landingURL: APPI_LANDING_URL,
     esAndroid: esAndroid,
     nombre: function(v){ return NOMBRE[v || preferencia()] || ''; },
     LS_KEY: LS_KEY

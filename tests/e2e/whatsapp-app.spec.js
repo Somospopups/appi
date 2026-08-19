@@ -294,6 +294,81 @@ test('el ítem del engranaje no repite WhatsApp al final', async ({ browser }) =
   await ctx.close();
 });
 
+test('Compartir APPI abre el selector de contactos con la landing y sin destinatario fijo', async ({ browser }) => {
+  const ctx = await browser.newContext({ userAgent: UA_ANDROID });
+  const page = await ctx.newPage();
+
+  await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
+  await page.waitForFunction(() => !!window.APPIWhatsApp?.compartirAPPI);
+
+  const share = await page.evaluate(() => {
+    const url = window.APPIWhatsApp.enlaceCompartirAPPI();
+
+    return {
+      hasCompartir: typeof window.APPIWhatsApp.compartirAPPI === 'function',
+      hasEnlace: typeof window.APPIWhatsApp.enlaceCompartirAPPI === 'function',
+      hasMensaje: typeof window.APPIWhatsApp.mensajeCompartirAPPI === 'function',
+      url,
+      parsed: window.APPIWhatsApp.partirEnlace(url),
+      intent: window.APPIWhatsApp.construir(url, 'normal'),
+      businessIntent: window.APPIWhatsApp.construir(url, 'business'),
+      message: window.APPIWhatsApp.mensajeCompartirAPPI(),
+      landing: window.APPIWhatsApp.landingURL
+    };
+  });
+
+  expect(share.hasCompartir).toBe(true);
+  expect(share.hasEnlace).toBe(true);
+  expect(share.hasMensaje).toBe(true);
+  expect(share.url).toContain('https://wa.me/?text=');
+  expect(share.url).not.toContain('phone=');
+  expect(share.parsed.numero).toBe('');
+
+  expect(share.intent).toContain('intent://send?text=');
+  expect(share.intent).toContain('package=com.whatsapp;');
+  expect(share.intent).not.toContain('phone=');
+
+  expect(share.businessIntent).toContain('intent://send?text=');
+  expect(share.businessIntent).toContain('package=com.whatsapp.w4b;');
+  expect(share.businessIntent).not.toContain('phone=');
+
+  expect(share.message).toContain('Conocela acá:');
+  expect(share.message).toContain('https://somospopups.github.io/appi-landing/');
+  expect(share.message.toLowerCase()).not.toContain('escribime');
+  expect(share.message.toLowerCase()).not.toContain('te cuento cómo funciona');
+
+  expect(share.landing).toBe('https://somospopups.github.io/appi-landing/');
+
+  await expect(page.locator('#btnToolsShareAPPI')).toContainText('Compartir APPI');
+
+  await ctx.close();
+});
+
+test('Compartir APPI usa wa.me sin teléfono fuera de Android', async ({ browser }) => {
+  const ctx = await browser.newContext({
+    userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) Safari'
+  });
+  const page = await ctx.newPage();
+
+  await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
+  await page.waitForFunction(() => !!window.APPIWhatsApp?.enlaceCompartirAPPI);
+
+  const result = await page.evaluate(() => {
+    const url = window.APPIWhatsApp.enlaceCompartirAPPI();
+
+    return {
+      parsed: window.APPIWhatsApp.partirEnlace(url),
+      destination: window.APPIWhatsApp.construir(url, '')
+    };
+  });
+
+  expect(result.parsed.numero).toBe('');
+  expect(result.destination).toContain('https://wa.me/?text=');
+  expect(result.destination).not.toContain('phone=');
+
+  await ctx.close();
+});
+
 test('fuera de Android no se intercepta nada', async ({ browser }) => {
   const ctx = await browser.newContext({ userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) Safari' });
   const page = await ctx.newPage();

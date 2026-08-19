@@ -5,17 +5,17 @@ const read = file => fs.readFileSync(file, 'utf8');
 
 test('la versión visible, el paquete y el Service Worker están alineados', () => {
   const html=read('index.html'),sw=read('service-worker.js'),pkg=JSON.parse(read('package.json'));
-  expect(pkg.version).toBe('264.0.0');
-  expect(html).toContain('APPI · v264 · Segura');
-  expect(html).toContain("const swVersion='264'");
+  expect(pkg.version).toBe('265.0.0');
+  expect(html).toContain('APPI · v265 · Segura');
+  expect(html).toContain("const swVersion='265'");
   expect(html).toContain("{updateViaCache:'none'}");
   expect(html).toContain('await registration.update()');
-  expect(sw).toContain("CACHE_NAME = 'appi-v264-");
+  expect(sw).toContain("CACHE_NAME = 'appi-v265-");
   const manifest=JSON.parse(read('manifest.json'));
   expect(manifest.background_color).toBe('#06172d');
   expect(manifest.theme_color).toBe('#06172d');
   expect(html).toContain('theme-color" content="#06172d"');
-  expect(sw).toContain("CACHE_NAME = 'appi-v264-centro-accion'");
+  expect(sw).toContain("CACHE_NAME = 'appi-v265-compartir-appi'");
   expect(html).toContain('apple-touch-startup-image');
   expect(html).toContain('class="boot-water"');
   expect(html).not.toContain('boot-water-caustic');
