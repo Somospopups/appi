@@ -11,7 +11,9 @@ permissions:
 jobs:
   e2e:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    # La suite tarda unos 6 minutos y bajar el navegador puede tardar otros
+    # tantos: con 15 el trabajo se cortaba antes de llegar a las pruebas.
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -19,5 +21,17 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
-      - run: npx playwright install --with-deps chromium
+      # El navegador se guarda entre corridas: sin esto se baja entero cada vez.
+      - name: Recuperar el navegador guardado
+        id: cache-navegador
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+      - name: Instalar el navegador
+        if: steps.cache-navegador.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+      - name: Instalar solo lo que el navegador necesita del sistema
+        if: steps.cache-navegador.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
       - run: npm test
