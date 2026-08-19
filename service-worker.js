@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v256-archivo-aesthetic-copa';
+const CACHE_NAME = 'appi-v260-historico-desktop-type';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

@@ -15,7 +15,7 @@
 .hist-preview{margin-top:10px;padding:11px 12px;border-radius:14px;background:rgba(58,208,164,.08);border:1px solid rgba(58,208,164,.2);font-size:10.5px;line-height:1.45;color:#356359}.hist-preview.warn{background:rgba(245,179,1,.09);border-color:rgba(245,179,1,.25);color:#8a6116}.hist-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:11px}.hist-actions>*{flex:1;min-width:115px}
 .hist-period-list{display:grid;gap:8px}.hist-period{display:grid;grid-template-columns:48px minmax(0,1fr) auto;gap:10px;align-items:center;padding:11px;border-radius:17px;background:rgba(255,255,255,.66);border:1px solid rgba(255,255,255,.85)}.hist-period-date{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(135deg,rgba(91,141,239,.16),rgba(160,107,255,.12));color:#3d63c9}.hist-period-date b{display:block;font-size:11px;line-height:1;text-align:center}.hist-period-date small{display:block;font-size:8px;margin-top:3px;text-align:center}.hist-period-info{min-width:0}.hist-period-info h4{margin:0 0 4px;font-size:12px;color:#292938}.hist-period-info p{margin:0;font-size:9.5px;color:#777887;line-height:1.4}.hist-period-info .file-flags{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px}.hist-period-info .file-flags span{font-size:8px;font-weight:850;padding:3px 6px;border-radius:999px;background:rgba(58,208,164,.11);color:#168765}.hist-period-actions{position:relative}.hist-more{width:34px;height:34px;border:0;border-radius:11px;background:rgba(91,141,239,.09);color:#3d63c9;font-size:18px;cursor:pointer}.hist-action-menu{display:flex;gap:5px;flex-wrap:wrap;grid-column:1/-1;padding-top:8px;border-top:1px solid rgba(80,90,130,.08)}.hist-action-menu button{border:0;border-radius:9px;padding:7px 9px;font:inherit;font-size:9px;font-weight:850;background:rgba(91,141,239,.09);color:#3d63c9;cursor:pointer}.hist-action-menu button.danger{background:rgba(222,69,78,.09);color:#c63c46}
 .hist-picker-tools{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:9px}.hist-picker-tools button{border:0;padding:7px 9px;border-radius:999px;background:rgba(91,141,239,.1);color:#3d63c9;font:inherit;font-size:9px;font-weight:900;cursor:pointer}.hist-month-picker{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-bottom:12px}.hist-month-option{position:relative}.hist-month-option input{position:absolute;opacity:0;pointer-events:none}.hist-month-option span{display:block;padding:9px 6px;border-radius:12px;text-align:center;background:rgba(255,255,255,.62);border:1px solid rgba(80,90,130,.09);font-size:9.5px;font-weight:850;color:#666776;cursor:pointer}.hist-month-option input:checked+span{background:linear-gradient(135deg,#5b8def,#875fdd);color:#fff;border-color:transparent;box-shadow:0 4px 11px rgba(91,112,210,.2)}
-.hist-chart{overflow:hidden}.hist-chart svg{display:block;width:100%;height:auto;min-height:150px}.hist-chart-labels{display:flex;justify-content:space-between;gap:4px;font-size:8px;color:#8a8a94;margin-top:3px}.hist-chart-legend{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:7px;font-size:9px;font-weight:800;color:#666776}.hist-chart-legend i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px}
+.hist-chart{overflow:hidden;margin:2px 0 4px}.hist-chart svg{display:block;width:100%;height:auto;min-height:180px}.hist-chart-labels{display:flex;justify-content:space-between;gap:4px;font-size:8px;color:#8a8a94;margin-top:3px}.hist-chart-legend{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:7px;font-size:9px;font-weight:800;color:#666776}.hist-chart-legend i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px}
 .hist-table-wrap{overflow:auto;border-radius:14px;border:1px solid rgba(80,90,130,.09)}.hist-table{width:100%;border-collapse:collapse;min-width:520px;background:rgba(255,255,255,.48)}.hist-table th{position:sticky;top:0;background:#edf1fb;text-align:left;font-size:8.5px;text-transform:uppercase;letter-spacing:.3px;color:#6f7080;padding:8px}.hist-table td{padding:8px;border-top:1px solid rgba(80,90,130,.08);font-size:9.5px;color:#363644}.hist-table td strong{font-size:10px}.hist-table .up{color:#168765;font-weight:900}.hist-table .down{color:#d64d55;font-weight:900}.hist-table .neutral{color:#777887}.hist-search{position:relative;margin-bottom:9px}.hist-search input{width:100%;border:1px solid rgba(80,90,130,.11);background:rgba(255,255,255,.7);border-radius:12px;padding:10px 12px 10px 34px;font:inherit;font-size:11px;outline:none}.hist-search:before{content:"⌕";position:absolute;left:12px;top:7px;color:#777887;font-size:18px}
 .hist-strategies{display:grid;gap:8px}.hist-strategy{padding:12px 13px;border-radius:16px;background:rgba(255,255,255,.63);border:1px solid rgba(255,255,255,.83);border-left:4px solid var(--tone,#5b8def)}.hist-strategy .s-top{display:flex;align-items:center;gap:7px}.hist-strategy .s-priority{font-size:8px;font-weight:900;text-transform:uppercase;letter-spacing:.45px;color:var(--tone,#5b8def);background:color-mix(in srgb,var(--tone,#5b8def) 11%,transparent);padding:3px 7px;border-radius:999px}.hist-strategy h4{margin:7px 0 4px;font-size:12px;color:#292938}.hist-strategy p{margin:0;color:#686978;font-size:10px;line-height:1.45}.hist-strategy .evidence{margin-top:7px;padding:7px 9px;border-radius:10px;background:rgba(80,90,130,.055);font-size:9.5px;color:#4d4e5c}.hist-strategy .action{margin-top:6px;font-size:10px;color:#363746}.hist-strategy .action b{color:var(--tone,#3d63c9)}
 .hist-report{padding:14px;border-radius:18px;background:linear-gradient(135deg,rgba(91,141,239,.09),rgba(160,107,255,.07));border:1px solid rgba(91,141,239,.18);font-size:10.5px;line-height:1.55;color:#3d3e4c;white-space:pre-wrap}.hist-report h3,.hist-report h4{white-space:normal}.hist-ai-consent{display:flex;align-items:flex-start;gap:8px;font-size:9.5px;color:#6d6e7c;line-height:1.4;margin:10px 0}.hist-ai-consent input{margin-top:2px}
@@ -25,7 +25,13 @@
 body.dark .hist-statusbar,body.dark .hist-card,body.dark .hist-kpi,body.dark .hist-period,body.dark .hist-empty{background:rgba(28,29,46,.68);border-color:rgba(255,255,255,.08)}body.dark .hist-statusbar strong,body.dark .hist-card-head h3,body.dark .hist-kpi strong,body.dark .hist-empty h3,body.dark .hist-period-info h4,body.dark .hist-strategy h4,body.dark .hist-cloud-state b{color:#f0f0f5}body.dark .hist-statusbar small,body.dark .hist-card-head p,body.dark .hist-kpi span,body.dark .hist-empty p,body.dark .hist-period-info p,body.dark .hist-strategy p,body.dark .hist-cloud-state p{color:#a0a1af}body.dark .hist-tabs{background:rgba(255,255,255,.06)}body.dark .hist-tabs button{color:#a8a9b6}body.dark .hist-field select,body.dark .hist-field input,body.dark .hist-search input{background:rgba(25,26,42,.78);border-color:rgba(255,255,255,.09);color:#f0f0f5}body.dark .hist-upload{background:rgba(91,141,239,.07)}body.dark .hist-upload b{color:#f0f0f5}body.dark .hist-month-option span{background:rgba(30,31,48,.72);border-color:rgba(255,255,255,.08);color:#b7b8c4}body.dark .hist-table{background:rgba(25,26,42,.62)}body.dark .hist-table th{background:#25283a;color:#b7b8c4}body.dark .hist-table td{color:#e0e1e8;border-top-color:rgba(255,255,255,.07)}body.dark .hist-strategy{background:rgba(28,29,46,.66);border-color:rgba(255,255,255,.08)}body.dark .hist-strategy .evidence{background:rgba(255,255,255,.05);color:#cacbd4}body.dark .hist-strategy .action,body.dark .hist-report{color:#d5d6df}body.dark .hist-cloud-state{background:rgba(91,141,239,.08)}
 @media(min-width:700px){.hist-kpi-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.hist-form-grid{grid-template-columns:180px 180px}.hist-month-picker{grid-template-columns:repeat(6,minmax(0,1fr))}.hist-cloud-grid{grid-template-columns:1fr 1fr}.hist-cloud-grid>.hist-card.wide{grid-column:1/-1}}
 @media(max-width:390px){.hist-tabs button{font-size:8px;padding:8px 2px}.hist-statusbar{padding:9px}.hist-period{grid-template-columns:44px minmax(0,1fr) auto}.hist-period-date{width:44px;height:44px}.hist-form-grid{grid-template-columns:1fr 1fr}.hist-upload{grid-template-columns:35px minmax(0,1fr) auto;padding:9px}.hist-upload .u-icon{width:35px;height:35px}.hist-kpi strong{font-size:17px}}
-@media(prefers-reduced-motion:reduce){.hist-loading span{animation:none}.hist-upload{transition:none}}
+@media(prefers-reduced-motion:reduce){.hist-loading span{animation:none}.hist-upload{transition:none}
+.hist-chart-motion,.hist-chart-motion *{animation:none!important;transition:none!important}
+.hist-chart-motion .hist-chart-line,.hist-chart-motion .hist-chart-shine{stroke-dasharray:none!important;stroke-dashoffset:0!important}
+.hist-chart-motion .hist-chart-area{opacity:1!important;transform:none!important}
+.hist-chart-motion .hist-chart-dot,.hist-chart-motion .hist-chart-value,.hist-chart-motion .hist-chart-month{opacity:1!important;transform:none!important}
+.hist-year-ring,.hist-story-meter i,.hist-copa-item,.hist-year-kpis>div,.hist-single-chart{animation:none!important}
+}
 
 /* Tablero anual de cargas */
 .hist-year-card{background:linear-gradient(135deg,rgba(255,255,255,.76),rgba(244,239,255,.68))}
@@ -42,7 +48,7 @@ body.dark .hist-year-card,body.dark .hist-month-card{background:rgba(28,29,46,.7
 .hist-detail-overlay{position:fixed;inset:0;z-index:10000;display:none;background:rgba(24,26,42,.46);backdrop-filter:blur(5px)}.hist-detail-overlay.open{display:block}.hist-detail-drawer{position:absolute;top:0;right:0;bottom:0;width:min(580px,100%);padding:20px;background:linear-gradient(160deg,#f5f8ff,#fff3f9);box-shadow:-18px 0 55px rgba(30,35,75,.22);overflow:auto}.hist-detail-head{display:flex;align-items:start;justify-content:space-between;gap:12px;padding-bottom:14px;border-bottom:1px solid rgba(80,90,130,.11)}.hist-detail-head h2{margin:0;color:#292938;font-size:22px}.hist-detail-head p{margin:5px 0 0;color:#777887;font-size:12px}.hist-detail-head button{width:48px;height:48px;flex:0 0 auto;border:0;border-radius:50%;background:rgba(91,141,239,.11);color:#3d63c9;font-size:22px;font-weight:900}.hist-drill-note{margin:12px 0;padding:11px 12px;border-radius:13px;background:rgba(91,141,239,.08);color:#555765;font-size:11px;line-height:1.45}.hist-data-list{display:grid;gap:7px}.hist-data-row{display:grid;grid-template-columns:46px minmax(0,1fr) auto;gap:10px;align-items:center;min-height:72px;padding:10px;border:1px solid rgba(80,90,130,.1);border-radius:15px;background:#fff;font:inherit;text-align:left;cursor:pointer}.hist-data-avatar{width:44px;height:44px;display:grid;place-items:center;border-radius:13px;background:linear-gradient(135deg,rgba(91,141,239,.18),rgba(160,107,255,.14));color:#3d63c9;font-weight:950}.hist-data-avatar.income{color:#fff;background:linear-gradient(135deg,#5b8def,#a06bff);font-size:11px}.hist-data-row strong{display:block;color:#30303d;font-size:13px}.hist-data-row small{display:block;margin-top:3px;color:#777887;font-size:10px}.hist-data-row>b{color:#3d63c9;font-size:11px;white-space:nowrap}.hist-person-kpis{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:13px 0}.hist-person-kpis>div{padding:13px;border:1px solid rgba(80,90,130,.1);border-radius:14px;background:#fff}.hist-person-kpis b{display:block;color:#292938;font-size:19px}.hist-person-kpis span{display:block;margin-top:4px;color:#777887;font-size:10px}.hist-contact-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}.hist-contact-actions a{min-height:50px;display:grid;place-items:center;border-radius:13px;text-decoration:none;font-size:12px;font-weight:900}.hist-contact-actions .wa{background:#25d366;color:#fff}.hist-contact-actions .call{background:rgba(91,141,239,.13);color:#3d63c9}
 body.dark .hist-section-title h3,body.dark .hist-attention strong,body.dark .hist-sponsor-list strong,body.dark .hist-mini-stats span{color:#f0f0f5}body.dark .hist-attention{background:rgba(28,29,46,.68);border-color:rgba(255,255,255,.08)}body.dark .hist-mini-stats button{background:rgba(91,141,239,.09);border-color:rgba(255,255,255,.08)}body.dark .hist-detail-drawer{background:linear-gradient(160deg,#161827,#252036)}body.dark .hist-detail-head h2,body.dark .hist-data-row strong,body.dark .hist-person-kpis b{color:#f0f0f5}body.dark .hist-data-row,body.dark .hist-person-kpis>div{background:rgba(35,36,54,.9);border-color:rgba(255,255,255,.08)}
 @media(max-width:700px){.hist-attention-grid,.hist-two-cols{grid-template-columns:1fr}.hist-attention{grid-template-columns:40px minmax(0,1fr)}.hist-attention em{grid-column:2;justify-self:start}.hist-kpi-main .hist-kpi{min-height:112px}.hist-detail-drawer{padding:15px}.hist-data-row{grid-template-columns:43px minmax(0,1fr)}.hist-data-row>b{grid-column:2}.hist-person-kpis{grid-template-columns:1fr 1fr}}
-.hist-single-chart{min-height:150px;display:grid;place-items:center;align-content:center;gap:4px;text-align:center}.hist-single-chart>span{width:16px;height:16px;border-radius:50%;background:var(--tone);box-shadow:0 0 0 7px color-mix(in srgb,var(--tone) 14%,transparent)}.hist-single-chart strong{margin-top:9px;color:#292938;font-size:25px}.hist-single-chart b{color:#3d63c9;font-size:12px}.hist-single-chart small{margin-top:6px;color:#777887;font-size:10px}body.dark .hist-single-chart strong{color:#f0f0f5}
+.hist-single-chart{min-height:180px;display:grid;place-items:center;align-content:center;gap:6px;text-align:center;padding:12px 8px}.hist-single-chart>span,.hist-single-chart .hist-single-dot{width:16px;height:16px;border-radius:50%;background:var(--tone);box-shadow:0 0 0 7px color-mix(in srgb,var(--tone) 14%,transparent)}.hist-single-chart strong{margin-top:9px;color:#292938;font-size:25px}.hist-single-chart b{color:#3d63c9;font-size:12px}.hist-single-chart small{margin-top:6px;color:#777887;font-size:10px}body.dark .hist-single-chart strong{color:#f0f0f5}
 
 /* Resumen anual solicitado */
 .hist-annual-summary{margin-top:12px}.hist-annual-table-wrap{overflow:auto;border:1px solid rgba(80,90,130,.12);border-radius:15px;background:rgba(255,255,255,.48)}.hist-annual-table-wrap table{width:100%;min-width:1320px;border-collapse:collapse}.hist-annual-table-wrap th,.hist-annual-table-wrap td{height:44px;padding:5px;border-right:1px solid rgba(80,90,130,.12);border-top:1px solid rgba(80,90,130,.12);text-align:center;font-size:10px}.hist-annual-table-wrap thead th{position:sticky;top:0;z-index:2;background:#e9edf8;color:#4a4b58;font-size:9px;text-transform:uppercase}.hist-annual-table-wrap th:first-child{position:sticky;left:0;z-index:3;min-width:190px;text-align:left;padding-left:12px;background:#f1f3fa;color:#393a48;font-weight:900}.hist-annual-table-wrap thead th:first-child{z-index:4;background:#dfe5f3}.hist-annual-table-wrap td:last-child,.hist-annual-table-wrap thead th:last-child{background:rgba(91,141,239,.08);font-weight:900}.hist-annual-table-wrap td button{width:100%;min-height:32px;border:0;border-radius:8px;background:rgba(91,141,239,.07);color:#3d63c9;font:inherit;font-size:10px;font-weight:850;cursor:pointer}.hist-annual-table-wrap td button:hover,.hist-annual-table-wrap td button:focus{outline:2px solid rgba(91,141,239,.25);background:rgba(91,141,239,.14)}.hist-annual-section th{position:static!important;height:32px!important;padding:5px!important;background:#767984!important;color:#fff!important;text-align:center!important;text-transform:uppercase;letter-spacing:.5px;font-size:9px!important}.hist-month-data{width:100%}body.dark .hist-annual-table-wrap{background:rgba(24,25,40,.7);border-color:rgba(255,255,255,.1)}body.dark .hist-annual-table-wrap th:first-child{background:#25283a;color:#f0f0f5}body.dark .hist-annual-table-wrap thead th{background:#303449;color:#d0d1dd}body.dark .hist-annual-table-wrap td button{color:#a8c0ff;background:rgba(91,141,239,.1)}
@@ -52,17 +58,351 @@ body.dark .hist-section-title h3,body.dark .hist-attention strong,body.dark .his
 @media(max-width:700px){.hist-full-report-cta{grid-template-columns:52px minmax(0,1fr)}.hist-report-mark{width:50px;height:50px}.hist-full-report-cta button{grid-column:1/-1;width:100%}}
 /* Archivo anual amigable + lectura COPA */
 .hist-year-story{padding:17px;background:linear-gradient(145deg,rgba(255,255,255,.78),rgba(247,245,254,.72));border-color:rgba(255,255,255,.92)}
-.hist-year-bento{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(190px,.55fr);gap:10px}.hist-year-trend,.hist-year-progress-card{border:1px solid rgba(93,99,143,.1);border-radius:19px;background:rgba(255,255,255,.84);box-shadow:0 8px 23px rgba(68,71,116,.055)}.hist-year-trend{padding:13px 13px 7px}.hist-year-panel-title{display:flex;justify-content:space-between;align-items:flex-start;gap:9px}.hist-year-panel-title b{display:block;color:#303248;font-size:12px}.hist-year-panel-title small{display:block;margin-top:3px;color:#85879a;font-size:8.5px}.hist-year-panel-title>span{padding:5px 8px;border-radius:999px;background:#edf1ff;color:#5a6fc5;font-size:8px;font-weight:950}.hist-year-trend .hist-chart{margin-top:4px}.hist-year-trend .hist-chart svg{display:block;width:100%;height:auto}.hist-year-progress-card{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:14px;text-align:center}.hist-year-ring{width:116px;height:116px;padding:10px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(#31bc9b 0 var(--hist-progress),#eceefa var(--hist-progress) 360deg);box-shadow:0 12px 28px rgba(49,188,155,.12)}.hist-year-ring>div{width:100%;height:100%;display:grid;place-content:center;border-radius:50%;background:#fff}.hist-year-ring b{display:block;color:#303248;font-size:24px;line-height:1}.hist-year-ring span{display:block;margin-top:4px;color:#85889a;font-size:8px;font-weight:850}.hist-year-progress-card>strong{margin-top:10px;color:#454860;font-size:10px}.hist-year-progress-card>small{margin-top:3px;color:#85889a;font-size:8px}
-.hist-year-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:9px}.hist-year-kpis>div{min-height:78px;padding:11px;border:1px solid rgba(93,99,143,.09);border-radius:15px;background:rgba(255,255,255,.82)}.hist-year-kpis i{display:block;width:7px;height:7px;border-radius:50%;background:var(--tone);box-shadow:0 0 0 4px color-mix(in srgb,var(--tone) 13%,transparent)}.hist-year-kpis b{display:block;margin-top:9px;color:#303248;font-size:15px}.hist-year-kpis span{display:block;margin-top:3px;color:#85889a;font-size:8px;line-height:1.25}
-.hist-story-heading,.hist-complete-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;margin:18px 2px 9px}.hist-story-heading h4,.hist-complete-heading h4{margin:0;color:#303248;font-size:14px}.hist-story-heading p,.hist-complete-heading p{margin:3px 0 0;color:#85889a;font-size:8.5px}.hist-story-heading>span,.hist-complete-heading>span{padding:5px 8px;border-radius:9px;background:#efedfb;color:#6e60bd;font-size:7.5px;font-weight:950;white-space:nowrap}.hist-quarter-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.hist-quarter{padding:8px;border:1px solid rgba(93,99,143,.1);border-radius:18px;background:rgba(255,255,255,.65)}.hist-quarter-head{display:flex;align-items:center;justify-content:space-between;gap:6px;margin:0 2px 6px}.hist-quarter-head b{color:#5c6078;font-size:8px}.hist-quarter-head span{color:#999bad;font-size:6.5px}.hist-story-month{margin-top:6px;padding:10px;border:1px solid #e6e7f1;border-radius:14px;background:#fff;box-shadow:0 6px 15px rgba(65,67,106,.04)}.hist-story-month:first-of-type{margin-top:0}.hist-story-month-top{display:flex;align-items:flex-start;justify-content:space-between;gap:6px}.hist-story-month-name{display:flex;align-items:center;gap:6px;min-width:0}.hist-story-month-name i{width:7px;height:7px;flex:none;border-radius:50%;background:#756fe6;box-shadow:0 0 0 3px rgba(117,111,230,.12)}.hist-story-month-name strong{display:block;color:#42445b;font-size:8.5px;white-space:nowrap}.hist-story-month-name span{display:block;margin-top:2px;color:#a0a2af;font-size:6px}.hist-story-pb{flex:none;padding:0;border:0;background:none;text-align:right;cursor:pointer}.hist-story-pb b{display:block;color:#465071;font-size:10px}.hist-story-pb small{display:block;margin-top:2px;color:#a0a2af;font-size:5.5px}.hist-story-meter{height:4px;margin:7px 0;overflow:hidden;border-radius:999px;background:#f0f1f6}.hist-story-meter i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#5c82ee,#8a65e8,#e87fa9)}.hist-story-cats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:3px}.hist-story-cats button{min-width:0;padding:4px 2px;border:0;border-radius:7px;background:#f5f6fa;color:#57617d;text-align:center;cursor:pointer}.hist-story-cats b{display:block;font-size:6px}.hist-story-cats span{display:block;margin-top:2px;font-size:7px;font-weight:900;white-space:nowrap}.hist-story-empty{grid-column:1/-1;color:#a0a2af;font-size:7px}.hist-story-moves{display:flex;flex-wrap:wrap;gap:3px;margin-top:6px}.hist-story-moves span{padding:3px 4px;border-radius:6px;background:#f0f4fa;color:#687188;font-size:5.8px;font-weight:850}.hist-story-moves span:nth-child(1){background:#e9f8f4;color:#23826b}.hist-story-moves span:nth-child(2){background:#ebf1fc;color:#4169a6}.hist-story-moves span:nth-child(3){background:#f0ebfb;color:#7158b3}.hist-story-month.pending{min-height:110px;display:grid;place-items:center;border-style:dashed;background:rgba(249,249,252,.7);box-shadow:none;text-align:center}.hist-story-month.pending strong{display:block;color:#999bad;font-size:9px}.hist-story-month.pending span{display:block;margin-top:4px;color:#b1b3bf;font-size:6.5px}
-.hist-year-story .hist-annual-table-wrap{overflow:auto;background:rgba(255,255,255,.68)}.hist-year-story .hist-annual-table-wrap table{width:100%;min-width:930px;table-layout:fixed}.hist-year-story .hist-annual-table-wrap thead th:first-child,.hist-year-story .hist-annual-table-wrap tbody th:first-child{width:165px;min-width:165px}.hist-year-story .hist-annual-table-wrap th,.hist-year-story .hist-annual-table-wrap td{height:39px;font-size:8.5px}.hist-year-story .hist-annual-table-wrap td button{min-height:27px;font-size:8.5px}.hist-year-story .hist-annual-total{background:#e8ecf9!important}.hist-annual-mobile{display:none}.hist-mobile-matrix-block{margin-top:8px}.hist-mobile-matrix-title{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 2px 5px}.hist-mobile-matrix-title b{color:#5e6178;font-size:8px;text-transform:uppercase;letter-spacing:.45px}.hist-mobile-matrix-title small{color:#999bad;font-size:6.5px}.hist-mobile-matrix-wrap{overflow:hidden;border:1px solid #e1e4ef;border-radius:12px;background:#fff}.hist-mobile-matrix-wrap table{width:100%;table-layout:fixed;border-collapse:separate;border-spacing:0}.hist-mobile-matrix-wrap th,.hist-mobile-matrix-wrap td{height:34px;padding:3px 2px;border-top:1px solid #eaecf3;border-right:1px solid #eaecf3;text-align:center}.hist-mobile-matrix-wrap tr>*:last-child{border-right:0}.hist-mobile-matrix-wrap thead th{height:32px;border-top:0;background:#e3e7f3;color:#5b6075;font-size:6.7px;line-height:1.1;text-transform:uppercase}.hist-mobile-matrix-wrap thead th:first-child,.hist-mobile-matrix-wrap tbody th,.hist-mobile-matrix-wrap tfoot th{width:43px}.hist-mobile-matrix-wrap tbody th{background:#f2f4f9;color:#666b7f;font-size:7px}.hist-mobile-matrix-wrap td{color:#3e63a8;font-size:8px;font-weight:900}.hist-mobile-matrix-wrap td button{width:100%;min-height:25px;padding:2px;border:0;border-radius:7px;background:#f1f4fb;color:inherit;font:inherit;font-size:8px;font-weight:900;cursor:pointer}.hist-mobile-matrix-wrap tfoot th{background:#4e5473;color:#fff;font-size:7px}.hist-mobile-matrix-wrap tfoot td{background:#e8ebf7}.hist-mobile-matrix-help{margin-top:9px;padding:9px 10px;border-radius:11px;background:rgba(92,130,238,.08);color:#74778b;font-size:7.5px;line-height:1.4}.hist-mobile-matrix-help b{color:#5567a2}
-.hist-copa{padding:17px;background:linear-gradient(145deg,rgba(255,255,255,.78),rgba(242,249,250,.74))}.hist-copa-kicker{margin-bottom:4px;color:#6d79cf;font-size:7.5px;font-weight:950;letter-spacing:1px}.hist-copa-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.hist-copa-item{position:relative;min-height:132px;padding:12px;border:1px solid rgba(93,99,143,.1);border-radius:17px;background:#fff;display:grid;grid-template-columns:34px minmax(0,1fr);align-items:start;gap:9px;text-align:left;font:inherit;cursor:pointer;overflow:hidden}.hist-copa-item:after{content:"";position:absolute;left:0;right:0;bottom:0;height:4px;background:var(--copa-tone)}.hist-copa-item.c{--copa-tone:#5c82ee}.hist-copa-item.o{--copa-tone:#8a65e8}.hist-copa-item.p{--copa-tone:#e87fa9}.hist-copa-item.a{--copa-tone:#31bc9b}.hist-copa-letter{width:34px;height:34px;display:grid;place-items:center;border-radius:11px;background:color-mix(in srgb,var(--copa-tone) 13%,white);color:var(--copa-tone);font-size:16px;font-weight:950}.hist-copa-item small{display:block;color:#85889a;font-size:6.5px;font-weight:950;letter-spacing:.45px}.hist-copa-item b{display:block;margin-top:6px;color:#383b53;font-size:14px}.hist-copa-item p{margin:5px 0 0;color:#85889a;font-size:7.5px;line-height:1.3}.hist-copa-item em{grid-column:2;align-self:end;color:var(--copa-tone);font-size:7px;font-style:normal;font-weight:900}.hist-copa-note{margin-top:9px;padding:9px 10px;border-radius:11px;background:rgba(49,188,155,.08);color:#677f78;font-size:7.5px;line-height:1.4}
+.hist-year-bento{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(190px,.55fr);gap:10px}.hist-year-trend,.hist-year-progress-card{border:1px solid rgba(93,99,143,.1);border-radius:19px;background:rgba(255,255,255,.84);box-shadow:0 8px 23px rgba(68,71,116,.055)}.hist-year-trend{padding:13px 13px 7px}.hist-year-panel-title{display:flex;justify-content:space-between;align-items:flex-start;gap:9px}.hist-year-panel-title b{display:block;color:#303248;font-size:14px}.hist-year-panel-title small{display:block;margin-top:3px;color:#85879a;font-size:11px}.hist-year-panel-title>span{padding:5px 9px;border-radius:999px;background:#edf1ff;color:#5a6fc5;font-size:10px;font-weight:950}.hist-year-trend .hist-chart{margin-top:4px}.hist-year-trend .hist-chart svg{display:block;width:100%;height:auto}.hist-year-progress-card{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:14px;text-align:center}.hist-year-ring{width:116px;height:116px;padding:10px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(#31bc9b 0 var(--hist-progress),#eceefa var(--hist-progress) 360deg);box-shadow:0 12px 28px rgba(49,188,155,.12)}.hist-year-ring>div{width:100%;height:100%;display:grid;place-content:center;border-radius:50%;background:#fff}.hist-year-ring b{display:block;color:#303248;font-size:24px;line-height:1}.hist-year-ring span{display:block;margin-top:4px;color:#85889a;font-size:8px;font-weight:850}.hist-year-progress-card>strong{margin-top:10px;color:#454860;font-size:10px}.hist-year-progress-card>small{margin-top:3px;color:#85889a;font-size:8px}
+.hist-year-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:9px}.hist-year-kpis>div{min-height:88px;padding:13px;border:1px solid rgba(93,99,143,.09);border-radius:15px;background:rgba(255,255,255,.82)}.hist-year-kpis i{display:block;width:8px;height:8px;border-radius:50%;background:var(--tone);box-shadow:0 0 0 4px color-mix(in srgb,var(--tone) 13%,transparent)}.hist-year-kpis b{display:block;margin-top:10px;color:#303248;font-size:17px}.hist-year-kpis span{display:block;margin-top:4px;color:#85889a;font-size:11px;line-height:1.3}
+.hist-story-heading,.hist-complete-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;margin:18px 2px 9px}.hist-story-heading h4,.hist-complete-heading h4{margin:0;color:#303248;font-size:16px}.hist-story-heading p,.hist-complete-heading p{margin:3px 0 0;color:#85889a;font-size:12px}.hist-story-heading>span,.hist-complete-heading>span{padding:6px 9px;border-radius:9px;background:#efedfb;color:#6e60bd;font-size:10px;font-weight:950;white-space:nowrap}.hist-quarter-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.hist-quarter{padding:12px;border:1px solid rgba(93,99,143,.1);border-radius:18px;background:rgba(255,255,255,.65)}.hist-quarter-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 2px 8px}.hist-quarter-head b{color:#5c6078;font-size:12px}.hist-quarter-head span{color:#999bad;font-size:10px}.hist-story-month{margin-top:8px;padding:14px;border:1px solid #e6e7f1;border-radius:16px;background:#fff;box-shadow:0 6px 15px rgba(65,67,106,.04)}.hist-story-month:first-of-type{margin-top:0}.hist-story-month-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}.hist-story-month-name{display:flex;align-items:center;gap:8px;min-width:0}.hist-story-month-name i{width:9px;height:9px;flex:none;border-radius:50%;background:#756fe6;box-shadow:0 0 0 4px rgba(117,111,230,.12)}.hist-story-month-name strong{display:block;color:#42445b;font-size:13px;white-space:nowrap}.hist-story-month-name span{display:block;margin-top:3px;color:#a0a2af;font-size:10px}.hist-story-pb{flex:none;padding:0;border:0;background:none;text-align:right;cursor:pointer}.hist-story-pb b{display:block;color:#465071;font-size:15px}.hist-story-pb small{display:block;margin-top:3px;color:#a0a2af;font-size:9px;font-weight:850;letter-spacing:.3px}.hist-story-meter{height:6px;margin:10px 0;overflow:hidden;border-radius:999px;background:#f0f1f6}.hist-story-meter i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#5c82ee,#8a65e8,#e87fa9)}.hist-story-cats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.hist-story-cats button{min-width:0;min-height:44px;padding:8px 6px;border:0;border-radius:10px;background:#f5f6fa;color:#57617d;text-align:center;cursor:pointer}.hist-story-cats b{display:block;font-size:10px;font-weight:900}.hist-story-cats span{display:block;margin-top:3px;font-size:12px;font-weight:900;white-space:nowrap}.hist-story-empty{grid-column:1/-1;color:#a0a2af;font-size:11px}.hist-story-moves{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px}.hist-story-moves span{padding:5px 8px;border-radius:8px;background:#f0f4fa;color:#687188;font-size:10px;font-weight:850}.hist-story-moves span:nth-child(1){background:#e9f8f4;color:#23826b}.hist-story-moves span:nth-child(2){background:#ebf1fc;color:#4169a6}.hist-story-moves span:nth-child(3){background:#f0ebfb;color:#7158b3}.hist-story-month.pending{min-height:128px;display:grid;place-items:center;border-style:dashed;background:rgba(249,249,252,.7);box-shadow:none;text-align:center}.hist-story-month.pending strong{display:block;color:#999bad;font-size:13px}.hist-story-month.pending span{display:block;margin-top:5px;color:#b1b3bf;font-size:11px}
+.hist-year-story .hist-annual-table-wrap{overflow:auto;background:rgba(255,255,255,.68)}.hist-year-story .hist-annual-table-wrap table{width:100%;min-width:930px;table-layout:fixed}.hist-year-story .hist-annual-table-wrap thead th:first-child,.hist-year-story .hist-annual-table-wrap tbody th:first-child{width:165px;min-width:165px}.hist-year-story .hist-annual-table-wrap th,.hist-year-story .hist-annual-table-wrap td{height:39px;font-size:8.5px}.hist-year-story .hist-annual-table-wrap td button{min-height:27px;font-size:8.5px}.hist-year-story .hist-annual-total{background:#e8ecf9!important}.hist-annual-mobile{display:none}.hist-mobile-matrix-block{margin-top:8px}.hist-mobile-matrix-title{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 2px 5px}.hist-mobile-matrix-title b{color:#5e6178;font-size:11px;text-transform:uppercase;letter-spacing:.45px}.hist-mobile-matrix-title small{color:#999bad;font-size:10px}.hist-mobile-matrix-wrap{overflow:hidden;border:1px solid #e1e4ef;border-radius:12px;background:#fff}.hist-mobile-matrix-wrap table{width:100%;table-layout:fixed;border-collapse:separate;border-spacing:0}.hist-mobile-matrix-wrap th,.hist-mobile-matrix-wrap td{height:40px;padding:4px 3px;border-top:1px solid #eaecf3;border-right:1px solid #eaecf3;text-align:center}.hist-mobile-matrix-wrap tr>*:last-child{border-right:0}.hist-mobile-matrix-wrap thead th{height:38px;border-top:0;background:#e3e7f3;color:#5b6075;font-size:10px;line-height:1.15;text-transform:uppercase}.hist-mobile-matrix-wrap thead th:first-child,.hist-mobile-matrix-wrap tbody th,.hist-mobile-matrix-wrap tfoot th{width:48px}.hist-mobile-matrix-wrap tbody th{background:#f2f4f9;color:#666b7f;font-size:11px}.hist-mobile-matrix-wrap td{color:#3e63a8;font-size:12px;font-weight:900}.hist-mobile-matrix-wrap td button{width:100%;min-height:32px;padding:4px;border:0;border-radius:8px;background:#f1f4fb;color:inherit;font:inherit;font-size:12px;font-weight:900;cursor:pointer}.hist-mobile-matrix-wrap tfoot th{background:#4e5473;color:#fff;font-size:11px}.hist-mobile-matrix-wrap tfoot td{background:#e8ebf7}.hist-mobile-matrix-help{margin-top:10px;padding:11px 12px;border-radius:12px;background:rgba(92,130,238,.08);color:#74778b;font-size:11px;line-height:1.45}.hist-mobile-matrix-help b{color:#5567a2}
+.hist-copa{padding:17px;background:linear-gradient(145deg,rgba(255,255,255,.78),rgba(242,249,250,.74))}.hist-copa-kicker{margin-bottom:4px;color:#6d79cf;font-size:10px;font-weight:950;letter-spacing:1px}.hist-copa-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.hist-copa-item{position:relative;min-height:148px;padding:14px;border:1px solid rgba(93,99,143,.1);border-radius:17px;background:#fff;display:grid;grid-template-columns:38px minmax(0,1fr);align-items:start;gap:10px;text-align:left;font:inherit;cursor:pointer;overflow:hidden}.hist-copa-item:after{content:"";position:absolute;left:0;right:0;bottom:0;height:4px;background:var(--copa-tone)}.hist-copa-item.c{--copa-tone:#5c82ee}.hist-copa-item.o{--copa-tone:#8a65e8}.hist-copa-item.p{--copa-tone:#e87fa9}.hist-copa-item.a{--copa-tone:#31bc9b}.hist-copa-letter{width:38px;height:38px;display:grid;place-items:center;border-radius:12px;background:color-mix(in srgb,var(--copa-tone) 13%,white);color:var(--copa-tone);font-size:18px;font-weight:950}.hist-copa-item small{display:block;color:#85889a;font-size:10px;font-weight:950;letter-spacing:.45px}.hist-copa-item b{display:block;margin-top:7px;color:#383b53;font-size:17px}.hist-copa-item p{margin:6px 0 0;color:#85889a;font-size:11px;line-height:1.35}.hist-copa-item em{grid-column:2;align-self:end;color:var(--copa-tone);font-size:11px;font-style:normal;font-weight:900}.hist-copa-note{margin-top:10px;padding:11px 12px;border-radius:12px;background:rgba(49,188,155,.08);color:#677f78;font-size:11px;line-height:1.45}
 body.dark .hist-year-story,body.dark .hist-copa{background:linear-gradient(145deg,rgba(32,33,51,.86),rgba(40,34,61,.78));border-color:rgba(255,255,255,.08)}body.dark .hist-year-trend,body.dark .hist-year-progress-card,body.dark .hist-year-kpis>div,body.dark .hist-quarter,body.dark .hist-story-month,body.dark .hist-copa-item{background:rgba(35,36,54,.9);border-color:rgba(255,255,255,.08)}body.dark .hist-year-panel-title b,body.dark .hist-year-kpis b,body.dark .hist-story-heading h4,body.dark .hist-complete-heading h4,body.dark .hist-story-month-name strong,body.dark .hist-story-pb b,body.dark .hist-copa-item b{color:#f0f0f5}body.dark .hist-year-ring>div{background:#252638}body.dark .hist-year-ring b{color:#f0f0f5}body.dark .hist-story-cats button{background:rgba(91,141,239,.1);color:#c7d2ef}body.dark .hist-mobile-matrix-wrap{background:#27283a;border-color:rgba(255,255,255,.08)}
 @media(max-width:980px){.hist-quarter-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.hist-copa-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:700px){.hist-year-story{padding:13px}.hist-year-bento{grid-template-columns:1fr}.hist-year-progress-card{display:grid;grid-template-columns:84px minmax(0,1fr);grid-template-rows:auto auto;column-gap:14px;text-align:left;justify-items:start}.hist-year-ring{grid-row:1/3;width:84px;height:84px;padding:7px}.hist-year-ring b{font-size:19px}.hist-year-progress-card>strong{align-self:end;margin:0}.hist-year-progress-card>small{align-self:start}.hist-year-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.hist-quarter-grid{grid-template-columns:1fr}.hist-quarter{padding:8px}.hist-story-cats{grid-template-columns:repeat(auto-fit,minmax(54px,1fr))}.hist-annual-desktop{display:none}.hist-annual-mobile{display:block}.hist-complete-heading{align-items:flex-start}.hist-copa-grid{grid-template-columns:1fr 1fr}.hist-copa-item{min-height:126px;grid-template-columns:31px minmax(0,1fr);padding:10px}.hist-copa-letter{width:31px;height:31px}.hist-copa-item b{font-size:12px}}
 @media(max-width:390px){.hist-copa-grid{grid-template-columns:1fr}.hist-copa-item{min-height:98px;grid-template-columns:34px minmax(0,1fr)}.hist-copa-item em{grid-column:2}.hist-year-kpis b{font-size:13px}.hist-story-heading,.hist-complete-heading{align-items:flex-start}.hist-story-heading>span,.hist-complete-heading>span{max-width:105px;text-align:right}}
 
 /* Histórico simplificado: dos secciones y análisis integrado */
-.hist-tabs-simple button{flex-direction:row;justify-content:center;gap:7px;min-height:43px;font-size:10px}.hist-tabs-simple button span{font-size:15px}.hist-unified-analysis{scroll-margin-top:16px}.hist-compare-strip{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px;margin-top:12px}.hist-compare-strip>div{min-height:74px;padding:10px;border:1px solid rgba(80,90,130,.08);border-radius:13px;background:rgba(91,141,239,.05)}.hist-compare-strip span{display:block;color:#777887;font-size:8px;font-weight:850;text-transform:uppercase}.hist-compare-strip b{display:block;margin-top:5px;color:#292938;font-size:14px}.hist-compare-strip small{display:block;margin-top:4px;font-size:8px;font-weight:900}.hist-compare-strip small.up{color:#168765}.hist-compare-strip small.down{color:#c34c53}.hist-compare-strip small.neutral{color:#858694}.hist-analysis-charts{align-items:stretch}.hist-analysis-charts>.hist-card{margin:0}.hist-period-library{margin-top:18px}.hist-static-row{cursor:default}body.dark .hist-compare-strip>div{background:rgba(91,141,239,.08);border-color:rgba(255,255,255,.08)}body.dark .hist-compare-strip b{color:#f0f0f5}@media(max-width:760px){.hist-compare-strip{grid-template-columns:repeat(2,minmax(0,1fr))}.hist-compare-strip>div:last-child{grid-column:1/-1}.hist-analysis-charts{grid-template-columns:1fr}}@media(max-width:430px){.hist-tabs-simple button{font-size:9px}.hist-tabs-simple button span{font-size:13px}.hist-compare-strip{grid-template-columns:1fr 1fr}}
+.hist-tabs-simple button{flex-direction:row;justify-content:center;gap:7px;min-height:43px;font-size:10px}.hist-tabs-simple button span{font-size:15px}.hist-unified-analysis{scroll-margin-top:16px}.hist-compare-strip{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px;margin-top:12px}.hist-compare-strip>div{min-height:84px;padding:12px;border:1px solid rgba(80,90,130,.08);border-radius:13px;background:rgba(91,141,239,.05)}.hist-compare-strip span{display:block;color:#777887;font-size:10px;font-weight:850;text-transform:uppercase}.hist-compare-strip b{display:block;margin-top:6px;color:#292938;font-size:16px}.hist-compare-strip small{display:block;margin-top:5px;font-size:11px;font-weight:900}.hist-compare-strip small.up{color:#168765}.hist-compare-strip small.down{color:#c34c53}.hist-compare-strip small.neutral{color:#858694}.hist-analysis-charts{align-items:stretch}.hist-analysis-charts>.hist-card{margin:0}.hist-period-library{margin-top:18px}.hist-static-row{cursor:default}body.dark .hist-compare-strip>div{background:rgba(91,141,239,.08);border-color:rgba(255,255,255,.08)}body.dark .hist-compare-strip b{color:#f0f0f5}@media(max-width:760px){.hist-compare-strip{grid-template-columns:repeat(2,minmax(0,1fr))}.hist-compare-strip>div:last-child{grid-column:1/-1}.hist-analysis-charts{grid-template-columns:1fr}}@media(max-width:430px){.hist-tabs-simple button{font-size:9px}.hist-tabs-simple button span{font-size:13px}.hist-compare-strip{grid-template-columns:1fr 1fr}}
 /* Secciones minimizables del Resumen y análisis */
 .hist-collapse-btn{flex:0 0 auto;min-height:34px;padding:7px 10px;border:1px solid rgba(91,141,239,.13);border-radius:10px;background:rgba(91,141,239,.07);color:#3d63c9;font:inherit;font-size:8.5px;font-weight:900;cursor:pointer;white-space:nowrap}.hist-collapse-btn span{display:inline-block;width:13px;font-size:12px;line-height:1}.hist-collapsed>.hist-card-head{margin-bottom:0}.hist-collapsible-content[hidden]{display:none!important}.hist-attention-card{margin-top:12px}.hist-attention-card .hist-attention-grid{margin:10px 0 0}.hist-card-head:has(.hist-collapse-btn){align-items:center}body.dark .hist-collapse-btn{background:rgba(91,141,239,.12);border-color:rgba(255,255,255,.08);color:#b8c8ff}@media(max-width:520px){.hist-collapse-btn{padding:7px 8px;font-size:8px}.hist-card-head:has(.hist-collapse-btn)>div{min-width:0}.hist-card-head:has(.hist-collapse-btn) h3{font-size:13px}}
+
+/* v257 · cuadritos y gráficos legibles en celular */
+@media(max-width:700px){
+  .hist-chart svg{min-height:210px}
+  .hist-single-chart{min-height:200px}
+  .hist-year-trend{padding:14px 12px 10px}
+  .hist-year-trend .hist-chart{margin-top:8px}
+  .hist-year-kpis>div{min-height:96px;padding:14px}
+  .hist-year-kpis b{font-size:18px}
+  .hist-year-kpis span{font-size:11.5px}
+  .hist-story-month{padding:15px;margin-top:10px}
+  .hist-story-month-name strong{font-size:14px}
+  .hist-story-month-name span{font-size:11px}
+  .hist-story-pb b{font-size:16px}
+  .hist-story-pb small{font-size:10px}
+  .hist-story-cats{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+  .hist-story-cats button{min-height:48px;padding:10px 8px}
+  .hist-story-cats b{font-size:11px}
+  .hist-story-cats span{font-size:13px}
+  .hist-story-moves span{font-size:11px;padding:6px 9px}
+  .hist-copa-item{min-height:150px;padding:14px}
+  .hist-copa-item b{font-size:18px}
+  .hist-copa-item p{font-size:12px}
+  .hist-copa-item small{font-size:10.5px}
+  .hist-copa-item em{font-size:12px}
+  .hist-analysis-charts>.hist-card{padding:16px}
+  .hist-kpi-main .hist-kpi{min-height:120px}
+  .hist-kpi-main .hist-kpi strong{font-size:24px}
+  .hist-kpi-main .hist-kpi span{font-size:12px}
+  .hist-attention{min-height:86px}
+  .hist-attention strong{font-size:13px}
+  .hist-attention small{font-size:11px}
+}
+@media(max-width:430px){
+  .hist-chart svg{min-height:230px}
+  .hist-year-kpis{grid-template-columns:1fr 1fr;gap:9px}
+  .hist-story-cats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .hist-copa-grid{grid-template-columns:1fr}
+  .hist-copa-item{min-height:120px;grid-template-columns:40px minmax(0,1fr)}
+  .hist-copa-item em{grid-column:2}
+}
+
+/* v258 · motion graphics de gráficos del Histórico */
+.hist-chart-motion{position:relative;isolation:isolate}
+.hist-chart-motion:before{content:"";position:absolute;inset:8% 4% 18% 8%;border-radius:28px;background:radial-gradient(ellipse at 30% 40%,color-mix(in srgb,var(--tone,#5b8def) 16%,transparent),transparent 68%);opacity:0;pointer-events:none;z-index:0;transition:opacity .8s ease}
+.hist-chart-motion.is-ready:before{opacity:1;animation:hist-chart-glow 3.6s ease-in-out infinite alternate}
+.hist-chart-motion svg{position:relative;z-index:1;overflow:visible}
+.hist-chart-motion .hist-chart-grid,.hist-chart-motion .hist-chart-axis{opacity:0}
+.hist-chart-motion.is-ready .hist-chart-grid,.hist-chart-motion.is-ready .hist-chart-axis{animation:hist-fade-up .45s ease both}
+.hist-chart-motion.is-ready .hist-chart-axis{animation-delay:.05s}
+.hist-chart-motion .hist-chart-line,.hist-chart-motion .hist-chart-shine{fill:none}
+.hist-chart-motion .hist-chart-shine{opacity:0;mix-blend-mode:soft-light;pointer-events:none}
+.hist-chart-motion.is-drawn .hist-chart-shine{opacity:.9;animation:hist-shine-flow 2.8s ease-in-out .9s infinite}
+.hist-chart-motion .hist-chart-area{opacity:0;transform-box:fill-box;transform-origin:center bottom}
+.hist-chart-motion .hist-chart-dot{opacity:0;transform:scale(.2);transform-box:fill-box;transform-origin:center}
+.hist-chart-motion.is-drawn .hist-chart-dot{animation:hist-dot-pop .48s cubic-bezier(.2,1.25,.35,1) both;animation-delay:calc(.55s + var(--i,0) * .08s)}
+.hist-chart-motion .hist-chart-halo{opacity:.75;transform-origin:center;transform-box:fill-box}
+.hist-chart-motion.is-drawn .hist-chart-dot.is-last .hist-chart-halo{animation:hist-halo-pulse 1.8s ease-in-out 1.1s infinite}
+.hist-chart-motion .hist-chart-value{opacity:0;transform:translateY(6px)}
+.hist-chart-motion.is-drawn .hist-chart-value{animation:hist-label-in .4s ease both;animation-delay:calc(.72s + var(--i,0) * .08s)}
+.hist-chart-motion .hist-chart-month{opacity:0}
+.hist-chart-motion.is-drawn .hist-chart-month{animation:hist-fade-up .35s ease both;animation-delay:calc(.4s + var(--i,0) * .05s)}
+.hist-chart-motion.is-static .hist-chart-grid,
+.hist-chart-motion.is-static .hist-chart-axis,
+.hist-chart-motion.is-static .hist-chart-dot,
+.hist-chart-motion.is-static .hist-chart-value,
+.hist-chart-motion.is-static .hist-chart-month,
+.hist-chart-motion.is-static .hist-chart-area,
+.hist-chart-motion.is-static .hist-chart-shine{opacity:1;transform:none;animation:none}
+.hist-single-chart.hist-chart-motion{position:relative;overflow:hidden}
+.hist-single-chart.hist-chart-motion:after{content:"";position:absolute;inset:-30%;background:conic-gradient(from 180deg,transparent,color-mix(in srgb,var(--tone) 18%,transparent),transparent 40%);opacity:0;animation:hist-single-spin 4.5s linear infinite}
+.hist-single-chart.hist-chart-motion.is-ready:after{opacity:1}
+.hist-single-chart.hist-chart-motion .hist-single-dot{position:relative;z-index:1;animation:hist-halo-pulse 1.8s ease-in-out infinite}
+.hist-single-chart.hist-chart-motion strong,.hist-single-chart.hist-chart-motion b,.hist-single-chart.hist-chart-motion small{position:relative;z-index:1}
+.hist-single-chart.hist-chart-motion.is-ready strong{animation:hist-fade-up .5s ease both .05s}
+.hist-single-chart.hist-chart-motion.is-ready b{animation:hist-fade-up .5s ease both .12s}
+.hist-single-chart.hist-chart-motion.is-ready small{animation:hist-fade-up .5s ease both .18s}
+.hist-year-ring{transition:background .8s ease;animation:hist-ring-in .7s cubic-bezier(.22,.9,.28,1) both}
+.hist-year-kpis>div{animation:hist-card-rise .5s ease both;animation-delay:calc(var(--kpi-i,0) * .07s)}
+.hist-year-kpis>div:nth-child(1){--kpi-i:0}.hist-year-kpis>div:nth-child(2){--kpi-i:1}.hist-year-kpis>div:nth-child(3){--kpi-i:2}.hist-year-kpis>div:nth-child(4){--kpi-i:3}
+.hist-story-meter i{transform-origin:left center;animation:hist-meter-fill .85s cubic-bezier(.22,.9,.28,1) both}
+.hist-story-month{animation:hist-card-rise .45s ease both;animation-delay:calc(var(--m-i,0) * .04s)}
+.hist-quarter:nth-child(1) .hist-story-month:nth-child(2){--m-i:0}
+.hist-quarter:nth-child(1) .hist-story-month:nth-child(3){--m-i:1}
+.hist-quarter:nth-child(1) .hist-story-month:nth-child(4){--m-i:2}
+.hist-quarter:nth-child(2) .hist-story-month:nth-child(2){--m-i:3}
+.hist-quarter:nth-child(2) .hist-story-month:nth-child(3){--m-i:4}
+.hist-quarter:nth-child(2) .hist-story-month:nth-child(4){--m-i:5}
+.hist-quarter:nth-child(3) .hist-story-month:nth-child(2){--m-i:6}
+.hist-quarter:nth-child(3) .hist-story-month:nth-child(4){--m-i:8}
+.hist-quarter:nth-child(3) .hist-story-month:nth-child(3){--m-i:7}
+.hist-quarter:nth-child(4) .hist-story-month:nth-child(2){--m-i:9}
+.hist-quarter:nth-child(4) .hist-story-month:nth-child(3){--m-i:10}
+.hist-quarter:nth-child(4) .hist-story-month:nth-child(4){--m-i:11}
+.hist-copa-item{animation:hist-card-rise .5s cubic-bezier(.22,.9,.28,1) both}
+.hist-copa-item.c{animation-delay:.05s}.hist-copa-item.o{animation-delay:.12s}.hist-copa-item.p{animation-delay:.19s}.hist-copa-item.a{animation-delay:.26s}
+.hist-copa-item:after{transform:scaleX(0);transform-origin:left center;animation:hist-meter-fill .7s cubic-bezier(.22,.9,.28,1) .35s both}
+.hist-compare-strip>div{animation:hist-card-rise .42s ease both}
+.hist-compare-strip>div:nth-child(1){animation-delay:.02s}.hist-compare-strip>div:nth-child(2){animation-delay:.07s}.hist-compare-strip>div:nth-child(3){animation-delay:.12s}.hist-compare-strip>div:nth-child(4){animation-delay:.17s}.hist-compare-strip>div:nth-child(5){animation-delay:.22s}
+@keyframes hist-fade-up{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+@keyframes hist-dot-pop{0%{opacity:0;transform:scale(.15)}70%{opacity:1;transform:scale(1.18)}100%{opacity:1;transform:scale(1)}}
+@keyframes hist-label-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes hist-halo-pulse{0%,100%{opacity:.35;transform:scale(.85)}50%{opacity:.9;transform:scale(1.25)}}
+@keyframes hist-chart-glow{from{opacity:.55;transform:scale(1)}to{opacity:1;transform:scale(1.04)}}
+@keyframes hist-shine-flow{0%,100%{opacity:.15}50%{opacity:.85}}
+@keyframes hist-card-rise{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:none}}
+@keyframes hist-meter-fill{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes hist-ring-in{from{opacity:0;transform:scale(.82) rotate(-12deg)}to{opacity:1;transform:none}}
+@keyframes hist-single-spin{to{transform:rotate(360deg)}}
+@media(max-width:700px){
+  .hist-chart-motion:before{inset:10% 2% 20% 6%}
+  .hist-chart-motion.is-drawn .hist-chart-dot.is-last .hist-chart-halo{animation-duration:2.1s}
+}
+
+/* v259 · Histórico en modos: Comparar | Mi año | Cargar */
+.hist-tabs-3{grid-template-columns:repeat(3,minmax(0,1fr));max-width:720px}
+.hist-tabs-3 button{font-size:9.5px;padding:9px 3px}
+.hist-tabs-simple.hist-tabs-3 button{gap:5px;min-height:44px}
+.hist-hero-compact{padding:16px 17px;margin-bottom:11px}
+.hist-hero-compact h2{font-size:19px;margin:5px 0 6px}
+.hist-hero-compact p{font-size:11px}
+.hist-compare-home{display:grid;gap:11px}
+.hist-compare-picker{margin-bottom:0}
+.hist-main-chart-card{margin-bottom:0}
+.hist-metric-chips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}
+.hist-metric-chip{border:0;border-radius:999px;padding:8px 11px;background:rgba(91,141,239,.1);color:#3d63c9;font:inherit;font-size:10px;font-weight:900;cursor:pointer}
+.hist-metric-chip.active{background:linear-gradient(135deg,#5b8def,#875fdd);color:#fff;box-shadow:0 5px 12px rgba(91,112,210,.22)}
+.hist-detail-stack{display:grid;gap:12px}
+.hist-subcard{padding:12px;border:1px solid rgba(80,90,130,.08);border-radius:14px;background:rgba(255,255,255,.55)}
+.hist-subcard h4{margin:0 0 3px;color:#292938;font-size:13px}
+.hist-subcard>p{margin:0 0 9px;color:#777887;font-size:10.5px}
+.hist-compare-home .hist-attention-card{margin-top:0}
+body.dark .hist-metric-chip{background:rgba(91,141,239,.14);color:#b8c8ff}
+body.dark .hist-subcard{background:rgba(28,29,46,.55);border-color:rgba(255,255,255,.08)}
+body.dark .hist-subcard h4{color:#f0f0f5}
+@media(max-width:430px){
+  .hist-tabs-3 button{font-size:8.5px;padding:8px 2px;gap:3px}
+  .hist-tabs-3 button span{font-size:13px}
+  .hist-metric-chip{padding:7px 9px;font-size:9.5px}
+  .hist-hero-compact h2{font-size:17px}
+}
+
+/* v260 · tipografía y datos legibles en PC / pantallas grandes */
+@media(min-width:900px){
+  .hist-view{max-width:1180px;margin:0 auto;padding-left:8px;padding-right:8px}
+  .hist-tabs{max-width:780px;padding:6px;gap:8px;margin-bottom:16px}
+  .hist-tabs button{font-size:12px;padding:12px 10px;border-radius:14px}
+  .hist-tabs button span{font-size:18px}
+  .hist-tabs-simple button{min-height:48px;font-size:12.5px;gap:8px}
+  .hist-tabs-simple button span{font-size:17px}
+  .hist-tabs-3{max-width:820px}
+  .hist-tabs-3 button{font-size:12px;padding:11px 8px}
+
+  .hist-hero{padding:26px 28px;border-radius:26px;margin-bottom:16px}
+  .hist-hero .eyebrow{font-size:11px;letter-spacing:1px}
+  .hist-hero h2{font-size:28px;margin:8px 0 10px}
+  .hist-hero p{font-size:14.5px;line-height:1.5;max-width:720px}
+  .hist-hero-actions{margin-top:16px;gap:10px}
+  .hist-hero-actions button{padding:12px 16px;font-size:13px;border-radius:14px}
+  .hist-hero-compact{padding:22px 26px}
+  .hist-hero-compact h2{font-size:26px;margin:6px 0 8px}
+  .hist-hero-compact p{font-size:14px;max-width:720px}
+
+  .hist-card{padding:20px 22px;border-radius:22px;margin-bottom:14px}
+  .hist-card-head{margin-bottom:14px;gap:14px}
+  .hist-card-head h3{font-size:18px}
+  .hist-card-head p{font-size:13px;line-height:1.45}
+  .hist-card-head .hist-badge{padding:6px 12px;font-size:11px}
+
+  .hist-statusbar{padding:14px 16px;margin-bottom:14px}
+  .hist-statusbar strong{font-size:14px}
+  .hist-statusbar small{font-size:12px}
+  .hist-mini-btn{padding:9px 14px;font-size:12px}
+
+  .hist-kpi{min-height:110px;padding:16px}
+  .hist-kpi .k-icon{font-size:18px}
+  .hist-kpi strong{font-size:26px}
+  .hist-kpi span{font-size:12.5px;margin-top:6px}
+  .hist-kpi small{font-size:12px}
+  .hist-kpi-main .hist-kpi{min-height:130px}
+  .hist-kpi-main .hist-kpi strong{font-size:30px}
+  .hist-kpi-main .hist-kpi span{font-size:13.5px}
+
+  .hist-compare-strip{gap:10px;margin-top:14px}
+  .hist-compare-strip>div{min-height:104px;padding:16px;border-radius:16px}
+  .hist-compare-strip span{font-size:12px}
+  .hist-compare-strip b{font-size:22px;margin-top:8px}
+  .hist-compare-strip small{font-size:13px;margin-top:6px}
+
+  .hist-picker-tools{gap:8px;margin-bottom:12px}
+  .hist-picker-tools button{padding:10px 14px;font-size:12px}
+  .hist-month-picker{grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;margin-bottom:14px}
+  .hist-month-option span{padding:12px 8px;font-size:12.5px;border-radius:14px}
+
+  .hist-metric-chips{gap:8px;margin-bottom:12px}
+  .hist-metric-chip{padding:10px 14px;font-size:12.5px}
+
+  .hist-chart svg{min-height:280px}
+  .hist-single-chart{min-height:220px}
+  .hist-single-chart strong{font-size:34px}
+  .hist-single-chart b{font-size:15px}
+  .hist-single-chart small{font-size:13px}
+
+  .hist-table{min-width:640px}
+  .hist-table th{font-size:11px;padding:12px 10px}
+  .hist-table td{font-size:13px;padding:12px 10px}
+  .hist-table td strong{font-size:13.5px}
+  .hist-search input{padding:12px 14px 12px 38px;font-size:13.5px;border-radius:14px}
+
+  .hist-attention{min-height:92px;padding:14px 16px;gap:12px}
+  .hist-attention>span{width:46px;height:46px;font-size:20px}
+  .hist-attention strong{font-size:15px}
+  .hist-attention small{font-size:12.5px}
+  .hist-attention em{font-size:11.5px;padding:7px 10px}
+
+  .hist-subcard{padding:16px;border-radius:16px}
+  .hist-subcard h4{font-size:16px}
+  .hist-subcard>p{font-size:13px;margin-bottom:12px}
+  .hist-detail-stack{gap:16px;grid-template-columns:1fr 1fr}
+  .hist-compare-home{gap:14px}
+
+  .hist-primary,.hist-secondary,.hist-danger{padding:12px 18px;font-size:13px;border-radius:14px}
+  .hist-collapse-btn{min-height:38px;padding:8px 12px;font-size:11.5px}
+
+  .hist-strategy{padding:16px 18px}
+  .hist-strategy h4{font-size:15px}
+  .hist-strategy p{font-size:13px}
+  .hist-strategy .evidence{font-size:12px;padding:9px 11px}
+  .hist-strategy .action{font-size:13px}
+  .hist-strategy .s-priority{font-size:10px;padding:4px 9px}
+
+  .hist-year-story{padding:22px}
+  .hist-year-panel-title b{font-size:16px}
+  .hist-year-panel-title small{font-size:13px}
+  .hist-year-panel-title>span{font-size:12px;padding:6px 10px}
+  .hist-year-kpis>div{min-height:104px;padding:16px}
+  .hist-year-kpis b{font-size:22px}
+  .hist-year-kpis span{font-size:13px}
+  .hist-year-ring{width:140px;height:140px;padding:12px}
+  .hist-year-ring b{font-size:30px}
+  .hist-year-ring span{font-size:11px}
+  .hist-year-progress-card>strong{font-size:13px}
+  .hist-year-progress-card>small{font-size:11px}
+  .hist-year-trend .hist-chart svg{min-height:260px}
+
+  .hist-story-heading h4,.hist-complete-heading h4{font-size:18px}
+  .hist-story-heading p,.hist-complete-heading p{font-size:13px}
+  .hist-story-heading>span,.hist-complete-heading>span{font-size:11.5px;padding:7px 11px}
+
+  .hist-quarter{padding:14px}
+  .hist-quarter-head b{font-size:13px}
+  .hist-quarter-head span{font-size:12px}
+  .hist-story-month{padding:16px;margin-top:10px;border-radius:18px}
+  .hist-story-month-name strong{font-size:15px}
+  .hist-story-month-name span{font-size:12px}
+  .hist-story-pb b{font-size:18px}
+  .hist-story-pb small{font-size:11px}
+  .hist-story-meter{height:8px;margin:12px 0}
+  .hist-story-cats{gap:8px}
+  .hist-story-cats button{min-height:52px;padding:10px 8px;border-radius:12px}
+  .hist-story-cats b{font-size:12px}
+  .hist-story-cats span{font-size:14px}
+  .hist-story-moves span{font-size:12px;padding:6px 10px}
+  .hist-story-month.pending{min-height:140px}
+  .hist-story-month.pending strong{font-size:15px}
+  .hist-story-month.pending span{font-size:13px}
+
+  .hist-copa{padding:22px}
+  .hist-copa-kicker{font-size:12px}
+  .hist-copa-item{min-height:168px;padding:18px;grid-template-columns:46px minmax(0,1fr);gap:12px}
+  .hist-copa-letter{width:46px;height:46px;font-size:22px;border-radius:14px}
+  .hist-copa-item small{font-size:12px}
+  .hist-copa-item b{font-size:22px;margin-top:8px}
+  .hist-copa-item p{font-size:13.5px;line-height:1.4}
+  .hist-copa-item em{font-size:13px}
+  .hist-copa-note{font-size:13px;padding:12px 14px}
+
+  .hist-annual-table-wrap th,.hist-annual-table-wrap td{height:48px;padding:7px;font-size:12.5px}
+  .hist-annual-table-wrap thead th{font-size:11px}
+  .hist-annual-table-wrap th:first-child{min-width:210px;font-size:13px;padding-left:14px}
+  .hist-annual-table-wrap td button{min-height:36px;font-size:12.5px}
+  .hist-year-story .hist-annual-table-wrap th,.hist-year-story .hist-annual-table-wrap td{height:44px;font-size:12px}
+  .hist-year-story .hist-annual-table-wrap td button{min-height:32px;font-size:12px}
+
+  .hist-full-report-cta{padding:22px 24px;margin:20px 0 32px;gap:18px}
+  .hist-full-report-cta h3{font-size:20px}
+  .hist-full-report-cta p{font-size:13.5px}
+  .hist-full-report-cta button{min-height:52px;padding:12px 20px;font-size:13px}
+  .hist-report-mark{width:64px;height:64px;font-size:14px}
+  .hist-share-pdf{min-height:42px;padding:10px 16px;font-size:12.5px}
+
+  .hist-period{padding:14px;gap:12px}
+  .hist-period-info h4{font-size:15px}
+  .hist-period-info p{font-size:12.5px}
+  .hist-period-date{width:56px;height:56px}
+  .hist-period-date b{font-size:13px}
+  .hist-period-date small{font-size:10px}
+  .hist-action-menu button{padding:9px 12px;font-size:12px}
+
+  .hist-upload b{font-size:14px}
+  .hist-upload small{font-size:12px}
+  .hist-upload .u-state{font-size:11px;padding:6px 10px}
+  .hist-file-slot b{font-size:13px}
+  .hist-file-slot small{font-size:11px}
+  .hist-month-head h3{font-size:17px}
+  .hist-month-head span{font-size:11px}
+  .hist-month-count{font-size:12px;padding:6px 10px}
+
+  .hist-data-row{min-height:80px;padding:12px}
+  .hist-data-row strong{font-size:15px}
+  .hist-data-row small{font-size:12px}
+  .hist-data-row>b{font-size:13px}
+  .hist-detail-head h2{font-size:26px}
+  .hist-detail-head p{font-size:14px}
+  .hist-person-kpis b{font-size:24px}
+  .hist-person-kpis span{font-size:12.5px}
+  .hist-drill-note{font-size:13px;padding:13px 14px}
+
+  .hist-empty h3{font-size:18px}
+  .hist-empty p{font-size:14px}
+  .hist-section-title h3{font-size:20px}
+  .hist-section-title p{font-size:14px}
+}
+
+@media(min-width:1200px){
+  .hist-view{max-width:1280px}
+  .hist-chart svg{min-height:310px}
+  .hist-year-trend .hist-chart svg{min-height:290px}
+  .hist-hero h2,.hist-hero-compact h2{font-size:30px}
+  .hist-compare-strip b{font-size:24px}
+  .hist-card-head h3{font-size:19px}
+  .hist-copa-item b{font-size:24px}
+  .hist-story-pb b{font-size:20px}
+}
