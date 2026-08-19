@@ -40,10 +40,13 @@ test('Archivo conserva los doce meses, adapta la matriz y suma la lectura COPA',
   await page.setViewportSize({ width:390, height:844 });
   await mountArchive(page);
 
-  await expect(page.locator('.hist-quarter')).toHaveCount(4);
-  await expect(page.locator('.hist-story-month')).toHaveCount(12);
-  await expect(page.locator('.hist-story-month:not(.pending)')).toHaveCount(2);
-  await expect(page.locator('.hist-story-month.pending')).toHaveCount(10);
+  await expect(page.locator('.hist-album-tile')).toHaveCount(12);
+  await expect(page.locator('.hist-album-tile:not(.pending)')).toHaveCount(2);
+  await expect(page.locator('.hist-album-tile.pending')).toHaveCount(10);
+  await expect(page.locator('.hist-quarter, .hist-story-month')).toHaveCount(0);
+  await expect(page.locator('.hist-album-readout')).toHaveCount(1);
+  await expect(page.locator('.hist-album-readout')).toContainText('Febrero: tu equipo hizo 130 PB y sumó 2 ingresos');
+  await expect(page.locator('.hist-album-actions button')).toHaveCount(4);
   await expect(page.locator('.hist-annual-desktop')).toBeHidden();
   await expect(page.locator('.hist-annual-mobile')).toBeVisible();
   expect(await page.locator('.hist-mobile-matrix-wrap tbody tr').count()).toBeGreaterThanOrEqual(60);
