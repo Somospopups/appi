@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v261-historico-desktop-type';
+const CACHE_NAME = 'appi-v262-historico-dark-pills';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

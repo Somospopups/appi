@@ -214,6 +214,12 @@ body.dark .hist-subcard h4{color:#f0f0f5}
   .hist-hero-compact h2{font-size:17px}
 }
 
+/* v262 · modo noche: botones del Histórico que quedaban en paleta clara */
+body.dark .hist-hero-actions button{background:rgba(37,40,58,.92);color:#c5d4ff}
+body.dark .hist-hero-actions button.secondary{background:rgba(255,255,255,.12);color:#f0f0f5;border-color:rgba(255,255,255,.22)}
+body.dark .hist-mini-btn,body.dark .hist-secondary,body.dark .hist-more,body.dark .hist-action-menu button,body.dark .hist-picker-tools button,body.dark .hist-year-nav button{background:rgba(91,141,239,.18);color:#c5d4ff}
+body.dark .hist-action-menu button.danger{background:rgba(222,69,78,.16);color:#ff8a86}
+
 /* v261 · tipografía y datos legibles en PC / pantallas grandes */
 @media(min-width:900px){
   .hist-view{max-width:1180px;margin:0 auto;padding-left:8px;padding-right:8px}
