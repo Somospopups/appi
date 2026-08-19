@@ -40,3 +40,28 @@ test('las bibliotecas de ejecución están fijadas dentro del repositorio', () =
     expect(sw).toContain(`./vendor/${file}`);
   }
 });
+
+test('los pines del mapa salen del repositorio y no de un CDN', () => {
+  // El mapa de garantías se usa en la calle, con mala señal. Si los pines
+  // vinieran de internet, el distribuidor abriría el mapa y no vería ninguno:
+  // justo el dato que el mapa existe para mostrar (rojo vencida, amarillo por
+  // vencer, verde vigente).
+  const html = read('index.html');
+  const sw = read('service-worker.js');
+  const pines = [
+    'marker-icon-2x-red.png','marker-icon-2x-green.png',
+    'marker-icon-2x-yellow.png','marker-shadow-0.7.7.png'
+  ];
+
+  for (const pin of pines) {
+    expect(fs.existsSync(`vendor/images/${pin}`), `Falta vendor/images/${pin}`).toBe(true);
+    expect(html).toContain(`./vendor/images/${pin}`);
+    expect(sw, `${pin} debe estar cacheado para el primer uso offline`).toContain(`./vendor/images/${pin}`);
+  }
+
+  // Ningún ícono de Leaflet puede volver a colgarse de un servidor ajeno.
+  expect(html).not.toMatch(/iconUrl:\s*['"]https?:\/\//i);
+  expect(html).not.toMatch(/shadowUrl:\s*['"]https?:\/\//i);
+  expect(html).not.toContain('raw.githubusercontent.com');
+  expect(html).not.toContain('cdnjs.cloudflare.com');
+});

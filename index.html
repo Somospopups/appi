@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<script>window._pendingFile=null; window.cargarArchivoU = function(f){ console.log('cargarArchivoU early stub, queuing', f?.name); window._pendingFile=f; if(window._pendingFile) setTimeout(()=>{ if(window.cargarArchivoUReal && window._pendingFile){ const file=window._pendingFile; window._pendingFile=null; window.cargarArchivoUReal(file); } }, 800); };</script>
+<script>window._pendingFile=null; window.cargarArchivoU = function(f){ console.log('cargarArchivoU early stub, queuing'); window._pendingFile=f; if(window._pendingFile) setTimeout(()=>{ if(window.cargarArchivoUReal && window._pendingFile){ const file=window._pendingFile; window._pendingFile=null; window.cargarArchivoUReal(file); } }, 800); };</script>
 <script>
 window.openHistorico=function(){
   window.__histOpenRequested=true;
@@ -67,7 +67,7 @@ window.openStock=function(){
 <link rel="icon" href="./icon-192.png" />
 <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
 <link rel="manifest" href="./manifest.json" />
-<!-- APPI v265 · Compartir APPI desde el engranaje -->
+<!-- APPI v269 · El mapa funciona sin internet -->
 <link rel="apple-touch-startup-image" href="./splash/apple-splash-1170x2532.png" />
 <link rel="apple-touch-startup-image" href="./splash/apple-splash-640x1136.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" />
 <link rel="apple-touch-startup-image" href="./splash/apple-splash-750x1334.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" />
@@ -4112,7 +4112,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v268 · Segura</div>
+  <div class="ds-foot">APPI · v269 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -6969,7 +6969,7 @@ function validarTitularContraCuenta(titular){
 }
 function procesarExcel(rows){
   console.log('📊 Total de filas leídas:', rows.length);
-  console.log('📊 Primeras 20 filas:', rows.slice(0, 20));
+  // Sin volcar el contenido: estas filas traen nombres, DIP y teléfonos.
 
   let headerRow = -1;
   for(let i = 0; i < Math.min(rows.length, 60); i++){
@@ -6990,7 +6990,7 @@ function procesarExcel(rows){
     });
     if(tieneNombre && keywordCount >= 4){
       headerRow = i;
-      console.log('✅ Encabezado REAL encontrado en fila:', i, r);
+      console.log('✅ Encabezado REAL encontrado en fila:', i);
       break;
     }
   }
@@ -7024,7 +7024,7 @@ function procesarExcel(rows){
       if(catMatch && !titular.categoria) titular.categoria = catMatch[1].trim();
     });
   }
-  console.log('👤 Titular detectado:', titular);
+  console.log('👤 Titular detectado:', titular ? 'sí' : 'no');
   validarTitularContraCuenta(titular);
 
   const headerRawRow = rows[headerRow] || [];
@@ -11536,7 +11536,7 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='268';
+      const swVersion='269';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 
@@ -14335,19 +14335,22 @@ window.mostrarEnMapaU=async function(query, lista=null){
   setTimeout(doInvalidate,1500);
   markersU.forEach(m=>mapU.removeLayer(m));
   markersU=[];
+  // Los pines viven en vendor/images: son los mismos archivos de siempre, pero
+  // guardados en el repo. Sin esto, el mapa se quedaba sin marcadores cuando la
+  // señal no alcanzaba, que es justo donde se lo usa.
   const redIcon = L.icon({
-    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
-    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+    iconUrl: './vendor/images/marker-icon-2x-red.png',
+    shadowUrl: './vendor/images/marker-shadow-0.7.7.png',
     iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41]
   });
   const greenIcon = L.icon({
-    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
-    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+    iconUrl: './vendor/images/marker-icon-2x-green.png',
+    shadowUrl: './vendor/images/marker-shadow-0.7.7.png',
     iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41]
   });
   const yellowIcon = L.icon({
-    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-yellow.png',
-    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+    iconUrl: './vendor/images/marker-icon-2x-yellow.png',
+    shadowUrl: './vendor/images/marker-shadow-0.7.7.png',
     iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41]
   });
   function getIconForEstado(estado){
@@ -14450,7 +14453,7 @@ function cargarArchivoU(file){
       if(infoEl) infoEl.innerHTML=`❌ Error: librería XLSX no cargada - recargá con internet y desactivá AdBlock para cdn.jsdelivr.net`;
       return;
     }
-    console.log('📂 Archivo seleccionado:', file.name, file.size, file.type);
+    console.log('📂 Archivo seleccionado:', file.size, file.type);
     const reader=new FileReader();
     reader.onerror=(e)=>{ 
       console.error('FileReader error', e);
@@ -14479,7 +14482,7 @@ function cargarArchivoU(file){
           try{
             const ws=wb.Sheets[name];
             const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:'', blankrows:false});
-            console.log(`Hoja ${name}: ${rows.length} filas`, rows.slice(0,3));
+            console.log(`Hoja ${name}: ${rows.length} filas`);
             const res=parseRowsU(rows);
             debugAll.push(`Hoja "${name}": ${rows.length} filas, ${res.data.length} usuarios detectados | Header: ${res.debug.substring(0,120)}`);
             if(res.data.length>mejor.data.length) mejor=res;
@@ -14534,7 +14537,7 @@ function cargarArchivoU(file){
 window.cargarArchivoU = cargarArchivoU;
 window.cargarArchivoUReal = cargarArchivoU;
 if(window._pendingFile){
-  console.log('Procesando archivo pendiente', window._pendingFile.name);
+  console.log('Procesando archivo pendiente');
   const pf=window._pendingFile; window._pendingFile=null;
   setTimeout(()=>{ try{ cargarArchivoU(pf); }catch(e){ console.error(e); } }, 300);
 }
@@ -14582,7 +14585,7 @@ function initUsuarios(){
   const onFileSelected=e=>{
     const f=e.target.files && e.target.files[0];
     if(f){
-      console.log('Archivo elegido',f.name,f.size);
+      console.log('Archivo elegido',f.size);
       try{ cargarArchivoU(f); }catch(err){ console.error(err); window.APPIDialog.alert('Error al leer el archivo: '+err.message,{title:'Error',icon:'⚠️'}); }
     }
     setTimeout(()=>{ try{ e.target.value=''; }catch(_){} },600);
