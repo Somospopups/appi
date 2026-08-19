@@ -67,7 +67,7 @@ window.openStock=function(){
 <link rel="icon" href="./icon-192.png" />
 <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
 <link rel="manifest" href="./manifest.json" />
-<!-- APPI v261 · histórico: datos legibles en PC -->
+<!-- APPI v262 · histórico: modo noche botones + píldoras -->
 <link rel="apple-touch-startup-image" href="./splash/apple-splash-1170x2532.png" />
 <link rel="apple-touch-startup-image" href="./splash/apple-splash-640x1136.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" />
 <link rel="apple-touch-startup-image" href="./splash/apple-splash-750x1334.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" />
@@ -332,6 +332,12 @@ body.dark .hist-subcard h4{color:#f0f0f5}
   .hist-metric-chip{padding:7px 9px;font-size:9.5px}
   .hist-hero-compact h2{font-size:17px}
 }
+
+/* v262 · modo noche: botones del Histórico que quedaban en paleta clara */
+body.dark .hist-hero-actions button{background:rgba(37,40,58,.92);color:#c5d4ff}
+body.dark .hist-hero-actions button.secondary{background:rgba(255,255,255,.12);color:#f0f0f5;border-color:rgba(255,255,255,.22)}
+body.dark .hist-mini-btn,body.dark .hist-secondary,body.dark .hist-more,body.dark .hist-action-menu button,body.dark .hist-picker-tools button,body.dark .hist-year-nav button{background:rgba(91,141,239,.18);color:#c5d4ff}
+body.dark .hist-action-menu button.danger{background:rgba(222,69,78,.16);color:#ff8a86}
 
 /* v261 · tipografía y datos legibles en PC / pantallas grandes */
 @media(min-width:900px){
@@ -4091,7 +4097,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v261 · Segura</div>
+  <div class="ds-foot">APPI · v262 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -15391,7 +15397,7 @@ function lineChart(periods,metric,color,suffix){
   const areaD=`M${left} ${(top+ch).toFixed(1)} `+pts.map(p=>`L${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ')+` L${(left+cw).toFixed(1)} ${(top+ch).toFixed(1)} Z`;
   const grids=[0,.25,.5,.75,1].map(t=>{const y=top+t*ch,v=max-t*(max-min);return `<line class="hist-chart-grid" x1="${left}" y1="${y}" x2="${left+cw}" y2="${y}" stroke="#9aa3b5" stroke-opacity=".18"/><text class="hist-chart-axis" x="${left-8}" y="${y+4}" text-anchor="end" font-size="12" font-weight="700" fill="#8a8a94">${esc(fmt(v))}${suffix}</text>`}).join('');
   const monthLabels=periods.map((p,i)=>`<text class="hist-chart-month" x="${pts[i].x}" y="${Ht-10}" text-anchor="middle" font-size="12" font-weight="700" fill="#777887" style="--i:${i}">${SHORT_H[p.month]} ${String(p.year).slice(-2)}</text>`).join('');
-  const valueLabels=pts.map((point,i)=>{const text=`${fmt(vals[i])}${suffix}`,width=Math.max(30,text.length*6.2+12),below=point.y<top+14,labelY=below?point.y+24:point.y-14,rectY=labelY-12;return `<g class="hist-chart-value" style="--i:${i}"><rect x="${point.x-width/2}" y="${rectY}" width="${width}" height="20" rx="8" fill="#fff" fill-opacity=".94" stroke="${color}" stroke-opacity=".2"/><text x="${point.x}" y="${labelY}" text-anchor="middle" font-size="12" font-weight="900" fill="${color}">${esc(text)}</text></g>`}).join('');
+  const valueLabels=pts.map((point,i)=>{const text=`${fmt(vals[i])}${suffix}`,width=Math.max(30,text.length*6.2+12),below=point.y<top+14,labelY=below?point.y+24:point.y-14,rectY=labelY-12,cx=Math.max(width/2+4,Math.min(W-width/2-4,point.x));return `<g class="hist-chart-value" style="--i:${i}"><rect x="${cx-width/2}" y="${rectY}" width="${width}" height="20" rx="8" fill="#fff" fill-opacity=".94" stroke="${color}" stroke-opacity=".2"/><text x="${cx}" y="${labelY}" text-anchor="middle" font-size="12" font-weight="900" fill="${color}">${esc(text)}</text></g>`}).join('');
   const dots=pts.map((point,i)=>{const last=i===pts.length-1;return `<g class="hist-chart-dot${last?' is-last':''}" style="--i:${i}" transform="translate(${point.x.toFixed(1)} ${point.y.toFixed(1)})"><circle class="hist-chart-halo" r="11" fill="${color}" fill-opacity=".16"/><circle class="hist-chart-point" r="5.5" fill="${color}" stroke="#fff" stroke-width="2.5"><title>${periods[i].label}: ${fmt(vals[i])}${suffix}</title></circle></g>`}).join('');
   const gradId=`histGrad-${metric}-${Math.abs(hashCode(color+vals.join(',')))%99999}`;
   return `<div class="hist-chart hist-chart-motion" style="--tone:${color}"><svg viewBox="0 0 ${W} ${Ht}" role="img" aria-label="Gráfico de ${esc(metric)}"><defs><linearGradient id="${gradId}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${color}" stop-opacity=".28"/><stop offset="100%" stop-color="${color}" stop-opacity="0"/></linearGradient><linearGradient id="${gradId}-shine" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#fff" stop-opacity="0"/><stop offset="45%" stop-color="#fff" stop-opacity=".55"/><stop offset="100%" stop-color="#fff" stop-opacity="0"/></linearGradient></defs>${grids}<path class="hist-chart-area" d="${areaD}" fill="url(#${gradId})"/><path class="hist-chart-line" d="${pathD}" fill="none" stroke="${color}" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/><path class="hist-chart-shine" d="${pathD}" fill="none" stroke="url(#${gradId}-shine)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>${valueLabels}${dots}${monthLabels}</svg></div>`;
