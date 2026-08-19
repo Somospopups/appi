@@ -20,9 +20,9 @@ const FILE_TYPES={
   ingresos:{label:'Ingresos',icon:'IN',input:'histFileIngresos'}
 };
 const H={
-  db:null,periods:[],reports:[],tab:'dashboard',ready:false,rendering:false,
+  db:null,periods:[],reports:[],tab:'comparar',ready:false,rendering:false,
   uploadYear:new Date().getFullYear(),uploads:{},fileTarget:null,
-  selected:new Set(),openMenu:'',personSearch:'',lastReport:null,syncing:false,syncLog:[]
+  selected:new Set(),openMenu:'',personSearch:'',lastReport:null,syncing:false,syncLog:[],chartMetric:'pbPersonal'
 };
 
 const $=id=>document.getElementById(id);
@@ -131,9 +131,7 @@ async function refreshData(){
   }
   H.reports=(await dbGetAll('reports')).sort((a,b)=>String(b.createdAt).localeCompare(String(a.createdAt)));
   H.lastReport=H.reports[0]||null;notifyDbChange();
-  if(!H.selected.size&&H.periods.length){
-    const last=H.periods.slice(-Math.min(2,H.periods.length));last.forEach(p=>H.selected.add(p.id));
-  }
+  if(!H.selected.size&&H.periods.length) ensureDefaultSelection();
 }
 
 async function sha256(file){
@@ -270,17 +268,33 @@ async function saveMonthPeriod(id){
     if(existing&&!await window.APPIDialog.confirm(`${MONTHS_H[draft.month]} ${draft.year} ya está guardado.`,{title:'Actualizar cierre',icon:'📈',okText:'Actualizar'})){render();return}
     const record=await buildPeriodRecord(draft),db=await openDB();
     await new Promise((resolve,reject)=>{const tx=db.transaction(['periods','files'],'readwrite');tx.objectStore('periods').put(record);for(const type of Object.keys(FILE_TYPES)){const file=draft.files[type];tx.objectStore('files').put({key:`${record.id}:${type}`,periodId:record.id,type,name:file.name,size:file.size,mime:file.type||'',lastModified:file.lastModified||0,blob:file})}tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)});
-    delete H.uploads[id];await refreshData();H.selected=new Set(H.periods.slice(-Math.min(2,H.periods.length)).map(p=>p.id));render();toast(`✓ ${record.label} guardado`,2400);try{haptic(20)}catch(e){}
+    delete H.uploads[id];await refreshData();ensureDefaultSelection(true);render();toast(`✓ ${record.label} guardado`,2400);try{haptic(20)}catch(e){}
     if(navigator.onLine&&cloudReady()&&getSession())setTimeout(()=>syncAll(false),400);
   }catch(e){console.error('Histórico guardar',e);toast(`No se pudo guardar: ${e.message}`,3500);render()}
 }
 
-function setActiveTab(){document.querySelectorAll('.hist-tabs [data-hist-tab]').forEach(b=>b.classList.toggle('active',b.dataset.histTab===H.tab))}
-function openTab(tab){H.tab=['cargar','meses'].includes(tab)?'cargar':'dashboard';setActiveTab();render()}
+function normalizeHistTab(tab){
+  if(['cargar','meses','upload'].includes(tab))return 'cargar';
+  if(['anio','year','mi-anio','dashboard-year'].includes(tab))return 'anio';
+  if(['analizar','compare','comparar','dashboard','resumen'].includes(tab))return 'comparar';
+  return 'comparar';
+}
+function setActiveTab(){document.querySelectorAll('.hist-tabs [data-hist-tab]').forEach(b=>b.classList.toggle('active',normalizeHistTab(b.dataset.histTab)===H.tab))}
+function openTab(tab){H.tab=normalizeHistTab(tab);setActiveTab();render()}
+function ensureDefaultSelection(force){
+  if(!H.periods.length){H.selected.clear();return}
+  if(!force&&H.selected.size)return;
+  H.selected.clear();
+  const latest=H.periods[H.periods.length-1];
+  const yearList=H.periods.filter(p=>p.year===latest.year);
+  (yearList.length?yearList:H.periods).forEach(p=>H.selected.add(p.id));
+}
 function render(){
   const c=$('historicoContent');if(!c||H.rendering)return;H.rendering=true;
   try{
-    if(H.tab==='cargar')renderUpload(c);else renderDashboard(c);
+    if(H.tab==='cargar')renderUpload(c);
+    else if(H.tab==='anio')renderYearView(c);
+    else renderCompareView(c);
   }finally{H.rendering=false}
   updateSyncStatus();
 }
@@ -387,34 +401,106 @@ async function shareFullHistoricalReport(year){
   const pages=pdf.getNumberOfPages();for(let page=1;page<=pages;page++){pdf.setPage(page);if(page>1){color('draw',C.line);pdf.line(M,PH-19,W-M,PH-19)}setFont(6.3,'normal',C.muted);pdf.text(`APPI · Informe completo ${year}`,M,PH-8);pdf.text(`Página ${page} de ${pages}`,W-M,PH-8,{align:'right'})}
   const blob=pdf.output('blob'),file=new File([blob],fileName,{type:'application/pdf'});if(navigator.canShare&&navigator.canShare({files:[file]})){try{await navigator.share({files:[file],title:`Informe completo APPI ${year}`,text:`Informe completo ${year} generado por APPI, listo para compartir por WhatsApp.`});toast('Informe compartido',2300);return}catch(error){if(error&&error.name==='AbortError'){toast('Se canceló el envío del informe.',2200);return}}}pdf.save(fileName);toast('Informe PDF descargado. Ya podés compartirlo por WhatsApp.',3600)
 }
-function renderUnifiedAnalysis(){if(!H.periods.length)return '';let periods=selectedPeriods();if(!periods.length){H.periods.slice(-Math.min(2,H.periods.length)).forEach(p=>H.selected.add(p.id));periods=selectedPeriods()}const analysis=analyzePeriods(periods),latest=periods[periods.length-1],first=periods[0];return `<section id="histUnifiedAnalysis" class="hist-unified-analysis"><div class="hist-card"><div class="hist-card-head"><div><h3>Comparar y analizar</h3><p>Elegí los cierres que querés estudiar dentro del mismo resumen.</p></div><span class="hist-badge">${periods.length} seleccionados</span></div><div class="hist-picker-tools"><button data-pick="latest">Último</button><button data-pick="last2">Últimos 2</button><button data-pick="last6">Últimos 6</button><button data-pick="year">Año ${latest.year}</button><button data-pick="all">Todos</button></div><div class="hist-month-picker">${H.periods.map(p=>`<label class="hist-month-option"><input type="checkbox" value="${p.id}" ${H.selected.has(p.id)?'checked':''}><span>${SHORT_H[p.month]} ${String(p.year).slice(-2)}</span></label>`).join('')}</div><div class="hist-compare-strip"><div><span>PB del equipo</span><b>${fmt(latest.summary.pbPersonal)} PB</b><small class="${analysis.pbDelta.cls}">${esc(analysis.pbDelta.text)}</small></div><div><span>Actividad</span><b>${latest.summary.activePct}%</b><small class="${analysis.activeDelta.cls}">${esc(analysis.activeDelta.text)}</small></div><div><span>Personas</span><b>${latest.summary.people}</b><small class="${analysis.peopleDelta.cls}">${esc(analysis.peopleDelta.text)}</small></div><div><span>Ingresos</span><b>${latest.summary.incomeCount}</b><small class="${analysis.incomeDelta.cls}">${esc(analysis.incomeDelta.text)}</small></div><div><span>Pendientes</span><b>${fmt(latest.summary.pending)}</b><small class="${analysis.pendingDelta.cls}">${esc(analysis.pendingDelta.text)}</small></div></div></div><div class="hist-two-cols hist-analysis-charts"><div class="hist-card"><div class="hist-card-head"><div><h3>Actividad</h3><p>Porcentaje de personas activas</p></div></div>${lineChart(periods,'activePct','#3ad0a4','%')}</div><div class="hist-card"><div class="hist-card-head"><div><h3>Garantías pendientes</h3><p>Evolución entre cierres</p></div></div>${lineChart(periods,'pending','#f5b301','')}</div></div><div class="hist-card"><div class="hist-card-head"><div><h3>Evolución por categoría</h3><p>${esc(first.label)} comparado con ${esc(latest.label)}</p></div></div><div class="hist-table-wrap"><table class="hist-table" style="min-width:420px"><thead><tr><th>Categoría</th><th>${esc(SHORT_H[first.month])} ${first.year}</th><th>${esc(SHORT_H[latest.month])} ${latest.year}</th><th>Cambio</th></tr></thead><tbody>${categoryRows(first,latest)}</tbody></table></div></div><div class="hist-card"><div class="hist-card-head"><div><h3>Cambios individuales</h3><p>${analysis.improved} mejoraron · ${analysis.declined} bajaron · ${analysis.newPeople} nuevos</p></div><span class="hist-badge">${analysis.changes.length} personas</span></div><div class="hist-search"><input id="histPersonSearch" value="${esc(H.personSearch)}" placeholder="Buscar persona o código…"></div><div class="hist-table-wrap"><table class="hist-table"><thead><tr><th>Persona</th><th>Categoría</th><th>PB inicial</th><th>PB final</th><th>Cambio</th><th>Equipo</th></tr></thead><tbody id="histPersonRows">${personRows(analysis.changes,H.personSearch)}</tbody></table></div></div></section>`}
-function bindUnifiedAnalysis(root){root.querySelectorAll('#histUnifiedAnalysis .hist-month-option input').forEach(input=>input.onchange=()=>{input.checked?H.selected.add(input.value):H.selected.delete(input.value);if(!H.selected.size)H.selected.add(input.value);render()});root.querySelectorAll('#histUnifiedAnalysis [data-pick]').forEach(button=>button.onclick=()=>pickPeriods(button.dataset.pick));const search=$('histPersonSearch');if(search)search.oninput=event=>{H.personSearch=event.target.value;const periods=selectedPeriods(),analysis=periods.length?analyzePeriods(periods):null;if(analysis&&$('histPersonRows'))$('histPersonRows').innerHTML=personRows(analysis.changes,H.personSearch)};root.querySelectorAll('[data-hist-scroll-analysis]').forEach(button=>button.onclick=()=>document.getElementById('histUnifiedAnalysis')?.scrollIntoView({behavior:'smooth',block:'start'}))}
-
+const HIST_CHART_METRICS={
+  pbPersonal:{label:'PB del equipo',suffix:' PB',color:'#5b8def',hint:'Evolución del PB de la organización'},
+  activePct:{label:'Actividad',suffix:'%',color:'#3ad0a4',hint:'Porcentaje de personas con PB personal'},
+  pending:{label:'Pendientes',suffix:'',color:'#f5b301',hint:'Garantías pendientes entre cierres'},
+  incomeCount:{label:'Ingresos',suffix:'',color:'#a06bff',hint:'Cantidad de ingresos por cierre'},
+  people:{label:'Personas',suffix:'',color:'#e87fa9',hint:'Tamaño del equipo en cada cierre'}
+};
+function currentChartMetric(){
+  return HIST_CHART_METRICS[H.chartMetric]?H.chartMetric:'pbPersonal';
+}
+function selectionAttention(periods){
+  if(!periods.length)return '';
+  const latest=periods[periods.length-1],previous=periods.length>1?periods[periods.length-2]:null,s=latest.summary||{};
+  const previousPeople=new Map((previous&&previous.people||[]).map(p=>[p.matchKey,p]));
+  const inactive2=previous?latest.people.filter(p=>p.pnAct===0&&previousPeople.get(p.matchKey)&&previousPeople.get(p.matchKey).pnAct===0):[];
+  const highPending=latest.people.filter(p=>num(p.garantias&&p.garantias.pendientes)>=10);
+  const topBranch=(s.branches||[])[0],branchShare=topBranch&&s.pbPersonal?pct(topBranch.pb,s.pbPersonal):0;
+  const cards=[];
+  if(previous)cards.push(histAttention('#d9535a','!',`${inactive2.length} personas con dos cierres sin actividad`,'Según los meses elegidos','inactive2'));
+  else cards.push(`<div class="hist-attention hist-info-attention" style="--tone:#5b8def"><span>i</span><div><strong>Elegí al menos dos meses</strong><small>Así aparecen inactividad consecutiva y deltas reales.</small></div></div>`);
+  cards.push(histAttention('#e99a20','◷',`${num(s.incomeNoPurchase)} ingresos sin compra posterior`,'Del último mes seleccionado','incomeNoPurchase'));
+  cards.push(histAttention('#8a63e6','▤',`${highPending.length} personas con muchos pendientes`,'Ordenadas por garantías','highPending'));
+  cards.push(histAttention('#5b8def','↗',`${branchShare}% del PB en la rama principal`,'Ver la rama y sus integrantes','topBranch'));
+  return `<div class="hist-card hist-attention-card"><div class="hist-card-head"><div><h3>Atención según tu selección</h3><p>Alertas calculadas con los ${periods.length} cierres elegidos · foco en ${esc(latest.label)}</p></div></div><div class="hist-attention-grid">${cards.join('')}</div></div>`;
+}
+function renderUnifiedAnalysis(){
+  if(!H.periods.length)return '';
+  ensureDefaultSelection();
+  let periods=selectedPeriods();
+  if(!periods.length){ensureDefaultSelection(true);periods=selectedPeriods()}
+  const analysis=analyzePeriods(periods),latest=periods[periods.length-1],first=periods[0];
+  const metric=currentChartMetric(),meta=HIST_CHART_METRICS[metric];
+  const metricButtons=Object.entries(HIST_CHART_METRICS).map(([key,item])=>`<button type="button" class="hist-metric-chip${key===metric?' active':''}" data-hist-metric="${key}">${esc(item.label)}</button>`).join('');
+  return `<section id="histUnifiedAnalysis" class="hist-unified-analysis hist-compare-home">
+    <div class="hist-card hist-compare-picker">
+      <div class="hist-card-head"><div><h3>Comparar y analizar</h3><p>Elegí los cierres: el gráfico y las alertas se arman con esa selección.</p></div><span class="hist-badge">${periods.length} seleccionados</span></div>
+      <div class="hist-picker-tools"><button data-pick="latest">Último</button><button data-pick="last2">Últimos 2</button><button data-pick="last6">Últimos 6</button><button data-pick="year">Año ${latest.year}</button><button data-pick="all">Todos</button></div>
+      <div class="hist-month-picker">${H.periods.map(p=>`<label class="hist-month-option"><input type="checkbox" value="${p.id}" ${H.selected.has(p.id)?'checked':''}><span>${SHORT_H[p.month]} ${String(p.year).slice(-2)}</span></label>`).join('')}</div>
+      <div class="hist-compare-strip">
+        <div><span>PB del equipo</span><b>${fmt(latest.summary.pbPersonal)} PB</b><small class="${analysis.pbDelta.cls}">${esc(analysis.pbDelta.text)}</small></div>
+        <div><span>Actividad</span><b>${latest.summary.activePct}%</b><small class="${analysis.activeDelta.cls}">${esc(analysis.activeDelta.text)}</small></div>
+        <div><span>Personas</span><b>${latest.summary.people}</b><small class="${analysis.peopleDelta.cls}">${esc(analysis.peopleDelta.text)}</small></div>
+        <div><span>Ingresos</span><b>${latest.summary.incomeCount}</b><small class="${analysis.incomeDelta.cls}">${esc(analysis.incomeDelta.text)}</small></div>
+        <div><span>Pendientes</span><b>${fmt(latest.summary.pending)}</b><small class="${analysis.pendingDelta.cls}">${esc(analysis.pendingDelta.text)}</small></div>
+      </div>
+    </div>
+    <div class="hist-card hist-main-chart-card">
+      <div class="hist-card-head"><div><h3>${esc(meta.label)}</h3><p>${esc(meta.hint)} · ${esc(first.label)} → ${esc(latest.label)}</p></div></div>
+      <div class="hist-metric-chips">${metricButtons}</div>
+      ${lineChart(periods,metric,meta.color,meta.suffix)}
+    </div>
+    ${selectionAttention(periods)}
+    <div class="hist-card hist-more-details" data-hist-default-collapsed="1"><div class="hist-card-head"><div><h3>Más detalle</h3><p>Categorías y cambios individuales de la selección</p></div></div>
+      <div class="hist-detail-stack">
+        <div class="hist-subcard"><h4>Evolución por categoría</h4><p>${esc(first.label)} comparado con ${esc(latest.label)}</p><div class="hist-table-wrap"><table class="hist-table" style="min-width:420px"><thead><tr><th>Categoría</th><th>${esc(SHORT_H[first.month])} ${first.year}</th><th>${esc(SHORT_H[latest.month])} ${latest.year}</th><th>Cambio</th></tr></thead><tbody>${categoryRows(first,latest)}</tbody></table></div></div>
+        <div class="hist-subcard"><h4>Cambios individuales</h4><p>${analysis.improved} mejoraron · ${analysis.declined} bajaron · ${analysis.newPeople} nuevos</p><div class="hist-search"><input id="histPersonSearch" value="${esc(H.personSearch)}" placeholder="Buscar persona o código…"></div><div class="hist-table-wrap"><table class="hist-table"><thead><tr><th>Persona</th><th>Categoría</th><th>PB inicial</th><th>PB final</th><th>Cambio</th><th>Equipo</th></tr></thead><tbody id="histPersonRows">${personRows(analysis.changes,H.personSearch)}</tbody></table></div></div>
+      </div>
+    </div>
+  </section>`;
+}
+function bindUnifiedAnalysis(root){
+  root.querySelectorAll('#histUnifiedAnalysis .hist-month-option input').forEach(input=>input.onchange=()=>{input.checked?H.selected.add(input.value):H.selected.delete(input.value);if(!H.selected.size)H.selected.add(input.value);render()});
+  root.querySelectorAll('#histUnifiedAnalysis [data-pick]').forEach(button=>button.onclick=()=>pickPeriods(button.dataset.pick));
+  root.querySelectorAll('[data-hist-metric]').forEach(button=>button.onclick=()=>{H.chartMetric=button.dataset.histMetric;render()});
+  const search=$('histPersonSearch');
+  if(search)search.oninput=event=>{H.personSearch=event.target.value;const periods=selectedPeriods(),analysis=periods.length?analyzePeriods(periods):null;if(analysis&&$('histPersonRows'))$('histPersonRows').innerHTML=personRows(analysis.changes,H.personSearch)};
+  root.querySelectorAll('[data-hist-scroll-analysis]').forEach(button=>button.onclick=()=>{openTab('comparar');requestAnimationFrame(()=>document.getElementById('histUnifiedAnalysis')?.scrollIntoView({behavior:'smooth',block:'start'}))});
+  root.querySelectorAll('[data-hist-open-tab]').forEach(button=>button.onclick=()=>openTab(button.dataset.histOpenTab));
+}
 const HIST_COLLAPSE_KEY='hist_dashboard_collapsed_v1';
 function collapsedPreferences(){try{return JSON.parse(localStorage.getItem(HIST_COLLAPSE_KEY)||'{}')}catch(e){return {}}}
-function enableDashboardCollapsibles(root){const preferences=collapsedPreferences();root.querySelectorAll('.hist-card').forEach((card,index)=>{const head=card.querySelector(':scope > .hist-card-head');if(!head||card.dataset.collapsibleReady)return;const title=head.querySelector('h3')?.textContent?.trim()||`Sección ${index+1}`,key=normalize(title).replace(/\b20\d{2}\b/g,'').trim()||`section-${index}`,defaultCollapsed=/cambios individuales/i.test(title),collapsed=Object.prototype.hasOwnProperty.call(preferences,key)?!!preferences[key]:defaultCollapsed,content=document.createElement('div');content.className='hist-collapsible-content';while(head.nextSibling)content.appendChild(head.nextSibling);card.appendChild(content);const button=document.createElement('button');button.type='button';button.className='hist-collapse-btn';button.setAttribute('aria-expanded',String(!collapsed));button.innerHTML=collapsed?'<span>＋</span> Mostrar':'<span>−</span> Minimizar';head.appendChild(button);const apply=value=>{card.classList.toggle('hist-collapsed',value);content.hidden=value;button.setAttribute('aria-expanded',String(!value));button.innerHTML=value?'<span>＋</span> Mostrar':'<span>−</span> Minimizar'};apply(collapsed);button.onclick=()=>{const value=!card.classList.contains('hist-collapsed');apply(value);const next=collapsedPreferences();next[key]=value;localStorage.setItem(HIST_COLLAPSE_KEY,JSON.stringify(next))};card.dataset.collapsibleReady='1'})}
-
-function renderDashboard(c){
+function enableDashboardCollapsibles(root){const preferences=collapsedPreferences();root.querySelectorAll('.hist-card').forEach((card,index)=>{const head=card.querySelector(':scope > .hist-card-head');if(!head||card.dataset.collapsibleReady)return;const title=head.querySelector('h3')?.textContent?.trim()||`Sección ${index+1}`,key=normalize(title).replace(/\b20\d{2}\b/g,'').trim()||`section-${index}`,defaultCollapsed=card.dataset.histDefaultCollapsed==='1'||/cambios individuales|más detalle/i.test(title),collapsed=Object.prototype.hasOwnProperty.call(preferences,key)?!!preferences[key]:defaultCollapsed,content=document.createElement('div');content.className='hist-collapsible-content';while(head.nextSibling)content.appendChild(head.nextSibling);card.appendChild(content);const button=document.createElement('button');button.type='button';button.className='hist-collapse-btn';button.setAttribute('aria-expanded',String(!collapsed));button.innerHTML=collapsed?'<span>＋</span> Mostrar':'<span>−</span> Minimizar';head.appendChild(button);const apply=value=>{card.classList.toggle('hist-collapsed',value);content.hidden=value;button.setAttribute('aria-expanded',String(!value));button.innerHTML=value?'<span>＋</span> Mostrar':'<span>−</span> Minimizar'};apply(collapsed);button.onclick=()=>{const value=!card.classList.contains('hist-collapsed');apply(value);const next=collapsedPreferences();next[key]=value;localStorage.setItem(HIST_COLLAPSE_KEY,JSON.stringify(next));if(!value)requestAnimationFrame(()=>animateHistCharts(card))};card.dataset.collapsibleReady='1'})}
+function renderCompareView(c){
   const {latest,previous}=latestPair();
   if(!latest){c.innerHTML=`<div class="hist-hero"><div class="eyebrow">Nuevo módulo</div><h2>Tu evolución, mes a mes</h2><p>Guardá los tres archivos de cada cierre y convertí todo el año en indicadores, comparaciones y acciones concretas.</p><div class="hist-hero-actions"><button data-go="cargar">Cargar primer mes</button></div></div><div class="hist-empty"><div class="ico">▦</div><h3>Todavía no hay cierres mensuales</h3><p>Para comenzar necesitás Línea Descendente, Garantías por Organización e Ingresos del mismo período.</p><button class="hist-primary" data-go="cargar">Crear primer cierre</button></div>`;bindGo(c);return}
   const s=latest.summary;
-  const strategies=buildStrategies(H.periods.slice(-Math.min(6,H.periods.length))),topBranch=(s.branches||[])[0],branchShare=topBranch&&s.pbPersonal?pct(topBranch.pb,s.pbPersonal):0;
-  const previousPeople=new Map((previous&&previous.people||[]).map(p=>[p.matchKey,p])),inactive2=latest.people.filter(p=>p.pnAct===0&&previousPeople.get(p.matchKey)&&previousPeople.get(p.matchKey).pnAct===0),highPending=latest.people.filter(p=>num(p.garantias&&p.garantias.pendientes)>=10);
+  const strategies=buildStrategies(H.periods.slice(-Math.min(6,H.periods.length)));
+  const periods=(()=>{ensureDefaultSelection();return selectedPeriods()})();
+  const focus=periods[periods.length-1]||latest;
+  const prevFocus=periods.length>1?periods[periods.length-2]:previous;
+  const topBranch=((focus.summary||{}).branches||[])[0];
   c.innerHTML=`
-    <div class="hist-hero"><div class="eyebrow">Último cierre · ${esc(latest.label)}</div><h2>Histórico y análisis</h2><p>${s.people} personas · ${s.active} activas · ${fmt(s.pbPersonal)} PB · ${s.incomeCount} ingresos. Todo el año y sus comparaciones están reunidos en esta pantalla.</p><div class="hist-hero-actions"><button data-go="cargar">＋ Cargar o administrar meses</button><button class="secondary" data-hist-scroll-analysis>Comparar períodos</button></div></div>
-    <div class="hist-card hist-attention-card"><div class="hist-card-head"><div><h3>Atención requerida</h3><p>Qué conviene revisar primero</p></div></div><div class="hist-attention-grid">
-      ${previous?histAttention('#d9535a','!',`${inactive2.length} personas con dos meses sin actividad`,'Ver las personas y abrir cada ficha','inactive2'):'<div class="hist-attention hist-info-attention" style="--tone:#5b8def"><span>i</span><div><strong>La comparación comienza con el próximo cierre</strong><small>Con dos meses podremos detectar inactividad consecutiva.</small></div></div>'}
-      ${histAttention('#e99a20','◷',`${s.incomeNoPurchase} ingresos sin compra posterior`,'Revisar acompañamiento inicial','incomeNoPurchase')}
-      ${histAttention('#8a63e6','▤',`${highPending.length} personas con muchos pendientes`,'Ordenadas por cantidad de garantías','highPending')}
-      ${histAttention('#5b8def','↗',`${branchShare}% del PB está en la rama principal`,'Ver la rama y sus integrantes','topBranch')}
-    </div></div>
+    <div class="hist-hero hist-hero-compact"><div class="eyebrow">Comparar · foco ${esc(focus.label)}</div><h2>Elegí meses y mirá el pulso</h2><p>${periods.length} cierres en juego · ${fmt((focus.summary||{}).pbPersonal)} PB · ${(focus.summary||{}).activePct||0}% actividad. El gráfico principal cambia con tu selección.</p><div class="hist-hero-actions"><button data-go="cargar">＋ Cargar meses</button><button class="secondary" data-hist-open-tab="anio">Ver mi año</button></div></div>
+    ${renderUnifiedAnalysis()}
+    <div class="hist-card"><div class="hist-card-head"><div><h3>Próximas acciones</h3><p>Recomendaciones basadas en los datos</p></div><button class="hist-mini-btn" data-hist-open-tab="anio">Ir a mi año</button></div><div class="hist-strategies">${strategies.slice(0,3).map(strategyHtml).join('')}</div></div>
+    <section class="hist-full-report-cta"><span class="hist-report-mark">PDF</span><div><h3>Informe completo ${latest.year}</h3><p>Resumen anual, gráficos, indicadores, rankings, ingresos, pases, Bonus y recomendaciones listos para compartir.</p></div><button type="button" data-hist-full-report="${latest.year}">Generar y compartir PDF</button></section>`;
+  bindGo(c);bindDashboardDrill(c,focus,prevFocus,topBranch);bindUnifiedAnalysis(c);enableDashboardCollapsibles(c);requestAnimationFrame(()=>animateHistCharts(c));
+}
+function renderYearView(c){
+  const {latest,previous}=latestPair();
+  if(!latest){openTab('comparar');return}
+  const s=latest.summary,topBranch=(s.branches||[])[0];
+  c.innerHTML=`
+    <div class="hist-hero hist-hero-compact"><div class="eyebrow">Mi año · ${latest.year}</div><h2>Panorama completo del año</h2><p>Historia visual, lectura COPA del último cierre y todos los números para comparar mes a mes.</p><div class="hist-hero-actions"><button data-hist-open-tab="comparar">← Volver a comparar</button><button class="secondary" data-go="cargar">Cargar o administrar</button></div></div>
     ${renderAnnualSummary(latest.year)}
     ${renderCOPA(latest,previous)}
-    ${renderUnifiedAnalysis()}
-    <div class="hist-card"><div class="hist-card-head"><div><h3>Próximas acciones</h3><p>Recomendaciones basadas en los datos</p></div><button class="hist-mini-btn" data-hist-scroll-analysis>Revisar comparación</button></div><div class="hist-strategies">${strategies.slice(0,3).map(strategyHtml).join('')}</div></div>
-    <section class="hist-full-report-cta"><span class="hist-report-mark">PDF</span><div><h3>Informe completo ${latest.year}</h3><p>Resumen anual, gráficos, indicadores, rankings, ingresos, pases, Bonus y recomendaciones en un documento profesional listo para compartir.</p></div><button type="button" data-hist-full-report="${latest.year}">Generar y compartir PDF</button></section>`;
-  bindGo(c);bindDashboardDrill(c,latest,previous,topBranch);bindUnifiedAnalysis(c);enableDashboardCollapsibles(c);
+    <section class="hist-full-report-cta"><span class="hist-report-mark">PDF</span><div><h3>Informe completo ${latest.year}</h3><p>Llevá el año a un PDF profesional para compartir.</p></div><button type="button" data-hist-full-report="${latest.year}">Generar y compartir PDF</button></section>`;
+  bindGo(c);bindDashboardDrill(c,latest,previous,topBranch);bindUnifiedAnalysis(c);enableDashboardCollapsibles(c);requestAnimationFrame(()=>animateHistCharts(c));
 }
+function renderDashboard(c){renderCompareView(c)}
 function histAttention(tone,icon,title,desc,type){return `<button class="hist-attention" style="--tone:${tone}" data-hist-drill="${type}"><span>${icon}</span><div><strong>${esc(title)}</strong><small>${esc(desc)}</small></div><em>Ver datos ›</em></button>`}
 function bindDashboardDrill(root,period,previous,topBranch){
   root.querySelectorAll('[data-hist-drill]').forEach(btn=>btn.onclick=()=>openHistDrill(btn.dataset.histDrill,period,previous,topBranch));
@@ -529,7 +615,7 @@ function bindPeriodRows(root){
   root.querySelectorAll('[data-more]').forEach(b=>b.onclick=e=>{e.stopPropagation();H.openMenu=H.openMenu===b.dataset.more?'':b.dataset.more;render()});
   root.querySelectorAll('.hist-action-menu').forEach(menu=>menu.querySelectorAll('[data-pa]').forEach(b=>b.onclick=async()=>{
     const row=b.closest('[data-period]'),id=row.dataset.period,action=b.dataset.pa;
-    if(action==='analyze'){H.selected=new Set([id]);H.openMenu='';openTab('analizar')}
+    if(action==='analyze'){H.selected=new Set([id]);H.openMenu='';openTab('comparar')}
     else if(['equipo','garantias','ingresos'].includes(action))await downloadOriginal(id,action);
     else if(action==='zip')await exportPeriodZip(id);
     else if(action==='delete'&&await window.APPIDialog.confirm(`Se eliminarán ${H.periods.find(p=>p.id===id)?.label||id} y sus tres archivos.`,{title:'Eliminar cierre',icon:'📈',okText:'Eliminar',danger:true})){await deletePeriod(id);H.openMenu='';render();toast('Cierre eliminado')}
@@ -563,6 +649,7 @@ function renderAnalyze(c){
   c.querySelectorAll('.hist-month-option input').forEach(input=>input.onchange=()=>{input.checked?H.selected.add(input.value):H.selected.delete(input.value);render()});
   c.querySelectorAll('[data-pick]').forEach(b=>b.onclick=()=>pickPeriods(b.dataset.pick));
   $('histPersonSearch').oninput=e=>{H.personSearch=e.target.value;$('histPersonRows').innerHTML=personRows(a.changes,H.personSearch)};
+  requestAnimationFrame(()=>animateHistCharts(c));
   $('histLocalReport').onclick=()=>createLocalReport(periods,strategies,a);
   $('histOnlineReport').onclick=()=>createOnlineReport(periods,strategies,a);
 }
@@ -574,13 +661,70 @@ function pickPeriods(mode){
 function metricValue(p,metric){return num((p.summary||{})[metric])}
 function lineChart(periods,metric,color,suffix){
   if(!periods.length)return '<div class="hist-empty">Sin datos</div>';
-  if(periods.length===1){const value=metricValue(periods[0],metric);return `<div class="hist-single-chart"><span style="--tone:${color}"></span><strong>${fmt(value)}${suffix}</strong><b>${esc(periods[0].label)}</b><small>Cargá otro mes para ver la evolución y las diferencias.</small></div>`}
-  const vals=periods.map(p=>metricValue(p,metric));let min=Math.min(...vals),max=Math.max(...vals);if(min===max){min=Math.max(0,min-1);max+=1}const W=620,Ht=190,left=54,right=18,top=31,bottom=33,cw=W-left-right,ch=Ht-top-bottom;
-  const point=(v,i)=>({x:left+(periods.length===1?cw/2:i*cw/(periods.length-1)),y:top+(max-v)/(max-min)*ch});const pts=vals.map(point),poly=pts.map(p=>`${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' '),area=`${left},${top+ch} ${poly} ${left+cw},${top+ch}`;
-  const grids=[0,.25,.5,.75,1].map(t=>{const y=top+t*ch,v=max-t*(max-min);return `<line x1="${left}" y1="${y}" x2="${left+cw}" y2="${y}" stroke="#9aa3b5" stroke-opacity=".18"/><text x="${left-8}" y="${y+3}" text-anchor="end" font-size="8.5" fill="#8a8a94">${esc(fmt(v))}${suffix}</text>`}).join('');
-  const monthLabels=periods.map((p,i)=>`<text x="${pts[i].x}" y="${Ht-8}" text-anchor="middle" font-size="9" font-weight="700" fill="#777887">${SHORT_H[p.month]} ${String(p.year).slice(-2)}</text>`).join('');
-  const valueLabels=pts.map((point,i)=>{const text=`${fmt(vals[i])}${suffix}`,width=Math.max(25,text.length*5.15+9),below=point.y<top+12,labelY=below?point.y+20:point.y-11,rectY=labelY-10;return `<g class="hist-chart-value"><rect x="${point.x-width/2}" y="${rectY}" width="${width}" height="14" rx="6" fill="#fff" fill-opacity=".94" stroke="${color}" stroke-opacity=".2"/><text x="${point.x}" y="${labelY}" text-anchor="middle" font-size="8" font-weight="900" fill="${color}">${esc(text)}</text></g>`}).join('');
-  return `<div class="hist-chart"><svg viewBox="0 0 ${W} ${Ht}" role="img" aria-label="Gráfico de ${esc(metric)}">${grids}<polygon points="${area}" fill="${color}" fill-opacity=".09"/><polyline points="${poly}" fill="none" stroke="${color}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>${valueLabels}${pts.map((point,i)=>`<circle cx="${point.x}" cy="${point.y}" r="4.5" fill="${color}" stroke="#fff" stroke-width="2"><title>${periods[i].label}: ${fmt(vals[i])}${suffix}</title></circle>`).join('')}${monthLabels}</svg></div>`;
+  if(periods.length===1){const value=metricValue(periods[0],metric);return `<div class="hist-single-chart hist-chart-motion" style="--tone:${color}"><span class="hist-single-dot"></span><strong>${fmt(value)}${suffix}</strong><b>${esc(periods[0].label)}</b><small>Cargá otro mes para ver la evolución y las diferencias.</small></div>`}
+  const vals=periods.map(p=>metricValue(p,metric));let min=Math.min(...vals),max=Math.max(...vals);if(min===max){min=Math.max(0,min-1);max+=1}
+  /* viewBox más alto y tipografía mayor: en celular el SVG escala al 100% del ancho y los números dejan de verse diminutos */
+  const W=620,Ht=260,left=62,right=22,top=40,bottom=44,cw=W-left-right,ch=Ht-top-bottom;
+  const point=(v,i)=>({x:left+(periods.length===1?cw/2:i*cw/(periods.length-1)),y:top+(max-v)/(max-min)*ch});
+  const pts=vals.map(point);
+  const pathD=pts.map((p,i)=>(i?'L':'M')+`${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ');
+  const areaD=`M${left} ${(top+ch).toFixed(1)} `+pts.map(p=>`L${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ')+` L${(left+cw).toFixed(1)} ${(top+ch).toFixed(1)} Z`;
+  const grids=[0,.25,.5,.75,1].map(t=>{const y=top+t*ch,v=max-t*(max-min);return `<line class="hist-chart-grid" x1="${left}" y1="${y}" x2="${left+cw}" y2="${y}" stroke="#9aa3b5" stroke-opacity=".18"/><text class="hist-chart-axis" x="${left-8}" y="${y+4}" text-anchor="end" font-size="12" font-weight="700" fill="#8a8a94">${esc(fmt(v))}${suffix}</text>`}).join('');
+  const monthLabels=periods.map((p,i)=>`<text class="hist-chart-month" x="${pts[i].x}" y="${Ht-10}" text-anchor="middle" font-size="12" font-weight="700" fill="#777887" style="--i:${i}">${SHORT_H[p.month]} ${String(p.year).slice(-2)}</text>`).join('');
+  const valueLabels=pts.map((point,i)=>{const text=`${fmt(vals[i])}${suffix}`,width=Math.max(30,text.length*6.2+12),below=point.y<top+14,labelY=below?point.y+24:point.y-14,rectY=labelY-12;return `<g class="hist-chart-value" style="--i:${i}"><rect x="${point.x-width/2}" y="${rectY}" width="${width}" height="20" rx="8" fill="#fff" fill-opacity=".94" stroke="${color}" stroke-opacity=".2"/><text x="${point.x}" y="${labelY}" text-anchor="middle" font-size="12" font-weight="900" fill="${color}">${esc(text)}</text></g>`}).join('');
+  const dots=pts.map((point,i)=>{const last=i===pts.length-1;return `<g class="hist-chart-dot${last?' is-last':''}" style="--i:${i}" transform="translate(${point.x.toFixed(1)} ${point.y.toFixed(1)})"><circle class="hist-chart-halo" r="11" fill="${color}" fill-opacity=".16"/><circle class="hist-chart-point" r="5.5" fill="${color}" stroke="#fff" stroke-width="2.5"><title>${periods[i].label}: ${fmt(vals[i])}${suffix}</title></circle></g>`}).join('');
+  const gradId=`histGrad-${metric}-${Math.abs(hashCode(color+vals.join(',')))%99999}`;
+  return `<div class="hist-chart hist-chart-motion" style="--tone:${color}"><svg viewBox="0 0 ${W} ${Ht}" role="img" aria-label="Gráfico de ${esc(metric)}"><defs><linearGradient id="${gradId}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${color}" stop-opacity=".28"/><stop offset="100%" stop-color="${color}" stop-opacity="0"/></linearGradient><linearGradient id="${gradId}-shine" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#fff" stop-opacity="0"/><stop offset="45%" stop-color="#fff" stop-opacity=".55"/><stop offset="100%" stop-color="#fff" stop-opacity="0"/></linearGradient></defs>${grids}<path class="hist-chart-area" d="${areaD}" fill="url(#${gradId})"/><path class="hist-chart-line" d="${pathD}" fill="none" stroke="${color}" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/><path class="hist-chart-shine" d="${pathD}" fill="none" stroke="url(#${gradId}-shine)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>${valueLabels}${dots}${monthLabels}</svg></div>`;
+}
+function hashCode(str){let h=0;for(let i=0;i<str.length;i++)h=((h<<5)-h)+str.charCodeAt(i)|0;return h}
+function prefersHistReducedMotion(){try{return window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches}catch(e){return false}}
+function animateHistCharts(root){
+  const scope=root&&root.querySelectorAll?root:document;
+  const charts=scope.querySelectorAll?scope.querySelectorAll('.hist-chart-motion:not([data-hist-animated])'):[];
+  if(!charts.length)return;
+  const reduced=prefersHistReducedMotion();
+  const run=chart=>{
+    if(chart.dataset.histAnimated)return;
+    chart.dataset.histAnimated='1';
+    if(reduced){chart.classList.add('is-ready','is-static');return}
+    const svg=chart.querySelector('svg');
+    const line=chart.querySelector('.hist-chart-line');
+    const shine=chart.querySelector('.hist-chart-shine');
+    const area=chart.querySelector('.hist-chart-area');
+    requestAnimationFrame(()=>{
+      chart.classList.add('is-ready');
+      if(line&&line.getTotalLength){
+        const len=Math.max(1,line.getTotalLength());
+        [line,shine].forEach(path=>{
+          if(!path)return;
+          path.style.strokeDasharray=String(len);
+          path.style.strokeDashoffset=String(len);
+          path.getBoundingClientRect();
+          path.style.transition=`stroke-dashoffset ${path.classList.contains('hist-chart-shine')?'1.35s':'1.15s'} cubic-bezier(.22,.9,.28,1)`;
+          path.style.strokeDashoffset='0';
+        });
+      }
+      if(area){
+        area.style.transformOrigin='center bottom';
+        area.style.transform='scaleY(0.15)';
+        area.style.opacity='0';
+        area.getBoundingClientRect();
+        area.style.transition='transform .9s cubic-bezier(.22,.9,.28,1) .12s, opacity .7s ease .12s';
+        area.style.transform='scaleY(1)';
+        area.style.opacity='1';
+      }
+      chart.classList.add('is-drawn');
+    });
+  };
+  if(typeof IntersectionObserver==='undefined'){charts.forEach(run);return}
+  const io=new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      if(!entry.isIntersecting)return;
+      run(entry.target);
+      io.unobserve(entry.target);
+    });
+  },{threshold:.28,rootMargin:'0px 0px -8% 0px'});
+  charts.forEach(chart=>io.observe(chart));
 }
 function analyzePeriods(periods){
   const first=periods[0],last=periods[periods.length-1],fs=first.summary,ls=last.summary;
@@ -754,7 +898,7 @@ async function initHistorico(){
 }
 window.openHistorico=openHistorico;
 window.initHistoricoAPPI=initHistorico;
-window.__APPI_HISTORICO__={state:H,open:openHistorico,refresh:refreshData,parseFile:parseHistoricalFile,saveMonth:saveMonthPeriod,analyze:analyzePeriods,strategies:buildStrategies,dbGetAll,annualMatrix,renderAnnualSummary,renderCOPA};
+window.__APPI_HISTORICO__={state:H,open:openHistorico,refresh:refreshData,parseFile:parseHistoricalFile,saveMonth:saveMonthPeriod,analyze:analyzePeriods,strategies:buildStrategies,dbGetAll,annualMatrix,renderAnnualSummary,renderCOPA,animateCharts:animateHistCharts,lineChart};
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initHistorico);else initHistorico();
 setTimeout(initHistorico,1200);
 

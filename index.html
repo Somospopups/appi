@@ -67,7 +67,7 @@ window.openStock=function(){
 <link rel="icon" href="./icon-192.png" />
 <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
 <link rel="manifest" href="./manifest.json" />
-<!-- APPI v256 · el logo de vidrio arranca en todos los dispositivos -->
+<!-- APPI v260 · histórico: datos legibles en PC -->
 <link rel="apple-touch-startup-image" href="./splash/apple-splash-1170x2532.png" />
 <link rel="apple-touch-startup-image" href="./splash/apple-splash-640x1136.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" />
 <link rel="apple-touch-startup-image" href="./splash/apple-splash-750x1334.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" />
@@ -134,7 +134,7 @@ window.openStock=function(){
 .hist-preview{margin-top:10px;padding:11px 12px;border-radius:14px;background:rgba(58,208,164,.08);border:1px solid rgba(58,208,164,.2);font-size:10.5px;line-height:1.45;color:#356359}.hist-preview.warn{background:rgba(245,179,1,.09);border-color:rgba(245,179,1,.25);color:#8a6116}.hist-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:11px}.hist-actions>*{flex:1;min-width:115px}
 .hist-period-list{display:grid;gap:8px}.hist-period{display:grid;grid-template-columns:48px minmax(0,1fr) auto;gap:10px;align-items:center;padding:11px;border-radius:17px;background:rgba(255,255,255,.66);border:1px solid rgba(255,255,255,.85)}.hist-period-date{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(135deg,rgba(91,141,239,.16),rgba(160,107,255,.12));color:#3d63c9}.hist-period-date b{display:block;font-size:11px;line-height:1;text-align:center}.hist-period-date small{display:block;font-size:8px;margin-top:3px;text-align:center}.hist-period-info{min-width:0}.hist-period-info h4{margin:0 0 4px;font-size:12px;color:#292938}.hist-period-info p{margin:0;font-size:9.5px;color:#777887;line-height:1.4}.hist-period-info .file-flags{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px}.hist-period-info .file-flags span{font-size:8px;font-weight:850;padding:3px 6px;border-radius:999px;background:rgba(58,208,164,.11);color:#168765}.hist-period-actions{position:relative}.hist-more{width:34px;height:34px;border:0;border-radius:11px;background:rgba(91,141,239,.09);color:#3d63c9;font-size:18px;cursor:pointer}.hist-action-menu{display:flex;gap:5px;flex-wrap:wrap;grid-column:1/-1;padding-top:8px;border-top:1px solid rgba(80,90,130,.08)}.hist-action-menu button{border:0;border-radius:9px;padding:7px 9px;font:inherit;font-size:9px;font-weight:850;background:rgba(91,141,239,.09);color:#3d63c9;cursor:pointer}.hist-action-menu button.danger{background:rgba(222,69,78,.09);color:#c63c46}
 .hist-picker-tools{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:9px}.hist-picker-tools button{border:0;padding:7px 9px;border-radius:999px;background:rgba(91,141,239,.1);color:#3d63c9;font:inherit;font-size:9px;font-weight:900;cursor:pointer}.hist-month-picker{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-bottom:12px}.hist-month-option{position:relative}.hist-month-option input{position:absolute;opacity:0;pointer-events:none}.hist-month-option span{display:block;padding:9px 6px;border-radius:12px;text-align:center;background:rgba(255,255,255,.62);border:1px solid rgba(80,90,130,.09);font-size:9.5px;font-weight:850;color:#666776;cursor:pointer}.hist-month-option input:checked+span{background:linear-gradient(135deg,#5b8def,#875fdd);color:#fff;border-color:transparent;box-shadow:0 4px 11px rgba(91,112,210,.2)}
-.hist-chart{overflow:hidden}.hist-chart svg{display:block;width:100%;height:auto;min-height:150px}.hist-chart-labels{display:flex;justify-content:space-between;gap:4px;font-size:8px;color:#8a8a94;margin-top:3px}.hist-chart-legend{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:7px;font-size:9px;font-weight:800;color:#666776}.hist-chart-legend i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px}
+.hist-chart{overflow:hidden;margin:2px 0 4px}.hist-chart svg{display:block;width:100%;height:auto;min-height:180px}.hist-chart-labels{display:flex;justify-content:space-between;gap:4px;font-size:8px;color:#8a8a94;margin-top:3px}.hist-chart-legend{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:7px;font-size:9px;font-weight:800;color:#666776}.hist-chart-legend i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px}
 .hist-table-wrap{overflow:auto;border-radius:14px;border:1px solid rgba(80,90,130,.09)}.hist-table{width:100%;border-collapse:collapse;min-width:520px;background:rgba(255,255,255,.48)}.hist-table th{position:sticky;top:0;background:#edf1fb;text-align:left;font-size:8.5px;text-transform:uppercase;letter-spacing:.3px;color:#6f7080;padding:8px}.hist-table td{padding:8px;border-top:1px solid rgba(80,90,130,.08);font-size:9.5px;color:#363644}.hist-table td strong{font-size:10px}.hist-table .up{color:#168765;font-weight:900}.hist-table .down{color:#d64d55;font-weight:900}.hist-table .neutral{color:#777887}.hist-search{position:relative;margin-bottom:9px}.hist-search input{width:100%;border:1px solid rgba(80,90,130,.11);background:rgba(255,255,255,.7);border-radius:12px;padding:10px 12px 10px 34px;font:inherit;font-size:11px;outline:none}.hist-search:before{content:"⌕";position:absolute;left:12px;top:7px;color:#777887;font-size:18px}
 .hist-strategies{display:grid;gap:8px}.hist-strategy{padding:12px 13px;border-radius:16px;background:rgba(255,255,255,.63);border:1px solid rgba(255,255,255,.83);border-left:4px solid var(--tone,#5b8def)}.hist-strategy .s-top{display:flex;align-items:center;gap:7px}.hist-strategy .s-priority{font-size:8px;font-weight:900;text-transform:uppercase;letter-spacing:.45px;color:var(--tone,#5b8def);background:color-mix(in srgb,var(--tone,#5b8def) 11%,transparent);padding:3px 7px;border-radius:999px}.hist-strategy h4{margin:7px 0 4px;font-size:12px;color:#292938}.hist-strategy p{margin:0;color:#686978;font-size:10px;line-height:1.45}.hist-strategy .evidence{margin-top:7px;padding:7px 9px;border-radius:10px;background:rgba(80,90,130,.055);font-size:9.5px;color:#4d4e5c}.hist-strategy .action{margin-top:6px;font-size:10px;color:#363746}.hist-strategy .action b{color:var(--tone,#3d63c9)}
 .hist-report{padding:14px;border-radius:18px;background:linear-gradient(135deg,rgba(91,141,239,.09),rgba(160,107,255,.07));border:1px solid rgba(91,141,239,.18);font-size:10.5px;line-height:1.55;color:#3d3e4c;white-space:pre-wrap}.hist-report h3,.hist-report h4{white-space:normal}.hist-ai-consent{display:flex;align-items:flex-start;gap:8px;font-size:9.5px;color:#6d6e7c;line-height:1.4;margin:10px 0}.hist-ai-consent input{margin-top:2px}
@@ -144,7 +144,13 @@ window.openStock=function(){
 body.dark .hist-statusbar,body.dark .hist-card,body.dark .hist-kpi,body.dark .hist-period,body.dark .hist-empty{background:rgba(28,29,46,.68);border-color:rgba(255,255,255,.08)}body.dark .hist-statusbar strong,body.dark .hist-card-head h3,body.dark .hist-kpi strong,body.dark .hist-empty h3,body.dark .hist-period-info h4,body.dark .hist-strategy h4,body.dark .hist-cloud-state b{color:#f0f0f5}body.dark .hist-statusbar small,body.dark .hist-card-head p,body.dark .hist-kpi span,body.dark .hist-empty p,body.dark .hist-period-info p,body.dark .hist-strategy p,body.dark .hist-cloud-state p{color:#a0a1af}body.dark .hist-tabs{background:rgba(255,255,255,.06)}body.dark .hist-tabs button{color:#a8a9b6}body.dark .hist-field select,body.dark .hist-field input,body.dark .hist-search input{background:rgba(25,26,42,.78);border-color:rgba(255,255,255,.09);color:#f0f0f5}body.dark .hist-upload{background:rgba(91,141,239,.07)}body.dark .hist-upload b{color:#f0f0f5}body.dark .hist-month-option span{background:rgba(30,31,48,.72);border-color:rgba(255,255,255,.08);color:#b7b8c4}body.dark .hist-table{background:rgba(25,26,42,.62)}body.dark .hist-table th{background:#25283a;color:#b7b8c4}body.dark .hist-table td{color:#e0e1e8;border-top-color:rgba(255,255,255,.07)}body.dark .hist-strategy{background:rgba(28,29,46,.66);border-color:rgba(255,255,255,.08)}body.dark .hist-strategy .evidence{background:rgba(255,255,255,.05);color:#cacbd4}body.dark .hist-strategy .action,body.dark .hist-report{color:#d5d6df}body.dark .hist-cloud-state{background:rgba(91,141,239,.08)}
 @media(min-width:700px){.hist-kpi-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.hist-form-grid{grid-template-columns:180px 180px}.hist-month-picker{grid-template-columns:repeat(6,minmax(0,1fr))}.hist-cloud-grid{grid-template-columns:1fr 1fr}.hist-cloud-grid>.hist-card.wide{grid-column:1/-1}}
 @media(max-width:390px){.hist-tabs button{font-size:8px;padding:8px 2px}.hist-statusbar{padding:9px}.hist-period{grid-template-columns:44px minmax(0,1fr) auto}.hist-period-date{width:44px;height:44px}.hist-form-grid{grid-template-columns:1fr 1fr}.hist-upload{grid-template-columns:35px minmax(0,1fr) auto;padding:9px}.hist-upload .u-icon{width:35px;height:35px}.hist-kpi strong{font-size:17px}}
-@media(prefers-reduced-motion:reduce){.hist-loading span{animation:none}.hist-upload{transition:none}}
+@media(prefers-reduced-motion:reduce){.hist-loading span{animation:none}.hist-upload{transition:none}
+.hist-chart-motion,.hist-chart-motion *{animation:none!important;transition:none!important}
+.hist-chart-motion .hist-chart-line,.hist-chart-motion .hist-chart-shine{stroke-dasharray:none!important;stroke-dashoffset:0!important}
+.hist-chart-motion .hist-chart-area{opacity:1!important;transform:none!important}
+.hist-chart-motion .hist-chart-dot,.hist-chart-motion .hist-chart-value,.hist-chart-motion .hist-chart-month{opacity:1!important;transform:none!important}
+.hist-year-ring,.hist-story-meter i,.hist-copa-item,.hist-year-kpis>div,.hist-single-chart{animation:none!important}
+}
 
 /* Tablero anual de cargas */
 .hist-year-card{background:linear-gradient(135deg,rgba(255,255,255,.76),rgba(244,239,255,.68))}
@@ -161,7 +167,7 @@ body.dark .hist-year-card,body.dark .hist-month-card{background:rgba(28,29,46,.7
 .hist-detail-overlay{position:fixed;inset:0;z-index:10000;display:none;background:rgba(24,26,42,.46);backdrop-filter:blur(5px)}.hist-detail-overlay.open{display:block}.hist-detail-drawer{position:absolute;top:0;right:0;bottom:0;width:min(580px,100%);padding:20px;background:linear-gradient(160deg,#f5f8ff,#fff3f9);box-shadow:-18px 0 55px rgba(30,35,75,.22);overflow:auto}.hist-detail-head{display:flex;align-items:start;justify-content:space-between;gap:12px;padding-bottom:14px;border-bottom:1px solid rgba(80,90,130,.11)}.hist-detail-head h2{margin:0;color:#292938;font-size:22px}.hist-detail-head p{margin:5px 0 0;color:#777887;font-size:12px}.hist-detail-head button{width:48px;height:48px;flex:0 0 auto;border:0;border-radius:50%;background:rgba(91,141,239,.11);color:#3d63c9;font-size:22px;font-weight:900}.hist-drill-note{margin:12px 0;padding:11px 12px;border-radius:13px;background:rgba(91,141,239,.08);color:#555765;font-size:11px;line-height:1.45}.hist-data-list{display:grid;gap:7px}.hist-data-row{display:grid;grid-template-columns:46px minmax(0,1fr) auto;gap:10px;align-items:center;min-height:72px;padding:10px;border:1px solid rgba(80,90,130,.1);border-radius:15px;background:#fff;font:inherit;text-align:left;cursor:pointer}.hist-data-avatar{width:44px;height:44px;display:grid;place-items:center;border-radius:13px;background:linear-gradient(135deg,rgba(91,141,239,.18),rgba(160,107,255,.14));color:#3d63c9;font-weight:950}.hist-data-avatar.income{color:#fff;background:linear-gradient(135deg,#5b8def,#a06bff);font-size:11px}.hist-data-row strong{display:block;color:#30303d;font-size:13px}.hist-data-row small{display:block;margin-top:3px;color:#777887;font-size:10px}.hist-data-row>b{color:#3d63c9;font-size:11px;white-space:nowrap}.hist-person-kpis{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:13px 0}.hist-person-kpis>div{padding:13px;border:1px solid rgba(80,90,130,.1);border-radius:14px;background:#fff}.hist-person-kpis b{display:block;color:#292938;font-size:19px}.hist-person-kpis span{display:block;margin-top:4px;color:#777887;font-size:10px}.hist-contact-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}.hist-contact-actions a{min-height:50px;display:grid;place-items:center;border-radius:13px;text-decoration:none;font-size:12px;font-weight:900}.hist-contact-actions .wa{background:#25d366;color:#fff}.hist-contact-actions .call{background:rgba(91,141,239,.13);color:#3d63c9}
 body.dark .hist-section-title h3,body.dark .hist-attention strong,body.dark .hist-sponsor-list strong,body.dark .hist-mini-stats span{color:#f0f0f5}body.dark .hist-attention{background:rgba(28,29,46,.68);border-color:rgba(255,255,255,.08)}body.dark .hist-mini-stats button{background:rgba(91,141,239,.09);border-color:rgba(255,255,255,.08)}body.dark .hist-detail-drawer{background:linear-gradient(160deg,#161827,#252036)}body.dark .hist-detail-head h2,body.dark .hist-data-row strong,body.dark .hist-person-kpis b{color:#f0f0f5}body.dark .hist-data-row,body.dark .hist-person-kpis>div{background:rgba(35,36,54,.9);border-color:rgba(255,255,255,.08)}
 @media(max-width:700px){.hist-attention-grid,.hist-two-cols{grid-template-columns:1fr}.hist-attention{grid-template-columns:40px minmax(0,1fr)}.hist-attention em{grid-column:2;justify-self:start}.hist-kpi-main .hist-kpi{min-height:112px}.hist-detail-drawer{padding:15px}.hist-data-row{grid-template-columns:43px minmax(0,1fr)}.hist-data-row>b{grid-column:2}.hist-person-kpis{grid-template-columns:1fr 1fr}}
-.hist-single-chart{min-height:150px;display:grid;place-items:center;align-content:center;gap:4px;text-align:center}.hist-single-chart>span{width:16px;height:16px;border-radius:50%;background:var(--tone);box-shadow:0 0 0 7px color-mix(in srgb,var(--tone) 14%,transparent)}.hist-single-chart strong{margin-top:9px;color:#292938;font-size:25px}.hist-single-chart b{color:#3d63c9;font-size:12px}.hist-single-chart small{margin-top:6px;color:#777887;font-size:10px}body.dark .hist-single-chart strong{color:#f0f0f5}
+.hist-single-chart{min-height:180px;display:grid;place-items:center;align-content:center;gap:6px;text-align:center;padding:12px 8px}.hist-single-chart>span,.hist-single-chart .hist-single-dot{width:16px;height:16px;border-radius:50%;background:var(--tone);box-shadow:0 0 0 7px color-mix(in srgb,var(--tone) 14%,transparent)}.hist-single-chart strong{margin-top:9px;color:#292938;font-size:25px}.hist-single-chart b{color:#3d63c9;font-size:12px}.hist-single-chart small{margin-top:6px;color:#777887;font-size:10px}body.dark .hist-single-chart strong{color:#f0f0f5}
 
 /* Resumen anual solicitado */
 .hist-annual-summary{margin-top:12px}.hist-annual-table-wrap{overflow:auto;border:1px solid rgba(80,90,130,.12);border-radius:15px;background:rgba(255,255,255,.48)}.hist-annual-table-wrap table{width:100%;min-width:1320px;border-collapse:collapse}.hist-annual-table-wrap th,.hist-annual-table-wrap td{height:44px;padding:5px;border-right:1px solid rgba(80,90,130,.12);border-top:1px solid rgba(80,90,130,.12);text-align:center;font-size:10px}.hist-annual-table-wrap thead th{position:sticky;top:0;z-index:2;background:#e9edf8;color:#4a4b58;font-size:9px;text-transform:uppercase}.hist-annual-table-wrap th:first-child{position:sticky;left:0;z-index:3;min-width:190px;text-align:left;padding-left:12px;background:#f1f3fa;color:#393a48;font-weight:900}.hist-annual-table-wrap thead th:first-child{z-index:4;background:#dfe5f3}.hist-annual-table-wrap td:last-child,.hist-annual-table-wrap thead th:last-child{background:rgba(91,141,239,.08);font-weight:900}.hist-annual-table-wrap td button{width:100%;min-height:32px;border:0;border-radius:8px;background:rgba(91,141,239,.07);color:#3d63c9;font:inherit;font-size:10px;font-weight:850;cursor:pointer}.hist-annual-table-wrap td button:hover,.hist-annual-table-wrap td button:focus{outline:2px solid rgba(91,141,239,.25);background:rgba(91,141,239,.14)}.hist-annual-section th{position:static!important;height:32px!important;padding:5px!important;background:#767984!important;color:#fff!important;text-align:center!important;text-transform:uppercase;letter-spacing:.5px;font-size:9px!important}.hist-month-data{width:100%}body.dark .hist-annual-table-wrap{background:rgba(24,25,40,.7);border-color:rgba(255,255,255,.1)}body.dark .hist-annual-table-wrap th:first-child{background:#25283a;color:#f0f0f5}body.dark .hist-annual-table-wrap thead th{background:#303449;color:#d0d1dd}body.dark .hist-annual-table-wrap td button{color:#a8c0ff;background:rgba(91,141,239,.1)}
@@ -171,21 +177,354 @@ body.dark .hist-section-title h3,body.dark .hist-attention strong,body.dark .his
 @media(max-width:700px){.hist-full-report-cta{grid-template-columns:52px minmax(0,1fr)}.hist-report-mark{width:50px;height:50px}.hist-full-report-cta button{grid-column:1/-1;width:100%}}
 /* Archivo anual amigable + lectura COPA */
 .hist-year-story{padding:17px;background:linear-gradient(145deg,rgba(255,255,255,.78),rgba(247,245,254,.72));border-color:rgba(255,255,255,.92)}
-.hist-year-bento{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(190px,.55fr);gap:10px}.hist-year-trend,.hist-year-progress-card{border:1px solid rgba(93,99,143,.1);border-radius:19px;background:rgba(255,255,255,.84);box-shadow:0 8px 23px rgba(68,71,116,.055)}.hist-year-trend{padding:13px 13px 7px}.hist-year-panel-title{display:flex;justify-content:space-between;align-items:flex-start;gap:9px}.hist-year-panel-title b{display:block;color:#303248;font-size:12px}.hist-year-panel-title small{display:block;margin-top:3px;color:#85879a;font-size:8.5px}.hist-year-panel-title>span{padding:5px 8px;border-radius:999px;background:#edf1ff;color:#5a6fc5;font-size:8px;font-weight:950}.hist-year-trend .hist-chart{margin-top:4px}.hist-year-trend .hist-chart svg{display:block;width:100%;height:auto}.hist-year-progress-card{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:14px;text-align:center}.hist-year-ring{width:116px;height:116px;padding:10px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(#31bc9b 0 var(--hist-progress),#eceefa var(--hist-progress) 360deg);box-shadow:0 12px 28px rgba(49,188,155,.12)}.hist-year-ring>div{width:100%;height:100%;display:grid;place-content:center;border-radius:50%;background:#fff}.hist-year-ring b{display:block;color:#303248;font-size:24px;line-height:1}.hist-year-ring span{display:block;margin-top:4px;color:#85889a;font-size:8px;font-weight:850}.hist-year-progress-card>strong{margin-top:10px;color:#454860;font-size:10px}.hist-year-progress-card>small{margin-top:3px;color:#85889a;font-size:8px}
-.hist-year-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:9px}.hist-year-kpis>div{min-height:78px;padding:11px;border:1px solid rgba(93,99,143,.09);border-radius:15px;background:rgba(255,255,255,.82)}.hist-year-kpis i{display:block;width:7px;height:7px;border-radius:50%;background:var(--tone);box-shadow:0 0 0 4px color-mix(in srgb,var(--tone) 13%,transparent)}.hist-year-kpis b{display:block;margin-top:9px;color:#303248;font-size:15px}.hist-year-kpis span{display:block;margin-top:3px;color:#85889a;font-size:8px;line-height:1.25}
-.hist-story-heading,.hist-complete-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;margin:18px 2px 9px}.hist-story-heading h4,.hist-complete-heading h4{margin:0;color:#303248;font-size:14px}.hist-story-heading p,.hist-complete-heading p{margin:3px 0 0;color:#85889a;font-size:8.5px}.hist-story-heading>span,.hist-complete-heading>span{padding:5px 8px;border-radius:9px;background:#efedfb;color:#6e60bd;font-size:7.5px;font-weight:950;white-space:nowrap}.hist-quarter-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.hist-quarter{padding:8px;border:1px solid rgba(93,99,143,.1);border-radius:18px;background:rgba(255,255,255,.65)}.hist-quarter-head{display:flex;align-items:center;justify-content:space-between;gap:6px;margin:0 2px 6px}.hist-quarter-head b{color:#5c6078;font-size:8px}.hist-quarter-head span{color:#999bad;font-size:6.5px}.hist-story-month{margin-top:6px;padding:10px;border:1px solid #e6e7f1;border-radius:14px;background:#fff;box-shadow:0 6px 15px rgba(65,67,106,.04)}.hist-story-month:first-of-type{margin-top:0}.hist-story-month-top{display:flex;align-items:flex-start;justify-content:space-between;gap:6px}.hist-story-month-name{display:flex;align-items:center;gap:6px;min-width:0}.hist-story-month-name i{width:7px;height:7px;flex:none;border-radius:50%;background:#756fe6;box-shadow:0 0 0 3px rgba(117,111,230,.12)}.hist-story-month-name strong{display:block;color:#42445b;font-size:8.5px;white-space:nowrap}.hist-story-month-name span{display:block;margin-top:2px;color:#a0a2af;font-size:6px}.hist-story-pb{flex:none;padding:0;border:0;background:none;text-align:right;cursor:pointer}.hist-story-pb b{display:block;color:#465071;font-size:10px}.hist-story-pb small{display:block;margin-top:2px;color:#a0a2af;font-size:5.5px}.hist-story-meter{height:4px;margin:7px 0;overflow:hidden;border-radius:999px;background:#f0f1f6}.hist-story-meter i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#5c82ee,#8a65e8,#e87fa9)}.hist-story-cats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:3px}.hist-story-cats button{min-width:0;padding:4px 2px;border:0;border-radius:7px;background:#f5f6fa;color:#57617d;text-align:center;cursor:pointer}.hist-story-cats b{display:block;font-size:6px}.hist-story-cats span{display:block;margin-top:2px;font-size:7px;font-weight:900;white-space:nowrap}.hist-story-empty{grid-column:1/-1;color:#a0a2af;font-size:7px}.hist-story-moves{display:flex;flex-wrap:wrap;gap:3px;margin-top:6px}.hist-story-moves span{padding:3px 4px;border-radius:6px;background:#f0f4fa;color:#687188;font-size:5.8px;font-weight:850}.hist-story-moves span:nth-child(1){background:#e9f8f4;color:#23826b}.hist-story-moves span:nth-child(2){background:#ebf1fc;color:#4169a6}.hist-story-moves span:nth-child(3){background:#f0ebfb;color:#7158b3}.hist-story-month.pending{min-height:110px;display:grid;place-items:center;border-style:dashed;background:rgba(249,249,252,.7);box-shadow:none;text-align:center}.hist-story-month.pending strong{display:block;color:#999bad;font-size:9px}.hist-story-month.pending span{display:block;margin-top:4px;color:#b1b3bf;font-size:6.5px}
-.hist-year-story .hist-annual-table-wrap{overflow:auto;background:rgba(255,255,255,.68)}.hist-year-story .hist-annual-table-wrap table{width:100%;min-width:930px;table-layout:fixed}.hist-year-story .hist-annual-table-wrap thead th:first-child,.hist-year-story .hist-annual-table-wrap tbody th:first-child{width:165px;min-width:165px}.hist-year-story .hist-annual-table-wrap th,.hist-year-story .hist-annual-table-wrap td{height:39px;font-size:8.5px}.hist-year-story .hist-annual-table-wrap td button{min-height:27px;font-size:8.5px}.hist-year-story .hist-annual-total{background:#e8ecf9!important}.hist-annual-mobile{display:none}.hist-mobile-matrix-block{margin-top:8px}.hist-mobile-matrix-title{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 2px 5px}.hist-mobile-matrix-title b{color:#5e6178;font-size:8px;text-transform:uppercase;letter-spacing:.45px}.hist-mobile-matrix-title small{color:#999bad;font-size:6.5px}.hist-mobile-matrix-wrap{overflow:hidden;border:1px solid #e1e4ef;border-radius:12px;background:#fff}.hist-mobile-matrix-wrap table{width:100%;table-layout:fixed;border-collapse:separate;border-spacing:0}.hist-mobile-matrix-wrap th,.hist-mobile-matrix-wrap td{height:34px;padding:3px 2px;border-top:1px solid #eaecf3;border-right:1px solid #eaecf3;text-align:center}.hist-mobile-matrix-wrap tr>*:last-child{border-right:0}.hist-mobile-matrix-wrap thead th{height:32px;border-top:0;background:#e3e7f3;color:#5b6075;font-size:6.7px;line-height:1.1;text-transform:uppercase}.hist-mobile-matrix-wrap thead th:first-child,.hist-mobile-matrix-wrap tbody th,.hist-mobile-matrix-wrap tfoot th{width:43px}.hist-mobile-matrix-wrap tbody th{background:#f2f4f9;color:#666b7f;font-size:7px}.hist-mobile-matrix-wrap td{color:#3e63a8;font-size:8px;font-weight:900}.hist-mobile-matrix-wrap td button{width:100%;min-height:25px;padding:2px;border:0;border-radius:7px;background:#f1f4fb;color:inherit;font:inherit;font-size:8px;font-weight:900;cursor:pointer}.hist-mobile-matrix-wrap tfoot th{background:#4e5473;color:#fff;font-size:7px}.hist-mobile-matrix-wrap tfoot td{background:#e8ebf7}.hist-mobile-matrix-help{margin-top:9px;padding:9px 10px;border-radius:11px;background:rgba(92,130,238,.08);color:#74778b;font-size:7.5px;line-height:1.4}.hist-mobile-matrix-help b{color:#5567a2}
-.hist-copa{padding:17px;background:linear-gradient(145deg,rgba(255,255,255,.78),rgba(242,249,250,.74))}.hist-copa-kicker{margin-bottom:4px;color:#6d79cf;font-size:7.5px;font-weight:950;letter-spacing:1px}.hist-copa-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.hist-copa-item{position:relative;min-height:132px;padding:12px;border:1px solid rgba(93,99,143,.1);border-radius:17px;background:#fff;display:grid;grid-template-columns:34px minmax(0,1fr);align-items:start;gap:9px;text-align:left;font:inherit;cursor:pointer;overflow:hidden}.hist-copa-item:after{content:"";position:absolute;left:0;right:0;bottom:0;height:4px;background:var(--copa-tone)}.hist-copa-item.c{--copa-tone:#5c82ee}.hist-copa-item.o{--copa-tone:#8a65e8}.hist-copa-item.p{--copa-tone:#e87fa9}.hist-copa-item.a{--copa-tone:#31bc9b}.hist-copa-letter{width:34px;height:34px;display:grid;place-items:center;border-radius:11px;background:color-mix(in srgb,var(--copa-tone) 13%,white);color:var(--copa-tone);font-size:16px;font-weight:950}.hist-copa-item small{display:block;color:#85889a;font-size:6.5px;font-weight:950;letter-spacing:.45px}.hist-copa-item b{display:block;margin-top:6px;color:#383b53;font-size:14px}.hist-copa-item p{margin:5px 0 0;color:#85889a;font-size:7.5px;line-height:1.3}.hist-copa-item em{grid-column:2;align-self:end;color:var(--copa-tone);font-size:7px;font-style:normal;font-weight:900}.hist-copa-note{margin-top:9px;padding:9px 10px;border-radius:11px;background:rgba(49,188,155,.08);color:#677f78;font-size:7.5px;line-height:1.4}
+.hist-year-bento{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(190px,.55fr);gap:10px}.hist-year-trend,.hist-year-progress-card{border:1px solid rgba(93,99,143,.1);border-radius:19px;background:rgba(255,255,255,.84);box-shadow:0 8px 23px rgba(68,71,116,.055)}.hist-year-trend{padding:13px 13px 7px}.hist-year-panel-title{display:flex;justify-content:space-between;align-items:flex-start;gap:9px}.hist-year-panel-title b{display:block;color:#303248;font-size:14px}.hist-year-panel-title small{display:block;margin-top:3px;color:#85879a;font-size:11px}.hist-year-panel-title>span{padding:5px 9px;border-radius:999px;background:#edf1ff;color:#5a6fc5;font-size:10px;font-weight:950}.hist-year-trend .hist-chart{margin-top:4px}.hist-year-trend .hist-chart svg{display:block;width:100%;height:auto}.hist-year-progress-card{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:14px;text-align:center}.hist-year-ring{width:116px;height:116px;padding:10px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(#31bc9b 0 var(--hist-progress),#eceefa var(--hist-progress) 360deg);box-shadow:0 12px 28px rgba(49,188,155,.12)}.hist-year-ring>div{width:100%;height:100%;display:grid;place-content:center;border-radius:50%;background:#fff}.hist-year-ring b{display:block;color:#303248;font-size:24px;line-height:1}.hist-year-ring span{display:block;margin-top:4px;color:#85889a;font-size:8px;font-weight:850}.hist-year-progress-card>strong{margin-top:10px;color:#454860;font-size:10px}.hist-year-progress-card>small{margin-top:3px;color:#85889a;font-size:8px}
+.hist-year-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:9px}.hist-year-kpis>div{min-height:88px;padding:13px;border:1px solid rgba(93,99,143,.09);border-radius:15px;background:rgba(255,255,255,.82)}.hist-year-kpis i{display:block;width:8px;height:8px;border-radius:50%;background:var(--tone);box-shadow:0 0 0 4px color-mix(in srgb,var(--tone) 13%,transparent)}.hist-year-kpis b{display:block;margin-top:10px;color:#303248;font-size:17px}.hist-year-kpis span{display:block;margin-top:4px;color:#85889a;font-size:11px;line-height:1.3}
+.hist-story-heading,.hist-complete-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;margin:18px 2px 9px}.hist-story-heading h4,.hist-complete-heading h4{margin:0;color:#303248;font-size:16px}.hist-story-heading p,.hist-complete-heading p{margin:3px 0 0;color:#85889a;font-size:12px}.hist-story-heading>span,.hist-complete-heading>span{padding:6px 9px;border-radius:9px;background:#efedfb;color:#6e60bd;font-size:10px;font-weight:950;white-space:nowrap}.hist-quarter-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.hist-quarter{padding:12px;border:1px solid rgba(93,99,143,.1);border-radius:18px;background:rgba(255,255,255,.65)}.hist-quarter-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 2px 8px}.hist-quarter-head b{color:#5c6078;font-size:12px}.hist-quarter-head span{color:#999bad;font-size:10px}.hist-story-month{margin-top:8px;padding:14px;border:1px solid #e6e7f1;border-radius:16px;background:#fff;box-shadow:0 6px 15px rgba(65,67,106,.04)}.hist-story-month:first-of-type{margin-top:0}.hist-story-month-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}.hist-story-month-name{display:flex;align-items:center;gap:8px;min-width:0}.hist-story-month-name i{width:9px;height:9px;flex:none;border-radius:50%;background:#756fe6;box-shadow:0 0 0 4px rgba(117,111,230,.12)}.hist-story-month-name strong{display:block;color:#42445b;font-size:13px;white-space:nowrap}.hist-story-month-name span{display:block;margin-top:3px;color:#a0a2af;font-size:10px}.hist-story-pb{flex:none;padding:0;border:0;background:none;text-align:right;cursor:pointer}.hist-story-pb b{display:block;color:#465071;font-size:15px}.hist-story-pb small{display:block;margin-top:3px;color:#a0a2af;font-size:9px;font-weight:850;letter-spacing:.3px}.hist-story-meter{height:6px;margin:10px 0;overflow:hidden;border-radius:999px;background:#f0f1f6}.hist-story-meter i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#5c82ee,#8a65e8,#e87fa9)}.hist-story-cats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.hist-story-cats button{min-width:0;min-height:44px;padding:8px 6px;border:0;border-radius:10px;background:#f5f6fa;color:#57617d;text-align:center;cursor:pointer}.hist-story-cats b{display:block;font-size:10px;font-weight:900}.hist-story-cats span{display:block;margin-top:3px;font-size:12px;font-weight:900;white-space:nowrap}.hist-story-empty{grid-column:1/-1;color:#a0a2af;font-size:11px}.hist-story-moves{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px}.hist-story-moves span{padding:5px 8px;border-radius:8px;background:#f0f4fa;color:#687188;font-size:10px;font-weight:850}.hist-story-moves span:nth-child(1){background:#e9f8f4;color:#23826b}.hist-story-moves span:nth-child(2){background:#ebf1fc;color:#4169a6}.hist-story-moves span:nth-child(3){background:#f0ebfb;color:#7158b3}.hist-story-month.pending{min-height:128px;display:grid;place-items:center;border-style:dashed;background:rgba(249,249,252,.7);box-shadow:none;text-align:center}.hist-story-month.pending strong{display:block;color:#999bad;font-size:13px}.hist-story-month.pending span{display:block;margin-top:5px;color:#b1b3bf;font-size:11px}
+.hist-year-story .hist-annual-table-wrap{overflow:auto;background:rgba(255,255,255,.68)}.hist-year-story .hist-annual-table-wrap table{width:100%;min-width:930px;table-layout:fixed}.hist-year-story .hist-annual-table-wrap thead th:first-child,.hist-year-story .hist-annual-table-wrap tbody th:first-child{width:165px;min-width:165px}.hist-year-story .hist-annual-table-wrap th,.hist-year-story .hist-annual-table-wrap td{height:39px;font-size:8.5px}.hist-year-story .hist-annual-table-wrap td button{min-height:27px;font-size:8.5px}.hist-year-story .hist-annual-total{background:#e8ecf9!important}.hist-annual-mobile{display:none}.hist-mobile-matrix-block{margin-top:8px}.hist-mobile-matrix-title{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 2px 5px}.hist-mobile-matrix-title b{color:#5e6178;font-size:11px;text-transform:uppercase;letter-spacing:.45px}.hist-mobile-matrix-title small{color:#999bad;font-size:10px}.hist-mobile-matrix-wrap{overflow:hidden;border:1px solid #e1e4ef;border-radius:12px;background:#fff}.hist-mobile-matrix-wrap table{width:100%;table-layout:fixed;border-collapse:separate;border-spacing:0}.hist-mobile-matrix-wrap th,.hist-mobile-matrix-wrap td{height:40px;padding:4px 3px;border-top:1px solid #eaecf3;border-right:1px solid #eaecf3;text-align:center}.hist-mobile-matrix-wrap tr>*:last-child{border-right:0}.hist-mobile-matrix-wrap thead th{height:38px;border-top:0;background:#e3e7f3;color:#5b6075;font-size:10px;line-height:1.15;text-transform:uppercase}.hist-mobile-matrix-wrap thead th:first-child,.hist-mobile-matrix-wrap tbody th,.hist-mobile-matrix-wrap tfoot th{width:48px}.hist-mobile-matrix-wrap tbody th{background:#f2f4f9;color:#666b7f;font-size:11px}.hist-mobile-matrix-wrap td{color:#3e63a8;font-size:12px;font-weight:900}.hist-mobile-matrix-wrap td button{width:100%;min-height:32px;padding:4px;border:0;border-radius:8px;background:#f1f4fb;color:inherit;font:inherit;font-size:12px;font-weight:900;cursor:pointer}.hist-mobile-matrix-wrap tfoot th{background:#4e5473;color:#fff;font-size:11px}.hist-mobile-matrix-wrap tfoot td{background:#e8ebf7}.hist-mobile-matrix-help{margin-top:10px;padding:11px 12px;border-radius:12px;background:rgba(92,130,238,.08);color:#74778b;font-size:11px;line-height:1.45}.hist-mobile-matrix-help b{color:#5567a2}
+.hist-copa{padding:17px;background:linear-gradient(145deg,rgba(255,255,255,.78),rgba(242,249,250,.74))}.hist-copa-kicker{margin-bottom:4px;color:#6d79cf;font-size:10px;font-weight:950;letter-spacing:1px}.hist-copa-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.hist-copa-item{position:relative;min-height:148px;padding:14px;border:1px solid rgba(93,99,143,.1);border-radius:17px;background:#fff;display:grid;grid-template-columns:38px minmax(0,1fr);align-items:start;gap:10px;text-align:left;font:inherit;cursor:pointer;overflow:hidden}.hist-copa-item:after{content:"";position:absolute;left:0;right:0;bottom:0;height:4px;background:var(--copa-tone)}.hist-copa-item.c{--copa-tone:#5c82ee}.hist-copa-item.o{--copa-tone:#8a65e8}.hist-copa-item.p{--copa-tone:#e87fa9}.hist-copa-item.a{--copa-tone:#31bc9b}.hist-copa-letter{width:38px;height:38px;display:grid;place-items:center;border-radius:12px;background:color-mix(in srgb,var(--copa-tone) 13%,white);color:var(--copa-tone);font-size:18px;font-weight:950}.hist-copa-item small{display:block;color:#85889a;font-size:10px;font-weight:950;letter-spacing:.45px}.hist-copa-item b{display:block;margin-top:7px;color:#383b53;font-size:17px}.hist-copa-item p{margin:6px 0 0;color:#85889a;font-size:11px;line-height:1.35}.hist-copa-item em{grid-column:2;align-self:end;color:var(--copa-tone);font-size:11px;font-style:normal;font-weight:900}.hist-copa-note{margin-top:10px;padding:11px 12px;border-radius:12px;background:rgba(49,188,155,.08);color:#677f78;font-size:11px;line-height:1.45}
 body.dark .hist-year-story,body.dark .hist-copa{background:linear-gradient(145deg,rgba(32,33,51,.86),rgba(40,34,61,.78));border-color:rgba(255,255,255,.08)}body.dark .hist-year-trend,body.dark .hist-year-progress-card,body.dark .hist-year-kpis>div,body.dark .hist-quarter,body.dark .hist-story-month,body.dark .hist-copa-item{background:rgba(35,36,54,.9);border-color:rgba(255,255,255,.08)}body.dark .hist-year-panel-title b,body.dark .hist-year-kpis b,body.dark .hist-story-heading h4,body.dark .hist-complete-heading h4,body.dark .hist-story-month-name strong,body.dark .hist-story-pb b,body.dark .hist-copa-item b{color:#f0f0f5}body.dark .hist-year-ring>div{background:#252638}body.dark .hist-year-ring b{color:#f0f0f5}body.dark .hist-story-cats button{background:rgba(91,141,239,.1);color:#c7d2ef}body.dark .hist-mobile-matrix-wrap{background:#27283a;border-color:rgba(255,255,255,.08)}
 @media(max-width:980px){.hist-quarter-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.hist-copa-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:700px){.hist-year-story{padding:13px}.hist-year-bento{grid-template-columns:1fr}.hist-year-progress-card{display:grid;grid-template-columns:84px minmax(0,1fr);grid-template-rows:auto auto;column-gap:14px;text-align:left;justify-items:start}.hist-year-ring{grid-row:1/3;width:84px;height:84px;padding:7px}.hist-year-ring b{font-size:19px}.hist-year-progress-card>strong{align-self:end;margin:0}.hist-year-progress-card>small{align-self:start}.hist-year-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.hist-quarter-grid{grid-template-columns:1fr}.hist-quarter{padding:8px}.hist-story-cats{grid-template-columns:repeat(auto-fit,minmax(54px,1fr))}.hist-annual-desktop{display:none}.hist-annual-mobile{display:block}.hist-complete-heading{align-items:flex-start}.hist-copa-grid{grid-template-columns:1fr 1fr}.hist-copa-item{min-height:126px;grid-template-columns:31px minmax(0,1fr);padding:10px}.hist-copa-letter{width:31px;height:31px}.hist-copa-item b{font-size:12px}}
 @media(max-width:390px){.hist-copa-grid{grid-template-columns:1fr}.hist-copa-item{min-height:98px;grid-template-columns:34px minmax(0,1fr)}.hist-copa-item em{grid-column:2}.hist-year-kpis b{font-size:13px}.hist-story-heading,.hist-complete-heading{align-items:flex-start}.hist-story-heading>span,.hist-complete-heading>span{max-width:105px;text-align:right}}
 
 /* Histórico simplificado: dos secciones y análisis integrado */
-.hist-tabs-simple button{flex-direction:row;justify-content:center;gap:7px;min-height:43px;font-size:10px}.hist-tabs-simple button span{font-size:15px}.hist-unified-analysis{scroll-margin-top:16px}.hist-compare-strip{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px;margin-top:12px}.hist-compare-strip>div{min-height:74px;padding:10px;border:1px solid rgba(80,90,130,.08);border-radius:13px;background:rgba(91,141,239,.05)}.hist-compare-strip span{display:block;color:#777887;font-size:8px;font-weight:850;text-transform:uppercase}.hist-compare-strip b{display:block;margin-top:5px;color:#292938;font-size:14px}.hist-compare-strip small{display:block;margin-top:4px;font-size:8px;font-weight:900}.hist-compare-strip small.up{color:#168765}.hist-compare-strip small.down{color:#c34c53}.hist-compare-strip small.neutral{color:#858694}.hist-analysis-charts{align-items:stretch}.hist-analysis-charts>.hist-card{margin:0}.hist-period-library{margin-top:18px}.hist-static-row{cursor:default}body.dark .hist-compare-strip>div{background:rgba(91,141,239,.08);border-color:rgba(255,255,255,.08)}body.dark .hist-compare-strip b{color:#f0f0f5}@media(max-width:760px){.hist-compare-strip{grid-template-columns:repeat(2,minmax(0,1fr))}.hist-compare-strip>div:last-child{grid-column:1/-1}.hist-analysis-charts{grid-template-columns:1fr}}@media(max-width:430px){.hist-tabs-simple button{font-size:9px}.hist-tabs-simple button span{font-size:13px}.hist-compare-strip{grid-template-columns:1fr 1fr}}
+.hist-tabs-simple button{flex-direction:row;justify-content:center;gap:7px;min-height:43px;font-size:10px}.hist-tabs-simple button span{font-size:15px}.hist-unified-analysis{scroll-margin-top:16px}.hist-compare-strip{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px;margin-top:12px}.hist-compare-strip>div{min-height:84px;padding:12px;border:1px solid rgba(80,90,130,.08);border-radius:13px;background:rgba(91,141,239,.05)}.hist-compare-strip span{display:block;color:#777887;font-size:10px;font-weight:850;text-transform:uppercase}.hist-compare-strip b{display:block;margin-top:6px;color:#292938;font-size:16px}.hist-compare-strip small{display:block;margin-top:5px;font-size:11px;font-weight:900}.hist-compare-strip small.up{color:#168765}.hist-compare-strip small.down{color:#c34c53}.hist-compare-strip small.neutral{color:#858694}.hist-analysis-charts{align-items:stretch}.hist-analysis-charts>.hist-card{margin:0}.hist-period-library{margin-top:18px}.hist-static-row{cursor:default}body.dark .hist-compare-strip>div{background:rgba(91,141,239,.08);border-color:rgba(255,255,255,.08)}body.dark .hist-compare-strip b{color:#f0f0f5}@media(max-width:760px){.hist-compare-strip{grid-template-columns:repeat(2,minmax(0,1fr))}.hist-compare-strip>div:last-child{grid-column:1/-1}.hist-analysis-charts{grid-template-columns:1fr}}@media(max-width:430px){.hist-tabs-simple button{font-size:9px}.hist-tabs-simple button span{font-size:13px}.hist-compare-strip{grid-template-columns:1fr 1fr}}
 /* Secciones minimizables del Resumen y análisis */
 .hist-collapse-btn{flex:0 0 auto;min-height:34px;padding:7px 10px;border:1px solid rgba(91,141,239,.13);border-radius:10px;background:rgba(91,141,239,.07);color:#3d63c9;font:inherit;font-size:8.5px;font-weight:900;cursor:pointer;white-space:nowrap}.hist-collapse-btn span{display:inline-block;width:13px;font-size:12px;line-height:1}.hist-collapsed>.hist-card-head{margin-bottom:0}.hist-collapsible-content[hidden]{display:none!important}.hist-attention-card{margin-top:12px}.hist-attention-card .hist-attention-grid{margin:10px 0 0}.hist-card-head:has(.hist-collapse-btn){align-items:center}body.dark .hist-collapse-btn{background:rgba(91,141,239,.12);border-color:rgba(255,255,255,.08);color:#b8c8ff}@media(max-width:520px){.hist-collapse-btn{padding:7px 8px;font-size:8px}.hist-card-head:has(.hist-collapse-btn)>div{min-width:0}.hist-card-head:has(.hist-collapse-btn) h3{font-size:13px}}
 
+/* v257 · cuadritos y gráficos legibles en celular */
+@media(max-width:700px){
+  .hist-chart svg{min-height:210px}
+  .hist-single-chart{min-height:200px}
+  .hist-year-trend{padding:14px 12px 10px}
+  .hist-year-trend .hist-chart{margin-top:8px}
+  .hist-year-kpis>div{min-height:96px;padding:14px}
+  .hist-year-kpis b{font-size:18px}
+  .hist-year-kpis span{font-size:11.5px}
+  .hist-story-month{padding:15px;margin-top:10px}
+  .hist-story-month-name strong{font-size:14px}
+  .hist-story-month-name span{font-size:11px}
+  .hist-story-pb b{font-size:16px}
+  .hist-story-pb small{font-size:10px}
+  .hist-story-cats{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+  .hist-story-cats button{min-height:48px;padding:10px 8px}
+  .hist-story-cats b{font-size:11px}
+  .hist-story-cats span{font-size:13px}
+  .hist-story-moves span{font-size:11px;padding:6px 9px}
+  .hist-copa-item{min-height:150px;padding:14px}
+  .hist-copa-item b{font-size:18px}
+  .hist-copa-item p{font-size:12px}
+  .hist-copa-item small{font-size:10.5px}
+  .hist-copa-item em{font-size:12px}
+  .hist-analysis-charts>.hist-card{padding:16px}
+  .hist-kpi-main .hist-kpi{min-height:120px}
+  .hist-kpi-main .hist-kpi strong{font-size:24px}
+  .hist-kpi-main .hist-kpi span{font-size:12px}
+  .hist-attention{min-height:86px}
+  .hist-attention strong{font-size:13px}
+  .hist-attention small{font-size:11px}
+}
+@media(max-width:430px){
+  .hist-chart svg{min-height:230px}
+  .hist-year-kpis{grid-template-columns:1fr 1fr;gap:9px}
+  .hist-story-cats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .hist-copa-grid{grid-template-columns:1fr}
+  .hist-copa-item{min-height:120px;grid-template-columns:40px minmax(0,1fr)}
+  .hist-copa-item em{grid-column:2}
+}
+
+/* v258 · motion graphics de gráficos del Histórico */
+.hist-chart-motion{position:relative;isolation:isolate}
+.hist-chart-motion:before{content:"";position:absolute;inset:8% 4% 18% 8%;border-radius:28px;background:radial-gradient(ellipse at 30% 40%,color-mix(in srgb,var(--tone,#5b8def) 16%,transparent),transparent 68%);opacity:0;pointer-events:none;z-index:0;transition:opacity .8s ease}
+.hist-chart-motion.is-ready:before{opacity:1;animation:hist-chart-glow 3.6s ease-in-out infinite alternate}
+.hist-chart-motion svg{position:relative;z-index:1;overflow:visible}
+.hist-chart-motion .hist-chart-grid,.hist-chart-motion .hist-chart-axis{opacity:0}
+.hist-chart-motion.is-ready .hist-chart-grid,.hist-chart-motion.is-ready .hist-chart-axis{animation:hist-fade-up .45s ease both}
+.hist-chart-motion.is-ready .hist-chart-axis{animation-delay:.05s}
+.hist-chart-motion .hist-chart-line,.hist-chart-motion .hist-chart-shine{fill:none}
+.hist-chart-motion .hist-chart-shine{opacity:0;mix-blend-mode:soft-light;pointer-events:none}
+.hist-chart-motion.is-drawn .hist-chart-shine{opacity:.9;animation:hist-shine-flow 2.8s ease-in-out .9s infinite}
+.hist-chart-motion .hist-chart-area{opacity:0;transform-box:fill-box;transform-origin:center bottom}
+.hist-chart-motion .hist-chart-dot{opacity:0;transform:scale(.2);transform-box:fill-box;transform-origin:center}
+.hist-chart-motion.is-drawn .hist-chart-dot{animation:hist-dot-pop .48s cubic-bezier(.2,1.25,.35,1) both;animation-delay:calc(.55s + var(--i,0) * .08s)}
+.hist-chart-motion .hist-chart-halo{opacity:.75;transform-origin:center;transform-box:fill-box}
+.hist-chart-motion.is-drawn .hist-chart-dot.is-last .hist-chart-halo{animation:hist-halo-pulse 1.8s ease-in-out 1.1s infinite}
+.hist-chart-motion .hist-chart-value{opacity:0;transform:translateY(6px)}
+.hist-chart-motion.is-drawn .hist-chart-value{animation:hist-label-in .4s ease both;animation-delay:calc(.72s + var(--i,0) * .08s)}
+.hist-chart-motion .hist-chart-month{opacity:0}
+.hist-chart-motion.is-drawn .hist-chart-month{animation:hist-fade-up .35s ease both;animation-delay:calc(.4s + var(--i,0) * .05s)}
+.hist-chart-motion.is-static .hist-chart-grid,
+.hist-chart-motion.is-static .hist-chart-axis,
+.hist-chart-motion.is-static .hist-chart-dot,
+.hist-chart-motion.is-static .hist-chart-value,
+.hist-chart-motion.is-static .hist-chart-month,
+.hist-chart-motion.is-static .hist-chart-area,
+.hist-chart-motion.is-static .hist-chart-shine{opacity:1;transform:none;animation:none}
+.hist-single-chart.hist-chart-motion{position:relative;overflow:hidden}
+.hist-single-chart.hist-chart-motion:after{content:"";position:absolute;inset:-30%;background:conic-gradient(from 180deg,transparent,color-mix(in srgb,var(--tone) 18%,transparent),transparent 40%);opacity:0;animation:hist-single-spin 4.5s linear infinite}
+.hist-single-chart.hist-chart-motion.is-ready:after{opacity:1}
+.hist-single-chart.hist-chart-motion .hist-single-dot{position:relative;z-index:1;animation:hist-halo-pulse 1.8s ease-in-out infinite}
+.hist-single-chart.hist-chart-motion strong,.hist-single-chart.hist-chart-motion b,.hist-single-chart.hist-chart-motion small{position:relative;z-index:1}
+.hist-single-chart.hist-chart-motion.is-ready strong{animation:hist-fade-up .5s ease both .05s}
+.hist-single-chart.hist-chart-motion.is-ready b{animation:hist-fade-up .5s ease both .12s}
+.hist-single-chart.hist-chart-motion.is-ready small{animation:hist-fade-up .5s ease both .18s}
+.hist-year-ring{transition:background .8s ease;animation:hist-ring-in .7s cubic-bezier(.22,.9,.28,1) both}
+.hist-year-kpis>div{animation:hist-card-rise .5s ease both;animation-delay:calc(var(--kpi-i,0) * .07s)}
+.hist-year-kpis>div:nth-child(1){--kpi-i:0}.hist-year-kpis>div:nth-child(2){--kpi-i:1}.hist-year-kpis>div:nth-child(3){--kpi-i:2}.hist-year-kpis>div:nth-child(4){--kpi-i:3}
+.hist-story-meter i{transform-origin:left center;animation:hist-meter-fill .85s cubic-bezier(.22,.9,.28,1) both}
+.hist-story-month{animation:hist-card-rise .45s ease both;animation-delay:calc(var(--m-i,0) * .04s)}
+.hist-quarter:nth-child(1) .hist-story-month:nth-child(2){--m-i:0}
+.hist-quarter:nth-child(1) .hist-story-month:nth-child(3){--m-i:1}
+.hist-quarter:nth-child(1) .hist-story-month:nth-child(4){--m-i:2}
+.hist-quarter:nth-child(2) .hist-story-month:nth-child(2){--m-i:3}
+.hist-quarter:nth-child(2) .hist-story-month:nth-child(3){--m-i:4}
+.hist-quarter:nth-child(2) .hist-story-month:nth-child(4){--m-i:5}
+.hist-quarter:nth-child(3) .hist-story-month:nth-child(2){--m-i:6}
+.hist-quarter:nth-child(3) .hist-story-month:nth-child(4){--m-i:8}
+.hist-quarter:nth-child(3) .hist-story-month:nth-child(3){--m-i:7}
+.hist-quarter:nth-child(4) .hist-story-month:nth-child(2){--m-i:9}
+.hist-quarter:nth-child(4) .hist-story-month:nth-child(3){--m-i:10}
+.hist-quarter:nth-child(4) .hist-story-month:nth-child(4){--m-i:11}
+.hist-copa-item{animation:hist-card-rise .5s cubic-bezier(.22,.9,.28,1) both}
+.hist-copa-item.c{animation-delay:.05s}.hist-copa-item.o{animation-delay:.12s}.hist-copa-item.p{animation-delay:.19s}.hist-copa-item.a{animation-delay:.26s}
+.hist-copa-item:after{transform:scaleX(0);transform-origin:left center;animation:hist-meter-fill .7s cubic-bezier(.22,.9,.28,1) .35s both}
+.hist-compare-strip>div{animation:hist-card-rise .42s ease both}
+.hist-compare-strip>div:nth-child(1){animation-delay:.02s}.hist-compare-strip>div:nth-child(2){animation-delay:.07s}.hist-compare-strip>div:nth-child(3){animation-delay:.12s}.hist-compare-strip>div:nth-child(4){animation-delay:.17s}.hist-compare-strip>div:nth-child(5){animation-delay:.22s}
+@keyframes hist-fade-up{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+@keyframes hist-dot-pop{0%{opacity:0;transform:scale(.15)}70%{opacity:1;transform:scale(1.18)}100%{opacity:1;transform:scale(1)}}
+@keyframes hist-label-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes hist-halo-pulse{0%,100%{opacity:.35;transform:scale(.85)}50%{opacity:.9;transform:scale(1.25)}}
+@keyframes hist-chart-glow{from{opacity:.55;transform:scale(1)}to{opacity:1;transform:scale(1.04)}}
+@keyframes hist-shine-flow{0%,100%{opacity:.15}50%{opacity:.85}}
+@keyframes hist-card-rise{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:none}}
+@keyframes hist-meter-fill{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes hist-ring-in{from{opacity:0;transform:scale(.82) rotate(-12deg)}to{opacity:1;transform:none}}
+@keyframes hist-single-spin{to{transform:rotate(360deg)}}
+@media(max-width:700px){
+  .hist-chart-motion:before{inset:10% 2% 20% 6%}
+  .hist-chart-motion.is-drawn .hist-chart-dot.is-last .hist-chart-halo{animation-duration:2.1s}
+}
+
+/* v259 · Histórico en modos: Comparar | Mi año | Cargar */
+.hist-tabs-3{grid-template-columns:repeat(3,minmax(0,1fr));max-width:720px}
+.hist-tabs-3 button{font-size:9.5px;padding:9px 3px}
+.hist-tabs-simple.hist-tabs-3 button{gap:5px;min-height:44px}
+.hist-hero-compact{padding:16px 17px;margin-bottom:11px}
+.hist-hero-compact h2{font-size:19px;margin:5px 0 6px}
+.hist-hero-compact p{font-size:11px}
+.hist-compare-home{display:grid;gap:11px}
+.hist-compare-picker{margin-bottom:0}
+.hist-main-chart-card{margin-bottom:0}
+.hist-metric-chips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}
+.hist-metric-chip{border:0;border-radius:999px;padding:8px 11px;background:rgba(91,141,239,.1);color:#3d63c9;font:inherit;font-size:10px;font-weight:900;cursor:pointer}
+.hist-metric-chip.active{background:linear-gradient(135deg,#5b8def,#875fdd);color:#fff;box-shadow:0 5px 12px rgba(91,112,210,.22)}
+.hist-detail-stack{display:grid;gap:12px}
+.hist-subcard{padding:12px;border:1px solid rgba(80,90,130,.08);border-radius:14px;background:rgba(255,255,255,.55)}
+.hist-subcard h4{margin:0 0 3px;color:#292938;font-size:13px}
+.hist-subcard>p{margin:0 0 9px;color:#777887;font-size:10.5px}
+.hist-compare-home .hist-attention-card{margin-top:0}
+body.dark .hist-metric-chip{background:rgba(91,141,239,.14);color:#b8c8ff}
+body.dark .hist-subcard{background:rgba(28,29,46,.55);border-color:rgba(255,255,255,.08)}
+body.dark .hist-subcard h4{color:#f0f0f5}
+@media(max-width:430px){
+  .hist-tabs-3 button{font-size:8.5px;padding:8px 2px;gap:3px}
+  .hist-tabs-3 button span{font-size:13px}
+  .hist-metric-chip{padding:7px 9px;font-size:9.5px}
+  .hist-hero-compact h2{font-size:17px}
+}
+
+/* v260 · tipografía y datos legibles en PC / pantallas grandes */
+@media(min-width:900px){
+  .hist-view{max-width:1180px;margin:0 auto;padding-left:8px;padding-right:8px}
+  .hist-tabs{max-width:780px;padding:6px;gap:8px;margin-bottom:16px}
+  .hist-tabs button{font-size:12px;padding:12px 10px;border-radius:14px}
+  .hist-tabs button span{font-size:18px}
+  .hist-tabs-simple button{min-height:48px;font-size:12.5px;gap:8px}
+  .hist-tabs-simple button span{font-size:17px}
+  .hist-tabs-3{max-width:820px}
+  .hist-tabs-3 button{font-size:12px;padding:11px 8px}
+
+  .hist-hero{padding:26px 28px;border-radius:26px;margin-bottom:16px}
+  .hist-hero .eyebrow{font-size:11px;letter-spacing:1px}
+  .hist-hero h2{font-size:28px;margin:8px 0 10px}
+  .hist-hero p{font-size:14.5px;line-height:1.5;max-width:720px}
+  .hist-hero-actions{margin-top:16px;gap:10px}
+  .hist-hero-actions button{padding:12px 16px;font-size:13px;border-radius:14px}
+  .hist-hero-compact{padding:22px 26px}
+  .hist-hero-compact h2{font-size:26px;margin:6px 0 8px}
+  .hist-hero-compact p{font-size:14px;max-width:720px}
+
+  .hist-card{padding:20px 22px;border-radius:22px;margin-bottom:14px}
+  .hist-card-head{margin-bottom:14px;gap:14px}
+  .hist-card-head h3{font-size:18px}
+  .hist-card-head p{font-size:13px;line-height:1.45}
+  .hist-card-head .hist-badge{padding:6px 12px;font-size:11px}
+
+  .hist-statusbar{padding:14px 16px;margin-bottom:14px}
+  .hist-statusbar strong{font-size:14px}
+  .hist-statusbar small{font-size:12px}
+  .hist-mini-btn{padding:9px 14px;font-size:12px}
+
+  .hist-kpi{min-height:110px;padding:16px}
+  .hist-kpi .k-icon{font-size:18px}
+  .hist-kpi strong{font-size:26px}
+  .hist-kpi span{font-size:12.5px;margin-top:6px}
+  .hist-kpi small{font-size:12px}
+  .hist-kpi-main .hist-kpi{min-height:130px}
+  .hist-kpi-main .hist-kpi strong{font-size:30px}
+  .hist-kpi-main .hist-kpi span{font-size:13.5px}
+
+  .hist-compare-strip{gap:10px;margin-top:14px}
+  .hist-compare-strip>div{min-height:104px;padding:16px;border-radius:16px}
+  .hist-compare-strip span{font-size:12px}
+  .hist-compare-strip b{font-size:22px;margin-top:8px}
+  .hist-compare-strip small{font-size:13px;margin-top:6px}
+
+  .hist-picker-tools{gap:8px;margin-bottom:12px}
+  .hist-picker-tools button{padding:10px 14px;font-size:12px}
+  .hist-month-picker{grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;margin-bottom:14px}
+  .hist-month-option span{padding:12px 8px;font-size:12.5px;border-radius:14px}
+
+  .hist-metric-chips{gap:8px;margin-bottom:12px}
+  .hist-metric-chip{padding:10px 14px;font-size:12.5px}
+
+  .hist-chart svg{min-height:280px}
+  .hist-single-chart{min-height:220px}
+  .hist-single-chart strong{font-size:34px}
+  .hist-single-chart b{font-size:15px}
+  .hist-single-chart small{font-size:13px}
+
+  .hist-table{min-width:640px}
+  .hist-table th{font-size:11px;padding:12px 10px}
+  .hist-table td{font-size:13px;padding:12px 10px}
+  .hist-table td strong{font-size:13.5px}
+  .hist-search input{padding:12px 14px 12px 38px;font-size:13.5px;border-radius:14px}
+
+  .hist-attention{min-height:92px;padding:14px 16px;gap:12px}
+  .hist-attention>span{width:46px;height:46px;font-size:20px}
+  .hist-attention strong{font-size:15px}
+  .hist-attention small{font-size:12.5px}
+  .hist-attention em{font-size:11.5px;padding:7px 10px}
+
+  .hist-subcard{padding:16px;border-radius:16px}
+  .hist-subcard h4{font-size:16px}
+  .hist-subcard>p{font-size:13px;margin-bottom:12px}
+  .hist-detail-stack{gap:16px;grid-template-columns:1fr 1fr}
+  .hist-compare-home{gap:14px}
+
+  .hist-primary,.hist-secondary,.hist-danger{padding:12px 18px;font-size:13px;border-radius:14px}
+  .hist-collapse-btn{min-height:38px;padding:8px 12px;font-size:11.5px}
+
+  .hist-strategy{padding:16px 18px}
+  .hist-strategy h4{font-size:15px}
+  .hist-strategy p{font-size:13px}
+  .hist-strategy .evidence{font-size:12px;padding:9px 11px}
+  .hist-strategy .action{font-size:13px}
+  .hist-strategy .s-priority{font-size:10px;padding:4px 9px}
+
+  .hist-year-story{padding:22px}
+  .hist-year-panel-title b{font-size:16px}
+  .hist-year-panel-title small{font-size:13px}
+  .hist-year-panel-title>span{font-size:12px;padding:6px 10px}
+  .hist-year-kpis>div{min-height:104px;padding:16px}
+  .hist-year-kpis b{font-size:22px}
+  .hist-year-kpis span{font-size:13px}
+  .hist-year-ring{width:140px;height:140px;padding:12px}
+  .hist-year-ring b{font-size:30px}
+  .hist-year-ring span{font-size:11px}
+  .hist-year-progress-card>strong{font-size:13px}
+  .hist-year-progress-card>small{font-size:11px}
+  .hist-year-trend .hist-chart svg{min-height:260px}
+
+  .hist-story-heading h4,.hist-complete-heading h4{font-size:18px}
+  .hist-story-heading p,.hist-complete-heading p{font-size:13px}
+  .hist-story-heading>span,.hist-complete-heading>span{font-size:11.5px;padding:7px 11px}
+
+  .hist-quarter{padding:14px}
+  .hist-quarter-head b{font-size:13px}
+  .hist-quarter-head span{font-size:12px}
+  .hist-story-month{padding:16px;margin-top:10px;border-radius:18px}
+  .hist-story-month-name strong{font-size:15px}
+  .hist-story-month-name span{font-size:12px}
+  .hist-story-pb b{font-size:18px}
+  .hist-story-pb small{font-size:11px}
+  .hist-story-meter{height:8px;margin:12px 0}
+  .hist-story-cats{gap:8px}
+  .hist-story-cats button{min-height:52px;padding:10px 8px;border-radius:12px}
+  .hist-story-cats b{font-size:12px}
+  .hist-story-cats span{font-size:14px}
+  .hist-story-moves span{font-size:12px;padding:6px 10px}
+  .hist-story-month.pending{min-height:140px}
+  .hist-story-month.pending strong{font-size:15px}
+  .hist-story-month.pending span{font-size:13px}
+
+  .hist-copa{padding:22px}
+  .hist-copa-kicker{font-size:12px}
+  .hist-copa-item{min-height:168px;padding:18px;grid-template-columns:46px minmax(0,1fr);gap:12px}
+  .hist-copa-letter{width:46px;height:46px;font-size:22px;border-radius:14px}
+  .hist-copa-item small{font-size:12px}
+  .hist-copa-item b{font-size:22px;margin-top:8px}
+  .hist-copa-item p{font-size:13.5px;line-height:1.4}
+  .hist-copa-item em{font-size:13px}
+  .hist-copa-note{font-size:13px;padding:12px 14px}
+
+  .hist-annual-table-wrap th,.hist-annual-table-wrap td{height:48px;padding:7px;font-size:12.5px}
+  .hist-annual-table-wrap thead th{font-size:11px}
+  .hist-annual-table-wrap th:first-child{min-width:210px;font-size:13px;padding-left:14px}
+  .hist-annual-table-wrap td button{min-height:36px;font-size:12.5px}
+  .hist-year-story .hist-annual-table-wrap th,.hist-year-story .hist-annual-table-wrap td{height:44px;font-size:12px}
+  .hist-year-story .hist-annual-table-wrap td button{min-height:32px;font-size:12px}
+
+  .hist-full-report-cta{padding:22px 24px;margin:20px 0 32px;gap:18px}
+  .hist-full-report-cta h3{font-size:20px}
+  .hist-full-report-cta p{font-size:13.5px}
+  .hist-full-report-cta button{min-height:52px;padding:12px 20px;font-size:13px}
+  .hist-report-mark{width:64px;height:64px;font-size:14px}
+  .hist-share-pdf{min-height:42px;padding:10px 16px;font-size:12.5px}
+
+  .hist-period{padding:14px;gap:12px}
+  .hist-period-info h4{font-size:15px}
+  .hist-period-info p{font-size:12.5px}
+  .hist-period-date{width:56px;height:56px}
+  .hist-period-date b{font-size:13px}
+  .hist-period-date small{font-size:10px}
+  .hist-action-menu button{padding:9px 12px;font-size:12px}
+
+  .hist-upload b{font-size:14px}
+  .hist-upload small{font-size:12px}
+  .hist-upload .u-state{font-size:11px;padding:6px 10px}
+  .hist-file-slot b{font-size:13px}
+  .hist-file-slot small{font-size:11px}
+  .hist-month-head h3{font-size:17px}
+  .hist-month-head span{font-size:11px}
+  .hist-month-count{font-size:12px;padding:6px 10px}
+
+  .hist-data-row{min-height:80px;padding:12px}
+  .hist-data-row strong{font-size:15px}
+  .hist-data-row small{font-size:12px}
+  .hist-data-row>b{font-size:13px}
+  .hist-detail-head h2{font-size:26px}
+  .hist-detail-head p{font-size:14px}
+  .hist-person-kpis b{font-size:24px}
+  .hist-person-kpis span{font-size:12.5px}
+  .hist-drill-note{font-size:13px;padding:13px 14px}
+
+  .hist-empty h3{font-size:18px}
+  .hist-empty p{font-size:14px}
+  .hist-section-title h3{font-size:20px}
+  .hist-section-title p{font-size:14px}
+}
+
+@media(min-width:1200px){
+  .hist-view{max-width:1280px}
+  .hist-chart svg{min-height:310px}
+  .hist-year-trend .hist-chart svg{min-height:290px}
+  .hist-hero h2,.hist-hero-compact h2{font-size:30px}
+  .hist-compare-strip b{font-size:24px}
+  .hist-card-head h3{font-size:19px}
+  .hist-copa-item b{font-size:24px}
+  .hist-story-pb b{font-size:20px}
+}
 </style>
 
 <script src="./vendor/xlsx.full.min.js" integrity="sha384-vtjasyidUo0kW94K5MXDXntzOJpQgBKXmE7e2Ga4LG0skTTLeBi97eFAXsqewJjw"></script>
@@ -3752,7 +4091,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v256 · Segura</div>
+  <div class="ds-foot">APPI · v260 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4703,9 +5042,10 @@ body.dark #pageTabs button.active{color:#a8c0ff}
       <p>Cierres mensuales, evolución y estrategias</p>
     </header>
 
-    <nav class="hist-tabs hist-tabs-simple" aria-label="Secciones del histórico">
-      <button type="button" data-hist-tab="dashboard" class="active"><span>▦</span>Resumen y análisis</button>
-      <button type="button" data-hist-tab="cargar"><span>＋</span>Cargar y administrar</button>
+    <nav class="hist-tabs hist-tabs-simple hist-tabs-3" aria-label="Secciones del histórico">
+      <button type="button" data-hist-tab="comparar" class="active"><span>↗</span>Comparar</button>
+      <button type="button" data-hist-tab="anio"><span>▦</span>Mi año</button>
+      <button type="button" data-hist-tab="cargar"><span>＋</span>Cargar</button>
     </nav>
 
     <div id="historicoContent" class="hist-content">
@@ -14400,9 +14740,9 @@ const FILE_TYPES={
   ingresos:{label:'Ingresos',icon:'IN',input:'histFileIngresos'}
 };
 const H={
-  db:null,periods:[],reports:[],tab:'dashboard',ready:false,rendering:false,
+  db:null,periods:[],reports:[],tab:'comparar',ready:false,rendering:false,
   uploadYear:new Date().getFullYear(),uploads:{},fileTarget:null,
-  selected:new Set(),openMenu:'',personSearch:'',lastReport:null,syncing:false,syncLog:[]
+  selected:new Set(),openMenu:'',personSearch:'',lastReport:null,syncing:false,syncLog:[],chartMetric:'pbPersonal'
 };
 
 const $=id=>document.getElementById(id);
@@ -14511,9 +14851,7 @@ async function refreshData(){
   }
   H.reports=(await dbGetAll('reports')).sort((a,b)=>String(b.createdAt).localeCompare(String(a.createdAt)));
   H.lastReport=H.reports[0]||null;notifyDbChange();
-  if(!H.selected.size&&H.periods.length){
-    const last=H.periods.slice(-Math.min(2,H.periods.length));last.forEach(p=>H.selected.add(p.id));
-  }
+  if(!H.selected.size&&H.periods.length) ensureDefaultSelection();
 }
 
 async function sha256(file){
@@ -14650,17 +14988,33 @@ async function saveMonthPeriod(id){
     if(existing&&!await window.APPIDialog.confirm(`${MONTHS_H[draft.month]} ${draft.year} ya está guardado.`,{title:'Actualizar cierre',icon:'📈',okText:'Actualizar'})){render();return}
     const record=await buildPeriodRecord(draft),db=await openDB();
     await new Promise((resolve,reject)=>{const tx=db.transaction(['periods','files'],'readwrite');tx.objectStore('periods').put(record);for(const type of Object.keys(FILE_TYPES)){const file=draft.files[type];tx.objectStore('files').put({key:`${record.id}:${type}`,periodId:record.id,type,name:file.name,size:file.size,mime:file.type||'',lastModified:file.lastModified||0,blob:file})}tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)});
-    delete H.uploads[id];await refreshData();H.selected=new Set(H.periods.slice(-Math.min(2,H.periods.length)).map(p=>p.id));render();toast(`✓ ${record.label} guardado`,2400);try{haptic(20)}catch(e){}
+    delete H.uploads[id];await refreshData();ensureDefaultSelection(true);render();toast(`✓ ${record.label} guardado`,2400);try{haptic(20)}catch(e){}
     if(navigator.onLine&&cloudReady()&&getSession())setTimeout(()=>syncAll(false),400);
   }catch(e){console.error('Histórico guardar',e);toast(`No se pudo guardar: ${e.message}`,3500);render()}
 }
 
-function setActiveTab(){document.querySelectorAll('.hist-tabs [data-hist-tab]').forEach(b=>b.classList.toggle('active',b.dataset.histTab===H.tab))}
-function openTab(tab){H.tab=['cargar','meses'].includes(tab)?'cargar':'dashboard';setActiveTab();render()}
+function normalizeHistTab(tab){
+  if(['cargar','meses','upload'].includes(tab))return 'cargar';
+  if(['anio','year','mi-anio','dashboard-year'].includes(tab))return 'anio';
+  if(['analizar','compare','comparar','dashboard','resumen'].includes(tab))return 'comparar';
+  return 'comparar';
+}
+function setActiveTab(){document.querySelectorAll('.hist-tabs [data-hist-tab]').forEach(b=>b.classList.toggle('active',normalizeHistTab(b.dataset.histTab)===H.tab))}
+function openTab(tab){H.tab=normalizeHistTab(tab);setActiveTab();render()}
+function ensureDefaultSelection(force){
+  if(!H.periods.length){H.selected.clear();return}
+  if(!force&&H.selected.size)return;
+  H.selected.clear();
+  const latest=H.periods[H.periods.length-1];
+  const yearList=H.periods.filter(p=>p.year===latest.year);
+  (yearList.length?yearList:H.periods).forEach(p=>H.selected.add(p.id));
+}
 function render(){
   const c=$('historicoContent');if(!c||H.rendering)return;H.rendering=true;
   try{
-    if(H.tab==='cargar')renderUpload(c);else renderDashboard(c);
+    if(H.tab==='cargar')renderUpload(c);
+    else if(H.tab==='anio')renderYearView(c);
+    else renderCompareView(c);
   }finally{H.rendering=false}
   updateSyncStatus();
 }
@@ -14767,34 +15121,106 @@ async function shareFullHistoricalReport(year){
   const pages=pdf.getNumberOfPages();for(let page=1;page<=pages;page++){pdf.setPage(page);if(page>1){color('draw',C.line);pdf.line(M,PH-19,W-M,PH-19)}setFont(6.3,'normal',C.muted);pdf.text(`APPI · Informe completo ${year}`,M,PH-8);pdf.text(`Página ${page} de ${pages}`,W-M,PH-8,{align:'right'})}
   const blob=pdf.output('blob'),file=new File([blob],fileName,{type:'application/pdf'});if(navigator.canShare&&navigator.canShare({files:[file]})){try{await navigator.share({files:[file],title:`Informe completo APPI ${year}`,text:`Informe completo ${year} generado por APPI, listo para compartir por WhatsApp.`});toast('Informe compartido',2300);return}catch(error){if(error&&error.name==='AbortError'){toast('Se canceló el envío del informe.',2200);return}}}pdf.save(fileName);toast('Informe PDF descargado. Ya podés compartirlo por WhatsApp.',3600)
 }
-function renderUnifiedAnalysis(){if(!H.periods.length)return '';let periods=selectedPeriods();if(!periods.length){H.periods.slice(-Math.min(2,H.periods.length)).forEach(p=>H.selected.add(p.id));periods=selectedPeriods()}const analysis=analyzePeriods(periods),latest=periods[periods.length-1],first=periods[0];return `<section id="histUnifiedAnalysis" class="hist-unified-analysis"><div class="hist-card"><div class="hist-card-head"><div><h3>Comparar y analizar</h3><p>Elegí los cierres que querés estudiar dentro del mismo resumen.</p></div><span class="hist-badge">${periods.length} seleccionados</span></div><div class="hist-picker-tools"><button data-pick="latest">Último</button><button data-pick="last2">Últimos 2</button><button data-pick="last6">Últimos 6</button><button data-pick="year">Año ${latest.year}</button><button data-pick="all">Todos</button></div><div class="hist-month-picker">${H.periods.map(p=>`<label class="hist-month-option"><input type="checkbox" value="${p.id}" ${H.selected.has(p.id)?'checked':''}><span>${SHORT_H[p.month]} ${String(p.year).slice(-2)}</span></label>`).join('')}</div><div class="hist-compare-strip"><div><span>PB del equipo</span><b>${fmt(latest.summary.pbPersonal)} PB</b><small class="${analysis.pbDelta.cls}">${esc(analysis.pbDelta.text)}</small></div><div><span>Actividad</span><b>${latest.summary.activePct}%</b><small class="${analysis.activeDelta.cls}">${esc(analysis.activeDelta.text)}</small></div><div><span>Personas</span><b>${latest.summary.people}</b><small class="${analysis.peopleDelta.cls}">${esc(analysis.peopleDelta.text)}</small></div><div><span>Ingresos</span><b>${latest.summary.incomeCount}</b><small class="${analysis.incomeDelta.cls}">${esc(analysis.incomeDelta.text)}</small></div><div><span>Pendientes</span><b>${fmt(latest.summary.pending)}</b><small class="${analysis.pendingDelta.cls}">${esc(analysis.pendingDelta.text)}</small></div></div></div><div class="hist-two-cols hist-analysis-charts"><div class="hist-card"><div class="hist-card-head"><div><h3>Actividad</h3><p>Porcentaje de personas activas</p></div></div>${lineChart(periods,'activePct','#3ad0a4','%')}</div><div class="hist-card"><div class="hist-card-head"><div><h3>Garantías pendientes</h3><p>Evolución entre cierres</p></div></div>${lineChart(periods,'pending','#f5b301','')}</div></div><div class="hist-card"><div class="hist-card-head"><div><h3>Evolución por categoría</h3><p>${esc(first.label)} comparado con ${esc(latest.label)}</p></div></div><div class="hist-table-wrap"><table class="hist-table" style="min-width:420px"><thead><tr><th>Categoría</th><th>${esc(SHORT_H[first.month])} ${first.year}</th><th>${esc(SHORT_H[latest.month])} ${latest.year}</th><th>Cambio</th></tr></thead><tbody>${categoryRows(first,latest)}</tbody></table></div></div><div class="hist-card"><div class="hist-card-head"><div><h3>Cambios individuales</h3><p>${analysis.improved} mejoraron · ${analysis.declined} bajaron · ${analysis.newPeople} nuevos</p></div><span class="hist-badge">${analysis.changes.length} personas</span></div><div class="hist-search"><input id="histPersonSearch" value="${esc(H.personSearch)}" placeholder="Buscar persona o código…"></div><div class="hist-table-wrap"><table class="hist-table"><thead><tr><th>Persona</th><th>Categoría</th><th>PB inicial</th><th>PB final</th><th>Cambio</th><th>Equipo</th></tr></thead><tbody id="histPersonRows">${personRows(analysis.changes,H.personSearch)}</tbody></table></div></div></section>`}
-function bindUnifiedAnalysis(root){root.querySelectorAll('#histUnifiedAnalysis .hist-month-option input').forEach(input=>input.onchange=()=>{input.checked?H.selected.add(input.value):H.selected.delete(input.value);if(!H.selected.size)H.selected.add(input.value);render()});root.querySelectorAll('#histUnifiedAnalysis [data-pick]').forEach(button=>button.onclick=()=>pickPeriods(button.dataset.pick));const search=$('histPersonSearch');if(search)search.oninput=event=>{H.personSearch=event.target.value;const periods=selectedPeriods(),analysis=periods.length?analyzePeriods(periods):null;if(analysis&&$('histPersonRows'))$('histPersonRows').innerHTML=personRows(analysis.changes,H.personSearch)};root.querySelectorAll('[data-hist-scroll-analysis]').forEach(button=>button.onclick=()=>document.getElementById('histUnifiedAnalysis')?.scrollIntoView({behavior:'smooth',block:'start'}))}
-
+const HIST_CHART_METRICS={
+  pbPersonal:{label:'PB del equipo',suffix:' PB',color:'#5b8def',hint:'Evolución del PB de la organización'},
+  activePct:{label:'Actividad',suffix:'%',color:'#3ad0a4',hint:'Porcentaje de personas con PB personal'},
+  pending:{label:'Pendientes',suffix:'',color:'#f5b301',hint:'Garantías pendientes entre cierres'},
+  incomeCount:{label:'Ingresos',suffix:'',color:'#a06bff',hint:'Cantidad de ingresos por cierre'},
+  people:{label:'Personas',suffix:'',color:'#e87fa9',hint:'Tamaño del equipo en cada cierre'}
+};
+function currentChartMetric(){
+  return HIST_CHART_METRICS[H.chartMetric]?H.chartMetric:'pbPersonal';
+}
+function selectionAttention(periods){
+  if(!periods.length)return '';
+  const latest=periods[periods.length-1],previous=periods.length>1?periods[periods.length-2]:null,s=latest.summary||{};
+  const previousPeople=new Map((previous&&previous.people||[]).map(p=>[p.matchKey,p]));
+  const inactive2=previous?latest.people.filter(p=>p.pnAct===0&&previousPeople.get(p.matchKey)&&previousPeople.get(p.matchKey).pnAct===0):[];
+  const highPending=latest.people.filter(p=>num(p.garantias&&p.garantias.pendientes)>=10);
+  const topBranch=(s.branches||[])[0],branchShare=topBranch&&s.pbPersonal?pct(topBranch.pb,s.pbPersonal):0;
+  const cards=[];
+  if(previous)cards.push(histAttention('#d9535a','!',`${inactive2.length} personas con dos cierres sin actividad`,'Según los meses elegidos','inactive2'));
+  else cards.push(`<div class="hist-attention hist-info-attention" style="--tone:#5b8def"><span>i</span><div><strong>Elegí al menos dos meses</strong><small>Así aparecen inactividad consecutiva y deltas reales.</small></div></div>`);
+  cards.push(histAttention('#e99a20','◷',`${num(s.incomeNoPurchase)} ingresos sin compra posterior`,'Del último mes seleccionado','incomeNoPurchase'));
+  cards.push(histAttention('#8a63e6','▤',`${highPending.length} personas con muchos pendientes`,'Ordenadas por garantías','highPending'));
+  cards.push(histAttention('#5b8def','↗',`${branchShare}% del PB en la rama principal`,'Ver la rama y sus integrantes','topBranch'));
+  return `<div class="hist-card hist-attention-card"><div class="hist-card-head"><div><h3>Atención según tu selección</h3><p>Alertas calculadas con los ${periods.length} cierres elegidos · foco en ${esc(latest.label)}</p></div></div><div class="hist-attention-grid">${cards.join('')}</div></div>`;
+}
+function renderUnifiedAnalysis(){
+  if(!H.periods.length)return '';
+  ensureDefaultSelection();
+  let periods=selectedPeriods();
+  if(!periods.length){ensureDefaultSelection(true);periods=selectedPeriods()}
+  const analysis=analyzePeriods(periods),latest=periods[periods.length-1],first=periods[0];
+  const metric=currentChartMetric(),meta=HIST_CHART_METRICS[metric];
+  const metricButtons=Object.entries(HIST_CHART_METRICS).map(([key,item])=>`<button type="button" class="hist-metric-chip${key===metric?' active':''}" data-hist-metric="${key}">${esc(item.label)}</button>`).join('');
+  return `<section id="histUnifiedAnalysis" class="hist-unified-analysis hist-compare-home">
+    <div class="hist-card hist-compare-picker">
+      <div class="hist-card-head"><div><h3>Comparar y analizar</h3><p>Elegí los cierres: el gráfico y las alertas se arman con esa selección.</p></div><span class="hist-badge">${periods.length} seleccionados</span></div>
+      <div class="hist-picker-tools"><button data-pick="latest">Último</button><button data-pick="last2">Últimos 2</button><button data-pick="last6">Últimos 6</button><button data-pick="year">Año ${latest.year}</button><button data-pick="all">Todos</button></div>
+      <div class="hist-month-picker">${H.periods.map(p=>`<label class="hist-month-option"><input type="checkbox" value="${p.id}" ${H.selected.has(p.id)?'checked':''}><span>${SHORT_H[p.month]} ${String(p.year).slice(-2)}</span></label>`).join('')}</div>
+      <div class="hist-compare-strip">
+        <div><span>PB del equipo</span><b>${fmt(latest.summary.pbPersonal)} PB</b><small class="${analysis.pbDelta.cls}">${esc(analysis.pbDelta.text)}</small></div>
+        <div><span>Actividad</span><b>${latest.summary.activePct}%</b><small class="${analysis.activeDelta.cls}">${esc(analysis.activeDelta.text)}</small></div>
+        <div><span>Personas</span><b>${latest.summary.people}</b><small class="${analysis.peopleDelta.cls}">${esc(analysis.peopleDelta.text)}</small></div>
+        <div><span>Ingresos</span><b>${latest.summary.incomeCount}</b><small class="${analysis.incomeDelta.cls}">${esc(analysis.incomeDelta.text)}</small></div>
+        <div><span>Pendientes</span><b>${fmt(latest.summary.pending)}</b><small class="${analysis.pendingDelta.cls}">${esc(analysis.pendingDelta.text)}</small></div>
+      </div>
+    </div>
+    <div class="hist-card hist-main-chart-card">
+      <div class="hist-card-head"><div><h3>${esc(meta.label)}</h3><p>${esc(meta.hint)} · ${esc(first.label)} → ${esc(latest.label)}</p></div></div>
+      <div class="hist-metric-chips">${metricButtons}</div>
+      ${lineChart(periods,metric,meta.color,meta.suffix)}
+    </div>
+    ${selectionAttention(periods)}
+    <div class="hist-card hist-more-details" data-hist-default-collapsed="1"><div class="hist-card-head"><div><h3>Más detalle</h3><p>Categorías y cambios individuales de la selección</p></div></div>
+      <div class="hist-detail-stack">
+        <div class="hist-subcard"><h4>Evolución por categoría</h4><p>${esc(first.label)} comparado con ${esc(latest.label)}</p><div class="hist-table-wrap"><table class="hist-table" style="min-width:420px"><thead><tr><th>Categoría</th><th>${esc(SHORT_H[first.month])} ${first.year}</th><th>${esc(SHORT_H[latest.month])} ${latest.year}</th><th>Cambio</th></tr></thead><tbody>${categoryRows(first,latest)}</tbody></table></div></div>
+        <div class="hist-subcard"><h4>Cambios individuales</h4><p>${analysis.improved} mejoraron · ${analysis.declined} bajaron · ${analysis.newPeople} nuevos</p><div class="hist-search"><input id="histPersonSearch" value="${esc(H.personSearch)}" placeholder="Buscar persona o código…"></div><div class="hist-table-wrap"><table class="hist-table"><thead><tr><th>Persona</th><th>Categoría</th><th>PB inicial</th><th>PB final</th><th>Cambio</th><th>Equipo</th></tr></thead><tbody id="histPersonRows">${personRows(analysis.changes,H.personSearch)}</tbody></table></div></div>
+      </div>
+    </div>
+  </section>`;
+}
+function bindUnifiedAnalysis(root){
+  root.querySelectorAll('#histUnifiedAnalysis .hist-month-option input').forEach(input=>input.onchange=()=>{input.checked?H.selected.add(input.value):H.selected.delete(input.value);if(!H.selected.size)H.selected.add(input.value);render()});
+  root.querySelectorAll('#histUnifiedAnalysis [data-pick]').forEach(button=>button.onclick=()=>pickPeriods(button.dataset.pick));
+  root.querySelectorAll('[data-hist-metric]').forEach(button=>button.onclick=()=>{H.chartMetric=button.dataset.histMetric;render()});
+  const search=$('histPersonSearch');
+  if(search)search.oninput=event=>{H.personSearch=event.target.value;const periods=selectedPeriods(),analysis=periods.length?analyzePeriods(periods):null;if(analysis&&$('histPersonRows'))$('histPersonRows').innerHTML=personRows(analysis.changes,H.personSearch)};
+  root.querySelectorAll('[data-hist-scroll-analysis]').forEach(button=>button.onclick=()=>{openTab('comparar');requestAnimationFrame(()=>document.getElementById('histUnifiedAnalysis')?.scrollIntoView({behavior:'smooth',block:'start'}))});
+  root.querySelectorAll('[data-hist-open-tab]').forEach(button=>button.onclick=()=>openTab(button.dataset.histOpenTab));
+}
 const HIST_COLLAPSE_KEY='hist_dashboard_collapsed_v1';
 function collapsedPreferences(){try{return JSON.parse(localStorage.getItem(HIST_COLLAPSE_KEY)||'{}')}catch(e){return {}}}
-function enableDashboardCollapsibles(root){const preferences=collapsedPreferences();root.querySelectorAll('.hist-card').forEach((card,index)=>{const head=card.querySelector(':scope > .hist-card-head');if(!head||card.dataset.collapsibleReady)return;const title=head.querySelector('h3')?.textContent?.trim()||`Sección ${index+1}`,key=normalize(title).replace(/\b20\d{2}\b/g,'').trim()||`section-${index}`,defaultCollapsed=/cambios individuales/i.test(title),collapsed=Object.prototype.hasOwnProperty.call(preferences,key)?!!preferences[key]:defaultCollapsed,content=document.createElement('div');content.className='hist-collapsible-content';while(head.nextSibling)content.appendChild(head.nextSibling);card.appendChild(content);const button=document.createElement('button');button.type='button';button.className='hist-collapse-btn';button.setAttribute('aria-expanded',String(!collapsed));button.innerHTML=collapsed?'<span>＋</span> Mostrar':'<span>−</span> Minimizar';head.appendChild(button);const apply=value=>{card.classList.toggle('hist-collapsed',value);content.hidden=value;button.setAttribute('aria-expanded',String(!value));button.innerHTML=value?'<span>＋</span> Mostrar':'<span>−</span> Minimizar'};apply(collapsed);button.onclick=()=>{const value=!card.classList.contains('hist-collapsed');apply(value);const next=collapsedPreferences();next[key]=value;localStorage.setItem(HIST_COLLAPSE_KEY,JSON.stringify(next))};card.dataset.collapsibleReady='1'})}
-
-function renderDashboard(c){
+function enableDashboardCollapsibles(root){const preferences=collapsedPreferences();root.querySelectorAll('.hist-card').forEach((card,index)=>{const head=card.querySelector(':scope > .hist-card-head');if(!head||card.dataset.collapsibleReady)return;const title=head.querySelector('h3')?.textContent?.trim()||`Sección ${index+1}`,key=normalize(title).replace(/\b20\d{2}\b/g,'').trim()||`section-${index}`,defaultCollapsed=card.dataset.histDefaultCollapsed==='1'||/cambios individuales|más detalle/i.test(title),collapsed=Object.prototype.hasOwnProperty.call(preferences,key)?!!preferences[key]:defaultCollapsed,content=document.createElement('div');content.className='hist-collapsible-content';while(head.nextSibling)content.appendChild(head.nextSibling);card.appendChild(content);const button=document.createElement('button');button.type='button';button.className='hist-collapse-btn';button.setAttribute('aria-expanded',String(!collapsed));button.innerHTML=collapsed?'<span>＋</span> Mostrar':'<span>−</span> Minimizar';head.appendChild(button);const apply=value=>{card.classList.toggle('hist-collapsed',value);content.hidden=value;button.setAttribute('aria-expanded',String(!value));button.innerHTML=value?'<span>＋</span> Mostrar':'<span>−</span> Minimizar'};apply(collapsed);button.onclick=()=>{const value=!card.classList.contains('hist-collapsed');apply(value);const next=collapsedPreferences();next[key]=value;localStorage.setItem(HIST_COLLAPSE_KEY,JSON.stringify(next));if(!value)requestAnimationFrame(()=>animateHistCharts(card))};card.dataset.collapsibleReady='1'})}
+function renderCompareView(c){
   const {latest,previous}=latestPair();
   if(!latest){c.innerHTML=`<div class="hist-hero"><div class="eyebrow">Nuevo módulo</div><h2>Tu evolución, mes a mes</h2><p>Guardá los tres archivos de cada cierre y convertí todo el año en indicadores, comparaciones y acciones concretas.</p><div class="hist-hero-actions"><button data-go="cargar">Cargar primer mes</button></div></div><div class="hist-empty"><div class="ico">▦</div><h3>Todavía no hay cierres mensuales</h3><p>Para comenzar necesitás Línea Descendente, Garantías por Organización e Ingresos del mismo período.</p><button class="hist-primary" data-go="cargar">Crear primer cierre</button></div>`;bindGo(c);return}
   const s=latest.summary;
-  const strategies=buildStrategies(H.periods.slice(-Math.min(6,H.periods.length))),topBranch=(s.branches||[])[0],branchShare=topBranch&&s.pbPersonal?pct(topBranch.pb,s.pbPersonal):0;
-  const previousPeople=new Map((previous&&previous.people||[]).map(p=>[p.matchKey,p])),inactive2=latest.people.filter(p=>p.pnAct===0&&previousPeople.get(p.matchKey)&&previousPeople.get(p.matchKey).pnAct===0),highPending=latest.people.filter(p=>num(p.garantias&&p.garantias.pendientes)>=10);
+  const strategies=buildStrategies(H.periods.slice(-Math.min(6,H.periods.length)));
+  const periods=(()=>{ensureDefaultSelection();return selectedPeriods()})();
+  const focus=periods[periods.length-1]||latest;
+  const prevFocus=periods.length>1?periods[periods.length-2]:previous;
+  const topBranch=((focus.summary||{}).branches||[])[0];
   c.innerHTML=`
-    <div class="hist-hero"><div class="eyebrow">Último cierre · ${esc(latest.label)}</div><h2>Histórico y análisis</h2><p>${s.people} personas · ${s.active} activas · ${fmt(s.pbPersonal)} PB · ${s.incomeCount} ingresos. Todo el año y sus comparaciones están reunidos en esta pantalla.</p><div class="hist-hero-actions"><button data-go="cargar">＋ Cargar o administrar meses</button><button class="secondary" data-hist-scroll-analysis>Comparar períodos</button></div></div>
-    <div class="hist-card hist-attention-card"><div class="hist-card-head"><div><h3>Atención requerida</h3><p>Qué conviene revisar primero</p></div></div><div class="hist-attention-grid">
-      ${previous?histAttention('#d9535a','!',`${inactive2.length} personas con dos meses sin actividad`,'Ver las personas y abrir cada ficha','inactive2'):'<div class="hist-attention hist-info-attention" style="--tone:#5b8def"><span>i</span><div><strong>La comparación comienza con el próximo cierre</strong><small>Con dos meses podremos detectar inactividad consecutiva.</small></div></div>'}
-      ${histAttention('#e99a20','◷',`${s.incomeNoPurchase} ingresos sin compra posterior`,'Revisar acompañamiento inicial','incomeNoPurchase')}
-      ${histAttention('#8a63e6','▤',`${highPending.length} personas con muchos pendientes`,'Ordenadas por cantidad de garantías','highPending')}
-      ${histAttention('#5b8def','↗',`${branchShare}% del PB está en la rama principal`,'Ver la rama y sus integrantes','topBranch')}
-    </div></div>
+    <div class="hist-hero hist-hero-compact"><div class="eyebrow">Comparar · foco ${esc(focus.label)}</div><h2>Elegí meses y mirá el pulso</h2><p>${periods.length} cierres en juego · ${fmt((focus.summary||{}).pbPersonal)} PB · ${(focus.summary||{}).activePct||0}% actividad. El gráfico principal cambia con tu selección.</p><div class="hist-hero-actions"><button data-go="cargar">＋ Cargar meses</button><button class="secondary" data-hist-open-tab="anio">Ver mi año</button></div></div>
+    ${renderUnifiedAnalysis()}
+    <div class="hist-card"><div class="hist-card-head"><div><h3>Próximas acciones</h3><p>Recomendaciones basadas en los datos</p></div><button class="hist-mini-btn" data-hist-open-tab="anio">Ir a mi año</button></div><div class="hist-strategies">${strategies.slice(0,3).map(strategyHtml).join('')}</div></div>
+    <section class="hist-full-report-cta"><span class="hist-report-mark">PDF</span><div><h3>Informe completo ${latest.year}</h3><p>Resumen anual, gráficos, indicadores, rankings, ingresos, pases, Bonus y recomendaciones listos para compartir.</p></div><button type="button" data-hist-full-report="${latest.year}">Generar y compartir PDF</button></section>`;
+  bindGo(c);bindDashboardDrill(c,focus,prevFocus,topBranch);bindUnifiedAnalysis(c);enableDashboardCollapsibles(c);requestAnimationFrame(()=>animateHistCharts(c));
+}
+function renderYearView(c){
+  const {latest,previous}=latestPair();
+  if(!latest){openTab('comparar');return}
+  const s=latest.summary,topBranch=(s.branches||[])[0];
+  c.innerHTML=`
+    <div class="hist-hero hist-hero-compact"><div class="eyebrow">Mi año · ${latest.year}</div><h2>Panorama completo del año</h2><p>Historia visual, lectura COPA del último cierre y todos los números para comparar mes a mes.</p><div class="hist-hero-actions"><button data-hist-open-tab="comparar">← Volver a comparar</button><button class="secondary" data-go="cargar">Cargar o administrar</button></div></div>
     ${renderAnnualSummary(latest.year)}
     ${renderCOPA(latest,previous)}
-    ${renderUnifiedAnalysis()}
-    <div class="hist-card"><div class="hist-card-head"><div><h3>Próximas acciones</h3><p>Recomendaciones basadas en los datos</p></div><button class="hist-mini-btn" data-hist-scroll-analysis>Revisar comparación</button></div><div class="hist-strategies">${strategies.slice(0,3).map(strategyHtml).join('')}</div></div>
-    <section class="hist-full-report-cta"><span class="hist-report-mark">PDF</span><div><h3>Informe completo ${latest.year}</h3><p>Resumen anual, gráficos, indicadores, rankings, ingresos, pases, Bonus y recomendaciones en un documento profesional listo para compartir.</p></div><button type="button" data-hist-full-report="${latest.year}">Generar y compartir PDF</button></section>`;
-  bindGo(c);bindDashboardDrill(c,latest,previous,topBranch);bindUnifiedAnalysis(c);enableDashboardCollapsibles(c);
+    <section class="hist-full-report-cta"><span class="hist-report-mark">PDF</span><div><h3>Informe completo ${latest.year}</h3><p>Llevá el año a un PDF profesional para compartir.</p></div><button type="button" data-hist-full-report="${latest.year}">Generar y compartir PDF</button></section>`;
+  bindGo(c);bindDashboardDrill(c,latest,previous,topBranch);bindUnifiedAnalysis(c);enableDashboardCollapsibles(c);requestAnimationFrame(()=>animateHistCharts(c));
 }
+function renderDashboard(c){renderCompareView(c)}
 function histAttention(tone,icon,title,desc,type){return `<button class="hist-attention" style="--tone:${tone}" data-hist-drill="${type}"><span>${icon}</span><div><strong>${esc(title)}</strong><small>${esc(desc)}</small></div><em>Ver datos ›</em></button>`}
 function bindDashboardDrill(root,period,previous,topBranch){
   root.querySelectorAll('[data-hist-drill]').forEach(btn=>btn.onclick=()=>openHistDrill(btn.dataset.histDrill,period,previous,topBranch));
@@ -14909,7 +15335,7 @@ function bindPeriodRows(root){
   root.querySelectorAll('[data-more]').forEach(b=>b.onclick=e=>{e.stopPropagation();H.openMenu=H.openMenu===b.dataset.more?'':b.dataset.more;render()});
   root.querySelectorAll('.hist-action-menu').forEach(menu=>menu.querySelectorAll('[data-pa]').forEach(b=>b.onclick=async()=>{
     const row=b.closest('[data-period]'),id=row.dataset.period,action=b.dataset.pa;
-    if(action==='analyze'){H.selected=new Set([id]);H.openMenu='';openTab('analizar')}
+    if(action==='analyze'){H.selected=new Set([id]);H.openMenu='';openTab('comparar')}
     else if(['equipo','garantias','ingresos'].includes(action))await downloadOriginal(id,action);
     else if(action==='zip')await exportPeriodZip(id);
     else if(action==='delete'&&await window.APPIDialog.confirm(`Se eliminarán ${H.periods.find(p=>p.id===id)?.label||id} y sus tres archivos.`,{title:'Eliminar cierre',icon:'📈',okText:'Eliminar',danger:true})){await deletePeriod(id);H.openMenu='';render();toast('Cierre eliminado')}
@@ -14943,6 +15369,7 @@ function renderAnalyze(c){
   c.querySelectorAll('.hist-month-option input').forEach(input=>input.onchange=()=>{input.checked?H.selected.add(input.value):H.selected.delete(input.value);render()});
   c.querySelectorAll('[data-pick]').forEach(b=>b.onclick=()=>pickPeriods(b.dataset.pick));
   $('histPersonSearch').oninput=e=>{H.personSearch=e.target.value;$('histPersonRows').innerHTML=personRows(a.changes,H.personSearch)};
+  requestAnimationFrame(()=>animateHistCharts(c));
   $('histLocalReport').onclick=()=>createLocalReport(periods,strategies,a);
   $('histOnlineReport').onclick=()=>createOnlineReport(periods,strategies,a);
 }
@@ -14954,13 +15381,70 @@ function pickPeriods(mode){
 function metricValue(p,metric){return num((p.summary||{})[metric])}
 function lineChart(periods,metric,color,suffix){
   if(!periods.length)return '<div class="hist-empty">Sin datos</div>';
-  if(periods.length===1){const value=metricValue(periods[0],metric);return `<div class="hist-single-chart"><span style="--tone:${color}"></span><strong>${fmt(value)}${suffix}</strong><b>${esc(periods[0].label)}</b><small>Cargá otro mes para ver la evolución y las diferencias.</small></div>`}
-  const vals=periods.map(p=>metricValue(p,metric));let min=Math.min(...vals),max=Math.max(...vals);if(min===max){min=Math.max(0,min-1);max+=1}const W=620,Ht=190,left=54,right=18,top=31,bottom=33,cw=W-left-right,ch=Ht-top-bottom;
-  const point=(v,i)=>({x:left+(periods.length===1?cw/2:i*cw/(periods.length-1)),y:top+(max-v)/(max-min)*ch});const pts=vals.map(point),poly=pts.map(p=>`${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' '),area=`${left},${top+ch} ${poly} ${left+cw},${top+ch}`;
-  const grids=[0,.25,.5,.75,1].map(t=>{const y=top+t*ch,v=max-t*(max-min);return `<line x1="${left}" y1="${y}" x2="${left+cw}" y2="${y}" stroke="#9aa3b5" stroke-opacity=".18"/><text x="${left-8}" y="${y+3}" text-anchor="end" font-size="8.5" fill="#8a8a94">${esc(fmt(v))}${suffix}</text>`}).join('');
-  const monthLabels=periods.map((p,i)=>`<text x="${pts[i].x}" y="${Ht-8}" text-anchor="middle" font-size="9" font-weight="700" fill="#777887">${SHORT_H[p.month]} ${String(p.year).slice(-2)}</text>`).join('');
-  const valueLabels=pts.map((point,i)=>{const text=`${fmt(vals[i])}${suffix}`,width=Math.max(25,text.length*5.15+9),below=point.y<top+12,labelY=below?point.y+20:point.y-11,rectY=labelY-10;return `<g class="hist-chart-value"><rect x="${point.x-width/2}" y="${rectY}" width="${width}" height="14" rx="6" fill="#fff" fill-opacity=".94" stroke="${color}" stroke-opacity=".2"/><text x="${point.x}" y="${labelY}" text-anchor="middle" font-size="8" font-weight="900" fill="${color}">${esc(text)}</text></g>`}).join('');
-  return `<div class="hist-chart"><svg viewBox="0 0 ${W} ${Ht}" role="img" aria-label="Gráfico de ${esc(metric)}">${grids}<polygon points="${area}" fill="${color}" fill-opacity=".09"/><polyline points="${poly}" fill="none" stroke="${color}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>${valueLabels}${pts.map((point,i)=>`<circle cx="${point.x}" cy="${point.y}" r="4.5" fill="${color}" stroke="#fff" stroke-width="2"><title>${periods[i].label}: ${fmt(vals[i])}${suffix}</title></circle>`).join('')}${monthLabels}</svg></div>`;
+  if(periods.length===1){const value=metricValue(periods[0],metric);return `<div class="hist-single-chart hist-chart-motion" style="--tone:${color}"><span class="hist-single-dot"></span><strong>${fmt(value)}${suffix}</strong><b>${esc(periods[0].label)}</b><small>Cargá otro mes para ver la evolución y las diferencias.</small></div>`}
+  const vals=periods.map(p=>metricValue(p,metric));let min=Math.min(...vals),max=Math.max(...vals);if(min===max){min=Math.max(0,min-1);max+=1}
+  /* viewBox más alto y tipografía mayor: en celular el SVG escala al 100% del ancho y los números dejan de verse diminutos */
+  const W=620,Ht=260,left=62,right=22,top=40,bottom=44,cw=W-left-right,ch=Ht-top-bottom;
+  const point=(v,i)=>({x:left+(periods.length===1?cw/2:i*cw/(periods.length-1)),y:top+(max-v)/(max-min)*ch});
+  const pts=vals.map(point);
+  const pathD=pts.map((p,i)=>(i?'L':'M')+`${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ');
+  const areaD=`M${left} ${(top+ch).toFixed(1)} `+pts.map(p=>`L${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ')+` L${(left+cw).toFixed(1)} ${(top+ch).toFixed(1)} Z`;
+  const grids=[0,.25,.5,.75,1].map(t=>{const y=top+t*ch,v=max-t*(max-min);return `<line class="hist-chart-grid" x1="${left}" y1="${y}" x2="${left+cw}" y2="${y}" stroke="#9aa3b5" stroke-opacity=".18"/><text class="hist-chart-axis" x="${left-8}" y="${y+4}" text-anchor="end" font-size="12" font-weight="700" fill="#8a8a94">${esc(fmt(v))}${suffix}</text>`}).join('');
+  const monthLabels=periods.map((p,i)=>`<text class="hist-chart-month" x="${pts[i].x}" y="${Ht-10}" text-anchor="middle" font-size="12" font-weight="700" fill="#777887" style="--i:${i}">${SHORT_H[p.month]} ${String(p.year).slice(-2)}</text>`).join('');
+  const valueLabels=pts.map((point,i)=>{const text=`${fmt(vals[i])}${suffix}`,width=Math.max(30,text.length*6.2+12),below=point.y<top+14,labelY=below?point.y+24:point.y-14,rectY=labelY-12;return `<g class="hist-chart-value" style="--i:${i}"><rect x="${point.x-width/2}" y="${rectY}" width="${width}" height="20" rx="8" fill="#fff" fill-opacity=".94" stroke="${color}" stroke-opacity=".2"/><text x="${point.x}" y="${labelY}" text-anchor="middle" font-size="12" font-weight="900" fill="${color}">${esc(text)}</text></g>`}).join('');
+  const dots=pts.map((point,i)=>{const last=i===pts.length-1;return `<g class="hist-chart-dot${last?' is-last':''}" style="--i:${i}" transform="translate(${point.x.toFixed(1)} ${point.y.toFixed(1)})"><circle class="hist-chart-halo" r="11" fill="${color}" fill-opacity=".16"/><circle class="hist-chart-point" r="5.5" fill="${color}" stroke="#fff" stroke-width="2.5"><title>${periods[i].label}: ${fmt(vals[i])}${suffix}</title></circle></g>`}).join('');
+  const gradId=`histGrad-${metric}-${Math.abs(hashCode(color+vals.join(',')))%99999}`;
+  return `<div class="hist-chart hist-chart-motion" style="--tone:${color}"><svg viewBox="0 0 ${W} ${Ht}" role="img" aria-label="Gráfico de ${esc(metric)}"><defs><linearGradient id="${gradId}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${color}" stop-opacity=".28"/><stop offset="100%" stop-color="${color}" stop-opacity="0"/></linearGradient><linearGradient id="${gradId}-shine" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#fff" stop-opacity="0"/><stop offset="45%" stop-color="#fff" stop-opacity=".55"/><stop offset="100%" stop-color="#fff" stop-opacity="0"/></linearGradient></defs>${grids}<path class="hist-chart-area" d="${areaD}" fill="url(#${gradId})"/><path class="hist-chart-line" d="${pathD}" fill="none" stroke="${color}" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/><path class="hist-chart-shine" d="${pathD}" fill="none" stroke="url(#${gradId}-shine)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>${valueLabels}${dots}${monthLabels}</svg></div>`;
+}
+function hashCode(str){let h=0;for(let i=0;i<str.length;i++)h=((h<<5)-h)+str.charCodeAt(i)|0;return h}
+function prefersHistReducedMotion(){try{return window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches}catch(e){return false}}
+function animateHistCharts(root){
+  const scope=root&&root.querySelectorAll?root:document;
+  const charts=scope.querySelectorAll?scope.querySelectorAll('.hist-chart-motion:not([data-hist-animated])'):[];
+  if(!charts.length)return;
+  const reduced=prefersHistReducedMotion();
+  const run=chart=>{
+    if(chart.dataset.histAnimated)return;
+    chart.dataset.histAnimated='1';
+    if(reduced){chart.classList.add('is-ready','is-static');return}
+    const svg=chart.querySelector('svg');
+    const line=chart.querySelector('.hist-chart-line');
+    const shine=chart.querySelector('.hist-chart-shine');
+    const area=chart.querySelector('.hist-chart-area');
+    requestAnimationFrame(()=>{
+      chart.classList.add('is-ready');
+      if(line&&line.getTotalLength){
+        const len=Math.max(1,line.getTotalLength());
+        [line,shine].forEach(path=>{
+          if(!path)return;
+          path.style.strokeDasharray=String(len);
+          path.style.strokeDashoffset=String(len);
+          path.getBoundingClientRect();
+          path.style.transition=`stroke-dashoffset ${path.classList.contains('hist-chart-shine')?'1.35s':'1.15s'} cubic-bezier(.22,.9,.28,1)`;
+          path.style.strokeDashoffset='0';
+        });
+      }
+      if(area){
+        area.style.transformOrigin='center bottom';
+        area.style.transform='scaleY(0.15)';
+        area.style.opacity='0';
+        area.getBoundingClientRect();
+        area.style.transition='transform .9s cubic-bezier(.22,.9,.28,1) .12s, opacity .7s ease .12s';
+        area.style.transform='scaleY(1)';
+        area.style.opacity='1';
+      }
+      chart.classList.add('is-drawn');
+    });
+  };
+  if(typeof IntersectionObserver==='undefined'){charts.forEach(run);return}
+  const io=new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      if(!entry.isIntersecting)return;
+      run(entry.target);
+      io.unobserve(entry.target);
+    });
+  },{threshold:.28,rootMargin:'0px 0px -8% 0px'});
+  charts.forEach(chart=>io.observe(chart));
 }
 function analyzePeriods(periods){
   const first=periods[0],last=periods[periods.length-1],fs=first.summary,ls=last.summary;
@@ -15120,7 +15604,7 @@ async function openHistorico(){
 async function initHistorico(){
   if(window.APPIAuth&&window.APPIAuth.isEnabled()&&(!window.APPIAuth.isLocallyAuthorized()||window.APPIAuth.needsPersonChoice&&window.APPIAuth.needsPersonChoice()))return;
   if(H._initialized)return;H._initialized=true;
-  try{await openDB();handleAuthHash();await refreshData();H.ready=true;if(navigator.onLine&&cloudReady()&&getSession())setTimeout(()=>syncAll(false),200)}catch(e){console.error('Inicialización histórico',e)}
+  try{await openDB();handleAuthHash();await refreshData();H.ready=true}catch(e){console.error('Inicialización histórico',e)}
   document.querySelectorAll('.hist-tabs [data-hist-tab]').forEach(b=>b.onclick=()=>openTab(b.dataset.histTab));
   const back=$('btnBackHistorico');if(back)back.onclick=()=>{showView('view-home');try{renderHomeCompleto()}catch(e){}};
   const help=$('btnHelpHistorico');if(help)help.onclick=showHelp;
@@ -15134,12 +15618,11 @@ async function initHistorico(){
 }
 window.openHistorico=openHistorico;
 window.initHistoricoAPPI=initHistorico;
-window.__APPI_HISTORICO__={state:H,open:openHistorico,refresh:refreshData,parseFile:parseHistoricalFile,saveMonth:saveMonthPeriod,analyze:analyzePeriods,strategies:buildStrategies,dbGetAll,annualMatrix,renderAnnualSummary,renderCOPA};
+window.__APPI_HISTORICO__={state:H,open:openHistorico,refresh:refreshData,parseFile:parseHistoricalFile,saveMonth:saveMonthPeriod,analyze:analyzePeriods,strategies:buildStrategies,dbGetAll,annualMatrix,renderAnnualSummary,renderCOPA,animateCharts:animateHistCharts,lineChart};
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initHistorico);else initHistorico();
 setTimeout(initHistorico,1200);
 
 })();
-
 </script>
 
 <script>
