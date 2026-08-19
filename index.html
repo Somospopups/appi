@@ -67,7 +67,7 @@ window.openStock=function(){
 <link rel="icon" href="./icon-192.png" />
 <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
 <link rel="manifest" href="./manifest.json" />
-<!-- APPI v264 · Histórico: Centro de Acción -->
+<!-- APPI v265 · Compartir APPI desde el engranaje -->
 <link rel="apple-touch-startup-image" href="./splash/apple-splash-1170x2532.png" />
 <link rel="apple-touch-startup-image" href="./splash/apple-splash-640x1136.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" />
 <link rel="apple-touch-startup-image" href="./splash/apple-splash-750x1334.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" />
@@ -4112,7 +4112,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v264 · Segura</div>
+  <div class="ds-foot">APPI · v265 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -11527,7 +11527,7 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='264';
+      const swVersion='265';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 
@@ -12640,6 +12640,14 @@ body.dark .presu-select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:
   <button class="tools-item" id="btnToolsTheme" onclick="toggleThemeDesdeMenu()">
     <span class="ti-ico" id="toolsThemeIco">🌙</span><span id="toolsThemeTxt">Modo noche</span>
   </button>
+  <button
+    class="tools-item"
+    id="btnToolsShareAPPI"
+    onclick="cerrarToolsMenu(); window.APPIWhatsApp && window.APPIWhatsApp.compartirAPPI()"
+  >
+    <span class="ti-ico">📤</span>
+    <span>Compartir APPI</span>
+  </button>
   <button class="tools-item" id="btnToolsDevices" onclick="abrirDispositivosDesdeMenu()" hidden>
     <span class="ti-ico">📲</span><span id="toolsDevicesTxt">Vincular teléfono</span>
   </button>
@@ -12708,10 +12716,13 @@ body.dark .tools-item:hover{background:rgba(91,141,239,.22); color:#a8b8ff}
 
 /* Animación en cascada: cada icono entra desde la derecha hacia el centro */
 .tools-menu.open .tools-item{opacity:0; animation:toolsIn .32s cubic-bezier(.34,1.56,.64,1) forwards}
-.tools-menu.open .tools-item:nth-child(1){animation-delay:.05s}
-.tools-menu.open .tools-item:nth-child(2){animation-delay:.12s}
-.tools-menu.open .tools-item:nth-child(3){animation-delay:.18s}
-.tools-menu.open .tools-item:nth-child(4){animation-delay:.24s}
+.tools-menu.open .tools-item:nth-child(1){animation-delay:.04s}
+.tools-menu.open .tools-item:nth-child(2){animation-delay:.08s}
+.tools-menu.open .tools-item:nth-child(3){animation-delay:.12s}
+.tools-menu.open .tools-item:nth-child(4){animation-delay:.16s}
+.tools-menu.open .tools-item:nth-child(5){animation-delay:.20s}
+.tools-menu.open .tools-item:nth-child(6){animation-delay:.24s}
+.tools-menu.open .tools-item:nth-child(7){animation-delay:.28s}
 @keyframes toolsIn{
   from{opacity:0; transform:translateX(26px) scale(.9)}
   to{opacity:1; transform:translateX(0) scale(1)}
