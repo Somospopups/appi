@@ -1,0 +1,156 @@
+const { test, expect } = require('@playwright/test');
+
+// El Home se partió en "Mi mes" y "Mi negocio", y los avisos quedaron con el
+// mismo id en dos lugares. Como el código los llenaba con getElementById —que
+// devuelve sólo el primero— la copia de la pantalla nueva quedaba vacía.
+// Estas pruebas fijan que los tres avisos lleguen a TODAS sus ubicaciones.
+
+const USER_ID = '11111111-1111-4111-8111-111111111111';
+
+function tokenFor(sub) {
+  const h = Buffer.from(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).toString('base64url');
+  const p = Buffer.from(JSON.stringify({ sub, exp: Math.floor(Date.now() / 1000) + 3600 })).toString('base64url');
+  return `${h}.${p}.firma`;
+}
+
+// Un equipo con una persona que cumple hoy y otra a un paso del Bonus.
+function equipoDePrueba() {
+  const hoy = new Date();
+  const mm = String(hoy.getMonth() + 1).padStart(2, '0');
+  const dd = String(hoy.getDate()).padStart(2, '0');
+  return {
+    titular: { dip: '02-9802014', nombre: 'María Pérez' },
+    personas: [
+      { id: 1, nombre: 'Cumple Hoy', cumple: `1990-${mm}-${dd}`, cat: 'D', pnAct: 3, tel: '3515550001', codigo: '02-1111111' },
+      { id: 2, nombre: 'Casi Bonus', cumple: '1985-01-15', cat: 'D', pnAct: 10, tel: '3515550002', codigo: '02-2222222' }
+    ]
+  };
+}
+
+async function abrirApp(page) {
+  const now = new Date().toISOString();
+  const profile = {
+    user_id: USER_ID, username: null, dip: '02-9802014', sucursal: '02', numero_distribuidor: '9802014',
+    nombre: 'María Pérez', socio_nombre: null, rol: 'usuario', activo: true, debe_cambiar_password: false,
+    membresia_meses: 1, membresia_inicio: now, membresia_vence: new Date(Date.now() + 30 * 86400000).toISOString()
+  };
+
+  await page.route('**/auth-config.js', route => route.fulfill({
+    contentType: 'application/javascript',
+    body: "window.APPI_AUTH={enabled:true,url:'https://mock.supabase.co',anonKey:'anon-key-publica-de-prueba-1234567890',distributorEmailDomain:'distribuidores.appi.invalid',adminLogin:{username:'popups',email:'admin-popups@appi.invalid'},loginAliases:{},offlineDays:7};"
+  }));
+  await page.route('https://mock.supabase.co/**', route => {
+    const url = new URL(route.request().url());
+    const cors = { 'access-control-allow-origin': '*', 'content-type': 'application/json' };
+    if (url.pathname === '/auth/v1/token') return route.fulfill({ status: 200, headers: cors, body: JSON.stringify({ access_token: tokenFor(USER_ID), refresh_token: 'r', expires_in: 3600, user: { id: USER_ID } }) });
+    if (url.pathname === '/rest/v1/appi_perfiles') return route.fulfill({ status: 200, headers: cors, body: JSON.stringify([profile]) });
+    if (url.pathname === '/functions/v1/dispositivo-puente') return route.fulfill({ status: 200, headers: cors, body: JSON.stringify({ devices: [] }) });
+    return route.fulfill({ status: 200, headers: cors, body: '[]' });
+  });
+
+  await page.addInitScript(equipo => {
+    localStorage.setItem('welcomeSeen', '1');
+    localStorage.setItem('tutoVisto_v2', '1');
+    localStorage.setItem('equipoData', JSON.stringify(equipo));
+  }, equipoDePrueba());
+
+  await page.goto('/index.html', { waitUntil: 'networkidle' });
+  await page.locator('#distributorInput').fill('02-9802014');
+  await page.locator('#distributorPassword').fill('Clave1234');
+  await page.locator('#btnDistributorLogin').click();
+  await expect(page.locator('#lockScreen')).toHaveClass(/hidden/);
+}
+
+// Cuenta, para un id repetido, cuántas copias hay y cuántas tienen contenido.
+async function copias(page, id) {
+  return page.evaluate(elId => {
+    const nodos = Array.from(document.querySelectorAll('#' + elId));
+    return {
+      total: nodos.length,
+      llenas: nodos.filter(n => n.innerHTML.trim().length > 0).length,
+      secciones: nodos.map(n => (n.closest('section') || {}).id || '?')
+    };
+  }, id);
+}
+
+test('el saludo de cumpleaños llega al inicio y a Mi negocio', async ({ page }) => {
+  await abrirApp(page);
+  await page.evaluate(() => window.renderBdayBanner && window.renderBdayBanner());
+  await page.waitForTimeout(300);
+
+  const r = await copias(page, 'bdayBannerWrap');
+  expect(r.total).toBeGreaterThan(1);
+  // Ninguna copia puede quedar vacía: si el aviso existe, se ve en las dos.
+  expect(r.llenas).toBe(r.total);
+  await expect(page.locator('#bdayBannerWrap .bday-banner')).toHaveCount(r.total);
+  for (const nodo of await page.locator('#bdayBannerWrap').all()) {
+    await expect(nodo).toContainText('Cumple Hoy');
+  }
+});
+
+test('el aviso de Bonus llega al inicio y a Mi negocio', async ({ page }) => {
+  await abrirApp(page);
+  await page.evaluate(() => window.renderBonusNotifs && window.renderBonusNotifs());
+  await page.waitForTimeout(300);
+
+  const r = await copias(page, 'bonusNotifWrap');
+  expect(r.total).toBeGreaterThan(1);
+  expect(r.llenas).toBe(r.total);
+  // Los botones de contacto tienen que existir en cada copia, no sólo en la primera.
+  const tarjetas = await page.locator('#bonusNotifWrap [data-bonus-id]').count();
+  expect(tarjetas).toBeGreaterThanOrEqual(r.total);
+  expect(await page.locator('#bonusNotifWrap [data-bonus-act="wa"]').count()).toBe(tarjetas);
+});
+
+test('Cultura de Crecimiento llega al inicio y a Mi mes, y funciona en las dos', async ({ page }) => {
+  await abrirApp(page);
+  await page.evaluate(() => window.renderCulturaCrecimiento && window.renderCulturaCrecimiento());
+  await page.waitForTimeout(300);
+
+  const r = await copias(page, 'culturaWrap');
+  expect(r.total).toBeGreaterThan(1);
+  expect(r.llenas).toBe(r.total);
+
+  // El bloque quedó con ids internos repetidos en v265: ahora son data-*,
+  // así que cada copia tiene su propio campo enganchado.
+  expect(await page.locator('#culturaWrap [data-cultura-pb]').count()).toBe(r.total);
+  expect(await page.evaluate(() => document.querySelectorAll('#culturaPbInput').length)).toBe(0);
+  expect(await page.evaluate(() => document.querySelectorAll('#culturaAddSlot').length)).toBe(0);
+
+  // Cargar los PB desde la copia de Mi mes (la segunda) tiene que guardar igual.
+  // Hay que abrir esa pantalla: si no, el campo existe pero está fuera de vista.
+  const seccion = r.secciones[1];
+  await page.evaluate(id => window.showView && window.showView(id), seccion);
+  await page.waitForTimeout(300);
+
+  const segundo = page.locator('#culturaWrap [data-cultura-pb]').nth(1);
+  await expect(segundo).toBeVisible();
+  await segundo.fill('7,5');
+  await segundo.blur();
+  await page.waitForTimeout(400);
+  const guardado = await page.evaluate(() => {
+    const raw = JSON.parse(localStorage.getItem('cultura_crecimiento_v1') || '{}');
+    const meses = raw && raw.meses ? raw.meses : raw;
+    const claves = Object.keys(meses || {});
+    return claves.length ? (meses[claves[claves.length - 1]] || {}).pb : null;
+  });
+  expect(guardado).toBe(7.5);
+});
+
+test('sin datos que mostrar, ninguna copia queda con contenido viejo', async ({ page }) => {
+  await abrirApp(page);
+  await page.evaluate(() => window.renderBdayBanner && window.renderBdayBanner());
+  await page.waitForTimeout(200);
+  expect((await copias(page, 'bdayBannerWrap')).llenas).toBeGreaterThan(0);
+
+  // Se va la persona que cumplía: el aviso tiene que borrarse de TODAS las copias.
+  await page.evaluate(() => {
+    const d = JSON.parse(localStorage.getItem('equipoData'));
+    d.personas = d.personas.filter(p => p.nombre !== 'Cumple Hoy');
+    localStorage.setItem('equipoData', JSON.stringify(d));
+    if (window.loadEquipoFromStorage) window.loadEquipoFromStorage();
+    if (window.renderBdayBanner) window.renderBdayBanner();
+  });
+  await page.waitForTimeout(300);
+  expect((await copias(page, 'bdayBannerWrap')).llenas).toBe(0);
+});

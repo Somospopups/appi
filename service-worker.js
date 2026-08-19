@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v265-compartir-appi';
+const CACHE_NAME = 'appi-v266-avisos-en-todas-las-pantallas';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

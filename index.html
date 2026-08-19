@@ -4112,7 +4112,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v265 · Segura</div>
+  <div class="ds-foot">APPI · v266 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -9800,10 +9800,15 @@ function renderDateContext(){
   if(pctText) pctText.textContent = pct + '%';
   if(dayInfo) dayInfo.textContent = `Día ${now.getDate()} de ${daysInMonth}`;
 }
+function appiPintarTodos(id, html){
+  const nodos = document.querySelectorAll('#' + id);
+  nodos.forEach(nodo => { nodo.innerHTML = html; });
+  return nodos.length;
+}
 function renderBdayBanner(){
-  const wrap = document.getElementById('bdayBannerWrap');
+  if(!document.querySelector('#bdayBannerWrap')) return;
   if(!equipoData) loadEquipoFromStorage();
-  if(!equipoData || !equipoData.personas){ wrap.innerHTML = ''; return; }
+  if(!equipoData || !equipoData.personas){ appiPintarTodos('bdayBannerWrap',''); return; }
   const hoy = new Date();
   const dia = hoy.getDate(), mes = hoy.getMonth() + 1;
   const cumplenHoy = equipoData.personas.filter(p => {
@@ -9811,11 +9816,11 @@ function renderBdayBanner(){
     const parts = p.cumple.split('-');
     return parts.length >= 3 && parseInt(parts[1]) === mes && parseInt(parts[2]) === dia;
   });
-  if(cumplenHoy.length === 0){ wrap.innerHTML = ''; return; }
+  if(cumplenHoy.length === 0){ appiPintarTodos('bdayBannerWrap',''); return; }
   const nombres = cumplenHoy.slice(0,2).map(p => p.nombre.split(',')[0]).join(', ');
   const extra = cumplenHoy.length > 2 ? ` y ${cumplenHoy.length - 2} más` : '';
-  wrap.innerHTML = `
-    <div class="bday-banner" id="bdayBannerClick">
+  appiPintarTodos('bdayBannerWrap', `
+    <div class="bday-banner">
       <div class="bico">🎂</div>
       <div class="btxt">
         <h4>Hoy cumple${cumplenHoy.length>1?'n':''}</h4>
@@ -9823,8 +9828,9 @@ function renderBdayBanner(){
       </div>
       <div class="barrow">›</div>
     </div>
-  `;
-  document.getElementById('bdayBannerClick').onclick = ()=>{ openEquipo(); };
+  `);
+  // Cada copia del aviso tiene que abrir Mi Equipo, no solo la primera.
+  document.querySelectorAll('#bdayBannerWrap .bday-banner').forEach(el => { el.onclick = ()=>{ openEquipo(); }; });
 }
 const BONUS_CAT_OK={D:1,DC:1,CE:1,L:1,LE:1,EJ:1,E:1};
 const BONUS_PB_SPONSOR=12;
@@ -9877,11 +9883,10 @@ function personasOportunidadBonus(){
   return near.concat(ready).slice(0,2);
 }
 function renderBonusNotifs(){
-  const wrap=document.getElementById('bonusNotifWrap');
-  if(!wrap) return;
+  if(!document.querySelector('#bonusNotifWrap')) return;
   const list=personasOportunidadBonus();
-  if(!list.length){ wrap.innerHTML=''; return; }
-  wrap.innerHTML='<div class="bonus-notif-list">'+list.map(p=>{
+  if(!list.length){ appiPintarTodos('bonusNotifWrap',''); return; }
+  const htmlBonus='<div class="bonus-notif-list">'+list.map(p=>{
     const pb=Number(p.pnAct)||0;
     const near=pb<BONUS_PB_SPONSOR;
     const yo=bonusEsTitular(p);
@@ -9908,7 +9913,9 @@ function renderBonusNotifs(){
       </div>
     </div>`;
   }).join('')+'</div>';
-  wrap.querySelectorAll('[data-bonus-id]').forEach(card=>{
+  appiPintarTodos('bonusNotifWrap', htmlBonus);
+  // Los botones se enganchan en todas las copias del aviso, no solo en la primera.
+  document.querySelectorAll('#bonusNotifWrap [data-bonus-id]').forEach(card=>{
     const id=+card.dataset.bonusId;
     const persona=()=>equipoData&&equipoData.personas&&equipoData.personas.find(x=>x.id===id);
     card.onclick=e=>{
@@ -10559,7 +10566,7 @@ function culturaQuitarPorContacto(ref={}){
 window.culturaQuitarPorContacto=culturaQuitarPorContacto;
 window.renderCulturaCrecimiento=renderCulturaCrecimiento;
 function renderCulturaCrecimiento(){
-  const wrap=document.getElementById('culturaWrap');
+  const wrap=document.querySelector('#culturaWrap');
   if(!wrap) return;
   culturaReconciliarInvitados();
   const openPast=[...wrap.querySelectorAll('details.cultura-past[open]')].map(el=>el.dataset.week);
@@ -10597,7 +10604,7 @@ function renderCulturaCrecimiento(){
       </div>
     </details>`;
   }).join('');
-  wrap.innerHTML=`
+  const htmlCultura=`
     <section class="cultura-card">
       <div class="cultura-head">
         <div>
@@ -10610,7 +10617,7 @@ function renderCulturaCrecimiento(){
         <article class="cultura-task ${pbDone?'done':''}">
           <div class="cultura-task-top"><strong>💎 PB personales</strong><span class="cultura-task-hint">meta ${CULTURA_PB_META}${extra?` · +${culturaFmt(extra)}`:''}</span></div>
           <div class="cultura-step">
-            <input id="culturaPbInput" type="text" inputmode="decimal" enterkeyhint="done" value="${week.pb?String(week.pb).replace('.',','):''}" placeholder="0" aria-label="PB personales del mes">
+            <input data-cultura-pb type="text" inputmode="decimal" enterkeyhint="done" value="${week.pb?String(week.pb).replace('.',','):''}" placeholder="0" aria-label="PB personales del mes">
           </div>
         </article>
         <article class="cultura-task ${accDone?'done':''}">
@@ -10620,7 +10627,7 @@ function renderCulturaCrecimiento(){
               const guest=week.invitados.find(p=>Number(p.slot)===slot);
               return `<button type="button" class="cultura-pill ${guest?'filled':''}" data-cultura-slot="${slot}" aria-label="${guest?culturaEsc(culturaInvitadoNombre(guest)):'Cargar invitado'}">${guest?culturaEsc(culturaIniciales(guest)):'👤'}</button>`;
             }).join('')}
-            <button type="button" class="cultura-pill plus" id="culturaAddSlot" aria-label="Agregar invitado">+</button>
+            <button type="button" class="cultura-pill plus" data-cultura-add aria-label="Agregar invitado">+</button>
           </div>
         </article>
       </div>
@@ -10636,22 +10643,24 @@ function renderCulturaCrecimiento(){
     saveCulturaMonth(id,{...getCulturaMonth(id),pb:Math.round(n*100)/100});
     renderCulturaCrecimiento();
   };
-  const pbInput=document.getElementById('culturaPbInput');
-  if(pbInput){
+  appiPintarTodos('culturaWrap', htmlCultura);
+  // El mismo bloque vive en el inicio y en Mi mes: se engancha en los dos.
+  document.querySelectorAll('#culturaWrap [data-cultura-pb]').forEach(pbInput=>{
     pbInput.onfocus=()=>{ try{ pbInput.select(); }catch(e){} };
     pbInput.onchange=()=>persistPb(pbInput.value);
     pbInput.onblur=()=>persistPb(pbInput.value);
     pbInput.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();pbInput.blur()}}
-  }
-  wrap.querySelectorAll('[data-cultura-slot]').forEach(btn=>btn.onclick=()=>openCulturaInvitado(id,+btn.dataset.culturaSlot));
-  const addSlot=document.getElementById('culturaAddSlot');
-  if(addSlot) addSlot.onclick=()=>{
-    const current=getCulturaMonth(id);
-    const nextSlot=current.slots;
-    current.slots=nextSlot+1;
-    saveCulturaMonth(id,current);
-    openCulturaInvitado(id,nextSlot);
-  };
+  });
+  document.querySelectorAll('#culturaWrap [data-cultura-slot]').forEach(btn=>btn.onclick=()=>openCulturaInvitado(id,+btn.dataset.culturaSlot));
+  document.querySelectorAll('#culturaWrap [data-cultura-add]').forEach(addSlot=>{
+    addSlot.onclick=()=>{
+      const current=getCulturaMonth(id);
+      const nextSlot=current.slots;
+      current.slots=nextSlot+1;
+      saveCulturaMonth(id,current);
+      openCulturaInvitado(id,nextSlot);
+    };
+  });
 }
 function openCulturaInvitado(monthId,slot){
   const week=getCulturaMonth(monthId);
