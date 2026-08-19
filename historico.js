@@ -1,4 +1,4 @@
-/* APPI v146 · Histórico mensual local-first */
+/* APPI v264 · Histórico: Centro de Acción local-first */
 (function(){
 'use strict';
 
@@ -22,7 +22,8 @@ const FILE_TYPES={
 const H={
   db:null,periods:[],reports:[],tab:'comparar',ready:false,rendering:false,
   uploadYear:new Date().getFullYear(),uploads:{},fileTarget:null,
-  selected:new Set(),openMenu:'',personSearch:'',lastReport:null,syncing:false,syncLog:[],chartMetric:'pbPersonal',albumMonth:null
+  selected:new Set(),openMenu:'',personSearch:'',lastReport:null,syncing:false,syncLog:[],chartMetric:'pbPersonal',albumMonth:null,
+  actionPlans:[],actionTab:'today',actionContext:null
 };
 
 const $=id=>document.getElementById(id);
@@ -36,6 +37,53 @@ const normalize=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'')
 const codeNorm=s=>String(s||'').trim().replace(/\s+/g,'').toUpperCase();
 const cloneClean=obj=>JSON.parse(JSON.stringify(obj));
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+
+const ACTION_ALERTS={
+  pb_drop:{title:'Recuperar el volumen de puntos',priority:'Alta',tone:'#d9534f'},
+  pb_growth:{title:'Sostener el crecimiento de puntos',priority:'Oportunidad',tone:'#168765'},
+  active_drop:{title:'Reactivar personas inactivas',priority:'Alta',tone:'#d9534f'},
+  active_growth:{title:'Consolidar la mejora de actividad',priority:'Positiva',tone:'#168765'},
+  pending:{title:'Reducir garantías pendientes',priority:'Alta',tone:'#e18a18'},
+  consecutive:{title:'Atender inactividad consecutiva',priority:'Media',tone:'#a06bff'},
+  income_no_purchase:{title:'Acompañar ingresos sin compra posterior',priority:'Alta',tone:'#d9534f'},
+  contact_incomplete:{title:'Completar datos de contacto',priority:'Media',tone:'#e18a18'},
+  branch_balance:{title:'Diversificar el aporte de las ramas',priority:'Media',tone:'#5b8def'},
+  expired:{title:'Revisar garantías vencidas',priority:'Media',tone:'#e18a18'},
+  monthly_control:{title:'Mantener control mensual',priority:'Seguimiento',tone:'#5b8def'}
+};
+const ACTION_RESULTS={
+  no_response:'Sin respuesta',contacted:'Contactada',conversation_pending:'Conversación pendiente',
+  goal_agreed:'Objetivo acordado',reactivated:'Reactivada',no_followup:'No desea seguimiento',referred:'Derivada'
+};
+const ACTION_CLOSED_RESULTS=new Set(['reactivated','no_followup']);
+function actionId(prefix='plan'){return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2,8)}`}
+function localActionDate(value=new Date()){const d=value instanceof Date?value:new Date(value);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
+function actionDateIn(days){const d=new Date();d.setHours(12,0,0,0);d.setDate(d.getDate()+Number(days||0));return localActionDate(d)}
+function actionPhone(value){return String(value||'').replace(/\D/g,'').slice(0,15)}
+function validActionPhone(value){const digits=actionPhone(value);return digits.length>=8&&digits.length<=15}
+function actionActorKey(){
+  const user=window.APPIAuth&&window.APPIAuth.userId?window.APPIAuth.userId():'local';
+  return `${user||'local'}_${historicalPersonType()}`;
+}
+function actionPlansKey(){return `appi_historico_action_plans_v264_${actionActorKey()}`}
+function latestPlanUpdate(plans){return (plans||[]).reduce((latest,plan)=>String(plan.updatedAt||plan.createdAt||'')>latest?String(plan.updatedAt||plan.createdAt||''):latest,'')}
+function loadActionPlans(){
+  let local=[];try{const parsed=JSON.parse(localStorage.getItem(actionPlansKey())||'[]');if(Array.isArray(parsed))local=parsed}catch(e){}
+  const latest=H.periods[H.periods.length-1],synced=latest&&Array.isArray(latest._actionPlans)?latest._actionPlans:[];
+  H.actionPlans=cloneClean(latestPlanUpdate(synced)>latestPlanUpdate(local)?synced:local);
+  try{localStorage.setItem(actionPlansKey(),JSON.stringify(H.actionPlans))}catch(e){}
+  return H.actionPlans;
+}
+async function persistActionPlans(){
+  const now=new Date().toISOString();
+  try{localStorage.setItem(actionPlansKey(),JSON.stringify(H.actionPlans))}catch(e){}
+  const latest=H.periods[H.periods.length-1];
+  if(latest){latest._actionPlans=cloneClean(H.actionPlans);latest.updatedAt=now;latest.syncStatus='pending';await dbPut('periods',latest)}
+  notifyDbChange();
+  try{window.dispatchEvent(new CustomEvent('appi-action-plans-change',{detail:{plans:H.actionPlans}}))}catch(e){}
+  if(navigator.onLine&&cloudReady()&&getSession())setTimeout(()=>syncAll(false),450);
+  return H.actionPlans;
+}
 
 function toast(message,duration=2200){
   try{ if(typeof showToast==='function') showToast(message,duration); else console.log(message); }catch(e){ console.log(message); }
@@ -130,7 +178,7 @@ async function refreshData(){
     if(changed){p.updatedAt=new Date().toISOString();p.syncStatus='pending';await dbPut('periods',p);await dbDelete('files',`${p.id}:usuarios`)}
   }
   H.reports=(await dbGetAll('reports')).sort((a,b)=>String(b.createdAt).localeCompare(String(a.createdAt)));
-  H.lastReport=H.reports[0]||null;notifyDbChange();
+  H.lastReport=H.reports[0]||null;notifyDbChange();loadActionPlans();
   if(!H.selected.size&&H.periods.length) ensureDefaultSelection();
 }
 
@@ -256,7 +304,7 @@ async function buildPeriodRecord(draft){
   const existing=H.periods.find(p=>p.id===draft.id);
   const normalized=normalizePeriod(draft.parsed.equipo.result,draft.parsed.garantias.result,draft.parsed.ingresos.result,draft.year,draft.month);
   const filesMeta=[];for(const type of Object.keys(FILE_TYPES)){const file=draft.files[type];filesMeta.push({type,name:file.name,size:file.size,mime:file.type||'application/octet-stream',lastModified:file.lastModified||0,hash:await sha256(file)})}
-  return {id:draft.id,year:draft.year,month:draft.month,label:`${MONTHS_H[draft.month]} ${draft.year}`,version:existing?num(existing.version)+1:1,createdAt:existing?existing.createdAt:new Date().toISOString(),updatedAt:new Date().toISOString(),syncStatus:'pending',filesMeta,...normalized};
+  return {id:draft.id,year:draft.year,month:draft.month,label:`${MONTHS_H[draft.month]} ${draft.year}`,version:existing?num(existing.version)+1:1,createdAt:existing?existing.createdAt:new Date().toISOString(),updatedAt:new Date().toISOString(),syncStatus:'pending',filesMeta,_actionPlans:cloneClean(H.actionPlans),...normalized};
 }
 async function saveMonthPeriod(id){
   const draft=H.uploads[id],existing=H.periods.find(p=>p.id===id);if(!draft)return;
@@ -268,7 +316,7 @@ async function saveMonthPeriod(id){
     if(existing&&!await window.APPIDialog.confirm(`${MONTHS_H[draft.month]} ${draft.year} ya está guardado.`,{title:'Actualizar cierre',icon:'📈',okText:'Actualizar'})){render();return}
     const record=await buildPeriodRecord(draft),db=await openDB();
     await new Promise((resolve,reject)=>{const tx=db.transaction(['periods','files'],'readwrite');tx.objectStore('periods').put(record);for(const type of Object.keys(FILE_TYPES)){const file=draft.files[type];tx.objectStore('files').put({key:`${record.id}:${type}`,periodId:record.id,type,name:file.name,size:file.size,mime:file.type||'',lastModified:file.lastModified||0,blob:file})}tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)});
-    delete H.uploads[id];await refreshData();ensureDefaultSelection(true);render();toast(`✓ ${record.label} guardado`,2400);try{haptic(20)}catch(e){}
+    delete H.uploads[id];await refreshData();ensureDefaultSelection(true);await reconcileActionPlans();render();notifyActionDueOnce();toast(`✓ ${record.label} guardado`,2400);try{haptic(20)}catch(e){}
     if(navigator.onLine&&cloudReady()&&getSession())setTimeout(()=>syncAll(false),400);
   }catch(e){console.error('Histórico guardar',e);toast(`No se pudo guardar: ${e.message}`,3500);render()}
 }
@@ -497,10 +545,11 @@ function renderCompareView(c){
   const topBranch=((focus.summary||{}).branches||[])[0];
   c.innerHTML=`
     <div class="hist-hero hist-hero-compact"><div class="eyebrow">Comparar · foco ${esc(focus.label)}</div><h2>Elegí meses y mirá el pulso</h2><p>${periods.length} cierres en juego · ${fmt((focus.summary||{}).pbPersonal)} PB · ${(focus.summary||{}).activePct||0}% actividad. El gráfico principal cambia con tu selección.</p><div class="hist-hero-actions"><button data-go="cargar">＋ Cargar meses</button><button class="secondary" data-hist-open-tab="anio">Ver mi año</button></div></div>
+    ${actionCenterSummaryHtml(strategies)}
     ${renderUnifiedAnalysis()}
-    <div class="hist-card"><div class="hist-card-head"><div><h3>Próximas acciones</h3><p>Recomendaciones basadas en los datos</p></div><button class="hist-mini-btn" data-hist-open-tab="anio">Ir a mi año</button></div><div class="hist-strategies">${strategies.slice(0,3).map(strategyHtml).join('')}</div></div>
+    <div class="hist-card hist-action-alerts-card"><div class="hist-card-head"><div><h3>Próximas acciones</h3><p>Diagnóstico, afectados y planes semanales en un solo lugar</p></div><button class="hist-mini-btn" data-hist-open-tab="anio">Ir a mi año</button></div><div class="hist-strategies">${strategies.map(strategyHtml).join('')}</div></div>
     <section class="hist-full-report-cta"><span class="hist-report-mark">PDF</span><div><h3>Informe completo ${latest.year}</h3><p>Resumen anual, gráficos, indicadores, rankings, ingresos, pases, Bonus y recomendaciones listos para compartir.</p></div><button type="button" data-hist-full-report="${latest.year}">Generar y compartir PDF</button></section>`;
-  bindGo(c);bindDashboardDrill(c,focus,prevFocus,topBranch);bindUnifiedAnalysis(c);enableDashboardCollapsibles(c);requestAnimationFrame(()=>animateHistCharts(c));
+  bindGo(c);bindDashboardDrill(c,focus,prevFocus,topBranch);bindUnifiedAnalysis(c);bindActionCenter(c);enableDashboardCollapsibles(c);requestAnimationFrame(()=>animateHistCharts(c));
 }
 function renderYearView(c){
   const {latest,previous}=latestPair();
@@ -757,20 +806,181 @@ function personRows(changes,search){
   return list.map(x=>{const cls=x.delta>0?'up':x.delta<0?'down':'neutral',sign=x.delta>0?'+':'';return `<tr><td><strong>${esc(x.name)}</strong><br><small>${esc(x.code||x.status)}</small></td><td>${esc(x.cat||'—')}</td><td>${fmt(x.old)}</td><td>${fmt(x.current)}</td><td class="${cls}">${sign}${fmt(x.delta)}</td><td>${fmt(x.teamCurrent)} PB</td></tr>`}).join('');
 }
 function buildStrategies(periods){
-  if(!periods.length)return [];const first=periods[0],last=periods[periods.length-1],fs=first.summary,ls=last.summary,out=[];const add=(priority,title,evidence,action,tone)=>out.push({priority,title,evidence,action,tone});
-  if(periods.length>1){const pbChange=fs.pbPersonal?(ls.pbPersonal-fs.pbPersonal)/fs.pbPersonal*100:0;if(pbChange<=-10)add('Alta','Recuperar el volumen de puntos',`El PB cayó ${Math.abs(Math.round(pbChange))}% entre ${first.label} y ${last.label}.`,'Separar la caída por ramas, hablar primero con quienes más retrocedieron y definir objetivos semanales medibles.','#d9534f');else if(pbChange>=10)add('Oportunidad','Sostener el crecimiento de puntos',`El PB creció ${Math.round(pbChange)}% en el período seleccionado.`,'Identificar las tres acciones que impulsaron el crecimiento y repetirlas con las ramas secundarias.','#168765');
-    const activeDiff=ls.activePct-fs.activePct;if(activeDiff<=-5)add('Alta','Reactivar personas inactivas',`La actividad bajó ${Math.abs(activeDiff)} puntos porcentuales y terminó en ${ls.activePct}%.`,'Crear una lista de inactividad consecutiva, asignar un contacto y acordar un primer objetivo pequeño.','#d9534f');else if(activeDiff>=5)add('Positiva','Consolidar la mejora de actividad',`La actividad aumentó ${activeDiff} puntos porcentuales.`,'Reconocer a quienes se reactivaron y acompañarlos para sostener un segundo mes activo.','#168765');
-    const pendChange=fs.pending?(ls.pending-fs.pending)/fs.pending*100:0;if(pendChange>=15)add('Alta','Reducir garantías pendientes',`Los pendientes aumentaron ${Math.round(pendChange)}% y llegaron a ${fmt(ls.pending)}.`,'Ordenar por cantidad, trabajar primero el 20% de personas con mayor pendiente y revisar avances cada semana.','#e18a18');
+  if(!periods.length)return [];
+  const first=periods[0],last=periods[periods.length-1],fs=first.summary||{},ls=last.summary||{},out=[];
+  const add=(type,evidence,action)=>{const definition=ACTION_ALERTS[type];out.push({id:type,type,priority:definition.priority,title:definition.title,evidence,action,tone:definition.tone})};
+  if(periods.length>1){
+    const pbChange=num(fs.pbPersonal)?(num(ls.pbPersonal)-num(fs.pbPersonal))/num(fs.pbPersonal)*100:0;
+    if(pbChange<=-10)add('pb_drop',`El PB cayó ${Math.abs(Math.round(pbChange))}% entre ${first.label} y ${last.label}.`,'Hablar primero con quienes más retrocedieron y acordar objetivos semanales posibles.');
+    else if(pbChange>=10)add('pb_growth',`El PB creció ${Math.round(pbChange)}% en el período seleccionado.`,'Reconocer la mejora y acompañarla para sostenerla en el próximo cierre.');
+    const activeDiff=num(ls.activePct)-num(fs.activePct);
+    if(activeDiff<=-5)add('active_drop',`La actividad bajó ${Math.abs(activeDiff)} puntos porcentuales y terminó en ${num(ls.activePct)}%.`,'Escuchar a las personas inactivas y acordar un primer objetivo pequeño.');
+    else if(activeDiff>=5)add('active_growth',`La actividad aumentó ${activeDiff} puntos porcentuales.`,'Reconocer a quienes se reactivaron y acompañarlos durante otra semana.');
   }
-  if(periods.length>=2){const p1=periods[periods.length-2],p2=last,m1=new Map(p1.people.map(p=>[p.matchKey,p]));const consecutive=p2.people.filter(p=>p.pnAct===0&&m1.get(p.matchKey)&&m1.get(p.matchKey).pnAct===0);if(consecutive.length)add('Media','Atender inactividad consecutiva',`${consecutive.length} personas registran cero PB en los dos últimos cierres.`,'Preparar un seguimiento diferenciado: reconexión, diagnóstico de obstáculo y fecha concreta para la próxima acción.','#a06bff')}
-  if(ls.incomeNoPurchase>0)add('Alta','Acompañar ingresos sin compra posterior',`${ls.incomeNoPurchase} de ${ls.incomeCount} ingresos todavía no registran una compra posterior al alta.`,'Abrir la lista de ingresos, contactar a cada persona y acordar una primera acción concreta.','#d9534f');
-  if(ls.incomeContactIncomplete>0)add('Media','Completar datos de contacto',`${ls.incomeContactIncomplete} ingresos tienen teléfono o correo incompleto.`,'Actualizar esos datos para no perder posibilidades de seguimiento.','#e18a18');
-  const branches=(ls.branches||[]).sort((a,b)=>b.pb-a.pb),top=branches[0];if(top&&ls.pbPersonal&&top.pb/ls.pbPersonal>=.55)add('Media','Diversificar el aporte de las ramas',`${top.name} concentra ${pct(top.pb,ls.pbPersonal)}% del PB del período.`,'Definir un plan de crecimiento para las dos ramas siguientes y reducir la dependencia de un solo origen.','#5b8def');
-  if(ls.expiredPct>=25)add('Media','Revisar la tasa de vencimiento',`${ls.expiredPct}% de las garantías presentadas aparecen vencidas.`,'Revisar causas, fechas y responsables; usar una rutina de control antes de cada cierre.','#e18a18');
-  if(!out.length)add('Seguimiento','Mantener control mensual',`El cierre muestra ${ls.activePct}% de actividad y ${fmt(ls.pbPersonal)} PB.`,'Conservar la carga mensual y fijar un objetivo verificable para actividad, puntos y pendientes.','#5b8def');
-  return out.sort((a,b)=>({Alta:0,Media:1,Oportunidad:2,Positiva:2,Seguimiento:3}[a.priority]-({Alta:0,Media:1,Oportunidad:2,Positiva:2,Seguimiento:3}[b.priority])));
+  if(num(ls.pending)>0)add('pending',`${fmt(ls.pending)} garantías continúan pendientes en el último cierre.`,'Ordenar por cantidad, contactar individualmente y revisar avances cada semana.');
+  if(periods.length>=2){const previous=periods[periods.length-2],before=new Map((previous.people||[]).map(person=>[person.matchKey,person])),consecutive=(last.people||[]).filter(person=>num(person.pnAct)===0&&before.get(person.matchKey)&&num(before.get(person.matchKey).pnAct)===0);if(consecutive.length)add('consecutive',`${consecutive.length} personas registran cero PB en los dos últimos cierres.`,'Reconectar, escuchar el obstáculo y dejar una próxima fecha concreta.')}
+  if(num(ls.incomeNoPurchase)>0)add('income_no_purchase',`${ls.incomeNoPurchase} de ${num(ls.incomeCount)} ingresos todavía no registran una compra posterior al alta.`,'Contactar a cada persona y acordar una primera acción concreta.');
+  if(num(ls.incomeContactIncomplete)>0)add('contact_incomplete',`${ls.incomeContactIncomplete} ingresos tienen teléfono o correo incompleto.`,'Completar sus datos para no perder el seguimiento.');
+  const branches=[...(ls.branches||[])].sort((a,b)=>num(b.pb)-num(a.pb)),top=branches[0];
+  if(top&&num(ls.pbPersonal)&&num(top.pb)/num(ls.pbPersonal)>=.55)add('branch_balance',`${top.name} concentra ${pct(top.pb,ls.pbPersonal)}% del PB del período.`,'Acompañar a las ramas secundarias con contactos individuales y metas realistas.');
+  if(num(ls.expired)>0)add('expired',`${fmt(ls.expired)} garantías aparecen vencidas en el último cierre.`,'Revisar cada caso, su necesidad y una fecha de resolución.');
+  if(!out.length)add('monthly_control',`El cierre muestra ${num(ls.activePct)}% de actividad y ${fmt(ls.pbPersonal)} PB.`,'Fijar un objetivo verificable para actividad, puntos y pendientes.');
+  const rank={Alta:0,Media:1,Oportunidad:2,Positiva:2,Seguimiento:3};
+  return out.sort((a,b)=>rank[a.priority]-rank[b.priority]);
 }
-function strategyHtml(s){return `<article class="hist-strategy" style="--tone:${s.tone}"><div class="s-top"><span class="s-priority">${esc(s.priority)}</span></div><h4>${esc(s.title)}</h4><p>${esc(s.evidence)}</p><div class="action"><b>Acción:</b> ${esc(s.action)}</div></article>`}
+function actionManagementContacts(){return window.APPIGestion&&window.APPIGestion.state&&Array.isArray(window.APPIGestion.state.contacts)?window.APPIGestion.state.contacts:[]}
+function relatedActionContact(person,phone=''){
+  const contacts=actionManagementContacts(),dip=codeNorm(person&&person.codigo||person&&person.dip),digits=actionPhone(phone||person&&person.tel||person&&person.telefono),name=normalize(person&&person.nombre);
+  return contacts.find(contact=>dip&&codeNorm(contact.metadata&&contact.metadata.dip)===dip)||contacts.find(contact=>digits&&actionPhone(contact.telefono)===digits)||contacts.find(contact=>name&&normalize(contact.nombre)===name)||null;
+}
+function actionBranchName(person,period){const leader=(period.people||[]).find(item=>item.key===(person.branchKey||person.key));return leader?leader.nombre:person.nombre||'Sin rama'}
+function actionPhoneFor(person,period){
+  const income=(period.incomes||[]).find(item=>item.matchKey===person.matchKey||codeNorm(item.dip)===codeNorm(person.codigo)||normalize(item.nombre)===normalize(person.nombre));
+  const contact=relatedActionContact(person,person.tel||income&&income.telefono),candidates=[person.tel,income&&income.telefono,contact&&contact.telefono].filter(Boolean),phone=candidates.find(validActionPhone)||candidates[0]||'';
+  return {phone:String(phone),contact};
+}
+function actionAffectedPerson(person,previous,period,extra={}){
+  const linked=actionPhoneFor(person,period),old=previous?num(previous.pnAct):0,current=num(person.pnAct),phone=linked.phone;
+  return {key:person.matchKey||`c:${codeNorm(person.codigo)}`||`n:${normalize(person.nombre)}`,personKey:person.key||'',person:person.nombre||'Sin nombre',name:person.nombre||'Sin nombre',dip:person.codigo||person.dip||'',category:person.cat||'',branchKey:person.branchKey||person.key||'',branch:actionBranchName(person,period),phone,hasPhone:validActionPhone(phone),contactId:linked.contact&&linked.contact.id||'',pbPrevious:old,pbCurrent:current,difference:current-old,organizationSize:num(person.totalPB||person.teamPB),...extra};
+}
+function dedupeAffected(rows){const map=new Map();for(const row of rows){const key=row.key||`p:${actionPhone(row.phone)}`||`n:${normalize(row.name)}`;if(!map.has(key))map.set(key,row);else if(!map.get(key).phone&&row.phone)map.set(key,{...map.get(key),...row})}return [...map.values()]}
+function affectedForStrategy(strategy,periods=H.periods){
+  if(!strategy||!periods.length)return [];
+  const last=periods[periods.length-1],previous=periods[periods.length-2]||null,before=new Map((previous&&previous.people||[]).map(person=>[person.matchKey,person])),people=last.people||[],type=strategy.type||strategy.id;
+  let rows=[];
+  if(type==='pb_drop')rows=people.filter(person=>before.has(person.matchKey)&&num(person.pnAct)<num(before.get(person.matchKey).pnAct)).map(person=>actionAffectedPerson(person,before.get(person.matchKey),last)).sort((a,b)=>a.difference-b.difference);
+  else if(type==='pb_growth')rows=people.filter(person=>before.has(person.matchKey)&&num(person.pnAct)>num(before.get(person.matchKey).pnAct)).map(person=>actionAffectedPerson(person,before.get(person.matchKey),last)).sort((a,b)=>b.difference-a.difference);
+  else if(type==='active_drop'||type==='consecutive')rows=people.filter(person=>before.has(person.matchKey)&&num(person.pnAct)===0&&num(before.get(person.matchKey).pnAct)===0).map(person=>{const priorActivity=periods.slice(0,-2).reduce((best,period)=>{const old=(period.people||[]).find(item=>item.matchKey===person.matchKey);return Math.max(best,num(old&&old.pnAct))},0);return actionAffectedPerson(person,before.get(person.matchKey),last,{priorActivity})}).sort((a,b)=>num(b.priorActivity)-num(a.priorActivity)||num(b.organizationSize)-num(a.organizationSize));
+  else if(type==='active_growth')rows=people.filter(person=>before.has(person.matchKey)&&num(before.get(person.matchKey).pnAct)===0&&num(person.pnAct)>0).map(person=>actionAffectedPerson(person,before.get(person.matchKey),last)).sort((a,b)=>b.pbCurrent-a.pbCurrent);
+  else if(type==='pending')rows=people.filter(person=>num(person.garantias&&person.garantias.pendientes)>0).map(person=>actionAffectedPerson(person,before.get(person.matchKey),last,{pending:num(person.garantias.pendientes)})).sort((a,b)=>b.pending-a.pending);
+  else if(type==='expired')rows=people.filter(person=>num(person.garantias&&person.garantias.vencidas)>0).map(person=>actionAffectedPerson(person,before.get(person.matchKey),last,{expired:num(person.garantias.vencidas)})).sort((a,b)=>b.expired-a.expired);
+  else if(type==='income_no_purchase'||type==='contact_incomplete'){
+    const incomes=(last.incomes||[]).filter(item=>type==='income_no_purchase'?!item.compraPosterior:!item.contactoCompleto);
+    rows=incomes.map(item=>{const person=people.find(current=>current.matchKey===item.matchKey||codeNorm(current.codigo)===codeNorm(item.dip))||{key:item.linkedPersonKey||item.matchKey,matchKey:item.matchKey,codigo:item.dip,nombre:item.nombre,cat:item.cat,pnAct:0,branchKey:'',tel:item.telefono};const row=actionAffectedPerson(person,before.get(person.matchKey),last,{income:true});if(!row.phone)row.phone=item.telefono||'';row.hasPhone=validActionPhone(row.phone);return row}).sort((a,b)=>a.person.localeCompare(b.person));
+  }else if(type==='branch_balance'){
+    const branches=[...((last.summary||{}).branches||[])].sort((a,b)=>num(b.pb)-num(a.pb)),secondary=new Set(branches.slice(1).map(branch=>branch.key));
+    rows=people.filter(person=>secondary.has(person.branchKey||person.key)).map(person=>actionAffectedPerson(person,before.get(person.matchKey),last)).sort((a,b)=>num(b.organizationSize)-num(a.organizationSize));
+  }else rows=people.map(person=>actionAffectedPerson(person,before.get(person.matchKey),last)).sort((a,b)=>num(b.organizationSize)-num(a.organizationSize));
+  return dedupeAffected(rows);
+}
+function activePlanFor(type){return H.actionPlans.find(plan=>plan.alertType===type&&plan.status==='active')||null}
+function completedActionTask(task){return ACTION_CLOSED_RESULTS.has(task.result)||task.status==='closed'}
+function strategyHtml(strategy){
+  const plan=activePlanFor(strategy.type),tasks=plan&&Array.isArray(plan.tasks)?plan.tasks:[],done=tasks.filter(task=>!!task.result).length,total=tasks.length,progress=total?Math.round(done/total*100):0;
+  return `<article class="hist-strategy hist-action-alert" style="--tone:${strategy.tone}" data-alert-type="${esc(strategy.type)}"><div class="s-top"><span class="s-priority">${esc(strategy.priority)}</span><span class="hist-plan-state ${plan?'active':'empty'}">${plan?'Plan activo':'Sin plan'}</span></div><h4>${esc(strategy.title)}</h4><p class="evidence">${esc(strategy.evidence)}</p><div class="action"><b>Acción sugerida:</b> ${esc(strategy.action)}</div>${plan?`<div class="hist-alert-progress"><div><span>${done} atendidas sobre ${total}</span><b>${progress}%</b></div><i><em style="width:${progress}%"></em></i></div><button type="button" class="hist-action-main" data-action-continue="${esc(plan.id)}">Continuar plan</button>`:`<div class="hist-alert-buttons"><button type="button" data-action-affected="${esc(strategy.type)}">Ver afectados</button><button type="button" class="primary" data-action-create="${esc(strategy.type)}">Crear plan</button></div>`}</article>`
+}
+function actionDueTasks(){
+  const today=localActionDate();
+  return H.actionPlans.filter(plan=>plan.status==='active').flatMap(plan=>(plan.tasks||[]).filter(task=>!completedActionTask(task)&&task.date&&task.date<=today).map(task=>({plan,task}))).sort((a,b)=>String(a.task.date).localeCompare(String(b.task.date))||String(a.plan.priority).localeCompare(String(b.plan.priority)));
+}
+function actionCenterSummaryHtml(strategies){
+  const active=H.actionPlans.filter(plan=>plan.status==='active'),due=actionDueTasks(),unattended=active.reduce((sum,plan)=>sum+(plan.tasks||[]).filter(task=>!task.result).length,0),withoutPlan=strategies.filter(strategy=>!activePlanFor(strategy.type)).length,first=due[0];
+  return `<section class="hist-action-summary"><div class="hist-action-summary-head"><div><span>Centro de Acción</span><h3>Qué tenés que hacer hoy</h3></div><b>${due.length?'Prioridad inmediata':'Todo al día'}</b></div><div class="hist-action-kpis"><div><strong>${due.length}</strong><span>Para hoy o vencidas</span></div><div><strong>${active.length}</strong><span>Planes activos</span></div><div><strong>${unattended}</strong><span>Personas sin atender</span></div><div><strong>${withoutPlan}</strong><span>Alertas sin plan</span></div></div><div class="hist-action-next">${first?`<p><b>Primero:</b> ${esc(first.task.person)} · ${esc(first.plan.title)}</p><button type="button" data-action-first="${esc(first.plan.id)}">Accionar ahora</button>`:`<p>Todo al día. Revisá las alertas nuevas o el avance de tus planes.</p><button type="button" data-action-open>Abrir centro</button>`}</div>${first?'<button type="button" class="hist-action-open" data-action-open>Abrir centro</button>':''}</section>`;
+}
+function strategyByType(type){
+  return buildStrategies(H.periods.slice(-Math.min(6,H.periods.length))).find(strategy=>strategy.type===type)||{id:type,type,...ACTION_ALERTS[type],evidence:'Alerta del Histórico',action:'Escuchar primero y acordar una acción pequeña y posible.'};
+}
+function bindActionCenter(root){
+  root.querySelectorAll('[data-action-open]').forEach(button=>button.onclick=()=>openActionCenter('today'));
+  root.querySelectorAll('[data-action-first]').forEach(button=>button.onclick=()=>openActionCenter('today',button.dataset.actionFirst));
+  root.querySelectorAll('[data-action-affected]').forEach(button=>button.onclick=()=>openAffectedPanel(button.dataset.actionAffected));
+  root.querySelectorAll('[data-action-create]').forEach(button=>button.onclick=()=>openPlanPreview(button.dataset.actionCreate));
+  root.querySelectorAll('[data-action-continue]').forEach(button=>button.onclick=()=>openActionCenter('plans',button.dataset.actionContinue));
+}
+function ensureActionCenter(){
+  let overlay=document.getElementById('histActionOverlay');if(overlay)return overlay;
+  overlay=document.createElement('div');overlay.id='histActionOverlay';overlay.className='hist-action-overlay';overlay.innerHTML='<aside class="hist-action-drawer" role="dialog" aria-modal="true" aria-labelledby="histActionTitle"><header><div><span>Histórico</span><h2 id="histActionTitle">Centro de Acción</h2><p id="histActionSubtitle">Qué tenés que hacer hoy</p></div><button type="button" id="histActionClose" aria-label="Cerrar">×</button></header><nav id="histActionTabs" class="hist-action-tabs"><button type="button" data-action-tab="today">Hoy</button><button type="button" data-action-tab="plans">Planes</button><button type="button" data-action-tab="organizations">Organizaciones</button></nav><div id="histActionBody"></div></aside>';
+  document.body.appendChild(overlay);overlay.onclick=event=>{if(event.target===overlay)closeActionCenter()};overlay.querySelector('#histActionClose').onclick=closeActionCenter;overlay.querySelectorAll('[data-action-tab]').forEach(button=>button.onclick=()=>openActionCenter(button.dataset.actionTab));return overlay;
+}
+function closeActionCenter(){document.getElementById('histActionOverlay')?.classList.remove('open');H.actionContext=null}
+function actionPlanProgress(plan){const tasks=plan.tasks||[],attended=tasks.filter(task=>!!task.result).length;return {attended,total:tasks.length,percent:tasks.length?Math.round(attended/tasks.length*100):0}}
+function actionMessage(task,plan){
+  const first=String(task.person||'').trim().split(/\s+/)[0]||'¿cómo estás?',inactive=['active_drop','consecutive'].includes(plan.alertType),growth=['pb_growth','active_growth'].includes(plan.alertType);
+  if(growth)return `Hola ${first}. Quería reconocer cómo venís avanzando. Antes que nada, ¿cómo estás? Si te parece, podemos hablar unos minutos, escuchar qué te ayudó y acordar juntos un objetivo pequeño y posible para esta semana.`;
+  if(inactive)return `Hola ${first}. Quería saber cómo venís y cómo te estás sintiendo con la actividad. Antes que nada, ¿cómo estás? Si te parece, podemos hablar unos minutos, ver qué necesitás y acordar juntos un objetivo pequeño y posible para esta semana.`;
+  return `Hola ${first}. Vi que estos últimos cierres estuvieron más tranquilos. Antes que nada, ¿cómo estás? Si te parece, podemos hablar unos minutos, ver qué necesitás y acordar juntos un objetivo pequeño y posible para esta semana.`;
+}
+function actionTaskHtml(task,plan){
+  const overdue=!completedActionTask(task)&&task.date<localActionDate(),today=task.date===localActionDate(),result=ACTION_RESULTS[task.result]||'',message=task.script||actionMessage(task,plan);
+  return `<article class="hist-action-task ${overdue?'overdue':today?'today':''}" data-action-task="${esc(task.id)}" data-action-plan="${esc(plan.id)}"><div class="hist-action-task-head"><div><h4>${esc(task.person)}</h4><p>${esc(task.dip||'Sin DIP')} · ${esc(task.category||'Sin categoría')} · ${esc(task.branch||'Sin rama')}</p></div><span>${overdue?'Vencida':today?'Hoy':completedActionTask(task)?'Cerrada':esc(task.date||'Sin fecha')}</span></div><div class="hist-action-task-meta"><span>Responsable: <b>${esc(task.responsible||plan.responsible)}</b></span>${result?`<span>Resultado: <b>${esc(result)}</b></span>`:''}</div>${task.notes?`<p class="hist-action-note">${esc(task.notes)}</p>`:''}<label class="hist-action-script"><span>Mensaje preparado · podés editarlo antes de abrir WhatsApp</span><textarea rows="5">${esc(message)}</textarea></label><div class="hist-action-task-buttons"><button type="button" class="wa" data-action-whatsapp>WhatsApp</button><a class="call" href="tel:${esc(actionPhone(task.phone))}" data-action-call>Llamar</a><button type="button" data-action-result>Registrar resultado</button></div></article>`;
+}
+function renderActionToday(body,focusPlanId=''){
+  let items=actionDueTasks();if(focusPlanId)items=items.sort((a,b)=>(a.plan.id===focusPlanId?-1:0)-(b.plan.id===focusPlanId?-1:0));
+  body.innerHTML=items.length?`<div class="hist-action-section-title"><h3>Prioridad inmediata</h3><p>${items.length} ${items.length===1?'acción':'acciones'} para hoy o vencidas.</p></div><div class="hist-action-task-list">${items.map(item=>actionTaskHtml(item.task,item.plan)).join('')}</div>`:'<div class="hist-action-empty"><span>✓</span><h3>Todo al día</h3><p>No hay tareas vencidas ni para hoy. Revisá Planes para anticipar la semana.</p></div>';
+  bindActionTasks(body);
+}
+function actionPlanCardHtml(plan,expanded=false){
+  const progress=actionPlanProgress(plan),tasks=plan.tasks||[];
+  return `<article class="hist-action-plan-card ${expanded?'expanded':''}"><div class="hist-action-plan-head"><div><span style="--tone:${plan.color}">${esc(plan.priority)}</span><h3>${esc(plan.title)}</h3><p>${esc(plan.organizationLabel||'Todo el equipo')} · Responsable: ${esc(plan.responsible)}</p></div><b>${progress.percent}%</b></div><div class="hist-alert-progress"><div><span>${progress.attended} atendidas sobre ${progress.total}</span><b>Revisión ${esc(plan.reviewDate||'—')}</b></div><i><em style="width:${progress.percent}%"></em></i></div><div class="hist-plan-goals"><span>Objetivo: <b>${num(plan.contactGoal)} contactos</b></span><span>PB a recuperar: <b>${fmt(plan.pbGoal)}</b></span><span>Sin teléfono: <b>${num(plan.excludedCount)}</b></span></div>${expanded?`<div class="hist-action-task-list compact">${tasks.map(task=>actionTaskHtml(task,plan)).join('')}</div><div class="hist-plan-history"><b>Próximos pasos</b><p>Completá las tareas individuales, revisá los acuerdos el ${esc(plan.reviewDate||'próximo cierre')} y conservá las notas en Mi Gestión.</p></div><button type="button" class="hist-close-plan" data-action-close-plan="${esc(plan.id)}">Cerrar plan sin borrar el historial</button>`:`<button type="button" class="hist-action-main" data-action-view-plan="${esc(plan.id)}">Ver plan y continuar</button>`}</article>`;
+}
+function renderActionPlans(body,focusPlanId=''){
+  const plans=H.actionPlans.slice().sort((a,b)=>(a.status==='active'?0:1)-(b.status==='active'?0:1)||String(b.updatedAt).localeCompare(String(a.updatedAt)));
+  if(!plans.length){body.innerHTML='<div class="hist-action-empty"><span>＋</span><h3>Todavía no hay planes</h3><p>Creá uno desde una alerta del Histórico. Siempre verás una vista previa antes de guardarlo.</p></div>';return}
+  const selected=plans.find(plan=>plan.id===focusPlanId);
+  body.innerHTML=selected?`<button type="button" class="hist-action-back" data-action-all-plans>← Todos los planes</button>${actionPlanCardHtml(selected,true)}`:plans.map(plan=>actionPlanCardHtml(plan,false)).join('');
+  body.querySelectorAll('[data-action-view-plan]').forEach(button=>button.onclick=()=>openActionCenter('plans',button.dataset.actionViewPlan));
+  body.querySelectorAll('[data-action-all-plans]').forEach(button=>button.onclick=()=>openActionCenter('plans'));
+  body.querySelectorAll('[data-action-close-plan]').forEach(button=>button.onclick=()=>closeActionPlan(button.dataset.actionClosePlan));bindActionTasks(body);
+}
+function renderActionOrganizations(body){
+  const groups=new Map();for(const plan of H.actionPlans.filter(item=>item.status==='active'))for(const task of plan.tasks||[]){const key=task.branch||'Sin rama',group=groups.get(key)||{name:key,tasks:[],plans:new Set()};group.tasks.push(task);group.plans.add(plan.id);groups.set(key,group)}
+  const rows=[...groups.values()].sort((a,b)=>b.tasks.length-a.tasks.length);
+  body.innerHTML=rows.length?`<div class="hist-action-section-title"><h3>Organizaciones</h3><p>Avance agrupado por rama. Cada contacto sigue siendo individual.</p></div><div class="hist-organization-list">${rows.map(group=>{const attended=group.tasks.filter(task=>!!task.result).length,percent=group.tasks.length?Math.round(attended/group.tasks.length*100):0;return `<article><div><h3>${esc(group.name)}</h3><p>${group.tasks.length} personas · ${group.plans.size} ${group.plans.size===1?'plan':'planes'} · ${group.tasks.length-attended} pendientes</p></div><b>${percent}%</b><i><em style="width:${percent}%"></em></i></article>`}).join('')}</div>`:'<div class="hist-action-empty"><span>◎</span><h3>Sin organizaciones activas</h3><p>Cuando crees un plan vas a ver aquí el avance de cada rama.</p></div>';
+}
+function openActionCenter(tab='today',focusPlanId=''){
+  const overlay=ensureActionCenter(),body=overlay.querySelector('#histActionBody');H.actionTab=tab;H.actionContext={mode:'center',focusPlanId};overlay.querySelector('#histActionTitle').textContent='Centro de Acción';overlay.querySelector('#histActionSubtitle').textContent='Qué tenés que hacer hoy';overlay.querySelector('#histActionTabs').hidden=false;overlay.querySelectorAll('[data-action-tab]').forEach(button=>button.classList.toggle('active',button.dataset.actionTab===tab));
+  if(tab==='plans')renderActionPlans(body,focusPlanId);else if(tab==='organizations')renderActionOrganizations(body);else renderActionToday(body,focusPlanId);overlay.classList.add('open');overlay.querySelector('#histActionClose').focus();
+}
+function affectedStats(rows){return {total:rows.length,withPhone:rows.filter(row=>row.hasPhone).length,excluded:rows.filter(row=>!row.hasPhone).length}}
+function affectedRowsHtml(rows){return rows.map(row=>`<article class="hist-affected-row ${row.hasPhone?'':'excluded'}"><div><h4>${esc(row.person)}</h4><p>${esc(row.dip||'Sin DIP')} · ${esc(row.category||'Sin categoría')}</p></div><div><span>PB anterior <b>${fmt(row.pbPrevious)}</b></span><span>PB actual <b>${fmt(row.pbCurrent)}</b></span><span>Diferencia <b class="${row.difference<0?'down':row.difference>0?'up':''}">${row.difference>0?'+':''}${fmt(row.difference)}</b></span></div><p>${row.hasPhone?`📱 ${esc(row.phone)}`:'⚠ Sin teléfono · excluida del plan activo'}</p></article>`).join('')||'<div class="hist-action-empty"><h3>No hay personas en esta condición</h3><p>La alerta queda disponible para revisar el próximo cierre.</p></div>'}
+function openAffectedPanel(type){
+  const strategy=strategyByType(type),rows=affectedForStrategy(strategy),stats=affectedStats(rows),overlay=ensureActionCenter(),body=overlay.querySelector('#histActionBody');H.actionContext={mode:'affected',type};overlay.querySelector('#histActionTitle').textContent='Personas afectadas';overlay.querySelector('#histActionSubtitle').textContent=strategy.title;overlay.querySelector('#histActionTabs').hidden=true;body.innerHTML=`<div class="hist-affected-stats"><div><b>${stats.total}</b><span>Detectadas</span></div><div><b>${stats.withPhone}</b><span>Con teléfono</span></div><div><b>${stats.excluded}</b><span>Excluidas sin teléfono</span></div></div><div class="hist-affected-list">${affectedRowsHtml(rows)}</div><div class="hist-action-sticky"><button type="button" class="secondary" data-action-back-alert>Cerrar</button><button type="button" data-action-preview ${stats.withPhone?'':'disabled'}>Crear plan con estos casos</button></div>`;body.querySelector('[data-action-back-alert]').onclick=closeActionCenter;body.querySelector('[data-action-preview]').onclick=()=>openPlanPreview(type);overlay.classList.add('open');
+}
+function actionOrganizationOptions(period){
+  const branches=[...((period.summary||{}).branches||[])].sort((a,b)=>num(b.people)-num(a.people)),leaders=(period.people||[]).filter(person=>(period.people||[]).some(child=>child.parentKey===person.key)).sort((a,b)=>num(b.totalPB)-num(a.totalPB));
+  return [{value:'all',label:'Todo el equipo',kind:'all'},...branches.map(branch=>({value:`branch:${branch.key}`,label:`Rama principal · ${branch.name}`,kind:'branch'})),...leaders.map(leader=>({value:`leader:${leader.key}`,label:`Organización de ${leader.nombre}`,kind:'leader'}))];
+}
+function isDescendant(person,leaderKey,period){let current=person,guard=0,byKey=new Map((period.people||[]).map(item=>[item.key,item]));while(current&&guard++<50){if(current.key===leaderKey)return true;current=byKey.get(current.parentKey)}return false}
+function filterAffectedForPlan(rows,scope,organization,period){
+  if(organization&&organization.startsWith('branch:')){const key=organization.slice(7);return rows.filter(row=>row.branchKey===key)}
+  if(organization&&organization.startsWith('leader:')){const key=organization.slice(7);return rows.filter(row=>{const person=(period.people||[]).find(item=>item.key===row.personKey);return person&&isDescendant(person,key,period)})}
+  if(scope==='main_branch'){const key=((period.summary||{}).branches||[]).slice().sort((a,b)=>num(b.people)-num(a.people))[0]?.key;return key?rows.filter(row=>row.branchKey===key):rows}
+  return rows;
+}
+function openPlanPreview(type){
+  const strategy=strategyByType(type),period=H.periods[H.periods.length-1],rows=affectedForStrategy(strategy),stats=affectedStats(rows),organizations=actionOrganizationOptions(period),pbSuggested=Math.round(rows.reduce((sum,row)=>sum+Math.max(0,-row.difference),0)),overlay=ensureActionCenter(),body=overlay.querySelector('#histActionBody');H.actionContext={mode:'preview',type,rows};overlay.querySelector('#histActionTitle').textContent='Vista previa del plan';overlay.querySelector('#histActionSubtitle').textContent=strategy.title;overlay.querySelector('#histActionTabs').hidden=true;
+  body.innerHTML=`<section class="hist-plan-preview"><div class="hist-preview-evidence"><span>${esc(strategy.priority)} · ${esc(strategy.type)}</span><h3>${esc(strategy.title)}</h3><p>${esc(strategy.evidence)}</p></div><div class="hist-affected-stats"><div><b>${stats.total}</b><span>Detectadas</span></div><div><b>${stats.withPhone}</b><span>Con teléfono</span></div><div><b>${stats.excluded}</b><span>Excluidas</span></div></div><div class="hist-plan-fields"><label><span>Trabajar</span><select id="histActionScope"><option value="people">Personas, una por una</option><option value="main_branch">Por rama principal</option><option value="leader_org">Organización de un líder</option></select></label><label><span>Organización</span><select id="histActionOrganization">${organizations.map(option=>`<option value="${esc(option.value)}">${esc(option.label)}</option>`).join('')}</select></label><label><span>Objetivo de contactos</span><input id="histActionContactGoal" type="number" min="1" value="${Math.max(1,stats.withPhone)}"></label><label><span>PB sugeridos a recuperar</span><input id="histActionPbGoal" type="number" min="0" step="1" value="${pbSuggested}"></label><label><span>Responsable general</span><select id="histActionResponsible"><option value="Titular">Titular</option><option value="Socio/a">Socio/a</option><option value="Líder de cada organización">Líder de cada organización</option></select></label><label><span>Fecha de revisión semanal</span><input id="histActionReview" type="date" value="${actionDateIn(7)}"></label></div><div id="histActionPreviewList" class="hist-preview-list"><h3>Lista previa ordenada por impacto</h3>${affectedRowsHtml(rows.slice(0,20))}</div></section><div class="hist-action-sticky"><button type="button" class="secondary" data-action-cancel>Cancelar</button><button type="button" data-action-confirm ${stats.withPhone?'':'disabled'}>Confirmar y crear plan</button></div>`;
+  const refresh=()=>{const filtered=filterAffectedForPlan(rows,body.querySelector('#histActionScope').value,body.querySelector('#histActionOrganization').value,period),next=affectedStats(filtered);body.querySelector('#histActionContactGoal').value=Math.max(1,next.withPhone);body.querySelector('#histActionPreviewList').innerHTML=`<h3>Lista previa · ${next.withPhone} con teléfono · ${next.excluded} excluidas</h3>${affectedRowsHtml(filtered.slice(0,20))}`};body.querySelector('#histActionScope').onchange=refresh;body.querySelector('#histActionOrganization').onchange=refresh;body.querySelector('[data-action-cancel]').onclick=closeActionCenter;body.querySelector('[data-action-confirm]').onclick=()=>confirmActionPlan(type);overlay.classList.add('open');
+}
+function taskFromAffected(row,plan,index){const now=new Date().toISOString(),responsible=plan.responsible==='Líder de cada organización'?(row.branch||plan.responsible):plan.responsible;return {id:actionId('task'),key:row.key,person:row.person,dip:row.dip,category:row.category,branchKey:row.branchKey,branch:row.branch,phone:row.phone,contactId:row.contactId||'',pbPrevious:row.pbPrevious,pbCurrent:row.pbCurrent,difference:row.difference,responsible,date:actionDateIn(index%7),result:'',notes:'',status:'pending',script:'',createdAt:now,updatedAt:now,history:[{at:now,type:'created',detail:'Tarea creada y distribuida en la agenda semanal.'}]}}
+async function confirmActionPlan(type){
+  const body=document.getElementById('histActionBody'),strategy=strategyByType(type),period=H.periods[H.periods.length-1],scope=body.querySelector('#histActionScope').value,organization=body.querySelector('#histActionOrganization').value,rows=filterAffectedForPlan(affectedForStrategy(strategy),scope,organization,period),eligible=rows.filter(row=>row.hasPhone),now=new Date().toISOString(),organizationLabel=body.querySelector('#histActionOrganization').selectedOptions[0]?.textContent||'Todo el equipo';
+  const existing=activePlanFor(type);if(existing){openActionCenter('plans',existing.id);toast('Ya existe un plan activo para esta alerta. Lo actualizamos con cada cierre.',3000);return}
+  const plan={id:actionId('plan'),alertType:type,title:strategy.title,evidence:strategy.evidence,priority:strategy.priority,color:strategy.tone,scope,organization,organizationLabel,responsible:body.querySelector('#histActionResponsible').value,contactGoal:num(body.querySelector('#histActionContactGoal').value),pbGoal:num(body.querySelector('#histActionPbGoal').value),reviewDate:body.querySelector('#histActionReview').value||actionDateIn(7),status:'active',sourcePeriods:H.periods.slice(-2).map(item=>item.id),lastClose:period.id,excludedCount:rows.length-eligible.length,createdAt:now,updatedAt:now,tasks:[],history:[{at:now,type:'created',detail:`Plan creado con ${eligible.length} tareas y ${rows.length-eligible.length} casos excluidos sin teléfono.`}]};plan.tasks=eligible.map((row,index)=>taskFromAffected(row,plan,index));H.actionPlans.push(plan);await persistActionPlans();for(const task of plan.tasks)programTaskInManagement(task,plan,'historico_accion').catch(()=>{});openActionCenter('plans',plan.id);render();notifyActionDueOnce();toast(`Plan creado: ${plan.tasks.length} contactos en los próximos siete días`,3000);
+}
+async function programTaskInManagement(task,plan,activity='historico_accion',note=''){
+  if(!(window.APPIGestion&&window.APPIGestion.programarDesdeHistorico))return null;
+  const contact=await window.APPIGestion.programarDesdeHistorico(task.contactId||'',{person:task.person,nombre:task.person,dip:task.dip,telefono:task.phone,plan_id:plan.id,plan_title:plan.title,alerta:plan.alertType,resultado:task.result||'',nota:note||task.notes||`Plan del Histórico: ${plan.title}`,proximo_contacto:task.date,activity});if(contact&&contact.id&&task.contactId!==contact.id){task.contactId=contact.id;task.updatedAt=new Date().toISOString();await persistActionPlans()}return contact;
+}
+function bindActionTasks(root){
+  root.querySelectorAll('.hist-action-task').forEach(card=>{const plan=H.actionPlans.find(item=>item.id===card.dataset.actionPlan),task=plan&&plan.tasks.find(item=>item.id===card.dataset.actionTask);if(!task)return;const textarea=card.querySelector('textarea');textarea.onchange=async()=>{task.script=textarea.value.trim().slice(0,1200);task.updatedAt=new Date().toISOString();await persistActionPlans()};card.querySelector('[data-action-whatsapp]').onclick=async()=>{const message=textarea.value.trim()||actionMessage(task,plan);task.script=message;task.history.push({at:new Date().toISOString(),type:'whatsapp_abierto',detail:'Se abrió WhatsApp con el mensaje preparado.'});await persistActionPlans();programTaskInManagement(task,plan,'whatsapp_abierto').catch(()=>{});window.open(`https://wa.me/${actionPhone(task.phone)}?text=${encodeURIComponent(message)}`,'_blank','noopener')};card.querySelector('[data-action-call]').onclick=()=>{task.history.push({at:new Date().toISOString(),type:'llamada_iniciada',detail:'Se inició una llamada individual.'});persistActionPlans();programTaskInManagement(task,plan,'llamada_iniciada').catch(()=>{})};card.querySelector('[data-action-result]').onclick=()=>recordActionResult(plan.id,task.id)});
+}
+async function recordActionResult(planId,taskId){
+  const plan=H.actionPlans.find(item=>item.id===planId),task=plan&&plan.tasks.find(item=>item.id===taskId);if(!task)return;
+  const options=Object.entries(ACTION_RESULTS).map(([value,label])=>({value,label})),result=await window.APPIDialog.choose(`¿Qué pasó con ${task.person}?`,options,{title:'Registrar resultado',icon:'✓'});if(!result)return;const note=await window.APPIDialog.prompt('Dejá una nota breve: qué pasó, qué necesita o qué acordaron.','',{title:ACTION_RESULTS[result],icon:'📝',placeholder:'Nota breve…',okText:'Guardar resultado'}),now=new Date().toISOString();task.result=result;task.notes=[task.notes,note&&note.trim()].filter(Boolean).join('\n').slice(0,3000);task.updatedAt=now;
+  if(result==='no_response'){task.date=actionDateIn(2);task.status='pending'}else if(result==='conversation_pending'||result==='goal_agreed'){task.date=actionDateIn(7);task.status='pending'}else if(result==='reactivated'||result==='no_followup'||result==='contacted'||result==='referred'){task.status='closed';task.date=''}
+  task.history.push({at:now,type:'result',result,note:String(note||''),nextDate:task.date});plan.updatedAt=now;plan.history.push({at:now,type:'task_result',taskId:task.id,result,note:String(note||'')});await persistActionPlans();await programTaskInManagement(task,plan,'historico_accion',String(note||''));openActionCenter('plans',plan.id);render();toast('Resultado y próximo paso guardados',2400);
+}
+async function closeActionPlan(planId){const plan=H.actionPlans.find(item=>item.id===planId);if(!plan)return;const ok=await window.APPIDialog.confirm('El plan se cerrará, pero sus tareas, notas, resultados e historial seguirán guardados.',{title:'Cerrar plan',icon:'✓',okText:'Cerrar plan'});if(!ok)return;plan.status='closed';plan.updatedAt=new Date().toISOString();plan.history.push({at:plan.updatedAt,type:'closed',detail:'Plan cerrado manualmente sin borrar el historial.'});await persistActionPlans();openActionCenter('plans');render();toast('Plan cerrado. El historial se conservó.',2600)}
+async function reconcileActionPlans(){
+  if(!H.periods.length||!H.actionPlans.length)return H.actionPlans;const period=H.periods[H.periods.length-1],now=new Date().toISOString();let changed=false;
+  for(const plan of H.actionPlans.filter(item=>item.status==='active')){const strategy=strategyByType(plan.alertType),rows=filterAffectedForPlan(affectedForStrategy(strategy),plan.scope,plan.organization,period),byKey=new Map(rows.map(row=>[row.key,row])),tasks=new Map((plan.tasks||[]).map(task=>[task.key,task]));for(const task of plan.tasks||[]){const row=byKey.get(task.key);if(row){task.pbPrevious=row.pbPrevious;task.pbCurrent=row.pbCurrent;task.difference=row.difference;if(row.phone)task.phone=row.phone;if(row.contactId)task.contactId=row.contactId;task.updatedAt=now}else if(['active_drop','consecutive'].includes(plan.alertType)){const current=(period.people||[]).find(person=>person.matchKey===task.key);if(current&&num(current.pnAct)>0&&!task.result){task.result='reactivated';task.status='closed';task.pbCurrent=num(current.pnAct);task.updatedAt=now;task.history.push({at:now,type:'auto_reactivated',detail:'El nuevo cierre registra actividad; APPI marcó la tarea como reactivada.'})}}}for(const row of rows.filter(item=>item.hasPhone&&!tasks.has(item.key))){plan.tasks.push(taskFromAffected(row,plan,plan.tasks.length));changed=true}plan.excludedCount=rows.filter(row=>!row.hasPhone).length;plan.sourcePeriods=H.periods.slice(-2).map(item=>item.id);plan.lastClose=period.id;plan.updatedAt=now;plan.history.push({at:now,type:'historico_plan_actualizado',detail:`Plan recalculado con el cierre ${period.label}; se conservaron tareas, notas y resultados.`});changed=true}
+  if(changed){await persistActionPlans();for(const plan of H.actionPlans.filter(item=>item.status==='active'))for(const task of plan.tasks||[])programTaskInManagement(task,plan,'historico_plan_actualizado').catch(()=>{})}return H.actionPlans;
+}
+function notifyActionDueOnce(){
+  const count=actionDueTasks().length;if(!count)return false;const key=`appi_historico_action_notice_${actionActorKey()}_${localActionDate()}`;if(localStorage.getItem(key))return false;localStorage.setItem(key,'1');if(typeof Notification!=='undefined'&&Notification.permission==='granted')try{new Notification('Centro de Acción APPI',{body:`Tenés ${count} acciones para hoy o vencidas`,icon:'./icon-192.png',tag:`appi-actions-${localActionDate()}`})}catch(e){}return true;
+}
+
 function localReportText(periods,strategies,a){
   const first=periods[0],last=periods[periods.length-1],s=last.summary,lines=[];lines.push(`INFORME ESTRATÉGICO · ${first.label}${first.id===last.id?'':` a ${last.label}`}`,'',`Resumen: ${s.people} personas, ${s.activePct}% activas, ${fmt(s.pbPersonal)} PB, ${fmt(s.pending)} garantías pendientes y ${s.incomeCount} ingresos.`);
   if(periods.length>1)lines.push(`Evolución: ${a.pbDelta.text}; actividad ${a.activeDelta.text}; personas ${a.peopleDelta.text}; ingresos ${a.incomeDelta.text}.`,`${a.improved} personas mejoraron sus PB, ${a.declined} bajaron, ${a.newPeople} se incorporaron y ${a.leftPeople} dejaron de aparecer.`);
@@ -888,7 +1098,7 @@ function showHelp(){
 async function openHistorico(){
   showView('view-historico');const c=$('historicoContent');if(c)c.innerHTML='<div class="hist-loading"><span></span>Abriendo cierres mensuales…</div>';
   try{
-    await refreshData();H.ready=true;render();
+    await refreshData();H.ready=true;render();notifyActionDueOnce();
     if(navigator.onLine&&cloudReady()&&getSession()){
       if(c)c.innerHTML='<div class="hist-loading"><span></span>Sincronizando Histórico…</div>';
       await syncAll(false);
@@ -906,13 +1116,13 @@ async function initHistorico(){
   const restore=$('histRestoreInput');if(restore)restore.onchange=e=>restoreBackup(e.target.files&&e.target.files[0]);
   const quick=$('histSyncQuick');if(quick)quick.onclick=()=>cloudReady()&&getSession()?syncAll(true):openTab('nube');
   window.addEventListener('online',()=>{updateSyncStatus();if(cloudReady()&&getSession())syncAll(false)});window.addEventListener('offline',()=>updateSyncStatus());
-  document.addEventListener('visibilitychange',()=>{if(!document.hidden&&navigator.onLine&&cloudReady()&&getSession())syncAll(false)});
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden){notifyActionDueOnce();if(navigator.onLine&&cloudReady()&&getSession())syncAll(false)}});
   updateSyncStatus();
   if(window.__histOpenRequested) setTimeout(openHistorico,0);
 }
 window.openHistorico=openHistorico;
 window.initHistoricoAPPI=initHistorico;
-window.__APPI_HISTORICO__={state:H,open:openHistorico,refresh:refreshData,parseFile:parseHistoricalFile,saveMonth:saveMonthPeriod,analyze:analyzePeriods,strategies:buildStrategies,dbGetAll,annualMatrix,albumMonthStats,ensureAlbumMonth,renderAlbumReadout,renderAnnualSummary,renderCOPA,animateCharts:animateHistCharts,lineChart};
+window.__APPI_HISTORICO__={state:H,open:openHistorico,refresh:refreshData,parseFile:parseHistoricalFile,saveMonth:saveMonthPeriod,analyze:analyzePeriods,strategies:buildStrategies,buildStrategies,affectedForStrategy,reconcileActionPlans,notifyActionDueOnce,openActionCenter,renderActionSummary:actionCenterSummaryHtml,strategyHtml,dbGetAll,annualMatrix,albumMonthStats,ensureAlbumMonth,renderAlbumReadout,renderAnnualSummary,renderCOPA,animateCharts:animateHistCharts,lineChart};
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initHistorico);else initHistorico();
 setTimeout(initHistorico,1200);
 
