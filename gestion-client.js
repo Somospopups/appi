@@ -59,6 +59,7 @@ function queueMutation(id,method,payload){
   queue.push({kind:'contact',id,method,payload,queuedAt:Date.now()});saveQueue(queue);
 }
 function queueActivity(payload){const queue=loadQueue();queue.push({kind:'activity',id:payload.id,method:'POST',payload,queuedAt:Date.now()});saveQueue(queue)}
+function queueHistoricoImport(tempId,payload){const queue=loadQueue();queue.push({kind:'historico_import',id:tempId,method:'POST',payload,queuedAt:Date.now()});saveQueue(queue)}
 async function flushQueue(){
   if(!navigator.onLine||!authorized())return false;
   if(state.queueFlushing)return state.queueFlushing;
@@ -67,7 +68,10 @@ async function flushQueue(){
       const queue=loadQueue();if(!queue.length)return true;const item=queue[0];
       try{
         if(item.kind==='activity')await cloudFetch('/rest/v1/appi_gestion_actividades',{method:'POST',headers:{'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify(item.payload)});
-        else await cloudFetch(`/rest/v1/appi_gestion_contactos?id=eq.${encodeURIComponent(item.id)}`,{method:item.method,headers:{'Content-Type':'application/json',Prefer:'return=minimal'},body:item.method==='DELETE'?undefined:JSON.stringify(item.payload)});
+        else if(item.kind==='historico_import'){
+          const imported=await importarPersona(item.payload),realId=imported&&imported.id;
+          if(realId){const tempId=item.id,local=state.contacts.find(contact=>contact.id===tempId);if(local)Object.assign(local,imported,{id:realId});const rewritten=loadQueue().map(current=>{if(current.id===tempId)current.id=realId;if(current.payload&&current.payload.contacto_id===tempId)current.payload.contacto_id=realId;return current});saveQueue(rewritten);item.id=realId;saveCache()}
+        }else await cloudFetch(`/rest/v1/appi_gestion_contactos?id=eq.${encodeURIComponent(item.id)}`,{method:item.method,headers:{'Content-Type':'application/json',Prefer:'return=minimal'},body:item.method==='DELETE'?undefined:JSON.stringify(item.payload)});
         saveQueue(loadQueue().filter(current=>!(current.kind===item.kind&&current.id===item.id)));
       }catch(error){return false}
     }
@@ -604,10 +608,35 @@ function guardarMetadata(contact, extra){
   return persistContact(contact, {metadata});
 }
 
+function normalizarHistorico(value){return String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim()}
+function contactoDesdeHistorico(contactId,action={}){
+  const id=String(contactId||''),dip=String(action.dip||'').trim().toUpperCase(),phone=phoneDigits(action.telefono),name=normalizarHistorico(action.nombre||action.person);
+  return state.contacts.find(contact=>id&&contact.id===id)||state.contacts.find(contact=>dip&&String(contact.metadata&&contact.metadata.dip||'').trim().toUpperCase()===dip)||state.contacts.find(contact=>phone&&phoneDigits(contact.telefono)===phone)||state.contacts.find(contact=>name&&normalizarHistorico(contact.nombre)===name)||null;
+}
+function estadoDesdeResultado(result,current='seguimiento'){
+  if(result==='no_followup')return 'no_interesado';
+  if(result==='contacted'||result==='reactivated')return 'contactado';
+  if(['no_response','conversation_pending','goal_agreed','referred'].includes(result))return 'seguimiento';
+  return current==='nuevo'?'seguimiento':current||'seguimiento';
+}
+async function importarDesdeHistorico(action){
+  const data={nombre:String(action.nombre||action.person||'Sin nombre').trim(),telefono:String(action.telefono||''),interes:'Negocio',estado:'seguimiento',notas:String(action.nota||`Plan del Histórico: ${action.plan_title||action.alerta||'Centro de Acción'}`).slice(0,5000),proximo:action.proximo_contacto||null,localId:`historico:${action.dip||phoneDigits(action.telefono)}`};
+  if(authorized()&&navigator.onLine){const imported=await importarPersona(data);if(imported&&imported.id){const contact={tipo:'manual',cantidad_origenes:1,created_at:new Date().toISOString(),updated_at:new Date().toISOString(),...data,...imported};state.contacts=state.contacts.filter(item=>item.id!==contact.id);state.contacts.unshift(contact);saveCache();return contact}}
+  const now=new Date().toISOString(),contact={id:`local-historico-${uuidV4()}`,user_id:userId(),tipo:'manual',nombre:data.nombre,telefono:data.telefono,telefono_normalizado:phoneDigits(data.telefono),estado:'seguimiento',notas:data.notas,proximo_contacto:data.proximo,metadata:{dip:action.dip||'',origen:'historico'},cantidad_origenes:1,created_at:now,updated_at:now};state.contacts.unshift(contact);saveCache();queueHistoricoImport(contact.id,data);return contact;
+}
+async function programarDesdeHistorico(contactId,action={}){
+  let contact=contactoDesdeHistorico(contactId,action);
+  if(!contact){if(!telefonoValido(action.telefono))throw new Error('La persona del Histórico no tiene un teléfono válido.');contact=await importarDesdeHistorico(action)}
+  const now=new Date().toISOString(),base=contact.metadata&&typeof contact.metadata==='object'&&!Array.isArray(contact.metadata)?contact.metadata:{},previousHistory=Array.isArray(base.centro_accion_historial)?base.centro_accion_historial:[],entry={plan_id:String(action.plan_id||''),alerta:String(action.alerta||''),resultado:String(action.resultado||''),nota:String(action.nota||''),proximo_contacto:action.proximo_contacto||null,fecha_actualizacion:now},metadata={...base,dip:action.dip||base.dip||'',plan_id:entry.plan_id,alerta:entry.alerta,resultado:entry.resultado,nota:entry.nota,proximo_contacto:entry.proximo_contacto,fecha_actualizacion:now,centro_accion:entry,centro_accion_historial:[...previousHistory,entry].slice(-80)};
+  const payload={estado:estadoDesdeResultado(action.resultado,contact.estado),proximo_contacto:action.proximo_contacto||null,metadata};if(action.nota)payload.notas=[contact.notas,String(action.nota).trim()].filter(Boolean).join('\n').slice(0,5000);if(action.resultado)payload.ultimo_contacto=now;
+  try{await persistContact(contact,payload)}catch(error){queueMutation(contact.id,'PATCH',payload)}
+  const allowed=new Set(['historico_accion','historico_plan_actualizado','whatsapp_abierto','llamada_iniciada']),activity=allowed.has(action.activity)?action.activity:'historico_accion';logActivity(contact.id,activity,action.nota||`${action.plan_title||'Centro de Acción'} · ${action.alerta||'seguimiento'}`,entry);saveCache();updateBadges();renderManagement();return contact;
+}
+
 window.openEncuestaTool=openEncuestaTool;
 window.openMiGestion=openMiGestion;
 window.closeGestionDetail=closeContactDetail;
-window.APPIGestion={state,open:openMiGestion,importarPersona,guardarPersonaManual,migrarContactosLocales,contactosPendientes,telefonoValido,nuevaPersonaManual,refresh:refreshManagement,createInvitation:createSurveyInvitation,surveyUrl,shareMessage,flushQueue,updateBadges,priorityFor,messageFor,actionableContacts,logActivity,setView:setManagementView,prepareBulk:addBulkRecipients,processPendingOutcome:maybeAskPendingOutcome,guardarMetadata,render:renderManagement};
+window.APPIGestion={state,open:openMiGestion,importarPersona,guardarPersonaManual,migrarContactosLocales,contactosPendientes,telefonoValido,nuevaPersonaManual,refresh:refreshManagement,createInvitation:createSurveyInvitation,surveyUrl,shareMessage,flushQueue,updateBadges,priorityFor,messageFor,actionableContacts,logActivity,setView:setManagementView,prepareBulk:addBulkRecipients,processPendingOutcome:maybeAskPendingOutcome,guardarMetadata,programarDesdeHistorico,render:renderManagement};
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 
