@@ -33,12 +33,12 @@
       texto: [
         'Hola {nombre}! 👋',
         '',
-        'Te escribo para recordarte que a tu equipo le toca un retrolavado. Es un mantenimiento simple, de 5 minutos, que lo mantiene funcionando como el primer día.',
+        'Me acordé de tu equipo: ya pasaron unos meses y le vendría bien un retrolavado.',
         '',
-        'Te dejo el video paso a paso:',
+        'Te dejo el video con el paso a paso:',
         '{link_retrolavado}',
         '',
-        'Cualquier duda escribime que te ayudo. 😊'
+        'Es simple, en 5 minutos lo tenés listo.'
       ].join('\n')
     },
     {
@@ -49,35 +49,35 @@
       texto: [
         '¡Feliz cumpleaños, {nombre}! 🎂🎉',
         '',
-        'Que tengas un día hermoso rodeado de la gente que querés.',
+        'Te mando un saludo grande en tu día. Que lo disfrutes mucho.',
         '',
-        'Un abrazo grande 🤗'
+        '¡Un abrazo!'
       ].join('\n')
     },
     {
       id: 'porvencer',
       icono: '⏰',
-      nombre: 'Garantía por vencer',
+      nombre: 'Vida útil por cumplirse',
       grupo: 'vigente',
       texto: [
-        'Hola {nombre}! 👋',
+        'Hola {nombre}! ¿Cómo andás? 😊',
         '',
-        'Te paso el dato de que la garantía de tu equipo vence el {vence}.',
+        'Te escribo porque el {vence} tu equipo cumple su vida útil. A partir de ahí ya no puede garantizar que no se desarrollen microorganismos adentro, que es justamente lo que lo hace seguro.',
         '',
-        'Si querés la renovamos y seguís con el servicio técnico y el mantenimiento cubierto. Avisame y lo vemos juntos. 😊'
+        'Esta semana voy a estar por {localidad}. ¿Querés que pase, lo revisemos y te explico cómo es el canje? ¿Qué día te queda mejor?'
       ].join('\n')
     },
     {
       id: 'renovacion',
       icono: '🔄',
-      nombre: 'Renovación',
+      nombre: 'Equipo vencido',
       grupo: 'vencido',
       texto: [
-        'Hola {nombre}! 👋',
+        'Hola {nombre}! ¿Cómo estás? 😊',
         '',
-        'Te cuento que la garantía de tu equipo venció el {vence}.',
+        'Vi que tu equipo cumplió la vida útil el {vence} y no llegamos a hacer el canje.',
         '',
-        'Renovarla es simple y te deja tranquilo con el servicio técnico y el mantenimiento cubierto. ¿Querés que te pase los detalles?'
+        'Si querés paso a verlo un día de estos y lo charlamos tranquilos.'
       ].join('\n')
     },
     {
@@ -86,9 +86,9 @@
       nombre: 'Saludo suelto',
       grupo: 'todos',
       texto: [
-        'Hola {nombre}! 👋 ¿Cómo estás?',
+        'Hola {nombre}! ¿Cómo andás? 😊',
         '',
-        'Te escribo para saber cómo viene funcionando tu equipo. Cualquier cosa que necesites, quedo a disposición. 😊'
+        'Pasaba a saludarte y a preguntarte cómo viene funcionando el equipo.'
       ].join('\n')
     }
   ];

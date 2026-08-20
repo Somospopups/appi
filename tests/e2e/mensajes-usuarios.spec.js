@@ -215,7 +215,7 @@ test('editar una plantilla la deja guardada para la próxima', async ({ page }) 
   await page.locator('[data-mu-editar="saludo"]').click();
   await expect(page.locator('#muTexto')).toHaveValue('Buenas {nombre}, ¿todo bien con el {producto}?');
   await page.locator('#muRestaurar').click();
-  await expect(page.locator('#muTexto')).toContainText('¿Cómo estás?');
+  await expect(page.locator('#muTexto')).toContainText('Pasaba a saludarte');
 });
 
 test('los botones de datos dicen el nombre, no la llave', async ({ page }) => {

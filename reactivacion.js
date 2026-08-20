@@ -52,11 +52,9 @@
       texto: [
         '¡Qué bueno, {nombre}! 😊',
         '',
-        'Te hago una pregunta: ¿cuándo fue la última vez que le cambiaste el filtro?',
+        'Te cuento algo importante entonces: tu equipo ya pasó su vida útil, y cuando eso ocurre el purificador deja de poder frenar el desarrollo de microorganismos en su interior.',
         '',
-        'Te lo digo porque con los años el filtro se satura y deja de purificar. Si tiene el original, puede estar ensuciando el agua en vez de limpiarla.',
-        '',
-        'Si querés paso a revisarlo sin cargo y te digo cómo está. 😊'
+        'Me gustaría pasar a verlo y explicarte bien de qué se trata el canje.'
       ].join('\n')
     },
     {
@@ -65,11 +63,11 @@
       nombre: 'Lo tiene guardado / no lo usa',
       pista: 'Casi siempre es sólo el filtro',
       texto: [
-        'Te entiendo, {nombre}. Pasa muchísimo. 😊',
+        'Te entiendo, {nombre}, pasa muchísimo. 😊',
         '',
-        'La mayoría de las veces el equipo está perfecto y lo único que necesita es un filtro nuevo: se cambia en cinco minutos y queda como el primer día.',
+        'Igual te cuento: cuando un equipo queda mucho tiempo sin usarse es cuando más importa la protección interna, y la del tuyo ya venció.',
         '',
-        '¿Querés que pase a verlo? Lo reviso sin cargo y te digo si vale la pena o no. Sin compromiso.'
+        'Si querés paso a verlo y te explico cómo es el canje.'
       ].join('\n')
     },
     {
@@ -78,11 +76,9 @@
       nombre: 'Dijo que se rompió',
       pista: 'Casi nunca está roto de verdad',
       texto: [
-        'Puede que tenga arreglo, {nombre}. 😊',
+        '¿Qué le pasó, {nombre}?',
         '',
-        'Muchas veces lo que parece una falla es el filtro tapado o la válvula sucia, y se soluciona en el momento.',
-        '',
-        '¿Querés que lo revise? Si tiene arreglo te lo dejo funcionando, y si no, vemos qué te conviene.'
+        'Te pregunto porque a veces es algo simple y se resuelve, pero si ya cumplió la vida útil lo que corresponde es el canje. Prefiero verlo antes de decirte cualquier cosa.'
       ].join('\n')
     },
     {
@@ -91,11 +87,9 @@
       nombre: 'Ya no lo tiene',
       pista: 'Acá se busca el referido',
       texto: [
-        'Gracias por contestarme igual, {nombre}! 😊',
+        'Ah, entiendo. Gracias por avisarme, {nombre}! 😊',
         '',
-        'Cualquier cosa que necesites sobre agua, quedo a disposición.',
-        '',
-        'Y si conocés a alguien que esté armando su casa y quiera agua segura, avisame que lo asesoro sin compromiso. 🙌'
+        '¿Y ahora qué están tomando en casa? Te pregunto por curiosidad, y por si en algún momento querés volver a tener el purificador.'
       ].join('\n')
     },
     {
@@ -104,21 +98,23 @@
       nombre: 'Coordinar la visita',
       pista: 'Para cerrar el día y la hora',
       texto: [
-        'Genial, {nombre}! 😊',
+        'Perfecto, {nombre}! 😊',
         '',
-        'Esta semana voy a estar por {localidad}. ¿Qué día te queda mejor?',
-        '',
-        'Es un ratito nomás: reviso el equipo y te digo cómo está.'
+        '¿Qué días y en qué horario te viene bien? Yo me acomodo a lo que te quede más cómodo.'
       ].join('\n')
     }
   ];
 
   var PLANTILLA_BASE = [
-    'Hola {nombre}! 👋 ¿Cómo estás?',
+    'Hola {nombre}, ¿cómo estás? 😊',
     '',
-    'Estoy revisando los equipos PSA que instalamos en {localidad} y vi que el tuyo ya tiene unos años.',
+    'Soy {vos}, distribuidor de PSA. Te escribo porque en nuestra base de datos figurás como usuario de nuestros equipos y estamos retomando el contacto con personas que alguna vez confiaron en nosotros.',
     '',
-    '¿Lo seguís usando?'
+    'Como pasó bastante tiempo, quería consultarte algo muy simple: *¿seguís teniendo el equipo, o actualmente estás tomando otro tipo de agua?*',
+    '',
+    'La idea es simplemente volver a tomar contacto, saber cómo estás y qué fue lo que sucedió en todo este tiempo, para poder acompañarte nuevamente como distribuidor.',
+    '',
+    '¡Espero que estés muy bien! 😊'
   ].join('\n');
 
   /* ---------- guardado ---------- */
@@ -352,12 +348,21 @@
     else d.texto = String(t == null ? '' : t);
     guardar(d);
   }
+  // Nombre de pila del distribuidor, para que el mensaje diga quién escribe.
+  function nombreDistribuidor(){
+    var activa = window.APPIAuth && window.APPIAuth.activePerson ? window.APPIAuth.activePerson() : null;
+    var perfil = window.APPIAuth && window.APPIAuth.currentProfile ? window.APPIAuth.currentProfile() : null;
+    var full = String((activa && activa.nombre) || (perfil && perfil.nombre) || '').trim();
+    return full.split(/\s+/)[0] || '';
+  }
+
   function completar(texto, u){
     u = u || {};
     var nombre = (typeof window.nombreDePila === 'function' ? window.nombreDePila(u.usuario) : '') ||
                  String(u.usuario || '').split(',')[0].trim();
     var mapa = {
       '{nombre}': nombre,
+      '{vos}': nombreDistribuidor(),
       '{localidad}': u.localidad || 'la zona',
       '{domicilio}': u.domicilio || '',
       '{compra}': u.fCompra || '',

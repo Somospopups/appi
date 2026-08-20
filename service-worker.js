@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v285-notas-fuera-del-sitio';
+const CACHE_NAME = 'appi-v286-mensajes-reescritos';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

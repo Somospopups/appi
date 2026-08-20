@@ -164,18 +164,37 @@ test('la fila manda de a uno y avisa cuántos quedan del cupo', async ({ page })
   expect(urls).toHaveLength(1);
   const texto = decodeURIComponent(urls[0].split('text=')[1]);
   expect(texto).toContain('Hola Ana');
-  expect(texto).toContain('Alta Gracia');
-  expect(texto).toContain('¿Lo seguís usando?');
+  expect(texto).toContain('seguís teniendo el equipo');
+  // El mensaje se presenta: quien lo recibe no lo tiene agendado hace años.
+  expect(texto).toContain('distribuidor de PSA');
+  expect(texto).not.toContain('{vos}');
 });
 
-test('el mensaje es corto y no ofrece nada todavía', async ({ page }) => {
+test('el primer mensaje pregunta, sin ofrecer ni presionar', async ({ page }) => {
   await entrar(page);
   const texto = await page.evaluate(() => window.APPIReactivacion.plantilla());
-  // Cuanto más corto, más gente contesta: es una pregunta, no un folleto.
-  expect(texto.split('\n').filter(l => l.trim()).length).toBeLessThanOrEqual(4);
-  expect(texto).toContain('¿Lo seguís usando?');
+  // Abre con una pregunta simple que da salida a las dos respuestas posibles.
+  expect(texto).toContain('seguís teniendo el equipo');
+  expect(texto).toContain('otro tipo de agua');
+  // Nada de venta en el primer contacto.
   expect(texto.toLowerCase()).not.toContain('precio');
   expect(texto.toLowerCase()).not.toContain('promoción');
+  expect(texto.toLowerCase()).not.toContain('oferta');
+});
+
+test('el mensaje se presenta con el nombre del distribuidor', async ({ page }) => {
+  await entrar(page);
+  // Quien lo recibe hace años que no habla con él: tiene que saber quién es.
+  const r = await page.evaluate(() => ({
+    plantilla: window.APPIReactivacion.plantilla(),
+    armado: window.APPIReactivacion.completar(
+      window.APPIReactivacion.plantilla(),
+      { usuario: 'GOMEZ, ANA', localidad: 'Alta Gracia' })
+  }));
+  expect(r.plantilla).toContain('{vos}');
+  // Al armarlo, la etiqueta se reemplaza por el nombre real del perfil.
+  expect(r.armado).not.toContain('{vos}');
+  expect(r.armado).toContain('María');
 });
 
 test('el tope diario corta la campaña y explica por qué', async ({ page }) => {
@@ -274,7 +293,7 @@ test('el texto de la campaña se puede editar y vuelve al original', async ({ pa
   await expect(page.locator('#reTexto')).toHaveValue('Hola {nombre}, ¿seguís en {localidad}?');
 
   await page.locator('#reRestaurar').click();
-  await expect(page.locator('#reTexto')).toContainText('¿Lo seguís usando?');
+  await expect(page.locator('#reTexto')).toContainText('seguís teniendo el equipo');
 });
 
 test('los dormidos siguen fuera de los pendientes del día', async ({ page }) => {
@@ -367,7 +386,7 @@ test('el seguimiento manda el texto que corresponde', async ({ page }) => {
   expect(urls).toHaveLength(1);
   const texto = decodeURIComponent(urls[0].split('text=')[1]);
   expect(texto).toContain('Ana');
-  expect(texto).toContain('filtro');
+  expect(texto).toContain('canje');
   expect(texto).not.toContain('{nombre}');
 });
 
@@ -451,7 +470,7 @@ test('los textos de seguimiento se editan y vuelven al original', async ({ page 
 
   await page.locator('[data-re-edit="roto"]').click();
   await page.locator('#reRestaurar').click();
-  await expect(page.locator('#reTexto')).toContainText('filtro tapado');
+  await expect(page.locator('#reTexto')).toContainText('cumplió la vida útil');
 });
 
 /* ---------- el aviso de WhatsApp ---------- */
