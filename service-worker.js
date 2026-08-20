@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v281-tu-equipo-y-ficha-ordenada';
+const CACHE_NAME = 'appi-v282-reactivacion-de-dormidos';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
@@ -20,6 +20,7 @@ const APP_SHELL = [
   './tarjetas-promos.js',
   './usuarios-botones.js',
   './mensajes-usuarios.js',
+  './reactivacion.js',
   './escalera-suenos.js',
   './demo-guia.js',
   './tablero-negocio.js',

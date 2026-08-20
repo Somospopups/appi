@@ -241,7 +241,10 @@ test('los botones de datos dicen el nombre, no la llave', async ({ page }) => {
 test('la barra no tiene botón de Mensajes: se escribe desde la ficha', async ({ page }) => {
   await entrar(page);
   await expect(page.locator('#usuariosBtnMensajes')).toHaveCount(0);
-  await expect(page.locator('.u-tools button:visible')).toHaveCount(5);
+  // Los cinco de siempre; "Dormidos" se suma sólo si hay clientes dormidos,
+  // y esta lista tiene uno vencido hace más de un año.
+  await expect(page.locator('.u-tools button:visible')).toHaveCount(6);
+  await expect(page.locator('#usuariosBtnDormidos')).toBeVisible();
 });
 
 test('el gesto de atrás cierra el popup de mensajes', async ({ page }) => {
