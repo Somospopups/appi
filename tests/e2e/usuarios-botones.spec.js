@@ -1,8 +1,8 @@
 const { test, expect } = require('@playwright/test');
 
-// En Usuarios la lista se agrupa por barrio: cada barrio es una sección que se
-// abre en el lugar. Las tarjetas siguen viviendo en su popup, que se abre desde
-// la barra de herramientas del pie.
+// En Usuarios el listado muestra los nombres de las personas. Las zonas se
+// filtran desde el botón "Zonas", que despliega los barrios en un popup; las
+// tarjetas, desde su botón en la barra de herramientas del pie.
 
 const USER_ID = '11111111-1111-4111-8111-111111111111';
 
@@ -62,91 +62,85 @@ async function entrar(page, { tarjetas = null } = {}) {
   await expect(page.locator('#lockScreen')).toHaveClass(/hidden/);
   await page.evaluate(() => window.showView('view-usuarios'));
   await expect(page.locator('#view-usuarios')).toHaveClass(/active/);
-  await expect(page.locator('.barrio-grupo').first()).toBeVisible();
+  await expect(page.locator('#ubBtnZonas')).toBeVisible();
 }
 
-test('la lista se agrupa por barrio, con su cuenta y las vencidas a la vista', async ({ page }) => {
+test('el listado muestra los nombres de las personas, no los barrios', async ({ page }) => {
   await entrar(page);
 
-  // Un grupo por barrio, alfabético, y "Sin barrio" al final.
-  const grupos = page.locator('.barrio-grupo');
-  await expect(grupos).toHaveCount(3);
-  await expect(grupos.nth(0)).toContainText('Alta Gracia');
-  await expect(grupos.nth(1)).toContainText('Villa Allende');
-  await expect(grupos.nth(2)).toContainText('Sin barrio');
+  // Una fila por persona, con su nombre.
+  const nombres = page.locator('#usuariosList .tree-name');
+  await expect(nombres).toHaveCount(6);
+  await expect(nombres.nth(0)).toHaveText('Ana Gómez');
+  await expect(nombres.nth(3)).toHaveText('Diego Paz');
 
-  // Cada cabecera dice cuántos hay y cuántas vencidas.
-  await expect(grupos.nth(0).locator('.barrio-cuenta')).toHaveText('3');
-  await expect(grupos.nth(0).locator('.barrio-alerta')).toHaveText('1 vencida');
-  await expect(grupos.nth(1).locator('.barrio-cuenta')).toHaveText('2');
-  // Sin vencidas no se muestra la alerta: no hay por qué alarmar de más.
-  await expect(grupos.nth(2).locator('.barrio-alerta')).toHaveCount(0);
-
-  // Ya no hay desplegable de zona ni botón de Barrios: el barrio es la lista.
+  // Sin cabeceras de barrio: eso vive en el popup de Zonas.
+  await expect(page.locator('.barrio-grupo')).toHaveCount(0);
   await expect(page.locator('#usuariosSelectZona')).toHaveCount(0);
-  await expect(page.locator('#ubBtnBarrios')).toHaveCount(0);
 });
 
-test('los barrios arrancan cerrados y se abren en el lugar', async ({ page }) => {
+test('el botón Zonas despliega los barrios con su cuenta', async ({ page }) => {
   await entrar(page);
-  await expect(page.locator('.barrio-grupo.abierto')).toHaveCount(0);
+  await expect(page.locator('#ubBtnZonas')).toContainText('Zonas');
+  await page.locator('#ubBtnZonas').click();
 
-  const altaGracia = page.locator('.barrio-grupo', { hasText: 'Alta Gracia' });
-  await altaGracia.locator('.barrio-cab').click();
-  await expect(altaGracia).toHaveClass(/abierto/);
-  await expect(altaGracia.locator('.tree-node')).toHaveCount(3);
-  await expect(altaGracia).toContainText('Ana Gómez');
-
-  // Se puede abrir un segundo barrio sin que se cierre el primero: comparar
-  // dos zonas es habitual.
-  const villaAllende = page.locator('.barrio-grupo', { hasText: 'Villa Allende' });
-  await villaAllende.locator('.barrio-cab').click();
-  await expect(villaAllende).toHaveClass(/abierto/);
-  await expect(altaGracia).toHaveClass(/abierto/);
-
-  // Y se cierra volviendo a tocarlo.
-  await altaGracia.locator('.barrio-cab').click();
-  await expect(altaGracia).not.toHaveClass(/abierto/);
-  await expect(villaAllende).toHaveClass(/abierto/);
+  await expect(page.locator('#ubOverlay')).toHaveClass(/open/);
+  await expect(page.locator('#ubTitulo')).toContainText('Zonas');
+  const items = page.locator('#ubCuerpo .ub-item');
+  await expect(items).toHaveCount(2);
+  await expect(items.nth(0)).toContainText('Alta Gracia');
+  await expect(items.nth(0)).toContainText('3');
+  await expect(items.nth(1)).toContainText('Villa Allende');
+  await expect(page.locator('[data-ub-todos]')).toContainText('Todos los barrios');
 });
 
-test('dentro de un barrio la ficha de cada persona conserva sus acciones', async ({ page }) => {
+test('elegir una zona filtra el listado y el botón muestra cuál está puesta', async ({ page }) => {
   await entrar(page);
-  const altaGracia = page.locator('.barrio-grupo', { hasText: 'Alta Gracia' });
-  await altaGracia.locator('.barrio-cab').click();
+  await expect(page.locator('#usuariosList .tree-name')).toHaveCount(6);
 
-  const ficha = altaGracia.locator('.tree-node').first();
+  await page.locator('#ubBtnZonas').click();
+  await page.locator('[data-ub-zona="Villa Allende"]').click();
+
+  // El popup se cierra y quedan sólo los de esa zona, por nombre.
+  await expect(page.locator('#ubOverlay')).not.toHaveClass(/open/);
+  await expect(page.locator('#usuariosList .tree-name')).toHaveCount(2);
+  await expect(page.locator('#usuariosList')).toContainText('Diego Paz');
+  await expect(page.locator('#usuariosList')).not.toContainText('Ana Gómez');
+
+  await expect(page.locator('#ubBtnZonas')).toContainText('Villa Allende');
+  await expect(page.locator('#ubBtnZonas')).toHaveClass(/on/);
+});
+
+test('"Todos los barrios" y la cruz del botón devuelven el listado completo', async ({ page }) => {
+  await entrar(page);
+
+  await page.locator('#ubBtnZonas').click();
+  await page.locator('[data-ub-zona="Alta Gracia"]').click();
+  await expect(page.locator('#usuariosList .tree-name')).toHaveCount(3);
+
+  await page.locator('#ubBtnZonas').click();
+  await page.locator('[data-ub-todos]').click();
+  await expect(page.locator('#usuariosList .tree-name')).toHaveCount(6);
+  await expect(page.locator('#ubBtnZonas')).toContainText('Zonas');
+
+  await page.locator('#ubBtnZonas').click();
+  await page.locator('[data-ub-zona="Alta Gracia"]').click();
+  await expect(page.locator('#usuariosList .tree-name')).toHaveCount(3);
+  await page.locator('[data-ub-quitar="zona"]').click();
+  await expect(page.locator('#usuariosList .tree-name')).toHaveCount(6);
+});
+
+test('la ficha de cada persona conserva sus acciones', async ({ page }) => {
+  await entrar(page);
+  const ficha = page.locator('#usuariosList .tree-node').first();
   await ficha.click();
   await expect(ficha).toHaveClass(/expanded/);
 
-  const detalle = altaGracia.locator('.tree-children').first();
+  const detalle = page.locator('#usuariosList .tree-children').first();
   await expect(detalle).toContainText('3515551001');
   await expect(detalle).toContainText('San Martín 120');
   await expect(detalle.locator('[data-u-action="map"]')).toBeVisible();
   await expect(detalle.locator('[data-u-action="whatsapp"]')).toBeVisible();
-  await expect(detalle.locator('[data-u-action="neighbors"]')).toBeVisible();
-});
-
-test('el barrio abierto sigue abierto después de buscar', async ({ page }) => {
-  await entrar(page);
-  const altaGracia = page.locator('.barrio-grupo', { hasText: 'Alta Gracia' });
-  await altaGracia.locator('.barrio-cab').click();
-  await expect(altaGracia).toHaveClass(/abierto/);
-
-  // Buscar rehace la lista; el barrio que se estaba mirando no debe cerrarse.
-  await page.locator('#usuariosSearch').fill('Gómez');
-  await expect(page.locator('.barrio-grupo')).toHaveCount(1);
-  await expect(page.locator('.barrio-grupo')).toHaveClass(/abierto/);
-  await expect(page.locator('.barrio-grupo')).toContainText('Ana Gómez');
-});
-
-test('con un solo barrio en pantalla se abre solo', async ({ page }) => {
-  await entrar(page);
-  // La búsqueda deja un único barrio: obligar a un toque más sería de más.
-  await page.locator('#usuariosSearch').fill('Villa Allende');
-  await expect(page.locator('.barrio-grupo')).toHaveCount(1);
-  await expect(page.locator('.barrio-grupo')).toHaveClass(/abierto/);
-  await expect(page.locator('.tree-node')).toHaveCount(2);
 });
 
 test('las herramientas viven al pie y Tarjetas abre su popup', async ({ page }) => {
@@ -185,16 +179,14 @@ test('elegir una tarjeta filtra la lista y deja un chip para soltarlo', async ({
   await expect(page.locator('#ubCuerpo .ub-persona')).toHaveCount(2);
   await page.locator('#ubCerrar').click();
 
-  // Detrás, la lista quedó recortada a esas dos personas, cada una en su barrio.
-  await expect(page.locator('.barrio-grupo')).toHaveCount(2);
-  await expect(page.locator('.tree-node')).toHaveCount(2);
+  // Detrás, la lista quedó recortada a esas dos personas.
+  await expect(page.locator('#usuariosList .tree-name')).toHaveCount(2);
 
-  // Y aparece el chip que avisa del filtro, con su cruz para quitarlo.
-  const chip = page.locator('#usuariosFiltroBotones .ub-chip');
+  // Y aparece el aviso del filtro, con su cruz para quitarlo.
+  const chip = page.locator('#ubBtnTarjetasChip');
   await expect(chip).toContainText('Visa Galicia');
   await chip.locator('[data-ub-quitar]').click();
-  await expect(page.locator('.tree-node')).toHaveCount(6);
-  await expect(page.locator('#usuariosFiltroBotones .ub-chip')).toHaveCount(0);
+  await expect(page.locator('#usuariosList .tree-name')).toHaveCount(6);
 });
 
 test('sin tarjetas cargadas el popup lo explica en vez de quedar vacío', async ({ page }) => {

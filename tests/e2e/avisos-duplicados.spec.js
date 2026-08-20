@@ -73,60 +73,57 @@ async function copias(page, id) {
   }, id);
 }
 
-test('el saludo de cumpleaños llega al inicio y a Mi negocio', async ({ page }) => {
+test('los tres avisos viven sólo en el inicio', async ({ page }) => {
   await abrirApp(page);
-  await page.evaluate(() => window.renderBdayBanner && window.renderBdayBanner());
+  await page.evaluate(() => {
+    if (window.renderBdayBanner) window.renderBdayBanner();
+    if (window.renderBonusNotifs) window.renderBonusNotifs();
+    if (window.renderCulturaCrecimiento) window.renderCulturaCrecimiento();
+  });
   await page.waitForTimeout(300);
 
-  const r = await copias(page, 'bdayBannerWrap');
-  expect(r.total).toBeGreaterThan(1);
-  // Ninguna copia puede quedar vacía: si el aviso existe, se ve en las dos.
-  expect(r.llenas).toBe(r.total);
-  await expect(page.locator('#bdayBannerWrap .bday-banner')).toHaveCount(r.total);
-  for (const nodo of await page.locator('#bdayBannerWrap').all()) {
-    await expect(nodo).toContainText('Cumple Hoy');
+  // Se quitaron de Mi mes y de Mi negocio a pedido: esas pantallas quedan para
+  // planificar y para los números, sin avisos encima.
+  for (const id of ['bdayBannerWrap', 'bonusNotifWrap', 'culturaWrap']) {
+    const r = await copias(page, id);
+    expect(r.total, `${id} debe existir una sola vez`).toBe(1);
+    expect(r.secciones[0], `${id} sólo va en el inicio`).toBe('view-home');
   }
+
+  await expect(page.locator('#view-mes #culturaWrap')).toHaveCount(0);
+  await expect(page.locator('#view-negocio #bonusNotifWrap')).toHaveCount(0);
+  await expect(page.locator('#view-negocio #bdayBannerWrap')).toHaveCount(0);
 });
 
-test('el aviso de Bonus llega al inicio y a Mi negocio', async ({ page }) => {
+test('el saludo de cumpleaños y el aviso de Bonus se pintan en el inicio', async ({ page }) => {
   await abrirApp(page);
-  await page.evaluate(() => window.renderBonusNotifs && window.renderBonusNotifs());
+  await page.evaluate(() => {
+    if (window.renderBdayBanner) window.renderBdayBanner();
+    if (window.renderBonusNotifs) window.renderBonusNotifs();
+  });
   await page.waitForTimeout(300);
 
-  const r = await copias(page, 'bonusNotifWrap');
-  expect(r.total).toBeGreaterThan(1);
-  expect(r.llenas).toBe(r.total);
-  // Los botones de contacto tienen que existir en cada copia, no sólo en la primera.
+  await expect(page.locator('#bdayBannerWrap .bday-banner')).toHaveCount(1);
+  await expect(page.locator('#bdayBannerWrap')).toContainText('Cumple Hoy');
+
   const tarjetas = await page.locator('#bonusNotifWrap [data-bonus-id]').count();
-  expect(tarjetas).toBeGreaterThanOrEqual(r.total);
+  expect(tarjetas).toBeGreaterThan(0);
   expect(await page.locator('#bonusNotifWrap [data-bonus-act="wa"]').count()).toBe(tarjetas);
 });
 
-test('Cultura de Crecimiento llega al inicio y a Mi mes, y funciona en las dos', async ({ page }) => {
+test('Cultura de Crecimiento sigue guardando los PB desde el inicio', async ({ page }) => {
   await abrirApp(page);
   await page.evaluate(() => window.renderCulturaCrecimiento && window.renderCulturaCrecimiento());
   await page.waitForTimeout(300);
 
-  const r = await copias(page, 'culturaWrap');
-  expect(r.total).toBeGreaterThan(1);
-  expect(r.llenas).toBe(r.total);
-
-  // El bloque quedó con ids internos repetidos en v265: ahora son data-*,
-  // así que cada copia tiene su propio campo enganchado.
-  expect(await page.locator('#culturaWrap [data-cultura-pb]').count()).toBe(r.total);
+  // Los campos se enganchan por data-*, no por id repetido.
+  expect(await page.locator('#culturaWrap [data-cultura-pb]').count()).toBe(1);
   expect(await page.evaluate(() => document.querySelectorAll('#culturaPbInput').length)).toBe(0);
-  expect(await page.evaluate(() => document.querySelectorAll('#culturaAddSlot').length)).toBe(0);
 
-  // Cargar los PB desde la copia de Mi mes (la segunda) tiene que guardar igual.
-  // Hay que abrir esa pantalla: si no, el campo existe pero está fuera de vista.
-  const seccion = r.secciones[1];
-  await page.evaluate(id => window.showView && window.showView(id), seccion);
-  await page.waitForTimeout(300);
-
-  const segundo = page.locator('#culturaWrap [data-cultura-pb]').nth(1);
-  await expect(segundo).toBeVisible();
-  await segundo.fill('7,5');
-  await segundo.blur();
+  const campo = page.locator('#culturaWrap [data-cultura-pb]').first();
+  await expect(campo).toBeVisible();
+  await campo.fill('7,5');
+  await campo.blur();
   await page.waitForTimeout(400);
   const guardado = await page.evaluate(() => {
     const raw = JSON.parse(localStorage.getItem('cultura_crecimiento_v1') || '{}');
@@ -137,13 +134,13 @@ test('Cultura de Crecimiento llega al inicio y a Mi mes, y funciona en las dos',
   expect(guardado).toBe(7.5);
 });
 
-test('sin datos que mostrar, ninguna copia queda con contenido viejo', async ({ page }) => {
+test('sin datos que mostrar, el aviso no queda con contenido viejo', async ({ page }) => {
   await abrirApp(page);
   await page.evaluate(() => window.renderBdayBanner && window.renderBdayBanner());
   await page.waitForTimeout(200);
   expect((await copias(page, 'bdayBannerWrap')).llenas).toBeGreaterThan(0);
 
-  // Se va la persona que cumplía: el aviso tiene que borrarse de TODAS las copias.
+  // Se va la persona que cumplía: el aviso tiene que borrarse.
   await page.evaluate(() => {
     const d = JSON.parse(localStorage.getItem('equipoData'));
     d.personas = d.personas.filter(p => p.nombre !== 'Cumple Hoy');

@@ -38,7 +38,8 @@
       'cursor:pointer;box-shadow:0 5px 14px rgba(91,112,210,.24)}',
       '.ub-chip .ub-x{display:grid;place-items:center;width:19px;height:19px;flex:0 0 auto;border-radius:50%;',
       'background:rgba(255,255,255,.28);font-size:12px;font-weight:900}',
-      '.ub-barra{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:12px}',
+      '.ub-barra{display:grid;grid-template-columns:1fr;gap:9px;margin-bottom:12px}',
+      '.ub-barra:has(.ub-main + .ub-main){grid-template-columns:1fr 1fr}',
       '.ub-main{display:flex;align-items:center;justify-content:center;gap:8px;min-height:52px;padding:11px 14px;',
       'border:1px solid rgba(80,90,130,.14);border-radius:16px;background:rgba(255,255,255,.78);backdrop-filter:blur(14px);',
       'color:#3a3a48;font:inherit;font-size:13px;font-weight:800;cursor:pointer;',
@@ -222,7 +223,7 @@
   function abrirBarrios(){
     var grupos = zonas();
     if (!grupos.length){
-      abrir('📍 Barrios', '', '<div class="ub-empty">Todavía no hay barrios en la planilla cargada.</div>');
+      abrir('📍 Zonas', '', '<div class="ub-empty">Todavía no hay barrios en la planilla cargada.</div>');
       return;
     }
     var html = '<div class="ub-list">' + grupos.map(function(g){
@@ -232,7 +233,7 @@
     }).join('') + '</div>' +
     '<button type="button" class="ub-todos" data-ub-todos>Todos los barrios</button>';
 
-    var ov = abrir('📍 Barrios', grupos.length + (grupos.length === 1 ? ' barrio' : ' barrios'), html);
+    var ov = abrir('📍 Zonas', grupos.length + (grupos.length === 1 ? ' barrio' : ' barrios'), html);
     ov.querySelectorAll('[data-ub-zona]').forEach(function(b){
       b.onclick = function(){
         var z = b.getAttribute('data-ub-zona');
@@ -319,26 +320,31 @@
     });
   }
 
-  /* ---------- aviso del filtro activo ---------- */
-  // Los barrios ya no necesitan botón: son la propia lista, agrupada. Acá sólo
-  // queda el aviso de un filtro de tarjeta puesto, para que se entienda por qué
-  // la lista está recortada y se pueda soltar de un toque.
+  /* ---------- botón de Zonas ---------- */
+  // Un botón al ancho: abre el popup con todos los barrios para filtrar. Con un
+  // filtro puesto muestra cuál es, con una cruz para soltarlo.
   function pintar(){
     var host = document.getElementById(ID_BOTONES);
     if (!host) return;
     css();
-    if (actual.tipo !== 'tarjeta'){
-      host.innerHTML = '';
-      return;
-    }
+    var zonaOn = actual.tipo === 'zona';
+    var tarjOn = actual.tipo === 'tarjeta';
     host.innerHTML =
-      '<div class="ub-barra-chip">' +
-        '<button type="button" class="ub-chip on" id="ubBtnTarjetas">' +
-          '<span class="ub-txt">💳 ' + esc(actual.label) + '</span>' +
-          '<span class="ub-x" data-ub-quitar="tarjeta" role="button" aria-label="Quitar filtro">×</span>' +
+      '<div class="ub-barra">' +
+        '<button type="button" class="ub-main' + (zonaOn ? ' on' : '') + '" id="ubBtnZonas">' +
+          '<span class="ub-txt">📍 ' + esc(zonaOn ? actual.label : 'Zonas') + '</span>' +
+          (zonaOn ? '<span class="ub-x" data-ub-quitar="zona" role="button" aria-label="Quitar filtro">×</span>' : '') +
         '</button>' +
+        (tarjOn
+          ? '<button type="button" class="ub-main on" id="ubBtnTarjetasChip">' +
+              '<span class="ub-txt">💳 ' + esc(actual.label) + '</span>' +
+              '<span class="ub-x" data-ub-quitar="tarjeta" role="button" aria-label="Quitar filtro">×</span>' +
+            '</button>'
+          : '') +
       '</div>';
-    host.querySelector('#ubBtnTarjetas').onclick = abrirTarjetas;
+    host.querySelector('#ubBtnZonas').onclick = abrirBarrios;
+    var chip = host.querySelector('#ubBtnTarjetasChip');
+    if (chip) chip.onclick = abrirTarjetas;
     host.querySelectorAll('[data-ub-quitar]').forEach(function(x){
       x.onclick = function(e){ e.stopPropagation(); limpiar(); };
     });
