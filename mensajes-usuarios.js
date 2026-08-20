@@ -288,6 +288,8 @@
     if (!data.envios) data.envios = {};
     data.envios[key] = { at: new Date().toISOString(), texto: String(texto || '').slice(0, 400) };
     guardar(data);
+    // El que ya recibió su mensaje sale de los pendientes del día.
+    try{ pintarHoy(); }catch(e){}
   }
   function ultimoEnvio(u){
     var key = telefonoDe(u);
@@ -296,7 +298,163 @@
     return e[key] || null;
   }
 
-  /* ---------- estilos ---------- */
+  /* ---------- pendientes del día ---------- */
+  /* Tres motivos, en orden de urgencia. Cada uno junta a los clientes que le
+     corresponden hoy, respetando siempre la regla de vigencia. */
+  var MOTIVOS = [
+    {
+      id: 'cumple', icono: '🎂', plantilla: 'cumple',
+      uno: 'cumple años', varios: 'cumplen años',
+      aplica: function(u){ return grupoDe(u) === 'vigente' && cumpleHoy(u); }
+    },
+    {
+      id: 'retro', icono: '🔧', plantilla: 'retrolavado',
+      uno: 'debe retrolavar', varios: 'deben retrolavar',
+      aplica: function(u){
+        if (grupoDe(u) !== 'vigente') return false;
+        var m = mantenimiento(u);
+        return !!(m && m.vencido);
+      }
+    },
+    {
+      id: 'porvencer', icono: '⏰', plantilla: 'porvencer',
+      uno: 'vence la garantía', varios: 'vencen la garantía',
+      aplica: function(u){
+        if (grupoDe(u) !== 'vigente') return false;
+        var v = aFecha(u.fVence);
+        if (!v) return false;
+        var d = dias(v, hoy());
+        return d >= 0 && d <= 30;
+      }
+    }
+  ];
+
+  // A un cliente ya contactado hoy no se lo vuelve a mostrar: si no, el panel
+  // no baja nunca y deja de significar algo.
+  function escritoHoy(u){
+    var ult = ultimoEnvio(u);
+    if (!ult || !ult.at) return false;
+    var d = new Date(ult.at);
+    if (isNaN(d.getTime())) return false;
+    return dias(hoy(), new Date(d.getFullYear(), d.getMonth(), d.getDate())) === 0;
+  }
+
+  function pendientes(){
+    var lista = [];
+    if (typeof window.usuariosTodosActual === 'function') lista = window.usuariosTodosActual() || [];
+    else if (Array.isArray(window.usuariosU)) lista = window.usuariosU;
+    var out = [];
+    MOTIVOS.forEach(function(m){
+      var gente = lista.filter(function(u){
+        return telefonoDe(u) && !escritoHoy(u) && m.aplica(u);
+      });
+      if (gente.length) out.push({ motivo:m, gente:gente });
+    });
+    return out;
+  }
+
+  /* ---------- franja del día ---------- */
+  /* Sólo se dibuja si hay algo que hacer: sin pendientes la pantalla queda
+     exactamente como antes. */
+  function pintarHoy(){
+    var vista = document.getElementById('view-usuarios');
+    if (!vista) return;
+    var stats = vista.querySelector('.stats');
+    if (!stats) return;
+    css();
+    var host = document.getElementById('muHoy');
+    var grupos = pendientes();
+
+    if (!grupos.length){
+      if (host) host.remove();
+      return;
+    }
+    if (!host){
+      host = document.createElement('div');
+      host.id = 'muHoy';
+      stats.parentNode.insertBefore(host, stats);
+    }
+    var total = 0;
+    grupos.forEach(function(g){ total += g.gente.length; });
+    var html = '<div class="mu-hoy-top"><span class="mu-hoy-ico">📋</span>' +
+      '<b>Hoy tenés ' + total + (total === 1 ? ' mensaje' : ' mensajes') + ' para mandar</b></div>' +
+      '<div class="mu-hoy-list">';
+    grupos.forEach(function(g){
+      var n = g.gente.length;
+      html += '<button type="button" class="mu-hoy-item" data-mu-hoy="' + esc(g.motivo.id) + '">' +
+        '<span class="mu-hoy-n">' + g.motivo.icono + ' ' + n + '</span>' +
+        '<span class="mu-hoy-txt">' + esc(n === 1 ? g.motivo.uno : g.motivo.varios) + '</span>' +
+        '<span class="mu-hoy-go">›</span></button>';
+    });
+    html += '</div>';
+    host.innerHTML = html;
+    host.querySelectorAll('[data-mu-hoy]').forEach(function(b){
+      b.onclick = function(){ abrirFila(b.getAttribute('data-mu-hoy')); };
+    });
+  }
+
+  /* ---------- fila de trabajo ---------- */
+  /* Un cliente por vez: se manda y pasa al siguiente. WhatsApp no deja enviar
+     en lote desde la web, así que lo que se puede ahorrar son los toques. */
+  var fila = null;
+
+  function abrirFila(motivoId){
+    var grupos = pendientes();
+    var g = null;
+    grupos.forEach(function(x){ if (x.motivo.id === motivoId) g = x; });
+    if (!g) { pintarHoy(); return; }
+    fila = { motivo: g.motivo, gente: g.gente.slice(), i: 0, hechos: 0 };
+    pintarFila();
+  }
+
+  function pintarFila(){
+    var ov = overlay();
+    var cuerpo = ov.querySelector('#muCuerpo');
+    if (!fila) return;
+
+    if (fila.i >= fila.gente.length){
+      ov.querySelector('#muTitulo').textContent = '¡Listo!';
+      ov.querySelector('#muSub').textContent = '';
+      cuerpo.innerHTML = '<div class="mu-fin"><div class="mu-fin-ico">✅</div>' +
+        '<b>' + fila.hechos + (fila.hechos === 1 ? ' mensaje enviado' : ' mensajes enviados') + '</b>' +
+        '<p>No queda nadie más en esta lista por hoy.</p></div>' +
+        '<button type="button" class="mu-enviar" id="muFinCerrar">Cerrar</button>';
+      cuerpo.querySelector('#muFinCerrar').onclick = function(){ cerrar(); pintarHoy(); };
+      ov.classList.add('open');
+      return;
+    }
+
+    var u = fila.gente[fila.i];
+    var p = plantilla(fila.motivo.plantilla) || plantilla('saludo');
+    var texto = completar(p.texto, u);
+    var nombre = (typeof window.nombreDePila === 'function' ? window.nombreDePila(u.usuario) : '') || u.usuario;
+    var quedan = fila.gente.length - fila.i;
+
+    ov.querySelector('#muTitulo').textContent = p.icono + ' ' + p.nombre;
+    ov.querySelector('#muSub').textContent = quedan === 1 ? 'Queda 1' : 'Quedan ' + quedan;
+
+    var html = '<div class="mu-fila-quien"><b>' + esc(u.usuario || '') + '</b>' +
+      '<small>' + esc([u.localidad, u.producto].filter(Boolean).join(' · ')) + '</small></div>';
+    html += '<div class="mu-prev"><b>Así lo va a recibir</b><span>' + esc(texto) + '</span></div>';
+    html += '<div class="mu-acciones">';
+    html += '<button type="button" class="mu-enviar" id="muFilaEnviar">💬 Mandar a ' + esc(nombre) + '</button>';
+    html += '<button type="button" class="mu-sec" id="muFilaSaltar">Saltear</button>';
+    html += '</div>';
+    html += '<div class="mu-fila-pos">' + (fila.i + 1) + ' de ' + fila.gente.length + '</div>';
+    cuerpo.innerHTML = html;
+
+    cuerpo.querySelector('#muFilaEnviar').onclick = function(){
+      enviar(u, texto);
+      fila.hechos++;
+      fila.i++;
+      pintarFila();
+    };
+    cuerpo.querySelector('#muFilaSaltar').onclick = function(){
+      fila.i++;
+      pintarFila();
+    };
+    ov.classList.add('open');
+  }
   function css(){
     if (document.getElementById('muEstilos')) return;
     var st = document.createElement('style');
@@ -344,6 +502,35 @@
       '.mu-sec.mu-grande{min-height:50px;font-size:14px}',
       '.mu-nota{margin-top:13px;padding:11px 13px;border-radius:13px;background:rgba(245,179,1,.1);color:#8a6100;font-size:11.5px;line-height:1.5}',
       '.mu-vacio{margin-top:16px;padding:18px 14px;border-radius:15px;background:rgba(255,255,255,.7);color:#777887;font-size:12.5px;text-align:center;line-height:1.55}',
+      /* franja del día */
+      '#muHoy{margin:0 0 12px;padding:13px 14px;border-radius:16px;border:1px solid rgba(91,141,239,.2);',
+      'background:linear-gradient(135deg,rgba(91,141,239,.11),rgba(160,107,255,.1))}',
+      '.mu-hoy-top{display:flex;align-items:center;gap:8px;margin-bottom:10px}',
+      '.mu-hoy-top b{color:#3a3a48;font-size:13px}',
+      '.mu-hoy-ico{font-size:16px}',
+      '.mu-hoy-list{display:grid;gap:6px}',
+      '.mu-hoy-item{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;width:100%;',
+      'min-height:46px;padding:9px 12px;border:1px solid rgba(80,90,130,.1);border-radius:13px;background:rgba(255,255,255,.85);',
+      'font:inherit;text-align:left;cursor:pointer;transition:background .14s,transform .14s}',
+      '.mu-hoy-item:hover{background:#fff;transform:translateY(-1px)}',
+      '.mu-hoy-n{display:inline-grid;place-items:center;min-width:44px;padding:4px 9px;border-radius:999px;',
+      'background:linear-gradient(135deg,#5b8def,#a06bff);color:#fff;font-size:12px;font-weight:900;white-space:nowrap}',
+      '.mu-hoy-txt{color:#3a3a48;font-size:12.5px;font-weight:700}',
+      '.mu-hoy-go{color:#3d63c9;font-size:17px;font-weight:900}',
+      /* fila de trabajo */
+      '.mu-fila-quien{margin-top:14px;padding:13px 14px;border-radius:14px;background:rgba(255,255,255,.9);border:1px solid rgba(80,90,130,.1)}',
+      '.mu-fila-quien b{display:block;color:#30303d;font-size:14.5px}',
+      '.mu-fila-quien small{display:block;margin-top:3px;color:#777887;font-size:11px}',
+      '.mu-fila-pos{margin-top:12px;color:#777887;font-size:11px;text-align:center;font-weight:700}',
+      '.mu-fin{margin-top:18px;padding:26px 16px;border-radius:16px;background:rgba(58,208,164,.1);text-align:center}',
+      '.mu-fin-ico{font-size:40px}',
+      '.mu-fin b{display:block;margin-top:10px;color:#20705c;font-size:16px}',
+      '.mu-fin p{margin:6px 0 0;color:#59897c;font-size:12.5px}',
+      'body.dark #muHoy{background:linear-gradient(135deg,rgba(91,141,239,.16),rgba(160,107,255,.14));border-color:rgba(255,255,255,.1)}',
+      'body.dark .mu-hoy-top b,body.dark .mu-hoy-txt{color:#f2f2f7}',
+      'body.dark .mu-hoy-item{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.1)}',
+      'body.dark .mu-fila-quien{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.1)}',
+      'body.dark .mu-fila-quien b{color:#f2f2f7}',
       '.mu-volver{margin-top:14px;min-height:40px;padding:9px 14px;border:0;border-radius:12px;background:rgba(91,141,239,.11);',
       'color:#3d63c9;font:inherit;font-size:12px;font-weight:850;cursor:pointer}',
       '.mu-volver:hover{background:rgba(91,141,239,.2)}',
@@ -601,28 +788,22 @@
     var cont = document.getElementById('usuariosList');
     if (!cont || cont.__muObs) return;
     cont.__muObs = true;
-    var mo = new MutationObserver(function(){ pintarFichas(); });
+    var mo = new MutationObserver(function(){
+      pintarFichas();
+      // Cambiar de archivo o de filtro cambia quién está pendiente.
+      pintarHoy();
+    });
     mo.observe(cont, { childList:true, subtree:true });
     pintarFichas();
   }
 
-  function montarBoton(){
-    var barra = document.querySelector('#view-usuarios .u-tools');
-    if (!barra || document.getElementById('usuariosBtnMensajes')) return;
-    css();
-    var b = document.createElement('button');
-    b.type = 'button';
-    b.id = 'usuariosBtnMensajes';
-    b.innerHTML = '<span>💬</span>Mensajes';
-    b.onclick = function(){ abrir(null); };
-    var limpiar = document.getElementById('usuariosBtnLimpiar');
-    if (limpiar) barra.insertBefore(b, limpiar);
-    else barra.appendChild(b);
-  }
-
+  // No hay botón de Mensajes en la barra: los mensajes se mandan desde la ficha
+  // de cada cliente, que es donde se decide a quién escribirle. Los textos se
+  // editan desde ahí mismo, con "Editar los textos".
   function montar(){
-    montarBoton();
+    css();
     observar();
+    pintarHoy();
   }
 
   function envolver(){
@@ -655,6 +836,10 @@
     registrar: registrar,
     abrir: abrir,
     mandar: mandar,
+    pendientes: pendientes,
+    pintarHoy: pintarHoy,
+    abrirFila: abrirFila,
+    escritoHoy: escritoHoy,
     cerrar: cerrar,
     montar: montar,
     pintarFichas: pintarFichas

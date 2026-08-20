@@ -238,19 +238,16 @@ test('los botones de datos dicen el nombre, no la llave', async ({ page }) => {
   await expect(page.locator('#muPrevTxt')).toContainText('Hola Alta Gracia');
 });
 
-test('el botón Mensajes de la barra abre la biblioteca completa', async ({ page }) => {
+test('la barra no tiene botón de Mensajes: se escribe desde la ficha', async ({ page }) => {
   await entrar(page);
-  const boton = page.locator('#usuariosBtnMensajes');
-  await expect(boton).toBeVisible();
-  await boton.click();
-  // Sin cliente elegido se ven las cinco, para poder editarlas con calma.
-  await expect(page.locator('[data-mu-plantilla]')).toHaveCount(5);
-  await expect(page.locator('#muTitulo')).toContainText('Plantillas');
+  await expect(page.locator('#usuariosBtnMensajes')).toHaveCount(0);
+  await expect(page.locator('.u-tools button:visible')).toHaveCount(5);
 });
 
 test('el gesto de atrás cierra el popup de mensajes', async ({ page }) => {
   await entrar(page);
-  await page.locator('#usuariosBtnMensajes').click();
+  await abrirFicha(page, 0);
+  await page.locator('[data-u-toggle="0"] + .tree-children [data-u-action="whatsapp"]').click();
   await expect(page.locator('#muOverlay')).toHaveClass(/open/);
 
   await page.goBack();
@@ -305,4 +302,118 @@ test('la regla de vigencia clasifica bien los tres grupos', async ({ page }) => 
   expect(r.casiAnio).toBe('vencido');
   expect(r.pasadoAnio).toBe('inactivo');
   expect(r.sinFecha).toBe('vigente');
+});
+
+/* ---------- etapa 2: la franja del día y la fila de trabajo ---------- */
+
+// Clientes armados para que cada uno caiga en un motivo distinto.
+const hoyDDMM = () => {
+  const d = new Date();
+  return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}`;
+};
+const PENDIENTES = [
+  // cumple años hoy
+  { id: 1, usuario: 'GOMEZ, ANA MARIA', telf: '3515551001', localidad: 'Alta Gracia', producto: 'PSA SENIOR 4',
+    cumpleRaw: `${hoyDDMM()}/1975`, fCompra: ddmmyyyy(-30), fVenceRaw: ddmmyyyy(300), fVence: dias(300), estado: 'vigente' },
+  // compró hace 6 meses justos: le toca retrolavado
+  { id: 2, usuario: 'RUIZ, ROBERTO', telf: '3515551002', localidad: 'Villa Allende', producto: 'PSA VERO',
+    fCompra: ddmmyyyy(-182), fVenceRaw: ddmmyyyy(400), fVence: dias(400), estado: 'vigente' },
+  // la garantía le vence en 10 días
+  { id: 3, usuario: 'DIAZ, CAROLINA', telf: '3515551003', localidad: 'Centro', producto: 'SODA BURBY',
+    fCompra: ddmmyyyy(-60), fVenceRaw: ddmmyyyy(10), fVence: dias(10), estado: 'porVencer' },
+  // vencido hace años: no tiene que aparecer en ningún lado
+  { id: 4, usuario: 'PEREZ, JUAN', telf: '3515551004', localidad: 'Centro', producto: 'PSA VERO',
+    fCompra: ddmmyyyy(-1500), fVenceRaw: ddmmyyyy(-500), fVence: dias(-500), estado: 'vencida' }
+];
+
+test('la franja del día junta los pendientes y no inventa ninguno', async ({ page }) => {
+  await entrar(page, PENDIENTES);
+  const hoy = page.locator('#muHoy');
+  await expect(hoy).toBeVisible();
+  await expect(hoy).toContainText('3 mensajes');
+
+  // Un renglón por motivo, con su cuenta.
+  await expect(page.locator('[data-mu-hoy]')).toHaveCount(3);
+  await expect(page.locator('[data-mu-hoy="cumple"]')).toContainText('1');
+  await expect(page.locator('[data-mu-hoy="retro"]')).toContainText('1');
+  await expect(page.locator('[data-mu-hoy="porvencer"]')).toContainText('1');
+});
+
+test('sin pendientes la franja no se dibuja y la pantalla queda igual', async ({ page }) => {
+  // Todos vigentes, recién comprados y sin cumpleaños cargado.
+  await entrar(page, [
+    { id: 1, usuario: 'GOMEZ, ANA MARIA', telf: '3515551001', localidad: 'Alta Gracia', producto: 'PSA',
+      fCompra: ddmmyyyy(-20), fVenceRaw: ddmmyyyy(300), fVence: dias(300), estado: 'vigente' }
+  ]);
+  await expect(page.locator('#muHoy')).toHaveCount(0);
+});
+
+test('la fila de trabajo va de a uno y avisa cuántos quedan', async ({ page }) => {
+  await entrar(page, PENDIENTES);
+  await page.evaluate(() => {
+    window.__wa = [];
+    window.APPIWhatsApp.abrir = url => { window.__wa.push(url); };
+  });
+
+  await page.locator('[data-mu-hoy="cumple"]').click();
+  await expect(page.locator('#muOverlay')).toHaveClass(/open/);
+  await expect(page.locator('#muSub')).toContainText('Queda 1');
+  await expect(page.locator('.mu-fila-quien')).toContainText('GOMEZ, ANA MARIA');
+  // Se ve el mensaje final, no la receta.
+  await expect(page.locator('.mu-prev')).toContainText('Feliz cumpleaños, Ana');
+
+  await page.locator('#muFilaEnviar').click();
+  // Al terminar la lista, cierra con el resumen.
+  await expect(page.locator('.mu-fin')).toContainText('1 mensaje enviado');
+  const urls = await page.evaluate(() => window.__wa);
+  expect(urls).toHaveLength(1);
+  expect(decodeURIComponent(urls[0])).toContain('Feliz cumpleaños, Ana');
+});
+
+test('el que ya recibió su mensaje sale de los pendientes', async ({ page }) => {
+  await entrar(page, PENDIENTES);
+  await page.evaluate(() => { window.APPIWhatsApp.abrir = () => {}; });
+  await expect(page.locator('#muHoy')).toContainText('3 mensajes');
+
+  await page.locator('[data-mu-hoy="cumple"]').click();
+  await page.locator('#muFilaEnviar').click();
+  await page.locator('#muFinCerrar').click();
+
+  // La franja se rehace sola: quedan dos y el motivo cumplido desaparece.
+  await expect(page.locator('#muHoy')).toContainText('2 mensajes');
+  await expect(page.locator('[data-mu-hoy="cumple"]')).toHaveCount(0);
+});
+
+test('saltear pasa al siguiente sin mandar nada', async ({ page }) => {
+  const dos = [
+    { id: 1, usuario: 'GOMEZ, ANA MARIA', telf: '3515551001', localidad: 'Alta Gracia', producto: 'PSA',
+      fCompra: ddmmyyyy(-182), fVenceRaw: ddmmyyyy(400), fVence: dias(400), estado: 'vigente' },
+    { id: 2, usuario: 'RUIZ, ROBERTO', telf: '3515551002', localidad: 'Villa Allende', producto: 'PSA VERO',
+      fCompra: ddmmyyyy(-182), fVenceRaw: ddmmyyyy(400), fVence: dias(400), estado: 'vigente' }
+  ];
+  await entrar(page, dos);
+  await page.evaluate(() => { window.__wa = []; window.APPIWhatsApp.abrir = u => window.__wa.push(u); });
+
+  await page.locator('[data-mu-hoy="retro"]').click();
+  await expect(page.locator('#muSub')).toContainText('Quedan 2');
+  await expect(page.locator('.mu-fila-quien')).toContainText('GOMEZ');
+
+  await page.locator('#muFilaSaltar').click();
+  await expect(page.locator('.mu-fila-quien')).toContainText('RUIZ');
+  await expect(page.locator('#muSub')).toContainText('Queda 1');
+
+  await page.locator('#muFilaEnviar').click();
+  await expect(page.locator('.mu-fin')).toContainText('1 mensaje enviado');
+  // El salteado no recibió nada.
+  const urls = await page.evaluate(() => window.__wa);
+  expect(urls).toHaveLength(1);
+  expect(decodeURIComponent(urls[0])).toContain('Roberto');
+});
+
+test('el vencido hace más de un año nunca entra en los pendientes', async ({ page }) => {
+  await entrar(page, PENDIENTES);
+  const nombres = await page.evaluate(() =>
+    window.APPIMensajes.pendientes().flatMap(g => g.gente.map(u => u.usuario)));
+  expect(nombres).not.toContain('PEREZ, JUAN');
+  expect(nombres).toHaveLength(3);
 });

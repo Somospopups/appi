@@ -4117,7 +4117,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v279 · Segura</div>
+  <div class="ds-foot">APPI · v280 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -11539,7 +11539,7 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='279';
+      const swVersion='280';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 
@@ -12906,8 +12906,7 @@ body.dark .search-box input{color:#ffffff !important}
 
 /* Herramientas de Usuarios: van arriba, debajo de los contadores, porque son
    la forma de recortar la lista antes de mirarla. */
-/* Seis botones fijos: de a tres entran cómodos y se leen. */
-.u-tools{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:0 0 12px}
+.u-tools{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:0 0 12px}
 .u-tools button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:62px;padding:9px 2px;border:1px solid rgba(80,90,130,.12);border-radius:14px;background:rgba(255,255,255,.7);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);color:#5a5b6b;font:inherit;font-size:9px;font-weight:800;line-height:1.2;text-align:center;cursor:pointer;transition:background .15s,transform .15s}
 .u-tools button span{font-size:17px;line-height:1}
 .u-tools button:hover{background:rgba(91,141,239,.1);transform:translateY(-1px)}
@@ -12920,8 +12919,8 @@ body.dark .search-box input{color:#ffffff !important}
 .u-tools button.limpiar{background:linear-gradient(135deg,#ff6b6b,#ff8f6b);border-color:transparent;color:#fff;box-shadow:0 5px 14px rgba(255,107,107,.32)}
 .u-tools button.limpiar:hover{background:linear-gradient(135deg,#ff6b6b,#ff8f6b)}
 .u-tools button[hidden]{display:none}
-/* Con Limpiar a la vista son siete: pasan a cuatro por fila. */
-.u-tools:has(#usuariosBtnLimpiar:not([hidden])){grid-template-columns:repeat(4,1fr)}
+/* Con Limpiar a la vista son seis: entran de a tres para que no queden espichados. */
+.u-tools:has(#usuariosBtnLimpiar:not([hidden])){grid-template-columns:repeat(3,1fr)}
 body.dark .u-tools button{background:rgba(31,32,49,.74);border-color:rgba(255,255,255,.08);color:#c9cad6}
 body.dark .u-tools button.activo{background:linear-gradient(135deg,#5b8def,#a06bff);color:#fff}
 @media(min-width:600px){.u-tools{gap:8px}.u-tools button{font-size:10.5px;min-height:66px}}
