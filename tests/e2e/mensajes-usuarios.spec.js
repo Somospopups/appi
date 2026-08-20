@@ -93,22 +93,60 @@ test('el cumpleaños del Excel se detecta el día que corresponde', async ({ pag
   expect(r.sinDato).toBe(false);
 });
 
-test('cada ficha ofrece mandar un mensaje', async ({ page }) => {
+test('el botón de WhatsApp de la ficha abre las plantillas', async ({ page }) => {
   await entrar(page);
   await abrirFicha(page, 0);
-  const boton = page.locator('[data-u-toggle="0"] + .tree-children [data-mu-btn]');
-  await expect(boton).toBeVisible();
-  await expect(boton).toContainText('Mensaje');
+  // Queda un solo botón: el de siempre, que ahora ofrece las plantillas en vez
+  // de mandar un saludo fijo.
+  const ficha = page.locator('[data-u-toggle="0"] + .tree-children');
+  await expect(ficha.locator('[data-u-action="whatsapp"]')).toHaveCount(1);
+  await expect(ficha.locator('[data-u-action="whatsapp"]')).toContainText('WhatsApp');
 
-  await boton.click();
+  await ficha.locator('[data-u-action="whatsapp"]').click();
   await expect(page.locator('#muOverlay')).toHaveClass(/open/);
   await expect(page.locator('#muTitulo')).toContainText('Ana');
+});
+
+test('tocar una plantilla abre WhatsApp derecho, sin pantalla intermedia', async ({ page }) => {
+  await entrar(page);
+  // Se atrapa la apertura de WhatsApp para leer el texto que se manda.
+  await page.evaluate(() => {
+    window.__wa = [];
+    window.APPIWhatsApp.abrir = url => { window.__wa.push(url); };
+  });
+  await abrirFicha(page, 0);
+  await page.locator('[data-u-toggle="0"] + .tree-children [data-u-action="whatsapp"]').click();
+  await page.locator('[data-mu-plantilla="retrolavado"]').click();
+
+  // Un solo toque: ni editor, ni confirmación.
+  const urls = await page.evaluate(() => window.__wa);
+  expect(urls).toHaveLength(1);
+  const texto = decodeURIComponent(urls[0].split('text=')[1]);
+  expect(texto).toContain('Hola Ana');
+  expect(texto).toContain('PSA SENIOR 4');
+  expect(texto).toContain('qa6xkQQsyg8');
+  expect(texto).not.toContain('{nombre}');
+  // Y el popup se cierra solo.
+  await expect(page.locator('#muOverlay')).not.toHaveClass(/open/);
+});
+
+test('el que elige mandar no ve ninguna llave', async ({ page }) => {
+  await entrar(page);
+  await abrirFicha(page, 0);
+  await page.locator('[data-u-toggle="0"] + .tree-children [data-u-action="whatsapp"]').click();
+  // Esto fue lo que confundió al usuario: llaves y etiquetas en la pantalla de
+  // enviar. No tienen que aparecer por ningún lado.
+  const cuerpo = await page.locator('#muCuerpo').innerText();
+  expect(cuerpo).not.toContain('{');
+  await expect(page.locator('#muCuerpo [data-mu-tag]')).toHaveCount(0);
+  await expect(page.locator('#muCuerpo textarea')).toHaveCount(0);
+  await expect(page.locator('#muSub')).toContainText('se abre WhatsApp');
 });
 
 test('a un cliente vigente le ofrece mantenimiento y cumpleaños', async ({ page }) => {
   await entrar(page);
   await abrirFicha(page, 0);
-  await page.locator('[data-u-toggle="0"] + .tree-children [data-mu-btn]').click();
+  await page.locator('[data-u-toggle="0"] + .tree-children [data-u-action="whatsapp"]').click();
 
   const items = page.locator('[data-mu-plantilla]');
   await expect(items).toHaveCount(4);   // retrolavado, cumple, por vencer, saludo
@@ -121,9 +159,8 @@ test('a un cliente vigente le ofrece mantenimiento y cumpleaños', async ({ page
 test('a un vencido hace menos de un año sólo le ofrece renovar', async ({ page }) => {
   await entrar(page);
   await abrirFicha(page, 1);
-  await page.locator('[data-u-toggle="1"] + .tree-children [data-mu-btn]').click();
+  await page.locator('[data-u-toggle="1"] + .tree-children [data-u-action="whatsapp"]').click();
 
-  await expect(page.locator('#muSub')).toContainText('vencida hace menos de un año');
   await expect(page.locator('[data-mu-plantilla="renovacion"]')).toBeVisible();
   await expect(page.locator('[data-mu-plantilla="retrolavado"]')).toHaveCount(0);
   await expect(page.locator('[data-mu-plantilla="cumple"]')).toHaveCount(0);
@@ -132,65 +169,71 @@ test('a un vencido hace menos de un año sólo le ofrece renovar', async ({ page
 test('al vencido hace más de un año no se le ofrece nada', async ({ page }) => {
   await entrar(page);
   await abrirFicha(page, 2);
-  // Ni siquiera aparece el botón: es la regla que pidió el usuario.
-  await expect(page.locator('[data-u-toggle="2"] + .tree-children [data-mu-btn]')).toHaveCount(0);
-
-  // Y si se lo fuerza desde el código, avisa antes de dejar seguir.
+  // Si se abre el popup igual, avisa antes de dejar seguir.
   await page.evaluate(() => {
     const u = window.usuariosFiltradosActual()[2];
     window.APPIMensajes.abrir(u);
   });
   await expect(page.locator('#muOverlay')).toHaveClass(/open/);
   await expect(page.locator('#muCuerpo')).toContainText('venció hace más de un año');
+  // Nada de plantillas hasta que se lo pida a propósito.
+  await expect(page.locator('[data-mu-plantilla]')).toHaveCount(0);
+  await page.locator('#muIgual').click();
+  await expect(page.locator('[data-mu-plantilla]')).toHaveCount(5);
 });
 
-test('el texto se completa con los datos del cliente', async ({ page }) => {
+test('el resumen de cada plantilla ya viene con los datos puestos', async ({ page }) => {
   await entrar(page);
   await abrirFicha(page, 0);
-  await page.locator('[data-u-toggle="0"] + .tree-children [data-mu-btn]').click();
-  await page.locator('[data-mu-plantilla="retrolavado"]').click();
-
-  // La vista previa muestra el mensaje ya armado, sin etiquetas sueltas.
-  const prev = page.locator('#muPrevTxt');
-  await expect(prev).toContainText('Hola Ana');
-  await expect(prev).toContainText('PSA SENIOR 4');
-  await expect(prev).toContainText('youtube.com/watch?v=qa6xkQQsyg8');
-  await expect(prev).not.toContainText('{nombre}');
-  await expect(prev).not.toContainText('{producto}');
+  await page.locator('[data-u-toggle="0"] + .tree-children [data-u-action="whatsapp"]').click();
+  // Se elige mirando el mensaje real, no una receta con huecos.
+  const item = page.locator('[data-mu-plantilla="retrolavado"]');
+  await expect(item).toContainText('Hola Ana');
+  await expect(item).toContainText('PSA SENIOR 4');
+  await expect(item).not.toContainText('{');
 });
 
 test('editar una plantilla la deja guardada para la próxima', async ({ page }) => {
   await entrar(page);
   await abrirFicha(page, 0);
-  await page.locator('[data-u-toggle="0"] + .tree-children [data-mu-btn]').click();
-  await page.locator('[data-mu-plantilla="saludo"]').click();
+  await page.locator('[data-u-toggle="0"] + .tree-children [data-u-action="whatsapp"]').click();
+  // Ahora editar es un desvío explícito, no el camino principal.
+  await page.locator('#muIrEditar').click();
+  await page.locator('[data-mu-editar="saludo"]').click();
 
   await page.locator('#muTexto').fill('Buenas {nombre}, ¿todo bien con el {producto}?');
   await expect(page.locator('#muPrevTxt')).toContainText('Buenas Ana, ¿todo bien con el PSA SENIOR 4?');
   await page.locator('#muGuardar').click();
 
-  // Vuelve a la lista y el cambio sobrevive a reabrir el popup.
-  await expect(page.locator('[data-mu-plantilla="saludo"]')).toContainText('Buenas Ana');
+  // Vuelve a la lista de edición y el cambio sobrevive a reabrir el popup.
+  await expect(page.locator('[data-mu-editar="saludo"]')).toContainText('Buenas Ana');
   await page.locator('#muCerrar').click();
-  await page.locator('[data-u-toggle="0"] + .tree-children [data-mu-btn]').click();
-  await page.locator('[data-mu-plantilla="saludo"]').click();
-  await expect(page.locator('#muTexto')).toHaveValue('Buenas {nombre}, ¿todo bien con el {producto}?');
+  await page.locator('[data-u-toggle="0"] + .tree-children [data-u-action="whatsapp"]').click();
+  await expect(page.locator('[data-mu-plantilla="saludo"]')).toContainText('Buenas Ana');
 
-  // Y se puede volver atrás.
+  await page.locator('#muIrEditar').click();
+  await page.locator('[data-mu-editar="saludo"]').click();
+  await expect(page.locator('#muTexto')).toHaveValue('Buenas {nombre}, ¿todo bien con el {producto}?');
   await page.locator('#muRestaurar').click();
   await expect(page.locator('#muTexto')).toContainText('¿Cómo estás?');
 });
 
-test('las etiquetas se insertan donde está el cursor', async ({ page }) => {
+test('los botones de datos dicen el nombre, no la llave', async ({ page }) => {
   await entrar(page);
   await abrirFicha(page, 0);
-  await page.locator('[data-u-toggle="0"] + .tree-children [data-mu-btn]').click();
-  await page.locator('[data-mu-plantilla="saludo"]').click();
+  await page.locator('[data-u-toggle="0"] + .tree-children [data-u-action="whatsapp"]').click();
+  await page.locator('#muIrEditar').click();
+  await page.locator('[data-mu-editar="saludo"]').click();
+
+  // En el editor el botón se lee "+ Barrio", no "{localidad}".
+  const tag = page.locator('[data-mu-tag="{localidad}"]');
+  await expect(tag).toContainText('Barrio');
+  await expect(tag).not.toContainText('{');
 
   await page.locator('#muTexto').fill('Hola ');
   await page.locator('#muTexto').click();
   await page.keyboard.press('End');
-  await page.locator('[data-mu-tag="{localidad}"]').click();
+  await tag.click();
   await expect(page.locator('#muTexto')).toHaveValue('Hola {localidad}');
   await expect(page.locator('#muPrevTxt')).toContainText('Hola Alta Gracia');
 });

@@ -99,7 +99,14 @@ test('arranca, navega e importa Garantías una sola vez', async ({ page }) => {
   });
   await expect(page.locator('#view-usuarios')).toBeVisible();
   await page.locator('#usuariosList .tree-node').first().click();
+  // El botón de WhatsApp ahora ofrece las plantillas; se elige una y recién
+  // ahí se abre el chat con el texto ya armado.
   await page.locator('#usuariosList [data-u-action="whatsapp"]').first().click();
+  // La planilla de prueba trae garantías viejísimas: para esos casos el popup
+  // avisa primero y hay que pedirle escribir igual.
+  const igual = page.locator('#muIgual');
+  if (await igual.count()) await igual.click();
+  await page.locator('[data-mu-plantilla]').first().click();
   const opened = await page.evaluate(() => window.__appiLastOpen);
   expect(opened[0]).toMatch(/^https:\/\/wa\.me\//);
   expect(pageErrors).toEqual([]);

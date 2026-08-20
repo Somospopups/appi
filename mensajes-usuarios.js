@@ -93,15 +93,27 @@
     }
   ];
 
+  // `corto` es lo que se ve en pantalla: el usuario nunca lee las llaves.
   var ETIQUETAS = [
-    { tag:'{nombre}', que:'Nombre de pila' },
-    { tag:'{producto}', que:'Equipo que compró' },
-    { tag:'{domicilio}', que:'Dirección' },
-    { tag:'{localidad}', que:'Barrio o localidad' },
-    { tag:'{vence}', que:'Fecha de vencimiento' },
-    { tag:'{compra}', que:'Fecha de compra' },
-    { tag:'{link_retrolavado}', que:'Video de mantenimiento' }
+    { tag:'{nombre}', corto:'Nombre', que:'Nombre de pila' },
+    { tag:'{producto}', corto:'Producto', que:'Equipo que compró' },
+    { tag:'{domicilio}', corto:'Domicilio', que:'Dirección' },
+    { tag:'{localidad}', corto:'Barrio', que:'Barrio o localidad' },
+    { tag:'{vence}', corto:'Vence', que:'Fecha de vencimiento' },
+    { tag:'{compra}', corto:'Compra', que:'Fecha de compra' },
+    { tag:'{link_retrolavado}', corto:'Video', que:'Video de mantenimiento' }
   ];
+  function etiquetaPorTag(tag){
+    for (var i=0;i<ETIQUETAS.length;i++) if (ETIQUETAS[i].tag === tag) return ETIQUETAS[i];
+    return null;
+  }
+
+  // Cliente inventado para mostrar cómo queda un texto cuando se lo edita sin
+  // tener a nadie elegido.
+  var EJEMPLO = {
+    usuario: 'GOMEZ, ANA MARIA', producto: 'PSA SENIOR 4', domicilio: 'San Martín 120',
+    localidad: 'Alta Gracia', fVenceRaw: '30/09/2026', fCompra: '15/03/2024'
+  };
 
   /* ---------- utilidades ---------- */
   function uid(){ return window.APPIAuth && window.APPIAuth.userId ? window.APPIAuth.userId() : 'local'; }
@@ -322,11 +334,14 @@
       '.mu-tag{border:1px dashed rgba(91,141,239,.4);border-radius:9px;background:rgba(91,141,239,.07);color:#3d63c9;',
       'font:inherit;font-size:10.5px;font-weight:800;padding:6px 9px;cursor:pointer}',
       '.mu-tag:hover{background:rgba(91,141,239,.16)}',
+      '.mu-ayuda{margin-top:14px;padding:11px 13px;border-radius:13px;background:rgba(91,141,239,.08);',
+      'color:#3d63c9;font-size:11.5px;line-height:1.5}',
       '.mu-acciones{display:grid;grid-template-columns:1fr;gap:9px;margin-top:15px}',
       '.mu-enviar{min-height:52px;border:0;border-radius:15px;background:linear-gradient(135deg,#25d366,#128C7E);color:#fff;',
       'font:inherit;font-size:14px;font-weight:850;cursor:pointer;box-shadow:0 7px 18px rgba(18,140,126,.26)}',
       '.mu-sec{min-height:44px;border:0;border-radius:13px;background:rgba(91,141,239,.11);color:#3d63c9;font:inherit;font-size:12.5px;font-weight:850;cursor:pointer}',
       '.mu-sec:hover{background:rgba(91,141,239,.2)}',
+      '.mu-sec.mu-grande{min-height:50px;font-size:14px}',
       '.mu-nota{margin-top:13px;padding:11px 13px;border-radius:13px;background:rgba(245,179,1,.1);color:#8a6100;font-size:11.5px;line-height:1.5}',
       '.mu-vacio{margin-top:16px;padding:18px 14px;border-radius:15px;background:rgba(255,255,255,.7);color:#777887;font-size:12.5px;text-align:center;line-height:1.55}',
       '.mu-volver{margin-top:14px;min-height:40px;padding:9px 14px;border:0;border-radius:12px;background:rgba(91,141,239,.11);',
@@ -372,7 +387,8 @@
     ctx = { persona:null, plantilla:null };
   }
 
-  // Pantalla 1: elegir plantilla.
+  /* Elegir plantilla y mandar. Es la pantalla de todos los días: se toca una
+     y se abre WhatsApp. Nada de llaves ni de edición acá. */
   function abrir(u){
     var ov = overlay();
     ctx.persona = u || null;
@@ -380,7 +396,6 @@
     var nombre = u ? ((typeof window.nombreDePila === 'function' ? window.nombreDePila(u.usuario) : '') || u.usuario) : '';
     ov.querySelector('#muTitulo').textContent = u ? ('Mensaje para ' + nombre) : 'Plantillas de mensajes';
     var cuerpo = ov.querySelector('#muCuerpo');
-    var lista = u ? plantillasPara(u) : plantillas();
     var sub = ov.querySelector('#muSub');
 
     if (u && !recibeMensajes(u)){
@@ -396,23 +411,32 @@
       return;
     }
 
+    if (u && !telefonoDe(u)){
+      sub.textContent = 'Sin teléfono';
+      cuerpo.innerHTML = '<div class="mu-vacio">Este cliente no tiene un teléfono válido cargado,<br>' +
+        'así que no se le puede escribir por WhatsApp.</div>';
+      ov.classList.add('open');
+      return;
+    }
+
     var g = u ? grupoDe(u) : null;
     sub.textContent = u
-      ? (g === 'vencido' ? 'Garantía vencida hace menos de un año' : 'Elegí qué querés mandarle')
-      : 'Tocá una para verla y editarla';
+      ? 'Tocá una y se abre WhatsApp'
+      : 'Tocá una para editarla';
     cuerpo.innerHTML = '';
-    pintarLista(cuerpo, lista, u);
+    pintarLista(cuerpo, u ? plantillasPara(u) : plantillas(), u);
     ov.classList.add('open');
   }
 
   function pintarLista(cuerpo, lista, u){
     var html = '<div class="mu-list">';
     lista.forEach(function(p){
-      var resumen = completar(p.texto, u || {}).replace(/\n+/g, ' ').slice(0, 70);
+      // El resumen ya viene con los datos puestos: se ve lo que va a recibir.
+      var resumen = completar(p.texto, u || EJEMPLO).replace(/\n+/g, ' ').slice(0, 68);
       html += '<button type="button" class="mu-item" data-mu-plantilla="' + esc(p.id) + '">' +
         '<span class="mu-ico">' + p.icono + '</span>' +
         '<span><strong>' + esc(p.nombre) + (p.editada ? ' ✏️' : '') + '</strong><small>' + esc(resumen) + '…</small></span>' +
-        '<span class="mu-go">›</span></button>';
+        '<span class="mu-go">' + (u ? '💬' : '›') + '</span></button>';
     });
     html += '</div>';
     if (u){
@@ -425,42 +449,86 @@
             (dd === 0 ? 'hoy' : dd === 1 ? 'ayer' : 'hace ' + dd + ' días') + '.</div>';
         }
       }
+      // Editar existe, pero corrido a un costado: no es lo que se viene a hacer.
+      html += '<button type="button" class="mu-volver" id="muIrEditar">✏️ Editar los textos</button>';
     }
     cuerpo.innerHTML += html;
     cuerpo.querySelectorAll('[data-mu-plantilla]').forEach(function(b){
-      b.onclick = function(){ verPlantilla(b.getAttribute('data-mu-plantilla'), u); };
+      var id = b.getAttribute('data-mu-plantilla');
+      b.onclick = function(){
+        // Con cliente elegido se manda derecho; sin cliente, se edita.
+        if (u) mandar(id, u);
+        else verPlantilla(id, null);
+      };
     });
+    var ed = cuerpo.querySelector('#muIrEditar');
+    if (ed) ed.onclick = function(){
+      cuerpo.innerHTML = '';
+      var ov = overlay();
+      ov.querySelector('#muTitulo').textContent = 'Editar los textos';
+      ov.querySelector('#muSub').textContent = 'Elegí cuál querés cambiar';
+      pintarListaEdicion(cuerpo, plantillasPara(u), u);
+    };
   }
 
-  // Pantalla 2: ver, editar y mandar.
-  function verPlantilla(id, u){
+  function pintarListaEdicion(cuerpo, lista, u){
+    var html = '<div class="mu-list">';
+    lista.forEach(function(p){
+      var resumen = completar(p.texto, u || EJEMPLO).replace(/\n+/g, ' ').slice(0, 68);
+      html += '<button type="button" class="mu-item" data-mu-editar="' + esc(p.id) + '">' +
+        '<span class="mu-ico">' + p.icono + '</span>' +
+        '<span><strong>' + esc(p.nombre) + (p.editada ? ' ✏️' : '') + '</strong><small>' + esc(resumen) + '…</small></span>' +
+        '<span class="mu-go">›</span></button>';
+    });
+    html += '</div>';
+    html += '<button type="button" class="mu-volver" id="muVolverEnviar">‹ Volver a enviar</button>';
+    cuerpo.innerHTML = html;
+    cuerpo.querySelectorAll('[data-mu-editar]').forEach(function(b){
+      b.onclick = function(){ verPlantilla(b.getAttribute('data-mu-editar'), u, true); };
+    });
+    cuerpo.querySelector('#muVolverEnviar').onclick = function(){ abrir(u); };
+  }
+
+  // Manda sin más vueltas: se abre WhatsApp con el texto ya completo.
+  function mandar(id, u){
+    var p = plantilla(id);
+    if (!p) return;
+    enviar(u, completar(p.texto, u));
+    cerrar();
+  }
+
+  /* Pantalla de edición. Sólo se llega a propósito. Acá sí se ven las llaves,
+     porque son la herramienta: los botones dicen "Nombre", no "{nombre}". */
+  function verPlantilla(id, u, volverAEditar){
     var p = plantilla(id);
     if (!p) return;
     ctx.plantilla = id;
     var ov = overlay();
     var cuerpo = ov.querySelector('#muCuerpo');
     ov.querySelector('#muTitulo').textContent = p.icono + ' ' + p.nombre;
-    ov.querySelector('#muSub').textContent = u ? 'Se manda a ' + esc(u.usuario || '') : 'Editar plantilla';
+    ov.querySelector('#muSub').textContent = 'Editar el texto';
 
-    var html = '<div class="mu-caja"><textarea id="muTexto" spellcheck="true">' + esc(p.texto) + '</textarea></div>';
+    var html = '<div class="mu-ayuda">Los botones de abajo meten datos que se completan solos con los de cada cliente.</div>';
+    html += '<div class="mu-caja"><textarea id="muTexto" spellcheck="true">' + esc(p.texto) + '</textarea></div>';
     html += '<div class="mu-tags">';
     ETIQUETAS.forEach(function(e){
-      html += '<button type="button" class="mu-tag" data-mu-tag="' + esc(e.tag) + '" title="' + esc(e.que) + '">' + esc(e.tag) + '</button>';
+      html += '<button type="button" class="mu-tag" data-mu-tag="' + esc(e.tag) + '" title="' + esc(e.que) + '">+ ' + esc(e.corto) + '</button>';
     });
     html += '</div>';
-    if (u) html += '<div class="mu-prev" id="muPrev"><b>Así lo va a recibir</b><span id="muPrevTxt"></span></div>';
+    html += '<div class="mu-prev" id="muPrev"><b>' + (u ? 'Así lo va a recibir' : 'Ejemplo con un cliente') +
+            '</b><span id="muPrevTxt"></span></div>';
     html += '<div class="mu-acciones">';
-    if (u && telefonoDe(u)) html += '<button type="button" class="mu-enviar" id="muEnviar">💬 Abrir WhatsApp</button>';
-    else if (u) html += '<div class="mu-nota">Este cliente no tiene un teléfono válido cargado.</div>';
-    html += '<button type="button" class="mu-sec" id="muGuardar">Guardar cambios</button>';
+    // Guardar no es enviar: el verde queda reservado para WhatsApp.
+    html += '<button type="button" class="mu-sec mu-grande" id="muGuardar">Guardar</button>';
     if (p.editada) html += '<button type="button" class="mu-sec" id="muRestaurar">Volver al texto original</button>';
     html += '</div>';
-    html += '<button type="button" class="mu-volver" id="muVolver">‹ Volver a las plantillas</button>';
+    html += '<button type="button" class="mu-volver" id="muVolver">‹ Volver</button>';
     cuerpo.innerHTML = html;
 
     var ta = cuerpo.querySelector('#muTexto');
     var prev = cuerpo.querySelector('#muPrevTxt');
-    function repintar(){ if (prev) prev.textContent = completar(ta.value, u || {}); }
+    var quien = u || EJEMPLO;
+    function repintar(){ prev.textContent = completar(ta.value, quien); }
     repintar();
     ta.oninput = repintar;
 
@@ -476,29 +544,35 @@
       };
     });
 
-    cuerpo.querySelector('#muVolver').onclick = function(){ abrir(u); };
+    function volver(){
+      if (u && volverAEditar){
+        var c = overlay().querySelector('#muCuerpo');
+        c.innerHTML = '';
+        overlay().querySelector('#muTitulo').textContent = 'Editar los textos';
+        overlay().querySelector('#muSub').textContent = 'Elegí cuál querés cambiar';
+        pintarListaEdicion(c, plantillasPara(u), u);
+      } else {
+        abrir(u);
+      }
+    }
+    cuerpo.querySelector('#muVolver').onclick = volver;
     cuerpo.querySelector('#muGuardar').onclick = function(){
       guardarTexto(id, ta.value);
-      if (typeof window.showToast === 'function') window.showToast('Plantilla guardada ✓');
-      abrir(u);
+      if (typeof window.showToast === 'function') window.showToast('Guardado ✓');
+      volver();
     };
     var rest = cuerpo.querySelector('#muRestaurar');
     if (rest) rest.onclick = function(){
       restaurar(id);
       if (typeof window.showToast === 'function') window.showToast('Texto original restaurado ✓');
-      verPlantilla(id, u);
-    };
-    var env = cuerpo.querySelector('#muEnviar');
-    if (env) env.onclick = function(){
-      guardarTexto(id, ta.value);
-      enviar(u, completar(ta.value, u));
-      cerrar();
+      verPlantilla(id, u, volverAEditar);
     };
   }
 
   /* ---------- integración con la lista de Garantías ---------- */
-  // Se agrega un botón 💬 Mensaje a cada ficha abierta, sin tocar el HTML que
-  // arma la lista: si esa función cambia, esto sigue funcionando igual.
+  /* El botón de WhatsApp que ya existía pasa a abrir las plantillas, en vez de
+     mandar un saludo fijo. Queda uno solo: es el mismo gesto de siempre, con
+     más opciones adentro. El saludo de antes sobrevive como plantilla. */
   function pintarFichas(){
     var cont = document.getElementById('usuariosList');
     if (!cont) return;
@@ -511,16 +585,13 @@
       var idx = Number(nodo.getAttribute('data-u-toggle'));
       var u = lista[idx];
       if (!u) return;
-      var fila = hijo.querySelector('div[style*="display:flex"]');
-      if (!fila || fila.querySelector('[data-mu-btn]')) return;
-      if (!recibeMensajes(u)) return;
-      var b = document.createElement('button');
-      b.type = 'button';
-      b.className = 'action-btn msg';
-      b.setAttribute('data-mu-btn', '1');
-      b.textContent = '💬 Mensaje';
-      b.onclick = function(e){ e.stopPropagation(); abrir(u); };
-      fila.appendChild(b);
+      var wa = hijo.querySelector('[data-u-action="whatsapp"]');
+      if (!wa || wa.getAttribute('data-mu-btn')) return;
+      wa.setAttribute('data-mu-btn', '1');
+      wa.onclick = function(e){
+        e.stopPropagation();
+        abrir(u);
+      };
     });
   }
 
@@ -583,6 +654,7 @@
     ultimoEnvio: ultimoEnvio,
     registrar: registrar,
     abrir: abrir,
+    mandar: mandar,
     cerrar: cerrar,
     montar: montar,
     pintarFichas: pintarFichas

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v278-mensajes-para-usuarios';
+const CACHE_NAME = 'appi-v279-mensajes-un-toque';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
