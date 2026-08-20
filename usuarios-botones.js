@@ -66,6 +66,28 @@
       '.ub-todos{margin-top:14px;width:100%;min-height:50px;border:1px dashed rgba(91,141,239,.4);border-radius:15px;',
       'background:rgba(91,141,239,.06);color:#3d63c9;font:inherit;font-size:12.5px;font-weight:850;cursor:pointer}',
       '.ub-todos:hover{background:rgba(91,141,239,.13)}',
+      /* mensaje de promo dentro del popup */
+      '.ub-msg{margin-top:14px;padding:13px 14px;border:1px solid rgba(91,141,239,.18);border-radius:15px;background:rgba(91,141,239,.06)}',
+      '.ub-msg label{display:block;margin-bottom:7px;color:#3d63c9;font-size:10.5px;font-weight:900;text-transform:uppercase;letter-spacing:.4px}',
+      '.ub-msg textarea{width:100%;min-height:74px;padding:10px 12px;border:1px solid rgba(80,90,130,.16);border-radius:12px;',
+      'background:rgba(255,255,255,.9);color:#292938;font:inherit;font-size:12.5px;resize:vertical;box-sizing:border-box}',
+      '.ub-msg textarea:focus{outline:none;border-color:#5b8def;box-shadow:0 0 0 3px rgba(91,141,239,.12)}',
+      '.ub-msg small{display:block;margin-top:7px;color:#777887;font-size:10.5px;line-height:1.4}',
+      /* volver y personas de una tarjeta */
+      '.ub-volver{margin-top:14px;min-height:40px;padding:9px 14px;border:0;border-radius:12px;background:rgba(91,141,239,.11);',
+      'color:#3d63c9;font:inherit;font-size:12px;font-weight:850;cursor:pointer}',
+      '.ub-volver:hover{background:rgba(91,141,239,.2)}',
+      '.ub-persona{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;min-height:60px;',
+      'padding:11px 14px;border:1px solid rgba(80,90,130,.1);border-radius:15px;background:#fff}',
+      '.ub-persona strong{display:block;color:#30303d;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
+      '.ub-persona small{display:block;margin-top:3px;color:#777887;font-size:10px}',
+      '.ub-wa{min-height:38px;padding:8px 13px;border:0;border-radius:11px;background:#25d366;color:#fff;',
+      'font:inherit;font-size:11.5px;font-weight:900;cursor:pointer;white-space:nowrap}',
+      '.ub-wa:hover{filter:brightness(1.06)}',
+      '.ub-sintel{color:#9a9aa8;font-size:10.5px;font-weight:700}',
+      'body.dark .ub-msg textarea{background:#1d1f31;color:#f2f2f7;border-color:rgba(255,255,255,.1)}',
+      'body.dark .ub-persona{background:rgba(31,32,49,.8);border-color:rgba(255,255,255,.08)}',
+      'body.dark .ub-persona strong{color:#f1f1f6}',
       '.ub-empty{margin-top:14px;padding:16px;border-radius:14px;background:rgba(0,0,0,.04);color:#777887;font-size:12px;text-align:center}',
       'body.dark .ub-main{background:rgba(31,32,49,.74);border-color:rgba(255,255,255,.09);color:#e8e8f0}',
       'body.dark .ub-panel{background:linear-gradient(160deg,#1b1c2b,#241c2b)}',
@@ -223,24 +245,72 @@
       abrir('💳 Tarjetas', '', '<div class="ub-empty">Todavía no hay tarjetas cargadas.<br>Se agregan desde la ficha de cada usuario.</div>');
       return;
     }
-    var html = '<div class="ub-list">' + combos.map(function(c){
-      var on = actual.tipo === 'tarjeta' && actual.marca === c.marca && actual.banco === c.banco;
-      return '<button type="button" class="ub-item' + (on ? ' on' : '') + '" data-ub-marca="' + esc(c.marca) + '" data-ub-banco="' + esc(c.banco) + '">' +
-        '<strong>' + esc(c.label) + '</strong><span class="ub-n">' + c.cuantos + '</span></button>';
-    }).join('') + '</div>' +
-    '<button type="button" class="ub-todos" data-ub-todos>Todas las tarjetas</button>';
+    var T = window.APPITarjetas;
+    var texto = (T && T.mensajeActual) ? T.mensajeActual() : '';
+    // El mensaje va arriba: se escribe una vez y sirve para cualquier tarjeta
+    // que se elija después, sin salir del popup.
+    var html =
+      '<div class="ub-msg">' +
+        '<label for="ubMsg">Mensaje para avisar la promo</label>' +
+        '<textarea id="ubMsg" placeholder="Hola {nombre}, hay una promo con {tarjeta}…">' + esc(texto) + '</textarea>' +
+        '<small>Podés usar {nombre} y {tarjeta}: se reemplazan por los datos de cada persona.</small>' +
+      '</div>' +
+      '<div class="ub-list">' + combos.map(function(c){
+        var on = actual.tipo === 'tarjeta' && actual.marca === c.marca && actual.banco === c.banco;
+        return '<button type="button" class="ub-item' + (on ? ' on' : '') + '" data-ub-marca="' + esc(c.marca) + '" data-ub-banco="' + esc(c.banco) + '">' +
+          '<strong>' + esc(c.label) + '</strong><span class="ub-n">' + c.cuantos + '</span></button>';
+      }).join('') + '</div>' +
+      '<button type="button" class="ub-todos" data-ub-todos>Todas las tarjetas</button>';
 
     var ov = abrir('💳 Tarjetas', combos.length + (combos.length === 1 ? ' combinación' : ' combinaciones'), html);
+    var caja = ov.querySelector('#ubMsg');
+    if (caja && T && T.guardarMensaje){
+      caja.oninput = function(){ T.guardarMensaje(caja.value); };
+    }
     ov.querySelectorAll('[data-ub-marca]').forEach(function(b){
       b.onclick = function(){
         var m = b.getAttribute('data-ub-marca'), k = b.getAttribute('data-ub-banco');
         var combo = combos.filter(function(c){ return c.marca === m && c.banco === k; })[0];
         actual = { tipo: 'tarjeta', zona: '', marca: m, banco: k, label: combo ? combo.label : 'Tarjeta' };
-        cerrar();
         aplicar();
+        verGenteDeTarjeta(combo);
       };
     });
     ov.querySelector('[data-ub-todos]').onclick = function(){ cerrar(); limpiar(); };
+  }
+
+  // Segundo paso del popup: la gente que tiene esa tarjeta, con el botón para
+  // avisarle a cada uno. El listado grande ya quedó filtrado por detrás.
+  function verGenteDeTarjeta(combo){
+    if (!combo) { cerrar(); return; }
+    var T = window.APPITarjetas;
+    var gente = lista().filter(function(u){
+      return (T.cardsOf(u) || []).some(function(c){
+        return c && c.marca === combo.marca && (c.banco || '') === combo.banco;
+      });
+    });
+    var filas = gente.map(function(u, i){
+      var tel = String(u.telf || u.telefono || '').replace(/\D/g, '');
+      var donde = [u.localidad, u.domicilio].filter(Boolean).join(' · ') || 'Sin domicilio';
+      return '<div class="ub-persona">' +
+        '<span><strong>' + esc(u.usuario || 'Sin nombre') + '</strong><small>' + esc(donde) + '</small></span>' +
+        (tel ? '<button type="button" class="ub-wa" data-ub-wa="' + i + '">💬 Avisar</button>'
+             : '<span class="ub-sintel">Sin teléfono</span>') +
+        '</div>';
+    }).join('');
+
+    var ov = abrir('💳 ' + combo.label,
+      gente.length + (gente.length === 1 ? ' persona' : ' personas'),
+      '<button type="button" class="ub-volver" data-ub-volver>‹ Todas las tarjetas</button>' +
+      '<div class="ub-list">' + (filas || '<div class="ub-empty">No hay nadie con esta tarjeta.</div>') + '</div>');
+
+    ov.querySelector('[data-ub-volver]').onclick = abrirTarjetas;
+    ov.querySelectorAll('[data-ub-wa]').forEach(function(b){
+      b.onclick = function(){
+        var u = gente[Number(b.getAttribute('data-ub-wa'))];
+        if (u && T && T.abrirWhatsApp) T.abrirWhatsApp(u);
+      };
+    });
   }
 
   /* ---------- los dos botones ---------- */

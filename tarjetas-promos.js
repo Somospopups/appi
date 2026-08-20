@@ -356,6 +356,10 @@
     css();
     var host = document.getElementById('usuariosTarjetasBar');
     if (!host) return;
+    // En Usuarios la barra queda fuera de la vista: el mensaje se escribe en el
+    // popup del botón "Tarjetas". Se sigue montando porque el textarea es el
+    // que guarda el texto que arma cada WhatsApp.
+    host.hidden = true;
     host.innerHTML = barraHtml('tpU', { sinFiltros: true });
     bindBarra('tpU', function(){
       if (typeof window.aplicarFiltrosU === 'function') window.aplicarFiltrosU();
@@ -466,6 +470,14 @@
   function resetFiltro(){
     filtro = { marca:'', banco:'', sin:false };
   }
+  // El mensaje de promo ahora se escribe dentro del popup de Tarjetas, que vive
+  // en otro archivo: se comparte el mismo texto para no tener dos copias.
+  function mensajeActual(){ return mensajePromo; }
+  function guardarMensaje(texto){
+    mensajePromo = String(texto == null ? '' : texto);
+    var caja = document.getElementById('tpUMsg');
+    if (caja && caja.value !== mensajePromo) caja.value = mensajePromo;
+  }
   // Los botones de Tarjetas de Usuarios eligen una combinación entera desde su
   // popup, en vez de marca y banco por separado.
   function aplicarFiltro(marca, banco){
@@ -506,6 +518,8 @@
     filterPersonas: filterPersonas,
     resetFiltro: resetFiltro,
     aplicarFiltro: aplicarFiltro,
+    mensajeActual: mensajeActual,
+    guardarMensaje: guardarMensaje,
     armarMensaje: armarMensaje,
     abrirWhatsApp: abrirWhatsApp,
     montarBarraUsuarios: montarBarraUsuarios,

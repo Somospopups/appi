@@ -171,6 +171,80 @@ test('el popup de Tarjetas filtra y reemplaza al filtro de barrio', async ({ pag
   await expect(page.locator('#ubBtnBarrios')).not.toHaveClass(/on/);
 });
 
+test('el mensaje de promo se escribe dentro del popup y no en la pantalla', async ({ page }) => {
+  await entrar(page, {
+    tarjetas: { byKey: { 'tel:3515551001': [{ marca: 'visa', banco: 'galicia' }] } }
+  });
+
+  // El bloque "Promos con tarjeta" ya no ocupa lugar en la pantalla.
+  await expect(page.locator('#usuariosTarjetasBar')).toBeHidden();
+
+  await page.locator('#ubBtnTarjetas').click();
+  const caja = page.locator('#ubMsg');
+  await expect(caja).toBeVisible();
+
+  // Va arriba de la lista de tarjetas.
+  const orden = await page.evaluate(() => {
+    const msg = document.querySelector('.ub-msg');
+    const lista = document.querySelector('#ubCuerpo .ub-list');
+    return msg.compareDocumentPosition(lista) & Node.DOCUMENT_POSITION_FOLLOWING ? 'mensaje primero' : 'lista primero';
+  });
+  expect(orden).toBe('mensaje primero');
+
+  await caja.fill('Hola {nombre}, promo con {tarjeta} este mes');
+  // El texto queda guardado en el módulo, que es quien arma cada WhatsApp.
+  expect(await page.evaluate(() => window.APPITarjetas.mensajeActual()))
+    .toBe('Hola {nombre}, promo con {tarjeta} este mes');
+
+  // Y sigue ahí al reabrir el popup.
+  await page.locator('#ubCerrar').click();
+  await page.locator('#ubBtnTarjetas').click();
+  await expect(page.locator('#ubMsg')).toHaveValue('Hola {nombre}, promo con {tarjeta} este mes');
+});
+
+test('al elegir una tarjeta el popup muestra su gente con el botón de avisar', async ({ page }) => {
+  await entrar(page, {
+    tarjetas: {
+      byKey: {
+        'tel:3515551001': [{ marca: 'visa', banco: 'galicia' }],
+        'tel:3515551004': [{ marca: 'visa', banco: 'galicia' }]
+      }
+    }
+  });
+  await page.evaluate(() => {
+    window.__appiLastOpen = null;
+    window.open = url => { window.__appiLastOpen = url; return { closed:false, close(){}, location:{} }; };
+    if (window.APPIWhatsApp) window.APPIWhatsApp.abrir = url => { window.__appiLastOpen = url; return Promise.resolve(true); };
+  });
+
+  await page.locator('#ubBtnTarjetas').click();
+  await page.locator('#ubMsg').fill('Hola {nombre}, promo con {tarjeta}');
+  await page.locator('[data-ub-marca="visa"][data-ub-banco="galicia"]').click();
+
+  // El popup sigue abierto y ahora muestra a las dos personas.
+  await expect(page.locator('#ubOverlay')).toHaveClass(/open/);
+  await expect(page.locator('#ubTitulo')).toContainText('Visa Galicia');
+  await expect(page.locator('#ubCuerpo .ub-persona')).toHaveCount(2);
+  await expect(page.locator('#ubCuerpo')).toContainText('Ana Gómez');
+  await expect(page.locator('#ubCuerpo')).toContainText('Diego Paz');
+
+  // Y el listado grande quedó filtrado por detrás.
+  await expect(page.locator('#usuariosList .tree-node')).toHaveCount(2);
+
+  // Avisar arma el WhatsApp con el mensaje escrito arriba.
+  await page.locator('[data-ub-wa="0"]').click();
+  const url = await page.evaluate(() => window.__appiLastOpen);
+  expect(url).toMatch(/^https:\/\/wa\.me\/5493515551001\?text=/);
+  const texto = decodeURIComponent(url.split('text=')[1]);
+  expect(texto).toContain('Ana');
+  expect(texto).toContain('Visa Galicia');
+
+  // Se puede volver a la lista de tarjetas.
+  await page.locator('[data-ub-volver]').click();
+  await expect(page.locator('#ubCuerpo .ub-item')).toHaveCount(1);
+  await expect(page.locator('#ubMsg')).toBeVisible();
+});
+
 test('sin tarjetas cargadas el popup lo explica en vez de quedar vacío', async ({ page }) => {
   await entrar(page);
   await page.locator('#ubBtnTarjetas').click();

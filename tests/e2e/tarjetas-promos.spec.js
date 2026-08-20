@@ -94,7 +94,10 @@ async function entrar(page, { usuarios = USUARIOS, contactos = CONTACTOS, tarjet
 async function abrirUsuarios(page) {
   await page.evaluate(() => window.showView('view-usuarios'));
   await expect(page.locator('#view-usuarios')).toHaveClass(/active/);
-  await expect(page.locator('#usuariosTarjetasBar .tp-bar')).toBeVisible();
+  // La barra de promos se sigue montando, pero fuera de la vista: el mensaje se
+  // escribe dentro del popup del botón "Tarjetas".
+  await expect(page.locator('#usuariosTarjetasBar')).toBeHidden();
+  await expect(page.locator('#ubBtnTarjetas')).toBeVisible();
   await expect(page.locator('#usuariosList .tree-node')).toHaveCount(2);
 }
 
@@ -123,12 +126,18 @@ test('en Usuarios se carga Visa Galicia, se filtra y se arma el WhatsApp', async
   await expect(itemVisa).toBeVisible();
   await expect(itemVisa).toContainText('Visa Galicia');
   await itemVisa.click();
-  await expect(page.locator('#ubOverlay')).not.toHaveClass(/open/);
+  // El popup pasa a mostrar la gente de esa tarjeta y el listado grande queda
+  // filtrado por detrás.
+  await expect(page.locator('#ubCuerpo .ub-persona')).toHaveCount(1);
+  await page.locator('#ubCerrar').click();
   await expect(page.locator('#usuariosList .tree-node')).toHaveCount(1);
   await expect(page.locator('#usuariosList')).toContainText('Laura Gómez');
   await expect(page.locator('#usuariosList')).not.toContainText('Carlos Ruiz');
 
-  await page.locator('#tpUMsg').fill('Hola {nombre}, hay una promo con {tarjeta}');
+  // El mensaje se escribe en el popup de Tarjetas.
+  await page.locator('#ubBtnTarjetas').click();
+  await page.locator('#ubMsg').fill('Hola {nombre}, hay una promo con {tarjeta}');
+  await page.locator('#ubCerrar').click();
   await page.locator('#usuariosList .tree-node').first().click();
   await page.locator('[data-tp-wa]').click();
   const opened = await page.evaluate(() => window.__appiLastOpen);
