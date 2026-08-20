@@ -252,6 +252,7 @@ test('el texto de la campaña se puede editar y vuelve al original', async ({ pa
   await entrar(page);
   await page.locator('#usuariosBtnDormidos').click();
   await page.locator('#reEditar').click();
+  await page.locator('[data-re-edit="primero"]').click();
 
   await page.locator('#reTexto').fill('Hola {nombre}, ¿seguís en {localidad}?');
   await expect(page.locator('#rePrev')).toContainText('Hola Ana, ¿seguís en Alta Gracia?');
@@ -261,6 +262,7 @@ test('el texto de la campaña se puede editar y vuelve al original', async ({ pa
   await page.locator('#reCerrar').click();
   await page.locator('#usuariosBtnDormidos').click();
   await page.locator('#reEditar').click();
+  await page.locator('[data-re-edit="primero"]').click();
   await expect(page.locator('#reTexto')).toHaveValue('Hola {nombre}, ¿seguís en {localidad}?');
 
   await page.locator('#reRestaurar').click();
@@ -303,4 +305,143 @@ test('las olas parten la antigüedad donde corresponde', async ({ page }) => {
   expect(r.cuatro).toBe('o2');
   expect(r.siete).toBe('o3');
   expect(r.quince).toBe('o4');
+});
+
+/* ---------- cerrar el círculo: contestaron → seguimiento → reactivado ---------- */
+
+// Marca a alguien como que contestó, sin pasar por toda la interfaz.
+async function marcarContesto(page, nombre) {
+  await page.evaluate(n => {
+    const u = window.usuariosTodosActual().find(x => x.usuario === n);
+    window.APPIReactivacion.marcar(u, 'interesado');
+  }, nombre);
+}
+
+test('los que contestaron aparecen primero, separados del resto', async ({ page }) => {
+  await entrar(page);
+  await marcarContesto(page, 'GOMEZ, ANA');
+  await page.locator('#usuariosBtnDormidos').click();
+
+  const destacado = page.locator('#reContestaron');
+  await expect(destacado).toBeVisible();
+  await expect(destacado).toContainText('1 te contestó');
+  // Y sale de la lista de los que faltan contactar: la ola baja de 3 a 2.
+  await expect(page.locator('[data-re-ola="o1"]')).toContainText('2');
+});
+
+test('el que contestó ofrece las respuestas típicas', async ({ page }) => {
+  await entrar(page);
+  await marcarContesto(page, 'GOMEZ, ANA');
+  await page.locator('#usuariosBtnDormidos').click();
+  await page.locator('#reContestaron').click();
+  await expect(page.locator('#reTitulo')).toContainText('Te contestaron');
+
+  await page.locator('[data-re-cont="0"]').click();
+  // Las cinco salidas posibles de un "¿lo seguís usando?".
+  await expect(page.locator('[data-re-seg]')).toHaveCount(5);
+  await expect(page.locator('[data-re-seg="lo_usa"]')).toBeVisible();
+  await expect(page.locator('[data-re-seg="no_lo_usa"]')).toBeVisible();
+  await expect(page.locator('[data-re-seg="roto"]')).toBeVisible();
+  await expect(page.locator('[data-re-seg="no_lo_tiene"]')).toBeVisible();
+  await expect(page.locator('[data-re-seg="visita"]')).toBeVisible();
+});
+
+test('el seguimiento manda el texto que corresponde', async ({ page }) => {
+  await entrar(page);
+  await espiarWhatsApp(page);
+  await marcarContesto(page, 'GOMEZ, ANA');
+  await page.locator('#usuariosBtnDormidos').click();
+  await page.locator('#reContestaron').click();
+  await page.locator('[data-re-cont="0"]').click();
+  await page.locator('[data-re-seg="lo_usa"]').click();
+
+  const urls = await page.evaluate(() => window.__wa);
+  expect(urls).toHaveLength(1);
+  const texto = decodeURIComponent(urls[0].split('text=')[1]);
+  expect(texto).toContain('Ana');
+  expect(texto).toContain('filtro');
+  expect(texto).not.toContain('{nombre}');
+});
+
+test('responderle a alguien que ya contestó no gasta el cupo del día', async ({ page }) => {
+  await entrar(page);
+  await espiarWhatsApp(page);
+  await marcarContesto(page, 'GOMEZ, ANA');
+  await page.locator('#usuariosBtnDormidos').click();
+  const antes = await page.evaluate(() => window.APPIReactivacion.quedanHoy());
+
+  await page.locator('#reContestaron').click();
+  await page.locator('[data-re-cont="0"]').click();
+  await page.locator('[data-re-seg="visita"]').click();
+
+  // El tope existe para no escribirle a desconocidos, no para responder.
+  const despues = await page.evaluate(() => window.APPIReactivacion.quedanHoy());
+  expect(despues).toBe(antes);
+});
+
+test('"Lo reactivé" lo saca de la campaña y lo devuelve al circuito normal', async ({ page }) => {
+  await entrar(page);
+  await marcarContesto(page, 'GOMEZ, ANA');
+  await page.locator('#usuariosBtnDormidos').click();
+  await page.locator('#reContestaron').click();
+  await page.locator('[data-re-cont="0"]').click();
+  await page.locator('#reReactivar').click();
+
+  // Sale de los dormidos...
+  const dormidos = await page.evaluate(() =>
+    window.APPIReactivacion.dormidos().map(u => u.usuario));
+  expect(dormidos).not.toContain('GOMEZ, ANA');
+
+  // ...y vuelve a ser un cliente vigente para el resto de la app, aunque su
+  // fecha de vencimiento en el Excel siga siendo vieja.
+  const grupo = await page.evaluate(() => {
+    const u = window.usuariosTodosActual().find(x => x.usuario === 'GOMEZ, ANA');
+    return window.APPIMensajes.grupoDe(u);
+  });
+  expect(grupo).toBe('vigente');
+});
+
+test('el reactivado vuelve a recibir mensajes normales desde su ficha', async ({ page }) => {
+  await entrar(page);
+  await page.evaluate(() => {
+    const u = window.usuariosTodosActual().find(x => x.usuario === 'GOMEZ, ANA');
+    window.APPIReactivacion.reactivar(u);
+  });
+  const plantillas = await page.evaluate(() => {
+    const u = window.usuariosTodosActual().find(x => x.usuario === 'GOMEZ, ANA');
+    return window.APPIMensajes.plantillasPara(u).map(p => p.id);
+  });
+  // Antes no recibía nada por estar vencido hace años; ahora sí.
+  expect(plantillas).toContain('retrolavado');
+  expect(plantillas).toContain('cumple');
+});
+
+test('la campaña muestra cuántos se reactivaron', async ({ page }) => {
+  await entrar(page);
+  await page.evaluate(() => {
+    const R = window.APPIReactivacion;
+    ['GOMEZ, ANA', 'RUIZ, BETO'].forEach(n => {
+      R.reactivar(window.usuariosTodosActual().find(x => x.usuario === n));
+    });
+  });
+  await page.locator('#usuariosBtnDormidos').click();
+  await expect(page.locator('.re-logro')).toContainText('2 clientes reactivados');
+});
+
+test('los textos de seguimiento se editan y vuelven al original', async ({ page }) => {
+  await entrar(page);
+  await page.locator('#usuariosBtnDormidos').click();
+  await page.locator('#reEditar').click();
+  // Ahora hay que elegir qué texto: el primero o alguno de seguimiento.
+  await expect(page.locator('[data-re-edit]')).toHaveCount(6);
+
+  await page.locator('[data-re-edit="roto"]').click();
+  await page.locator('#reTexto').fill('Lo vemos, {nombre}!');
+  await expect(page.locator('#rePrev')).toContainText('Lo vemos, Ana!');
+  await page.locator('#reGuardar').click();
+  await expect(page.locator('[data-re-edit="roto"]')).toContainText('✏️');
+
+  await page.locator('[data-re-edit="roto"]').click();
+  await page.locator('#reRestaurar').click();
+  await expect(page.locator('#reTexto')).toContainText('filtro tapado');
 });

@@ -40,6 +40,79 @@
     { id:'nomolestar', icono:'🚫', nombre:'No molestar', color:'#d9534f' }
   ];
 
+  /* Respuestas típicas al "¿lo seguís usando?". El primer mensaje lo manda la
+     app, pero la conversación la escribe el distribuidor: sin estos textos
+     hay que responder a mano cada vez, que es donde está el trabajo real. */
+  var SEGUIMIENTOS = [
+    {
+      id: 'lo_usa',
+      icono: '💧',
+      nombre: 'Dijo que SÍ lo usa',
+      pista: 'Ofrecele la revisión, sin vender nada todavía',
+      texto: [
+        '¡Qué bueno, {nombre}! 😊',
+        '',
+        'Te hago una pregunta: ¿cuándo fue la última vez que le cambiaste el filtro?',
+        '',
+        'Te lo digo porque con los años el filtro se satura y deja de purificar. Si tiene el original, puede estar ensuciando el agua en vez de limpiarla.',
+        '',
+        'Si querés paso a revisarlo sin cargo y te digo cómo está. 😊'
+      ].join('\n')
+    },
+    {
+      id: 'no_lo_usa',
+      icono: '📦',
+      nombre: 'Lo tiene guardado / no lo usa',
+      pista: 'Casi siempre es sólo el filtro',
+      texto: [
+        'Te entiendo, {nombre}. Pasa muchísimo. 😊',
+        '',
+        'La mayoría de las veces el equipo está perfecto y lo único que necesita es un filtro nuevo: se cambia en cinco minutos y queda como el primer día.',
+        '',
+        '¿Querés que pase a verlo? Lo reviso sin cargo y te digo si vale la pena o no. Sin compromiso.'
+      ].join('\n')
+    },
+    {
+      id: 'roto',
+      icono: '🔧',
+      nombre: 'Dijo que se rompió',
+      pista: 'Casi nunca está roto de verdad',
+      texto: [
+        'Puede que tenga arreglo, {nombre}. 😊',
+        '',
+        'Muchas veces lo que parece una falla es el filtro tapado o la válvula sucia, y se soluciona en el momento.',
+        '',
+        '¿Querés que lo revise? Si tiene arreglo te lo dejo funcionando, y si no, vemos qué te conviene.'
+      ].join('\n')
+    },
+    {
+      id: 'no_lo_tiene',
+      icono: '🤝',
+      nombre: 'Ya no lo tiene',
+      pista: 'Acá se busca el referido',
+      texto: [
+        'Gracias por contestarme igual, {nombre}! 😊',
+        '',
+        'Cualquier cosa que necesites sobre agua, quedo a disposición.',
+        '',
+        'Y si conocés a alguien que esté armando su casa y quiera agua segura, avisame que lo asesoro sin compromiso. 🙌'
+      ].join('\n')
+    },
+    {
+      id: 'visita',
+      icono: '📅',
+      nombre: 'Coordinar la visita',
+      pista: 'Para cerrar el día y la hora',
+      texto: [
+        'Genial, {nombre}! 😊',
+        '',
+        'Esta semana voy a estar por {localidad}. ¿Qué día te queda mejor?',
+        '',
+        'Es un ratito nomás: reviso el equipo y te digo cómo está.'
+      ].join('\n')
+    }
+  ];
+
   var PLANTILLA_BASE = [
     'Hola {nombre}! 👋 ¿Cómo estás?',
     '',
@@ -119,6 +192,72 @@
     return null;
   }
 
+  /* Reactivado: volvió a ser cliente. Sale de la campaña y vuelve al circuito
+     normal de mantenimiento. Hace falta anotarlo aparte porque la fecha de
+     vencimiento vive en el Excel y no cambia: sin esto, el que revivió
+     seguiría figurando como dormido para siempre. */
+  function reactivar(u){
+    var k = tel(u);
+    if (!k) return;
+    var d = leer();
+    if (!d.revividos) d.revividos = {};
+    d.revividos[k] = { at: new Date().toISOString() };
+    if (d.estados) delete d.estados[k];
+    guardar(d);
+  }
+  function esRevivido(u){
+    var k = tel(u);
+    if (!k) return false;
+    var d = leer();
+    return !!(d.revividos && d.revividos[k]);
+  }
+  function deshacerReactivar(u){
+    var k = tel(u);
+    if (!k) return;
+    var d = leer();
+    if (d.revividos) delete d.revividos[k];
+    guardar(d);
+  }
+  function revividos(){
+    return todos().filter(esRevivido);
+  }
+
+  // Los que contestaron y todavía no se cerraron: es la lista que hay que
+  // seguir, y la que justifica toda la campaña.
+  function contestaron(){
+    return todos().filter(function(u){
+      if (!esDormido(u) || esRevivido(u)) return false;
+      var e = estadoDe(u);
+      return !!(e && e.estado === 'interesado');
+    });
+  }
+
+  /* ---------- textos de seguimiento ---------- */
+  function seguimientos(){
+    var g = leer().seguimientos || {};
+    return SEGUIMIENTOS.map(function(s){
+      var copia = {};
+      for (var k in s) copia[k] = s[k];
+      if (typeof g[s.id] === 'string') copia.texto = g[s.id];
+      copia.editada = typeof g[s.id] === 'string' && g[s.id] !== s.texto;
+      return copia;
+    });
+  }
+  function seguimiento(id){
+    var todas = seguimientos();
+    for (var i=0;i<todas.length;i++) if (todas[i].id === id) return todas[i];
+    return null;
+  }
+  function guardarSeguimiento(id, texto){
+    var d = leer();
+    if (!d.seguimientos) d.seguimientos = {};
+    var base = null;
+    for (var i=0;i<SEGUIMIENTOS.length;i++) if (SEGUIMIENTOS[i].id === id) base = SEGUIMIENTOS[i];
+    if (base && String(texto) === base.texto) delete d.seguimientos[id];
+    else d.seguimientos[id] = String(texto == null ? '' : texto);
+    guardar(d);
+  }
+
   /* ---------- quiénes son los dormidos ---------- */
   function aFecha(v){
     if (!v) return null;
@@ -152,13 +291,23 @@
     return [];
   }
 
-  // Los dormidos, sin los que ya dijeron que no y sin los números caídos.
+  // Los dormidos, sin los que ya dijeron que no, sin los números caídos y sin
+  // los que ya volvieron a ser clientes.
   function dormidos(){
     return todos().filter(function(u){
-      if (!esDormido(u)) return false;
+      if (!esDormido(u) || esRevivido(u)) return false;
       var e = estadoDe(u);
       if (e && (e.estado === 'nomolestar' || e.estado === 'equivocado')) return false;
       return true;
+    });
+  }
+
+  // Los que todavía hay que contactar por primera vez: sin los que ya
+  // contestaron, que tienen su propia lista.
+  function porContactar(){
+    return dormidos().filter(function(u){
+      var e = estadoDe(u);
+      return !(e && e.estado === 'interesado');
     });
   }
 
@@ -174,7 +323,7 @@
   function porOla(){
     var mapa = {};
     OLAS.forEach(function(o){ mapa[o.id] = { ola:o, gente:[] }; });
-    dormidos().forEach(function(u){
+    porContactar().forEach(function(u){
       var o = olaDe(u);
       if (o) mapa[o.id].gente.push(u);
     });
@@ -219,10 +368,15 @@
     });
   }
 
-  function enviar(u, texto){
+  /* `respuesta` marca los mensajes de seguimiento: son contestaciones dentro
+     de una conversación que la persona ya empezó, no mensajes en frío. No
+     gastan cupo ni pisan el estado, porque el riesgo que el tope evita es
+     escribirle a desconocidos, no responderle a alguien que te habló. */
+  function enviar(u, texto, respuesta){
     var url = 'https://wa.me/' + tel(u) + '?text=' + encodeURIComponent(texto);
     if (window.APPIWhatsApp && window.APPIWhatsApp.abrir) window.APPIWhatsApp.abrir(url);
     else window.open(url, '_blank', 'noopener');
+    if (respuesta) return;
     sumarEnvio();
     // Se da por escrito; si contesta se cambia a mano.
     if (!estadoDe(u)) marcar(u, 'sinrespuesta');
@@ -289,6 +443,15 @@
       '.re-estado{display:inline-flex;align-items:center;gap:5px;margin-top:7px;padding:4px 10px;border-radius:999px;',
       'font-size:10.5px;font-weight:900;color:#fff}',
       /* varios */
+      /* los que contestaron: es el resultado de la campaña, tiene que gritar */
+      '.re-item.re-destacado{border-color:rgba(58,208,164,.4);background:linear-gradient(135deg,rgba(58,208,164,.12),rgba(91,141,239,.08))}',
+      '.re-item.re-destacado strong{color:#20705c}',
+      '.re-item.re-destacado .re-n{background:linear-gradient(135deg,#3ad0a4,#25b88f)}',
+      '.re-logro{margin-top:12px;padding:12px 14px;border-radius:14px;background:rgba(58,208,164,.1);color:#20705c;font-size:12.5px;font-weight:800}',
+      '.re-logro small{display:block;margin-top:3px;color:#59897c;font-size:10.5px;font-weight:600}',
+      '.re-logro-btn{width:100%;min-height:50px;border:0;border-radius:14px;background:linear-gradient(135deg,#3ad0a4,#25b88f);',
+      'color:#fff;font:inherit;font-size:13.5px;font-weight:850;cursor:pointer;box-shadow:0 6px 16px rgba(37,184,143,.26)}',
+      '.re-hint{display:block;margin-top:8px;color:#777887;font-size:10.5px;line-height:1.45;text-align:center}',
       '.re-nota{margin-top:14px;padding:12px 14px;border-radius:14px;background:rgba(245,179,1,.11);color:#8a6100;font-size:11.5px;line-height:1.55}',
       '.re-vacio{margin-top:16px;padding:22px 16px;border-radius:15px;background:rgba(255,255,255,.7);color:#777887;',
       'font-size:12.5px;text-align:center;line-height:1.6}',
@@ -373,6 +536,18 @@
     }
 
     var html = cupoHtml();
+
+    // Lo primero de todo: los que ya contestaron. Es el resultado de la
+    // campaña, y si queda enterrado abajo se pierde la venta que ya ganaste.
+    var conts = contestaron();
+    if (conts.length){
+      html += '<div class="re-list"><button type="button" class="re-item re-destacado" id="reContestaron">' +
+        '<span class="re-ico">🔥</span>' +
+        '<span><strong>' + conts.length + (conts.length === 1 ? ' te contestó' : ' te contestaron') + '</strong>' +
+        '<small>Seguilos ahora, es lo que vale de toda la campaña</small></span>' +
+        '<span class="re-n">' + conts.length + '</span></button></div>';
+    }
+
     html += '<div class="re-list">';
     grupos.forEach(function(g){
       html += '<button type="button" class="re-item" data-re-ola="' + esc(g.ola.id) + '">' +
@@ -381,15 +556,174 @@
         '<span class="re-n">' + g.gente.length + '</span></button>';
     });
     html += '</div>';
+    var revs = revividos();
+    if (revs.length){
+      html += '<div class="re-logro">🎉 ' + revs.length +
+        (revs.length === 1 ? ' cliente reactivado' : ' clientes reactivados') +
+        '<small>Volvieron al circuito normal de mantenimiento</small></div>';
+    }
     html += '<div class="re-nota">Empezá por un solo barrio de la primera ola. Con esa tanda vas a ' +
       'aprender qué contestan, y te queda el resto de la lista intacta para hacerlo mejor.</div>';
-    html += '<button type="button" class="re-volver" id="reEditar">✏️ Editar el mensaje</button>';
+    html += '<button type="button" class="re-volver" id="reEditar">✏️ Editar los mensajes</button>';
     cuerpo.innerHTML = html;
 
     cuerpo.querySelectorAll('[data-re-ola]').forEach(function(b){
       b.onclick = function(){ verBarrios(b.getAttribute('data-re-ola')); };
     });
-    cuerpo.querySelector('#reEditar').onclick = editarTexto;
+    var bc = cuerpo.querySelector('#reContestaron');
+    if (bc) bc.onclick = verContestaron;
+    cuerpo.querySelector('#reEditar').onclick = elegirQueEditar;
+    ov.classList.add('open');
+  }
+
+  /* Los que contestaron: la lista que hay que trabajar. */
+  function verContestaron(){
+    var ov = overlay();
+    var cuerpo = ov.querySelector('#reCuerpo');
+    var gente = contestaron();
+    ov.querySelector('#reTitulo').textContent = '🔥 Te contestaron';
+    ov.querySelector('#reSub').textContent = gente.length ? 'Elegí a quién seguirle la conversación' : '';
+
+    if (!gente.length){
+      cuerpo.innerHTML = '<div class="re-vacio">Todavía no marcaste a nadie como “contestó”.<br>' +
+        'Cuando alguien te responda, marcalo y va a aparecer acá.</div>' +
+        '<button type="button" class="re-volver" id="reVolverC">‹ Volver</button>';
+      cuerpo.querySelector('#reVolverC').onclick = abrir;
+      ov.classList.add('open');
+      return;
+    }
+
+    var html = '<div class="re-list">';
+    gente.forEach(function(u, i){
+      var ant = antiguedad(u);
+      var anios = ant ? Math.floor(ant / 365) : 0;
+      html += '<button type="button" class="re-item" data-re-cont="' + i + '">' +
+        '<span class="re-ico">💬</span>' +
+        '<span><strong>' + esc(u.usuario || '') + '</strong><small>' +
+        esc(u.localidad || '') + ' · venció hace ' + anios + (anios === 1 ? ' año' : ' años') +
+        '</small></span><span class="re-go">›</span></button>';
+    });
+    html += '</div>';
+    html += '<button type="button" class="re-volver" id="reVolverC">‹ Volver</button>';
+    cuerpo.innerHTML = html;
+    cuerpo.querySelectorAll('[data-re-cont]').forEach(function(b){
+      b.onclick = function(){ verSeguimiento(gente[Number(b.getAttribute('data-re-cont'))]); };
+    });
+    cuerpo.querySelector('#reVolverC').onclick = abrir;
+    ov.classList.add('open');
+  }
+
+  /* La ficha del que contestó: qué respondió y cómo se le sigue. */
+  function verSeguimiento(u){
+    var ov = overlay();
+    var cuerpo = ov.querySelector('#reCuerpo');
+    var nombre = (typeof window.nombreDePila === 'function' ? window.nombreDePila(u.usuario) : '') || u.usuario;
+    ov.querySelector('#reTitulo').textContent = '💬 ' + nombre;
+    ov.querySelector('#reSub').textContent = '¿Qué te contestó?';
+
+    var html = '<div class="re-quien"><b>' + esc(u.usuario || '') + '</b><small>' +
+      esc([u.domicilio, u.localidad, u.producto].filter(Boolean).join(' · ')) + '</small></div>';
+    html += '<div class="re-list">';
+    seguimientos().forEach(function(s){
+      var resumen = completar(s.texto, u).replace(/\n+/g, ' ').slice(0, 64);
+      html += '<button type="button" class="re-item" data-re-seg="' + esc(s.id) + '">' +
+        '<span class="re-ico">' + s.icono + '</span>' +
+        '<span><strong>' + esc(s.nombre) + (s.editada ? ' ✏️' : '') + '</strong>' +
+        '<small>' + esc(resumen) + '…</small></span>' +
+        '<span class="re-go">💬</span></button>';
+    });
+    html += '</div>';
+    html += '<div class="re-marcar"><span>¿Ya volvió a ser cliente?</span>' +
+      '<button type="button" class="re-logro-btn" id="reReactivar">🎉 Lo reactivé</button>' +
+      '<small class="re-hint">Sale de esta campaña y vuelve al circuito normal de mantenimiento.</small></div>';
+    html += '<button type="button" class="re-volver" id="reVolverS">‹ Volver</button>';
+    cuerpo.innerHTML = html;
+
+    cuerpo.querySelectorAll('[data-re-seg]').forEach(function(b){
+      b.onclick = function(){
+        var s = seguimiento(b.getAttribute('data-re-seg'));
+        if (!s) return;
+        enviar(u, completar(s.texto, u), true);
+        cerrar();
+      };
+    });
+    cuerpo.querySelector('#reReactivar').onclick = function(){
+      reactivar(u);
+      if (typeof window.showToast === 'function') window.showToast('¡Cliente reactivado! 🎉');
+      montar();
+      // Vuelve al circuito normal: los pendientes del día lo toman de nuevo.
+      if (window.APPIMensajes && window.APPIMensajes.pintarHoy) window.APPIMensajes.pintarHoy();
+      verContestaron();
+    };
+    cuerpo.querySelector('#reVolverS').onclick = verContestaron;
+    ov.classList.add('open');
+  }
+
+  /* Elegir qué texto editar: el primero o los de seguimiento. */
+  function elegirQueEditar(){
+    var ov = overlay();
+    var cuerpo = ov.querySelector('#reCuerpo');
+    ov.querySelector('#reTitulo').textContent = '✏️ Los mensajes';
+    ov.querySelector('#reSub').textContent = 'Elegí cuál querés cambiar';
+
+    var html = '<div class="re-list">';
+    html += '<button type="button" class="re-item" data-re-edit="primero">' +
+      '<span class="re-ico">👋</span><span><strong>El primer mensaje</strong>' +
+      '<small>El que abre la conversación</small></span><span class="re-go">›</span></button>';
+    seguimientos().forEach(function(s){
+      html += '<button type="button" class="re-item" data-re-edit="' + esc(s.id) + '">' +
+        '<span class="re-ico">' + s.icono + '</span>' +
+        '<span><strong>' + esc(s.nombre) + (s.editada ? ' ✏️' : '') + '</strong>' +
+        '<small>' + esc(s.pista) + '</small></span><span class="re-go">›</span></button>';
+    });
+    html += '</div>';
+    html += '<button type="button" class="re-volver" id="reVolverE">‹ Volver</button>';
+    cuerpo.innerHTML = html;
+    cuerpo.querySelectorAll('[data-re-edit]').forEach(function(b){
+      b.onclick = function(){
+        var id = b.getAttribute('data-re-edit');
+        if (id === 'primero') editarTexto();
+        else editarSeguimiento(id);
+      };
+    });
+    cuerpo.querySelector('#reVolverE').onclick = abrir;
+    ov.classList.add('open');
+  }
+
+  function editarSeguimiento(id){
+    var s = seguimiento(id);
+    if (!s) return;
+    var ov = overlay();
+    var cuerpo = ov.querySelector('#reCuerpo');
+    ov.querySelector('#reTitulo').textContent = s.icono + ' ' + s.nombre;
+    ov.querySelector('#reSub').textContent = s.pista;
+
+    var ejemplo = { usuario:'GOMEZ, ANA MARIA', localidad:'Alta Gracia', domicilio:'San Martín 120', fCompra:'15/03/2014' };
+    var html = '<div class="re-caja"><textarea id="reTexto" spellcheck="true">' + esc(s.texto) + '</textarea></div>';
+    html += '<div class="re-prev"><b>Ejemplo</b><span id="rePrev"></span></div>';
+    html += '<button type="button" class="re-sec" id="reGuardar">Guardar</button>';
+    if (s.editada) html += '<button type="button" class="re-sec" id="reRestaurar">Volver al texto original</button>';
+    html += '<button type="button" class="re-volver" id="reVolver3">‹ Volver</button>';
+    cuerpo.innerHTML = html;
+
+    var ta = cuerpo.querySelector('#reTexto');
+    var prev = cuerpo.querySelector('#rePrev');
+    function repintar(){ prev.textContent = completar(ta.value, ejemplo); }
+    repintar();
+    ta.oninput = repintar;
+    cuerpo.querySelector('#reGuardar').onclick = function(){
+      guardarSeguimiento(id, ta.value);
+      if (typeof window.showToast === 'function') window.showToast('Guardado ✓');
+      elegirQueEditar();
+    };
+    var r = cuerpo.querySelector('#reRestaurar');
+    if (r) r.onclick = function(){
+      var base = null;
+      for (var i=0;i<SEGUIMIENTOS.length;i++) if (SEGUIMIENTOS[i].id === id) base = SEGUIMIENTOS[i];
+      if (base) guardarSeguimiento(id, base.texto);
+      editarSeguimiento(id);
+    };
+    cuerpo.querySelector('#reVolver3').onclick = elegirQueEditar;
     ov.classList.add('open');
   }
 
@@ -599,8 +933,19 @@
   window.APPIReactivacion = {
     OLAS: OLAS,
     ESTADOS: ESTADOS,
+    SEGUIMIENTOS: SEGUIMIENTOS,
     TOPE_DIARIO: TOPE_DIARIO,
     PLANTILLA_BASE: PLANTILLA_BASE,
+    contestaron: contestaron,
+    porContactar: porContactar,
+    reactivar: reactivar,
+    deshacerReactivar: deshacerReactivar,
+    esRevivido: esRevivido,
+    revividos: revividos,
+    seguimientos: seguimientos,
+    seguimiento: seguimiento,
+    guardarSeguimiento: guardarSeguimiento,
+    verContestaron: verContestaron,
     dormidos: dormidos,
     porOla: porOla,
     porBarrio: porBarrio,

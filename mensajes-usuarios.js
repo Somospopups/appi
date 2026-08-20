@@ -193,6 +193,10 @@
      'vigente' | 'vencido' (menos de un año) | 'inactivo' (más de un año) */
   function grupoDe(u){
     if (!u) return 'inactivo';
+    // Al que se rescató de la campaña de dormidos se lo trata como cliente
+    // otra vez: su fecha de vencimiento vive en el Excel y no cambia, así que
+    // sin esto seguiría figurando como perdido para siempre.
+    if (window.APPIReactivacion && window.APPIReactivacion.esRevivido && window.APPIReactivacion.esRevivido(u)) return 'vigente';
     var v = aFecha(u.fVence);
     if (!v) return 'vigente';           // sin fecha, se lo trata como activo
     var d = dias(hoy(), v);             // positivo = ya venció

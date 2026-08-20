@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v282-reactivacion-de-dormidos';
+const CACHE_NAME = 'appi-v283-cerrar-el-circulo';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
