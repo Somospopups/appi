@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v283-cerrar-el-circulo';
+const CACHE_NAME = 'appi-v284-aviso-cuidar-el-numero';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

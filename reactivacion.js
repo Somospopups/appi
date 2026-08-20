@@ -452,6 +452,26 @@
       '.re-logro-btn{width:100%;min-height:50px;border:0;border-radius:14px;background:linear-gradient(135deg,#3ad0a4,#25b88f);',
       'color:#fff;font:inherit;font-size:13.5px;font-weight:850;cursor:pointer;box-shadow:0 6px 16px rgba(37,184,143,.26)}',
       '.re-hint{display:block;margin-top:8px;color:#777887;font-size:10.5px;line-height:1.45;text-align:center}',
+      /* el aviso de WhatsApp: es serio, así que se ve serio */
+      '.re-aviso{margin-top:14px}',
+      '.re-aviso-ico{width:56px;height:56px;margin:0 auto 12px;border-radius:18px;display:grid;place-items:center;',
+      'background:linear-gradient(135deg,#f5b301,#ff8f6b);font-size:27px;box-shadow:0 8px 20px rgba(245,179,1,.28)}',
+      '.re-aviso h3{margin:0 0 8px;color:#292938;font-size:18px;text-align:center}',
+      '.re-aviso-bajada{margin:0 0 16px;padding:13px 14px;border-radius:14px;background:rgba(217,83,79,.09);',
+      'border:1px solid rgba(217,83,79,.18);color:#a33b37;font-size:12.5px;line-height:1.55;text-align:center}',
+      '.re-aviso-bajada b{color:#8d2b28}',
+      '.re-regla{display:grid;grid-template-columns:auto minmax(0,1fr);gap:11px;align-items:start;',
+      'padding:12px 13px;margin-bottom:8px;border-radius:14px;background:#fff;border:1px solid rgba(80,90,130,.1)}',
+      '.re-regla-n{display:grid;place-items:center;width:26px;height:26px;border-radius:50%;',
+      'background:linear-gradient(135deg,#5b8def,#a06bff);color:#fff;font-size:12.5px;font-weight:900}',
+      '.re-regla b{display:block;color:#30303d;font-size:13px;font-weight:800}',
+      '.re-regla small{display:block;margin-top:3px;color:#777887;font-size:11px;line-height:1.5}',
+      '.re-aviso-pie{margin-top:13px;padding:12px 14px;border-radius:14px;background:rgba(91,141,239,.09);',
+      'color:#3d63c9;font-size:11.5px;line-height:1.55;text-align:center}',
+      '.re-aviso-ok{margin-top:16px}',
+      'body.dark .re-aviso h3{color:#f2f2f7}',
+      'body.dark .re-regla{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.1)}',
+      'body.dark .re-regla b{color:#f2f2f7}',
       '.re-nota{margin-top:14px;padding:12px 14px;border-radius:14px;background:rgba(245,179,1,.11);color:#8a6100;font-size:11.5px;line-height:1.55}',
       '.re-vacio{margin-top:16px;padding:22px 16px;border-radius:15px;background:rgba(255,255,255,.7);color:#777887;',
       'font-size:12.5px;text-align:center;line-height:1.6}',
@@ -472,6 +492,70 @@
       'body.dark .re-caja textarea{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.12);color:#f2f2f7}'
     ].join('');
     document.head.appendChild(st);
+  }
+
+  /* ---------- el aviso de WhatsApp ---------- */
+  /* Se muestra la primera vez que se abre la campaña. Es lo único de la app
+     que puede costarle al distribuidor su herramienta de trabajo: WhatsApp no
+     avisa antes de restringir una cuenta, y recuperarla no siempre se puede. */
+  function vioElAviso(){ return !!leer().avisoVisto; }
+  function marcarAvisoVisto(){
+    var d = leer();
+    d.avisoVisto = new Date().toISOString();
+    guardar(d);
+  }
+
+  function avisoHtml(){
+    return '<div class="re-aviso">' +
+      '<div class="re-aviso-ico">⚠️</div>' +
+      '<h3>Antes de empezar, leé esto</h3>' +
+      '<p class="re-aviso-bajada">Vas a escribirle a gente que hace años no te habla. ' +
+      'Para WhatsApp eso se parece bastante al spam, y si se pasa de la raya ' +
+      '<b>te puede restringir o bloquear el número</b>. Casi nunca se recupera.</p>' +
+
+      '<div class="re-regla"><span class="re-regla-n">1</span><div>' +
+      '<b>Máximo ' + TOPE_DIARIO + ' por día</b>' +
+      '<small>La app te frena sola cuando llegás. No busques la vuelta: es el límite que hace que esto sea seguro.</small>' +
+      '</div></div>' +
+
+      '<div class="re-regla"><span class="re-regla-n">2</span><div>' +
+      '<b>Espaciados, no todos juntos</b>' +
+      '<small>Quince mensajes en cinco minutos es una señal clarísima. Repartilos a lo largo del día.</small>' +
+      '</div></div>' +
+
+      '<div class="re-regla"><span class="re-regla-n">3</span><div>' +
+      '<b>Cambiá algo en cada uno</b>' +
+      '<small>El mensaje ya lleva el nombre y el barrio de cada persona. Si además le agregás una línea propia, mejor todavía.</small>' +
+      '</div></div>' +
+
+      '<div class="re-regla"><span class="re-regla-n">4</span><div>' +
+      '<b>Respetá el “no molestar”</b>' +
+      '<small>Al que te pide que no le escribas más, marcalo. Si insistís, te reporta — y varios reportes es lo que dispara el bloqueo.</small>' +
+      '</div></div>' +
+
+      '<div class="re-regla"><span class="re-regla-n">5</span><div>' +
+      '<b>Al que contesta, contestale</b>' +
+      '<small>Una conversación de ida y vuelta le dice a WhatsApp que sos una persona, no un robot. Es lo que mejor protege tu número.</small>' +
+      '</div></div>' +
+
+      '<div class="re-aviso-pie">Si te llega un aviso de WhatsApp, parate unos días. ' +
+      'Más vale tardar tres meses en recorrer la lista que quedarte sin el número.</div>' +
+      '</div>';
+  }
+
+  function verAviso(despues){
+    var ov = overlay();
+    var cuerpo = ov.querySelector('#reCuerpo');
+    ov.querySelector('#reTitulo').textContent = 'Cuidar tu número';
+    ov.querySelector('#reSub').textContent = 'Cinco reglas, una sola vez';
+    cuerpo.innerHTML = avisoHtml() +
+      '<button type="button" class="re-enviar re-aviso-ok" id="reAvisoOk">Entendido, arranquemos</button>';
+    cuerpo.querySelector('#reAvisoOk').onclick = function(){
+      marcarAvisoVisto();
+      if (typeof despues === 'function') despues();
+      else abrir();
+    };
+    ov.classList.add('open');
   }
 
   /* ---------- popup ---------- */
@@ -513,7 +597,8 @@
         '<div class="re-barra"><i style="width:100%"></i></div></div>';
     }
     return '<div class="re-cupo"><b>Te quedan ' + quedan + ' de los ' + TOPE_DIARIO + ' de hoy</b>' +
-      '<small>El tope protege tu número: son mensajes a gente que hace años no te escribe.</small>' +
+      '<small>El tope protege tu número: son mensajes a gente que hace años no te escribe. ' +
+      'Mandalos espaciados, no todos juntos.</small>' +
       '<div class="re-barra"><i style="width:' + pct + '%"></i></div></div>';
   }
 
@@ -521,6 +606,8 @@
   function abrir(){
     var ov = overlay();
     fila = null;
+    // La primera vez, las reglas antes que nada.
+    if (!vioElAviso()){ verAviso(); return; }
     var cuerpo = ov.querySelector('#reCuerpo');
     ov.querySelector('#reTitulo').textContent = '😴 Clientes dormidos';
     var grupos = porOla();
@@ -565,6 +652,7 @@
     html += '<div class="re-nota">Empezá por un solo barrio de la primera ola. Con esa tanda vas a ' +
       'aprender qué contestan, y te queda el resto de la lista intacta para hacerlo mejor.</div>';
     html += '<button type="button" class="re-volver" id="reEditar">✏️ Editar los mensajes</button>';
+    html += '<button type="button" class="re-volver" id="reVerAviso">⚠️ Cómo cuidar tu número</button>';
     cuerpo.innerHTML = html;
 
     cuerpo.querySelectorAll('[data-re-ola]').forEach(function(b){
@@ -573,6 +661,7 @@
     var bc = cuerpo.querySelector('#reContestaron');
     if (bc) bc.onclick = verContestaron;
     cuerpo.querySelector('#reEditar').onclick = elegirQueEditar;
+    cuerpo.querySelector('#reVerAviso').onclick = function(){ verAviso(abrir); };
     ov.classList.add('open');
   }
 
@@ -946,6 +1035,8 @@
     seguimiento: seguimiento,
     guardarSeguimiento: guardarSeguimiento,
     verContestaron: verContestaron,
+    verAviso: verAviso,
+    vioElAviso: vioElAviso,
     dormidos: dormidos,
     porOla: porOla,
     porBarrio: porBarrio,

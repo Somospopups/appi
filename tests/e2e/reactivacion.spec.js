@@ -45,7 +45,9 @@ const LISTA = [
   dormido(8, 'SOSA, ELENA', 'Alta Gracia', 4000)
 ];
 
-async function entrar(page, users = LISTA) {
+// El aviso de WhatsApp se muestra una sola vez y taparía todos los tests que
+// van a la campaña. Se lo da por leído salvo que el test lo pida.
+async function entrar(page, users = LISTA, { conAviso = false } = {}) {
   const accessToken = tokenFor(USER_ID);
   const profile = {
     user_id: USER_ID, username: null, dip: '02-9802014', sucursal: '02', numero_distribuidor: '9802014',
@@ -66,11 +68,15 @@ async function entrar(page, users = LISTA) {
     return route.fulfill({ status: 200, headers: cors, body: '[]' });
   });
   await page.route('**/tile.openstreetmap.org/**', route => route.abort());
-  await page.addInitScript(([u]) => {
+  await page.addInitScript(([u, aviso]) => {
     localStorage.setItem('welcomeSeen', '1');
     localStorage.setItem('tutoVisto_v2', '1');
     localStorage.setItem('usuarios_garantias', JSON.stringify(u));
-  }, [users]);
+    if (!aviso) {
+      localStorage.setItem('appi_reactivacion_v1_11111111-1111-4111-8111-111111111111',
+        JSON.stringify({ avisoVisto: new Date().toISOString() }));
+    }
+  }, [users, conAviso]);
   await page.goto('/index.html', { waitUntil: 'networkidle' });
   await page.locator('#distributorInput').fill('02-9802014');
   await page.locator('#distributorPassword').fill('Clave1234');
@@ -180,7 +186,9 @@ test('el tope diario corta la campaña y explica por qué', async ({ page }) => 
     const k = 'appi_reactivacion_v1_' + window.APPIAuth.userId();
     const h = new Date();
     const dia = h.getFullYear() + '-' + String(h.getMonth()+1).padStart(2,'0') + '-' + String(h.getDate()).padStart(2,'0');
-    localStorage.setItem(k, JSON.stringify({ porDia: { [dia]: 15 } }));
+    const prev = JSON.parse(localStorage.getItem(k) || '{}');
+    prev.porDia = { [dia]: 15 };
+    localStorage.setItem(k, JSON.stringify(prev));
   });
   await page.locator('#usuariosBtnDormidos').click();
   await expect(page.locator('.re-cupo')).toContainText('Por hoy alcanza');
@@ -444,4 +452,57 @@ test('los textos de seguimiento se editan y vuelven al original', async ({ page 
   await page.locator('[data-re-edit="roto"]').click();
   await page.locator('#reRestaurar').click();
   await expect(page.locator('#reTexto')).toContainText('filtro tapado');
+});
+
+/* ---------- el aviso de WhatsApp ---------- */
+
+test('la primera vez que se abre la campaña, aparece el aviso', async ({ page }) => {
+  await entrar(page, LISTA, { conAviso: true });
+  await page.locator('#usuariosBtnDormidos').click();
+
+  // Antes de dejar mandar nada, las reglas.
+  await expect(page.locator('.re-aviso')).toBeVisible();
+  await expect(page.locator('#reTitulo')).toContainText('Cuidar tu número');
+  await expect(page.locator('.re-aviso-bajada')).toContainText('bloquear el número');
+  await expect(page.locator('.re-regla')).toHaveCount(5);
+  // Y no se ven las olas hasta aceptarlo.
+  await expect(page.locator('[data-re-ola]')).toHaveCount(0);
+
+  await page.locator('#reAvisoOk').click();
+  await expect(page.locator('[data-re-ola]')).not.toHaveCount(0);
+});
+
+test('el aviso no vuelve a molestar después de leerlo', async ({ page }) => {
+  await entrar(page, LISTA, { conAviso: true });
+  await page.locator('#usuariosBtnDormidos').click();
+  await page.locator('#reAvisoOk').click();
+  await page.locator('#reCerrar').click();
+
+  // Segunda vez: derecho a las olas.
+  await page.locator('#usuariosBtnDormidos').click();
+  await expect(page.locator('.re-aviso')).toHaveCount(0);
+  await expect(page.locator('[data-re-ola]')).not.toHaveCount(0);
+});
+
+test('el aviso queda a mano para releerlo cuando se quiera', async ({ page }) => {
+  await entrar(page, LISTA, { conAviso: true });
+  await page.locator('#usuariosBtnDormidos').click();
+  await page.locator('#reAvisoOk').click();
+
+  await page.locator('#reVerAviso').click();
+  await expect(page.locator('.re-aviso')).toBeVisible();
+  // Y se vuelve sin perder el lugar.
+  await page.locator('#reAvisoOk').click();
+  await expect(page.locator('[data-re-ola]')).not.toHaveCount(0);
+});
+
+test('el aviso nombra las reglas que de verdad protegen el número', async ({ page }) => {
+  await entrar(page, LISTA, { conAviso: true });
+  await page.locator('#usuariosBtnDormidos').click();
+  const texto = (await page.locator('.re-aviso').innerText()).toLowerCase();
+  expect(texto).toContain('15 por día');
+  expect(texto).toContain('espaciados');
+  expect(texto).toContain('no molestar');
+  // La más importante: contestarle al que contesta.
+  expect(texto).toContain('contestale');
 });
