@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v276-el-gesto-atras-cierra-el-panel';
+const CACHE_NAME = 'appi-v277-el-boton-mapa-abre-y-cierra';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

@@ -148,8 +148,10 @@ test('las herramientas viven arriba y Tarjetas abre su popup', async ({ page }) 
     tarjetas: { byKey: { 'tel:3515551001': [{ marca: 'visa', banco: 'galicia' }] } }
   });
 
-  const tools = page.locator('.u-tools button');
+  // Cinco a la vista; el sexto es Limpiar, que aparece sólo con un filtro.
+  const tools = page.locator('.u-tools button:visible');
   await expect(tools).toHaveCount(5);
+  await expect(page.locator('#usuariosBtnLimpiar')).toBeHidden();
   await expect(page.locator('#usuariosBtnTarjetas')).toBeVisible();
   await expect(page.locator('#usuariosBtnMapAll')).toBeVisible();
   await expect(page.locator('#usuariosBtnZonas')).toBeVisible();

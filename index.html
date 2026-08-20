@@ -4116,7 +4116,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v276 · Segura</div>
+  <div class="ds-foot">APPI · v277 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4965,6 +4965,9 @@ body.dark #pageTabs button.active{color:#a8c0ff}
         <button type="button" id="usuariosBtnOrdenVence"><span>📅</span>Ordenar</button>
         <button type="button" id="usuariosBtnZonas"><span>📍</span>Zonas</button>
         <button type="button" id="usuariosBtnCambiarArchivo"><span>📂</span>Cambiar archivo</button>
+        <!-- Aparece sólo con un filtro puesto. Va aparte para que Mapa siga
+             siendo Mapa: es el mismo botón que abre y cierra el mapa. -->
+        <button type="button" id="usuariosBtnLimpiar" class="limpiar" hidden><span>🧹</span>Limpiar</button>
       </div>
       <div class="glass">
         <div id="usuariosFiltroBotones"></div>
@@ -11535,7 +11538,7 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='276';
+      const swVersion='277';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 
@@ -12907,7 +12910,18 @@ body.dark .search-box input{color:#ffffff !important}
 .u-tools button span{font-size:17px;line-height:1}
 .u-tools button:hover{background:rgba(91,141,239,.1);transform:translateY(-1px)}
 .u-tools button:active{transform:none}
+/* Con el mapa abierto el botón queda marcado: así se sabe que ese mismo toque
+   lo vuelve a cerrar. */
+.u-tools button.activo{background:linear-gradient(135deg,#5b8def,#a06bff);border-color:transparent;color:#fff;box-shadow:0 6px 16px rgba(91,112,210,.26)}
+.u-tools button.activo:hover{background:linear-gradient(135deg,#5b8def,#a06bff)}
+/* Limpiar sólo existe mientras haya un filtro puesto. */
+.u-tools button.limpiar{background:linear-gradient(135deg,#ff6b6b,#ff8f6b);border-color:transparent;color:#fff;box-shadow:0 5px 14px rgba(255,107,107,.32)}
+.u-tools button.limpiar:hover{background:linear-gradient(135deg,#ff6b6b,#ff8f6b)}
+.u-tools button[hidden]{display:none}
+/* Con seis, entran de a tres para que no queden espichados. */
+.u-tools:has(#usuariosBtnLimpiar:not([hidden])){grid-template-columns:repeat(3,1fr)}
 body.dark .u-tools button{background:rgba(31,32,49,.74);border-color:rgba(255,255,255,.08);color:#c9cad6}
+body.dark .u-tools button.activo{background:linear-gradient(135deg,#5b8def,#a06bff);color:#fff}
 @media(min-width:600px){.u-tools{gap:8px}.u-tools button{font-size:10.5px;min-height:66px}}
 
 
@@ -13988,53 +14002,15 @@ function aplicarFiltrosU(){
   if(btnVerTodos){
     btnVerTodos.style.display=isFiltered?'inline-flex':'none';
   }
-  // Transformar boton Mapa general -> Limpiar Busqueda cuando hay filtro, con titilado suave
-  if(btnMapAll){
-    if(isFiltered){
-      // Guardar handler original de mapa si no existe
-      if(!btnMapAll.dataset.origText){
-        btnMapAll.dataset.origText=btnMapAll.textContent;
-        btnMapAll.dataset.origOnclick='map';
-      }
-      // El botón vive en la barra del pie: se conserva el ícono arriba y la
-      // palabra abajo, si no el texto largo desborda la celda.
-      btnMapAll.innerHTML='<span>🧹</span>Limpiar';
-      btnMapAll.classList.add('blink-soft');
-      btnMapAll.style.background='linear-gradient(135deg,#ff6b6b,#ff8f6b)';
-      btnMapAll.style.color='#fff';
-      btnMapAll.style.border='none';
-      btnMapAll.style.boxShadow='0 4px 14px rgba(255,107,107,0.35)';
-      btnMapAll.onclick=()=>{ resetFiltrosU(); };
-    }else{
-      btnMapAll.innerHTML='<span>🗺️</span>Mapa';
-      btnMapAll.classList.remove('blink-soft');
-      btnMapAll.style.background='';
-      btnMapAll.style.color='';
-      btnMapAll.style.border='';
-      btnMapAll.style.boxShadow='';
-      // Restaurar handler original de mapa
-      btnMapAll.onclick=()=>{
-        const mapDiv=document.getElementById('usuariosMap');
-        if(mapDiv){
-          const willShow=!mapDiv.classList.contains('show');
-          mapDiv.classList.toggle('show');
-          if(willShow){
-            mapDiv.style.display='block';
-            mapDiv.style.height='420px';
-            if(!mapU){
-              try{
-                mapU=L.map('usuariosMap',{zoomControl:true}).setView([-31.4201,-64.1888],12);
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap', maxZoom:19}).addTo(mapU);
-              }catch(e){ console.log('map init fail',e); }
-            }
-            setTimeout(()=>{ try{ if(mapU) mapU.invalidateSize(true); }catch(e){} },150);
-            setTimeout(()=>{ try{ if(mapU) mapU.invalidateSize(true); }catch(e){} },500);
-            setTimeout(()=>{ try{ if(mapU) mapU.invalidateSize(true); }catch(e){} },1200);
-          }
-        }
-      };
-    }
+  // Con un filtro puesto aparece "Limpiar" como botón aparte. Mapa se queda
+  // como está: es el mismo botón que abre y cierra el mapa, y transformarlo
+  // dejaba sin forma de cerrarlo justo cuando había un filtro.
+  const btnLimpiar=document.getElementById('usuariosBtnLimpiar');
+  if(btnLimpiar){
+    btnLimpiar.hidden=!isFiltered;
+    btnLimpiar.onclick=()=>{ resetFiltrosU(); };
   }
+  if(btnMapAll) btnMapAll.onclick=()=>{ window.alternarMapaU(); };
   renderListU();
 }
 function renderListU(){
@@ -14348,23 +14324,44 @@ async function geocodePreciseForUser(u){
   return null;
 }
 
-window.mostrarEnMapaU=async function(query, lista=null){
+// El mapa se abre y se cierra desde un solo lugar. Antes cada punto ponía
+// `style.display='block'` a mano y ese estilo en línea le ganaba al CSS: al
+// quitar la clase el mapa seguía a la vista y el botón no lo podía cerrar.
+window.abrirMapaU=function(){
   const mapDiv=document.getElementById('usuariosMap');
-  if(!mapDiv) return;
+  if(!mapDiv) return null;
   mapDiv.classList.add('show');
-  mapDiv.style.display='block';
-  mapDiv.style.height='420px';
+  mapDiv.style.removeProperty('display');
+  const btn=document.getElementById('usuariosBtnMapAll');
+  if(btn) btn.classList.add('activo');
   if(!mapU){
     try{
-      mapU=L.map('usuariosMap',{zoomControl:true}).setView([-31.4201,-64.1888], 12);
+      mapU=L.map('usuariosMap',{zoomControl:true}).setView([-31.4201,-64.1888],12);
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap', maxZoom:19}).addTo(mapU);
-    }catch(e){ console.log('map init fail',e); }
+    }catch(e){}
   }
-  const doInvalidate=()=>{ try{ if(mapU) mapU.invalidateSize(true); }catch(e){} };
-  setTimeout(doInvalidate,100);
-  setTimeout(doInvalidate,350);
-  setTimeout(doInvalidate,800);
-  setTimeout(doInvalidate,1500);
+  // Leaflet mide mal si lo dibujan mientras el bloque todavía está creciendo.
+  [100,350,800,1500].forEach(ms=>setTimeout(()=>{ try{ if(mapU) mapU.invalidateSize(true); }catch(e){} },ms));
+  return mapDiv;
+};
+window.cerrarMapaU=function(){
+  const mapDiv=document.getElementById('usuariosMap');
+  if(!mapDiv) return;
+  mapDiv.classList.remove('show');
+  mapDiv.style.removeProperty('display');
+  const btn=document.getElementById('usuariosBtnMapAll');
+  if(btn) btn.classList.remove('activo');
+};
+window.alternarMapaU=function(){
+  const mapDiv=document.getElementById('usuariosMap');
+  if(!mapDiv) return;
+  if(mapDiv.classList.contains('show')) window.cerrarMapaU();
+  else window.abrirMapaU();
+};
+
+window.mostrarEnMapaU=async function(query, lista=null){
+  const mapDiv=window.abrirMapaU();
+  if(!mapDiv) return;
   markersU.forEach(m=>mapU.removeLayer(m));
   markersU=[];
   // Los pines viven en vendor/images: son los mismos archivos de siempre, pero
@@ -14668,8 +14665,7 @@ function initUsuarios(){
       if(list) list.innerHTML='';
       // Limpiar mapa
       try{ markersU.forEach(m=>mapU && mapU.removeLayer(m)); markersU=[]; }catch(e){}
-      const mapDiv=document.getElementById('usuariosMap');
-      if(mapDiv){ mapDiv.classList.remove('show'); mapDiv.style.display='none'; }
+      window.cerrarMapaU();
     }
   };
   const btnCambiar=document.getElementById('usuariosBtnCambiarArchivo');
@@ -14745,26 +14741,9 @@ function initUsuarios(){
     if(window.APPIUsuariosBotones) window.APPIUsuariosBotones.abrirTarjetas();
   };
   const btnMapAll=document.getElementById('usuariosBtnMapAll');
-  if(btnMapAll) btnMapAll.onclick=()=>{
-    const mapDiv=document.getElementById('usuariosMap');
-    if(mapDiv){
-      const willShow=!mapDiv.classList.contains('show');
-      mapDiv.classList.toggle('show');
-      if(willShow){
-        mapDiv.style.display='block';
-        mapDiv.style.height='420px';
-        if(!mapU){
-          try{
-            mapU=L.map('usuariosMap',{zoomControl:true}).setView([-31.4201,-64.1888],12);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap', maxZoom:19}).addTo(mapU);
-          }catch(e){ console.log('map init fail',e); }
-        }
-        setTimeout(()=>{ try{ if(mapU) mapU.invalidateSize(true); }catch(e){} },150);
-        setTimeout(()=>{ try{ if(mapU) mapU.invalidateSize(true); }catch(e){} },500);
-        setTimeout(()=>{ try{ if(mapU) mapU.invalidateSize(true); }catch(e){} },1200);
-      }
-    }
-  };
+  // Tocar Mapa de nuevo lo cierra: es el mismo botón, así que tiene que hacer
+  // el camino de ida y el de vuelta.
+  if(btnMapAll) btnMapAll.onclick=()=>{ window.alternarMapaU(); };
   const btnVerTodos=document.getElementById('usuariosBtnVerTodos');
   if(btnVerTodos) btnVerTodos.onclick=()=>{ resetFiltrosU(); };
 
