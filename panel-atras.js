@@ -19,6 +19,7 @@
   // los crea el JS la primera vez que se usan).
   var PANELES = [
     '#ubOverlay',              // Zonas y Tarjetas de Usuarios
+    '#muOverlay',              // plantillas de mensajes
     '#tpOverlay',              // elegir marca y banco de una tarjeta
     '#histDetailOverlay',      // detalle del Histórico
     '#histActionOverlay',      // Centro de Acción del Histórico

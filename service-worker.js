@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v277-el-boton-mapa-abre-y-cierra';
+const CACHE_NAME = 'appi-v278-mensajes-para-usuarios';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
@@ -19,6 +19,7 @@ const APP_SHELL = [
   './panel-atras.js',
   './tarjetas-promos.js',
   './usuarios-botones.js',
+  './mensajes-usuarios.js',
   './escalera-suenos.js',
   './demo-guia.js',
   './tablero-negocio.js',

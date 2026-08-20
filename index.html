@@ -111,6 +111,7 @@ window.openStock=function(){
 <script src="./gestion-client.js"></script>
 <script src="./tarjetas-promos.js"></script>
 <script src="./usuarios-botones.js"></script>
+<script src="./mensajes-usuarios.js"></script>
 
 <script src="./escalera-suenos.js"></script>
 <script src="./demo-guia.js"></script>
@@ -4116,7 +4117,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v277 · Segura</div>
+  <div class="ds-foot">APPI · v278 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -11538,7 +11539,7 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='277';
+      const swVersion='278';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 
@@ -12905,7 +12906,8 @@ body.dark .search-box input{color:#ffffff !important}
 
 /* Herramientas de Usuarios: van arriba, debajo de los contadores, porque son
    la forma de recortar la lista antes de mirarla. */
-.u-tools{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:0 0 12px}
+/* Seis botones fijos: de a tres entran cómodos y se leen. */
+.u-tools{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:0 0 12px}
 .u-tools button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:62px;padding:9px 2px;border:1px solid rgba(80,90,130,.12);border-radius:14px;background:rgba(255,255,255,.7);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);color:#5a5b6b;font:inherit;font-size:9px;font-weight:800;line-height:1.2;text-align:center;cursor:pointer;transition:background .15s,transform .15s}
 .u-tools button span{font-size:17px;line-height:1}
 .u-tools button:hover{background:rgba(91,141,239,.1);transform:translateY(-1px)}
@@ -12918,8 +12920,8 @@ body.dark .search-box input{color:#ffffff !important}
 .u-tools button.limpiar{background:linear-gradient(135deg,#ff6b6b,#ff8f6b);border-color:transparent;color:#fff;box-shadow:0 5px 14px rgba(255,107,107,.32)}
 .u-tools button.limpiar:hover{background:linear-gradient(135deg,#ff6b6b,#ff8f6b)}
 .u-tools button[hidden]{display:none}
-/* Con seis, entran de a tres para que no queden espichados. */
-.u-tools:has(#usuariosBtnLimpiar:not([hidden])){grid-template-columns:repeat(3,1fr)}
+/* Con Limpiar a la vista son siete: pasan a cuatro por fila. */
+.u-tools:has(#usuariosBtnLimpiar:not([hidden])){grid-template-columns:repeat(4,1fr)}
 body.dark .u-tools button{background:rgba(31,32,49,.74);border-color:rgba(255,255,255,.08);color:#c9cad6}
 body.dark .u-tools button.activo{background:linear-gradient(135deg,#5b8def,#a06bff);color:#fff}
 @media(min-width:600px){.u-tools{gap:8px}.u-tools button{font-size:10.5px;min-height:66px}}
@@ -13825,6 +13827,9 @@ function detectarColumnasU(headers){
     else if(/producto|equipo/.test(nh) && map.producto===undefined){ map.producto=i; }
     else if(/f.*compra/.test(nh) && map.fCompra===undefined){ map.fCompra=i; }
     else if(/f.*vence|vencimiento/.test(nh) && map.fVence===undefined){ map.fVence=i; }
+    // La planilla ya traía estas dos columnas y la app las venía ignorando.
+    else if(/cumple|nacimiento/.test(nh) && map.cumple===undefined){ map.cumple=i; }
+    else if(/mail|correo/.test(nh) && map.email===undefined){ map.email=i; }
   });
   if(map.usuario===undefined) map.usuario=0;
   return {map, debug};
@@ -13872,6 +13877,8 @@ function parseRowsU(rows){
     const fCompra=get('fCompra');
     const fVenceRaw=get('fVence');
     const fVence=parseFechaU(fVenceRaw);
+    const cumpleRaw=get('cumple');
+    const email=get('email');
     let domFinal=domicilio;
     if(!domFinal){
       for(let j=0;j<r.length;j++){
@@ -13882,7 +13889,7 @@ function parseRowsU(rows){
       }
     }
     const estado=fVence? estadoVencU(fVence) : 'vigente';
-    out.push({id:i, usuario, telf, domicilio:domFinal, cp, localidad, producto, fCompra, fVenceRaw, fVence, estado, nombreNorm:normU(usuario)});
+    out.push({id:i, usuario, telf, domicilio:domFinal, cp, localidad, producto, fCompra, fVenceRaw, fVence, cumpleRaw, email, estado, nombreNorm:normU(usuario)});
   }
   debugText+=`Filas totales: ${rows.length}, Usuarios: ${out.length}`;
   return {data:out, debug:debugText};
@@ -14101,6 +14108,8 @@ function renderListU(){
 }
 window.aplicarFiltrosU=aplicarFiltrosU;
 window.usuariosFiltradosActual=function(){ return filtradosU.slice(); };
+// Las usa el módulo de mensajes, que vive en otro archivo.
+window.parseFechaU=parseFechaU;
 // Los botones de barrios y tarjetas viven en otro archivo y necesitan la lista
 // completa, no la filtrada: cada botón muestra su grupo entero.
 window.usuariosTodosActual=function(){ return usuariosU.slice(); };
@@ -14162,6 +14171,7 @@ function formatWhatsAppNumberU(telf){
   }
   return '54'+digits;
 }
+window.formatWhatsAppNumberU=formatWhatsAppNumberU;
 function getWhatsAppLinkU(u){
   const num=formatWhatsAppNumberU(u.telf||'');
   if(!num) return '';
