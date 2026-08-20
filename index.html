@@ -4113,7 +4113,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v270 · Segura</div>
+  <div class="ds-foot">APPI · v271 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4958,12 +4958,11 @@ body.dark #pageTabs button.active{color:#a8c0ff}
         <div class="stat stat-clickable" data-f="vigente" id="statVig"><b id="usuariosStVigentes" style="color:#3ad0a4">0</b><small>Vigentes</small></div>
       </div>
       <div class="glass">
+        <div id="usuariosFiltroBotones"></div>
         <div class="search-box">
           <span>🔍</span><input type="text" id="usuariosSearch" placeholder="Buscar por nombre, domicilio, localidad...">
           <button id="usuariosClearSearch" style="border:none;background:none;cursor:pointer">✕</button>
         </div>
-        <div id="usuariosZonasBotones"></div>
-        <div id="usuariosTarjetasBotones"></div>
         <div id="usuariosTarjetasBar"></div>
         <div id="usuariosActiveFilters" style="display:none;margin-top:12px;padding:10px 14px;border-radius:12px;background:rgba(91,141,239,0.10);border:1px solid rgba(91,141,239,0.18);font-size:12px;font-weight:600;color:#3a3a48"></div>
         <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
@@ -11533,7 +11532,7 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='270';
+      const swVersion='271';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 
@@ -13883,6 +13882,10 @@ function renderZonasU(){
 function resetFiltrosU(){
   filtroVencU='all';
   filtroZonaU='all';
+  // Los botones de Barrios y Tarjetas vuelven a su estado neutro junto con el
+  // resto: si no, seguirían mostrando un filtro que ya no se aplica.
+  window.filtroZonaUExterno='all';
+  if(window.APPIUsuariosBotones) window.APPIUsuariosBotones.olvidar();
   ordenAscU=true;
   window.ordenPorVenceU=false;
   const qEl=document.getElementById('usuariosSearch');
@@ -13918,6 +13921,9 @@ function resetFiltrosU(){
 function aplicarFiltrosU(){
   const qEl=document.getElementById('usuariosSearch');
   const q=qEl? normU(qEl.value) : '';
+  // El barrio se elige en el popup del botón "Barrios", que deja su elección
+  // acá. Sin esto el listado grande no se enteraría del filtro.
+  if(typeof window.filtroZonaUExterno==='string') filtroZonaU=window.filtroZonaUExterno;
   filtradosU=usuariosU.filter(u=>{
     if(filtroVencU!=='all' && u.estado!==filtroVencU) return false;
     if(filtroZonaU!=='all' && u.localidad!==filtroZonaU) return false;

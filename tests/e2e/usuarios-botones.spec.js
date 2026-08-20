@@ -1,8 +1,8 @@
 const { test, expect } = require('@playwright/test');
 
-// Los barrios y las tarjetas se eligen con botones a la vista, no con
-// desplegables. Cada botón abre el listado de su grupo en un popup y deja el
-// listado grande de la pantalla como estaba.
+// En Usuarios hay dos botones: "Barrios" y "Tarjetas". Cada uno abre un popup
+// con su listado; al elegir un ítem el popup se cierra y el listado grande de
+// la pantalla queda filtrado por esa elección. Los dos filtros son excluyentes.
 
 const USER_ID = '11111111-1111-4111-8111-111111111111';
 
@@ -14,15 +14,12 @@ function tokenFor(sub) {
 
 const dias = n => new Date(Date.now() + n * 86400000).toISOString();
 
-// Tres barrios con estados mezclados y uno sin barrio, para ver el orden y el
-// botón aparte de "Sin barrio".
 const USUARIOS = [
-  { id: 1, usuario: 'Ana Gómez',  telf: '3515551001', domicilio: 'San Martín 120', localidad: 'Alta Gracia',   fVenceRaw: '30/07/2026', fVence: dias(-20), estado: 'vencida' },
-  { id: 2, usuario: 'Beto Ruiz',  telf: '3515551002', domicilio: 'Belgrano 45',    localidad: 'Alta Gracia',   fVenceRaw: '03/09/2026', fVence: dias(15),  estado: 'porVencer' },
-  { id: 3, usuario: 'Caro Díaz',  telf: '3515551003', domicilio: 'Sarmiento 8',    localidad: 'Alta Gracia',   fVenceRaw: '07/03/2027', fVence: dias(200), estado: 'vigente' },
-  { id: 4, usuario: 'Diego Paz',  telf: '3515551004', domicilio: 'Los Álamos 33',  localidad: 'Villa Allende', fVenceRaw: '14/08/2026', fVence: dias(-5),  estado: 'vencida' },
-  { id: 5, usuario: 'Elsa Mota',  telf: '3515551005', domicilio: 'Río Ceballos 91', localidad: 'Villa Allende', fVenceRaw: '17/12/2026', fVence: dias(120), estado: 'vigente' },
-  { id: 6, usuario: 'Hugo Vera',  telf: '',           domicilio: 'Libertad 12',    localidad: '',              fVenceRaw: '18/10/2026', fVence: dias(60),  estado: 'vigente' }
+  { id: 1, usuario: 'Ana Gómez', telf: '3515551001', domicilio: 'San Martín 120',  localidad: 'Alta Gracia',   producto: 'PSA', cp: '5186', fVenceRaw: '30/07/2026', fVence: dias(-20), estado: 'vencida' },
+  { id: 2, usuario: 'Beto Ruiz', telf: '3515551002', domicilio: 'Belgrano 45',     localidad: 'Alta Gracia',   producto: 'PSA', cp: '5186', fVenceRaw: '03/09/2026', fVence: dias(15),  estado: 'porVencer' },
+  { id: 3, usuario: 'Caro Díaz', telf: '3515551003', domicilio: 'Sarmiento 8',     localidad: 'Alta Gracia',   producto: 'PSA', cp: '5186', fVenceRaw: '07/03/2027', fVence: dias(200), estado: 'vigente' },
+  { id: 4, usuario: 'Diego Paz', telf: '3515551004', domicilio: 'Los Álamos 33',   localidad: 'Villa Allende', producto: 'PSA', cp: '5105', fVenceRaw: '14/08/2026', fVence: dias(-5),  estado: 'vencida' },
+  { id: 5, usuario: 'Elsa Mota', telf: '3515551005', domicilio: 'Río Ceballos 91', localidad: 'Villa Allende', producto: 'PSA', cp: '5105', fVenceRaw: '17/12/2026', fVence: dias(120), estado: 'vigente' }
 ];
 
 async function entrar(page, { tarjetas = null } = {}) {
@@ -64,86 +61,85 @@ async function entrar(page, { tarjetas = null } = {}) {
   await expect(page.locator('#lockScreen')).toHaveClass(/hidden/);
   await page.evaluate(() => window.showView('view-usuarios'));
   await expect(page.locator('#view-usuarios')).toHaveClass(/active/);
-  await expect(page.locator('#usuariosZonasBotones .ub-btn').first()).toBeVisible();
+  await expect(page.locator('#ubBtnBarrios')).toBeVisible();
 }
 
-test('los barrios son botones con su cuenta y ya no un desplegable', async ({ page }) => {
+test('hay dos botones y ningún desplegable de zona', async ({ page }) => {
   await entrar(page);
 
-  // El desplegable de zonas no debe volver por la ventana.
+  // Exactamente dos: Barrios y Tarjetas. Ni uno por barrio ni uno por tarjeta.
+  await expect(page.locator('#usuariosFiltroBotones .ub-main')).toHaveCount(2);
+  await expect(page.locator('#ubBtnBarrios')).toContainText('Barrios');
+  await expect(page.locator('#ubBtnTarjetas')).toContainText('Tarjetas');
   await expect(page.locator('#usuariosSelectZona')).toHaveCount(0);
 
-  const botones = page.locator('#usuariosZonasBotones .ub-btn');
-  await expect(botones).toHaveCount(3); // Alta Gracia, Villa Allende y Sin barrio
-  await expect(botones.nth(0)).toContainText('Alta Gracia');
-  await expect(botones.nth(0)).toContainText('3');
-  await expect(botones.nth(1)).toContainText('Villa Allende');
-  await expect(botones.nth(1)).toContainText('2');
-  // Quien no tiene barrio no se pierde: tiene su propio botón.
-  await expect(botones.nth(2)).toContainText('Sin barrio');
-
-  // Los barrios con alguna garantía vencida se marcan con un punto rojo.
-  await expect(page.locator('[data-ub-zona="Alta Gracia"] .ub-dot')).toHaveCount(1);
+  // Van arriba del buscador.
+  const orden = await page.evaluate(() => {
+    const botones = document.getElementById('usuariosFiltroBotones');
+    const buscador = document.querySelector('#view-usuarios .search-box');
+    return botones.compareDocumentPosition(buscador) & Node.DOCUMENT_POSITION_FOLLOWING ? 'botones primero' : 'buscador primero';
+  });
+  expect(orden).toBe('botones primero');
 });
 
-test('tocar un barrio abre el popup con su gente y las vencidas primero', async ({ page }) => {
+test('el popup de Barrios lista cada barrio con su cantidad', async ({ page }) => {
   await entrar(page);
-  await page.locator('[data-ub-zona="Alta Gracia"]').click();
+  await page.locator('#ubBtnBarrios').click();
 
-  const popup = page.locator('#ubOverlay');
-  await expect(popup).toHaveClass(/open/);
-  await expect(page.locator('#ubTitulo')).toHaveText('Alta Gracia');
-  await expect(page.locator('#ubSub')).toContainText('3 usuarios');
-  await expect(page.locator('#ubSub')).toContainText('1 vencida');
+  await expect(page.locator('#ubOverlay')).toHaveClass(/open/);
+  await expect(page.locator('#ubTitulo')).toContainText('Barrios');
+  await expect(page.locator('#ubSub')).toContainText('2 barrios');
 
-  const filas = page.locator('#ubCuerpo .ub-row');
-  await expect(filas).toHaveCount(3);
-  // Lo que urge va arriba: vencida, por vencer y recién después vigente.
-  await expect(page.locator('#ubCuerpo .ub-badge').nth(0)).toHaveText('VENC');
-  await expect(page.locator('#ubCuerpo .ub-badge').nth(1)).toHaveText('POR VENC');
-  await expect(page.locator('#ubCuerpo .ub-badge').nth(2)).toHaveText('VIG');
-  await expect(filas.nth(0)).toContainText('Ana Gómez');
-
-  // Cada fila ofrece WhatsApp y llamada con el teléfono real.
-  await expect(filas.nth(0).locator('a.wa')).toHaveAttribute('href', /wa\.me\/3515551001/);
-  await expect(filas.nth(0).locator('a.tel')).toHaveAttribute('href', 'tel:3515551001');
-
-  // Nadie de otro barrio se cuela.
-  await expect(page.locator('#ubCuerpo')).not.toContainText('Diego Paz');
+  const items = page.locator('#ubCuerpo .ub-item');
+  await expect(items).toHaveCount(2);
+  await expect(items.nth(0)).toContainText('Alta Gracia');
+  await expect(items.nth(0)).toContainText('3');
+  await expect(items.nth(1)).toContainText('Villa Allende');
+  await expect(items.nth(1)).toContainText('2');
+  await expect(page.locator('[data-ub-todos]')).toContainText('Todos los barrios');
 });
 
-test('el popup no altera el listado grande de la pantalla', async ({ page }) => {
+test('elegir un barrio cierra el popup y filtra el listado', async ({ page }) => {
   await entrar(page);
-  const antes = await page.locator('#usuariosList .tree-node').count();
+  await expect(page.locator('#usuariosList .tree-node')).toHaveCount(5);
 
+  await page.locator('#ubBtnBarrios').click();
   await page.locator('[data-ub-zona="Villa Allende"]').click();
-  await expect(page.locator('#ubOverlay')).toHaveClass(/open/);
-  await expect(page.locator('#ubCuerpo .ub-row')).toHaveCount(2);
 
-  // El listado de abajo sigue completo mientras el popup está abierto.
-  await expect(page.locator('#usuariosList .tree-node')).toHaveCount(antes);
-
-  await page.locator('#ubCerrar').click();
+  // El popup se cierra solo y el listado grande queda recortado.
   await expect(page.locator('#ubOverlay')).not.toHaveClass(/open/);
-  await expect(page.locator('#usuariosList .tree-node')).toHaveCount(antes);
+  await expect(page.locator('#usuariosList .tree-node')).toHaveCount(2);
+  await expect(page.locator('#usuariosList')).toContainText('Diego Paz');
+  await expect(page.locator('#usuariosList')).not.toContainText('Ana Gómez');
+
+  // El botón deja de decir "Barrios" y muestra el filtro puesto.
+  await expect(page.locator('#ubBtnBarrios')).toContainText('Villa Allende');
+  await expect(page.locator('#ubBtnBarrios')).toHaveClass(/on/);
 });
 
-test('el popup se cierra con Escape y tocando fuera', async ({ page }) => {
+test('"Todos los barrios" y la cruz del botón devuelven el listado completo', async ({ page }) => {
   await entrar(page);
 
+  await page.locator('#ubBtnBarrios').click();
   await page.locator('[data-ub-zona="Alta Gracia"]').click();
-  await expect(page.locator('#ubOverlay')).toHaveClass(/open/);
-  await page.keyboard.press('Escape');
-  await expect(page.locator('#ubOverlay')).not.toHaveClass(/open/);
+  await expect(page.locator('#usuariosList .tree-node')).toHaveCount(3);
 
+  // Desde adentro del popup.
+  await page.locator('#ubBtnBarrios').click();
+  await page.locator('[data-ub-todos]').click();
+  await expect(page.locator('#usuariosList .tree-node')).toHaveCount(5);
+  await expect(page.locator('#ubBtnBarrios')).toContainText('Barrios');
+
+  // Y con la cruz del propio botón.
+  await page.locator('#ubBtnBarrios').click();
   await page.locator('[data-ub-zona="Alta Gracia"]').click();
-  await expect(page.locator('#ubOverlay')).toHaveClass(/open/);
-  await page.locator('#ubOverlay').click({ position: { x: 12, y: 300 } });
-  await expect(page.locator('#ubOverlay')).not.toHaveClass(/open/);
+  await expect(page.locator('#usuariosList .tree-node')).toHaveCount(3);
+  await page.locator('[data-ub-quitar="zona"]').click();
+  await expect(page.locator('#usuariosList .tree-node')).toHaveCount(5);
 });
 
-test('las tarjetas son botones por combinación real y abren su listado', async ({ page }) => {
-  // Ana y Diego con Visa Galicia; Beto con Mastercard Macro.
+test('el popup de Tarjetas filtra y reemplaza al filtro de barrio', async ({ page }) => {
+  // Ana (Alta Gracia) y Diego (Villa Allende) comparten Visa Galicia.
   await entrar(page, {
     tarjetas: {
       byKey: {
@@ -154,33 +150,44 @@ test('las tarjetas son botones por combinación real y abren su listado', async 
     }
   });
 
-  // Los desplegables de marca y banco quedan fuera de la vista.
-  await expect(page.locator('#tpUMarca')).toBeHidden();
-  await expect(page.locator('#tpUBanco')).toBeHidden();
+  await page.locator('#ubBtnBarrios').click();
+  await page.locator('[data-ub-zona="Alta Gracia"]').click();
+  await expect(page.locator('#usuariosList .tree-node')).toHaveCount(3);
 
-  const botones = page.locator('#usuariosTarjetasBotones .ub-btn');
-  // Sólo las combinaciones que alguien tiene, ordenadas por cuántos son.
-  await expect(botones.nth(0)).toContainText('Visa Galicia');
-  await expect(botones.nth(0)).toContainText('2');
-  await expect(botones.nth(1)).toContainText('Mastercard Macro');
-  await expect(page.locator('#usuariosTarjetasBotones')).not.toContainText('Amex');
-
+  await page.locator('#ubBtnTarjetas').click();
+  await expect(page.locator('#ubTitulo')).toContainText('Tarjetas');
+  const items = page.locator('#ubCuerpo .ub-item');
+  await expect(items.nth(0)).toContainText('Visa Galicia');
+  await expect(items.nth(0)).toContainText('2');
   await page.locator('[data-ub-marca="visa"][data-ub-banco="galicia"]').click();
-  await expect(page.locator('#ubTitulo')).toContainText('Visa Galicia');
-  await expect(page.locator('#ubCuerpo .ub-row')).toHaveCount(2);
-  await expect(page.locator('#ubCuerpo')).toContainText('Ana Gómez');
-  await expect(page.locator('#ubCuerpo')).toContainText('Diego Paz');
-  await expect(page.locator('#ubCuerpo')).not.toContainText('Beto Ruiz');
 
-  // Los que no tienen ninguna tarjeta también se pueden mirar.
-  await page.locator('#ubCerrar').click();
-  await page.locator('[data-ub-sin]').click();
-  await expect(page.locator('#ubTitulo')).toHaveText('Sin tarjeta cargada');
-  await expect(page.locator('#ubCuerpo')).toContainText('Caro Díaz');
+  // Los filtros no se acumulan: al poner la tarjeta, el barrio se suelta y
+  // aparece Diego, que es de otro barrio.
+  await expect(page.locator('#usuariosList .tree-node')).toHaveCount(2);
+  await expect(page.locator('#usuariosList')).toContainText('Ana Gómez');
+  await expect(page.locator('#usuariosList')).toContainText('Diego Paz');
+  await expect(page.locator('#ubBtnTarjetas')).toContainText('Visa Galicia');
+  await expect(page.locator('#ubBtnBarrios')).toContainText('Barrios');
+  await expect(page.locator('#ubBtnBarrios')).not.toHaveClass(/on/);
 });
 
-test('sin tarjetas cargadas lo dice en vez de mostrar botones vacíos', async ({ page }) => {
+test('sin tarjetas cargadas el popup lo explica en vez de quedar vacío', async ({ page }) => {
   await entrar(page);
-  await expect(page.locator('#usuariosTarjetasBotones .ub-btn')).toHaveCount(0);
-  await expect(page.locator('#usuariosTarjetasBotones')).toContainText('Todavía no hay tarjetas cargadas');
+  await page.locator('#ubBtnTarjetas').click();
+  await expect(page.locator('#ubCuerpo')).toContainText('Todavía no hay tarjetas cargadas');
+  await expect(page.locator('#ubCuerpo .ub-item')).toHaveCount(0);
+});
+
+test('el popup se cierra con Escape y tocando fuera', async ({ page }) => {
+  await entrar(page);
+
+  await page.locator('#ubBtnBarrios').click();
+  await expect(page.locator('#ubOverlay')).toHaveClass(/open/);
+  await page.keyboard.press('Escape');
+  await expect(page.locator('#ubOverlay')).not.toHaveClass(/open/);
+
+  await page.locator('#ubBtnBarrios').click();
+  await expect(page.locator('#ubOverlay')).toHaveClass(/open/);
+  await page.locator('#ubOverlay').click({ position: { x: 12, y: 300 } });
+  await expect(page.locator('#ubOverlay')).not.toHaveClass(/open/);
 });

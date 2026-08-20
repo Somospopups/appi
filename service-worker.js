@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v270-botones-barrios-tarjetas';
+const CACHE_NAME = 'appi-v271-botones-barrios-tarjetas';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

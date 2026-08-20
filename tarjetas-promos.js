@@ -117,7 +117,7 @@
     // cargado. Se rehacen acá, en el momento del guardado, porque los repintados
     // de la lista pueden correr antes de que el dato exista.
     if (window.APPIUsuariosBotones) {
-      try { window.APPIUsuariosBotones.pintarTarjetas(); } catch (e) {}
+      try { window.APPIUsuariosBotones.pintar(); } catch (e) {}
     }
     if (p && typeof p.id === 'string' && window.APPIGestion && typeof window.APPIGestion.guardarMetadata === 'function'){
       try{ window.APPIGestion.guardarMetadata(p, { tarjetas: cards }); }catch(e){}
@@ -365,7 +365,7 @@
     actualizarConteo('tpU', lista.length);
     // Los botones de tarjeta salen de lo que la gente tiene cargado: si se
     // agrega o se quita una, tienen que reflejarlo en el momento.
-    if (window.APPIUsuariosBotones) window.APPIUsuariosBotones.pintarTarjetas();
+    if (window.APPIUsuariosBotones) window.APPIUsuariosBotones.pintar();
   }
   function pintarListaUsuarios(cont, lista){
     css();
@@ -394,7 +394,7 @@
     actualizarConteo('tpU', lista.length);
     // Agregar o quitar una tarjeta cambia las combinaciones que existen, así
     // que los botones se rehacen junto con la lista.
-    if (window.APPIUsuariosBotones) window.APPIUsuariosBotones.pintarTarjetas();
+    if (window.APPIUsuariosBotones) window.APPIUsuariosBotones.pintar();
   }
 
   function montarBarraGestion(){
@@ -466,6 +466,11 @@
   function resetFiltro(){
     filtro = { marca:'', banco:'', sin:false };
   }
+  // Los botones de Tarjetas de Usuarios eligen una combinación entera desde su
+  // popup, en vez de marca y banco por separado.
+  function aplicarFiltro(marca, banco){
+    filtro = { marca: marca || '', banco: banco || '', sin: false };
+  }
 
   function envolver(){
     if (window.__tpWrapped) return;
@@ -500,6 +505,7 @@
     filtroActivo: filtroActivo,
     filterPersonas: filterPersonas,
     resetFiltro: resetFiltro,
+    aplicarFiltro: aplicarFiltro,
     armarMensaje: armarMensaje,
     abrirWhatsApp: abrirWhatsApp,
     montarBarraUsuarios: montarBarraUsuarios,
