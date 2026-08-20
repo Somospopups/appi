@@ -62,7 +62,7 @@ async function entrar(page, { tarjetas = null } = {}) {
   await expect(page.locator('#lockScreen')).toHaveClass(/hidden/);
   await page.evaluate(() => window.showView('view-usuarios'));
   await expect(page.locator('#view-usuarios')).toHaveClass(/active/);
-  await expect(page.locator('#ubBtnZonas')).toBeVisible();
+  await expect(page.locator('#usuariosBtnZonas')).toBeVisible();
 }
 
 test('el listado muestra los nombres de las personas, no los barrios', async ({ page }) => {
@@ -81,8 +81,8 @@ test('el listado muestra los nombres de las personas, no los barrios', async ({ 
 
 test('el botón Zonas despliega los barrios con su cuenta', async ({ page }) => {
   await entrar(page);
-  await expect(page.locator('#ubBtnZonas')).toContainText('Zonas');
-  await page.locator('#ubBtnZonas').click();
+  await expect(page.locator('#usuariosBtnZonas')).toContainText('Zonas');
+  await page.locator('#usuariosBtnZonas').click();
 
   await expect(page.locator('#ubOverlay')).toHaveClass(/open/);
   await expect(page.locator('#ubTitulo')).toContainText('Zonas');
@@ -94,11 +94,11 @@ test('el botón Zonas despliega los barrios con su cuenta', async ({ page }) => 
   await expect(page.locator('[data-ub-todos]')).toContainText('Todos los barrios');
 });
 
-test('elegir una zona filtra el listado y el botón muestra cuál está puesta', async ({ page }) => {
+test('elegir una zona filtra el listado y el chip muestra cuál está puesta', async ({ page }) => {
   await entrar(page);
   await expect(page.locator('#usuariosList .tree-name')).toHaveCount(6);
 
-  await page.locator('#ubBtnZonas').click();
+  await page.locator('#usuariosBtnZonas').click();
   await page.locator('[data-ub-zona="Villa Allende"]').click();
 
   // El popup se cierra y quedan sólo los de esa zona, por nombre.
@@ -107,26 +107,26 @@ test('elegir una zona filtra el listado y el botón muestra cuál está puesta',
   await expect(page.locator('#usuariosList')).toContainText('Diego Paz');
   await expect(page.locator('#usuariosList')).not.toContainText('Ana Gómez');
 
-  await expect(page.locator('#ubBtnZonas')).toContainText('Villa Allende');
-  await expect(page.locator('#ubBtnZonas')).toHaveClass(/on/);
+  // El chip avisa qué zona está puesta.
+  await expect(page.locator('#ubChipFiltro')).toContainText('Villa Allende');
 });
 
-test('"Todos los barrios" y la cruz del botón devuelven el listado completo', async ({ page }) => {
+test('"Todos los barrios" y la cruz del chip devuelven el listado completo', async ({ page }) => {
   await entrar(page);
 
-  await page.locator('#ubBtnZonas').click();
+  await page.locator('#usuariosBtnZonas').click();
   await page.locator('[data-ub-zona="Alta Gracia"]').click();
   await expect(page.locator('#usuariosList .tree-name')).toHaveCount(3);
 
-  await page.locator('#ubBtnZonas').click();
+  await page.locator('#usuariosBtnZonas').click();
   await page.locator('[data-ub-todos]').click();
   await expect(page.locator('#usuariosList .tree-name')).toHaveCount(6);
-  await expect(page.locator('#ubBtnZonas')).toContainText('Zonas');
+  await expect(page.locator('#ubChipFiltro')).toHaveCount(0);
 
-  await page.locator('#ubBtnZonas').click();
+  await page.locator('#usuariosBtnZonas').click();
   await page.locator('[data-ub-zona="Alta Gracia"]').click();
   await expect(page.locator('#usuariosList .tree-name')).toHaveCount(3);
-  await page.locator('[data-ub-quitar="zona"]').click();
+  await page.locator('#ubChipFiltro [data-ub-quitar]').click();
   await expect(page.locator('#usuariosList .tree-name')).toHaveCount(6);
 });
 
@@ -143,7 +143,7 @@ test('la ficha de cada persona conserva sus acciones', async ({ page }) => {
   await expect(detalle.locator('[data-u-action="whatsapp"]')).toBeVisible();
 });
 
-test('las herramientas viven al pie y Tarjetas abre su popup', async ({ page }) => {
+test('las herramientas viven arriba y Tarjetas abre su popup', async ({ page }) => {
   await entrar(page, {
     tarjetas: { byKey: { 'tel:3515551001': [{ marca: 'visa', banco: 'galicia' }] } }
   });
@@ -152,7 +152,9 @@ test('las herramientas viven al pie y Tarjetas abre su popup', async ({ page }) 
   await expect(tools).toHaveCount(5);
   await expect(page.locator('#usuariosBtnTarjetas')).toBeVisible();
   await expect(page.locator('#usuariosBtnMapAll')).toBeVisible();
-  await expect(page.locator('#usuariosBtnExport')).toBeVisible();
+  await expect(page.locator('#usuariosBtnZonas')).toBeVisible();
+  // Exportar CSV se quitó a pedido.
+  await expect(page.locator('#usuariosBtnExport')).toHaveCount(0);
 
   await page.locator('#usuariosBtnTarjetas').click();
   await expect(page.locator('#ubOverlay')).toHaveClass(/open/);
@@ -183,7 +185,7 @@ test('elegir una tarjeta filtra la lista y deja un chip para soltarlo', async ({
   await expect(page.locator('#usuariosList .tree-name')).toHaveCount(2);
 
   // Y aparece el aviso del filtro, con su cruz para quitarlo.
-  const chip = page.locator('#ubBtnTarjetasChip');
+  const chip = page.locator('#ubChipFiltro');
   await expect(chip).toContainText('Visa Galicia');
   await chip.locator('[data-ub-quitar]').click();
   await expect(page.locator('#usuariosList .tree-name')).toHaveCount(6);

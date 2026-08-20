@@ -32,7 +32,7 @@
     var st = document.createElement('style');
     st.id = 'ubEstilos';
     st.textContent = [
-      '.ub-barra-chip{display:flex;margin-top:10px}',
+      '.ub-barra-chip{display:flex;margin-bottom:10px}',
       '.ub-chip{display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border:0;border-radius:999px;',
       'background:linear-gradient(135deg,#5b8def,#a06bff);color:#fff;font:inherit;font-size:12.5px;font-weight:800;',
       'cursor:pointer;box-shadow:0 5px 14px rgba(91,112,210,.24)}',
@@ -320,31 +320,28 @@
     });
   }
 
-  /* ---------- botón de Zonas ---------- */
-  // Un botón al ancho: abre el popup con todos los barrios para filtrar. Con un
-  // filtro puesto muestra cuál es, con una cruz para soltarlo.
+  /* ---------- aviso del filtro activo ---------- */
+  // Zonas y Tarjetas viven en la barra de herramientas, arriba. Acá sólo queda
+  // el chip que avisa qué filtro está puesto: en los botones chicos no entraría
+  // el nombre de un barrio, y sin aviso no se entendería por qué la lista está
+  // recortada. Tocarlo reabre su popup; la cruz suelta el filtro.
   function pintar(){
     var host = document.getElementById(ID_BOTONES);
     if (!host) return;
     css();
-    var zonaOn = actual.tipo === 'zona';
-    var tarjOn = actual.tipo === 'tarjeta';
+    if (!actual.tipo){
+      host.innerHTML = '';
+      return;
+    }
+    var esZona = actual.tipo === 'zona';
     host.innerHTML =
-      '<div class="ub-barra">' +
-        '<button type="button" class="ub-main' + (zonaOn ? ' on' : '') + '" id="ubBtnZonas">' +
-          '<span class="ub-txt">📍 ' + esc(zonaOn ? actual.label : 'Zonas') + '</span>' +
-          (zonaOn ? '<span class="ub-x" data-ub-quitar="zona" role="button" aria-label="Quitar filtro">×</span>' : '') +
+      '<div class="ub-barra-chip">' +
+        '<button type="button" class="ub-chip on" id="ubChipFiltro">' +
+          '<span class="ub-txt">' + (esZona ? '📍 ' : '💳 ') + esc(actual.label) + '</span>' +
+          '<span class="ub-x" data-ub-quitar="1" role="button" aria-label="Quitar filtro">×</span>' +
         '</button>' +
-        (tarjOn
-          ? '<button type="button" class="ub-main on" id="ubBtnTarjetasChip">' +
-              '<span class="ub-txt">💳 ' + esc(actual.label) + '</span>' +
-              '<span class="ub-x" data-ub-quitar="tarjeta" role="button" aria-label="Quitar filtro">×</span>' +
-            '</button>'
-          : '') +
       '</div>';
-    host.querySelector('#ubBtnZonas').onclick = abrirBarrios;
-    var chip = host.querySelector('#ubBtnTarjetasChip');
-    if (chip) chip.onclick = abrirTarjetas;
+    host.querySelector('#ubChipFiltro').onclick = esZona ? abrirBarrios : abrirTarjetas;
     host.querySelectorAll('[data-ub-quitar]').forEach(function(x){
       x.onclick = function(e){ e.stopPropagation(); limpiar(); };
     });

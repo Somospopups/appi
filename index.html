@@ -4113,7 +4113,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v274 · Segura</div>
+  <div class="ds-foot">APPI · v275 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4954,27 +4954,27 @@ body.dark #pageTabs button.active{color:#a8c0ff}
         <div class="stat stat-clickable" data-f="porVencer" id="statPorV"><b id="usuariosStPorVencer" style="color:#a3670b">0</b><small>Por vencer</small></div>
         <div class="stat stat-clickable" data-f="vigente" id="statVig"><b id="usuariosStVigentes" style="color:#3ad0a4">0</b><small>Vigentes</small></div>
       </div>
+      <!-- Las herramientas van arriba, pegadas a los contadores: son la forma
+           de recortar la lista, así que se usan antes de mirarla. -->
+      <div class="u-tools">
+        <button type="button" id="usuariosBtnMapAll"><span>🗺️</span>Mapa</button><!-- el texto lo fija el JS al filtrar -->
+        <button type="button" id="usuariosBtnTarjetas"><span>💳</span>Tarjetas</button>
+        <button type="button" id="usuariosBtnOrdenVence"><span>📅</span>Ordenar</button>
+        <button type="button" id="usuariosBtnZonas"><span>📍</span>Zonas</button>
+        <button type="button" id="usuariosBtnCambiarArchivo"><span>📂</span>Cambiar archivo</button>
+      </div>
       <div class="glass">
+        <div id="usuariosFiltroBotones"></div>
         <div class="search-box">
           <span>🔍</span><input type="text" id="usuariosSearch" placeholder="Buscar por nombre, domicilio, localidad...">
           <button id="usuariosClearSearch" style="border:none;background:none;cursor:pointer">✕</button>
         </div>
-        <div id="usuariosFiltroBotones"></div>
         <div id="usuariosTarjetasBar"></div>
         <div id="usuariosActiveFilters" style="display:none;margin-top:12px;padding:10px 14px;border-radius:12px;background:rgba(91,141,239,0.10);border:1px solid rgba(91,141,239,0.18);font-size:12px;font-weight:600;color:#3a3a48"></div>
         <button class="btn btn-primary" id="usuariosBtnVerTodos" style="display:none;width:100%;margin-top:12px;background:linear-gradient(135deg,#5b8def,#a06bff);color:#fff;border:none;box-shadow:0 4px 12px rgba(91,141,239,0.30)">📋 Ver listado completo</button>
         <div id="usuariosMap" class="map-wrap"></div>
       </div>
       <div id="usuariosList"></div>
-      <!-- Herramientas al pie: se usan de vez en cuando y no deben competir
-           con los barrios, que son el corazón de la pantalla. -->
-      <div class="u-tools">
-        <button type="button" id="usuariosBtnMapAll"><span>🗺️</span>Mapa</button><!-- el texto lo fija el JS al filtrar -->
-        <button type="button" id="usuariosBtnTarjetas"><span>💳</span>Tarjetas</button>
-        <button type="button" id="usuariosBtnOrdenVence"><span>📅</span>Ordenar</button>
-        <button type="button" id="usuariosBtnExport"><span>📤</span>Exportar</button>
-        <button type="button" id="usuariosBtnCambiarArchivo"><span>📂</span>Archivo</button>
-      </div>
     </div>
   </section>
 
@@ -11532,7 +11532,7 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='274';
+      const swVersion='275';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 
@@ -12897,14 +12897,15 @@ body.dark .search-box input{color:#ffffff !important}
 /* En pantallas chicas el barrio ya se lee en la ficha: mejor el nombre entero. */
 @media(max-width:430px){#usuariosList .tree-node .tree-pts:not(:last-child){display:none}}
 
-/* Herramientas al pie de Usuarios: presentes pero sin robar protagonismo. */
-.u-tools{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:14px 0 8px}
-.u-tools button{display:flex;flex-direction:column;align-items:center;gap:3px;padding:11px 3px;border:1px solid rgba(80,90,130,.12);border-radius:14px;background:rgba(255,255,255,.7);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);color:#5a5b6b;font:inherit;font-size:9.5px;font-weight:800;cursor:pointer;transition:background .15s,transform .15s}
+/* Herramientas de Usuarios: van arriba, debajo de los contadores, porque son
+   la forma de recortar la lista antes de mirarla. */
+.u-tools{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:0 0 12px}
+.u-tools button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:62px;padding:9px 2px;border:1px solid rgba(80,90,130,.12);border-radius:14px;background:rgba(255,255,255,.7);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);color:#5a5b6b;font:inherit;font-size:9px;font-weight:800;line-height:1.2;text-align:center;cursor:pointer;transition:background .15s,transform .15s}
 .u-tools button span{font-size:17px;line-height:1}
 .u-tools button:hover{background:rgba(91,141,239,.1);transform:translateY(-1px)}
 .u-tools button:active{transform:none}
 body.dark .u-tools button{background:rgba(31,32,49,.74);border-color:rgba(255,255,255,.08);color:#c9cad6}
-@media(max-width:380px){.u-tools{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:600px){.u-tools{gap:8px}.u-tools button{font-size:10.5px;min-height:66px}}
 
 
 #view-usuarios .stat{
@@ -13761,11 +13762,6 @@ let mapU=null, markersU=[];
 
 function escU(value){
   return String(value==null?'':value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-}
-function csvCellU(value){
-  let text=String(value==null?'':value);
-  if(/^[=+\-@]/.test(text)) text="'"+text;
-  return '"'+text.replace(/"/g,'""')+'"';
 }
 
 function normU(s){ return (s||'').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim(); }
@@ -14769,17 +14765,10 @@ function initUsuarios(){
   const btnVerTodos=document.getElementById('usuariosBtnVerTodos');
   if(btnVerTodos) btnVerTodos.onclick=()=>{ resetFiltrosU(); };
 
-  const btnExport=document.getElementById('usuariosBtnExport');
-  if(btnExport) btnExport.onclick=()=>{
-    if(usuariosU.length===0){ window.APPIDialog.alert('Todavía no hay usuarios para exportar.',{title:'Nada para exportar',icon:'📭'}); return; }
-    let csv='Usuario,Telefono,Domicilio,CP,Localidad,Producto,F.Vence,Estado,Tarjetas\n';
-    (filtradosU.length?filtradosU:usuariosU).forEach(u=>{
-      const cards=window.APPITarjetas&&window.APPITarjetas.textoDe?window.APPITarjetas.textoDe(u):'';
-      csv += [u.usuario,u.telf,u.domicilio,u.cp,u.localidad,u.producto,u.fVenceRaw||'',u.estado,cards].map(csvCellU).join(',')+'\n';
-    });
-    const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
-    const url=URL.createObjectURL(blob);
-    const a=document.createElement('a'); a.href=url; a.download='usuarios.csv'; a.click(); URL.revokeObjectURL(url);
+  // El botón Zonas despliega los barrios de la planilla en un popup.
+  const btnZonas=document.getElementById('usuariosBtnZonas');
+  if(btnZonas) btnZonas.onclick=()=>{
+    if(window.APPIUsuariosBotones) window.APPIUsuariosBotones.abrirBarrios();
   };
 
   // Cargar de localStorage

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v274-zonas-y-limpieza';
+const CACHE_NAME = 'appi-v275-barra-de-herramientas-arriba';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
