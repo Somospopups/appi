@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v275-barra-de-herramientas-arriba';
+const CACHE_NAME = 'appi-v276-el-gesto-atras-cierra-el-panel';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
@@ -16,6 +16,7 @@ const APP_SHELL = [
   './account-request.js',
   './qr-code.js',
   './gestion-client.js',
+  './panel-atras.js',
   './tarjetas-promos.js',
   './usuarios-botones.js',
   './escalera-suenos.js',

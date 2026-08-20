@@ -95,6 +95,9 @@ window.openStock=function(){
 <link rel="apple-touch-startup-image" href="./splash/apple-splash-2224x1668.png" media="(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)" />
 <link rel="apple-touch-startup-image" href="./splash/apple-splash-2388x1668.png" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)" />
 <link rel="apple-touch-startup-image" href="./splash/apple-splash-2732x2048.png" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)" />
+<!-- Primero de todos: su escucha de popstate tiene que correr antes que la de
+     la app, para que el gesto de atrás cierre el panel abierto y no navegue. -->
+<script src="./panel-atras.js"></script>
 <script src="./auth-config.js"></script>
 <script src="./appi-dialog.js"></script>
 <script src="./whatsapp-app.js"></script>
@@ -4113,7 +4116,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v275 · Segura</div>
+  <div class="ds-foot">APPI · v276 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -11532,7 +11535,7 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='275';
+      const swVersion='276';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 
