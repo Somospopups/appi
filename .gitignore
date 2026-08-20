@@ -4,3 +4,9 @@ node_modules/
 test-results/
 playwright-report/
 supabase/.temp/
+
+# Notas de trabajo y estrategia: se escriben para discutir, no para publicar.
+# Todo lo que vive en esta carpeta termina servido en el sitio.
+PROPUESTA-*.md
+ESTRATEGIA-*.md
+NOTAS-*.md
