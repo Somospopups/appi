@@ -33,7 +33,7 @@
       texto: [
         'Hola {nombre}! 👋',
         '',
-        'Te escribo para recordarte que a tu {producto} le toca un retrolavado. Es un mantenimiento simple, de 5 minutos, que mantiene el equipo funcionando como el primer día.',
+        'Te escribo para recordarte que a tu equipo le toca un retrolavado. Es un mantenimiento simple, de 5 minutos, que lo mantiene funcionando como el primer día.',
         '',
         'Te dejo el video paso a paso:',
         '{link_retrolavado}',
@@ -62,7 +62,7 @@
       texto: [
         'Hola {nombre}! 👋',
         '',
-        'Te paso el dato de que la garantía de tu {producto} vence el {vence}.',
+        'Te paso el dato de que la garantía de tu equipo vence el {vence}.',
         '',
         'Si querés la renovamos y seguís con el servicio técnico y el mantenimiento cubierto. Avisame y lo vemos juntos. 😊'
       ].join('\n')
@@ -75,7 +75,7 @@
       texto: [
         'Hola {nombre}! 👋',
         '',
-        'Te cuento que la garantía de tu {producto} venció el {vence}.',
+        'Te cuento que la garantía de tu equipo venció el {vence}.',
         '',
         'Renovarla es simple y te deja tranquilo con el servicio técnico y el mantenimiento cubierto. ¿Querés que te pase los detalles?'
       ].join('\n')
@@ -88,7 +88,7 @@
       texto: [
         'Hola {nombre}! 👋 ¿Cómo estás?',
         '',
-        'Te escribo para saber cómo viene funcionando tu {producto}. Cualquier cosa que necesites, quedo a disposición. 😊'
+        'Te escribo para saber cómo viene funcionando tu equipo. Cualquier cosa que necesites, quedo a disposición. 😊'
       ].join('\n')
     }
   ];

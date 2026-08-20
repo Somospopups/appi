@@ -4117,7 +4117,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v280 · Segura</div>
+  <div class="ds-foot">APPI · v281 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -11539,7 +11539,7 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='280';
+      const swVersion='281';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 
@@ -13145,6 +13145,30 @@ body.dark .leaflet-popup-tip{background:rgba(35,35,55,0.92) !important}
   background:rgba(255,255,255,0.72);
   color:#3d63c9;
 }
+/* WhatsApp con el verde de la marca, para que se distinga de "Llamar". */
+#view-usuarios .action-btn.wa{
+  background:linear-gradient(135deg,#25d366,#128C7E);
+  color:#fff;
+  border-color:transparent;
+  box-shadow:0 4px 12px rgba(18,140,126,0.28);
+}
+/* Tres grupos: lo que se anota, cómo se lo contacta y cómo se llega.
+   La línea separa sin gritar; el primero no la lleva. */
+#view-usuarios .u-grupo{
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
+  padding-top:10px;
+  margin-top:10px;
+  border-top:1px solid rgba(80,90,130,0.13);
+}
+#view-usuarios .u-grupo:first-of-type{
+  padding-top:0;
+  margin-top:10px;
+  border-top:0;
+}
+#view-usuarios .u-grupo:empty{display:none}
+body.dark #view-usuarios .u-grupo{border-top-color:rgba(255,255,255,0.10)}
 body.dark #view-usuarios .tree-node{
   background:rgba(35,35,55,0.62);
   border-color:rgba(255,255,255,0.10);
@@ -14057,13 +14081,18 @@ function renderListU(){
         <div>🛒 Compra: <b>${escU(compraRaw)}</b></div>
         <div>📅 Vence: <b>${escU(venceRaw)}</b> <small>${escU(diasLabel)}</small></div>
       </div>
-      <div class="tp-slot" data-tp-scope="usuarios" data-tp-index="${index}"></div>
-      <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">
+      <!-- Las acciones van en tres grupos separados por una línea: lo que se
+           anota del cliente, cómo se lo contacta y cómo se llega hasta él. -->
+      <div class="tp-slot u-grupo" data-tp-scope="usuarios" data-tp-index="${index}"></div>
+      ${u.telf?`
+      <div class="u-grupo u-acciones">
+        <button type="button" class="action-btn wa" data-u-action="whatsapp" data-u-index="${index}">💬 WhatsApp</button>
+        <button type="button" class="action-btn call" data-u-action="call" data-u-index="${index}" data-appi-call-phone="${escU(String(u.telf||'').replace(/\D/g,''))}" data-appi-call-name="${escU(u.usuario||'Contacto')}" data-appi-call-label="1">📲 Llamar en teléfono</button>
+      </div>`:''}
+      <div class="u-grupo u-acciones">
         <button type="button" class="action-btn map" data-u-action="map" data-u-index="${index}">📍 Mapa</button>
         <button type="button" class="action-btn neighbors" data-u-action="neighbors" data-u-index="${index}">👥 Vecinos</button>
-        ${u.telf?`<button type="button" class="action-btn call" style="background:rgba(37,211,102,0.14);color:#128C7E;border-color:rgba(37,211,102,0.20)" data-u-action="whatsapp" data-u-index="${index}">💬 WhatsApp</button>`:''}
-        ${u.telf?`<button type="button" class="action-btn call" data-u-action="call" data-u-index="${index}" data-appi-call-phone="${escU(String(u.telf||'').replace(/\D/g,''))}" data-appi-call-name="${escU(u.usuario||'Contacto')}" data-appi-call-label="1">📲 Llamar en teléfono</button>`:''}
-        <button type="button" class="action-btn mail" data-u-action="google" data-u-index="${index}">🗺️ Google</button>
+        <button type="button" class="action-btn mail" data-u-action="google" data-u-index="${index}">🧭 ¿Cómo llego?</button>
       </div>
     </div>`;
   }).join('');

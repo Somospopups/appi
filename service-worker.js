@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v280-panel-hoy-y-fila';
+const CACHE_NAME = 'appi-v281-tu-equipo-y-ficha-ordenada';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

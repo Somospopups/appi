@@ -123,7 +123,7 @@ test('tocar una plantilla abre WhatsApp derecho, sin pantalla intermedia', async
   expect(urls).toHaveLength(1);
   const texto = decodeURIComponent(urls[0].split('text=')[1]);
   expect(texto).toContain('Hola Ana');
-  expect(texto).toContain('PSA SENIOR 4');
+  expect(texto).toContain('tu equipo');
   expect(texto).toContain('qa6xkQQsyg8');
   expect(texto).not.toContain('{nombre}');
   // Y el popup se cierra solo.
@@ -189,7 +189,7 @@ test('el resumen de cada plantilla ya viene con los datos puestos', async ({ pag
   // Se elige mirando el mensaje real, no una receta con huecos.
   const item = page.locator('[data-mu-plantilla="retrolavado"]');
   await expect(item).toContainText('Hola Ana');
-  await expect(item).toContainText('PSA SENIOR 4');
+  await expect(item).toContainText('tu equipo');
   await expect(item).not.toContainText('{');
 });
 
@@ -416,4 +416,52 @@ test('el vencido hace más de un año nunca entra en los pendientes', async ({ p
     window.APPIMensajes.pendientes().flatMap(g => g.gente.map(u => u.usuario)));
   expect(nombres).not.toContain('PEREZ, JUAN');
   expect(nombres).toHaveLength(3);
+});
+
+/* ---------- retoques: el texto habla de "tu equipo" y la ficha se ordena ---------- */
+
+test('los mensajes hablan de "tu equipo", no del modelo del purificador', async ({ page }) => {
+  await entrar(page);
+  await page.evaluate(() => { window.__wa = []; window.APPIWhatsApp.abrir = u => window.__wa.push(u); });
+  await abrirFicha(page, 0);
+  await page.locator('[data-u-toggle="0"] + .tree-children [data-u-action="whatsapp"]').click();
+  await page.locator('[data-mu-plantilla="retrolavado"]').click();
+
+  const texto = decodeURIComponent((await page.evaluate(() => window.__wa))[0].split('text=')[1]);
+  expect(texto).toContain('tu equipo');
+  // El cliente no tiene por qué leer el código del modelo.
+  expect(texto).not.toContain('PSA SENIOR 4');
+});
+
+test('las acciones de la ficha van en tres grupos separados', async ({ page }) => {
+  await entrar(page);
+  await abrirFicha(page, 0);
+  const ficha = page.locator('[data-u-toggle="0"] + .tree-children');
+  const grupos = ficha.locator('.u-grupo');
+  await expect(grupos).toHaveCount(3);
+
+  // 1) lo que se anota del cliente
+  await expect(grupos.nth(0)).toContainText('Agregar tarjeta');
+  await expect(grupos.nth(0)).toContainText('Avisar promo');
+  // 2) cómo se lo contacta
+  await expect(grupos.nth(1)).toContainText('WhatsApp');
+  await expect(grupos.nth(1).locator('[data-u-action="call"]')).toBeVisible();
+  // 3) cómo se llega hasta él
+  await expect(grupos.nth(2)).toContainText('Mapa');
+  await expect(grupos.nth(2)).toContainText('Vecinos');
+  await expect(grupos.nth(2)).toContainText('¿Cómo llego?');
+  // El viejo "Google" ya no se nombra.
+  await expect(ficha).not.toContainText('🗺️ Google');
+});
+
+test('sin teléfono no aparece el grupo de contacto, pero sí el de ubicación', async ({ page }) => {
+  await entrar(page, [
+    { id: 1, usuario: 'SIN TEL, PEDRO', telf: '', localidad: 'Centro', producto: 'PSA',
+      fCompra: ddmmyyyy(-30), fVenceRaw: ddmmyyyy(300), fVence: dias(300), estado: 'vigente' }
+  ]);
+  await abrirFicha(page, 0);
+  const ficha = page.locator('[data-u-toggle="0"] + .tree-children');
+  await expect(ficha.locator('[data-u-action="whatsapp"]')).toHaveCount(0);
+  await expect(ficha.locator('[data-u-action="call"]')).toHaveCount(0);
+  await expect(ficha.locator('[data-u-action="google"]')).toBeVisible();
 });

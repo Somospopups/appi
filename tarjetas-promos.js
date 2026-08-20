@@ -189,7 +189,9 @@
       '.tp-chip{border:0;border-radius:999px;padding:7px 10px;font:inherit;font-size:11px;font-weight:900;cursor:pointer;background:rgba(91,141,239,.12);color:#3d63c9}' +
       '.tp-chip.on{background:linear-gradient(135deg,#5b8def,#875fdd);color:#fff}' +
       '.tp-count{margin-left:auto;font-size:11px;font-weight:900;color:#3d63c9}' +
-      '.tp-slot{margin-top:10px;padding-top:8px;border-top:1px dashed rgba(80,90,130,.14)}' +
+      /* En la ficha de Usuarios el separador lo pone .u-grupo: acá sólo se
+         mantiene el aire para el resto de las pantallas. */
+      '.tp-slot{margin-top:10px}' +
       '.tp-pills{display:flex;flex-wrap:wrap;gap:6px;align-items:center}' +
       '.tp-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 8px;border-radius:999px;background:rgba(91,141,239,.12);color:#3d63c9;font-size:11px;font-weight:850}' +
       'body.dark .tp-pill{background:rgba(91,141,239,.2);color:#c5d4ff}' +
