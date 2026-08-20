@@ -98,6 +98,8 @@ test('arranca, navega e importa Garantías una sola vez', async ({ page }) => {
     showView('view-usuarios');
   });
   await expect(page.locator('#view-usuarios')).toBeVisible();
+  // La lista se agrupa por barrio: se abre el primer grupo para llegar a la ficha.
+  await page.locator('.barrio-grupo:not(.abierto) .barrio-cab').first().click();
   await page.locator('#usuariosList .tree-node').first().click();
   await page.locator('#usuariosList [data-u-action="whatsapp"]').first().click();
   const opened = await page.evaluate(() => window.__appiLastOpen);

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v272-mensaje-en-el-popup';
+const CACHE_NAME = 'appi-v273-usuarios-por-barrio';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

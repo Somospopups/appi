@@ -97,7 +97,11 @@ async function abrirUsuarios(page) {
   // La barra de promos se sigue montando, pero fuera de la vista: el mensaje se
   // escribe dentro del popup del botón "Tarjetas".
   await expect(page.locator('#usuariosTarjetasBar')).toBeHidden();
-  await expect(page.locator('#ubBtnTarjetas')).toBeVisible();
+  await expect(page.locator('#usuariosBtnTarjetas')).toBeVisible();
+  // La lista se agrupa por barrio: hay que abrir el grupo para ver las fichas.
+  const grupos = page.locator('.barrio-grupo');
+  await expect(grupos).toHaveCount(1);
+  await expect(grupos).toHaveClass(/abierto/);
   await expect(page.locator('#usuariosList .tree-node')).toHaveCount(2);
 }
 
@@ -121,7 +125,7 @@ test('en Usuarios se carga Visa Galicia, se filtra y se arma el WhatsApp', async
 
   // En Usuarios se filtra por tarjeta desde el botón "Tarjetas": abre un popup
   // con las combinaciones y al elegir una recorta el listado.
-  await page.locator('#ubBtnTarjetas').click();
+  await page.locator('#usuariosBtnTarjetas').click();
   const itemVisa = page.locator('[data-ub-marca="visa"][data-ub-banco="galicia"]');
   await expect(itemVisa).toBeVisible();
   await expect(itemVisa).toContainText('Visa Galicia');
@@ -135,7 +139,7 @@ test('en Usuarios se carga Visa Galicia, se filtra y se arma el WhatsApp', async
   await expect(page.locator('#usuariosList')).not.toContainText('Carlos Ruiz');
 
   // El mensaje se escribe en el popup de Tarjetas.
-  await page.locator('#ubBtnTarjetas').click();
+  await page.locator('#usuariosBtnTarjetas').click();
   await page.locator('#ubMsg').fill('Hola {nombre}, hay una promo con {tarjeta}');
   await page.locator('#ubCerrar').click();
   await page.locator('#usuariosList .tree-node').first().click();
@@ -162,6 +166,9 @@ test('recargar el Excel no borra las tarjetas guardadas', async ({ page }) => {
   }, USER_ID);
   expect(keep).toEqual([{ marca: 'naranja', banco: 'naranja_x' }]);
 
+  // La lista se agrupa por barrio: primero se abre el grupo donde está.
+  const grupoDeGomez = page.locator('.barrio-grupo', { hasText: 'GOMEZ, JUAN PEREZ' });
+  await grupoDeGomez.locator('.barrio-cab').click();
   const gomez = page.locator('#usuariosList .tree-node', { hasText: 'GOMEZ, JUAN PEREZ' });
   await gomez.click();
   const slot = page.locator('.tp-slot[data-tp-scope="usuarios"]').nth(

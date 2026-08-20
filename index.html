@@ -4113,7 +4113,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v272 · Segura</div>
+  <div class="ds-foot">APPI · v273 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4958,23 +4958,26 @@ body.dark #pageTabs button.active{color:#a8c0ff}
         <div class="stat stat-clickable" data-f="vigente" id="statVig"><b id="usuariosStVigentes" style="color:#3ad0a4">0</b><small>Vigentes</small></div>
       </div>
       <div class="glass">
-        <div id="usuariosFiltroBotones"></div>
         <div class="search-box">
           <span>🔍</span><input type="text" id="usuariosSearch" placeholder="Buscar por nombre, domicilio, localidad...">
           <button id="usuariosClearSearch" style="border:none;background:none;cursor:pointer">✕</button>
         </div>
+        <div id="usuariosFiltroBotones"></div>
         <div id="usuariosTarjetasBar"></div>
         <div id="usuariosActiveFilters" style="display:none;margin-top:12px;padding:10px 14px;border-radius:12px;background:rgba(91,141,239,0.10);border:1px solid rgba(91,141,239,0.18);font-size:12px;font-weight:600;color:#3a3a48"></div>
-        <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
-          <button class="btn btn-primary" id="usuariosBtnVerTodos" style="display:none;background:linear-gradient(135deg,#5b8def,#a06bff);color:#fff;border:none;box-shadow:0 4px 12px rgba(91,141,239,0.30)">📋 Ver listado completo</button>
-          <button class="btn btn-secondary" id="usuariosBtnCambiarArchivo">📂 Cambiar archivo</button>
-          <button class="btn btn-secondary" id="usuariosBtnOrdenVence">📅 Ordenar por Vence</button>
-          <button class="btn btn-secondary" id="usuariosBtnExport">📤 Exportar CSV</button>
-          <button class="btn btn-secondary" id="usuariosBtnMapAll" style="margin-left:auto">🗺️ Mapa general</button>
-        </div>
+        <button class="btn btn-primary" id="usuariosBtnVerTodos" style="display:none;width:100%;margin-top:12px;background:linear-gradient(135deg,#5b8def,#a06bff);color:#fff;border:none;box-shadow:0 4px 12px rgba(91,141,239,0.30)">📋 Ver listado completo</button>
         <div id="usuariosMap" class="map-wrap"></div>
       </div>
       <div id="usuariosList"></div>
+      <!-- Herramientas al pie: se usan de vez en cuando y no deben competir
+           con los barrios, que son el corazón de la pantalla. -->
+      <div class="u-tools">
+        <button type="button" id="usuariosBtnMapAll"><span>🗺️</span>Mapa</button><!-- el texto lo fija el JS al filtrar -->
+        <button type="button" id="usuariosBtnTarjetas"><span>💳</span>Tarjetas</button>
+        <button type="button" id="usuariosBtnOrdenVence"><span>📅</span>Ordenar</button>
+        <button type="button" id="usuariosBtnExport"><span>📤</span>Exportar</button>
+        <button type="button" id="usuariosBtnCambiarArchivo"><span>📂</span>Archivo</button>
+      </div>
     </div>
   </section>
 
@@ -11532,7 +11535,7 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='272';
+      const swVersion='273';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 
@@ -12877,14 +12880,45 @@ body.dark .search-box input{color:#ffffff !important}
 #view-usuarios .upload-zone b{font-size:13.5px; display:block; margin-top:6px}
 #view-usuarios .upload-zone small{font-size:11px}
 
-/* stats glass */
+/* stats glass · el semáforo en una sola línea: cuatro cajas apiladas comían
+   media pantalla antes de mostrar un solo usuario. */
 #view-usuarios .stats{
   display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-  margin:14px 0;
+  grid-template-columns:repeat(4,1fr);
+  gap:7px;
+  margin:12px 0;
 }
-@media(min-width:600px){ #view-usuarios .stats{grid-template-columns:repeat(4,1fr)} }
+#view-usuarios .stats .stat{padding:10px 4px}
+#view-usuarios .stats .stat b{font-size:19px}
+#view-usuarios .stats .stat small{font-size:8.5px;letter-spacing:.2px}
+@media(min-width:600px){ #view-usuarios .stats{gap:10px} #view-usuarios .stats .stat{padding:14px 10px} #view-usuarios .stats .stat b{font-size:26px} }
+
+/* Herramientas al pie de Usuarios: presentes pero sin robar protagonismo. */
+.u-tools{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:14px 0 8px}
+.u-tools button{display:flex;flex-direction:column;align-items:center;gap:3px;padding:11px 3px;border:1px solid rgba(80,90,130,.12);border-radius:14px;background:rgba(255,255,255,.7);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);color:#5a5b6b;font:inherit;font-size:9.5px;font-weight:800;cursor:pointer;transition:background .15s,transform .15s}
+.u-tools button span{font-size:17px;line-height:1}
+.u-tools button:hover{background:rgba(91,141,239,.1);transform:translateY(-1px)}
+.u-tools button:active{transform:none}
+body.dark .u-tools button{background:rgba(31,32,49,.74);border-color:rgba(255,255,255,.08);color:#c9cad6}
+@media(max-width:380px){.u-tools{grid-template-columns:repeat(3,1fr)}}
+
+/* Barrios: la lista se agrupa por zona y cada grupo se abre en el lugar. */
+.barrio-grupo{margin-bottom:8px;border:1px solid rgba(80,90,130,.1);border-radius:16px;background:rgba(255,255,255,.72);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);overflow:hidden}
+.barrio-cab{display:flex;align-items:center;gap:10px;padding:14px 15px;cursor:pointer;user-select:none;transition:background .15s}
+.barrio-cab:hover{background:rgba(91,141,239,.06)}
+.barrio-flecha{flex:0 0 auto;color:#a3a4b2;font-size:16px;font-weight:900;transition:transform .22s cubic-bezier(.4,0,.2,1)}
+.barrio-grupo.abierto .barrio-flecha{transform:rotate(90deg)}
+.barrio-nom{flex:1;min-width:0;color:#292938;font-size:13.5px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.barrio-alerta{flex:0 0 auto;padding:4px 9px;border-radius:999px;background:rgba(217,83,79,.12);color:#c34c53;font-size:10px;font-weight:900}
+.barrio-cuenta{flex:0 0 auto;min-width:30px;padding:4px 9px;border-radius:999px;background:rgba(91,141,239,.12);color:#3d63c9;font-size:10.5px;font-weight:900;text-align:center}
+.barrio-gente{display:none;padding:8px 10px 10px;border-top:1px solid rgba(80,90,130,.08);background:rgba(245,248,255,.5)}
+.barrio-grupo.abierto .barrio-gente{display:block;animation:barrioAbre .26s cubic-bezier(.4,0,.2,1)}
+@keyframes barrioAbre{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+body.dark .barrio-grupo{background:rgba(31,32,49,.74);border-color:rgba(255,255,255,.08)}
+body.dark .barrio-cab:hover{background:rgba(91,141,239,.12)}
+body.dark .barrio-nom{color:#f1f1f6}
+body.dark .barrio-gente{background:rgba(20,21,34,.5);border-top-color:rgba(255,255,255,.06)}
+
 #view-usuarios .stat{
   padding:14px 10px;
   border-radius:16px;
@@ -13975,24 +14009,22 @@ function aplicarFiltrosU(){
         btnMapAll.dataset.origText=btnMapAll.textContent;
         btnMapAll.dataset.origOnclick='map';
       }
-      btnMapAll.textContent='🧹 LIMPIAR BUSQUEDA';
-      btnMapAll.classList.add('blink-soft','btn-primary');
-      btnMapAll.classList.remove('btn-secondary');
-      btnMapAll.style.marginLeft='auto';
+      // El botón vive en la barra del pie: se conserva el ícono arriba y la
+      // palabra abajo, si no el texto largo desborda la celda.
+      btnMapAll.innerHTML='<span>🧹</span>Limpiar';
+      btnMapAll.classList.add('blink-soft');
       btnMapAll.style.background='linear-gradient(135deg,#ff6b6b,#ff8f6b)';
       btnMapAll.style.color='#fff';
       btnMapAll.style.border='none';
       btnMapAll.style.boxShadow='0 4px 14px rgba(255,107,107,0.35)';
       btnMapAll.onclick=()=>{ resetFiltrosU(); };
     }else{
-      btnMapAll.textContent=btnMapAll.dataset.origText||'🗺️ Mapa general';
-      btnMapAll.classList.remove('blink-soft','btn-primary');
-      btnMapAll.classList.add('btn-secondary');
+      btnMapAll.innerHTML='<span>🗺️</span>Mapa';
+      btnMapAll.classList.remove('blink-soft');
       btnMapAll.style.background='';
       btnMapAll.style.color='';
       btnMapAll.style.border='';
       btnMapAll.style.boxShadow='';
-      btnMapAll.style.marginLeft='auto';
       // Restaurar handler original de mapa
       btnMapAll.onclick=()=>{
         const mapDiv=document.getElementById('usuariosMap');
@@ -14026,8 +14058,25 @@ function renderListU(){
     if(window.APPITarjetas&&window.APPITarjetas.pintarListaUsuarios) window.APPITarjetas.pintarListaUsuarios(cont, filtradosU);
     return;
   }
-  // Los datos importados se escapan y los eventos se vinculan fuera del HTML.
-  cont.innerHTML=filtradosU.map((u,index)=>{
+  // El barrio es la estructura de la pantalla, no un filtro aparte: se sale a
+  // recorrer una zona, así que la lista se agrupa por barrio y cada grupo se
+  // abre en el lugar. Los barrios abiertos se recuerdan entre repintados.
+  window.__uAbiertos = window.__uAbiertos || {};
+  const grupos=new Map();
+  filtradosU.forEach((u,index)=>{
+    const barrio=String(u.localidad||'').trim() || 'Sin barrio';
+    if(!grupos.has(barrio)) grupos.set(barrio,[]);
+    grupos.get(barrio).push({u,index});
+  });
+  // Con un solo barrio no tiene sentido el acordeón: se abre solo.
+  const unico=grupos.size===1;
+  const orden=[...grupos.keys()].sort((a,b)=>{
+    if(a==='Sin barrio') return 1;
+    if(b==='Sin barrio') return -1;
+    return a.localeCompare(b,'es');
+  });
+
+  const fichaHtml=(u,index)=>{
     const venceRaw=u.fVenceRaw||'—';
     const compraRaw=u.fCompra||'—';
     const diasNum=u.fVence? Math.ceil((u.fVence-new Date())/(1000*60*60*24)) : null;
@@ -14040,7 +14089,6 @@ function renderListU(){
       <span class="tree-arrow">›</span>
       <span class="tree-cat-badge" style="background:${estadoColor}">${estadoTxt}</span>
       <span class="tree-name" title="${escU(`${u.usuario||''} - ${u.domicilio||''}`)}">${escU(u.usuario)}</span>
-      <span class="tree-pts" style="background:rgba(0,0,0,0.06);color:#1c1c1e">${escU(u.localidad||'')}</span>
       <span class="tree-pts" style="min-width:70px;text-align:right">${escU(venceRaw)}</span>
     </div>
     <div class="tree-children" style="padding:8px;background:rgba(255,255,255,0.5);border-radius:12px;margin-bottom:8px">
@@ -14061,7 +14109,41 @@ function renderListU(){
         <button type="button" class="action-btn mail" data-u-action="google" data-u-index="${index}">🗺️ Google</button>
       </div>
     </div>`;
+  };
+
+  cont.innerHTML=orden.map(barrio=>{
+    const gente=grupos.get(barrio);
+    const vencidas=gente.filter(g=>g.u.estado==='vencida').length;
+    const abierto=unico||!!window.__uAbiertos[barrio];
+    return `
+    <section class="barrio-grupo${abierto?' abierto':''}" data-barrio="${escU(barrio)}">
+      <div class="barrio-cab" role="button" tabindex="0" aria-expanded="${abierto?'true':'false'}">
+        <span class="barrio-flecha">›</span>
+        <strong class="barrio-nom">${escU(barrio)}</strong>
+        ${vencidas?`<span class="barrio-alerta">${vencidas} vencida${vencidas===1?'':'s'}</span>`:''}
+        <span class="barrio-cuenta">${gente.length}</span>
+      </div>
+      <div class="barrio-gente">${gente.map(g=>fichaHtml(g.u,g.index)).join('')}</div>
+    </section>`;
   }).join('');
+
+  // Abrir y cerrar un barrio. Se pueden tener varios abiertos: comparar dos
+  // zonas es habitual y cerrar el anterior obligaría a rehacer el camino.
+  const toggleBarrio=cab=>{
+    const grupo=cab.parentElement;
+    const barrio=grupo.getAttribute('data-barrio');
+    const abre=!grupo.classList.contains('abierto');
+    grupo.classList.toggle('abierto',abre);
+    cab.setAttribute('aria-expanded',String(abre));
+    if(abre) window.__uAbiertos[barrio]=true; else delete window.__uAbiertos[barrio];
+    if(typeof haptic==='function') haptic(8);
+  };
+  cont.querySelectorAll('.barrio-cab').forEach(cab=>{
+    cab.onclick=()=>toggleBarrio(cab);
+    cab.onkeydown=event=>{
+      if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleBarrio(cab)}
+    };
+  });
 
   const toggleNode=node=>{
     const children=node.nextElementSibling;
@@ -14714,6 +14796,12 @@ function initUsuarios(){
     ordenAscU=!ordenAscU;
     aplicarFiltrosU();
     btnOrden.textContent=ordenAscU?'📅 Vence ↑':'📅 Vence ↓';
+  };
+  // Las promos con tarjeta viven en su popup: se usan de a ratos y no tienen
+  // por qué ocupar lugar fijo en la pantalla.
+  const btnTarjetas=document.getElementById('usuariosBtnTarjetas');
+  if(btnTarjetas) btnTarjetas.onclick=()=>{
+    if(window.APPIUsuariosBotones) window.APPIUsuariosBotones.abrirTarjetas();
   };
   const btnMapAll=document.getElementById('usuariosBtnMapAll');
   if(btnMapAll) btnMapAll.onclick=()=>{
