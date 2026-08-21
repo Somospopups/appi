@@ -453,6 +453,72 @@ test('la ✓ marca hecha sin abrir WhatsApp', async ({ page }) => {
   await expect(page.locator('#muHoy')).toContainText('Día completo');
 });
 
+const TRES = [
+  { id: 1, usuario: 'GOMEZ, ANA MARIA', telf: '3515551001', localidad: 'Alta Gracia', producto: 'PSA',
+    fCompra: ddmmyyyy(-182), fVenceRaw: ddmmyyyy(400), fVence: dias(400), estado: 'vigente' },
+  { id: 2, usuario: 'RUIZ, ROBERTO', telf: '3515551002', localidad: 'Villa Allende', producto: 'PSA VERO',
+    fCompra: ddmmyyyy(-182), fVenceRaw: ddmmyyyy(400), fVence: dias(400), estado: 'vigente' },
+  { id: 3, usuario: 'DIAZ, CAROLINA', telf: '3515551003', localidad: 'Centro', producto: 'SODA BURBY',
+    fCompra: ddmmyyyy(-182), fVenceRaw: ddmmyyyy(400), fVence: dias(400), estado: 'vigente' }
+];
+
+test('las flechitas pasan y vuelven entre tareas sin marcar nada', async ({ page }) => {
+  await entrar(page, TRES);
+  await page.locator('[data-mu-hoy="retro"]').click();
+
+  // Arranca en la primera, con la flecha de volver apagada.
+  await expect(page.locator('.mu-fila-quien')).toContainText('GOMEZ');
+  await expect(page.locator('.mu-fila-pos')).toContainText('1 de 3');
+  await expect(page.locator('#muFilaPrev')).toBeDisabled();
+
+  await page.locator('#muFilaNext').click();
+  await expect(page.locator('.mu-fila-quien')).toContainText('RUIZ');
+  await expect(page.locator('.mu-fila-pos')).toContainText('2 de 3');
+
+  await page.locator('#muFilaNext').click();
+  await expect(page.locator('.mu-fila-quien')).toContainText('DIAZ');
+  // En la última, la flecha de avanzar se apaga: al final se llega marcando.
+  await expect(page.locator('#muFilaNext')).toBeDisabled();
+
+  await page.locator('#muFilaPrev').click();
+  await expect(page.locator('.mu-fila-quien')).toContainText('RUIZ');
+
+  // Pasear no es marcar: las tres siguen pendientes.
+  const res = await page.evaluate(() => window.APPIMensajes.resumenHoy());
+  expect(res.pendientes).toBe(3);
+  expect(res.hechas).toBe(0);
+  expect(res.noHechas).toBe(0);
+});
+
+test('volver con la flechita muestra la marca y deja corregirla', async ({ page }) => {
+  await entrar(page, TRES.slice(0, 2));
+  await page.evaluate(() => { window.__wa = []; window.APPIWhatsApp.abrir = u => window.__wa.push(u); });
+  await page.locator('[data-mu-hoy="retro"]').click();
+
+  // Se marca la primera como no hecha y avanza solo.
+  await page.locator('#muFilaNoHecha').click();
+  await expect(page.locator('.mu-fila-quien')).toContainText('RUIZ');
+
+  // Con la flechita se vuelve: la marca está a la vista.
+  await page.locator('#muFilaPrev').click();
+  await expect(page.locator('.mu-fila-quien')).toContainText('GOMEZ');
+  await expect(page.locator('.mu-marca-actual')).toContainText('✗ Marcada como no hecha');
+
+  // Se corrige a hecha: la marca se pisa, no se duplica.
+  await page.locator('#muFilaHecha').click();
+  await expect(page.locator('.mu-fila-quien')).toContainText('RUIZ');
+  await page.locator('#muFilaHecha').click();
+
+  await expect(page.locator('.mu-fin')).toContainText('2 acciones hechas');
+  await expect(page.locator('.mu-fin')).not.toContainText('sin hacer');
+
+  const res = await page.evaluate(() => window.APPIMensajes.resumenHoy());
+  expect(res.hechas).toBe(2);
+  expect(res.noHechas).toBe(0);
+  expect(res.pendientes).toBe(0);
+});
+
+
 test('el vencido hace más de un año nunca entra en los pendientes', async ({ page }) => {
   await entrar(page, PENDIENTES);
   const nombres = await page.evaluate(() =>

@@ -1,12 +1,19 @@
-# Estado al retomar — APPI v292
+# Estado al retomar — APPI v293
 
 Repo: `github.com/somospopups/appi` · **suite en verde**.
 
-Corrida local completa: **269 pruebas pasan, 1 salteada, 0 fallan** (10,2 min, sin flakes).
+Corrida local completa: **271 pruebas pasan, 1 salteada, 0 fallan** (10,2 min, sin flakes).
 
 ---
 
-## Último cambio: v292 · Acciones del día con ✓ y ✗
+## Último cambio: v293 · Flechitas en el carrusel
+
+Flechitas ‹ › alrededor del contador para ir y volver entre las tareas del
+día. Pasear no marca nada; volver a una tarea marcada muestra su marca y
+deja corregirla (se pisa, no se duplica). El resumen final se cuenta de las
+marcas reales.
+
+## Anterior: v292 · Acciones del día con ✓ y ✗
 
 Pedido del equipo: la franja "Hoy tenés N mensajes" (Garantías) dura todo el
 día, no se puede eliminar, rota sola al cambiar el día, y cada acción se

@@ -516,7 +516,7 @@
     var g = null;
     grupos.forEach(function(x){ if (x.motivo.id === motivoId) g = x; });
     if (!g) { pintarHoy(); return; }
-    fila = { motivo: g.motivo, gente: g.gente.slice(), i: 0, hechos: 0, noHechos: 0 };
+    fila = { motivo: g.motivo, gente: g.gente.slice(), i: 0 };
     pintarFila();
   }
 
@@ -526,11 +526,18 @@
     if (!fila) return;
 
     if (fila.i >= fila.gente.length){
+      // El resumen se cuenta de las marcas reales: navegar o corregir no lo infla.
+      var hechas = 0, noHechas = 0;
+      fila.gente.forEach(function(x){
+        var m = marcaDe(fila.motivo.id, x);
+        if (m && m.e === 'hecha') hechas++;
+        else if (m && m.e === 'no_hecha') noHechas++;
+      });
       ov.querySelector('#muTitulo').textContent = '¡Listo!';
       ov.querySelector('#muSub').textContent = '';
       cuerpo.innerHTML = '<div class="mu-fin"><div class="mu-fin-ico">✅</div>' +
-        '<b>' + fila.hechos + (fila.hechos === 1 ? ' acción hecha' : ' acciones hechas') +
-        (fila.noHechos ? ' · ' + fila.noHechos + ' sin hacer' : '') + '</b>' +
+        '<b>' + hechas + (hechas === 1 ? ' acción hecha' : ' acciones hechas') +
+        (noHechas ? ' · ' + noHechas + ' sin hacer' : '') + '</b>' +
         '<p>No queda nadie sin marcar en esta lista por hoy.</p></div>' +
         '<button type="button" class="mu-enviar" id="muFinCerrar">Cerrar</button>';
       cuerpo.querySelector('#muFinCerrar').onclick = function(){ cerrar(); pintarHoy(); };
@@ -549,6 +556,14 @@
 
     var html = '<div class="mu-fila-quien"><b>' + esc(u.usuario || '') + '</b>' +
       '<small>' + esc([u.localidad, u.producto].filter(Boolean).join(' · ')) + '</small></div>';
+    // Si esta tarea ya tiene marca (se volvió con las flechitas), se muestra
+    // y se puede corregir tocando la otra.
+    var marcaActual = marcaDe(fila.motivo.id, u);
+    if (marcaActual){
+      html += '<div class="mu-marca-actual ' + (marcaActual.e === 'hecha' ? 'ok' : 'no') + '">' +
+        (marcaActual.e === 'hecha' ? '✓ Marcada como hecha' : '✗ Marcada como no hecha') +
+        ' · si te confundiste, tocá la otra</div>';
+    }
     html += '<div class="mu-prev"><b>Así lo va a recibir</b><span>' + esc(texto) + '</span></div>';
     html += '<div class="mu-acciones">';
     html += '<button type="button" class="mu-enviar" id="muFilaEnviar">💬 Mandar a ' + esc(nombre) + '</button>';
@@ -558,26 +573,34 @@
       '<button type="button" class="mu-marca ok" id="muFilaHecha"><i>✓</i>Ya lo hice</button>' +
       '<button type="button" class="mu-marca no" id="muFilaNoHecha"><i>✗</i>No se hizo</button></div>';
     html += '</div>';
-    html += '<div class="mu-fila-pos">' + (fila.i + 1) + ' de ' + fila.gente.length + '</div>';
+    // Las flechitas van y vuelven entre tareas sin marcar nada.
+    html += '<div class="mu-fila-nav">' +
+      '<button type="button" class="mu-nav" id="muFilaPrev" aria-label="Tarea anterior"' + (fila.i === 0 ? ' disabled' : '') + '>‹</button>' +
+      '<span class="mu-fila-pos">' + (fila.i + 1) + ' de ' + fila.gente.length + '</span>' +
+      '<button type="button" class="mu-nav" id="muFilaNext" aria-label="Tarea siguiente"' + (fila.i >= fila.gente.length - 1 ? ' disabled' : '') + '>›</button>' +
+      '</div>';
     cuerpo.innerHTML = html;
 
     cuerpo.querySelector('#muFilaEnviar').onclick = function(){
       enviar(u, texto);
-      fila.hechos++;
       fila.i++;
       pintarFila();
     };
     cuerpo.querySelector('#muFilaHecha').onclick = function(){
       marcarAccion(fila.motivo.id, u, 'hecha');
-      fila.hechos++;
       fila.i++;
       pintarFila();
     };
     cuerpo.querySelector('#muFilaNoHecha').onclick = function(){
       marcarAccion(fila.motivo.id, u, 'no_hecha');
-      fila.noHechos++;
       fila.i++;
       pintarFila();
+    };
+    cuerpo.querySelector('#muFilaPrev').onclick = function(){
+      if (fila.i > 0){ fila.i--; pintarFila(); }
+    };
+    cuerpo.querySelector('#muFilaNext').onclick = function(){
+      if (fila.i < fila.gente.length - 1){ fila.i++; pintarFila(); }
     };
     ov.classList.add('open');
   }
@@ -667,7 +690,16 @@
       '.mu-fila-quien{margin-top:14px;padding:13px 14px;border-radius:14px;background:rgba(255,255,255,.9);border:1px solid rgba(80,90,130,.1)}',
       '.mu-fila-quien b{display:block;color:#30303d;font-size:14.5px}',
       '.mu-fila-quien small{display:block;margin-top:3px;color:#777887;font-size:11px}',
-      '.mu-fila-pos{margin-top:12px;color:#777887;font-size:11px;text-align:center;font-weight:700}',
+      '.mu-fila-pos{color:#777887;font-size:11px;text-align:center;font-weight:700}',
+      '.mu-fila-nav{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:12px}',
+      '.mu-nav{width:44px;height:44px;border:1px solid rgba(80,90,130,.14);border-radius:50%;background:#fff;',
+      'color:#3d63c9;font-size:22px;font-weight:900;line-height:1;cursor:pointer;transition:background .14s,transform .14s}',
+      '.mu-nav:hover:not(:disabled){background:rgba(91,141,239,.1);transform:translateY(-1px)}',
+      '.mu-nav:disabled{opacity:.3;cursor:default}',
+      '.mu-marca-actual{margin-top:10px;padding:9px 12px;border-radius:12px;font-size:11.5px;font-weight:800;line-height:1.45}',
+      '.mu-marca-actual.ok{background:rgba(58,208,164,.12);color:#178a6c;border:1px solid rgba(58,208,164,.25)}',
+      '.mu-marca-actual.no{background:rgba(255,107,107,.1);color:#c0392b;border:1px solid rgba(255,107,107,.25)}',
+      'body.dark .mu-nav{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.14);color:#9db7f5}',
       '.mu-fin{margin-top:18px;padding:26px 16px;border-radius:16px;background:rgba(58,208,164,.1);text-align:center}',
       '.mu-fin-ico{font-size:40px}',
       '.mu-fin b{display:block;margin-top:10px;color:#20705c;font-size:16px}',

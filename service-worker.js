@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v292-acciones-del-dia';
+const CACHE_NAME = 'appi-v293-flechitas-de-tareas';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
