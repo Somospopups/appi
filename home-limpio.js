@@ -548,10 +548,8 @@
     host.querySelectorAll('[data-wa]').forEach(function(b){
       b.onclick = function(e){
         e.stopPropagation();
-        var tel = String(b.dataset.wa || '').replace(/\D/g, '');
-        var url = 'https://wa.me/' + tel + '?text=' + encodeURIComponent('¡Hola! Soy ' + (window.APPIAuth && window.APPIAuth.currentProfile ? String(window.APPIAuth.currentProfile().nombre || '').split(/\s+/)[0] : '') + ' 😊 ¿Cómo estás? Quería retomarte, ¿te viene bien que charlemos hoy?');
-        if (window.APPIWhatsApp && window.APPIWhatsApp.abrir) window.APPIWhatsApp.abrir(url);
-        else window.open(url, '_blank', 'noopener');
+        var texto = '¡Hola! Soy ' + (window.APPIAuth && window.APPIAuth.currentProfile ? String(window.APPIAuth.currentProfile().nombre || '').split(/\s+/)[0] : '') + ' 😊 ¿Cómo estás? Quería retomarte, ¿te viene bien que charlemos hoy?';
+        window.APPITel.abrir(b.dataset.wa || '', texto);
       };
     });
     // Llamar buttons

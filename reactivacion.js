@@ -146,8 +146,7 @@
   function dias(a, b){ return Math.round((a - b) / DIA); }
 
   function tel(u){
-    if (window.APPIMensajes && typeof window.formatWhatsAppNumberU === 'function') return window.formatWhatsAppNumberU(u && u.telf || '');
-    return String(u && u.telf || '').replace(/\D/g, '');
+    return window.APPITel ? window.APPITel.normalizar(u && u.telf || '') : '';
   }
 
   /* ---------- contador del día ---------- */

@@ -161,15 +161,8 @@
     return /^\s*(hola|buen)/i.test(texto) ? texto : saludo + texto;
   }
   function abrirWhatsApp(p){
-    var digits = telefonoDe(p);
-    if (!digits){
-      if (window.APPIDialog) window.APPIDialog.alert('Esta persona no tiene un teléfono válido.', { title:'Sin teléfono', icon:'📵' });
-      return;
-    }
-    var num = digits.length === 10 ? '549' + digits : '54' + digits;
-    var url = 'https://wa.me/' + num + '?text=' + encodeURIComponent(armarMensaje(p));
-    if (window.APPIWhatsApp && window.APPIWhatsApp.abrir) window.APPIWhatsApp.abrir(url);
-    else window.open(url, '_blank', 'noopener');
+    var crudo = p && (p.telf || p.telefono || p.tel) || '';
+    window.APPITel.abrir(crudo, armarMensaje(p), pila(p));
   }
 
   function css(){

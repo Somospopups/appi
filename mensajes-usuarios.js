@@ -271,15 +271,12 @@
   }
 
   function telefonoDe(u){
-    if (typeof window.formatWhatsAppNumberU === 'function') return window.formatWhatsAppNumberU(u && u.telf || '');
-    return String(u && u.telf || '').replace(/\D/g, '');
+    return window.APPITel ? window.APPITel.normalizar(u && u.telf || '') : '';
   }
 
   function enviar(u, texto){
-    var num = telefonoDe(u);
-    var url = 'https://wa.me/' + num + '?text=' + encodeURIComponent(texto);
-    if (window.APPIWhatsApp && window.APPIWhatsApp.abrir) window.APPIWhatsApp.abrir(url);
-    else window.open(url, '_blank', 'noopener');
+    var nombre = (u && (u.usuario || u.nombre) || '').split(',')[0].trim();
+    if (!window.APPITel.abrir(u && u.telf || '', texto, nombre)) return;
     registrar(u, texto);
   }
 

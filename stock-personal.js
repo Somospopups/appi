@@ -335,16 +335,8 @@
   function avisar(id){
     var row = leerPrestamos().find(function(r){ return r.id === id; });
     if (!row) return;
-    var digits = last10(row.telefono);
-    if (!digits){
-      if (window.APPIDialog) window.APPIDialog.alert('Este préstamo no tiene un teléfono válido.', { title:'Sin teléfono', icon:'📵' });
-      return;
-    }
-    var num = digits.length === 10 ? '549' + digits : '54' + digits;
     var texto = 'Hola ' + (row.quien.split(/\s+/)[0] || '') + '! ¿Cómo andás? 😊\n\n¿Cómo te fue con el ' + row.producto + ' que te presté? Te consulto porque lo estoy necesitando.';
-    var url = 'https://wa.me/' + num + '?text=' + encodeURIComponent(texto);
-    if (window.APPIWhatsApp && window.APPIWhatsApp.abrir) window.APPIWhatsApp.abrir(url);
-    else window.open(url, '_blank', 'noopener');
+    window.APPITel.abrir(row.telefono, texto, row.quien);
   }
 
   function abrir(){

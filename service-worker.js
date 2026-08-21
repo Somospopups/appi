@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v288-app-neutral-de-marca';
+const CACHE_NAME = 'appi-v289-telefonos-whatsapp';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
@@ -8,6 +8,7 @@ const APP_SHELL = [
   './revisar-contactos.html',
   './auth-config.js',
   './appi-dialog.js',
+  './telefono.js',
   './whatsapp-app.js',
   './auth-client.js',
   './data-sync.js',

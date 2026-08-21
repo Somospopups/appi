@@ -315,7 +315,7 @@ async function openEncuestaTool(){
 }
 function statusInfo(value){return STATUSES[value]||STATUSES.nuevo}
 function phoneDigits(value){return String(value||'').replace(/\D/g,'').slice(0,15)}
-function whatsappDigits(value){let digits=phoneDigits(value);if(digits.startsWith('00'))digits=digits.slice(2);if(digits.length===10&&!digits.startsWith('54'))return `549${digits}`;if(digits.startsWith('54')&&digits.length===12&&!digits.startsWith('549'))return `549${digits.slice(2)}`;return digits}
+function whatsappDigits(value){return window.APPITel?window.APPITel.normalizar(value):''}
 function localISODate(value=new Date()){const d=value instanceof Date?value:new Date(value);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
 function addDaysISO(days){const d=new Date();d.setHours(12,0,0,0);d.setDate(d.getDate()+Number(days||0));return localISODate(d)}
 function formatDate(value,withTime=false){if(!value)return '-';const raw=String(value),d=/^\d{4}-\d{2}-\d{2}$/.test(raw)?new Date(`${raw}T12:00:00`):new Date(value);if(Number.isNaN(d.getTime()))return raw;return new Intl.DateTimeFormat('es-AR',withTime?{dateStyle:'short',timeStyle:'short'}:{dateStyle:'medium'}).format(d)}
@@ -363,7 +363,7 @@ function messageFor(c,type='recommended'){
   return `Hola ${first}! ¿Cómo va? 😊\n\nSoy ${sender}, pasaba a saludarte y a ver cómo venías con lo que habíamos hablado.`
 }
 function recommendedTemplate(c){return c.estado==='nuevo'?'first':c.estado==='presentacion'?'presentation':c.tipo==='encuestado'&&Array.isArray(surveyFor(c)?.referidos)&&surveyFor(c).referidos.length?'thanks':'followup'}
-function whatsappUrlFor(c,type='recommended'){return `https://wa.me/${whatsappDigits(c.telefono)}?text=${encodeURIComponent(messageFor(c,type))}`}
+function whatsappUrlFor(c,type='recommended'){const num=whatsappDigits(c.telefono);return num?`https://wa.me/${num}?text=${encodeURIComponent(messageFor(c,type))}`:''}
 function nextActionFor(c){if(isOverdueContact(c))return {text:`Seguimiento vencido · ${formatDate(c.proximo_contacto)}`,due:true};if(isTodayContact(c))return {text:'Seguimiento programado para hoy',due:true};if(c.estado==='nuevo')return {text:`Primer contacto pendiente · ingresó ${formatAgo(c.created_at)}`,due:false};if(c.estado==='seguimiento'&&!c.proximo_contacto)return {text:'Falta programar el próximo contacto',due:true};if(c.estado==='presentacion')return {text:c.proximo_contacto?`Presentación · ${formatDate(c.proximo_contacto)}${shortTime(c.proximo_contacto_hora)?` · ${shortTime(c.proximo_contacto_hora)}`:''}`:'Definir fecha de presentación',due:false};return {text:`Última actualización ${formatAgo(c.updated_at||c.created_at)}`,due:false}}
 function activitiesFor(contactId){return (state.activities.get(contactId)||[]).slice().sort((a,b)=>new Date(b.created_at)-new Date(a.created_at))}
 function addActivityLocal(activity){const list=state.activities.get(activity.contacto_id)||[];if(!list.some(row=>row.id===activity.id))list.unshift(activity);state.activities.set(activity.contacto_id,list);saveCache()}

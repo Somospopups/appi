@@ -100,6 +100,7 @@ window.openStock=function(){
 <script src="./panel-atras.js"></script>
 <script src="./auth-config.js"></script>
 <script src="./appi-dialog.js"></script>
+<script src="./telefono.js"></script>
 <script src="./whatsapp-app.js"></script>
 <script src="./auth-client.js"></script>
 <script src="./data-sync.js"></script>
@@ -4118,7 +4119,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v288 · Segura</div>
+  <div class="ds-foot">APPI · v289 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -7718,10 +7719,10 @@ ${(function(){
   cont.querySelectorAll('[data-tel]').forEach(b=>{
     b.onclick = (e)=>{
       e.stopPropagation();
-      const tel = b.dataset.tel.replace(/\D/g,'');
+      const tel = b.dataset.tel;
       const nom = b.dataset.nom;
       const msg = `¡Feliz cumpleaños ${nombreDePila(nom)||nom}! 🎂🎉 Te deseo un año maravilloso.`;
-      window.APPIWhatsApp.abrir(`https://wa.me/${tel}?text=${encodeURIComponent(msg)}`);
+      window.APPITel.abrir(tel, msg, nombreDePila(nom)||nom);
     };
   });
   
@@ -7764,7 +7765,7 @@ ${(function(){
             const tel = btn.dataset.teltarget;
             modal.close();
             haptic(15);
-            window.APPIWhatsApp.abrir(`https://wa.me/${tel}?text=${encodeURIComponent(msg)}`);
+            window.APPITel.abrir(tel, msg);
           };
         });
       }, 50);
@@ -8068,7 +8069,7 @@ function parseTelefonos(telStr){
 }
 
 function llamarWhatsAppDirecto(numero){
-  const url='whatsapp://call?phone='+encodeURIComponent(numero);let abierto=false;const onBlur=()=>{abierto=true;window.removeEventListener('blur',onBlur)};window.addEventListener('blur',onBlur);window.location.href=url;setTimeout(()=>{window.removeEventListener('blur',onBlur);if(!abierto)window.APPIWhatsApp.abrir('https://wa.me/'+numero)},900);
+  const url='whatsapp://call?phone='+encodeURIComponent(numero);let abierto=false;const onBlur=()=>{abierto=true;window.removeEventListener('blur',onBlur)};window.addEventListener('blur',onBlur);window.location.href=url;setTimeout(()=>{window.removeEventListener('blur',onBlur);if(!abierto)window.APPITel.abrir(numero)},900);
 }
 
 /* ============ POPUP ELEGIR TELÉFONO ============ */
@@ -8114,8 +8115,8 @@ function bonusAfterContact(){
 }
 function abrirWaNumero(digits){
   const data = window._telPicker;
-  if(data && data.nombre) window.APPIWhatsApp.abrir('https://wa.me/'+digits+'?text='+encodeURIComponent('Hola '+(nombreDePila(data.nombre)||data.nombre)+'! ¿Cómo andás? 😊'));
-  else window.APPIWhatsApp.abrir('https://wa.me/'+digits);
+  if(data && data.nombre) window.APPITel.abrir(digits, 'Hola '+(nombreDePila(data.nombre)||data.nombre)+'! ¿Cómo andás? 😊', nombreDePila(data.nombre)||data.nombre);
+  else window.APPITel.abrir(digits);
   modal.close();
   bonusAfterContact();
 }
@@ -8187,7 +8188,7 @@ function openPersonaModal(p){
   if(telefonos.length === 1){
     const t = telefonos[0];
     botonesTel = `
-      <button class="pm-wa" onclick="window.APPIWhatsApp.abrir('https://wa.me/${t.digits}?text='+encodeURIComponent('Hola ${escapeXml(nombreDePila(p.nombre)||p.nombre)}! ¿Cómo andás? 😊'))">💬 Contactar por WhatsApp</button>
+      <button class="pm-wa" onclick="window.APPITel.abrir('${t.digits}','Hola ${escapeXml(nombreDePila(p.nombre)||p.nombre)}! ¿Cómo andás? 😊','${escapeXml(nombreDePila(p.nombre)||p.nombre)}')">💬 Contactar por WhatsApp</button>
       <button type="button" class="pm-call" data-appi-call-phone="${t.digits}" data-appi-call-name="${escapeXml(p.nombre||'Contacto')}" data-appi-call-label="1">📲 Llamar en teléfono</button>
     `;
   } else if(telefonos.length > 1){
@@ -10039,8 +10040,8 @@ function seguimientoProgreso(){ const nube=genteNube(); if(nube.length) return M
 function openSeguimiento(){ showView('view-seguimiento'); }
 function capitalizarNombreSeg(valor){ return String(valor||'').toLocaleLowerCase('es-AR').replace(/(^|[\s'-])(\p{L})/gu,(m,sep,letra)=>sep+letra.toLocaleUpperCase('es-AR')).replace(/\s{2,}/g,' '); }
 function limpiarFormularioSeg(){ ['segNombre','segTelefono','segFecha','segNotas'].forEach(id=>document.getElementById(id).value=''); document.getElementById('segInteres').value='Producto'; document.getElementById('segEstado').value='No contactado'; seguimientoEditId=null; }
-function segDigits(phone){return String(phone||'').replace(/\D/g,'')}
-function segContactActions(p){const d=segDigits(p.telefono);if(!d)return '';const msg=encodeURIComponent(`Hola ${nombreDePila(p.nombre)||p.nombre}! ¿Cómo andás? 😊`);return `<div class="seg-contact-actions"><a class="wa-msg" title="Contactar por WhatsApp" aria-label="Contactar por WhatsApp" href="https://wa.me/${d}?text=${msg}" target="_blank" rel="noopener">💬 Contactar por WhatsApp</a><a class="phone-call" title="Llamar al contacto" aria-label="Llamar al contacto" href="tel:${d}" data-appi-call-phone="${d}" data-appi-call-name="${escapeXml(p.nombre||'Contacto')}" data-appi-call-label="1">📲 Llamar en teléfono</a></div>`}
+function segDigits(phone){return window.APPITel?window.APPITel.normalizar(phone):''}
+function segContactActions(p){const d=segDigits(p.telefono);if(!d)return '';const msg=encodeURIComponent(`Hola ${nombreDePila(p.nombre)||p.nombre}! ¿Cómo andás? 😊`);return `<div class="seg-contact-actions"><a class="wa-msg" title="Contactar por WhatsApp" aria-label="Contactar por WhatsApp" href="https://wa.me/${d}?text=${msg}" target="_blank" rel="noopener">💬 Contactar por WhatsApp</a><a class="phone-call" title="Llamar al contacto" aria-label="Llamar al contacto" href="tel:+${d}" data-appi-call-phone="${d}" data-appi-call-name="${escapeXml(p.nombre||'Contacto')}" data-appi-call-label="1">📲 Llamar en teléfono</a></div>`}
 function renderSeguimiento(){
   const all=cargarSeguimientos();
   const hoy=hoyLocal();
@@ -11540,7 +11541,7 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='288';
+      const swVersion='289';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 
@@ -14089,7 +14090,7 @@ function renderListU(){
       ${u.telf?`
       <div class="u-grupo u-acciones">
         <button type="button" class="action-btn wa" data-u-action="whatsapp" data-u-index="${index}">💬 WhatsApp</button>
-        <button type="button" class="action-btn call" data-u-action="call" data-u-index="${index}" data-appi-call-phone="${escU(String(u.telf||'').replace(/\D/g,''))}" data-appi-call-name="${escU(u.usuario||'Contacto')}" data-appi-call-label="1">📲 Llamar en teléfono</button>
+        <button type="button" class="action-btn call" data-u-action="call" data-u-index="${index}" data-appi-call-phone="${escU(window.APPITel?window.APPITel.normalizar(u.telf||''):'')}" data-appi-call-name="${escU(u.usuario||'Contacto')}" data-appi-call-label="1">📲 Llamar en teléfono</button>
       </div>`:''}
       <div class="u-grupo u-acciones">
         <button type="button" class="action-btn map" data-u-action="map" data-u-index="${index}">📍 Mapa</button>
@@ -14125,7 +14126,7 @@ function renderListU(){
         const link=getWhatsAppLinkU(u);
         if(link) window.open(link,'_blank','noopener'); else window.APPIDialog.alert('Este usuario no tiene un teléfono válido cargado.',{title:'Sin teléfono',icon:'📵'});
       }else if(action==='call'){
-        const digits=String(u.telf||'').replace(/\D/g,'');
+        const digits=window.APPITel?window.APPITel.normalizar(u.telf||''):'';
         if(digits) window.location.href='tel:'+digits;
       }else if(action==='google'){
         const query=[u.domicilio,u.localidad].filter(Boolean).join(' ');
@@ -14183,23 +14184,9 @@ function setGeoCacheU(cache){
 function normCacheKeyU(s){ return (s||'').toString().toLowerCase().trim().replace(/\s+/g,' '); }
 
 function formatWhatsAppNumberU(telf){
-  if(!telf) return '';
-  let digits=(telf||'').toString().replace(/\D/g,'');
-  if(!digits) return '';
-  if(digits.startsWith('0')) digits=digits.substring(1);
-  if(digits.startsWith('54')){
-    if(!digits.startsWith('549') && digits.length>=12){
-      digits='549'+digits.substring(2);
-    }
-    return digits;
-  }
-  if(digits.length>=11 && digits.indexOf('15')===3){
-    digits=digits.slice(0,3)+digits.slice(5);
-  }
-  if(digits.length>=10){
-    return '549'+digits.slice(-10);
-  }
-  return '54'+digits;
+  // Toda la app arma los números en un solo lugar: telefono.js (window.APPITel).
+  // Devuelve '' cuando el número no es válido, para no abrir un chat vacío.
+  return window.APPITel ? window.APPITel.normalizar(telf) : '';
 }
 window.formatWhatsAppNumberU=formatWhatsAppNumberU;
 function getWhatsAppLinkU(u){
@@ -14873,8 +14860,8 @@ const ACTION_CLOSED_RESULTS=new Set(['reactivated','no_followup']);
 function actionId(prefix='plan'){return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2,8)}`}
 function localActionDate(value=new Date()){const d=value instanceof Date?value:new Date(value);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
 function actionDateIn(days){const d=new Date();d.setHours(12,0,0,0);d.setDate(d.getDate()+Number(days||0));return localActionDate(d)}
-function actionPhone(value){return String(value||'').replace(/\D/g,'').slice(0,15)}
-function validActionPhone(value){const digits=actionPhone(value);return digits.length>=8&&digits.length<=15}
+function actionPhone(value){return window.APPITel?window.APPITel.normalizar(value):''}
+function validActionPhone(value){return !!actionPhone(value)}
 function actionActorKey(){
   const user=window.APPIAuth&&window.APPIAuth.userId?window.APPIAuth.userId():'local';
   return `${user||'local'}_${historicalPersonType()}`;
@@ -15419,8 +15406,8 @@ function openHistDrill(type,period,previous,topBranch){
 }
 function openHistSponsor(key,period){const sponsor=(period.summary.incomeSponsors||[]).find(s=>s.key===key),items=(period.incomes||[]).filter(i=>(i.patrocinanteDip||i.patrocinanteNombre||'Sin patrocinante')===key);openHistDrawer(sponsor?sponsor.name:'Patrocinante',`${items.length} ingresos · ${sponsor&&sponsor.dip||''}`,`<div class="hist-data-list">${items.map(histIncomeRow).join('')}</div>`);bindHistRows(period)}
 function bindHistRows(period){document.querySelectorAll('#histDetailBody [data-hist-person]').forEach(b=>b.onclick=()=>openHistPerson(b.dataset.histPerson,period));document.querySelectorAll('#histDetailBody [data-hist-income]').forEach(b=>b.onclick=()=>{const item=(period.incomes||[]).find(i=>i.matchKey===b.dataset.histIncome);if(item&&item.linkedPersonKey)openHistPerson(item.linkedPersonKey,period);else if(item)openHistIncome(item,period)})}
-function openHistPerson(key,period){const p=period.people.find(x=>x.key===key);if(!p)return;const income=(period.incomes||[]).find(i=>i.matchKey===p.matchKey),digits=String(p.tel||income&&income.telefono||'').replace(/\D/g,'');openHistDrawer(p.nombre,`${p.codigo||'Sin DIP'} · Categoría ${p.cat||'—'}`,`<div class="hist-person-kpis"><div><b>${fmt(p.pnAct)} PB</b><span>PB Personal</span></div><div><b>${fmt(p.teamPB)} PB</b><span>PB de Equipo</span></div><div><b>${fmt(p.garantias&&p.garantias.pendientes)}</b><span>Pendientes</span></div><div><b>${income?'Sí':'No'}</b><span>Ingreso del mes</span></div></div>${income?`<div class="hist-drill-note"><b>Fecha de alta:</b> ${esc(income.fechaAlta||'—')}<br><b>Última compra:</b> ${esc(income.ultimaCompra||'—')}<br><b>Patrocinante:</b> ${esc(income.patrocinanteNombre||'—')}</div>`:''}<div class="hist-contact-actions"><a class="wa" href="${digits?`https://wa.me/${digits}`:'#'}" ${digits?'target="_blank"':''}>WhatsApp</a><a class="call" href="${digits?`tel:${digits}`:'#'}">Llamar</a></div>`)}
-function openHistIncome(item,period){const digits=String(item.telefono||'').replace(/\D/g,'');openHistDrawer(item.nombre,`${item.dip} · Ingreso de ${period.label}`,`<div class="hist-person-kpis"><div><b>${esc(item.cat||'—')}</b><span>Categoría</span></div><div><b>${item.compraPosterior?'Sí':'No'}</b><span>Compra posterior</span></div><div><b>${item.diasHastaCompra===null?'—':item.diasHastaCompra}</b><span>Días hasta compra</span></div><div><b>${item.capacitacion?'Sí':'No'}</b><span>Capacitación</span></div></div><div class="hist-drill-note"><b>Alta:</b> ${esc(item.fechaAlta||'—')}<br><b>Última compra:</b> ${esc(item.ultimaCompra||'—')}<br><b>Patrocinante:</b> ${esc(item.patrocinanteNombre||'—')} · ${esc(item.patrocinanteDip||'')}</div><div class="hist-contact-actions"><a class="wa" href="${digits?`https://wa.me/${digits}`:'#'}" ${digits?'target="_blank"':''}>WhatsApp</a><a class="call" href="${digits?`tel:${digits}`:'#'}">Llamar</a></div>`)}
+function openHistPerson(key,period){const p=period.people.find(x=>x.key===key);if(!p)return;const income=(period.incomes||[]).find(i=>i.matchKey===p.matchKey),digits=window.APPITel?window.APPITel.normalizar(p.tel||income&&income.telefono||''):'';openHistDrawer(p.nombre,`${p.codigo||'Sin DIP'} · Categoría ${p.cat||'—'}`,`<div class="hist-person-kpis"><div><b>${fmt(p.pnAct)} PB</b><span>PB Personal</span></div><div><b>${fmt(p.teamPB)} PB</b><span>PB de Equipo</span></div><div><b>${fmt(p.garantias&&p.garantias.pendientes)}</b><span>Pendientes</span></div><div><b>${income?'Sí':'No'}</b><span>Ingreso del mes</span></div></div>${income?`<div class="hist-drill-note"><b>Fecha de alta:</b> ${esc(income.fechaAlta||'—')}<br><b>Última compra:</b> ${esc(income.ultimaCompra||'—')}<br><b>Patrocinante:</b> ${esc(income.patrocinanteNombre||'—')}</div>`:''}<div class="hist-contact-actions"><a class="wa" href="${digits?`https://wa.me/${digits}`:'#'}" ${digits?'target="_blank"':''}>WhatsApp</a><a class="call" href="${digits?`tel:${digits}`:'#'}">Llamar</a></div>`)}
+function openHistIncome(item,period){const digits=window.APPITel?window.APPITel.normalizar(item.telefono||''):'';openHistDrawer(item.nombre,`${item.dip} · Ingreso de ${period.label}`,`<div class="hist-person-kpis"><div><b>${esc(item.cat||'—')}</b><span>Categoría</span></div><div><b>${item.compraPosterior?'Sí':'No'}</b><span>Compra posterior</span></div><div><b>${item.diasHastaCompra===null?'—':item.diasHastaCompra}</b><span>Días hasta compra</span></div><div><b>${item.capacitacion?'Sí':'No'}</b><span>Capacitación</span></div></div><div class="hist-drill-note"><b>Alta:</b> ${esc(item.fechaAlta||'—')}<br><b>Última compra:</b> ${esc(item.ultimaCompra||'—')}<br><b>Patrocinante:</b> ${esc(item.patrocinanteNombre||'—')} · ${esc(item.patrocinanteDip||'')}</div><div class="hist-contact-actions"><a class="wa" href="${digits?`https://wa.me/${digits}`:'#'}" ${digits?'target="_blank"':''}>WhatsApp</a><a class="call" href="${digits?`tel:${digits}`:'#'}">Llamar</a></div>`)}
 function bindGo(root){root.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>openTab(b.dataset.go))}
 
 function periodLibraryHtml(){return `<div class="hist-card hist-period-library"><div class="hist-card-head"><div><h3>Meses guardados</h3><p>${H.periods.length} cierres con sus archivos originales</p></div><span class="hist-badge">Administrar</span></div>${H.periods.length?`<div class="hist-period-list">${[...H.periods].reverse().map(periodRow).join('')}</div>`:`<div class="hist-empty"><h3>Sin cierres guardados</h3><p>Completá los tres archivos de un mes para comenzar.</p></div>`}</div><div class="hist-card"><div class="hist-card-head"><div><h3>Respaldo completo</h3><p>Incluye estadísticas y los archivos originales.</p></div></div><div class="hist-actions"><button class="hist-primary" id="histBackupAll" ${H.periods.length?'':'disabled'}>Descargar backup ZIP</button><button class="hist-secondary" id="histRestore">Restaurar ZIP</button></div></div>`}
