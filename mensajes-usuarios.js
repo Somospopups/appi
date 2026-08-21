@@ -289,7 +289,10 @@
     if (!data.envios) data.envios = {};
     data.envios[key] = { at: new Date().toISOString(), texto: String(texto || '').slice(0, 400) };
     guardar(data);
-    // El que ya recibió su mensaje sale de los pendientes del día.
+    // Mandar el mensaje es hacer la acción: queda marcada ✓ sola.
+    MOTIVOS.forEach(function(m){
+      try{ if (m.aplica(u)) marcarAccion(m.id, u, 'hecha', true); }catch(e){}
+    });
     try{ pintarHoy(); }catch(e){}
   }
   function ultimoEnvio(u){
@@ -298,6 +301,78 @@
     var e = leerGuardado().envios || {};
     return e[key] || null;
   }
+
+  /* ---------- marcas del día (v292) ----------
+     Cada acción del día se marca con ✓ (hecha) o ✗ (no se hizo). Las marcas
+     viven por día y por usuario en su propia clave, que data-sync sube a la
+     nube: así el administrador puede ver el cumplimiento de cada cuenta.
+     Al cambiar el día, la lista arranca de nuevo. */
+  function accionesKey(){ return 'appi_acciones_v1_' + uid(); }
+  function leerAcciones(){
+    try{
+      var raw = JSON.parse(localStorage.getItem(accionesKey()) || '{}');
+      return raw && typeof raw === 'object' ? raw : {};
+    }catch(e){ return {}; }
+  }
+  function guardarAcciones(d){
+    try{ localStorage.setItem(accionesKey(), JSON.stringify(d)); }catch(e){}
+  }
+  function hoyKey(){
+    var h = hoy();
+    return h.getFullYear() + '-' + String(h.getMonth()+1).padStart(2,'0') + '-' + String(h.getDate()).padStart(2,'0');
+  }
+  function marcasDeHoy(){
+    var d = leerAcciones();
+    return (d.dias && d.dias[hoyKey()] && d.dias[hoyKey()].marcas) || {};
+  }
+  function marcaDe(motivoId, u){
+    var tel = telefonoDe(u);
+    if (!tel) return null;
+    return marcasDeHoy()[motivoId + ':' + tel] || null;
+  }
+  // Sólo se guardan los últimos 60 días: alcanza para el resumen y no crece sin fin.
+  function limpiarViejos(d){
+    var claves = Object.keys(d.dias || {});
+    claves.forEach(function(k){
+      var f = aFecha(k);
+      if (!f || dias(hoy(), f) > 60) delete d.dias[k];
+    });
+  }
+  function marcarAccion(motivoId, u, estado, silencioso){
+    var tel = telefonoDe(u);
+    if (!tel) return;
+    var d = leerAcciones();
+    if (!d.dias) d.dias = {};
+    var k = hoyKey();
+    if (!d.dias[k]) d.dias[k] = { marcas: {} };
+    d.dias[k].marcas[motivoId + ':' + tel] = {
+      e: estado === 'hecha' ? 'hecha' : 'no_hecha',
+      at: new Date().toISOString(),
+      n: String(u.usuario || '').slice(0, 60)
+    };
+    // El resumen queda escrito en el día: es lo que lee el panel del admin.
+    var r = resumenCon(d);
+    d.dias[k].total = r.total; d.dias[k].hechas = r.hechas; d.dias[k].noHechas = r.noHechas;
+    limpiarViejos(d);
+    guardarAcciones(d);
+    if (!silencioso){ try{ pintarHoy(); }catch(e){} }
+  }
+  function resumenCon(d){
+    var marcas = (d.dias && d.dias[hoyKey()] && d.dias[hoyKey()].marcas) || {};
+    var total = 0, hechas = 0, noHechas = 0, pendientes = 0;
+    deHoy().forEach(function(g){
+      g.gente.forEach(function(u){
+        total++;
+        var m = marcas[g.motivo.id + ':' + telefonoDe(u)];
+        if (m && m.e === 'hecha') hechas++;
+        else if (m && m.e === 'no_hecha') noHechas++;
+        else pendientes++;
+      });
+    });
+    return { total: total, hechas: hechas, noHechas: noHechas, pendientes: pendientes };
+  }
+  function resumenHoy(){ return resumenCon(leerAcciones()); }
+
 
   /* ---------- pendientes del día ---------- */
   /* Tres motivos, en orden de urgencia. Cada uno junta a los clientes que le
@@ -340,23 +415,37 @@
     return dias(hoy(), new Date(d.getFullYear(), d.getMonth(), d.getDate())) === 0;
   }
 
-  function pendientes(){
+  // La lista completa del día: todos los que corresponden hoy, con marca o
+  // sin ella. Es lo que el panel muestra todo el día, sin poder borrarse.
+  function deHoy(){
     var lista = [];
     if (typeof window.usuariosTodosActual === 'function') lista = window.usuariosTodosActual() || [];
     else if (Array.isArray(window.usuariosU)) lista = window.usuariosU;
     var out = [];
     MOTIVOS.forEach(function(m){
       var gente = lista.filter(function(u){
-        return telefonoDe(u) && !escritoHoy(u) && m.aplica(u);
+        return telefonoDe(u) && m.aplica(u);
       });
       if (gente.length) out.push({ motivo:m, gente:gente });
     });
     return out;
   }
 
+  // Para el carrusel: sólo los que todavía no tienen ✓ ni ✗.
+  function pendientes(){
+    var out = [];
+    deHoy().forEach(function(g){
+      var gente = g.gente.filter(function(u){ return !marcaDe(g.motivo.id, u); });
+      if (gente.length) out.push({ motivo: g.motivo, gente: gente });
+    });
+    return out;
+  }
+
   /* ---------- franja del día ---------- */
-  /* Sólo se dibuja si hay algo que hacer: sin pendientes la pantalla queda
-     exactamente como antes. */
+  /* La franja dura todo el día: las acciones marcadas no desaparecen, cambian
+     de estado. No hay forma de cerrarla; recién al cambiar el día se arma la
+     lista nueva. */
+  var diaPintado = '';
   function pintarHoy(){
     var vista = document.getElementById('view-usuarios');
     if (!vista) return;
@@ -364,9 +453,11 @@
     if (!stats) return;
     css();
     var host = document.getElementById('muHoy');
-    var grupos = pendientes();
+    var grupos = deHoy();
+    var res = resumenHoy();
+    diaPintado = hoyKey();
 
-    if (!grupos.length){
+    if (!res.total){
       if (host) host.remove();
       return;
     }
@@ -375,17 +466,31 @@
       host.id = 'muHoy';
       stats.parentNode.insertBefore(host, stats);
     }
-    var total = 0;
-    grupos.forEach(function(g){ total += g.gente.length; });
+    var titulo = res.pendientes === 0
+      ? '🎉 Día completo: las ' + res.total + (res.total === 1 ? ' acción' : ' acciones') + ' están marcadas'
+      : 'Hoy tenés ' + res.total + (res.total === 1 ? ' mensaje' : ' mensajes') + ' para mandar';
     var html = '<div class="mu-hoy-top"><span class="mu-hoy-ico">📋</span>' +
-      '<b>Hoy tenés ' + total + (total === 1 ? ' mensaje' : ' mensajes') + ' para mandar</b></div>' +
+      '<b>' + titulo + '</b>' +
+      '<span class="mu-hoy-res"><i class="ok">✓ ' + res.hechas + '</i><i class="no">✗ ' + res.noHechas + '</i>' +
+      (res.pendientes ? '<i>quedan ' + res.pendientes + '</i>' : '') + '</span></div>' +
       '<div class="mu-hoy-list">';
     grupos.forEach(function(g){
-      var n = g.gente.length;
-      html += '<button type="button" class="mu-hoy-item" data-mu-hoy="' + esc(g.motivo.id) + '">' +
-        '<span class="mu-hoy-n">' + g.motivo.icono + ' ' + n + '</span>' +
-        '<span class="mu-hoy-txt">' + esc(n === 1 ? g.motivo.uno : g.motivo.varios) + '</span>' +
-        '<span class="mu-hoy-go">›</span></button>';
+      var sinMarca = g.gente.filter(function(u){ return !marcaDe(g.motivo.id, u); }).length;
+      var hechas = g.gente.filter(function(u){ var m = marcaDe(g.motivo.id, u); return m && m.e === 'hecha'; }).length;
+      var noHechas = g.gente.length - sinMarca - hechas;
+      var estado = '<span class="mu-hoy-est">' + (hechas ? '<i class="ok">✓' + hechas + '</i>' : '') +
+                   (noHechas ? '<i class="no">✗' + noHechas + '</i>' : '') + '</span>';
+      if (sinMarca){
+        html += '<button type="button" class="mu-hoy-item" data-mu-hoy="' + esc(g.motivo.id) + '">' +
+          '<span class="mu-hoy-n">' + g.motivo.icono + ' ' + sinMarca + '</span>' +
+          '<span class="mu-hoy-txt">' + esc(sinMarca === 1 ? g.motivo.uno : g.motivo.varios) + '</span>' +
+          estado + '<span class="mu-hoy-go">›</span></button>';
+      } else {
+        html += '<div class="mu-hoy-item done">' +
+          '<span class="mu-hoy-n">' + g.motivo.icono + ' ' + g.gente.length + '</span>' +
+          '<span class="mu-hoy-txt">' + esc(g.gente.length === 1 ? g.motivo.uno : g.motivo.varios) + ' · completado</span>' +
+          estado + '<span class="mu-hoy-go">✓</span></div>';
+      }
     });
     html += '</div>';
     host.innerHTML = html;
@@ -393,6 +498,13 @@
       b.onclick = function(){ abrirFila(b.getAttribute('data-mu-hoy')); };
     });
   }
+
+  // Al cambiar el día, la franja se rearma sola con las acciones nuevas.
+  setInterval(function(){
+    if (diaPintado && diaPintado !== hoyKey()){
+      try{ pintarHoy(); }catch(e){}
+    }
+  }, 60000);
 
   /* ---------- fila de trabajo ---------- */
   /* Un cliente por vez: se manda y pasa al siguiente. WhatsApp no deja enviar
@@ -404,7 +516,7 @@
     var g = null;
     grupos.forEach(function(x){ if (x.motivo.id === motivoId) g = x; });
     if (!g) { pintarHoy(); return; }
-    fila = { motivo: g.motivo, gente: g.gente.slice(), i: 0, hechos: 0 };
+    fila = { motivo: g.motivo, gente: g.gente.slice(), i: 0, hechos: 0, noHechos: 0 };
     pintarFila();
   }
 
@@ -417,8 +529,9 @@
       ov.querySelector('#muTitulo').textContent = '¡Listo!';
       ov.querySelector('#muSub').textContent = '';
       cuerpo.innerHTML = '<div class="mu-fin"><div class="mu-fin-ico">✅</div>' +
-        '<b>' + fila.hechos + (fila.hechos === 1 ? ' mensaje enviado' : ' mensajes enviados') + '</b>' +
-        '<p>No queda nadie más en esta lista por hoy.</p></div>' +
+        '<b>' + fila.hechos + (fila.hechos === 1 ? ' acción hecha' : ' acciones hechas') +
+        (fila.noHechos ? ' · ' + fila.noHechos + ' sin hacer' : '') + '</b>' +
+        '<p>No queda nadie sin marcar en esta lista por hoy.</p></div>' +
         '<button type="button" class="mu-enviar" id="muFinCerrar">Cerrar</button>';
       cuerpo.querySelector('#muFinCerrar').onclick = function(){ cerrar(); pintarHoy(); };
       ov.classList.add('open');
@@ -439,7 +552,11 @@
     html += '<div class="mu-prev"><b>Así lo va a recibir</b><span>' + esc(texto) + '</span></div>';
     html += '<div class="mu-acciones">';
     html += '<button type="button" class="mu-enviar" id="muFilaEnviar">💬 Mandar a ' + esc(nombre) + '</button>';
-    html += '<button type="button" class="mu-sec" id="muFilaSaltar">Saltear</button>';
+    // Cada acción se marca sí o sí: ✓ la hice (aunque sea por otro medio) o
+    // ✗ no se hizo. No hay forma de pasar de largo sin dejar constancia.
+    html += '<div class="mu-marcar">' +
+      '<button type="button" class="mu-marca ok" id="muFilaHecha"><i>✓</i>Ya lo hice</button>' +
+      '<button type="button" class="mu-marca no" id="muFilaNoHecha"><i>✗</i>No se hizo</button></div>';
     html += '</div>';
     html += '<div class="mu-fila-pos">' + (fila.i + 1) + ' de ' + fila.gente.length + '</div>';
     cuerpo.innerHTML = html;
@@ -450,7 +567,15 @@
       fila.i++;
       pintarFila();
     };
-    cuerpo.querySelector('#muFilaSaltar').onclick = function(){
+    cuerpo.querySelector('#muFilaHecha').onclick = function(){
+      marcarAccion(fila.motivo.id, u, 'hecha');
+      fila.hechos++;
+      fila.i++;
+      pintarFila();
+    };
+    cuerpo.querySelector('#muFilaNoHecha').onclick = function(){
+      marcarAccion(fila.motivo.id, u, 'no_hecha');
+      fila.noHechos++;
       fila.i++;
       pintarFila();
     };
@@ -501,6 +626,26 @@
       '.mu-sec{min-height:44px;border:0;border-radius:13px;background:rgba(91,141,239,.11);color:#3d63c9;font:inherit;font-size:12.5px;font-weight:850;cursor:pointer}',
       '.mu-sec:hover{background:rgba(91,141,239,.2)}',
       '.mu-sec.mu-grande{min-height:50px;font-size:14px}',
+      /* marcas ✓ / ✗ */
+      '.mu-marcar{display:grid;grid-template-columns:1fr 1fr;gap:9px}',
+      '.mu-marca{display:flex;align-items:center;justify-content:center;gap:7px;min-height:46px;border:0;border-radius:13px;',
+      'font:inherit;font-size:12.5px;font-weight:850;cursor:pointer;transition:transform .12s,filter .12s}',
+      '.mu-marca:hover{transform:translateY(-1px);filter:brightness(1.04)}',
+      '.mu-marca i{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;font-style:normal;font-size:12px;font-weight:900;color:#fff}',
+      '.mu-marca.ok{background:rgba(58,208,164,.14);color:#178a6c}',
+      '.mu-marca.ok i{background:linear-gradient(135deg,#3ad0a4,#128C7E)}',
+      '.mu-marca.no{background:rgba(255,107,107,.12);color:#c0392b}',
+      '.mu-marca.no i{background:linear-gradient(135deg,#ff6b6b,#e74c3c)}',
+      '.mu-hoy-res{display:inline-flex;gap:6px;margin-left:auto;align-items:center}',
+      '.mu-hoy-res i,.mu-hoy-est i{font-style:normal;font-size:10.5px;font-weight:900;padding:3px 8px;border-radius:999px;background:rgba(120,120,140,.12);color:#63636f;white-space:nowrap}',
+      '.mu-hoy-res i.ok,.mu-hoy-est i.ok{background:rgba(58,208,164,.16);color:#178a6c}',
+      '.mu-hoy-res i.no,.mu-hoy-est i.no{background:rgba(255,107,107,.14);color:#c0392b}',
+      '.mu-hoy-est{display:inline-flex;gap:4px}',
+      '.mu-hoy-item.done{opacity:.72;cursor:default;grid-template-columns:auto minmax(0,1fr) auto auto}',
+      '.mu-hoy-item.done .mu-hoy-go{color:#178a6c}',
+      '.mu-hoy-item:not(.done){grid-template-columns:auto minmax(0,1fr) auto auto}',
+      'body.dark .mu-marca.ok{background:rgba(58,208,164,.18)}',
+      'body.dark .mu-marca.no{background:rgba(255,107,107,.16)}',
       '.mu-nota{margin-top:13px;padding:11px 13px;border-radius:13px;background:rgba(245,179,1,.1);color:#8a6100;font-size:11.5px;line-height:1.5}',
       '.mu-vacio{margin-top:16px;padding:18px 14px;border-radius:15px;background:rgba(255,255,255,.7);color:#777887;font-size:12.5px;text-align:center;line-height:1.55}',
       /* franja del día */
@@ -838,6 +983,10 @@
     abrir: abrir,
     mandar: mandar,
     pendientes: pendientes,
+    deHoy: deHoy,
+    marcarAccion: marcarAccion,
+    marcaDe: marcaDe,
+    resumenHoy: resumenHoy,
     pintarHoy: pintarHoy,
     abrirFila: abrirFila,
     escritoHoy: escritoHoy,

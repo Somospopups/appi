@@ -4119,7 +4119,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v291 · Segura</div>
+  <div class="ds-foot">APPI · v292 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -5025,6 +5025,11 @@ body.dark #pageTabs button.active{color:#a8c0ff}
         <div class="admin-card-head"><div><h2>WhatsApp del equipo</h2><p>Este número recibe ayuda y solicitudes nuevas.</p></div></div>
         <div class="admin-setting-row"><input id="adminWhatsappNumber" inputmode="tel" autocomplete="off" placeholder="Ej: 5493515551234"><button type="button" class="btn btn-primary" id="adminSaveWhatsapp">Guardar número</button></div>
         <div class="admin-inline-status" id="adminWhatsappStatus" role="status"></div>
+      </section>
+      <section class="glass admin-card">
+        <div class="admin-card-head"><div><h2>Cumplimiento diario</h2><p>Acciones del día que cada cuenta marcó con ✓ o ✗.</p></div><button type="button" class="btn btn-secondary" id="adminRefreshAcciones">Actualizar</button></div>
+        <div class="admin-pending-list" id="adminAccionesList"><div class="admin-pending-empty">Todavía no hay marcas sincronizadas.</div></div>
+        <div class="admin-inline-status" id="adminAccionesStatus" role="status"></div>
       </section>
       <section class="glass admin-card">
         <div class="admin-card-head"><div><h2>Solicitudes pendientes</h2><p>Revisá los datos antes de crear la cuenta.</p></div><button type="button" class="btn btn-secondary" id="adminRefreshRequests">Actualizar</button></div>
@@ -11562,7 +11567,7 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='291';
+      const swVersion='292';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 

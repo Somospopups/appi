@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v291-planilla-del-titular';
+const CACHE_NAME = 'appi-v292-acciones-del-dia';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

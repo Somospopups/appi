@@ -1,12 +1,27 @@
-# Estado al retomar — APPI v291
+# Estado al retomar — APPI v292
 
 Repo: `github.com/somospopups/appi` · **suite en verde**.
 
-Corrida local completa: **264 pruebas pasan, 1 salteada, 0 fallan** (3 flakes de contactos re-corridos en verde).
+Corrida local completa: **269 pruebas pasan, 1 salteada, 0 fallan** (10,2 min, sin flakes).
 
 ---
 
-## Último arreglo: v291 · Solo la planilla del titular
+## Último cambio: v292 · Acciones del día con ✓ y ✗
+
+Pedido del equipo: la franja "Hoy tenés N mensajes" (Garantías) dura todo el
+día, no se puede eliminar, rota sola al cambiar el día, y cada acción se
+marca sí o sí con ✓ (hecha) o ✗ (no se hizo) — sin "Saltear". Mandar por
+WhatsApp marca la ✓ sola.
+
+Cómputo: marcas por día en appi_acciones_v1_<uid> (prefijo nuevo en
+data-sync → sube a appi_datos con nube/offline/titular-socio resueltos).
+Migración nueva SUPABASE_ACCIONES_DIA.sql: RPC appi_admin_cumplimiento
+(solo rol admin) + sección "Cumplimiento diario" en el panel admin.
+
+⚠️ PENDIENTE DE DESPLIEGUE: correr SUPABASE_ACCIONES_DIA.sql en el SQL
+Editor de Supabase. Hasta entonces la sección del panel avisa que falta.
+
+## Anterior: v291 · Solo la planilla del titular
 
 Pedido del equipo: que no se pueda cargar una planilla de Garantías ajena.
 La LD ya se validaba por DIP del titular (cliente + triggers de Supabase),

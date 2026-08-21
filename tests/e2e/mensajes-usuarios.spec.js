@@ -367,13 +367,13 @@ test('la fila de trabajo va de a uno y avisa cuántos quedan', async ({ page }) 
 
   await page.locator('#muFilaEnviar').click();
   // Al terminar la lista, cierra con el resumen.
-  await expect(page.locator('.mu-fin')).toContainText('1 mensaje enviado');
+  await expect(page.locator('.mu-fin')).toContainText('1 acción hecha');
   const urls = await page.evaluate(() => window.__wa);
   expect(urls).toHaveLength(1);
   expect(decodeURIComponent(urls[0])).toContain('Feliz cumpleaños, Ana');
 });
 
-test('el que ya recibió su mensaje sale de los pendientes', async ({ page }) => {
+test('el contactado no desaparece: queda marcado ✓ y la franja dura todo el día', async ({ page }) => {
   await entrar(page, PENDIENTES);
   await page.evaluate(() => { window.APPIWhatsApp.abrir = () => {}; });
   await expect(page.locator('#muHoy')).toContainText('3 mensajes');
@@ -382,12 +382,15 @@ test('el que ya recibió su mensaje sale de los pendientes', async ({ page }) =>
   await page.locator('#muFilaEnviar').click();
   await page.locator('#muFinCerrar').click();
 
-  // La franja se rehace sola: quedan dos y el motivo cumplido desaparece.
-  await expect(page.locator('#muHoy')).toContainText('2 mensajes');
+  // La franja no se achica: la acción hecha queda a la vista con su ✓.
+  await expect(page.locator('#muHoy')).toContainText('3 mensajes');
+  await expect(page.locator('#muHoy .mu-hoy-res')).toContainText('✓ 1');
+  // El motivo completado deja de ser un botón: ya no hay nada para abrir ahí.
   await expect(page.locator('[data-mu-hoy="cumple"]')).toHaveCount(0);
+  await expect(page.locator('.mu-hoy-item.done')).toContainText('completado');
 });
 
-test('saltear pasa al siguiente sin mandar nada', async ({ page }) => {
+test('la ✗ registra que no se hizo y obliga a dejar constancia: no hay saltear', async ({ page }) => {
   const dos = [
     { id: 1, usuario: 'GOMEZ, ANA MARIA', telf: '3515551001', localidad: 'Alta Gracia', producto: 'PSA',
       fCompra: ddmmyyyy(-182), fVenceRaw: ddmmyyyy(400), fVence: dias(400), estado: 'vigente' },
@@ -400,17 +403,54 @@ test('saltear pasa al siguiente sin mandar nada', async ({ page }) => {
   await page.locator('[data-mu-hoy="retro"]').click();
   await expect(page.locator('#muSub')).toContainText('Quedan 2');
   await expect(page.locator('.mu-fila-quien')).toContainText('GOMEZ');
+  // El botón de saltear no existe más: se marca sí o sí.
+  await expect(page.locator('#muFilaSaltar')).toHaveCount(0);
 
-  await page.locator('#muFilaSaltar').click();
+  await page.locator('#muFilaNoHecha').click();
   await expect(page.locator('.mu-fila-quien')).toContainText('RUIZ');
   await expect(page.locator('#muSub')).toContainText('Queda 1');
 
   await page.locator('#muFilaEnviar').click();
-  await expect(page.locator('.mu-fin')).toContainText('1 mensaje enviado');
-  // El salteado no recibió nada.
+  await expect(page.locator('.mu-fin')).toContainText('1 acción hecha · 1 sin hacer');
+  // La no hecha no recibió nada, pero quedó registrada.
   const urls = await page.evaluate(() => window.__wa);
   expect(urls).toHaveLength(1);
   expect(decodeURIComponent(urls[0])).toContain('Roberto');
+
+  await page.locator('#muFinCerrar').click();
+  await expect(page.locator('#muHoy')).toContainText('Día completo');
+  await expect(page.locator('#muHoy .mu-hoy-res')).toContainText('✓ 1');
+  await expect(page.locator('#muHoy .mu-hoy-res')).toContainText('✗ 1');
+
+  // El cómputo del día queda guardado para la nube y el panel del admin.
+  const dia = await page.evaluate(() => {
+    const clave = Object.keys(localStorage).find(k => k.startsWith('appi_acciones_v1_'));
+    const dias = JSON.parse(localStorage.getItem(clave) || '{}').dias || {};
+    return dias[Object.keys(dias)[0]] || null;
+  });
+  expect(dia.total).toBe(2);
+  expect(dia.hechas).toBe(1);
+  expect(dia.noHechas).toBe(1);
+});
+
+test('la ✓ marca hecha sin abrir WhatsApp', async ({ page }) => {
+  const uno = [
+    { id: 1, usuario: 'GOMEZ, ANA MARIA', telf: '3515551001', localidad: 'Alta Gracia', producto: 'PSA',
+      fCompra: ddmmyyyy(-182), fVenceRaw: ddmmyyyy(400), fVence: dias(400), estado: 'vigente' }
+  ];
+  await entrar(page, uno);
+  await page.evaluate(() => { window.__wa = []; window.APPIWhatsApp.abrir = u => window.__wa.push(u); });
+
+  await page.locator('[data-mu-hoy="retro"]').click();
+  await page.locator('#muFilaHecha').click();
+  await expect(page.locator('.mu-fin')).toContainText('1 acción hecha');
+
+  // No se abrió WhatsApp: la acción se hizo por otro medio (llamada, visita).
+  const urls = await page.evaluate(() => window.__wa);
+  expect(urls).toHaveLength(0);
+
+  await page.locator('#muFinCerrar').click();
+  await expect(page.locator('#muHoy')).toContainText('Día completo');
 });
 
 test('el vencido hace más de un año nunca entra en los pendientes', async ({ page }) => {
