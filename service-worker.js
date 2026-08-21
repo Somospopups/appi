@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v287-los-26-mensajes';
+const CACHE_NAME = 'appi-v288-app-neutral-de-marca';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

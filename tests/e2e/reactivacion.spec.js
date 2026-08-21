@@ -166,7 +166,9 @@ test('la fila manda de a uno y avisa cuántos quedan del cupo', async ({ page })
   expect(texto).toContain('Hola Ana');
   expect(texto).toContain('seguís teniendo el equipo');
   // El mensaje se presenta: quien lo recibe no lo tiene agendado hace años.
-  expect(texto).toContain('distribuidor de PSA');
+  // La app no nombra ninguna marca: sirve para cualquier distribuidor.
+  expect(texto).toContain('nuestros purificadores');
+  expect(texto).not.toContain('PSA');
   expect(texto).not.toContain('{vos}');
 });
 

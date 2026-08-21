@@ -108,7 +108,7 @@
   var PLANTILLA_BASE = [
     'Hola {nombre}, ¿cómo estás? 😊',
     '',
-    'Soy {vos}, distribuidor de PSA. Te escribo porque en nuestra base de datos figurás como usuario de nuestros equipos y estamos retomando el contacto con personas que alguna vez confiaron en nosotros.',
+    'Soy {vos}. Te escribo porque figurás como usuario de nuestros purificadores y estamos retomando el contacto con personas que alguna vez confiaron en nosotros.',
     '',
     'Como pasó bastante tiempo, quería consultarte algo muy simple: *¿seguís teniendo el equipo, o actualmente estás tomando otro tipo de agua?*',
     '',
