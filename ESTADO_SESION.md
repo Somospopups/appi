@@ -1,12 +1,24 @@
-# Estado al retomar — APPI v290
+# Estado al retomar — APPI v291
 
 Repo: `github.com/somospopups/appi` · **suite en verde**.
 
-Corrida local completa: **257 pruebas pasan, 1 salteada, 0 fallan** (9,7 min, Chromium).
+Corrida local completa: **264 pruebas pasan, 1 salteada, 0 fallan** (3 flakes de contactos re-corridos en verde).
 
 ---
 
-## Último arreglo: v290 · El panel dejaba de lado la validación de números
+## Último arreglo: v291 · Solo la planilla del titular
+
+Pedido del equipo: que no se pueda cargar una planilla de Garantías ajena.
+La LD ya se validaba por DIP del titular (cliente + triggers de Supabase),
+pero la GO se aceptaba ignorando en silencio las filas que no coincidían.
+
+Desde v291 la GO se valida por contenido (el reporte no trae el DIP del
+titular): si ningún DIP está en la LD, o con 5+ registros coincide menos
+del 20%, se rechaza entera. Aplica en la pantalla principal, en la carga
+del Histórico (con la LD del mes, en cualquier orden) y como respaldo en
+normalizePeriod al guardar el cierre. Tests en garantias-titular.spec.js.
+
+## Anterior: v290 · El panel dejaba de lado la validación de números
 
 El usuario reportó con captura real que WhatsApp respondía
 "+549280434264454 no es un número de teléfono válido" al avisar desde el

@@ -257,7 +257,19 @@ async function parseHistoricalFile(type,file){
 function makePersonKey(p,index,used){
   const matchKey=p.codigo?`c:${codeNorm(p.codigo)}`:`n:${normalize(p.nombre)}`;let key=matchKey||`fila:${index}`;let n=2;while(used.has(key))key=`${matchKey}#${n++}`;used.add(key);return {key,matchKey};
 }
+/* Solo la planilla del titular (v291): las Garantías del mes tienen que
+   corresponder a la Línea Descendente de ese mes. El reporte no trae el DIP
+   del titular, así que se valida por contenido: si casi ningún DIP coincide,
+   la planilla es de otra cuenta y se rechaza entera. */
+function validarGarantiasDelTitular(teamData,garantiasMap){
+  const dips=Object.keys(garantiasMap||{});
+  if(!dips.length)return;
+  const codigos=new Set((teamData&&teamData.personas||[]).map(p=>codeNorm(p&&p.codigo)).filter(Boolean));
+  const coincidencias=dips.filter(d=>codigos.has(codeNorm(d))).length;
+  if(coincidencias===0||(dips.length>=5&&coincidencias/dips.length<0.2))throw new Error('La planilla de Garantías no corresponde a esta Línea Descendente. Descargá la de tu propia cuenta.');
+}
 function normalizePeriod(teamData,guarantees,incomeData,year,month){
+  validarGarantiasDelTitular(teamData,guarantees&&guarantees.garantiasMap);
   const used=new Set(),sourceToKey=new Map();
   const people=teamData.personas.map((p,index)=>{const keys=makePersonKey(p,index,used);sourceToKey.set(String(p.id),keys.key);return {
     key:keys.key,matchKey:keys.matchKey,sourceId:String(p.id),codigo:String(p.codigo||''),nombre:String(p.nombre||'Sin nombre'),cat:String(p.cat||''),nivel:num(p.nivel),
@@ -654,7 +666,12 @@ function monthFileSlot(id,type,cfg,state){
 function yearOptions(selected){const y=new Date().getFullYear(),values=new Set([selected]);for(let n=y+2;n>=y-12;n--)values.add(n);return [...values].sort((a,b)=>b-a).map(n=>`<option value="${n}" ${n===selected?'selected':''}>${n}</option>`).join('')}
 async function handleFile(type,file,id){
   if(!file||!id)return;const [year,mo]=id.split('-').map(Number),draft=getMonthDraft(year,mo-1);draft.files[type]=file;draft.status[type]='loading';draft.changed=true;delete draft.parsed[type];render();
-  try{draft.parsed[type]=await parseHistoricalFile(type,file);draft.status[type]='ready';const emptyIncome=type==='ingresos'&&draft.parsed[type].result.ingresos.length===0;toast(emptyIncome?`✓ Ingresos recibido · No hubo ingresos`:`✓ ${FILE_TYPES[type].label} · ${MONTHS_H[draft.month]}`,emptyIncome?2600:1800)}catch(e){console.error('Histórico archivo',type,e);draft.status[type]={error:e.message};delete draft.parsed[type];toast(e.message,3200)}render();
+  try{
+    draft.parsed[type]=await parseHistoricalFile(type,file);
+    if(type==='garantias'&&draft.parsed.equipo)validarGarantiasDelTitular(draft.parsed.equipo.result,draft.parsed.garantias.result.garantiasMap);
+    if(type==='equipo'&&draft.parsed.garantias){try{validarGarantiasDelTitular(draft.parsed.equipo.result,draft.parsed.garantias.result.garantiasMap)}catch(err){draft.status.garantias={error:err.message};delete draft.parsed.garantias;toast(err.message,3200)}}
+    draft.status[type]='ready';const emptyIncome=type==='ingresos'&&draft.parsed[type].result.ingresos.length===0;toast(emptyIncome?`✓ Ingresos recibido · No hubo ingresos`:`✓ ${FILE_TYPES[type].label} · ${MONTHS_H[draft.month]}`,emptyIncome?2600:1800)
+  }catch(e){console.error('Histórico archivo',type,e);draft.status[type]={error:e.message};delete draft.parsed[type];toast(e.message,3200)}render();
 }
 async function useCurrentData(){
   const currentTeam=(()=>{try{return JSON.parse(localStorage.getItem('equipoData')||'null')}catch(e){return null}})();
