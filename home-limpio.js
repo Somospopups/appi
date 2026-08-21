@@ -113,22 +113,6 @@
       'body.dark .hl-ev-btn.suave{background:rgba(255,255,255,.1);color:#c6cbea}' +
       '.hl-link{width:100%;border:0;background:rgba(255,255,255,.85);border-radius:18px;padding:14px;font:inherit;font-size:13px;font-weight:900;color:#5a6082;box-shadow:0 8px 20px rgba(50,60,120,.08);cursor:pointer;text-align:center;margin-top:12px}' +
       'body.dark .hl-link{background:#25273a;color:#c6cbea}' +
-      '.hl-impulso{margin:0 0 12px;padding:15px;border-radius:22px;background:linear-gradient(160deg,rgba(91,141,239,.16),rgba(160,107,255,.12) 55%,rgba(58,208,164,.10));border:1px solid rgba(255,255,255,.7);box-shadow:0 12px 28px rgba(50,60,120,.10)}' +
-      'body.dark .hl-impulso{background:linear-gradient(160deg,rgba(91,141,239,.18),rgba(160,107,255,.14));border-color:rgba(255,255,255,.08)}' +
-      '.hl-imp-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}' +
-      '.hl-imp-kicker{color:#3d63c9;font-size:10px;font-weight:950;letter-spacing:.7px;text-transform:uppercase}' +
-      'body.dark .hl-imp-kicker{color:#a8c0ff}' +
-      '.hl-imp-racha{padding:4px 8px;border-radius:999px;background:rgba(255,255,255,.62);color:#c05621;font-size:10.5px;font-weight:900}' +
-      'body.dark .hl-imp-racha{background:rgba(28,29,46,.55);color:#ffb38a}' +
-      '.hl-impulso h3{margin:0 0 6px;color:#161620;font-size:17px;font-weight:950;letter-spacing:-.3px}' +
-      'body.dark .hl-impulso h3{color:#f2f2f7}' +
-      '.hl-impulso p{margin:0 0 10px;color:#4a4d5c;font-size:12.5px;font-weight:700;line-height:1.4}' +
-      'body.dark .hl-impulso p{color:#c6cbea}' +
-      '.hl-imp-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}' +
-      '.hl-imp-chips span{padding:5px 8px;border-radius:999px;background:rgba(255,255,255,.62);color:#3d63c9;font-size:10.5px;font-weight:900}' +
-      'body.dark .hl-imp-chips span{background:rgba(28,29,46,.55);color:#c5d4ff}' +
-      '.hl-imp-cta{width:100%;border:0;border-radius:14px;padding:12px 14px;background:linear-gradient(135deg,#5b8def,#8b63e8);color:#fff;font:inherit;font-size:13px;font-weight:900;cursor:pointer}' +
-      '.hl-imp-cta:active{transform:scale(.98)}' +
 
       /* Calendario modal */
       '.cal-overlay{position:fixed;inset:0;z-index:200;background:rgba(20,20,30,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);display:none;align-items:flex-end;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .25s ease}' +
@@ -185,108 +169,7 @@
     document.head.appendChild(s);
   }
 
-  /* ---- Impulso diario: una sola acción, racha y avisos ---- */
-  function hoyId(){ return new Date().toISOString().slice(0, 10); }
-  function impulsoKey(){ return 'appi_impulso_v1_' + uid(); }
-  function leerImpulso(){ try{ return JSON.parse(localStorage.getItem(impulsoKey()) || '{}'); }catch(e){ return {}; } }
-  function guardarImpulso(d){ try{ localStorage.setItem(impulsoKey(), JSON.stringify(d)); }catch(e){} }
-  function tocarRacha(){
-    var d = leerImpulso(), hoy = hoyId();
-    if (d.lastDay === hoy) return d.racha || 1;
-    var ayer = new Date(); ayer.setDate(ayer.getDate() - 1);
-    var ayerId = ayer.toISOString().slice(0, 10);
-    d.racha = d.lastDay === ayerId ? (d.racha || 0) + 1 : 1;
-    d.lastDay = hoy;
-    guardarImpulso(d);
-    return d.racha;
-  }
-  function culturaHoy(){
-    try{
-      var data = JSON.parse(localStorage.getItem('cultura_crecimiento_v1') || '{}');
-      var now = new Date();
-      var id = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
-      var row = data[id] || {};
-      var invitados = Array.isArray(row.invitados) ? row.invitados.length : Number(row.invitados) || 0;
-      return { pb: Number(row.pb) || 0, invitados: invitados, metaPb: 15, metaInv: 2 };
-    }catch(e){ return { pb: 0, invitados: 0, metaPb: 15, metaInv: 2 }; }
-  }
-  function sieteHoy(){
-    if (typeof window.obtenerProgresoSieteActual === 'function') {
-      try{ return window.obtenerProgresoSieteActual(); }catch(e){}
-    }
-    return { existe: false, done: 0, total: 7, pct: 0 };
-  }
-  function calcularImpulso(){
-    var hoy = hoyId();
-    var lista = contactos();
-    var cul = culturaHoy();
-    var siete = sieteHoy();
-    var racha = tocarRacha();
-    var dia = new Date().getDate();
-    var diasMes = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
-    var ritmoPb = cul.metaPb * (dia / diasMes);
-    var presentacionHoy = lista.filter(function(c){ return c.estado === 'presentacion' && c.proximo_contacto === hoy; })[0];
-    var vencido = lista.filter(function(c){
-      return c.proximo_contacto && c.proximo_contacto < hoy && ['seguimiento', 'presentacion', 'nuevo'].indexOf(c.estado) >= 0;
-    })[0];
-    var nuevo = lista.filter(function(c){ return c.estado === 'nuevo'; })[0];
-    var item;
-    if (presentacionHoy) {
-      item = { urgente: true, ico: '🎤', titulo: 'Hoy es la demo', texto: presentacionHoy.nombre + ' te espera. Llevá la Botella y el Coach: el contacto de verdad se genera ahí.', cta: 'Abrir el Panel', go: 'panel' };
-    } else if (vencido) {
-      item = { urgente: true, ico: '⏰', titulo: 'Se te pasó una fecha', texto: vencido.nombre + ' quedó para antes de hoy. Un mensaje ahora te pone al día y no se enfría.', cta: 'Retomar contacto', go: 'panel' };
-    } else if (nuevo) {
-      item = { urgente: true, ico: '✨', titulo: 'Hay alguien nuevo esperando', texto: nuevo.nombre + ' todavía no recibió tu primer contacto. Las primeras 24 horas pesan más que una semana.', cta: 'Escribirle ahora', go: 'panel' };
-    } else if (cul.invitados < cul.metaInv) {
-      item = { urgente: false, ico: '🤝', titulo: 'Te faltan invitados', texto: 'Cultura del mes: ' + cul.invitados + ' de ' + cul.metaInv + ' invitados. Invitar es el hábito que más duplica.', cta: 'Cargar un invitado', go: 'cultura' };
-    } else if (cul.pb < ritmoPb && cul.pb < cul.metaPb) {
-      item = { urgente: false, ico: '💎', titulo: 'El mes te está pidiendo PB', texto: 'Vas ' + String(cul.pb).replace('.', ',') + ' de ' + cul.metaPb + '. Si seguís este ritmo te quedás corto. Una demo hoy te acerca.', cta: 'Planificar el mes', go: 'siete' };
-    } else if (siete.existe && siete.done < siete.total) {
-      item = { urgente: false, ico: '🚀', titulo: 'Tu mes todavía no está cerrado', texto: 'Las 7 P: ' + siete.done + '/' + siete.total + '. Completá el siguiente paso y el Score se mueve.', cta: 'Seguir Las 7 P', go: 'siete' };
-    } else {
-      item = { urgente: false, ico: '🔥', titulo: 'Vas bien. Ahora pedile más al mes.', texto: 'Cultura encaminada y el Panel en orden. Es el momento de una demo extra o de empujar a alguien de tu equipo.', cta: 'Abrir el Simulador', go: 'sim' };
-    }
-    item.racha = racha;
-    item.pb = cul.pb;
-    item.inv = cul.invitados;
-    item.metaPb = cul.metaPb;
-    item.metaInv = cul.metaInv;
-    return item;
-  }
-  function htmlImpulso(){
-    var p = calcularImpulso();
-    return '<div class="hl-impulso" id="hlImpulso">' +
-      '<div class="hl-imp-top"><span class="hl-imp-kicker">Tu impulso</span><span class="hl-imp-racha">🔥 ' + p.racha + ' día' + (p.racha === 1 ? '' : 's') + '</span></div>' +
-      '<h3>' + p.ico + ' ' + esc(p.titulo) + '</h3>' +
-      '<p>' + esc(p.texto) + '</p>' +
-      '<div class="hl-imp-chips"><span>💎 ' + String(p.pb).replace('.', ',') + ' / ' + p.metaPb + ' PB</span><span>🤝 ' + p.inv + ' / ' + p.metaInv + ' invitados</span></div>' +
-      '<button type="button" class="hl-imp-cta" id="hlImpCta" data-go="' + p.go + '">' + esc(p.cta) + '</button>' +
-    '</div>';
-  }
-  function irImpulso(go){
-    if (go === 'panel' && typeof window.openMiGestion === 'function') window.openMiGestion();
-    else if (go === 'siete' && typeof window.openSiete === 'function') window.openSiete();
-    else if (go === 'sim' && typeof window.openCalculadora === 'function') window.openCalculadora();
-    else if (go === 'cultura') {
-      var el = document.getElementById('culturaWrap') || document.querySelector('.cultura-card');
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-  }
-  function avisosActivos(){
-    return typeof Notification !== 'undefined' && Notification.permission === 'granted' && localStorage.getItem('appi_avisos_ok') === '1';
-  }
-  function maybeNotify(){
-    try{
-      if (!avisosActivos()) return;
-      var d = leerImpulso(), hoy = hoyId();
-      if (d.notified === hoy) return;
-      var p = calcularImpulso();
-      if (!p.urgente && p.go === 'sim') return;
-      d.notified = hoy;
-      guardarImpulso(d);
-      new Notification('APPI · ' + p.titulo, { body: p.texto, icon: './icon-192.png', tag: 'appi-impulso', badge: './notification-badge.png' });
-    }catch(e){}
-  }
+  /* ---- Avisos del navegador (permiso para los recordatorios) ---- */
   async function activarAvisosImpulso(){
     try{ if (typeof cerrarToolsMenu === 'function') cerrarToolsMenu(); }catch(e){}
     if (!('Notification' in window)) {
@@ -300,7 +183,6 @@
       return;
     }
     localStorage.setItem('appi_avisos_ok', '1');
-    maybeNotify();
     if (typeof showToast === 'function') showToast('Avisos activados 🔔', 2200);
   }
   window.activarAvisosImpulso = activarAvisosImpulso;
@@ -383,7 +265,6 @@
 
     return '<div id="homeLimpio">' +
       (pq ? '<p class="hl-porque">💙 ' + esc(pq) + '</p>' : '') +
-      htmlImpulso() +
       '<div class="hl-card" id="hlCardOpen">' +
         '<div class="hl-kicker">Tu jornada</div>' +
         timelineHtml +
@@ -529,13 +410,6 @@
     if (viejo) viejo.remove();
     var header = host.querySelector('header');
     header.insertAdjacentHTML('afterend', html());
-
-    var cta = $('hlImpCta');
-    if (cta) cta.onclick = function(e){
-      e.stopPropagation();
-      irImpulso(cta.dataset.go);
-    };
-    maybeNotify();
 
     // Abrir calendario al tocar la card
     var cardOpen = $('hlCardOpen');

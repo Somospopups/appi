@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v297-ayuda-de-marcas';
+const CACHE_NAME = 'appi-v298-home-sin-impulso';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

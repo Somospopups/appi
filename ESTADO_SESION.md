@@ -1,4 +1,4 @@
-# Estado al retomar — APPI v297
+# Estado al retomar — APPI v298
 
 Repo: `github.com/somospopups/appi` · **suite en verde**.
 
@@ -6,7 +6,15 @@ Corrida local completa: **282 pruebas pasan, 1 salteada, 0 fallan** (sin flakes 
 
 ---
 
-## Último cambio: v297 · Ayuda de los botones ✓/✗
+## Último cambio: v298 · Home sin "Tu impulso"
+
+A pedido del equipo se retiró completa la tarjeta "Tu impulso" del Home:
+vista, lógica (racha, sugerencia del día, chips), estilos y su
+notificación diaria. El Home queda con saludo, porqué, Tu jornada y
+avisos. Cultura, Las 7 P y el Panel siguen intactos en sus pantallas.
+El botón "Avisos" del engranaje se conserva (permiso del navegador).
+
+## Anterior: v297 · Ayuda de los botones ✓/✗
 
 Debajo de los botones de marca del carrusel hay una explicación breve y
 siempre visible: el verde es "ya lo hice" (aunque haya sido por llamada o
