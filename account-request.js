@@ -14,8 +14,10 @@ async function call(body){
 async function getConfig(force=false){if(cachedConfig&&!force)return cachedConfig;cachedConfig=await call({action:'config'});return cachedConfig}
 async function submit({nombre,socio_nombre='',dip,telefono,website=''}){return call({action:'create',nombre,socio_nombre,dip,telefono,website})}
 async function openSupport(message){
-  const config=await getConfig(),number=String(config.whatsapp||'').replace(/\D/g,'');
-  if(!number)throw new Error('El WhatsApp de soporte todavía no está configurado.');
+  const config=await getConfig(),crudo=String(config.whatsapp||'');
+  if(!crudo.replace(/\D/g,''))throw new Error('El WhatsApp de soporte todavía no está configurado.');
+  const number=window.APPITel?window.APPITel.normalizar(crudo):crudo.replace(/\D/g,'');
+  if(!number)throw new Error('El WhatsApp de soporte está mal cargado. Avisale a la persona administradora.');
   window.APPIWhatsApp.abrir(`https://wa.me/${number}?text=${encodeURIComponent(message||'Hola, necesito ayuda para ingresar a APPI.')}`);
 }
 window.APPIAccountRequest={getConfig,submit,openSupport};

@@ -35,6 +35,8 @@ test.describe('APPITel · armado de números argentinos', () => {
     ['Río Cuarto con 15',              '0358 15-412-3456',      '5493584123456'],
     ['Rosario con 15',                 '0341 15-666-7777',      '5493416667777'],
     ['Mendoza con 15',                 '0261 15-444-5555',      '5492614445555'],
+    ['Rawson/Trelew (área 280)',       '0280 434-2644',         '5492804342644'],
+    ['Rawson/Trelew con 15',           '0280 15-434-2644',      '5492804342644'],
     ['con texto alrededor',            'Tel: 351-766-9967 (cel)','5493517669967'],
   ];
 
@@ -52,6 +54,12 @@ test.describe('APPITel · armado de números argentinos', () => {
     ['demasiado corto',        '0351-999888'],
     ['dos números pegados',    '3517669967 / 3514552272'],
     ['solo el código de área', '0351'],
+    /* Caso real (v290): el panel de administración agregaba dígitos sin
+       validar y WhatsApp respondía "no es un número de teléfono válido".
+       Un número con dígitos de más tiene que rechazarse, no completarse. */
+    ['con dígitos de más (caso real del panel)', '+54 280 434264454'],
+    ['con 54 pero sin el 9 y con dígitos de más', '54 2804 3426445 4'],
+    ['internacional con 14 dígitos',              '+54 9 280 43426 4454'],
   ];
 
   for (const [caso, entrada] of invalidos) {
@@ -131,4 +139,23 @@ test.describe('APPITel · armado de números argentinos', () => {
     }), entradas);
     for (const { una, dos } of r) expect(dos).toBe(una);
   });
+});
+
+/* Convención (v290): nadie más que telefono.js arma números. En v289 quedó
+   afuera admin-panel.js, que concatenaba '549' a mano y mandaba a WhatsApp
+   números con dígitos de más. Este test evita que vuelva a pasar. */
+test('solo telefono.js concatena el prefijo 549', () => {
+  const fs = require('fs');
+  const problemas = [];
+  const patron = /['"`]549['"`]\s*\+|\+\s*['"`]549['"`]/;
+  const archivos = fs.readdirSync('.')
+    .filter(f => f.endsWith('.js') && f !== 'telefono.js')
+    .concat(['index.html', 'encuesta.html', 'revisar-contactos.html'].filter(f => fs.existsSync(f)));
+  for (const archivo of archivos) {
+    const lineas = fs.readFileSync(archivo, 'utf8').split('\n');
+    lineas.forEach((linea, i) => {
+      if (patron.test(linea)) problemas.push(`${archivo}:${i + 1}: ${linea.trim().slice(0, 90)}`);
+    });
+  }
+  expect(problemas, `Números armados a mano (usar window.APPITel):\n${problemas.join('\n')}`).toEqual([]);
 });

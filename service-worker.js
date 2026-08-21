@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v289-telefonos-whatsapp';
+const CACHE_NAME = 'appi-v290-numeros-del-panel';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
