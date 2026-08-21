@@ -86,3 +86,12 @@ test('al vencer la prueba, el ingreso se bloquea con su propio mensaje', () => {
   // La consulta del flag va protegida: sin la migración, el bloqueo genérico sigue.
   expect(js).toContain('select=membresia_prueba');
 });
+
+test('el panel de administración tiene su ayuda, como todas las pantallas', () => {
+  const html = fs.readFileSync('index.html', 'utf8');
+  expect(html).toContain('id="btnHelpAdmin"');
+  const js = fs.readFileSync('admin-panel.js', 'utf8');
+  expect(js).toContain('btnHelpAdmin');
+  expect(js).toContain('CUMPLIMIENTO DIARIO');
+  expect(js).toContain('PRUEBA (5 días');
+});

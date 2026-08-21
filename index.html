@@ -4120,7 +4120,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v298 · Segura</div>
+  <div class="ds-foot">APPI · v299 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -5002,6 +5002,7 @@ body.dark #pageTabs button.active{color:#a8c0ff}
   <!-- PANEL ADMINISTRADOR -->
   <section id="view-admin" class="view admin-view">
     <header class="top admin-top">
+      <button class="help-btn" id="btnHelpAdmin" aria-label="Ayuda">?</button>
       <button type="button" class="admin-round-password" id="btnAdminPanelPassword" aria-label="Cambiar contraseña" title="Cambiar contraseña">🔑</button>
       <button type="button" class="admin-round-logout" id="btnAdminPanelLogout" aria-label="Cerrar sesión" title="Cerrar sesión">↪</button>
       <div class="admin-top-lock">🔒</div>
@@ -11568,7 +11569,7 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='298';
+      const swVersion='299';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 

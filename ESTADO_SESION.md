@@ -1,4 +1,4 @@
-# Estado al retomar — APPI v298
+# Estado al retomar — APPI v299
 
 Repo: `github.com/somospopups/appi` · **suite en verde**.
 
@@ -6,7 +6,14 @@ Corrida local completa: **282 pruebas pasan, 1 salteada, 0 fallan** (sin flakes 
 
 ---
 
-## Último cambio: v298 · Home sin "Tu impulso"
+## Último cambio: v299 · Ayuda del panel de administración
+
+Auditoría de ayudas: 23 de 24 pantallas tenían su "?" conectado; faltaba
+solo el panel de administración. Ahora tiene su guía completa (crear
+cuenta con 1 mes/PRUEBA, solicitudes, botones de cada carpeta,
+cumplimiento diario, WhatsApp de soporte). Test en prueba.spec.js.
+
+## Anterior: v298 · Home sin "Tu impulso"
 
 A pedido del equipo se retiró completa la tarjeta "Tu impulso" del Home:
 vista, lógica (racha, sugerencia del día, chips), estilos y su
