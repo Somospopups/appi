@@ -213,7 +213,7 @@ function surveyUrl(invitation=state.link){
 function distributorFirstName(){const active=window.APPIAuth&&window.APPIAuth.activePerson?window.APPIAuth.activePerson():null,full=String(active?.nombre||profile()?.nombre||'').trim();return full.split(/\s+/)[0]||''}
 function shareMessage(url,recipientName=''){
   const name=distributorFirstName(),recipient=String(recipientName||'').trim().split(/\s+/)[0]||'';
-  return `¡Hola${recipient?', '+recipient:''}! 😊 Soy ${name}.\n\nQuería contarte que estoy realizando una pequeña encuesta que es muy importante para mí. Gracias a tu apoyo puedo seguir concientizando a más familias a través de demostraciones y compartiendo información que puede ayudarlas a cuidar su bienestar.\n\nCuando llegues al final, si te nace, podés regalarles esta misma oportunidad a algunos de tus seres queridos. Tus referidos son muy importantes para mí porque me permiten continuar con esta tarea. Puede ser una persona, dos o diez: la cantidad no es lo importante; lo valioso es poder acercarles la posibilidad de cuidarse y cuidar a toda su familia.\n\n¿Me ayudás completándola? Te va a llevar sólo unos minutos:\n${url}\n\n¡Muchas gracias por tu tiempo y por acompañarme! 💙`;
+  return `¡Hola${recipient?', '+recipient:''}! 😊 Soy ${name}.\n\nEstoy realizando una encuesta que es muy importante para mí. Gracias a esto puedo seguir acercando información a más familias sobre cómo cuidar su bienestar.\n\n¿Me ayudás completándola? Te va a llevar sólo unos minutos:\n${url}\n\n¡Muchas gracias por tu tiempo! 💙`;
 }
 function isAdmin(){return profile()&&profile().rol==='admin'}
 
@@ -356,11 +356,11 @@ function contactFirstName(c){return String(c&&c.nombre||'').trim().split(/\s+/)[
 function messageFor(c,type='recommended'){
   const first=contactFirstName(c),sender=distributorFirstName(),survey=surveyFor(c),opportunity=answerValues(survey,'oportunidad').join(', '),date=c.proximo_contacto?formatDate(c.proximo_contacto):'';
   if(type==='recommended')type=c.estado==='nuevo'?'first':c.estado==='presentacion'?'presentation':c.tipo==='encuestado'&&Array.isArray(survey?.referidos)&&survey.referidos.length?'thanks':'followup';
-  if(type==='first'&&c.tipo==='referido')return `Hola ${first}, ¿cómo estás? Soy ${sender} 😊 ${c.referido_por?`${c.referido_por} me compartió tu contacto porque pensó que esta información podría interesarte.`:'Me compartieron tu contacto con mucho respeto.'} Quería presentarme y saber cuándo sería un buen momento para conversar. No quiero molestarte; quedo a disposición.`;
-  if(type==='first')return `Hola ${first}, ¿cómo estás? Soy ${sender} 😊 Muchas gracias por tomarte el tiempo de responder la encuesta.${opportunity?` Vi que respondiste “${opportunity}” respecto de conocer una oportunidad.`:''} Quería ponerme a disposición y saber cuándo sería un buen momento para conversar.`;
-  if(type==='presentation')return `Hola ${first} 😊 Soy ${sender}. Quería confirmar nuestra presentación${date?` del ${date}`:''}. Si necesitás cambiar el horario, avisame con tranquilidad. ¡Nos vemos pronto!`;
-  if(type==='thanks')return `Hola ${first} 😊 Soy ${sender}. Quería agradecerte especialmente por las personas que recomendaste. Valoro muchísimo tu confianza y voy a comunicarme con cada una con mucho respeto. ¡Gracias por ayudarme a llegar a más familias!`;
-  return `Hola ${first}, ¿cómo estás? Soy ${sender} 😊 Quería retomar nuestra conversación. Cuando tengas un momento, me encantaría saber cómo estás y si puedo ayudarte con alguna información. Quedo a disposición.`
+  if(type==='first'&&c.tipo==='referido')return `Hola ${first}, ¿cómo estás? 😊\n\nSoy ${sender}. ${c.referido_por?`${c.referido_por} me pasó tu contacto`:'Me pasaron tu contacto'} porque pensó${c.referido_por?'':'n'} que lo que hago te podía interesar.\n\nTe escribo para presentarme, nada más. Si en algún momento tenés ganas de que charlemos, avisame.`;
+  if(type==='first')return `Hola ${first}! ¿Cómo andás? 😊\n\nSoy ${sender}, gracias por responder la encuesta.\n\n${opportunity?'Vi tu respuesta sobre la oportunidad y quería':'Quería'} presentarme por si querés que lo charlemos.`;
+  if(type==='presentation')return `Hola ${first}! ¿Cómo andás? 😊\n\nSoy ${sender}, te escribo para confirmar que nos vemos${date?` el ${date}`:''}.\n\nSi te surgió algo y necesitás cambiarlo, decime tranquilo que lo movemos.`;
+  if(type==='thanks')return `Hola ${first}! 😊\n\nQuería agradecerte por los contactos que me pasaste. Gracias por la confianza!`;
+  return `Hola ${first}! ¿Cómo va? 😊\n\nSoy ${sender}, pasaba a saludarte y a ver cómo venías con lo que habíamos hablado.`
 }
 function recommendedTemplate(c){return c.estado==='nuevo'?'first':c.estado==='presentacion'?'presentation':c.tipo==='encuestado'&&Array.isArray(surveyFor(c)?.referidos)&&surveyFor(c).referidos.length?'thanks':'followup'}
 function whatsappUrlFor(c,type='recommended'){return `https://wa.me/${whatsappDigits(c.telefono)}?text=${encodeURIComponent(messageFor(c,type))}`}

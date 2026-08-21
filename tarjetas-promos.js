@@ -153,8 +153,12 @@
     var nombre = pila(p);
     var tarjeta = cards.map(labelCard).join(', ') || 'tu tarjeta';
     var base = String(mensajePromo || '').trim();
-    if (!base) return 'Hola ' + nombre + ', ';
-    return base.replace(/\{nombre\}/gi, nombre).replace(/\{tarjeta\}/gi, tarjeta);
+    // El saludo lo pone siempre la app; abajo va la promo que escribió el
+    // usuario. Si él ya saluda en su texto, no se le agrega nada.
+    var saludo = 'Hola ' + nombre + '! ¿Cómo va? 😊 Te paso una promo que puede interesarte:\n\n';
+    if (!base) return saludo;
+    var texto = base.replace(/\{nombre\}/gi, nombre).replace(/\{tarjeta\}/gi, tarjeta);
+    return /^\s*(hola|buen)/i.test(texto) ? texto : saludo + texto;
   }
   function abrirWhatsApp(p){
     var digits = telefonoDe(p);

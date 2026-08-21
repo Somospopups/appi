@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v286-mensajes-reescritos';
+const CACHE_NAME = 'appi-v287-los-26-mensajes';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

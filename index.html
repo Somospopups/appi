@@ -4118,7 +4118,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v286 · Segura</div>
+  <div class="ds-foot">APPI · v287 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -8114,7 +8114,7 @@ function bonusAfterContact(){
 }
 function abrirWaNumero(digits){
   const data = window._telPicker;
-  if(data && data.nombre) window.APPIWhatsApp.abrir('https://wa.me/'+digits+'?text='+encodeURIComponent('Hola '+(nombreDePila(data.nombre)||data.nombre)+', ¿cómo estás?'));
+  if(data && data.nombre) window.APPIWhatsApp.abrir('https://wa.me/'+digits+'?text='+encodeURIComponent('Hola '+(nombreDePila(data.nombre)||data.nombre)+'! ¿Cómo andás? 😊'));
   else window.APPIWhatsApp.abrir('https://wa.me/'+digits);
   modal.close();
   bonusAfterContact();
@@ -8187,7 +8187,7 @@ function openPersonaModal(p){
   if(telefonos.length === 1){
     const t = telefonos[0];
     botonesTel = `
-      <button class="pm-wa" onclick="window.APPIWhatsApp.abrir('https://wa.me/${t.digits}?text='+encodeURIComponent('Hola ${escapeXml(nombreDePila(p.nombre)||p.nombre)}, ¿cómo estás?'))">💬 Contactar por WhatsApp</button>
+      <button class="pm-wa" onclick="window.APPIWhatsApp.abrir('https://wa.me/${t.digits}?text='+encodeURIComponent('Hola ${escapeXml(nombreDePila(p.nombre)||p.nombre)}! ¿Cómo andás? 😊'))">💬 Contactar por WhatsApp</button>
       <button type="button" class="pm-call" data-appi-call-phone="${t.digits}" data-appi-call-name="${escapeXml(p.nombre||'Contacto')}" data-appi-call-label="1">📲 Llamar en teléfono</button>
     `;
   } else if(telefonos.length > 1){
@@ -10040,7 +10040,7 @@ function openSeguimiento(){ showView('view-seguimiento'); }
 function capitalizarNombreSeg(valor){ return String(valor||'').toLocaleLowerCase('es-AR').replace(/(^|[\s'-])(\p{L})/gu,(m,sep,letra)=>sep+letra.toLocaleUpperCase('es-AR')).replace(/\s{2,}/g,' '); }
 function limpiarFormularioSeg(){ ['segNombre','segTelefono','segFecha','segNotas'].forEach(id=>document.getElementById(id).value=''); document.getElementById('segInteres').value='Producto'; document.getElementById('segEstado').value='No contactado'; seguimientoEditId=null; }
 function segDigits(phone){return String(phone||'').replace(/\D/g,'')}
-function segContactActions(p){const d=segDigits(p.telefono);if(!d)return '';const msg=encodeURIComponent(`Hola ${nombreDePila(p.nombre)||p.nombre}, ¿cómo estás?`);return `<div class="seg-contact-actions"><a class="wa-msg" title="Contactar por WhatsApp" aria-label="Contactar por WhatsApp" href="https://wa.me/${d}?text=${msg}" target="_blank" rel="noopener">💬 Contactar por WhatsApp</a><a class="phone-call" title="Llamar al contacto" aria-label="Llamar al contacto" href="tel:${d}" data-appi-call-phone="${d}" data-appi-call-name="${escapeXml(p.nombre||'Contacto')}" data-appi-call-label="1">📲 Llamar en teléfono</a></div>`}
+function segContactActions(p){const d=segDigits(p.telefono);if(!d)return '';const msg=encodeURIComponent(`Hola ${nombreDePila(p.nombre)||p.nombre}! ¿Cómo andás? 😊`);return `<div class="seg-contact-actions"><a class="wa-msg" title="Contactar por WhatsApp" aria-label="Contactar por WhatsApp" href="https://wa.me/${d}?text=${msg}" target="_blank" rel="noopener">💬 Contactar por WhatsApp</a><a class="phone-call" title="Llamar al contacto" aria-label="Llamar al contacto" href="tel:${d}" data-appi-call-phone="${d}" data-appi-call-name="${escapeXml(p.nombre||'Contacto')}" data-appi-call-label="1">📲 Llamar en teléfono</a></div>`}
 function renderSeguimiento(){
   const all=cargarSeguimientos();
   const hoy=hoyLocal();
@@ -11177,7 +11177,7 @@ function mostrarPantallaLoginDistribuidor(reason=''){
   if(requestHasPartner&&!requestHasPartner.dataset.bound){requestHasPartner.dataset.bound='1';requestHasPartner.onchange=()=>{requestPartnerField.hidden=!requestHasPartner.checked;if(requestHasPartner.checked)setTimeout(()=>document.getElementById('requestPartnerName').focus(),40);else document.getElementById('requestPartnerName').value=''}}
   if(support&&!support.dataset.bound){
     support.dataset.bound='1';
-    support.onclick=async()=>{const numero=dip&&dip.value?dip.value:'sin completar';const msg=`Hola, necesito ayuda para ingresar a APPI. Mi número de distribuidor es: ${numero}`;try{await window.APPIAccountRequest.openSupport(msg)}catch(error){mostrarErrorLogin(error.message)}};
+    support.onclick=async()=>{const numero=dip&&dip.value?dip.value:'sin completar';const msg=`Hola! ¿Cómo están? 😊 Estoy teniendo problemas para entrar a APPI.\n\nMi número de distribuidor es ${numero}. ¡Gracias!`;try{await window.APPIAccountRequest.openSupport(msg)}catch(error){mostrarErrorLogin(error.message)}};
   }
   if(adminOpen&&!adminOpen.dataset.bound){adminOpen.dataset.bound='1';adminOpen.onclick=mostrarAdminLoginPopup}
   setTimeout(()=>{if(dip&&!dip.value)dip.focus();else if(password)password.focus()},80);
@@ -11540,7 +11540,7 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='286';
+      const swVersion='287';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 
@@ -15710,9 +15710,9 @@ function closeActionCenter(){document.getElementById('histActionOverlay')?.class
 function actionPlanProgress(plan){const tasks=plan.tasks||[],attended=tasks.filter(task=>!!task.result).length;return {attended,total:tasks.length,percent:tasks.length?Math.round(attended/tasks.length*100):0}}
 function actionMessage(task,plan){
   const first=String(task.person||'').trim().split(/\s+/)[0]||'¿cómo estás?',inactive=['active_drop','consecutive'].includes(plan.alertType),growth=['pb_growth','active_growth'].includes(plan.alertType);
-  if(growth)return `Hola ${first}. Quería reconocer cómo venís avanzando. Antes que nada, ¿cómo estás? Si te parece, podemos hablar unos minutos, escuchar qué te ayudó y acordar juntos un objetivo pequeño y posible para esta semana.`;
-  if(inactive)return `Hola ${first}. Quería saber cómo venís y cómo te estás sintiendo con la actividad. Antes que nada, ¿cómo estás? Si te parece, podemos hablar unos minutos, ver qué necesitás y acordar juntos un objetivo pequeño y posible para esta semana.`;
-  return `Hola ${first}. Vi que estos últimos cierres estuvieron más tranquilos. Antes que nada, ¿cómo estás? Si te parece, podemos hablar unos minutos, ver qué necesitás y acordar juntos un objetivo pequeño y posible para esta semana.`;
+  if(growth)return `Hola ${first}! ¿Cómo estás? 😊 Te escribo porque vi que venís creciendo y me puso muy contento. ¿Cómo lo estás viviendo?`;
+  if(inactive)return `Hola ${first}! ¿Cómo estás? 😊 Quería saber cómo venís, más allá de los números. ¿Todo bien por casa?`;
+  return `Hola ${first}! ¿Cómo estás? 😊 Vi que bajó un poco el ritmo y quería saber si está todo bien.`;
 }
 function actionTaskHtml(task,plan){
   const overdue=!completedActionTask(task)&&task.date<localActionDate(),today=task.date===localActionDate(),result=ACTION_RESULTS[task.result]||'',message=task.script||actionMessage(task,plan);

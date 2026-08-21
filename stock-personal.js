@@ -341,7 +341,7 @@
       return;
     }
     var num = digits.length === 10 ? '549' + digits : '54' + digits;
-    var texto = 'Hola ' + (row.quien.split(/\s+/)[0] || '') + ', te consulto por el ' + row.producto + ' que te presté el ' + fechaTxt(row.fecha) + '.';
+    var texto = 'Hola ' + (row.quien.split(/\s+/)[0] || '') + '! ¿Cómo andás? 😊\n\n¿Cómo te fue con el ' + row.producto + ' que te presté? Te consulto porque lo estoy necesitando.';
     var url = 'https://wa.me/' + num + '?text=' + encodeURIComponent(texto);
     if (window.APPIWhatsApp && window.APPIWhatsApp.abrir) window.APPIWhatsApp.abrir(url);
     else window.open(url, '_blank', 'noopener');

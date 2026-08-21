@@ -896,9 +896,9 @@ function closeActionCenter(){document.getElementById('histActionOverlay')?.class
 function actionPlanProgress(plan){const tasks=plan.tasks||[],attended=tasks.filter(task=>!!task.result).length;return {attended,total:tasks.length,percent:tasks.length?Math.round(attended/tasks.length*100):0}}
 function actionMessage(task,plan){
   const first=String(task.person||'').trim().split(/\s+/)[0]||'¿cómo estás?',inactive=['active_drop','consecutive'].includes(plan.alertType),growth=['pb_growth','active_growth'].includes(plan.alertType);
-  if(growth)return `Hola ${first}. Quería reconocer cómo venís avanzando. Antes que nada, ¿cómo estás? Si te parece, podemos hablar unos minutos, escuchar qué te ayudó y acordar juntos un objetivo pequeño y posible para esta semana.`;
-  if(inactive)return `Hola ${first}. Quería saber cómo venís y cómo te estás sintiendo con la actividad. Antes que nada, ¿cómo estás? Si te parece, podemos hablar unos minutos, ver qué necesitás y acordar juntos un objetivo pequeño y posible para esta semana.`;
-  return `Hola ${first}. Vi que estos últimos cierres estuvieron más tranquilos. Antes que nada, ¿cómo estás? Si te parece, podemos hablar unos minutos, ver qué necesitás y acordar juntos un objetivo pequeño y posible para esta semana.`;
+  if(growth)return `Hola ${first}! ¿Cómo estás? 😊 Te escribo porque vi que venís creciendo y me puso muy contento. ¿Cómo lo estás viviendo?`;
+  if(inactive)return `Hola ${first}! ¿Cómo estás? 😊 Quería saber cómo venís, más allá de los números. ¿Todo bien por casa?`;
+  return `Hola ${first}! ¿Cómo estás? 😊 Vi que bajó un poco el ritmo y quería saber si está todo bien.`;
 }
 function actionTaskHtml(task,plan){
   const overdue=!completedActionTask(task)&&task.date<localActionDate(),today=task.date===localActionDate(),result=ACTION_RESULTS[task.result]||'',message=task.script||actionMessage(task,plan);
