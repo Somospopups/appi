@@ -405,6 +405,10 @@ test('la ✗ registra que no se hizo y obliga a dejar constancia: no hay saltear
   await expect(page.locator('.mu-fila-quien')).toContainText('GOMEZ');
   // El botón de saltear no existe más: se marca sí o sí.
   await expect(page.locator('#muFilaSaltar')).toHaveCount(0);
+  // Y los dos botones vienen con su explicación, para que se entiendan solos.
+  await expect(page.locator('.mu-marcar-ayuda')).toBeVisible();
+  await expect(page.locator('.mu-marcar-ayuda')).toContainText('Tocá el verde si ya hiciste esta acción');
+  await expect(page.locator('.mu-marcar-ayuda')).toContainText('Tocá el rojo si hoy no se va a hacer');
 
   await page.locator('#muFilaNoHecha').click();
   await expect(page.locator('.mu-fila-quien')).toContainText('RUIZ');

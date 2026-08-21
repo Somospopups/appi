@@ -572,6 +572,10 @@
     html += '<div class="mu-marcar">' +
       '<button type="button" class="mu-marca ok" id="muFilaHecha"><i>✓</i>Ya lo hice</button>' +
       '<button type="button" class="mu-marca no" id="muFilaNoHecha"><i>✗</i>No se hizo</button></div>';
+    html += '<div class="mu-marcar-ayuda">' +
+      '<span><i class="ok">✓</i> Tocá el verde si ya hiciste esta acción, aunque haya sido por llamada o en persona.</span>' +
+      '<span><i class="no">✗</i> Tocá el rojo si hoy no se va a hacer: queda anotado y mañana empezás con la lista nueva.</span>' +
+      '</div>';
     html += '</div>';
     // Las flechitas van y vuelven entre tareas sin marcar nada.
     html += '<div class="mu-fila-nav">' +
@@ -659,6 +663,13 @@
       '.mu-marca.ok i{background:linear-gradient(135deg,#3ad0a4,#128C7E)}',
       '.mu-marca.no{background:rgba(255,107,107,.12);color:#c0392b}',
       '.mu-marca.no i{background:linear-gradient(135deg,#ff6b6b,#e74c3c)}',
+      '.mu-marcar-ayuda{display:grid;gap:5px;padding:10px 12px;border-radius:12px;background:rgba(120,120,140,.07)}',
+      '.mu-marcar-ayuda span{display:flex;align-items:flex-start;gap:7px;color:#696a78;font-size:10.5px;line-height:1.45}',
+      '.mu-marcar-ayuda i{flex:0 0 auto;display:inline-grid;place-items:center;width:16px;height:16px;margin-top:1px;border-radius:50%;font-style:normal;font-size:9px;font-weight:900;color:#fff}',
+      '.mu-marcar-ayuda i.ok{background:linear-gradient(135deg,#3ad0a4,#128C7E)}',
+      '.mu-marcar-ayuda i.no{background:linear-gradient(135deg,#ff6b6b,#e74c3c)}',
+      'body.dark .mu-marcar-ayuda{background:rgba(255,255,255,.06)}',
+      'body.dark .mu-marcar-ayuda span{color:#a9a9b8}',
       '.mu-hoy-res{display:inline-flex;gap:6px;margin-left:auto;align-items:center}',
       '.mu-hoy-res i,.mu-hoy-est i{font-style:normal;font-size:10.5px;font-weight:900;padding:3px 8px;border-radius:999px;background:rgba(120,120,140,.12);color:#63636f;white-space:nowrap}',
       '.mu-hoy-res i.ok,.mu-hoy-est i.ok{background:rgba(58,208,164,.16);color:#178a6c}',

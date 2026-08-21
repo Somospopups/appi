@@ -1,4 +1,4 @@
-# Estado al retomar — APPI v296
+# Estado al retomar — APPI v297
 
 Repo: `github.com/somospopups/appi` · **suite en verde**.
 
@@ -6,7 +6,14 @@ Corrida local completa: **282 pruebas pasan, 1 salteada, 0 fallan** (sin flakes 
 
 ---
 
-## Último cambio: v296 · Limpieza de pendientes menores
+## Último cambio: v297 · Ayuda de los botones ✓/✗
+
+Debajo de los botones de marca del carrusel hay una explicación breve y
+siempre visible: el verde es "ya lo hice" (aunque haya sido por llamada o
+en persona) y el rojo es "hoy no se va a hacer, queda anotado". La prueba
+del carrusel exige que la ayuda esté visible.
+
+## Anterior: v296 · Limpieza de pendientes menores
 
 Barridos los tres pendientes menores de REVISION_APPI.md: (1) los logs del
 geocodificador ya no vuelcan direcciones de personas en la consola; (2) los
