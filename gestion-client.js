@@ -43,9 +43,12 @@ async function cloudFetch(path,options={},retry=true){
 }
 
 function cacheKey(){return `appi_gestion_cache_v1_${userId()}`}
+/* El panel es privado (v295): aunque la base o una caché vieja devuelvan
+   filas de otras cuentas (pasaba con la sesión admin), acá no entran. */
+function soloMios(rows){const uid=userId();return (Array.isArray(rows)?rows:[]).filter(row=>row&&(!row.user_id||row.user_id===uid))}
 function queueKey(){return `appi_gestion_queue_v1_${userId()}`}
 function loadCache(){
-  try{const value=JSON.parse(localStorage.getItem(cacheKey())||'null');if(value&&Array.isArray(value.contacts)){state.contacts=value.contacts;state.surveys=new Map((value.surveys||[]).map(row=>[row.id,row]));state.activities=new Map();for(const row of value.activities||[]){const list=state.activities.get(row.contacto_id)||[];list.push(row);state.activities.set(row.contacto_id,list)}state.lastLoaded=Number(value.savedAt)||0;loadBulkQueue();return true}}catch(e){}
+  try{const value=JSON.parse(localStorage.getItem(cacheKey())||'null');if(value&&Array.isArray(value.contacts)){state.contacts=soloMios(value.contacts);state.surveys=new Map(soloMios(value.surveys||[]).map(row=>[row.id,row]));state.activities=new Map();for(const row of soloMios(value.activities||[])){const list=state.activities.get(row.contacto_id)||[];list.push(row);state.activities.set(row.contacto_id,list)}state.lastLoaded=Number(value.savedAt)||0;loadBulkQueue();return true}}catch(e){}
   return false;
 }
 function saveCache(){
@@ -607,7 +610,7 @@ function conservarPendientes(desdeLaNube){
   return [...siguenFaltando,...desdeLaNube];
 }
 
-async function fetchManagement(){const contacts=await cloudFetch('/rest/v1/appi_gestion_contactos?select=id,user_id,encuesta_id,tipo,nombre,telefono,telefono_normalizado,relacion,zona,referido_por,estado,notas,proximo_contacto,proximo_contacto_hora,ultimo_contacto,cantidad_origenes,metadata,created_at,updated_at&order=updated_at.desc&limit=2000'),surveys=await cloudFetch('/rest/v1/appi_encuestas?select=id,user_id,nombre,telefono,respuestas,referidos,created_at&order=created_at.desc&limit=1000'),activities=await cloudFetch('/rest/v1/appi_gestion_actividades?select=id,user_id,contacto_id,tipo,detalle,metadata,created_at&order=created_at.desc&limit=5000');state.contacts=conservarPendientes(Array.isArray(contacts)?contacts:[]);state.surveys=new Map((Array.isArray(surveys)?surveys:[]).map(row=>[row.id,row]));state.activities=new Map();for(const row of Array.isArray(activities)?activities:[]){const list=state.activities.get(row.contacto_id)||[];list.push(row);state.activities.set(row.contacto_id,list)}state.lastLoaded=Date.now();state.lastError='';saveCache();updateBadges();notifyDueOnce()}
+async function fetchManagement(){const contacts=await cloudFetch('/rest/v1/appi_gestion_contactos?select=id,user_id,encuesta_id,tipo,nombre,telefono,telefono_normalizado,relacion,zona,referido_por,estado,notas,proximo_contacto,proximo_contacto_hora,ultimo_contacto,cantidad_origenes,metadata,created_at,updated_at&order=updated_at.desc&limit=2000'),surveys=await cloudFetch('/rest/v1/appi_encuestas?select=id,user_id,nombre,telefono,respuestas,referidos,created_at&order=created_at.desc&limit=1000'),activities=await cloudFetch('/rest/v1/appi_gestion_actividades?select=id,user_id,contacto_id,tipo,detalle,metadata,created_at&order=created_at.desc&limit=5000');state.contacts=conservarPendientes(soloMios(contacts));state.surveys=new Map(soloMios(surveys).map(row=>[row.id,row]));state.activities=new Map();for(const row of soloMios(activities)){const list=state.activities.get(row.contacto_id)||[];list.push(row);state.activities.set(row.contacto_id,list)}state.lastLoaded=Date.now();state.lastError='';saveCache();updateBadges();notifyDueOnce()}
 // Una notificación tocada en el teléfono debe llevar a la pantalla correcta,
 // incluso si APPI todavía está cargando o pidiendo quién es la persona activa.
 function pendingNotificationKey(){return 'appi_gestion_notificacion_pendiente'}
@@ -695,7 +698,7 @@ async function programarDesdeHistorico(contactId,action={}){
 window.openEncuestaTool=openEncuestaTool;
 window.openMiGestion=openMiGestion;
 window.closeGestionDetail=closeContactDetail;
-window.APPIGestion={state,open:openMiGestion,importarPersona,guardarPersonaManual,migrarContactosLocales,contactosPendientes,telefonoValido,nuevaPersonaManual,refresh:refreshManagement,createInvitation:createSurveyInvitation,surveyUrl,shareMessage,flushQueue,updateBadges,priorityFor,messageFor,actionableContacts,logActivity,setView:setManagementView,prepareBulk:addBulkRecipients,processPendingOutcome:maybeAskPendingOutcome,guardarMetadata,programarDesdeHistorico,render:renderManagement};
+window.APPIGestion={state,soloMios,open:openMiGestion,importarPersona,guardarPersonaManual,migrarContactosLocales,contactosPendientes,telefonoValido,nuevaPersonaManual,refresh:refreshManagement,createInvitation:createSurveyInvitation,surveyUrl,shareMessage,flushQueue,updateBadges,priorityFor,messageFor,actionableContacts,logActivity,setView:setManagementView,prepareBulk:addBulkRecipients,processPendingOutcome:maybeAskPendingOutcome,guardarMetadata,programarDesdeHistorico,render:renderManagement};
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 

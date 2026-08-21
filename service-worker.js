@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v294-modo-prueba';
+const CACHE_NAME = 'appi-v295-panel-privado';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

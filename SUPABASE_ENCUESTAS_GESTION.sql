@@ -89,10 +89,7 @@ drop policy if exists "appi_encuesta_links_select_own" on public.appi_encuesta_l
 create policy "appi_encuesta_links_select_own"
 on public.appi_encuesta_links for select
 to authenticated
-using (
-  (auth.uid() = user_id and public.appi_cuenta_activa())
-  or public.appi_es_admin()
-);
+using (auth.uid() = user_id and public.appi_cuenta_activa());
 
 -- ============================================================
 -- 3. Respuestas completas de la encuesta
@@ -334,37 +331,25 @@ drop policy if exists "appi_encuestas_select_own" on public.appi_encuestas;
 create policy "appi_encuestas_select_own"
 on public.appi_encuestas for select
 to authenticated
-using (
-  (auth.uid() = user_id and public.appi_cuenta_activa())
-  or public.appi_es_admin()
-);
+using (auth.uid() = user_id and public.appi_cuenta_activa());
 
 drop policy if exists "appi_encuestas_delete_own" on public.appi_encuestas;
 create policy "appi_encuestas_delete_own"
 on public.appi_encuestas for delete
 to authenticated
-using (
-  (auth.uid() = user_id and public.appi_cuenta_activa())
-  or public.appi_es_admin()
-);
+using (auth.uid() = user_id and public.appi_cuenta_activa());
 
 drop policy if exists "appi_encuesta_invitaciones_select_own" on public.appi_encuesta_invitaciones;
 create policy "appi_encuesta_invitaciones_select_own"
 on public.appi_encuesta_invitaciones for select
 to authenticated
-using (
-  (auth.uid() = user_id and public.appi_cuenta_activa())
-  or public.appi_es_admin()
-);
+using (auth.uid() = user_id and public.appi_cuenta_activa());
 
 drop policy if exists "appi_gestion_select_own" on public.appi_gestion_contactos;
 create policy "appi_gestion_select_own"
 on public.appi_gestion_contactos for select
 to authenticated
-using (
-  (auth.uid() = user_id and public.appi_cuenta_activa())
-  or public.appi_es_admin()
-);
+using (auth.uid() = user_id and public.appi_cuenta_activa());
 
 drop policy if exists "appi_gestion_insert_own" on public.appi_gestion_contactos;
 create policy "appi_gestion_insert_own"
@@ -376,57 +361,39 @@ drop policy if exists "appi_gestion_update_own" on public.appi_gestion_contactos
 create policy "appi_gestion_update_own"
 on public.appi_gestion_contactos for update
 to authenticated
-using (
-  (auth.uid() = user_id and public.appi_cuenta_activa())
-  or public.appi_es_admin()
-)
-with check (
-  (auth.uid() = user_id and public.appi_cuenta_activa())
-  or public.appi_es_admin()
-);
+using (auth.uid() = user_id and public.appi_cuenta_activa())
+with check (auth.uid() = user_id and public.appi_cuenta_activa());
 
 drop policy if exists "appi_gestion_delete_own" on public.appi_gestion_contactos;
 create policy "appi_gestion_delete_own"
 on public.appi_gestion_contactos for delete
 to authenticated
-using (
-  (auth.uid() = user_id and public.appi_cuenta_activa())
-  or public.appi_es_admin()
-);
+using (auth.uid() = user_id and public.appi_cuenta_activa());
 
 drop policy if exists "appi_gestion_actividades_select_own" on public.appi_gestion_actividades;
 create policy "appi_gestion_actividades_select_own"
 on public.appi_gestion_actividades for select
 to authenticated
-using (
-  (auth.uid() = user_id and public.appi_cuenta_activa())
-  or public.appi_es_admin()
-);
+using (auth.uid() = user_id and public.appi_cuenta_activa());
 
 drop policy if exists "appi_gestion_actividades_insert_own" on public.appi_gestion_actividades;
 create policy "appi_gestion_actividades_insert_own"
 on public.appi_gestion_actividades for insert
 to authenticated
 with check (
-  (
-    auth.uid() = user_id
-    and public.appi_cuenta_activa()
-    and exists (
-      select 1 from public.appi_gestion_contactos c
-      where c.id = contacto_id and c.user_id = auth.uid()
-    )
+  auth.uid() = user_id
+  and public.appi_cuenta_activa()
+  and exists (
+    select 1 from public.appi_gestion_contactos c
+    where c.id = contacto_id and c.user_id = auth.uid()
   )
-  or public.appi_es_admin()
 );
 
 drop policy if exists "appi_gestion_actividades_delete_own" on public.appi_gestion_actividades;
 create policy "appi_gestion_actividades_delete_own"
 on public.appi_gestion_actividades for delete
 to authenticated
-using (
-  (auth.uid() = user_id and public.appi_cuenta_activa())
-  or public.appi_es_admin()
-);
+using (auth.uid() = user_id and public.appi_cuenta_activa());
 
 -- ============================================================
 -- 6. Actualización automática de fechas

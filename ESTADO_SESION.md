@@ -1,12 +1,27 @@
-# Estado al retomar — APPI v294
+# Estado al retomar — APPI v295
 
 Repo: `github.com/somospopups/appi` · **suite en verde**.
 
-Corrida local completa: **279 pruebas pasan, 1 salteada, 0 fallan** (10,2 min, sin flakes).
+Corrida local completa: **286 pruebas pasan, 1 salteada, 0 fallan** (1 flake conocido de alta-sin-internet re-corrido en verde).
 
 ---
 
-## Último cambio: v294 · Modo PRUEBA de 5 días
+## Último cambio: v295 · Panel de Contactos privado (bug real de privacidad)
+
+Reportado por el equipo: la sesión admin veía en SU Panel de Contactos los
+encuestados/referidos de todas las distribuidoras. Diagnóstico con datos:
+las encuestas SIEMPRE se guardaron bien (asignación por token); lo roto era
+la cláusula `or appi_es_admin()` en las políticas RLS de gestión + el panel
+pidiendo "todo lo visible". Doble arreglo: SUPABASE_PANEL_PRIVADO.sql
+(políticas solo-dueño; la Edge Function usa service_role y no pierde nada)
++ filtro soloMios() en gestion-client (nube y caché). Instaladores
+alineados. No hubo datos mal guardados; no hay nada que transferir.
+
+⚠️ PENDIENTE DE DESPLIEGUE: correr SUPABASE_PANEL_PRIVADO.sql en Supabase
+(URGENTE: hasta entonces la sesión admin sigue viendo datos ajenos si usa
+una versión vieja de la app; la v295 ya filtra en el cliente igualmente).
+
+## Anterior: v294 · Modo PRUEBA de 5 días
 
 Píldoras de creación reducidas a [1 mes] [🧪 PRUEBA · 5 días] (también al
 aprobar solicitudes). La prueba dura 5 días calendario (vence a medianoche
