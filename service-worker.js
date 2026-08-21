@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v295-panel-privado';
+const CACHE_NAME = 'appi-v296-limpieza-de-consola';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

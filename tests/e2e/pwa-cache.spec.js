@@ -11,6 +11,8 @@ test('la versión visible, el paquete y el Service Worker están alineados', () 
   const v = pkg.version.split('.')[0];
   expect(pkg.version).toBe(`${v}.0.0`);
   expect(html).toContain(`APPI · v${v} · Segura`);
+  // El README también dice la versión: si queda atrás, esta prueba lo avisa.
+  expect(read('README.md')).toContain(`v${v} · Segura`);
   expect(html).toContain(`const swVersion='${v}'`);
   expect(html).toContain("{updateViaCache:'none'}");
   expect(html).toContain('await registration.update()');

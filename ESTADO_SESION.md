@@ -1,12 +1,24 @@
-# Estado al retomar — APPI v295
+# Estado al retomar — APPI v296
 
 Repo: `github.com/somospopups/appi` · **suite en verde**.
 
-Corrida local completa: **286 pruebas pasan, 1 salteada, 0 fallan** (1 flake conocido de alta-sin-internet re-corrido en verde).
+Corrida local completa: **282 pruebas pasan, 1 salteada, 0 fallan** (sin flakes en esta corrida).
 
 ---
 
-## Último cambio: v295 · Panel de Contactos privado (bug real de privacidad)
+## Último cambio: v296 · Limpieza de pendientes menores
+
+Barridos los tres pendientes menores de REVISION_APPI.md: (1) los logs del
+geocodificador ya no vuelcan direcciones de personas en la consola; (2) los
+mensajes de error de Excel dejaron de aconsejar desactivar AdBlock para un
+CDN que la app no usa desde v250; (3) verificado que no queda ninguna URL
+de cdnjs/jsdelivr/unpkg en el código. El README pasó a v296 y quedó
+vigilado: pwa-cache.spec ahora exige que diga la misma versión que el
+paquete.
+
+Pendientes que quedan: solo revocar el token de GitHub (manual, del equipo).
+
+## Anterior: v295 · Panel de Contactos privado (bug real de privacidad)
 
 Reportado por el equipo: la sesión admin veía en SU Panel de Contactos los
 encuestados/referidos de todas las distribuidoras. Diagnóstico con datos:

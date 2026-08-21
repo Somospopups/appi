@@ -4120,7 +4120,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v295 · Segura</div>
+  <div class="ds-foot">APPI · v296 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -11568,7 +11568,7 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='295';
+      const swVersion='296';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 
@@ -14259,7 +14259,7 @@ async function geocodeTryU(q){
       setGeoCacheU(cache);
       return r;
     }
-  }catch(e){ console.log('Geocode try fail',q,e); }
+  }catch(e){ console.log('Geocode try fail',e); }
   return null;
 }
 
@@ -14290,7 +14290,7 @@ async function geocodeStructuredU({street, city, suburb, state, postalcode}){
       setGeoCacheU(cache);
       return r;
     }
-  }catch(e){ console.log('Structured fail',qstr,e); }
+  }catch(e){ console.log('Structured fail',e); }
   return null;
 }
 
@@ -14532,8 +14532,8 @@ function cargarArchivoU(file){
   try{
     if(infoEl){ infoEl.style.display='block'; infoEl.innerHTML=`⏳ Leyendo <b>${escU(file.name)}</b> (${(file.size/1024).toFixed(1)} KB) ...<br/><small>Si no avanza, revisá consola (F12)</small>`; }
     if(typeof XLSX==='undefined'){
-      window.APPIDialog.alert('Librería Excel no cargada. Recargá la página con internet.\n\nTip: desactivá el bloqueador de anuncios para cdn.jsdelivr.net.',{title:'Librería Excel no cargada',icon:'⚠️'});
-      if(infoEl) infoEl.innerHTML=`❌ Error: librería XLSX no cargada - recargá con internet y desactivá AdBlock para cdn.jsdelivr.net`;
+      window.APPIDialog.alert('La librería para leer Excel todavía no terminó de cargar. Cerrá y volvé a abrir APPI e intentá de nuevo.',{title:'Librería Excel no cargada',icon:'⚠️'});
+      if(infoEl) infoEl.innerHTML=`❌ La librería para leer Excel no cargó. Cerrá y volvé a abrir APPI.`;
       return;
     }
     console.log('📂 Archivo seleccionado:', file.size, file.type);
