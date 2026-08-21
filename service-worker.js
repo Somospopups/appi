@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v293-flechitas-de-tareas';
+const CACHE_NAME = 'appi-v294-modo-prueba';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
@@ -11,6 +11,7 @@ const APP_SHELL = [
   './telefono.js',
   './whatsapp-app.js',
   './auth-client.js',
+  './prueba-banner.js',
   './data-sync.js',
   './js/membership-admin.js',
   './admin-panel.js',

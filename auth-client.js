@@ -119,7 +119,18 @@ async function fetchProfile(session){
   if(profile.rol!=='admin'){
     const expires=profile.membresia_vence?new Date(profile.membresia_vence).getTime():0;
     if(!expires)throw authError('Tu cuenta todavía no tiene una membresía activa. Contactá a administración.','membership_missing',403);
-    if(expires<=Date.now())throw authError('Tu membresía de APPI venció. Contactá a administración para renovarla.','membership_expired',403);
+    if(expires<=Date.now()){
+      // Si la cuenta estaba en modo PRUEBA, el mensaje lo dice con todas las
+      // letras. La consulta va aparte y protegida: si la migración de la
+      // prueba todavía no corrió, el bloqueo genérico sigue funcionando.
+      let enPrueba=false;
+      try{
+        const flag=await request(`/rest/v1/appi_perfiles?select=membresia_prueba&user_id=eq.${encodeURIComponent(payload.sub)}&limit=1`,{headers:{Accept:'application/json'}},session.access_token);
+        enPrueba=!!(Array.isArray(flag)&&flag[0]&&flag[0].membresia_prueba);
+      }catch(e){}
+      if(enPrueba)throw authError('Tu período de PRUEBA de APPI terminó. Contactá a administración para activar tu membresía.','membership_expired',403);
+      throw authError('Tu membresía de APPI venció. Contactá a administración para renovarla.','membership_expired',403);
+    }
     profile.membresia_dias_restantes=Math.max(0,Math.ceil((expires-Date.now())/86400000));
   }
   return profile;

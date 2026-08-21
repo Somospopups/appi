@@ -1,12 +1,26 @@
-# Estado al retomar — APPI v293
+# Estado al retomar — APPI v294
 
 Repo: `github.com/somospopups/appi` · **suite en verde**.
 
-Corrida local completa: **271 pruebas pasan, 1 salteada, 0 fallan** (10,2 min, sin flakes).
+Corrida local completa: **279 pruebas pasan, 1 salteada, 0 fallan** (10,2 min, sin flakes).
 
 ---
 
-## Último cambio: v293 · Flechitas en el carrusel
+## Último cambio: v294 · Modo PRUEBA de 5 días
+
+Píldoras de creación reducidas a [1 mes] [🧪 PRUEBA · 5 días] (también al
+aprobar solicitudes). La prueba dura 5 días calendario (vence a medianoche
+argentina del quinto día). Franja roja fija en todas las pantallas, sin
+cerrar, con días → horas el último día (prueba-banner.js, en el App Shell).
+Píldora 🧪 en cada carpeta del panel para poner a prueba cuentas existentes
+(pisa la membresía, con confirmación) + badge 🧪 PRUEBA · XD. Pago o
+prórroga sacan del modo prueba solos (trigger). Al vencer: bloqueo de
+ingreso con mensaje propio.
+
+⚠️ PENDIENTE DE DESPLIEGUE: correr SUPABASE_PRUEBA.sql en Supabase
+(además de SUPABASE_ACCIONES_DIA.sql de v292 si todavía no corrió).
+
+## Anterior: v293 · Flechitas en el carrusel
 
 Flechitas ‹ › alrededor del contador para ir y volver entre las tareas del
 día. Pasear no marca nada; volver a una tarea marcada muestra su marca y
