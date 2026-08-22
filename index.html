@@ -4120,7 +4120,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v302 · Segura</div>
+  <div class="ds-foot">APPI · v303 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -5128,6 +5128,9 @@ body.dark #pageTabs button.active{color:#a8c0ff}
         <div class="admin-card-head"><div><h2>WhatsApp del equipo</h2><p>Este número recibe ayuda y solicitudes nuevas.</p></div></div>
         <div class="admin-setting-row"><input id="adminWhatsappNumber" inputmode="tel" autocomplete="off" placeholder="Ej: 5493515551234"><button type="button" class="btn btn-primary" id="adminSaveWhatsapp">Guardar número</button></div>
         <div class="admin-inline-status" id="adminWhatsappStatus" role="status"></div>
+          <div class="admin-card-head" style="margin-top:16px"><div><h2>Con qué WhatsApp mandás</h2><p>Los envíos del panel (bienvenida, contraseña, avisos) abren siempre esta aplicación en tu teléfono, sin preguntar. Vale para este dispositivo; en la PC, WhatsApp Web usa la cuenta que tengas abierta.</p></div></div>
+          <div class="admin-membership-pills" id="adminWaPref"><button type="button" data-wa-pref="normal">📱 WhatsApp normal</button><button type="button" data-wa-pref="business">💼 WhatsApp Business</button></div>
+          <div class="admin-inline-status" id="adminWaPrefStatus" role="status"></div>
         </div>
       </section>
       
@@ -11670,7 +11673,7 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='302';
+      const swVersion='303';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 

@@ -1,4 +1,4 @@
-# Estado al retomar — APPI v302
+# Estado al retomar — APPI v303
 
 Repo: `github.com/somospopups/appi` · **suite en verde**.
 
@@ -6,7 +6,17 @@ Corrida local completa: **282 pruebas pasan, 1 salteada, 0 fallan** (sin flakes 
 
 ---
 
-## Último cambio: v302 · Salida y frontera de la sesión admin
+## Último cambio: v303 · WhatsApp del admin + guías con scroll
+
+(1) Selector 📱 normal / 💼 Business en ⚙️ Configuración del panel: los
+envíos del admin (bienvenida, contraseña, avisos) abren siempre esa app
+en el teléfono, sin preguntar (la preferencia APPIWhatsApp existía pero
+el admin no tenía dónde elegirla desde que la sesión admin no ve el menú
+de la app). Por dispositivo; en PC manda WhatsApp Web. (2) Todos los
+diálogos de APPI ahora scrollean: tarjeta limitada al alto de pantalla y
+texto deslizable — las guías largas se leen enteras.
+
+## Anterior: v302 · Salida y frontera de la sesión admin
 
 Dos bugs reales reportados y reproducidos con pruebas: (1) desde v299 el
 "?" de ayuda tapaba el botón de cerrar sesión (header.top .help-btn con

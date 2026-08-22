@@ -89,3 +89,28 @@ test('las credenciales viajan en dos mensajes: bienvenida y contraseña sola', (
   // Y el popup existe en los dos flujos: crear y aprobar.
   expect(js.match(/popupCredenciales\(\{/g).length).toBeGreaterThanOrEqual(3);
 });
+
+test('los envíos del panel abren el WhatsApp elegido (normal o Business)', () => {
+  const h = html();
+  expect(h).toContain('id="adminWaPref"');
+  expect(h).toContain('data-wa-pref="normal"');
+  expect(h).toContain('data-wa-pref="business"');
+  const js = panel();
+  expect(js).toContain('setPreferencia(b.dataset.waPref)');
+});
+
+test('un popup largo scrollea en vez de desbordarse', async ({ page }) => {
+  await page.goto('/index.html');
+  await page.waitForFunction(() => window.APPIDialog && window.APPIDialog.alert);
+  const r = await page.evaluate(() => {
+    window.APPIDialog.alert('línea de guía\n'.repeat(300), { title: 'Ayuda larga', icon: '?' });
+    const msg = document.getElementById('appiDialogMessage');
+    const card = msg.closest('.appi-dialog-card');
+    return {
+      scrollea: msg.scrollHeight > msg.clientHeight,
+      entra: card.getBoundingClientRect().height <= window.innerHeight
+    };
+  });
+  expect(r.scrollea).toBe(true);
+  expect(r.entra).toBe(true);
+});

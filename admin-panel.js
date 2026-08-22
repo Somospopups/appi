@@ -386,6 +386,17 @@ function bind(){if(state.bound)return;state.bound=true;['adminSucursal','adminNu
   const refreshPagos=$('adminRefreshPagos');if(refreshPagos)refreshPagos.onclick=()=>loadPagos();
   const goRequests=$('adminGoRequests');if(goRequests)goRequests.onclick=()=>{const card=$('adminPendingCard');if(card)card.scrollIntoView({behavior:'smooth',block:'start'})};
   const ingresosToggle=$('adminIngresosToggle');if(ingresosToggle)ingresosToggle.onclick=()=>{const wrap=$('adminIngresosWrap'),chev=$('adminIngresosChevron');const abrir=wrap.hidden;wrap.hidden=!abrir;ingresosToggle.setAttribute('aria-expanded',abrir?'true':'false');if(chev)chev.classList.toggle('open',abrir)};
+  // El WhatsApp con el que salen los envíos del panel (v303): sin preguntar.
+  const waPref=$('adminWaPref');
+  if(waPref&&window.APPIWhatsApp){
+    const pintarPref=()=>{const actual=window.APPIWhatsApp.preferencia();waPref.querySelectorAll('[data-wa-pref]').forEach(b=>b.classList.toggle('active',b.dataset.waPref===actual))};
+    pintarPref();
+    waPref.querySelectorAll('[data-wa-pref]').forEach(b=>b.onclick=()=>{
+      window.APPIWhatsApp.setPreferencia(b.dataset.waPref);
+      pintarPref();
+      setStatus('adminWaPrefStatus',`Listo: los envíos abren ${b.dataset.waPref==='business'?'WhatsApp Business':'WhatsApp normal'} en este dispositivo.`);
+    });
+  }
   const configToggle=$('adminConfigToggle');if(configToggle)configToggle.onclick=()=>{const body=$('adminConfigBody'),chev=$('adminConfigChevron');const abrir=body.hidden;body.hidden=!abrir;configToggle.setAttribute('aria-expanded',abrir?'true':'false');if(chev)chev.classList.toggle('open',abrir)};
   const refreshAcciones=$('adminRefreshAcciones');if(refreshAcciones)refreshAcciones.onclick=()=>loadAcciones();$('adminSaveWhatsapp').onclick=saveWhatsapp;$('btnAdminPanelLogout').onclick=logout;$('btnAdminPanelPassword').onclick=()=>window.abrirCambioPasswordAPPI();const helpAdmin=$('btnHelpAdmin');if(helpAdmin)helpAdmin.onclick=()=>window.APPIDialog.alert(
 `Desde acá administrás las cuentas de APPI.
@@ -412,7 +423,10 @@ INGRESOS POR MES
 Los pagos registrados, mes por mes: total recaudado, cantidad de pagos y quién pagó. Con las flechas cambiás de mes y la tira anual muestra los 12 meses del año.
 
 WHATSAPP DE SOPORTE
-El número que ven quienes piden ayuda para entrar. Se valida antes de guardarse.`,
+El número que ven quienes piden ayuda para entrar. Se valida antes de guardarse.
+
+CON QUÉ WHATSAPP MANDÁS
+En Configuración elegís si los envíos del panel abren WhatsApp normal o Business en tu teléfono, sin preguntar cada vez.`,
 {title:'Panel de administración',icon:'🛡️'});$('adminUserSearch').oninput=event=>{state.filter=event.target.value;renderUsers()};$('adminSucursal').oninput=event=>event.target.value=event.target.value.replace(/\D/g,'').slice(0,2);$('adminNumero').oninput=event=>event.target.value=event.target.value.replace(/\D/g,'').slice(0,12);$('adminWhatsappNumber').oninput=event=>event.target.value=event.target.value.replace(/\D/g,'').slice(0,15)}
 function open(){const profile=window.APPIAuth.currentProfile();if(!profile||profile.rol!=='admin')return;bind();$('adminPanelIdentity').textContent='Administración del equipo';load();
   // Cargar estadísticas de ganancias
