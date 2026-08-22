@@ -653,6 +653,23 @@
     }catch(e){ return false; }
   }
   var autoAbierto = false;
+  // El mazo aparece recién cuando la app terminó de cargar DE VERDAD:
+  // sin pantalla de arranque, sin la elección de titular/socio abierta,
+  // con la sesión autorizada. Antes de eso, espera.
+  function appTerminoDeCargar(){
+    try{
+      var boot = document.getElementById('bootScreen');
+      if (boot && !boot.classList.contains('gone') && boot.offsetParent !== null) return false;
+      var persona = document.getElementById('personChoiceOverlay');
+      if (persona && !persona.hidden) return false;
+      if (window.__appiCubriendoInicio) return false;
+      if (window.APPIAuth && window.APPIAuth.isEnabled && window.APPIAuth.isEnabled()){
+        if (window.APPIAuth.isLocallyAuthorized && !window.APPIAuth.isLocallyAuthorized()) return false;
+        if (window.APPIAuth.needsPersonChoice && window.APPIAuth.needsPersonChoice()) return false;
+      }
+      return true;
+    }catch(e){ return false; }
+  }
   function alEntrarAlHome(){
     if (!sesionDeDistribuidor() || !esHome()) return;
     css();
@@ -662,7 +679,16 @@
     // La llave existe para las pruebas automatizadas y para depurar: apaga
     // solo la apertura automática; el botón 🔔 sigue funcionando igual.
     if (localStorage.getItem('appi_tarjetas_auto') === '0') return;
-    if (cuantasNovedades() > 0) setTimeout(function(){ if (esHome()) abrir(); }, 650);
+    var intentos = 0;
+    (function esperar(){
+      if (!esHome() || document.getElementById('htOverlay')) return;
+      if (++intentos > 45) return;                     // ~18 s y desistimos por hoy
+      if (!appTerminoDeCargar()){ setTimeout(esperar, 400); return; }
+      // Un respiro final después de cargar, y recién ahí el mazo.
+      setTimeout(function(){
+        if (esHome() && appTerminoDeCargar() && !document.getElementById('htOverlay') && cuantasNovedades() > 0) abrir();
+      }, 500);
+    })();
   }
 
   function envolver(){

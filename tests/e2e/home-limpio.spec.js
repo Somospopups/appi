@@ -309,3 +309,22 @@ test('tocar un cumpleaños saluda por WhatsApp directamente', async ({ page }) =
   // El mazo se cerró en el camino.
   await expect(page.locator('#htOverlay')).toHaveCount(0);
 });
+
+test('el mazo espera a que la app cargue: nunca sobre la elección de persona', async ({ page }) => {
+  await entrar(page);
+  await page.evaluate(() => {
+    localStorage.removeItem('appi_tarjetas_auto');
+    // Como si el usuario estuviera eligiendo titular o socio.
+    window.__pcOriginal = window.APPIAuth.needsPersonChoice;
+    window.APPIAuth.needsPersonChoice = () => true;
+    showView('view-mes');
+    showView('view-home');
+  });
+  // Mientras la elección está abierta, el mazo NO aparece.
+  await page.waitForTimeout(1800);
+  await expect(page.locator('#htOverlay')).toHaveCount(0);
+  // Al cerrarse la elección, la app quedó lista y el mazo recién ahí sale.
+  await page.evaluate(() => { window.APPIAuth.needsPersonChoice = window.__pcOriginal || (() => false); });
+  await expect(page.locator('#htOverlay')).toBeVisible({ timeout: 5000 });
+  await expect(page.locator('#htOverlay')).toContainText('Tu impulso de hoy');
+});

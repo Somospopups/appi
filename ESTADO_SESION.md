@@ -1,4 +1,4 @@
-# Estado al retomar — APPI v308
+# Estado al retomar — APPI v309
 
 Repo: `github.com/somospopups/appi` · **suite en verde**.
 
@@ -6,7 +6,17 @@ Corrida local completa: **282 pruebas pasan, 1 salteada, 0 fallan** (sin flakes 
 
 ---
 
-## Último cambio: v308 · Enlaces del mazo auto-dirigibles
+## Último cambio: v309 · El mazo espera su turno
+
+Bug reportado: las tarjetas salían antes de tiempo (sobre la elección
+titular/socio). Causa: view-home queda activa debajo de los overlays de
+arranque y el mazo salía a los 650ms fijos. Arreglo: appTerminoDeCargar()
+verifica bootScreen ido, elección de persona cerrada y no pendiente
+(needsPersonChoice), inicio no cubierto y sesión autorizada; el auto-open
+espera cada 400ms hasta 18s y recién ahí sale (+500ms de respiro). Test
+nuevo que simula la elección pendiente vía needsPersonChoice.
+
+## Anterior: v308 · Enlaces del mazo auto-dirigibles
 
 Regla: tocar un renglón deja EN la persona/acción exacta. Jornada y
 nuevos del Panel → ficha del contacto abierta (APPIGestion.abrirContacto
