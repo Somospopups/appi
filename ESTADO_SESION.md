@@ -1,4 +1,4 @@
-# Estado al retomar — APPI v306
+# Estado al retomar — APPI v307
 
 Repo: `github.com/somospopups/appi` · **suite en verde**.
 
@@ -6,7 +6,16 @@ Corrida local completa: **282 pruebas pasan, 1 salteada, 0 fallan** (sin flakes 
 
 ---
 
-## Último cambio: v306 · Mazo a punto
+## Último cambio: v307 · Saludo directo desde la tarjeta de cumpleaños
+
+Bug: la tarjeta de Cumpleaños abría Mi Equipo vacío (showView sin
+openEquipo). Arreglo + mejora: tocar a la persona abre WhatsApp con el
+saludo listo (equipo → APPITel con nombre de pila; cliente → plantilla
+de Mensajes que además marca la ✓ del día); sin teléfono → pantalla
+bien renderizada. CTA "Saludar ahora". Oportunidades y Cultura también
+usan openEquipo(). El mazo soporta acción propia por renglón (t.items).
+
+## Anterior: v306 · Mazo a punto
 
 Segunda ronda con el mazo en la mano: (1) deslizar desde cualquier parte
 de verdad — el cuerpo scrolleable se quedaba con el gesto; touch-action

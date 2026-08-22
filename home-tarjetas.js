@@ -233,7 +233,7 @@
         cat: 'oportunidades', icono: '🎯', kicker: 'Oportunidades',
         titulo: gente.length === 1 ? 'Un Bonus al alcance de la mano' : gente.length + ' Bonus al alcance de la mano',
         html: '<ul class="ht-lista">' + filas + '</ul><p class="ht-nota">Un empujón tuyo hoy puede cerrar ese Bonus.</p>',
-        cta: { label: 'Ver Mi Equipo', go: function(){ if (typeof window.showView === 'function') window.showView('view-equipo'); } }
+        cta: { label: 'Ver Mi Equipo', go: function(){ if (typeof window.openEquipo === 'function') window.openEquipo(); else if (typeof window.showView === 'function') window.showView('view-equipo'); } }
       };
     }catch(e){ return null; }
   }
@@ -255,15 +255,49 @@
     }catch(e){}
     var total = equipo.length + clientes.length;
     if (!total) return null;
-    var filas = equipo.slice(0, 2).map(function(p){ return '<li>🎂 <b>' + esc(String(p.nombre || '').split(',')[0]) + '</b> · de tu equipo</li>'; })
-      .concat(clientes.slice(0, 2).map(function(u){ return '<li>🎂 <b>' + esc(String(u.usuario || '').split(',')[0]) + '</b> · cliente</li>'; })).join('');
+
+    var pila = function(n){
+      try{ if (typeof window.nombreDePila === 'function'){ var v = window.nombreDePila(n); if (v) return v; } }catch(e){}
+      var t = String(n || '').trim();
+      if (t.indexOf(',') >= 0) t = (t.split(',')[1] || t.split(',')[0]);
+      t = t.trim().split(/\s+/)[0] || '';
+      return t ? t.charAt(0).toUpperCase() + t.slice(1).toLowerCase() : '';
+    };
+    var abrirEquipo = function(){ if (typeof window.openEquipo === 'function') window.openEquipo(); else if (typeof window.showView === 'function') window.showView('view-equipo'); };
+    // Saludo directo: a la persona del equipo la saluda APPITel con el mensaje
+    // de cumpleaños; al cliente lo saluda la plantilla de Mensajes, que además
+    // deja marcada la ✓ de la acción del día.
+    var saludarEquipo = function(p){ return function(){
+      var tel = p.telefono || p.telf || '';
+      if (tel && window.APPITel && window.APPITel.esValido(tel)){
+        window.APPITel.abrir(tel, '¡Feliz cumpleaños, ' + pila(p.nombre) + '! 🎂🎉\n\nTe mando un saludo grande en tu día. Que lo disfrutes mucho.\n\n¡Un abrazo!', pila(p.nombre));
+      } else abrirEquipo();
+    }; };
+    var saludarCliente = function(u){ return function(){
+      if (window.APPIMensajes && window.APPIMensajes.mandar) window.APPIMensajes.mandar('cumple', u);
+      else if (typeof window.showView === 'function') window.showView('view-usuarios');
+    }; };
+
+    var filas = [], items = [];
+    equipo.slice(0, 2).forEach(function(p){
+      filas.push('<li>🎂 <b>' + esc(String(p.nombre || '').split(',')[0]) + '</b> · de tu equipo</li>');
+      items.push(saludarEquipo(p));
+    });
+    clientes.slice(0, 2).forEach(function(u){
+      filas.push('<li>🎂 <b>' + esc(String(u.usuario || '').split(',')[0]) + '</b> · cliente</li>');
+      items.push(saludarCliente(u));
+    });
+    if (total > 4){
+      filas.push('<li>… y más cumpleaños</li>');
+      items.push(clientes.length > 2 ? function(){ if (typeof window.showView === 'function') window.showView('view-usuarios'); } : abrirEquipo);
+    }
+    var primero = items[0];
     return {
       cat: 'cumples', icono: '🎂', kicker: 'Cumpleaños',
       titulo: total === 1 ? 'Hoy hay un cumpleaños' : 'Hoy hay ' + total + ' cumpleaños',
-      html: '<ul class="ht-lista">' + filas + (total > 4 ? '<li>… y más</li>' : '') + '</ul><p class="ht-nota">Un saludo tuyo hoy vale doble.</p>',
-      cta: clientes.length
-        ? { label: 'Saludar ahora', go: function(){ if (typeof window.showView === 'function') window.showView('view-usuarios'); } }
-        : { label: 'Ver Mi Equipo', go: function(){ if (typeof window.showView === 'function') window.showView('view-equipo'); } }
+      html: '<ul class="ht-lista">' + filas.join('') + '</ul><p class="ht-nota">Tocá a la persona y sale el saludo por WhatsApp.</p>',
+      items: items,
+      cta: { label: 'Saludar ahora', go: primero }
     };
   }
 
@@ -282,7 +316,7 @@
       titulo: 'La Cultura del mes te está esperando',
       html: '<p class="ht-frase">Te falta' + (partes.length > 1 ? 'n' : '') + ' ' + partes.join(' y ') + ' para completar el mes.</p>' +
             '<div class="ht-chips"><span>💎 ' + String(cul.pb).replace('.', ',') + ' / ' + cul.metaPb + '</span><span>🤝 ' + cul.invitados + ' / ' + cul.metaInv + '</span></div>',
-      cta: { label: 'Cargar mi avance', go: function(){ if (typeof window.showView === 'function') window.showView('view-equipo'); } }
+      cta: { label: 'Cargar mi avance', go: function(){ if (typeof window.openEquipo === 'function') window.openEquipo(); else if (typeof window.showView === 'function') window.showView('view-equipo'); } }
     };
   }
 
@@ -455,8 +489,12 @@
     if (t && t.cta){
       var cta = el.querySelector('.ht-cta');
       if (cta) cta.onclick = irYCerrar(t.cta.go);
-      // Cada renglón también lleva directo: tocás la tarea y llegás.
-      el.querySelectorAll('.ht-lista li').forEach(function(li){ li.onclick = irYCerrar(t.cta.go); });
+      // Cada renglón lleva directo: si la tarjeta trae una acción por ítem
+      // (como saludar a ESA persona), se usa esa; si no, la general.
+      el.querySelectorAll('.ht-lista li').forEach(function(li, i){
+        var accion = (t.items && t.items[i]) || t.cta.go;
+        li.onclick = irYCerrar(accion);
+      });
     }
     activarArrastre(el);
   }
