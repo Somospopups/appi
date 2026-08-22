@@ -44,6 +44,7 @@ async function entrar(page) {
   });
   await page.addInitScript(([uid, equipo, contactos]) => {
     localStorage.setItem('welcomeSeen', '1');
+    localStorage.setItem('appi_tarjetas_auto', '0');
     localStorage.setItem('tutoVisto_v2', '1');
     localStorage.setItem('equipoData', JSON.stringify(equipo));
     localStorage.setItem(`appi_gestion_cache_v1_${uid}`, JSON.stringify({ contacts: contactos, surveys: [], activities: [], savedAt: Date.now() }));
@@ -170,4 +171,71 @@ test('los titulos entran animados desde arriba al cambiar de pantalla', async ({
   await page.evaluate(() => window.showView('view-negocio'));
   const name = await page.evaluate(() => getComputedStyle(document.querySelector('#view-negocio header h1')).animationName);
   expect(name).toContain('titleSlideDown');
+});
+
+/* ---------- el mazo de notificaciones (v304) ---------- */
+
+test('el mazo abre con la tarjeta especial primero y se pasa con el botón', async ({ page }) => {
+  await entrar(page);
+  await page.evaluate(() => window.APPIHomeTarjetas.abrir());
+  const overlay = page.locator('#htOverlay');
+  await expect(overlay).toBeVisible();
+  // La primera es siempre la especial, con el aliento y el progreso real.
+  await expect(overlay).toContainText('Tu impulso de hoy');
+  await expect(overlay).toContainText('Para vos, María');
+  await expect(page.locator('#htPos')).toContainText('1 de');
+  // Pasar avanza a la siguiente categoría con contenido: Tu jornada.
+  await page.locator('#htPasar').click();
+  await expect(overlay).toContainText('Tu jornada');
+  await expect(overlay).toContainText('Jorge Salas');
+});
+
+test('las tarjetas son inteligentes: solo aparecen las categorías con novedades', async ({ page }) => {
+  await entrar(page);
+  const cats = await page.evaluate(() => window.APPIHomeTarjetas.armarTarjetas().map(t => t.cat));
+  expect(cats[0]).toBe('especial');
+  expect(cats).toContain('jornada');   // Jorge y Lucía tienen fecha para hoy
+  expect(cats).toContain('panel');         // Carla está nueva sin contactar
+  expect(cats).toContain('oportunidades'); // María (DC) está en 9 PB: bonus cerca
+  expect(cats).not.toContain('cumples');   // nadie cumple años en los datos
+  expect(cats).not.toContain('usuarios');  // sin planilla de garantías cargada
+});
+
+test('el botón Notificaciones late con el contador y reabre el mazo', async ({ page }) => {
+  await entrar(page);
+  await page.evaluate(() => window.APPIHomeTarjetas.abrir());
+  // Cerrar el mazo lo marca como visto: el botón queda quieto.
+  await page.locator('#htCerrar').click();
+  const boton = page.locator('#htBoton');
+  await expect(boton).toBeVisible();
+  await expect(boton).not.toHaveClass(/late/);
+  await expect(boton).toContainText('Notificaciones');
+  // Reabre al tocarlo.
+  await boton.click();
+  await expect(page.locator('#htOverlay')).toBeVisible();
+  await expect(page.locator('#htOverlay')).toContainText('Tu impulso de hoy');
+});
+
+test('deslizar la tarjeta la pasa, como corresponde a un mazo', async ({ page }) => {
+  await entrar(page);
+  await page.evaluate(() => window.APPIHomeTarjetas.abrir());
+  const card = page.locator('.ht-card:not(.detras1):not(.detras2)');
+  await expect(card).toContainText('Tu impulso de hoy');
+  const box = await card.boundingBox();
+  await page.mouse.move(box.x + box.width / 2, box.y + 60);
+  await page.mouse.down();
+  await page.mouse.move(box.x + box.width / 2 + 160, box.y + 70, { steps: 8 });
+  await page.mouse.up();
+  await expect(page.locator('#htOverlay')).toContainText('Tu jornada');
+});
+
+test('hay frases de sobra y la del día no cambia dentro del mismo día', async ({ page }) => {
+  await entrar(page);
+  const r = await page.evaluate(() => ({
+    total: window.APPIHomeTarjetas.FRASES.length,
+    una: window.APPIHomeTarjetas.fraseDelDia(),
+    dos: window.APPIHomeTarjetas.fraseDelDia()
+  }));
+  expect(r.total).toBeGreaterThanOrEqual(80);
+  expect(r.una).toBe(r.dos);
 });

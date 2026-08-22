@@ -204,6 +204,7 @@ test('Mi Encuesta y Mi Gestión usan la cuenta autenticada y guardan el seguimie
   await page.setViewportSize({ width: 390, height: 844 });
   await page.addInitScript(() => {
     localStorage.setItem('welcomeSeen', '1');
+    localStorage.setItem('appi_tarjetas_auto', '0');
     localStorage.setItem('tutoVisto_v2', '1');
   });
   await page.goto('/index.html', { waitUntil: 'networkidle' });

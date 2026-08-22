@@ -50,6 +50,7 @@ async function abrirApp(page) {
 
   await page.addInitScript(equipo => {
     localStorage.setItem('welcomeSeen', '1');
+    localStorage.setItem('appi_tarjetas_auto', '0');
     localStorage.setItem('tutoVisto_v2', '1');
     localStorage.setItem('equipoData', JSON.stringify(equipo));
   }, equipoDePrueba());

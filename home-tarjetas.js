@@ -1,0 +1,544 @@
+/* ============================================================
+   APPI · Tarjetas de notificaciones del Home (estilo mazo)
+   ------------------------------------------------------------
+   Al entrar al Home, las novedades aparecen como un mazo de
+   tarjetas que se pasan deslizando (como Tinder): la primera es
+   el aliento del día con el progreso real; después, una tarjeta
+   por categoría, solo si esa categoría tiene algo para decir:
+
+     💙 Especial  · aliento personalizado (siempre, 1 frase/día)
+     📅 Tu jornada · seguimientos y presentaciones de hoy
+     🎯 Oportunidades · bonus al alcance en Mi Equipo
+     🎂 Cumpleaños · equipo + clientes que cumplen hoy
+     👥 Mi Equipo · la Cultura del mes que falta completar
+     📇 Panel de Contactos · nuevos sin contactar y vencidos
+     💧 Usuarios · las acciones del día sin marcar (✓/✗)
+
+   Deslizar pasa la tarjeta; el botón de cada tarjeta lleva a la
+   pantalla. El Home tiene el botón 🔔 Notificaciones: parpadea
+   con el contador cuando hay tarjetas sin ver y las reabre.
+   ============================================================ */
+(function(){
+  'use strict';
+
+  /* ---------- utilidades ---------- */
+  function uid(){ return window.APPIAuth && window.APPIAuth.userId ? (window.APPIAuth.userId() || 'local') : 'local'; }
+  function esc(s){
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
+      return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c];
+    });
+  }
+  function hoyKey(){
+    var d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  }
+  function leerLS(clave, defecto){
+    try{ var v = JSON.parse(localStorage.getItem(clave)); return v == null ? defecto : v; }catch(e){ return defecto; }
+  }
+  function nombrePila(){
+    try{
+      var activo = window.APPIAuth && window.APPIAuth.activePerson ? window.APPIAuth.activePerson() : null;
+      var perfil = window.APPIAuth && window.APPIAuth.currentProfile ? window.APPIAuth.currentProfile() : null;
+      var full = String((activo && activo.nombre) || (perfil && perfil.nombre) || '').trim();
+      return full.split(/\s+/)[0] || '';
+    }catch(e){ return ''; }
+  }
+
+  /* ---------- el aliento del día ----------
+     Muchas frases para que no se repitan seguido: se sortea entre las que
+     todavía no salieron y recién cuando se usaron todas vuelve a barajar. */
+  var FRASES = [
+    'Hoy es un gran día para avanzar un paso más, {nombre}.',
+    'Lo que hacés todos los días pesa más que lo que hacés de vez en cuando.',
+    'Una llamada de hoy puede ser el ingreso del mes que viene.',
+    'No hace falta hacerlo perfecto: hace falta hacerlo hoy.',
+    'Tu constancia está construyendo algo que todavía no se ve entero.',
+    'Cada demo que hacés es una semilla. Alguna siempre florece.',
+    'El "no" de hoy te acerca al "sí" de mañana. Seguí.',
+    'La diferencia entre soñar y lograr se llama agenda.',
+    'Hoy alguien de tu equipo necesita esa palabra tuya. Mandala.',
+    'Los grandes meses se arman con días comunes bien usados.',
+    'Nadie llegó lejos sin un día como hoy: normal, pero trabajado.',
+    'Tu ejemplo arrastra más que tus palabras. Mostrá cómo se hace.',
+    'Si el día viene lento, hacé UNA cosa importante y ya ganaste.',
+    'La gente no compra productos: te compra a vos. Cuidate.',
+    'Retomá ese contacto que quedó frío. Hoy es buen día.',
+    'El mes no se cierra el 30: se cierra hoy, un poquito.',
+    'Quien pregunta vende. Hoy preguntá más.',
+    'Tu racha vale oro: no la cortes hoy, {nombre}.',
+    'Un equipo crece cuando su líder no se esconde. Aparecé.',
+    'Hoy puede aparecer tu próximo líder. Tratá a todos como si lo fueran.',
+    'La visita que estás postergando es la que más te va a agradecer.',
+    'Cuando dudes, volvé a tu porqué. Ahí está la nafta.',
+    'No compitas con nadie: superá a tu versión de ayer.',
+    'Al miedo se le gana marcando el número igual.',
+    'Vender es servir. Hoy salí a servir y las ventas vienen solas.',
+    'Un mensaje corto y sincero abre más puertas que mil excusas.',
+    'Tus clientes de hoy son tus referidos de mañana. Mimalos.',
+    'El Bonus no se gana el último día: se gana hoy.',
+    'Si ya hiciste lo difícil, no te frenes en lo fácil.',
+    'Hacé que hoy valga la pena contarse el domingo.',
+    'La organización de tu semana es el sueldo de tu mes.',
+    'Hay alguien esperando exactamente lo que vos ofrecés.',
+    'Tomate 5 minutos y agendá. El resto del día te lo agradece.',
+    'Las oportunidades no se pierden: las agarra otro. Agarrala vos.',
+    'Hoy no hace falta motivación: hace falta empezar. Después viene sola.',
+    'Cada persona nueva que conocés agranda tu mundo y tu negocio.',
+    'Sé la persona que te hubiera gustado que te invite a esto.',
+    'Un seguimiento a tiempo vale más que diez promesas.',
+    'Tu escalera de sueños se sube con los escalones de hoy.',
+    'El PB que falta está a una conversación de distancia.',
+    'Que tu equipo hoy te vea cerca: un audio alcanza.',
+    'Ordenar el Panel 10 minutos te devuelve horas de cabeza.',
+    'A la primera demo del día le siguen las demás más fáciles.',
+    'Hablá con una persona nueva hoy. Solo una. Cambia todo.',
+    'No es suerte: es que nunca dejaste de aparecer.',
+    'Los meses grandes empiezan con lunes chicos bien usados.',
+    'Tu palabra tiene más llegada de la que creés. Usala hoy.',
+    'Reactivar un cliente dormido es la venta más barata que existe.',
+    'Hoy festejá lo que ya hiciste y después andá por más.',
+    'El negocio crece al ritmo de tus conversaciones.',
+    'Poné primera: el envión viene después del arranque.',
+    'Una familia más cuidando su agua. Ese es el impacto de hoy.',
+    'Si te caés siete veces, la octava llamada sale mejor.',
+    'Lo urgente grita, lo importante construye. Hacé lo importante.',
+    'Tu futuro yo está mirando lo que hacés hoy. Dale material.',
+    'De a un contacto por vez se arma una red gigante.',
+    'Las garantías vencen, las relaciones no. Cultivalas.',
+    'Contale tu historia a alguien hoy. Las historias venden.',
+    'El que muestra el plan dos veces por día no tiene meses malos.',
+    'Sonreí antes de llamar: se escucha del otro lado.',
+    'Hoy es un buen día para pedir un referido. Pedilo.',
+    'La cultura se contagia: cargá tus PB y tu equipo te copia.',
+    'Cuando el equipo te ve marcar, el equipo marca.',
+    'Tu demo número cien empieza por la de hoy.',
+    'Invitar no es molestar: es dar la posibilidad de elegir.',
+    'Un café con un prospecto vale más que una tarde de redes.',
+    'Medí tu día por conversaciones, no por horas.',
+    'El seguimiento es donde se esconde la plata.',
+    'Hacelo simple: contactar, mostrar, acompañar. Repetir.',
+    'Tu energía de hoy es la publicidad de tu negocio.',
+    'Si ayudás a dos de tu equipo hoy, tu mes se ayuda solo.',
+    'Nadie se arrepiente de la llamada que sí hizo.',
+    'Hoy hay alguien cumpliendo años: un saludo tuyo vale doble.',
+    'Que la agenda mande y el ánimo obedezca.',
+    'Un pasito hoy, otro mañana: así se llega a Directora.',
+    'Las metas de papel se cumplen con zapatos gastados.',
+    'Vos ya sabés qué hay que hacer. Hoy solo hay que hacerlo.',
+    'La mejor hora para sembrar fue ayer. La segunda mejor es ahora.',
+    'Tu equipo no necesita un jefe: necesita verte en acción.',
+    'Cerrá el día pudiendo decir: hice lo que dependía de mí.',
+    'Todo gran cheque empezó con un "hola, ¿cómo estás?".',
+    'Hay 24 horas nuevas sobre la mesa. Son tuyas, {nombre}.',
+    'No pares cuando estés cansado: pará cuando esté hecho.',
+    'Hoy también se puede. Y vos lo sabés.'
+  ];
+
+  function fraseDelDia(){
+    var clave = 'appi_tarjetas_frases_' + uid();
+    var estado = leerLS(clave, {});
+    var hoy = hoyKey();
+    if (estado.dia === hoy && typeof estado.idx === 'number' && FRASES[estado.idx]) return FRASES[estado.idx];
+    var usadas = Array.isArray(estado.usadas) ? estado.usadas : [];
+    if (usadas.length >= FRASES.length) usadas = [];
+    var libres = [];
+    for (var i = 0; i < FRASES.length; i++) if (usadas.indexOf(i) < 0) libres.push(i);
+    var idx = libres[Math.floor(Math.random() * libres.length)];
+    usadas.push(idx);
+    try{ localStorage.setItem(clave, JSON.stringify({ dia: hoy, idx: idx, usadas: usadas })); }catch(e){}
+    return FRASES[idx];
+  }
+
+  /* ---------- fuentes de datos (todas a prueba de ausencias) ---------- */
+  function contactosGestion(){
+    try{
+      if (window.APPIGestion && window.APPIGestion.state && Array.isArray(window.APPIGestion.state.contacts) && window.APPIGestion.state.contacts.length){
+        return window.APPIGestion.state.contacts;
+      }
+      var cache = leerLS('appi_gestion_cache_v1_' + uid(), null);
+      return cache && Array.isArray(cache.contacts) ? cache.contacts : [];
+    }catch(e){ return []; }
+  }
+  function personasEquipo(){
+    try{
+      if (window.equipoData && Array.isArray(window.equipoData.personas)) return window.equipoData.personas;
+      var data = leerLS('equipoData', null);
+      return data && Array.isArray(data.personas) ? data.personas : [];
+    }catch(e){ return []; }
+  }
+  function culturaMes(){
+    try{
+      var data = leerLS('cultura_crecimiento_v1', {});
+      var d = new Date();
+      var id = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
+      var row = data[id] || {};
+      var inv = Array.isArray(row.invitados) ? row.invitados.length : Number(row.invitados) || 0;
+      return { pb: Number(row.pb) || 0, invitados: inv, metaPb: 15, metaInv: 2 };
+    }catch(e){ return { pb: 0, invitados: 0, metaPb: 15, metaInv: 2 }; }
+  }
+
+  /* ---------- las tarjetas por categoría ---------- */
+  function tarjetaEspecial(){
+    var nombre = nombrePila();
+    var frase = fraseDelDia().replace('{nombre}', nombre || 'campeón/a');
+    var chips = [];
+    try{
+      var cul = culturaMes();
+      chips.push('💎 ' + String(cul.pb).replace('.', ',') + ' / ' + cul.metaPb + ' PB');
+      chips.push('🤝 ' + cul.invitados + ' / ' + cul.metaInv + ' invitados');
+    }catch(e){}
+    try{
+      if (window.APPIMensajes && window.APPIMensajes.resumenHoy){
+        var r = window.APPIMensajes.resumenHoy();
+        if (r.total) chips.push('✓ ' + r.hechas + ' de ' + r.total + ' acciones');
+      }
+    }catch(e){}
+    return {
+      cat: 'especial', icono: '💙', kicker: 'Para vos' + (nombre ? ', ' + nombre : ''),
+      titulo: 'Tu impulso de hoy',
+      html: '<p class="ht-frase">' + esc(frase) + '</p>' +
+            (chips.length ? '<div class="ht-chips">' + chips.map(function(c){ return '<span>' + esc(c) + '</span>'; }).join('') + '</div>' : ''),
+      cta: null
+    };
+  }
+
+  function tarjetaJornada(){
+    var hoy = hoyKey();
+    var lista = contactosGestion().filter(function(c){
+      return c && ['seguimiento','presentacion'].indexOf(c.estado) >= 0 && c.proximo_contacto && c.proximo_contacto <= hoy;
+    });
+    if (!lista.length) return null;
+    var nombres = lista.slice(0, 3).map(function(c){
+      return '<li>' + (c.estado === 'presentacion' ? '🎤 ' : '📞 ') + esc(c.nombre || 'Sin nombre') +
+             (c.proximo_contacto < hoy ? ' <i>(atrasado)</i>' : '') + '</li>';
+    }).join('');
+    return {
+      cat: 'jornada', icono: '📅', kicker: 'Tu jornada',
+      titulo: lista.length === 1 ? '1 contacto te espera hoy' : lista.length + ' contactos te esperan hoy',
+      html: '<ul class="ht-lista">' + nombres + (lista.length > 3 ? '<li>… y ' + (lista.length - 3) + ' más</li>' : '') + '</ul>',
+      cta: { label: 'Abrir el Panel', go: function(){ if (typeof window.openMiGestion === 'function') window.openMiGestion(); } }
+    };
+  }
+
+  function tarjetaOportunidades(){
+    try{
+      if (typeof window.personasOportunidadBonus !== 'function') return null;
+      var gente = window.personasOportunidadBonus() || [];
+      if (!gente.length) return null;
+      var filas = gente.slice(0, 3).map(function(p){
+        var pb = Number(p.pnAct || p.pb || 0);
+        return '<li>🎯 <b>' + esc(String(p.nombre || '').split(',')[0]) + '</b> está en ' + String(pb).replace('.', ',') + ' PB</li>';
+      }).join('');
+      return {
+        cat: 'oportunidades', icono: '🎯', kicker: 'Oportunidades',
+        titulo: gente.length === 1 ? 'Un Bonus al alcance de la mano' : gente.length + ' Bonus al alcance de la mano',
+        html: '<ul class="ht-lista">' + filas + '</ul><p class="ht-nota">Un empujón tuyo hoy puede cerrar ese Bonus.</p>',
+        cta: { label: 'Ver Mi Equipo', go: function(){ if (typeof window.showView === 'function') window.showView('view-equipo'); } }
+      };
+    }catch(e){ return null; }
+  }
+
+  function tarjetaCumples(){
+    var hoy = new Date(), dia = hoy.getDate(), mes = hoy.getMonth() + 1;
+    var equipo = personasEquipo().filter(function(p){
+      if (!p || !p.cumple) return false;
+      var partes = String(p.cumple).split('-');
+      return partes.length >= 3 && parseInt(partes[1]) === mes && parseInt(partes[2]) === dia;
+    });
+    var clientes = [];
+    try{
+      if (window.APPIMensajes && window.APPIMensajes.deHoy){
+        window.APPIMensajes.deHoy().forEach(function(g){
+          if (g.motivo && g.motivo.id === 'cumple') clientes = g.gente;
+        });
+      }
+    }catch(e){}
+    var total = equipo.length + clientes.length;
+    if (!total) return null;
+    var filas = equipo.slice(0, 2).map(function(p){ return '<li>🎂 <b>' + esc(String(p.nombre || '').split(',')[0]) + '</b> · de tu equipo</li>'; })
+      .concat(clientes.slice(0, 2).map(function(u){ return '<li>🎂 <b>' + esc(String(u.usuario || '').split(',')[0]) + '</b> · cliente</li>'; })).join('');
+    return {
+      cat: 'cumples', icono: '🎂', kicker: 'Cumpleaños',
+      titulo: total === 1 ? 'Hoy hay un cumpleaños' : 'Hoy hay ' + total + ' cumpleaños',
+      html: '<ul class="ht-lista">' + filas + (total > 4 ? '<li>… y más</li>' : '') + '</ul><p class="ht-nota">Un saludo tuyo hoy vale doble.</p>',
+      cta: clientes.length
+        ? { label: 'Saludar ahora', go: function(){ if (typeof window.showView === 'function') window.showView('view-usuarios'); } }
+        : { label: 'Ver Mi Equipo', go: function(){ if (typeof window.showView === 'function') window.showView('view-equipo'); } }
+    };
+  }
+
+  function tarjetaEquipo(){
+    var cul = culturaMes();
+    var faltaPb = Math.max(0, cul.metaPb - cul.pb);
+    var faltaInv = Math.max(0, cul.metaInv - cul.invitados);
+    if (!faltaPb && !faltaInv) return null;
+    var dia = new Date().getDate();
+    if (dia <= 3 && cul.pb === 0 && cul.invitados === 0) return null; // el mes recién arranca: sin reproches
+    var partes = [];
+    if (faltaPb) partes.push('<b>' + String(faltaPb).replace('.', ',') + ' PB</b>');
+    if (faltaInv) partes.push('<b>' + faltaInv + ' invitado' + (faltaInv === 1 ? '' : 's') + '</b>');
+    return {
+      cat: 'equipo', icono: '👥', kicker: 'Mi Equipo',
+      titulo: 'La Cultura del mes te está esperando',
+      html: '<p class="ht-frase">Te falta' + (partes.length > 1 ? 'n' : '') + ' ' + partes.join(' y ') + ' para completar el mes.</p>' +
+            '<div class="ht-chips"><span>💎 ' + String(cul.pb).replace('.', ',') + ' / ' + cul.metaPb + '</span><span>🤝 ' + cul.invitados + ' / ' + cul.metaInv + '</span></div>',
+      cta: { label: 'Cargar mi avance', go: function(){ if (typeof window.showView === 'function') window.showView('view-equipo'); } }
+    };
+  }
+
+  function tarjetaPanel(){
+    var hoy = hoyKey();
+    var nuevos = contactosGestion().filter(function(c){ return c && c.estado === 'nuevo'; });
+    var vencidos = contactosGestion().filter(function(c){
+      return c && c.proximo_contacto && c.proximo_contacto < hoy && ['seguimiento','presentacion'].indexOf(c.estado) >= 0;
+    });
+    if (!nuevos.length && !vencidos.length) return null;
+    var filas = [];
+    if (nuevos.length) filas.push('<li>✨ <b>' + nuevos.length + '</b> sin el primer contacto' + (nuevos[0] ? ' · ' + esc(nuevos[0].nombre) + (nuevos.length > 1 ? ' y más' : '') : '') + '</li>');
+    if (vencidos.length) filas.push('<li>⏰ <b>' + vencidos.length + '</b> con la fecha pasada</li>');
+    return {
+      cat: 'panel', icono: '📇', kicker: 'Panel de Contactos',
+      titulo: 'Hay gente esperando tu mensaje',
+      html: '<ul class="ht-lista">' + filas.join('') + '</ul><p class="ht-nota">Las primeras 24 horas pesan más que una semana.</p>',
+      cta: { label: 'Abrir el Panel', go: function(){ if (typeof window.openMiGestion === 'function') window.openMiGestion(); } }
+    };
+  }
+
+  function tarjetaUsuarios(){
+    try{
+      if (!window.APPIMensajes || !window.APPIMensajes.resumenHoy) return null;
+      var r = window.APPIMensajes.resumenHoy();
+      if (!r.pendientes) return null;
+      return {
+        cat: 'usuarios', icono: '💧', kicker: 'Usuarios',
+        titulo: r.pendientes === 1 ? 'Queda 1 acción del día sin marcar' : 'Quedan ' + r.pendientes + ' acciones del día sin marcar',
+        html: '<p class="ht-frase">Retrolavados, garantías por vencer y saludos: cada una se marca con ✓ o ✗.</p>' +
+              '<div class="ht-chips"><span>✓ ' + r.hechas + '</span><span>✗ ' + r.noHechas + '</span><span>quedan ' + r.pendientes + '</span></div>',
+        cta: { label: 'Ir a marcar', go: function(){ if (typeof window.showView === 'function') window.showView('view-usuarios'); } }
+      };
+    }catch(e){ return null; }
+  }
+
+  function armarTarjetas(){
+    var lista = [tarjetaEspecial()];
+    [tarjetaJornada(), tarjetaOportunidades(), tarjetaCumples(), tarjetaEquipo(), tarjetaPanel(), tarjetaUsuarios()].forEach(function(t){
+      if (t) lista.push(t);
+    });
+    return lista;
+  }
+  function cuantasNovedades(){ return armarTarjetas().length - 1; } // la especial no cuenta como "pendiente"
+  function firmaTarjetas(){
+    return hoyKey() + '|' + armarTarjetas().map(function(t){ return t.cat; }).join(',');
+  }
+  function vistoKey(){ return 'appi_tarjetas_visto_' + uid(); }
+  function hayNovedadesSinVer(){
+    return cuantasNovedades() > 0 && localStorage.getItem(vistoKey()) !== firmaTarjetas();
+  }
+  function marcarVisto(){
+    try{ localStorage.setItem(vistoKey(), firmaTarjetas()); }catch(e){}
+  }
+
+  /* ---------- el mazo ---------- */
+  var mazo = null; // { tarjetas, i }
+
+  function css(){
+    if (document.getElementById('htEstilos')) return;
+    var st = document.createElement('style');
+    st.id = 'htEstilos';
+    st.textContent = [
+      '#htOverlay{position:fixed;inset:0;z-index:10055;display:flex;flex-direction:column;background:rgba(22,24,40,.55);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px)}',
+      '.ht-top{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:16px 18px calc(0px + env(safe-area-inset-top,0px));padding-top:calc(16px + env(safe-area-inset-top,0px));color:#fff}',
+      '.ht-top b{font-size:15px}.ht-top span{font-size:11px;opacity:.8;font-weight:800}',
+      '.ht-cerrar{width:42px;height:42px;border:0;border-radius:50%;background:rgba(255,255,255,.16);color:#fff;font-size:20px;font-weight:900;cursor:pointer}',
+      '.ht-deck{position:relative;flex:1;display:grid;place-items:center;padding:10px 18px;min-height:0}',
+      '.ht-card{position:absolute;width:min(92vw,400px);max-height:72vh;display:flex;flex-direction:column;padding:22px 20px 18px;border-radius:24px;background:linear-gradient(160deg,#ffffff,#f4f6ff);box-shadow:0 22px 60px rgba(10,12,40,.35);touch-action:pan-y;user-select:none}',
+      '.ht-card.detras1{transform:translateY(14px) scale(.95);opacity:.75;pointer-events:none}',
+      '.ht-card.detras2{transform:translateY(26px) scale(.9);opacity:.45;pointer-events:none}',
+      '.ht-card.arrastre{transition:none;cursor:grabbing}',
+      '.ht-card.volver{transition:transform .28s cubic-bezier(.3,1.4,.5,1)}',
+      '.ht-card.vuela{transition:transform .38s ease-out,opacity .38s ease-out;opacity:0;pointer-events:none}',
+      '.ht-card .ht-kicker{color:#3d63c9;font-size:10px;font-weight:950;letter-spacing:.7px;text-transform:uppercase}',
+      '.ht-card h3{margin:7px 0 9px;color:#1d1d2c;font-size:19px;line-height:1.25;letter-spacing:-.3px}',
+      '.ht-card .ht-ico{position:absolute;top:16px;right:18px;font-size:26px}',
+      '.ht-cuerpo{overflow-y:auto;-webkit-overflow-scrolling:touch;min-height:0}',
+      '.ht-frase{margin:0;color:#41424f;font-size:14.5px;line-height:1.55;font-weight:650}',
+      '.ht-lista{margin:0;padding:0;list-style:none;display:grid;gap:7px}',
+      '.ht-lista li{padding:9px 11px;border-radius:12px;background:rgba(91,141,239,.07);color:#3a3a48;font-size:12.5px;font-weight:700}',
+      '.ht-lista li i{color:#c0392b;font-style:normal;font-size:10.5px;font-weight:900}',
+      '.ht-nota{margin:10px 0 0;color:#8a8b98;font-size:11px;line-height:1.45}',
+      '.ht-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}',
+      '.ht-chips span{padding:5px 10px;border-radius:999px;background:rgba(91,141,239,.1);color:#3d63c9;font-size:10.5px;font-weight:900}',
+      '.ht-cta{margin-top:14px;min-height:48px;border:0;border-radius:14px;background:linear-gradient(135deg,#5b8def,#8b63e8);color:#fff;font:inherit;font-size:13.5px;font-weight:900;cursor:pointer}',
+      '.ht-foot{display:flex;justify-content:center;gap:10px;padding:14px 18px calc(16px + env(safe-area-inset-bottom,0px))}',
+      '.ht-pasar{min-height:46px;padding:0 26px;border:0;border-radius:999px;background:rgba(255,255,255,.16);color:#fff;font:inherit;font-size:13px;font-weight:900;cursor:pointer}',
+      '.ht-hint{position:absolute;bottom:12px;left:0;right:0;text-align:center;color:#b9bac8;font-size:10px;font-weight:800}',
+      /* botón del Home */
+      '.ht-boton{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:50px;margin:0 0 12px;border:1px solid rgba(91,141,239,.2);border-radius:16px;background:rgba(255,255,255,.8);color:#3d63c9;font:inherit;font-size:13.5px;font-weight:900;cursor:pointer}',
+      '.ht-boton b{min-width:24px;padding:3px 8px;border-radius:999px;background:#e02424;color:#fff;font-size:11px}',
+      '.ht-boton.late{border-color:rgba(224,36,36,.4);animation:htLatido 1.1s ease-in-out infinite}',
+      '@keyframes htLatido{0%,100%{box-shadow:0 0 0 0 rgba(224,36,36,.35);transform:scale(1)}50%{box-shadow:0 0 0 10px rgba(224,36,36,0);transform:scale(1.015)}}',
+      'body.dark .ht-card{background:linear-gradient(160deg,#262838,#1f2130)}',
+      'body.dark .ht-card h3{color:#f2f2f7}body.dark .ht-frase{color:#c9cad8}body.dark .ht-lista li{background:rgba(255,255,255,.07);color:#d4d5e2}',
+      'body.dark .ht-boton{background:rgba(31,32,49,.8);border-color:rgba(255,255,255,.12);color:#9db7f5}'
+    ].join('');
+    document.head.appendChild(st);
+  }
+
+  function abrir(){
+    css();
+    var tarjetas = armarTarjetas();
+    if (!tarjetas.length) return false;
+    cerrar();
+    mazo = { tarjetas: tarjetas, i: 0 };
+    var ov = document.createElement('div');
+    ov.id = 'htOverlay';
+    ov.innerHTML = '<div class="ht-top"><div><b>🔔 Notificaciones</b></div><span id="htPos"></span>' +
+      '<button type="button" class="ht-cerrar" id="htCerrar" aria-label="Cerrar">×</button></div>' +
+      '<div class="ht-deck" id="htDeck"><div class="ht-hint">Deslizá la tarjeta para pasar a la siguiente</div></div>' +
+      '<div class="ht-foot"><button type="button" class="ht-pasar" id="htPasar">Pasar ›</button></div>';
+    document.body.appendChild(ov);
+    document.getElementById('htCerrar').onclick = function(){ marcarVisto(); cerrar(); };
+    document.getElementById('htPasar').onclick = function(){ pasar(); };
+    pintar();
+    return true;
+  }
+
+  function cerrar(){
+    var ov = document.getElementById('htOverlay');
+    if (ov) ov.remove();
+    mazo = null;
+    actualizarBoton();
+  }
+
+  function pintar(){
+    if (!mazo) return;
+    var deck = document.getElementById('htDeck');
+    var pos = document.getElementById('htPos');
+    if (!deck) return;
+    deck.querySelectorAll('.ht-card').forEach(function(n){ n.remove(); });
+    if (mazo.i >= mazo.tarjetas.length){ marcarVisto(); cerrar(); return; }
+    if (pos) pos.textContent = (mazo.i + 1) + ' de ' + mazo.tarjetas.length;
+    for (var k = Math.min(mazo.i + 2, mazo.tarjetas.length - 1); k >= mazo.i; k--){
+      var t = mazo.tarjetas[k];
+      var el = document.createElement('div');
+      el.className = 'ht-card' + (k === mazo.i ? '' : k === mazo.i + 1 ? ' detras1' : ' detras2');
+      el.innerHTML = '<span class="ht-ico">' + t.icono + '</span>' +
+        '<span class="ht-kicker">' + esc(t.kicker) + '</span>' +
+        '<h3>' + esc(t.titulo) + '</h3>' +
+        '<div class="ht-cuerpo">' + t.html + '</div>' +
+        (t.cta ? '<button type="button" class="ht-cta">' + esc(t.cta.label) + '</button>' : '');
+      if (k === mazo.i){
+        if (t.cta){
+          el.querySelector('.ht-cta').onclick = function(ir){ return function(){ marcarVisto(); cerrar(); try{ ir(); }catch(e){} }; }(t.cta.go);
+        }
+        activarArrastre(el);
+      }
+      deck.appendChild(el);
+    }
+  }
+
+  function pasar(direccion){
+    if (!mazo) return;
+    var deck = document.getElementById('htDeck');
+    var top = deck && deck.querySelector('.ht-card:not(.detras1):not(.detras2)');
+    if (top){
+      top.classList.add('vuela');
+      top.style.transform = 'translateX(' + (direccion < 0 ? '-' : '') + '120vw) rotate(' + (direccion < 0 ? '-' : '') + '18deg)';
+      setTimeout(function(){ if (mazo){ mazo.i++; pintar(); } }, 230);
+    } else {
+      mazo.i++; pintar();
+    }
+  }
+
+  function activarArrastre(el){
+    var x0 = 0, dx = 0, arrastrando = false;
+    el.addEventListener('pointerdown', function(e){
+      if (e.target.closest('.ht-cta') || e.target.closest('button')) return;
+      arrastrando = true; x0 = e.clientX; dx = 0;
+      el.classList.add('arrastre');
+      try{ el.setPointerCapture(e.pointerId); }catch(err){}
+    });
+    el.addEventListener('pointermove', function(e){
+      if (!arrastrando) return;
+      dx = e.clientX - x0;
+      el.style.transform = 'translateX(' + dx + 'px) rotate(' + (dx / 18) + 'deg)';
+    });
+    function soltar(){
+      if (!arrastrando) return;
+      arrastrando = false;
+      el.classList.remove('arrastre');
+      if (Math.abs(dx) > 90){ pasar(dx); }
+      else { el.classList.add('volver'); el.style.transform = ''; setTimeout(function(){ el.classList.remove('volver'); }, 300); }
+    }
+    el.addEventListener('pointerup', soltar);
+    el.addEventListener('pointercancel', soltar);
+  }
+
+  /* ---------- el botón del Home ---------- */
+  function actualizarBoton(){
+    var home = document.getElementById('homeLimpio');
+    if (!home) return;
+    var boton = document.getElementById('htBoton');
+    if (!boton){
+      boton = document.createElement('button');
+      boton.id = 'htBoton';
+      boton.type = 'button';
+      boton.className = 'ht-boton';
+      boton.onclick = function(){ abrir(); };
+      home.insertBefore(boton, home.firstChild);
+    }
+    var n = cuantasNovedades();
+    var sinVer = hayNovedadesSinVer();
+    boton.classList.toggle('late', sinVer);
+    boton.innerHTML = '🔔 Notificaciones' + (n > 0 ? ' <b>' + n + '</b>' : '');
+  }
+
+  /* ---------- integración con el Home ---------- */
+  function esHome(){
+    var v = document.getElementById('view-home');
+    return !!(v && v.classList.contains('active'));
+  }
+  var autoAbierto = false;
+  function alEntrarAlHome(){
+    css();
+    actualizarBoton();
+    if (autoAbierto) return;      // una apertura automática por entrada al Home
+    autoAbierto = true;
+    // La llave existe para las pruebas automatizadas y para depurar: apaga
+    // solo la apertura automática; el botón 🔔 sigue funcionando igual.
+    if (localStorage.getItem('appi_tarjetas_auto') === '0') return;
+    if (cuantasNovedades() > 0) setTimeout(function(){ if (esHome()) abrir(); }, 650);
+  }
+
+  function envolver(){
+    if (window.__htWrapped) return;
+    if (typeof window.showView !== 'function') return;
+    window.__htWrapped = true;
+    var orig = window.showView;
+    window.showView = function(id){
+      var r = orig.apply(this, arguments);
+      try{
+        if (id === 'view-home'){ autoAbierto = false; setTimeout(alEntrarAlHome, 350); }
+        else { autoAbierto = false; }
+      }catch(e){}
+      return r;
+    };
+    // Si el Home ya estaba activo cuando cargó el módulo:
+    if (esHome()) setTimeout(alEntrarAlHome, 900);
+    // El contador del botón respira solo (los datos llegan de a poco).
+    setInterval(function(){ if (esHome() && !document.getElementById('htOverlay')) actualizarBoton(); }, 4000);
+  }
+
+  window.APPIHomeTarjetas = {
+    abrir: abrir,
+    cerrar: cerrar,
+    armarTarjetas: armarTarjetas,
+    cuantasNovedades: cuantasNovedades,
+    fraseDelDia: fraseDelDia,
+    FRASES: FRASES
+  };
+
+  if (document.readyState === 'complete') envolver();
+  else window.addEventListener('load', envolver);
+  setTimeout(envolver, 1200);
+})();

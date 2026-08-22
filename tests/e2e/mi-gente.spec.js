@@ -47,6 +47,7 @@ async function abrirMiGente(page, { contactosLocales = [], yaMigrado = false, fa
 
   await page.addInitScript(([locales, migrado, uid]) => {
     localStorage.setItem('welcomeSeen', '1');
+    localStorage.setItem('appi_tarjetas_auto', '0');
     localStorage.setItem('tutoVisto_v2', '1');
     localStorage.setItem('seguimientoPersonas', JSON.stringify(locales));
     if (migrado) localStorage.setItem(`appi_gente_migrado_v1_${uid}`, new Date().toISOString());

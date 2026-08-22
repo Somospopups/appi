@@ -38,6 +38,7 @@ test('el arranque completa una secuencia fluida antes de mostrar el acceso', asy
   });
   await page.addInitScript(() => {
     localStorage.setItem('welcomeSeen', '1');
+    localStorage.setItem('appi_tarjetas_auto', '0');
     localStorage.setItem('tutoVisto_v2', '1');
   });
 
@@ -83,6 +84,7 @@ test('con una conexión lenta el arranque espera sin cortarse', async ({ page })
   await mockBase(page, profile, { profileGate });
   await page.addInitScript(([uid, perf]) => {
     localStorage.setItem('welcomeSeen', '1');
+    localStorage.setItem('appi_tarjetas_auto', '0');
     localStorage.setItem('tutoVisto_v2', '1');
     const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
     const payload = btoa(JSON.stringify({ sub: uid, exp: Math.floor(Date.now() / 1000) + 3600 })).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
@@ -112,6 +114,7 @@ test('sin pantallazos: boot mientras elegís persona, y directo al home', async 
   await mockBase(page, profile);
   await page.addInitScript(([uid, perf]) => {
     localStorage.setItem('welcomeSeen', '1');
+    localStorage.setItem('appi_tarjetas_auto', '0');
     localStorage.setItem('tutoVisto_v2', '1');
     // Sesión guardada: el arranque real que antes flasheaba home y login.
     const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
@@ -151,6 +154,7 @@ test('en el celular pageshow no saltea titular/socio ni deja un home a medias', 
   });
   await page.addInitScript(([uid, perf]) => {
     localStorage.setItem('welcomeSeen', '1');
+    localStorage.setItem('appi_tarjetas_auto', '0');
     localStorage.setItem('tutoVisto_v2', '1');
     const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
     const payload = btoa(JSON.stringify({ sub: uid, exp: Math.floor(Date.now() / 1000) + 3600 })).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
@@ -209,6 +213,7 @@ test('las pantallas nuevas tienen su ayuda y abre al tocarla', async ({ page }) 
   });
   await page.addInitScript(() => {
     localStorage.setItem('welcomeSeen', '1');
+    localStorage.setItem('appi_tarjetas_auto', '0');
     localStorage.setItem('tutoVisto_v2', '1');
   });
   await page.goto('/index.html', { waitUntil: 'networkidle' });

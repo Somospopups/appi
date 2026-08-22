@@ -71,6 +71,7 @@ async function entrar(page, { usuarios = USUARIOS, contactos = CONTACTOS, tarjet
   });
   await page.addInitScript(([uid, users, contacts, cards]) => {
     localStorage.setItem('welcomeSeen', '1');
+    localStorage.setItem('appi_tarjetas_auto', '0');
     localStorage.setItem('tutoVisto_v2', '1');
     localStorage.setItem('usuarios_garantias', JSON.stringify(users));
     localStorage.setItem(`appi_gestion_cache_v1_${uid}`, JSON.stringify({ contacts, surveys: [], activities: [], savedAt: Date.now() }));

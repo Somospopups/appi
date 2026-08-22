@@ -41,6 +41,7 @@ async function entrar(page, { tarjetas = null } = {}) {
   });
   await page.addInitScript(([uid, users, cards]) => {
     localStorage.setItem('welcomeSeen', '1');
+    localStorage.setItem('appi_tarjetas_auto', '0');
     localStorage.setItem('tutoVisto_v2', '1');
     localStorage.setItem('usuarios_garantias', JSON.stringify(users));
     if (cards) localStorage.setItem(`appi_tarjetas_v1_${uid}`, JSON.stringify(cards));

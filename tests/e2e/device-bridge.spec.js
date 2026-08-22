@@ -165,6 +165,7 @@ test('vincula por QR y envía una llamada de la PC al teléfono', async ({ page 
   await page.setViewportSize({ width: 1280, height: 820 });
   await page.addInitScript(() => {
     localStorage.setItem('welcomeSeen', '1');
+    localStorage.setItem('appi_tarjetas_auto', '0');
     localStorage.setItem('tutoVisto_v2', '1');
   });
   await page.goto('/index.html', { waitUntil: 'networkidle' });

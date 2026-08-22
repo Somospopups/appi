@@ -29,7 +29,7 @@ async function abrirAppActivada(page) {
   await page.addInitScript(([userId,token,profileValue]) => {
     localStorage.setItem('appi_cache_v186','1');
     localStorage.setItem('tutoVisto_v2','1');
-    localStorage.setItem('welcomeSeen','1');
+    localStorage.setItem('welcomeSeen','1');localStorage.setItem('appi_tarjetas_auto','0');
     localStorage.setItem('appi_auth_session_v1',JSON.stringify({
       session:{access_token:token,refresh_token:'refresh-test',token_type:'bearer',expires_in:3600,expires_at:Math.floor(Date.now()/1000)+3600,user:{id:userId}},
       profile:profileValue,lastValidatedAt:Date.now(),offline:false

@@ -41,6 +41,7 @@ async function entrar(page) {
   await page.route('**/tile.openstreetmap.org/**', route => route.abort());
   await page.addInitScript(([users]) => {
     localStorage.setItem('welcomeSeen', '1');
+    localStorage.setItem('appi_tarjetas_auto', '0');
     localStorage.setItem('tutoVisto_v2', '1');
     localStorage.setItem('usuarios_garantias', JSON.stringify(users));
   }, [USUARIOS]);

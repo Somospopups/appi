@@ -39,6 +39,7 @@ async function abrirComoDistribuidor(page, invitaciones) {
 
   await page.addInitScript(() => {
     localStorage.setItem('welcomeSeen', '1');
+    localStorage.setItem('appi_tarjetas_auto', '0');
     localStorage.setItem('tutoVisto_v2', '1');
     // Se registra la pestaña que APPI abre y a dónde termina navegando,
     // sin dejar que el navegador de pruebas salga hacia WhatsApp.

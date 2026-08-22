@@ -32,6 +32,7 @@ async function entrar(page) {
 
   await page.addInitScript(() => {
     localStorage.setItem('welcomeSeen', '1');
+    localStorage.setItem('appi_tarjetas_auto', '0');
     localStorage.setItem('tutoVisto_v2', '1');
     localStorage.setItem('seguimientoPersonas', '[]');
     window.open = () => ({ closed: false, close() {}, location: { set href(v) {}, get href() { return ''; } } });

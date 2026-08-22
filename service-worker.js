@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v303-whatsapp-del-admin';
+const CACHE_NAME = 'appi-v304-mazo-de-tarjetas';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
@@ -29,6 +29,7 @@ const APP_SHELL = [
   './stock-personal.js',
   './porque-vivo.js',
   './home-limpio.js',
+  './home-tarjetas.js',
   './device-bridge.js',
   './css/membership-admin.css',
   './historico.css',

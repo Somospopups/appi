@@ -1,4 +1,4 @@
-# Estado al retomar — APPI v303
+# Estado al retomar — APPI v304
 
 Repo: `github.com/somospopups/appi` · **suite en verde**.
 
@@ -6,7 +6,21 @@ Corrida local completa: **282 pruebas pasan, 1 salteada, 0 fallan** (sin flakes 
 
 ---
 
-## Último cambio: v303 · WhatsApp del admin + guías con scroll
+## Último cambio: v304 · Mazo de tarjetas de notificaciones en el Home
+
+Feature grande pedida por el equipo (especificada con 6 preguntas):
+home-tarjetas.js. Mazo estilo Tinder al entrar al Home (solo si hay
+novedades reales): 💙 especial siempre primera (84 frases rotando sin
+repetir + progreso real), y tarjetas inteligentes por categoría (jornada,
+oportunidades/bonus, cumpleaños equipo+clientes, Mi Equipo/cultura,
+panel, usuarios/acciones). Deslizar pasa (touch y mouse), botón actúa,
+"Pasar ›" para PC. Botón 🔔 en el Home con contador que late solo con
+tarjetas sin ver (firma por día+categorías en appi_tarjetas_visto_).
+Convive con Tu jornada. Llave appi_tarjetas_auto='0' apaga el auto-open
+(sembrada en los 23 arneses de tests). 5 tests nuevos en
+home-limpio.spec.js.
+
+## Anterior: v303 · WhatsApp del admin + guías con scroll
 
 (1) Selector 📱 normal / 💼 Business en ⚙️ Configuración del panel: los
 envíos del admin (bienvenida, contraseña, avisos) abren siempre esa app
