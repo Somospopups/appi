@@ -68,6 +68,7 @@
             <div class="stat-card"><div class="stat-label">Ingresos del mes</div><div class="stat-value">${money(stats.monthlyRevenue)}</div></div>
             <div class="stat-card"><div class="stat-label">Usuarios activos</div><div class="stat-value">${stats.activeUsers}</div></div>
             <div class="stat-card warning"><div class="stat-label">En prórroga</div><div class="stat-value">${stats.gracePeriodUsers}</div></div>
+            <div class="stat-card"><div class="stat-label">🧪 En prueba</div><div class="stat-value">${typeof window.__appiPruebasCount==='number'?window.__appiPruebasCount:'—'}</div></div>
             <div class="stat-card danger"><div class="stat-label">Vencidos</div><div class="stat-value">${stats.expiredUsers}</div></div>
           </div>
         </div>`;

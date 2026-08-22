@@ -1,4 +1,4 @@
-# Estado al retomar — APPI v299
+# Estado al retomar — APPI v300
 
 Repo: `github.com/somospopups/appi` · **suite en verde**.
 
@@ -6,7 +6,21 @@ Corrida local completa: **282 pruebas pasan, 1 salteada, 0 fallan** (sin flakes 
 
 ---
 
-## Último cambio: v299 · Ayuda del panel de administración
+## Último cambio: v300 · Panel de administración ordenado
+
+Seis mejoras pedidas por el equipo: (1) Crear cuenta pasa a ser un botón
+que abre un popup con todos los campos + WhatsApp opcional del titular;
+(2) las credenciales se mandan en dos mensajes separados (bienvenida con
+pasos SIN contraseña, y la contraseña sola para copiar/pegar) en ambos
+flujos; (3) Solicitudes pendientes parpadea fuerte con badge ● N NUEVAS;
+(4) Cumplimiento diario arranca minimizado con resumen, buscador por
+nombre/DIP y orden alfabético; (5) tarjeta 🧪 En prueba en estadísticas;
+(6) sección 📅 Ingresos por mes con selector ‹ ›, total, lista de pagos
+y tira anual (RPC nueva appi_admin_pagos).
+
+⚠️ PENDIENTE DE DESPLIEGUE: correr SUPABASE_INGRESOS_ADMIN.sql.
+
+## Anterior: v299 · Ayuda del panel de administración
 
 Auditoría de ayudas: 23 de 24 pantallas tenían su "?" conectado; faltaba
 solo el panel de administración. Ahora tiene su guía completa (crear

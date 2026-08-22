@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v299-ayuda-del-admin';
+const CACHE_NAME = 'appi-v300-panel-ordenado';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
