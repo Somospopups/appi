@@ -4120,7 +4120,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v301 · Segura</div>
+  <div class="ds-foot">APPI · v302 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -5034,6 +5034,13 @@ body.dark #pageTabs button.active{color:#a8c0ff}
   .admin-send-grid .bienvenida{background:linear-gradient(135deg,#25d366,#128C7E)}
   .admin-send-grid .clave{background:linear-gradient(135deg,#5b8def,#8b63e8)}
   .admin-send-grid .cerrar{background:rgba(91,141,239,.11);color:#3d63c9}
+  /* La sesión admin vive solo en el panel: sin sidebar ni menú de la app. */
+  body.appi-admin #deskSidebar,body.appi-admin #dsReopenBtn,body.appi-admin #btnTopMenu,body.appi-admin nav.tabs,body.appi-admin #pageTabs{display:none!important}
+  /* El "?" del panel no puede taparle el cerrar sesión (v302): va tercero.
+     Orden: ? · 🔑 · ↪ */
+  header.top.admin-top .help-btn{right:96px!important;left:auto!important}
+  /* hidden es hidden, aunque la clase tenga display propio. */
+  .admin-blink-badge[hidden],.admin-quick-badge[hidden]{display:none!important}
   /* Tablero (v301) */
   .admin-hero{position:relative;margin-bottom:12px;padding:17px;border-radius:22px;color:#fff;background:linear-gradient(150deg,#5b8def,#8b63e8 70%,#a06bff);box-shadow:0 14px 34px rgba(100,90,220,.28)}
   .admin-hero-load{font-size:12px;font-weight:800;opacity:.85}
@@ -5925,12 +5932,18 @@ document.addEventListener('visibilitychange',()=>{
 });
 
 function showView(id){
-  const target=document.getElementById(id);
+  let target=document.getElementById(id);
   // Una llamada tardía de un módulo no debe dejar toda la aplicación en blanco.
   if(!target||!target.classList.contains('view')){
     console.warn('Vista APPI inexistente:',id);
     return false;
   }
+  // La sesión administradora vive solo en el panel (v302): ninguna vista de la
+  // app puede abrirse con el rol admin, venga de donde venga la llamada.
+  try{
+    const perfilAdmin=window.APPIAuth&&window.APPIAuth.isEnabled&&window.APPIAuth.isEnabled()?window.APPIAuth.currentProfile():null;
+    if(perfilAdmin&&perfilAdmin.rol==='admin'&&id!=='view-admin'){id='view-admin';target=document.getElementById(id)}
+  }catch(e){}
   liberarScrollCuerpo();
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   target.classList.add('active');
@@ -11356,9 +11369,11 @@ function iniciarApp() {
   if(typeof forzarScrollLibre==='function')forzarScrollLibre();
   const profile=window.APPIAuth&&window.APPIAuth.isEnabled()?window.APPIAuth.currentProfile():null;
   if(profile&&profile.rol==='admin'){
+    document.body.classList.add('appi-admin');
     showView('view-admin');
     setTimeout(()=>{if(window.APPIAdminPanel)window.APPIAdminPanel.open()},0);
   }else{
+    document.body.classList.remove('appi-admin');
     loadEquipoFromStorage();
     
     // Mostrar home directamente
@@ -11655,7 +11670,7 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='301';
+      const swVersion='302';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 

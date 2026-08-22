@@ -347,3 +347,30 @@ test('administración ingresa por el candado y no tiene distribuidor asociado', 
   await expect(page.locator('#modalOverlay')).toHaveClass(/open/);
   await expect(page.locator('#accountNewPassword')).toBeVisible();
 });
+
+test('la sesión admin vive solo en el panel: sin pasear por la app y con salida', async ({ page }) => {
+  await mockSupabase(page);
+  await page.goto('/index.html', { waitUntil: 'networkidle' });
+  await page.locator('#btnAdminLoginOpen').click();
+  await page.locator('#adminLoginPassword').fill('Clave1234');
+  await page.locator('#btnAdminLoginSubmit').click();
+  await expect(page.locator('#view-admin')).toHaveClass(/active/);
+
+  // 1) Desde la sesión admin no se puede entrar a la app.
+  await page.evaluate(() => showView('view-home'));
+  await expect(page.locator('#view-admin')).toHaveClass(/active/);
+  await expect(page.locator('#view-home')).not.toHaveClass(/active/);
+  // Ni el menú de la app queda a mano.
+  const menuVisible = await page.evaluate(() => {
+    const nodos = [document.getElementById('menuBtn'), document.querySelector('.sidebar'), document.getElementById('sidebar')];
+    return nodos.some(n => n && n.offsetParent !== null);
+  });
+  expect(menuVisible).toBe(false);
+
+  // 2) Cerrar sesión funciona: confirma, cierra y vuelve al candado.
+  await page.locator('#btnAdminPanelLogout').click();
+  await expect(page.locator('#appiDialogTitle')).toHaveText('Cerrar sesión');
+  await page.locator('#appiDialogOk').click();
+  await page.waitForLoadState('domcontentloaded');
+  await expect(page.locator('#lockScreen')).not.toHaveClass(/hidden/, { timeout: 15000 });
+});

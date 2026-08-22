@@ -1,4 +1,4 @@
-# Estado al retomar — APPI v301
+# Estado al retomar — APPI v302
 
 Repo: `github.com/somospopups/appi` · **suite en verde**.
 
@@ -6,7 +6,18 @@ Corrida local completa: **282 pruebas pasan, 1 salteada, 0 fallan** (sin flakes 
 
 ---
 
-## Último cambio: v301 · Tablero del panel admin (rediseño Opción B)
+## Último cambio: v302 · Salida y frontera de la sesión admin
+
+Dos bugs reales reportados y reproducidos con pruebas: (1) desde v299 el
+"?" de ayuda tapaba el botón de cerrar sesión (header.top .help-btn con
+right:0 !important); ahora el orden es ? · 🔑 · ↪ y la salida quedó
+blindada (si la sync de despedida falla, ofrece cerrar igual). (2) la
+sesión admin podía navegar a las vistas de distribuidor; ahora showView
+redirige todo a view-admin con rol admin y el chrome de la app (sidebar,
+menú, tabs) se oculta con body.appi-admin. Bonus: badge "● 0 NUEVAS" ya
+no aparece con cero solicitudes ([hidden] con !important).
+
+## Anterior: v301 · Tablero del panel admin (rediseño Opción B)
 
 Elegido por el equipo entre dos maquetas (en /maquetas del sandbox, no
 versionadas). Tablero violeta arriba: recaudado del mes + % vs anterior +

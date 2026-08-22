@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v301-tablero-admin';
+const CACHE_NAME = 'appi-v302-salida-y-frontera';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
