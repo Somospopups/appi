@@ -1,4 +1,4 @@
-# Estado al retomar — APPI v307
+# Estado al retomar — APPI v308
 
 Repo: `github.com/somospopups/appi` · **suite en verde**.
 
@@ -6,7 +6,16 @@ Corrida local completa: **282 pruebas pasan, 1 salteada, 0 fallan** (sin flakes 
 
 ---
 
-## Último cambio: v307 · Saludo directo desde la tarjeta de cumpleaños
+## Último cambio: v308 · Enlaces del mazo auto-dirigibles
+
+Regla: tocar un renglón deja EN la persona/acción exacta. Jornada y
+nuevos del Panel → ficha del contacto abierta (APPIGestion.abrirContacto
+nuevo export); vencidos → Panel vista Hoy; Oportunidades → WhatsApp
+directo con la propuesta del Bonus (APPITel); Cultura → Mi Equipo
+posicionado en la Cultura; Usuarios → renglones por motivo que abren su
+carrusel (APPIMensajes.abrirFila). Cumpleaños ya estaba (v307).
+
+## Anterior: v307 · Saludo directo desde la tarjeta de cumpleaños
 
 Bug: la tarjeta de Cumpleaños abría Mi Equipo vacío (showView sin
 openEquipo). Arreglo + mejora: tocar a la persona abre WhatsApp con el

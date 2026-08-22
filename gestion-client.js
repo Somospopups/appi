@@ -630,6 +630,14 @@ function notifyDueOnce(){const count=actionCount();if(!count)return;const key=`a
 async function refreshManagement(showLoading=false){if(state.loading)return;state.loading=true;if(showLoading)renderManagement();try{await flushQueue();await fetchManagement()}catch(error){state.lastError=error.message;if(!state.contacts.length)loadCache();if(showLoading&&!state.contacts.length){const c=$('gestionContent');if(c)c.innerHTML=`${emptyManagement('⚠️','No pudimos cargar Mi Gestión',error.message,'<button type="button" class="gestion-primary" id="gestionRetry" style="margin-top:12px">Reintentar</button>')}`;if($('gestionRetry'))$('gestionRetry').onclick=()=>refreshManagement(true);state.loading=false;return}}state.loading=false;renderManagement()}
 async function openMiGestion(){if(typeof window.showView==='function')window.showView('view-gestion');if(!authorized()){const c=$('gestionContent');if(c)c.innerHTML=emptyManagement('🔒','Iniciá sesión','El Panel de Contactos necesita una cuenta para identificar tus contactos.');return}if(!state.contacts.length)loadCache();renderManagement();await refreshManagement(!state.contacts.length);const current=document.querySelector('.view.active')?.id;if(current==='view-home'&&typeof window.showView==='function')window.showView('view-gestion');if(navigator.onLine)setTimeout(()=>{migrarContactosLocales().catch(()=>{})},700)}
 
+/* Enlace auto-dirigible (v308): abre el Panel y deja la ficha de la persona
+   a la vista. Lo usa el mazo de notificaciones del Home. */
+async function abrirContacto(id){
+  state.currentId=id;
+  await openMiGestion();
+  try{openContactDetail(id)}catch(e){}
+}
+
 function csvCell(value){const text=String(value==null?'':value).replace(/"/g,'""');return `"${text}"`}
 function exportCsv(){
   if(!state.contacts.length){showToastSafe('No hay contactos para exportar');return}
@@ -698,7 +706,7 @@ async function programarDesdeHistorico(contactId,action={}){
 window.openEncuestaTool=openEncuestaTool;
 window.openMiGestion=openMiGestion;
 window.closeGestionDetail=closeContactDetail;
-window.APPIGestion={state,soloMios,open:openMiGestion,importarPersona,guardarPersonaManual,migrarContactosLocales,contactosPendientes,telefonoValido,nuevaPersonaManual,refresh:refreshManagement,createInvitation:createSurveyInvitation,surveyUrl,shareMessage,flushQueue,updateBadges,priorityFor,messageFor,actionableContacts,logActivity,setView:setManagementView,prepareBulk:addBulkRecipients,processPendingOutcome:maybeAskPendingOutcome,guardarMetadata,programarDesdeHistorico,render:renderManagement};
+window.APPIGestion={state,soloMios,open:openMiGestion,abrirContacto,importarPersona,guardarPersonaManual,migrarContactosLocales,contactosPendientes,telefonoValido,nuevaPersonaManual,refresh:refreshManagement,createInvitation:createSurveyInvitation,surveyUrl,shareMessage,flushQueue,updateBadges,priorityFor,messageFor,actionableContacts,logActivity,setView:setManagementView,prepareBulk:addBulkRecipients,processPendingOutcome:maybeAskPendingOutcome,guardarMetadata,programarDesdeHistorico,render:renderManagement};
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 

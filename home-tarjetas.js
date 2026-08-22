@@ -208,14 +208,25 @@
       return c && ['seguimiento','presentacion'].indexOf(c.estado) >= 0 && c.proximo_contacto && c.proximo_contacto <= hoy;
     });
     if (!lista.length) return null;
-    var nombres = lista.slice(0, 3).map(function(c){
-      return '<li>' + (c.estado === 'presentacion' ? '🎤 ' : '📞 ') + esc(c.nombre || 'Sin nombre') +
-             (c.proximo_contacto < hoy ? ' <i>(atrasado)</i>' : '') + '</li>';
-    }).join('');
+    var ficha = function(c){ return function(){
+      if (window.APPIGestion && window.APPIGestion.abrirContacto) window.APPIGestion.abrirContacto(c.id);
+      else if (typeof window.openMiGestion === 'function') window.openMiGestion();
+    }; };
+    var filas = [], items = [];
+    lista.slice(0, 3).forEach(function(c){
+      filas.push('<li>' + (c.estado === 'presentacion' ? '🎤 ' : '📞 ') + esc(c.nombre || 'Sin nombre') +
+                 (c.proximo_contacto < hoy ? ' <i>(atrasado)</i>' : '') + '</li>');
+      items.push(ficha(c));
+    });
+    if (lista.length > 3){
+      filas.push('<li>… y ' + (lista.length - 3) + ' más</li>');
+      items.push(function(){ if (typeof window.openMiGestion === 'function') window.openMiGestion(); });
+    }
     return {
       cat: 'jornada', icono: '📅', kicker: 'Tu jornada',
       titulo: lista.length === 1 ? '1 contacto te espera hoy' : lista.length + ' contactos te esperan hoy',
-      html: '<ul class="ht-lista">' + nombres + (lista.length > 3 ? '<li>… y ' + (lista.length - 3) + ' más</li>' : '') + '</ul>',
+      html: '<ul class="ht-lista">' + filas.join('') + '</ul><p class="ht-nota">Tocá a la persona y se abre su ficha, lista para escribirle o llamarla.</p>',
+      items: items,
       cta: { label: 'Abrir el Panel', go: function(){ if (typeof window.openMiGestion === 'function') window.openMiGestion(); } }
     };
   }
@@ -225,15 +236,32 @@
       if (typeof window.personasOportunidadBonus !== 'function') return null;
       var gente = window.personasOportunidadBonus() || [];
       if (!gente.length) return null;
-      var filas = gente.slice(0, 3).map(function(p){
+      var pilaB = function(n){
+        try{ if (typeof window.nombreDePila === 'function'){ var v = window.nombreDePila(n); if (v) return v; } }catch(e){}
+        var t = String(n || '').trim();
+        if (t.indexOf(',') >= 0) t = (t.split(',')[1] || t.split(',')[0]);
+        return (t.trim().split(/\s+/)[0] || '');
+      };
+      var abrirEquipo = function(){ if (typeof window.openEquipo === 'function') window.openEquipo(); else if (typeof window.showView === 'function') window.showView('view-equipo'); };
+      var proponer = function(p){ return function(){
+        var tel = p.telefono || p.telf || '';
+        var pb = String(Number(p.pnAct || p.pb || 0)).replace('.', ',');
+        if (tel && window.APPITel && window.APPITel.esValido(tel)){
+          window.APPITel.abrir(tel, 'Hola ' + pilaB(p.nombre) + '! 😊 Vi que ya estás en ' + pb + ' PB… ¡a nada del Bonus! ¿Te ayudo a llegar? Podemos invitar a alguien y trabajarlo juntos esta semana. 💪', pilaB(p.nombre));
+        } else abrirEquipo();
+      }; };
+      var filas = [], items = [];
+      gente.slice(0, 3).forEach(function(p){
         var pb = Number(p.pnAct || p.pb || 0);
-        return '<li>🎯 <b>' + esc(String(p.nombre || '').split(',')[0]) + '</b> está en ' + String(pb).replace('.', ',') + ' PB</li>';
-      }).join('');
+        filas.push('<li>🎯 <b>' + esc(String(p.nombre || '').split(',')[0]) + '</b> está en ' + String(pb).replace('.', ',') + ' PB</li>');
+        items.push(proponer(p));
+      });
       return {
         cat: 'oportunidades', icono: '🎯', kicker: 'Oportunidades',
         titulo: gente.length === 1 ? 'Un Bonus al alcance de la mano' : gente.length + ' Bonus al alcance de la mano',
-        html: '<ul class="ht-lista">' + filas + '</ul><p class="ht-nota">Un empujón tuyo hoy puede cerrar ese Bonus.</p>',
-        cta: { label: 'Ver Mi Equipo', go: function(){ if (typeof window.openEquipo === 'function') window.openEquipo(); else if (typeof window.showView === 'function') window.showView('view-equipo'); } }
+        html: '<ul class="ht-lista">' + filas.join('') + '</ul><p class="ht-nota">Tocá a la persona y sale la propuesta por WhatsApp.</p>',
+        items: items,
+        cta: { label: 'Ver Mi Equipo', go: abrirEquipo }
       };
     }catch(e){ return null; }
   }
@@ -316,7 +344,14 @@
       titulo: 'La Cultura del mes te está esperando',
       html: '<p class="ht-frase">Te falta' + (partes.length > 1 ? 'n' : '') + ' ' + partes.join(' y ') + ' para completar el mes.</p>' +
             '<div class="ht-chips"><span>💎 ' + String(cul.pb).replace('.', ',') + ' / ' + cul.metaPb + '</span><span>🤝 ' + cul.invitados + ' / ' + cul.metaInv + '</span></div>',
-      cta: { label: 'Cargar mi avance', go: function(){ if (typeof window.openEquipo === 'function') window.openEquipo(); else if (typeof window.showView === 'function') window.showView('view-equipo'); } }
+      cta: { label: 'Cargar mi avance', go: function(){
+        if (typeof window.openEquipo === 'function') window.openEquipo();
+        else if (typeof window.showView === 'function') window.showView('view-equipo');
+        setTimeout(function(){
+          var cult = document.getElementById('culturaWrap') || document.querySelector('.cultura-card');
+          if (cult) cult.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 500);
+      } }
     };
   }
 
@@ -327,13 +362,26 @@
       return c && c.proximo_contacto && c.proximo_contacto < hoy && ['seguimiento','presentacion'].indexOf(c.estado) >= 0;
     });
     if (!nuevos.length && !vencidos.length) return null;
-    var filas = [];
-    if (nuevos.length) filas.push('<li>✨ <b>' + nuevos.length + '</b> sin el primer contacto' + (nuevos[0] ? ' · ' + esc(nuevos[0].nombre) + (nuevos.length > 1 ? ' y más' : '') : '') + '</li>');
-    if (vencidos.length) filas.push('<li>⏰ <b>' + vencidos.length + '</b> con la fecha pasada</li>');
+    var ficha = function(c){ return function(){
+      if (window.APPIGestion && window.APPIGestion.abrirContacto) window.APPIGestion.abrirContacto(c.id);
+      else if (typeof window.openMiGestion === 'function') window.openMiGestion();
+    }; };
+    var vistaHoy = function(){
+      if (typeof window.openMiGestion === 'function') window.openMiGestion();
+      setTimeout(function(){ try{ if (window.APPIGestion && window.APPIGestion.setView) window.APPIGestion.setView('hoy'); }catch(e){} }, 450);
+    };
+    var filas = [], items = [];
+    nuevos.slice(0, 2).forEach(function(c){
+      filas.push('<li>✨ <b>' + esc(c.nombre || 'Sin nombre') + '</b> · sin el primer contacto</li>');
+      items.push(ficha(c));
+    });
+    if (nuevos.length > 2){ filas.push('<li>✨ … y ' + (nuevos.length - 2) + ' nuevos más</li>'); items.push(vistaHoy); }
+    if (vencidos.length){ filas.push('<li>⏰ <b>' + vencidos.length + '</b> con la fecha pasada</li>'); items.push(vistaHoy); }
     return {
       cat: 'panel', icono: '📇', kicker: 'Panel de Contactos',
       titulo: 'Hay gente esperando tu mensaje',
-      html: '<ul class="ht-lista">' + filas.join('') + '</ul><p class="ht-nota">Las primeras 24 horas pesan más que una semana.</p>',
+      html: '<ul class="ht-lista">' + filas.join('') + '</ul><p class="ht-nota">Tocá a la persona y se abre su ficha. Las primeras 24 horas pesan más que una semana.</p>',
+      items: items,
       cta: { label: 'Abrir el Panel', go: function(){ if (typeof window.openMiGestion === 'function') window.openMiGestion(); } }
     };
   }
@@ -343,11 +391,23 @@
       if (!window.APPIMensajes || !window.APPIMensajes.resumenHoy) return null;
       var r = window.APPIMensajes.resumenHoy();
       if (!r.pendientes) return null;
+      var alCarrusel = function(motivoId){ return function(){
+        if (typeof window.showView === 'function') window.showView('view-usuarios');
+        setTimeout(function(){ try{ window.APPIMensajes.abrirFila(motivoId); }catch(e){} }, 480);
+      }; };
+      var filas = [], items = [];
+      (window.APPIMensajes.pendientes ? window.APPIMensajes.pendientes() : []).forEach(function(g){
+        var n = g.gente.length;
+        filas.push('<li>' + g.motivo.icono + ' <b>' + n + '</b> ' + esc(n === 1 ? g.motivo.uno : g.motivo.varios) + '</li>');
+        items.push(alCarrusel(g.motivo.id));
+      });
       return {
         cat: 'usuarios', icono: '💧', kicker: 'Usuarios',
         titulo: r.pendientes === 1 ? 'Queda 1 acción del día sin marcar' : 'Quedan ' + r.pendientes + ' acciones del día sin marcar',
-        html: '<p class="ht-frase">Retrolavados, garantías por vencer y saludos: cada una se marca con ✓ o ✗.</p>' +
-              '<div class="ht-chips"><span>✓ ' + r.hechas + '</span><span>✗ ' + r.noHechas + '</span><span>quedan ' + r.pendientes + '</span></div>',
+        html: '<ul class="ht-lista">' + filas.join('') + '</ul>' +
+              '<div class="ht-chips"><span>✓ ' + r.hechas + '</span><span>✗ ' + r.noHechas + '</span><span>quedan ' + r.pendientes + '</span></div>' +
+              '<p class="ht-nota">Tocá un motivo y se abre el carrusel para mandar y marcar ✓/✗.</p>',
+        items: items,
         cta: { label: 'Ir a marcar', go: function(){ if (typeof window.showView === 'function') window.showView('view-usuarios'); } }
       };
     }catch(e){ return null; }

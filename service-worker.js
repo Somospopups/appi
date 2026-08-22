@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v307-saludo-directo';
+const CACHE_NAME = 'appi-v308-enlaces-directos';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

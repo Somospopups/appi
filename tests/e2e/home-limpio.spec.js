@@ -274,6 +274,9 @@ test('tocar un renglón de la tarjeta te lleva directo, y la primera se hamaca',
   await page.locator('.ht-lista li', { hasText: 'Jorge Salas' }).click();
   await expect(page.locator('#htOverlay')).toHaveCount(0);
   await expect(page.locator('#view-gestion')).toHaveClass(/active/);
+  // Auto-dirigible de verdad: la ficha de Jorge queda abierta, lista para actuar.
+  await expect(page.locator('#gestionDrawer')).toContainText('Jorge Salas');
+  await expect(page.locator('#gestionDrawer')).toContainText('WhatsApp');
 });
 
 test('tocar un cumpleaños saluda por WhatsApp directamente', async ({ page }) => {
