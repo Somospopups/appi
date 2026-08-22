@@ -43,10 +43,23 @@ test('el cumplimiento diario se minimiza, tiene buscador y ordena alfabético', 
   expect(js).toContain('state.accionesFiltro');
 });
 
-test('las estadísticas de membresías muestran los usuarios en prueba', () => {
-  const js = fs.readFileSync('js/membership-admin.js', 'utf8');
-  expect(js).toContain('🧪 En prueba');
-  expect(js).toContain('__appiPruebasCount');
+test('el tablero reemplaza a las tarjetas sueltas y muestra la prueba', () => {
+  const h = html();
+  expect(h).toContain('id="adminHero"');
+  expect(h).toContain('Necesitan tu atención');
+  expect(h).toContain('id="adminGoRequests"');
+  // Lo viejo se fue de verdad: ni las 4 tarjetas ni el panel de membresías.
+  expect(h).not.toContain('adminStatTotal');
+  expect(h).not.toContain('revenueStatsContainer');
+  expect(h).not.toContain('Configuración de Precios');
+  // Ingresos y Configuración quedaron colapsables.
+  expect(h).toContain('id="adminIngresosToggle"');
+  expect(h).toContain('id="adminConfigToggle"');
+  const js = panel();
+  expect(js).toContain('function renderHero');
+  expect(js).toContain('function renderAtencion');
+  expect(js).toContain('en prueba');
+  expect(js).toContain('vs. mes anterior');
 });
 
 test('los ingresos se ven por mes con total, nombres y resumen anual', () => {

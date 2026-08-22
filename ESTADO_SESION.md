@@ -1,4 +1,4 @@
-# Estado al retomar — APPI v300
+# Estado al retomar — APPI v301
 
 Repo: `github.com/somospopups/appi` · **suite en verde**.
 
@@ -6,7 +6,19 @@ Corrida local completa: **282 pruebas pasan, 1 salteada, 0 fallan** (sin flakes 
 
 ---
 
-## Último cambio: v300 · Panel de administración ordenado
+## Último cambio: v301 · Tablero del panel admin (rediseño Opción B)
+
+Elegido por el equipo entre dos maquetas (en /maquetas del sandbox, no
+versionadas). Tablero violeta arriba: recaudado del mes + % vs anterior +
+histórico + 12 barras del año (clic → salta a ese mes en Ingresos) +
+chips (activas, prueba, por vencer, solicitudes parpadeando). Tarjeta
+"⚠️ Necesitan tu atención" (solicitudes, vencimientos, pruebas por
+terminar, con navegación). Accesos rápidos Crear cuenta/Solicitudes.
+Ingresos y Configuración colapsables. Se eliminaron las 4 tarjetas
+sueltas, el panel Estadísticas de membresías (redundante) y la sección
+vacía "Configuración de Precios". Sin migraciones nuevas.
+
+## Anterior: v300 · Panel de administración ordenado
 
 Seis mejoras pedidas por el equipo: (1) Crear cuenta pasa a ser un botón
 que abre un popup con todos los campos + WhatsApp opcional del titular;

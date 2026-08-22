@@ -80,10 +80,13 @@ function renderPagos(){
   $('adminMesPrev').onclick=()=>mover(-1);
   $('adminMesNext').onclick=()=>mover(1);
   body.querySelectorAll('[data-mes]').forEach(btn=>btn.onclick=()=>{state.pagosMes=btn.dataset.mes;renderPagos()});
+  const resumen=$('adminIngresosResumen');
+  if(resumen)resumen.textContent=`${label}: ${moneyAdmin(mesData.total)} · ${mesData.pagos.length} pago${mesData.pagos.length===1?'':'s'} · tocá para el detalle`;
+  renderHero();
 }
 (function(){
 'use strict';
-const state={users:[],requests:[],filter:'',whatsapp:'',createMembership:1,bound:false,pruebas:new Map(),acciones:[],accionesFiltro:'',pagos:null,pagosMes:''};
+const state={users:[],requests:[],filter:'',whatsapp:'',createMembership:1,bound:false,pruebas:new Map(),acciones:[],accionesFiltro:'',pagos:null,pagosMes:'',revenue:null};
 const $=id=>document.getElementById(id);
 const esc=value=>String(value==null?'':value).replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
 const cfg=()=>window.APPIAuth.config();
@@ -101,7 +104,75 @@ async function callAdmin(body,retry=true){
   if(!response.ok)throw new Error(data.error||'No se pudo completar la operación.');return data;
 }
 function setStatus(id,message,error=false){const node=$(id);if(!node)return;node.textContent=message||'';node.className='admin-inline-status'+(message?' show':'')+(error?' error':'')}
-function updateStats(){const users=state.users.filter(user=>user.rol!=='admin');$('adminStatTotal').textContent=users.length;$('adminStatActive').textContent=users.filter(user=>user.activo).length;$('adminStatBlocked').textContent=users.filter(user=>!user.activo).length;$('adminStatPending').textContent=state.requests.length}
+/* Tablero (v301): la plata del mes como protagonista, con la tendencia anual
+   y los chips del estado general. Reemplaza a las tarjetas sueltas. */
+const MESES_ADMIN=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+function updateStats(){renderHero();renderAtencion()}
+function renderHero(){
+  const hero=$('adminHero');if(!hero)return;
+  const users=state.users.filter(user=>user.rol!=='admin');
+  const activos=users.filter(user=>user.activo).length;
+  const enPrueba=state.pruebas.size;
+  const porVencer=users.filter(user=>{if(state.pruebas.has(user.user_id)||!user.activo)return false;const d=membershipInfo(user).days;return d>=0&&d<=7}).length;
+  const pend=state.requests.length;
+  const hoy=new Date(),anio=hoy.getFullYear(),mesAct=`${anio}-${String(hoy.getMonth()+1).padStart(2,'0')}`;
+  const pagos=Array.isArray(state.pagos)?state.pagos:[];
+  const totalDe=clave=>pagos.filter(row=>String(row.fecha).slice(0,7)===clave).reduce((acc,row)=>acc+(Number(row.monto)||0),0);
+  const mesTotal=totalDe(mesAct);
+  const prev=new Date(anio,hoy.getMonth()-1,1),clavePrev=`${prev.getFullYear()}-${String(prev.getMonth()+1).padStart(2,'0')}`;
+  const prevTotal=totalDe(clavePrev);
+  const cmp=prevTotal>0?Math.round((mesTotal-prevTotal)*100/prevTotal):null;
+  const historico=state.revenue&&typeof state.revenue.totalRevenue==='number'&&state.revenue.totalRevenue>0?state.revenue.totalRevenue:pagos.reduce((acc,row)=>acc+(Number(row.monto)||0),0);
+  const totalesAnio=MESES_ADMIN.map((_,i)=>totalDe(`${anio}-${String(i+1).padStart(2,'0')}`));
+  const maxBar=Math.max(...totalesAnio,1);
+  const bars=MESES_ADMIN.map((nombre,i)=>{
+    const clave=`${anio}-${String(i+1).padStart(2,'0')}`;
+    const alto=Math.max(6,Math.round(totalesAnio[i]*100/maxBar));
+    return `<button type="button" data-hero-mes="${clave}" class="${clave===mesAct?'on':''}" style="height:${totalesAnio[i]?alto:6}%" title="${nombre}: ${moneyAdmin(totalesAnio[i])}" aria-label="${nombre}"></button>`;
+  }).join('');
+  hero.innerHTML=`<div class="k">Recaudado en ${MESES_ADMIN[hoy.getMonth()].toLowerCase()}</div>
+    <b class="big">${moneyAdmin(mesTotal)}</b>
+    <div class="cmp">${cmp===null?'':`${cmp>=0?'↑':'↓'} ${Math.abs(cmp)}% vs. mes anterior · `}${moneyAdmin(historico)} histórico</div>
+    <div class="bars">${bars}</div>
+    <div class="chips">
+      <i>👥 ${activos} activa${activos===1?'':'s'} de ${users.length}</i>
+      <i>🧪 ${enPrueba} en prueba</i>
+      <i>⏳ ${porVencer} vence${porVencer===1?'':'n'} esta semana</i>
+      <i class="${pend?'alert':''}" id="adminChipSolicitudes">● ${pend} solicitud${pend===1?'':'es'}</i>
+    </div>`;
+  hero.querySelectorAll('[data-hero-mes]').forEach(btn=>btn.onclick=()=>abrirIngresosEn(btn.dataset.heroMes));
+  const chip=$('adminChipSolicitudes');
+  if(chip&&pend)chip.onclick=()=>{const card=$('adminPendingCard');if(card)card.scrollIntoView({behavior:'smooth',block:'start'})};
+}
+function renderAtencion(){
+  const list=$('adminAtencionList');if(!list)return;
+  const items=[];
+  state.requests.forEach(item=>items.push({ico:'📨',t:`${item.nombre} pidió acceso`,s:`${item.dip} · aprobar o rechazar`,go:'solicitudes'}));
+  state.users.filter(user=>user.rol!=='admin'&&user.activo).forEach(user=>{
+    const quien=user.nombre||user.dip;
+    if(state.pruebas.has(user.user_id)){
+      const dias=Math.max(0,Math.ceil((new Date(state.pruebas.get(user.user_id)).getTime()-Date.now())/86400000));
+      if(dias<=2)items.push({ico:'🧪',t:`La prueba de ${quien} ${dias===0?'termina HOY':`termina en ${dias} día${dias===1?'':'s'}`}`,s:'¿le proponés el pase a 1 mes?',go:'usuarios'});
+      return;
+    }
+    const info=membershipInfo(user);
+    if(info.label==='VENCIDA')items.push({ico:'⛔',t:`${quien} está vencida`,s:'registrar pago, prórroga o bloquear',go:'usuarios'});
+    else if(info.days===0)items.push({ico:'⏰',t:`${quien} vence HOY`,s:'registrar pago o prórroga',go:'usuarios'});
+    else if(info.days>0&&info.days<=3)items.push({ico:'⏳',t:`${quien} vence en ${info.days} día${info.days===1?'':'s'}`,s:'anticipate al corte',go:'usuarios'});
+  });
+  if(!items.length){list.innerHTML='<div class="admin-pending-empty">✓ Todo en orden: nada urgente por ahora.</div>';return}
+  list.innerHTML=items.slice(0,8).map(item=>`<button type="button" class="admin-atencion-row" data-aten-go="${item.go}"><span class="ico">${item.ico}</span><div><b>${esc(item.t)}</b><small>${esc(item.s)}</small></div><span class="chev">›</span></button>`).join('');
+  list.querySelectorAll('[data-aten-go]').forEach(button=>button.onclick=()=>{
+    const target=button.dataset.atenGo==='solicitudes'?$('adminPendingCard'):$('adminUserList');
+    if(target)target.scrollIntoView({behavior:'smooth',block:'start'});
+  });
+}
+function abrirIngresosEn(mes){
+  const wrap=$('adminIngresosWrap'),toggle=$('adminIngresosToggle'),chev=$('adminIngresosChevron');
+  if(wrap&&wrap.hidden){wrap.hidden=false;if(toggle)toggle.setAttribute('aria-expanded','true');if(chev)chev.classList.add('open')}
+  if(mes){state.pagosMes=mes;renderPagos()}
+  if(toggle)toggle.scrollIntoView({behavior:'smooth',block:'start'});
+}
 function filteredUsers(){const term=state.filter.toLowerCase().trim();return state.users.filter(user=>user.rol!=='admin'&&(!term||`${user.nombre} ${user.socio_nombre||''} ${user.dip} ${user.sucursal} ${user.numero_distribuidor}`.toLowerCase().includes(term)))}
 function renderUsers(){
   const list=$('adminUserList'),users=filteredUsers();if(!list)return;if(!users.length){list.innerHTML='<div class="empty">No hay distribuidores para mostrar.</div>';return}
@@ -113,17 +184,18 @@ function renderRequests(){const list=$('adminPendingList');if(!list)return;
   const title=$('adminPendingTitle'),badge=$('adminPendingBadge');
   if(title)title.classList.toggle('blinking',state.requests.length>0);
   if(badge){badge.hidden=!state.requests.length;badge.textContent=`● ${state.requests.length} NUEVA${state.requests.length===1?'':'S'}`}
+  const quick=$('adminQuickPendBadge');
+  if(quick){quick.hidden=!state.requests.length;quick.textContent=state.requests.length}
   if(!state.requests.length){list.innerHTML='<div class="admin-pending-empty">No hay solicitudes pendientes.</div>';return}list.innerHTML=state.requests.map(item=>`<article class="admin-user-row" data-request-id="${esc(item.id)}"><div><h3>${esc(item.nombre)}${item.socio_nombre?` + ${esc(item.socio_nombre)}`:''}</h3><p>${item.socio_nombre?`Socio/a: ${esc(item.socio_nombre)}<br>`:''}${esc(item.dip)} · ${esc(item.telefono)}<br>${new Date(item.created_at).toLocaleString('es-AR')}</p><span class="admin-user-badge blocked">PENDIENTE</span></div><div class="admin-row-actions"><button type="button" class="wa" data-request-action="whatsapp">WhatsApp</button><button type="button" class="good" data-request-action="approve">Aprobar</button><button type="button" class="danger" data-request-action="reject">Rechazar</button></div></article>`).join('');list.querySelectorAll('[data-request-action]').forEach(button=>button.onclick=()=>handleRequestAction(button))}
 function notifyAdminMemberships(){const alerts=state.users.filter(user=>user.rol!=='admin'&&membershipInfo(user).days<=7);if(!alerts.length)return;const today=new Date().toISOString().slice(0,10),key=`appi_admin_membresias_${today}`;if(sessionStorage.getItem(key))return;sessionStorage.setItem(key,'1');const names=alerts.slice(0,8).map(user=>`${user.nombre||user.dip}: ${membershipInfo(user).label}`).join('\n');window.APPIDialog.alert(`${alerts.length} membresía${alerts.length===1?'':'s'} requiere${alerts.length===1?'':'n'} atención.\n\n${names}`,{title:'Membresías por vencer',icon:'⏳',okText:'Revisar'})}
 function render(){updateStats();renderUsers();renderRequests();if($('adminWhatsappNumber'))$('adminWhatsappNumber').value=state.whatsapp||''}
-async function load(){const users=$('adminUserList'),requests=$('adminPendingList');if(users)users.innerHTML='<div class="empty">Cargando cuentas…</div>';if(requests)requests.innerHTML='<div class="admin-pending-empty">Cargando solicitudes…</div>';try{const [userData,requestData,settings]=await Promise.all([callAdmin({action:'list'}),callAdmin({action:'list_requests'}),callAdmin({action:'get_settings'})]);state.users=userData.users||[];state.requests=requestData.requests||[];state.whatsapp=settings.whatsapp||'';render();notifyAdminMemberships()}catch(error){if(users)users.innerHTML=`<div class="admin-inline-status show error">${esc(error.message)}</div>`;if(requests)requests.innerHTML=''}loadAcciones().catch(()=>{});loadPruebas().catch(()=>{});loadPagos().catch(()=>{})}
+async function load(){const users=$('adminUserList'),requests=$('adminPendingList');if(users)users.innerHTML='<div class="empty">Cargando cuentas…</div>';if(requests)requests.innerHTML='<div class="admin-pending-empty">Cargando solicitudes…</div>';try{const [userData,requestData,settings]=await Promise.all([callAdmin({action:'list'}),callAdmin({action:'list_requests'}),callAdmin({action:'get_settings'})]);state.users=userData.users||[];state.requests=requestData.requests||[];state.whatsapp=settings.whatsapp||'';render();notifyAdminMemberships()}catch(error){if(users)users.innerHTML=`<div class="admin-inline-status show error">${esc(error.message)}</div>`;if(requests)requests.innerHTML=''}loadAcciones().catch(()=>{});loadPruebas().catch(()=>{});loadPagos().catch(()=>{});if(window.APPIAdminMembership&&window.APPIAdminMembership.loadRevenueStats)window.APPIAdminMembership.loadRevenueStats().then(r=>{state.revenue=r;renderHero()}).catch(()=>{})}
 /* Qué cuentas están en modo PRUEBA (v294). Si la migración no corrió, el
    panel sigue andando sin los badges. */
 async function loadPruebas(){
   try{const rows=await rpcAdmin('appi_admin_lista_pruebas',{});state.pruebas=new Map((Array.isArray(rows)?rows:[]).map(r=>[r.cuenta,r.vence]))}catch(e){state.pruebas=new Map()}
   window.__appiPruebasCount=state.pruebas.size;
-  try{if(window.APPIAdminMembership&&window.APPIAdminMembership.renderRevenuePanel)window.APPIAdminMembership.renderRevenuePanel()}catch(e){}
-  renderUsers();
+  renderUsers();renderHero();renderAtencion();
 }
 /* Cumplimiento diario (v292): resumen de las acciones que cada cuenta marcó
    con ✓ o ✗. Se lee con una función RPC que sólo responde al rol admin. */
@@ -220,10 +292,8 @@ async function create(){
     popupCredenciales({nombre,dip:data.user.dip,socio:socioNombre,password,telefono:telefonoNuevo,esPrueba});
     await load();
     
-    // Actualizar estadísticas de ganancias
-    if(window.APPIAdminMembership&&window.APPIAdminMembership.renderRevenuePanel){
-      window.APPIAdminMembership.renderRevenuePanel();
-    }
+    // Refrescar el tablero con la cuenta nueva
+    loadPagos().catch(()=>{});
     
     if(typeof showToast==='function')showToast('Cuenta creada y datos copiados 📋',2800);
   }catch(error){setStatus('adminCreateStatus',error.message,true)}finally{button.disabled=false;button.textContent='Crear cuenta'}
@@ -307,8 +377,17 @@ function bind(){if(state.bound)return;state.bound=true;['adminSucursal','adminNu
   const accionesToggle=$('adminAccionesToggle');if(accionesToggle)accionesToggle.onclick=()=>{const body=$('adminAccionesBody'),chev=$('adminAccionesChevron');const abrir=body.hidden;body.hidden=!abrir;accionesToggle.setAttribute('aria-expanded',abrir?'true':'false');if(chev)chev.classList.toggle('open',abrir)};
   const accionesSearch=$('adminAccionesSearch');if(accionesSearch)accionesSearch.oninput=event=>{state.accionesFiltro=event.target.value;renderAcciones()};
   const refreshPagos=$('adminRefreshPagos');if(refreshPagos)refreshPagos.onclick=()=>loadPagos();
+  const goRequests=$('adminGoRequests');if(goRequests)goRequests.onclick=()=>{const card=$('adminPendingCard');if(card)card.scrollIntoView({behavior:'smooth',block:'start'})};
+  const ingresosToggle=$('adminIngresosToggle');if(ingresosToggle)ingresosToggle.onclick=()=>{const wrap=$('adminIngresosWrap'),chev=$('adminIngresosChevron');const abrir=wrap.hidden;wrap.hidden=!abrir;ingresosToggle.setAttribute('aria-expanded',abrir?'true':'false');if(chev)chev.classList.toggle('open',abrir)};
+  const configToggle=$('adminConfigToggle');if(configToggle)configToggle.onclick=()=>{const body=$('adminConfigBody'),chev=$('adminConfigChevron');const abrir=body.hidden;body.hidden=!abrir;configToggle.setAttribute('aria-expanded',abrir?'true':'false');if(chev)chev.classList.toggle('open',abrir)};
   const refreshAcciones=$('adminRefreshAcciones');if(refreshAcciones)refreshAcciones.onclick=()=>loadAcciones();$('adminSaveWhatsapp').onclick=saveWhatsapp;$('btnAdminPanelLogout').onclick=logout;$('btnAdminPanelPassword').onclick=()=>window.abrirCambioPasswordAPPI();const helpAdmin=$('btnHelpAdmin');if(helpAdmin)helpAdmin.onclick=()=>window.APPIDialog.alert(
 `Desde acá administrás las cuentas de APPI.
+
+TABLERO
+Arriba está la plata del mes con la comparación contra el mes anterior y las 12 barras del año (tocá una y saltás a ese mes). Los chips resumen el estado: activas, en prueba, por vencer y solicitudes.
+
+NECESITAN TU ATENCIÓN
+Lo urgente en un solo lugar: solicitudes sin resolver, membresías que vencen y pruebas por terminar. Tocá un renglón y te lleva.
 
 CREAR CUENTA
 Tocá "➕ Crear cuenta nueva" y completá los datos en la ventana. Elegí la duración: 1 mes, o 🧪 PRUEBA (5 días con franja roja; al vencer, el ingreso se bloquea). Al crear, podés mandar por WhatsApp la bienvenida y la contraseña en dos mensajes separados: la contraseña viaja sola para copiar y pegar fácil.

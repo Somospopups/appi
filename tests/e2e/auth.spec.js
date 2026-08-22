@@ -327,12 +327,14 @@ test('administración ingresa por el candado y no tiene distribuidor asociado', 
   await expect(page.locator('#adminPanelIdentity')).toContainText('Administración del equipo');
   await expect(page.locator('#adminUserList')).toContainText('Distribuidor A');
   await expect(page.locator('#adminPendingList')).toContainText('Solicitud Pendiente');
-  await expect(page.locator('#adminStatPending')).toHaveText('1');
+  // El tablero muestra la solicitud en el chip que parpadea y en Atención.
+  await expect(page.locator('#adminHero')).toContainText('1 solicitud');
+  await expect(page.locator('#adminHero')).toContainText('Recaudado en');
+  await expect(page.locator('#adminAtencionCard')).toContainText('pidió acceso');
   await expect(page.locator('[data-admin-action="people"]').first()).toBeVisible();
   await expect(page.locator('[data-admin-action="grace_period"]').first()).toBeVisible();
   await expect(page.locator('[data-admin-action="payment"]').first()).toBeVisible();
   await expect(page.locator('[data-admin-action="delete"]').first()).toBeVisible();
-  await expect(page.locator('#revenueStatsContainer')).toContainText('Ingresos registrados');
   await page.locator('[data-admin-action="grace_period"]').first().click();
   await expect(page.locator('.grace-period-modal')).toBeVisible();
   await page.locator('.grace-period-modal .modal-close').click();
