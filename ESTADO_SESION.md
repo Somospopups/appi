@@ -1,4 +1,4 @@
-# Estado al retomar — APPI v305
+# Estado al retomar — APPI v306
 
 Repo: `github.com/somospopups/appi` · **suite en verde**.
 
@@ -6,7 +6,18 @@ Corrida local completa: **282 pruebas pasan, 1 salteada, 0 fallan** (sin flakes 
 
 ---
 
-## Último cambio: v305 · Mazo pulido
+## Último cambio: v306 · Mazo a punto
+
+Segunda ronda con el mazo en la mano: (1) deslizar desde cualquier parte
+de verdad — el cuerpo scrolleable se quedaba con el gesto; touch-action
+pan-y lo libera; (2) letra más grande en toda la tarjeta (título 23px,
+frase 17,5px, renglones 15px); (3) cada renglón de las listas navega
+directo a su pantalla (con ›); (4) Pasar › pegado al pie de la tarjeta;
+(5) vaivén de demostración al abrir (1,5s, se corta al tocar). Fix: la
+tarjeta promovida durante el vuelo se cablea al instante (no había
+handlers por 330ms).
+
+## Anterior: v305 · Mazo pulido
 
 Ajustes tras la prueba del equipo: tarjetas todas del mismo tamaño (alto
 fijo, cuerpo con scroll, CTA anclado), la ✗ en la punta derecha de CADA

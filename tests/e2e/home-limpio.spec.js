@@ -262,3 +262,16 @@ test('todas las tarjetas miden lo mismo y cada una lleva su X en la punta', asyn
   r.equis.forEach(n => expect(n).toBe(1));   // una X por tarjeta
   expect(r.xALaDerecha).toBe(true);          // en la punta derecha
 });
+
+test('tocar un renglón de la tarjeta te lleva directo, y la primera se hamaca', async ({ page }) => {
+  await entrar(page);
+  await page.evaluate(() => window.APPIHomeTarjetas.abrir());
+  // La primera tarjeta hace el vaivén de demostración.
+  await expect(page.locator('.ht-card.demo')).toHaveCount(1);
+  // Pasamos a Tu jornada y tocamos a Jorge: tiene que abrir el Panel ya.
+  await page.locator('#htPasar').click();
+  await expect(page.locator('#htOverlay')).toContainText('Tu jornada');
+  await page.locator('.ht-lista li', { hasText: 'Jorge Salas' }).click();
+  await expect(page.locator('#htOverlay')).toHaveCount(0);
+  await expect(page.locator('#view-gestion')).toHaveClass(/active/);
+});
