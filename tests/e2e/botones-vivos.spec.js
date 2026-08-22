@@ -78,6 +78,8 @@ test('ningún botón visible muere en silencio', async ({ page }) => {
         if (o) o.hidden = true;
         const m = document.getElementById('modalOverlay');
         if (m) m.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+        // El mazo de notificaciones también se cierra para seguir recorriendo.
+        if (window.APPIHomeTarjetas) window.APPIHomeTarjetas.cerrar();
       });
     }
   }

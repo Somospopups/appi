@@ -239,3 +239,26 @@ test('hay frases de sobra y la del día no cambia dentro del mismo día', async 
   expect(r.total).toBeGreaterThanOrEqual(80);
   expect(r.una).toBe(r.dos);
 });
+
+test('todas las tarjetas miden lo mismo y cada una lleva su X en la punta', async ({ page }) => {
+  await entrar(page);
+  await page.evaluate(() => window.APPIHomeTarjetas.abrir());
+  const r = await page.evaluate(() => {
+    const cards = [...document.querySelectorAll('.ht-card')];
+    return {
+      alturas: cards.map(c => c.offsetHeight),
+      anchos: cards.map(c => c.offsetWidth),
+      equis: cards.map(c => c.querySelectorAll('.ht-x').length),
+      xALaDerecha: (() => {
+        const top = cards.find(c => !c.classList.contains('detras1') && !c.classList.contains('detras2'));
+        const x = top.querySelector('.ht-x').getBoundingClientRect();
+        const card = top.getBoundingClientRect();
+        return x.right > card.left + card.width * 0.8 && x.top < card.top + 70;
+      })()
+    };
+  });
+  expect(new Set(r.alturas).size).toBe(1);   // mismo alto para todas
+  expect(new Set(r.anchos).size).toBe(1);    // mismo ancho para todas
+  r.equis.forEach(n => expect(n).toBe(1));   // una X por tarjeta
+  expect(r.xALaDerecha).toBe(true);          // en la punta derecha
+});

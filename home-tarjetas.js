@@ -351,16 +351,19 @@
       '.ht-top b{font-size:15px}.ht-top span{font-size:11px;opacity:.8;font-weight:800}',
       '.ht-cerrar{width:42px;height:42px;border:0;border-radius:50%;background:rgba(255,255,255,.16);color:#fff;font-size:20px;font-weight:900;cursor:pointer}',
       '.ht-deck{position:relative;flex:1;display:grid;place-items:center;padding:10px 18px;min-height:0}',
-      '.ht-card{position:absolute;width:min(92vw,400px);max-height:72vh;display:flex;flex-direction:column;padding:22px 20px 18px;border-radius:24px;background:linear-gradient(160deg,#ffffff,#f4f6ff);box-shadow:0 22px 60px rgba(10,12,40,.35);touch-action:pan-y;user-select:none}',
-      '.ht-card.detras1{transform:translateY(14px) scale(.95);opacity:.75;pointer-events:none}',
-      '.ht-card.detras2{transform:translateY(26px) scale(.9);opacity:.45;pointer-events:none}',
+      '.ht-card{position:absolute;width:min(92vw,400px);height:min(64vh,470px);display:flex;flex-direction:column;padding:18px 20px;border-radius:24px;background:linear-gradient(160deg,#ffffff,#f4f6ff);box-shadow:0 22px 60px rgba(10,12,40,.35);touch-action:pan-y;user-select:none;-webkit-user-select:none;cursor:grab;will-change:transform;transition:transform .32s cubic-bezier(.22,.9,.35,1),opacity .32s ease}',
+      '.ht-card.detras1{transform:translateY(15px) scale(.95);opacity:.75;pointer-events:none}',
+      '.ht-card.detras2{transform:translateY(28px) scale(.9);opacity:.45;pointer-events:none}',
       '.ht-card.arrastre{transition:none;cursor:grabbing}',
-      '.ht-card.volver{transition:transform .28s cubic-bezier(.3,1.4,.5,1)}',
-      '.ht-card.vuela{transition:transform .38s ease-out,opacity .38s ease-out;opacity:0;pointer-events:none}',
-      '.ht-card .ht-kicker{color:#3d63c9;font-size:10px;font-weight:950;letter-spacing:.7px;text-transform:uppercase}',
+      '.ht-card.volver{transition:transform .34s cubic-bezier(.28,1.45,.45,1)}',
+      '.ht-card.vuela{transition:transform .46s cubic-bezier(.3,.7,.4,1),opacity .4s ease-out;opacity:0;pointer-events:none}',
+      '.ht-cab{display:flex;align-items:center;gap:8px;margin-bottom:2px}',
+      '.ht-cab .ht-ico{font-size:22px;line-height:1}',
+      '.ht-card .ht-kicker{flex:1;min-width:0;color:#3d63c9;font-size:10px;font-weight:950;letter-spacing:.7px;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+      '.ht-x{flex:0 0 auto;width:34px;height:34px;border:0;border-radius:50%;background:rgba(120,120,140,.12);color:#63636f;font-size:17px;font-weight:900;line-height:1;cursor:pointer}',
+      '.ht-x:hover{background:rgba(224,36,36,.14);color:#c0392b}',
       '.ht-card h3{margin:7px 0 9px;color:#1d1d2c;font-size:19px;line-height:1.25;letter-spacing:-.3px}',
-      '.ht-card .ht-ico{position:absolute;top:16px;right:18px;font-size:26px}',
-      '.ht-cuerpo{overflow-y:auto;-webkit-overflow-scrolling:touch;min-height:0}',
+      '.ht-cuerpo{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;min-height:0}',
       '.ht-frase{margin:0;color:#41424f;font-size:14.5px;line-height:1.55;font-weight:650}',
       '.ht-lista{margin:0;padding:0;list-style:none;display:grid;gap:7px}',
       '.ht-lista li{padding:9px 11px;border-radius:12px;background:rgba(91,141,239,.07);color:#3a3a48;font-size:12.5px;font-weight:700}',
@@ -368,7 +371,7 @@
       '.ht-nota{margin:10px 0 0;color:#8a8b98;font-size:11px;line-height:1.45}',
       '.ht-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}',
       '.ht-chips span{padding:5px 10px;border-radius:999px;background:rgba(91,141,239,.1);color:#3d63c9;font-size:10.5px;font-weight:900}',
-      '.ht-cta{margin-top:14px;min-height:48px;border:0;border-radius:14px;background:linear-gradient(135deg,#5b8def,#8b63e8);color:#fff;font:inherit;font-size:13.5px;font-weight:900;cursor:pointer}',
+      '.ht-cta{margin-top:12px;min-height:48px;border:0;border-radius:14px;background:linear-gradient(135deg,#5b8def,#8b63e8);color:#fff;font:inherit;font-size:13.5px;font-weight:900;cursor:pointer}',
       '.ht-foot{display:flex;justify-content:center;gap:10px;padding:14px 18px calc(16px + env(safe-area-inset-bottom,0px))}',
       '.ht-pasar{min-height:46px;padding:0 26px;border:0;border-radius:999px;background:rgba(255,255,255,.16);color:#fff;font:inherit;font-size:13px;font-weight:900;cursor:pointer}',
       '.ht-hint{position:absolute;bottom:12px;left:0;right:0;text-align:center;color:#b9bac8;font-size:10px;font-weight:800}',
@@ -378,13 +381,14 @@
       '.ht-boton.late{border-color:rgba(224,36,36,.4);animation:htLatido 1.1s ease-in-out infinite}',
       '@keyframes htLatido{0%,100%{box-shadow:0 0 0 0 rgba(224,36,36,.35);transform:scale(1)}50%{box-shadow:0 0 0 10px rgba(224,36,36,0);transform:scale(1.015)}}',
       'body.dark .ht-card{background:linear-gradient(160deg,#262838,#1f2130)}',
-      'body.dark .ht-card h3{color:#f2f2f7}body.dark .ht-frase{color:#c9cad8}body.dark .ht-lista li{background:rgba(255,255,255,.07);color:#d4d5e2}',
+      'body.dark .ht-x{background:rgba(255,255,255,.1);color:#c9cad8}body.dark .ht-card h3{color:#f2f2f7}body.dark .ht-frase{color:#c9cad8}body.dark .ht-lista li{background:rgba(255,255,255,.07);color:#d4d5e2}',
       'body.dark .ht-boton{background:rgba(31,32,49,.8);border-color:rgba(255,255,255,.12);color:#9db7f5}'
     ].join('');
     document.head.appendChild(st);
   }
 
   function abrir(){
+    if (!sesionDeDistribuidor()) return false;
     css();
     var tarjetas = armarTarjetas();
     if (!tarjetas.length) return false;
@@ -392,12 +396,10 @@
     mazo = { tarjetas: tarjetas, i: 0 };
     var ov = document.createElement('div');
     ov.id = 'htOverlay';
-    ov.innerHTML = '<div class="ht-top"><div><b>🔔 Notificaciones</b></div><span id="htPos"></span>' +
-      '<button type="button" class="ht-cerrar" id="htCerrar" aria-label="Cerrar">×</button></div>' +
-      '<div class="ht-deck" id="htDeck"><div class="ht-hint">Deslizá la tarjeta para pasar a la siguiente</div></div>' +
+    ov.innerHTML = '<div class="ht-top"><div><b>🔔 Notificaciones</b></div><span id="htPos"></span></div>' +
+      '<div class="ht-deck" id="htDeck"><div class="ht-hint">Deslizá la tarjeta hacia un costado para pasarla</div></div>' +
       '<div class="ht-foot"><button type="button" class="ht-pasar" id="htPasar">Pasar ›</button></div>';
     document.body.appendChild(ov);
-    document.getElementById('htCerrar').onclick = function(){ marcarVisto(); cerrar(); };
     document.getElementById('htPasar').onclick = function(){ pasar(); };
     pintar();
     return true;
@@ -422,12 +424,14 @@
       var t = mazo.tarjetas[k];
       var el = document.createElement('div');
       el.className = 'ht-card' + (k === mazo.i ? '' : k === mazo.i + 1 ? ' detras1' : ' detras2');
-      el.innerHTML = '<span class="ht-ico">' + t.icono + '</span>' +
+      el.innerHTML = '<div class="ht-cab"><span class="ht-ico">' + t.icono + '</span>' +
         '<span class="ht-kicker">' + esc(t.kicker) + '</span>' +
+        '<button type="button" class="ht-x"' + (k === mazo.i ? ' id="htCerrar"' : '') + ' aria-label="Cerrar notificaciones">×</button></div>' +
         '<h3>' + esc(t.titulo) + '</h3>' +
         '<div class="ht-cuerpo">' + t.html + '</div>' +
         (t.cta ? '<button type="button" class="ht-cta">' + esc(t.cta.label) + '</button>' : '');
       if (k === mazo.i){
+        el.querySelector('.ht-x').onclick = function(){ marcarVisto(); cerrar(); };
         if (t.cta){
           el.querySelector('.ht-cta').onclick = function(ir){ return function(){ marcarVisto(); cerrar(); try{ ir(); }catch(e){} }; }(t.cta.go);
         }
@@ -443,39 +447,57 @@
     var top = deck && deck.querySelector('.ht-card:not(.detras1):not(.detras2)');
     if (top){
       top.classList.add('vuela');
-      top.style.transform = 'translateX(' + (direccion < 0 ? '-' : '') + '120vw) rotate(' + (direccion < 0 ? '-' : '') + '18deg)';
-      setTimeout(function(){ if (mazo){ mazo.i++; pintar(); } }, 230);
+      top.style.transform = 'translateX(' + (direccion < 0 ? '-' : '') + '130vw) translateY(-4vh) rotate(' + (direccion < 0 ? '-' : '') + '22deg)';
+      // Las de atrás suben a su nuevo lugar mientras la de arriba vuela:
+      // la transición base de .ht-card hace el resto.
+      var d1 = deck.querySelector('.ht-card.detras1');
+      var d2 = deck.querySelector('.ht-card.detras2');
+      if (d1) d1.classList.remove('detras1');
+      if (d2){ d2.classList.remove('detras2'); d2.classList.add('detras1'); }
+      setTimeout(function(){ if (mazo){ mazo.i++; pintar(); } }, 330);
     } else {
       mazo.i++; pintar();
     }
   }
 
   function activarArrastre(el){
+    // Se arrastra desde cualquier parte de la tarjeta, botones incluidos.
+    // Si el dedo casi no se movió, el toque cuenta como toque (la X y el
+    // botón siguen respondiendo normal); si se movió, es arrastre y el
+    // click posterior se anula para que no dispare nada por accidente.
     var x0 = 0, dx = 0, arrastrando = false;
     el.addEventListener('pointerdown', function(e){
-      if (e.target.closest('.ht-cta') || e.target.closest('button')) return;
-      arrastrando = true; x0 = e.clientX; dx = 0;
-      el.classList.add('arrastre');
-      try{ el.setPointerCapture(e.pointerId); }catch(err){}
+      arrastrando = true; x0 = e.clientX; dx = 0; el.__arrastro = false;
+      // Ojo: la captura del puntero recién se toma cuando el gesto ES un
+      // arrastre. Si se toma acá, el click de la ✗ y del botón se pierde.
     });
     el.addEventListener('pointermove', function(e){
       if (!arrastrando) return;
       dx = e.clientX - x0;
-      el.style.transform = 'translateX(' + dx + 'px) rotate(' + (dx / 18) + 'deg)';
+      if (!el.__arrastro && Math.abs(dx) > 7){
+        el.__arrastro = true;
+        el.classList.add('arrastre');
+        try{ el.setPointerCapture(e.pointerId); }catch(err){}
+      }
+      if (el.__arrastro) el.style.transform = 'translateX(' + dx + 'px) rotate(' + (dx / 20) + 'deg)';
     });
     function soltar(){
       if (!arrastrando) return;
       arrastrando = false;
       el.classList.remove('arrastre');
-      if (Math.abs(dx) > 90){ pasar(dx); }
-      else { el.classList.add('volver'); el.style.transform = ''; setTimeout(function(){ el.classList.remove('volver'); }, 300); }
+      if (el.__arrastro && Math.abs(dx) > 80){ pasar(dx); }
+      else if (el.__arrastro){ el.classList.add('volver'); el.style.transform = ''; setTimeout(function(){ el.classList.remove('volver'); }, 360); }
     }
     el.addEventListener('pointerup', soltar);
     el.addEventListener('pointercancel', soltar);
+    el.addEventListener('click', function(e){
+      if (el.__arrastro){ e.stopPropagation(); e.preventDefault(); }
+    }, true);
   }
 
   /* ---------- el botón del Home ---------- */
   function actualizarBoton(){
+    if (!sesionDeDistribuidor()) return;
     var home = document.getElementById('homeLimpio');
     if (!home) return;
     var boton = document.getElementById('htBoton');
@@ -498,8 +520,22 @@
     var v = document.getElementById('view-home');
     return !!(v && v.classList.contains('active'));
   }
+  // El mazo es del distribuidor logueado: nunca sobre el candado, nunca
+  // para la sesión administradora, nunca sin perfil cargado.
+  function sesionDeDistribuidor(){
+    try{
+      var lock = document.getElementById('lockScreen');
+      if (lock && !lock.classList.contains('hidden')) return false;
+      if (window.APPIAuth && window.APPIAuth.isEnabled && window.APPIAuth.isEnabled()){
+        var p = window.APPIAuth.currentProfile ? window.APPIAuth.currentProfile() : null;
+        if (!p || p.rol === 'admin') return false;
+      }
+      return true;
+    }catch(e){ return false; }
+  }
   var autoAbierto = false;
   function alEntrarAlHome(){
+    if (!sesionDeDistribuidor() || !esHome()) return;
     css();
     actualizarBoton();
     if (autoAbierto) return;      // una apertura automática por entrada al Home

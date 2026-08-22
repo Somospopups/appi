@@ -1,4 +1,4 @@
-# Estado al retomar — APPI v304
+# Estado al retomar — APPI v305
 
 Repo: `github.com/somospopups/appi` · **suite en verde**.
 
@@ -6,7 +6,21 @@ Corrida local completa: **282 pruebas pasan, 1 salteada, 0 fallan** (sin flakes 
 
 ---
 
-## Último cambio: v304 · Mazo de tarjetas de notificaciones en el Home
+## Último cambio: v305 · Mazo pulido
+
+Ajustes tras la prueba del equipo: tarjetas todas del mismo tamaño (alto
+fijo, cuerpo con scroll, CTA anclado), la ✗ en la punta derecha de CADA
+tarjeta (cierra el mazo), arrastre desde cualquier parte de la tarjeta
+(umbral de 7px distingue toque de arrastre; la captura del puntero se
+toma recién al arrastrar para no matar los clicks), vuelo con curva más
+suave y las tarjetas de atrás suben en la misma transición.
+
+Bug real encontrado por el camino: el mazo se abría sobre el candado y
+sobre el panel admin (view-home queda 'active' debajo). Guardia nueva
+sesionDeDistribuidor(): nunca sin sesión, nunca rol admin. Y
+botones-vivos.spec ahora cierra el mazo en su limpieza entre clicks.
+
+## Anterior: v304 · Mazo de tarjetas de notificaciones en el Home
 
 Feature grande pedida por el equipo (especificada con 6 preguntas):
 home-tarjetas.js. Mazo estilo Tinder al entrar al Home (solo si hay
