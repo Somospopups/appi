@@ -44,6 +44,20 @@
       return full.split(/\s+/)[0] || '';
     }catch(e){ return ''; }
   }
+  // La planilla trae "TRONCOSO, SEBASTIAN" a los gritos; en las tarjetas se
+  // lee mejor "Sebastian Troncoso": nombre y apellido, en su orden (v323).
+  function nombreLindo(n){
+    var t = String(n == null ? '' : n).trim();
+    if (!t) return '';
+    if (t.indexOf(',') >= 0){
+      var partes = t.split(',');
+      t = ((partes[1] || '').trim() + ' ' + (partes[0] || '').trim()).trim();
+    }
+    if (t === t.toUpperCase()){
+      t = t.toLowerCase().replace(/(^|[\s-])([a-záéíóúüñ])/g, function(m, a, b){ return a + b.toUpperCase(); });
+    }
+    return t;
+  }
 
   /* ---------- el aliento del día ----------
      Muchas frases para que no se repitan seguido: se sortea entre las que
@@ -259,7 +273,7 @@
       var filas = [], items = [];
       gente.slice(0, 3).forEach(function(p){
         var pb = Number(p.pnAct || p.pb || 0);
-        filas.push('<li>🎯 <b>' + esc(String(p.nombre || '').split(',')[0]) + '</b> está en ' + String(pb).replace('.', ',') + ' PB' + (telValidoB(p) ? '' : ' <i>sin teléfono</i>') + '</li>');
+        filas.push('<li>🎯 <b>' + esc(nombreLindo(p.nombre)) + '</b> está en ' + String(pb).replace('.', ',') + ' PB' + (telValidoB(p) ? '' : ' <i>sin teléfono</i>') + '</li>');
         items.push(proponer(p));
       });
       return {
@@ -323,11 +337,11 @@
 
     var filas = [], items = [];
     equipo.slice(0, 2).forEach(function(p){
-      filas.push('<li>🎂 <b>' + esc(String(p.nombre || '').split(',')[0]) + '</b> · de tu equipo' + (telValido(p) ? '' : ' <i>sin teléfono</i>') + '</li>');
+      filas.push('<li>🎂 <b>' + esc(nombreLindo(p.nombre)) + '</b> · de tu equipo' + (telValido(p) ? '' : ' <i>sin teléfono</i>') + '</li>');
       items.push(saludarEquipo(p));
     });
     clientes.slice(0, 2).forEach(function(u){
-      filas.push('<li>🎂 <b>' + esc(String(u.usuario || '').split(',')[0]) + '</b> · cliente</li>');
+      filas.push('<li>🎂 <b>' + esc(nombreLindo(u.usuario)) + '</b> · cliente</li>');
       items.push(saludarCliente(u));
     });
     if (total > 4){
@@ -550,15 +564,17 @@
   function cablearTope(el, t){
     if (!el || el.__cableada) return;
     el.__cableada = true;
-    var irYCerrar = function(ir){ return function(){ cerrar(); try{ ir(); }catch(e){} }; };
+    // La acción se ejecuta con el mazo quieto: las tarjetas quedan donde
+    // estaban, listas para seguir cuando se vuelve al Home (v323).
+    var ejecutar = function(ir){ return function(){ try{ ir(); }catch(e){} }; };
     if (t && t.cta){
       var cta = el.querySelector('.ht-cta');
-      if (cta) cta.onclick = irYCerrar(t.cta.go);
+      if (cta) cta.onclick = ejecutar(t.cta.go);
       // Cada renglón lleva directo: si la tarjeta trae una acción por ítem
       // (como saludar a ESA persona), se usa esa; si no, la general.
       el.querySelectorAll('.ht-lista li').forEach(function(li, i){
         var accion = (t.items && t.items[i]) || t.cta.go;
-        li.onclick = irYCerrar(accion);
+        li.onclick = ejecutar(accion);
       });
     }
     activarArrastre(el);

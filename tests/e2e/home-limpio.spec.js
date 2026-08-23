@@ -295,8 +295,10 @@ test('tocar un renglón de la tarjeta te lleva directo, y la primera se hamaca',
   await page.evaluate(() => window.APPIHomeTarjetas.pasar());
   await expect(page.locator('#htOverlay')).toContainText('Tu jornada');
   await page.locator('.ht-lista li', { hasText: 'Jorge Salas' }).click();
-  await expect(page.locator('#htOverlay')).toHaveCount(0);
   await expect(page.locator('#view-gestion')).toHaveClass(/active/);
+  // El mazo NO se borra por hacer una acción (v323): sigue en el Home,
+  // quieto en su tarjeta, esperando la vuelta.
+  await expect(page.locator('#htOverlay')).toHaveCount(1);
   // Auto-dirigible de verdad: la ficha de Jorge queda abierta, lista para actuar.
   await expect(page.locator('#gestionDrawer')).toContainText('Jorge Salas');
   await expect(page.locator('#gestionDrawer')).toContainText('WhatsApp');
@@ -331,8 +333,8 @@ test('tocar un cumpleaños saluda por WhatsApp directamente', async ({ page }) =
   expect(saludos).toHaveLength(1);
   expect(saludos[0].texto).toContain('Feliz cumpleaños, Ana');
   expect(saludos[0].tel).toContain('351');
-  // El mazo se cerró en el camino.
-  await expect(page.locator('#htOverlay')).toHaveCount(0);
+  // El mazo sigue ahí después del saludo (v323): no desaparece por actuar.
+  await expect(page.locator('#htOverlay')).toHaveCount(1);
 });
 
 test('el mazo espera a que la app cargue: nunca sobre la elección de persona', async ({ page }) => {
@@ -371,8 +373,9 @@ test('un toque con temblor de dedo sobre el botón dispara la acción igual', as
     fire('pointerup', x + 9);
     cta.dispatchEvent(new MouseEvent('click', { bubbles: true, clientX: x + 9, clientY: y }));
   });
-  await expect(page.locator('#htOverlay')).toHaveCount(0, { timeout: 3000 });
-  await expect(page.locator('#gestionDrawer')).toContainText('Jorge Salas');
+  await expect(page.locator('#gestionDrawer')).toContainText('Jorge Salas', { timeout: 5000 });
+  // Y el mazo quedó vivo en el Home (v323).
+  await expect(page.locator('#htOverlay')).toHaveCount(1);
 });
 
 test('las tareas del calendario aceptan hora y se ordenan por ella', async ({ page }) => {
@@ -541,4 +544,30 @@ test('el cumpleañero sin teléfono lo dice en el renglón y el toque lo explica
   await expect(page.locator('.appi-dialog-overlay')).toContainText('planilla');
   const saludos = await page.evaluate(() => window.__saludos);
   expect(saludos).toHaveLength(0);
+});
+
+// v323 · Los renglones muestran nombre y apellido legibles: la planilla trae
+// "TRONCOSO, SEBASTIAN" a los gritos y la tarjeta lo pinta "Sebastian Troncoso".
+test('las tarjetas muestran nombre y apellido, no solo el apellido (v323)', async ({ page }) => {
+  await entrar(page);
+  const hoyLocal = new Date();
+  const cumpleHoy = `1980-${String(hoyLocal.getMonth() + 1).padStart(2, '0')}-${String(hoyLocal.getDate()).padStart(2, '0')}`;
+  await page.evaluate((cumple) => {
+    const data = JSON.parse(localStorage.getItem('equipoData'));
+    data.personas.push({ id: 9, nivel: 1, codigo: '02-111', nombre: 'TRONCOSO, SEBASTIAN', cat: 'D', pnAct: 2, cumple, tel: '351 766-9967', hijos: [] });
+    localStorage.setItem('equipoData', JSON.stringify(data));
+    if (typeof loadEquipoFromStorage === 'function') loadEquipoFromStorage();
+  }, cumpleHoy);
+  const r = await page.evaluate(() => {
+    const t = window.APPIHomeTarjetas.armarTarjetas();
+    return {
+      cumple: (t.find(x => x.cat === 'cumples') || {}).html || '',
+      bonus: (t.find(x => x.cat === 'oportunidades') || {}).html || ''
+    };
+  });
+  // Cumpleaños: nombre y apellido en su orden, sin gritos.
+  expect(r.cumple).toContain('Sebastian Troncoso');
+  expect(r.cumple).not.toContain('TRONCOSO,');
+  // Oportunidades: María Pérez ya venía legible y sigue completa.
+  expect(r.bonus).toContain('María Pérez');
 });

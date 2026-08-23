@@ -1,12 +1,24 @@
-# Estado al retomar — APPI v322
+# Estado al retomar — APPI v323
 
 Repo: `github.com/somospopups/appi` · **suite en verde**.
 
-Corrida local completa: **313 pruebas pasan, 1 salteada, 0 fallan** (sin flakes en esta corrida).
+Corrida local completa: **314 pruebas pasan, 1 salteada, 0 fallan** (sin flakes en esta corrida).
 
 ---
 
-## Último cambio: v322 · El cumpleañero sin teléfono lo dice de frente
+## Último cambio: v323 · Nombre y apellido en las tarjetas + el mazo no desaparece
+
+Dos retoques pedidos: (1) los renglones de Cumpleaños y Oportunidades
+muestran nombre y apellido legibles con nombreLindo() ("TRONCOSO,
+SEBASTIAN" → "Sebastian Troncoso"; da vuelta el orden de la planilla y
+baja mayúsculas a título con acentos/guiones; los nombres ya legibles
+quedan igual). (2) Hacer una acción ya no cierra el mazo: irYCerrar
+pasó a ejecutar() en cablearTope (CTA y renglones); el mazo queda en su
+tarjeta y al volver al Home sigue donde estaba. Tests: 1 nuevo de
+nombres + 3 adaptados (la acción deja el mazo con count 1); 25 del
+Home/mazo en verde.
+
+## Anterior: v322 · El cumpleañero sin teléfono lo dice de frente
 
 Reporte: con dos cumpleañeros, el primero saludaba por WhatsApp y el
 segundo no. Test primero: con teléfonos válidos los DOS renglones
