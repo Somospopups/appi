@@ -158,3 +158,50 @@ test('elegir titular o socio no se cierra con el gesto', async ({ page }) => {
   });
   expect(cuenta).toBe(0);
 });
+
+// v317 · El calendario se cerraba con el gesto de atrás "por la ventana":
+// panel-atras escondía #calModal con hidden, pero el fondo #calOverlay quedaba
+// con la clase open para siempre. El guard de overlays lo veía "abierto" y no
+// liberaba el scroll nunca más: Mi Equipo (la pantalla larga) quedaba muerta.
+// En la computadora no pasaba porque no hay botón de atrás: solo en el teléfono.
+
+test('el gesto de atrás cierra el calendario por la puerta y el scroll sigue vivo (regresión v317)', async ({ page }) => {
+  await entrar(page);
+  await page.locator('#hlCardOpen').click();
+  await expect(page.locator('#calOverlay')).toHaveClass(/open/);
+
+  await page.goBack();
+
+  // El fondo del calendario no queda colgado tapando la pantalla.
+  await expect(page.locator('#calOverlay')).not.toHaveClass(/open/);
+  const overflow = await page.evaluate(() => document.body.style.overflow);
+  expect(overflow).not.toBe('hidden');
+
+  // Y en Mi Equipo se scrollea normal.
+  await page.evaluate(() => {
+    window.openEquipo();
+    const sp = document.createElement('div');
+    sp.style.height = '2000px';
+    document.getElementById('view-equipo').appendChild(sp);
+  });
+  await page.mouse.move(640, 400);
+  await page.mouse.wheel(0, 500);
+  await page.waitForTimeout(300);
+  const top = await page.evaluate(() => document.body.scrollTop || window.scrollY);
+  expect(top).toBeGreaterThan(100);
+});
+
+test('después del gesto de atrás, el calendario vuelve a abrir entero', async ({ page }) => {
+  await entrar(page);
+  await page.locator('#hlCardOpen').click();
+  await expect(page.locator('#calOverlay')).toHaveClass(/open/);
+
+  await page.goBack();
+  await expect(page.locator('#calOverlay')).not.toHaveClass(/open/);
+
+  // Reabrir muestra el panel completo: antes quedaba el fondo oscuro vacío,
+  // porque el modal seguía escondido con hidden.
+  await page.locator('#hlCardOpen').click();
+  await expect(page.locator('#calOverlay')).toHaveClass(/open/);
+  await expect(page.locator('#calModal')).toBeVisible();
+});

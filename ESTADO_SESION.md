@@ -1,12 +1,28 @@
-# Estado al retomar — APPI v316
+# Estado al retomar — APPI v317
 
 Repo: `github.com/somospopups/appi` · **suite en verde**.
 
-Corrida local completa: **282 pruebas pasan, 1 salteada, 0 fallan** (sin flakes en esta corrida).
+Corrida local completa: **308 pruebas pasan, 1 salteada, 0 fallan** (sin flakes en esta corrida).
 
 ---
 
-## Último cambio: v316 · Mazo dentro del Home + 2 bugs de fondo
+## Último cambio: v317 · El gesto de atrás cierra el calendario por la puerta
+
+Bug real solo-teléfono: al cerrar el calendario con el botón/gesto de
+atrás de Android, panel-atras.js no encontraba el botón de cerrar (el ×
+no tenía aria-label) y escondía #calModal con hidden, dejando el fondo
+#calOverlay con la clase open para siempre. El guard de overlays lo veía
+"abierto" y liberarScrollCuerpo no liberaba nunca más → scroll muerto en
+toda la app (Mi Equipo, la pantalla larga, era donde más se notaba). En
+la compu nunca se reprodujo porque los tests cerraban con la ✕. Arreglo:
+el × del calendario lleva aria-label="Cerrar" (panel-atras lo clickea y
+closeCal libera todo), panel-atras vigila #calOverlay (que es quien
+lleva la clase open) en vez de #calModal, cerrarTodos() libera el scroll
+como cinturón si algún panel se cerró por la ventana, y renderCal revive
+un modal que quedó con hidden. 2 tests de regresión nuevos en
+panel-atras.spec.js (goBack + scroll vivo + reabrir entero).
+
+## Anterior: v316 · Mazo dentro del Home + 2 bugs de fondo
 
 El mazo dejó de ser popup: vive en una tarjeta contenedora arriba del
 Home con todo igual (pila, gestos ida/vuelta, ✗ descarta una, acciones

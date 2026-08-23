@@ -27,7 +27,7 @@
     '#gestionDetailOverlay',   // ficha de un contacto del Panel
     '#stOverlay',              // Mi stock
     '#appiDeviceOverlay',      // teléfonos vinculados
-    '#calModal',               // calendario
+    '#calOverlay',             // calendario (el fondo lleva la clase open; v317)
     '#demoObjectionSheet',     // objeciones del Coach de Demo
     '#orgCanvas',              // organización del equipo
     '#adminLoginOverlay',      // ingreso de administración
@@ -101,6 +101,12 @@
   function cerrarTodos(){
     var lista = abiertos();
     for (var i = lista.length - 1; i >= 0; i--) cerrar(lista[i]);
+    // Si algún panel se cerró por la ventana (sin pasar por su propio botón),
+    // que el cuerpo no quede trabado: cuando ya no hay overlays a la vista,
+    // el guard libera el scroll; si todavía hay uno, no hace nada (v317).
+    if (lista.length && window.liberarScrollCuerpo){
+      try { window.liberarScrollCuerpo(); } catch (e) {}
+    }
     return lista.length > 0;
   }
 

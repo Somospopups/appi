@@ -325,6 +325,8 @@
   function renderCal(){
     var modal = $('calModal');
     if(!modal) return;
+    // Si el gesto de atrás lo escondió a lo bruto (hidden), reabrir lo revive (v317).
+    modal.hidden = false;
     var y = calState.year, m = calState.month;
     var firstDay = new Date(y, m, 1).getDay();
     var daysInMonth = new Date(y, m + 1, 0).getDate();
@@ -337,7 +339,7 @@
         '<button id="calPrev">‹</button>' +
         '<button id="calNext">›</button>' +
       '</div>' +
-      '<button class="cal-close" id="calClose">×</button>' +
+      '<button class="cal-close" id="calClose" aria-label="Cerrar">×</button>' +
     '</div>';
 
     html += '<div class="cal-grid">';
