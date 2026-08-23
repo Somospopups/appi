@@ -618,3 +618,57 @@ test('al arrastrar asoma la tarjeta correcta según la dirección (v324)', async
   expect(r.izquierda).toContain(r.kickers[2]);  // a la izquierda asoma la SIGUIENTE
   expect(r.despues).toContain(r.kickers[2]);    // el rebote deja la siguiente asomando
 });
+
+// v325 · La primera tarjeta se viste distinta: fondo pleno azul-violeta,
+// frase grande con comilla, chips vidriosos y el 💙 de marca de agua. Las
+// demás tarjetas quedan con su vestido de siempre.
+test('la tarjeta especial se viste distinta y sin espacio muerto (v325)', async ({ page }) => {
+  await entrar(page);
+  await page.evaluate(() => window.APPIHomeTarjetas.abrir());
+  const top = page.locator('.ht-card:not(.detras1):not(.detras2):not(.ht-fantasma)');
+  await expect(top).toHaveClass(/ht-esp/);
+  const r = await page.evaluate(() => {
+    const el = document.querySelector('.ht-card.ht-esp');
+    return {
+      fondo: getComputedStyle(el).backgroundImage,
+      colorFrase: getComputedStyle(el.querySelector('.ht-esp-frase')).color,
+      comilla: !!el.querySelector('.ht-esp-comilla'),
+      marca: !!el.querySelector('.ht-esp-marca'),
+      // La frase vive centrada: el cuerpo es una columna flex con margin auto.
+      centro: getComputedStyle(el.querySelector('.ht-esp-centro')).marginTop
+    };
+  });
+  expect(r.fondo).toContain('linear-gradient');
+  expect(r.colorFrase).toBe('rgb(255, 255, 255)');
+  expect(r.comilla).toBe(true);
+  expect(r.marca).toBe(true);
+  expect(r.centro).not.toBe('0px');   // margin:auto reparte el espacio, no queda muerto
+  // La siguiente tarjeta NO lleva el vestido especial.
+  await page.evaluate(() => window.APPIHomeTarjetas.pasar());
+  await page.waitForTimeout(450);
+  await expect(page.locator('.ht-card:not(.detras1):not(.detras2):not(.ht-fantasma)')).not.toHaveClass(/ht-esp/);
+});
+
+// v325 · El botón grande de Cumpleaños lleva a la lista del mes en Mi Equipo.
+test('el botón de Cumpleaños dice Revisar los cumpleaños del mes y va a Mi Equipo (v325)', async ({ page }) => {
+  await entrar(page);
+  const hoyLocal = new Date();
+  const cumpleHoy = `1980-${String(hoyLocal.getMonth() + 1).padStart(2, '0')}-${String(hoyLocal.getDate()).padStart(2, '0')}`;
+  await page.evaluate((cumple) => {
+    const data = JSON.parse(localStorage.getItem('equipoData'));
+    data.personas.push({ id: 9, nivel: 1, codigo: '02-111', nombre: 'LOPEZ, ANA', cat: 'D', pnAct: 2, cumple, tel: '351 766-9967', hijos: [] });
+    localStorage.setItem('equipoData', JSON.stringify(data));
+    if (typeof loadEquipoFromStorage === 'function') loadEquipoFromStorage();
+  }, cumpleHoy);
+  await page.evaluate(() => window.APPIHomeTarjetas.abrir());
+  while (!(await page.locator('.ht-card:not(.detras1):not(.detras2):not(.ht-fantasma)').textContent()).includes('cumpleaños')) {
+    await page.evaluate(() => window.APPIHomeTarjetas.pasar());
+    await page.waitForTimeout(400);
+  }
+  const cta = page.locator('.ht-card:not(.detras1):not(.detras2):not(.ht-fantasma) .ht-cta');
+  await expect(cta).toHaveText('Revisar los cumpleaños del mes');
+  await cta.click();
+  await expect(page.locator('#view-equipo')).toHaveClass(/active/);
+  // Y la lista de cumpleaños del mes está ahí para revisar.
+  await expect(page.locator('#bdayListWrap')).toBeVisible({ timeout: 5000 });
+});

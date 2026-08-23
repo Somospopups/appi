@@ -1,12 +1,25 @@
-# Estado al retomar — APPI v324
+# Estado al retomar — APPI v325
 
 Repo: `github.com/somospopups/appi` · **suite en verde**.
 
-Corrida local completa: **316 pruebas pasan, 1 salteada, 0 fallan** (sin flakes en esta corrida).
+Corrida local completa: **318 pruebas pasan, 1 salteada, 0 fallan** (sin flakes en esta corrida).
 
 ---
 
-## Último cambio: v324 · Asomo fiel + botón de Oportunidades a Mi Equipo
+## Último cambio: v325 · Tarjeta especial de gala + Cumpleaños al mes
+
+(1) La tarjeta 💙 se viste distinta (.ht-card.ht-esp): fondo pleno
+azul-violeta en degradado, frase 21px blanca con comilla decorativa,
+cuerpo flex con margin:auto (sin espacio muerto), chips vidriosos
+abajo y 💙 de marca de agua; degradado propio en modo oscuro
+(especificidad: body.dark .ht-card.ht-esp .ht-esp-frase). crearCarta()
+pone la clase base y pintar/asomar solo suman detras1/2. (2) El CTA de
+Cumpleaños dice "Revisar los cumpleaños del mes": abrirEquipo() +
+scroll con reintentos hasta #bdayListWrap. 2 tests nuevos; 29 del
+Home/mazo. Captura de referencia: /home/user/tarjeta-especial-v325.png
+(fuera del repo).
+
+## Anterior: v324 · Asomo fiel + botón de Oportunidades a Mi Equipo
 
 (1) El CTA de la tarjeta de Oportunidades dice "Ir a Mi Equipo" y va a
 abrirEquipo() (antes "Proponerle a X"; los renglones siguen con la

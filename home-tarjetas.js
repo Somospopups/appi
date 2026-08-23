@@ -211,8 +211,10 @@
     return {
       cat: 'especial', icono: '💙', kicker: 'Para vos' + (nombre ? ', ' + nombre : ''),
       titulo: 'Tu impulso de hoy',
-      html: '<p class="ht-frase">' + esc(frase) + '</p>' +
-            (chips.length ? '<div class="ht-chips">' + chips.map(function(c){ return '<span>' + esc(c) + '</span>'; }).join('') + '</div>' : ''),
+      html: '<div class="ht-esp-centro"><span class="ht-esp-comilla">“</span>' +
+            '<p class="ht-frase ht-esp-frase">' + esc(frase) + '</p></div>' +
+            (chips.length ? '<div class="ht-chips">' + chips.map(function(c){ return '<span>' + esc(c) + '</span>'; }).join('') + '</div>' : '') +
+            '<span class="ht-esp-marca">💙</span>',
       cta: null
     };
   }
@@ -348,13 +350,23 @@
       filas.push('<li>… y más cumpleaños</li>');
       items.push(clientes.length > 2 ? function(){ if (typeof window.showView === 'function') window.showView('view-usuarios'); } : abrirEquipo);
     }
-    var primero = items[0];
+    // El botón grande lleva a la lista de cumpleaños del mes en Mi Equipo:
+    // se abre la pantalla y se hace scroll hasta la lista (v325).
+    var verCumplesDelMes = function(){
+      abrirEquipo();
+      var intentos = 0;
+      (function buscar(){
+        var lista = document.getElementById('bdayListWrap') || document.querySelector('.bday-list');
+        if (lista){ try{ lista.scrollIntoView({ behavior: 'smooth', block: 'start' }); }catch(e){ lista.scrollIntoView(); } return; }
+        if (++intentos < 10) setTimeout(buscar, 300);
+      })();
+    };
     return {
       cat: 'cumples', icono: '🎂', kicker: 'Cumpleaños',
       titulo: total === 1 ? 'Hoy hay un cumpleaños' : 'Hoy hay ' + total + ' cumpleaños',
       html: '<ul class="ht-lista">' + filas.join('') + '</ul><p class="ht-nota">Tocá a la persona y sale el saludo por WhatsApp.</p>',
       items: items,
-      cta: { label: 'Saludar a ' + (equipo.length ? pila(equipo[0].nombre) : pila(clientes[0] && clientes[0].usuario)) , go: primero }
+      cta: { label: 'Revisar los cumpleaños del mes', go: verCumplesDelMes }
     };
   }
 
@@ -491,6 +503,20 @@
       '.ht-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}',
       '.ht-chips span{padding:7px 12px;border-radius:999px;background:rgba(91,141,239,.1);color:#3d63c9;font-size:12.5px;font-weight:900}',
       '.ht-cta{margin-top:12px;min-height:52px;border:0;border-radius:15px;background:linear-gradient(135deg,#5b8def,#8b63e8);color:#fff;font:inherit;font-size:15px;font-weight:900;cursor:pointer}',
+      /* La tarjeta especial se viste distinta: fondo pleno, frase grande y
+         centrada, chips vidriosos y el corazón de marca de agua (v325). */
+      '.ht-card.ht-esp{background:linear-gradient(150deg,#4f7df2,#8b63e8 55%,#a06bff);}',
+      'body.dark .ht-card.ht-esp{background:linear-gradient(150deg,#3b5fc4,#6f4cc4 55%,#7e54d6)}',
+      '.ht-card.ht-esp .ht-kicker{color:rgba(255,255,255,.9)}',
+      '.ht-card.ht-esp h3{color:#fff;text-shadow:0 1px 6px rgba(20,20,60,.25)}',
+      '.ht-card.ht-esp .ht-cuerpo{display:flex;flex-direction:column}',
+      '.ht-esp-centro{margin:auto 0;position:relative;padding:4px 2px 0}',
+      '.ht-esp-comilla{position:absolute;top:-14px;left:-4px;font-size:58px;line-height:1;color:rgba(255,255,255,.35);font-weight:900;pointer-events:none}',
+      '.ht-esp-frase{margin:0;padding-left:14px;color:#fff;font-size:21px;line-height:1.45;font-weight:800;letter-spacing:-.2px;text-shadow:0 1px 8px rgba(20,20,60,.22)}',
+      '.ht-card.ht-esp .ht-chips{margin-top:14px}',
+      '.ht-card.ht-esp .ht-chips span{background:rgba(255,255,255,.18);color:#fff;border:1px solid rgba(255,255,255,.22)}',
+      '.ht-esp-marca{position:absolute;right:10px;bottom:2px;font-size:74px;line-height:1;opacity:.16;pointer-events:none}',
+      'body.dark .ht-card.ht-esp .ht-esp-frase{color:#fff}',
       '.ht-hint{text-align:center;color:#9a9ba8;font-size:10.5px;font-weight:800}',
       'body.dark .ht-card{background:linear-gradient(160deg,#262838,#1f2130)}',
       'body.dark .ht-card h3{color:#f2f2f7}body.dark .ht-frase{color:#c9cad8}body.dark .ht-lista li{background:rgba(255,255,255,.07);color:#d4d5e2}'
@@ -531,6 +557,7 @@
 
   function crearCarta(t){
     var el = document.createElement('div');
+    el.className = 'ht-card' + (t.cat === 'especial' ? ' ht-esp' : '');
     el.innerHTML = '<div class="ht-cab"><span class="ht-ico">' + t.icono + '</span>' +
       '<span class="ht-kicker">' + esc(t.kicker) + '</span></div>' +
       '<h3>' + esc(t.titulo) + '</h3>' +
@@ -556,7 +583,7 @@
     for (var j = Math.min(2, len - 1); j >= 1; j--){
       var k = ((mazo.i + offs[j - 1]) % len + len) % len;
       var el = crearCarta(mazo.tarjetas[k]);
-      el.className = 'ht-card ' + (j === 1 ? 'detras1' : 'detras2');
+      el.classList.add(j === 1 ? 'detras1' : 'detras2');
       deck.insertBefore(el, top);
     }
   }
@@ -578,7 +605,7 @@
       var k = (mazo.i + off) % len;
       var t = mazo.tarjetas[k];
       var el = crearCarta(t);
-      el.className = 'ht-card' + (off === 0 ? '' : off === 1 ? ' detras1' : ' detras2');
+      if (off > 0) el.classList.add(off === 1 ? 'detras1' : 'detras2');
       if (off === 0){
         cablearTope(el, t);
         // La primera vez, la tarjeta se hamaca sola: así se entiende el gesto.
