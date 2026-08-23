@@ -86,7 +86,7 @@ function renderPagos(){
 }
 (function(){
 'use strict';
-const state={users:[],requests:[],filter:'',whatsapp:'',createMembership:1,bound:false,pruebas:new Map(),acciones:[],accionesFiltro:'',pagos:null,pagosMes:'',revenue:null,userAbierto:''};
+const state={users:[],requests:[],filter:'',whatsapp:'',createMembership:1,bound:false,pruebas:new Map(),acciones:[],accionesFiltro:'',pagos:null,pagosMes:'',revenue:null,userAbierto:'',telefonos:new Map()};
 const $=id=>document.getElementById(id);
 const esc=value=>String(value==null?'':value).replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
 const cfg=()=>window.APPIAuth.config();
@@ -194,6 +194,7 @@ function renderUsers(){
       <button type="button" data-admin-action="grace_period">📅 Prórroga</button>
       <button type="button" data-admin-action="password">🔑 Nueva contraseña</button>
       <button type="button" data-admin-action="people">👥 Personas</button>
+      <button type="button" data-admin-action="phone">📱 Teléfono</button>
       <button type="button" class="trial" data-admin-action="trial">🧪 Prueba 5 días</button>
       <button type="button" class="forever" data-admin-action="forever">♾️ Para siempre</button>
       <button type="button" class="${user.activo?'danger':'good'}" data-admin-action="active" data-active="${user.activo?'0':'1'}">${user.activo?'⛔ Bloquear':'✓ Activar'}</button>
@@ -202,7 +203,7 @@ function renderUsers(){
     return `<article class="admin-user-row" data-admin-user="${esc(user.user_id)}">
       <button type="button" class="admin-user-head" data-user-toggle="${esc(user.user_id)}">
         <div><h3>${esc(user.nombre||'Sin nombre')}${user.socio_nombre?` + ${esc(user.socio_nombre)}`:''}</h3>
-        <p>${esc(user.dip||'Sin número')} · Vence ${esc(expires)}</p></div>
+        <p>${esc(user.dip||'Sin número')} · Vence ${esc(expires)}${state.telefonos.get(user.user_id)?` · 📱 ${esc(state.telefonos.get(user.user_id))}`:''}</p></div>
         <span class="admin-user-badges"><span class="admin-user-badge ${user.activo?'':'blocked'}">${user.activo?'ACTIVA':'BLOQUEADA'}</span><span class="membership-state ${membership.cls}">${membership.label}</span></span>
         <span class="admin-user-chev ${abierto?'open':''}">›</span>
       </button>${acciones}</article>`}).join('');
@@ -223,7 +224,17 @@ function renderRequests(){const list=$('adminPendingList');if(!list)return;
   if(!state.requests.length){list.innerHTML='<div class="admin-pending-empty">No hay solicitudes pendientes.</div>';return}list.innerHTML=state.requests.map(item=>`<article class="admin-user-row" data-request-id="${esc(item.id)}"><div><h3>${esc(item.nombre)}${item.socio_nombre?` + ${esc(item.socio_nombre)}`:''}</h3><p>${item.socio_nombre?`Socio/a: ${esc(item.socio_nombre)}<br>`:''}${esc(item.dip)} · ${esc(item.telefono)}<br>${new Date(item.created_at).toLocaleString('es-AR')}</p><span class="admin-user-badge blocked">PENDIENTE</span></div><div class="admin-row-actions"><button type="button" class="wa" data-request-action="whatsapp">WhatsApp</button><button type="button" class="good" data-request-action="approve">Aprobar</button><button type="button" class="danger" data-request-action="reject">Rechazar</button></div></article>`).join('');list.querySelectorAll('[data-request-action]').forEach(button=>button.onclick=()=>handleRequestAction(button))}
 function notifyAdminMemberships(){const alerts=state.users.filter(user=>user.rol!=='admin'&&membershipInfo(user).days<=7);if(!alerts.length)return;const today=new Date().toISOString().slice(0,10),key=`appi_admin_membresias_${today}`;if(sessionStorage.getItem(key))return;sessionStorage.setItem(key,'1');const names=alerts.slice(0,8).map(user=>`${user.nombre||user.dip}: ${membershipInfo(user).label}`).join('\n');window.APPIDialog.alert(`${alerts.length} membresía${alerts.length===1?'':'s'} requiere${alerts.length===1?'':'n'} atención.\n\n${names}`,{title:'Membresías por vencer',icon:'⏳',okText:'Revisar'})}
 function render(){updateStats();renderUsers();renderRequests();if($('adminWhatsappNumber'))$('adminWhatsappNumber').value=state.whatsapp||''}
-async function load(){const users=$('adminUserList'),requests=$('adminPendingList');if(users)users.innerHTML='<div class="empty">Cargando cuentas…</div>';if(requests)requests.innerHTML='<div class="admin-pending-empty">Cargando solicitudes…</div>';try{const [userData,requestData,settings]=await Promise.all([callAdmin({action:'list'}),callAdmin({action:'list_requests'}),callAdmin({action:'get_settings'})]);state.users=userData.users||[];state.requests=requestData.requests||[];state.whatsapp=settings.whatsapp||'';render();notifyAdminMemberships()}catch(error){if(users)users.innerHTML=`<div class="admin-inline-status show error">${esc(error.message)}</div>`;if(requests)requests.innerHTML=''}loadAcciones().catch(()=>{});loadPruebas().catch(()=>{});loadPagos().catch(()=>{});if(window.APPIAdminMembership&&window.APPIAdminMembership.loadRevenueStats)window.APPIAdminMembership.loadRevenueStats().then(r=>{state.revenue=r;renderHero()}).catch(()=>{})}
+async function load(){const users=$('adminUserList'),requests=$('adminPendingList');if(users)users.innerHTML='<div class="empty">Cargando cuentas…</div>';if(requests)requests.innerHTML='<div class="admin-pending-empty">Cargando solicitudes…</div>';try{const [userData,requestData,settings]=await Promise.all([callAdmin({action:'list'}),callAdmin({action:'list_requests'}),callAdmin({action:'get_settings'})]);state.users=userData.users||[];state.requests=requestData.requests||[];state.whatsapp=settings.whatsapp||'';render();notifyAdminMemberships()}catch(error){if(users)users.innerHTML=`<div class="admin-inline-status show error">${esc(error.message)}</div>`;if(requests)requests.innerHTML=''}loadAcciones().catch(()=>{});loadPruebas().catch(()=>{});loadPagos().catch(()=>{});loadTelefonos().catch(()=>{});if(window.APPIAdminMembership&&window.APPIAdminMembership.loadRevenueStats)window.APPIAdminMembership.loadRevenueStats().then(r=>{state.revenue=r;renderHero()}).catch(()=>{})}
+/* Teléfonos de los distribuidores (v313): el 💬 va directo cuando hay número.
+   Si la migración no corrió, el panel sigue andando con el selector. */
+async function loadTelefonos(){
+  try{const rows=await rpcAdmin('appi_admin_telefonos',{});state.telefonos=new Map((Array.isArray(rows)?rows:[]).map(r=>[r.cuenta,r.telefono]))}catch(e){state.telefonos=new Map()}
+  renderUsers();
+}
+async function guardarTelefono(userId,telefono){
+  await rpcAdmin('appi_admin_set_telefono',{p_user_id:userId,p_telefono:String(telefono||'').trim()});
+  await loadTelefonos();
+}
 /* Qué cuentas están en modo PRUEBA (v294). Si la migración no corrió, el
    panel sigue andando sin los badges. */
 async function loadPruebas(){
@@ -321,6 +332,7 @@ async function create(){
     setStatus('adminCreateStatus',esPrueba?`Cuenta creada en modo PRUEBA (5 días): ${data.user.dip} · contraseña temporal lista.`:esSiempre?`Cuenta creada con acceso PARA SIEMPRE: ${data.user.dip} · contraseña temporal lista.`:`Cuenta creada: ${data.user.dip} · contraseña temporal lista.`);
     await navigator.clipboard.writeText(`APPI\nDistribuidor: ${data.user.dip}\nTitular: ${nombre}${socioNombre?`\nSocio/a: ${socioNombre}`:''}\nContraseña temporal: ${password}`).catch(()=>{});
     const telefonoNuevo=$('adminTelefono')?$('adminTelefono').value:'';
+    if(data.user&&data.user.user_id&&String(telefonoNuevo||'').trim())guardarTelefono(data.user.user_id,telefonoNuevo).catch(()=>{});
     ['adminSucursal','adminNumero','adminNombre','adminPartnerName','adminTempPassword','adminTelefono'].forEach(id=>{const f=$(id);if(f)f.value=''});$('adminHasPartner').checked=false;$('adminPartnerField').hidden=true;
     cerrarCrearCuenta();
     popupCredenciales({nombre,dip:data.user.dip,socio:socioNombre,password,telefono:telefonoNuevo,esPrueba});
@@ -343,7 +355,29 @@ async function handleUserAction(button){
     }
     if(action==='whatsapp_dist'){
       const pilaDist=(user.nombre||'').trim().split(/\s+/)[0]||'';
-      abrirWhatsAppCredencial('', `Hola ${pilaDist}! 😊 ¿Cómo vas con APPI? ¿Necesitás ayuda con algo? Cualquier cosa estoy acá para darte una mano. 💪`, pilaDist);
+      const mensaje=`Hola ${pilaDist}! 😊 ¿Cómo vas con APPI? ¿Necesitás ayuda con algo? Cualquier cosa estoy acá para darte una mano. 💪`;
+      let telDist=state.telefonos.get(userId)||'';
+      if(!(telDist&&window.APPITel&&window.APPITel.esValido(telDist))){
+        // Sin número guardado: se ofrece cargarlo una vez y queda para siempre.
+        const nuevoTel=await window.APPIDialog.prompt(`Cargá el WhatsApp de ${user.nombre||user.dip} para ir directo (con código de área, ej: 351 766-9967). Dejalo vacío para elegir el contacto a mano.`,telDist,{title:'WhatsApp del distribuidor',icon:'📱',inputType:'tel',okText:'Continuar'});
+        if(nuevoTel===null)return;
+        const limpio=String(nuevoTel||'').trim();
+        if(limpio&&window.APPITel&&window.APPITel.esValido(limpio)){
+          try{await guardarTelefono(userId,limpio);telDist=limpio}catch(error){await window.APPIDialog.alert(error.message,{title:'No se pudo guardar',icon:'!'});telDist=limpio}
+        } else telDist='';
+      }
+      if(telDist&&window.APPITel&&window.APPITel.esValido(telDist))window.APPITel.abrir(telDist,mensaje,pilaDist);
+      else abrirWhatsAppCredencial('',mensaje,pilaDist);
+      return;
+    }
+    if(action==='phone'){
+      const actual=state.telefonos.get(userId)||'';
+      const nuevoTel=await window.APPIDialog.prompt('WhatsApp del distribuidor, con código de área (ej: 351 766-9967). Dejá vacío para borrarlo.',actual,{title:`📱 ${user.nombre||user.dip}`,icon:'📱',inputType:'tel',okText:'Guardar'});
+      if(nuevoTel===null)return;
+      const limpio=String(nuevoTel||'').trim();
+      if(limpio&&!(window.APPITel&&window.APPITel.esValido(limpio))){await window.APPIDialog.alert('Ese número no parece un celular argentino válido. Revisá el código de área.',{title:'Número incompleto',icon:'📵'});return}
+      await guardarTelefono(userId,limpio);
+      if(typeof showToast==='function')showToast(limpio?'Teléfono guardado 📱':'Teléfono borrado');
       return;
     }
     if(action==='forever'){
@@ -408,6 +442,7 @@ async function handleRequestAction(button){
       try{await rpcAdmin(esPrueba?'appi_admin_activar_prueba':'appi_admin_para_siempre',{p_user_id:result.user.user_id})}
       catch(error){throw new Error(`La cuenta se aprobó, pero no se pudo completar: ${error.message} Usá la píldora de su carpeta.`)}
     }
+    if(result.user&&result.user.user_id&&item.telefono)guardarTelefono(result.user.user_id,item.telefono).catch(()=>{});
     const text=`APPI\nDistribuidor: ${result.user.dip}\nTitular: ${result.user.nombre}${result.user.socio_nombre?`\nSocio/a: ${result.user.socio_nombre}`:''}\nContraseña temporal: ${password}`;await navigator.clipboard.writeText(text).catch(()=>{});
     popupCredenciales({nombre:result.user.nombre||item.nombre,dip:result.user.dip,socio:result.user.socio_nombre||'',password,telefono:item.telefono,esPrueba});
     await load();
@@ -461,7 +496,7 @@ SOLICITUDES PENDIENTES
 Las personas que piden acceso desde la app aparecen acá. Al aprobar elegís 1 mes o PRUEBA, y podés mandar las credenciales por WhatsApp.
 
 CUENTAS (Distribuidores)
-La sección arranca minimizada con el resumen; tocala para abrir. Cada distribuidor es un renglón: tocalo y se despliegan todas sus acciones, cómodas y con nombre: 💬 WhatsApp (le mandás un "¿cómo vas con APPI?"), 💳 Registrar pago y 📅 Prórroga (ambos sacan del modo prueba solos), 🔑 Nueva contraseña, 👥 Personas, 🧪 Prueba 5 días, ♾️ Para siempre (acceso permanente), Bloquear y Eliminar.
+La sección arranca minimizada con el resumen; tocala para abrir. Cada distribuidor es un renglón: tocalo y se despliegan todas sus acciones, cómodas y con nombre: 💬 WhatsApp (va directo si la cuenta tiene el número guardado — al aprobar una solicitud queda solo; con 📱 Teléfono lo cargás o corregís cuando quieras), 💳 Registrar pago y 📅 Prórroga (ambos sacan del modo prueba solos), 🔑 Nueva contraseña, 👥 Personas, 🧪 Prueba 5 días, ♾️ Para siempre (acceso permanente), Bloquear y Eliminar.
 
 CUMPLIMIENTO DIARIO
 Lo que cada cuenta marcó con ✓ y ✗ en sus acciones del día: hoy y últimos 7 días. La sección arranca minimizada con el resumen a la vista; tocala para abrir el detalle y usá el buscador por nombre o DIP.

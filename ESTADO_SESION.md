@@ -1,4 +1,4 @@
-# Estado al retomar — APPI v312
+# Estado al retomar — APPI v313
 
 Repo: `github.com/somospopups/appi` · **suite en verde**.
 
@@ -6,7 +6,18 @@ Corrida local completa: **282 pruebas pasan, 1 salteada, 0 fallan** (sin flakes 
 
 ---
 
-## Último cambio: v312 · X descarta de a una + Distribuidores cómodos
+## Último cambio: v313 · WhatsApp directo al distribuidor
+
+El teléfono de la solicitud ahora queda en appi_perfiles.telefono al
+aprobar (y el opcional al crear). El 💬 de cada cuenta va directo si hay
+número válido (APPITel); si falta, ofrece cargarlo una vez (queda) o
+elegir contacto a mano. Botón 📱 Teléfono para editar/borrar. RPCs
+appi_admin_set_telefono / appi_admin_telefonos en SUPABASE_TELEFONOS.sql.
+
+⚠️ PENDIENTE DE DESPLIEGUE: correr SUPABASE_TELEFONOS.sql (y
+SUPABASE_PARA_SIEMPRE.sql de v312 si aún no corrió).
+
+## Anterior: v312 · X descarta de a una + Distribuidores cómodos
 
 Mazo: la ✗ de cada tarjeta descarta SOLO esa (vuelo incluido); cerrar
 todo = ✕ del encabezado o tocar el fondo. Panel admin/Distribuidores:

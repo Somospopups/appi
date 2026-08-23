@@ -140,3 +140,20 @@ test('los distribuidores: minimizable, WhatsApp directo y PARA SIEMPRE (v312)', 
   expect(sql).toContain("rol = 'admin'");
   expect(sql).toContain('2099-12-31');
 });
+
+test('el teléfono del distribuidor queda guardado y el 💬 va directo (v313)', () => {
+  const js = panel();
+  // Al aprobar, el teléfono de la solicitud pasa al perfil sin pasos extra.
+  expect(js).toContain('guardarTelefono(result.user.user_id,item.telefono)');
+  // Al crear, el teléfono opcional también queda.
+  expect(js).toContain('guardarTelefono(data.user.user_id,telefonoNuevo)');
+  // El botón va directo con número válido y ofrece cargarlo si falta.
+  expect(js).toContain("state.telefonos.get(userId)");
+  expect(js).toContain('appi_admin_set_telefono');
+  expect(js).toContain('appi_admin_telefonos');
+  expect(js).toContain('data-admin-action="phone"');
+  const sql = fs.readFileSync('SUPABASE_TELEFONOS.sql', 'utf8');
+  expect(sql).toContain('add column if not exists telefono');
+  expect(sql).toContain("rol = 'admin'");
+  expect(sql).toContain('appi_admin_set_telefono');
+});
