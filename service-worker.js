@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v309-mazo-espera-su-turno';
+const CACHE_NAME = 'appi-v310-accion-directa';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

@@ -27,7 +27,7 @@ test.describe('la franja roja de la versión de prueba', () => {
     expect(t).toContain('Tu prueba terminó');
   });
 
-  test('la franja se dibuja fija, sin botón de cerrar, y empuja el contenido', async ({ page }) => {
+  test('la franja se dibuja fija, sin botón de cerrar, y empuja sin tapar', async ({ page }) => {
     await page.evaluate(() => window.APPIPrueba.pintar(Date.now() + 3 * 86400000));
     const bar = page.locator('#appiPruebaBar');
     await expect(bar).toBeVisible();
@@ -36,7 +36,13 @@ test.describe('la franja roja de la versión de prueba', () => {
     expect(await bar.locator('button').count()).toBe(0);
     const body = page.locator('body');
     await expect(body).toHaveClass(/appi-prueba/);
-    // Se apaga sola cuando la cuenta deja el modo prueba.
+    // No tapa: la pantalla se achica exactamente el alto real de la franja.
+    const medidas = await page.evaluate(() => ({
+      franja: Math.ceil(document.getElementById('appiPruebaBar').getBoundingClientRect().height),
+      padding: parseFloat(getComputedStyle(document.body).paddingTop)
+    }));
+    expect(medidas.padding).toBeGreaterThanOrEqual(medidas.franja);
+    // Se apaga sola cuando la cuenta deja el modo prueba, y devuelve el espacio.
     await page.evaluate(() => window.APPIPrueba.apagar());
     await expect(page.locator('#appiPruebaBar')).toHaveCount(0);
   });

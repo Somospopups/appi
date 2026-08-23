@@ -1,4 +1,4 @@
-# Estado al retomar — APPI v309
+# Estado al retomar — APPI v310
 
 Repo: `github.com/somospopups/appi` · **suite en verde**.
 
@@ -6,7 +6,17 @@ Corrida local completa: **282 pruebas pasan, 1 salteada, 0 fallan** (sin flakes 
 
 ---
 
-## Último cambio: v309 · El mazo espera su turno
+## Último cambio: v310 · Acción directa, gesto ida/vuelta, franja que achica
+
+(1) El botón grande de TODAS las tarjetas ejecuta la primera acción
+(como Usuarios): Ir con Jorge (ficha), Proponerle a Ana (WA bonus),
+Saludar a X (WA cumple), primer carrusel, vencidos de hoy. (2) Deslizar:
+izquierda pasa, derecha vuelve a la anterior (entra volando desde la
+izquierda; en la primera hace resorte). (3) La franja de PRUEBA mide su
+alto real y setea --appi-prueba-alto: el body y el deskSidebar se corren
+exactamente eso; nada queda tapado; al apagarse devuelve el espacio.
+
+## Anterior: v309 · El mazo espera su turno
 
 Bug reportado: las tarjetas salían antes de tiempo (sobre la elección
 titular/socio). Causa: view-home queda activa debajo de los overlays de

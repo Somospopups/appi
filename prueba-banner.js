@@ -39,20 +39,33 @@
           '#appiPruebaBar{position:fixed;top:0;left:0;right:0;z-index:10080;' +
           'background:linear-gradient(135deg,#e02424,#b91c1c);color:#fff;' +
           'font-weight:900;font-size:12.5px;line-height:1.35;text-align:center;' +
-          'padding:9px 14px calc(9px + env(safe-area-inset-top, 0px) * 0);letter-spacing:.3px;' +
+          'padding:9px 14px;letter-spacing:.3px;' +
           'padding-top:calc(9px + env(safe-area-inset-top, 0px));' +
           'box-shadow:0 3px 14px rgba(185,28,28,.35);pointer-events:none}' +
-          'body.appi-prueba{padding-top:calc(36px + env(safe-area-inset-top, 0px))}';
+          /* La franja no tapa nada: la pantalla se achica exactamente su alto,
+             medido en vivo (una o dos líneas, con o sin notch). */
+          'body.appi-prueba{padding-top:var(--appi-prueba-alto, 38px)}' +
+          'body.appi-prueba #deskSidebar{top:var(--appi-prueba-alto, 38px)}';
         document.head.appendChild(st);
       }
     }
     b.textContent = texto(vence);
+    ajustarAltura();
   }
+
+  function ajustarAltura(){
+    var b = document.getElementById('appiPruebaBar');
+    if (!b) return;
+    var alto = Math.ceil(b.getBoundingClientRect().height);
+    if (alto > 0) document.documentElement.style.setProperty('--appi-prueba-alto', alto + 'px');
+  }
+  window.addEventListener('resize', function(){ setTimeout(ajustarAltura, 120); });
 
   function apagar(){
     var b = document.getElementById('appiPruebaBar');
     if (b) b.remove();
     document.body.classList.remove('appi-prueba');
+    document.documentElement.style.removeProperty('--appi-prueba-alto');
     window.__appiEsPrueba = false;
     clearInterval(TIMER);
     TIMER = null;

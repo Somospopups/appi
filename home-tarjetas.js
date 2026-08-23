@@ -222,12 +222,13 @@
       filas.push('<li>… y ' + (lista.length - 3) + ' más</li>');
       items.push(function(){ if (typeof window.openMiGestion === 'function') window.openMiGestion(); });
     }
+    var primero = String(lista[0].nombre || '').split(/\s+|,/)[0] || 'la primera';
     return {
       cat: 'jornada', icono: '📅', kicker: 'Tu jornada',
       titulo: lista.length === 1 ? '1 contacto te espera hoy' : lista.length + ' contactos te esperan hoy',
       html: '<ul class="ht-lista">' + filas.join('') + '</ul><p class="ht-nota">Tocá a la persona y se abre su ficha, lista para escribirle o llamarla.</p>',
       items: items,
-      cta: { label: 'Abrir el Panel', go: function(){ if (typeof window.openMiGestion === 'function') window.openMiGestion(); } }
+      cta: { label: 'Ir con ' + primero, go: items[0] }
     };
   }
 
@@ -261,7 +262,7 @@
         titulo: gente.length === 1 ? 'Un Bonus al alcance de la mano' : gente.length + ' Bonus al alcance de la mano',
         html: '<ul class="ht-lista">' + filas.join('') + '</ul><p class="ht-nota">Tocá a la persona y sale la propuesta por WhatsApp.</p>',
         items: items,
-        cta: { label: 'Ver Mi Equipo', go: abrirEquipo }
+        cta: { label: 'Proponerle a ' + (pilaB(gente[0].nombre) || 'la primera persona'), go: items[0] }
       };
     }catch(e){ return null; }
   }
@@ -325,7 +326,7 @@
       titulo: total === 1 ? 'Hoy hay un cumpleaños' : 'Hoy hay ' + total + ' cumpleaños',
       html: '<ul class="ht-lista">' + filas.join('') + '</ul><p class="ht-nota">Tocá a la persona y sale el saludo por WhatsApp.</p>',
       items: items,
-      cta: { label: 'Saludar ahora', go: primero }
+      cta: { label: 'Saludar a ' + (equipo.length ? pila(equipo[0].nombre) : pila(clientes[0] && clientes[0].usuario)) , go: primero }
     };
   }
 
@@ -382,7 +383,9 @@
       titulo: 'Hay gente esperando tu mensaje',
       html: '<ul class="ht-lista">' + filas.join('') + '</ul><p class="ht-nota">Tocá a la persona y se abre su ficha. Las primeras 24 horas pesan más que una semana.</p>',
       items: items,
-      cta: { label: 'Abrir el Panel', go: function(){ if (typeof window.openMiGestion === 'function') window.openMiGestion(); } }
+      cta: nuevos.length
+        ? { label: 'Ir con ' + (String(nuevos[0].nombre || '').split(/\s+|,/)[0] || 'la primera'), go: items[0] }
+        : { label: 'Ver los vencidos de hoy', go: vistaHoy }
     };
   }
 
@@ -408,7 +411,7 @@
               '<div class="ht-chips"><span>✓ ' + r.hechas + '</span><span>✗ ' + r.noHechas + '</span><span>quedan ' + r.pendientes + '</span></div>' +
               '<p class="ht-nota">Tocá un motivo y se abre el carrusel para mandar y marcar ✓/✗.</p>',
         items: items,
-        cta: { label: 'Ir a marcar', go: function(){ if (typeof window.showView === 'function') window.showView('view-usuarios'); } }
+        cta: { label: 'Ir a marcar', go: items[0] || function(){ if (typeof window.showView === 'function') window.showView('view-usuarios'); } }
       };
     }catch(e){ return null; }
   }
@@ -498,7 +501,7 @@
     ov.innerHTML = '<div class="ht-top"><div><b>🔔 Notificaciones</b></div><span id="htPos"></span></div>' +
       '<div class="ht-centro"><div class="ht-deck" id="htDeck"></div>' +
       '<button type="button" class="ht-pasar" id="htPasar">Pasar ›</button>' +
-      '<div class="ht-hint">Deslizá la tarjeta hacia un costado para pasarla</div></div>' +
+      '<div class="ht-hint">← Deslizá a la izquierda para pasar · a la derecha volvés →</div></div>' +
       '<div class="ht-espacio"></div>';
     document.body.appendChild(ov);
     document.getElementById('htPasar').onclick = function(){ pasar(); };
@@ -559,13 +562,13 @@
     activarArrastre(el);
   }
 
-  function pasar(direccion){
+  function pasar(){
     if (!mazo) return;
     var deck = document.getElementById('htDeck');
     var top = deck && deck.querySelector('.ht-card:not(.detras1):not(.detras2)');
     if (top){
       top.classList.add('vuela');
-      top.style.transform = 'translateX(' + (direccion < 0 ? '-' : '') + '130vw) translateY(-4vh) rotate(' + (direccion < 0 ? '-' : '') + '22deg)';
+      top.style.transform = 'translateX(-130vw) translateY(-4vh) rotate(-22deg)';
       // Las de atrás suben a su nuevo lugar mientras la de arriba vuela:
       // la transición base de .ht-card hace el resto.
       var d1 = deck.querySelector('.ht-card.detras1');
@@ -576,6 +579,24 @@
     } else {
       mazo.i++; pintar();
     }
+  }
+
+  // Deslizar a la derecha vuelve a la tarjeta anterior: entra volando desde
+  // la izquierda, por donde se había ido.
+  function volver(){
+    if (!mazo || mazo.i === 0) return false;
+    mazo.i--;
+    pintar();
+    var deck = document.getElementById('htDeck');
+    var top = deck && deck.querySelector('.ht-card:not(.detras1):not(.detras2)');
+    if (top){
+      top.classList.add('arrastre');
+      top.style.transform = 'translateX(-130vw) rotate(-22deg)';
+      void top.offsetWidth;                    // forzar el punto de partida
+      top.classList.remove('arrastre');
+      top.style.transform = '';
+    }
+    return true;
   }
 
   function activarArrastre(el){
@@ -604,7 +625,8 @@
       if (!arrastrando) return;
       arrastrando = false;
       el.classList.remove('arrastre');
-      if (el.__arrastro && Math.abs(dx) > 80){ pasar(dx); }
+      if (el.__arrastro && dx < -80){ pasar(); }
+      else if (el.__arrastro && dx > 80 && volver()){ /* volvió a la anterior */ }
       else if (el.__arrastro){ el.classList.add('volver'); el.style.transform = ''; setTimeout(function(){ el.classList.remove('volver'); }, 360); }
     }
     el.addEventListener('pointerup', soltar);

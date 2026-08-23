@@ -216,17 +216,27 @@ test('el botón Notificaciones late con el contador y reabre el mazo', async ({ 
   await expect(page.locator('#htOverlay')).toContainText('Tu impulso de hoy');
 });
 
-test('deslizar la tarjeta la pasa, como corresponde a un mazo', async ({ page }) => {
+test('deslizar a la izquierda pasa y a la derecha vuelve a la anterior', async ({ page }) => {
   await entrar(page);
   await page.evaluate(() => window.APPIHomeTarjetas.abrir());
-  const card = page.locator('.ht-card:not(.detras1):not(.detras2)');
-  await expect(card).toContainText('Tu impulso de hoy');
-  const box = await card.boundingBox();
-  await page.mouse.move(box.x + box.width / 2, box.y + 60);
+  const top = () => page.locator('.ht-card:not(.detras1):not(.detras2)');
+  await expect(top()).toContainText('Tu impulso de hoy');
+  // Izquierda: pasa a la siguiente.
+  let box = await top().boundingBox();
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
   await page.mouse.down();
-  await page.mouse.move(box.x + box.width / 2 + 160, box.y + 70, { steps: 8 });
+  await page.mouse.move(box.x + box.width / 2 - 170, box.y + box.height / 2 + 8, { steps: 8 });
   await page.mouse.up();
-  await expect(page.locator('#htOverlay')).toContainText('Tu jornada');
+  await expect(page.locator('#htPos')).toContainText('2 de');
+  // Derecha: vuelve a la anterior.
+  await page.waitForTimeout(450);
+  box = await top().boundingBox();
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(box.x + box.width / 2 + 170, box.y + box.height / 2 + 8, { steps: 8 });
+  await page.mouse.up();
+  await expect(page.locator('#htPos')).toContainText('1 de');
+  await expect(top()).toContainText('Tu impulso de hoy');
 });
 
 test('hay frases de sobra y la del día no cambia dentro del mismo día', async ({ page }) => {
