@@ -14,9 +14,10 @@
      📇 Panel de Contactos · nuevos sin contactar y vencidos
      💧 Usuarios · las acciones del día sin marcar (✓/✗)
 
-   Deslizar pasa la tarjeta; el botón de cada tarjeta lleva a la
-   pantalla. El Home tiene el botón 🔔 Notificaciones: parpadea
-   con el contador cuando hay tarjetas sin ver y las reabre.
+   Deslizar pasa la tarjeta y el mazo da la vuelta en bucle: se
+   puede ir para adelante y para atrás sin fin. El mazo vive
+   siempre a la vista arriba del Home; el botón de cada tarjeta
+   lleva directo a la pantalla que corresponde.
    ============================================================ */
 (function(){
   'use strict';
@@ -424,16 +425,6 @@
     return lista;
   }
   function cuantasNovedades(){ return armarTarjetas().length - 1; } // la especial no cuenta como "pendiente"
-  function firmaTarjetas(){
-    return hoyKey() + '|' + armarTarjetas().map(function(t){ return t.cat; }).join(',');
-  }
-  function vistoKey(){ return 'appi_tarjetas_visto_' + uid(); }
-  function hayNovedadesSinVer(){
-    return cuantasNovedades() > 0 && localStorage.getItem(vistoKey()) !== firmaTarjetas();
-  }
-  function marcarVisto(){
-    try{ localStorage.setItem(vistoKey(), firmaTarjetas()); }catch(e){}
-  }
 
   /* ---------- el mazo ---------- */
   var mazo = null; // { tarjetas, i }
@@ -446,10 +437,8 @@
       '#htOverlay{position:relative;margin:0 0 14px;padding:14px 12px 12px;border-radius:22px;background:linear-gradient(160deg,rgba(91,141,239,.09),rgba(160,107,255,.08));border:1px solid rgba(255,255,255,.7)}',
       'body.dark #htOverlay{background:linear-gradient(160deg,rgba(91,141,239,.13),rgba(160,107,255,.11));border-color:rgba(255,255,255,.08)}',
       '.ht-top{display:flex;align-items:center;gap:10px;padding:0 4px 10px}',
-      '.ht-top b{font-size:14px;color:#30303d}.ht-top span{font-size:11px;color:#777887;font-weight:800;margin-left:auto;margin-right:8px}',
+      '.ht-top b{font-size:14px;color:#30303d}.ht-top span{font-size:11px;color:#777887;font-weight:800;margin-left:auto;margin-right:2px}',
       'body.dark .ht-top b{color:#f2f2f7}',
-      '.ht-cerrar{width:38px;height:38px;border:0;border-radius:50%;background:rgba(120,120,140,.12);color:#63636f;font-size:18px;font-weight:900;cursor:pointer}',
-      'body.dark .ht-cerrar{background:rgba(255,255,255,.1);color:#c9cad8}',
       '.ht-centro{display:flex;flex-direction:column;align-items:center;gap:11px}',
       '.ht-deck{position:relative;width:100%;max-width:400px;height:min(56vh,440px);margin:0 auto}',
       '.ht-card{position:absolute;inset:0;display:flex;flex-direction:column;padding:18px 20px;border-radius:24px;background:linear-gradient(160deg,#ffffff,#f4f6ff);box-shadow:0 22px 60px rgba(10,12,40,.35);touch-action:pan-y;user-select:none;-webkit-user-select:none;cursor:grab;will-change:transform;transition:transform .32s cubic-bezier(.22,.9,.35,1),opacity .32s ease}',
@@ -463,8 +452,6 @@
       '.ht-cab{display:flex;align-items:center;gap:8px;margin-bottom:2px}',
       '.ht-cab .ht-ico{font-size:24px;line-height:1}',
       '.ht-card .ht-kicker{flex:1;min-width:0;color:#3d63c9;font-size:11.5px;font-weight:950;letter-spacing:.7px;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
-      '.ht-x{flex:0 0 auto;width:34px;height:34px;border:0;border-radius:50%;background:rgba(120,120,140,.12);color:#63636f;font-size:17px;font-weight:900;line-height:1;cursor:pointer}',
-      '.ht-x:hover{background:rgba(224,36,36,.14);color:#c0392b}',
       '.ht-card h3{margin:9px 0 11px;color:#1d1d2c;font-size:23px;line-height:1.22;letter-spacing:-.4px}',
       '.ht-cuerpo{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;min-height:0;touch-action:pan-y}',
       '.ht-frase{margin:0;color:#41424f;font-size:17.5px;line-height:1.55;font-weight:700}',
@@ -477,17 +464,9 @@
       '.ht-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}',
       '.ht-chips span{padding:7px 12px;border-radius:999px;background:rgba(91,141,239,.1);color:#3d63c9;font-size:12.5px;font-weight:900}',
       '.ht-cta{margin-top:12px;min-height:52px;border:0;border-radius:15px;background:linear-gradient(135deg,#5b8def,#8b63e8);color:#fff;font:inherit;font-size:15px;font-weight:900;cursor:pointer}',
-      '.ht-pasar{min-height:44px;padding:0 30px;border:0;border-radius:999px;background:rgba(91,141,239,.13);color:#3d63c9;font:inherit;font-size:13.5px;font-weight:900;cursor:pointer}',
-      'body.dark .ht-pasar{background:rgba(255,255,255,.1);color:#9db7f5}',
       '.ht-hint{text-align:center;color:#9a9ba8;font-size:10.5px;font-weight:800}',
-      /* botón del Home */
-      '.ht-boton{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:50px;margin:0 0 12px;border:1px solid rgba(91,141,239,.2);border-radius:16px;background:rgba(255,255,255,.8);color:#3d63c9;font:inherit;font-size:13.5px;font-weight:900;cursor:pointer}',
-      '.ht-boton b{min-width:24px;padding:3px 8px;border-radius:999px;background:#e02424;color:#fff;font-size:11px}',
-      '.ht-boton.late{border-color:rgba(224,36,36,.4);animation:htLatido 1.1s ease-in-out infinite}',
-      '@keyframes htLatido{0%,100%{box-shadow:0 0 0 0 rgba(224,36,36,.35);transform:scale(1)}50%{box-shadow:0 0 0 10px rgba(224,36,36,0);transform:scale(1.015)}}',
       'body.dark .ht-card{background:linear-gradient(160deg,#262838,#1f2130)}',
-      'body.dark .ht-x{background:rgba(255,255,255,.1);color:#c9cad8}body.dark .ht-card h3{color:#f2f2f7}body.dark .ht-frase{color:#c9cad8}body.dark .ht-lista li{background:rgba(255,255,255,.07);color:#d4d5e2}',
-      'body.dark .ht-boton{background:rgba(31,32,49,.8);border-color:rgba(255,255,255,.12);color:#9db7f5}'
+      'body.dark .ht-card h3{color:#f2f2f7}body.dark .ht-frase{color:#c9cad8}body.dark .ht-lista li{background:rgba(255,255,255,.07);color:#d4d5e2}'
     ].join('');
     document.head.appendChild(st);
   }
@@ -496,7 +475,6 @@
   function abrir(reusar){
     if (!sesionDeDistribuidor()) return false;
     css();
-    actualizarBoton();
     var home = document.getElementById('homeLimpio');
     if (!home) return false;
     if (!(reusar && mazo && mazo.tarjetas && mazo.tarjetas.length)){
@@ -508,16 +486,10 @@
     if (previo) previo.remove();
     var ov = document.createElement('div');
     ov.id = 'htOverlay';
-    ov.innerHTML = '<div class="ht-top"><div><b>🔔 Notificaciones</b></div><span id="htPos"></span>' +
-      '<button type="button" class="ht-cerrar" id="htCerrar" aria-label="Cerrar notificaciones">×</button></div>' +
+    ov.innerHTML = '<div class="ht-top"><div><b>🔔 Notificaciones</b></div><span id="htPos"></span></div>' +
       '<div class="ht-centro"><div class="ht-deck" id="htDeck"></div>' +
-      '<button type="button" class="ht-pasar" id="htPasar">Pasar ›</button>' +
-      '<div class="ht-hint">← Deslizá a la izquierda para pasar · a la derecha volvés →</div></div>';
-    var boton = document.getElementById('htBoton');
-    if (boton && boton.parentNode === home) home.insertBefore(ov, boton.nextSibling);
-    else home.insertBefore(ov, home.firstChild);
-    document.getElementById('htPasar').onclick = function(){ pasar(); };
-    document.getElementById('htCerrar').onclick = function(){ marcarVisto(); cerrar(); };
+      '<div class="ht-hint">← Deslizá para un lado o para el otro: las tarjetas dan la vuelta →</div></div>';
+    home.insertBefore(ov, home.firstChild);
     inlineAbierto = true;
     pintar();
     return true;
@@ -528,7 +500,6 @@
     if (ov) ov.remove();
     mazo = null;
     inlineAbierto = false;
-    actualizarBoton();
   }
 
   function pintar(){
@@ -537,19 +508,24 @@
     var pos = document.getElementById('htPos');
     if (!deck) return;
     deck.querySelectorAll('.ht-card').forEach(function(n){ n.remove(); });
-    if (mazo.i >= mazo.tarjetas.length){ marcarVisto(); cerrar(); return; }
-    if (pos) pos.textContent = (mazo.i + 1) + ' de ' + mazo.tarjetas.length;
-    for (var k = Math.min(mazo.i + 2, mazo.tarjetas.length - 1); k >= mazo.i; k--){
+    var len = mazo.tarjetas.length;
+    if (!len){ cerrar(); return; }
+    // El mazo es un bucle: el índice siempre da la vuelta.
+    mazo.i = ((mazo.i % len) + len) % len;
+    if (pos) pos.textContent = (mazo.i + 1) + ' de ' + len;
+    // Se pintan la de arriba y hasta dos de atrás; con el bucle, después de la
+    // última asoma de nuevo la primera.
+    for (var off = Math.min(2, len - 1); off >= 0; off--){
+      var k = (mazo.i + off) % len;
       var t = mazo.tarjetas[k];
       var el = document.createElement('div');
-      el.className = 'ht-card' + (k === mazo.i ? '' : k === mazo.i + 1 ? ' detras1' : ' detras2');
+      el.className = 'ht-card' + (off === 0 ? '' : off === 1 ? ' detras1' : ' detras2');
       el.innerHTML = '<div class="ht-cab"><span class="ht-ico">' + t.icono + '</span>' +
-        '<span class="ht-kicker">' + esc(t.kicker) + '</span>' +
-        '<button type="button" class="ht-x" aria-label="Descartar esta notificación" title="Descartar">×</button></div>' +
+        '<span class="ht-kicker">' + esc(t.kicker) + '</span></div>' +
         '<h3>' + esc(t.titulo) + '</h3>' +
         '<div class="ht-cuerpo">' + t.html + '</div>' +
         (t.cta ? '<button type="button" class="ht-cta">' + esc(t.cta.label) + '</button>' : '');
-      if (k === mazo.i){
+      if (off === 0){
         cablearTope(el, t);
         // La primera vez, la tarjeta se hamaca sola: así se entiende el gesto.
         if (mazo.i === 0 && !mazo.demoHecha){ mazo.demoHecha = true; el.classList.add('demo'); }
@@ -561,9 +537,7 @@
   function cablearTope(el, t){
     if (!el || el.__cableada) return;
     el.__cableada = true;
-    var x = el.querySelector('.ht-x');
-    if (x) x.onclick = function(){ pasar(); };   // descarta esta tarjeta y sigue
-    var irYCerrar = function(ir){ return function(){ marcarVisto(); cerrar(); try{ ir(); }catch(e){} }; };
+    var irYCerrar = function(ir){ return function(){ cerrar(); try{ ir(); }catch(e){} }; };
     if (t && t.cta){
       var cta = el.querySelector('.ht-cta');
       if (cta) cta.onclick = irYCerrar(t.cta.go);
@@ -579,6 +553,8 @@
 
   function pasar(){
     if (!mazo) return;
+    var len = mazo.tarjetas.length;
+    if (len < 2) return;                         // con una sola no hay a dónde ir
     var deck = document.getElementById('htDeck');
     var top = deck && deck.querySelector('.ht-card:not(.detras1):not(.detras2)');
     if (top){
@@ -588,19 +564,20 @@
       // la transición base de .ht-card hace el resto.
       var d1 = deck.querySelector('.ht-card.detras1');
       var d2 = deck.querySelector('.ht-card.detras2');
-      if (d1){ d1.classList.remove('detras1'); cablearTope(d1, mazo.tarjetas[mazo.i + 1]); }
+      if (d1){ d1.classList.remove('detras1'); cablearTope(d1, mazo.tarjetas[(mazo.i + 1) % len]); }
       if (d2){ d2.classList.remove('detras2'); d2.classList.add('detras1'); }
-      setTimeout(function(){ if (mazo){ mazo.i++; pintar(); } }, 330);
+      setTimeout(function(){ if (mazo){ mazo.i = (mazo.i + 1) % len; pintar(); } }, 330);
     } else {
-      mazo.i++; pintar();
+      mazo.i = (mazo.i + 1) % len; pintar();
     }
   }
 
   // Deslizar a la derecha vuelve a la tarjeta anterior: entra volando desde
-  // la izquierda, por donde se había ido.
+  // la izquierda, por donde se había ido. Desde la primera, da la vuelta y
+  // aparece la última: el mazo es un bucle para los dos lados.
   function volver(){
-    if (!mazo || mazo.i === 0) return false;
-    mazo.i--;
+    if (!mazo || mazo.tarjetas.length < 2) return false;
+    mazo.i = (mazo.i - 1 + mazo.tarjetas.length) % mazo.tarjetas.length;
     pintar();
     var deck = document.getElementById('htDeck');
     var top = deck && deck.querySelector('.ht-card:not(.detras1):not(.detras2)');
@@ -654,26 +631,6 @@
     }, true);
   }
 
-  /* ---------- el botón del Home ---------- */
-  function actualizarBoton(){
-    if (!sesionDeDistribuidor()) return;
-    var home = document.getElementById('homeLimpio');
-    if (!home) return;
-    var boton = document.getElementById('htBoton');
-    if (!boton){
-      boton = document.createElement('button');
-      boton.id = 'htBoton';
-      boton.type = 'button';
-      boton.className = 'ht-boton';
-      boton.onclick = function(){ abrir(); };
-      home.insertBefore(boton, home.firstChild);
-    }
-    var n = cuantasNovedades();
-    var sinVer = hayNovedadesSinVer();
-    boton.classList.toggle('late', sinVer);
-    boton.innerHTML = '🔔 Notificaciones' + (n > 0 ? ' <b>' + n + '</b>' : '');
-  }
-
   /* ---------- integración con el Home ---------- */
   function esHome(){
     var v = document.getElementById('view-home');
@@ -713,20 +670,20 @@
   function alEntrarAlHome(){
     if (!sesionDeDistribuidor() || !esHome()) return;
     css();
-    actualizarBoton();
     if (autoAbierto) return;      // una apertura automática por entrada al Home
     autoAbierto = true;
-    // La llave existe para las pruebas automatizadas y para depurar: apaga
-    // solo la apertura automática; el botón 🔔 sigue funcionando igual.
+    // La llave existe para las pruebas automatizadas y para depurar: apaga la
+    // apertura automática; el mazo se puede abrir a mano con APPIHomeTarjetas.abrir().
     if (localStorage.getItem('appi_tarjetas_auto') === '0') return;
     var intentos = 0;
     (function esperar(){
       if (!esHome() || document.getElementById('htOverlay')) return;
       if (++intentos > 45) return;                     // ~18 s y desistimos por hoy
       if (!appTerminoDeCargar()){ setTimeout(esperar, 400); return; }
-      // Un respiro final después de cargar, y recién ahí el mazo.
+      // Un respiro final después de cargar, y recién ahí el mazo. Siempre hay
+      // al menos la tarjeta especial: el mazo queda a la vista todos los días.
       setTimeout(function(){
-        if (esHome() && appTerminoDeCargar() && !document.getElementById('htOverlay') && cuantasNovedades() > 0) abrir();
+        if (esHome() && appTerminoDeCargar() && !document.getElementById('htOverlay')) abrir();
       }, 500);
     })();
   }
@@ -746,18 +703,19 @@
     };
     // Si el Home ya estaba activo cuando cargó el módulo:
     if (esHome()) setTimeout(alEntrarAlHome, 900);
-    // El contador del botón respira solo (los datos llegan de a poco) y, si
-    // el Home se repintó con el mazo abierto, se vuelve a montar donde estaba.
+    // Si el Home se repintó con el mazo abierto, se vuelve a montar donde
+    // estaba, conservando la tarjeta en la que se había quedado.
     setInterval(function(){
       if (!esHome()) return;
       if (inlineAbierto && mazo && !document.getElementById('htOverlay')) abrir(true);
-      else if (!document.getElementById('htOverlay')) actualizarBoton();
     }, 2500);
   }
 
   window.APPIHomeTarjetas = {
     abrir: abrir,
     cerrar: cerrar,
+    pasar: pasar,
+    volver: volver,
     armarTarjetas: armarTarjetas,
     cuantasNovedades: cuantasNovedades,
     fraseDelDia: fraseDelDia,

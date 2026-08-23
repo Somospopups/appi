@@ -176,7 +176,7 @@ test('los titulos entran animados desde arriba al cambiar de pantalla', async ({
 
 /* ---------- el mazo de notificaciones (v304) ---------- */
 
-test('el mazo abre con la tarjeta especial primero y se pasa con el botón', async ({ page }) => {
+test('el mazo abre con la tarjeta especial primero y se pasa deslizando', async ({ page }) => {
   await entrar(page);
   await page.evaluate(() => window.APPIHomeTarjetas.abrir());
   const overlay = page.locator('#htOverlay');
@@ -186,7 +186,7 @@ test('el mazo abre con la tarjeta especial primero y se pasa con el botón', asy
   await expect(overlay).toContainText('Para vos, María');
   await expect(page.locator('#htPos')).toContainText('1 de');
   // Pasar avanza a la siguiente categoría con contenido: Tu jornada.
-  await page.locator('#htPasar').click();
+  await page.evaluate(() => window.APPIHomeTarjetas.pasar());
   await expect(overlay).toContainText('Tu jornada');
   await expect(overlay).toContainText('Jorge Salas');
 });
@@ -202,23 +202,37 @@ test('las tarjetas son inteligentes: solo aparecen las categorías con novedades
   expect(cats).not.toContain('usuarios');  // sin planilla de garantías cargada
 });
 
-test('el botón Notificaciones late con el contador y reabre el mazo', async ({ page }) => {
+test('el mazo queda a la vista: sin botón 🔔, sin ✕ de cierre, sin ✗ y sin Pasar (v318)', async ({ page }) => {
   await entrar(page);
   await page.evaluate(() => window.APPIHomeTarjetas.abrir());
-  // La X de la tarjeta descarta SOLO esa tarjeta: el mazo sigue abierto.
-  await page.locator('.ht-card:not(.detras1):not(.detras2) .ht-x').click();
   await expect(page.locator('#htOverlay')).toBeVisible();
-  await expect(page.locator('#htPos')).toContainText('2 de');
-  // El ✕ del encabezado sí cierra todo y lo marca como visto.
-  await page.locator('#htCerrar').click();
-  const boton = page.locator('#htBoton');
-  await expect(boton).toBeVisible();
-  await expect(boton).not.toHaveClass(/late/);
-  await expect(boton).toContainText('Notificaciones');
-  // Reabre al tocarlo.
-  await boton.click();
-  await expect(page.locator('#htOverlay')).toBeVisible();
+  // Nada de cerrarlo ni descartarlo: las tarjetas viven siempre en el Home.
+  await expect(page.locator('#htBoton')).toHaveCount(0);
+  await expect(page.locator('#htCerrar')).toHaveCount(0);
+  await expect(page.locator('.ht-x')).toHaveCount(0);
+  await expect(page.locator('#htPasar')).toHaveCount(0);
+  // Y el texto de abajo explica el bucle, no el viejo "volvés".
+  await expect(page.locator('.ht-hint')).toContainText('dan la vuelta');
+});
+
+test('las tarjetas dan la vuelta en bucle para los dos lados (v318)', async ({ page }) => {
+  await entrar(page);
+  await page.evaluate(() => window.APPIHomeTarjetas.abrir());
+  const total = await page.evaluate(() => window.APPIHomeTarjetas.armarTarjetas().length);
+  expect(total).toBeGreaterThan(1);
+  // Hacia adelante: pasar N veces da la vuelta completa y cae en la primera.
+  for (let i = 0; i < total; i++) {
+    await page.evaluate(() => window.APPIHomeTarjetas.pasar());
+    await page.waitForTimeout(400);
+  }
+  await expect(page.locator('#htPos')).toContainText('1 de');
   await expect(page.locator('#htOverlay')).toContainText('Tu impulso de hoy');
+  // Hacia atrás desde la primera: aparece la última, no rebota.
+  await page.evaluate(() => window.APPIHomeTarjetas.volver());
+  await page.waitForTimeout(400);
+  await expect(page.locator('#htPos')).toContainText(`${total} de ${total}`);
+  // Y el mazo sigue abierto: dar la vuelta nunca lo cierra.
+  await expect(page.locator('#htOverlay')).toBeVisible();
 });
 
 test('deslizar a la izquierda pasa y a la derecha vuelve a la anterior', async ({ page }) => {
@@ -258,27 +272,18 @@ test('hay frases de sobra y la del día no cambia dentro del mismo día', async 
   expect(r.una).toBe(r.dos);
 });
 
-test('todas las tarjetas miden lo mismo y cada una lleva su X en la punta', async ({ page }) => {
+test('todas las tarjetas miden lo mismo', async ({ page }) => {
   await entrar(page);
   await page.evaluate(() => window.APPIHomeTarjetas.abrir());
   const r = await page.evaluate(() => {
     const cards = [...document.querySelectorAll('.ht-card')];
     return {
       alturas: cards.map(c => c.offsetHeight),
-      anchos: cards.map(c => c.offsetWidth),
-      equis: cards.map(c => c.querySelectorAll('.ht-x').length),
-      xALaDerecha: (() => {
-        const top = cards.find(c => !c.classList.contains('detras1') && !c.classList.contains('detras2'));
-        const x = top.querySelector('.ht-x').getBoundingClientRect();
-        const card = top.getBoundingClientRect();
-        return x.right > card.left + card.width * 0.8 && x.top < card.top + 70;
-      })()
+      anchos: cards.map(c => c.offsetWidth)
     };
   });
   expect(new Set(r.alturas).size).toBe(1);   // mismo alto para todas
   expect(new Set(r.anchos).size).toBe(1);    // mismo ancho para todas
-  r.equis.forEach(n => expect(n).toBe(1));   // una X por tarjeta
-  expect(r.xALaDerecha).toBe(true);          // en la punta derecha
 });
 
 test('tocar un renglón de la tarjeta te lleva directo, y la primera se hamaca', async ({ page }) => {
@@ -287,7 +292,7 @@ test('tocar un renglón de la tarjeta te lleva directo, y la primera se hamaca',
   // La primera tarjeta hace el vaivén de demostración.
   await expect(page.locator('.ht-card.demo')).toHaveCount(1);
   // Pasamos a Tu jornada y tocamos a Jorge: tiene que abrir el Panel ya.
-  await page.locator('#htPasar').click();
+  await page.evaluate(() => window.APPIHomeTarjetas.pasar());
   await expect(page.locator('#htOverlay')).toContainText('Tu jornada');
   await page.locator('.ht-lista li', { hasText: 'Jorge Salas' }).click();
   await expect(page.locator('#htOverlay')).toHaveCount(0);
@@ -316,7 +321,7 @@ test('tocar un cumpleaños saluda por WhatsApp directamente', async ({ page }) =
   expect(cats).toContain('cumples');
   // Avanzamos hasta la tarjeta de cumpleaños y tocamos a Ana.
   while (!(await page.locator('.ht-card:not(.detras1):not(.detras2)').textContent()).includes('cumpleaños')) {
-    await page.locator('#htPasar').click();
+    await page.evaluate(() => window.APPIHomeTarjetas.pasar());
     await page.waitForTimeout(400);
   }
   await page.locator('.ht-lista li', { hasText: 'LOPEZ' }).click();
@@ -350,7 +355,7 @@ test('el mazo espera a que la app cargue: nunca sobre la elección de persona', 
 test('un toque con temblor de dedo sobre el botón dispara la acción igual', async ({ page }) => {
   await entrar(page);
   await page.evaluate(() => window.APPIHomeTarjetas.abrir());
-  await page.locator('#htPasar').click();
+  await page.evaluate(() => window.APPIHomeTarjetas.pasar());
   await expect(page.locator('#htOverlay')).toContainText('Tu jornada');
   // El dedo real no baja quieto: baja, tiembla ~9px y suelta. Eso es un TOQUE.
   await page.evaluate(() => {

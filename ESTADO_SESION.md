@@ -1,12 +1,25 @@
-# Estado al retomar — APPI v317
+# Estado al retomar — APPI v318
 
 Repo: `github.com/somospopups/appi` · **suite en verde**.
 
-Corrida local completa: **308 pruebas pasan, 1 salteada, 0 fallan** (sin flakes en esta corrida).
+Corrida local completa: **309 pruebas pasan, 1 salteada, 0 fallan** (sin flakes en esta corrida).
 
 ---
 
-## Último cambio: v317 · El gesto de atrás cierra el calendario por la puerta
+## Último cambio: v318 · El mazo queda a la vista y da la vuelta en bucle
+
+Retoques pedidos por el administrador: se fue el botón 🔔 del Home (el
+mazo queda siempre visible, montado arriba de todo apenas carga la
+app), se fueron el botón "Pasar ›", la ✗ de cada tarjeta y la ✕ del
+encabezado (el mazo no se cierra), y las tarjetas ahora son un bucle
+infinito para los dos lados (índice en módulo: tras la última asoma la
+primera; antes de la primera, la última). Texto de abajo corregido:
+"← Deslizá para un lado o para el otro: las tarjetas dan la vuelta →".
+Se eliminó la maquinaria del botón (contador, latido, marca de visto).
+APPIHomeTarjetas exporta también pasar/volver. 2 tests nuevos de bucle
+y de "no existe nada de lo quitado"; el resto adaptado (20 en total).
+
+## Anterior: v317 · El gesto de atrás cierra el calendario por la puerta
 
 Bug real solo-teléfono: al cerrar el calendario con el botón/gesto de
 atrás de Android, panel-atras.js no encontraba el botón de cerrar (el ×
