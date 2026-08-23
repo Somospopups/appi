@@ -246,7 +246,8 @@
       };
       var abrirEquipo = function(){ if (typeof window.openEquipo === 'function') window.openEquipo(); else if (typeof window.showView === 'function') window.showView('view-equipo'); };
       var proponer = function(p){ return function(){
-        var tel = p.telefono || p.telf || '';
+        // La planilla de Línea Descendente guarda el número en `tel` (v320).
+        var tel = p.tel || p.telefono || p.telf || '';
         var pb = String(Number(p.pnAct || p.pb || 0)).replace('.', ',');
         if (tel && window.APPITel && window.APPITel.esValido(tel)){
           window.APPITel.abrir(tel, 'Hola ' + pilaB(p.nombre) + '! 😊 Vi que ya estás en ' + pb + ' PB… ¡a nada del Bonus! ¿Te ayudo a llegar? Podemos invitar a alguien y trabajarlo juntos esta semana. 💪', pilaB(p.nombre));
@@ -298,7 +299,8 @@
     // de cumpleaños; al cliente lo saluda la plantilla de Mensajes, que además
     // deja marcada la ✓ de la acción del día.
     var saludarEquipo = function(p){ return function(){
-      var tel = p.telefono || p.telf || '';
+      // La planilla de Línea Descendente guarda el número en `tel` (v320).
+      var tel = p.tel || p.telefono || p.telf || '';
       if (tel && window.APPITel && window.APPITel.esValido(tel)){
         window.APPITel.abrir(tel, '¡Feliz cumpleaños, ' + pila(p.nombre) + '! 🎂🎉\n\nTe mando un saludo grande en tu día. Que lo disfrutes mucho.\n\n¡Un abrazo!', pila(p.nombre));
       } else abrirEquipo();

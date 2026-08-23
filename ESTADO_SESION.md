@@ -1,12 +1,24 @@
-# Estado al retomar — APPI v319
+# Estado al retomar — APPI v320
 
 Repo: `github.com/somospopups/appi` · **suite en verde**.
 
-Corrida local completa: **310 pruebas pasan, 1 salteada, 0 fallan** (sin flakes en esta corrida).
+Corrida local completa: **311 pruebas pasan, 1 salteada, 0 fallan** (sin flakes en esta corrida).
 
 ---
 
-## Último cambio: v319 · El vuelo de las tarjetas es igual para los dos lados
+## Último cambio: v320 · El saludo al cumpleañero va directo al WhatsApp
+
+Bug real con datos reales: el lector de la planilla de Línea
+Descendente guarda el número en `tel`, pero tarjetaCumples y
+tarjetaOportunidades buscaban `telefono`/`telf` (campos que la planilla
+no genera) → nunca había número y el toque caía al plan B (abrir Mi
+Equipo) en vez del WhatsApp con el saludo listo. La suite no lo pescaba
+porque el test sembraba `telefono:`, el mismo campo equivocado que leía
+el código. Arreglo: `p.tel || p.telefono || p.telf` en ambas tarjetas;
+el test del cumple ahora siembra `tel:` y hay guardia nuevo para el
+WhatsApp de la tarjeta de Oportunidades. 22 tests del Home/mazo.
+
+## Anterior: v319 · El vuelo de las tarjetas es igual para los dos lados
 
 Al deslizar a la derecha, la tarjeta anterior "entraba desde el
 costado": un efecto distinto al vuelo de pasar. Ahora es espejo

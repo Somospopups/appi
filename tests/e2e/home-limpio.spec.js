@@ -307,9 +307,11 @@ test('tocar un cumpleaños saluda por WhatsApp directamente', async ({ page }) =
   const hoyLocal = new Date();
   const cumpleHoy = `1980-${String(hoyLocal.getMonth() + 1).padStart(2, '0')}-${String(hoyLocal.getDate()).padStart(2, '0')}`;
   await page.evaluate((cumple) => {
-    // Ana cumple años hoy y tiene teléfono válido.
+    // Ana cumple años hoy y tiene teléfono válido, en el campo REAL que
+    // arma el lector de la planilla: `tel` (v320: antes el test sembraba
+    // `telefono`, un campo que la planilla no genera, y eso tapaba el bug).
     const data = JSON.parse(localStorage.getItem('equipoData'));
-    data.personas.push({ id: 9, nivel: 1, codigo: '02-111', nombre: 'LOPEZ, ANA', cat: 'D', pnAct: 2, cumple, telefono: '351 766-9967', hijos: [] });
+    data.personas.push({ id: 9, nivel: 1, codigo: '02-111', nombre: 'LOPEZ, ANA', cat: 'D', pnAct: 2, cumple, tel: '351 766-9967', hijos: [] });
     localStorage.setItem('equipoData', JSON.stringify(data));
     if (typeof loadEquipoFromStorage === 'function') loadEquipoFromStorage();
     window.__saludos = [];
@@ -449,4 +451,33 @@ test('deslizar a la derecha vuela con el mismo gesto que a la izquierda, espejad
   await expect(page.locator('.ht-fantasma')).toHaveCount(0);
   await expect(page.locator('#htPos')).toContainText('1 de');
   await expect(page.locator('.ht-card:not(.detras1):not(.detras2)')).toContainText('Tu impulso de hoy');
+});
+
+// v320 · Los cumpleañeros y las oportunidades de bonus del equipo salen de la
+// planilla de Línea Descendente, donde el teléfono se llama `tel`. Las
+// tarjetas buscaban `telefono`/`telf` (campos que la planilla no genera), así
+// que con datos reales nunca encontraban el número y en vez de abrir el
+// WhatsApp del cumpleañero mandaban a Mi Equipo.
+test('proponer el bonus abre el WhatsApp de la persona con el teléfono real de la planilla (v320)', async ({ page }) => {
+  await entrar(page);
+  await page.evaluate(() => {
+    // María viene de la planilla con su teléfono en `tel`, como en la vida real.
+    const data = JSON.parse(localStorage.getItem('equipoData'));
+    data.personas[0].tel = '351 766-9967';
+    localStorage.setItem('equipoData', JSON.stringify(data));
+    if (typeof loadEquipoFromStorage === 'function') loadEquipoFromStorage();
+    window.__saludos = [];
+    window.APPITel.abrir = (tel, texto, nombre) => { window.__saludos.push({ tel, texto, nombre }); return true; };
+  });
+  await page.evaluate(() => window.APPIHomeTarjetas.abrir());
+  // Avanzamos hasta la tarjeta de Oportunidades y tocamos a María.
+  while (!(await page.locator('.ht-card:not(.detras1):not(.detras2):not(.ht-fantasma)').textContent()).includes('Oportunidades')) {
+    await page.evaluate(() => window.APPIHomeTarjetas.pasar());
+    await page.waitForTimeout(400);
+  }
+  await page.locator('.ht-lista li', { hasText: 'María' }).click();
+  const saludos = await page.evaluate(() => window.__saludos);
+  expect(saludos).toHaveLength(1);
+  expect(saludos[0].texto).toContain('Bonus');
+  expect(saludos[0].tel).toContain('351');
 });

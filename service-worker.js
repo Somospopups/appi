@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v319-vuelo-espejado';
+const CACHE_NAME = 'appi-v320-saludo-directo';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
