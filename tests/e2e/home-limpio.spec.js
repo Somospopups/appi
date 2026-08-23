@@ -238,7 +238,7 @@ test('las tarjetas dan la vuelta en bucle para los dos lados (v318)', async ({ p
 test('deslizar a la izquierda pasa y a la derecha vuelve a la anterior', async ({ page }) => {
   await entrar(page);
   await page.evaluate(() => window.APPIHomeTarjetas.abrir());
-  const top = () => page.locator('.ht-card:not(.detras1):not(.detras2)');
+  const top = () => page.locator('.ht-card:not(.detras1):not(.detras2):not(.ht-fantasma)');
   await expect(top()).toContainText('Tu impulso de hoy');
   // El mazo vive dentro del Home: lo traemos a la vista antes de arrastrar.
   await top().scrollIntoViewIfNeeded();
@@ -422,4 +422,31 @@ test('cerrar el calendario devuelve el scroll en toda la app (regresión v300)',
   await page.waitForTimeout(300);
   const top = await page.evaluate(() => document.body.scrollTop || window.scrollY);
   expect(top).toBeGreaterThan(100);
+});
+
+// v319 · El vuelo al volver era distinto: la tarjeta anterior "entraba desde
+// el costado" en vez de que la de arriba volara. Ahora los dos lados usan el
+// mismo gesto, espejado: a la izquierda vuela girando a la izquierda, a la
+// derecha vuela girando a la derecha, y la que sigue sube desde atrás.
+test('deslizar a la derecha vuela con el mismo gesto que a la izquierda, espejado (v319)', async ({ page }) => {
+  await entrar(page);
+  await page.evaluate(() => window.APPIHomeTarjetas.abrir());
+  await page.evaluate(() => window.APPIHomeTarjetas.pasar());
+  await page.waitForTimeout(450);
+  await expect(page.locator('#htPos')).toContainText('2 de');
+  // Al volver, la tarjeta de arriba vuela hacia la derecha girando: espejo
+  // exacto del vuelo de pasar. Ninguna entra desde el costado.
+  const vuelo = await page.evaluate(() => {
+    window.APPIHomeTarjetas.volver();
+    const f = document.querySelector('.ht-card.ht-fantasma.vuela');
+    return f ? f.style.transform : '(sin fantasma volando)';
+  });
+  expect(vuelo).toContain('translateX(130vw)');
+  expect(vuelo).not.toContain('-130vw');
+  expect(vuelo).toContain('rotate(22deg)');
+  // Termina el vuelo: el fantasma desaparece y la primera quedó arriba.
+  await page.waitForTimeout(600);
+  await expect(page.locator('.ht-fantasma')).toHaveCount(0);
+  await expect(page.locator('#htPos')).toContainText('1 de');
+  await expect(page.locator('.ht-card:not(.detras1):not(.detras2)')).toContainText('Tu impulso de hoy');
 });

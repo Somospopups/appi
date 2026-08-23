@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v318-mazo-bucle';
+const CACHE_NAME = 'appi-v319-vuelo-espejado';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

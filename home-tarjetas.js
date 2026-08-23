@@ -507,7 +507,7 @@
     var deck = document.getElementById('htDeck');
     var pos = document.getElementById('htPos');
     if (!deck) return;
-    deck.querySelectorAll('.ht-card').forEach(function(n){ n.remove(); });
+    deck.querySelectorAll('.ht-card:not(.ht-fantasma)').forEach(function(n){ n.remove(); });
     var len = mazo.tarjetas.length;
     if (!len){ cerrar(); return; }
     // El mazo es un bucle: el índice siempre da la vuelta.
@@ -552,11 +552,11 @@
   }
 
   function pasar(){
-    if (!mazo) return;
+    if (!mazo) return false;
     var len = mazo.tarjetas.length;
-    if (len < 2) return;                         // con una sola no hay a dónde ir
+    if (len < 2) return false;                   // con una sola no hay a dónde ir
     var deck = document.getElementById('htDeck');
-    var top = deck && deck.querySelector('.ht-card:not(.detras1):not(.detras2)');
+    var top = deck && deck.querySelector('.ht-card:not(.detras1):not(.detras2):not(.ht-fantasma)');
     if (top){
       top.classList.add('vuela');
       top.style.transform = 'translateX(-130vw) translateY(-4vh) rotate(-22deg)';
@@ -570,23 +570,33 @@
     } else {
       mazo.i = (mazo.i + 1) % len; pintar();
     }
+    return true;
   }
 
-  // Deslizar a la derecha vuelve a la tarjeta anterior: entra volando desde
-  // la izquierda, por donde se había ido. Desde la primera, da la vuelta y
-  // aparece la última: el mazo es un bucle para los dos lados.
+  // Deslizar a la derecha va a la tarjeta anterior con el MISMO vuelo que al
+  // pasar, pero espejado: la de arriba vuela girando hacia la derecha y la
+  // anterior sube desde atrás a su lugar. El mazo es un bucle para los dos
+  // lados: desde la primera aparece la última.
   function volver(){
     if (!mazo || mazo.tarjetas.length < 2) return false;
+    var deck = document.getElementById('htDeck');
+    var top = deck && deck.querySelector('.ht-card:not(.detras1):not(.detras2):not(.ht-fantasma)');
+    if (top){
+      // La que se va queda volando por encima del mazo mientras abajo ya
+      // está pintada la anterior; al terminar el vuelo, desaparece.
+      top.classList.add('ht-fantasma', 'vuela');
+      top.style.zIndex = '30';
+      top.style.transform = 'translateX(130vw) translateY(-4vh) rotate(22deg)';
+      setTimeout(function(){ if (top.parentNode) top.parentNode.removeChild(top); }, 470);
+    }
     mazo.i = (mazo.i - 1 + mazo.tarjetas.length) % mazo.tarjetas.length;
     pintar();
-    var deck = document.getElementById('htDeck');
-    var top = deck && deck.querySelector('.ht-card:not(.detras1):not(.detras2)');
-    if (top){
-      top.classList.add('arrastre');
-      top.style.transform = 'translateX(-130vw) rotate(-22deg)';
-      void top.offsetWidth;                    // forzar el punto de partida
-      top.classList.remove('arrastre');
-      top.style.transform = '';
+    var nuevo = deck && deck.querySelector('.ht-card:not(.detras1):not(.detras2):not(.ht-fantasma)');
+    if (nuevo){
+      // Arranca un pasito atrás y sube a su lugar: igual que cuando se pasa.
+      nuevo.classList.add('detras1');
+      void nuevo.offsetWidth;                    // forzar el punto de partida
+      nuevo.classList.remove('detras1');
     }
     return true;
   }
@@ -620,7 +630,7 @@
       if (!arrastrando) return;
       arrastrando = false;
       el.classList.remove('arrastre');
-      if (el.__arrastro && dx < -80){ pasar(); }
+      if (el.__arrastro && dx < -80 && pasar()){ /* pasó a la siguiente */ }
       else if (el.__arrastro && dx > 80 && volver()){ /* volvió a la anterior */ }
       else if (el.__arrastro){ el.classList.add('volver'); el.style.transform = ''; setTimeout(function(){ el.classList.remove('volver'); }, 360); }
     }

@@ -1,12 +1,24 @@
-# Estado al retomar — APPI v318
+# Estado al retomar — APPI v319
 
 Repo: `github.com/somospopups/appi` · **suite en verde**.
 
-Corrida local completa: **309 pruebas pasan, 1 salteada, 0 fallan** (sin flakes en esta corrida).
+Corrida local completa: **310 pruebas pasan, 1 salteada, 0 fallan** (sin flakes en esta corrida).
 
 ---
 
-## Último cambio: v318 · El mazo queda a la vista y da la vuelta en bucle
+## Último cambio: v319 · El vuelo de las tarjetas es igual para los dos lados
+
+Al deslizar a la derecha, la tarjeta anterior "entraba desde el
+costado": un efecto distinto al vuelo de pasar. Ahora es espejo
+perfecto: para la derecha la de arriba vuela girando
+(translateX(130vw) rotate(22deg)) como fantasma por encima del mazo
+(ht-fantasma, se elimina al terminar) y la anterior sube desde atrás
+(arranca como detras1 y sube). pintar() y los selectores del tope
+excluyen fantasmas; pasar() devuelve true/false como volver() (con una
+sola tarjeta el gesto rebota suave en ambos sentidos). Test nuevo de
+guardia del vuelo espejado; 21 tests del Home/mazo.
+
+## Anterior: v318 · El mazo queda a la vista y da la vuelta en bucle
 
 Retoques pedidos por el administrador: se fue el botón 🔔 del Home (el
 mazo queda siempre visible, montado arriba de todo apenas carga la
