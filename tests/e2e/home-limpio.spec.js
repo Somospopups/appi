@@ -204,7 +204,11 @@ test('las tarjetas son inteligentes: solo aparecen las categorías con novedades
 test('el botón Notificaciones late con el contador y reabre el mazo', async ({ page }) => {
   await entrar(page);
   await page.evaluate(() => window.APPIHomeTarjetas.abrir());
-  // Cerrar el mazo lo marca como visto: el botón queda quieto.
+  // La X de la tarjeta descarta SOLO esa tarjeta: el mazo sigue abierto.
+  await page.locator('.ht-card:not(.detras1):not(.detras2) .ht-x').click();
+  await expect(page.locator('#htOverlay')).toBeVisible();
+  await expect(page.locator('#htPos')).toContainText('2 de');
+  // El ✕ del encabezado sí cierra todo y lo marca como visto.
   await page.locator('#htCerrar').click();
   const boton = page.locator('#htBoton');
   await expect(boton).toBeVisible();

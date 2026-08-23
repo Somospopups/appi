@@ -86,7 +86,7 @@ function renderPagos(){
 }
 (function(){
 'use strict';
-const state={users:[],requests:[],filter:'',whatsapp:'',createMembership:1,bound:false,pruebas:new Map(),acciones:[],accionesFiltro:'',pagos:null,pagosMes:'',revenue:null};
+const state={users:[],requests:[],filter:'',whatsapp:'',createMembership:1,bound:false,pruebas:new Map(),acciones:[],accionesFiltro:'',pagos:null,pagosMes:'',revenue:null,userAbierto:''};
 const $=id=>document.getElementById(id);
 const esc=value=>String(value==null?'':value).replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
 const cfg=()=>window.APPIAuth.config();
@@ -94,7 +94,7 @@ function randomPassword(){const upper='ABCDEFGHJKLMNPQRSTUVWXYZ',lower='abcdefgh
 /* Los números de WhatsApp se arman en un solo lugar: telefono.js (window.APPITel).
    Acá vivía una función propia que agregaba dígitos sin validar (por ejemplo
    "+54 280 434264454" terminaba en 549280434264454, un número que no existe). */
-function membershipInfo(user){const time=user.membresia_vence?new Date(user.membresia_vence).getTime():0,days=time?Math.ceil((time-Date.now())/86400000):-1;if(!time)return{label:'SIN MEMBRESÍA',cls:'expired',days};if(days<0)return{label:'VENCIDA',cls:'expired',days};if(days<=7)return{label:days===0?'VENCE HOY':`VENCE EN ${days}D`,cls:'soon',days};return{label:`${days} DÍAS`,cls:'',days}}
+function membershipInfo(user){const time=user.membresia_vence?new Date(user.membresia_vence).getTime():0,days=time?Math.ceil((time-Date.now())/86400000):-1;if(!time)return{label:'SIN MEMBRESÍA',cls:'expired',days};if(days>20000)return{label:'♾️ PARA SIEMPRE',cls:'forever',days};if(days<0)return{label:'VENCIDA',cls:'expired',days};if(days<=7)return{label:days===0?'VENCE HOY':`VENCE EN ${days}D`,cls:'soon',days};return{label:`${days} DÍAS`,cls:'',days}}
 async function callAdmin(body,retry=true){
   const configuration=cfg(),token=window.APPIAuth.accessToken();let response;
   try{response=await fetch(String(configuration.url).replace(/\/$/,'')+'/functions/v1/admin-distribuidores',{method:'POST',headers:{apikey:configuration.anonKey,Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body:JSON.stringify(body)})}catch(error){throw new Error('No se pudo conectar con el panel administrador.')}
@@ -163,7 +163,11 @@ function renderAtencion(){
   if(!items.length){list.innerHTML='<div class="admin-pending-empty">✓ Todo en orden: nada urgente por ahora.</div>';return}
   list.innerHTML=items.slice(0,8).map(item=>`<button type="button" class="admin-atencion-row" data-aten-go="${item.go}"><span class="ico">${item.ico}</span><div><b>${esc(item.t)}</b><small>${esc(item.s)}</small></div><span class="chev">›</span></button>`).join('');
   list.querySelectorAll('[data-aten-go]').forEach(button=>button.onclick=()=>{
-    const target=button.dataset.atenGo==='solicitudes'?$('adminPendingCard'):$('adminUserList');
+    if(button.dataset.atenGo!=='solicitudes'){
+      const body=$('adminUsersBody'),toggle=$('adminUsersToggle'),chev=$('adminUsersChevron');
+      if(body&&body.hidden){body.hidden=false;if(toggle)toggle.setAttribute('aria-expanded','true');if(chev)chev.classList.add('open')}
+    }
+    const target=button.dataset.atenGo==='solicitudes'?$('adminPendingCard'):$('adminUsersToggle');
     if(target)target.scrollIntoView({behavior:'smooth',block:'start'});
   });
 }
@@ -176,7 +180,37 @@ function abrirIngresosEn(mes){
 function filteredUsers(){const term=state.filter.toLowerCase().trim();return state.users.filter(user=>user.rol!=='admin'&&(!term||`${user.nombre} ${user.socio_nombre||''} ${user.dip} ${user.sucursal} ${user.numero_distribuidor}`.toLowerCase().includes(term)))}
 function renderUsers(){
   const list=$('adminUserList'),users=filteredUsers();if(!list)return;if(!users.length){list.innerHTML='<div class="empty">No hay distribuidores para mostrar.</div>';return}
-  list.innerHTML=users.map(user=>{let membership=membershipInfo(user);const prueba=state.pruebas.get(user.user_id);if(prueba){const dias=Math.max(0,Math.ceil((new Date(prueba).getTime()-Date.now())/86400000));membership={label:dias===0?'🧪 PRUEBA · VENCE HOY':`🧪 PRUEBA · ${dias}D`,cls:'trial',days:dias}}const expires=user.membresia_vence?new Date(user.membresia_vence).toLocaleDateString('es-AR'):'—';return `<article class="admin-user-row" data-admin-user="${esc(user.user_id)}"><div><h3>${esc(user.nombre||'Sin nombre')}${user.socio_nombre?` + ${esc(user.socio_nombre)}`:''}</h3><p>${esc(user.dip||'Sin número')} · Vence ${esc(expires)}<br>Titular: ${esc(user.nombre||'—')}${user.socio_nombre?` · Socio/a: ${esc(user.socio_nombre)}`:' · Sin socio/a'}</p><span class="admin-user-badge ${user.activo?'':'blocked'}">${user.activo?'ACTIVA':'BLOQUEADA'}</span><span class="membership-state ${membership.cls}">${membership.label}</span></div><div class="admin-row-actions"><button type="button" data-admin-action="people">Personas</button><button type="button" data-admin-action="password">Nueva contraseña</button><button type="button" class="btn-grace-period" data-admin-action="grace_period">📅 Prórroga</button><button type="button" class="btn-payment" data-admin-action="payment">💳 Registrar Pago</button><button type="button" class="btn-trial" data-admin-action="trial">🧪 Prueba 5 días</button><button type="button" class="${user.activo?'danger':'good'}" data-admin-action="active" data-active="${user.activo?'0':'1'}">${user.activo?'Bloquear':'Activar'}</button><button type="button" class="danger" data-admin-action="delete">Eliminar</button></div></article>`}).join('');
+  const resumen=$('adminUsersResumen');
+  if(resumen){const todos=state.users.filter(u=>u.rol!=='admin');resumen.textContent=todos.length?`${todos.length} cuenta${todos.length===1?'':'s'} · ${todos.filter(u=>u.activo).length} activas · tocá para abrir`:'Tocá para abrir las cuentas.'}
+  list.innerHTML=users.map(user=>{
+    let membership=membershipInfo(user);
+    const prueba=state.pruebas.get(user.user_id);
+    if(prueba){const dias=Math.max(0,Math.ceil((new Date(prueba).getTime()-Date.now())/86400000));membership={label:dias===0?'🧪 PRUEBA · VENCE HOY':`🧪 PRUEBA · ${dias}D`,cls:'trial',days:dias}}
+    const expires=user.membresia_vence?new Date(user.membresia_vence).toLocaleDateString('es-AR'):'—';
+    const abierto=state.userAbierto===user.user_id;
+    const acciones=abierto?`<div class="admin-user-acciones">
+      <button type="button" class="wa" data-admin-action="whatsapp_dist">💬 WhatsApp</button>
+      <button type="button" class="pago" data-admin-action="payment">💳 Registrar pago</button>
+      <button type="button" data-admin-action="grace_period">📅 Prórroga</button>
+      <button type="button" data-admin-action="password">🔑 Nueva contraseña</button>
+      <button type="button" data-admin-action="people">👥 Personas</button>
+      <button type="button" class="trial" data-admin-action="trial">🧪 Prueba 5 días</button>
+      <button type="button" class="forever" data-admin-action="forever">♾️ Para siempre</button>
+      <button type="button" class="${user.activo?'danger':'good'}" data-admin-action="active" data-active="${user.activo?'0':'1'}">${user.activo?'⛔ Bloquear':'✓ Activar'}</button>
+      <button type="button" class="danger" data-admin-action="delete" style="grid-column:1/-1">🗑 Eliminar la cuenta</button>
+    </div>`:'';
+    return `<article class="admin-user-row" data-admin-user="${esc(user.user_id)}">
+      <button type="button" class="admin-user-head" data-user-toggle="${esc(user.user_id)}">
+        <div><h3>${esc(user.nombre||'Sin nombre')}${user.socio_nombre?` + ${esc(user.socio_nombre)}`:''}</h3>
+        <p>${esc(user.dip||'Sin número')} · Vence ${esc(expires)}</p></div>
+        <span class="admin-user-badges"><span class="admin-user-badge ${user.activo?'':'blocked'}">${user.activo?'ACTIVA':'BLOQUEADA'}</span><span class="membership-state ${membership.cls}">${membership.label}</span></span>
+        <span class="admin-user-chev ${abierto?'open':''}">›</span>
+      </button>${acciones}</article>`}).join('');
+  list.querySelectorAll('[data-user-toggle]').forEach(head=>head.onclick=()=>{
+    const id=head.dataset.userToggle;
+    state.userAbierto=state.userAbierto===id?'':id;
+    renderUsers();
+  });
   list.querySelectorAll('[data-admin-action]').forEach(button=>button.onclick=()=>handleUserAction(button));
 }
 function renderRequests(){const list=$('adminPendingList');if(!list)return;
@@ -277,14 +311,14 @@ async function create(){
   if(password.length<8||!/[A-Za-z]/.test(password)||!/[0-9]/.test(password)){setStatus('adminCreateStatus','La contraseña temporal necesita 8 caracteres, letras y números.',true);return}
   const button=$('adminCreateUser');button.disabled=true;button.textContent='Creando…';setStatus('adminCreateStatus','Creando cuenta…');
   try{
-    const esPrueba=state.createMembership==='prueba';
-    const data=await callAdmin({action:'create',dip:`${sucursal}-${numero}`,nombre,socio_nombre:socioNombre,password,membership_months:esPrueba?1:state.createMembership});
-    if(esPrueba){
-      if(!data.user||!data.user.user_id)throw new Error('La cuenta se creó, pero no se pudo activar la prueba: falta el identificador. Usá la píldora 🧪 de su carpeta.');
-      try{await rpcAdmin('appi_admin_activar_prueba',{p_user_id:data.user.user_id})}
-      catch(error){throw new Error(`La cuenta se creó, pero no se pudo activar la prueba: ${error.message} Usá la píldora 🧪 de su carpeta.`)}
+    const esPrueba=state.createMembership==='prueba',esSiempre=state.createMembership==='siempre';
+    const data=await callAdmin({action:'create',dip:`${sucursal}-${numero}`,nombre,socio_nombre:socioNombre,password,membership_months:(esPrueba||esSiempre)?1:state.createMembership});
+    if(esPrueba||esSiempre){
+      if(!data.user||!data.user.user_id)throw new Error(`La cuenta se creó, pero falta el identificador para ${esPrueba?'activar la prueba':'el acceso permanente'}. Usá la píldora de su carpeta.`);
+      try{await rpcAdmin(esPrueba?'appi_admin_activar_prueba':'appi_admin_para_siempre',{p_user_id:data.user.user_id})}
+      catch(error){throw new Error(`La cuenta se creó, pero no se pudo completar: ${error.message} Usá la píldora de su carpeta.`)}
     }
-    setStatus('adminCreateStatus',esPrueba?`Cuenta creada en modo PRUEBA (5 días): ${data.user.dip} · contraseña temporal lista.`:`Cuenta creada: ${data.user.dip} · contraseña temporal lista.`);
+    setStatus('adminCreateStatus',esPrueba?`Cuenta creada en modo PRUEBA (5 días): ${data.user.dip} · contraseña temporal lista.`:esSiempre?`Cuenta creada con acceso PARA SIEMPRE: ${data.user.dip} · contraseña temporal lista.`:`Cuenta creada: ${data.user.dip} · contraseña temporal lista.`);
     await navigator.clipboard.writeText(`APPI\nDistribuidor: ${data.user.dip}\nTitular: ${nombre}${socioNombre?`\nSocio/a: ${socioNombre}`:''}\nContraseña temporal: ${password}`).catch(()=>{});
     const telefonoNuevo=$('adminTelefono')?$('adminTelefono').value:'';
     ['adminSucursal','adminNumero','adminNombre','adminPartnerName','adminTempPassword','adminTelefono'].forEach(id=>{const f=$(id);if(f)f.value=''});$('adminHasPartner').checked=false;$('adminPartnerField').hidden=true;
@@ -306,6 +340,18 @@ async function handleUserAction(button){
       const titular=await window.APPIDialog.prompt('Nombre y apellido del titular.',user.nombre||'',{title:'Editar personas',icon:'👥',placeholder:'Nombre del titular',okText:'Continuar'});if(titular===null)return;
       const socio=await window.APPIDialog.prompt('Nombre y apellido del socio/a. Dejá el campo vacío si la cuenta no tiene socio.',user.socio_nombre||'',{title:'Socio/a de la cuenta',icon:'🤝',placeholder:'Sin socio/a',okText:'Guardar'});if(socio===null)return;
       await callAdmin({action:'update_people',user_id:userId,nombre:String(titular).trim(),socio_nombre:String(socio).trim()});await load();return;
+    }
+    if(action==='whatsapp_dist'){
+      const pilaDist=(user.nombre||'').trim().split(/\s+/)[0]||'';
+      abrirWhatsAppCredencial('', `Hola ${pilaDist}! 😊 ¿Cómo vas con APPI? ¿Necesitás ayuda con algo? Cualquier cosa estoy acá para darte una mano. 💪`, pilaDist);
+      return;
+    }
+    if(action==='forever'){
+      const okSiempre=await window.APPIDialog.confirm(`${user.nombre||user.dip} tendrá acceso a APPI PARA SIEMPRE, sin vencimiento. ¿Confirmás?`,{title:'Membresía permanente',icon:'♾️',okText:'Dar acceso permanente'});
+      if(!okSiempre)return;
+      await rpcAdmin('appi_admin_para_siempre',{p_user_id:userId});
+      await window.APPIDialog.alert('Listo: la cuenta quedó con acceso permanente.',{title:'Para siempre',icon:'♾️'});
+      await load();return;
     }
     if(action==='trial'){
       const prueba=state.pruebas.get(user.user_id);
@@ -353,14 +399,14 @@ async function handleRequestAction(button){
       const ok=await window.APPIDialog.confirm(`La solicitud de ${item.nombre} quedará rechazada.`,{title:'Rechazar solicitud',icon:'×',okText:'Rechazar',danger:true});if(!ok)return;
       await callAdmin({action:'reject_request',request_id:id});await load();return;
     }
-    const months=await window.APPIDialog.choose('Elegí la duración inicial para esta cuenta.',[{label:'1 mes',value:1},{label:'🧪 PRUEBA · 5 días',value:'prueba'}],{title:'Membresía inicial',icon:'📅'});if(!months)return;
-    const esPrueba=months==='prueba';
+    const months=await window.APPIDialog.choose('Elegí la duración inicial para esta cuenta.',[{label:'1 mes',value:1},{label:'🧪 PRUEBA · 5 días',value:'prueba'},{label:'♾️ PARA SIEMPRE',value:'siempre'}],{title:'Membresía inicial',icon:'📅'});if(!months)return;
+    const esPrueba=months==='prueba',esSiempre=months==='siempre';
     const password=await window.APPIDialog.prompt('La persona deberá cambiarla obligatoriamente en su primer ingreso.',randomPassword(),{title:'Contraseña temporal',icon:'🔐',inputType:'text',okText:'Crear cuenta'});if(!password)return;
-    const result=await callAdmin({action:'approve_request',request_id:id,password,membership_months:esPrueba?1:months});
-    if(esPrueba){
-      if(!result.user||!result.user.user_id)throw new Error('La cuenta se aprobó, pero no se pudo activar la prueba: falta el identificador. Usá la píldora 🧪 de su carpeta.');
-      try{await rpcAdmin('appi_admin_activar_prueba',{p_user_id:result.user.user_id})}
-      catch(error){throw new Error(`La cuenta se aprobó, pero no se pudo activar la prueba: ${error.message} Usá la píldora 🧪 de su carpeta.`)}
+    const result=await callAdmin({action:'approve_request',request_id:id,password,membership_months:(esPrueba||esSiempre)?1:months});
+    if(esPrueba||esSiempre){
+      if(!result.user||!result.user.user_id)throw new Error(`La cuenta se aprobó, pero falta el identificador para ${esPrueba?'activar la prueba':'el acceso permanente'}. Usá la píldora de su carpeta.`);
+      try{await rpcAdmin(esPrueba?'appi_admin_activar_prueba':'appi_admin_para_siempre',{p_user_id:result.user.user_id})}
+      catch(error){throw new Error(`La cuenta se aprobó, pero no se pudo completar: ${error.message} Usá la píldora de su carpeta.`)}
     }
     const text=`APPI\nDistribuidor: ${result.user.dip}\nTitular: ${result.user.nombre}${result.user.socio_nombre?`\nSocio/a: ${result.user.socio_nombre}`:''}\nContraseña temporal: ${password}`;await navigator.clipboard.writeText(text).catch(()=>{});
     popupCredenciales({nombre:result.user.nombre||item.nombre,dip:result.user.dip,socio:result.user.socio_nombre||'',password,telefono:item.telefono,esPrueba});
@@ -376,7 +422,7 @@ async function logout(){const ok=await window.APPIDialog.confirm('Se cerrará la
   try{await window.APPIAuth.logout()}catch(e){}
   location.reload();
 }}
-function bind(){if(state.bound)return;state.bound=true;['adminSucursal','adminNumero','adminNombre','adminPartnerName','adminTempPassword'].forEach(id=>{const input=$(id);if(input)input.value=''});document.querySelectorAll('[data-create-membership]').forEach(button=>button.onclick=()=>{state.createMembership=button.dataset.createMembership==='prueba'?'prueba':Number(button.dataset.createMembership);document.querySelectorAll('[data-create-membership]').forEach(item=>item.classList.toggle('active',item===button))});$('adminHasPartner').onchange=()=>{$('adminPartnerField').hidden=!$('adminHasPartner').checked;if($('adminHasPartner').checked)setTimeout(()=>$('adminPartnerName').focus(),40);else $('adminPartnerName').value=''};$('adminGeneratePassword').onclick=()=>$('adminTempPassword').value=randomPassword();$('adminCreateUser').onclick=create;$('adminRefreshUsers').onclick=load;$('adminRefreshRequests').onclick=load;
+function bind(){if(state.bound)return;state.bound=true;['adminSucursal','adminNumero','adminNombre','adminPartnerName','adminTempPassword'].forEach(id=>{const input=$(id);if(input)input.value=''});document.querySelectorAll('[data-create-membership]').forEach(button=>button.onclick=()=>{state.createMembership=(button.dataset.createMembership==='prueba'||button.dataset.createMembership==='siempre')?button.dataset.createMembership:Number(button.dataset.createMembership);document.querySelectorAll('[data-create-membership]').forEach(item=>item.classList.toggle('active',item===button))});$('adminHasPartner').onchange=()=>{$('adminPartnerField').hidden=!$('adminHasPartner').checked;if($('adminHasPartner').checked)setTimeout(()=>$('adminPartnerName').focus(),40);else $('adminPartnerName').value=''};$('adminGeneratePassword').onclick=()=>$('adminTempPassword').value=randomPassword();$('adminCreateUser').onclick=create;$('adminRefreshUsers').onclick=load;$('adminRefreshRequests').onclick=load;
   const openCreate=$('adminOpenCreate');if(openCreate)openCreate.onclick=abrirCrearCuenta;
   const closeCreate=$('adminCreateClose');if(closeCreate)closeCreate.onclick=cerrarCrearCuenta;
   const cancelCreate=$('adminCreateCancel');if(cancelCreate)cancelCreate.onclick=cerrarCrearCuenta;
@@ -397,6 +443,7 @@ function bind(){if(state.bound)return;state.bound=true;['adminSucursal','adminNu
       setStatus('adminWaPrefStatus',`Listo: los envíos abren ${b.dataset.waPref==='business'?'WhatsApp Business':'WhatsApp normal'} en este dispositivo.`);
     });
   }
+  const usersToggle=$('adminUsersToggle');if(usersToggle)usersToggle.onclick=()=>{const body=$('adminUsersBody'),chev=$('adminUsersChevron');const abrir=body.hidden;body.hidden=!abrir;usersToggle.setAttribute('aria-expanded',abrir?'true':'false');if(chev)chev.classList.toggle('open',abrir)};
   const configToggle=$('adminConfigToggle');if(configToggle)configToggle.onclick=()=>{const body=$('adminConfigBody'),chev=$('adminConfigChevron');const abrir=body.hidden;body.hidden=!abrir;configToggle.setAttribute('aria-expanded',abrir?'true':'false');if(chev)chev.classList.toggle('open',abrir)};
   const refreshAcciones=$('adminRefreshAcciones');if(refreshAcciones)refreshAcciones.onclick=()=>loadAcciones();$('adminSaveWhatsapp').onclick=saveWhatsapp;$('btnAdminPanelLogout').onclick=logout;$('btnAdminPanelPassword').onclick=()=>window.abrirCambioPasswordAPPI();const helpAdmin=$('btnHelpAdmin');if(helpAdmin)helpAdmin.onclick=()=>window.APPIDialog.alert(
 `Desde acá administrás las cuentas de APPI.
@@ -408,13 +455,13 @@ NECESITAN TU ATENCIÓN
 Lo urgente en un solo lugar: solicitudes sin resolver, membresías que vencen y pruebas por terminar. Tocá un renglón y te lleva.
 
 CREAR CUENTA
-Tocá "➕ Crear cuenta nueva" y completá los datos en la ventana. Elegí la duración: 1 mes, o 🧪 PRUEBA (5 días con franja roja; al vencer, el ingreso se bloquea). Al crear, podés mandar por WhatsApp la bienvenida y la contraseña en dos mensajes separados: la contraseña viaja sola para copiar y pegar fácil.
+Tocá "➕ Crear cuenta nueva" y completá los datos en la ventana. Elegí la duración: 1 mes, 🧪 PRUEBA (5 días con franja roja; al vencer, el ingreso se bloquea) o ♾️ PARA SIEMPRE (sin vencimiento). Al crear, podés mandar por WhatsApp la bienvenida y la contraseña en dos mensajes separados: la contraseña viaja sola para copiar y pegar fácil.
 
 SOLICITUDES PENDIENTES
 Las personas que piden acceso desde la app aparecen acá. Al aprobar elegís 1 mes o PRUEBA, y podés mandar las credenciales por WhatsApp.
 
-CUENTAS
-Cada carpeta muestra su estado y membresía. Botones: Personas (editar titular/socio), Nueva contraseña, 📅 Prórroga, 💳 Registrar Pago (ambos sacan del modo prueba solos), 🧪 Prueba 5 días (pisa la membresía vigente), Bloquear y Eliminar.
+CUENTAS (Distribuidores)
+La sección arranca minimizada con el resumen; tocala para abrir. Cada distribuidor es un renglón: tocalo y se despliegan todas sus acciones, cómodas y con nombre: 💬 WhatsApp (le mandás un "¿cómo vas con APPI?"), 💳 Registrar pago y 📅 Prórroga (ambos sacan del modo prueba solos), 🔑 Nueva contraseña, 👥 Personas, 🧪 Prueba 5 días, ♾️ Para siempre (acceso permanente), Bloquear y Eliminar.
 
 CUMPLIMIENTO DIARIO
 Lo que cada cuenta marcó con ✓ y ✗ en sus acciones del día: hoy y últimos 7 días. La sección arranca minimizada con el resumen a la vista; tocala para abrir el detalle y usá el buscador por nombre o DIP.

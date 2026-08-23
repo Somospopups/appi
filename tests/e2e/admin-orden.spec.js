@@ -114,3 +114,29 @@ test('un popup largo scrollea en vez de desbordarse', async ({ page }) => {
   expect(r.scrollea).toBe(true);
   expect(r.entra).toBe(true);
 });
+
+
+test('los distribuidores: minimizable, WhatsApp directo y PARA SIEMPRE (v312)', () => {
+  const h = html();
+  // La sección se minimiza como el cumplimiento.
+  expect(h).toContain('id="adminUsersToggle"');
+  expect(h).toContain('id="adminUsersResumen"');
+  expect(h).toMatch(/id="adminUsersBody" hidden/);
+  // La píldora nueva de creación.
+  expect(h).toContain('data-create-membership="siempre"');
+  const js = panel();
+  // Cada renglón se abre con sus acciones cómodas.
+  expect(js).toContain('data-user-toggle');
+  expect(js).toContain('admin-user-acciones');
+  // WhatsApp al distribuidor con el mensaje amable.
+  expect(js).toContain('whatsapp_dist');
+  expect(js).toContain('¿Cómo vas con APPI?');
+  // Para siempre: acción por cuenta + RPC + badge.
+  expect(js).toContain("data-admin-action=\"forever\"");
+  expect(js).toContain('appi_admin_para_siempre');
+  expect(js).toContain('♾️ PARA SIEMPRE');
+  const sql = fs.readFileSync('SUPABASE_PARA_SIEMPRE.sql', 'utf8');
+  expect(sql).toContain('create or replace function public.appi_admin_para_siempre');
+  expect(sql).toContain("rol = 'admin'");
+  expect(sql).toContain('2099-12-31');
+});

@@ -61,7 +61,7 @@ test('las píldoras de creación quedaron en 1 mes y PRUEBA', () => {
 
 test('aprobar una solicitud ofrece 1 mes o PRUEBA, y la prueba se activa por RPC', () => {
   const js = fs.readFileSync('admin-panel.js', 'utf8');
-  expect(js).toContain("{label:'1 mes',value:1},{label:'🧪 PRUEBA · 5 días',value:'prueba'}");
+  expect(js).toContain("{label:'1 mes',value:1},{label:'🧪 PRUEBA · 5 días',value:'prueba'},{label:'♾️ PARA SIEMPRE',value:'siempre'}");
   expect(js).not.toContain("'3 meses'");
   expect(js).not.toContain("'6 meses'");
   expect(js).toContain('appi_admin_activar_prueba');

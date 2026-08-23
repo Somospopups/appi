@@ -1,4 +1,4 @@
-# Estado al retomar — APPI v311
+# Estado al retomar — APPI v312
 
 Repo: `github.com/somospopups/appi` · **suite en verde**.
 
@@ -6,7 +6,21 @@ Corrida local completa: **282 pruebas pasan, 1 salteada, 0 fallan** (sin flakes 
 
 ---
 
-## Último cambio: v311 · El toque no se confunde con arrastre
+## Último cambio: v312 · X descarta de a una + Distribuidores cómodos
+
+Mazo: la ✗ de cada tarjeta descarta SOLO esa (vuelo incluido); cerrar
+todo = ✕ del encabezado o tocar el fondo. Panel admin/Distribuidores:
+sección minimizable con resumen; cada cuenta es un renglón que se abre
+con las acciones en botones grandes (💬 WhatsApp al distribuidor con
+mensaje amable — via selector de contactos porque el perfil no guarda
+teléfono —, 💳 pago, 📅 prórroga, 🔑 contraseña, 👥 personas, 🧪 prueba,
+♾️ para siempre, bloquear, eliminar). Membresía ♾️ PARA SIEMPRE nueva
+(píldora de creación + aprobar + acción por cuenta): vence 2099, badge
+dorado, RPC appi_admin_para_siempre en SUPABASE_PARA_SIEMPRE.sql.
+
+⚠️ PENDIENTE DE DESPLIEGUE: correr SUPABASE_PARA_SIEMPRE.sql.
+
+## Anterior: v311 · El toque no se confunde con arrastre
 
 Bug real de teléfono reproducido con eventos táctiles: el dedo tiembla
 5-10px al tocar y el umbral de arrastre (7px) anulaba el click de los

@@ -445,7 +445,8 @@
     st.textContent = [
       '#htOverlay{position:fixed;inset:0;z-index:10055;display:flex;flex-direction:column;background:rgba(22,24,40,.55);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px)}',
       '.ht-top{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:16px 18px calc(0px + env(safe-area-inset-top,0px));padding-top:calc(16px + env(safe-area-inset-top,0px));color:#fff}',
-      '.ht-top b{font-size:15px}.ht-top span{font-size:11px;opacity:.8;font-weight:800}',
+      '.ht-top b{font-size:15px}.ht-top span{font-size:11px;opacity:.8;font-weight:800;margin-left:auto;margin-right:10px}',
+      '.ht-cerrar{width:40px;height:40px;border:0;border-radius:50%;background:rgba(255,255,255,.16);color:#fff;font-size:19px;font-weight:900;cursor:pointer}',
       '.ht-cerrar{width:42px;height:42px;border:0;border-radius:50%;background:rgba(255,255,255,.16);color:#fff;font-size:20px;font-weight:900;cursor:pointer}',
       '.ht-centro{margin:auto;display:flex;flex-direction:column;align-items:center;gap:12px;padding:10px 18px;min-height:0}',
       '.ht-deck{position:relative;width:min(92vw,400px);height:min(62vh,470px)}',
@@ -498,13 +499,16 @@
     mazo = { tarjetas: tarjetas, i: 0 };
     var ov = document.createElement('div');
     ov.id = 'htOverlay';
-    ov.innerHTML = '<div class="ht-top"><div><b>🔔 Notificaciones</b></div><span id="htPos"></span></div>' +
+    ov.innerHTML = '<div class="ht-top"><div><b>🔔 Notificaciones</b></div><span id="htPos"></span>' +
+      '<button type="button" class="ht-cerrar" id="htCerrar" aria-label="Cerrar notificaciones">×</button></div>' +
       '<div class="ht-centro"><div class="ht-deck" id="htDeck"></div>' +
       '<button type="button" class="ht-pasar" id="htPasar">Pasar ›</button>' +
       '<div class="ht-hint">← Deslizá a la izquierda para pasar · a la derecha volvés →</div></div>' +
       '<div class="ht-espacio"></div>';
     document.body.appendChild(ov);
     document.getElementById('htPasar').onclick = function(){ pasar(); };
+    document.getElementById('htCerrar').onclick = function(){ marcarVisto(); cerrar(); };
+    ov.addEventListener('click', function(e){ if (e.target === ov) { marcarVisto(); cerrar(); } });
     pintar();
     return true;
   }
@@ -530,7 +534,7 @@
       el.className = 'ht-card' + (k === mazo.i ? '' : k === mazo.i + 1 ? ' detras1' : ' detras2');
       el.innerHTML = '<div class="ht-cab"><span class="ht-ico">' + t.icono + '</span>' +
         '<span class="ht-kicker">' + esc(t.kicker) + '</span>' +
-        '<button type="button" class="ht-x"' + (k === mazo.i ? ' id="htCerrar"' : '') + ' aria-label="Cerrar notificaciones">×</button></div>' +
+        '<button type="button" class="ht-x" aria-label="Descartar esta notificación" title="Descartar">×</button></div>' +
         '<h3>' + esc(t.titulo) + '</h3>' +
         '<div class="ht-cuerpo">' + t.html + '</div>' +
         (t.cta ? '<button type="button" class="ht-cta">' + esc(t.cta.label) + '</button>' : '');
@@ -547,7 +551,7 @@
     if (!el || el.__cableada) return;
     el.__cableada = true;
     var x = el.querySelector('.ht-x');
-    if (x) x.onclick = function(){ marcarVisto(); cerrar(); };
+    if (x) x.onclick = function(){ pasar(); };   // descarta esta tarjeta y sigue
     var irYCerrar = function(ir){ return function(){ marcarVisto(); cerrar(); try{ ir(); }catch(e){} }; };
     if (t && t.cta){
       var cta = el.querySelector('.ht-cta');

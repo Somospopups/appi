@@ -325,7 +325,10 @@ test('administración ingresa por el candado y no tiene distribuidor asociado', 
   await page.locator('#btnAdminLoginSubmit').click();
   await expect(page.locator('#view-admin')).toHaveClass(/active/);
   await expect(page.locator('#adminPanelIdentity')).toContainText('Administración del equipo');
+  // Distribuidores arranca minimizado: se abre la sección y el renglón.
+  await page.locator('#adminUsersToggle').click();
   await expect(page.locator('#adminUserList')).toContainText('Distribuidor A');
+  await page.locator('.admin-user-head').first().click();
   await expect(page.locator('#adminPendingList')).toContainText('Solicitud Pendiente');
   // El tablero muestra la solicitud en el chip que parpadea y en Atención.
   await expect(page.locator('#adminHero')).toContainText('1 solicitud');
