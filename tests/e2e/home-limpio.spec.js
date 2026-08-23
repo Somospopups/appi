@@ -571,3 +571,50 @@ test('las tarjetas muestran nombre y apellido, no solo el apellido (v323)', asyn
   // Oportunidades: María Pérez ya venía legible y sigue completa.
   expect(r.bonus).toContain('María Pérez');
 });
+
+// v324 · El botón violeta de Oportunidades lleva a Mi Equipo (los renglones
+// siguen proponiendo por WhatsApp directo a cada persona).
+test('el botón de Oportunidades dice Ir a Mi Equipo y te lleva ahí (v324)', async ({ page }) => {
+  await entrar(page);
+  await page.evaluate(() => window.APPIHomeTarjetas.abrir());
+  while (!(await page.locator('.ht-card:not(.detras1):not(.detras2):not(.ht-fantasma)').textContent()).includes('Oportunidades')) {
+    await page.evaluate(() => window.APPIHomeTarjetas.pasar());
+    await page.waitForTimeout(400);
+  }
+  const cta = page.locator('.ht-card:not(.detras1):not(.detras2):not(.ht-fantasma) .ht-cta');
+  await expect(cta).toHaveText('Ir a Mi Equipo');
+  await cta.click();
+  await expect(page.locator('#view-equipo')).toHaveClass(/active/);
+  // Y el mazo sigue vivo en el Home (v323).
+  await expect(page.locator('#htOverlay')).toHaveCount(1);
+});
+
+// v324 · Mientras se arrastra, atrás asoma la tarjeta que DE VERDAD viene:
+// a la izquierda la siguiente, a la derecha la anterior. Antes asomaba
+// siempre la siguiente y al volver aparecía otra: quedaba feo.
+test('al arrastrar asoma la tarjeta correcta según la dirección (v324)', async ({ page }) => {
+  await entrar(page);
+  await page.evaluate(() => window.APPIHomeTarjetas.abrir());
+  await page.evaluate(() => window.APPIHomeTarjetas.pasar());
+  await page.waitForTimeout(450);
+  await expect(page.locator('#htPos')).toContainText('2 de');
+  const r = await page.evaluate(() => {
+    const kickers = window.APPIHomeTarjetas.armarTarjetas().map(t => t.kicker);
+    const top = document.querySelector('.ht-card:not(.detras1):not(.detras2):not(.ht-fantasma)');
+    const rect = top.getBoundingClientRect();
+    const x = rect.x + rect.width / 2, y = rect.y + rect.height / 2;
+    const fire = (type, cx) => top.dispatchEvent(new PointerEvent(type, { bubbles: true, clientX: cx, clientY: y, pointerId: 7, pointerType: 'touch' }));
+    const detras = () => (document.querySelector('.ht-card.detras1') || {}).textContent || '';
+    fire('pointerdown', x);
+    fire('pointermove', x + 30);   // arrastre a la derecha confirmado
+    fire('pointermove', x + 60);
+    const derecha = detras();
+    fire('pointermove', x - 40);   // el dedo cambia de dirección
+    const izquierda = detras();
+    fire('pointerup', x - 40);     // suelta sin concretar: la tarjeta rebota
+    return { kickers, derecha, izquierda, despues: detras() };
+  });
+  expect(r.derecha).toContain(r.kickers[0]);    // a la derecha asoma la ANTERIOR (💙)
+  expect(r.izquierda).toContain(r.kickers[2]);  // a la izquierda asoma la SIGUIENTE
+  expect(r.despues).toContain(r.kickers[2]);    // el rebote deja la siguiente asomando
+});

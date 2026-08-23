@@ -1,12 +1,24 @@
-# Estado al retomar — APPI v323
+# Estado al retomar — APPI v324
 
 Repo: `github.com/somospopups/appi` · **suite en verde**.
 
-Corrida local completa: **314 pruebas pasan, 1 salteada, 0 fallan** (sin flakes en esta corrida).
+Corrida local completa: **316 pruebas pasan, 1 salteada, 0 fallan** (sin flakes en esta corrida).
 
 ---
 
-## Último cambio: v323 · Nombre y apellido en las tarjetas + el mazo no desaparece
+## Último cambio: v324 · Asomo fiel + botón de Oportunidades a Mi Equipo
+
+(1) El CTA de la tarjeta de Oportunidades dice "Ir a Mi Equipo" y va a
+abrirEquipo() (antes "Proponerle a X"; los renglones siguen con la
+propuesta directa por WhatsApp). (2) Asomo direccional: asomar(dir)
+repinta las cartas de atrás según el signo de dx durante el arrastre —
+a la izquierda asoman la siguiente/subsiguiente, a la derecha la
+anterior/ante-anterior; al soltar hay continuidad total (la que asomaba
+es la que sube) y el rebote restaura la siguiente. crearCarta() quedó
+como armador único del HTML (pintar + asomar). 2 tests nuevos de
+guardia; 27 del Home/mazo.
+
+## Anterior: v323 · Nombre y apellido en las tarjetas + el mazo no desaparece
 
 Dos retoques pedidos: (1) los renglones de Cumpleaños y Oportunidades
 muestran nombre y apellido legibles con nombreLindo() ("TRONCOSO,

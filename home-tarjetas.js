@@ -281,7 +281,7 @@
         titulo: gente.length === 1 ? 'Un Bonus al alcance de la mano' : gente.length + ' Bonus al alcance de la mano',
         html: '<ul class="ht-lista">' + filas.join('') + '</ul><p class="ht-nota">Tocá a la persona y sale la propuesta por WhatsApp.</p>',
         items: items,
-        cta: { label: 'Proponerle a ' + (pilaB(gente[0].nombre) || 'la primera persona'), go: items[0] }
+        cta: { label: 'Ir a Mi Equipo', go: abrirEquipo }
       };
     }catch(e){ return null; }
   }
@@ -529,6 +529,38 @@
     inlineAbierto = false;
   }
 
+  function crearCarta(t){
+    var el = document.createElement('div');
+    el.innerHTML = '<div class="ht-cab"><span class="ht-ico">' + t.icono + '</span>' +
+      '<span class="ht-kicker">' + esc(t.kicker) + '</span></div>' +
+      '<h3>' + esc(t.titulo) + '</h3>' +
+      '<div class="ht-cuerpo">' + t.html + '</div>' +
+      (t.cta ? '<button type="button" class="ht-cta">' + esc(t.cta.label) + '</button>' : '');
+    return el;
+  }
+
+  // Mientras se arrastra, atrás asoma la tarjeta que de verdad viene: si el
+  // gesto va a la izquierda asoma la siguiente, si va a la derecha asoma la
+  // anterior. Antes asomaba siempre la siguiente y al volver aparecía otra
+  // cosa: quedaba feo (v324).
+  function asomar(dir){
+    if (!mazo) return;
+    var deck = document.getElementById('htDeck');
+    if (!deck) return;
+    var len = mazo.tarjetas.length;
+    if (len < 2) return;
+    var top = deck.querySelector('.ht-card:not(.detras1):not(.detras2):not(.ht-fantasma)');
+    if (!top) return;
+    deck.querySelectorAll('.ht-card.detras1, .ht-card.detras2').forEach(function(n){ n.remove(); });
+    var offs = dir < 0 ? [-1, -2] : [1, 2];
+    for (var j = Math.min(2, len - 1); j >= 1; j--){
+      var k = ((mazo.i + offs[j - 1]) % len + len) % len;
+      var el = crearCarta(mazo.tarjetas[k]);
+      el.className = 'ht-card ' + (j === 1 ? 'detras1' : 'detras2');
+      deck.insertBefore(el, top);
+    }
+  }
+
   function pintar(){
     if (!mazo) return;
     var deck = document.getElementById('htDeck');
@@ -545,13 +577,8 @@
     for (var off = Math.min(2, len - 1); off >= 0; off--){
       var k = (mazo.i + off) % len;
       var t = mazo.tarjetas[k];
-      var el = document.createElement('div');
+      var el = crearCarta(t);
       el.className = 'ht-card' + (off === 0 ? '' : off === 1 ? ' detras1' : ' detras2');
-      el.innerHTML = '<div class="ht-cab"><span class="ht-ico">' + t.icono + '</span>' +
-        '<span class="ht-kicker">' + esc(t.kicker) + '</span></div>' +
-        '<h3>' + esc(t.titulo) + '</h3>' +
-        '<div class="ht-cuerpo">' + t.html + '</div>' +
-        (t.cta ? '<button type="button" class="ht-cta">' + esc(t.cta.label) + '</button>' : '');
       if (off === 0){
         cablearTope(el, t);
         // La primera vez, la tarjeta se hamaca sola: así se entiende el gesto.
@@ -636,10 +663,10 @@
     // confunda con un arrastre, el gesto recién cuenta como arrastre cuando
     // el movimiento es claramente horizontal y amplio (y sobre un botón o un
     // renglón, más amplio todavía). Si fue toque, el click sale normal.
-    var x0 = 0, y0 = 0, dx = 0, dy = 0, arrastrando = false, umbral = 14;
+    var x0 = 0, y0 = 0, dx = 0, dy = 0, arrastrando = false, umbral = 14, dir = 0;
     el.addEventListener('pointerdown', function(e){
       el.classList.remove('demo');
-      arrastrando = true; x0 = e.clientX; y0 = e.clientY; dx = 0; dy = 0; el.__arrastro = false;
+      arrastrando = true; x0 = e.clientX; y0 = e.clientY; dx = 0; dy = 0; dir = 0; el.__arrastro = false;
       umbral = e.target.closest('button, .ht-lista li, a') ? 26 : 14;
       // Ojo: la captura del puntero recién se toma cuando el gesto ES un
       // arrastre. Si se toma acá, el click de la ✗ y del botón se pierde.
@@ -653,7 +680,12 @@
         el.classList.add('arrastre');
         try{ el.setPointerCapture(e.pointerId); }catch(err){}
       }
-      if (el.__arrastro) el.style.transform = 'translateX(' + dx + 'px) rotate(' + (dx / 20) + 'deg)';
+      if (el.__arrastro && dx !== 0){
+        // Atrás asoma la tarjeta hacia donde va el gesto (v324).
+        var nueva = dx < 0 ? 1 : -1;
+        if (nueva !== dir){ dir = nueva; asomar(dir); }
+        el.style.transform = 'translateX(' + dx + 'px) rotate(' + (dx / 20) + 'deg)';
+      }
     });
     function soltar(){
       if (!arrastrando) return;
@@ -661,7 +693,13 @@
       el.classList.remove('arrastre');
       if (el.__arrastro && dx < -80 && pasar()){ /* pasó a la siguiente */ }
       else if (el.__arrastro && dx > 80 && volver()){ /* volvió a la anterior */ }
-      else if (el.__arrastro){ el.classList.add('volver'); el.style.transform = ''; setTimeout(function(){ el.classList.remove('volver'); }, 360); }
+      else if (el.__arrastro){
+        el.classList.add('volver'); el.style.transform = '';
+        setTimeout(function(){ el.classList.remove('volver'); }, 360);
+        // El gesto no se concretó: atrás vuelve a asomar la siguiente.
+        if (dir === -1) asomar(1);
+      }
+      dir = 0;
     }
     el.addEventListener('pointerup', soltar);
     el.addEventListener('pointercancel', soltar);
