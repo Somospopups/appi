@@ -4069,6 +4069,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
 })();
 </script>
 <style>
+#bootScreen[data-exit-requested="1"],#bootScreen.leaving,#bootScreen.gone{pointer-events:none!important}
 #bootScreen{position:fixed;inset:0;z-index:9990;overflow:hidden;display:flex;align-items:center;justify-content:center;min-height:100vh;min-height:100dvh;isolation:isolate;opacity:1;background:linear-gradient(180deg,#06172d 0%,#0a2946 44%,#12526b 100%);transition:opacity .52s ease,visibility 0s linear 0s}
 #bootScreen.gone{pointer-events:none;display:none!important}
 .boot-ambience{position:absolute;inset:0;z-index:0;overflow:hidden;background:radial-gradient(circle at 18% 18%,rgba(66,157,196,.16),transparent 34%),radial-gradient(circle at 83% 35%,rgba(81,212,202,.11),transparent 32%),radial-gradient(circle at 50% 82%,rgba(22,148,167,.18),transparent 43%)}
@@ -4126,7 +4127,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v315 · Segura</div>
+  <div class="ds-foot">APPI · v316 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -5863,7 +5864,7 @@ function initStateFor(id){
 function overlayDeScrollAbierto(){
   return !!(
     document.querySelector('.modal-overlay.open') ||
-    document.querySelector('.membership-modal-overlay') ||
+    document.querySelector('.membership-modal-overlay:not([hidden])') ||
     document.querySelector('.appi-dialog-overlay:not([hidden])') ||
     document.querySelector('.appi-device-overlay:not([hidden])') ||
     document.querySelector('#gestionDetailOverlay:not([hidden])') ||
@@ -11705,7 +11706,7 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='315';
+      const swVersion='316';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 

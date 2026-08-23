@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v315-bonus-en-equipo';
+const CACHE_NAME = 'appi-v316-mazo-en-casa';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

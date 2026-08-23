@@ -1,4 +1,4 @@
-# Estado al retomar — APPI v315
+# Estado al retomar — APPI v316
 
 Repo: `github.com/somospopups/appi` · **suite en verde**.
 
@@ -6,7 +6,21 @@ Corrida local completa: **282 pruebas pasan, 1 salteada, 0 fallan** (sin flakes 
 
 ---
 
-## Último cambio: v315 · Bonus en Mi Equipo
+## Último cambio: v316 · Mazo dentro del Home + 2 bugs de fondo
+
+El mazo dejó de ser popup: vive en una tarjeta contenedora arriba del
+Home con todo igual (pila, gestos ida/vuelta, ✗ descarta una, acciones
+directas, vaivén); ✕ oculta, 🔔 trae de vuelta; si el Home se repinta,
+se re-monta solo conservando la posición. BUG 1 (real, desde v300): el
+guard de overlays veía el popup oculto de Crear cuenta
+(.membership-modal-overlay en DOM) y liberarScrollCuerpo nunca liberaba
+→ scroll muerto en toda la app tras abrir el calendario o una ficha;
+ahora solo cuenta overlays visibles + test de regresión. BUG 2: el
+bootScreen seguía capturando toques durante su animación de salida
+(medio segundo de botones muertos por apertura); con exit-requested/
+leaving/gone ahora deja pasar los toques.
+
+## Anterior: v315 · Bonus en Mi Equipo
 
 Las tarjetas OPORTUNIDAD DE BONUS salieron del Home y viven en Mi
 Equipo, después del título y antes de los botones, con entrada animada

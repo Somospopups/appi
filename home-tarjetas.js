@@ -443,13 +443,15 @@
     var st = document.createElement('style');
     st.id = 'htEstilos';
     st.textContent = [
-      '#htOverlay{position:fixed;inset:0;z-index:10055;display:flex;flex-direction:column;background:rgba(22,24,40,.55);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px)}',
-      '.ht-top{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:16px 18px calc(0px + env(safe-area-inset-top,0px));padding-top:calc(16px + env(safe-area-inset-top,0px));color:#fff}',
-      '.ht-top b{font-size:15px}.ht-top span{font-size:11px;opacity:.8;font-weight:800;margin-left:auto;margin-right:10px}',
-      '.ht-cerrar{width:40px;height:40px;border:0;border-radius:50%;background:rgba(255,255,255,.16);color:#fff;font-size:19px;font-weight:900;cursor:pointer}',
-      '.ht-cerrar{width:42px;height:42px;border:0;border-radius:50%;background:rgba(255,255,255,.16);color:#fff;font-size:20px;font-weight:900;cursor:pointer}',
-      '.ht-centro{margin:auto;display:flex;flex-direction:column;align-items:center;gap:12px;padding:10px 18px;min-height:0}',
-      '.ht-deck{position:relative;width:min(92vw,400px);height:min(62vh,470px)}',
+      '#htOverlay{position:relative;margin:0 0 14px;padding:14px 12px 12px;border-radius:22px;background:linear-gradient(160deg,rgba(91,141,239,.09),rgba(160,107,255,.08));border:1px solid rgba(255,255,255,.7)}',
+      'body.dark #htOverlay{background:linear-gradient(160deg,rgba(91,141,239,.13),rgba(160,107,255,.11));border-color:rgba(255,255,255,.08)}',
+      '.ht-top{display:flex;align-items:center;gap:10px;padding:0 4px 10px}',
+      '.ht-top b{font-size:14px;color:#30303d}.ht-top span{font-size:11px;color:#777887;font-weight:800;margin-left:auto;margin-right:8px}',
+      'body.dark .ht-top b{color:#f2f2f7}',
+      '.ht-cerrar{width:38px;height:38px;border:0;border-radius:50%;background:rgba(120,120,140,.12);color:#63636f;font-size:18px;font-weight:900;cursor:pointer}',
+      'body.dark .ht-cerrar{background:rgba(255,255,255,.1);color:#c9cad8}',
+      '.ht-centro{display:flex;flex-direction:column;align-items:center;gap:11px}',
+      '.ht-deck{position:relative;width:100%;max-width:400px;height:min(56vh,440px);margin:0 auto}',
       '.ht-card{position:absolute;inset:0;display:flex;flex-direction:column;padding:18px 20px;border-radius:24px;background:linear-gradient(160deg,#ffffff,#f4f6ff);box-shadow:0 22px 60px rgba(10,12,40,.35);touch-action:pan-y;user-select:none;-webkit-user-select:none;cursor:grab;will-change:transform;transition:transform .32s cubic-bezier(.22,.9,.35,1),opacity .32s ease}',
       '.ht-card.demo{animation:htVaiven 1.5s ease .55s 1}',
       '@keyframes htVaiven{0%,100%{transform:none}22%{transform:translateX(34px) rotate(2.5deg)}60%{transform:translateX(-30px) rotate(-2.2deg)}}',
@@ -475,9 +477,9 @@
       '.ht-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}',
       '.ht-chips span{padding:7px 12px;border-radius:999px;background:rgba(91,141,239,.1);color:#3d63c9;font-size:12.5px;font-weight:900}',
       '.ht-cta{margin-top:12px;min-height:52px;border:0;border-radius:15px;background:linear-gradient(135deg,#5b8def,#8b63e8);color:#fff;font:inherit;font-size:15px;font-weight:900;cursor:pointer}',
-      '.ht-espacio{flex:0 0 calc(10px + env(safe-area-inset-bottom,0px))}',
-      '.ht-pasar{min-height:46px;padding:0 30px;border:0;border-radius:999px;background:rgba(255,255,255,.18);color:#fff;font:inherit;font-size:14px;font-weight:900;cursor:pointer}',
-      '.ht-hint{text-align:center;color:#b9bac8;font-size:11px;font-weight:800}',
+      '.ht-pasar{min-height:44px;padding:0 30px;border:0;border-radius:999px;background:rgba(91,141,239,.13);color:#3d63c9;font:inherit;font-size:13.5px;font-weight:900;cursor:pointer}',
+      'body.dark .ht-pasar{background:rgba(255,255,255,.1);color:#9db7f5}',
+      '.ht-hint{text-align:center;color:#9a9ba8;font-size:10.5px;font-weight:800}',
       /* botón del Home */
       '.ht-boton{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:50px;margin:0 0 12px;border:1px solid rgba(91,141,239,.2);border-radius:16px;background:rgba(255,255,255,.8);color:#3d63c9;font:inherit;font-size:13.5px;font-weight:900;cursor:pointer}',
       '.ht-boton b{min-width:24px;padding:3px 8px;border-radius:999px;background:#e02424;color:#fff;font-size:11px}',
@@ -490,25 +492,33 @@
     document.head.appendChild(st);
   }
 
-  function abrir(){
+  var inlineAbierto = false;
+  function abrir(reusar){
     if (!sesionDeDistribuidor()) return false;
     css();
-    var tarjetas = armarTarjetas();
-    if (!tarjetas.length) return false;
-    cerrar();
-    mazo = { tarjetas: tarjetas, i: 0 };
+    actualizarBoton();
+    var home = document.getElementById('homeLimpio');
+    if (!home) return false;
+    if (!(reusar && mazo && mazo.tarjetas && mazo.tarjetas.length)){
+      var tarjetas = armarTarjetas();
+      if (!tarjetas.length) return false;
+      mazo = { tarjetas: tarjetas, i: 0 };
+    }
+    var previo = document.getElementById('htOverlay');
+    if (previo) previo.remove();
     var ov = document.createElement('div');
     ov.id = 'htOverlay';
     ov.innerHTML = '<div class="ht-top"><div><b>🔔 Notificaciones</b></div><span id="htPos"></span>' +
       '<button type="button" class="ht-cerrar" id="htCerrar" aria-label="Cerrar notificaciones">×</button></div>' +
       '<div class="ht-centro"><div class="ht-deck" id="htDeck"></div>' +
       '<button type="button" class="ht-pasar" id="htPasar">Pasar ›</button>' +
-      '<div class="ht-hint">← Deslizá a la izquierda para pasar · a la derecha volvés →</div></div>' +
-      '<div class="ht-espacio"></div>';
-    document.body.appendChild(ov);
+      '<div class="ht-hint">← Deslizá a la izquierda para pasar · a la derecha volvés →</div></div>';
+    var boton = document.getElementById('htBoton');
+    if (boton && boton.parentNode === home) home.insertBefore(ov, boton.nextSibling);
+    else home.insertBefore(ov, home.firstChild);
     document.getElementById('htPasar').onclick = function(){ pasar(); };
     document.getElementById('htCerrar').onclick = function(){ marcarVisto(); cerrar(); };
-    ov.addEventListener('click', function(e){ if (e.target === ov) { marcarVisto(); cerrar(); } });
+    inlineAbierto = true;
     pintar();
     return true;
   }
@@ -517,6 +527,7 @@
     var ov = document.getElementById('htOverlay');
     if (ov) ov.remove();
     mazo = null;
+    inlineAbierto = false;
     actualizarBoton();
   }
 
@@ -735,8 +746,13 @@
     };
     // Si el Home ya estaba activo cuando cargó el módulo:
     if (esHome()) setTimeout(alEntrarAlHome, 900);
-    // El contador del botón respira solo (los datos llegan de a poco).
-    setInterval(function(){ if (esHome() && !document.getElementById('htOverlay')) actualizarBoton(); }, 4000);
+    // El contador del botón respira solo (los datos llegan de a poco) y, si
+    // el Home se repintó con el mazo abierto, se vuelve a montar donde estaba.
+    setInterval(function(){
+      if (!esHome()) return;
+      if (inlineAbierto && mazo && !document.getElementById('htOverlay')) abrir(true);
+      else if (!document.getElementById('htOverlay')) actualizarBoton();
+    }, 2500);
   }
 
   window.APPIHomeTarjetas = {

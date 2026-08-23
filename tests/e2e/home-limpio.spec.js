@@ -40,6 +40,7 @@ async function entrar(page) {
     if (url.pathname === '/auth/v1/token') return route.fulfill({ status: 200, headers: cors, body: JSON.stringify({ access_token: accessToken, refresh_token: 'r', expires_in: 3600, user: { id: USER_ID } }) });
     if (url.pathname === '/rest/v1/appi_perfiles') return route.fulfill({ status: 200, headers: cors, body: JSON.stringify([profile]) });
     if (url.pathname === '/functions/v1/dispositivo-puente') return route.fulfill({ status: 200, headers: cors, body: JSON.stringify({ devices: [] }) });
+    if (url.pathname === '/rest/v1/appi_gestion_contactos' && route.request().method() === 'GET') return route.fulfill({ status: 200, headers: cors, body: JSON.stringify(CONTACTOS) });
     return route.fulfill({ status: 200, headers: cors, body: '[]' });
   });
   await page.addInitScript(([uid, equipo, contactos]) => {
@@ -225,6 +226,8 @@ test('deslizar a la izquierda pasa y a la derecha vuelve a la anterior', async (
   await page.evaluate(() => window.APPIHomeTarjetas.abrir());
   const top = () => page.locator('.ht-card:not(.detras1):not(.detras2)');
   await expect(top()).toContainText('Tu impulso de hoy');
+  // El mazo vive dentro del Home: lo traemos a la vista antes de arrastrar.
+  await top().scrollIntoViewIfNeeded();
   // Izquierda: pasa a la siguiente.
   let box = await top().boundingBox();
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
@@ -234,6 +237,7 @@ test('deslizar a la izquierda pasa y a la derecha vuelve a la anterior', async (
   await expect(page.locator('#htPos')).toContainText('2 de');
   // Derecha: vuelve a la anterior.
   await page.waitForTimeout(450);
+  await top().scrollIntoViewIfNeeded();
   box = await top().boundingBox();
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
   await page.mouse.down();
@@ -390,4 +394,27 @@ test('las tareas del calendario aceptan hora y se ordenan por ella', async ({ pa
   await page.locator('#calClose').click();
   await expect(page.locator('#homeLimpio')).toContainText('09:15');
   await expect(page.locator('#homeLimpio')).toContainText('Llamar a Pedro');
+});
+
+test('cerrar el calendario devuelve el scroll en toda la app (regresión v300)', async ({ page }) => {
+  await entrar(page);
+  // Abrir y cerrar el calendario bloqueaba el scroll para siempre: el guard
+  // de overlays veía el popup oculto de Crear cuenta y nunca liberaba.
+  await page.locator('#hlCardOpen').click();
+  await expect(page.locator('.cal-overlay')).toBeVisible();
+  await page.locator('#calClose').click();
+  const overflow = await page.evaluate(() => document.body.style.overflow);
+  expect(overflow).not.toBe('hidden');
+  // Y en Mi Equipo se scrollea normal.
+  await page.evaluate(() => {
+    window.openEquipo();
+    const sp = document.createElement('div');
+    sp.style.height = '2000px';
+    document.getElementById('view-equipo').appendChild(sp);
+  });
+  await page.mouse.move(640, 400);
+  await page.mouse.wheel(0, 500);
+  await page.waitForTimeout(300);
+  const top = await page.evaluate(() => document.body.scrollTop || window.scrollY);
+  expect(top).toBeGreaterThan(100);
 });
