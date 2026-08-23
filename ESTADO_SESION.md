@@ -1,4 +1,4 @@
-# Estado al retomar — APPI v320
+# Estado al retomar — APPI v321
 
 Repo: `github.com/somospopups/appi` · **suite en verde**.
 
@@ -6,7 +6,18 @@ Corrida local completa: **311 pruebas pasan, 1 salteada, 0 fallan** (sin flakes 
 
 ---
 
-## Último cambio: v320 · El saludo al cumpleañero va directo al WhatsApp
+## Último cambio: v321 · El aviso "Hoy cumplen" del Home se retiró
+
+Con la tarjeta de Cumpleaños del mazo a pleno (v320), el widget HOY
+CUMPLEN del Home quedó redundante y se quitó a pedido: contenedor
+#bdayBannerWrap, renderBdayBanner() y su llamada en
+renderHomeCompleto(), CSS de .bday-banner (claro/oscuro) y el keyframes
+bounce que solo usaba el banner. OJO: .bday-list/.bday-item son la
+lista de cumpleaños de Mi Equipo y siguen igual. avisos-duplicados.spec
+reescrito: exige 0 copias del banner, que renderBdayBanner no exista, y
+que el cumpleañero siga cubierto por la tarjeta del mazo.
+
+## Anterior: v320 · El saludo al cumpleañero va directo al WhatsApp
 
 Bug real con datos reales: el lector de la planilla de Línea
 Descendente guarda el número en `tel`, pero tarjetaCumples y

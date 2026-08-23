@@ -773,26 +773,6 @@ body.dark .hist-action-drawer{background:linear-gradient(155deg,#151827,#252036 
     letter-spacing: 0.3px;
   }
 
-  .bday-banner {
-    padding: 12px 14px; border-radius: 16px; margin-bottom: 12px;
-    background: linear-gradient(135deg, rgba(255,143,107,0.20), rgba(255,107,157,0.18));
-    border: 1px solid rgba(255,255,255,0.7);
-    display: flex; align-items: center; gap: 12px;
-    cursor: pointer;
-    transition: transform .15s ease;
-  }
-  .bday-banner:active { transform: scale(0.98); }
-  .bday-banner .bico { font-size: 26px; flex: none; animation: bounce 2s ease-in-out infinite; }
-  @keyframes bounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-4px); }
-  }
-  .bday-banner .btxt { flex: 1; min-width: 0; }
-  .bday-banner .btxt h4 { margin: 0 0 2px; font-size: 13px; font-weight: 800; color: #a03631; letter-spacing: 0.3px; text-transform: uppercase; }
-  .bday-banner .btxt p { margin: 0; font-size: 12.5px; color: #4a4a55; line-height: 1.4; }
-  .bday-banner .btxt p strong { color: #1c1c1e; }
-  .bday-banner .barrow { color: #a03631; font-size: 20px; font-weight: 700; }
-
   .bonus-notif-list{display:grid;gap:8px;margin:0 0 12px}
   @keyframes bonusEntra{from{opacity:0;transform:translateY(16px) scale(.97)}to{opacity:1;transform:none}}
   #bonusNotifWrap .bonus-notif{animation:bonusEntra .5s cubic-bezier(.25,.9,.35,1.15) backwards}
@@ -2950,11 +2930,6 @@ body.dark .hist-action-drawer{background:linear-gradient(155deg,#151827,#252036 
   body.dark .filter-chip { color: #a0a0b0; }
   body.dark .bday-list { background: linear-gradient(135deg, rgba(255,143,107,0.15), rgba(255,107,157,0.10)); }
   body.dark .bday-list h4 { color: #ffb0ab; }
-  body.dark .bday-banner { background: linear-gradient(135deg, rgba(255,143,107,0.20), rgba(255,107,157,0.15)); }
-  body.dark .bday-banner .btxt h4 { color: #ffb0ab; }
-  body.dark .bday-banner .btxt p { color: #d0d0d8; }
-  body.dark .bday-banner .btxt p strong { color: #f0f0f5; }
-  body.dark .bday-banner .barrow { color: #ffb0ab; }
   body.dark .person-modal-body .pm-row { border-bottom-color: rgba(255,255,255,0.08); }
   body.dark .person-modal-body .pm-row .pm-lbl { color: #a0a0b0; }
   body.dark .person-modal-body .pm-row .pm-val { color: #f0f0f5; }
@@ -4127,7 +4102,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v320 · Segura</div>
+  <div class="ds-foot">APPI · v321 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4438,7 +4413,6 @@ body.dark #pageTabs button.active{color:#a8c0ff}
       </div>
     </header>
 
-    <div id="bdayBannerWrap"></div>
     <div id="culturaWrap"></div>
 
     <div class="home-section-head">
@@ -9973,33 +9947,9 @@ function appiPintarTodos(id, html){
   nodos.forEach(nodo => { nodo.innerHTML = html; });
   return nodos.length;
 }
-function renderBdayBanner(){
-  if(!document.querySelector('#bdayBannerWrap')) return;
-  if(!equipoData) loadEquipoFromStorage();
-  if(!equipoData || !equipoData.personas){ appiPintarTodos('bdayBannerWrap',''); return; }
-  const hoy = new Date();
-  const dia = hoy.getDate(), mes = hoy.getMonth() + 1;
-  const cumplenHoy = equipoData.personas.filter(p => {
-    if(!p.cumple) return false;
-    const parts = p.cumple.split('-');
-    return parts.length >= 3 && parseInt(parts[1]) === mes && parseInt(parts[2]) === dia;
-  });
-  if(cumplenHoy.length === 0){ appiPintarTodos('bdayBannerWrap',''); return; }
-  const nombres = cumplenHoy.slice(0,2).map(p => p.nombre.split(',')[0]).join(', ');
-  const extra = cumplenHoy.length > 2 ? ` y ${cumplenHoy.length - 2} más` : '';
-  appiPintarTodos('bdayBannerWrap', `
-    <div class="bday-banner">
-      <div class="bico">🎂</div>
-      <div class="btxt">
-        <h4>Hoy cumple${cumplenHoy.length>1?'n':''}</h4>
-        <p><strong>${escapeXml(nombres)}${extra}</strong> · ¡No te olvides de saludar!</p>
-      </div>
-      <div class="barrow">›</div>
-    </div>
-  `);
-  // Cada copia del aviso tiene que abrir Mi Equipo, no solo la primera.
-  document.querySelectorAll('#bdayBannerWrap .bday-banner').forEach(el => { el.onclick = ()=>{ openEquipo(); }; });
-}
+// El aviso "Hoy cumplen" del Home se retiró en v321: la tarjeta de Cumpleaños
+// del mazo de notificaciones hace lo mismo y mejor (saluda por WhatsApp
+// directo a cada persona, con el teléfono real de la planilla).
 const BONUS_CAT_OK={D:1,DC:1,CE:1,L:1,LE:1,EJ:1,E:1};
 const BONUS_PB_SPONSOR=12;
 const BONUS_PB_INVITADO=9;
@@ -10909,7 +10859,6 @@ function openCulturaInvitado(monthId,slot){
 function renderHomeCompleto(){
   try{ renderDateContext(); }catch(e){ console.error(e); }
   try{ renderCulturaCrecimiento(); }catch(e){ console.error(e); }
-  try{ renderBdayBanner(); }catch(e){ console.error(e); }
   try{ renderBonusNotifs(); }catch(e){ console.error(e); }
   try{ renderScoreCompact(); }catch(e){ console.error(e); }
   try{ renderToolsList(); }catch(e){ console.error(e); }
@@ -11706,7 +11655,7 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='320';
+      const swVersion='321';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 

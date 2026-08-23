@@ -3,7 +3,8 @@ const { test, expect } = require('@playwright/test');
 // El Home se partió en "Mi mes" y "Mi negocio", y los avisos quedaron con el
 // mismo id en dos lugares. Como el código los llenaba con getElementById —que
 // devuelve sólo el primero— la copia de la pantalla nueva quedaba vacía.
-// Estas pruebas fijan que los tres avisos lleguen a TODAS sus ubicaciones.
+// Estas pruebas fijan que cada aviso viva en su único lugar (v321: el de
+// cumpleaños ya no existe, lo cubre la tarjeta del mazo).
 
 const USER_ID = '11111111-1111-4111-8111-111111111111';
 
@@ -74,7 +75,7 @@ async function copias(page, id) {
   }, id);
 }
 
-test('los tres avisos viven sólo en el inicio', async ({ page }) => {
+test('cada aviso vive sólo en su lugar', async ({ page }) => {
   await abrirApp(page);
   await page.evaluate(() => {
     if (window.renderBdayBanner) window.renderBdayBanner();
@@ -84,13 +85,13 @@ test('los tres avisos viven sólo en el inicio', async ({ page }) => {
   await page.waitForTimeout(300);
 
   // Se quitaron de Mi mes y de Mi negocio a pedido: esas pantallas quedan para
-  // planificar y para los números, sin avisos encima. Y desde v315 el aviso
-  // de Bonus vive en Mi Equipo, después del título.
-  for (const id of ['bdayBannerWrap', 'culturaWrap']) {
-    const r = await copias(page, id);
-    expect(r.total, `${id} debe existir una sola vez`).toBe(1);
-    expect(r.secciones[0], `${id} sólo va en el inicio`).toBe('view-home');
-  }
+  // planificar y para los números, sin avisos encima. Desde v315 el aviso de
+  // Bonus vive en Mi Equipo, y desde v321 el de cumpleaños ya no existe: lo
+  // reemplaza la tarjeta de Cumpleaños del mazo de notificaciones.
+  const cultura = await copias(page, 'culturaWrap');
+  expect(cultura.total, 'culturaWrap debe existir una sola vez').toBe(1);
+  expect(cultura.secciones[0], 'culturaWrap sólo va en el inicio').toBe('view-home');
+  expect((await copias(page, 'bdayBannerWrap')).total, 'el aviso Hoy cumplen se retiró en v321').toBe(0);
   const bonus = await copias(page, 'bonusNotifWrap');
   expect(bonus.total, 'bonusNotifWrap debe existir una sola vez').toBe(1);
   expect(bonus.secciones[0], 'el aviso de Bonus vive en Mi Equipo').toBe('view-equipo');
@@ -101,7 +102,7 @@ test('los tres avisos viven sólo en el inicio', async ({ page }) => {
   await expect(page.locator('#view-negocio #bdayBannerWrap')).toHaveCount(0);
 });
 
-test('el saludo de cumpleaños se pinta en el inicio y el Bonus en Mi Equipo', async ({ page }) => {
+test('el Bonus se pinta en Mi Equipo y el cumple ya no tiene aviso propio', async ({ page }) => {
   await abrirApp(page);
   await page.evaluate(() => {
     if (window.renderBdayBanner) window.renderBdayBanner();
@@ -109,8 +110,10 @@ test('el saludo de cumpleaños se pinta en el inicio y el Bonus en Mi Equipo', a
   });
   await page.waitForTimeout(300);
 
-  await expect(page.locator('#bdayBannerWrap .bday-banner')).toHaveCount(1);
-  await expect(page.locator('#bdayBannerWrap')).toContainText('Cumple Hoy');
+  // El aviso "Hoy cumplen" se retiró en v321: ni el contenedor, ni la función,
+  // ni un banner suelto. El saludo vive en la tarjeta de Cumpleaños del mazo.
+  await expect(page.locator('.bday-banner')).toHaveCount(0);
+  expect(await page.evaluate(() => typeof window.renderBdayBanner)).toBe('undefined');
 
   const tarjetas = await page.locator('#bonusNotifWrap [data-bonus-id]').count();
   expect(tarjetas).toBeGreaterThan(0);
@@ -140,20 +143,16 @@ test('Cultura de Crecimiento sigue guardando los PB desde el inicio', async ({ p
   expect(guardado).toBe(7.5);
 });
 
-test('sin datos que mostrar, el aviso no queda con contenido viejo', async ({ page }) => {
+test('el cumpleañero sigue cubierto: la tarjeta del mazo lo trae (v321)', async ({ page }) => {
   await abrirApp(page);
-  await page.evaluate(() => window.renderBdayBanner && window.renderBdayBanner());
-  await page.waitForTimeout(200);
-  expect((await copias(page, 'bdayBannerWrap')).llenas).toBeGreaterThan(0);
-
-  // Se va la persona que cumplía: el aviso tiene que borrarse.
-  await page.evaluate(() => {
-    const d = JSON.parse(localStorage.getItem('equipoData'));
-    d.personas = d.personas.filter(p => p.nombre !== 'Cumple Hoy');
-    localStorage.setItem('equipoData', JSON.stringify(d));
-    if (window.loadEquipoFromStorage) window.loadEquipoFromStorage();
-    if (window.renderBdayBanner) window.renderBdayBanner();
+  // El widget se fue, pero el cumpleaños de "Cumple Hoy" no queda huérfano:
+  // la tarjeta de Cumpleaños del mazo lo tiene, con saludo directo.
+  const r = await page.evaluate(() => {
+    const tarjetas = window.APPIHomeTarjetas.armarTarjetas();
+    const cumples = tarjetas.find(t => t.cat === 'cumples');
+    return { hay: !!cumples, titulo: cumples ? cumples.titulo : '', html: cumples ? cumples.html : '' };
   });
-  await page.waitForTimeout(300);
-  expect((await copias(page, 'bdayBannerWrap')).llenas).toBe(0);
+  expect(r.hay).toBe(true);
+  expect(r.titulo).toContain('cumpleaños');
+  expect(r.html).toContain('Cumple Hoy');
 });

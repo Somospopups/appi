@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v320-saludo-directo';
+const CACHE_NAME = 'appi-v321-cumple-sin-widget';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
