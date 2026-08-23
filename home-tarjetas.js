@@ -601,20 +601,23 @@
 
   function activarArrastre(el){
     // Se arrastra desde cualquier parte de la tarjeta, botones incluidos.
-    // Si el dedo casi no se movió, el toque cuenta como toque (la X y el
-    // botón siguen respondiendo normal); si se movió, es arrastre y el
-    // click posterior se anula para que no dispare nada por accidente.
-    var x0 = 0, dx = 0, arrastrando = false;
+    // El dedo real tiembla unos píxeles al tocar: para que un toque nunca se
+    // confunda con un arrastre, el gesto recién cuenta como arrastre cuando
+    // el movimiento es claramente horizontal y amplio (y sobre un botón o un
+    // renglón, más amplio todavía). Si fue toque, el click sale normal.
+    var x0 = 0, y0 = 0, dx = 0, dy = 0, arrastrando = false, umbral = 14;
     el.addEventListener('pointerdown', function(e){
       el.classList.remove('demo');
-      arrastrando = true; x0 = e.clientX; dx = 0; el.__arrastro = false;
+      arrastrando = true; x0 = e.clientX; y0 = e.clientY; dx = 0; dy = 0; el.__arrastro = false;
+      umbral = e.target.closest('button, .ht-lista li, a') ? 26 : 14;
       // Ojo: la captura del puntero recién se toma cuando el gesto ES un
       // arrastre. Si se toma acá, el click de la ✗ y del botón se pierde.
     });
     el.addEventListener('pointermove', function(e){
       if (!arrastrando) return;
       dx = e.clientX - x0;
-      if (!el.__arrastro && Math.abs(dx) > 7){
+      dy = e.clientY - y0;
+      if (!el.__arrastro && Math.abs(dx) > umbral && Math.abs(dx) > Math.abs(dy) + 4){
         el.__arrastro = true;
         el.classList.add('arrastre');
         try{ el.setPointerCapture(e.pointerId); }catch(err){}

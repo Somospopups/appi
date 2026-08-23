@@ -1,4 +1,4 @@
-# Estado al retomar — APPI v310
+# Estado al retomar — APPI v311
 
 Repo: `github.com/somospopups/appi` · **suite en verde**.
 
@@ -6,7 +6,16 @@ Corrida local completa: **282 pruebas pasan, 1 salteada, 0 fallan** (sin flakes 
 
 ---
 
-## Último cambio: v310 · Acción directa, gesto ida/vuelta, franja que achica
+## Último cambio: v311 · El toque no se confunde con arrastre
+
+Bug real de teléfono reproducido con eventos táctiles: el dedo tiembla
+5-10px al tocar y el umbral de arrastre (7px) anulaba el click de los
+botones de las tarjetas. Ahora el arrastre exige movimiento horizontal
+y amplio: 14px general, 26px sobre botones/renglones/✗, y siempre más
+horizontal que vertical. Test táctil permanente (toque con 9px de
+temblor dispara la acción).
+
+## Anterior: v310 · Acción directa, gesto ida/vuelta, franja que achica
 
 (1) El botón grande de TODAS las tarjetas ejecuta la primera acción
 (como Usuarios): Ir con Jorge (ficha), Proponerle a Ana (WA bonus),

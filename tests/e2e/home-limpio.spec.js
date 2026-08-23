@@ -338,3 +338,24 @@ test('el mazo espera a que la app cargue: nunca sobre la elección de persona', 
   await expect(page.locator('#htOverlay')).toBeVisible({ timeout: 5000 });
   await expect(page.locator('#htOverlay')).toContainText('Tu impulso de hoy');
 });
+
+test('un toque con temblor de dedo sobre el botón dispara la acción igual', async ({ page }) => {
+  await entrar(page);
+  await page.evaluate(() => window.APPIHomeTarjetas.abrir());
+  await page.locator('#htPasar').click();
+  await expect(page.locator('#htOverlay')).toContainText('Tu jornada');
+  // El dedo real no baja quieto: baja, tiembla ~9px y suelta. Eso es un TOQUE.
+  await page.evaluate(() => {
+    const cta = document.querySelector('.ht-card:not(.detras1):not(.detras2) .ht-cta');
+    const r = cta.getBoundingClientRect();
+    const x = r.x + r.width / 2, y = r.y + r.height / 2;
+    const fire = (type, cx) => cta.dispatchEvent(new PointerEvent(type, { bubbles: true, clientX: cx, clientY: y, pointerId: 1, pointerType: 'touch' }));
+    fire('pointerdown', x);
+    fire('pointermove', x + 5);
+    fire('pointermove', x + 9);
+    fire('pointerup', x + 9);
+    cta.dispatchEvent(new MouseEvent('click', { bubbles: true, clientX: x + 9, clientY: y }));
+  });
+  await expect(page.locator('#htOverlay')).toHaveCount(0, { timeout: 3000 });
+  await expect(page.locator('#gestionDrawer')).toContainText('Jorge Salas');
+});
