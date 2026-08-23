@@ -794,6 +794,11 @@ body.dark .hist-action-drawer{background:linear-gradient(155deg,#151827,#252036 
   .bday-banner .barrow { color: #a03631; font-size: 20px; font-weight: 700; }
 
   .bonus-notif-list{display:grid;gap:8px;margin:0 0 12px}
+  @keyframes bonusEntra{from{opacity:0;transform:translateY(16px) scale(.97)}to{opacity:1;transform:none}}
+  #bonusNotifWrap .bonus-notif{animation:bonusEntra .5s cubic-bezier(.25,.9,.35,1.15) backwards}
+  #bonusNotifWrap .bonus-notif:nth-child(2){animation-delay:.12s}
+  #bonusNotifWrap .bonus-notif:nth-child(3){animation-delay:.24s}
+  #bonusNotifWrap .bonus-notif:nth-child(n+4){animation-delay:.36s}
   .bonus-notif{
     position:relative;overflow:hidden;padding:13px 14px 12px;border-radius:20px;
     background:
@@ -4121,7 +4126,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v314 · Segura</div>
+  <div class="ds-foot">APPI · v315 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4432,7 +4437,6 @@ body.dark #pageTabs button.active{color:#a8c0ff}
       </div>
     </header>
 
-    <div id="bonusNotifWrap"></div>
     <div id="bdayBannerWrap"></div>
     <div id="culturaWrap"></div>
 
@@ -4818,6 +4822,8 @@ body.dark #pageTabs button.active{color:#a8c0ff}
       <div class="script">Equipo</div>
       <p id="equipoSubtitle">Cargá tu planilla para empezar</p>
     </header>
+
+    <div id="bonusNotifWrap"></div>
 
     <div class="equipo-tabs" id="equipoTabsWrap" style="display:none">
       <button class="equipo-tab active" data-eqtab="dashboard">
@@ -7299,6 +7305,7 @@ function procesarExcel(rows){
 
 function openEquipo(){
   loadEquipoFromStorage();
+  try{ renderBonusNotifs(); }catch(e){}
   equipoActiveTab = 'dashboard';
   document.querySelectorAll('.equipo-tab').forEach(b=>b.classList.toggle('active', b.dataset.eqtab==='dashboard'));
   showView('view-equipo');
@@ -11698,7 +11705,7 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='314';
+      const swVersion='315';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 

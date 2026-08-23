@@ -84,19 +84,24 @@ test('los tres avisos viven sólo en el inicio', async ({ page }) => {
   await page.waitForTimeout(300);
 
   // Se quitaron de Mi mes y de Mi negocio a pedido: esas pantallas quedan para
-  // planificar y para los números, sin avisos encima.
-  for (const id of ['bdayBannerWrap', 'bonusNotifWrap', 'culturaWrap']) {
+  // planificar y para los números, sin avisos encima. Y desde v315 el aviso
+  // de Bonus vive en Mi Equipo, después del título.
+  for (const id of ['bdayBannerWrap', 'culturaWrap']) {
     const r = await copias(page, id);
     expect(r.total, `${id} debe existir una sola vez`).toBe(1);
     expect(r.secciones[0], `${id} sólo va en el inicio`).toBe('view-home');
   }
+  const bonus = await copias(page, 'bonusNotifWrap');
+  expect(bonus.total, 'bonusNotifWrap debe existir una sola vez').toBe(1);
+  expect(bonus.secciones[0], 'el aviso de Bonus vive en Mi Equipo').toBe('view-equipo');
+  await expect(page.locator('#view-home #bonusNotifWrap')).toHaveCount(0);
 
   await expect(page.locator('#view-mes #culturaWrap')).toHaveCount(0);
   await expect(page.locator('#view-negocio #bonusNotifWrap')).toHaveCount(0);
   await expect(page.locator('#view-negocio #bdayBannerWrap')).toHaveCount(0);
 });
 
-test('el saludo de cumpleaños y el aviso de Bonus se pintan en el inicio', async ({ page }) => {
+test('el saludo de cumpleaños se pinta en el inicio y el Bonus en Mi Equipo', async ({ page }) => {
   await abrirApp(page);
   await page.evaluate(() => {
     if (window.renderBdayBanner) window.renderBdayBanner();

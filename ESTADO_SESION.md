@@ -1,4 +1,4 @@
-# Estado al retomar — APPI v314
+# Estado al retomar — APPI v315
 
 Repo: `github.com/somospopups/appi` · **suite en verde**.
 
@@ -6,7 +6,15 @@ Corrida local completa: **282 pruebas pasan, 1 salteada, 0 fallan** (sin flakes 
 
 ---
 
-## Último cambio: v314 · Tareas del calendario con hora
+## Último cambio: v315 · Bonus en Mi Equipo
+
+Las tarjetas OPORTUNIDAD DE BONUS salieron del Home y viven en Mi
+Equipo, después del título y antes de los botones, con entrada animada
+en cascada (bonusEntra + delays). openEquipo() las repinta frescas. El
+Home no pierde nada: el mazo ya trae Oportunidades con WhatsApp directo.
+avisos-duplicados.spec exige bonusNotifWrap único y en view-equipo.
+
+## Anterior: v314 · Tareas del calendario con hora
 
 El alta de tareas del calendario del Home suma selector de hora
 (opcional). Chip de hora en la lista, orden automático (con hora
