@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v321-cumple-sin-widget';
+const CACHE_NAME = 'appi-v322-sin-telefono-avisa';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

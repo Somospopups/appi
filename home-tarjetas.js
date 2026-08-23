@@ -245,18 +245,21 @@
         return (t.trim().split(/\s+/)[0] || '');
       };
       var abrirEquipo = function(){ if (typeof window.openEquipo === 'function') window.openEquipo(); else if (typeof window.showView === 'function') window.showView('view-equipo'); };
+      var telDeB = function(p){ return p.tel || p.telefono || p.telf || ''; };
+      var telValidoB = function(p){ var t = telDeB(p); return !!(t && window.APPITel && window.APPITel.esValido(t)); };
       var proponer = function(p){ return function(){
-        // La planilla de Línea Descendente guarda el número en `tel` (v320).
-        var tel = p.tel || p.telefono || p.telf || '';
         var pb = String(Number(p.pnAct || p.pb || 0)).replace('.', ',');
-        if (tel && window.APPITel && window.APPITel.esValido(tel)){
-          window.APPITel.abrir(tel, 'Hola ' + pilaB(p.nombre) + '! 😊 Vi que ya estás en ' + pb + ' PB… ¡a nada del Bonus! ¿Te ayudo a llegar? Podemos invitar a alguien y trabajarlo juntos esta semana. 💪', pilaB(p.nombre));
+        if (telValidoB(p)){
+          window.APPITel.abrir(telDeB(p), 'Hola ' + pilaB(p.nombre) + '! 😊 Vi que ya estás en ' + pb + ' PB… ¡a nada del Bonus! ¿Te ayudo a llegar? Podemos invitar a alguien y trabajarlo juntos esta semana. 💪', pilaB(p.nombre));
+        } else if (window.APPIDialog && window.APPIDialog.alert){
+          // Sin teléfono en la planilla, decirlo de frente (v322).
+          window.APPIDialog.alert((pilaB(p.nombre) || 'Esta persona') + ' no tiene un teléfono válido cargado en la planilla de Línea Descendente. Cuando subas una planilla con su número, el mensaje sale a un toque.', { title: 'Sin teléfono en la planilla', icon: '📵' });
         } else abrirEquipo();
       }; };
       var filas = [], items = [];
       gente.slice(0, 3).forEach(function(p){
         var pb = Number(p.pnAct || p.pb || 0);
-        filas.push('<li>🎯 <b>' + esc(String(p.nombre || '').split(',')[0]) + '</b> está en ' + String(pb).replace('.', ',') + ' PB</li>');
+        filas.push('<li>🎯 <b>' + esc(String(p.nombre || '').split(',')[0]) + '</b> está en ' + String(pb).replace('.', ',') + ' PB' + (telValidoB(p) ? '' : ' <i>sin teléfono</i>') + '</li>');
         items.push(proponer(p));
       });
       return {
@@ -295,15 +298,23 @@
       return t ? t.charAt(0).toUpperCase() + t.slice(1).toLowerCase() : '';
     };
     var abrirEquipo = function(){ if (typeof window.openEquipo === 'function') window.openEquipo(); else if (typeof window.showView === 'function') window.showView('view-equipo'); };
+    var telDe = function(p){ return p.tel || p.telefono || p.telf || ''; };
+    var telValido = function(p){ var t = telDe(p); return !!(t && window.APPITel && window.APPITel.esValido(t)); };
+    // Sin teléfono en la planilla no hay a quién marcarle: mejor decirlo de
+    // frente que mandar a otra pantalla en silencio (v322).
+    var avisarSinTelefono = function(p){
+      var nombre = pila(p.nombre) || 'Esta persona';
+      if (window.APPIDialog && window.APPIDialog.alert){
+        window.APPIDialog.alert(nombre + ' no tiene un teléfono válido cargado en la planilla de Línea Descendente. Cuando subas una planilla con su número, el saludo sale a un toque.', { title: 'Sin teléfono en la planilla', icon: '📵' });
+      } else abrirEquipo();
+    };
     // Saludo directo: a la persona del equipo la saluda APPITel con el mensaje
     // de cumpleaños; al cliente lo saluda la plantilla de Mensajes, que además
     // deja marcada la ✓ de la acción del día.
     var saludarEquipo = function(p){ return function(){
-      // La planilla de Línea Descendente guarda el número en `tel` (v320).
-      var tel = p.tel || p.telefono || p.telf || '';
-      if (tel && window.APPITel && window.APPITel.esValido(tel)){
-        window.APPITel.abrir(tel, '¡Feliz cumpleaños, ' + pila(p.nombre) + '! 🎂🎉\n\nTe mando un saludo grande en tu día. Que lo disfrutes mucho.\n\n¡Un abrazo!', pila(p.nombre));
-      } else abrirEquipo();
+      if (telValido(p)){
+        window.APPITel.abrir(telDe(p), '¡Feliz cumpleaños, ' + pila(p.nombre) + '! 🎂🎉\n\nTe mando un saludo grande en tu día. Que lo disfrutes mucho.\n\n¡Un abrazo!', pila(p.nombre));
+      } else avisarSinTelefono(p);
     }; };
     var saludarCliente = function(u){ return function(){
       if (window.APPIMensajes && window.APPIMensajes.mandar) window.APPIMensajes.mandar('cumple', u);
@@ -312,7 +323,7 @@
 
     var filas = [], items = [];
     equipo.slice(0, 2).forEach(function(p){
-      filas.push('<li>🎂 <b>' + esc(String(p.nombre || '').split(',')[0]) + '</b> · de tu equipo</li>');
+      filas.push('<li>🎂 <b>' + esc(String(p.nombre || '').split(',')[0]) + '</b> · de tu equipo' + (telValido(p) ? '' : ' <i>sin teléfono</i>') + '</li>');
       items.push(saludarEquipo(p));
     });
     clientes.slice(0, 2).forEach(function(u){

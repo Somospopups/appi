@@ -1,12 +1,24 @@
-# Estado al retomar — APPI v321
+# Estado al retomar — APPI v322
 
 Repo: `github.com/somospopups/appi` · **suite en verde**.
 
-Corrida local completa: **311 pruebas pasan, 1 salteada, 0 fallan** (sin flakes en esta corrida).
+Corrida local completa: **313 pruebas pasan, 1 salteada, 0 fallan** (sin flakes en esta corrida).
 
 ---
 
-## Último cambio: v321 · El aviso "Hoy cumplen" del Home se retiró
+## Último cambio: v322 · El cumpleañero sin teléfono lo dice de frente
+
+Reporte: con dos cumpleañeros, el primero saludaba por WhatsApp y el
+segundo no. Test primero: con teléfonos válidos los DOS renglones
+saludan → el código estaba sano; el segundo real no tiene número válido
+en la planilla y el plan B (abrir Mi Equipo en silencio) parecía rotura.
+Arreglo de honestidad: el renglón sin número dice "sin teléfono" (i en
+rojo del estilo de ht-lista) y el toque abre APPIDialog explicando que
+falta el número en la planilla de Línea Descendente. Igual en la
+tarjeta de Oportunidades. Con número válido, WhatsApp directo como en
+v320. 2 tests nuevos de guardia.
+
+## Anterior: v321 · El aviso "Hoy cumplen" del Home se retiró
 
 Con la tarjeta de Cumpleaños del mazo a pleno (v320), el widget HOY
 CUMPLEN del Home quedó redundante y se quitó a pedido: contenedor

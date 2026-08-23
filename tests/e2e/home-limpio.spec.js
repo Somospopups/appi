@@ -481,3 +481,64 @@ test('proponer el bonus abre el WhatsApp de la persona con el teléfono real de 
   expect(saludos[0].texto).toContain('Bonus');
   expect(saludos[0].tel).toContain('351');
 });
+
+// v322 · Con dos cumpleañeros en la tarjeta, el primero saludaba por WhatsApp
+// pero el segundo no. Este test toca el SEGUNDO renglón y exige su saludo.
+test('con dos cumpleañeros, el segundo renglón también saluda por WhatsApp (v322)', async ({ page }) => {
+  await entrar(page);
+  const hoyLocal = new Date();
+  const cumpleHoy = `1980-${String(hoyLocal.getMonth() + 1).padStart(2, '0')}-${String(hoyLocal.getDate()).padStart(2, '0')}`;
+  await page.evaluate((cumple) => {
+    // Dos del equipo cumplen hoy, ambos con teléfono real de planilla (tel).
+    const data = JSON.parse(localStorage.getItem('equipoData'));
+    data.personas.push({ id: 9, nivel: 1, codigo: '02-111', nombre: 'TRONCOSO, SEBASTIAN', cat: 'D', pnAct: 2, cumple, tel: '351 766-9967', hijos: [] });
+    data.personas.push({ id: 10, nivel: 1, codigo: '02-222', nombre: 'OVIEDO, MARCELA', cat: 'D', pnAct: 1, cumple, tel: '3515 55-1002', hijos: [] });
+    localStorage.setItem('equipoData', JSON.stringify(data));
+    if (typeof loadEquipoFromStorage === 'function') loadEquipoFromStorage();
+    window.__saludos = [];
+    window.APPITel.abrir = (tel, texto, nombre) => { window.__saludos.push({ tel, texto, nombre }); return true; };
+  }, cumpleHoy);
+  await page.evaluate(() => window.APPIHomeTarjetas.abrir());
+  while (!(await page.locator('.ht-card:not(.detras1):not(.detras2):not(.ht-fantasma)').textContent()).includes('cumpleaños')) {
+    await page.evaluate(() => window.APPIHomeTarjetas.pasar());
+    await page.waitForTimeout(400);
+  }
+  await page.locator('.ht-lista li', { hasText: 'OVIEDO' }).click();
+  const saludos = await page.evaluate(() => window.__saludos);
+  expect(saludos).toHaveLength(1);
+  expect(saludos[0].texto).toContain('Feliz cumpleaños, Marcela');
+  expect(saludos[0].tel).toContain('351');
+});
+
+// v322 · El caso real del reporte: el segundo cumpleañero no tenía teléfono
+// válido en la planilla y el toque abría Mi Equipo en silencio — parecía roto.
+// Ahora el renglón avisa "sin teléfono" y el toque lo explica con un diálogo.
+test('el cumpleañero sin teléfono lo dice en el renglón y el toque lo explica (v322)', async ({ page }) => {
+  await entrar(page);
+  const hoyLocal = new Date();
+  const cumpleHoy = `1980-${String(hoyLocal.getMonth() + 1).padStart(2, '0')}-${String(hoyLocal.getDate()).padStart(2, '0')}`;
+  await page.evaluate((cumple) => {
+    const data = JSON.parse(localStorage.getItem('equipoData'));
+    data.personas.push({ id: 9, nivel: 1, codigo: '02-111', nombre: 'TRONCOSO, SEBASTIAN', cat: 'D', pnAct: 2, cumple, tel: '351 766-9967', hijos: [] });
+    data.personas.push({ id: 10, nivel: 1, codigo: '02-222', nombre: 'OVIEDO, MARCELA', cat: 'D', pnAct: 1, cumple, tel: '', hijos: [] });
+    localStorage.setItem('equipoData', JSON.stringify(data));
+    if (typeof loadEquipoFromStorage === 'function') loadEquipoFromStorage();
+    window.__saludos = [];
+    window.APPITel.abrir = (tel, texto, nombre) => { window.__saludos.push({ tel, texto, nombre }); return true; };
+  }, cumpleHoy);
+  await page.evaluate(() => window.APPIHomeTarjetas.abrir());
+  while (!(await page.locator('.ht-card:not(.detras1):not(.detras2):not(.ht-fantasma)').textContent()).includes('cumpleaños')) {
+    await page.evaluate(() => window.APPIHomeTarjetas.pasar());
+    await page.waitForTimeout(400);
+  }
+  // El renglón de Marcela avisa que no hay número; el de Sebastián no.
+  const fila = page.locator('.ht-lista li', { hasText: 'OVIEDO' });
+  await expect(fila).toContainText('sin teléfono');
+  await expect(page.locator('.ht-lista li', { hasText: 'TRONCOSO' })).not.toContainText('sin teléfono');
+  // Tocarla no abre WhatsApp ni manda a otra pantalla en silencio: explica.
+  await fila.click();
+  await expect(page.locator('.appi-dialog-overlay:not([hidden])')).toBeVisible();
+  await expect(page.locator('.appi-dialog-overlay')).toContainText('planilla');
+  const saludos = await page.evaluate(() => window.__saludos);
+  expect(saludos).toHaveLength(0);
+});
