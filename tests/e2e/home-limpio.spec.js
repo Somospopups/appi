@@ -363,3 +363,31 @@ test('un toque con temblor de dedo sobre el botón dispara la acción igual', as
   await expect(page.locator('#htOverlay')).toHaveCount(0, { timeout: 3000 });
   await expect(page.locator('#gestionDrawer')).toContainText('Jorge Salas');
 });
+
+test('las tareas del calendario aceptan hora y se ordenan por ella', async ({ page }) => {
+  await entrar(page);
+  await page.locator('#hlCardOpen').click();
+  await expect(page.locator('.cal-overlay')).toBeVisible();
+  // Una tarea a las 18:30…
+  await page.locator('#calNewHora').fill('18:30');
+  await page.locator('#calNewTask').fill('Demo con Marta');
+  await page.locator('#calAddBtn').click();
+  // …otra más temprano, a las 09:15…
+  await page.locator('#calNewHora').fill('09:15');
+  await page.locator('#calNewTask').fill('Llamar a Pedro');
+  await page.locator('#calAddBtn').click();
+  // …y una sin hora.
+  await page.locator('#calNewTask').fill('Ordenar el stock');
+  await page.locator('#calAddBtn').click();
+  // Se muestran con su hora, ordenadas: 09:15, 18:30 y al final la suelta.
+  const tareas = page.locator('.cal-task');
+  await expect(tareas).toHaveCount(3);
+  await expect(tareas.nth(0)).toContainText('09:15');
+  await expect(tareas.nth(0)).toContainText('Llamar a Pedro');
+  await expect(tareas.nth(1)).toContainText('18:30');
+  await expect(tareas.nth(2)).toContainText('Ordenar el stock');
+  // Y en Tu jornada, la tarea sale con su hora en la línea de tiempo.
+  await page.locator('#calClose').click();
+  await expect(page.locator('#homeLimpio')).toContainText('09:15');
+  await expect(page.locator('#homeLimpio')).toContainText('Llamar a Pedro');
+});

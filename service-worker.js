@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v313-whatsapp-directo';
+const CACHE_NAME = 'appi-v314-tareas-con-hora';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

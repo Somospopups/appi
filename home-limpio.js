@@ -26,13 +26,20 @@
   function guardarTareas(t){ localStorage.setItem(tareasKey(), JSON.stringify(t)); }
   function tareasDe(fecha){
     var t = leerTareas();
-    return t[fecha] || [];
+    var lista = (t[fecha] || []).slice();
+    lista.sort(function(a, b){
+      if (a.hora && b.hora) return a.hora.localeCompare(b.hora);
+      if (a.hora) return -1;
+      if (b.hora) return 1;
+      return 0;
+    });
+    return lista;
   }
-  function agregarTarea(fecha, texto){
+  function agregarTarea(fecha, texto, hora){
     if(!texto || !texto.trim()) return;
     var t = leerTareas();
     if(!t[fecha]) t[fecha] = [];
-    t[fecha].push({ id: Date.now(), texto: texto.trim(), done: false });
+    t[fecha].push({ id: Date.now(), texto: texto.trim(), done: false, hora: /^\d{2}:\d{2}$/.test(hora || '') ? hora : '' });
     guardarTareas(t);
   }
   function eliminarTarea(fecha, id){
@@ -157,6 +164,10 @@
       '.cal-task-text{flex:1;font-size:13px;color:#343441;font-weight:600;min-width:0}' +
       '.cal-task-text.done{text-decoration:line-through;opacity:.5}' +
       'body.dark .cal-task-text{color:#e0e0e8}' +
+      '.cal-task-hora{flex:0 0 auto;padding:3px 8px;border-radius:8px;background:rgba(91,141,239,.12);color:#3d63c9;font-size:10.5px;font-weight:900;white-space:nowrap}' +
+      '.cal-add input[type=time]{flex:0 0 96px;padding:10px 8px;border:1px solid rgba(80,90,130,.16);border-radius:12px;background:rgba(255,255,255,.94);color:#292938;font:inherit;font-size:12px}' +
+      'body.dark .cal-add input[type=time]{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.12);color:#f2f2f7}' +
+      'body.dark .cal-task-hora{background:rgba(91,141,239,.2);color:#a8c0ff}' +
       '.cal-task-del{border:0;background:none;color:#d9534f;font-size:16px;cursor:pointer;padding:0 4px;opacity:.6}' +
       '.cal-task-del:hover{opacity:1}' +
       '.cal-add{display:flex;gap:8px;margin-top:8px}' +
@@ -199,9 +210,9 @@
     // Tareas del calendario para hoy
     tareasHoy.filter(function(t){ return !t.done; }).forEach(function(t){
       eventos.push({
-        hora: '📌',
+        hora: t.hora || '📌',
         titulo: t.texto,
-        desc: 'Tarea de hoy',
+        desc: t.hora ? 'Tarea de hoy · ' + t.hora : 'Tarea de hoy',
         color: '#5b8def',
         acciones: []
       });
@@ -355,6 +366,7 @@
       tareasSel.forEach(function(t){
         html += '<div class="cal-task">' +
           '<div class="cal-task-check' + (t.done ? ' done' : '') + '" data-task-id="' + t.id + '" data-task-date="' + sel + '">' + (t.done ? '✓' : '') + '</div>' +
+          (t.hora ? '<span class="cal-task-hora">' + esc(t.hora) + '</span>' : '') +
           '<span class="cal-task-text' + (t.done ? ' done' : '') + '">' + esc(t.texto) + '</span>' +
           '<button class="cal-task-del" data-task-del="' + t.id + '" data-task-date="' + sel + '">✕</button>' +
         '</div>';
@@ -364,6 +376,7 @@
     }
 
     html += '<div class="cal-add">' +
+      '<input type="time" id="calNewHora" aria-label="Hora (opcional)">' +
       '<input type="text" id="calNewTask" placeholder="Nueva tarea…">' +
       '<button id="calAddBtn">＋</button>' +
     '</div>';
@@ -390,11 +403,13 @@
 
     var addBtn = $('calAddBtn');
     var addInput = $('calNewTask');
+    var addHora = $('calNewHora');
     function doAdd(){
       var txt = addInput.value.trim();
       if(!txt) return;
-      agregarTarea(calState.selected, txt);
+      agregarTarea(calState.selected, txt, addHora ? addHora.value : '');
       addInput.value = '';
+      if (addHora) addHora.value = '';
       renderCal();
     }
     addBtn.onclick = doAdd;

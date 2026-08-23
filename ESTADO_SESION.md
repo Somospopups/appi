@@ -1,4 +1,4 @@
-# Estado al retomar — APPI v313
+# Estado al retomar — APPI v314
 
 Repo: `github.com/somospopups/appi` · **suite en verde**.
 
@@ -6,7 +6,14 @@ Corrida local completa: **282 pruebas pasan, 1 salteada, 0 fallan** (sin flakes 
 
 ---
 
-## Último cambio: v313 · WhatsApp directo al distribuidor
+## Último cambio: v314 · Tareas del calendario con hora
+
+El alta de tareas del calendario del Home suma selector de hora
+(opcional). Chip de hora en la lista, orden automático (con hora
+primero, ascendente; sueltas al final) y la línea de tiempo de Tu
+jornada muestra la hora en lugar del 📌. Sin hora, todo como antes.
+
+## Anterior: v313 · WhatsApp directo al distribuidor
 
 El teléfono de la solicitud ahora queda en appi_perfiles.telefono al
 aprobar (y el opcional al crear). El 💬 de cada cuenta va directo si hay
