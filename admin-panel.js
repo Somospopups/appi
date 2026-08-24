@@ -1,188 +1,3 @@
-async function loadAcciones(){
-  try{
-    const rows=await rpcAdmin('appi_admin_cumplimiento',{dias_atras:7});
-    state.acciones=Array.isArray(rows)?rows:[];
-    setStatus('adminAccionesStatus','');
-  }catch(error){
-    state.acciones=[];
-    setStatus('adminAccionesStatus',error.message,true);
-  }
-  renderAcciones();
-}
-function renderAcciones(){
-  const list=$('adminAccionesList'),resumen=$('adminAccionesResumen');
-  if(!list)return;
-  const hoy=new Date(),hoyISO=`${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,'0')}-${String(hoy.getDate()).padStart(2,'0')}`;
-  const porCuenta=new Map();
-  state.acciones.forEach(row=>{
-    const key=`${row.cuenta}·${row.persona}`;
-    if(!porCuenta.has(key))porCuenta.set(key,{dip:row.dip,nombre:row.nombre,persona:row.persona,hoy:null,sem:{total:0,hechas:0,noHechas:0}});
-    const acc=porCuenta.get(key);
-    acc.sem.total+=row.total||0;acc.sem.hechas+=row.hechas||0;acc.sem.noHechas+=row.no_hechas||0;
-    if(String(row.fecha)===hoyISO)acc.hoy={total:row.total||0,hechas:row.hechas||0,noHechas:row.no_hechas||0};
-  });
-  const cuentas=[...porCuenta.values()].sort((a,b)=>String(a.nombre||a.dip).localeCompare(String(b.nombre||b.dip),'es'));
-  // El resumen vive en el encabezado: se entiende sin abrir la sección.
-  const hoyTot=cuentas.reduce((acc,c)=>{if(c.hoy){acc.h+=c.hoy.hechas;acc.n+=c.hoy.noHechas}return acc},{h:0,n:0});
-  if(resumen)resumen.textContent=cuentas.length?`${cuentas.length} cuenta${cuentas.length===1?'':'s'} · hoy ✓ ${hoyTot.h} · ✗ ${hoyTot.n} · tocá para ver el detalle`:'Todavía no hay marcas sincronizadas.';
-  const term=String(state.accionesFiltro||'').toLowerCase().trim();
-  const visibles=term?cuentas.filter(acc=>`${acc.nombre} ${acc.dip}`.toLowerCase().includes(term)):cuentas;
-  if(!visibles.length){list.innerHTML=`<div class="admin-pending-empty">${term?'Ninguna cuenta coincide con la búsqueda.':'Todavía no hay marcas sincronizadas.'}</div>`;return}
-  const pct=(hechas,total)=>total?Math.round(hechas*100/total):0;
-  list.innerHTML=visibles.map(acc=>{
-    const hoyTxt=acc.hoy?`Hoy: ✓ ${acc.hoy.hechas} · ✗ ${acc.hoy.noHechas} de ${acc.hoy.total}`:'Hoy: sin marcas todavía';
-    const semTxt=`Últimos 7 días: ✓ ${acc.sem.hechas} · ✗ ${acc.sem.noHechas} de ${acc.sem.total} (${pct(acc.sem.hechas,acc.sem.total)}% hecho)`;
-    return `<div class="admin-pending-item"><div><strong>${esc(acc.nombre||'Sin nombre')}${acc.persona==='socio'?' · socio/a':''}</strong><span>DIP ${esc(acc.dip||'—')}</span></div><div><span>${esc(hoyTxt)}</span><span>${esc(semTxt)}</span></div></div>`;
-  }).join('');
-}
-/* ---------- Ingresos por mes (v300) ---------- */
-async function loadPagos(){
-  const body=$('adminIngresosBody');if(!body)return;
-  try{
-    const rows=await rpcAdmin('appi_admin_pagos',{p_meses:24});
-    state.pagos=Array.isArray(rows)?rows:[];
-    if(!state.pagosMes){const d=new Date();state.pagosMes=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`}
-  }catch(error){
-    state.pagos=null;
-    body.innerHTML=`<div class="admin-pending-empty">${esc(error.message)}</div>`;
-    return;
-  }
-  renderPagos();
-}
-function moneyAdmin(v){return new Intl.NumberFormat('es-AR',{style:'currency',currency:'ARS',maximumFractionDigits:0}).format(Number(v)||0)}
-/* ---------- Anuncio para todos (v326) ----------
-   El administrador escribe un mensaje y hasta tres reuniones; el aviso
-   vigente les aparece a los distribuidores al abrir APPI. */
-async function fetchAdmin(path){
-  const configuration=cfg(),token=window.APPIAuth.accessToken();
-  const response=await fetch(`${String(configuration.url).replace(/\/$/,'')}${path}`,{headers:{apikey:configuration.anonKey,Authorization:`Bearer ${token}`}});
-  const data=await response.json().catch(()=>null);
-  if(response.status===404)throw new Error('Falta correr SUPABASE_ANUNCIOS.sql en Supabase.');
-  if(!response.ok)throw new Error((data&&(data.message||data.error))||'No se pudo leer el anuncio.');
-  return data;
-}
-const ANUNCIO_EVENTOS=3;
-function anuncioEventosDelForm(){
-  const eventos=[];
-  for(let i=0;i<ANUNCIO_EVENTOS;i++){
-    const titulo=$(`adminAnuncioEv${i}Titulo`),fecha=$(`adminAnuncioEv${i}Fecha`),hora=$(`adminAnuncioEv${i}Hora`),lugar=$(`adminAnuncioEv${i}Lugar`);
-    if(!titulo)continue;
-    const t=titulo.value.trim();
-    if(!t&&!fecha.value&&!hora.value&&!lugar.value.trim())continue;
-    eventos.push({titulo:t,fecha:fecha.value||'',hora:/^\d{2}:\d{2}$/.test(hora.value||'')?hora.value:'',lugar:lugar.value.trim()});
-  }
-  return eventos;
-}
-function anuncioFormDesdeRow(row){
-  const texto=$('adminAnuncioTexto');if(!texto)return;
-  texto.value=row?String(row.texto||''):'';
-  for(let i=0;i<ANUNCIO_EVENTOS;i++){
-    const titulo=$(`adminAnuncioEv${i}Titulo`),fecha=$(`adminAnuncioEv${i}Fecha`),hora=$(`adminAnuncioEv${i}Hora`),lugar=$(`adminAnuncioEv${i}Lugar`);
-    if(!titulo)continue;
-    const ev=row&&Array.isArray(row.eventos)?row.eventos[i]:null;
-    titulo.value=ev?String(ev.titulo||''):'';
-    fecha.value=ev?String(ev.fecha||''):'';
-    hora.value=ev&&/^\d{2}:\d{2}$/.test(String(ev.hora||''))?String(ev.hora):'';
-    lugar.value=ev?String(ev.lugar||''):'';
-  }
-}
-async function loadAnuncio(){
-  const resumen=$('adminAnuncioResumen');
-  if(!resumen)return;
-  try{
-    const rows=await fetchAdmin('/rest/v1/appi_anuncios?select=*&activo=eq.true&order=creado_en.desc&limit=1');
-    state.anuncio=Array.isArray(rows)&&rows[0]?rows[0]:null;
-  }catch(error){state.anuncio=null;resumen.textContent='No se pudo leer el aviso vigente.';return}
-  // El formulario arranca con el aviso vigente puesto: cambiar una palabra
-  // y volver a publicar es el caso más común.
-  anuncioFormDesdeRow(state.anuncio);
-  renderAnuncio();
-}
-function renderAnuncio(){
-  const resumen=$('adminAnuncioResumen');if(!resumen)return;
-  const row=state.anuncio;
-  if(!row){resumen.textContent='Sin aviso publicado. Escribí uno y tocá Publicar.';return}
-  const fecha=new Date(row.creado_en);
-  const cuando=isNaN(fecha.getTime())?'':` · ${fecha.toLocaleDateString('es-AR')}`;
-  const eventos=Array.isArray(row.eventos)?row.eventos.length:0;
-  const extracto=String(row.texto||'').replace(/\s+/g,' ').slice(0,60);
-  resumen.textContent=`Vigente${cuando}: “${extracto}${String(row.texto||'').length>60?'…':''}”${eventos?` · ${eventos} reunión${eventos===1?'':'es'}`:''}`;
-}
-async function publicarAnuncio(){
-  const texto=$('adminAnuncioTexto');if(!texto)return;
-  const mensaje=texto.value.trim();
-  if(!mensaje){setStatus('adminAnuncioStatus','Escribí el mensaje del aviso.',true);texto.focus();return}
-  if(mensaje.length>600){setStatus('adminAnuncioStatus','El mensaje no puede pasar de 600 caracteres.',true);return}
-  const eventos=anuncioEventosDelForm();
-  for(const ev of eventos){
-    if(!ev.titulo){
-      setStatus('adminAnuncioStatus','Toda reunión con fecha o lugar necesita un título.',true);
-      window.APPIDialog.alert('Pusiste fecha en una reunión pero le falta el título.\n\nEscribilo (ej: "Reunión general por Zoom") o borrá la fecha para dejarla vacía.',{title:'Falta el título',icon:'✍️',okText:'Entendido'});
-      return;
-    }
-    if(!/^\d{4}-\d{2}-\d{2}$/.test(ev.fecha)){
-      setStatus('adminAnuncioStatus',`“${ev.titulo}”: falta la fecha.`,true);
-      window.APPIDialog.alert(`La reunión “${ev.titulo}” tiene título pero le falta la fecha.\n\nElegí el día en el calendario de esa reunión, o borrá el título para dejarla vacía.`,{title:'Falta la fecha',icon:'📅',okText:'Entendido'});
-      return;
-    }
-  }
-  try{
-    await rpcAdmin('appi_admin_publicar_anuncio',{p_texto:mensaje,p_eventos:eventos});
-    setStatus('adminAnuncioStatus','Publicado ✓ Lo van a ver todos al abrir APPI.');
-    await window.APPIDialog.alert('El aviso quedó publicado.\n\nTodos los distribuidores lo van a ver como cartel al abrir APPI, con los botones para agendar las reuniones en APPI o en el teléfono.',{title:'Aviso publicado ✓',icon:'📣',okText:'Listo'});
-    await loadAnuncio();
-  }catch(error){
-    let msg=error.message||'No se pudo publicar el aviso.';
-    // El 404 del RPC arrastraba un texto de otra función: ahora dice la verdad.
-    if(/Falta correr SUPABASE_ACCIONES_DIA/.test(msg))msg='El backend todavía no conoce los anuncios. Corré el workflow "Publicar backend completo de APPI" en GitHub.';
-    setStatus('adminAnuncioStatus',msg,true);
-    await window.APPIDialog.alert(msg,{title:'No se pudo publicar',icon:'⚠️',okText:'Entendido'});
-  }
-}
-async function quitarAnuncioVigente(){
-  const ok=await window.APPIDialog.confirm('El aviso va a desaparecer de los teléfonos del equipo. Lo que ya se agendó en las agendas queda.',{title:'Quitar el aviso',icon:'📣',okText:'Quitar'});
-  if(!ok)return;
-  try{
-    await rpcAdmin('appi_admin_quitar_anuncio',{});
-    setStatus('adminAnuncioStatus','Aviso quitado. Nadie ve el cartel al abrir APPI.');
-    await window.APPIDialog.alert('El aviso quedó quitado: nadie va a ver el cartel al abrir APPI. Lo que ya se agendó en las agendas queda.',{title:'Aviso quitado ✓',icon:'📣',okText:'Listo'});
-    await loadAnuncio();
-  }catch(error){setStatus('adminAnuncioStatus',error.message||'No se pudo quitar el aviso.',true)}
-}
-function renderPagos(){
-  const body=$('adminIngresosBody');if(!body||!Array.isArray(state.pagos))return;
-  const mesSel=state.pagosMes,anio=Number(mesSel.slice(0,4));
-  const porMes=new Map();
-  state.pagos.forEach(row=>{
-    const mes=String(row.fecha).slice(0,7);
-    if(!porMes.has(mes))porMes.set(mes,{total:0,pagos:[]});
-    const m=porMes.get(mes);m.total+=Number(row.monto)||0;m.pagos.push(row);
-  });
-  const mesData=porMes.get(mesSel)||{total:0,pagos:[]};
-  const MESES=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-  const label=`${MESES[Number(mesSel.slice(5,7))-1]} ${anio}`;
-  const mover=paso=>{const d=new Date(Number(mesSel.slice(0,4)),Number(mesSel.slice(5,7))-1+paso,1);state.pagosMes=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;renderPagos()};
-  // Resumen anual: los 12 meses del año elegido, para ver la tendencia de un vistazo.
-  const strip=MESES.map((nombre,i)=>{
-    const clave=`${anio}-${String(i+1).padStart(2,'0')}`,datos=porMes.get(clave);
-    return `<button type="button" data-mes="${clave}" class="${clave===mesSel?'sel':''}">${nombre.slice(0,3)}<small>${datos?moneyAdmin(datos.total):'—'}</small></button>`;
-  }).join('');
-  const filas=mesData.pagos.map(row=>`<div class="admin-pago-row"><div><b>${esc(row.nombre||'Sin nombre')}</b><small>DIP ${esc(row.dip||'—')} · ${new Date(row.fecha).toLocaleDateString('es-AR')} · ${esc(row.metodo||'')}</small></div><span class="monto">${moneyAdmin(row.monto)}</span></div>`).join('');
-  body.innerHTML=`
-    <div class="admin-mes-nav"><button type="button" id="adminMesPrev">‹</button><b>${label}</b><button type="button" id="adminMesNext">›</button></div>
-    <div class="admin-mes-tot">
-      <div class="stat-card"><b>${moneyAdmin(mesData.total)}</b><span>Recaudado en el mes</span></div>
-      <div class="stat-card"><b>${mesData.pagos.length}</b><span>Pago${mesData.pagos.length===1?'':'s'} registrado${mesData.pagos.length===1?'':'s'}</span></div>
-    </div>
-    <div class="admin-anio-strip">${strip}</div>
-    ${filas||'<div class="admin-pending-empty">Sin pagos registrados en este mes.</div>'}`;
-  $('adminMesPrev').onclick=()=>mover(-1);
-  $('adminMesNext').onclick=()=>mover(1);
-  body.querySelectorAll('[data-mes]').forEach(btn=>btn.onclick=()=>{state.pagosMes=btn.dataset.mes;renderPagos()});
-  const resumen=$('adminIngresosResumen');
-  if(resumen)resumen.textContent=`${label}: ${moneyAdmin(mesData.total)} · ${mesData.pagos.length} pago${mesData.pagos.length===1?'':'s'} · tocá para el detalle`;
-  renderHero();
-}
 (function(){
 'use strict';
 const state={users:[],requests:[],filter:'',whatsapp:'',createMembership:1,bound:false,pruebas:new Map(),acciones:[],accionesFiltro:'',pagos:null,pagosMes:'',revenue:null,userAbierto:'',telefonos:new Map()};
@@ -556,6 +371,181 @@ async function logout(){const ok=await window.APPIDialog.confirm('Se cerrará la
   try{await window.APPIAuth.logout()}catch(e){}
   location.reload();
 }}
+
+function renderAcciones(){
+  const list=$('adminAccionesList'),resumen=$('adminAccionesResumen');
+  if(!list)return;
+  const hoy=new Date(),hoyISO=`${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,'0')}-${String(hoy.getDate()).padStart(2,'0')}`;
+  const porCuenta=new Map();
+  state.acciones.forEach(row=>{
+    const key=`${row.cuenta}·${row.persona}`;
+    if(!porCuenta.has(key))porCuenta.set(key,{dip:row.dip,nombre:row.nombre,persona:row.persona,hoy:null,sem:{total:0,hechas:0,noHechas:0}});
+    const acc=porCuenta.get(key);
+    acc.sem.total+=row.total||0;acc.sem.hechas+=row.hechas||0;acc.sem.noHechas+=row.no_hechas||0;
+    if(String(row.fecha)===hoyISO)acc.hoy={total:row.total||0,hechas:row.hechas||0,noHechas:row.no_hechas||0};
+  });
+  const cuentas=[...porCuenta.values()].sort((a,b)=>String(a.nombre||a.dip).localeCompare(String(b.nombre||b.dip),'es'));
+  // El resumen vive en el encabezado: se entiende sin abrir la sección.
+  const hoyTot=cuentas.reduce((acc,c)=>{if(c.hoy){acc.h+=c.hoy.hechas;acc.n+=c.hoy.noHechas}return acc},{h:0,n:0});
+  if(resumen)resumen.textContent=cuentas.length?`${cuentas.length} cuenta${cuentas.length===1?'':'s'} · hoy ✓ ${hoyTot.h} · ✗ ${hoyTot.n} · tocá para ver el detalle`:'Todavía no hay marcas sincronizadas.';
+  const term=String(state.accionesFiltro||'').toLowerCase().trim();
+  const visibles=term?cuentas.filter(acc=>`${acc.nombre} ${acc.dip}`.toLowerCase().includes(term)):cuentas;
+  if(!visibles.length){list.innerHTML=`<div class="admin-pending-empty">${term?'Ninguna cuenta coincide con la búsqueda.':'Todavía no hay marcas sincronizadas.'}</div>`;return}
+  const pct=(hechas,total)=>total?Math.round(hechas*100/total):0;
+  list.innerHTML=visibles.map(acc=>{
+    const hoyTxt=acc.hoy?`Hoy: ✓ ${acc.hoy.hechas} · ✗ ${acc.hoy.noHechas} de ${acc.hoy.total}`:'Hoy: sin marcas todavía';
+    const semTxt=`Últimos 7 días: ✓ ${acc.sem.hechas} · ✗ ${acc.sem.noHechas} de ${acc.sem.total} (${pct(acc.sem.hechas,acc.sem.total)}% hecho)`;
+    return `<div class="admin-pending-item"><div><strong>${esc(acc.nombre||'Sin nombre')}${acc.persona==='socio'?' · socio/a':''}</strong><span>DIP ${esc(acc.dip||'—')}</span></div><div><span>${esc(hoyTxt)}</span><span>${esc(semTxt)}</span></div></div>`;
+  }).join('');
+}
+/* ---------- Ingresos por mes (v300) ---------- */
+async function loadPagos(){
+  const body=$('adminIngresosBody');if(!body)return;
+  try{
+    const rows=await rpcAdmin('appi_admin_pagos',{p_meses:24});
+    state.pagos=Array.isArray(rows)?rows:[];
+    if(!state.pagosMes){const d=new Date();state.pagosMes=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`}
+  }catch(error){
+    state.pagos=null;
+    body.innerHTML=`<div class="admin-pending-empty">${esc(error.message)}</div>`;
+    return;
+  }
+  renderPagos();
+}
+function moneyAdmin(v){return new Intl.NumberFormat('es-AR',{style:'currency',currency:'ARS',maximumFractionDigits:0}).format(Number(v)||0)}
+/* ---------- Anuncio para todos (v326) ----------
+   El administrador escribe un mensaje y hasta tres reuniones; el aviso
+   vigente les aparece a los distribuidores al abrir APPI. */
+async function fetchAdmin(path){
+  const configuration=cfg(),token=window.APPIAuth.accessToken();
+  const response=await fetch(`${String(configuration.url).replace(/\/$/,'')}${path}`,{headers:{apikey:configuration.anonKey,Authorization:`Bearer ${token}`}});
+  const data=await response.json().catch(()=>null);
+  if(response.status===404)throw new Error('Falta correr SUPABASE_ANUNCIOS.sql en Supabase.');
+  if(!response.ok)throw new Error((data&&(data.message||data.error))||'No se pudo leer el anuncio.');
+  return data;
+}
+const ANUNCIO_EVENTOS=3;
+function anuncioEventosDelForm(){
+  const eventos=[];
+  for(let i=0;i<ANUNCIO_EVENTOS;i++){
+    const titulo=$(`adminAnuncioEv${i}Titulo`),fecha=$(`adminAnuncioEv${i}Fecha`),hora=$(`adminAnuncioEv${i}Hora`),lugar=$(`adminAnuncioEv${i}Lugar`);
+    if(!titulo)continue;
+    const t=titulo.value.trim();
+    if(!t&&!fecha.value&&!hora.value&&!lugar.value.trim())continue;
+    eventos.push({titulo:t,fecha:fecha.value||'',hora:/^\d{2}:\d{2}$/.test(hora.value||'')?hora.value:'',lugar:lugar.value.trim()});
+  }
+  return eventos;
+}
+function anuncioFormDesdeRow(row){
+  const texto=$('adminAnuncioTexto');if(!texto)return;
+  texto.value=row?String(row.texto||''):'';
+  for(let i=0;i<ANUNCIO_EVENTOS;i++){
+    const titulo=$(`adminAnuncioEv${i}Titulo`),fecha=$(`adminAnuncioEv${i}Fecha`),hora=$(`adminAnuncioEv${i}Hora`),lugar=$(`adminAnuncioEv${i}Lugar`);
+    if(!titulo)continue;
+    const ev=row&&Array.isArray(row.eventos)?row.eventos[i]:null;
+    titulo.value=ev?String(ev.titulo||''):'';
+    fecha.value=ev?String(ev.fecha||''):'';
+    hora.value=ev&&/^\d{2}:\d{2}$/.test(String(ev.hora||''))?String(ev.hora):'';
+    lugar.value=ev?String(ev.lugar||''):'';
+  }
+}
+async function loadAnuncio(){
+  const resumen=$('adminAnuncioResumen');
+  if(!resumen)return;
+  try{
+    const rows=await fetchAdmin('/rest/v1/appi_anuncios?select=*&activo=eq.true&order=creado_en.desc&limit=1');
+    state.anuncio=Array.isArray(rows)&&rows[0]?rows[0]:null;
+  }catch(error){state.anuncio=null;resumen.textContent='No se pudo leer el aviso vigente.';return}
+  // El formulario arranca con el aviso vigente puesto: cambiar una palabra
+  // y volver a publicar es el caso más común.
+  anuncioFormDesdeRow(state.anuncio);
+  renderAnuncio();
+}
+function renderAnuncio(){
+  const resumen=$('adminAnuncioResumen');if(!resumen)return;
+  const row=state.anuncio;
+  if(!row){resumen.textContent='Sin aviso publicado. Escribí uno y tocá Publicar.';return}
+  const fecha=new Date(row.creado_en);
+  const cuando=isNaN(fecha.getTime())?'':` · ${fecha.toLocaleDateString('es-AR')}`;
+  const eventos=Array.isArray(row.eventos)?row.eventos.length:0;
+  const extracto=String(row.texto||'').replace(/\s+/g,' ').slice(0,60);
+  resumen.textContent=`Vigente${cuando}: “${extracto}${String(row.texto||'').length>60?'…':''}”${eventos?` · ${eventos} reunión${eventos===1?'':'es'}`:''}`;
+}
+async function publicarAnuncio(){
+  const texto=$('adminAnuncioTexto');if(!texto)return;
+  const mensaje=texto.value.trim();
+  if(!mensaje){setStatus('adminAnuncioStatus','Escribí el mensaje del aviso.',true);texto.focus();return}
+  if(mensaje.length>600){setStatus('adminAnuncioStatus','El mensaje no puede pasar de 600 caracteres.',true);return}
+  const eventos=anuncioEventosDelForm();
+  for(const ev of eventos){
+    if(!ev.titulo){
+      setStatus('adminAnuncioStatus','Toda reunión con fecha o lugar necesita un título.',true);
+      window.APPIDialog.alert('Pusiste fecha en una reunión pero le falta el título.\n\nEscribilo (ej: "Reunión general por Zoom") o borrá la fecha para dejarla vacía.',{title:'Falta el título',icon:'✍️',okText:'Entendido'});
+      return;
+    }
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(ev.fecha)){
+      setStatus('adminAnuncioStatus',`“${ev.titulo}”: falta la fecha.`,true);
+      window.APPIDialog.alert(`La reunión “${ev.titulo}” tiene título pero le falta la fecha.\n\nElegí el día en el calendario de esa reunión, o borrá el título para dejarla vacía.`,{title:'Falta la fecha',icon:'📅',okText:'Entendido'});
+      return;
+    }
+  }
+  try{
+    await rpcAdmin('appi_admin_publicar_anuncio',{p_texto:mensaje,p_eventos:eventos});
+    setStatus('adminAnuncioStatus','Publicado ✓ Lo van a ver todos al abrir APPI.');
+    await window.APPIDialog.alert('El aviso quedó publicado.\n\nTodos los distribuidores lo van a ver como cartel al abrir APPI, con los botones para agendar las reuniones en APPI o en el teléfono.',{title:'Aviso publicado ✓',icon:'📣',okText:'Listo'});
+    await loadAnuncio();
+  }catch(error){
+    let msg=error.message||'No se pudo publicar el aviso.';
+    // El 404 del RPC arrastraba un texto de otra función: ahora dice la verdad.
+    if(/Falta correr SUPABASE_ACCIONES_DIA/.test(msg))msg='El backend todavía no conoce los anuncios. Corré el workflow "Publicar backend completo de APPI" en GitHub.';
+    setStatus('adminAnuncioStatus',msg,true);
+    await window.APPIDialog.alert(msg,{title:'No se pudo publicar',icon:'⚠️',okText:'Entendido'});
+  }
+}
+async function quitarAnuncioVigente(){
+  const ok=await window.APPIDialog.confirm('El aviso va a desaparecer de los teléfonos del equipo. Lo que ya se agendó en las agendas queda.',{title:'Quitar el aviso',icon:'📣',okText:'Quitar'});
+  if(!ok)return;
+  try{
+    await rpcAdmin('appi_admin_quitar_anuncio',{});
+    setStatus('adminAnuncioStatus','Aviso quitado. Nadie ve el cartel al abrir APPI.');
+    await window.APPIDialog.alert('El aviso quedó quitado: nadie va a ver el cartel al abrir APPI. Lo que ya se agendó en las agendas queda.',{title:'Aviso quitado ✓',icon:'📣',okText:'Listo'});
+    await loadAnuncio();
+  }catch(error){setStatus('adminAnuncioStatus',error.message||'No se pudo quitar el aviso.',true)}
+}
+function renderPagos(){
+  const body=$('adminIngresosBody');if(!body||!Array.isArray(state.pagos))return;
+  const mesSel=state.pagosMes,anio=Number(mesSel.slice(0,4));
+  const porMes=new Map();
+  state.pagos.forEach(row=>{
+    const mes=String(row.fecha).slice(0,7);
+    if(!porMes.has(mes))porMes.set(mes,{total:0,pagos:[]});
+    const m=porMes.get(mes);m.total+=Number(row.monto)||0;m.pagos.push(row);
+  });
+  const mesData=porMes.get(mesSel)||{total:0,pagos:[]};
+  const MESES=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  const label=`${MESES[Number(mesSel.slice(5,7))-1]} ${anio}`;
+  const mover=paso=>{const d=new Date(Number(mesSel.slice(0,4)),Number(mesSel.slice(5,7))-1+paso,1);state.pagosMes=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;renderPagos()};
+  // Resumen anual: los 12 meses del año elegido, para ver la tendencia de un vistazo.
+  const strip=MESES.map((nombre,i)=>{
+    const clave=`${anio}-${String(i+1).padStart(2,'0')}`,datos=porMes.get(clave);
+    return `<button type="button" data-mes="${clave}" class="${clave===mesSel?'sel':''}">${nombre.slice(0,3)}<small>${datos?moneyAdmin(datos.total):'—'}</small></button>`;
+  }).join('');
+  const filas=mesData.pagos.map(row=>`<div class="admin-pago-row"><div><b>${esc(row.nombre||'Sin nombre')}</b><small>DIP ${esc(row.dip||'—')} · ${new Date(row.fecha).toLocaleDateString('es-AR')} · ${esc(row.metodo||'')}</small></div><span class="monto">${moneyAdmin(row.monto)}</span></div>`).join('');
+  body.innerHTML=`
+    <div class="admin-mes-nav"><button type="button" id="adminMesPrev">‹</button><b>${label}</b><button type="button" id="adminMesNext">›</button></div>
+    <div class="admin-mes-tot">
+      <div class="stat-card"><b>${moneyAdmin(mesData.total)}</b><span>Recaudado en el mes</span></div>
+      <div class="stat-card"><b>${mesData.pagos.length}</b><span>Pago${mesData.pagos.length===1?'':'s'} registrado${mesData.pagos.length===1?'':'s'}</span></div>
+    </div>
+    <div class="admin-anio-strip">${strip}</div>
+    ${filas||'<div class="admin-pending-empty">Sin pagos registrados en este mes.</div>'}`;
+  $('adminMesPrev').onclick=()=>mover(-1);
+  $('adminMesNext').onclick=()=>mover(1);
+  body.querySelectorAll('[data-mes]').forEach(btn=>btn.onclick=()=>{state.pagosMes=btn.dataset.mes;renderPagos()});
+  const resumen=$('adminIngresosResumen');
+  if(resumen)resumen.textContent=`${label}: ${moneyAdmin(mesData.total)} · ${mesData.pagos.length} pago${mesData.pagos.length===1?'':'s'} · tocá para el detalle`;
+  renderHero();
+}
 function bind(){if(state.bound)return;state.bound=true;['adminSucursal','adminNumero','adminNombre','adminPartnerName','adminTempPassword'].forEach(id=>{const input=$(id);if(input)input.value=''});document.querySelectorAll('[data-create-membership]').forEach(button=>button.onclick=()=>{state.createMembership=(button.dataset.createMembership==='prueba'||button.dataset.createMembership==='siempre')?button.dataset.createMembership:Number(button.dataset.createMembership);document.querySelectorAll('[data-create-membership]').forEach(item=>item.classList.toggle('active',item===button))});$('adminHasPartner').onchange=()=>{$('adminPartnerField').hidden=!$('adminHasPartner').checked;if($('adminHasPartner').checked)setTimeout(()=>$('adminPartnerName').focus(),40);else $('adminPartnerName').value=''};$('adminGeneratePassword').onclick=()=>$('adminTempPassword').value=randomPassword();$('adminCreateUser').onclick=create;$('adminRefreshUsers').onclick=load;$('adminRefreshRequests').onclick=load;
   const openCreate=$('adminOpenCreate');if(openCreate)openCreate.onclick=abrirCrearCuenta;
   const closeCreate=$('adminCreateClose');if(closeCreate)closeCreate.onclick=cerrarCrearCuenta;

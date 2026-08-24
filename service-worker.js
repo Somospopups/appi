@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v328-panel-centrado';
+const CACHE_NAME = 'appi-v329-publicar-anuncio';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
