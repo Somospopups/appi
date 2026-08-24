@@ -367,11 +367,16 @@ test('la fila de trabajo va de a uno y avisa cuántos quedan', async ({ page }) 
   await expect(page.locator('.mu-prev')).toContainText('Feliz cumpleaños, Ana');
 
   await page.locator('#muFilaEnviar').click();
-  // Al terminar la lista, cierra con el resumen.
-  await expect(page.locator('.mu-fin')).toContainText('1 acción hecha');
+  // Mandar NO avanza solo (v330): la misma persona queda a la vista, ya
+  // marcada ✓, para marcar qué pasó en ese contacto.
+  await expect(page.locator('.mu-fila-quien')).toContainText('GOMEZ, ANA MARIA');
+  await expect(page.locator('.mu-marca-actual')).toContainText('✓ Marcada como hecha');
   const urls = await page.evaluate(() => window.__wa);
   expect(urls).toHaveLength(1);
   expect(decodeURIComponent(urls[0])).toContain('Feliz cumpleaños, Ana');
+  // Al confirmar con el ✓, recién ahí cierra con el resumen.
+  await page.locator('#muFilaHecha').click();
+  await expect(page.locator('.mu-fin')).toContainText('1 acción hecha');
 });
 
 test('el contactado no desaparece: queda marcado ✓ y la franja dura todo el día', async ({ page }) => {
@@ -381,6 +386,8 @@ test('el contactado no desaparece: queda marcado ✓ y la franja dura todo el d�
 
   await page.locator('[data-mu-hoy="cumple"]').click();
   await page.locator('#muFilaEnviar').click();
+  // Tras mandar, la persona queda en pantalla: se confirma con el ✓.
+  await page.locator('#muFilaHecha').click();
   await page.locator('#muFinCerrar').click();
 
   // La franja no se achica: la acción hecha queda a la vista con su ✓.
@@ -416,12 +423,17 @@ test('la ✗ registra que no se hizo y obliga a dejar constancia: no hay saltear
   await expect(page.locator('#muSub')).toContainText('Queda 1');
 
   await page.locator('#muFilaEnviar').click();
-  await expect(page.locator('.mu-fin')).toContainText('1 acción hecha · 1 sin hacer');
+  // Mandar no avanza solo: RUIZ sigue a la vista, marcado ✓, para confirmar
+  // o corregir qué pasó en el contacto (v330).
+  await expect(page.locator('.mu-fila-quien')).toContainText('RUIZ');
+  await expect(page.locator('.mu-marca-actual')).toContainText('✓ Marcada como hecha');
   // La no hecha no recibió nada, pero quedó registrada.
   const urls = await page.evaluate(() => window.__wa);
   expect(urls).toHaveLength(1);
   expect(decodeURIComponent(urls[0])).toContain('Roberto');
 
+  await page.locator('#muFilaHecha').click();
+  await expect(page.locator('.mu-fin')).toContainText('1 acción hecha · 1 sin hacer');
   await page.locator('#muFinCerrar').click();
   await expect(page.locator('#muHoy')).toContainText('Día completo');
   await expect(page.locator('#muHoy .mu-hoy-res')).toContainText('✓ 1');
@@ -436,6 +448,33 @@ test('la ✗ registra que no se hizo y obliga a dejar constancia: no hay saltear
   expect(dia.total).toBe(2);
   expect(dia.hechas).toBe(1);
   expect(dia.noHechas).toBe(1);
+});
+
+test('mandar no pasa solo a la siguiente: la misma persona queda para marcar', async ({ page }) => {
+  const dos = [
+    { id: 1, usuario: 'GOMEZ, ANA MARIA', telf: '3515551001', localidad: 'Alta Gracia', producto: 'PSA',
+      fCompra: ddmmyyyy(-182), fVenceRaw: ddmmyyyy(400), fVence: dias(400), estado: 'vigente' },
+    { id: 2, usuario: 'RUIZ, ROBERTO', telf: '3515551002', localidad: 'Villa Allende', producto: 'PSA VERO',
+      fCompra: ddmmyyyy(-182), fVenceRaw: ddmmyyyy(400), fVence: dias(400), estado: 'vigente' }
+  ];
+  await entrar(page, dos);
+  await page.evaluate(() => { window.__wa = []; window.APPIWhatsApp.abrir = u => window.__wa.push(u); });
+
+  await page.locator('[data-mu-hoy="retro"]').click();
+  await expect(page.locator('.mu-fila-quien')).toContainText('GOMEZ');
+  await expect(page.locator('#muSub')).toContainText('Quedan 2');
+
+  // Mandar a GOMEZ no avanza: la tarjeta se queda en la misma persona, lista
+  // para marcar qué pasó en ese contacto (v330).
+  await page.locator('#muFilaEnviar').click();
+  await expect(page.locator('.mu-fila-quien')).toContainText('GOMEZ');
+  await expect(page.locator('#muSub')).toContainText('Quedan 2');
+  await expect(page.locator('.mu-marca-actual')).toContainText('✓ Marcada como hecha');
+
+  // Recién al marcar con el ✓ se pasa a la siguiente.
+  await page.locator('#muFilaHecha').click();
+  await expect(page.locator('.mu-fila-quien')).toContainText('RUIZ');
+  await expect(page.locator('#muSub')).toContainText('Queda 1');
 });
 
 test('la ✓ marca hecha sin abrir WhatsApp', async ({ page }) => {

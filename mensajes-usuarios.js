@@ -626,7 +626,10 @@
 
     cuerpo.querySelector('#muFilaEnviar').onclick = function(){
       enviar(u, texto);
-      fila.i++;
+      // No se avanza solo: al volver de WhatsApp la misma persona sigue a la
+      // vista, lista para marcar qué pasó en ese contacto (✓ ya lo hice /
+      // ✗ no se hizo). Mandar ya deja la ✓ puesta; si no se concretó, se
+      // corrige con la ✗ y se avanza desde ahí (v330).
       pintarFila();
     };
     cuerpo.querySelector('#muFilaHecha').onclick = function(){
