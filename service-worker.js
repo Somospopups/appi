@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v332-sin-boton-mapa';
+const CACHE_NAME = 'appi-v333-sin-mapa';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
@@ -36,22 +36,11 @@ const APP_SHELL = [
   './historico.css',
   './historico.js',
   './vendor/xlsx.full.min.js',
-  './vendor/leaflet.css',
-  './vendor/leaflet.js',
   './vendor/html2canvas.min.js',
   './vendor/jspdf.umd.min.js',
   './vendor/svg2pdf.umd.min.js',
   './vendor/jszip.min.js',
   './vendor/transformers.min.js',
-  './vendor/images/layers.png',
-  './vendor/images/layers-2x.png',
-  './vendor/images/marker-icon.png',
-  './vendor/images/marker-icon-2x.png',
-  './vendor/images/marker-shadow.png',
-  './vendor/images/marker-icon-2x-red.png',
-  './vendor/images/marker-icon-2x-green.png',
-  './vendor/images/marker-icon-2x-yellow.png',
-  './vendor/images/marker-shadow-0.7.7.png',
   './manifest.json',
   './icon-192.png',
   './notification-badge.png',

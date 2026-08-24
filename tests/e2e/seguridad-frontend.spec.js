@@ -29,7 +29,7 @@ test('las bibliotecas de ejecución están fijadas dentro del repositorio', () =
   const html = read('index.html');
   const sw = read('service-worker.js');
   const required = [
-    'xlsx.full.min.js','leaflet.js','html2canvas.min.js','jspdf.umd.min.js',
+    'xlsx.full.min.js','html2canvas.min.js','jspdf.umd.min.js',
     'svg2pdf.umd.min.js','jszip.min.js','transformers.min.js'
   ];
 
@@ -41,25 +41,25 @@ test('las bibliotecas de ejecución están fijadas dentro del repositorio', () =
   }
 });
 
-test('los pines del mapa salen del repositorio y no de un CDN', () => {
-  // El mapa de garantías se usa en la calle, con mala señal. Si los pines
-  // vinieran de internet, el distribuidor abriría el mapa y no vería ninguno:
-  // justo el dato que el mapa existe para mostrar (rojo vencida, amarillo por
-  // vencer, verde vigente).
+test('el mapa y Leaflet quedaron eliminados de la app (v333)', () => {
+  // A pedido del equipo, la función de mapa (Leaflet + geocodificación) se
+  // eliminó por completo: no queda ni el botón, ni el contenedor, ni la
+  // librería, ni los pines. "¿Cómo llego?" abre Google Maps en una pestaña
+  // nueva, que es lo único que se conserva.
   const html = read('index.html');
   const sw = read('service-worker.js');
-  const pines = [
-    'marker-icon-2x-red.png','marker-icon-2x-green.png',
-    'marker-icon-2x-yellow.png','marker-shadow-0.7.7.png'
-  ];
 
-  for (const pin of pines) {
-    expect(fs.existsSync(`vendor/images/${pin}`), `Falta vendor/images/${pin}`).toBe(true);
-    expect(html).toContain(`./vendor/images/${pin}`);
-    expect(sw, `${pin} debe estar cacheado para el primer uso offline`).toContain(`./vendor/images/${pin}`);
-  }
+  expect(html).not.toContain('leaflet');
+  expect(html).not.toContain('usuariosMap');
+  expect(html).not.toContain('verVecinosU');
+  expect(html).not.toContain('marker-icon');
+  expect(html).not.toContain('Vecinos');
+  expect(sw).not.toContain('leaflet');
+  expect(sw).not.toContain('marker-icon');
+  expect(fs.existsSync('vendor/leaflet.js')).toBe(false);
+  expect(fs.existsSync('vendor/leaflet.css')).toBe(false);
 
-  // Ningún ícono de Leaflet puede volver a colgarse de un servidor ajeno.
+  // Sigue prohibido colgarse de servidores ajenos para íconos.
   expect(html).not.toMatch(/iconUrl:\s*['"]https?:\/\//i);
   expect(html).not.toMatch(/shadowUrl:\s*['"]https?:\/\//i);
   expect(html).not.toContain('raw.githubusercontent.com');

@@ -1,7 +1,8 @@
 const { test, expect } = require('@playwright/test');
 
-// El botón "Mapa" se quitó (v332): el mapa ahora vive sólo detrás de "Vecinos"
-// y se cierra con su botón ×, dentro del propio mapa.
+// La función de mapa se eliminó por completo (v333): no hay botón Mapa, ni
+// botón Vecinos, ni contenedor de mapa. La ficha conserva sólo "¿Cómo llego?"
+// (Google Maps en una pestaña nueva).
 
 const USER_ID = '11111111-1111-4111-8111-111111111111';
 
@@ -37,8 +38,6 @@ async function entrar(page) {
     if (url.pathname === '/functions/v1/dispositivo-puente') return route.fulfill({ status: 200, headers: cors, body: JSON.stringify({ devices: [] }) });
     return route.fulfill({ status: 200, headers: cors, body: '[]' });
   });
-  // Los tiles salen a internet: se cortan para que la prueba no dependa de eso.
-  await page.route('**/tile.openstreetmap.org/**', route => route.abort());
   await page.addInitScript(([users]) => {
     localStorage.setItem('welcomeSeen', '1');
     localStorage.setItem('appi_tarjetas_auto', '0');
@@ -54,46 +53,35 @@ async function entrar(page) {
   await expect(page.locator('#usuariosBtnZonas')).toBeVisible();
 }
 
-test('ya no existen los botones Mapa de la barra ni de la ficha', async ({ page }) => {
+test('no queda rastro del mapa: ni botones ni contenedor', async ({ page }) => {
   await entrar(page);
 
-  // Barra de herramientas: el botón Mapa se fue.
+  // Barra de herramientas: sin Mapa.
   await expect(page.locator('#usuariosBtnMapAll')).toHaveCount(0);
+  // Contenedor del mapa: eliminado.
+  await expect(page.locator('#usuariosMap')).toHaveCount(0);
 
-  // Ficha: tampoco hay botón Mapa; quedan Vecinos y ¿Cómo llego?.
+  // Ficha: sin botón Mapa ni Vecinos; queda ¿Cómo llego? (Google Maps).
   const ficha = page.locator('#usuariosList .tree-node').first();
   await ficha.click();
   const detalle = page.locator('#usuariosList .tree-children').first();
   await expect(detalle.locator('[data-u-action="map"]')).toHaveCount(0);
-  await expect(detalle.locator('[data-u-action="neighbors"]')).toBeVisible();
+  await expect(detalle.locator('[data-u-action="neighbors"]')).toHaveCount(0);
   await expect(detalle.locator('[data-u-action="google"]')).toBeVisible();
 });
 
-test('Vecinos abre el mapa y su botón × lo cierra', async ({ page }) => {
+test('no existen las funciones globales del mapa', async ({ page }) => {
   await entrar(page);
-  const mapa = page.locator('#usuariosMap');
-  await expect(mapa).toBeHidden();
-
-  await page.evaluate(() => window.verVecinosU('Alta Gracia'));
-  await expect(mapa).toBeVisible();
-  // El mapa entra con animación y la pantalla hace scroll suave: esperar a que
-  // se asiente antes de tocar el × evita que el clic caiga en pleno movimiento.
-  await page.waitForTimeout(700);
-
-  await page.locator('#usuariosMapCerrar').click();
-  await expect(mapa).toBeHidden();
-});
-
-test('cerrar no deja estilos pegados que impidan reabrirlo', async ({ page }) => {
-  await entrar(page);
-  await page.evaluate(() => window.verVecinosU('Alta Gracia'));
-  await page.waitForTimeout(700);
-  await page.locator('#usuariosMapCerrar').click();
-
-  // El bug de origen: al abrir se ponía display:block en el elemento y ese
-  // estilo le ganaba al CSS, así que quitar la clase no alcanzaba para cerrar.
-  const estilo = await page.locator('#usuariosMap').evaluate(el => el.style.display);
-  expect(estilo).toBe('');
+  const r = await page.evaluate(() => ({
+    verVecinosU: typeof window.verVecinosU,
+    abrirMapaU: typeof window.abrirMapaU,
+    cerrarMapaU: typeof window.cerrarMapaU,
+    mostrarEnMapaU: typeof window.mostrarEnMapaU
+  }));
+  expect(r.verVecinosU).toBe('undefined');
+  expect(r.abrirMapaU).toBe('undefined');
+  expect(r.cerrarMapaU).toBe('undefined');
+  expect(r.mostrarEnMapaU).toBe('undefined');
 });
 
 test('con un filtro puesto, Limpiar es su propio botón', async ({ page }) => {
@@ -110,19 +98,4 @@ test('con un filtro puesto, Limpiar es su propio botón', async ({ page }) => {
   await limpiar.click();
   await expect(page.locator('#usuariosList .tree-name')).toHaveCount(2);
   await expect(limpiar).toBeHidden();
-});
-
-test('cambiar de archivo cierra el mapa y lo deja reutilizable', async ({ page }) => {
-  await entrar(page);
-  const mapa = page.locator('#usuariosMap');
-
-  await page.evaluate(() => window.verVecinosU('Alta Gracia'));
-  await expect(mapa).toBeVisible();
-
-  await page.evaluate(() => window.cerrarMapaU());
-  await expect(mapa).toBeHidden();
-  expect(await mapa.evaluate(el => el.style.display)).toBe('');
-
-  await page.evaluate(() => window.verVecinosU('Villa Allende'));
-  await expect(mapa).toBeVisible();
 });
