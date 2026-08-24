@@ -62,7 +62,7 @@ async function entrar(page, users = USUARIOS) {
   await page.locator('#btnDistributorLogin').click();
   await expect(page.locator('#lockScreen')).toHaveClass(/hidden/);
   await page.evaluate(() => window.showView('view-usuarios'));
-  await expect(page.locator('#usuariosBtnMapAll')).toBeVisible();
+  await expect(page.locator('#usuariosBtnZonas')).toBeVisible();
 }
 
 // Abre la ficha de un cliente por su posición en la lista.
@@ -242,9 +242,9 @@ test('los botones de datos dicen el nombre, no la llave', async ({ page }) => {
 test('la barra no tiene botón de Mensajes: se escribe desde la ficha', async ({ page }) => {
   await entrar(page);
   await expect(page.locator('#usuariosBtnMensajes')).toHaveCount(0);
-  // Los cinco de siempre; "Dormidos" se suma sólo si hay clientes dormidos,
-  // y esta lista tiene uno vencido hace más de un año.
-  await expect(page.locator('.u-tools button:visible')).toHaveCount(6);
+  // Los cuatro de siempre (Mapa se quitó en v332); "Dormidos" se suma sólo si
+  // hay clientes dormidos, y esta lista tiene uno vencido hace más de un año.
+  await expect(page.locator('.u-tools button:visible')).toHaveCount(5);
   await expect(page.locator('#usuariosBtnDormidos')).toBeVisible();
 });
 
@@ -599,10 +599,10 @@ test('las acciones de la ficha van en tres grupos separados', async ({ page }) =
   // 2) cómo se lo contacta
   await expect(grupos.nth(1)).toContainText('WhatsApp');
   await expect(grupos.nth(1).locator('[data-u-action="call"]')).toBeVisible();
-  // 3) cómo se llega hasta él
-  await expect(grupos.nth(2)).toContainText('Mapa');
+  // 3) cómo se llega hasta él (sin Mapa, que se quitó en v332)
   await expect(grupos.nth(2)).toContainText('Vecinos');
   await expect(grupos.nth(2)).toContainText('¿Cómo llego?');
+  await expect(grupos.nth(2)).not.toContainText('Mapa');
   // El viejo "Google" ya no se nombra.
   await expect(ficha).not.toContainText('🗺️ Google');
 });

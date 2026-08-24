@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v331-telefonos-dobles';
+const CACHE_NAME = 'appi-v332-sin-boton-mapa';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

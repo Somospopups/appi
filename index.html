@@ -4103,7 +4103,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v331 · Segura</div>
+  <div class="ds-foot">APPI · v332 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4947,13 +4947,11 @@ body.dark #pageTabs button.active{color:#a8c0ff}
       <!-- Las herramientas van arriba, pegadas a los contadores: son la forma
            de recortar la lista, así que se usan antes de mirarla. -->
       <div class="u-tools">
-        <button type="button" id="usuariosBtnMapAll"><span>🗺️</span>Mapa</button><!-- el texto lo fija el JS al filtrar -->
         <button type="button" id="usuariosBtnTarjetas"><span>💳</span>Tarjetas</button>
         <button type="button" id="usuariosBtnOrdenVence"><span>📅</span>Ordenar</button>
         <button type="button" id="usuariosBtnZonas"><span>📍</span>Zonas</button>
         <button type="button" id="usuariosBtnCambiarArchivo"><span>📂</span>Cambiar archivo</button>
-        <!-- Aparece sólo con un filtro puesto. Va aparte para que Mapa siga
-             siendo Mapa: es el mismo botón que abre y cierra el mapa. -->
+        <!-- Aparece sólo con un filtro puesto. -->
         <button type="button" id="usuariosBtnLimpiar" class="limpiar" hidden><span>🧹</span>Limpiar</button>
       </div>
       <div class="glass">
@@ -4965,7 +4963,9 @@ body.dark #pageTabs button.active{color:#a8c0ff}
         <div id="usuariosTarjetasBar"></div>
         <div id="usuariosActiveFilters" style="display:none;margin-top:12px;padding:10px 14px;border-radius:12px;background:rgba(91,141,239,0.10);border:1px solid rgba(91,141,239,0.18);font-size:12px;font-weight:600;color:#3a3a48"></div>
         <button class="btn btn-primary" id="usuariosBtnVerTodos" style="display:none;width:100%;margin-top:12px;background:linear-gradient(135deg,#5b8def,#a06bff);color:#fff;border:none;box-shadow:0 4px 12px rgba(91,141,239,0.30)">📋 Ver listado completo</button>
-        <div id="usuariosMap" class="map-wrap"></div>
+        <div id="usuariosMap" class="map-wrap">
+          <button type="button" id="usuariosMapCerrar" class="map-cerrar" aria-label="Cerrar mapa" title="Cerrar mapa">×</button>
+        </div>
       </div>
       <div id="usuariosList"></div>
     </div>
@@ -5798,8 +5798,8 @@ const HELP = {
     <div class="tip"><strong>Dashboard</strong> — total, vencidas, por vencer y vigentes.</div>
     <div class="tip"><strong>Filtros</strong> — buscador, zona, orden por vencimiento y tarjetas (marca + banco) para avisar una promo.</div>
     <div class="tip"><strong>Tarjetas</strong> — en la ficha de cada usuario cargá Visa Galicia, Naranja, etc. Se guardan aparte: recargar la planilla no las borra. En el mensaje de la promo usá {nombre} y {tarjeta}.</div>
-    <div class="tip"><strong>Mapa</strong> — ver domicilio o vecinos de la misma zona.</div>
-    <div class="warn-tip"><strong>🔒 Privacidad:</strong> Con una cuenta activa, tus datos se guardan en tu espacio privado de Supabase. Al usar el mapa, la dirección se consulta en OpenStreetMap/Nominatim.</div>`
+    <div class="tip"><strong>Vecinos</strong> — en la ficha de cada usuario, ves los de la misma zona en el mapa.</div>
+    <div class="warn-tip"><strong>🔒 Privacidad:</strong> Con una cuenta activa, tus datos se guardan en tu espacio privado de Supabase. Al usar el mapa (Vecinos), la dirección se consulta en OpenStreetMap/Nominatim.</div>`
   }
 };
 
@@ -11716,7 +11716,7 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='331';
+      const swVersion='332';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 
@@ -13224,6 +13224,15 @@ body.dark #view-usuarios .filter.active{
   background:#e6ecff;
   font-family:inherit;
 }
+#usuariosMap .map-cerrar{
+  position:absolute; top:10px; right:10px; z-index:1001;
+  width:36px; height:36px; border:0; border-radius:50%;
+  background:rgba(255,255,255,.92); color:#3a3a48; font-size:20px; font-weight:900;
+  cursor:pointer; box-shadow:0 4px 12px rgba(30,35,75,.28); line-height:1;
+  display:none; place-items:center;
+}
+#usuariosMap.show .map-cerrar{display:grid}
+body.dark #usuariosMap .map-cerrar{background:rgba(30,30,50,.92); color:#f0f0f5}
 #usuariosMap .leaflet-tile-pane{filter:saturate(1.1)}
 body.dark #usuariosMap.map-wrap{
   background:rgba(30,30,50,0.62);
@@ -14187,10 +14196,9 @@ function aplicarFiltrosU(){
       return ordenAscU? a.fVence - b.fVence : b.fVence - a.fVence;
     });
   }
-  // Mostrar banner de filtros activos y transformar boton Mapa general -> Limpiar Busqueda
+  // Mostrar banner de filtros activos y, con filtro, el botón Limpiar.
   const activeDiv=document.getElementById('usuariosActiveFilters');
   const btnVerTodos=document.getElementById('usuariosBtnVerTodos');
-  const btnMapAll=document.getElementById('usuariosBtnMapAll');
   const cardOn = window.APPITarjetas&&window.APPITarjetas.filtroActivo&&window.APPITarjetas.filtroActivo();
   const isFiltered = filtroVencU!=='all' || filtroZonaU!=='all' || q || !!cardOn;
   if(activeDiv){
@@ -14213,15 +14221,12 @@ function aplicarFiltrosU(){
   if(btnVerTodos){
     btnVerTodos.style.display=isFiltered?'inline-flex':'none';
   }
-  // Con un filtro puesto aparece "Limpiar" como botón aparte. Mapa se queda
-  // como está: es el mismo botón que abre y cierra el mapa, y transformarlo
-  // dejaba sin forma de cerrarlo justo cuando había un filtro.
+  // Con un filtro puesto aparece "Limpiar" como botón aparte.
   const btnLimpiar=document.getElementById('usuariosBtnLimpiar');
   if(btnLimpiar){
     btnLimpiar.hidden=!isFiltered;
     btnLimpiar.onclick=()=>{ resetFiltrosU(); };
   }
-  if(btnMapAll) btnMapAll.onclick=()=>{ window.alternarMapaU(); };
   renderListU();
 }
 function renderListU(){
@@ -14271,7 +14276,6 @@ function renderListU(){
         <button type="button" class="action-btn call" data-u-action="call" data-u-index="${index}" data-appi-call-phone="${escU(window.APPITel?window.APPITel.normalizar(u.telf||''):'')}" data-appi-call-name="${escU(u.usuario||'Contacto')}" data-appi-call-label="1">📲 Llamar en teléfono</button>
       </div>`:''}
       <div class="u-grupo u-acciones">
-        <button type="button" class="action-btn map" data-u-action="map" data-u-index="${index}">📍 Mapa</button>
         <button type="button" class="action-btn neighbors" data-u-action="neighbors" data-u-index="${index}">👥 Vecinos</button>
         <button type="button" class="action-btn mail" data-u-action="google" data-u-index="${index}">🧭 ¿Cómo llego?</button>
       </div>
@@ -14296,9 +14300,7 @@ function renderListU(){
       const u=filtradosU[Number(button.dataset.uIndex)];
       if(!u) return;
       const action=button.dataset.uAction;
-      if(action==='map'){
-        window.verMapaU([u.domicilio,u.localidad,u.cp].filter(Boolean).join(' '));
-      }else if(action==='neighbors'){
+      if(action==='neighbors'){
         window.verVecinosU(u.localidad||'');
       }else if(action==='whatsapp'){
         const link=getWhatsAppLinkU(u);
@@ -14322,12 +14324,6 @@ window.parseFechaU=parseFechaU;
 // Los botones de barrios y tarjetas viven en otro archivo y necesitan la lista
 // completa, no la filtrada: cada botón muestra su grupo entero.
 window.usuariosTodosActual=function(){ return usuariosU.slice(); };
-window.verMapaU=function(query){
-  if(!query.trim()){ window.APPIDialog.alert('Este usuario no tiene domicilio cargado.',{title:'Sin domicilio',icon:'📍'}); return; }
-  const url='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(query);
-  window.open(url,'_blank');
-  window.mostrarEnMapaU(query);
-};
 window.verVecinosU=function(localidad){
   if(!localidad || localidad==='all'){ window.APPIDialog.alert('Elegí primero una zona para ver los vecinos.',{title:'Elegí una zona',icon:'🗺️'}); return; }
   // Compatibilidad vieja pills
@@ -14540,8 +14536,15 @@ window.abrirMapaU=function(){
   if(!mapDiv) return null;
   mapDiv.classList.add('show');
   mapDiv.style.removeProperty('display');
-  const btn=document.getElementById('usuariosBtnMapAll');
-  if(btn) btn.classList.add('activo');
+  const cerrarBtn=document.getElementById('usuariosMapCerrar');
+  if(cerrarBtn){
+    const cerrar=()=>window.cerrarMapaU();
+    cerrarBtn.onclick=cerrar;
+    // Se cierra al PRESIONAR (pointerdown), no al soltar: entre el press y el
+    // release el mapa puede refluirse (popup/geocodificación) y el clic caía
+    // en el mapa en vez de en el botón. El clic queda para el teclado.
+    cerrarBtn.addEventListener('pointerdown', function(e){ e.stopPropagation(); cerrar(); }, true);
+  }
   if(!mapU){
     try{
       mapU=L.map('usuariosMap',{zoomControl:true}).setView([-31.4201,-64.1888],12);
@@ -14557,14 +14560,6 @@ window.cerrarMapaU=function(){
   if(!mapDiv) return;
   mapDiv.classList.remove('show');
   mapDiv.style.removeProperty('display');
-  const btn=document.getElementById('usuariosBtnMapAll');
-  if(btn) btn.classList.remove('activo');
-};
-window.alternarMapaU=function(){
-  const mapDiv=document.getElementById('usuariosMap');
-  if(!mapDiv) return;
-  if(mapDiv.classList.contains('show')) window.cerrarMapaU();
-  else window.abrirMapaU();
 };
 
 window.mostrarEnMapaU=async function(query, lista=null){
@@ -14948,10 +14943,6 @@ function initUsuarios(){
   if(btnTarjetas) btnTarjetas.onclick=()=>{
     if(window.APPIUsuariosBotones) window.APPIUsuariosBotones.abrirTarjetas();
   };
-  const btnMapAll=document.getElementById('usuariosBtnMapAll');
-  // Tocar Mapa de nuevo lo cierra: es el mismo botón, así que tiene que hacer
-  // el camino de ida y el de vuelta.
-  if(btnMapAll) btnMapAll.onclick=()=>{ window.alternarMapaU(); };
   const btnVerTodos=document.getElementById('usuariosBtnVerTodos');
   if(btnVerTodos) btnVerTodos.onclick=()=>{ resetFiltrosU(); };
 

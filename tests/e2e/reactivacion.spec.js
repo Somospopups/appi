@@ -84,7 +84,7 @@ async function entrar(page, users = LISTA, { conAviso = false } = {}) {
   await page.locator('#btnDistributorLogin').click();
   await expect(page.locator('#lockScreen')).toHaveClass(/hidden/);
   await page.evaluate(() => window.showView('view-usuarios'));
-  await expect(page.locator('#usuariosBtnMapAll')).toBeVisible();
+  await expect(page.locator('#usuariosBtnZonas')).toBeVisible();
 }
 
 // Atrapa la apertura de WhatsApp para leer qué se manda.
@@ -104,7 +104,8 @@ test('el botón Dormidos aparece sólo si hay dormidos', async ({ page }) => {
 test('sin dormidos la barra queda como estaba', async ({ page }) => {
   await entrar(page, [LISTA[0], LISTA[1]]);   // sólo vigente y vencido reciente
   await expect(page.locator('#usuariosBtnDormidos')).toHaveCount(0);
-  await expect(page.locator('.u-tools button:visible')).toHaveCount(5);
+  // Cuatro de base (Mapa se quitó en v332).
+  await expect(page.locator('.u-tools button:visible')).toHaveCount(4);
 });
 
 test('se ven los dormidos separados en olas por antigüedad', async ({ page }) => {

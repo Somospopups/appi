@@ -1,7 +1,7 @@
 const { test, expect } = require('@playwright/test');
 
-// El botón Mapa es uno solo, así que tiene que hacer el camino de ida y el de
-// vuelta: tocarlo abre el mapa y volver a tocarlo lo cierra.
+// El botón "Mapa" se quitó (v332): el mapa ahora vive sólo detrás de "Vecinos"
+// y se cierra con su botón ×, dentro del propio mapa.
 
 const USER_ID = '11111111-1111-4111-8111-111111111111';
 
@@ -51,36 +51,44 @@ async function entrar(page) {
   await page.locator('#btnDistributorLogin').click();
   await expect(page.locator('#lockScreen')).toHaveClass(/hidden/);
   await page.evaluate(() => window.showView('view-usuarios'));
-  await expect(page.locator('#usuariosBtnMapAll')).toBeVisible();
+  await expect(page.locator('#usuariosBtnZonas')).toBeVisible();
 }
 
-test('el botón Mapa abre y vuelve a cerrar el mapa', async ({ page }) => {
+test('ya no existen los botones Mapa de la barra ni de la ficha', async ({ page }) => {
+  await entrar(page);
+
+  // Barra de herramientas: el botón Mapa se fue.
+  await expect(page.locator('#usuariosBtnMapAll')).toHaveCount(0);
+
+  // Ficha: tampoco hay botón Mapa; quedan Vecinos y ¿Cómo llego?.
+  const ficha = page.locator('#usuariosList .tree-node').first();
+  await ficha.click();
+  const detalle = page.locator('#usuariosList .tree-children').first();
+  await expect(detalle.locator('[data-u-action="map"]')).toHaveCount(0);
+  await expect(detalle.locator('[data-u-action="neighbors"]')).toBeVisible();
+  await expect(detalle.locator('[data-u-action="google"]')).toBeVisible();
+});
+
+test('Vecinos abre el mapa y su botón × lo cierra', async ({ page }) => {
   await entrar(page);
   const mapa = page.locator('#usuariosMap');
-  const boton = page.locator('#usuariosBtnMapAll');
-
   await expect(mapa).toBeHidden();
 
-  await boton.click();
+  await page.evaluate(() => window.verVecinosU('Alta Gracia'));
   await expect(mapa).toBeVisible();
-  // El botón queda marcado: así se sabe que ese mismo toque lo cierra.
-  await expect(boton).toHaveClass(/activo/);
+  // El mapa entra con animación y la pantalla hace scroll suave: esperar a que
+  // se asiente antes de tocar el × evita que el clic caiga en pleno movimiento.
+  await page.waitForTimeout(700);
 
-  await boton.click();
+  await page.locator('#usuariosMapCerrar').click();
   await expect(mapa).toBeHidden();
-  await expect(boton).not.toHaveClass(/activo/);
-
-  // Y se puede volver a abrir: cerrar no debe dejarlo trabado.
-  await boton.click();
-  await expect(mapa).toBeVisible();
 });
 
 test('cerrar no deja estilos pegados que impidan reabrirlo', async ({ page }) => {
   await entrar(page);
-  const boton = page.locator('#usuariosBtnMapAll');
-
-  await boton.click();
-  await boton.click();
+  await page.evaluate(() => window.verVecinosU('Alta Gracia'));
+  await page.waitForTimeout(700);
+  await page.locator('#usuariosMapCerrar').click();
 
   // El bug de origen: al abrir se ponía display:block en el elemento y ese
   // estilo le ganaba al CSS, así que quitar la clase no alcanzaba para cerrar.
@@ -88,42 +96,16 @@ test('cerrar no deja estilos pegados que impidan reabrirlo', async ({ page }) =>
   expect(estilo).toBe('');
 });
 
-test('el mapa de una ficha lo abre aunque estuviera cerrado', async ({ page }) => {
-  await entrar(page);
-  const mapa = page.locator('#usuariosMap');
-  await expect(mapa).toBeHidden();
-
-  // "Vecinos" y el "Mapa" de cada ficha reutilizan el mismo mapa de la pantalla.
-  await page.evaluate(() => window.verVecinosU('Alta Gracia'));
-  await expect(mapa).toBeVisible();
-  await expect(page.locator('#usuariosBtnMapAll')).toHaveClass(/activo/);
-
-  // Y el botón lo cierra igual, aunque lo haya abierto otro camino.
-  await page.locator('#usuariosBtnMapAll').click();
-  await expect(mapa).toBeHidden();
-});
-
-test('con un filtro puesto, Limpiar es su propio botón y Mapa sigue siendo Mapa', async ({ page }) => {
+test('con un filtro puesto, Limpiar es su propio botón', async ({ page }) => {
   await entrar(page);
   const limpiar = page.locator('#usuariosBtnLimpiar');
-  const boton = page.locator('#usuariosBtnMapAll');
-  const mapa = page.locator('#usuariosMap');
 
-  // Sin filtro no hay por qué ofrecer limpiar nada.
   await expect(limpiar).toBeHidden();
 
   await page.locator('#usuariosBtnZonas').click();
   await page.locator('[data-ub-zona="Alta Gracia"]').click();
   await expect(page.locator('#usuariosList .tree-name')).toHaveCount(1);
   await expect(limpiar).toBeVisible();
-
-  // Antes Mapa se transformaba en Limpiar y con un filtro puesto el mapa
-  // quedaba sin forma de cerrarse. Ahora sigue abriendo y cerrando.
-  await expect(boton).toContainText('Mapa');
-  await boton.click();
-  await expect(mapa).toBeVisible();
-  await boton.click();
-  await expect(mapa).toBeHidden();
 
   await limpiar.click();
   await expect(page.locator('#usuariosList .tree-name')).toHaveCount(2);
@@ -134,13 +116,13 @@ test('cambiar de archivo cierra el mapa y lo deja reutilizable', async ({ page }
   await entrar(page);
   const mapa = page.locator('#usuariosMap');
 
-  await page.locator('#usuariosBtnMapAll').click();
+  await page.evaluate(() => window.verVecinosU('Alta Gracia'));
   await expect(mapa).toBeVisible();
 
   await page.evaluate(() => window.cerrarMapaU());
   await expect(mapa).toBeHidden();
   expect(await mapa.evaluate(el => el.style.display)).toBe('');
 
-  await page.locator('#usuariosBtnMapAll').click();
+  await page.evaluate(() => window.verVecinosU('Villa Allende'));
   await expect(mapa).toBeVisible();
 });
