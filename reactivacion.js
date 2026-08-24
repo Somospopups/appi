@@ -146,7 +146,9 @@
   function dias(a, b){ return Math.round((a - b) / DIA); }
 
   function tel(u){
-    return window.APPITel ? window.APPITel.normalizar(u && u.telf || '') : '';
+    if(!window.APPITel) return '';
+    if(window.APPITel.primeroValido) return window.APPITel.primeroValido(u && u.telf || '');
+    return window.APPITel.normalizar(u && u.telf || '');
   }
 
   /* ---------- contador del día ---------- */

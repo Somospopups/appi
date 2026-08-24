@@ -318,7 +318,7 @@ async function openEncuestaTool(){
 }
 function statusInfo(value){return STATUSES[value]||STATUSES.nuevo}
 function phoneDigits(value){return String(value||'').replace(/\D/g,'').slice(0,15)}
-function whatsappDigits(value){return window.APPITel?window.APPITel.normalizar(value):''}
+function whatsappDigits(value){if(!window.APPITel)return '';if(window.APPITel.primeroValido)return window.APPITel.primeroValido(value);return window.APPITel.normalizar(value)}
 function localISODate(value=new Date()){const d=value instanceof Date?value:new Date(value);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
 function addDaysISO(days){const d=new Date();d.setHours(12,0,0,0);d.setDate(d.getDate()+Number(days||0));return localISODate(d)}
 function formatDate(value,withTime=false){if(!value)return '-';const raw=String(value),d=/^\d{4}-\d{2}-\d{2}$/.test(raw)?new Date(`${raw}T12:00:00`):new Date(value);if(Number.isNaN(d.getTime()))return raw;return new Intl.DateTimeFormat('es-AR',withTime?{dateStyle:'short',timeStyle:'short'}:{dateStyle:'medium'}).format(d)}

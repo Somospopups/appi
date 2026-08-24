@@ -141,6 +141,39 @@ test.describe('APPITel · armado de números argentinos', () => {
   });
 });
 
+test.describe('APPITel · primeroValido (campos con varios números)', () => {
+  test.beforeEach(async ({ page }) => { await cargar(page); });
+
+  const casos = [
+    // [entrada, esperado]
+    ['un número suelto',                '351 766-9967',                              '5493517669967'],
+    ['completo seguido de un "54"',     '351 766-9967 / 54',                         '5493517669967'],
+    ['"54" primero y número después',   '54 / 351 766-9967',                         '5493517669967'],
+    ['dos números: gana el primero',    '351 766-9967 / 54 351 555-1234',            '5493517669967'],
+    ['dos con prefijo 54',              '54 351 766-9967 / 54 351 555-1234',         '5493517669967'],
+    ['separados por coma',              '351 766-9967, 351 455-2272',                '5493517669967'],
+    ['separados por salto de línea',    '351 766-9967\n351 455-2272',                 '5493517669967'],
+    ['guiones con espacios (partido)',  '54 351 766 - 9967',                         '5493517669967'],
+    ['número válido con +54',           '+54 9 351 766 9967 / 54',                   '5493517669967'],
+    ['solo basura "54"',                '54',                                        ''],
+    ['solo "54 / 54"',                  '54 / 54',                                   ''],
+    ['vacío',                           '',                                          ''],
+  ];
+
+  for (const [caso, entrada, esperado] of casos) {
+    test(`${caso}`, async ({ page }) => {
+      const salida = await page.evaluate(v => window.APPITel.primeroValido(v), entrada);
+      expect(salida).toBe(esperado);
+    });
+  }
+
+  test('primeroValido de dos números no devuelve los dos pegados', async ({ page }) => {
+    const salida = await page.evaluate(() => window.APPITel.primeroValido('351 766-9967 / 54 351 555-1234'));
+    expect(salida).toMatch(/^549\d{10}$/);
+    expect(salida).toBe('5493517669967');
+  });
+});
+
 /* Convención (v290): nadie más que telefono.js arma números. En v289 quedó
    afuera admin-panel.js, que concatenaba '549' a mano y mandaba a WhatsApp
    números con dígitos de más. Este test evita que vuelva a pasar. */

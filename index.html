@@ -4103,7 +4103,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v330 · Segura</div>
+  <div class="ds-foot">APPI · v331 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -7831,7 +7831,7 @@ ${(function(){
         } else if(tels.length > 1){
           btnWa = `<button class="bd-call" data-multitel="${p.id}" data-nom="${escapeXml(p.nombre)}">💬 x${tels.length}</button>`;
         }
-        return `<div class="bday-item clickable" data-persona="${p.id}"><div class="bd-day"><div class="bd-num">${dia}</div><div class="bd-mon">${MONTHS_SHORT[hoy.getMonth()]}</div></div><div class="bd-info"><div class="bd-name">${escapeXml(p.nombre)}</div><div class="bd-meta">${catInfoOf(p.cat).name}${p.tel ? ' · '+escapeXml(p.tel) : ''}</div></div>${btnWa}</div>`;
+        return `<div class="bday-item clickable" data-persona="${p.id}"><div class="bd-day"><div class="bd-num">${dia}</div><div class="bd-mon">${MONTHS_SHORT[hoy.getMonth()]}</div></div><div class="bd-info"><div class="bd-name">${escapeXml(p.nombre)}</div><div class="bd-meta">${catInfoOf(p.cat).name}${tels.length ? ' · '+escapeXml(tels.map(t=>t.display).join(' · ')) : ''}</div></div>${btnWa}</div>`;
       };
       
       let html = '';
@@ -8224,7 +8224,8 @@ function renderEquipoPersonList(){
         const pts = p.pnAct || 0;
         const ptsOrg = calcularPBOrganizacion(p);
         const tieneEquipo = ptsOrg > pts;
-        return `<div class="person-item" data-pid="${p.id}"><span class="pi-cat" style="${catBadgeStyle(info)}">${info.name}</span><div class="pi-info"><div class="pi-name ${pts===0?'inactive':''}">${escapeXml(p.nombre)}</div><div class="pi-meta">${p.codigo||''}${p.tel?' · '+escapeXml(p.tel):''}</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex:none;min-width:70px"><div class="pi-pts ${pts===0?'zero':''}" style="min-width:0" title="PB Personal">👤 ${formatPB(pts)}</div>${tieneEquipo ? `<div class="pi-org" style="font-size:11px;font-weight:700;color:#7a4bd9" title="PB de Organización — tocar para ver descendencia" onclick="event.stopPropagation();mostrarDescendenciaById(${p.id})">👥 ${formatPB(ptsOrg)}</div>` : ''}</div></div>`;
+        const tels = parseTelefonos(p.tel);
+        return `<div class="person-item" data-pid="${p.id}"><span class="pi-cat" style="${catBadgeStyle(info)}">${info.name}</span><div class="pi-info"><div class="pi-name ${pts===0?'inactive':''}">${escapeXml(p.nombre)}</div><div class="pi-meta">${p.codigo||''}${tels.length?' · '+escapeXml(tels.map(t=>t.display).join(' · ')):''}</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex:none;min-width:70px"><div class="pi-pts ${pts===0?'zero':''}" style="min-width:0" title="PB Personal">👤 ${formatPB(pts)}</div>${tieneEquipo ? `<div class="pi-org" style="font-size:11px;font-weight:700;color:#7a4bd9" title="PB de Organización — tocar para ver descendencia" onclick="event.stopPropagation();mostrarDescendenciaById(${p.id})">👥 ${formatPB(ptsOrg)}</div>` : ''}</div></div>`;
       }).join('');
   
   wrap.querySelectorAll('.person-item').forEach(n=>{
@@ -8241,16 +8242,27 @@ function parseTelefonos(telStr){
   const partes = (''+telStr).split(/\s*[\/,;|\n\r]+\s*|\s+-\s+/);
   const tels = [];
   const vistos = new Set();
+  // Sólo se guardan números REALMENTE válidos: un "54" suelto, un área sin
+  // abonado o la mitad de un número partido se descartan (v330). Antes bastaba
+  // con 8 dígitos y un "54" roto entraba al listado y rompía el enlace.
+  const esNumero = d => { try{ return window.APPITel && window.APPITel.esValido ? window.APPITel.esValido(d) : (d.length >= 8); }catch(e){ return d.length >= 8; } };
+  const soloDigitosDe = s => (''+s).replace(/[^\d+]/g, '').replace(/(?!^)\+/g, '').replace(/^\+/, '');
   partes.forEach(p => {
     const limpio = p.trim();
     if(!limpio) return;
-    const soloDigitos = limpio.replace(/[^\d+]/g, '').replace(/(?!^)\+/g, '');
-    const digits = soloDigitos.replace(/^\+/, '');
-    if(digits.length >= 8 && !vistos.has(digits)){
-      vistos.add(digits);
+    const digits = soloDigitosDe(limpio);
+    const clave = (window.APPITel && window.APPITel.normalizar) ? window.APPITel.normalizar(digits) : digits;
+    if(esNumero(digits) && clave && !vistos.has(clave)){
+      vistos.add(clave);
       tels.push({ display: limpio, digits });
     }
   });
+  // Si el split de " - " partió un número único (ej. "54 351 766 - 9967"),
+  // la cadena entera sigue siendo un número válido: se rescata.
+  if(!tels.length){
+    const entero = soloDigitosDe(telStr);
+    if(esNumero(entero)) tels.push({ display: (''+telStr).trim(), digits: entero });
+  }
   return tels;
 }
 
@@ -10202,7 +10214,7 @@ function seguimientoProgreso(){ const nube=genteNube(); if(nube.length) return M
 function openSeguimiento(){ showView('view-seguimiento'); }
 function capitalizarNombreSeg(valor){ return String(valor||'').toLocaleLowerCase('es-AR').replace(/(^|[\s'-])(\p{L})/gu,(m,sep,letra)=>sep+letra.toLocaleUpperCase('es-AR')).replace(/\s{2,}/g,' '); }
 function limpiarFormularioSeg(){ ['segNombre','segTelefono','segFecha','segNotas'].forEach(id=>document.getElementById(id).value=''); document.getElementById('segInteres').value='Producto'; document.getElementById('segEstado').value='No contactado'; seguimientoEditId=null; }
-function segDigits(phone){return window.APPITel?window.APPITel.normalizar(phone):''}
+function segDigits(phone){if(!window.APPITel)return '';if(window.APPITel.primeroValido)return window.APPITel.primeroValido(phone);return window.APPITel.normalizar(phone)}
 function segContactActions(p){const d=segDigits(p.telefono);if(!d)return '';const msg=encodeURIComponent(`Hola ${nombreDePila(p.nombre)||p.nombre}! ¿Cómo andás? 😊`);return `<div class="seg-contact-actions"><a class="wa-msg" title="Contactar por WhatsApp" aria-label="Contactar por WhatsApp" href="https://wa.me/${d}?text=${msg}" target="_blank" rel="noopener">💬 Contactar por WhatsApp</a><a class="phone-call" title="Llamar al contacto" aria-label="Llamar al contacto" href="tel:+${d}" data-appi-call-phone="${d}" data-appi-call-name="${escapeXml(p.nombre||'Contacto')}" data-appi-call-label="1">📲 Llamar en teléfono</a></div>`}
 function renderSeguimiento(){
   const all=cargarSeguimientos();
@@ -11704,7 +11716,7 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='330';
+      const swVersion='331';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 
@@ -14352,7 +14364,10 @@ function normCacheKeyU(s){ return (s||'').toString().toLowerCase().trim().replac
 function formatWhatsAppNumberU(telf){
   // Toda la app arma los números en un solo lugar: telefono.js (window.APPITel).
   // Devuelve '' cuando el número no es válido, para no abrir un chat vacío.
-  return window.APPITel ? window.APPITel.normalizar(telf) : '';
+  // Si el campo trae varios números (o un "54" suelto), usa el primero válido.
+  if(!window.APPITel) return '';
+  if(window.APPITel.primeroValido) return window.APPITel.primeroValido(telf);
+  return window.APPITel.normalizar(telf);
 }
 window.formatWhatsAppNumberU=formatWhatsAppNumberU;
 function getWhatsAppLinkU(u){
@@ -15026,7 +15041,7 @@ const ACTION_CLOSED_RESULTS=new Set(['reactivated','no_followup']);
 function actionId(prefix='plan'){return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2,8)}`}
 function localActionDate(value=new Date()){const d=value instanceof Date?value:new Date(value);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
 function actionDateIn(days){const d=new Date();d.setHours(12,0,0,0);d.setDate(d.getDate()+Number(days||0));return localActionDate(d)}
-function actionPhone(value){return window.APPITel?window.APPITel.normalizar(value):''}
+function actionPhone(value){if(!window.APPITel)return '';if(window.APPITel.primeroValido)return window.APPITel.primeroValido(value);return window.APPITel.normalizar(value)}
 function validActionPhone(value){return !!actionPhone(value)}
 function actionActorKey(){
   const user=window.APPIAuth&&window.APPIAuth.userId?window.APPIAuth.userId():'local';

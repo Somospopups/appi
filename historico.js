@@ -59,7 +59,7 @@ const ACTION_CLOSED_RESULTS=new Set(['reactivated','no_followup']);
 function actionId(prefix='plan'){return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2,8)}`}
 function localActionDate(value=new Date()){const d=value instanceof Date?value:new Date(value);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
 function actionDateIn(days){const d=new Date();d.setHours(12,0,0,0);d.setDate(d.getDate()+Number(days||0));return localActionDate(d)}
-function actionPhone(value){return window.APPITel?window.APPITel.normalizar(value):''}
+function actionPhone(value){if(!window.APPITel)return '';if(window.APPITel.primeroValido)return window.APPITel.primeroValido(value);return window.APPITel.normalizar(value)}
 function validActionPhone(value){return !!actionPhone(value)}
 function actionActorKey(){
   const user=window.APPIAuth&&window.APPIAuth.userId?window.APPIAuth.userId():'local';

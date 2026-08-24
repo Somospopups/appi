@@ -310,12 +310,17 @@
   }
 
   function telefonoDe(u){
-    return window.APPITel ? window.APPITel.normalizar(u && u.telf || '') : '';
+    if(!window.APPITel) return '';
+    if(window.APPITel.primeroValido) return window.APPITel.primeroValido(u && u.telf || '');
+    return window.APPITel.normalizar(u && u.telf || '');
   }
 
   function enviar(u, texto){
     var nombre = (u && (u.usuario || u.nombre) || '').split(',')[0].trim();
-    if (!window.APPITel.abrir(u && u.telf || '', texto, nombre)) return;
+    // Si el campo trae más de un número (o un "54" suelto), se manda al
+    // primer número válido y no se rompe la redirección (v331).
+    var tel = (window.APPITel && window.APPITel.primeroValido) ? window.APPITel.primeroValido(u && u.telf || '') : (u && u.telf || '');
+    if (!window.APPITel.abrir(tel, texto, nombre)) return;
     registrar(u, texto);
   }
 

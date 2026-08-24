@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v330-mandar-queda-en-la-misma';
+const CACHE_NAME = 'appi-v331-telefonos-dobles';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

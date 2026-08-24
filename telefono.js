@@ -66,6 +66,21 @@
 
   function esValido(valor){ return !!normalizar(valor); }
 
+  /* Un campo puede traer varios números pegados (ej. "351 766-9967 / 54" o
+     "54 351 766 - 9967"). Devuelve el PRIMER número válido, listo para wa.me,
+     o '' si no hay ninguno. Así un "54" suelto o un segundo número nunca
+     rompe la redirección de WhatsApp. */
+  function primeroValido(valor){
+    var partes = String(valor == null ? '' : valor).split(/\s*[\/,;|\n\r]+\s*|\s+-\s+/);
+    for (var i = 0; i < partes.length; i++){
+      var n = normalizar(partes[i]);
+      if (n) return n;
+    }
+    // Si los separadores partieron un número único (guiones con espacios),
+    // la cadena entera puede seguir siendo un número válido.
+    return normalizar(valor);
+  }
+
   /* Para mostrarlo en pantalla: +54 9 351 766-9967 */
   function bonito(valor){
     var n = normalizar(valor);
@@ -107,6 +122,7 @@
   window.APPITel = {
     normalizar: normalizar,
     esValido:   esValido,
+    primeroValido: primeroValido,
     bonito:     bonito,
     link:       link,
     abrir:      abrir

@@ -261,7 +261,7 @@
         return (t.trim().split(/\s+/)[0] || '');
       };
       var abrirEquipo = function(){ if (typeof window.openEquipo === 'function') window.openEquipo(); else if (typeof window.showView === 'function') window.showView('view-equipo'); };
-      var telDeB = function(p){ return p.tel || p.telefono || p.telf || ''; };
+      var telDeB = function(p){ var c = p.tel || p.telefono || p.telf || ''; var v = window.APPITel && window.APPITel.primeroValido ? window.APPITel.primeroValido(c) : ''; return v || c; };
       var telValidoB = function(p){ var t = telDeB(p); return !!(t && window.APPITel && window.APPITel.esValido(t)); };
       var proponer = function(p){ return function(){
         var pb = String(Number(p.pnAct || p.pb || 0)).replace('.', ',');
@@ -314,7 +314,7 @@
       return t ? t.charAt(0).toUpperCase() + t.slice(1).toLowerCase() : '';
     };
     var abrirEquipo = function(){ if (typeof window.openEquipo === 'function') window.openEquipo(); else if (typeof window.showView === 'function') window.showView('view-equipo'); };
-    var telDe = function(p){ return p.tel || p.telefono || p.telf || ''; };
+    var telDe = function(p){ var c = p.tel || p.telefono || p.telf || ''; var v = window.APPITel && window.APPITel.primeroValido ? window.APPITel.primeroValido(c) : ''; return v || c; };
     var telValido = function(p){ var t = telDe(p); return !!(t && window.APPITel && window.APPITel.esValido(t)); };
     // Sin teléfono en la planilla no hay a quién marcarle: mejor decirlo de
     // frente que mandar a otra pantalla en silencio (v322).
