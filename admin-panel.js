@@ -115,15 +115,28 @@ async function publicarAnuncio(){
   if(mensaje.length>600){setStatus('adminAnuncioStatus','El mensaje no puede pasar de 600 caracteres.',true);return}
   const eventos=anuncioEventosDelForm();
   for(const ev of eventos){
-    if(!ev.titulo){setStatus('adminAnuncioStatus','Toda reunión con fecha o lugar necesita un título.',true);return}
-    if(!/^\d{4}-\d{2}-\d{2}$/.test(ev.fecha)){setStatus('adminAnuncioStatus',`“${ev.lugar||ev.titulo}”: falta la fecha de la reunión.`,true);return}
+    if(!ev.titulo){
+      setStatus('adminAnuncioStatus','Toda reunión con fecha o lugar necesita un título.',true);
+      window.APPIDialog.alert('Pusiste fecha en una reunión pero le falta el título.\n\nEscribilo (ej: "Reunión general por Zoom") o borrá la fecha para dejarla vacía.',{title:'Falta el título',icon:'✍️',okText:'Entendido'});
+      return;
+    }
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(ev.fecha)){
+      setStatus('adminAnuncioStatus',`“${ev.titulo}”: falta la fecha.`,true);
+      window.APPIDialog.alert(`La reunión “${ev.titulo}” tiene título pero le falta la fecha.\n\nElegí el día en el calendario de esa reunión, o borrá el título para dejarla vacía.`,{title:'Falta la fecha',icon:'📅',okText:'Entendido'});
+      return;
+    }
   }
   try{
     await rpcAdmin('appi_admin_publicar_anuncio',{p_texto:mensaje,p_eventos:eventos});
     setStatus('adminAnuncioStatus','Publicado ✓ Lo van a ver todos al abrir APPI.');
+    await window.APPIDialog.alert('El aviso quedó publicado.\n\nTodos los distribuidores lo van a ver como cartel al abrir APPI, con los botones para agendar las reuniones en APPI o en el teléfono.',{title:'Aviso publicado ✓',icon:'📣',okText:'Listo'});
     await loadAnuncio();
   }catch(error){
-    setStatus('adminAnuncioStatus',error.message||'No se pudo publicar el aviso.',true);
+    let msg=error.message||'No se pudo publicar el aviso.';
+    // El 404 del RPC arrastraba un texto de otra función: ahora dice la verdad.
+    if(/Falta correr SUPABASE_ACCIONES_DIA/.test(msg))msg='El backend todavía no conoce los anuncios. Corré el workflow "Publicar backend completo de APPI" en GitHub.';
+    setStatus('adminAnuncioStatus',msg,true);
+    await window.APPIDialog.alert(msg,{title:'No se pudo publicar',icon:'⚠️',okText:'Entendido'});
   }
 }
 async function quitarAnuncioVigente(){
@@ -132,6 +145,7 @@ async function quitarAnuncioVigente(){
   try{
     await rpcAdmin('appi_admin_quitar_anuncio',{});
     setStatus('adminAnuncioStatus','Aviso quitado. Nadie ve el cartel al abrir APPI.');
+    await window.APPIDialog.alert('El aviso quedó quitado: nadie va a ver el cartel al abrir APPI. Lo que ya se agendó en las agendas queda.',{title:'Aviso quitado ✓',icon:'📣',okText:'Listo'});
     await loadAnuncio();
   }catch(error){setStatus('adminAnuncioStatus',error.message||'No se pudo quitar el aviso.',true)}
 }

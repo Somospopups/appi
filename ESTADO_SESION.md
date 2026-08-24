@@ -1,4 +1,4 @@
-# Estado al retomar — APPI v326
+# Estado al retomar — APPI v327
 
 Repo: `github.com/somospopups/appi` · **suite en verde**.
 
@@ -7,7 +7,24 @@ corrida previa tuvo un flake puntual en mi-gente que pasa suelto).
 
 ---
 
-## Último cambio: v326 · Anuncios para todos y mensajes propios
+## Último cambio: v327 · El aviso habla claro
+
+Parche de soporte sobre v326: publicar/quitar anuncio responde con
+APPIDialog grande (éxito y error); el 404 del RPC ya no dice
+"SUPABASE_ACCIONES_DIA" sino que pide correr el workflow del backend;
+las validaciones de reuniones (título sin fecha, fecha sin título)
+abren cartel explicando qué completar. Cambio de caché
+`appi-v327-aviso-habla-claro` fuerza la actualización del App Shell en
+todos los dispositivos (había riesgo de v325 cacheada). VERIFICADO en
+producción: `appi_admin_publicar_anuncio` responde "Sólo la cuenta
+administradora puede publicar anuncios." igual que `appi_admin_pagos`;
+SUPABASE_ANUNCIOS.sql corrió en el workflow (run 32746615784, "OK:
+SUPABASE_ANUNCIOS.sql"); la web sirve v326/v327 según el deploy. Si un
+admin reporta "no publica": revisar que el pie diga v327 (reabrir dos
+veces), y que pruebe el CARTEL con cuenta distribuidora (popups no lo
+ve: es quien escribe).
+
+## Anterior: v326 · Anuncios para todos y mensajes propios
 
 (1) **📣 Anuncio para todos**: sección nueva del panel admin (entre
 Ingresos y Configuración) con mensaje de hasta 600 caracteres y hasta 3
