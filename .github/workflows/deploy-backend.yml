@@ -32,7 +32,7 @@ jobs:
           # El instalador consolidado crea la base; las migraciones posteriores
           # completan módulos agregados después y son seguras al reejecutarse.
           fallidas=""
-          for migration in SUPABASE_INSTALACION_COMPLETA.sql SUPABASE_MI_GENTE.sql SUPABASE_MEMBRESIAS.sql SUPABASE_PERSONAS_CUENTA.sql SUPABASE_INVITACIONES_PERSONA.sql SUPABASE_RECORDATORIOS.sql; do
+          for migration in SUPABASE_INSTALACION_COMPLETA.sql SUPABASE_MI_GENTE.sql SUPABASE_MEMBRESIAS.sql SUPABASE_PERSONAS_CUENTA.sql SUPABASE_INVITACIONES_PERSONA.sql SUPABASE_RECORDATORIOS.sql SUPABASE_ANUNCIOS.sql; do
             echo "::group::$migration"
             jq -Rs '{query: ., read_only: false}' "$migration" > /tmp/migration.json
             if curl --fail-with-body --silent --show-error \
