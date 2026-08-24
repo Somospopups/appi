@@ -138,13 +138,18 @@
 
   function plantillas(){
     var g = leerGuardado().textos || {};
-    return BASE.map(function(p){
+    var todas = BASE.map(function(p){
       var copia = {};
       for (var k in p) copia[k] = p[k];
       if (typeof g[p.id] === 'string') copia.texto = g[p.id];
       copia.editada = typeof g[p.id] === 'string' && g[p.id] !== p.texto;
       return copia;
     });
+    // Las propias van al final del mazo y valen para cualquier cliente.
+    leerPropias().forEach(function(p){
+      todas.push({ id: p.id, icono: p.icono, nombre: p.nombre, texto: p.texto, grupo: 'todos', propio: true, editada: false });
+    });
+    return todas;
   }
   function plantilla(id){
     var todas = plantillas();
@@ -165,6 +170,40 @@
     var data = leerGuardado();
     if (data.textos) delete data.textos[id];
     guardar(data);
+  }
+
+  /* ---------- mensajes propios (v326) ----------
+     El distribuidor suma los mensajes que quiera: viven junto a las
+     ediciones, en el mismo lugar del dispositivo, y valen para todos
+     sus clientes. Si recarga el Excel, no se pierden tampoco. */
+  function leerPropias(){
+    var d = leerGuardado().propias;
+    return Array.isArray(d) ? d.filter(function(p){ return p && p.id && p.texto; }) : [];
+  }
+  function guardarPropias(lista){
+    var data = leerGuardado();
+    data.propias = lista || [];
+    guardar(data);
+  }
+  function crearPropia(icono, nombre, texto){
+    var lista = leerPropias();
+    var id = 'propia_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+    lista.push({ id: id, icono: icono || '💬', nombre: nombre, texto: texto });
+    guardarPropias(lista);
+    return id;
+  }
+  function guardarPropia(id, cambios){
+    var lista = leerPropias();
+    for (var i = 0; i < lista.length; i++){
+      if (lista[i].id !== id) continue;
+      if (typeof cambios.icono === 'string' && cambios.icono.trim()) lista[i].icono = cambios.icono.trim().slice(0, 3);
+      if (typeof cambios.nombre === 'string' && cambios.nombre.trim()) lista[i].nombre = cambios.nombre.trim().slice(0, 30);
+      if (typeof cambios.texto === 'string') lista[i].texto = cambios.texto;
+    }
+    guardarPropias(lista);
+  }
+  function eliminarPropia(id){
+    guardarPropias(leerPropias().filter(function(p){ return p.id !== id; }));
   }
 
   /* ---------- fechas y vigencia ---------- */
@@ -857,11 +896,14 @@
         '<span class="mu-go">›</span></button>';
     });
     html += '</div>';
+    // Crear mensajes propios (v326): el distribuidor arma su propia biblioteca.
+    html += '<button type="button" class="mu-sec mu-grande" id="muNuevo" style="margin-top:12px">✍️ Crear un mensaje nuevo</button>';
     html += '<button type="button" class="mu-volver" id="muVolverEnviar">‹ Volver a enviar</button>';
     cuerpo.innerHTML = html;
     cuerpo.querySelectorAll('[data-mu-editar]').forEach(function(b){
       b.onclick = function(){ verPlantilla(b.getAttribute('data-mu-editar'), u, true); };
     });
+    cuerpo.querySelector('#muNuevo').onclick = function(){ verPlantillaNueva(u); };
     cuerpo.querySelector('#muVolverEnviar').onclick = function(){ abrir(u); };
   }
 
@@ -885,6 +927,12 @@
     ov.querySelector('#muSub').textContent = 'Editar el texto';
 
     var html = '<div class="mu-ayuda">Los botones de abajo meten datos que se completan solos con los de cada cliente.</div>';
+    if (p.propio){
+      // Los mensajes propios también pueden cambiar de emoji y nombre.
+      html += '<div class="mu-propios" style="display:grid;grid-template-columns:64px 1fr;gap:8px;margin-top:11px">' +
+        '<input id="muIcono" maxlength="3" value="' + esc(p.icono) + '" aria-label="Emoji" style="text-align:center;font-size:17px">' +
+        '<input id="muNombre" maxlength="30" value="' + esc(p.nombre) + '" placeholder="Nombre del mensaje" aria-label="Nombre"></div>';
+    }
     html += '<div class="mu-caja"><textarea id="muTexto" spellcheck="true">' + esc(p.texto) + '</textarea></div>';
     html += '<div class="mu-tags">';
     ETIQUETAS.forEach(function(e){
@@ -896,7 +944,8 @@
     html += '<div class="mu-acciones">';
     // Guardar no es enviar: el verde queda reservado para WhatsApp.
     html += '<button type="button" class="mu-sec mu-grande" id="muGuardar">Guardar</button>';
-    if (p.editada) html += '<button type="button" class="mu-sec" id="muRestaurar">Volver al texto original</button>';
+    if (p.editada && !p.propio) html += '<button type="button" class="mu-sec" id="muRestaurar">Volver al texto original</button>';
+    if (p.propio) html += '<button type="button" class="mu-sec" id="muEliminar" style="background:rgba(255,107,107,.12);color:#c0392b">Eliminar este mensaje</button>';
     html += '</div>';
     html += '<button type="button" class="mu-volver" id="muVolver">‹ Volver</button>';
     cuerpo.innerHTML = html;
@@ -933,8 +982,25 @@
     }
     cuerpo.querySelector('#muVolver').onclick = volver;
     cuerpo.querySelector('#muGuardar').onclick = function(){
-      guardarTexto(id, ta.value);
-      if (typeof window.showToast === 'function') window.showToast('Guardado ✓');
+      var inIco = cuerpo.querySelector('#muIcono');
+      var inNom = cuerpo.querySelector('#muNombre');
+      if (p.propio){
+        var nombre = inNom ? inNom.value.trim() : '';
+        if (!nombre){
+          if (typeof window.showToast === 'function') window.showToast('Ponle un nombre al mensaje');
+          if (inNom) inNom.focus();
+          return;
+        }
+        if (!ta.value.trim()){
+          if (typeof window.showToast === 'function') window.showToast('Escribí el texto del mensaje');
+          return;
+        }
+        guardarPropia(id, { icono: inIco ? inIco.value : p.icono, nombre: nombre, texto: ta.value });
+        if (typeof window.showToast === 'function') window.showToast('Guardado ✓');
+      } else {
+        guardarTexto(id, ta.value);
+        if (typeof window.showToast === 'function') window.showToast('Guardado ✓');
+      }
       volver();
     };
     var rest = cuerpo.querySelector('#muRestaurar');
@@ -942,6 +1008,89 @@
       restaurar(id);
       if (typeof window.showToast === 'function') window.showToast('Texto original restaurado ✓');
       verPlantilla(id, u, volverAEditar);
+    };
+    var del = cuerpo.querySelector('#muEliminar');
+    if (del) del.onclick = function(){
+      var ok = window.APPIDialog && window.APPIDialog.confirm;
+      var quitar = function(){
+        eliminarPropia(id);
+        if (typeof window.showToast === 'function') window.showToast('Mensaje eliminado');
+        volver();
+      };
+      if (typeof ok === 'function'){
+        window.APPIDialog.confirm('El mensaje se borra de tu lista. Los enviados ya hechos no cambian.', { title: 'Eliminar mensaje', icon: '🗑️', okText: 'Eliminar' })
+          .then(function(si){ if (si) quitar(); });
+      } else quitar();
+    };
+  }
+
+  /* Mensaje propio nuevo (v326): mismo editor, pero arranca vacío y
+     pide nombre antes de guardar. */
+  function verPlantillaNueva(u){
+    ctx.plantilla = null;
+    var ov = overlay();
+    var cuerpo = ov.querySelector('#muCuerpo');
+    ov.querySelector('#muTitulo').textContent = '✍️ Nuevo mensaje';
+    ov.querySelector('#muSub').textContent = 'Tuyo, para cualquier cliente';
+
+    var html = '<div class="mu-ayuda">Escribí el texto una vez y queda en tu lista para siempre. Los botones de abajo meten datos que se completan solos con los de cada cliente.</div>';
+    html += '<div class="mu-propios" style="display:grid;grid-template-columns:64px 1fr;gap:8px;margin-top:11px">' +
+      '<input id="muIcono" maxlength="3" value="💬" aria-label="Emoji" style="text-align:center;font-size:17px">' +
+      '<input id="muNombre" maxlength="30" placeholder="Nombre del mensaje" aria-label="Nombre"></div>';
+    html += '<div class="mu-caja" style="margin-top:9px"><textarea id="muTexto" spellcheck="true" placeholder="Hola {nombre}! 😊"></textarea></div>';
+    html += '<div class="mu-tags">';
+    ETIQUETAS.forEach(function(e){
+      html += '<button type="button" class="mu-tag" data-mu-tag="' + esc(e.tag) + '" title="' + esc(e.que) + '">+ ' + esc(e.corto) + '</button>';
+    });
+    html += '</div>';
+    html += '<div class="mu-prev" id="muPrev"><b>Ejemplo con un cliente</b><span id="muPrevTxt"></span></div>';
+    html += '<div class="mu-acciones">';
+    html += '<button type="button" class="mu-sec mu-grande" id="muCrear">Crear mensaje</button>';
+    html += '</div>';
+    html += '<button type="button" class="mu-volver" id="muVolver">‹ Volver</button>';
+    cuerpo.innerHTML = html;
+
+    var ta = cuerpo.querySelector('#muTexto');
+    var prev = cuerpo.querySelector('#muPrevTxt');
+    function repintar(){ prev.textContent = completar(ta.value, EJEMPLO); }
+    repintar();
+    ta.oninput = repintar;
+    cuerpo.querySelectorAll('[data-mu-tag]').forEach(function(b){
+      b.onclick = function(){
+        var tag = b.getAttribute('data-mu-tag');
+        var i = ta.selectionStart == null ? ta.value.length : ta.selectionStart;
+        var f = ta.selectionEnd == null ? i : ta.selectionEnd;
+        ta.value = ta.value.slice(0, i) + tag + ta.value.slice(f);
+        ta.focus();
+        ta.selectionStart = ta.selectionEnd = i + tag.length;
+        repintar();
+      };
+    });
+
+    function volver(){
+      var c = overlay().querySelector('#muCuerpo');
+      c.innerHTML = '';
+      overlay().querySelector('#muTitulo').textContent = 'Editar los textos';
+      overlay().querySelector('#muSub').textContent = 'Elegí cuál querés cambiar';
+      pintarListaEdicion(c, u ? plantillasPara(u) : plantillas(), u);
+    }
+    cuerpo.querySelector('#muVolver').onclick = volver;
+    cuerpo.querySelector('#muCrear').onclick = function(){
+      var nombre = cuerpo.querySelector('#muNombre').value.trim();
+      var icono = cuerpo.querySelector('#muIcono').value.trim();
+      if (!nombre){
+        if (typeof window.showToast === 'function') window.showToast('Ponle un nombre al mensaje');
+        cuerpo.querySelector('#muNombre').focus();
+        return;
+      }
+      if (!ta.value.trim()){
+        if (typeof window.showToast === 'function') window.showToast('Escribí el texto del mensaje');
+        ta.focus();
+        return;
+      }
+      crearPropia(icono || '💬', nombre, ta.value);
+      if (typeof window.showToast === 'function') window.showToast('Mensaje creado ✓');
+      volver();
     };
   }
 
@@ -1015,6 +1164,11 @@
     plantilla: plantilla,
     guardarTexto: guardarTexto,
     restaurar: restaurar,
+    leerPropias: leerPropias,
+    crearPropia: crearPropia,
+    guardarPropia: guardarPropia,
+    eliminarPropia: eliminarPropia,
+    verPlantillaNueva: verPlantillaNueva,
     completar: completar,
     grupoDe: grupoDe,
     recibeMensajes: recibeMensajes,

@@ -579,3 +579,95 @@ test('sin teléfono no aparece el grupo de contacto, pero sí el de ubicación',
   await expect(ficha.locator('[data-u-action="call"]')).toHaveCount(0);
   await expect(ficha.locator('[data-u-action="google"]')).toBeVisible();
 });
+
+/* ================== Mensajes propios (v326) ==================
+   El distribuidor arma su propia biblioteca: crea, edita y borra, y
+   los mensajes propios salen igual que los de fábrica. */
+
+async function irAEditar(page) {
+  await abrirFicha(page, 0);
+  await page.locator('[data-u-toggle="0"] + .tree-children [data-u-action="whatsapp"]').click();
+  await expect(page.locator('#muOverlay')).toHaveClass(/open/);
+  await page.locator('#muIrEditar').click();
+  await expect(page.locator('#muNuevo')).toBeVisible();
+}
+
+test('se puede crear un mensaje propio y mandarlo a un cliente', async ({ page }) => {
+  await entrar(page);
+  await page.evaluate(() => {
+    window.__wa = [];
+    window.APPIWhatsApp.abrir = url => { window.__wa.push(url); };
+  });
+  await irAEditar(page);
+
+  await page.locator('#muNuevo').click();
+  await expect(page.locator('#muTitulo')).toContainText('Nuevo mensaje');
+  await page.locator('#muIcono').fill('🛠️');
+  await page.locator('#muNombre').fill('Control de agua');
+  await page.locator('#muTexto').fill('Hola {nombre}! Te paso el control de agua del mes. Queda perfecto ✅');
+  await page.locator('#muCrear').click();
+
+  // Vuelve a la lista de edición y el mensaje propio queda arriba de todo.
+  await expect(page.locator('[data-mu-editar^="propia_"]')).toHaveCount(1);
+  await page.locator('#muVolverEnviar').click();
+
+  // En la lista para enviar aparece al final y manda en un toque.
+  const item = page.locator('[data-mu-plantilla^="propia_"]');
+  await expect(item).toContainText('Control de agua');
+  await item.click();
+  const urls = await page.evaluate(() => window.__wa);
+  expect(urls).toHaveLength(1);
+  const texto = decodeURIComponent(urls[0].split('text=')[1]);
+  expect(texto).toContain('Hola Ana');
+  expect(texto).toContain('control de agua');
+  expect(texto).not.toContain('{nombre}');
+  await expect(page.locator('#muOverlay')).not.toHaveClass(/open/);
+});
+
+test('el mensaje propio se edita (emoji, nombre y texto) y se borra con confirmación', async ({ page }) => {
+  await entrar(page);
+  await page.evaluate(() => {
+    const M = window.APPIMensajes;
+    M.crearPropia('💧', 'Cambio de filtro', 'Hola {nombre}, hay que cambiar el filtro.');
+  });
+  await irAEditar(page);
+
+  const item = page.locator('[data-mu-editar^="propia_"]');
+  await expect(item).toContainText('Cambio de filtro');
+  await item.click();
+
+  // El editor propio deja cambiar emoji, nombre y texto.
+  await page.locator('#muIcono').fill('🚰');
+  await page.locator('#muNombre').fill('Cambio de filtro y valvula');
+  await page.locator('#muTexto').fill('Hola {nombre}! Cambiamos filtro y válvula en la misma visita.');
+  await page.locator('#muGuardar').click();
+  await expect(page.locator('[data-mu-editar^="propia_"]')).toContainText('Cambio de filtro y valvula');
+
+  // Y se elimina con confirmación de APPIDialog.
+  await page.locator('[data-mu-editar^="propia_"]').click();
+  await page.evaluate(() => { window.APPIDialog.confirm = () => Promise.resolve(true); });
+  await page.locator('#muEliminar').click();
+  await expect(page.locator('[data-mu-editar^="propia_"]')).toHaveCount(0);
+  const propias = await page.evaluate(() => window.APPIMensajes.leerPropias());
+  expect(propias).toHaveLength(0);
+});
+
+test('los mensajes propios valen para cualquier cliente y no se pierden al recargar', async ({ page }) => {
+  await entrar(page);
+  const idCreado = await page.evaluate(() => {
+    const M = window.APPIMensajes;
+    const id = M.crearPropia('🎯', 'Seguimiento', 'Hola {nombre}! ¿Cómo veniste esta semana?');
+    // El cliente vencido hace menos de un año sólo recibe renovación de
+    // fábrica… pero los propios son del distribuidor: van con todos.
+    const paraVencido = M.plantillasPara({ fVence: new Date(Date.now() - 90 * 86400000).toISOString(), estado: 'vencida' });
+    return { id, saleParaVencido: paraVencido.some(p => p.id === id) };
+  });
+  expect(idCreado.saleParaVencido).toBe(true);
+
+  // Sobrevive a una recarga de la planilla: vive aparte del Excel.
+  const viven = await page.evaluate(() => {
+    window.usuarios_garantias = [];
+    return window.APPIMensajes.leerPropias().length;
+  });
+  expect(viven).toBe(1);
+});

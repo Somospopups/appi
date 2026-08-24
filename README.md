@@ -4,7 +4,7 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
-- Versión: **v325 · Segura**.
+- Versión: **v326 · Segura**.
 - Publicación: [https://somospopups.github.io/appi/](https://somospopups.github.io/appi/)
 - Acceso por número de distribuidor y contraseña.
 - Acceso administrador POPUPS mediante el candado, sin DIP ni número de distribuidor.
@@ -23,6 +23,28 @@ Desde v256, todos los dispositivos abren APPI con el mismo logo de vidrio.
 - Dentro de la app, la animación de carga muestra el mismo cartel de vidrio dibujado con CSS, sin descargar imágenes, en celular, tablet y PC.
 
 Al cambiar el logo hay que regenerar ambos juegos y volver a correr `npm test`: `tests/e2e/logo-vidrio.spec.js` verifica que cada dispositivo tenga su imagen y que el arranque muestre el vidrio.
+
+## Anuncios del administrador (v326)
+
+Desde el panel, la sección **📣 Anuncio para todos** publica un mensaje que
+todo el equipo ve como cartel al abrir APPI (reuniones por Zoom, avisos). Se
+pueden sumar hasta tres reuniones con título, fecha, hora y lugar; en el
+cartel, cada una trae dos botones: agendarla en el **calendario de APPI** o en
+la **agenda del teléfono** (Google Calendar, o `.ics` en iPhone). La 🔔 de la
+esquina vuelve a mostrar el aviso vigente. Publicar reemplaza el aviso
+anterior; quitar lo apaga para todos.
+
+- La tabla `appi_anuncios` se lee con la sesión de cada distribuidor y sólo
+  se escribe mediante `SUPABASE_ANUNCIOS.sql` (RPC exclusivas del rol admin).
+- Sin conexión, el teléfono muestra el último aviso que conoció.
+
+## Mensajes propios del distribuidor (v326)
+
+En **Mensajes** de Garantías, el botón **✍️ Crear un mensaje nuevo** suma
+plantillas propias (emoji, nombre y texto) que se envían igual que las de
+fábrica, aceptan los mismos comodines (`{nombre}`, `{vence}`, …) y valen para
+cualquier cliente. Se editan y se borran desde la misma lista; las de fábrica
+siguen pudiendo volver a su texto original.
 
 ## Con qué WhatsApp se envía
 
@@ -148,6 +170,7 @@ La suite cubre la aplicación, autenticación, aislamiento por cuenta, solicitud
 - `encuesta.html`: formulario público responsive.
 - `gestion-client.js`: Mi Encuesta y Mi Gestión dentro de APPI.
 - `whatsapp-app.js`: elige entre WhatsApp y WhatsApp Business al abrir mensajes en Android.
+- `anuncios.js`: carteles del administrador con botones para agendar en APPI o en el teléfono.
 - `device-bridge.js`: vinculación y solicitudes de llamada entre dispositivos.
 - `qr-code.js`: QR local para vincular teléfonos (MIT).
 - `auth-config.js`: configuración pública de Supabase.

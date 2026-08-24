@@ -1,12 +1,39 @@
-# Estado al retomar — APPI v325
+# Estado al retomar — APPI v326
 
 Repo: `github.com/somospopups/appi` · **suite en verde**.
 
-Corrida local completa: **318 pruebas pasan, 1 salteada, 0 fallan** (sin flakes en esta corrida).
+Corrida local completa: **329 pruebas pasan, 1 salteada, 0 fallan** (la
+corrida previa tuvo un flake puntual en mi-gente que pasa suelto).
 
 ---
 
-## Último cambio: v325 · Tarjeta especial de gala + Cumpleaños al mes
+## Último cambio: v326 · Anuncios para todos y mensajes propios
+
+(1) **📣 Anuncio para todos**: sección nueva del panel admin (entre
+Ingresos y Configuración) con mensaje de hasta 600 caracteres y hasta 3
+reuniones (título/fecha/hora/lugar). Publicar reemplaza el aviso vigente;
+Quitar lo apaga; el formulario precarga el aviso actual. Al abrir APPI el
+distribuidor ve el cartel (módulo nuevo `anuncios.js`, cachea el último
+aviso por cuenta para offline), cada reunión con dos botones: 📅 agenda en
+`APPICalendario.agregar` (recuerda ✓ por aviso) y 📲 agenda del teléfono
+(Google Calendar en Android/PC, .ics en iPhone). 🔔 fija para reabrir, con
+puntito hasta cerrar el cartel; el admin no recibe carteles. Backend:
+`SUPABASE_ANUNCIOS.sql` (tabla `appi_anuncios`, RLS lectura autenticados,
+escritura sólo con RPC appi_admin_publicar_anuncio / appi_admin_quitar_anuncio
+que exigen rol admin y sanea eventos), agregada a deploy-backend.yml. Para
+que ande en producción: correr el workflow **Publicar backend completo de
+APPI**. (2) **✍️ Mensajes propios**: en Garantías → Mensajes → editar, botón
+"Crear un mensaje nuevo" (emoji+nombre+texto, mismos comodines); propias
+grupo 'todos' (valen para cualquier cliente), editables y eliminables con
+APPIDialog; viven junto a las ediciones (recargar planilla no las toca).
+`window.APPIAnuncios` y `APPIMensajes.crearPropia/guardarPropia/eliminarPropia`
+expuestos para pruebas. Versionado: package 326.0.0, visible v326, caché
+`appi-v326-anuncios-y-mensajes-propios`, anuncios.js en el App Shell.
+11 pruebas nuevas (8 anuncios + 3 propias). Capturas de referencia:
+/home/user/capturas/anuncio-v326.png, campanita-v326.png y
+mensaje-propio-v326.png (fuera del repo).
+
+## Anterior: v325 · Tarjeta especial de gala + Cumpleaños al mes
 
 (1) La tarjeta 💙 se viste distinta (.ht-card.ht-esp): fondo pleno
 azul-violeta en degradado, frase 21px blanca con comilla decorativa,

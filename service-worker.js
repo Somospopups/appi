@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v325-impulso-con-vestido';
+const CACHE_NAME = 'appi-v326-anuncios-y-mensajes-propios';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
@@ -31,6 +31,7 @@ const APP_SHELL = [
   './home-limpio.js',
   './home-tarjetas.js',
   './device-bridge.js',
+  './anuncios.js',
   './css/membership-admin.css',
   './historico.css',
   './historico.js',

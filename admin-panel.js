@@ -50,6 +50,91 @@ async function loadPagos(){
   renderPagos();
 }
 function moneyAdmin(v){return new Intl.NumberFormat('es-AR',{style:'currency',currency:'ARS',maximumFractionDigits:0}).format(Number(v)||0)}
+/* ---------- Anuncio para todos (v326) ----------
+   El administrador escribe un mensaje y hasta tres reuniones; el aviso
+   vigente les aparece a los distribuidores al abrir APPI. */
+async function fetchAdmin(path){
+  const configuration=cfg(),token=window.APPIAuth.accessToken();
+  const response=await fetch(`${String(configuration.url).replace(/\/$/,'')}${path}`,{headers:{apikey:configuration.anonKey,Authorization:`Bearer ${token}`}});
+  const data=await response.json().catch(()=>null);
+  if(response.status===404)throw new Error('Falta correr SUPABASE_ANUNCIOS.sql en Supabase.');
+  if(!response.ok)throw new Error((data&&(data.message||data.error))||'No se pudo leer el anuncio.');
+  return data;
+}
+const ANUNCIO_EVENTOS=3;
+function anuncioEventosDelForm(){
+  const eventos=[];
+  for(let i=0;i<ANUNCIO_EVENTOS;i++){
+    const titulo=$(`adminAnuncioEv${i}Titulo`),fecha=$(`adminAnuncioEv${i}Fecha`),hora=$(`adminAnuncioEv${i}Hora`),lugar=$(`adminAnuncioEv${i}Lugar`);
+    if(!titulo)continue;
+    const t=titulo.value.trim();
+    if(!t&&!fecha.value&&!hora.value&&!lugar.value.trim())continue;
+    eventos.push({titulo:t,fecha:fecha.value||'',hora:/^\d{2}:\d{2}$/.test(hora.value||'')?hora.value:'',lugar:lugar.value.trim()});
+  }
+  return eventos;
+}
+function anuncioFormDesdeRow(row){
+  const texto=$('adminAnuncioTexto');if(!texto)return;
+  texto.value=row?String(row.texto||''):'';
+  for(let i=0;i<ANUNCIO_EVENTOS;i++){
+    const titulo=$(`adminAnuncioEv${i}Titulo`),fecha=$(`adminAnuncioEv${i}Fecha`),hora=$(`adminAnuncioEv${i}Hora`),lugar=$(`adminAnuncioEv${i}Lugar`);
+    if(!titulo)continue;
+    const ev=row&&Array.isArray(row.eventos)?row.eventos[i]:null;
+    titulo.value=ev?String(ev.titulo||''):'';
+    fecha.value=ev?String(ev.fecha||''):'';
+    hora.value=ev&&/^\d{2}:\d{2}$/.test(String(ev.hora||''))?String(ev.hora):'';
+    lugar.value=ev?String(ev.lugar||''):'';
+  }
+}
+async function loadAnuncio(){
+  const resumen=$('adminAnuncioResumen');
+  if(!resumen)return;
+  try{
+    const rows=await fetchAdmin('/rest/v1/appi_anuncios?select=*&activo=eq.true&order=creado_en.desc&limit=1');
+    state.anuncio=Array.isArray(rows)&&rows[0]?rows[0]:null;
+  }catch(error){state.anuncio=null;resumen.textContent='No se pudo leer el aviso vigente.';return}
+  // El formulario arranca con el aviso vigente puesto: cambiar una palabra
+  // y volver a publicar es el caso más común.
+  anuncioFormDesdeRow(state.anuncio);
+  renderAnuncio();
+}
+function renderAnuncio(){
+  const resumen=$('adminAnuncioResumen');if(!resumen)return;
+  const row=state.anuncio;
+  if(!row){resumen.textContent='Sin aviso publicado. Escribí uno y tocá Publicar.';return}
+  const fecha=new Date(row.creado_en);
+  const cuando=isNaN(fecha.getTime())?'':` · ${fecha.toLocaleDateString('es-AR')}`;
+  const eventos=Array.isArray(row.eventos)?row.eventos.length:0;
+  const extracto=String(row.texto||'').replace(/\s+/g,' ').slice(0,60);
+  resumen.textContent=`Vigente${cuando}: “${extracto}${String(row.texto||'').length>60?'…':''}”${eventos?` · ${eventos} reunión${eventos===1?'':'es'}`:''}`;
+}
+async function publicarAnuncio(){
+  const texto=$('adminAnuncioTexto');if(!texto)return;
+  const mensaje=texto.value.trim();
+  if(!mensaje){setStatus('adminAnuncioStatus','Escribí el mensaje del aviso.',true);texto.focus();return}
+  if(mensaje.length>600){setStatus('adminAnuncioStatus','El mensaje no puede pasar de 600 caracteres.',true);return}
+  const eventos=anuncioEventosDelForm();
+  for(const ev of eventos){
+    if(!ev.titulo){setStatus('adminAnuncioStatus','Toda reunión con fecha o lugar necesita un título.',true);return}
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(ev.fecha)){setStatus('adminAnuncioStatus',`“${ev.lugar||ev.titulo}”: falta la fecha de la reunión.`,true);return}
+  }
+  try{
+    await rpcAdmin('appi_admin_publicar_anuncio',{p_texto:mensaje,p_eventos:eventos});
+    setStatus('adminAnuncioStatus','Publicado ✓ Lo van a ver todos al abrir APPI.');
+    await loadAnuncio();
+  }catch(error){
+    setStatus('adminAnuncioStatus',error.message||'No se pudo publicar el aviso.',true);
+  }
+}
+async function quitarAnuncioVigente(){
+  const ok=await window.APPIDialog.confirm('El aviso va a desaparecer de los teléfonos del equipo. Lo que ya se agendó en las agendas queda.',{title:'Quitar el aviso',icon:'📣',okText:'Quitar'});
+  if(!ok)return;
+  try{
+    await rpcAdmin('appi_admin_quitar_anuncio',{});
+    setStatus('adminAnuncioStatus','Aviso quitado. Nadie ve el cartel al abrir APPI.');
+    await loadAnuncio();
+  }catch(error){setStatus('adminAnuncioStatus',error.message||'No se pudo quitar el aviso.',true)}
+}
 function renderPagos(){
   const body=$('adminIngresosBody');if(!body||!Array.isArray(state.pagos))return;
   const mesSel=state.pagosMes,anio=Number(mesSel.slice(0,4));
@@ -224,7 +309,7 @@ function renderRequests(){const list=$('adminPendingList');if(!list)return;
   if(!state.requests.length){list.innerHTML='<div class="admin-pending-empty">No hay solicitudes pendientes.</div>';return}list.innerHTML=state.requests.map(item=>`<article class="admin-user-row" data-request-id="${esc(item.id)}"><div><h3>${esc(item.nombre)}${item.socio_nombre?` + ${esc(item.socio_nombre)}`:''}</h3><p>${item.socio_nombre?`Socio/a: ${esc(item.socio_nombre)}<br>`:''}${esc(item.dip)} · ${esc(item.telefono)}<br>${new Date(item.created_at).toLocaleString('es-AR')}</p><span class="admin-user-badge blocked">PENDIENTE</span></div><div class="admin-row-actions"><button type="button" class="wa" data-request-action="whatsapp">WhatsApp</button><button type="button" class="good" data-request-action="approve">Aprobar</button><button type="button" class="danger" data-request-action="reject">Rechazar</button></div></article>`).join('');list.querySelectorAll('[data-request-action]').forEach(button=>button.onclick=()=>handleRequestAction(button))}
 function notifyAdminMemberships(){const alerts=state.users.filter(user=>user.rol!=='admin'&&membershipInfo(user).days<=7);if(!alerts.length)return;const today=new Date().toISOString().slice(0,10),key=`appi_admin_membresias_${today}`;if(sessionStorage.getItem(key))return;sessionStorage.setItem(key,'1');const names=alerts.slice(0,8).map(user=>`${user.nombre||user.dip}: ${membershipInfo(user).label}`).join('\n');window.APPIDialog.alert(`${alerts.length} membresía${alerts.length===1?'':'s'} requiere${alerts.length===1?'':'n'} atención.\n\n${names}`,{title:'Membresías por vencer',icon:'⏳',okText:'Revisar'})}
 function render(){updateStats();renderUsers();renderRequests();if($('adminWhatsappNumber'))$('adminWhatsappNumber').value=state.whatsapp||''}
-async function load(){const users=$('adminUserList'),requests=$('adminPendingList');if(users)users.innerHTML='<div class="empty">Cargando cuentas…</div>';if(requests)requests.innerHTML='<div class="admin-pending-empty">Cargando solicitudes…</div>';try{const [userData,requestData,settings]=await Promise.all([callAdmin({action:'list'}),callAdmin({action:'list_requests'}),callAdmin({action:'get_settings'})]);state.users=userData.users||[];state.requests=requestData.requests||[];state.whatsapp=settings.whatsapp||'';render();notifyAdminMemberships()}catch(error){if(users)users.innerHTML=`<div class="admin-inline-status show error">${esc(error.message)}</div>`;if(requests)requests.innerHTML=''}loadAcciones().catch(()=>{});loadPruebas().catch(()=>{});loadPagos().catch(()=>{});loadTelefonos().catch(()=>{});if(window.APPIAdminMembership&&window.APPIAdminMembership.loadRevenueStats)window.APPIAdminMembership.loadRevenueStats().then(r=>{state.revenue=r;renderHero()}).catch(()=>{})}
+async function load(){const users=$('adminUserList'),requests=$('adminPendingList');if(users)users.innerHTML='<div class="empty">Cargando cuentas…</div>';if(requests)requests.innerHTML='<div class="admin-pending-empty">Cargando solicitudes…</div>';try{const [userData,requestData,settings]=await Promise.all([callAdmin({action:'list'}),callAdmin({action:'list_requests'}),callAdmin({action:'get_settings'})]);state.users=userData.users||[];state.requests=requestData.requests||[];state.whatsapp=settings.whatsapp||'';render();notifyAdminMemberships()}catch(error){if(users)users.innerHTML=`<div class="admin-inline-status show error">${esc(error.message)}</div>`;if(requests)requests.innerHTML=''}loadAcciones().catch(()=>{});loadPruebas().catch(()=>{});loadPagos().catch(()=>{});loadTelefonos().catch(()=>{});loadAnuncio().catch(()=>{});if(window.APPIAdminMembership&&window.APPIAdminMembership.loadRevenueStats)window.APPIAdminMembership.loadRevenueStats().then(r=>{state.revenue=r;renderHero()}).catch(()=>{})}
 /* Teléfonos de los distribuidores (v313): el 💬 va directo cuando hay número.
    Si la migración no corrió, el panel sigue andando con el selector. */
 async function loadTelefonos(){
@@ -467,6 +552,10 @@ function bind(){if(state.bound)return;state.bound=true;['adminSucursal','adminNu
   const refreshPagos=$('adminRefreshPagos');if(refreshPagos)refreshPagos.onclick=()=>loadPagos();
   const goRequests=$('adminGoRequests');if(goRequests)goRequests.onclick=()=>{const card=$('adminPendingCard');if(card)card.scrollIntoView({behavior:'smooth',block:'start'})};
   const ingresosToggle=$('adminIngresosToggle');if(ingresosToggle)ingresosToggle.onclick=()=>{const wrap=$('adminIngresosWrap'),chev=$('adminIngresosChevron');const abrir=wrap.hidden;wrap.hidden=!abrir;ingresosToggle.setAttribute('aria-expanded',abrir?'true':'false');if(chev)chev.classList.toggle('open',abrir)};
+  // Anuncio para todos (v326): mensaje + reuniones que el equipo agenda en un toque.
+  const anuncioToggle=$('adminAnuncioToggle');if(anuncioToggle)anuncioToggle.onclick=()=>{const body=$('adminAnuncioBody'),chev=$('adminAnuncioChevron');const abrir=body.hidden;body.hidden=!abrir;anuncioToggle.setAttribute('aria-expanded',abrir?'true':'false');if(chev)chev.classList.toggle('open',abrir)};
+  const anuncioPublicar=$('adminAnuncioPublicar');if(anuncioPublicar)anuncioPublicar.onclick=()=>publicarAnuncio();
+  const anuncioQuitar=$('adminAnuncioQuitar');if(anuncioQuitar)anuncioQuitar.onclick=()=>quitarAnuncioVigente();
   // El WhatsApp con el que salen los envíos del panel (v303): sin preguntar.
   const waPref=$('adminWaPref');
   if(waPref&&window.APPIWhatsApp){
