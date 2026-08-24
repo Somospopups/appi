@@ -4103,7 +4103,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v327 · Segura</div>
+  <div class="ds-foot">APPI · v328 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -11704,7 +11704,7 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='327';
+      const swVersion='328';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 
@@ -11987,6 +11987,9 @@ body.dark .presu-select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:
   .desk-sidebar{transition:transform .3s ease}
   .desk-sidebar.collapsed{transform:translateX(-105%)}
   body.sidebar-cerrada .app{margin-left:0}
+  /* Panel administrador (v328): centrado en el escritorio. La sesión admin
+     esconde la sidebar, así que la app no debe seguir corriéndose 316px. */
+  body.appi-admin .app{margin-left:auto;margin-right:auto;max-width:1140px}
   /* Botón flotante para reabrir la barra */
   .ds-reopen{
     display:none; position:fixed; top:16px; left:16px; z-index:160;

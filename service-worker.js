@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v327-aviso-habla-claro';
+const CACHE_NAME = 'appi-v328-panel-centrado';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
