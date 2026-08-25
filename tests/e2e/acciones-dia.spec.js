@@ -40,4 +40,9 @@ test('el carrusel obliga a marcar: no queda ningún saltear en el módulo', () =
   expect(js.toLowerCase()).not.toContain('saltear');
   expect(js).toContain('muFilaHecha');
   expect(js).toContain('muFilaNoHecha');
+  // El progreso de una ✓ vive más allá del día y la tarjeta identifica la
+  // fecha de la agenda para no confundirla con la de ayer.
+  expect(js).toContain('completadas');
+  expect(js).toContain('claveAccion');
+  expect(js).toContain('mu-hoy-fecha');
 });
