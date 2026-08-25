@@ -859,6 +859,7 @@
     }
     html += '<div class="mu-prev" style="position:relative;"><b>Así lo va a recibir</b><span id="muPrevTxt">' + esc(texto) + '</span>' +
       '<div style="position:absolute;bottom:8px;right:8px;display:flex;gap:8px;">' +
+        '<button type="button" class="mu-prev-btn" id="muCambiarMensaje" title="Cambiar mensaje según el equipo" style="border-radius:50%;width:36px;height:36px;font-size:14px;border:1px solid rgba(245,166,35,.35);background:rgba(255,255,255,.9);cursor:pointer;">🔁</button>' +
         '<button type="button" class="mu-prev-btn" id="muEditarMsg" title="Editar mensaje" style="border-radius:50%;width:36px;height:36px;font-size:14px;border:1px solid rgba(58,208,164,.22);background:rgba(255,255,255,.9);cursor:pointer;">✏️</button>' +
         '<button type="button" class="mu-prev-btn" id="muBibliotecaMsg" title="Biblioteca de mensajes" style="border-radius:50%;width:36px;height:36px;font-size:14px;border:1px solid rgba(91,141,239,.22);background:rgba(255,255,255,.9);cursor:pointer;">💬</button>' +
       '</div></div>';
@@ -1358,10 +1359,9 @@
     cuerpo.querySelector('#muGuardar').onclick = function(){
       var inIco = cuerpo.querySelector('#muIcono');
       var inNom = cuerpo.querySelector('#muNombre');
-      var guardarTodos = true;
-      if (typeof window.confirm === 'function'){
-        guardarTodos = window.confirm('¿Guardar para todos los clientes?\n\n• OK = Todos los clientes (conserva {nombre}, {vence}, etc.)\n• Cancelar = Sólo esta persona');
-      }
+      // Los mensajes propios ya son personales: se guardan sin preguntar
+      // (v356; antes la opción "sólo esta persona" creaba un duplicado en
+      // la lista en vez de editar el existente).
       if (p.propio){
         var nombre = inNom ? inNom.value.trim() : '';
         if (!nombre){
@@ -1373,14 +1373,22 @@
           if (typeof window.showToast === 'function') window.showToast('Escribí el texto del mensaje');
           return;
         }
-        if (guardarTodos){
-          guardarPropia(id, { icono: inIco ? inIco.value : p.icono, nombre: nombre, texto: ta.value });
-        } else {
-          crearPropia(inIco ? inIco.value : p.icono, nombre || p.nombre, ta.value);
-        }
+        guardarPropia(id, { icono: inIco ? inIco.value : p.icono, nombre: nombre, texto: ta.value });
         if (typeof window.showToast === 'function') window.showToast('Guardado ✓');
-      } else {
-        if (guardarTodos){
+        volver();
+        return;
+      }
+      // Plantillas de fábrica: el alcance se elige con el diálogo propio de
+      // la app (v356; antes era un confirm nativo, prohibido por convención
+      // del README y riesgoso en la PWA instalada de iOS).
+      var confirmar = (window.APPIDialog && typeof window.APPIDialog.confirm === 'function')
+        ? window.APPIDialog.confirm(
+            '¿Guardar para todos los clientes?\n\nTodos conserva los comodines ({nombre}, {vence}, {producto}…). "Sólo esta persona" deja este texto apenas para el cliente abierto.',
+            { title: 'Guardar mensaje', icon: '💬', okText: 'Todos los clientes', cancelText: 'Sólo esta persona' }
+          )
+        : Promise.resolve(true);
+      confirmar.then(function(todos){
+        if (todos){
           guardarTexto(id, ta.value);
         } else {
           var data = leerGuardado();
@@ -1390,8 +1398,8 @@
           guardar(data);
         }
         if (typeof window.showToast === 'function') window.showToast('Guardado ✓');
-      }
-      volver();
+        volver();
+      });
     };
     var rest = cuerpo.querySelector('#muRestaurar');
     if (rest) rest.onclick = function(){
