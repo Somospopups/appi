@@ -4101,7 +4101,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v345 · Segura</div>
+  <div class="ds-foot">APPI · v346 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -5054,16 +5054,21 @@ body.dark #pageTabs button.active{color:#a8c0ff}
   .admin-cump-bar i.alta{background:linear-gradient(90deg,#3ad0a4,#2bb893)}
   .admin-cump-bar i.media{background:linear-gradient(90deg,#f5b301,#e08e00)}
   .admin-cump-bar i.baja{background:linear-gradient(90deg,#ff8a80,#e0514a)}
-  /* Medallas del podio (v345): top 3 con fondo propio, medalla y estrellas */
-  .admin-cump-item{position:relative}
-  .admin-cump-item.top1{background:linear-gradient(135deg,#fff8e1,#fff0c2);border-color:rgba(245,179,1,.35)}
-  .admin-cump-item.top2{background:linear-gradient(135deg,#f4f6fb,#e6ebf4);border-color:rgba(140,155,180,.3)}
-  .admin-cump-item.top3{background:linear-gradient(135deg,#fdf1ec,#f8e0d2);border-color:rgba(200,130,70,.3)}
-  .admin-cump-medalla{position:absolute;top:8px;right:12px;font-size:30px;line-height:1;pointer-events:none;filter:drop-shadow(0 3px 6px rgba(0,0,0,.2))}
-  .admin-cump-stars{display:block;margin-top:2px;color:#e9a800;font-size:11px;letter-spacing:1px}
-  body.dark .admin-cump-item.top1{background:linear-gradient(135deg,rgba(245,179,1,.14),rgba(245,179,1,.05));border-color:rgba(245,179,1,.28)}
-  body.dark .admin-cump-item.top2{background:linear-gradient(135deg,rgba(150,165,195,.16),rgba(150,165,195,.05));border-color:rgba(150,165,195,.25)}
-  body.dark .admin-cump-item.top3{background:linear-gradient(135deg,rgba(200,130,70,.16),rgba(200,130,70,.05));border-color:rgba(200,130,70,.28)}
+  /* Medallas del podio (v345): columna de trofeo, fondo propio y estrellas */
+  .admin-cump-item{display:flex;gap:12px;align-items:stretch}
+  .admin-cump-item.top1{background:linear-gradient(135deg,#fff8e1,#fff0c2);border-color:rgba(245,179,1,.4)}
+  .admin-cump-item.top2{background:linear-gradient(135deg,#f4f6fb,#e6ebf4);border-color:rgba(140,155,180,.32)}
+  .admin-cump-item.top3{background:linear-gradient(135deg,#fdf1ec,#f8e0d2);border-color:rgba(200,130,70,.32)}
+  .admin-cump-med{flex:0 0 auto;width:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border-radius:13px;background:rgba(255,255,255,.55)}
+  .admin-cump-trofeo{font-size:34px;line-height:1;filter:drop-shadow(0 4px 6px rgba(0,0,0,.18))}
+  .admin-cump-puesto{font-size:11px;font-weight:950;color:#8a6100;background:rgba(245,179,1,.22);padding:2px 9px;border-radius:999px}
+  .admin-cump-cuerpo{flex:1;min-width:0}
+  .admin-cump-stars{display:block;margin-top:2px;color:#e9a800;font-size:13px;letter-spacing:1.5px}
+  body.dark .admin-cump-item.top1{background:linear-gradient(135deg,rgba(245,179,1,.16),rgba(245,179,1,.05));border-color:rgba(245,179,1,.3)}
+  body.dark .admin-cump-item.top2{background:linear-gradient(135deg,rgba(150,165,195,.18),rgba(150,165,195,.05));border-color:rgba(150,165,195,.26)}
+  body.dark .admin-cump-item.top3{background:linear-gradient(135deg,rgba(200,130,70,.18),rgba(200,130,70,.05));border-color:rgba(200,130,70,.3)}
+  body.dark .admin-cump-med{background:rgba(255,255,255,.06)}
+  body.dark .admin-cump-puesto{color:#ffd97a;background:rgba(245,179,1,.2)}
   body.dark .admin-cump-item{background:rgba(31,32,49,.74);border-color:rgba(255,255,255,.08)}
   body.dark .admin-cump-id strong{color:#f1f1f6}
   body.dark .admin-cump-semcount{color:#c9cad8}
@@ -11728,7 +11733,7 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='345';
+      const swVersion='346';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 

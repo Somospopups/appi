@@ -66,7 +66,8 @@ test('el cumplimiento se pinta con tarjetas, chips y barra de progreso', async (
 
   // Medallas del podio (v345): la primera es 🥇 con estrellas, la segunda 🥈.
   await expect(primera).toHaveClass(/top1/);
-  await expect(primera.locator('.admin-cump-medalla')).toHaveText('🥇');
+  await expect(primera.locator('.admin-cump-trofeo')).toHaveText('🥇');
+  await expect(primera.locator('.admin-cump-puesto')).toHaveText('1°');
   await expect(primera.locator('.admin-cump-stars')).toHaveText('★★★');
 
   // La segunda es socio/a y con porcentaje medio (9/14 = 64%).
@@ -76,6 +77,7 @@ test('el cumplimiento se pinta con tarjetas, chips y barra de progreso', async (
   await expect(segunda.locator('.admin-cump-pct')).toHaveText('64%');
   await expect(segunda.locator('.admin-cump-pct')).toHaveClass(/media/);
   await expect(segunda).toHaveClass(/top2/);
-  await expect(segunda.locator('.admin-cump-medalla')).toHaveText('🥈');
+  await expect(segunda.locator('.admin-cump-trofeo')).toHaveText('🥈');
+  await expect(segunda.locator('.admin-cump-puesto')).toHaveText('2°');
   await expect(segunda.locator('.admin-cump-stars')).toHaveText('★');
 });

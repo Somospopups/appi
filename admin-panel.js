@@ -397,20 +397,30 @@ function renderAcciones(){
     const hoyChips=acc.hoy
       ? `<span class="admin-cump-hoychips"><i class="ok">✓ ${acc.hoy.hechas}</i><i class="no">✗ ${acc.hoy.noHechas}</i></span>`
       : '<span class="admin-cump-hoyvacio">Hoy · sin marcas</span>';
+    const puesto=top==='top1'?'1°':top==='top2'?'2°':top==='top3'?'3°':'';
     return `<article class="admin-cump-item ${top}">
-      ${medalla?`<span class="admin-cump-medalla" aria-hidden="true">${medalla}</span>`:''}
-      <div class="admin-cump-cab">
-        <span class="admin-cump-ava">${esc(inicialesCump(acc.nombre))}</span>
-        <div class="admin-cump-id"><strong>${esc(acc.nombre||'Sin nombre')}${socio}</strong>${estrellas?`<span class="admin-cump-stars">${estrellas}</span>`:''}<small>DIP ${esc(acc.dip||'—')}</small></div>
-        <div class="admin-cump-hoy">${hoyChips}</div>
+      <div class="admin-cump-med">
+        <span class="admin-cump-trofeo">${medalla||'🏅'}</span>
+        ${puesto?`<b class="admin-cump-puesto">${puesto}</b>`:''}
       </div>
-      <div class="admin-cump-sem">
-        <div class="admin-cump-semtop">
-          <span class="admin-cump-semlbl">Últimos 7 días</span>
-          <span class="admin-cump-semcount"><i class="ok">✓ ${acc.sem.hechas}</i><i class="no">✗ ${acc.sem.noHechas}</i><em>de ${acc.sem.total}</em></span>
-          <b class="admin-cump-pct ${tono}">${pct}%</b>
+      <div class="admin-cump-cuerpo">
+        <div class="admin-cump-cab">
+          <span class="admin-cump-ava">${esc(inicialesCump(acc.nombre))}</span>
+          <div class="admin-cump-id">
+            <strong>${esc(acc.nombre||'Sin nombre')}${socio}</strong>
+            ${estrellas?`<span class="admin-cump-stars">${estrellas}</span>`:''}
+            <small>DIP ${esc(acc.dip||'—')}</small>
+          </div>
+          <div class="admin-cump-hoy">${hoyChips}</div>
         </div>
-        <div class="admin-cump-bar"><i class="${tono}" style="width:${Math.max(pct,3)}%"></i></div>
+        <div class="admin-cump-sem">
+          <div class="admin-cump-semtop">
+            <span class="admin-cump-semlbl">Últimos 7 días</span>
+            <span class="admin-cump-semcount"><i class="ok">✓ ${acc.sem.hechas}</i><i class="no">✗ ${acc.sem.noHechas}</i><em>de ${acc.sem.total}</em></span>
+            <b class="admin-cump-pct ${tono}">${pct}%</b>
+          </div>
+          <div class="admin-cump-bar"><i class="${tono}" style="width:${Math.max(pct,3)}%"></i></div>
+        </div>
       </div>
     </article>`;
   }).join('');
