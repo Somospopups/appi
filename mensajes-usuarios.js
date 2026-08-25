@@ -315,6 +315,10 @@
     return String(d.getDate()).padStart(2,'0') + '/' +
            String(d.getMonth()+1).padStart(2,'0') + '/' + d.getFullYear();
   }
+  function claveFecha(d){
+    if (!d || isNaN(d.getTime())) return '';
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  }
 
   /* Grupo del cliente según su vencimiento.
      'vigente' | 'vencido' (menos de un año) | 'inactivo' (más de un año) */
@@ -434,11 +438,12 @@
     return e[key] || null;
   }
 
-  /* ---------- marcas del día (v292) ----------
+  /* ---------- marcas del día y progreso (v292/v352) ----------
      Cada acción del día se marca con ✓ (hecha) o ✗ (no se hizo). Las marcas
      viven por día y por usuario en su propia clave, que data-sync sube a la
      nube: así el administrador puede ver el cumplimiento de cada cuenta.
-     Al cambiar el día, la lista arranca de nuevo. */
+     Las ✓ también se guardan por ciclo en `completadas`: al cambiar el día
+     vuelven sólo las acciones que todavía no fueron resueltas. */
   function accionesKey(){ return 'appi_acciones_v1_' + uid(); }
   function leerAcciones(){
     try{
@@ -453,10 +458,121 @@
     var h = hoy();
     return h.getFullYear() + '-' + String(h.getMonth()+1).padStart(2,'0') + '-' + String(h.getDate()).padStart(2,'0');
   }
+
+  /* La marca diaria responde "qué pasó hoy"; esta clave responde "qué ciclo
+     ya quedó resuelto". Así una acción hecha ayer no vuelve a entrar mañana,
+     pero sí puede volver cuando llegue el próximo mantenimiento, cumpleaños o
+     vencimiento. */
+  function claveAccion(motivoId, u){
+    var tel = telefonoDe(u);
+    if (!tel) return '';
+    var base = motivoId + ':' + tel;
+    if (motivoId === 'retro'){
+      var m = mantenimiento(u);
+      return base + ':mantenimiento:' + (m && m.previo ? claveFecha(m.previo) : 'sin-fecha');
+    }
+    if (motivoId === 'porvencer'){
+      var vence = aFecha(u && u.fVence);
+      return base + ':garantia:' + (vence ? claveFecha(vence) : 'sin-fecha');
+    }
+    if (motivoId === 'cumple'){
+      var cumple = aFecha(u && (u.cumpleRaw || u.cumple));
+      var h = hoy();
+      return base + ':cumple:' + h.getFullYear() + '-' +
+        (cumple ? String(cumple.getMonth()+1).padStart(2,'0') + '-' + String(cumple.getDate()).padStart(2,'0') : 'sin-fecha');
+    }
+    return base;
+  }
+
+  function fechaDeMotivo(motivoId, u){
+    if (motivoId === 'retro'){
+      var m = mantenimiento(u);
+      return m && m.previo ? m.previo : null;
+    }
+    if (motivoId === 'porvencer') return aFecha(u && u.fVence);
+    if (motivoId === 'cumple'){
+      var c = aFecha(u && (u.cumpleRaw || u.cumple));
+      if (!c) return null;
+      var h = hoy();
+      return new Date(h.getFullYear(), c.getMonth(), c.getDate());
+    }
+    return null;
+  }
+
+  function textoFechaAccion(motivoId, u){
+    var fecha = fechaDeMotivo(motivoId, u);
+    if (!fecha) return '';
+    if (motivoId === 'retro') return 'Pendiente desde: ' + fmtFecha(fecha);
+    if (motivoId === 'porvencer') return 'Vence: ' + fmtFecha(fecha);
+    if (motivoId === 'cumple') return 'Cumple: ' + fmtFecha(fecha);
+    return fmtFecha(fecha);
+  }
+
+  function textoFechaGrupo(g){
+    var fechas = {};
+    (g.gente || []).forEach(function(u){
+      var texto = textoFechaAccion(g.motivo.id, u);
+      if (texto) fechas[texto] = true;
+    });
+    var lista = Object.keys(fechas);
+    if (!lista.length) return '';
+    return lista.length === 1 ? lista[0] : 'Fechas individuales';
+  }
+
   function marcasDeHoy(){
     var d = leerAcciones();
     return (d.dias && d.dias[hoyKey()] && d.dias[hoyKey()].marcas) || {};
   }
+
+  function completadaDe(motivoId, u){
+    var tel = telefonoDe(u);
+    if (!tel) return null;
+    var d = leerAcciones();
+    var clave = claveAccion(motivoId, u);
+    var guardada = d.completadas && clave && d.completadas[clave];
+    if (guardada && guardada.e === 'hecha') return guardada;
+
+    /* Compatibilidad con v292-v351: antes de existir `completadas`, una ✓
+       quedaba solamente dentro del día. Una marca histórica reciente se toma
+       como completada para este mismo ciclo; no se inventa una nueva marca ni
+       se pierde el progreso ya guardado en el teléfono o en la nube. */
+    var marcaVieja = motivoId + ':' + tel;
+    var hoyActual = hoyKey();
+    var inicioCiclo = null;
+    if (motivoId === 'retro'){
+      var mantenimientoActual = mantenimiento(u);
+      inicioCiclo = mantenimientoActual && mantenimientoActual.previo;
+    } else if (motivoId === 'porvencer'){
+      var vencimientoActual = aFecha(u && u.fVence);
+      if (vencimientoActual){
+        inicioCiclo = new Date(vencimientoActual);
+        inicioCiclo.setDate(inicioCiclo.getDate() - 30);
+      }
+    }
+    var inicioCicloKey = inicioCiclo ? claveFecha(inicioCiclo) : '';
+    var diasGuardados = Object.keys(d.dias || {}).sort().reverse();
+    for (var i = 0; i < diasGuardados.length; i++){
+      var dia = diasGuardados[i];
+      if (dia >= hoyActual || (inicioCicloKey && dia < inicioCicloKey)) continue;
+      // Cumpleaños sólo puede resolverse en el día exacto: no se migra una
+      // marca vieja sin fecha de ciclo para no tapar un cumpleaños modificado.
+      if (!inicioCicloKey) continue;
+      var marcas = d.dias[dia] && d.dias[dia].marcas;
+      var m = marcas && marcas[marcaVieja];
+      if (!m) continue;
+      // Se respeta la última corrección histórica: una ✗ posterior a una ✓
+      // no puede quedar anulada por una marca vieja.
+      if (m.e === 'hecha') return { e:'hecha', dia:dia, at:m.at || '', n:m.n || '', legado:true };
+      if (m.e === 'no_hecha') return null;
+    }
+    return null;
+  }
+
+  function completadaAntesDeHoy(motivoId, u){
+    var c = completadaDe(motivoId, u);
+    return !!(c && c.dia && c.dia < hoyKey());
+  }
+
   function marcaDe(motivoId, u){
     var tel = telefonoDe(u);
     if (!tel) return null;
@@ -477,11 +593,28 @@
     if (!d.dias) d.dias = {};
     var k = hoyKey();
     if (!d.dias[k]) d.dias[k] = { marcas: {} };
+    var ahora = new Date().toISOString();
     d.dias[k].marcas[motivoId + ':' + tel] = {
       e: estado === 'hecha' ? 'hecha' : 'no_hecha',
-      at: new Date().toISOString(),
+      at: ahora,
       n: String(u.usuario || '').slice(0, 60)
     };
+
+    /* La ✓ resuelve el ciclo, no solamente el día. Se conserva separada del
+       historial diario para que el progreso sobreviva a medianoches, recargas
+       y sincronizaciones. La ✗ permite corregir una ✓ hecha por error. */
+    var accion = claveAccion(motivoId, u);
+    if (accion){
+      if (!d.completadas) d.completadas = {};
+      if (estado === 'hecha'){
+        d.completadas[accion] = {
+          e:'hecha', dia:k, at:ahora, n:String(u.usuario || '').slice(0, 60)
+        };
+      } else {
+        delete d.completadas[accion];
+      }
+    }
+
     // El resumen queda escrito en el día: es lo que lee el panel del admin.
     var r = resumenCon(d);
     d.dias[k].total = r.total; d.dias[k].hechas = r.hechas; d.dias[k].noHechas = r.noHechas;
@@ -548,7 +681,8 @@
   }
 
   // La lista completa del día: todos los que corresponden hoy, con marca o
-  // sin ella. Es lo que el panel muestra todo el día, sin poder borrarse.
+  // sin ella, menos los ciclos ya resueltos antes de hoy. Es lo que el panel
+  // muestra durante la jornada, con el progreso a la vista.
   function deHoy(){
     var lista = [];
     if (typeof window.usuariosTodosActual === 'function') lista = window.usuariosTodosActual() || [];
@@ -556,7 +690,7 @@
     var out = [];
     MOTIVOS.forEach(function(m){
       var gente = lista.filter(function(u){
-        return telefonoDe(u) && m.aplica(u);
+        return telefonoDe(u) && m.aplica(u) && !completadaAntesDeHoy(m.id, u);
       });
       if (gente.length) out.push({ motivo:m, gente:gente });
     });
@@ -602,7 +736,8 @@
       ? '🎉 Día completo: las ' + res.total + (res.total === 1 ? ' acción' : ' acciones') + ' están marcadas'
       : 'Hoy tenés ' + res.total + (res.total === 1 ? ' mensaje' : ' mensajes') + ' para mandar';
     var html = '<div class="mu-hoy-top"><span class="mu-hoy-ico">📋</span>' +
-      '<b>' + titulo + '</b>' +
+      '<div class="mu-hoy-heading"><b>' + titulo + '</b>' +
+      '<span class="mu-hoy-fecha">📅 ' + esc(fmtFecha(hoy())) + '</span></div>' +
       '<span class="mu-hoy-res"><i class="ok">✓ ' + res.hechas + '</i><i class="no">✗ ' + res.noHechas + '</i>' +
       (res.pendientes ? '<i>quedan ' + res.pendientes + '</i>' : '') + '</span></div>' +
       '<div class="mu-hoy-list">';
@@ -610,17 +745,19 @@
       var sinMarca = g.gente.filter(function(u){ return !marcaDe(g.motivo.id, u); }).length;
       var hechas = g.gente.filter(function(u){ var m = marcaDe(g.motivo.id, u); return m && m.e === 'hecha'; }).length;
       var noHechas = g.gente.length - sinMarca - hechas;
+      var fechaGrupo = textoFechaGrupo(g);
+      var fechaHTML = fechaGrupo ? '<small class="mu-hoy-fecha-accion">📅 ' + esc(fechaGrupo) + '</small>' : '';
       var estado = '<span class="mu-hoy-est">' + (hechas ? '<i class="ok">✓' + hechas + '</i>' : '') +
                    (noHechas ? '<i class="no">✗' + noHechas + '</i>' : '') + '</span>';
       if (sinMarca){
         html += '<button type="button" class="mu-hoy-item" data-mu-hoy="' + esc(g.motivo.id) + '">' +
           '<span class="mu-hoy-n">' + g.motivo.icono + ' ' + sinMarca + '</span>' +
-          '<span class="mu-hoy-txt">' + esc(sinMarca === 1 ? g.motivo.uno : g.motivo.varios) + '</span>' +
+          '<span class="mu-hoy-txt"><span>' + esc(sinMarca === 1 ? g.motivo.uno : g.motivo.varios) + '</span>' + fechaHTML + '</span>' +
           estado + '<span class="mu-hoy-go">›</span></button>';
       } else {
         html += '<div class="mu-hoy-item done">' +
           '<span class="mu-hoy-n">' + g.motivo.icono + ' ' + g.gente.length + '</span>' +
-          '<span class="mu-hoy-txt">' + esc(g.gente.length === 1 ? g.motivo.uno : g.motivo.varios) + ' · completado</span>' +
+          '<span class="mu-hoy-txt"><span>' + esc(g.gente.length === 1 ? g.motivo.uno : g.motivo.varios) + ' · completado</span>' + fechaHTML + '</span>' +
           estado + '<span class="mu-hoy-go">✓</span></div>';
       }
     });
@@ -688,6 +825,7 @@
     ov.querySelector('#muSub').textContent = quedan === 1 ? 'Queda 1' : 'Quedan ' + quedan;
 
     var estadoClase = u.estado === 'vencida' ? 'mu-vencida' : (u.estado === 'porVencer' ? 'mu-porvencer' : 'mu-vigente');
+    var fechaAccion = textoFechaAccion(fila.motivo.id, u);
     var html = '<div class="mu-fila-quien"><b>' + esc(u.usuario || '') + '</b>' +
       '<div class="mu-fila-datos">' +
         '<div class="mu-col">' +
@@ -699,6 +837,7 @@
           (u.producto ? '<span>📦 ' + esc(u.producto) + '</span>' : '') +
           (u.fCompra ? '<span>🛒 Compra: ' + esc(u.fCompra) + '</span>' : '') +
           (u.fVenceRaw ? '<span class="mu-vence ' + estadoClase + '">📅 Vence: ' + esc(u.fVenceRaw) + '</span>' : '') +
+          ((fila.motivo.id === 'retro' || fila.motivo.id === 'cumple') && fechaAccion ? '<span class="mu-accion-fecha">📅 ' + esc(fechaAccion) + '</span>' : '') +
         '</div>' +
       '</div></div>';
     // Si esta tarea ya tiene marca (se volvió con las flechitas), se muestra
@@ -881,8 +1020,10 @@
       /* franja del día */
       '#muHoy{margin:0 0 12px;padding:13px 14px;border-radius:16px;border:1px solid rgba(91,141,239,.2);',
       'background:linear-gradient(135deg,rgba(91,141,239,.11),rgba(160,107,255,.1))}',
-      '.mu-hoy-top{display:flex;align-items:center;gap:8px;margin-bottom:10px}',
+      '.mu-hoy-top{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}',
+      '.mu-hoy-heading{display:grid;gap:2px;min-width:0}',
       '.mu-hoy-top b{color:#3a3a48;font-size:13px}',
+      '.mu-hoy-fecha{color:#68697a;font-size:10.5px;font-weight:750}',
       '.mu-hoy-ico{font-size:16px}',
       '.mu-hoy-list{display:grid;gap:6px}',
       '.mu-hoy-item{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;width:100%;',
@@ -891,7 +1032,9 @@
       '.mu-hoy-item:hover{background:#fff;transform:translateY(-1px)}',
       '.mu-hoy-n{display:inline-grid;place-items:center;min-width:44px;padding:4px 9px;border-radius:999px;',
       'background:linear-gradient(135deg,#5b8def,#a06bff);color:#fff;font-size:12px;font-weight:900;white-space:nowrap}',
-      '.mu-hoy-txt{color:#3a3a48;font-size:12.5px;font-weight:700}',
+      '.mu-hoy-txt{display:grid;gap:2px;min-width:0;color:#3a3a48;font-size:12.5px;font-weight:700}',
+      '.mu-hoy-fecha-accion{color:#68697a;font-size:10.5px;font-weight:750;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+      '.mu-accion-fecha{color:#a3670b;font-size:11px;font-weight:850}',
       '.mu-hoy-go{color:#3d63c9;font-size:17px;font-weight:900}',
       /* fila de trabajo */
       '.mu-fila-quien{margin-top:14px;padding:13px 14px;border-radius:14px;background:rgba(255,255,255,.9);border:1px solid rgba(80,90,130,.1)}',
@@ -920,6 +1063,9 @@
       '.mu-fin p{margin:6px 0 0;color:#59897c;font-size:12.5px}',
       'body.dark #muHoy{background:linear-gradient(135deg,rgba(91,141,239,.16),rgba(160,107,255,.14));border-color:rgba(255,255,255,.1)}',
       'body.dark .mu-hoy-top b,body.dark .mu-hoy-txt{color:#f2f2f7}',
+      'body.dark .mu-hoy-fecha{color:#b4b6c4}',
+      'body.dark .mu-hoy-fecha-accion{color:#b4b6c4}',
+      'body.dark .mu-accion-fecha{color:#e0b23c}',
       'body.dark .mu-hoy-item{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.1)}',
       'body.dark .mu-fila-quien{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.1)}',
       'body.dark .mu-fila-quien b{color:#f2f2f7}',
@@ -1370,6 +1516,8 @@
     deHoy: deHoy,
     marcarAccion: marcarAccion,
     marcaDe: marcaDe,
+    claveAccion: claveAccion,
+    completadaDe: completadaDe,
     resumenHoy: resumenHoy,
     pintarHoy: pintarHoy,
     abrirFila: abrirFila,

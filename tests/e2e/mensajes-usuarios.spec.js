@@ -353,6 +353,47 @@ test('sin pendientes la franja no se dibuja y la pantalla queda igual', async ({
   await expect(page.locator('#muHoy')).toHaveCount(0);
 });
 
+test('la franja muestra la fecha de la agenda y de cada accion', async ({ page }) => {
+  await entrar(page, PENDIENTES);
+  const hoy = new Date();
+  const fecha = `${String(hoy.getDate()).padStart(2, '0')}/${String(hoy.getMonth() + 1).padStart(2, '0')}/${hoy.getFullYear()}`;
+  await expect(page.locator('.mu-hoy-fecha')).toContainText(fecha);
+  await expect(page.locator('[data-mu-hoy="cumple"]')).toContainText('Cumple:');
+  await expect(page.locator('[data-mu-hoy="retro"]')).toContainText('Pendiente desde:');
+  await expect(page.locator('[data-mu-hoy="porvencer"]')).toContainText('Vence:');
+});
+
+test('una accion hecha queda guardada y no reaparece al dia siguiente', async ({ page }) => {
+  await entrar(page, PENDIENTES);
+  const estado = await page.evaluate(() => {
+    const M = window.APPIMensajes;
+    const u = window.usuariosTodosActual().find(x => x.usuario === 'RUIZ, ROBERTO');
+    const clave = M.claveAccion('retro', u);
+    M.marcarAccion('retro', u, 'hecha');
+    const accionesKey = Object.keys(localStorage).find(k => k.startsWith('appi_acciones_v1_'));
+    const guardado = JSON.parse(localStorage.getItem(accionesKey) || '{}');
+    const completadaHoy = guardado.completadas && guardado.completadas[clave];
+
+    // Simula volver a abrir APPI mañana: la marca diaria queda en el pasado,
+    // pero la resolución del ciclo es la que decide que no vuelva a entrar.
+    const ayer = new Date();
+    ayer.setDate(ayer.getDate() - 1);
+    const ayerKey = `${ayer.getFullYear()}-${String(ayer.getMonth() + 1).padStart(2, '0')}-${String(ayer.getDate()).padStart(2, '0')}`;
+    guardado.completadas[clave].dia = ayerKey;
+    localStorage.setItem(accionesKey, JSON.stringify(guardado));
+    M.pintarHoy();
+
+    return {
+      guardada: completadaHoy && completadaHoy.e === 'hecha',
+      sigueHoy: M.deHoy().some(g => g.motivo.id === 'retro' && g.gente.some(x => x.usuario === 'RUIZ, ROBERTO')),
+      siguePendiente: M.pendientes().some(g => g.motivo.id === 'retro')
+    };
+  });
+  expect(estado.guardada).toBe(true);
+  expect(estado.sigueHoy).toBe(false);
+  expect(estado.siguePendiente).toBe(false);
+});
+
 test('la fila de trabajo va de a uno y avisa cuántos quedan', async ({ page }) => {
   await entrar(page, PENDIENTES);
   await page.evaluate(() => {
