@@ -205,6 +205,10 @@ test('editar una plantilla la deja guardada para la próxima', async ({ page }) 
   await page.locator('#muTexto').fill('Buenas {nombre}, ¿todo bien con el {producto}?');
   await expect(page.locator('#muPrevTxt')).toContainText('Buenas Ana, ¿todo bien con el PSA SENIOR 4?');
   await page.locator('#muGuardar').click();
+  // Desde v356 el alcance se elige con APPIDialog (los confirm nativos
+  // están prohibidos por convención). Guardar para todos.
+  await expect(page.locator('#appiDialogOk')).toContainText('Todos los clientes');
+  await page.locator('#appiDialogOk').click();
 
   // Vuelve a la lista de edición y el cambio sobrevive a reabrir el popup.
   await expect(page.locator('[data-mu-editar="saludo"]')).toContainText('Buenas Ana');
@@ -403,7 +407,10 @@ test('la fila de trabajo va de a uno y avisa cuántos quedan', async ({ page }) 
 
   await page.locator('[data-mu-hoy="cumple"]').click();
   await expect(page.locator('#muOverlay')).toHaveClass(/open/);
-  await expect(page.locator('#muSub')).toContainText('Queda 1');
+  // Desde v353 el "cuántos quedan" no va en el subtítulo: la pastilla de
+  // fecha ocupa #muSub y el avance se lee en la posición de la fila.
+  await expect(page.locator('#muSub')).toContainText('Cumple');
+  await expect(page.locator('.mu-fila-pos')).toContainText('1 de 1');
   await expect(page.locator('.mu-fila-quien')).toContainText('GOMEZ, ANA MARIA');
   // Se ve el mensaje final, no la receta.
   await expect(page.locator('.mu-prev')).toContainText('Feliz cumpleaños, Ana');
@@ -515,7 +522,7 @@ test('la ✗ registra que no se hizo y obliga a dejar constancia: no hay saltear
   await page.evaluate(() => { window.__wa = []; window.APPIWhatsApp.abrir = u => window.__wa.push(u); });
 
   await page.locator('[data-mu-hoy="retro"]').click();
-  await expect(page.locator('#muSub')).toContainText('Quedan 2');
+  await expect(page.locator('.mu-fila-pos')).toContainText('1 de 2');
   await expect(page.locator('.mu-fila-quien')).toContainText('GOMEZ');
   // El botón de saltear no existe más: se marca sí o sí.
   await expect(page.locator('#muFilaSaltar')).toHaveCount(0);
@@ -526,7 +533,7 @@ test('la ✗ registra que no se hizo y obliga a dejar constancia: no hay saltear
 
   await page.locator('#muFilaNoHecha').click();
   await expect(page.locator('.mu-fila-quien')).toContainText('RUIZ');
-  await expect(page.locator('#muSub')).toContainText('Queda 1');
+  await expect(page.locator('.mu-fila-pos')).toContainText('2 de 2');
 
   await page.locator('#muFilaEnviar').click();
   // Mandar no avanza solo: RUIZ sigue a la vista, marcado ✓, para confirmar
@@ -568,19 +575,19 @@ test('mandar no pasa solo a la siguiente: la misma persona queda para marcar', a
 
   await page.locator('[data-mu-hoy="retro"]').click();
   await expect(page.locator('.mu-fila-quien')).toContainText('GOMEZ');
-  await expect(page.locator('#muSub')).toContainText('Quedan 2');
+  await expect(page.locator('.mu-fila-pos')).toContainText('1 de 2');
 
   // Mandar a GOMEZ no avanza: la tarjeta se queda en la misma persona, lista
   // para marcar qué pasó en ese contacto (v330).
   await page.locator('#muFilaEnviar').click();
   await expect(page.locator('.mu-fila-quien')).toContainText('GOMEZ');
-  await expect(page.locator('#muSub')).toContainText('Quedan 2');
+  await expect(page.locator('.mu-fila-pos')).toContainText('1 de 2');
   await expect(page.locator('.mu-marca-actual')).toContainText('✓ Marcada como hecha');
 
   // Recién al marcar con el ✓ se pasa a la siguiente.
   await page.locator('#muFilaHecha').click();
   await expect(page.locator('.mu-fila-quien')).toContainText('RUIZ');
-  await expect(page.locator('#muSub')).toContainText('Queda 1');
+  await expect(page.locator('.mu-fila-pos')).toContainText('2 de 2');
 });
 
 test('la ✓ marca hecha sin abrir WhatsApp', async ({ page }) => {
