@@ -827,7 +827,7 @@
     var quedan = fila.gente.length - fila.i;
 
     ov.querySelector('#muTitulo').textContent = p.icono + ' ' + p.nombre;
-    ov.querySelector('#muSub').textContent = '';
+    ov.querySelector('#muSub').textContent = fechaAccion || '';
 
     var estadoClase = u.estado === 'vencida' ? 'mu-vencida' : (u.estado === 'porVencer' ? 'mu-porvencer' : 'mu-vigente');
     var fechaAccion = textoFechaAccion(fila.motivo.id, u);
@@ -843,7 +843,6 @@
           (u.fCompra ? '<span>🛒 Compra: ' + esc(u.fCompra) + '</span>' : '') +
           (u.fVenceRaw ? '<span class="mu-vence ' + estadoClase + '">📅 Vence: ' + esc(u.fVenceRaw) + '</span>' : '') +
         '</div>' +
-        ((fechaAccion) ? '<span class="mu-accion-fecha">📅 ' + esc(fechaAccion) + '</span>' : '') +
       '</div></div>';
     // Si esta tarea ya tiene marca (se volvió con las flechitas), se muestra
     // y se puede corregir tocando la otra.
