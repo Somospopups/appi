@@ -170,27 +170,13 @@ async function loadAcciones(){
   const list=$('adminAccionesList');if(!list)return;
   try{
     const rows=await rpcAdmin('appi_admin_cumplimiento',{dias_atras:7});
-    if(!Array.isArray(rows)||!rows.length){list.innerHTML='<div class="admin-pending-empty">Todavía no hay marcas sincronizadas.</div>';return}
-    const hoy=new Date(),hoyISO=`${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,'0')}-${String(hoy.getDate()).padStart(2,'0')}`;
-    const porCuenta=new Map();
-    rows.forEach(row=>{
-      const key=`${row.cuenta}·${row.persona}`;
-      if(!porCuenta.has(key))porCuenta.set(key,{dip:row.dip,nombre:row.nombre,persona:row.persona,hoy:null,sem:{total:0,hechas:0,noHechas:0}});
-      const acc=porCuenta.get(key);
-      acc.sem.total+=row.total||0;acc.sem.hechas+=row.hechas||0;acc.sem.noHechas+=row.no_hechas||0;
-      if(String(row.fecha)===hoyISO)acc.hoy={total:row.total||0,hechas:row.hechas||0,noHechas:row.no_hechas||0};
-    });
-    const pct=(hechas,total)=>total?Math.round(hechas*100/total):0;
-    list.innerHTML=[...porCuenta.values()].sort((a,b)=>String(a.dip).localeCompare(String(b.dip))).map(acc=>{
-      const hoyTxt=acc.hoy?`Hoy: ✓ ${acc.hoy.hechas} · ✗ ${acc.hoy.noHechas} de ${acc.hoy.total}`:'Hoy: sin marcas todavía';
-      const semTxt=`Últimos 7 días: ✓ ${acc.sem.hechas} · ✗ ${acc.sem.noHechas} de ${acc.sem.total} (${pct(acc.sem.hechas,acc.sem.total)}% hecho)`;
-      return `<div class="admin-pending-item"><div><strong>${esc(acc.nombre||'Sin nombre')}${acc.persona==='socio'?' · socio/a':''}</strong><span>DIP ${esc(acc.dip||'—')}</span></div><div><span>${esc(hoyTxt)}</span><span>${esc(semTxt)}</span></div></div>`;
-    }).join('');
+    state.acciones=Array.isArray(rows)?rows:[];
     setStatus('adminAccionesStatus','');
   }catch(error){
-    list.innerHTML='<div class="admin-pending-empty">No se pudo leer el cumplimiento.</div>';
+    state.acciones=[];
     setStatus('adminAccionesStatus',error.message,true);
   }
+  renderAcciones();
 }
 /* Credenciales en dos mensajes (v300): la bienvenida explica qué hacer y la
    contraseña viaja sola, para copiar y pegar sin borrar nada. */
@@ -372,6 +358,13 @@ async function logout(){const ok=await window.APPIDialog.confirm('Se cerrará la
   location.reload();
 }}
 
+function inicialesCump(nombre){
+  const partes=String(nombre||'').trim().split(/\s+/).filter(Boolean);
+  if(!partes.length) return '—';
+  const a=(partes[0][0]||'').toUpperCase();
+  const b=partes.length>1?(partes[1][0]||'').toUpperCase():'';
+  return a+b;
+}
 function renderAcciones(){
   const list=$('adminAccionesList'),resumen=$('adminAccionesResumen');
   if(!list)return;
@@ -385,17 +378,33 @@ function renderAcciones(){
     if(String(row.fecha)===hoyISO)acc.hoy={total:row.total||0,hechas:row.hechas||0,noHechas:row.no_hechas||0};
   });
   const cuentas=[...porCuenta.values()].sort((a,b)=>String(a.nombre||a.dip).localeCompare(String(b.nombre||b.dip),'es'));
-  // El resumen vive en el encabezado: se entiende sin abrir la sección.
   const hoyTot=cuentas.reduce((acc,c)=>{if(c.hoy){acc.h+=c.hoy.hechas;acc.n+=c.hoy.noHechas}return acc},{h:0,n:0});
   if(resumen)resumen.textContent=cuentas.length?`${cuentas.length} cuenta${cuentas.length===1?'':'s'} · hoy ✓ ${hoyTot.h} · ✗ ${hoyTot.n} · tocá para ver el detalle`:'Todavía no hay marcas sincronizadas.';
   const term=String(state.accionesFiltro||'').toLowerCase().trim();
   const visibles=term?cuentas.filter(acc=>`${acc.nombre} ${acc.dip}`.toLowerCase().includes(term)):cuentas;
   if(!visibles.length){list.innerHTML=`<div class="admin-pending-empty">${term?'Ninguna cuenta coincide con la búsqueda.':'Todavía no hay marcas sincronizadas.'}</div>`;return}
-  const pct=(hechas,total)=>total?Math.round(hechas*100/total):0;
   list.innerHTML=visibles.map(acc=>{
-    const hoyTxt=acc.hoy?`Hoy: ✓ ${acc.hoy.hechas} · ✗ ${acc.hoy.noHechas} de ${acc.hoy.total}`:'Hoy: sin marcas todavía';
-    const semTxt=`Últimos 7 días: ✓ ${acc.sem.hechas} · ✗ ${acc.sem.noHechas} de ${acc.sem.total} (${pct(acc.sem.hechas,acc.sem.total)}% hecho)`;
-    return `<div class="admin-pending-item"><div><strong>${esc(acc.nombre||'Sin nombre')}${acc.persona==='socio'?' · socio/a':''}</strong><span>DIP ${esc(acc.dip||'—')}</span></div><div><span>${esc(hoyTxt)}</span><span>${esc(semTxt)}</span></div></div>`;
+    const pct=acc.sem.total?Math.round(acc.sem.hechas*100/acc.sem.total):0;
+    const tono=pct>=80?'alta':(pct>=50?'media':'baja');
+    const socio=acc.persona==='socio'?'<em class="admin-cump-socio">socio/a</em>':'';
+    const hoyChips=acc.hoy
+      ? `<span class="admin-cump-hoychips"><i class="ok">✓ ${acc.hoy.hechas}</i><i class="no">✗ ${acc.hoy.noHechas}</i></span>`
+      : '<span class="admin-cump-hoyvacio">Hoy · sin marcas</span>';
+    return `<article class="admin-cump-item">
+      <div class="admin-cump-cab">
+        <span class="admin-cump-ava">${esc(inicialesCump(acc.nombre))}</span>
+        <div class="admin-cump-id"><strong>${esc(acc.nombre||'Sin nombre')}${socio}</strong><small>DIP ${esc(acc.dip||'—')}</small></div>
+        <div class="admin-cump-hoy">${hoyChips}</div>
+      </div>
+      <div class="admin-cump-sem">
+        <div class="admin-cump-semtop">
+          <span class="admin-cump-semlbl">Últimos 7 días</span>
+          <span class="admin-cump-semcount"><i class="ok">✓ ${acc.sem.hechas}</i><i class="no">✗ ${acc.sem.noHechas}</i><em>de ${acc.sem.total}</em></span>
+          <b class="admin-cump-pct ${tono}">${pct}%</b>
+        </div>
+        <div class="admin-cump-bar"><i class="${tono}" style="width:${Math.max(pct,3)}%"></i></div>
+      </div>
+    </article>`;
   }).join('');
 }
 /* ---------- Ingresos por mes (v300) ---------- */

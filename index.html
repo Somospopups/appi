@@ -4101,7 +4101,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v343 · Segura</div>
+  <div class="ds-foot">APPI · v344 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -5023,6 +5023,43 @@ body.dark #pageTabs button.active{color:#a8c0ff}
   header.top.admin-top .help-btn{right:96px!important;left:auto!important}
   /* hidden es hidden, aunque la clase tenga display propio. */
   .admin-blink-badge[hidden],.admin-quick-badge[hidden]{display:none!important}
+  /* Cumplimiento diario (v344): tarjetas con avatar, chips y barra de progreso */
+  .admin-cump-item{padding:13px 14px;border:1px solid rgba(80,90,130,.1);border-radius:16px;background:rgba(255,255,255,.78);box-shadow:0 4px 14px rgba(65,75,120,.05)}
+  .admin-cump-cab{display:flex;align-items:center;gap:10px}
+  .admin-cump-ava{flex:0 0 auto;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:12px;font-weight:900;letter-spacing:.5px;background:linear-gradient(135deg,#5b8def,#a06bff)}
+  .admin-cump-id{min-width:0;flex:1}
+  .admin-cump-id strong{display:block;color:#292938;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .admin-cump-id small{display:block;margin-top:2px;color:#8a8b98;font-size:9.5px;font-weight:700}
+  .admin-cump-socio{font-style:normal;margin-left:6px;padding:2px 7px;border-radius:999px;background:rgba(160,107,255,.13);color:#7a4bd9;font-size:9px;font-weight:850;vertical-align:middle}
+  .admin-cump-hoy{flex:0 0 auto;display:flex;align-items:center;gap:5px}
+  .admin-cump-hoychips{display:flex;gap:4px}
+  .admin-cump-hoychips i{font-style:normal;display:inline-grid;place-items:center;min-width:30px;height:24px;padding:0 8px;border-radius:999px;font-size:10.5px;font-weight:900}
+  .admin-cump-hoychips i.ok{background:rgba(58,208,164,.14);color:#168765}
+  .admin-cump-hoychips i.no{background:rgba(217,83,79,.12);color:#c34c53}
+  .admin-cump-hoyvacio{padding:5px 9px;border-radius:999px;background:rgba(80,90,130,.08);color:#8a8b98;font-size:10px;font-weight:800}
+  .admin-cump-sem{margin-top:11px;padding-top:10px;border-top:1px solid rgba(80,90,130,.09)}
+  .admin-cump-semtop{display:flex;align-items:center;gap:8px}
+  .admin-cump-semlbl{font-size:9.5px;font-weight:900;letter-spacing:.5px;text-transform:uppercase;color:#777887}
+  .admin-cump-semcount{font-size:11px;font-weight:800;color:#555665}
+  .admin-cump-semcount i{font-style:normal;font-weight:950}
+  .admin-cump-semcount i.ok{color:#168765}
+  .admin-cump-semcount i.no{color:#c34c53}
+  .admin-cump-semcount em{font-style:normal;color:#9a9ba8;font-weight:700}
+  .admin-cump-pct{margin-left:auto;font-size:12px;font-weight:950}
+  .admin-cump-pct.alta{color:#168765}
+  .admin-cump-pct.media{color:#b07a10}
+  .admin-cump-pct.baja{color:#c34c53}
+  .admin-cump-bar{margin-top:7px;height:7px;border-radius:999px;background:rgba(80,90,130,.1);overflow:hidden}
+  .admin-cump-bar i{display:block;height:100%;border-radius:999px;transition:width .4s ease}
+  .admin-cump-bar i.alta{background:linear-gradient(90deg,#3ad0a4,#2bb893)}
+  .admin-cump-bar i.media{background:linear-gradient(90deg,#f5b301,#e08e00)}
+  .admin-cump-bar i.baja{background:linear-gradient(90deg,#ff8a80,#e0514a)}
+  body.dark .admin-cump-item{background:rgba(31,32,49,.74);border-color:rgba(255,255,255,.08)}
+  body.dark .admin-cump-id strong{color:#f1f1f6}
+  body.dark .admin-cump-semcount{color:#c9cad8}
+  body.dark .admin-cump-semlbl{color:#b7b8c4}
+  body.dark .admin-cump-hoyvacio{background:rgba(255,255,255,.07);color:#b7b8c4}
+  body.dark .admin-cump-sem{border-top-color:rgba(255,255,255,.08)}
   /* Tablero (v301) */
   .admin-hero{position:relative;margin-bottom:12px;padding:17px;border-radius:22px;color:#fff;background:linear-gradient(150deg,#5b8def,#8b63e8 70%,#a06bff);box-shadow:0 14px 34px rgba(100,90,220,.28)}
   .admin-hero-load{font-size:12px;font-weight:800;opacity:.85}
@@ -11681,7 +11718,7 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='343';
+      const swVersion='344';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 
