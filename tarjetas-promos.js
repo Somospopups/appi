@@ -186,8 +186,8 @@
       '.tp-chip{border:0;border-radius:999px;padding:7px 10px;font:inherit;font-size:11px;font-weight:900;cursor:pointer;background:rgba(91,141,239,.12);color:#3d63c9}' +
       '.tp-chip.on{background:linear-gradient(135deg,#5b8def,#875fdd);color:#fff}' +
       '.tp-count{margin-left:auto;font-size:11px;font-weight:900;color:#3d63c9}' +
-      /* En la ficha de Usuarios el separador lo pone .u-grupo: acá sólo se
-         mantiene el aire para el resto de las pantallas. */
+      /* En la ficha de Usuarios el separador lo pone .u-fila (un solo
+         renglón, v335): acá sólo se mantiene el aire. */
       '.tp-slot{margin-top:10px}' +
       '.tp-pills{display:flex;flex-wrap:wrap;gap:6px;align-items:center}' +
       '.tp-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 8px;border-radius:999px;background:rgba(91,141,239,.12);color:#3d63c9;font-size:11px;font-weight:850}' +
@@ -256,14 +256,17 @@
     if (el) el.textContent = filtroActivo() ? (n + ' persona' + (n === 1 ? '' : 's')) : '';
   }
 
-  function pillsHtml(p){
+  function pillsHtml(p, opciones){
     var cards = cardsOf(p);
+    var sinPromo = !!(opciones && opciones.sinPromo);
     var html = '<div class="tp-pills">';
     cards.forEach(function(c, i){
       html += '<span class="tp-pill">' + esc(labelCard(c)) + '<button type="button" data-tp-del="' + i + '" aria-label="Quitar">×</button></span>';
     });
     html += '<button type="button" class="tp-add" data-tp-add>+ Agregar tarjeta</button>';
-    if (telefonoDe(p)){
+    // "Avisar promo" se quitó de la ficha de Usuarios (v335): la promo se
+    // manda desde Mensajes. En el Panel de Contactos se conserva.
+    if (!sinPromo && telefonoDe(p)){
       html += '<button type="button" class="tp-wa" data-tp-wa>💬 Avisar promo</button>';
     }
     html += '</div>';
@@ -377,7 +380,7 @@
       var i = Number(slot.getAttribute('data-tp-index'));
       var p = lista[i];
       if (!p) return;
-      slot.innerHTML = pillsHtml(p);
+      slot.innerHTML = pillsHtml(p, { sinPromo: true });
       bindPills(slot, p, function(){
         var openIdx = [];
         cont.querySelectorAll('.tree-node.expanded').forEach(function(n){

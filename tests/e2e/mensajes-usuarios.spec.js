@@ -586,24 +586,22 @@ test('los mensajes hablan de "tu equipo", no del modelo del purificador', async 
   expect(texto).not.toContain('PSA SENIOR 4');
 });
 
-test('las acciones de la ficha van en tres grupos separados', async ({ page }) => {
+test('todas las acciones de la ficha van en un solo renglón', async ({ page }) => {
   await entrar(page);
   await abrirFicha(page, 0);
   const ficha = page.locator('[data-u-toggle="0"] + .tree-children');
-  const grupos = ficha.locator('.u-grupo');
-  await expect(grupos).toHaveCount(3);
+  const fila = ficha.locator('.u-fila');
+  await expect(fila).toHaveCount(1);
 
-  // 1) lo que se anota del cliente
-  await expect(grupos.nth(0)).toContainText('Agregar tarjeta');
-  await expect(grupos.nth(0)).toContainText('Avisar promo');
-  // 2) cómo se lo contacta
-  await expect(grupos.nth(1)).toContainText('WhatsApp');
-  await expect(grupos.nth(1).locator('[data-u-action="call"]')).toBeVisible();
-  // 3) cómo se llega hasta él: Vecinos (listado) y ¿Cómo llego? (el mapa se
-  // eliminó en v333).
-  await expect(grupos.nth(2)).toContainText('Vecinos');
-  await expect(grupos.nth(2)).toContainText('¿Cómo llego?');
-  await expect(grupos.nth(2)).not.toContainText('Mapa');
+  // Tarjetas, contacto y cómo llegar, todo en el mismo renglón (v335).
+  await expect(fila).toContainText('Agregar tarjeta');
+  await expect(fila).toContainText('WhatsApp');
+  await expect(fila.locator('[data-u-action="call"]')).toBeVisible();
+  await expect(fila).toContainText('Vecinos');
+  await expect(fila).toContainText('¿Cómo llego?');
+  // "Avisar promo" se quitó: la promo sale desde Mensajes.
+  await expect(fila).not.toContainText('Avisar promo');
+  await expect(fila).not.toContainText('Mapa');
   // El viejo "Google" ya no se nombra.
   await expect(ficha).not.toContainText('🗺️ Google');
 });

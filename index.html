@@ -4101,7 +4101,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v334 · Segura</div>
+  <div class="ds-foot">APPI · v335 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -11699,7 +11699,7 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='334';
+      const swVersion='335';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 
@@ -13256,23 +13256,24 @@ body.dark #view-usuarios .filter.active{
   border-color:transparent;
   box-shadow:0 4px 12px rgba(18,140,126,0.28);
 }
-/* Tres grupos: lo que se anota, cómo se lo contacta y cómo se llega.
-   La línea separa sin gritar; el primero no la lleva. */
-#view-usuarios .u-grupo{
+/* Todas las acciones en un solo renglón (v335): tarjetas + contacto +
+   cómo llegar. Si no entran, la fila se desliza horizontal. */
+#view-usuarios .u-fila{
   display:flex;
+  align-items:center;
   gap:6px;
-  flex-wrap:wrap;
+  flex-wrap:nowrap;
+  overflow-x:auto;
   padding-top:10px;
   margin-top:10px;
   border-top:1px solid rgba(80,90,130,0.13);
+  scrollbar-width:thin;
 }
-#view-usuarios .u-grupo:first-of-type{
-  padding-top:0;
-  margin-top:10px;
-  border-top:0;
-}
-#view-usuarios .u-grupo:empty{display:none}
-body.dark #view-usuarios .u-grupo{border-top-color:rgba(255,255,255,0.10)}
+#view-usuarios .u-fila .tp-slot{margin-top:0;flex:none;display:flex}
+#view-usuarios .u-fila .tp-slot:empty{display:none}
+#view-usuarios .u-fila .tp-pills{flex-wrap:nowrap;flex:0 0 auto}
+#view-usuarios .u-fila .action-btn{flex:0 0 auto}
+body.dark #view-usuarios .u-fila{border-top-color:rgba(255,255,255,0.10)}
 body.dark #view-usuarios .tree-node{
   background:rgba(35,35,55,0.62);
   border-color:rgba(255,255,255,0.10);
@@ -13916,9 +13917,13 @@ function parseFechaU(str){
   str=str.toString().trim();
   let m=str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/);
   if(m){
-    let d=parseInt(m[1]), mo=parseInt(m[2])-1, y=parseInt(m[3]);
+    let d=parseInt(m[1]), mo=parseInt(m[2]), y=parseInt(m[3]);
     if(y<100) y+=2000;
-    return new Date(y,mo,d);
+    // Una fecha imposible (mes 13, día 32, 31/02, 4/17) se rechaza en vez de
+    // "acomodarse" sola: mostrar una fecha inventada es peor que ninguna.
+    if(mo<1||mo>12||d<1||d>31) return null;
+    if(d>new Date(y,mo,0).getDate()) return null;
+    return new Date(y,mo-1,d);
   }
   m=str.match(/^(\d{1,2})[\s\-]+([a-z]{3,})$/i);
   if(m){
@@ -13926,10 +13931,23 @@ function parseFechaU(str){
     let d=parseInt(m[1]);
     let mesStr=m[2].substring(0,3).toLowerCase();
     let mo=meses[mesStr];
-    if(mo===undefined) return null;
+    if(mo===undefined||d<1||d>31) return null;
+    if(d>new Date(new Date().getFullYear(),mo+1,0).getDate()) return null;
     return new Date(new Date().getFullYear(),mo,d);
   }
   return null;
+}
+/* Una celda de fecha puede venir como texto ("17/4/2022") o como número
+   (fecha real de Excel: días desde 1900). Convertir el número a DD/MM/YYYY
+   evita que las fechas reales se muestren como "44663" o se pierdan. */
+function fechaDeCeldaU(v){
+  if(v==null) return '';
+  if(typeof v==='number' && isFinite(v) && v>0 && v<2958466){
+    const ms=Math.round((v-25569)*86400000);
+    const d=new Date(ms);
+    return [String(d.getUTCDate()).padStart(2,'0'), String(d.getUTCMonth()+1).padStart(2,'0'), d.getUTCFullYear()].join('/');
+  }
+  return String(v).trim();
 }
 function estadoVencU(fecha){
   if(!fecha) return 'vigente';
@@ -13990,6 +14008,7 @@ function parseRowsU(rows){
     if(r.length===0) continue;
     if(r.every(v=>!v||!v.toString().trim())) continue;
     const get=(k)=>{ const idx=map[k]; if(idx===undefined) return ''; return (r[idx]||'').toString().trim(); };
+    const crudo=(k)=>{ const idx=map[k]; return idx===undefined ? undefined : r[idx]; };
     const usuario=get('usuario');
     if(!usuario||usuario.length<3) continue;
     const low=usuario.toLowerCase();
@@ -14000,8 +14019,8 @@ function parseRowsU(rows){
     const cp=get('cp');
     const localidad=get('localidad');
     const producto=get('producto');
-    const fCompra=get('fCompra');
-    const fVenceRaw=get('fVence');
+    const fCompra=fechaDeCeldaU(crudo('fCompra'));
+    const fVenceRaw=fechaDeCeldaU(crudo('fVence'));
     const fVence=parseFechaU(fVenceRaw);
     const cumpleRaw=get('cumple');
     const email=get('email');
@@ -14180,15 +14199,13 @@ function renderListU(){
         <div>🛒 Compra: <b>${escU(compraRaw)}</b></div>
         <div>📅 Vence: <b>${escU(venceRaw)}</b> <small>${escU(diasLabel)}</small></div>
       </div>
-      <!-- Las acciones van en tres grupos separados por una línea: lo que se
-           anota del cliente, cómo se lo contacta y cómo se llega hasta él. -->
-      <div class="tp-slot u-grupo" data-tp-scope="usuarios" data-tp-index="${index}"></div>
-      ${u.telf?`
-      <div class="u-grupo u-acciones">
+      <!-- Todas las acciones en un solo renglón (v335): tarjetas + contacto
+           + cómo llegar. Si no entran, la fila se desliza horizontal. -->
+      <div class="u-fila">
+        <div class="tp-slot" data-tp-scope="usuarios" data-tp-index="${index}"></div>
+        ${u.telf?`
         <button type="button" class="action-btn wa" data-u-action="whatsapp" data-u-index="${index}">💬 WhatsApp</button>
-        <button type="button" class="action-btn call" data-u-action="call" data-u-index="${index}" data-appi-call-phone="${escU(window.APPITel?window.APPITel.normalizar(u.telf||''):'')}" data-appi-call-name="${escU(u.usuario||'Contacto')}" data-appi-call-label="1">📲 Llamar en teléfono</button>
-      </div>`:''}
-      <div class="u-grupo u-acciones">
+        <button type="button" class="action-btn call" data-u-action="call" data-u-index="${index}" data-appi-call-phone="${escU(window.APPITel?window.APPITel.normalizar(u.telf||''):'')}" data-appi-call-name="${escU(u.usuario||'Contacto')}" data-appi-call-label="1">📲 Llamar en teléfono</button>`:''}
         <button type="button" class="action-btn neighbors" data-u-action="neighbors" data-u-index="${index}">👥 Vecinos</button>
         <button type="button" class="action-btn mail" data-u-action="google" data-u-index="${index}">🧭 ¿Cómo llego?</button>
       </div>
@@ -14238,6 +14255,7 @@ window.aplicarFiltrosU=aplicarFiltrosU;
 window.usuariosFiltradosActual=function(){ return filtradosU.slice(); };
 // Las usa el módulo de mensajes, que vive en otro archivo.
 window.parseFechaU=parseFechaU;
+window.fechaDeCeldaU=fechaDeCeldaU;
 // Los botones de barrios y tarjetas viven en otro archivo y necesitan la lista
 // completa, no la filtrada: cada botón muestra su grupo entero.
 window.usuariosTodosActual=function(){ return usuariosU.slice(); };

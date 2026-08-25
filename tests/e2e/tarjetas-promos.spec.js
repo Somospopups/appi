@@ -135,12 +135,12 @@ test('en Usuarios se carga Visa Galicia, se filtra y se arma el WhatsApp', async
   await expect(page.locator('#usuariosList')).toContainText('Laura Gómez');
   await expect(page.locator('#usuariosList')).not.toContainText('Carlos Ruiz');
 
-  // El mensaje se escribe en el popup de Tarjetas.
+  // El mensaje se escribe en el popup de Tarjetas y el aviso sale desde ahí:
+  // la ficha ya no trae "Avisar promo" (v335), se manda desde Mensajes.
   await page.locator('#usuariosBtnTarjetas').click();
   await page.locator('#ubMsg').fill('Hola {nombre}, hay una promo con {tarjeta}');
-  await page.locator('#ubCerrar').click();
-  await page.locator('#usuariosList .tree-node').first().click();
-  await page.locator('[data-tp-wa]').click();
+  await page.locator('[data-ub-marca="visa"][data-ub-banco="galicia"]').click();
+  await page.locator('#ubCuerpo [data-ub-wa]').first().click();
   const opened = await page.evaluate(() => window.__appiLastOpen);
   expect(opened).toMatch(/^https:\/\/wa\.me\/5493515551234\?text=/);
   const text = decodeURIComponent(opened.split('text=')[1]);
