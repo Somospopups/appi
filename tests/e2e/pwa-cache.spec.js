@@ -9,14 +9,18 @@ test('la versión visible, el paquete y el Service Worker están alineados', () 
   // que los cuatro lugares digan lo mismo, no cuál es el número de hoy.
   // Si quedaran desalineados, el teléfono seguiría mostrando la versión vieja.
   const v = pkg.version.split('.')[0];
+  const cacheName = `appi-v${v}-sync-agenda-personal`;
   expect(pkg.version).toBe(`${v}.0.0`);
+  expect(pkg.cacheName).toBe(cacheName);
   expect(html).toContain(`APPI · v${v} · Segura`);
+  expect(html).toContain(`const CACHE_NAME='${cacheName}'`);
   // El README también dice la versión: si queda atrás, esta prueba lo avisa.
   expect(read('README.md')).toContain(`v${v} · Segura`);
+  expect(read('README.md')).toContain(`\`${cacheName}\``);
   expect(html).toContain(`const swVersion='${v}'`);
   expect(html).toContain("{updateViaCache:'none'}");
   expect(html).toContain('await registration.update()');
-  expect(sw).toContain(`CACHE_NAME = 'appi-v${v}-`);
+  expect(sw).toContain(`CACHE_NAME = '${cacheName}'`);
   const manifest=JSON.parse(read('manifest.json'));
   expect(manifest.background_color).toBe('#06172d');
   expect(manifest.theme_color).toBe('#06172d');

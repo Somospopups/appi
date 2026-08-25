@@ -1,5 +1,5 @@
 -- =====================================================================
--- APPI · Agenda personal (v357)
+-- APPI · Agenda personal (v358)
 -- La solapa "📱 AGENDA PERSONAL" del Panel de Contactos guarda los
 -- contactos del teléfono del distribuidor en su propia cuenta, para
 -- que no se pierdan al cambiar de celular y poder pasarlos de a uno
