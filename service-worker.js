@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v356-ci-verde';
+const CACHE_NAME = 'appi-v357-agenda-personal';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
@@ -18,6 +18,7 @@ const APP_SHELL = [
   './account-request.js',
   './qr-code.js',
   './gestion-client.js',
+  './agenda-personal.js',
   './panel-atras.js',
   './tarjetas-promos.js',
   './usuarios-botones.js',
