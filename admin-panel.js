@@ -414,8 +414,8 @@ async function loadPagos(){
 }
 function moneyAdmin(v){return new Intl.NumberFormat('es-AR',{style:'currency',currency:'ARS',maximumFractionDigits:0}).format(Number(v)||0)}
 /* ---------- Anuncio para todos (v326) ----------
-   El administrador escribe un mensaje y hasta tres reuniones; el aviso
-   vigente les aparece a los distribuidores al abrir APPI. */
+   El administrador escribe un mensaje y hasta una reunión (v343); el
+   aviso vigente les aparece a los distribuidores al abrir APPI. */
 async function fetchAdmin(path){
   const configuration=cfg(),token=window.APPIAuth.accessToken();
   const response=await fetch(`${String(configuration.url).replace(/\/$/,'')}${path}`,{headers:{apikey:configuration.anonKey,Authorization:`Bearer ${token}`}});
@@ -424,7 +424,7 @@ async function fetchAdmin(path){
   if(!response.ok)throw new Error((data&&(data.message||data.error))||'No se pudo leer el anuncio.');
   return data;
 }
-const ANUNCIO_EVENTOS=3;
+const ANUNCIO_EVENTOS=1;
 function anuncioEventosDelForm(){
   const eventos=[];
   for(let i=0;i<ANUNCIO_EVENTOS;i++){

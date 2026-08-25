@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v342-mantenimientos-por-producto';
+const CACHE_NAME = 'appi-v343-una-reunion';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

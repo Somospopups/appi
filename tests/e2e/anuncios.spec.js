@@ -215,12 +215,15 @@ test('el panel, la base y el caché quedan cableados para v326', () => {
   const workflow = fs.readFileSync('.github/workflows/deploy-backend.yml', 'utf8');
   const mod = fs.readFileSync('anuncios.js', 'utf8');
 
-  // Sección del panel con mensaje, tres reuniones y botones.
+  // Sección del panel con mensaje, UNA reunión (v343) y botones.
   for (const id of ['adminAnuncioToggle', 'adminAnuncioTexto', 'adminAnuncioPublicar', 'adminAnuncioQuitar',
-    'adminAnuncioEv0Titulo', 'adminAnuncioEv0Fecha', 'adminAnuncioEv0Hora', 'adminAnuncioEv0Lugar',
-    'adminAnuncioEv2Titulo']) {
+    'adminAnuncioEv0Titulo', 'adminAnuncioEv0Fecha', 'adminAnuncioEv0Hora', 'adminAnuncioEv0Lugar']) {
     expect(html).toContain(`id="${id}"`);
   }
+  // Las reuniones 2 y 3 se quitaron a pedido: queda una sola.
+  expect(html).not.toContain('adminAnuncioEv1Titulo');
+  expect(html).not.toContain('adminAnuncioEv2Titulo');
+  expect(panel).toContain('const ANUNCIO_EVENTOS=1');
   expect(panel).toContain("rpcAdmin('appi_admin_publicar_anuncio'");
   expect(panel).toContain("rpcAdmin('appi_admin_quitar_anuncio'");
   expect(panel).toContain('function loadAnuncio');

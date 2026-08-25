@@ -4101,7 +4101,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v342 · Segura</div>
+  <div class="ds-foot">APPI · v343 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -5134,34 +5134,16 @@ body.dark #pageTabs button.active{color:#a8c0ff}
           <div class="admin-card-head"><div><h2>Mensaje del equipo</h2><p>Aparece como cartel al abrir APPI y queda en la 🔔 para volver a verlo.</p></div></div>
           <textarea id="adminAnuncioTexto" rows="4" maxlength="600" placeholder="Ej: ¡Atención equipo! Este jueves hay reunión general por Zoom a las 21:00. ¡No se la pierdan!" style="width:100%;min-height:96px;padding:12px 14px;border-radius:14px;border:1.5px solid rgba(80,90,130,.18);font:inherit;font-size:13px;line-height:1.5;resize:vertical;background:rgba(255,255,255,.9);color:#2e3040"></textarea>
           <div class="admin-inline-status" id="adminAnuncioStatus" role="status"></div>
-          <div class="admin-card-head" style="margin-top:16px"><div><h2>Reuniones para agendar (opcional)</h2><p>Cada reunión aparece en el cartel con dos botones: sumarla al calendario de APPI o a la agenda del teléfono.</p></div></div>
+          <div class="admin-card-head" style="margin-top:16px"><div><h2>Reuniones para agendar (opcional)</h2><p>La reunión aparece en el cartel con dos botones: sumarla al calendario de APPI o a la agenda del teléfono.</p></div></div>
           <div id="adminAnuncioEventos">
             <div class="admin-anuncio-ev">
-              <div class="admin-anuncio-ev-head">Reunión 1 · opcional</div>
+              <div class="admin-anuncio-ev-head">Reunión · opcional</div>
               <input id="adminAnuncioEv0Titulo" placeholder="Título, ej: Reunión general por Zoom" autocomplete="off">
               <div class="admin-anuncio-ev-row">
                 <input type="date" id="adminAnuncioEv0Fecha" title="Fecha">
                 <input type="time" id="adminAnuncioEv0Hora" title="Hora">
               </div>
               <input id="adminAnuncioEv0Lugar" placeholder="Lugar o link de Zoom (opcional)" autocomplete="off">
-            </div>
-            <div class="admin-anuncio-ev">
-              <div class="admin-anuncio-ev-head">Reunión 2 · opcional</div>
-              <input id="adminAnuncioEv1Titulo" placeholder="Título, ej: Mentoría de negocios" autocomplete="off">
-              <div class="admin-anuncio-ev-row">
-                <input type="date" id="adminAnuncioEv1Fecha" title="Fecha">
-                <input type="time" id="adminAnuncioEv1Hora" title="Hora">
-              </div>
-              <input id="adminAnuncioEv1Lugar" placeholder="Lugar o link (opcional)" autocomplete="off">
-            </div>
-            <div class="admin-anuncio-ev">
-              <div class="admin-anuncio-ev-head">Reunión 3 · opcional</div>
-              <input id="adminAnuncioEv2Titulo" placeholder="Título de la reunión" autocomplete="off">
-              <div class="admin-anuncio-ev-row">
-                <input type="date" id="adminAnuncioEv2Fecha" title="Fecha">
-                <input type="time" id="adminAnuncioEv2Hora" title="Hora">
-              </div>
-              <input id="adminAnuncioEv2Lugar" placeholder="Lugar o link (opcional)" autocomplete="off">
             </div>
           </div>
           <button type="button" class="btn btn-primary" id="adminAnuncioPublicar" style="margin-top:6px">Publicar aviso</button>
@@ -11699,7 +11681,7 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='342';
+      const swVersion='343';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 
