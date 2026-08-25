@@ -203,7 +203,7 @@ test('editar una plantilla la deja guardada para la próxima', async ({ page }) 
   await page.locator('[data-mu-editar="saludo"]').click();
 
   await page.locator('#muTexto').fill('Buenas {nombre}, ¿todo bien con el {producto}?');
-  await expect(page.locator('#muPrevTxt')).toContainText('Buenas Ana, ¿todo bien con el PSA SENIOR 4?');
+  await expect(page.locator('#muPrevTxt')).toContainText('Buenas Ana, ¿todo bien con el Senior 4?');
   await page.locator('#muGuardar').click();
 
   // Vuelve a la lista de edición y el cambio sobrevive a reabrir el popup.
@@ -396,7 +396,7 @@ test('la ficha del carrusel muestra domicilio, teléfono, compra y vencimiento',
   await expect(cols.nth(0)).toContainText('📍 Alta Gracia');
   await expect(cols.nth(0)).toContainText('🏠 San Martín 120');
   await expect(cols.nth(0)).toContainText('📞 3515551001');
-  await expect(cols.nth(1)).toContainText('📦 PSA SENIOR 4');
+  await expect(cols.nth(1)).toContainText('📦 Senior 4');
   await expect(cols.nth(1)).toContainText('Compra: 15/03/2024');
   await expect(cols.nth(1)).toContainText('Vence: 30/09/2026');
 

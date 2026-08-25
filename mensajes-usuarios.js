@@ -297,7 +297,7 @@
     var vence = aFecha(u.fVence);
     var mapa = {
       '{nombre}': nombre,
-      '{producto}': u.producto || 'equipo',
+      '{producto}': nombreProductoDe(u.producto) || 'equipo',
       '{domicilio}': u.domicilio || '',
       '{localidad}': u.localidad || '',
       '{vence}': u.fVenceRaw || (vence ? fmtFecha(vence) : ''),
@@ -313,6 +313,11 @@
     if(!window.APPITel) return '';
     if(window.APPITel.primeroValido) return window.APPITel.primeroValido(u && u.telf || '');
     return window.APPITel.normalizar(u && u.telf || '');
+  }
+  // Nombre lindo del equipo (v339): SEN4BLAC -> Senior 4 Black.
+  function nombreProductoDe(v){
+    if(window.nombreProducto) return window.nombreProducto(v);
+    return String(v == null ? '' : v);
   }
 
   function enviar(u, texto){
@@ -607,7 +612,7 @@
           (u.telf ? '<span>📞 ' + esc(u.telf) + '</span>' : '') +
         '</div>' +
         '<div class="mu-col">' +
-          (u.producto ? '<span>📦 ' + esc(u.producto) + '</span>' : '') +
+          (u.producto ? '<span>📦 ' + esc(nombreProductoDe(u.producto)) + '</span>' : '') +
           (u.fCompra ? '<span>🛒 Compra: ' + esc(u.fCompra) + '</span>' : '') +
           (u.fVenceRaw ? '<span class="mu-vence ' + estadoClase + '">📅 Vence: ' + esc(u.fVenceRaw) + '</span>' : '') +
         '</div>' +

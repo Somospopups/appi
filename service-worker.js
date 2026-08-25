@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v338-vencimiento-por-estado';
+const CACHE_NAME = 'appi-v339-nombre-de-equipo';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
