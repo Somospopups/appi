@@ -484,6 +484,41 @@
     return base;
   }
 
+  function fechaDeMotivo(motivoId, u){
+    if (motivoId === 'retro'){
+      var m = mantenimiento(u);
+      return m && m.previo ? m.previo : null;
+    }
+    if (motivoId === 'porvencer') return aFecha(u && u.fVence);
+    if (motivoId === 'cumple'){
+      var c = aFecha(u && (u.cumpleRaw || u.cumple));
+      if (!c) return null;
+      var h = hoy();
+      return new Date(h.getFullYear(), c.getMonth(), c.getDate());
+    }
+    return null;
+  }
+
+  function textoFechaAccion(motivoId, u){
+    var fecha = fechaDeMotivo(motivoId, u);
+    if (!fecha) return '';
+    if (motivoId === 'retro') return 'Pendiente desde: ' + fmtFecha(fecha);
+    if (motivoId === 'porvencer') return 'Vence: ' + fmtFecha(fecha);
+    if (motivoId === 'cumple') return 'Cumple: ' + fmtFecha(fecha);
+    return fmtFecha(fecha);
+  }
+
+  function textoFechaGrupo(g){
+    var fechas = {};
+    (g.gente || []).forEach(function(u){
+      var texto = textoFechaAccion(g.motivo.id, u);
+      if (texto) fechas[texto] = true;
+    });
+    var lista = Object.keys(fechas);
+    if (!lista.length) return '';
+    return lista.length === 1 ? lista[0] : 'Fechas individuales';
+  }
+
   function marcasDeHoy(){
     var d = leerAcciones();
     return (d.dias && d.dias[hoyKey()] && d.dias[hoyKey()].marcas) || {};
@@ -710,17 +745,19 @@
       var sinMarca = g.gente.filter(function(u){ return !marcaDe(g.motivo.id, u); }).length;
       var hechas = g.gente.filter(function(u){ var m = marcaDe(g.motivo.id, u); return m && m.e === 'hecha'; }).length;
       var noHechas = g.gente.length - sinMarca - hechas;
+      var fechaGrupo = textoFechaGrupo(g);
+      var fechaHTML = fechaGrupo ? '<small class="mu-hoy-fecha-accion">📅 ' + esc(fechaGrupo) + '</small>' : '';
       var estado = '<span class="mu-hoy-est">' + (hechas ? '<i class="ok">✓' + hechas + '</i>' : '') +
                    (noHechas ? '<i class="no">✗' + noHechas + '</i>' : '') + '</span>';
       if (sinMarca){
         html += '<button type="button" class="mu-hoy-item" data-mu-hoy="' + esc(g.motivo.id) + '">' +
           '<span class="mu-hoy-n">' + g.motivo.icono + ' ' + sinMarca + '</span>' +
-          '<span class="mu-hoy-txt">' + esc(sinMarca === 1 ? g.motivo.uno : g.motivo.varios) + '</span>' +
+          '<span class="mu-hoy-txt"><span>' + esc(sinMarca === 1 ? g.motivo.uno : g.motivo.varios) + '</span>' + fechaHTML + '</span>' +
           estado + '<span class="mu-hoy-go">›</span></button>';
       } else {
         html += '<div class="mu-hoy-item done">' +
           '<span class="mu-hoy-n">' + g.motivo.icono + ' ' + g.gente.length + '</span>' +
-          '<span class="mu-hoy-txt">' + esc(g.gente.length === 1 ? g.motivo.uno : g.motivo.varios) + ' · completado</span>' +
+          '<span class="mu-hoy-txt"><span>' + esc(g.gente.length === 1 ? g.motivo.uno : g.motivo.varios) + ' · completado</span>' + fechaHTML + '</span>' +
           estado + '<span class="mu-hoy-go">✓</span></div>';
       }
     });
@@ -788,6 +825,7 @@
     ov.querySelector('#muSub').textContent = quedan === 1 ? 'Queda 1' : 'Quedan ' + quedan;
 
     var estadoClase = u.estado === 'vencida' ? 'mu-vencida' : (u.estado === 'porVencer' ? 'mu-porvencer' : 'mu-vigente');
+    var fechaAccion = textoFechaAccion(fila.motivo.id, u);
     var html = '<div class="mu-fila-quien"><b>' + esc(u.usuario || '') + '</b>' +
       '<div class="mu-fila-datos">' +
         '<div class="mu-col">' +
@@ -799,6 +837,7 @@
           (u.producto ? '<span>📦 ' + esc(u.producto) + '</span>' : '') +
           (u.fCompra ? '<span>🛒 Compra: ' + esc(u.fCompra) + '</span>' : '') +
           (u.fVenceRaw ? '<span class="mu-vence ' + estadoClase + '">📅 Vence: ' + esc(u.fVenceRaw) + '</span>' : '') +
+          ((fila.motivo.id === 'retro' || fila.motivo.id === 'cumple') && fechaAccion ? '<span class="mu-accion-fecha">📅 ' + esc(fechaAccion) + '</span>' : '') +
         '</div>' +
       '</div></div>';
     // Si esta tarea ya tiene marca (se volvió con las flechitas), se muestra
@@ -993,7 +1032,9 @@
       '.mu-hoy-item:hover{background:#fff;transform:translateY(-1px)}',
       '.mu-hoy-n{display:inline-grid;place-items:center;min-width:44px;padding:4px 9px;border-radius:999px;',
       'background:linear-gradient(135deg,#5b8def,#a06bff);color:#fff;font-size:12px;font-weight:900;white-space:nowrap}',
-      '.mu-hoy-txt{color:#3a3a48;font-size:12.5px;font-weight:700}',
+      '.mu-hoy-txt{display:grid;gap:2px;min-width:0;color:#3a3a48;font-size:12.5px;font-weight:700}',
+      '.mu-hoy-fecha-accion{color:#68697a;font-size:10.5px;font-weight:750;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+      '.mu-accion-fecha{color:#a3670b;font-size:11px;font-weight:850}',
       '.mu-hoy-go{color:#3d63c9;font-size:17px;font-weight:900}',
       /* fila de trabajo */
       '.mu-fila-quien{margin-top:14px;padding:13px 14px;border-radius:14px;background:rgba(255,255,255,.9);border:1px solid rgba(80,90,130,.1)}',
@@ -1023,6 +1064,8 @@
       'body.dark #muHoy{background:linear-gradient(135deg,rgba(91,141,239,.16),rgba(160,107,255,.14));border-color:rgba(255,255,255,.1)}',
       'body.dark .mu-hoy-top b,body.dark .mu-hoy-txt{color:#f2f2f7}',
       'body.dark .mu-hoy-fecha{color:#b4b6c4}',
+      'body.dark .mu-hoy-fecha-accion{color:#b4b6c4}',
+      'body.dark .mu-accion-fecha{color:#e0b23c}',
       'body.dark .mu-hoy-item{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.1)}',
       'body.dark .mu-fila-quien{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.1)}',
       'body.dark .mu-fila-quien b{color:#f2f2f7}',

@@ -21,13 +21,23 @@ Durante el día, las acciones resueltas siguen visibles en la tarjeta con su
 `✓` para mostrar el progreso. Al cambiar la fecha dejan de formar parte de la
 agenda pendiente.
 
-## Fecha visible
+## Fechas visibles
 
 La tarjeta muestra la fecha exacta de la agenda, por ejemplo:
 
 > 📅 25/08/2026
 
-Así se puede distinguir la lista de hoy de la del día anterior.
+Además, cada renglón muestra la fecha de la acción:
+
+- **Retrolavado:** pendiente desde `DD/MM/AAAA`.
+- **Garantía:** vence el `DD/MM/AAAA`.
+- **Cumpleaños:** `DD/MM/AAAA`.
+
+Si un renglón agrupa personas con fechas distintas, indica **Fechas
+individuales** y la fecha concreta aparece dentro de cada ficha.
+
+Así se puede distinguir la lista de hoy de la del día anterior y comprobar si
+la acción corresponde al mismo ciclo o a uno nuevo.
 
 ## Datos y sincronización
 
