@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v352-progreso-acciones';
+const CACHE_NAME = 'appi-v353-depurar-zindex';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
