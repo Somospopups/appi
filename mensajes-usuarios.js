@@ -825,13 +825,17 @@
     var textoBase = completar(p.texto, u);
     var texto = fila.textoActual || textoBase;
     var nombre = (typeof window.nombreDePila === 'function' ? window.nombreDePila(u.usuario) : '') || u.usuario;
-    var quedan = fila.gente.length - fila.i;
 
     ov.querySelector('#muTitulo').textContent = p.icono + ' ' + p.nombre;
-    ov.querySelector('#muSub').textContent = quedan === 1 ? 'Queda 1' : 'Quedan ' + quedan;
+    var fechaAccion = textoFechaAccion(fila.motivo.id, u);
+    var sub = ov.querySelector('#muSub');
+    if (fechaAccion){
+      sub.innerHTML = '<span class="mu-fecha-pill">📅 ' + esc(fechaAccion) + '</span>';
+    } else {
+      sub.textContent = '';
+    }
 
     var estadoClase = u.estado === 'vencida' ? 'mu-vencida' : (u.estado === 'porVencer' ? 'mu-porvencer' : 'mu-vigente');
-    var fechaAccion = textoFechaAccion(fila.motivo.id, u);
     var html = '<div class="mu-fila-quien"><b>' + esc(u.usuario || '') + '</b>' +
       '<div class="mu-fila-datos">' +
         '<div class="mu-col">' +
@@ -843,7 +847,6 @@
           (u.producto ? '<span>📦 ' + esc(u.producto) + '</span>' : '') +
           (u.fCompra ? '<span>🛒 Compra: ' + esc(u.fCompra) + '</span>' : '') +
           (u.fVenceRaw ? '<span class="mu-vence ' + estadoClase + '">📅 Vence: ' + esc(u.fVenceRaw) + '</span>' : '') +
-          ((fechaAccion) ? '<span class="mu-accion-fecha">📅 ' + esc(fechaAccion) + '</span>' : '') +
         '</div>' +
       '</div></div>';
     // Si esta tarea ya tiene marca (se volvió con las flechitas), se muestra
@@ -1570,6 +1573,24 @@
     mandar: mandar,
     pendientes: pendientes,
     deHoy: deHoy,
+    marcarAccion: marcarAccion,
+    marcaDe: marcaDe,
+    claveAccion: claveAccion,
+    completadaDe: completadaDe,
+    resumenHoy: resumenHoy,
+    pintarHoy: pintarHoy,
+    abrirFila: abrirFila,
+    escritoHoy: escritoHoy,
+    cerrar: cerrar,
+    montar: montar,
+    pintarFichas: pintarFichas
+  };
+
+  if (document.readyState === 'complete') envolver();
+  else window.addEventListener('load', envolver);
+  setTimeout(envolver, 900);
+})();
+Hoy,
     marcarAccion: marcarAccion,
     marcaDe: marcaDe,
     claveAccion: claveAccion,
