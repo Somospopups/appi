@@ -9,8 +9,9 @@
                           distribuidor, subidos con el selector
                           nativo (Android) o un archivo .vcf
                           (Android e iPhone). Cada contacto se
-                          puede "pasar a APPI" uno por uno: entra
-                          como contacto nuevo del embudo.
+                          puede "pasar a APPI" uno por uno o en
+                          bloque: entra como contacto nuevo del
+                          embudo.
 
    La agenda vive en este teléfono y se sincroniza con la tabla
    appi_agenda_personal de la cuenta (SUPABASE_AGENDA_PERSONAL.sql).
@@ -59,6 +60,7 @@
   /* ---------- estado ---------- */
 
   var mios = [];          // {id, nombre, telefono, tel_norm, estado:'nuevo'|'mergado', contacto_id, origen, created_at, updated_at}
+  var seleccionados = new Set();
   var busqueda = '';
   var sinTabla = false;   // falta correr SUPABASE_AGENDA_PERSONAL.sql
   var cargado = false;
@@ -373,6 +375,18 @@
     return contactosAppi().find(function(g){ return digitos(g.telefono) === telNorm; }) || null;
   }
 
+  function abrirWa(id){
+    cargar();
+    var c = mios.find(function(x){ return x.id === id; });
+    if (!c) return;
+    if (window.APPITel && typeof window.APPITel.abrir === 'function'){
+      window.APPITel.abrir(c.telefono, '', c.nombre);
+    } else {
+      var d = digitos(c.telefono);
+      if (d) window.open('https://wa.me/' + d, '_blank', 'noopener');
+    }
+  }
+
   async function pasarApapi(id){
     cargar();
     var c = mios.find(function(x){ return x.id === id; });
@@ -409,6 +423,64 @@
     }
   }
 
+  async function pasarSeleccionados(){
+    cargar();
+    var elegidos = mios.filter(function(c){ return seleccionados.has(c.id); });
+    if (!elegidos.length) return;
+
+    var paraPasar = elegidos.filter(function(c){ return c.estado !== 'mergado' && !enAppi(c.tel_norm); });
+    var yaEstan = elegidos.length - paraPasar.length;
+
+    if (!paraPasar.length){
+      await window.APPIDialog.alert(
+        'Todos los contactos seleccionados (' + elegidos.length + ') ya están en tu Agenda APPI.',
+        { title: 'Ya están en APPI', icon: '📇' }
+      );
+      return;
+    }
+
+    var mensaje = '¿Pasás ' + paraPasar.length + (paraPasar.length === 1 ? ' contacto' : ' contactos') + ' a tu Agenda APPI?\n\nEntrarán como contactos Nuevos en el embudo.';
+    if (yaEstan > 0){
+      mensaje += '\n\n(' + yaEstan + (yaEstan === 1 ? ' ya estaba en APPI y no se duplicará).' : ' ya estaban en APPI y no se duplicarán).');
+    }
+
+    var ok = await window.APPIDialog.confirm(mensaje, {
+      title: 'Pasar a Agenda APPI',
+      icon: '📇',
+      okText: 'Pasar a APPI',
+      cancelText: 'Cancelar'
+    });
+    if (!ok) return;
+
+    var exitosos = 0;
+    for (var i = 0; i < paraPasar.length; i++){
+      var c = paraPasar[i];
+      try{
+        var guardado = await window.APPIGestion.importarPersona({
+          nombre: c.nombre,
+          telefono: c.telefono,
+          estado: 'nuevo',
+          notas: 'Traído de la agenda del teléfono (v357).'
+        });
+        marcarMerlado(c, guardado && guardado.id);
+        exitosos++;
+      }catch(err){
+        console.warn('Agenda personal: error importando', c.nombre, err);
+      }
+    }
+
+    elegidos.forEach(function(c){
+      var ya = enAppi(c.tel_norm);
+      if (ya && c.estado !== 'mergado') marcarMerlado(c, ya.id);
+    });
+
+    seleccionados.clear();
+    toast('📥 ' + exitosos + (exitosos === 1 ? ' contacto pasado a Agenda APPI ✓' : ' contactos pasados a Agenda APPI ✓'), 3500);
+
+    if (navigator.onLine && window.APPIGestion.refresh) await window.APPIGestion.refresh(false);
+    else repintarSiVisible();
+  }
+
   function marcarMerlado(c, contactoId){
     c.estado = 'mergado';
     c.contacto_id = contactoId || c.contacto_id || null;
@@ -437,10 +509,32 @@
     );
     if (!ok) return;
     mios = mios.filter(function(x){ return x.id !== id; });
+    seleccionados.delete(id);
     guardar();
     encolar({ a: 'del', t: c.tel_norm });
     if (navigator.onLine) sincronizar(); else repintarSiVisible();
     toast('Contacto quitado de tu agenda personal');
+  }
+
+  async function quitarSeleccionados(){
+    cargar();
+    var elegidos = mios.filter(function(c){ return seleccionados.has(c.id); });
+    if (!elegidos.length) return;
+
+    var ok = await window.APPIDialog.confirm(
+      'Se quitarán ' + elegidos.length + (elegidos.length === 1 ? ' contacto' : ' contactos') + ' de tu Agenda Personal.\n\n(La Agenda APPI no se toca).',
+      { title: 'Quitar de la agenda', icon: '🗑️', okText: 'Quitar seleccionados', danger: true }
+    );
+    if (!ok) return;
+
+    var selIds = new Set(elegidos.map(function(c){ return c.id; }));
+    elegidos.forEach(function(c){ encolar({ a: 'del', t: c.tel_norm }); });
+    mios = mios.filter(function(x){ return !selIds.has(x.id); });
+    seleccionados.clear();
+    guardar();
+
+    if (navigator.onLine) sincronizar(); else repintarSiVisible();
+    toast(elegidos.length + (elegidos.length === 1 ? ' contacto quitado de tu agenda personal' : ' contactos quitados de tu agenda personal'));
   }
 
   /* ---------- vista ---------- */
@@ -460,24 +554,53 @@
       '.ap-import .ppal{background:linear-gradient(135deg,#25d366,#128c7e);color:#fff}',
       '.ap-import .sec{background:rgba(91,141,239,.1);color:#3d63c9}',
       '.ap-import .guia{background:none;border:1px dashed rgba(80,90,130,.3);border-radius:13px;color:#858692;font-weight:700;font-size:12px}',
-      '.ap-buscar{width:100%;min-height:42px;margin:10px 0;padding:8px 13px;border:1px solid rgba(80,90,130,.15);border-radius:12px;background:#f8f9ff;font:inherit;font-size:13px;outline:none;box-sizing:border-box}',
+      '.ap-buscar{width:100%;min-height:42px;margin:10px 0 6px;padding:8px 13px;border:1px solid rgba(80,90,130,.15);border-radius:12px;background:#f8f9ff;font:inherit;font-size:13px;outline:none;box-sizing:border-box}',
       'body.dark .ap-buscar{background:#1d1f31;border-color:rgba(255,255,255,.1);color:#f2f2f7}',
-      '.ap-item{margin-bottom:8px}',
-      '.ap-row{display:flex;align-items:center;gap:11px;width:100%;box-sizing:border-box;padding:12px 13px;border:1px solid rgba(80,90,130,.1);border-radius:15px;background:#fff;text-align:left}',
+      '.ap-toolbar{display:flex;align-items:center;justify-content:space-between;margin:8px 0 10px;padding:2px 4px;font-size:12px;color:#6b6e82;font-weight:750;user-select:none}',
+      'body.dark .ap-toolbar{color:#9d9fb5}',
+      '.ap-select-all{display:inline-flex;align-items:center;gap:7px;cursor:pointer}',
+      '.ap-select-all input{width:17px;height:17px;cursor:pointer;accent-color:#5b8def}',
+      '.ap-count-tag{font-size:11.5px;color:#858692}',
+      '.ap-item{margin-bottom:9px}',
+      '.ap-row{display:flex;flex-direction:column;gap:9px;width:100%;box-sizing:border-box;padding:12px 13px;border:1px solid rgba(80,90,130,.1);border-radius:15px;background:#fff;text-align:left;transition:border-color .15s, background .15s}',
       'body.dark .ap-row{background:rgba(30,30,50,.58);border-color:rgba(255,255,255,.08)}',
-      '.ap-row .ap-ava{width:38px;height:38px;flex:0 0 auto;border-radius:50%;display:grid;place-items:center;background:rgba(91,141,239,.12);color:#3d63c9;font-weight:900;font-size:15px}',
+      '.ap-item.seleccionado .ap-row{border-color:#5b8def;background:rgba(91,141,239,.04)}',
+      'body.dark .ap-item.seleccionado .ap-row{border-color:#5b8def;background:rgba(91,141,239,.1)}',
+      '.ap-top-row{display:flex;align-items:center;gap:10px;width:100%}',
+      '.ap-check-label{display:inline-flex;align-items:center;cursor:pointer;flex:0 0 auto;margin:0;padding:0}',
+      '.ap-check{width:18px;height:18px;cursor:pointer;accent-color:#5b8def}',
+      '.ap-row .ap-ava{width:36px;height:36px;flex:0 0 auto;border-radius:50%;display:grid;place-items:center;background:rgba(91,141,239,.12);color:#3d63c9;font-weight:900;font-size:14.5px}',
       '.ap-row .ap-quien{flex:1;min-width:0}',
       '.ap-row .ap-quien b{display:block;color:#30303d;font-size:13.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
       'body.dark .ap-row .ap-quien b{color:#f0f0f5}',
       '.ap-row .ap-quien small{color:#858692;font-size:11.5px;display:block;margin-top:2px}',
-      '.ap-chip{flex:0 0 auto;font-size:10.5px;font-weight:850;padding:5px 9px;border-radius:999px;white-space:nowrap}',
+      '.ap-chip{flex:0 0 auto;font-size:10.5px;font-weight:850;padding:4px 8px;border-radius:999px;white-space:nowrap}',
       '.ap-chip.nuevo{background:rgba(37,211,102,.14);color:#128c55}',
       '.ap-chip.enappi{background:rgba(91,141,239,.14);color:#3d63c9}',
       '.ap-chip.pasado{background:rgba(58,208,164,.16);color:#1f8f70}',
-      '.ap-acciones{display:grid;grid-template-columns:1fr 44px;gap:8px;margin-top:9px}',
-      '.ap-acciones .pasar{min-height:40px;border:0;border-radius:11px;background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;font:inherit;font-size:12.5px;font-weight:850;cursor:pointer}',
-      '.ap-acciones .ver{min-height:40px;border:0;border-radius:11px;background:rgba(91,141,239,.12);color:#3d63c9;font:inherit;font-size:12.5px;font-weight:850;cursor:pointer}',
-      '.ap-acciones .borrar{min-height:40px;border:0;border-radius:11px;background:rgba(80,90,130,.08);color:#858692;font-size:15px;cursor:pointer}',
+      '.ap-card-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px;padding-top:8px;border-top:1px solid rgba(80,90,130,.08)}',
+      'body.dark .ap-card-actions{border-top-color:rgba(255,255,255,.06)}',
+      '.ap-btn-icon{width:38px;height:38px;min-width:38px;min-height:38px;border-radius:11px;border:0;display:inline-flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;text-decoration:none;box-sizing:border-box;transition:transform .12s ease, opacity .12s ease}',
+      '.ap-btn-icon:active{transform:scale(0.93)}',
+      '.ap-btn-icon.wa{background:rgba(37,211,102,.14);color:#128c55;border:1px solid rgba(37,211,102,.25)}',
+      '.ap-btn-icon.call{background:rgba(91,141,239,.13);color:#3d63c9;border:1px solid rgba(91,141,239,.25)}',
+      '.ap-btn-icon.pasar{background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;border:0;box-shadow:0 2px 6px rgba(37,211,102,.28)}',
+      '.ap-btn-icon.ver{background:rgba(91,141,239,.13);color:#3d63c9;border:1px solid rgba(91,141,239,.25)}',
+      '.ap-btn-icon.borrar{background:rgba(235,87,87,.09);color:#c0392b;border:1px solid rgba(235,87,87,.22)}',
+      'body.dark .ap-btn-icon.wa{background:rgba(37,211,102,.2);border-color:rgba(37,211,102,.38);color:#25d366}',
+      'body.dark .ap-btn-icon.call{background:rgba(91,141,239,.22);border-color:rgba(91,141,239,.38);color:#7da2f5}',
+      'body.dark .ap-btn-icon.ver{background:rgba(91,141,239,.22);border-color:rgba(91,141,239,.38);color:#7da2f5}',
+      'body.dark .ap-btn-icon.borrar{background:rgba(235,87,87,.2);border-color:rgba(235,87,87,.35);color:#ff6b6b}',
+      '.ap-bulk-bar{position:sticky;bottom:14px;z-index:99;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 12px;margin:12px 0 6px;border-radius:15px;background:#1e2133;color:#fff;box-shadow:0 8px 24px rgba(0,0,0,.32)}',
+      'body.dark .ap-bulk-bar{background:#151624;border:1px solid rgba(255,255,255,.12)}',
+      '.ap-bulk-info{display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:800}',
+      '.ap-bulk-badge{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 5px;border-radius:999px;background:#5b8def;color:#fff;font-size:11.5px;font-weight:900}',
+      '.ap-bulk-actions{display:flex;align-items:center;gap:6px}',
+      '.ap-bulk-btn{height:35px;padding:0 10px;border:0;border-radius:9px;font:inherit;font-size:12px;font-weight:850;cursor:pointer;display:inline-flex;align-items:center;gap:4px;transition:transform .1s}',
+      '.ap-bulk-btn:active{transform:scale(0.96)}',
+      '.ap-bulk-btn.pasar{background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;box-shadow:0 2px 6px rgba(37,211,102,.25)}',
+      '.ap-bulk-btn.borrar{background:rgba(235,87,87,.22);color:#ff7a7a;border:1px solid rgba(235,87,87,.35)}',
+      '.ap-bulk-btn.cancelar{background:rgba(255,255,255,.1);color:#d3d5e2;width:32px;padding:0;justify-content:center;font-size:14px}',
       '.ap-vacio{padding:26px 14px;border:1px dashed rgba(80,90,130,.25);border-radius:16px;text-align:center;color:#858692;font-size:12.5px;line-height:1.6}',
       '.ap-vacio .ico{font-size:30px;display:block;margin-bottom:8px}',
       '.ap-aviso{margin:10px 0;padding:10px 12px;border-radius:12px;background:rgba(245,166,35,.12);color:#8a5a08;font-size:11.5px;line-height:1.5}'
@@ -500,22 +623,52 @@
   function filaHTML(c){
     var inicial = (c.nombre || '?').trim().charAt(0).toUpperCase() || '?';
     var enPanel = enAppi(c.tel_norm);
-    var chip, acciones;
+    var chip, btnAppi;
+    var telLlamar = digitos(c.telefono);
+    var estaSeleccionado = seleccionados.has(c.id);
+
     if (c.estado === 'mergado'){
       chip = '<span class="ap-chip pasado">✓ En tu Agenda APPI</span>';
-      acciones = '<div class="ap-acciones"><button type="button" class="ver" data-ap-ver="' + esc(c.id) + '">Ver en APPI</button><button type="button" class="borrar" data-ap-quitar="' + esc(c.id) + '" aria-label="Quitar">🗑️</button></div>';
+      btnAppi = '<button type="button" class="ap-btn-icon ver" data-ap-ver="' + esc(c.id) + '" title="Ver en Agenda APPI" aria-label="Ver en Agenda APPI">👁️</button>';
     } else if (enPanel){
       chip = '<span class="ap-chip enappi">📇 Ya está en APPI</span>';
-      acciones = '<div class="ap-acciones"><button type="button" class="ver" data-ap-ver="' + esc(c.id) + '">Ver en APPI</button><button type="button" class="borrar" data-ap-quitar="' + esc(c.id) + '" aria-label="Quitar">🗑️</button></div>';
+      btnAppi = '<button type="button" class="ap-btn-icon ver" data-ap-ver="' + esc(c.id) + '" title="Ver en Agenda APPI" aria-label="Ver en Agenda APPI">👁️</button>';
     } else {
       chip = '<span class="ap-chip nuevo">🆕 Para pasar</span>';
-      acciones = '<div class="ap-acciones"><button type="button" class="pasar" data-ap-pasar="' + esc(c.id) + '">→ Pasar a Agenda APPI</button><button type="button" class="borrar" data-ap-quitar="' + esc(c.id) + '" aria-label="Quitar">🗑️</button></div>';
+      btnAppi = '<button type="button" class="ap-btn-icon pasar" data-ap-pasar="' + esc(c.id) + '" title="Pasar a Agenda APPI" aria-label="Pasar a Agenda APPI">📇</button>';
     }
-    return '<div class="ap-item" data-ap-id="' + esc(c.id) + '">' +
+
+    return '<div class="ap-item' + (estaSeleccionado ? ' seleccionado' : '') + '" data-ap-id="' + esc(c.id) + '">' +
       '<div class="ap-row">' +
-      '<span class="ap-ava">' + esc(inicial) + '</span>' +
-      '<span class="ap-quien"><b>' + esc(c.nombre || 'Sin nombre') + '</b><small>📱 ' + esc(c.telefono) + '</small></span>' +
-      chip + '</div>' + acciones + '</div>';
+        '<div class="ap-top-row">' +
+          '<label class="ap-check-label" title="Seleccionar ' + esc(c.nombre || 'contacto') + '">' +
+            '<input type="checkbox" class="ap-check" data-ap-select="' + esc(c.id) + '"' + (estaSeleccionado ? ' checked' : '') + ' aria-label="Seleccionar ' + esc(c.nombre) + '">' +
+          '</label>' +
+          '<span class="ap-ava">' + esc(inicial) + '</span>' +
+          '<div class="ap-quien"><b>' + esc(c.nombre || 'Sin nombre') + '</b><small>📱 ' + esc(c.telefono) + '</small></div>' +
+          chip +
+        '</div>' +
+        '<div class="ap-card-actions">' +
+          '<button type="button" class="ap-btn-icon wa" data-ap-wa="' + esc(c.id) + '" title="WhatsApp con ' + esc(c.nombre) + '" aria-label="WhatsApp">💬</button>' +
+          '<a href="tel:' + esc(telLlamar) + '" class="ap-btn-icon call" data-appi-call-phone="' + esc(telLlamar) + '" data-appi-call-name="' + esc(c.nombre) + '" title="Llamar a ' + esc(c.nombre) + '" aria-label="Llamar">📞</a>' +
+          btnAppi +
+          '<button type="button" class="ap-btn-icon borrar" data-ap-quitar="' + esc(c.id) + '" title="Quitar de la agenda" aria-label="Quitar">🗑️</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }
+
+  function bulkBarHTML(){
+    var n = seleccionados.size;
+    if (!n) return '';
+    return '<div class="ap-bulk-bar" id="apBulkBar">' +
+      '<div class="ap-bulk-info"><span class="ap-bulk-badge">' + n + '</span><span>' + (n === 1 ? 'elegido' : 'elegidos') + '</span></div>' +
+      '<div class="ap-bulk-actions">' +
+        '<button type="button" class="ap-bulk-btn pasar" id="apBulkPasar">📇 Pasar a APPI (' + n + ')</button>' +
+        '<button type="button" class="ap-bulk-btn borrar" id="apBulkQuitar">🗑️ Quitar (' + n + ')</button>' +
+        '<button type="button" class="ap-bulk-btn cancelar" id="apBulkCancelar" title="Cancelar selección" aria-label="Cancelar selección">✕</button>' +
+      '</div>' +
+    '</div>';
   }
 
   function html(){
@@ -536,6 +689,8 @@
     var paraPasar = mios.filter(function(c){ return c.estado !== 'mergado' && !enAppi(c.tel_norm); }).length;
     var pickerDisponible = !!(navigator.contacts && typeof navigator.contacts.select === 'function');
 
+    var todosVisiblesSeleccionados = listado.length > 0 && listado.every(function(c){ return seleccionados.has(c.id); });
+
     var salida = '';
     salida += '<input type="file" id="apVcfInput" accept=".vcf,text/vcard,text/directory" hidden>';
     salida += '<div class="gestion-section-title" style="margin-top:8px"><h3>Tu agenda del teléfono</h3><small>' + mios.length + ' contacto' + (mios.length === 1 ? '' : 's') + '</small></div>';
@@ -550,6 +705,13 @@
     if (mios.length){
       salida += '<div class="gestion-stats"><div class="gestion-stat"><span>🆕</span><b>' + paraPasar + '</b><small>Para pasar</small></div><div class="gestion-stat"><span>📇</span><b>' + (mios.length - paraPasar) + '</b><small>En APPI</small></div><div class="gestion-stat"><span>📱</span><b>' + mios.length + '</b><small>Total</small></div></div>';
       salida += '<input type="search" id="apBuscar" class="ap-buscar" placeholder="Buscar por nombre o teléfono…" value="' + esc(busqueda) + '">';
+      salida += '<div class="ap-toolbar">' +
+        '<label class="ap-select-all" title="Seleccionar todos los contactos">' +
+          '<input type="checkbox" id="apSelectAll"' + (todosVisiblesSeleccionados ? ' checked' : '') + '> ' +
+          '<span>' + (todosVisiblesSeleccionados ? 'Deseleccionar todos' : 'Seleccionar todos') + '</span>' +
+        '</label>' +
+        '<span class="ap-count-tag">' + listado.length + (listado.length === 1 ? ' contacto' : ' contactos') + '</span>' +
+      '</div>';
     }
     if (!mios.length){
       salida += '<div class="ap-vacio"><span class="ico">📱</span><b>Tu agenda personal todavía está vacía.</b><br>Subila una sola vez y queda guardada en tu cuenta: después vas pasando de a uno los que quieras trabajar con APPI.</div>';
@@ -557,6 +719,7 @@
       salida += '<div class="ap-vacio"><span class="ico">🔍</span>No hay contactos que coincidan con la búsqueda.</div>';
     } else {
       salida += '<div id="apLista">' + listado.map(filaHTML).join('') + '</div>';
+      salida += bulkBarHTML();
     }
     return salida;
   }
@@ -621,14 +784,64 @@
         if (nuevo){ nuevo.focus(); try{ nuevo.setSelectionRange(pos, pos); }catch(err){} }
       };
     }
+
+    // Seleccionar todos
+    var selectAll = $('apSelectAll');
+    if (selectAll){
+      selectAll.onchange = function(){
+        var q = busqueda.trim().toLowerCase();
+        var visibles = mios.filter(function(c){
+          if (!q) return true;
+          return (c.nombre || '').toLowerCase().includes(q) || (c.telefono || '').includes(q);
+        });
+        if (selectAll.checked){
+          visibles.forEach(function(c){ seleccionados.add(c.id); });
+        } else {
+          visibles.forEach(function(c){ seleccionados.delete(c.id); });
+        }
+        repintarSiVisible();
+      };
+    }
+
+    // Selección individual
+    document.querySelectorAll('[data-ap-select]').forEach(function(chk){
+      chk.onchange = function(e){
+        e.stopPropagation();
+        var id = chk.getAttribute('data-ap-select');
+        if (chk.checked) seleccionados.add(id);
+        else seleccionados.delete(id);
+        repintarSiVisible();
+      };
+    });
+
+    // WhatsApp individual
+    document.querySelectorAll('[data-ap-wa]').forEach(function(b){
+      b.onclick = function(e){
+        e.stopPropagation();
+        abrirWa(b.getAttribute('data-ap-wa'));
+      };
+    });
+
+    // Pasar a APPI individual
     document.querySelectorAll('[data-ap-pasar]').forEach(function(b){
-      b.onclick = function(){ pasarApapi(b.getAttribute('data-ap-pasar')); };
+      b.onclick = function(e){
+        e.stopPropagation();
+        pasarApapi(b.getAttribute('data-ap-pasar'));
+      };
     });
+
+    // Quitar individual
     document.querySelectorAll('[data-ap-quitar]').forEach(function(b){
-      b.onclick = function(){ quitar(b.getAttribute('data-ap-quitar')); };
+      b.onclick = function(e){
+        e.stopPropagation();
+        quitar(b.getAttribute('data-ap-quitar'));
+      };
     });
+
+    // Ver en APPI
     document.querySelectorAll('[data-ap-ver]').forEach(function(b){
-      b.onclick = function(){
+      b.onclick = function(e){
+        e.stopPropagation();
         cargar();
         var c = mios.find(function(x){ return x.id === b.getAttribute('data-ap-ver'); });
         var destino = c ? (c.contacto_id || (enAppi(c.tel_norm) || {}).id) : null;
@@ -636,6 +849,19 @@
         verEnAppi(destino);
       };
     });
+
+    // Acciones masivas
+    var bulkPasar = $('apBulkPasar');
+    if (bulkPasar) bulkPasar.onclick = function(){ pasarSeleccionados(); };
+
+    var bulkQuitar = $('apBulkQuitar');
+    if (bulkQuitar) bulkQuitar.onclick = function(){ quitarSeleccionados(); };
+
+    var bulkCancelar = $('apBulkCancelar');
+    if (bulkCancelar) bulkCancelar.onclick = function(){
+      seleccionados.clear();
+      repintarSiVisible();
+    };
   }
 
   window.APPIAgendaPersonal = {
@@ -647,7 +873,11 @@
     importarLista: importarLista,
     lista: function(){ cargar(); return mios; },
     pasarApapi: pasarApapi,
+    pasarSeleccionados: pasarSeleccionados,
     quitar: quitar,
+    quitarSeleccionados: quitarSeleccionados,
+    abrirWa: abrirWa,
+    seleccionados: function(){ return Array.from(seleccionados); },
     _mejorTelefono: mejorTelefono
   };
 })();
