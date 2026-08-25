@@ -389,12 +389,24 @@ test('la ficha del carrusel muestra domicilio, teléfono, compra y vencimiento',
   await page.locator('[data-mu-hoy="cumple"]').click();
   const quien = page.locator('.mu-fila-quien');
   await expect(quien).toContainText('GOMEZ, ANA MARIA');
-  await expect(quien).toContainText('📍 Alta Gracia');
-  await expect(quien).toContainText('🏠 San Martín 120');
-  await expect(quien).toContainText('📞 3515551001');
-  await expect(quien).toContainText('Compra: 15/03/2024');
-  await expect(quien).toContainText('Vence: 30/09/2026');
-  await expect(quien).toContainText('📦 PSA SENIOR 4');
+
+  // Dos columnas: izquierda (ubicación), derecha (equipo y fechas).
+  const cols = quien.locator('.mu-col');
+  await expect(cols).toHaveCount(2);
+  await expect(cols.nth(0)).toContainText('📍 Alta Gracia');
+  await expect(cols.nth(0)).toContainText('🏠 San Martín 120');
+  await expect(cols.nth(0)).toContainText('📞 3515551001');
+  await expect(cols.nth(1)).toContainText('📦 PSA SENIOR 4');
+  await expect(cols.nth(1)).toContainText('Compra: 15/03/2024');
+  await expect(cols.nth(1)).toContainText('Vence: 30/09/2026');
+
+  // El vencimiento va en rojo y negrita.
+  const vence = quien.locator('.mu-vence');
+  await expect(vence).toContainText('Vence: 30/09/2026');
+  const color = await vence.evaluate(el => getComputedStyle(el).color);
+  expect(color).toBe('rgb(217, 83, 79)'); // #d9534f
+  const peso = await vence.evaluate(el => getComputedStyle(el).fontWeight);
+  expect(Number(peso)).toBeGreaterThanOrEqual(700);
 });
 
 test('el contactado no desaparece: queda marcado ✓ y la franja dura todo el día', async ({ page }) => {
