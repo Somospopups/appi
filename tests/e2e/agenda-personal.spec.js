@@ -1,6 +1,6 @@
 const { test, expect } = require('@playwright/test');
 
-// La solapa "📱 AGENDA PERSONAL" del Panel de Contactos (v357): subir la
+// La solapa "📱 AGENDA PERSONAL" del Panel de Contactos (v358): subir la
 // agenda del teléfono (.vcf en cualquier equipo, selector nativo donde esté),
 // botones de WhatsApp/Llamar/Pasar/Quitar dentro de cada tarjeta blanca,
 // y selección múltiple para pasar a APPI o eliminar en bloque.
@@ -61,7 +61,7 @@ const VCF = [
   'END:VCARD'
 ].join('\r\n');
 
-async function abrirPanel(page, { contactos = CONTACTOS_APPI, agendaRemota = [] } = {}) {
+async function abrirPanel(page, { contactos = CONTACTOS_APPI, agendaRemota = [], agendaVista = '' } = {}) {
   const accessToken = tokenFor(USER_ID);
   const profile = {
     user_id: USER_ID, username: null, dip: '02-9802014', sucursal: '02', numero_distribuidor: '9802014',
@@ -107,12 +107,13 @@ async function abrirPanel(page, { contactos = CONTACTOS_APPI, agendaRemota = [] 
     return route.fulfill({ status: 200, headers: cors, body: '[]' });
   });
 
-  await page.addInitScript(([uid, contacts]) => {
+  await page.addInitScript(([uid, contacts, savedAgenda]) => {
     localStorage.setItem('welcomeSeen', '1');
     localStorage.setItem('appi_tarjetas_auto', '0');
     localStorage.setItem('tutoVisto_v2', '1');
     localStorage.setItem(`appi_gestion_cache_v1_${uid}`, JSON.stringify({ contacts, surveys: [], activities: [], savedAt: Date.now() }));
-  }, [USER_ID, contactos]);
+    if (savedAgenda) localStorage.setItem(`appi_gestion_agenda_vista_${uid}`, savedAgenda);
+  }, [USER_ID, contactos, agendaVista]);
 
   await page.goto('/index.html', { waitUntil: 'networkidle' });
   await page.locator('#distributorInput').fill('02-9802014');
@@ -150,6 +151,17 @@ test('el switch AGENDA APPI / AGENDA PERSONAL está arriba del panel y cambia de
   await expect(page.locator('#apSubirVcf')).toHaveCount(0);
 });
 
+test('al abrir APPI con Agenda Personal guardada, primero pinta esa solapa y descarga la agenda remota', async ({ page }) => {
+  const remota = [{
+    nombre: 'Contacto desde el celular', telefono: '3515559090',
+    telefono_normalizado: '3515559090', estado: 'nuevo', contacto_id: null,
+    origen: 'telefono', created_at: HOY
+  }];
+  await abrirPanel(page, { contactos: [], agendaRemota: remota, agendaVista: 'personal' });
+  await expect(page.locator('#apSubirVcf')).toBeVisible();
+  await expect(page.locator('.ap-item').filter({ hasText: 'Contacto desde el celular' })).toBeVisible();
+});
+
 test('el vCard de Android, iPhone y las agendas viejas 2.1 se leen bien', async ({ page }) => {
   await abrirPanel(page);
   const salida = await page.evaluate(texto => window.APPIAgendaPersonal.parsearVcard(texto), VCF);
@@ -171,8 +183,12 @@ test('subir un .vcf llena la agenda personal y no duplica al repetir', async ({ 
   await expect(page.locator('.ap-item')).toHaveCount(3); // el repetido quedó en uno solo
   await expect(page.locator('.ap-item').filter({ hasText: 'Juan Pérez' })).toContainText('3515551111');
   await expect(page.locator('.ap-item').filter({ hasText: 'José Pérez' })).toBeVisible();
-  // Los tres se suben a la cuenta (cola de sincronización).
-  await expect.poll(() => subidasAgenda.length).toBeGreaterThanOrEqual(3);
+  // Los tres se suben juntos a la cuenta (un batch upsert, no una request
+  // por contacto).
+  await expect.poll(() => subidasAgenda.flat().length).toBeGreaterThanOrEqual(3);
+  expect(subidasAgenda).toHaveLength(1);
+  expect(Array.isArray(subidasAgenda[0])).toBe(true);
+  expect(subidasAgenda[0]).toHaveLength(3);
 
   const filas = await page.evaluate(() => window.APPIAgendaPersonal.lista().length);
   expect(filas).toBe(3);
@@ -235,7 +251,7 @@ test('pasar a APPI pide confirmación, crea el contacto y queda marcado', async 
   const fila = page.locator('.ap-item').filter({ hasText: 'Nuevo Cliente' });
   await expect(fila).toContainText('En tu Agenda APPI');
   await expect(page.locator('[data-ap-pasar]')).toHaveCount(0);
-  await expect.poll(() => subidasAgenda.some(p => p && p.estado === 'mergado')).toBe(true);
+  await expect.poll(() => subidasAgenda.flat().some(p => p && p.estado === 'mergado')).toBe(true);
 });
 
 test('selección múltiple: pasar contactos seleccionados a APPI en bloque', async ({ page }) => {

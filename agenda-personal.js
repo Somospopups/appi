@@ -1,5 +1,5 @@
 /* ============================================================
-   APPI · Agenda personal (v357)
+   APPI · Agenda personal (v358)
    ------------------------------------------------------------
    Solapa del Panel de Contactos con dos agendas:
 
@@ -22,6 +22,10 @@
 'use strict';
 
   var MAX_IMPORT = 1500;
+  // Supabase/PostgREST acepta un array JSON en un solo upsert. Mantener los
+  // lotes acotados evita requests enormes y permite subir agendas grandes en
+  // paralelo, sin volver a caer en un POST por contacto.
+  var UPSERT_BATCH_SIZE = 500;
 
   function $(id){ return document.getElementById(id); }
   function esc(s){
@@ -65,6 +69,7 @@
   var sinTabla = false;   // falta correr SUPABASE_AGENDA_PERSONAL.sql
   var cargado = false;
   var sincronizando = false;
+  var sincronizacionActiva = null;
 
   function cacheKey(){ return 'appi_agenda_personal_v1_' + uid(); }
   function colaKey(){ return 'appi_agenda_personal_queue_v1_' + uid(); }
@@ -89,11 +94,26 @@
     try{ localStorage.setItem(colaKey(), JSON.stringify(cola)); }catch(e){}
   }
   // La última operación por teléfono gana: si se sube y se borra antes de
-  // sincronizar, no se mandan las dos.
+  // sincronizar, no se mandan las dos. q permite quitar sólo la operación que
+  // terminó, aunque el usuario haya generado otra mientras subía el lote.
   function encolar(accion){
-    var cola = leerCola().filter(function(it){ return it.t !== accion.t; });
-    cola.push(accion);
+    var entrada = Object.assign({ q: uuid() }, accion);
+    var cola = leerCola().filter(function(it){ return it.t !== entrada.t; });
+    cola.push(entrada);
     guardarCola(cola);
+  }
+
+  function quitarDeCola(procesadas){
+    var ids = new Set(procesadas.map(function(it){ return it.q; }).filter(Boolean));
+    var restantes = leerCola().filter(function(actual){
+      if (actual.q) return !ids.has(actual.q);
+      // Compatibilidad con colas creadas antes de v358, que no tenían q.
+      return !procesadas.some(function(it){
+        return !it.q && actual.a === it.a && actual.t === it.t &&
+          JSON.stringify(actual.p || null) === JSON.stringify(it.p || null);
+      });
+    });
+    guardarCola(restantes);
   }
 
   function cargar(){
@@ -116,11 +136,17 @@
       origen: c.origen || 'manual'
     };
   }
-  async function subirFila(c){
+  async function subirLote(filas){
+    if (!filas.length) return;
     await cloudFetch('/rest/v1/appi_agenda_personal?on_conflict=user_id,telefono_normalizado', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', Prefer: 'resolution=merge-duplicates' },
-      body: JSON.stringify(filaDe(c))
+      headers: {
+        'Content-Type': 'application/json',
+        Prefer: 'resolution=merge-duplicates,return=minimal'
+      },
+      // Un array es un batch upsert real de PostgREST: todos los contactos
+      // llegan juntos, en lugar de abrir una request por cada teléfono.
+      body: JSON.stringify(filas)
     });
   }
   async function borrarFila(telNorm){
@@ -130,60 +156,87 @@
     });
   }
   async function vaciarCola(){
-    var cola = leerCola();
-    while (cola.length){
-      var it = cola[0];
-      if (it.a === 'up') await subirFila(it.p);
-      else await borrarFila(it.t);
-      cola.shift();
-      guardarCola(cola);
+    var subidas = [];
+    while (true){
+      var cola = leerCola();
+      if (!cola.length) return subidas;
+
+      if (cola[0].a === 'up'){
+        // Tomar todos los upserts consecutivos y partirlos en paquetes. Los
+        // paquetes se envían en paralelo para que una agenda completa quede
+        // disponible apenas termina la importación.
+        var lotes = [], indice = 0;
+        while (indice < cola.length && cola[indice].a === 'up'){
+          lotes.push(cola.slice(indice, indice + UPSERT_BATCH_SIZE));
+          indice += UPSERT_BATCH_SIZE;
+        }
+        await Promise.all(lotes.map(function(lote){
+          return subirLote(lote.map(function(it){ return it.p; }));
+        }));
+        [].concat.apply([], lotes).forEach(function(it){ subidas.push(it.t); });
+        quitarDeCola([].concat.apply([], lotes));
+      } else {
+        var it = cola[0];
+        await borrarFila(it.t);
+        quitarDeCola([it]);
+      }
     }
   }
   function falloDeTabla(error){
     var texto = String(error && error.message || '') + ' ' + String(error && error.status || '');
     return /appi_agenda_personal|42P01|PGRST204|does not exist|Could not find|404/.test(texto);
   }
-  async function sincronizar(){
-    if (!autorizado() || sincronizando) return;
+  function sincronizar(){
+    if (!autorizado()) return Promise.resolve(false);
+    if (sincronizacionActiva) return sincronizacionActiva;
+
     sincronizando = true;
-    try{
-      await vaciarCola();
-      sinTabla = false;
-      var filas = await cloudFetch('/rest/v1/appi_agenda_personal?select=nombre,telefono,telefono_normalizado,estado,contacto_id,origen,created_at&order=created_at.asc&limit=5000');
-      var locales = {};
-      cargar().forEach(function(c){ locales[c.tel_norm] = c; });
-      (Array.isArray(filas) ? filas : []).forEach(function(f){
-        if (!f || !f.telefono_normalizado) return;
-        var local = locales[f.telefono_normalizado];
-        if (local){
-          local.estado = f.estado === 'mergado' || local.estado === 'mergado' ? 'mergado' : 'nuevo';
-          if (f.contacto_id) local.contacto_id = f.contacto_id;
-        } else {
-          mios.push({
-            id: 'ap-' + uuid(), nombre: f.nombre || '', telefono: f.telefono || '',
-            tel_norm: f.telefono_normalizado, estado: f.estado || 'nuevo',
-            contacto_id: f.contacto_id || null, origen: f.origen || 'vcf',
-            created_at: f.created_at || new Date().toISOString()
-          });
-          locales[f.telefono_normalizado] = mios[mios.length - 1];
+    sincronizacionActiva = (async function(){
+      try{
+        var subidasEnEstaVuelta = new Set(await vaciarCola());
+        sinTabla = false;
+        var filas = await cloudFetch('/rest/v1/appi_agenda_personal?select=nombre,telefono,telefono_normalizado,estado,contacto_id,origen,created_at&order=created_at.asc&limit=5000');
+        var locales = {};
+        cargar().forEach(function(c){ locales[c.tel_norm] = c; });
+        (Array.isArray(filas) ? filas : []).forEach(function(f){
+          if (!f || !f.telefono_normalizado) return;
+          var local = locales[f.telefono_normalizado];
+          if (local){
+            local.estado = f.estado === 'mergado' || local.estado === 'mergado' ? 'mergado' : 'nuevo';
+            if (f.contacto_id) local.contacto_id = f.contacto_id;
+          } else {
+            mios.push({
+              id: 'ap-' + uuid(), nombre: f.nombre || '', telefono: f.telefono || '',
+              tel_norm: f.telefono_normalizado, estado: f.estado || 'nuevo',
+              contacto_id: f.contacto_id || null, origen: f.origen || 'vcf',
+              created_at: f.created_at || new Date().toISOString()
+            });
+            locales[f.telefono_normalizado] = mios[mios.length - 1];
+          }
+        });
+        // Lo que quedó sólo en este teléfono se sube (se creó en otra ocasión
+        // sin conexión o se importó mientras la tabla todavía no existía).
+        var enLaNube = {};
+        (Array.isArray(filas) ? filas : []).forEach(function(f){ if (f && f.telefono_normalizado) enLaNube[f.telefono_normalizado] = true; });
+        for (var i = 0; i < mios.length; i++){
+          if (!enLaNube[mios[i].tel_norm] && !subidasEnEstaVuelta.has(mios[i].tel_norm)){
+            encolar({ a: 'up', t: mios[i].tel_norm, p: filaDe(mios[i]) });
+          }
         }
-      });
-      // Lo que quedó sólo en este teléfono se sube (se creó en otra ocasión
-      // sin conexión o se importó mientras la tabla todavía no existía).
-      var enLaNube = {};
-      (Array.isArray(filas) ? filas : []).forEach(function(f){ if (f && f.telefono_normalizado) enLaNube[f.telefono_normalizado] = true; });
-      for (var i = 0; i < mios.length; i++){
-        if (!enLaNube[mios[i].tel_norm]) encolar({ a: 'up', t: mios[i].tel_norm, p: filaDe(mios[i]) });
+        guardar();
+        await vaciarCola();
+        return true;
+      }catch(error){
+        if (falloDeTabla(error)) sinTabla = true;
+        else if (!(error && error.network)) console.warn('Agenda personal: no se pudo sincronizar', error);
+        return false;
+      }finally{
+        sincronizando = false;
+        sincronizacionActiva = null;
+        repintarSiVisible();
       }
-      guardar();
-      await vaciarCola();
-    }catch(error){
-      if (falloDeTabla(error)) sinTabla = true;
-      else if (!(error && error.network)) console.warn('Agenda personal: no se pudo sincronizar', error);
-    }finally{
-      sincronizando = false;
-      repintarSiVisible();
-    }
+    })();
+    return sincronizacionActiva;
   }
 
   /* ---------- importar ---------- */
@@ -220,8 +273,15 @@
     if (agregados){
       guardar();
       nuevos.forEach(function(c){ encolar({ a: 'up', t: c.tel_norm, p: filaDe(c) }); });
-      // La cola ya quedó ordenada; si hay internet sale ahora mismo.
-      if (navigator.onLine) sincronizar();
+      // La cola ya quedó ordenada; si hay internet sale ahora mismo en uno o
+      // varios batches. Esperar acá deja la importación lista al volver del
+      // selector, sin bloquear cuando el dispositivo está offline. Si había
+      // otra sincronización en vuelo, una segunda pasada recoge una cola que
+      // se haya agregado entre sus dos lecturas.
+      if (navigator.onLine){
+        await sincronizar();
+        if (leerCola().length) await sincronizar();
+      }
     }
     return { agregados: agregados, repetidos: repetidos, sinTel: sinTel };
   }
@@ -433,7 +493,7 @@
     try{
       var guardado = await window.APPIGestion.importarPersona({
         nombre: c.nombre, telefono: c.telefono, estado: 'nuevo',
-        notas: 'Traído de la agenda del teléfono (v357).'
+        notas: 'Traído de la agenda del teléfono (v358).'
       });
       marcarMerlado(c, guardado && guardado.id);
       var primer = c.nombre.split(/\s+/)[0];
@@ -484,9 +544,11 @@
           nombre: c.nombre,
           telefono: c.telefono,
           estado: 'nuevo',
-          notas: 'Traído de la agenda del teléfono (v357).'
+          notas: 'Traído de la agenda del teléfono (v358).'
         });
-        marcarMerlado(c, guardado && guardado.id);
+        // En el pase masivo se difiere la sincronización para que todos los
+        // cambios de estado viajen juntos en un batch upsert.
+        marcarMerlado(c, guardado && guardado.id, false);
         exitosos++;
       }catch(err){
         console.warn('Agenda personal: error importando', c.nombre, err);
@@ -495,22 +557,23 @@
 
     elegidos.forEach(function(c){
       var ya = enAppi(c.tel_norm);
-      if (ya && c.estado !== 'mergado') marcarMerlado(c, ya.id);
+      if (ya && c.estado !== 'mergado') marcarMerlado(c, ya.id, false);
     });
 
     seleccionados.clear();
     toast('📥 ' + exitosos + (exitosos === 1 ? ' contacto pasado a Agenda APPI ✓' : ' contactos pasados a Agenda APPI ✓'), 3500);
 
+    if (navigator.onLine) await sincronizar();
     if (navigator.onLine && window.APPIGestion.refresh) await window.APPIGestion.refresh(false);
     else repintarSiVisible();
   }
 
-  function marcarMerlado(c, contactoId){
+  function marcarMerlado(c, contactoId, sincronizarAhora){
     c.estado = 'mergado';
     c.contacto_id = contactoId || c.contacto_id || null;
     guardar();
     encolar({ a: 'up', t: c.tel_norm, p: filaDe(c) });
-    if (navigator.onLine) sincronizar();
+    if (sincronizarAhora !== false && navigator.onLine) sincronizar();
     repintarSiVisible();
   }
 
@@ -755,6 +818,23 @@
     }
   }
 
+  function sincronizarSiPanelVisible(){
+    var panel = document.getElementById('view-gestion');
+    if (panel && panel.classList.contains('active') && navigator.onLine && autorizado()) sincronizar();
+  }
+  // También se revalida al volver a la PC: el teléfono puede haber subido
+  // contactos mientras esta pestaña estaba en segundo plano.
+  window.addEventListener('appi-auth-change', function(){
+    setTimeout(function(){
+      if (navigator.onLine && autorizado()) sincronizar();
+    }, 0);
+  });
+  window.addEventListener('focus', function(){ setTimeout(sincronizarSiPanelVisible, 0); });
+  window.addEventListener('online', sincronizarSiPanelVisible);
+  document.addEventListener('visibilitychange', function(){
+    if (document.visibilityState === 'visible') sincronizarSiPanelVisible();
+  });
+
   function bind(){
     // El switch de agendas (los botones viven arriba del panel).
     document.querySelectorAll('[data-agenda-vista]').forEach(function(b){
@@ -763,11 +843,12 @@
         var vista = b.getAttribute('data-agenda-vista');
         window.APPIGestion.state.agenda = vista;
         try{ localStorage.setItem('appi_gestion_agenda_vista_' + uid(), vista); }catch(e){}
-        if (vista === 'personal'){
-          cargar();
-          if (navigator.onLine && autorizado()) sincronizar();
-        }
+        // El cambio de solapa también es un punto de sincronización: la PC
+        // descarga lo que se subió desde el celular aunque la agenda personal
+        // haya quedado guardada en otra pestaña.
+        if (vista === 'personal') cargar();
         window.APPIGestion.render();
+        if (navigator.onLine && autorizado()) sincronizar();
       };
     });
     var elegir = $('apElegirTel');
