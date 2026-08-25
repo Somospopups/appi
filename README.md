@@ -4,7 +4,7 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
-- Versión: **v356 · Segura**.
+- Versión: **v357 · Segura**.
 - Publicación: [https://somospopups.github.io/appi/](https://somospopups.github.io/appi/)
 - Acceso por número de distribuidor y contraseña.
 - Acceso administrador POPUPS mediante el candado, sin DIP ni número de distribuidor.
@@ -23,6 +23,21 @@ Desde v256, todos los dispositivos abren APPI con el mismo logo de vidrio.
 - Dentro de la app, la animación de carga muestra el mismo cartel de vidrio dibujado con CSS, sin descargar imágenes, en celular, tablet y PC.
 
 Al cambiar el logo hay que regenerar ambos juegos y volver a correr `npm test`: `tests/e2e/logo-vidrio.spec.js` verifica que cada dispositivo tenga su imagen y que el arranque muestre el vidrio.
+
+## Agenda personal (v357)
+
+El Panel de Contactos tiene dos agendas, con un switch arriba:
+
+- **📇 AGENDA APPI**: la de siempre (Hoy / Todos / Resultados).
+- **📱 AGENDA PERSONAL**: la agenda del teléfono del distribuidor. Se sube una
+  sola vez — con el selector nativo en Android o un archivo `.vcf` (guía
+  incluida para iPhone/iCloud) — y queda guardada en su cuenta: si cambia de
+  celular, no se pierde. Cada contacto se pasa a la Agenda APPI de a uno, con
+  confirmación; los que ya están se detectan por teléfono y no se duplican.
+
+Requiere `SUPABASE_AGENDA_PERSONAL.sql` (una sola vez, aditiva); sin ella la
+solapa funciona igual en local. La barra de tarjetas de crédito se quitó del
+panel (sigue en Usuarios).
 
 ## Anuncios del administrador (v326)
 
