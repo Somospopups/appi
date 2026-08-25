@@ -485,6 +485,11 @@
     // El resumen queda escrito en el día: es lo que lee el panel del admin.
     var r = resumenCon(d);
     d.dias[k].total = r.total; d.dias[k].hechas = r.hechas; d.dias[k].noHechas = r.noHechas;
+    // Cuando no queda nada pendiente, se anota a qué hora se completó el día:
+    // con eso se arma el podio de "primero en cumplir" (v345).
+    if (r.pendientes === 0 && r.total > 0 && !d.dias[k].completo_at){
+      d.dias[k].completo_at = new Date().toISOString();
+    }
     limpiarViejos(d);
     guardarAcciones(d);
     if (!silencioso){ try{ pintarHoy(); }catch(e){} }

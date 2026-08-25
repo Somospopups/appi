@@ -456,9 +456,67 @@
     }catch(e){ return null; }
   }
 
+  /* ---------- cumplimiento del día (v345): medalla por completar primero ---------- */
+  var cumPosCache = null;
+  var cumPosPidiendo = false;
+  function textoCumPos(){
+    var r = null;
+    try{ r = window.APPIMensajes && window.APPIMensajes.resumenHoy ? window.APPIMensajes.resumenHoy() : null; }catch(e){}
+    var completado = !!(r && r.total > 0 && r.pendientes === 0);
+    if (!cumPosCache) return 'Consultando tu lugar…';
+    if (!cumPosCache.total_completos){
+      return completado ? '🥇 ¡Sos la primera persona en completar hoy!' : 'Todavía nadie completó: ¡podés ser la primera!';
+    }
+    if (completado){
+      var med = cumPosCache.posicion === 1 ? '🥇' : cumPosCache.posicion === 2 ? '🥈' : cumPosCache.posicion === 3 ? '🥉' : '🏅';
+      return med + ' Completaste en el puesto #' + cumPosCache.posicion + ' de ' + cumPosCache.total_completos + '.';
+    }
+    return 'Ya completaron ' + cumPosCache.total_completos + (cumPosCache.total_completos === 1 ? ' persona' : ' personas') + ' · ¡todavía estás a tiempo!';
+  }
+  function pintarCumPos(){
+    var html = textoCumPos();
+    document.querySelectorAll('.ht-cump-pos').forEach(function(n){ n.textContent = html; });
+  }
+  function consultarPosicionCumplimiento(){
+    try{
+      if (!window.APPIAuth || !window.APPIAuth.isEnabled || !window.APPIAuth.isEnabled()) return;
+      var cfg = window.APPIAuth.config();
+      var token = window.APPIAuth.accessToken();
+      if (!cfg || !cfg.url || !token) return;
+      fetch(String(cfg.url).replace(/\/$/,'') + '/rest/v1/rpc/appi_mi_posicion_cumplimiento', {
+        method: 'POST',
+        headers: { apikey: cfg.anonKey, Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+        body: '{}'
+      }).then(function(resp){ return resp.json(); }).then(function(data){
+        var row = Array.isArray(data) && data[0] ? data[0] : null;
+        if (row && typeof row.total_completos === 'number'){
+          cumPosCache = row;
+          pintarCumPos();
+        }
+      }).catch(function(){}).then(function(){ cumPosPidiendo = false; });
+    }catch(e){ cumPosPidiendo = false; }
+  }
+  function tarjetaCumplimiento(){
+    try{
+      if (!window.APPIMensajes || !window.APPIMensajes.resumenHoy) return null;
+      var r = window.APPIMensajes.resumenHoy();
+      if (!r || !r.total) return null;      // sin acciones hoy, no hay carrera
+      var completado = r.pendientes === 0;
+      var html = '<p class="ht-frase">' +
+        (completado ? '🎉 ¡Completaste todas tus acciones de hoy!' : '🏁 Hoy hay podio: el primero en completar se lleva la medalla.') +
+        '</p>' +
+        '<div class="ht-chips"><span>✓ ' + r.hechas + ' de ' + r.total + ' hechas</span>' +
+        (r.pendientes ? '<span>quedan ' + r.pendientes + '</span>' : '') +
+        '</div>' +
+        '<div class="ht-cump-pos">' + esc(textoCumPos()) + '</div>';
+      if (!cumPosCache && !cumPosPidiendo){ cumPosPidiendo = true; consultarPosicionCumplimiento(); }
+      return { cat: 'cumplimiento', icono: '🏆', kicker: 'Tu lugar de hoy', titulo: 'Cumplimiento del día', html: html, cta: null };
+    }catch(e){ return null; }
+  }
+
   function armarTarjetas(){
     var lista = [tarjetaEspecial()];
-    [tarjetaJornada(), tarjetaOportunidades(), tarjetaCumples(), tarjetaEquipo(), tarjetaPanel(), tarjetaUsuarios()].forEach(function(t){
+    [tarjetaCumplimiento(), tarjetaJornada(), tarjetaOportunidades(), tarjetaCumples(), tarjetaEquipo(), tarjetaPanel(), tarjetaUsuarios()].forEach(function(t){
       if (t) lista.push(t);
     });
     return lista;
@@ -502,6 +560,8 @@
       '.ht-nota{margin:12px 0 0;color:#8a8b98;font-size:13px;line-height:1.5}',
       '.ht-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}',
       '.ht-chips span{padding:7px 12px;border-radius:999px;background:rgba(91,141,239,.1);color:#3d63c9;font-size:12.5px;font-weight:900}',
+      '.ht-cump-pos{margin-top:12px;padding:11px 13px;border-radius:13px;background:linear-gradient(135deg,rgba(245,179,1,.14),rgba(255,138,80,.1));border:1px solid rgba(245,179,1,.3);color:#8a6100;font-size:13px;font-weight:850;line-height:1.45}',
+      'body.dark .ht-cump-pos{background:linear-gradient(135deg,rgba(245,179,1,.14),rgba(255,138,80,.08));color:#ffd97a}',
       '.ht-cta{margin-top:12px;min-height:52px;border:0;border-radius:15px;background:linear-gradient(135deg,#5b8def,#8b63e8);color:#fff;font:inherit;font-size:15px;font-weight:900;cursor:pointer}',
       /* La tarjeta especial se viste distinta: fondo pleno, frase grande y
          centrada, chips vidriosos y el corazón de marca de agua (v325). */

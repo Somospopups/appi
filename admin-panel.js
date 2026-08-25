@@ -377,23 +377,31 @@ function renderAcciones(){
     acc.sem.total+=row.total||0;acc.sem.hechas+=row.hechas||0;acc.sem.noHechas+=row.no_hechas||0;
     if(String(row.fecha)===hoyISO)acc.hoy={total:row.total||0,hechas:row.hechas||0,noHechas:row.no_hechas||0};
   });
+  const pctDe=c=>c.sem.total?Math.round(c.sem.hechas*100/c.sem.total):0;
   const cuentas=[...porCuenta.values()].sort((a,b)=>String(a.nombre||a.dip).localeCompare(String(b.nombre||b.dip),'es'));
+  // Podio del top 3 por porcentaje semanal: medallas y estrellas (v345).
+  const podio=[...cuentas].filter(c=>c.sem.total>0).sort((a,b)=>pctDe(b)-pctDe(a)).slice(0,3).map(c=>c.dip+'|'+c.persona);
+  const medallaDe=c=>{const i=podio.indexOf(c.dip+'|'+c.persona);return i===0?'🥇':i===1?'🥈':i===2?'🥉':''};
+  const topCls=c=>{const i=podio.indexOf(c.dip+'|'+c.persona);return i===0?'top1':i===1?'top2':i===2?'top3':''};
+  const estrellasDe=c=>{const p=pctDe(c);return p>=95?'★★★':p>=75?'★★':p>=50?'★':''};
   const hoyTot=cuentas.reduce((acc,c)=>{if(c.hoy){acc.h+=c.hoy.hechas;acc.n+=c.hoy.noHechas}return acc},{h:0,n:0});
   if(resumen)resumen.textContent=cuentas.length?`${cuentas.length} cuenta${cuentas.length===1?'':'s'} · hoy ✓ ${hoyTot.h} · ✗ ${hoyTot.n} · tocá para ver el detalle`:'Todavía no hay marcas sincronizadas.';
   const term=String(state.accionesFiltro||'').toLowerCase().trim();
   const visibles=term?cuentas.filter(acc=>`${acc.nombre} ${acc.dip}`.toLowerCase().includes(term)):cuentas;
   if(!visibles.length){list.innerHTML=`<div class="admin-pending-empty">${term?'Ninguna cuenta coincide con la búsqueda.':'Todavía no hay marcas sincronizadas.'}</div>`;return}
   list.innerHTML=visibles.map(acc=>{
-    const pct=acc.sem.total?Math.round(acc.sem.hechas*100/acc.sem.total):0;
+    const pct=pctDe(acc);
     const tono=pct>=80?'alta':(pct>=50?'media':'baja');
+    const medalla=medallaDe(acc),top=topCls(acc),estrellas=estrellasDe(acc);
     const socio=acc.persona==='socio'?'<em class="admin-cump-socio">socio/a</em>':'';
     const hoyChips=acc.hoy
       ? `<span class="admin-cump-hoychips"><i class="ok">✓ ${acc.hoy.hechas}</i><i class="no">✗ ${acc.hoy.noHechas}</i></span>`
       : '<span class="admin-cump-hoyvacio">Hoy · sin marcas</span>';
-    return `<article class="admin-cump-item">
+    return `<article class="admin-cump-item ${top}">
+      ${medalla?`<span class="admin-cump-medalla" aria-hidden="true">${medalla}</span>`:''}
       <div class="admin-cump-cab">
         <span class="admin-cump-ava">${esc(inicialesCump(acc.nombre))}</span>
-        <div class="admin-cump-id"><strong>${esc(acc.nombre||'Sin nombre')}${socio}</strong><small>DIP ${esc(acc.dip||'—')}</small></div>
+        <div class="admin-cump-id"><strong>${esc(acc.nombre||'Sin nombre')}${socio}</strong>${estrellas?`<span class="admin-cump-stars">${estrellas}</span>`:''}<small>DIP ${esc(acc.dip||'—')}</small></div>
         <div class="admin-cump-hoy">${hoyChips}</div>
       </div>
       <div class="admin-cump-sem">
@@ -407,6 +415,7 @@ function renderAcciones(){
     </article>`;
   }).join('');
 }
+
 /* ---------- Ingresos por mes (v300) ---------- */
 async function loadPagos(){
   const body=$('adminIngresosBody');if(!body)return;
