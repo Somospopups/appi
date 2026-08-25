@@ -379,6 +379,24 @@ test('la fila de trabajo va de a uno y avisa cuántos quedan', async ({ page }) 
   await expect(page.locator('.mu-fin')).toContainText('1 acción hecha');
 });
 
+test('la ficha del carrusel muestra domicilio, teléfono, compra y vencimiento', async ({ page }) => {
+  const una = [
+    { id: 1, usuario: 'GOMEZ, ANA MARIA', telf: '3515551001', domicilio: 'San Martín 120', localidad: 'Alta Gracia',
+      producto: 'PSA SENIOR 4', cp: '5186', fCompra: '15/03/2024', fVenceRaw: '30/09/2026', fVence: dias(200), estado: 'vigente',
+      cumpleRaw: `${hoyDDMM()}/1975` }
+  ];
+  await entrar(page, una);
+  await page.locator('[data-mu-hoy="cumple"]').click();
+  const quien = page.locator('.mu-fila-quien');
+  await expect(quien).toContainText('GOMEZ, ANA MARIA');
+  await expect(quien).toContainText('📍 Alta Gracia');
+  await expect(quien).toContainText('🏠 San Martín 120');
+  await expect(quien).toContainText('📞 3515551001');
+  await expect(quien).toContainText('Compra: 15/03/2024');
+  await expect(quien).toContainText('Vence: 30/09/2026');
+  await expect(quien).toContainText('📦 PSA SENIOR 4');
+});
+
 test('el contactado no desaparece: queda marcado ✓ y la franja dura todo el día', async ({ page }) => {
   await entrar(page, PENDIENTES);
   await page.evaluate(() => { window.APPIWhatsApp.abrir = () => {}; });

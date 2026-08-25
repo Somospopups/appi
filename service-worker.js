@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v335-acciones-en-un-renglon';
+const CACHE_NAME = 'appi-v336-ficha-con-datos';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

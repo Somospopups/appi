@@ -599,7 +599,14 @@
     ov.querySelector('#muSub').textContent = quedan === 1 ? 'Queda 1' : 'Quedan ' + quedan;
 
     var html = '<div class="mu-fila-quien"><b>' + esc(u.usuario || '') + '</b>' +
-      '<small>' + esc([u.localidad, u.producto].filter(Boolean).join(' · ')) + '</small></div>';
+      '<div class="mu-fila-datos">' +
+        (u.localidad ? '<span>📍 ' + esc(u.localidad) + '</span>' : '') +
+        (u.domicilio ? '<span>🏠 ' + esc(u.domicilio) + '</span>' : '') +
+        (u.telf ? '<span>📞 ' + esc(u.telf) + '</span>' : '') +
+        (u.fCompra ? '<span>🛒 Compra: ' + esc(u.fCompra) + '</span>' : '') +
+        (u.fVenceRaw ? '<span>📅 Vence: ' + esc(u.fVenceRaw) + '</span>' : '') +
+        (u.producto ? '<span>📦 ' + esc(u.producto) + '</span>' : '') +
+      '</div></div>';
     // Si esta tarea ya tiene marca (se volvió con las flechitas), se muestra
     // y se puede corregir tocando la otra.
     var marcaActual = marcaDe(fila.motivo.id, u);
@@ -748,6 +755,8 @@
       '.mu-fila-quien{margin-top:14px;padding:13px 14px;border-radius:14px;background:rgba(255,255,255,.9);border:1px solid rgba(80,90,130,.1)}',
       '.mu-fila-quien b{display:block;color:#30303d;font-size:14.5px}',
       '.mu-fila-quien small{display:block;margin-top:3px;color:#777887;font-size:11px}',
+      '.mu-fila-datos{display:grid;grid-template-columns:1fr 1fr;gap:5px 12px;margin-top:9px}',
+      '.mu-fila-datos span{color:#5b5f74;font-size:11.5px;line-height:1.4;min-width:0;word-break:break-word}',
       '.mu-fila-pos{color:#777887;font-size:11px;text-align:center;font-weight:700}',
       '.mu-fila-nav{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:12px}',
       '.mu-nav{width:44px;height:44px;border:1px solid rgba(80,90,130,.14);border-radius:50%;background:#fff;',
@@ -767,6 +776,7 @@
       'body.dark .mu-hoy-item{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.1)}',
       'body.dark .mu-fila-quien{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.1)}',
       'body.dark .mu-fila-quien b{color:#f2f2f7}',
+      'body.dark .mu-fila-datos span{color:#b4b6c4}',
       '.mu-volver{margin-top:14px;min-height:40px;padding:9px 14px;border:0;border-radius:12px;background:rgba(91,141,239,.11);',
       'color:#3d63c9;font:inherit;font-size:12px;font-weight:850;cursor:pointer}',
       '.mu-volver:hover{background:rgba(91,141,239,.2)}',
