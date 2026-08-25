@@ -4101,7 +4101,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v349 · Segura</div>
+  <div class="ds-foot">APPI · v350 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4949,6 +4949,7 @@ body.dark #pageTabs button.active{color:#a8c0ff}
         <button type="button" id="usuariosBtnOrdenVence"><span>📅</span>Ordenar</button>
         <button type="button" id="usuariosBtnZonas"><span>📍</span>Zonas</button>
         <button type="button" id="usuariosBtnCambiarArchivo"><span>📂</span>Cambiar archivo</button>
+        <button type="button" id="usuariosBtnDepurados"><span>🧹</span>Depurados</button>
         <!-- Aparece sólo con un filtro puesto. -->
         <button type="button" id="usuariosBtnLimpiar" class="limpiar" hidden><span>🧹</span>Limpiar</button>
       </div>
@@ -11731,7 +11732,7 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='349';
+      const swVersion='350';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 
@@ -14248,6 +14249,7 @@ function renderListU(){
         <button type="button" class="action-btn call" data-u-action="call" data-u-index="${index}" data-appi-call-phone="${escU(window.APPITel?window.APPITel.normalizar(u.telf||''):'')}" data-appi-call-name="${escU(u.usuario||'Contacto')}" data-appi-call-label="1">📲 Llamar en teléfono</button>`:''}
         <button type="button" class="action-btn neighbors" data-u-action="neighbors" data-u-index="${index}">👥 Vecinos</button>
         <button type="button" class="action-btn mail" data-u-action="google" data-u-index="${index}">🧭 ¿Cómo llego?</button>
+        <button type="button" class="action-btn depurar" data-u-action="depurar" data-u-index="${index}">🧹 Depurar</button>
       </div>
     </div>`;
   }).join('');
@@ -14285,6 +14287,21 @@ function renderListU(){
       }else if(action==='google'){
         const query=[u.domicilio,u.localidad].filter(Boolean).join(' ');
         window.open('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(query),'_blank','noopener');
+      }else if(action==='depurar'){
+        if(depuradosEsUsuario(u)){
+          if(window.showToast) showToast('Este contacto ya está depurado', 2000);
+          return;
+        }
+        confirmarAccion({
+          title:'Depurar contacto',
+          sub:'El contacto saldrá de la lista y se ignorará en las futuras cargas.',
+          html:'<p style="margin:0;color:#30303d;font-size:13px"><b>'+escU(u.usuario||'Sin nombre')+'</b> · '+escU(u.telf||'Sin teléfono')+'</p><p style="margin:8px 0 0;color:#777887;font-size:11.5px;line-height:1.5">Queda registrado en la planilla de depurados, lista para descargar y pasársela a la empresa.</p>',
+          okText:'Depurar', cancelText:'Cancelar', danger:true,
+          onConfirm: function(){
+            depurarUsuario(u);
+            if(window.showToast) showToast('Contacto depurado 🧹', 2200);
+          }
+        });
       }
     };
   });
@@ -14299,6 +14316,101 @@ window.fechaDeCeldaU=fechaDeCeldaU;
 // Los botones de barrios y tarjetas viven en otro archivo y necesitan la lista
 // completa, no la filtrada: cada botón muestra su grupo entero.
 window.usuariosTodosActual=function(){ return usuariosU.slice(); };
+/* ---------- Contactos depurados (v350) ----------
+   El distribuidor marca contactos cuyo teléfono no corresponde: salen de la
+   lista y se ignoran en futuras cargas. Quedan en memoria y se descargan como
+   CSV para pasarlos a la empresa. */
+function depuradosKey(){ return 'appi_depurados_v1_' + (window.APPIAuth && window.APPIAuth.userId ? window.APPIAuth.userId() : 'local'); }
+function depuradosLeer(){
+  try{
+    var raw=JSON.parse(localStorage.getItem(depuradosKey())||'{"lista":[]}');
+    return (raw && Array.isArray(raw.lista)) ? raw : { lista: [] };
+  }catch(e){ return { lista: [] }; }
+}
+function depuradosGuardar(d){ try{ localStorage.setItem(depuradosKey(), JSON.stringify(d)); }catch(e){} }
+function telDigitosDep(v){ return String(v==null?'':v).replace(/\D/g,''); }
+function depuradosEsUsuario(u){
+  var tel=telDigitosDep(u && u.telf);
+  return depuradosLeer().lista.some(function(d){
+    return !!(tel && d.telDig && d.telDig === tel);
+  });
+}
+function depuradosContar(){ return depuradosLeer().lista.length; }
+function depuradosAplicar(lista){ return (lista||[]).filter(function(u){ return !depuradosEsUsuario(u); }); }
+function depuradosGuardarUsuarios(){
+  try{ localStorage.setItem('usuarios_garantias', JSON.stringify(usuariosU.map(u=>({...u, fVence:u.fVence?u.fVence.toISOString():null})))); }catch(e){}
+}
+function actualizarBadgeDepurados(){
+  var b=document.getElementById('usuariosBtnDepurados');
+  if(!b) return;
+  var n=depuradosContar();
+  b.innerHTML='<span>🧹</span>Depurados'+(n?' · '+n:'');
+}
+function depurarUsuario(u){
+  var d=depuradosLeer();
+  d.lista.unshift({
+    id: Date.now()+'-'+Math.random().toString(36).slice(2,8),
+    nombre: String((u&&u.usuario)||''), telefono: String((u&&u.telf)||''),
+    telDig: telDigitosDep(u&&u.telf),
+    domicilio: String((u&&u.domicilio)||''), localidad: String((u&&u.localidad)||''),
+    producto: String((u&&u.producto)||''), dip: String((u&&u.dip)||''),
+    motivo: 'Teléfono no corresponde', fecha: new Date().toISOString()
+  });
+  depuradosGuardar(d);
+  usuariosU=usuariosU.filter(function(x){ return !depuradosEsUsuario(x); });
+  depuradosGuardarUsuarios();
+  aplicarFiltrosU();
+  actualizarBadgeDepurados();
+}
+function depuradosDeshacer(id){
+  var d=depuradosLeer();
+  d.lista=d.lista.filter(function(x){ return x.id!==id; });
+  depuradosGuardar(d);
+  abrirPanelDepurados();
+  actualizarBadgeDepurados();
+}
+function depuradosDescargarCsv(){
+  var lista=depuradosLeer().lista;
+  if(!lista.length){ if(window.showToast) showToast('No hay contactos depurados', 2000); return; }
+  var head=['Nombre','Teléfono','Dirección','Localidad','Producto','DIP','Motivo','Fecha'];
+  var filas=lista.map(function(d){ return [d.nombre,d.telefono,d.domicilio,d.localidad,d.producto,d.dip,d.motivo,String(d.fecha||'').slice(0,10)]; });
+  var csv='\ufeff'+[head].concat(filas).map(function(r){ return r.map(function(c){ return '"'+String(c==null?'':c).replace(/"/g,'""')+'"'; }).join(';'); }).join('\r\n');
+  var blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=url; a.download='appi-depurados-'+new Date().toISOString().slice(0,10)+'.csv';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(url); },1000);
+  if(window.showToast) showToast('Planilla descargada ✓', 2200);
+}
+function abrirPanelDepurados(){
+  var lista=depuradosLeer().lista;
+  var html;
+  if(!lista.length){
+    html='<p style="color:#777887;font-size:13px;text-align:center;padding:10px 0;line-height:1.5">Todavía no depuraste ningún contacto.<br>Usá el botón 🧹 de cada ficha cuando un teléfono no corresponda.</p>';
+  }else{
+    html='<style>.depurado-item{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:11px 12px;border:1px solid rgba(80,90,130,.1);border-radius:13px;background:rgba(255,255,255,.7);margin-bottom:8px}.depurado-item b{display:block;color:#30303d;font-size:12.5px}.depurado-item small{display:block;margin-top:3px;color:#777887;font-size:10.5px;line-height:1.4}.depurado-undo{flex:0 0 auto;border:0;border-radius:9px;padding:6px 9px;background:rgba(91,141,239,.12);color:#3d63c9;font:inherit;font-size:10.5px;font-weight:850;cursor:pointer}body.dark .depurado-item{background:rgba(31,32,49,.7);border-color:rgba(255,255,255,.08)}body.dark .depurado-item b{color:#f1f1f6}</style>';
+    html+=lista.map(function(x){
+      return '<div class="depurado-item"><div><b>'+escU(x.nombre||'Sin nombre')+'</b>'+
+        '<small>'+escU(x.telefono||'Sin teléfono')+(x.dip?' · DIP '+escU(x.dip):'')+(x.localidad?' · '+escU(x.localidad):'')+'</small>'+
+        '<small>'+escU(x.motivo||'')+' · '+String(x.fecha||'').slice(0,10)+'</small></div>'+
+        '<button type="button" class="depurado-undo" data-depurado-undo="'+escU(x.id)+'">↩️ Deshacer</button></div>';
+    }).join('');
+    html+='<button type="button" class="btn btn-primary" id="depuradosDescargar" style="width:100%;margin-top:10px">⬇️ Descargar planilla ('+lista.length+')</button>';
+  }
+  modal.open({
+    icon:'🧹', iconBg:'linear-gradient(135deg,#e02424,#ff6b6b)',
+    title:'Contactos depurados',
+    sub: lista.length + (lista.length===1?' contacto':' contactos') + ' · se ignoran en futuras cargas',
+    html: html,
+    okText:'Cerrar'
+  });
+  var dl=document.getElementById('depuradosDescargar');
+  if(dl) dl.onclick=depuradosDescargarCsv;
+  document.querySelectorAll('[data-depurado-undo]').forEach(function(b){
+    b.onclick=function(){ depuradosDeshacer(b.getAttribute('data-depurado-undo')); };
+  });
+}
 function cargarArchivoU(file){
   const infoEl=document.getElementById('usuariosFileInfo');
   const dbgEl=document.getElementById('usuariosDebug');
@@ -14362,7 +14474,9 @@ function cargarArchivoU(file){
           if(dbgEl) dbgEl.style.display='block';
           return;
         }
-        usuariosU=parsed;
+        usuariosU=depuradosAplicar(parsed);
+        const depuradosIgnorados=parsed.length-usuariosU.length;
+        if(depuradosIgnorados>0 && infoEl) infoEl.innerHTML=`✅ <b>${usuariosU.length}</b> usuarios cargados · 🧹 ${depuradosIgnorados} depurado${depuradosIgnorados===1?'':'s'} ignorado${depuradosIgnorados===1?'':'s'}`;
         try{ 
           localStorage.setItem('usuarios_garantias', JSON.stringify(usuariosU.map(u=>({...u, fVence:u.fVence?u.fVence.toISOString():null}))));
           console.log('💾 Guardado en localStorage', usuariosU.length);
@@ -14567,6 +14681,11 @@ function initUsuarios(){
   const btnVerTodos=document.getElementById('usuariosBtnVerTodos');
   if(btnVerTodos) btnVerTodos.onclick=()=>{ resetFiltrosU(); };
 
+  // Contactos depurados (v350): se ignoran en futuras cargas y se descargan.
+  const btnDepurados=document.getElementById('usuariosBtnDepurados');
+  if(btnDepurados) btnDepurados.onclick=()=>{ abrirPanelDepurados(); };
+  actualizarBadgeDepurados();
+
   // El botón Zonas despliega los barrios de la planilla en un popup.
   const btnZonas=document.getElementById('usuariosBtnZonas');
   if(btnZonas) btnZonas.onclick=()=>{
@@ -14577,7 +14696,7 @@ function initUsuarios(){
   try{
     const saved=JSON.parse(localStorage.getItem('usuarios_garantias')||'[]');
     if(saved.length>0){
-      usuariosU=saved.map(u=>({...u, fVence:u.fVence? new Date(u.fVence):null, estado:u.fVence? ( (new Date(u.fVence)-new Date())/(1000*60*60*24)<0?'vencida': ( (new Date(u.fVence)-new Date())/(1000*60*60*24)<=30?'porVencer':'vigente')):'vigente'}));
+      usuariosU=depuradosAplicar(saved.map(u=>({...u, fVence:u.fVence? new Date(u.fVence):null, estado:u.fVence? ( (new Date(u.fVence)-new Date())/(1000*60*60*24)<0?'vencida': ( (new Date(u.fVence)-new Date())/(1000*60*60*24)<=30?'porVencer':'vigente')):'vigente'})));
       mostrarDashboardU();
       const info=document.getElementById('usuariosFileInfo');
       if(info){ info.style.display='block'; info.innerHTML=`💾 ${usuariosU.length} usuarios recuperados de memoria`; }

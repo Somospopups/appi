@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v349-medalla-sin-puesto';
+const CACHE_NAME = 'appi-v350-contactos-depurados';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

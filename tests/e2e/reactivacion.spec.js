@@ -104,8 +104,8 @@ test('el botón Dormidos aparece sólo si hay dormidos', async ({ page }) => {
 test('sin dormidos la barra queda como estaba', async ({ page }) => {
   await entrar(page, [LISTA[0], LISTA[1]]);   // sólo vigente y vencido reciente
   await expect(page.locator('#usuariosBtnDormidos')).toHaveCount(0);
-  // Cuatro de base (Mapa se quitó en v332).
-  await expect(page.locator('.u-tools button:visible')).toHaveCount(4);
+  // Cinco de base (Mapa se quitó en v332; Depurados se sumó en v350).
+  await expect(page.locator('.u-tools button:visible')).toHaveCount(5);
 });
 
 test('se ven los dormidos separados en olas por antigüedad', async ({ page }) => {
