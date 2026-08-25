@@ -113,7 +113,7 @@ window.openStock=function(){
 <script src="./gestion-client.js"></script>
 <script src="./tarjetas-promos.js"></script>
 <script src="./usuarios-botones.js"></script>
-<script src="./mensajes-usuarios.js"></script>
+<script src="./mensajes-usuarios.js?v=354"></script>
 <script src="./reactivacion.js"></script>
 
 <script src="./escalera-suenos.js"></script>
@@ -11732,17 +11732,16 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='352';
+      const swVersion='354';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 
-      // Si el splash arrancó bajo un Service Worker viejo, recargar una sola vez
-      // apenas v256 toma el control. Así no queda visible la animación anterior.
+      // Un SW nuevo tiene que recargar la pestaña: si no, el usuario sigue
+      // viendo index.html y JS viejos de la caché anterior.
       navigator.serviceWorker.addEventListener('controllerchange', () => {
-        const boot=document.getElementById('bootScreen');
         const reloadKey='appi-sw-reloaded-'+swVersion;
-        if(!hadController || reloadingForUpdate || !boot || boot.classList.contains('gone'))return;
-        if(sessionStorage.getItem(reloadKey))return;
+        if(!hadController || reloadingForUpdate) return;
+        if(sessionStorage.getItem(reloadKey)) return;
         reloadingForUpdate=true;
         sessionStorage.setItem(reloadKey,'1');
         window.location.reload();
