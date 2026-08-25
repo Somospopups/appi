@@ -238,16 +238,40 @@
     var sel;
     try{
       sel = await picker.select(['name', 'tel'], { multiple: true });
-    }catch(e){
-      return; // canceló el usuario
+    }catch(error){
+      // Cancelar el selector es lo más normal del mundo: no se molesta a nadie.
+      if (error && /Abort/i.test(String(error.name || ''))) return;
+      // Si Android no dejó abrir la agenda, se explica cómo salir en criollo
+      // (v358: antes fallaba en silencio y parecía que el botón no hacía nada).
+      var que = String(error && error.name || '') + ' ' + String(error && error.message || '');
+      if (/NotAllowed|Security|Permission|NotEnabled/i.test(que)){
+        await window.APPIDialog.alert(
+          'Android no dejó abrir tu agenda desde acá. Casi siempre es el permiso de contactos bloqueado:\n\n' +
+          '1. Si estás en Chrome: tocá los tres puntitos ⋮ (o el candado 🔒) → Permisos → activá Contactos para APPI y volvé a probar.\n' +
+          '2. Si APPI está instalada como app: andá a Ajustes del teléfono → Apps → APPI (o Chrome) → Permisos → Contactos → Permitir.\n\n' +
+          'Si sigue sin dejar, usá "Subir agenda (.vcf)": funciona igual en cualquier teléfono.',
+          { title: 'Falta el permiso', icon: '🔐' }
+        );
+      } else {
+        await window.APPIDialog.alert(
+          'No pudimos abrir la agenda del teléfono (' + String(error && error.name || 'error desconocido') + ').\n\n' +
+          'Probá de nuevo en un rato, o usá "Subir agenda (.vcf)": funciona en cualquier teléfono y trae todos los contactos de una.',
+          { title: 'No se pudo abrir', icon: '📱' }
+        );
+      }
+      return;
     }
     var lista = (Array.isArray(sel) ? sel : []).map(function(c){
       var nombre = Array.isArray(c.name) && c.name.length ? c.name[0] : (c.name || '');
       var tels = Array.isArray(c.tel) ? c.tel : (c.tel ? [c.tel] : []);
       return { nombre: nombre, telefono: mejorTelefono(tels) };
     });
-    var res = await importarLista(lista, 'telefono');
-    resumenDeImportacion(res);
+    if (lista.length){
+      var res = await importarLista(lista, 'telefono');
+      resumenDeImportacion(res);
+    } else {
+      await window.APPIDialog.alert('No elegiste ningún contacto. Tocá de nuevo "Elegir del teléfono" y marcá los que quieras pasar.', { title: 'Nadie elegido', icon: '👆' });
+    }
   }
 
   // De todos los números del contacto queda el mejor: primero el celular,

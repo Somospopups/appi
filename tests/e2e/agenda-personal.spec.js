@@ -249,3 +249,50 @@ test('quitar un contacto de la agenda personal pide confirmación y lo saca de l
   await expect(page.locator('.ap-item')).toHaveCount(2);
   await expect(page.locator('.ap-item').filter({ hasText: 'María Gómez' })).toHaveCount(0);
 });
+
+// El selector nativo (Android) mockeado: la API no existe en Chromium de
+// escritorio, así que se inyecta para probar los tres caminos reales.
+async function abrirConPicker(page, contactoMock) {
+  await page.addInitScript(mock => {
+    Object.defineProperty(navigator, 'contacts', {
+      configurable: true,
+      value: { select: async () => {
+        if (mock === 'permiso') { const e = new Error('Permission denied'); e.name = 'NotAllowedError'; throw e; }
+        if (mock === 'cancela') { const e = new Error('The user cancelled'); e.name = 'AbortError'; throw e; }
+        return mock;
+      } }
+    });
+  }, contactoMock);
+  return abrirAgendaPersonal(page);
+}
+
+test('con selector nativo (Android): elegir del teléfono importa los contactos', async ({ page }) => {
+  await abrirConPicker(page, [
+    { name: ['Juan Picker'], tel: ['3515557777'] },
+    { name: ['Ana Picker'], tel: ['+54 9 351 555 8888', '0351 422 9999'] }
+  ]);
+  await expect(page.locator('#apElegirTel')).toBeVisible();
+  await page.locator('#apElegirTel').click();
+  await expect(page.locator('.ap-item')).toHaveCount(2);
+  await expect(page.locator('.ap-item').filter({ hasText: 'Juan Picker' })).toContainText('3515557777');
+  // Del doble número de Ana queda el celular (15/móvil), no el fijo.
+  await expect(page.locator('.ap-item').filter({ hasText: 'Ana Picker' })).toContainText('351 555 8888');
+});
+
+test('si Android bloquea el permiso, se explica cómo habilitarlo (v358)', async ({ page }) => {
+  await abrirConPicker(page, 'permiso');
+  await page.locator('#apElegirTel').click();
+  await expect(page.locator('#appiDialogTitle')).toContainText('Falta el permiso');
+  await expect(page.locator('#appiDialogMessage')).toContainText('Permisos');
+  await expect(page.locator('#appiDialogMessage')).toContainText('.vcf');
+  await page.locator('#appiDialogOk').click();
+  await expect(page.locator('.ap-item')).toHaveCount(0);
+});
+
+test('cancelar el selector no molesta con ningún cartel', async ({ page }) => {
+  await abrirConPicker(page, 'cancela');
+  await page.locator('#apElegirTel').click();
+  await page.waitForTimeout(250);
+  await expect(page.locator('.appi-dialog-overlay')).toBeHidden();
+  await expect(page.locator('.ap-item')).toHaveCount(0);
+});
