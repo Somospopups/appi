@@ -400,13 +400,47 @@ test('la ficha del carrusel muestra domicilio, teléfono, compra y vencimiento',
   await expect(cols.nth(1)).toContainText('Compra: 15/03/2024');
   await expect(cols.nth(1)).toContainText('Vence: 30/09/2026');
 
-  // El vencimiento va en rojo y negrita.
+  // El vencimiento va en negrita y se pinta según el estado: vigente → verde.
   const vence = quien.locator('.mu-vence');
   await expect(vence).toContainText('Vence: 30/09/2026');
+  await expect(vence).toHaveClass(/mu-vigente/);
   const color = await vence.evaluate(el => getComputedStyle(el).color);
-  expect(color).toBe('rgb(217, 83, 79)'); // #d9534f
+  expect(color).toBe('rgb(22, 135, 101)'); // #168765 vigente
   const peso = await vence.evaluate(el => getComputedStyle(el).fontWeight);
   expect(Number(peso)).toBeGreaterThanOrEqual(700);
+});
+
+test('el vencimiento se pinta en ámbar cuando está por vencer', async ({ page }) => {
+  const porVencer = [
+    { id: 2, usuario: 'POR VENCER, BETO', telf: '3515551002', domicilio: 'Calle 2 200', localidad: 'Centro',
+      producto: 'PSA VERO', cp: '5000', fCompra: ddmmyyyy(-10), fVenceRaw: ddmmyyyy(10), fVence: dias(10), estado: 'porVencer' }
+  ];
+  await entrar(page, porVencer);
+  await page.locator('[data-mu-hoy="porvencer"]').click();
+  const vence = page.locator('.mu-vence');
+  await expect(vence).toHaveClass(/mu-porvencer/);
+  const color = await vence.evaluate(el => getComputedStyle(el).color);
+  expect(color).toBe('rgb(163, 103, 11)'); // #a3670b por vencer
+  const peso = await vence.evaluate(el => getComputedStyle(el).fontWeight);
+  expect(Number(peso)).toBeGreaterThanOrEqual(700);
+});
+
+test('la regla roja de vencida existe en los estilos', async ({ page }) => {
+  // Los vencidos no entran al carrusel (van a Reactivación), así que el rojo
+  // se cuida por la regla de estilo: si desaparece, el test avisa.
+  const porVencer = [
+    { id: 2, usuario: 'POR VENCER, BETO', telf: '3515551002', domicilio: 'Calle 2 200', localidad: 'Centro',
+      producto: 'PSA VERO', cp: '5000', fCompra: ddmmyyyy(-10), fVenceRaw: ddmmyyyy(10), fVence: dias(10), estado: 'porVencer' }
+  ];
+  await entrar(page, porVencer);
+  await page.locator('[data-mu-hoy="porvencer"]').click();
+  const css = await page.evaluate(() => {
+    const st = document.getElementById('muEstilos');
+    return st ? st.textContent : '';
+  });
+  expect(css).toContain('.mu-col .mu-vence.mu-vencida{color:#d9534f}');
+  expect(css).toContain('.mu-col .mu-vence.mu-vigente{color:#168765}');
+  expect(css).toContain('.mu-col .mu-vence.mu-porvencer{color:#a3670b}');
 });
 
 test('el contactado no desaparece: queda marcado ✓ y la franja dura todo el día', async ({ page }) => {

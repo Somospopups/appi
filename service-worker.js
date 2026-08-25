@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v337-ficha-en-dos-columnas';
+const CACHE_NAME = 'appi-v338-vencimiento-por-estado';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

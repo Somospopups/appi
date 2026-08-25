@@ -598,6 +598,7 @@
     ov.querySelector('#muTitulo').textContent = p.icono + ' ' + p.nombre;
     ov.querySelector('#muSub').textContent = quedan === 1 ? 'Queda 1' : 'Quedan ' + quedan;
 
+    var estadoClase = u.estado === 'vencida' ? 'mu-vencida' : (u.estado === 'porVencer' ? 'mu-porvencer' : 'mu-vigente');
     var html = '<div class="mu-fila-quien"><b>' + esc(u.usuario || '') + '</b>' +
       '<div class="mu-fila-datos">' +
         '<div class="mu-col">' +
@@ -608,7 +609,7 @@
         '<div class="mu-col">' +
           (u.producto ? '<span>📦 ' + esc(u.producto) + '</span>' : '') +
           (u.fCompra ? '<span>🛒 Compra: ' + esc(u.fCompra) + '</span>' : '') +
-          (u.fVenceRaw ? '<span class="mu-vence">📅 Vence: ' + esc(u.fVenceRaw) + '</span>' : '') +
+          (u.fVenceRaw ? '<span class="mu-vence ' + estadoClase + '">📅 Vence: ' + esc(u.fVenceRaw) + '</span>' : '') +
         '</div>' +
       '</div></div>';
     // Si esta tarea ya tiene marca (se volvió con las flechitas), se muestra
@@ -762,7 +763,10 @@
       '.mu-fila-datos{display:grid;grid-template-columns:1fr 1fr;gap:5px 14px;margin-top:9px}',
       '.mu-col{display:grid;gap:5px;align-content:start;min-width:0}',
       '.mu-col span{color:#5b5f74;font-size:11.5px;line-height:1.4;min-width:0;word-break:break-word}',
-      '.mu-col .mu-vence{color:#d9534f;font-weight:800}',
+      '.mu-col .mu-vence{font-weight:800}',
+      '.mu-col .mu-vence.mu-vencida{color:#d9534f}',
+      '.mu-col .mu-vence.mu-porvencer{color:#a3670b}',
+      '.mu-col .mu-vence.mu-vigente{color:#168765}',
       '.mu-fila-pos{color:#777887;font-size:11px;text-align:center;font-weight:700}',
       '.mu-fila-nav{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:12px}',
       '.mu-nav{width:44px;height:44px;border:1px solid rgba(80,90,130,.14);border-radius:50%;background:#fff;',
@@ -783,7 +787,9 @@
       'body.dark .mu-fila-quien{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.1)}',
       'body.dark .mu-fila-quien b{color:#f2f2f7}',
       'body.dark .mu-fila-datos span{color:#b4b6c4}',
-      'body.dark .mu-col .mu-vence{color:#ff7a76}',
+      'body.dark .mu-col .mu-vence.mu-vencida{color:#ff7a76}',
+      'body.dark .mu-col .mu-vence.mu-porvencer{color:#e0b23c}',
+      'body.dark .mu-col .mu-vence.mu-vigente{color:#3ad0a4}',
       '.mu-volver{margin-top:14px;min-height:40px;padding:9px 14px;border:0;border-radius:12px;background:rgba(91,141,239,.11);',
       'color:#3d63c9;font:inherit;font-size:12px;font-weight:850;cursor:pointer}',
       '.mu-volver:hover{background:rgba(91,141,239,.2)}',
