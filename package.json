@@ -1,6 +1,6 @@
 {
   "name": "appi",
-  "version": "352.0.0",
+  "version": "353.0.0",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {
@@ -9,6 +9,6 @@
     "test:e2e:headed": "playwright test --headed"
   },
   "devDependencies": {
-    "@playwright/test": "1.62.1"
+    "@playwright/test": "^1.62.1"
   }
 }

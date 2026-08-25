@@ -751,13 +751,18 @@
                    (noHechas ? '<i class="no">✗' + noHechas + '</i>' : '') + '</span>';
       if (sinMarca){
         html += '<button type="button" class="mu-hoy-item" data-mu-hoy="' + esc(g.motivo.id) + '">' +
-          '<span class="mu-hoy-n">' + g.motivo.icono + ' ' + sinMarca + '</span>' +
-          '<span class="mu-hoy-txt"><span>' + esc(sinMarca === 1 ? g.motivo.uno : g.motivo.varios) + '</span>' + fechaHTML + '</span>' +
+          '<span class="mu-hoy-n">' + g.motivo.icono + '</span>' +
+          '<span class="mu-hoy-txt"><span style="display:flex;justify-content:space-between;align-items:center;font-weight:700">' +
+            '<span>' + esc(g.motivo.nombre || '') + '</span>' +
+          '</span>' + fechaHTML + '</span>' +
           estado + '<span class="mu-hoy-go">›</span></button>';
       } else {
         html += '<div class="mu-hoy-item done">' +
-          '<span class="mu-hoy-n">' + g.motivo.icono + ' ' + g.gente.length + '</span>' +
-          '<span class="mu-hoy-txt"><span>' + esc(g.gente.length === 1 ? g.motivo.uno : g.motivo.varios) + ' · completado</span>' + fechaHTML + '</span>' +
+          '<span class="mu-hoy-n">' + g.motivo.icono + '</span>' +
+          '<span class="mu-hoy-txt"><span style="display:flex;justify-content:space-between;align-items:center;font-weight:700">' +
+            '<span>' + esc(g.motivo.nombre || '') + ' · completado</span>' +
+            '<span>' + g.gente.length + '</span>' +
+          '</span>' + fechaHTML + '</span>' +
           estado + '<span class="mu-hoy-go">✓</span></div>';
       }
     });
@@ -822,7 +827,7 @@
     var quedan = fila.gente.length - fila.i;
 
     ov.querySelector('#muTitulo').textContent = p.icono + ' ' + p.nombre;
-    ov.querySelector('#muSub').textContent = quedan === 1 ? 'Queda 1' : 'Quedan ' + quedan;
+    ov.querySelector('#muSub').textContent = '';
 
     var estadoClase = u.estado === 'vencida' ? 'mu-vencida' : (u.estado === 'porVencer' ? 'mu-porvencer' : 'mu-vigente');
     var fechaAccion = textoFechaAccion(fila.motivo.id, u);
@@ -837,8 +842,8 @@
           (u.producto ? '<span>📦 ' + esc(u.producto) + '</span>' : '') +
           (u.fCompra ? '<span>🛒 Compra: ' + esc(u.fCompra) + '</span>' : '') +
           (u.fVenceRaw ? '<span class="mu-vence ' + estadoClase + '">📅 Vence: ' + esc(u.fVenceRaw) + '</span>' : '') +
-          ((fila.motivo.id === 'retro' || fila.motivo.id === 'cumple') && fechaAccion ? '<span class="mu-accion-fecha">📅 ' + esc(fechaAccion) + '</span>' : '') +
         '</div>' +
+        ((fechaAccion) ? '<span class="mu-accion-fecha">📅 ' + esc(fechaAccion) + '</span>' : '') +
       '</div></div>';
     // Si esta tarea ya tiene marca (se volvió con las flechitas), se muestra
     // y se puede corregir tocando la otra.
@@ -848,15 +853,18 @@
         (marcaActual.e === 'hecha' ? '✓ Marcada como hecha' : '✗ Marcada como no hecha') +
         ' · si te confundiste, tocá la otra</div>';
     }
-    html += '<div class="mu-prev"><b>Así lo va a recibir</b><span id="muPrevTxt">' + esc(texto) + '</span></div>';
-    // Con el 🔁 se elige el mensaje correcto según el equipo del cliente (v342).
-    html += '<button type="button" class="mu-sec" id="muCambiarMensaje" style="margin-top:8px">🔁 Cambiar mensaje</button>';
+    html += '<div class="mu-prev" style="position:relative;"><b>Así lo va a recibir</b><span id="muPrevTxt">' + esc(texto) + '</span>' +
+      '<div style="position:absolute;bottom:8px;right:8px;display:flex;gap:8px;">' +
+        '<button type="button" class="mu-prev-btn" id="muEditarMsg" title="Editar mensaje" style="border-radius:50%;width:36px;height:36px;font-size:14px;border:1px solid rgba(58,208,164,.22);background:rgba(255,255,255,.9);cursor:pointer;">✏️</button>' +
+        '<button type="button" class="mu-prev-btn" id="muBibliotecaMsg" title="Biblioteca de mensajes" style="border-radius:50%;width:36px;height:36px;font-size:14px;border:1px solid rgba(91,141,239,.22);background:rgba(255,255,255,.9);cursor:pointer;">💬</button>' +
+      '</div></div>';
     html += '<div class="mu-acciones">';
     html += '<button type="button" class="mu-enviar" id="muFilaEnviar">💬 Mandar a ' + esc(nombre) + '</button>';
     // Cada acción se marca sí o sí: ✓ la hice (aunque sea por otro medio) o
     // ✗ no se hizo. No hay forma de pasar de largo sin dejar constancia.
-    html += '<div class="mu-marcar">' +
+    html += '<div class="mu-marcar" style="grid-template-columns:1fr 44px 1fr;">' +
       '<button type="button" class="mu-marca ok" id="muFilaHecha"><i>✓</i>Ya lo hice</button>' +
+      '<button type="button" class="mu-marca dep" id="muFilaDepurar" title="Depurar contacto" style="border-radius:50%;width:44px;height:44px;padding:0;flex-shrink:0;">🧹</button>' +
       '<button type="button" class="mu-marca no" id="muFilaNoHecha"><i>✗</i>No se hizo</button></div>';
     html += '<div class="mu-marcar-ayuda">' +
       '<span><i class="ok">✓</i> Tocá el verde si ya hiciste esta acción, aunque haya sido por llamada o en persona.</span>' +
@@ -881,11 +889,42 @@
     };
     var cambiar = cuerpo.querySelector('#muCambiarMensaje');
     if (cambiar) cambiar.onclick = function(){ pintarSelectorMensaje(u); };
+    var editarMsg = cuerpo.querySelector('#muEditarMsg');
+    if (editarMsg) editarMsg.onclick = function(){ verPlantilla(fila.motivo.plantilla, u, true); };
+    var bibliotecaMsg = cuerpo.querySelector('#muBibliotecaMsg');
+    if (bibliotecaMsg) bibliotecaMsg.onclick = function(){
+      var c = overlay().querySelector('#muCuerpo');
+      c.innerHTML = '';
+      overlay().querySelector('#muTitulo').textContent = '💬 Biblioteca de mensajes';
+      overlay().querySelector('#muSub').textContent = 'Generales, propios, mantenimiento e instalación';
+      pintarListaEdicion(c, plantillas(), u);
+    };
     cuerpo.querySelector('#muFilaHecha').onclick = function(){
       marcarAccion(fila.motivo.id, u, 'hecha');
       fila.textoActual = null;
       fila.i++;
       pintarFila();
+    };
+    cuerpo.querySelector('#muFilaDepurar').onclick = function(){
+      if (typeof window.confirmarAccion === 'function'){
+        window.confirmarAccion({
+          title: 'Depurar contacto',
+          sub: 'El contacto saldrá de la lista y se ignorará en las futuras cargas.',
+          html: '<p style="margin:0;color:#30303d;font-size:13px"><b>'+esc(u.usuario||'Sin nombre')+'</b> · '+esc(u.telf||'Sin teléfono')+'</p><p style="margin:8px 0 0;color:#777887;font-size:11.5px;line-height:1.5">Motivo: Teléfono no corresponde. Queda registrado en la planilla de depurados, lista para descargar y pasársela a la empresa.</p>',
+          okText: 'Depurar', cancelText: 'Cancelar', danger: true,
+          onConfirm: function(){
+            if (typeof window.depurarUsuario === 'function') window.depurarUsuario(u);
+            fila.textoActual = null;
+            fila.i++;
+            pintarFila();
+          }
+        });
+      } else {
+        if (typeof window.depurarUsuario === 'function') window.depurarUsuario(u);
+        fila.textoActual = null;
+        fila.i++;
+        pintarFila();
+      }
     };
     cuerpo.querySelector('#muFilaNoHecha').onclick = function(){
       marcarAccion(fila.motivo.id, u, 'no_hecha');
@@ -1315,6 +1354,10 @@
     cuerpo.querySelector('#muGuardar').onclick = function(){
       var inIco = cuerpo.querySelector('#muIcono');
       var inNom = cuerpo.querySelector('#muNombre');
+      var guardarTodos = true;
+      if (typeof window.confirm === 'function'){
+        guardarTodos = window.confirm('¿Guardar para todos los clientes?\n\n• OK = Todos los clientes (conserva {nombre}, {vence}, etc.)\n• Cancelar = Sólo esta persona');
+      }
       if (p.propio){
         var nombre = inNom ? inNom.value.trim() : '';
         if (!nombre){
@@ -1326,10 +1369,22 @@
           if (typeof window.showToast === 'function') window.showToast('Escribí el texto del mensaje');
           return;
         }
-        guardarPropia(id, { icono: inIco ? inIco.value : p.icono, nombre: nombre, texto: ta.value });
+        if (guardarTodos){
+          guardarPropia(id, { icono: inIco ? inIco.value : p.icono, nombre: nombre, texto: ta.value });
+        } else {
+          crearPropia(inIco ? inIco.value : p.icono, nombre || p.nombre, ta.value);
+        }
         if (typeof window.showToast === 'function') window.showToast('Guardado ✓');
       } else {
-        guardarTexto(id, ta.value);
+        if (guardarTodos){
+          guardarTexto(id, ta.value);
+        } else {
+          var data = leerGuardado();
+          if (!data.personales) data.personales = {};
+          var clavePersonal = id + ':' + (telefonoDe(u) || 'sin-tel');
+          data.personales[clavePersonal] = ta.value;
+          guardar(data);
+        }
         if (typeof window.showToast === 'function') window.showToast('Guardado ✓');
       }
       volver();
