@@ -1,6 +1,6 @@
 {
   "name": "appi",
-  "version": "333.0.0",
+  "version": "334.0.0",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

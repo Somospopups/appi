@@ -599,11 +599,11 @@ test('las acciones de la ficha van en tres grupos separados', async ({ page }) =
   // 2) cómo se lo contacta
   await expect(grupos.nth(1)).toContainText('WhatsApp');
   await expect(grupos.nth(1).locator('[data-u-action="call"]')).toBeVisible();
-  // 3) cómo se llega hasta él: sólo ¿Cómo llego? (el mapa y Vecinos se
-  // eliminaron en v333).
+  // 3) cómo se llega hasta él: Vecinos (listado) y ¿Cómo llego? (el mapa se
+  // eliminó en v333).
+  await expect(grupos.nth(2)).toContainText('Vecinos');
   await expect(grupos.nth(2)).toContainText('¿Cómo llego?');
   await expect(grupos.nth(2)).not.toContainText('Mapa');
-  await expect(grupos.nth(2)).not.toContainText('Vecinos');
   // El viejo "Google" ya no se nombra.
   await expect(ficha).not.toContainText('🗺️ Google');
 });

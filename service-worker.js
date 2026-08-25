@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v333-sin-mapa';
+const CACHE_NAME = 'appi-v334-vecinos-lista';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

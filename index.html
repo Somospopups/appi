@@ -4101,7 +4101,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v333 · Segura</div>
+  <div class="ds-foot">APPI · v334 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -11699,7 +11699,7 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='333';
+      const swVersion='334';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 
@@ -14189,6 +14189,7 @@ function renderListU(){
         <button type="button" class="action-btn call" data-u-action="call" data-u-index="${index}" data-appi-call-phone="${escU(window.APPITel?window.APPITel.normalizar(u.telf||''):'')}" data-appi-call-name="${escU(u.usuario||'Contacto')}" data-appi-call-label="1">📲 Llamar en teléfono</button>
       </div>`:''}
       <div class="u-grupo u-acciones">
+        <button type="button" class="action-btn neighbors" data-u-action="neighbors" data-u-index="${index}">👥 Vecinos</button>
         <button type="button" class="action-btn mail" data-u-action="google" data-u-index="${index}">🧭 ¿Cómo llego?</button>
       </div>
     </div>`;
@@ -14212,7 +14213,13 @@ function renderListU(){
       const u=filtradosU[Number(button.dataset.uIndex)];
       if(!u) return;
       const action=button.dataset.uAction;
-      if(action==='whatsapp'){
+      if(action==='neighbors'){
+        if(window.APPIUsuariosBotones&&window.APPIUsuariosBotones.abrirVecinos){
+          window.APPIUsuariosBotones.abrirVecinos(u.localidad||'', u.id);
+        }else{
+          window.APPIDialog.alert('El listado de vecinos todavía no está disponible.',{title:'Vecinos',icon:'👥'});
+        }
+      }else if(action==='whatsapp'){
         const link=getWhatsAppLinkU(u);
         if(link) window.open(link,'_blank','noopener'); else window.APPIDialog.alert('Este usuario no tiene un teléfono válido cargado.',{title:'Sin teléfono',icon:'📵'});
       }else if(action==='call'){

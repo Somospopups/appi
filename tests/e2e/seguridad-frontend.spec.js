@@ -53,7 +53,6 @@ test('el mapa y Leaflet quedaron eliminados de la app (v333)', () => {
   expect(html).not.toContain('usuariosMap');
   expect(html).not.toContain('verVecinosU');
   expect(html).not.toContain('marker-icon');
-  expect(html).not.toContain('Vecinos');
   expect(sw).not.toContain('leaflet');
   expect(sw).not.toContain('marker-icon');
   expect(fs.existsSync('vendor/leaflet.js')).toBe(false);

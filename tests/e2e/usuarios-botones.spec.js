@@ -140,6 +140,7 @@ test('la ficha de cada persona conserva sus acciones', async ({ page }) => {
   const detalle = page.locator('#usuariosList .tree-children').first();
   await expect(detalle).toContainText('3515551001');
   await expect(detalle).toContainText('San Martín 120');
+  await expect(detalle.locator('[data-u-action="neighbors"]')).toBeVisible();
   await expect(detalle.locator('[data-u-action="google"]')).toBeVisible();
   await expect(detalle.locator('[data-u-action="whatsapp"]')).toBeVisible();
 });

@@ -245,6 +245,56 @@
     ov.querySelector('[data-ub-todos]').onclick = function(){ cerrar(); limpiar(); };
   }
 
+  /* ---------- popup de Vecinos (personas de la misma zona) ----------
+     La función de mapa se eliminó (v333); Vecinos ya no abre un mapa sino
+     un listado con las personas de la misma zona, para verlas y escribirles
+     directo por WhatsApp. */
+  function abrirVecinos(zona, origenId){
+    var z = String(zona || '').trim();
+    if (!z){
+      abrir('👥 Vecinos', '', '<div class="ub-empty">Esta persona no tiene zona cargada en la planilla.</div>');
+      return;
+    }
+    var gente = lista().filter(function(u){
+      return String(u.localidad || '').trim().toLowerCase() === z.toLowerCase();
+    });
+    // La persona desde la que se abrió el listado va primera.
+    gente.sort(function(a, b){
+      if (a.id === origenId) return -1;
+      if (b.id === origenId) return 1;
+      return String(a.usuario || '').localeCompare(String(b.usuario || ''), 'es');
+    });
+    var estadoDe = function(u){
+      if (u.estado === 'vencida') return { txt: 'Vencida', color: '#d9534f' };
+      if (u.estado === 'porVencer') return { txt: 'Por vencer', color: '#a3670b' };
+      return { txt: 'Vigente', color: '#168765' };
+    };
+    var filas = gente.map(function(u, i){
+      var tel = (window.APPITel && window.APPITel.primeroValido) ? window.APPITel.primeroValido(u.telf || '') : '';
+      var est = estadoDe(u);
+      var donde = [u.domicilio, u.fVenceRaw ? 'Vence ' + u.fVenceRaw : ''].filter(Boolean).join(' · ') || 'Sin domicilio';
+      return '<div class="ub-persona">' +
+        '<span><strong>' + esc(u.usuario || 'Sin nombre') + (u.id === origenId ? ' <span style="color:#3d63c9;font-weight:900">· esta persona</span>' : '') + '</strong>' +
+        '<small>' + esc(donde) + ' · <span style="color:' + est.color + ';font-weight:800">' + est.txt + '</span></small></span>' +
+        (tel ? '<button type="button" class="ub-wa" data-ub-vec-wa="' + i + '">💬 WhatsApp</button>'
+             : '<span class="ub-sintel">Sin teléfono</span>') +
+        '</div>';
+    }).join('');
+
+    var ov = abrir('👥 Vecinos de ' + z,
+      gente.length + (gente.length === 1 ? ' persona' : ' personas'),
+      '<div class="ub-list">' + (filas || '<div class="ub-empty">No hay otras personas en esta zona.</div>') + '</div>');
+
+    ov.querySelectorAll('[data-ub-vec-wa]').forEach(function(b){
+      b.onclick = function(){
+        var u = gente[Number(b.getAttribute('data-ub-vec-wa'))];
+        if (!u) return;
+        var pila = (typeof window.nombreDePila === 'function' ? window.nombreDePila(u.usuario) : '') || String(u.usuario || '').split(',')[0].trim();
+        window.APPITel.abrir(u.telf || '', 'Hola ' + pila + '! 😊 ¿Cómo estás?', pila);
+      };
+    });
+  }
+
   /* ---------- popup de Tarjetas ---------- */
   function abrirTarjetas(){
     var combos = combinaciones();
@@ -351,6 +401,7 @@
     pintar: pintar,
     abrirBarrios: abrirBarrios,
     abrirTarjetas: abrirTarjetas,
+    abrirVecinos: abrirVecinos,
     cerrar: cerrar,
     limpiar: limpiar,
     olvidar: olvidar,
