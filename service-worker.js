@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v354-sw-reload';
+const CACHE_NAME = 'appi-v355-fix-blanco';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
