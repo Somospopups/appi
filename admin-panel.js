@@ -397,11 +397,9 @@ function renderAcciones(){
     const hoyChips=acc.hoy
       ? `<span class="admin-cump-hoychips"><i class="ok">✓ ${acc.hoy.hechas}</i><i class="no">✗ ${acc.hoy.noHechas}</i></span>`
       : '<span class="admin-cump-hoyvacio">Hoy · sin marcas</span>';
-    const puesto=top==='top1'?'1°':top==='top2'?'2°':top==='top3'?'3°':'';
     return `<article class="admin-cump-item ${top}">
       <div class="admin-cump-med">
         <span class="admin-cump-trofeo">${medalla||'🏅'}</span>
-        ${puesto?`<b class="admin-cump-puesto">${puesto}</b>`:''}
       </div>
       <div class="admin-cump-cuerpo">
         <div class="admin-cump-cab">
