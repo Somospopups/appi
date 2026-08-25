@@ -150,11 +150,6 @@
     if(window.APPITel.primeroValido) return window.APPITel.primeroValido(u && u.telf || '');
     return window.APPITel.normalizar(u && u.telf || '');
   }
-  // Nombre lindo del equipo (v339): SEN4BLAC -> Senior 4 Black.
-  function nombreProductoRe(v){
-    if(window.nombreProducto) return window.nombreProducto(v);
-    return String(v == null ? '' : v);
-  }
 
   /* ---------- contador del día ---------- */
   function mandadosHoy(){
@@ -722,7 +717,7 @@
     ov.querySelector('#reSub').textContent = '¿Qué te contestó?';
 
     var html = '<div class="re-quien"><b>' + esc(u.usuario || '') + '</b><small>' +
-      esc([u.domicilio, u.localidad, nombreProductoRe(u.producto)].filter(Boolean).join(' · ')) + '</small></div>';
+      esc([u.domicilio, u.localidad, u.producto].filter(Boolean).join(' · ')) + '</small></div>';
     html += '<div class="re-list">';
     seguimientos().forEach(function(s){
       var resumen = completar(s.texto, u).replace(/\n+/g, ' ').slice(0, 64);
@@ -912,7 +907,7 @@
       ' · quedan ' + quedanHoy() + ' hoy';
 
     var html = '<div class="re-quien"><b>' + esc(u.usuario || '') + '</b><small>' +
-      esc([u.domicilio, nombreProductoRe(u.producto)].filter(Boolean).join(' · ')) + '<br>' +
+      esc([u.domicilio, u.producto].filter(Boolean).join(' · ')) + '<br>' +
       'Venció hace ' + (anios >= 1 ? anios + (anios === 1 ? ' año' : ' años') : ant + ' días') +
       (u.fVenceRaw ? ' · ' + esc(u.fVenceRaw) : '') + '</small>';
     if (e){

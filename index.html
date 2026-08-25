@@ -4101,7 +4101,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v339 · Segura</div>
+  <div class="ds-foot">APPI · v340 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -5282,31 +5282,6 @@ function nombreDePila(nombre){
   if(!first) return raw;
   return first.charAt(0).toUpperCase()+first.slice(1).toLowerCase();
 }
-
-/* Nombre lindo del equipo (v339). La planilla trae códigos cortos (SEN4BLAC,
-   SEN4, SENIOR4) y acá se traducen a su nombre completo, para que la ficha y
-   los mensajes muestren "Senior 4 Black" en vez de "SEN4BLAC". */
-const PRODUCTOS_LINDOS = {
-  'sen4blac':'Senior 4 Black', 'sen4black':'Senior 4 Black', 'sen4negro':'Senior 4 Black',
-  'senior4black':'Senior 4 Black', 'senior4blac':'Senior 4 Black', 'senior4negro':'Senior 4 Black',
-  'sen4':'Senior 4', 'senior4':'Senior 4', 'senior':'Senior',
-  'psasenior4':'Senior 4', 'psasenior':'Senior',
-  'psavero':'Vero', 'vero':'Vero',
-  'sodaburby':'Soda Burby', 'sodabur':'Soda Burby', 'burby':'Soda Burby',
-  'psa':'PSA'
-};
-function nombreProducto(value){
-  const v=String(value==null?'':value).trim();
-  if(!v) return '';
-  const key=v.toLowerCase().replace(/[^a-z0-9ñ]+/g,'');
-  if(PRODUCTOS_LINDOS[key]) return PRODUCTOS_LINDOS[key];
-  // Fallback: la marca "PSA" queda en mayúsculas y el resto se escribe como título.
-  return v.replace(/^psa[\s\-\.]+/i,'').split(/[\s\-]+/).filter(Boolean).map(function(w){
-    if(/^psa$/i.test(w)) return 'PSA';
-    return w.charAt(0).toUpperCase()+w.slice(1).toLowerCase();
-  }).join(' ');
-}
-window.nombreProducto=nombreProducto;
 
 let toastTimer = null;
 function showToast(msg = 'Guardado ✓', duration = 1200){
@@ -11724,7 +11699,7 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='339';
+      const swVersion='340';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 
@@ -14140,7 +14115,7 @@ function aplicarFiltrosU(){
     if(filtroVencU!=='all' && u.estado!==filtroVencU) return false;
     if(filtroZonaU!=='all' && u.localidad!==filtroZonaU) return false;
     if(q){
-      const txt=(u.usuario+' '+u.domicilio+' '+u.localidad+' '+u.producto+' '+(window.nombreProducto?window.nombreProducto(u.producto):'')+' '+(u.cp||'')).toLowerCase();
+      const txt=(u.usuario+' '+u.domicilio+' '+u.localidad+' '+u.producto+' '+(u.cp||'')).toLowerCase();
       if(!normU(txt).includes(q)) return false;
     }
     return true;
@@ -14220,7 +14195,7 @@ function renderListU(){
         <div>📞 <b>${escU(u.telf||'—')}</b></div>
         <div>🏠 <b>${escU(u.domicilio||'—')}</b></div>
         <div>📍 <b>${escU(zonaCp)}</b></div>
-        <div>📦 <b>${escU(window.nombreProducto?window.nombreProducto(u.producto):(u.producto||'—'))}</b></div>
+        <div>📦 <b>${escU(u.producto||'—')}</b></div>
         <div>🛒 Compra: <b>${escU(compraRaw)}</b></div>
         <div>📅 Vence: <b>${escU(venceRaw)}</b> <small>${escU(diasLabel)}</small></div>
       </div>
