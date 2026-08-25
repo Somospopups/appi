@@ -4101,7 +4101,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v340 · Segura</div>
+  <div class="ds-foot">APPI · v341 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -11699,7 +11699,7 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='340';
+      const swVersion='341';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 
@@ -13885,14 +13885,22 @@ window.renderKeep=renderKeep;
 
 <script type="module">
 // ===== GRABADORA V156: TRANSCRIPCIÓN COMPLETA DEL AUDIO =====
-import { pipeline, env } from '@xenova/transformers';
-env.allowLocalModels=false;
-env.useBrowserCache=true;
+// La IA se carga recién al transcribir (import dinámico, v341): antes el
+// módulo completo (~900 KB) se bajaba y parseaba al abrir la app, aunque la
+// transcripción casi no se usa. Así el arranque es más liviano.
+let _transformers=null;
+async function transformersLib(){
+  if(_transformers) return _transformers;
+  _transformers=await import('@xenova/transformers');
+  _transformers.env.allowLocalModels=false;
+  _transformers.env.useBrowserCache=true;
+  return _transformers;
+}
 let transcriber=null,modelLoading=false,transcriptionRunning=false;
 const node=id=>document.getElementById(id);
 function status(message,type='ok',visible=true){window.grabadoraModelStatus?.(message,type,visible);if(type==='error')window.grabadoraShowStatus?.(message,'error',true)}
 function setBusy(busy){window.grabadoraTranscriptionBusy=busy;const transcribe=node('btnTranscribe'),record=node('btnRecord'),mic=node('recVisual');if(transcribe){transcribe.disabled=busy||!window._lastBlobUniversal;transcribe.textContent=busy?'Transcribiendo…':'Transcribir audio'}if(record)record.disabled=busy;if(mic)mic.disabled=busy;const badge=node('transcriptBadge');if(badge&&busy){badge.textContent='Transcribiendo';badge.className='working'}if(busy){const summary=node('summary');if(summary){summary.hidden=true;summary.innerHTML=''}const empty=node('summaryEmpty');if(empty){empty.hidden=false;empty.textContent='El resumen se creará cuando termine la transcripción.'}const sumButton=node('btnSummarize');if(sumButton)sumButton.disabled=true}}
-async function loadModelUniversal(){if(transcriber)return transcriber;if(modelLoading){while(modelLoading)await new Promise(resolve=>setTimeout(resolve,250));return transcriber}modelLoading=true;status('Preparando la IA local para transcribir…','ok',true);try{transcriber=await pipeline('automatic-speech-recognition','Xenova/whisper-tiny',{quantized:true,progress_callback:progress=>{if(progress?.status==='progress'&&Number.isFinite(progress.progress))status(`Preparando IA local · ${Math.round(progress.progress)}%`,'ok',true)}});status('IA local lista. Procesando el audio…','ok',true);return transcriber}catch(error){console.error('Modelo local de transcripción',error);status('No pude preparar la transcripción local. Revisá la conexión e intentá nuevamente.','error',true);return null}finally{modelLoading=false}}
+async function loadModelUniversal(){if(transcriber)return transcriber;if(modelLoading){while(modelLoading)await new Promise(resolve=>setTimeout(resolve,250));return transcriber}modelLoading=true;status('Preparando la IA local para transcribir…','ok',true);try{const {pipeline}=await transformersLib();transcriber=await pipeline('automatic-speech-recognition','Xenova/whisper-tiny',{quantized:true,progress_callback:progress=>{if(progress?.status==='progress'&&Number.isFinite(progress.progress))status(`Preparando IA local · ${Math.round(progress.progress)}%`,'ok',true)}});status('IA local lista. Procesando el audio…','ok',true);return transcriber}catch(error){console.error('Modelo local de transcripción',error);status('No pude preparar la transcripción local. Revisá la conexión e intentá nuevamente.','error',true);return null}finally{modelLoading=false}}
 async function audioA16k(blob){const AudioCtx=window.AudioContext||window.webkitAudioContext;if(!AudioCtx)throw new Error('El navegador no permite procesar audio');const context=new AudioCtx();try{const raw=await blob.arrayBuffer(),buffer=await context.decodeAudioData(raw.slice(0)),channels=buffer.numberOfChannels,length=buffer.length,mono=new Float32Array(length);for(let channel=0;channel<channels;channel++){const data=buffer.getChannelData(channel);for(let i=0;i<length;i++)mono[i]+=data[i]/channels}let output=mono;if(buffer.sampleRate!==16000){const newLength=Math.max(1,Math.round(mono.length*16000/buffer.sampleRate)),resampled=new Float32Array(newLength),scale=(mono.length-1)/Math.max(1,newLength-1);for(let i=0;i<newLength;i++){const position=i*scale,a=Math.floor(position),b=Math.min(mono.length-1,a+1),mix=position-a;resampled[i]=mono[a]*(1-mix)+mono[b]*mix}output=resampled}let peak=0,energy=0;for(let i=0;i<output.length;i++){const abs=Math.abs(output[i]);peak=Math.max(peak,abs);energy+=output[i]*output[i]}const rms=Math.sqrt(energy/Math.max(1,output.length));if(peak<.0025||rms<.00035)throw new Error('No se detectó voz con suficiente volumen');const gain=Math.min(5,.92/peak);if(gain>1.08)for(let i=0;i<output.length;i++)output[i]=Math.max(-1,Math.min(1,output[i]*gain));return output}finally{try{await context.close()}catch(e){}}}
 function cleanTranscript(value){let text=String(value||'').replace(/\[(?:música|music|aplausos|silencio|ruido)\]/gi,' ').replace(/\s+/g,' ').trim();text=text.replace(/\b([^\s]+(?:\s+[^\s]+){0,3})(?:\s+\1){2,}\b/gi,'$1');if(text){text=text.charAt(0).toUpperCase()+text.slice(1);if(!/[.!?]$/.test(text))text+='.'}return text}
 async function transcribeUniversal(blob,recordingId=window._lastRecordingId){if(!blob){window.grabadoraShowStatus?.('Primero grabá o abrí un audio guardado.','warn');return}if(transcriptionRunning){window.grabadoraShowStatus?.('Ya hay una transcripción en curso.','warn');return}transcriptionRunning=true;window._lastBlobUniversal=blob;window._lastRecordingId=recordingId;setBusy(true);status('Analizando el audio completo en este dispositivo…','ok',true);try{const model=await loadModelUniversal();if(!model)throw new Error('No se pudo cargar el transcriptor');status('Transcribiendo el audio completo. Podés seguir usando APPI…','ok',true);const audio=await audioA16k(blob),result=await model(audio,{language:'spanish',task:'transcribe',chunk_length_s:25,stride_length_s:4});const text=cleanTranscript(result?.text);if(!text||text.length<2)throw new Error('No se detectó voz clara en el audio');window.finishGrabadoraTranscription?.(recordingId,text);status('Transcripción terminada. Preparando el resumen…','ok',true);setTimeout(()=>status('', 'ok', false),3500)}catch(error){console.error('Transcripción de audio',error);window.failGrabadoraTranscription?.(recordingId,`No pude transcribir: ${error.message||'error de audio'}. Reproducí el audio para comprobarlo y tocá Transcribir para reintentar.`);status(error.message||'No se pudo transcribir','error',true)}finally{transcriptionRunning=false;setBusy(false)}}

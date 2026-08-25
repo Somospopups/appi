@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v340-producto-crudo';
+const CACHE_NAME = 'appi-v341-ia-diferida';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
