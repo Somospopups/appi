@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v350-contactos-depurados';
+const CACHE_NAME = 'appi-v351-botones-envuelven-movil';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
