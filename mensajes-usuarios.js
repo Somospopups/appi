@@ -827,10 +827,9 @@
     var quedan = fila.gente.length - fila.i;
 
     ov.querySelector('#muTitulo').textContent = p.icono + ' ' + p.nombre;
-    ov.querySelector('#muSub').textContent = fechaAccion || '';
-
     var estadoClase = u.estado === 'vencida' ? 'mu-vencida' : (u.estado === 'porVencer' ? 'mu-porvencer' : 'mu-vigente');
     var fechaAccion = textoFechaAccion(fila.motivo.id, u);
+    ov.querySelector('#muSub').textContent = fechaAccion || '';
     var html = '<div class="mu-fila-quien"><b>' + esc(u.usuario || '') + '</b>' +
       '<div class="mu-fila-datos">' +
         '<div class="mu-col">' +
@@ -984,7 +983,7 @@
     var st = document.createElement('style');
     st.id = 'muEstilos';
     st.textContent = [
-      '.mu-ov{position:fixed;inset:0;z-index:10060;display:none;background:rgba(24,26,42,.46);backdrop-filter:blur(5px)}',
+      '.mu-ov{position:fixed;inset:0;z-index:99999;display:none;background:rgba(24,26,42,.46);backdrop-filter:blur(5px)}',
       '.mu-ov.open{display:block}',
       '.mu-panel{position:absolute;top:0;right:0;bottom:0;width:min(520px,100%);padding:20px;overflow:auto;',
       'background:linear-gradient(160deg,#f5f8ff,#fff3f9);box-shadow:-18px 0 55px rgba(30,35,75,.22);',
