@@ -9,7 +9,7 @@ const ARCHIVOS = [
   'gestion-client.js', 'historico.js', 'data-sync.js', 'auth-client.js',
   'escalera-suenos.js', 'demo-guia.js', 'tablero-negocio.js', 'porque-vivo.js', 'home-limpio.js',
   'admin-panel.js', 'js/membership-admin.js', 'account-request.js', 'device-bridge.js', 'whatsapp-app.js',
-  'anuncios.js', 'mensajes-usuarios.js'
+  'anuncios.js', 'mensajes-usuarios.js', 'agenda-personal.js', 'gestion-client.js'
 ];
 
 test('no hay alert/confirm/prompt nativos: siempre APPIDialog', () => {

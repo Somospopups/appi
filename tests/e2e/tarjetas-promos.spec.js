@@ -172,42 +172,26 @@ test('recargar el Excel no borra las tarjetas guardadas', async ({ page }) => {
   await expect(slot).toContainText('Naranja');
 });
 
-test('el Panel de Contactos comparte la tarjeta por teléfono y avisa la promo', async ({ page }) => {
-  const { patches } = await entrar(page, {
+// v357: la barra de tarjetas de crédito se quitó del Panel de Contactos
+// (se sigue usando desde la sección Usuarios). El panel queda enfocado en la
+// agenda: sin barra de promos, sin chips en las fichas y sin tarjetas en el
+// cajón del contacto.
+test('el Panel de Contactos ya no muestra las tarjetas (v357)', async ({ page }) => {
+  await entrar(page, {
     tarjetas: { byKey: { 'tel:3515551234': [{ marca: 'visa', banco: 'galicia' }] } }
   });
   await page.evaluate(() => window.openMiGestion());
   await expect(page.locator('#view-gestion')).toHaveClass(/active/);
   await page.locator('[data-gestion-view="todos"]').click();
-  await expect(page.locator('#gestionTarjetasBar .tp-bar')).toBeVisible();
-  await expect(page.locator('.gestion-contact').filter({ hasText: 'Laura Gómez' })).toContainText('Visa Galicia');
+  await expect(page.locator('#gestionTarjetasBar')).toHaveCount(0);
+  const ficha = page.locator('.gestion-contact').filter({ hasText: 'Laura Gómez' });
+  await expect(ficha).toBeVisible();
+  await expect(ficha).not.toContainText('Visa Galicia');
 
   await page.locator('[data-open-contact="c-laura"]').click();
-  const drawer = page.locator('#gestionDrawer');
-  await expect(drawer.locator('#tpContactSlot')).toBeVisible();
-  await expect(drawer.locator('#tpContactSlot')).toContainText('Visa Galicia');
-
-  await drawer.locator('[data-tp-add]').click();
-  await page.locator('[data-tp-marca="mastercard"]').click();
-  await page.locator('[data-tp-banco="macro"]').click();
-  await page.locator('#tpSave').click();
-  await expect(drawer.locator('#tpContactSlot')).toContainText('Mastercard Macro');
-
-  await page.waitForTimeout(80);
-  expect(patches.some(p => p && p.metadata && Array.isArray(p.metadata.tarjetas) && p.metadata.tarjetas.length === 2)).toBeTruthy();
-
+  await expect(page.locator('#gestionDrawer')).toBeVisible();
+  await expect(page.locator('#gestionDrawer #tpContactSlot')).toHaveCount(0);
   await page.locator('#gestionDetailClose').click();
-  await page.locator('#tpGMarca').selectOption('mastercard');
-  await expect(page.locator('.gestion-contact')).toHaveCount(1);
-  await expect(page.locator('.gestion-contact')).toContainText('Laura Gómez');
-
-  await page.locator('#tpGMsg').fill('Hola {nombre}, tu {tarjeta} tiene 3 cuotas');
-  await page.locator('.gestion-contact [data-tp-wa-card]').click();
-  const opened = await page.evaluate(() => window.__appiLastOpen);
-  expect(opened).toMatch(/^https:\/\/wa\.me\/5493515551234\?text=/);
-  const text = decodeURIComponent(opened.split('text=')[1]);
-  expect(text).toContain('Laura');
-  expect(text).toMatch(/Visa Galicia.*Mastercard Macro|Mastercard Macro.*Visa Galicia/);
 });
 
 test('el módulo queda expuesto y no pisa la planilla de usuarios', async ({ page }) => {
