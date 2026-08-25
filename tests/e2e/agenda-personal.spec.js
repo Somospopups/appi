@@ -1,8 +1,9 @@
 const { test, expect } = require('@playwright/test');
 
 // La solapa "📱 AGENDA PERSONAL" del Panel de Contactos (v357): subir la
-// agenda del teléfono (.vcf en cualquier equipo, selector nativo donde esté)
-// y pasar cada contacto a la Agenda APPI de a uno, con confirmación.
+// agenda del teléfono (.vcf en cualquier equipo, selector nativo donde esté),
+// botones de WhatsApp/Llamar/Pasar/Quitar dentro de cada tarjeta blanca,
+// y selección múltiple para pasar a APPI o eliminar en bloque.
 
 const USER_ID = '11111111-1111-4111-8111-111111111111';
 const HOY = new Date().toISOString();
@@ -177,6 +178,17 @@ test('subir un .vcf llena la agenda personal y no duplica al repetir', async ({ 
   expect(filas).toBe(3);
 });
 
+test('cada contacto tiene dentro de su tarjeta los botones WhatsApp, Llamar, Pasar y Borrar del mismo tamaño', async ({ page }) => {
+  await abrirAgendaPersonal(page);
+  await page.setInputFiles('#apVcfInput', { name: 'agenda.vcf', mimeType: 'text/vcard', buffer: Buffer.from(VCF, 'utf8') });
+
+  const primerContacto = page.locator('.ap-item').first();
+  await expect(primerContacto.locator('.ap-row .ap-card-actions [data-ap-wa]')).toBeVisible();
+  await expect(primerContacto.locator('.ap-row .ap-card-actions [data-appi-call-phone]')).toBeVisible();
+  await expect(primerContacto.locator('.ap-row .ap-card-actions [data-ap-pasar]')).toBeVisible();
+  await expect(primerContacto.locator('.ap-row .ap-card-actions [data-ap-quitar]')).toBeVisible();
+});
+
 test('un contacto que ya está en la Agenda APPI se marca y no ofrece pasarlo', async ({ page }) => {
   const yaEnAppi = [
     'BEGIN:VCARD',
@@ -224,6 +236,46 @@ test('pasar a APPI pide confirmación, crea el contacto y queda marcado', async 
   await expect(fila).toContainText('En tu Agenda APPI');
   await expect(page.locator('[data-ap-pasar]')).toHaveCount(0);
   await expect.poll(() => subidasAgenda.some(p => p && p.estado === 'mergado')).toBe(true);
+});
+
+test('selección múltiple: pasar contactos seleccionados a APPI en bloque', async ({ page }) => {
+  const { importados } = await abrirAgendaPersonal(page, { contactos: [] });
+  await page.setInputFiles('#apVcfInput', { name: 'agenda.vcf', mimeType: 'text/vcard', buffer: Buffer.from(VCF, 'utf8') });
+
+  // Seleccionamos "Seleccionar todos"
+  await page.locator('#apSelectAll').check();
+  await expect(page.locator('#apBulkBar')).toBeVisible();
+  await expect(page.locator('#apBulkPasar')).toContainText('Pasar a APPI (3)');
+
+  // Pasamos todos en bloque
+  await page.locator('#apBulkPasar').click();
+  await expect(page.locator('#appiDialogTitle')).toContainText('Pasar a Agenda APPI');
+  await expect(page.locator('#appiDialogMessage')).toContainText('3 contactos');
+  await page.locator('#appiDialogOk').click();
+
+  // Se importaron los 3
+  await expect.poll(() => importados.length).toBe(3);
+  await expect(page.locator('#apBulkBar')).toHaveCount(0);
+});
+
+test('selección múltiple: eliminar contactos seleccionados en bloque', async ({ page }) => {
+  await abrirAgendaPersonal(page);
+  await page.setInputFiles('#apVcfInput', { name: 'agenda.vcf', mimeType: 'text/vcard', buffer: Buffer.from(VCF, 'utf8') });
+  await expect(page.locator('.ap-item')).toHaveCount(3);
+
+  // Marcamos los dos primeros checkboxes
+  const checkboxes = page.locator('[data-ap-select]');
+  await checkboxes.nth(0).check();
+  await checkboxes.nth(1).check();
+
+  await expect(page.locator('#apBulkBar')).toBeVisible();
+  await expect(page.locator('#apBulkQuitar')).toContainText('Quitar (2)');
+
+  await page.locator('#apBulkQuitar').click();
+  await expect(page.locator('#appiDialogTitle')).toContainText('Quitar de la agenda');
+  await page.locator('#appiDialogOk').click();
+
+  await expect(page.locator('.ap-item')).toHaveCount(1);
 });
 
 test('sin selector nativo (iPhone) la entrada es el .vcf y no aparece el botón del teléfono', async ({ page }) => {
