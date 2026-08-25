@@ -93,6 +93,80 @@
     }
   ];
 
+  /* ---------- mensajes de mantenimiento e instalación por producto (v342) ----------
+     Predefinidos con el video de cada equipo. El distribuidor elige el que
+     corresponde según el producto del cliente, desde el carrusel (🔁 Cambiar
+     mensaje) o desde el editor. `grupo` separa Mantenimiento (cada 6 meses)
+     de Instalación y puesta en marcha. */
+  function _mm(id, icono, grupo, nombre, texto){
+    return { id: id, icono: icono, grupo: grupo, nombre: nombre, texto: texto };
+  }
+  var MANTENIMIENTOS = [
+    // — Grupo 1: Mantenimiento (lo que se hace cada 6 meses)
+    _mm('mant_senik', '🔧', 'mantenimiento', 'Mantenimiento · PSA Senik',
+      'Hola {nombre}! 😊\n\nTu PSA Senik ya está listo para su mantenimiento. Te dejo el video con el paso a paso:\nhttps://www.youtube.com/watch?v=RxnqnLtDjis\n\nEs simple y en 5 minutos lo tenés listo. Cualquier duda me escribís.'),
+    _mm('mant_senik_bm', '🔧', 'mantenimiento', 'Mantenimiento · PSA Senik Bajo Mesada',
+      'Hola {nombre}! 😊\n\nTu PSA Senik Bajo Mesada ya está listo para su mantenimiento. Te dejo el video con el paso a paso:\nhttps://www.youtube.com/watch?v=t9QRKohc-30\n\nEs simple y en 5 minutos lo tenés listo. Cualquier duda me escribís.'),
+    _mm('mant_domus', '🔧', 'mantenimiento', 'Mantenimiento · PSA Domus',
+      'Hola {nombre}! 😊\n\nTu PSA Domus ya está listo para su mantenimiento. Te dejo el video con el paso a paso:\nhttps://www.youtube.com/watch?v=5nEBNeL0k5A\n\nEs simple y en 5 minutos lo tenés listo. Cualquier duda me escribís.'),
+    _mm('mant_griferia', '🔧', 'mantenimiento', 'Mantenimiento · Grifería bicomando',
+      'Hola {nombre}! 😊\n\nTu grifería bicomando ya está lista para su mantenimiento. Te dejo el video con el paso a paso:\nhttps://www.youtube.com/watch?v=0qBeaiFAckA\n\nEs simple y en 5 minutos lo tenés listo. Cualquier duda me escribís.'),
+    _mm('mant_iontrix', '🔧', 'mantenimiento', 'Mantenimiento · PSA Iontrix 3',
+      'Hola {nombre}! 😊\n\nTu PSA Iontrix 3 ya está listo para su mantenimiento. Te dejo el video con el paso a paso:\nhttps://www.youtube.com/watch?v=UdEL7fdUy5I\n\nEs simple y en 5 minutos lo tenés listo. Cualquier duda me escribís.'),
+    _mm('mant_ropot', '🔧', 'mantenimiento', 'Mantenimiento · PSA ROPOT',
+      'Hola {nombre}! 😊\n\nTu PSA ROPOT ya está listo para su mantenimiento. Te dejo el video con el paso a paso:\nhttps://www.youtube.com/watch?v=gRtTiI32ciY\n\nEs simple y en 5 minutos lo tenés listo. Cualquier duda me escribís.'),
+    _mm('mant_aire', '🔧', 'mantenimiento', 'Mantenimiento · Purificador de Aire',
+      'Hola {nombre}! 😊\n\nTu Purificador de Aire PSA ya está listo para su mantenimiento y limpieza. Te dejo el video con el paso a paso:\nhttps://www.youtube.com/watch?v=IXrVLYZajKs\n\nEs simple y en unos minutos lo tenés listo. Cualquier duda me escribís.'),
+    _mm('mant_ducha_retro', '🔧', 'mantenimiento', 'Retrolavado · PSA DUCHA II',
+      'Hola {nombre}! 😊\n\nYa pasaron unos meses y tu PSA DUCHA II está listo para un retrolavado. Te dejo el video con el paso a paso:\nhttps://www.youtube.com/watch?v=7t6gQ1z5DPk\n\nEs simple y en 5 minutos lo tenés listo. Cualquier duda me escribís.'),
+    _mm('mant_ducha_cartucho', '🔧', 'mantenimiento', 'Cambio de cartucho · PSA DUCHA II',
+      'Hola {nombre}! 😊\n\nLlegó el momento de cambiarle el cartucho a tu PSA DUCHA II. Te dejo el video con el paso a paso:\nhttps://www.youtube.com/watch?v=63NClblK0sQ\n\nEs simple y en unos minutos lo tenés listo. Cualquier duda me escribís.'),
+    _mm('mant_ducha', '🔧', 'mantenimiento', 'Mantenimiento · PSA DUCHA II',
+      'Hola {nombre}! 😊\n\nTu PSA DUCHA II ya está listo para su mantenimiento. Te dejo el video con el paso a paso:\nhttps://www.youtube.com/watch?v=C3IiaANlDTg\n\nEs simple y en 5 minutos lo tenés listo. Cualquier duda me escribís.'),
+    _mm('mant_s1000', '🔧', 'mantenimiento', 'Mantenimiento · PSA S•1000 II Bajo Mesada',
+      'Hola {nombre}! 😊\n\nTu PSA S•1000 II Bajo Mesada ya está listo para su mantenimiento. Te dejo el video con el paso a paso:\nhttps://www.youtube.com/watch?v=bRwJoC0YZ2Q\n\nEs simple y en 5 minutos lo tenés listo. Cualquier duda me escribís.'),
+    _mm('mant_quantum', '🔧', 'mantenimiento', 'Mantenimiento · PSA Quantum',
+      'Hola {nombre}! 😊\n\nTu PSA Quantum ya está listo para su mantenimiento. Te dejo el video con el paso a paso:\nhttps://www.youtube.com/watch?v=E9w3szPfIIk\n\nEs simple y en 5 minutos lo tenés listo. Cualquier duda me escribís.'),
+    _mm('mant_sodaburby', '🔧', 'mantenimiento', 'Uso y mantenimiento · SodaBurby',
+      'Hola {nombre}! 💧\n\nTe dejo el video con el uso y mantenimiento de tu SodaBurby:\nhttps://www.youtube.com/watch?v=xz6AATkZkOc\n\nEs simple y lo tenés listo en minutos. Cualquier duda me escribís.'),
+    // — Grupo 2: Instalación y puesta en marcha
+    _mm('inst_domus', '🛠️', 'instalacion', 'Instalación · PSA Domus',
+      'Hola {nombre}! 👋\n\nTe dejo el video con la instalación de tu PSA Domus, paso a paso:\nhttps://www.youtube.com/watch?v=w_hJ3wQad1U\n\nCualquier duda me escribís.'),
+    _mm('inst_domus_puesta', '🛠️', 'instalacion', 'Puesta en funcionamiento · PSA Domus',
+      'Hola {nombre}! 👋\n\nTe dejo el video para dejar tu PSA Domus en funcionamiento, paso a paso:\nhttps://www.youtube.com/watch?v=fdc1ZQC8m_4\n\nCualquier duda me escribís.'),
+    _mm('inst_griferia_puesta', '🛠️', 'instalacion', 'Puesta a punto · Grifería bicomando',
+      'Hola {nombre}! 👋\n\nTe dejo el video con la puesta a punto de tu grifería bicomando:\nhttps://www.youtube.com/watch?v=wZmeE_rQBjY\n\nCualquier duda me escribís.'),
+    _mm('inst_iontrix', '🛠️', 'instalacion', 'Instalación · PSA Iontrix 3',
+      'Hola {nombre}! 👋\n\nTe dejo el video con la instalación de tu PSA Iontrix 3, paso a paso:\nhttps://www.youtube.com/watch?v=y6HwBdpRCuo\n\nCualquier duda me escribís.'),
+    _mm('inst_iontrix_acond', '🛠️', 'instalacion', 'Acondicionamiento del agua · PSA Iontrix 3',
+      'Hola {nombre}! 💧\n\nTe dejo el video con el acondicionamiento del agua de tu PSA Iontrix 3:\nhttps://www.youtube.com/watch?v=mzstQD7Ul_Q\n\nCualquier duda me escribís.'),
+    _mm('inst_ropot', '🛠️', 'instalacion', 'Instalación y puesta en marcha · PSA ROPOT',
+      'Hola {nombre}! 👋\n\nTe dejo el video con la instalación y puesta en marcha de tu PSA ROPOT:\nhttps://www.youtube.com/watch?v=8uSXLqFDXh0\n\nCualquier duda me escribís.'),
+    _mm('inst_ropot_modulos', '🛠️', 'instalacion', 'Reemplazo de módulos · PSA ROPOT',
+      'Hola {nombre}! 🔧\n\nCuando los módulos de tu PSA ROPOT se agotan hay que reemplazarlos. Te dejo el video con el paso a paso:\nhttps://www.youtube.com/watch?v=yh4dwgb21Xc\n\nCualquier duda me escribís.'),
+    _mm('inst_aire_presentacion', '🛠️', 'instalacion', 'Presentación y puesta en marcha · Purificador de Aire',
+      'Hola {nombre}! 👋\n\nTe dejo el video con la presentación y puesta en marcha de tu Purificador de Aire PSA:\nhttps://www.youtube.com/watch?v=OXQP2qWHt5g\n\nCualquier duda me escribís.'),
+    _mm('inst_aire_funcionamiento', '🛠️', 'instalacion', 'Funcionamiento · Purificador de Aire',
+      'Hola {nombre}! 👋\n\nTe dejo el video para que veas cómo funciona tu Purificador de Aire PSA:\nhttps://www.youtube.com/watch?v=YV271hKc66g\n\nCualquier duda me escribís.')
+  ];
+  function mensajeMantenimientoBase(id){
+    for (var i=0;i<MANTENIMIENTOS.length;i++) if (MANTENIMIENTOS[i].id === id) return MANTENIMIENTOS[i];
+    return null;
+  }
+  function mensajeMantenimiento(id){
+    var base = mensajeMantenimientoBase(id);
+    if (!base) return null;
+    var g = leerGuardado().mantenimientos || {};
+    var copia = {};
+    for (var k in base) copia[k] = base[k];
+    if (typeof g[id] === 'string') copia.texto = g[id];
+    copia.editada = typeof g[id] === 'string' && g[id] !== base.texto;
+    return copia;
+  }
+  function mensajesMantenimiento(){
+    return MANTENIMIENTOS.map(function(m){ return mensajeMantenimiento(m.id); });
+  }
+
   // `corto` es lo que se ve en pantalla: el usuario nunca lee las llaves.
   var ETIQUETAS = [
     { tag:'{nombre}', corto:'Nombre', que:'Nombre de pila' },
@@ -154,10 +228,19 @@
   function plantilla(id){
     var todas = plantillas();
     for (var i=0;i<todas.length;i++) if (todas[i].id === id) return todas[i];
-    return null;
+    return mensajeMantenimiento(id) || null;
   }
   function guardarTexto(id, texto){
     var data = leerGuardado();
+    // Mensajes de mantenimiento/instalación (v342): se editan igual, aparte.
+    var mb = mensajeMantenimientoBase(id);
+    if (mb){
+      if (!data.mantenimientos) data.mantenimientos = {};
+      if (String(texto) === mb.texto) delete data.mantenimientos[id];
+      else data.mantenimientos[id] = String(texto == null ? '' : texto);
+      guardar(data);
+      return;
+    }
     if (!data.textos) data.textos = {};
     var base = null;
     for (var i=0;i<BASE.length;i++) if (BASE[i].id === id) base = BASE[i];
@@ -168,6 +251,11 @@
   }
   function restaurar(id){
     var data = leerGuardado();
+    if (mensajeMantenimientoBase(id)){
+      if (data.mantenimientos) delete data.mantenimientos[id];
+      guardar(data);
+      return;
+    }
     if (data.textos) delete data.textos[id];
     guardar(data);
   }
@@ -560,7 +648,7 @@
     var g = null;
     grupos.forEach(function(x){ if (x.motivo.id === motivoId) g = x; });
     if (!g) { pintarHoy(); return; }
-    fila = { motivo: g.motivo, gente: g.gente.slice(), i: 0 };
+    fila = { motivo: g.motivo, gente: g.gente.slice(), i: 0, textoActual: null };
     pintarFila();
   }
 
@@ -591,7 +679,8 @@
 
     var u = fila.gente[fila.i];
     var p = plantilla(fila.motivo.plantilla) || plantilla('saludo');
-    var texto = completar(p.texto, u);
+    var textoBase = completar(p.texto, u);
+    var texto = fila.textoActual || textoBase;
     var nombre = (typeof window.nombreDePila === 'function' ? window.nombreDePila(u.usuario) : '') || u.usuario;
     var quedan = fila.gente.length - fila.i;
 
@@ -620,7 +709,9 @@
         (marcaActual.e === 'hecha' ? '✓ Marcada como hecha' : '✗ Marcada como no hecha') +
         ' · si te confundiste, tocá la otra</div>';
     }
-    html += '<div class="mu-prev"><b>Así lo va a recibir</b><span>' + esc(texto) + '</span></div>';
+    html += '<div class="mu-prev"><b>Así lo va a recibir</b><span id="muPrevTxt">' + esc(texto) + '</span></div>';
+    // Con el 🔁 se elige el mensaje correcto según el equipo del cliente (v342).
+    html += '<button type="button" class="mu-sec" id="muCambiarMensaje" style="margin-top:8px">🔁 Cambiar mensaje</button>';
     html += '<div class="mu-acciones">';
     html += '<button type="button" class="mu-enviar" id="muFilaEnviar">💬 Mandar a ' + esc(nombre) + '</button>';
     // Cada acción se marca sí o sí: ✓ la hice (aunque sea por otro medio) o
@@ -642,30 +733,74 @@
     cuerpo.innerHTML = html;
 
     cuerpo.querySelector('#muFilaEnviar').onclick = function(){
-      enviar(u, texto);
+      enviar(u, fila.textoActual || textoBase);
       // No se avanza solo: al volver de WhatsApp la misma persona sigue a la
       // vista, lista para marcar qué pasó en ese contacto (✓ ya lo hice /
       // ✗ no se hizo). Mandar ya deja la ✓ puesta; si no se concretó, se
       // corrige con la ✗ y se avanza desde ahí (v330).
       pintarFila();
     };
+    var cambiar = cuerpo.querySelector('#muCambiarMensaje');
+    if (cambiar) cambiar.onclick = function(){ pintarSelectorMensaje(u); };
     cuerpo.querySelector('#muFilaHecha').onclick = function(){
       marcarAccion(fila.motivo.id, u, 'hecha');
+      fila.textoActual = null;
       fila.i++;
       pintarFila();
     };
     cuerpo.querySelector('#muFilaNoHecha').onclick = function(){
       marcarAccion(fila.motivo.id, u, 'no_hecha');
+      fila.textoActual = null;
       fila.i++;
       pintarFila();
     };
     cuerpo.querySelector('#muFilaPrev').onclick = function(){
-      if (fila.i > 0){ fila.i--; pintarFila(); }
+      if (fila.i > 0){ fila.textoActual = null; fila.i--; pintarFila(); }
     };
     cuerpo.querySelector('#muFilaNext').onclick = function(){
-      if (fila.i < fila.gente.length - 1){ fila.i++; pintarFila(); }
+      if (fila.i < fila.gente.length - 1){ fila.textoActual = null; fila.i++; pintarFila(); }
     };
     ov.classList.add('open');
+  }
+
+  // Lista para elegir el mensaje correcto según el equipo del cliente (v342):
+  // Mantenimiento primero, Instalación después. Al elegir, el carrusel vuelve
+  // con ese texto puesto para mandar.
+  function pintarSelectorMensaje(u){
+    var ov = overlay();
+    var cuerpo = ov.querySelector('#muCuerpo');
+    ov.querySelector('#muTitulo').textContent = '🔁 Elegir mensaje';
+    ov.querySelector('#muSub').textContent = 'Según el equipo del cliente';
+    var mant = mensajesMantenimiento();
+    var grupos = [
+      { titulo: '🔧 Mantenimiento', lista: mant.filter(function(m){ return m.grupo === 'mantenimiento'; }) },
+      { titulo: '🛠️ Instalación y puesta en marcha', lista: mant.filter(function(m){ return m.grupo === 'instalacion'; }) }
+    ];
+    var html = '';
+    grupos.forEach(function(g){
+      if (!g.lista.length) return;
+      html += '<div class="mu-sec-titulo">' + g.titulo + '</div><div class="mu-list">';
+      g.lista.forEach(function(m){
+        var resumen = completar(m.texto, u || EJEMPLO).replace(/\n+/g, ' ').slice(0, 68);
+        html += '<button type="button" class="mu-item" data-mu-sel-mant="' + esc(m.id) + '">' +
+          '<span class="mu-ico">' + m.icono + '</span>' +
+          '<span><strong>' + esc(m.nombre) + '</strong><small>' + esc(resumen) + '…</small></span>' +
+          '<span class="mu-go">💬</span></button>';
+      });
+      html += '</div>';
+    });
+    html += '<button type="button" class="mu-volver" id="muSelVolver">‹ Volver</button>';
+    cuerpo.innerHTML = html;
+    cuerpo.querySelectorAll('[data-mu-sel-mant]').forEach(function(b){
+      b.onclick = function(){
+        var m = mensajeMantenimiento(b.getAttribute('data-mu-sel-mant'));
+        if (!m || !fila) return;
+        fila.textoActual = completar(m.texto, u);
+        pintarFila();
+      };
+    });
+    var volver = cuerpo.querySelector('#muSelVolver');
+    if (volver) volver.onclick = function(){ pintarFila(); };
   }
   function css(){
     if (document.getElementById('muEstilos')) return;
@@ -683,6 +818,8 @@
       '.mu-top p{margin:5px 0 0;color:#777887;font-size:12px}',
       '.mu-close{width:48px;height:48px;flex:0 0 auto;border:0;border-radius:50%;background:rgba(91,141,239,.11);color:#3d63c9;font-size:22px;font-weight:900;cursor:pointer}',
       '.mu-list{display:grid;gap:8px;margin-top:14px}',
+      '.mu-sec-titulo{margin:16px 0 8px;color:#3d63c9;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.5px}',
+      'body.dark .mu-sec-titulo{color:#a8b8ff}',
       '.mu-item{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:11px;align-items:center;width:100%;min-height:58px;',
       'padding:12px 14px;border:1px solid rgba(80,90,130,.1);border-radius:15px;background:#fff;font:inherit;',
       'text-align:left;cursor:pointer;transition:background .14s,border-color .14s}',
@@ -927,6 +1064,23 @@
         '<span class="mu-go">›</span></button>';
     });
     html += '</div>';
+    // Mensajes de mantenimiento e instalación por producto (v342): agrupados y
+    // editables como las plantillas de fábrica.
+    var mant = mensajesMantenimiento();
+    [['mantenimiento', '🔧 Mantenimiento'], ['instalacion', '🛠️ Instalación y puesta en marcha']].forEach(function(g){
+      var grupo = g[0], titulo = g[1];
+      var delGrupo = mant.filter(function(m){ return m.grupo === grupo; });
+      if (!delGrupo.length) return;
+      html += '<div class="mu-sec-titulo">' + titulo + '</div><div class="mu-list">';
+      delGrupo.forEach(function(m){
+        var resumen = completar(m.texto, u || EJEMPLO).replace(/\n+/g, ' ').slice(0, 68);
+        html += '<button type="button" class="mu-item" data-mu-editar="' + esc(m.id) + '">' +
+          '<span class="mu-ico">' + m.icono + '</span>' +
+          '<span><strong>' + esc(m.nombre) + (m.editada ? ' ✏️' : '') + '</strong><small>' + esc(resumen) + '…</small></span>' +
+          '<span class="mu-go">›</span></button>';
+      });
+      html += '</div>';
+    });
     // Crear mensajes propios (v326): el distribuidor arma su propia biblioteca.
     html += '<button type="button" class="mu-sec mu-grande" id="muNuevo" style="margin-top:12px">✍️ Crear un mensaje nuevo</button>';
     html += '<button type="button" class="mu-volver" id="muVolverEnviar">‹ Volver a enviar</button>';
@@ -1205,6 +1359,8 @@
     recibeMensajes: recibeMensajes,
     plantillasPara: plantillasPara,
     mantenimiento: mantenimiento,
+    mensajesMantenimiento: mensajesMantenimiento,
+    mensajeMantenimiento: mensajeMantenimiento,
     cumpleHoy: cumpleHoy,
     ultimoEnvio: ultimoEnvio,
     registrar: registrar,
