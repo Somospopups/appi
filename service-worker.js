@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v357-agenda-personal';
+const CACHE_NAME = 'appi-v358-picker-permiso';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
