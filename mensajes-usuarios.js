@@ -1590,21 +1590,3 @@
   else window.addEventListener('load', envolver);
   setTimeout(envolver, 900);
 })();
-Hoy,
-    marcarAccion: marcarAccion,
-    marcaDe: marcaDe,
-    claveAccion: claveAccion,
-    completadaDe: completadaDe,
-    resumenHoy: resumenHoy,
-    pintarHoy: pintarHoy,
-    abrirFila: abrirFila,
-    escritoHoy: escritoHoy,
-    cerrar: cerrar,
-    montar: montar,
-    pintarFichas: pintarFichas
-  };
-
-  if (document.readyState === 'complete') envolver();
-  else window.addEventListener('load', envolver);
-  setTimeout(envolver, 900);
-})();
