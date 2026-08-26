@@ -34,14 +34,4 @@ jobs:
       - name: Instalar solo lo que el navegador necesita del sistema
         if: steps.cache-navegador.outputs.cache-hit == 'true'
         run: npx playwright install-deps chromium
-      - run: npm test 2>&1 | tee /tmp/pt.log
-        continue-on-error: true
-      - name: Reportar fallos (diagnóstico)
-        if: always()
-        run: |
-          grep -E "^[[:space:]]+[0-9]+\) " /tmp/pt.log | while read -r line; do
-            echo "::error file=.github::FALLO-TEST $(echo "$line" | tr -d '[:space:]' | sed 's/::/;/g')"
-          done
-          grep -E "failed|passed" /tmp/pt.log | tail -6 | while read -r line; do
-            echo "::error file=.github::RESUMEN $(echo "$line" | sed 's/::/;/g')"
-          done
+      - run: npm test
