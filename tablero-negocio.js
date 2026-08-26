@@ -94,9 +94,10 @@
   /* ---------------- 1 · GPS DEL MES ---------------- */
   function datosGps(){
     var eq = equipo();
-    var raiz = eq && Array.isArray(eq.personas) ? (eq.personas.find(function(p){ return p.nivel === 0; }) || eq.personas[0]) : null;
+    var raiz = eq && Array.isArray(eq.personas) ? (eq.personas.find(function(p){ return p.nivel === 0 && !p.esTitular; }) || eq.personas.find(function(p){ return p.nivel === 0; }) || eq.personas[0]) : null;
     var cul = culturaMes();
-    var A = raiz ? (Number(raiz.pnAct) || 0) : cul.pb;
+    var off = (typeof window.culturaPbOficial === 'function') ? window.culturaPbOficial(eq) : null;
+    var A = off ? (Number(off.pb) || 0) : (raiz ? (Number(raiz.pnAct) || 0) : cul.pb);
     var patrocinios9 = raiz ? (raiz.hijos || []).filter(function(h){
       return h.alta && mesActual(h.alta) && (Number(h.pnAct) || 0) >= 9;
     }).length : 0;

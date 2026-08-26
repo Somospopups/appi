@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "361.0.0",
-  "cacheName": "appi-v361-jornada-del-parque",
+  "version": "362.0.0",
+  "cacheName": "appi-v362-pb-cultura",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

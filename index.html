@@ -3354,6 +3354,7 @@ body.dark .admin-login-card{background:#242638}body.dark .admin-login-card h2{co
   }
   .cultura-step input:focus{border-color:#5b8def;box-shadow:0 0 0 3px rgba(91,141,239,.16)}
   .cultura-task-hint{color:#8a8a94;font-size:10px;font-weight:800}
+  .cultura-step .cultura-task-hint{display:block;margin-top:4px;text-align:center}
   .cultura-pills{display:flex;flex-wrap:wrap;gap:5px;align-items:center;min-height:34px}
   .cultura-pill{
     width:32px;height:32px;border:0;border-radius:50%;
@@ -4102,7 +4103,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v361 · Segura</div>
+  <div class="ds-foot">APPI · v362 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -7164,6 +7165,41 @@ function validarTitularContraCuenta(titular){
   if(!comparison.ok)throw new Error(`Esta planilla pertenece a otro distribuidor. Se detectó ${titular.dip||'un DIP diferente'} y tu cuenta es ${profile.dip}.`);
   return true;
 }
+/* === CULTURA PB OFICIAL ===
+   El PB personal de Cultura es el del titular de la cuenta. En la Línea
+   el titular figura primero; si hay socio, ese segundo nombre no se usa. */
+function identidadNombreNorm(value){
+  return String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+}
+function identidadNombresCoinciden(a,b){
+  const na=identidadNombreNorm(a), nb=identidadNombreNorm(b);
+  if(!na||!nb) return false;
+  if(na===nb) return true;
+  const sa=na.split(' ').filter(Boolean).sort().join(' ');
+  const sb=nb.split(' ').filter(Boolean).sort().join(' ');
+  if(sa&&sa===sb) return true;
+  return false;
+}
+function identidadDipCoinciden(a,b){
+  const da=numeroIdentidadComparable(a), db=numeroIdentidadComparable(b);
+  if(!da||!db) return false;
+  return da===db || da.endsWith(db) || db.endsWith(da);
+}
+function titularPbPersonalDesdeEquipo(titular,personas){
+  const tit=titular||{};
+  if(tit.pbPersonal!=null && tit.pbPersonal!==''){
+    const n=Number(tit.pbPersonal);
+    if(!isNaN(n)) return {pb:n,fuente:'cabecera',nombre:tit.nombre||''};
+  }
+  const list=(personas||[]).filter(p=>p&&!p.esTitular);
+  const esSocio=p=>!!(tit.socio&&identidadNombresCoinciden(p.nombre,tit.socio));
+  let hit=list.find(p=>tit.dip&&identidadDipCoinciden(p.codigo,tit.dip)&&!esSocio(p));
+  if(!hit) hit=list.find(p=>tit.nombre&&identidadNombresCoinciden(p.nombre,tit.nombre)&&!esSocio(p));
+  if(hit) return {pb:Number(hit.pnAct)||0,fuente:'fila',nombre:hit.nombre||tit.nombre||''};
+  return null;
+}
+window.titularPbPersonalDesdeEquipo=titularPbPersonalDesdeEquipo;
+/* === /CULTURA PB OFICIAL === */
 /* Solo la planilla del titular (v291): el reporte de Garantías por Organización
    no trae el DIP del titular, así que se valida por contenido. Si los DIP del
    archivo no corresponden al equipo cargado, la planilla es de otra cuenta y
@@ -7214,7 +7250,7 @@ function procesarExcel(rows){
     return null;
   }
 
-  let titular = { dip:'', nombre:'', socio:'', sucursal:'', categoria:'' };
+  let titular = { dip:'', nombre:'', socio:'', sucursal:'', categoria:'', pbPersonal:null };
   for(let i = 0; i < headerRow; i++){
     const r = rows[i] || [];
     r.forEach((cellVal,cellIndex) => {
@@ -7231,6 +7267,8 @@ function procesarExcel(rows){
       if(sucMatch && !titular.sucursal) titular.sucursal = sucMatch[1].trim();
       const catMatch = cell.match(/Categor[íi]a[:\s]*([^]+?)(?=\s+(?:País|Pais|Sucursal|Socio|Nombre|DIP|$))/i);
       if(catMatch && !titular.categoria) titular.categoria = catMatch[1].trim();
+      const pbHead = cell.match(/(?:PB|PN|Vol(?:umen)?)\s*(?:pers(?:onal)?\.?|mes)[:\s]*([0-9]+(?:[.,][0-9]+)?)/i);
+      if(pbHead && (titular.pbPersonal==null || titular.pbPersonal==='')) titular.pbPersonal = parsePB(pbHead[1]);
     });
   }
   console.log('👤 Titular detectado:', titular ? 'sí' : 'no');
@@ -7299,12 +7337,19 @@ function procesarExcel(rows){
   for(let i = headerRow + 1; i < rows.length; i++){
     const r = rows[i] || [];
     const nivelRaw = r[idx.nivel];
-    const nivel = parseInt(nivelRaw);
-    if(!nivel || isNaN(nivel) || nivel < 1 || nivel > 30) continue;
+    const nivel = parseInt(nivelRaw, 10);
+    if(isNaN(nivel) || nivel < 0 || nivel > 30) continue;
     const nomCell = r[idx.nombre];
     if(!nomCell) continue;
     const nc = parseNombreCodigo(nomCell);
     if(!nc.nombre || nc.nombre.length < 3) continue;
+    // Nivel 0 = fila del titular (figura primero). No entra al árbol: sólo su PB.
+    if(nivel === 0){
+      if(titular.pbPersonal==null || titular.pbPersonal==='') titular.pbPersonal = parsePB(r[idx.pnAct]);
+      if(!titular.nombre) titular.nombre = nc.nombre;
+      if(!titular.dip && nc.codigo) titular.dip = nc.codigo;
+      continue;
+    }
     const p = {
       id: i,
       nivel: nivel,
@@ -7344,6 +7389,11 @@ function procesarExcel(rows){
     else { stack[stack.length-1].hijos.push(p); p.padreId = stack[stack.length-1].id; }
     stack.push(p);
   });
+
+  if(titular.pbPersonal==null || titular.pbPersonal===''){
+    const off = titularPbPersonalDesdeEquipo(titular, personas);
+    if(off) titular.pbPersonal = off.pb;
+  }
 
   return {
     titular, raices, personas,
@@ -7468,8 +7518,10 @@ document.getElementById('equipoFileInput').onchange = (e)=>{
         procesado.fileSize = file.size;
         equipoData = procesado;
         saveEquipoToStorage();
+        try{ culturaSincronizarPbOficial({force:true}); }catch(e){}
         haptic(20);
         renderEquipo();
+        try{ renderCulturaCrecimiento(); }catch(e){}
         // Preguntar si quiere cargar garantías
         setTimeout(() => {
           confirmarAccion({
@@ -10771,14 +10823,39 @@ function culturaQuitarPorContacto(ref={}){
   return changed;
 }
 window.culturaQuitarPorContacto=culturaQuitarPorContacto;
+function culturaEquipoActual(){
+  if(typeof equipoData!=='undefined' && equipoData) return equipoData;
+  try{return JSON.parse(localStorage.getItem('equipoData')||'null')}catch(e){return null}
+}
+function culturaPbOficial(eq){
+  eq=eq||culturaEquipoActual();
+  if(!eq) return null;
+  return titularPbPersonalDesdeEquipo(eq.titular||{}, eq.personas||[]);
+}
+function culturaSincronizarPbOficial(opts){
+  const force=!!(opts&&opts.force);
+  const off=culturaPbOficial();
+  if(!off) return false;
+  const id=culturaMonthId();
+  const cur=getCulturaMonth(id);
+  const pb=Math.max(0,Math.round((Number(off.pb)||0)*100)/100);
+  if(!force && (Number(cur.pb)||0)>0) return false;
+  if((Number(cur.pb)||0)===pb) return false;
+  saveCulturaMonth(id,{...cur,pb});
+  return true;
+}
+window.culturaPbOficial=culturaPbOficial;
+window.culturaSincronizarPbOficial=culturaSincronizarPbOficial;
 window.renderCulturaCrecimiento=renderCulturaCrecimiento;
 function renderCulturaCrecimiento(){
   const wrap=document.querySelector('#culturaWrap');
   if(!wrap) return;
   culturaReconciliarInvitados();
+  try{ culturaSincronizarPbOficial(); }catch(e){}
   const openPast=[...wrap.querySelectorAll('details.cultura-past[open]')].map(el=>el.dataset.week);
   const id=culturaMonthId();
   const week=getCulturaMonth(id);
+  const off=culturaPbOficial();
   const pbDone=week.pb>=CULTURA_PB_META;
   const accDone=week.invitados.length>=CULTURA_INV_META;
   const extra=Math.max(0,Math.round((week.pb-CULTURA_PB_META)*100)/100);
@@ -10825,6 +10902,7 @@ function renderCulturaCrecimiento(){
           <div class="cultura-task-top"><strong>💎 PB personales</strong><span class="cultura-task-hint">meta ${CULTURA_PB_META}${extra?` · +${culturaFmt(extra)}`:''}</span></div>
           <div class="cultura-step">
             <input data-cultura-pb type="text" inputmode="decimal" enterkeyhint="done" value="${week.pb?String(week.pb).replace('.',','):''}" placeholder="0" aria-label="PB personales del mes">
+            ${off?`<small class="cultura-task-hint" data-cultura-pb-src>${(Number(week.pb)||0)===(Number(off.pb)||0)?'Desde tu Línea':'En tu Línea figura '+culturaFmt(off.pb)}</small>`:''}
           </div>
         </article>
         <article class="cultura-task ${accDone?'done':''}">
@@ -11733,8 +11811,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='361';
-      const CACHE_NAME='appi-v361-jornada-del-parque';
+      const swVersion='362';
+      const CACHE_NAME='appi-v362-pb-cultura';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 
