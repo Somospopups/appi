@@ -4,8 +4,8 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
-- Versión: **v362 · Segura**.
-- Caché de la app: `appi-v362-pb-cultura` (se renueva al abrir APPI).
+- Versión: **v363 · Segura**.
+- Caché de la app: `appi-v363-pb-auto` (se renueva al abrir APPI).
 - Publicación: [https://somospopups.github.io/appi/](https://somospopups.github.io/appi/)
 - Acceso por número de distribuidor y contraseña.
 - Acceso administrador POPUPS mediante el candado, sin DIP ni número de distribuidor.
@@ -25,13 +25,13 @@ Desde v256, todos los dispositivos abren APPI con el mismo logo de vidrio.
 
 Al cambiar el logo hay que regenerar ambos juegos y volver a correr `npm test`: `tests/e2e/logo-vidrio.spec.js` verifica que cada dispositivo tenga su imagen y que el arranque muestre el vidrio.
 
-## PB personales de Cultura (v362)
+## PB personales de Cultura (v363)
 
-Cultura del mes deja de pedirte el PB a mano cuando ya está en tu Línea
-Descendente. Toma **el PB personal del titular de la cuenta** (en la
-planilla el titular figura primero; si hay socio, ese segundo nombre no
-se usa). Los invitados siguen cargándose a mano. Si el número oficial no
-está en los datos, el campo queda vacío: APPI no inventa un PB.
+El PB del mes **ya no se tipea**. Cultura lo lee solo de tu Línea
+Descendente: es el PB personal del titular (figura primero; si hay socio,
+ese segundo nombre no se usa). Si todavía no está la planilla, se ve un
+guión y un toque abre Mi Equipo. Los invitados siguen a mano. APPI no
+inventa un número.
 
 ## Jornada del parque (v361)
 

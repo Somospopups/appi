@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "362.0.0",
-  "cacheName": "appi-v362-pb-cultura",
+  "version": "363.0.0",
+  "cacheName": "appi-v363-pb-auto",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

@@ -83,6 +83,13 @@ eq('DIP corto vs DIP con sucursal',
   { pb: 9, fuente: 'fila', nombre: 'Otra' }
 );
 
+eq('nivel 0 es el titular aunque el nombre no coincida',
+  lookup({ dip: '99-1', nombre: 'Otro Nombre' }, [
+    { nombre: 'BOULARD, VALERIA', codigo: '02-9802014', pnAct: 8.5, nivel: 0 }
+  ]),
+  { pb: 8.5, fuente: 'fila', nombre: 'BOULARD, VALERIA' }
+);
+
 eq('sin datos no inventa',
   lookup({ nombre: 'María Pérez' }, [
     { nombre: 'Juan Rama', codigo: '02-1', pnAct: 40 }

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v362-pb-cultura';
+const CACHE_NAME = 'appi-v363-pb-auto';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

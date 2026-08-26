@@ -56,8 +56,10 @@ test('Cultura toma el PB del titular, no el del socio', async ({ page }) => {
   });
   await page.evaluate(() => window.renderCulturaCrecimiento && window.renderCulturaCrecimiento());
   const campo = page.locator('#culturaWrap [data-cultura-pb]').first();
-  await expect(campo).toHaveValue('8,5');
+  await expect(campo).toHaveAttribute('data-cultura-pb', '8.5');
+  await expect(campo.locator('b')).toHaveText('8,5');
   await expect(page.locator('#culturaWrap [data-cultura-pb-src]').first()).toContainText('Desde tu Línea');
+  expect(await page.locator('#culturaWrap input[data-cultura-pb]').count()).toBe(0);
   const guardado = await page.evaluate(id => {
     const raw = JSON.parse(localStorage.getItem('cultura_crecimiento_v1') || '{}');
     const meses = raw && raw.meses ? raw.meses : raw;
@@ -66,7 +68,7 @@ test('Cultura toma el PB del titular, no el del socio', async ({ page }) => {
   expect(guardado).toBe(8.5);
 });
 
-test('si el titular no está en la planilla, no inventa y deja cargar a mano', async ({ page }) => {
+test('si el titular no está en la planilla, no inventa ni deja tipear', async ({ page }) => {
   await abrirApp(page, {
     titular: { dip: '02-9802014', nombre: 'Boulard, Valeria', socio: 'Toledo, Silvia' },
     personas: [
@@ -76,13 +78,13 @@ test('si el titular no está en la planilla, no inventa y deja cargar a mano', a
   });
   await page.evaluate(() => window.renderCulturaCrecimiento && window.renderCulturaCrecimiento());
   const campo = page.locator('#culturaWrap [data-cultura-pb]').first();
-  await expect(campo).toHaveValue('');
-  await campo.fill('7,5');
-  await campo.blur();
+  await expect(campo.locator('b')).toHaveText('—');
+  await expect(campo).toContainText('Cargá tu Línea');
+  expect(await page.locator('#culturaWrap input[data-cultura-pb]').count()).toBe(0);
   const guardado = await page.evaluate(id => {
     const raw = JSON.parse(localStorage.getItem('cultura_crecimiento_v1') || '{}');
     const meses = raw && raw.meses ? raw.meses : raw;
-    return (meses[id] || {}).pb;
+    return (meses[id] || {}).pb || 0;
   }, mesId());
-  expect(guardado).toBe(7.5);
+  expect(guardado).toBe(0);
 });

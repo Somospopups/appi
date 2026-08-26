@@ -3348,13 +3348,18 @@ body.dark .admin-login-card{background:#242638}body.dark .admin-login-card h2{co
   .cultura-bar{height:9px;border-radius:999px;background:rgba(80,90,130,.12);overflow:hidden}
   .cultura-bar i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#3ad0a4,#5b8def,#a06bff);box-shadow:0 0 12px rgba(91,141,239,.30);transition:width .35s ease}
   .cultura-step{display:block}
-  .cultura-step input{
-    width:100%;height:42px;border:1.5px solid rgba(91,141,239,.22);border-radius:13px;
-    background:rgba(255,255,255,.90);color:#161620;font:inherit;font-size:20px;font-weight:950;text-align:center;outline:none;letter-spacing:-.3px;
+  .cultura-pb-auto{
+    min-height:42px;padding:6px 8px;border-radius:13px;
+    background:rgba(91,141,239,.08);border:1.5px solid rgba(91,141,239,.14);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
+    text-align:center;
   }
-  .cultura-step input:focus{border-color:#5b8def;box-shadow:0 0 0 3px rgba(91,141,239,.16)}
+  .cultura-pb-auto b{color:#161620;font-size:22px;font-weight:950;letter-spacing:-.4px;line-height:1}
+  .cultura-pb-auto small{color:#8a8a94;font-size:10px;font-weight:800}
+  .cultura-pb-auto.from-line{background:rgba(58,208,164,.12);border-color:rgba(58,208,164,.22)}
+  .cultura-pb-auto.from-line b{color:#168765}
+  .cultura-pb-auto[data-cultura-pb-load]{cursor:pointer}
   .cultura-task-hint{color:#8a8a94;font-size:10px;font-weight:800}
-  .cultura-step .cultura-task-hint{display:block;margin-top:4px;text-align:center}
   .cultura-pills{display:flex;flex-wrap:wrap;gap:5px;align-items:center;min-height:34px}
   .cultura-pill{
     width:32px;height:32px;border:0;border-radius:50%;
@@ -3403,7 +3408,10 @@ body.dark .admin-login-card{background:#242638}body.dark .admin-login-card h2{co
   body.dark .cultura-week,body.dark .cultura-task,body.dark .cultura-kicker,body.dark .cultura-past,body.dark .cultura-past-kpi{background:rgba(28,29,46,.62);border-color:rgba(255,255,255,.08)}
   body.dark .cultura-week,body.dark .cultura-task-top span,body.dark .cultura-past-kpi b,body.dark .cultura-meter-top b{color:#a8c0ff}
   body.dark .cultura-meter-top span,body.dark .cultura-task-hint{color:#9aa0b4}
-  body.dark .cultura-step input{background:rgba(20,22,36,.86);border-color:rgba(255,255,255,.08);color:#f0f0f5}
+  body.dark .cultura-pb-auto{background:rgba(91,141,239,.16);border-color:rgba(255,255,255,.08)}
+  body.dark .cultura-pb-auto b{color:#f0f0f5}
+  body.dark .cultura-pb-auto.from-line{background:rgba(58,208,164,.16);border-color:rgba(58,208,164,.28)}
+  body.dark .cultura-pb-auto.from-line b{color:#3ad0a4}
   body.dark .cultura-action{background:rgba(91,141,239,.12)}
   body.dark .cultura-pill{background:rgba(91,141,239,.18);color:#c5d4ff}
   body.dark .cultura-pill.filled{color:#fff}
@@ -4103,7 +4111,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v362 · Segura</div>
+  <div class="ds-foot">APPI · v363 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -7195,6 +7203,7 @@ function titularPbPersonalDesdeEquipo(titular,personas){
   const esSocio=p=>!!(tit.socio&&identidadNombresCoinciden(p.nombre,tit.socio));
   let hit=list.find(p=>tit.dip&&identidadDipCoinciden(p.codigo,tit.dip)&&!esSocio(p));
   if(!hit) hit=list.find(p=>tit.nombre&&identidadNombresCoinciden(p.nombre,tit.nombre)&&!esSocio(p));
+  if(!hit) hit=list.find(p=>Number(p.nivel)===0&&!esSocio(p));
   if(hit) return {pb:Number(hit.pnAct)||0,fuente:'fila',nombre:hit.nombre||tit.nombre||''};
   return null;
 }
@@ -10830,16 +10839,20 @@ function culturaEquipoActual(){
 function culturaPbOficial(eq){
   eq=eq||culturaEquipoActual();
   if(!eq) return null;
-  return titularPbPersonalDesdeEquipo(eq.titular||{}, eq.personas||[]);
+  const titular=Object.assign({},eq.titular||{});
+  const profile=window.APPIAuth&&window.APPIAuth.currentProfile?window.APPIAuth.currentProfile():null;
+  if(profile){
+    if(!titular.dip&&profile.dip) titular.dip=profile.dip;
+    if(!titular.nombre&&(profile.nombre||profile.nombre_completo)) titular.nombre=profile.nombre||profile.nombre_completo;
+  }
+  return titularPbPersonalDesdeEquipo(titular, eq.personas||[]);
 }
-function culturaSincronizarPbOficial(opts){
-  const force=!!(opts&&opts.force);
+function culturaSincronizarPbOficial(){
   const off=culturaPbOficial();
   if(!off) return false;
   const id=culturaMonthId();
   const cur=getCulturaMonth(id);
   const pb=Math.max(0,Math.round((Number(off.pb)||0)*100)/100);
-  if(!force && (Number(cur.pb)||0)>0) return false;
   if((Number(cur.pb)||0)===pb) return false;
   saveCulturaMonth(id,{...cur,pb});
   return true;
@@ -10901,8 +10914,10 @@ function renderCulturaCrecimiento(){
         <article class="cultura-task ${pbDone?'done':''}">
           <div class="cultura-task-top"><strong>💎 PB personales</strong><span class="cultura-task-hint">meta ${CULTURA_PB_META}${extra?` · +${culturaFmt(extra)}`:''}</span></div>
           <div class="cultura-step">
-            <input data-cultura-pb type="text" inputmode="decimal" enterkeyhint="done" value="${week.pb?String(week.pb).replace('.',','):''}" placeholder="0" aria-label="PB personales del mes">
-            ${off?`<small class="cultura-task-hint" data-cultura-pb-src>${(Number(week.pb)||0)===(Number(off.pb)||0)?'Desde tu Línea':'En tu Línea figura '+culturaFmt(off.pb)}</small>`:''}
+            <div class="cultura-pb-auto ${off?'from-line':''}" data-cultura-pb="${off?String(off.pb):''}" ${off?'':'data-cultura-pb-load'} role="status" aria-label="PB personales del mes">
+              <b>${off?culturaFmt(off.pb):'—'}</b>
+              <small data-cultura-pb-src>${off?'Desde tu Línea':'Cargá tu Línea'}</small>
+            </div>
           </div>
         </article>
         <article class="cultura-task ${accDone?'done':''}">
@@ -10923,18 +10938,9 @@ function renderCulturaCrecimiento(){
       <div class="cultura-foot">${weekPct>=100?(extra?'✓ Mes completo y superaste los 15 PB.':'✓ Mes completo: 15 PB y 2 invitados.'):`15 PB + 2 invitados en el mes = 100% · se pueden pasar`}</div>
       ${past.length?`<div class="cultura-history-title">Meses anteriores</div><div class="cultura-history">${pastHtml}</div>`:''}
     </section>`;
-  const persistPb=raw=>{
-    const n=Math.max(0,Number(String(raw).replace(',','.'))||0);
-    saveCulturaMonth(id,{...getCulturaMonth(id),pb:Math.round(n*100)/100});
-    renderCulturaCrecimiento();
-  };
   appiPintarTodos('culturaWrap', htmlCultura);
-  // El mismo bloque vive en el inicio y en Mi mes: se engancha en los dos.
-  document.querySelectorAll('#culturaWrap [data-cultura-pb]').forEach(pbInput=>{
-    pbInput.onfocus=()=>{ try{ pbInput.select(); }catch(e){} };
-    pbInput.onchange=()=>persistPb(pbInput.value);
-    pbInput.onblur=()=>persistPb(pbInput.value);
-    pbInput.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();pbInput.blur()}}
+  document.querySelectorAll('#culturaWrap [data-cultura-pb-load]').forEach(el=>{
+    el.onclick=()=>{ try{ if(typeof openEquipo==='function') openEquipo(); }catch(e){} };
   });
   document.querySelectorAll('#culturaWrap [data-cultura-slot]').forEach(btn=>btn.onclick=()=>openCulturaInvitado(id,+btn.dataset.culturaSlot));
   document.querySelectorAll('#culturaWrap [data-cultura-add]').forEach(addSlot=>{
@@ -11811,8 +11817,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='362';
-      const CACHE_NAME='appi-v362-pb-cultura';
+      const swVersion='363';
+      const CACHE_NAME='appi-v363-pb-auto';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 
@@ -15986,6 +15992,22 @@ setTimeout(initHistorico,1200);
         if(n.nodeType === 3){
           const t = n.textContent || '';
           if(/initHistorico|parseHistoricalFile|<\/script>|<\/html>/.test(t)){
+            n.parentNode && n.parentNode.removeChild(n);
+          }
+        }
+      });
+    }catch(e){}
+  }
+  limpiarRestos();
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', limpiarRestos);
+  setTimeout(limpiarRestos, 0);
+  setTimeout(limpiarRestos, 400);
+})();
+</script>
+
+</body>
+</html>
+      if(/initHistorico|parseHistoricalFile|<\/script>|<\/html>/.test(t)){
             n.parentNode && n.parentNode.removeChild(n);
           }
         }

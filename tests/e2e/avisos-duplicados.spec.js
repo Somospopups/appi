@@ -120,27 +120,16 @@ test('el Bonus se pinta en Mi Equipo y el cumple ya no tiene aviso propio', asyn
   expect(await page.locator('#bonusNotifWrap [data-bonus-act="wa"]').count()).toBe(tarjetas);
 });
 
-test('Cultura de Crecimiento sigue guardando los PB desde el inicio', async ({ page }) => {
+test('Cultura de Crecimiento muestra el PB automático, no un input', async ({ page }) => {
   await abrirApp(page);
   await page.evaluate(() => window.renderCulturaCrecimiento && window.renderCulturaCrecimiento());
   await page.waitForTimeout(300);
 
-  // Los campos se enganchan por data-*, no por id repetido.
   expect(await page.locator('#culturaWrap [data-cultura-pb]').count()).toBe(1);
-  expect(await page.evaluate(() => document.querySelectorAll('#culturaPbInput').length)).toBe(0);
-
+  expect(await page.evaluate(() => document.querySelectorAll('#culturaWrap input[data-cultura-pb], #culturaPbInput').length)).toBe(0);
   const campo = page.locator('#culturaWrap [data-cultura-pb]').first();
   await expect(campo).toBeVisible();
-  await campo.fill('7,5');
-  await campo.blur();
-  await page.waitForTimeout(400);
-  const guardado = await page.evaluate(() => {
-    const raw = JSON.parse(localStorage.getItem('cultura_crecimiento_v1') || '{}');
-    const meses = raw && raw.meses ? raw.meses : raw;
-    const claves = Object.keys(meses || {});
-    return claves.length ? (meses[claves[claves.length - 1]] || {}).pb : null;
-  });
-  expect(guardado).toBe(7.5);
+  await expect(campo).toContainText('Cargá tu Línea');
 });
 
 test('el cumpleañero sigue cubierto: la tarjeta del mazo lo trae (v321)', async ({ page }) => {
