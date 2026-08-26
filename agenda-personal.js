@@ -1,5 +1,5 @@
 /* ============================================================
-   APPI · Agenda personal (v358)
+   APPI · Agenda personal (v360)
    ------------------------------------------------------------
    Solapa del Panel de Contactos con dos agendas:
 
@@ -12,6 +12,11 @@
                           puede "pasar a APPI" uno por uno o en
                           bloque: entra como contacto nuevo del
                           embudo.
+
+   Selección flotante (v360): mantener presionado un contacto lo
+   elige, y el botón "☑️ Elegir varios" abre la barra para seguir
+   eligiendo con un toque por fila. La barra queda pegada abajo
+   con "📇 Pasar a APPI (n)", "🗑️ Quitar (n)" y "✕".
 
    La agenda vive en este teléfono y se sincroniza con la tabla
    appi_agenda_personal de la cuenta (SUPABASE_AGENDA_PERSONAL.sql).
@@ -63,8 +68,22 @@
 
   /* ---------- estado ---------- */
 
-  var mios = [];          // {id, nombre, telefono, tel_norm, estado:'nuevo'|'mergado', contacto_id, origen, created_at, updated_at}
+  var mios = []; // {id, nombre, telefono, tel_norm, estado:'nuevo'|'mergado', contacto_id, origen, created_at, updated_at}
   var seleccionados = new Set();
+  // Selección flotante (v360): el modo se abre al mantener presionado un
+  // contacto o con el botón "Elegir varios". Mientras está abierto la barra
+  // queda a la vista aunque todavía no haya nada marcado, y tocar una fila la
+  // elige o la suelta.
+  var modoSeleccion = false;
+  // Cuánto hay que dejar el dedo apoyado para que cuente como selección.
+  var PRESION_MS = 500;
+  // Si el dedo se corre más que esto, el gesto era un desplazamiento de la
+  // lista y no una selección: se cancela sin marcar nada.
+  var MARGEN_MOVIMIENTO = 10;
+  // El gesto largo repinta el panel; el click que lo sigue cae sobre el nodo
+  // nuevo y volvería a soltar lo que recién se eligió. Este sello se consume
+  // en el primer click posterior y evita ese ida y vuelta.
+  var gestoPresionado = null;
   var busqueda = '';
   var sinTabla = false;   // falta correr SUPABASE_AGENDA_PERSONAL.sql
   var cargado = false;
@@ -561,6 +580,7 @@
     });
 
     seleccionados.clear();
+    modoSeleccion = false;
     toast('📥 ' + exitosos + (exitosos === 1 ? ' contacto pasado a Agenda APPI ✓' : ' contactos pasados a Agenda APPI ✓'), 3500);
 
     if (navigator.onLine) await sincronizar();
@@ -618,10 +638,54 @@
     elegidos.forEach(function(c){ encolar({ a: 'del', t: c.tel_norm }); });
     mios = mios.filter(function(x){ return !selIds.has(x.id); });
     seleccionados.clear();
+    modoSeleccion = false;
     guardar();
 
     if (navigator.onLine) sincronizar(); else repintarSiVisible();
     toast(elegidos.length + (elegidos.length === 1 ? ' contacto quitado de tu agenda personal' : ' contactos quitados de tu agenda personal'));
+  }
+
+  /* ---------- selección flotante (v360) ---------- */
+
+  // Elige o suelta un contacto y repinta. Elegir siempre abre la barra, así el
+  // gesto largo y el toque sobre la fila terminan en el mismo lugar.
+  function alternarSeleccion(id){
+    if (!id) return;
+    if (seleccionados.has(id)) seleccionados.delete(id);
+    else {
+      seleccionados.add(id);
+      modoSeleccion = true;
+    }
+    repintarSiVisible();
+  }
+
+  // Suelta todo y cierra la barra. Es lo que hacen el ✕ de la barra y el
+  // botón "Listo" cuando el modo ya estaba abierto.
+  function cerrarSeleccion(){
+    seleccionados.clear();
+    modoSeleccion = false;
+    repintarSiVisible();
+  }
+
+  // Al soltar el dedo después de un gesto largo el navegador manda un click.
+  // Ese click cae sobre la fila recién repintada y la volvería a soltar, así
+  // que se descarta el primer click que llegue después del gesto. Se registra
+  // una sola vez por página: bind() corre en cada repintada.
+  var gestoProtegido = false;
+  function protegerDelGestoLargo(){
+    if (gestoProtegido) return;
+    gestoProtegido = true;
+    document.addEventListener('click', function(e){
+      if (!gestoPresionado) return;
+      // Si pasó mucho tiempo el gesto quedó colgado (el dedo se fue de la
+      // ventana sin click): se descarta el sello y el click vale.
+      if (Date.now() - gestoPresionado.hasta > 5000){ gestoPresionado = null; return; }
+      gestoPresionado = null;
+      e.preventDefault();
+      e.stopPropagation();
+    }, true);
+    // Un gesto nuevo deja sin efecto cualquier sello anterior.
+    document.addEventListener('pointerdown', function(){ gestoPresionado = null; }, true);
   }
 
   /* ---------- vista ---------- */
@@ -643,11 +707,16 @@
       '.ap-import .guia{background:none;border:1px dashed rgba(80,90,130,.3);border-radius:13px;color:#858692;font-weight:700;font-size:12px}',
       '.ap-buscar{width:100%;min-height:42px;margin:10px 0 6px;padding:8px 13px;border:1px solid rgba(80,90,130,.15);border-radius:12px;background:#f8f9ff;font:inherit;font-size:13px;outline:none;box-sizing:border-box}',
       'body.dark .ap-buscar{background:#1d1f31;border-color:rgba(255,255,255,.1);color:#f2f2f7}',
-      '.ap-toolbar{display:flex;align-items:center;justify-content:space-between;margin:8px 0 10px;padding:2px 4px;font-size:12px;color:#6b6e82;font-weight:750;user-select:none}',
+      '.ap-toolbar{display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap;margin:8px 0 10px;padding:2px 4px;font-size:12px;color:#6b6e82;font-weight:750;user-select:none}',
       'body.dark .ap-toolbar{color:#9d9fb5}',
       '.ap-select-all{display:inline-flex;align-items:center;gap:7px;cursor:pointer}',
       '.ap-select-all input{width:17px;height:17px;cursor:pointer;accent-color:#5b8def}',
       '.ap-count-tag{font-size:11.5px;color:#858692}',
+      /* Botón que abre la selección flotante (v360) */
+      '.ap-elegir{flex:0 0 auto;min-height:30px;padding:0 10px;border:1px solid rgba(91,141,239,.28);border-radius:999px;background:rgba(91,141,239,.08);color:#3d63c9;font:inherit;font-size:11.5px;font-weight:850;cursor:pointer;white-space:nowrap;transition:background .15s,color .15s}',
+      '.ap-elegir.activa{background:linear-gradient(135deg,#5b8def,#8b63e8);border-color:transparent;color:#fff}',
+      'body.dark .ap-elegir{background:rgba(91,141,239,.16);border-color:rgba(91,141,239,.4);color:#9db9f7}',
+      'body.dark .ap-elegir.activa{color:#fff}',
       '.ap-item{margin-bottom:9px}',
       '.ap-row{display:flex;flex-direction:column;gap:9px;width:100%;box-sizing:border-box;padding:12px 13px;border:1px solid rgba(80,90,130,.1);border-radius:15px;background:#fff;text-align:left;transition:border-color .15s, background .15s}',
       'body.dark .ap-row{background:rgba(30,30,50,.58);border-color:rgba(255,255,255,.08)}',
@@ -688,6 +757,12 @@
       '.ap-bulk-btn.pasar{background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;box-shadow:0 2px 6px rgba(37,211,102,.25)}',
       '.ap-bulk-btn.borrar{background:rgba(235,87,87,.22);color:#ff7a7a;border:1px solid rgba(235,87,87,.35)}',
       '.ap-bulk-btn.cancelar{background:rgba(255,255,255,.1);color:#d3d5e2;width:32px;padding:0;justify-content:center;font-size:14px}',
+      '.ap-bulk-btn:disabled{opacity:.42;cursor:default;box-shadow:none}',
+      /* Con el modo abierto la fila entera se puede tocar; mientras el dedo
+         está apoyado no se selecciona texto ni salta el menú del navegador. */
+      '.ap-modo .ap-row{cursor:pointer;touch-action:manipulation}',
+      '.ap-modo .ap-row,.ap-row.presionado{user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}',
+      '.ap-row.presionado{border-color:#5b8def;background:rgba(91,141,239,.12);transform:scale(.99)}',
       '.ap-vacio{padding:26px 14px;border:1px dashed rgba(80,90,130,.25);border-radius:16px;text-align:center;color:#858692;font-size:12.5px;line-height:1.6}',
       '.ap-vacio .ico{font-size:30px;display:block;margin-bottom:8px}',
       '.ap-aviso{margin:10px 0;padding:10px 12px;border-radius:12px;background:rgba(245,166,35,.12);color:#8a5a08;font-size:11.5px;line-height:1.5}'
@@ -747,12 +822,18 @@
 
   function bulkBarHTML(){
     var n = seleccionados.size;
-    if (!n) return '';
+    // La barra también aparece con cero elegidos mientras el modo está
+    // abierto: es la señal de que se puede seguir tocando filas.
+    if (!n && !modoSeleccion) return '';
+    var sinElegir = n === 0;
+    var resumen = sinElegir
+      ? 'Tocá los contactos que quieras'
+      : (n === 1 ? 'elegido' : 'elegidos');
     return '<div class="ap-bulk-bar" id="apBulkBar">' +
-      '<div class="ap-bulk-info"><span class="ap-bulk-badge">' + n + '</span><span>' + (n === 1 ? 'elegido' : 'elegidos') + '</span></div>' +
+      '<div class="ap-bulk-info"><span class="ap-bulk-badge">' + n + '</span><span>' + resumen + '</span></div>' +
       '<div class="ap-bulk-actions">' +
-        '<button type="button" class="ap-bulk-btn pasar" id="apBulkPasar">📇 Pasar a APPI (' + n + ')</button>' +
-        '<button type="button" class="ap-bulk-btn borrar" id="apBulkQuitar">🗑️ Quitar (' + n + ')</button>' +
+        '<button type="button" class="ap-bulk-btn pasar" id="apBulkPasar"' + (sinElegir ? ' disabled' : '') + '>📇 Pasar a APPI (' + n + ')</button>' +
+        '<button type="button" class="ap-bulk-btn borrar" id="apBulkQuitar"' + (sinElegir ? ' disabled' : '') + '>🗑️ Quitar (' + n + ')</button>' +
         '<button type="button" class="ap-bulk-btn cancelar" id="apBulkCancelar" title="Cancelar selección" aria-label="Cancelar selección">✕</button>' +
       '</div>' +
     '</div>';
@@ -797,6 +878,11 @@
           '<input type="checkbox" id="apSelectAll"' + (todosVisiblesSeleccionados ? ' checked' : '') + '> ' +
           '<span>' + (todosVisiblesSeleccionados ? 'Deseleccionar todos' : 'Seleccionar todos') + '</span>' +
         '</label>' +
+        '<button type="button" id="apElegirVarios" class="ap-elegir' + (modoSeleccion ? ' activa' : '') + '"' +
+          ' aria-pressed="' + (modoSeleccion ? 'true' : 'false') + '"' +
+          ' title="Elegir varios contactos (o mantené presionado uno)">' +
+          (modoSeleccion ? '✓ Listo' : '☑️ Elegir varios') +
+        '</button>' +
         '<span class="ap-count-tag">' + listado.length + (listado.length === 1 ? ' contacto' : ' contactos') + '</span>' +
       '</div>';
     }
@@ -805,7 +891,7 @@
     } else if (!listado.length){
       salida += '<div class="ap-vacio"><span class="ico">🔍</span>No hay contactos que coincidan con la búsqueda.</div>';
     } else {
-      salida += '<div id="apLista">' + listado.map(filaHTML).join('') + '</div>';
+      salida += '<div id="apLista"' + (modoSeleccion ? ' class="ap-modo"' : '') + '>' + listado.map(filaHTML).join('') + '</div>';
       salida += bulkBarHTML();
     }
     return salida;
@@ -908,6 +994,64 @@
       };
     }
 
+    // "Elegir varios" (v360): abre la barra flotante para elegir tocando las
+    // filas. Si ya estaba abierta, la cierra y suelta todo.
+    var elegirVarios = $('apElegirVarios');
+    if (elegirVarios){
+      elegirVarios.onclick = function(){
+        if (modoSeleccion) cerrarSeleccion();
+        else { modoSeleccion = true; repintarSiVisible(); }
+      };
+    }
+
+    // Mantener presionado un contacto (medio segundo) lo elige y abre la
+    // barra. Con el modo abierto alcanza con tocar la fila para elegir o
+    // soltar. Los botones y el checkbox de la fila siguen haciendo lo suyo.
+    protegerDelGestoLargo();
+    document.querySelectorAll('#apLista .ap-item').forEach(function(item){
+      var temporizador = null;
+      var origen = null;
+
+      function esControl(nodo){
+        return !!(nodo && nodo.closest && nodo.closest('button, a, input, label, select, textarea'));
+      }
+      function cancelar(){
+        if (temporizador){ clearTimeout(temporizador); temporizador = null; }
+        origen = null;
+      }
+
+      item.addEventListener('pointerdown', function(e){
+        if (e.pointerType === 'mouse' && e.button !== 0) return;
+        if (esControl(e.target)) return;
+        origen = { x: e.clientX, y: e.clientY };
+        temporizador = setTimeout(function(){
+          temporizador = null;
+          // cancelar() por movimiento o por soltar el dedo deja origen en null.
+          if (!origen) return;
+          var id = item.getAttribute('data-ap-id');
+          var fila = item.querySelector('.ap-row');
+          if (fila) fila.classList.add('presionado');
+          gestoPresionado = { id: id, hasta: Date.now() };
+          if (navigator.vibrate){ try{ navigator.vibrate(12); }catch(err){} }
+          alternarSeleccion(id);
+        }, PRESION_MS);
+      });
+      // Recorrer la lista no elige nada: si el dedo se corrió, no era un gesto.
+      item.addEventListener('pointermove', function(e){
+        if (!origen) return;
+        if (Math.abs(e.clientX - origen.x) > MARGEN_MOVIMIENTO ||
+            Math.abs(e.clientY - origen.y) > MARGEN_MOVIMIENTO) cancelar();
+      });
+      item.addEventListener('pointerup', cancelar);
+      item.addEventListener('pointercancel', cancelar);
+      item.addEventListener('pointerleave', cancelar);
+      item.addEventListener('click', function(e){
+        if (esControl(e.target)) return;
+        if (!modoSeleccion) return;
+        alternarSeleccion(item.getAttribute('data-ap-id'));
+      });
+    });
+
     // Selección individual
     document.querySelectorAll('[data-ap-select]').forEach(function(chk){
       chk.onchange = function(e){
@@ -963,10 +1107,7 @@
     if (bulkQuitar) bulkQuitar.onclick = function(){ quitarSeleccionados(); };
 
     var bulkCancelar = $('apBulkCancelar');
-    if (bulkCancelar) bulkCancelar.onclick = function(){
-      seleccionados.clear();
-      repintarSiVisible();
-    };
+    if (bulkCancelar) bulkCancelar.onclick = function(){ cerrarSeleccion(); };
   }
 
   window.APPIAgendaPersonal = {
@@ -983,6 +1124,8 @@
     quitarSeleccionados: quitarSeleccionados,
     abrirWa: abrirWa,
     seleccionados: function(){ return Array.from(seleccionados); },
+    alternarSeleccion: alternarSeleccion,
+    modoSeleccion: function(){ return modoSeleccion; },
     _mejorTelefono: mejorTelefono
   };
 })();

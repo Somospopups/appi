@@ -1,9 +1,10 @@
 const { test, expect } = require('@playwright/test');
 
-// La solapa "📱 AGENDA PERSONAL" del Panel de Contactos (v358): subir la
+// La solapa "📱 AGENDA PERSONAL" del Panel de Contactos: subir la
 // agenda del teléfono (.vcf en cualquier equipo, selector nativo donde esté),
 // botones de WhatsApp/Llamar/Pasar/Quitar dentro de cada tarjeta blanca,
-// y selección múltiple para pasar a APPI o eliminar en bloque.
+// selección múltiple para pasar a APPI o eliminar en bloque, y la selección
+// flotante de v360 (mantener presionado / "☑️ Elegir varios").
 
 const USER_ID = '11111111-1111-4111-8111-111111111111';
 const HOY = new Date().toISOString();
@@ -292,6 +293,122 @@ test('selección múltiple: eliminar contactos seleccionados en bloque', async (
   await page.locator('#appiDialogOk').click();
 
   await expect(page.locator('.ap-item')).toHaveCount(1);
+});
+
+/* ---------- selección flotante (v360) ---------- */
+
+// El gesto del teléfono: apoyar el puntero medio segundo sobre la fila. El
+// click con el que termina el gesto no tiene que soltar lo que se eligió.
+async function mantenerPresionado(page, locator) {
+  const caja = await locator.boundingBox();
+  const x = caja.x + caja.width / 2;
+  const y = caja.y + caja.height / 2;
+  await page.mouse.move(x, y);
+  await page.mouse.down();
+  await page.waitForTimeout(650);
+  await page.mouse.up();
+}
+
+async function subirAgendaDePrueba(page) {
+  const mocks = await abrirAgendaPersonal(page, { contactos: [] });
+  await page.setInputFiles('#apVcfInput', { name: 'agenda.vcf', mimeType: 'text/vcard', buffer: Buffer.from(VCF, 'utf8') });
+  await expect(page.locator('.ap-item')).toHaveCount(3);
+  return mocks;
+}
+
+test('mantener presionado un contacto abre la barra flotante con ese contacto elegido', async ({ page }) => {
+  await subirAgendaDePrueba(page);
+
+  // Sin elegir nada no hay barra: la lista queda limpia.
+  await expect(page.locator('#apBulkBar')).toHaveCount(0);
+
+  await mantenerPresionado(page, page.locator('.ap-item').filter({ hasText: 'Juan Pérez' }).locator('.ap-quien'));
+
+  // Queda elegido exactamente uno: el gesto no arrastra a los vecinos.
+  await expect(page.locator('#apBulkBar')).toBeVisible();
+  await expect(page.locator('#apBulkPasar')).toContainText('Pasar a APPI (1)');
+  await expect(page.locator('.ap-item.seleccionado')).toHaveCount(1);
+  await expect(page.locator('.ap-item').filter({ hasText: 'Juan Pérez' })).toHaveClass(/seleccionado/);
+
+  // Y el gesto largo encendió el modo: la fila se puede seguir tocando.
+  expect(await page.evaluate(() => window.APPIAgendaPersonal.modoSeleccion())).toBe(true);
+});
+
+test('el botón "Elegir varios" abre la barra y deja elegir tocando las filas', async ({ page }) => {
+  await subirAgendaDePrueba(page);
+
+  const boton = page.locator('#apElegirVarios');
+  await expect(boton).toBeVisible();
+  await expect(boton).toContainText('Elegir varios');
+  await expect(page.locator('#apBulkBar')).toHaveCount(0);
+
+  await boton.click();
+  // Abre la barra aunque todavía no haya nada marcado, con las acciones
+  // apagadas hasta que se elija algo.
+  await expect(page.locator('#apBulkBar')).toBeVisible();
+  await expect(page.locator('#apBulkPasar')).toBeDisabled();
+  await expect(page.locator('#apBulkQuitar')).toBeDisabled();
+  await expect(boton).toContainText('Listo');
+
+  // Con el modo abierto alcanza un toque sobre la fila.
+  await page.locator('.ap-item').filter({ hasText: 'María Gómez' }).locator('.ap-quien').click();
+  await page.locator('.ap-item').filter({ hasText: 'José Pérez' }).locator('.ap-quien').click();
+  await expect(page.locator('#apBulkQuitar')).toContainText('Quitar (2)');
+  await expect(page.locator('#apBulkPasar')).toBeEnabled();
+
+  // Y el mismo toque suelta: de dos elegidos vuelve a uno.
+  await page.locator('.ap-item').filter({ hasText: 'José Pérez' }).locator('.ap-quien').click();
+  await expect(page.locator('#apBulkQuitar')).toContainText('Quitar (1)');
+
+  // "✓ Listo" cierra el modo y suelta todo.
+  await page.locator('#apElegirVarios').click();
+  await expect(page.locator('#apBulkBar')).toHaveCount(0);
+  await expect(page.locator('.ap-item.seleccionado')).toHaveCount(0);
+});
+
+test('recorrer la lista con el dedo no selecciona nada', async ({ page }) => {
+  await subirAgendaDePrueba(page);
+
+  const caja = await page.locator('.ap-item').first().locator('.ap-quien').boundingBox();
+  await page.mouse.move(caja.x + caja.width / 2, caja.y + caja.height / 2);
+  await page.mouse.down();
+  // El dedo se corre más que el margen: era un desplazamiento de la lista.
+  await page.mouse.move(caja.x + caja.width / 2, caja.y + caja.height / 2 + 40, { steps: 6 });
+  await page.waitForTimeout(650);
+  await page.mouse.up();
+
+  await expect(page.locator('#apBulkBar')).toHaveCount(0);
+  await expect(page.locator('.ap-item.seleccionado')).toHaveCount(0);
+});
+
+test('los botones de la fila siguen funcionando con el modo de selección abierto', async ({ page }) => {
+  const { importados } = await subirAgendaDePrueba(page);
+
+  await page.locator('#apElegirVarios').click();
+  await expect(page.locator('#apBulkBar')).toBeVisible();
+
+  // El 📇 de la fila no se confunde con el toque que elige: pasa uno solo.
+  await page.locator('.ap-item').filter({ hasText: 'Juan Pérez' }).locator('[data-ap-pasar]').click();
+  await expect(page.locator('#appiDialogTitle')).toContainText('Pasar a Agenda APPI');
+  await expect(page.locator('#appiDialogMessage')).toContainText('Juan Pérez');
+  await page.locator('#appiDialogOk').click();
+  await expect.poll(() => importados.length).toBe(1);
+
+  // Y el checkbox de la fila tampoco dispara el toque de la fila entera.
+  await page.locator('.ap-item').filter({ hasText: 'María Gómez' }).locator('[data-ap-select]').check();
+  await expect(page.locator('#apBulkPasar')).toContainText('Pasar a APPI (1)');
+});
+
+test('la ✕ de la barra suelta todo y cierra la selección flotante', async ({ page }) => {
+  await subirAgendaDePrueba(page);
+
+  await page.locator('[data-ap-select]').nth(0).check();
+  await expect(page.locator('#apBulkBar')).toBeVisible();
+
+  await page.locator('#apBulkCancelar').click();
+  await expect(page.locator('#apBulkBar')).toHaveCount(0);
+  await expect(page.locator('.ap-item.seleccionado')).toHaveCount(0);
+  expect(await page.evaluate(() => window.APPIAgendaPersonal.modoSeleccion())).toBe(false);
 });
 
 test('sin selector nativo (iPhone) la entrada es el .vcf y no aparece el botón del teléfono', async ({ page }) => {
