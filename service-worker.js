@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v364-hoy-conviene';
+const CACHE_NAME = 'appi-v365-depurados-tel';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

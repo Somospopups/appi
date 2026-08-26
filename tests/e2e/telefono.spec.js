@@ -94,7 +94,10 @@ test.describe('APPITel · armado de números argentinos', () => {
       const abiertos = [];
       window.APPIWhatsApp = { abrir: u => abiertos.push(u) };
       let aviso = null;
-      window.APPIDialog = { alert: (msg, opts) => { aviso = { msg, opts }; } };
+      window.APPIDialog = {
+        confirm: (msg, opts) => { aviso = { msg, opts }; return Promise.resolve(false); },
+        alert: (msg, opts) => { aviso = { msg, opts, tipo: 'alert' }; }
+      };
       const devuelto = window.APPITel.abrir('0351-999888', 'Hola', 'Juan');
       return { devuelto, abiertos, aviso };
     });
@@ -103,6 +106,24 @@ test.describe('APPITel · armado de números argentinos', () => {
     expect(r.aviso).not.toBeNull();
     expect(r.aviso.msg).toContain('Juan');
     expect(r.aviso.msg.toLowerCase()).toContain('no se puede abrir whatsapp');
+    expect(r.aviso.opts.okText).toBe('A depurados');
+    expect(r.aviso.opts.cancelText).toBe('Aceptar');
+  });
+
+  test('A depurados manda el contacto a la lista', async ({ page }) => {
+    const r = await page.evaluate(async () => {
+      const enviados = [];
+      window.depurarUsuario = u => enviados.push(u);
+      window.APPIDialog = {
+        confirm: (msg, opts) => Promise.resolve(true)
+      };
+      window.APPITel.abrir('0351-999888', 'Hola', 'Julieta', { usuario: 'Julieta Pérez', telf: '0351-999888', localidad: 'Córdoba' });
+      await new Promise(res => setTimeout(res, 20));
+      return enviados;
+    });
+    expect(r).toHaveLength(1);
+    expect(r[0].usuario).toContain('Julieta');
+    expect(r[0].telf).toContain('999888');
   });
 
   test('abrir manda a WhatsApp cuando el número sirve', async ({ page }) => {

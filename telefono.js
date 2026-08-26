@@ -99,19 +99,79 @@
     return 'https://wa.me/' + n + (texto ? '?text=' + encodeURIComponent(texto) : '');
   }
 
+  function listaUsuariosTel(){
+    try{
+      if (typeof window.usuariosTodosActual === 'function'){
+        var vivos = window.usuariosTodosActual() || [];
+        if (vivos.length) return vivos;
+      }
+    }catch(e){}
+    return Array.isArray(window.usuariosU) ? window.usuariosU : [];
+  }
+  function aUsuarioDep(p, valor, nombre){
+    if (!p) p = {};
+    return {
+      usuario: p.usuario || p.nombre || nombre || 'Sin nombre',
+      telf: p.telf || p.tel || p.telefono || valor || '',
+      domicilio: p.domicilio || '',
+      localidad: p.localidad || '',
+      producto: p.producto || '',
+      dip: p.dip || p.codigo || ''
+    };
+  }
+  function buscarPersonaTel(valor, nombre, persona){
+    if (persona && (persona.usuario || persona.nombre || persona.telf || persona.tel || persona.telefono)) return persona;
+    var tel = String(valor == null ? '' : valor).replace(/\D/g, '');
+    var nom = String(nombre == null ? '' : nombre).trim().toLowerCase();
+    var lista = listaUsuariosTel();
+    var hit = null;
+    for (var i = 0; i < lista.length; i++){
+      var u = lista[i];
+      var t = String(u.telf || u.tel || u.telefono || '').replace(/\D/g, '');
+      if (tel && t && (t === tel || t.endsWith(tel) || tel.endsWith(t))){ hit = u; break; }
+      var n = String(u.usuario || u.nombre || '').trim().toLowerCase();
+      if (nom && n && (n === nom || n.indexOf(nom) >= 0 || nom.indexOf(n) >= 0)){ hit = u; break; }
+    }
+    return hit || { usuario: nombre || 'Sin nombre', telf: valor || '' };
+  }
+  function mandarADepurados(valor, nombre, persona){
+    var dest = aUsuarioDep(buscarPersonaTel(valor, nombre, persona), valor, nombre);
+    if (typeof window.depurarUsuario === 'function'){
+      window.depurarUsuario(dest);
+      if (window.showToast) window.showToast('Listo: quedó en Depurados 🧹', 2200);
+      return true;
+    }
+    if (typeof window.abrirPanelDepurados === 'function'){
+      window.abrirPanelDepurados();
+      return true;
+    }
+    return false;
+  }
+
+  /* Si el número no sirve, el mismo cartel ofrece mandarlo a Depurados. */
+  function avisarInvalido(valor, nombre, persona){
+    var quien = nombre ? ('"' + nombre + '"') : 'Este contacto';
+    var msg = quien + ' no tiene un número de teléfono válido, así que no se puede abrir WhatsApp.\n\n' +
+              'Revisá que esté completo: código de área y número, por ejemplo 351 766-9967.';
+    var opts = { title: 'Número incompleto', icon: '📵', okText: 'A depurados', cancelText: 'Aceptar', danger: true };
+    if (window.APPIDialog && window.APPIDialog.confirm){
+      Promise.resolve(window.APPIDialog.confirm(msg, opts)).then(function(ok){
+        if (ok) mandarADepurados(valor, nombre, persona);
+      });
+    } else if (window.APPIDialog && window.APPIDialog.alert){
+      window.APPIDialog.alert(msg, { title: 'Número incompleto', icon: '📵' });
+    } else {
+      alert(msg);
+    }
+  }
+
   /* Abre WhatsApp. Si el número no sirve, avisa y no abre nada.
+     persona (opcional) es el contacto/usuario para poder depurarlo.
      Devuelve true si abrió, false si el número era inválido. */
-  function abrir(valor, texto, nombre){
+  function abrir(valor, texto, nombre, persona){
     var url = link(valor, texto);
     if (!url){
-      var quien = nombre ? ('"' + nombre + '"') : 'Este contacto';
-      var msg = quien + ' no tiene un número de teléfono válido, así que no se puede abrir WhatsApp.\n\n' +
-                'Revisá que esté completo: código de área y número, por ejemplo 351 766-9967.';
-      if (window.APPIDialog && window.APPIDialog.alert){
-        window.APPIDialog.alert(msg, { title: 'Número incompleto', icon: '📵' });
-      } else {
-        alert(msg);
-      }
+      avisarInvalido(valor, nombre, persona);
       return false;
     }
     if (window.APPIWhatsApp && window.APPIWhatsApp.abrir) window.APPIWhatsApp.abrir(url);
@@ -125,6 +185,7 @@
     primeroValido: primeroValido,
     bonito:     bonito,
     link:       link,
-    abrir:      abrir
+    abrir:      abrir,
+    avisarInvalido: avisarInvalido
   };
 })();

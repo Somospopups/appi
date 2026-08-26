@@ -95,6 +95,32 @@ test('el panel de depurados lista el contacto y descarga el CSV', async ({ page 
   expect(download.suggestedFilename()).toMatch(/appi-depurados-\d{4}-\d{2}-\d{2}\.csv/);
 });
 
+test('el cartel de número incompleto ofrece mandar a depurados', async ({ page }) => {
+  await entrar(page);
+  await page.evaluate(() => {
+    const lista = JSON.parse(localStorage.getItem('usuarios_garantias') || '[]');
+    lista.push({
+      id: 9, usuario: 'Julieta López', telf: '0351-999888', domicilio: 'Rivadavia 10',
+      localidad: 'Córdoba', producto: 'PSA', estado: 'vigente'
+    });
+    localStorage.setItem('usuarios_garantias', JSON.stringify(lista));
+    if (typeof loadUsuariosFromStorage === 'function') loadUsuariosFromStorage();
+    else if (window.usuariosU) window.usuariosU.push(lista[lista.length - 1]);
+  });
+  await page.evaluate(() => {
+    const u = (window.usuariosU || []).find(x => /Julieta/i.test(x.usuario));
+    window.APPITel.abrir(u && u.telf, 'Hola', 'Julieta', u);
+  });
+  await expect(page.locator('#appiDialogTitle')).toContainText('Número incompleto');
+  await expect(page.locator('#appiDialogOk')).toHaveText('A depurados');
+  await page.locator('#appiDialogOk').click();
+  const dep = await page.evaluate(() => {
+    const k = Object.keys(localStorage).find(x => x.startsWith('appi_depurados_v1_'));
+    return JSON.parse(localStorage.getItem(k) || '{"lista":[]}').lista;
+  });
+  expect(dep.some(x => /Julieta/i.test(x.nombre))).toBe(true);
+});
+
 test('un contacto depurado no reaparece al recargar la planilla', async ({ page }) => {
   await entrar(page);
   const ficha = page.locator('#usuariosList .tree-node').first();

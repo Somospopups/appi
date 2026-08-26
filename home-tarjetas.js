@@ -457,7 +457,8 @@
           window.APPITel.abrir(telDeB(p), 'Hola ' + pilaB(p.nombre) + '! 😊 Vi que ya estás en ' + pb + ' PB… ¡a nada del Bonus! ¿Te ayudo a llegar? Podemos invitar a alguien y trabajarlo juntos esta semana. 💪', pilaB(p.nombre));
         } else if (window.APPIDialog && window.APPIDialog.alert){
           // Sin teléfono en la planilla, decirlo de frente (v322).
-          window.APPIDialog.alert((pilaB(p.nombre) || 'Esta persona') + ' no tiene un teléfono válido cargado en la planilla de Línea Descendente. Cuando subas una planilla con su número, el mensaje sale a un toque.', { title: 'Sin teléfono en la planilla', icon: '📵' });
+          if (window.APPITel && window.APPITel.avisarInvalido) window.APPITel.avisarInvalido(telDeB(p), pilaB(p.nombre), p);
+          else if (window.APPIDialog && window.APPIDialog.alert) window.APPIDialog.alert((pilaB(p.nombre) || 'Esta persona') + ' no tiene un teléfono válido cargado en la planilla de Línea Descendente. Cuando subas una planilla con su número, el mensaje sale a un toque.', { title: 'Sin teléfono en la planilla', icon: '📵' });
         } else abrirEquipo();
       }; };
       var filas = [], items = [];
@@ -509,7 +510,8 @@
     var avisarSinTelefono = function(p){
       var nombre = pila(p.nombre) || 'Esta persona';
       if (window.APPIDialog && window.APPIDialog.alert){
-        window.APPIDialog.alert(nombre + ' no tiene un teléfono válido cargado en la planilla de Línea Descendente. Cuando subas una planilla con su número, el saludo sale a un toque.', { title: 'Sin teléfono en la planilla', icon: '📵' });
+        if (window.APPITel && window.APPITel.avisarInvalido) window.APPITel.avisarInvalido(telDe(p), nombre, p);
+        else if (window.APPIDialog && window.APPIDialog.alert) window.APPIDialog.alert(nombre + ' no tiene un teléfono válido cargado en la planilla de Línea Descendente. Cuando subas una planilla con su número, el saludo sale a un toque.', { title: 'Sin teléfono en la planilla', icon: '📵' });
       } else abrirEquipo();
     };
     // Saludo directo: a la persona del equipo la saluda APPITel con el mensaje

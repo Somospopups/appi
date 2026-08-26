@@ -434,7 +434,7 @@
     // Si el campo trae más de un número (o un "54" suelto), se manda al
     // primer número válido y no se rompe la redirección (v331).
     var tel = (window.APPITel && window.APPITel.primeroValido) ? window.APPITel.primeroValido(u && u.telf || '') : (u && u.telf || '');
-    if (!window.APPITel.abrir(tel, texto, nombre)) return;
+    if (!window.APPITel.abrir(tel, texto, nombre, u)) return;
     registrar(u, texto);
   }
 

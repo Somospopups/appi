@@ -4111,7 +4111,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v364 · Segura</div>
+  <div class="ds-foot">APPI · v365 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -11817,8 +11817,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='364';
-      const CACHE_NAME='appi-v364-hoy-conviene';
+      const swVersion='365';
+      const CACHE_NAME='appi-v365-depurados-tel';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 
@@ -14373,7 +14373,9 @@ function renderListU(){
         }
       }else if(action==='whatsapp'){
         const link=getWhatsAppLinkU(u);
-        if(link) window.open(link,'_blank','noopener'); else window.APPIDialog.alert('Este usuario no tiene un teléfono válido cargado.',{title:'Sin teléfono',icon:'📵'});
+        if(link) window.open(link,'_blank','noopener');
+        else if(window.APPITel && window.APPITel.avisarInvalido) window.APPITel.avisarInvalido(u.telf||'', nombreDePila(u.usuario)||u.usuario, u);
+        else window.APPIDialog.alert('Este usuario no tiene un teléfono válido cargado.',{title:'Sin teléfono',icon:'📵'});
       }else if(action==='call'){
         const digits=window.APPITel?window.APPITel.normalizar(u.telf||''):'';
         if(digits) window.location.href='tel:'+digits;
@@ -14439,6 +14441,8 @@ function actualizarBadgeDepurados(){
   var n=depuradosContar();
   b.innerHTML='<span>🧹</span>Depurados'+(n?' · '+n:'');
 }
+window.depurarUsuario=depurarUsuario;
+window.abrirPanelDepurados=abrirPanelDepurados;
 function depurarUsuario(u){
   var d=depuradosLeer();
   d.lista.unshift({
