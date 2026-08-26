@@ -541,6 +541,12 @@
     if (!fecha) return '';
     if (motivoId === 'retro') return 'Pendiente desde: ' + fmtFecha(fecha);
     if (motivoId === 'porvencer') return 'Vence: ' + fmtFecha(fecha);
+    if (motivoId === 'renovacion') return 'Venció: ' + fmtFecha(fecha);
+    if (motivoId === 'checkin'){
+      var ultC = ultimoEnvio(u);
+      if (ultC && ultC.at) return 'Sin escribirle desde: ' + fmtFecha(fecha);
+      return fecha ? 'Cliente desde: ' + fmtFecha(fecha) : 'Hace rato que no le escribís';
+    }
     if (motivoId === 'cumple') return 'Cumple: ' + fmtFecha(fecha);
     return fmtFecha(fecha);
   }
