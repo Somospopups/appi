@@ -658,8 +658,11 @@ async function openMiGestion(){
   // desde el celular ya está disponible en la caché local.
   const agendaSync=window.APPIAgendaPersonal&&navigator.onLine&&authorized()
     ?window.APPIAgendaPersonal.sincronizar():Promise.resolve(false);
+  const agendaCuenta=window.APPIAgendaPersonal&&window.APPIAgendaPersonal.traerDeLaNube
+    ?window.APPIAgendaPersonal.traerDeLaNube():Promise.resolve(false);
   await refreshManagement(!state.contacts.length);
   await agendaSync;
+  await agendaCuenta;
   if(navigator.onLine)setTimeout(()=>{migrarContactosLocales().catch(()=>{})},700);
 }
 

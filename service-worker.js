@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v370-agenda-nube';
+const CACHE_NAME = 'appi-v371-agenda-cuenta';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

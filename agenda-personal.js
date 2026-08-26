@@ -147,6 +147,18 @@
     }
     return mios;
   }
+  function recargarDesdeCache(){
+    cargado = false;
+    cargar();
+    repintarSiVisible();
+  }
+  function pedirNubeCuenta(){
+    if (!window.APPIDataSync || typeof window.APPIDataSync.syncNow !== 'function') return Promise.resolve(false);
+    return window.APPIDataSync.syncNow(true).then(function(){
+      recargarDesdeCache();
+      return true;
+    }).catch(function(){ return false; });
+  }
 
   /* ---------- sincronización (espejo de la tabla) ---------- */
 
@@ -726,8 +738,8 @@
       '.ap-cabeza h3{margin:0;font-size:28px;font-weight:500;letter-spacing:-.03em;color:#2c2c34;font-family:Georgia,"Times New Roman",serif}',
       'body.dark .ap-cabeza h3{color:#f2f0ea}',
       '.ap-cabeza small{display:block;margin-top:4px;color:#9a9aa8;font-size:13px;font-weight:500}',
-      '.ap-import{display:flex;gap:8px;margin:12px 0 8px}',
-      '.ap-import button{flex:1;min-height:44px;border:0;border-radius:10px;font:inherit;font-size:12.5px;font-weight:750;cursor:pointer;padding:8px 10px;line-height:1.25}',
+      '.ap-import{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 6px}',
+      '.ap-import button{flex:0 0 auto;width:auto;min-height:32px;border:0;border-radius:8px;font:inherit;font-size:12px;font-weight:700;cursor:pointer;padding:6px 11px;line-height:1.2}',
       '.ap-import .ppal{background:rgba(91,141,239,.14);color:#3d63c9;box-shadow:none}',
       '.ap-import .guia{background:rgba(80,90,130,.07);border:0;color:#6b6e82}',
       'body.dark .ap-import .ppal{background:rgba(91,141,239,.22);color:#9db9f7}',
@@ -870,8 +882,8 @@
     var cuenta = mios.length + (mios.length === 1 ? ' contacto' : ' contactos');
     if (mios.length && paraPasar) cuenta += ' · ' + paraPasar + ' para pasar';
     salida += '<div class="ap-cabeza"><h3>Agenda personal</h3><small>' + cuenta + '</small></div>';
-    if (sinTabla){
-      salida += '<div class="ap-aviso"><b>La sincronización está esperando un paso en la base.</b> Tu agenda vive segura en este teléfono; para que también viva en tu cuenta (y no se pierda al cambiar de celular) hay que ejecutar <b>SUPABASE_AGENDA_PERSONAL.sql</b> una sola vez en Supabase.</div>';
+    if (sinTabla && !mios.length){
+      salida += '<div class="ap-aviso">Si subiste la agenda en el celular, abrí APPI ahí un momento con internet y después volvé a esta solapa.</div>';
     }
     salida += '<div class="ap-import">';
     salida += '<button type="button" class="ppal" id="apSubirVcf">Subir agenda</button>';
@@ -929,8 +941,14 @@
   window.addEventListener('appi-auth-change', function(){
     if (uid() !== uidVisto) cargado = false;
     setTimeout(function(){
-      if (navigator.onLine && autorizado()) sincronizar();
+      if (navigator.onLine && autorizado()){
+        sincronizar();
+        pedirNubeCuenta();
+      }
     }, 0);
+  });
+  window.addEventListener('appi-datasync-applied', function(){
+    recargarDesdeCache();
   });
   window.addEventListener('focus', function(){ setTimeout(sincronizarSiPanelVisible, 0); });
   window.addEventListener('online', sincronizarSiPanelVisible);
@@ -1136,6 +1154,7 @@
     html: html,
     bind: bind,
     sincronizar: sincronizar,
+    traerDeLaNube: pedirNubeCuenta,
     parsearVcard: parsearVcard,
     importarLista: importarLista,
     lista: function(){ cargar(); return mios; },

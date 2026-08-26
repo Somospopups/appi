@@ -161,6 +161,14 @@ test('al abrir APPI con Agenda Personal guardada, primero pinta esa solapa y des
   await expect(page.locator('.ap-item').filter({ hasText: 'Contacto desde el celular' })).toBeVisible();
 });
 
+test('la agenda personal viaja en la nube de la cuenta', async ({ page }) => {
+  await abrirAgendaPersonal(page);
+  const vaALaNube = await page.evaluate(() =>
+    !!(window.APPIDataSync && window.APPIDataSync.isDataKey('appi_agenda_personal_v1_' + (window.APPIAuth && window.APPIAuth.userId ? window.APPIAuth.userId() : '')))
+  );
+  expect(vaALaNube).toBe(true);
+});
+
 test('en la PC aparece la agenda que se subió desde el celular', async ({ page }) => {
   const remota = [{
     nombre: 'Contacto desde el celular', telefono: '3515559090',

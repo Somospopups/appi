@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "370.0.0",
-  "cacheName": "appi-v370-agenda-nube",
+  "version": "371.0.0",
+  "cacheName": "appi-v371-agenda-cuenta",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

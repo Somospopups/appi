@@ -17,7 +17,7 @@ const EXACT_KEYS=new Set([
 const PREFIXES=[
   'rueda','siete_','presu_','lastUpdate_','bonus_notif_',
   'appi_suenos_v1_','appi_porque_v1_','appi_stock_v1_','appi_prestamos_v1_','appi_cal_tareas_v1_','appi_tarjetas_v1_',
-  'appi_acciones_v1_'
+  'appi_acciones_v1_','appi_agenda_personal_v1_'
 ];
 const state={ready:false,userId:'',workspaceId:'',personType:'titular',values:{},changedAt:{},dirty:new Set(),deleted:new Set(),cacheTimer:null,syncTimer:null,syncing:false,lastError:''};
 const nativeSet=Storage.prototype.setItem;
@@ -140,7 +140,9 @@ function merge(local,remote,preferLocal=false){
 async function pullLatest(){
   const remote=await pullCloud(state.personType),merged=merge({values:state.values,changedAt:state.changedAt},remote,false);
   state.values={...(merged.values||{})};state.changedAt={...(merged.changedAt||{})};merged.dirty.forEach(key=>state.dirty.add(key));
-  applyValues(state.values);await cachePut(cacheRecord()).catch(()=>{});return true;
+  applyValues(state.values);await cachePut(cacheRecord()).catch(()=>{});
+  try{window.dispatchEvent(new CustomEvent('appi-datasync-applied'))}catch(e){}
+  return true;
 }
 async function start({claimLegacy=true}={}){
   if(!window.APPIAuth||!window.APPIAuth.isEnabled()||!window.APPIAuth.isLocallyAuthorized())return {ready:false};
@@ -169,6 +171,7 @@ async function start({claimLegacy=true}={}){
   const userAudio=localStorage.getItem(audioMetaKey(workspaceId));if(userAudio!=null)nativeSet.call(localStorage,AUDIO_META_KEY,userAudio);
   nativeSet.call(localStorage,ACTIVE_USER_KEY,workspaceId);state.ready=true;
   await cachePut(cacheRecord()).catch(()=>{});
+  try{window.dispatchEvent(new CustomEvent('appi-datasync-applied'))}catch(e){}
   if(online&&state.dirty.size)await syncNow(false);
   return {ready:true,online,claimedLegacy:preferLocal,keys:Object.keys(state.values).length,personType};
 }
