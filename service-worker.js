@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v368-punto-derecha';
+const CACHE_NAME = 'appi-v369-cuadraditos';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

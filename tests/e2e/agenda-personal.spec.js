@@ -1,10 +1,8 @@
 const { test, expect } = require('@playwright/test');
 
 // La solapa "📱 AGENDA PERSONAL" del Panel de Contactos: subir la
-// agenda del teléfono (.vcf en cualquier equipo, selector nativo donde esté),
-// listado sutil por letra (v366) — un puntito si falta pasar, y las
-// acciones (WhatsApp / Llamar / Pasar / Quitar) al tocar el nombre.
-// Selección múltiple y selección flotante (mantener presionado / "Elegir varios").
+// agenda del teléfono con un .vcf, listado sutil por letra, puntito a
+// la derecha si ya está en APPI, y las acciones al tocar el nombre.
 
 const USER_ID = '11111111-1111-4111-8111-111111111111';
 const HOY = new Date().toISOString();
@@ -415,15 +413,13 @@ test('la ✕ de la barra suelta todo y cierra la selección flotante', async ({ 
   expect(await page.evaluate(() => window.APPIAgendaPersonal.modoSeleccion())).toBe(false);
 });
 
-test('sin selector nativo (iPhone) la entrada es el .vcf y no aparece el botón del teléfono', async ({ page }) => {
+test('la entrada es el .vcf: no hay botón de elegir del teléfono', async ({ page }) => {
   await abrirAgendaPersonal(page);
-  // Chromium de escritorio no tiene navigator.contacts: mismo caso que iPhone.
-  const picker = await page.evaluate(() => !!(navigator.contacts && navigator.contacts.select));
-  expect(picker).toBe(false);
   await expect(page.locator('#apElegirTel')).toHaveCount(0);
   const subir = page.locator('#apSubirVcf');
   await expect(subir).toBeVisible();
   await expect(subir).toHaveClass(/ppal/);
+  await expect(page.locator('#apGuia')).toBeVisible();
 });
 
 test('quitar un contacto de la agenda personal pide confirmación y lo saca de la lista', async ({ page }) => {
@@ -431,57 +427,11 @@ test('quitar un contacto de la agenda personal pide confirmación y lo saca de l
   await page.setInputFiles('#apVcfInput', { name: 'agenda.vcf', mimeType: 'text/vcard', buffer: Buffer.from(VCF, 'utf8') });
   await expect(page.locator('.ap-item')).toHaveCount(3);
 
+  await page.locator('.ap-item').filter({ hasText: 'María Gómez' }).locator('.ap-quien').click();
   await page.locator('.ap-item').filter({ hasText: 'María Gómez' }).locator('[data-ap-quitar]').click();
   await expect(page.locator('#appiDialogTitle')).toContainText('Quitar de la agenda');
   await page.locator('#appiDialogOk').click();
 
   await expect(page.locator('.ap-item')).toHaveCount(2);
   await expect(page.locator('.ap-item').filter({ hasText: 'María Gómez' })).toHaveCount(0);
-});
-
-// El selector nativo (Android) mockeado: la API no existe en Chromium de
-// escritorio, así que se inyecta para probar los tres caminos reales.
-async function abrirConPicker(page, contactoMock) {
-  await page.addInitScript(mock => {
-    Object.defineProperty(navigator, 'contacts', {
-      configurable: true,
-      value: { select: async () => {
-        if (mock === 'permiso') { const e = new Error('Permission denied'); e.name = 'NotAllowedError'; throw e; }
-        if (mock === 'cancela') { const e = new Error('The user cancelled'); e.name = 'AbortError'; throw e; }
-        return mock;
-      } }
-    });
-  }, contactoMock);
-  return abrirAgendaPersonal(page);
-}
-
-test('con selector nativo (Android): elegir del teléfono importa los contactos', async ({ page }) => {
-  await abrirConPicker(page, [
-    { name: ['Juan Picker'], tel: ['3515557777'] },
-    { name: ['Ana Picker'], tel: ['+54 9 351 555 8888', '0351 422 9999'] }
-  ]);
-  await expect(page.locator('#apElegirTel')).toBeVisible();
-  await page.locator('#apElegirTel').click();
-  await expect(page.locator('.ap-item')).toHaveCount(2);
-  await expect(page.locator('.ap-item').filter({ hasText: 'Juan Picker' })).toContainText('3515557777');
-  // Del doble número de Ana queda el celular (15/móvil), no el fijo.
-  await expect(page.locator('.ap-item').filter({ hasText: 'Ana Picker' })).toContainText('351 555 8888');
-});
-
-test('si Android bloquea el permiso, se explica cómo habilitarlo (v358)', async ({ page }) => {
-  await abrirConPicker(page, 'permiso');
-  await page.locator('#apElegirTel').click();
-  await expect(page.locator('#appiDialogTitle')).toContainText('Falta el permiso');
-  await expect(page.locator('#appiDialogMessage')).toContainText('Permisos');
-  await expect(page.locator('#appiDialogMessage')).toContainText('.vcf');
-  await page.locator('#appiDialogOk').click();
-  await expect(page.locator('.ap-item')).toHaveCount(0);
-});
-
-test('cancelar el selector no molesta con ningún cartel', async ({ page }) => {
-  await abrirConPicker(page, 'cancela');
-  await page.locator('#apElegirTel').click();
-  await page.waitForTimeout(250);
-  await expect(page.locator('.appi-dialog-overlay')).toBeHidden();
-  await expect(page.locator('.ap-item')).toHaveCount(0);
 });

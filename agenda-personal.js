@@ -717,12 +717,10 @@
       '.ap-cabeza h3{margin:0;font-size:28px;font-weight:500;letter-spacing:-.03em;color:#2c2c34;font-family:Georgia,"Times New Roman",serif}',
       'body.dark .ap-cabeza h3{color:#f2f0ea}',
       '.ap-cabeza small{display:block;margin-top:4px;color:#9a9aa8;font-size:13px;font-weight:500}',
-      '.ap-import{display:grid;gap:8px;margin:14px 0 8px}',
-      '.ap-import button{width:100%;min-height:46px;border:0;border-radius:13px;font:inherit;font-size:13.5px;font-weight:800;cursor:pointer;padding:0 14px}',
-      '.ap-import .ppal{background:linear-gradient(135deg,#5b8def,#8b63e8);color:#fff;box-shadow:0 6px 16px rgba(91,112,210,.25)}',
-      '.ap-import .sec{background:rgba(91,141,239,.12);color:#3d63c9}',
+      '.ap-import{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0 10px}',
+      '.ap-import button{width:100%;aspect-ratio:1;min-height:0;border:0;border-radius:16px;font:inherit;font-size:14px;font-weight:800;cursor:pointer;padding:14px 12px;display:flex;align-items:center;justify-content:center;text-align:center;line-height:1.25;box-sizing:border-box}',
+      '.ap-import .ppal{background:linear-gradient(135deg,#5b8def,#8b63e8);color:#fff;box-shadow:0 6px 16px rgba(91,112,210,.22)}',
       '.ap-import .guia{background:#fff;border:1.5px solid rgba(91,112,210,.28);color:#3d63c9}',
-      'body.dark .ap-import .sec{background:rgba(91,141,239,.2);color:#9db9f7}',
       'body.dark .ap-import .guia{background:rgba(30,30,50,.58);border-color:rgba(157,185,247,.35);color:#9db9f7}',
       '.ap-buscar{width:100%;min-height:36px;margin:14px 0 2px;padding:6px 0 8px;border:0;border-bottom:1px solid rgba(80,90,130,.16);border-radius:0;background:transparent;font:inherit;font-size:15px;outline:none;box-sizing:border-box;color:#30303d}',
       '.ap-buscar:focus{border-bottom-color:#b7a8d9}',
@@ -742,7 +740,7 @@
       'body.dark .ap-row{background:transparent;border-bottom-color:rgba(255,255,255,.06)}',
       '.ap-item.seleccionado .ap-row{background:transparent;border-bottom-color:rgba(183,168,217,.55)}',
       '.ap-item.abierto .ap-row{border-bottom-color:transparent}',
-      '.ap-punto{width:7px;height:7px;margin-top:8px;flex:0 0 auto;border-radius:50%;background:#d4a017;box-shadow:0 0 0 3px rgba(212,160,23,.12)}',
+      '.ap-punto{width:7px;height:7px;margin-left:auto;flex:0 0 auto;border-radius:50%;background:#d4a017;box-shadow:0 0 0 3px rgba(212,160,23,.12)}',
       '.ap-punto.ap-punto-off{background:transparent;box-shadow:none}',
       '.ap-check-label{display:none;align-items:center;cursor:pointer;flex:0 0 auto;margin:6px 0 0;padding:0}',
       '.ap-modo .ap-check-label{display:inline-flex}',
@@ -854,7 +852,6 @@
       return String(a.nombre || '').localeCompare(String(b.nombre || ''), 'es');
     });
     var paraPasar = mios.filter(function(c){ return c.estado !== 'mergado' && !enAppi(c.tel_norm); }).length;
-    var pickerDisponible = !!(navigator.contacts && typeof navigator.contacts.select === 'function');
 
     var todosVisiblesSeleccionados = listado.length > 0 && listado.every(function(c){ return seleccionados.has(c.id); });
 
@@ -867,8 +864,7 @@
       salida += '<div class="ap-aviso"><b>La sincronización está esperando un paso en la base.</b> Tu agenda vive segura en este teléfono; para que también viva en tu cuenta (y no se pierda al cambiar de celular) hay que ejecutar <b>SUPABASE_AGENDA_PERSONAL.sql</b> una sola vez en Supabase.</div>';
     }
     salida += '<div class="ap-import">';
-    if (pickerDisponible) salida += '<button type="button" class="ppal" id="apElegirTel">Elegir del teléfono</button>';
-    salida += '<button type="button" class="' + (pickerDisponible ? 'sec' : 'ppal') + '" id="apSubirVcf">Subir agenda</button>';
+    salida += '<button type="button" class="ppal" id="apSubirVcf">Subir agenda</button>';
     salida += '<button type="button" class="guia" id="apGuia">Cómo saco la agenda</button>';
     salida += '</div>';
     if (mios.length){
@@ -947,21 +943,18 @@
         if (navigator.onLine && autorizado()) sincronizar();
       };
     });
-    var elegir = $('apElegirTel');
-    if (elegir) elegir.onclick = function(){ elegirDelTelefono(); };
     var subir = $('apSubirVcf');
     if (subir) subir.onclick = function(){ var inp = $('apVcfInput'); if (inp) inp.click(); };
     var guia = $('apGuia');
     if (guia) guia.onclick = function(){
       window.APPIDialog.alert(
-        '📱 ANDROID (la vía corta)\n' +
-        '1. Elegí "Elegir del teléfono" y marcá los contactos: no hace falta archivo.\n' +
-        '2. Si preferís el archivo: contactos.google.com → Exportar → "vCard de iOS" → volvé acá y subilo.\n\n' +
+        '📱 ANDROID\n' +
+        'En contactos.google.com → Exportar → "vCard de iOS". Después volvé acá y tocá Subir agenda.\n\n' +
         '🍎 IPHONE (una sola vez, 2 minutos)\n' +
         '1. Abrí icloud.com en Safari y entrá a Contactos.\n' +
         '2. Tocá ⚙️ (abajo a la izquierda) → "Seleccionar todo".\n' +
         '3. ⚙️ de nuevo → "Exportar vCard": baja un archivo .vcf.\n' +
-        '4. Volvé a APPI → "Subir agenda (.vcf)" → elegí ese archivo.\n\n' +
+        '4. Volvé a APPI → Subir agenda → elegí ese archivo.\n\n' +
         'Después de la primera vez, la agenda queda en APPI: sólo subís de nuevo si cambiaron muchos números.',
         { title: 'Cómo pasar tu agenda', icon: '📥' }
       );
