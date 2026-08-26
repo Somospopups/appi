@@ -4,8 +4,8 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
-- Versión: **v369 · Segura**.
-- Caché de la app: `appi-v369-cuadraditos` (se renueva al abrir APPI).
+- Versión: **v370 · Segura**.
+- Caché de la app: `appi-v370-agenda-nube` (se renueva al abrir APPI).
 - Publicación: [https://somospopups.github.io/appi/](https://somospopups.github.io/appi/)
 - Acceso por número de distribuidor y contraseña.
 - Acceso administrador POPUPS mediante el candado, sin DIP ni número de distribuidor.
@@ -79,10 +79,10 @@ El Panel de Contactos tiene dos agendas, con un switch arriba:
 
 - **📇 AGENDA APPI**: la de siempre (Hoy / Todos / Resultados).
 - **📱 AGENDA PERSONAL**: la agenda del teléfono del distribuidor. Se sube una
-  sola vez — con el selector nativo en Android o un archivo `.vcf` (guía
-  incluida para iPhone/iCloud) — y queda guardada en su cuenta: si cambia de
-  celular, no se pierde. Cada contacto se pasa a la Agenda APPI de a uno, con
-  confirmación; los que ya están se detectan por teléfono y no se duplican.
+  sola vez con un archivo `.vcf` (hay guía para Android e iPhone) y queda
+  guardada en su cuenta: si cambia de celular, no se pierde. Cada contacto se
+  pasa a la Agenda APPI de a uno, con confirmación; los que ya están se
+  detectan por teléfono y no se duplican.
 - La carga masiva usa **batch upsert**: los contactos se envían a Supabase en
   paquetes JSON de hasta 500 filas, en paralelo, nunca con una request por
   contacto.

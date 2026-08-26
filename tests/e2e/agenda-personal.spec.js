@@ -161,6 +161,17 @@ test('al abrir APPI con Agenda Personal guardada, primero pinta esa solapa y des
   await expect(page.locator('.ap-item').filter({ hasText: 'Contacto desde el celular' })).toBeVisible();
 });
 
+test('en la PC aparece la agenda que se subió desde el celular', async ({ page }) => {
+  const remota = [{
+    nombre: 'Contacto desde el celular', telefono: '3515559090',
+    telefono_normalizado: '3515559090', estado: 'nuevo', contacto_id: null,
+    origen: 'vcf', created_at: HOY
+  }];
+  await abrirPanel(page, { contactos: [], agendaRemota: remota, agendaVista: 'appi' });
+  await page.locator('[data-agenda-vista="personal"]').click();
+  await expect(page.locator('.ap-item').filter({ hasText: 'Contacto desde el celular' })).toBeVisible();
+});
+
 test('el vCard de Android, iPhone y las agendas viejas 2.1 se leen bien', async ({ page }) => {
   await abrirPanel(page);
   const salida = await page.evaluate(texto => window.APPIAgendaPersonal.parsearVcard(texto), VCF);

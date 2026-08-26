@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v369-cuadraditos';
+const CACHE_NAME = 'appi-v370-agenda-nube';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

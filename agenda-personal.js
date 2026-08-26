@@ -88,6 +88,7 @@
   var busqueda = '';
   var sinTabla = false;   // falta correr SUPABASE_AGENDA_PERSONAL.sql
   var cargado = false;
+  var uidVisto = '';
   var sincronizando = false;
   var sincronizacionActiva = null;
 
@@ -137,7 +138,10 @@
   }
 
   function cargar(){
-    if (!cargado && uid()){
+    var id = uid();
+    if (!id) return mios;
+    if (!cargado || uidVisto !== id){
+      uidVisto = id;
       mios = leerCache();
       cargado = true;
     }
@@ -148,6 +152,7 @@
 
   function filaDe(c){
     return {
+      user_id: uid(),
       nombre: String(c.nombre || '').slice(0, 120),
       telefono: String(c.telefono || '').slice(0, 30),
       telefono_normalizado: c.tel_norm,
@@ -191,7 +196,11 @@
           indice += UPSERT_BATCH_SIZE;
         }
         await Promise.all(lotes.map(function(lote){
-          return subirLote(lote.map(function(it){ return it.p; }));
+          return subirLote(lote.map(function(it){
+            var p = it.p || {};
+            if (!p.user_id) p = Object.assign({}, p, { user_id: uid() });
+            return p;
+          }));
         }));
         [].concat.apply([], lotes).forEach(function(it){ subidas.push(it.t); });
         quitarDeCola([].concat.apply([], lotes));
@@ -215,7 +224,7 @@
       try{
         var subidasEnEstaVuelta = new Set(await vaciarCola());
         sinTabla = false;
-        var filas = await cloudFetch('/rest/v1/appi_agenda_personal?select=nombre,telefono,telefono_normalizado,estado,contacto_id,origen,created_at&order=created_at.asc&limit=5000');
+        var filas = await cloudFetch('/rest/v1/appi_agenda_personal?select=nombre,telefono,telefono_normalizado,estado,contacto_id,origen,created_at&user_id=eq.' + encodeURIComponent(uid()) + '&order=created_at.asc&limit=5000');
         var locales = {};
         cargar().forEach(function(c){ locales[c.tel_norm] = c; });
         (Array.isArray(filas) ? filas : []).forEach(function(f){
@@ -717,11 +726,12 @@
       '.ap-cabeza h3{margin:0;font-size:28px;font-weight:500;letter-spacing:-.03em;color:#2c2c34;font-family:Georgia,"Times New Roman",serif}',
       'body.dark .ap-cabeza h3{color:#f2f0ea}',
       '.ap-cabeza small{display:block;margin-top:4px;color:#9a9aa8;font-size:13px;font-weight:500}',
-      '.ap-import{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0 10px}',
-      '.ap-import button{width:100%;aspect-ratio:1;min-height:0;border:0;border-radius:16px;font:inherit;font-size:14px;font-weight:800;cursor:pointer;padding:14px 12px;display:flex;align-items:center;justify-content:center;text-align:center;line-height:1.25;box-sizing:border-box}',
-      '.ap-import .ppal{background:linear-gradient(135deg,#5b8def,#8b63e8);color:#fff;box-shadow:0 6px 16px rgba(91,112,210,.22)}',
-      '.ap-import .guia{background:#fff;border:1.5px solid rgba(91,112,210,.28);color:#3d63c9}',
-      'body.dark .ap-import .guia{background:rgba(30,30,50,.58);border-color:rgba(157,185,247,.35);color:#9db9f7}',
+      '.ap-import{display:flex;gap:8px;margin:12px 0 8px}',
+      '.ap-import button{flex:1;min-height:44px;border:0;border-radius:10px;font:inherit;font-size:12.5px;font-weight:750;cursor:pointer;padding:8px 10px;line-height:1.25}',
+      '.ap-import .ppal{background:rgba(91,141,239,.14);color:#3d63c9;box-shadow:none}',
+      '.ap-import .guia{background:rgba(80,90,130,.07);border:0;color:#6b6e82}',
+      'body.dark .ap-import .ppal{background:rgba(91,141,239,.22);color:#9db9f7}',
+      'body.dark .ap-import .guia{background:rgba(255,255,255,.06);color:#b7b3c9}',
       '.ap-buscar{width:100%;min-height:36px;margin:14px 0 2px;padding:6px 0 8px;border:0;border-bottom:1px solid rgba(80,90,130,.16);border-radius:0;background:transparent;font:inherit;font-size:15px;outline:none;box-sizing:border-box;color:#30303d}',
       '.ap-buscar:focus{border-bottom-color:#b7a8d9}',
       'body.dark .ap-buscar{background:transparent;border-bottom-color:rgba(255,255,255,.14);color:#f2f2f7}',
@@ -917,6 +927,7 @@
   // También se revalida al volver a la PC: el teléfono puede haber subido
   // contactos mientras esta pestaña estaba en segundo plano.
   window.addEventListener('appi-auth-change', function(){
+    if (uid() !== uidVisto) cargado = false;
     setTimeout(function(){
       if (navigator.onLine && autorizado()) sincronizar();
     }, 0);
