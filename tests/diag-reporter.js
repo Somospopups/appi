@@ -3,15 +3,17 @@
 // bloqueado. Se usa sólo para depurar y luego se revierte.
 'use strict';
 
+function limpio(s) {
+  return String(s == null ? '' : s).replace(/::/g, ';').replace(/[\r\n]+/g, ' ').slice(0, 400);
+}
+
 class DiagReporter {
   onTestEnd(test, result) {
     const st = result && result.status;
     if (st !== 'passed' && st !== 'skipped' && st !== 'expected') {
-      const msg = (result && result.error && result.error.message)
-        ? String(result.error.message).replace(/::/g, ';').slice(0, 600)
-        : '(sin detalle de error)';
-      const t = String(test.title).replace(/::/g, ';');
-      process.stdout.write(`::error file=${test.file.replace(/[^a-z0-9_./-]/gi,'_')}::FALLO-TEST ${t} || ERR ${msg}\n`);
+      const msg = result && result.error && result.error.message
+        ? ' | ERR ' + limpio(result.error.message) : ' (sin detalle)';
+      process.stdout.write(`::error file=.github::FALLO-TEST ${limpio(test.title)}${msg}\n`);
     }
   }
 }
