@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v365-depurados-tel';
+const CACHE_NAME = 'appi-v366-agenda-sutil';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

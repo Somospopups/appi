@@ -2,9 +2,9 @@ const { test, expect } = require('@playwright/test');
 
 // La solapa "📱 AGENDA PERSONAL" del Panel de Contactos: subir la
 // agenda del teléfono (.vcf en cualquier equipo, selector nativo donde esté),
-// botones de WhatsApp/Llamar/Pasar/Quitar dentro de cada tarjeta blanca,
-// selección múltiple para pasar a APPI o eliminar en bloque, y la selección
-// flotante de v360 (mantener presionado / "☑️ Elegir varios").
+// listado sutil por letra (v366) — un puntito si falta pasar, y las
+// acciones (WhatsApp / Llamar / Pasar / Quitar) al tocar el nombre.
+// Selección múltiple y selección flotante (mantener presionado / "Elegir varios").
 
 const USER_ID = '11111111-1111-4111-8111-111111111111';
 const HOY = new Date().toISOString();
@@ -195,15 +195,18 @@ test('subir un .vcf llena la agenda personal y no duplica al repetir', async ({ 
   expect(filas).toBe(3);
 });
 
-test('cada contacto tiene dentro de su tarjeta los botones WhatsApp, Llamar, Pasar y Borrar del mismo tamaño', async ({ page }) => {
+test('el listado va por letra y las acciones aparecen al tocar el nombre', async ({ page }) => {
   await abrirAgendaPersonal(page);
   await page.setInputFiles('#apVcfInput', { name: 'agenda.vcf', mimeType: 'text/vcard', buffer: Buffer.from(VCF, 'utf8') });
 
+  await expect(page.locator('.ap-letra').first()).toBeVisible();
   const primerContacto = page.locator('.ap-item').first();
-  await expect(primerContacto.locator('.ap-row .ap-card-actions [data-ap-wa]')).toBeVisible();
-  await expect(primerContacto.locator('.ap-row .ap-card-actions [data-appi-call-phone]')).toBeVisible();
-  await expect(primerContacto.locator('.ap-row .ap-card-actions [data-ap-pasar]')).toBeVisible();
-  await expect(primerContacto.locator('.ap-row .ap-card-actions [data-ap-quitar]')).toBeVisible();
+  await expect(primerContacto.locator('.ap-card-actions')).toHaveCount(0);
+  await primerContacto.locator('.ap-quien').click();
+  await expect(primerContacto.locator('.ap-card-actions [data-ap-wa]')).toBeVisible();
+  await expect(primerContacto.locator('.ap-card-actions [data-appi-call-phone]')).toBeVisible();
+  await expect(primerContacto.locator('.ap-card-actions [data-ap-pasar]')).toBeVisible();
+  await expect(primerContacto.locator('.ap-card-actions [data-ap-quitar]')).toBeVisible();
 });
 
 test('un contacto que ya está en la Agenda APPI se marca y no ofrece pasarlo', async ({ page }) => {
@@ -220,7 +223,9 @@ test('un contacto que ya está en la Agenda APPI se marca y no ofrece pasarlo', 
 
   const fila = page.locator('.ap-item').filter({ hasText: 'Laura Gómez' });
   await expect(fila).toBeVisible();
-  await expect(fila).toContainText('Ya está en APPI');
+  await expect(fila).toHaveAttribute('data-ap-estado', 'enappi');
+  await expect(fila.locator('.ap-punto-off')).toHaveCount(1);
+  await fila.locator('.ap-quien').click();
   await expect(page.locator('[data-ap-pasar]')).toHaveCount(0);
   await expect(page.locator('[data-ap-ver]')).toHaveCount(1);
 });
@@ -238,6 +243,7 @@ test('pasar a APPI pide confirmación, crea el contacto y queda marcado', async 
   await page.setInputFiles('#apVcfInput', { name: 'agenda.vcf', mimeType: 'text/vcard', buffer: Buffer.from(unSolo, 'utf8') });
   await expect(page.locator('.ap-item')).toHaveCount(1);
 
+  await page.locator('.ap-item').filter({ hasText: 'Nuevo Cliente' }).locator('.ap-quien').click();
   await page.locator('[data-ap-pasar]').click();
   await expect(page.locator('#appiDialogTitle')).toContainText('Pasar a Agenda APPI');
   await expect(page.locator('#appiDialogMessage')).toContainText('Nuevo Cliente');
@@ -250,7 +256,7 @@ test('pasar a APPI pide confirmación, crea el contacto y queda marcado', async 
 
   // Y el personal quedó marcado como pasado, sincronizado con estado mergado.
   const fila = page.locator('.ap-item').filter({ hasText: 'Nuevo Cliente' });
-  await expect(fila).toContainText('En tu Agenda APPI');
+  await expect(fila).toHaveAttribute('data-ap-estado', 'pasado');
   await expect(page.locator('[data-ap-pasar]')).toHaveCount(0);
   await expect.poll(() => subidasAgenda.flat().some(p => p && p.estado === 'mergado')).toBe(true);
 });
@@ -280,10 +286,9 @@ test('selección múltiple: eliminar contactos seleccionados en bloque', async (
   await page.setInputFiles('#apVcfInput', { name: 'agenda.vcf', mimeType: 'text/vcard', buffer: Buffer.from(VCF, 'utf8') });
   await expect(page.locator('.ap-item')).toHaveCount(3);
 
-  // Marcamos los dos primeros checkboxes
-  const checkboxes = page.locator('[data-ap-select]');
-  await checkboxes.nth(0).check();
-  await checkboxes.nth(1).check();
+  await page.locator('#apElegirVarios').click();
+  await page.locator('.ap-item').nth(0).locator('.ap-quien').click();
+  await page.locator('.ap-item').nth(1).locator('.ap-quien').click();
 
   await expect(page.locator('#apBulkBar')).toBeVisible();
   await expect(page.locator('#apBulkQuitar')).toContainText('Quitar (2)');
@@ -381,28 +386,25 @@ test('recorrer la lista con el dedo no selecciona nada', async ({ page }) => {
   await expect(page.locator('.ap-item.seleccionado')).toHaveCount(0);
 });
 
-test('los botones de la fila siguen funcionando con el modo de selección abierto', async ({ page }) => {
-  const { importados } = await subirAgendaDePrueba(page);
+test('con el modo de selección abierto, tocar el nombre elige y no abre acciones', async ({ page }) => {
+  await subirAgendaDePrueba(page);
 
   await page.locator('#apElegirVarios').click();
   await expect(page.locator('#apBulkBar')).toBeVisible();
 
-  // El 📇 de la fila no se confunde con el toque que elige: pasa uno solo.
-  await page.locator('.ap-item').filter({ hasText: 'Juan Pérez' }).locator('[data-ap-pasar]').click();
-  await expect(page.locator('#appiDialogTitle')).toContainText('Pasar a Agenda APPI');
-  await expect(page.locator('#appiDialogMessage')).toContainText('Juan Pérez');
-  await page.locator('#appiDialogOk').click();
-  await expect.poll(() => importados.length).toBe(1);
-
-  // Y el checkbox de la fila tampoco dispara el toque de la fila entera.
-  await page.locator('.ap-item').filter({ hasText: 'María Gómez' }).locator('[data-ap-select]').check();
+  await page.locator('.ap-item').filter({ hasText: 'Juan Pérez' }).locator('.ap-quien').click();
   await expect(page.locator('#apBulkPasar')).toContainText('Pasar a APPI (1)');
+  await expect(page.locator('[data-ap-pasar]')).toHaveCount(0);
+
+  await page.locator('.ap-item').filter({ hasText: 'María Gómez' }).locator('[data-ap-select]').check();
+  await expect(page.locator('#apBulkPasar')).toContainText('Pasar a APPI (2)');
 });
 
 test('la ✕ de la barra suelta todo y cierra la selección flotante', async ({ page }) => {
   await subirAgendaDePrueba(page);
 
-  await page.locator('[data-ap-select]').nth(0).check();
+  await page.locator('#apElegirVarios').click();
+  await page.locator('.ap-item').nth(0).locator('.ap-quien').click();
   await expect(page.locator('#apBulkBar')).toBeVisible();
 
   await page.locator('#apBulkCancelar').click();

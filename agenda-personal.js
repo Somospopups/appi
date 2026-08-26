@@ -1,5 +1,5 @@
 /* ============================================================
-   APPI · Agenda personal (v360)
+   APPI · Agenda personal (v366)
    ------------------------------------------------------------
    Solapa del Panel de Contactos con dos agendas:
 
@@ -13,10 +13,10 @@
                           bloque: entra como contacto nuevo del
                           embudo.
 
-   Selección flotante (v360): mantener presionado un contacto lo
-   elige, y el botón "☑️ Elegir varios" abre la barra para seguir
-   eligiendo con un toque por fila. La barra queda pegada abajo
-   con "📇 Pasar a APPI (n)", "🗑️ Quitar (n)" y "✕".
+   Listado sutil (v366): agrupado por letra, un puntito si todavía
+   no está en APPI. Las acciones (WhatsApp, llamar, pasar, quitar)
+   aparecen al tocar el nombre. Selección flotante: mantener
+   presionado o "Elegir varios".
 
    La agenda vive en este teléfono y se sincroniza con la tabla
    appi_agenda_personal de la cuenta (SUPABASE_AGENDA_PERSONAL.sql).
@@ -74,6 +74,7 @@
   // contacto o con el botón "Elegir varios". Mientras está abierto la barra
   // queda a la vista aunque todavía no haya nada marcado, y tocar una fila la
   // elige o la suelta.
+  var abiertoId = null; // fila cuya ficha de acciones está abierta
   var modoSeleccion = false;
   // Cuánto hay que dejar el dedo apoyado para que cuente como selección.
   var PRESION_MS = 500;
@@ -655,6 +656,7 @@
     else {
       seleccionados.add(id);
       modoSeleccion = true;
+      abiertoId = null;
     }
     repintarSiVisible();
   }
@@ -664,6 +666,7 @@
   function cerrarSeleccion(){
     seleccionados.clear();
     modoSeleccion = false;
+    abiertoId = null;
     repintarSiVisible();
   }
 
@@ -690,6 +693,16 @@
 
   /* ---------- vista ---------- */
 
+  function letraDe(nombre){
+    var n = String(nombre || '').trim();
+    if (!n) return '#';
+    var ch = n.charAt(0).toUpperCase();
+    try{ ch = ch.normalize('NFD').replace(/[\u0300-\u036f]/g, ''); }catch(e){}
+    if (ch === 'Ñ' || n.charAt(0).toUpperCase() === 'Ñ') return 'Ñ';
+    if (ch >= 'A' && ch <= 'Z') return ch;
+    return '#';
+  }
+
   function css(){
     if (document.getElementById('apEstilos')) return;
     var st = document.createElement('style');
@@ -700,72 +713,67 @@
       '.agenda-switch button.activo{background:linear-gradient(135deg,#5b8def,#8b63e8);border-color:transparent;color:#fff;box-shadow:0 6px 16px rgba(91,112,210,.25)}',
       'body.dark .agenda-switch button{background:rgba(30,30,50,.58);border-color:rgba(255,255,255,.08);color:#c9c9d6}',
       'body.dark .agenda-switch button.activo{color:#fff}',
-      '.ap-import{display:grid;gap:8px;margin:12px 0}',
-      '.ap-import button{width:100%;min-height:46px;border:0;border-radius:13px;font:inherit;font-size:13px;font-weight:850;cursor:pointer}',
-      '.ap-import .ppal{background:linear-gradient(135deg,#25d366,#128c7e);color:#fff}',
-      '.ap-import .sec{background:rgba(91,141,239,.1);color:#3d63c9}',
-      '.ap-import .guia{background:none;border:1px dashed rgba(80,90,130,.3);border-radius:13px;color:#858692;font-weight:700;font-size:12px}',
-      '.ap-buscar{width:100%;min-height:42px;margin:10px 0 6px;padding:8px 13px;border:1px solid rgba(80,90,130,.15);border-radius:12px;background:#f8f9ff;font:inherit;font-size:13px;outline:none;box-sizing:border-box}',
-      'body.dark .ap-buscar{background:#1d1f31;border-color:rgba(255,255,255,.1);color:#f2f2f7}',
-      '.ap-toolbar{display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap;margin:8px 0 10px;padding:2px 4px;font-size:12px;color:#6b6e82;font-weight:750;user-select:none}',
+      '.ap-cabeza{margin:18px 0 4px}',
+      '.ap-cabeza h3{margin:0;font-size:28px;font-weight:500;letter-spacing:-.03em;color:#2c2c34;font-family:Georgia,"Times New Roman",serif}',
+      'body.dark .ap-cabeza h3{color:#f2f0ea}',
+      '.ap-cabeza small{display:block;margin-top:4px;color:#9a9aa8;font-size:13px;font-weight:500}',
+      '.ap-import{display:flex;flex-wrap:wrap;gap:4px 18px;margin:10px 0 4px}',
+      '.ap-import button{background:none;border:0;padding:0;min-height:0;width:auto;font:inherit;font-size:13px;font-weight:600;cursor:pointer;color:#8a82a8}',
+      '.ap-import .ppal{color:#6b63a0}',
+      '.ap-import .sec{color:#8a82a8}',
+      '.ap-import .guia{color:#b0aab8;font-weight:500;font-size:12.5px}',
+      '.ap-buscar{width:100%;min-height:36px;margin:14px 0 2px;padding:6px 0 8px;border:0;border-bottom:1px solid rgba(80,90,130,.16);border-radius:0;background:transparent;font:inherit;font-size:15px;outline:none;box-sizing:border-box;color:#30303d}',
+      '.ap-buscar:focus{border-bottom-color:#b7a8d9}',
+      'body.dark .ap-buscar{background:transparent;border-bottom-color:rgba(255,255,255,.14);color:#f2f2f7}',
+      '.ap-toolbar{display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap;margin:6px 0 8px;padding:0;font-size:12.5px;color:#8a8a98;font-weight:600;user-select:none}',
       'body.dark .ap-toolbar{color:#9d9fb5}',
       '.ap-select-all{display:inline-flex;align-items:center;gap:7px;cursor:pointer}',
-      '.ap-select-all input{width:17px;height:17px;cursor:pointer;accent-color:#5b8def}',
-      '.ap-count-tag{font-size:11.5px;color:#858692}',
-      /* Botón que abre la selección flotante (v360) */
-      '.ap-elegir{flex:0 0 auto;min-height:30px;padding:0 10px;border:1px solid rgba(91,141,239,.28);border-radius:999px;background:rgba(91,141,239,.08);color:#3d63c9;font:inherit;font-size:11.5px;font-weight:850;cursor:pointer;white-space:nowrap;transition:background .15s,color .15s}',
-      '.ap-elegir.activa{background:linear-gradient(135deg,#5b8def,#8b63e8);border-color:transparent;color:#fff}',
-      'body.dark .ap-elegir{background:rgba(91,141,239,.16);border-color:rgba(91,141,239,.4);color:#9db9f7}',
-      'body.dark .ap-elegir.activa{color:#fff}',
-      '.ap-item{margin-bottom:9px}',
-      '.ap-row{display:flex;flex-direction:column;gap:9px;width:100%;box-sizing:border-box;padding:12px 13px;border:1px solid rgba(80,90,130,.1);border-radius:15px;background:#fff;text-align:left;transition:border-color .15s, background .15s}',
-      'body.dark .ap-row{background:rgba(30,30,50,.58);border-color:rgba(255,255,255,.08)}',
-      '.ap-item.seleccionado .ap-row{border-color:#5b8def;background:rgba(91,141,239,.04)}',
-      'body.dark .ap-item.seleccionado .ap-row{border-color:#5b8def;background:rgba(91,141,239,.1)}',
-      '.ap-top-row{display:flex;align-items:center;gap:10px;width:100%}',
-      '.ap-check-label{display:inline-flex;align-items:center;cursor:pointer;flex:0 0 auto;margin:0;padding:0}',
-      '.ap-check{width:18px;height:18px;cursor:pointer;accent-color:#5b8def}',
-      '.ap-row .ap-ava{width:36px;height:36px;flex:0 0 auto;border-radius:50%;display:grid;place-items:center;background:rgba(91,141,239,.12);color:#3d63c9;font-weight:900;font-size:14.5px}',
+      '.ap-select-all input{width:15px;height:15px;cursor:pointer;accent-color:#b7a8d9}',
+      '.ap-count-tag{font-size:12px;color:#b0aab8;font-weight:500}',
+      '.ap-elegir{flex:0 0 auto;min-height:0;padding:0;border:0;background:none;color:#8a82a8;font:inherit;font-size:12.5px;font-weight:600;cursor:pointer;white-space:nowrap}',
+      '.ap-elegir.activa{color:#6b63a0}',
+      'body.dark .ap-elegir{background:none;color:#b7b3c9}',
+      '.ap-letra{margin:22px 0 4px;padding:0;font-family:Georgia,"Times New Roman",serif;font-size:20px;font-weight:500;color:#b7a8d9;letter-spacing:.04em}',
+      'body.dark .ap-letra{color:#9b8ec4}',
+      '.ap-item{margin:0}',
+      '.ap-row{display:flex;align-items:flex-start;gap:12px;width:100%;box-sizing:border-box;padding:11px 0 12px;border:0;border-bottom:1px solid rgba(80,90,130,.08);border-radius:0;background:transparent;text-align:left;cursor:pointer}',
+      'body.dark .ap-row{background:transparent;border-bottom-color:rgba(255,255,255,.06)}',
+      '.ap-item.seleccionado .ap-row{background:transparent;border-bottom-color:rgba(183,168,217,.55)}',
+      '.ap-item.abierto .ap-row{border-bottom-color:transparent}',
+      '.ap-punto{width:7px;height:7px;margin-top:8px;flex:0 0 auto;border-radius:50%;background:#d4a017;box-shadow:0 0 0 3px rgba(212,160,23,.12)}',
+      '.ap-punto.ap-punto-off{background:transparent;box-shadow:none}',
+      '.ap-check-label{display:none;align-items:center;cursor:pointer;flex:0 0 auto;margin:6px 0 0;padding:0}',
+      '.ap-modo .ap-check-label{display:inline-flex}',
+      '.ap-check{width:16px;height:16px;cursor:pointer;accent-color:#b7a8d9}',
       '.ap-row .ap-quien{flex:1;min-width:0}',
-      '.ap-row .ap-quien b{display:block;color:#30303d;font-size:13.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
+      '.ap-row .ap-quien b{display:block;color:#2c2c34;font-size:16px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
       'body.dark .ap-row .ap-quien b{color:#f0f0f5}',
-      '.ap-row .ap-quien small{color:#858692;font-size:11.5px;display:block;margin-top:2px}',
-      '.ap-chip{flex:0 0 auto;font-size:10.5px;font-weight:850;padding:4px 8px;border-radius:999px;white-space:nowrap}',
-      '.ap-chip.nuevo{background:rgba(37,211,102,.14);color:#128c55}',
-      '.ap-chip.enappi{background:rgba(91,141,239,.14);color:#3d63c9}',
-      '.ap-chip.pasado{background:rgba(58,208,164,.16);color:#1f8f70}',
-      '.ap-card-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px;padding-top:8px;border-top:1px solid rgba(80,90,130,.08)}',
-      'body.dark .ap-card-actions{border-top-color:rgba(255,255,255,.06)}',
-      '.ap-btn-icon{width:38px;height:38px;min-width:38px;min-height:38px;border-radius:11px;border:0;display:inline-flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;text-decoration:none;box-sizing:border-box;transition:transform .12s ease, opacity .12s ease}',
-      '.ap-btn-icon:active{transform:scale(0.93)}',
-      '.ap-btn-icon.wa{background:rgba(37,211,102,.14);color:#128c55;border:1px solid rgba(37,211,102,.25)}',
-      '.ap-btn-icon.call{background:rgba(91,141,239,.13);color:#3d63c9;border:1px solid rgba(91,141,239,.25)}',
-      '.ap-btn-icon.pasar{background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;border:0;box-shadow:0 2px 6px rgba(37,211,102,.28)}',
-      '.ap-btn-icon.ver{background:rgba(91,141,239,.13);color:#3d63c9;border:1px solid rgba(91,141,239,.25)}',
-      '.ap-btn-icon.borrar{background:rgba(235,87,87,.09);color:#c0392b;border:1px solid rgba(235,87,87,.22)}',
-      'body.dark .ap-btn-icon.wa{background:rgba(37,211,102,.2);border-color:rgba(37,211,102,.38);color:#25d366}',
-      'body.dark .ap-btn-icon.call{background:rgba(91,141,239,.22);border-color:rgba(91,141,239,.38);color:#7da2f5}',
-      'body.dark .ap-btn-icon.ver{background:rgba(91,141,239,.22);border-color:rgba(91,141,239,.38);color:#7da2f5}',
-      'body.dark .ap-btn-icon.borrar{background:rgba(235,87,87,.2);border-color:rgba(235,87,87,.35);color:#ff6b6b}',
-      '.ap-bulk-bar{position:sticky;bottom:14px;z-index:99;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 12px;margin:12px 0 6px;border-radius:15px;background:#1e2133;color:#fff;box-shadow:0 8px 24px rgba(0,0,0,.32)}',
-      'body.dark .ap-bulk-bar{background:#151624;border:1px solid rgba(255,255,255,.12)}',
-      '.ap-bulk-info{display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:800}',
-      '.ap-bulk-badge{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 5px;border-radius:999px;background:#5b8def;color:#fff;font-size:11.5px;font-weight:900}',
-      '.ap-bulk-actions{display:flex;align-items:center;gap:6px}',
-      '.ap-bulk-btn{height:35px;padding:0 10px;border:0;border-radius:9px;font:inherit;font-size:12px;font-weight:850;cursor:pointer;display:inline-flex;align-items:center;gap:4px;transition:transform .1s}',
-      '.ap-bulk-btn:active{transform:scale(0.96)}',
-      '.ap-bulk-btn.pasar{background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;box-shadow:0 2px 6px rgba(37,211,102,.25)}',
-      '.ap-bulk-btn.borrar{background:rgba(235,87,87,.22);color:#ff7a7a;border:1px solid rgba(235,87,87,.35)}',
-      '.ap-bulk-btn.cancelar{background:rgba(255,255,255,.1);color:#d3d5e2;width:32px;padding:0;justify-content:center;font-size:14px}',
-      '.ap-bulk-btn:disabled{opacity:.42;cursor:default;box-shadow:none}',
-      /* Con el modo abierto la fila entera se puede tocar; mientras el dedo
-         está apoyado no se selecciona texto ni salta el menú del navegador. */
+      '.ap-row .ap-quien small{color:#9a9aa8;font-size:13px;font-weight:400;display:block;margin-top:2px}',
+      '.ap-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}',
+      '.ap-card-actions{display:flex;flex-wrap:wrap;align-items:center;gap:4px 16px;padding:0 0 14px 19px;border-bottom:1px solid rgba(80,90,130,.08)}',
+      'body.dark .ap-card-actions{border-bottom-color:rgba(255,255,255,.06)}',
+      '.ap-link{background:none;border:0;padding:0;font:inherit;font-size:13px;font-weight:500;cursor:pointer;color:#8a82a8;text-decoration:none}',
+      '.ap-link.wa{color:#3d8f6a}',
+      '.ap-link.pasar{color:#6b63a0}',
+      '.ap-link.ver{color:#6b63a0}',
+      '.ap-link.borrar{color:#c07878}',
+      '.ap-link.call{color:#8a82a8}',
+      '.ap-bulk-bar{position:sticky;bottom:14px;z-index:99;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 4px 10px 0;margin:18px 0 6px;border:0;border-top:1px solid rgba(80,90,130,.12);border-radius:0;background:rgba(252,250,247,.92);color:#2c2c34;backdrop-filter:blur(8px)}',
+      'body.dark .ap-bulk-bar{background:rgba(18,16,28,.92);border-top-color:rgba(255,255,255,.1);color:#f2f0ea}',
+      '.ap-bulk-info{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:500}',
+      '.ap-bulk-badge{display:inline-grid;place-items:center;min-width:18px;height:18px;padding:0;border-radius:999px;background:#d4a017;color:#fff;font-size:11px;font-weight:700}',
+      '.ap-bulk-actions{display:flex;align-items:center;gap:14px}',
+      '.ap-bulk-btn{height:auto;padding:0;border:0;border-radius:0;background:none;font:inherit;font-size:13px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:4px;color:#6b63a0}',
+      '.ap-bulk-btn.pasar{background:none;color:#6b63a0;box-shadow:none}',
+      '.ap-bulk-btn.borrar{background:none;color:#c07878;border:0}',
+      '.ap-bulk-btn.cancelar{background:none;color:#9a9aa8;width:auto;padding:0;justify-content:center;font-size:13px}',
+      '.ap-bulk-btn:disabled{opacity:.38;cursor:default;box-shadow:none}',
       '.ap-modo .ap-row{cursor:pointer;touch-action:manipulation}',
       '.ap-modo .ap-row,.ap-row.presionado{user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}',
-      '.ap-row.presionado{border-color:#5b8def;background:rgba(91,141,239,.12);transform:scale(.99)}',
-      '.ap-vacio{padding:26px 14px;border:1px dashed rgba(80,90,130,.25);border-radius:16px;text-align:center;color:#858692;font-size:12.5px;line-height:1.6}',
-      '.ap-vacio .ico{font-size:30px;display:block;margin-bottom:8px}',
-      '.ap-aviso{margin:10px 0;padding:10px 12px;border-radius:12px;background:rgba(245,166,35,.12);color:#8a5a08;font-size:11.5px;line-height:1.5}'
+      '.ap-row.presionado{opacity:.55}',
+      '.ap-vacio{padding:28px 4px;border:0;text-align:left;color:#9a9aa8;font-size:14px;line-height:1.6}',
+      '.ap-vacio .ico{display:none}',
+      '.ap-aviso{margin:10px 0;padding:0;border:0;background:none;color:#8a5a08;font-size:12px;line-height:1.5}'
     ].join('\n');
     document.head.appendChild(st);
   }
@@ -783,40 +791,33 @@
   }
 
   function filaHTML(c){
-    var inicial = (c.nombre || '?').trim().charAt(0).toUpperCase() || '?';
     var enPanel = enAppi(c.tel_norm);
-    var chip, btnAppi;
     var telLlamar = digitos(c.telefono);
     var estaSeleccionado = seleccionados.has(c.id);
-
-    if (c.estado === 'mergado'){
-      chip = '<span class="ap-chip pasado">✓ En tu Agenda APPI</span>';
-      btnAppi = '<button type="button" class="ap-btn-icon ver" data-ap-ver="' + esc(c.id) + '" title="Ver en Agenda APPI" aria-label="Ver en Agenda APPI">👁️</button>';
-    } else if (enPanel){
-      chip = '<span class="ap-chip enappi">📇 Ya está en APPI</span>';
-      btnAppi = '<button type="button" class="ap-btn-icon ver" data-ap-ver="' + esc(c.id) + '" title="Ver en Agenda APPI" aria-label="Ver en Agenda APPI">👁️</button>';
-    } else {
-      chip = '<span class="ap-chip nuevo">🆕 Para pasar</span>';
-      btnAppi = '<button type="button" class="ap-btn-icon pasar" data-ap-pasar="' + esc(c.id) + '" title="Pasar a Agenda APPI" aria-label="Pasar a Agenda APPI">📇</button>';
-    }
-
-    return '<div class="ap-item' + (estaSeleccionado ? ' seleccionado' : '') + '" data-ap-id="' + esc(c.id) + '">' +
-      '<div class="ap-row">' +
-        '<div class="ap-top-row">' +
-          '<label class="ap-check-label" title="Seleccionar ' + esc(c.nombre || 'contacto') + '">' +
-            '<input type="checkbox" class="ap-check" data-ap-select="' + esc(c.id) + '"' + (estaSeleccionado ? ' checked' : '') + ' aria-label="Seleccionar ' + esc(c.nombre) + '">' +
-          '</label>' +
-          '<span class="ap-ava">' + esc(inicial) + '</span>' +
-          '<div class="ap-quien"><b>' + esc(c.nombre || 'Sin nombre') + '</b><small>📱 ' + esc(c.telefono) + '</small></div>' +
-          chip +
-        '</div>' +
-        '<div class="ap-card-actions">' +
-          '<button type="button" class="ap-btn-icon wa" data-ap-wa="' + esc(c.id) + '" title="WhatsApp con ' + esc(c.nombre) + '" aria-label="WhatsApp">💬</button>' +
-          '<a href="tel:' + esc(telLlamar) + '" class="ap-btn-icon call" data-appi-call-phone="' + esc(telLlamar) + '" data-appi-call-name="' + esc(c.nombre) + '" title="Llamar a ' + esc(c.nombre) + '" aria-label="Llamar">📞</a>' +
+    var paraPasar = c.estado !== 'mergado' && !enPanel;
+    var estado = c.estado === 'mergado' ? 'pasado' : (enPanel ? 'enappi' : 'nuevo');
+    var sr = estado === 'pasado' ? 'En tu Agenda APPI' : (estado === 'enappi' ? 'Ya está en APPI' : 'Para pasar');
+    var abierto = abiertoId === c.id && !modoSeleccion;
+    var btnAppi = paraPasar
+      ? '<button type="button" class="ap-link pasar" data-ap-pasar="' + esc(c.id) + '">Pasar a APPI</button>'
+      : '<button type="button" class="ap-link ver" data-ap-ver="' + esc(c.id) + '">Ver en APPI</button>';
+    var acciones = abierto
+      ? ('<div class="ap-card-actions">' +
+          '<button type="button" class="ap-link wa" data-ap-wa="' + esc(c.id) + '">WhatsApp</button>' +
+          '<a href="tel:' + esc(telLlamar) + '" class="ap-link call" data-appi-call-phone="' + esc(telLlamar) + '" data-appi-call-name="' + esc(c.nombre) + '">Llamar</a>' +
           btnAppi +
-          '<button type="button" class="ap-btn-icon borrar" data-ap-quitar="' + esc(c.id) + '" title="Quitar de la agenda" aria-label="Quitar">🗑️</button>' +
-        '</div>' +
+          '<button type="button" class="ap-link borrar" data-ap-quitar="' + esc(c.id) + '">Quitar</button>' +
+        '</div>')
+      : '';
+    return '<div class="ap-item' + (estaSeleccionado ? ' seleccionado' : '') + (abierto ? ' abierto' : '') + '" data-ap-id="' + esc(c.id) + '" data-ap-estado="' + estado + '">' +
+      '<div class="ap-row">' +
+        '<label class="ap-check-label" title="Seleccionar ' + esc(c.nombre || 'contacto') + '">' +
+          '<input type="checkbox" class="ap-check" data-ap-select="' + esc(c.id) + '"' + (estaSeleccionado ? ' checked' : '') + ' aria-label="Seleccionar ' + esc(c.nombre) + '">' +
+        '</label>' +
+        '<span class="ap-punto' + (paraPasar ? '' : ' ap-punto-off') + '" aria-hidden="true"></span>' +
+        '<div class="ap-quien"><b>' + esc(c.nombre || 'Sin nombre') + '</b><small>' + esc(c.telefono) + '</small><span class="ap-sr">' + sr + '</span></div>' +
       '</div>' +
+      acciones +
     '</div>';
   }
 
@@ -832,8 +833,8 @@
     return '<div class="ap-bulk-bar" id="apBulkBar">' +
       '<div class="ap-bulk-info"><span class="ap-bulk-badge">' + n + '</span><span>' + resumen + '</span></div>' +
       '<div class="ap-bulk-actions">' +
-        '<button type="button" class="ap-bulk-btn pasar" id="apBulkPasar"' + (sinElegir ? ' disabled' : '') + '>📇 Pasar a APPI (' + n + ')</button>' +
-        '<button type="button" class="ap-bulk-btn borrar" id="apBulkQuitar"' + (sinElegir ? ' disabled' : '') + '>🗑️ Quitar (' + n + ')</button>' +
+        '<button type="button" class="ap-bulk-btn pasar" id="apBulkPasar"' + (sinElegir ? ' disabled' : '') + '>Pasar a APPI (' + n + ')</button>' +
+        '<button type="button" class="ap-bulk-btn borrar" id="apBulkQuitar"' + (sinElegir ? ' disabled' : '') + '>Quitar (' + n + ')</button>' +
         '<button type="button" class="ap-bulk-btn cancelar" id="apBulkCancelar" title="Cancelar selección" aria-label="Cancelar selección">✕</button>' +
       '</div>' +
     '</div>';
@@ -847,11 +848,7 @@
       if (!q) return true;
       return (c.nombre || '').toLowerCase().includes(q) || (c.telefono || '').includes(q);
     });
-    // Para pasar primero, después los que ya están vinculados.
     listado.sort(function(a, b){
-      var pa = a.estado === 'mergado' || enAppi(a.tel_norm) ? 1 : 0;
-      var pb = b.estado === 'mergado' || enAppi(b.tel_norm) ? 1 : 0;
-      if (pa !== pb) return pa - pb;
       return String(a.nombre || '').localeCompare(String(b.nombre || ''), 'es');
     });
     var paraPasar = mios.filter(function(c){ return c.estado !== 'mergado' && !enAppi(c.tel_norm); }).length;
@@ -861,18 +858,19 @@
 
     var salida = '';
     salida += '<input type="file" id="apVcfInput" accept=".vcf,text/vcard,text/directory" hidden>';
-    salida += '<div class="gestion-section-title" style="margin-top:8px"><h3>Tu agenda del teléfono</h3><small>' + mios.length + ' contacto' + (mios.length === 1 ? '' : 's') + '</small></div>';
+    var cuenta = mios.length + (mios.length === 1 ? ' contacto' : ' contactos');
+    if (mios.length && paraPasar) cuenta += ' · ' + paraPasar + ' para pasar';
+    salida += '<div class="ap-cabeza"><h3>Agenda personal</h3><small>' + cuenta + '</small></div>';
     if (sinTabla){
       salida += '<div class="ap-aviso"><b>La sincronización está esperando un paso en la base.</b> Tu agenda vive segura en este teléfono; para que también viva en tu cuenta (y no se pierda al cambiar de celular) hay que ejecutar <b>SUPABASE_AGENDA_PERSONAL.sql</b> una sola vez en Supabase.</div>';
     }
     salida += '<div class="ap-import">';
-    if (pickerDisponible) salida += '<button type="button" class="ppal" id="apElegirTel">📱 Elegir del teléfono</button>';
-    salida += '<button type="button" class="' + (pickerDisponible ? 'sec' : 'ppal') + '" id="apSubirVcf">📂 Subir agenda (.vcf)</button>';
-    salida += '<button type="button" class="guia" id="apGuia">❓ ¿Cómo saco la agenda de mi teléfono?</button>';
+    if (pickerDisponible) salida += '<button type="button" class="ppal" id="apElegirTel">Elegir del teléfono</button>';
+    salida += '<button type="button" class="' + (pickerDisponible ? 'sec' : 'ppal') + '" id="apSubirVcf">Subir agenda</button>';
+    salida += '<button type="button" class="guia" id="apGuia">Cómo saco la agenda</button>';
     salida += '</div>';
     if (mios.length){
-      salida += '<div class="gestion-stats"><div class="gestion-stat"><span>🆕</span><b>' + paraPasar + '</b><small>Para pasar</small></div><div class="gestion-stat"><span>📇</span><b>' + (mios.length - paraPasar) + '</b><small>En APPI</small></div><div class="gestion-stat"><span>📱</span><b>' + mios.length + '</b><small>Total</small></div></div>';
-      salida += '<input type="search" id="apBuscar" class="ap-buscar" placeholder="Buscar por nombre o teléfono…" value="' + esc(busqueda) + '">';
+      salida += '<input type="search" id="apBuscar" class="ap-buscar" placeholder="Buscar" value="' + esc(busqueda) + '">';
       salida += '<div class="ap-toolbar">' +
         '<label class="ap-select-all" title="Seleccionar todos los contactos">' +
           '<input type="checkbox" id="apSelectAll"' + (todosVisiblesSeleccionados ? ' checked' : '') + '> ' +
@@ -881,17 +879,27 @@
         '<button type="button" id="apElegirVarios" class="ap-elegir' + (modoSeleccion ? ' activa' : '') + '"' +
           ' aria-pressed="' + (modoSeleccion ? 'true' : 'false') + '"' +
           ' title="Elegir varios contactos (o mantené presionado uno)">' +
-          (modoSeleccion ? '✓ Listo' : '☑️ Elegir varios') +
+          (modoSeleccion ? 'Listo' : 'Elegir varios') +
         '</button>' +
         '<span class="ap-count-tag">' + listado.length + (listado.length === 1 ? ' contacto' : ' contactos') + '</span>' +
       '</div>';
     }
     if (!mios.length){
-      salida += '<div class="ap-vacio"><span class="ico">📱</span><b>Tu agenda personal todavía está vacía.</b><br>Subila una sola vez y queda guardada en tu cuenta: después vas pasando de a uno los que quieras trabajar con APPI.</div>';
+      salida += '<div class="ap-vacio">Tu agenda personal todavía está vacía.<br>Subila una sola vez y queda guardada en tu cuenta.</div>';
     } else if (!listado.length){
       salida += '<div class="ap-vacio"><span class="ico">🔍</span>No hay contactos que coincidan con la búsqueda.</div>';
     } else {
-      salida += '<div id="apLista"' + (modoSeleccion ? ' class="ap-modo"' : '') + '>' + listado.map(filaHTML).join('') + '</div>';
+      var grupos = '';
+      var letraAnt = '';
+      listado.forEach(function(c){
+        var L = letraDe(c.nombre);
+        if (L !== letraAnt){
+          grupos += '<div class="ap-letra">' + L + '</div>';
+          letraAnt = L;
+        }
+        grupos += filaHTML(c);
+      });
+      salida += '<div id="apLista"' + (modoSeleccion ? ' class="ap-modo"' : '') + '>' + grupos + '</div>';
       salida += bulkBarHTML();
     }
     return salida;
@@ -1000,7 +1008,7 @@
     if (elegirVarios){
       elegirVarios.onclick = function(){
         if (modoSeleccion) cerrarSeleccion();
-        else { modoSeleccion = true; repintarSiVisible(); }
+        else { modoSeleccion = true; abiertoId = null; repintarSiVisible(); }
       };
     }
 
@@ -1047,8 +1055,13 @@
       item.addEventListener('pointerleave', cancelar);
       item.addEventListener('click', function(e){
         if (esControl(e.target)) return;
-        if (!modoSeleccion) return;
-        alternarSeleccion(item.getAttribute('data-ap-id'));
+        var id = item.getAttribute('data-ap-id');
+        if (modoSeleccion){
+          alternarSeleccion(id);
+          return;
+        }
+        abiertoId = abiertoId === id ? null : id;
+        repintarSiVisible();
       });
     });
 
