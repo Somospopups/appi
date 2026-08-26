@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "393.0.0",
-  "cacheName": "appi-v393-botones-fuera",
+  "version": "394.0.0",
+  "cacheName": "appi-v394-tel-lindo",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

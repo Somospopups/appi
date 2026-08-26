@@ -979,7 +979,7 @@
         '<div class="mu-col">' +
           (u.localidad ? '<span>📍 ' + esc(u.localidad) + '</span>' : '') +
           (u.domicilio ? '<span>🏠 ' + esc(u.domicilio) + '</span>' : '') +
-          (u.telf ? '<span>📞 ' + esc(u.telf) + '</span>' : '') +
+          (function(){ var lindo = (window.APPITel && window.APPITel.bonito) ? window.APPITel.bonito(u.telf) : ''; return (lindo || u.telf) ? '<span>📞 ' + esc(lindo || u.telf) + '</span>' : ''; })() +
         '</div>' +
         '<div class="mu-col">' +
           (u.producto ? '<span>📦 ' + esc(u.producto) + '</span>' : '') +
