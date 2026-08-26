@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "358.0.0",
-  "cacheName": "appi-v358-sync-agenda-personal",
+  "version": "359.0.0",
+  "cacheName": "appi-v359-sin-pantallazo-panel",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

@@ -495,18 +495,16 @@
       var r = orig.apply(this, arguments);
       try{
         if (id === 'view-usuarios') setTimeout(montarBarraUsuarios, 40);
-        if (id === 'view-gestion') setTimeout(montarBarraGestion, 80);
+        // v359: la barra de promos NO se monta en el Panel de Contactos.
+        // Antes se inyectaba con setTimeout(montarBarraGestion, 80) apenas
+        // el panel se volvía visible y el siguiente renderManagement la
+        // borraba al rearmar el contenido: la pantalla saltaba dos veces
+        // (todo el contenido ~250 px hacia abajo y de vuelta) y durante esos
+        // segundos mostraba la barra de tarjetas que v357 había quitado del
+        // panel. El módulo de promos sigue intacto en la sección Usuarios.
       }catch(e){}
       return r;
     };
-    if (window.APPIGestion && typeof window.APPIGestion.open === 'function'){
-      var origOpen = window.APPIGestion.open;
-      window.APPIGestion.open = function(){
-        var r = origOpen.apply(this, arguments);
-        setTimeout(montarBarraGestion, 120);
-        return r;
-      };
-    }
   }
 
   window.APPITarjetas = {
