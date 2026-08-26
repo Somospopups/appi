@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v374-pedir-nombre';
+const CACHE_NAME = 'appi-v375-sin-avisos-menu';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
