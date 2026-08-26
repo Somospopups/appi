@@ -279,7 +279,7 @@
       : null;
     if (p && window.APPIMensajes.completar) return window.APPIMensajes.completar(p.texto, u);
     var nombre = pilaDe(u && (u.usuario || u.nombre));
-    return 'Hola ' + (nombre || '') + '! 😊\n\nMe acordé de tu ducha y te quiero pasar este video de PSA Rinnova. Es un minutito: habla del pelo y de la piel cuando el agua está bien.\n\n' + LINK_RINNOVA + '\n\nDecime qué te parece.';
+    return 'Hola ' + (nombre || '') + '! 😊\n\nComo ya tenés la ducha — ya la probaste — te quiero mostrar lo nuevo. Ahora nos renovamos: PSA Rinnova. Es nuestro último modelo, para el pelo y la piel.\n\n' + LINK_RINNOVA + '\n\nDecime qué te parece.';
   }
   function colaDuchaRinnova(){
     if (!ventanaRinnova()) return [];

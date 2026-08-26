@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "382.0.0",
-  "cacheName": "appi-v382-metodo-envio",
+  "version": "383.0.0",
+  "cacheName": "appi-v383-rinnova-nuevo",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

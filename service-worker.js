@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v382-metodo-envio';
+const CACHE_NAME = 'appi-v383-rinnova-nuevo';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
