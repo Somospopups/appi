@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "386.0.0",
-  "cacheName": "appi-v386-canje-video",
+  "version": "387.0.0",
+  "cacheName": "appi-v387-canje-amigo",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {
