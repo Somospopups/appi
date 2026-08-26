@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "388.0.0",
-  "cacheName": "appi-v388-canje-explica",
+  "version": "389.0.0",
+  "cacheName": "appi-v389-canje-calma",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {
