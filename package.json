@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "360.0.0",
-  "cacheName": "appi-v360-seleccion-flotante",
+  "version": "361.0.0",
+  "cacheName": "appi-v361-postventa-dia-lleno",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

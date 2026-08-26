@@ -4,8 +4,8 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
-- Versión: **v360 · Segura**.
-- Caché de la app: `appi-v360-seleccion-flotante` (se renueva al abrir APPI).
+- Versión: **v361 · Segura**.
+- Caché de la app: `appi-v361-postventa-dia-lleno` (se renueva al abrir APPI).
 - Publicación: [https://somospopups.github.io/appi/](https://somospopups.github.io/appi/)
 - Acceso por número de distribuidor y contraseña.
 - Acceso administrador POPUPS mediante el candado, sin DIP ni número de distribuidor.
@@ -13,6 +13,28 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 - Sincronización automática por cuenta.
 - Funcionamiento offline por hasta 7 días desde la última validación.
 - Grabaciones y transcripciones de audio locales: no se suben a la nube.
+
+## Motor de tareas: el día nunca queda vacío (v361)
+
+La lista del día (la franja **Hoy** de Mensajes y la tarjeta 💧 de Usuarios del
+Home) se arma en dos capas:
+
+- **Capa A · urgentes**: las que disparan solas (cumpleaños de hoy, retrolavado
+  vencido y garantías por vencer en 30 días).
+- **Capa B · reserva de post-venta**: si las urgentes no alcanzan el mínimo
+  (`MIN_TAREAS_DIA`, 6), el motor recorre la cartera por *hace cuánto no
+  tocamos a cada cliente* y llena el día con tareas de post-venta: reactivar
+  dormidos, clientes fríos, pedir referidos, anticipar mantenimientos y
+  seguimiento de ventas recientes. Así **ningún día queda en cero**.
+
+Reglas:
+
+- Nunca se mete a un cliente que ya tiene una urgencia hoy (Capa A).
+- Los vencidos hace más de un año siguen fuera de todo.
+- Mandar un mensaje a un cliente (o marcar su tarea de post-venta ✓) cuenta
+  como "tocar": esa persona no reaparece hasta que pasen unos días.
+- Las marcas siguen viviendo en `appi_acciones_v1_*` y suben a la nube, así que
+  el panel del administrador ve también esta actividad.
 
 ## Arranque con el logo de vidrio
 
