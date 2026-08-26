@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v392-alerta-frase';
+const CACHE_NAME = 'appi-v393-botones-fuera';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

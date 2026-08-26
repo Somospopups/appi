@@ -995,12 +995,12 @@
         (marcaActual.e === 'hecha' ? '✓ Marcada como hecha' : '✗ Marcada como no hecha') +
         ' · si te confundiste, tocá la otra</div>';
     }
-    html += '<div class="mu-prev" style="position:relative;"><b>Así lo va a recibir</b><span id="muPrevTxt">' + esc(texto) + '</span>' +
-      '<div style="position:absolute;bottom:8px;right:8px;display:flex;gap:8px;">' +
-        '<button type="button" class="mu-prev-btn" id="muCambiarMensaje" title="Cambiar mensaje según el equipo" style="border-radius:50%;width:36px;height:36px;font-size:14px;border:1px solid rgba(245,166,35,.35);background:rgba(255,255,255,.9);cursor:pointer;">🔁</button>' +
-        '<button type="button" class="mu-prev-btn" id="muEditarMsg" title="Editar mensaje" style="border-radius:50%;width:36px;height:36px;font-size:14px;border:1px solid rgba(58,208,164,.22);background:rgba(255,255,255,.9);cursor:pointer;">✏️</button>' +
-        '<button type="button" class="mu-prev-btn" id="muBibliotecaMsg" title="Biblioteca de mensajes" style="border-radius:50%;width:36px;height:36px;font-size:14px;border:1px solid rgba(91,141,239,.22);background:rgba(255,255,255,.9);cursor:pointer;">💬</button>' +
-      '</div></div>';
+    html += '<div class="mu-prev"><b>Así lo va a recibir</b><span id="muPrevTxt">' + esc(texto) + '</span></div>';
+    html += '<div class="mu-prev-tools">' +
+      '<button type="button" class="mu-prev-btn" id="muCambiarMensaje" title="Cambiar mensaje según el equipo">🔁</button>' +
+      '<button type="button" class="mu-prev-btn" id="muEditarMsg" title="Editar mensaje">✏️</button>' +
+      '<button type="button" class="mu-prev-btn" id="muBibliotecaMsg" title="Biblioteca de mensajes">💬</button>' +
+      '</div>';
     html += '<div class="mu-acciones">';
     html += '<button type="button" class="mu-enviar" id="muFilaEnviar">💬 Mandar a ' + esc(nombre) + '</button>';
     // Cada acción se marca sí o sí: ✓ la hice (aunque sea por otro medio) o
@@ -1158,6 +1158,10 @@
       '.mu-prev{margin-top:12px;padding:13px 14px;border:1px solid rgba(58,208,164,.22);border-radius:14px;background:rgba(58,208,164,.08);',
       'color:#20705c;font-size:12.5px;line-height:1.55;white-space:pre-wrap;word-break:break-word}',
       '.mu-prev b{display:block;margin-bottom:6px;color:#178a6c;font-size:10.5px;font-weight:900;text-transform:uppercase;letter-spacing:.4px}',
+      '.mu-prev-tools{display:flex;justify-content:flex-end;gap:8px;margin-top:8px}',
+      '.mu-prev-btn{width:40px;height:40px;border-radius:50%;font-size:15px;border:1px solid rgba(80,90,130,.14);background:#fff;cursor:pointer}',
+      '.mu-prev-btn:hover{background:rgba(91,141,239,.08)}',
+      'body.dark .mu-prev-btn{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.14)}',
       '.mu-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:11px}',
       '.mu-tag{border:1px dashed rgba(91,141,239,.4);border-radius:9px;background:rgba(91,141,239,.07);color:#3d63c9;',
       'font:inherit;font-size:10.5px;font-weight:800;padding:6px 9px;cursor:pointer}',
