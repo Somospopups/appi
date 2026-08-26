@@ -243,7 +243,7 @@
   function resetCuidado(){
     try{ localStorage.removeItem(storeCuidadoKey()); }catch(e){}
   }
-  function metodoKey(){ return 'appi_metodo_envio_v1_' + uidCuidado(); }
+  function metodoKey(){ return 'appi_metodo_envio_v2_' + uidCuidado(); }
   function vioMetodo(){
     try{ return localStorage.getItem(metodoKey()) === '1'; }catch(e){ return false; }
   }

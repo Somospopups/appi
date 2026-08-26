@@ -17,7 +17,7 @@ const EXACT_KEYS=new Set([
 const PREFIXES=[
   'rueda','siete_','presu_','lastUpdate_','bonus_notif_',
   'appi_suenos_v1_','appi_porque_v1_','appi_stock_v1_','appi_prestamos_v1_','appi_cal_tareas_v1_','appi_tarjetas_v1_',
-  'appi_acciones_v1_','appi_agenda_personal_v1_','appi_wa_cuidado_','appi_ducha_rinnova_v1_','appi_metodo_envio_v1_'
+  'appi_acciones_v1_','appi_agenda_personal_v1_','appi_wa_cuidado_','appi_ducha_rinnova_v1_','appi_metodo_envio_v1_','appi_metodo_envio_v2_'
 ];
 const state={ready:false,userId:'',workspaceId:'',personType:'titular',values:{},changedAt:{},dirty:new Set(),deleted:new Set(),cacheTimer:null,syncTimer:null,syncing:false,lastError:''};
 const nativeSet=Storage.prototype.setItem;

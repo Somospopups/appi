@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v389-canje-calma';
+const CACHE_NAME = 'appi-v390-alerta-linea';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

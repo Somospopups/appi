@@ -739,16 +739,15 @@
       if (mazo){ mazo.tarjetas = armarTarjetas(); pintar(); }
     };
     return {
-      cat: 'metodo', icono: '🕊️', kicker: 'Cómo se escribe ahora',
-      titulo: 'Sé que querés escribirle a todos',
-      html: '<p class="ht-frase">Tranqui. Esto es un proceso, no una carrera.</p>' +
+      cat: 'metodo', icono: '⚠️', kicker: 'Atención · tu WhatsApp',
+      titulo: 'WhatsApp te puede cortar el número',
+      html: '<p class="ht-frase">Si le escribís a mucha gente el mismo mensaje, uno atrás del otro, WhatsApp te suspende la línea. Ya le pasó a una distribuidora.</p>' +
             '<ol class="ht-pasos">' +
-            '<li><b>De a uno.</b> APPI te arma el mensaje y te abre el chat.</li>' +
-            '<li><b>' + tope + ' por día.</b> Personas distintas. Tu línea se queda.</li>' +
-            '<li><b>Un minuto entre cada una.</b> Mañana otros ' + tope + '.</li>' +
-            '</ol>' +
-            '<p class="ht-nota">En dos semanas hablaste con ' + (tope * 14) + ' personas y WhatsApp no te cortó. Todo va como corresponde.</p>',
-      cta: { label: 'Entendido, vamos', go: entendido }
+            '<li><b>Por eso, de a uno.</b> APPI te abre el chat. No es un envío masivo.</li>' +
+            '<li><b>' + tope + ' personas distintas por día.</b> A la misma podés escribirle de nuevo.</li>' +
+            '<li><b>Un minuto entre cada una.</b> Mañana otros ' + tope + '. En dos semanas, ' + (tope * 14) + ' — y tu número sigue vivo.</li>' +
+            '</ol>',
+      cta: { label: 'Entendido, cuido mi línea', go: entendido }
     };
   }
 
@@ -844,6 +843,17 @@
       '.ht-esp-marca{position:absolute;right:10px;bottom:2px;font-size:74px;line-height:1;opacity:.16;pointer-events:none}',
       'body.dark .ht-card.ht-esp .ht-esp-frase{color:#fff}',
       '.ht-hint{text-align:center;color:#9a9ba8;font-size:10.5px;font-weight:800}',
+      '.ht-card.ht-alerta{background:linear-gradient(155deg,#fff4e0,#ffd7a8 55%,#ffc078);box-shadow:0 22px 60px rgba(180,70,0,.38);border:2px solid #f08a1a}',
+      'body.dark .ht-card.ht-alerta{background:linear-gradient(155deg,#5a3208,#7a4010 55%,#9a4e12);border-color:#f0a040}',
+      '.ht-card.ht-alerta .ht-kicker{color:#b04600}',
+      'body.dark .ht-card.ht-alerta .ht-kicker{color:#ffc078}',
+      '.ht-card.ht-alerta h3{color:#7a2e00}',
+      'body.dark .ht-card.ht-alerta h3{color:#fff3e0}',
+      '.ht-card.ht-alerta .ht-frase{color:#5c2e0a;font-size:15.5px;line-height:1.45}',
+      'body.dark .ht-card.ht-alerta .ht-frase{color:#ffe0b8}',
+      '.ht-card.ht-alerta .ht-pasos li{background:rgba(176,70,0,.12);color:#5c2e0a}',
+      'body.dark .ht-card.ht-alerta .ht-pasos li{background:rgba(255,200,120,.12);color:#ffe8c8}',
+      '.ht-card.ht-alerta .ht-cta{background:linear-gradient(135deg,#f08a1a,#e04a12);box-shadow:0 8px 20px rgba(200,70,10,.35)}',
       'body.dark .ht-card{background:linear-gradient(160deg,#262838,#1f2130)}',
       'body.dark .ht-card h3{color:#f2f2f7}body.dark .ht-frase{color:#c9cad8}body.dark .ht-lista li{background:rgba(255,255,255,.07);color:#d4d5e2}'
     ].join('');
@@ -883,7 +893,7 @@
 
   function crearCarta(t){
     var el = document.createElement('div');
-    el.className = 'ht-card' + (t.cat === 'especial' ? ' ht-esp' : '');
+    el.className = 'ht-card' + (t.cat === 'especial' ? ' ht-esp' : '') + (t.cat === 'metodo' ? ' ht-alerta' : '');
     el.innerHTML = '<div class="ht-cab"><span class="ht-ico">' + t.icono + '</span>' +
       '<span class="ht-kicker">' + esc(t.kicker) + '</span></div>' +
       '<h3>' + esc(t.titulo) + '</h3>' +
