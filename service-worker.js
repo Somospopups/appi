@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v379-rinnova-ducha';
+const CACHE_NAME = 'appi-v381-rinnova-foto';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
