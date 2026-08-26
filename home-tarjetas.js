@@ -239,10 +239,15 @@
     try{ localStorage.setItem(st.clave, JSON.stringify(st.set)); }catch(e){}
   }
   function colaCanje(){ return colaMensajes('renovacion'); }
+  function telDeUsuario(u){
+    var crudo = (u && (u.telf || u.tel || u.telefono)) || '';
+    if (window.APPITel && window.APPITel.primeroValido) return window.APPITel.primeroValido(crudo) || '';
+    return String(crudo).replace(/\D/g, '');
+  }
   function colaVigentesParaReferido(){
     var st = referidosPedidosMes();
     return colaMensajes('checkin').filter(function(u){
-      var tel = String(u.telf || u.tel || u.telefono || '').replace(/\D/g,'');
+      var tel = telDeUsuario(u);
       return tel && st.set.indexOf(tel) < 0;
     });
   }
@@ -257,11 +262,11 @@
   function pedirReferidoA(u){
     return function(){
       var nombre = pilaDe(u.usuario || u.nombre);
-      var tel = u.telf || u.tel || u.telefono || '';
+      var tel = telDeUsuario(u);
       var texto = 'Hola ' + (nombre || '') + '! ¿Cómo andás? 😊\n\nTe escribo porque estoy armando un grupo chico de personas que quieren cuidar el agua de su casa.\n\n¿Se te ocurre alguien (familia, vecinos, laburo) a quien le vendría bien que le cuente?\n\nCon un nombre y un teléfono me alcanza. ¡Gracias!';
       marcarReferidoPedido(tel);
       if (window.APPITel && window.APPITel.abrir && tel){
-        window.APPITel.abrir(tel, texto, nombre);
+        window.APPITel.abrir(tel, texto, nombre, u);
       } else if (window.APPIMensajes && window.APPIMensajes.mandar){
         window.APPIMensajes.mandar('saludo', u);
       } else if (typeof window.showView === 'function') window.showView('view-usuarios');

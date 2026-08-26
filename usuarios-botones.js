@@ -290,7 +290,8 @@
         var u = gente[Number(b.getAttribute('data-ub-vec-wa'))];
         if (!u) return;
         var pila = (typeof window.nombreDePila === 'function' ? window.nombreDePila(u.usuario) : '') || String(u.usuario || '').split(',')[0].trim();
-        window.APPITel.abrir(u.telf || '', 'Hola ' + pila + '! 😊 ¿Cómo estás?', pila, u);
+        var telWa = (window.APPITel && window.APPITel.primeroValido) ? window.APPITel.primeroValido(u.telf || '') : (u.telf || '');
+        window.APPITel.abrir(telWa, 'Hola ' + pila + '! 😊 ¿Cómo estás?', pila, u);
       };
     });
   }

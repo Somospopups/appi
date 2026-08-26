@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v373-sincronizar';
+const CACHE_NAME = 'appi-v374-pedir-nombre';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
