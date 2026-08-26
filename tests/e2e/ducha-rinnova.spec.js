@@ -16,6 +16,7 @@ test('la tarjeta de Rinnova vive 4 días y solo para quien tiene ducha', () => {
   expect(js).toContain('/duch/i');
   expect(js).toContain('rinnova-ducha.jpg');
   expect(js).toContain('lM2XjEVCPFI');
+  expect(js).toContain('Ahora nos renovamos');
 });
 
 test('a quién ya se le mandó viaja en la nube de la cuenta', () => {
