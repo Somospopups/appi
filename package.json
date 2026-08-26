@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "378.0.0",
-  "cacheName": "appi-v378-diez-personas",
+  "version": "379.0.0",
+  "cacheName": "appi-v379-rinnova-ducha",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

@@ -4,8 +4,8 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
-- Versión: **v378 · Segura**.
-- Caché de la app: `appi-v378-diez-personas` (se renueva al abrir APPI).
+- Versión: **v379 · Segura**.
+- Caché de la app: `appi-v379-rinnova-ducha` (se renueva al abrir APPI).
 - Publicación: [https://somospopups.github.io/appi/](https://somospopups.github.io/appi/)
 - Acceso por número de distribuidor y contraseña.
 - Acceso administrador POPUPS mediante el candado, sin DIP ni número de distribuidor.

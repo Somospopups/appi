@@ -239,6 +239,70 @@
     try{ localStorage.setItem(st.clave, JSON.stringify(st.set)); }catch(e){}
   }
   function colaCanje(){ return colaMensajes('renovacion'); }
+  var RINNOVA_DESDE = '2026-08-26';
+  var RINNOVA_HASTA = '2026-08-29';
+  var LINK_RINNOVA = 'https://www.youtube.com/watch?v=lM2XjEVCPFI';
+  function ventanaRinnova(){
+    var h = hoyKey();
+    return h >= RINNOVA_DESDE && h <= RINNOVA_HASTA;
+  }
+  function listaUsuariosHome(){
+    try{
+      if (typeof window.usuariosTodosActual === 'function'){
+        var vivos = window.usuariosTodosActual() || [];
+        if (vivos.length) return vivos;
+      }
+    }catch(e){}
+    if (Array.isArray(window.usuariosU) && window.usuariosU.length) return window.usuariosU;
+    var raw = leerLS('usuarios_garantias', []);
+    return Array.isArray(raw) ? raw : [];
+  }
+  function esDucha(u){
+    return /ducha/i.test(String((u && u.producto) || ''));
+  }
+  function rinnovaPedidos(){
+    var clave = 'appi_ducha_rinnova_v1_' + uid();
+    var set = leerLS(clave, []);
+    return { clave: clave, set: Array.isArray(set) ? set : [] };
+  }
+  function marcarRinnovaPedido(tel){
+    var st = rinnovaPedidos();
+    var n = String(tel || '').replace(/\D/g, '');
+    if (!n || st.set.indexOf(n) >= 0) return;
+    st.set.push(n);
+    try{ localStorage.setItem(st.clave, JSON.stringify(st.set)); }catch(e){}
+  }
+  function textoRinnova(u){
+    var p = window.APPIMensajes && window.APPIMensajes.mensajeMantenimiento
+      ? window.APPIMensajes.mensajeMantenimiento('mant_ducha_rinnova')
+      : null;
+    if (p && window.APPIMensajes.completar) return window.APPIMensajes.completar(p.texto, u);
+    var nombre = pilaDe(u && (u.usuario || u.nombre));
+    return 'Hola ' + (nombre || '') + '! 😊\n\nVi este video de PSA Rinnova y me acordé de tu ducha. Es cortito: habla de cómo se siente el pelo y la piel cuando el agua está bien.\n\n' + LINK_RINNOVA + '\n\n¿Lo viste? Cualquier cosa me decís.';
+  }
+  function colaDuchaRinnova(){
+    if (!ventanaRinnova()) return [];
+    var st = rinnovaPedidos();
+    return listaUsuariosHome().filter(function(u){
+      if (!esDucha(u)) return false;
+      var tel = telDeUsuario(u);
+      return tel && st.set.indexOf(tel) < 0 && st.set.indexOf(String(tel).replace(/\D/g, '')) < 0;
+    });
+  }
+  function mandarRinnovaA(u){
+    return function(){
+      var nombre = pilaDe(u.usuario || u.nombre);
+      var tel = telDeUsuario(u);
+      var abierto = false;
+      if (window.APPITel && window.APPITel.abrir && tel){
+        abierto = !!window.APPITel.abrir(tel, textoRinnova(u), nombre, u);
+      }
+      if (abierto){
+        marcarRinnovaPedido(tel);
+        if (mazo){ mazo.tarjetas = armarTarjetas(); pintar(); }
+      }
+    };
+  }
   function telDeUsuario(u){
     var crudo = (u && (u.telf || u.tel || u.telefono)) || '';
     if (window.APPITel && window.APPITel.primeroValido) return window.APPITel.primeroValido(crudo) || '';
@@ -651,9 +715,30 @@
     }catch(e){ return null; }
   }
 
+  function tarjetaDuchaRinnova(){
+    var lista = colaDuchaRinnova();
+    if (!lista.length) return null;
+    var filas = [], items = [];
+    lista.slice(0, 3).forEach(function(u){
+      filas.push('<li>🚿 <b>' + esc(nombreLindo(u.usuario || u.nombre)) + '</b> · tiene la ducha</li>');
+      items.push(mandarRinnovaA(u));
+    });
+    if (lista.length > 3){
+      filas.push('<li>… y ' + (lista.length - 3) + ' más</li>');
+      items.push(mandarRinnovaA(lista[3]));
+    }
+    return {
+      cat: 'rinnova', icono: '🚿', kicker: 'PSA Ducha · 4 días',
+      titulo: lista.length === 1 ? 'Mandale el video de Rinnova' : 'Mandales el video de Rinnova',
+      html: '<ul class="ht-lista">' + filas.join('') + '</ul><p class="ht-nota">Quienes ya tienen la ducha. El video es cortito: pelo y piel. Estos 4 días, y después queda en los mensajes del producto.</p>',
+      items: items,
+      cta: { label: 'Enviar a ' + (pilaDe(lista[0].usuario || lista[0].nombre) || 'la primera'), go: items[0] }
+    };
+  }
+
   function armarTarjetas(){
     var lista = [tarjetaEspecial()];
-    [tarjetaJornada(), tarjetaOportunidades(), tarjetaCumples(), tarjetaEquipo(), tarjetaPanel(), tarjetaUsuarios()].forEach(function(t){
+    [tarjetaDuchaRinnova(), tarjetaJornada(), tarjetaOportunidades(), tarjetaCumples(), tarjetaEquipo(), tarjetaPanel(), tarjetaUsuarios()].forEach(function(t){
       if (t) lista.push(t);
     });
     return lista;
@@ -1019,7 +1104,10 @@
     mejorAccionHoy: mejorAccionHoy,
     cuantasNovedades: cuantasNovedades,
     fraseDelDia: fraseDelDia,
-    FRASES: FRASES
+    FRASES: FRASES,
+    ventanaRinnova: ventanaRinnova,
+    esDucha: esDucha,
+    colaDuchaRinnova: colaDuchaRinnova
   };
 
   if (document.readyState === 'complete') envolver();
