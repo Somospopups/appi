@@ -160,6 +160,98 @@
     }).catch(function(){ return false; });
   }
 
+  var CUENTA_KEY = 'agenda_personal';
+
+  function contactoDeCuenta(f){
+    var tel = String((f && (f.telefono || f.telf)) || '').trim();
+    var norm = String((f && (f.tel_norm || f.telefono_normalizado)) || '').replace(/\D/g, '') || digitos(tel);
+    if (!norm) return null;
+    return {
+      id: (f && f.id) || ('ap-' + uuid()),
+      nombre: String((f && f.nombre) || 'Sin nombre').slice(0, 120),
+      telefono: tel.slice(0, 30) || norm,
+      tel_norm: norm.slice(0, 15),
+      estado: (f && f.estado) === 'mergado' ? 'mergado' : 'nuevo',
+      contacto_id: (f && f.contacto_id) || null,
+      origen: (f && f.origen) || 'vcf',
+      created_at: (f && f.created_at) || new Date().toISOString()
+    };
+  }
+  function mezclarDeCuenta(filas){
+    cargar();
+    var porTel = {};
+    mios.forEach(function(c){ if (c.tel_norm) porTel[c.tel_norm] = c; });
+    (filas || []).forEach(function(bruto){
+      var f = contactoDeCuenta(bruto);
+      if (!f) return;
+      var local = porTel[f.tel_norm];
+      if (!local){
+        mios.push(f);
+        porTel[f.tel_norm] = f;
+      } else {
+        if (f.estado === 'mergado') local.estado = 'mergado';
+        if (f.contacto_id) local.contacto_id = f.contacto_id;
+        if (f.nombre && (!local.nombre || local.nombre.indexOf('Sin nombre') === 0)) local.nombre = f.nombre;
+      }
+    });
+    guardar();
+  }
+  async function verEnOtroDispositivo(){
+    if (!autorizado()){
+      await window.APPIDialog.alert('Iniciá sesión con tu cuenta de distribuidor para ver la agenda en otro dispositivo.', { title: 'Ver en otro dispositivo', icon: '📱' });
+      return;
+    }
+    if (!navigator.onLine){
+      await window.APPIDialog.alert('Sin internet no se puede pasar al otro dispositivo.', { title: 'Sin conexión', icon: '📡' });
+      return;
+    }
+    cargar();
+    var boton = $('apOtroDispositivo');
+    if (boton){ boton.disabled = true; boton.textContent = 'Pasando…'; }
+    try{
+      var subi = false;
+      if (mios.length){
+        await cloudFetch('/rest/v1/appi_datos?on_conflict=user_id,data_key', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Prefer: 'resolution=merge-duplicates,return=minimal' },
+          body: JSON.stringify([{
+            user_id: uid(),
+            data_key: CUENTA_KEY,
+            data: { value: JSON.stringify(mios) },
+            updated_at: new Date().toISOString()
+          }])
+        });
+        subi = true;
+      }
+      var rows = await cloudFetch('/rest/v1/appi_datos?select=data,updated_at&data_key=eq.' + encodeURIComponent(CUENTA_KEY) + '&limit=1');
+      var remoto = [];
+      (Array.isArray(rows) ? rows : []).forEach(function(row){
+        var crudo = row && row.data && (row.data.value != null ? row.data.value : row.data);
+        if (typeof crudo === 'string'){
+          try{ crudo = JSON.parse(crudo); }catch(e){ crudo = []; }
+        }
+        if (Array.isArray(crudo)) remoto = remoto.concat(crudo);
+      });
+      mezclarDeCuenta(remoto);
+      repintarSiVisible();
+      if (subi && mios.length){
+        toast('Listo: ya está en tu cuenta. En el otro dispositivo tocá Ver en otro dispositivo.', 4200);
+      } else if (mios.length){
+        toast('Trajimos tu agenda: ' + mios.length + (mios.length === 1 ? ' contacto' : ' contactos'), 3200);
+      } else {
+        await window.APPIDialog.alert(
+          'No hay agenda en este teléfono ni en tu cuenta.\n\nSubila acá primero (Subir agenda) y después tocá de nuevo Ver en otro dispositivo.',
+          { title: 'Todavía no hay agenda', icon: '📱' }
+        );
+      }
+    }catch(error){
+      await window.APPIDialog.alert(String(error && error.message || 'No se pudo pasar la agenda.'), { title: 'No se pudo pasar', icon: '!' });
+    }finally{
+      var b = $('apOtroDispositivo');
+      if (b){ b.disabled = false; b.textContent = 'Ver en otro dispositivo'; }
+    }
+  }
+
   /* ---------- sincronización (espejo de la tabla) ---------- */
 
   function filaDe(c){
@@ -740,7 +832,9 @@
       '.ap-cabeza small{display:block;margin-top:4px;color:#9a9aa8;font-size:13px;font-weight:500}',
       '.ap-import{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 6px}',
       '.ap-import button{flex:0 0 auto;width:auto;min-height:32px;border:0;border-radius:8px;font:inherit;font-size:12px;font-weight:700;cursor:pointer;padding:6px 11px;line-height:1.2}',
+      '.ap-import button:disabled{opacity:.55;cursor:default}',
       '.ap-import .ppal{background:rgba(91,141,239,.14);color:#3d63c9;box-shadow:none}',
+      '.ap-import .otro{background:rgba(91,141,239,.14);color:#3d63c9}',
       '.ap-import .guia{background:rgba(80,90,130,.07);border:0;color:#6b6e82}',
       'body.dark .ap-import .ppal{background:rgba(91,141,239,.22);color:#9db9f7}',
       'body.dark .ap-import .guia{background:rgba(255,255,255,.06);color:#b7b3c9}',
@@ -882,10 +976,11 @@
     var cuenta = mios.length + (mios.length === 1 ? ' contacto' : ' contactos');
     if (mios.length && paraPasar) cuenta += ' · ' + paraPasar + ' para pasar';
     salida += '<div class="ap-cabeza"><h3>Agenda personal</h3><small>' + cuenta + '</small></div>';
-    if (sinTabla && !mios.length){
-      salida += '<div class="ap-aviso">Si subiste la agenda en el celular, abrí APPI ahí un momento con internet y después volvé a esta solapa.</div>';
+    if (!mios.length){
+      salida += '<div class="ap-aviso">Si la subiste en el celular, tocá <b>Ver en otro dispositivo</b> acá (con internet).</div>';
     }
     salida += '<div class="ap-import">';
+    salida += '<button type="button" class="otro" id="apOtroDispositivo">Ver en otro dispositivo</button>';
     salida += '<button type="button" class="ppal" id="apSubirVcf">Subir agenda</button>';
     salida += '<button type="button" class="guia" id="apGuia">Cómo saco la agenda</button>';
     salida += '</div>';
@@ -972,6 +1067,8 @@
         if (navigator.onLine && autorizado()) sincronizar();
       };
     });
+    var otro = $('apOtroDispositivo');
+    if (otro) otro.onclick = function(){ verEnOtroDispositivo(); };
     var subir = $('apSubirVcf');
     if (subir) subir.onclick = function(){ var inp = $('apVcfInput'); if (inp) inp.click(); };
     var guia = $('apGuia');

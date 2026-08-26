@@ -100,6 +100,22 @@ async function abrirPanel(page, { contactos = CONTACTOS_APPI, agendaRemota = [],
       if (request.method() === 'DELETE') return route.fulfill({ status: 204, headers: cors, body: '' });
       return route.fulfill({ status: 200, headers: cors, body: JSON.stringify(agendaRemota) });
     }
+    if (url.pathname === '/rest/v1/appi_datos') {
+      if (request.method() === 'POST') {
+        const body = request.postDataJSON();
+        const rows = Array.isArray(body) ? body : [body];
+        rows.forEach(row => {
+          if (row && row.data_key === 'agenda_personal') {
+            agendaCuenta.splice(0, agendaCuenta.length, row);
+          }
+        });
+        return route.fulfill({ status: 201, headers: cors, body: '' });
+      }
+      if (String(url.search || '').includes('agenda_personal')) {
+        return route.fulfill({ status: 200, headers: cors, body: JSON.stringify(agendaCuenta) });
+      }
+      return route.fulfill({ status: 200, headers: cors, body: '[]' });
+    }
     if (url.pathname === '/functions/v1/dispositivo-puente') {
       return route.fulfill({ status: 200, headers: cors, body: JSON.stringify({ devices: [] }) });
     }
@@ -430,6 +446,28 @@ test('la ✕ de la barra suelta todo y cierra la selección flotante', async ({ 
   await expect(page.locator('#apBulkBar')).toHaveCount(0);
   await expect(page.locator('.ap-item.seleccionado')).toHaveCount(0);
   expect(await page.evaluate(() => window.APPIAgendaPersonal.modoSeleccion())).toBe(false);
+});
+
+test('Ver en otro dispositivo sube la agenda y la trae de la cuenta', async ({ page }) => {
+  const { agendaCuenta } = await abrirAgendaPersonal(page);
+  await page.setInputFiles('#apVcfInput', { name: 'agenda.vcf', mimeType: 'text/vcard', buffer: Buffer.from(VCF, 'utf8') });
+  await expect(page.locator('.ap-item')).toHaveCount(3);
+  await page.locator('#apOtroDispositivo').click();
+  await expect.poll(() => agendaCuenta.length).toBe(1);
+  expect(String(agendaCuenta[0].data.value)).toContain('Juan Pérez');
+});
+
+test('en un dispositivo vacío, Ver en otro dispositivo trae la agenda de la cuenta', async ({ page }) => {
+  const remota = [{
+    id: 'ap-remoto', nombre: 'Desde la cuenta', telefono: '3515550000',
+    tel_norm: '3515550000', estado: 'nuevo', origen: 'vcf'
+  }];
+  await abrirAgendaPersonal(page, {
+    agendaCuenta: [{ user_id: USER_ID, data_key: 'agenda_personal', data: { value: JSON.stringify(remota) } }]
+  });
+  await expect(page.locator('.ap-item')).toHaveCount(0);
+  await page.locator('#apOtroDispositivo').click();
+  await expect(page.locator('.ap-item').filter({ hasText: 'Desde la cuenta' })).toBeVisible();
 });
 
 test('la entrada es el .vcf: no hay botón de elegir del teléfono', async ({ page }) => {
