@@ -240,7 +240,7 @@
   }
   function colaCanje(){ return colaMensajes('renovacion'); }
   var RINNOVA_DESDE = '2026-08-26';
-  var RINNOVA_HASTA = '2026-08-29';
+  var RINNOVA_HASTA = '2026-08-30';
   var LINK_RINNOVA = 'https://www.youtube.com/watch?v=lM2XjEVCPFI';
   function ventanaRinnova(){
     var h = hoyKey();
@@ -258,7 +258,8 @@
     return Array.isArray(raw) ? raw : [];
   }
   function esDucha(u){
-    return /ducha/i.test(String((u && u.producto) || ''));
+    // En la planilla viene abreviado: DUCH PLA, PSA DUCH, DUCH MA, DUCHA II…
+    return /duch/i.test(String((u && u.producto) || ''));
   }
   function rinnovaPedidos(){
     var clave = 'appi_ducha_rinnova_v1_' + uid();
@@ -278,7 +279,7 @@
       : null;
     if (p && window.APPIMensajes.completar) return window.APPIMensajes.completar(p.texto, u);
     var nombre = pilaDe(u && (u.usuario || u.nombre));
-    return 'Hola ' + (nombre || '') + '! 😊\n\nVi este video de PSA Rinnova y me acordé de tu ducha. Es cortito: habla de cómo se siente el pelo y la piel cuando el agua está bien.\n\n' + LINK_RINNOVA + '\n\n¿Lo viste? Cualquier cosa me decís.';
+    return 'Hola ' + (nombre || '') + '! 😊\n\nMe acordé de tu ducha y te quiero pasar este video de PSA Rinnova. Es un minutito: habla del pelo y de la piel cuando el agua está bien.\n\n' + LINK_RINNOVA + '\n\nDecime qué te parece.';
   }
   function colaDuchaRinnova(){
     if (!ventanaRinnova()) return [];
@@ -720,7 +721,9 @@
     if (!lista.length) return null;
     var filas = [], items = [];
     lista.slice(0, 3).forEach(function(u){
-      filas.push('<li>🚿 <b>' + esc(nombreLindo(u.usuario || u.nombre)) + '</b> · tiene la ducha</li>');
+      var prod = String(u.producto || '').trim();
+      filas.push('<li>🚿 <b>' + esc(nombreLindo(u.usuario || u.nombre)) + '</b>' +
+        (prod ? ' · ' + esc(prod) : '') + '</li>');
       items.push(mandarRinnovaA(u));
     });
     if (lista.length > 3){
@@ -728,9 +731,11 @@
       items.push(mandarRinnovaA(lista[3]));
     }
     return {
-      cat: 'rinnova', icono: '🚿', kicker: 'PSA Ducha · 4 días',
+      cat: 'rinnova', icono: '🚿', kicker: 'PSA Ducha · 5 días',
       titulo: lista.length === 1 ? 'Mandale el video de Rinnova' : 'Mandales el video de Rinnova',
-      html: '<ul class="ht-lista">' + filas.join('') + '</ul><p class="ht-nota">Quienes ya tienen la ducha. El video es cortito: pelo y piel. Estos 4 días, y después queda en los mensajes del producto.</p>',
+      html: '<img class="ht-foto" src="./img/rinnova-ducha.jpg" alt="">' +
+            '<ul class="ht-lista">' + filas.join('') + '</ul>' +
+            '<p class="ht-nota">Vigentes y vencidos. Un toque y sale el video. Hasta el 30 de agosto.</p>',
       items: items,
       cta: { label: 'Enviar a ' + (pilaDe(lista[0].usuario || lista[0].nombre) || 'la primera'), go: items[0] }
     };
@@ -783,6 +788,7 @@
       '.ht-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}',
       '.ht-chips span{padding:7px 12px;border-radius:999px;background:rgba(91,141,239,.1);color:#3d63c9;font-size:12.5px;font-weight:900}',
       '.ht-cta{margin-top:12px;min-height:52px;border:0;border-radius:15px;background:linear-gradient(135deg,#5b8def,#8b63e8);color:#fff;font:inherit;font-size:15px;font-weight:900;cursor:pointer}',
+      '.ht-foto{display:block;width:100%;height:122px;object-fit:cover;border-radius:16px;margin:0 0 12px}',
       /* La tarjeta especial se viste distinta: fondo pleno, frase grande y
          centrada, chips vidriosos y el corazón de marca de agua (v325). */
       '.ht-card.ht-esp{background:linear-gradient(150deg,#4f7df2,#8b63e8 55%,#a06bff);}',

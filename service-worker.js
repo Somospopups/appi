@@ -48,7 +48,8 @@ const APP_SHELL = [
   './icon-512.png',
   './icon-192-maskable.png',
   './icon-512-maskable.png',
-  './apple-touch-icon.png'
+  './apple-touch-icon.png',
+  './img/rinnova-ducha.jpg'
 ];
 
 self.addEventListener('install', event => {
