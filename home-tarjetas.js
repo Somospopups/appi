@@ -7,10 +7,12 @@
    por categoría, solo si esa categoría tiene algo para decir:
 
      💙 Especial  · aliento personalizado (siempre, 1 frase/día)
+     ⚡ Hoy te conviene · LA acción del día (venta, canje o equipo)
+     🔄 Plan Canje · equipos vencidos < 1 año, listos para renovar
      📅 Tu jornada · seguimientos y presentaciones de hoy
      🎯 Oportunidades · bonus al alcance en Mi Equipo
      🎂 Cumpleaños · equipo + clientes que cumplen hoy
-     👥 Mi Equipo · la Cultura del mes que falta completar
+     👥 Mi Equipo · Cultura + a quién invitar
      📇 Panel de Contactos · nuevos sin contactar y vencidos
      💧 Usuarios · las acciones del día sin marcar (✓/✗)
 
@@ -191,6 +193,153 @@
       return { pb: Number(row.pb) || 0, invitados: inv, metaPb: 15, metaInv: 2 };
     }catch(e){ return { pb: 0, invitados: 0, metaPb: 15, metaInv: 2 }; }
   }
+  function pilaDe(n){
+    try{ if (typeof window.nombreDePila === 'function'){ var v = window.nombreDePila(n); if (v) return v; } }catch(e){}
+    var t = String(n == null ? '' : n).trim();
+    if (t.indexOf(',') >= 0) t = (t.split(',')[1] || t.split(',')[0] || '').trim();
+    t = t.split(/\s+/)[0] || '';
+    return t ? t.charAt(0).toUpperCase() + t.slice(1).toLowerCase() : '';
+  }
+  function abrirContacto(c){
+    return function(){
+      if (window.APPIGestion && window.APPIGestion.abrirContacto) window.APPIGestion.abrirContacto(c.id);
+      else if (typeof window.openMiGestion === 'function') window.openMiGestion();
+    };
+  }
+  function abrirEquipo(){
+    if (typeof window.openEquipo === 'function') window.openEquipo();
+    else if (typeof window.showView === 'function') window.showView('view-equipo');
+  }
+  function abrirCultura(){
+    abrirEquipo();
+    setTimeout(function(){
+      var cult = document.getElementById('culturaWrap') || document.querySelector('.cultura-card');
+      if (cult) try{ cult.scrollIntoView({ behavior: 'smooth', block: 'center' }); }catch(e){}
+    }, 450);
+  }
+  function colaMensajes(id){
+    try{
+      if (window.APPIMensajes && typeof window.APPIMensajes.colaMotivo === 'function'){
+        return window.APPIMensajes.colaMotivo(id) || [];
+      }
+    }catch(e){}
+    return [];
+  }
+  function referidosPedidosMes(){
+    var d = new Date();
+    var clave = 'appi_referidos_mes_' + uid() + '_' + d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
+    var set = leerLS(clave, []);
+    return { clave: clave, set: Array.isArray(set) ? set : [] };
+  }
+  function marcarReferidoPedido(tel){
+    var st = referidosPedidosMes();
+    var n = String(tel || '').replace(/\D/g,'');
+    if (!n || st.set.indexOf(n) >= 0) return;
+    st.set.push(n);
+    try{ localStorage.setItem(st.clave, JSON.stringify(st.set)); }catch(e){}
+  }
+  function colaCanje(){ return colaMensajes('renovacion'); }
+  function colaVigentesParaReferido(){
+    var st = referidosPedidosMes();
+    return colaMensajes('checkin').filter(function(u){
+      var tel = String(u.telf || u.tel || u.telefono || '').replace(/\D/g,'');
+      return tel && st.set.indexOf(tel) < 0;
+    });
+  }
+  function prospectosEquipo(){
+    return contactosGestion().filter(function(c){
+      if (!c || ['convertido','no_interesado'].indexOf(c.estado) >= 0) return false;
+      var interes = String(c.interes || '').toLowerCase();
+      if (interes.indexOf('negocio') >= 0 || interes.indexOf('oportunidad') >= 0) return true;
+      return c.tipo === 'referido' && c.estado === 'nuevo';
+    });
+  }
+  function pedirReferidoA(u){
+    return function(){
+      var nombre = pilaDe(u.usuario || u.nombre);
+      var tel = u.telf || u.tel || u.telefono || '';
+      var texto = 'Hola ' + (nombre || '') + '! ¿Cómo andás? 😊\n\nTe escribo porque estoy armando un grupo chico de personas que quieren cuidar el agua de su casa.\n\n¿Se te ocurre alguien (familia, vecinos, laburo) a quien le vendría bien que le cuente?\n\nCon un nombre y un teléfono me alcanza. ¡Gracias!';
+      marcarReferidoPedido(tel);
+      if (window.APPITel && window.APPITel.abrir && tel){
+        window.APPITel.abrir(tel, texto, nombre);
+      } else if (window.APPIMensajes && window.APPIMensajes.mandar){
+        window.APPIMensajes.mandar('saludo', u);
+      } else if (typeof window.showView === 'function') window.showView('view-usuarios');
+    };
+  }
+  function mejorAccionHoy(){
+    var hoy = hoyKey();
+    var cs = contactosGestion();
+    var pres = cs.filter(function(c){
+      return c && c.estado === 'presentacion' && c.proximo_contacto && c.proximo_contacto <= hoy;
+    }).sort(function(a,b){ return String(a.proximo_contacto_hora || '').localeCompare(String(b.proximo_contacto_hora || '')); });
+    if (pres[0]) return {
+      motor: 'venta', tipo: 'presentacion', persona: pres[0],
+      titulo: 'Hoy cerrás con ' + (pilaDe(pres[0].nombre) || 'tu presentación'),
+      detalle: 'Tenés una presentación. Es la plata del mes: 30 demos, 10 cierres.',
+      cta: 'Ir con ' + (pilaDe(pres[0].nombre) || 'ella'),
+      go: abrirContacto(pres[0])
+    };
+    var canjes = colaCanje();
+    if (canjes[0]) return {
+      motor: 'canje', tipo: 'canje', persona: canjes[0],
+      titulo: 'Canje listo: ' + (nombreLindo(canjes[0].usuario) || 'un cliente'),
+      detalle: 'Ya conoce el producto. El Plan Canje es la venta más fácil del parque.',
+      cta: 'Escribirle ahora',
+      go: function(){
+        if (window.APPIMensajes && window.APPIMensajes.mandar) window.APPIMensajes.mandar('renovacion', canjes[0]);
+        else if (typeof window.showView === 'function') window.showView('view-usuarios');
+      }
+    };
+    var nuevos = cs.filter(function(c){ return c && c.estado === 'nuevo'; })
+      .sort(function(a,b){ return new Date(a.created_at || 0) - new Date(b.created_at || 0); });
+    if (nuevos[0]) return {
+      motor: 'venta', tipo: 'nuevo', persona: nuevos[0],
+      titulo: 'Escribile a ' + (pilaDe(nuevos[0].nombre) || 'tu nuevo contacto'),
+      detalle: 'Las primeras 24 horas pesan más que una semana entera.',
+      cta: 'Abrir la ficha',
+      go: abrirContacto(nuevos[0])
+    };
+    var bonus = [];
+    try{ if (typeof window.personasOportunidadBonus === 'function') bonus = window.personasOportunidadBonus() || []; }catch(e){}
+    if (bonus[0]) return {
+      motor: 'equipo', tipo: 'bonus', persona: bonus[0],
+      titulo: (nombreLindo(bonus[0].nombre) || 'Alguien de tu red') + ' está a un paso del Bonus',
+      detalle: '12 PB personales + un patrocinio de 9 PB. Acompañalo esta semana.',
+      cta: 'Ir a Mi Equipo',
+      go: abrirEquipo
+    };
+    var cul = culturaMes();
+    if (cul.invitados < cul.metaInv){
+      var prospecto = prospectosEquipo()[0];
+      return {
+        motor: 'equipo', tipo: 'invitar', persona: prospecto || null,
+        titulo: prospecto ? ('Invitá a ' + (pilaDe(prospecto.nombre) || 'esta persona')) : 'Invitá a alguien hoy',
+        detalle: 'Te faltan ' + (cul.metaInv - cul.invitados) + ' invitado' + (cul.metaInv - cul.invitados === 1 ? '' : 's') + ' para la Cultura del mes.',
+        cta: prospecto ? 'Abrir la ficha' : 'Cargar un invitado',
+        go: prospecto ? abrirContacto(prospecto) : abrirCultura
+      };
+    }
+    var segs = cs.filter(function(c){
+      return c && c.estado === 'seguimiento' && c.proximo_contacto && c.proximo_contacto <= hoy;
+    });
+    if (segs[0]) return {
+      motor: 'venta', tipo: 'seguimiento', persona: segs[0],
+      titulo: 'Retomá a ' + (pilaDe(segs[0].nombre) || 'ese seguimiento'),
+      detalle: 'El seguimiento es donde se esconde la plata.',
+      cta: 'Ir con ' + (pilaDe(segs[0].nombre) || 'esa persona'),
+      go: abrirContacto(segs[0])
+    };
+    var refs = colaVigentesParaReferido();
+    if (refs[0]) return {
+      motor: 'equipo', tipo: 'referido', persona: refs[0],
+      titulo: 'Pedile un nombre a ' + (pilaDe(refs[0].usuario) || 'un cliente'),
+      detalle: 'Tus clientes de hoy son tus referidos de mañana. Un nombre alcanza.',
+      cta: 'Pedir el nombre',
+      go: pedirReferidoA(refs[0])
+    };
+    return null;
+  }
 
   /* ---------- las tarjetas por categoría ---------- */
   function tarjetaEspecial(){
@@ -216,6 +365,45 @@
             (chips.length ? '<div class="ht-chips">' + chips.map(function(c){ return '<span>' + esc(c) + '</span>'; }).join('') + '</div>' : '') +
             '<span class="ht-esp-marca">💙</span>',
       cta: null
+    };
+  }
+
+  function tarjetaHoyConviene(){
+    var a = mejorAccionHoy();
+    if (!a) return null;
+    var motor = a.motor === 'venta' ? 'Venta' : a.motor === 'canje' ? 'Plan Canje' : 'Equipo';
+    return {
+      cat: 'hoy', icono: '⚡', kicker: 'Hoy te conviene · ' + motor,
+      titulo: a.titulo,
+      html: '<p class="ht-frase">' + esc(a.detalle) + '</p>',
+      cta: { label: a.cta, go: a.go }
+    };
+  }
+
+  function tarjetaCanje(){
+    var lista = colaCanje();
+    if (!lista.length) return null;
+    var filas = [], items = [];
+    lista.slice(0, 3).forEach(function(u){
+      filas.push('<li>🔄 <b>' + esc(nombreLindo(u.usuario)) + '</b> · canje listo</li>');
+      items.push(function(){
+        if (window.APPIMensajes && window.APPIMensajes.mandar) window.APPIMensajes.mandar('renovacion', u);
+        else if (typeof window.showView === 'function') window.showView('view-usuarios');
+      });
+    });
+    if (lista.length > 3){
+      filas.push('<li>… y ' + (lista.length - 3) + ' más</li>');
+      items.push(function(){
+        if (typeof window.showView === 'function') window.showView('view-usuarios');
+        setTimeout(function(){ try{ window.APPIMensajes.abrirFila('renovacion'); }catch(e){} }, 480);
+      });
+    }
+    return {
+      cat: 'canje', icono: '🔄', kicker: 'Plan Canje',
+      titulo: lista.length === 1 ? 'Hay 1 equipo para canjear' : 'Hay ' + lista.length + ' equipos para canjear',
+      html: '<ul class="ht-lista">' + filas.join('') + '</ul><p class="ht-nota">Ya conocen el producto. Un toque y sale el mensaje del canje.</p>',
+      items: items,
+      cta: { label: 'Escribirle al primero', go: items[0] }
     };
   }
 
@@ -380,19 +568,18 @@
     var partes = [];
     if (faltaPb) partes.push('<b>' + String(faltaPb).replace('.', ',') + ' PB</b>');
     if (faltaInv) partes.push('<b>' + faltaInv + ' invitado' + (faltaInv === 1 ? '' : 's') + '</b>');
+    var prospecto = faltaInv ? prospectosEquipo()[0] : null;
+    var ref = faltaInv ? colaVigentesParaReferido()[0] : null;
+    var extra = '';
+    if (prospecto) extra += '<ul class="ht-lista"><li>🌱 <b>' + esc(nombreLindo(prospecto.nombre)) + '</b> · para invitar</li></ul>';
+    else if (ref) extra += '<ul class="ht-lista"><li>🌱 Pedile un nombre a <b>' + esc(nombreLindo(ref.usuario)) + '</b></li></ul>';
     return {
       cat: 'equipo', icono: '👥', kicker: 'Mi Equipo',
-      titulo: 'La Cultura del mes te está esperando',
-      html: '<p class="ht-frase">Te falta' + (partes.length > 1 ? 'n' : '') + ' ' + partes.join(' y ') + ' para completar el mes.</p>' +
+      titulo: faltaInv ? 'Sumá gente a tu equipo' : 'La Cultura del mes te está esperando',
+      html: '<p class="ht-frase">Te falta' + (partes.length > 1 ? 'n' : '') + ' ' + partes.join(' y ') + ' para completar el mes.</p>' + extra +
             '<div class="ht-chips"><span>💎 ' + String(cul.pb).replace('.', ',') + ' / ' + cul.metaPb + '</span><span>🤝 ' + cul.invitados + ' / ' + cul.metaInv + '</span></div>',
-      cta: { label: 'Cargar mi avance', go: function(){
-        if (typeof window.openEquipo === 'function') window.openEquipo();
-        else if (typeof window.showView === 'function') window.showView('view-equipo');
-        setTimeout(function(){
-          var cult = document.getElementById('culturaWrap') || document.querySelector('.cultura-card');
-          if (cult) cult.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }, 500);
-      } }
+      items: prospecto ? [abrirContacto(prospecto)] : (ref ? [pedirReferidoA(ref)] : null),
+      cta: { label: prospecto ? 'Ir con ' + (pilaDe(prospecto.nombre) || 'esa persona') : (faltaInv ? 'Cargar un invitado' : 'Cargar mi avance'), go: prospecto ? abrirContacto(prospecto) : abrirCultura }
     };
   }
 
@@ -821,6 +1008,7 @@
     pasar: pasar,
     volver: volver,
     armarTarjetas: armarTarjetas,
+    mejorAccionHoy: mejorAccionHoy,
     cuantasNovedades: cuantasNovedades,
     fraseDelDia: fraseDelDia,
     FRASES: FRASES

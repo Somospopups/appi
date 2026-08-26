@@ -4,8 +4,8 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
-- Versión: **v363 · Segura**.
-- Caché de la app: `appi-v363-pb-auto` (se renueva al abrir APPI).
+- Versión: **v364 · Segura**.
+- Caché de la app: `appi-v364-hoy-conviene` (se renueva al abrir APPI).
 - Publicación: [https://somospopups.github.io/appi/](https://somospopups.github.io/appi/)
 - Acceso por número de distribuidor y contraseña.
 - Acceso administrador POPUPS mediante el candado, sin DIP ni número de distribuidor.
@@ -24,6 +24,16 @@ Desde v256, todos los dispositivos abren APPI con el mismo logo de vidrio.
 - Dentro de la app, la animación de carga muestra el mismo cartel de vidrio dibujado con CSS, sin descargar imágenes, en celular, tablet y PC.
 
 Al cambiar el logo hay que regenerar ambos juegos y volver a correr `npm test`: `tests/e2e/logo-vidrio.spec.js` verifica que cada dispositivo tenga su imagen y que el arranque muestre el vidrio.
+
+## Hoy te conviene (v364)
+
+El mazo del Home ahora trabaja como un gerente comercial. Después del
+impulso del día aparece **Hoy te conviene**: una sola acción, la que más
+plata mueve hoy (presentación, canje listo, contacto nuevo, bonus,
+invitado o un nombre pedido a un vigente). Si hay equipos vencidos de
+menos de un año, sale además la carta **Plan Canje**. Mi Equipo pasa a
+decir a quién invitar. Ninguna carta se inventa: si no hay alguien real,
+no está.
 
 ## PB personales de Cultura (v363)
 

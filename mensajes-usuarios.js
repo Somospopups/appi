@@ -746,9 +746,20 @@
     return null;
   }
   function listaUsuarios(){
-    if (typeof window.usuariosTodosActual === 'function') return window.usuariosTodosActual() || [];
-    if (Array.isArray(window.usuariosU)) return window.usuariosU;
-    return [];
+    if (typeof window.usuariosTodosActual === 'function'){
+      var vivos = window.usuariosTodosActual() || [];
+      if (vivos.length) return vivos;
+    }
+    if (Array.isArray(window.usuariosU) && window.usuariosU.length) return window.usuariosU;
+    try{
+      var raw = JSON.parse(localStorage.getItem('usuarios_garantias') || '[]');
+      return Array.isArray(raw) ? raw : [];
+    }catch(e){ return []; }
+  }
+  function colaMotivo(id){
+    var m = motivoPorId(id);
+    if (!m) return [];
+    return ordenarPorUrgencia(m, candidatosDe(m));
   }
   function candidatosDe(motivo){
     return listaUsuarios().filter(function(u){
@@ -1694,6 +1705,7 @@
     mandar: mandar,
     pendientes: pendientes,
     deHoy: deHoy,
+    colaMotivo: colaMotivo,
     CUPO_DIA: CUPO_DIA,
     DIAS_CHECKIN: DIAS_CHECKIN,
     aplicaCheckin: aplicaCheckin,

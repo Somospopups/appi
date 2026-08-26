@@ -195,6 +195,8 @@ test('las tarjetas son inteligentes: solo aparecen las categorías con novedades
   await entrar(page);
   const cats = await page.evaluate(() => window.APPIHomeTarjetas.armarTarjetas().map(t => t.cat));
   expect(cats[0]).toBe('especial');
+  expect(cats).toContain('hoy');           // Lucía tiene presentación hoy
+  expect(cats).not.toContain('canje');     // sin parque de garantías
   expect(cats).toContain('jornada');   // Jorge y Lucía tienen fecha para hoy
   expect(cats).toContain('panel');         // Carla está nueva sin contactar
   expect(cats).toContain('oportunidades'); // María (DC) está en 9 PB: bonus cerca
@@ -594,10 +596,7 @@ test('el botón de Oportunidades dice Ir a Mi Equipo y te lleva ahí (v324)', as
 // siempre la siguiente y al volver aparecía otra: quedaba feo.
 test('al arrastrar asoma la tarjeta correcta según la dirección (v324)', async ({ page }) => {
   await entrar(page);
-  await page.evaluate(() => window.APPIHomeTarjetas.abrir());
-  await page.evaluate(() => window.APPIHomeTarjetas.pasar());
-  await page.waitForTimeout(450);
-  await expect(page.locator('#htPos')).toContainText('2 de');
+  await page.evaluate(() => window.APPIHomeTarjetas.abrir()).toContainText('2 de');
   const r = await page.evaluate(() => {
     const kickers = window.APPIHomeTarjetas.armarTarjetas().map(t => t.kicker);
     const top = document.querySelector('.ht-card:not(.detras1):not(.detras2):not(.ht-fantasma)');
@@ -670,5 +669,8 @@ test('el botón de Cumpleaños dice Revisar los cumpleaños del mes y va a Mi Eq
   await cta.click();
   await expect(page.locator('#view-equipo')).toHaveClass(/active/);
   // Y la lista de cumpleaños del mes está ahí para revisar.
+  await expect(page.locator('#bdayListWrap')).toBeVisible({ timeout: 5000 });
+});
+lista de cumpleaños del mes está ahí para revisar.
   await expect(page.locator('#bdayListWrap')).toBeVisible({ timeout: 5000 });
 });
