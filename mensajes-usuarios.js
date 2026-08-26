@@ -137,7 +137,7 @@
     _mm('mant_ducha', '🔧', 'mantenimiento', 'Mantenimiento · PSA DUCHA II',
       'Hola {nombre}! 😊\n\nTu PSA DUCHA II ya está listo para su mantenimiento. Te dejo el video con el paso a paso:\nhttps://www.youtube.com/watch?v=C3IiaANlDTg\n\nEs simple y en 5 minutos lo tenés listo. Cualquier duda me escribís.'),
     _mm('mant_ducha_rinnova', '💧', 'mantenimiento', 'PSA Rinnova · DUCHA II',
-      'Hola {nombre}! 😊\n\nComo ya tenés la ducha — ya la probaste — te quería contar una. Ahora nos renovamos y salió Rinnova.\n\nTe dejo el video, es un minutito.\n\nhttps://www.youtube.com/watch?v=lM2XjEVCPFI\n\nCuando puedas lo mirás. Después me contás.'),
+      'Hola {nombre}! 😊\n\nAhora nos renovamos y salió Rinnova.\n\nhttps://www.youtube.com/watch?v=lM2XjEVCPFI'),
     _mm('mant_s1000', '🔧', 'mantenimiento', 'Mantenimiento · PSA S•1000 II Bajo Mesada',
       'Hola {nombre}! 😊\n\nTu PSA S•1000 II Bajo Mesada ya está listo para su mantenimiento. Te dejo el video con el paso a paso:\nhttps://www.youtube.com/watch?v=bRwJoC0YZ2Q\n\nEs simple y en 5 minutos lo tenés listo. Cualquier duda me escribís.'),
     _mm('mant_quantum', '🔧', 'mantenimiento', 'Mantenimiento · PSA Quantum',
