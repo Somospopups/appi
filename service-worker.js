@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v383-rinnova-nuevo';
+const CACHE_NAME = 'appi-v384-rinnova-amigo';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

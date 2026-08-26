@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "383.0.0",
-  "cacheName": "appi-v383-rinnova-nuevo",
+  "version": "384.0.0",
+  "cacheName": "appi-v384-rinnova-amigo",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {
