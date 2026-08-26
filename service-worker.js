@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v359-sin-pantallazo-panel';
+const CACHE_NAME = 'appi-v360-seleccion-flotante';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
