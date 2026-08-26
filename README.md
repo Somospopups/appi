@@ -4,8 +4,8 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
-- Versión: **v387 · Segura**.
-- Caché de la app: `appi-v387-canje-amigo` (se renueva al abrir APPI).
+- Versión: **v388 · Segura**.
+- Caché de la app: `appi-v388-canje-explica` (se renueva al abrir APPI).
 - Publicación: [https://somospopups.github.io/appi/](https://somospopups.github.io/appi/)
 - Acceso por número de distribuidor y contraseña.
 - Acceso administrador POPUPS mediante el candado, sin DIP ni número de distribuidor.

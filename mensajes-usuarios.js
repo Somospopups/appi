@@ -89,12 +89,16 @@
       texto: [
         'Hola {nombre}! ¿Cómo estás? 😊',
         '',
-        'Vi que tu equipo cumplió la vida útil el {vence} y no llegamos a hacer el canje.',
+        'Vi que tu equipo cumplió la vida útil el {vence}.',
         '',
-        'Te dejo este video, es cortito:',
+        'Cuando eso pasa hay tres motivos para el canje: ya no se garantiza que no crezcan microorganismos adentro, el carbón activado se satura (deja de retener bien el sabor y el color) y los otros medios (KDF, resinas) también se agotan.',
+        '',
+        'Por eso existe el canje. No es un trámite: es para que el agua siga estando bien.',
+        '',
+        'Te dejo este video, es un minutito y lo explica re claro:',
         '{link_canje}',
         '',
-        'Si querés paso a verlo un día de estos y lo charlamos tranquilos.'
+        'Cuando puedas lo mirás. Si querés paso un día de estos y lo charlamos tranquilos.'
       ].join('\n')
     },
     {
@@ -143,7 +147,7 @@
     _mm('mant_ducha_rinnova', '💧', 'mantenimiento', 'PSA Rinnova · DUCHA II',
       'Hola {nombre}! 😊\n\nAhora nos renovamos y salió Rinnova.\n\nhttps://www.youtube.com/watch?v=lM2XjEVCPFI'),
     _mm('mant_canje', '🔄', 'mantenimiento', 'Plan Canje',
-      'Hola {nombre}! 😊\n\nTe dejo este video sobre el canje.\n\nhttps://www.youtube.com/watch?v=evwYO9-o5MY'),
+      'Hola {nombre}! 😊\n\nTe quería contar una, con calma.\n\nCuando el equipo cumple su vida útil pasan tres cosas: ya no se puede garantizar que no crezcan microorganismos adentro, el carbón activado se satura (deja de retener bien el sabor y el color) y los otros medios (KDF, resinas) también se agotan.\n\nPor eso existe el canje. No es un trámite: es para que el agua siga estando bien.\n\nTe dejo este video, es un minutito y lo explica re claro:\n\nhttps://www.youtube.com/watch?v=evwYO9-o5MY\n\nCuando puedas lo mirás. Después lo charlamos.'),
     _mm('mant_s1000', '🔧', 'mantenimiento', 'Mantenimiento · PSA S•1000 II Bajo Mesada',
       'Hola {nombre}! 😊\n\nTu PSA S•1000 II Bajo Mesada ya está listo para su mantenimiento. Te dejo el video con el paso a paso:\nhttps://www.youtube.com/watch?v=bRwJoC0YZ2Q\n\nEs simple y en 5 minutos lo tenés listo. Cualquier duda me escribís.'),
     _mm('mant_quantum', '🔧', 'mantenimiento', 'Mantenimiento · PSA Quantum',

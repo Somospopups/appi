@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v387-canje-amigo';
+const CACHE_NAME = 'appi-v388-canje-explica';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
