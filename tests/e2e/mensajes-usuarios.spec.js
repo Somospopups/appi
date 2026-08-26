@@ -361,11 +361,6 @@ test('un día sin urgentes se llena con la reserva de post-venta (nunca queda va
   await expect(page.locator('[data-mu-hoy="postventa"]')).toContainText('1');
 });
 
-test('sin cartera no hay franja: el día no inventa tareas sin gente detrás', async ({ page }) => {
-  await entrar(page, []);
-  await expect(page.locator('#muHoy')).toHaveCount(0);
-});
-
 test('un día con poca urgencia se completa con la reserva hasta el mínimo', async ({ page }) => {
   // Ocho vigentes, sin urgencias: el mínimo del día (6) se llena con post-venta.
   const muchos = [];

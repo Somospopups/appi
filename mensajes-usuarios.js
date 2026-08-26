@@ -713,8 +713,19 @@
   ];
   var RESERVA_MAP = {};
   RESERVA.forEach(function(r){ RESERVA_MAP[r.id] = r; });
-  // Memoria de la reserva del día: una selección por persona y por día.
-  var reservaCache = { uid:'', dia:'', grupos:[] };
+  // Memoria de la reserva del día: una selección por persona, día y cartera.
+  // `firma` es la lista de teléfonos de la cartera: si la cartera cambia (por
+  // ejemplo, al cargarse recién después del montaje), la reserva se rearma.
+  var reservaCache = { uid:'', dia:'', firma:'', grupos:[] };
+
+  // Firma del estado de la cartera para saber si cambió entre llamadas.
+  function firmaCartera(lista){
+    var tel = '';
+    for (var i = 0; i < (lista || []).length && i < 50; i++){
+      tel += telefonoDe(lista[i]) + ';';
+    }
+    return tel;
+  }
 
   // Días desde la última vez que tocamos a este cliente (WhatsApp o una ✓ de
   // post-venta). Si nunca lo contactamos, cuenta como muy frío.
@@ -830,8 +841,9 @@
       // (Al cambiar la cartera a mitad de día, la lista del día se conserva; se
       // rearma recién mañana o con _resetReservaCache.)
       var uidAct = uid();
-      if (reservaCache.uid !== uidAct || reservaCache.dia !== hoyKey()){
-        reservaCache.uid = uidAct; reservaCache.dia = hoyKey();
+      var firma = firmaCartera(lista);
+      if (reservaCache.uid !== uidAct || reservaCache.dia !== hoyKey() || reservaCache.firma !== firma){
+        reservaCache.uid = uidAct; reservaCache.dia = hoyKey(); reservaCache.firma = firma;
         reservaCache.grupos = reservaDelDia(conUrgente, MIN_TAREAS_DIA - urgentes);
       }
       reservaCache.grupos.forEach(function(g){ out.push(g); });
@@ -840,7 +852,7 @@
   }
 
   // Sólo para pruebas y para recargar la reserva si cambió la cartera a mano.
-  function resetReservaCache(){ reservaCache = { uid:'', dia:'', grupos:[] }; }
+  function resetReservaCache(){ reservaCache = { uid:'', dia:'', firma:'', grupos:[] }; }
 
   // Para el carrusel: sólo los que todavía no tienen ✓ ni ✗.
   function pendientes(){

@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Motor de Tareas · Día nunca vacío</title>
+<style>
+  :root{--azul:#5b8def;--violeta:#8b63e8;--rosa:#a06bff;--ok:#3ad0a4;--no:#e8624f;--texto:#1d1d2c;--gris:#9a9ba8}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:linear-gradient(165deg,#eef2ff,#f7f2ff);color:var(--texto);min-height:100vh}
+  .appbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:10px;padding:14px 16px 10px;
+    background:rgba(238,242,255,.75);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+  .logo{width:38px;height:38px;border-radius:13px;display:grid;place-items:center;
+    background:linear-gradient(135deg,#5b8def,#8b63e8);color:#fff;font-weight:950;box-shadow:0 6px 18px rgba(91,141,239,.4)}
+  .appbar .tt{font-size:16px;font-weight:950;letter-spacing:-.3px}
+  .appbar .st{display:block;font-size:10.5px;font-weight:800;color:var(--gris)}
+  .wrap{max-width:460px;margin:0 auto;padding:6px 16px 40px}
+  .notice{margin:0 0 12px;padding:10px 13px;border-radius:13px;font-size:11.5px;line-height:1.5;
+    background:rgba(255,190,67,.15);border:1px solid rgba(255,180,60,.35);color:#8a5a00;font-weight:750}
+  .notice b{font-weight:950}
+  .prog{display:flex;align-items:center;gap:12px;padding:13px 15px;border-radius:18px;
+    background:rgba(255,255,255,.62);border:1px solid rgba(255,255,255,.8);margin:6px 0 12px}
+  .prog .pico{font-size:26px}.prog .pbody{flex:1;min-width:0}
+  .prog .ptitle{font-size:14px;font-weight:950}.prog .psub{font-size:11px;font-weight:750;color:var(--gris);margin-top:1px}
+  .bar{height:8px;border-radius:99px;background:rgba(90,95,140,.15);margin-top:8px;overflow:hidden}
+  .bar i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,#3ad0a4,#5b8def);transition:width .5s}
+  .estado{font-size:11px;font-weight:900;text-align:center;line-height:1.3}
+  .estado.ok{color:#0d9e74}.estado.mid{color:#d98a16}.estado.bad{color:#d33b28}
+
+  /* las 2 capas */
+  .capas{display:grid;gap:8px;margin:0 0 12px}
+  .capa{padding:11px 13px;border-radius:14px;border:1px solid;font-size:11.5px;line-height:1.5;font-weight:800}
+  .capa b{display:block;font-size:12.5px;margin-bottom:2px}
+  .capaA{background:rgba(232,98,79,.09);border-color:rgba(232,98,79,.3);color:#b33a2a}
+  .capaB{background:rgba(91,141,239,.09);border-color:rgba(91,141,239,.3);color:#2f56b8}
+  .capaB em{font-style:normal;color:#0d9e74}
+
+  .deck{position:relative;width:100%;height:min(56vh,460px);margin:0 auto}
+  .card{position:absolute;inset:0;display:flex;flex-direction:column;padding:20px 22px;border-radius:26px;
+    background:linear-gradient(160deg,#ffffff,#f4f6ff);box-shadow:0 24px 60px rgba(10,12,40,.30);
+    touch-action:pan-y;user-select:none;-webkit-user-select:none;cursor:grab;will-change:transform;
+    transition:transform .32s cubic-bezier(.22,.9,.35,1),opacity .32s ease}
+  .card.detras1{transform:translateY(15px) scale(.95);opacity:.78;pointer-events:none}
+  .card.detras2{transform:translateY(28px) scale(.90);opacity:.48;pointer-events:none}
+  .card.arrastre{transition:none;cursor:grabbing}
+  .card .cab{display:flex;align-items:center;gap:9px;margin-bottom:2px}
+  .card .ico{font-size:26px;line-height:1}
+  .card .kicker{flex:1;min-width:0;color:#3d63c9;font-size:11px;font-weight:950;letter-spacing:.7px;
+    text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .card h3{margin:10px 0 12px;font-size:22px;line-height:1.22;letter-spacing:-.4px}
+  .card .cuerpo{flex:1;overflow-y:auto;min-height:0;touch-action:pan-y}
+  .card .nota{margin:12px 0 0;color:var(--gris);font-size:13px;line-height:1.5}
+  .lista{margin:0;padding:0;list-style:none;display:grid;gap:9px}
+  .lista li{display:flex;align-items:center;gap:8px;padding:13px 14px;border-radius:14px;
+    background:rgba(91,141,239,.08);color:#33343f;font-size:15px;font-weight:750;cursor:pointer}
+  .lista li::after{content:"›";margin-left:auto;color:#3d63c9;font-weight:900;font-size:17px}
+  .lista li small{display:block;font-size:11px;color:var(--gris);font-weight:800}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+  .chips span{padding:7px 12px;border-radius:999px;background:rgba(91,141,239,.1);color:#3d63c9;font-size:12.5px;font-weight:900}
+  .cta{margin-top:12px;min-height:50px;border:0;border-radius:15px;background:linear-gradient(135deg,#5b8def,#8b63e8);
+    color:#fff;font:inherit;font-size:15px;font-weight:900;cursor:pointer;transition:transform .08s}
+  .cta:active{transform:scale(.97)}
+  .cta.done{background:linear-gradient(135deg,#2bb690,#3ad0a4)}
+  .hint{text-align:center;color:var(--gris);font-size:10.5px;font-weight:800;margin-top:12px}
+  .pos{text-align:center;color:var(--gris);font-size:11.5px;font-weight:900;margin:2px 0 0}
+  .naveg{display:flex;gap:10px;margin-top:10px}
+  .naveg button{flex:1;min-height:48px;border:0;border-radius:14px;font:inherit;font-size:14px;font-weight:900;
+    cursor:pointer;background:rgba(255,255,255,.7);color:#3d63c9;border:1px solid rgba(255,255,255,.9)}
+  .naveg button:active{transform:scale(.97)}
+
+  .pie{margin-top:14px;padding:12px;border-radius:14px;background:rgba(255,255,255,.55);
+    border:1px solid rgba(255,255,255,.75);font-size:12px;line-height:1.5;color:#55565f;font-weight:750}
+  .pie b{color:var(--texto)}
+</style>
+</head>
+<body>
+  <div class="appbar">
+    <div class="logo">A</div>
+    <div class="tt">Motor de Tareas
+      <span class="st">Post-venta · el día nunca queda vacío</span>
+    </div>
+    <div class="pill" style="margin-left:auto;padding:6px 10px;border-radius:999px;font-size:12px;font-weight:900;
+      background:rgba(91,141,239,.12);color:#3d63c9" id="contadorTareas"></div>
+  </div>
+
+  <div class="wrap">
+    <div class="notice">🧪 <b>Prototipo</b> · datos de ejemplo. Muestra el arreglo: hoy <b>no hay nada urgente</b>, y aun así el día tiene <b>6 tareas</b> sacadas de tu cartera de post-venta. Ningún día queda en cero.</div>
+
+    <div class="prog">
+      <div class="pico" id="progIco">🌱</div>
+      <div class="pbody">
+        <div class="ptitle" id="progTitle">Tu día arranca</div>
+        <div class="psub" id="progSub">0 de 6 tareas completadas</div>
+        <div class="bar"><i id="progBar"></i></div>
+      </div>
+      <div class="estado" id="progEst">🔴</div>
+    </div>
+
+    <div class="capas">
+      <div class="capa capaA"><b>Capa A · Urgentes</b>Hoy no hay cumpleaños, ni retrolavado vencido, ni garantías por vencer en 30 días.</div>
+      <div class="capa capaB"><b>Capa B · Reserva de la cartera</b>El motor recorrió tu base por <em>“hace cuánto no los tocás”</em> y llenó el día con <em id="nReserva">0</em> tareas de post-venta. 👈 Esta es la que hoy faltaba.</div>
+    </div>
+
+    <div class="deck" id="deck"></div>
+    <div class="hint">← Deslizá la tarjeta o usá los botones →</div>
+    <div class="pos" id="pos"></div>
+    <div class="naveg">
+      <button onclick="MT.atras()">‹ Anterior</button>
+      <button onclick="MT.siguiente()">Siguiente ›</button>
+    </div>
+
+    <div class="pie"><b>Así se llena siempre:</b> primero las tareas que <u>disparan solas</u> (Capa A). Si quedan pocas, el motor <u>rellena</u> con la cartera (Capa B) ordenada por el cliente más frío primero, hasta llegar a un mínimo garantizado. Si la cartera estuviera vacía, cae a “contactá 1 persona nueva”. <b>Resultado: un día sin tareas no existe.</b></div>
+  </div>
+
+<script>
+/* ============================================================
+   Prototipo · Motor de tareas post-venta, día nunca vacío.
+   Capa A (urgentes) + Capa B (reserva de la cartera).
+   Datos de ejemplo. No toca la app real.
+   ============================================================ */
+(function(){
+  'use strict';
+  var esc=function(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});};
+
+  /* Cartera de ejemplo con los campos reales que usa APPI.
+     ultimoContacto = hace cuántos días fue la última vez que el
+     distribuidor habló con el cliente. Es la llave de la rotación. */
+  var cartera = [
+    { nombre:'Roxana Suárez', producto:'PSA Senior 4', fCompra:30, fVence:40,   ultimoContacto:62 }, // dormida, garantía vencida
+    { nombre:'Hugo Maidana',  producto:'PSA DUCHA II', fCompra:10, fVence:20,   ultimoContacto:8  }, // post-venta reciente
+    { nombre:'Celia Paz',     producto:'PSA Domus',    fCompra:200,fVence:250,  ultimoContacto:95 }, // muy fría
+    { nombre:'Raúl Tapia',    producto:'SodaBurby',    fCompra:170,fVence:300,  ultimoContacto:50 }, // fría
+    { nombre:'Marta Iglesias',producto:'PSA Iontrix 3',fCompra:45, fVence:120,  ultimoContacto:15 }, // a punto de mantenimiento
+    { nombre:'Jorge Luna',    producto:'PSA Quantum',  fCompra:15, fVence:60,   ultimoContacto:5  }  // venta reciente
+  ];
+
+  var MIN = 6;            // mínimo de tareas garantizadas por día
+  var estado = { hechas:[], racha:4 };
+
+  /* ---------- EL MOTOR ----------
+     Orden de prioridad para llenar el día:
+       1. Capa A: urgentes que disparan solas (hoy: ninguna).
+       2. Capa B: reserva de la cartera, del cliente más frío al más caliente.
+     Nunca devuelve menos de MIN tareas (fallback: construir banco). */
+  function motorDelDia(){
+    var tareas = [];
+
+    // 1) CAPA A · urgentes (hoy vacía de propósito, para mostrar el relleno)
+    //    (en la app real: cumpleaños de hoy, retrolavado vencido ≤30d, garantía ≤30d)
+
+    // 2) CAPA B · reserva de la cartera, ordenada por el más frío primero
+    var frios = cartera.slice().sort(function(a,b){ return b.ultimoContacto - a.ultimoContacto; });
+    frios.forEach(function(c){
+      if (tareas.length >= MIN) return;
+      if (c.ultimoContacto > 180){ // garantía vencida hace mucho → reactivar dormido
+        tareas.push({ id:'revivir', icono:'💤', tip:'Reactivar', cliente:c,
+          titulo:'Reactivar a '+c.nombre,
+          det:'Garantía vencida · sin contacto hace '+c.ultimoContacto+' días',
+          accion:'Ofrecer servicio o cambio de equipo' });
+      } else if (c.ultimoContacto >= 60){ // frío hace rato
+        tareas.push({ id:'frio', icono:'🔄', tip:'Cliente frío', cliente:c,
+          titulo:'Tocá a '+c.nombre,
+          det:'No hablás con '+(c.nombre.split(' ')[0])+' hace '+c.ultimoContacto+' días',
+          accion:'Saludar, saber cómo está su equipo y ofrecerle algo' });
+      } else if (c.ultimoContacto >= 30){ // hace un mes o más → referido
+        tareas.push({ id:'referido', icono:'📇', tip:'Referido', cliente:c,
+          titulo:'Pedile un referido a '+c.nombre,
+          det:'Contactado hace '+c.ultimoContacto+' días · te conoce y confía',
+          accion:'¿Conocés a alguien que pueda necesitarlo?' });
+      } else if (c.ultimoContacto >= 20){ // mantenimiento próximo
+        tareas.push({ id:'manto', icono:'🔧', tip:'Mantenimiento próximo', cliente:c,
+          titulo:'Mantenimiento de '+c.producto,
+          det:'Su equipo está por cumplir el ciclo · avisale antes de que falle',
+          accion:'Anticipar el retrolavado / cambio de cartucho' });
+      } else { // venta/contacto reciente → post-venta
+        tareas.push({ id:'postventa', icono:'🛒', tip:'Seguimiento post-venta', cliente:c,
+          titulo:'Chequeá a '+c.nombre,
+          det:'Compró hace '+c.fCompra+' días · no contactado desde hace '+c.ultimoContacto,
+          accion:'¿Cómo va el equipo? ¿Necesitás algo?' });
+      }
+    });
+
+    // 3) Fallback absoluto: sin cartera nunca hay día vacío
+    if (!tareas.length){
+      tareas.push({ id:'banco', icono:'📇', tip:'Construir',
+        titulo:'Contactá 1 persona nueva hoy',
+        det:'Tu banco de datos está vacío: es la materia prima del negocio',
+        accion:'Elegí a quién contactar o invitá a la demo' });
+    }
+
+    // 4) Cierre de día, siempre al final
+    tareas.push({ id:'cierre', icono:'🌙', tip:'Cierre de día',
+      titulo:'¿Cómo cerrás hoy?',
+      det:'Marcá lo hecho y dejá 1 contacto listo para mañana',
+      accion:'Racha asegurada si cerrás el día' });
+
+    return tareas;
+  }
+
+  var tarjetas = motorDelDia();
+  var nReserva = tarjetas.length - 1; // todas menos el cierre
+
+  /* ---------- render ---------- */
+  var idx = 0, deckEl = null;
+  function crearCarta(t){
+    var el=document.createElement('div'); el.className='card';
+    var hecho=estado.hechas.indexOf(t.id)>=0;
+    el.innerHTML =
+      '<div class="cab"><span class="ico">'+t.icono+'</span><span class="kicker">'+esc(t.tip)+'</span></div>'+
+      '<h3>'+esc(t.titulo)+'</h3>'+
+      '<div class="cuerpo">'+
+        '<p style="margin:0 0 8px;font-size:15px;font-weight:750;line-height:1.5">'+esc(t.det)+'</p>'+
+        '<div class="chips"><span>👉 '+esc(t.accion)+'</span></div>'+
+      '</div>'+
+      '<button type="button" class="cta'+(hecho?' done':'')+'">'+(hecho?'Tarea hecha ✓':'Marcar como hecha')+'</button>';
+    el.querySelector('.cta').onclick=function(e){ e.stopPropagation();
+      var i=estado.hechas.indexOf(t.id); if(i>=0) estado.hechas.splice(i,1); else estado.hechas.push(t.id);
+      pintarTodo(); };
+    return el;
+  }
+  function pintar(){
+    deckEl.querySelectorAll('.card').forEach(function(n){n.remove();});
+    var len=tarjetas.length; idx=((idx%len)+len)%len;
+    document.getElementById('pos').textContent=(idx+1)+' de '+len;
+    for(var off=Math.min(2,len-1);off>=0;off--){
+      var k=(idx+off)%len, el=crearCarta(tarjetas[k]);
+      if(off>0) el.classList.add(off===1?'detras1':'detras2');
+      if(off===0) arrastre(el);
+      deckEl.appendChild(el);
+    }
+  }
+  function siguiente(){ if(tarjetas.length<2)return; idx=(idx+1)%tarjetas.length; pintar(); }
+  function atras(){ if(tarjetas.length<2)return; idx=(idx-1+tarjetas.length)%tarjetas.length; pintar(); }
+
+  function arrastre(el){
+    var x0=0,y0=0,dx=0,dy=0,act=false,arr=false,umbral=16;
+    el.addEventListener('pointerdown',function(e){act=true;x0=e.clientX;y0=e.clientY;dx=0;dy=0;arr=false;umbral=e.target.closest('button')?26:16;});
+    el.addEventListener('pointermove',function(e){ if(!act)return; dx=e.clientX-x0; dy=e.clientY-y0;
+      if(!arr && Math.abs(dx)>umbral && Math.abs(dx)>Math.abs(dy)+4){ arr=true; el.classList.add('arrastre'); try{el.setPointerCapture(e.pointerId);}catch(_){}
+        var d=dx<0?1:-1; deckEl.querySelectorAll('.detras1,.detras2').forEach(function(n){n.remove();});
+        for(var j=Math.min(2,tarjetas.length-1);j>=1;j--){ var k=((idx+(d*j))%tarjetas.length+tarjetas.length)%tarjetas.length; var n=crearCarta(tarjetas[k]); n.classList.add(j===1?'detras1':'detras2'); deckEl.insertBefore(n,el); } }
+      if(arr&&dx!==0) el.style.transform='translateX('+dx+'px) rotate('+(dx/20)+'deg)'; });
+    function soltar(){ if(!act)return; act=false; el.classList.remove('arrastre');
+      if(arr&&dx<-80) siguiente(); else if(arr&&dx>80) atras();
+      else if(arr){ el.style.transform=''; setTimeout(function(){ var d1=deckEl.querySelector('.detras1'); if(d1)d1.remove(); },60); } el.style.transform=''; }
+    el.addEventListener('pointerup',soltar); el.addEventListener('pointercancel',soltar);
+    el.addEventListener('click',function(e){ if(arr){e.stopPropagation();e.preventDefault();} },true);
+  }
+
+  function pintarTodo(){
+    // re-ordenar: las hechas van al final (sentimiento de ir terminando el día)
+    var hechas=tarjetas.filter(function(t){return estado.hechas.indexOf(t.id)>=0;});
+    var pend=tarjetas.filter(function(t){return estado.hechas.indexOf(t.id)<0;});
+    tarjetas = pend.concat(hechas);
+    if(idx>=tarjetas.length) idx=0;
+    if(deckEl) pintar();
+    var h=estado.hechas.length, tot=tarjetas.length, pct=Math.round(h/tot*100);
+    document.getElementById('progBar').style.width=pct+'%';
+    document.getElementById('progSub').textContent=h+' de '+tot+' tareas completadas';
+    document.getElementById('progIco').textContent=pct===100?'🎉':(pct>=50?'🚀':'🌱');
+    var est=document.getElementById('progEst');
+    if(pct===100){est.textContent='🟢';est.className='estado ok';document.getElementById('progTitle').textContent='Día completo';}
+    else if(pct>=50){est.textContent='🟡';est.className='estado mid';document.getElementById('progTitle').textContent='Vas bien, seguí';}
+    else if(h>0){est.textContent='🟡';est.className='estado mid';document.getElementById('progTitle').textContent='Mitad de camino';}
+    else {est.textContent='🔴';est.className='estado bad';document.getElementById('progTitle').textContent='Arrancá con una tarea';}
+    document.getElementById('contadorTareas').textContent='6 tareas hoy';
+    document.getElementById('nReserva').textContent=nReserva;
+  }
+
+  window.addEventListener('load',function(){ deckEl=document.getElementById('deck'); pintarTodo(); });
+  window.MT={siguiente:siguiente,atras:atras};
+})();
+</script>
+</body>
+</html>
