@@ -741,7 +741,7 @@
     return {
       cat: 'metodo', icono: '⚠️', kicker: 'Atención · tu WhatsApp',
       titulo: 'WhatsApp te puede cortar el número',
-      html: '<p class="ht-frase">Si le escribís a mucha gente el mismo mensaje, uno atrás del otro, WhatsApp te suspende la línea. Ya le pasó a una distribuidora.</p>' +
+      html: '<p class="ht-frase">Si le escribís a mucha gente el mismo mensaje, uno atrás del otro, WhatsApp te suspende la línea.</p>' +
             '<ol class="ht-pasos">' +
             '<li><b>Por eso, de a uno.</b> APPI te abre el chat. No es un envío masivo.</li>' +
             '<li><b>' + tope + ' personas distintas por día.</b> A la misma podés escribirle de nuevo.</li>' +
