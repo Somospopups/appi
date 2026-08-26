@@ -348,13 +348,36 @@ test('la franja del día junta los pendientes y no inventa ninguno', async ({ pa
   await expect(page.locator('[data-mu-hoy="porvencer"]')).toContainText('1');
 });
 
-test('sin pendientes la franja no se dibuja y la pantalla queda igual', async ({ page }) => {
-  // Todos vigentes, recién comprados y sin cumpleaños cargado.
+test('un día sin urgentes se llena con la reserva de post-venta (nunca queda vacío)', async ({ page }) => {
+  // Vigente, recién comprado y sin cumpleaños: no hay ninguna urgencia hoy.
+  // Igual el día no queda en cero: la cartera llena la franja con post-venta.
   await entrar(page, [
     { id: 1, usuario: 'GOMEZ, ANA MARIA', telf: '3515551001', localidad: 'Alta Gracia', producto: 'PSA',
       fCompra: ddmmyyyy(-20), fVenceRaw: ddmmyyyy(300), fVence: dias(300), estado: 'vigente' }
   ]);
+  await expect(page.locator('#muHoy')).toBeVisible();
+  await expect(page.locator('#muHoy')).toContainText('1 mensaje');
+  // La tarea es de la reserva: seguimiento post-venta de un cliente sin tocar.
+  await expect(page.locator('[data-mu-hoy="postventa"]')).toContainText('1');
+});
+
+test('sin cartera no hay franja: el día no inventa tareas sin gente detrás', async ({ page }) => {
+  await entrar(page, []);
   await expect(page.locator('#muHoy')).toHaveCount(0);
+});
+
+test('un día con poca urgencia se completa con la reserva hasta el mínimo', async ({ page }) => {
+  // Ocho vigentes, sin urgencias: el mínimo del día (6) se llena con post-venta.
+  const muchos = [];
+  for (let i = 0; i < 8; i++){
+    muchos.push({ id: i + 1, usuario: `CLIENTE ${i}, TEST`, telf: `3515552${String(i).padStart(2, '0')}`,
+      localidad: 'Alta Gracia', producto: 'PSA', fCompra: ddmmyyyy(-400), fVenceRaw: ddmmyyyy(200), fVence: dias(200), estado: 'vigente' });
+  }
+  await entrar(page, muchos);
+  await expect(page.locator('#muHoy')).toBeVisible();
+  await expect(page.locator('#muHoy')).toContainText('6 mensajes');
+  // Todos son de la reserva (clientes fríos): un solo renglón con los 6.
+  await expect(page.locator('[data-mu-hoy="frio"]')).toContainText('6');
 });
 
 test('la franja muestra la fecha de la agenda y de cada accion', async ({ page }) => {

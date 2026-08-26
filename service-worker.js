@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v360-seleccion-flotante';
+const CACHE_NAME = 'appi-v361-postventa-dia-lleno';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

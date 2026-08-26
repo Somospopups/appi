@@ -421,6 +421,11 @@
   function registrar(u, texto){
     var key = telefonoDe(u);
     if (!key) return;
+    // Si ese cliente tenía una tarea de post-venta hoy, se captura ANTES de
+    // anotar el envío: al escribirle, esa tarea también queda resuelta (y
+    // cuenta como "tocar" para que no reaparezca mañana).
+    var reservaId = null;
+    try{ reservaId = reservaDe(u); }catch(e){}
     var data = leerGuardado();
     if (!data.envios) data.envios = {};
     data.envios[key] = { at: new Date().toISOString(), texto: String(texto || '').slice(0, 400) };
@@ -429,6 +434,7 @@
     MOTIVOS.forEach(function(m){
       try{ if (m.aplica(u)) marcarAccion(m.id, u, 'hecha', true); }catch(e){}
     });
+    if (reservaId) marcarAccion(reservaId, u, 'hecha', true);
     try{ pintarHoy(); }catch(e){}
   }
   function ultimoEnvio(u){
@@ -466,6 +472,9 @@
   function claveAccion(motivoId, u){
     var tel = telefonoDe(u);
     if (!tel) return '';
+    // Las tareas de post-venta no cierran un "ciclo": se rearman cada día según
+    // hace cuánto no tocamos al cliente, así que no se archivan para siempre.
+    if (RESERVA_MAP && RESERVA_MAP[motivoId]) return '';
     var base = motivoId + ':' + tel;
     if (motivoId === 'retro'){
       var m = mantenimiento(u);
@@ -615,6 +624,15 @@
       }
     }
 
+    // La ✓ de una tarea de post-venta cuenta como "tocar" al cliente: así la
+    // misma persona no reaparece todos los días hasta que se la contacta (v361).
+    if (RESERVA_MAP && RESERVA_MAP[motivoId] && estado === 'hecha'){
+      var g2 = leerGuardado();
+      if (!g2.reservaTocado) g2.reservaTocado = {};
+      g2.reservaTocado[tel] = new Date().toISOString();
+      guardar(g2);
+    }
+
     // El resumen queda escrito en el día: es lo que lee el panel del admin.
     var r = resumenCon(d);
     d.dias[k].total = r.total; d.dias[k].hechas = r.hechas; d.dias[k].noHechas = r.noHechas;
@@ -670,6 +688,110 @@
     }
   ];
 
+  /* ---------- reserva de post-venta (v361) ----------
+     Las tareas urgentes (cumpleaños, retrolavado vencido, garantía por vencer)
+     disparan solas, pero hay días en que no coincide ninguna y el día queda en
+     cero. Para que la post-venta se trabaje SIEMPRE y ningún día quede vacío,
+     cuando las urgentes no alcanzan un mínimo el motor recorre la cartera por
+     "hace cuánto no tocamos a cada cliente" y llena el día con tareas de
+     post-venta: reactivar dormidos, clientes fríos, pedir referidos, anticipar
+     mantenimientos y seguimiento de ventas recientes. Nunca mete a alguien que
+     ya tiene una urgencia hoy: esa persona ya está atendida en la Capa A. */
+  var MIN_TAREAS_DIA = 6;   // mínimo de tareas que el día garantiza
+
+  var RESERVA = [
+    { id:'revivir',   icono:'💤', nombre:'Reactivar dormido',     plantilla:'renovacion',
+      uno:'dormido por reactivar', varios:'dormidos por reactivar' },
+    { id:'frio',      icono:'🔄', nombre:'Cliente frío',          plantilla:'saludo',
+      uno:'cliente frío por tocar', varios:'clientes fríos por tocar' },
+    { id:'referido',  icono:'📇', nombre:'Pedir referido',        plantilla:'saludo',
+      uno:'cliente para pedirle un referido', varios:'clientes para pedirles un referido' },
+    { id:'manto',     icono:'🔧', nombre:'Mantenimiento próximo', plantilla:'retrolavado',
+      uno:'mantenimiento por anticipar', varios:'mantenimientos por anticipar' },
+    { id:'postventa', icono:'🛒', nombre:'Seguimiento post-venta', plantilla:'saludo',
+      uno:'seguimiento post-venta', varios:'seguimientos post-venta' }
+  ];
+  var RESERVA_MAP = {};
+  RESERVA.forEach(function(r){ RESERVA_MAP[r.id] = r; });
+  // Memoria de la reserva del día: una selección por persona y por día.
+  var reservaCache = { uid:'', dia:'', grupos:[] };
+
+  // Días desde la última vez que tocamos a este cliente (WhatsApp o una ✓ de
+  // post-venta). Si nunca lo contactamos, cuenta como muy frío.
+  function diasSinContacto(u){
+    var telf = telefonoDe(u);
+    if (!telf) return 999;
+    var best = 999;
+    var ult = ultimoEnvio(u);
+    if (ult && ult.at){
+      var d = new Date(ult.at);
+      if (!isNaN(d.getTime())){
+        var c = dias(hoy(), new Date(d.getFullYear(), d.getMonth(), d.getDate()));
+        if (c >= 0 && c < best) best = c;
+      }
+    }
+    var tocado = leerGuardado().reservaTocado && leerGuardado().reservaTocado[telf];
+    if (tocado){
+      var t = new Date(tocado);
+      if (!isNaN(t.getTime())){
+        var c2 = dias(hoy(), new Date(t.getFullYear(), t.getMonth(), t.getDate()));
+        if (c2 >= 0 && c2 < best) best = c2;
+      }
+    }
+    return best;
+  }
+
+  // Qué tarea de post-venta le toca hoy a este cliente (una sola, la que
+  // corresponde según su estado y hace cuánto no lo tocamos). null = nada.
+  function reservaDe(u){
+    if (!u) return null;
+    var g = grupoDe(u);
+    if (g === 'inactivo') return null;
+    if (!telefonoDe(u)) return null;
+    var d = diasSinContacto(u);
+    if (g === 'vencido') return d >= 60 ? 'revivir' : null; // dormido → reactivar
+    // vigente (o rescatado de la campaña de dormidos)
+    if (d <= 5) return null;                                // recién tocado: nada
+    var m = mantenimiento(u);
+    if (m && m.dias >= 0 && m.dias <= 30) return 'manto';   // mantenimiento próximo
+    var compra = aFecha(u && u.fCompra);
+    if (compra){
+      var edadCompra = dias(hoy(), compra);
+      if (edadCompra >= 0 && edadCompra <= 90) return d >= 20 ? 'postventa' : null;
+    }
+    if (d >= 60) return 'frio';
+    if (d >= 30) return 'referido';
+    if (d >= 20) return 'postventa';
+    return null;
+  }
+
+  // Llena el día con la reserva de la cartera hasta cubrir el cupo, desde el
+  // cliente más frío hacia el más reciente (v361).
+  function reservaDelDia(conUrgente, cupo){
+    if (cupo <= 0) return [];
+    var lista = [];
+    if (typeof window.usuariosTodosActual === 'function') lista = window.usuariosTodosActual() || [];
+    else if (Array.isArray(window.usuariosU)) lista = window.usuariosU;
+    var candidatos = [];
+    lista.forEach(function(u){
+      var telf = telefonoDe(u);
+      if (!telf) return;
+      if (conUrgente[telf]) return;
+      var id = reservaDe(u);
+      if (!id) return;
+      candidatos.push({ u:u, id:id, d:diasSinContacto(u) });
+    });
+    candidatos.sort(function(a,b){ return b.d - a.d; });
+    var grupos = {}, orden = [], agregadas = 0;
+    for (var i = 0; i < candidatos.length && agregadas < cupo; i++){
+      var c = candidatos[i];
+      if (!grupos[c.id]){ grupos[c.id] = { motivo: RESERVA_MAP[c.id], gente: [] }; orden.push(c.id); }
+      grupos[c.id].gente.push(c.u);
+      agregadas++;
+    }
+    return orden.map(function(id){ return grupos[id]; });
+  }
+
   // A un cliente ya contactado hoy no se lo vuelve a mostrar: si no, el panel
   // no baja nunca y deja de significar algo.
   function escritoHoy(u){
@@ -688,14 +810,37 @@
     if (typeof window.usuariosTodosActual === 'function') lista = window.usuariosTodosActual() || [];
     else if (Array.isArray(window.usuariosU)) lista = window.usuariosU;
     var out = [];
+    // Capa A: las urgentes que disparan solas.
     MOTIVOS.forEach(function(m){
       var gente = lista.filter(function(u){
         return telefonoDe(u) && m.aplica(u) && !completadaAntesDeHoy(m.id, u);
       });
       if (gente.length) out.push({ motivo:m, gente:gente });
     });
+    // Capa B: la reserva de post-venta. Si las urgentes no alcanzan el mínimo,
+    // la cartera llena el día hasta el cupo y ningún día queda en cero (v361).
+    var urgentes = 0;
+    out.forEach(function(g){ urgentes += g.gente.length; });
+    if (urgentes < MIN_TAREAS_DIA){
+      var conUrgente = {};
+      out.forEach(function(g){ g.gente.forEach(function(u){ conUrgente[telefonoDe(u)] = true; }); });
+      // La selección de la reserva se arma UNA vez por día y por persona: si se
+      // recomputara en cada marca, marcar a un cliente como "tocado" lo sacaría
+      // de la franja en el acto. Como las urgentes, la reserva dura todo el día.
+      // (Al cambiar la cartera a mitad de día, la lista del día se conserva; se
+      // rearma recién mañana o con _resetReservaCache.)
+      var uidAct = uid();
+      if (reservaCache.uid !== uidAct || reservaCache.dia !== hoyKey()){
+        reservaCache.uid = uidAct; reservaCache.dia = hoyKey();
+        reservaCache.grupos = reservaDelDia(conUrgente, MIN_TAREAS_DIA - urgentes);
+      }
+      reservaCache.grupos.forEach(function(g){ out.push(g); });
+    }
     return out;
   }
+
+  // Sólo para pruebas y para recargar la reserva si cambió la cartera a mano.
+  function resetReservaCache(){ reservaCache = { uid:'', dia:'', grupos:[] }; }
 
   // Para el carrusel: sólo los que todavía no tienen ✓ ni ✗.
   function pendientes(){
@@ -1588,6 +1733,11 @@
     resumenHoy: resumenHoy,
     pintarHoy: pintarHoy,
     abrirFila: abrirFila,
+    MIN_TAREAS_DIA: MIN_TAREAS_DIA,
+    diasSinContacto: diasSinContacto,
+    reservaDe: reservaDe,
+    reservaDelDia: reservaDelDia,
+    _resetReservaCache: resetReservaCache,
     escritoHoy: escritoHoy,
     cerrar: cerrar,
     montar: montar,
