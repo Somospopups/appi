@@ -4,8 +4,8 @@ const fs = require('fs');
 test('la tarjeta del método de envío existe y se puede cerrar', () => {
   const js = fs.readFileSync('home-tarjetas.js', 'utf8');
   expect(js).toContain('tarjetaMetodoEnvio()');
-  expect(js).toContain('WhatsApp te puede cortar el número');
-  expect(js).toContain('WhatsApp te suspende la línea');
+  expect(js).toContain('WhatsApp puede suspender tu línea');
+  expect(js).toContain('uno atrás del otro');
   expect(js).toContain('Entendido, cuido mi línea');
   expect(js).toContain('ht-alerta');
 });
