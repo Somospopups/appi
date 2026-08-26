@@ -822,3 +822,179 @@ test('los mensajes propios valen para cualquier cliente y no se pierden al recar
   });
   expect(viven).toBe(1);
 });
+
+/* ---------- v361: jornada del parque ---------- */
+
+function parque(n, extra) {
+  const out = [];
+  for (let i = 0; i < n; i++) {
+    out.push(Object.assign({
+      id: 100 + i,
+      usuario: `CLIENTE, N${String(i + 1).padStart(2, '0')}`,
+      telf: `3515552${String(i + 1).padStart(3, '0')}`,
+      localidad: 'Córdoba',
+      producto: 'PSA SENIOR 4',
+      fCompra: ddmmyyyy(-400),
+      fVenceRaw: ddmmyyyy(200),
+      fVence: dias(200),
+      estado: 'vigente'
+    }, extra || {}));
+  }
+  return out;
+}
+
+test('el cupo diario es 8 y no inventa más', async ({ page }) => {
+  await entrar(page, parque(20));
+  const r = await page.evaluate(() => {
+    const M = window.APPIMensajes;
+    const grupos = M.deHoy();
+    const total = grupos.reduce((n, g) => n + g.gente.length, 0);
+    return { cupo: M.CUPO_DIA, total, motivos: grupos.map(g => g.motivo.id), pendientes: M.resumenHoy().pendientes };
+  });
+  expect(r.cupo).toBe(8);
+  expect(r.total).toBe(8);
+  expect(r.pendientes).toBe(8);
+  expect(r.motivos).toEqual(['checkin']);
+  await expect(page.locator('#muHoy')).toContainText('8 mensajes');
+});
+
+test('un parque recién comprado sigue sin franja: no se inventa trabajo', async ({ page }) => {
+  await entrar(page, parque(12, { fCompra: ddmmyyyy(-20), fVence: dias(300), fVenceRaw: ddmmyyyy(300) }));
+  const total = await page.evaluate(() => window.APPIMensajes.deHoy().reduce((n, g) => n + g.gente.length, 0));
+  expect(total).toBe(0);
+  await expect(page.locator('#muHoy')).toHaveCount(0);
+});
+
+test('el vencido de menos de un año entra como canje cuando el calendario está flojo', async ({ page }) => {
+  await entrar(page, [
+    { id: 1, usuario: 'RUIZ, ROBERTO', telf: '3515551002', localidad: 'Villa Allende', producto: 'PSA VERO',
+      fCompra: ddmmyyyy(-800), fVenceRaw: ddmmyyyy(-90), fVence: dias(-90), estado: 'vencida' }
+  ]);
+  const r = await page.evaluate(() => {
+    const g = window.APPIMensajes.deHoy();
+    return { n: g.length, id: g[0] && g[0].motivo.id, quien: g[0] && g[0].gente[0].usuario };
+  });
+  expect(r.n).toBe(1);
+  expect(r.id).toBe('renovacion');
+  expect(r.quien).toBe('RUIZ, ROBERTO');
+  await expect(page.locator('[data-mu-hoy="renovacion"]')).toBeVisible();
+  await expect(page.locator('[data-mu-hoy="renovacion"]')).toContainText('Venció:');
+});
+
+test('el vencido hace más de un año sigue afuera aunque el día esté vacío', async ({ page }) => {
+  await entrar(page, [
+    { id: 4, usuario: 'PEREZ, JUAN', telf: '3515551004', localidad: 'Centro', producto: 'PSA VERO',
+      fCompra: ddmmyyyy(-1500), fVenceRaw: ddmmyyyy(-500), fVence: dias(-500), estado: 'vencida' }
+  ]);
+  const nombres = await page.evaluate(() =>
+    window.APPIMensajes.deHoy().flatMap(g => g.gente.map(u => u.usuario)));
+  expect(nombres).toEqual([]);
+  await expect(page.locator('#muHoy')).toHaveCount(0);
+});
+
+test('los cumpleaños entran todos aunque el cupo esté lleno', async ({ page }) => {
+  const gente = parque(8);
+  for (let i = 0; i < 3; i++) {
+    gente.push({
+      id: 200 + i,
+      usuario: `CUMPLE, N${i + 1}`,
+      telf: `3515553${String(i + 1).padStart(3, '0')}`,
+      localidad: 'Córdoba',
+      producto: 'PSA',
+      cumpleRaw: `${hoyDDMM()}/1980`,
+      fCompra: ddmmyyyy(-30),
+      fVenceRaw: ddmmyyyy(300),
+      fVence: dias(300),
+      estado: 'vigente'
+    });
+  }
+  await entrar(page, gente);
+  const r = await page.evaluate(() => {
+    const grupos = window.APPIMensajes.deHoy();
+    const por = {};
+    let total = 0;
+    grupos.forEach(g => { por[g.motivo.id] = g.gente.length; total += g.gente.length; });
+    return { por, total };
+  });
+  expect(r.por.cumple).toBe(3);
+  expect(r.total).toBe(8); // 3 cumples + 5 check-ins del parque viejo
+});
+
+test('si hay 15 garantías por vencer, hoy salen las 8 más cercanas', async ({ page }) => {
+  const gente = [];
+  for (let i = 0; i < 15; i++) {
+    const d = 2 + i; // 2, 3, … 16 días
+    gente.push({
+      id: 300 + i,
+      usuario: `VENCE, D${String(d).padStart(2, '0')}`,
+      telf: `3515554${String(i + 1).padStart(3, '0')}`,
+      localidad: 'Córdoba',
+      producto: 'PSA',
+      fCompra: ddmmyyyy(-60),
+      fVenceRaw: ddmmyyyy(d),
+      fVence: dias(d),
+      estado: 'porVencer'
+    });
+  }
+  await entrar(page, gente);
+  const r = await page.evaluate(() => {
+    const g = window.APPIMensajes.deHoy();
+    return {
+      motivos: g.map(x => x.motivo.id),
+      n: g[0] && g[0].gente.length,
+      primero: g[0] && g[0].gente[0].usuario,
+      ultimo: g[0] && g[0].gente[g[0].gente.length - 1].usuario
+    };
+  });
+  expect(r.motivos).toEqual(['porvencer']);
+  expect(r.n).toBe(8);
+  expect(r.primero).toBe('VENCE, D02');
+  expect(r.ultimo).toBe('VENCE, D09');
+});
+
+test('una persona no aparece dos veces: gana el motivo más urgente', async ({ page }) => {
+  // Vigente que cumple hoy Y le vence la garantía en 5 días.
+  await entrar(page, [{
+    id: 1, usuario: 'GOMEZ, ANA MARIA', telf: '3515551001', localidad: 'Alta Gracia', producto: 'PSA',
+    cumpleRaw: `${hoyDDMM()}/1975`, fCompra: ddmmyyyy(-400), fVenceRaw: ddmmyyyy(5), fVence: dias(5), estado: 'porVencer'
+  }]);
+  const r = await page.evaluate(() => {
+    const grupos = window.APPIMensajes.deHoy();
+    const tels = [];
+    grupos.forEach(g => g.gente.forEach(u => tels.push(g.motivo.id + ':' + u.telf)));
+    return { motivos: grupos.map(g => g.motivo.id), tels };
+  });
+  expect(r.motivos).toEqual(['cumple']);
+  expect(r.tels).toEqual(['cumple:3515551001']);
+});
+
+test('marcar las 8 no mete a una novena el mismo día', async ({ page }) => {
+  await entrar(page, parque(12));
+  const r = await page.evaluate(() => {
+    const M = window.APPIMensajes;
+    const antes = M.deHoy()[0].gente.map(u => u.telf);
+    antes.forEach(tel => {
+      const u = window.usuariosTodosActual().find(x => x.telf === tel);
+      M.marcarAccion('checkin', u, 'hecha');
+    });
+    const despues = M.deHoy()[0].gente.map(u => u.telf);
+    return { antes, despues, pendientes: M.resumenHoy().pendientes, hechas: M.resumenHoy().hechas };
+  });
+  expect(r.antes).toEqual(r.despues);
+  expect(r.hechas).toBe(8);
+  expect(r.pendientes).toBe(0);
+});
+
+test('el check-in usa el saludo y no suma una plantilla extra en la ficha', async ({ page }) => {
+  await entrar(page);
+  const r = await page.evaluate(() => {
+    const M = window.APPIMensajes;
+    const vigente = M.plantillasPara({ fVence: new Date(Date.now() + 200 * 86400000).toISOString() });
+    return {
+      ids: vigente.map(p => p.id),
+      plantillaCheckin: M.motivoPorId('checkin').plantilla
+    };
+  });
+  expect(r.plantillaCheckin).toBe('saludo');
+  expect(r.ids).toEqual(['retrolavado', 'cumple', 'porvencer', 'saludo']);
+});

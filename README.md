@@ -4,8 +4,8 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
-- Versión: **v360 · Segura**.
-- Caché de la app: `appi-v360-seleccion-flotante` (se renueva al abrir APPI).
+- Versión: **v361 · Segura**.
+- Caché de la app: `appi-v361-jornada-del-parque` (se renueva al abrir APPI).
 - Publicación: [https://somospopups.github.io/appi/](https://somospopups.github.io/appi/)
 - Acceso por número de distribuidor y contraseña.
 - Acceso administrador POPUPS mediante el candado, sin DIP ni número de distribuidor.
@@ -24,6 +24,24 @@ Desde v256, todos los dispositivos abren APPI con el mismo logo de vidrio.
 - Dentro de la app, la animación de carga muestra el mismo cartel de vidrio dibujado con CSS, sin descargar imágenes, en celular, tablet y PC.
 
 Al cambiar el logo hay que regenerar ambos juegos y volver a correr `npm test`: `tests/e2e/logo-vidrio.spec.js` verifica que cada dispositivo tenga su imagen y que el arranque muestre el vidrio.
+
+## Jornada del parque (v361)
+
+En **Usuarios / Garantías** el día ya no depende sólo del calendario. APPI
+arma hasta **8 acciones** (los cumpleaños de hoy entran todos) y, si el
+calendario está flojo, rellena con el parque:
+
+1. Cumpleaños de hoy.
+2. Garantía que vence en 0–30 días (las más cercanas primero).
+3. Mantenimiento caído en los últimos 30 días (los más viejos primero).
+4. Canje: equipo vencido hace menos de 1 año.
+5. Check-in a vigentes a los que no se les escribe hace 90 días.
+
+Si hay 20 vencimientos, no salen los 20: se reparte. Una persona no aparece
+dos veces el mismo día. El vencido hace más de un año sigue en Reactivación,
+afuera de esta cola. La franja y la tarjeta del Home **sólo se muestran si
+hay trabajo real**; un parque recién cargado o todo al día deja la pantalla
+como estaba.
 
 ## Agenda personal (v358)
 
