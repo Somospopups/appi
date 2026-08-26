@@ -29,6 +29,7 @@
   'use strict';
 
   var LINK_RETROLAVADO = 'https://www.youtube.com/watch?v=qa6xkQQsyg8';
+  var LINK_CANJE = 'https://www.youtube.com/watch?v=evwYO9-o5MY';
   var MESES_MANTENIMIENTO = 6;   // el ciclo que pidió el usuario
   var DIAS_ANIO = 365;
   var CUPO_DIA = 8;              // techo diario: se siente jornada, no satura WhatsApp
@@ -90,6 +91,9 @@
         '',
         'Vi que tu equipo cumplió la vida útil el {vence} y no llegamos a hacer el canje.',
         '',
+        'Te dejo este video, es cortito:',
+        '{link_canje}',
+        '',
         'Si querés paso a verlo un día de estos y lo charlamos tranquilos.'
       ].join('\n')
     },
@@ -138,6 +142,8 @@
       'Hola {nombre}! 😊\n\nTu PSA DUCHA II ya está listo para su mantenimiento. Te dejo el video con el paso a paso:\nhttps://www.youtube.com/watch?v=C3IiaANlDTg\n\nEs simple y en 5 minutos lo tenés listo. Cualquier duda me escribís.'),
     _mm('mant_ducha_rinnova', '💧', 'mantenimiento', 'PSA Rinnova · DUCHA II',
       'Hola {nombre}! 😊\n\nAhora nos renovamos y salió Rinnova.\n\nhttps://www.youtube.com/watch?v=lM2XjEVCPFI'),
+    _mm('mant_canje', '🔄', 'mantenimiento', 'Plan Canje',
+      'Hola {nombre}! 😊\n\nTe dejo este video sobre el canje.\n\nhttps://www.youtube.com/watch?v=evwYO9-o5MY'),
     _mm('mant_s1000', '🔧', 'mantenimiento', 'Mantenimiento · PSA S•1000 II Bajo Mesada',
       'Hola {nombre}! 😊\n\nTu PSA S•1000 II Bajo Mesada ya está listo para su mantenimiento. Te dejo el video con el paso a paso:\nhttps://www.youtube.com/watch?v=bRwJoC0YZ2Q\n\nEs simple y en 5 minutos lo tenés listo. Cualquier duda me escribís.'),
     _mm('mant_quantum', '🔧', 'mantenimiento', 'Mantenimiento · PSA Quantum',
@@ -190,7 +196,8 @@
     { tag:'{localidad}', corto:'Barrio', que:'Barrio o localidad' },
     { tag:'{vence}', corto:'Vence', que:'Fecha de vencimiento' },
     { tag:'{compra}', corto:'Compra', que:'Fecha de compra' },
-    { tag:'{link_retrolavado}', corto:'Video', que:'Video de mantenimiento' }
+    { tag:'{link_retrolavado}', corto:'Video', que:'Video de mantenimiento' },
+    { tag:'{link_canje}', corto:'Canje', que:'Video del Plan Canje' }
   ];
   function etiquetaPorTag(tag){
     for (var i=0;i<ETIQUETAS.length;i++) if (ETIQUETAS[i].tag === tag) return ETIQUETAS[i];
@@ -418,7 +425,8 @@
       '{localidad}': u.localidad || '',
       '{vence}': u.fVenceRaw || (vence ? fmtFecha(vence) : ''),
       '{compra}': u.fCompra || '',
-      '{link_retrolavado}': LINK_RETROLAVADO
+      '{link_retrolavado}': LINK_RETROLAVADO,
+      '{link_canje}': LINK_CANJE
     };
     return String(texto || '').replace(/\{[a-z_]+\}/g, function(m){
       return mapa[m] !== undefined ? mapa[m] : m;
@@ -1684,6 +1692,7 @@
     BASE: BASE,
     ETIQUETAS: ETIQUETAS,
     LINK_RETROLAVADO: LINK_RETROLAVADO,
+    LINK_CANJE: LINK_CANJE,
     plantillas: plantillas,
     plantilla: plantilla,
     guardarTexto: guardarTexto,

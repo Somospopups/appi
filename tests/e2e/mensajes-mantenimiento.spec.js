@@ -60,7 +60,7 @@ async function entrar(page) {
   await expect(page.locator('#usuariosBtnZonas')).toBeVisible();
 }
 
-test('la biblioteca trae 22 mensajes en dos grupos', async ({ page }) => {
+test('la biblioteca trae 24 mensajes en dos grupos', async ({ page }) => {
   await entrar(page);
   const r = await page.evaluate(() => {
     const todos = window.APPIMensajes.mensajesMantenimiento();
@@ -71,8 +71,8 @@ test('la biblioteca trae 22 mensajes en dos grupos', async ({ page }) => {
       senik: todos.find(m => m.id === 'mant_senik') || null
     };
   });
-  expect(r.total).toBe(22);
-  expect(r.mantenimiento).toBe(13);
+  expect(r.total).toBe(24);
+  expect(r.mantenimiento).toBe(15);
   expect(r.instalacion).toBe(9);
   expect(r.senik).not.toBeNull();
   expect(r.senik.nombre).toBe('Mantenimiento · PSA Senik');
@@ -89,7 +89,7 @@ test('el botón Cambiar mensaje reemplaza el texto del carrusel', async ({ page 
 
   await page.locator('#muCambiarMensaje').click();
   await expect(page.locator('#muTitulo')).toContainText('Elegir mensaje');
-  await expect(page.locator('[data-mu-sel-mant]')).toHaveCount(22);
+  await expect(page.locator('[data-mu-sel-mant]')).toHaveCount(24);
   // El selector muestra los dos títulos de grupo.
   await expect(page.locator('.mu-sec-titulo').first()).toContainText('Mantenimiento');
   await expect(page.locator('.mu-sec-titulo').nth(1)).toContainText('Instalación');
@@ -110,7 +110,7 @@ test('los mensajes aparecen en el editor, agrupados', async ({ page }) => {
   const titulos = page.locator('.mu-sec-titulo');
   await expect(titulos.first()).toContainText('Mantenimiento');
   await expect(titulos.nth(1)).toContainText('Instalación');
-  // Los 22 mensajes están disponibles para editar.
+  // Los 24 mensajes están disponibles para editar.
   await expect(page.locator('[data-mu-editar="mant_senik"]')).toHaveCount(1);
   await expect(page.locator('[data-mu-editar="inst_ropot"]')).toHaveCount(1);
   await expect(page.locator('[data-mu-editar="mant_sodaburby"]')).toHaveCount(1);

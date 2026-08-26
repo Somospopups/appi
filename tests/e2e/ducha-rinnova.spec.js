@@ -23,3 +23,10 @@ test('a quién ya se le mandó viaja en la nube de la cuenta', () => {
   const js = fs.readFileSync('data-sync.js', 'utf8');
   expect(js).toContain("'appi_ducha_rinnova_v1_'");
 });
+
+test('el video del Plan Canje está en el listado y en el mensaje de renovación', () => {
+  const js = fs.readFileSync('mensajes-usuarios.js', 'utf8');
+  expect(js).toContain('mant_canje');
+  expect(js).toContain('evwYO9-o5MY');
+  expect(js).toContain('{link_canje}');
+});

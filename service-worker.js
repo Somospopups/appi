@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v385-rinnova-frase';
+const CACHE_NAME = 'appi-v386-canje-video';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
