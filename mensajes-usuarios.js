@@ -13,6 +13,17 @@
      - vigente ................. mantenimiento + cumpleaños
      - vencido hace < 1 año .... sólo renovación
      - vencido hace > 1 año .... nada
+
+   Jornada del parque (v361): el calendario ya no es la única fuente.
+   Cada día se arman hasta CUPO_DIA acciones, en este orden:
+     1. cumpleaños de hoy (entran todos: es hoy o no es)
+     2. garantía a 0–30 días, las más cercanas primero
+     3. mantenimiento caído, los más viejos primero
+     4. canje (vencido < 1 año), los más antiguos primero
+     5. check-in a vigentes sin escribirles en 90 días
+   Si el calendario está flojo, el parque rellena. Si hay 20
+   vencimientos, se reparte: hoy salen 8, mañana los que siguen.
+   Una persona no aparece dos veces el mismo día.
    ============================================================ */
 (function(){
   'use strict';
@@ -20,6 +31,8 @@
   var LINK_RETROLAVADO = 'https://www.youtube.com/watch?v=qa6xkQQsyg8';
   var MESES_MANTENIMIENTO = 6;   // el ciclo que pidió el usuario
   var DIAS_ANIO = 365;
+  var CUPO_DIA = 8;              // techo diario: se siente jornada, no satura WhatsApp
+  var DIAS_CHECKIN = 90;         // vigentes sin contacto: vuelven a la cola
 
   /* ---------- plantillas de fábrica ----------
      El usuario las edita desde la app; estas son el punto de partida.
@@ -319,6 +332,15 @@
     if (!d || isNaN(d.getTime())) return '';
     return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
   }
+  /* Ventana de 90 días del año: un check-in hecho en esta ventana no vuelve
+     a entrar hasta la siguiente. Así el cupo diario no recicla a la misma
+     persona apenas cambia el día. */
+  function ventanaCheckin(d){
+    d = d || hoy();
+    var start = new Date(d.getFullYear(), 0, 1);
+    var n = Math.floor(Math.max(0, dias(d, start)) / DIAS_CHECKIN);
+    return d.getFullYear() + '-v' + n;
+  }
 
   /* Grupo del cliente según su vencimiento.
      'vigente' | 'vencido' (menos de un año) | 'inactivo' (más de un año) */
@@ -475,6 +497,13 @@
       var vence = aFecha(u && u.fVence);
       return base + ':garantia:' + (vence ? claveFecha(vence) : 'sin-fecha');
     }
+    if (motivoId === 'renovacion'){
+      var venceR = aFecha(u && u.fVence);
+      return base + ':renovacion:' + (venceR ? claveFecha(venceR) : 'sin-fecha');
+    }
+    if (motivoId === 'checkin'){
+      return base + ':checkin:' + ventanaCheckin();
+    }
     if (motivoId === 'cumple'){
       var cumple = aFecha(u && (u.cumpleRaw || u.cumple));
       var h = hoy();
@@ -489,7 +518,15 @@
       var m = mantenimiento(u);
       return m && m.previo ? m.previo : null;
     }
-    if (motivoId === 'porvencer') return aFecha(u && u.fVence);
+    if (motivoId === 'porvencer' || motivoId === 'renovacion') return aFecha(u && u.fVence);
+    if (motivoId === 'checkin'){
+      var ult = ultimoEnvio(u);
+      if (ult && ult.at){
+        var d = new Date(ult.at);
+        if (!isNaN(d.getTime())) return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+      }
+      return aFecha(u && u.fCompra);
+    }
     if (motivoId === 'cumple'){
       var c = aFecha(u && (u.cumpleRaw || u.cumple));
       if (!c) return null;
@@ -548,6 +585,13 @@
         inicioCiclo = new Date(vencimientoActual);
         inicioCiclo.setDate(inicioCiclo.getDate() - 30);
       }
+    } else if (motivoId === 'renovacion'){
+      inicioCiclo = aFecha(u && u.fVence);
+    } else if (motivoId === 'checkin'){
+      var h = hoy();
+      inicioCiclo = new Date(h.getFullYear(), 0, 1);
+      var nVentana = Math.floor(Math.max(0, dias(h, inicioCiclo)) / DIAS_CHECKIN);
+      inicioCiclo.setDate(inicioCiclo.getDate() + (nVentana * DIAS_CHECKIN));
     }
     var inicioCicloKey = inicioCiclo ? claveFecha(inicioCiclo) : '';
     var diasGuardados = Object.keys(d.dias || {}).sort().reverse();
@@ -640,26 +684,29 @@
 
 
   /* ---------- pendientes del día ---------- */
-  /* Tres motivos, en orden de urgencia. Cada uno junta a los clientes que le
-     corresponden hoy, respetando siempre la regla de vigencia. */
+  /* Motivos en orden de urgencia. El calendario (cumple / mantenimiento /
+     garantía) sigue primero; si no llenan el cupo, el parque rellena con
+     canjes y check-ins. El vencido hace más de un año sigue afuera. */
+  function aplicaCheckin(u){
+    if (grupoDe(u) !== 'vigente') return false;
+    var compra = aFecha(u && u.fCompra);
+    if (compra && dias(hoy(), compra) < DIAS_CHECKIN) return false;
+    var ult = ultimoEnvio(u);
+    if (ult && ult.at){
+      var d = new Date(ult.at);
+      if (!isNaN(d.getTime()) && dias(hoy(), d) < DIAS_CHECKIN) return false;
+    }
+    return true;
+  }
   var MOTIVOS = [
     {
-      id: 'cumple', icono: '🎂', plantilla: 'cumple',
-      uno: 'cumple años', varios: 'cumplen años',
+      id: 'cumple', icono: '🎂', plantilla: 'cumple', nombre: 'Cumpleaños',
+      uno: 'cumple años', varios: 'cumplen años', capa: 1, cupo: false,
       aplica: function(u){ return grupoDe(u) === 'vigente' && cumpleHoy(u); }
     },
     {
-      id: 'retro', icono: '🔧', plantilla: 'retrolavado',
-      uno: 'debe retrolavar', varios: 'deben retrolavar',
-      aplica: function(u){
-        if (grupoDe(u) !== 'vigente') return false;
-        var m = mantenimiento(u);
-        return !!(m && m.vencido);
-      }
-    },
-    {
-      id: 'porvencer', icono: '⏰', plantilla: 'porvencer',
-      uno: 'vence la garantía', varios: 'vencen la garantía',
+      id: 'porvencer', icono: '⏰', plantilla: 'porvencer', nombre: 'Vida útil por cumplirse',
+      uno: 'vence la garantía', varios: 'vencen la garantía', capa: 1, cupo: true,
       aplica: function(u){
         if (grupoDe(u) !== 'vigente') return false;
         var v = aFecha(u.fVence);
@@ -667,8 +714,57 @@
         var d = dias(v, hoy());
         return d >= 0 && d <= 30;
       }
+    },
+    {
+      id: 'retro', icono: '🔧', plantilla: 'retrolavado', nombre: 'Retrolavado',
+      uno: 'debe retrolavar', varios: 'deben retrolavar', capa: 1, cupo: true,
+      aplica: function(u){
+        if (grupoDe(u) !== 'vigente') return false;
+        var m = mantenimiento(u);
+        return !!(m && m.vencido);
+      }
+    },
+    {
+      id: 'renovacion', icono: '🔄', plantilla: 'renovacion', nombre: 'Equipo para canjear',
+      uno: 'tiene el equipo vencido', varios: 'tienen el equipo vencido', capa: 2, cupo: true,
+      aplica: function(u){ return grupoDe(u) === 'vencido'; }
+    },
+    {
+      id: 'checkin', icono: '👋', plantilla: 'saludo', nombre: '¿Cómo viene el equipo?',
+      uno: 'hace rato que no le escribís', varios: 'hace rato que no les escribís', capa: 3, cupo: true,
+      aplica: aplicaCheckin
     }
   ];
+  function motivoPorId(id){
+    for (var i = 0; i < MOTIVOS.length; i++) if (MOTIVOS[i].id === id) return MOTIVOS[i];
+    return null;
+  }
+  function listaUsuarios(){
+    if (typeof window.usuariosTodosActual === 'function') return window.usuariosTodosActual() || [];
+    if (Array.isArray(window.usuariosU)) return window.usuariosU;
+    return [];
+  }
+  function candidatosDe(motivo){
+    return listaUsuarios().filter(function(u){
+      return telefonoDe(u) && motivo.aplica(u) && !completadaAntesDeHoy(motivo.id, u);
+    });
+  }
+  function ordenarPorUrgencia(motivo, gente){
+    return gente.slice().sort(function(a, b){
+      if (motivo.id === 'checkin'){
+        var ea = ultimoEnvio(a), eb = ultimoEnvio(b);
+        var ta = ea && ea.at ? new Date(ea.at).getTime() : 0;
+        var tb = eb && eb.at ? new Date(eb.at).getTime() : 0;
+        if (ta !== tb) return ta - tb;
+      }
+      var fa = fechaDeMotivo(motivo.id, a);
+      var fb = fechaDeMotivo(motivo.id, b);
+      if (!fa && !fb) return 0;
+      if (!fa) return 1;
+      if (!fb) return -1;
+      return fa - fb;
+    });
+  }
 
   // A un cliente ya contactado hoy no se lo vuelve a mostrar: si no, el panel
   // no baja nunca y deja de significar algo.
@@ -680,21 +776,32 @@
     return dias(hoy(), new Date(d.getFullYear(), d.getMonth(), d.getDate())) === 0;
   }
 
-  // La lista completa del día: todos los que corresponden hoy, con marca o
-  // sin ella, menos los ciclos ya resueltos antes de hoy. Es lo que el panel
-  // muestra durante la jornada, con el progreso a la vista.
+  // La lista completa del día: hasta CUPO_DIA personas, con marca o sin ella,
+  // menos los ciclos ya resueltos antes de hoy. Los cumpleaños entran todos.
+  // El resto se reparte por urgencia para que un día flojo no quede vacío y
+  // un día cargado no tire 40 WhatsApp de golpe.
   function deHoy(){
-    var lista = [];
-    if (typeof window.usuariosTodosActual === 'function') lista = window.usuariosTodosActual() || [];
-    else if (Array.isArray(window.usuariosU)) lista = window.usuariosU;
-    var out = [];
-    MOTIVOS.forEach(function(m){
-      var gente = lista.filter(function(u){
-        return telefonoDe(u) && m.aplica(u) && !completadaAntesDeHoy(m.id, u);
+    var usados = {};
+    var grupos = [];
+    function tomar(motivo, max){
+      if (!motivo || max === 0) return 0;
+      var gente = ordenarPorUrgencia(motivo, candidatosDe(motivo)).filter(function(u){
+        var t = telefonoDe(u);
+        return t && !usados[t];
       });
-      if (gente.length) out.push({ motivo:m, gente:gente });
+      if (max != null && max >= 0) gente = gente.slice(0, max);
+      if (!gente.length) return 0;
+      gente.forEach(function(u){ usados[telefonoDe(u)] = true; });
+      grupos.push({ motivo: motivo, gente: gente });
+      return gente.length;
+    }
+    var nCumple = tomar(motivoPorId('cumple'), null);
+    var faltan = Math.max(0, CUPO_DIA - nCumple);
+    ['porvencer', 'retro', 'renovacion', 'checkin'].forEach(function(id){
+      if (faltan <= 0) return;
+      faltan -= tomar(motivoPorId(id), faltan);
     });
-    return out;
+    return grupos;
   }
 
   // Para el carrusel: sólo los que todavía no tienen ✓ ni ✗.
@@ -826,7 +933,7 @@
     var texto = fila.textoActual || textoBase;
     var nombre = (typeof window.nombreDePila === 'function' ? window.nombreDePila(u.usuario) : '') || u.usuario;
 
-    ov.querySelector('#muTitulo').textContent = p.icono + ' ' + p.nombre;
+    ov.querySelector('#muTitulo').textContent = (fila.motivo.icono || p.icono) + ' ' + (fila.motivo.nombre || p.nombre);
     var fechaAccion = textoFechaAccion(fila.motivo.id, u);
     var sub = ov.querySelector('#muSub');
     if (fechaAccion){
@@ -1581,6 +1688,10 @@
     mandar: mandar,
     pendientes: pendientes,
     deHoy: deHoy,
+    CUPO_DIA: CUPO_DIA,
+    DIAS_CHECKIN: DIAS_CHECKIN,
+    aplicaCheckin: aplicaCheckin,
+    motivoPorId: motivoPorId,
     marcarAccion: marcarAccion,
     marcaDe: marcaDe,
     claveAccion: claveAccion,
