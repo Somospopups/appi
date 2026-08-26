@@ -7,7 +7,7 @@
    por categoría, solo si esa categoría tiene algo para decir:
 
      💙 Especial  · aliento personalizado (siempre, 1 frase/día)
-     ⚡ Hoy te conviene · LA acción del día (venta, canje o equipo)
+     ⚡ Hoy te conviene · LA jugada del día (primera carta, un nombre)
      🔄 Plan Canje · equipos vencidos < 1 año, listos para renovar
      📅 Tu jornada · seguimientos y presentaciones de hoy
      🎯 Oportunidades · bonus al alcance en Mi Equipo
@@ -383,12 +383,12 @@
     var cul = culturaMes();
     if (cul.invitados < cul.metaInv){
       var prospecto = prospectosEquipo()[0];
-      return {
-        motor: 'equipo', tipo: 'invitar', persona: prospecto || null,
-        titulo: prospecto ? ('Invitá a ' + (pilaDe(prospecto.nombre) || 'esta persona')) : 'Invitá a alguien hoy',
+      if (prospecto) return {
+        motor: 'equipo', tipo: 'invitar', persona: prospecto,
+        titulo: 'Invitá a ' + (pilaDe(prospecto.nombre) || 'esta persona'),
         detalle: 'Te faltan ' + (cul.metaInv - cul.invitados) + ' invitado' + (cul.metaInv - cul.invitados === 1 ? '' : 's') + ' para la Cultura del mes.',
-        cta: prospecto ? 'Abrir la ficha' : 'Cargar un invitado',
-        go: prospecto ? abrirContacto(prospecto) : abrirCultura
+        cta: 'Ir con ' + (pilaDe(prospecto.nombre) || 'esa persona'),
+        go: abrirContacto(prospecto)
       };
     }
     var segs = cs.filter(function(c){
@@ -778,7 +778,7 @@
 
   function armarTarjetas(){
     var lista = [tarjetaEspecial()];
-    [tarjetaMetodoEnvio(), tarjetaDuchaRinnova(), tarjetaJornada(), tarjetaOportunidades(), tarjetaCumples(), tarjetaEquipo(), tarjetaPanel(), tarjetaUsuarios()].forEach(function(t){
+    [tarjetaHoyConviene(), tarjetaMetodoEnvio(), tarjetaDuchaRinnova(), tarjetaCanje(), tarjetaJornada(), tarjetaOportunidades(), tarjetaCumples(), tarjetaEquipo(), tarjetaPanel(), tarjetaUsuarios()].forEach(function(t){
       if (t) lista.push(t);
     });
     return lista;
@@ -843,6 +843,10 @@
       '.ht-esp-marca{position:absolute;right:10px;bottom:2px;font-size:74px;line-height:1;opacity:.16;pointer-events:none}',
       'body.dark .ht-card.ht-esp .ht-esp-frase{color:#fff}',
       '.ht-hint{text-align:center;color:#9a9ba8;font-size:10.5px;font-weight:800}',
+      '.ht-card.ht-hoy{background:linear-gradient(160deg,#fffdf6,#fff3d6);border:2px solid #e8b84a;box-shadow:0 22px 60px rgba(180,130,20,.28)}',
+      'body.dark .ht-card.ht-hoy{background:linear-gradient(160deg,#3a3218,#2c2818);border-color:#e8b84a}',
+      '.ht-card.ht-hoy .ht-kicker{color:#a67c12}',
+      '.ht-card.ht-hoy .ht-cta{background:linear-gradient(135deg,#e8b84a,#d4891a)}',
       '.ht-card.ht-alerta{background:linear-gradient(155deg,#fff4e0,#ffd7a8 55%,#ffc078);box-shadow:0 22px 60px rgba(180,70,0,.38);border:2px solid #f08a1a}',
       'body.dark .ht-card.ht-alerta{background:linear-gradient(155deg,#5a3208,#7a4010 55%,#9a4e12);border-color:#f0a040}',
       '.ht-card.ht-alerta .ht-kicker{color:#b04600}',
@@ -893,7 +897,7 @@
 
   function crearCarta(t){
     var el = document.createElement('div');
-    el.className = 'ht-card' + (t.cat === 'especial' ? ' ht-esp' : '') + (t.cat === 'metodo' ? ' ht-alerta' : '');
+    el.className = 'ht-card' + (t.cat === 'especial' ? ' ht-esp' : '') + (t.cat === 'metodo' ? ' ht-alerta' : '') + (t.cat === 'hoy' ? ' ht-hoy' : '');
     el.innerHTML = '<div class="ht-cab"><span class="ht-ico">' + t.icono + '</span>' +
       '<span class="ht-kicker">' + esc(t.kicker) + '</span></div>' +
       '<h3>' + esc(t.titulo) + '</h3>' +
