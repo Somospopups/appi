@@ -4,8 +4,8 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
-- Versión: **v366 · Segura**.
-- Caché de la app: `appi-v366-agenda-sutil` (se renueva al abrir APPI).
+- Versión: **v367 · Segura**.
+- Caché de la app: `appi-v367-punto-appi` (se renueva al abrir APPI).
 - Publicación: [https://somospopups.github.io/appi/](https://somospopups.github.io/appi/)
 - Acceso por número de distribuidor y contraseña.
 - Acceso administrador POPUPS mediante el candado, sin DIP ni número de distribuidor.
@@ -28,7 +28,7 @@ Al cambiar el logo hay que regenerar ambos juegos y volver a correr `npm test`: 
 ## Agenda personal, listado sutil (v366)
 
 La agenda del teléfono se lee como una guía: letras A B C, nombre y
-número, un puntito dorado si todavía falta pasarlo a APPI. Las acciones
+número. Un puntito marca a quien ya está en la Agenda APPI. Las acciones
 (WhatsApp, llamar, pasar, quitar) aparecen al tocar el nombre.
 
 ## Número incompleto → Depurados (v365)

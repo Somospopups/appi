@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v366-agenda-sutil';
+const CACHE_NAME = 'appi-v367-punto-appi';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

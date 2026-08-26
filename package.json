@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "366.0.0",
-  "cacheName": "appi-v366-agenda-sutil",
+  "version": "367.0.0",
+  "cacheName": "appi-v367-punto-appi",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

@@ -224,7 +224,8 @@ test('un contacto que ya está en la Agenda APPI se marca y no ofrece pasarlo', 
   const fila = page.locator('.ap-item').filter({ hasText: 'Laura Gómez' });
   await expect(fila).toBeVisible();
   await expect(fila).toHaveAttribute('data-ap-estado', 'enappi');
-  await expect(fila.locator('.ap-punto-off')).toHaveCount(1);
+  await expect(fila.locator('.ap-punto-off')).toHaveCount(0);
+  await expect(fila.locator('.ap-punto')).toHaveCount(1);
   await fila.locator('.ap-quien').click();
   await expect(page.locator('[data-ap-pasar]')).toHaveCount(0);
   await expect(page.locator('[data-ap-ver]')).toHaveCount(1);
@@ -257,6 +258,7 @@ test('pasar a APPI pide confirmación, crea el contacto y queda marcado', async 
   // Y el personal quedó marcado como pasado, sincronizado con estado mergado.
   const fila = page.locator('.ap-item').filter({ hasText: 'Nuevo Cliente' });
   await expect(fila).toHaveAttribute('data-ap-estado', 'pasado');
+  await expect(fila.locator('.ap-punto-off')).toHaveCount(0);
   await expect(page.locator('[data-ap-pasar]')).toHaveCount(0);
   await expect.poll(() => subidasAgenda.flat().some(p => p && p.estado === 'mergado')).toBe(true);
 });

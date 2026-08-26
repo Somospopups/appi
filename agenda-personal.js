@@ -13,10 +13,10 @@
                           bloque: entra como contacto nuevo del
                           embudo.
 
-   Listado sutil (v366): agrupado por letra, un puntito si todavía
-   no está en APPI. Las acciones (WhatsApp, llamar, pasar, quitar)
-   aparecen al tocar el nombre. Selección flotante: mantener
-   presionado o "Elegir varios".
+   Listado sutil (v366/v367): agrupado por letra. Un puntito marca
+   a quien ya está en la Agenda APPI. Las acciones (WhatsApp,
+   llamar, pasar, quitar) aparecen al tocar el nombre. Selección
+   flotante: mantener presionado o "Elegir varios".
 
    La agenda vive en este teléfono y se sincroniza con la tabla
    appi_agenda_personal de la cuenta (SUPABASE_AGENDA_PERSONAL.sql).
@@ -717,11 +717,13 @@
       '.ap-cabeza h3{margin:0;font-size:28px;font-weight:500;letter-spacing:-.03em;color:#2c2c34;font-family:Georgia,"Times New Roman",serif}',
       'body.dark .ap-cabeza h3{color:#f2f0ea}',
       '.ap-cabeza small{display:block;margin-top:4px;color:#9a9aa8;font-size:13px;font-weight:500}',
-      '.ap-import{display:flex;flex-wrap:wrap;gap:4px 18px;margin:10px 0 4px}',
-      '.ap-import button{background:none;border:0;padding:0;min-height:0;width:auto;font:inherit;font-size:13px;font-weight:600;cursor:pointer;color:#8a82a8}',
-      '.ap-import .ppal{color:#6b63a0}',
-      '.ap-import .sec{color:#8a82a8}',
-      '.ap-import .guia{color:#b0aab8;font-weight:500;font-size:12.5px}',
+      '.ap-import{display:grid;gap:8px;margin:14px 0 8px}',
+      '.ap-import button{width:100%;min-height:46px;border:0;border-radius:13px;font:inherit;font-size:13.5px;font-weight:800;cursor:pointer;padding:0 14px}',
+      '.ap-import .ppal{background:linear-gradient(135deg,#5b8def,#8b63e8);color:#fff;box-shadow:0 6px 16px rgba(91,112,210,.25)}',
+      '.ap-import .sec{background:rgba(91,141,239,.12);color:#3d63c9}',
+      '.ap-import .guia{background:#fff;border:1.5px solid rgba(91,112,210,.28);color:#3d63c9}',
+      'body.dark .ap-import .sec{background:rgba(91,141,239,.2);color:#9db9f7}',
+      'body.dark .ap-import .guia{background:rgba(30,30,50,.58);border-color:rgba(157,185,247,.35);color:#9db9f7}',
       '.ap-buscar{width:100%;min-height:36px;margin:14px 0 2px;padding:6px 0 8px;border:0;border-bottom:1px solid rgba(80,90,130,.16);border-radius:0;background:transparent;font:inherit;font-size:15px;outline:none;box-sizing:border-box;color:#30303d}',
       '.ap-buscar:focus{border-bottom-color:#b7a8d9}',
       'body.dark .ap-buscar{background:transparent;border-bottom-color:rgba(255,255,255,.14);color:#f2f2f7}',
@@ -814,7 +816,7 @@
         '<label class="ap-check-label" title="Seleccionar ' + esc(c.nombre || 'contacto') + '">' +
           '<input type="checkbox" class="ap-check" data-ap-select="' + esc(c.id) + '"' + (estaSeleccionado ? ' checked' : '') + ' aria-label="Seleccionar ' + esc(c.nombre) + '">' +
         '</label>' +
-        '<span class="ap-punto' + (paraPasar ? '' : ' ap-punto-off') + '" aria-hidden="true"></span>' +
+        '<span class="ap-punto' + (paraPasar ? ' ap-punto-off' : '') + '" title="' + (paraPasar ? '' : 'Ya está en APPI') + '" aria-hidden="true"></span>' +
         '<div class="ap-quien"><b>' + esc(c.nombre || 'Sin nombre') + '</b><small>' + esc(c.telefono) + '</small><span class="ap-sr">' + sr + '</span></div>' +
       '</div>' +
       acciones +
@@ -995,6 +997,8 @@
         });
         if (selectAll.checked){
           visibles.forEach(function(c){ seleccionados.add(c.id); });
+          modoSeleccion = true;
+          abiertoId = null;
         } else {
           visibles.forEach(function(c){ seleccionados.delete(c.id); });
         }
