@@ -165,17 +165,133 @@
     }
   }
 
+  /* Cuidado de la línea (v377).
+     WhatsApp no publica un tope, pero 15 mensajes iguales seguidos ya
+     suspendieron a una distribuidora. APPI abre el chat: acá se cuenta
+     cada persona NUEVA del día (la misma no suma) y se obliga a esperar
+     un minuto entre una y otra. El tope es el de la jornada (8).
+     Se guarda en la cuenta, no en el aparato: celular y PC comparten. */
+  var PAUSA_MS = 60 * 1000;
+  function topeCuidado(){
+    return (window.APPIMensajes && window.APPIMensajes.CUPO_DIA) || 8;
+  }
+  function uidCuidado(){
+    try{
+      if (window.APPIAuth && typeof window.APPIAuth.userId === 'function'){
+        return window.APPIAuth.userId() || 'local';
+      }
+    }catch(e){}
+    return 'local';
+  }
+  function diaCuidado(){
+    var d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+  function storeCuidadoKey(){ return 'appi_wa_cuidado_' + uidCuidado(); }
+  function leerCuidado(){
+    try{
+      var raw = JSON.parse(localStorage.getItem(storeCuidadoKey()) || '{}');
+      if (!raw || raw.dia !== diaCuidado()) return { dia: diaCuidado(), tels: [], ultimoNuevoAt: 0 };
+      if (!Array.isArray(raw.tels)) raw.tels = [];
+      return raw;
+    }catch(e){ return { dia: diaCuidado(), tels: [], ultimoNuevoAt: 0 }; }
+  }
+  function guardarCuidado(d){
+    try{ localStorage.setItem(storeCuidadoKey(), JSON.stringify(d)); }catch(e){}
+  }
+  function estadoCuidado(valor){
+    var n = normalizar(valor);
+    var st = leerCuidado();
+    var ya = !!(n && st.tels.indexOf(n) >= 0);
+    var tope = topeCuidado();
+    var usados = st.tels.length;
+    var quedan = Math.max(0, tope - usados);
+    var espera = 0;
+    if (!ya && st.ultimoNuevoAt){
+      var falta = PAUSA_MS - (Date.now() - Number(st.ultimoNuevoAt || 0));
+      if (falta > 0) espera = Math.ceil(falta / 1000);
+    }
+    return {
+      tel: n,
+      yaHoy: ya,
+      usados: usados,
+      tope: tope,
+      quedan: quedan,
+      esperaSeg: ya ? 0 : espera,
+      puede: !!n && (ya || (quedan > 0 && espera <= 0))
+    };
+  }
+  function evaluarCuidado(valor){
+    var e = estadoCuidado(valor);
+    if (!e.tel) return { ok: true, motivo: 'sin-tel', estado: e };
+    if (e.yaHoy) return { ok: true, motivo: 'mismo', estado: e };
+    if (e.quedan <= 0) return { ok: false, motivo: 'tope', estado: e };
+    if (e.esperaSeg > 0) return { ok: false, motivo: 'pausa', estado: e };
+    return { ok: true, motivo: 'nuevo', estado: e };
+  }
+  function registrarCuidado(valor){
+    var n = normalizar(valor);
+    if (!n) return { nuevo: false, estado: estadoCuidado(valor) };
+    var st = leerCuidado();
+    if (st.tels.indexOf(n) >= 0) return { nuevo: false, estado: estadoCuidado(valor) };
+    st.tels.push(n);
+    st.ultimoNuevoAt = Date.now();
+    guardarCuidado(st);
+    return { nuevo: true, estado: estadoCuidado(valor) };
+  }
+  function resetCuidado(){
+    try{ localStorage.removeItem(storeCuidadoKey()); }catch(e){}
+  }
+  function avisarCuidado(motivo, estado){
+    estado = estado || estadoCuidado('');
+    var titulo, msg, icono;
+    if (motivo === 'tope'){
+      titulo = 'Hoy ya está';
+      icono = '🛡️';
+      msg = 'Ya escribiste a ' + estado.usados + ' personas distintas desde APPI. Ese es el tope del día: así WhatsApp no te suspende la línea.\n\nA la misma persona podés escribirle de nuevo. Mañana se reinicia.';
+    } else {
+      titulo = 'Un minuto';
+      icono = '⏳';
+      var seg = estado.esperaSeg || 1;
+      var cuanto = seg < 60 ? (seg + (seg === 1 ? ' segundo' : ' segundos')) : '1 minuto';
+      msg = 'Mandar muchos mensajes seguidos es lo que más suspende la línea.\n\nEsperá ' + cuanto + ' y después el siguiente. Te quedan ' + estado.quedan + ' para hoy.';
+    }
+    if (window.APPIDialog && window.APPIDialog.alert){
+      window.APPIDialog.alert(msg, { title: titulo, icon: icono, okText: 'Entendido' });
+    } else if (typeof window.showToast === 'function'){
+      window.showToast(titulo + '. ' + msg.replace(/\n+/g, ' '), 4200);
+    } else {
+      alert(titulo + '\n\n' + msg);
+    }
+  }
+  function avisarToqueHecho(estado){
+    if (!estado || typeof window.showToast !== 'function') return;
+    if (estado.usados >= estado.tope){
+      window.showToast('Ese fue el último del día. Mañana de nuevo, para cuidar tu línea.', 3200);
+      return;
+    }
+    window.showToast('Van ' + estado.usados + ' de ' + estado.tope + ' hoy. Esperá un minuto antes de escribirle a otra persona.', 2800);
+  }
+
   /* Abre WhatsApp. Si el número no sirve, avisa y no abre nada.
      persona (opcional) es el contacto/usuario para poder depurarlo.
-     Devuelve true si abrió, false si el número era inválido. */
+     Devuelve true si abrió, false si el número era inválido o si
+     el cuidado de la línea frenó el envío. */
   function abrir(valor, texto, nombre, persona){
     var url = link(valor, texto);
     if (!url){
       avisarInvalido(valor, nombre, persona);
       return false;
     }
+    var gate = evaluarCuidado(valor);
+    if (!gate.ok){
+      avisarCuidado(gate.motivo, gate.estado);
+      return false;
+    }
+    var reg = registrarCuidado(valor);
     if (window.APPIWhatsApp && window.APPIWhatsApp.abrir) window.APPIWhatsApp.abrir(url);
     else window.open(url, '_blank', 'noopener');
+    if (reg.nuevo) avisarToqueHecho(reg.estado);
     return true;
   }
 
@@ -186,6 +302,13 @@
     bonito:     bonito,
     link:       link,
     abrir:      abrir,
-    avisarInvalido: avisarInvalido
+    avisarInvalido: avisarInvalido,
+    cuidado: {
+      TOPE: 8,
+      PAUSA_MS: PAUSA_MS,
+      estado: estadoCuidado,
+      evaluar: evaluarCuidado,
+      reset: resetCuidado
+    }
   };
 })();

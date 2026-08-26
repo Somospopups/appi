@@ -264,12 +264,13 @@
       var nombre = pilaDe(u.usuario || u.nombre);
       var tel = telDeUsuario(u);
       var texto = 'Hola ' + (nombre || '') + '! ¿Cómo andás? 😊\n\nTe escribo porque estoy armando un grupo chico de personas que quieren cuidar el agua de su casa.\n\n¿Se te ocurre alguien (familia, vecinos, laburo) a quien le vendría bien que le cuente?\n\nCon un nombre y un teléfono me alcanza. ¡Gracias!';
-      marcarReferidoPedido(tel);
+      var abierto = false;
       if (window.APPITel && window.APPITel.abrir && tel){
-        window.APPITel.abrir(tel, texto, nombre, u);
+        abierto = !!window.APPITel.abrir(tel, texto, nombre, u);
       } else if (window.APPIMensajes && window.APPIMensajes.mandar){
         window.APPIMensajes.mandar('saludo', u);
       } else if (typeof window.showView === 'function') window.showView('view-usuarios');
+      if (abierto) marcarReferidoPedido(tel);
     };
   }
   function mejorAccionHoy(){

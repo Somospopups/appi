@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "376.0.0",
-  "cacheName": "appi-v376-engranaje",
+  "version": "377.0.0",
+  "cacheName": "appi-v377-cuidado-linea",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

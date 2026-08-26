@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v376-engranaje';
+const CACHE_NAME = 'appi-v377-cuidado-linea';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

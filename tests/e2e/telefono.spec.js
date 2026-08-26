@@ -128,6 +128,7 @@ test.describe('APPITel · armado de números argentinos', () => {
 
   test('abrir manda a WhatsApp cuando el número sirve', async ({ page }) => {
     const r = await page.evaluate(() => {
+      if (window.APPITel.cuidado) window.APPITel.cuidado.reset();
       const abiertos = [];
       window.APPIWhatsApp = { abrir: u => abiertos.push(u) };
       window.APPIDialog = { alert: () => { throw new Error('no debería avisar'); } };
@@ -192,6 +193,69 @@ test.describe('APPITel · primeroValido (campos con varios números)', () => {
     const salida = await page.evaluate(() => window.APPITel.primeroValido('351 766-9967 / 54 351 555-1234'));
     expect(salida).toMatch(/^549\d{10}$/);
     expect(salida).toBe('5493517669967');
+  });
+});
+
+test.describe('APPITel · cuidado de la linea', () => {
+  test.beforeEach(async ({ page }) => {
+    await cargar(page);
+    await page.evaluate(() => window.APPITel.cuidado.reset());
+  });
+
+  test('la misma persona se puede escribir de nuevo el mismo dia', async ({ page }) => {
+    const r = await page.evaluate(() => {
+      const abiertos = [];
+      window.APPIWhatsApp = { abrir: u => abiertos.push(u) };
+      window.APPIDialog = { alert: () => { throw new Error('no deberia frenar'); } };
+      const a = window.APPITel.abrir('3517669967', 'Hola');
+      const b = window.APPITel.abrir('3517669967', 'Hola de nuevo');
+      return { a, b, n: abiertos.length };
+    });
+    expect(r.a).toBe(true);
+    expect(r.b).toBe(true);
+    expect(r.n).toBe(2);
+  });
+
+  test('entre dos personas distintas hay que esperar un minuto', async ({ page }) => {
+    const r = await page.evaluate(() => {
+      const abiertos = [];
+      const avisos = [];
+      window.APPIWhatsApp = { abrir: u => abiertos.push(u) };
+      window.APPIDialog = { alert: (msg, opts) => avisos.push({ msg, opts }) };
+      const a = window.APPITel.abrir('3517669960', 'Hola');
+      const b = window.APPITel.abrir('3517669961', 'Hola');
+      return { a, b, n: abiertos.length, titulo: avisos[0] && avisos[0].opts && avisos[0].opts.title };
+    });
+    expect(r.a).toBe(true);
+    expect(r.b).toBe(false);
+    expect(r.n).toBe(1);
+    expect(r.titulo).toBe('Un minuto');
+  });
+
+  test('el noveno numero distinto del dia no abre WhatsApp', async ({ page }) => {
+    const r = await page.evaluate(() => {
+      const abiertos = [];
+      const avisos = [];
+      window.APPIWhatsApp = { abrir: u => abiertos.push(u) };
+      window.APPIDialog = { alert: (msg, opts) => avisos.push({ msg, opts }) };
+      const d = new Date();
+      const dia = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+      const st = { dia: dia, tels: [], ultimoNuevoAt: Date.now() - 120000 };
+      for (let i = 0; i < 8; i++) st.tels.push('54935176699' + String(60 + i));
+      localStorage.setItem('appi_wa_cuidado_local', JSON.stringify(st));
+      const ok = window.APPITel.abrir('3514552272', 'Hola');
+      return { ok, n: abiertos.length, titulo: avisos[0] && avisos[0].opts && avisos[0].opts.title, msg: avisos[0] && avisos[0].msg };
+    });
+    expect(r.ok).toBe(false);
+    expect(r.n).toBe(0);
+    expect(r.titulo).toBe('Hoy ya está');
+    expect(r.msg).toMatch(/8 personas/);
+  });
+
+  test('el tope viaja en la nube de la cuenta', () => {
+    const fs = require('fs');
+    const js = fs.readFileSync('data-sync.js', 'utf8');
+    expect(js).toContain("'appi_wa_cuidado_'");
   });
 });
 
