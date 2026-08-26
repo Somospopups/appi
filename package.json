@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "367.0.0",
-  "cacheName": "appi-v367-punto-appi",
+  "version": "368.0.0",
+  "cacheName": "appi-v368-punto-derecha",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

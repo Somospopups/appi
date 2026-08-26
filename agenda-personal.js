@@ -738,7 +738,7 @@
       '.ap-letra{margin:22px 0 4px;padding:0;font-family:Georgia,"Times New Roman",serif;font-size:20px;font-weight:500;color:#b7a8d9;letter-spacing:.04em}',
       'body.dark .ap-letra{color:#9b8ec4}',
       '.ap-item{margin:0}',
-      '.ap-row{display:flex;align-items:flex-start;gap:12px;width:100%;box-sizing:border-box;padding:11px 0 12px;border:0;border-bottom:1px solid rgba(80,90,130,.08);border-radius:0;background:transparent;text-align:left;cursor:pointer}',
+      '.ap-row{display:flex;align-items:center;gap:12px;width:100%;box-sizing:border-box;padding:11px 0 12px;border:0;border-bottom:1px solid rgba(80,90,130,.08);border-radius:0;background:transparent;text-align:left;cursor:pointer}',
       'body.dark .ap-row{background:transparent;border-bottom-color:rgba(255,255,255,.06)}',
       '.ap-item.seleccionado .ap-row{background:transparent;border-bottom-color:rgba(183,168,217,.55)}',
       '.ap-item.abierto .ap-row{border-bottom-color:transparent}',
@@ -816,8 +816,8 @@
         '<label class="ap-check-label" title="Seleccionar ' + esc(c.nombre || 'contacto') + '">' +
           '<input type="checkbox" class="ap-check" data-ap-select="' + esc(c.id) + '"' + (estaSeleccionado ? ' checked' : '') + ' aria-label="Seleccionar ' + esc(c.nombre) + '">' +
         '</label>' +
-        '<span class="ap-punto' + (paraPasar ? ' ap-punto-off' : '') + '" title="' + (paraPasar ? '' : 'Ya está en APPI') + '" aria-hidden="true"></span>' +
         '<div class="ap-quien"><b>' + esc(c.nombre || 'Sin nombre') + '</b><small>' + esc(c.telefono) + '</small><span class="ap-sr">' + sr + '</span></div>' +
+        '<span class="ap-punto' + (paraPasar ? ' ap-punto-off' : '') + '" title="' + (paraPasar ? '' : 'Ya está en APPI') + '" aria-hidden="true"></span>' +
       '</div>' +
       acciones +
     '</div>';
