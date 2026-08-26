@@ -457,7 +457,7 @@ test('Ver en otro dispositivo sube la agenda y la trae de la cuenta', async ({ p
   expect(String(agendaCuenta[0].data.value)).toContain('Juan Pérez');
 });
 
-test('en un dispositivo vacío, Ver en otro dispositivo trae la agenda de la cuenta', async ({ page }) => {
+test('en un dispositivo vacío, Sincronizar dispositivo trae la agenda de la cuenta', async ({ page }) => {
   const remota = [{
     id: 'ap-remoto', nombre: 'Desde la cuenta', telefono: '3515550000',
     tel_norm: '3515550000', estado: 'nuevo', origen: 'vcf'

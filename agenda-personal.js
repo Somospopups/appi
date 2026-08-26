@@ -198,16 +198,16 @@
   }
   async function verEnOtroDispositivo(){
     if (!autorizado()){
-      await window.APPIDialog.alert('Iniciá sesión con tu cuenta de distribuidor para ver la agenda en otro dispositivo.', { title: 'Ver en otro dispositivo', icon: '📱' });
+      await window.APPIDialog.alert('Iniciá sesión con tu cuenta de distribuidor para sincronizar la agenda.', { title: 'Sincronizar dispositivo', icon: '📱' });
       return;
     }
     if (!navigator.onLine){
-      await window.APPIDialog.alert('Sin internet no se puede pasar al otro dispositivo.', { title: 'Sin conexión', icon: '📡' });
+      await window.APPIDialog.alert('Sin internet no se puede sincronizar el dispositivo.', { title: 'Sin conexión', icon: '📡' });
       return;
     }
     cargar();
     var boton = $('apOtroDispositivo');
-    if (boton){ boton.disabled = true; boton.textContent = 'Pasando…'; }
+    if (boton){ boton.disabled = true; boton.textContent = 'Sincronizando…'; }
     try{
       var subi = false;
       if (mios.length){
@@ -235,12 +235,12 @@
       mezclarDeCuenta(remoto);
       repintarSiVisible();
       if (subi && mios.length){
-        toast('Listo: ya está en tu cuenta. En el otro dispositivo tocá Ver en otro dispositivo.', 4200);
+        toast('Listo: ya está en tu cuenta. En el otro dispositivo tocá Sincronizar dispositivo.', 4200);
       } else if (mios.length){
         toast('Trajimos tu agenda: ' + mios.length + (mios.length === 1 ? ' contacto' : ' contactos'), 3200);
       } else {
         await window.APPIDialog.alert(
-          'No hay agenda en este teléfono ni en tu cuenta.\n\nSubila acá primero (Subir agenda) y después tocá de nuevo Ver en otro dispositivo.',
+          'No hay agenda en este teléfono ni en tu cuenta.\n\nSubila acá primero (Subir agenda) y después tocá de nuevo Sincronizar dispositivo.',
           { title: 'Todavía no hay agenda', icon: '📱' }
         );
       }
@@ -248,7 +248,7 @@
       await window.APPIDialog.alert(String(error && error.message || 'No se pudo pasar la agenda.'), { title: 'No se pudo pasar', icon: '!' });
     }finally{
       var b = $('apOtroDispositivo');
-      if (b){ b.disabled = false; b.textContent = 'Ver en otro dispositivo'; }
+      if (b){ b.disabled = false; b.textContent = 'Sincronizar dispositivo'; }
     }
   }
 
@@ -977,10 +977,10 @@
     if (mios.length && paraPasar) cuenta += ' · ' + paraPasar + ' para pasar';
     salida += '<div class="ap-cabeza"><h3>Agenda personal</h3><small>' + cuenta + '</small></div>';
     if (!mios.length){
-      salida += '<div class="ap-aviso">Si la subiste en el celular, tocá <b>Ver en otro dispositivo</b> acá (con internet).</div>';
+      salida += '<div class="ap-aviso">Si la subiste en el celular, tocá <b>Sincronizar dispositivo</b> acá (con internet).</div>';
     }
     salida += '<div class="ap-import">';
-    salida += '<button type="button" class="otro" id="apOtroDispositivo">Ver en otro dispositivo</button>';
+    salida += '<button type="button" class="otro" id="apOtroDispositivo">Sincronizar dispositivo</button>';
     salida += '<button type="button" class="ppal" id="apSubirVcf">Subir agenda</button>';
     salida += '<button type="button" class="guia" id="apGuia">Cómo saco la agenda</button>';
     salida += '</div>';
