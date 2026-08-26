@@ -9,7 +9,9 @@ test('la versión visible, el paquete y el Service Worker están alineados', () 
   // que los cuatro lugares digan lo mismo, no cuál es el número de hoy.
   // Si quedaran desalineados, el teléfono seguiría mostrando la versión vieja.
   const v = pkg.version.split('.')[0];
-  const cacheName = `appi-v${v}-sync-agenda-personal`;
+  // El nombre del caché se lee del paquete (igual que la versión): lo que
+  // importa es que los cuatro lugares digan lo mismo, no cuál es el sufijo.
+  const cacheName = pkg.cacheName;
   expect(pkg.version).toBe(`${v}.0.0`);
   expect(pkg.cacheName).toBe(cacheName);
   expect(html).toContain(`APPI · v${v} · Segura`);
