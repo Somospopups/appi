@@ -237,24 +237,32 @@
     st.tels.push(n);
     st.ultimoNuevoAt = Date.now();
     guardarCuidado(st);
+    marcarMetodoVisto();
     return { nuevo: true, estado: estadoCuidado(valor) };
   }
   function resetCuidado(){
     try{ localStorage.removeItem(storeCuidadoKey()); }catch(e){}
   }
+  function metodoKey(){ return 'appi_metodo_envio_v1_' + uidCuidado(); }
+  function vioMetodo(){
+    try{ return localStorage.getItem(metodoKey()) === '1'; }catch(e){ return false; }
+  }
+  function marcarMetodoVisto(){
+    try{ localStorage.setItem(metodoKey(), '1'); }catch(e){}
+  }
   function avisarCuidado(motivo, estado){
     estado = estado || estadoCuidado('');
     var titulo, msg, icono;
     if (motivo === 'tope'){
-      titulo = 'Hoy ya está';
+      titulo = 'Hoy llegamos';
       icono = '🛡️';
-      msg = 'Ya escribiste a ' + estado.usados + ' personas distintas desde APPI. Ese es el tope del día: así WhatsApp no te suspende la línea.\n\nA la misma persona podés escribirle de nuevo. Mañana se reinicia.';
+      msg = 'Ya escribiste a ' + estado.usados + ' personas distintas. Está perfecto: así WhatsApp no te toca la línea.\n\nA la misma persona podés escribirle de nuevo. Mañana otros ' + estado.tope + '. Tranqui, el proceso va.';
     } else {
-      titulo = 'Un minuto';
+      titulo = 'Un minutito';
       icono = '⏳';
       var seg = estado.esperaSeg || 1;
       var cuanto = seg < 60 ? (seg + (seg === 1 ? ' segundo' : ' segundos')) : '1 minuto';
-      msg = 'Mandar muchos mensajes seguidos es lo que más suspende la línea.\n\nEsperá ' + cuanto + ' y después el siguiente. Te quedan ' + estado.quedan + ' para hoy.';
+      msg = 'De a uno rinde más, y la línea se queda.\n\nEsperá ' + cuanto + ' y el siguiente. Te quedan ' + estado.quedan + ' para hoy.';
     }
     if (window.APPIDialog && window.APPIDialog.alert){
       window.APPIDialog.alert(msg, { title: titulo, icon: icono, okText: 'Entendido' });
@@ -267,10 +275,10 @@
   function avisarToqueHecho(estado){
     if (!estado || typeof window.showToast !== 'function') return;
     if (estado.usados >= estado.tope){
-      window.showToast('Ese fue el último del día. Mañana de nuevo, para cuidar tu línea.', 3200);
+      window.showToast('Ese fue el último de hoy. Mañana otros ' + estado.tope + '. Vas bien.', 3200);
       return;
     }
-    window.showToast('Van ' + estado.usados + ' de ' + estado.tope + ' hoy. Esperá un minuto antes de escribirle a otra persona.', 2800);
+    window.showToast('Van ' + estado.usados + ' de ' + estado.tope + ' hoy. Un minuto y la siguiente.', 2800);
   }
 
   /* Abre WhatsApp. Si el número no sirve, avisa y no abre nada.
@@ -308,7 +316,9 @@
       PAUSA_MS: PAUSA_MS,
       estado: estadoCuidado,
       evaluar: evaluarCuidado,
-      reset: resetCuidado
+      reset: resetCuidado,
+      vioMetodo: vioMetodo,
+      marcarMetodoVisto: marcarMetodoVisto
     }
   };
 })();

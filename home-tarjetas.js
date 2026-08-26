@@ -428,6 +428,12 @@
         if (r.total) chips.push('✓ ' + r.hechas + ' de ' + r.total + ' acciones');
       }
     }catch(e){}
+    try{
+      if (window.APPITel && window.APPITel.cuidado && window.APPITel.cuidado.estado){
+        var linea = window.APPITel.cuidado.estado('');
+        chips.push('💬 ' + linea.usados + ' / ' + linea.tope + ' hoy');
+      }
+    }catch(e){}
     return {
       cat: 'especial', icono: '💙', kicker: 'Para vos' + (nombre ? ', ' + nombre : ''),
       titulo: 'Tu impulso de hoy',
@@ -716,6 +722,36 @@
     }catch(e){ return null; }
   }
 
+  function tarjetaMetodoEnvio(){
+    try{
+      if (window.APPITel && window.APPITel.cuidado && window.APPITel.cuidado.vioMetodo && window.APPITel.cuidado.vioMetodo()) return null;
+    }catch(e){}
+    var tope = 10;
+    try{
+      if (window.APPITel && window.APPITel.cuidado && window.APPITel.cuidado.TOPE) tope = window.APPITel.cuidado.TOPE;
+    }catch(e){}
+    var entendido = function(){
+      try{
+        if (window.APPITel && window.APPITel.cuidado && window.APPITel.cuidado.marcarMetodoVisto){
+          window.APPITel.cuidado.marcarMetodoVisto();
+        }
+      }catch(e){}
+      if (mazo){ mazo.tarjetas = armarTarjetas(); pintar(); }
+    };
+    return {
+      cat: 'metodo', icono: '🕊️', kicker: 'Cómo se escribe ahora',
+      titulo: 'Sé que querés escribirle a todos',
+      html: '<p class="ht-frase">Tranqui. Esto es un proceso, no una carrera.</p>' +
+            '<ol class="ht-pasos">' +
+            '<li><b>De a uno.</b> APPI te arma el mensaje y te abre el chat.</li>' +
+            '<li><b>' + tope + ' por día.</b> Personas distintas. Tu línea se queda.</li>' +
+            '<li><b>Un minuto entre cada una.</b> Mañana otros ' + tope + '.</li>' +
+            '</ol>' +
+            '<p class="ht-nota">En dos semanas hablaste con ' + (tope * 14) + ' personas y WhatsApp no te cortó. Todo va como corresponde.</p>',
+      cta: { label: 'Entendido, vamos', go: entendido }
+    };
+  }
+
   function tarjetaDuchaRinnova(){
     var lista = colaDuchaRinnova();
     if (!lista.length) return null;
@@ -743,7 +779,7 @@
 
   function armarTarjetas(){
     var lista = [tarjetaEspecial()];
-    [tarjetaDuchaRinnova(), tarjetaJornada(), tarjetaOportunidades(), tarjetaCumples(), tarjetaEquipo(), tarjetaPanel(), tarjetaUsuarios()].forEach(function(t){
+    [tarjetaMetodoEnvio(), tarjetaDuchaRinnova(), tarjetaJornada(), tarjetaOportunidades(), tarjetaCumples(), tarjetaEquipo(), tarjetaPanel(), tarjetaUsuarios()].forEach(function(t){
       if (t) lista.push(t);
     });
     return lista;
@@ -785,6 +821,10 @@
       '.ht-lista li::after{content:"›";margin-left:auto;color:#3d63c9;font-weight:900;font-size:17px}',
       '.ht-lista li i{color:#c0392b;font-style:normal;font-size:12px;font-weight:900}',
       '.ht-nota{margin:12px 0 0;color:#8a8b98;font-size:13px;line-height:1.5}',
+      '.ht-pasos{margin:12px 0 0;padding:0;list-style:none;display:grid;gap:8px}',
+      '.ht-pasos li{padding:11px 13px;border-radius:14px;background:rgba(91,141,239,.08);color:#33343f;font-size:14.5px;line-height:1.4;font-weight:650}',
+      '.ht-pasos li b{font-weight:900}',
+      'body.dark .ht-pasos li{background:rgba(255,255,255,.07);color:#d4d5e2}',
       '.ht-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}',
       '.ht-chips span{padding:7px 12px;border-radius:999px;background:rgba(91,141,239,.1);color:#3d63c9;font-size:12.5px;font-weight:900}',
       '.ht-cta{margin-top:12px;min-height:52px;border:0;border-radius:15px;background:linear-gradient(135deg,#5b8def,#8b63e8);color:#fff;font:inherit;font-size:15px;font-weight:900;cursor:pointer}',
@@ -1113,7 +1153,8 @@
     FRASES: FRASES,
     ventanaRinnova: ventanaRinnova,
     esDucha: esDucha,
-    colaDuchaRinnova: colaDuchaRinnova
+    colaDuchaRinnova: colaDuchaRinnova,
+    tarjetaMetodoEnvio: tarjetaMetodoEnvio
   };
 
   if (document.readyState === 'complete') envolver();

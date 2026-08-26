@@ -229,7 +229,7 @@ test.describe('APPITel · cuidado de la linea', () => {
     expect(r.a).toBe(true);
     expect(r.b).toBe(false);
     expect(r.n).toBe(1);
-    expect(r.titulo).toBe('Un minuto');
+    expect(r.titulo).toBe('Un minutito');
   });
 
   test('la persona 11 distinta del dia no abre WhatsApp', async ({ page }) => {
@@ -248,7 +248,7 @@ test.describe('APPITel · cuidado de la linea', () => {
     });
     expect(r.ok).toBe(false);
     expect(r.n).toBe(0);
-    expect(r.titulo).toBe('Hoy ya está');
+    expect(r.titulo).toBe('Hoy llegamos');
     expect(r.msg).toMatch(/10 personas/);
   });
 
