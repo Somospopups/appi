@@ -232,7 +232,7 @@ test.describe('APPITel · cuidado de la linea', () => {
     expect(r.titulo).toBe('Un minuto');
   });
 
-  test('el noveno numero distinto del dia no abre WhatsApp', async ({ page }) => {
+  test('la persona 11 distinta del dia no abre WhatsApp', async ({ page }) => {
     const r = await page.evaluate(() => {
       const abiertos = [];
       const avisos = [];
@@ -241,7 +241,7 @@ test.describe('APPITel · cuidado de la linea', () => {
       const d = new Date();
       const dia = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
       const st = { dia: dia, tels: [], ultimoNuevoAt: Date.now() - 120000 };
-      for (let i = 0; i < 8; i++) st.tels.push('54935176699' + String(60 + i));
+      for (let i = 0; i < 10; i++) st.tels.push('54935176699' + String(50 + i));
       localStorage.setItem('appi_wa_cuidado_local', JSON.stringify(st));
       const ok = window.APPITel.abrir('3514552272', 'Hola');
       return { ok, n: abiertos.length, titulo: avisos[0] && avisos[0].opts && avisos[0].opts.title, msg: avisos[0] && avisos[0].msg };
@@ -249,7 +249,7 @@ test.describe('APPITel · cuidado de la linea', () => {
     expect(r.ok).toBe(false);
     expect(r.n).toBe(0);
     expect(r.titulo).toBe('Hoy ya está');
-    expect(r.msg).toMatch(/8 personas/);
+    expect(r.msg).toMatch(/10 personas/);
   });
 
   test('el tope viaja en la nube de la cuenta', () => {

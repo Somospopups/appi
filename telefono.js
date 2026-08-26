@@ -169,12 +169,12 @@
      WhatsApp no publica un tope, pero 15 mensajes iguales seguidos ya
      suspendieron a una distribuidora. APPI abre el chat: acá se cuenta
      cada persona NUEVA del día (la misma no suma) y se obliga a esperar
-     un minuto entre una y otra. El tope es el de la jornada (8).
+     un minuto entre una y otra. El tope es 10 personas distintas.
+     La jornada sigue siendo 8 acciones: acá se cuida la línea, no el día.
      Se guarda en la cuenta, no en el aparato: celular y PC comparten. */
+  var TOPE_PERSONAS = 10;
   var PAUSA_MS = 60 * 1000;
-  function topeCuidado(){
-    return (window.APPIMensajes && window.APPIMensajes.CUPO_DIA) || 8;
-  }
+  function topeCuidado(){ return TOPE_PERSONAS; }
   function uidCuidado(){
     try{
       if (window.APPIAuth && typeof window.APPIAuth.userId === 'function'){
@@ -304,7 +304,7 @@
     abrir:      abrir,
     avisarInvalido: avisarInvalido,
     cuidado: {
-      TOPE: 8,
+      TOPE: TOPE_PERSONAS,
       PAUSA_MS: PAUSA_MS,
       estado: estadoCuidado,
       evaluar: evaluarCuidado,
