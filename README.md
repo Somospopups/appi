@@ -4,8 +4,8 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
-- Versión: **v395 · Segura**.
-- Caché de la app: `appi-v395-hoy-conviene` (se renueva al abrir APPI).
+- Versión: **v396 · Segura**.
+- Caché de la app: `appi-v396-sin-parque` (se renueva al abrir APPI).
 - Publicación: [https://somospopups.github.io/appi/](https://somospopups.github.io/appi/)
 - Acceso por número de distribuidor y contraseña.
 - Acceso administrador POPUPS mediante el candado, sin DIP ni número de distribuidor.
@@ -55,11 +55,11 @@ ese segundo nombre no se usa). Si todavía no está la planilla, se ve un
 guión y un toque abre Mi Equipo. Los invitados siguen a mano. APPI no
 inventa un número.
 
-## Jornada del parque (v361)
+## Jornada de usuarios (v361)
 
 En **Usuarios / Garantías** el día ya no depende sólo del calendario. APPI
 arma hasta **8 acciones** (los cumpleaños de hoy entran todos) y, si el
-calendario está flojo, rellena con el parque:
+calendario está flojo, rellena con los usuarios:
 
 1. Cumpleaños de hoy.
 2. Garantía que vence en 0–30 días (las más cercanas primero).
@@ -70,7 +70,7 @@ calendario está flojo, rellena con el parque:
 Si hay 20 vencimientos, no salen los 20: se reparte. Una persona no aparece
 dos veces el mismo día. El vencido hace más de un año sigue en Reactivación,
 afuera de esta cola. La franja y la tarjeta del Home **sólo se muestran si
-hay trabajo real**; un parque recién cargado o todo al día deja la pantalla
+hay trabajo real**; unos usuarios recién cargados o todo al día deja la pantalla
 como estaba.
 
 ## Agenda personal (v358)

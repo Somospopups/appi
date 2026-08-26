@@ -14,14 +14,14 @@
      - vencido hace < 1 año .... sólo renovación
      - vencido hace > 1 año .... nada
 
-   Jornada del parque (v361): el calendario ya no es la única fuente.
+   Jornada de usuarios (v361): el calendario ya no es la única fuente.
    Cada día se arman hasta CUPO_DIA acciones, en este orden:
      1. cumpleaños de hoy (entran todos: es hoy o no es)
      2. garantía a 0–30 días, las más cercanas primero
      3. mantenimiento caído, los más viejos primero
      4. canje (vencido < 1 año), los más antiguos primero
      5. check-in a vigentes sin escribirles en 90 días
-   Si el calendario está flojo, el parque rellena. Si hay 20
+   Si el calendario está flojo, los usuarios rellenan. Si hay 20
    vencimientos, se reparte: hoy salen 8, mañana los que siguen.
    Una persona no aparece dos veces el mismo día.
    ============================================================ */
@@ -705,7 +705,7 @@
 
   /* ---------- pendientes del día ---------- */
   /* Motivos en orden de urgencia. El calendario (cumple / mantenimiento /
-     garantía) sigue primero; si no llenan el cupo, el parque rellena con
+     garantía) sigue primero; si no llenan el cupo, los usuarios rellenan con
      canjes y check-ins. El vencido hace más de un año sigue afuera. */
   function aplicaCheckin(u){
     if (grupoDe(u) !== 'vigente') return false;

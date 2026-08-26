@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "395.0.0",
-  "cacheName": "appi-v395-hoy-conviene",
+  "version": "396.0.0",
+  "cacheName": "appi-v396-sin-parque",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

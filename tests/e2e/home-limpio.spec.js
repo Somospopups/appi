@@ -196,7 +196,7 @@ test('las tarjetas son inteligentes: solo aparecen las categorías con novedades
   const cats = await page.evaluate(() => window.APPIHomeTarjetas.armarTarjetas().map(t => t.cat));
   expect(cats[0]).toBe('especial');
   expect(cats).toContain('hoy');           // Lucía tiene presentación hoy
-  expect(cats).not.toContain('canje');     // sin parque de garantías
+  expect(cats).not.toContain('canje');     // sin usuarios de garantías
   expect(cats).toContain('jornada');   // Jorge y Lucía tienen fecha para hoy
   expect(cats).toContain('panel');         // Carla está nueva sin contactar
   expect(cats).toContain('oportunidades'); // María (DC) está en 9 PB: bonus cerca

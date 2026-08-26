@@ -355,7 +355,7 @@
     if (canjes[0]) return {
       motor: 'canje', tipo: 'canje', persona: canjes[0],
       titulo: 'Canje listo: ' + (nombreLindo(canjes[0].usuario) || 'un cliente'),
-      detalle: 'Ya conoce el producto. El Plan Canje es la venta más fácil del parque.',
+      detalle: 'Ya conoce el producto. El Plan Canje es la venta más fácil entre tus usuarios.',
       cta: 'Escribirle ahora',
       go: function(){
         if (window.APPIMensajes && window.APPIMensajes.mandar) window.APPIMensajes.mandar('renovacion', canjes[0]);

@@ -4111,7 +4111,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v395 · Segura</div>
+  <div class="ds-foot">APPI · v396 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -5465,7 +5465,7 @@ const HELP = {
     Tu evolución mes a mes. Cargá los 3 archivos cada mes (Línea Descendente, Garantías, Ingresos) y mirá cómo crece tu negocio. Podés comparar meses y ver tendencias.</div>
 
     <div class="tip"><strong>📍 USUARIOS / GARANTÍAS</strong><br/>
-    El parque instalado: todos los hogares que tienen un equipo tuyo. Cargá las garantías, mirá cuáles vencen pronto y planificá visitas de mantenimiento. ¡Es tu tesoro!</div>
+    Todos los hogares que tienen un equipo tuyo. Cargá las garantías, mirá cuáles vencen pronto y planificá visitas de mantenimiento. ¡Es tu tesoro!</div>
 
     <div class="tip"><strong>💡 CONSEJO</strong><br/>
     Revisá el GPS todos los días. Si estás lejos del bonus, enfocá tus esfuerzos en patrocinios y demos. El Panel te dice a quién contactar hoy.</div>`
@@ -5602,7 +5602,7 @@ const HELP = {
     • <strong>Panel de Contactos</strong> — tu CRM con nuevos, seguimientos, presentaciones y cerrados<br/>
     • <strong>Mi Equipo</strong> — toda tu línea descendente con tablero, árbol y lista<br/>
     • <strong>Histórico</strong> — tu evolución mes a mes<br/>
-    • <strong>Usuarios</strong> — el parque instalado y garantías vencidas</div>
+    • <strong>Usuarios</strong> — quienes ya tienen un equipo y las garantías vencidas</div>
 
     <div class="tip"><strong>🧰 MIS HERRAMIENTAS</strong><br/>
     Tu caja de herramientas para el día a día:<br/>
@@ -11817,8 +11817,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='395';
-      const CACHE_NAME='appi-v395-hoy-conviene';
+      const swVersion='396';
+      const CACHE_NAME='appi-v396-sin-parque';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 

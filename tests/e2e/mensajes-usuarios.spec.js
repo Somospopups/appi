@@ -823,9 +823,9 @@ test('los mensajes propios valen para cualquier cliente y no se pierden al recar
   expect(viven).toBe(1);
 });
 
-/* ---------- v361: jornada del parque ---------- */
+/* ---------- v361: jornada de usuarios ---------- */
 
-function parque(n, extra) {
+function usuariosDe(n, extra) {
   const out = [];
   for (let i = 0; i < n; i++) {
     out.push(Object.assign({
@@ -844,7 +844,7 @@ function parque(n, extra) {
 }
 
 test('el cupo diario es 8 y no inventa más', async ({ page }) => {
-  await entrar(page, parque(20));
+  await entrar(page, usuariosDe(20));
   const r = await page.evaluate(() => {
     const M = window.APPIMensajes;
     const grupos = M.deHoy();
@@ -858,8 +858,8 @@ test('el cupo diario es 8 y no inventa más', async ({ page }) => {
   await expect(page.locator('#muHoy')).toContainText('8 mensajes');
 });
 
-test('un parque recién comprado sigue sin franja: no se inventa trabajo', async ({ page }) => {
-  await entrar(page, parque(12, { fCompra: ddmmyyyy(-20), fVence: dias(300), fVenceRaw: ddmmyyyy(300) }));
+test('usuarios recién comprados siguen sin franja: no se inventa trabajo', async ({ page }) => {
+  await entrar(page, usuariosDe(12, { fCompra: ddmmyyyy(-20), fVence: dias(300), fVenceRaw: ddmmyyyy(300) }));
   const total = await page.evaluate(() => window.APPIMensajes.deHoy().reduce((n, g) => n + g.gente.length, 0));
   expect(total).toBe(0);
   await expect(page.locator('#muHoy')).toHaveCount(0);
@@ -893,7 +893,7 @@ test('el vencido hace más de un año sigue afuera aunque el día esté vacío',
 });
 
 test('los cumpleaños entran todos aunque el cupo esté lleno', async ({ page }) => {
-  const gente = parque(8);
+  const gente = usuariosDe(8);
   for (let i = 0; i < 3; i++) {
     gente.push({
       id: 200 + i,
@@ -917,7 +917,7 @@ test('los cumpleaños entran todos aunque el cupo esté lleno', async ({ page })
     return { por, total };
   });
   expect(r.por.cumple).toBe(3);
-  expect(r.total).toBe(8); // 3 cumples + 5 check-ins del parque viejo
+  expect(r.total).toBe(8); // 3 cumples + 5 check-ins de usuarios viejos
 });
 
 test('si hay 15 garantías por vencer, hoy salen las 8 más cercanas', async ({ page }) => {
@@ -969,7 +969,7 @@ test('una persona no aparece dos veces: gana el motivo más urgente', async ({ p
 });
 
 test('marcar las 8 no mete a una novena el mismo día', async ({ page }) => {
-  await entrar(page, parque(12));
+  await entrar(page, usuariosDe(12));
   const r = await page.evaluate(() => {
     const M = window.APPIMensajes;
     const antes = M.deHoy()[0].gente.map(u => u.telf);
