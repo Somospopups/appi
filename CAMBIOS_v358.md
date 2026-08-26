@@ -33,3 +33,30 @@ La tabla `appi_agenda_personal` de `SUPABASE_AGENDA_PERSONAL.sql` no cambia y
 sigue siendo una migración aditiva. Si todavía no se ejecutó, la agenda local
 continúa funcionando y APPI avisa que falta correr ese SQL para sincronizarla
 con la cuenta.
+
+## Verificación de deploy
+
+La versión v358 ya está publicada en `main` vía el pull request
+**#28 — "v358: sincronización por lotes de Agenda Personal"**, cuyo merge commit
+es `c692a22e799e192c55bb8242cb4a229ae07d5f8c`.
+
+Se verificó que los cuatro puntos pedidos están presentes en el código de esa
+versión:
+
+- **Subida masiva por lotes**: `agenda-personal.js` usa `UPSERT_BATCH_SIZE = 500`
+  y `subirLote()` envía un array JSON a
+  `/rest/v1/appi_agenda_personal?on_conflict=user_id,telefono_normalizado`
+  con `Prefer: resolution=merge-duplicates,return=minimal`; `vaciarCola()` parte
+  la cola en paquetes y los envía en paralelo.
+- **Sincronización automática en PC**: `openMiGestion()` dispara la descarga al
+  abrir el Panel de Contactos; `agenda-personal.js` también sincroniza con
+  `focus`, `online`, `visibilitychange` y al cambiar entre **Agenda APPI** y
+  **Agenda Personal**.
+- **Sin pantallazo**: `openMiGestion()` renderiza la solapa guardada en
+  `#gestionContent` mientras el panel sigue oculto y recién después llama a
+  `showView('view-gestion')`, evitando un frame de la agenda anterior.
+- **Versión v358**: `CACHE_NAME`/`cacheName` es
+  `appi-v358-sync-agenda-personal` en `service-worker.js`, `index.html`,
+  `package.json`, `package-lock.json` y `README.md`; `package.json` y el pie
+  visible indican `358.0.0` / `v358`.
+
