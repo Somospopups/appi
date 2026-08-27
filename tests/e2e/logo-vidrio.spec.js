@@ -70,11 +70,13 @@ test('los íconos del manifiesto llevan el mismo logo de vidrio que usa Android 
   }
   expect(manifest.background_color).toBe('#06172d');
   expect(manifest.theme_color).toBe('#06172d');
-  // El generador único mantiene splash e íconos con el mismo dibujo.
+  // Splash de iPhone: logo de vidrio. Ícono de inicio: brand/icono-app.png
+  // (vidrio oscuro, APPI en la zona que recortan Android e iOS).
   const generador = read('scripts/logo_vidrio.py');
   expect(generador).toContain('def paint_glass_wordmark');
-  expect(read('scripts/make-icons.py')).toContain('from logo_vidrio import');
+  expect(read('scripts/make-icons.py')).toContain('icono-app.png');
   expect(read('scripts/make-splash.py')).toContain('from logo_vidrio import');
+  expect(fs.existsSync('brand/icono-app.png')).toBe(true);
 });
 
 test('el arranque de la app muestra el logo de vidrio en celular, tablet y PC', async ({ page }) => {

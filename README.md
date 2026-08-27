@@ -4,8 +4,8 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
-- Versión: **v399 · Segura**.
-- Caché de la app: `appi-v399-lista-cuenta` (se renueva al abrir APPI).
+- Versión: **v400 · Segura**.
+- Caché de la app: `appi-v400-icono` (se renueva al abrir APPI).
 - Publicación: [https://somospopups.github.io/appi/](https://somospopups.github.io/appi/)
 - Acceso por número de distribuidor y contraseña.
 - Acceso administrador POPUPS mediante el candado, sin DIP ni número de distribuidor.
@@ -20,7 +20,7 @@ Desde v256, todos los dispositivos abren APPI con el mismo logo de vidrio.
 
 - `scripts/logo_vidrio.py` dibuja el logo una sola vez: fondo pastel, cartel de vidrio esmerilado y el wordmark APPI en letras heladas.
 - `python3 scripts/make-splash.py` genera las 26 imágenes de arranque de iPhone y iPad, verticales y apaisadas, dentro de `splash/`.
-- `python3 scripts/make-icons.py` genera los íconos del manifiesto y `apple-touch-icon.png`; Android usa el ícono para su pantalla de arranque, así que ve el mismo logo.
+- `python3 scripts/make-icons.py` genera los íconos de la pantalla de inicio desde `brand/icono-app.png` (vidrio oscuro, APPI al centro para que Android e iOS no recorten el nombre).
 - Dentro de la app, la animación de carga muestra el mismo cartel de vidrio dibujado con CSS, sin descargar imágenes, en celular, tablet y PC.
 
 Al cambiar el logo hay que regenerar ambos juegos y volver a correr `npm test`: `tests/e2e/logo-vidrio.spec.js` verifica que cada dispositivo tenga su imagen y que el arranque muestre el vidrio.
@@ -54,6 +54,11 @@ Descendente: es el PB personal del titular (figura primero; si hay socio,
 ese segundo nombre no se usa). Si todavía no está la planilla, se ve un
 guión y un toque abre Mi Equipo. Los invitados siguen a mano. APPI no
 inventa un número.
+
+## Ícono de inicio (v400)
+
+Vidrio oscuro, APPI al centro. Se lee en la grilla del teléfono y no se
+corta cuando Android hace un círculo o iPhone redondea las esquinas.
 
 ## Una sola lista (v399)
 
