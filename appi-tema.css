@@ -174,29 +174,33 @@ body.dark .admin-user-row h3{color:#f2f2f7}
 body.dark .stat-label,
 body.dark .admin-user-row p{color:#b8b9c5}
 
-
-/* ---------- login y admin: vidrio sobre el agua del arranque (v407) ---------- */
-.lock-card{
-  background:rgba(255,255,255,.28);
-  border:1px solid rgba(255,255,255,.42);
-  box-shadow:0 18px 50px rgba(4,31,55,.18);
+/* ---------- login y admin: ficha blanca sobre el agua (v409) ---------- */
+.lock-card,
+.admin-login-card{
+  background:#fff !important;
+  -webkit-backdrop-filter:none !important;
+  backdrop-filter:none !important;
+  border:0 !important;
+  box-shadow:0 22px 60px rgba(4,31,55,.22) !important;
 }
-body.dark .lock-card{
-  background:rgba(255,255,255,.20);
-  border-color:rgba(255,255,255,.28);
+body.dark .lock-card,
+body.dark .admin-login-card{
+  background:#fff !important;
+  border:0 !important;
 }
-#lockScreen .lock-activate-btn{
+#lockScreen .lock-activate-btn,
+.admin-login-card .lock-activate-btn{
   background:linear-gradient(135deg,#27b5c4,#0b5878);
   box-shadow:0 8px 20px rgba(11,88,120,.32);
 }
 #lockScreen .lock-input:focus{border-color:#27b5c4;box-shadow:0 0 0 3px rgba(39,181,196,.22)}
 #lockScreen .lock-pass-row button{
-  background:rgba(11,88,120,.14);
+  background:rgba(11,88,120,.10);
   color:#0b5878;
 }
 #lockScreen .admin-login-lock{
-  background:rgba(255,255,255,.22);
-  border-color:rgba(255,255,255,.4);
+  background:rgba(11,88,120,.08);
+  border-color:rgba(11,88,120,.16);
   color:#0b5878;
 }
 #lockScreen .login-tabs button.active{color:#0b5878}
@@ -214,6 +218,19 @@ body.appi-admin header.top .script{
   background:linear-gradient(90deg,#0b5878,#27b5c4);
   -webkit-background-clip:text;
   background-clip:text;
+}
+body.appi-admin .glass,
+body.appi-admin .admin-card,
+body.appi-admin .admin-stat,
+body.appi-admin .admin-user-row,
+body.appi-admin .admin-cump-item,
+body.appi-admin .admin-quick .q,
+body.appi-admin .revenue-stats{
+  background:#fff !important;
+  -webkit-backdrop-filter:none !important;
+  backdrop-filter:none !important;
+  border:0 !important;
+  box-shadow:0 10px 28px rgba(4,31,55,.14) !important;
 }
 .admin-hero{
   background:linear-gradient(150deg,#27b5c4,#0b5878 70%,#063652);
