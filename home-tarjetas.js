@@ -1271,6 +1271,10 @@
     textoMarcador: textoMarcador
   };
 
+  window.addEventListener('appi-datasync-applied', function(){
+    try{ if (document.getElementById('htOverlay')) pintar(); }catch(e){}
+  });
+
   if (document.readyState === 'complete') envolver();
   else window.addEventListener('load', envolver);
   setTimeout(envolver, 1200);

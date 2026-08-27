@@ -241,7 +241,8 @@ test('titular y socio eligen su identidad y separan el espacio personal', async 
   expect(await page.evaluate(()=>APPIAuth.activePerson())).toEqual({tipo:'socio',nombre:'Juan Gómez'});
   await expect.poll(()=>page.evaluate(async()=>{const dbs=await indexedDB.databases();return dbs.map(db=>db.name).includes(`appi-historico-v1-${APPIAuth.userId()}-socio`)})).toBe(true);
   expect(await page.evaluate(()=>JSON.parse(localStorage.getItem('presu_2099_0')).propietario)).toBe('socio');
-  expect(await page.evaluate(()=>({personal:APPIDataSync.cloudDataKey('appi_keep_notas'),shared:APPIDataSync.cloudDataKey('equipoData')}))).toEqual({personal:'persona_socio__appi_keep_notas',shared:'equipoData'});
+  expect(await page.evaluate(()=>({personal:APPIDataSync.cloudDataKey('appi_keep_notas'),shared:APPIDataSync.cloudDataKey('equipoData'),acciones:APPIDataSync.cloudDataKey('appi_acciones_v1_x')}))).toEqual({personal:'persona_socio__appi_keep_notas',shared:'equipoData',acciones:'appi_acciones_v1_x'});
+  expect(await page.evaluate(()=>APPIDataSync.isSharedKey('appi_acciones_v1_x'))).toBe(true);
   await page.evaluate(()=>{
     localStorage.setItem('appi_keep_notas',JSON.stringify([{id:1,texto:'Nota del socio'}]));
     localStorage.setItem('equipoData',JSON.stringify({titular:null,personas:[],raices:[]}));

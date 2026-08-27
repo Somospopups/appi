@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "398.0.0",
-  "cacheName": "appi-v398-partido",
+  "version": "399.0.0",
+  "cacheName": "appi-v399-lista-cuenta",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

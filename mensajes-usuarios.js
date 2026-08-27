@@ -16,6 +16,8 @@
 
    Jornada de usuarios (v397): las 10 de hoy, mismo tope que WhatsApp.
    Partido del día (v398): ganar es hacer las que hay (✓). La ✗ no suma.
+   Lista de la cuenta (v399): titular y socio ven las mismas 10. Si uno
+   ya la hizo, al otro no le queda pendiente. El partido es de la casa.
    Sin tareas no hay partido y la racha no se corta.
    Cada día se arman hasta CUPO_DIA acciones, en este orden:
      1. cumpleaños de hoy (entran primero y cuentan)
@@ -1822,6 +1824,10 @@
     montar: montar,
     pintarFichas: pintarFichas
   };
+
+  window.addEventListener('appi-datasync-applied', function(){
+    try{ pintarHoy(); pintarFichas(); }catch(e){}
+  });
 
   if (document.readyState === 'complete') envolver();
   else window.addEventListener('load', envolver);

@@ -4,8 +4,8 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
-- Versión: **v398 · Segura**.
-- Caché de la app: `appi-v398-partido` (se renueva al abrir APPI).
+- Versión: **v399 · Segura**.
+- Caché de la app: `appi-v399-lista-cuenta` (se renueva al abrir APPI).
 - Publicación: [https://somospopups.github.io/appi/](https://somospopups.github.io/appi/)
 - Acceso por número de distribuidor y contraseña.
 - Acceso administrador POPUPS mediante el candado, sin DIP ni número de distribuidor.
@@ -54,6 +54,11 @@ Descendente: es el PB personal del titular (figura primero; si hay socio,
 ese segundo nombre no se usa). Si todavía no está la planilla, se ve un
 guión y un toque abre Mi Equipo. Los invitados siguen a mano. APPI no
 inventa un número.
+
+## Una sola lista (v399)
+
+Titular y socio ven las mismas 10. Si uno ya la hizo (✓), al otro no le
+queda pendiente. El partido es de la casa: entre los dos llenan el día.
 
 ## El partido de hoy (v398)
 
@@ -177,6 +182,7 @@ Una cuenta puede tener un titular y, opcionalmente, un socio. Ambos usan el mism
 - El Home saluda con **Hola + nombre**.
 - Planificación, presupuesto, Siete Pasos, ruedas, contactos, notas e Histórico son personales.
 - Mi Equipo y Garantías cargados mediante Excel se comparten.
+- Las 10 de hoy son de la cuenta: si uno ya le escribió a alguien, al otro no le aparece. El partido también es de los dos.
 - Mi Encuesta y Mi Gestión también se comparten; cada invitación conserva el nombre de quien la envió.
 - La Grabadora continúa siendo local en cada dispositivo.
 - Cada persona puede vincular un teléfono; las llamadas van al teléfono de la persona activa.

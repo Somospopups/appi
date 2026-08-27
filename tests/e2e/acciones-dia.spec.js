@@ -8,6 +8,10 @@ const fs = require('fs');
 test('las marcas del día se sincronizan: la clave está en data-sync', () => {
   const js = fs.readFileSync('data-sync.js', 'utf8');
   expect(js).toContain("'appi_acciones_v1_'");
+  // v399: una sola lista para titular y socio.
+  expect(js).toContain('isAccionesKey');
+  expect(js).toContain('mergeAccionesValue');
+  expect(js).toContain("PERSON_PREFIX+'appi_acciones_v1_'");
 });
 
 test('la migración del cumplimiento existe y solo responde al admin', () => {

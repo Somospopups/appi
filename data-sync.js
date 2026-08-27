@@ -19,7 +19,7 @@ const PREFIXES=[
   'appi_suenos_v1_','appi_porque_v1_','appi_stock_v1_','appi_prestamos_v1_','appi_cal_tareas_v1_','appi_tarjetas_v1_',
   'appi_acciones_v1_','appi_agenda_personal_v1_','appi_wa_cuidado_','appi_ducha_rinnova_v1_','appi_metodo_envio_v1_','appi_metodo_envio_v2_'
 ];
-const state={ready:false,userId:'',workspaceId:'',personType:'titular',values:{},changedAt:{},dirty:new Set(),deleted:new Set(),cacheTimer:null,syncTimer:null,syncing:false,lastError:''};
+const state={ready:false,userId:'',workspaceId:'',personType:'titular',values:{},changedAt:{},dirty:new Set(),deleted:new Set(),dropCloudKeys:new Set(),cacheTimer:null,syncTimer:null,syncing:false,lastError:''};
 const nativeSet=Storage.prototype.setItem;
 const nativeRemove=Storage.prototype.removeItem;
 
@@ -29,13 +29,53 @@ function isDataKey(key){
   return PREFIXES.some(prefix=>key.startsWith(prefix));
 }
 function activePersonType(){const person=window.APPIAuth&&window.APPIAuth.activePerson?window.APPIAuth.activePerson():null;return person&&person.tipo==='socio'?'socio':'titular'}
-function isSharedKey(key){return SHARED_KEYS.has(String(key||''))}
+function isAccionesKey(key){return String(key||'').startsWith('appi_acciones_v1_')}
+function accionesLegacyCloudKey(key){return String(key||'').startsWith(PERSON_PREFIX+'appi_acciones_v1_')}
+function isSharedKey(key){
+  key=String(key||'');
+  return SHARED_KEYS.has(key)||isAccionesKey(key);
+}
 function cloudDataKey(key,personType=state.personType){return personType==='socio'&&!isSharedKey(key)?PERSON_PREFIX+key:key}
 function localDataKey(cloudKey,personType=state.personType){
   const key=String(cloudKey||'');
   if(isSharedKey(key))return key;
+  // v399: las marcas que el socio tenía aparte entran a la lista única de la cuenta.
+  if(accionesLegacyCloudKey(key))return key.slice(PERSON_PREFIX.length);
   if(personType==='socio')return key.startsWith(PERSON_PREFIX)&&isDataKey(key.slice(PERSON_PREFIX.length))?key.slice(PERSON_PREFIX.length):'';
   return !key.startsWith(PERSON_PREFIX)&&isDataKey(key)?key:'';
+}
+function parseJsonObj(raw){
+  try{const o=JSON.parse(raw||'{}');return o&&typeof o==='object'&&!Array.isArray(o)?o:{};}catch(e){return {};}
+}
+function newerMarca(a,b){
+  if(!a)return b;if(!b)return a;
+  return String(a.at||'')>=String(b.at||'')?a:b;
+}
+function mergeAccionesValue(left,right){
+  const a=parseJsonObj(left),b=parseJsonObj(right);
+  const completadas={};
+  new Set([...Object.keys(a.completadas||{}),...Object.keys(b.completadas||{})]).forEach(k=>{
+    completadas[k]=newerMarca((a.completadas||{})[k],(b.completadas||{})[k]);
+  });
+  const dias={};
+  new Set([...Object.keys(a.dias||{}),...Object.keys(b.dias||{})]).forEach(k=>{
+    const x=(a.dias||{})[k]||{},y=(b.dias||{})[k]||{},marcas={};
+    new Set([...Object.keys(x.marcas||{}),...Object.keys(y.marcas||{})]).forEach(m=>{
+      marcas[m]=newerMarca((x.marcas||{})[m],(y.marcas||{})[m]);
+    });
+    let hechas=0,noHechas=0;
+    Object.keys(marcas).forEach(m=>{const e=marcas[m]&&marcas[m].e;if(e==='hecha')hechas++;else if(e==='no_hecha')noHechas++;});
+    const total=Math.max(Number(x.total)||0,Number(y.total)||0,Object.keys(marcas).length);
+    dias[k]={marcas,total,hechas,noHechas,ganado:!!(total&&hechas===total)};
+  });
+  return JSON.stringify({dias,completadas});
+}
+function rememberLegacyAcciones(cloudKeys,personType=state.personType){
+  (cloudKeys||[]).forEach(cloudKey=>{
+    state.dropCloudKeys.add(cloudKey);
+    const localKey=localDataKey(cloudKey,personType);
+    if(localKey)state.dirty.add(localKey);
+  });
 }
 function collect(){
   const values={};
@@ -116,14 +156,19 @@ async function cloudFetch(path,options={}){
 }
 async function pullCloud(personType=state.personType){
   const rows=await cloudFetch('/rest/v1/appi_datos?select=data_key,data,updated_at&order=data_key.asc');
-  const values={},changedAt={};
+  const values={},changedAt={},dropCloudKeys=[];
   for(const row of rows||[]){
-    const key=localDataKey(row.data_key,personType);if(!key)continue;
+    const cloudKey=String(row.data_key||'');
+    const key=localDataKey(cloudKey,personType);if(!key)continue;
     const value=row.data&&Object.prototype.hasOwnProperty.call(row.data,'value')?row.data.value:null;
-    if(value!=null)values[key]=String(value);
-    changedAt[key]=new Date(row.updated_at||0).getTime()||0;
+    if(value!=null){
+      if(values[key]!=null&&isAccionesKey(key))values[key]=mergeAccionesValue(values[key],String(value));
+      else values[key]=String(value);
+    }
+    changedAt[key]=Math.max(changedAt[key]||0,new Date(row.updated_at||0).getTime()||0);
+    if(accionesLegacyCloudKey(cloudKey))dropCloudKeys.push(cloudKey);
   }
-  return {values,changedAt};
+  return {values,changedAt,dropCloudKeys};
 }
 function merge(local,remote,preferLocal=false){
   const values={},changedAt={},dirty=[];
@@ -131,14 +176,31 @@ function merge(local,remote,preferLocal=false){
   for(const key of keys){
     const localHas=Object.prototype.hasOwnProperty.call(local.values||{},key),remoteHas=Object.prototype.hasOwnProperty.call(remote.values||{},key);
     const lt=Number(local.changedAt&&local.changedAt[key])||0,rt=Number(remote.changedAt&&remote.changedAt[key])||0;
+    if(isAccionesKey(key)&&localHas&&remoteHas){
+      const merged=mergeAccionesValue(local.values[key],remote.values[key]);
+      values[key]=merged;changedAt[key]=Math.max(lt,rt,Date.now());
+      if(merged!==String(remote.values[key]||''))dirty.push(key);
+      continue;
+    }
     const useLocal=localHas&&(!remoteHas||preferLocal||lt>rt);
     if(useLocal){values[key]=local.values[key];changedAt[key]=lt||Date.now();if(!remoteHas||local.values[key]!==remote.values[key])dirty.push(key)}
     else if(remoteHas){values[key]=remote.values[key];changedAt[key]=rt}
   }
   return {values,changedAt,dirty};
 }
+async function dropLegacyAcciones(){
+  const userId=state.userId||(window.APPIAuth&&window.APPIAuth.userId?window.APPIAuth.userId():'');
+  if(!userId||!state.dropCloudKeys.size)return;
+  const keys=[...state.dropCloudKeys];
+  for(const key of keys){
+    await cloudFetch(`/rest/v1/appi_datos?user_id=eq.${encodeURIComponent(userId)}&data_key=eq.${encodeURIComponent(key)}`,{method:'DELETE'});
+    state.dropCloudKeys.delete(key);
+  }
+}
 async function pullLatest(){
-  const remote=await pullCloud(state.personType),merged=merge({values:state.values,changedAt:state.changedAt},remote,false);
+  const remote=await pullCloud(state.personType);
+  rememberLegacyAcciones(remote.dropCloudKeys);
+  const merged=merge({values:state.values,changedAt:state.changedAt},remote,false);
   state.values={...(merged.values||{})};state.changedAt={...(merged.changedAt||{})};merged.dirty.forEach(key=>state.dirty.add(key));
   applyValues(state.values);await cachePut(cacheRecord()).catch(()=>{});
   try{window.dispatchEvent(new CustomEvent('appi-datasync-applied'))}catch(e){}
@@ -160,19 +222,21 @@ async function start({claimLegacy=true}={}){
   }else if(!previousWorkspace&&claimLegacy&&personType==='titular'&&hasMeaningfulData(working)&&!hasMeaningfulData(local.values)){
     const now=Date.now();local={values:working,changedAt:{}};Object.keys(working).forEach(key=>local.changedAt[key]=now);
   }
-  let remote={values:{},changedAt:{}},online=true;
-  state.userId=userId;state.workspaceId=workspaceId;state.personType=personType;state.lastError='';
+  let remote={values:{},changedAt:{},dropCloudKeys:[]},online=true;
+  state.userId=userId;state.workspaceId=workspaceId;state.personType=personType;state.lastError='';state.dropCloudKeys=new Set();
   try{remote=await pullCloud(personType)}catch(error){online=false;state.lastError=error.message}
   const preferLocal=hasMeaningfulData(local.values)&&!hasMeaningfulData(remote.values);
   const merged=online?merge(local,remote,preferLocal):local;
   state.values={...(merged.values||{})};state.changedAt={...(merged.changedAt||{})};state.dirty=new Set(merged.dirty||[]);state.deleted=new Set();
+  rememberLegacyAcciones(remote.dropCloudKeys,personType);
   applyValues(state.values);
   nativeRemove.call(localStorage,AUDIO_META_KEY);
   const userAudio=localStorage.getItem(audioMetaKey(workspaceId));if(userAudio!=null)nativeSet.call(localStorage,AUDIO_META_KEY,userAudio);
   nativeSet.call(localStorage,ACTIVE_USER_KEY,workspaceId);state.ready=true;
   await cachePut(cacheRecord()).catch(()=>{});
   try{window.dispatchEvent(new CustomEvent('appi-datasync-applied'))}catch(e){}
-  if(online&&state.dirty.size)await syncNow(false);
+  if(online&&(state.dirty.size||state.deleted.size))await syncNow(false);
+  else if(online&&state.dropCloudKeys.size)await dropLegacyAcciones();
   return {ready:true,online,claimedLegacy:preferLocal,keys:Object.keys(state.values).length,personType};
 }
 async function syncNow(force=false){
@@ -180,7 +244,14 @@ async function syncNow(force=false){
   const userId=state.userId||window.APPIAuth.userId();if(!userId)return false;
   const keys=[...state.dirty];
   const deleted=[...state.deleted];
-  if(!keys.length&&!deleted.length){if(force)await pullLatest();return true;}
+  if(!keys.length&&!deleted.length){
+    if(force){
+      await pullLatest();
+      if(state.dirty.size||state.deleted.size)return syncNow(false);
+      if(state.dropCloudKeys.size)await dropLegacyAcciones();
+    }
+    return true;
+  }
   state.syncing=true;
   try{
     if(keys.length){
@@ -189,7 +260,10 @@ async function syncNow(force=false){
       if(rows.length)await cloudFetch('/rest/v1/appi_datos?on_conflict=user_id,data_key',{method:'POST',headers:{'Content-Type':'application/json',Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify(rows)});
     }
     for(const key of deleted)await cloudFetch(`/rest/v1/appi_datos?user_id=eq.${encodeURIComponent(userId)}&data_key=eq.${encodeURIComponent(cloudDataKey(key))}` ,{method:'DELETE'});
-    keys.forEach(key=>state.dirty.delete(key));deleted.forEach(key=>state.deleted.delete(key));state.lastError='';if(force)await pullLatest();else await cachePut(cacheRecord()).catch(()=>{});return true;
+    keys.forEach(key=>state.dirty.delete(key));deleted.forEach(key=>state.deleted.delete(key));state.lastError='';
+    if(force)await pullLatest();else await cachePut(cacheRecord()).catch(()=>{});
+    if(state.dropCloudKeys.size)await dropLegacyAcciones();
+    return true;
   }catch(error){state.lastError=error.message;throw error}
   finally{state.syncing=false}
 }
@@ -199,7 +273,7 @@ async function logoutAndLock({removeCache=false}={}){
   const userId=state.userId,workspaceId=state.workspaceId,audio=localStorage.getItem(AUDIO_META_KEY);
   if(removeCache&&typeof window.clearGrabadoraAudios==='function')await window.clearGrabadoraAudios();
   if(workspaceId&&audio!=null)nativeSet.call(localStorage,audioMetaKey(workspaceId),audio);
-  applyValues({});nativeRemove.call(localStorage,AUDIO_META_KEY);nativeRemove.call(localStorage,ACTIVE_USER_KEY);state.ready=false;state.userId='';state.workspaceId='';state.personType='titular';state.values={};state.changedAt={};state.dirty.clear();state.deleted.clear();
+  applyValues({});nativeRemove.call(localStorage,AUDIO_META_KEY);nativeRemove.call(localStorage,ACTIVE_USER_KEY);state.ready=false;state.userId='';state.workspaceId='';state.personType='titular';state.values={};state.changedAt={};state.dirty.clear();state.deleted.clear();state.dropCloudKeys.clear();
   if(removeCache&&workspaceId){await cacheDelete(workspaceId).catch(()=>{});nativeRemove.call(localStorage,audioMetaKey(workspaceId))}
   await window.APPIAuth.logout();
   return {synced,cacheRemoved:removeCache};
@@ -207,9 +281,13 @@ async function logoutAndLock({removeCache=false}={}){
 function status(){return {ready:state.ready,userId:state.userId,workspaceId:state.workspaceId,personType:state.personType,dirty:state.dirty.size,deleted:state.deleted.size,syncing:state.syncing,lastError:state.lastError,audioLocalOnly:true}}
 
 window.addEventListener('online',()=>{if(state.ready)syncNow(false).catch(error=>console.warn('Sincronización al reconectar',error))});
-document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'&&state.ready)syncNow(false).catch(()=>{})});
+document.addEventListener('visibilitychange',()=>{
+  if(!state.ready)return;
+  if(document.visibilityState==='hidden')syncNow(false).catch(()=>{});
+  if(document.visibilityState==='visible')syncNow(true).catch(()=>{});
+});
 window.addEventListener('pagehide',()=>{if(state.ready)syncNow(false).catch(()=>{})});
-setInterval(()=>{if(state.ready&&navigator.onLine&&(state.dirty.size||state.deleted.size))syncNow(false).catch(()=>{})},30000);
+setInterval(()=>{if(state.ready&&navigator.onLine&&(state.dirty.size||state.deleted.size||state.dropCloudKeys.size))syncNow(false).catch(()=>{})},30000);
 
-window.APPIDataSync={isDataKey,isSharedKey,cloudDataKey,localDataKey,collect,start,syncNow,logoutAndLock,status,cacheDelete};
+window.APPIDataSync={isDataKey,isSharedKey,isAccionesKey,cloudDataKey,localDataKey,mergeAccionesValue,collect,start,syncNow,logoutAndLock,status,cacheDelete};
 })();
