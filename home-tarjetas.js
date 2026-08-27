@@ -225,6 +225,34 @@
     }catch(e){}
     return [];
   }
+  function enLasDiez(u){
+    try{
+      if (window.APPIMensajes && typeof window.APPIMensajes.enJornada === 'function'){
+        return window.APPIMensajes.enJornada(u);
+      }
+    }catch(e){}
+    return true;
+  }
+  function topeHoy(){
+    try{
+      if (window.APPITel && window.APPITel.cuidado && window.APPITel.cuidado.estado){
+        var e = window.APPITel.cuidado.estado('');
+        if (e && e.tope) return e.tope;
+      }
+    }catch(e){}
+    try{ if (window.APPIMensajes && window.APPIMensajes.CUPO_DIA) return window.APPIMensajes.CUPO_DIA; }catch(e){}
+    return 10;
+  }
+  function usadosWA(){
+    try{
+      if (window.APPITel && window.APPITel.cuidado && window.APPITel.cuidado.estado){
+        return window.APPITel.cuidado.estado('').usados || 0;
+      }
+    }catch(e){}
+    return 0;
+  }
+  function quedanLinea(){ return Math.max(0, topeHoy() - usadosWA()); }
+  function textoCupo(){ return usadosWA() + ' / ' + topeHoy(); }
   function referidosPedidosMes(){
     var d = new Date();
     var clave = 'appi_referidos_mes_' + uid() + '_' + d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
@@ -238,7 +266,7 @@
     st.set.push(n);
     try{ localStorage.setItem(st.clave, JSON.stringify(st.set)); }catch(e){}
   }
-  function colaCanje(){ return colaMensajes('renovacion'); }
+  function colaCanje(){ return colaMensajes('renovacion').filter(enLasDiez); }
   var RINNOVA_DESDE = '2026-08-26';
   var RINNOVA_HASTA = '2026-08-30';
   var LINK_RINNOVA = 'https://www.youtube.com/watch?v=lM2XjEVCPFI';
@@ -285,7 +313,7 @@
     if (!ventanaRinnova()) return [];
     var st = rinnovaPedidos();
     return listaUsuariosHome().filter(function(u){
-      if (!esDucha(u)) return false;
+      if (!esDucha(u) || !enLasDiez(u)) return false;
       var tel = telDeUsuario(u);
       return tel && st.set.indexOf(tel) < 0 && st.set.indexOf(String(tel).replace(/\D/g, '')) < 0;
     });
@@ -312,6 +340,7 @@
   function colaVigentesParaReferido(){
     var st = referidosPedidosMes();
     return colaMensajes('checkin').filter(function(u){
+      var tel = telD;
       var tel = telDeUsuario(u);
       return tel && st.set.indexOf(tel) < 0;
     });
@@ -351,7 +380,7 @@
       cta: 'Ir con ' + (pilaDe(pres[0].nombre) || 'ella'),
       go: abrirContacto(pres[0])
     };
-    var canjes = colaCanje();
+    var canjes = quedanLinea() ? colaCanje() : [];
     if (canjes[0]) return {
       motor: 'canje', tipo: 'canje', persona: canjes[0],
       titulo: 'Canje listo: ' + (nombreLindo(canjes[0].usuario) || 'un cliente'),
@@ -401,7 +430,7 @@
       cta: 'Ir con ' + (pilaDe(segs[0].nombre) || 'esa persona'),
       go: abrirContacto(segs[0])
     };
-    var refs = colaVigentesParaReferido();
+    var refs = quedanLinea() ? colaVigentesParaReferido() : [];
     if (refs[0]) return {
       motor: 'equipo', tipo: 'referido', persona: refs[0],
       titulo: 'Pedile un nombre a ' + (pilaDe(refs[0].usuario) || 'un cliente'),
@@ -425,7 +454,7 @@
     try{
       if (window.APPIMensajes && window.APPIMensajes.resumenHoy){
         var r = window.APPIMensajes.resumenHoy();
-        if (r.total) chips.push('✓ ' + r.hechas + ' de ' + r.total + ' acciones');
+        if (r.total) chips.push('✓ ' + r.hechas + ' / ' + topeHoy());
       }
     }catch(e){}
     try{
@@ -458,6 +487,7 @@
   }
 
   function tarjetaCanje(){
+    if (!quedanLinea()) return null;
     var lista = colaCanje();
     if (!lista.length) return null;
     var filas = [], items = [];
@@ -712,7 +742,9 @@
       });
       return {
         cat: 'usuarios', icono: '💧', kicker: 'Usuarios',
-        titulo: r.pendientes === 1 ? 'Queda 1 acción del día sin marcar' : 'Quedan ' + r.pendientes + ' acciones del día sin marcar',
+        titulo: r.pendientes === 1
+        ? 'Queda 1 de ' + topeHoy()
+        : 'Quedan ' + r.pendientes + ' de ' + topeHoy(),
         html: '<ul class="ht-lista">' + filas.join('') + '</ul>' +
               '<div class="ht-chips"><span>✓ ' + r.hechas + '</span><span>✗ ' + r.noHechas + '</span><span>quedan ' + r.pendientes + '</span></div>' +
               '<p class="ht-nota">Tocá un motivo y se abre el carrusel para mandar y marcar ✓/✗.</p>',
@@ -751,7 +783,19 @@
     };
   }
 
+  function tarjetaLlegamos(){
+    if (quedanLinea() > 0) return null;
+    var tope = topeHoy();
+    return {
+      cat: 'llegamos', icono: '✅', kicker: 'Tope de WhatsApp',
+      titulo: 'Hoy llegamos: ' + tope + ' de ' + tope,
+      html: '<p class=\"ht-frase\">Escribiste a ' + tope + ' personas distintas. Mañana otros ' + tope + '. Así WhatsApp no te toca la línea.</p>',
+      cta: null
+    };
+  }
+
   function tarjetaDuchaRinnova(){
+    if (!quedanLinea()) return null;
     var lista = colaDuchaRinnova();
     if (!lista.length) return null;
     var filas = [], items = [];
@@ -797,6 +841,7 @@
       'body.dark #htOverlay{background:linear-gradient(160deg,rgba(91,141,239,.13),rgba(160,107,255,.11));border-color:rgba(255,255,255,.08)}',
       '.ht-top{display:flex;align-items:center;gap:10px;padding:0 4px 10px}',
       '.ht-top b{font-size:14px;color:#30303d}.ht-top span{font-size:11px;color:#777887;font-weight:800;margin-left:auto;margin-right:2px}',
+      '.ht-tope{display:block;font-size:10px;color:#777887;font-weight:800;letter-spacing:.2px}',
       'body.dark .ht-top b{color:#f2f2f7}',
       '.ht-centro{display:flex;flex-direction:column;align-items:center;gap:11px}',
       '.ht-deck{position:relative;width:100%;max-width:400px;height:min(56vh,440px);margin:0 auto}',
@@ -879,7 +924,7 @@
     if (previo) previo.remove();
     var ov = document.createElement('div');
     ov.id = 'htOverlay';
-    ov.innerHTML = '<div class="ht-top"><div><b>🔔 Notificaciones</b></div><span id="htPos"></span></div>' +
+    ov.innerHTML = '<div class="ht-top"><div><b id="htCupo">Hoy ' + esc(textoCupo()) + '</b><small class="ht-tope">tope de WhatsApp</small></div><span id="htPos"></span></div>' +
       '<div class="ht-centro"><div class="ht-deck" id="htDeck"></div>' +
       '<div class="ht-hint">← Deslizá para un lado o para el otro: las tarjetas dan la vuelta →</div></div>';
     home.insertBefore(ov, home.firstChild);
@@ -932,6 +977,8 @@
     if (!mazo) return;
     var deck = document.getElementById('htDeck');
     var pos = document.getElementById('htPos');
+    var cupoEl = document.getElementById('htCupo');
+    if (cupoEl) cupoEl.textContent = 'Hoy ' + textoCupo();
     if (!deck) return;
     deck.querySelectorAll('.ht-card:not(.ht-fantasma)').forEach(function(n){ n.remove(); });
     var len = mazo.tarjetas.length;
@@ -1168,7 +1215,11 @@
     ventanaRinnova: ventanaRinnova,
     esDucha: esDucha,
     colaDuchaRinnova: colaDuchaRinnova,
-    tarjetaMetodoEnvio: tarjetaMetodoEnvio
+    colaCanje: colaCanje,
+    enLasDiez: enLasDiez,
+    topeHoy: topeHoy,
+    tarjetaMetodoEnvio: tarjetaMetodoEnvio,
+    tarjetaLlegamos: tarjetaLlegamos
   };
 
   if (document.readyState === 'complete') envolver();

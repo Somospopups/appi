@@ -84,6 +84,38 @@ test('si no hay venta, el canje entra al mazo y a Hoy te conviene', async ({ pag
   expect(r.canje).toContain('1 equipo');
 });
 
+test('con 15 canjes el mazo y la jornada sólo dan 10', async ({ page }) => {
+  const usuarios = [];
+  for (let i = 0; i < 15; i++) {
+    const vence = new Date(Date.now() - (40 + i) * 86400000).toISOString();
+    usuarios.push({
+      id: 20 + i, usuario: `CANJE, N${String(i + 1).padStart(2, '0')}`,
+      telf: `3515558${String(i + 1).padStart(3, '0')}`, domicilio: 'Belgrano 50',
+      localidad: 'Córdoba', producto: 'SENIOR 4', fVence: vence, estado: 'vencido'
+    });
+  }
+  await entrar(page, { usuarios });
+  const r = await page.evaluate(() => {
+    const grupos = window.APPIMensajes.deHoy();
+    const total = grupos.reduce((n, g) => n + g.gente.length, 0);
+    const canje = window.APPIHomeTarjetas.colaCanje();
+    const card = window.APPIHomeTarjetas.armarTarjetas().find(t => t.cat === 'canje');
+    return {
+      cupo: window.APPIMensajes.CUPO_DIA,
+      total,
+      canjeN: canje.length,
+      titulo: card && card.titulo,
+      tope: window.APPIHomeTarjetas.topeHoy()
+    };
+  });
+  expect(r.cupo).toBe(10);
+  expect(r.total).toBe(10);
+  expect(r.canjeN).toBe(10);
+  expect(r.tope).toBe(10);
+  expect(r.titulo).toContain('10');
+  expect(r.titulo).not.toContain('15');
+});
+
 test('sin trabajo real no se inventa la carta de Hoy ni la de Canje', async ({ page }) => {
   await entrar(page, { contactos: [], usuarios: [] });
   const cats = await page.evaluate(() => window.APPIHomeTarjetas.armarTarjetas().map(t => t.cat));

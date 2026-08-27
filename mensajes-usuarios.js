@@ -14,16 +14,17 @@
      - vencido hace < 1 año .... sólo renovación
      - vencido hace > 1 año .... nada
 
-   Jornada de usuarios (v361): el calendario ya no es la única fuente.
+   Jornada de usuarios (v397): las 10 de hoy, mismo tope que WhatsApp.
    Cada día se arman hasta CUPO_DIA acciones, en este orden:
-     1. cumpleaños de hoy (entran todos: es hoy o no es)
+     1. cumpleaños de hoy (entran primero y cuentan)
      2. garantía a 0–30 días, las más cercanas primero
      3. mantenimiento caído, los más viejos primero
      4. canje (vencido < 1 año), los más antiguos primero
      5. check-in a vigentes sin escribirles en 90 días
    Si el calendario está flojo, los usuarios rellenan. Si hay 20
-   vencimientos, se reparte: hoy salen 8, mañana los que siguen.
-   Una persona no aparece dos veces el mismo día.
+   vencimientos, se reparte: hoy salen 10, mañana los que siguen.
+   Una persona no aparece dos veces el mismo día. El mazo del Home
+   no ofrece a nadie que no esté en estas 10.
    ============================================================ */
 (function(){
   'use strict';
@@ -32,7 +33,7 @@
   var LINK_CANJE = 'https://www.youtube.com/watch?v=evwYO9-o5MY';
   var MESES_MANTENIMIENTO = 6;   // el ciclo que pidió el usuario
   var DIAS_ANIO = 365;
-  var CUPO_DIA = 8;              // techo diario: se siente jornada, no satura WhatsApp
+  var CUPO_DIA = 10;             // las 10 de hoy: mismo tope que WhatsApp
   var DIAS_CHECKIN = 90;         // vigentes sin contacto: vuelven a la cola
 
   /* ---------- plantillas de fábrica ----------
@@ -721,7 +722,7 @@
   var MOTIVOS = [
     {
       id: 'cumple', icono: '🎂', plantilla: 'cumple', nombre: 'Cumpleaños',
-      uno: 'cumple años', varios: 'cumplen años', capa: 1, cupo: false,
+      uno: 'cumple años', varios: 'cumplen años', capa: 1, cupo: true,
       aplica: function(u){ return grupoDe(u) === 'vigente' && cumpleHoy(u); }
     },
     {
@@ -807,10 +808,8 @@
     return dias(hoy(), new Date(d.getFullYear(), d.getMonth(), d.getDate())) === 0;
   }
 
-  // La lista completa del día: hasta CUPO_DIA personas, con marca o sin ella,
-  // menos los ciclos ya resueltos antes de hoy. Los cumpleaños entran todos.
-  // El resto se reparte por urgencia para que un día flojo no quede vacío y
-  // un día cargado no tire 40 WhatsApp de golpe.
+  // Las 10 de hoy: ni una más. Los cumpleaños entran primero y cuentan.
+  // El resto se reparte por urgencia. Mismo tope que WhatsApp.
   function deHoy(){
     var usados = {};
     var grupos = [];
@@ -826,13 +825,27 @@
       grupos.push({ motivo: motivo, gente: gente });
       return gente.length;
     }
-    var nCumple = tomar(motivoPorId('cumple'), null);
-    var faltan = Math.max(0, CUPO_DIA - nCumple);
-    ['porvencer', 'retro', 'renovacion', 'checkin'].forEach(function(id){
+    var faltan = CUPO_DIA;
+    ['cumple', 'porvencer', 'retro', 'renovacion', 'checkin'].forEach(function(id){
       if (faltan <= 0) return;
       faltan -= tomar(motivoPorId(id), faltan);
     });
     return grupos;
+  }
+  function telsJornada(){
+    var s = {};
+    deHoy().forEach(function(g){
+      g.gente.forEach(function(u){
+        var t = telefonoDe(u);
+        if (t) s[t] = true;
+      });
+    });
+    return s;
+  }
+  function enJornada(u){
+    var t = telefonoDe(u);
+    if (!t) return false;
+    return !!telsJornada()[t];
   }
 
   // Para el carrusel: sólo los que todavía no tienen ✓ ni ✗.
@@ -871,8 +884,8 @@
       stats.parentNode.insertBefore(host, stats);
     }
     var titulo = res.pendientes === 0
-      ? '🎉 Día completo: las ' + res.total + (res.total === 1 ? ' acción' : ' acciones') + ' están marcadas'
-      : 'Hoy tenés ' + res.total + (res.total === 1 ? ' mensaje' : ' mensajes') + ' para mandar';
+      ? '🎉 Día completo: las ' + res.total + ' de ' + CUPO_DIA + ' están hechas'
+      : 'Hoy: ' + res.total + ' de ' + CUPO_DIA + ' · tope de WhatsApp';
     var html = '<div class="mu-hoy-top"><span class="mu-hoy-ico">📋</span>' +
       '<div class="mu-hoy-heading"><b>' + titulo + '</b>' +
       '<span class="mu-hoy-fecha">📅 ' + esc(fmtFecha(hoy())) + '</span></div>' +
@@ -1724,6 +1737,8 @@
     mandar: mandar,
     pendientes: pendientes,
     deHoy: deHoy,
+    enJornada: enJornada,
+    telsJornada: telsJornada,
     colaMotivo: colaMotivo,
     CUPO_DIA: CUPO_DIA,
     DIAS_CHECKIN: DIAS_CHECKIN,

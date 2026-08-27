@@ -339,7 +339,7 @@ test('la franja del día junta los pendientes y no inventa ninguno', async ({ pa
   await entrar(page, PENDIENTES);
   const hoy = page.locator('#muHoy');
   await expect(hoy).toBeVisible();
-  await expect(hoy).toContainText('3 mensajes');
+  await expect(hoy).toContainText('3 de 10');
 
   // Un renglón por motivo, con su cuenta.
   await expect(page.locator('[data-mu-hoy]')).toHaveCount(3);
@@ -495,7 +495,7 @@ test('la regla roja de vencida existe en los estilos', async ({ page }) => {
 test('el contactado no desaparece: queda marcado ✓ y la franja dura todo el día', async ({ page }) => {
   await entrar(page, PENDIENTES);
   await page.evaluate(() => { window.APPIWhatsApp.abrir = () => {}; });
-  await expect(page.locator('#muHoy')).toContainText('3 mensajes');
+  await expect(page.locator('#muHoy')).toContainText('3 de 10');
 
   await page.locator('[data-mu-hoy="cumple"]').click();
   await page.locator('#muFilaEnviar').click();
@@ -504,7 +504,7 @@ test('el contactado no desaparece: queda marcado ✓ y la franja dura todo el d�
   await page.locator('#muFinCerrar').click();
 
   // La franja no se achica: la acción hecha queda a la vista con su ✓.
-  await expect(page.locator('#muHoy')).toContainText('3 mensajes');
+  await expect(page.locator('#muHoy')).toContainText('3 de 10');
   await expect(page.locator('#muHoy .mu-hoy-res')).toContainText('✓ 1');
   // El motivo completado deja de ser un botón: ya no hay nada para abrir ahí.
   await expect(page.locator('[data-mu-hoy="cumple"]')).toHaveCount(0);
@@ -843,7 +843,7 @@ function usuariosDe(n, extra) {
   return out;
 }
 
-test('el cupo diario es 8 y no inventa más', async ({ page }) => {
+test('el cupo diario es 10 y no inventa más', async ({ page }) => {
   await entrar(page, usuariosDe(20));
   const r = await page.evaluate(() => {
     const M = window.APPIMensajes;
@@ -851,11 +851,11 @@ test('el cupo diario es 8 y no inventa más', async ({ page }) => {
     const total = grupos.reduce((n, g) => n + g.gente.length, 0);
     return { cupo: M.CUPO_DIA, total, motivos: grupos.map(g => g.motivo.id), pendientes: M.resumenHoy().pendientes };
   });
-  expect(r.cupo).toBe(8);
-  expect(r.total).toBe(8);
-  expect(r.pendientes).toBe(8);
+  expect(r.cupo).toBe(10);
+  expect(r.total).toBe(10);
+  expect(r.pendientes).toBe(10);
   expect(r.motivos).toEqual(['checkin']);
-  await expect(page.locator('#muHoy')).toContainText('8 mensajes');
+  await expect(page.locator('#muHoy')).toContainText('10 de 10');
 });
 
 test('usuarios recién comprados siguen sin franja: no se inventa trabajo', async ({ page }) => {
@@ -892,7 +892,7 @@ test('el vencido hace más de un año sigue afuera aunque el día esté vacío',
   await expect(page.locator('#muHoy')).toHaveCount(0);
 });
 
-test('los cumpleaños entran todos aunque el cupo esté lleno', async ({ page }) => {
+test('los cumpleaños entran primero y cuentan en las 10', async ({ page }) => {
   const gente = usuariosDe(8);
   for (let i = 0; i < 3; i++) {
     gente.push({
@@ -917,10 +917,11 @@ test('los cumpleaños entran todos aunque el cupo esté lleno', async ({ page })
     return { por, total };
   });
   expect(r.por.cumple).toBe(3);
-  expect(r.total).toBe(8); // 3 cumples + 5 check-ins de usuarios viejos
+  expect(r.por.checkin).toBe(7);
+  expect(r.total).toBe(10); // 3 cumples + 7 check-ins; el 11 no entra
 });
 
-test('si hay 15 garantías por vencer, hoy salen las 8 más cercanas', async ({ page }) => {
+test('si hay 15 garantías por vencer, hoy salen las 10 más cercanas', async ({ page }) => {
   const gente = [];
   for (let i = 0; i < 15; i++) {
     const d = 2 + i; // 2, 3, … 16 días
@@ -947,9 +948,9 @@ test('si hay 15 garantías por vencer, hoy salen las 8 más cercanas', async ({ 
     };
   });
   expect(r.motivos).toEqual(['porvencer']);
-  expect(r.n).toBe(8);
+  expect(r.n).toBe(10);
   expect(r.primero).toBe('VENCE, D02');
-  expect(r.ultimo).toBe('VENCE, D09');
+  expect(r.ultimo).toBe('VENCE, D11');
 });
 
 test('una persona no aparece dos veces: gana el motivo más urgente', async ({ page }) => {
@@ -968,7 +969,7 @@ test('una persona no aparece dos veces: gana el motivo más urgente', async ({ p
   expect(r.tels).toEqual(['cumple:3515551001']);
 });
 
-test('marcar las 8 no mete a una novena el mismo día', async ({ page }) => {
+test('marcar las 10 no mete a una undécima el mismo día', async ({ page }) => {
   await entrar(page, usuariosDe(12));
   const r = await page.evaluate(() => {
     const M = window.APPIMensajes;
@@ -981,7 +982,7 @@ test('marcar las 8 no mete a una novena el mismo día', async ({ page }) => {
     return { antes, despues, pendientes: M.resumenHoy().pendientes, hechas: M.resumenHoy().hechas };
   });
   expect(r.antes).toEqual(r.despues);
-  expect(r.hechas).toBe(8);
+  expect(r.hechas).toBe(10);
   expect(r.pendientes).toBe(0);
 });
 

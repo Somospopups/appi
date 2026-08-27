@@ -4,8 +4,8 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
-- Versión: **v396 · Segura**.
-- Caché de la app: `appi-v396-sin-parque` (se renueva al abrir APPI).
+- Versión: **v397 · Segura**.
+- Caché de la app: `appi-v397-diez-tareas` (se renueva al abrir APPI).
 - Publicación: [https://somospopups.github.io/appi/](https://somospopups.github.io/appi/)
 - Acceso por número de distribuidor y contraseña.
 - Acceso administrador POPUPS mediante el candado, sin DIP ni número de distribuidor.
@@ -55,11 +55,11 @@ ese segundo nombre no se usa). Si todavía no está la planilla, se ve un
 guión y un toque abre Mi Equipo. Los invitados siguen a mano. APPI no
 inventa un número.
 
-## Jornada de usuarios (v361)
+## Las 10 de hoy (v397)
 
-En **Usuarios / Garantías** el día ya no depende sólo del calendario. APPI
-arma hasta **8 acciones** (los cumpleaños de hoy entran todos) y, si el
-calendario está flojo, rellena con los usuarios:
+En **Usuarios** y en el mazo del Home hay **10 tareas por día**: el mismo
+tope que WhatsApp. Los cumpleaños entran primero y cuentan. Si el
+calendario está flojo, se rellena con:
 
 1. Cumpleaños de hoy.
 2. Garantía que vence en 0–30 días (las más cercanas primero).
@@ -67,11 +67,10 @@ calendario está flojo, rellena con los usuarios:
 4. Canje: equipo vencido hace menos de 1 año.
 5. Check-in a vigentes a los que no se les escribe hace 90 días.
 
-Si hay 20 vencimientos, no salen los 20: se reparte. Una persona no aparece
-dos veces el mismo día. El vencido hace más de un año sigue en Reactivación,
-afuera de esta cola. La franja y la tarjeta del Home **sólo se muestran si
-hay trabajo real**; unos usuarios recién cargados o todo al día deja la pantalla
-como estaba.
+Si hay 20 vencimientos, hoy salen 10. El mazo no ofrece a una undécima
+persona. La franja dice **Hoy: n de 10 · tope de WhatsApp**. El vencido
+hace más de un año sigue en Reactivación. Sin trabajo real, no se inventa
+carta ni franja.
 
 ## Agenda personal (v358)
 
