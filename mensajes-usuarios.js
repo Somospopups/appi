@@ -690,6 +690,7 @@
     d.dias[k].ganado = !!(r.total && r.hechas === r.total);
     limpiarViejos(d);
     guardarAcciones(d);
+    invalidarJornada();
     if (!silencioso){ try{ pintarHoy(); }catch(e){} }
   }
   function resumenCon(d){
@@ -707,6 +708,9 @@
     return { total: total, hechas: hechas, noHechas: noHechas, pendientes: pendientes };
   }
   function resumenHoy(){ return resumenCon(leerAcciones()); }
+  /* deHoy() recorre toda la planilla. Sin memo, el mazo lo llamaba
+     una vez por cliente (enJornada) y el Home se clavaba. */
+  var jornadaMemo = { gen: 0, genHecho: -1, deHoy: null, tels: null };
 
   /* Partido del día (v398): el marcador es hechas / las que hay.
      Ganar es hacerlas todas (✓). La ✗ no cuenta. Un día sin tareas
@@ -722,6 +726,11 @@
       ganado: r.total > 0 && r.hechas === r.total,
       enCurso: r.total > 0 && r.pendientes > 0 && r.hechas < r.total
     };
+  }
+  function invalidarJornada(){
+    jornadaMemo.gen++;
+    jornadaMemo.deHoy = null;
+    jornadaMemo.tels = null;
   }
   function registrarPartido(){
     var r = resumenHoy();
@@ -871,6 +880,7 @@
   // Las 10 de hoy: ni una más. Los cumpleaños entran primero y cuentan.
   // El resto se reparte por urgencia. Mismo tope que WhatsApp.
   function deHoy(){
+    if (jornadaMemo.genHecho === jornadaMemo.gen && jornadaMemo.deHoy) return jornadaMemo.deHoy;
     var usados = {};
     var grupos = [];
     function tomar(motivo, max){
@@ -890,9 +900,13 @@
       if (faltan <= 0) return;
       faltan -= tomar(motivoPorId(id), faltan);
     });
+    jornadaMemo.deHoy = grupos;
+    jornadaMemo.tels = null;
+    jornadaMemo.genHecho = jornadaMemo.gen;
     return grupos;
   }
   function telsJornada(){
+    if (jornadaMemo.genHecho === jornadaMemo.gen && jornadaMemo.tels) return jornadaMemo.tels;
     var s = {};
     deHoy().forEach(function(g){
       g.gente.forEach(function(u){
@@ -900,6 +914,8 @@
         if (t) s[t] = true;
       });
     });
+    jornadaMemo.tels = s;
+    jornadaMemo.genHecho = jornadaMemo.gen;
     return s;
   }
   function enJornada(u){
@@ -1803,6 +1819,7 @@
     deHoy: deHoy,
     enJornada: enJornada,
     telsJornada: telsJornada,
+    invalidarJornada: invalidarJornada,
     colaMotivo: colaMotivo,
     CUPO_DIA: CUPO_DIA,
     DIAS_CHECKIN: DIAS_CHECKIN,
@@ -1826,7 +1843,7 @@
   };
 
   window.addEventListener('appi-datasync-applied', function(){
-    try{ pintarHoy(); pintarFichas(); }catch(e){}
+    try{ invalidarJornada(); pintarHoy(); pintarFichas(); }catch(e){}
   });
 
   if (document.readyState === 'complete') envolver();

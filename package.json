@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "400.0.0",
-  "cacheName": "appi-v400-icono",
+  "version": "401.0.0",
+  "cacheName": "appi-v401-home-suelto",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

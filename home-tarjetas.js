@@ -955,27 +955,33 @@
   }
 
   var inlineAbierto = false;
+  var abriendo = false;
   function abrir(reusar){
+    if (abriendo) return false;
     if (!sesionDeDistribuidor()) return false;
-    css();
-    var home = document.getElementById('homeLimpio');
-    if (!home) return false;
-    if (!(reusar && mazo && mazo.tarjetas && mazo.tarjetas.length)){
-      var tarjetas = armarTarjetas();
-      if (!tarjetas.length) return false;
-      mazo = { tarjetas: tarjetas, i: 0 };
-    }
-    var previo = document.getElementById('htOverlay');
-    if (previo) previo.remove();
-    var ov = document.createElement('div');
-    ov.id = 'htOverlay';
-    ov.innerHTML = '<div class="ht-top"><div><b id="htCupo">' + esc(textoMarcador()) + '</b><small class="ht-tope" id="htSubCupo">' + esc(textoSubMarcador()) + '</small></div><span id="htPos"></span></div>' +
-      '<div class="ht-centro"><div class="ht-deck" id="htDeck"></div>' +
-      '<div class="ht-hint">← Deslizá para un lado o para el otro: las tarjetas dan la vuelta →</div></div>';
-    home.insertBefore(ov, home.firstChild);
-    inlineAbierto = true;
-    pintar();
-    return true;
+    abriendo = true;
+    try{
+      css();
+      var home = document.getElementById('homeLimpio');
+      if (!home) return false;
+      if (!(reusar && mazo && mazo.tarjetas && mazo.tarjetas.length)){
+        var tarjetas = armarTarjetas();
+        if (!tarjetas.length) return false;
+        mazo = { tarjetas: tarjetas, i: 0 };
+      }
+      var previo = document.getElementById('htOverlay');
+      if (previo) previo.remove();
+      var ov = document.createElement('div');
+      ov.id = 'htOverlay';
+      ov.innerHTML = '<div class="ht-top"><div><b id="htCupo">' + esc(textoMarcador()) + '</b><small class="ht-tope" id="htSubCupo">' + esc(textoSubMarcador()) + '</small></div><span id="htPos"></span></div>' +
+        '<div class="ht-centro"><div class="ht-deck" id="htDeck"></div>' +
+        '<div class="ht-hint">← Deslizá para un lado o para el otro: las tarjetas dan la vuelta →</div></div>';
+      home.insertBefore(ov, home.firstChild);
+      inlineAbierto = true;
+      pintar();
+      return true;
+    }catch(e){ return false; }
+    finally{ abriendo = false; }
   }
 
   function cerrar(){

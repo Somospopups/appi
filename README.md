@@ -4,8 +4,8 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
-- Versión: **v400 · Segura**.
-- Caché de la app: `appi-v400-icono` (se renueva al abrir APPI).
+- Versión: **v401 · Segura**.
+- Caché de la app: `appi-v401-home-suelto` (se renueva al abrir APPI).
 - Publicación: [https://somospopups.github.io/appi/](https://somospopups.github.io/appi/)
 - Acceso por número de distribuidor y contraseña.
 - Acceso administrador POPUPS mediante el candado, sin DIP ni número de distribuidor.
@@ -54,6 +54,11 @@ Descendente: es el PB personal del titular (figura primero; si hay socio,
 ese segundo nombre no se usa). Si todavía no está la planilla, se ve un
 guión y un toque abre Mi Equipo. Los invitados siguen a mano. APPI no
 inventa un número.
+
+## Home suelto (v401)
+
+El mazo del Home calculaba las 10 de hoy una vez por cada cliente. Con la
+planilla grande se clavaba. Ahora se calcula una sola vez.
 
 ## Ícono de inicio (v400)
 
