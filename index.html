@@ -2976,20 +2976,6 @@ body.dark .lock-card {
   background: rgba(30,30,50,0.75);
   border-color: rgba(255,255,255,0.08);
 }
-.lock-logo {
-  width: 88px; height: 88px; margin: 0 auto 16px;
-  border-radius: 24px;
-  background: linear-gradient(135deg, #5b8def, #a06bff, #ff6b9d);
-  display: flex; align-items: center; justify-content: center;
-  overflow: hidden;
-  box-shadow: 0 8px 24px rgba(120,100,220,0.35);
-  padding: 8px;
-}
-.lock-logo img {
-  width: 100%; height: 100%;
-  object-fit: contain;
-  border-radius: 16px;
-}
 .lock-title {
   font-size: 24px; font-weight: 800; margin: 0 0 6px;
   letter-spacing: -0.3px;
@@ -4119,7 +4105,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v405 · Segura</div>
+  <div class="ds-foot">APPI · v406 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4325,8 +4311,6 @@ body.dark #pageTabs button.active{color:#a8c0ff}
   </div>
   <div class="lock-card">
     <button type="button" class="admin-login-lock" id="btnAdminLoginOpen" aria-label="Acceso administrador" title="Acceso administrador">🔒</button>
-    <div class="lock-logo"><img src="./icon-192.png" alt="APPI" /></div>
-
     <div id="distributorLoginPanel" class="auth-panel" hidden>
       <h1 class="lock-title">Bienvenido a APPI</h1>
       <p class="lock-subtitle" id="loginPanelSubtitle">Ingresá con tu número de distribuidor.</p>
@@ -11829,8 +11813,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='405';
-      const CACHE_NAME='appi-v405-admin-agua';
+      const swVersion='406';
+      const CACHE_NAME='appi-v406-login-sin-logo';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 

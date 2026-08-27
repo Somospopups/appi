@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v405-admin-agua';
+const CACHE_NAME = 'appi-v406-login-sin-logo';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

@@ -4,8 +4,8 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
-- Versión: **v405 · Segura**.
-- Caché de la app: `appi-v405-admin-agua` (se renueva al abrir APPI).
+- Versión: **v406 · Segura**.
+- Caché de la app: `appi-v406-login-sin-logo` (se renueva al abrir APPI).
 - Publicación: [https://somospopups.github.io/appi/](https://somospopups.github.io/appi/)
 - Acceso por número de distribuidor y contraseña.
 - Acceso administrador POPUPS mediante el candado, sin DIP ni número de distribuidor.
@@ -54,6 +54,10 @@ Descendente: es el PB personal del titular (figura primero; si hay socio,
 ese segundo nombre no se usa). Si todavía no está la planilla, se ve un
 guión y un toque abre Mi Equipo. Los invitados siguen a mano. APPI no
 inventa un número.
+
+## Login sin logo (v406)
+
+El ingreso ya no muestra el ícono arriba del título.
 
 ## Admin con agua (v405)
 
