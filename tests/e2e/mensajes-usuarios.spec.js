@@ -339,7 +339,7 @@ test('la franja del día junta los pendientes y no inventa ninguno', async ({ pa
   await entrar(page, PENDIENTES);
   const hoy = page.locator('#muHoy');
   await expect(hoy).toBeVisible();
-  await expect(hoy).toContainText('3 de 10');
+  await expect(hoy).toContainText('Hoy 0 / 3');
 
   // Un renglón por motivo, con su cuenta.
   await expect(page.locator('[data-mu-hoy]')).toHaveCount(3);
@@ -495,7 +495,7 @@ test('la regla roja de vencida existe en los estilos', async ({ page }) => {
 test('el contactado no desaparece: queda marcado ✓ y la franja dura todo el día', async ({ page }) => {
   await entrar(page, PENDIENTES);
   await page.evaluate(() => { window.APPIWhatsApp.abrir = () => {}; });
-  await expect(page.locator('#muHoy')).toContainText('3 de 10');
+  await expect(page.locator('#muHoy')).toContainText('Hoy 0 / 3');
 
   await page.locator('[data-mu-hoy="cumple"]').click();
   await page.locator('#muFilaEnviar').click();
@@ -504,7 +504,7 @@ test('el contactado no desaparece: queda marcado ✓ y la franja dura todo el d�
   await page.locator('#muFinCerrar').click();
 
   // La franja no se achica: la acción hecha queda a la vista con su ✓.
-  await expect(page.locator('#muHoy')).toContainText('3 de 10');
+  await expect(page.locator('#muHoy')).toContainText('Hoy 1 / 3');
   await expect(page.locator('#muHoy .mu-hoy-res')).toContainText('✓ 1');
   // El motivo completado deja de ser un botón: ya no hay nada para abrir ahí.
   await expect(page.locator('[data-mu-hoy="cumple"]')).toHaveCount(0);
@@ -548,7 +548,8 @@ test('la ✗ registra que no se hizo y obliga a dejar constancia: no hay saltear
   await page.locator('#muFilaHecha').click();
   await expect(page.locator('.mu-fin')).toContainText('1 acción hecha · 1 sin hacer');
   await page.locator('#muFinCerrar').click();
-  await expect(page.locator('#muHoy')).toContainText('Día completo');
+  await expect(page.locator('#muHoy')).toContainText('Hoy 1 / 2');
+  await expect(page.locator('#muHoy')).not.toContainText('Hoy ganaste');
   await expect(page.locator('#muHoy .mu-hoy-res')).toContainText('✓ 1');
   await expect(page.locator('#muHoy .mu-hoy-res')).toContainText('✗ 1');
 
@@ -607,7 +608,7 @@ test('la ✓ marca hecha sin abrir WhatsApp', async ({ page }) => {
   expect(urls).toHaveLength(0);
 
   await page.locator('#muFinCerrar').click();
-  await expect(page.locator('#muHoy')).toContainText('Día completo');
+  await expect(page.locator('#muHoy')).toContainText('Hoy ganaste');
 });
 
 const TRES = [
@@ -855,7 +856,7 @@ test('el cupo diario es 10 y no inventa más', async ({ page }) => {
   expect(r.total).toBe(10);
   expect(r.pendientes).toBe(10);
   expect(r.motivos).toEqual(['checkin']);
-  await expect(page.locator('#muHoy')).toContainText('10 de 10');
+  await expect(page.locator('#muHoy')).toContainText('Hoy 0 / 10');
 });
 
 test('usuarios recién comprados siguen sin franja: no se inventa trabajo', async ({ page }) => {
@@ -998,4 +999,62 @@ test('el check-in usa el saludo y no suma una plantilla extra en la ficha', asyn
   });
   expect(r.plantillaCheckin).toBe('saludo');
   expect(r.ids).toEqual(['retrolavado', 'cumple', 'porvencer', 'saludo']);
+});
+
+/* ---------- v398: partido del día ---------- */
+
+test('hacer las que hay gana el partido; la ✗ no', async ({ page }) => {
+  await entrar(page, TRES.slice(0, 2));
+  const r = await page.evaluate(() => {
+    const M = window.APPIMensajes;
+    const gente = M.deHoy()[0].gente;
+    const p0 = M.partidoHoy();
+    M.marcarAccion('checkin', gente[0], 'hecha');
+    const p1 = M.partidoHoy();
+    M.marcarAccion('checkin', gente[1], 'no_hecha');
+    const p2 = M.partidoHoy();
+    return { p0, p1, p2, racha: M.rachaGanados() };
+  });
+  expect(r.p0).toMatchObject({ total: 2, hechas: 0, ganado: false });
+  expect(r.p1).toMatchObject({ total: 2, hechas: 1, ganado: false });
+  expect(r.p2).toMatchObject({ total: 2, hechas: 1, ganado: false });
+  expect(r.racha).toBe(0);
+});
+
+test('un día vacío no es partido y no corta la racha', async ({ page }) => {
+  await entrar(page, usuariosDe(1, { fCompra: ddmmyyyy(-20), fVence: dias(300), fVenceRaw: ddmmyyyy(300) }));
+  const r = await page.evaluate(() => {
+    const M = window.APPIMensajes;
+    const clave = Object.keys(localStorage).find(k => k.startsWith('appi_acciones_v1_')) || ('appi_acciones_v1_' + (window.APPIAuth.userId() || 'local'));
+    const ayer = new Date();
+    ayer.setDate(ayer.getDate() - 1);
+    const ayerKey = `${ayer.getFullYear()}-${String(ayer.getMonth() + 1).padStart(2, '0')}-${String(ayer.getDate()).padStart(2, '0')}`;
+    localStorage.setItem(clave, JSON.stringify({
+      dias: { [ayerKey]: { marcas: {}, total: 4, hechas: 4, noHechas: 0, ganado: true } }
+    }));
+    return { hoy: M.partidoHoy(), racha: M.rachaGanados() };
+  });
+  expect(r.hoy.hay).toBe(false);
+  expect(r.hoy.ganado).toBe(false);
+  expect(r.racha).toBe(1);
+});
+
+test('ganar hoy con la racha de ayer suma 2', async ({ page }) => {
+  await entrar(page, TRES.slice(0, 1));
+  const r = await page.evaluate(() => {
+    const M = window.APPIMensajes;
+    const clave = Object.keys(localStorage).find(k => k.startsWith('appi_acciones_v1_'));
+    const ayer = new Date();
+    ayer.setDate(ayer.getDate() - 1);
+    const ayerKey = `${ayer.getFullYear()}-${String(ayer.getMonth() + 1).padStart(2, '0')}-${String(ayer.getDate()).padStart(2, '0')}`;
+    const data = JSON.parse(localStorage.getItem(clave) || '{}');
+    data.dias = data.dias || {};
+    data.dias[ayerKey] = { marcas: {}, total: 3, hechas: 3, noHechas: 0, ganado: true };
+    localStorage.setItem(clave, JSON.stringify(data));
+    const u = M.deHoy()[0].gente[0];
+    M.marcarAccion('checkin', u, 'hecha');
+    return { partido: M.partidoHoy(), racha: M.rachaGanados() };
+  });
+  expect(r.partido.ganado).toBe(true);
+  expect(r.racha).toBe(2);
 });

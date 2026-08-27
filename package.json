@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "397.0.0",
-  "cacheName": "appi-v397-diez-tareas",
+  "version": "398.0.0",
+  "cacheName": "appi-v398-partido",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

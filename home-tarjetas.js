@@ -252,7 +252,32 @@
     return 0;
   }
   function quedanLinea(){ return Math.max(0, topeHoy() - usadosWA()); }
-  function textoCupo(){ return usadosWA() + ' / ' + topeHoy(); }
+  function partidoDe(){
+    try{
+      if (window.APPIMensajes && window.APPIMensajes.partidoHoy) return window.APPIMensajes.partidoHoy();
+    }catch(e){}
+    return { total: 0, hechas: 0, hay: false, ganado: false };
+  }
+  function rachaDe(){
+    try{
+      if (window.APPIMensajes && window.APPIMensajes.rachaGanados) return window.APPIMensajes.rachaGanados() || 0;
+    }catch(e){}
+    return 0;
+  }
+  function textoMarcador(){
+    var p = partidoDe();
+    if (p.ganado) return 'Hoy ganaste';
+    if (p.hay) return 'Hoy ' + p.hechas + ' / ' + p.total;
+    return 'Hoy';
+  }
+  function textoSubMarcador(){
+    var n = rachaDe();
+    if (n > 1) return 'venís ' + n + ' días ganados';
+    if (n === 1) return '1 día ganado';
+    var p = partidoDe();
+    if (p.hay && !p.ganado) return 'partido de hoy';
+    return '';
+  }
   function referidosPedidosMes(){
     var d = new Date();
     var clave = 'appi_referidos_mes_' + uid() + '_' + d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
@@ -340,7 +365,7 @@
   function colaVigentesParaReferido(){
     var st = referidosPedidosMes();
     return colaMensajes('checkin').filter(function(u){
-      var tel = telD;
+      if (!enLasDiez(u)) return false;
       var tel = telDeUsuario(u);
       return tel && st.set.indexOf(tel) < 0;
     });
@@ -454,7 +479,7 @@
     try{
       if (window.APPIMensajes && window.APPIMensajes.resumenHoy){
         var r = window.APPIMensajes.resumenHoy();
-        if (r.total) chips.push('✓ ' + r.hechas + ' / ' + topeHoy());
+        if (r.total) chips.push('✓ ' + r.hechas + ' / ' + r.total);
       }
     }catch(e){}
     try{
@@ -743,8 +768,8 @@
       return {
         cat: 'usuarios', icono: '💧', kicker: 'Usuarios',
         titulo: r.pendientes === 1
-        ? 'Queda 1 de ' + topeHoy()
-        : 'Quedan ' + r.pendientes + ' de ' + topeHoy(),
+        ? 'Queda 1 de ' + r.total
+        : 'Quedan ' + r.pendientes + ' de ' + r.total,
         html: '<ul class="ht-lista">' + filas.join('') + '</ul>' +
               '<div class="ht-chips"><span>✓ ' + r.hechas + '</span><span>✗ ' + r.noHechas + '</span><span>quedan ' + r.pendientes + '</span></div>' +
               '<p class="ht-nota">Tocá un motivo y se abre el carrusel para mandar y marcar ✓/✗.</p>',
@@ -783,13 +808,26 @@
     };
   }
 
+  function tarjetaGanaste(){
+    var p = partidoDe();
+    if (!p.ganado) return null;
+    var n = rachaDe();
+    var extra = n > 1 ? ' Venís ' + n + ' días ganados.' : '';
+    return {
+      cat: 'ganaste', icono: '✅', kicker: 'Partido de hoy',
+      titulo: 'Hoy ganaste',
+      html: '<p class="ht-frase">Mañana otros 10.' + extra + '</p>',
+      cta: null
+    };
+  }
+
   function tarjetaLlegamos(){
     if (quedanLinea() > 0) return null;
     var tope = topeHoy();
     return {
       cat: 'llegamos', icono: '✅', kicker: 'Tope de WhatsApp',
       titulo: 'Hoy llegamos: ' + tope + ' de ' + tope,
-      html: '<p class=\"ht-frase\">Escribiste a ' + tope + ' personas distintas. Mañana otros ' + tope + '. Así WhatsApp no te toca la línea.</p>',
+      html: '<p class="ht-frase">Escribiste a ' + tope + ' personas distintas. Mañana otros ' + tope + '. Así WhatsApp no te toca la línea.</p>',
       cta: null
     };
   }
@@ -822,7 +860,8 @@
 
   function armarTarjetas(){
     var lista = [tarjetaEspecial()];
-    [tarjetaHoyConviene(), tarjetaMetodoEnvio(), tarjetaDuchaRinnova(), tarjetaCanje(), tarjetaJornada(), tarjetaOportunidades(), tarjetaCumples(), tarjetaEquipo(), tarjetaPanel(), tarjetaUsuarios()].forEach(function(t){
+    try{ if (window.APPIMensajes && window.APPIMensajes.registrarPartido) window.APPIMensajes.registrarPartido(); }catch(e){}
+    [tarjetaHoyConviene(), tarjetaGanaste(), tarjetaMetodoEnvio(), tarjetaLlegamos(), tarjetaDuchaRinnova(), tarjetaCanje(), tarjetaJornada(), tarjetaOportunidades(), tarjetaCumples(), tarjetaEquipo(), tarjetaPanel(), tarjetaUsuarios()].forEach(function(t){
       if (t) lista.push(t);
     });
     return lista;
@@ -903,6 +942,12 @@
       '.ht-card.ht-alerta .ht-pasos li{background:rgba(176,70,0,.12);color:#5c2e0a}',
       'body.dark .ht-card.ht-alerta .ht-pasos li{background:rgba(255,200,120,.12);color:#ffe8c8}',
       '.ht-card.ht-alerta .ht-cta{background:linear-gradient(135deg,#f08a1a,#e04a12);box-shadow:0 8px 20px rgba(200,70,10,.35)}',
+      '.ht-card.ht-ganaste{background:linear-gradient(160deg,#f3fff8,#d8f5e6);border:2px solid #3ad0a4;box-shadow:0 22px 60px rgba(18,140,126,.22)}',
+      'body.dark .ht-card.ht-ganaste{background:linear-gradient(160deg,#1a3328,#152820);border-color:#3ad0a4}',
+      '.ht-card.ht-ganaste .ht-kicker{color:#178a6c}',
+      'body.dark .ht-card.ht-ganaste .ht-kicker{color:#3ad0a4}',
+      '.ht-card.ht-ganaste h3{color:#146b54}',
+      'body.dark .ht-card.ht-ganaste h3{color:#d8f5e6}',
       'body.dark .ht-card{background:linear-gradient(160deg,#262838,#1f2130)}',
       'body.dark .ht-card h3{color:#f2f2f7}body.dark .ht-frase{color:#c9cad8}body.dark .ht-lista li{background:rgba(255,255,255,.07);color:#d4d5e2}'
     ].join('');
@@ -924,7 +969,7 @@
     if (previo) previo.remove();
     var ov = document.createElement('div');
     ov.id = 'htOverlay';
-    ov.innerHTML = '<div class="ht-top"><div><b id="htCupo">Hoy ' + esc(textoCupo()) + '</b><small class="ht-tope">tope de WhatsApp</small></div><span id="htPos"></span></div>' +
+    ov.innerHTML = '<div class="ht-top"><div><b id="htCupo">' + esc(textoMarcador()) + '</b><small class="ht-tope" id="htSubCupo">' + esc(textoSubMarcador()) + '</small></div><span id="htPos"></span></div>' +
       '<div class="ht-centro"><div class="ht-deck" id="htDeck"></div>' +
       '<div class="ht-hint">← Deslizá para un lado o para el otro: las tarjetas dan la vuelta →</div></div>';
     home.insertBefore(ov, home.firstChild);
@@ -942,7 +987,7 @@
 
   function crearCarta(t){
     var el = document.createElement('div');
-    el.className = 'ht-card' + (t.cat === 'especial' ? ' ht-esp' : '') + (t.cat === 'metodo' ? ' ht-alerta' : '') + (t.cat === 'hoy' ? ' ht-hoy' : '');
+    el.className = 'ht-card' + (t.cat === 'especial' ? ' ht-esp' : '') + (t.cat === 'metodo' ? ' ht-alerta' : '') + (t.cat === 'hoy' ? ' ht-hoy' : '') + (t.cat === 'ganaste' ? ' ht-ganaste' : '');
     el.innerHTML = '<div class="ht-cab"><span class="ht-ico">' + t.icono + '</span>' +
       '<span class="ht-kicker">' + esc(t.kicker) + '</span></div>' +
       '<h3>' + esc(t.titulo) + '</h3>' +
@@ -978,7 +1023,9 @@
     var deck = document.getElementById('htDeck');
     var pos = document.getElementById('htPos');
     var cupoEl = document.getElementById('htCupo');
-    if (cupoEl) cupoEl.textContent = 'Hoy ' + textoCupo();
+    if (cupoEl) cupoEl.textContent = textoMarcador();
+    var subEl = document.getElementById('htSubCupo');
+    if (subEl) subEl.textContent = textoSubMarcador();
     if (!deck) return;
     deck.querySelectorAll('.ht-card:not(.ht-fantasma)').forEach(function(n){ n.remove(); });
     var len = mazo.tarjetas.length;
@@ -1219,7 +1266,9 @@
     enLasDiez: enLasDiez,
     topeHoy: topeHoy,
     tarjetaMetodoEnvio: tarjetaMetodoEnvio,
-    tarjetaLlegamos: tarjetaLlegamos
+    tarjetaLlegamos: tarjetaLlegamos,
+    tarjetaGanaste: tarjetaGanaste,
+    textoMarcador: textoMarcador
   };
 
   if (document.readyState === 'complete') envolver();

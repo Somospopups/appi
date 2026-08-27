@@ -4,8 +4,8 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
-- Versión: **v397 · Segura**.
-- Caché de la app: `appi-v397-diez-tareas` (se renueva al abrir APPI).
+- Versión: **v398 · Segura**.
+- Caché de la app: `appi-v398-partido` (se renueva al abrir APPI).
 - Publicación: [https://somospopups.github.io/appi/](https://somospopups.github.io/appi/)
 - Acceso por número de distribuidor y contraseña.
 - Acceso administrador POPUPS mediante el candado, sin DIP ni número de distribuidor.
@@ -54,6 +54,12 @@ Descendente: es el PB personal del titular (figura primero; si hay socio,
 ese segundo nombre no se usa). Si todavía no está la planilla, se ve un
 guión y un toque abre Mi Equipo. Los invitados siguen a mano. APPI no
 inventa un número.
+
+## El partido de hoy (v398)
+
+Cada día con tareas es un partido: el marcador es **hechas / las que hay**.
+Ganar es hacerlas todas (✓). La ✗ no suma. Sin tareas no hay partido y la
+racha no se corta. En el mazo: **Hoy ganaste. Mañana otros 10.**
 
 ## Las 10 de hoy (v397)
 

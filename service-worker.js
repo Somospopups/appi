@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v397-diez-tareas';
+const CACHE_NAME = 'appi-v398-partido';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

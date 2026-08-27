@@ -15,6 +15,8 @@
      - vencido hace > 1 año .... nada
 
    Jornada de usuarios (v397): las 10 de hoy, mismo tope que WhatsApp.
+   Partido del día (v398): ganar es hacer las que hay (✓). La ✗ no suma.
+   Sin tareas no hay partido y la racha no se corta.
    Cada día se arman hasta CUPO_DIA acciones, en este orden:
      1. cumpleaños de hoy (entran primero y cuentan)
      2. garantía a 0–30 días, las más cercanas primero
@@ -683,6 +685,7 @@
     // El resumen queda escrito en el día: es lo que lee el panel del admin.
     var r = resumenCon(d);
     d.dias[k].total = r.total; d.dias[k].hechas = r.hechas; d.dias[k].noHechas = r.noHechas;
+    d.dias[k].ganado = !!(r.total && r.hechas === r.total);
     limpiarViejos(d);
     guardarAcciones(d);
     if (!silencioso){ try{ pintarHoy(); }catch(e){} }
@@ -702,6 +705,61 @@
     return { total: total, hechas: hechas, noHechas: noHechas, pendientes: pendientes };
   }
   function resumenHoy(){ return resumenCon(leerAcciones()); }
+
+  /* Partido del día (v398): el marcador es hechas / las que hay.
+     Ganar es hacerlas todas (✓). La ✗ no cuenta. Un día sin tareas
+     no es partido y no corta la racha. */
+  function partidoHoy(){
+    var r = resumenHoy();
+    return {
+      total: r.total,
+      hechas: r.hechas,
+      noHechas: r.noHechas,
+      pendientes: r.pendientes,
+      hay: r.total > 0,
+      ganado: r.total > 0 && r.hechas === r.total,
+      enCurso: r.total > 0 && r.pendientes > 0 && r.hechas < r.total
+    };
+  }
+  function registrarPartido(){
+    var r = resumenHoy();
+    if (!r.total) return;
+    var d = leerAcciones();
+    if (!d.dias) d.dias = {};
+    var k = hoyKey();
+    if (!d.dias[k]) d.dias[k] = { marcas: {} };
+    d.dias[k].total = r.total;
+    d.dias[k].hechas = r.hechas;
+    d.dias[k].noHechas = r.noHechas;
+    d.dias[k].ganado = !!(r.total && r.hechas === r.total);
+    guardarAcciones(d);
+  }
+  function rachaGanados(){
+    var d = leerAcciones();
+    var n = 0;
+    var fecha = hoy();
+    for (var i = 0; i < 60; i++){
+      var k = claveFecha(fecha);
+      var dia = d.dias && d.dias[k];
+      var esHoy = i === 0;
+      if (!dia || !dia.total){
+        fecha.setDate(fecha.getDate() - 1);
+        continue;
+      }
+      var ganado = dia.hechas === dia.total && dia.total > 0;
+      var pend = Math.max(0, (dia.total || 0) - (dia.hechas || 0) - (dia.noHechas || 0));
+      if (ganado) n++;
+      else if (esHoy && pend > 0) { /* partido en curso: no suma, no corta */ }
+      else break;
+      fecha.setDate(fecha.getDate() - 1);
+    }
+    return n;
+  }
+  function textoRacha(n){
+    n = n == null ? rachaGanados() : n;
+    if (!n) return '';
+    return n === 1 ? '1 día ganado' : n + ' días ganados';
+  }
 
 
   /* ---------- pendientes del día ---------- */
@@ -873,6 +931,7 @@
     var grupos = deHoy();
     var res = resumenHoy();
     diaPintado = hoyKey();
+    try{ registrarPartido(); }catch(e){}
 
     if (!res.total){
       if (host) host.remove();
@@ -883,12 +942,15 @@
       host.id = 'muHoy';
       stats.parentNode.insertBefore(host, stats);
     }
-    var titulo = res.pendientes === 0
-      ? '🎉 Día completo: las ' + res.total + ' de ' + CUPO_DIA + ' están hechas'
-      : 'Hoy: ' + res.total + ' de ' + CUPO_DIA + ' · tope de WhatsApp';
+    var p = partidoHoy();
+    var rachaTxt = textoRacha();
+    var titulo = p.ganado
+      ? 'Hoy ganaste · ' + p.hechas + ' / ' + p.total
+      : 'Hoy ' + p.hechas + ' / ' + p.total;
+    var subRacha = rachaTxt ? ' · ' + rachaTxt : '';
     var html = '<div class="mu-hoy-top"><span class="mu-hoy-ico">📋</span>' +
       '<div class="mu-hoy-heading"><b>' + titulo + '</b>' +
-      '<span class="mu-hoy-fecha">📅 ' + esc(fmtFecha(hoy())) + '</span></div>' +
+      '<span class="mu-hoy-fecha">📅 ' + esc(fmtFecha(hoy())) + esc(subRacha) + '</span></div>' +
       '<span class="mu-hoy-res"><i class="ok">✓ ' + res.hechas + '</i><i class="no">✗ ' + res.noHechas + '</i>' +
       (res.pendientes ? '<i>quedan ' + res.pendientes + '</i>' : '') + '</span></div>' +
       '<div class="mu-hoy-list">';
@@ -1749,6 +1811,10 @@
     claveAccion: claveAccion,
     completadaDe: completadaDe,
     resumenHoy: resumenHoy,
+    partidoHoy: partidoHoy,
+    registrarPartido: registrarPartido,
+    rachaGanados: rachaGanados,
+    textoRacha: textoRacha,
     pintarHoy: pintarHoy,
     abrirFila: abrirFila,
     escritoHoy: escritoHoy,

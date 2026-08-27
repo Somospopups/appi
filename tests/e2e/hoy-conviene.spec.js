@@ -116,6 +116,28 @@ test('con 15 canjes el mazo y la jornada sólo dan 10', async ({ page }) => {
   expect(r.titulo).not.toContain('15');
 });
 
+test('al ganar el partido aparece Hoy ganaste y no se inventa si no hay tareas', async ({ page }) => {
+  const vence = new Date(Date.now() - 40 * 86400000).toISOString();
+  await entrar(page, {
+    usuarios: [{
+      id: 7, usuario: 'Carlos Ruiz', telf: '3515559876', domicilio: 'Belgrano 50',
+      localidad: 'Córdoba', producto: 'SENIOR 4', fVence: vence, estado: 'vencido'
+    }]
+  });
+  const r = await page.evaluate(() => {
+    const M = window.APPIMensajes;
+    const u = M.deHoy()[0].gente[0];
+    M.marcarAccion('renovacion', u, 'hecha');
+    const t = window.APPIHomeTarjetas.armarTarjetas();
+    const g = t.find(x => x.cat === 'ganaste');
+    return { ganado: M.partidoHoy().ganado, titulo: g && g.titulo, html: g && g.html, marcador: window.APPIHomeTarjetas.textoMarcador() };
+  });
+  expect(r.ganado).toBe(true);
+  expect(r.titulo).toBe('Hoy ganaste');
+  expect(r.html).toContain('Mañana otros 10');
+  expect(r.marcador).toBe('Hoy ganaste');
+});
+
 test('sin trabajo real no se inventa la carta de Hoy ni la de Canje', async ({ page }) => {
   await entrar(page, { contactos: [], usuarios: [] });
   const cats = await page.evaluate(() => window.APPIHomeTarjetas.armarTarjetas().map(t => t.cat));
