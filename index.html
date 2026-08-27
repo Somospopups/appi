@@ -2939,7 +2939,7 @@ body.dark .hist-action-drawer{background:linear-gradient(155deg,#151827,#252036 
 /* ============ PANTALLA DE ACTIVACIÓN ============ */
 #lockScreen {
   position: fixed; inset: 0; z-index: 9999;
-  background: linear-gradient(160deg, #eaf1ff 0%, #f5ecff 45%, #ffe9f2 100%);
+  background: linear-gradient(180deg,#5ee0df 0%,#27b5c4 8%,#12809c 29%,#0b5878 58%,#063652 82%,#041f37 100%);
   display: flex; align-items: flex-start; justify-content: center;
   padding: 20px;
   overflow-x: hidden;
@@ -2949,9 +2949,16 @@ body.dark .hist-action-drawer{background:linear-gradient(155deg,#151827,#252036 
 }
 #lockScreen.hidden { display: none; }
 body.dark #lockScreen {
-  background: linear-gradient(160deg, #0f1424 0%, #1a1530 45%, #2a1530 100%);
+  background: linear-gradient(180deg,#5ee0df 0%,#27b5c4 8%,#12809c 29%,#0b5878 58%,#063652 82%,#041f37 100%);
   color: #e8e8ec;
 }
+.lock-water{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.lock-wave{position:absolute;left:-12%;width:124%;height:52px;top:18%;opacity:.55}
+.lock-wave svg{display:block;width:100%;height:100%}
+.lock-wave.wave-back path{fill:rgba(157,245,240,.45)}
+.lock-wave.wave-front{top:22%;opacity:.7}
+.lock-wave.wave-front path{fill:rgba(218,255,251,.55)}
+.lock-card{position:relative;z-index:1}
 .lock-card {
   background: rgba(255,255,255,0.75);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
@@ -4112,7 +4119,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v403 · Segura</div>
+  <div class="ds-foot">APPI · v404 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4312,6 +4319,10 @@ body.dark #pageTabs button.active{color:#a8c0ff}
 }
 </style>
 <div id="lockScreen" class="hidden">
+  <div class="lock-water" aria-hidden="true">
+    <div class="lock-wave wave-back"><svg viewBox="0 0 500 60" preserveAspectRatio="none"><path d="M0 35 C45 8 86 9 128 34 C171 59 212 58 255 31 C298 5 340 8 382 35 C424 62 463 57 500 28 L500 60 L0 60 Z"/></svg></div>
+    <div class="lock-wave wave-front"><svg viewBox="0 0 500 60" preserveAspectRatio="none"><path d="M0 29 C38 53 77 53 116 28 C155 3 194 4 233 30 C273 55 312 55 351 29 C390 4 429 4 468 29 C480 37 490 40 500 39 L500 60 L0 60 Z"/></svg></div>
+  </div>
   <div class="lock-card">
     <button type="button" class="admin-login-lock" id="btnAdminLoginOpen" aria-label="Acceso administrador" title="Acceso administrador">🔒</button>
     <div class="lock-logo"><img src="./icon-192.png" alt="APPI" /></div>
@@ -11818,8 +11829,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='403';
-      const CACHE_NAME='appi-v403-agenda-vidrio';
+      const swVersion='404';
+      const CACHE_NAME='appi-v404-agua';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 
