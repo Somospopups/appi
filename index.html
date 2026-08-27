@@ -3153,7 +3153,7 @@ body.dark .login-tabs{background:rgba(255,255,255,.07)}body.dark .login-tabs but
 .admin-login-close{position:absolute;top:12px;right:12px;width:34px;height:34px;border:0;border-radius:50%;background:rgba(80,90,130,.08);color:#555665;font-size:22px;cursor:pointer}
 body.dark .admin-login-lock{background:rgba(91,141,239,.18);color:#b6c8ff;border-color:rgba(255,255,255,.1)}
 body.dark .admin-login-card{background:#242638}body.dark .admin-login-card h2{color:#f2f2f7}body.dark .admin-login-card>p{color:#b6b7c4}
-.person-choice-card{width:min(100%,460px)}.person-choice-copy{margin:-10px 0 18px;color:#6d6e7c;font-size:13px;line-height:1.5}.person-choice-list{display:grid;gap:10px}.person-choice-option{width:100%;min-height:70px;display:grid;grid-template-columns:48px 1fr auto;align-items:center;gap:12px;padding:11px 14px;border:1px solid rgba(91,141,239,.16);border-radius:17px;background:rgba(91,141,239,.07);color:#292938;text-align:left;font:inherit;cursor:pointer}.person-choice-option:hover{background:rgba(91,141,239,.13);transform:translateY(-1px)}.person-choice-avatar{width:48px;height:48px;border-radius:15px;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,#3ad0a4,#5b8def);font-size:22px}.person-choice-option strong{display:block;font-size:15px}.person-choice-option small{display:block;margin-top:3px;color:#717381;font-size:11px;font-weight:700}.person-choice-arrow{color:#5b8def;font-size:24px;font-weight:900}body.dark .person-choice-option{background:rgba(91,141,239,.13);border-color:rgba(255,255,255,.09);color:#f2f2f7}body.dark .person-choice-option small{color:#b6b7c4}
+.person-choice-card{width:min(100%,460px)}.person-choice-copy{margin:0 0 18px;color:#6d6e7c;font-size:13px;line-height:1.5}.person-choice-list{display:grid;gap:10px}.person-choice-option{width:100%;min-height:70px;display:grid;grid-template-columns:48px 1fr auto;align-items:center;gap:12px;padding:11px 14px;border:1px solid rgba(91,141,239,.16);border-radius:17px;background:rgba(91,141,239,.07);color:#292938;text-align:left;font:inherit;cursor:pointer}.person-choice-option:hover{background:rgba(91,141,239,.13);transform:translateY(-1px)}.person-choice-avatar{width:48px;height:48px;border-radius:15px;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,#3ad0a4,#5b8def);font-size:22px}.person-choice-option strong{display:block;font-size:15px}.person-choice-option small{display:block;margin-top:3px;color:#717381;font-size:11px;font-weight:700}.person-choice-arrow{color:#5b8def;font-size:24px;font-weight:900}body.dark .person-choice-option{background:rgba(91,141,239,.13);border-color:rgba(255,255,255,.09);color:#f2f2f7}body.dark .person-choice-option small{color:#b6b7c4}
 @media(max-width:480px){.lock-card{padding:27px 18px}.admin-login-lock{top:12px;right:12px}#distributorLoginPanel .lock-title{font-size:23px}}
 </style> 
 
@@ -4105,7 +4105,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v407 · Segura</div>
+  <div class="ds-foot">APPI · v408 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4376,10 +4376,8 @@ body.dark #pageTabs button.active{color:#a8c0ff}
 </div>
 
 <div class="admin-login-overlay" id="personChoiceOverlay" hidden>
-  <div class="admin-login-card person-choice-card" role="dialog" aria-modal="true" aria-labelledby="personChoiceTitle">
-    <div class="admin-login-icon">👋</div>
-    <h2 id="personChoiceTitle">¿Quién sos?</h2>
-    <p class="person-choice-copy">Elegí tu nombre para abrir tu espacio personal.</p>
+  <div class="admin-login-card person-choice-card" role="dialog" aria-modal="true" aria-labelledby="personChoiceCopy">
+    <p class="person-choice-copy" id="personChoiceCopy">Elegí tu nombre para abrir tu espacio personal.</p>
     <div class="person-choice-list" id="personChoiceList"></div>
   </div>
 </div>
@@ -11372,9 +11370,7 @@ async function asegurarPersonaActiva(){
     list.querySelectorAll('[data-person-type]').forEach(button=>button.onclick=()=>{
       const selected=window.APPIAuth.selectPerson(button.dataset.personType);
       list.querySelectorAll('button').forEach(item=>{item.disabled=true;item.setAttribute('aria-busy','true')});
-      const title=document.getElementById('personChoiceTitle');
       const copy=overlay.querySelector('.person-choice-copy');
-      if(title)title.textContent='Entrando…';
       if(copy)copy.textContent='Estamos abriendo tu espacio.';
       marcarInicioCubierto(true);
       resolve(selected);
@@ -11813,8 +11809,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='407';
-      const CACHE_NAME='appi-v407-vidrio-agua';
+      const swVersion='408';
+      const CACHE_NAME='appi-v408-quien-sos';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 

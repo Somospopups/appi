@@ -163,7 +163,7 @@ test('en el celular pageshow no saltea titular/socio ni deja un home a medias', 
 
   await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
   await expect(page.locator('#personChoiceOverlay')).toBeVisible();
-  await expect(page.locator('#personChoiceOverlay')).toContainText('¿Quién sos?');
+  await expect(page.locator('#personChoiceOverlay')).toContainText('Elegí tu nombre');
   await expect(page.locator('[data-person-type="titular"]')).toContainText('María Pérez');
   await expect(page.locator('[data-person-type="socio"]')).toContainText('Juan Pérez');
   await expect(page.locator('#lockScreen')).toBeHidden();
