@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v409-ficha';
+const CACHE_NAME = 'appi-v410-dos-tarjetas';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

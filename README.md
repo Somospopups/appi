@@ -4,8 +4,8 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
-- Versión: **v409 · Segura**.
-- Caché de la app: `appi-v409-ficha` (se renueva al abrir APPI).
+- Versión: **v410 · Segura**.
+- Caché de la app: `appi-v410-dos-tarjetas` (se renueva al abrir APPI).
 - Publicación: [https://somospopups.github.io/appi/](https://somospopups.github.io/appi/)
 - Acceso por número de distribuidor y contraseña.
 - Acceso administrador POPUPS mediante el candado, sin DIP ni número de distribuidor.
@@ -54,6 +54,10 @@ Descendente: es el PB personal del titular (figura primero; si hay socio,
 ese segundo nombre no se usa). Si todavía no está la planilla, se ve un
 guión y un toque abre Mi Equipo. Los invitados siguen a mano. APPI no
 inventa un número.
+
+## Dos tarjetas (v410)
+
+Si hay titular y socio, dos tarjetas verticales: avatar, nombre y rol.
 
 ## Ficha sobre el agua (v409)
 
@@ -221,7 +225,7 @@ La función valida el enlace, la membresía, el contenido, el consentimiento y l
 
 ## Titular y socio
 
-Una cuenta puede tener un titular y, opcionalmente, un socio. Ambos usan el mismo número de distribuidor, contraseña y membresía. Después de ingresar, se elige el nombre y se abre ese espacio.
+Una cuenta puede tener un titular y, opcionalmente, un socio. Ambos usan el mismo número de distribuidor, contraseña y membresía. Después de ingresar, si hay socio, se elige entre dos tarjetas y se abre ese espacio.
 
 - El Home saluda con **Hola + nombre**.
 - Planificación, presupuesto, Siete Pasos, ruedas, contactos, notas e Histórico son personales.
