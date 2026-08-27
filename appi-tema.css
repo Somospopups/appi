@@ -1,0 +1,175 @@
+/* APPI · un solo idioma visual (v402)
+   Vidrio, pastel, azul → violeta, pastillas, sombra suave.
+   Toda la app se lee como si se hubiera dibujado el mismo día.
+   La Agenda personal se deja como guía A–Z a propósito. */
+
+:root{
+  --appi-azul:#5b8def;
+  --appi-azul-2:#3d63c9;
+  --appi-violeta:#a06bff;
+  --appi-violeta-2:#8b63e8;
+  --appi-menta:#3ad0a4;
+  --appi-texto:#282837;
+  --appi-muted:#777887;
+  --appi-vidrio:rgba(255,255,255,.68);
+  --appi-borde:1px solid rgba(255,255,255,.84);
+  --appi-sombra:0 8px 22px rgba(68,76,118,.08);
+  --appi-radio:16px;
+  --appi-radio-lg:22px;
+  --appi-pill:999px;
+  --appi-grad:linear-gradient(135deg,#5b8def,#8b63e8);
+  --appi-focus:0 0 0 3px rgba(91,141,239,.14);
+}
+
+/* ---------- botones: el mismo gesto en login, diálogos, hist, mazo, admin ---------- */
+.lock-btn-full,
+.lock-btn:not(.copy):not(.whatsapp),
+.appi-dialog-ok:not(.danger),
+.hist-primary,
+.ht-cta,
+.btn-primary,
+.btn.btn-primary{
+  background:var(--appi-grad);
+  color:#fff;
+  border:0;
+  border-radius:14px;
+  font-weight:900;
+  box-shadow:0 8px 20px rgba(91,112,210,.22);
+}
+.lock-btn.copy,
+.appi-dialog-cancel,
+.hist-secondary,
+.btn-secondary{
+  border-radius:14px;
+  font-weight:850;
+}
+.lock-btn,
+.lock-btn-full{
+  min-height:48px;
+  border-radius:14px;
+  font-weight:850;
+}
+
+/* ---------- campos ---------- */
+.lock-input,
+.appi-dialog-input,
+.hist-field input,
+.hist-field select,
+.form-input,
+.cultura-inv-grid input{
+  border-radius:14px;
+  border:1.5px solid rgba(80,90,130,.14);
+  background:rgba(255,255,255,.88);
+}
+.lock-input:focus,
+.appi-dialog-input:focus,
+.form-input:focus{
+  border-color:var(--appi-azul);
+  box-shadow:var(--appi-focus);
+}
+
+/* ---------- tarjetas de vidrio (admin membresías venía en blanco plano) ---------- */
+.revenue-stats,
+.stat-card,
+.membership-modal-overlay .modal,
+.hist-card,
+.tool-card,
+.admin-user-row,
+.cultura-card,
+.home-month-card{
+  background:var(--appi-vidrio);
+  -webkit-backdrop-filter:blur(18px) saturate(170%);
+  backdrop-filter:blur(18px) saturate(170%);
+  border:var(--appi-borde);
+  box-shadow:var(--appi-sombra);
+}
+.revenue-stats,
+.membership-modal-overlay .modal,
+.hist-card{border-radius:var(--appi-radio-lg)}
+.stat-card,
+.admin-user-row{border-radius:var(--appi-radio)}
+.revenue-stats h2,
+.modal-header h2,
+.stat-value{color:var(--appi-texto)}
+.stat-label,
+.stat-card{color:var(--appi-muted)}
+.stat-card{
+  background:linear-gradient(135deg,rgba(91,141,239,.10),rgba(160,107,255,.08));
+  border:1px solid rgba(91,141,239,.16);
+}
+.stat-card.warning{
+  background:linear-gradient(135deg,rgba(245,179,1,.14),rgba(255,143,107,.10));
+  border-color:rgba(245,179,1,.35);
+}
+.stat-card.danger{
+  background:linear-gradient(135deg,rgba(222,69,78,.12),rgba(255,107,107,.08));
+  border-color:rgba(222,69,78,.28);
+}
+.btn,.btn-action{
+  border-radius:12px;
+  font-weight:850;
+}
+.btn-primary,.btn-payment{
+  background:var(--appi-grad);
+  color:#fff;
+}
+.btn-grace-period{
+  background:linear-gradient(135deg,#f5b301,#ff8f6b);
+  color:#fff;
+}
+.membership-badge{
+  border-radius:var(--appi-pill);
+  font-weight:900;
+}
+.membership-badge.active{background:rgba(58,208,164,.16);color:#168765}
+.membership-badge.grace_period{background:rgba(245,179,1,.16);color:#8a6116}
+.membership-badge.expired{background:rgba(222,69,78,.12);color:#c34c53}
+
+/* ---------- panel admin: misma letra, no microscópica ---------- */
+.admin-user-row h3{font-size:15px;font-weight:850;color:var(--appi-texto)}
+.admin-user-row p{font-size:12px;color:var(--appi-muted)}
+.admin-user-badge{font-size:10px;padding:5px 9px}
+.admin-row-actions button{
+  min-height:40px;
+  padding:8px 12px;
+  border-radius:12px;
+  font-size:12px;
+  font-weight:850;
+}
+
+/* ---------- barra de páginas: se lee, no se adivina ---------- */
+#pageTabs button{font-size:10px;font-weight:800}
+#pageTabs button.active{font-weight:900}
+
+/* ---------- chips y pastillas ---------- */
+.ht-chips span,
+.hist-mini-btn,
+.tp-chip,
+.tp-pill{
+  border-radius:var(--appi-pill);
+  font-weight:850;
+}
+
+/* ---------- overlays laterales (mensajes / reactivación) ---------- */
+.mu-panel,.re-panel{
+  background:linear-gradient(160deg,#f5f8ff,#fff3f9);
+}
+.mu-item,.re-item,.re-quien{
+  border-radius:16px;
+  background:rgba(255,255,255,.78);
+  border:1px solid rgba(255,255,255,.9);
+}
+
+body.dark .revenue-stats,
+body.dark .stat-card,
+body.dark .membership-modal-overlay .modal,
+body.dark .admin-user-row{
+  background:rgba(30,32,50,.72);
+  border-color:rgba(255,255,255,.08);
+}
+body.dark .revenue-stats h2,
+body.dark .modal-header h2,
+body.dark .stat-value,
+body.dark .admin-user-row h3{color:#f2f2f7}
+body.dark .stat-label,
+body.dark .admin-user-row p{color:#b8b9c5}

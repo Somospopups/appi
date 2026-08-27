@@ -108,6 +108,7 @@ window.openStock=function(){
 <script src="./js/membership-admin.js"></script>
 <script src="./admin-panel.js"></script>
 <link rel="stylesheet" href="./css/membership-admin.css">
+<link rel="stylesheet" href="./appi-tema.css">
 <script src="./account-request.js"></script>
 <script src="./qr-code.js"></script>
 <script src="./gestion-client.js"></script>
@@ -4111,7 +4112,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v401 · Segura</div>
+  <div class="ds-foot">APPI · v402 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -11817,8 +11818,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='401';
-      const CACHE_NAME='appi-v401-home-suelto';
+      const swVersion='402';
+      const CACHE_NAME='appi-v402-un-idioma';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 
@@ -15975,6 +15976,7 @@ setTimeout(initHistorico,1200);
 })();
 </script>
 
+<link rel="stylesheet" href="./appi-tema.css">
 </body>
 </html>
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initHistorico);else initHistorico();

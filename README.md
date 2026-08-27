@@ -4,8 +4,8 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
-- Versión: **v401 · Segura**.
-- Caché de la app: `appi-v401-home-suelto` (se renueva al abrir APPI).
+- Versión: **v402 · Segura**.
+- Caché de la app: `appi-v402-un-idioma` (se renueva al abrir APPI).
 - Publicación: [https://somospopups.github.io/appi/](https://somospopups.github.io/appi/)
 - Acceso por número de distribuidor y contraseña.
 - Acceso administrador POPUPS mediante el candado, sin DIP ni número de distribuidor.
@@ -54,6 +54,11 @@ Descendente: es el PB personal del titular (figura primero; si hay socio,
 ese segundo nombre no se usa). Si todavía no está la planilla, se ve un
 guión y un toque abre Mi Equipo. Los invitados siguen a mano. APPI no
 inventa un número.
+
+## Un idioma visual (v402)
+
+Vidrio, pastel, azul a violeta. Login, Home, mazo, admin y membresías
+hablan igual. La Agenda personal sigue como guía A–Z.
 
 ## Home suelto (v401)
 

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v401-home-suelto';
+const CACHE_NAME = 'appi-v402-un-idioma';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
@@ -34,6 +34,7 @@ const APP_SHELL = [
   './device-bridge.js',
   './anuncios.js',
   './css/membership-admin.css',
+  './appi-tema.css',
   './historico.css',
   './historico.js',
   './vendor/xlsx.full.min.js',
