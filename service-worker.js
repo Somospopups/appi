@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v402-un-idioma';
+const CACHE_NAME = 'appi-v403-agenda-vidrio';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

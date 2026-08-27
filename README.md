@@ -4,8 +4,8 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
-- Versión: **v402 · Segura**.
-- Caché de la app: `appi-v402-un-idioma` (se renueva al abrir APPI).
+- Versión: **v403 · Segura**.
+- Caché de la app: `appi-v403-agenda-vidrio` (se renueva al abrir APPI).
 - Publicación: [https://somospopups.github.io/appi/](https://somospopups.github.io/appi/)
 - Acceso por número de distribuidor y contraseña.
 - Acceso administrador POPUPS mediante el candado, sin DIP ni número de distribuidor.
@@ -55,10 +55,15 @@ ese segundo nombre no se usa). Si todavía no está la planilla, se ve un
 guión y un toque abre Mi Equipo. Los invitados siguen a mano. APPI no
 inventa un número.
 
+## Agenda del mismo vidrio (v403)
+
+La Agenda personal ya no parece una guía aparte: mismas tarjetas,
+mismo azul. Sigue A–Z, puntito a la derecha y toque para abrir.
+
 ## Un idioma visual (v402)
 
-Vidrio, pastel, azul a violeta. Login, Home, mazo, admin y membresías
-hablan igual. La Agenda personal sigue como guía A–Z.
+Vidrio, pastel, azul a violeta. Login, Home, mazo, admin, membresías
+y la Agenda personal hablan igual.
 
 ## Home suelto (v401)
 
