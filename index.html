@@ -2622,6 +2622,10 @@ body.dark .hist-action-drawer{background:linear-gradient(155deg,#151827,#252036 
   .modal-icon.off { display: none !important; }
   .modal-title { margin: 0; font-size: 20px; font-weight: 800; letter-spacing: -0.3px; }
   .modal-sub { margin: 4px 0 0; font-size: 13px; color: #6b6b76; }
+  .modal-sub .pm-cat-sub{display:inline-flex;align-items:center;justify-content:center;gap:8px;margin-top:6px;flex-wrap:wrap}
+  .modal-sub .pm-cat-pill{display:inline-block;padding:3px 10px;border-radius:8px;font-size:11px;font-weight:800;letter-spacing:.3px}
+  .modal-sub .pm-cat-name{color:#1c1c1e;font-size:13px;font-weight:700}
+  body.dark .modal-sub .pm-cat-name{color:#f0f0f5}
   .modal-body { padding: 8px 22px 20px; font-size: 14px; line-height: 1.6; color: #3a3a48; }
   .modal-body p { margin: 10px 0; }
   .modal-body strong { color: #1c1c1e; }
@@ -4139,7 +4143,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v431 · Segura</div>
+  <div class="ds-foot">APPI · v432 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -5382,7 +5386,11 @@ const modal = {
     this.icon.style.background = opts.iconBg || 'linear-gradient(135deg,#5b8def,#a06bff)';
     this.icon.classList.toggle('off', !!opts.hideIcon);
     this.title.textContent = opts.title || '';
-    this.sub.textContent = opts.sub || '';
+    if(opts.subHtml){
+      this.sub.innerHTML = opts.subHtml;
+    } else {
+      this.sub.textContent = opts.sub || '';
+    }
     this.body.innerHTML = opts.html || '';
     if(opts.hideFooter){
       this.footer.innerHTML = '';
@@ -8542,7 +8550,6 @@ function openPersonaModal(p){
   
   const html = `<div class="person-modal-body">
     <div class="pm-row"><span class="pm-lbl">N° de Distribuidor</span><span class="pm-val">${escapeXml(p.codigo||'—')}</span></div>
-    <div class="pm-row"><span class="pm-lbl">Categoría</span><span class="pm-val"><span style="${catBadgeStyle(info)};padding:3px 10px;border-radius:8px;font-size:11px;font-weight:800;letter-spacing:0.3px;margin-right:6px">${info.name}</span>${info.full}</span></div>
     <div class="pm-row"><span class="pm-lbl">Estado</span><span class="pm-val">${p.estado || '—'}</span></div>
         <div class="pm-row" style="background:rgba(91,141,239,0.08); margin:6px -6px; padding:10px 12px; border-radius:8px; border-bottom:none"><span class="pm-lbl">👤 PB Personal</span><span class="pm-val" style="color:#3d63c9; font-size:15px">${formatPB(p.pnAct)}</span></div>
     ${(function(){
@@ -8603,7 +8610,8 @@ function openPersonaModal(p){
   </div>`;
   modal.open({
     hideIcon: true,
-    title: p.nombre, sub: info.full,
+    title: p.nombre,
+    subHtml: '<span class="pm-cat-sub"><span class="pm-cat-pill" style="'+catBadgeStyle(info)+'">'+escapeXml(info.name)+'</span><span class="pm-cat-name">'+escapeXml(info.full)+'</span></span>',
     html
   });
   if(window.APPIDeviceBridge)window.APPIDeviceBridge.decorateCallButtons();
@@ -11879,8 +11887,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='431';
-      const CACHE_NAME='appi-v431-sin-icono-ficha';
+      const swVersion='432';
+      const CACHE_NAME='appi-v432-pildora-subtitulo';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 

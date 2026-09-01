@@ -4,8 +4,8 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
-- Versión: **v431 · Segura**.
-- Caché de la app: `appi-v431-sin-icono-ficha` (se renueva al abrir APPI).
+- Versión: **v432 · Segura**.
+- Caché de la app: `appi-v432-pildora-subtitulo` (se renueva al abrir APPI).
 - Publicación: [https://somospopups.github.io/appi/](https://somospopups.github.io/appi/)
 - Acceso por número de distribuidor y contraseña.
 - Acceso administrador POPUPS mediante el candado, sin DIP ni número de distribuidor.
