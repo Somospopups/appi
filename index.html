@@ -4145,7 +4145,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v436 · Segura</div>
+  <div class="ds-foot">APPI · v437 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -8393,6 +8393,101 @@ function parseTelefonos(telStr){
   return tels;
 }
 
+function vcardEscape(s){
+  return String(s==null?'':s).replace(/\\/g,'\\\\').replace(/\r?\n/g,'\\n').replace(/,/g,'\\,').replace(/;/g,'\\;');
+}
+function telAgendaDeCampo(valor){
+  const out=[];
+  const vistos=new Set();
+  const meter=raw=>{
+    let n='';
+    try{ n = window.APPITel && window.APPITel.normalizar ? window.APPITel.normalizar(raw) : ''; }catch(e){ n=''; }
+    if(!n){
+      const d=String(raw||'').replace(/\D/g,'');
+      if(d.length>=8) n=d;
+    }
+    if(!n || vistos.has(n)) return;
+    vistos.add(n);
+    out.push(n);
+  };
+  const partes=String(valor==null?'':valor).split(/\s*[\/,;|\n\r]+\s*|\s+-\s+/);
+  partes.forEach(p=>{ if(p && String(p).trim()) meter(p); });
+  if(!out.length) meter(valor);
+  return out;
+}
+function contactosParaAgenda(){
+  try{ if(typeof loadEquipoFromStorage==='function') loadEquipoFromStorage(); }catch(e){}
+  const porNombre=new Map();
+  function add(nombre, tels, origen){
+    const nom=String(nombre||'').trim();
+    if(!nom || !tels || !tels.length) return;
+    const k=nom.toLowerCase();
+    let row=porNombre.get(k);
+    if(!row){ row={nombre:nom, tels:[], origenes:[]}; porNombre.set(k,row); }
+    tels.forEach(n=>{
+      if(!n) return;
+      if(row.tels.indexOf(n)<0) row.tels.push(n);
+    });
+    if(row.origenes.indexOf(origen)<0) row.origenes.push(origen);
+  }
+  const personas=(typeof equipoData!=='undefined' && equipoData && equipoData.personas) ? equipoData.personas : [];
+  personas.forEach(p=>{
+    if(!p || p.esTitular) return;
+    add(p.nombre, telAgendaDeCampo(p.tel), 'Equipo');
+  });
+  let usuarios=[];
+  try{ usuarios = typeof window.usuariosTodosActual==='function' ? window.usuariosTodosActual() : (typeof usuariosU!=='undefined' ? usuariosU : []); }catch(e){ usuarios=[]; }
+  (usuarios||[]).forEach(u=>{
+    if(!u) return;
+    add(u.usuario, telAgendaDeCampo(u.telf), 'Usuario');
+  });
+  return [...porNombre.values()].filter(c=>c.tels.length);
+}
+function contarContactosAgenda(){ return contactosParaAgenda().length; }
+function emojiAgendaDe(c){
+  const o=c && c.origenes || [];
+  if(o.indexOf('Equipo')>=0) return '🟢 ';
+  return '🔵 ';
+}
+function vcardDeContactos(lista){
+  return lista.map(c=>{
+    const nota='APPI · '+(c.origenes||[]).join(' · ');
+    const fn=emojiAgendaDe(c)+(c.nombre||'');
+    const tels=c.tels.map(n=>'TEL;TYPE=CELL:+'+String(n).replace(/^\+/,'')).join('\r\n');
+    return ['BEGIN:VCARD','VERSION:3.0','FN:'+vcardEscape(fn),tels,'NOTE:'+vcardEscape(nota),'END:VCARD'].join('\r\n');
+  }).join('\r\n')+'\r\n';
+}
+async function exportarAgendaTelefono(){
+  const lista=contactosParaAgenda();
+  if(!lista.length){
+    if(window.APPIDialog) window.APPIDialog.alert('No hay nombres con teléfono en Equipo ni en Usuarios.',{title:'Pasar a contactos',icon:'📲'});
+    else if(typeof showToast==='function') showToast('No hay teléfonos para guardar',2200);
+    return;
+  }
+  const vcf=vcardDeContactos(lista);
+  const blob=new Blob([vcf],{type:'text/vcard;charset=utf-8'});
+  const nombreArchivo='APPI-contactos.vcf';
+  try{
+    const file=new File([blob],nombreArchivo,{type:'text/vcard'});
+    if(navigator.canShare && navigator.canShare({files:[file]})){
+      await navigator.share({files:[file], title:'Contactos APPI'});
+      if(typeof showToast==='function') showToast(lista.length+' contactos listos para la agenda',2400);
+      return;
+    }
+  }catch(e){
+    if(e && e.name==='AbortError') return;
+  }
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=nombreArchivo;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(()=>{ try{ a.remove(); URL.revokeObjectURL(a.href); }catch(_){ } }, 1200);
+  const msg='Se armó un archivo con '+lista.length+' contactos. Abrilo y aceptá importarlos a la agenda del teléfono.';
+  if(window.APPIDialog) window.APPIDialog.alert(msg,{title:'Pasar a contactos',icon:'📲'});
+  else if(typeof showToast==='function') showToast(msg,3200);
+}
+
 function llamarWhatsAppDirecto(numero){
   const url='whatsapp://call?phone='+encodeURIComponent(numero);let abierto=false;const onBlur=()=>{abierto=true;window.removeEventListener('blur',onBlur)};window.addEventListener('blur',onBlur);window.location.href=url;setTimeout(()=>{window.removeEventListener('blur',onBlur);if(!abierto)window.APPITel.abrir(numero)},900);
 }
@@ -10640,7 +10735,17 @@ function renderToolsList(){
       statusVal:'Notas', statusClass:'pending', progressPct:100,
       timeAgo:'Tus ideas', onClick:"showView('view-notas')", accent:'#fbbf24', gradient:'linear-gradient(135deg,#fbbf24,#f59e0b)'
     });
-    herrHost.innerHTML = h1 + h2 + h3 + h4 + h5 + hStock + h6 + h7;
+    let nAgenda=0;
+    try{ nAgenda = typeof contarContactosAgenda==='function' ? contarContactosAgenda() : 0; }catch(e){ nAgenda=0; }
+    const hAgenda = renderHomeQuickCard({
+      icon:'📲', title:'Pasar a contactos', sub:'Equipo y usuarios, al teléfono',
+      statusVal: nAgenda ? String(nAgenda) : '—',
+      statusClass: nAgenda ? 'pending' : 'empty',
+      progressPct: nAgenda ? 100 : 0,
+      timeAgo: nAgenda ? 'Listos para importar' : 'Sin teléfonos',
+      onClick:'exportarAgendaTelefono()', accent:'#25d366', gradient:'linear-gradient(135deg,#25d366,#128c7e)'
+    });
+    herrHost.innerHTML = h1 + h2 + h3 + h4 + h5 + hStock + h6 + h7 + hAgenda;
   }
   if(!mesHost){const toolsList=document.getElementById('toolsList');if(toolsList)toolsList.innerHTML = `
     <details class="home-section-block" data-home-sec="mes" ${openMes?'open':''}>
@@ -11889,8 +11994,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='436';
-      const CACHE_NAME='appi-v436-campana-al-lado';
+      const swVersion='437';
+      const CACHE_NAME='appi-v437-pasar-contactos';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 
@@ -13014,6 +13119,9 @@ body.dark .presu-select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:
     <span class="ti-ico">📤</span>
     <span>Compartir APPI</span>
   </button>
+  <button class="tools-item" id="btnToolsAgenda" onclick="cerrarToolsMenu(); exportarAgendaTelefono()">
+    <span class="ti-ico">📲</span><span>Pasar a contactos</span>
+  </button>
   <button class="tools-item" id="btnToolsDevices" onclick="abrirDispositivosDesdeMenu()" hidden>
     <span class="ti-ico">📲</span><span id="toolsDevicesTxt">Vincular teléfono</span>
   </button>
@@ -13086,6 +13194,7 @@ body.dark .tools-item:hover{background:rgba(91,141,239,.22); color:#a8b8ff}
 .tools-menu.open .tools-item:nth-child(5){animation-delay:.20s}
 .tools-menu.open .tools-item:nth-child(6){animation-delay:.24s}
 .tools-menu.open .tools-item:nth-child(7){animation-delay:.28s}
+.tools-menu.open .tools-item:nth-child(8){animation-delay:.32s}
 @keyframes toolsIn{
   from{opacity:0; transform:translateX(26px) scale(.9)}
   to{opacity:1; transform:translateX(0) scale(1)}
