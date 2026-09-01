@@ -1127,6 +1127,7 @@
     }
     html += '<div class="mu-acciones">';
     html += '<button type="button" class="mu-enviar" id="muFilaEnviar">💬 Mandar a ' + esc(nombre) + '</button>';
+    html += '<button type="button" class="mu-mensajes" id="muFilaMensajes">' + icoWa() + 'Mensajes</button>';
     // Cada acción se marca sí o sí: ✓ la hice (aunque sea por otro medio) o
     // ✗ no se hizo. No hay forma de pasar de largo sin dejar constancia.
     html += '<div class="mu-marcar" style="grid-template-columns:1fr 44px 1fr;">' +
@@ -1155,6 +1156,7 @@
       // corrige con la ✗ y se avanza desde ahí (v330).
       pintarFila();
     };
+    cuerpo.querySelector('#muFilaMensajes').onclick = function(){ pintarGrupos(u); };
     var otroHielo = cuerpo.querySelector('#muOtroHielo');
     if (otroHielo) otroHielo.onclick = function(){
       fila.textoActual = textoHielo();
@@ -1301,6 +1303,12 @@
       '.mu-acciones{display:grid;grid-template-columns:1fr;gap:9px;margin-top:15px}',
       '.mu-enviar{min-height:52px;border:0;border-radius:15px;background:linear-gradient(135deg,#25d366,#128C7E);color:#fff;',
       'font:inherit;font-size:14px;font-weight:850;cursor:pointer;box-shadow:0 7px 18px rgba(18,140,126,.26)}',
+      '.mu-mensajes{display:flex;align-items:center;justify-content:center;gap:8px;min-height:48px;border:1px solid rgba(37,211,102,.35);border-radius:15px;',
+      'background:#fff;color:#128C7E;font:inherit;font-size:14px;font-weight:850;cursor:pointer}',
+      '.mu-mensajes:hover{background:rgba(37,211,102,.08)}',
+      '.mu-wa-ico{display:inline-flex;line-height:0}',
+      '.mu-wa-ico svg{display:block}',
+      'body.dark .mu-mensajes{background:rgba(255,255,255,.08);border-color:rgba(37,211,102,.4);color:#3ad0a4}',
       '.mu-sec{min-height:44px;border:0;border-radius:13px;background:rgba(91,141,239,.11);color:#3d63c9;font:inherit;font-size:12.5px;font-weight:850;cursor:pointer}',
       '.mu-sec:hover{background:rgba(91,141,239,.2)}',
       '.mu-sec.mu-grande{min-height:50px;font-size:14px}',
@@ -1331,7 +1339,7 @@
       '.mu-hoy-item:not(.done){grid-template-columns:auto minmax(0,1fr) auto auto}',
       'body.dark .mu-marca.ok{background:rgba(58,208,164,.18)}',
       'body.dark .mu-marca.no{background:rgba(255,107,107,.16)}',
-      '.mu-nota{margin-top:13px;padding:11px 13px;border-radius:13px;background:rgba(245,179,1,.1);color:#8a6100;font-size:11.5px;line-height:1.5}',
+      '.mu-nota{margin-top:13px;padding:11px 13px;border-radius:13px;background:rgba(245,179,1,.1);color:#8a6100;font-size:11.;color:#8a6100;font-size:11.5px;line-height:1.5}',
       '.mu-vacio{margin-top:16px;padding:18px 14px;border-radius:15px;background:rgba(255,255,255,.7);color:#777887;font-size:12.5px;text-align:center;line-height:1.55}',
       /* franja del día */
       '#muHoy{margin:0 0 12px;padding:13px 14px;border-radius:16px;border:1px solid rgba(91,141,239,.2);',
@@ -1433,6 +1441,9 @@
   }
 
   /* ---------- hielo y plantillas por para qué (v412) ---------- */
+  function icoWa(){
+    return '<span class="mu-wa-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18"><path fill="#25D366" d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2zm.01 1.67c2.2 0 4.26.86 5.82 2.42a8.19 8.19 0 0 1 2.41 5.83c0 4.54-3.7 8.23-8.24 8.23-1.48 0-2.93-.39-4.19-1.15l-.3-.17-3.12.82.83-3.04-.2-.32a8.2 8.2 0 0 1-1.26-4.38c0-4.54 3.7-8.24 8.25-8.24z"/><path fill="#25D366" d="M9.79 7.54c-.2 0-.52.07-.79.37-.26.3-1.02 1-1.02 2.43s1.04 2.82 1.19 3.01c.15.2 2.03 3.25 5.01 4.43 2.48.98 2.98.79 3.52.74.54-.05 1.73-.7 1.97-1.38.24-.67.24-1.25.17-1.37-.07-.12-.26-.2-.54-.35-.28-.15-1.73-.85-2-.95-.27-.1-.46-.15-.66.15s-.76.95-.93 1.14c-.17.2-.34.22-.63.07-.28-.14-1.2-.44-2.29-1.4-.85-.75-1.42-1.69-1.58-1.97-.17-.28-.02-.43.13-.58.13-.13.28-.34.43-.51.14-.17.19-.29.28-.48.1-.2.05-.36-.02-.51-.08-.14-.65-1.57-.9-2.15-.23-.55-.48-.48-.66-.48z"/></svg></span>';
+  }
   function nombreCortoDe(u){
     return (u ? ((typeof window.nombreDePila === 'function' ? window.nombreDePila(u.usuario) : '') || u.usuario) : '') || '';
   }
@@ -1486,7 +1497,8 @@
       '<button type="button" class="mu-volver" id="muVolverEnvio">‹ Volver</button>';
     cuerpo.querySelector('#muEnviar').onclick = function(){
       dispararEnvio(cuerpo.querySelector('#muPrevTxt').textContent, u);
-      cerrar();
+      if (fila){ fila.textoActual = null; pintarFila(); }
+      else cerrar();
     };
     cuerpo.querySelector('#muVolverEnvio').onclick = function(){
       if (typeof volver === 'function') volver();
@@ -1577,6 +1589,7 @@
     });
     html += '</div>';
     html += '<button type="button" class="mu-volver" id="muIrEditar">✏️ Editar los textos</button>';
+    if (fila) html += '<button type="button" class="mu-volver" id="muVolverFila">‹ Volver</button>';
     cuerpo.innerHTML = html;
     cuerpo.querySelectorAll('[data-mu-grupo]').forEach(function(b){
       b.onclick = function(){
@@ -1593,6 +1606,8 @@
       ov.querySelector('#muSub').textContent = 'Elegí cuál querés cambiar';
       pintarListaEdicion(cuerpo, u ? plantillasPara(u) : plantillas(), u);
     };
+    var vf = cuerpo.querySelector('#muVolverFila');
+    if (vf) vf.onclick = function(){ pintarFila(); };
     ov.classList.add('open');
   }
   function alElegirGrupo(g, u){

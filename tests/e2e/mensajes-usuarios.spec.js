@@ -431,6 +431,12 @@ test('la fila de trabajo va de a uno y avisa cuántos quedan', async ({ page }) 
   await expect(page.locator('.mu-fila-quien')).toContainText('GOMEZ, ANA MARIA');
   await expect(page.locator('.mu-prev')).toContainText('María');
   await expect(page.locator('.mu-prev')).not.toContainText('Feliz cumpleaños');
+  await expect(page.locator('#muFilaMensajes')).toBeVisible();
+  await expect(page.locator('#muFilaMensajes')).toContainText('Mensajes');
+  await page.locator('#muFilaMensajes').click();
+  await expect(page.locator('[data-mu-grupo]')).toHaveCount(7);
+  await page.locator('#muVolverFila').click();
+  await expect(page.locator('#muFilaEnviar')).toBeVisible();
 
   await page.locator('#muFilaEnviar').click();
   await expect(page.locator('.mu-fila-quien')).toContainText('GOMEZ, ANA MARIA');
