@@ -2327,6 +2327,19 @@ body.dark .hist-action-drawer{background:linear-gradient(155deg,#151827,#252036 
   .person-modal-body .pm-row:last-child { border-bottom: none; }
   .person-modal-body .pm-row .pm-lbl { color: #6b6b76; font-weight: 600; }
   .person-modal-body .pm-row .pm-val { color: #1c1c1e; font-weight: 700; text-align: right; word-break: break-word; }
+  .pm-meses{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:8px 0 12px}
+  .pm-mes-card{padding:10px 6px 8px;border:1px solid rgba(122,75,217,.18);border-radius:12px;background:#fff;text-align:center}
+  .pm-mes-tit{margin-bottom:8px;color:#8a8a94;font-size:10.5px;font-weight:750}
+  .pm-mes-nums{display:grid;grid-template-columns:1fr 1fr;gap:2px}
+  .pm-mes-col{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0}
+  .pm-mes-pers{color:#3d63c9;font-size:12.5px;font-weight:900;white-space:nowrap}
+  .pm-mes-org{color:#9a9aa8;font-size:12.5px;font-weight:900;white-space:nowrap}
+  .pm-mes-org.on{color:#7a4bd9;cursor:pointer}
+  .pm-mes-col small{color:#9a9aa8;font-size:9px;font-weight:700}
+  body.dark .pm-mes-card{background:rgba(31,32,49,.72);border-color:rgba(201,160,255,.22)}
+  body.dark .pm-mes-tit, body.dark .pm-mes-col small{color:#a0a0b0}
+  body.dark .pm-mes-pers{color:#a8b8ff}
+  body.dark .pm-mes-org.on{color:#d4b3ff}
   /* ============ EXPORTAR IMAGEN ============ */
   .share-menu-item {
     display: flex; align-items: center; gap: 12px;
@@ -4116,7 +4129,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v425 · Segura</div>
+  <div class="ds-foot">APPI · v426 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -8502,7 +8515,6 @@ function openPersonaModal(p){
     })()}
     
         ${(function(){
-      // Calcular PB de organización de los meses anteriores
       const calcOrgMes = (campo) => {
         let total = Number(p[campo]) || 0;
         (p.hijos||[]).forEach(h => { total += calcOrgMesRec(h, campo); });
@@ -8512,18 +8524,24 @@ function openPersonaModal(p){
       const orgM2 = calcOrgMes('m2');
       const orgM3 = calcOrgMes('m3');
       const tieneEquipo = (p.hijos && p.hijos.length > 0);
-      
-      const renderMes = (label, personal, org, campo) => {
-        if(!tieneEquipo || org <= personal){
-          return `<div class="pm-row"><span class="pm-lbl">${label}</span><span class="pm-val">${formatPB(personal)}</span></div>`;
-        }
-        return `
-          <div class="pm-row" style="border-bottom:none; padding-bottom:4px;"><span class="pm-lbl">${label}</span><span class="pm-val" style="font-size:11px; color:#8a8a94; font-weight:600">👤 Personal / 👥 Org.</span></div>
-          <div class="pm-row" style="padding-top:2px;"><span class="pm-lbl" style="padding-left:8px; font-size:12px">↳</span><span class="pm-val"><span style="color:#3d63c9">${formatPB(personal)}</span> <span style="color:#8a8a94; font-weight:500">/</span> <span class="pm-org-link" onclick="event.stopPropagation();mostrarDescendenciaById(${p.id},'${campo}')" title="Ver descendencia de este mes">${formatPB(org)} ▸</span></span></div>
-        `;
+      const card = (label, personal, org, campo) => {
+        const hayOrg = tieneEquipo && org > personal;
+        const orgAttr = hayOrg
+          ? ` class="pm-mes-org on" onclick="event.stopPropagation();mostrarDescendenciaById(${p.id},'${campo}')" title="Ver descendencia de este mes"`
+          : ' class="pm-mes-org"';
+        return `<div class="pm-mes-card">
+          <div class="pm-mes-tit">${label}</div>
+          <div class="pm-mes-nums">
+            <div class="pm-mes-col"><span class="pm-mes-pers">👤 ${formatPB(personal)}</span><small>Pers.</small></div>
+            <div class="pm-mes-col"><span${orgAttr}>👥 ${formatPB(org)}</span><small>Org.</small></div>
+          </div>
+        </div>`;
       };
-      
-      return renderMes('PB mes ant.', p.m1, orgM1, 'm1') + renderMes('PB 2 meses ant.', p.m2, orgM2, 'm2') + renderMes('PB 3 meses ant.', p.m3, orgM3, 'm3');
+      return '<div class="pm-meses">' +
+        card('Mes ant.', p.m1, orgM1, 'm1') +
+        card('Hace 2', p.m2, orgM2, 'm2') +
+        card('Hace 3', p.m3, orgM3, 'm3') +
+      '</div>';
     })()}
 
     <div class="pm-row"><span class="pm-lbl">Alta</span><span class="pm-val">${p.alta || '—'}</span></div>
@@ -11818,8 +11836,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='425';
-      const CACHE_NAME='appi-v425-sin-bonus-equipo';
+      const swVersion='426';
+      const CACHE_NAME='appi-v426-pb-tres-tarjetas';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 
