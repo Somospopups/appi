@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v430-sin-icono-ficha';
+const CACHE_NAME = 'appi-v431-sin-icono-ficha';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

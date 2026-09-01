@@ -2619,6 +2619,7 @@ body.dark .hist-action-drawer{background:linear-gradient(155deg,#151827,#252036 
     font-size: 28px; color: #fff;
     box-shadow: 0 6px 18px rgba(0,0,0,0.15);
   }
+  .modal-icon.off { display: none !important; }
   .modal-title { margin: 0; font-size: 20px; font-weight: 800; letter-spacing: -0.3px; }
   .modal-sub { margin: 4px 0 0; font-size: 13px; color: #6b6b76; }
   .modal-body { padding: 8px 22px 20px; font-size: 14px; line-height: 1.6; color: #3a3a48; }
@@ -4138,7 +4139,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v430 · Segura</div>
+  <div class="ds-foot">APPI · v431 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -5379,6 +5380,7 @@ const modal = {
   open(opts){
     this.icon.textContent = opts.icon || '💡';
     this.icon.style.background = opts.iconBg || 'linear-gradient(135deg,#5b8def,#a06bff)';
+    this.icon.classList.toggle('off', !!opts.hideIcon);
     this.title.textContent = opts.title || '';
     this.sub.textContent = opts.sub || '';
     this.body.innerHTML = opts.html || '';
@@ -11877,8 +11879,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='430';
-      const CACHE_NAME='appi-v430-sin-icono-ficha';
+      const swVersion='431';
+      const CACHE_NAME='appi-v431-sin-icono-ficha';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 
@@ -16053,6 +16055,11 @@ setTimeout(initHistorico,1200);
  setTimeout(limpiarRestos, 400);
 })();
 </script>
+
+<link rel="stylesheet" href="./appi-tema.css">
+</body>
+</html>
+cript>
 
 <link rel="stylesheet" href="./appi-tema.css">
 </body>
