@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v429-pb-pers-org';
+const CACHE_NAME = 'appi-v430-sin-icono-ficha';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

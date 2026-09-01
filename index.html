@@ -4138,7 +4138,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v429 · Segura</div>
+  <div class="ds-foot">APPI · v430 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -8600,7 +8600,7 @@ function openPersonaModal(p){
     ${telefonos.length > 0 ? `<div style="margin-top:14px">${telefonos.length > 1 ? '<div style="font-size:11px; color:#6b6b76; font-weight:700; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.3px;">Contactar:</div>' : ''}<div class="pm-actions">${botonesTel}${p.email && telefonos.length === 1 ? `<button class="pm-mail" onclick="window.open('mailto:${p.email}','_self')">✉️ Email</button>` : ''}${telefonos.length > 1 && p.email ? `<button class="pm-mail" onclick="window.open('mailto:${p.email}','_self')">✉️ Enviar Email</button>` : ''}</div></div>` : (p.email ? `<div class="pm-actions" style="margin-top:14px"><button class="pm-mail" onclick="window.open('mailto:${p.email}','_self')">✉️ Email</button></div>` : '')}
   </div>`;
   modal.open({
-    icon:'👤', iconBg: `linear-gradient(135deg,${info.color},#5b8def)`,
+    hideIcon: true,
     title: p.nombre, sub: info.full,
     html
   });
@@ -11877,8 +11877,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='429';
-      const CACHE_NAME='appi-v429-pb-pers-org';
+      const swVersion='430';
+      const CACHE_NAME='appi-v430-sin-icono-ficha';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 
@@ -16044,6 +16044,13 @@ setTimeout(initHistorico,1200);
 </html>
 );
   setTimeout(limpiarRestos, 400);
+})();
+</script>
+
+<link rel="stylesheet" href="./appi-tema.css">
+</body>
+</html>
+ setTimeout(limpiarRestos, 400);
 })();
 </script>
 
