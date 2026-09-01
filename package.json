@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "421.0.0",
-  "cacheName": "appi-v421-mandar-primero",
+  "version": "422.0.0",
+  "cacheName": "appi-v422-zona-whatsapp",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

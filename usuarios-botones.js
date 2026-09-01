@@ -28,7 +28,8 @@
 
   /* ---------- estilos ---------- */
   function css(){
-    if (document.getElementById('ubEstilos')) return;
+    var viejo = document.getElementById('ubEstilos');
+    if (viejo) viejo.remove();
     var st = document.createElement('style');
     st.id = 'ubEstilos';
     st.textContent = [
@@ -62,6 +63,11 @@
       '.ub-top p{margin:5px 0 0;color:#777887;font-size:12px}',
       '.ub-close{width:48px;height:48px;flex:0 0 auto;border:0;border-radius:50%;background:rgba(91,141,239,.11);color:#3d63c9;font-size:22px;font-weight:900;cursor:pointer}',
       '.ub-list{display:grid;gap:7px;margin-top:14px}',
+      '.ub-fila{display:grid;grid-template-columns:minmax(0,1fr) 26px;gap:8px;align-items:center}',
+      '.ub-share{display:grid;place-items:center;width:26px;height:26px;padding:0;border:0;border-radius:50%;',
+      'background:#25d366;color:#fff;cursor:pointer;box-shadow:0 2px 6px rgba(18,140,126,.28)}',
+      '.ub-share:hover{filter:brightness(1.08)}',
+      '.ub-share svg{display:block;width:14px;height:14px}',
       '.ub-item{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;width:100%;min-height:56px;',
       'padding:12px 14px;border:1px solid rgba(80,90,130,.1);border-radius:15px;background:#fff;font:inherit;',
       'text-align:left;cursor:pointer;transition:background .14s,border-color .14s}',
@@ -157,6 +163,29 @@
       return a.localeCompare(b, 'es');
     }).map(function(z){ return { nombre: z, cuantos: mapa[z] }; });
   }
+  function genteDeZona(zona){
+    var z = String(zona || '').trim().toLowerCase();
+    return lista().filter(function(u){
+      return String(u.localidad || '').trim().toLowerCase() === z;
+    }).sort(function(a, b){
+      return String(a.usuario || '').localeCompare(String(b.usuario || ''), 'es');
+    });
+  }
+  function textoListaZona(zona){
+    var gente = genteDeZona(zona);
+    var lineas = [zona + ' · ' + gente.length + (gente.length === 1 ? ' persona' : ' personas'), ''];
+    gente.forEach(function(u){ lineas.push(String(u.usuario || 'Sin nombre')); });
+    return lineas.join('\n');
+  }
+  function icoWaChico(){
+    return '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2C6.5 2 2 6.5 2 12c0 1.8.5 3.4 1.3 4.9L2 22l5.2-1.3C8.7 21.5 10.3 22 12 22c5.5 0 10-4.5 10-10S17.5 2 12 2zm5.7 14.2c-.2.7-1.2 1.2-1.9 1.4-.5.1-1.1.2-3.6-.8-3.1-1.2-5.1-4.2-5.3-4.4-.2-.2-1.6-2.1-1.6-4s1-2.8 1.4-3.2c.3-.3.7-.5 1.1-.5h.8c.3 0 .6 0 .8.6.2.8.8 2 .9 2.1.1.2.1.4 0 .6-.1.2-.2.4-.4.6l-.6.7c-.2.2-.4.4-.2.8.2.4 1 1.6 2.1 2.6 1.4 1.3 2.6 1.7 3 .1.9.2.6 0 .8-.2.2-.2.5-.3.8-.2.3.1 1.8.8 2.1 1 .3.2.5.3.6.5.1.2.1.7-.1 1.4z"/></svg>';
+  }
+  function compartirZona(zona){
+    var texto = textoListaZona(zona);
+    var url = 'https://wa.me/?text=' + encodeURIComponent(texto);
+    if (window.APPIWhatsApp && window.APPIWhatsApp.abrir) window.APPIWhatsApp.abrir(url);
+    else window.open(url, '_blank', 'noopener');
+  }
   function etiqueta(coleccion, id){
     for (var i = 0; i < (coleccion || []).length; i++){
       if (coleccion[i].id === id) return coleccion[i].label;
@@ -228,8 +257,11 @@
     }
     var html = '<div class="ub-list">' + grupos.map(function(g){
       var on = actual.tipo === 'zona' && actual.zona === g.nombre;
-      return '<button type="button" class="ub-item' + (on ? ' on' : '') + '" data-ub-zona="' + esc(g.nombre) + '">' +
-        '<strong>' + esc(g.nombre) + '</strong><span class="ub-n">' + g.cuantos + '</span></button>';
+      return '<div class="ub-fila">' +
+        '<button type="button" class="ub-item' + (on ? ' on' : '') + '" data-ub-zona="' + esc(g.nombre) + '">' +
+        '<strong>' + esc(g.nombre) + '</strong><span class="ub-n">' + g.cuantos + '</span></button>' +
+        '<button type="button" class="ub-share" data-ub-zona-wa="' + esc(g.nombre) + '" title="Compartir lista por WhatsApp" aria-label="Compartir ' + esc(g.nombre) + ' por WhatsApp">' + icoWaChico() + '</button>' +
+        '</div>';
     }).join('') + '</div>' +
     '<button type="button" class="ub-todos" data-ub-todos>Todos los barrios</button>';
 
@@ -240,6 +272,12 @@
         actual = { tipo: 'zona', zona: z, marca: '', banco: '', label: z };
         cerrar();
         aplicar();
+      };
+    });
+    ov.querySelectorAll('[data-ub-zona-wa]').forEach(function(b){
+      b.onclick = function(e){
+        e.stopPropagation();
+        compartirZona(b.getAttribute('data-ub-zona-wa'));
       };
     });
     ov.querySelector('[data-ub-todos]').onclick = function(){ cerrar(); limpiar(); };

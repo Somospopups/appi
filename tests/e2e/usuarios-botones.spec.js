@@ -203,6 +203,31 @@ test('sin tarjetas cargadas el popup lo explica en vez de quedar vacío', async 
   await expect(page.locator('#ubCuerpo .ub-item')).toHaveCount(0);
 });
 
+test('el círculo verde comparte la lista de esa zona por WhatsApp', async ({ page }) => {
+  await entrar(page);
+  await page.locator('#usuariosBtnZonas').click();
+  await expect(page.locator('[data-ub-zona-wa]')).toHaveCount(2);
+
+  await page.evaluate(() => {
+    window.__waUrl = '';
+    window.APPIWhatsApp = Object.assign({}, window.APPIWhatsApp, {
+      abrir: function(url){ window.__waUrl = url; return Promise.resolve(true); }
+    });
+  });
+  await page.locator('[data-ub-zona-wa="Alta Gracia"]').click();
+
+  // No filtra ni cierra: sólo abre WhatsApp con los nombres.
+  await expect(page.locator('#ubOverlay')).toHaveClass(/open/);
+  await expect(page.locator('#usuariosList .tree-name')).toHaveCount(6);
+  const url = await page.evaluate(() => window.__waUrl);
+  const texto = decodeURIComponent(String(url).split('text=')[1] || '');
+  expect(texto).toContain('Alta Gracia');
+  expect(texto).toContain('Ana Gómez');
+  expect(texto).toContain('Beto Ruiz');
+  expect(texto).toContain('Caro Díaz');
+  expect(texto).not.toContain('Diego Paz');
+});
+
 test('el popup se cierra con Escape y tocando fuera', async ({ page }) => {
   await entrar(page);
 

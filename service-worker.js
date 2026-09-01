@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v421-mandar-primero';
+const CACHE_NAME = 'appi-v422-zona-whatsapp';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
