@@ -1125,8 +1125,8 @@
     html += '</div></div>';
     html += '<span id="muPrevTxt">' + esc(texto) + '</span></div>';
     html += '<div class="mu-acciones">';
-    html += '<div class="mu-otro-msg-row"><button type="button" class="mu-otro-msg" id="muFilaMensajes">Elegir otro mensaje</button></div>';
     html += '<button type="button" class="mu-enviar" id="muFilaEnviar">💬 Mandar a ' + esc(nombre) + '</button>';
+    html += '<div class="mu-otro-msg-row"><button type="button" class="mu-otro-msg" id="muFilaMensajes">Elegir otro mensaje</button></div>';
     // Cada acción se marca sí o sí: ✓ la hice (aunque sea por otro medio) o
     // ✗ no se hizo. No hay forma de pasar de largo sin dejar constancia.
     html += '<div class="mu-marcar" style="grid-template-columns:1fr 44px 1fr;">' +
