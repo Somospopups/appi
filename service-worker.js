@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v415-mensajes-fila';
+const CACHE_NAME = 'appi-v416-mensajes-fila-visible';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
