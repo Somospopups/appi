@@ -4145,7 +4145,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v437 · Segura</div>
+  <div class="ds-foot">APPI · v438 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -8460,7 +8460,7 @@ function vcardDeContactos(lista){
 async function exportarAgendaTelefono(){
   const lista=contactosParaAgenda();
   if(!lista.length){
-    if(window.APPIDialog) window.APPIDialog.alert('No hay nombres con teléfono en Equipo ni en Usuarios.',{title:'Pasar a contactos',icon:'📲'});
+    if(window.APPIDialog) window.APPIDialog.alert('No hay nombres con teléfono en Equipo ni en Usuarios.',{title:'Pasar a contactos',icon:'📒'});
     else if(typeof showToast==='function') showToast('No hay teléfonos para guardar',2200);
     return;
   }
@@ -8484,7 +8484,7 @@ async function exportarAgendaTelefono(){
   a.click();
   setTimeout(()=>{ try{ a.remove(); URL.revokeObjectURL(a.href); }catch(_){ } }, 1200);
   const msg='Se armó un archivo con '+lista.length+' contactos. Abrilo y aceptá importarlos a la agenda del teléfono.';
-  if(window.APPIDialog) window.APPIDialog.alert(msg,{title:'Pasar a contactos',icon:'📲'});
+  if(window.APPIDialog) window.APPIDialog.alert(msg,{title:'Pasar a contactos',icon:'📒'});
   else if(typeof showToast==='function') showToast(msg,3200);
 }
 
@@ -10738,7 +10738,7 @@ function renderToolsList(){
     let nAgenda=0;
     try{ nAgenda = typeof contarContactosAgenda==='function' ? contarContactosAgenda() : 0; }catch(e){ nAgenda=0; }
     const hAgenda = renderHomeQuickCard({
-      icon:'📲', title:'Pasar a contactos', sub:'Equipo y usuarios, al teléfono',
+      icon:'📒', title:'Pasar a contactos', sub:'Equipo y usuarios, al teléfono',
       statusVal: nAgenda ? String(nAgenda) : '—',
       statusClass: nAgenda ? 'pending' : 'empty',
       progressPct: nAgenda ? 100 : 0,
@@ -11994,8 +11994,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='437';
-      const CACHE_NAME='appi-v437-pasar-contactos';
+      const swVersion='438';
+      const CACHE_NAME='appi-v438-agenda-icono';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 
@@ -13120,7 +13120,7 @@ body.dark .presu-select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:
     <span>Compartir APPI</span>
   </button>
   <button class="tools-item" id="btnToolsAgenda" onclick="cerrarToolsMenu(); exportarAgendaTelefono()">
-    <span class="ti-ico">📲</span><span>Pasar a contactos</span>
+    <span class="ti-ico">📒</span><span>Pasar a contactos</span>
   </button>
   <button class="tools-item" id="btnToolsDevices" onclick="abrirDispositivosDesdeMenu()" hidden>
     <span class="ti-ico">📲</span><span id="toolsDevicesTxt">Vincular teléfono</span>

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v437-pasar-contactos';
+const CACHE_NAME = 'appi-v438-agenda-icono';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
