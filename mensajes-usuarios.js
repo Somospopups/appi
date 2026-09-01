@@ -1303,6 +1303,7 @@
       '.mu-acciones{display:grid;grid-template-columns:1fr;gap:9px;margin-top:15px}',
       '.mu-enviar{min-height:52px;border:0;border-radius:15px;background:linear-gradient(135deg,#25d366,#128C7E);color:#fff;',
       'font:inherit;font-size:14px;font-weight:850;cursor:pointer;box-shadow:0 7px 18px rgba(18,140,126,.26)}',
+      '.mu-otro-msg-row{display:flex;justify-content:flex-end}',
       '.mu-otro-msg{border:0;background:transparent;color:#128C7E;font:inherit;font-size:13px;font-weight:800;',
       'text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:4px 8px;min-height:36px}',
       '.mu-otro-msg:hover{color:#0b6b4a}',
