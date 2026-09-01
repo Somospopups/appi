@@ -4,8 +4,8 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
-- Versión: **v427 · Segura**.
-- Caché de la app: `appi-v427-pb-whatsapp` (se renueva al abrir APPI).
+- Versión: **v428 · Segura**.
+- Caché de la app: `appi-v428-pb-icono-abajo` (se renueva al abrir APPI).
 - Publicación: [https://somospopups.github.io/appi/](https://somospopups.github.io/appi/)
 - Acceso por número de distribuidor y contraseña.
 - Acceso administrador POPUPS mediante el candado, sin DIP ni número de distribuidor.

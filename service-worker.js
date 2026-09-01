@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v427-pb-whatsapp';
+const CACHE_NAME = 'appi-v428-pb-icono-abajo';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
