@@ -127,7 +127,7 @@ test('el botón de WhatsApp de la ficha abre el hielo la primera vez', async ({ 
   await expect(page.locator('[data-mu-grupo]')).toHaveCount(0);
 });
 
-test('tocar una plantilla abre WhatsApp derecho, sin pantalla intermedia', async ({ page }) => {
+test('tocar una plantilla muestra la previa y Enviar abre WhatsApp', async ({ page }) => {
   await entrar(page);
   // Se atrapa la apertura de WhatsApp para leer el texto que se manda.
   await page.evaluate(() => {
@@ -137,8 +137,11 @@ test('tocar una plantilla abre WhatsApp derecho, sin pantalla intermedia', async
   await abrirGruposFicha(page, 0);
   await page.locator('[data-mu-grupo="mant"]').click();
   await page.locator('[data-mu-plantilla="retrolavado"]').click();
+  await expect(page.locator('#muPrevTxt')).toContainText('Hola Ana');
+  await expect(page.locator('#muEnviar')).toBeVisible();
+  expect(await page.evaluate(() => window.__wa)).toEqual([]);
+  await page.locator('#muEnviar').click();
 
-  // Un solo toque: ni editor, ni confirmación.
   const urls = await page.evaluate(() => window.__wa);
   expect(urls).toHaveLength(1);
   const texto = decodeURIComponent(urls[0].split('text=')[1]);
@@ -712,6 +715,7 @@ test('los mensajes hablan de "tu equipo", no del modelo del purificador', async 
   await abrirGruposFicha(page, 0);
   await page.locator('[data-mu-grupo="mant"]').click();
   await page.locator('[data-mu-plantilla="retrolavado"]').click();
+  await page.locator('#muEnviar').click();
 
   const texto = decodeURIComponent((await page.evaluate(() => window.__wa))[0].split('text=')[1]);
   expect(texto).toContain('tu equipo');
@@ -785,6 +789,8 @@ test('se puede crear un mensaje propio y mandarlo a un cliente', async ({ page }
   const item = page.locator('[data-mu-plantilla^="propia_"]');
   await expect(item).toContainText('Control de agua');
   await item.click();
+  await expect(page.locator('#muPrevTxt')).toContainText('Hola Ana');
+  await page.locator('#muEnviar').click();
   const urls = await page.evaluate(() => window.__wa);
   expect(urls).toHaveLength(1);
   const texto = decodeURIComponent(urls[0].split('text=')[1]);
@@ -1119,7 +1125,7 @@ test('el botón Mensajes abre los grupos sin elegir a nadie', async ({ page }) =
   await expect(page.locator('#muIrEditar')).toBeVisible();
 });
 
-test('desde Mensajes un toque abre WhatsApp para elegir a cualquiera', async ({ page }) => {
+test('desde Mensajes se ve la previa y Enviar abre WhatsApp para cualquiera', async ({ page }) => {
   await entrar(page);
   await page.evaluate(() => {
     window.__wa = [];
@@ -1127,6 +1133,10 @@ test('desde Mensajes un toque abre WhatsApp para elegir a cualquiera', async ({ 
   });
   await page.locator('#usuariosBtnMensajes').click();
   await page.locator('[data-mu-grupo="cumple"]').click();
+  await expect(page.locator('#muPrevTxt')).toContainText('Feliz cumpleaños');
+  await expect(page.locator('#muEnviar')).toHaveText('Enviar');
+  expect(await page.evaluate(() => window.__wa)).toEqual([]);
+  await page.locator('#muEnviar').click();
   const urls = await page.evaluate(() => window.__wa);
   expect(urls).toHaveLength(1);
   expect(urls[0]).toMatch(/^https:\/\/wa\.me\/\?text=/);

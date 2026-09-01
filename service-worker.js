@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v413-mensajes-whatsapp';
+const CACHE_NAME = 'appi-v414-previa-enviar';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

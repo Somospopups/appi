@@ -113,6 +113,8 @@ test('arranca, navega e importa Garantías una sola vez', async ({ page }) => {
     await page.locator('[data-mu-grupo]').first().click();
     const plantilla = page.locator('[data-mu-plantilla]').first();
     if (await plantilla.count()) await plantilla.click();
+    const enviar = page.locator('#muEnviar');
+    if (await enviar.count()) await enviar.click();
   }
   const opened = await page.evaluate(() => window.__appiLastOpen);
   expect(opened[0]).toMatch(/^https:\/\/wa\.me\//);

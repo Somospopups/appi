@@ -1458,14 +1458,41 @@
     t = t.replace(/\n{3,}/g, '\n\n');
     return t.replace(/^\s+|\s+$/g, '');
   }
-  function mandarLibre(id){
+  function textoParaEnviar(id, u){
     var p = plantilla(id);
-    if (!p) return;
-    var texto = completarLibre(p.texto);
+    if (!p) return '';
+    return u ? completar(p.texto, u) : completarLibre(p.texto);
+  }
+  function dispararEnvio(texto, u){
+    if (u){
+      enviar(u, texto);
+      return;
+    }
     var url = 'https://wa.me/?text=' + encodeURIComponent(texto);
     if (window.APPIWhatsApp && window.APPIWhatsApp.abrir) window.APPIWhatsApp.abrir(url);
     else window.open(url, '_blank', 'noopener');
-    cerrar();
+  }
+  function pintarEnvio(id, u, volver){
+    var p = plantilla(id);
+    if (!p) return;
+    var ov = overlay();
+    var texto = textoParaEnviar(id, u);
+    var nombre = nombreCortoDe(u);
+    ov.querySelector('#muTitulo').textContent = (p.icono || '💬') + ' ' + p.nombre;
+    ov.querySelector('#muSub').textContent = u ? ('Para ' + nombre) : 'Revisá el texto y tocá Enviar';
+    var cuerpo = ov.querySelector('#muCuerpo');
+    cuerpo.innerHTML = '<div class="mu-prev"><b>Así lo va a recibir</b><span id="muPrevTxt">' + esc(texto) + '</span></div>' +
+      '<div class="mu-acciones"><button type="button" class="mu-enviar" id="muEnviar">Enviar</button></div>' +
+      '<button type="button" class="mu-volver" id="muVolverEnvio">‹ Volver</button>';
+    cuerpo.querySelector('#muEnviar').onclick = function(){
+      dispararEnvio(cuerpo.querySelector('#muPrevTxt').textContent, u);
+      cerrar();
+    };
+    cuerpo.querySelector('#muVolverEnvio').onclick = function(){
+      if (typeof volver === 'function') volver();
+      else pintarGrupos(u);
+    };
+    ov.classList.add('open');
   }
   function normProd(s){
     return String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
@@ -1539,7 +1566,7 @@
     ctx.plantilla = null;
     var nombre = nombreCortoDe(u);
     ov.querySelector('#muTitulo').textContent = u ? ('Mensaje para ' + nombre) : '💬 Mensajes';
-    ov.querySelector('#muSub').textContent = u ? 'Elegí para qué escribís' : 'Elegí uno y se abre WhatsApp, para quien quieras';
+    ov.querySelector('#muSub').textContent = u ? 'Elegí para qué escribís' : 'Elegí uno, miralo y enviá';
     var cuerpo = ov.querySelector('#muCuerpo');
     var html = '<div class="mu-list">';
     gruposPlantilla().forEach(function(g){
@@ -1571,8 +1598,7 @@
   function alElegirGrupo(g, u){
     var items = itemsDeGrupo(g, u);
     if (items.length === 1 && g.fuente !== 'propias'){
-      if (u) mandar(items[0].id, u);
-      else mandarLibre(items[0].id);
+      pintarEnvio(items[0].id, u, function(){ pintarGrupos(u); });
       return;
     }
     pintarItemsGrupo(g, u, items);
@@ -1603,8 +1629,7 @@
     cuerpo.querySelectorAll('[data-mu-plantilla]').forEach(function(b){
       var id = b.getAttribute('data-mu-plantilla');
       b.onclick = function(){
-        if (u) mandar(id, u);
-        else mandarLibre(id);
+        pintarEnvio(id, u, function(){ pintarItemsGrupo(g, u, items); });
       };
     });
     var neu = cuerpo.querySelector('#muNuevo');
@@ -2040,6 +2065,8 @@
     gruposPlantilla: gruposPlantilla,
     pintarGrupos: pintarGrupos,
     pintarHielo: pintarHielo,
+    pintarEnvio: pintarEnvio,
+    completarLibre: completarLibre,
     mandar: mandar,
     pendientes: pendientes,
     deHoy: deHoy,
