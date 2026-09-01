@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "411.0.0",
-  "cacheName": "appi-v411-mes-completo",
+  "version": "412.0.0",
+  "cacheName": "appi-v412-hielo-whatsapp",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

@@ -115,6 +115,7 @@ window.openStock=function(){
   <script src="./agenda-personal.js"></script>
 <script src="./tarjetas-promos.js"></script>
 <script src="./usuarios-botones.js"></script>
+<script src="./mensajes-hielo.js"></script>
 <script src="./mensajes-usuarios.js"></script>
 <script src="./reactivacion.js"></script>
 
@@ -4115,7 +4116,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v411 · Segura</div>
+  <div class="ds-foot">APPI · v412 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4961,6 +4962,7 @@ body.dark #pageTabs button.active{color:#a8c0ff}
         <button type="button" id="usuariosBtnTarjetas"><span>💳</span>Tarjetas</button>
         <button type="button" id="usuariosBtnOrdenVence"><span>📅</span>Ordenar</button>
         <button type="button" id="usuariosBtnZonas"><span>📍</span>Zonas</button>
+        <button type="button" id="usuariosBtnPlantillas"><span>💬</span>Plantillas</button>
         <button type="button" id="usuariosBtnCambiarArchivo"><span>📂</span>Cambiar archivo</button>
         <button type="button" id="usuariosBtnDepurados"><span>🧹</span>Depurados</button>
         <!-- Aparece sólo con un filtro puesto. -->
@@ -11624,6 +11626,7 @@ function abrirCuentaDesdeMenu(){
     icon:'👤',iconBg:'linear-gradient(135deg,#5b8def,#a06bff)',title:'Mi cuenta',sub:activePerson?.nombre||profile.nombre||`Distribuidor ${profile.dip||''}`,
     html:`<div style="display:grid;gap:9px;text-align:left">
       <div class="tip"><b>Persona activa:</b> ${escapeXml(activePerson?.nombre||profile.nombre||'—')} · ${activePerson?.tipo==='socio'?'Socio/a':'Titular'}<br><b>Número de distribuidor:</b> ${escapeXml(profile.dip||'—')}<br><b>Última validación:</b> ${escapeXml(last)}<br><b>Estado:</b> ${authStatus.offline?'Modo offline':'Conectada'}</div>
+      <div class="tip"><b>Cómo te nombran en los WhatsApp</b><br><input id="appiFirmaWa" type="text" maxlength="40" value="${escapeXml((window.APPIHielo&&window.APPIHielo.firma&&window.APPIHielo.firma())||'')}" placeholder="${escapeXml((window.APPIHielo&&window.APPIHielo.nombreCuenta&&window.APPIHielo.nombreCuenta())||'')}" style="width:100%;margin-top:8px;padding:10px 12px;border-radius:12px;border:1px solid rgba(80,90,130,.16);font:inherit;font-size:14px;box-sizing:border-box"><small style="display:block;margin-top:6px;color:#777887;line-height:1.4">Si lo dejás vacío, se usa tu primer nombre. Cada uno (titular o socio) tiene el suyo.</small><button type="button" class="btn btn-secondary" id="btnGuardarFirma" style="margin-top:10px">Guardar nombre</button></div>
       <div class="tip"><b>Sincronización:</b> ${syncStatus.syncing?'En curso':syncStatus.dirty?`${syncStatus.dirty} cambios pendientes`:'Actualizada'}${syncStatus.lastError?`<br><span style="color:#b13e47">${escapeXml(syncStatus.lastError)}</span>`:''}</div>
       <div class="warn-tip"><b>🎙️ Importante:</b> las grabaciones de audio quedan únicamente en el dispositivo donde se hicieron. El resto de los datos se sincroniza con tu cuenta.</div>
       <button type="button" class="btn btn-primary" id="btnAccountSync">☁️ Sincronizar ahora</button>
@@ -11635,7 +11638,8 @@ function abrirCuentaDesdeMenu(){
     </div>`
   });
   setTimeout(()=>{
-    const sync=document.getElementById('btnAccountSync'),devices=document.getElementById('btnAccountDevices'),password=document.getElementById('btnAccountPassword'),logout=document.getElementById('btnAccountLogout'),erase=document.getElementById('btnAccountLogoutErase');
+    const sync=document.getElementById('btnAccountSync'),devices=document.getElementById('btnAccountDevices'),password=document.getElementById('btnAccountPassword'),logout=document.getElementById('btnAccountLogout'),erase=document.getElementById('btnAccountLogoutErase'),firmaBtn=document.getElementById('btnGuardarFirma'),firmaInput=document.getElementById('appiFirmaWa');
+    if(firmaBtn&&window.APPIHielo)firmaBtn.onclick=()=>{const nombre=window.APPIHielo.guardarFirma(firmaInput?firmaInput.value:'');if(firmaInput)firmaInput.value=nombre;showToast('En los WhatsApp te van a nombrar '+nombre,2400)};
     if(sync)sync.onclick=async()=>{sync.disabled=true;sync.textContent='Sincronizando…';try{await window.APPIDataSync.syncNow(true);showToast('Cuenta sincronizada ☁️',2200);modal.close()}catch(error){showToast(error.message||'No se pudo sincronizar',3500);sync.disabled=false;sync.textContent='☁️ Sincronizar ahora'}};
     if(devices)devices.onclick=()=>window.APPIDeviceBridge&&window.APPIDeviceBridge.openManager();
     if(password)password.onclick=abrirCambioPasswordAPPI;
@@ -11819,8 +11823,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='411';
-      const CACHE_NAME='appi-v411-mes-completo';
+      const swVersion='412';
+      const CACHE_NAME='appi-v412-hielo-whatsapp';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 
@@ -14786,6 +14790,10 @@ function initUsuarios(){
   const btnZonas=document.getElementById('usuariosBtnZonas');
   if(btnZonas) btnZonas.onclick=()=>{
     if(window.APPIUsuariosBotones) window.APPIUsuariosBotones.abrirBarrios();
+  };
+  const btnPlantillas=document.getElementById('usuariosBtnPlantillas');
+  if(btnPlantillas) btnPlantillas.onclick=()=>{
+    if(window.APPIMensajes&&window.APPIMensajes.abrirPlantillas) window.APPIMensajes.abrirPlantillas();
   };
 
   // Cargar de localStorage

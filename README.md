@@ -4,8 +4,8 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
-- Versión: **v411 · Segura**.
-- Caché de la app: `appi-v411-mes-completo` (se renueva al abrir APPI).
+- Versión: **v412 · Segura**.
+- Caché de la app: `appi-v412-hielo-whatsapp` (se renueva al abrir APPI).
 - Publicación: [https://somospopups.github.io/appi/](https://somospopups.github.io/appi/)
 - Acceso por número de distribuidor y contraseña.
 - Acceso administrador POPUPS mediante el candado, sin DIP ni número de distribuidor.
@@ -54,6 +54,12 @@ Descendente: es el PB personal del titular (figura primero; si hay socio,
 ese segundo nombre no se usa). Si todavía no está la planilla, se ve un
 guión y un toque abre Mi Equipo. Los invitados siguen a mano. APPI no
 inventa un número.
+
+## Primer WhatsApp: hielo, después plantillas (v412)
+
+El primer mensaje es sólo un saludo: 8 frases, según la hora (Buenos días 6–12, Buenas tardes 12–20, Buenas noches 20–6) y el nombre que eligió titular o socio en el engranaje. El equipo, el video o el canje no van en ese primer toque.
+
+Después, **💬 Plantillas** en Usuarios agrupa por para qué: mantenimiento, vida útil o canje, visita, cumpleaños, pedir un nombre, instalación y los míos. El video sale del equipo de esa ficha.
 
 ## 1 mes completo (v411)
 

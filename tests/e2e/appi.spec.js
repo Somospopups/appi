@@ -106,7 +106,14 @@ test('arranca, navega e importa Garantías una sola vez', async ({ page }) => {
   // avisa primero y hay que pedirle escribir igual.
   const igual = page.locator('#muIgual');
   if (await igual.count()) await igual.click();
-  await page.locator('[data-mu-plantilla]').first().click();
+  const hielo = page.locator('#muMandarHielo');
+  if (await hielo.count()) {
+    await hielo.click();
+  } else {
+    await page.locator('[data-mu-grupo]').first().click();
+    const plantilla = page.locator('[data-mu-plantilla]').first();
+    if (await plantilla.count()) await plantilla.click();
+  }
   const opened = await page.evaluate(() => window.__appiLastOpen);
   expect(opened[0]).toMatch(/^https:\/\/wa\.me\//);
   expect(pageErrors).toEqual([]);

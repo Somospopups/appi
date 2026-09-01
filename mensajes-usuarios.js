@@ -116,6 +116,24 @@
         '',
         'Pasaba a saludarte y a preguntarte cómo viene funcionando el equipo.'
       ].join('\n')
+    },
+    {
+      id: 'visita',
+      icono: '📅',
+      nombre: 'Coordinar una visita',
+      grupo: 'todos',
+      texto: [
+        '{nombre}, ¿qué día te viene bien que pase? Yo me acomodo.'
+      ].join('\n')
+    },
+    {
+      id: 'referido',
+      icono: '👋',
+      nombre: 'Pedir un nombre',
+      grupo: 'todos',
+      texto: [
+        '{nombre}, ¿se te ocurre alguien a quien le vendría bien que le cuente? Con un nombre y un teléfono me alcanza. ¡Gracias!'
+      ].join('\n')
     }
   ];
 
@@ -448,28 +466,31 @@
     return window.APPITel.normalizar(u && u.telf || '');
   }
 
-  function enviar(u, texto){
+  function enviar(u, texto, opts){
     var nombre = (u && (u.usuario || u.nombre) || '').split(',')[0].trim();
     // Si el campo trae más de un número (o un "54" suelto), se manda al
     // primer número válido y no se rompe la redirección (v331).
     var tel = (window.APPITel && window.APPITel.primeroValido) ? window.APPITel.primeroValido(u && u.telf || '') : (u && u.telf || '');
     if (!window.APPITel.abrir(tel, texto, nombre, u)) return;
-    registrar(u, texto);
+    registrar(u, texto, opts);
   }
 
   // Se anota a quién y cuándo se le escribió, para no repetir el aviso al día
   // siguiente y para el panel de la etapa 2.
-  function registrar(u, texto){
+  function registrar(u, texto, opts){
     var key = telefonoDe(u);
     if (!key) return;
     var data = leerGuardado();
     if (!data.envios) data.envios = {};
     data.envios[key] = { at: new Date().toISOString(), texto: String(texto || '').slice(0, 400) };
     guardar(data);
-    // Mandar el mensaje es hacer la acción: queda marcada ✓ sola.
-    MOTIVOS.forEach(function(m){
-      try{ if (m.aplica(u)) marcarAccion(m.id, u, 'hecha', true); }catch(e){}
-    });
+    // El hielo no cierra la acción del día: sólo saluda. El cuerpo (video,
+    // canje, visita) es el que deja la ✓.
+    if (!(opts && opts.sinMarcar)){
+      MOTIVOS.forEach(function(m){
+        try{ if (m.aplica(u)) marcarAccion(m.id, u, 'hecha', true); }catch(e){}
+      });
+    }
     try{ pintarHoy(); }catch(e){}
   }
   function ultimoEnvio(u){
@@ -1053,14 +1074,18 @@
 
     var u = fila.gente[fila.i];
     var p = plantilla(fila.motivo.plantilla) || plantilla('saludo');
-    var textoBase = completar(p.texto, u);
+    var primer = !ultimoEnvio(u);
+    var textoBase = primer ? textoHielo() : completar(p.texto, u);
+    if (primer && !fila.textoActual) fila.textoActual = textoBase;
     var texto = fila.textoActual || textoBase;
     var nombre = (typeof window.nombreDePila === 'function' ? window.nombreDePila(u.usuario) : '') || u.usuario;
 
     ov.querySelector('#muTitulo').textContent = (fila.motivo.icono || p.icono) + ' ' + (fila.motivo.nombre || p.nombre);
     var fechaAccion = textoFechaAccion(fila.motivo.id, u);
     var sub = ov.querySelector('#muSub');
-    if (fechaAccion){
+    if (primer){
+      sub.textContent = 'Primero un hola. El resto, cuando contesten.';
+    } else if (fechaAccion){
       sub.innerHTML = '<span class="mu-fecha-pill">📅 ' + esc(fechaAccion) + '</span>';
     } else {
       sub.textContent = '';
@@ -1089,11 +1114,17 @@
         ' · si te confundiste, tocá la otra</div>';
     }
     html += '<div class="mu-prev"><b>Así lo va a recibir</b><span id="muPrevTxt">' + esc(texto) + '</span></div>';
-    html += '<div class="mu-prev-tools">' +
-      '<button type="button" class="mu-prev-btn" id="muCambiarMensaje" title="Cambiar mensaje según el equipo">🔁</button>' +
-      '<button type="button" class="mu-prev-btn" id="muEditarMsg" title="Editar mensaje">✏️</button>' +
-      '<button type="button" class="mu-prev-btn" id="muBibliotecaMsg" title="Biblioteca de mensajes">💬</button>' +
-      '</div>';
+    if (primer){
+      html += '<div class="mu-prev-tools">' +
+        '<button type="button" class="mu-prev-btn" id="muOtroHielo" title="Otro saludo">🔁</button>' +
+        '</div>';
+    } else {
+      html += '<div class="mu-prev-tools">' +
+        '<button type="button" class="mu-prev-btn" id="muCambiarMensaje" title="Cambiar mensaje según el equipo">🔁</button>' +
+        '<button type="button" class="mu-prev-btn" id="muEditarMsg" title="Editar mensaje">✏️</button>' +
+        '<button type="button" class="mu-prev-btn" id="muBibliotecaMsg" title="Biblioteca de mensajes">💬</button>' +
+        '</div>';
+    }
     html += '<div class="mu-acciones">';
     html += '<button type="button" class="mu-enviar" id="muFilaEnviar">💬 Mandar a ' + esc(nombre) + '</button>';
     // Cada acción se marca sí o sí: ✓ la hice (aunque sea por otro medio) o
@@ -1116,11 +1147,17 @@
     cuerpo.innerHTML = html;
 
     cuerpo.querySelector('#muFilaEnviar').onclick = function(){
-      enviar(u, fila.textoActual || textoBase);
+      enviar(u, fila.textoActual || textoBase, primer ? { sinMarcar: true } : null);
+      fila.textoActual = null;
       // No se avanza solo: al volver de WhatsApp la misma persona sigue a la
       // vista, lista para marcar qué pasó en ese contacto (✓ ya lo hice /
       // ✗ no se hizo). Mandar ya deja la ✓ puesta; si no se concretó, se
       // corrige con la ✗ y se avanza desde ahí (v330).
+      pintarFila();
+    };
+    var otroHielo = cuerpo.querySelector('#muOtroHielo');
+    if (otroHielo) otroHielo.onclick = function(){
+      fila.textoActual = textoHielo();
       pintarFila();
     };
     var cambiar = cuerpo.querySelector('#muCambiarMensaje');
@@ -1395,8 +1432,169 @@
     ctx = { persona:null, plantilla:null };
   }
 
-  /* Elegir plantilla y mandar. Es la pantalla de todos los días: se toca una
-     y se abre WhatsApp. Nada de llaves ni de edición acá. */
+  /* ---------- hielo y plantillas por para qué (v412) ---------- */
+  function nombreCortoDe(u){
+    return (u ? ((typeof window.nombreDePila === 'function' ? window.nombreDePila(u.usuario) : '') || u.usuario) : '') || '';
+  }
+  function textoHielo(){
+    if (window.APPIHielo && typeof window.APPIHielo.hielo === 'function') return window.APPIHielo.hielo();
+    var f = window.APPIHielo && window.APPIHielo.firma ? window.APPIHielo.firma() : 'yo';
+    return '¡Hola! 😊 Soy ' + f + ', ¿cómo estás?';
+  }
+  function textoSeguimiento(plantillaTexto, u){
+    var t = completar(plantillaTexto, u);
+    if (window.APPIHielo && typeof window.APPIHielo.sinHolaInicial === 'function') return window.APPIHielo.sinHolaInicial(t);
+    return t;
+  }
+  function normProd(s){
+    return String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
+  }
+  function filtrarPorProducto(lista, u){
+    var prod = normProd(u && u.producto);
+    if (!prod) return lista;
+    var tokens = prod.split(' ').filter(function(w){ return w.length > 2 && w !== 'psa'; });
+    if (!tokens.length) return lista;
+    var hits = lista.filter(function(m){
+      var n = normProd(m.nombre);
+      return tokens.some(function(w){ return n.indexOf(w) !== -1; });
+    });
+    return hits.length ? hits : lista;
+  }
+  function gruposPlantilla(){
+    return [
+      { id:'mant', icono:'💧', nombre:'Mantenimiento', pista:'El video sale del equipo de esa persona', fuente:'mantenimiento' },
+      { id:'canje', icono:'🔄', nombre:'Vida útil o canje', pista:'Cuando el equipo ya cumplió', ids:['porvencer','renovacion','mant_canje'] },
+      { id:'visita', icono:'📅', nombre:'Coordinar una visita', pista:'Día y horario', ids:['visita'] },
+      { id:'cumple', icono:'🎂', nombre:'Cumpleaños', pista:'Saludo del día', ids:['cumple'] },
+      { id:'nombre', icono:'👋', nombre:'Pedir un nombre', pista:'Un referido, nada más', ids:['referido'] },
+      { id:'inst', icono:'🛠️', nombre:'Instalación', pista:'El video sale del equipo de esa persona', fuente:'instalacion' },
+      { id:'mios', icono:'✍️', nombre:'Los míos', pista:'Los que armás vos', fuente:'propias' }
+    ];
+  }
+  function itemsDeGrupo(g, u){
+    if (!g) return [];
+    if (g.fuente === 'mantenimiento'){
+      var gen = plantilla('retrolavado');
+      var mant = mensajesMantenimiento().filter(function(m){ return m.grupo === 'mantenimiento' && m.id !== 'mant_canje'; });
+      var lista = gen ? [gen].concat(mant) : mant;
+      return u ? filtrarPorProducto(lista, u) : lista;
+    }
+    if (g.fuente === 'instalacion'){
+      var inst = mensajesMantenimiento().filter(function(m){ return m.grupo === 'instalacion'; });
+      return u ? filtrarPorProducto(inst, u) : inst;
+    }
+    if (g.fuente === 'propias'){
+      return leerPropias().map(function(p){
+        return { id:p.id, icono:p.icono, nombre:p.nombre, texto:p.texto, grupo:'todos', propio:true };
+      });
+    }
+    return (g.ids || []).map(function(id){ return plantilla(id); }).filter(Boolean);
+  }
+  function pintarHielo(u){
+    var ov = overlay();
+    ctx.persona = u || null;
+    ctx.plantilla = null;
+    var nombre = nombreCortoDe(u);
+    var texto = textoHielo();
+    ov.querySelector('#muTitulo').textContent = u ? ('Saludo para ' + nombre) : 'Saludo';
+    ov.querySelector('#muSub').textContent = 'Primero un hola, nada más';
+    var cuerpo = ov.querySelector('#muCuerpo');
+    cuerpo.innerHTML = '<div class="mu-ayuda">El primer mensaje es sólo para saludar. El resto (equipo, video, visita) va después, cuando contesten.</div>' +
+      '<div class="mu-prev"><b>Así lo va a recibir</b><span id="muPrevTxt">' + esc(texto) + '</span></div>' +
+      '<div class="mu-prev-tools"><button type="button" class="mu-prev-btn" id="muOtroHielo" title="Otro saludo">🔁</button></div>' +
+      '<div class="mu-acciones"><button type="button" class="mu-enviar" id="muMandarHielo">💬 Mandar el saludo</button></div>';
+    cuerpo.querySelector('#muOtroHielo').onclick = function(){
+      cuerpo.querySelector('#muPrevTxt').textContent = textoHielo();
+    };
+    cuerpo.querySelector('#muMandarHielo').onclick = function(){
+      enviar(u, cuerpo.querySelector('#muPrevTxt').textContent);
+      pintarGrupos(u);
+    };
+    ov.classList.add('open');
+  }
+  function pintarGrupos(u){
+    var ov = overlay();
+    ctx.persona = u || null;
+    ctx.plantilla = null;
+    var nombre = nombreCortoDe(u);
+    ov.querySelector('#muTitulo').textContent = u ? ('Mensaje para ' + nombre) : '💬 Plantillas';
+    ov.querySelector('#muSub').textContent = u ? 'Elegí para qué escribís' : 'Elegí para qué · tocá para ver o editar';
+    var cuerpo = ov.querySelector('#muCuerpo');
+    var html = '<div class="mu-list">';
+    gruposPlantilla().forEach(function(g){
+      html += '<button type="button" class="mu-item" data-mu-grupo="' + esc(g.id) + '">' +
+        '<span class="mu-ico">' + g.icono + '</span>' +
+        '<span><strong>' + esc(g.nombre) + '</strong><small>' + esc(g.pista) + '</small></span>' +
+        '<span class="mu-go">›</span></button>';
+    });
+    html += '</div>';
+    html += '<button type="button" class="mu-volver" id="muIrEditar">✏️ Editar los textos</button>';
+    cuerpo.innerHTML = html;
+    cuerpo.querySelectorAll('[data-mu-grupo]').forEach(function(b){
+      b.onclick = function(){
+        var id = b.getAttribute('data-mu-grupo');
+        var g = null;
+        gruposPlantilla().forEach(function(x){ if (x.id === id) g = x; });
+        if (g) alElegirGrupo(g, u);
+      };
+    });
+    var ed = cuerpo.querySelector('#muIrEditar');
+    if (ed) ed.onclick = function(){
+      cuerpo.innerHTML = '';
+      ov.querySelector('#muTitulo').textContent = 'Editar los textos';
+      ov.querySelector('#muSub').textContent = 'Elegí cuál querés cambiar';
+      pintarListaEdicion(cuerpo, u ? plantillasPara(u) : plantillas(), u);
+    };
+    ov.classList.add('open');
+  }
+  function alElegirGrupo(g, u){
+    var items = itemsDeGrupo(g, u);
+    if (u && items.length === 1 && g.fuente !== 'propias'){
+      mandar(items[0].id, u);
+      return;
+    }
+    pintarItemsGrupo(g, u, items);
+  }
+  function pintarItemsGrupo(g, u, items){
+    var ov = overlay();
+    var cuerpo = ov.querySelector('#muCuerpo');
+    ov.querySelector('#muTitulo').textContent = g.icono + ' ' + g.nombre;
+    ov.querySelector('#muSub').textContent = u ? 'Tocá una y se abre WhatsApp' : 'Tocá una para editarla';
+    var lista = items || [];
+    var html = '';
+    if (!lista.length && g.fuente === 'propias'){
+      html += '<div class="mu-vacio">Todavía no armaste ninguno.<br>Creá el primero y queda en tu lista.</div>';
+    } else {
+      html += '<div class="mu-list">';
+      lista.forEach(function(p){
+        var resumen = completar(p.texto, u || EJEMPLO).replace(/\n+/g, ' ').slice(0, 68);
+        html += '<button type="button" class="mu-item" data-mu-plantilla="' + esc(p.id) + '">' +
+          '<span class="mu-ico">' + (p.icono || g.icono) + '</span>' +
+          '<span><strong>' + esc(p.nombre) + (p.editada ? ' ✏️' : '') + '</strong><small>' + esc(resumen) + '…</small></span>' +
+          '<span class="mu-go">' + (u ? '💬' : '›') + '</span></button>';
+      });
+      html += '</div>';
+    }
+    if (g.fuente === 'propias') html += '<button type="button" class="mu-sec mu-grande" id="muNuevo" style="margin-top:12px">✍️ Crear un mensaje nuevo</button>';
+    html += '<button type="button" class="mu-volver" id="muVolverGrupos">‹ Volver</button>';
+    cuerpo.innerHTML = html;
+    cuerpo.querySelectorAll('[data-mu-plantilla]').forEach(function(b){
+      var id = b.getAttribute('data-mu-plantilla');
+      b.onclick = function(){
+        if (u) mandar(id, u);
+        else verPlantilla(id, null);
+      };
+    });
+    var neu = cuerpo.querySelector('#muNuevo');
+    if (neu) neu.onclick = function(){ verPlantillaNueva(u); };
+    cuerpo.querySelector('#muVolverGrupos').onclick = function(){ pintarGrupos(u); };
+  }
+  function abrirPlantillas(){
+    abrir(null);
+  }
+
+  /* Elegir plantilla y mandar. El primer toque es un hielo; después, las
+     plantillas agrupadas por para qué. Nada de llaves ni de edición acá. */
   function abrir(u){
     var ov = overlay();
     ctx.persona = u || null;
@@ -1412,8 +1610,8 @@
         'Acordamos no hacer acciones sobre estos casos.</div>' +
         '<button type="button" class="mu-sec" id="muIgual" style="margin-top:12px;width:100%">Escribirle igual</button>';
       cuerpo.querySelector('#muIgual').onclick = function(){
-        cuerpo.innerHTML = '';
-        pintarLista(cuerpo, plantillas(), u);
+        if (!ultimoEnvio(u)) pintarHielo(u);
+        else pintarGrupos(u);
       };
       ov.classList.add('open');
       return;
@@ -1427,13 +1625,11 @@
       return;
     }
 
-    var g = u ? grupoDe(u) : null;
-    sub.textContent = u
-      ? 'Tocá una y se abre WhatsApp'
-      : 'Tocá una para editarla';
-    cuerpo.innerHTML = '';
-    pintarLista(cuerpo, u ? plantillasPara(u) : plantillas(), u);
-    ov.classList.add('open');
+    if (u && !ultimoEnvio(u)){
+      pintarHielo(u);
+      return;
+    }
+    pintarGrupos(u);
   }
 
   function pintarLista(cuerpo, lista, u){
@@ -1768,13 +1964,17 @@
     pintarFichas();
   }
 
-  // No hay botón de Mensajes en la barra: los mensajes se mandan desde la ficha
-  // de cada cliente, que es donde se decide a quién escribirle. Los textos se
-  // editan desde ahí mismo, con "Editar los textos".
+  // Plantillas en la barra: se hojean y editan sin elegir a nadie. El
+  // primer WhatsApp de cada ficha es un hielo; después, las plantillas.
   function montar(){
     css();
     observar();
     pintarHoy();
+    var btnP = document.getElementById('usuariosBtnPlantillas');
+    if (btnP && !btnP.__muBound){
+      btnP.__muBound = true;
+      btnP.onclick = function(){ abrirPlantillas(); };
+    }
   }
 
   function envolver(){
@@ -1814,6 +2014,10 @@
     ultimoEnvio: ultimoEnvio,
     registrar: registrar,
     abrir: abrir,
+    abrirPlantillas: abrirPlantillas,
+    gruposPlantilla: gruposPlantilla,
+    pintarGrupos: pintarGrupos,
+    pintarHielo: pintarHielo,
     mandar: mandar,
     pendientes: pendientes,
     deHoy: deHoy,

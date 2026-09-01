@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v411-mes-completo';
+const CACHE_NAME = 'appi-v412-hielo-whatsapp';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
@@ -22,6 +22,7 @@ const APP_SHELL = [
   './panel-atras.js',
   './tarjetas-promos.js',
   './usuarios-botones.js',
+  './mensajes-hielo.js',
   './mensajes-usuarios.js',
   './reactivacion.js',
   './escalera-suenos.js',

@@ -71,6 +71,23 @@ async function abrirFicha(page, i) {
   await expect(page.locator(`[data-u-toggle="${i}"]`)).toHaveClass(/expanded/);
 }
 
+// El primer WhatsApp es un hielo. Para mirar plantillas, se anota que ya se saludó.
+async function sembrarHielo(page) {
+  await page.evaluate(() => {
+    const M = window.APPIMensajes;
+    (window.usuariosTodosActual() || []).forEach(u => {
+      if (u && u.telf) M.registrar(u, 'hielo', { sinMarcar: true });
+    });
+  });
+}
+
+async function abrirGruposFicha(page, i) {
+  await sembrarHielo(page);
+  await abrirFicha(page, i);
+  await page.locator(`[data-u-toggle="${i}"] + .tree-children [data-u-action="whatsapp"]`).click();
+  await expect(page.locator('#muOverlay')).toHaveClass(/open/);
+}
+
 test('el cumpleaños del Excel se detecta el día que corresponde', async ({ page }) => {
   await entrar(page);
   // La planilla real trae la columna Cumpleaños; la app la ignoraba.
@@ -94,11 +111,9 @@ test('el cumpleaños del Excel se detecta el día que corresponde', async ({ pag
   expect(r.sinDato).toBe(false);
 });
 
-test('el botón de WhatsApp de la ficha abre las plantillas', async ({ page }) => {
+test('el botón de WhatsApp de la ficha abre el hielo la primera vez', async ({ page }) => {
   await entrar(page);
   await abrirFicha(page, 0);
-  // Queda un solo botón: el de siempre, que ahora ofrece las plantillas en vez
-  // de mandar un saludo fijo.
   const ficha = page.locator('[data-u-toggle="0"] + .tree-children');
   await expect(ficha.locator('[data-u-action="whatsapp"]')).toHaveCount(1);
   await expect(ficha.locator('[data-u-action="whatsapp"]')).toContainText('WhatsApp');
@@ -106,6 +121,10 @@ test('el botón de WhatsApp de la ficha abre las plantillas', async ({ page }) =
   await ficha.locator('[data-u-action="whatsapp"]').click();
   await expect(page.locator('#muOverlay')).toHaveClass(/open/);
   await expect(page.locator('#muTitulo')).toContainText('Ana');
+  await expect(page.locator('#muSub')).toContainText('Primero un hola');
+  await expect(page.locator('#muMandarHielo')).toBeVisible();
+  await expect(page.locator('#muPrevTxt')).toContainText('María');
+  await expect(page.locator('[data-mu-grupo]')).toHaveCount(0);
 });
 
 test('tocar una plantilla abre WhatsApp derecho, sin pantalla intermedia', async ({ page }) => {
@@ -115,8 +134,8 @@ test('tocar una plantilla abre WhatsApp derecho, sin pantalla intermedia', async
     window.__wa = [];
     window.APPIWhatsApp.abrir = url => { window.__wa.push(url); };
   });
-  await abrirFicha(page, 0);
-  await page.locator('[data-u-toggle="0"] + .tree-children [data-u-action="whatsapp"]').click();
+  await abrirGruposFicha(page, 0);
+  await page.locator('[data-mu-grupo="mant"]').click();
   await page.locator('[data-mu-plantilla="retrolavado"]').click();
 
   // Un solo toque: ni editor, ni confirmación.
@@ -135,36 +154,36 @@ test('el que elige mandar no ve ninguna llave', async ({ page }) => {
   await entrar(page);
   await abrirFicha(page, 0);
   await page.locator('[data-u-toggle="0"] + .tree-children [data-u-action="whatsapp"]').click();
-  // Esto fue lo que confundió al usuario: llaves y etiquetas en la pantalla de
-  // enviar. No tienen que aparecer por ningún lado.
+  // El primer toque es un hielo: sin llaves, sin editor, sin plantillas.
   const cuerpo = await page.locator('#muCuerpo').innerText();
   expect(cuerpo).not.toContain('{');
   await expect(page.locator('#muCuerpo [data-mu-tag]')).toHaveCount(0);
   await expect(page.locator('#muCuerpo textarea')).toHaveCount(0);
-  await expect(page.locator('#muSub')).toContainText('se abre WhatsApp');
+  await expect(page.locator('#muSub')).toContainText('Primero un hola');
 });
 
-test('a un cliente vigente le ofrece mantenimiento y cumpleaños', async ({ page }) => {
+test('a un cliente vigente le ofrece los grupos de plantillas', async ({ page }) => {
   await entrar(page);
-  await abrirFicha(page, 0);
-  await page.locator('[data-u-toggle="0"] + .tree-children [data-u-action="whatsapp"]').click();
+  await abrirGruposFicha(page, 0);
 
-  const items = page.locator('[data-mu-plantilla]');
-  await expect(items).toHaveCount(4);   // retrolavado, cumple, por vencer, saludo
-  await expect(page.locator('[data-mu-plantilla="retrolavado"]')).toBeVisible();
-  await expect(page.locator('[data-mu-plantilla="cumple"]')).toBeVisible();
-  // La renovación es para los que ya vencieron.
-  await expect(page.locator('[data-mu-plantilla="renovacion"]')).toHaveCount(0);
+  await expect(page.locator('[data-mu-grupo]')).toHaveCount(7);
+  await expect(page.locator('[data-mu-grupo="mant"]')).toBeVisible();
+  await expect(page.locator('[data-mu-grupo="cumple"]')).toBeVisible();
+  await expect(page.locator('[data-mu-grupo="canje"]')).toBeVisible();
+  await expect(page.locator('[data-mu-grupo="visita"]')).toBeVisible();
+  await expect(page.locator('[data-mu-grupo="nombre"]')).toBeVisible();
+  await expect(page.locator('[data-mu-grupo="inst"]')).toBeVisible();
+  await expect(page.locator('[data-mu-grupo="mios"]')).toBeVisible();
 });
 
-test('a un vencido hace menos de un año sólo le ofrece renovar', async ({ page }) => {
+test('a un vencido hace menos de un año también le ofrece los grupos', async ({ page }) => {
   await entrar(page);
-  await abrirFicha(page, 1);
-  await page.locator('[data-u-toggle="1"] + .tree-children [data-u-action="whatsapp"]').click();
+  await abrirGruposFicha(page, 1);
 
+  await expect(page.locator('[data-mu-grupo]')).toHaveCount(7);
+  await expect(page.locator('[data-mu-grupo="canje"]')).toBeVisible();
+  await page.locator('[data-mu-grupo="canje"]').click();
   await expect(page.locator('[data-mu-plantilla="renovacion"]')).toBeVisible();
-  await expect(page.locator('[data-mu-plantilla="retrolavado"]')).toHaveCount(0);
-  await expect(page.locator('[data-mu-plantilla="cumple"]')).toHaveCount(0);
 });
 
 test('al vencido hace más de un año no se le ofrece nada', async ({ page }) => {
@@ -180,7 +199,7 @@ test('al vencido hace más de un año no se le ofrece nada', async ({ page }) =>
   // Nada de plantillas hasta que se lo pida a propósito.
   await expect(page.locator('[data-mu-plantilla]')).toHaveCount(0);
   await page.locator('#muIgual').click();
-  await expect(page.locator('[data-mu-plantilla]')).toHaveCount(5);
+  await expect(page.locator('#muMandarHielo')).toBeVisible();
 });
 
 test('el resumen de cada plantilla ya viene con los datos puestos', async ({ page }) => {
@@ -196,9 +215,7 @@ test('el resumen de cada plantilla ya viene con los datos puestos', async ({ pag
 
 test('editar una plantilla la deja guardada para la próxima', async ({ page }) => {
   await entrar(page);
-  await abrirFicha(page, 0);
-  await page.locator('[data-u-toggle="0"] + .tree-children [data-u-action="whatsapp"]').click();
-  // Ahora editar es un desvío explícito, no el camino principal.
+  await page.locator('#usuariosBtnPlantillas').click();
   await page.locator('#muIrEditar').click();
   await page.locator('[data-mu-editar="saludo"]').click();
 
@@ -213,10 +230,9 @@ test('editar una plantilla la deja guardada para la próxima', async ({ page }) 
   // Vuelve a la lista de edición y el cambio sobrevive a reabrir el popup.
   await expect(page.locator('[data-mu-editar="saludo"]')).toContainText('Buenas Ana');
   await page.locator('#muCerrar').click();
-  await page.locator('[data-u-toggle="0"] + .tree-children [data-u-action="whatsapp"]').click();
-  await expect(page.locator('[data-mu-plantilla="saludo"]')).toContainText('Buenas Ana');
-
+  await page.locator('#usuariosBtnPlantillas').click();
   await page.locator('#muIrEditar').click();
+  await expect(page.locator('[data-mu-editar="saludo"]')).toContainText('Buenas Ana');
   await page.locator('[data-mu-editar="saludo"]').click();
   await expect(page.locator('#muTexto')).toHaveValue('Buenas {nombre}, ¿todo bien con el {producto}?');
   await page.locator('#muRestaurar').click();
@@ -225,8 +241,7 @@ test('editar una plantilla la deja guardada para la próxima', async ({ page }) 
 
 test('los botones de datos dicen el nombre, no la llave', async ({ page }) => {
   await entrar(page);
-  await abrirFicha(page, 0);
-  await page.locator('[data-u-toggle="0"] + .tree-children [data-u-action="whatsapp"]').click();
+  await page.locator('#usuariosBtnPlantillas').click();
   await page.locator('#muIrEditar').click();
   await page.locator('[data-mu-editar="saludo"]').click();
 
@@ -243,13 +258,12 @@ test('los botones de datos dicen el nombre, no la llave', async ({ page }) => {
   await expect(page.locator('#muPrevTxt')).toContainText('Hola Alta Gracia');
 });
 
-test('la barra no tiene botón de Mensajes: se escribe desde la ficha', async ({ page }) => {
+test('la barra tiene Plantillas y no el viejo botón de Mensajes', async ({ page }) => {
   await entrar(page);
   await expect(page.locator('#usuariosBtnMensajes')).toHaveCount(0);
-  // Los cinco de siempre (Mapa se quitó en v332; Depurados se sumó en v350);
-  // "Dormidos" se suma sólo si hay clientes dormidos, y esta lista tiene uno
-  // vencido hace más de un año.
-  await expect(page.locator('.u-tools button:visible')).toHaveCount(6);
+  await expect(page.locator('#usuariosBtnPlantillas')).toBeVisible();
+  // Base + Depurados + Dormidos + Plantillas (v412).
+  await expect(page.locator('.u-tools button:visible')).toHaveCount(7);
   await expect(page.locator('#usuariosBtnDormidos')).toBeVisible();
 });
 
@@ -407,23 +421,26 @@ test('la fila de trabajo va de a uno y avisa cuántos quedan', async ({ page }) 
 
   await page.locator('[data-mu-hoy="cumple"]').click();
   await expect(page.locator('#muOverlay')).toHaveClass(/open/);
-  // Desde v353 el "cuántos quedan" no va en el subtítulo: la pastilla de
-  // fecha ocupa #muSub y el avance se lee en la posición de la fila.
-  await expect(page.locator('#muSub')).toContainText('Cumple');
+  await expect(page.locator('#muSub')).toContainText('Primero un hola');
   await expect(page.locator('.mu-fila-pos')).toContainText('1 de 1');
   await expect(page.locator('.mu-fila-quien')).toContainText('GOMEZ, ANA MARIA');
-  // Se ve el mensaje final, no la receta.
-  await expect(page.locator('.mu-prev')).toContainText('Feliz cumpleaños, Ana');
+  await expect(page.locator('.mu-prev')).toContainText('María');
+  await expect(page.locator('.mu-prev')).not.toContainText('Feliz cumpleaños');
 
   await page.locator('#muFilaEnviar').click();
-  // Mandar NO avanza solo (v330): la misma persona queda a la vista, ya
-  // marcada ✓, para marcar qué pasó en ese contacto.
   await expect(page.locator('.mu-fila-quien')).toContainText('GOMEZ, ANA MARIA');
+  await expect(page.locator('.mu-marca-actual')).toHaveCount(0);
+  await expect(page.locator('.mu-prev')).toContainText('Feliz cumpleaños, Ana');
+  const urlsHielo = await page.evaluate(() => window.__wa);
+  expect(urlsHielo).toHaveLength(1);
+  expect(decodeURIComponent(urlsHielo[0])).toContain('María');
+  expect(decodeURIComponent(urlsHielo[0])).not.toContain('Feliz cumpleaños');
+
+  await page.locator('#muFilaEnviar').click();
   await expect(page.locator('.mu-marca-actual')).toContainText('✓ Marcada como hecha');
   const urls = await page.evaluate(() => window.__wa);
-  expect(urls).toHaveLength(1);
-  expect(decodeURIComponent(urls[0])).toContain('Feliz cumpleaños, Ana');
-  // Al confirmar con el ✓, recién ahí cierra con el resumen.
+  expect(urls).toHaveLength(2);
+  expect(decodeURIComponent(urls[1])).toContain('Feliz cumpleaños, Ana');
   await page.locator('#muFilaHecha').click();
   await expect(page.locator('.mu-fin')).toContainText('1 acción hecha');
 });
@@ -498,8 +515,6 @@ test('el contactado no desaparece: queda marcado ✓ y la franja dura todo el d�
   await expect(page.locator('#muHoy')).toContainText('Hoy 0 / 3');
 
   await page.locator('[data-mu-hoy="cumple"]').click();
-  await page.locator('#muFilaEnviar').click();
-  // Tras mandar, la persona queda en pantalla: se confirma con el ✓.
   await page.locator('#muFilaHecha').click();
   await page.locator('#muFinCerrar').click();
 
@@ -521,6 +536,7 @@ test('la ✗ registra que no se hizo y obliga a dejar constancia: no hay saltear
   await entrar(page, dos);
   await page.evaluate(() => { window.__wa = []; window.APPIWhatsApp.abrir = u => window.__wa.push(u); });
 
+  await sembrarHielo(page);
   await page.locator('[data-mu-hoy="retro"]').click();
   await expect(page.locator('.mu-fila-pos')).toContainText('1 de 2');
   await expect(page.locator('.mu-fila-quien')).toContainText('GOMEZ');
@@ -574,6 +590,7 @@ test('mandar no pasa solo a la siguiente: la misma persona queda para marcar', a
   await entrar(page, dos);
   await page.evaluate(() => { window.__wa = []; window.APPIWhatsApp.abrir = u => window.__wa.push(u); });
 
+  await sembrarHielo(page);
   await page.locator('[data-mu-hoy="retro"]').click();
   await expect(page.locator('.mu-fila-quien')).toContainText('GOMEZ');
   await expect(page.locator('.mu-fila-pos')).toContainText('1 de 2');
@@ -690,8 +707,8 @@ test('el vencido hace más de un año nunca entra en los pendientes', async ({ p
 test('los mensajes hablan de "tu equipo", no del modelo del purificador', async ({ page }) => {
   await entrar(page);
   await page.evaluate(() => { window.__wa = []; window.APPIWhatsApp.abrir = u => window.__wa.push(u); });
-  await abrirFicha(page, 0);
-  await page.locator('[data-u-toggle="0"] + .tree-children [data-u-action="whatsapp"]').click();
+  await abrirGruposFicha(page, 0);
+  await page.locator('[data-mu-grupo="mant"]').click();
   await page.locator('[data-mu-plantilla="retrolavado"]').click();
 
   const texto = decodeURIComponent((await page.evaluate(() => window.__wa))[0].split('text=')[1]);
@@ -737,8 +754,7 @@ test('sin teléfono no aparece el grupo de contacto, pero sí el de ubicación',
    los mensajes propios salen igual que los de fábrica. */
 
 async function irAEditar(page) {
-  await abrirFicha(page, 0);
-  await page.locator('[data-u-toggle="0"] + .tree-children [data-u-action="whatsapp"]').click();
+  await page.locator('#usuariosBtnPlantillas').click();
   await expect(page.locator('#muOverlay')).toHaveClass(/open/);
   await page.locator('#muIrEditar').click();
   await expect(page.locator('#muNuevo')).toBeVisible();
@@ -759,11 +775,11 @@ test('se puede crear un mensaje propio y mandarlo a un cliente', async ({ page }
   await page.locator('#muTexto').fill('Hola {nombre}! Te paso el control de agua del mes. Queda perfecto ✅');
   await page.locator('#muCrear').click();
 
-  // Vuelve a la lista de edición y el mensaje propio queda arriba de todo.
   await expect(page.locator('[data-mu-editar^="propia_"]')).toHaveCount(1);
-  await page.locator('#muVolverEnviar').click();
+  await page.locator('#muCerrar').click();
 
-  // En la lista para enviar aparece al final y manda en un toque.
+  await abrirGruposFicha(page, 0);
+  await page.locator('[data-mu-grupo="mios"]').click();
   const item = page.locator('[data-mu-plantilla^="propia_"]');
   await expect(item).toContainText('Control de agua');
   await item.click();
@@ -1057,4 +1073,65 @@ test('ganar hoy con la racha de ayer suma 2', async ({ page }) => {
   });
   expect(r.partido.ganado).toBe(true);
   expect(r.racha).toBe(2);
+});
+
+/* ---------- v412: hielo, firma y plantillas por para qué ---------- */
+
+test('el banco de hielo tiene 8 saludos y respeta la hora', async ({ page }) => {
+  await entrar(page);
+  const r = await page.evaluate(() => {
+    const H = window.APPIHielo;
+    const maniana = H.saludoHora(new Date(2026, 7, 31, 8, 0, 0));
+    const tarde = H.saludoHora(new Date(2026, 7, 31, 15, 0, 0));
+    const noche = H.saludoHora(new Date(2026, 7, 31, 22, 0, 0));
+    const madrugada = H.saludoHora(new Date(2026, 7, 31, 3, 0, 0));
+    H.guardarFirma('Juanchi');
+    const textos = [];
+    for (let i = 0; i < 16; i++) textos.push(H.hielo(new Date(2026, 7, 31, 8, 0, 0)));
+    return {
+      n: H.FRASES.length,
+      maniana, tarde, noche, madrugada,
+      firma: H.firma(),
+      key: H.FIRMA_KEY,
+      todosTienenFirma: textos.every(t => t.includes('Juanchi')),
+      sinHola: H.sinHolaInicial(['Hola Ana! 👋', '', 'Me acordé de tu equipo.'].join(String.fromCharCode(10)))
+    };
+  });
+  expect(r.n).toBe(8);
+  expect(r.key).toBe('appi_firma_wa_v1');
+  expect(r.firma).toBe('Juanchi');
+  expect(r.maniana.corto).toBe('buen día');
+  expect(r.tarde.corto).toBe('buenas tardes');
+  expect(r.noche.corto).toBe('buenas noches');
+  expect(r.madrugada.corto).toBe('buenas noches');
+  expect(r.todosTienenFirma).toBe(true);
+  expect(r.sinHola).toBe('Me acordé de tu equipo.');
+});
+
+test('el botón Plantillas abre los grupos sin elegir a nadie', async ({ page }) => {
+  await entrar(page);
+  await page.locator('#usuariosBtnPlantillas').click();
+  await expect(page.locator('#muOverlay')).toHaveClass(/open/);
+  await expect(page.locator('#muTitulo')).toContainText('Plantillas');
+  await expect(page.locator('[data-mu-grupo]')).toHaveCount(7);
+  await expect(page.locator('#muIrEditar')).toBeVisible();
+});
+
+test('la firma se guarda en Mi cuenta y sale en el hielo', async ({ page }) => {
+  await entrar(page);
+  await page.evaluate(() => window.abrirCuentaDesdeMenu());
+  await expect(page.locator('#appiFirmaWa')).toBeVisible();
+  await expect(page.locator('#appiFirmaWa')).toHaveValue('María');
+  await page.waitForFunction(() => {
+    const b = document.getElementById('btnGuardarFirma');
+    return !!(b && b.onclick);
+  });
+  await page.locator('#appiFirmaWa').fill('Juanchi');
+  await page.locator('#btnGuardarFirma').click();
+  const r = await page.evaluate(() => ({
+    guardada: localStorage.getItem('appi_firma_wa_v1'),
+    hielo: window.APPIHielo.hielo()
+  }));
+  expect(r.guardada).toBe('Juanchi');
+  expect(r.hielo).toContain('Juanchi');
 });
