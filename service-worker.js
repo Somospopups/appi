@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v418-elegir-arriba';
+const CACHE_NAME = 'appi-v419-elegir-arriba';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
