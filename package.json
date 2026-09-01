@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "432.0.0",
-  "cacheName": "appi-v432-pildora-subtitulo",
+  "version": "433.0.0",
+  "cacheName": "appi-v433-wa-texto",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

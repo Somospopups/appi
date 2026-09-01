@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v432-pildora-subtitulo';
+const CACHE_NAME = 'appi-v433-wa-texto';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
