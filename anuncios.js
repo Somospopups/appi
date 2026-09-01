@@ -256,7 +256,8 @@
 
   /* ---------- estilos y cartel ---------- */
   function estilos(){
-    if (document.getElementById('anEstilos')) return;
+    var viejo = document.getElementById('anEstilos');
+    if (viejo) viejo.remove();
     var st = document.createElement('style');
     st.id = 'anEstilos';
     st.textContent = [
@@ -298,7 +299,7 @@
       'body.dark .an-ev b{color:#f0f1f8}',
       'body.dark .an-b-tel{background:rgba(255,255,255,.08);color:#bcd0ff}',
       /* campanita */
-      '#anBell{position:fixed;top:calc(12px + env(safe-area-inset-top));right:12px;z-index:9000;width:42px;height:42px;',
+      '#anBell{position:fixed;top:calc(12px + env(safe-area-inset-top));right:104px;z-index:9000;width:42px;height:42px;',
       'border:0;border-radius:50%;background:linear-gradient(135deg,#5b8def,#a06bff);color:#fff;font-size:18px;',
       'cursor:pointer;box-shadow:0 8px 20px rgba(91,141,239,.4);display:none;place-items:center}',
       '#anBell.on{display:grid}',

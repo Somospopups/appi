@@ -128,7 +128,7 @@ window.openStock=function(){
 <script src="./home-limpio.js"></script>
   <script src="./home-tarjetas.js"></script>
   <script src="./device-bridge.js"></script>
-  <script src="./anuncios.js"></script>
+  <script src="./anuncios.js?v=436"></script>
 <style id="historico-inline-css">
 /* APPI · Histórico mensual */
 .hist-view{padding-bottom:calc(34px + env(safe-area-inset-bottom));}
@@ -4145,7 +4145,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v435 · Segura</div>
+  <div class="ds-foot">APPI · v436 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -11889,8 +11889,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='435';
-      const CACHE_NAME='appi-v435-sin-restos';
+      const swVersion='436';
+      const CACHE_NAME='appi-v436-campana-al-lado';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 
