@@ -2343,7 +2343,8 @@ body.dark .hist-action-drawer{background:linear-gradient(155deg,#151827,#252036 
   .pm-mes-pers{color:#3d63c9;font-size:13px;font-weight:900;line-height:1.1}
   .pm-mes-org{color:#9a9aa8;font-size:13px;font-weight:900;line-height:1.1}
   .pm-mes-org.on{color:#7a4bd9;cursor:pointer}
-  .pm-mes-ico{font-size:13px;line-height:1}
+  .pm-mes-ico{display:inline-flex;align-items:center;gap:3px;color:#8a8a94;font-size:9.5px;font-weight:800;line-height:1;letter-spacing:.2px}
+  body.dark .pm-mes-ico{color:#a0a0b0}
   body.dark .pm-mes-card{background:rgba(31,32,49,.72);border-color:rgba(201,160,255,.22)}
   body.dark .pm-mes-tit{color:#a0a0b0}
   body.dark .pm-mes-pers{color:#a8b8ff}
@@ -4137,7 +4138,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v428 · Segura</div>
+  <div class="ds-foot">APPI · v429 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -8567,8 +8568,8 @@ function openPersonaModal(p){
         return `<div class="pm-mes-card">
           <div class="pm-mes-tit">${label}</div>
           <div class="pm-mes-nums">
-            <div class="pm-mes-col"><span class="pm-mes-pers">${formatPB(personal)}</span><span class="pm-mes-ico" aria-hidden="true">👤</span></div>
-            <div class="pm-mes-col"><span${orgAttr}>${formatPB(org)}</span><span class="pm-mes-ico" aria-hidden="true">👥</span></div>
+            <div class="pm-mes-col"><span class="pm-mes-pers">${formatPB(personal)}</span><span class="pm-mes-ico"><span aria-hidden="true">👤</span> Pers.</span></div>
+            <div class="pm-mes-col"><span${orgAttr}>${formatPB(org)}</span><span class="pm-mes-ico"><span aria-hidden="true">👥</span> Org.</span></div>
           </div>
         </div>`;
       };
@@ -11876,8 +11877,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='428';
-      const CACHE_NAME='appi-v428-pb-icono-abajo';
+      const swVersion='429';
+      const CACHE_NAME='appi-v429-pb-pers-org';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 
