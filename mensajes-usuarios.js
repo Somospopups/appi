@@ -1126,8 +1126,8 @@
         '</div>';
     }
     html += '<div class="mu-acciones">';
-    html += '<button type="button" class="mu-mensajes" id="muFilaMensajes">' + icoWa() + 'Mensajes</button>';
     html += '<button type="button" class="mu-enviar" id="muFilaEnviar">💬 Mandar a ' + esc(nombre) + '</button>';
+    html += '<button type="button" class="mu-otro-msg" id="muFilaMensajes">Elegir otro mensaje</button>';
     // Cada acción se marca sí o sí: ✓ la hice (aunque sea por otro medio) o
     // ✗ no se hizo. No hay forma de pasar de largo sin dejar constancia.
     html += '<div class="mu-marcar" style="grid-template-columns:1fr 44px 1fr;">' +
@@ -1303,12 +1303,12 @@
       '.mu-acciones{display:grid;grid-template-columns:1fr;gap:9px;margin-top:15px}',
       '.mu-enviar{min-height:52px;border:0;border-radius:15px;background:linear-gradient(135deg,#25d366,#128C7E);color:#fff;',
       'font:inherit;font-size:14px;font-weight:850;cursor:pointer;box-shadow:0 7px 18px rgba(18,140,126,.26)}',
-      '.mu-mensajes{display:flex;align-items:center;justify-content:center;gap:8px;min-height:50px;border:2px solid #25d366;border-radius:15px;',
-      'background:rgba(37,211,102,.16);color:#0b6b4a;font:inherit;font-size:14px;font-weight:850;cursor:pointer}',
-      '.mu-mensajes:hover{background:rgba(37,211,102,.24)}',
+      '.mu-otro-msg{border:0;background:transparent;color:#128C7E;font:inherit;font-size:13px;font-weight:800;',
+      'text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:4px 8px;min-height:36px}',
+      '.mu-otro-msg:hover{color:#0b6b4a}',
       '.mu-wa-ico{display:inline-flex;line-height:0;flex:0 0 auto}',
       '.mu-wa-ico svg{display:block}',
-      'body.dark .mu-mensajes{background:rgba(37,211,102,.2);border-color:#25d366;color:#9af0c8}',
+      'body.dark .mu-otro-msg{color:#3ad0a4}',
       '.mu-sec{min-height:44px;border:0;border-radius:13px;background:rgba(91,141,239,.11);color:#3d63c9;font:inherit;font-size:12.5px;font-weight:850;cursor:pointer}',
       '.mu-sec:hover{background:rgba(91,141,239,.2)}',
       '.mu-sec.mu-grande{min-height:50px;font-size:14px}',

@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "416.0.0",
-  "cacheName": "appi-v416-mensajes-fila-visible",
+  "version": "417.0.0",
+  "cacheName": "appi-v417-elegir-otro-mensaje",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {
