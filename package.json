@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "419.0.0",
-  "cacheName": "appi-v419-elegir-arriba",
+  "version": "420.0.0",
+  "cacheName": "appi-v420-shuffle-dentro",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

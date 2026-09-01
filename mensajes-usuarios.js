@@ -1113,18 +1113,17 @@
         (marcaActual.e === 'hecha' ? '✓ Marcada como hecha' : '✗ Marcada como no hecha') +
         ' · si te confundiste, tocá la otra</div>';
     }
-    html += '<div class="mu-prev"><b>Así lo va a recibir</b><span id="muPrevTxt">' + esc(texto) + '</span></div>';
+    html += '<div class="mu-prev">';
+    html += '<div class="mu-prev-head"><b>Así lo va a recibir</b><div class="mu-prev-tools">';
     if (primer){
-      html += '<div class="mu-prev-tools">' +
-        '<button type="button" class="mu-prev-btn" id="muOtroHielo" title="Otro saludo">🔁</button>' +
-        '</div>';
+      html += '<button type="button" class="mu-prev-btn" id="muOtroHielo" title="Otro saludo">🔁</button>';
     } else {
-      html += '<div class="mu-prev-tools">' +
-        '<button type="button" class="mu-prev-btn" id="muCambiarMensaje" title="Cambiar mensaje según el equipo">🔁</button>' +
-        '<button type="button" class="mu-prev-btn" id="muEditarMsg" title="Editar mensaje">✏️</button>' +
-        '<button type="button" class="mu-prev-btn" id="muBibliotecaMsg" title="Biblioteca de mensajes">💬</button>' +
-        '</div>';
+      html += '<button type="button" class="mu-prev-btn" id="muCambiarMensaje" title="Cambiar mensaje según el equipo">🔁</button>';
+      html += '<button type="button" class="mu-prev-btn" id="muEditarMsg" title="Editar mensaje">✏️</button>';
+      html += '<button type="button" class="mu-prev-btn" id="muBibliotecaMsg" title="Biblioteca de mensajes">💬</button>';
     }
+    html += '</div></div>';
+    html += '<span id="muPrevTxt">' + esc(texto) + '</span></div>';
     html += '<div class="mu-acciones">';
     html += '<div class="mu-otro-msg-row"><button type="button" class="mu-otro-msg" id="muFilaMensajes">Elegir otro mensaje</button></div>';
     html += '<button type="button" class="mu-enviar" id="muFilaEnviar">💬 Mandar a ' + esc(nombre) + '</button>';
@@ -1256,7 +1255,8 @@
     if (volver) volver.onclick = function(){ pintarFila(); };
   }
   function css(){
-    if (document.getElementById('muEstilos')) return;
+    var viejo = document.getElementById('muEstilos');
+    if (viejo) viejo.remove();
     var st = document.createElement('style');
     st.id = 'muEstilos';
     st.textContent = [
@@ -1289,9 +1289,10 @@
       '.mu-caja textarea:focus{outline:none;border-color:#5b8def;box-shadow:0 0 0 3px rgba(91,141,239,.12)}',
       '.mu-prev{margin-top:12px;padding:13px 14px;border:1px solid rgba(58,208,164,.22);border-radius:14px;background:rgba(58,208,164,.08);',
       'color:#20705c;font-size:12.5px;line-height:1.55;white-space:pre-wrap;word-break:break-word}',
-      '.mu-prev b{display:block;margin-bottom:6px;color:#178a6c;font-size:10.5px;font-weight:900;text-transform:uppercase;letter-spacing:.4px}',
-      '.mu-prev-tools{display:flex;justify-content:flex-end;gap:8px;margin-top:8px}',
-      '.mu-prev-btn{width:40px;height:40px;border-radius:50%;font-size:15px;border:1px solid rgba(80,90,130,.14);background:#fff;cursor:pointer}',
+      '.mu-prev-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}',
+      '.mu-prev b{display:block;margin:0;color:#178a6c;font-size:10.5px;font-weight:900;text-transform:uppercase;letter-spacing:.4px}',
+      '.mu-prev-tools{display:flex;justify-content:flex-end;gap:6px;margin:0;flex:0 0 auto}',
+      '.mu-prev-btn{width:34px;height:34px;border-radius:50%;font-size:14px;border:1px solid rgba(80,90,130,.14);background:#fff;cursor:pointer}',
       '.mu-prev-btn:hover{background:rgba(91,141,239,.08)}',
       'body.dark .mu-prev-btn{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.14)}',
       '.mu-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:11px}',
@@ -1561,8 +1562,9 @@
     ov.querySelector('#muSub').textContent = 'Primero un hola, nada más';
     var cuerpo = ov.querySelector('#muCuerpo');
     cuerpo.innerHTML = '<div class="mu-ayuda">El primer mensaje es sólo para saludar. El resto (equipo, video, visita) va después, cuando contesten.</div>' +
-      '<div class="mu-prev"><b>Así lo va a recibir</b><span id="muPrevTxt">' + esc(texto) + '</span></div>' +
-      '<div class="mu-prev-tools"><button type="button" class="mu-prev-btn" id="muOtroHielo" title="Otro saludo">🔁</button></div>' +
+      '<div class="mu-prev"><div class="mu-prev-head"><b>Así lo va a recibir</b><div class="mu-prev-tools">' +
+      '<button type="button" class="mu-prev-btn" id="muOtroHielo" title="Otro saludo">🔁</button></div></div>' +
+      '<span id="muPrevTxt">' + esc(texto) + '</span></div>' +
       '<div class="mu-acciones"><button type="button" class="mu-enviar" id="muMandarHielo">💬 Mandar el saludo</button></div>';
     cuerpo.querySelector('#muOtroHielo').onclick = function(){
       cuerpo.querySelector('#muPrevTxt').textContent = textoHielo();
