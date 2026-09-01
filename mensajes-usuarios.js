@@ -1446,6 +1446,27 @@
     if (window.APPIHielo && typeof window.APPIHielo.sinHolaInicial === 'function') return window.APPIHielo.sinHolaInicial(t);
     return t;
   }
+  /* Texto para mandar a cualquiera: sin nombre de ficha, sin “Hola ,”. */
+  function completarLibre(texto){
+    var t = completar(texto, {});
+    t = t.replace(/,\s*([¡!¿?])/g, '$1');
+    t = t.replace(/¡Hola\s+!/g, '¡Hola!');
+    t = t.replace(/Hola\s+!/g, 'Hola!');
+    t = t.replace(/^[ \t]*,[ \t]*/gm, '');
+    t = t.replace(/[ \t]{2,}/g, ' ');
+    t = t.replace(/[ \t]+\n/g, '\n');
+    t = t.replace(/\n{3,}/g, '\n\n');
+    return t.replace(/^\s+|\s+$/g, '');
+  }
+  function mandarLibre(id){
+    var p = plantilla(id);
+    if (!p) return;
+    var texto = completarLibre(p.texto);
+    var url = 'https://wa.me/?text=' + encodeURIComponent(texto);
+    if (window.APPIWhatsApp && window.APPIWhatsApp.abrir) window.APPIWhatsApp.abrir(url);
+    else window.open(url, '_blank', 'noopener');
+    cerrar();
+  }
   function normProd(s){
     return String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
   }
@@ -1517,8 +1538,8 @@
     ctx.persona = u || null;
     ctx.plantilla = null;
     var nombre = nombreCortoDe(u);
-    ov.querySelector('#muTitulo').textContent = u ? ('Mensaje para ' + nombre) : '💬 Plantillas';
-    ov.querySelector('#muSub').textContent = u ? 'Elegí para qué escribís' : 'Elegí para qué · tocá para ver o editar';
+    ov.querySelector('#muTitulo').textContent = u ? ('Mensaje para ' + nombre) : '💬 Mensajes';
+    ov.querySelector('#muSub').textContent = u ? 'Elegí para qué escribís' : 'Elegí uno y se abre WhatsApp, para quien quieras';
     var cuerpo = ov.querySelector('#muCuerpo');
     var html = '<div class="mu-list">';
     gruposPlantilla().forEach(function(g){
@@ -1549,8 +1570,9 @@
   }
   function alElegirGrupo(g, u){
     var items = itemsDeGrupo(g, u);
-    if (u && items.length === 1 && g.fuente !== 'propias'){
-      mandar(items[0].id, u);
+    if (items.length === 1 && g.fuente !== 'propias'){
+      if (u) mandar(items[0].id, u);
+      else mandarLibre(items[0].id);
       return;
     }
     pintarItemsGrupo(g, u, items);
@@ -1559,7 +1581,7 @@
     var ov = overlay();
     var cuerpo = ov.querySelector('#muCuerpo');
     ov.querySelector('#muTitulo').textContent = g.icono + ' ' + g.nombre;
-    ov.querySelector('#muSub').textContent = u ? 'Tocá una y se abre WhatsApp' : 'Tocá una para editarla';
+    ov.querySelector('#muSub').textContent = 'Tocá una y se abre WhatsApp';
     var lista = items || [];
     var html = '';
     if (!lista.length && g.fuente === 'propias'){
@@ -1571,7 +1593,7 @@
         html += '<button type="button" class="mu-item" data-mu-plantilla="' + esc(p.id) + '">' +
           '<span class="mu-ico">' + (p.icono || g.icono) + '</span>' +
           '<span><strong>' + esc(p.nombre) + (p.editada ? ' ✏️' : '') + '</strong><small>' + esc(resumen) + '…</small></span>' +
-          '<span class="mu-go">' + (u ? '💬' : '›') + '</span></button>';
+          '<span class="mu-go">💬</span></button>';
       });
       html += '</div>';
     }
@@ -1582,7 +1604,7 @@
       var id = b.getAttribute('data-mu-plantilla');
       b.onclick = function(){
         if (u) mandar(id, u);
-        else verPlantilla(id, null);
+        else mandarLibre(id);
       };
     });
     var neu = cuerpo.querySelector('#muNuevo');
@@ -1600,7 +1622,7 @@
     ctx.persona = u || null;
     ctx.plantilla = null;
     var nombre = u ? ((typeof window.nombreDePila === 'function' ? window.nombreDePila(u.usuario) : '') || u.usuario) : '';
-    ov.querySelector('#muTitulo').textContent = u ? ('Mensaje para ' + nombre) : 'Plantillas de mensajes';
+    ov.querySelector('#muTitulo').textContent = u ? ('Mensaje para ' + nombre) : 'Mensajes';
     var cuerpo = ov.querySelector('#muCuerpo');
     var sub = ov.querySelector('#muSub');
 
@@ -1970,7 +1992,7 @@
     css();
     observar();
     pintarHoy();
-    var btnP = document.getElementById('usuariosBtnPlantillas');
+    var btnP = document.getElementById('usuariosBtnMensajes');
     if (btnP && !btnP.__muBound){
       btnP.__muBound = true;
       btnP.onclick = function(){ abrirPlantillas(); };

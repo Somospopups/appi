@@ -215,7 +215,7 @@ test('el resumen de cada plantilla ya viene con los datos puestos', async ({ pag
 
 test('editar una plantilla la deja guardada para la próxima', async ({ page }) => {
   await entrar(page);
-  await page.locator('#usuariosBtnPlantillas').click();
+  await page.locator('#usuariosBtnMensajes').click();
   await page.locator('#muIrEditar').click();
   await page.locator('[data-mu-editar="saludo"]').click();
 
@@ -230,7 +230,7 @@ test('editar una plantilla la deja guardada para la próxima', async ({ page }) 
   // Vuelve a la lista de edición y el cambio sobrevive a reabrir el popup.
   await expect(page.locator('[data-mu-editar="saludo"]')).toContainText('Buenas Ana');
   await page.locator('#muCerrar').click();
-  await page.locator('#usuariosBtnPlantillas').click();
+  await page.locator('#usuariosBtnMensajes').click();
   await page.locator('#muIrEditar').click();
   await expect(page.locator('[data-mu-editar="saludo"]')).toContainText('Buenas Ana');
   await page.locator('[data-mu-editar="saludo"]').click();
@@ -241,7 +241,7 @@ test('editar una plantilla la deja guardada para la próxima', async ({ page }) 
 
 test('los botones de datos dicen el nombre, no la llave', async ({ page }) => {
   await entrar(page);
-  await page.locator('#usuariosBtnPlantillas').click();
+  await page.locator('#usuariosBtnMensajes').click();
   await page.locator('#muIrEditar').click();
   await page.locator('[data-mu-editar="saludo"]').click();
 
@@ -258,11 +258,13 @@ test('los botones de datos dicen el nombre, no la llave', async ({ page }) => {
   await expect(page.locator('#muPrevTxt')).toContainText('Hola Alta Gracia');
 });
 
-test('la barra tiene Plantillas y no el viejo botón de Mensajes', async ({ page }) => {
+test('la barra tiene Mensajes con el logo de WhatsApp', async ({ page }) => {
   await entrar(page);
-  await expect(page.locator('#usuariosBtnMensajes')).toHaveCount(0);
-  await expect(page.locator('#usuariosBtnPlantillas')).toBeVisible();
-  // Base + Depurados + Dormidos + Plantillas (v412).
+  await expect(page.locator('#usuariosBtnMensajes')).toBeVisible();
+  await expect(page.locator('#usuariosBtnMensajes')).toContainText('Mensajes');
+  await expect(page.locator('#usuariosBtnMensajes svg')).toBeVisible();
+  await expect(page.locator('#usuariosBtnPlantillas')).toHaveCount(0);
+  // Base + Depurados + Dormidos + Mensajes (v413).
   await expect(page.locator('.u-tools button:visible')).toHaveCount(7);
   await expect(page.locator('#usuariosBtnDormidos')).toBeVisible();
 });
@@ -754,7 +756,7 @@ test('sin teléfono no aparece el grupo de contacto, pero sí el de ubicación',
    los mensajes propios salen igual que los de fábrica. */
 
 async function irAEditar(page) {
-  await page.locator('#usuariosBtnPlantillas').click();
+  await page.locator('#usuariosBtnMensajes').click();
   await expect(page.locator('#muOverlay')).toHaveClass(/open/);
   await page.locator('#muIrEditar').click();
   await expect(page.locator('#muNuevo')).toBeVisible();
@@ -1108,13 +1110,31 @@ test('el banco de hielo tiene 8 saludos y respeta la hora', async ({ page }) => 
   expect(r.sinHola).toBe('Me acordé de tu equipo.');
 });
 
-test('el botón Plantillas abre los grupos sin elegir a nadie', async ({ page }) => {
+test('el botón Mensajes abre los grupos sin elegir a nadie', async ({ page }) => {
   await entrar(page);
-  await page.locator('#usuariosBtnPlantillas').click();
+  await page.locator('#usuariosBtnMensajes').click();
   await expect(page.locator('#muOverlay')).toHaveClass(/open/);
-  await expect(page.locator('#muTitulo')).toContainText('Plantillas');
+  await expect(page.locator('#muTitulo')).toContainText('Mensajes');
   await expect(page.locator('[data-mu-grupo]')).toHaveCount(7);
   await expect(page.locator('#muIrEditar')).toBeVisible();
+});
+
+test('desde Mensajes un toque abre WhatsApp para elegir a cualquiera', async ({ page }) => {
+  await entrar(page);
+  await page.evaluate(() => {
+    window.__wa = [];
+    window.APPIWhatsApp.abrir = url => { window.__wa.push(url); };
+  });
+  await page.locator('#usuariosBtnMensajes').click();
+  await page.locator('[data-mu-grupo="cumple"]').click();
+  const urls = await page.evaluate(() => window.__wa);
+  expect(urls).toHaveLength(1);
+  expect(urls[0]).toMatch(/^https:\/\/wa\.me\/\?text=/);
+  const texto = decodeURIComponent(urls[0].split('text=')[1]);
+  expect(texto).toContain('Feliz cumpleaños');
+  expect(texto).not.toContain('{nombre}');
+  expect(texto).not.toContain('Ana');
+  await expect(page.locator('#muOverlay')).not.toHaveClass(/open/);
 });
 
 test('la firma se guarda en Mi cuenta y sale en el hielo', async ({ page }) => {

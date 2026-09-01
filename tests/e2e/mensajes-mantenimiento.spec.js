@@ -103,7 +103,7 @@ test('el botón Cambiar mensaje reemplaza el texto del carrusel', async ({ page 
 
 test('los mensajes aparecen en el editor, agrupados', async ({ page }) => {
   await entrar(page);
-  await page.locator('#usuariosBtnPlantillas').click();
+  await page.locator('#usuariosBtnMensajes').click();
   await page.locator('#muIrEditar').click();
   const titulos = page.locator('.mu-sec-titulo');
   await expect(titulos.first()).toContainText('Mantenimiento');

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v412-hielo-whatsapp';
+const CACHE_NAME = 'appi-v413-mensajes-whatsapp';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
