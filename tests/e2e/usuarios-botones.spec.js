@@ -223,6 +223,10 @@ test('el círculo verde comparte la lista de esa zona por WhatsApp', async ({ pa
   const texto = decodeURIComponent(String(url).split('text=')[1] || '');
   expect(texto).toContain('Alta Gracia');
   expect(texto).toContain('Ana Gómez');
+  expect(texto).toContain('Tel:');
+  expect(texto).toContain('Domicilio: San Martín 120');
+  expect(texto).toContain('Equipo: PSA');
+  expect(texto).toContain('Vence: 30/07/2026');
   expect(texto).toContain('Beto Ruiz');
   expect(texto).toContain('Caro Díaz');
   expect(texto).not.toContain('Diego Paz');

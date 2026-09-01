@@ -174,7 +174,20 @@
   function textoListaZona(zona){
     var gente = genteDeZona(zona);
     var lineas = [zona + ' · ' + gente.length + (gente.length === 1 ? ' persona' : ' personas'), ''];
-    gente.forEach(function(u){ lineas.push(String(u.usuario || 'Sin nombre')); });
+    gente.forEach(function(u){
+      var tel = (window.APPITel && window.APPITel.bonito) ? (window.APPITel.bonito(u.telf) || u.telf) : (u.telf || u.telefono || '');
+      var zonaCp = [u.localidad, u.cp ? 'CP ' + u.cp : ''].filter(Boolean).join(' ');
+      lineas.push(String(u.usuario || 'Sin nombre'));
+      if (tel) lineas.push('Tel: ' + tel);
+      if (u.domicilio) lineas.push('Domicilio: ' + u.domicilio);
+      if (zonaCp) lineas.push('Zona: ' + zonaCp);
+      if (u.producto) lineas.push('Equipo: ' + u.producto);
+      if (u.fCompra) lineas.push('Compra: ' + u.fCompra);
+      if (u.fVenceRaw) lineas.push('Vence: ' + u.fVenceRaw);
+      if (u.email) lineas.push('Mail: ' + u.email);
+      if (u.cumpleRaw) lineas.push('Cumple: ' + u.cumpleRaw);
+      lineas.push('');
+    });
     return lineas.join('\n');
   }
   function icoWaChico(){
