@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "424.0.0",
-  "cacheName": "appi-v424-compartir-distribuidor",
+  "version": "425.0.0",
+  "cacheName": "appi-v425-sin-bonus-equipo",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

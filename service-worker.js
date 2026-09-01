@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v424-compartir-distribuidor';
+const CACHE_NAME = 'appi-v425-sin-bonus-equipo';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

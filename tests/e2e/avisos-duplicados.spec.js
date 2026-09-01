@@ -92,9 +92,7 @@ test('cada aviso vive sólo en su lugar', async ({ page }) => {
   expect(cultura.total, 'culturaWrap debe existir una sola vez').toBe(1);
   expect(cultura.secciones[0], 'culturaWrap sólo va en el inicio').toBe('view-home');
   expect((await copias(page, 'bdayBannerWrap')).total, 'el aviso Hoy cumplen se retiró en v321').toBe(0);
-  const bonus = await copias(page, 'bonusNotifWrap');
-  expect(bonus.total, 'bonusNotifWrap debe existir una sola vez').toBe(1);
-  expect(bonus.secciones[0], 'el aviso de Bonus vive en Mi Equipo').toBe('view-equipo');
+  expect((await copias(page, 'bonusNotifWrap')).total, 'el aviso de Bonus se retiró de Mi Equipo').toBe(0);
   await expect(page.locator('#view-home #bonusNotifWrap')).toHaveCount(0);
 
   await expect(page.locator('#view-mes #culturaWrap')).toHaveCount(0);

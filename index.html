@@ -4116,7 +4116,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v424 · Segura</div>
+  <div class="ds-foot">APPI · v425 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4810,8 +4810,6 @@ body.dark #pageTabs button.active{color:#a8c0ff}
       <div class="script">Equipo</div>
       <p id="equipoSubtitle">Cargá tu planilla para empezar</p>
     </header>
-
-    <div id="bonusNotifWrap"></div>
 
     <div class="equipo-tabs" id="equipoTabsWrap" style="display:none">
       <button class="equipo-tab active" data-eqtab="dashboard">
@@ -7423,7 +7421,6 @@ function procesarExcel(rows){
 
 function openEquipo(){
   loadEquipoFromStorage();
-  try{ renderBonusNotifs(); }catch(e){}
   equipoActiveTab = 'dashboard';
   document.querySelectorAll('.equipo-tab').forEach(b=>b.classList.toggle('active', b.dataset.eqtab==='dashboard'));
   showView('view-equipo');
@@ -11821,8 +11818,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='424';
-      const CACHE_NAME='appi-v424-compartir-distribuidor';
+      const swVersion='425';
+      const CACHE_NAME='appi-v425-sin-bonus-equipo';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 
