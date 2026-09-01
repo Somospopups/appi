@@ -4,8 +4,8 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
-- Versión: **v426 · Segura**.
-- Caché de la app: `appi-v426-pb-tres-tarjetas` (se renueva al abrir APPI).
+- Versión: **v427 · Segura**.
+- Caché de la app: `appi-v427-pb-whatsapp` (se renueva al abrir APPI).
 - Publicación: [https://somospopups.github.io/appi/](https://somospopups.github.io/appi/)
 - Acceso por número de distribuidor y contraseña.
 - Acceso administrador POPUPS mediante el candado, sin DIP ni número de distribuidor.

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v426-pb-tres-tarjetas';
+const CACHE_NAME = 'appi-v427-pb-whatsapp';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
