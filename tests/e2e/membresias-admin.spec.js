@@ -17,6 +17,9 @@ test('las membresías administrativas usan la sesión y la Edge Function protegi
   expect(edge.indexOf("action === 'membership_stats'")).toBeGreaterThan(adminCheck);
   expect(edge).toContain("admin.rpc('appi_admin_prorrogar_membresia'");
   expect(edge).toContain("admin.rpc('appi_admin_registrar_pago_membresia'");
+  expect(edge).toContain("action === 'grant_month'");
+  expect(edge).toContain('addUtcMonths(base, 1)');
+  expect(edge).toContain('Esta cuenta ya tiene acceso permanente.');
 });
 
 test('la migración de membresías restringe RLS y mantiene appi_perfiles como acceso real', () => {

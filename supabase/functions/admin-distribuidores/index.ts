@@ -197,6 +197,29 @@ Deno.serve(async request => {
       const { error: profileError } = await admin.from('appi_perfiles').update({ debe_cambiar_password: true }).eq('user_id', targetId); if (profileError) throw profileError;
       return json({ ok: true });
     }
+    if (action === 'grant_month') {
+      const { data: target, error: targetError } = await admin.from('appi_perfiles').select('user_id,membresia_vence').eq('user_id', targetId).eq('rol', 'usuario').maybeSingle();
+      if (targetError) throw targetError;
+      if (!target) return json({ error: 'La cuenta no existe.' }, 404);
+      const now = new Date();
+      const current = target.membresia_vence ? new Date(target.membresia_vence) : now;
+      if (!Number.isNaN(current.getTime()) && current.getTime() - now.getTime() > 20000 * 86400000) {
+        return json({ error: 'Esta cuenta ya tiene acceso permanente.' }, 400);
+      }
+      const base = current.getTime() > now.getTime() ? current : now;
+      const startedAt = now, expiresAt = addUtcMonths(base, 1);
+      const { data, error } = await admin.from('appi_perfiles').update({
+        membresia_meses: 1,
+        membresia_inicio: startedAt.toISOString(),
+        membresia_vence: expiresAt.toISOString(),
+        membresia_prueba: false,
+        activo: true
+      }).eq('user_id', targetId).select('user_id,dip,nombre,membresia_meses,membresia_inicio,membresia_vence,activo').single();
+      if (error) throw error;
+      await syncMembership(targetId, { status: 'active', starts_at: startedAt.toISOString(), expires_at: expiresAt.toISOString(), grace_period_until: null, grace_period_notes: null });
+      await admin.auth.admin.updateUserById(targetId, { ban_duration: 'none' }).catch(() => null);
+      return json({ user: data, expires_at: expiresAt.toISOString() });
+    }
     if (action === 'set_membership') {
       const months = Number(body?.membership_months); if (![1,3,6].includes(months)) return json({ error: 'Elegí una membresía de 1, 3 o 6 meses.' }, 400);
       const startedAt = new Date(), expiresAt = new Date(startedAt); expiresAt.setUTCMonth(expiresAt.getUTCMonth() + months);

@@ -4,8 +4,8 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
-- Versión: **v410 · Segura**.
-- Caché de la app: `appi-v410-dos-tarjetas` (se renueva al abrir APPI).
+- Versión: **v411 · Segura**.
+- Caché de la app: `appi-v411-mes-completo` (se renueva al abrir APPI).
 - Publicación: [https://somospopups.github.io/appi/](https://somospopups.github.io/appi/)
 - Acceso por número de distribuidor y contraseña.
 - Acceso administrador POPUPS mediante el candado, sin DIP ni número de distribuidor.
@@ -54,6 +54,10 @@ Descendente: es el PB personal del titular (figura primero; si hay socio,
 ese segundo nombre no se usa). Si todavía no está la planilla, se ve un
 guión y un toque abre Mi Equipo. Los invitados siguen a mano. APPI no
 inventa un número.
+
+## 1 mes completo (v411)
+
+En cada cuenta del panel, junto a Prueba y Para siempre: **📅 1 mes completo**. Suma un mes a lo que le queda (si está vencida, arranca de hoy). No registra un pago. Si ya es para siempre, no se toca.
 
 ## Dos tarjetas (v410)
 

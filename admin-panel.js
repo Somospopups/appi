@@ -110,6 +110,7 @@ function renderUsers(){
       <button type="button" data-admin-action="people">👥 Personas</button>
       <button type="button" data-admin-action="phone">📱 Teléfono</button>
       <button type="button" class="trial" data-admin-action="trial">🧪 Prueba 5 días</button>
+      <button type="button" class="mes" data-admin-action="month">📅 1 mes completo</button>
       <button type="button" class="forever" data-admin-action="forever">♾️ Para siempre</button>
       <button type="button" class="${user.activo?'danger':'good'}" data-admin-action="active" data-active="${user.activo?'0':'1'}">${user.activo?'⛔ Bloquear':'✓ Activar'}</button>
       <button type="button" class="danger" data-admin-action="delete" style="grid-column:1/-1">🗑 Eliminar la cuenta</button>
@@ -279,6 +280,25 @@ async function handleUserAction(button){
       await guardarTelefono(userId,limpio);
       if(typeof showToast==='function')showToast(limpio?'Teléfono guardado 📱':'Teléfono borrado');
       return;
+    }
+    if(action==='month'){
+      const info=membershipInfo(user);
+      if(info.days>20000){await window.APPIDialog.alert('Esta cuenta ya tiene acceso permanente.',{title:'1 mes completo',icon:'📅'});return}
+      const baseMs=Math.max(Date.now(),user.membresia_vence?new Date(user.membresia_vence).getTime():0);
+      const hasta=new Date(baseMs);const dia=hasta.getDate();hasta.setDate(1);hasta.setMonth(hasta.getMonth()+1);hasta.setDate(Math.min(dia,new Date(hasta.getFullYear(),hasta.getMonth()+1,0).getDate()));
+      const fecha=hasta.toLocaleDateString('es-AR');
+      const enPrueba=state.pruebas.has(user.user_id);
+      const texto=enPrueba
+        ?`La prueba de ${user.nombre||user.dip} pasa a 1 mes completo, hasta el ${fecha}. ¿Confirmás?`
+        :(info.days<0
+          ?`${user.nombre||user.dip} va a tener 1 mes completo de APPI, hasta el ${fecha}. ¿Confirmás?`
+          :`${user.nombre||user.dip} va a tener 1 mes completo más de APPI, hasta el ${fecha}. Los días que le quedan se suman. ¿Confirmás?`);
+      const okMes=await window.APPIDialog.confirm(texto,{title:'1 mes completo',icon:'📅',okText:'Dar 1 mes'});
+      if(!okMes)return;
+      const data=await callAdmin({action:'grant_month',user_id:userId});
+      const fechaReal=data&&data.expires_at?new Date(data.expires_at).toLocaleDateString('es-AR'):fecha;
+      await window.APPIDialog.alert(`Listo: ${user.nombre||user.dip} tiene APPI hasta el ${fechaReal}.`,{title:'1 mes completo',icon:'📅'});
+      await load();return;
     }
     if(action==='forever'){
       const okSiempre=await window.APPIDialog.confirm(`${user.nombre||user.dip} tendrá acceso a APPI PARA SIEMPRE, sin vencimiento. ¿Confirmás?`,{title:'Membresía permanente',icon:'♾️',okText:'Dar acceso permanente'});
@@ -615,7 +635,7 @@ SOLICITUDES PENDIENTES
 Las personas que piden acceso desde la app aparecen acá. Al aprobar elegís 1 mes o PRUEBA, y podés mandar las credenciales por WhatsApp.
 
 CUENTAS (Distribuidores)
-La sección arranca minimizada con el resumen; tocala para abrir. Cada distribuidor es un renglón: tocalo y se despliegan todas sus acciones, cómodas y con nombre: 💬 WhatsApp (va directo si la cuenta tiene el número guardado — al aprobar una solicitud queda solo; con 📱 Teléfono lo cargás o corregís cuando quieras), 💳 Registrar pago y 📅 Prórroga (ambos sacan del modo prueba solos), 🔑 Nueva contraseña, 👥 Personas, 🧪 Prueba 5 días, ♾️ Para siempre (acceso permanente), Bloquear y Eliminar.
+La sección arranca minimizada con el resumen; tocala para abrir. Cada distribuidor es un renglón: tocalo y se despliegan todas sus acciones, cómodas y con nombre: 💬 WhatsApp (va directo si la cuenta tiene el número guardado — al aprobar una solicitud queda solo; con 📱 Teléfono lo cargás o corregís cuando quieras), 💳 Registrar pago y 📅 Prórroga (ambos sacan del modo prueba solos), 🔑 Nueva contraseña, 👥 Personas, 🧪 Prueba 5 días, 📅 1 mes completo (suma un mes a lo que le queda, sin registrar un pago), ♾️ Para siempre (acceso permanente), Bloquear y Eliminar.
 
 CUMPLIMIENTO DIARIO
 Lo que cada cuenta marcó con ✓ y ✗ en sus acciones del día: hoy y últimos 7 días. La sección arranca minimizada con el resumen a la vista; tocala para abrir el detalle y usá el buscador por nombre o DIP.

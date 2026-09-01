@@ -141,6 +141,18 @@ test('los distribuidores: minimizable, WhatsApp directo y PARA SIEMPRE (v312)', 
   expect(sql).toContain('2099-12-31');
 });
 
+test('cada cuenta puede recibir 1 mes completo sin registrar un pago (v411)', () => {
+  const js = panel();
+  expect(js).toContain('data-admin-action="month"');
+  expect(js).toContain("action:'grant_month'");
+  expect(js).toContain('1 mes completo');
+  expect(js).toContain('Los días que le quedan se suman');
+  const edge = fs.readFileSync('supabase/functions/admin-distribuidores/index.ts', 'utf8');
+  expect(edge).toContain("action === 'grant_month'");
+  expect(edge).toContain('addUtcMonths(base, 1)');
+  expect(edge).not.toMatch(/grant_month[\s\S]{0,800}membership_payments/);
+});
+
 test('el teléfono del distribuidor queda guardado y el 💬 va directo (v313)', () => {
   const js = panel();
   // Al aprobar, el teléfono de la solicitud pasa al perfil sin pasos extra.

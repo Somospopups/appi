@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "410.0.0",
-  "cacheName": "appi-v410-dos-tarjetas",
+  "version": "411.0.0",
+  "cacheName": "appi-v411-mes-completo",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {
