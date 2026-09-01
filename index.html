@@ -4116,7 +4116,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v423 · Segura</div>
+  <div class="ds-foot">APPI · v424 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -8786,10 +8786,8 @@ async function enviarMensajeWhatsApp(mensaje, titulo){
 
 // Menú principal: compartir datos unificado + imagen
 function generarMensajeUnificadoEquipoYDistribuidor(persona){
-  // Combina datos de mi equipo + datos del distribuidor seleccionado
-  const teamMsg = generarMensajeMiEquipo();
-  const distMsg = generarMensajeCombinado(persona);
-  return `${teamMsg}\n\n━━━━━━━━━━━━━━━\n\n${distMsg}`;
+  // Sólo el distribuidor elegido: no se mezclan los datos de la cuenta titular.
+  return generarMensajeCombinado(persona);
 }
 
 function abrirSelectorParaCompartirDatos(){
@@ -8826,7 +8824,7 @@ function abrirSelectorParaCompartirDatos(){
   
   const html = `
     <p style="margin:0 0 12px; font-size:13px; color:#5c5c66">
-      Elegí el distribuidor para compartir <b>datos de tu equipo + sus datos</b> juntos.
+      Elegí el distribuidor cuyos datos querés compartir.
     </p>
     <div class="person-picker-search">
       <span style="color:#8a8a94">🔍</span>
@@ -8838,7 +8836,7 @@ function abrirSelectorParaCompartirDatos(){
   `;
   modal.open({
     icon:'📊', iconBg:'linear-gradient(135deg,#25D366,#128C7E)',
-    title:'Compartir datos', sub:'Mi equipo + distribuidor',
+    title:'Compartir datos', sub:'Un distribuidor',
     html
   });
   setTimeout(()=>{
@@ -8860,7 +8858,7 @@ function abrirSelectorParaCompartirDatos(){
         modal.close();
         haptic(15);
         const mensajeFinal = generarMensajeUnificadoEquipoYDistribuidor(p);
-        enviarMensajeWhatsApp(mensajeFinal, 'Datos: Mi equipo + ' + p.nombre.split(',')[0].trim());
+        enviarMensajeWhatsApp(mensajeFinal, p.nombre.split(',')[0].trim());
       };
     });
   }
@@ -8873,7 +8871,7 @@ document.getElementById('btnEquipoShare').onclick = ()=>{
       <div class="sm-ico" style="background:linear-gradient(135deg,#25D366,#128C7E)">📊</div>
       <div class="sm-txt">
         <div class="sm-title">Compartir datos</div>
-        <div class="sm-desc">Datos de mi equipo + datos de un distribuidor</div>
+        <div class="sm-desc">Datos del distribuidor que elijas</div>
       </div>
       <span class="sm-arrow">›</span>
     </button>
@@ -11823,8 +11821,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='423';
-      const CACHE_NAME='appi-v423-zona-datos';
+      const swVersion='424';
+      const CACHE_NAME='appi-v424-compartir-distribuidor';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 
