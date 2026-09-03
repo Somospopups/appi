@@ -1,6 +1,6 @@
 (function(){
 'use strict';
-const state={users:[],requests:[],filter:'',whatsapp:'',createMembership:1,bound:false,pruebas:new Map(),acciones:[],accionesFiltro:'',pagos:null,pagosMes:'',revenue:null,userAbierto:'',telefonos:new Map(),tab:'hoy',plataVisible:false};
+const state={users:[],requests:[],filter:'',whatsapp:'',createMembership:1,bound:false,pruebas:new Map(),acciones:[],accionesFiltro:'',pagos:null,pagosMes:'',revenue:null,userAbierto:'',telefonos:new Map(),tab:'hoy',plataVisible:false,cuentaFiltro:''};
 const $=id=>document.getElementById(id);
 const esc=value=>String(value==null?'':value).replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
 const cfg=()=>window.APPIAuth.config();
@@ -90,11 +90,46 @@ function abrirIngresosEn(mes){
   const card=$('adminIngresosCard');
   if(card) card.scrollIntoView({behavior:'smooth',block:'start'});
 }
-function filteredUsers(){const term=state.filter.toLowerCase().trim();return state.users.filter(user=>user.rol!=='admin'&&(!term||`${user.nombre} ${user.socio_nombre||''} ${user.dip} ${user.sucursal} ${user.numero_distribuidor}`.toLowerCase().includes(term)))}
+function tipoCuenta(user){
+  if(state.pruebas.has(user.user_id)) return 'prueba';
+  const g=user.grace_period_until||user.prorroga_hasta||user.gracePeriodUntil||'';
+  if(g && !isNaN(new Date(g).getTime()) && new Date(g).getTime()>=Date.now()) return 'prorroga';
+  if(membershipInfo(user).days>20000) return 'siempre';
+  return 'mes';
+}
+function filteredUsers(){
+  const term=state.filter.toLowerCase().trim();
+  return state.users.filter(user=>{
+    if(user.rol==='admin') return false;
+    if(state.cuentaFiltro && tipoCuenta(user)!==state.cuentaFiltro) return false;
+    if(term && !`${user.nombre} ${user.socio_nombre||''} ${user.dip} ${user.sucursal} ${user.numero_distribuidor}`.toLowerCase().includes(term)) return false;
+    return true;
+  });
+}
+function pintarFiltrosCuentas(){
+  const wrap=$('adminCuentasFiltros'); if(!wrap) return;
+  const todos=state.users.filter(u=>u.rol!=='admin');
+  const n={prueba:0,mes:0,siempre:0,prorroga:0};
+  todos.forEach(u=>{ n[tipoCuenta(u)]=(n[tipoCuenta(u)]||0)+1; });
+  const labels={prueba:'🧪 Prueba 5 días',mes:'📅 1 mes',siempre:'♾️ Para siempre',prorroga:'📅 Prórroga'};
+  wrap.querySelectorAll('[data-cuenta-filtro]').forEach(b=>{
+    const k=b.dataset.cuentaFiltro;
+    const on=state.cuentaFiltro===k;
+    b.setAttribute('aria-selected', on?'true':'false');
+    b.innerHTML=labels[k]+'<small>'+(n[k]||0)+'</small>';
+  });
+}
 function renderUsers(){
-  const list=$('adminUserList'),users=filteredUsers();if(!list)return;if(!users.length){list.innerHTML='<div class="empty">No hay distribuidores para mostrar.</div>';return}
+  const list=$('adminUserList'),users=filteredUsers();if(!list)return;if(!users.length){list.innerHTML='<div class="empty">'+ (state.cuentaFiltro?'Nadie en este filtro.':'No hay distribuidores para mostrar.') +'</div>';pintarFiltrosCuentas();return}
   const resumen=$('adminUsersResumen');
-  if(resumen){const todos=state.users.filter(u=>u.rol!=='admin');resumen.textContent=todos.length?`${todos.length} cuenta${todos.length===1?'':'s'} · ${todos.filter(u=>u.activo).length} activas`:'Todavía no hay cuentas.'}
+  if(resumen){
+    const todos=state.users.filter(u=>u.rol!=='admin');
+    const n=users.length;
+    if(!todos.length) resumen.textContent='Todavía no hay cuentas.';
+    else if(state.cuentaFiltro) resumen.textContent=`${n} cuenta${n===1?'':'s'} en este filtro`;
+    else resumen.textContent=`${todos.length} cuenta${todos.length===1?'':'s'} · ${todos.filter(u=>u.activo).length} activas`;
+  }
+  pintarFiltrosCuentas();
   list.innerHTML=users.map(user=>{
     let membership=membershipInfo(user);
     const prueba=state.pruebas.get(user.user_id);
@@ -102,15 +137,17 @@ function renderUsers(){
     const expires=user.membresia_vence?new Date(user.membresia_vence).toLocaleDateString('es-AR'):'—';
     const abierto=state.userAbierto===user.user_id;
     const acciones=abierto?`<div class="admin-user-acciones">
-      <button type="button" class="wa" data-admin-action="whatsapp_dist">💬 WhatsApp</button>
-      <button type="button" class="pago" data-admin-action="payment">💳 Registrar pago</button>
-      <button type="button" data-admin-action="grace_period">📅 Prórroga</button>
-      <button type="button" data-admin-action="password">🔑 Nueva contraseña</button>
-      <button type="button" data-admin-action="people">👥 Personas</button>
-      <button type="button" data-admin-action="phone">📱 Teléfono</button>
+      <div class="admin-mem-label">Membresía</div>
       <button type="button" class="trial" data-admin-action="trial">🧪 Prueba 5 días</button>
       <button type="button" class="mes" data-admin-action="month">📅 1 mes completo</button>
       <button type="button" class="forever" data-admin-action="forever">♾️ Para siempre</button>
+      <button type="button" class="prorroga" data-admin-action="grace_period">📅 Prórroga</button>
+      <div class="admin-mem-label">Acciones</div>
+      <button type="button" class="wa" data-admin-action="whatsapp_dist">💬 WhatsApp</button>
+      <button type="button" class="pago" data-admin-action="payment">💳 Registrar pago</button>
+      <button type="button" data-admin-action="password">🔑 Nueva contraseña</button>
+      <button type="button" data-admin-action="people">👥 Personas</button>
+      <button type="button" data-admin-action="phone">📱 Teléfono</button>
       <button type="button" class="${user.activo?'danger':'good'}" data-admin-action="active" data-active="${user.activo?'0':'1'}">${user.activo?'⛔ Bloquear':'✓ Activar'}</button>
       <button type="button" class="danger" data-admin-action="delete" style="grid-column:1/-1">🗑 Eliminar la cuenta</button>
     </div>`:'';
@@ -498,6 +535,8 @@ function pintarBadgeSolic(){
   const n=state.requests.length;
   const badge=$('adminTabSolicBadge');
   if(badge){badge.hidden=!n; badge.textContent=n;}
+  const btn=document.querySelector('#adminTabs [data-admin-tab="solicitudes"]');
+  if(btn) btn.classList.toggle('alerta', n>0);
   const quick=$('adminQuickPendBadge');
   if(quick){quick.hidden=!n; quick.textContent=n;}
 }
@@ -704,7 +743,13 @@ El número que ven quienes piden ayuda para entrar. Se valida antes de guardarse
 
 CON QUÉ WHATSAPP MANDÁS
 En Configuración elegís si los envíos del panel abren WhatsApp normal o Business en tu teléfono, sin preguntar cada vez.`,
-{title:'Panel de administración',icon:'🛡️'});$('adminUserSearch').oninput=event=>{state.filter=event.target.value;renderUsers()};$('adminSucursal').oninput=event=>event.target.value=event.target.value.replace(/\D/g,'').slice(0,2);$('adminNumero').oninput=event=>event.target.value=event.target.value.replace(/\D/g,'').slice(0,12);$('adminWhatsappNumber').oninput=event=>event.target.value=event.target.value.replace(/\D/g,'').slice(0,15)}
+{title:'Panel de administración',icon:'🛡️'});$('adminUserSearch').oninput=event=>{state.filter=event.target.value;renderUsers()};
+  const filtrosCuentas=$('adminCuentasFiltros');
+  if(filtrosCuentas) filtrosCuentas.querySelectorAll('[data-cuenta-filtro]').forEach(b=>b.onclick=()=>{
+    const k=b.dataset.cuentaFiltro;
+    state.cuentaFiltro = state.cuentaFiltro===k ? '' : k;
+    renderUsers();
+  });$('adminSucursal').oninput=event=>event.target.value=event.target.value.replace(/\D/g,'').slice(0,2);$('adminNumero').oninput=event=>event.target.value=event.target.value.replace(/\D/g,'').slice(0,12);$('adminWhatsappNumber').oninput=event=>event.target.value=event.target.value.replace(/\D/g,'').slice(0,15)}
 function open(){const profile=window.APPIAuth.currentProfile();if(!profile||profile.rol!=='admin')return;state.plataVisible=false;state.tab='hoy';bind();showAdminTab('hoy');$('adminPanelIdentity').textContent='Administración del equipo';load();
   // Cargar estadísticas de ganancias
   if(window.APPIAdminMembership&&window.APPIAdminMembership.renderRevenuePanel){

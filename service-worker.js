@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v439-admin-tabs-ojo';
+const CACHE_NAME = 'appi-v440-admin-filtros';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
