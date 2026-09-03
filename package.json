@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "447.0.0",
-  "cacheName": "appi-v447-ticket",
+  "version": "448.0.0",
+  "cacheName": "appi-v448-ticket-cine",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

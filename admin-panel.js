@@ -321,40 +321,180 @@ function fechaTicketDesdeVence(vence){
   const dt=new Date(vence);
   return isNaN(dt.getTime())?null:new Date(dt.getFullYear(),dt.getMonth(),dt.getDate());
 }
-function htmlTicketCine({nombre,dip,pagoTxt,hastaTxt}){
-  return `<div class="appi-ticket" id="adminTicketCard">
-    <div class="appi-ticket-stub">
-      <span class="t-brand">APPI</span>
-      <span class="t-vert">${esc(nombre||'APPI')} · ${esc(dip||'')}</span>
-    </div>
-    <div class="appi-ticket-body">
-      <div class="t-top">APPI</div>
-      <div class="t-name">${esc((nombre||'SIN NOMBRE').toUpperCase())}</div>
-      <div class="t-dip">DIP ${esc(dip||'—')}</div>
-      <div class="t-ico">🎫</div>
-      <div class="appi-ticket-rows">
-        <div><span>PAGÓ</span><b>${esc(pagoTxt)}</b></div>
-        <div><span>MEMBRESÍA HASTA</span><b>${esc(hastaTxt)}</b></div>
-      </div>
-      <div class="appi-ticket-stamp">PAGADO</div>
-      <div class="appi-ticket-foot">Comprobante de membresía</div>
-    </div>
-  </div>`;
+function ticketFuente(px,peso){
+  return `${peso||'bold'} ${px}px Georgia,"Times New Roman",Times,serif`;
+}
+function ticketAjustarFuente(ctx,texto,maxW,px,peso){
+  let n=px;
+  while(n>14){
+    ctx.font=ticketFuente(n,peso);
+    if(ctx.measureText(texto).width<=maxW) return n;
+    n-=1;
+  }
+  ctx.font=ticketFuente(n,peso);
+  return n;
+}
+function dibujarIconoCine(ctx,cx,cy){
+  ctx.save();
+  ctx.translate(cx,cy);
+  ctx.fillStyle='#1a1a1a';
+  const w=70,h=40,r=6,n=7;
+  ctx.beginPath();
+  ctx.moveTo(-w/2+r,-h/2);
+  ctx.lineTo(-n,-h/2);
+  ctx.arc(-n,-h/2,n,Math.PI,0,true);
+  ctx.lineTo(w/2-r,-h/2);
+  ctx.quadraticCurveTo(w/2,-h/2,w/2,-h/2+r);
+  ctx.lineTo(w/2,h/2-r);
+  ctx.quadraticCurveTo(w/2,h/2,w/2-r,h/2);
+  ctx.lineTo(n,h/2);
+  ctx.arc(n,h/2,n,0,Math.PI,true);
+  ctx.lineTo(-w/2+r,h/2);
+  ctx.quadraticCurveTo(-w/2,h/2,-w/2,h/2-r);
+  ctx.lineTo(-w/2,-h/2+r);
+  ctx.quadraticCurveTo(-w/2,-h/2,-w/2+r,-h/2);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle='#f0e6cc';
+  ctx.beginPath(); ctx.arc(-18,0,6,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(18,0,6,0,Math.PI*2); ctx.fill();
+  ctx.restore();
+}
+function dibujarSelloPagado(ctx,cx,cy,anio){
+  ctx.save();
+  ctx.translate(cx,cy);
+  ctx.rotate(-18*Math.PI/180);
+  const R=78;
+  ctx.strokeStyle='#1f8a4c';
+  ctx.lineWidth=5;
+  ctx.beginPath(); ctx.arc(0,0,R,0,Math.PI*2); ctx.stroke();
+  ctx.lineWidth=2.5;
+  ctx.beginPath(); ctx.arc(0,0,R-10,0,Math.PI*2); ctx.stroke();
+  ctx.fillStyle='#1f8a4c';
+  ctx.textAlign='center';
+  ctx.textBaseline='middle';
+  ctx.font=ticketFuente(13,'bold');
+  ctx.fillText('APPI',0,-46);
+  ctx.beginPath();
+  ctx.lineWidth=4;
+  ctx.lineCap='round';
+  ctx.lineJoin='round';
+  ctx.moveTo(-16,-6); ctx.lineTo(-4,10); ctx.lineTo(22,-16);
+  ctx.stroke();
+  ctx.save();
+  ctx.rotate(-6*Math.PI/180);
+  ctx.fillStyle='#1f8a4c';
+  ctx.fillRect(-58,8,116,28);
+  ctx.fillStyle='#f0e6cc';
+  ctx.font=ticketFuente(18,'bold');
+  ctx.fillText('PAGADO',0,22);
+  ctx.restore();
+  ctx.fillStyle='#1f8a4c';
+  ctx.font=ticketFuente(11,'bold');
+  ctx.fillText('APPI OK '+anio,0,54);
+  ctx.restore();
+}
+function dibujarTicketCine({nombre,dip,pagoTxt,hastaTxt}){
+  const W=1200,H=520,pad=36,stub=188,notch=32,r=22;
+  const canvas=document.createElement('canvas');
+  canvas.width=W+pad*2; canvas.height=H+pad*2;
+  const ctx=canvas.getContext('2d');
+  ctx.translate(pad,pad);
+  const papel='#f0e6cc',stubC='#ebe0c4';
+  ctx.beginPath();
+  ctx.moveTo(r,0);
+  ctx.lineTo(stub-notch,0);
+  ctx.arc(stub,0,notch,Math.PI,0,false);
+  ctx.lineTo(W-r,0);
+  ctx.quadraticCurveTo(W,0,W,r);
+  ctx.lineTo(W,H-r);
+  ctx.quadraticCurveTo(W,H,W-r,H);
+  ctx.lineTo(stub+notch,H);
+  ctx.arc(stub,H,notch,0,Math.PI,false);
+  ctx.lineTo(r,H);
+  ctx.quadraticCurveTo(0,H,0,H-r);
+  ctx.lineTo(0,r);
+  ctx.quadraticCurveTo(0,0,r,0);
+  ctx.closePath();
+  ctx.save();
+  ctx.shadowColor='rgba(70,50,20,.28)';
+  ctx.shadowBlur=22;
+  ctx.shadowOffsetY=10;
+  ctx.fillStyle=papel;
+  ctx.fill();
+  ctx.restore();
+  ctx.save();
+  ctx.clip();
+  ctx.fillStyle=stubC;
+  ctx.fillRect(0,0,stub,H);
+  ctx.setLineDash([7,7]);
+  ctx.strokeStyle='#c4b48a';
+  ctx.lineWidth=2;
+  ctx.beginPath();
+  ctx.moveTo(stub,notch+6);
+  ctx.lineTo(stub,H-notch-6);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.save();
+  ctx.translate(stub/2,H/2);
+  ctx.rotate(-Math.PI/2);
+  ctx.fillStyle='#1c1c1c';
+  ctx.textAlign='center';
+  ctx.textBaseline='middle';
+  ctx.font=ticketFuente(15,'bold');
+  ctx.fillText('APPI',0,-34);
+  const nomStub=String(nombre||'APPI').toUpperCase();
+  ticketAjustarFuente(ctx,nomStub,H-80,18,'bold');
+  ctx.fillText(nomStub,0,0);
+  ctx.font=ticketFuente(14,'bold');
+  ctx.fillText('DIP '+String(dip||'—'),0,32);
+  ctx.restore();
+  const cx=stub+(W-stub)/2;
+  const left=stub+36, right=W-36, bodyW=right-left;
+  ctx.strokeStyle='#1c1c1c';
+  ctx.lineWidth=2.2;
+  ctx.beginPath(); ctx.moveTo(left,28); ctx.lineTo(right,28); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(left,88); ctx.lineTo(right,88); ctx.stroke();
+  ctx.fillStyle='#111';
+  ctx.textAlign='center';
+  ctx.textBaseline='alphabetic';
+  ctx.font=ticketFuente(22,'bold');
+  ctx.fillText('APPI',cx,68);
+  const nom=String(nombre||'SIN NOMBRE').toUpperCase();
+  ticketAjustarFuente(ctx,nom,bodyW-20,40,'bold');
+  ctx.fillText(nom,cx,148);
+  ctx.fillStyle='#4a453c';
+  ctx.font=ticketFuente(20,'normal');
+  ctx.fillText('DIP '+String(dip||'—'),cx,182);
+  dibujarIconoCine(ctx,cx,232);
+  ctx.strokeStyle='#1c1c1c';
+  ctx.lineWidth=2.2;
+  ctx.beginPath(); ctx.moveTo(left,268); ctx.lineTo(right,268); ctx.stroke();
+  ctx.textAlign='left';
+  ctx.fillStyle='#3a372f';
+  ctx.font=ticketFuente(16,'bold');
+  ctx.fillText('PAGÓ:',left+8,318);
+  ctx.fillText('MEMBRESÍA',left+8,372);
+  ctx.fillText('HASTA:',left+8,396);
+  ctx.textAlign='center';
+  ctx.fillStyle='#111';
+  ctx.font=ticketFuente(34,'bold');
+  ctx.fillText(String(pagoTxt),cx-20,322);
+  ctx.fillText(String(hastaTxt),cx-20,388);
+  const anio=String(hastaTxt).match(/\d{4}/);
+  dibujarSelloPagado(ctx,W-150,360,anio?anio[0]:String(new Date().getFullYear()));
+  ctx.textAlign='center';
+  ctx.fillStyle='#5c564c';
+  ctx.font=ticketFuente(14,'normal');
+  ctx.fillText('Comprobante de membresía',cx,H-28);
+  ctx.restore();
+  return canvas;
 }
 async function capturarTicketCine(datos){
-  const wrap=document.createElement('div');
-  wrap.className='appi-ticket-shot';
-  wrap.innerHTML=htmlTicketCine(datos);
-  document.body.appendChild(wrap);
-  await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
-  const card=wrap.querySelector('#adminTicketCard');
-  const h2c=window.html2canvas;
-  if(typeof h2c!=='function' || !card){ wrap.remove(); throw new Error('No se pudo armar el ticket.'); }
-  try{
-    const canvas=await h2c(card,{backgroundColor:'#f4ead4',scale:2,logging:false,useCORS:true});
-    const blob=await new Promise((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(new Error('No se pudo armar el ticket.')),'image/png',1));
-    return blob;
-  }finally{ wrap.remove(); }
+  const canvas=dibujarTicketCine(datos);
+  return new Promise((resolve,reject)=>{
+    canvas.toBlob(b=>b?resolve(b):reject(new Error('No se pudo armar el ticket.')),'image/png',1);
+  });
 }
 async function compartirImagenWhatsApp(blob,titulo,fileName){
   const file=new File([blob],fileName,{type:'image/png'});
