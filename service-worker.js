@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v448-ticket-cine';
+const CACHE_NAME = 'appi-v449-ticket-termico';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
