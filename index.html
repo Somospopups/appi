@@ -4145,7 +4145,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v442 · Segura</div>
+  <div class="ds-foot">APPI · v443 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -5283,7 +5283,6 @@ body.dark #pageTabs button.active{color:#a8c0ff}
       <button class="help-btn" id="btnHelpAdmin" aria-label="Ayuda">?</button>
       <button type="button" class="admin-round-password" id="btnAdminPanelPassword" aria-label="Cambiar contraseña" title="Cambiar contraseña">🔑</button>
       <button type="button" class="admin-round-logout" id="btnAdminPanelLogout" aria-label="Cerrar sesión" title="Cerrar sesión">↪</button>
-      <div class="admin-top-lock">🔒</div>
       <h1>Panel</h1>
       <div class="script">Administrador</div>
       <p id="adminPanelIdentity">Cuenta de administración</p>
@@ -5316,9 +5315,6 @@ body.dark #pageTabs button.active{color:#a8c0ff}
       </div>
 
       <div class="admin-pane" id="adminPane-cuentas" hidden>
-        <div class="admin-quick">
-          <button type="button" class="q" id="adminOpenCreate" style="grid-column:1/-1"><em>➕</em>Crear cuenta</button>
-        </div>
         <section class="glass admin-card">
           <div class="admin-card-head"><div><h2>Distribuidores</h2><p id="adminUsersResumen">Buscá por nombre, sucursal o número.</p></div></div>
           <div id="adminUsersBody">
@@ -12150,8 +12146,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='442';
-      const CACHE_NAME='appi-v442-filtros-fila';
+      const swVersion='443';
+      const CACHE_NAME='appi-v443-admin-limpio';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 

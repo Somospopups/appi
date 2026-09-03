@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v442-filtros-fila';
+const CACHE_NAME = 'appi-v443-admin-limpio';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
