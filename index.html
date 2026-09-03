@@ -106,7 +106,7 @@ window.openStock=function(){
 <script src="./prueba-banner.js"></script>
 <script src="./data-sync.js"></script>
 <script src="./js/membership-admin.js?v=439"></script>
-<script src="./admin-panel.js?v=445"></script>
+<script src="./admin-panel.js?v=446"></script>
 <link rel="stylesheet" href="./css/membership-admin.css">
 <link rel="stylesheet" href="./appi-tema.css">
 <script src="./account-request.js"></script>
@@ -4145,7 +4145,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v445 · Segura</div>
+  <div class="ds-foot">APPI · v446 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -5069,7 +5069,10 @@ body.dark #pageTabs button.active{color:#a8c0ff}
   /* Cumplimiento diario (v344): tarjetas con avatar, chips y barra de progreso */
 
   #adminCumpOverlay[hidden]{display:none!important}
-  .admin-cump-overlay .admin-cump-sheet{width:min(440px,100%);max-height:88vh;overflow:auto;padding:22px 20px 18px;border-radius:24px;position:relative}
+  .admin-cump-overlay .admin-cump-sheet{width:min(440px,100%);max-height:88vh;overflow:auto;padding:22px 20px 56px;border-radius:24px;position:relative}
+  .admin-cump-wa{position:absolute;right:16px;bottom:14px;width:44px;height:44px;border:0;border-radius:50%;background:#25D366;display:grid;place-items:center;cursor:pointer;box-shadow:0 8px 18px rgba(37,211,102,.38);z-index:2}
+  .admin-cump-wa:active{transform:scale(.96)}
+
   .admin-cump-row{display:flex;align-items:center;gap:10px;width:100%;padding:12px 12px;margin-bottom:7px;border:1px solid rgba(80,90,130,.1);border-radius:16px;background:rgba(255,255,255,.82);font:inherit;text-align:left;cursor:pointer}
   .admin-cump-row:hover{transform:translateY(-1px)}
   .cump-dots{display:flex;gap:5px;margin-left:auto;flex:none;align-items:flex-end}
@@ -5445,6 +5448,9 @@ body.dark #pageTabs button.active{color:#a8c0ff}
         <div class="modal admin-cump-sheet" role="dialog" aria-modal="true" aria-labelledby="adminCumpTitle">
           <button type="button" class="modal-close" id="adminCumpClose" aria-label="Cerrar">×</button>
           <div class="modal-body" id="adminCumpFicha"></div>
+          <button type="button" class="admin-cump-wa" id="adminCumpWa" aria-label="Enviar por WhatsApp">
+            <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="#fff" d="M20.5 3.5A11 11 0 0 0 2.1 16.6L1 23l6.6-1.1A11 11 0 1 0 20.5 3.5zM12 20.2a9.2 9.2 0 0 1-4.7-1.3l-.3-.2-3.9.6.7-3.8-.2-.3A9.2 9.2 0 1 1 12 20.2zm5.3-6.9c-.3-.1-1.7-.8-2-.9s-.5-.1-.6.1-.8.9-1 1.1-.4.2-.7.1a7.5 7.5 0 0 1-2.2-1.4 8.3 8.3 0 0 1-1.5-1.9c-.2-.3 0-.4.1-.6l.4-.5.1-.3c0-.1 0-.3-.1-.4s-.6-1.5-.9-2.1c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.4.1-.6.3s-.8.8-.8 1.9.8 2.2.9 2.3c.1.2 1.6 2.5 3.9 3.4 1.4.6 1.9.7 2.6.6.4-.1 1.7-.7 1.9-1.3s.2-1.2.2-1.3-.2-.2-.4-.3z"/></svg>
+          </button>
         </div>
       </div>
       <div class="modal-overlay membership-modal-overlay admin-create-overlay" id="adminCreateOverlay" hidden>
@@ -12199,8 +12205,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='445';
-      const CACHE_NAME='appi-v445-cump-mes';
+      const swVersion='446';
+      const CACHE_NAME='appi-v446-cump-wa';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 

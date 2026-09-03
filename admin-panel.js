@@ -568,6 +568,60 @@ function pintarCumpFicha(){
   const prev=$('cumpMesPrev'); if(prev) prev.onclick=()=>mover(-1);
   const next=$('cumpMesNext'); if(next) next.onclick=()=>mover(1);
 }
+function tituloCumpShare(){
+  const acc=(state.cumpCuentas||[]).find(c=>c.key===state.cumpKey);
+  const mes=state.cumpMes||'';
+  const nombres=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  const y=Number(mes.slice(0,4))||new Date().getFullYear();
+  const m=Number(mes.slice(5,7))-1;
+  const mesNom=m>=0&&m<12?nombres[m]:'';
+  return {titulo:`Cumplimiento de ${acc&&acc.nombre||'APPI'} · ${mesNom} ${y}`.trim(), fileName:`cumplimiento-${String(acc&&acc.nombre||'appi').replace(/\s+/g,'-')}-${mes||'mes'}.png`};
+}
+function descargarBlobCump(blob,name){
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=name;
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+}
+async function capturarCumpImagen(){
+  const el=$('adminCumpFicha');
+  if(!el) throw new Error('No está el calendario.');
+  const h2c=window.html2canvas;
+  if(typeof h2c!=='function') throw new Error('No se pudo armar la imagen.');
+  const canvas=await h2c(el,{backgroundColor:'#f4f4f8',scale:2,logging:false,useCORS:true});
+  return new Promise((resolve,reject)=>{
+    canvas.toBlob(b=>b?resolve(b):reject(new Error('No se pudo armar la imagen.')),'image/png',1);
+  });
+}
+async function enviarCumpWhatsApp(){
+  const btn=$('adminCumpWa');
+  if(btn) btn.disabled=true;
+  try{
+    const blob=await capturarCumpImagen();
+    const {titulo,fileName}=tituloCumpShare();
+    const file=new File([blob],fileName,{type:'image/png'});
+    // En el teléfono, compartir el archivo abre WhatsApp y el listado de contactos.
+    if(navigator.canShare&&navigator.canShare({files:[file]})){
+      try{
+        await navigator.share({files:[file],title:titulo,text:titulo});
+        return;
+      }catch(e){ if(e&&e.name==='AbortError') return; }
+    }
+    try{
+      if(navigator.clipboard&&window.ClipboardItem){
+        await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);
+      }
+    }catch(e){}
+    abrirWhatsAppCredencial('',titulo);
+    descargarBlobCump(blob,fileName);
+    if(typeof showToast==='function') showToast('WhatsApp abre el listado. Adjuntá la imagen.',3200);
+  }catch(error){
+    if(window.APPIDialog) window.APPIDialog.alert(error.message||'No se pudo armar la imagen.',{title:'WhatsApp',icon:'💬'});
+  }finally{
+    if(btn) btn.disabled=false;
+  }
+}
 
 /* ---------- Ingresos por mes (v300) ---------- */
 async function loadPagos(){
@@ -802,6 +856,7 @@ function bind(){if(state.bound)return;state.bound=true;['adminSucursal','adminNu
   const cumpOv=$('adminCumpOverlay');
   if(cumpOv){cumpOv.addEventListener('click',e=>{if(e.target===cumpOv)cerrarCumpFicha()});}
   const cumpClose=$('adminCumpClose'); if(cumpClose) cumpClose.onclick=cerrarCumpFicha;
+  const cumpWa=$('adminCumpWa'); if(cumpWa) cumpWa.onclick=enviarCumpWhatsApp;
 $('adminSaveWhatsapp').onclick=saveWhatsapp;$('btnAdminPanelLogout').onclick=logout;$('btnAdminPanelPassword').onclick=()=>window.abrirCambioPasswordAPPI();const helpAdmin=$('btnHelpAdmin');if(helpAdmin)helpAdmin.onclick=()=>window.APPIDialog.alert(
 `Desde acá administrás las cuentas de APPI.
 

@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "445.0.0",
-  "cacheName": "appi-v445-cump-mes",
+  "version": "446.0.0",
+  "cacheName": "appi-v446-cump-wa",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {
