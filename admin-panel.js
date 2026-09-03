@@ -499,7 +499,7 @@ async function enviarTicketWhatsApp(user){
     hastaTxt=fechaTicketTermico(dv);
   }
   const ultimo=ultimoPagoTicket(user);
-  const montoTxt=moneyTicket(ultimo&&ultimo.monto?ultimo.monto:5000);
+  const montoTxt=moneyTicket(ultimo&&ultimo.monto?ultimo.monto:50000);
   const metodoTxt=metodoTicketNom(ultimo&&ultimo.metodo);
   const dip=user.dip||'—';
   const txn='#TXN-'+String(Date.now()).slice(-9);

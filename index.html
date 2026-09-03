@@ -105,8 +105,8 @@ window.openStock=function(){
 <script src="./auth-client.js?v=441"></script>
 <script src="./prueba-banner.js"></script>
 <script src="./data-sync.js"></script>
-<script src="./js/membership-admin.js?v=439"></script>
-<script src="./admin-panel.js?v=450"></script>
+<script src="./js/membership-admin.js?v=451"></script>
+<script src="./admin-panel.js?v=451"></script>
 <link rel="stylesheet" href="./css/membership-admin.css">
 <link rel="stylesheet" href="./appi-tema.css">
 <script src="./account-request.js"></script>
@@ -4145,7 +4145,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v450 · Segura</div>
+  <div class="ds-foot">APPI · v451 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -12222,8 +12222,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='450';
-      const CACHE_NAME='appi-v450-ticket-05';
+      const swVersion='451';
+      const CACHE_NAME='appi-v451-ticket-50k';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 

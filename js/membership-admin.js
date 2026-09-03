@@ -78,8 +78,8 @@
     }
   }
 
-  async function createMembershipForUser(userId,monthlyFee=5000){
-    const data=await callAdmin({action:'ensure_membership',user_id:userId,monthly_fee:Number(monthlyFee)||5000});
+  async function createMembershipForUser(userId,monthlyFee=50000){
+    const data=await callAdmin({action:'ensure_membership',user_id:userId,monthly_fee:Number(monthlyFee)||50000});
     return data.membership||null;
   }
 
@@ -148,7 +148,7 @@
         <div class="modal-header"><h2 id="membershipPaymentTitle">💳 Registrar pago</h2><button type="button" class="modal-close" aria-label="Cerrar">×</button></div>
         <div class="modal-body">
           <p>Registrar pago de <strong>${esc(userName)}</strong></p>
-          <div class="form-group"><label for="paymentAmount">Monto ($)</label><input type="number" id="paymentAmount" class="form-input" value="5000" min="1" max="1000000000" step="100"></div>
+          <div class="form-group"><label for="paymentAmount">Monto ($)</label><input type="number" id="paymentAmount" class="form-input" value="50000" min="1" max="1000000000" step="100"></div>
           <div class="form-group"><label for="paymentMethod">Método de pago</label><select id="paymentMethod" class="form-input"><option value="transferencia">Transferencia</option><option value="efectivo">Efectivo</option><option value="mercadopago">Mercado Pago</option><option value="otro">Otro</option></select></div>
           <div class="form-group"><label for="paymentNotes">Notas</label><textarea id="paymentNotes" class="form-input" rows="2" maxlength="1000" placeholder="Notas opcionales"></textarea></div>
           <div class="admin-inline-status" id="paymentStatus" role="status"></div>
