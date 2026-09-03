@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "451.0.0",
-  "cacheName": "appi-v451-ticket-50k",
+  "version": "452.0.0",
+  "cacheName": "appi-v452-cuentas-ficha",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {
