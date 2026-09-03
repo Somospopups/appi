@@ -234,7 +234,7 @@ async function rpcAdmin(fn,body){
 async function loadAcciones(){
   const list=$('adminAccionesList');if(!list)return;
   try{
-    const rows=await rpcAdmin('appi_admin_cumplimiento',{dias_atras:7});
+    const rows=await rpcAdmin('appi_admin_cumplimiento',{dias_atras:40});
     state.acciones=Array.isArray(rows)?rows:[];
     setStatus('adminAccionesStatus','');
   }catch(error){
@@ -449,63 +449,127 @@ function inicialesCump(nombre){
   const b=partes.length>1?(partes[1][0]||'').toUpperCase():'';
   return a+b;
 }
+function fechaCumpISO(v){
+  const m=String(v||'').match(/^(\d{4}-\d{2}-\d{2})/);
+  return m?m[1]:'';
+}
+function isoDiaOffset(base,delta){
+  const d=new Date(base.getFullYear(),base.getMonth(),base.getDate()+delta);
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function tonoCumpDia(d){
+  if(!d || !d.total) return 'vacio';
+  const p=Math.round((d.hechas||0)*100/d.total);
+  if(p>=80) return 'verde';
+  if(p>=50) return 'naranja';
+  return 'rojo';
+}
+function cuentasCump(){
+  const hoy=new Date(),hoyISO=isoDiaOffset(hoy,0);
+  const porCuenta=new Map();
+  (state.acciones||[]).forEach(row=>{
+    const key=`${row.cuenta}·${row.persona}`;
+    if(!porCuenta.has(key)) porCuenta.set(key,{key,cuenta:row.cuenta,dip:row.dip,nombre:row.nombre,persona:row.persona,hoy:null,sem:{total:0,hechas:0,noHechas:0},dias:{}});
+    const acc=porCuenta.get(key);
+    const f=fechaCumpISO(row.fecha);
+    const dia={total:row.total||0,hechas:row.hechas||0,noHechas:row.no_hechas||0};
+    if(f) acc.dias[f]=dia;
+    acc.sem.total+=dia.total;acc.sem.hechas+=dia.hechas;acc.sem.noHechas+=dia.noHechas;
+    if(f===hoyISO) acc.hoy=dia;
+  });
+  return [...porCuenta.values()].sort((a,b)=>String(a.nombre||a.dip).localeCompare(String(b.nombre||b.dip),'es'));
+}
+function dotsSemana(acc){
+  const hoy=new Date();
+  return [6,5,4,3,2,1,0].map(i=>{
+    const iso=isoDiaOffset(hoy,-i);
+    const tono=tonoCumpDia(acc.dias[iso]);
+    return `<i class="cump-dot ${tono}" title="${iso}"></i>`;
+  }).join('');
+}
 function renderAcciones(){
   const list=$('adminAccionesList'),resumen=$('adminAccionesResumen');
   if(!list)return;
-  const hoy=new Date(),hoyISO=`${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,'0')}-${String(hoy.getDate()).padStart(2,'0')}`;
-  const porCuenta=new Map();
-  state.acciones.forEach(row=>{
-    const key=`${row.cuenta}·${row.persona}`;
-    if(!porCuenta.has(key))porCuenta.set(key,{dip:row.dip,nombre:row.nombre,persona:row.persona,hoy:null,sem:{total:0,hechas:0,noHechas:0}});
-    const acc=porCuenta.get(key);
-    acc.sem.total+=row.total||0;acc.sem.hechas+=row.hechas||0;acc.sem.noHechas+=row.no_hechas||0;
-    if(String(row.fecha)===hoyISO)acc.hoy={total:row.total||0,hechas:row.hechas||0,noHechas:row.no_hechas||0};
-  });
-  const pctDe=c=>c.sem.total?Math.round(c.sem.hechas*100/c.sem.total):0;
-  const cuentas=[...porCuenta.values()].sort((a,b)=>String(a.nombre||a.dip).localeCompare(String(b.nombre||b.dip),'es'));
-  // Podio del top 3 por porcentaje semanal: medallas y estrellas (v345).
-  const podio=[...cuentas].filter(c=>c.sem.total>0).sort((a,b)=>pctDe(b)-pctDe(a)).slice(0,3).map(c=>c.dip+'|'+c.persona);
-  const medallaDe=c=>{const i=podio.indexOf(c.dip+'|'+c.persona);return i===0?'🥇':i===1?'🥈':i===2?'🥉':''};
-  const topCls=c=>{const i=podio.indexOf(c.dip+'|'+c.persona);return i===0?'top1':i===1?'top2':i===2?'top3':''};
-  const estrellasDe=c=>{const p=pctDe(c);return p>=95?'★★★':p>=75?'★★':p>=50?'★':''};
+  const cuentas=cuentasCump();
+  state.cumpCuentas=cuentas;
   const hoyTot=cuentas.reduce((acc,c)=>{if(c.hoy){acc.h+=c.hoy.hechas;acc.n+=c.hoy.noHechas}return acc},{h:0,n:0});
-  if(resumen)resumen.textContent=cuentas.length?`${cuentas.length} cuenta${cuentas.length===1?'':'s'} · hoy ✓ ${hoyTot.h} · ✗ ${hoyTot.n} · tocá para ver el detalle`:'Todavía no hay marcas sincronizadas.';
+  if(resumen)resumen.textContent=cuentas.length?`${cuentas.length} cuenta${cuentas.length===1?'':'s'} · hoy ✓ ${hoyTot.h} · ✗ ${hoyTot.n} · tocá para ver el mes`:'Todavía no hay marcas sincronizadas.';
   const term=String(state.accionesFiltro||'').toLowerCase().trim();
   const visibles=term?cuentas.filter(acc=>`${acc.nombre} ${acc.dip}`.toLowerCase().includes(term)):cuentas;
   if(!visibles.length){list.innerHTML=`<div class="admin-pending-empty">${term?'Ninguna cuenta coincide con la búsqueda.':'Todavía no hay marcas sincronizadas.'}</div>`;return}
   list.innerHTML=visibles.map(acc=>{
-    const pct=pctDe(acc);
-    const tono=pct>=80?'alta':(pct>=50?'media':'baja');
-    const medalla=medallaDe(acc),top=topCls(acc),estrellas=estrellasDe(acc);
     const socio=acc.persona==='socio'?'<em class="admin-cump-socio">socio/a</em>':'';
-    const hoyChips=acc.hoy
-      ? `<span class="admin-cump-hoychips"><i class="ok">✓ ${acc.hoy.hechas}</i><i class="no">✗ ${acc.hoy.noHechas}</i></span>`
-      : '<span class="admin-cump-hoyvacio">Hoy · sin marcas</span>';
-    return `<article class="admin-cump-item ${top}">
-      <div class="admin-cump-med">
-        <span class="admin-cump-trofeo">${medalla||'🏅'}</span>
-      </div>
-      <div class="admin-cump-cuerpo">
-        <div class="admin-cump-cab">
-          <span class="admin-cump-ava">${esc(inicialesCump(acc.nombre))}</span>
-          <div class="admin-cump-id">
-            <strong>${esc(acc.nombre||'Sin nombre')}${socio}</strong>
-            ${estrellas?`<span class="admin-cump-stars">${estrellas}</span>`:''}
-            <small>DIP ${esc(acc.dip||'—')}</small>
-          </div>
-          <div class="admin-cump-hoy">${hoyChips}</div>
-        </div>
-        <div class="admin-cump-sem">
-          <div class="admin-cump-semtop">
-            <span class="admin-cump-semlbl">Últimos 7 días</span>
-            <span class="admin-cump-semcount"><i class="ok">✓ ${acc.sem.hechas}</i><i class="no">✗ ${acc.sem.noHechas}</i><em>de ${acc.sem.total}</em></span>
-            <b class="admin-cump-pct ${tono}">${pct}%</b>
-          </div>
-          <div class="admin-cump-bar"><i class="${tono}" style="width:${Math.max(pct,3)}%"></i></div>
-        </div>
-      </div>
-    </article>`;
+    return `<button type="button" class="admin-cump-row" data-cump-key="${esc(acc.key)}">
+      <span class="admin-cump-ava">${esc(inicialesCump(acc.nombre))}</span>
+      <div class="admin-cump-id"><strong>${esc(acc.nombre||'Sin nombre')}${socio}</strong><small>DIP ${esc(acc.dip||'—')}</small></div>
+      <span class="cump-dots">${dotsSemana(acc)}</span>
+    </button>`;
   }).join('');
+  list.querySelectorAll('[data-cump-key]').forEach(btn=>btn.onclick=()=>abrirCumpFicha(btn.dataset.cumpKey));
+}
+function cerrarCumpFicha(){
+  const ov=$('adminCumpOverlay'); if(ov) ov.hidden=true;
+  state.cumpKey='';
+}
+function abrirCumpFicha(key){
+  state.cumpKey=key;
+  state.cumpPer=state.cumpPer||'mes';
+  const ov=$('adminCumpOverlay'); if(ov) ov.hidden=false;
+  pintarCumpFicha();
+}
+function pintarCumpFicha(){
+  const acc=(state.cumpCuentas||[]).find(c=>c.key===state.cumpKey);
+  const box=$('adminCumpFicha'); if(!box) return;
+  if(!acc){box.innerHTML='';return}
+  const per=state.cumpPer||'mes';
+  const socio=acc.persona==='socio'?' · socio/a':'';
+  const ley='<div class="cump-ley"><i class="rojo"></i>Rojo (&lt;50%) <i class="naranja"></i>Naranja (50–80%) <i class="verde"></i>Verde (&gt;80%)</div>';
+  let cuerpo='';
+  const hoy=new Date();
+  if(per==='hoy'){
+    const iso=isoDiaOffset(hoy,0);
+    const d=acc.dias[iso];
+    cuerpo = d && d.total
+      ? `<div class="cump-hoybox"><b>Hoy</b><p>✓ ${d.hechas} hechas · ✗ ${d.noHechas} no hechas · de ${d.total}</p></div>`
+      : `<div class="cump-hoybox"><b>Hoy</b><p>Sin marcas todavía.</p></div>`;
+  } else if(per==='semana'){
+    const dias=['D','L','M','M','J','V','S'];
+    const celdas=[6,5,4,3,2,1,0].map(i=>{
+      const iso=isoDiaOffset(hoy,-i);
+      const dt=new Date(hoy.getFullYear(),hoy.getMonth(),hoy.getDate()-i);
+      const tono=tonoCumpDia(acc.dias[iso]);
+      return `<div class="admin-cump-dia ${tono}"><small>${dias[dt.getDay()]}</small><b>${dt.getDate()}</b></div>`;
+    }).join('');
+    cuerpo=`<div class="admin-cump-semgrid">${celdas}</div>`;
+  } else {
+    const y=hoy.getFullYear(), m=hoy.getMonth();
+    const nombres=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+    const first=new Date(y,m,1).getDay(); // 0 sun
+    const last=new Date(y,m+1,0).getDate();
+    const dows=['D','L','M','M','J','V','S'].map(x=>`<span class="dow">${x}</span>`).join('');
+    let cells='';
+    for(let i=0;i<first;i++) cells+=`<span class="admin-cump-dia pad"></span>`;
+    for(let d=1;d<=last;d++){
+      const iso=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      const tono=tonoCumpDia(acc.dias[iso]);
+      const esHoy=iso===isoDiaOffset(hoy,0);
+      cells+=`<span class="admin-cump-dia ${tono}${esHoy?' hoy':''}">${d}</span>`;
+    }
+    cuerpo=`<div class="cump-mes-tit">Actividad de ${nombres[m]} ${y}</div><div class="admin-cump-cal">${dows}${cells}</div>`;
+  }
+  box.innerHTML=`
+    <div class="cump-ficha-head">
+      <span class="admin-cump-ava">${esc(inicialesCump(acc.nombre))}</span>
+      <div><strong>${esc(acc.nombre||'Sin nombre')}</strong><small>DIP ${esc(acc.dip||'—')}${esc(socio)}</small></div>
+    </div>
+    ${ley}
+    ${cuerpo}
+    <div class="cump-per">
+      <button type="button" data-cump-per="hoy" class="${per==='hoy'?'on':''}">Hoy</button>
+      <button type="button" data-cump-per="semana" class="${per==='semana'?'on':''}">Semana</button>
+      <button type="button" data-cump-per="mes" class="${per==='mes'?'on':''}">Mes</button>
+    </div>`;
+  box.querySelectorAll('[data-cump-per]').forEach(b=>b.onclick=()=>{state.cumpPer=b.dataset.cumpPer;pintarCumpFicha()});
 }
 
 /* ---------- Ingresos por mes (v300) ---------- */
@@ -737,7 +801,11 @@ function bind(){if(state.bound)return;state.bound=true;['adminSucursal','adminNu
   }
   const usersToggle=$('adminUsersToggle');if(usersToggle)usersToggle.onclick=()=>{const body=$('adminUsersBody'),chev=$('adminUsersChevron');const abrir=body.hidden;body.hidden=!abrir;usersToggle.setAttribute('aria-expanded',abrir?'true':'false');if(chev)chev.classList.toggle('open',abrir)};
   const configToggle=$('adminConfigToggle');if(configToggle)configToggle.onclick=()=>{const body=$('adminConfigBody'),chev=$('adminConfigChevron');const abrir=body.hidden;body.hidden=!abrir;configToggle.setAttribute('aria-expanded',abrir?'true':'false');if(chev)chev.classList.toggle('open',abrir)};
-  const refreshAcciones=$('adminRefreshAcciones');if(refreshAcciones)refreshAcciones.onclick=()=>loadAcciones();$('adminSaveWhatsapp').onclick=saveWhatsapp;$('btnAdminPanelLogout').onclick=logout;$('btnAdminPanelPassword').onclick=()=>window.abrirCambioPasswordAPPI();const helpAdmin=$('btnHelpAdmin');if(helpAdmin)helpAdmin.onclick=()=>window.APPIDialog.alert(
+  const refreshAcciones=$('adminRefreshAcciones');if(refreshAcciones)refreshAcciones.onclick=()=>loadAcciones();
+  const cumpOv=$('adminCumpOverlay');
+  if(cumpOv){cumpOv.addEventListener('click',e=>{if(e.target===cumpOv)cerrarCumpFicha()});}
+  const cumpClose=$('adminCumpClose'); if(cumpClose) cumpClose.onclick=cerrarCumpFicha;
+$('adminSaveWhatsapp').onclick=saveWhatsapp;$('btnAdminPanelLogout').onclick=logout;$('btnAdminPanelPassword').onclick=()=>window.abrirCambioPasswordAPPI();const helpAdmin=$('btnHelpAdmin');if(helpAdmin)helpAdmin.onclick=()=>window.APPIDialog.alert(
 `Desde acá administrás las cuentas de APPI.
 
 ABAJO

@@ -106,7 +106,7 @@ window.openStock=function(){
 <script src="./prueba-banner.js"></script>
 <script src="./data-sync.js"></script>
 <script src="./js/membership-admin.js?v=439"></script>
-<script src="./admin-panel.js?v=441"></script>
+<script src="./admin-panel.js?v=444"></script>
 <link rel="stylesheet" href="./css/membership-admin.css">
 <link rel="stylesheet" href="./appi-tema.css">
 <script src="./account-request.js"></script>
@@ -4145,7 +4145,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v443 · Segura</div>
+  <div class="ds-foot">APPI · v444 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -5067,6 +5067,45 @@ body.dark #pageTabs button.active{color:#a8c0ff}
   /* hidden es hidden, aunque la clase tenga display propio. */
   .admin-blink-badge[hidden],.admin-quick-badge[hidden]{display:none!important}
   /* Cumplimiento diario (v344): tarjetas con avatar, chips y barra de progreso */
+
+  #adminCumpOverlay[hidden]{display:none!important}
+  .admin-cump-overlay .admin-cump-sheet{width:min(440px,100%);max-height:88vh;overflow:auto;padding:22px 20px 18px;border-radius:24px;position:relative}
+  .admin-cump-row{display:flex;align-items:center;gap:10px;width:100%;padding:12px 12px;margin-bottom:7px;border:1px solid rgba(80,90,130,.1);border-radius:16px;background:rgba(255,255,255,.82);font:inherit;text-align:left;cursor:pointer}
+  .admin-cump-row:hover{transform:translateY(-1px)}
+  .cump-dots{display:flex;gap:4px;margin-left:auto;flex:none}
+  .cump-dot{width:10px;height:10px;border-radius:50%;background:#e6e8ef}
+  .cump-dot.verde{background:#3ad0a4}
+  .cump-dot.naranja{background:#f5b301}
+  .cump-dot.rojo{background:#e0514a}
+  .cump-dot.vacio{background:#e6e8ef}
+  .cump-ficha-head{display:flex;align-items:center;gap:12px;margin-bottom:12px;padding-right:28px}
+  .cump-ficha-head strong{display:block;font-size:16px}
+  .cump-ficha-head small{display:block;margin-top:2px;color:#8a8b98;font-size:11px}
+  .cump-ley{display:flex;flex-wrap:wrap;gap:8px 12px;margin:0 0 12px;color:#777887;font-size:10px;font-weight:750}
+  .cump-ley i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px;vertical-align:middle}
+  .cump-ley i.rojo{background:#e0514a}.cump-ley i.naranja{background:#f5b301}.cump-ley i.verde{background:#3ad0a4}
+  .cump-mes-tit{margin:0 0 8px;font-size:13px;font-weight:900;color:#292938}
+  .admin-cump-cal{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+  .admin-cump-cal .dow{text-align:center;color:#8a8b98;font-size:9px;font-weight:900}
+  .admin-cump-dia{aspect-ratio:1;border-radius:12px;display:grid;place-items:center;background:#eef0f5;color:#6a6b7a;font-size:12px;font-weight:850}
+  .admin-cump-dia.verde{background:#3ad0a4;color:#fff}
+  .admin-cump-dia.naranja{background:#f5b301;color:#fff}
+  .admin-cump-dia.rojo{background:#e0514a;color:#fff}
+  .admin-cump-dia.vacio{background:#eef0f5;color:#9aa}
+  .admin-cump-dia.pad{background:transparent}
+  .admin-cump-dia.hoy{box-shadow:0 0 0 2px #5b8def}
+  .admin-cump-semgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:7px}
+  .admin-cump-semgrid .admin-cump-dia{aspect-ratio:auto;min-height:64px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+  .admin-cump-semgrid .admin-cump-dia small{font-size:9px;font-weight:900;opacity:.85}
+  .cump-hoybox{padding:18px;border-radius:16px;background:rgba(91,141,239,.08);text-align:center}
+  .cump-hoybox b{display:block;font-size:18px}
+  .cump-hoybox p{margin:8px 0 0;color:#555665;font-size:13px}
+  .cump-per{display:flex;gap:8px;margin-top:16px}
+  .cump-per button{flex:1;min-height:42px;border:0;border-radius:999px;background:rgba(80,90,130,.08);color:#3a3a48;font:inherit;font-size:13px;font-weight:850;cursor:pointer}
+  .cump-per button.on{background:linear-gradient(135deg,#5b8def,#8b63e8);color:#fff}
+  body.dark .admin-cump-row{background:rgba(31,32,49,.82);border-color:rgba(255,255,255,.08)}
+  body.dark .cump-mes-tit,body.dark .cump-ficha-head strong{color:#f1f1f6}
+
   .admin-cump-item{padding:13px 14px;border:1px solid rgba(80,90,130,.1);border-radius:16px;background:rgba(255,255,255,.78);box-shadow:0 4px 14px rgba(65,75,120,.05)}
   .admin-cump-cab{display:flex;align-items:center;gap:10px}
   .admin-cump-ava{flex:0 0 auto;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:12px;font-weight:900;letter-spacing:.5px;background:linear-gradient(135deg,#5b8def,#a06bff)}
@@ -5394,6 +5433,12 @@ body.dark #pageTabs button.active{color:#a8c0ff}
       <button type="button" id="adminIngresosToggle" hidden></button>
       <span id="adminIngresosChevron" hidden></span>
 
+      <div class="modal-overlay membership-modal-overlay admin-cump-overlay" id="adminCumpOverlay" hidden>
+        <div class="modal admin-cump-sheet" role="dialog" aria-modal="true" aria-labelledby="adminCumpTitle">
+          <button type="button" class="modal-close" id="adminCumpClose" aria-label="Cerrar">×</button>
+          <div class="modal-body" id="adminCumpFicha"></div>
+        </div>
+      </div>
       <div class="modal-overlay membership-modal-overlay admin-create-overlay" id="adminCreateOverlay" hidden>
         <div class="modal" role="dialog" aria-modal="true" aria-labelledby="adminCreateTitle">
           <div class="modal-header"><h2 id="adminCreateTitle">➕ Nueva cuenta</h2><button type="button" class="modal-close" id="adminCreateClose" aria-label="Cerrar">×</button></div>
@@ -12146,8 +12191,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='443';
-      const CACHE_NAME='appi-v443-admin-limpio';
+      const swVersion='444';
+      const CACHE_NAME='appi-v444-cump-calendario';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 
