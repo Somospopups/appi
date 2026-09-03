@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "449.0.0",
-  "cacheName": "appi-v449-ticket-termico",
+  "version": "450.0.0",
+  "cacheName": "appi-v450-ticket-05",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

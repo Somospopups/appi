@@ -326,7 +326,7 @@ function ticketFuente(px,peso){
 }
 function ticketAjustarFuente(ctx,texto,maxW,px,peso){
   let n=px;
-  while(n>12){
+  while(n>11){
     ctx.font=ticketFuente(n,peso);
     if(ctx.measureText(texto).width<=maxW) return n;
     n-=1;
@@ -339,12 +339,37 @@ function fechaTicketTermico(d){
   const mm=String(d.getMonth()+1).padStart(2,'0');
   return `${dd}/${mm}/${d.getFullYear()}`;
 }
+function horaTicketTermico(d){
+  const p=n=>String(n).padStart(2,'0');
+  return `${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
+}
+function mesTicketNom(d){
+  return ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'][d.getMonth()]+' '+d.getFullYear();
+}
+function moneyTicket(v){
+  return new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',minimumFractionDigits:2}).format(Number(v)||0).replace('US$','$');
+}
+function ultimoPagoTicket(user){
+  const pagos=Array.isArray(state.pagos)?state.pagos:[];
+  const mios=pagos.filter(p=>p.user_id===user.user_id||p.dip===user.dip)
+    .sort((a,b)=>String(b.fecha||'').localeCompare(String(a.fecha||'')));
+  return mios[0]||null;
+}
+function metodoTicketNom(v){
+  const k=String(v||'').toLowerCase();
+  if(k==='transferencia') return 'Transferencia';
+  if(k==='efectivo') return 'Efectivo';
+  if(k==='mercadopago') return 'Mercado Pago';
+  if(k==='tarjeta'||k.includes('visa')||k.includes('credito')||k.includes('crédito')) return 'Tarjeta de Crédito';
+  if(k) return String(v);
+  return 'Transferencia';
+}
 function dibujarQrTicket(ctx,cx,cy,size,seed){
   const n=21, cell=size/n, x0=cx-size/2, y0=cy-size/2;
   ctx.fillStyle='#111';
-  ctx.fillRect(x0-8,y0-8,size+16,size+16);
-  ctx.fillStyle='#f6f3ee';
-  ctx.fillRect(x0-4,y0-4,size+8,size+8);
+  ctx.fillRect(x0-7,y0-7,size+14,size+14);
+  ctx.fillStyle='#f4f2ec';
+  ctx.fillRect(x0-3,y0-3,size+6,size+6);
   ctx.fillStyle='#111';
   let h=2166136261;
   const s=String(seed||'APPI');
@@ -353,84 +378,89 @@ function dibujarQrTicket(ctx,cx,cy,size,seed){
   function finder(fx,fy){
     for(let r=0;r<7;r++) for(let c=0;c<7;c++){
       const on=r===0||c===0||r===6||c===6||(r>=2&&r<=4&&c>=2&&c<=4);
-      if(on) ctx.fillRect(x0+(fx+c)*cell,y0+(fy+r)*cell,cell+0.4,cell+0.4);
+      if(on) ctx.fillRect(x0+(fx+c)*cell,y0+(fy+r)*cell,cell+0.35,cell+0.35);
     }
   }
   finder(0,0); finder(n-7,0); finder(0,n-7);
   for(let r=0;r<n;r++) for(let c=0;c<n;c++){
     if((r<8&&c<8)||(r<8&&c>n-9)||(r>n-9&&c<8)) continue;
-    if(bit()) ctx.fillRect(x0+c*cell,y0+r*cell,cell+0.4,cell+0.4);
+    if(bit()) ctx.fillRect(x0+c*cell,y0+r*cell,cell+0.35,cell+0.35);
   }
 }
-function dibujarTicketTermico({nombre,dip,pagoTxt,hastaTxt}){
-  const W=440,H=640,pad=32;
+function dibujarTicketTermico(d){
+  const W=420,H=680,pad=28;
   const canvas=document.createElement('canvas');
   canvas.width=W+pad*2; canvas.height=H+pad*2;
   const ctx=canvas.getContext('2d');
   ctx.translate(pad,pad);
-  const tooth=12;
+  const tooth=11;
   ctx.beginPath();
   ctx.moveTo(0,tooth);
   for(let x=0;x<W;x+=tooth){
-    ctx.lineTo(x+tooth/2,0);
+    ctx.lineTo(x+tooth/2,1);
     ctx.lineTo(Math.min(W,x+tooth),tooth);
   }
-  ctx.lineTo(W,H-18);
-  ctx.quadraticCurveTo(W-30,H+8,W-90,H-4);
+  ctx.lineTo(W,H-16);
+  ctx.quadraticCurveTo(W-24,H+10,W-88,H-2);
   ctx.lineTo(0,H);
   ctx.closePath();
   ctx.save();
-  ctx.shadowColor='rgba(30,24,16,.28)';
-  ctx.shadowBlur=20;
-  ctx.shadowOffsetY=10;
-  ctx.fillStyle='#f6f3ee';
+  ctx.shadowColor='rgba(20,16,12,.3)';
+  ctx.shadowBlur=18;
+  ctx.shadowOffsetY=8;
+  ctx.fillStyle='#f4f2ec';
   ctx.fill();
   ctx.restore();
   ctx.save();
   ctx.clip();
-  const cx=W/2, left=32, maxW=W-64;
-  let y=78;
+  const cx=W/2, left=28, maxW=W-56;
+  let y=64;
   ctx.fillStyle='#111';
   ctx.textAlign='center';
   ctx.textBaseline='alphabetic';
-  ctx.font=ticketFuente(56,'bold');
-  ctx.fillText('APPI',cx,y);
-  y+=34;
-  ctx.font=ticketFuente(18,'bold');
-  ctx.fillText('****  ****',cx,y);
-  y+=42;
-  ctx.textAlign='left';
-  const renglón=(txt,alto)=>{
-    ticketAjustarFuente(ctx,txt,maxW,17,'bold');
-    ctx.fillText(txt,left,y);
-    y+=alto||26;
-  };
-  renglón('CLIENTE: '+String(nombre||'Sin nombre'));
-  renglón('DIP: '+String(dip||'—'));
-  renglón('FECHA DE PAGO: '+String(pagoTxt));
-  renglón(hastaTxt==='Para siempre'?'CONCEPTO: Membresía permanente':'CONCEPTO: Membresía mensual');
-  y+=10;
-  ctx.textAlign='center';
-  ctx.font=ticketFuente(22,'bold');
-  ctx.fillText('ESTADO: PAGADO',cx,y);
-  y+=36;
-  ctx.textAlign='left';
-  renglón('MEMBRESÍA HASTA: '+String(hastaTxt));
-  y+=18;
-  ctx.textAlign='center';
-  ctx.font=ticketFuente(16,'bold');
-  ctx.fillText('¡Gracias por tu pago!',cx,y);
-  y+=26;
-  ctx.font=ticketFuente(15,'bold');
+  ctx.font=ticketFuente(48,'bold');
   ctx.fillText('APPI',cx,y);
   y+=28;
+  ctx.font=ticketFuente(16,'bold');
+  ctx.fillText('****  ****',cx,y);
+  y+=36;
+  ctx.textAlign='left';
+  const renglón=(txt,alto)=>{
+    ticketAjustarFuente(ctx,txt,maxW,15,'bold');
+    ctx.fillText(txt,left,y);
+    y+=alto||22;
+  };
+  renglón('CLIENTE: '+String(d.nombre||'Sin nombre'));
+  renglón('DIP: '+String(d.dip||'—'));
+  renglón('FECHA DE PAGO: '+String(d.pagoTxt));
+  renglón('('+String(d.horaTxt)+')');
+  renglón('CONCEPTO: Membresía Mensual');
+  renglón('APPI Plus ('+String(d.mesNom)+')');
+  renglón('MONTO: '+String(d.montoTxt));
+  renglón('TOTAL MENSUAL: '+String(d.montoTxt));
+  y+=8;
+  ctx.textAlign='center';
+  ctx.font=ticketFuente(18,'bold');
+  ctx.fillText('ESTADO: PAGADO',cx,y);
+  y+=28;
+  ctx.textAlign='left';
+  renglón('MEMBRESIA HASTA: '+String(d.hastaTxt));
+  renglón('Transacción: '+String(d.txn));
+  renglón('MÉTODO: '+String(d.metodoTxt));
+  y+=16;
+  ctx.textAlign='center';
+  ctx.font=ticketFuente(14,'bold');
+  ctx.fillText('¡Gracias por su pago!',cx,y);
+  y+=20;
+  ctx.fillText('Appi Cuentas',cx,y);
+  y+=22;
   ctx.strokeStyle='#111';
-  ctx.lineWidth=1.4;
-  ctx.setLineDash([5,5]);
+  ctx.lineWidth=1.2;
+  ctx.setLineDash([4,4]);
   ctx.beginPath(); ctx.moveTo(left,y); ctx.lineTo(W-left,y); ctx.stroke();
   ctx.setLineDash([]);
-  y+=90;
-  dibujarQrTicket(ctx,cx,y,120,String(dip)+'|'+pagoTxt+'|'+hastaTxt);
+  y+=78;
+  dibujarQrTicket(ctx,cx,y,108,String(d.dip)+'|'+d.pagoTxt+'|'+d.hastaTxt+'|'+d.txn);
   ctx.restore();
   return canvas;
 }
@@ -458,20 +488,26 @@ async function compartirImagenWhatsApp(blob,titulo,fileName){
 async function enviarTicketWhatsApp(user){
   const hoy=new Date();
   const pagoTxt=fechaTicketTermico(hoy);
+  const horaTxt=horaTicketTermico(hoy);
   const info=membershipInfo(user);
   let hastaTxt='';
+  let mesNom=mesTicketNom(hoy);
   if(info.days>20000) hastaTxt='Para siempre';
   else {
     const dv=fechaTicketDesdeVence(user.membresia_vence);
     if(!dv){ await window.APPIDialog.alert('Esta cuenta no tiene fecha de membresía. Dale 1 mes y después mandá el ticket.',{title:'Ticket',icon:'🎫'}); return; }
     hastaTxt=fechaTicketTermico(dv);
   }
-  const nombre=user.nombre||'Sin nombre';
+  const ultimo=ultimoPagoTicket(user);
+  const montoTxt=moneyTicket(ultimo&&ultimo.monto?ultimo.monto:5000);
+  const metodoTxt=metodoTicketNom(ultimo&&ultimo.metodo);
   const dip=user.dip||'—';
+  const txn='#TXN-'+String(Date.now()).slice(-9);
+  const nombre=user.nombre||'Sin nombre';
   const titulo=`Comprobante APPI · ${nombre} · pagó ${pagoTxt} · membresía hasta ${hastaTxt}`;
   const fileName=`ticket-appi-${String(nombre).replace(/\s+/g,'-')}.png`;
   try{
-    const blob=await capturarTicketCine({nombre,dip,pagoTxt,hastaTxt});
+    const blob=await capturarTicketCine({nombre,dip,pagoTxt,horaTxt,hastaTxt,mesNom,montoTxt,metodoTxt,txn});
     await compartirImagenWhatsApp(blob,titulo,fileName);
   }catch(error){
     await window.APPIDialog.alert(error.message||'No se pudo armar el ticket.',{title:'Ticket',icon:'🎫'});
