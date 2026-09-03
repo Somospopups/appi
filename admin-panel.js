@@ -173,6 +173,7 @@ function renderUsers(){
       <button type="button" class="prorroga" data-admin-action="grace_period">📅 Prórroga</button>
       <div class="admin-mem-label">Acciones</div>
       <button type="button" class="wa" data-admin-action="whatsapp_dist">💬 WhatsApp</button>
+      <button type="button" class="ticket" data-admin-action="ticket">🎫 Ticket</button>
       <button type="button" class="pago" data-admin-action="payment">💳 Registrar pago</button>
       <button type="button" data-admin-action="password">🔑 Nueva contraseña</button>
       <button type="button" data-admin-action="people">👥 Personas</button>
@@ -309,6 +310,89 @@ async function create(){
     if(typeof showToast==='function')showToast('Cuenta creada y datos copiados 📋',2800);
   }catch(error){setStatus('adminCreateStatus',error.message,true)}finally{button.disabled=false;button.textContent='Crear cuenta'}
 }
+function fechaTicketCorta(d){
+  const meses=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+  return `${d.getDate()} ${meses[d.getMonth()]} ${d.getFullYear()}`;
+}
+function fechaTicketDesdeVence(vence){
+  const s=String(vence||'').trim();
+  const m=s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if(m) return new Date(+m[1],+m[2]-1,+m[3]);
+  const dt=new Date(vence);
+  return isNaN(dt.getTime())?null:new Date(dt.getFullYear(),dt.getMonth(),dt.getDate());
+}
+function htmlTicketCine({nombre,dip,pagoTxt,hastaTxt}){
+  return `<div class="appi-ticket" id="adminTicketCard">
+    <div class="appi-ticket-stub">
+      <span class="t-brand">APPI</span>
+      <span class="t-vert">${esc(nombre||'APPI')} · ${esc(dip||'')}</span>
+    </div>
+    <div class="appi-ticket-body">
+      <div class="t-top">APPI</div>
+      <div class="t-name">${esc((nombre||'SIN NOMBRE').toUpperCase())}</div>
+      <div class="t-dip">DIP ${esc(dip||'—')}</div>
+      <div class="t-ico">🎫</div>
+      <div class="appi-ticket-rows">
+        <div><span>PAGÓ</span><b>${esc(pagoTxt)}</b></div>
+        <div><span>MEMBRESÍA HASTA</span><b>${esc(hastaTxt)}</b></div>
+      </div>
+      <div class="appi-ticket-stamp">PAGADO</div>
+      <div class="appi-ticket-foot">Comprobante de membresía</div>
+    </div>
+  </div>`;
+}
+async function capturarTicketCine(datos){
+  const wrap=document.createElement('div');
+  wrap.className='appi-ticket-shot';
+  wrap.innerHTML=htmlTicketCine(datos);
+  document.body.appendChild(wrap);
+  await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
+  const card=wrap.querySelector('#adminTicketCard');
+  const h2c=window.html2canvas;
+  if(typeof h2c!=='function' || !card){ wrap.remove(); throw new Error('No se pudo armar el ticket.'); }
+  try{
+    const canvas=await h2c(card,{backgroundColor:'#f4ead4',scale:2,logging:false,useCORS:true});
+    const blob=await new Promise((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(new Error('No se pudo armar el ticket.')),'image/png',1));
+    return blob;
+  }finally{ wrap.remove(); }
+}
+async function compartirImagenWhatsApp(blob,titulo,fileName){
+  const file=new File([blob],fileName,{type:'image/png'});
+  if(navigator.canShare&&navigator.canShare({files:[file]})){
+    try{ await navigator.share({files:[file],title:titulo,text:titulo}); return; }
+    catch(e){ if(e&&e.name==='AbortError') return; }
+  }
+  try{
+    if(navigator.clipboard&&window.ClipboardItem){
+      await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);
+    }
+  }catch(e){}
+  abrirWhatsAppCredencial('',titulo);
+  descargarBlobCump(blob,fileName);
+  if(typeof showToast==='function') showToast('WhatsApp abre el listado. Adjuntá la imagen.',3200);
+}
+async function enviarTicketWhatsApp(user){
+  const hoy=new Date();
+  const pagoTxt=fechaTicketCorta(hoy);
+  const info=membershipInfo(user);
+  let hastaTxt='';
+  if(info.days>20000) hastaTxt='Para siempre';
+  else {
+    const dv=fechaTicketDesdeVence(user.membresia_vence);
+    if(!dv){ await window.APPIDialog.alert('Esta cuenta no tiene fecha de membresía. Dale 1 mes y después mandá el ticket.',{title:'Ticket',icon:'🎫'}); return; }
+    hastaTxt=fechaTicketCorta(dv);
+  }
+  const nombre=user.nombre||'Sin nombre';
+  const dip=user.dip||'—';
+  const titulo=`Comprobante APPI · ${nombre} · pagó ${pagoTxt} · membresía hasta ${hastaTxt}`;
+  const fileName=`ticket-appi-${String(nombre).replace(/\s+/g,'-')}.png`;
+  try{
+    const blob=await capturarTicketCine({nombre,dip,pagoTxt,hastaTxt});
+    await compartirImagenWhatsApp(blob,titulo,fileName);
+  }catch(error){
+    await window.APPIDialog.alert(error.message||'No se pudo armar el ticket.',{title:'Ticket',icon:'🎫'});
+  }
+}
 async function handleUserAction(button){
   const row=button.closest('[data-admin-user]'),userId=row&&row.dataset.adminUser,user=state.users.find(item=>item.user_id===userId);if(!userId||!user)return;button.disabled=true;
   try{
@@ -390,6 +474,10 @@ async function handleUserAction(button){
       }else{
         await window.APPIDialog.alert('El sistema de membresías no está disponible.',{title:'Error',icon:'!'});
       }
+      return;
+    }
+    if(action==='ticket'){
+      await enviarTicketWhatsApp(user);
       return;
     }
     if(action==='payment'){
@@ -879,7 +967,7 @@ SOLICITUDES PENDIENTES
 Las personas que piden acceso desde la app aparecen acá. Al aprobar elegís 1 mes o PRUEBA, y podés mandar las credenciales por WhatsApp.
 
 CUENTAS (Distribuidores)
-La sección arranca minimizada con el resumen; tocala para abrir. Cada distribuidor es un renglón: tocalo y se despliegan todas sus acciones, cómodas y con nombre: 💬 WhatsApp (va directo si la cuenta tiene el número guardado — al aprobar una solicitud queda solo; con 📱 Teléfono lo cargás o corregís cuando quieras), 💳 Registrar pago y 📅 Prórroga (ambos sacan del modo prueba solos), 🔑 Nueva contraseña, 👥 Personas, 🧪 Prueba 5 días, 📅 1 mes completo (suma un mes a lo que le queda, sin registrar un pago), ♾️ Para siempre (acceso permanente), Bloquear y Eliminar.
+La sección arranca minimizada con el resumen; tocala para abrir. Cada distribuidor es un renglón: tocalo y se despliegan todas sus acciones, cómodas y con nombre: 💬 WhatsApp (va directo si la cuenta tiene el número guardado — al aprobar una solicitud queda solo; con 📱 Teléfono lo cargás o corregís cuando quieras), 🎫 Ticket (manda el comprobante por WhatsApp, con fecha de pago y hasta cuándo vale), 💳 Registrar pago y 📅 Prórroga (ambos sacan del modo prueba solos), 🔑 Nueva contraseña, 👥 Personas, 🧪 Prueba 5 días, 📅 1 mes completo (suma un mes a lo que le queda, sin registrar un pago), ♾️ Para siempre (acceso permanente), Bloquear y Eliminar.
 
 CUMPLIMIENTO DIARIO
 Lo que cada cuenta marcó con ✓ y ✗ en sus acciones del día: hoy y últimos 7 días. La sección arranca minimizada con el resumen a la vista; tocala para abrir el detalle y usá el buscador por nombre o DIP.
