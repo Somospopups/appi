@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "441.0.0",
-  "cacheName": "appi-v441-cuentas-color",
+  "version": "442.0.0",
+  "cacheName": "appi-v442-filtros-fila",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {
