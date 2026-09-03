@@ -40,6 +40,7 @@
   }
 
   function money(value){
+    if(window.APPIAdminPanel&&typeof window.APPIAdminPanel.money==='function') return window.APPIAdminPanel.money(value);
     return '$'+Number(value||0).toLocaleString('es-AR',{maximumFractionDigits:2});
   }
 

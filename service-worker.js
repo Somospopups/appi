@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v438-agenda-icono';
+const CACHE_NAME = 'appi-v439-admin-tabs-ojo';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

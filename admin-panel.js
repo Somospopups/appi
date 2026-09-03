@@ -1,6 +1,6 @@
 (function(){
 'use strict';
-const state={users:[],requests:[],filter:'',whatsapp:'',createMembership:1,bound:false,pruebas:new Map(),acciones:[],accionesFiltro:'',pagos:null,pagosMes:'',revenue:null,userAbierto:'',telefonos:new Map()};
+const state={users:[],requests:[],filter:'',whatsapp:'',createMembership:1,bound:false,pruebas:new Map(),acciones:[],accionesFiltro:'',pagos:null,pagosMes:'',revenue:null,userAbierto:'',telefonos:new Map(),tab:'hoy',plataVisible:false};
 const $=id=>document.getElementById(id);
 const esc=value=>String(value==null?'':value).replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
 const cfg=()=>window.APPIAuth.config();
@@ -53,10 +53,13 @@ function renderHero(){
       <i>🧪 ${enPrueba} en prueba</i>
       <i>⏳ ${porVencer} vence${porVencer===1?'':'n'} esta semana</i>
       <i class="${pend?'alert':''}" id="adminChipSolicitudes">● ${pend} solicitud${pend===1?'':'es'}</i>
-    </div>`;
+    </div>
+    <button type="button" class="admin-ojo" id="adminOjoHero" aria-label="Mostrar montos">👁</button>`;
   hero.querySelectorAll('[data-hero-mes]').forEach(btn=>btn.onclick=()=>abrirIngresosEn(btn.dataset.heroMes));
   const chip=$('adminChipSolicitudes');
-  if(chip&&pend)chip.onclick=()=>{const card=$('adminPendingCard');if(card)card.scrollIntoView({behavior:'smooth',block:'start'})};
+  if(chip&&pend)chip.onclick=()=>showAdminTab('solicitudes');
+  const ojo=$('adminOjoHero'); if(ojo) ojo.onclick=togglePlata;
+  pintarOjos();
 }
 function renderAtencion(){
   const list=$('adminAtencionList');if(!list)return;
@@ -77,25 +80,21 @@ function renderAtencion(){
   if(!items.length){list.innerHTML='<div class="admin-pending-empty">✓ Todo en orden: nada urgente por ahora.</div>';return}
   list.innerHTML=items.slice(0,8).map(item=>`<button type="button" class="admin-atencion-row" data-aten-go="${item.go}"><span class="ico">${item.ico}</span><div><b>${esc(item.t)}</b><small>${esc(item.s)}</small></div><span class="chev">›</span></button>`).join('');
   list.querySelectorAll('[data-aten-go]').forEach(button=>button.onclick=()=>{
-    if(button.dataset.atenGo!=='solicitudes'){
-      const body=$('adminUsersBody'),toggle=$('adminUsersToggle'),chev=$('adminUsersChevron');
-      if(body&&body.hidden){body.hidden=false;if(toggle)toggle.setAttribute('aria-expanded','true');if(chev)chev.classList.add('open')}
-    }
-    const target=button.dataset.atenGo==='solicitudes'?$('adminPendingCard'):$('adminUsersToggle');
-    if(target)target.scrollIntoView({behavior:'smooth',block:'start'});
+    if(button.dataset.atenGo==='solicitudes') showAdminTab('solicitudes');
+    else showAdminTab('cuentas');
   });
 }
 function abrirIngresosEn(mes){
-  const wrap=$('adminIngresosWrap'),toggle=$('adminIngresosToggle'),chev=$('adminIngresosChevron');
-  if(wrap&&wrap.hidden){wrap.hidden=false;if(toggle)toggle.setAttribute('aria-expanded','true');if(chev)chev.classList.add('open')}
+  showAdminTab('hoy');
   if(mes){state.pagosMes=mes;renderPagos()}
-  if(toggle)toggle.scrollIntoView({behavior:'smooth',block:'start'});
+  const card=$('adminIngresosCard');
+  if(card) card.scrollIntoView({behavior:'smooth',block:'start'});
 }
 function filteredUsers(){const term=state.filter.toLowerCase().trim();return state.users.filter(user=>user.rol!=='admin'&&(!term||`${user.nombre} ${user.socio_nombre||''} ${user.dip} ${user.sucursal} ${user.numero_distribuidor}`.toLowerCase().includes(term)))}
 function renderUsers(){
   const list=$('adminUserList'),users=filteredUsers();if(!list)return;if(!users.length){list.innerHTML='<div class="empty">No hay distribuidores para mostrar.</div>';return}
   const resumen=$('adminUsersResumen');
-  if(resumen){const todos=state.users.filter(u=>u.rol!=='admin');resumen.textContent=todos.length?`${todos.length} cuenta${todos.length===1?'':'s'} · ${todos.filter(u=>u.activo).length} activas · tocá para abrir`:'Tocá para abrir las cuentas.'}
+  if(resumen){const todos=state.users.filter(u=>u.rol!=='admin');resumen.textContent=todos.length?`${todos.length} cuenta${todos.length===1?'':'s'} · ${todos.filter(u=>u.activo).length} activas`:'Todavía no hay cuentas.'}
   list.innerHTML=users.map(user=>{
     let membership=membershipInfo(user);
     const prueba=state.pruebas.get(user.user_id);
@@ -134,8 +133,7 @@ function renderRequests(){const list=$('adminPendingList');if(!list)return;
   const title=$('adminPendingTitle'),badge=$('adminPendingBadge');
   if(title)title.classList.toggle('blinking',state.requests.length>0);
   if(badge){badge.hidden=!state.requests.length;badge.textContent=`● ${state.requests.length} NUEVA${state.requests.length===1?'':'S'}`}
-  const quick=$('adminQuickPendBadge');
-  if(quick){quick.hidden=!state.requests.length;quick.textContent=state.requests.length}
+  pintarBadgeSolic();
   if(!state.requests.length){list.innerHTML='<div class="admin-pending-empty">No hay solicitudes pendientes.</div>';return}list.innerHTML=state.requests.map(item=>`<article class="admin-user-row" data-request-id="${esc(item.id)}"><div><h3>${esc(item.nombre)}${item.socio_nombre?` + ${esc(item.socio_nombre)}`:''}</h3><p>${item.socio_nombre?`Socio/a: ${esc(item.socio_nombre)}<br>`:''}${esc(item.dip)} · ${esc(item.telefono)}<br>${new Date(item.created_at).toLocaleString('es-AR')}</p><span class="admin-user-badge blocked">PENDIENTE</span></div><div class="admin-row-actions"><button type="button" class="wa" data-request-action="whatsapp">WhatsApp</button><button type="button" class="good" data-request-action="approve">Aprobar</button><button type="button" class="danger" data-request-action="reject">Rechazar</button></div></article>`).join('');list.querySelectorAll('[data-request-action]').forEach(button=>button.onclick=()=>handleRequestAction(button))}
 function notifyAdminMemberships(){const alerts=state.users.filter(user=>user.rol!=='admin'&&membershipInfo(user).days<=7);if(!alerts.length)return;const today=new Date().toISOString().slice(0,10),key=`appi_admin_membresias_${today}`;if(sessionStorage.getItem(key))return;sessionStorage.setItem(key,'1');const names=alerts.slice(0,8).map(user=>`${user.nombre||user.dip}: ${membershipInfo(user).label}`).join('\n');window.APPIDialog.alert(`${alerts.length} membresía${alerts.length===1?'':'s'} requiere${alerts.length===1?'':'n'} atención.\n\n${names}`,{title:'Membresías por vencer',icon:'⏳',okText:'Revisar'})}
 function render(){updateStats();renderUsers();renderRequests();if($('adminWhatsappNumber'))$('adminWhatsappNumber').value=state.whatsapp||''}
@@ -458,7 +456,51 @@ async function loadPagos(){
   }
   renderPagos();
 }
-function moneyAdmin(v){return new Intl.NumberFormat('es-AR',{style:'currency',currency:'ARS',maximumFractionDigits:0}).format(Number(v)||0)}
+function moneyAdmin(v){
+  if(!state.plataVisible) return '$ ••••';
+  return new Intl.NumberFormat('es-AR',{style:'currency',currency:'ARS',maximumFractionDigits:0}).format(Number(v)||0);
+}
+function pintarOjos(){
+  const ico=state.plataVisible?'🙈':'👁';
+  const lab=state.plataVisible?'Ocultar montos':'Mostrar montos';
+  ['adminOjoHero','adminOjoIngresos'].forEach(id=>{
+    const b=$(id); if(!b)return;
+    b.textContent=ico; b.setAttribute('aria-label',lab); b.title=lab;
+    b.classList.toggle('on', state.plataVisible);
+  });
+}
+function togglePlata(){
+  state.plataVisible=!state.plataVisible;
+  renderHero();
+  if(Array.isArray(state.pagos)) renderPagos();
+}
+function moverIndicadorAdmin(){
+  const nav=$('adminTabs'), ind=$('adminTabIndicator');
+  if(!nav||!ind)return;
+  const btn=nav.querySelector('[data-admin-tab].active');
+  if(!btn){ind.style.width='0';return;}
+  ind.style.width=btn.offsetWidth+'px';
+  ind.style.transform='translateX('+btn.offsetLeft+'px)';
+}
+function showAdminTab(tab){
+  state.tab=tab||'hoy';
+  ['hoy','solicitudes','cuentas','mas'].forEach(t=>{
+    const pan=$('adminPane-'+t);
+    if(pan) pan.hidden = (t!==state.tab);
+  });
+  document.querySelectorAll('#adminTabs [data-admin-tab]').forEach(b=>b.classList.toggle('active', b.dataset.adminTab===state.tab));
+  const fab=$('adminFabCreate');
+  if(fab) fab.classList.toggle('hid', state.tab==='mas'||state.tab==='solicitudes');
+  pintarBadgeSolic();
+  requestAnimationFrame(moverIndicadorAdmin);
+}
+function pintarBadgeSolic(){
+  const n=state.requests.length;
+  const badge=$('adminTabSolicBadge');
+  if(badge){badge.hidden=!n; badge.textContent=n;}
+  const quick=$('adminQuickPendBadge');
+  if(quick){quick.hidden=!n; quick.textContent=n;}
+}
 /* ---------- Anuncio para todos (v326) ----------
    El administrador escribe un mensaje y hasta una reunión (v343); el
    aviso vigente les aparece a los distribuidores al abrir APPI. */
@@ -589,7 +631,11 @@ function renderPagos(){
   $('adminMesNext').onclick=()=>mover(1);
   body.querySelectorAll('[data-mes]').forEach(btn=>btn.onclick=()=>{state.pagosMes=btn.dataset.mes;renderPagos()});
   const resumen=$('adminIngresosResumen');
-  if(resumen)resumen.textContent=`${label}: ${moneyAdmin(mesData.total)} · ${mesData.pagos.length} pago${mesData.pagos.length===1?'':'s'} · tocá para el detalle`;
+  if(resumen)resumen.textContent=state.plataVisible
+    ? `${label}: ${moneyAdmin(mesData.total)} · ${mesData.pagos.length} pago${mesData.pagos.length===1?'':'s'}`
+    : `${label}: ${mesData.pagos.length} pago${mesData.pagos.length===1?'':'s'} · montos ocultos`;
+  const ojoIng=$('adminOjoIngresos'); if(ojoIng) ojoIng.onclick=togglePlata;
+  pintarOjos();
   renderHero();
 }
 function bind(){if(state.bound)return;state.bound=true;['adminSucursal','adminNumero','adminNombre','adminPartnerName','adminTempPassword'].forEach(id=>{const input=$(id);if(input)input.value=''});document.querySelectorAll('[data-create-membership]').forEach(button=>button.onclick=()=>{state.createMembership=(button.dataset.createMembership==='prueba'||button.dataset.createMembership==='siempre')?button.dataset.createMembership:Number(button.dataset.createMembership);document.querySelectorAll('[data-create-membership]').forEach(item=>item.classList.toggle('active',item===button))});$('adminHasPartner').onchange=()=>{$('adminPartnerField').hidden=!$('adminHasPartner').checked;if($('adminHasPartner').checked)setTimeout(()=>$('adminPartnerName').focus(),40);else $('adminPartnerName').value=''};$('adminGeneratePassword').onclick=()=>$('adminTempPassword').value=randomPassword();$('adminCreateUser').onclick=create;$('adminRefreshUsers').onclick=load;$('adminRefreshRequests').onclick=load;
@@ -600,7 +646,11 @@ function bind(){if(state.bound)return;state.bound=true;['adminSucursal','adminNu
   const accionesToggle=$('adminAccionesToggle');if(accionesToggle)accionesToggle.onclick=()=>{const body=$('adminAccionesBody'),chev=$('adminAccionesChevron');const abrir=body.hidden;body.hidden=!abrir;accionesToggle.setAttribute('aria-expanded',abrir?'true':'false');if(chev)chev.classList.toggle('open',abrir)};
   const accionesSearch=$('adminAccionesSearch');if(accionesSearch)accionesSearch.oninput=event=>{state.accionesFiltro=event.target.value;renderAcciones()};
   const refreshPagos=$('adminRefreshPagos');if(refreshPagos)refreshPagos.onclick=()=>loadPagos();
-  const goRequests=$('adminGoRequests');if(goRequests)goRequests.onclick=()=>{const card=$('adminPendingCard');if(card)card.scrollIntoView({behavior:'smooth',block:'start'})};
+  const goRequests=$('adminGoRequests');if(goRequests)goRequests.onclick=()=>showAdminTab('solicitudes');
+  document.querySelectorAll('#adminTabs [data-admin-tab]').forEach(b=>b.onclick=()=>showAdminTab(b.dataset.adminTab));
+  const fab=$('adminFabCreate'); if(fab) fab.onclick=abrirCrearCuenta;
+  const ojoIngBind=$('adminOjoIngresos'); if(ojoIngBind) ojoIngBind.onclick=togglePlata;
+  window.addEventListener('resize', moverIndicadorAdmin);
   const ingresosToggle=$('adminIngresosToggle');if(ingresosToggle)ingresosToggle.onclick=()=>{const wrap=$('adminIngresosWrap'),chev=$('adminIngresosChevron');const abrir=wrap.hidden;wrap.hidden=!abrir;ingresosToggle.setAttribute('aria-expanded',abrir?'true':'false');if(chev)chev.classList.toggle('open',abrir)};
   // Anuncio para todos (v326): mensaje + reuniones que el equipo agenda en un toque.
   const anuncioToggle=$('adminAnuncioToggle');if(anuncioToggle)anuncioToggle.onclick=()=>{const body=$('adminAnuncioBody'),chev=$('adminAnuncioChevron');const abrir=body.hidden;body.hidden=!abrir;anuncioToggle.setAttribute('aria-expanded',abrir?'true':'false');if(chev)chev.classList.toggle('open',abrir)};
@@ -621,6 +671,12 @@ function bind(){if(state.bound)return;state.bound=true;['adminSucursal','adminNu
   const configToggle=$('adminConfigToggle');if(configToggle)configToggle.onclick=()=>{const body=$('adminConfigBody'),chev=$('adminConfigChevron');const abrir=body.hidden;body.hidden=!abrir;configToggle.setAttribute('aria-expanded',abrir?'true':'false');if(chev)chev.classList.toggle('open',abrir)};
   const refreshAcciones=$('adminRefreshAcciones');if(refreshAcciones)refreshAcciones.onclick=()=>loadAcciones();$('adminSaveWhatsapp').onclick=saveWhatsapp;$('btnAdminPanelLogout').onclick=logout;$('btnAdminPanelPassword').onclick=()=>window.abrirCambioPasswordAPPI();const helpAdmin=$('btnHelpAdmin');if(helpAdmin)helpAdmin.onclick=()=>window.APPIDialog.alert(
 `Desde acá administrás las cuentas de APPI.
+
+ABAJO
+Hoy · Solicitudes · Cuentas · Más. En el teléfono y en la PC es lo mismo.
+
+PLATA
+Los montos arrancan tapados. Tocá el 👁 para verlos. Cuando volvés a entrar, otra vez ocultos.
 
 TABLERO
 Arriba está la plata del mes con la comparación contra el mes anterior y las 12 barras del año (tocá una y saltás a ese mes). Los chips resumen el estado: activas, en prueba, por vencer y solicitudes.
@@ -649,11 +705,11 @@ El número que ven quienes piden ayuda para entrar. Se valida antes de guardarse
 CON QUÉ WHATSAPP MANDÁS
 En Configuración elegís si los envíos del panel abren WhatsApp normal o Business en tu teléfono, sin preguntar cada vez.`,
 {title:'Panel de administración',icon:'🛡️'});$('adminUserSearch').oninput=event=>{state.filter=event.target.value;renderUsers()};$('adminSucursal').oninput=event=>event.target.value=event.target.value.replace(/\D/g,'').slice(0,2);$('adminNumero').oninput=event=>event.target.value=event.target.value.replace(/\D/g,'').slice(0,12);$('adminWhatsappNumber').oninput=event=>event.target.value=event.target.value.replace(/\D/g,'').slice(0,15)}
-function open(){const profile=window.APPIAuth.currentProfile();if(!profile||profile.rol!=='admin')return;bind();$('adminPanelIdentity').textContent='Administración del equipo';load();
+function open(){const profile=window.APPIAuth.currentProfile();if(!profile||profile.rol!=='admin')return;state.plataVisible=false;state.tab='hoy';bind();showAdminTab('hoy');$('adminPanelIdentity').textContent='Administración del equipo';load();
   // Cargar estadísticas de ganancias
   if(window.APPIAdminMembership&&window.APPIAdminMembership.renderRevenuePanel){
     setTimeout(()=>window.APPIAdminMembership.renderRevenuePanel(),500);
   }
 }
-window.APPIAdminPanel={open,load};
+window.APPIAdminPanel={open,load,money:moneyAdmin,togglePlata,showAdminTab};
 })();
