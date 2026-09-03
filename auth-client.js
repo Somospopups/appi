@@ -108,6 +108,27 @@ async function request(path,options={},token=''){
   }
   return data;
 }
+function finMembresiaMs(vence){
+  if(!vence) return 0;
+  const s=String(vence).trim();
+  const m=s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  let y,mo,d;
+  if(m){ y=+m[1]; mo=+m[2]-1; d=+m[3]; }
+  else {
+    const dt=new Date(vence);
+    if(isNaN(dt.getTime())) return 0;
+    y=dt.getFullYear(); mo=dt.getMonth(); d=dt.getDate();
+  }
+  return new Date(y, mo, d, 23, 59, 59, 999).getTime();
+}
+function diasMembresiaRestantes(fin){
+  const ms=typeof fin==='number'?fin:finMembresiaMs(fin);
+  if(!ms) return 0;
+  const hoy=new Date();
+  const a=new Date(hoy.getFullYear(),hoy.getMonth(),hoy.getDate());
+  const b=new Date(new Date(ms).getFullYear(), new Date(ms).getMonth(), new Date(ms).getDate());
+  return Math.max(0, Math.round((b-a)/86400000));
+}
 async function fetchProfile(session){
   const payload=jwtPayload(session&&session.access_token);
   if(!payload||!payload.sub)throw authError('La sesión recibida no es válida.','invalid_session');
@@ -117,9 +138,12 @@ async function fetchProfile(session){
   if(!profile)throw authError('La cuenta no tiene un perfil de distribuidor.','profile_missing',403);
   if(profile.activo===false)throw authError('Esta cuenta está desactivada. Contactá al administrador.','account_disabled',403);
   if(profile.rol!=='admin'){
-    const expires=profile.membresia_vence?new Date(profile.membresia_vence).getTime():0;
+    /* El último día de membresía cuenta entero (hora Argentina del teléfono).
+       Antes se cortaba al instante guardado, a menudo a las 00:00 UTC:
+       con 1 día en el cartel, ya no dejaba entrar. */
+    const expires=finMembresiaMs(profile.membresia_vence);
     if(!expires)throw authError('Tu cuenta todavía no tiene una membresía activa. Contactá a administración.','membership_missing',403);
-    if(expires<=Date.now()){
+    if(Date.now()>expires){
       // Si la cuenta estaba en modo PRUEBA, el mensaje lo dice con todas las
       // letras. La consulta va aparte y protegida: si la migración de la
       // prueba todavía no corrió, el bloqueo genérico sigue funcionando.
@@ -131,7 +155,7 @@ async function fetchProfile(session){
       if(enPrueba)throw authError('Tu período de PRUEBA de APPI terminó. Contactá a administración para activar tu membresía.','membership_expired',403);
       throw authError('Tu membresía de APPI venció. Contactá a administración para renovarla.','membership_expired',403);
     }
-    profile.membresia_dias_restantes=Math.max(0,Math.ceil((expires-Date.now())/86400000));
+    profile.membresia_dias_restantes=diasMembresiaRestantes(expires);
   }
   return profile;
 }

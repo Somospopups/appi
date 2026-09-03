@@ -8,7 +8,32 @@ function randomPassword(){const upper='ABCDEFGHJKLMNPQRSTUVWXYZ',lower='abcdefgh
 /* Los números de WhatsApp se arman en un solo lugar: telefono.js (window.APPITel).
    Acá vivía una función propia que agregaba dígitos sin validar (por ejemplo
    "+54 280 434264454" terminaba en 549280434264454, un número que no existe). */
-function membershipInfo(user){const time=user.membresia_vence?new Date(user.membresia_vence).getTime():0,days=time?Math.ceil((time-Date.now())/86400000):-1;if(!time)return{label:'SIN MEMBRESÍA',cls:'expired',days};if(days>20000)return{label:'♾️ PARA SIEMPRE',cls:'forever',days};if(days<0)return{label:'VENCIDA',cls:'expired',days};if(days<=7)return{label:days===0?'VENCE HOY':`VENCE EN ${days}D`,cls:'soon',days};return{label:`${days} DÍAS`,cls:'',days}}
+function finMembresiaMs(vence){
+  if(!vence) return 0;
+  const s=String(vence).trim();
+  const m=s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  let y,mo,d;
+  if(m){ y=+m[1]; mo=+m[2]-1; d=+m[3]; }
+  else {
+    const dt=new Date(vence);
+    if(isNaN(dt.getTime())) return 0;
+    y=dt.getFullYear(); mo=dt.getMonth(); d=dt.getDate();
+  }
+  return new Date(y, mo, d, 23, 59, 59, 999).getTime();
+}
+function membershipInfo(user){
+  const time=finMembresiaMs(user.membresia_vence);
+  if(!time)return{label:'SIN MEMBRESÍA',cls:'expired',days:-1};
+  const hoy=new Date();
+  const a=new Date(hoy.getFullYear(),hoy.getMonth(),hoy.getDate());
+  const fin=new Date(time);
+  const b=new Date(fin.getFullYear(),fin.getMonth(),fin.getDate());
+  const days=Math.round((b-a)/86400000);
+  if(days>20000)return{label:'♾️ PARA SIEMPRE',cls:'forever',days};
+  if(days<0)return{label:'VENCIDA',cls:'expired',days};
+  if(days<=7)return{label:days===0?'VENCE HOY':`VENCE EN ${days}D`,cls:'soon',days};
+  return{label:`${days} DÍAS`,cls:'',days};
+}
 async function callAdmin(body,retry=true){
   const configuration=cfg(),token=window.APPIAuth.accessToken();let response;
   try{response=await fetch(String(configuration.url).replace(/\/$/,'')+'/functions/v1/admin-distribuidores',{method:'POST',headers:{apikey:configuration.anonKey,Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body:JSON.stringify(body)})}catch(error){throw new Error('No se pudo conectar con el panel administrador.')}
@@ -111,12 +136,16 @@ function pintarFiltrosCuentas(){
   const todos=state.users.filter(u=>u.rol!=='admin');
   const n={prueba:0,mes:0,siempre:0,prorroga:0};
   todos.forEach(u=>{ n[tipoCuenta(u)]=(n[tipoCuenta(u)]||0)+1; });
-  const labels={prueba:'🧪 Prueba 5 días',mes:'📅 1 mes',siempre:'♾️ Para siempre',prorroga:'📅 Prórroga'};
+  const meta={
+    prueba:{ico:'🧪',title:'Prueba',sub:'Cuentas de prueba'},
+    mes:{ico:'📅',title:'1 mes',sub:'Membresía mensual'},
+    siempre:{ico:'♾️',title:'Para siempre',sub:'Acceso permanente'},
+    prorroga:{ico:'⏳',title:'Prórroga',sub:'Cuentas en prórroga'}
+  };
   wrap.querySelectorAll('[data-cuenta-filtro]').forEach(b=>{
-    const k=b.dataset.cuentaFiltro;
-    const on=state.cuentaFiltro===k;
+    const k=b.dataset.cuentaFiltro, m=meta[k], c=n[k]||0, on=state.cuentaFiltro===k;
     b.setAttribute('aria-selected', on?'true':'false');
-    b.innerHTML=labels[k]+'<small>'+(n[k]||0)+'</small>';
+    b.innerHTML=`<span class="cfi">${m.ico}</span><span class="cft"><b>${m.title}</b><strong>${c} cuenta${c===1?'':'s'}</strong><em>${m.sub}</em></span>${on?'<span class="cfok">✓</span>':''}`;
   });
 }
 function renderUsers(){

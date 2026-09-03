@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v440-admin-filtros';
+const CACHE_NAME = 'appi-v441-cuentas-color';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

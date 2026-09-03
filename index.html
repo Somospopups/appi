@@ -102,11 +102,11 @@ window.openStock=function(){
 <script src="./appi-dialog.js"></script>
 <script src="./telefono.js"></script>
 <script src="./whatsapp-app.js"></script>
-<script src="./auth-client.js"></script>
+<script src="./auth-client.js?v=441"></script>
 <script src="./prueba-banner.js"></script>
 <script src="./data-sync.js"></script>
 <script src="./js/membership-admin.js?v=439"></script>
-<script src="./admin-panel.js?v=440"></script>
+<script src="./admin-panel.js?v=441"></script>
 <link rel="stylesheet" href="./css/membership-admin.css">
 <link rel="stylesheet" href="./appi-tema.css">
 <script src="./account-request.js"></script>
@@ -4145,7 +4145,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v440 · Segura</div>
+  <div class="ds-foot">APPI · v441 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -5216,18 +5216,39 @@ body.dark #pageTabs button.active{color:#a8c0ff}
   .admin-user-chev{flex:0 0 auto;width:30px;height:30px;display:grid;place-items:center;border-radius:50%;background:rgba(91,141,239,.1);color:#3d63c9;font-weight:900;transition:transform .2s}
   .admin-user-chev.open{transform:rotate(90deg)}
   .admin-user-acciones{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:4px 4px 14px}
-  .admin-cuentas-filtros{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:10px 0 4px}
+  .admin-cuentas-filtros{display:flex;flex-direction:column;gap:8px;margin:12px 0 8px}
   .admin-cuentas-filtros button{
-    min-height:44px;padding:8px 8px;border:1px solid rgba(91,141,239,.18);border-radius:13px;
-    background:rgba(255,255,255,.78);color:#3d63c9;font:inherit;font-size:11px;font-weight:850;cursor:pointer;
+    position:relative;display:flex;align-items:center;gap:12px;width:100%;
+    min-height:76px;padding:12px 14px 12px 20px;border:0;border-radius:18px;
+    background:rgba(255,255,255,.88);color:#292938;font:inherit;text-align:left;cursor:pointer;
+    box-shadow:0 7px 18px rgba(65,75,120,.08);overflow:hidden;
   }
-  .admin-cuentas-filtros button[aria-selected="true"]{
-    background:linear-gradient(135deg,#5b8def,#8b63e8);color:#fff;border-color:transparent;
-    box-shadow:0 6px 15px rgba(91,112,210,.22);
+  .admin-cuentas-filtros button::before{
+    content:'';position:absolute;left:0;top:0;bottom:0;width:8px;
+    border-radius:18px 0 0 18px;
   }
-  .admin-cuentas-filtros button small{display:block;margin-top:2px;font-size:9px;font-weight:750;opacity:.8}
-  body.dark .admin-cuentas-filtros button{background:rgba(31,32,49,.74);border-color:rgba(255,255,255,.1);color:#c9d5f5}
-  body.dark .admin-cuentas-filtros button[aria-selected="true"]{background:linear-gradient(135deg,#5b8def,#8b63e8);color:#fff}
+  .admin-cuentas-filtros button[data-cuenta-filtro="prueba"]::before{background:#ff7a6e}
+  .admin-cuentas-filtros button[data-cuenta-filtro="mes"]::before{background:#3ad0a4}
+  .admin-cuentas-filtros button[data-cuenta-filtro="siempre"]::before{background:#f5b301}
+  .admin-cuentas-filtros button[data-cuenta-filtro="prorroga"]::before{background:#8b63e8}
+  .admin-cuentas-filtros .cfi{flex:none;width:36px;font-size:22px;text-align:center}
+  .admin-cuentas-filtros .cft{min-width:0;flex:1}
+  .admin-cuentas-filtros .cft b{display:block;color:#6a6b7a;font-size:11px;font-weight:800}
+  .admin-cuentas-filtros .cft strong{display:block;margin-top:1px;color:#1f2030;font-size:20px;font-weight:950;line-height:1.15}
+  .admin-cuentas-filtros .cft em{display:block;margin-top:3px;color:#8a8b98;font-size:10px;font-style:normal;font-weight:650}
+  .admin-cuentas-filtros .cfok{flex:none;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:rgba(22,135,101,.15);color:#168765;font-weight:950}
+  .admin-cuentas-filtros button[aria-selected="true"][data-cuenta-filtro="prueba"]{background:linear-gradient(135deg,#ff8a80,#ff6b6b);color:#fff}
+  .admin-cuentas-filtros button[aria-selected="true"][data-cuenta-filtro="mes"]{background:linear-gradient(135deg,#7ee0c8,#3ad0a4);color:#0b5878}
+  .admin-cuentas-filtros button[aria-selected="true"][data-cuenta-filtro="siempre"]{background:linear-gradient(135deg,#ffd56a,#f5b301);color:#6a4a00}
+  .admin-cuentas-filtros button[aria-selected="true"][data-cuenta-filtro="prorroga"]{background:linear-gradient(135deg,#c4b0ff,#8b63e8);color:#fff}
+  .admin-cuentas-filtros button[aria-selected="true"] .cft b,
+  .admin-cuentas-filtros button[aria-selected="true"] .cft em{color:inherit;opacity:.85}
+  .admin-cuentas-filtros button[aria-selected="true"] .cft strong{color:inherit}
+  .admin-cuentas-filtros button[aria-selected="true"] .cfok{background:rgba(255,255,255,.28);color:inherit}
+  body.dark .admin-cuentas-filtros button{background:rgba(31,32,49,.82);color:#f1f1f6}
+  body.dark .admin-cuentas-filtros .cft b{color:#b7b8c4}
+  body.dark .admin-cuentas-filtros .cft strong{color:#f1f1f6}
+  body.dark .admin-cuentas-filtros .cft em{color:#9a9ba8}
   .admin-mem-label{grid-column:1/-1;margin:8px 2px 0;color:#777887;font-size:10px;font-weight:900;letter-spacing:.4px;text-transform:uppercase}
   .admin-mem-label:first-child{margin-top:2px}
   .admin-user-acciones button{display:flex;align-items:center;justify-content:center;gap:7px;min-height:48px;border:1px solid rgba(80,90,130,.12);border-radius:13px;background:rgba(255,255,255,.85);color:#3a3a48;font:inherit;font-size:12px;font-weight:850;cursor:pointer}
@@ -11770,7 +11791,7 @@ function mostrarPantallaLoginDistribuidor(reason=''){
 
 function avisarMembresiaUsuario(){
   const profile=window.APPIAuth&&window.APPIAuth.currentProfile?window.APPIAuth.currentProfile():null;if(!profile||profile.rol==='admin'||!profile.membresia_vence)return;
-  const days=Math.max(0,Math.ceil((new Date(profile.membresia_vence).getTime()-Date.now())/86400000));if(days>7)return;
+  const days=(profile.membresia_dias_restantes!=null)?Number(profile.membresia_dias_restantes):Math.max(0,Math.ceil((new Date(profile.membresia_vence).getTime()-Date.now())/86400000));if(days>7)return;
   const today=new Date().toISOString().slice(0,10),key=`appi_membresia_aviso_${profile.user_id}_${today}`;if(localStorage.getItem(key))return;localStorage.setItem(key,'1');
   window.APPIDialog.alert(days===0?'Tu membresía vence hoy.':`Tu membresía de APPI vence en ${days} día${days===1?'':'s'}.`,{title:'Membresía por vencer',icon:'⏳',okText:'Entendido'});
 }
@@ -12118,8 +12139,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='440';
-      const CACHE_NAME='appi-v440-admin-filtros';
+      const swVersion='441';
+      const CACHE_NAME='appi-v441-cuentas-color';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 

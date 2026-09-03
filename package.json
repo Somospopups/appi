@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "440.0.0",
-  "cacheName": "appi-v440-admin-filtros",
+  "version": "441.0.0",
+  "cacheName": "appi-v441-cuentas-color",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {
