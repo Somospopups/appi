@@ -106,7 +106,7 @@ window.openStock=function(){
 <script src="./prueba-banner.js"></script>
 <script src="./data-sync.js"></script>
 <script src="./js/membership-admin.js?v=439"></script>
-<script src="./admin-panel.js?v=444"></script>
+<script src="./admin-panel.js?v=445"></script>
 <link rel="stylesheet" href="./css/membership-admin.css">
 <link rel="stylesheet" href="./appi-tema.css">
 <script src="./account-request.js"></script>
@@ -4145,7 +4145,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v444 · Segura</div>
+  <div class="ds-foot">APPI · v445 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -5072,7 +5072,9 @@ body.dark #pageTabs button.active{color:#a8c0ff}
   .admin-cump-overlay .admin-cump-sheet{width:min(440px,100%);max-height:88vh;overflow:auto;padding:22px 20px 18px;border-radius:24px;position:relative}
   .admin-cump-row{display:flex;align-items:center;gap:10px;width:100%;padding:12px 12px;margin-bottom:7px;border:1px solid rgba(80,90,130,.1);border-radius:16px;background:rgba(255,255,255,.82);font:inherit;text-align:left;cursor:pointer}
   .admin-cump-row:hover{transform:translateY(-1px)}
-  .cump-dots{display:flex;gap:4px;margin-left:auto;flex:none}
+  .cump-dots{display:flex;gap:5px;margin-left:auto;flex:none;align-items:flex-end}
+  .cump-dow{display:flex;flex-direction:column;align-items:center;gap:3px}
+  .cump-dow b{font-size:8px;font-weight:900;color:#8a8b98;line-height:1;letter-spacing:0}
   .cump-dot{width:10px;height:10px;border-radius:50%;background:#e6e8ef}
   .cump-dot.verde{background:#3ad0a4}
   .cump-dot.naranja{background:#f5b301}
@@ -5085,6 +5087,12 @@ body.dark #pageTabs button.active{color:#a8c0ff}
   .cump-ley i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px;vertical-align:middle}
   .cump-ley i.rojo{background:#e0514a}.cump-ley i.naranja{background:#f5b301}.cump-ley i.verde{background:#3ad0a4}
   .cump-mes-tit{margin:0 0 8px;font-size:13px;font-weight:900;color:#292938}
+  .cump-mes-nav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 10px}
+  .cump-mes-nav b{flex:1;text-align:center;font-size:13px;color:#292938}
+  .cump-mes-nav button{width:36px;height:36px;border:1px solid rgba(80,90,130,.14);border-radius:50%;background:#fff;color:#3d63c9;font-size:18px;font-weight:900;cursor:pointer}
+  .cump-mes-nav button:disabled{opacity:.28;cursor:default}
+  body.dark .cump-mes-nav b{color:#f1f1f6}
+  body.dark .cump-mes-nav button{background:rgba(31,32,49,.8);border-color:rgba(255,255,255,.1);color:#a8b8ff}
   .admin-cump-cal{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
   .admin-cump-cal .dow{text-align:center;color:#8a8b98;font-size:9px;font-weight:900}
   .admin-cump-dia{aspect-ratio:1;border-radius:12px;display:grid;place-items:center;background:#eef0f5;color:#6a6b7a;font-size:12px;font-weight:850}
@@ -12191,8 +12199,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='444';
-      const CACHE_NAME='appi-v444-cump-calendario';
+      const swVersion='445';
+      const CACHE_NAME='appi-v445-cump-mes';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 

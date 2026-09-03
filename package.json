@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "444.0.0",
-  "cacheName": "appi-v444-cump-calendario",
+  "version": "445.0.0",
+  "cacheName": "appi-v445-cump-mes",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

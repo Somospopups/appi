@@ -234,7 +234,7 @@ async function rpcAdmin(fn,body){
 async function loadAcciones(){
   const list=$('adminAccionesList');if(!list)return;
   try{
-    const rows=await rpcAdmin('appi_admin_cumplimiento',{dias_atras:40});
+    const rows=await rpcAdmin('appi_admin_cumplimiento',{dias_atras:370});
     state.acciones=Array.isArray(rows)?rows:[];
     setStatus('adminAccionesStatus','');
   }catch(error){
@@ -481,10 +481,12 @@ function cuentasCump(){
 }
 function dotsSemana(acc){
   const hoy=new Date();
+  const letras=['D','L','M','M','J','V','S'];
   return [6,5,4,3,2,1,0].map(i=>{
     const iso=isoDiaOffset(hoy,-i);
+    const dt=new Date(hoy.getFullYear(),hoy.getMonth(),hoy.getDate()-i);
     const tono=tonoCumpDia(acc.dias[iso]);
-    return `<i class="cump-dot ${tono}" title="${iso}"></i>`;
+    return `<span class="cump-dow"><b>${letras[dt.getDay()]}</b><i class="cump-dot ${tono}" title="${iso}"></i></span>`;
   }).join('');
 }
 function renderAcciones(){
@@ -513,7 +515,8 @@ function cerrarCumpFicha(){
 }
 function abrirCumpFicha(key){
   state.cumpKey=key;
-  state.cumpPer=state.cumpPer||'mes';
+  const hoy=new Date();
+  state.cumpMes=`${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,'0')}`;
   const ov=$('adminCumpOverlay'); if(ov) ov.hidden=false;
   pintarCumpFicha();
 }
@@ -521,55 +524,49 @@ function pintarCumpFicha(){
   const acc=(state.cumpCuentas||[]).find(c=>c.key===state.cumpKey);
   const box=$('adminCumpFicha'); if(!box) return;
   if(!acc){box.innerHTML='';return}
-  const per=state.cumpPer||'mes';
   const socio=acc.persona==='socio'?' · socio/a':'';
   const ley='<div class="cump-ley"><i class="rojo"></i>Rojo (&lt;50%) <i class="naranja"></i>Naranja (50–80%) <i class="verde"></i>Verde (&gt;80%)</div>';
-  let cuerpo='';
   const hoy=new Date();
-  if(per==='hoy'){
-    const iso=isoDiaOffset(hoy,0);
-    const d=acc.dias[iso];
-    cuerpo = d && d.total
-      ? `<div class="cump-hoybox"><b>Hoy</b><p>✓ ${d.hechas} hechas · ✗ ${d.noHechas} no hechas · de ${d.total}</p></div>`
-      : `<div class="cump-hoybox"><b>Hoy</b><p>Sin marcas todavía.</p></div>`;
-  } else if(per==='semana'){
-    const dias=['D','L','M','M','J','V','S'];
-    const celdas=[6,5,4,3,2,1,0].map(i=>{
-      const iso=isoDiaOffset(hoy,-i);
-      const dt=new Date(hoy.getFullYear(),hoy.getMonth(),hoy.getDate()-i);
-      const tono=tonoCumpDia(acc.dias[iso]);
-      return `<div class="admin-cump-dia ${tono}"><small>${dias[dt.getDay()]}</small><b>${dt.getDate()}</b></div>`;
-    }).join('');
-    cuerpo=`<div class="admin-cump-semgrid">${celdas}</div>`;
-  } else {
-    const y=hoy.getFullYear(), m=hoy.getMonth();
-    const nombres=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-    const first=new Date(y,m,1).getDay(); // 0 sun
-    const last=new Date(y,m+1,0).getDate();
-    const dows=['D','L','M','M','J','V','S'].map(x=>`<span class="dow">${x}</span>`).join('');
-    let cells='';
-    for(let i=0;i<first;i++) cells+=`<span class="admin-cump-dia pad"></span>`;
-    for(let d=1;d<=last;d++){
-      const iso=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-      const tono=tonoCumpDia(acc.dias[iso]);
-      const esHoy=iso===isoDiaOffset(hoy,0);
-      cells+=`<span class="admin-cump-dia ${tono}${esHoy?' hoy':''}">${d}</span>`;
-    }
-    cuerpo=`<div class="cump-mes-tit">Actividad de ${nombres[m]} ${y}</div><div class="admin-cump-cal">${dows}${cells}</div>`;
+  const mesAct=`${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,'0')}`;
+  let mesSel=state.cumpMes||mesAct;
+  if(mesSel>mesAct) mesSel=mesAct;
+  state.cumpMes=mesSel;
+  const y=Number(mesSel.slice(0,4)), m=Number(mesSel.slice(5,7))-1;
+  const nombres=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  const first=new Date(y,m,1).getDay();
+  const last=new Date(y,m+1,0).getDate();
+  const dows=['D','L','M','M','J','V','S'].map(x=>`<span class="dow">${x}</span>`).join('');
+  let cells='';
+  for(let i=0;i<first;i++) cells+=`<span class="admin-cump-dia pad"></span>`;
+  const hoyISO=isoDiaOffset(hoy,0);
+  for(let d=1;d<=last;d++){
+    const iso=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const tono=tonoCumpDia(acc.dias[iso]);
+    const esHoy=iso===hoyISO;
+    cells+=`<span class="admin-cump-dia ${tono}${esHoy?' hoy':''}">${d}</span>`;
   }
+  const puedeNext=mesSel<mesAct;
   box.innerHTML=`
     <div class="cump-ficha-head">
       <span class="admin-cump-ava">${esc(inicialesCump(acc.nombre))}</span>
       <div><strong>${esc(acc.nombre||'Sin nombre')}</strong><small>DIP ${esc(acc.dip||'—')}${esc(socio)}</small></div>
     </div>
     ${ley}
-    ${cuerpo}
-    <div class="cump-per">
-      <button type="button" data-cump-per="hoy" class="${per==='hoy'?'on':''}">Hoy</button>
-      <button type="button" data-cump-per="semana" class="${per==='semana'?'on':''}">Semana</button>
-      <button type="button" data-cump-per="mes" class="${per==='mes'?'on':''}">Mes</button>
-    </div>`;
-  box.querySelectorAll('[data-cump-per]').forEach(b=>b.onclick=()=>{state.cumpPer=b.dataset.cumpPer;pintarCumpFicha()});
+    <div class="cump-mes-nav">
+      <button type="button" id="cumpMesPrev" aria-label="Mes anterior">‹</button>
+      <b>Actividad de ${nombres[m]} ${y}</b>
+      <button type="button" id="cumpMesNext" aria-label="Mes siguiente"${puedeNext?'':' disabled'}>›</button>
+    </div>
+    <div class="admin-cump-cal">${dows}${cells}</div>`;
+  const mover=paso=>{
+    const dt=new Date(y,m+paso,1);
+    const clave=`${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}`;
+    if(clave>mesAct) return;
+    state.cumpMes=clave;
+    pintarCumpFicha();
+  };
+  const prev=$('cumpMesPrev'); if(prev) prev.onclick=()=>mover(-1);
+  const next=$('cumpMesNext'); if(next) next.onclick=()=>mover(1);
 }
 
 /* ---------- Ingresos por mes (v300) ---------- */

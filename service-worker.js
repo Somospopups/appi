@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v444-cump-calendario';
+const CACHE_NAME = 'appi-v445-cump-mes';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
