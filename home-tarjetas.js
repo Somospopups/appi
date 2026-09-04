@@ -12,6 +12,7 @@
      📅 Tu jornada · seguimientos y presentaciones de hoy
      🎯 Oportunidades · bonus al alcance en Mi Equipo
      🎂 Cumpleaños · equipo + clientes que cumplen hoy
+     📝 Reempadronar · Alta de este mes, hace 1 año o más
      👥 Mi Equipo · Cultura + a quién invitar
      📇 Panel de Contactos · nuevos sin contactar y vencidos
      💧 Usuarios · las acciones del día sin marcar (✓/✗)
@@ -692,6 +693,71 @@
     };
   }
 
+  function parseAlta(p){
+    var s = String((p && p.alta) || '').trim();
+    var m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (!m) return null;
+    return { y: +m[1], mo: +m[2], d: +m[3], iso: m[0] };
+  }
+  function fechaAltaTxt(a){
+    if (!a) return '—';
+    return String(a.d).padStart(2,'0') + '/' + String(a.mo).padStart(2,'0') + '/' + a.y;
+  }
+  function personasAReempadronar(){
+    var hoy = new Date();
+    var mes = hoy.getMonth() + 1;
+    var anio = hoy.getFullYear();
+    return personasEquipo().filter(function(p){
+      var a = parseAlta(p);
+      if (!a) return false;
+      if (a.mo !== mes) return false;
+      if (a.y >= anio) return false;
+      return true;
+    }).sort(function(x,y){
+      var ax = parseAlta(x), ay = parseAlta(y);
+      if (ax && ay && ax.d !== ay.d) return ax.d - ay.d;
+      return String(x.nombre||'').localeCompare(String(y.nombre||''), 'es');
+    });
+  }
+  function enviarReempadronar(lista, mesNom, anio){
+    var n = lista.length;
+    var msg = '📋 *Reempadronar · ' + mesNom.charAt(0).toUpperCase() + mesNom.slice(1) + ' ' + anio + '*\n';
+    msg += n + (n === 1 ? ' persona' : ' personas') + '\n━━━━━━━━━━━━━━━\n';
+    msg += '*Apellido, nombre - Categoría - Alta*\n\n';
+    lista.forEach(function(p){
+      var a = parseAlta(p);
+      msg += String(p.nombre||'').trim() + ' - ' + (p.cat || '—') + ' - ' + fechaAltaTxt(a) + '\n';
+    });
+    msg += '\n━━━━━━━━━━━━━━━\nEnviado desde *APPI* 🚀';
+    if (typeof window.enviarMensajeWhatsApp === 'function') window.enviarMensajeWhatsApp(msg, 'Reempadronar');
+    else if (window.APPIWhatsApp && window.APPIWhatsApp.abrir) window.APPIWhatsApp.abrir('https://wa.me/?text=' + encodeURIComponent(msg));
+  }
+  function tarjetaReempadronar(){
+    var lista = personasAReempadronar();
+    if (!lista.length) return null;
+    var hoy = new Date();
+    var MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+    var mesNom = MESES[hoy.getMonth()];
+    var anio = hoy.getFullYear();
+    var n = lista.length;
+    var filas = [];
+    lista.slice(0, 6).forEach(function(p){
+      var a = parseAlta(p);
+      filas.push('<li>📝 <b>' + esc(p.nombre || '') + '</b> · ' + esc(p.cat || '—') + ' · alta ' + esc(fechaAltaTxt(a)) + '</li>');
+    });
+    if (n > 6) filas.push('<li>… y ' + (n - 6) + ' más</li>');
+    return {
+      cat: 'reempadronar', icono: '📝', kicker: 'Reempadronar',
+      titulo: n === 1
+        ? '1 persona para reempadronar en ' + mesNom
+        : n + ' personas para reempadronar en ' + mesNom,
+      html: '<ul class="ht-lista ht-plain">' + filas.join('') + '</ul>' +
+            '<p class="ht-nota">Mantené presionada la tarjeta para enviarla por WhatsApp.</p>',
+      alMantener: function(){ enviarReempadronar(lista, mesNom, anio); },
+      cta: null
+    };
+  }
+
   function tarjetaEquipo(){
     var cul = culturaMes();
     var faltaPb = Math.max(0, cul.metaPb - cul.pb);
@@ -861,7 +927,7 @@
   function armarTarjetas(){
     var lista = [tarjetaEspecial()];
     try{ if (window.APPIMensajes && window.APPIMensajes.registrarPartido) window.APPIMensajes.registrarPartido(); }catch(e){}
-    [tarjetaHoyConviene(), tarjetaGanaste(), tarjetaMetodoEnvio(), tarjetaLlegamos(), tarjetaDuchaRinnova(), tarjetaCanje(), tarjetaJornada(), tarjetaOportunidades(), tarjetaCumples(), tarjetaEquipo(), tarjetaPanel(), tarjetaUsuarios()].forEach(function(t){
+    [tarjetaHoyConviene(), tarjetaGanaste(), tarjetaMetodoEnvio(), tarjetaLlegamos(), tarjetaDuchaRinnova(), tarjetaCanje(), tarjetaJornada(), tarjetaOportunidades(), tarjetaCumples(), tarjetaReempadronar(), tarjetaEquipo(), tarjetaPanel(), tarjetaUsuarios()].forEach(function(t){
       if (t) lista.push(t);
     });
     return lista;
@@ -902,6 +968,8 @@
       '.ht-lista li{display:flex;align-items:center;gap:8px;padding:13px 14px;border-radius:14px;background:rgba(91,141,239,.08);color:#33343f;font-size:15px;font-weight:750;cursor:pointer;transition:background .14s}',
       '.ht-lista li:hover{background:rgba(91,141,239,.16)}',
       '.ht-lista li::after{content:"›";margin-left:auto;color:#3d63c9;font-weight:900;font-size:17px}',
+      '.ht-lista.ht-plain li{cursor:default}',
+      '.ht-lista.ht-plain li::after{content:none}',
       '.ht-lista li i{color:#c0392b;font-style:normal;font-size:12px;font-weight:900}',
       '.ht-nota{margin:12px 0 0;color:#8a8b98;font-size:13px;line-height:1.5}',
       '.ht-pasos{margin:12px 0 0;padding:0;list-style:none;display:grid;gap:8px}',
@@ -1070,6 +1138,24 @@
         var accion = (t.items && t.items[i]) || t.cta.go;
         li.onclick = ejecutar(accion);
       });
+    }
+    if (t && typeof t.alMantener === 'function'){
+      var holdT = null;
+      var clearHold = function(){ if (holdT){ clearTimeout(holdT); holdT = null; } };
+      el.addEventListener('pointerdown', function(e){
+        if (e.target.closest('button, a')) return;
+        clearHold();
+        holdT = setTimeout(function(){
+          holdT = null;
+          if (el.__arrastro) return;
+          try{ if (navigator.vibrate) navigator.vibrate(18); }catch(err){}
+          try{ t.alMantener(); }catch(err){}
+        }, 550);
+      });
+      el.addEventListener('pointerup', clearHold);
+      el.addEventListener('pointercancel', clearHold);
+      el.addEventListener('pointermove', function(){ if (el.__arrastro) clearHold(); });
+      el.addEventListener('contextmenu', function(e){ e.preventDefault(); });
     }
     activarArrastre(el);
   }
