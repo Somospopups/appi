@@ -108,7 +108,7 @@ window.openStock=function(){
 <script src="./js/membership-admin.js?v=451"></script>
 <script src="./admin-panel.js?v=452"></script>
 <link rel="stylesheet" href="./css/membership-admin.css">
-<link rel="stylesheet" href="./appi-tema.css">
+<link rel="stylesheet" href="./appi-tema.css?v=476">
 <script src="./account-request.js"></script>
 <script src="./qr-code.js"></script>
 <script src="./gestion-client.js"></script>
@@ -4219,7 +4219,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v475 · Segura</div>
+  <div class="ds-foot">APPI · v476 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4500,7 +4500,7 @@ body.dark #pageTabs button.active{color:#c5d6ff}
       <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
 
       <div class="home-brand-row">
-        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · v475</span></span>
+        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · v476</span></span>
       </div>
 
       <div class="home-hero-card">
@@ -12370,8 +12370,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='475';
-      const CACHE_NAME='appi-v475-admin-dock';
+      const swVersion='476';
+      const CACHE_NAME='appi-v476-paleta-crema';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · v'+swVersion;
       const hadController=Boolean(navigator.serviceWorker.controller);
@@ -16658,6 +16658,6 @@ setTimeout(initHistorico,1200);
 })();
 </script>
 
-<link rel="stylesheet" href="./appi-tema.css">
+<link rel="stylesheet" href="./appi-tema.css?v=476">
 </body>
 </html>

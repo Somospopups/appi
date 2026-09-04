@@ -1,40 +1,116 @@
-/* APPI · un solo idioma visual (v402)
-   Vidrio, pastel, azul → violeta, pastillas, sombra suave.
-   Toda la app se lee como si se hubiera dibujado el mismo día.
-   La Agenda personal también: vidrio, pastillas, azul → violeta. */
+/* APPI · un solo idioma visual (v476)
+   Crema y azul del dock. Verde / rojo / oro siguen siendo estado.
+   Categorías y WhatsApp no se tocan. */
 
 :root{
-  --appi-azul:#5b8def;
-  --appi-azul-2:#3d63c9;
-  --appi-violeta:#a06bff;
-  --appi-violeta-2:#8b63e8;
+  --appi-crema:#f3eee3;
+  --appi-crema-2:#f7f3ea;
+  --appi-acento:#0b5878;
+  --appi-acento-2:#0e6a90;
+  --appi-azul:#0b5878;
+  --appi-azul-2:#0b5878;
+  --appi-violeta:#0b5878;
+  --appi-violeta-2:#0b5878;
   --appi-menta:#3ad0a4;
-  --appi-texto:#282837;
-  --appi-muted:#777887;
-  --appi-vidrio:rgba(255,255,255,.68);
-  --appi-borde:1px solid rgba(255,255,255,.84);
-  --appi-sombra:0 8px 22px rgba(68,76,118,.08);
+  --appi-texto:#2a2a32;
+  --appi-muted:#6b675e;
+  --appi-vidrio:#f7f3ea;
+  --appi-borde:1px solid rgba(40,36,28,.10);
+  --appi-sombra:0 8px 22px rgba(30,24,12,.08);
   --appi-radio:16px;
   --appi-radio-lg:22px;
   --appi-pill:999px;
-  --appi-grad:linear-gradient(135deg,#5b8def,#8b63e8);
-  --appi-focus:0 0 0 3px rgba(91,141,239,.14);
+  --appi-grad:#0b5878;
+  --appi-focus:0 0 0 3px rgba(11,88,120,.16);
 }
 
-/* ---------- botones: el mismo gesto en login, diálogos, hist, mazo, admin ---------- */
+/* ---------- fondo de la app ---------- */
+body{
+  background:#f3eee3 !important;
+}
+body::before{
+  background:
+    radial-gradient(circle at 18% 12%, rgba(11,88,120,.06), transparent 42%),
+    radial-gradient(circle at 86% 28%, rgba(243,238,227,.9), transparent 48%) !important;
+}
+body.dark{
+  background:#16161e !important;
+}
+body.dark::before{
+  background:
+    radial-gradient(circle at 18% 12%, rgba(11,88,120,.18), transparent 42%),
+    radial-gradient(circle at 86% 28%, rgba(40,38,52,.5), transparent 48%) !important;
+}
+
+/* Admin: ya era familia del acento; se deja el agua, tarjetas claras */
+body.appi-admin{
+  background:linear-gradient(180deg,#5ee0df 0%,#27b5c4 8%,#12809c 29%,#0b5878 58%,#063652 82%,#041f37 100%);
+}
+
+/* ---------- vidrio → crema ---------- */
+.glass,
+.card.glass,
+.revenue-stats,
+.stat-card,
+.membership-modal-overlay .modal,
+.hist-card,
+.tool-card,
+.admin-user-row,
+.cultura-card,
+.home-month-card,
+.home-hero-card,
+.home-brand-mark,
+.backup-collapsible,
+.u-tools button{
+  background:var(--appi-crema-2) !important;
+  -webkit-backdrop-filter:none !important;
+  backdrop-filter:none !important;
+  border:var(--appi-borde) !important;
+  box-shadow:var(--appi-sombra) !important;
+}
+.home-hero-card{
+  background:var(--appi-crema-2) !important;
+}
+.stat-card{
+  background:linear-gradient(135deg,rgba(11,88,120,.08),rgba(11,88,120,.04)) !important;
+  border:1px solid rgba(11,88,120,.14) !important;
+}
+.stat-card.warning{
+  background:linear-gradient(135deg,rgba(245,179,1,.14),rgba(255,143,107,.10)) !important;
+  border-color:rgba(245,179,1,.35) !important;
+}
+.stat-card.danger{
+  background:linear-gradient(135deg,rgba(222,69,78,.12),rgba(255,107,107,.08)) !important;
+  border-color:rgba(222,69,78,.28) !important;
+}
+
+body.dark .glass,
+body.dark .revenue-stats,
+body.dark .stat-card,
+body.dark .membership-modal-overlay .modal,
+body.dark .admin-user-row,
+body.dark .home-hero-card,
+body.dark .home-month-card,
+body.dark .u-tools button{
+  background:rgba(30,32,50,.86) !important;
+  border-color:rgba(255,255,255,.08) !important;
+}
+
+/* ---------- botones ---------- */
 .lock-btn-full,
 .lock-btn:not(.copy):not(.whatsapp),
 .appi-dialog-ok:not(.danger),
 .hist-primary,
 .ht-cta,
 .btn-primary,
-.btn.btn-primary{
-  background:var(--appi-grad);
-  color:#fff;
-  border:0;
+.btn.btn-primary,
+.btn-payment{
+  background:#0b5878 !important;
+  color:#fff !important;
+  border:0 !important;
   border-radius:14px;
   font-weight:900;
-  box-shadow:0 8px 20px rgba(91,112,210,.22);
+  box-shadow:0 8px 20px rgba(11,88,120,.28) !important;
 }
 .lock-btn.copy,
 .appi-dialog-cancel,
@@ -43,138 +119,68 @@
   border-radius:14px;
   font-weight:850;
 }
-.lock-btn,
-.lock-btn-full{
-  min-height:48px;
-  border-radius:14px;
-  font-weight:850;
-}
-
-/* ---------- campos ---------- */
-.lock-input,
-.appi-dialog-input,
-.hist-field input,
-.hist-field select,
-.form-input,
-.cultura-inv-grid input{
-  border-radius:14px;
-  border:1.5px solid rgba(80,90,130,.14);
-  background:rgba(255,255,255,.88);
-}
-.lock-input:focus,
-.appi-dialog-input:focus,
-.form-input:focus{
-  border-color:var(--appi-azul);
-  box-shadow:var(--appi-focus);
-}
-
-/* ---------- tarjetas de vidrio (admin membresías venía en blanco plano) ---------- */
-.revenue-stats,
-.stat-card,
-.membership-modal-overlay .modal,
-.hist-card,
-.tool-card,
-.admin-user-row,
-.cultura-card,
-.home-month-card{
-  background:var(--appi-vidrio);
-  -webkit-backdrop-filter:blur(18px) saturate(170%);
-  backdrop-filter:blur(18px) saturate(170%);
-  border:var(--appi-borde);
-  box-shadow:var(--appi-sombra);
-}
-.revenue-stats,
-.membership-modal-overlay .modal,
-.hist-card{border-radius:var(--appi-radio-lg)}
-.stat-card,
-.admin-user-row{border-radius:var(--appi-radio)}
-.revenue-stats h2,
-.modal-header h2,
-.stat-value{color:var(--appi-texto)}
-.stat-label,
-.stat-card{color:var(--appi-muted)}
-.stat-card{
-  background:linear-gradient(135deg,rgba(91,141,239,.10),rgba(160,107,255,.08));
-  border:1px solid rgba(91,141,239,.16);
-}
-.stat-card.warning{
-  background:linear-gradient(135deg,rgba(245,179,1,.14),rgba(255,143,107,.10));
-  border-color:rgba(245,179,1,.35);
-}
-.stat-card.danger{
-  background:linear-gradient(135deg,rgba(222,69,78,.12),rgba(255,107,107,.08));
-  border-color:rgba(222,69,78,.28);
-}
-.btn,.btn-action{
-  border-radius:12px;
-  font-weight:850;
-}
-.btn-primary,.btn-payment{
-  background:var(--appi-grad);
-  color:#fff;
-}
 .btn-grace-period{
   background:linear-gradient(135deg,#f5b301,#ff8f6b);
   color:#fff;
 }
-.membership-badge{
-  border-radius:var(--appi-pill);
-  font-weight:900;
+
+.lock-input:focus,
+.appi-dialog-input:focus,
+.form-input:focus{
+  border-color:#0b5878;
+  box-shadow:var(--appi-focus);
 }
+
+.revenue-stats h2,
+.modal-header h2,
+.stat-value{color:var(--appi-texto)}
+.stat-label{color:var(--appi-muted)}
+
 .membership-badge.active{background:rgba(58,208,164,.16);color:#168765}
 .membership-badge.grace_period{background:rgba(245,179,1,.16);color:#8a6116}
 .membership-badge.expired{background:rgba(222,69,78,.12);color:#c34c53}
 
-/* ---------- panel admin: misma letra, no microscópica ---------- */
 .admin-user-row h3{font-size:15px;font-weight:850;color:var(--appi-texto)}
 .admin-user-row p{font-size:12px;color:var(--appi-muted)}
-.admin-user-badge{font-size:10px;padding:5px 9px}
-.admin-row-actions button{
-  min-height:40px;
-  padding:8px 12px;
-  border-radius:12px;
-  font-size:12px;
-  font-weight:850;
+
+/* título script: un color, no arcoíris */
+header.top .script{
+  background:none !important;
+  -webkit-text-fill-color:#0b5878 !important;
+  color:#0b5878 !important;
+}
+body.dark header.top .script{
+  -webkit-text-fill-color:#c5d6ff !important;
+  color:#c5d6ff !important;
 }
 
-/* ---------- barra de páginas: se lee, no se adivina ---------- */
-#pageTabs button{font-size:10px;font-weight:800}
-#pageTabs button.active{font-weight:900}
-
-/* ---------- chips y pastillas ---------- */
-.ht-chips span,
-.hist-mini-btn,
-.tp-chip,
-.tp-pill{
-  border-radius:var(--appi-pill);
-  font-weight:850;
+/* overlays */
+.mu-panel,.re-panel,.uc-panel{
+  background:#f7f3ea !important;
 }
-
-/* ---------- overlays laterales (mensajes / reactivación) ---------- */
-.mu-panel,.re-panel{
-  background:linear-gradient(160deg,#f5f8ff,#fff3f9);
-}
-.mu-item,.re-item,.re-quien{
+.mu-item,.re-item,.re-quien,.uc-item{
   border-radius:16px;
-  background:rgba(255,255,255,.78);
-  border:1px solid rgba(255,255,255,.9);
+  background:#fffef8;
+  border:1px solid rgba(40,36,28,.10);
 }
 
-body.dark .revenue-stats,
-body.dark .stat-card,
-body.dark .membership-modal-overlay .modal,
-body.dark .admin-user-row{
-  background:rgba(30,32,50,.72);
-  border-color:rgba(255,255,255,.08);
+/* mazo del home */
+#htOverlay{
+  background:#f7f3ea !important;
+  border:1px solid rgba(40,36,28,.10) !important;
 }
-body.dark .revenue-stats h2,
-body.dark .modal-header h2,
-body.dark .stat-value,
-body.dark .admin-user-row h3{color:#f2f2f7}
-body.dark .stat-label,
-body.dark .admin-user-row p{color:#b8b9c5}
+.ht-card{
+  background:linear-gradient(160deg,#fffef8,#f3eee3) !important;
+  box-shadow:0 18px 40px rgba(30,24,12,.16) !important;
+}
+.ht-top b{color:#2a2a32}
 
-/* ---------- login y admin: ficha blanca sobre el agua (v409) ---------- */
+/* back / help */
+.back-btn,.help-btn,.tools-btn{
+  color:#0b5878 !important;
+}
+
+/* login */
 .lock-card,
 .admin-login-card{
   background:#fff !important;
@@ -183,42 +189,18 @@ body.dark .admin-user-row p{color:#b8b9c5}
   border:0 !important;
   box-shadow:0 22px 60px rgba(4,31,55,.22) !important;
 }
-body.dark .lock-card,
-body.dark .admin-login-card{
-  background:#fff !important;
-  border:0 !important;
-}
 #lockScreen .lock-activate-btn,
 .admin-login-card .lock-activate-btn{
-  background:linear-gradient(135deg,#27b5c4,#0b5878);
+  background:#0b5878;
   box-shadow:0 8px 20px rgba(11,88,120,.32);
 }
-#lockScreen .lock-input:focus{border-color:#27b5c4;box-shadow:0 0 0 3px rgba(39,181,196,.22)}
+#lockScreen .lock-input:focus{border-color:#0b5878;box-shadow:0 0 0 3px rgba(11,88,120,.18)}
 #lockScreen .lock-pass-row button{
   background:rgba(11,88,120,.10);
   color:#0b5878;
 }
-#lockScreen .admin-login-lock{
-  background:rgba(11,88,120,.08);
-  border-color:rgba(11,88,120,.16);
-  color:#0b5878;
-}
 #lockScreen .login-tabs button.active{color:#0b5878}
 
-body.appi-admin{
-  background:linear-gradient(180deg,#5ee0df 0%,#27b5c4 8%,#12809c 29%,#0b5878 58%,#063652 82%,#041f37 100%);
-}
-body.appi-admin::before{
-  background:
-    radial-gradient(circle at 18% 18%,rgba(94,224,223,.22),transparent 34%),
-    radial-gradient(circle at 83% 35%,rgba(39,181,196,.16),transparent 32%),
-    radial-gradient(circle at 50% 82%,rgba(18,128,156,.22),transparent 43%);
-}
-body.appi-admin header.top .script{
-  background:linear-gradient(90deg,#0b5878,#27b5c4);
-  -webkit-background-clip:text;
-  background-clip:text;
-}
 body.appi-admin .glass,
 body.appi-admin .admin-card,
 body.appi-admin .admin-stat,

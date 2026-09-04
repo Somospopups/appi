@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v475-admin-dock';
+const CACHE_NAME = 'appi-v476-paleta-crema';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
