@@ -187,11 +187,11 @@
     {id:'mini', grupo:'Beber y cocinar', nombre:'Mini', precio:411000, litros:12000, meses:12, inst:'Sobre mesada',
       para:'Cocina chica u oficina, consumo bajo.',
       trata:'Cloro y sólidos en suspensión.',
-      tiene:['CAG','CAG con plata','Fipor n.° 3','Casquete 360°','Kit posventa']},
+      tiene:['CAG','CAG con plata','Fipor','Casquete 360°','Kit posventa']},
     {id:'vero', grupo:'Beber y cocinar', nombre:'Vero', precio:528000, litros:15000, meses:18, inst:'Sobre mesada',
       para:'Beber, cocinar y lavar alimentos al menor precio con KDF.',
       trata:'Cloro (más del 90 %), THM (más del 60 %), hierro y plomo.',
-      tiene:['CAG','CAG con plata','KDF','Resina mineral','Fipor n.° 3','Kit posventa']},
+      tiene:['CAG','CAG con plata','KDF','Resina mineral','Fipor','Kit posventa']},
     {id:'senior', grupo:'Beber y cocinar', nombre:'Senior', precio:751000, litros:36000, meses:36, inst:'Sobre mesada',
       para:'Uso diario de una familia, 3 años.',
       trata:'Cloro (más del 90 %), THM (más del 60 %), hierro y plomo.',
@@ -245,6 +245,32 @@
       trata:'Bacterias en agua de piscina, por ionización.',
       tiene:['Ionización','Panel solar']}
   ];
+  var CMP_QUE = {
+    'CAG': 'Carbón activado granular. Se queda con el cloro, el gusto a canilla y la materia orgánica. Es la base de casi todos los equipos de beber.',
+    'CAG con plata': 'El mismo carbón, impregnado en plata. La plata frena que se reproduzcan bacterias adentro del equipo cuando el agua queda quieta.',
+    'KDF': 'Aleación de cobre y zinc de alta pureza. Baja hierro, plomo y otros metales, refuerza la baja de cloro y THM, y colabora con el control bacteriostático.',
+    'Resina mineral': 'Ayuda a retener partículas sólidas y protege al KDF para que no se tape. El Vero la trae; el Mini no.',
+    'Fipor': 'Filtro de superficie grande que retiene sedimentos antes de que el agua entre a los medios. El kit posventa trae los recambios para toda la vida útil.',
+    'Casquete 360°': 'La canilla del equipo gira. Llenás una olla o una botella sin mover el cuerpo.',
+    'Kit posventa': 'Vienen los recambios (Fipor) para cubrir toda la vida útil. No hace falta comprarlos aparte.',
+    'Prefiltro': 'Una etapa extra arriba del cuerpo. Retiene tierra y partículas gruesas y alarga la vida de los medios de adentro.',
+    'Cartucho de repuesto': 'El Senior4 sale con un cartucho de recambio. Lo tenés para cuando toque el mantenimiento, sin salir a buscarlo.',
+    'Bajo mesada': 'Se puede instalar debajo de la mesada, con grifería PSA. La mesada queda libre; el agua sale por una canilla propia.',
+    'Cartucho bacteriostático': 'Cartucho con iones de plata que impide que se reproduzcan bacterias adentro. Se recambia cada 6 o 12 meses, según el equipo. El kit posventa cubre toda la vida útil.',
+    'Alto volumen': 'Pensado para sacar mucha agua, rápido: familia grande, oficina o uso intenso. Por eso rinde 80.000 litros.',
+    'Resina de arsénico': 'Resina selectiva de arsénico. Es lo que hace al Senik distinto: trata aguas con arsénico, además de cloro y metales. A más arsénico, menos litros rinde.',
+    'Resina de dureza': 'Resina de intercambio catiónico. Baja el sarro y la cal. El agua queda más blanda: menos incrustaciones en cafetera, termo y vajilla.',
+    'Ducha': 'Va en el brazo de la ducha, no en la cocina. Trata el agua con la que te bañás: piel, pelo y grifería.',
+    'Polifosfato': 'Neutraliza el sarro. En la ducha protege flor y caños; en el Poli 2 protege cañerías, termotanque y electrodomésticos de agua caliente.',
+    'Portátil': 'Se lleva. No se instala en la canilla de casa. Sirve de viaje o en la oficina, con agua de red.',
+    'Sedimentos': 'Retiene tierra, óxido y partículas gruesas que vienen del tanque o de las cañerías, antes de que lleguen al resto de la casa.',
+    'Soda': 'No purifica. Gasifica agua que ya pasó por un equipo PSA, para tener soda en casa.',
+    'Ionización': 'Suelta iones de cobre y plata en el agua de la pileta. Controla bacterias y algas y permite usar menos cloro.',
+    'Panel solar': 'Se alimenta con el sol. Después de la primera ionización, el panel mantiene la pileta sin enchufe.'
+  };
+  function cmpExplica(key){
+    return CMP_QUE[key] || key;
+  }
   function cmpGet(id){
     for (var i = 0; i < CMP.length; i++) if (CMP[i].id === id) return CMP[i];
     return CMP[0];
@@ -354,21 +380,46 @@
     }
     if (winU === 'a') relato.push('El litro de ' + a.nombre + ' sale ' + cmpMoney(la) + '; el de ' + b.nombre + ', ' + cmpMoney(lb) + '.');
     if (winU === 'b') relato.push('El litro de ' + b.nombre + ' sale ' + cmpMoney(lb) + '; el de ' + a.nombre + ', ' + cmpMoney(la) + '.');
-    if (da.length) relato.push(a.nombre + ' trae de distinto: ' + da.join(', ') + '.');
-    if (db.length) relato.push(b.nombre + ' trae de distinto: ' + db.join(', ') + '.');
-    if (!da.length && !db.length) relato.push('Los medios activos se parecen. La diferencia está en litros, meses o el precio.');
-    var conv = '';
-    if (a.grupo === b.grupo && winU) {
-      var barato = winU === 'a' ? a : b;
-      var caro = barato === a ? b : a;
-      conv = barato.nombre + ' conviene más en el tiempo: cada litro sale menos. ' + caro.nombre + ' puede ganar si el presupuesto de entrada es el techo.';
-    } else if (a.grupo === b.grupo && winP) {
-      var baratoE = winP === 'a' ? a : b;
-      conv = baratoE.nombre + ' pide menos plata de entrada (' + cmpMoney(baratoE === a ? pa : pb) + ').';
-    } else if (a.grupo !== b.grupo) {
-      conv = 'Cada uno cubre una necesidad distinta. La plata sirve para mostrar, no para elegir en lugar del otro.';
+    function cmpLista(nombre, keys){
+      if (!keys.length) return '';
+      return '<p class="cmp-h">' + esc(nombre) + ' trae de más</p><ul>' + keys.map(function(k){
+        return '<li><b>' + esc(k) + '.</b> ' + esc(cmpExplica(k)) + '</li>';
+      }).join('') + '</ul>';
+    }
+    var distHtml = '';
+    if (da.length || db.length) {
+      distHtml = cmpLista(a.nombre, da) + cmpLista(b.nombre, db);
     } else {
-      conv = 'En plata de entrada y en el litro quedan parejos. Ahí gana lo que la familia necesita (espacio, arsénico, sarro, volumen).';
+      distHtml = '<p>Los medios activos se parecen. La diferencia está en litros, meses o el precio.</p>';
+    }
+    var distTxt = [];
+    if (da.length) {
+      distTxt.push(a.nombre + ' trae de más:');
+      da.forEach(function(k){ distTxt.push('• ' + k + ': ' + cmpExplica(k)); });
+    }
+    if (db.length) {
+      distTxt.push(b.nombre + ' trae de más:');
+      db.forEach(function(k){ distTxt.push('• ' + k + ': ' + cmpExplica(k)); });
+    }
+    if (!distTxt.length) distTxt.push('Los medios activos se parecen. La diferencia está en litros, meses o el precio.');
+    var conv = 'El más barato no es siempre el que va. Primero el estudio del agua en ese domicilio: cloro, sarro, arsénico, pozo o red, cuánto usan y dónde hay lugar. Con eso se elige el que se adapta. La plata y el litro sirven para mostrar, no para decidir solos.';
+    if (a.grupo !== b.grupo) {
+      conv = a.nombre + ' y ' + b.nombre + ' no cubren lo mismo (' + a.grupo.toLowerCase() + ' vs ' + b.grupo.toLowerCase() + '). El estudio del agua en esa casa dice cuál hace falta. La plata acá es para ver, no para reemplazar uno con el otro.';
+    } else {
+      var extra = [];
+      if (a.id === 'senik' || b.id === 'senik') extra.push('Si hay arsénico, el Senik es el que lo trata; el otro no.');
+      if (a.id === 'quantum2' || b.id === 'quantum2') extra.push('Si el agua es dura (sarro), el Quantum·2 es el que ablanda; el otro no.');
+      if ((a.id === 'rinnova' && b.id === 'rinnova-poli') || (b.id === 'rinnova' && a.id === 'rinnova-poli')) {
+        extra.push('Las dos duchas bajan cloro. La KDF+Poli además frena el sarro en flor y caños.');
+      }
+      if (extra.length) conv = extra.join(' ') + ' ' + conv;
+      if (winU) {
+        var baratoL = winU === 'a' ? a : b;
+        conv += ' En el litro, ' + baratoL.nombre + ' sale menos: es un dato, no la recomendación.';
+      } else if (winP) {
+        var baratoE = winP === 'a' ? a : b;
+        conv += ' ' + baratoE.nombre + ' pide menos de entrada: es un dato, no la recomendación.';
+      }
     }
     out.innerHTML =
       '<div class="cmp-grid">' +
@@ -384,14 +435,16 @@
         '<tr><td>Dónde va</td><td>' + esc(a.inst) + '</td><td>' + esc(b.inst) + '</td></tr>' +
         '<tr><td>Qué trata</td><td>' + esc(a.trata) + '</td><td>' + esc(b.trata) + '</td></tr>' +
       '</table>' +
-      '<div class="cmp-box"><b>Qué trae distinto</b><ul>' + relato.map(function(x){ return '<li>' + esc(x) + '</li>'; }).join('') + '</ul></div>' +
+      (relato.length ? '<div class="cmp-box"><b>En números</b><ul>' + relato.map(function(x){ return '<li>' + esc(x) + '</li>'; }).join('') + '</ul></div>' : '') +
+      '<div class="cmp-box"><b>Qué trae distinto</b>' + distHtml + '</div>' +
       '<div class="cmp-box"><b>Conveniencia</b><p>' + esc(conv) + '</p></div>';
     window.__cmpTexto =
       '⚖️ ' + a.nombre + ' vs ' + b.nombre + '\n\n' +
       a.nombre + '\n• ' + litrosTxt(a) + ' · ' + mesesTxt(a) + '\n• ' + cmpMoney(pa) + (la != null ? ' · ' + cmpMoney(la) + ' el litro' : '') + '\n• ' + a.trata + '\n\n' +
       b.nombre + '\n• ' + litrosTxt(b) + ' · ' + mesesTxt(b) + '\n• ' + cmpMoney(pb) + (lb != null ? ' · ' + cmpMoney(lb) + ' el litro' : '') + '\n• ' + b.trata + '\n\n' +
-      'Qué cambia\n' + relato.map(function(x){ return '• ' + x; }).join('\n') + '\n\n' +
-      'Conveniencia\n' + conv;
+      (relato.length ? 'En números\n' + relato.map(function(x){ return '• ' + x; }).join('\n') + '\n\n' : '') +
+      'Qué trae distinto\n' + distTxt.join('\n') + '\n\n' +
+      'En esa casa\n' + conv;
   }
   function cmpMostrar(tab){
     try { localStorage.setItem(CMP_LS_TAB, tab); } catch (e) {}
