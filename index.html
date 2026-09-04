@@ -4163,7 +4163,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v454 · Segura</div>
+  <div class="ds-foot">APPI · v455 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -6314,7 +6314,8 @@ document.addEventListener('visibilitychange',()=>{
   if(document.getElementById('lockScreen')?.classList.contains('hidden'))liberarScrollCuerpo();
 });
 
-function showView(id){
+function showView(id,opts){
+  opts=opts||{};
   let target=document.getElementById(id);
   // Una llamada tardía de un módulo no debe dejar toda la aplicación en blanco.
   if(!target||!target.classList.contains('view')){
@@ -6327,6 +6328,14 @@ function showView(id){
     const perfilAdmin=window.APPIAuth&&window.APPIAuth.isEnabled&&window.APPIAuth.isEnabled()?window.APPIAuth.currentProfile():null;
     if(perfilAdmin&&perfilAdmin.rol==='admin'&&id!=='view-admin'){id='view-admin';target=document.getElementById(id)}
   }catch(e){}
+  const _cur=document.querySelector('.view.active');
+  const _curId=_cur&&_cur.id;
+  if(!opts.atras && _curId && _curId!==id && id!=='view-admin' && _curId!=='view-admin'){
+    const st=window._appiViewStack||(window._appiViewStack=[]);
+    if(st[st.length-1]!==_curId) st.push(_curId);
+    if(st.length>40) st.shift();
+    try{ history.pushState({appiVista:true,view:id,from:_curId},''); }catch(e){}
+  }
   liberarScrollCuerpo();
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   target.classList.add('active');
@@ -6368,7 +6377,34 @@ function showView(id){
   if(id==='view-seguimiento') try{ renderSeguimiento(); }catch(e){ console.error(e); }
   document.body.classList.toggle('evaluar-hint', id === 'view-wheel');
   window.scrollTo({top:0});
+  return true;
 }
+function irAtrasAPPI(){
+  if(window.APPIPanelAtras&&window.APPIPanelAtras.abiertos&&window.APPIPanelAtras.abiertos().length){
+    history.back(); return true;
+  }
+  if((window._appiViewStack||[]).length){ history.back(); return true; }
+  const cur=document.querySelector('.view.active');
+  if(cur&&cur.id!=='view-home'&&cur.id!=='view-admin'){ showView('view-home',{atras:true}); return true; }
+  return false;
+}
+window.irAtrasAPPI=irAtrasAPPI;
+window.addEventListener('popstate',function(){
+  if(window.APPIPanelAtras&&window.APPIPanelAtras.hayPendiente&&window.APPIPanelAtras.hayPendiente()) return;
+  const st=window._appiViewStack||[];
+  while(st.length){
+    const prev=st.pop();
+    const cur=document.querySelector('.view.active');
+    if(prev&&document.getElementById(prev)&&(!cur||prev!==cur.id)){ showView(prev,{atras:true}); return; }
+  }
+});
+document.addEventListener('click',function(e){
+  const b=e.target.closest&&e.target.closest('.back-btn');
+  if(!b) return;
+  e.preventDefault();
+  e.stopPropagation();
+  irAtrasAPPI();
+},true);
 
 /* ============ INDICADOR Y ANIMACIONES DE PÁGINAS ============ */
 (function(){
@@ -12252,8 +12288,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='454';
-      const CACHE_NAME='appi-v454-paginas-siempre';
+      const swVersion='455';
+      const CACHE_NAME='appi-v455-atras-uno';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 
