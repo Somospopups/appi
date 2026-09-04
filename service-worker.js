@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v453-buscadores';
+const CACHE_NAME = 'appi-v454-paginas-siempre';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "453.0.0",
-  "cacheName": "appi-v453-buscadores",
+  "version": "454.0.0",
+  "cacheName": "appi-v454-paginas-siempre",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

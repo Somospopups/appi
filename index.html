@@ -131,7 +131,7 @@ window.openStock=function(){
   <script src="./anuncios.js?v=436"></script>
 <style id="historico-inline-css">
 /* APPI · Histórico mensual */
-.hist-view{padding-bottom:calc(34px + env(safe-area-inset-bottom));}
+.hist-view{padding-bottom:calc(24px + env(safe-area-inset-bottom));}
 .hist-header{padding-bottom:12px!important;}
 .hist-statusbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 12px;padding:11px 13px;border-radius:16px;background:rgba(255,255,255,.64);border:1px solid rgba(255,255,255,.84);box-shadow:0 7px 20px rgba(65,75,120,.07)}
 .hist-statusbar>div{display:grid;grid-template-columns:10px minmax(0,1fr);column-gap:8px;align-items:center;min-width:0}.hist-statusbar strong{font-size:12px;color:#272736;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.hist-statusbar small{grid-column:2;font-size:10px;color:#777887;margin-top:1px}.hist-status-dot{width:9px;height:9px;border-radius:50%;background:#f5b301;box-shadow:0 0 0 4px rgba(245,179,1,.13)}.hist-status-dot.online{background:#3ad0a4;box-shadow:0 0 0 4px rgba(58,208,164,.14)}.hist-status-dot.error{background:#e95757;box-shadow:0 0 0 4px rgba(233,87,87,.14)}
@@ -614,6 +614,11 @@ body.dark .hist-action-drawer{background:linear-gradient(155deg,#151827,#252036 
     position: relative;
     touch-action: pan-y;
   }
+  @media (max-width:1023px){
+    body:not(.appi-admin):not(.appi-login-abierto) .app{
+      padding-bottom: calc(env(safe-area-inset-bottom) + 136px);
+    }
+  }
   body.appi-scroll-lock { overflow: hidden !important; }
   #modalOverlay:not(.open),
   .modal-overlay:not(.open):not(.membership-modal-overlay),
@@ -646,6 +651,7 @@ body.dark .hist-action-drawer{background:linear-gradient(155deg,#151827,#252036 
   body.appi-login-abierto .top-menu-btn {
     pointer-events: none !important;
   }
+  body.appi-login-abierto #pageTabs{display:none!important}
   #modalOverlay.open,
   .modal-overlay.open {
     display: flex !important;
@@ -1126,7 +1132,7 @@ body.dark .hist-action-drawer{background:linear-gradient(155deg,#151827,#252036 
 
   nav.tabs {
     position: fixed; left: 0; right: 0;
-    bottom: calc(env(safe-area-inset-bottom) + 12px);
+    bottom: calc(env(safe-area-inset-bottom) + 96px);
     margin: 0 auto; max-width: 360px;
     display: flex; justify-content: space-around;
     padding: 10px; border-radius: 999px;
@@ -4157,7 +4163,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v453 · Segura</div>
+  <div class="ds-foot">APPI · v454 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -6335,12 +6341,21 @@ function showView(id){
   });
   const hideTabsOn = ['view-home','view-siete','view-siete-detail','view-ocho','view-suenos','view-demo','view-botella','view-simulador','view-stock','view-presu','view-presu-hist','view-equipo','view-historico','view-seguimiento','view-planning','view-encuesta','view-gestion','view-grabadora','view-notas','view-usuarios','view-admin'];
   document.getElementById('tabs').style.display = (id==='view-wheel'||id==='view-eval') ? 'flex' : 'none';
+  const _pageHub={
+    'view-home':'view-home',
+    'view-mes':'view-mes','view-siete':'view-mes','view-siete-detail':'view-mes','view-presu':'view-mes','view-presu-hist':'view-mes','view-wheel':'view-mes','view-eval':'view-mes','view-planning':'view-mes',
+    'view-negocio':'view-negocio','view-equipo':'view-negocio','view-historico':'view-negocio','view-usuarios':'view-negocio','view-seguimiento':'view-negocio','view-gestion':'view-negocio',
+    'view-herramientas':'view-herramientas','view-stock':'view-herramientas','view-ocho':'view-herramientas','view-suenos':'view-herramientas','view-demo':'view-herramientas','view-botella':'view-herramientas','view-simulador':'view-herramientas','view-grabadora':'view-herramientas','view-notas':'view-herramientas','view-encuesta':'view-herramientas'
+  };
+  const _hub=_pageHub[id]||'view-home';
   const _isPage = ['view-home','view-mes','view-negocio','view-herramientas'].includes(id);
-  const pt=document.getElementById('pageTabs'); if(pt) pt.style.display = _isPage ? 'flex' : 'none';
-  document.querySelectorAll('#pageTabs button').forEach(b=>b.classList.toggle('active', b.dataset.view===id));
+  const pt=document.getElementById('pageTabs');
+  const _hidePt = id==='view-admin' || document.body.classList.contains('appi-login-abierto') || document.body.classList.contains('appi-admin');
+  if(pt) pt.style.display = _hidePt ? 'none' : 'flex';
+  document.querySelectorAll('#pageTabs button').forEach(b=>b.classList.toggle('active', b.dataset.view===_hub));
   const _pageIdx = {'view-home':0,'view-mes':1,'view-negocio':2,'view-herramientas':3};
   // Mover indicador deslizante
-  if(_isPage && typeof window._movePageIndicator==='function') setTimeout(()=>window._movePageIndicator(_pageIdx[id]), 50);
+  if(!_hidePt && typeof window._movePageIndicator==='function') setTimeout(()=>window._movePageIndicator(_pageIdx[_hub]||0), 50);
   // Animar título de entrada
   if(_isPage){
     const el = document.getElementById(id);
@@ -12237,8 +12252,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='453';
-      const CACHE_NAME='appi-v453-buscadores';
+      const swVersion='454';
+      const CACHE_NAME='appi-v454-paginas-siempre';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 
@@ -12545,7 +12560,7 @@ body.dark .presu-select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:
   /* --- Tabs inferiores: visibles solo donde la app las necesita (Rueda → Evaluar) ---
      El JS de showView pone display:flex inline solo para view-wheel/view-eval.
      Sin !important, el inline del JS manda. */
-  nav.tabs{position:fixed; left:50%; transform:translateX(-50%); bottom:calc(env(safe-area-inset-bottom) + 14px); z-index:120; max-width:380px}
+  nav.tabs{position:fixed; left:50%; transform:translateX(-50%); bottom:calc(env(safe-area-inset-bottom) + 96px); z-index:120; max-width:380px}
 
   /* --- Grillas adaptativas --- */
   .home-tool-grid{grid-template-columns:repeat(4, minmax(0,1fr)); gap:14px}
