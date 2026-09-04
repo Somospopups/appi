@@ -4219,7 +4219,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v472 · Segura</div>
+  <div class="ds-foot">APPI · v473 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4500,7 +4500,7 @@ body.dark #pageTabs button.active{color:#c5d6ff}
       <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
 
       <div class="home-brand-row">
-        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · v472</span></span>
+        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · v473</span></span>
       </div>
 
       <div class="home-hero-card">
@@ -12329,8 +12329,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='472';
-      const CACHE_NAME='appi-v472-cumples-usuarios';
+      const swVersion='473';
+      const CACHE_NAME='appi-v473-cumples-pulido';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · v'+swVersion;
       const hadController=Boolean(navigator.serviceWorker.controller);
@@ -15225,14 +15225,26 @@ function abrirCumplesUsuarios(){
   if(!lista.length){
     cuerpo.innerHTML='<div class="uc-vacio">Este mes no hay cumpleaños en el archivo.</div>';
   } else {
+    lista.sort((a,b)=>{
+      const ha=a.ymd.d===hoy, hb=b.ymd.d===hoy;
+      if(ha!==hb) return ha?-1:1;
+      return a.ymd.d-b.ymd.d || String(a.u.usuario||'').localeCompare(String(b.u.usuario||''),'es');
+    });
+    const telDe=(u)=>{
+      const c=u&&(u.telf||u.tel||'');
+      if(window.APPITel&&window.APPITel.primeroValido) return window.APPITel.primeroValido(c)||'';
+      return String(c).replace(/\D/g,'').length>=8?c:'';
+    };
     cuerpo.innerHTML=lista.map(({u,ymd})=>{
       const esHoy=ymd.d===hoy;
-      const nom=escU((typeof nombreDePila==='function'?nombreDePila(u.usuario):'')||u.usuario||'');
+      const nom=escU(u.usuario||'');
       const meta=escU([u.localidad,u.producto].filter(Boolean).join(' · '));
+      const tel=telDe(u);
+      const wa=tel?'<button type="button" class="uc-wa" data-uc-id="'+escU(String(u.id))+'" aria-label="WhatsApp">💬</button>':'<span></span>';
       return '<div class="uc-item'+(esHoy?' hoy':'')+'">'+
         '<div class="uc-day"><b>'+ymd.d+'</b><span>'+(esHoy?'HOY':cortos[mes])+'</span></div>'+
         '<div><div class="uc-name">'+nom+'</div>'+(meta?'<div class="uc-meta">'+meta+'</div>':'')+'</div>'+
-        '<button type="button" class="uc-wa" data-uc-id="'+escU(String(u.id))+'" aria-label="WhatsApp">💬</button>'+
+        wa+
       '</div>';
     }).join('');
     cuerpo.querySelectorAll('.uc-wa').forEach(b=>{
