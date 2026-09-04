@@ -3293,6 +3293,14 @@ body.dark .admin-login-card{background:#242638}body.dark .admin-login-card h2{co
     font-weight: 950;
     letter-spacing: 1.2px;
   }
+  .home-brand-ver { display: none; }
+  @media (max-width: 1023px) {
+    .home-brand-ver {
+      display: inline;
+      letter-spacing: 0.35px;
+      font-weight: 800;
+    }
+  }
   .home-hero-card {
     position: relative;
     overflow: hidden;
@@ -4211,7 +4219,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v469 · Segura</div>
+  <div class="ds-foot">APPI · v470 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4492,7 +4500,7 @@ body.dark #pageTabs button.active{color:#c5d6ff}
       <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
 
       <div class="home-brand-row">
-        <span class="home-brand-mark">APPI</span>
+        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · v470</span></span>
       </div>
 
       <div class="home-hero-card">
@@ -12281,8 +12289,10 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='469';
-      const CACHE_NAME='appi-v469-atras';
+      const swVersion='470';
+      const CACHE_NAME='appi-v470-ver-home';
+      const _hv=document.getElementById('homeAppVer');
+      if(_hv) _hv.textContent=' · v'+swVersion;
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 
