@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v462-ranking-wa';
+const CACHE_NAME = 'appi-v463-ranking-hold';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
