@@ -150,7 +150,7 @@
   }
   function htmlBotella(){
     return '<div class="tb-card" style="margin:10px 2px">' +
-      '<div class="tb-title"> La comparativa de la botella</div>' +
+      '<div class="tb-title">Comparativas</div>' +
       '<div class="tb-sub">Mostrala en la demo: la plata y el planeta despiertan conciencia</div>' +
       '<div class="tb-row"><span>Botellas de 2 L por día</span><input class="tb-input" style="max-width:90px" id="botPorDia" type="number" min="1" max="40" value="2"></div>' +
       '<div class="tb-row"><span>Precio por botella ($)</span><input class="tb-input" style="max-width:120px" id="botPrecio" type="number" min="0" step="50" value="1500"></div>' +
@@ -340,7 +340,7 @@
     var app = document.querySelector('.app');
     var s1 = document.createElement('section');
     s1.id = 'view-botella'; s1.className = 'view';
-    s1.innerHTML = '<header class="top"><button class="back-btn" onclick="history.back()" aria-label="Volver">‹</button><button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button><h1>La botella</h1><div class="script">conciencia</div></header><div id="botellaCont"></div>';
+    s1.innerHTML = '<header class="top"><button class="back-btn" onclick="history.back()" aria-label="Volver">‹</button><button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button><h1>Comparativas</h1><div class="script">conciencia</div></header><div id="botellaCont"></div>';
     app.appendChild(s1);
     var s2 = document.createElement('section');
     s2.id = 'view-simulador'; s2.className = 'view';

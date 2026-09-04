@@ -108,7 +108,7 @@ window.openStock=function(){
 <script src="./js/membership-admin.js?v=451"></script>
 <script src="./admin-panel.js?v=452"></script>
 <link rel="stylesheet" href="./css/membership-admin.css">
-<link rel="stylesheet" href="./appi-tema.css?v=477">
+<link rel="stylesheet" href="./appi-tema.css?v=478">
 <script src="./account-request.js"></script>
 <script src="./qr-code.js"></script>
 <script src="./gestion-client.js"></script>
@@ -4214,12 +4214,12 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-ocho" onclick="openOcho()"><span>🧭</span> Los 8 Pasos</button>
     <button class="ds-btn" data-ds="view-suenos" onclick="openSuenos()"><span>🪜</span> Escalera de Sueños</button>
     <button class="ds-btn" data-ds="view-demo" onclick="openDemo()"><span>🎯</span> Coach de Demo</button>
-    <button class="ds-btn" data-ds="view-botella" onclick="openBotella()"><span>🍾</span> Botella</button>
+    <button class="ds-btn" data-ds="view-botella" onclick="openBotella()"><span>🍾</span> Comparativas</button>
     <button class="ds-btn" data-ds="view-simulador" onclick="openCalculadora()"><span>🧮</span> Simulador</button>
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v477 · Segura</div>
+  <div class="ds-foot">APPI · v478 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4500,7 +4500,7 @@ body.dark #pageTabs button.active{color:#c5d6ff}
       <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
 
       <div class="home-brand-row">
-        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · v477</span></span>
+        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · v478</span></span>
       </div>
 
       <div class="home-hero-card">
@@ -5854,7 +5854,7 @@ const HELP = {
     • Termómetro de decisión y laboratorio de objeciones<br/>
     Mantiene los 4 momentos: conciencia, comparativa, sistema, cierre y seguimiento. No registra la presentación ni datos de la persona.</div>
 
-    <div class="tip"><strong>🍶 LA BOTELLA</strong><br/>
+    <div class="tip"><strong>🍶 COMPARATIVAS</strong><br/>
     Herramienta de conciencia para la demo. Mostrá cuánto gasta una familia en botellas de 2L y qué le ahorra al planeta:<br/>
     • Por día, por mes, por año, en 3 años<br/>
     • Kilos de plástico, metros cuadrados, años de descomposición y petróleo<br/>
@@ -5888,7 +5888,7 @@ const HELP = {
     Todo queda en tu dispositivo.</div>
 
     <div class="tip"><strong>💡 CONSEJO</strong><br/>
-    Usá Los 8 Pasos como guía mensual. La Escalera de Sueños releela cuando el día se ponga difícil. La Guía de Demo y La Botella son tus mejores aliadas en las presentaciones.</div>`
+    Usá Los 8 Pasos como guía mensual. La Escalera de Sueños releela cuando el día se ponga difícil. La Guía de Demo y Comparativas son tus mejores aliadas en las presentaciones.</div>`
   },
   ocho: {
     icon:'🧭', iconBg:'linear-gradient(135deg,#5b8def,#3ad0a4)',
@@ -5962,7 +5962,7 @@ const HELP = {
     • <strong>Los 8 Pasos</strong> — el ciclo completo del negocio<br/>
     • <strong>Escalera de Sueños</strong> — tu combustible emocional<br/>
     • <strong>Coach Comercial de Demo</strong> — guiones, preguntas y objeciones en vivo<br/>
-    • <strong>La Botella</strong> — herramienta de conciencia para la demo<br/>
+    • <strong>Comparativas</strong> — herramienta de conciencia para la demo<br/>
     • <strong>Simulador</strong> — calculá cuánto podés ganar<br/>
     • <strong>Mi stock</strong> — lo que tenés en casa y lo que prestaste<br/>
     • <strong>Grabadora</strong> — grabá ideas y reuniones<br/>
@@ -11192,7 +11192,7 @@ function renderToolsList(){
       timeAgo:'Guiones + objeciones', onClick:'openDemo()', accent:'#ff6b9d', gradient:'linear-gradient(135deg,#ff8f6b,#ff6b9d)'
     });
     const h4 = renderHomeQuickCard({
-      icon:'🍾', title:'Botella', sub:'Dinámica de presentación',
+      icon:'🍾', title:'Comparativas', sub:'Dinámica de presentación',
       statusVal:'Juego', statusClass:'pending', progressPct:100,
       timeAgo:'Interactivo', onClick:'openBotella()', accent:'#3ad0a4', gradient:'linear-gradient(135deg,#3ad0a4,#5b8def)'
     });
@@ -11258,7 +11258,7 @@ function openBotella(){
   if(typeof window.abrirBotella === 'function') {
     window.abrirBotella();
   } else {
-    if(typeof showToast==='function') showToast('🍾 Botella no disponible', 2000);
+    if(typeof showToast==='function') showToast('🍾 Comparativas no disponible', 2000);
   }
 }
 function openCalculadora(){
@@ -12370,8 +12370,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='477';
-      const CACHE_NAME='appi-v477-impulso';
+      const swVersion='478';
+      const CACHE_NAME='appi-v478-comparativas-admin';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · v'+swVersion;
       const hadController=Boolean(navigator.serviceWorker.controller);
@@ -16658,6 +16658,6 @@ setTimeout(initHistorico,1200);
 })();
 </script>
 
-<link rel="stylesheet" href="./appi-tema.css?v=477">
+<link rel="stylesheet" href="./appi-tema.css?v=478">
 </body>
 </html>

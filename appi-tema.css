@@ -42,9 +42,18 @@ body.dark::before{
     radial-gradient(circle at 86% 28%, rgba(40,38,52,.5), transparent 48%) !important;
 }
 
-/* Admin: ya era familia del acento; se deja el agua, tarjetas claras */
+/* Admin: misma crema y azul que APPI */
 body.appi-admin{
-  background:linear-gradient(180deg,#5ee0df 0%,#27b5c4 8%,#12809c 29%,#0b5878 58%,#063652 82%,#041f37 100%);
+  background:#f3eee3 !important;
+}
+body.appi-admin::before{
+  background:
+    radial-gradient(circle at 18% 12%, rgba(11,88,120,.06), transparent 42%),
+    radial-gradient(circle at 86% 28%, rgba(243,238,227,.9), transparent 48%) !important;
+}
+body.appi-admin.dark,
+body.dark.appi-admin{
+  background:#16161e !important;
 }
 
 /* ---------- vidrio → crema ---------- */
@@ -212,23 +221,23 @@ body.appi-admin .admin-user-row,
 body.appi-admin .admin-cump-item,
 body.appi-admin .admin-quick .q,
 body.appi-admin .revenue-stats{
-  background:#fff !important;
+  background:#f7f3ea !important;
   -webkit-backdrop-filter:none !important;
   backdrop-filter:none !important;
-  border:0 !important;
-  box-shadow:0 10px 28px rgba(4,31,55,.14) !important;
+  border:1px solid rgba(40,36,28,.10) !important;
+  box-shadow:0 8px 22px rgba(30,24,12,.08) !important;
 }
 .admin-hero{
-  background:linear-gradient(150deg,#27b5c4,#0b5878 70%,#063652);
-  box-shadow:0 14px 34px rgba(11,88,120,.28);
+  background:linear-gradient(150deg,#1278a0,#0b5878 58%,#063652) !important;
+  box-shadow:0 14px 34px rgba(11,88,120,.28) !important;
 }
 .admin-top-lock,
 .admin-login-icon{
-  background:linear-gradient(135deg,#27b5c4,#0b5878);
+  background:#0b5878 !important;
   box-shadow:0 10px 24px rgba(11,88,120,.25);
 }
 .admin-login-overlay{
-  background:linear-gradient(180deg,#5ee0df 0%,#27b5c4 8%,#12809c 29%,#0b5878 58%,#063652 82%,#041f37 100%);
-  backdrop-filter:none;
-  -webkit-backdrop-filter:none;
+  background:#f3eee3 !important;
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
 }

@@ -71,7 +71,7 @@
         'Si este hábito siguiera igual durante un año, ¿qué impacto tendría?'
       ],
       signals: 'Cuando pregunta por plazos, inversión, mantenimiento o uso, ya está evaluando una alternativa concreta.',
-      tip: 'Usá La Botella con cifras que la persona te dio. Un número propio es más potente que diez datos genéricos.',
+      tip: 'Usá Comparativas con cifras que la persona te dio. Un número propio es más potente que diez datos genéricos.',
       avoid: 'No ataques otras opciones ni inventes ahorros: compará con transparencia.'
     },
     {
@@ -300,7 +300,7 @@
     var qIndex = state.questions[i];
     var focus = focusData();
     var actionExtra = '';
-    if (i === 1) actionExtra = '<button type="button" class="demo-bottle" data-demo-bottle>🍾 Abrir La Botella</button>';
+    if (i === 1) actionExtra = '<button type="button" class="demo-bottle" data-demo-bottle>🍾 Abrir Comparativas</button>';
     if (i === 3) actionExtra = '<button type="button" class="demo-objection-open" data-demo-objections>🛡 Ver objeciones</button>';
     var nextLabel = i < 3 ? 'Listo, seguir a ' + PASOS_DEMO[i + 1].t + ' →' : 'Completar el recorrido ✓';
     return '<article class="demo-paso ' + (open ? 'active ' : '') + (state.done[i] ? 'done' : '') + '" data-demo-step="' + i + '">' +
@@ -431,7 +431,7 @@
     if (event.target.closest('[data-demo-objection-back]')) { showObjectionList(); return; }
     if (event.target.closest('[data-demo-bottle]')) {
       if (typeof window.openBotella === 'function') window.openBotella();
-      else if (typeof window.showToast === 'function') window.showToast('La Botella no está disponible en este momento.', 2200);
+      else if (typeof window.showToast === 'function') window.showToast('Comparativas no está disponible en este momento.', 2200);
       return;
     }
     if (event.target.closest('[data-demo-reset]')) {
