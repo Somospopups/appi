@@ -4219,7 +4219,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v471 · Segura</div>
+  <div class="ds-foot">APPI · v472 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4500,7 +4500,7 @@ body.dark #pageTabs button.active{color:#c5d6ff}
       <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
 
       <div class="home-brand-row">
-        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · v471</span></span>
+        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · v472</span></span>
       </div>
 
       <div class="home-hero-card">
@@ -5071,6 +5071,7 @@ body.dark #pageTabs button.active{color:#c5d6ff}
         <button type="button" id="usuariosBtnMensajes"><span class="u-wa-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path fill="#25D366" d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2zm.01 1.67c2.2 0 4.26.86 5.82 2.42a8.19 8.19 0 0 1 2.41 5.83c0 4.54-3.7 8.23-8.24 8.23-1.48 0-2.93-.39-4.19-1.15l-.3-.17-3.12.82.83-3.04-.2-.32a8.2 8.2 0 0 1-1.26-4.38c0-4.54 3.7-8.24 8.25-8.24z"/><path fill="#25D366" d="M9.79 7.54c-.2 0-.52.07-.79.37-.26.3-1.02 1-1.02 2.43s1.04 2.82 1.19 3.01c.15.2 2.03 3.25 5.01 4.43 2.48.98 2.98.79 3.52.74.54-.05 1.73-.7 1.97-1.38.24-.67.24-1.25.17-1.37-.07-.12-.26-.2-.54-.35-.28-.15-1.73-.85-2-.95-.27-.1-.46-.15-.66.15s-.76.95-.93 1.14c-.17.2-.34.22-.63.07-.28-.14-1.2-.44-2.29-1.4-.85-.75-1.42-1.69-1.58-1.97-.17-.28-.02-.43.13-.58.13-.13.28-.34.43-.51.14-.17.19-.29.28-.48.1-.2.05-.36-.02-.51-.08-.14-.65-1.57-.9-2.15-.23-.55-.48-.48-.66-.48z"/></svg></span>Mensajes</button>
         <button type="button" id="usuariosBtnCambiarArchivo"><span>📂</span>Cambiar archivo</button>
         <button type="button" id="usuariosBtnDepurados"><span>🧹</span>Depurados</button>
+        <button type="button" id="usuariosBtnCumples"><span>🎂</span>Cumpleaños</button>
         <!-- Aparece sólo con un filtro puesto. -->
         <button type="button" id="usuariosBtnLimpiar" class="limpiar" hidden><span>🧹</span>Limpiar</button>
       </div>
@@ -12328,8 +12329,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='471';
-      const CACHE_NAME='appi-v471-fechas-cumple';
+      const swVersion='472';
+      const CACHE_NAME='appi-v472-cumples-usuarios';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · v'+swVersion;
       const hadController=Boolean(navigator.serviceWorker.controller);
@@ -13733,7 +13734,31 @@ body.dark .hist-search input::placeholder{color:#f0d78a!important}
 .u-tools button[hidden]{display:none}
 /* Con seis o más botones se apretarían: pasan a tres por fila. */
 .u-tools:has(#usuariosBtnLimpiar:not([hidden])),
-.u-tools:has(#usuariosBtnDormidos){grid-template-columns:repeat(3,1fr)}
+.u-tools:has(#usuariosBtnDormidos),
+.u-tools:has(#usuariosBtnCumples){grid-template-columns:repeat(3,1fr)}
+.uc-ov{position:fixed;inset:0;z-index:10060;display:none;background:rgba(24,26,42,.46);backdrop-filter:blur(5px)}
+.uc-ov.open{display:flex;align-items:flex-end;justify-content:center}
+.uc-panel{width:min(520px,100%);max-height:86vh;overflow:auto;padding:18px 16px 28px;border-radius:22px 22px 0 0;
+  background:linear-gradient(165deg,#f7f3ea,#fff);box-shadow:0 -18px 50px rgba(30,35,75,.2);box-sizing:border-box}
+.uc-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px}
+.uc-top h2{margin:0;color:#292938;font-size:18px}
+.uc-top p{margin:4px 0 0;color:#777887;font-size:12px;font-weight:700}
+.uc-close{width:36px;height:36px;border:0;border-radius:12px;background:rgba(80,90,130,.1);color:#555;font-size:22px;cursor:pointer}
+.uc-item{display:grid;grid-template-columns:46px minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 10px;margin-bottom:8px;
+  border:1px solid rgba(80,90,130,.1);border-radius:14px;background:rgba(255,255,255,.78)}
+.uc-item.hoy{border-color:rgba(29,122,92,.28);background:rgba(58,208,164,.12)}
+.uc-day{text-align:center}
+.uc-day b{display:block;color:#3d63c9;font-size:18px;line-height:1}
+.uc-day span{color:#8a8a94;font-size:9px;font-weight:900;letter-spacing:.3px;text-transform:uppercase}
+.uc-item.hoy .uc-day b{color:#1d7a5c}
+.uc-name{color:#292938;font-size:14px;font-weight:800}
+.uc-meta{margin-top:2px;color:#777887;font-size:11px}
+.uc-wa{min-width:42px;height:42px;border:0;border-radius:12px;background:rgba(37,211,102,.14);color:#128c4a;font-size:18px;cursor:pointer}
+.uc-vacio{padding:22px 8px;color:#777887;font-size:13px;font-weight:700;text-align:center}
+body.dark .uc-panel{background:linear-gradient(165deg,#171b29,#24263a)}
+body.dark .uc-top h2,body.dark .uc-name{color:#f0f0f5}
+body.dark .uc-item{background:rgba(35,36,54,.9);border-color:rgba(255,255,255,.08)}
+@media(min-width:700px){.uc-ov.open{align-items:center}.uc-panel{border-radius:22px;max-height:80vh}}
 body.dark .u-tools button{background:rgba(31,32,49,.74);border-color:rgba(255,255,255,.08);color:#c9cad6}
 body.dark .u-tools button.activo{background:linear-gradient(135deg,#5b8def,#a06bff);color:#fff}
 @media(min-width:600px){.u-tools{gap:8px}.u-tools button{font-size:10.5px;min-height:66px}}
@@ -15152,6 +15177,77 @@ function mostrarDashboardU(){
   if(window.APPITarjetas&&window.APPITarjetas.montarBarraUsuarios) window.APPITarjetas.montarBarraUsuarios();
   aplicarFiltrosU();
 }
+function cumplesDelMesU(){
+  const mes=new Date().getMonth()+1;
+  const seen=new Set();
+  const out=[];
+  (usuariosU||[]).forEach(u=>{
+    const ymd=typeof ymdDesdeCelda==='function' ? ymdDesdeCelda(u&&(u.cumpleRaw||u.cumple||'')) : null;
+    if(!ymd || ymd.m!==mes) return;
+    const k=String(u.nombreNorm||u.usuario||'')+'|'+ymd.d;
+    if(seen.has(k)) return;
+    seen.add(k);
+    out.push({u, ymd});
+  });
+  out.sort((a,b)=>a.ymd.d-b.ymd.d || String(a.u.usuario||'').localeCompare(String(b.u.usuario||''),'es'));
+  return out;
+}
+function overlayCumplesU(){
+  let ov=document.getElementById('ucOverlay');
+  if(ov) return ov;
+  ov=document.createElement('div');
+  ov.id='ucOverlay';
+  ov.className='uc-ov';
+  ov.innerHTML='<div class="uc-panel" role="dialog" aria-modal="true" aria-labelledby="ucTitulo">'+
+    '<div class="uc-top"><div><h2 id="ucTitulo">Cumpleaños</h2><p id="ucSub"></p></div>'+
+    '<button type="button" class="uc-close" id="ucCerrar" aria-label="Cerrar">×</button></div>'+
+    '<div id="ucCuerpo"></div></div>';
+  document.body.appendChild(ov);
+  ov.addEventListener('click',e=>{ if(e.target===ov) cerrarCumplesUsuarios(); });
+  ov.querySelector('#ucCerrar').onclick=()=>cerrarCumplesUsuarios();
+  return ov;
+}
+function cerrarCumplesUsuarios(){
+  const ov=document.getElementById('ucOverlay');
+  if(ov) ov.classList.remove('open');
+  if(window.liberarScrollCuerpo) try{ window.liberarScrollCuerpo(); }catch(e){}
+}
+function abrirCumplesUsuarios(){
+  const ov=overlayCumplesU();
+  const mes=new Date().getMonth();
+  const meses=(typeof MONTHS!=='undefined'?MONTHS:['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']);
+  const cortos=(typeof MONTHS_SHORT!=='undefined'?MONTHS_SHORT:['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC']);
+  const lista=cumplesDelMesU();
+  const hoy=new Date().getDate();
+  ov.querySelector('#ucTitulo').textContent='Cumpleaños de '+meses[mes];
+  ov.querySelector('#ucSub').textContent=lista.length?(lista.length===1?'1 usuario este mes':lista.length+' usuarios este mes'):'Nadie cumple este mes';
+  const cuerpo=ov.querySelector('#ucCuerpo');
+  if(!lista.length){
+    cuerpo.innerHTML='<div class="uc-vacio">Este mes no hay cumpleaños en el archivo.</div>';
+  } else {
+    cuerpo.innerHTML=lista.map(({u,ymd})=>{
+      const esHoy=ymd.d===hoy;
+      const nom=escU((typeof nombreDePila==='function'?nombreDePila(u.usuario):'')||u.usuario||'');
+      const meta=escU([u.localidad,u.producto].filter(Boolean).join(' · '));
+      return '<div class="uc-item'+(esHoy?' hoy':'')+'">'+
+        '<div class="uc-day"><b>'+ymd.d+'</b><span>'+(esHoy?'HOY':cortos[mes])+'</span></div>'+
+        '<div><div class="uc-name">'+nom+'</div>'+(meta?'<div class="uc-meta">'+meta+'</div>':'')+'</div>'+
+        '<button type="button" class="uc-wa" data-uc-id="'+escU(String(u.id))+'" aria-label="WhatsApp">💬</button>'+
+      '</div>';
+    }).join('');
+    cuerpo.querySelectorAll('.uc-wa').forEach(b=>{
+      b.onclick=()=>{
+        const id=b.getAttribute('data-uc-id');
+        const u=(usuariosU||[]).find(x=>String(x.id)===String(id));
+        if(!u) return;
+        if(window.APPIMensajes&&window.APPIMensajes.mandar) window.APPIMensajes.mandar('cumple', u);
+        else if(window.APPIDialog) window.APPIDialog.alert('No hay un mensaje de cumpleaños listo para esta persona.',{title:'Cumpleaños',icon:'🎂'});
+      };
+    });
+  }
+  ov.classList.add('open');
+  if(window.bloquearScrollCuerpo) try{ window.bloquearScrollCuerpo(); }catch(e){}
+}
 function initUsuarios(){
   if(initUsuarios._initialized) return;
   initUsuarios._initialized=true;
@@ -15317,6 +15413,8 @@ function initUsuarios(){
   if(btnMensajes) btnMensajes.onclick=()=>{
     if(window.APPIMensajes&&window.APPIMensajes.abrirPlantillas) window.APPIMensajes.abrirPlantillas();
   };
+  const btnCumples=document.getElementById('usuariosBtnCumples');
+  if(btnCumples) btnCumples.onclick=()=>abrirCumplesUsuarios();
 
   // Cargar de localStorage
   try{

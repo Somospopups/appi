@@ -20,6 +20,7 @@
   var PANELES = [
     '#ubOverlay',              // Zonas y Tarjetas de Usuarios
     '#muOverlay',              // plantillas de mensajes
+    '#ucOverlay',              // cumpleaños del mes en Usuarios
     '#reOverlay',              // reactivación de clientes dormidos
     '#tpOverlay',              // elegir marca y banco de una tarjeta
     '#histDetailOverlay',      // detalle del Histórico

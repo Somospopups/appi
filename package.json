@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "471.0.0",
-  "cacheName": "appi-v471-fechas-cumple",
+  "version": "472.0.0",
+  "cacheName": "appi-v472-cumples-usuarios",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {
