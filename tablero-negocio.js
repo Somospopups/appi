@@ -87,7 +87,39 @@
       'body.dark .bot-eco-item small{color:#a9c4b8}' +
       '.bot-eco-nota{margin:12px 0 0;color:#2d4a3e;font-size:12px;font-weight:750;line-height:1.45}' +
       'body.dark .bot-eco-nota{color:#cfe8dc}' +
-      '@media (min-width:1024px){.bot-eco-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}';
+      '@media (min-width:1024px){.bot-eco-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}' +
+      '.cmp-tabs{display:flex;gap:8px;margin:8px 0 12px}' +
+      '.cmp-tab{flex:1;min-height:44px;border:0;border-radius:14px;background:#efe8d8;color:#2a2a32;font:inherit;font-size:13px;font-weight:850;cursor:pointer}' +
+      '.cmp-tab.on{background:#0b5878;color:#fff}' +
+      'body.dark .cmp-tab{background:#2a2d40;color:#e8e8f0}' +
+      'body.dark .cmp-tab.on{background:#0b5878;color:#fff}' +
+      '.cmp-pick{display:grid;gap:8px;margin:0 0 12px}' +
+      '.cmp-pick .tb-input + .tb-input{margin-top:6px}' +
+      '.cmp-pick label{display:block;margin:0 0 4px;font-size:10px;font-weight:850;letter-spacing:.4px;text-transform:uppercase;color:#686977}' +
+      '.cmp-pick select + label{margin-top:8px}' +
+      '.cmp-swap{width:100%;min-height:36px;border:0;border-radius:12px;background:#efe8d8;color:#0b5878;font:inherit;font-size:13px;font-weight:850;cursor:pointer}' +
+      'body.dark .cmp-swap{background:#2a2d40;color:#8ec4d8}' +
+      '.cmp-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 0 12px}' +
+      '.cmp-card{padding:12px;border-radius:14px;background:#f7f3ea;border:1px solid rgba(11,88,120,.12)}' +
+      'body.dark .cmp-card{background:#1d2130;border-color:rgba(255,255,255,.08)}' +
+      '.cmp-card h3{margin:0 0 2px;font-size:15px;font-weight:950;color:#0b5878}' +
+      'body.dark .cmp-card h3{color:#8ec4d8}' +
+      '.cmp-card p{margin:0 0 8px;font-size:11px;font-weight:700;color:#686977;line-height:1.35}' +
+      '.cmp-card .tb-input{margin-top:6px}' +
+      '.cmp-table{width:100%;border-collapse:collapse;font-size:12px}' +
+      '.cmp-table th{text-align:left;padding:8px 6px;color:#0b5878;font-size:11px}' +
+      '.cmp-table td{padding:8px 6px;border-top:1px solid rgba(11,88,120,.12);vertical-align:top;font-weight:750;color:#343441}' +
+      'body.dark .cmp-table td{color:#e8e8f0;border-color:rgba(255,255,255,.08)}' +
+      '.cmp-win{color:#0b5878;font-weight:950}' +
+      '.cmp-box{margin:10px 0 0;padding:12px;border-radius:14px;background:#f7f3ea;border:1px solid rgba(11,88,120,.12)}' +
+      'body.dark .cmp-box{background:#1d2130}' +
+      '.cmp-box b{display:block;margin:0 0 6px;color:#0b5878;font-size:12px}' +
+      '.cmp-box p,.cmp-box li{margin:0 0 6px;font-size:12.5px;font-weight:700;color:#343441;line-height:1.4}' +
+      'body.dark .cmp-box p,body.dark .cmp-box li{color:#e8e8f0}' +
+      '.cmp-box ul{margin:0;padding-left:18px}' +
+      '.cmp-btn{width:100%;margin-top:12px;border:0;border-radius:12px;padding:12px 14px;background:#0b5878;color:#fff;font:inherit;font-size:13px;font-weight:900;cursor:pointer}' +
+      '.cmp-note{margin:8px 0 0;font-size:10.5px;font-weight:700;color:#686977;line-height:1.35}' +
+      '@media (max-width:420px){.cmp-grid{grid-template-columns:1fr}}';
     document.head.appendChild(s);
   }
 
@@ -148,17 +180,271 @@
     if (m2 < 7140) return 'como ' + botFmt(m2 / 261, 1) + ' canchas de tenis';
     return 'como ' + botFmt(m2 / 7140, 1) + ' canchas de fútbol';
   }
-  function htmlBotella(){
-    return '<div class="tb-card" style="margin:10px 2px">' +
-      '<div class="tb-title">Comparativas</div>' +
-      '<div class="tb-sub">Mostrala en la demo: la plata y el planeta despiertan conciencia</div>' +
+  var CMP_LS_TAB = 'appi_cmp_tab_v1';
+  var CMP_LS_SEL = 'appi_cmp_sel_v1';
+  var CMP_LS_PRE = 'appi_cmp_precios_v1';
+  var CMP = [
+    {id:'mini', grupo:'Beber y cocinar', nombre:'Mini', precio:411000, litros:12000, meses:12, inst:'Sobre mesada',
+      para:'Cocina chica u oficina, consumo bajo.',
+      trata:'Cloro y sólidos en suspensión.',
+      tiene:['CAG','CAG con plata','Fipor n.° 3','Casquete 360°','Kit posventa']},
+    {id:'vero', grupo:'Beber y cocinar', nombre:'Vero', precio:528000, litros:15000, meses:18, inst:'Sobre mesada',
+      para:'Beber, cocinar y lavar alimentos al menor precio con KDF.',
+      trata:'Cloro (más del 90 %), THM (más del 60 %), hierro y plomo.',
+      tiene:['CAG','CAG con plata','KDF','Resina mineral','Fipor n.° 3','Kit posventa']},
+    {id:'senior', grupo:'Beber y cocinar', nombre:'Senior', precio:751000, litros:36000, meses:36, inst:'Sobre mesada',
+      para:'Uso diario de una familia, 3 años.',
+      trata:'Cloro (más del 90 %), THM (más del 60 %), hierro y plomo.',
+      tiene:['CAG','CAG con plata','KDF','Fipor','Casquete 360°','Kit posventa']},
+    {id:'senior4', grupo:'Beber y cocinar', nombre:'Senior4', precio:913000, litros:36000, meses:36, inst:'Sobre o bajo mesada',
+      para:'La evolución del Senior: diseño, prefiltro y también bajo mesada.',
+      trata:'Cloro (más del 90 %), THM (más del 60 %), hierro y plomo.',
+      tiene:['CAG','CAG con plata','KDF','Prefiltro','Fipor','Casquete 360°','Cartucho de repuesto','Bajo mesada']},
+    {id:'s1000', grupo:'Beber y cocinar', nombre:'S-1000 II', precio:1079000, litros:80000, meses:36, inst:'Sobre o bajo mesada',
+      para:'Mucho volumen: oficinas, familias grandes, uso intenso.',
+      trata:'Cloro (más del 90 %), THM (más del 60 %), hierro y plomo.',
+      tiene:['CAG','CAG con plata','KDF','Cartucho bacteriostático','Alto volumen','Bajo mesada']},
+    {id:'senik', grupo:'Beber y cocinar', nombre:'Senik', precio:1248000, litros:8000, meses:18, inst:'Sobre o bajo mesada',
+      para:'Agua con arsénico. El rendimiento baja si hay más arsénico.',
+      trata:'Arsénico, cloro, THM y metales.',
+      tiene:['CAG','CAG con plata','KDF','Resina de arsénico','Cartucho bacteriostático','Bajo mesada']},
+    {id:'quantum2', grupo:'Beber y cocinar', nombre:'Quantum·2', precio:1271000, litros:30000, meses:36, inst:'Sobre o bajo mesada',
+      para:'Agua dura: menos sarro en cafeteras, termos y vajilla.',
+      trata:'Dureza / sarro, cloro y THM.',
+      tiene:['CAG','CAG con plata','Resina de dureza','Cartucho bacteriostático','Bajo mesada']},
+    {id:'c3', grupo:'Baño', nombre:'C3', precio:208000, litros:2000, meses:6, inst:'Canilla del baño',
+      para:'Cepillarse los dientes y lavarse la cara con menos cloro.',
+      trata:'Cloro, THM y sólidos en suspensión.',
+      tiene:['CAG','CAG con plata']},
+    {id:'rinnova', grupo:'Baño', nombre:'Ducha Rinnova KDF', precio:296000, litros:150000, meses:6, inst:'Ducha',
+      para:'Piel y pelo: menos cloro en la ducha. Cartucho a los 6 meses.',
+      trata:'Cloro y metales (hierro, plomo).',
+      tiene:['KDF','Ducha']},
+    {id:'rinnova-poli', grupo:'Baño', nombre:'Ducha Rinnova KDF+Poli', precio:296000, litros:150000, meses:6, inst:'Ducha',
+      para:'Lo mismo que KDF y además frena el sarro en la ducha.',
+      trata:'Cloro, metales y sarro.',
+      tiene:['KDF','Polifosfato','Ducha']},
+    {id:'portatil', grupo:'Otros', nombre:'Portátil', precio:122000, litros:0, meses:0, inst:'Para llevar',
+      para:'Viaje o la oficina, cuando no hay equipo fijo.',
+      trata:'Cloro en agua de red, según el uso.',
+      tiene:['CAG','Portátil']},
+    {id:'stopper', grupo:'Otros', nombre:'Stopper', precio:240000, litros:0, meses:6, inst:'Cañería',
+      para:'Retiene tierra y partículas gruesas antes de que lleguen a la casa.',
+      trata:'Sedimentos y suciedad de tanque o cañerías.',
+      tiene:['Sedimentos']},
+    {id:'poli2', grupo:'Otros', nombre:'Poli 2', precio:280000, litros:0, meses:0, inst:'Cañería / entrada de agua',
+      para:'Frena el sarro en cañerías, termotanque y electrodomésticos.',
+      trata:'Sarro / cal en agua caliente.',
+      tiene:['Polifosfato']},
+    {id:'soda', grupo:'Otros', nombre:'SodaBurby', precio:438000, litros:0, meses:0, inst:'Mesada',
+      para:'Soda en casa con agua ya purificada. No es un purificador.',
+      trata:'No trata el agua: la gasifica.',
+      tiene:['Soda']},
+    {id:'iontrix', grupo:'Otros', nombre:'Iontrix 3', precio:1176000, litros:40000, meses:24, inst:'Piscina',
+      para:'Piscina con menos cloro. Primera ionización ~40.000 L.',
+      trata:'Bacterias en agua de piscina, por ionización.',
+      tiene:['Ionización','Panel solar']}
+  ];
+  function cmpGet(id){
+    for (var i = 0; i < CMP.length; i++) if (CMP[i].id === id) return CMP[i];
+    return CMP[0];
+  }
+  function cmpPrecios(){
+    try { return JSON.parse(localStorage.getItem(CMP_LS_PRE) || '{}') || {}; } catch (e) { return {}; }
+  }
+  function cmpPrecioDe(p){
+    var n = Number(cmpPrecios()[p.id]);
+    return n > 0 ? n : p.precio;
+  }
+  function cmpMoney(n){ return '$' + Math.round(n).toLocaleString('es-AR'); }
+  function cmpL(n){ return Number(n).toLocaleString('es-AR'); }
+  function cmpPorLitro(p){
+    if (!p.litros) return null;
+    return cmpPrecioDe(p) / p.litros;
+  }
+  function cmpSolo(a, b){
+    return (a.tiene || []).filter(function(x){ return (b.tiene || []).indexOf(x) < 0; });
+  }
+  function cmpOpts(sel){
+    var grupos = [];
+    var seen = {};
+    CMP.forEach(function(p){
+      if (!seen[p.grupo]) { seen[p.grupo] = 1; grupos.push(p.grupo); }
+    });
+    return grupos.map(function(g){
+      return '<optgroup label="' + esc(g) + '">' + CMP.filter(function(p){ return p.grupo === g; }).map(function(p){
+        return '<option value="' + p.id + '"' + (p.id === sel ? ' selected' : '') + '>' + esc(p.nombre) + '</option>';
+      }).join('') + '</optgroup>';
+    }).join('');
+  }
+  function cmpSel(){
+    var d = { a: 'vero', b: 'senior4' };
+    try {
+      var s = JSON.parse(localStorage.getItem(CMP_LS_SEL) || 'null');
+      if (s && s.a && s.b) { d.a = s.a; d.b = s.b; }
+    } catch (e) {}
+    return d;
+  }
+  function cmpTab(){
+    try { return localStorage.getItem(CMP_LS_TAB) === 'bot' ? 'bot' : 'prod'; } catch (e) { return 'prod'; }
+  }
+  function htmlCmpProd(){
+    var s = cmpSel();
+    var a = cmpGet(s.a), b = cmpGet(s.b);
+    return '<div class="tb-sub">Elegí dos. APPI te dice qué cambia, los litros y cuál conviene en plata.</div>' +
+      '<div class="cmp-pick">' +
+        '<div><label>Producto 1</label><select class="tb-input" id="cmpA">' + cmpOpts(s.a) + '</select>' +
+          '<label>Precio</label><input class="tb-input" id="cmpPa" type="number" min="0" step="1000" value="' + cmpPrecioDe(a) + '"></div>' +
+        '<button type="button" class="cmp-swap" id="cmpSwap">⇄ Dar vuelta</button>' +
+        '<div><label>Producto 2</label><select class="tb-input" id="cmpB">' + cmpOpts(s.b) + '</select>' +
+          '<label>Precio</label><input class="tb-input" id="cmpPb" type="number" min="0" step="1000" value="' + cmpPrecioDe(b) + '"></div>' +
+      '</div>' +
+      '<div id="cmpOut"></div>' +
+      '<button type="button" class="cmp-btn" id="cmpShare">📤 Mandarla por WhatsApp</button>' +
+      '<p class="cmp-note">Fichas de catalogo.psa.com.ar. Precios de lista tienda 4-Sep-2026. Cambiá el precio si cotizás otro.</p>';
+  }
+  function htmlCmpBot(){
+    return '<div class="tb-sub">Mostrala en la demo: la plata y el planeta despiertan conciencia</div>' +
       '<div class="tb-row"><span>Botellas de 2 L por día</span><input class="tb-input" style="max-width:90px" id="botPorDia" type="number" min="1" max="40" value="2"></div>' +
       '<div class="tb-row"><span>Precio por botella ($)</span><input class="tb-input" style="max-width:120px" id="botPrecio" type="number" min="0" step="50" value="1500"></div>' +
       '<div id="botResult"></div>' +
       '<div class="bot-eco" id="botEco"></div>' +
-      '<button type="button" class="tb-btn" id="botShare" style="width:100%;margin-top:12px">📤 Compartirla por WhatsApp</button></div>';
+      '<button type="button" class="tb-btn" id="botShare" style="width:100%;margin-top:12px">📤 Compartirla por WhatsApp</button>';
+  }
+  function cmpCelda(val, win){
+    return '<td class="' + (win ? 'cmp-win' : '') + '">' + val + '</td>';
+  }
+  function cmpPinta(){
+    var aEl = $('cmpA'), bEl = $('cmpB'), out = $('cmpOut');
+    if (!aEl || !bEl || !out) return;
+    var a = cmpGet(aEl.value), b = cmpGet(bEl.value);
+    try { localStorage.setItem(CMP_LS_SEL, JSON.stringify({ a: a.id, b: b.id })); } catch (e) {}
+    if (a.id === b.id) {
+      out.innerHTML = '<div class="cmp-box"><p>Elegí dos productos distintos.</p></div>';
+      window.__cmpTexto = '';
+      return;
+    }
+    var pa = $('cmpPa') ? Math.max(0, Number($('cmpPa').value) || 0) : cmpPrecioDe(a);
+    var pb = $('cmpPb') ? Math.max(0, Number($('cmpPb').value) || 0) : cmpPrecioDe(b);
+    var map = cmpPrecios();
+    if ($('cmpPa')) map[a.id] = pa;
+    if ($('cmpPb')) map[b.id] = pb;
+    try { localStorage.setItem(CMP_LS_PRE, JSON.stringify(map)); } catch (e) {}
+    function porL(p, precio){ return p.litros ? (precio / p.litros) : null; }
+    var la = porL(a, pa), lb = porL(b, pb);
+    var winL = (a.litros && b.litros) ? (a.litros === b.litros ? '' : (a.litros > b.litros ? 'a' : 'b')) : '';
+    var winP = pa === pb ? '' : (pa < pb ? 'a' : 'b');
+    var winU = (la != null && lb != null && Math.abs(la - lb) >= 0.5) ? (la < lb ? 'a' : 'b') : '';
+    var winM = (a.meses && b.meses) ? (a.meses === b.meses ? '' : (a.meses > b.meses ? 'a' : 'b')) : '';
+    function litrosTxt(p){ return p.litros ? (cmpL(p.litros) + ' L') : 'Según el uso'; }
+    function mesesTxt(p){ return p.meses ? (p.meses + ' meses') : 'Según el agua'; }
+    function litroTxt(n){ return n == null ? '—' : cmpMoney(n) + ' / L'; }
+    var da = cmpSolo(a, b), db = cmpSolo(b, a);
+    var relato = [];
+    if (a.grupo !== b.grupo) {
+      relato.push('No son del mismo uso: ' + a.nombre + ' es de ' + a.grupo.toLowerCase() + ' y ' + b.nombre + ' de ' + b.grupo.toLowerCase() + '. Sirve para ver plata y litros, no para reemplazar uno con el otro.');
+    }
+    if (a.litros && b.litros && a.litros !== b.litros) {
+      var mas = a.litros > b.litros ? a : b;
+      var menos = mas === a ? b : a;
+      var veces = mas.litros / menos.litros;
+      relato.push(mas.nombre + ' rinde ' + (veces >= 1.8 ? botFmt(veces, 1) + ' veces más litros' : cmpL(mas.litros - menos.litros) + ' litros más') + ' (' + cmpL(mas.litros) + ' vs ' + cmpL(menos.litros) + ').');
+    } else if (a.litros && b.litros) {
+      relato.push('Los dos rinden ' + cmpL(a.litros) + ' litros.');
+    }
+    if (winU === 'a') relato.push('El litro de ' + a.nombre + ' sale ' + cmpMoney(la) + '; el de ' + b.nombre + ', ' + cmpMoney(lb) + '.');
+    if (winU === 'b') relato.push('El litro de ' + b.nombre + ' sale ' + cmpMoney(lb) + '; el de ' + a.nombre + ', ' + cmpMoney(la) + '.');
+    if (da.length) relato.push(a.nombre + ' trae de distinto: ' + da.join(', ') + '.');
+    if (db.length) relato.push(b.nombre + ' trae de distinto: ' + db.join(', ') + '.');
+    if (!da.length && !db.length) relato.push('Los medios activos se parecen. La diferencia está en litros, meses o el precio.');
+    var conv = '';
+    if (a.grupo === b.grupo && winU) {
+      var barato = winU === 'a' ? a : b;
+      var caro = barato === a ? b : a;
+      conv = barato.nombre + ' conviene más en el tiempo: cada litro sale menos. ' + caro.nombre + ' puede ganar si el presupuesto de entrada es el techo.';
+    } else if (a.grupo === b.grupo && winP) {
+      var baratoE = winP === 'a' ? a : b;
+      conv = baratoE.nombre + ' pide menos plata de entrada (' + cmpMoney(baratoE === a ? pa : pb) + ').';
+    } else if (a.grupo !== b.grupo) {
+      conv = 'Cada uno cubre una necesidad distinta. La plata sirve para mostrar, no para elegir en lugar del otro.';
+    } else {
+      conv = 'En plata de entrada y en el litro quedan parejos. Ahí gana lo que la familia necesita (espacio, arsénico, sarro, volumen).';
+    }
+    out.innerHTML =
+      '<div class="cmp-grid">' +
+        '<div class="cmp-card"><h3>' + esc(a.nombre) + '</h3><p>' + esc(a.para) + '</p></div>' +
+        '<div class="cmp-card"><h3>' + esc(b.nombre) + '</h3><p>' + esc(b.para) + '</p></div>' +
+      '</div>' +
+      '<table class="cmp-table">' +
+        '<tr><th></th><th>' + esc(a.nombre) + '</th><th>' + esc(b.nombre) + '</th></tr>' +
+        '<tr><td>Rendimiento</td>' + cmpCelda(litrosTxt(a), winL === 'a') + cmpCelda(litrosTxt(b), winL === 'b') + '</tr>' +
+        '<tr><td>Vida útil</td>' + cmpCelda(mesesTxt(a), winM === 'a') + cmpCelda(mesesTxt(b), winM === 'b') + '</tr>' +
+        '<tr><td>Precio</td>' + cmpCelda(cmpMoney(pa), winP === 'a') + cmpCelda(cmpMoney(pb), winP === 'b') + '</tr>' +
+        '<tr><td>El litro</td>' + cmpCelda(litroTxt(la), winU === 'a') + cmpCelda(litroTxt(lb), winU === 'b') + '</tr>' +
+        '<tr><td>Dónde va</td><td>' + esc(a.inst) + '</td><td>' + esc(b.inst) + '</td></tr>' +
+        '<tr><td>Qué trata</td><td>' + esc(a.trata) + '</td><td>' + esc(b.trata) + '</td></tr>' +
+      '</table>' +
+      '<div class="cmp-box"><b>Qué trae distinto</b><ul>' + relato.map(function(x){ return '<li>' + esc(x) + '</li>'; }).join('') + '</ul></div>' +
+      '<div class="cmp-box"><b>Conveniencia</b><p>' + esc(conv) + '</p></div>';
+    window.__cmpTexto =
+      '⚖️ ' + a.nombre + ' vs ' + b.nombre + '\n\n' +
+      a.nombre + '\n• ' + litrosTxt(a) + ' · ' + mesesTxt(a) + '\n• ' + cmpMoney(pa) + (la != null ? ' · ' + cmpMoney(la) + ' el litro' : '') + '\n• ' + a.trata + '\n\n' +
+      b.nombre + '\n• ' + litrosTxt(b) + ' · ' + mesesTxt(b) + '\n• ' + cmpMoney(pb) + (lb != null ? ' · ' + cmpMoney(lb) + ' el litro' : '') + '\n• ' + b.trata + '\n\n' +
+      'Qué cambia\n' + relato.map(function(x){ return '• ' + x; }).join('\n') + '\n\n' +
+      'Conveniencia\n' + conv;
+  }
+  function cmpMostrar(tab){
+    try { localStorage.setItem(CMP_LS_TAB, tab); } catch (e) {}
+    var prod = $('cmpPaneProd'), bot = $('cmpPaneBot');
+    var tProd = $('cmpTabProd'), tBot = $('cmpTabBot');
+    if (prod) prod.hidden = tab !== 'prod';
+    if (bot) bot.hidden = tab !== 'bot';
+    if (tProd) tProd.classList.toggle('on', tab === 'prod');
+    if (tBot) tBot.classList.toggle('on', tab === 'bot');
+    if (tab === 'bot') calcBotella();
+    if (tab === 'prod') cmpPinta();
+  }
+  function bindCmp(){
+    var tProd = $('cmpTabProd'), tBot = $('cmpTabBot');
+    if (tProd) tProd.onclick = function(){ cmpMostrar('prod'); };
+    if (tBot) tBot.onclick = function(){ cmpMostrar('bot'); };
+    var aEl = $('cmpA'), bEl = $('cmpB'), sw = $('cmpSwap');
+    var paEl = $('cmpPa'), pbEl = $('cmpPb');
+    function loadPre(sel, pre){
+      if (!sel || !pre) return;
+      pre.value = cmpPrecioDe(cmpGet(sel.value));
+    }
+    if (aEl) aEl.onchange = function(){ loadPre(aEl, paEl); cmpPinta(); };
+    if (bEl) bEl.onchange = function(){ loadPre(bEl, pbEl); cmpPinta(); };
+    if (paEl) paEl.oninput = cmpPinta;
+    if (pbEl) pbEl.oninput = cmpPinta;
+    if (sw) sw.onclick = function(){
+      if (!aEl || !bEl) return;
+      var x = aEl.value; aEl.value = bEl.value; bEl.value = x;
+      var y = paEl ? paEl.value : ''; if (paEl && pbEl) { paEl.value = pbEl.value; pbEl.value = y; }
+      cmpPinta();
+    };
+    var sh = $('cmpShare');
+    if (sh) sh.onclick = function(){
+      var url = 'https://wa.me/?text=' + encodeURIComponent(window.__cmpTexto || '');
+      if (window.APPIWhatsApp && window.APPIWhatsApp.abrir) window.APPIWhatsApp.abrir(url);
+      else window.open(url, '_blank', 'noopener');
+    };
+    cmpMostrar(cmpTab());
+  }
+
+  function htmlBotella(){
+    return '<div class="tb-card" style="margin:10px 2px">' +
+      '<div class="tb-title">Comparativas</div>' +
+      '<div class="cmp-tabs">' +
+        '<button type="button" class="cmp-tab" id="cmpTabProd">Productos</button>' +
+        '<button type="button" class="cmp-tab" id="cmpTabBot">Botellas</button>' +
+      '</div>' +
+      '<div id="cmpPaneProd"' + (cmpTab() === 'prod' ? '' : ' hidden') + '>' + htmlCmpProd() + '</div>' +
+      '<div id="cmpPaneBot"' + (cmpTab() === 'bot' ? '' : ' hidden') + '>' + htmlCmpBot() + '</div></div>';
   }
   function calcBotella(){
+    if (!$('botPorDia') || !$('botResult')) return;
     var d = Math.max(1, Number($('botPorDia').value) || 2);
     var p = Math.max(0, Number($('botPrecio').value) || 0);
     var dia = d * p, mes = dia * 30, anio = mes * 12, tres = anio * 3;
@@ -353,14 +639,15 @@
     showView('view-botella');
     var t1=$('tabs'); if(t1) t1.style.display='none';
     $('botellaCont').innerHTML = htmlBotella();
-    $('botPorDia').oninput = calcBotella;
-    $('botPrecio').oninput = calcBotella;
-    calcBotella();
-    $('botShare').onclick = function(){
+    var d=$('botPorDia'), p=$('botPrecio'), sh=$('botShare');
+    if (d) d.oninput = calcBotella;
+    if (p) p.oninput = calcBotella;
+    if (sh) sh.onclick = function(){
       var url = 'https://wa.me/?text=' + encodeURIComponent(window.__botTexto || '');
       if (window.APPIWhatsApp && window.APPIWhatsApp.abrir) window.APPIWhatsApp.abrir(url);
       else window.open(url, '_blank', 'noopener');
     };
+    bindCmp();
   }
   function abrirSimulador(){
     crearVistas();
