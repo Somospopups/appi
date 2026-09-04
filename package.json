@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "458.0.0",
-  "cacheName": "appi-v458-equipo-tabs",
+  "version": "459.0.0",
+  "cacheName": "appi-v459-equipo-iguales",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

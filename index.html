@@ -1827,24 +1827,31 @@ body.dark .hist-action-drawer{background:linear-gradient(155deg,#151827,#252036 
   .btn-upload:active { transform: scale(0.96); }
 
   .equipo-tabs {
-    display: flex; flex-wrap: wrap; gap: 6px; padding: 6px; border-radius: 16px;
+    display: grid; grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 4px; padding: 6px; border-radius: 16px;
     background: rgba(255,255,255,0.55);
     border: 1px solid rgba(255,255,255,0.7);
     -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
     margin-bottom: 14px;
   }
   .equipo-tab {
-    flex: 1 1 18%; min-width: 56px; padding: 10px 4px; border-radius: 12px;
+    min-width: 0; width: 100%; padding: 10px 2px; border-radius: 12px;
     border: none; background: transparent;
     cursor: pointer; font-family: inherit;
-    font-size: 11px; font-weight: 700; color: #6b6b76;
-    display: flex; flex-direction: column; align-items: center; gap: 2px;
-    transition: all .2s ease;
+    font-size: 10.5px; font-weight: 700; color: #6b6b76;
+    display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+    gap: 3px; text-align: center; transition: all .2s ease;
   }
-  .equipo-tab.equipo-share { color: #3d63c9; }
-  .equipo-tab .eq-emo { font-size: 18px; }
-  .equipo-tab .eq-org-ico { display:flex; align-items:center; justify-content:center; line-height:0; }
+  .equipo-tab .eq-emo {
+    font-size: 18px; height: 22px; line-height: 22px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .equipo-tab .eq-org-ico { line-height: 0; }
   .equipo-tab .eq-org-ico svg { width:18px; height:18px; display:block; }
+  .equipo-tab > span:last-child {
+    display: block; width: 100%; line-height: 1.2; min-height: 2.4em;
+    text-align: center;
+  }
   .equipo-tab.active {
     color: #fff;
     background: linear-gradient(135deg, #3ad0a4, #a06bff);
@@ -4166,7 +4173,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v458 · Segura</div>
+  <div class="ds-foot">APPI · v459 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -7786,7 +7793,7 @@ function renderEquipo(){
     document.getElementById('equipoSubtitle').textContent = 'Cargá tu planilla para empezar';
     return;
   }
-  tabsWrap.style.display = 'flex';
+  tabsWrap.style.display = 'grid';
   bottomActs.style.display = equipoActiveTab === 'dashboard' ? 'none' : 'flex';
   const btnReload = document.getElementById('btnEquipoReload');
   if(btnReload) btnReload.style.display = 'none';
@@ -12282,8 +12289,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='458';
-      const CACHE_NAME='appi-v458-equipo-tabs';
+      const swVersion='459';
+      const CACHE_NAME='appi-v459-equipo-iguales';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 
