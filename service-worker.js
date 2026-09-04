@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v460-equipo-meta';
+const CACHE_NAME = 'appi-v461-paginas-claras';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
