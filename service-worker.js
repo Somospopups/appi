@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v465-reemp-abc';
+const CACHE_NAME = 'appi-v466-reemp-info';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

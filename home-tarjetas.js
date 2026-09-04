@@ -726,6 +726,16 @@
       var a = parseAlta(p);
       msg += String(p.nombre||'').trim() + ' - ' + (p.cat || '—') + ' - ' + fechaAltaTxt(a) + '\n';
     });
+    msg += '\n━━━━━━━━━━━━━━━\n';
+    msg += 'La Solicitud de Distribución Independiente que firmaste al ingresar al Negocio PSA tiene un año de vigencia. La renovación o reempadronamiento *no es automática*. Cada año, en el mes que hiciste tu ingreso, deberás presentar nuevamente la Solicitud con fotocopia de tu DNI y haber realizado el requisito de reempadronamiento.\n\n';
+    msg += '*¿Cuál es el requisito para reempadronarme?*\n';
+    msg += 'Desde el 1° de julio de 2022:\n\n';
+    msg += '1. Cumplir con el mínimo de *1 PB personal* o *1 ingreso personal* durante el mes de reempadronamiento o durante alguno de los últimos tres meses anteriores.\n\n';
+    msg += '2. Presentar en formato físico en tu Centro PSA:\n';
+    msg += '• Solicitud de Distribución Independiente PSA firmada de forma manuscrita (frente y dorso) por el titular, por el socio (si corresponde) y por el Patrocinante.\n';
+    msg += '• Fotocopia del DNI vigente del titular y socio (si corresponde).\n';
+    msg += '• Fotocopia de un servicio del domicilio (no excluyente).\n\n';
+    msg += 'Cualquier otra consulta: tu Centro PSA o cuidadodelamarca@psa.com.ar\n';
     msg += '\n━━━━━━━━━━━━━━━\nEnviado desde *APPI* 🚀';
     if (typeof window.enviarMensajeWhatsApp === 'function') window.enviarMensajeWhatsApp(msg, 'Reempadronar');
     else if (window.APPIWhatsApp && window.APPIWhatsApp.abrir) window.APPIWhatsApp.abrir('https://wa.me/?text=' + encodeURIComponent(msg));
