@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v457-org-export';
+const CACHE_NAME = 'appi-v458-equipo-tabs';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

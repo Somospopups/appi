@@ -1843,6 +1843,8 @@ body.dark .hist-action-drawer{background:linear-gradient(155deg,#151827,#252036 
   }
   .equipo-tab.equipo-share { color: #3d63c9; }
   .equipo-tab .eq-emo { font-size: 18px; }
+  .equipo-tab .eq-org-ico { display:flex; align-items:center; justify-content:center; line-height:0; }
+  .equipo-tab .eq-org-ico svg { width:18px; height:18px; display:block; }
   .equipo-tab.active {
     color: #fff;
     background: linear-gradient(135deg, #3ad0a4, #a06bff);
@@ -4164,7 +4166,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v457 · Segura</div>
+  <div class="ds-foot">APPI · v458 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4870,14 +4872,14 @@ body.dark #pageTabs button.active{color:#a8c0ff}
       </button>
       <button class="equipo-tab" data-eqtab="lista">
         <span class="eq-emo">📋</span>
-        <span>Lista</span>
+        <span>Distribuidores</span>
       </button>
       <button type="button" class="equipo-tab equipo-share" data-eqshare="datos">
         <span class="eq-emo">📤</span>
-        <span>Datos</span>
+        <span>Compartir datos</span>
       </button>
       <button type="button" class="equipo-tab equipo-share" data-eqshare="org">
-        <span class="eq-emo">🧭</span>
+        <span class="eq-emo eq-org-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="3.7" r="2"/><path d="M9.6 8.35c0-1.65 4.8-1.65 4.8 0"/><path d="M12 8.55v3.1M6 11.65h12M6 11.65v2.05M18 11.65v2.05"/><circle cx="6" cy="16.3" r="2"/><path d="M3.6 20.95c0-1.65 4.8-1.65 4.8 0"/><circle cx="18" cy="16.3" r="2"/><path d="M15.6 20.95c0-1.65 4.8-1.65 4.8 0"/></svg></span>
         <span>Organigrama</span>
       </button>
     </div>
@@ -12280,8 +12282,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='457';
-      const CACHE_NAME='appi-v457-org-export';
+      const swVersion='458';
+      const CACHE_NAME='appi-v458-equipo-tabs';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 
