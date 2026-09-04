@@ -714,9 +714,7 @@
       if (a.y >= anio) return false;
       return true;
     }).sort(function(x,y){
-      var ax = parseAlta(x), ay = parseAlta(y);
-      if (ax && ay && ax.d !== ay.d) return ax.d - ay.d;
-      return String(x.nombre||'').localeCompare(String(y.nombre||''), 'es');
+      return String(x.nombre||'').localeCompare(String(y.nombre||''), 'es', {sensitivity:'base'});
     });
   }
   function enviarReempadronar(lista, mesNom, anio){
