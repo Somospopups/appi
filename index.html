@@ -4219,7 +4219,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v473 · Segura</div>
+  <div class="ds-foot">APPI · v474 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4500,7 +4500,7 @@ body.dark #pageTabs button.active{color:#c5d6ff}
       <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
 
       <div class="home-brand-row">
-        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · v473</span></span>
+        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · v474</span></span>
       </div>
 
       <div class="home-hero-card">
@@ -7514,6 +7514,44 @@ function ymdDesdeCelda(v){
     let d=+m[1], mo=+m[2], y=+m[3];
     if(y<100) y+=(y>50?1900:2000);
     if(mo>=1&&mo<=12&&d>=1&&d<=31) return {y,m:mo,d};
+  }
+  m=s.match(/^(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{2,4})$/);
+  if(m){
+    let d=+m[1], mo=+m[2], y=+m[3];
+    if(y<100) y+=(y>50?1900:2000);
+    if(mo>=1&&mo<=12&&d>=1&&d<=31) return {y,m:mo,d};
+  }
+  m=s.match(/^(\d{1,2})[\/\-\.](\d{1,2})$/);
+  if(m){
+    let d=+m[1], mo=+m[2];
+    if(mo>=1&&mo<=12&&d>=1&&d<=31) return {y:2000,m:mo,d};
+  }
+  const MESES={
+    ene:1,enero:1,jan:1,january:1,
+    feb:2,febrero:2,february:2,
+    mar:3,marzo:3,march:3,
+    abr:4,abril:4,apr:4,april:4,
+    may:5,mayo:5,
+    jun:6,junio:6,june:6,
+    jul:7,julio:7,july:7,
+    ago:8,agosto:8,aug:8,august:8,
+    sep:9,set:9,sept:9,septiembre:9,setiembre:9,september:9,
+    oct:10,octubre:10,october:10,
+    nov:11,noviembre:11,november:11,
+    dic:12,diciembre:12,dec:12,december:12
+  };
+  const nom=s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  m=nom.match(/^(\d{1,2})[\s\/\.-]+([a-z]+)/);
+  if(m){
+    const d=+m[1];
+    const mo=MESES[m[2]]||MESES[m[2].slice(0,3)];
+    if(mo&&d>=1&&d<=31) return {y:2000,m:mo,d};
+  }
+  m=nom.match(/^([a-z]+)[\s\/\.-]+(\d{1,2})/);
+  if(m){
+    const d=+m[2];
+    const mo=MESES[m[1]]||MESES[m[1].slice(0,3)];
+    if(mo&&d>=1&&d<=31) return {y:2000,m:mo,d};
   }
   return null;
 }
@@ -12329,8 +12367,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='473';
-      const CACHE_NAME='appi-v473-cumples-pulido';
+      const swVersion='474';
+      const CACHE_NAME='appi-v474-cumples-fecha';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · v'+swVersion;
       const hadController=Boolean(navigator.serviceWorker.controller);
@@ -14656,7 +14694,7 @@ function detectarColumnasU(headers){
     else if(/f.*compra/.test(nh) && map.fCompra===undefined){ map.fCompra=i; }
     else if(/f.*vence|vencimiento/.test(nh) && map.fVence===undefined){ map.fVence=i; }
     // La planilla ya traía estas dos columnas y la app las venía ignorando.
-    else if(/cumple|nacimiento/.test(nh) && map.cumple===undefined){ map.cumple=i; }
+    else if(/cumple|nacimiento|fnac|\bf\s*nac|\bnac\b|nacio|birthday/.test(nh) && map.cumple===undefined){ map.cumple=i; }
     else if(/mail|correo/.test(nh) && map.email===undefined){ map.email=i; }
   });
   if(map.usuario===undefined) map.usuario=0;
