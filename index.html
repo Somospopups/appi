@@ -4211,7 +4211,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v468 · Segura</div>
+  <div class="ds-foot">APPI · v469 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -6432,23 +6432,33 @@ function showView(id,opts){
   window.scrollTo({top:0});
   return true;
 }
+window.showView=showView;
 function irAtrasAPPI(){
+  const go=window.showView||showView;
   if(window.APPIPanelAtras&&window.APPIPanelAtras.abiertos&&window.APPIPanelAtras.abiertos().length){
     history.back(); return true;
   }
-  if((window._appiViewStack||[]).length){ history.back(); return true; }
+  if((window._appiViewStack||[]).length){
+    if(history.state&&(history.state.appiVista||history.state.appiPanel||history.state.view||history.state.modal)){
+      history.back(); return true;
+    }
+    const st=window._appiViewStack;
+    const prev=st.pop();
+    if(prev){ go(prev,{atras:true}); return true; }
+  }
   const cur=document.querySelector('.view.active');
-  if(cur&&cur.id!=='view-home'&&cur.id!=='view-admin'){ showView('view-home',{atras:true}); return true; }
+  if(cur&&cur.id!=='view-home'&&cur.id!=='view-admin'){ go('view-home',{atras:true}); return true; }
   return false;
 }
 window.irAtrasAPPI=irAtrasAPPI;
 window.addEventListener('popstate',function(){
   if(window.APPIPanelAtras&&window.APPIPanelAtras.hayPendiente&&window.APPIPanelAtras.hayPendiente()) return;
+  const go=window.showView||showView;
   const st=window._appiViewStack||[];
   while(st.length){
     const prev=st.pop();
     const cur=document.querySelector('.view.active');
-    if(prev&&document.getElementById(prev)&&(!cur||prev!==cur.id)){ showView(prev,{atras:true}); return; }
+    if(prev&&document.getElementById(prev)&&(!cur||prev!==cur.id)){ go(prev,{atras:true}); return; }
   }
 });
 document.addEventListener('click',function(e){
@@ -11758,116 +11768,9 @@ document.getElementById('importInput').onchange = (e)=>{
   window.applyTheme = applyTheme;
 })();
 
-/* ============ NAVEGACIÓN ATRÁS NATIVA — PILA REAL ============ */
-(function(){
-  const PAGE_VIEWS = ['view-home','view-mes','view-negocio','view-herramientas'];
-  // Pila de navegación: recuerda de dónde veniste
-  const navStack = ['view-home'];
-
-  function pushNav(id){
-    // No apilar la misma vista dos veces seguidas
-    if(navStack[navStack.length-1] === id) return;
-    navStack.push(id);
-    // Limitar la pila a 20 entradas
-    if(navStack.length > 20) navStack.splice(0, navStack.length - 20);
-  }
-
-  function popNav(){
-    if(navStack.length > 1){
-      navStack.pop();
-      return navStack[navStack.length - 1];
-    }
-    return null;
-  }
-
-  // Back target para sub-vistas que tienen padre fijo
-  function getSubViewBack(id){
-    switch(id){
-      case 'view-siete-detail': return 'view-siete';
-      case 'view-presu-hist': return 'view-presu';
-      case 'view-wheel':
-      case 'view-eval': return 'view-mes';
-      case 'view-siete':
-      case 'view-presu': return 'view-mes';
-      case 'view-planning': return 'view-mes';
-      case 'view-equipo':
-      case 'view-historico':
-      case 'view-usuarios':
-      case 'view-gestion':
-      case 'view-seguimiento': return 'view-negocio';
-      case 'view-encuesta': return 'view-negocio';
-      case 'view-ocho':
-      case 'view-suenos':
-      case 'view-demo':
-      case 'view-grabadora':
-      case 'view-notas':
-      case 'view-botella':
-      case 'view-simulador':
-      case 'view-stock': return 'view-herramientas';
-      default: return null;
-    }
-  }
-
-  const _origShow = showView;
-  showView = function(id){
-    _origShow(id);
-    pushNav(id);
-    if(id !== 'view-home') history.pushState({ view: id }, '');
-    else history.replaceState({ view: 'view-home' }, '');
-  };
-  history.replaceState({ view: 'view-home' }, '');
-
-  window.addEventListener('popstate', function(){
-    // Si hay un modal abierto, cerrarlo primero
-    if(modal.el.classList.contains('open')){
-      modal.close();
-      const a = document.querySelector('.view.active');
-      if(a) history.pushState({ view: a.id }, '');
-      return;
-    }
-
-    const activa = document.querySelector('.view.active');
-    if(!activa){ history.pushState({ view:'view-home' }, ''); return; }
-    const currentId = activa.id;
-
-    // 1. Si es una sub-vista con padre fijo, volver al padre
-    const subBack = getSubViewBack(currentId);
-    if(subBack){
-      popNav(); // sacar la sub-vista de la pila
-      _origShow(subBack);
-      if(subBack === 'view-siete') try{ renderSieteHome(); }catch(e){}
-      if(subBack === 'view-home') try{ renderHomeCompleto(); }catch(e){}
-      if(subBack === 'view-presu') try{ renderPresu(); }catch(e){}
-      if(subBack === 'view-mes' || subBack === 'view-negocio' || subBack === 'view-herramientas') try{ renderHomeCompleto(); }catch(e){}
-      return;
-    }
-
-    // 2. Si es una de las 4 páginas principales, volver a la anterior en la pila
-    if(PAGE_VIEWS.includes(currentId)){
-      const prev = popNav();
-      if(prev && prev !== currentId){
-        _origShow(prev);
-        if(prev === 'view-home') try{ renderHomeCompleto(); }catch(e){}
-        if(PAGE_VIEWS.includes(prev)) try{ renderHomeCompleto(); }catch(e){}
-        return;
-      }
-    }
-
-    // 3. Fallback: si estamos en home, no ir a ningún lado
-    if(currentId === 'view-home'){
-      history.pushState({ view:'view-home' }, '');
-      return;
-    }
-
-    // 4. Fallback general: volver al home
-    popNav();
-    _origShow('view-home');
-    try{ renderHomeCompleto(); }catch(e){}
-  });
-
-  const _origOpen = modal.open.bind(modal);
-  modal.open = function(opts){ _origOpen(opts); history.pushState({ modal: true }, ''); };
-})();
+/* El atrás lo manejan showView + irAtrasAPPI + panel-atras.js.
+   Había un segundo sistema que pisaba showView, duplicaba el historial
+   y hacía que el gesto y la flechita no respondieran. */
 
 /* ============ INICIO ============ */
 function mostrarAdminLoginPopup(){
@@ -12111,12 +12014,14 @@ function iniciarApp() {
 
 // Ajustes de vistas que no pertenecen al enrutador principal.
 const _origShowViewAjustes = showView;
-showView = function(id){
-  _origShowViewAjustes(id);
+showView = function(id,opts){
+  const r=_origShowViewAjustes.apply(this, arguments);
   try{
     if(id==='view-notas'&&typeof window.renderKeep==='function')setTimeout(()=>window.renderKeep(),200);
   }catch(error){console.warn('Ajuste de vista',error)}
+  return r;
 };
+window.showView=showView;
 
 function actualizarCuentaUI(){
   const account=document.getElementById('btnToolsAccount'),devices=document.getElementById('btnToolsDevices'),deviceText=document.getElementById('toolsDevicesTxt'),logout=document.getElementById('btnToolsLogout'),profile=window.APPIAuth&&window.APPIAuth.isEnabled()?window.APPIAuth.currentProfile():null;
@@ -12376,8 +12281,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='468';
-      const CACHE_NAME='appi-v468-reemp-verde';
+      const swVersion='469';
+      const CACHE_NAME='appi-v469-atras';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 
