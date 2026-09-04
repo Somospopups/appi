@@ -1974,6 +1974,24 @@ body.dark .hist-action-drawer{background:linear-gradient(155deg,#151827,#252036 
     margin: 0 0 10px; font-size: 13px; font-weight: 800;
     color: #3a3a48; text-transform: uppercase; letter-spacing: 0.4px;
   }
+  .top-mode-tabs {
+    display: flex; gap: 6px; padding: 4px; border-radius: 10px;
+    background: rgba(80,90,130,0.08); margin-bottom: 12px;
+    align-items: center;
+  }
+  .top-mode-pair {
+    flex: 1; min-width: 0; display: flex; align-items: center; gap: 6px;
+  }
+  .top-mode-btn {
+    flex: 1; min-width: 0; padding: 8px 6px; border: none; border-radius: 8px;
+    font-family: inherit; font-size: 12px; font-weight: 700; cursor: pointer;
+  }
+  .top-wa-btn {
+    width: 32px; height: 32px; flex: none; padding: 0; border: 0; border-radius: 50%;
+    background: #25D366; display: grid; place-items: center; cursor: pointer;
+    box-shadow: 0 3px 8px rgba(37,211,102,.38);
+  }
+  .top-wa-btn:active { transform: scale(.94); }
   .top-item {
     display: flex; align-items: center; gap: 10px;
     padding: 8px 4px; border-bottom: 1px dashed rgba(80,90,130,0.10);
@@ -4201,7 +4219,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v461 · Segura</div>
+  <div class="ds-foot">APPI · v462 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -8168,6 +8186,29 @@ function renderEquipoContactPanel(){
   return `<div class="equipo-contact-dashboard"><h3>📊 Contactos del Mes</h3><div class="eq-contact-tabs">${typeLabels.map(x=>`<button class="eq-contact-tab ${equipoContactType===x[0]?'active':''}" data-eqtype="${x[0]}">${x[1]}</button>`).join('')}</div><div class="eq-contact-stats">${statusLabels.map(x=>`<button class="eq-contact-stat ${equipoContactStatus===x[0]?'selected':''}" data-eqstatus="${x[0]}"><span>${x[1]}</span><b>${count(x[0])}</b><small>${x[2]}</small></button>`).join('')}</div><div class="eq-contact-detail-title">${equipoContactStatus==='todos'?'Todos los contactos':statusLabels.find(x=>x[0]===equipoContactStatus)[2]}</div><div class="eq-contact-list">${filtered.length?filtered.slice(0,12).map(p=>`<div class="eq-contact-person"><div><strong>${escapeXml(p.nombre)}</strong><small>${escapeXml(p.telefono||'Sin teléfono')} · ${escapeXml(p.interes)}</small></div><span class="eq-contact-badge">${escapeXml(p.estado)}</span></div>`).join(''):'<div class="eq-contact-empty">No hay contactos en esta categoría.</div>'}</div></div>`;
 }
 function bindEquipoContactPanel(cont){cont.querySelectorAll('[data-eqstatus]').forEach(b=>b.onclick=()=>{equipoContactStatus=b.dataset.eqstatus;renderSeguimiento()});cont.querySelectorAll('[data-eqtype]').forEach(b=>b.onclick=()=>{equipoContactType=b.dataset.eqtype;renderSeguimiento()})}
+function compartirRankingEquipo(modo){
+  if(!equipoData || !equipoData.personas) return;
+  const esOrg = modo === 'organizacion';
+  const lista = esOrg
+    ? [...equipoData.personas].map(p => ({...p, pbOrg: calcularPBOrganizacion(p)})).filter(p => p.pbOrg > 0).sort((a,b)=> b.pbOrg - a.pbOrg).slice(0, 10)
+    : [...equipoData.personas].sort((a,b)=> (b.pnAct||0) - (a.pnAct||0)).filter(p => (p.pnAct||0) > 0).slice(0, 10);
+  if(!lista.length){
+    if(window.APPIDialog) window.APPIDialog.alert('Todavía no hay datos para compartir en este ranking.',{title:'Ranking',icon:'🏆'});
+    return;
+  }
+  const titular = (equipoData.titular && (equipoData.titular.nombre || equipoData.titular.dip)) || 'Tu equipo';
+  const titulo = esOrg ? 'Ranking Organización' : 'Ranking Personal';
+  const mes = (typeof MONTHS!=='undefined' ? MONTHS[new Date().getMonth()] : '') + ' ' + new Date().getFullYear();
+  let msg = '🏆 *' + titulo + '*\n' + titular + '\n📅 ' + mes + '\n━━━━━━━━━━━━━━━\n\n';
+  lista.forEach((p,i)=>{
+    const valor = esOrg ? p.pbOrg : p.pnAct;
+    const nom = String(p.nombre||'').split(',')[0].trim() || p.nombre || '';
+    msg += (i+1) + '. ' + nom + ' — ' + formatPB(valor) + ' PB\n';
+  });
+  msg += '\n━━━━━━━━━━━━━━━\nEnviado desde *APPI* 🚀';
+  if(typeof enviarMensajeWhatsApp==='function') enviarMensajeWhatsApp(msg, titulo);
+  else if(window.APPIWhatsApp && window.APPIWhatsApp.abrir) window.APPIWhatsApp.abrir('https://wa.me/?text=' + encodeURIComponent(msg));
+}
 function renderEquipoDashboard(){
   const cont = document.getElementById('equipoContent');
   const personas = equipoData.personas;
@@ -8294,9 +8335,15 @@ ${(function(){
         <span>🏆 Ranking de Ventas</span>
         <span style="font-size:11px; font-weight:800; color:#7a4bd9; background:rgba(160,107,255,0.15); padding:2px 8px; border-radius:6px">PB</span>
       </h4>
-      <div class="top-mode-tabs" style="display:flex; gap:4px; padding:4px; border-radius:10px; background:rgba(80,90,130,0.08); margin-bottom:12px;">
-        <button class="top-mode-btn ${equipoTopMode==='personal'?'active':''}" data-topmode="personal" style="flex:1; padding:8px; border:none; border-radius:8px; font-family:inherit; font-size:12px; font-weight:700; cursor:pointer; ${equipoTopMode==='personal' ? 'background:linear-gradient(135deg,#5b8def,#a06bff); color:#fff; box-shadow:0 3px 10px rgba(120,100,220,0.35);' : 'background:transparent; color:#6b6b76;'}">👤 Personal</button>
-        <button class="top-mode-btn ${equipoTopMode==='organizacion'?'active':''}" data-topmode="organizacion" style="flex:1; padding:8px; border:none; border-radius:8px; font-family:inherit; font-size:12px; font-weight:700; cursor:pointer; ${equipoTopMode==='organizacion' ? 'background:linear-gradient(135deg,#a06bff,#ff6b9d); color:#fff; box-shadow:0 3px 10px rgba(160,107,255,0.35);' : 'background:transparent; color:#6b6b76;'}">👥 Organización</button>
+      <div class="top-mode-tabs">
+        <div class="top-mode-pair">
+          <button class="top-mode-btn ${equipoTopMode==='personal'?'active':''}" data-topmode="personal" style="${equipoTopMode==='personal' ? 'background:linear-gradient(135deg,#5b8def,#a06bff); color:#fff; box-shadow:0 3px 10px rgba(120,100,220,0.35);' : 'background:transparent; color:#6b6b76;'}">👤 Personal</button>
+          <button type="button" class="top-wa-btn" data-topwa="personal" aria-label="Compartir ranking personal por WhatsApp"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="#fff" d="M20.5 3.5A11 11 0 0 0 2.1 16.6L1 23l6.6-1.1A11 11 0 1 0 20.5 3.5zM12 20.2a9.2 9.2 0 0 1-4.7-1.3l-.3-.2-3.9.6.7-3.8-.2-.3A9.2 9.2 0 1 1 12 20.2zm5.3-6.9c-.3-.1-1.7-.8-2-.9s-.5-.1-.6.1-.8.9-1 1.1-.4.2-.7.1a7.5 7.5 0 0 1-2.2-1.4 8.3 8.3 0 0 1-1.5-1.9c-.2-.3 0-.4.1-.6l.4-.5.1-.3c0-.1 0-.3-.1-.4s-.6-1.5-.9-2.1c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.4.1-.6.3s-.8.8-.8 1.9.8 2.2.9 2.3c.1.2 1.6 2.5 3.9 3.4 1.4.6 1.9.7 2.6.6.4-.1 1.7-.7 1.9-1.3s.2-1.2.2-1.3-.2-.2-.4-.3z"/></svg></button>
+        </div>
+        <div class="top-mode-pair">
+          <button class="top-mode-btn ${equipoTopMode==='organizacion'?'active':''}" data-topmode="organizacion" style="${equipoTopMode==='organizacion' ? 'background:linear-gradient(135deg,#a06bff,#ff6b9d); color:#fff; box-shadow:0 3px 10px rgba(160,107,255,0.35);' : 'background:transparent; color:#6b6b76;'}">👥 Organización</button>
+          <button type="button" class="top-wa-btn" data-topwa="organizacion" aria-label="Compartir ranking organización por WhatsApp"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="#fff" d="M20.5 3.5A11 11 0 0 0 2.1 16.6L1 23l6.6-1.1A11 11 0 1 0 20.5 3.5zM12 20.2a9.2 9.2 0 0 1-4.7-1.3l-.3-.2-3.9.6.7-3.8-.2-.3A9.2 9.2 0 1 1 12 20.2zm5.3-6.9c-.3-.1-1.7-.8-2-.9s-.5-.1-.6.1-.8.9-1 1.1-.4.2-.7.1a7.5 7.5 0 0 1-2.2-1.4 8.3 8.3 0 0 1-1.5-1.9c-.2-.3 0-.4.1-.6l.4-.5.1-.3c0-.1 0-.3-.1-.4s-.6-1.5-.9-2.1c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.4.1-.6.3s-.8.8-.8 1.9.8 2.2.9 2.3c.1.2 1.6 2.5 3.9 3.4 1.4.6 1.9.7 2.6.6.4-.1 1.7-.7 1.9-1.3s.2-1.2.2-1.3-.2-.2-.4-.3z"/></svg></button>
+        </div>
       </div>
       ${top10.map((p,i)=>{
         const info = catInfoOf(p.cat);
@@ -8371,6 +8418,13 @@ ${(function(){
       equipoTopMode = nuevoModo;
       haptic(8);
       renderEquipoDashboard();
+    };
+  });
+  cont.querySelectorAll('[data-topwa]').forEach(b=>{
+    b.onclick = (e)=>{
+      e.preventDefault(); e.stopPropagation();
+      haptic(10);
+      compartirRankingEquipo(b.dataset.topwa);
     };
   });
 
@@ -12325,8 +12379,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='461';
-      const CACHE_NAME='appi-v461-paginas-claras';
+      const swVersion='462';
+      const CACHE_NAME='appi-v462-ranking-wa';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 
