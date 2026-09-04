@@ -349,14 +349,20 @@
     return new Date(d.getFullYear(), d.getMonth(), d.getDate());
   }
   function aFecha(v){
-    if (!v) return null;
-    if (v instanceof Date) return isNaN(v.getTime()) ? null : v;
+    if (v==null || v==='') return null;
+    if (v instanceof Date){
+      if (isNaN(v.getTime())) return null;
+      return new Date(v.getFullYear(), v.getMonth(), v.getDate());
+    }
+    if (typeof window.ymdDesdeCelda === 'function'){
+      var ymd = window.ymdDesdeCelda(v);
+      if (ymd) return new Date(ymd.y, ymd.m - 1, ymd.d);
+    }
     if (typeof window.parseFechaU === 'function'){
       var p = window.parseFechaU(v);
-      if (p && !isNaN(p.getTime())) return p;
+      if (p && !isNaN(p.getTime())) return new Date(p.getFullYear(), p.getMonth(), p.getDate());
     }
-    var d = new Date(v);
-    return isNaN(d.getTime()) ? null : d;
+    return null;
   }
   function dias(a, b){ return Math.round((a - b) / 86400000); }
   function fmtFecha(d){

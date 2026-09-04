@@ -116,7 +116,7 @@ window.openStock=function(){
 <script src="./tarjetas-promos.js"></script>
 <script src="./usuarios-botones.js?v=423"></script>
 <script src="./mensajes-hielo.js"></script>
-<script src="./mensajes-usuarios.js?v=421"></script>
+<script src="./mensajes-usuarios.js?v=471"></script>
 <script src="./reactivacion.js"></script>
 
 <script src="./escalera-suenos.js"></script>
@@ -4219,7 +4219,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v470 · Segura</div>
+  <div class="ds-foot">APPI · v471 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4500,7 +4500,7 @@ body.dark #pageTabs button.active{color:#c5d6ff}
       <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
 
       <div class="home-brand-row">
-        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · v470</span></span>
+        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · v471</span></span>
       </div>
 
       <div class="home-hero-card">
@@ -7475,13 +7475,52 @@ function saveEquipoToStorage(){
   } catch(e){ modal.open({ icon:'⚠️', title:'Error al guardar', html:'<p>El archivo puede ser muy grande. Probá con menos personas.</p>' }); }
 }
 
+function padFecha2(n){ return String(n).padStart(2,'0'); }
+function ymdJoin(y,m,d){ return y+'-'+padFecha2(m)+'-'+padFecha2(d); }
+/* Día de calendario, sin hora ni zona: Excel, ISO o DD/MM. */
+function ymdDesdeCelda(v){
+  if(v==null || v==='') return null;
+  if(v instanceof Date){
+    if(isNaN(v.getTime())) return null;
+    const utcMid=v.getUTCHours()===0 && v.getUTCMinutes()===0 && v.getUTCSeconds()===0;
+    const locMid=v.getHours()===0 && v.getMinutes()===0 && v.getSeconds()===0;
+    if(utcMid && !locMid){
+      return {y:v.getUTCFullYear(), m:v.getUTCMonth()+1, d:v.getUTCDate()};
+    }
+    return {y:v.getFullYear(), m:v.getMonth()+1, d:v.getDate()};
+  }
+  if(typeof v==='number' && isFinite(v) && v>59 && v<2958466){
+    const serial=Math.floor(v+1e-9);
+    const d=new Date(Math.round((serial-25569)*86400000));
+    if(isNaN(d.getTime())) return null;
+    return {y:d.getUTCFullYear(), m:d.getUTCMonth()+1, d:d.getUTCDate()};
+  }
+  const s=String(v).trim();
+  if(!s) return null;
+  if(/^\d+(\.\d+)?$/.test(s)){
+    const n=parseFloat(s);
+    if(n>59 && n<2958466) return ymdDesdeCelda(n);
+  }
+  let m=s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if(m){
+    const y=+m[1], mo=+m[2], d=+m[3];
+    if(mo>=1&&mo<=12&&d>=1&&d<=31) return {y,m:mo,d};
+    return null;
+  }
+  m=s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/);
+  if(m){
+    // Argentina: el primero es el día, el segundo el mes. Nunca mes/día.
+    let d=+m[1], mo=+m[2], y=+m[3];
+    if(y<100) y+=(y>50?1900:2000);
+    if(mo>=1&&mo<=12&&d>=1&&d<=31) return {y,m:mo,d};
+  }
+  return null;
+}
+window.ymdDesdeCelda=ymdDesdeCelda;
 function parseExcelDate(v){
   if(!v && v !== 0) return '';
-  if(v instanceof Date) return v.toISOString().split('T')[0];
-  if(typeof v === 'number'){
-    const d = new Date(Math.round((v - 25569) * 86400 * 1000));
-    if(!isNaN(d.getTime())) return d.toISOString().split('T')[0];
-  }
+  const ymd=ymdDesdeCelda(v);
+  if(ymd) return ymdJoin(ymd.y,ymd.m,ymd.d);
   const s = (''+v).trim();
   if(!s) return '';
   
@@ -12289,8 +12328,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='470';
-      const CACHE_NAME='appi-v470-ver-home';
+      const swVersion='471';
+      const CACHE_NAME='appi-v471-fechas-cumple';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · v'+swVersion;
       const hadController=Boolean(navigator.serviceWorker.controller);
@@ -14542,9 +14581,8 @@ function parseFechaU(str){
   let m=str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/);
   if(m){
     let d=parseInt(m[1]), mo=parseInt(m[2]), y=parseInt(m[3]);
-    if(y<100) y+=2000;
-    // Una fecha imposible (mes 13, día 32, 31/02, 4/17) se rechaza en vez de
-    // "acomodarse" sola: mostrar una fecha inventada es peor que ninguna.
+    if(y<100) y+=(y>50?1900:2000);
+    // Día/mes (Argentina). Si el segundo número no es un mes, no es fecha.
     if(mo<1||mo>12||d<1||d>31) return null;
     if(d>new Date(y,mo,0).getDate()) return null;
     return new Date(y,mo-1,d);
@@ -14565,12 +14603,9 @@ function parseFechaU(str){
    (fecha real de Excel: días desde 1900). Convertir el número a DD/MM/YYYY
    evita que las fechas reales se muestren como "44663" o se pierdan. */
 function fechaDeCeldaU(v){
-  if(v==null) return '';
-  if(typeof v==='number' && isFinite(v) && v>0 && v<2958466){
-    const ms=Math.round((v-25569)*86400000);
-    const d=new Date(ms);
-    return [String(d.getUTCDate()).padStart(2,'0'), String(d.getUTCMonth()+1).padStart(2,'0'), d.getUTCFullYear()].join('/');
-  }
+  if(v==null || v==='') return '';
+  const ymd=typeof ymdDesdeCelda==='function' ? ymdDesdeCelda(v) : null;
+  if(ymd) return padFecha2(ymd.d)+'/'+padFecha2(ymd.m)+'/'+ymd.y;
   return String(v).trim();
 }
 function estadoVencU(fecha){
@@ -14646,7 +14681,7 @@ function parseRowsU(rows){
     const fCompra=fechaDeCeldaU(crudo('fCompra'));
     const fVenceRaw=fechaDeCeldaU(crudo('fVence'));
     const fVence=parseFechaU(fVenceRaw);
-    const cumpleRaw=get('cumple');
+    const cumpleRaw=fechaDeCeldaU(crudo('cumple'));
     const email=get('email');
     let domFinal=domicilio;
     if(!domFinal){
@@ -15022,7 +15057,7 @@ function cargarArchivoU(file){
         const data=new Uint8Array(e.target.result);
         let wb;
         try{
-          wb=XLSX.read(data,{type:'array', cellDates:false, raw:true});
+          wb=XLSX.read(data,{type:'array', cellDates:false, raw:true, dateNF:'dd/mm/yyyy'});
         }catch(err){
           console.error('XLSX.read array fail, probando binary', err);
           // Fallback intentar como binary string
@@ -15036,7 +15071,7 @@ function cargarArchivoU(file){
         wb.SheetNames.forEach(name=>{
           try{
             const ws=wb.Sheets[name];
-            const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:'', blankrows:false});
+            const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:'', blankrows:false, raw:true, dateNF:'dd/mm/yyyy'});
             console.log(`Hoja ${name}: ${rows.length} filas`);
             const res=parseRowsU(rows);
             debugAll.push(`Hoja "${name}": ${rows.length} filas, ${res.data.length} usuarios detectados | Header: ${res.debug.substring(0,120)}`);
@@ -15287,7 +15322,7 @@ function initUsuarios(){
   try{
     const saved=JSON.parse(localStorage.getItem('usuarios_garantias')||'[]');
     if(saved.length>0){
-      usuariosU=depuradosAplicar(saved.map(u=>({...u, fVence:u.fVence? new Date(u.fVence):null, estado:u.fVence? ( (new Date(u.fVence)-new Date())/(1000*60*60*24)<0?'vencida': ( (new Date(u.fVence)-new Date())/(1000*60*60*24)<=30?'porVencer':'vigente')):'vigente'})));
+      usuariosU=depuradosAplicar(saved.map(u=>({...u, cumpleRaw:fechaDeCeldaU(u.cumpleRaw||u.cumple||''), fVence:u.fVence? new Date(u.fVence):null, estado:u.fVence? ( (new Date(u.fVence)-new Date())/(1000*60*60*24)<0?'vencida': ( (new Date(u.fVence)-new Date())/(1000*60*60*24)<=30?'porVencer':'vigente')):'vigente'})));
       mostrarDashboardU();
       const info=document.getElementById('usuariosFileInfo');
       if(info){ info.style.display='block'; info.innerHTML=`💾 ${usuariosU.length} usuarios recuperados de memoria`; }
