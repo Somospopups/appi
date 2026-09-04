@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v467-reemp-lista';
+const CACHE_NAME = 'appi-v468-reemp-verde';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

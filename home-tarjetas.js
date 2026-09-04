@@ -728,27 +728,74 @@
       '• Fotocopia de un servicio del domicilio (no excluyente).\n\n' +
       'Cualquier otra consulta: tu Centro PSA o cuidadodelamarca@psa.com.ar';
   }
-  function reempMesClave(){
+  function reempYm(){
     var d = new Date();
-    return 'appi_reemp_ok_v1_' + uid() + '_' + d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
+  }
+  function reempClaves(){
+    var ym = reempYm();
+    var keys = ['appi_reemp_ok_v1_' + ym, 'appi_reemp_ok_v1_local_' + ym];
+    var id = uid();
+    if (id) keys.push('appi_reemp_ok_v1_' + id + '_' + ym);
+    return keys;
   }
   function reempId(p){
-    return String((p && (p.codigo || p.id || p.nombre)) || '').trim();
+    var nom = String((p && p.nombre) || '').trim().toLowerCase();
+    var alta = String((p && p.alta) || '').trim();
+    var cod = String((p && p.codigo) || '').trim();
+    if (cod && nom) return cod + '|' + nom + '|' + alta;
+    if (nom && alta) return nom + '|' + alta;
+    if (cod) return cod;
+    return nom || String((p && p.id) || '').trim();
+  }
+  function reempIdsDe(p){
+    var nom = String((p && p.nombre) || '').trim();
+    var nomL = nom.toLowerCase();
+    var alta = String((p && p.alta) || '').trim();
+    var cod = String((p && p.codigo) || '').trim();
+    var id = p && p.id != null ? String(p.id) : '';
+    var keys = [];
+    function add(k){ if (k && keys.indexOf(k) < 0) keys.push(k); }
+    add(reempId(p));
+    add(cod);
+    add(nom);
+    add(id);
+    add(nomL + '|' + alta);
+    return keys;
   }
   function reempEnviados(){
-    var set = leerLS(reempMesClave(), []);
-    return Array.isArray(set) ? set : [];
+    var all = [];
+    reempClaves().forEach(function(k){
+      var set = leerLS(k, []);
+      if (!Array.isArray(set)) return;
+      set.forEach(function(x){ if (x && all.indexOf(x) < 0) all.push(x); });
+    });
+    return all;
+  }
+  function reempGuardar(set){
+    reempClaves().forEach(function(k){
+      try{ localStorage.setItem(k, JSON.stringify(set)); }catch(e){}
+    });
   }
   function reempMarcar(p){
-    var id = reempId(p);
-    if (!id) return;
     var set = reempEnviados();
-    if (set.indexOf(id) >= 0) return;
-    set.push(id);
-    try{ localStorage.setItem(reempMesClave(), JSON.stringify(set)); }catch(e){}
+    var hubo = false;
+    reempIdsDe(p).forEach(function(id){
+      if (id && set.indexOf(id) < 0){ set.push(id); hubo = true; }
+    });
+    if (hubo) reempGuardar(set);
   }
   function reempYa(p){
-    return reempEnviados().indexOf(reempId(p)) >= 0;
+    var set = reempEnviados();
+    return reempIdsDe(p).some(function(k){ return set.indexOf(k) >= 0; });
+  }
+  function pintarVerdesReemp(el){
+    if (!el) return;
+    var set = reempEnviados();
+    el.querySelectorAll('[data-reemp-id]').forEach(function(li){
+      var id = li.getAttribute('data-reemp-id') || '';
+      if (id && set.indexOf(id) >= 0) li.classList.add('ht-hecho');
+    });
   }
   function telDeEquipo(p){
     var c = (p && (p.tel || p.telefono || p.telf)) || '';
@@ -845,7 +892,7 @@
     lista.forEach(function(p){
       var a = parseAlta(p);
       var hecho = reempYa(p);
-      filas.push('<li class="' + (hecho ? 'ht-hecho' : '') + '">📝 <b>' + esc(p.nombre || '') + '</b> · ' + esc(p.cat || '—') + ' · alta ' + esc(fechaAltaTxt(a)) + '</li>');
+      filas.push('<li data-reemp-id="' + esc(reempId(p)) + '" class="' + (hecho ? 'ht-hecho' : '') + '">📝 <b>' + esc(p.nombre || '') + '</b> · ' + esc(p.cat || '—') + ' · alta ' + esc(fechaAltaTxt(a)) + '</li>');
       items.push(escribirReempA(p, mesNom));
     });
     return {
@@ -1174,6 +1221,7 @@
       '<h3>' + esc(t.titulo) + '</h3>' +
       '<div class="ht-cuerpo">' + t.html + '</div>' +
       (t.cta ? '<button type="button" class="ht-cta">' + esc(t.cta.label) + '</button>' : '');
+    if (t && t.cat === 'reempadronar') pintarVerdesReemp(el);
     return el;
   }
 
