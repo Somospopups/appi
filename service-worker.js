@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v455-atras-uno';
+const CACHE_NAME = 'appi-v456-equipo-share';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

@@ -1827,20 +1827,21 @@ body.dark .hist-action-drawer{background:linear-gradient(155deg,#151827,#252036 
   .btn-upload:active { transform: scale(0.96); }
 
   .equipo-tabs {
-    display: flex; gap: 6px; padding: 6px; border-radius: 16px;
+    display: flex; flex-wrap: wrap; gap: 6px; padding: 6px; border-radius: 16px;
     background: rgba(255,255,255,0.55);
     border: 1px solid rgba(255,255,255,0.7);
     -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
     margin-bottom: 14px;
   }
   .equipo-tab {
-    flex: 1; padding: 10px 6px; border-radius: 12px;
+    flex: 1 1 18%; min-width: 56px; padding: 10px 4px; border-radius: 12px;
     border: none; background: transparent;
     cursor: pointer; font-family: inherit;
-    font-size: 12px; font-weight: 700; color: #6b6b76;
+    font-size: 11px; font-weight: 700; color: #6b6b76;
     display: flex; flex-direction: column; align-items: center; gap: 2px;
     transition: all .2s ease;
   }
+  .equipo-tab.equipo-share { color: #3d63c9; }
   .equipo-tab .eq-emo { font-size: 18px; }
   .equipo-tab.active {
     color: #fff;
@@ -4163,7 +4164,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v455 · Segura</div>
+  <div class="ds-foot">APPI · v456 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4871,6 +4872,14 @@ body.dark #pageTabs button.active{color:#a8c0ff}
         <span class="eq-emo">📋</span>
         <span>Lista</span>
       </button>
+      <button type="button" class="equipo-tab equipo-share" data-eqshare="datos">
+        <span class="eq-emo">📤</span>
+        <span>Datos</span>
+      </button>
+      <button type="button" class="equipo-tab equipo-share" data-eqshare="org">
+        <span class="eq-emo">🧭</span>
+        <span>Organigrama</span>
+      </button>
     </div>
 
     <div id="equipoContent"></div>
@@ -4880,7 +4889,6 @@ body.dark #pageTabs button.active{color:#a8c0ff}
 
     <div class="actions" id="equipoBottomActions" style="margin-top:14px; display:none">
       <button class="btn" id="btnEquipoReload">🔄 Actualizar</button>
-      <button class="btn whatsapp" id="btnEquipoShare">Compartir</button>
     </div>
     <div id="equipoGarantiasActions" style="display:none">
       <button id="btnCargarGarantias" style="display:none">📄 Cargar Garantías</button>
@@ -7793,8 +7801,17 @@ function renderEquipo(){
 }
 document.querySelectorAll('.equipo-tab').forEach(btn=>{
   btn.onclick = ()=>{
+    if(btn.dataset.eqshare){
+      if(!equipoData) return;
+      haptic(10);
+      if(btn.dataset.eqshare==='datos') abrirSelectorParaCompartirDatos();
+      else if(typeof window.abrirSelectorOrganigrama==='function') window.abrirSelectorOrganigrama();
+      else if(typeof window.abrirOrganigramaInteractivo==='function') window.abrirOrganigramaInteractivo();
+      return;
+    }
+    if(!btn.dataset.eqtab) return;
     equipoActiveTab = btn.dataset.eqtab;
-    document.querySelectorAll('.equipo-tab').forEach(b=>b.classList.toggle('active', b.dataset.eqtab===equipoActiveTab));
+    document.querySelectorAll('.equipo-tab[data-eqtab]').forEach(b=>b.classList.toggle('active', b.dataset.eqtab===equipoActiveTab));
     haptic(8); renderEquipo();
   };
 });
@@ -9321,43 +9338,7 @@ function abrirSelectorParaCompartirDatos(){
   }
 }
 
-document.getElementById('btnEquipoShare').onclick = ()=>{
-  if(!equipoData) return;
-  const html = `
-    <button class="share-menu-item" id="smDatos">
-      <div class="sm-ico" style="background:linear-gradient(135deg,#25D366,#128C7E)">📊</div>
-      <div class="sm-txt">
-        <div class="sm-title">Compartir datos</div>
-        <div class="sm-desc">Datos del distribuidor que elijas</div>
-      </div>
-      <span class="sm-arrow">›</span>
-    </button>
-    <button class="share-menu-item" id="smImage">
-      <div class="sm-ico" style="background:linear-gradient(135deg,#5b8def,#a06bff)">🧭</div>
-      <div class="sm-txt">
-        <div class="sm-title">Organigrama interactivo</div>
-        <div class="sm-desc">Lienzo navegable para explorar, imprimir y exportar</div>
-      </div>
-      <span class="sm-arrow">›</span>
-    </button>
-  `;
-  modal.open({
-    icon:'📤', iconBg:'linear-gradient(135deg,#3ad0a4,#a06bff)',
-    title:'¿Cómo querés compartir?', sub:'Elegí una opción',
-    html
-  });
-  setTimeout(()=>{
-    const bd = document.getElementById('smDatos');
-    const bi = document.getElementById('smImage');
-    if(bd) bd.onclick = ()=>{ modal.close(); haptic(10); abrirSelectorParaCompartirDatos(); };
-    if(bi) bi.onclick = ()=>{
-      modal.close();
-      haptic(10);
-      if(typeof abrirSelectorOrganigrama==='function') abrirSelectorOrganigrama();
-      else if(typeof abrirOrganigramaInteractivo==='function') abrirOrganigramaInteractivo();
-    };
-  }, 50);
-};
+
 
 // Selector para elegir un distribuidor y ver qué datos compartir
 function abrirSelectorDistribuidor(){
@@ -12288,8 +12269,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='455';
-      const CACHE_NAME='appi-v455-atras-uno';
+      const swVersion='456';
+      const CACHE_NAME='appi-v456-equipo-share';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 
