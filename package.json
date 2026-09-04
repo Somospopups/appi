@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "476.0.0",
-  "cacheName": "appi-v476-paleta-crema",
+  "version": "477.0.0",
+  "cacheName": "appi-v477-impulso",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

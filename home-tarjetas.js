@@ -1136,8 +1136,8 @@
       '.ht-foto{display:block;width:100%;height:148px;object-fit:contain;background:#eef2f7;border-radius:16px;margin:0 0 12px}',
       /* La tarjeta especial se viste distinta: fondo pleno, frase grande y
          centrada, chips vidriosos y el corazón de marca de agua (v325). */
-      '.ht-card.ht-esp{background:linear-gradient(150deg,#4f7df2,#8b63e8 55%,#a06bff);}',
-      'body.dark .ht-card.ht-esp{background:linear-gradient(150deg,#3b5fc4,#6f4cc4 55%,#7e54d6)}',
+      '.ht-card.ht-esp{background:linear-gradient(150deg,#1278a0,#0b5878 58%,#063652);}',
+      'body.dark .ht-card.ht-esp{background:linear-gradient(150deg,#0e6a90,#0b5878 58%,#041f37)}',
       '.ht-card.ht-esp .ht-kicker{color:rgba(255,255,255,.9)}',
       '.ht-card.ht-esp h3{color:#fff;text-shadow:0 1px 6px rgba(20,20,60,.25)}',
       '.ht-card.ht-esp .ht-cuerpo{display:flex;flex-direction:column}',

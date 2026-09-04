@@ -169,9 +169,13 @@ body.dark header.top .script{
   background:#f7f3ea !important;
   border:1px solid rgba(40,36,28,.10) !important;
 }
-.ht-card{
+.ht-card:not(.ht-esp){
   background:linear-gradient(160deg,#fffef8,#f3eee3) !important;
   box-shadow:0 18px 40px rgba(30,24,12,.16) !important;
+}
+.ht-card.ht-esp{
+  background:linear-gradient(150deg,#1278a0,#0b5878 58%,#063652) !important;
+  box-shadow:0 18px 40px rgba(11,88,120,.28) !important;
 }
 .ht-top b{color:#2a2a32}
 
