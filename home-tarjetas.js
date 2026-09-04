@@ -717,6 +717,82 @@
       return String(x.nombre||'').localeCompare(String(y.nombre||''), 'es', {sensitivity:'base'});
     });
   }
+  function textoRequisitosReemp(){
+    return 'La Solicitud de Distribución Independiente que firmaste al ingresar al Negocio PSA tiene un año de vigencia. La renovación o reempadronamiento *no es automática*. Cada año, en el mes que hiciste tu ingreso, deberás presentar nuevamente la Solicitud con fotocopia de tu DNI y haber realizado el requisito de reempadronamiento.\n\n' +
+      '*¿Cuál es el requisito para reempadronarme?*\n' +
+      'Desde el 1° de julio de 2022:\n\n' +
+      '1. Cumplir con el mínimo de *1 PB personal* o *1 ingreso personal* durante el mes de reempadronamiento o durante alguno de los últimos tres meses anteriores.\n\n' +
+      '2. Presentar en formato físico en tu Centro PSA:\n' +
+      '• Solicitud de Distribución Independiente PSA firmada de forma manuscrita (frente y dorso) por el titular, por el socio (si corresponde) y por el Patrocinante.\n' +
+      '• Fotocopia del DNI vigente del titular y socio (si corresponde).\n' +
+      '• Fotocopia de un servicio del domicilio (no excluyente).\n\n' +
+      'Cualquier otra consulta: tu Centro PSA o cuidadodelamarca@psa.com.ar';
+  }
+  function reempMesClave(){
+    var d = new Date();
+    return 'appi_reemp_ok_v1_' + uid() + '_' + d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
+  }
+  function reempId(p){
+    return String((p && (p.codigo || p.id || p.nombre)) || '').trim();
+  }
+  function reempEnviados(){
+    var set = leerLS(reempMesClave(), []);
+    return Array.isArray(set) ? set : [];
+  }
+  function reempMarcar(p){
+    var id = reempId(p);
+    if (!id) return;
+    var set = reempEnviados();
+    if (set.indexOf(id) >= 0) return;
+    set.push(id);
+    try{ localStorage.setItem(reempMesClave(), JSON.stringify(set)); }catch(e){}
+  }
+  function reempYa(p){
+    return reempEnviados().indexOf(reempId(p)) >= 0;
+  }
+  function telDeEquipo(p){
+    var c = (p && (p.tel || p.telefono || p.telf)) || '';
+    var v = window.APPITel && window.APPITel.primeroValido ? window.APPITel.primeroValido(c) : '';
+    return v || c;
+  }
+  function saludoHoraReemp(){
+    var h = new Date().getHours();
+    if (h >= 6 && h < 12) return 'Buenos días';
+    if (h >= 12 && h < 20) return 'Buenas tardes';
+    return 'Buenas noches';
+  }
+  function siguientePlantillaReemp(){
+    var clave = 'appi_reemp_plantillas_v1_' + uid();
+    var estado = leerLS(clave, {});
+    var usadas = Array.isArray(estado.usadas) ? estado.usadas : [];
+    var n = 10;
+    if (usadas.length >= n) usadas = [];
+    var libres = [];
+    for (var i = 0; i < n; i++) if (usadas.indexOf(i) < 0) libres.push(i);
+    var idx = libres[Math.floor(Math.random() * libres.length)];
+    usadas.push(idx);
+    try{ localStorage.setItem(clave, JSON.stringify({ usadas: usadas })); }catch(e){}
+    return idx;
+  }
+  function mensajeReempPersona(p, mesNom){
+    var pila = pilaDe(p.nombre) || '';
+    var saludo = saludoHoraReemp();
+    var mes = mesNom;
+    var req = textoRequisitosReemp();
+    var plantillas = [
+      saludo + (pila ? ' ' + pila : '') + '! ¿Cómo andás? 😊\n\nTe escribo porque en *' + mes + '* te toca el reempadronamiento.\n\n' + req,
+      'Hola' + (pila ? ' ' + pila : '') + '! ' + saludo + ' 😊\n\nPaso a recordarte que este mes (*' + mes + '*) hay que reempadronarse. No es automático.\n\n' + req,
+      saludo + (pila ? ' ' + pila : '') + '!\n\nEn *' + mes + '* vence tu Solicitud de Distribución. Hay que renovarla en el Centro PSA.\n\n' + req,
+      'Hola' + (pila ? ' ' + pila : '') + '! Te dejo el aviso del reempadronamiento de *' + mes + '*, así lo tenés a mano.\n\n' + req,
+      saludo + (pila ? ' ' + pila : '') + '! ¿Todo bien?\n\nEste mes te corresponde reempadronar (el mes de tu ingreso). Te dejo qué hay que llevar.\n\n' + req,
+      'Hola' + (pila ? ' ' + pila : '') + '! 😊\n\nUn recordatorio: la renovación no es automática. En *' + mes + '* hay que presentar de nuevo la Solicitud.\n\n' + req,
+      saludo + (pila ? ' ' + pila : '') + '!\n\nPara no perder la distribución, en *' + mes + '* hay que reempadronarse. Te copio los requisitos.\n\n' + req,
+      'Hola' + (pila ? ' ' + pila : '') + '! Te escribo por el reempadronamiento de *' + mes + '*.\n\nSi ya lo hiciste, ignorá este mensaje. Si no, esto es lo que piden:\n\n' + req,
+      saludo + (pila ? ' ' + pila : '') + '! Te aviso con tiempo: *' + mes + '* es tu mes de reempadronamiento. Se presenta en el Centro PSA.\n\n' + req,
+      'Hola' + (pila ? ' ' + pila : '') + '! ¿Cómo venís?\n\nTe dejo la info del reempadronamiento (vigencia anual, no se renueva sola).\n\n' + req
+    ];
+    return plantillas[siguientePlantillaReemp()];
+  }
   function enviarReempadronar(lista, mesNom, anio){
     var n = lista.length;
     var msg = '📋 *Reempadronar · ' + mesNom.charAt(0).toUpperCase() + mesNom.slice(1) + ' ' + anio + '*\n';
@@ -726,19 +802,35 @@
       var a = parseAlta(p);
       msg += String(p.nombre||'').trim() + ' - ' + (p.cat || '—') + ' - ' + fechaAltaTxt(a) + '\n';
     });
-    msg += '\n━━━━━━━━━━━━━━━\n';
-    msg += 'La Solicitud de Distribución Independiente que firmaste al ingresar al Negocio PSA tiene un año de vigencia. La renovación o reempadronamiento *no es automática*. Cada año, en el mes que hiciste tu ingreso, deberás presentar nuevamente la Solicitud con fotocopia de tu DNI y haber realizado el requisito de reempadronamiento.\n\n';
-    msg += '*¿Cuál es el requisito para reempadronarme?*\n';
-    msg += 'Desde el 1° de julio de 2022:\n\n';
-    msg += '1. Cumplir con el mínimo de *1 PB personal* o *1 ingreso personal* durante el mes de reempadronamiento o durante alguno de los últimos tres meses anteriores.\n\n';
-    msg += '2. Presentar en formato físico en tu Centro PSA:\n';
-    msg += '• Solicitud de Distribución Independiente PSA firmada de forma manuscrita (frente y dorso) por el titular, por el socio (si corresponde) y por el Patrocinante.\n';
-    msg += '• Fotocopia del DNI vigente del titular y socio (si corresponde).\n';
-    msg += '• Fotocopia de un servicio del domicilio (no excluyente).\n\n';
-    msg += 'Cualquier otra consulta: tu Centro PSA o cuidadodelamarca@psa.com.ar\n';
-    msg += '\n━━━━━━━━━━━━━━━\nEnviado desde *APPI* 🚀';
+    msg += '\n━━━━━━━━━━━━━━━\n' + textoRequisitosReemp();
+    msg += '\n\n━━━━━━━━━━━━━━━\nEnviado desde *APPI* 🚀';
     if (typeof window.enviarMensajeWhatsApp === 'function') window.enviarMensajeWhatsApp(msg, 'Reempadronar');
     else if (window.APPIWhatsApp && window.APPIWhatsApp.abrir) window.APPIWhatsApp.abrir('https://wa.me/?text=' + encodeURIComponent(msg));
+  }
+  function escribirReempA(p, mesNom){
+    return function(li){
+      var nombre = pilaDe(p.nombre) || 'Esta persona';
+      var tel = telDeEquipo(p);
+      var okTel = !!(tel && window.APPITel && window.APPITel.esValido && window.APPITel.esValido(tel));
+      if (!okTel && tel && !window.APPITel) okTel = String(tel).replace(/\D/g,'').length >= 8;
+      if (!okTel){
+        if (window.APPITel && window.APPITel.avisarInvalido) window.APPITel.avisarInvalido(tel, nombre, p);
+        else if (window.APPIDialog && window.APPIDialog.alert) window.APPIDialog.alert(nombre + ' no tiene un teléfono válido en la planilla.', { title: 'Sin teléfono', icon: '📵' });
+        return;
+      }
+      var texto = mensajeReempPersona(p, mesNom);
+      var abierto = false;
+      if (window.APPITel && window.APPITel.abrir){
+        abierto = !!window.APPITel.abrir(tel, texto, nombre);
+      } else if (window.APPIWhatsApp && window.APPIWhatsApp.abrir){
+        window.APPIWhatsApp.abrir('https://wa.me/' + String(tel).replace(/\D/g,'') + '?text=' + encodeURIComponent(texto));
+        abierto = true;
+      }
+      if (abierto){
+        reempMarcar(p);
+        if (li && li.classList) li.classList.add('ht-hecho');
+      }
+    };
   }
   function tarjetaReempadronar(){
     var lista = personasAReempadronar();
@@ -749,18 +841,21 @@
     var anio = hoy.getFullYear();
     var n = lista.length;
     var filas = [];
-    lista.slice(0, 6).forEach(function(p){
+    var items = [];
+    lista.forEach(function(p){
       var a = parseAlta(p);
-      filas.push('<li>📝 <b>' + esc(p.nombre || '') + '</b> · ' + esc(p.cat || '—') + ' · alta ' + esc(fechaAltaTxt(a)) + '</li>');
+      var hecho = reempYa(p);
+      filas.push('<li class="' + (hecho ? 'ht-hecho' : '') + '">📝 <b>' + esc(p.nombre || '') + '</b> · ' + esc(p.cat || '—') + ' · alta ' + esc(fechaAltaTxt(a)) + '</li>');
+      items.push(escribirReempA(p, mesNom));
     });
-    if (n > 6) filas.push('<li>… y ' + (n - 6) + ' más</li>');
     return {
       cat: 'reempadronar', icono: '📝', kicker: 'Reempadronar',
       titulo: n === 1
         ? '1 persona para reempadronar en ' + mesNom
         : n + ' personas para reempadronar en ' + mesNom,
-      html: '<ul class="ht-lista ht-plain">' + filas.join('') + '</ul>' +
-            '<p class="ht-nota">Mantené presionada la tarjeta para enviarla por WhatsApp.</p>',
+      html: '<ul class="ht-lista">' + filas.join('') + '</ul>' +
+            '<p class="ht-nota">Tocá un nombre para escribirle. Mantené la tarjeta para enviar el listado.</p>',
+      items: items,
       alMantener: function(){ enviarReempadronar(lista, mesNom, anio); },
       cta: null
     };
@@ -978,6 +1073,10 @@
       '.ht-lista li::after{content:"›";margin-left:auto;color:#3d63c9;font-weight:900;font-size:17px}',
       '.ht-lista.ht-plain li{cursor:default}',
       '.ht-lista.ht-plain li::after{content:none}',
+      '.ht-lista li.ht-hecho{background:rgba(58,208,164,.22);color:#146b54}',
+      '.ht-lista li.ht-hecho::after{content:"✓";color:#168765}',
+      'body.dark .ht-lista li.ht-hecho{background:rgba(58,208,164,.2);color:#d8f5e6}',
+      'body.dark .ht-lista li.ht-hecho::after{color:#3ad0a4}',
       '.ht-lista li i{color:#c0392b;font-style:normal;font-size:12px;font-weight:900}',
       '.ht-nota{margin:12px 0 0;color:#8a8b98;font-size:13px;line-height:1.5}',
       '.ht-pasos{margin:12px 0 0;padding:0;list-style:none;display:grid;gap:8px}',
@@ -1140,18 +1239,20 @@
     if (t && t.cta){
       var cta = el.querySelector('.ht-cta');
       if (cta) cta.onclick = ejecutar(t.cta.go);
-      // Cada renglón lleva directo: si la tarjeta trae una acción por ítem
-      // (como saludar a ESA persona), se usa esa; si no, la general.
-      el.querySelectorAll('.ht-lista li').forEach(function(li, i){
-        var accion = (t.items && t.items[i]) || t.cta.go;
-        li.onclick = ejecutar(accion);
-      });
     }
+    el.querySelectorAll('.ht-lista li').forEach(function(li, i){
+      var accion = (t.items && t.items[i]) || (t.cta && t.cta.go);
+      if (accion){
+        (function(fn, fila){
+          li.onclick = function(){ try{ fn(fila); }catch(e){} };
+        })(accion, li);
+      }
+    });
     if (t && typeof t.alMantener === 'function'){
       var holdT = null;
       var clearHold = function(){ if (holdT){ clearTimeout(holdT); holdT = null; } };
       el.addEventListener('pointerdown', function(e){
-        if (e.target.closest('button, a')) return;
+        if (e.target.closest('button, a, .ht-lista li')) return;
         clearHold();
         holdT = setTimeout(function(){
           holdT = null;
