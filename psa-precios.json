@@ -1,0 +1,38 @@
+{
+  "actualizado": "4-Sep-2026",
+  "fuente": "https://tienda.psa.com.ar/",
+  "precios": {
+    "mini": 411000,
+    "vero": 528000,
+    "senior": 751000,
+    "senior4": 913000,
+    "s1000": 1079000,
+    "senik": 1248000,
+    "quantum2": 1271000,
+    "c3": 208000,
+    "rinnova": 296000,
+    "rinnova-poli": 296000,
+    "portatil": 122000,
+    "stopper": 240000,
+    "poli2": 280000,
+    "soda": 438000,
+    "iontrix": 1176000
+  },
+  "nombres": {
+    "mini": "PSA Mini - Bianco",
+    "vero": "PSA Vero - Bianco",
+    "senior": "PSA Senior - Bianco",
+    "senior4": "PSA Senior4 - Bianco",
+    "s1000": "PSA S-1000 II - Bianco",
+    "senik": "PSA Senik - Bianco ",
+    "quantum2": "PSA Quantum\\u00b72",
+    "c3": "PSA C3  - Grigio",
+    "rinnova": "Ducha PSA Rinnova - Bianco con KDF",
+    "rinnova-poli": "Ducha PSA Rinnova - Bianco con KDF Y POLI",
+    "portatil": "PSA Port\\u00e1til",
+    "stopper": "PSA Stopper",
+    "poli2": "PSA Poli 2 - Bianco",
+    "soda": "PSA SodaBurby - Bianco",
+    "iontrix": "PSA Iontrix 3"
+  }
+}

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v482-cotejo-conciencia';
+const CACHE_NAME = 'appi-v483-precios-tienda';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
@@ -87,6 +87,16 @@ self.addEventListener('fetch', event => {
 
   // Los CDN, Supabase, mapas y APIs conservan su comportamiento de red normal.
   if (url.origin !== self.location.origin) return;
+
+  // Precios de lista: siempre la red, nunca el cache del SW.
+  if (/\/psa-precios\.json$/.test(url.pathname)) {
+    event.respondWith(
+      fetch(event.request, { cache: 'no-store' }).catch(function(){
+        return new Response('{}', { status: 503, headers: { 'Content-Type': 'application/json' } });
+      })
+    );
+    return;
+  }
 
   if (event.request.mode === 'navigate') {
     event.respondWith(

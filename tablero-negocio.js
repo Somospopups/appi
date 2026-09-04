@@ -186,6 +186,7 @@
   var CMP_LS_TAB = 'appi_cmp_tab_v1';
   var CMP_LS_SEL = 'appi_cmp_sel_v1';
   var CMP_LS_PRE = 'appi_cmp_precios_v1';
+  var CMP_LIVE = null;
   var CMP = [
     {id:'mini', grupo:'Beber y cocinar', nombre:'Mini', precio:411000, litros:12000, meses:12, inst:'Sobre mesada',
       para:'Cocina chica u oficina, consumo bajo.',
@@ -333,7 +334,36 @@
   }
   function cmpPrecioDe(p){
     var n = Number(cmpPrecios()[p.id]);
-    return n > 0 ? n : p.precio;
+    if (n > 0) return n;
+    var live = CMP_LIVE && CMP_LIVE.precios ? Number(CMP_LIVE.precios[p.id]) : 0;
+    if (live > 0) return live;
+    return p.precio;
+  }
+  function cmpFechaLista(){
+    return (CMP_LIVE && CMP_LIVE.actualizado) ? CMP_LIVE.actualizado : '4-Sep-2026';
+  }
+  function cmpNotaPrecios(){
+    var el = $('cmpNotePrecios');
+    if (!el) return;
+    el.textContent = 'Fichas de catalogo.psa.com.ar. Precios de lista tienda ' + cmpFechaLista() + '. Cambiá el precio si cotizás otro.';
+  }
+  function cmpAplicarLive(){
+    var custom = cmpPrecios();
+    var aEl = $('cmpA'), bEl = $('cmpB'), paEl = $('cmpPa'), pbEl = $('cmpPb');
+    if (aEl && paEl && !custom[aEl.value]) paEl.value = cmpPrecioDe(cmpGet(aEl.value));
+    if (bEl && pbEl && !custom[bEl.value]) pbEl.value = cmpPrecioDe(cmpGet(bEl.value));
+    cmpNotaPrecios();
+    if ($('cmpOut')) cmpPinta();
+  }
+  function cmpCargarTienda(){
+    fetch('./psa-precios.json', { cache: 'no-store' })
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(d){
+        if (!d || !d.precios) return;
+        CMP_LIVE = d;
+        cmpAplicarLive();
+      })
+      .catch(function(){});
   }
   function cmpMoney(n){ return '$' + Math.round(n).toLocaleString('es-AR'); }
   function cmpL(n){ return Number(n).toLocaleString('es-AR'); }
@@ -380,7 +410,7 @@
       '</div>' +
       '<div id="cmpOut"></div>' +
       '<button type="button" class="cmp-btn" id="cmpShare">📤 Mandarla por WhatsApp</button>' +
-      '<p class="cmp-note">Fichas de catalogo.psa.com.ar. Precios de lista tienda 4-Sep-2026. Cambiá el precio si cotizás otro.</p>';
+      '<p class="cmp-note" id="cmpNotePrecios">Fichas de catalogo.psa.com.ar. Precios de lista tienda ' + cmpFechaLista() + '. Cambiá el precio si cotizás otro.</p>';
   }
   function htmlCmpBot(){
     return '<div class="tb-sub">Mostrala en la demo: la plata y el planeta despiertan conciencia</div>' +
@@ -538,6 +568,7 @@
       else window.open(url, '_blank', 'noopener');
     };
     cmpMostrar(cmpTab());
+    cmpCargarTienda();
   }
 
   function htmlBotella(){

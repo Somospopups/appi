@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "482.0.0",
-  "cacheName": "appi-v482-cotejo-conciencia",
+  "version": "483.0.0",
+  "cacheName": "appi-v483-precios-tienda",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {
