@@ -4164,7 +4164,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v456 · Segura</div>
+  <div class="ds-foot">APPI · v457 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -7798,6 +7798,17 @@ function renderEquipo(){
   if(equipoActiveTab === 'dashboard') renderEquipoDashboard();
   if(equipoActiveTab === 'arbol') renderEquipoArbol();
   if(equipoActiveTab === 'lista') renderEquipoLista();
+}
+function puedeExportarOrganigrama(){
+  const auth=window.APPIAuth;
+  const p=auth&&auth.currentProfile?auth.currentProfile():null;
+  if(!p) return false;
+  if(p.rol==='admin') return true;
+  const days=p.membresia_dias_restantes!=null?Number(p.membresia_dias_restantes):0;
+  return days>20000;
+}
+function aplicarPermisoExportarOrganigrama(){
+  document.body.classList.toggle('org-puede-exportar', !!puedeExportarOrganigrama());
 }
 document.querySelectorAll('.equipo-tab').forEach(btn=>{
   btn.onclick = ()=>{
@@ -12269,8 +12280,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='456';
-      const CACHE_NAME='appi-v456-equipo-share';
+      const swVersion='457';
+      const CACHE_NAME='appi-v457-org-export';
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 
@@ -12745,11 +12756,12 @@ body.dark .presu-select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:
   #orgPrint{ position:fixed; left:-99999px; top:0; }
   @media print{
     body * { visibility:hidden !important; }
-    #orgPrint, #orgPrint * { visibility:visible !important; }
-    #orgPrint{ position:absolute; left:0; top:0; width:100%; }
-    #orgPrint svg{ width:100%; height:auto; display:block; }
+    body.org-puede-exportar #orgPrint, body.org-puede-exportar #orgPrint * { visibility:visible !important; }
+    body.org-puede-exportar #orgPrint{ position:absolute; left:0; top:0; width:100%; }
+    body.org-puede-exportar #orgPrint svg{ width:100%; height:auto; display:block; }
     @page{ margin:8mm; }
   }
+  body:not(.org-puede-exportar) .oc-export{ display:none !important; }
 </style>
 
 <div id="orgCanvas" aria-hidden="true">
@@ -12761,9 +12773,9 @@ body.dark .presu-select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:
     <button class="oc-btn ghost" id="ocZoomIn" title="Acercar">＋</button>
     <button class="oc-btn ghost" id="ocFit" title="Ajustar a pantalla"><span class="ico">⤢</span></button>
     <div style="flex:1"></div>
-    <button class="oc-btn ghost" id="ocPrint" title="Imprimir en calidad vectorial"><span class="ico">🖨️</span><span>Imprimir</span></button>
-    <button class="oc-btn ghost" id="ocSvg" title="Descargar SVG vectorial, calidad máxima"><span class="ico">💎</span><span>SVG HD</span></button>
-    <button class="oc-btn ghost" id="ocPdfVector" title="PDF vectorial, nítido a cualquier zoom"><span class="ico">✦</span><span>PDF Vector</span></button>
+    <button class="oc-btn ghost oc-export" id="ocPrint" title="Imprimir en calidad vectorial"><span class="ico">🖨️</span><span>Imprimir</span></button>
+    <button class="oc-btn ghost oc-export" id="ocSvg" title="Descargar SVG vectorial, calidad máxima"><span class="ico">💎</span><span>SVG HD</span></button>
+    <button class="oc-btn ghost oc-export" id="ocPdfVector" title="PDF vectorial, nítido a cualquier zoom"><span class="ico">✦</span><span>PDF Vector</span></button>
   </div>
 
   <div class="oc-search" id="ocSearch">
@@ -13342,9 +13354,9 @@ body.dark .presu-select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:
     $('ocZoomIn').onclick=()=>{ const r=vRect(); zoomAt(r.width/2,r.height/2,1.2); };
     $('ocZoomOut').onclick=()=>{ const r=vRect(); zoomAt(r.width/2,r.height/2,1/1.2); };
     $('ocFit').onclick=()=>fitToScreen();
-    $('ocPrint').onclick=imprimir;
-    $('ocSvg').onclick=exportarSVG;
-    $('ocPdfVector').onclick=exportarPDFVector;
+    $('ocPrint').onclick=()=>{ if(!puedeExportarOrganigrama()) return; imprimir(); };
+    $('ocSvg').onclick=()=>{ if(!puedeExportarOrganigrama()) return; exportarSVG(); };
+    $('ocPdfVector').onclick=()=>{ if(!puedeExportarOrganigrama()) return; exportarPDFVector(); };
     bindSearch();
     window.addEventListener('resize',()=>{ if($('orgCanvas').classList.contains('open')){ updateMinimapViewport(); } });
   }
@@ -13364,6 +13376,7 @@ body.dark .presu-select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:
     bindNodeClicks();
     $('ocPersonLabel').textContent=root.esTitular?'Todo el equipo':String(root.nombre||'Persona').split(',')[0].trim();
     $('ocSearch').classList.remove('open');
+    if(typeof aplicarPermisoExportarOrganigrama==='function') aplicarPermisoExportarOrganigrama();
     $('orgCanvas').classList.add('open'); $('orgCanvas').setAttribute('aria-hidden','false');
     // esperar layout del DOM
     requestAnimationFrame(()=>requestAnimationFrame(()=>{ drawMinimap(); fitToScreen(); }));
