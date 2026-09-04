@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "481.0.0",
-  "cacheName": "appi-v481-cotejo-trata",
+  "version": "482.0.0",
+  "cacheName": "appi-v482-cotejo-conciencia",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

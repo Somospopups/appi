@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v481-cotejo-trata';
+const CACHE_NAME = 'appi-v482-cotejo-conciencia';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

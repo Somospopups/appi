@@ -290,14 +290,14 @@
     return CMP_QUE[key] || key;
   }
   var CMP_TRATA = {
-    cloro: { nom:'Cloro', txt:'La red lo agrega para que el agua llegue sin microbios. En la canilla queda gusto y olor a pileta, reseca piel y pelo, y al calentar (té, comida, ducha) puede formar THM. Bajarlo es tomar y cocinar sin ese gusto, y bañarse más suave.' },
-    thm: { nom:'THM (trihalometanos)', txt:'Se forman solos cuando el cloro se junta con materia orgánica del agua. No se ven. No es suciedad: es un subproducto del desinfectante. Conviene reducirlos porque los tomás todos los días sin darte cuenta.' },
-    hierro: { nom:'Hierro', txt:'Sale de caños viejos o de agua de pozo. Da gusto metálico y mancha pileta, ropa y sanitarios. Sacarlo es agua más limpia a la vista y al paladar.' },
-    plomo: { nom:'Plomo', txt:'Puede venir de cañerías o soldaduras antiguas. No se siente ni se ve. Conviene bajarlo porque el cuerpo lo acumula; en casas con chicos importa más.' },
-    solidos: { nom:'Sólidos en suspensión', txt:'Tierra, óxido y partículas del tanque o de la red. El agua se ve turbia o deja poso. Retenerlos mejora el aspecto y cuida los medios de adentro del equipo.' },
-    dureza: { nom:'Sarro / dureza', txt:'Calcio y magnesio. No es un veneno: es el sarro que incrusta cafetera, termo, flor de ducha y caños. Tratarlo es menos incrustación y menos gasto en artefactos.' },
-    arsenico: { nom:'Arsénico', txt:'En varias zonas de Argentina está en el agua de pozo, de origen natural (el suelo). No se ve ni se siente. El estudio del agua dice si hace falta un equipo que lo retenga, como el Senik.' },
-    algas: { nom:'Bacterias y algas (pileta)', txt:'En la piscina se reproducen con el calor y el uso. La ionización las controla y permite usar menos cloro en el agua donde te bañás.' }
+    cloro: { nom:'Cloro', txt:'La red lo pone para que el agua viaje sin microbios. En casa ya no hace falta: queda gusto a pileta, reseca piel, pelo y mucosas, irrita ojos en la ducha y, al calentar (mate, té, comida), forma THM. Tomarlo todos los días es tragar el desinfectante y sus derivados. Bajarlo es el primer paso entre el agua que venís tomando y el agua que vas a tomar.' },
+    thm: { nom:'THM (trihalometanos)', txt:'Se forman solos cuando el cloro se junta con materia orgánica. No se ven ni se huelen. En cada vaso, cada mate y cada comida entran al cuerpo. Con el consumo de años se los relaciona con más riesgo en vejiga e hígado. No es un susto de un día: es lo invisible de la canilla, todos los días.' },
+    hierro: { nom:'Hierro', txt:'Sale de caños viejos o de agua de pozo. Da gusto metálico, mancha ropa y sanitarios, y en exceso puede sentar mal el estómago. No es el más grave, pero es la señal de que el agua arrastra lo que hay en las cañerías. Sacarlo es paladar limpio y menos óxido en lo que tomás.' },
+    plomo: { nom:'Plomo', txt:'Puede salir de caños o soldaduras antiguas. No se ve, no se siente, no tiene gusto. El cuerpo no lo elimina bien: se acumula. En chicos afecta el desarrollo y el aprendizaje; en grandes, tensión y riñón. No hay una dosis “segura” para crecer. Por eso conviene no pasarlo en el agua de todos los días.' },
+    solidos: { nom:'Sólidos en suspensión', txt:'Tierra, óxido y partículas del tanque o de la red. El agua se ve turbia o deja poso: eso también se toma. Pueden llevar microbios y tapan los medios de adentro. Si se ve sucia, no es “solo tierra”: es lo que está entrando al vaso.' },
+    dureza: { nom:'Sarro / dureza', txt:'Calcio y magnesio. No es un veneno, pero el consumo constante deja sarro en el cuerpo de la casa: cafetera, termo, flor de ducha, caños, y la piel queda áspera. Tratarlo es otra agua al tacto y menos incrustación. El estudio dice si esa casa la tiene dura.' },
+    arsenico: { nom:'Arsénico', txt:'En varias zonas de Argentina (también Córdoba) está en el agua de pozo, de origen natural. No se ve ni se siente. Tomarlo años se asocia a lesiones en la piel y a más riesgo de cáncer de piel, pulmón y vejiga. No es un maybe de un vaso: es el agua de esa casa, todos los días. El estudio dice si hace falta un Senik.' },
+    algas: { nom:'Bacterias y algas (pileta)', txt:'En la pileta se reproducen con el calor y el uso. Tragar esa agua o bañarse con exceso de cloro irrita ojos, piel y puede sentar mal la panza. Ionizar es otra agua para el cuerpo que se mete a nadar, con menos químico.' }
   };
   var CMP_TRATA_ORDEN = ['cloro','thm','hierro','plomo','solidos','dureza','arsenico','algas'];
   function cmpTrataHtml(a, b){
@@ -306,7 +306,7 @@
     if (!keys.length) {
       return '<p>Ninguno de los dos purifica: no bajan cloro ni metales. Si es soda, gasifica agua que ya pasó por un equipo.</p>';
     }
-    return '<ul>' + keys.map(function(k){
+    return '<p>Hoy esa familia toma lo que sale de la canilla. Mañana puede tomar lo que el equipo deja pasar. La diferencia no se juega en un vaso: se juega en años, mate a mate.</p><ul>' + keys.map(function(k){
       var info = CMP_TRATA[k];
       var enA = ka.indexOf(k) >= 0, enB = kb.indexOf(k) >= 0;
       var quien = (enA && enB) ? 'Los dos lo tratan.' : (enA ? ('Lo trata ' + a.nombre + '. ' + b.nombre + ' no.') : ('Lo trata ' + b.nombre + '. ' + a.nombre + ' no.'));
@@ -317,7 +317,7 @@
     var ka = a.trataKeys || [], kb = b.trataKeys || [];
     var keys = CMP_TRATA_ORDEN.filter(function(k){ return ka.indexOf(k) >= 0 || kb.indexOf(k) >= 0; });
     if (!keys.length) return 'Ninguno purifica el agua.';
-    return keys.map(function(k){
+    return 'Hoy toman lo que sale de la canilla. Mañana pueden tomar lo que el equipo deja pasar.\n' + keys.map(function(k){
       var info = CMP_TRATA[k];
       var enA = ka.indexOf(k) >= 0, enB = kb.indexOf(k) >= 0;
       var quien = (enA && enB) ? 'Los dos.' : (enA ? a.nombre : b.nombre);
