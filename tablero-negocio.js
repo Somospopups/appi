@@ -113,10 +113,13 @@
       '.cmp-win{color:#0b5878;font-weight:950}' +
       '.cmp-box{margin:10px 0 0;padding:12px;border-radius:14px;background:#f7f3ea;border:1px solid rgba(11,88,120,.12)}' +
       'body.dark .cmp-box{background:#1d2130}' +
-      '.cmp-box b{display:block;margin:0 0 6px;color:#0b5878;font-size:12px}' +
-      '.cmp-box p,.cmp-box li{margin:0 0 6px;font-size:12.5px;font-weight:700;color:#343441;line-height:1.4}' +
+      '.cmp-box > b{display:block;margin:0 0 6px;color:#0b5878;font-size:12px}' +
+      '.cmp-box p,.cmp-box li{margin:0 0 8px;font-size:12.5px;font-weight:700;color:#343441;line-height:1.45}' +
       'body.dark .cmp-box p,body.dark .cmp-box li{color:#e8e8f0}' +
-      '.cmp-box ul{margin:0;padding-left:18px}' +
+      '.cmp-box ul{margin:0 0 4px;padding-left:18px}' +
+      '.cmp-box li b{color:#0b5878}' +
+      '.cmp-h{margin:8px 0 4px;font-size:12px;font-weight:950;color:#0b5878}' +
+      '.cmp-quien{display:block;margin-top:4px;color:#0b5878;font-size:11.5px;font-weight:850}' +
       '.cmp-btn{width:100%;margin-top:12px;border:0;border-radius:12px;padding:12px 14px;background:#0b5878;color:#fff;font:inherit;font-size:13px;font-weight:900;cursor:pointer}' +
       '.cmp-note{margin:8px 0 0;font-size:10.5px;font-weight:700;color:#686977;line-height:1.35}' +
       '@media (max-width:420px){.cmp-grid{grid-template-columns:1fr}}';
@@ -187,62 +190,77 @@
     {id:'mini', grupo:'Beber y cocinar', nombre:'Mini', precio:411000, litros:12000, meses:12, inst:'Sobre mesada',
       para:'Cocina chica u oficina, consumo bajo.',
       trata:'Cloro y sólidos en suspensión.',
+      trataKeys:['cloro','solidos'],
       tiene:['CAG','CAG con plata','Fipor','Casquete 360°','Kit posventa']},
     {id:'vero', grupo:'Beber y cocinar', nombre:'Vero', precio:528000, litros:15000, meses:18, inst:'Sobre mesada',
       para:'Beber, cocinar y lavar alimentos al menor precio con KDF.',
       trata:'Cloro (más del 90 %), THM (más del 60 %), hierro y plomo.',
+      trataKeys:['cloro','thm','hierro','plomo'],
       tiene:['CAG','CAG con plata','KDF','Resina mineral','Fipor','Kit posventa']},
     {id:'senior', grupo:'Beber y cocinar', nombre:'Senior', precio:751000, litros:36000, meses:36, inst:'Sobre mesada',
       para:'Uso diario de una familia, 3 años.',
       trata:'Cloro (más del 90 %), THM (más del 60 %), hierro y plomo.',
+      trataKeys:['cloro','thm','hierro','plomo'],
       tiene:['CAG','CAG con plata','KDF','Fipor','Casquete 360°','Kit posventa']},
     {id:'senior4', grupo:'Beber y cocinar', nombre:'Senior4', precio:913000, litros:36000, meses:36, inst:'Sobre o bajo mesada',
       para:'La evolución del Senior: diseño, prefiltro y también bajo mesada.',
       trata:'Cloro (más del 90 %), THM (más del 60 %), hierro y plomo.',
+      trataKeys:['cloro','thm','hierro','plomo'],
       tiene:['CAG','CAG con plata','KDF','Prefiltro','Fipor','Casquete 360°','Cartucho de repuesto','Bajo mesada']},
     {id:'s1000', grupo:'Beber y cocinar', nombre:'S-1000 II', precio:1079000, litros:80000, meses:36, inst:'Sobre o bajo mesada',
       para:'Mucho volumen: oficinas, familias grandes, uso intenso.',
       trata:'Cloro (más del 90 %), THM (más del 60 %), hierro y plomo.',
+      trataKeys:['cloro','thm','hierro','plomo'],
       tiene:['CAG','CAG con plata','KDF','Cartucho bacteriostático','Alto volumen','Bajo mesada']},
     {id:'senik', grupo:'Beber y cocinar', nombre:'Senik', precio:1248000, litros:8000, meses:18, inst:'Sobre o bajo mesada',
       para:'Agua con arsénico. El rendimiento baja si hay más arsénico.',
       trata:'Arsénico, cloro, THM y metales.',
+      trataKeys:['arsenico','cloro','thm','hierro','plomo'],
       tiene:['CAG','CAG con plata','KDF','Resina de arsénico','Cartucho bacteriostático','Bajo mesada']},
     {id:'quantum2', grupo:'Beber y cocinar', nombre:'Quantum·2', precio:1271000, litros:30000, meses:36, inst:'Sobre o bajo mesada',
       para:'Agua dura: menos sarro en cafeteras, termos y vajilla.',
       trata:'Dureza / sarro, cloro y THM.',
+      trataKeys:['dureza','cloro','thm'],
       tiene:['CAG','CAG con plata','Resina de dureza','Cartucho bacteriostático','Bajo mesada']},
     {id:'c3', grupo:'Baño', nombre:'C3', precio:208000, litros:2000, meses:6, inst:'Canilla del baño',
       para:'Cepillarse los dientes y lavarse la cara con menos cloro.',
       trata:'Cloro, THM y sólidos en suspensión.',
+      trataKeys:['cloro','thm','solidos'],
       tiene:['CAG','CAG con plata']},
     {id:'rinnova', grupo:'Baño', nombre:'Ducha Rinnova KDF', precio:296000, litros:150000, meses:6, inst:'Ducha',
       para:'Piel y pelo: menos cloro en la ducha. Cartucho a los 6 meses.',
       trata:'Cloro y metales (hierro, plomo).',
+      trataKeys:['cloro','hierro','plomo'],
       tiene:['KDF','Ducha']},
     {id:'rinnova-poli', grupo:'Baño', nombre:'Ducha Rinnova KDF+Poli', precio:296000, litros:150000, meses:6, inst:'Ducha',
       para:'Lo mismo que KDF y además frena el sarro en la ducha.',
       trata:'Cloro, metales y sarro.',
+      trataKeys:['cloro','hierro','plomo','dureza'],
       tiene:['KDF','Polifosfato','Ducha']},
     {id:'portatil', grupo:'Otros', nombre:'Portátil', precio:122000, litros:0, meses:0, inst:'Para llevar',
       para:'Viaje o la oficina, cuando no hay equipo fijo.',
       trata:'Cloro en agua de red, según el uso.',
+      trataKeys:['cloro'],
       tiene:['CAG','Portátil']},
     {id:'stopper', grupo:'Otros', nombre:'Stopper', precio:240000, litros:0, meses:6, inst:'Cañería',
       para:'Retiene tierra y partículas gruesas antes de que lleguen a la casa.',
       trata:'Sedimentos y suciedad de tanque o cañerías.',
+      trataKeys:['solidos'],
       tiene:['Sedimentos']},
     {id:'poli2', grupo:'Otros', nombre:'Poli 2', precio:280000, litros:0, meses:0, inst:'Cañería / entrada de agua',
       para:'Frena el sarro en cañerías, termotanque y electrodomésticos.',
       trata:'Sarro / cal en agua caliente.',
+      trataKeys:['dureza'],
       tiene:['Polifosfato']},
     {id:'soda', grupo:'Otros', nombre:'SodaBurby', precio:438000, litros:0, meses:0, inst:'Mesada',
       para:'Soda en casa con agua ya purificada. No es un purificador.',
       trata:'No trata el agua: la gasifica.',
+      trataKeys:[],
       tiene:['Soda']},
     {id:'iontrix', grupo:'Otros', nombre:'Iontrix 3', precio:1176000, litros:40000, meses:24, inst:'Piscina',
       para:'Piscina con menos cloro. Primera ionización ~40.000 L.',
       trata:'Bacterias en agua de piscina, por ionización.',
+      trataKeys:['algas'],
       tiene:['Ionización','Panel solar']}
   ];
   var CMP_QUE = {
@@ -270,6 +288,41 @@
   };
   function cmpExplica(key){
     return CMP_QUE[key] || key;
+  }
+  var CMP_TRATA = {
+    cloro: { nom:'Cloro', txt:'La red lo agrega para que el agua llegue sin microbios. En la canilla queda gusto y olor a pileta, reseca piel y pelo, y al calentar (té, comida, ducha) puede formar THM. Bajarlo es tomar y cocinar sin ese gusto, y bañarse más suave.' },
+    thm: { nom:'THM (trihalometanos)', txt:'Se forman solos cuando el cloro se junta con materia orgánica del agua. No se ven. No es suciedad: es un subproducto del desinfectante. Conviene reducirlos porque los tomás todos los días sin darte cuenta.' },
+    hierro: { nom:'Hierro', txt:'Sale de caños viejos o de agua de pozo. Da gusto metálico y mancha pileta, ropa y sanitarios. Sacarlo es agua más limpia a la vista y al paladar.' },
+    plomo: { nom:'Plomo', txt:'Puede venir de cañerías o soldaduras antiguas. No se siente ni se ve. Conviene bajarlo porque el cuerpo lo acumula; en casas con chicos importa más.' },
+    solidos: { nom:'Sólidos en suspensión', txt:'Tierra, óxido y partículas del tanque o de la red. El agua se ve turbia o deja poso. Retenerlos mejora el aspecto y cuida los medios de adentro del equipo.' },
+    dureza: { nom:'Sarro / dureza', txt:'Calcio y magnesio. No es un veneno: es el sarro que incrusta cafetera, termo, flor de ducha y caños. Tratarlo es menos incrustación y menos gasto en artefactos.' },
+    arsenico: { nom:'Arsénico', txt:'En varias zonas de Argentina está en el agua de pozo, de origen natural (el suelo). No se ve ni se siente. El estudio del agua dice si hace falta un equipo que lo retenga, como el Senik.' },
+    algas: { nom:'Bacterias y algas (pileta)', txt:'En la piscina se reproducen con el calor y el uso. La ionización las controla y permite usar menos cloro en el agua donde te bañás.' }
+  };
+  var CMP_TRATA_ORDEN = ['cloro','thm','hierro','plomo','solidos','dureza','arsenico','algas'];
+  function cmpTrataHtml(a, b){
+    var ka = a.trataKeys || [], kb = b.trataKeys || [];
+    var keys = CMP_TRATA_ORDEN.filter(function(k){ return ka.indexOf(k) >= 0 || kb.indexOf(k) >= 0; });
+    if (!keys.length) {
+      return '<p>Ninguno de los dos purifica: no bajan cloro ni metales. Si es soda, gasifica agua que ya pasó por un equipo.</p>';
+    }
+    return '<ul>' + keys.map(function(k){
+      var info = CMP_TRATA[k];
+      var enA = ka.indexOf(k) >= 0, enB = kb.indexOf(k) >= 0;
+      var quien = (enA && enB) ? 'Los dos lo tratan.' : (enA ? ('Lo trata ' + a.nombre + '. ' + b.nombre + ' no.') : ('Lo trata ' + b.nombre + '. ' + a.nombre + ' no.'));
+      return '<li><b>' + esc(info.nom) + '.</b> ' + esc(info.txt) + '<span class="cmp-quien">' + esc(quien) + '</span></li>';
+    }).join('') + '</ul>';
+  }
+  function cmpTrataTxt(a, b){
+    var ka = a.trataKeys || [], kb = b.trataKeys || [];
+    var keys = CMP_TRATA_ORDEN.filter(function(k){ return ka.indexOf(k) >= 0 || kb.indexOf(k) >= 0; });
+    if (!keys.length) return 'Ninguno purifica el agua.';
+    return keys.map(function(k){
+      var info = CMP_TRATA[k];
+      var enA = ka.indexOf(k) >= 0, enB = kb.indexOf(k) >= 0;
+      var quien = (enA && enB) ? 'Los dos.' : (enA ? a.nombre : b.nombre);
+      return '• ' + info.nom + ': ' + info.txt + ' (' + quien + ')';
+    }).join('\n');
   }
   function cmpGet(id){
     for (var i = 0; i < CMP.length; i++) if (CMP[i].id === id) return CMP[i];
@@ -317,7 +370,7 @@
   function htmlCmpProd(){
     var s = cmpSel();
     var a = cmpGet(s.a), b = cmpGet(s.b);
-    return '<div class="tb-sub">Elegí dos. APPI te dice qué cambia, los litros y cuál conviene en plata.</div>' +
+    return '<div class="tb-sub">Elegí dos. Ves qué cambia y los litros. El que va es el que se adapta al agua de esa casa, después del estudio.</div>' +
       '<div class="cmp-pick">' +
         '<div><label>Producto 1</label><select class="tb-input" id="cmpA">' + cmpOpts(s.a) + '</select>' +
           '<label>Precio</label><input class="tb-input" id="cmpPa" type="number" min="0" step="1000" value="' + cmpPrecioDe(a) + '"></div>' +
@@ -433,15 +486,16 @@
         '<tr><td>Precio</td>' + cmpCelda(cmpMoney(pa), winP === 'a') + cmpCelda(cmpMoney(pb), winP === 'b') + '</tr>' +
         '<tr><td>El litro</td>' + cmpCelda(litroTxt(la), winU === 'a') + cmpCelda(litroTxt(lb), winU === 'b') + '</tr>' +
         '<tr><td>Dónde va</td><td>' + esc(a.inst) + '</td><td>' + esc(b.inst) + '</td></tr>' +
-        '<tr><td>Qué trata</td><td>' + esc(a.trata) + '</td><td>' + esc(b.trata) + '</td></tr>' +
       '</table>' +
+      '<div class="cmp-box"><b>Qué trata y por qué sacarlo</b>' + cmpTrataHtml(a, b) + '</div>' +
       (relato.length ? '<div class="cmp-box"><b>En números</b><ul>' + relato.map(function(x){ return '<li>' + esc(x) + '</li>'; }).join('') + '</ul></div>' : '') +
       '<div class="cmp-box"><b>Qué trae distinto</b>' + distHtml + '</div>' +
-      '<div class="cmp-box"><b>Conveniencia</b><p>' + esc(conv) + '</p></div>';
+      '<div class="cmp-box"><b>En esa casa</b><p>' + esc(conv) + '</p></div>';
     window.__cmpTexto =
       '⚖️ ' + a.nombre + ' vs ' + b.nombre + '\n\n' +
-      a.nombre + '\n• ' + litrosTxt(a) + ' · ' + mesesTxt(a) + '\n• ' + cmpMoney(pa) + (la != null ? ' · ' + cmpMoney(la) + ' el litro' : '') + '\n• ' + a.trata + '\n\n' +
-      b.nombre + '\n• ' + litrosTxt(b) + ' · ' + mesesTxt(b) + '\n• ' + cmpMoney(pb) + (lb != null ? ' · ' + cmpMoney(lb) + ' el litro' : '') + '\n• ' + b.trata + '\n\n' +
+      a.nombre + '\n• ' + litrosTxt(a) + ' · ' + mesesTxt(a) + '\n• ' + cmpMoney(pa) + (la != null ? ' · ' + cmpMoney(la) + ' el litro' : '') + '\n\n' +
+      b.nombre + '\n• ' + litrosTxt(b) + ' · ' + mesesTxt(b) + '\n• ' + cmpMoney(pb) + (lb != null ? ' · ' + cmpMoney(lb) + ' el litro' : '') + '\n\n' +
+      'Qué trata y por qué sacarlo\n' + cmpTrataTxt(a, b) + '\n\n' +
       (relato.length ? 'En números\n' + relato.map(function(x){ return '• ' + x; }).join('\n') + '\n\n' : '') +
       'Qué trae distinto\n' + distTxt.join('\n') + '\n\n' +
       'En esa casa\n' + conv;
