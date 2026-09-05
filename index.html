@@ -4230,7 +4230,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v507 · Segura</div>
+  <div class="ds-foot">APPI · v508 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4511,7 +4511,7 @@ body.dark #pageTabs button.active{color:#c5d6ff}
       <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
 
       <div class="home-brand-row">
-        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · v507</span></span>
+        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · v508</span></span>
       </div>
 
       <div class="home-hero-card">
@@ -5050,7 +5050,7 @@ body.dark #pageTabs button.active{color:#c5d6ff}
         <div style="font-size:32px">📂</div>
         <h3 style="margin:8px 0 4px">Cargar archivo de Garantías / Usuarios</h3>
       </div>
-      <a class="btn-ir-psa" href="https://mi.psa.com.ar/login" target="_blank" rel="noopener noreferrer">Ir a PSA</a>
+      <a class="btn-ir-psa" href="https://mi.psa.com.ar/login" target="_blank" rel="noopener noreferrer">Descargar archivos</a>
       <label class="upload-zone" id="usuariosDropZone" for="usuariosFileInput" role="button" tabindex="0" aria-label="Cargar archivo Excel" style="display:block;cursor:pointer;position:relative;overflow:hidden">
         <input type="file" id="usuariosFileInput" accept=".xls,.xlsx,.csv,.ods" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;z-index:2">
         <div style="position:relative;z-index:1;pointer-events:none">
@@ -7936,7 +7936,7 @@ function renderEquipo(){
         <span class="up-ico">📤</span>
         <h3>Cargá tu planilla</h3>
         <p>Descargá el reporte de <strong>Línea Descendente</strong> desde la empresa (.xls o .xlsx) y cargalo acá.</p>
-        <a class="btn-ir-psa" href="https://mi.psa.com.ar/login" target="_blank" rel="noopener noreferrer">Ir a PSA</a>
+        <a class="btn-ir-psa" href="https://mi.psa.com.ar/login" target="_blank" rel="noopener noreferrer">Descargar archivos</a>
         <button class="btn-upload" id="btnUpload">📁 Elegir archivo</button>
       </div>
       <div class="footer-quote" style="margin-top:12px">Tu equipo, siempre a mano.<br/>Los datos quedan solo en tu dispositivo.</div>
@@ -12400,8 +12400,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='507';
-      const CACHE_NAME='appi-v507-ir-psa';
+      const swVersion='508';
+      const CACHE_NAME='appi-v508-descargar';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · v'+swVersion;
       const hadController=Boolean(navigator.serviceWorker.controller);

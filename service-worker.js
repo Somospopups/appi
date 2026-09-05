@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v507-ir-psa';
+const CACHE_NAME = 'appi-v508-descargar';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
