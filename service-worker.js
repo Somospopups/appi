@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v506-admin-ojo';
+const CACHE_NAME = 'appi-v507-ir-psa';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "506.0.0",
-  "cacheName": "appi-v506-admin-ojo",
+  "version": "507.0.0",
+  "cacheName": "appi-v507-ir-psa",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {
