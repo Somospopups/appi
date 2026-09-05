@@ -31,6 +31,34 @@
     { l: 4, t: '4 litros diarios', s: 'hogar con o sin bebé' },
     { l: 8, t: '8 litros diarios', s: 'hogar familia tipo' }
   ];
+  var TRATA_INTRO = 'Hoy esa familia toma lo que sale de la canilla. Mañana puede tomar lo que el equipo deja pasar. La diferencia no se juega en un vaso: se juega en años, mate a mate.';
+  var TRATA = {
+    cloro: { nom: 'Cloro', txt: 'La red lo pone para que el agua viaje sin microbios. En casa ya no hace falta: queda gusto a pileta, reseca piel, pelo y mucosas, irrita ojos en la ducha y, al calentar (mate, té, comida), forma THM. Tomarlo todos los días es tragar el desinfectante y sus derivados. Bajarlo es el primer paso entre el agua que venís tomando y el agua que vas a tomar.' },
+    thm: { nom: 'THM (trihalometanos)', txt: 'Se forman solos cuando el cloro se junta con materia orgánica. No se ven ni se huelen. En cada vaso, cada mate y cada comida entran al cuerpo. Con el consumo de años se los relaciona con más riesgo en vejiga e hígado. No es un susto de un día: es lo invisible de la canilla, todos los días.' },
+    hierro: { nom: 'Hierro', txt: 'Sale de caños viejos o de agua de pozo. Da gusto metálico, mancha ropa y sanitarios, y en exceso puede sentar mal el estómago. No es el más grave, pero es la señal de que el agua arrastra lo que hay en las cañerías. Sacarlo es paladar limpio y menos óxido en lo que tomás.' },
+    plomo: { nom: 'Plomo', txt: 'Puede salir de caños o soldaduras antiguas. No se ve, no se siente, no tiene gusto. El cuerpo no lo elimina bien: se acumula. En chicos afecta el desarrollo y el aprendizaje; en grandes, tensión y riñón. No hay una dosis “segura” para crecer. Por eso conviene no pasarlo en el agua de todos los días.' },
+    solidos: { nom: 'Sólidos en suspensión', txt: 'Tierra, óxido y partículas del tanque o de la red. El agua se ve turbia o deja poso: eso también se toma. Pueden llevar microbios y tapan los medios de adentro. Si se ve sucia, no es “solo tierra”: es lo que está entrando al vaso.' },
+    dureza: { nom: 'Sarro / dureza', txt: 'Calcio y magnesio. No es un veneno, pero el consumo constante deja sarro en el cuerpo de la casa: cafetera, termo, flor de ducha, caños, y la piel queda áspera. Tratarlo es otra agua al tacto y menos incrustación. El estudio dice si esa casa la tiene dura.' },
+    arsenico: { nom: 'Arsénico', txt: 'En varias zonas de Argentina (también Córdoba) está en el agua de pozo, de origen natural. No se ve ni se siente. Tomarlo años se asocia a lesiones en la piel y a más riesgo de cáncer de piel, pulmón y vejiga. No es un maybe de un vaso: es el agua de esa casa, todos los días.' },
+    algas: { nom: 'Bacterias y algas (pileta)', txt: 'En la pileta se reproducen con el calor y el uso. Tragar esa agua o bañarse con exceso de cloro irrita ojos, piel y puede sentar mal la panza. Ionizar es otra agua para el cuerpo que se mete a nadar, con menos químico.' }
+  };
+  var TRATA_ORDEN = ['cloro', 'thm', 'hierro', 'plomo', 'solidos', 'dureza', 'arsenico', 'algas'];
+  var TRATA_EQ = [
+    { k: ['SENIOR4', 'SENIOR 4'], keys: ['cloro', 'thm', 'hierro', 'plomo'] },
+    { k: ['S-1000', 'S·1000', 'S•1000'], keys: ['cloro', 'thm', 'hierro', 'plomo'] },
+    { k: ['SENIK'], keys: ['arsenico', 'cloro', 'thm', 'hierro', 'plomo'] },
+    { k: ['QUANTUM'], keys: ['dureza', 'cloro', 'thm'] },
+    { k: ['IONTRIX'], keys: ['algas'] },
+    { k: ['VERO'], keys: ['cloro', 'thm', 'hierro', 'plomo'] },
+    { k: ['MINI'], keys: ['cloro', 'solidos'] },
+    { k: ['POLI'], keys: ['cloro', 'hierro', 'plomo', 'dureza'] },
+    { k: ['RINNOVA', 'DUCHA'], keys: ['cloro', 'hierro', 'plomo'] },
+    { k: ['C3'], keys: ['cloro', 'thm', 'solidos'] },
+    { k: ['SENIOR'], keys: ['cloro', 'thm', 'hierro', 'plomo'] },
+    { k: ['STOPPER'], keys: ['solidos'] },
+    { k: ['PORTÁTIL', 'PORTATIL'], keys: ['cloro'] },
+    { k: ['POLI 2', 'POLI2'], keys: ['dureza'] }
+  ];
   var PLANES = { cuotas: [3, 6, 9, 12, 15, 18], bancos: [], vigencia: '' };
   var filtro = 'todos';
   var busca = '';
@@ -491,6 +519,19 @@
     }
     return null;
   }
+  function trataDe(p) {
+    var n = String((p && p.nombre) || '').toUpperCase();
+    if (!n || (p && p.grupo && p.grupo !== 'equipos')) return [];
+    if (/BURBY|SODA/.test(n) && n.indexOf('DUCHA') < 0) return [];
+    // Poli 2 (cañerías) vs ducha con poli
+    if (/POLI\s*2|POLI2/.test(n) && n.indexOf('DUCHA') < 0 && n.indexOf('RINNOVA') < 0) return ['dureza'];
+    for (var i = 0; i < TRATA_EQ.length; i++) {
+      for (var j = 0; j < TRATA_EQ[i].k.length; j++) {
+        if (n.indexOf(TRATA_EQ[i].k[j]) >= 0) return TRATA_EQ[i].keys.slice();
+      }
+    }
+    return [];
+  }
   function botFmt(n, d) {
     return Number(n).toLocaleString('es-AR', { maximumFractionDigits: d || 0, minimumFractionDigits: 0 });
   }
@@ -728,12 +769,9 @@
         pdf.rect(0, 22, W, 5, 'F');
       }
       function pie(n, tot) {
-        pdf.setDrawColor(210, 200, 180);
-        pdf.line(m, H - 12, W - m, H - 12);
         pdf.setFont('helvetica', 'normal');
         pdf.setFontSize(8);
         pdf.setTextColor.apply(pdf, gris);
-        pdf.text('Precios de lista. No incluye instalación.' + (fecha ? '  ·  ' + fecha : ''), m, H - 7);
         pdf.text(n + ' / ' + tot, W - m, H - 7, { align: 'right' });
       }
       function botonVideo(x, y, w, h, url) {
@@ -746,74 +784,119 @@
         pdf.link(x, y, w, h, { url: url });
       }
 
-      encabezado('Presupuesto');
-      pdf.setTextColor.apply(pdf, oscuro);
+      pdf.setFillColor.apply(pdf, crema);
+      pdf.rect(0, 0, W, H, 'F');
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(26);
+      pdf.setTextColor.apply(pdf, azul);
+      pdf.text('PRESUPUESTO', m, 24);
       pdf.setFont('helvetica', 'normal');
-      pdf.setFontSize(11);
-      var y = 36;
-      if (para) { pdf.setFont('helvetica', 'bold'); pdf.text('Para:  ' + para, m, y); y += 7; pdf.setFont('helvetica', 'normal'); }
       pdf.setFontSize(9);
       pdf.setTextColor.apply(pdf, gris);
-      pdf.text('Fecha de lista: ' + (hoy || '—'), m, y);
-      y += 8;
+      pdf.text(hoy || fecha || '', W - m, 16, { align: 'right' });
+      pdf.setFontSize(8);
+      pdf.text('Precios de lista', W - m, 21, { align: 'right' });
+      pdf.setDrawColor.apply(pdf, azul);
+      pdf.setLineWidth(1.15);
+      pdf.line(m, 30, W - m, 30);
+      pdf.setLineWidth(0.28);
+      pdf.line(m, 32.2, W - m, 32.2);
 
+      var y = 42;
+      if (para) {
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(8);
+        pdf.setTextColor.apply(pdf, gris);
+        pdf.text('PARA', m, y);
+        pdf.setFontSize(13);
+        pdf.setTextColor.apply(pdf, oscuro);
+        pdf.text(para, m, y + 7);
+        y += 16;
+      }
+
+      var usable = W - 2 * m;
+      var xCant = m + 118;
+      var xPre = m + 140;
+      var rowH = 9;
       pdf.setFillColor.apply(pdf, azul);
-      pdf.rect(m, y, W - 2 * m, 8, 'F');
+      pdf.rect(m, y, usable, 9, 'F');
       pdf.setTextColor(255, 255, 255);
       pdf.setFont('helvetica', 'bold');
       pdf.setFontSize(8);
-      pdf.text('Cant.', m + 2, y + 5.5);
-      pdf.text('Producto', m + 16, y + 5.5);
-      pdf.text('SKU', W - 78, y + 5.5);
-      pdf.text('P. unitario', W - 52, y + 5.5);
-      pdf.text('Subtotal', W - m - 2, y + 5.5, { align: 'right' });
-      y += 8;
-
-      pdf.setFont('helvetica', 'normal');
-      pdf.setTextColor.apply(pdf, oscuro);
+      pdf.text('Descripción', m + 3, y + 6);
+      pdf.text('Cant.', xCant, y + 6);
+      pdf.text('P. unitario', xPre, y + 6);
+      pdf.text('Subtotal', W - m - 3, y + 6, { align: 'right' });
+      y += 9;
+      var yTable = y;
       r.lineas.forEach(function (ln, i) {
-        if (y > H - 28) {
+        if (y > H - 56) {
+          pdf.setDrawColor.apply(pdf, azul);
+          pdf.setLineWidth(0.35);
+          pdf.rect(m, yTable - 9, usable, y - (yTable - 9));
           pie(pdf.internal.getNumberOfPages(), '?');
           pdf.addPage();
-          encabezado('Presupuesto');
-          y = 40;
+          pdf.setFillColor.apply(pdf, crema);
+          pdf.rect(0, 0, W, H, 'F');
+          y = 36;
+          yTable = y + 9;
+          pdf.setFillColor.apply(pdf, azul);
+          pdf.rect(m, y, usable, 9, 'F');
+          pdf.setTextColor(255, 255, 255);
+          pdf.setFont('helvetica', 'bold');
+          pdf.setFontSize(8);
+          pdf.text('Descripción', m + 3, y + 6);
+          pdf.text('Cant.', xCant, y + 6);
+          pdf.text('P. unitario', xPre, y + 6);
+          pdf.text('Subtotal', W - m - 3, y + 6, { align: 'right' });
+          y += 9;
         }
         if (i % 2 === 0) {
           pdf.setFillColor(252, 249, 242);
-          pdf.rect(m, y, W - 2 * m, 8, 'F');
+          pdf.rect(m, y, usable, rowH, 'F');
         }
-        pdf.setFontSize(8);
-        pdf.text(String(ln.q), m + 2, y + 5.5);
-        var nom = pdf.splitTextToSize(sinMarca(ln.p.nombre) || ln.p.nombre || '', 70);
-        pdf.text(nom[0] || '', m + 16, y + 5.5);
-        pdf.setTextColor.apply(pdf, gris);
-        pdf.text(String(ln.p.sku || ''), W - 78, y + 5.5);
-        pdf.setTextColor.apply(pdf, oscuro);
-        pdf.text(money(ln.p.precio), W - 52, y + 5.5);
-        pdf.setFont('helvetica', 'bold');
-        pdf.text(money(ln.q * ln.p.precio), W - m - 2, y + 5.5, { align: 'right' });
         pdf.setFont('helvetica', 'normal');
-        y += 8;
+        pdf.setFontSize(8.5);
+        pdf.setTextColor.apply(pdf, oscuro);
+        var nom = pdf.splitTextToSize(sinMarca(ln.p.nombre) || ln.p.nombre || '', xCant - m - 6);
+        pdf.text(nom[0] || '', m + 3, y + 6);
+        pdf.text(String(ln.q), xCant + 8, y + 6);
+        pdf.text(money(ln.p.precio), xPre, y + 6);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text(money(ln.q * ln.p.precio), W - m - 3, y + 6, { align: 'right' });
+        y += rowH;
       });
+      pdf.setDrawColor.apply(pdf, azul);
+      pdf.setLineWidth(0.4);
+      pdf.rect(m, yTable - 9, usable, y - (yTable - 9));
+      pdf.line(xCant - 2, yTable - 9, xCant - 2, y);
+      pdf.line(xPre - 2, yTable - 9, xPre - 2, y);
 
-      y += 4;
+      y += 8;
+      var totW = 72;
+      var totX = W - m - totW;
       pdf.setFillColor.apply(pdf, azul);
-      pdf.roundedRect(W - 78, y, 62, 12, 2, 2, 'F');
+      pdf.rect(totX, y, totW, 12, 'F');
       pdf.setTextColor(255, 255, 255);
       pdf.setFont('helvetica', 'bold');
       pdf.setFontSize(11);
-      pdf.text('Total  ' + money(r.tot), W - 47, y + 8, { align: 'center' });
+      pdf.text('TOTAL', totX + 4, y + 8);
+      pdf.text(money(r.tot), totX + totW - 4, y + 8, { align: 'right' });
+      y += 18;
 
       var pago = pagoActual();
       if (pago.cuotas > 1) {
-        y += 18;
-        pdf.setTextColor.apply(pdf, oscuro);
         pdf.setFont('helvetica', 'bold');
-        pdf.setFontSize(11);
+        pdf.setFontSize(8);
+        pdf.setTextColor.apply(pdf, gris);
+        pdf.text('PAGO', m, y);
+        y += 6;
+        pdf.setFontSize(12);
+        pdf.setTextColor.apply(pdf, oscuro);
         pdf.text(pago.cuotas + ' cuotas de ' + money(r.tot / pago.cuotas), m, y);
         y += 6;
         pdf.setFont('helvetica', 'normal');
-        pdf.setFontSize(9);
+        pdf.setFontSize(8);
         pdf.setTextColor.apply(pdf, gris);
         var det = [];
         if (pago.banco) {
@@ -822,7 +905,20 @@
         }
         if (PLANES.vigencia) det.push('Vigencia ' + PLANES.vigencia);
         if (det.length) pdf.text(det.join('  ·  '), m, y);
+        y += 10;
       }
+
+      pdf.setDrawColor.apply(pdf, azul);
+      pdf.setLineWidth(0.28);
+      pdf.line(m, H - 22, W - m, H - 22);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(8);
+      pdf.setTextColor.apply(pdf, azul);
+      pdf.text('Condiciones', m, H - 17);
+      pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(7.5);
+      pdf.setTextColor.apply(pdf, gris);
+      pdf.text('Precios de lista. No incluye instalación.' + (fecha ? '  ·  ' + fecha : ''), m, H - 12);
 
       var naranja = [229, 106, 23];
       var usable = W - 2 * m;
@@ -937,7 +1033,6 @@
 
       function dibujarCmp(c, yy) {
         if (!c) return yy;
-        if (yy > H - 90) return yy;
         pdf.setFillColor(255, 244, 232);
         pdf.roundedRect(m, yy, usable, 16, 2.2, 2.2, 'F');
         pdf.setTextColor.apply(pdf, naranja);
@@ -964,31 +1059,23 @@
         return yy;
       }
 
-      var mainC = null;
-      r.lineas.forEach(function (ln) {
-        if (mainC) return;
-        var cc = cmpDe(ln.p, ln.q);
-        if (cc) mainC = cc;
-      });
-      if (mainC) {
-        y += 14;
-        if (y > 150) {
-          pie(pdf.internal.getNumberOfPages(), '?');
-          pdf.addPage();
-          encabezado('Comparativa de costos');
-          y = 36;
-        }
-        y = dibujarCmp(mainC, y);
+      function nuevaFicha() {
+        pdf.addPage();
+        encabezado('Ficha de producto');
+        return 36;
+      }
+      function cabe(yy, h) {
+        if (yy + h < H - 16) return yy;
+        return nuevaFicha();
       }
 
       r.lineas.forEach(function (ln, ix) {
-        pdf.addPage();
-        encabezado('Ficha de producto');
+        var yy = nuevaFicha();
         var p = ln.p;
-        var yy = 36;
         var foto = fotos[ix] || '';
         var imgW = 42;
         var c = cmpDe(p, ln.q);
+        var keys = trataDe(p);
         var tx = m;
         var tw = W - 2 * m;
         if (p.video) tw -= 30;
@@ -1048,11 +1135,46 @@
         pdf.setFontSize(9);
         var cuerpo = sinMarca(p.desc || p.para || 'Sin descripción cargada.').replace(/\n+/g, '\n');
         var lineasTxt = pdf.splitTextToSize(cuerpo, W - 2 * m);
-        var maxL = c ? 5 : 16;
+        var maxL = (c || keys.length) ? 4 : 16;
         if (lineasTxt.length > maxL) lineasTxt = lineasTxt.slice(0, maxL);
         pdf.text(lineasTxt, m, yy);
-        yy += lineasTxt.length * 4.4 + 6;
-        if (c) yy = dibujarCmp(c, yy);
+        yy += lineasTxt.length * 4.4 + 8;
+        if (keys.length) {
+          yy = cabe(yy, 24);
+          pdf.setFont('helvetica', 'bold');
+          pdf.setFontSize(11);
+          pdf.setTextColor.apply(pdf, azul);
+          pdf.text('Qué trata y por qué sacarlo', m, yy);
+          yy += 6;
+          pdf.setFont('helvetica', 'italic');
+          pdf.setFontSize(8);
+          pdf.setTextColor.apply(pdf, oscuro);
+          var intro = pdf.splitTextToSize(TRATA_INTRO, usable);
+          yy = cabe(yy, intro.length * 3.7 + 4);
+          pdf.text(intro, m, yy);
+          yy += intro.length * 3.7 + 5;
+          keys.forEach(function (k) {
+            var info = TRATA[k];
+            if (!info) return;
+            var body = pdf.splitTextToSize(info.txt, usable);
+            yy = cabe(yy, 8 + body.length * 3.5 + 3);
+            pdf.setFont('helvetica', 'bold');
+            pdf.setFontSize(9);
+            pdf.setTextColor.apply(pdf, azul);
+            pdf.text(info.nom + '.', m, yy);
+            yy += 4.4;
+            pdf.setFont('helvetica', 'normal');
+            pdf.setFontSize(8);
+            pdf.setTextColor.apply(pdf, oscuro);
+            pdf.text(body, m, yy);
+            yy += body.length * 3.5 + 3.2;
+          });
+          yy += 4;
+        }
+        if (c) {
+          yy = cabe(yy, 128);
+          yy = dibujarCmp(c, yy);
+        }
       });
 
       var pages = pdf.internal.getNumberOfPages();

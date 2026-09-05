@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "493.0.0",
-  "cacheName": "appi-v493-pdf-completo",
+  "version": "494.0.0",
+  "cacheName": "appi-v494-factura-trata",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {
