@@ -13,7 +13,9 @@ from zoneinfo import ZoneInfo
 ROOT = Path(__file__).resolve().parents[1]
 OUT_CAT = ROOT / "psa-catalogo.json"
 OUT_PRE = ROOT / "psa-precios.json"
+OUT_PLAN = ROOT / "psa-planes.json"
 IMG_DIR = ROOT / "catalogo-img"
+PROMO_URL = "https://tienda.psa.com.ar/promociones_vigentes"
 GQL = "https://tienda.psa.com.ar/graphql"
 UA = "APPI-precios/1.0"
 
@@ -318,6 +320,159 @@ def scrape_precios(faltan):
     return precios, nombres
 
 
+def cuotas_de(texto):
+    t = re.sub(r"\s+", " ", texto or "")
+    found = []
+    for m in re.finditer(r"(\d+(?:\s*,\s*\d+)*)(?:\s*y\s*(\d+))?\s*cuotas", t, re.I):
+        nums = re.findall(r"\d+", m.group(0))
+        for n in nums:
+            v = int(n)
+            if 2 <= v <= 24:
+                found.append(v)
+    return sorted(set(found))
+
+
+def slug(s):
+    s = limp(s).lower()
+    s = s.replace("á", "a").replace("é", "e").replace("í", "i").replace("ó", "o").replace("ú", "u").replace("ñ", "n")
+    s = re.sub(r"[^a-z0-9]+", "-", s).strip("-")
+    return s or "plan"
+
+
+def extraer_planes():
+    html = get(PROMO_URL, timeout=30)
+    pdfs = re.findall(r"https://[^\"'\s]+legales[^\"'\s]+\.pdf", html, re.I)
+    if not pdfs:
+        pdfs = re.findall(r"https://contenidos\.psa\.com\.ar/[^\"'\s]+\.pdf", html, re.I)
+    texto = ""
+    fuente_pdf = pdfs[0] if pdfs else ""
+    if fuente_pdf:
+        raw = get_bytes(fuente_pdf, timeout=40)
+        try:
+            from io import BytesIO
+            from pypdf import PdfReader
+
+            reader = PdfReader(BytesIO(raw))
+            texto = "\n".join((p.extract_text() or "") for p in reader.pages)
+        except Exception as e:
+            print(f"pdf planes: {e}")
+    # cuotas genéricas de una ficha de la tienda
+    cuotas_tienda = [3, 6, 9, 12, 15, 18]
+    try:
+        ficha = get("https://tienda.psa.com.ar/psa-senior-4-bianco.html", timeout=25)
+        m = re.search(r"(\d+)\s*cuotas sin inter[eé]s", ficha, re.I)
+        if m:
+            n = int(m.group(1))
+            if n not in cuotas_tienda:
+                cuotas_tienda.append(n)
+                cuotas_tienda.sort()
+    except Exception:
+        pass
+
+    vigencia = ""
+    vm3 = re.search(r"(\d{1,2})/(\d{1,2})/(\d{4})\s*al\s*(\d{1,2})/(\d{1,2})/(\d{4})", texto)
+    if vm3:
+        vigencia = f"{int(vm3.group(1))}-{MESES[int(vm3.group(2)) - 1]}-{vm3.group(3)} al {int(vm3.group(4))}-{MESES[int(vm3.group(5)) - 1]}-{vm3.group(6)}"
+    vm = re.search(
+        r"desde el[^\n]{0,40}?(\d{1,2}).{0,20}?(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre).{0,15}?(\d{4}).{0,40}?hasta el[^\n]{0,40}?(\d{1,2}).{0,20}?(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre).{0,15}?(\d{4})",
+        texto,
+        re.I,
+    )
+    meses = {
+        "enero": "Ene",
+        "febrero": "Feb",
+        "marzo": "Mar",
+        "abril": "Abr",
+        "mayo": "May",
+        "junio": "Jun",
+        "julio": "Jul",
+        "agosto": "Ago",
+        "septiembre": "Sep",
+        "octubre": "Oct",
+        "noviembre": "Nov",
+        "diciembre": "Dic",
+    }
+    if not vigencia and vm:
+        vigencia = f"{vm.group(1)}-{meses[vm.group(2).lower()]}-{vm.group(3)} al {vm.group(4)}-{meses[vm.group(5).lower()]}-{vm.group(6)}"
+    if not vigencia:
+        vm2 = re.search(r"Vigencia\s+(\d).{0,8}(?:de\s+)?(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre).{0,8}(\d{4})", texto, re.I)
+        if vm2:
+            vigencia = f"{vm2.group(1)}-{meses[vm2.group(2).lower()]}-{vm2.group(3)}"
+
+    titulos = [
+        "CUOTA SIMPLE",
+        "TARJETA NARANJA",
+        "BANCO GALICIA",
+        "BBVA",
+        "BANCO NACIÓN",
+        "MACRO",
+        "SANTANDER",
+        "HIPOTECARIO",
+        "CABAL",
+        "AMERICAN EXPRESS",
+        "TARJETA DATA",
+        "TARJETA PATAGONIA 365",
+        "TARJETA TUYA",
+        "TARJETA SOL",
+        "BANCO DEL SOL",
+    ]
+    bancos = []
+    up = "\n" + texto.upper() + "\n"
+    raw_up = "\n" + texto + "\n"
+    for i, tit in enumerate(titulos):
+        idx = up.find("\n" + tit)
+        if idx < 0:
+            idx = up.find(tit)
+        if idx < 0:
+            continue
+        nxt = len(up)
+        for t2 in titulos[i + 1 :]:
+            j = up.find("\n" + t2, idx + 5)
+            if j > idx:
+                nxt = min(nxt, j)
+        bloque = raw_up[idx:nxt]
+        cuotas = cuotas_de(bloque) or list(cuotas_tienda)
+        tarjetas = ""
+        if re.search(r"Visa", bloque, re.I):
+            tarjetas = "Visa"
+        if re.search(r"Mastercard", bloque, re.I):
+            tarjetas = (tarjetas + ", Mastercard") if tarjetas else "Mastercard"
+        if re.search(r"American Express|Amex", bloque, re.I):
+            tarjetas = (tarjetas + ", American Express") if tarjetas else "American Express"
+        if re.search(r"Cordobesa", bloque, re.I):
+            tarjetas = (tarjetas + ", Cordobesa") if tarjetas else "Cordobesa"
+        if re.search(r"Naranja", bloque, re.I) and "NARANJA" in tit:
+            tarjetas = "Naranja"
+        if re.search(r"Cabal", bloque, re.I):
+            tarjetas = "Cabal"
+        nombre = limp(tit.title().replace("Banco ", "").replace("Tarjeta ", ""))
+        if tit.upper() == "BBVA":
+            nombre = "BBVA"
+        if tit.upper() == "CUOTA SIMPLE":
+            nombre = "Cuota Simple"
+        if "NACI" in tit.upper():
+            nombre = "Nación"
+        if tit == "CUOTA SIMPLE":
+            nombre = "Cuota Simple"
+        if tit == "BANCO NACIÓN":
+            nombre = "Nación"
+        bancos.append(
+            {
+                "id": slug(tit),
+                "nombre": nombre,
+                "cuotas": cuotas,
+                "tarjetas": tarjetas,
+            }
+        )
+    return {
+        "actualizado": fecha_ar(),
+        "vigencia": vigencia,
+        "fuente": PROMO_URL,
+        "cuotas": cuotas_tienda,
+        "bancos": bancos,
+    }
+
+
 def leer_prev(path):
     if not path.exists():
         return {}
@@ -377,6 +532,18 @@ def main():
         + "\n",
         encoding="utf-8",
     )
+    try:
+        planes = extraer_planes()
+        planes["actualizado"] = fecha
+        OUT_PLAN.write_text(json.dumps(planes, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        print(f"planes {len(planes.get('bancos') or [])} bancos · vigencia {planes.get('vigencia') or '—'}")
+    except Exception as e:
+        print(f"planes no disponibles: {e}")
+        if not OUT_PLAN.exists():
+            OUT_PLAN.write_text(
+                json.dumps({"actualizado": fecha, "vigencia": "", "cuotas": [3, 6, 9, 12, 15, 18], "bancos": []}, ensure_ascii=False, indent=2) + "\n",
+                encoding="utf-8",
+            )
     print(f"ok {len(productos)} productos · {len(precios)} cotejo · {fecha}")
 
 

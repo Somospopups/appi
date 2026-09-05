@@ -1,0 +1,204 @@
+{
+  "actualizado": "4-Sep-2026",
+  "vigencia": "1-Sep-2026 al 7-Sep-2026",
+  "fuente": "https://tienda.psa.com.ar/promociones_vigentes",
+  "cuotas": [
+    3,
+    6,
+    9,
+    12,
+    15,
+    18
+  ],
+  "bancos": [
+    {
+      "id": "cuota-simple",
+      "nombre": "Cuota Simple",
+      "cuotas": [
+        3,
+        6,
+        9,
+        12,
+        15,
+        18
+      ],
+      "tarjetas": "Visa, Mastercard, American Express, Cordobesa"
+    },
+    {
+      "id": "tarjeta-naranja",
+      "nombre": "Naranja",
+      "cuotas": [
+        6,
+        9,
+        12
+      ],
+      "tarjetas": "Naranja"
+    },
+    {
+      "id": "banco-galicia",
+      "nombre": "Galicia",
+      "cuotas": [
+        3,
+        6,
+        9,
+        12
+      ],
+      "tarjetas": "Visa, Mastercard, American Express"
+    },
+    {
+      "id": "bbva",
+      "nombre": "BBVA",
+      "cuotas": [
+        3,
+        6,
+        9,
+        12,
+        15,
+        18
+      ],
+      "tarjetas": "Visa, Mastercard"
+    },
+    {
+      "id": "banco-nacion",
+      "nombre": "Nación",
+      "cuotas": [
+        3,
+        6,
+        9,
+        12,
+        15,
+        18
+      ],
+      "tarjetas": "Visa, Mastercard"
+    },
+    {
+      "id": "macro",
+      "nombre": "Macro",
+      "cuotas": [
+        3,
+        6,
+        9,
+        12,
+        15,
+        18
+      ],
+      "tarjetas": "Visa, Mastercard, American Express"
+    },
+    {
+      "id": "santander",
+      "nombre": "Santander",
+      "cuotas": [
+        3,
+        6,
+        9,
+        12,
+        15,
+        18
+      ],
+      "tarjetas": "Visa, Mastercard"
+    },
+    {
+      "id": "hipotecario",
+      "nombre": "Hipotecario",
+      "cuotas": [
+        3,
+        6,
+        9,
+        12,
+        15,
+        18
+      ],
+      "tarjetas": "Visa, Mastercard"
+    },
+    {
+      "id": "cabal",
+      "nombre": "Cabal",
+      "cuotas": [
+        3,
+        6,
+        9,
+        12,
+        18
+      ],
+      "tarjetas": "Cabal"
+    },
+    {
+      "id": "american-express",
+      "nombre": "American Express",
+      "cuotas": [
+        3,
+        6,
+        9,
+        12,
+        15,
+        18
+      ],
+      "tarjetas": "American Express"
+    },
+    {
+      "id": "tarjeta-data",
+      "nombre": "Data",
+      "cuotas": [
+        3,
+        6,
+        9,
+        12,
+        15,
+        18
+      ],
+      "tarjetas": ""
+    },
+    {
+      "id": "tarjeta-patagonia-365",
+      "nombre": "Patagonia 365",
+      "cuotas": [
+        3,
+        6,
+        9,
+        12,
+        15,
+        18
+      ],
+      "tarjetas": ""
+    },
+    {
+      "id": "tarjeta-tuya",
+      "nombre": "Tuya",
+      "cuotas": [
+        3,
+        6,
+        9,
+        12,
+        15,
+        18
+      ],
+      "tarjetas": ""
+    },
+    {
+      "id": "tarjeta-sol",
+      "nombre": "Sol",
+      "cuotas": [
+        3,
+        6,
+        9,
+        12,
+        15,
+        18
+      ],
+      "tarjetas": ""
+    },
+    {
+      "id": "banco-del-sol",
+      "nombre": "Del Sol",
+      "cuotas": [
+        3,
+        6,
+        9,
+        12,
+        15,
+        18
+      ],
+      "tarjetas": ""
+    }
+  ]
+}

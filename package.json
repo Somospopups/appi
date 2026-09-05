@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "486.0.0",
-  "cacheName": "appi-v486-ficha-foto",
+  "version": "487.0.0",
+  "cacheName": "appi-v487-planes-pago",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

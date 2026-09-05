@@ -4,7 +4,9 @@
 
   var LS = 'appi_lista_carrito_v1';
   var LS_FAB = 'appi_lista_fab_v1';
+  var LS_PAGO = 'appi_lista_pago_v1';
   var CAT = null;
+  var PLANES = { cuotas: [3, 6, 9, 12, 15, 18], bancos: [], vigencia: '' };
   var filtro = 'todos';
   var busca = '';
   var GRUPOS = [
@@ -141,9 +143,12 @@
       sh.setAttribute('aria-hidden', 'true');
       sh.innerHTML = '<div class="lp-sheet" role="dialog" aria-label="Presupuesto">' +
         '<div class="lp-sheet-top"><h2>Presupuesto</h2><button type="button" data-cerrar aria-label="Cerrar">×</button></div>' +
-        '<input class="lp-para" id="lpPara" type="text" placeholder="Para (nombre, opcional)" maxlength="80">' +
         '<div id="lpSheetLines"></div>' +
         '<div class="lp-tot" id="lpSheetTot"></div>' +
+        '<div class="lp-sec">Pago</div>' +
+        '<div class="lp-chips" id="lpCuotas"></div>' +
+        '<div class="lp-chips" id="lpBancos"></div>' +
+        '<p class="lp-note" id="lpPagoDet"></p>' +
         '<div class="lp-actions"><button type="button" class="lp-pdf" id="lpSheetPdf">PDF</button>' +
         '<button type="button" class="lp-clear" id="lpSheetClear">Vaciar</button></div></div>';
       document.body.appendChild(sh);
@@ -271,6 +276,79 @@
     aplicarFabPos(fab);
   }
 
+
+  function pagoGet() {
+    try { return JSON.parse(localStorage.getItem(LS_PAGO) || '{}') || {}; } catch (e) { return {}; }
+  }
+  function pagoSet(cuotas, banco) {
+    try { localStorage.setItem(LS_PAGO, JSON.stringify({ cuotas: cuotas, banco: banco || '' })); } catch (e) {}
+  }
+  function pagoActual() {
+    var g = pagoGet();
+    var c = Number(g.cuotas) || 1;
+    var banco = g.banco || '';
+    var bancos = PLANES.bancos || [];
+    var b = null;
+    for (var i = 0; i < bancos.length; i++) if (bancos[i].id === banco) b = bancos[i];
+    if (b && b.cuotas && b.cuotas.indexOf(c) < 0) b = null;
+    return { cuotas: c, banco: b };
+  }
+  function pintarPago() {
+    var hostC = $('lpCuotas'), hostB = $('lpBancos'), det = $('lpPagoDet');
+    if (!hostC) return;
+    var g = pagoGet();
+    var cAct = Number(g.cuotas) || 1;
+    var ops = [1].concat(PLANES.cuotas || [3, 6, 9, 12, 15, 18]);
+    var seen = {};
+    ops = ops.filter(function (n) { if (seen[n]) return false; seen[n] = 1; return true; });
+    hostC.innerHTML = ops.map(function (n) {
+      var lab = n === 1 ? 'Contado' : (n + ' cuotas');
+      return '<button type="button" class="lp-chip' + (cAct === n ? ' on' : '') + '" data-cuotas="' + n + '">' + lab + '</button>';
+    }).join('');
+    var bancos = (PLANES.bancos || []).filter(function (b) {
+      return cAct > 1 && (!b.cuotas || b.cuotas.indexOf(cAct) >= 0);
+    });
+    if (hostB) {
+      hostB.style.display = bancos.length ? '' : 'none';
+      hostB.innerHTML = bancos.map(function (b) {
+        return '<button type="button" class="lp-chip' + (g.banco === b.id ? ' on' : '') + '" data-banco="' + b.id + '">' + esc(b.nombre) + '</button>';
+      }).join('');
+    }
+    if (det) {
+      var p = pagoActual();
+      if (p.cuotas <= 1) det.textContent = 'Contado.';
+      else {
+        var tot = resumen().tot;
+        var txt = p.cuotas + ' cuotas de ' + money(tot / p.cuotas);
+        if (p.banco) txt += ' · ' + p.banco.nombre + (p.banco.tarjetas ? ' (' + p.banco.tarjetas + ')' : '');
+        if (PLANES.vigencia) txt += ' · vigencia ' + PLANES.vigencia;
+        det.textContent = txt;
+      }
+    }
+    if (hostC && !hostC._lpBound) {
+      hostC._lpBound = true;
+      hostC.onclick = function (e) {
+        var b = e.target.closest('[data-cuotas]');
+        if (!b) return;
+        var n = Number(b.getAttribute('data-cuotas')) || 1;
+        var cur = pagoGet();
+        pagoSet(n, n === 1 ? '' : (cur.banco || ''));
+        pintarPago();
+      };
+    }
+    if (hostB && !hostB._lpBound) {
+      hostB._lpBound = true;
+      hostB.onclick = function (e) {
+        var b = e.target.closest('[data-banco]');
+        if (!b) return;
+        var id = b.getAttribute('data-banco') || '';
+        var cur = pagoGet();
+        pagoSet(cur.cuotas || 1, cur.banco === id ? '' : id);
+        pintarPago();
+      };
+    }
+  }
+
   function pintarSheet() {
     var host = $('lpSheetLines');
     var tot = $('lpSheetTot');
@@ -288,6 +366,7 @@
         '<b>' + esc(ln.p.nombre) + '</b><span>' + money(ln.q * ln.p.precio) + '</span></div>';
     }).join('');
     if (tot) tot.textContent = 'Total ' + money(r.tot);
+    pintarPago();
   }
 
   function abrirSheet() {
@@ -350,6 +429,12 @@
     if (!r.n) return;
     var JsPDF = window.jspdf && window.jspdf.jsPDF;
     if (!JsPDF) { aviso('No se pudo cargar el PDF.'); return; }
+    var pedir = (window.APPIDialog && window.APPIDialog.prompt)
+      ? window.APPIDialog.prompt('¿A quién va dirigido el presupuesto?', '', { title: 'Presupuesto', placeholder: 'Nombre (opcional)', okText: 'Continuar', cancelText: 'Volver', icon: '✎' })
+      : Promise.resolve('');
+    pedir.then(function (para) {
+    if (para === null) return;
+    para = String(para || '').trim();
     var btn = $('lpSheetPdf');
     if (btn) { btn.disabled = true; btn.textContent = 'Armando…'; }
     Promise.all(r.lineas.map(function (ln) { return loadFoto(ln.p); })).then(function (fotos) {
@@ -362,7 +447,6 @@
       var oscuro = [42, 42, 50];
       var gris = [104, 105, 119];
       var fecha = (CAT && CAT.actualizado) ? CAT.actualizado : '';
-      var para = ($('lpPara') && $('lpPara').value || '').trim();
       var hoy = fecha;
       var m = 16;
 
@@ -453,6 +537,26 @@
       pdf.setFontSize(11);
       pdf.text('Total  ' + money(r.tot), W - 47, y + 8, { align: 'center' });
 
+      var pago = pagoActual();
+      if (pago.cuotas > 1) {
+        y += 18;
+        pdf.setTextColor.apply(pdf, oscuro);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(11);
+        pdf.text(pago.cuotas + ' cuotas de ' + money(r.tot / pago.cuotas), m, y);
+        y += 6;
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(9);
+        pdf.setTextColor.apply(pdf, gris);
+        var det = [];
+        if (pago.banco) {
+          det.push(pago.banco.nombre);
+          if (pago.banco.tarjetas) det.push(pago.banco.tarjetas);
+        }
+        if (PLANES.vigencia) det.push('Vigencia ' + PLANES.vigencia);
+        if (det.length) pdf.text(det.join('  ·  '), m, y);
+      }
+
       r.lineas.forEach(function (ln, ix) {
         pdf.addPage();
         encabezado('Ficha de producto');
@@ -540,6 +644,7 @@
       aviso('No se pudo armar el PDF.');
       if (btn) { btn.disabled = false; btn.textContent = 'PDF'; }
     });
+    });
   }
 
   function pintarTodo() {
@@ -592,13 +697,14 @@
   }
 
   function cargar(done) {
-    fetch('./psa-catalogo.json', { cache: 'no-store' })
-      .then(function (r) { return r.ok ? r.json() : null; })
-      .then(function (d) {
-        if (d && d.productos) CAT = d;
-        if (done) done();
-      })
-      .catch(function () { if (done) done(); });
+    Promise.all([
+      fetch('./psa-catalogo.json', { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }),
+      fetch('./psa-planes.json', { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; })
+    ]).then(function (arr) {
+      if (arr[0] && arr[0].productos) CAT = arr[0];
+      if (arr[1] && (arr[1].cuotas || arr[1].bancos)) PLANES = arr[1];
+      if (done) done();
+    }).catch(function () { if (done) done(); });
   }
 
   function abrirLista() {
