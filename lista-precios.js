@@ -1294,9 +1294,10 @@
   }
 
   function cargar(done) {
+    var bust = '?t=' + Date.now();
     Promise.all([
-      fetch('./psa-catalogo.json', { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }),
-      fetch('./psa-planes.json', { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; })
+      fetch('./psa-catalogo.json' + bust, { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }),
+      fetch('./psa-planes.json' + bust, { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; })
     ]).then(function (arr) {
       if (arr[0] && arr[0].productos) CAT = arr[0];
       if (arr[1] && (arr[1].cuotas || arr[1].bancos)) PLANES = arr[1];

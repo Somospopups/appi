@@ -1,7 +1,8 @@
 name: Precios lista PSA
 
-# Lee tienda.psa.com.ar y actualiza psa-precios.json + psa-catalogo.json.
-# Comparativas y Lista de precios usan esos archivos.
+# Lee tienda.psa.com.ar y actualiza psa-precios.json, psa-catalogo.json y psa-planes.json
+# (cuotas y bancos). Dos veces por día (8 y 17 ART) y a mano con workflow_dispatch.
+# Comparativas y Lista de precios / Cotizar leen esos archivos siempre de red.
 on:
   schedule:
     - cron: "0 11,20 * * *"

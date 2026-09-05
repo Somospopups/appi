@@ -356,7 +356,7 @@
     if ($('cmpOut')) cmpPinta();
   }
   function cmpCargarTienda(){
-    fetch('./psa-precios.json', { cache: 'no-store' })
+    fetch('./psa-precios.json?t=' + Date.now(), { cache: 'no-store' })
       .then(function(r){ return r.ok ? r.json() : null; })
       .then(function(d){
         if (!d || !d.precios) return;

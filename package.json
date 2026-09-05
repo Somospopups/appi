@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "502.0.0",
-  "cacheName": "appi-v502-cotizar-aire",
+  "version": "503.0.0",
+  "cacheName": "appi-v503-precios-auto",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {
