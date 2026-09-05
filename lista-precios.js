@@ -174,6 +174,12 @@
       '.lp-line b{flex:1;font-size:13px;font-weight:850;color:#2a2a32}' +
       '.lp-line span{font-size:12px;font-weight:900;color:#0b5878;white-space:nowrap}' +
       '.lp-tot{margin:12px 0;font-size:18px;font-weight:950;color:#0b5878}' +
+      '.lp-fin{margin:12px 0 4px;padding:12px 12px 8px;border-radius:14px;background:#fffef8;border:1px solid rgba(40,36,28,.10)}' +
+      '.lp-fin h3{margin:0 0 8px;font-size:13px;font-weight:950;letter-spacing:.4px;text-transform:uppercase;color:#2a2a32}' +
+      '.lp-fin p{margin:0 0 5px;font-size:13.5px;font-weight:650;color:#2a2a32;line-height:1.35}' +
+      '.lp-fin b{font-size:15.5px;font-weight:950}' +
+      'body.dark .lp-fin{background:#25273a;border-color:rgba(255,255,255,.08)}' +
+      'body.dark .lp-fin h3,body.dark .lp-fin p{color:#f2f2f7}' +
       '.lp-eco{margin:8px 0 12px}' +
       '.lp-cmp-litro{display:block;margin:0 0 10px;font-size:11px;font-weight:800;color:#686977}' +
       '.lp-cmp-litro input{width:110px;min-height:36px;margin-left:6px;border:1px solid rgba(196,164,92,.45);border-radius:10px;padding:6px 8px;font:inherit;font-size:14px;background:#faf6ee}' +
@@ -251,6 +257,7 @@
         '<div class="lp-sec" id="lpCuotasLab" hidden>Cuotas</div>' +
         '<div class="lp-chips-wrap" id="lpCuotasWrap" hidden><div class="lp-chips" id="lpCuotas"></div></div>' +
         '<p class="lp-note" id="lpPagoDet"></p>' +
+        '<div id="lpFinanc"></div>' +
         '<div class="lp-actions"><button type="button" class="lp-pdf" id="lpSheetPdf">Cotizar</button>' +
         '<button type="button" class="lp-clear" id="lpSheetClear">Vaciar</button></div></div>';
       document.body.appendChild(sh);
@@ -395,6 +402,19 @@
     var c = Number(g.cuotas) || 1;
     if (b.cuotas && b.cuotas.indexOf(c) < 0) c = b.cuotas[b.cuotas.length - 1] || 1;
     return { cuotas: c, banco: b };
+  }
+  function opsCuotas(banco) {
+    if (banco && banco.cuotas && banco.cuotas.length) return banco.cuotas.slice();
+    return (PLANES.cuotas && PLANES.cuotas.length) ? PLANES.cuotas.slice() : [3, 6, 9, 12, 15, 18];
+  }
+  function htmlFinanciacion(tot) {
+    var ops = opsCuotas(pagoActual().banco);
+    var h = '<div class="lp-fin"><h3>Financiación</h3>';
+    h += '<p>1 pago de <b>' + money(tot) + '</b></p>';
+    ops.forEach(function (n) {
+      h += '<p>' + n + ' pagos de <b>' + money(tot / n) + '</b> sin interés</p>';
+    });
+    return h + '</div>';
   }
   function markOverflow(el) {
     if (!el) return;
@@ -707,6 +727,7 @@
     if (!r.lineas.length) {
       host.innerHTML = '<div class="lp-empty">El carrito está vacío.</div>';
       if (tot) tot.textContent = '';
+      var fin0 = $('lpFinanc'); if (fin0) fin0.innerHTML = '';
       return;
     }
     host.innerHTML = r.lineas.map(function (ln) {
@@ -716,6 +737,8 @@
         '<b>' + esc(ln.p.nombre) + '</b><span>' + money(ln.q * ln.p.precio) + '</span></div>';
     }).join('');
     if (tot) tot.textContent = 'Total ' + money(r.tot);
+    var fin = $('lpFinanc');
+    if (fin) fin.innerHTML = htmlFinanciacion(r.tot);
     pintarPago();
     var eco = $('lpEco'); if (eco) eco.innerHTML = '';
     var pdfBtn = $('lpSheetPdf'); if (pdfBtn && !pdfBtn.disabled) pdfBtn.textContent = 'Cotizar';
@@ -930,27 +953,53 @@
       y += 18;
 
       var pago = pagoActual();
-      if (pago.cuotas > 1) {
-        pdf.setFont('helvetica', 'bold');
-        pdf.setFontSize(8);
-        pdf.setTextColor.apply(pdf, gris);
-        pdf.text('PAGO', m, y);
-        y += 6;
-        pdf.setFontSize(12);
+      var ops = opsCuotas(pago.banco);
+      var filasFin = 1 + ops.length;
+      var altoFin = 10 + filasFin * 7.2 + 6;
+      if (y + altoFin > H - 28) {
+        pie(pdf.internal.getNumberOfPages(), '?');
+        pdf.addPage();
+        pdf.setFillColor.apply(pdf, crema);
+        pdf.rect(0, 0, W, H, 'F');
+        y = 28;
+      }
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(12);
+      pdf.setTextColor.apply(pdf, oscuro);
+      pdf.text('FINANCIACIÓN', m, y);
+      y += 8;
+      function lineaFin(pref, monto, extra) {
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(11);
         pdf.setTextColor.apply(pdf, oscuro);
-        pdf.text(pago.cuotas + ' cuotas de ' + money(r.tot / pago.cuotas), m, y);
-        y += 6;
+        pdf.text(pref, m, y);
+        var w1 = pdf.getTextWidth(pref);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(12.5);
+        var mon = money(monto);
+        pdf.text(mon, m + w1, y);
+        if (extra) {
+          var w2 = pdf.getTextWidth(mon);
+          pdf.setFont('helvetica', 'normal');
+          pdf.setFontSize(11);
+          pdf.text(extra, m + w1 + w2, y);
+        }
+        y += 7.2;
+      }
+      lineaFin('1 pago de ', r.tot, '');
+      ops.forEach(function (n) {
+        lineaFin(n + ' pagos de ', r.tot / n, ' sin interés');
+      });
+      y += 4;
+      if (pago.banco) {
         pdf.setFont('helvetica', 'normal');
         pdf.setFontSize(8);
         pdf.setTextColor.apply(pdf, gris);
-        var det = [];
-        if (pago.banco) {
-          det.push(pago.banco.nombre);
-          if (pago.banco.tarjetas) det.push(pago.banco.tarjetas);
-        }
+        var det = [pago.banco.nombre];
+        if (pago.banco.tarjetas) det.push(pago.banco.tarjetas);
         if (PLANES.vigencia) det.push('Vigencia ' + PLANES.vigencia);
-        if (det.length) pdf.text(det.join('  ·  '), m, y);
-        y += 10;
+        pdf.text(det.join('  ·  '), m, y);
+        y += 8;
       }
 
       pdf.setDrawColor.apply(pdf, azul);

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v514-horario';
+const CACHE_NAME = 'appi-v515-financ';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
