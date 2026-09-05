@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "490.0.0",
-  "cacheName": "appi-v490-ficha-se-paga-solo",
+  "version": "491.0.0",
+  "cacheName": "appi-v491-pago-tarjeta-primero",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

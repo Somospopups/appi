@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v490-ficha-se-paga-solo';
+const CACHE_NAME = 'appi-v491-pago-tarjeta-primero';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
