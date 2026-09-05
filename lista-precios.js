@@ -943,30 +943,30 @@
         });
         yy += 8;
         function fila(label, sub, a1, a2, a3, tot, aho, eq) {
-          if (eq) { pdf.setFillColor(232, 240, 244); pdf.rect(m, yy, usable, 10, 'F'); }
+          if (eq) { pdf.setFillColor(232, 240, 244); pdf.rect(m, yy, usable, 8, 'F'); }
           pdf.setTextColor.apply(pdf, oscuro);
           pdf.setFont('helvetica', 'bold');
-          pdf.setFontSize(7.5);
+          pdf.setFontSize(7);
           var lab = pdf.splitTextToSize(label, colW[0] - 4);
-          pdf.text(lab[0] || '', m + 2, yy + (sub ? 4 : 6.4));
+          pdf.text(lab[0] || '', m + 2, yy + (sub ? 3.3 : 5.3));
           if (sub) {
             pdf.setFont('helvetica', 'normal');
-            pdf.setFontSize(6.5);
+            pdf.setFontSize(6);
             pdf.setTextColor.apply(pdf, gris);
-            pdf.text(sub, m + 2, yy + 8.2);
+            pdf.text(sub, m + 2, yy + 6.8);
           }
           pdf.setFont('helvetica', 'bold');
-          pdf.setFontSize(7.5);
+          pdf.setFontSize(7);
           pdf.setTextColor.apply(pdf, oscuro);
-          pdf.text(celAnio(a1), colR(1), yy + 6.4, { align: 'right' });
-          pdf.text(celAnio(a2), colR(2), yy + 6.4, { align: 'right' });
-          pdf.text(celAnio(a3), colR(3), yy + 6.4, { align: 'right' });
-          pdf.text(tot ? money(tot) : '', colR(4), yy + 6.4, { align: 'right' });
+          pdf.text(celAnio(a1), colR(1), yy + 5.3, { align: 'right' });
+          pdf.text(celAnio(a2), colR(2), yy + 5.3, { align: 'right' });
+          pdf.text(celAnio(a3), colR(3), yy + 5.3, { align: 'right' });
+          pdf.text(tot ? money(tot) : '', colR(4), yy + 5.3, { align: 'right' });
           if (aho) {
             pdf.setTextColor.apply(pdf, naranja);
-            pdf.text(money(aho), colR(5), yy + 6.4, { align: 'right' });
+            pdf.text(money(aho), colR(5), yy + 5.3, { align: 'right' });
           }
-          yy += 10;
+          yy += 8;
         }
         fila(c.tit, c.litroEq ? 'Costo litro ' + money2(c.litroEq) : '', c.yEq[0], c.yEq[1], c.yEq[2], c.totEq, 0, true);
         pdf.setFillColor(238, 243, 246);
@@ -984,20 +984,17 @@
 
       function dibujarPlaneta(c, yy) {
         pdf.setFillColor(255, 244, 232);
-        pdf.roundedRect(m, yy, usable, 14, 2, 2, 'F');
+        pdf.roundedRect(m, yy, usable, 11, 1.8, 1.8, 'F');
         pdf.setFont('helvetica', 'bold');
-        pdf.setFontSize(8);
+        pdf.setFontSize(7.5);
         pdf.setTextColor.apply(pdf, oscuro);
-        pdf.text('Si hoy compran agua envasada (4 L por día)', m + 4, yy + 5.2);
-        pdf.setFont('helvetica', 'normal');
-        pdf.setFontSize(8);
-        pdf.text(money(c.dia4) + ' / día   ·   ' + money(c.mes4) + ' / mes   ·   ' + money(c.anio4) + ' / año   ·   ' + money(c.tres4) + ' en 3 años', m + 4, yy + 10.5);
-        yy += 17;
+        pdf.text('4 L/día envasada:  ' + money(c.dia4) + '/día  ·  ' + money(c.mes4) + '/mes  ·  ' + money(c.anio4) + '/año  ·  ' + money(c.tres4) + ' en 3 años', m + 3, yy + 7);
+        yy += 13;
         pdf.setFont('helvetica', 'bold');
-        pdf.setFontSize(10);
+        pdf.setFontSize(8);
         pdf.setTextColor.apply(pdf, azul);
-        pdf.text('Lo que le ahorrás al planeta', m, yy);
-        yy += 4;
+        pdf.text('Al planeta', m, yy);
+        yy += 3.2;
         var boxW = (usable - 9) / 4;
         var kpis = [
           [botFmt(c.kgBot, 1) + ' kg', 'plástico / año'],
@@ -1008,53 +1005,44 @@
         kpis.forEach(function (k, i) {
           var bx = m + i * (boxW + 3);
           pdf.setFillColor(243, 238, 227);
-          pdf.roundedRect(bx, yy, boxW, 18, 2, 2, 'F');
+          pdf.roundedRect(bx, yy, boxW, 14, 1.6, 1.6, 'F');
           pdf.setFont('helvetica', 'bold');
-          pdf.setFontSize(9);
+          pdf.setFontSize(8);
           pdf.setTextColor.apply(pdf, azul);
-          pdf.text(k[0], bx + boxW / 2, yy + 7, { align: 'center' });
+          pdf.text(k[0], bx + boxW / 2, yy + 5.5, { align: 'center' });
           pdf.setFont('helvetica', 'normal');
-          pdf.setFontSize(6.2);
+          pdf.setFontSize(5.8);
           pdf.setTextColor.apply(pdf, gris);
-          var sub = pdf.splitTextToSize(k[1], boxW - 4);
-          pdf.text(sub[0] || '', bx + boxW / 2, yy + 12.5, { align: 'center' });
+          var sub = pdf.splitTextToSize(k[1], boxW - 3);
+          pdf.text(sub[0] || '', bx + boxW / 2, yy + 10.5, { align: 'center' });
         });
-        yy += 22;
-        pdf.setFont('helvetica', 'normal');
-        pdf.setFontSize(7.5);
-        pdf.setTextColor.apply(pdf, gris);
-        var nota = '2 botellas de 2 L por día. Cada una tarda ' + c.aniosBot + ' años en descomponerse. El plástico PET se hace con petróleo: evitarlo es no gastar ese combustible.';
-        if (c.kg3 > 0) nota += ' Si se usa todo el rendimiento del equipo, son ' + botFmt(c.kg3, 0) + ' kg menos de plástico en 3 años.';
-        var notaL = pdf.splitTextToSize(nota, usable);
-        pdf.text(notaL, m, yy);
-        yy += notaL.length * 3.6 + 2;
-        return yy;
+        return yy + 16;
       }
 
       function dibujarCmp(c, yy) {
         if (!c) return yy;
         pdf.setFillColor(255, 244, 232);
-        pdf.roundedRect(m, yy, usable, 16, 2.2, 2.2, 'F');
+        pdf.roundedRect(m, yy, usable, 12, 1.8, 1.8, 'F');
         pdf.setTextColor.apply(pdf, naranja);
         pdf.setFont('helvetica', 'bold');
-        pdf.setFontSize(11);
-        var pay1 = c.m4 > 0 ? ('Se paga solo en ' + txtMeses(c.m4) + '.') : 'Compará el litro del equipo contra el agua envasada.';
-        pdf.text(pay1, m + 4, yy + 6);
+        pdf.setFontSize(9);
+        var pay1 = c.m4 > 0 ? ('Se paga solo en ' + txtMeses(c.m4) + '.') : 'Compará el litro contra el agua envasada.';
+        pdf.text(pay1, m + 3, yy + 4.6);
         pdf.setFont('helvetica', 'normal');
-        pdf.setFontSize(8);
+        pdf.setFontSize(7);
         pdf.setTextColor.apply(pdf, oscuro);
         var pay2 = c.litroEq
-          ? ('Lo que un hogar de 4 litros diarios gasta en agua envasada cubre el equipo. Después, el litro sale ' + money2(c.litroEq) + ' en vez de ' + money(c.litroEnv) + '.')
+          ? ('Con 4 L/día el ahorro cubre el equipo. Después el litro sale ' + money2(c.litroEq) + ' en vez de ' + money(c.litroEnv) + '.')
           : '';
-        if (pay2) pdf.text(pdf.splitTextToSize(pay2, usable - 8), m + 4, yy + 12);
-        yy += 20;
+        if (pay2) pdf.text(pay2, m + 3, yy + 9.4);
+        yy += 14;
         pdf.setFont('helvetica', 'bold');
-        pdf.setFontSize(11);
+        pdf.setFontSize(9);
         pdf.setTextColor.apply(pdf, azul);
         pdf.text('Comparativa de costos  ·  vs. agua envasada', m, yy);
-        yy += 5;
+        yy += 3.5;
         yy = dibujarTabla(c, yy);
-        yy += 4;
+        yy += 2.5;
         yy = dibujarPlaneta(c, yy);
         return yy;
       }
@@ -1073,108 +1061,118 @@
         var yy = nuevaFicha();
         var p = ln.p;
         var foto = fotos[ix] || '';
-        var imgW = 42;
+        var imgW = 32;
         var c = cmpDe(p, ln.q);
         var keys = trataDe(p);
         var tx = m;
         var tw = W - 2 * m;
-        if (p.video) tw -= 30;
+        if (p.video) tw -= 28;
         if (foto) {
           pdf.setFillColor(255, 255, 255);
-          pdf.roundedRect(m, yy, imgW + 2, imgW + 2, 2, 2, 'F');
+          pdf.roundedRect(m, yy, imgW + 2, imgW + 2, 1.6, 1.6, 'F');
           try { pdf.addImage(foto, 'JPEG', m + 1, yy + 1, imgW, imgW); } catch (e1) {
             try { pdf.addImage(foto, 'PNG', m + 1, yy + 1, imgW, imgW); } catch (e2) {}
           }
-          tx = m + imgW + 8;
+          tx = m + imgW + 6;
           tw = W - m - tx;
-          if (p.video) tw -= 28;
+          if (p.video) tw -= 26;
         }
         pdf.setTextColor.apply(pdf, oscuro);
         pdf.setFont('helvetica', 'bold');
-        pdf.setFontSize(13);
+        pdf.setFontSize(12);
         var tit = pdf.splitTextToSize(sinMarca(p.nombre) || p.nombre || '', tw);
-        pdf.text(tit, tx, yy + 7);
-        var yTit = yy + 7 + tit.length * 5.5;
+        if (tit.length > 2) tit = tit.slice(0, 2);
+        pdf.text(tit, tx, yy + 5);
+        var yTit = yy + 5 + tit.length * 5;
         pdf.setFont('helvetica', 'normal');
-        pdf.setFontSize(8);
+        pdf.setFontSize(7.5);
         pdf.setTextColor.apply(pdf, gris);
-        pdf.text('SKU ' + (p.sku || ''), tx, yTit + 3);
+        pdf.text('SKU ' + (p.sku || ''), tx, yTit + 2.5);
         pdf.setTextColor.apply(pdf, oscuro);
         pdf.setFont('helvetica', 'bold');
-        pdf.setFontSize(11);
-        pdf.text(ln.q + ' × ' + money(p.precio) + '   ·   ' + money(ln.q * p.precio), tx, yTit + 10);
+        pdf.setFontSize(10);
+        pdf.text(ln.q + ' × ' + money(p.precio) + '   ·   ' + money(ln.q * p.precio), tx, yTit + 8.5);
         if (c && c.litroEq) {
           pdf.setFont('helvetica', 'normal');
-          pdf.setFontSize(8);
+          pdf.setFontSize(7.5);
           pdf.setTextColor.apply(pdf, gris);
-          pdf.text('Costo litro ' + money2(c.litroEq) + '   ·   envasada ' + money(c.litroEnv), tx, yTit + 16);
+          pdf.text('Costo litro ' + money2(c.litroEq) + '   ·   envasada ' + money(c.litroEnv), tx, yTit + 13.5);
         }
-        var yHead = Math.max(yy + (foto ? imgW + 4 : 0), yTit + (c ? 20 : 14));
+        var yHead = Math.max(yy + (foto ? imgW + 3 : 0), yTit + (c ? 16 : 11));
         if (p.video) {
           var data = qrDataUrl(p.video);
-          var qx = W - m - 24;
-          var qy = yy;
+          var qx = W - m - 22;
           if (data) {
-            try { pdf.addImage(data, 'GIF', qx, qy, 22, 22); } catch (e) {}
-            pdf.link(qx, qy, 22, 22, { url: p.video });
+            try { pdf.addImage(data, 'GIF', qx, yy, 20, 20); } catch (e) {}
+            pdf.link(qx, yy, 20, 20, { url: p.video });
           }
-          botonVideo(qx - 2, qy + 24, 26, 10, p.video);
+          botonVideo(qx - 1, yy + 21, 22, 8, p.video);
         }
         yy = yHead;
         pdf.setDrawColor(11, 88, 120);
-        pdf.setLineWidth(0.35);
+        pdf.setLineWidth(0.3);
         pdf.line(m, yy, W - m, yy);
-        yy += 6;
+        yy += 4.5;
         pdf.setTextColor.apply(pdf, azul);
         pdf.setFont('helvetica', 'bold');
-        pdf.setFontSize(9);
+        pdf.setFontSize(8);
         pdf.text('Para qué sirve', m, yy);
-        yy += 5;
+        yy += 4;
         pdf.setFont('helvetica', 'normal');
         pdf.setTextColor.apply(pdf, oscuro);
-        pdf.setFontSize(9);
-        var cuerpo = sinMarca(p.desc || p.para || 'Sin descripción cargada.').replace(/\n+/g, '\n');
-        var lineasTxt = pdf.splitTextToSize(cuerpo, W - 2 * m);
-        var maxL = (c || keys.length) ? 4 : 16;
-        if (lineasTxt.length > maxL) lineasTxt = lineasTxt.slice(0, maxL);
+        pdf.setFontSize(8);
+        var cuerpo = sinMarca(p.desc || p.para || 'Sin descripción cargada.').replace(/\n+/g, ' ');
+        var lineasTxt = pdf.splitTextToSize(cuerpo, usable);
+        if (lineasTxt.length > 2) lineasTxt = lineasTxt.slice(0, 2);
         pdf.text(lineasTxt, m, yy);
-        yy += lineasTxt.length * 4.4 + 8;
+        yy += lineasTxt.length * 3.5 + 5;
         if (keys.length) {
-          yy = cabe(yy, 24);
           pdf.setFont('helvetica', 'bold');
-          pdf.setFontSize(11);
+          pdf.setFontSize(9);
           pdf.setTextColor.apply(pdf, azul);
           pdf.text('Qué trata y por qué sacarlo', m, yy);
-          yy += 6;
+          yy += 4.2;
           pdf.setFont('helvetica', 'italic');
-          pdf.setFontSize(8);
+          pdf.setFontSize(7);
           pdf.setTextColor.apply(pdf, oscuro);
           var intro = pdf.splitTextToSize(TRATA_INTRO, usable);
-          yy = cabe(yy, intro.length * 3.7 + 4);
+          if (intro.length > 2) intro = intro.slice(0, 2);
           pdf.text(intro, m, yy);
-          yy += intro.length * 3.7 + 5;
+          yy += intro.length * 3.1 + 3;
+          var col = keys.length >= 4;
+          var colWtrata = col ? (usable - 6) / 2 : usable;
+          var x0 = m;
+          var yCol = [yy, yy];
+          var ci = 0;
           keys.forEach(function (k) {
             var info = TRATA[k];
             if (!info) return;
-            var body = pdf.splitTextToSize(info.txt, usable);
-            yy = cabe(yy, 8 + body.length * 3.5 + 3);
+            var x = col ? (ci % 2 === 0 ? x0 : x0 + colWtrata + 6) : x0;
+            var yk = col ? yCol[ci % 2] : yy;
             pdf.setFont('helvetica', 'bold');
-            pdf.setFontSize(9);
+            pdf.setFontSize(7.5);
             pdf.setTextColor.apply(pdf, azul);
-            pdf.text(info.nom + '.', m, yy);
-            yy += 4.4;
+            pdf.text(info.nom + '.', x, yk);
+            yk += 3.4;
             pdf.setFont('helvetica', 'normal');
-            pdf.setFontSize(8);
+            pdf.setFontSize(6.6);
             pdf.setTextColor.apply(pdf, oscuro);
-            pdf.text(body, m, yy);
-            yy += body.length * 3.5 + 3.2;
+            var body = pdf.splitTextToSize(info.txt, colWtrata);
+            var maxB = col ? 7 : 5;
+            if (body.length > maxB) body = body.slice(0, maxB);
+            pdf.text(body, x, yk);
+            yk += body.length * 2.85 + 3.2;
+            if (col) {
+              yCol[ci % 2] = yk;
+              ci += 1;
+            } else {
+              yy = yk;
+            }
           });
-          yy += 4;
+          yy = col ? Math.max(yCol[0], yCol[1]) : yy;
+          yy += 2;
         }
-        if (c) {
-          yy = cabe(yy, 128);
-          yy = dibujarCmp(c, yy);
-        }
+        if (c) yy = dibujarCmp(c, yy);
       });
 
       var pages = pdf.internal.getNumberOfPages();
