@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v495-ficha-una-hoja';
+const CACHE_NAME = 'appi-v496-carrito-pago';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
