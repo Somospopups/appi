@@ -249,7 +249,7 @@
         '<div class="lp-sec" id="lpCuotasLab" hidden>Cuotas</div>' +
         '<div class="lp-chips-wrap" id="lpCuotasWrap" hidden><div class="lp-chips" id="lpCuotas"></div></div>' +
         '<p class="lp-note" id="lpPagoDet"></p>' +
-        '<div class="lp-actions"><button type="button" class="lp-pdf" id="lpSheetPdf">Presupuestar</button>' +
+        '<div class="lp-actions"><button type="button" class="lp-pdf" id="lpSheetPdf">Cotizar</button>' +
         '<button type="button" class="lp-clear" id="lpSheetClear">Vaciar</button></div></div>';
       document.body.appendChild(sh);
       sh.addEventListener('click', function (e) { if (e.target === sh) cerrarSheet(); });
@@ -716,7 +716,7 @@
     if (tot) tot.textContent = 'Total ' + money(r.tot);
     pintarPago();
     var eco = $('lpEco'); if (eco) eco.innerHTML = '';
-    var pdfBtn = $('lpSheetPdf'); if (pdfBtn && !pdfBtn.disabled) pdfBtn.textContent = 'Presupuestar';
+    var pdfBtn = $('lpSheetPdf'); if (pdfBtn && !pdfBtn.disabled) pdfBtn.textContent = 'Cotizar';
   }
 
   function abrirSheet() {
@@ -1236,10 +1236,10 @@
     } catch (e) {
       aviso('No se pudo armar el PDF.');
     }
-    if (btn) { btn.disabled = false; btn.textContent = 'Presupuestar'; }
+    if (btn) { btn.disabled = false; btn.textContent = 'Cotizar'; }
     }).catch(function () {
       aviso('No se pudo armar el PDF.');
-      if (btn) { btn.disabled = false; btn.textContent = 'Presupuestar'; }
+      if (btn) { btn.disabled = false; btn.textContent = 'Cotizar'; }
     });
     });
   }

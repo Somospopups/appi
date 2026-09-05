@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v499-videos-condiciones';
+const CACHE_NAME = 'appi-v500-cotizar';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

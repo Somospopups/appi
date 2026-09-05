@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "499.0.0",
-  "cacheName": "appi-v499-videos-condiciones",
+  "version": "500.0.0",
+  "cacheName": "appi-v500-cotizar",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {
