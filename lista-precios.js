@@ -12,17 +12,24 @@
   var BOT_M2 = 0.018;
   var BOT_PETROLEO = 1.9;
   var VIDA = [
-    { k: ['SENIOR4', 'SENIOR 4'], litros: 36000, meses: 36 },
-    { k: ['S-1000', 'S·1000', 'S•1000'], litros: 80000, meses: 36 },
+    { k: ['SENIOR4', 'SENIOR 4'], litros: 36000, meses: 36, kit: 1 },
+    { k: ['S-1000', 'S·1000', 'S•1000'], litros: 80000, meses: 36, kit: 1 },
     { k: ['QUANTUM'], litros: 30000, meses: 36 },
     { k: ['IONTRIX'], litros: 40000, meses: 24 },
     { k: ['SENIK'], litros: 8000, meses: 18 },
-    { k: ['VERO'], litros: 15000, meses: 18 },
-    { k: ['MINI'], litros: 12000, meses: 12 },
+    { k: ['VERO'], litros: 15000, meses: 18, kit: 1 },
+    { k: ['MINI'], litros: 12000, meses: 12, kit: 1 },
     { k: ['RINNOVA', 'DUCHA'], litros: 150000, meses: 6 },
     { k: ['C3'], litros: 2000, meses: 6 },
-    { k: ['SENIOR'], litros: 36000, meses: 36 },
+    { k: ['SENIOR'], litros: 36000, meses: 36, kit: 1 },
     { k: ['STOPPER'], litros: 0, meses: 6 }
+  ];
+  var ENV_L = 1371;
+  var ENV_G = 45;
+  var ENV_ESC = [
+    { l: 2, t: '2 litros diarios', s: 'hogar soltero' },
+    { l: 4, t: '4 litros diarios', s: 'hogar con o sin bebé' },
+    { l: 8, t: '8 litros diarios', s: 'hogar familia tipo' }
   ];
   var PLANES = { cuotas: [3, 6, 9, 12, 15, 18], bancos: [], vigencia: '' };
   var filtro = 'todos';
@@ -133,12 +140,23 @@
       '.lp-line b{flex:1;font-size:13px;font-weight:850;color:#2a2a32}' +
       '.lp-line span{font-size:12px;font-weight:900;color:#0b5878;white-space:nowrap}' +
       '.lp-tot{margin:12px 0;font-size:18px;font-weight:950;color:#0b5878}' +
-      '.lp-eco{margin:8px 0 12px;padding:12px;border-radius:16px;background:rgba(11,88,120,.06)}' +
-      '.lp-eco-in{display:flex;gap:8px;margin:0 0 8px}' +
-      '.lp-eco-in label{flex:1;font-size:11px;font-weight:800;color:#686977}' +
-      '.lp-eco-in input{width:100%;min-height:38px;margin-top:4px;border:1px solid rgba(196,164,92,.45);border-radius:10px;padding:6px 8px;font:inherit;font-size:14px;background:#faf6ee}' +
-      '.lp-eco-row{display:flex;justify-content:space-between;gap:8px;font-size:12px;font-weight:800;color:#2a2a32;margin:4px 0}' +
-      '.lp-eco-ok{color:#0b5878}' +
+      '.lp-eco{margin:8px 0 12px}' +
+      '.lp-cmp-h{font-size:13px;font-weight:950;color:#0b5878;letter-spacing:.2px}' +
+      '.lp-cmp-sub{margin:2px 0 8px;font-size:12px;font-weight:750;color:#2a2a32}' +
+      '.lp-cmp-sub b{color:#0b5878}' +
+      '.lp-cmp-litro{display:block;margin:0 0 8px;font-size:11px;font-weight:800;color:#686977}' +
+      '.lp-cmp-litro input{width:110px;min-height:36px;margin-left:6px;border:1px solid rgba(196,164,92,.45);border-radius:10px;padding:6px 8px;font:inherit;font-size:14px;background:#faf6ee}' +
+      '.lp-cmp-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}' +
+      '.lp-cmp-tb{width:100%;border-collapse:collapse;font-size:11px;min-width:520px}' +
+      '.lp-cmp-tb th{background:#0b5878;color:#fff;font-weight:850;padding:7px 6px;text-align:right}' +
+      '.lp-cmp-tb th:first-child{text-align:left}' +
+      '.lp-cmp-tb td{padding:7px 6px;border-bottom:1px solid rgba(42,42,50,.08);text-align:right;font-weight:800;color:#2a2a32;vertical-align:top}' +
+      '.lp-cmp-tb td:first-child{text-align:left;font-weight:750}' +
+      '.lp-cmp-tb td small{display:block;font-size:10px;font-weight:700;color:#686977}' +
+      '.lp-cmp-eq td{background:rgba(11,88,120,.06)}' +
+      '.lp-cmp-ag td{background:#eef3f6;text-align:left;font-weight:900;color:#0b5878;letter-spacing:.3px;text-transform:uppercase;font-size:10px}' +
+      '.lp-aho{color:#e56a17!important;font-weight:950!important}' +
+      '.lp-cmp-pl{margin-top:8px;min-width:0}' +
       '.lp-actions{display:flex;gap:8px}' +
       '.lp-actions button{flex:1;border:0;border-radius:12px;padding:12px;font:inherit;font-size:13px;font-weight:900;cursor:pointer}' +
       '.lp-actions .lp-pdf{background:#0b5878;color:#fff}' +
@@ -378,8 +396,8 @@
   function botGet() {
     try { return JSON.parse(localStorage.getItem(LS_BOT) || '{}') || {}; } catch (e) { return {}; }
   }
-  function botSet(dia, precio) {
-    try { localStorage.setItem(LS_BOT, JSON.stringify({ dia: dia, precio: precio })); } catch (e) {}
+  function botSet(litro) {
+    try { localStorage.setItem(LS_BOT, JSON.stringify({ litro: litro })); } catch (e) {}
   }
   function vidaDe(p) {
     var n = String((p && p.nombre) || '').toUpperCase();
@@ -394,36 +412,52 @@
   function botFmt(n, d) {
     return Number(n).toLocaleString('es-AR', { maximumFractionDigits: d || 0, minimumFractionDigits: 0 });
   }
-  function ecoNums() {
+  function money2(n) {
+    return '$' + Number(n).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+  function celAnio(n) {
+    return n > 0 ? money(n) : '—';
+  }
+  function costosAnios(precio, meses, qty) {
+    var y = [0, 0, 0];
+    var life = ((meses > 0 ? meses : 36) / 12);
+    var t = 0, g = 0;
+    while (t < 2.999 && g++ < 24) {
+      y[Math.min(2, Math.floor(t))] += precio * qty;
+      t += life;
+    }
+    return y;
+  }
+  function cmpCostos() {
     var r = resumen();
-    var b = botGet();
-    var botDia = Math.max(1, Number(b.dia) || 2);
-    var botPre = Math.max(0, Number(b.precio) || 1500);
-    var gastoBotDia = botDia * botPre;
-    var costoEq = 0, hay = false, litros = 0, meses = 0;
+    var litroEnv = Math.max(1, Number(botGet().litro) || ENV_L);
+    var yEq = [0, 0, 0];
+    var litros3 = 0;
+    var ref = null;
     r.lineas.forEach(function (ln) {
       var v = vidaDe(ln.p);
-      if (!v || !v.meses) return;
-      hay = true;
-      costoEq += (ln.q * (Number(ln.p.precio) || 0)) / (v.meses * 30);
-      litros += ln.q * (Number(v.litros) || 0);
-      meses = Math.max(meses, v.meses);
+      var meses = v && v.meses ? v.meses : 0;
+      var add = costosAnios(Number(ln.p.precio) || 0, meses, ln.q);
+      yEq[0] += add[0]; yEq[1] += add[1]; yEq[2] += add[2];
+      if (v && v.litros && v.meses) litros3 += ln.q * v.litros * (36 / v.meses);
+      if (!ref && v && v.litros) ref = { p: ln.p, v: v };
     });
-    if (!hay && r.tot) {
-      costoEq = r.tot / 365;
-      meses = 12;
+    var totEq = yEq[0] + yEq[1] + yEq[2];
+    var litroEq = litros3 > 0 ? totEq / litros3 : 0;
+    var kg3 = litros3 * ENV_G / 1000;
+    var tit = 'Este presupuesto';
+    if (ref) {
+      tit = sinMarca(ref.p.nombre) || ref.p.nombre;
+      if (ref.v.kit) tit += ' + Kit posventa';
     }
-    var ahorroDia = Math.max(0, gastoBotDia - costoEq);
-    var botellasAnio = botDia * 365;
-    var kgAnio = botellasAnio * BOT_G / 1000;
-    var m2Anio = botellasAnio * BOT_M2;
-    var petroleo = kgAnio * BOT_PETROLEO;
-    var area = m2Anio < 2 ? 'como una mesa de café' : m2Anio < 10 ? 'como una habitación chica' : m2Anio < 16 ? 'como una plaza de estacionamiento' : m2Anio < 50 ? 'como un living comedor' : 'como un depto de ' + Math.round(m2Anio) + ' m²';
+    var filas = ENV_ESC.map(function (esc) {
+      var anual = esc.l * 365 * litroEnv;
+      var tot = anual * 3;
+      return { esc: esc, anual: anual, tot: tot, ahorro: Math.max(0, tot - totEq) };
+    });
     return {
-      botDia: botDia, botPre: botPre, gastoBotDia: gastoBotDia,
-      costoEq: costoEq, ahorroDia: ahorroDia, hay: hay, litros: litros, meses: meses,
-      kgAnio: kgAnio, m2Anio: m2Anio, petroleo: petroleo, area: area,
-      anioBot: gastoBotDia * 365, anioEq: costoEq * 365, anioAho: ahorroDia * 365
+      litroEnv: litroEnv, yEq: yEq, totEq: totEq, litroEq: litroEq,
+      kgY: kg3 / 3, kg3: kg3, tit: tit, filas: filas, litros3: litros3
     };
   }
   function pintarEco() {
@@ -431,24 +465,34 @@
     if (!host) return;
     var r = resumen();
     if (!r.n) { host.innerHTML = ''; return; }
-    var e = ecoNums();
-    host.innerHTML =
-      '<div class="lp-sec">Vs botella</div>' +
-      '<div class="lp-eco-in">' +
-        '<label>Botellas 2 L / día <input id="lpBotDia" type="number" min="1" max="40" value="' + e.botDia + '"></label>' +
-        '<label>Precio c/u $ <input id="lpBotPre" type="number" min="0" step="50" value="' + e.botPre + '"></label>' +
-      '</div>' +
-      '<div class="lp-eco-row"><span>Hoy, en botellas</span><b>' + money(e.gastoBotDia) + ' / día</b></div>' +
-      '<div class="lp-eco-row"><span>Este presupuesto</span><b>' + money(e.costoEq) + ' / día</b></div>' +
-      '<div class="lp-eco-row lp-eco-ok"><span>Ahorro</span><b>' + money(e.ahorroDia) + ' / día · ' + money(e.anioAho) + ' al año</b></div>' +
-      '<p class="lp-note">Al planeta: ' + botFmt(e.kgAnio, 1) + ' kg de plástico por año · ' + botFmt(e.m2Anio, 1) + ' m² (' + esc(e.area) + ') · ' + botFmt(e.petroleo, 0) + ' L de petróleo. Cada botella tarda ' + BOT_ANIOS + ' años en descomponerse.</p>';
-    var d = $('lpBotDia'), pr = $('lpBotPre');
-    function save() {
-      botSet(Math.max(1, Number(d && d.value) || 2), Math.max(0, Number(pr && pr.value) || 1500));
-      pintarEco();
+    var c = cmpCostos();
+    var filas = c.filas.map(function (f) {
+      return '<tr><td><b>' + esc(f.esc.t) + '</b><small>' + esc(f.esc.s) + '</small></td>' +
+        '<td>' + money(f.anual) + '</td><td>' + money(f.anual) + '</td><td>' + money(f.anual) + '</td>' +
+        '<td>' + money(f.tot) + '</td><td class="lp-aho">' + money(f.ahorro) + '</td></tr>';
+    }).join('');
+    var plast = '';
+    if (c.kg3 > 0) {
+      plast = '<table class="lp-cmp-tb lp-cmp-pl"><thead><tr><th>Consumo de plástico</th><th>1er año</th><th>2do año</th><th>3er año</th><th>Ahorro ecológico</th></tr></thead><tbody>' +
+        '<tr><td>Botellas de 1 L (' + ENV_G + ' g)</td><td>' + botFmt(c.kgY, 0) + ' kg</td><td>' + botFmt(c.kgY, 0) + ' kg</td><td>' + botFmt(c.kgY, 0) + ' kg</td>' +
+        '<td class="lp-aho">' + botFmt(c.kg3, 0) + ' kg</td></tr></tbody></table>';
     }
-    if (d) d.onchange = save;
-    if (pr) pr.onchange = save;
+    host.innerHTML =
+      '<div class="lp-cmp-h">Comparativa de costos</div>' +
+      '<p class="lp-cmp-sub"><b>' + esc(c.tit) + '</b> vs. agua envasada</p>' +
+      '<label class="lp-cmp-litro">Litro de agua envasada $ <input id="lpLitroEnv" type="number" min="1" step="1" value="' + Math.round(c.litroEnv) + '"></label>' +
+      '<div class="lp-cmp-scroll"><table class="lp-cmp-tb"><thead><tr><th></th><th>1er año</th><th>2do año</th><th>3er año</th><th>Gasto total</th><th>Ahorro</th></tr></thead><tbody>' +
+        '<tr class="lp-cmp-eq"><td><b>' + esc(c.tit) + '</b>' + (c.litroEq ? '<small>Costo litro ' + money2(c.litroEq) + '</small>' : '') + '</td>' +
+          '<td>' + celAnio(c.yEq[0]) + '</td><td>' + celAnio(c.yEq[1]) + '</td><td>' + celAnio(c.yEq[2]) + '</td>' +
+          '<td>' + money(c.totEq) + '</td><td></td></tr>' +
+        '<tr class="lp-cmp-ag"><td colspan="6">agua envasada</td></tr>' +
+        filas +
+      '</tbody></table></div>' + plast;
+    var inp = $('lpLitroEnv');
+    if (inp) inp.onchange = function () {
+      botSet(Math.max(1, Number(inp.value) || ENV_L));
+      pintarEco();
+    };
   }
 
   function pintarSheet() {
@@ -660,30 +704,79 @@
         if (det.length) pdf.text(det.join('  ·  '), m, y);
       }
 
-      var eco = ecoNums();
-      y += 12;
-      if (y > 230) { pie(pdf.internal.getNumberOfPages(), '?'); pdf.addPage(); encabezado('Presupuesto'); y = 36; }
-      pdf.setTextColor.apply(pdf, azul);
+      pdf.addPage();
+      encabezado('Comparativa de costos');
+      var c = cmpCostos();
+      var yy = 36;
       pdf.setFont('helvetica', 'bold');
-      pdf.setFontSize(10);
-      pdf.text('Si hoy compran agua embotellada', m, y);
-      y += 6;
-      pdf.setFont('helvetica', 'normal');
-      pdf.setTextColor.apply(pdf, oscuro);
-      pdf.setFontSize(9);
-      pdf.text(eco.botDia + ' botellas de 2 L por día a ' + money(eco.botPre) + '  ·  ' + money(eco.gastoBotDia) + ' por día  ·  ' + money(eco.anioBot) + ' al año', m, y);
-      y += 5;
-      pdf.text('Este presupuesto: ' + money(eco.costoEq) + ' por día  ·  ' + money(eco.anioEq) + ' al año', m, y);
-      y += 5;
-      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(13);
       pdf.setTextColor.apply(pdf, azul);
-      pdf.text('Ahorro: ' + money(eco.ahorroDia) + ' por día  ·  ' + money(eco.anioAho) + ' al año', m, y);
-      y += 6;
+      pdf.text(c.tit + ' vs. agua envasada', m, yy);
+      yy += 7;
       pdf.setFont('helvetica', 'normal');
       pdf.setFontSize(8);
       pdf.setTextColor.apply(pdf, gris);
-      var ecoTxt = pdf.splitTextToSize('Al planeta: ' + botFmt(eco.kgAnio, 1) + ' kg de plástico por año, ' + botFmt(eco.m2Anio, 1) + ' m² (' + eco.area + '), ' + botFmt(eco.petroleo, 0) + ' L de petróleo. Cada botella tarda ' + BOT_ANIOS + ' años en descomponerse.', W - 2 * m);
-      pdf.text(ecoTxt, m, y);
+      if (c.litroEq) pdf.text('Costo litro del equipo ' + money2(c.litroEq) + '   ·   litro envasada ' + money(c.litroEnv), m, yy);
+      yy += 6;
+      var cols = [m, m + 52, m + 78, m + 104, m + 132, m + 162];
+      var heads = ['', '1er año', '2do año', '3er año', 'Gasto total', 'Ahorro'];
+      pdf.setFillColor.apply(pdf, azul);
+      pdf.rect(m, yy, W - 2 * m, 8, 'F');
+      pdf.setTextColor(255, 255, 255);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(8);
+      heads.forEach(function (h, i) {
+        pdf.text(h, i === 0 ? cols[i] + 2 : cols[i] + 22, yy + 5.5, i === 0 ? undefined : { align: 'right' });
+      });
+      yy += 8;
+      function filaPdf(label, sub, a1, a2, a3, tot, aho, eq) {
+        if (eq) { pdf.setFillColor(232, 240, 244); pdf.rect(m, yy, W - 2 * m, 10, 'F'); }
+        pdf.setTextColor.apply(pdf, oscuro);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(8);
+        pdf.text(label, m + 2, yy + (sub ? 4 : 6.5));
+        if (sub) {
+          pdf.setFont('helvetica', 'normal');
+          pdf.setFontSize(7);
+          pdf.setTextColor.apply(pdf, gris);
+          pdf.text(sub, m + 2, yy + 8);
+        }
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(8);
+        pdf.setTextColor.apply(pdf, oscuro);
+        pdf.text(celAnio(a1), cols[1] + 22, yy + 6.5, { align: 'right' });
+        pdf.text(celAnio(a2), cols[2] + 22, yy + 6.5, { align: 'right' });
+        pdf.text(celAnio(a3), cols[3] + 22, yy + 6.5, { align: 'right' });
+        pdf.text(tot ? money(tot) : '', cols[4] + 22, yy + 6.5, { align: 'right' });
+        if (aho) {
+          pdf.setTextColor(229, 106, 23);
+          pdf.text(money(aho), cols[5] + 22, yy + 6.5, { align: 'right' });
+        }
+        yy += 10;
+      }
+      filaPdf(c.tit, c.litroEq ? 'Costo litro ' + money2(c.litroEq) : '', c.yEq[0], c.yEq[1], c.yEq[2], c.totEq, 0, true);
+      pdf.setFillColor(238, 243, 246);
+      pdf.rect(m, yy, W - 2 * m, 7, 'F');
+      pdf.setTextColor.apply(pdf, azul);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(8);
+      pdf.text('AGUA ENVASADA', m + 2, yy + 5);
+      yy += 7;
+      c.filas.forEach(function (f) {
+        filaPdf(f.esc.t, f.esc.s, f.anual, f.anual, f.anual, f.tot, f.ahorro, false);
+      });
+      if (c.kg3 > 0) {
+        yy += 4;
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(9);
+        pdf.setTextColor.apply(pdf, azul);
+        pdf.text('Consumo de plástico', m, yy);
+        yy += 5;
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(8);
+        pdf.setTextColor.apply(pdf, oscuro);
+        pdf.text('Botellas de 1 L (' + ENV_G + ' g):  ' + botFmt(c.kgY, 0) + ' kg por año   ·   ahorro ecológico ' + botFmt(c.kg3, 0) + ' kg en 3 años', m, yy);
+      }
 
       r.lineas.forEach(function (ln, ix) {
         pdf.addPage();

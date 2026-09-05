@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v488-presupuesto-conciencia';
+const CACHE_NAME = 'appi-v489-comparativa-envasada';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
