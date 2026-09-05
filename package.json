@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "504.0.0",
-  "cacheName": "appi-v504-planillas",
+  "version": "506.0.0",
+  "cacheName": "appi-v506-admin-ojo",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

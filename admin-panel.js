@@ -852,11 +852,9 @@ function moneyAdmin(v){
 function pintarOjos(){
   const ico=state.plataVisible?'🙈':'👁';
   const lab=state.plataVisible?'Ocultar montos':'Mostrar montos';
-  ['adminOjoHero','adminOjoIngresos'].forEach(id=>{
-    const b=$(id); if(!b)return;
-    b.textContent=ico; b.setAttribute('aria-label',lab); b.title=lab;
-    b.classList.toggle('on', state.plataVisible);
-  });
+  const b=$('adminOjoHero'); if(!b)return;
+  b.textContent=ico; b.setAttribute('aria-label',lab); b.title=lab;
+  b.classList.toggle('on', state.plataVisible);
 }
 function togglePlata(){
   state.plataVisible=!state.plataVisible;
@@ -1025,7 +1023,6 @@ function renderPagos(){
   if(resumen)resumen.textContent=state.plataVisible
     ? `${label}: ${moneyAdmin(mesData.total)} · ${mesData.pagos.length} pago${mesData.pagos.length===1?'':'s'}`
     : `${label}: ${mesData.pagos.length} pago${mesData.pagos.length===1?'':'s'} · montos ocultos`;
-  const ojoIng=$('adminOjoIngresos'); if(ojoIng) ojoIng.onclick=togglePlata;
   pintarOjos();
   renderHero();
 }
@@ -1040,7 +1037,6 @@ function bind(){if(state.bound)return;state.bound=true;['adminSucursal','adminNu
   const goRequests=$('adminGoRequests');if(goRequests)goRequests.onclick=()=>showAdminTab('solicitudes');
   document.querySelectorAll('#adminTabs [data-admin-tab]').forEach(b=>b.onclick=()=>showAdminTab(b.dataset.adminTab));
   const fab=$('adminFabCreate'); if(fab) fab.onclick=abrirCrearCuenta;
-  const ojoIngBind=$('adminOjoIngresos'); if(ojoIngBind) ojoIngBind.onclick=togglePlata;
   window.addEventListener('resize', moverIndicadorAdmin);
   const ingresosToggle=$('adminIngresosToggle');if(ingresosToggle)ingresosToggle.onclick=()=>{const wrap=$('adminIngresosWrap'),chev=$('adminIngresosChevron');const abrir=wrap.hidden;wrap.hidden=!abrir;ingresosToggle.setAttribute('aria-expanded',abrir?'true':'false');if(chev)chev.classList.toggle('open',abrir)};
   // Anuncio para todos (v326): mensaje + reuniones que el equipo agenda en un toque.

@@ -106,7 +106,7 @@ window.openStock=function(){
 <script src="./prueba-banner.js"></script>
 <script src="./data-sync.js?v=504"></script>
 <script src="./js/membership-admin.js?v=451"></script>
-<script src="./admin-panel.js?v=452"></script>
+<script src="./admin-panel.js?v=506"></script>
 <link rel="stylesheet" href="./css/membership-admin.css">
 <link rel="stylesheet" href="./appi-tema.css?v=478">
 <script src="./account-request.js"></script>
@@ -4221,7 +4221,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v504 · Segura</div>
+  <div class="ds-foot">APPI · v506 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4502,7 +4502,7 @@ body.dark #pageTabs button.active{color:#c5d6ff}
       <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
 
       <div class="home-brand-row">
-        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · v504</span></span>
+        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · v506</span></span>
       </div>
 
       <div class="home-hero-card">
@@ -5092,7 +5092,7 @@ body.dark #pageTabs button.active{color:#c5d6ff}
   </section>
 
   <style>
-  .admin-view{padding-bottom:118px}.admin-top{position:relative}.admin-top-lock{width:54px;height:54px;margin:0 auto 8px;border-radius:17px;display:grid;place-items:center;background:linear-gradient(135deg,#5b8def,#8b63e8);font-size:24px;box-shadow:0 10px 24px rgba(91,112,210,.23)}
+  .admin-view{padding-bottom:176px}.admin-top{position:relative}.admin-top-lock{width:54px;height:54px;margin:0 auto 8px;border-radius:17px;display:grid;place-items:center;background:linear-gradient(135deg,#5b8def,#8b63e8);font-size:24px;box-shadow:0 10px 24px rgba(91,112,210,.23)}
   .admin-round-logout,.admin-round-password{position:absolute;top:4px;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font:900 18px inherit;cursor:pointer}.admin-round-logout{right:0;border:1px solid rgba(217,83,79,.16);background:rgba(217,83,79,.09);color:#c94750}.admin-round-password{right:48px;border:1px solid rgba(91,141,239,.16);background:rgba(91,141,239,.09);color:#3d63c9}.admin-round-logout:hover{background:rgba(217,83,79,.16)}.admin-round-password:hover{background:rgba(91,141,239,.16)}
   .admin-dashboard{max-width:940px;margin:auto}.admin-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}.admin-stat{padding:16px;border-radius:18px;text-align:center;background:rgba(255,255,255,.66);border:1px solid rgba(255,255,255,.82);box-shadow:0 7px 20px rgba(65,75,120,.07)}.admin-stat strong{display:block;color:#3d63c9;font-size:26px}.admin-stat span{display:block;margin-top:3px;color:#777887;font-size:10px;font-weight:850;text-transform:uppercase}.admin-stat.good strong{color:#168765}.admin-stat.warn strong{color:#c34c53}
   .admin-card{padding:18px!important;margin-bottom:12px}.admin-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:15px}.admin-card-head h2{margin:0;color:#292938;font-size:17px}.admin-card-head p{margin:4px 0 0;color:#777887;font-size:11px}.admin-form-grid{display:grid;grid-template-columns:1fr 2fr;gap:10px}.admin-form-grid label{display:flex;flex-direction:column;gap:6px}.admin-form-grid label.wide{grid-column:1/-1}.admin-form-grid label>span{color:#666776;font-size:10px;font-weight:900;text-transform:uppercase}.admin-form-grid input{width:100%;min-height:45px;padding:11px 12px;border:1px solid rgba(80,90,130,.14);border-radius:13px;background:rgba(255,255,255,.76);color:#292938;font:inherit;font-size:13px;outline:none}.admin-form-grid input:focus{border-color:#5b8def;box-shadow:0 0 0 3px rgba(91,141,239,.1)}.admin-membership-label{grid-column:1/-1;color:#666776;font-size:10px;font-weight:900;text-transform:uppercase}.admin-membership-pills{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.admin-membership-pills button{min-height:42px;border:1px solid rgba(91,141,239,.15);border-radius:12px;background:rgba(91,141,239,.07);color:#3d63c9;font:inherit;font-size:11px;font-weight:900;cursor:pointer}.admin-membership-pills button.active{background:linear-gradient(135deg,#5b8def,#8b63e8);color:#fff;box-shadow:0 6px 15px rgba(91,112,210,.2)}.membership-state{display:inline-block;margin-left:6px;padding:4px 7px;border-radius:999px;background:rgba(91,141,239,.1);color:#3d63c9;font-size:8px;font-weight:900}.membership-state.soon{background:rgba(245,179,1,.14);color:#a3670b}.membership-state.expired{background:rgba(217,83,79,.12);color:#c34c53}.membership-state.trial{background:linear-gradient(135deg,#e02424,#b91c1c);color:#fff}.admin-row-actions .btn-trial{background:rgba(224,36,36,.1);color:#b91c1c;border-color:rgba(224,36,36,.25)}.admin-create-btn{width:100%;margin-top:13px;min-height:46px}.admin-inline-status{display:none;margin-top:10px;padding:10px 12px;border-radius:11px;background:rgba(58,208,164,.1);color:#168765;font-size:12px;font-weight:750}.admin-inline-status.show{display:block}.admin-inline-status.error{background:rgba(217,83,79,.1);color:#c34c53}
@@ -5259,8 +5259,8 @@ body.dark #pageTabs button.active{color:#c5d6ff}
   .admin-hero .admin-ojo{position:absolute;top:12px;right:12px;background:rgba(255,255,255,.22);color:#fff}
   .admin-ojo.on{background:rgba(58,208,164,.18)}
   .admin-fab{
-    position:fixed;right:18px;bottom:calc(env(safe-area-inset-bottom) + 86px);
-    z-index:70;width:56px;height:56px;border:0;border-radius:50%;
+    position:fixed;right:18px;bottom:calc(env(safe-area-inset-bottom) + 108px);
+    z-index:90;width:56px;height:56px;border:0;border-radius:50%;
     background:linear-gradient(135deg,#27b5c4,#3ad0a4);color:#fff;font-size:32px;line-height:1;
     font-weight:400;cursor:pointer;box-shadow:0 10px 24px rgba(39,181,196,.35);
   }
@@ -5453,7 +5453,6 @@ body.dark #pageTabs button.active{color:#c5d6ff}
         <section class="glass admin-card" id="adminIngresosCard">
           <div class="admin-card-head">
             <div><h2>📅 Ingresos</h2><p id="adminIngresosResumen">Total del mes, quién pagó y la tira anual.</p></div>
-            <button type="button" class="admin-ojo" id="adminOjoIngresos" aria-label="Mostrar montos" title="Mostrar montos">👁</button>
           </div>
           <div id="adminIngresosWrap">
             <div id="adminIngresosBody"><div class="admin-pending-empty">Cargando ingresos…</div></div>
@@ -12390,8 +12389,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='504';
-      const CACHE_NAME='appi-v504-planillas';
+      const swVersion='506';
+      const CACHE_NAME='appi-v506-admin-ojo';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · v'+swVersion;
       const hadController=Boolean(navigator.serviceWorker.controller);
