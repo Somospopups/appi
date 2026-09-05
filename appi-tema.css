@@ -241,3 +241,76 @@ body.appi-admin .revenue-stats{
   backdrop-filter:none !important;
   -webkit-backdrop-filter:none !important;
 }
+
+/* ---------- modo noche: nada de crema ---------- */
+body.dark .glass,
+body.dark .card.glass,
+body.dark .revenue-stats,
+body.dark .stat-card,
+body.dark .membership-modal-overlay .modal,
+body.dark .hist-card,
+body.dark .tool-card,
+body.dark .admin-user-row,
+body.dark .cultura-card,
+body.dark .home-month-card,
+body.dark .home-hero-card,
+body.dark .home-brand-mark,
+body.dark .backup-collapsible,
+body.dark .u-tools button,
+body.dark.appi-admin .glass,
+body.dark.appi-admin .admin-card,
+body.dark.appi-admin .admin-stat,
+body.dark.appi-admin .admin-user-row,
+body.dark.appi-admin .admin-cump-item,
+body.dark.appi-admin .admin-quick .q,
+body.dark.appi-admin .revenue-stats{
+  background:#25273a !important;
+  border-color:rgba(255,255,255,.08) !important;
+  box-shadow:0 8px 22px rgba(0,0,0,.28) !important;
+}
+body.dark .stat-card{
+  background:linear-gradient(135deg,rgba(11,88,120,.22),rgba(11,88,120,.10)) !important;
+  border-color:rgba(11,88,120,.28) !important;
+}
+body.dark .mu-panel,
+body.dark .re-panel,
+body.dark .uc-panel{
+  background:#1c2430 !important;
+}
+body.dark .mu-item,
+body.dark .re-item,
+body.dark .re-quien,
+body.dark .uc-item{
+  background:#25273a;
+  border-color:rgba(255,255,255,.08);
+}
+body.dark #htOverlay{
+  background:#25273a !important;
+  border-color:rgba(255,255,255,.08) !important;
+}
+body.dark .ht-card:not(.ht-esp){
+  background:linear-gradient(160deg,#2c2e42,#1c1e2c) !important;
+  box-shadow:0 18px 40px rgba(0,0,0,.38) !important;
+}
+body.dark .ht-top b{color:#f2f2f7}
+body.dark .ht-tope,
+body.dark .ht-top span{color:#a0a0b0}
+body.dark .admin-login-overlay{
+  background:#16161e !important;
+}
+body.dark .lock-card,
+body.dark .admin-login-card{
+  background:#25273a !important;
+}
+body.dark .modal,
+body.dark .modal-head{
+  background:#25273a !important;
+}
+body.dark .hl-card,
+body.dark .hl-link{
+  background:#25273a !important;
+}
+body.dark .cal-modal,
+body.dark .cal-head{
+  background:#1c2430 !important;
+}

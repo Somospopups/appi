@@ -165,8 +165,14 @@
       '.cal-task-text.done{text-decoration:line-through;opacity:.5}' +
       'body.dark .cal-task-text{color:#e0e0e8}' +
       '.cal-task-hora{flex:0 0 auto;padding:3px 8px;border-radius:8px;background:rgba(11,88,120,.12);color:#0b5878;font-size:10.5px;font-weight:900;white-space:nowrap}' +
-      '.cal-add input[type=time]{flex:0 0 96px;padding:10px 8px;border:1px solid rgba(80,90,130,.16);border-radius:12px;background:rgba(255,255,255,.94);color:#292938;font:inherit;font-size:12px}' +
-      'body.dark .cal-add input[type=time]{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.12);color:#f2f2f7}' +
+      '.cal-hora{position:relative;flex:0 0 112px;display:block}' +
+      '.cal-hora input[type=time]{width:100%;box-sizing:border-box;padding:10px 8px;border:1px solid rgba(80,90,130,.16);border-radius:12px;background:rgba(255,255,255,.94);color:#292938;font:inherit;font-size:12px}' +
+      '.cal-hora input[type=time]::-webkit-calendar-picker-indicator{display:none;-webkit-appearance:none;appearance:none;opacity:0;width:0;height:0}' +
+      '.cal-hora input[type=time]::-webkit-inner-spin-button,.cal-hora input[type=time]::-webkit-clear-button{display:none}' +
+      '.cal-hora-ph{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#8a8a94;font-size:12px;font-weight:800;pointer-events:none}' +
+      '.cal-hora.has .cal-hora-ph{display:none}' +
+      'body.dark .cal-hora input[type=time]{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.12);color:#f2f2f7}' +
+      'body.dark .cal-hora-ph{color:#a0a0b0}' +
       'body.dark .cal-task-hora{background:rgba(11,88,120,.28);color:#d7e8f0}' +
       '.cal-task-del{border:0;background:none;color:#d9534f;font-size:16px;cursor:pointer;padding:0 4px;opacity:.6}' +
       '.cal-task-del:hover{opacity:1}' +
@@ -378,7 +384,10 @@
     }
 
     html += '<div class="cal-add">' +
-      '<input type="time" id="calNewHora" aria-label="Hora (opcional)">' +
+      '<label class="cal-hora">' +
+        '<input type="time" id="calNewHora" aria-label="Horario">' +
+        '<span class="cal-hora-ph">Horario</span>' +
+      '</label>' +
       '<input type="text" id="calNewTask" placeholder="Nueva tarea…">' +
       '<button id="calAddBtn">＋</button>' +
     '</div>';
@@ -406,6 +415,11 @@
     var addBtn = $('calAddBtn');
     var addInput = $('calNewTask');
     var addHora = $('calNewHora');
+    function syncHoraPh(){
+      var lab = addHora && addHora.closest ? addHora.closest('.cal-hora') : (addHora && addHora.parentNode);
+      if (lab && lab.classList) lab.classList.toggle('has', !!(addHora && addHora.value));
+    }
+    if (addHora){ addHora.oninput = syncHoraPh; addHora.onchange = syncHoraPh; syncHoraPh(); }
     function doAdd(){
       var txt = addInput.value.trim();
       if(!txt) return;
