@@ -12,16 +12,16 @@
   var BOT_M2 = 0.018;
   var BOT_PETROLEO = 1.9;
   var VIDA = [
-    { k: ['SENIOR4', 'SENIOR 4'], litros: 36000, meses: 36, kit: 1 },
-    { k: ['S-1000', 'S·1000', 'S•1000'], litros: 80000, meses: 36, kit: 1 },
-    { k: ['QUANTUM'], litros: 30000, meses: 36 },
+    { k: ['SENIOR4', 'SENIOR 4'], litros: 36000, meses: 36, kit: 1, purif: 1 },
+    { k: ['S-1000', 'S·1000', 'S•1000'], litros: 80000, meses: 36, kit: 1, purif: 1 },
+    { k: ['QUANTUM'], litros: 30000, meses: 36, purif: 1 },
     { k: ['IONTRIX'], litros: 40000, meses: 24 },
-    { k: ['SENIK'], litros: 8000, meses: 18 },
-    { k: ['VERO'], litros: 15000, meses: 18, kit: 1 },
-    { k: ['MINI'], litros: 12000, meses: 12, kit: 1 },
+    { k: ['SENIK'], litros: 8000, meses: 18, purif: 1 },
+    { k: ['VERO'], litros: 15000, meses: 18, kit: 1, purif: 1 },
+    { k: ['MINI'], litros: 12000, meses: 12, kit: 1, purif: 1 },
     { k: ['RINNOVA', 'DUCHA'], litros: 150000, meses: 6 },
     { k: ['C3'], litros: 2000, meses: 6 },
-    { k: ['SENIOR'], litros: 36000, meses: 36, kit: 1 },
+    { k: ['SENIOR'], litros: 36000, meses: 36, kit: 1, purif: 1 },
     { k: ['STOPPER'], litros: 0, meses: 6 }
   ];
   var ENV_L = 1371;
@@ -135,7 +135,6 @@
       '.lp-fab.arrastre{cursor:grabbing;opacity:.92}' +
       '.lp-fab i{min-width:22px;height:22px;padding:0 6px;border-radius:99px;background:#fff;color:#0b5878;font-style:normal;font-size:12px;font-weight:950;display:flex;align-items:center;justify-content:center;pointer-events:none}' +
       '.lp-fab span{pointer-events:none}' +
-      '@media (min-width:1024px){.lp-fab{bottom:24px;right:28px}.lp-wrap{padding-bottom:88px}}' +
       '#lpSheet{display:none;position:fixed;inset:0;z-index:80;background:rgba(20,24,32,.45);align-items:flex-end}' +
       '#lpSheet.open{display:flex}' +
       '.lp-sheet{width:100%;max-height:86%;overflow:auto;background:#f3eee3;border-radius:22px 22px 0 0;padding:14px 14px calc(18px + env(safe-area-inset-bottom))}' +
@@ -178,7 +177,15 @@
       'body.dark #view-lista,.dark .lp-sheet{background:#1c1e2a}' +
       'body.dark .lp-item{background:#25273a;border-color:rgba(255,255,255,.08)}' +
       'body.dark .lp-item-txt b,body.dark .lp-sheet h2,body.dark .lp-line b{color:#f2f2f7}' +
-      'body.dark .lp-search,body.dark .lp-para{background:#25273a;color:#f2f2f7}';
+      'body.dark .lp-search,body.dark .lp-para{background:#25273a;color:#f2f2f7}' +
+      '@media (min-width:1024px){' +
+        '.lp-fab{bottom:24px;right:28px}' +
+        '.lp-wrap{padding-bottom:88px}' +
+        '#lpSheet{left:280px;align-items:center;justify-content:center;padding:28px;z-index:200}' +
+        'body.sidebar-cerrada #lpSheet{left:0}' +
+        '.lp-sheet{width:min(720px,100%);max-height:92%;border-radius:22px;box-shadow:0 24px 64px rgba(20,24,32,.28)}' +
+        '.lp-cmp-tb{min-width:0}' +
+      '}';
     var s = $('lpStyle');
     if (!s) { s = document.createElement('style'); s.id = 'lpStyle'; document.head.appendChild(s); }
     s.textContent = css;
@@ -499,7 +506,10 @@
     qty = qty || 1;
     var litroEnv = Math.max(1, Number(botGet().litro) || ENV_L);
     var v = vidaDe(p);
-    if (!v || !v.litros) return null;
+    if (!v || !v.litros || !v.purif) return null;
+    var nomU = String((p && p.nombre) || '').toUpperCase();
+    if (/RINNOVA|DUCHA|BURBY|SODA|STOPPER|POLI\s*2|AIRE|IONTRIX/.test(nomU)) return null;
+    if (p && p.grupo && p.grupo !== 'equipos') return null;
     var unit = Number(p.precio) || 0;
     var yEq = costosAnios(unit, v.meses || 0, qty);
     var totEq = yEq[0] + yEq[1] + yEq[2];

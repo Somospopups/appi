@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "491.0.0",
-  "cacheName": "appi-v491-pago-tarjeta-primero",
+  "version": "492.0.0",
+  "cacheName": "appi-v492-purif-pc",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {
