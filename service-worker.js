@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v492-purif-pc';
+const CACHE_NAME = 'appi-v493-pdf-completo';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
