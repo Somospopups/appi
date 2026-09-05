@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v489-comparativa-envasada';
+const CACHE_NAME = 'appi-v490-ficha-se-paga-solo';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

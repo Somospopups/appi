@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "489.0.0",
-  "cacheName": "appi-v489-comparativa-envasada",
+  "version": "490.0.0",
+  "cacheName": "appi-v490-ficha-se-paga-solo",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {
