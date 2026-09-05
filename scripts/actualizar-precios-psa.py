@@ -66,6 +66,7 @@ VIDEOS = [
     (("S-1000", "S·1000", "S•1000"), "kz31j16L_cQ", "Mantenimiento PSA S-1000 II"),
     (("VERO",), "EEXBGZNXAYg", "Purificador de agua PSA Vero"),
     (("MINI",), "kRXtseGEA8M", "PSA Mini"),
+    (("QUANTUM",), "E9w3szPfIIk", "Mantenimiento PSA Quantum"),
     (("RINNOVA", "DUCHA"), "tQV4c9p9TBQ", "PSA Rinnova — Una renovación en tu ducha"),
     (("BICO",), "2qL60kBDUlU", "Nueva Grifería Bicomando PSA"),
     (("SODA", "GASIFICADOR"), "f8Jb7wtu0tw", "SodaBurby — Gasificador de Agua PSA"),

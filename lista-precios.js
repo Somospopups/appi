@@ -518,6 +518,12 @@
     }
     return null;
   }
+  function videoDe(p) {
+    if (p && p.video) return p.video;
+    var n = String((p && p.nombre) || '').toUpperCase();
+    if (n.indexOf('QUANTUM') >= 0) return 'https://www.youtube.com/watch?v=E9w3szPfIIk';
+    return '';
+  }
   function trataDe(p) {
     var n = String((p && p.nombre) || '').toUpperCase();
     if (!n || (p && p.grupo && p.grupo !== 'equipos')) return [];
@@ -1064,7 +1070,7 @@
         var imgW = 36;
         var c = cmpDe(p, ln.q);
         var keys = trataDe(p);
-        var hasVid = !!p.video;
+        var hasVid = !!videoDe(p);
         var qrW = hasVid ? 24 : 0;
         var tx = m;
         var tw = usable;
@@ -1102,12 +1108,12 @@
         }
         if (hasVid) {
           var qx = W - m - qrW;
-          var data = qrDataUrl(p.video);
+          var data = qrDataUrl(videoDe(p));
           if (data) {
             try { pdf.addImage(data, 'GIF', qx, yy, qrW, qrW); } catch (e) {}
-            pdf.link(qx, yy, qrW, qrW, { url: p.video });
+            pdf.link(qx, yy, qrW, qrW, { url: videoDe(p) });
           }
-          botonVideo(qx - 8, yy + qrW + 2, qrW + 8, 11, p.video);
+          botonVideo(qx - 8, yy + qrW + 2, qrW + 8, 11, videoDe(p));
         }
         var yHead = Math.max(yy + (foto ? imgW + 4 : 0), yTit + (c ? 20 : 14), hasVid ? yy + qrW + 16 : 0);
         yy = yHead + 2;

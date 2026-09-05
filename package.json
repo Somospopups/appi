@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "497.0.0",
-  "cacheName": "appi-v497-ficha-video",
+  "version": "498.0.0",
+  "cacheName": "appi-v498-video-quantum",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {
