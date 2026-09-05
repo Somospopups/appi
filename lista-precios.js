@@ -233,8 +233,10 @@
       var s = document.createElement('section');
       s.id = 'view-lista';
       s.className = 'view';
-      s.innerHTML = '<header class="top"><button class="back-btn" onclick="history.back()" aria-label="Volver">‹</button><button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button><h1>Lista de precios</h1><div class="script">tienda PSA</div></header><div id="lpCont"></div><button type="button" class="lp-fab" id="lpFab" hidden aria-label="Ver presupuesto"></button>';
+      s.innerHTML = '<header class="top"><button class="back-btn" onclick="history.back()" aria-label="Volver">‹</button><button class="help-btn" id="btnHelpLista" aria-label="Ayuda">?</button><button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button><h1>Lista de precios</h1><div class="script">tienda PSA</div></header><div id="lpCont"></div><button type="button" class="lp-fab" id="lpFab" hidden aria-label="Ver presupuesto"></button>';
       app.appendChild(s);
+      var hl = $('btnHelpLista');
+      if (hl) hl.onclick = function () { if (typeof showHelp === 'function') showHelp('lista'); };
     }
     if (!$('lpSheet')) {
       var sh = document.createElement('div');

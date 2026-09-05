@@ -1077,7 +1077,7 @@ NECESITAN TU ATENCIÓN
 Lo urgente en un solo lugar: solicitudes sin resolver, membresías que vencen y pruebas por terminar. Tocá un renglón y te lleva.
 
 CREAR CUENTA
-Tocá "➕ Crear cuenta nueva" y completá los datos en la ventana. Elegí la duración: 1 mes, 🧪 PRUEBA (5 días con franja roja; al vencer, el ingreso se bloquea) o ♾️ PARA SIEMPRE (sin vencimiento). Al crear, podés mandar por WhatsApp la bienvenida y la contraseña en dos mensajes separados: la contraseña viaja sola para copiar y pegar fácil.
+Tocá el + de abajo a la derecha y completá los datos en la ventana. Elegí la duración: 1 mes, 🧪 PRUEBA (5 días con franja roja; al vencer, el ingreso se bloquea) o ♾️ PARA SIEMPRE (sin vencimiento). Al crear, podés mandar por WhatsApp la bienvenida y la contraseña en dos mensajes separados: la contraseña viaja sola para copiar y pegar fácil.
 
 SOLICITUDES PENDIENTES
 Las personas que piden acceso desde la app aparecen acá. Al aprobar elegís 1 mes o PRUEBA, y podés mandar las credenciales por WhatsApp.

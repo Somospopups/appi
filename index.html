@@ -106,7 +106,7 @@ window.openStock=function(){
 <script src="./prueba-banner.js"></script>
 <script src="./data-sync.js?v=504"></script>
 <script src="./js/membership-admin.js?v=451"></script>
-<script src="./admin-panel.js?v=506"></script>
+<script src="./admin-panel.js?v=510"></script>
 <link rel="stylesheet" href="./css/membership-admin.css">
 <link rel="stylesheet" href="./appi-tema.css?v=478">
 <script src="./account-request.js"></script>
@@ -121,8 +121,8 @@ window.openStock=function(){
 
 <script src="./escalera-suenos.js"></script>
 <script src="./demo-guia.js"></script>
-<script src="./tablero-negocio.js?v=503"></script>
-<script src="./lista-precios.js?v=503"></script>
+<script src="./tablero-negocio.js?v=510"></script>
+<script src="./lista-precios.js?v=510"></script>
 <script src="./stock-personal.js"></script>
 
 <script src="./porque-vivo.js"></script>
@@ -4230,7 +4230,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v509 · Segura</div>
+  <div class="ds-foot">APPI · v510 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4511,7 +4511,7 @@ body.dark #pageTabs button.active{color:#c5d6ff}
       <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
 
       <div class="home-brand-row">
-        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · v509</span></span>
+        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · v510</span></span>
       </div>
 
       <div class="home-hero-card">
@@ -5867,9 +5867,12 @@ const HELP = {
 
     <div class="tip"><strong>🍶 COMPARATIVAS</strong><br/>
     Dos herramientas para la demo:<br/>
-    • Productos: elegí dos equipos y ves litros, precio, qué trae distinto y cuál conviene<br/>
+    • Productos: solo purificadores, ficha contra ficha. El más barato no es siempre el que va: primero el estudio del agua de esa casa<br/>
     • Botellas: cuánto gasta una familia en 2 L y qué le ahorra al planeta<br/>
     Compartilo por WhatsApp.</div>
+
+    <div class="tip"><strong>📋 LISTA DE PRECIOS</strong><br/>
+    Catálogo de la tienda. Elegí productos y cotizá. Precios y planes de tarjeta se actualizan solos, dos veces por día. Cada ficha es una hoja, con foto, QR y video.</div>
 
     <div class="tip"><strong>🧮 SIMULADOR</strong><br/>
     Calculá cuánto podés ganar según tu actividad:<br/>
@@ -6031,7 +6034,7 @@ const HELP = {
     Entrá a cada paso, cargá lo que te pide y tocá <b>Hecho ✓</b>. Después APPI te lleva al presupuesto.</div>
 
     <div class="tip"><strong>PROGRESO</strong><br/>
-    La barra de arriba muestra el % del mes. Se guarda solo. Podés cambiar de mes y compartir el resumen.</div>`
+    La barra de arriba muestra el % del mes. Se guarda en tu cuenta. Podés cambiar de mes y compartir el resumen.</div>`
   },
   wheel: {
     icon:'⚖️', iconBg:'linear-gradient(135deg,#5b8def,#a06bff)',
@@ -6168,7 +6171,7 @@ const HELP = {
     html:`<p>Evaluá 8 áreas personales del 0 al 10. Es el tercer paso de la planificación del mes, después de Las 7 P y el Presupuesto.</p>
     <div class="tip">Buscá equilibrio, no un 10 en todo.</div>`
   },
-  negocio: {
+  ruedaNegocio: {
     icon:'📊', iconBg:'linear-gradient(135deg,#ff8f6b,#ff6b9d)',
     title:'Rueda del Negocio',
     sub:'8 áreas profesionales',
@@ -6183,7 +6186,8 @@ const HELP = {
     <div class="tip"><strong>Grabar</strong> — tocá el micrófono o Grabar. La primera vez pedí permiso al micrófono.</div>
     <div class="tip"><strong>Pausar / Finalizar</strong> — las barritas se animan solo mientras grabás.</div>
     <div class="tip"><strong>Nombre</strong> — al terminar se abre un popup. Queda: fecha - el nombre que elijas. Después lo podés cambiar.</div>
-    <div class="tip"><strong>Escuchar</strong> — cada audio tiene reproductor, descarga y borrar.</div>`
+    <div class="tip"><strong>Escuchar</strong> — cada audio tiene reproductor, descarga y borrar.</div>
+    <div class="tip"><strong>Este teléfono</strong> — los audios quedan acá, no en la nube.</div>`
   },
   notas: {
     icon:'📝', iconBg:'linear-gradient(135deg,#fbbf24,#f59e0b)',
@@ -6205,6 +6209,34 @@ const HELP = {
     <div class="tip"><strong>Filtros</strong> — buscador, zona, orden por vencimiento y tarjetas (marca + banco) para avisar una promo.</div>
     <div class="tip"><strong>Tarjetas</strong> — en la ficha de cada usuario cargá Visa Galicia, Naranja, etc. Se guardan aparte: recargar la planilla no las borra. En el mensaje de la promo usá {nombre} y {tarjeta}.</div>
     <div class="warn-tip"><strong>🔒 Privacidad:</strong> La planilla queda en tu cuenta, en cualquier dispositivo. La Clave PSA no pasa por APPI.</div>`
+  },
+  lista: {
+    icon:'📋', iconBg:'linear-gradient(135deg,#0b5878,#3ad0a4)',
+    title:'Lista de precios',
+    sub:'Catálogo y cotización',
+    html:`<p>Catálogo de la tienda. Elegí productos y cotizá.</p>
+    <div class="tip"><strong>LISTA</strong><br/>Buscá por modelo o SKU. Los chips filtran. El + arma el carrito. Precios y planes de tarjeta se actualizan solos, dos veces por día.</div>
+    <div class="tip"><strong>COTIZAR</strong><br/>El botón flotante abre el presupuesto. Primero la tarjeta, después las cuotas. Es un presupuesto tipo factura, no una comparativa.</div>
+    <div class="tip"><strong>FICHA</strong><br/>Cada producto: una hoja, foto, qué trata el agua, QR y Ver video. Sin logo de APPI ni de PSA. Si no hay video, no está en la lista.</div>
+    <div class="tip"><strong>ENVIAR</strong><br/>PDF o WhatsApp al destinatario que elijas.</div>`
+  },
+  comparativas: {
+    icon:'🍶', iconBg:'linear-gradient(135deg,#0b5878,#5b8def)',
+    title:'Comparativas',
+    sub:'Productos y botellas',
+    html:`<p>Dos herramientas para la demo: productos y botellas.</p>
+    <div class="tip"><strong>PRODUCTOS</strong><br/>Solo purificadores, ficha contra ficha. El más barato no es siempre el que va: primero el estudio del agua de esa casa. La plata y el $/L son un dato.</div>
+    <div class="tip"><strong>BOTELLAS</strong><br/>Cuánto gasta una familia en 2 L y qué le ahorra al planeta.</div>
+    <div class="tip"><strong>WHATSAPP</strong><br/>Mandala en el momento.</div>`
+  },
+  simulador: {
+    icon:'🧮', iconBg:'linear-gradient(135deg,#3ad0a4,#5b8def)',
+    title:'Simulador',
+    sub:'Tu mes soñado',
+    html:`<p>Calculá cuánto podés ganar según tu actividad.</p>
+    <div class="tip"><strong>DEMOS</strong><br/>Presentaciones del mes. Van atadas a los cierres: 3 demos = 1 cierre.</div>
+    <div class="tip"><strong>CIERRES</strong><br/>Ventas concretadas. 1 cierre = 3 demos. Si movés una barra, la otra se ajusta.</div>
+    <div class="tip"><strong>RED</strong><br/>PB de tu equipo. Te muestra comercialización + red + total.</div>`
   }
 };
 
@@ -6215,7 +6247,7 @@ document.getElementById('btnHelpNegocio')?.addEventListener('click', ()=>showHel
 document.getElementById('btnHelpHerramientas')?.addEventListener('click', ()=>showHelp('herramientas'));
 document.getElementById('btnHelpPresu').addEventListener('click', ()=>showHelp('presu'));
 document.getElementById('btnHelpSiete').addEventListener('click', ()=>showHelp('siete'));
-document.getElementById('btnHelpWheel').addEventListener('click', ()=>showHelp('wheel'));
+document.getElementById('btnHelpWheel').addEventListener('click', ()=>showHelp(currentRueda==='negocio'?'ruedaNegocio':currentRueda==='vida'?'vida':'wheel'));
 document.getElementById('btnHelpEquipo').addEventListener('click', ()=>{
   if(!equipoData || !equipoData.personas || equipoData.personas.length === 0){
     showHelp('equipo');
@@ -12404,8 +12436,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='509';
-      const CACHE_NAME='appi-v509-ayuda';
+      const swVersion='510';
+      const CACHE_NAME='appi-v510-ayuda';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · v'+swVersion;
       const hadController=Boolean(navigator.serviceWorker.controller);
