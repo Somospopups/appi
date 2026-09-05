@@ -64,18 +64,27 @@ VIDEOS = [
     (("SENIOR4", "SENIOR 4"), "ZGPO3UHxzE0", "PSA Senior 4 — La evolución en la purificación del agua"),
     (("SENIK",), "ucPCBNzhCMk", "PSA Senik"),
     (("S-1000", "S·1000", "S•1000"), "kz31j16L_cQ", "Mantenimiento PSA S-1000 II"),
+    (("QUANTUM",), "E9w3szPfIIk", "Mantenimiento PSA Quantum"),
     (("VERO",), "EEXBGZNXAYg", "Purificador de agua PSA Vero"),
     (("MINI",), "kRXtseGEA8M", "PSA Mini"),
-    (("QUANTUM",), "E9w3szPfIIk", "Mantenimiento PSA Quantum"),
     (("RINNOVA", "DUCHA"), "tQV4c9p9TBQ", "PSA Rinnova — Una renovación en tu ducha"),
+    (("C3",), "tQV4c9p9TBQ", "PSA Rinnova — Una renovación en tu ducha"),
+    (("IONTRIX",), "kgeNCoHLCL0", "PSA Iontrix"),
     (("BICO",), "2qL60kBDUlU", "Nueva Grifería Bicomando PSA"),
-    (("SODA", "GASIFICADOR"), "f8Jb7wtu0tw", "SodaBurby — Gasificador de Agua PSA"),
+    (("GRIFER", "BY PASS", "BYPASS"), "2qL60kBDUlU", "Nueva Grifería Bicomando PSA"),
+    (("SODA", "GASIFICADOR", "BURBY"), "f8Jb7wtu0tw", "SodaBurby — Gasificador de Agua PSA"),
     (("TÉRMICA", "TERMICA"), "lMJQB3PGIeI", "Nuevas botellas térmicas PSA"),
     (("NEO",), "s566uSsra_w", "Botella Neo reutilizable"),
     (("VIDRIO",), "UOTr9jI26Og", "Nueva Botella de vidrio PSA"),
     (("KIT MATERO", "MATE", "TERMO"), "gg_xh3VwuUI", "Nuevo mate y termo PSA"),
     (("SENIOR",), "__ISvWioYow", "Purificador de Agua PSA Senior"),
     (("AIRE",), "VV3CgvUgD78", "Purificador de Aire PSA"),
+    (("ROPOT", "ÓSMOSIS", "OSMOSIS", "MEMBRANA"), "yh4dwgb21Xc", "PSA ROPOT — Reemplazo de módulos"),
+    (("POLI",), "E9w3szPfIIk", "Mantenimiento PSA Quantum"),
+    (("STOPPER",), "kRXtseGEA8M", "PSA Mini"),
+    (("PORTÁTIL", "PORTATIL"), "kRXtseGEA8M", "PSA Mini"),
+    (("FIPOR",), "__ISvWioYow", "Purificador de Agua PSA Senior"),
+    (("BACTERIO",), "kz31j16L_cQ", "Mantenimiento PSA S-1000 II"),
 ]
 
 
@@ -178,7 +187,7 @@ def video_de(nombre):
     for keys, vid, titulo in VIDEOS:
         if any(k in n for k in keys):
             return "https://www.youtube.com/watch?v=" + vid, titulo
-    return "", ""
+    return "https://www.youtube.com/watch?v=ZGPO3UHxzE0", "PSA Senior 4"
 
 
 def grupo(name, cats):

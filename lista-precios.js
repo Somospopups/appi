@@ -521,8 +521,45 @@
   function videoDe(p) {
     if (p && p.video) return p.video;
     var n = String((p && p.nombre) || '').toUpperCase();
-    if (n.indexOf('QUANTUM') >= 0) return 'https://www.youtube.com/watch?v=E9w3szPfIIk';
-    return '';
+    var pares = [
+      ['SENIOR4', 'https://www.youtube.com/watch?v=ZGPO3UHxzE0'],
+      ['SENIOR 4', 'https://www.youtube.com/watch?v=ZGPO3UHxzE0'],
+      ['SENIK', 'https://www.youtube.com/watch?v=ucPCBNzhCMk'],
+      ['S-1000', 'https://www.youtube.com/watch?v=kz31j16L_cQ'],
+      ['QUANTUM', 'https://www.youtube.com/watch?v=E9w3szPfIIk'],
+      ['VERO', 'https://www.youtube.com/watch?v=EEXBGZNXAYg'],
+      ['MINI', 'https://www.youtube.com/watch?v=kRXtseGEA8M'],
+      ['RINNOVA', 'https://www.youtube.com/watch?v=tQV4c9p9TBQ'],
+      ['DUCHA', 'https://www.youtube.com/watch?v=tQV4c9p9TBQ'],
+      ['C3', 'https://www.youtube.com/watch?v=tQV4c9p9TBQ'],
+      ['IONTRIX', 'https://www.youtube.com/watch?v=kgeNCoHLCL0'],
+      ['BICO', 'https://www.youtube.com/watch?v=2qL60kBDUlU'],
+      ['GRIFER', 'https://www.youtube.com/watch?v=2qL60kBDUlU'],
+      ['BY PASS', 'https://www.youtube.com/watch?v=2qL60kBDUlU'],
+      ['BURBY', 'https://www.youtube.com/watch?v=f8Jb7wtu0tw'],
+      ['SODA', 'https://www.youtube.com/watch?v=f8Jb7wtu0tw'],
+      ['TÉRMICA', 'https://www.youtube.com/watch?v=lMJQB3PGIeI'],
+      ['TERMICA', 'https://www.youtube.com/watch?v=lMJQB3PGIeI'],
+      ['NEO', 'https://www.youtube.com/watch?v=s566uSsra_w'],
+      ['VIDRIO', 'https://www.youtube.com/watch?v=UOTr9jI26Og'],
+      ['MATE', 'https://www.youtube.com/watch?v=gg_xh3VwuUI'],
+      ['TERMO', 'https://www.youtube.com/watch?v=gg_xh3VwuUI'],
+      ['SENIOR', 'https://www.youtube.com/watch?v=__ISvWioYow'],
+      ['AIRE', 'https://www.youtube.com/watch?v=VV3CgvUgD78'],
+      ['ROPOT', 'https://www.youtube.com/watch?v=yh4dwgb21Xc'],
+      ['OSMOSIS', 'https://www.youtube.com/watch?v=yh4dwgb21Xc'],
+      ['ÓSMOSIS', 'https://www.youtube.com/watch?v=yh4dwgb21Xc'],
+      ['POLI', 'https://www.youtube.com/watch?v=E9w3szPfIIk'],
+      ['STOPPER', 'https://www.youtube.com/watch?v=kRXtseGEA8M'],
+      ['PORTÁTIL', 'https://www.youtube.com/watch?v=kRXtseGEA8M'],
+      ['PORTATIL', 'https://www.youtube.com/watch?v=kRXtseGEA8M'],
+      ['FIPOR', 'https://www.youtube.com/watch?v=__ISvWioYow'],
+      ['BACTERIO', 'https://www.youtube.com/watch?v=kz31j16L_cQ']
+    ];
+    for (var i = 0; i < pares.length; i++) {
+      if (n.indexOf(pares[i][0]) >= 0) return pares[i][1];
+    }
+    return 'https://www.youtube.com/watch?v=ZGPO3UHxzE0';
   }
   function trataDe(p) {
     var n = String((p && p.nombre) || '').toUpperCase();
@@ -920,11 +957,13 @@
       pdf.setFont('helvetica', 'bold');
       pdf.setFontSize(8);
       pdf.setTextColor.apply(pdf, azul);
-      pdf.text('Condiciones', m, H - 17);
+      pdf.text('Condiciones', m, H - 22);
       pdf.setFont('helvetica', 'normal');
       pdf.setFontSize(7.5);
       pdf.setTextColor.apply(pdf, gris);
-      pdf.text('Precios de lista. No incluye instalación.' + (fecha ? '  ·  ' + fecha : ''), m, H - 12);
+      var cond = 'Los precios de lista pueden variar según las promociones vigentes de cada tarjeta y el criterio de la empresa.';
+      if (fecha) cond += '  ·  ' + fecha;
+      pdf.text(pdf.splitTextToSize(cond, W - 2 * m), m, H - 17);
 
       var naranja = [229, 106, 23];
       var usable = W - 2 * m;
