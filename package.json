@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "518.0.0",
-  "cacheName": "appi-v518-sheet-limpio",
+  "version": "519.0.0",
+  "cacheName": "appi-v519-foto-hero",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

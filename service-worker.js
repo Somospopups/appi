@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v518-sheet-limpio';
+const CACHE_NAME = 'appi-v519-foto-hero';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

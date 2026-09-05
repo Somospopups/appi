@@ -122,7 +122,7 @@ window.openStock=function(){
 <script src="./escalera-suenos.js"></script>
 <script src="./demo-guia.js"></script>
 <script src="./tablero-negocio.js?v=510"></script>
-<script src="./lista-precios.js?v=518"></script>
+<script src="./lista-precios.js?v=519"></script>
 <script src="./stock-personal.js"></script>
 
 <script src="./porque-vivo.js"></script>
@@ -2689,6 +2689,23 @@ body.dark .hist-action-drawer{background:linear-gradient(155deg,#151827,#252036 
     box-shadow: 0 6px 18px rgba(0,0,0,0.15);
   }
   .modal-icon.off { display: none !important; }
+  .modal-icon.appi-foto-hero{
+    width:96px;height:96px;border-radius:50%;padding:0;overflow:hidden;
+    background:#0b5878;cursor:pointer;position:relative;
+    box-shadow:0 8px 22px rgba(11,88,120,.28);
+    border:3px solid rgba(255,255,255,.7);
+  }
+  .modal-icon.appi-foto-hero img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
+  body.dark .modal-icon.appi-foto-hero{border-color:rgba(255,255,255,.22)}
+  #appiFotoEdit{position:fixed;inset:0;z-index:32000;background:rgba(12,16,28,.8);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:22px 16px;gap:14px}
+  #appiFotoStage{width:min(78vw,300px);aspect-ratio:1;height:auto;border-radius:50%;overflow:hidden;position:relative;touch-action:none;background:#1a1c24;box-shadow:0 0 0 4px #0b5878,0 18px 40px rgba(0,0,0,.4);cursor:grab}
+  #appiFotoStage:active{cursor:grabbing}
+  #appiFotoStage img{position:absolute;max-width:none;user-select:none;-webkit-user-drag:none;pointer-events:none}
+  #appiFotoEdit .appi-foto-zoom{width:min(78vw,300px);accent-color:#0b5878}
+  #appiFotoEdit .appi-foto-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+  #appiFotoEdit button{min-height:44px;padding:0 16px;border:0;border-radius:13px;font:inherit;font-size:14px;font-weight:900;cursor:pointer}
+  #appiFotoEdit .ok{background:#0b5878;color:#fff}
+  #appiFotoEdit .sec{background:#f3eee3;color:#2a2a32}
   .modal-title { margin: 0; font-size: 20px; font-weight: 800; letter-spacing: -0.3px; }
   .modal-sub { margin: 4px 0 0; font-size: 13px; color: #6b6b76; }
   .modal-sub .pm-cat-sub{display:inline-flex;align-items:center;justify-content:center;gap:8px;margin-top:6px;flex-wrap:wrap}
@@ -4229,7 +4246,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v518 · Segura</div>
+  <div class="ds-foot">APPI · v519 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4510,7 +4527,7 @@ body.dark #pageTabs button.active{color:#c5d6ff}
       <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
 
       <div class="home-brand-row">
-        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · v518</span></span>
+        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · v519</span></span>
       </div>
 
       <div class="home-hero-card">
@@ -5708,6 +5725,10 @@ const modal = {
   ok: document.getElementById('modalOk'),
   footer: document.getElementById('modalFooter'),
   open(opts){
+    this.icon.classList.remove('appi-foto-hero');
+    this.icon.onclick = null;
+    this.icon.style.cursor = '';
+    this.icon.innerHTML = '';
     this.icon.textContent = opts.icon || '💡';
     this.icon.style.background = opts.iconBg || '#0b5878';
     this.icon.classList.toggle('off', !!opts.hideIcon);
@@ -12229,24 +12250,44 @@ function abrirCambioPasswordAPPI(){
   },80);
 }
 window.abrirCambioPasswordAPPI=abrirCambioPasswordAPPI;
+function appiFotoObj(){
+  try{
+    const raw=localStorage.getItem('appi_foto_perfil_v1')||'';
+    if(!raw) return null;
+    if(raw.charAt(0)==='{'){
+      const o=JSON.parse(raw);
+      return o&&(o.preview||o.img)?o:null;
+    }
+    return {img:raw,preview:raw,x:0,y:0,zoom:1};
+  }catch(e){return null}
+}
 function appiFotoPerfil(){
-  try{return localStorage.getItem('appi_foto_perfil_v1')||''}catch(e){return ''}
+  const o=appiFotoObj();
+  return (o&&(o.preview||o.img))||'';
 }
 function appiGuardarFotoPerfil(data){
   try{
     if(!data) localStorage.removeItem('appi_foto_perfil_v1');
-    else localStorage.setItem('appi_foto_perfil_v1', data);
+    else localStorage.setItem('appi_foto_perfil_v1', typeof data==='string'?data:JSON.stringify(data));
     return true;
   }catch(e){
     if(window.APPIDialog) window.APPIDialog.alert('La foto es muy pesada. Probá con otra más liviana.',{title:'Foto de perfil',icon:'📷'});
     return false;
   }
 }
-function appiComprimirFoto(file){
+function appiFotoLoadImg(src){
+  return new Promise((resolve,reject)=>{
+    const img=new Image();
+    img.onload=()=>resolve(img);
+    img.onerror=()=>reject(new Error('No se pudo leer la foto'));
+    img.src=src;
+  });
+}
+function appiComprimirFoto(file,max=1000){
   return new Promise((resolve,reject)=>{
     const img=new Image(), url=URL.createObjectURL(file);
     img.onload=()=>{
-      const max=420; let w=img.width,h=img.height;
+      let w=img.width,h=img.height;
       if(w>max||h>max){const s=max/Math.max(w,h); w=Math.round(w*s); h=Math.round(h*s)}
       const c=document.createElement('canvas'); c.width=w; c.height=h;
       c.getContext('2d').drawImage(img,0,0,w,h);
@@ -12257,31 +12298,149 @@ function appiComprimirFoto(file){
     img.src=url;
   });
 }
+function appiFotoInputEl(){
+  let inp=document.getElementById('appiFotoInput');
+  if(!inp){
+    inp=document.createElement('input');
+    inp.type='file'; inp.accept='image/*'; inp.id='appiFotoInput'; inp.hidden=true;
+    document.body.appendChild(inp);
+  }
+  return inp;
+}
+function appiFotoMontarHero(){
+  const el=document.getElementById('modalIcon');
+  if(!el) return;
+  el.classList.add('appi-foto-hero');
+  el.style.background='#0b5878';
+  el.style.cursor='pointer';
+  el.setAttribute('role','button');
+  const prev=appiFotoPerfil();
+  el.setAttribute('aria-label', prev?'Foto de perfil':'Subir foto de perfil');
+  if(prev){
+    const img=document.createElement('img');
+    img.alt=''; img.src=prev;
+    el.innerHTML='';
+    el.appendChild(img);
+  }else{
+    el.innerHTML='<svg viewBox="0 0 24 24" width="38" height="38" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l1.5-2.5h7L17 8h3a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2z"/><circle cx="12" cy="14" r="3.2"/></svg>';
+  }
+  el.onclick=()=>{appiFotoTap()};
+}
+function appiFotoRenderPreview(img,panX,panY,zoom,stageSize){
+  const S=420, nw=img.naturalWidth||img.width, nh=img.naturalHeight||img.height;
+  const base=S/Math.min(nw,nh), sc=base*zoom, w=nw*sc, h=nh*sc, k=S/stageSize;
+  const c=document.createElement('canvas'); c.width=c.height=S;
+  const ctx=c.getContext('2d');
+  ctx.fillStyle='#f3eee3'; ctx.fillRect(0,0,S,S);
+  ctx.beginPath(); ctx.arc(S/2,S/2,S/2,0,Math.PI*2); ctx.closePath(); ctx.clip();
+  ctx.drawImage(img, S/2-w/2+panX*k, S/2-h/2+panY*k, w, h);
+  return c.toDataURL('image/jpeg',0.88);
+}
+function appiFotoEditor(img, estado){
+  return new Promise(resolve=>{
+    const wrap=document.createElement('div');
+    wrap.id='appiFotoEdit';
+    wrap.innerHTML='<div id="appiFotoStage"></div><input id="appiFotoZoom" class="appi-foto-zoom" type="range" min="1" max="3" step="0.01"><div class="appi-foto-row"><button type="button" class="sec" data-acc="centrar">Centrar</button><button type="button" class="sec" data-acc="cancel">Cancelar</button><button type="button" class="ok" data-acc="ok">Listo</button></div>';
+    document.body.appendChild(wrap);
+    const stage=wrap.querySelector('#appiFotoStage');
+    const zoomEl=wrap.querySelector('#appiFotoZoom');
+    const move=document.createElement('img');
+    move.alt=''; move.src=img.src; move.draggable=false;
+    stage.appendChild(move);
+    let zoom=Number(estado&&estado.zoom)||1, panX=Number(estado&&estado.x)||0, panY=Number(estado&&estado.y)||0;
+    zoomEl.value=String(zoom);
+    function layout(){
+      const S=stage.clientWidth, nw=img.naturalWidth||img.width, nh=img.naturalHeight||img.height;
+      const base=S/Math.min(nw,nh), sc=base*zoom, w=nw*sc, h=nh*sc;
+      const maxX=Math.max(0,(w-S)/2), maxY=Math.max(0,(h-S)/2);
+      panX=Math.max(-maxX,Math.min(maxX,panX));
+      panY=Math.max(-maxY,Math.min(maxY,panY));
+      move.style.width=w+'px'; move.style.height=h+'px';
+      move.style.left=(S/2-w/2+panX)+'px';
+      move.style.top=(S/2-h/2+panY)+'px';
+    }
+    requestAnimationFrame(layout);
+    let drag=false,sx=0,sy=0,ox=0,oy=0;
+    stage.onpointerdown=e=>{drag=true;sx=e.clientX;sy=e.clientY;ox=panX;oy=panY;stage.setPointerCapture(e.pointerId)};
+    stage.onpointermove=e=>{if(!drag)return; panX=ox+(e.clientX-sx); panY=oy+(e.clientY-sy); layout()};
+    stage.onpointerup=()=>{drag=false};
+    stage.onpointercancel=()=>{drag=false};
+    zoomEl.oninput=()=>{zoom=Number(zoomEl.value)||1; layout()};
+    function cerrar(val){ wrap.remove(); resolve(val); }
+    wrap.onclick=e=>{
+      const acc=e.target&&e.target.getAttribute&&e.target.getAttribute('data-acc');
+      if(acc==='cancel') return cerrar(null);
+      if(acc==='centrar'){ panX=0; panY=0; layout(); return; }
+      if(acc==='ok'){
+        const preview=appiFotoRenderPreview(img,panX,panY,zoom,stage.clientWidth);
+        cerrar({img:estado&&estado.src||img.src, preview, x:panX, y:panY, zoom});
+      }
+    };
+  });
+}
+async function appiFotoTap(){
+  const tiene=!!appiFotoPerfil();
+  if(!tiene){ appiFotoElegirArchivo(); return; }
+  const acc=window.APPIDialog
+    ? await window.APPIDialog.choose('Podés moverla, cambiarla o quitarla.',[
+        {label:'Mover',value:'mover'},
+        {label:'Cambiar',value:'cambiar'},
+        {label:'Quitar',value:'quitar'}
+      ],{title:'Foto de perfil',icon:'📷'})
+    : 'cambiar';
+  if(acc==='quitar'){
+    appiGuardarFotoPerfil('');
+    showToast('Foto quitada',2000);
+    appiFotoMontarHero();
+    return;
+  }
+  if(acc==='cambiar'){ appiFotoElegirArchivo(); return; }
+  if(acc==='mover'){
+    try{
+      const o=appiFotoObj()||{};
+      const img=await appiFotoLoadImg(o.img||o.preview);
+      const rec=await appiFotoEditor(img,{x:o.x||0,y:o.y||0,zoom:o.zoom||1,src:o.img||o.preview});
+      if(!rec) return;
+      if(!appiGuardarFotoPerfil(rec)) return;
+      showToast('Foto actualizada',2000);
+      appiFotoMontarHero();
+    }catch(e){
+      if(window.APPIDialog) window.APPIDialog.alert(e.message||'No se pudo mover la foto',{title:'Foto de perfil',icon:'📷'});
+    }
+  }
+}
+function appiFotoElegirArchivo(){
+  const inp=appiFotoInputEl();
+  inp.onchange=async()=>{
+    const file=inp.files&&inp.files[0]; inp.value='';
+    if(!file) return;
+    try{
+      const src=await appiComprimirFoto(file,1000);
+      const img=await appiFotoLoadImg(src);
+      const rec=await appiFotoEditor(img,{x:0,y:0,zoom:1,src});
+      if(!rec) return;
+      if(!appiGuardarFotoPerfil(rec)) return;
+      showToast('Foto de perfil guardada',2200);
+      appiFotoMontarHero();
+    }catch(e){
+      if(window.APPIDialog) window.APPIDialog.alert(e.message||'No se pudo usar esa foto',{title:'Foto de perfil',icon:'📷'});
+    }
+  };
+  inp.click();
+}
 function abrirCuentaDesdeMenu(){
   try{cerrarToolsMenu()}catch(e){}
   if(!window.APPIAuth||!window.APPIAuth.isEnabled())return;
   const profile=window.APPIAuth.currentProfile()||{},activePerson=window.APPIAuth.activePerson?window.APPIAuth.activePerson():null,authStatus=window.APPIAuth.status(),syncStatus=window.APPIDataSync?window.APPIDataSync.status():{};
   const last=authStatus.lastValidatedAt?new Date(authStatus.lastValidatedAt).toLocaleString('es-AR'):'Sin validar';
   modal.open({
-    icon:'👤',iconBg:'linear-gradient(135deg,#5b8def,#a06bff)',title:'Mi cuenta',sub:activePerson?.nombre||profile.nombre||`Distribuidor ${profile.dip||''}`,
+    icon:'📷',iconBg:'#0b5878',title:'Mi cuenta',sub:activePerson?.nombre||profile.nombre||`Distribuidor ${profile.dip||''}`,
     html:`<div style="display:grid;gap:9px;text-align:left">
       <div class="tip">
-        <div style="display:flex;gap:14px;align-items:center">
-          ${appiFotoPerfil()?'<img id="appiFotoPrev" alt="" style="width:84px;height:84px;object-fit:cover;border-radius:50%;flex:0 0 84px;display:block">':''}
-          <div style="min-width:0;flex:1">
-            <div style="font-weight:950;font-size:16px">${escapeXml(activePerson?.nombre||profile.nombre||'—')}</div>
-            <div style="margin-top:3px;color:#686977;font-size:13px">${activePerson?.tipo==='socio'?'Socio/a':'Titular'} · Distribuidor ${escapeXml(profile.dip||'—')}</div>
-            ${profile.sucursal?`<div style="color:#686977;font-size:13px">Sucursal ${escapeXml(profile.sucursal)}</div>`:''}
-            <div style="margin-top:4px;color:#777887;font-size:12px">${authStatus.offline?'Modo offline':'Conectada'} · ${escapeXml(last)}</div>
-          </div>
-        </div>
-        <div id="appiFotoWrap" style="margin-top:10px">
-          <input type="file" id="appiFotoInput" accept="image/*" hidden>
-          <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <button type="button" class="btn btn-secondary" id="btnFotoElegir">Elegir foto</button>
-            ${appiFotoPerfil()?'<button type="button" class="btn btn-secondary" id="btnFotoQuitar">Quitar foto</button>':''}
-          </div>
-        </div>
+        <div style="font-weight:950;font-size:16px">${escapeXml(activePerson?.nombre||profile.nombre||'—')}</div>
+        <div style="margin-top:3px;color:#686977;font-size:13px">${activePerson?.tipo==='socio'?'Socio/a':'Titular'} · Distribuidor ${escapeXml(profile.dip||'—')}</div>
+        ${profile.sucursal?`<div style="color:#686977;font-size:13px">Sucursal ${escapeXml(profile.sucursal)}</div>`:''}
+        <div style="margin-top:4px;color:#777887;font-size:12px">${authStatus.offline?'Modo offline':'Conectada'} · ${escapeXml(last)}</div>
       </div>
       <div class="tip"><b>Cómo te nombran en los WhatsApp</b><br><input id="appiFirmaWa" type="text" maxlength="40" value="${escapeXml((window.APPIHielo&&window.APPIHielo.firma&&window.APPIHielo.firma())||'')}" placeholder="${escapeXml((window.APPIHielo&&window.APPIHielo.nombreCuenta&&window.APPIHielo.nombreCuenta())||'')}" style="width:100%;margin-top:8px;padding:10px 12px;border-radius:12px;border:1px solid rgba(80,90,130,.16);font:inherit;font-size:14px;box-sizing:border-box"><small style="display:block;margin-top:6px;color:#777887;line-height:1.4">Si lo dejás vacío, se usa tu primer nombre. Cada uno (titular o socio) tiene el suyo.</small><button type="button" class="btn btn-secondary" id="btnGuardarFirma" style="margin-top:10px">Guardar nombre</button></div>
       <div class="tip"><b>Sincronización:</b> ${syncStatus.syncing?'En curso':syncStatus.dirty?`${syncStatus.dirty} cambios pendientes`:'Actualizada'}${syncStatus.lastError?`<br><span style="color:#b13e47">${escapeXml(syncStatus.lastError)}</span>`:''}</div>
@@ -12294,22 +12453,10 @@ function abrirCuentaDesdeMenu(){
       <small style="color:#777887;line-height:1.4">Cerrar sesión quita tus datos de la vista y los deja separados por cuenta. Usá “borrar la copia” solamente en un equipo compartido y con conexión.</small>
     </div>`
   });
+  appiFotoMontarHero();
   setTimeout(()=>{
     const sync=document.getElementById('btnAccountSync'),devices=document.getElementById('btnAccountDevices'),password=document.getElementById('btnAccountPassword'),logout=document.getElementById('btnAccountLogout'),erase=document.getElementById('btnAccountLogoutErase'),firmaBtn=document.getElementById('btnGuardarFirma'),firmaInput=document.getElementById('appiFirmaWa');
-    const fotoNow=appiFotoPerfil(), prev=document.getElementById('appiFotoPrev'), inp=document.getElementById('appiFotoInput'), elig=document.getElementById('btnFotoElegir'), quit=document.getElementById('btnFotoQuitar');
-    if(prev&&fotoNow)prev.src=fotoNow;
-    if(elig&&inp)elig.onclick=()=>inp.click();
-    if(inp)inp.onchange=async()=>{
-      const file=inp.files&&inp.files[0]; inp.value='';
-      if(!file)return;
-      try{
-        const data=await appiComprimirFoto(file);
-        if(!appiGuardarFotoPerfil(data))return;
-        showToast('Foto de perfil guardada',2200);
-        abrirCuentaDesdeMenu();
-      }catch(e){ if(window.APPIDialog) window.APPIDialog.alert(e.message||'No se pudo usar esa foto',{title:'Foto de perfil',icon:'📷'}); }
-    };
-    if(quit)quit.onclick=()=>{appiGuardarFotoPerfil(''); showToast('Foto quitada',2000); abrirCuentaDesdeMenu()};
+    appiFotoMontarHero();
     if(firmaBtn&&window.APPIHielo)firmaBtn.onclick=()=>{const nombre=window.APPIHielo.guardarFirma(firmaInput?firmaInput.value:'');if(firmaInput)firmaInput.value=nombre;showToast('En los WhatsApp te van a nombrar '+nombre,2400)};
     if(sync)sync.onclick=async()=>{sync.disabled=true;sync.textContent='Sincronizando…';try{await window.APPIDataSync.syncNow(true);showToast('Cuenta sincronizada ☁️',2200);modal.close()}catch(error){showToast(error.message||'No se pudo sincronizar',3500);sync.disabled=false;sync.textContent='☁️ Sincronizar ahora'}};
     if(devices)devices.onclick=()=>window.APPIDeviceBridge&&window.APPIDeviceBridge.openManager();
@@ -12494,8 +12641,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='518';
-      const CACHE_NAME='appi-v518-sheet-limpio';
+      const swVersion='519';
+      const CACHE_NAME='appi-v519-foto-hero';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · v'+swVersion;
       const hadController=Boolean(navigator.serviceWorker.controller);

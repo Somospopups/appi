@@ -818,6 +818,12 @@
     if (btn) { btn.disabled = true; btn.textContent = 'Armando…'; }
     var fotoRaw = '';
     try { fotoRaw = localStorage.getItem('appi_foto_perfil_v1') || ''; } catch (e) {}
+    if (fotoRaw && fotoRaw.charAt(0) === '{') {
+      try {
+        var fo = JSON.parse(fotoRaw);
+        fotoRaw = (fo && (fo.preview || fo.img)) || '';
+      } catch (e2) { fotoRaw = ''; }
+    }
     Promise.all([
       Promise.all(r.lineas.map(function (ln) { return loadFoto(ln.p); })),
       loadFotoCirculo(fotoRaw)
