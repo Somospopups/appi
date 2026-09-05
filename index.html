@@ -122,7 +122,7 @@ window.openStock=function(){
 <script src="./escalera-suenos.js"></script>
 <script src="./demo-guia.js"></script>
 <script src="./tablero-negocio.js?v=510"></script>
-<script src="./lista-precios.js?v=516"></script>
+<script src="./lista-precios.js?v=517"></script>
 <script src="./stock-personal.js"></script>
 
 <script src="./porque-vivo.js"></script>
@@ -4229,7 +4229,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v516 · Segura</div>
+  <div class="ds-foot">APPI · v517 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4510,7 +4510,7 @@ body.dark #pageTabs button.active{color:#c5d6ff}
       <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
 
       <div class="home-brand-row">
-        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · v516</span></span>
+        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · v517</span></span>
       </div>
 
       <div class="home-hero-card">
@@ -12265,15 +12265,22 @@ function abrirCuentaDesdeMenu(){
   modal.open({
     icon:'👤',iconBg:'linear-gradient(135deg,#5b8def,#a06bff)',title:'Mi cuenta',sub:activePerson?.nombre||profile.nombre||`Distribuidor ${profile.dip||''}`,
     html:`<div style="display:grid;gap:9px;text-align:left">
-      <div class="tip"><b>Persona activa:</b> ${escapeXml(activePerson?.nombre||profile.nombre||'—')} · ${activePerson?.tipo==='socio'?'Socio/a':'Titular'}<br><b>Número de distribuidor:</b> ${escapeXml(profile.dip||'—')}<br><b>Última validación:</b> ${escapeXml(last)}<br><b>Estado:</b> ${authStatus.offline?'Modo offline':'Conectada'}</div>
-      <div class="tip"><b>Foto de perfil</b>
-        <div id="appiFotoWrap" style="margin-top:8px">${appiFotoPerfil()?'<img id="appiFotoPrev" alt="" style="width:76px;height:76px;object-fit:cover;border-radius:14px;display:block;margin:0 0 8px">':''}
+      <div class="tip">
+        <div style="display:flex;gap:14px;align-items:center">
+          ${appiFotoPerfil()?'<img id="appiFotoPrev" alt="" style="width:84px;height:84px;object-fit:cover;border-radius:50%;flex:0 0 84px;display:block">':''}
+          <div style="min-width:0;flex:1">
+            <div style="font-weight:950;font-size:16px">${escapeXml(activePerson?.nombre||profile.nombre||'—')}</div>
+            <div style="margin-top:3px;color:#686977;font-size:13px">${activePerson?.tipo==='socio'?'Socio/a':'Titular'} · Distribuidor ${escapeXml(profile.dip||'—')}</div>
+            ${profile.sucursal?`<div style="color:#686977;font-size:13px">Sucursal ${escapeXml(profile.sucursal)}</div>`:''}
+            <div style="margin-top:4px;color:#777887;font-size:12px">${authStatus.offline?'Modo offline':'Conectada'} · ${escapeXml(last)}</div>
+          </div>
+        </div>
+        <div id="appiFotoWrap" style="margin-top:10px">
           <input type="file" id="appiFotoInput" accept="image/*" hidden>
           <div style="display:flex;gap:8px;flex-wrap:wrap">
             <button type="button" class="btn btn-secondary" id="btnFotoElegir">Elegir foto</button>
             ${appiFotoPerfil()?'<button type="button" class="btn btn-secondary" id="btnFotoQuitar">Quitar foto</button>':''}
           </div>
-          <small style="display:block;margin-top:6px;color:#777887;line-height:1.4">Se ve en tu cuenta y en el presupuesto. Si no hay foto, no aparece nada.</small>
         </div>
       </div>
       <div class="tip"><b>Cómo te nombran en los WhatsApp</b><br><input id="appiFirmaWa" type="text" maxlength="40" value="${escapeXml((window.APPIHielo&&window.APPIHielo.firma&&window.APPIHielo.firma())||'')}" placeholder="${escapeXml((window.APPIHielo&&window.APPIHielo.nombreCuenta&&window.APPIHielo.nombreCuenta())||'')}" style="width:100%;margin-top:8px;padding:10px 12px;border-radius:12px;border:1px solid rgba(80,90,130,.16);font:inherit;font-size:14px;box-sizing:border-box"><small style="display:block;margin-top:6px;color:#777887;line-height:1.4">Si lo dejás vacío, se usa tu primer nombre. Cada uno (titular o socio) tiene el suyo.</small><button type="button" class="btn btn-secondary" id="btnGuardarFirma" style="margin-top:10px">Guardar nombre</button></div>
@@ -12487,8 +12494,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='516';
-      const CACHE_NAME='appi-v516-foto';
+      const swVersion='517';
+      const CACHE_NAME='appi-v517-foto-circulo';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · v'+swVersion;
       const hadController=Boolean(navigator.serviceWorker.controller);

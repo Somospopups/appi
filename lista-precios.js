@@ -799,6 +799,38 @@
       })
       .catch(function () { return ''; });
   }
+  function datosDistribuidor() {
+    var perfil = (window.APPIAuth && window.APPIAuth.currentProfile) ? (window.APPIAuth.currentProfile() || {}) : {};
+    var persona = (window.APPIAuth && window.APPIAuth.activePerson) ? window.APPIAuth.activePerson() : null;
+    return {
+      nombre: String((persona && persona.nombre) || perfil.nombre || '').trim(),
+      dip: String(perfil.dip || perfil.numero_distribuidor || '').trim(),
+      sucursal: String(perfil.sucursal || '').trim()
+    };
+  }
+  function loadFotoCirculo(src) {
+    if (!src) return Promise.resolve('');
+    return new Promise(function (resolve) {
+      var img = new Image();
+      img.onload = function () {
+        var s = 360, c = document.createElement('canvas');
+        c.width = c.height = s;
+        var ctx = c.getContext('2d');
+        ctx.fillStyle = '#f3eee3';
+        ctx.fillRect(0, 0, s, s);
+        ctx.beginPath();
+        ctx.arc(s / 2, s / 2, s / 2 - 2, 0, Math.PI * 2);
+        ctx.closePath();
+        ctx.clip();
+        var sc = Math.max(s / img.width, s / img.height);
+        var w = img.width * sc, h = img.height * sc;
+        ctx.drawImage(img, (s - w) / 2, (s - h) / 2, w, h);
+        resolve(c.toDataURL('image/jpeg', 0.88));
+      };
+      img.onerror = function () { resolve(''); };
+      img.src = src;
+    });
+  }
 
   function armarPdf() {
     var r = resumen();
@@ -813,7 +845,14 @@
     para = String(para || '').trim();
     var btn = $('lpSheetPdf');
     if (btn) { btn.disabled = true; btn.textContent = 'Armando…'; }
-    Promise.all(r.lineas.map(function (ln) { return loadFoto(ln.p); })).then(function (fotos) {
+    var fotoRaw = '';
+    try { fotoRaw = localStorage.getItem('appi_foto_perfil_v1') || ''; } catch (e) {}
+    Promise.all([
+      Promise.all(r.lineas.map(function (ln) { return loadFoto(ln.p); })),
+      loadFotoCirculo(fotoRaw)
+    ]).then(function (pack) {
+    var fotos = pack[0];
+    var fotoCirculo = pack[1];
     try {
       var pdf = new JsPDF({ unit: 'mm', format: 'a4', compress: true });
       var W = pdf.internal.pageSize.getWidth();
@@ -854,30 +893,48 @@
 
       pdf.setFillColor.apply(pdf, crema);
       pdf.rect(0, 0, W, H, 'F');
-      var fotoPerfil = '';
-      try { fotoPerfil = localStorage.getItem('appi_foto_perfil_v1') || ''; } catch (e) {}
+      var dist = datosDistribuidor();
       var fotoOk = false;
-      if (fotoPerfil) {
-        try { pdf.addImage(fotoPerfil, 'JPEG', m, 8, 22, 22); fotoOk = true; } catch (e) { fotoOk = false; }
+      var dFoto = 24;
+      if (fotoCirculo) {
+        try { pdf.addImage(fotoCirculo, 'JPEG', m, 8, dFoto, dFoto); fotoOk = true; } catch (e) { fotoOk = false; }
       }
-      pdf.setFont('helvetica', 'bold');
-      pdf.setFontSize(26);
-      pdf.setTextColor.apply(pdf, azul);
-      pdf.text('PRESUPUESTO', fotoOk ? m + 26 : m, fotoOk ? 22 : 24);
+      if (fotoOk) {
+        pdf.setDrawColor.apply(pdf, azul);
+        pdf.setLineWidth(0.45);
+        pdf.circle(m + dFoto / 2, 8 + dFoto / 2, dFoto / 2);
+      }
+      var xTxt = fotoOk ? m + dFoto + 5 : m;
+      var yTxt = 15;
+      if (dist.nombre) {
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(13);
+        pdf.setTextColor.apply(pdf, oscuro);
+        pdf.text(dist.nombre, xTxt, yTxt);
+        yTxt += 6;
+      }
       pdf.setFont('helvetica', 'normal');
-      pdf.setFontSize(9);
+      pdf.setFontSize(10);
       pdf.setTextColor.apply(pdf, gris);
-      pdf.text(hoy || fecha || '', W - m, 16, { align: 'right' });
+      if (dist.dip) { pdf.text('Distribuidor ' + dist.dip, xTxt, yTxt); yTxt += 5; }
+      if (dist.sucursal) { pdf.text('Sucursal ' + dist.sucursal, xTxt, yTxt); yTxt += 5; }
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(18);
+      pdf.setTextColor.apply(pdf, azul);
+      pdf.text('PRESUPUESTO', W - m, 16, { align: 'right' });
+      pdf.setFont('helvetica', 'normal');
       pdf.setFontSize(8);
-      pdf.text('Precios de lista', W - m, 21, { align: 'right' });
+      pdf.setTextColor.apply(pdf, gris);
+      pdf.text(hoy || fecha || '', W - m, 22, { align: 'right' });
+      pdf.text('Precios de lista', W - m, 27, { align: 'right' });
+      var yLinea = Math.max(fotoOk ? 36 : 32, yTxt + 3);
       pdf.setDrawColor.apply(pdf, azul);
       pdf.setLineWidth(1.15);
-      var yLinea = fotoOk ? 34 : 30;
       pdf.line(m, yLinea, W - m, yLinea);
       pdf.setLineWidth(0.28);
       pdf.line(m, yLinea + 2.2, W - m, yLinea + 2.2);
 
-      var y = fotoOk ? 46 : 42;
+      var y = yLinea + 12;
       if (para) {
         pdf.setFont('helvetica', 'bold');
         pdf.setFontSize(8);

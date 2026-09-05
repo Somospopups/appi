@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "516.0.0",
-  "cacheName": "appi-v516-foto",
+  "version": "517.0.0",
+  "cacheName": "appi-v517-foto-circulo",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {
