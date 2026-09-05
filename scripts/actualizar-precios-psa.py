@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Lee precios de lista en tienda.psa.com.ar y escribe psa-precios.json."""
+"""Lee tienda.psa.com.ar y escribe psa-catalogo.json + psa-precios.json."""
 import json
 import re
 import ssl
@@ -10,11 +10,11 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 
 ROOT = Path(__file__).resolve().parents[1]
-OUT = ROOT / "psa-precios.json"
+OUT_CAT = ROOT / "psa-catalogo.json"
+OUT_PRE = ROOT / "psa-precios.json"
 GQL = "https://tienda.psa.com.ar/graphql"
 UA = "APPI-precios/1.0"
 
-# Un SKU representativo por modelo (mismo precio en todos los colores).
 SKUS = {
     "mini": "611030410",
     "vero": "611030420",
@@ -53,6 +53,7 @@ URLS = {
 
 MESES = ("Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic")
 CTX = ssl.create_default_context()
+GRUPO_ORDEN = {"equipos": 0, "recargas": 1, "griferia": 2, "botellas": 3, "otros": 4}
 
 
 def fecha_ar(now=None):
@@ -69,28 +70,92 @@ def get(url, data=None, headers=None, timeout=40):
         return res.read().decode("utf-8", "replace")
 
 
-def graphql_precios():
-    parts = []
-    for i, sku in enumerate(SKUS.values()):
-        parts.append(
-            f'p{i}: products(filter: {{sku: {{eq: "{sku}"}}}}, pageSize: 1) '
-            "{ items { sku name price_range { minimum_price { final_price { value } } } } }"
+def limp(s):
+    return re.sub(r"\s+", " ", (s or "").replace("\\u00b7", "·")).strip()
+
+
+def grupo(name, cats):
+    n = (name or "").upper()
+    cl = " ".join((c.get("name") or "") for c in (cats or [])).upper()
+    if "GRIFER" in n:
+        return "griferia"
+    if any(x in n for x in ("BOTELLA", "MATE", "TERMO", "KIT MATERO")):
+        return "botellas"
+    if any(x in n for x in ("REPUESTO", "CARTUCHO", "KIT POSVENTA")):
+        return "recargas"
+    if any(
+        x in n
+        for x in (
+            "SENIOR",
+            "VERO",
+            "MINI",
+            "S-1000",
+            "SENIK",
+            "QUANTUM",
+            "IONTRIX",
+            "RINNOVA",
+            "DUCHA",
+            "C3",
+            "SODA",
+            "POLI 2",
+            "STOPPER",
+            "PORTÁTIL",
+            "PORTATIL",
         )
-    body = json.dumps({"query": "{ " + " ".join(parts) + " }"}).encode("utf-8")
-    raw = json.loads(get(GQL, data=body, headers={"Content-Type": "application/json"}))
-    precios = {}
-    nombres = {}
-    by_sku = {}
-    for block in (raw.get("data") or {}).values():
-        for it in (block or {}).get("items") or []:
-            sku = str(it.get("sku") or "")
-            val = (((it.get("price_range") or {}).get("minimum_price") or {}).get("final_price") or {}).get("value")
-            if sku and val:
-                by_sku[sku] = (int(round(float(val))), it.get("name") or "")
-    for pid, sku in SKUS.items():
-        if sku in by_sku:
-            precios[pid], nombres[pid] = by_sku[sku]
-    return precios, nombres
+    ):
+        return "equipos"
+    if "REPUESTOS" in cl:
+        return "recargas"
+    return "otros"
+
+
+def graphql_catalogo():
+    query = """query ($p:Int!) {
+      products(search:"", pageSize:50, currentPage:$p){
+        total_count page_info { current_page total_pages }
+        items {
+          sku name url_key stock_status
+          price_range { minimum_price { final_price { value } regular_price { value } } }
+          categories { name }
+        }
+      }
+    }"""
+    items = []
+    page = 1
+    pages = 1
+    while page <= pages:
+        body = json.dumps({"query": query, "variables": {"p": page}}).encode("utf-8")
+        raw = json.loads(get(GQL, data=body, headers={"Content-Type": "application/json"}))
+        prod = ((raw or {}).get("data") or {}).get("products") or {}
+        items.extend(prod.get("items") or [])
+        pages = int(((prod.get("page_info") or {}).get("total_pages") or 1))
+        page += 1
+    productos = []
+    seen = set()
+    for it in items:
+        sku = str(it.get("sku") or "").strip()
+        if not sku or sku in seen:
+            continue
+        seen.add(sku)
+        pr = (((it.get("price_range") or {}).get("minimum_price") or {}).get("final_price") or {}).get("value")
+        rg = (((it.get("price_range") or {}).get("minimum_price") or {}).get("regular_price") or {}).get("value")
+        nombre = limp(it.get("name"))
+        cats = [limp(c.get("name")) for c in (it.get("categories") or []) if c.get("name")]
+        uk = (it.get("url_key") or "").strip()
+        productos.append(
+            {
+                "sku": sku,
+                "nombre": nombre,
+                "precio": int(round(float(pr or 0))),
+                "lista": int(round(float(rg or pr or 0))),
+                "url": ("https://tienda.psa.com.ar/" + uk + ".html") if uk else "",
+                "grupo": grupo(nombre, it.get("categories") or []),
+                "stock": it.get("stock_status") or "",
+                "cats": cats,
+            }
+        )
+    productos.sort(key=lambda p: (GRUPO_ORDEN.get(p["grupo"], 9), p["nombre"].lower()))
+    return productos
 
 
 def scrape_uno(pid, url):
@@ -133,42 +198,66 @@ def scrape_precios(faltan):
     return precios, nombres
 
 
-def main():
-    prev = {}
-    if OUT.exists():
-        try:
-            prev = json.loads(OUT.read_text(encoding="utf-8"))
-        except Exception:
-            prev = {}
-    precios = {}
-    nombres = {}
+def leer_prev(path):
+    if not path.exists():
+        return {}
     try:
-        precios, nombres = graphql_precios()
-        print(f"graphql {len(precios)}/{len(SKUS)}")
+        return json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+
+
+def main():
+    prev_cat = leer_prev(OUT_CAT)
+    prev_pre = leer_prev(OUT_PRE)
+    productos = []
+    try:
+        productos = graphql_catalogo()
+        print(f"graphql catálogo {len(productos)}")
     except (urllib.error.URLError, TimeoutError, json.JSONDecodeError) as e:
         print(f"graphql no disponible: {e}")
+    if not productos:
+        productos = list((prev_cat.get("productos") or [])) if isinstance(prev_cat, dict) else []
+        if not productos:
+            raise SystemExit("la tienda no devolvió el catálogo")
+        print("catálogo anterior conservado")
+
+    by_sku = {p.get("sku"): p for p in productos if p.get("sku")}
+    precios = {}
+    nombres = {}
+    for pid, sku in SKUS.items():
+        row = by_sku.get(sku)
+        if row and row.get("precio"):
+            precios[pid] = int(row["precio"])
+            nombres[pid] = row.get("nombre") or ""
+
     faltan = [pid for pid in SKUS if pid not in precios]
     if faltan:
         extra, extra_n = scrape_precios(faltan)
         precios.update(extra)
         nombres.update(extra_n)
-        print(f"scrape +{len(extra)} · total {len(precios)}")
-    if not precios:
-        raise SystemExit("la tienda no devolvió precios")
-    viejos = (prev.get("precios") or {}) if isinstance(prev, dict) else {}
+        print(f"scrape +{len(extra)}")
+
+    viejos = (prev_pre.get("precios") or {}) if isinstance(prev_pre, dict) else {}
     for pid, val in viejos.items():
         if pid not in precios and val:
             precios[pid] = val
-    out = {
-        "actualizado": fecha_ar(),
-        "fuente": "https://tienda.psa.com.ar/",
-        "precios": precios,
-        "nombres": nombres,
-    }
-    OUT.write_text(json.dumps(out, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    print(f"ok {len(precios)} precios · {out['actualizado']}")
-    for pid in SKUS:
-        print(f"  {pid}: ${precios.get(pid, '—')}")
+
+    if not precios and not productos:
+        raise SystemExit("la tienda no devolvió precios")
+
+    fecha = fecha_ar()
+    OUT_CAT.write_text(
+        json.dumps({"actualizado": fecha, "fuente": "https://tienda.psa.com.ar/", "productos": productos}, ensure_ascii=False, indent=2)
+        + "\n",
+        encoding="utf-8",
+    )
+    OUT_PRE.write_text(
+        json.dumps({"actualizado": fecha, "fuente": "https://tienda.psa.com.ar/", "precios": precios, "nombres": nombres}, ensure_ascii=False, indent=2)
+        + "\n",
+        encoding="utf-8",
+    )
+    print(f"ok {len(productos)} productos · {len(precios)} cotejo · {fecha}")
 
 
 if __name__ == "__main__":

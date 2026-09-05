@@ -1,0 +1,897 @@
+{
+  "actualizado": "4-Sep-2026",
+  "fuente": "https://tienda.psa.com.ar/",
+  "productos": [
+    {
+      "sku": "611100240",
+      "nombre": "Ducha PSA Rinnova - Bianco con KDF",
+      "precio": 296000,
+      "lista": 296000,
+      "url": "https://tienda.psa.com.ar/ducha-psa-rinnova-bianco-con-kdf.html",
+      "grupo": "equipos",
+      "stock": "OUT_OF_STOCK",
+      "cats": [
+        "Purificadores De Agua",
+        "Linea Baño"
+      ]
+    },
+    {
+      "sku": "611100250",
+      "nombre": "Ducha PSA Rinnova - Bianco con KDF Y POLI",
+      "precio": 296000,
+      "lista": 296000,
+      "url": "https://tienda.psa.com.ar/ducha-psa-rinnova-bianco-con-kdf-y-poli.html",
+      "grupo": "equipos",
+      "stock": "OUT_OF_STOCK",
+      "cats": [
+        "Purificadores De Agua",
+        "Linea Baño"
+      ]
+    },
+    {
+      "sku": "611100280",
+      "nombre": "Ducha PSA Rinnova - Grigio con KDF",
+      "precio": 296000,
+      "lista": 296000,
+      "url": "https://tienda.psa.com.ar/ducha-psa-rinnova-grigio-con-kdf.html",
+      "grupo": "equipos",
+      "stock": "OUT_OF_STOCK",
+      "cats": [
+        "Purificadores De Agua",
+        "Linea Baño"
+      ]
+    },
+    {
+      "sku": "611100290",
+      "nombre": "Ducha PSA Rinnova - Grigio con KDF Y POLI",
+      "precio": 296000,
+      "lista": 296000,
+      "url": "https://tienda.psa.com.ar/ducha-psa-rinnova-grigio-con-kdf-y-poli.html",
+      "grupo": "equipos",
+      "stock": "OUT_OF_STOCK",
+      "cats": [
+        "Purificadores De Agua",
+        "Linea Baño"
+      ]
+    },
+    {
+      "sku": "611100320",
+      "nombre": "Ducha PSA Rinnova - Nero con KDF",
+      "precio": 296000,
+      "lista": 296000,
+      "url": "https://tienda.psa.com.ar/ducha-psa-rinnova-nero-con-kdf.html",
+      "grupo": "equipos",
+      "stock": "OUT_OF_STOCK",
+      "cats": [
+        "Purificadores De Agua",
+        "Linea Baño"
+      ]
+    },
+    {
+      "sku": "611100330",
+      "nombre": "Ducha PSA Rinnova - Nero con KDF y Poli",
+      "precio": 296000,
+      "lista": 296000,
+      "url": "https://tienda.psa.com.ar/ducha-psa-rinnova-nero-con-kdf-y-poli.html",
+      "grupo": "equipos",
+      "stock": "OUT_OF_STOCK",
+      "cats": [
+        "Purificadores De Agua",
+        "Linea Baño"
+      ]
+    },
+    {
+      "sku": "611030430",
+      "nombre": "PSA C3 - Grigio",
+      "precio": 208000,
+      "lista": 208000,
+      "url": "https://tienda.psa.com.ar/psa-c3-grigio.html",
+      "grupo": "equipos",
+      "stock": "IN_STOCK",
+      "cats": [
+        "Purificadores De Agua",
+        "Linea Baño",
+        "C3"
+      ]
+    },
+    {
+      "sku": "611290050",
+      "nombre": "PSA Iontrix 3",
+      "precio": 1176000,
+      "lista": 1176000,
+      "url": "https://tienda.psa.com.ar/psa-iontrix-3.html",
+      "grupo": "equipos",
+      "stock": "IN_STOCK",
+      "cats": [
+        "Purificadores De Agua",
+        "Otros Productos",
+        "Purificador de Piscina"
+      ]
+    },
+    {
+      "sku": "611030410",
+      "nombre": "PSA Mini - Bianco",
+      "precio": 411000,
+      "lista": 411000,
+      "url": "https://tienda.psa.com.ar/psa-mini-bianco.html",
+      "grupo": "equipos",
+      "stock": "IN_STOCK",
+      "cats": [
+        "Purificadores De Agua",
+        "Beber y Cocinar",
+        "Mini"
+      ]
+    },
+    {
+      "sku": "611030400",
+      "nombre": "PSA Mini - Nero",
+      "precio": 411000,
+      "lista": 411000,
+      "url": "https://tienda.psa.com.ar/psa-mini-nero.html",
+      "grupo": "equipos",
+      "stock": "IN_STOCK",
+      "cats": [
+        "Purificadores De Agua",
+        "Beber y Cocinar",
+        "Mini"
+      ]
+    },
+    {
+      "sku": "612280190",
+      "nombre": "PSA Poli 2 - Bianco",
+      "precio": 280000,
+      "lista": 280000,
+      "url": "https://tienda.psa.com.ar/psa-poli-2-bianco.html",
+      "grupo": "equipos",
+      "stock": "IN_STOCK",
+      "cats": [
+        "Purificadores De Agua",
+        "Otros Productos",
+        "Cuidado de Cañerías y Electrodomésticos"
+      ]
+    },
+    {
+      "sku": "611020010",
+      "nombre": "PSA Portátil",
+      "precio": 122000,
+      "lista": 122000,
+      "url": "https://tienda.psa.com.ar/portatil.html",
+      "grupo": "equipos",
+      "stock": "IN_STOCK",
+      "cats": [
+        "Purificadores De Agua",
+        "Otros Productos",
+        "Portátil"
+      ]
+    },
+    {
+      "sku": "611030620",
+      "nombre": "PSA Quantum·2",
+      "precio": 1271000,
+      "lista": 1271000,
+      "url": "https://tienda.psa.com.ar/psa-quantum-2.html",
+      "grupo": "equipos",
+      "stock": "IN_STOCK",
+      "cats": [
+        "Purificadores De Agua",
+        "Beber y Cocinar"
+      ]
+    },
+    {
+      "sku": "611030610",
+      "nombre": "PSA Quantum·2 Bajo Mesada",
+      "precio": 1271000,
+      "lista": 1271000,
+      "url": "https://tienda.psa.com.ar/psa-quantum-2-bajo-mesada.html",
+      "grupo": "equipos",
+      "stock": "IN_STOCK",
+      "cats": [
+        "Purificadores De Agua",
+        "Beber y Cocinar"
+      ]
+    },
+    {
+      "sku": "611120220",
+      "nombre": "PSA S-1000 II - Bajo Mesada",
+      "precio": 1079000,
+      "lista": 1079000,
+      "url": "https://tienda.psa.com.ar/psa-s-1000-ii-bajo-mesada.html",
+      "grupo": "equipos",
+      "stock": "IN_STOCK",
+      "cats": [
+        "Purificadores De Agua",
+        "Beber y Cocinar",
+        "Línea S-1000",
+        "Línea Bajo Mesada"
+      ]
+    },
+    {
+      "sku": "611120200",
+      "nombre": "PSA S-1000 II - Bianco",
+      "precio": 1079000,
+      "lista": 1079000,
+      "url": "https://tienda.psa.com.ar/psa-s-1000-ii-bianco.html",
+      "grupo": "equipos",
+      "stock": "IN_STOCK",
+      "cats": [
+        "Purificadores De Agua",
+        "Beber y Cocinar",
+        "Línea S-1000"
+      ]
+    },
+    {
+      "sku": "611120210",
+      "nombre": "PSA S-1000 II - Nero",
+      "precio": 1079000,
+      "lista": 1079000,
+      "url": "https://tienda.psa.com.ar/psa-s-1000-ii-nero.html",
+      "grupo": "equipos",
+      "stock": "IN_STOCK",
+      "cats": [
+        "Purificadores De Agua",
+        "Beber y Cocinar",
+        "Línea S-1000"
+      ]
+    },
+    {
+      "sku": "611030560",
+      "nombre": "PSA Senik - Bajo Mesada",
+      "precio": 1248000,
+      "lista": 1248000,
+      "url": "https://tienda.psa.com.ar/psa-senik-bajo-mesada-bianco.html",
+      "grupo": "equipos",
+      "stock": "IN_STOCK",
+      "cats": [
+        "Purificadores De Agua",
+        "Beber y Cocinar",
+        "Línea S-1000",
+        "Línea Bajo Mesada",
+        "HOT SALE"
+      ]
+    },
+    {
+      "sku": "611030540",
+      "nombre": "PSA Senik - Bianco",
+      "precio": 1248000,
+      "lista": 1248000,
+      "url": "https://tienda.psa.com.ar/psa-senik-bianco.html",
+      "grupo": "equipos",
+      "stock": "IN_STOCK",
+      "cats": [
+        "Purificadores De Agua",
+        "Beber y Cocinar",
+        "Línea S-1000",
+        "HOT SALE",
+        "Purificadores de Agua"
+      ]
+    },
+    {
+      "sku": "611010580",
+      "nombre": "PSA Senior - Bianco",
+      "precio": 751000,
+      "lista": 751000,
+      "url": "https://tienda.psa.com.ar/psa-senior-bianco.html",
+      "grupo": "equipos",
+      "stock": "IN_STOCK",
+      "cats": [
+        "Purificadores De Agua",
+        "Beber y Cocinar",
+        "Senior"
+      ]
+    },
+    {
+      "sku": "611010550",
+      "nombre": "PSA Senior4 - Bajo Mesada",
+      "precio": 808000,
+      "lista": 808000,
+      "url": "https://tienda.psa.com.ar/senior-4-bajo-mesada.html",
+      "grupo": "equipos",
+      "stock": "IN_STOCK",
+      "cats": [
+        "Purificadores De Agua",
+        "Beber y Cocinar",
+        "Senior 4",
+        "Línea Bajo Mesada",
+        "HOT SALE"
+      ]
+    },
+    {
+      "sku": "611010510",
+      "nombre": "PSA Senior4 - Bianco",
+      "precio": 913000,
+      "lista": 913000,
+      "url": "https://tienda.psa.com.ar/psa-senior-4-bianco.html",
+      "grupo": "equipos",
+      "stock": "IN_STOCK",
+      "cats": [
+        "Purificadores De Agua",
+        "Beber y Cocinar",
+        "Senior 4",
+        "HOT SALE",
+        "Purificadores de Agua"
+      ]
+    },
+    {
+      "sku": "611010560",
+      "nombre": "PSA Senior4 - Grigio",
+      "precio": 913000,
+      "lista": 913000,
+      "url": "https://tienda.psa.com.ar/senior-4-grigio.html",
+      "grupo": "equipos",
+      "stock": "IN_STOCK",
+      "cats": [
+        "Purificadores De Agua",
+        "Beber y Cocinar",
+        "Senior 4",
+        "HOT SALE",
+        "Purificadores de Agua"
+      ]
+    },
+    {
+      "sku": "611010530",
+      "nombre": "PSA Senior4 - Nero",
+      "precio": 913000,
+      "lista": 913000,
+      "url": "https://tienda.psa.com.ar/senior-4-nero.html",
+      "grupo": "equipos",
+      "stock": "IN_STOCK",
+      "cats": [
+        "Purificadores De Agua",
+        "Beber y Cocinar",
+        "Senior 4",
+        "HOT SALE",
+        "Purificadores de Agua"
+      ]
+    },
+    {
+      "sku": "617110040",
+      "nombre": "PSA SodaBurby - Bianco",
+      "precio": 438000,
+      "lista": 438000,
+      "url": "https://tienda.psa.com.ar/psa-gasificador-soda.html",
+      "grupo": "equipos",
+      "stock": "IN_STOCK",
+      "cats": [
+        "Gasificador de Agua",
+        "SodaBurby"
+      ]
+    },
+    {
+      "sku": "611030060",
+      "nombre": "PSA Stopper",
+      "precio": 240000,
+      "lista": 240000,
+      "url": "https://tienda.psa.com.ar/stopper.html",
+      "grupo": "equipos",
+      "stock": "IN_STOCK",
+      "cats": [
+        "Purificadores De Agua",
+        "Beber y Cocinar",
+        "Otros Productos",
+        "Cuidado de Cañerías y Electrodomésticos"
+      ]
+    },
+    {
+      "sku": "611030420",
+      "nombre": "PSA Vero - Bianco",
+      "precio": 528000,
+      "lista": 528000,
+      "url": "https://tienda.psa.com.ar/psa-vero-bianco.html",
+      "grupo": "equipos",
+      "stock": "IN_STOCK",
+      "cats": [
+        "Purificadores De Agua",
+        "Beber y Cocinar",
+        "Vero",
+        "HOT SALE",
+        "Purificadores de Agua"
+      ]
+    },
+    {
+      "sku": "612060040",
+      "nombre": "CARTUCHO MEMBRANA ÓSMOSIS PSA ROPOT 4",
+      "precio": 55600,
+      "lista": 55600,
+      "url": "https://tienda.psa.com.ar/cartucho-membrana-osmosis-psa-ropot-4.html",
+      "grupo": "recargas",
+      "stock": "IN_STOCK",
+      "cats": [
+        "Repuestos Y Accesorios",
+        "Repuestos equipos PSA",
+        "Repuestos para Ropot"
+      ]
+    },
+    {
+      "sku": "612012530",
+      "nombre": "KIT POSVENTA PURIFICADOR DE AIRE II",
+      "precio": 159000,
+      "lista": 159000,
+      "url": "https://tienda.psa.com.ar/kit-posventa-purificador-de-aire-ii.html",
+      "grupo": "recargas",
+      "stock": "IN_STOCK",
+      "cats": [
+        "Repuestos Y Accesorios",
+        "Repuestos equipos PSA",
+        "Repuestos para Purificador de Aire"
+      ]
+    },
+    {
+      "sku": "612050260",
+      "nombre": "Repuesto Bacterioestático 25 Micrones",
+      "precio": 75950,
+      "lista": 75950,
+      "url": "https://tienda.psa.com.ar/repuesto-bacteriostatico-20-micrones.html",
+      "grupo": "recargas",
+      "stock": "IN_STOCK",
+      "cats": [
+        "Repuestos Y Accesorios",
+        "Repuestos equipos PSA",
+        "Repuestos para Purificadores Línea S1000"
+      ]
+    },
+    {
+      "sku": "612050250",
+      "nombre": "Repuesto Bacterioestático 5 Micrones",
+      "precio": 75950,
+      "lista": 75950,
+      "url": "https://tienda.psa.com.ar/repuesto-bacteriostatico-5-micrones.html",
+      "grupo": "recargas",
+      "stock": "IN_STOCK",
+      "cats": [
+        "Repuestos Y Accesorios",
+        "Repuestos equipos PSA",
+        "Repuestos para Purificadores Línea S1000"
+      ]
+    },
+    {
+      "sku": "612050270",
+      "nombre": "Repuesto Bacteriostático - 50 micrones",
+      "precio": 75950,
+      "lista": 75950,
+      "url": "https://tienda.psa.com.ar/repuesto-bacteriostatico-50-micrones.html",
+      "grupo": "recargas",
+      "stock": "IN_STOCK",
+      "cats": [
+        "Repuestos Y Accesorios",
+        "Repuestos equipos PSA",
+        "Repuestos para Purificadores Línea S1000"
+      ]
+    },
+    {
+      "sku": "612290100",
+      "nombre": "Repuesto Electródo - PSA Iontrix 2",
+      "precio": 175000,
+      "lista": 175000,
+      "url": "https://tienda.psa.com.ar/electrodo.html",
+      "grupo": "recargas",
+      "stock": "IN_STOCK",
+      "cats": [
+        "Repuestos Y Accesorios",
+        "Repuestos equipos PSA"
+      ]
+    },
+    {
+      "sku": "612050360",
+      "nombre": "Repuesto FIPOR N° 3 - x 8 unidades",
+      "precio": 99100,
+      "lista": 99100,
+      "url": "https://tienda.psa.com.ar/fipor-n-3-x-8-unidades.html",
+      "grupo": "recargas",
+      "stock": "IN_STOCK",
+      "cats": [
+        "Repuestos Y Accesorios",
+        "Repuestos equipos PSA",
+        "Repuestos para Purificadores Línea Senior"
+      ]
+    },
+    {
+      "sku": "611300020",
+      "nombre": "Repuesto Jarra Ropot",
+      "precio": 61800,
+      "lista": 61800,
+      "url": "https://tienda.psa.com.ar/jarra-ropot-repuesto.html",
+      "grupo": "recargas",
+      "stock": "IN_STOCK",
+      "cats": [
+        "Repuestos Y Accesorios",
+        "Repuestos equipos PSA",
+        "Repuestos para Ropot"
+      ]
+    },
+    {
+      "sku": "612060010",
+      "nombre": "Repuesto N°1 - Sedimentos Ósmosis PSA Ropot",
+      "precio": 48600,
+      "lista": 48600,
+      "url": "https://tienda.psa.com.ar/cartucho-membrana-osmosis-psa-ropot-1.html",
+      "grupo": "recargas",
+      "stock": "IN_STOCK",
+      "cats": [
+        "Repuestos Y Accesorios",
+        "Repuestos equipos PSA",
+        "Repuestos para Ropot"
+      ]
+    },
+    {
+      "sku": "612060030",
+      "nombre": "Repuesto N°2 Carbon Bloque Ósmosis PSA Ropot",
+      "precio": 54550,
+      "lista": 54550,
+      "url": "https://tienda.psa.com.ar/cartucho-membrana-osmosis-psa-ropot-2.html",
+      "grupo": "recargas",
+      "stock": "IN_STOCK",
+      "cats": [
+        "Repuestos Y Accesorios",
+        "Repuestos equipos PSA",
+        "Repuestos para Ropot"
+      ]
+    },
+    {
+      "sku": "612060020",
+      "nombre": "Repuesto N°3 MEMBRANA OSMOSIS PSA ROPOT",
+      "precio": 158000,
+      "lista": 158000,
+      "url": "https://tienda.psa.com.ar/cartucho-membrana-osmosis-psa-ropot-3.html",
+      "grupo": "recargas",
+      "stock": "IN_STOCK",
+      "cats": [
+        "Repuestos Y Accesorios",
+        "Repuestos equipos PSA",
+        "Repuestos para Ropot"
+      ]
+    },
+    {
+      "sku": "612100030",
+      "nombre": "Repuesto PSA Ducha II con KDF",
+      "precio": 143000,
+      "lista": 143000,
+      "url": "https://tienda.psa.com.ar/repuesto-psa-ducha-con-kdf.html",
+      "grupo": "recargas",
+      "stock": "IN_STOCK",
+      "cats": [
+        "Repuestos Y Accesorios",
+        "Repuestos equipos PSA"
+      ]
+    },
+    {
+      "sku": "612100080",
+      "nombre": "Repuesto PSA Ducha II con KDF Y POLIFOSFATO",
+      "precio": 143000,
+      "lista": 143000,
+      "url": "https://tienda.psa.com.ar/repuesto-psa-ducha-poli-y-kdf.html",
+      "grupo": "recargas",
+      "stock": "IN_STOCK",
+      "cats": [
+        "Repuestos Y Accesorios",
+        "Repuestos equipos PSA",
+        "Repuestos para Ducha"
+      ]
+    },
+    {
+      "sku": "612280150",
+      "nombre": "Repuesto PSA Poli 2",
+      "precio": 83150,
+      "lista": 83150,
+      "url": "https://tienda.psa.com.ar/repuesto-psa-poli.html",
+      "grupo": "recargas",
+      "stock": "IN_STOCK",
+      "cats": [
+        "Repuestos Y Accesorios",
+        "Repuestos equipos PSA"
+      ]
+    },
+    {
+      "sku": "612020010",
+      "nombre": "Repuesto PSA Portátil",
+      "precio": 88450,
+      "lista": 88450,
+      "url": "https://tienda.psa.com.ar/repuesto-psa-portatil.html",
+      "grupo": "recargas",
+      "stock": "IN_STOCK",
+      "cats": [
+        "Repuestos Y Accesorios",
+        "Repuestos equipos PSA"
+      ]
+    },
+    {
+      "sku": "612011080",
+      "nombre": "Repuesto Válvula By Pass - C3",
+      "precio": 22250,
+      "lista": 22250,
+      "url": "https://tienda.psa.com.ar/valvula-by-pass-c3.html",
+      "grupo": "recargas",
+      "stock": "IN_STOCK",
+      "cats": [
+        "Repuestos Y Accesorios"
+      ]
+    },
+    {
+      "sku": "612012480",
+      "nombre": "Repuesto Válvula By Pass Nero",
+      "precio": 22250,
+      "lista": 22250,
+      "url": "https://tienda.psa.com.ar/valvula-by-pass-senior-3-black.html",
+      "grupo": "recargas",
+      "stock": "IN_STOCK",
+      "cats": [
+        "Repuestos Y Accesorios",
+        "Repuestos equipos PSA",
+        "Repuestos para Purificadores Línea Senior",
+        "Repuestos para Purificadores Línea S1000"
+      ]
+    },
+    {
+      "sku": "612010120",
+      "nombre": "Repuesto Válvula By Pass Universal",
+      "precio": 22250,
+      "lista": 22250,
+      "url": "https://tienda.psa.com.ar/valvula-by-pass.html",
+      "grupo": "recargas",
+      "stock": "IN_STOCK",
+      "cats": [
+        "Repuestos Y Accesorios",
+        "Repuestos equipos PSA",
+        "Repuestos para Purificadores Línea Senior",
+        "Repuestos para Purificadores Línea S1000"
+      ]
+    },
+    {
+      "sku": "612031380",
+      "nombre": "Grifería Bicomando - Bajo Mesada",
+      "precio": 517000,
+      "lista": 517000,
+      "url": "https://tienda.psa.com.ar/griferia-bicomando-bajo-mesada.html",
+      "grupo": "griferia",
+      "stock": "IN_STOCK",
+      "cats": [
+        "Purificadores De Agua",
+        "Repuestos Y Accesorios",
+        "Beber y Cocinar",
+        "Línea Bajo Mesada",
+        "Griferías y accesorios"
+      ]
+    },
+    {
+      "sku": "612031390",
+      "nombre": "Grifería Bicomando Nero",
+      "precio": 517000,
+      "lista": 517000,
+      "url": "https://tienda.psa.com.ar/griferia-bicomando-nero.html",
+      "grupo": "griferia",
+      "stock": "IN_STOCK",
+      "cats": [
+        "Purificadores De Agua",
+        "Repuestos Y Accesorios",
+        "Beber y Cocinar",
+        "Línea Bajo Mesada",
+        "Griferías y accesorios"
+      ]
+    },
+    {
+      "sku": "612031210",
+      "nombre": "Grifería PSA Bajo Mesada",
+      "precio": 211000,
+      "lista": 211000,
+      "url": "https://tienda.psa.com.ar/griferia-psa-bajo-mesada.html",
+      "grupo": "griferia",
+      "stock": "IN_STOCK",
+      "cats": [
+        "Purificadores De Agua",
+        "Repuestos Y Accesorios",
+        "Beber y Cocinar",
+        "Línea Bajo Mesada",
+        "Griferías y accesorios"
+      ]
+    },
+    {
+      "sku": "612031300",
+      "nombre": "Grifería PSA Bajo Mesada - Nero",
+      "precio": 211000,
+      "lista": 211000,
+      "url": "https://tienda.psa.com.ar/griferia-psa-bajo-mesada-nero.html",
+      "grupo": "griferia",
+      "stock": "IN_STOCK",
+      "cats": [
+        "Purificadores De Agua",
+        "Repuestos Y Accesorios",
+        "Beber y Cocinar",
+        "Línea Bajo Mesada",
+        "Griferías y accesorios"
+      ]
+    },
+    {
+      "sku": "612111250",
+      "nombre": "Botella de Vidrio PSA",
+      "precio": 42800,
+      "lista": 42800,
+      "url": "https://tienda.psa.com.ar/botella-de-vidrio-psa.html",
+      "grupo": "botellas",
+      "stock": "OUT_OF_STOCK",
+      "cats": [
+        "Botellas reutilizables |Mates |Termo",
+        "Botellas 1 lt"
+      ]
+    },
+    {
+      "sku": "612111050",
+      "nombre": "BOTELLA PSA NEO AQUA",
+      "precio": 32100,
+      "lista": 32100,
+      "url": "https://tienda.psa.com.ar/botella-psa-neo-aqua.html",
+      "grupo": "botellas",
+      "stock": "IN_STOCK",
+      "cats": [
+        "Botellas reutilizables |Mates |Termo",
+        "Botellas Neo",
+        "HOT SALE",
+        "Botellas Reutilizables"
+      ]
+    },
+    {
+      "sku": "612110230",
+      "nombre": "Botella SodaBurby",
+      "precio": 25150,
+      "lista": 25150,
+      "url": "https://tienda.psa.com.ar/botella-sodaburby.html",
+      "grupo": "botellas",
+      "stock": "IN_STOCK",
+      "cats": [
+        "Botellas reutilizables |Mates |Termo",
+        "Botella Soda Burby",
+        "HOT SALE",
+        "Botellas Reutilizables"
+      ]
+    },
+    {
+      "sku": "612111280",
+      "nombre": "Botella Térmica 500ml Roja",
+      "precio": 61200,
+      "lista": 61200,
+      "url": "https://tienda.psa.com.ar/botella-psa-termica-rosso-500-cc.html",
+      "grupo": "botellas",
+      "stock": "OUT_OF_STOCK",
+      "cats": [
+        "Botellas reutilizables |Mates |Termo",
+        "Botellas Térmicas"
+      ]
+    },
+    {
+      "sku": "612111290",
+      "nombre": "Botella Térmica 750ml Blanca",
+      "precio": 71150,
+      "lista": 71150,
+      "url": "https://tienda.psa.com.ar/botella-termica-750ml-bianca.html",
+      "grupo": "botellas",
+      "stock": "IN_STOCK",
+      "cats": [
+        "Botellas reutilizables |Mates |Termo",
+        "Botellas Térmicas"
+      ]
+    },
+    {
+      "sku": "612111300",
+      "nombre": "Botella Térmica 750ml Negra",
+      "precio": 71150,
+      "lista": 71150,
+      "url": "https://tienda.psa.com.ar/botella-termica-750ml-nero.html",
+      "grupo": "botellas",
+      "stock": "IN_STOCK",
+      "cats": [
+        "Botellas reutilizables |Mates |Termo",
+        "Botellas Térmicas"
+      ]
+    },
+    {
+      "sku": "612111310",
+      "nombre": "Botella Térmica 750ml Roja",
+      "precio": 66500,
+      "lista": 66500,
+      "url": "https://tienda.psa.com.ar/botella-termica-750ml-rosso.html",
+      "grupo": "botellas",
+      "stock": "OUT_OF_STOCK",
+      "cats": [
+        "Botellas reutilizables |Mates |Termo",
+        "Botellas Térmicas"
+      ]
+    },
+    {
+      "sku": "630139150",
+      "nombre": "Kit Matero PSA- Blanco",
+      "precio": 131000,
+      "lista": 131000,
+      "url": "https://tienda.psa.com.ar/kit-matero-psa-bianco.html",
+      "grupo": "botellas",
+      "stock": "IN_STOCK",
+      "cats": [
+        "Botellas reutilizables |Mates |Termo",
+        "Mates |Termo",
+        "Set Matero"
+      ]
+    },
+    {
+      "sku": "630139160",
+      "nombre": "Kit Matero PSA- Negro",
+      "precio": 131000,
+      "lista": 131000,
+      "url": "https://tienda.psa.com.ar/kit-matero-psa-nero.html",
+      "grupo": "botellas",
+      "stock": "IN_STOCK",
+      "cats": [
+        "Botellas reutilizables |Mates |Termo",
+        "Mates |Termo",
+        "Set Matero"
+      ]
+    },
+    {
+      "sku": "614066050",
+      "nombre": "Mate PSA Blanco",
+      "precio": 38500,
+      "lista": 38500,
+      "url": "https://tienda.psa.com.ar/mate-vaso-termico-bianco.html",
+      "grupo": "botellas",
+      "stock": "IN_STOCK",
+      "cats": [
+        "Botellas reutilizables |Mates |Termo",
+        "Mate",
+        "Mates |Termo",
+        "Mates"
+      ]
+    },
+    {
+      "sku": "614066040",
+      "nombre": "Mate PSA Negro",
+      "precio": 38500,
+      "lista": 38500,
+      "url": "https://tienda.psa.com.ar/mate-vaso-termico-nero.html",
+      "grupo": "botellas",
+      "stock": "IN_STOCK",
+      "cats": [
+        "Botellas reutilizables |Mates |Termo",
+        "Mate",
+        "Mates |Termo",
+        "Mates"
+      ]
+    },
+    {
+      "sku": "614065560",
+      "nombre": "Termo PSA - Aqua 1 lt",
+      "precio": 86500,
+      "lista": 86500,
+      "url": "https://tienda.psa.com.ar/termo-psa-aqua-1-lt.html",
+      "grupo": "botellas",
+      "stock": "OUT_OF_STOCK",
+      "cats": [
+        "Botellas reutilizables |Mates |Termo"
+      ]
+    },
+    {
+      "sku": "614066060",
+      "nombre": "Termo PSA - Negro",
+      "precio": 92550,
+      "lista": 92550,
+      "url": "https://tienda.psa.com.ar/termo-psa-nero-1-lt.html",
+      "grupo": "botellas",
+      "stock": "IN_STOCK",
+      "cats": [
+        "Botellas reutilizables |Mates |Termo",
+        "Mates |Termo",
+        "Termos"
+      ]
+    },
+    {
+      "sku": "614066070",
+      "nombre": "Termo PSA Blanco",
+      "precio": 92550,
+      "lista": 92550,
+      "url": "https://tienda.psa.com.ar/termo-psa-bianco-1-lt.html",
+      "grupo": "botellas",
+      "stock": "IN_STOCK",
+      "cats": [
+        "Botellas reutilizables |Mates |Termo",
+        "Cyber",
+        "Mates |Termo",
+        "Termos"
+      ]
+    }
+  ]
+}

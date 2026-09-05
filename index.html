@@ -122,6 +122,7 @@ window.openStock=function(){
 <script src="./escalera-suenos.js"></script>
 <script src="./demo-guia.js"></script>
 <script src="./tablero-negocio.js?v=483"></script>
+<script src="./lista-precios.js?v=484"></script>
 <script src="./stock-personal.js"></script>
 
 <script src="./porque-vivo.js"></script>
@@ -4215,11 +4216,12 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-suenos" onclick="openSuenos()"><span>🪜</span> Escalera de Sueños</button>
     <button class="ds-btn" data-ds="view-demo" onclick="openDemo()"><span>🎯</span> Coach de Demo</button>
     <button class="ds-btn" data-ds="view-botella" onclick="openBotella()"><span>🍾</span> Comparativas</button>
+    <button class="ds-btn" data-ds="view-lista" onclick="openLista()"><span>📋</span> Lista de precios</button>
     <button class="ds-btn" data-ds="view-simulador" onclick="openCalculadora()"><span>🧮</span> Simulador</button>
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v483 · Segura</div>
+  <div class="ds-foot">APPI · v484 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4500,7 +4502,7 @@ body.dark #pageTabs button.active{color:#c5d6ff}
       <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
 
       <div class="home-brand-row">
-        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · v483</span></span>
+        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · v484</span></span>
       </div>
 
       <div class="home-hero-card">
@@ -5962,6 +5964,7 @@ const HELP = {
     • <strong>Escalera de Sueños</strong> — tu combustible emocional<br/>
     • <strong>Coach Comercial de Demo</strong> — guiones, preguntas y objeciones en vivo<br/>
     • <strong>Comparativas</strong> — cotejá dos productos o la botella en la demo<br/>
+    • <strong>Lista de precios</strong> — catálogo de la tienda y presupuesto<br/>
     • <strong>Simulador</strong> — calculá cuánto podés ganar<br/>
     • <strong>Mi stock</strong> — lo que tenés en casa y lo que prestaste<br/>
     • <strong>Grabadora</strong> — grabá ideas y reuniones<br/>
@@ -11195,6 +11198,11 @@ function renderToolsList(){
       statusVal:'Juego', statusClass:'pending', progressPct:100,
       timeAgo:'Interactivo', onClick:'openBotella()', accent:'#3ad0a4', gradient:'linear-gradient(135deg,#3ad0a4,#5b8def)'
     });
+    const hLista = renderHomeQuickCard({
+      icon:'📋', title:'Lista de precios', sub:'Tienda PSA · presupuesto',
+      statusVal:'Lista', statusClass:'pending', progressPct:100,
+      timeAgo:'Equipos y recargas', onClick:'openLista()', accent:'#0b5878', gradient:'linear-gradient(135deg,#0b5878,#3ad0a4)'
+    });
     const h5 = renderHomeQuickCard({
       icon:'🧮', title:'Simulador', sub:'Calculá tu negocio',
       statusVal:'Calc', statusClass:'pending', progressPct:100,
@@ -11225,7 +11233,7 @@ function renderToolsList(){
       timeAgo: nAgenda ? 'Listos para importar' : 'Sin teléfonos',
       onClick:'exportarAgendaTelefono()', accent:'#25d366', gradient:'linear-gradient(135deg,#25d366,#128c7e)'
     });
-    herrHost.innerHTML = h1 + h2 + h3 + h4 + h5 + hStock + h6 + h7 + hAgenda;
+    herrHost.innerHTML = h1 + h2 + h3 + h4 + hLista + h5 + hStock + h6 + h7 + hAgenda;
   }
   if(!mesHost){const toolsList=document.getElementById('toolsList');if(toolsList)toolsList.innerHTML = `
     <details class="home-section-block" data-home-sec="mes" ${openMes?'open':''}>
@@ -11258,6 +11266,13 @@ function openBotella(){
     window.abrirBotella();
   } else {
     if(typeof showToast==='function') showToast('🍾 Comparativas no disponible', 2000);
+  }
+}
+function openLista(){
+  if(typeof window.abrirLista === 'function') {
+    window.abrirLista();
+  } else {
+    if(typeof showToast==='function') showToast('📋 Lista no disponible', 2000);
   }
 }
 function openCalculadora(){
@@ -12369,8 +12384,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='483';
-      const CACHE_NAME='appi-v483-precios-tienda';
+      const swVersion='484';
+      const CACHE_NAME='appi-v484-lista-precios';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · v'+swVersion;
       const hadController=Boolean(navigator.serviceWorker.controller);
@@ -16654,6 +16669,13 @@ setTimeout(initHistorico,1200);
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', limpiarRestos);
   setTimeout(limpiarRestos, 0);
   setTimeout(limpiarRestos, 400);
+})();
+</script>
+
+<link rel="stylesheet" href="./appi-tema.css?v=478">
+</body>
+</html>
+limpiarRestos, 400);
 })();
 </script>
 

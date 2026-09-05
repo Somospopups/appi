@@ -27,6 +27,7 @@
     '#histActionOverlay',      // Centro de Acción del Histórico
     '#gestionDetailOverlay',   // ficha de un contacto del Panel
     '#stOverlay',              // Mi stock
+    '#lpSheet',                // presupuesto de Lista de precios
     '#appiDeviceOverlay',      // teléfonos vinculados
     '#calOverlay',             // calendario (el fondo lleva la clase open; v317)
     '#demoObjectionSheet',     // objeciones del Coach de Demo
