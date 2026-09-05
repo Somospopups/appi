@@ -854,10 +854,16 @@
 
       pdf.setFillColor.apply(pdf, crema);
       pdf.rect(0, 0, W, H, 'F');
+      var fotoPerfil = '';
+      try { fotoPerfil = localStorage.getItem('appi_foto_perfil_v1') || ''; } catch (e) {}
+      var fotoOk = false;
+      if (fotoPerfil) {
+        try { pdf.addImage(fotoPerfil, 'JPEG', m, 8, 22, 22); fotoOk = true; } catch (e) { fotoOk = false; }
+      }
       pdf.setFont('helvetica', 'bold');
       pdf.setFontSize(26);
       pdf.setTextColor.apply(pdf, azul);
-      pdf.text('PRESUPUESTO', m, 24);
+      pdf.text('PRESUPUESTO', fotoOk ? m + 26 : m, fotoOk ? 22 : 24);
       pdf.setFont('helvetica', 'normal');
       pdf.setFontSize(9);
       pdf.setTextColor.apply(pdf, gris);
@@ -866,11 +872,12 @@
       pdf.text('Precios de lista', W - m, 21, { align: 'right' });
       pdf.setDrawColor.apply(pdf, azul);
       pdf.setLineWidth(1.15);
-      pdf.line(m, 30, W - m, 30);
+      var yLinea = fotoOk ? 34 : 30;
+      pdf.line(m, yLinea, W - m, yLinea);
       pdf.setLineWidth(0.28);
-      pdf.line(m, 32.2, W - m, 32.2);
+      pdf.line(m, yLinea + 2.2, W - m, yLinea + 2.2);
 
-      var y = 42;
+      var y = fotoOk ? 46 : 42;
       if (para) {
         pdf.setFont('helvetica', 'bold');
         pdf.setFontSize(8);

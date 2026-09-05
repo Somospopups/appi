@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "515.0.0",
-  "cacheName": "appi-v515-financ",
+  "version": "516.0.0",
+  "cacheName": "appi-v516-foto",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {
