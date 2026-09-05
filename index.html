@@ -4230,7 +4230,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v508 · Segura</div>
+  <div class="ds-foot">APPI · v509 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4511,7 +4511,7 @@ body.dark #pageTabs button.active{color:#c5d6ff}
       <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
 
       <div class="home-brand-row">
-        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · v508</span></span>
+        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · v509</span></span>
       </div>
 
       <div class="home-hero-card">
@@ -5823,13 +5823,13 @@ const HELP = {
     • <strong>Tablero:</strong> números, ranking, cumpleaños, garantías<br/>
     • <strong>Árbol:</strong> quién está debajo de quién<br/>
     • <strong>Lista:</strong> buscador y filtros<br/>
-    Cargá el Excel de Línea Descendente y tené todo actualizado.</div>
+    Tocá <b>Descargar archivos</b> (sitio de PSA), después cargá el Excel.</div>
 
     <div class="tip"><strong>📈 HISTÓRICO</strong><br/>
     Tu evolución mes a mes. Cargá los 3 archivos cada mes (Línea Descendente, Garantías, Ingresos) y mirá cómo crece tu negocio. Podés comparar meses y ver tendencias.</div>
 
     <div class="tip"><strong>📍 USUARIOS / GARANTÍAS</strong><br/>
-    Todos los hogares que tienen un equipo tuyo. Cargá las garantías, mirá cuáles vencen pronto y planificá visitas de mantenimiento. ¡Es tu tesoro!</div>
+    Todos los hogares que tienen un equipo tuyo. Tocá <b>Descargar archivos</b>, cargá las garantías y mirá cuáles vencen. ¡Es tu tesoro!</div>
 
     <div class="tip"><strong>💡 CONSEJO</strong><br/>
     Revisá el GPS todos los días. Si estás lejos del bonus, enfocá tus esfuerzos en patrocinios y demos. El Panel te dice a quién contactar hoy.</div>`
@@ -5855,7 +5855,7 @@ const HELP = {
     Tu combustible emocional. Escribí:<br/>
     • Tu <strong>"para qué"</strong> profundo<br/>
     • Hasta 7 sueños, del más cercano al más grande<br/>
-    Se guarda solo en tu dispositivo. Compartila con quien te acompaña en el negocio.</div>
+    Se guarda en tu cuenta. Compartila con quien te acompaña en el negocio.</div>
 
     <div class="tip"><strong>🎤 COACH COMERCIAL DE DEMO</strong><br/>
     Tu asistente en vivo para cada presentación:<br/>
@@ -5895,7 +5895,7 @@ const HELP = {
     • Elegí un color al guardar<br/>
     • Tocá para editar, fijar, enviar o borrar<br/>
     • Buscá por texto arriba<br/>
-    Todo queda en tu dispositivo.</div>
+    Quedan en tu cuenta.</div>
 
     <div class="tip"><strong>💡 CONSEJO</strong><br/>
     Usá Los 8 Pasos como guía mensual. La Escalera de Sueños releela cuando el día se ponga difícil. La Guía de Demo y Comparativas son tus mejores aliadas en las presentaciones.</div>`
@@ -5911,7 +5911,7 @@ const HELP = {
     icon:'🪜', iconBg:'linear-gradient(135deg,#8b63e8,#ff6bcf)',
     title:'Escalera de Sueños', sub:'Tu combustible',
     html:`<p>Escribí tu "para qué" y hasta siete sueños, del más cercano al más grande.</p>
-    <div class="tip"><strong>SE GUARDA SOLO</strong><br/>Queda en tu dispositivo y podés volver cuando quieras.</div>
+    <div class="tip"><strong>SE GUARDA SOLO</strong><br/>Queda en tu cuenta y podés volver cuando quieras.</div>
     <div class="tip"><strong>COMPARTILA</strong><br/>Con el botón de WhatsApp, compartila con quien te acompaña en el negocio.</div>`
   },
   demo: {
@@ -5986,7 +5986,7 @@ const HELP = {
     Tocá cualquier notificación para actuar rápido.</div>
 
     <div class="tip"><strong>💾 BACKUP</strong><br/>
-    En la sección Herramientas podés exportar o restaurar todos tus datos. Quedan solo en tu dispositivo, nadie más los ve.</div>
+    En Herramientas podés exportar o restaurar un backup. Con la cuenta, tus datos también quedan en tu espacio.</div>
 
     <div class="tip"><strong>❓ AYUDA</strong><br/>
     El botón <strong>?</strong> arriba a la derecha te explica cada pantalla en detalle. Tocálo cuando quieras saber más.</div>`
@@ -6058,12 +6058,15 @@ const HELP = {
     icon:'🌳', iconBg:'linear-gradient(135deg,#3ad0a4,#a06bff)',
     title:'Mi Equipo',
     sub:'Tu equipo, siempre a mano',
-    html:`<p>Cargá el reporte de tu empresa y tené toda tu línea a mano.</p>
+    html:`<p>Primero bajá el Excel en PSA y después cargalo acá.</p>
 
-    <div class="tip"><strong>1. CARGAR EQUIPO</strong><br/>
-    Descargá <b>Línea Descendente</b> y elegí el Excel. Podés actualizarlo cada mes.</div>
+    <div class="tip"><strong>1. DESCARGAR ARCHIVOS</strong><br/>
+    Tocá <b>Descargar archivos</b>. Se abre el sitio de PSA. Entrá allá con tu DIP y Clave PSA. APPI no ve ni guarda esa clave.</div>
 
-    <div class="tip"><strong>2. CARGAR GARANTÍAS</strong><br/>
+    <div class="tip"><strong>2. ELEGIR ARCHIVO</strong><br/>
+    Bajá <b>Línea Descendente</b> y acá elegí el Excel. Podés actualizarlo cada mes.</div>
+
+    <div class="tip"><strong>3. CARGAR GARANTÍAS</strong><br/>
     Después te pregunta por <b>Garantías por Organización</b>. Así ves presentadas, vencidas y pendientes en cada persona.</div>
 
     <p><strong>3 VISTAS</strong></p>
@@ -6076,7 +6079,7 @@ const HELP = {
     <div class="tip"><strong>TIPS</strong><br/>
     Tocá una persona para ver ficha, WhatsApp o llamada. Los cumpleañeros de hoy aparecen en el Inicio. En PC, Garantías del Equipo ocupa todo el ancho.</div>
 
-    <div class="warn-tip"><strong>🔒 Privacidad:</strong> Todo queda solo en tu dispositivo.</div>`
+    <div class="warn-tip"><strong>🔒 Privacidad:</strong> La planilla queda en tu cuenta, en este teléfono y en cualquier otro. La Clave PSA no pasa por APPI.</div>`
   },
   equipoTablero: {
     icon:'📊', iconBg:'linear-gradient(135deg,#5b8def,#a06bff)',
@@ -6133,7 +6136,7 @@ const HELP = {
     sub:'Puntuate del 0 al 10',
     html:`<p>Mové cada deslizador según cómo te sentís hoy en esa área.</p>
     <div class="tip"><strong>0</strong> = muy bajo · <strong>10</strong> = excelente</div>
-    <div class="tip"><strong>TIP</strong> — Sé honesto. Se guarda solo en tu dispositivo.</div>`
+    <div class="tip"><strong>TIP</strong> — Sé honesto. Se guarda en tu cuenta.</div>`
   },
   sieteDetail: {
     icon:'📋', iconBg:'linear-gradient(135deg,#3ad0a4,#5b8def)',
@@ -6189,18 +6192,19 @@ const HELP = {
     html:`<p>Tus notas rápidas, con color, como post-its.</p>
     <div class="tip"><strong>Nueva nota</strong> — título + texto y elegí un color al guardar.</div>
     <div class="tip"><strong>Abrir</strong> — tocá una nota para editar, fijar, enviar o borrar.</div>
-    <div class="tip"><strong>Buscar</strong> — filtrá por texto arriba. Todo queda en tu dispositivo.</div>`
+    <div class="tip"><strong>Buscar</strong> — filtrá por texto arriba. Quedan en tu cuenta.</div>`
   },
   usuarios: {
     icon:'📍', iconBg:'linear-gradient(135deg,#3ad0a4,#5b8def)',
     title:'Usuarios / Garantías',
     sub:'Zona y vencimiento',
-    html:`<p>Cargá tu planilla de usuarios con garantías para ver vencimientos y zonas.</p>
-    <div class="tip"><strong>Cargar</strong> — Excel o CSV con Usuario, teléfono, domicilio, localidad, producto y fechas.</div>
+    html:`<p>Primero bajá la planilla en PSA y después cargala acá.</p>
+    <div class="tip"><strong>Descargar archivos</strong> — se abre el sitio de PSA. Entrá allá con tu clave. APPI no la ve ni la guarda.</div>
+    <div class="tip"><strong>Elegir archivo</strong> — Excel o CSV con Usuario, teléfono, domicilio, localidad, producto y fechas.</div>
     <div class="tip"><strong>Dashboard</strong> — total, vencidas, por vencer y vigentes.</div>
     <div class="tip"><strong>Filtros</strong> — buscador, zona, orden por vencimiento y tarjetas (marca + banco) para avisar una promo.</div>
     <div class="tip"><strong>Tarjetas</strong> — en la ficha de cada usuario cargá Visa Galicia, Naranja, etc. Se guardan aparte: recargar la planilla no las borra. En el mensaje de la promo usá {nombre} y {tarjeta}.</div>
-    <div class="warn-tip"><strong>🔒 Privacidad:</strong> Con una cuenta activa, tus datos se guardan en tu espacio privado de Supabase.</div>`
+    <div class="warn-tip"><strong>🔒 Privacidad:</strong> La planilla queda en tu cuenta, en cualquier dispositivo. La Clave PSA no pasa por APPI.</div>`
   }
 };
 
@@ -7939,7 +7943,7 @@ function renderEquipo(){
         <a class="btn-ir-psa" href="https://mi.psa.com.ar/login" target="_blank" rel="noopener noreferrer">Descargar archivos</a>
         <button class="btn-upload" id="btnUpload">📁 Elegir archivo</button>
       </div>
-      <div class="footer-quote" style="margin-top:12px">Tu equipo, siempre a mano.<br/>Los datos quedan solo en tu dispositivo.</div>
+      <div class="footer-quote" style="margin-top:12px">Tu equipo, siempre a mano.<br/>La planilla queda en tu cuenta.</div>
     `;
     document.getElementById('btnUpload').onclick = ()=> document.getElementById('equipoFileInput').click();
     document.getElementById('equipoSubtitle').textContent = 'Cargá tu planilla para empezar';
@@ -12400,8 +12404,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='508';
-      const CACHE_NAME='appi-v508-descargar';
+      const swVersion='509';
+      const CACHE_NAME='appi-v509-ayuda';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · v'+swVersion;
       const hadController=Boolean(navigator.serviceWorker.controller);
@@ -16629,7 +16633,7 @@ function renderCloud(c){
 }
 
 function showHelp(){
-  const html=`<p>El Histórico guarda una fotografía independiente de cada cierre mensual.</p><div class="tip"><b>Necesitás tres archivos del mismo período:</b><br>1. Línea Descendente.<br>2. Garantías por Organización.<br>3. Ingresos.</div><p><b>Resumen y análisis:</b> reúne el Resumen Anual, los gráficos, las comparaciones y las estrategias.<br><b>Cargar y administrar:</b> permite cargar meses, descargar originales, respaldar o eliminar cierres.</p><p style="font-size:11px;color:#777887">Un archivo de Ingresos sin personas es válido y representa cero ingresos. El archivo único de Usuarios / Garantías continúa en su sección habitual.</p>`;
+  const html=`<p>El Histórico guarda una fotografía independiente de cada cierre mensual.</p><div class="tip"><b>Necesitás tres archivos del mismo período:</b><br>1. Línea Descendente.<br>2. Garantías por Organización.<br>3. Ingresos.</div><div class="tip"><b>Descargar archivos</b><br>En Mi Equipo y en Usuarios, tocá Descargar archivos: se abre el sitio de PSA. Entrá allá con tu clave. APPI no la ve. Después cargá el Excel acá.</div><p><b>Resumen y análisis:</b> reúne el Resumen Anual, los gráficos, las comparaciones y las estrategias.<br><b>Cargar y administrar:</b> permite cargar meses, descargar originales, respaldar o eliminar cierres.</p><p style="font-size:11px;color:#777887">Un archivo de Ingresos sin personas es válido y representa cero ingresos. El archivo único de Usuarios / Garantías continúa en su sección habitual.</p>`;
   try{modal.open({icon:'📈',iconBg:'linear-gradient(135deg,#5b8def,#a06bff)',title:'Cómo usar el Histórico',sub:'Control mensual y anual',html})}catch(e){window.APPIDialog.alert('Cargá los tres archivos de cada mes y compará los cierres dentro de Resumen y análisis.',{title:'Cómo usar el Histórico',icon:'📈'})}
 }
 async function openHistorico(){
