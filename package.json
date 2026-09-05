@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "512.0.0",
-  "cacheName": "appi-v512-tono",
+  "version": "513.0.0",
+  "cacheName": "appi-v513-jornada",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

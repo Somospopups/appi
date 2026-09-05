@@ -98,14 +98,14 @@
     s.id = 'hlStyle';
     s.textContent = '' +
       '#homeLimpio{padding:2px 2px 12px}' +
-      '.hl-porque{margin:0 4px 12px;font-size:12px;font-weight:800;color:#8b63e8;line-height:1.4}' +
-      '.hl-card{background:rgba(255,255,255,.85);border-radius:22px;padding:16px;box-shadow:0 12px 30px rgba(50,60,120,.10);margin-bottom:0;cursor:pointer;transition:transform .12s}' +
+      '.hl-porque{margin:0 4px 12px;font-size:12px;font-weight:800;color:#0b5878;line-height:1.4}' +
+      '.hl-card{background:#f3eee3;border-radius:22px;padding:16px;box-shadow:0 12px 30px rgba(30,24,12,.10);margin-bottom:0;cursor:pointer;transition:transform .12s}' +
       '.hl-card:active{transform:scale(.98)}' +
       'body.dark .hl-card{background:#25273a}' +
       '.hl-vacio{text-align:center;padding:18px 10px;font-size:13px;font-weight:850;color:#168765}' +
-      '.hl-kicker{font-size:9.5px;font-weight:900;letter-spacing:.8px;color:#168765;margin-bottom:10px;text-transform:uppercase}' +
+      '.hl-kicker{font-size:9.5px;font-weight:900;letter-spacing:.8px;color:#0b5878;margin-bottom:10px;text-transform:uppercase}' +
       '.hl-timeline{position:relative;padding-left:24px}' +
-      '.hl-timeline::before{content:"";position:absolute;left:8px;top:8px;bottom:8px;width:2px;background:#e8ebf7;border-radius:2px}' +
+      '.hl-timeline::before{content:"";position:absolute;left:8px;top:8px;bottom:8px;width:2px;background:rgba(11,88,120,.14);border-radius:2px}' +
       'body.dark .hl-timeline::before{background:rgba(255,255,255,.1)}' +
       '.hl-ev{position:relative;padding:10px 0}' +
       '.hl-ev-dot{position:absolute;left:-20px;top:14px;width:12px;height:12px;border-radius:50%;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.12)}' +
@@ -116,25 +116,25 @@
       '.hl-ev-actions{display:flex;gap:8px;margin-top:8px}' +
       '.hl-ev-btn{border:0;border-radius:12px;padding:9px 14px;font:inherit;font-size:11.5px;font-weight:900;cursor:pointer}' +
       '.hl-ev-btn.verde{background:linear-gradient(135deg,#3ad0a4,#25c46a);color:#fff;box-shadow:0 6px 14px rgba(37,208,164,.3)}' +
-      '.hl-ev-btn.suave{background:#eef1fa;color:#5a6082}' +
+      '.hl-ev-btn.suave{background:rgba(11,88,120,.08);color:#0b5878}' +
       'body.dark .hl-ev-btn.suave{background:rgba(255,255,255,.1);color:#c6cbea}' +
-      '.hl-link{width:100%;border:0;background:rgba(255,255,255,.85);border-radius:18px;padding:14px;font:inherit;font-size:13px;font-weight:900;color:#5a6082;box-shadow:0 8px 20px rgba(50,60,120,.08);cursor:pointer;text-align:center;margin-top:12px}' +
+      '.hl-link{width:100%;border:0;background:#f3eee3;border-radius:18px;padding:14px;font:inherit;font-size:13px;font-weight:900;color:#0b5878;box-shadow:0 8px 20px rgba(30,24,12,.08);cursor:pointer;text-align:center;margin-top:12px}' +
       'body.dark .hl-link{background:#25273a;color:#c6cbea}' +
 
       /* Calendario modal */
       '.cal-overlay{position:fixed;inset:0;z-index:200;background:rgba(20,20,30,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);display:none;align-items:flex-end;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .25s ease}' +
       '.cal-overlay.open{display:flex;opacity:1;pointer-events:auto}' +
-      '.cal-modal{background:rgba(255,255,255,.98);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);border-radius:24px 24px 0 0;width:100%;max-width:480px;max-height:85vh;overflow-y:auto;box-shadow:0 -10px 40px rgba(0,0,0,.2);transform:translateY(20px);transition:transform .3s cubic-bezier(.34,1.56,.64,1);padding-bottom:calc(env(safe-area-inset-bottom) + 12px)}' +
+      '.cal-modal{background:#f3eee3;border-radius:24px 24px 0 0;width:100%;max-width:480px;max-height:85vh;overflow-y:auto;box-shadow:0 -10px 40px rgba(30,24,12,.18);transform:translateY(20px);transition:transform .3s cubic-bezier(.34,1.56,.64,1);padding-bottom:calc(env(safe-area-inset-bottom) + 12px)}' +
       '.cal-overlay.open .cal-modal{transform:translateY(0)}' +
-      'body.dark .cal-modal{background:rgba(30,30,50,.98)}' +
-      '.cal-head{padding:18px 18px 8px;display:flex;align-items:center;gap:8px;position:sticky;top:0;background:rgba(255,255,255,.98);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);border-radius:24px 24px 0 0;z-index:2}' +
-      'body.dark .cal-head{background:rgba(30,30,50,.98)}' +
+      'body.dark .cal-modal{background:#1c2430}' +
+      '.cal-head{padding:18px 18px 8px;display:flex;align-items:center;gap:8px;position:sticky;top:0;background:#f3eee3;border-radius:24px 24px 0 0;z-index:2}' +
+      'body.dark .cal-head{background:#1c2430}' +
       '.cal-head h2{margin:0;font-size:18px;font-weight:900;color:#23263a;letter-spacing:-.3px;flex:1;min-width:0}' +
       'body.dark .cal-head h2{color:#f2f2f7}' +
       '.cal-nav{display:flex;gap:6px;flex:none}' +
-      '.cal-nav button{width:34px;height:34px;border-radius:10px;border:0;background:rgba(91,141,239,.1);color:#3d63c9;font-size:16px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center}' +
+      '.cal-nav button{width:34px;height:34px;border-radius:10px;border:0;background:rgba(11,88,120,.1);color:#0b5878;font-size:16px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center}' +
       '.cal-nav button:active{transform:scale(.9)}' +
-      'body.dark .cal-nav button{background:rgba(91,141,239,.2);color:#a8b8ff}' +
+      'body.dark .cal-nav button{background:rgba(11,88,120,.28);color:#d7e8f0}' +
       '.cal-close{width:30px;height:30px;border-radius:50%;background:rgba(0,0,0,.06);border:0;font-size:16px;font-weight:700;color:#6b6b76;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:none}' +
       'body.dark .cal-close{background:rgba(255,255,255,.1);color:#a0a0b0}' +
 
@@ -143,13 +143,13 @@
       '.cal-day{position:relative;min-height:40px;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;font-size:13px;font-weight:700;color:#343441;transition:all .12s}' +
       '.cal-day:active{transform:scale(.92)}' +
       '.cal-day.empty{color:transparent;cursor:default;pointer-events:none}' +
-      '.cal-day.today{background:linear-gradient(135deg,#5b8def,#8b63e8);color:#fff;box-shadow:0 4px 12px rgba(91,141,239,.3)}' +
-      '.cal-day.selected{background:rgba(91,141,239,.12);color:#3d63c9;box-shadow:inset 0 0 0 2px #5b8def}' +
-      '.cal-day.today.selected{background:linear-gradient(135deg,#5b8def,#8b63e8);color:#fff;box-shadow:0 4px 12px rgba(91,141,239,.3),inset 0 0 0 2px rgba(255,255,255,.5)}' +
+      '.cal-day.today{background:#0b5878;color:#fff;box-shadow:0 4px 12px rgba(11,88,120,.28)}' +
+      '.cal-day.selected{background:rgba(11,88,120,.12);color:#0b5878;box-shadow:inset 0 0 0 2px #0b5878}' +
+      '.cal-day.today.selected{background:#0b5878;color:#fff;box-shadow:0 4px 12px rgba(11,88,120,.28),inset 0 0 0 2px rgba(255,255,255,.5)}' +
       '.cal-day.has-tasks::after{content:"";position:absolute;bottom:4px;width:5px;height:5px;border-radius:50%;background:#f5b301}' +
       '.cal-day.today.has-tasks::after{background:#fff}' +
       'body.dark .cal-day{color:#c6cbea}' +
-      'body.dark .cal-day.selected{background:rgba(91,141,239,.25);color:#a8b8ff}' +
+      'body.dark .cal-day.selected{background:rgba(11,88,120,.28);color:#d7e8f0}' +
 
       '.cal-tasks{padding:8px 18px 14px;border-top:1px solid rgba(80,90,130,.08)}' +
       '.cal-tasks-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}' +
@@ -164,17 +164,17 @@
       '.cal-task-text{flex:1;font-size:13px;color:#343441;font-weight:600;min-width:0}' +
       '.cal-task-text.done{text-decoration:line-through;opacity:.5}' +
       'body.dark .cal-task-text{color:#e0e0e8}' +
-      '.cal-task-hora{flex:0 0 auto;padding:3px 8px;border-radius:8px;background:rgba(91,141,239,.12);color:#3d63c9;font-size:10.5px;font-weight:900;white-space:nowrap}' +
+      '.cal-task-hora{flex:0 0 auto;padding:3px 8px;border-radius:8px;background:rgba(11,88,120,.12);color:#0b5878;font-size:10.5px;font-weight:900;white-space:nowrap}' +
       '.cal-add input[type=time]{flex:0 0 96px;padding:10px 8px;border:1px solid rgba(80,90,130,.16);border-radius:12px;background:rgba(255,255,255,.94);color:#292938;font:inherit;font-size:12px}' +
       'body.dark .cal-add input[type=time]{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.12);color:#f2f2f7}' +
-      'body.dark .cal-task-hora{background:rgba(91,141,239,.2);color:#a8c0ff}' +
+      'body.dark .cal-task-hora{background:rgba(11,88,120,.28);color:#d7e8f0}' +
       '.cal-task-del{border:0;background:none;color:#d9534f;font-size:16px;cursor:pointer;padding:0 4px;opacity:.6}' +
       '.cal-task-del:hover{opacity:1}' +
       '.cal-add{display:flex;gap:8px;margin-top:8px}' +
       '.cal-add input{flex:1;border:1px dashed rgba(80,90,130,.25);border-radius:12px;padding:10px 12px;font:inherit;font-size:13px;background:rgba(255,255,255,.6);color:#23263a;outline:none}' +
-      '.cal-add input:focus{border-color:#5b8def;border-style:solid}' +
+      '.cal-add input:focus{border-color:#0b5878;border-style:solid}' +
       'body.dark .cal-add input{background:rgba(40,40,60,.5);color:#f2f2f7;border-color:rgba(255,255,255,.15)}' +
-      '.cal-add button{border:0;border-radius:12px;padding:10px 16px;background:linear-gradient(135deg,#5b8def,#8b63e8);color:#fff;font:inherit;font-size:13px;font-weight:900;cursor:pointer}' +
+      '.cal-add button{border:0;border-radius:12px;padding:10px 16px;background:#0b5878;color:#fff;font:inherit;font-size:13px;font-weight:900;cursor:pointer}' +
       '.cal-add button:active{transform:scale(.94)}' +
       '.cal-empty{text-align:center;padding:14px;font-size:12px;color:#8a8fae;font-weight:700}';
     document.head.appendChild(s);
@@ -213,7 +213,7 @@
         hora: t.hora || '📌',
         titulo: t.texto,
         desc: t.hora ? 'Tarea de hoy · ' + t.hora : 'Tarea de hoy',
-        color: '#5b8def',
+        color: '#0b5878',
         acciones: []
       });
     });
@@ -248,7 +248,7 @@
         hora: '20:00',
         titulo: segundo.nombre,
         desc: segundo.estado === 'presentacion' ? '🎤 Demo programada' : '📇 Seguimiento programado',
-        color: '#8b63e8',
+        color: '#0b5878',
         acciones: []
       });
     }

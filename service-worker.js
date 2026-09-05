@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v512-tono';
+const CACHE_NAME = 'appi-v513-jornada';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
