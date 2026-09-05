@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Lee tienda.psa.com.ar y escribe psa-catalogo.json + psa-precios.json."""
+import html as htmlmod
 import json
 import re
 import ssl
@@ -55,6 +56,24 @@ MESES = ("Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "
 CTX = ssl.create_default_context()
 GRUPO_ORDEN = {"equipos": 0, "recargas": 1, "griferia": 2, "botellas": 3, "otros": 4}
 
+# Canal @PSAPurificadores. El primero que matchea gana.
+VIDEOS = [
+    (("SENIOR4", "SENIOR 4"), "ZGPO3UHxzE0", "PSA Senior 4 — La evolución en la purificación del agua"),
+    (("SENIK",), "ucPCBNzhCMk", "PSA Senik"),
+    (("S-1000", "S·1000", "S•1000"), "kz31j16L_cQ", "Mantenimiento PSA S-1000 II"),
+    (("VERO",), "EEXBGZNXAYg", "Purificador de agua PSA Vero"),
+    (("MINI",), "kRXtseGEA8M", "PSA Mini"),
+    (("RINNOVA", "DUCHA"), "tQV4c9p9TBQ", "PSA Rinnova — Una renovación en tu ducha"),
+    (("BICO",), "2qL60kBDUlU", "Nueva Grifería Bicomando PSA"),
+    (("SODA", "GASIFICADOR"), "f8Jb7wtu0tw", "SodaBurby — Gasificador de Agua PSA"),
+    (("TÉRMICA", "TERMICA"), "lMJQB3PGIeI", "Nuevas botellas térmicas PSA"),
+    (("NEO",), "s566uSsra_w", "Botella Neo reutilizable"),
+    (("VIDRIO",), "UOTr9jI26Og", "Nueva Botella de vidrio PSA"),
+    (("KIT MATERO", "MATE", "TERMO"), "gg_xh3VwuUI", "Nuevo mate y termo PSA"),
+    (("SENIOR",), "__ISvWioYow", "Purificador de Agua PSA Senior"),
+    (("AIRE",), "VV3CgvUgD78", "Purificador de Aire PSA"),
+]
+
 
 def fecha_ar(now=None):
     d = now or datetime.now(ZoneInfo("America/Argentina/Buenos_Aires"))
@@ -72,6 +91,58 @@ def get(url, data=None, headers=None, timeout=40):
 
 def limp(s):
     return re.sub(r"\s+", " ", (s or "").replace("\\u00b7", "·")).strip()
+
+
+def texto_html(raw):
+    t = raw or ""
+    t = re.sub(r"<style[\s\S]*?</style>", " ", t, flags=re.I)
+    t = re.sub(r"<script[\s\S]*?</script>", " ", t, flags=re.I)
+    t = re.sub(r"<img[^>]*>", " ", t, flags=re.I)
+    t = re.sub(r"<br\s*/?>", "\n", t, flags=re.I)
+    t = re.sub(r"</p>", "\n", t, flags=re.I)
+    t = re.sub(r"</li>", "\n", t, flags=re.I)
+    t = re.sub(r"<[^>]+>", " ", t)
+    t = htmlmod.unescape(t)
+    t = t.replace("\xa0", " ").replace("\\u00b7", "·")
+    out = []
+    malo = (
+        "cuotas sin",
+        "promociones banc",
+        "reintegros",
+        "ver todas las promo",
+        "precio sin imp",
+        "aprovechá los grandes",
+        "clic aquí",
+        "click aquí",
+    )
+    for ln in t.split("\n"):
+        s = limp(ln)
+        if len(s) < 4:
+            continue
+        low = s.lower()
+        if any(b in low for b in malo):
+            continue
+        out.append(s)
+    return "\n".join(out).strip()
+
+
+def recortar(s, n=720):
+    s = (s or "").strip()
+    if len(s) <= n:
+        return s
+    cut = s[:n]
+    i = cut.rfind(". ")
+    if i > n * 0.45:
+        return cut[: i + 1]
+    return cut.rsplit(" ", 1)[0] + "…"
+
+
+def video_de(nombre):
+    n = (nombre or "").upper()
+    for keys, vid, titulo in VIDEOS:
+        if any(k in n for k in keys):
+            return "https://www.youtube.com/watch?v=" + vid, titulo
+    return "", ""
 
 
 def grupo(name, cats):
@@ -115,6 +186,9 @@ def graphql_catalogo():
         total_count page_info { current_page total_pages }
         items {
           sku name url_key stock_status
+          meta_description
+          description { html }
+          short_description { html }
           price_range { minimum_price { final_price { value } regular_price { value } } }
           categories { name }
         }
@@ -142,6 +216,13 @@ def graphql_catalogo():
         nombre = limp(it.get("name"))
         cats = [limp(c.get("name")) for c in (it.get("categories") or []) if c.get("name")]
         uk = (it.get("url_key") or "").strip()
+        desc = recortar(texto_html(((it.get("description") or {}).get("html") or "")))
+        short = recortar(texto_html(((it.get("short_description") or {}).get("html") or "")), 280)
+        meta = limp(it.get("meta_description") or "")
+        if meta and meta.lower() == nombre.lower():
+            meta = ""
+        para = recortar(meta or short or (desc.split("\n")[0] if desc else ""), 220)
+        vurl, vtit = video_de(nombre)
         productos.append(
             {
                 "sku": sku,
@@ -152,6 +233,10 @@ def graphql_catalogo():
                 "grupo": grupo(nombre, it.get("categories") or []),
                 "stock": it.get("stock_status") or "",
                 "cats": cats,
+                "para": para,
+                "desc": desc,
+                "video": vurl,
+                "videoTitulo": vtit,
             }
         )
     productos.sort(key=lambda p: (GRUPO_ORDEN.get(p["grupo"], 9), p["nombre"].lower()))

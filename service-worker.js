@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v484-lista-precios';
+const CACHE_NAME = 'appi-v485-presupuesto-pdf';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
