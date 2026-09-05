@@ -137,12 +137,12 @@
       '.lp-wrap{padding:10px 12px calc(env(safe-area-inset-bottom) + 168px)}' +
       '.lp-note{margin:0 0 10px;font-size:11px;font-weight:750;color:#686977;line-height:1.35}' +
       '.lp-search{width:100%;min-height:44px;border:1px solid rgba(196,164,92,.45);border-radius:14px;padding:10px 12px;font:inherit;font-size:14px;background:#faf6ee;color:#2a2a32;margin:0 0 10px}' +
-      '.lp-chips-wrap{position:relative;margin:0 0 4px}' +
-      '.lp-chips-wrap.lp-more:after{content:"";position:absolute;right:0;top:0;bottom:8px;width:36px;pointer-events:none;background:linear-gradient(90deg,rgba(243,238,227,0),#f3eee3)}' +
-      '.lp-chips{display:flex;gap:6px;overflow-x:auto;overflow-y:hidden;padding:0 0 8px;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none;overscroll-behavior-x:contain}' +
+      '.lp-chips-wrap{position:relative;margin:0 0 6px}' +
+      '.lp-chips-wrap.lp-more:after{content:"";position:absolute;right:0;top:0;bottom:10px;width:52px;pointer-events:none;background:linear-gradient(90deg,rgba(243,238,227,0),#f3eee3 70%)}' +
+      '.lp-chips{display:flex;gap:8px;overflow-x:auto;overflow-y:hidden;padding:0 36px 10px 0;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none;overscroll-behavior-x:contain}' +
       '.lp-chips::-webkit-scrollbar{display:none;height:0;width:0}' +
-      '.lp-chips-in{display:flex;gap:6px;width:max-content}' +
-      '.lp-chip{flex:0 0 auto;border:0;border-radius:999px;padding:7px 12px;font:inherit;font-size:12px;font-weight:850;background:rgba(255,255,255,.7);color:#2a2a32;cursor:pointer}' +
+      '.lp-chips-in{display:flex;gap:8px;width:max-content;padding-right:8px}' +
+      '.lp-chip{flex:0 0 auto;border:0;border-radius:999px;padding:8px 14px;font:inherit;font-size:12px;font-weight:850;background:rgba(255,255,255,.7);color:#2a2a32;cursor:pointer}' +
       '.lp-chip.on{background:#0b5878;color:#fff}' +
       '@keyframes lpIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}' +
       '.lp-cuotas-in{animation:lpIn .35s ease}' +
@@ -264,7 +264,7 @@
       return '<button type="button" class="lp-chip' + (filtro === g.id ? ' on' : '') + '" data-g="' + g.id + '">' + esc(g.t) + '</button>';
     }).join('');
     return '<div class="lp-wrap">' +
-      '<p class="lp-note">Lista de tienda.psa.com.ar' + (fecha ? ' · ' + esc(fecha) : '') + '. Armá el presupuesto y descargá el PDF.</p>' +
+      '<p class="lp-note">Lista de tienda.psa.com.ar' + (fecha ? ' · ' + esc(fecha) : '') + '. Elegí productos y cotizá.</p>' +
       '<input class="lp-search" id="lpSearch" type="search" placeholder="Buscar modelo, recarga o SKU" value="' + esc(busca) + '">' +
       '<div class="lp-chips" id="lpChips">' + chips + '</div>' +
       '<div id="lpList"></div></div>';
@@ -411,7 +411,7 @@
     function ease(t) { return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; }
     function frame(now) {
       if (!t0) t0 = now;
-      var p = (now - t0) / 1700;
+      var p = (now - t0) / 1900;
       if (p >= 1) {
         el.scrollLeft = 0;
         el._lpHint = false;
@@ -419,7 +419,7 @@
         return;
       }
       var u = p < 0.55 ? ease(p / 0.55) : ease((1 - p) / 0.45);
-      el.scrollLeft = max * 0.55 * u;
+      el.scrollLeft = max * 0.72 * u;
       markOverflow(el);
       requestAnimationFrame(frame);
     }
@@ -1079,15 +1079,15 @@
         var pay2 = c.litroEq
           ? ('Con 4 L/día el ahorro cubre el equipo. Después el litro sale ' + money2(c.litroEq) + ' en vez de ' + money(c.litroEnv) + '.')
           : '';
-        if (pay2) pdf.text(pay2, m + 3, yy + 10);
-        yy += 16;
+        if (pay2) pdf.text(pay2, m + 3, yy + 10.5);
+        yy += 17;
         pdf.setFont('helvetica', 'bold');
         pdf.setFontSize(9);
         pdf.setTextColor.apply(pdf, azul);
         pdf.text('Comparativa de costos  ·  vs. agua envasada', m, yy);
-        yy += 3.5;
+        yy += 4.2;
         yy = dibujarTabla(c, yy);
-        yy += 2.5;
+        yy += 3.5;
         yy = dibujarPlaneta(c, yy);
         return yy;
       }
@@ -1172,22 +1172,22 @@
         var lineasTxt = pdf.splitTextToSize(cuerpo, usable);
         if (lineasTxt.length > 2) lineasTxt = lineasTxt.slice(0, 2);
         pdf.text(lineasTxt, m, yy);
-        yy += lineasTxt.length * 3.6 + 6;
+        yy += lineasTxt.length * 3.8 + 7;
         if (keys.length) {
           pdf.setFont('helvetica', 'bold');
           pdf.setFontSize(9);
           pdf.setTextColor.apply(pdf, azul);
           pdf.text('Qué trata y por qué sacarlo', m, yy);
-          yy += 5;
+          yy += 5.5;
           pdf.setFont('helvetica', 'italic');
           pdf.setFontSize(7.2);
           pdf.setTextColor.apply(pdf, oscuro);
           var intro = pdf.splitTextToSize(TRATA_INTRO, usable);
           if (intro.length > 2) intro = intro.slice(0, 2);
           pdf.text(intro, m, yy);
-          yy += intro.length * 3.3 + 4;
+          yy += intro.length * 3.45 + 5;
           var col = keys.length >= 3;
-          var gapC = 8;
+          var gapC = 10;
           var colWtrata = col ? (usable - gapC) / 2 : usable;
           var yCol = [yy, yy];
           var ci = 0;
@@ -1200,7 +1200,7 @@
             pdf.setFontSize(8);
             pdf.setTextColor.apply(pdf, azul);
             pdf.text(info.nom + '.', x, yk);
-            yk += 4;
+            yk += 4.4;
             pdf.setFont('helvetica', 'normal');
             pdf.setFontSize(6.8);
             pdf.setTextColor.apply(pdf, oscuro);
@@ -1208,11 +1208,11 @@
             var maxB = col ? 6 : 4;
             if (body.length > maxB) body = body.slice(0, maxB);
             pdf.text(body, x, yk);
-            yk += body.length * 3.15 + 4.5;
+            yk += body.length * 3.3 + 5.2;
             if (col) { yCol[ci % 2] = yk; ci += 1; }
             else yy = yk;
           });
-          yy = (col ? Math.max(yCol[0], yCol[1]) : yy) + 3;
+          yy = (col ? Math.max(yCol[0], yCol[1]) : yy) + 4;
         }
         if (c) yy = dibujarCmp(c, yy);
       });

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v501-sin-restos';
+const CACHE_NAME = 'appi-v502-cotizar-aire';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
