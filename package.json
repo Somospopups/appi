@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "485.0.0",
-  "cacheName": "appi-v485-presupuesto-pdf",
+  "version": "486.0.0",
+  "cacheName": "appi-v486-ficha-foto",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

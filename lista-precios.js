@@ -24,6 +24,15 @@
     });
   }
   function money(n) { return '$' + Math.round(Number(n) || 0).toLocaleString('es-AR'); }
+  function sinMarca(s) {
+    return String(s || '')
+      .replace(/\bAPPI\b/gi, '')
+      .replace(/\bPSA\b/gi, '')
+      .replace(/\s{2,}/g, ' ')
+      .replace(/\s+([·\-,])/g, '$1')
+      .replace(/^[\s·\-—]+|[\s·\-—]+$/g, '')
+      .trim();
+  }
 
   function carrito() {
     try { return JSON.parse(localStorage.getItem(LS) || '{}') || {}; } catch (e) { return {}; }
@@ -317,6 +326,25 @@
     else if (window.APPIDialog && window.APPIDialog.alert) window.APPIDialog.alert(msg, { title: 'Lista de precios' });
   }
 
+
+  function loadFoto(p) {
+    var src = p && p.foto ? String(p.foto) : '';
+    if (!src) return Promise.resolve('');
+    if (src.indexOf('./') !== 0 && src.indexOf('http') !== 0) src = './' + src;
+    return fetch(src, { cache: 'force-cache' })
+      .then(function (r) { return r.ok ? r.blob() : null; })
+      .then(function (blob) {
+        if (!blob) return '';
+        return new Promise(function (res) {
+          var fr = new FileReader();
+          fr.onload = function () { res(fr.result); };
+          fr.onerror = function () { res(''); };
+          fr.readAsDataURL(blob);
+        });
+      })
+      .catch(function () { return ''; });
+  }
+
   function armarPdf() {
     var r = resumen();
     if (!r.n) return;
@@ -324,6 +352,7 @@
     if (!JsPDF) { aviso('No se pudo cargar el PDF.'); return; }
     var btn = $('lpSheetPdf');
     if (btn) { btn.disabled = true; btn.textContent = 'Armando…'; }
+    Promise.all(r.lineas.map(function (ln) { return loadFoto(ln.p); })).then(function (fotos) {
     try {
       var pdf = new JsPDF({ unit: 'mm', format: 'a4', compress: true });
       var W = pdf.internal.pageSize.getWidth();
@@ -339,15 +368,13 @@
 
       function encabezado(subtitulo) {
         pdf.setFillColor.apply(pdf, azul);
-        pdf.rect(0, 0, W, 28, 'F');
+        pdf.rect(0, 0, W, 22, 'F');
         pdf.setTextColor(255, 255, 255);
         pdf.setFont('helvetica', 'bold');
-        pdf.setFontSize(11);
-        pdf.text('APPI  ·  PSA', m, 11);
         pdf.setFontSize(16);
-        pdf.text(subtitulo, m, 21);
+        pdf.text(subtitulo, m, 14);
         pdf.setFillColor.apply(pdf, crema);
-        pdf.rect(0, 28, W, 6, 'F');
+        pdf.rect(0, 22, W, 5, 'F');
       }
       function pie(n, tot) {
         pdf.setDrawColor(210, 200, 180);
@@ -355,15 +382,24 @@
         pdf.setFont('helvetica', 'normal');
         pdf.setFontSize(8);
         pdf.setTextColor.apply(pdf, gris);
-        pdf.text('Lista tienda PSA' + (fecha ? ' · ' + fecha : '') + '  ·  Precios de lista. No incluye instalación.', m, H - 7);
+        pdf.text('Precios de lista. No incluye instalación.' + (fecha ? '  ·  ' + fecha : ''), m, H - 7);
         pdf.text(n + ' / ' + tot, W - m, H - 7, { align: 'right' });
+      }
+      function botonVideo(x, y, w, h, url) {
+        pdf.setFillColor.apply(pdf, azul);
+        pdf.roundedRect(x, y, w, h, 3, 3, 'F');
+        pdf.setTextColor(255, 255, 255);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(10);
+        pdf.text('Ver video', x + w / 2, y + h / 2 + 1.3, { align: 'center' });
+        pdf.link(x, y, w, h, { url: url });
       }
 
       encabezado('Presupuesto');
       pdf.setTextColor.apply(pdf, oscuro);
       pdf.setFont('helvetica', 'normal');
       pdf.setFontSize(11);
-      var y = 42;
+      var y = 36;
       if (para) { pdf.setFont('helvetica', 'bold'); pdf.text('Para:  ' + para, m, y); y += 7; pdf.setFont('helvetica', 'normal'); }
       pdf.setFontSize(9);
       pdf.setTextColor.apply(pdf, gris);
@@ -397,7 +433,7 @@
         }
         pdf.setFontSize(8);
         pdf.text(String(ln.q), m + 2, y + 5.5);
-        var nom = pdf.splitTextToSize(ln.p.nombre || '', 70);
+        var nom = pdf.splitTextToSize(sinMarca(ln.p.nombre) || ln.p.nombre || '', 70);
         pdf.text(nom[0] || '', m + 16, y + 5.5);
         pdf.setTextColor.apply(pdf, gris);
         pdf.text(String(ln.p.sku || ''), W - 78, y + 5.5);
@@ -417,22 +453,39 @@
       pdf.setFontSize(11);
       pdf.text('Total  ' + money(r.tot), W - 47, y + 8, { align: 'center' });
 
-      r.lineas.forEach(function (ln) {
+      r.lineas.forEach(function (ln, ix) {
         pdf.addPage();
         encabezado('Ficha de producto');
         var p = ln.p;
-        var yy = 42;
+        var yy = 36;
+        var foto = fotos[ix] || '';
+        var imgW = 48;
+        var tx = m;
+        var tw = W - 2 * m;
+        if (foto) {
+          pdf.setFillColor(255, 255, 255);
+          pdf.roundedRect(m, yy, imgW + 2, imgW + 2, 2, 2, 'F');
+          try { pdf.addImage(foto, 'JPEG', m + 1, yy + 1, imgW, imgW); } catch (e1) {
+            try { pdf.addImage(foto, 'PNG', m + 1, yy + 1, imgW, imgW); } catch (e2) {}
+          }
+          tx = m + imgW + 8;
+          tw = W - m - tx;
+        }
         pdf.setTextColor.apply(pdf, oscuro);
         pdf.setFont('helvetica', 'bold');
         pdf.setFontSize(14);
-        var tit = pdf.splitTextToSize(p.nombre || '', W - 2 * m);
-        pdf.text(tit, m, yy);
-        yy += tit.length * 6 + 3;
+        var tit = pdf.splitTextToSize(sinMarca(p.nombre) || p.nombre || '', tw);
+        pdf.text(tit, tx, yy + 8);
+        var yTit = yy + 8 + tit.length * 6;
         pdf.setFont('helvetica', 'normal');
         pdf.setFontSize(9);
         pdf.setTextColor.apply(pdf, gris);
-        pdf.text('SKU ' + (p.sku || '') + '    ·    ' + ln.q + ' × ' + money(p.precio) + '    ·    ' + money(ln.q * p.precio), m, yy);
-        yy += 8;
+        pdf.text('SKU ' + (p.sku || ''), tx, yTit + 4);
+        pdf.setTextColor.apply(pdf, oscuro);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(11);
+        pdf.text(ln.q + ' × ' + money(p.precio) + '   ·   ' + money(ln.q * p.precio), tx, yTit + 12);
+        yy = Math.max(yy + (foto ? imgW + 6 : 0), yTit + 18);
         pdf.setDrawColor(11, 88, 120);
         pdf.setLineWidth(0.4);
         pdf.line(m, yy, W - m, yy);
@@ -446,33 +499,20 @@
         pdf.setFont('helvetica', 'normal');
         pdf.setTextColor.apply(pdf, oscuro);
         pdf.setFontSize(10);
-        var cuerpo = (p.desc || p.para || 'Consultá la ficha en la tienda PSA.').replace(/\n+/g, '\n');
-        var lineasTxt = pdf.splitTextToSize(cuerpo, W - 2 * m - (p.video ? 42 : 0));
-        if (lineasTxt.length > 22) lineasTxt = lineasTxt.slice(0, 22);
+        var cuerpo = sinMarca(p.desc || p.para || 'Sin descripción cargada.').replace(/\n+/g, '\n');
+        var lineasTxt = pdf.splitTextToSize(cuerpo, W - 2 * m);
+        if (lineasTxt.length > 18) lineasTxt = lineasTxt.slice(0, 18);
         pdf.text(lineasTxt, m, yy);
-        var bloque = lineasTxt.length * 5 + 8;
+        yy += lineasTxt.length * 5 + 10;
 
         if (p.video) {
-          var qx = W - m - 36;
-          var qy = yy - 2;
           var data = qrDataUrl(p.video);
           if (data) {
-            try { pdf.addImage(data, 'GIF', qx, qy, 34, 34); } catch (e) {}
+            try { pdf.addImage(data, 'GIF', m, yy, 28, 28); } catch (e) {}
+            pdf.link(m, yy, 28, 28, { url: p.video });
           }
-          pdf.setFontSize(7);
-          pdf.setTextColor.apply(pdf, azul);
-          pdf.setFont('helvetica', 'bold');
-          pdf.text('Video', qx + 17, qy + 37, { align: 'center' });
-          pdf.setFont('helvetica', 'normal');
-          pdf.setTextColor.apply(pdf, gris);
-          var vt = pdf.splitTextToSize(p.videoTitulo || 'YouTube PSA', 36);
-          pdf.text(vt, qx + 17, qy + 41, { align: 'center' });
-        }
-        yy += Math.max(bloque, p.video ? 48 : 0) + 4;
-        if (p.url) {
-          pdf.setFontSize(8);
-          pdf.setTextColor.apply(pdf, azul);
-          pdf.textWithLink('Ver en tienda PSA', m, Math.min(yy, H - 18), { url: p.url });
+          botonVideo(m + 36, yy + 7, 46, 14, p.video);
+          yy += 32;
         }
       });
 
@@ -482,11 +522,11 @@
         pie(i, pages);
       }
 
-      var nombre = 'Presupuesto-PSA' + (para ? '-' + para.replace(/[^\wáéíóúñüÁÉÍÓÚÑ ]+/g, '').trim().replace(/\s+/g, '-') : '') + '.pdf';
+      var nombre = 'Presupuesto' + (para ? '-' + para.replace(/[^\wáéíóúñüÁÉÍÓÚÑ ]+/g, '').trim().replace(/\s+/g, '-') : '') + '.pdf';
       var blob = pdf.output('blob');
       var file = new File([blob], nombre, { type: 'application/pdf' });
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        navigator.share({ files: [file], title: 'Presupuesto PSA', text: para ? ('Presupuesto para ' + para) : 'Presupuesto PSA' }).catch(function () {
+        navigator.share({ files: [file], title: 'Presupuesto', text: para ? ('Presupuesto para ' + para) : 'Presupuesto' }).catch(function () {
           pdf.save(nombre);
         });
       } else {
@@ -496,6 +536,10 @@
       aviso('No se pudo armar el PDF.');
     }
     if (btn) { btn.disabled = false; btn.textContent = 'PDF'; }
+    }).catch(function () {
+      aviso('No se pudo armar el PDF.');
+      if (btn) { btn.disabled = false; btn.textContent = 'PDF'; }
+    });
   }
 
   function pintarTodo() {

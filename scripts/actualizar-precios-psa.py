@@ -13,6 +13,7 @@ from zoneinfo import ZoneInfo
 ROOT = Path(__file__).resolve().parents[1]
 OUT_CAT = ROOT / "psa-catalogo.json"
 OUT_PRE = ROOT / "psa-precios.json"
+IMG_DIR = ROOT / "catalogo-img"
 GQL = "https://tienda.psa.com.ar/graphql"
 UA = "APPI-precios/1.0"
 
@@ -87,6 +88,38 @@ def get(url, data=None, headers=None, timeout=40):
     req = urllib.request.Request(url, data=data, headers=h)
     with urllib.request.urlopen(req, timeout=timeout, context=CTX) as res:
         return res.read().decode("utf-8", "replace")
+
+
+def get_bytes(url, timeout=25):
+    h = {"User-Agent": UA}
+    req = urllib.request.Request(url, headers=h)
+    with urllib.request.urlopen(req, timeout=timeout, context=CTX) as res:
+        return res.read()
+
+
+def bajar_foto(sku, url):
+    from io import BytesIO
+    from PIL import Image
+
+    IMG_DIR.mkdir(exist_ok=True)
+    dest = IMG_DIR / f"{sku}.jpg"
+    rel = f"catalogo-img/{sku}.jpg"
+    if not url:
+        return rel if dest.exists() else ""
+    if url.startswith("//"):
+        url = "https:" + url
+    elif url.startswith("/"):
+        url = "https://tienda.psa.com.ar" + url
+    try:
+        raw = get_bytes(url, timeout=25)
+        im = Image.open(BytesIO(raw))
+        im = im.convert("RGB")
+        im.thumbnail((720, 720))
+        im.save(dest, "JPEG", quality=74, optimize=True)
+        return rel
+    except Exception as e:
+        print(f"  foto {sku}: {e}")
+        return rel if dest.exists() else ""
 
 
 def limp(s):
@@ -189,6 +222,7 @@ def graphql_catalogo():
           meta_description
           description { html }
           short_description { html }
+          small_image { url }
           price_range { minimum_price { final_price { value } regular_price { value } } }
           categories { name }
         }
@@ -237,6 +271,7 @@ def graphql_catalogo():
                 "desc": desc,
                 "video": vurl,
                 "videoTitulo": vtit,
+                "foto": bajar_foto(sku, ((it.get("small_image") or {}).get("url") or "").strip()),
             }
         )
     productos.sort(key=lambda p: (GRUPO_ORDEN.get(p["grupo"], 9), p["nombre"].lower()))
