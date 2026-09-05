@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v496-carrito-pago';
+const CACHE_NAME = 'appi-v497-ficha-video';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

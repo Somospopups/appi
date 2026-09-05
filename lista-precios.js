@@ -776,11 +776,11 @@
       }
       function botonVideo(x, y, w, h, url) {
         pdf.setFillColor.apply(pdf, azul);
-        pdf.roundedRect(x, y, w, h, 3, 3, 'F');
+        pdf.roundedRect(x, y, w, h, 2.2, 2.2, 'F');
         pdf.setTextColor(255, 255, 255);
         pdf.setFont('helvetica', 'bold');
-        pdf.setFontSize(10);
-        pdf.text('Ver video', x + w / 2, y + h / 2 + 1.3, { align: 'center' });
+        pdf.setFontSize(Math.max(7, Math.min(10, h - 2)));
+        pdf.text('Ver video', x + w / 2, y + h / 2 + 1.1, { align: 'center' });
         pdf.link(x, y, w, h, { url: url });
       }
 
@@ -1022,20 +1022,20 @@
       function dibujarCmp(c, yy) {
         if (!c) return yy;
         pdf.setFillColor(255, 244, 232);
-        pdf.roundedRect(m, yy, usable, 12, 1.8, 1.8, 'F');
+        pdf.roundedRect(m, yy, usable, 13, 1.8, 1.8, 'F');
         pdf.setTextColor.apply(pdf, naranja);
         pdf.setFont('helvetica', 'bold');
         pdf.setFontSize(9);
         var pay1 = c.m4 > 0 ? ('Se paga solo en ' + txtMeses(c.m4) + '.') : 'Compará el litro contra el agua envasada.';
-        pdf.text(pay1, m + 3, yy + 4.6);
+        pdf.text(pay1, m + 3, yy + 5);
         pdf.setFont('helvetica', 'normal');
         pdf.setFontSize(7);
         pdf.setTextColor.apply(pdf, oscuro);
         var pay2 = c.litroEq
           ? ('Con 4 L/día el ahorro cubre el equipo. Después el litro sale ' + money2(c.litroEq) + ' en vez de ' + money(c.litroEnv) + '.')
           : '';
-        if (pay2) pdf.text(pay2, m + 3, yy + 9.4);
-        yy += 14;
+        if (pay2) pdf.text(pay2, m + 3, yy + 10);
+        yy += 16;
         pdf.setFont('helvetica', 'bold');
         pdf.setFontSize(9);
         pdf.setTextColor.apply(pdf, azul);
@@ -1061,63 +1061,65 @@
         var yy = nuevaFicha();
         var p = ln.p;
         var foto = fotos[ix] || '';
-        var imgW = 32;
+        var imgW = 36;
         var c = cmpDe(p, ln.q);
         var keys = trataDe(p);
+        var hasVid = !!p.video;
+        var qrW = hasVid ? 24 : 0;
         var tx = m;
-        var tw = W - 2 * m;
-        if (p.video) tw -= 28;
+        var tw = usable;
         if (foto) {
           pdf.setFillColor(255, 255, 255);
-          pdf.roundedRect(m, yy, imgW + 2, imgW + 2, 1.6, 1.6, 'F');
+          pdf.roundedRect(m, yy, imgW + 2, imgW + 2, 1.8, 1.8, 'F');
           try { pdf.addImage(foto, 'JPEG', m + 1, yy + 1, imgW, imgW); } catch (e1) {
             try { pdf.addImage(foto, 'PNG', m + 1, yy + 1, imgW, imgW); } catch (e2) {}
           }
-          tx = m + imgW + 6;
-          tw = W - m - tx;
-          if (p.video) tw -= 26;
+          tx = m + imgW + 7;
+          tw = W - m - tx - (hasVid ? qrW + 8 : 0);
+        } else if (hasVid) {
+          tw = usable - qrW - 8;
         }
         pdf.setTextColor.apply(pdf, oscuro);
         pdf.setFont('helvetica', 'bold');
         pdf.setFontSize(12);
-        var tit = pdf.splitTextToSize(sinMarca(p.nombre) || p.nombre || '', tw);
+        var tit = pdf.splitTextToSize(sinMarca(p.nombre) || p.nombre || '', Math.max(40, tw));
         if (tit.length > 2) tit = tit.slice(0, 2);
-        pdf.text(tit, tx, yy + 5);
-        var yTit = yy + 5 + tit.length * 5;
+        pdf.text(tit, tx, yy + 6);
+        var yTit = yy + 6 + tit.length * 5.2;
         pdf.setFont('helvetica', 'normal');
-        pdf.setFontSize(7.5);
+        pdf.setFontSize(8);
         pdf.setTextColor.apply(pdf, gris);
-        pdf.text('SKU ' + (p.sku || ''), tx, yTit + 2.5);
+        pdf.text('SKU ' + (p.sku || ''), tx, yTit + 3);
         pdf.setTextColor.apply(pdf, oscuro);
         pdf.setFont('helvetica', 'bold');
         pdf.setFontSize(10);
-        pdf.text(ln.q + ' × ' + money(p.precio) + '   ·   ' + money(ln.q * p.precio), tx, yTit + 8.5);
+        pdf.text(ln.q + ' × ' + money(p.precio) + '   ·   ' + money(ln.q * p.precio), tx, yTit + 10);
         if (c && c.litroEq) {
           pdf.setFont('helvetica', 'normal');
           pdf.setFontSize(7.5);
           pdf.setTextColor.apply(pdf, gris);
-          pdf.text('Costo litro ' + money2(c.litroEq) + '   ·   envasada ' + money(c.litroEnv), tx, yTit + 13.5);
+          pdf.text('Costo litro ' + money2(c.litroEq) + '   ·   envasada ' + money(c.litroEnv), tx, yTit + 16);
         }
-        var yHead = Math.max(yy + (foto ? imgW + 3 : 0), yTit + (c ? 16 : 11));
-        if (p.video) {
+        if (hasVid) {
+          var qx = W - m - qrW;
           var data = qrDataUrl(p.video);
-          var qx = W - m - 22;
           if (data) {
-            try { pdf.addImage(data, 'GIF', qx, yy, 20, 20); } catch (e) {}
-            pdf.link(qx, yy, 20, 20, { url: p.video });
+            try { pdf.addImage(data, 'GIF', qx, yy, qrW, qrW); } catch (e) {}
+            pdf.link(qx, yy, qrW, qrW, { url: p.video });
           }
-          botonVideo(qx - 1, yy + 21, 22, 8, p.video);
+          botonVideo(qx - 8, yy + qrW + 2, qrW + 8, 11, p.video);
         }
-        yy = yHead;
+        var yHead = Math.max(yy + (foto ? imgW + 4 : 0), yTit + (c ? 20 : 14), hasVid ? yy + qrW + 16 : 0);
+        yy = yHead + 2;
         pdf.setDrawColor(11, 88, 120);
         pdf.setLineWidth(0.3);
         pdf.line(m, yy, W - m, yy);
-        yy += 4.5;
+        yy += 5.5;
         pdf.setTextColor.apply(pdf, azul);
         pdf.setFont('helvetica', 'bold');
         pdf.setFontSize(8);
         pdf.text('Para qué sirve', m, yy);
-        yy += 4;
+        yy += 4.5;
         pdf.setFont('helvetica', 'normal');
         pdf.setTextColor.apply(pdf, oscuro);
         pdf.setFontSize(8);
@@ -1125,52 +1127,47 @@
         var lineasTxt = pdf.splitTextToSize(cuerpo, usable);
         if (lineasTxt.length > 2) lineasTxt = lineasTxt.slice(0, 2);
         pdf.text(lineasTxt, m, yy);
-        yy += lineasTxt.length * 3.5 + 5;
+        yy += lineasTxt.length * 3.6 + 6;
         if (keys.length) {
           pdf.setFont('helvetica', 'bold');
           pdf.setFontSize(9);
           pdf.setTextColor.apply(pdf, azul);
           pdf.text('Qué trata y por qué sacarlo', m, yy);
-          yy += 4.2;
+          yy += 5;
           pdf.setFont('helvetica', 'italic');
-          pdf.setFontSize(7);
+          pdf.setFontSize(7.2);
           pdf.setTextColor.apply(pdf, oscuro);
           var intro = pdf.splitTextToSize(TRATA_INTRO, usable);
           if (intro.length > 2) intro = intro.slice(0, 2);
           pdf.text(intro, m, yy);
-          yy += intro.length * 3.1 + 3;
-          var col = keys.length >= 4;
-          var colWtrata = col ? (usable - 6) / 2 : usable;
-          var x0 = m;
+          yy += intro.length * 3.3 + 4;
+          var col = keys.length >= 3;
+          var gapC = 8;
+          var colWtrata = col ? (usable - gapC) / 2 : usable;
           var yCol = [yy, yy];
           var ci = 0;
           keys.forEach(function (k) {
             var info = TRATA[k];
             if (!info) return;
-            var x = col ? (ci % 2 === 0 ? x0 : x0 + colWtrata + 6) : x0;
+            var x = col ? (m + (ci % 2) * (colWtrata + gapC)) : m;
             var yk = col ? yCol[ci % 2] : yy;
             pdf.setFont('helvetica', 'bold');
-            pdf.setFontSize(7.5);
+            pdf.setFontSize(8);
             pdf.setTextColor.apply(pdf, azul);
             pdf.text(info.nom + '.', x, yk);
-            yk += 3.4;
+            yk += 4;
             pdf.setFont('helvetica', 'normal');
-            pdf.setFontSize(6.6);
+            pdf.setFontSize(6.8);
             pdf.setTextColor.apply(pdf, oscuro);
             var body = pdf.splitTextToSize(info.txt, colWtrata);
-            var maxB = col ? 7 : 5;
+            var maxB = col ? 6 : 4;
             if (body.length > maxB) body = body.slice(0, maxB);
             pdf.text(body, x, yk);
-            yk += body.length * 2.85 + 3.2;
-            if (col) {
-              yCol[ci % 2] = yk;
-              ci += 1;
-            } else {
-              yy = yk;
-            }
+            yk += body.length * 3.15 + 4.5;
+            if (col) { yCol[ci % 2] = yk; ci += 1; }
+            else yy = yk;
           });
-          yy = col ? Math.max(yCol[0], yCol[1]) : yy;
-          yy += 2;
+          yy = (col ? Math.max(yCol[0], yCol[1]) : yy) + 3;
         }
         if (c) yy = dibujarCmp(c, yy);
       });
