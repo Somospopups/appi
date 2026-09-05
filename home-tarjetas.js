@@ -1101,7 +1101,7 @@
       '.ht-centro{display:flex;flex-direction:column;align-items:center;gap:11px}',
       '.ht-deck{position:relative;width:100%;max-width:400px;height:min(56vh,440px);margin:0 auto}',
       '.ht-card{position:absolute;inset:0;display:flex;flex-direction:column;padding:18px 20px;border-radius:24px;background:linear-gradient(160deg,#ffffff,#f4f6ff);box-shadow:0 22px 60px rgba(10,12,40,.35);touch-action:pan-y;user-select:none;-webkit-user-select:none;cursor:grab;will-change:transform;transition:transform .32s cubic-bezier(.22,.9,.35,1),opacity .32s ease}',
-      '.ht-card.demo{animation:htVaiven 1.5s ease .55s 1}',
+      '.ht-card.demo{animation:htVaiven 1.1s ease .08s 1}',
       '@keyframes htVaiven{0%,100%{transform:none}22%{transform:translateX(34px) rotate(2.5deg)}60%{transform:translateX(-30px) rotate(-2.2deg)}}',
       '.ht-card.detras1{transform:translateY(15px) scale(.95);opacity:.75;pointer-events:none}',
       '.ht-card.detras2{transform:translateY(28px) scale(.9);opacity:.45;pointer-events:none}',
@@ -1457,21 +1457,15 @@
   function alEntrarAlHome(){
     if (!sesionDeDistribuidor() || !esHome()) return;
     css();
-    if (autoAbierto) return;      // una apertura automática por entrada al Home
+    if (autoAbierto) return;
     autoAbierto = true;
-    // La llave existe para las pruebas automatizadas y para depurar: apaga la
-    // apertura automática; el mazo se puede abrir a mano con APPIHomeTarjetas.abrir().
     if (localStorage.getItem('appi_tarjetas_auto') === '0') return;
     var intentos = 0;
     (function esperar(){
       if (!esHome() || document.getElementById('htOverlay')) return;
-      if (++intentos > 45) return;                     // ~18 s y desistimos por hoy
-      if (!appTerminoDeCargar()){ setTimeout(esperar, 400); return; }
-      // Un respiro final después de cargar, y recién ahí el mazo. Siempre hay
-      // al menos la tarjeta especial: el mazo queda a la vista todos los días.
-      setTimeout(function(){
-        if (esHome() && appTerminoDeCargar() && !document.getElementById('htOverlay')) abrir();
-      }, 500);
+      if (++intentos > 100) return;
+      if (!appTerminoDeCargar()){ setTimeout(esperar, 80); return; }
+      if (esHome() && !document.getElementById('htOverlay')) abrir();
     })();
   }
 
@@ -1483,13 +1477,12 @@
     window.showView = function(id){
       var r = orig.apply(this, arguments);
       try{
-        if (id === 'view-home'){ autoAbierto = false; setTimeout(alEntrarAlHome, 350); }
+        if (id === 'view-home'){ autoAbierto = false; alEntrarAlHome(); }
         else { autoAbierto = false; }
       }catch(e){}
       return r;
     };
-    // Si el Home ya estaba activo cuando cargó el módulo:
-    if (esHome()) setTimeout(alEntrarAlHome, 900);
+    if (esHome()) alEntrarAlHome();
     // Si el Home se repintó con el mazo abierto, se vuelve a montar donde
     // estaba, conservando la tarjeta en la que se había quedado.
     setInterval(function(){
@@ -1524,7 +1517,11 @@
     try{ if (document.getElementById('htOverlay')) pintar(); }catch(e){}
   });
 
-  if (document.readyState === 'complete') envolver();
-  else window.addEventListener('load', envolver);
-  setTimeout(envolver, 1200);
+  function intentarEnvolver(){
+    envolver();
+    if (window.__htWrapped) return;
+    setTimeout(intentarEnvolver, 80);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', intentarEnvolver);
+  else intentarEnvolver();
 })();
