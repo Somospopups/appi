@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "503.0.0",
-  "cacheName": "appi-v503-precios-auto",
+  "version": "504.0.0",
+  "cacheName": "appi-v504-planillas",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

@@ -128,6 +128,10 @@ function markRemove(key){
   if(!state.ready)return;
   if(key===AUDIO_META_KEY&&state.userId){nativeRemove.call(localStorage,audioMetaKey(state.workspaceId));return}
   if(!isDataKey(key))return;
+  if(isProtectedPlanillaKey(key)&&!window.__appiForgetPlanilla){
+    if(state.values[key]!=null)nativeSet.call(localStorage,key,state.values[key]);
+    return;
+  }
   delete state.values[key];state.changedAt[key]=Date.now();state.dirty.delete(key);state.deleted.add(key);scheduleSync();
 }
 Storage.prototype.setItem=function(key,value){nativeSet.call(this,key,value);if(this===localStorage)markSet(String(key),value)};
@@ -172,12 +176,35 @@ async function pullCloud(personType=state.personType){
   }
   return {values,changedAt,dropCloudKeys};
 }
+function isProtectedPlanillaKey(key){
+  return key==='equipoData'||key==='usuarios_garantias'||key==='lastUpdate_equipo';
+}
+function planillaValueAlive(value){
+  if(value==null)return false;
+  const s=String(value).trim();
+  return !!s && s!=='null' && s!=='{}' && s!=='[]';
+}
 function merge(local,remote,preferLocal=false){
   const values={},changedAt={},dirty=[];
   const keys=new Set([...Object.keys(local.values||{}),...Object.keys(remote.values||{})]);
   for(const key of keys){
     const localHas=Object.prototype.hasOwnProperty.call(local.values||{},key),remoteHas=Object.prototype.hasOwnProperty.call(remote.values||{},key);
     const lt=Number(local.changedAt&&local.changedAt[key])||0,rt=Number(remote.changedAt&&remote.changedAt[key])||0;
+    const localAlive=localHas&&planillaValueAlive(local.values[key]);
+    const remoteAlive=remoteHas&&planillaValueAlive(remote.values[key]);
+    if(isProtectedPlanillaKey(key)){
+      if(localAlive&&remoteAlive){
+        let useLocal=preferLocal||lt>rt;
+        if(!preferLocal&&lt===rt)useLocal=String(local.values[key]).length>=String(remote.values[key]).length;
+        if(useLocal){values[key]=local.values[key];changedAt[key]=lt||Date.now();if(local.values[key]!==remote.values[key])dirty.push(key)}
+        else {values[key]=remote.values[key];changedAt[key]=rt}
+      }else if(localAlive){
+        values[key]=local.values[key];changedAt[key]=lt||Date.now();dirty.push(key);
+      }else if(remoteAlive){
+        values[key]=remote.values[key];changedAt[key]=rt;
+      }
+      continue;
+    }
     if(isAccionesKey(key)&&localHas&&remoteHas){
       const merged=mergeAccionesValue(local.values[key],remote.values[key]);
       values[key]=merged;changedAt[key]=Math.max(lt,rt,Date.now());
@@ -244,8 +271,14 @@ async function start({claimLegacy=true}={}){
 async function syncNow(force=false){
   if(!state.ready||state.syncing||!navigator.onLine)return false;
   const userId=state.userId||window.APPIAuth.userId();if(!userId)return false;
-  const keys=[...state.dirty];
-  const deleted=[...state.deleted];
+  const keys=[...state.dirty].filter(key=>{
+    if(isProtectedPlanillaKey(key)&&!planillaValueAlive(state.values[key])){state.dirty.delete(key);return false}
+    return true;
+  });
+  const deleted=[...state.deleted].filter(key=>{
+    if(isProtectedPlanillaKey(key)&&!window.__appiForgetPlanilla){state.deleted.delete(key);return false}
+    return true;
+  });
   if(!keys.length&&!deleted.length){
     if(force){
       await pullLatest();

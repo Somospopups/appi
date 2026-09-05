@@ -104,7 +104,7 @@ window.openStock=function(){
 <script src="./whatsapp-app.js"></script>
 <script src="./auth-client.js?v=441"></script>
 <script src="./prueba-banner.js"></script>
-<script src="./data-sync.js"></script>
+<script src="./data-sync.js?v=504"></script>
 <script src="./js/membership-admin.js?v=451"></script>
 <script src="./admin-panel.js?v=452"></script>
 <link rel="stylesheet" href="./css/membership-admin.css">
@@ -4221,7 +4221,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v503 · Segura</div>
+  <div class="ds-foot">APPI · v504 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4502,7 +4502,7 @@ body.dark #pageTabs button.active{color:#c5d6ff}
       <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
 
       <div class="home-brand-row">
-        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · v503</span></span>
+        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · v504</span></span>
       </div>
 
       <div class="home-hero-card">
@@ -7465,15 +7465,18 @@ let equipoTopMode = 'personal'; // 'personal' o 'organizacion'
 function loadEquipoFromStorage(){
   try {
     const raw = localStorage.getItem('equipoData');
-    if(raw){
-      const parsed=JSON.parse(raw);validarTitularContraCuenta(parsed.titular||{});equipoData=parsed;return true;
-    }
+    if(!raw) return false;
+    const parsed=JSON.parse(raw);
+    try { validarTitularContraCuenta(parsed.titular||{}); }
+    catch (error) { console.warn('Planilla titular', error && error.message); }
+    equipoData=parsed;
+    return true;
   } catch(error){
-    equipoData=null;localStorage.removeItem('equipoData');
-    if(error&&error.message)window.APPIDialog.alert(error.message,{title:'Planilla no autorizada',icon:'🔒'});
+    console.warn('Planilla local', error);
+    return false;
   }
-  return false;
 }
+window.addEventListener('appi-datasync-applied',()=>{try{loadEquipoFromStorage()}catch(e){}});
 function saveEquipoToStorage(){
   try {
     localStorage.setItem('equipoData', JSON.stringify(equipoData));
@@ -8256,8 +8259,11 @@ if(btnEquipoDelete){
       html:'<p>Se borrarán todos los datos del equipo. Podrás volver a cargar el Excel cuando quieras.</p>',
       okText:'Eliminar', danger:true,
       onConfirm: ()=>{
-        localStorage.removeItem('equipoData');
-        localStorage.removeItem('lastUpdate_equipo');
+        window.__appiForgetPlanilla=true;
+        try{
+          localStorage.removeItem('equipoData');
+          localStorage.removeItem('lastUpdate_equipo');
+        }finally{window.__appiForgetPlanilla=false}
         equipoData = null;
         haptic(20); showToast('Equipo eliminado');
         renderEquipo();
@@ -12149,8 +12155,8 @@ async function abrirDispositivosDesdeMenu(){
 }
 async function cerrarSesionSeguraAPPI(){
   try{cerrarToolsMenu()}catch(e){}
-  if(!await window.APPIDialog.confirm('Se cerrará la sesión y se borrarán los datos locales de esta cuenta. Los datos sincronizados seguirán seguros en la nube.',{title:'Cerrar sesión',icon:'↪',okText:'Cerrar sesión'}))return;
-  try{await window.APPIDataSync.logoutAndLock({removeCache:true});location.reload()}
+  if(!await window.APPIDialog.confirm('¿Cerrar sesión en este dispositivo? Las planillas quedan en la cuenta para cualquier teléfono.',{title:'Cerrar sesión',icon:'↪',okText:'Cerrar sesión'}))return;
+  try{await window.APPIDataSync.logoutAndLock({removeCache:false});location.reload()}
   catch(error){showToast(error.message||'No se pudo cerrar la sesión',3600)}
 }
 function abrirCambioPasswordAPPI(){
@@ -12384,8 +12390,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='503';
-      const CACHE_NAME='appi-v503-precios-auto';
+      const swVersion='504';
+      const CACHE_NAME='appi-v504-planillas';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · v'+swVersion;
       const hadController=Boolean(navigator.serviceWorker.controller);

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v503-precios-auto';
+const CACHE_NAME = 'appi-v504-planillas';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
