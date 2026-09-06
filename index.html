@@ -105,7 +105,7 @@ window.openStock=function(){
 <script src="./whatsapp-app.js"></script>
 <script src="./auth-client.js?v=441"></script>
 <script src="./prueba-banner.js"></script>
-<script src="./data-sync.js?v=516"></script>
+<script src="./data-sync.js?v=524"></script>
 <script src="./js/membership-admin.js?v=451"></script>
 <script src="./admin-panel.js?v=510"></script>
 <link rel="stylesheet" href="./css/membership-admin.css">
@@ -131,6 +131,7 @@ window.openStock=function(){
   <script src="./home-tarjetas.js?v=511"></script>
   <script src="./device-bridge.js?v=523"></script>
   <script src="./anuncios.js?v=521"></script>
+  <script src="./reuniones.js?v=524"></script>
 <style id="historico-inline-css">
 /* APPI · Histórico mensual */
 .hist-view{padding-bottom:calc(24px + env(safe-area-inset-bottom));}
@@ -4243,11 +4244,12 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-demo" onclick="openDemo()"><span>🎯</span> Coach de Demo</button>
     <button class="ds-btn" data-ds="view-botella" onclick="openBotella()"><span>🍾</span> Comparativas</button>
     <button class="ds-btn" data-ds="view-lista" onclick="openLista()"><span>📋</span> Lista de precios</button>
+    <button class="ds-btn" data-ds="view-reuniones" onclick="openReuniones()"><span>🎥</span> Reuniones</button>
     <button class="ds-btn" data-ds="view-simulador" onclick="openCalculadora()"><span>🧮</span> Simulador</button>
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v523 · Segura</div>
+  <div class="ds-foot">APPI · v524 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4528,7 +4530,7 @@ body.dark #pageTabs button.active{color:#c5d6ff}
       <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
 
       <div class="home-brand-row">
-        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · v523</span></span>
+        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · v524</span></span>
       </div>
 
       <div class="home-hero-card">
@@ -4674,6 +4676,18 @@ body.dark #pageTabs button.active{color:#c5d6ff}
     </header>
     <div id="herrWrap"></div>
     <div class="home-tool-grid" id="herrGrid" style="padding:0 14px"></div>
+  </section>
+
+  <section id="view-reuniones" class="view">
+    <header class="top">
+      <button class="back-btn" id="btnBackReuniones" aria-label="Volver">‹</button>
+      <button class="help-btn" id="btnHelpReuniones" aria-label="Ayuda">?</button>
+      <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
+      <h1>Reuniones</h1>
+      <div class="script">adentro de APPI</div>
+      <p>Creá, pasá el código y entrá</p>
+    </header>
+    <div id="reuCont"></div>
   </section>
 
   <section id="view-stock" class="view">
@@ -5921,6 +5935,9 @@ const HELP = {
     • Buscá por texto arriba<br/>
     Quedan en tu cuenta.</div>
 
+    <div class="tip"><strong>🎥 REUNIONES</strong><br/>
+    Reuniones <strong>adentro de APPI</strong>. Creá una, pasá el código y entran con un toque. Reloj de inicio y fin. En la computadora se puede compartir pantalla.</div>
+
     <div class="tip"><strong>💡 CONSEJO</strong><br/>
     Usá Los 8 Pasos como guía mensual. La Escalera de Sueños releela cuando el día se ponga difícil. La Guía de Demo y Comparativas son tus mejores aliadas en las presentaciones.</div>`
   },
@@ -6266,6 +6283,8 @@ document.getElementById('btnHelpHome').addEventListener('click', ()=>showHelp('h
 document.getElementById('btnHelpMes')?.addEventListener('click', ()=>showHelp('mes'));
 document.getElementById('btnHelpNegocio')?.addEventListener('click', ()=>showHelp('negocio'));
 document.getElementById('btnHelpHerramientas')?.addEventListener('click', ()=>showHelp('herramientas'));
+document.getElementById('btnHelpReuniones')?.addEventListener('click', ()=>showHelp('herramientas'));
+document.getElementById('btnBackReuniones')?.addEventListener('click', ()=>showView('view-herramientas'));
 document.getElementById('btnHelpPresu').addEventListener('click', ()=>showHelp('presu'));
 document.getElementById('btnHelpSiete').addEventListener('click', ()=>showHelp('siete'));
 document.getElementById('btnHelpWheel').addEventListener('click', ()=>showHelp(currentRueda==='negocio'?'ruedaNegocio':currentRueda==='vida'?'vida':'wheel'));
@@ -6476,7 +6495,7 @@ function showView(id,opts){
     b.classList.toggle('active', b.dataset.view===id);
   });
   // Sidebar escritorio: marcar activo (con equivalencias de sub-vistas)
-  const dsMap = {'view-home':'view-home','view-presu':'view-presu','view-presu-hist':'view-presu','view-equipo':'view-equipo','view-historico':'view-historico','view-usuarios':'view-usuarios','view-seguimiento':'view-seguimiento','view-encuesta':'view-encuesta','view-gestion':'view-gestion','view-grabadora':'view-grabadora','view-notas':'view-notas','view-siete':'view-siete','view-siete-detail':'view-siete','view-ocho':'view-ocho','view-suenos':'view-suenos','view-demo':'view-demo','view-botella':'view-botella','view-simulador':'view-simulador','view-stock':'view-stock'};
+  const dsMap = {'view-home':'view-home','view-presu':'view-presu','view-presu-hist':'view-presu','view-equipo':'view-equipo','view-historico':'view-historico','view-usuarios':'view-usuarios','view-seguimiento':'view-seguimiento','view-encuesta':'view-encuesta','view-gestion':'view-gestion','view-grabadora':'view-grabadora','view-notas':'view-notas','view-siete':'view-siete','view-siete-detail':'view-siete','view-ocho':'view-ocho','view-suenos':'view-suenos','view-demo':'view-demo','view-botella':'view-botella','view-simulador':'view-simulador','view-stock':'view-stock','view-reuniones':'view-reuniones'};
   const dsTarget = (id==='view-wheel'||id==='view-eval') ? `rueda-${currentRueda||'vida'}` : (dsMap[id] || '');
   document.querySelectorAll('#deskSidebar .ds-btn').forEach(b=>{
     b.classList.toggle('active', b.dataset.ds===dsTarget);
@@ -11276,6 +11295,11 @@ function renderToolsList(){
       statusVal:'Lista', statusClass:'pending', progressPct:100,
       timeAgo:'Equipos y recargas', onClick:'openLista()', accent:'#0b5878', gradient:'linear-gradient(135deg,#0b5878,#3ad0a4)'
     });
+    const hReu = renderHomeQuickCard({
+      icon:'🎥', title:'Reuniones', sub:'Adentro de APPI · código para unirse',
+      statusVal:'Live', statusClass:'pending', progressPct:100,
+      timeAgo:'Pantalla y reloj', onClick:'openReuniones()', accent:'#0b5878', gradient:'linear-gradient(135deg,#0b5878,#5b8def)'
+    });
     const h5 = renderHomeQuickCard({
       icon:'🧮', title:'Simulador', sub:'Calculá tu negocio',
       statusVal:'Calc', statusClass:'pending', progressPct:100,
@@ -11306,7 +11330,7 @@ function renderToolsList(){
       timeAgo: nAgenda ? 'Listos para importar' : 'Sin teléfonos',
       onClick:'exportarAgendaTelefono()', accent:'#25d366', gradient:'linear-gradient(135deg,#25d366,#128c7e)'
     });
-    herrHost.innerHTML = h1 + h2 + h3 + h4 + hLista + h5 + hStock + h6 + h7 + hAgenda;
+    herrHost.innerHTML = h1 + h2 + h3 + h4 + hLista + hReu + h5 + hStock + h6 + h7 + hAgenda;
   }
   if(!mesHost){const toolsList=document.getElementById('toolsList');if(toolsList)toolsList.innerHTML = `
     <details class="home-section-block" data-home-sec="mes" ${openMes?'open':''}>
@@ -12642,8 +12666,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='523';
-      const CACHE_NAME='appi-v523-notif';
+      const swVersion='524';
+      const CACHE_NAME='appi-v524-reuniones';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · v'+swVersion;
       const hadController=Boolean(navigator.serviceWorker.controller);

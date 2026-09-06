@@ -10,7 +10,7 @@ const SHARED_KEYS=new Set(['equipoData','usuarios_garantias','lastUpdate_equipo'
 const audioMetaKey=workspaceId=>`appi_local_audio_meta_${workspaceId}`;
 const EXACT_KEYS=new Set([
   'equipoData','usuarios_garantias','seguimientoPersonas','cultura_crecimiento_v1','appi_keep_notas',
-  'themeDark','home_sec_mes','home_sec_neg','appi_firma_wa_v1','appi_foto_perfil_v1'
+  'themeDark','home_sec_mes','home_sec_neg','appi_firma_wa_v1','appi_foto_perfil_v1','appi_reuniones_v1'
 ]);
 // Los módulos nuevos también forman parte del espacio personal de la cuenta.
 // Mantenerlos en esta lista garantiza nube, backup y separación titular/socio.

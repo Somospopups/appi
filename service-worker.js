@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v523-notif';
+const CACHE_NAME = 'appi-v524-reuniones';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
@@ -36,6 +36,7 @@ const APP_SHELL = [
   './home-tarjetas.js',
   './device-bridge.js',
   './anuncios.js',
+  './reuniones.js',
   './css/membership-admin.css',
   './appi-tema.css',
   './historico.css',
