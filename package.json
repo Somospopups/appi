@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "539.0.0",
-  "cacheName": "appi-v539-coverflow",
+  "version": "540.0.0",
+  "cacheName": "appi-v540-coverflow",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

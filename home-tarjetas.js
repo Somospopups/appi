@@ -1172,7 +1172,7 @@
       'body.dark .ht-card.ht-ganaste h3{color:#d8f5e6}',
       'body.dark .ht-card{background:linear-gradient(160deg,#262838,#1f2130)}',
       'body.dark .ht-card h3{color:#f2f2f7}body.dark .ht-frase{color:#c9cad8}body.dark .ht-lista li{background:rgba(255,255,255,.07);color:#d4d5e2}',
-      '@media(min-width:1024px){#htOverlay.ht-cover-on{overflow:hidden;padding:12px 22px 18px}#htOverlay.ht-cover-on .ht-centro{width:100%}#htOverlay.ht-cover-on .ht-deck{max-width:none;width:100%;height:420px;perspective:1000px;perspective-origin:50% 50%;overflow:hidden;transform-style:preserve-3d}#htOverlay.ht-cover-on .ht-card{position:absolute;inset:auto;top:50%;left:50%;right:auto;bottom:auto;width:280px;height:360px;margin:0;transform:translate(-50%,-50%);transform-origin:center center;transform-style:preserve-3d;backface-visibility:hidden;-webkit-backface-visibility:hidden;cursor:pointer;box-shadow:0 16px 40px rgba(10,12,40,.25)}#htOverlay.ht-cover-on .ht-card.detras1,#htOverlay.ht-cover-on .ht-card.detras2{transform:translate(-50%,-50%);opacity:1;pointer-events:auto}#htOverlay.ht-cover-on .ht-card.demo{animation:none}#htOverlay.ht-cover-on .ht-card.ht-front{cursor:grab;box-shadow:0 24px 56px rgba(11,88,120,.3)}#htOverlay.ht-cover-on .ht-card.ht-side .ht-cta,#htOverlay.ht-cover-on .ht-card.ht-side .ht-lista{pointer-events:none}#htOverlay.ht-cover-on .ht-hint{font-size:12px;color:#686977}}'
+      '@media(min-width:1024px){#htOverlay.ht-cover-on{overflow:hidden;padding:12px 22px 18px}#htOverlay.ht-cover-on .ht-centro{width:100%}#htOverlay.ht-cover-on .ht-deck{max-width:none;width:100%;height:460px;perspective:1000px;perspective-origin:50% 50%;overflow:hidden;transform-style:preserve-3d} #htOverlay.ht-cover-on .ht-card{position:absolute;inset:auto;top:50%;left:50%;right:auto;bottom:auto;width:420px;height:400px;margin:0;padding:22px 26px;transform:translate(-50%,-50%);transform-origin:center center;transform-style:preserve-3d;backface-visibility:hidden;-webkit-backface-visibility:hidden;cursor:pointer;box-shadow:0 16px 40px rgba(10,12,40,.25)}#htOverlay.ht-cover-on .ht-card h3{font-size:24px;line-height:1.25}#htOverlay.ht-cover-on .ht-frase{font-size:18px;line-height:1.5}#htOverlay.ht-cover-on .ht-esp-frase{font-size:22px;line-height:1.4}#htOverlay.ht-cover-on .ht-chips{gap:8px}#htOverlay.ht-cover-on .ht-card.detras1,#htOverlay.ht-cover-on .ht-card.detras2{transform:translate(-50%,-50%);opacity:1;pointer-events:auto}#htOverlay.ht-cover-on .ht-card.demo{animation:none}#htOverlay.ht-cover-on .ht-card.ht-front{cursor:grab;box-shadow:0 24px 56px rgba(11,88,120,.3)}#htOverlay.ht-cover-on .ht-card.ht-side .ht-cta,#htOverlay.ht-cover-on .ht-card.ht-side .ht-lista{pointer-events:none}#htOverlay.ht-cover-on .ht-hint{font-size:12px;color:#686977}}'
     ].join('');
     document.head.appendChild(st);
   }
@@ -1264,14 +1264,14 @@
   }
   function transformCover(d, stageW){
     var c = 'translate(-50%,-50%) ';
-    var step = Math.max(108, Math.min(158, (stageW || 800) * 0.17));
-    if (d === 0) return c + 'translateX(0) translateZ(24px) rotateY(0deg) scale(1)';
+    var step = Math.max(170, Math.min(230, (stageW || 900) * 0.22));
+    if (d === 0) return c + 'translateX(0) translateZ(28px) rotateY(0deg) scale(1)';
     var dir = d < 0 ? -1 : 1;
     var a = Math.abs(d);
     var x = dir * step * a;
-    var ry = dir * (30 + Math.min(a, 3) * 8);
-    var z = -48 * a;
-    var sc = Math.max(0.7, 1 - a * 0.12);
+    var ry = dir * (26 + Math.min(a, 3) * 7);
+    var z = -56 * a;
+    var sc = a === 1 ? 0.78 : Math.max(0.62, 0.78 - (a - 1) * 0.1);
     return c + 'translateX(' + Math.round(x) + 'px) translateZ(' + z + 'px) rotateY(' + ry + 'deg) scale(' + sc + ')';
   }
   function irACover(k){
@@ -1310,8 +1310,8 @@
     }
     var cards = deck.querySelectorAll('.ht-card');
     var stageW = deck.clientWidth || 800;
-    var cardW = Math.round(Math.min(300, Math.max(240, stageW * 0.28)));
-    var cardH = Math.round(Math.min(378, Math.max(300, cardW * 1.24)));
+    var cardW = Math.round(Math.min(460, Math.max(380, stageW * 0.40)));
+    var cardH = Math.round(Math.min(420, Math.max(360, cardW * 0.92)));
     var reducir = reduceMotion();
     if (deal && reducir) deal = false;
     cards.forEach(function(el){
