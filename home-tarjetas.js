@@ -1172,7 +1172,7 @@
       'body.dark .ht-card.ht-ganaste h3{color:#d8f5e6}',
       'body.dark .ht-card{background:linear-gradient(160deg,#262838,#1f2130)}',
       'body.dark .ht-card h3{color:#f2f2f7}body.dark .ht-frase{color:#c9cad8}body.dark .ht-lista li{background:rgba(255,255,255,.07);color:#d4d5e2}',
-      '@media(min-width:1024px){#htOverlay{overflow:hidden;padding:14px 18px 18px}.ht-centro{width:100%}.ht-deck{max-width:none;width:100%;height:min(52vh,420px);perspective:1400px;perspective-origin:50% 50%;overflow:hidden;transform-style:preserve-3d}#htDeck .ht-card{inset:auto;top:50%;left:50%;right:auto;bottom:auto;width:min(340px,40%);height:min(380px,84%);margin:0;transform:translate(-50%,-50%);transform-origin:center center;transform-style:preserve-3d;cursor:pointer;box-shadow:0 18px 50px rgba(10,12,40,.28)}#htDeck .ht-card.detras1,#htDeck .ht-card.detras2{transform:translate(-50%,-50%);opacity:1;pointer-events:auto}#htDeck .ht-card.demo{animation:none}#htDeck .ht-card.ht-front{cursor:grab}#htDeck .ht-card.ht-side .ht-cta,#htDeck .ht-card.ht-side .ht-lista{pointer-events:none}.ht-hint{font-size:12px;color:#686977}}'
+      '@media(min-width:1024px){#htOverlay.ht-cover-on{overflow:hidden;padding:12px 22px 18px}#htOverlay.ht-cover-on .ht-centro{width:100%}#htOverlay.ht-cover-on .ht-deck{max-width:none;width:100%;height:420px;perspective:1000px;perspective-origin:50% 50%;overflow:hidden;transform-style:preserve-3d}#htOverlay.ht-cover-on .ht-card{position:absolute;inset:auto;top:50%;left:50%;right:auto;bottom:auto;width:280px;height:360px;margin:0;transform:translate(-50%,-50%);transform-origin:center center;transform-style:preserve-3d;backface-visibility:hidden;-webkit-backface-visibility:hidden;cursor:pointer;box-shadow:0 16px 40px rgba(10,12,40,.25)}#htOverlay.ht-cover-on .ht-card.detras1,#htOverlay.ht-cover-on .ht-card.detras2{transform:translate(-50%,-50%);opacity:1;pointer-events:auto}#htOverlay.ht-cover-on .ht-card.demo{animation:none}#htOverlay.ht-cover-on .ht-card.ht-front{cursor:grab;box-shadow:0 24px 56px rgba(11,88,120,.3)}#htOverlay.ht-cover-on .ht-card.ht-side .ht-cta,#htOverlay.ht-cover-on .ht-card.ht-side .ht-lista{pointer-events:none}#htOverlay.ht-cover-on .ht-hint{font-size:12px;color:#686977}}'
     ].join('');
     document.head.appendChild(st);
   }
@@ -1196,6 +1196,7 @@
       if (previo) previo.remove();
       var ov = document.createElement('div');
       ov.id = 'htOverlay';
+      if (esPC()) ov.classList.add('ht-cover-on');
       ov.innerHTML = '<div class="ht-top"><div><b id="htCupo">' + esc(textoMarcador()) + '</b><small class="ht-tope" id="htSubCupo">' + esc(textoSubMarcador()) + '</small></div><span id="htPos"></span></div>' +
         '<div class="ht-centro"><div class="ht-deck" id="htDeck"></div>' +
         '<div class="ht-hint" id="htHint">' + (esPC() ? 'Clic en una carta de costado para traerla al frente' : '← Deslizá para un lado o para el otro: las tarjetas dan la vuelta →') + '</div></div>';
@@ -1261,17 +1262,17 @@
     if (d < -len / 2) d += len;
     return d;
   }
-  function transformCover(d){
+  function transformCover(d, stageW){
     var c = 'translate(-50%,-50%) ';
-    if (d === 0) return c + 'translateX(0) translateZ(36px) rotateY(0deg) scale(1)';
+    var step = Math.max(108, Math.min(158, (stageW || 800) * 0.17));
+    if (d === 0) return c + 'translateX(0) translateZ(24px) rotateY(0deg) scale(1)';
     var dir = d < 0 ? -1 : 1;
     var a = Math.abs(d);
-    var x = dir * (105 + a * 88);
-    var y = a * 6;
-    var z = -90 - a * 70;
-    var ry = dir * -48;
-    var sc = Math.max(0.62, 0.92 - a * 0.1);
-    return c + 'translateX(' + x + 'px) translateY(' + y + 'px) translateZ(' + z + 'px) rotateY(' + ry + 'deg) scale(' + sc + ')';
+    var x = dir * step * a;
+    var ry = dir * (30 + Math.min(a, 3) * 8);
+    var z = -48 * a;
+    var sc = Math.max(0.7, 1 - a * 0.12);
+    return c + 'translateX(' + Math.round(x) + 'px) translateZ(' + z + 'px) rotateY(' + ry + 'deg) scale(' + sc + ')';
   }
   function irACover(k){
     if (!mazo) return;
@@ -1288,6 +1289,8 @@
     if (cupoEl) cupoEl.textContent = textoMarcador();
     var subEl = document.getElementById('htSubCupo');
     if (subEl) subEl.textContent = textoSubMarcador();
+    var ov = document.getElementById('htOverlay');
+    if (ov) ov.classList.add('ht-cover-on');
     var hint = document.getElementById('htHint');
     if (hint) hint.textContent = 'Clic en una carta de costado para traerla al frente';
     if (!deck) return;
@@ -1306,16 +1309,26 @@
       mazo.coverDOM = true;
     }
     var cards = deck.querySelectorAll('.ht-card');
+    var stageW = deck.clientWidth || 800;
+    var cardW = Math.round(Math.min(300, Math.max(240, stageW * 0.28)));
+    var cardH = Math.round(Math.min(378, Math.max(300, cardW * 1.24)));
     var reducir = reduceMotion();
     if (deal && reducir) deal = false;
     cards.forEach(function(el){
       var k = Number(el.dataset.k);
       var d = offsetCover(k, mazo.i, len);
       var abs = Math.abs(d);
+      el.style.width = cardW + 'px';
+      el.style.height = cardH + 'px';
+      el.style.top = '50%';
+      el.style.left = '50%';
+      el.style.right = 'auto';
+      el.style.bottom = 'auto';
+      el.style.margin = '0';
       el.style.zIndex = String(50 - abs);
       el.classList.toggle('ht-front', d === 0);
       el.classList.toggle('ht-side', d !== 0);
-      el.style.pointerEvents = abs > 3 ? 'none' : 'auto';
+      el.style.pointerEvents = abs > 2 ? 'none' : 'auto';
       if (!el.__coverClick){
         el.__coverClick = true;
         el.addEventListener('click', function(ev){
@@ -1329,8 +1342,8 @@
         }, true);
       }
       if (d === 0) cablearTope(el, mazo.tarjetas[k]);
-      var dest = transformCover(d);
-      var op = abs > 3 ? '0' : (d === 0 ? '1' : String(Math.max(0.52, 0.96 - abs * 0.12)));
+      var dest = transformCover(d, stageW);
+      var op = abs > 2 ? '0' : (d === 0 ? '1' : String(Math.max(0.62, 0.95 - abs * 0.14)));
       if (deal){
         el.style.transition = 'none';
         el.style.transform = 'translate(-50%,-50%) translateZ(-220px) rotateY(0deg) scale(.42)';
@@ -1349,9 +1362,9 @@
             var k = Number(el.dataset.k);
             var d = offsetCover(k, mazo.i, len);
             var abs = Math.abs(d);
-            var op = abs > 3 ? '0' : (d === 0 ? '1' : String(Math.max(0.52, 0.96 - abs * 0.12)));
+            var op = abs > 2 ? '0' : (d === 0 ? '1' : String(Math.max(0.62, 0.95 - abs * 0.14)));
             el.style.transition = 'transform .88s cubic-bezier(.16,1.14,.3,1) ' + (abs * 58) + 'ms, opacity .5s ease ' + (abs * 58) + 'ms';
-            el.style.transform = transformCover(d);
+            el.style.transform = transformCover(d, stageW);
             el.style.opacity = op;
           });
         });
@@ -1369,6 +1382,8 @@
     if (subEl) subEl.textContent = textoSubMarcador();
     if (!deck) return;
     if (esPC()){ pintarCover(!mazo.coverDeal); return; }
+    var ovOff = document.getElementById('htOverlay');
+    if (ovOff) ovOff.classList.remove('ht-cover-on');
     mazo.coverDOM = false;
     deck.removeAttribute('data-cover');
     deck.querySelectorAll('.ht-card:not(.ht-fantasma)').forEach(function(n){ n.remove(); });
