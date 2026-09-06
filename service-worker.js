@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v526-meet-nuevo';
+const CACHE_NAME = 'appi-v527-meet-web';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

@@ -27,8 +27,22 @@
     var meses = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
     return dias[d.getDay()] + ', ' + d.getDate() + ' ' + meses[d.getMonth()];
   }
+  function webMeet(url) {
+    var u;
+    try { u = new URL(url, 'https://meet.google.com/'); } catch (e) { return url; }
+    u.searchParams.set('hs', '193');
+    u.searchParams.set('pli', '1');
+    return u.href;
+  }
   function abrir(url) {
-    try { window.open(url, '_blank', 'noopener'); } catch (e) { location.href = url; }
+    var href = webMeet(url);
+    var a = document.createElement('a');
+    a.href = href;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
   }
 
   function estilos() {
@@ -77,7 +91,7 @@
     var inp = $('reuJoin');
     if (inp) inp.onkeydown = function (e) { if (e.key === 'Enter') unirse(); };
     var nv = $('reuNuevo');
-    if (nv) nv.onclick = function () { abrir('https://meet.google.com/new'); };
+    if (nv) nv.onclick = function () { abrir('https://meet.google.com/home'); };
   }
 
   function unirse() {
