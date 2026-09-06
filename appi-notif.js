@@ -29,13 +29,14 @@
   }
   function autorizado() {
     try {
-      if (!window.APPIAuth || !window.APPIAuth.isEnabled || !window.APPIAuth.isEnabled()) return true;
-      if (window.APPIAuth.isLocallyAuthorized && !window.APPIAuth.isLocallyAuthorized()) return false;
-      if (window.APPIAuth.needsPersonChoice && window.APPIAuth.needsPersonChoice()) return false;
-      var p = window.APPIAuth.currentProfile && window.APPIAuth.currentProfile();
+      if (window.APPIAuth && window.APPIAuth.needsPersonChoice && window.APPIAuth.needsPersonChoice()) return false;
+      var p = window.APPIAuth && window.APPIAuth.currentProfile && window.APPIAuth.currentProfile();
       if (p && p.rol === 'admin') return false;
     } catch (e) {}
     return true;
+  }
+  function yaListo() {
+    try { return localStorage.getItem('appi_notif_listo_v1') === '1'; } catch (e) { return false; }
   }
   function homeActivo() {
     var v = document.getElementById('view-home');
@@ -43,12 +44,12 @@
   }
   function hayOtroOverlay() {
     if (document.body.classList.contains('appi-login-abierto')) return true;
-    var an = document.getElementById('anPop');
-    if (an && an.classList.contains('open')) return true;
+    var per = document.getElementById('personChoiceOverlay');
+    if (per && !per.hidden) return true;
     var mo = document.getElementById('modalOverlay');
     if (mo && mo.classList.contains('open')) return true;
     if (document.getElementById('appiFotoEdit')) return true;
-    var dlg=document.querySelector('.appi-dialog-overlay');
+    var dlg = document.querySelector('.appi-dialog-overlay');
     if (dlg && !dlg.hidden) return true;
     return false;
   }
@@ -136,7 +137,7 @@
     var s = document.createElement('style');
     s.id = 'appiNotifCss';
     s.textContent =
-      '#appiNotifPop{position:fixed;inset:0;z-index:25000;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(20,22,38,.54);backdrop-filter:blur(10px)}' +
+      '#appiNotifPop{position:fixed;inset:0;z-index:40000;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(20,22,38,.54);backdrop-filter:blur(10px)}' +
       '#appiNotifPop[hidden]{display:none!important}' +
       '#appiNotifPop .card{width:min(100%,400px);padding:26px 22px 20px;border-radius:25px;background:#f3eee3;box-shadow:0 25px 80px rgba(30,24,12,.22);text-align:center;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}' +
       '#appiNotifPop .ico{width:58px;height:58px;margin:0 auto 10px;border-radius:18px;display:grid;place-items:center;background:#0b5878;color:#fff;font-size:26px;box-shadow:0 9px 23px rgba(11,88,120,.24)}' +
@@ -211,7 +212,7 @@
       }
       return;
     }
-    try { localStorage.setItem('appi_avisos_ok', '1'); } catch (e) {}
+    try { localStorage.setItem('appi_avisos_ok', '1'); localStorage.setItem('appi_notif_listo_v1', '1'); } catch (e) {}
     masTarde(400 * 24 * 3600 * 1000);
     try {
       if (window.APPIDeviceBridge && window.APPIDeviceBridge.activarEsteTelefono) {
@@ -236,13 +237,10 @@
   }
 
   function maybePopup() {
-    if (popAbierto) return;
-    if (!homeActivo() || !autorizado() || hayOtroOverlay()) {
-      setTimeout(maybePopup, 2000);
-      return;
-    }
-    if (permiso() === 'granted' || permiso() === 'unsupported') return;
+    if (popAbierto || yaListo()) return;
     if (enEspera()) return;
+    if (permiso() === 'unsupported') return;
+    if (!homeActivo() || !autorizado() || hayOtroOverlay()) return;
     pintarPopup();
   }
 
@@ -306,12 +304,12 @@
   function arranque() {
     hookShowView();
     aplicarQuery();
-    setTimeout(maybePopup, 1400);
     var n = 0;
     var t = setInterval(function () {
       hookShowView();
-      if (++n > 20) clearInterval(t);
-    }, 400);
+      maybePopup();
+      if (popAbierto || yaListo() || ++n > 60) clearInterval(t);
+    }, 1200);
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', arranque);
   else arranque();

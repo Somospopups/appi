@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v522-notif';
+const CACHE_NAME = 'appi-v523-notif';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
