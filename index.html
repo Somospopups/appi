@@ -131,7 +131,7 @@ window.openStock=function(){
   <script src="./home-tarjetas.js?v=511"></script>
   <script src="./device-bridge.js?v=523"></script>
   <script src="./anuncios.js?v=521"></script>
-  <script src="./reuniones.js?v=524"></script>
+  <script src="./reuniones.js?v=525"></script>
 <style id="historico-inline-css">
 /* APPI · Histórico mensual */
 .hist-view{padding-bottom:calc(24px + env(safe-area-inset-bottom));}
@@ -4249,7 +4249,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v524 · Segura</div>
+  <div class="ds-foot">APPI · v525 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4530,7 +4530,7 @@ body.dark #pageTabs button.active{color:#c5d6ff}
       <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
 
       <div class="home-brand-row">
-        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · v524</span></span>
+        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · v525</span></span>
       </div>
 
       <div class="home-hero-card">
@@ -4685,7 +4685,7 @@ body.dark #pageTabs button.active{color:#c5d6ff}
       <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
       <h1>Reuniones</h1>
       <div class="script">adentro de APPI</div>
-      <p>Creá, pasá el código y entrá</p>
+      <p>Google Meet · reloj en APPI</p>
     </header>
     <div id="reuCont"></div>
   </section>
@@ -5936,7 +5936,7 @@ const HELP = {
     Quedan en tu cuenta.</div>
 
     <div class="tip"><strong>🎥 REUNIONES</strong><br/>
-    Reuniones <strong>adentro de APPI</strong>. Creá una, pasá el código y entran con un toque. Reloj de inicio y fin. En la computadora se puede compartir pantalla.</div>
+    Reuniones con <strong>Google Meet</strong>. Creá el Meet, pegá el link en APPI y pasáselo a la gente. El reloj de inicio y fin se ve acá; el video es Meet.</div>
 
     <div class="tip"><strong>💡 CONSEJO</strong><br/>
     Usá Los 8 Pasos como guía mensual. La Escalera de Sueños releela cuando el día se ponga difícil. La Guía de Demo y Comparativas son tus mejores aliadas en las presentaciones.</div>`
@@ -11296,9 +11296,9 @@ function renderToolsList(){
       timeAgo:'Equipos y recargas', onClick:'openLista()', accent:'#0b5878', gradient:'linear-gradient(135deg,#0b5878,#3ad0a4)'
     });
     const hReu = renderHomeQuickCard({
-      icon:'🎥', title:'Reuniones', sub:'Adentro de APPI · código para unirse',
+      icon:'🎥', title:'Reuniones', sub:'Google Meet · pasá el link',
       statusVal:'Live', statusClass:'pending', progressPct:100,
-      timeAgo:'Pantalla y reloj', onClick:'openReuniones()', accent:'#0b5878', gradient:'linear-gradient(135deg,#0b5878,#5b8def)'
+      timeAgo:'Link y reloj', onClick:'openReuniones()', accent:'#0b5878', gradient:'linear-gradient(135deg,#0b5878,#5b8def)'
     });
     const h5 = renderHomeQuickCard({
       icon:'🧮', title:'Simulador', sub:'Calculá tu negocio',
@@ -12666,8 +12666,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='524';
-      const CACHE_NAME='appi-v524-reuniones';
+      const swVersion='525';
+      const CACHE_NAME='appi-v525-meet';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · v'+swVersion;
       const hadController=Boolean(navigator.serviceWorker.controller);
