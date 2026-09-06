@@ -3285,32 +3285,31 @@ body.dark .admin-login-card{background:#242638}body.dark .admin-login-card h2{co
 .pc-fx span:nth-child(3){width:180px;height:180px;background:#f3eee3;top:38%;left:42%;opacity:.22;animation-delay:-5.2s}
 @keyframes pcBlob{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(28px,-22px) scale(1.18)}}
 .person-choice-card{position:relative;z-index:1;width:min(100%,640px);padding:0;background:transparent;box-shadow:none;text-align:center;overflow:visible}
-.pc-title{margin:0 0 22px;color:#fff;font-size:26px;font-weight:950;letter-spacing:.2px;text-shadow:0 10px 30px rgba(0,0,0,.35);animation:pcTitle .8s cubic-bezier(.16,1.2,.3,1) both}
-.pc-title b{display:block;margin-top:6px;font-size:13px;font-weight:650;letter-spacing:.8px;text-transform:uppercase;opacity:.78}
+.pc-title{display:inline-block;margin:0 0 22px;padding:10px 22px;border-radius:999px;background:#f3eee3;color:#2a2a32;font-size:26px;font-weight:950;letter-spacing:.2px;animation:pcTitle .8s cubic-bezier(.16,1.2,.3,1) both}
 @keyframes pcTitle{from{opacity:0;transform:translateY(-18px);letter-spacing:10px;filter:blur(10px)}to{opacity:1;transform:none;filter:none}}
 .person-choice-list{display:grid;grid-template-columns:1fr 1fr;gap:16px;perspective:1100px}
 .person-choice-list:has(:only-child){grid-template-columns:minmax(0,280px);justify-content:center}
 #personChoiceOverlay.pc-in{animation:pcOverlayIn .5s ease both}
 @keyframes pcOverlayIn{from{opacity:0}to{opacity:1}}
-.person-choice-option{position:relative;overflow:visible;width:100%;min-height:260px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:32px 20px 28px;border:3px solid transparent;border-radius:24px;background:#fff;color:#1c1c1e;text-align:center;font:inherit;cursor:pointer;box-shadow:0 22px 60px rgba(4,31,55,.22);transform-origin:center;transform-style:preserve-3d;animation:pcCardIn .75s cubic-bezier(.16,1.25,.32,1) both;transition:transform .62s cubic-bezier(.16,1.15,.3,1),opacity .5s ease,box-shadow .5s ease,border-color .4s ease,filter .5s ease}
+.person-choice-option{position:relative;overflow:visible;appearance:none;-webkit-appearance:none;width:100%;min-height:260px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:32px 20px 28px;border:0;outline:0;-webkit-tap-highlight-color:transparent;border-radius:24px;background:#fff;color:#1c1c1e;text-align:center;font:inherit;cursor:pointer;box-shadow:0 22px 60px rgba(4,31,55,.22);transform-origin:center;transform-style:preserve-3d;animation:pcCardIn .75s cubic-bezier(.16,1.25,.32,1) both;transition:transform .62s cubic-bezier(.16,1.15,.3,1),opacity .5s ease,box-shadow .5s ease,border-color .4s ease,filter .5s ease}
 .person-choice-option:nth-child(2){animation-delay:.16s}
 .person-choice-option::before{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(115deg,transparent 28%,rgba(255,255,255,.7) 48%,transparent 64%);transform:translateX(-140%);animation:pcShine 1.15s ease .4s both;pointer-events:none;z-index:2}
 .person-choice-option:nth-child(2)::before{animation-delay:.56s}
 @keyframes pcShine{to{transform:translateX(140%)}}
 .person-choice-option:hover{transform:translateY(-6px) scale(1.03) rotateX(2deg)}
 .person-choice-option:active{transform:scale(.97)}
+.person-choice-option:focus,.person-choice-option:focus-visible{outline:0;box-shadow:0 22px 60px rgba(4,31,55,.22)}
 .pc-hero{position:relative;width:120px;height:120px;display:grid;place-items:center}
 .pc-orbit,.pc-orbit-b{position:absolute;inset:4px;border-radius:50%;border:1.6px dashed rgba(11,88,120,.32);animation:pcSpin 7.5s linear infinite;pointer-events:none}
 .pc-orbit-b{inset:-8px;border-style:solid;border-color:transparent rgba(39,181,196,.45) transparent rgba(11,88,120,.28);animation-duration:5.2s;animation-direction:reverse}
 @keyframes pcSpin{to{transform:rotate(360deg)}}
 .person-choice-avatar{position:relative;z-index:1;width:92px;height:92px;border-radius:50%;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,#27b5c4,#3d63c9);font-size:42px;box-shadow:0 10px 24px rgba(11,88,120,.22);transition:transform .45s cubic-bezier(.2,1.3,.3,1)}
 .person-choice-option[data-person-type="socio"] .person-choice-avatar{background:linear-gradient(135deg,#7ee0c8,#27b5c4)}
-.person-choice-option[data-person-type="socio"] .pc-orbit{border-color:rgba(39,181,196,.4)}
 .pc-meta{position:relative;z-index:1}
 .person-choice-option strong{display:block;font-size:17px;font-weight:800;line-height:1.25;letter-spacing:-.2px}
 .person-choice-option small{display:block;margin-top:2px;color:#8a8a94;font-size:13px;font-weight:500}
 .person-choice-arrow{display:none}
-.person-choice-option.is-picked{z-index:3;transform:translateY(-12px) scale(1.12);border-color:#0b5878;box-shadow:0 32px 80px rgba(11,88,120,.42),0 0 0 8px rgba(11,88,120,.16)}
+.person-choice-option.is-picked{z-index:3;transform:translateY(-12px) scale(1.12);box-shadow:0 32px 80px rgba(11,88,120,.42),0 0 0 6px rgba(11,88,120,.18)}
 .person-choice-option.is-picked .person-choice-avatar{transform:scale(1.1);animation:pcAvatarPop .6s cubic-bezier(.2,1.45,.3,1)}
 .person-choice-option.is-picked .pc-orbit,.person-choice-option.is-picked .pc-orbit-b{animation-duration:.7s;border-color:#0b5878}
 .person-choice-option.is-picked .pc-hero::after{content:"";position:absolute;inset:-6px;border-radius:50%;border:2px solid #0b5878;animation:pcRipple .95s ease-out forwards;pointer-events:none}
@@ -4291,7 +4290,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v532 · Segura</div>
+  <div class="ds-foot">APPI · v533 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4557,7 +4556,7 @@ body.dark #pageTabs button.active{color:#c5d6ff}
 <div class="admin-login-overlay" id="personChoiceOverlay" hidden>
   <div class="pc-fx" aria-hidden="true"><span></span><span></span><span></span></div>
   <div class="person-choice-card" role="dialog" aria-modal="true" aria-label="Elegí tu nombre">
-    <p class="pc-title">¿Quién ingresa?<b>Titular o socio</b></p>
+    <p class="pc-title">¿Quién ingresa?</p>
     <div class="person-choice-list" id="personChoiceList"></div>
   </div>
 </div>
@@ -4574,7 +4573,7 @@ body.dark #pageTabs button.active{color:#c5d6ff}
       <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
 
       <div class="home-brand-row">
-        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · v532</span></span>
+        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · v533</span></span>
       </div>
 
       <div class="home-hero-card">
@@ -12739,8 +12738,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='532';
-      const CACHE_NAME='appi-v532-persona-mg';
+      const swVersion='533';
+      const CACHE_NAME='appi-v533-persona';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · v'+swVersion;
       const hadController=Boolean(navigator.serviceWorker.controller);

@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "532.0.0",
-  "cacheName": "appi-v532-persona-mg",
+  "version": "533.0.0",
+  "cacheName": "appi-v533-persona",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {
