@@ -205,6 +205,38 @@ Deno.serve(async request => {
       return json({ device: safeDevice(data) });
     }
 
+    if (action === 'activar_telefono') {
+      if (!personAllowed) return json({ error: 'La persona seleccionada no pertenece a esta cuenta.' }, 400);
+      const deviceKey = String(body?.device_key || '');
+      const push = pushParts(body?.subscription);
+      if (!validUuid(deviceKey) || !push) return json({ error: 'No se pudo activar este teléfono.' }, 400);
+      await admin.from('appi_dispositivos_vinculados').update({
+        push_endpoint: null, push_p256dh: null, push_auth: null, notificaciones: false
+      }).eq('push_endpoint', push.endpoint);
+      await admin.from('appi_dispositivos_vinculados').update({
+        activo: false, notificaciones: false, push_endpoint: null, push_p256dh: null, push_auth: null
+      }).eq('user_id', userId).eq('persona_tipo', requestedPerson).eq('activo', true).neq('device_key', deviceKey);
+      const row = {
+        user_id: userId,
+        device_key: deviceKey,
+        persona_tipo: requestedPerson,
+        nombre: cleanText(body?.nombre, 80) || 'Mi teléfono',
+        plataforma: platform(body?.plataforma),
+        user_agent: cleanText(body?.user_agent, 500),
+        push_endpoint: push.endpoint,
+        push_p256dh: push.p256dh,
+        push_auth: push.auth,
+        notificaciones: true,
+        activo: true,
+        last_seen: new Date().toISOString(),
+      };
+      const { data: device, error: deviceError } = await admin.from('appi_dispositivos_vinculados')
+        .upsert(row, { onConflict: 'user_id,device_key' })
+        .select('*').single();
+      if (deviceError) throw deviceError;
+      return json({ device: safeDevice(device), notifications_enabled: true });
+    }
+
     if (action === 'remove_device') {
       const deviceId = String(body?.device_id || '');
       if (!validUuid(deviceId) || !personAllowed) return json({ error: 'Dispositivo inválido.' }, 400);

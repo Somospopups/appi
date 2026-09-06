@@ -96,6 +96,22 @@ async function enablePush(){
   const cfg=await callBridge({action:'config'});if(!cfg.push_ready||!cfg.public_key)throw new Error('Las notificaciones del servidor todavía no están listas.');
   const registration=await navigator.serviceWorker.ready;let subscription=await registration.pushManager.getSubscription();if(!subscription)subscription=await registration.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:applicationServerKey(cfg.public_key)});return subscriptionJSON(subscription)
 }
+async function activarEsteTelefono(){
+  const subscription=await enablePush();
+  const result=await callBridge({
+    action:'activar_telefono',
+    device_key:deviceKey(),
+    persona_tipo:activePersonType(),
+    nombre:defaultDeviceName(),
+    plataforma:platform(),
+    user_agent:navigator.userAgent,
+    subscription
+  });
+  if(result&&result.device){
+    state.devices=[result.device,...state.devices.filter(device=>device.id!==result.device.id&&(device.persona_tipo||'titular')!==activePersonType())];
+  }
+  return result;
+}
 async function loadDevices(){
   if(!authorized())return[];
   state.loading=true;state.lastError='';
@@ -254,6 +270,6 @@ function handleServiceWorkerMessage(event){const data=event&&event.data||{},comm
 function handlePendingLinks(){if(!authorized()||!personReady())return;const params=new URLSearchParams(location.search),pair=params.get('pair'),command=params.get('bridge_call');if(pair&&validUuid(pair))claimPairing({token:pair});else if(command&&validUuid(command))showCommand(command)}
 function validUuid(value){return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(value||''))}
 function init(){if(state.initialized)return;state.initialized=true;installStyles();ensureOverlay();installUniversalCallHandler();deviceKey();if('serviceWorker'in navigator)navigator.serviceWorker.addEventListener('message',handleServiceWorkerMessage);window.addEventListener('appi-auth-change',()=>setTimeout(()=>{if(authorized()&&personReady()){loadDevices();handlePendingLinks()}},180));window.addEventListener('appi-person-change',()=>setTimeout(()=>{if(authorized()){loadDevices().then(decorateCallButtons);handlePendingLinks()}},80));if(authorized()&&personReady()){setTimeout(loadDevices,1500);setTimeout(handlePendingLinks,500)}setInterval(()=>{if(authorized()&&personReady()&&isPhone())callBridge({action:'ping',device_key:deviceKey()}).catch(()=>{})},120000)}
-window.APPIDeviceBridge={openManager,unlinkFromMenu,loadDevices,devicesForActivePerson,shouldBridge,handleCall,callPhone,decorateCallButtons,isPhone,claimByCode,deviceKey,handleServiceWorkerMessage,state};
+window.APPIDeviceBridge={openManager,unlinkFromMenu,loadDevices,devicesForActivePerson,shouldBridge,handleCall,callPhone,decorateCallButtons,isPhone,claimByCode,deviceKey,activarEsteTelefono,handleServiceWorkerMessage,state};
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
