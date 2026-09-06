@@ -3280,14 +3280,27 @@ body.dark .admin-login-card{background:#242638}body.dark .admin-login-card h2{co
 .person-choice-card{width:min(100%,640px);padding:0;background:transparent;box-shadow:none;text-align:center}
 .person-choice-list{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .person-choice-list:has(:only-child){grid-template-columns:minmax(0,280px);justify-content:center}
-.person-choice-option{width:100%;min-height:260px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:32px 20px 28px;border:0;border-radius:24px;background:#fff;color:#1c1c1e;text-align:center;font:inherit;cursor:pointer;box-shadow:0 22px 60px rgba(4,31,55,.22);transition:transform .15s ease}
-.person-choice-option:hover{transform:translateY(-3px)}
-.person-choice-avatar{width:92px;height:92px;border-radius:50%;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,#27b5c4,#3d63c9);font-size:42px;box-shadow:0 10px 24px rgba(11,88,120,.22)}
+#personChoiceOverlay.pc-in{animation:pcOverlayIn .42s ease both}
+@keyframes pcOverlayIn{from{opacity:0}to{opacity:1}}
+.person-choice-option{position:relative;width:100%;min-height:260px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:32px 20px 28px;border:3px solid transparent;border-radius:24px;background:#fff;color:#1c1c1e;text-align:center;font:inherit;cursor:pointer;box-shadow:0 22px 60px rgba(4,31,55,.22);transform-origin:center;animation:pcCardIn .58s cubic-bezier(.2,1.15,.32,1) both;transition:transform .38s cubic-bezier(.2,1.1,.3,1),opacity .38s ease,box-shadow .38s ease,border-color .38s ease,filter .38s ease}
+.person-choice-option:nth-child(2){animation-delay:.12s}
+.person-choice-option:hover{transform:translateY(-4px) scale(1.02)}
+.person-choice-option:active{transform:scale(.97)}
+.person-choice-avatar{width:92px;height:92px;border-radius:50%;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,#27b5c4,#3d63c9);font-size:42px;box-shadow:0 10px 24px rgba(11,88,120,.22);transition:transform .38s cubic-bezier(.2,1.2,.3,1)}
 .person-choice-option[data-person-type="socio"] .person-choice-avatar{background:linear-gradient(135deg,#7ee0c8,#27b5c4)}
 .person-choice-option strong{display:block;font-size:17px;font-weight:800;line-height:1.25;letter-spacing:-.2px}
 .person-choice-option small{display:block;margin-top:2px;color:#8a8a94;font-size:13px;font-weight:500}
 .person-choice-arrow{display:none}
-@media(max-width:520px){.person-choice-list{gap:10px}.person-choice-option{min-height:210px;padding:22px 12px 20px}.person-choice-avatar{width:72px;height:72px;font-size:34px}.person-choice-option strong{font-size:14px}}
+.person-choice-option.is-picked{z-index:2;transform:translateY(-8px) scale(1.07);border-color:#0b5878;box-shadow:0 28px 70px rgba(11,88,120,.38),0 0 0 6px rgba(11,88,120,.14)}
+.person-choice-option.is-picked .person-choice-avatar{transform:scale(1.12);animation:pcAvatarPop .55s cubic-bezier(.2,1.4,.3,1)}
+.person-choice-option.is-picked::after{content:"✓";position:absolute;top:12px;right:12px;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:#0b5878;color:#fff;font-size:18px;font-weight:950;box-shadow:0 8px 18px rgba(11,88,120,.35);animation:pcOkIn .42s cubic-bezier(.2,1.5,.3,1) both}
+.person-choice-option.is-dimmed{opacity:.32;transform:scale(.9);filter:grayscale(.45);pointer-events:none}
+.person-choice-list.is-choosing .person-choice-option{animation:none;cursor:default}
+@keyframes pcCardIn{from{opacity:0;transform:translateY(28px) scale(.86)}to{opacity:1;transform:none}}
+@keyframes pcAvatarPop{0%{transform:scale(1)}40%{transform:scale(1.22)}100%{transform:scale(1.12)}}
+@keyframes pcOkIn{from{opacity:0;transform:scale(.2) rotate(-40deg)}to{opacity:1;transform:none}}
+@media(max-width:520px){.person-choice-list{gap:10px}.person-choice-option{min-height:210px;padding:22px 12px 20px}.person-choice-avatar{width:72px;height:72px;font-size:34px}.person-choice-option strong{font-size:14px}.person-choice-option.is-picked::after{width:28px;height:28px;font-size:15px;top:8px;right:8px}}
+@media(prefers-reduced-motion:reduce){#personChoiceOverlay.pc-in,.person-choice-option,.person-choice-option.is-picked .person-choice-avatar,.person-choice-option.is-picked::after{animation:none!important;transition:none!important}}
 @media(max-width:480px){.lock-card{padding:27px 18px}.admin-login-lock{top:12px;right:12px}#distributorLoginPanel .lock-title{font-size:23px}}
 </style> 
 
@@ -4249,7 +4262,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v530 · Segura</div>
+  <div class="ds-foot">APPI · v531 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4530,7 +4543,7 @@ body.dark #pageTabs button.active{color:#c5d6ff}
       <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
 
       <div class="home-brand-row">
-        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · v530</span></span>
+        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · v531</span></span>
       </div>
 
       <div class="home-hero-card">
@@ -12034,14 +12047,26 @@ async function asegurarPersonaActiva(){
   marcarInicioCubierto(true);
   bloquearScrollCuerpo();
   list.innerHTML=ordered.map(person=>`<button type="button" class="person-choice-option" data-person-type="${person.tipo}"><span class="person-choice-avatar">${person.tipo==='titular'?'👤':'🤝'}</span><span><strong>${escapeXml(person.nombre)}</strong><small>${person.tipo==='titular'?'Titular':'Socio/a'}${person.tipo===requestedPerson?' · Teléfono a vincular':''}</small></span><span class="person-choice-arrow">›</span></button>`).join('');
+  overlay.classList.remove('is-choosing','pc-in');
+  list.classList.remove('is-choosing');
   overlay.hidden=false;
+  requestAnimationFrame(()=>overlay.classList.add('pc-in'));
   return new Promise(resolve=>{
     list.querySelectorAll('[data-person-type]').forEach(button=>button.onclick=()=>{
-      const selected=window.APPIAuth.selectPerson(button.dataset.personType);
-      list.querySelectorAll('button').forEach(item=>{item.disabled=true;item.setAttribute('aria-busy','true')});
+      if(list.classList.contains('is-choosing'))return;
+      list.classList.add('is-choosing');
+      overlay.classList.add('is-choosing');
+      list.querySelectorAll('[data-person-type]').forEach(item=>{
+        item.disabled=true;
+        item.setAttribute('aria-busy','true');
+        item.classList.toggle('is-picked',item===button);
+        item.classList.toggle('is-dimmed',item!==button);
+      });
       overlay.setAttribute('aria-busy','true');
       marcarInicioCubierto(true);
-      resolve(selected);
+      const selected=window.APPIAuth.selectPerson(button.dataset.personType);
+      const reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      setTimeout(()=>resolve(selected),reduce?80:780);
     });
     setTimeout(()=>list.querySelector('[data-person-type]')?.focus(),50);
   });
@@ -12666,8 +12691,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='530';
-      const CACHE_NAME='appi-v530-meet-app';
+      const swVersion='531';
+      const CACHE_NAME='appi-v531-persona';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · v'+swVersion;
       const hadController=Boolean(navigator.serviceWorker.controller);
