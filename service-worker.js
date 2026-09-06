@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v541-flechas';
+const CACHE_NAME = 'appi-v542-cover';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
