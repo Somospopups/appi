@@ -44,16 +44,12 @@
     if (/OPR|Opera/i.test(ua)) return 'com.opera.browser';
     return 'com.android.chrome';
   }
+  function esCelular() {
+    return /Android|iPhone|iPod/i.test(navigator.userAgent || '') ||
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  }
   function abrir(url) {
     var href = webMeet(url);
-    var ua = navigator.userAgent || '';
-    if (/Android/i.test(ua)) {
-      var intent = 'intent://' + href.replace(/^https:\/\//i, '') +
-        '#Intent;scheme=https;package=' + paqueteNavegador() +
-        ';S.browser_fallback_url=' + encodeURIComponent(href) + ';end';
-      location.href = intent;
-      return;
-    }
     var a = document.createElement('a');
     a.href = href;
     a.target = '_blank';
@@ -61,6 +57,16 @@
     document.body.appendChild(a);
     a.click();
     a.remove();
+  }
+  function nuevoMeet() {
+    if (esCelular()) {
+      if (window.APPIDialog) window.APPIDialog.alert(
+        'En el celular Google no deja crear un Meet en el navegador: te manda a instalar la app, y eso no lo podemos saltear.\n\nCreá la reunión en la computadora (ahí sí es en el navegador) y en el teléfono usá Unirse con el código.\n\nSi querés crearla desde el celular, Google pide la app de Meet.',
+        { title: 'Reuniones', icon: '🎥' }
+      );
+      return;
+    }
+    abrir('https://meet.google.com/new');
   }
 
   function estilos() {
@@ -109,7 +115,7 @@
     var inp = $('reuJoin');
     if (inp) inp.onkeydown = function (e) { if (e.key === 'Enter') unirse(); };
     var nv = $('reuNuevo');
-    if (nv) nv.onclick = function () { abrir('https://meet.google.com/new'); };
+    if (nv) nv.onclick = nuevoMeet;
   }
 
   function unirse() {
