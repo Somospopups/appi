@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v519-foto-hero';
+const CACHE_NAME = 'appi-v520-notif';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
@@ -8,6 +8,7 @@ const APP_SHELL = [
   './revisar-contactos.html',
   './auth-config.js',
   './appi-dialog.js',
+  './appi-notif.js',
   './telefono.js',
   './whatsapp-app.js',
   './auth-client.js',
@@ -140,6 +141,9 @@ function notificationTag(data) {
   if (data.command_id) return 'appi-command-' + data.command_id;
   if (data.type === 'daily_summary') return 'appi-daily-summary';
   if (data.type === 'presentation_reminder') return 'appi-presentation-' + (data.contacto_id || 'proxima');
+  if (data.type === 'anuncio') return 'appi-anuncio-' + (data.id || 'aviso');
+  if (data.type === 'accion') return 'appi-actions';
+  if (data.tag) return data.tag;
   return 'appi-device-command';
 }
 
@@ -147,6 +151,8 @@ function notificationLabel(type) {
   if (type === 'call_request') return 'Abrir llamada';
   if (type === 'daily_summary') return 'Ver Mi Gestión';
   if (type === 'presentation_reminder') return 'Ver contacto';
+  if (type === 'anuncio') return 'Ver aviso';
+  if (type === 'accion') return 'Ver acciones';
   return 'Abrir APPI';
 }
 
@@ -159,10 +165,12 @@ self.addEventListener('push', event => {
   // bandeja sin bloquear la pantalla.
   const urgent = type === 'call_request';
   const title = data.title || 'APPI';
+  const iconAbs = new URL('./icon-192.png', self.registration.scope).href;
+  const badgeAbs = new URL('./notification-badge.png', self.registration.scope).href;
   const options = {
     body: data.body || 'Tenés una nueva solicitud.',
-    icon: './icon-192.png',
-    badge: './notification-badge.png',
+    icon: iconAbs,
+    badge: badgeAbs,
     tag: notificationTag(data),
     renotify: true,
     requireInteraction: urgent,

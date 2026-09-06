@@ -422,7 +422,30 @@
     }
     ACTUAL = an;
     pintarBell();
-    if (an && an.id !== vistoId()) mostrar(an);
+    if (an && an.id !== vistoId()) {
+      mostrar(an);
+      notificarPanel(an);
+    }
+  }
+  function notificarPanel(an){
+    if (!an || !window.APPINotif || !window.APPINotif.mostrar) return;
+    var k = 'appi_anuncio_panel_' + uid();
+    try {
+      if (localStorage.getItem(k) === String(an.id)) return;
+      localStorage.setItem(k, String(an.id));
+    } catch (e) {}
+    var cuerpo = String(an.texto || '').replace(/\s+/g, ' ').trim();
+    if (an.eventos && an.eventos[0] && an.eventos[0].titulo) {
+      cuerpo = an.eventos[0].titulo + (cuerpo ? ' · ' + cuerpo : '');
+    }
+    window.APPINotif.mostrar({
+      title: 'APPI',
+      body: cuerpo || 'Tenés un aviso nuevo.',
+      tag: 'appi-anuncio-' + an.id,
+      type: 'anuncio',
+      url: './?aviso=1',
+      actionTitle: 'Ver aviso'
+    });
   }
 
   function iniciar(){

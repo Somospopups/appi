@@ -92,8 +92,8 @@ test('el resumen diario y la presentación generan notificaciones propias', asyn
 
   // Todos conservan la identidad visual de APPI.
   for (const item of shown) {
-    expect(item.options.icon).toBe('./icon-192.png');
-    expect(item.options.badge).toBe('./notification-badge.png');
+    expect(item.options.icon).toBe('https://somospopups.github.io/appi/icon-192.png');
+    expect(item.options.badge).toBe('https://somospopups.github.io/appi/notification-badge.png');
   }
 
   expect(shown[0].options.actions[0].title).toBe('Ver Mi Gestión');
