@@ -1172,7 +1172,8 @@
       'body.dark .ht-card.ht-ganaste h3{color:#d8f5e6}',
       'body.dark .ht-card{background:linear-gradient(160deg,#262838,#1f2130)}',
       'body.dark .ht-card h3{color:#f2f2f7}body.dark .ht-frase{color:#c9cad8}body.dark .ht-lista li{background:rgba(255,255,255,.07);color:#d4d5e2}',
-      '@media(min-width:1024px){#htOverlay.ht-cover-on{overflow:hidden;padding:12px 22px 18px}#htOverlay.ht-cover-on .ht-centro{width:100%}#htOverlay.ht-cover-on .ht-deck{max-width:none;width:100%;height:460px;perspective:1000px;perspective-origin:50% 50%;overflow:hidden;transform-style:preserve-3d} #htOverlay.ht-cover-on .ht-card{position:absolute;inset:auto;top:50%;left:50%;right:auto;bottom:auto;width:420px;height:400px;margin:0;padding:22px 26px;transform:translate(-50%,-50%);transform-origin:center center;transform-style:preserve-3d;backface-visibility:hidden;-webkit-backface-visibility:hidden;cursor:pointer;box-shadow:0 16px 40px rgba(10,12,40,.25)}#htOverlay.ht-cover-on .ht-card h3{font-size:24px;line-height:1.25}#htOverlay.ht-cover-on .ht-frase{font-size:18px;line-height:1.5}#htOverlay.ht-cover-on .ht-esp-frase{font-size:22px;line-height:1.4}#htOverlay.ht-cover-on .ht-chips{gap:8px}#htOverlay.ht-cover-on .ht-card.detras1,#htOverlay.ht-cover-on .ht-card.detras2{transform:translate(-50%,-50%);opacity:1;pointer-events:auto}#htOverlay.ht-cover-on .ht-card.demo{animation:none}#htOverlay.ht-cover-on .ht-card.ht-front{cursor:grab;box-shadow:0 24px 56px rgba(11,88,120,.3)}#htOverlay.ht-cover-on .ht-card.ht-side .ht-cta,#htOverlay.ht-cover-on .ht-card.ht-side .ht-lista{pointer-events:none}#htOverlay.ht-cover-on .ht-hint{font-size:12px;color:#686977}}'
+      '.ht-arrow{display:none}',
+      '@media(min-width:1024px){#htOverlay.ht-cover-on{overflow:hidden;padding:12px 56px 18px}#htOverlay.ht-cover-on .ht-centro{position:relative;width:100%}#htOverlay.ht-cover-on .ht-arrow{display:grid;place-items:center;position:absolute;top:50%;z-index:70;width:48px;height:48px;margin-top:-24px;border:0;border-radius:50%;background:#0b5878;color:#fff;font-size:30px;font-weight:900;line-height:1;cursor:pointer;box-shadow:0 10px 24px rgba(11,88,120,.3)}#htOverlay.ht-cover-on .ht-arrow:hover{transform:scale(1.08);background:#09485f}#htOverlay.ht-cover-on .ht-arrow-prev{left:4px}#htOverlay.ht-cover-on .ht-arrow-next{right:4px}#htOverlay.ht-cover-on .ht-deck{max-width:none;width:100%;height:460px;perspective:1000px;perspective-origin:50% 50%;overflow:hidden;transform-style:preserve-3d} #htOverlay.ht-cover-on .ht-card{position:absolute;inset:auto;top:50%;left:50%;right:auto;bottom:auto;width:420px;height:400px;margin:0;padding:22px 26px;transform:translate(-50%,-50%);transform-origin:center center;transform-style:preserve-3d;backface-visibility:hidden;-webkit-backface-visibility:hidden;cursor:pointer;box-shadow:0 16px 40px rgba(10,12,40,.25)}#htOverlay.ht-cover-on .ht-card h3{font-size:24px;line-height:1.25}#htOverlay.ht-cover-on .ht-frase{font-size:18px;line-height:1.5}#htOverlay.ht-cover-on .ht-esp-frase{font-size:22px;line-height:1.4}#htOverlay.ht-cover-on .ht-chips{gap:8px}#htOverlay.ht-cover-on .ht-card.detras1,#htOverlay.ht-cover-on .ht-card.detras2{transform:translate(-50%,-50%);opacity:1;pointer-events:auto}#htOverlay.ht-cover-on .ht-card.demo{animation:none}#htOverlay.ht-cover-on .ht-card.ht-front{cursor:grab;box-shadow:0 24px 56px rgba(11,88,120,.3)}#htOverlay.ht-cover-on .ht-card.ht-side .ht-cta,#htOverlay.ht-cover-on .ht-card.ht-side .ht-lista{pointer-events:none}#htOverlay.ht-cover-on .ht-hint{font-size:12px;color:#686977}}'
     ].join('');
     document.head.appendChild(st);
   }
@@ -1198,11 +1199,15 @@
       ov.id = 'htOverlay';
       if (esPC()) ov.classList.add('ht-cover-on');
       ov.innerHTML = '<div class="ht-top"><div><b id="htCupo">' + esc(textoMarcador()) + '</b><small class="ht-tope" id="htSubCupo">' + esc(textoSubMarcador()) + '</small></div><span id="htPos"></span></div>' +
-        '<div class="ht-centro"><div class="ht-deck" id="htDeck"></div>' +
-        '<div class="ht-hint" id="htHint">' + (esPC() ? 'Clic en una carta de costado para traerla al frente' : '← Deslizá para un lado o para el otro: las tarjetas dan la vuelta →') + '</div></div>';
+        '<div class="ht-centro">' +
+        '<button type="button" class="ht-arrow ht-arrow-prev" id="htPrev" aria-label="Anterior">‹</button>' +
+        '<div class="ht-deck" id="htDeck"></div>' +
+        '<button type="button" class="ht-arrow ht-arrow-next" id="htNext" aria-label="Siguiente">›</button>' +
+        '<div class="ht-hint" id="htHint">' + (esPC() ? 'Usá las flechas para pasar las cartas' : '← Deslizá para un lado o para el otro: las tarjetas dan la vuelta →') + '</div></div>';
       home.insertBefore(ov, home.firstChild);
       inlineAbierto = true;
       pintar();
+      cablearFlechas();
       return true;
     }catch(e){ return false; }
     finally{ abriendo = false; }
@@ -1250,6 +1255,22 @@
     }
   }
 
+  function cablearFlechas(){
+    var prev = document.getElementById('htPrev');
+    var next = document.getElementById('htNext');
+    if (prev && !prev.__ok){ prev.__ok = true; prev.onclick = function(){ volver(); }; }
+    if (next && !next.__ok){ next.__ok = true; next.onclick = function(){ pasar(); }; }
+    if (!window.__htKeys){
+      window.__htKeys = true;
+      document.addEventListener('keydown', function(e){
+        if (!esPC() || !esHome() || !document.getElementById('htOverlay')) return;
+        var tag = (e.target && e.target.tagName) || '';
+        if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+        if (e.key === 'ArrowLeft'){ e.preventDefault(); volver(); }
+        if (e.key === 'ArrowRight'){ e.preventDefault(); pasar(); }
+      });
+    }
+  }
   function esPC(){
     try{ return window.matchMedia('(min-width:1024px)').matches; }catch(e){ return false; }
   }
@@ -1291,8 +1312,9 @@
     if (subEl) subEl.textContent = textoSubMarcador();
     var ov = document.getElementById('htOverlay');
     if (ov) ov.classList.add('ht-cover-on');
+    cablearFlechas();
     var hint = document.getElementById('htHint');
-    if (hint) hint.textContent = 'Clic en una carta de costado para traerla al frente';
+    if (hint) hint.textContent = 'Usá las flechas para pasar las cartas';
     if (!deck) return;
     var len = mazo.tarjetas.length;
     if (!len){ cerrar(); return; }
@@ -1335,10 +1357,10 @@
           if (!esPC()) return;
           var kk = Number(el.dataset.k);
           var dd = offsetCover(kk, mazo.i, mazo.tarjetas.length);
-          if (dd === 0) return;
+          if (dd === 0 || Math.abs(dd) !== 1) return;
           ev.preventDefault();
           ev.stopPropagation();
-          irACover(kk);
+          if (dd < 0) volver(); else pasar();
         }, true);
       }
       if (d === 0) cablearTope(el, mazo.tarjetas[k]);
