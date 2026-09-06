@@ -5,6 +5,8 @@
 (function () {
   'use strict';
 
+  var MEET_APP = 'com.google.android.apps.tachyon';
+
   function $(id) { return document.getElementById(id); }
   function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
@@ -27,6 +29,9 @@
     var meses = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
     return dias[d.getDay()] + ', ' + d.getDate() + ' ' + meses[d.getMonth()];
   }
+  function esAndroid() {
+    return /Android/i.test(navigator.userAgent || '');
+  }
   function webMeet(url) {
     var u;
     try { u = new URL(url, 'https://meet.google.com/'); } catch (e) { return url; }
@@ -35,20 +40,7 @@
     u.searchParams.set('authuser', '0');
     return u.href;
   }
-  function paqueteNavegador() {
-    var ua = navigator.userAgent || '';
-    if (/Brave/i.test(ua) || (navigator.brave && navigator.brave.isBrave)) return 'com.brave.browser';
-    if (/EdgA|Edg\//i.test(ua)) return 'com.microsoft.emmx';
-    if (/Firefox|FxiOS/i.test(ua)) return 'org.mozilla.firefox';
-    if (/SamsungBrowser/i.test(ua)) return 'com.sec.android.app.sbrowser';
-    if (/OPR|Opera/i.test(ua)) return 'com.opera.browser';
-    return 'com.android.chrome';
-  }
-  function esCelular() {
-    return /Android|iPhone|iPod/i.test(navigator.userAgent || '') ||
-      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-  }
-  function abrir(url) {
+  function abrirEnNavegador(url) {
     var href = webMeet(url);
     var a = document.createElement('a');
     a.href = href;
@@ -58,15 +50,28 @@
     a.click();
     a.remove();
   }
-  function nuevoMeet() {
-    if (esCelular()) {
-      if (window.APPIDialog) window.APPIDialog.alert(
-        'En el celular Google no deja crear un Meet en el navegador: te manda a instalar la app, y eso no lo podemos saltear.\n\nCreá la reunión en la computadora (ahí sí es en el navegador) y en el teléfono usá Unirse con el código.\n\nSi querés crearla desde el celular, Google pide la app de Meet.',
-        { title: 'Reuniones', icon: '🎥' }
-      );
+  function abrirAppMeet(path) {
+    var hostpath = 'meet.google.com/' + String(path || '').replace(/^\/+/, '');
+    location.href = 'intent://' + hostpath + '#Intent;scheme=https;package=' + MEET_APP + ';end';
+  }
+  function abrir(url) {
+    if (esAndroid()) {
+      var path = '';
+      try {
+        path = new URL(url, 'https://meet.google.com/').pathname.replace(/^\//, '');
+      } catch (e) {}
+      if (path === 'new' || path === 'home' || path === 'landing') path = '';
+      abrirAppMeet(path);
       return;
     }
-    abrir('https://meet.google.com/new');
+    abrirEnNavegador(url);
+  }
+  function nuevoMeet() {
+    if (esAndroid()) {
+      abrirAppMeet('');
+      return;
+    }
+    abrirEnNavegador('https://meet.google.com/new');
   }
 
   function estilos() {

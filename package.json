@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "529.0.0",
-  "cacheName": "appi-v529-meet-cel",
+  "version": "530.0.0",
+  "cacheName": "appi-v530-meet-app",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {
