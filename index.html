@@ -3285,7 +3285,8 @@ body.dark .admin-login-card{background:#242638}body.dark .admin-login-card h2{co
 .pc-fx span:nth-child(3){width:180px;height:180px;background:#f3eee3;top:38%;left:42%;opacity:.22;animation-delay:-5.2s}
 @keyframes pcBlob{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(28px,-22px) scale(1.18)}}
 .person-choice-card{position:relative;z-index:1;width:min(100%,640px);padding:0;background:transparent;box-shadow:none;text-align:center;overflow:visible}
-.pc-title{display:inline-block;margin:0 0 22px;padding:10px 22px;border-radius:999px;background:#f3eee3;color:#2a2a32;font-size:26px;font-weight:950;letter-spacing:.2px;animation:pcTitle .8s cubic-bezier(.16,1.2,.3,1) both}
+.pc-title{display:inline-block;margin:0 0 36px;padding:10px 22px;border-radius:999px;background:#f3eee3;color:#2a2a32;font-size:26px;font-weight:950;letter-spacing:.2px;animation:pcTitle .8s cubic-bezier(.16,1.2,.3,1) both;transition:opacity .4s ease,transform .4s cubic-bezier(.16,1,.3,1)}
+#personChoiceOverlay.is-choosing .pc-title{opacity:0;transform:translateY(-18px);pointer-events:none}
 @keyframes pcTitle{from{opacity:0;transform:translateY(-18px);letter-spacing:10px;filter:blur(10px)}to{opacity:1;transform:none;filter:none}}
 .person-choice-list{display:grid;grid-template-columns:1fr 1fr;gap:16px;perspective:1100px}
 .person-choice-list:has(:only-child){grid-template-columns:minmax(0,280px);justify-content:center}
@@ -3309,7 +3310,7 @@ body.dark .admin-login-card{background:#242638}body.dark .admin-login-card h2{co
 .person-choice-option strong{display:block;font-size:17px;font-weight:800;line-height:1.25;letter-spacing:-.2px}
 .person-choice-option small{display:block;margin-top:2px;color:#8a8a94;font-size:13px;font-weight:500}
 .person-choice-arrow{display:none}
-.person-choice-option.is-picked{z-index:3;transform:translateY(-12px) scale(1.12);box-shadow:0 32px 80px rgba(11,88,120,.42),0 0 0 6px rgba(11,88,120,.18)}
+.person-choice-option.is-picked{z-index:3;transform:translateY(-2px) scale(1.1);box-shadow:0 32px 80px rgba(11,88,120,.42),0 0 0 6px rgba(11,88,120,.18)}
 .person-choice-option.is-picked .person-choice-avatar{transform:scale(1.1);animation:pcAvatarPop .6s cubic-bezier(.2,1.45,.3,1)}
 .person-choice-option.is-picked .pc-orbit,.person-choice-option.is-picked .pc-orbit-b{animation-duration:.7s;border-color:#0b5878}
 .person-choice-option.is-picked .pc-hero::after{content:"";position:absolute;inset:-6px;border-radius:50%;border:2px solid #0b5878;animation:pcRipple .95s ease-out forwards;pointer-events:none}
@@ -3327,7 +3328,7 @@ body.dark .admin-login-card{background:#242638}body.dark .admin-login-card h2{co
 @keyframes pcRipple{0%{transform:scale(.55);opacity:.9}100%{transform:scale(2.15);opacity:0}}
 @keyframes pcNamePop{from{letter-spacing:6px;filter:blur(6px)}to{letter-spacing:-.2px;filter:none}}
 @keyframes pcSpark{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(var(--dx),var(--dy)) scale(0);opacity:0}}
-@media(max-width:520px){.pc-title{font-size:20px;margin-bottom:16px}.person-choice-list{gap:10px}.person-choice-option{min-height:210px;padding:22px 12px 20px}.pc-hero{width:96px;height:96px}.person-choice-avatar{width:72px;height:72px;font-size:34px}.person-choice-option strong{font-size:14px}.person-choice-option.is-picked::after{width:28px;height:28px;font-size:15px;top:8px;right:8px}}
+@media(max-width:520px){.pc-title{font-size:20px;margin-bottom:28px}.person-choice-list{gap:10px}.person-choice-option{min-height:210px;padding:22px 12px 20px}.pc-hero{width:96px;height:96px}.person-choice-avatar{width:72px;height:72px;font-size:34px}.person-choice-option strong{font-size:14px}.person-choice-option.is-picked::after{width:28px;height:28px;font-size:15px;top:8px;right:8px}}
 @media(prefers-reduced-motion:reduce){#personChoiceOverlay.pc-in,.person-choice-option,.person-choice-option::before,.pc-title,.pc-fx span,.pc-orbit,.pc-orbit-b,.person-choice-option.is-picked .person-choice-avatar,.person-choice-option.is-picked::after,.person-choice-option.is-picked .pc-hero::after,.person-choice-option.is-picked .pc-hero::before,.person-choice-option.is-picked strong,#personChoiceOverlay .pc-spark{animation:none!important;transition:none!important}}
 @media(max-width:480px){.lock-card{padding:27px 18px}.admin-login-lock{top:12px;right:12px}#distributorLoginPanel .lock-title{font-size:23px}}
 </style> 
@@ -4298,7 +4299,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v535 · Segura</div>
+  <div class="ds-foot">APPI · v536 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4582,7 +4583,7 @@ body.dark #pageTabs button.active{color:#c5d6ff}
       <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
 
       <div class="home-brand-row">
-        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · v535</span></span>
+        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · v536</span></span>
       </div>
 
       <div class="home-hero-card">
@@ -12794,8 +12795,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='535';
-      const CACHE_NAME='appi-v535-agua';
+      const swVersion='536';
+      const CACHE_NAME='appi-v536-titulo';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · v'+swVersion;
       const hadController=Boolean(navigator.serviceWorker.controller);
