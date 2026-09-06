@@ -32,10 +32,28 @@
     try { u = new URL(url, 'https://meet.google.com/'); } catch (e) { return url; }
     u.searchParams.set('hs', '193');
     u.searchParams.set('pli', '1');
+    u.searchParams.set('authuser', '0');
     return u.href;
+  }
+  function paqueteNavegador() {
+    var ua = navigator.userAgent || '';
+    if (/Brave/i.test(ua) || (navigator.brave && navigator.brave.isBrave)) return 'com.brave.browser';
+    if (/EdgA|Edg\//i.test(ua)) return 'com.microsoft.emmx';
+    if (/Firefox|FxiOS/i.test(ua)) return 'org.mozilla.firefox';
+    if (/SamsungBrowser/i.test(ua)) return 'com.sec.android.app.sbrowser';
+    if (/OPR|Opera/i.test(ua)) return 'com.opera.browser';
+    return 'com.android.chrome';
   }
   function abrir(url) {
     var href = webMeet(url);
+    var ua = navigator.userAgent || '';
+    if (/Android/i.test(ua)) {
+      var intent = 'intent://' + href.replace(/^https:\/\//i, '') +
+        '#Intent;scheme=https;package=' + paqueteNavegador() +
+        ';S.browser_fallback_url=' + encodeURIComponent(href) + ';end';
+      location.href = intent;
+      return;
+    }
     var a = document.createElement('a');
     a.href = href;
     a.target = '_blank';
@@ -91,7 +109,7 @@
     var inp = $('reuJoin');
     if (inp) inp.onkeydown = function (e) { if (e.key === 'Enter') unirse(); };
     var nv = $('reuNuevo');
-    if (nv) nv.onclick = function () { abrir('https://meet.google.com/home'); };
+    if (nv) nv.onclick = function () { abrir('https://meet.google.com/new'); };
   }
 
   function unirse() {
