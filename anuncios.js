@@ -430,21 +430,20 @@
   function notificarPanel(an){
     if (!an || !window.APPINotif || !window.APPINotif.mostrar) return;
     var k = 'appi_anuncio_panel_' + uid();
-    try {
-      if (localStorage.getItem(k) === String(an.id)) return;
-      localStorage.setItem(k, String(an.id));
-    } catch (e) {}
+    try { if (localStorage.getItem(k) === String(an.id)) return; } catch (e) {}
     var cuerpo = String(an.texto || '').replace(/\s+/g, ' ').trim();
     if (an.eventos && an.eventos[0] && an.eventos[0].titulo) {
       cuerpo = an.eventos[0].titulo + (cuerpo ? ' · ' + cuerpo : '');
     }
-    window.APPINotif.mostrar({
+    Promise.resolve(window.APPINotif.mostrar({
       title: 'APPI',
       body: cuerpo || 'Tenés un aviso nuevo.',
       tag: 'appi-anuncio-' + an.id,
       type: 'anuncio',
       url: './?aviso=1',
       actionTitle: 'Ver aviso'
+    })).then(function (ok) {
+      if (ok) { try { localStorage.setItem(k, String(an.id)); } catch (e) {} }
     });
   }
 
