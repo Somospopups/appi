@@ -15,5 +15,9 @@
   "supabaseRef": "tqwnjfnaywjmyfplvatm",
   "brand": {
     "color": ""
+  },
+  "admin": {
+    "mode": "direct",
+    "url": "https://somospopups.github.io/appi/"
   }
 }
