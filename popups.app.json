@@ -1,0 +1,19 @@
+{
+  "slug": "appi",
+  "name": "APPI",
+  "tagline": "PWA local-first para planificación mensual, presupuesto, equipo, garantías, contactos, notas, historial y gestión de referidos.",
+  "category": "gestion",
+  "status": "produccion",
+  "version": "543.0.0",
+  "versionDate": "2026-09-07",
+  "urls": {
+    "site": "https://somospopups.github.io/appi/",
+    "admin": "",
+    "repo": "https://github.com/Somospopups/appi",
+    "docs": "https://github.com/Somospopups/appi/blob/main/README.md"
+  },
+  "supabaseRef": "tqwnjfnaywjmyfplvatm",
+  "brand": {
+    "color": ""
+  }
+}
