@@ -1,6 +1,6 @@
 {
-  "actualizado": "7-Sep-2026",
-  "vigencia": "1-Sep-2026 al 7-Sep-2026",
+  "actualizado": "8-Sep-2026",
+  "vigencia": "8-Sep-2026 al 17-Sep-2026",
   "fuente": "https://tienda.psa.com.ar/promociones_vigentes",
   "cuotas": [
     3,
@@ -41,7 +41,9 @@
         3,
         6,
         9,
-        12
+        12,
+        15,
+        18
       ],
       "tarjetas": "Visa, Mastercard, American Express"
     },
@@ -49,11 +51,7 @@
       "id": "bbva",
       "nombre": "BBVA",
       "cuotas": [
-        3,
         6,
-        9,
-        12,
-        15,
         18
       ],
       "tarjetas": "Visa, Mastercard"
