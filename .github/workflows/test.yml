@@ -11,9 +11,9 @@ permissions:
 jobs:
   e2e:
     runs-on: ubuntu-latest
-    # La suite tarda unos 6 minutos y bajar el navegador puede tardar otros
-    # tantos: con 15 el trabajo se cortaba antes de llegar a las pruebas.
-    timeout-minutes: 35
+    # La suite creció con las versiones y ya no entra en 35 minutos en el
+    # runner compartido (se cortaba a los 35 con tests todavía en curso).
+    timeout-minutes: 75
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
