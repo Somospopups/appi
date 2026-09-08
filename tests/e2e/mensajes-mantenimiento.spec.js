@@ -17,11 +17,18 @@ const ddmmyyyy = n => {
   const d = new Date(Date.now() + n * 86400000);
   return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
 };
+// El mantenimiento suma meses de calendario desde la compra: para que el
+// aviso caiga hoy hay que restar 6 meses al calendario, no 182 días.
+const hace6mCal = () => {
+  const d = new Date();
+  d.setMonth(d.getMonth() - 6);
+  return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+};
 
 // Compró hace 6 meses justos: le toca retrolavado hoy.
 const USUARIOS = [
   { id: 1, usuario: 'TABORDA, JULIAN', telf: '3515551001', domicilio: 'Ancona 4231', localidad: 'Córdoba',
-    producto: 'SEN4BLAC', cp: '5000', fCompra: ddmmyyyy(-182), fVenceRaw: ddmmyyyy(400), fVence: dias(400), estado: 'vigente' }
+    producto: 'SEN4BLAC', cp: '5000', fCompra: hace6mCal(), fVenceRaw: ddmmyyyy(400), fVence: dias(400), estado: 'vigente' }
 ];
 
 async function entrar(page) {
@@ -81,11 +88,24 @@ test('la biblioteca trae 24 mensajes en dos grupos', async ({ page }) => {
 
 test('el botón Cambiar mensaje reemplaza el texto del carrusel', async ({ page }) => {
   await entrar(page);
+  await page.evaluate(() => {
+    window.__wa = [];
+    window.APPIWhatsApp.abrir = url => { window.__wa.push(url); };
+  });
   await page.locator('[data-mu-hoy="retro"]').click();
 
-  // El aviso por defecto habla de retrolavado genérico.
+  // Primer contacto: la fila arranca con el hielo, sin marca y sin el botón
+  // de cambiar mensaje (el cambio es para el aviso del motivo).
+  await expect(page.locator('#muPrevTxt')).toContainText('¡Hola');
+  await expect(page.locator('#muCambiarMensaje')).toHaveCount(0);
+
+  // Mandado el saludo, el aviso por defecto habla de retrolavado genérico.
+  await page.locator('#muFilaEnviar').click();
   await expect(page.locator('#muPrevTxt')).toContainText('retrolavado');
   await expect(page.locator('#muCambiarMensaje')).toBeVisible();
+  const ice = await page.evaluate(() => window.__wa);
+  expect(ice).toHaveLength(1);
+  expect(decodeURIComponent(ice[0])).toContain('¡Hola');
 
   await page.locator('#muCambiarMensaje').click();
   await expect(page.locator('#muTitulo')).toContainText('Elegir mensaje');

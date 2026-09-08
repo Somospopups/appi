@@ -1847,12 +1847,17 @@
     });
 
     function volver(){
-      if (u && volverAEditar){
+      /* Guardar (o volver) desde la sesión de edición regresa a la lista de
+         edición también cuando no hay cliente abierto: antes caía al menú de
+         grupos y el cambio quedaba sin confirmación visual. Sin cliente, la
+         lista es la biblioteca completa, como al entrar por "Editar los
+         textos" desde el hub. */
+      if (volverAEditar){
         var c = overlay().querySelector('#muCuerpo');
         c.innerHTML = '';
         overlay().querySelector('#muTitulo').textContent = 'Editar los textos';
         overlay().querySelector('#muSub').textContent = 'Elegí cuál querés cambiar';
-        pintarListaEdicion(c, plantillasPara(u), u);
+        pintarListaEdicion(c, u ? plantillasPara(u) : plantillas(), u);
       } else {
         abrir(u);
       }

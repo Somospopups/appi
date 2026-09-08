@@ -18,6 +18,13 @@ const ddmmyyyy = n => {
   const d = new Date(Date.now() + n * 86400000);
   return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
 };
+// El mantenimiento se cuenta por meses de calendario desde la compra: "hace 6
+// meses justos" no son 182 días, es restar 6 meses al día de hoy.
+const hace6mCal = () => {
+  const d = new Date();
+  d.setMonth(d.getMonth() - 6);
+  return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+};
 
 // Uno de cada grupo, para poder mirar las tres reglas.
 const USUARIOS = [
@@ -207,8 +214,9 @@ test('al vencido hace más de un año no se le ofrece nada', async ({ page }) =>
 
 test('el resumen de cada plantilla ya viene con los datos puestos', async ({ page }) => {
   await entrar(page);
-  await abrirFicha(page, 0);
-  await page.locator('[data-u-toggle="0"] + .tree-children [data-u-action="whatsapp"]').click();
+  // El primer WhatsApp es un hielo; recién después se ofrecen las plantillas.
+  await abrirGruposFicha(page, 0);
+  await page.locator('[data-mu-grupo="mant"]').click();
   // Se elige mirando el mensaje real, no una receta con huecos.
   const item = page.locator('[data-mu-plantilla="retrolavado"]');
   await expect(item).toContainText('Hola Ana');
@@ -267,8 +275,8 @@ test('la barra tiene Mensajes con el logo de WhatsApp', async ({ page }) => {
   await expect(page.locator('#usuariosBtnMensajes')).toContainText('Mensajes');
   await expect(page.locator('#usuariosBtnMensajes svg')).toBeVisible();
   await expect(page.locator('#usuariosBtnPlantillas')).toHaveCount(0);
-  // Base + Depurados + Dormidos + Mensajes (v413).
-  await expect(page.locator('.u-tools button:visible')).toHaveCount(7);
+  // Base + Depurados + Dormidos + Mensajes (v413) + Cumpleaños (v543).
+  await expect(page.locator('.u-tools button:visible')).toHaveCount(8);
   await expect(page.locator('#usuariosBtnDormidos')).toBeVisible();
 });
 
@@ -292,9 +300,15 @@ test('el ciclo de mantenimiento se cuenta desde la compra, cada 6 meses', async 
       const x = new Date(Date.now() + n * 86400000);
       return `${String(x.getDate()).padStart(2,'0')}/${String(x.getMonth()+1).padStart(2,'0')}/${x.getFullYear()}`;
     };
+    // 6 meses de calendario atrás: restar 182 días no es lo mismo que 6 meses.
+    const d6 = (() => {
+      const x = new Date();
+      x.setMonth(x.getMonth() - 6);
+      return `${String(x.getDate()).padStart(2,'0')}/${String(x.getMonth()+1).padStart(2,'0')}/${x.getFullYear()}`;
+    })();
     return {
       // Comprado hace 6 meses justos: le toca ahora.
-      justo: M.mantenimiento({ fCompra: d(-182) }),
+      justo: M.mantenimiento({ fCompra: d6 }),
       // Comprado hace un mes: falta bastante.
       nuevo: M.mantenimiento({ fCompra: d(-30) }),
       // Comprado hace años, el último aviso quedó lejos: no se muestra, para
@@ -345,7 +359,7 @@ const PENDIENTES = [
     cumpleRaw: `${hoyDDMM()}/1975`, fCompra: ddmmyyyy(-30), fVenceRaw: ddmmyyyy(300), fVence: dias(300), estado: 'vigente' },
   // compró hace 6 meses justos: le toca retrolavado
   { id: 2, usuario: 'RUIZ, ROBERTO', telf: '3515551002', localidad: 'Villa Allende', producto: 'PSA VERO',
-    fCompra: ddmmyyyy(-182), fVenceRaw: ddmmyyyy(400), fVence: dias(400), estado: 'vigente' },
+    fCompra: hace6mCal(), fVenceRaw: ddmmyyyy(400), fVence: dias(400), estado: 'vigente' },
   // la garantía le vence en 10 días
   { id: 3, usuario: 'DIAZ, CAROLINA', telf: '3515551003', localidad: 'Centro', producto: 'SODA BURBY',
     fCompra: ddmmyyyy(-60), fVenceRaw: ddmmyyyy(10), fVence: dias(10), estado: 'porVencer' },
@@ -404,6 +418,9 @@ test('una accion hecha queda guardada y no reaparece al dia siguiente', async ({
     const ayerKey = `${ayer.getFullYear()}-${String(ayer.getMonth() + 1).padStart(2, '0')}-${String(ayer.getDate()).padStart(2, '0')}`;
     guardado.completadas[clave].dia = ayerKey;
     localStorage.setItem(accionesKey, JSON.stringify(guardado));
+    // El cambio de día real invalida la jornada al arrancar; acá se simula
+    // igual, si no la memo de deHoy() todavía trae al cliente de hoy.
+    M.invalidarJornada();
     M.pintarHoy();
 
     return {
@@ -459,7 +476,7 @@ test('la fila de trabajo va de a uno y avisa cuántos quedan', async ({ page }) 
 test('la ficha del carrusel muestra domicilio, teléfono, compra y vencimiento', async ({ page }) => {
   const una = [
     { id: 1, usuario: 'GOMEZ, ANA MARIA', telf: '3515551001', domicilio: 'San Martín 120', localidad: 'Alta Gracia',
-      producto: 'PSA SENIOR 4', cp: '5186', fCompra: '15/03/2024', fVenceRaw: '30/09/2026', fVence: dias(200), estado: 'vigente',
+      producto: 'PSA SENIOR 4', cp: '5186', fCompra: '15/03/2024', fVenceRaw: ddmmyyyy(200), fVence: dias(200), estado: 'vigente',
       cumpleRaw: `${hoyDDMM()}/1975` }
   ];
   await entrar(page, una);
@@ -472,14 +489,15 @@ test('la ficha del carrusel muestra domicilio, teléfono, compra y vencimiento',
   await expect(cols).toHaveCount(2);
   await expect(cols.nth(0)).toContainText('📍 Alta Gracia');
   await expect(cols.nth(0)).toContainText('🏠 San Martín 120');
-  await expect(cols.nth(0)).toContainText('📞 3515551001');
+  // El teléfono se muestra ya formateado para llamar (E.164, v543).
+  await expect(cols.nth(0)).toContainText('📞 +54 9 351 555-1001');
   await expect(cols.nth(1)).toContainText('📦 PSA SENIOR 4');
   await expect(cols.nth(1)).toContainText('Compra: 15/03/2024');
-  await expect(cols.nth(1)).toContainText('Vence: 30/09/2026');
+  await expect(cols.nth(1)).toContainText(`Vence: ${ddmmyyyy(200)}`);
 
   // El vencimiento va en negrita y se pinta según el estado: vigente → verde.
   const vence = quien.locator('.mu-vence');
-  await expect(vence).toContainText('Vence: 30/09/2026');
+  await expect(vence).toContainText(`Vence: ${ddmmyyyy(200)}`);
   await expect(vence).toHaveClass(/mu-vigente/);
   const color = await vence.evaluate(el => getComputedStyle(el).color);
   expect(color).toBe('rgb(22, 135, 101)'); // #168765 vigente
@@ -540,9 +558,9 @@ test('el contactado no desaparece: queda marcado ✓ y la franja dura todo el d�
 test('la ✗ registra que no se hizo y obliga a dejar constancia: no hay saltear', async ({ page }) => {
   const dos = [
     { id: 1, usuario: 'GOMEZ, ANA MARIA', telf: '3515551001', localidad: 'Alta Gracia', producto: 'PSA',
-      fCompra: ddmmyyyy(-182), fVenceRaw: ddmmyyyy(400), fVence: dias(400), estado: 'vigente' },
+      fCompra: hace6mCal(), fVenceRaw: ddmmyyyy(400), fVence: dias(400), estado: 'vigente' },
     { id: 2, usuario: 'RUIZ, ROBERTO', telf: '3515551002', localidad: 'Villa Allende', producto: 'PSA VERO',
-      fCompra: ddmmyyyy(-182), fVenceRaw: ddmmyyyy(400), fVence: dias(400), estado: 'vigente' }
+      fCompra: hace6mCal(), fVenceRaw: ddmmyyyy(400), fVence: dias(400), estado: 'vigente' }
   ];
   await entrar(page, dos);
   await page.evaluate(() => { window.__wa = []; window.APPIWhatsApp.abrir = u => window.__wa.push(u); });
@@ -594,9 +612,9 @@ test('la ✗ registra que no se hizo y obliga a dejar constancia: no hay saltear
 test('mandar no pasa solo a la siguiente: la misma persona queda para marcar', async ({ page }) => {
   const dos = [
     { id: 1, usuario: 'GOMEZ, ANA MARIA', telf: '3515551001', localidad: 'Alta Gracia', producto: 'PSA',
-      fCompra: ddmmyyyy(-182), fVenceRaw: ddmmyyyy(400), fVence: dias(400), estado: 'vigente' },
+      fCompra: hace6mCal(), fVenceRaw: ddmmyyyy(400), fVence: dias(400), estado: 'vigente' },
     { id: 2, usuario: 'RUIZ, ROBERTO', telf: '3515551002', localidad: 'Villa Allende', producto: 'PSA VERO',
-      fCompra: ddmmyyyy(-182), fVenceRaw: ddmmyyyy(400), fVence: dias(400), estado: 'vigente' }
+      fCompra: hace6mCal(), fVenceRaw: ddmmyyyy(400), fVence: dias(400), estado: 'vigente' }
   ];
   await entrar(page, dos);
   await page.evaluate(() => { window.__wa = []; window.APPIWhatsApp.abrir = u => window.__wa.push(u); });
@@ -622,7 +640,7 @@ test('mandar no pasa solo a la siguiente: la misma persona queda para marcar', a
 test('la ✓ marca hecha sin abrir WhatsApp', async ({ page }) => {
   const uno = [
     { id: 1, usuario: 'GOMEZ, ANA MARIA', telf: '3515551001', localidad: 'Alta Gracia', producto: 'PSA',
-      fCompra: ddmmyyyy(-182), fVenceRaw: ddmmyyyy(400), fVence: dias(400), estado: 'vigente' }
+      fCompra: hace6mCal(), fVenceRaw: ddmmyyyy(400), fVence: dias(400), estado: 'vigente' }
   ];
   await entrar(page, uno);
   await page.evaluate(() => { window.__wa = []; window.APPIWhatsApp.abrir = u => window.__wa.push(u); });
@@ -641,11 +659,11 @@ test('la ✓ marca hecha sin abrir WhatsApp', async ({ page }) => {
 
 const TRES = [
   { id: 1, usuario: 'GOMEZ, ANA MARIA', telf: '3515551001', localidad: 'Alta Gracia', producto: 'PSA',
-    fCompra: ddmmyyyy(-182), fVenceRaw: ddmmyyyy(400), fVence: dias(400), estado: 'vigente' },
+    fCompra: hace6mCal(), fVenceRaw: ddmmyyyy(400), fVence: dias(400), estado: 'vigente' },
   { id: 2, usuario: 'RUIZ, ROBERTO', telf: '3515551002', localidad: 'Villa Allende', producto: 'PSA VERO',
-    fCompra: ddmmyyyy(-182), fVenceRaw: ddmmyyyy(400), fVence: dias(400), estado: 'vigente' },
+    fCompra: hace6mCal(), fVenceRaw: ddmmyyyy(400), fVence: dias(400), estado: 'vigente' },
   { id: 3, usuario: 'DIAZ, CAROLINA', telf: '3515551003', localidad: 'Centro', producto: 'SODA BURBY',
-    fCompra: ddmmyyyy(-182), fVenceRaw: ddmmyyyy(400), fVence: dias(400), estado: 'vigente' }
+    fCompra: hace6mCal(), fVenceRaw: ddmmyyyy(400), fVence: dias(400), estado: 'vigente' }
 ];
 
 test('las flechitas pasan y vuelven entre tareas sin marcar nada', async ({ page }) => {
@@ -1028,7 +1046,9 @@ test('el check-in usa el saludo y no suma una plantilla extra en la ficha', asyn
     };
   });
   expect(r.plantillaCheckin).toBe('saludo');
-  expect(r.ids).toEqual(['retrolavado', 'cumple', 'porvencer', 'saludo']);
+  // El saludo no se duplica: la ficha ofrece una vez cada plantilla de
+  // fábrica. visita y referido son de todos los clientes (no sólo del check-in).
+  expect(r.ids).toEqual(['retrolavado', 'cumple', 'porvencer', 'saludo', 'visita', 'referido']);
 });
 
 /* ---------- v398: partido del día ---------- */
@@ -1037,11 +1057,14 @@ test('hacer las que hay gana el partido; la ✗ no', async ({ page }) => {
   await entrar(page, TRES.slice(0, 2));
   const r = await page.evaluate(() => {
     const M = window.APPIMensajes;
-    const gente = M.deHoy()[0].gente;
+    // El motivo es el del grupo que el día realmente arma (hoy estos dos
+    // caen en retrolavado); marcar con un motivo ajeno no contaría.
+    const grupo = M.deHoy()[0];
+    const gente = grupo.gente;
     const p0 = M.partidoHoy();
-    M.marcarAccion('checkin', gente[0], 'hecha');
+    M.marcarAccion(grupo.motivo.id, gente[0], 'hecha');
     const p1 = M.partidoHoy();
-    M.marcarAccion('checkin', gente[1], 'no_hecha');
+    M.marcarAccion(grupo.motivo.id, gente[1], 'no_hecha');
     const p2 = M.partidoHoy();
     return { p0, p1, p2, racha: M.rachaGanados() };
   });
@@ -1081,8 +1104,8 @@ test('ganar hoy con la racha de ayer suma 2', async ({ page }) => {
     data.dias = data.dias || {};
     data.dias[ayerKey] = { marcas: {}, total: 3, hechas: 3, noHechas: 0, ganado: true };
     localStorage.setItem(clave, JSON.stringify(data));
-    const u = M.deHoy()[0].gente[0];
-    M.marcarAccion('checkin', u, 'hecha');
+    const grupo = M.deHoy()[0];
+    M.marcarAccion(grupo.motivo.id, grupo.gente[0], 'hecha');
     return { partido: M.partidoHoy(), racha: M.rachaGanados() };
   });
   expect(r.partido.ganado).toBe(true);
