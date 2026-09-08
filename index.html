@@ -4295,6 +4295,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-botella" onclick="openBotella()"><span>🍾</span> Comparativas</button>
     <button class="ds-btn" data-ds="view-lista" onclick="openLista()"><span>📋</span> Lista de precios</button>
     <button class="ds-btn" data-ds="view-reuniones" onclick="openReuniones()"><span>🎥</span> Reuniones</button>
+    <button class="ds-btn" onclick="abrirBancoImagenes()"><span>🖼️</span> Banco de Imágenes</button>
     <button class="ds-btn" data-ds="view-simulador" onclick="openCalculadora()"><span>🧮</span> Simulador</button>
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
@@ -11398,6 +11399,11 @@ function renderToolsList(){
       statusVal:'Live', statusClass:'pending', progressPct:100,
       timeAgo:'Nuevo o unirse', onClick:'openReuniones()', accent:'#0b5878', gradient:'linear-gradient(135deg,#0b5878,#5b8def)'
     });
+    const hBanco = renderHomeQuickCard({
+      icon:'🖼️', title:'Banco de Imágenes', sub:'Imágenes oficiales PSA',
+      statusVal:'Web', statusClass:'pending', progressPct:100,
+      timeAgo:'Fotos para vender', onClick:'abrirBancoImagenes()', accent:'#e07b39', gradient:'linear-gradient(135deg,#ff8f6b,#f5b301)'
+    });
     const h5 = renderHomeQuickCard({
       icon:'🧮', title:'Simulador', sub:'Calculá tu negocio',
       statusVal:'Calc', statusClass:'pending', progressPct:100,
@@ -11428,7 +11434,7 @@ function renderToolsList(){
       timeAgo: nAgenda ? 'Listos para importar' : 'Sin teléfonos',
       onClick:'exportarAgendaTelefono()', accent:'#25d366', gradient:'linear-gradient(135deg,#25d366,#128c7e)'
     });
-    herrHost.innerHTML = h1 + h2 + h3 + h4 + hLista + hReu + h5 + hStock + h6 + h7 + hAgenda;
+    herrHost.innerHTML = h1 + h2 + h3 + h4 + hLista + hReu + hBanco + h5 + hStock + h6 + h7 + hAgenda;
   }
   if(!mesHost){const toolsList=document.getElementById('toolsList');if(toolsList)toolsList.innerHTML = `
     <details class="home-section-block" data-home-sec="mes" ${openMes?'open':''}>
@@ -11469,6 +11475,10 @@ function openLista(){
   } else {
     if(typeof showToast==='function') showToast('📋 Lista no disponible', 2000);
   }
+}
+function abrirBancoImagenes(){
+  // Banco de imágenes oficial de PSA, en pestaña nueva (fuera de APPI).
+  window.open('https://info.psa.com.ar/landings/banco-imagenes-PSA/indexAR.html', '_blank', 'noopener');
 }
 function openCalculadora(){
   if(typeof window.abrirSimulador === 'function') {
