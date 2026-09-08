@@ -8,12 +8,23 @@ on:
 permissions:
   contents: read
 
+
 jobs:
   e2e:
+    name: e2e (${{ matrix.shard }})
     runs-on: ubuntu-latest
-    # La suite creció con las versiones y ya no entra en 35 minutos en el
-    # runner compartido (se cortaba a los 35 con tests todavía en curso).
     timeout-minutes: 75
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [A, B, C]
+        include:
+          - shard: A
+            files: acciones-dia.spec.js admin-scope.spec.js anuncios.spec.js avisos-duplicados.spec.js compartir-encuesta.spec.js depurados.spec.js encuesta-gestion.spec.js historico-action-center.spec.js home-limpio.spec.js mapa-usuarios.spec.js mensajes-mantenimiento.spec.js mi-gente.spec.js panel-atras.spec.js porque.spec.js reactivacion.spec.js seguridad-frontend.spec.js tarjetas-promos.spec.js tema.spec.js whatsapp-app.spec.js
+          - shard: B
+            files: admin-cumplimiento.spec.js agenda-personal.spec.js appi.spec.js boot-help.spec.js convenciones.spec.js device-bridge.spec.js fechas-usuarios.spec.js historico-aesthetic-copa.spec.js hoy-conviene.spec.js membresias-admin.spec.js mensajes-usuarios.spec.js migraciones.spec.js panel-privado.spec.js prueba.spec.js recordatorios.spec.js sintaxis.spec.js telefono.spec.js usuarios-botones.spec.js
+          - shard: C
+            files: admin-orden.spec.js alta-sin-internet.spec.js auth.spec.js botones-vivos.spec.js cultura-pb.spec.js ducha-rinnova.spec.js garantias-titular.spec.js historico.spec.js logo-vidrio.spec.js mensajes-hielo.spec.js metodo-envio.spec.js ocho-pasos.spec.js pantallazo-panel.spec.js pwa-cache.spec.js scroll.spec.js tablero.spec.js telefonos-dobles.spec.js v230.spec.js
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -21,7 +32,6 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
-      # El navegador se guarda entre corridas: sin esto se baja entero cada vez.
       - name: Recuperar el navegador guardado
         id: cache-navegador
         uses: actions/cache@v4
@@ -34,4 +44,4 @@ jobs:
       - name: Instalar solo lo que el navegador necesita del sistema
         if: steps.cache-navegador.outputs.cache-hit == 'true'
         run: npx playwright install-deps chromium
-      - run: npm test
+      - run: npx playwright test ${{ matrix.files }}
