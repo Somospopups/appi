@@ -48,7 +48,7 @@ Deno.serve(async request => {
     if (telefono.length < 8) return json({ error: 'Ingresá un teléfono válido.' }, 400);
 
     const { data: existing } = await admin.from('appi_perfiles').select('user_id').eq('dip', dip.canonical).maybeSingle();
-    if (existing) return json({ error: 'Ese distribuidor ya tiene una cuenta. Usá la solapa Ingresar.' }, 409);
+    if (existing) return json({ error: 'Ese distribuidor ya tiene una cuenta en APPI. Entrá con la solapa Ingresar, o si no recordás tu contraseña tocá Necesito ayuda y te la renovamos al toque.' }, 409);
     const { data: pending } = await admin.from('appi_solicitudes').select('id').eq('dip', dip.canonical).eq('estado', 'pendiente').maybeSingle();
     if (pending) return json({ error: 'Ya existe una solicitud pendiente para ese distribuidor.' }, 409);
 
