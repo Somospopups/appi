@@ -671,6 +671,3 @@ test('el botón de Cumpleaños dice Revisar los cumpleaños del mes y va a Mi Eq
   // Y la lista de cumpleaños del mes está ahí para revisar.
   await expect(page.locator('#bdayListWrap')).toBeVisible({ timeout: 5000 });
 });
-lista de cumpleaños del mes está ahí para revisar.
-  await expect(page.locator('#bdayListWrap')).toBeVisible({ timeout: 5000 });
-});
