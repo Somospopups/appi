@@ -74,6 +74,9 @@ test('el GPS del mes lee la Línea y el Panel', async ({ page }) => {
 test('la botella calcula conciencia y se comparte', async ({ page }) => {
   await entrar(page);
   await page.evaluate(() => window.abrirBotella());
+  // El acceso a la botella abre su solapa directo, sin depender de la última
+  // solapa que quedó elegida en el comparador.
+  await expect(page.locator('#cmpTabBot')).toHaveClass(/on/);
   await page.locator('#botPorDia').fill('3');
   await page.locator('#botPrecio').fill('1000');
   await expect(page.locator('#botResult')).toContainText('90.000');      // por mes

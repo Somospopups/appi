@@ -790,6 +790,9 @@
       else window.open(url, '_blank', 'noopener');
     };
     bindCmp();
+    // Entrar a la botella muestra la botella, no la solapa Productos que
+    // quedó guardada del comparador (v479): el acceso directo manda.
+    cmpMostrar('bot');
   }
   function abrirSimulador(){
     crearVistas();
