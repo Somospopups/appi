@@ -73,6 +73,9 @@ test('el App Shell sólo referencia archivos existentes e incluye los módulos a
   const localScripts=[...html.matchAll(/<script[^>]+src="\.\/([^"]+)"/g)].map(match=>match[1]);
   const localStyles=[...html.matchAll(/<link[^>]+rel="stylesheet"[^>]+href="\.\/([^"]+)"/g)].map(match=>match[1]);
   for(const resource of [...localScripts,...localStyles]){
-    expect(shell,`${resource} debe estar precargado para el primer uso offline`).toContain(resource);
+    // El ?v=NNN es cache-busting del HTML: el App Shell guarda el archivo sin
+    // el query. Lo que importa es que el módulo esté precargado.
+    const recurso = resource.split('?')[0];
+    expect(shell,`${recurso} debe estar precargado para el primer uso offline`).toContain(recurso);
   }
 });

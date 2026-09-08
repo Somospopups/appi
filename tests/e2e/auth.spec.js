@@ -326,15 +326,18 @@ test('administración ingresa por el candado y no tiene distribuidor asociado', 
   await page.locator('#btnAdminLoginSubmit').click();
   await expect(page.locator('#view-admin')).toHaveClass(/active/);
   await expect(page.locator('#adminPanelIdentity')).toContainText('Administración del equipo');
-  // Distribuidores arranca minimizado: se abre la sección y el renglón.
-  await page.locator('#adminUsersToggle').click();
-  await expect(page.locator('#adminUserList')).toContainText('Distribuidor A');
-  await page.locator('.admin-user-head').first().click();
-  await expect(page.locator('#adminPendingList')).toContainText('Solicitud Pendiente');
-  // El tablero muestra la solicitud en el chip que parpadea y en Atención.
+  // El panel arranca en Hoy: la solicitud recién creada se ve en el tablero
+  // (chip que parpadea) y en la tarjeta de Atención.
   await expect(page.locator('#adminHero')).toContainText('1 solicitud');
   await expect(page.locator('#adminHero')).toContainText('Recaudado en');
   await expect(page.locator('#adminAtencionCard')).toContainText('pidió acceso');
+  // Solicitudes: la pendiente queda esperando aprobación.
+  await page.click('#adminTabs [data-admin-tab="solicitudes"]');
+  await expect(page.locator('#adminPendingList')).toContainText('Solicitud Pendiente');
+  // Cuentas: el renglón del distribuidor se abre y muestra sus acciones.
+  await page.click('#adminTabs [data-admin-tab="cuentas"]');
+  await expect(page.locator('#adminUserList')).toContainText('Distribuidor A');
+  await page.locator('.admin-user-head').first().click();
   await expect(page.locator('[data-admin-action="people"]').first()).toBeVisible();
   await expect(page.locator('[data-admin-action="grace_period"]').first()).toBeVisible();
   await expect(page.locator('[data-admin-action="payment"]').first()).toBeVisible();

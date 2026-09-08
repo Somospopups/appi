@@ -60,7 +60,7 @@ const VCF = [
   'END:VCARD'
 ].join('\r\n');
 
-async function abrirPanel(page, { contactos = CONTACTOS_APPI, agendaRemota = [], agendaVista = '' } = {}) {
+async function abrirPanel(page, { contactos = CONTACTOS_APPI, agendaRemota = [], agendaVista = '', agendaCuenta = [] } = {}) {
   const accessToken = tokenFor(USER_ID);
   const profile = {
     user_id: USER_ID, username: null, dip: '02-9802014', sucursal: '02', numero_distribuidor: '9802014',
@@ -139,7 +139,7 @@ async function abrirPanel(page, { contactos = CONTACTOS_APPI, agendaRemota = [],
 
   await page.evaluate(() => window.openMiGestion());
   await expect(page.locator('#view-gestion')).toHaveClass(/active/);
-  return { importados, subidasAgenda };
+  return { importados, subidasAgenda, agendaCuenta };
 }
 
 async function abrirAgendaPersonal(page, opciones) {

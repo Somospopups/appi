@@ -13,6 +13,20 @@ module.exports = defineConfig({
     serviceWorkers: 'block',
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
+    // El cartel "¿Recibís los avisos de APPI?" (appi-notif.js) sale al entrar a
+    // cualquier pantalla salvo que el usuario ya haya decidido. Ningún test
+    // ejercita ese cartel: arrancamos con las claves de "ya decidió", como un
+    // usuario que viene usando la app (v523+).
+    storageState: {
+      cookies: [],
+      origins: [{
+        origin: 'http://127.0.0.1:4174',
+        localStorage: [
+          { name: 'appi_notif_listo_v1', value: '1' },
+          { name: 'appi_notif_popup_later', value: '4102444800000' }
+        ]
+      }]
+    },
     ...devices['Desktop Chrome']
   },
   webServer: {

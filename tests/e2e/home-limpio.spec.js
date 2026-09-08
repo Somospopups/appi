@@ -22,7 +22,8 @@ const CONTACTOS = [
   { id: 'c3', estado: 'nuevo', nombre: 'Carla Muñoz', telefono: '3515550001', telefono_normalizado: '3515550001', tipo: 'contacto', created_at: hoy, updated_at: hoy }
 ];
 
-async function entrar(page) {
+async function entrar(page, movil = true) {
+  if (movil) await page.setViewportSize({ width: 390, height: 840 });
   const accessToken = tokenFor(USER_ID);
   const now = new Date().toISOString();
   const profile = {
@@ -47,6 +48,8 @@ async function entrar(page) {
     localStorage.setItem('welcomeSeen', '1');
     localStorage.setItem('appi_tarjetas_auto', '0');
     localStorage.setItem('tutoVisto_v2', '1');
+    localStorage.setItem('appi_notif_listo_v1', '1');
+    localStorage.setItem('appi_notif_popup_later', String(Date.now() + 400 * 24 * 3600 * 1000));
     localStorage.setItem('equipoData', JSON.stringify(equipo));
     localStorage.setItem(`appi_gestion_cache_v1_${uid}`, JSON.stringify({ contacts: contactos, surveys: [], activities: [], savedAt: Date.now() }));
     localStorage.setItem(`appi_porque_v1_${uid}`, JSON.stringify({ niveles: ['Ganar dinero', 'Que mi familia viva tranquila'] }));
@@ -104,17 +107,18 @@ test('el selector de páginas navega y cada página tiene lo suyo', async ({ pag
 });
 
 test('en pantalla de PC el selector se esconde y manda la sidebar', async ({ page }) => {
-  await entrar(page);
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await entrar(page, false);
   await expect(page.locator('#pageTabs')).toBeHidden();
   await expect(page.locator('#deskSidebar')).toBeVisible();
 });
 
 test('en PC la barra trae las mismas herramientas que el celular', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
-  await entrar(page);
+  await entrar(page, false);
   const sidebar = page.locator('#deskSidebar');
   await expect(sidebar).toBeVisible();
-  for (const nombre of ['Los 8 Pasos', 'Escalera de Sueños', 'Coach de Demo', 'Botella', 'Simulador', 'Mi stock', 'Grabadora', 'Notas Keep']) {
+  for (const nombre of ['Los 8 Pasos', 'Escalera de Sueños', 'Coach de Demo', 'Comparativas', 'Simulador', 'Mi stock', 'Grabadora', 'Notas Keep']) {
     await expect(sidebar).toContainText(nombre);
   }
   await page.locator('#deskSidebar [data-ds="view-stock"]').click();
@@ -293,8 +297,14 @@ test('tocar un renglón de la tarjeta te lleva directo, y la primera se hamaca',
   await page.evaluate(() => window.APPIHomeTarjetas.abrir());
   // La primera tarjeta hace el vaivén de demostración.
   await expect(page.locator('.ht-card.demo')).toHaveCount(1);
-  // Pasamos a Tu jornada y tocamos a Jorge: tiene que abrir el Panel ya.
-  await page.evaluate(() => window.APPIHomeTarjetas.pasar());
+  // Avanzamos hasta la tarjeta Tu jornada (puede haber otras en el medio,
+  // como "Hoy te conviene") y tocamos a Jorge: tiene que abrir el Panel ya.
+  for (let i = 0; i < 12; i++) {
+    const texto = await page.locator('#htOverlay .ht-card:not(.detras1):not(.detras2):not(.ht-fantasma)').textContent().catch(() => '');
+    if (texto && texto.includes('Tu jornada')) break;
+    await page.evaluate(() => window.APPIHomeTarjetas.pasar());
+    await page.waitForTimeout(420);
+  }
   await expect(page.locator('#htOverlay')).toContainText('Tu jornada');
   await page.locator('.ht-lista li', { hasText: 'Jorge Salas' }).click();
   await expect(page.locator('#view-gestion')).toHaveClass(/active/);
@@ -361,7 +371,12 @@ test('el mazo espera a que la app cargue: nunca sobre la elección de persona', 
 test('un toque con temblor de dedo sobre el botón dispara la acción igual', async ({ page }) => {
   await entrar(page);
   await page.evaluate(() => window.APPIHomeTarjetas.abrir());
-  await page.evaluate(() => window.APPIHomeTarjetas.pasar());
+  for (let i = 0; i < 12; i++) {
+    const texto = await page.locator('#htOverlay .ht-card:not(.detras1):not(.detras2):not(.ht-fantasma)').textContent().catch(() => '');
+    if (texto && texto.includes('Tu jornada')) break;
+    await page.evaluate(() => window.APPIHomeTarjetas.pasar());
+    await page.waitForTimeout(420);
+  }
   await expect(page.locator('#htOverlay')).toContainText('Tu jornada');
   // El dedo real no baja quieto: baja, tiembla ~9px y suelta. Eso es un TOQUE.
   await page.evaluate(() => {
@@ -424,7 +439,7 @@ test('cerrar el calendario devuelve el scroll en toda la app (regresión v300)',
     sp.style.height = '2000px';
     document.getElementById('view-equipo').appendChild(sp);
   });
-  await page.mouse.move(640, 400);
+  await page.mouse.move(195, 400);
   await page.mouse.wheel(0, 500);
   await page.waitForTimeout(300);
   const top = await page.evaluate(() => document.body.scrollTop || window.scrollY);
@@ -537,13 +552,13 @@ test('el cumpleañero sin teléfono lo dice en el renglón y el toque lo explica
     await page.waitForTimeout(400);
   }
   // El renglón de Marcela avisa que no hay número; el de Sebastián no.
-  const fila = page.locator('.ht-lista li', { hasText: 'OVIEDO' });
+  const fila = page.locator('.ht-lista li', { hasText: 'Marcela Oviedo' });
   await expect(fila).toContainText('sin teléfono');
-  await expect(page.locator('.ht-lista li', { hasText: 'TRONCOSO' })).not.toContainText('sin teléfono');
+  await expect(page.locator('.ht-lista li', { hasText: 'Sebastian Troncoso' })).not.toContainText('sin teléfono');
   // Tocarla no abre WhatsApp ni manda a otra pantalla en silencio: explica.
   await fila.click();
   await expect(page.locator('.appi-dialog-overlay:not([hidden])')).toBeVisible();
-  await expect(page.locator('.appi-dialog-overlay')).toContainText('planilla');
+  await expect(page.locator('.appi-dialog-overlay')).toContainText('número de teléfono válido');
   const saludos = await page.evaluate(() => window.__saludos);
   expect(saludos).toHaveLength(0);
 });
@@ -596,7 +611,12 @@ test('el botón de Oportunidades dice Ir a Mi Equipo y te lleva ahí (v324)', as
 // siempre la siguiente y al volver aparecía otra: quedaba feo.
 test('al arrastrar asoma la tarjeta correcta según la dirección (v324)', async ({ page }) => {
   await entrar(page);
-  await page.evaluate(() => window.APPIHomeTarjetas.abrir()).toContainText('2 de');
+  await page.evaluate(() => window.APPIHomeTarjetas.abrir());
+  // Para que el arrastre a la derecha tenga una tarjeta ANTERIOR real (la
+  // primera del mazo), arrancamos desde la segunda carta.
+  await page.evaluate(() => window.APPIHomeTarjetas.pasar());
+  await page.waitForTimeout(500);
+  await expect(page.locator('#htPos')).toContainText('2 de');
   const r = await page.evaluate(() => {
     const kickers = window.APPIHomeTarjetas.armarTarjetas().map(t => t.kicker);
     const top = document.querySelector('.ht-card:not(.detras1):not(.detras2):not(.ht-fantasma)');

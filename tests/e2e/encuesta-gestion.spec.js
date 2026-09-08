@@ -198,6 +198,7 @@ test('Mi Encuesta y Mi Gestión usan la cuenta autenticada y guardan el seguimie
       return route.fulfill({ status: 204, headers: { 'access-control-allow-origin': '*' }, body: '' });
     }
     if (url.pathname === '/rest/v1/appi_encuestas') return route.fulfill({ status: 200, headers: cors, body: JSON.stringify([{ id: SURVEY_ID, user_id: USER_ID, nombre: 'Persona Encuestada', telefono: '351 555 1234', respuestas: completeAnswers(), referidos: [], created_at: now }]) });
+    if (url.pathname === '/functions/v1/dispositivo-puente') return route.fulfill({ status: 200, headers: cors, body: JSON.stringify({ devices: [] }) });
     return route.fulfill({ status: 404, headers: cors, body: JSON.stringify({ error: 'Ruta simulada no encontrada' }) });
   });
 
@@ -216,6 +217,9 @@ test('Mi Encuesta y Mi Gestión usan la cuenta autenticada y guardan el seguimie
   await expect(page.locator('#lockScreen')).toHaveClass(/hidden/);
   await expect.poll(() => page.evaluate(() => APPIAuth.currentProfile()?.dip || '')).toBe('02-9802014');
   await expect(page.locator('#view-home')).toHaveClass(/active/);
+  // El ingreso con socio termina con el agua del splash cubriendo la pantalla
+  // (v543): recién cuando el boot desaparece se puede tocar la interfaz.
+  await expect(page.locator('#bootScreen')).toHaveCount(0, { timeout: 15000 });
 
   await page.evaluate(() => openEncuestaTool());
   // Mi Encuesta se unificó en Mi Gente: el atajo viejo cae en la pantalla nueva.

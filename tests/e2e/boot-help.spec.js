@@ -195,8 +195,11 @@ test('en el celular pageshow no saltea titular/socio ni deja un home a medias', 
     const greeting = document.getElementById('homeGreeting');
     const covered = !!(overlay && !overlay.hidden);
     const listo = !!(home && greeting && /Hola Juan/.test(greeting.textContent || ''));
-    return { covered, listo, title: overlay && overlay.querySelector('h2') && overlay.querySelector('h2').textContent };
-  })).toEqual({ covered: true, listo: false, title: 'Entrando…' });
+    // La transición v543 no muestra "Entrando…": la entrada en curso se ve en
+    // la clase is-choosing del overlay, que sigue cubriendo hasta entrar.
+    const choosing = !!(overlay && overlay.classList.contains('is-choosing'));
+    return { covered, listo, choosing };
+  })).toEqual({ covered: true, listo: false, choosing: true });
   await expect(page.locator('#personChoiceOverlay')).toBeHidden();
   await expect(page.locator('#view-home')).toHaveClass(/active/);
   await expect(page.locator('#homeGreeting')).toHaveText('Hola Juan 👋');

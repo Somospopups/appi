@@ -28,7 +28,9 @@ test('una fecha real de Excel (número de serie) se convierte a DD/MM/YYYY', asy
   expect(r).toBe('17/04/2022');
 });
 
-test('una celda de fecha en texto queda igual', async ({ page }) => {
+test('una celda de fecha en texto se normaliza a dos dígitos', async ({ page }) => {
+  // La planilla puede traer "17/4/2002": APPI la muestra igual que a las que
+  // vienen con dos dígitos (17/04/2002).
   const r = await page.evaluate(() => window.fechaDeCeldaU('17/4/2002'));
-  expect(r).toBe('17/4/2002');
+  expect(r).toBe('17/04/2002');
 });

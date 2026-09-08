@@ -6,10 +6,10 @@ const { test, expect } = require('@playwright/test');
    dígitos, donde el 15 no está en la misma posición que en Córdoba). */
 
 async function cargar(page){
-  await page.goto('/telefono.js');
-  const codigo = await page.evaluate(() => document.body.innerText);
-  await page.goto('about:blank');
-  await page.evaluate(src => { eval(src); }, codigo);
+  // La app real, en un origin servido: los tests del cuidado de la línea
+  // guardan estado en localStorage, y en about:blank el storage no existe.
+  await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
+  await page.evaluate(() => window.APPITel ? true : (function(){ throw new Error('APPITel no cargó'); })());
 }
 
 test.describe('APPITel · armado de números argentinos', () => {

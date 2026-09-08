@@ -995,7 +995,14 @@ async function reconcileActionPlans(){
   if(changed){await persistActionPlans();for(const plan of H.actionPlans.filter(item=>item.status==='active'))for(const task of plan.tasks||[])programTaskInManagement(task,plan,'historico_plan_actualizado').catch(()=>{})}return H.actionPlans;
 }
 function notifyActionDueOnce(){
-  const count=actionDueTasks().length;if(!count)return false;const key=`appi_historico_action_notice_${actionActorKey()}_${localActionDate()}`;if(localStorage.getItem(key))return false;localStorage.setItem(key,'1');if(typeof Notification!=='undefined'&&Notification.permission==='granted')try{new Notification('Centro de Acción APPI',{body:`Tenés ${count} acciones para hoy o vencidas`,icon:'./icon-192.png',tag:`appi-actions-${localActionDate()}`})}catch(e){}return true;
+  const count=actionDueTasks().length;if(!count)return false;const key=`appi_historico_action_notice_${actionActorKey()}_${localActionDate()}`;if(localStorage.getItem(key))return false;
+  const marcar=()=>{try{localStorage.setItem(key,'1')}catch(e){}};
+  if(window.APPINotif&&window.APPINotif.mostrar){
+    Promise.resolve(window.APPINotif.mostrar({title:'APPI',body:`Tenés ${count} acciones para hoy o vencidas`,tag:`appi-actions-${localActionDate()}`,type:'accion',url:'./?accion=1',actionTitle:'Ver acciones'})).then(ok=>{if(ok)marcar()});
+  }else if(typeof Notification!=='undefined'&&Notification.permission==='granted'){
+    try{new Notification('APPI',{body:`Tenés ${count} acciones para hoy o vencidas`,icon:'./icon-192.png',tag:`appi-actions-${localActionDate()}`});marcar()}catch(e){}
+  }
+  return true;
 }
 
 function localReportText(periods,strategies,a){

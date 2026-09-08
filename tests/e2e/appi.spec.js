@@ -53,7 +53,7 @@ test('arranca, navega e importa Garantías una sola vez', async ({ page }) => {
   expect(sidebarLabels.map(text=>text.trim())).toEqual(['Mi mes','Mi negocio','Mis herramientas']);
   const sidebarButtons=await page.locator('#deskSidebar .ds-btn').allTextContents();
   expect(sidebarButtons.map(text=>text.replace(/^[^\p{L}]+/u,'').trim())).toEqual([
-    'Home','Las 7 P','Presupuesto','Rueda de la Vida','Rueda del Negocio','Mi Equipo','Histórico','Usuarios','Panel de Contactos 0','Mi stock','Los 8 Pasos','Escalera de Sueños','Coach de Demo','Botella','Simulador','Grabadora','Notas Keep'
+    'Home','Las 7 P','Presupuesto','Rueda de la Vida','Rueda del Negocio','Mi Equipo','Histórico','Usuarios','Panel de Contactos 0','Mi stock','Los 8 Pasos','Escalera de Sueños','Coach de Demo','Comparativas','Lista de precios','Reuniones','Banco de Imágenes','Simulador','Grabadora','Notas Keep'
   ]);
 
   for (const [expression, expectedView] of [
@@ -94,6 +94,10 @@ test('arranca, navega e importa Garantías una sola vez', async ({ page }) => {
 
   await page.evaluate(() => {
     window.__appiLastOpen = null;
+    // La apertura real va por APPITel -> APPIWhatsApp (whatsapp-app.js ya
+    // guardó su propio window.open al cargar, así que pisar el global no
+    // alcanza): capturamos el abrir de APPIWhatsApp.
+    window.APPIWhatsApp = { abrir: (...args) => { window.__appiLastOpen = args; return null; } };
     window.open = (...args) => { window.__appiLastOpen = args; return null; };
     showView('view-usuarios');
   });

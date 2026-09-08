@@ -1,9 +1,10 @@
 const { test, expect } = require('@playwright/test');
 
-/* Cumplimiento diario (v344): el panel administrador lo muestra como
-   tarjetas con avatar, chips de hoy y barra de progreso semanal. */
+/* Cumplimiento diario (v344): el panel administrador muestra cada cuenta con
+   su marca de hoy (verde/naranja/rojo) y, al tocar la fila, el calendario
+   mensual con el tono de cada día. */
 
-test('el cumplimiento se pinta con tarjetas, chips y barra de progreso', async ({ page }) => {
+test('el cumplimiento se pinta con filas, marca de hoy y calendario mensual', async ({ page }) => {
   await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
 
   await page.evaluate(() => {
@@ -44,38 +45,45 @@ test('el cumplimiento se pinta con tarjetas, chips y barra de progreso', async (
   await page.evaluate(() => window.APPIAdminPanel.open());
   await page.waitForTimeout(600);
 
-  // Abrir la sección Cumplimiento diario.
+  // El Cumplimiento diario vive en la pestaña "Más": entrar y abrir la sección.
+  await page.click('#adminTabs [data-admin-tab="mas"]');
+  await page.waitForTimeout(400);
+  await expect(page.locator('#adminPane-mas')).toBeVisible();
   await page.click('#adminAccionesToggle');
   await page.waitForTimeout(300);
 
-  const items = page.locator('.admin-cump-item');
-  await expect(items).toHaveCount(2);
+  const hoyISO = new Date().toISOString().slice(0, 10);
+  const filas = page.locator('.admin-cump-row');
+  await expect(filas).toHaveCount(2);
 
-  const primera = items.first();
+  // Resumen del día sobre las dos cuentas (51+9 hechas, 1+5 sin hacer).
+  await expect(page.locator('#adminAccionesResumen')).toContainText('2 cuentas · hoy ✓ 60 · ✗ 6');
+
+  // La primera: Boulard con su marca de hoy en verde (51/52).
+  const primera = filas.first();
   await expect(primera).toContainText('Boulard, Valeria');
   await expect(primera).toContainText('DIP 02-11000134');
-  // Avatar con iniciales.
   await expect(primera.locator('.admin-cump-ava')).toHaveText('BV');
-  // Chips del día.
-  await expect(primera.locator('.admin-cump-hoychips .ok')).toContainText('✓ 51');
-  await expect(primera.locator('.admin-cump-hoychips .no')).toContainText('✗ 1');
-  // Semana: barra y porcentaje.
-  await expect(primera.locator('.admin-cump-bar i')).toBeVisible();
-  await expect(primera.locator('.admin-cump-pct')).toHaveText('98%');
-  await expect(primera.locator('.admin-cump-pct')).toHaveClass(/alta/);
+  await expect(primera.locator(`.cump-dot[title="${hoyISO}"]`)).toHaveClass(/verde/);
 
-  // Medallas del podio (v349): la primera es 🥇 con estrellas, la segunda 🥈.
-  await expect(primera).toHaveClass(/top1/);
-  await expect(primera.locator('.admin-cump-trofeo')).toHaveText('🥇');
-  await expect(primera.locator('.admin-cump-stars')).toHaveText('★★★');
-
-  // La segunda es socio/a y con porcentaje medio (9/14 = 64%).
-  const segunda = items.nth(1);
+  // La segunda es socio/a y hoy le faltaron marcas (9/14 = naranja).
+  const segunda = filas.nth(1);
   await expect(segunda).toContainText('Toledo, Silvia');
   await expect(segunda.locator('.admin-cump-socio')).toHaveText('socio/a');
-  await expect(segunda.locator('.admin-cump-pct')).toHaveText('64%');
-  await expect(segunda.locator('.admin-cump-pct')).toHaveClass(/media/);
-  await expect(segunda).toHaveClass(/top2/);
-  await expect(segunda.locator('.admin-cump-trofeo')).toHaveText('🥈');
-  await expect(segunda.locator('.admin-cump-stars')).toHaveText('★');
+  await expect(segunda).toContainText('DIP 02-98020174');
+  await expect(segunda.locator('.admin-cump-ava')).toHaveText('TS');
+  await expect(segunda.locator(`.cump-dot[title="${hoyISO}"]`)).toHaveClass(/naranja/);
+
+  // Tocar una fila abre el calendario mensual de esa cuenta, con el día de
+  // hoy marcado en su color.
+  await primera.click();
+  await expect(page.locator('#adminCumpOverlay')).toBeVisible();
+  const ficha = page.locator('#adminCumpFicha');
+  await expect(ficha).toContainText('Boulard, Valeria');
+  await expect(ficha).toContainText('DIP 02-11000134');
+  await expect(ficha).toContainText('Actividad de');
+  await expect(ficha.locator('.admin-cump-dia.hoy')).toHaveClass(/verde/);
+  await expect(page.locator('#adminCumpClose')).toBeVisible();
+  await page.locator('#adminCumpClose').click();
+  await expect(page.locator('#adminCumpOverlay')).toBeHidden();
 });

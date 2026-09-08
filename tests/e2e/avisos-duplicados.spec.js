@@ -100,7 +100,7 @@ test('cada aviso vive sólo en su lugar', async ({ page }) => {
   await expect(page.locator('#view-negocio #bdayBannerWrap')).toHaveCount(0);
 });
 
-test('el Bonus se pinta en Mi Equipo y el cumple ya no tiene aviso propio', async ({ page }) => {
+test('el Bonus vive en el mazo: sin aviso duplicado en el Home (v425)', async ({ page }) => {
   await abrirApp(page);
   await page.evaluate(() => {
     if (window.renderBdayBanner) window.renderBdayBanner();
@@ -113,9 +113,15 @@ test('el Bonus se pinta en Mi Equipo y el cumple ya no tiene aviso propio', asyn
   await expect(page.locator('.bday-banner')).toHaveCount(0);
   expect(await page.evaluate(() => typeof window.renderBdayBanner)).toBe('undefined');
 
-  const tarjetas = await page.locator('#bonusNotifWrap [data-bonus-id]').count();
-  expect(tarjetas).toBeGreaterThan(0);
-  expect(await page.locator('#bonusNotifWrap [data-bonus-act="wa"]').count()).toBe(tarjetas);
+  // El aviso de Bonus se retiró del Home y de Mi Equipo en v425: la propuesta
+  // vive en la tarjeta de Oportunidades del mazo (lo cubre home-limpio v320).
+  // Acá se fija que no queden contenedores viejos duplicando el aviso.
+  expect(await page.evaluate(() => typeof window.renderBonusNotifs)).toBe('function');
+  await expect(page.locator('#bonusNotifWrap')).toHaveCount(0);
+  await expect(page.locator('[data-bonus-id]')).toHaveCount(0);
+  // La fuente del mazo sigue viva y detecta a quien está a un paso del Bonus.
+  const cerca = await page.evaluate(() => window.personasOportunidadBonus().map(p => p.nombre));
+  expect(cerca).toContain('Casi Bonus');
 });
 
 test('Cultura de Crecimiento muestra el PB automático, no un input', async ({ page }) => {
@@ -129,6 +135,7 @@ test('Cultura de Crecimiento muestra el PB automático, no un input', async ({ p
   await expect(campo).toBeVisible();
   await expect(campo).toContainText('Cargá tu Línea');
 });
+
 
 test('el cumpleañero sigue cubierto: la tarjeta del mazo lo trae (v321)', async ({ page }) => {
   await abrirApp(page);

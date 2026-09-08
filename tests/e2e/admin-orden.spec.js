@@ -11,7 +11,7 @@ const panel = () => fs.readFileSync('admin-panel.js', 'utf8');
 
 test('crear cuenta es un botón y el formulario vive en un popup', () => {
   const h = html();
-  expect(h).toContain('id="adminOpenCreate"');
+  expect(h).toMatch(/id="admin(FabCreate|OpenCreate)"/);
   expect(h).toContain('id="adminCreateOverlay"');
   // El formulario completo está adentro del popup, incluido el WhatsApp opcional.
   const overlay = h.slice(h.indexOf('id="adminCreateOverlay"'), h.indexOf('id="adminCreateOverlay"') + 4000);
@@ -46,7 +46,7 @@ test('el cumplimiento diario se minimiza, tiene buscador y ordena alfabético', 
 test('el tablero reemplaza a las tarjetas sueltas y muestra la prueba', () => {
   const h = html();
   expect(h).toContain('id="adminHero"');
-  expect(h).toContain('Necesitan tu atención');
+  expect(h).toContain('Hoy tenés');
   expect(h).toContain('id="adminGoRequests"');
   // Lo viejo se fue de verdad: ni las 4 tarjetas ni el panel de membresías.
   expect(h).not.toContain('adminStatTotal');
@@ -64,7 +64,7 @@ test('el tablero reemplaza a las tarjetas sueltas y muestra la prueba', () => {
 
 test('los ingresos se ven por mes con total, nombres y resumen anual', () => {
   const h = html();
-  expect(h).toContain('Ingresos por mes');
+  expect(h).toContain('📅 Ingresos');
   expect(h).toContain('id="adminIngresosBody"');
   const js = panel();
   expect(js).toContain('appi_admin_pagos');
@@ -118,10 +118,10 @@ test('un popup largo scrollea en vez de desbordarse', async ({ page }) => {
 
 test('los distribuidores: minimizable, WhatsApp directo y PARA SIEMPRE (v312)', () => {
   const h = html();
-  // La sección se minimiza como el cumplimiento.
-  expect(h).toContain('id="adminUsersToggle"');
+  // La sección tiene buscador y filtros por tipo de cuenta.
+  expect(h).toContain('id="adminUserSearch"');
   expect(h).toContain('id="adminUsersResumen"');
-  expect(h).toMatch(/id="adminUsersBody" hidden/);
+  expect(h).toContain('id="adminUsersBody"');
   // La píldora nueva de creación.
   expect(h).toContain('data-create-membership="siempre"');
   const js = panel();

@@ -20,8 +20,10 @@ test('el Service Worker escucha notificaciones y su apertura', async ({ request 
   const source = await response.text();
   expect(source).toContain("addEventListener('push'");
   expect(source).toContain("addEventListener('notificationclick'");
-  expect(source).toContain("icon: './icon-192.png'");
-  expect(source).toContain("badge: './notification-badge.png'");
+  expect(source).toContain("new URL('./icon-192.png', self.registration.scope)");
+  expect(source).toContain("new URL('./notification-badge.png', self.registration.scope)");
+  expect(source).toContain('icon: iconAbs');
+  expect(source).toContain('badge: badgeAbs');
   expect(source).toContain('call_request');
   expect(source).toContain('notificationTarget');
   expect(source).toContain('focusOrOpenNotification');
