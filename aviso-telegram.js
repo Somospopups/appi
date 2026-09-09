@@ -21,9 +21,10 @@
   var OVERLAY = 'avisoTgOv';
   var CSS = 'avisoTgCss';
   var POLL_MS = 2500;
+  var BOT_FIJO = 'APPI_Avisos_bot';
   var timer = null;
   var urlActual = ''; // https://t.me/<bot>... vigente
-  var botNombre = '';
+  var botNombre = BOT_FIJO;
   var peticionSeq = 0; // descarta respuestas viejas (evita pisar la UI)
 
 
@@ -146,6 +147,18 @@
   function esAndroid() {
     return /android/i.test(navigator.userAgent || '');
   }
+  function botDe(r) {
+    var b = String((r && r.bot) || botNombre || BOT_FIJO).replace(/^@/, '').trim();
+    return b || BOT_FIJO;
+  }
+  function urlDe(r) {
+    var bot = botDe(r);
+    var codigo = String((r && r.codigo) || '').trim();
+    var dada = String((r && (r.url || r.link)) || '').trim();
+    if (dada && /^https?:\/\/t(?:elegram)?\.me\//i.test(dada)) return dada;
+    if (codigo) return 'https://t.me/' + bot + '?start=' + encodeURIComponent(codigo);
+    return 'https://t.me/' + bot;
+  }
   function parsearTme(url) {
     try {
       var u = new URL(String(url || ''));
@@ -171,7 +184,9 @@
     return p.tme;
   }
   function abrirTelegram() {
+    if (!urlActual) urlActual = 'https://t.me/' + (botNombre || BOT_FIJO);
     var destino = destinoTelegram();
+    if (!destino) destino = urlActual;
     if (!destino) return;
     try {
       // Hook de navegación (lo usa el e2e; en producción no existe y se ignora).
@@ -217,13 +232,17 @@
   }
 
   // ---------- estados ----------
+  function botonAbrir(texto) {
+    return '<a class="aviso-tg-btn primary" href="' + esc(urlActual) + '" target="_blank" rel="noopener noreferrer" onclick="return window.__avisoTgClick(event)">' + esc(texto) + '</a>';
+  }
+
   function renderConectado(r) {
-    urlActual = String(r.link || 'https://t.me/');
-    botNombre = String(r.bot || '');
+    botNombre = botDe(r);
+    urlActual = urlDe(r);
     pintar(head() +
       '<div class="aviso-tg-ok"><div class="chk">✓</div><div><b>Chat vinculado</b>' +
       '<p>Recibís el resumen de cada día a las 8:00 y los avisos de presentaciones en este chat.</p></div></div>' +
-      '<button class="aviso-tg-btn primary" onclick="window.__avisoTgAbrirTg()">Abrir chat de Telegram</button>' +
+      botonAbrir('Abrir chat de Telegram') +
       '<a class="aviso-tg-btn ghost" href="' + esc(urlActual) + '" target="_blank" rel="noopener noreferrer">¿No abre? Abrir en el navegador</a>' +
       '<button class="aviso-tg-btn danger" onclick="window.__avisoTgDesvincular()">Desconectar este chat</button>' +
       '<div class="aviso-tg-note">Si algún día no te llega, abrí el chat y tocá «Iniciar» una vez.</div>'
@@ -231,15 +250,15 @@
   }
 
   function renderPendiente(r) {
-    urlActual = String(r.url || '');
-    botNombre = String(r.bot || '');
+    botNombre = botDe(r);
+    urlActual = urlDe(r);
     var bot = botNombre;
     var codigo = String(r.codigo || '');
     pintar(head() +
       '<div class="aviso-tg-hero"><b>Casi listo</b><p>Dos pasos y quedás conectado:</p>' +
       '<p><b>1.</b> Tocá «Abrir Telegram» y entrá al chat del bot.</p>' +
       '<p><b>2.</b> Tocá «Iniciar» y volvé acá.</p></div>' +
-      '<button class="aviso-tg-btn primary" onclick="window.__avisoTgAbrirTg()">Abrir Telegram</button>' +
+      botonAbrir('Abrir Telegram') +
       '<a class="aviso-tg-btn ghost" href="' + esc(urlActual) + '" target="_blank" rel="noopener noreferrer">¿No abre? Abrir en el navegador</a>' +
       '<button class="aviso-tg-btn ghost" onclick="window.__avisoTgRefrescar()">Ya toqué «Iniciar» — verificar</button>' +
       (codigo ? '<span class="aviso-tg-cod" onclick="window.__avisoTgCopiar()" title="Tocá para copiar">' + esc(codigo) + '</span>' : '') +
@@ -315,6 +334,12 @@
   window.__avisoTgCopiar = copiarCodigo;
   window.__avisoTgRefrescar = function () { refrescarEstado(false); };
   window.__avisoTgAbrirTg = abrirTelegram;
+  window.__avisoTgClick = function (e) {
+    if (!esAndroid()) return true;
+    try { if (e && e.preventDefault) e.preventDefault(); } catch (err) {}
+    abrirTelegram();
+    return false;
+  };
   window.__avisoTgConectar = conectar;
   window.__avisoTgDesvincular = desvincular;
 })();

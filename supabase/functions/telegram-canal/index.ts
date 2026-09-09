@@ -69,6 +69,7 @@ Deno.serve(async request => {
         .select('id,persona_tipo,canal,destino,activo,codigo,codigo_vence,creado_en')
         .eq('user_id', userId)
         .eq('canal', 'telegram')
+        .eq('persona_tipo', personaTipo)
         .maybeSingle();
       return data || null;
     };
@@ -86,7 +87,13 @@ Deno.serve(async request => {
           link: bot ? 'https://t.me/' + bot : '',
         });
       }
-      return json({ estado: 'pendiente', bot, codigo: codigoVigente ? row.codigo : null });
+      const codigo = codigoVigente ? row.codigo : null;
+      return json({
+        estado: 'pendiente',
+        bot,
+        codigo,
+        url: bot && codigo ? ('https://t.me/' + bot + '?start=' + codigo) : (bot ? ('https://t.me/' + bot) : ''),
+      });
     }
 
     if (accion === 'vincular') {
