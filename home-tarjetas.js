@@ -494,8 +494,7 @@
       titulo: 'Tu impulso de hoy',
       html: '<div class="ht-esp-centro"><span class="ht-esp-comilla">“</span>' +
             '<p class="ht-frase ht-esp-frase">' + esc(frase) + '</p></div>' +
-            (chips.length ? '<div class="ht-chips">' + chips.map(function(c){ return '<span>' + esc(c) + '</span>'; }).join('') + '</div>' : '') +
-            '<span class="ht-esp-marca">💙</span>',
+            (chips.length ? '<div class="ht-chips">' + chips.map(function(c){ return '<span>' + esc(c) + '</span>'; }).join('') + '</div>' : ''),
       cta: null
     };
   }
@@ -1172,6 +1171,42 @@
       'body.dark .ht-card.ht-ganaste h3{color:#d8f5e6}',
       'body.dark .ht-card{background:linear-gradient(160deg,#262838,#1f2130)}',
       'body.dark .ht-card h3{color:#f2f2f7}body.dark .ht-frase{color:#c9cad8}body.dark .ht-lista li{background:rgba(255,255,255,.07);color:#d4d5e2}',
+      '.ht-card.ht-poster{overflow:hidden;color:#fff;border:0}',
+      '.ht-card.ht-poster .ht-kicker{color:rgba(255,255,255,.82)}',
+      '.ht-card.ht-poster h3{color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.18)}',
+      '.ht-card.ht-poster .ht-frase,.ht-card.ht-poster .ht-esp-frase{color:rgba(255,255,255,.94)}',
+      '.ht-card.ht-poster .ht-lista li{background:rgba(255,255,255,.16);color:#fff}',
+      '.ht-card.ht-poster .ht-lista li:hover{background:rgba(255,255,255,.24)}',
+      '.ht-card.ht-poster .ht-lista li::after{color:#fff}',
+      '.ht-card.ht-poster .ht-lista li i{color:#ffd4c8}',
+      '.ht-card.ht-poster .ht-lista li.ht-hecho{background:rgba(255,255,255,.28);color:#fff}',
+      '.ht-card.ht-poster .ht-lista li.ht-hecho::after{color:#fff}',
+      '.ht-card.ht-poster .ht-nota{color:rgba(255,255,255,.72)}',
+      '.ht-card.ht-poster .ht-pasos li{background:rgba(255,255,255,.16);color:#fff}',
+      '.ht-card.ht-poster .ht-chips span{background:rgba(255,255,255,.18);color:#fff;border:1px solid rgba(255,255,255,.22)}',
+      '.ht-card.ht-poster .ht-cta{background:#fff;color:#111;box-shadow:0 10px 22px rgba(0,0,0,.18)}',
+      '.ht-card.ht-poster .ht-esp-comilla{color:rgba(255,255,255,.35)}',
+      '.ht-card.ht-poster .ht-foto{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18)}',
+      '.ht-marca{position:absolute;right:-8px;bottom:-18px;font-size:118px;line-height:1;opacity:.16;pointer-events:none}',
+      '.ht-card.ht-poster.ht-cat-especial,body.dark .ht-card.ht-poster.ht-cat-especial{background:linear-gradient(150deg,#1278a0,#0b5878);box-shadow:0 22px 60px rgba(11,88,120,.38)}',
+      '.ht-card.ht-poster.ht-cat-hoy,body.dark .ht-card.ht-poster.ht-cat-hoy{background:linear-gradient(150deg,#c9a227,#a67c12);border:0;box-shadow:0 22px 60px rgba(166,124,18,.38)}',
+      '.ht-card.ht-poster.ht-cat-ganaste,body.dark .ht-card.ht-poster.ht-cat-ganaste,.ht-card.ht-poster.ht-cat-llegamos,body.dark .ht-card.ht-poster.ht-cat-llegamos{background:linear-gradient(150deg,#1b8a6c,#146b54);border:0;box-shadow:0 22px 60px rgba(20,107,84,.38)}',
+      '.ht-card.ht-poster.ht-cat-metodo,body.dark .ht-card.ht-poster.ht-cat-metodo{background:linear-gradient(150deg,#d85a28,#c24514);border:0;box-shadow:0 22px 60px rgba(194,69,20,.4)}',
+      '.ht-card.ht-poster.ht-cat-canje,body.dark .ht-card.ht-poster.ht-cat-canje{background:linear-gradient(150deg,#5b8def,#3d63c9)}',
+      '.ht-card.ht-poster.ht-cat-jornada,body.dark .ht-card.ht-poster.ht-cat-jornada{background:linear-gradient(150deg,#7a56c4,#5b3d9c)}',
+      '.ht-card.ht-poster.ht-cat-oportunidades,body.dark .ht-card.ht-poster.ht-cat-oportunidades{background:linear-gradient(150deg,#a44aa4,#8b3d8b)}',
+      '.ht-card.ht-poster.ht-cat-cumples,body.dark .ht-card.ht-poster.ht-cat-cumples{background:linear-gradient(150deg,#c44a82,#b03a6e)}',
+      '.ht-card.ht-poster.ht-cat-reempadronar,body.dark .ht-card.ht-poster.ht-cat-reempadronar{background:linear-gradient(150deg,#3d7a62,#2f5d4a)}',
+      '.ht-card.ht-poster.ht-cat-equipo,body.dark .ht-card.ht-poster.ht-cat-equipo{background:linear-gradient(150deg,#2a6aa0,#1f4e79)}',
+      '.ht-card.ht-poster.ht-cat-panel,body.dark .ht-card.ht-poster.ht-cat-panel{background:linear-gradient(150deg,#4d5d82,#3a4a6b)}',
+      '.ht-card.ht-poster.ht-cat-usuarios,body.dark .ht-card.ht-poster.ht-cat-usuarios{background:linear-gradient(150deg,#1786b0,#0e6a90)}',
+      '.ht-card.ht-poster.ht-cat-rinnova,body.dark .ht-card.ht-poster.ht-cat-rinnova{background:linear-gradient(150deg,#e06a38,#c24e22)}',
+      '.ht-card.ht-poster.ht-cat-otra,body.dark .ht-card.ht-poster.ht-cat-otra{background:linear-gradient(150deg,#1278a0,#0b5878)}',
+      'body.dark .ht-card.ht-poster h3{color:#fff}',
+      'body.dark .ht-card.ht-poster .ht-frase{color:rgba(255,255,255,.94)}',
+      'body.dark .ht-card.ht-poster .ht-lista li{background:rgba(255,255,255,.16);color:#fff}',
+      'body.dark .ht-card.ht-poster .ht-kicker{color:rgba(255,255,255,.82)}',
+      'body.dark .ht-card.ht-poster .ht-pasos li{background:rgba(255,255,255,.16);color:#fff}',
       '.ht-arrow{display:none}',
       '@media(min-width:1024px){#htOverlay.ht-cover-on{overflow:hidden;padding:12px 56px 18px}#htOverlay.ht-cover-on .ht-centro{position:relative;width:100%}#htOverlay.ht-cover-on .ht-arrow{display:grid;place-items:center;position:absolute;top:50%;z-index:70;width:48px;height:48px;margin-top:-24px;border:0;border-radius:50%;background:#0b5878;color:#fff;font-size:30px;font-weight:900;line-height:1;cursor:pointer;box-shadow:0 10px 24px rgba(11,88,120,.3)}#htOverlay.ht-cover-on .ht-arrow:hover{transform:scale(1.08);background:#09485f}#htOverlay.ht-cover-on .ht-arrow:active{transform:scale(.94)}#htOverlay.ht-cover-on .ht-arrow-prev{left:4px}#htOverlay.ht-cover-on .ht-arrow-next{right:4px}#htOverlay.ht-cover-on .ht-deck{max-width:none;width:100%;height:460px;perspective:1000px;perspective-origin:50% 50%;overflow:hidden;transform-style:preserve-3d} #htOverlay.ht-cover-on .ht-card{position:absolute;inset:auto;top:50%;left:50%;right:auto;bottom:auto;width:420px;height:400px;margin:0;padding:22px 26px;transform:translate(-50%,-50%);transform-origin:center center;transform-style:preserve-3d;backface-visibility:hidden;-webkit-backface-visibility:hidden;cursor:default!important;touch-action:auto;-webkit-user-drag:none;user-select:none;box-shadow:0 16px 40px rgba(10,12,40,.25)}#htOverlay.ht-cover-on .ht-card.ht-front,#htOverlay.ht-cover-on .ht-card.arrastre,#htOverlay.ht-cover-on .ht-card.ht-side{cursor:default!important}#htOverlay.ht-cover-on .ht-cta,#htOverlay.ht-cover-on .ht-lista li{cursor:pointer!important}#htOverlay.ht-cover-on .ht-card h3{font-size:24px;line-height:1.25}#htOverlay.ht-cover-on .ht-frase{font-size:18px;line-height:1.5}#htOverlay.ht-cover-on .ht-esp-frase{font-size:22px;line-height:1.4}#htOverlay.ht-cover-on .ht-chips{gap:8px}#htOverlay.ht-cover-on .ht-card.detras1,#htOverlay.ht-cover-on .ht-card.detras2{transform:translate(-50%,-50%);opacity:1;pointer-events:auto}#htOverlay.ht-cover-on .ht-card.demo{animation:none}#htOverlay.ht-cover-on .ht-card.ht-front{cursor:default;box-shadow:0 24px 56px rgba(11,88,120,.3)}#htOverlay.ht-cover-on .ht-card.ht-side .ht-cta,#htOverlay.ht-cover-on .ht-card.ht-side .ht-lista{pointer-events:none}#htOverlay.ht-cover-on .ht-hint{font-size:12px;color:#686977}}'
     ].join('');
@@ -1222,8 +1257,14 @@
 
   function crearCarta(t){
     var el = document.createElement('div');
-    el.className = 'ht-card' + (t.cat === 'especial' ? ' ht-esp' : '') + (t.cat === 'metodo' ? ' ht-alerta' : '') + (t.cat === 'hoy' ? ' ht-hoy' : '') + (t.cat === 'ganaste' ? ' ht-ganaste' : '');
-    el.innerHTML = '<div class="ht-cab"><span class="ht-ico">' + t.icono + '</span>' +
+    var cat = t && t.cat ? t.cat : 'otra';
+    el.className = 'ht-card ht-poster ht-cat-' + cat +
+      (cat === 'especial' ? ' ht-esp' : '') +
+      (cat === 'metodo' ? ' ht-alerta' : '') +
+      (cat === 'hoy' ? ' ht-hoy' : '') +
+      (cat === 'ganaste' || cat === 'llegamos' ? ' ht-ganaste' : '');
+    el.innerHTML = '<span class="ht-marca" aria-hidden="true">' + (t.icono || '') + '</span>' +
+      '<div class="ht-cab"><span class="ht-ico">' + t.icono + '</span>' +
       '<span class="ht-kicker">' + esc(t.kicker) + '</span></div>' +
       '<h3>' + esc(t.titulo) + '</h3>' +
       '<div class="ht-cuerpo">' + t.html + '</div>' +
