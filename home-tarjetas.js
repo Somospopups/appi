@@ -1102,6 +1102,7 @@
       '.ht-centro{display:flex;flex-direction:column;align-items:center;gap:11px}',
       '.ht-deck{position:relative;width:100%;max-width:400px;height:min(56vh,440px);margin:0 auto}',
       '.ht-card{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-start;padding:14px 16px 12px;border-radius:24px;background:linear-gradient(160deg,#ffffff,#f4f6ff);box-shadow:0 22px 60px rgba(10,12,40,.35);touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab;will-change:transform;transition:transform .32s cubic-bezier(.22,.9,.35,1),opacity .32s ease}',
+      '.ht-card,.ht-card *{touch-action:none;-webkit-user-drag:none}',
       '.ht-card.demo{animation:htVaiven 1.1s ease .08s 1}',
       '@keyframes htVaiven{0%,100%{transform:none}22%{transform:translateX(34px) rotate(2.5deg)}60%{transform:translateX(-30px) rotate(-2.2deg)}}',
       '.ht-card.detras1{transform:translateY(15px) scale(.95);opacity:.75;pointer-events:none}',
@@ -1220,7 +1221,7 @@
       'body.dark .ht-card.ht-poster .ht-lista li,body.dark .ht-card.ht-poster .ht-pasos li,body.dark .ht-card.ht-poster.ht-alerta .ht-pasos li{background:rgba(0,0,0,.28);color:#fff}',
       'body.dark .ht-card.ht-poster .ht-nota{color:#fff}',
       '.ht-arrow{display:none}',
-      '@media(min-width:1024px){#htOverlay.ht-cover-on{overflow:hidden;padding:12px 56px 18px}#htOverlay.ht-cover-on .ht-centro{position:relative;width:100%}#htOverlay.ht-cover-on .ht-arrow{display:grid;place-items:center;position:absolute;top:50%;z-index:70;width:48px;height:48px;margin-top:-24px;border:0;border-radius:50%;background:#0b5878;color:#fff;font-size:30px;font-weight:900;line-height:1;cursor:pointer;box-shadow:0 10px 24px rgba(11,88,120,.3)}#htOverlay.ht-cover-on .ht-arrow:hover{transform:scale(1.08);background:#09485f}#htOverlay.ht-cover-on .ht-arrow:active{transform:scale(.94)}#htOverlay.ht-cover-on .ht-arrow-prev{left:4px}#htOverlay.ht-cover-on .ht-arrow-next{right:4px}#htOverlay.ht-cover-on .ht-deck{max-width:none;width:100%;height:460px;perspective:1000px;perspective-origin:50% 50%;overflow:hidden;transform-style:preserve-3d} #htOverlay.ht-cover-on .ht-card{position:absolute;inset:auto;top:50%;left:50%;right:auto;bottom:auto;width:420px;height:400px;margin:0;padding:16px 18px;transform:translate(-50%,-50%);transform-origin:center center;transform-style:preserve-3d;backface-visibility:hidden;-webkit-backface-visibility:hidden;cursor:default!important;touch-action:auto;-webkit-user-drag:none;user-select:none;box-shadow:0 16px 40px rgba(10,12,40,.25)}#htOverlay.ht-cover-on .ht-card.ht-front,#htOverlay.ht-cover-on .ht-card.arrastre,#htOverlay.ht-cover-on .ht-card.ht-side{cursor:default!important}#htOverlay.ht-cover-on .ht-cta,#htOverlay.ht-cover-on .ht-lista li{cursor:pointer!important}#htOverlay.ht-cover-on .ht-card h3{font-size:21px;line-height:1.2}#htOverlay.ht-cover-on .ht-frase{font-size:18px;line-height:1.5}#htOverlay.ht-cover-on .ht-esp-frase{font-size:22px;line-height:1.4}#htOverlay.ht-cover-on .ht-chips{gap:8px}#htOverlay.ht-cover-on .ht-card.detras1,#htOverlay.ht-cover-on .ht-card.detras2{transform:translate(-50%,-50%);opacity:1;pointer-events:auto}#htOverlay.ht-cover-on .ht-card.demo{animation:none}#htOverlay.ht-cover-on .ht-card.ht-front{cursor:default;box-shadow:0 24px 56px rgba(11,88,120,.3)}#htOverlay.ht-cover-on .ht-card.ht-side .ht-cta,#htOverlay.ht-cover-on .ht-card.ht-side .ht-lista{pointer-events:none}#htOverlay.ht-cover-on .ht-hint{font-size:12px;color:#686977}}'
+      '@media(min-width:1024px){#htOverlay.ht-cover-on{overflow:hidden;padding:12px 56px 18px}#htOverlay.ht-cover-on .ht-centro{position:relative;width:100%}#htOverlay.ht-cover-on .ht-arrow{display:grid;place-items:center;position:absolute;top:50%;z-index:70;width:48px;height:48px;margin-top:-24px;border:0;border-radius:50%;background:#0b5878;color:#fff;font-size:30px;font-weight:900;line-height:1;cursor:pointer;box-shadow:0 10px 24px rgba(11,88,120,.3)}#htOverlay.ht-cover-on .ht-arrow:hover{transform:scale(1.08);background:#09485f}#htOverlay.ht-cover-on .ht-arrow:active{transform:scale(.94)}#htOverlay.ht-cover-on .ht-arrow-prev{left:4px}#htOverlay.ht-cover-on .ht-arrow-next{right:4px}#htOverlay.ht-cover-on .ht-deck{max-width:none;width:100%;height:460px;perspective:1000px;perspective-origin:50% 50%;overflow:hidden;transform-style:preserve-3d} #htOverlay.ht-cover-on .ht-card{position:absolute;inset:auto;top:50%;left:50%;right:auto;bottom:auto;width:420px;height:400px;margin:0;padding:16px 18px;transform:translate(-50%,-50%);transform-origin:center center;transform-style:preserve-3d;backface-visibility:hidden;-webkit-backface-visibility:hidden;cursor:default!important;touch-action:auto;-webkit-user-drag:none;user-select:none;box-shadow:0 16px 40px rgba(10,12,40,.25)}#htOverlay.ht-cover-on .ht-card.ht-front,#htOverlay.ht-cover-on .ht-card.arrastre,#htOverlay.ht-cover-on .ht-card.ht-side{cursor:default!important}#htOverlay.ht-cover-on .ht-card,#htOverlay.ht-cover-on .ht-card *{touch-action:auto}#htOverlay.ht-cover-on .ht-cta,#htOverlay.ht-cover-on .ht-lista li{cursor:pointer!important}#htOverlay.ht-cover-on .ht-card h3{font-size:21px;line-height:1.2}#htOverlay.ht-cover-on .ht-frase{font-size:18px;line-height:1.5}#htOverlay.ht-cover-on .ht-esp-frase{font-size:22px;line-height:1.4}#htOverlay.ht-cover-on .ht-chips{gap:8px}#htOverlay.ht-cover-on .ht-card.detras1,#htOverlay.ht-cover-on .ht-card.detras2{transform:translate(-50%,-50%);opacity:1;pointer-events:auto}#htOverlay.ht-cover-on .ht-card.demo{animation:none}#htOverlay.ht-cover-on .ht-card.ht-front{cursor:default;box-shadow:0 24px 56px rgba(11,88,120,.3)}#htOverlay.ht-cover-on .ht-card.ht-side .ht-cta,#htOverlay.ht-cover-on .ht-card.ht-side .ht-lista{pointer-events:none}#htOverlay.ht-cover-on .ht-hint{font-size:12px;color:#686977}}'
     ].join('');
     document.head.appendChild(st);
   }
@@ -1576,24 +1577,25 @@
 
   function activarArrastre(el){
     if (esPC()) return;
-    // Se agarrá desde cualquier parte: horizontal pasa la carta, vertical
-    // (sobre la lista) scrollea los nombres. El scroll nativo de la lista
-    // cancelaba el gesto y solo se podía agarrar del título (v568).
+    // La carta toma el dedo enseguida (capture), desde título, lista o botón.
+    // Si no, el scroll de la lista cancela el gesto y solo se agarra arriba.
     var x0 = 0, y0 = 0, lastY = 0, dx = 0, dy = 0, arrastrando = false, dir = 0, modo = '';
     var lista = null;
     el.addEventListener('pointerdown', function(e){
+      if (e.button != null && e.button !== 0) return;
       el.classList.remove('demo');
       arrastrando = true; modo = '';
       x0 = e.clientX; y0 = e.clientY; lastY = e.clientY; dx = 0; dy = 0; dir = 0; el.__arrastro = false;
-      lista = e.target.closest ? e.target.closest('.ht-lista') : null;
+      lista = (e.target && e.target.closest) ? e.target.closest('.ht-lista') : null;
+      try{ el.setPointerCapture(e.pointerId); }catch(err){}
     }, true);
     el.addEventListener('pointermove', function(e){
       if (!arrastrando) return;
       dx = e.clientX - x0;
       dy = e.clientY - y0;
       if (!modo){
-        if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
-        if (Math.abs(dx) >= Math.abs(dy) + 2) modo = 'swipe';
+        if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
+        if (Math.abs(dx) >= Math.abs(dy) + 1) modo = 'swipe';
         else if (lista) modo = 'scroll';
         else modo = 'swipe';
       }
@@ -1602,7 +1604,6 @@
         if (!el.__arrastro){
           el.__arrastro = true;
           el.classList.add('arrastre');
-          try{ el.setPointerCapture(e.pointerId); }catch(err){}
         }
         if (dx !== 0){
           var nueva = dx < 0 ? 1 : -1;
@@ -1615,12 +1616,15 @@
         if (e.cancelable) e.preventDefault();
       }
     }, { capture: true, passive: false });
+    el.addEventListener('touchmove', function(e){
+      if (arrastrando && modo){ if (e.cancelable) e.preventDefault(); }
+    }, { capture: true, passive: false });
     function soltar(){
       if (!arrastrando) return;
       arrastrando = false;
       el.classList.remove('arrastre');
-      if (el.__arrastro && dx < -80 && pasar()){ /* pasó a la siguiente */ }
-      else if (el.__arrastro && dx > 80 && volver()){ /* volvió a la anterior */ }
+      if (el.__arrastro && dx < -80 && pasar()){ /* pasó */ }
+      else if (el.__arrastro && dx > 80 && volver()){ /* volvió */ }
       else if (el.__arrastro){
         el.classList.add('volver'); el.style.transform = '';
         setTimeout(function(){ el.classList.remove('volver'); }, 360);
