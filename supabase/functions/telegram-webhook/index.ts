@@ -69,11 +69,14 @@ Deno.serve(async request => {
     const texto = String(message?.text ?? '').trim();
     if (!chatId || !texto) return json({ ok: true }); // acuses de teclado, etc.
 
-    const [comando, resto] = texto.split(/\s+/, 2);
-    const arg = String(resto || '').trim();
+    const [comandoBruto] = texto.split(/\s+/, 1);
+    const comando = String(comandoBruto || '').split('@')[0];
+    const startCodigo = (texto.match(/^\/start(?:@\S+)?(?:\s+([A-Za-z0-9]{6,16}))?$/i) || [])[1];
+    const codigoPegado = (texto.match(/^([A-HJ-NP-Z2-9]{6,16})$/i) || [])[1];
+    const arg = String(startCodigo || codigoPegado || '').trim().toUpperCase();
 
-    // ---------- /start <codigo>: vincular ----------
-    if (comando === '/start' && arg) {
+    // ---------- /start <codigo> o el código pegado: vincular ----------
+    if (arg) {
       const { data: fila } = await admin
         .from('appi_canales_aviso')
         .select('id,user_id,persona_tipo,codigo_vence')
@@ -121,10 +124,13 @@ Deno.serve(async request => {
         return json({ ok: true });
       }
 
-      // Confirmación y, si hay pendientes hoy, el resumen de muestra.
-      const { data: resumen } = await admin.rpc('appi_resumen_gestion', { p_user_id: fila.user_id, p_fecha: localDate() });
-      const base = `¡Listo, ${nombre}! ✅\n\nDe ahora en más vas a recibir acá:\n• Tu resumen del día, a las 8:00\n• Avisos de presentaciones próximas\n\n`;
-      const extra = resumen && resumen.total > 0 ? `\n\n${resumenTexto(resumen, nombre)}` : '';
+      const base = `¡Listo, ${nombre}! ✅\n\nDe ahora en más vas a recibir acá:\n• Tu resumen del día, a las 8:00\n• Avisos de presentaciones próximas`;
+      let extra = '';
+      try {
+        const { data: resumen } = await admin.rpc('appi_resumen_gestion', { p_user_id: fila.user_id, p_fecha: localDate() });
+        const row = Array.isArray(resumen) ? resumen[0] : resumen;
+        if (row && row.total > 0) extra = `\n\n${resumenTexto(row, nombre)}`;
+      } catch { extra = ''; }
       await botFetch(token, 'sendMessage', {
         chat_id: chatId,
         text: base + extra + `\n\nPodés pausar con /pausa y reanudar con /reanudar.`,

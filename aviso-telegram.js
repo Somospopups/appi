@@ -332,7 +332,29 @@
   window.__avisoTgAbrirOv = abrir;
   window.__avisoTgCerrar = cerrar;
   window.__avisoTgCopiar = copiarCodigo;
-  window.__avisoTgRefrescar = function () { refrescarEstado(false); };
+  window.__avisoTgRefrescar = function () {
+    if (timer) { clearInterval(timer); timer = null; }
+    renderCarga();
+    var mi = ++peticionSeq;
+    llamar('estado').then(function (r) {
+      if (mi !== peticionSeq) return;
+      if (r && r.estado === 'conectado') {
+        renderConectado(r);
+        toast('Listo: Telegram quedó vinculado');
+        return;
+      }
+      if (r && r.estado === 'pendiente' && r.codigo) {
+        renderPendiente(r);
+        toast('Todavía no. En Telegram tocá Iniciar o mandá el código ' + r.codigo);
+        return;
+      }
+      if (r && r.error) { renderError(r.error); return; }
+      conectar();
+    }).catch(function () {
+      if (mi !== peticionSeq) return;
+      renderError('Sin conexión. Revisá internet y probá de nuevo.');
+    });
+  };
   window.__avisoTgAbrirTg = abrirTelegram;
   window.__avisoTgClick = function (e) {
     if (!esAndroid()) return true;
