@@ -1101,7 +1101,7 @@
       'body.dark .ht-top b{color:#f2f2f7}',
       '.ht-centro{display:flex;flex-direction:column;align-items:center;gap:11px}',
       '.ht-deck{position:relative;width:100%;max-width:400px;height:min(56vh,440px);margin:0 auto}',
-      '.ht-card{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-start;padding:14px 16px 12px;border-radius:24px;background:linear-gradient(160deg,#ffffff,#f4f6ff);box-shadow:0 22px 60px rgba(10,12,40,.35);touch-action:pan-y;user-select:none;-webkit-user-select:none;cursor:grab;will-change:transform;transition:transform .32s cubic-bezier(.22,.9,.35,1),opacity .32s ease}',
+      '.ht-card{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-start;padding:14px 16px 12px;border-radius:24px;background:linear-gradient(160deg,#ffffff,#f4f6ff);box-shadow:0 22px 60px rgba(10,12,40,.35);touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab;will-change:transform;transition:transform .32s cubic-bezier(.22,.9,.35,1),opacity .32s ease}',
       '.ht-card.demo{animation:htVaiven 1.1s ease .08s 1}',
       '@keyframes htVaiven{0%,100%{transform:none}22%{transform:translateX(34px) rotate(2.5deg)}60%{transform:translateX(-30px) rotate(-2.2deg)}}',
       '.ht-card.detras1{transform:translateY(15px) scale(.95);opacity:.75;pointer-events:none}',
@@ -1115,7 +1115,7 @@
       '.ht-card h3{margin:4px 0 8px;color:#1d1d2c;font-size:21px;line-height:1.2;letter-spacing:-.4px;min-height:2.4em;flex:0 0 auto}',
       '.ht-cuerpo{flex:1 1 auto;display:flex;flex-direction:column;justify-content:flex-start;gap:8px;overflow:hidden;min-height:0;z-index:0}',
       '.ht-frase{margin:0;color:#41424f;font-size:17.5px;line-height:1.55;font-weight:700}',
-      '.ht-lista{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;flex:1 1 auto;gap:6px;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch}',
+      '.ht-lista{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;flex:1 1 auto;gap:6px;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:none;overscroll-behavior:contain}',
       '.ht-lista li{display:flex;align-items:center;gap:8px;flex:0 0 auto;height:46px;padding:0 12px;border-radius:14px;background:rgba(91,141,239,.08);color:#33343f;font-size:14px;font-weight:750;cursor:pointer;overflow:hidden;transition:background .14s}',
       '.ht-lista li:hover{background:rgba(91,141,239,.16)}',
       '.ht-li-nom{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
@@ -1576,35 +1576,45 @@
 
   function activarArrastre(el){
     if (esPC()) return;
-    // Se arrastra desde cualquier parte de la tarjeta, botones incluidos.
-    // El dedo real tiembla unos píxeles al tocar: para que un toque nunca se
-    // confunda con un arrastre, el gesto recién cuenta como arrastre cuando
-    // el movimiento es claramente horizontal y amplio (y sobre un botón o un
-    // renglón, más amplio todavía). Si fue toque, el click sale normal.
-    var x0 = 0, y0 = 0, dx = 0, dy = 0, arrastrando = false, umbral = 14, dir = 0;
+    // Se agarrá desde cualquier parte: horizontal pasa la carta, vertical
+    // (sobre la lista) scrollea los nombres. El scroll nativo de la lista
+    // cancelaba el gesto y solo se podía agarrar del título (v568).
+    var x0 = 0, y0 = 0, lastY = 0, dx = 0, dy = 0, arrastrando = false, dir = 0, modo = '';
+    var lista = null;
     el.addEventListener('pointerdown', function(e){
       el.classList.remove('demo');
-      arrastrando = true; x0 = e.clientX; y0 = e.clientY; dx = 0; dy = 0; dir = 0; el.__arrastro = false;
-      umbral = e.target.closest('button, .ht-lista li, a') ? 26 : 14;
-      // Ojo: la captura del puntero recién se toma cuando el gesto ES un
-      // arrastre. Si se toma acá, el click de la ✗ y del botón se pierde.
-    });
+      arrastrando = true; modo = '';
+      x0 = e.clientX; y0 = e.clientY; lastY = e.clientY; dx = 0; dy = 0; dir = 0; el.__arrastro = false;
+      lista = e.target.closest ? e.target.closest('.ht-lista') : null;
+    }, true);
     el.addEventListener('pointermove', function(e){
       if (!arrastrando) return;
       dx = e.clientX - x0;
       dy = e.clientY - y0;
-      if (!el.__arrastro && Math.abs(dx) > umbral && Math.abs(dx) > Math.abs(dy) + 4){
-        el.__arrastro = true;
-        el.classList.add('arrastre');
-        try{ el.setPointerCapture(e.pointerId); }catch(err){}
+      if (!modo){
+        if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
+        if (Math.abs(dx) >= Math.abs(dy) + 2) modo = 'swipe';
+        else if (lista) modo = 'scroll';
+        else modo = 'swipe';
       }
-      if (el.__arrastro && dx !== 0){
-        // Atrás asoma la tarjeta hacia donde va el gesto (v324).
-        var nueva = dx < 0 ? 1 : -1;
-        if (nueva !== dir){ dir = nueva; asomar(dir); }
-        el.style.transform = 'translateX(' + dx + 'px) rotate(' + (dx / 20) + 'deg)';
+      if (modo === 'swipe'){
+        if (e.cancelable) e.preventDefault();
+        if (!el.__arrastro){
+          el.__arrastro = true;
+          el.classList.add('arrastre');
+          try{ el.setPointerCapture(e.pointerId); }catch(err){}
+        }
+        if (dx !== 0){
+          var nueva = dx < 0 ? 1 : -1;
+          if (nueva !== dir){ dir = nueva; asomar(dir); }
+          el.style.transform = 'translateX(' + dx + 'px) rotate(' + (dx / 20) + 'deg)';
+        }
+      } else if (modo === 'scroll' && lista){
+        lista.scrollTop += (lastY - e.clientY);
+        lastY = e.clientY;
+        if (e.cancelable) e.preventDefault();
       }
-    });
+    }, { capture: true, passive: false });
     function soltar(){
       if (!arrastrando) return;
       arrastrando = false;
@@ -1614,15 +1624,16 @@
       else if (el.__arrastro){
         el.classList.add('volver'); el.style.transform = '';
         setTimeout(function(){ el.classList.remove('volver'); }, 360);
-        // El gesto no se concretó: atrás vuelve a asomar la siguiente.
         if (dir === -1) asomar(1);
       }
       dir = 0;
     }
-    el.addEventListener('pointerup', soltar);
-    el.addEventListener('pointercancel', soltar);
+    el.addEventListener('pointerup', soltar, true);
+    el.addEventListener('pointercancel', soltar, true);
     el.addEventListener('click', function(e){
-      if (el.__arrastro){ e.stopPropagation(); e.preventDefault(); }
+      if (el.__arrastro || (modo === 'scroll' && Math.abs(dy) > 10)){
+        e.stopPropagation(); e.preventDefault();
+      }
     }, true);
   }
 
