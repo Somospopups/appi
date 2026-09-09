@@ -32,7 +32,7 @@ jobs:
           # El instalador consolidado crea la base; las migraciones posteriores
           # completan módulos agregados después y son seguras al reejecutarse.
           fallidas=""
-          for migration in SUPABASE_INSTALACION_COMPLETA.sql SUPABASE_MI_GENTE.sql SUPABASE_MEMBRESIAS.sql SUPABASE_PERSONAS_CUENTA.sql SUPABASE_INVITACIONES_PERSONA.sql SUPABASE_RECORDATORIOS.sql SUPABASE_ANUNCIOS.sql SUPABASE_TELEGRAM.sql; do
+          for migration in SUPABASE_INSTALACION_COMPLETA.sql SUPABASE_MI_GENTE.sql SUPABASE_MEMBRESIAS.sql SUPABASE_PERSONAS_CUENTA.sql SUPABASE_INVITACIONES_PERSONA.sql SUPABASE_RECORDATORIOS.sql SUPABASE_ANUNCIOS.sql SUPABASE_AVISOS_TELEGRAM.sql; do
             echo "::group::$migration"
             jq -Rs '{query: ., read_only: false}' "$migration" > /tmp/migration.json
             if curl --fail-with-body --silent --show-error \
@@ -77,19 +77,8 @@ jobs:
       - name: Publicar recordatorios de Mi Gestión
         run: supabase functions deploy recordatorios-gestion --project-ref "$SUPABASE_PROJECT_ID"
 
-      - name: Publicar avisos de Telegram
-        run: supabase functions deploy telegram-avisos --no-verify-jwt --project-ref "$SUPABASE_PROJECT_ID"
+      - name: Publicar canal de Telegram (gestión desde la app)
+        run: supabase functions deploy telegram-canal --project-ref "$SUPABASE_PROJECT_ID"
 
-      - name: Guardar token y webhook de Telegram
-        env:
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-        run: |
-          test -n "$TELEGRAM_BOT_TOKEN" || (echo "Falta el secret TELEGRAM_BOT_TOKEN" && exit 1)
-          printf '%s' "$TELEGRAM_BOT_TOKEN" | supabase secrets set TELEGRAM_BOT_TOKEN --project-ref "$SUPABASE_PROJECT_ID"
-          SECRET=$(python3 -c 'import hashlib,os; print(hashlib.sha256((os.environ["TELEGRAM_BOT_TOKEN"]+":appi-telegram").encode()).hexdigest()[:32])')
-          curl --fail-with-body --silent --show-error \
-            "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/setWebhook" \
-            --data-urlencode "url=https://tqwnjfnaywjmyfplvatm.supabase.co/functions/v1/telegram-avisos" \
-            --data-urlencode "secret_token=${SECRET}" \
-            --data 'allowed_updates=["message"]' >/dev/null
-          echo "Webhook de Telegram listo"
+      - name: Publicar webhook del bot de Telegram
+        run: supabase functions deploy telegram-webhook --no-verify-jwt --project-ref "$SUPABASE_PROJECT_ID"

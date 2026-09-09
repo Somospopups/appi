@@ -1,5 +1,6 @@
-// APPI · v216 · Recordatorios de Mi Gestión
-// Envía el resumen diario y los avisos de presentación por Web Push.
+// APPI · v544 · Recordatorios de Mi Gestión
+// Envía el resumen diario (8:00 ART) y los avisos de presentación por Web Push
+// y por Telegram (canal alternativo: llega aunque la PWA no esté instalada).
 // La invoca pg_cron con la clave de servicio; no la usa el navegador.
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.8';
@@ -26,7 +27,6 @@ function shortTime(value: unknown) {
   return /^\d{2}:\d{2}/.test(raw) ? raw.slice(0, 5) : '';
 }
 
-// "3 seguimientos, 1 presentación y 2 nuevos" en lugar de una lista seca.
 function joinParts(parts: string[]) {
   if (parts.length <= 1) return parts.join('');
   return `${parts.slice(0, -1).join(', ')} y ${parts[parts.length - 1]}`;
@@ -49,32 +49,13 @@ function summaryBody(row: any) {
   return `${base}${surveys}`;
 }
 
+function clavePersona(row: any) {
+  return `${row.user_id}|${row.persona_tipo}`;
+}
+
+// ---------- Web Push ----------
+
 // Un endpoint muerto se limpia para no reintentar indefinidamente.
-async function sendTelegram(chatId: unknown, text: string) {
-  const token = Deno.env.get('TELEGRAM_BOT_TOKEN') || '';
-  if (!token || !chatId) return { ok: false as const };
-  try {
-    const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ chat_id: chatId, text, disable_web_page_preview: true }),
-    });
-    const data = await res.json().catch(() => ({}));
-    return { ok: res.ok && data?.ok === true } as const;
-  } catch {
-    return { ok: false as const };
-  }
-}
-
-async function chatTelegram(admin: any, userId: string, personaTipo: string) {
-  const { data } = await admin.from('appi_telegram_vinculos')
-    .select('chat_id')
-    .eq('user_id', userId)
-    .eq('persona_tipo', personaTipo)
-    .maybeSingle();
-  return data?.chat_id || null;
-}
-
 async function sendPush(admin: any, target: any, payload: Record<string, unknown>, ttl: number) {
   try {
     await webpush.sendNotification(
@@ -94,6 +75,35 @@ async function sendPush(admin: any, target: any, payload: Record<string, unknown
   }
 }
 
+// ---------- Telegram ----------
+
+async function telegramSend(admin: any, chatId: string, token: string, text: string) {
+  try {
+    const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: chatId, text, disable_web_page_preview: true }),
+    });
+    const body = await res.json().catch(() => ({}));
+    if (body?.ok) return { ok: true as const };
+    const code = Number(body?.error_code || 0);
+    if (code === 403) {
+      // El usuario bloqueó el bot: desactivar el canal para no reintentar.
+      await admin.from('appi_canales_aviso')
+        .update({ activo: false, ultimo_error: 'bloqueado', actualizado_en: new Date().toISOString() })
+        .eq('destino', chatId)
+        .eq('canal', 'telegram');
+      return { ok: false as const, motivo: 'bloqueado' };
+    }
+    if (code === 429) return { ok: false as const, motivo: 'limite' };
+    return { ok: false as const, motivo: String(body?.description || 'telegram') };
+  } catch {
+    return { ok: false as const, motivo: 'red' };
+  }
+}
+
+// ---------- Registro anti-duplicados ----------
+
 async function registrar(admin: any, row: Record<string, unknown>) {
   // La clave única evita un segundo aviso si el cron se solapa o se reintenta.
   const { error } = await admin.from('appi_recordatorios_enviados').insert(row);
@@ -101,130 +111,168 @@ async function registrar(admin: any, row: Record<string, unknown>) {
   return !error;
 }
 
-async function enviarResumen(admin: any) {
+async function marcarEstado(admin: any, filtro: Record<string, unknown>, detalle: Record<string, unknown>, estado: string) {
+  await admin.from('appi_recordatorios_enviados')
+    .update({ estado, detalle })
+    .match(filtro);
+}
+
+// ---------- Contexto de envío por persona ----------
+
+async function contextoEnvios(admin: any) {
+  const [canales, dispositivos] = await Promise.all([
+    admin
+      .from('appi_canales_aviso')
+      .select('user_id,persona_tipo,destino')
+      .eq('canal', 'telegram')
+      .eq('activo', true)
+      .not('destino', 'is', null),
+    admin
+      .from('appi_dispositivos_vinculados')
+      .select('id,user_id,persona_tipo,push_endpoint,push_p256dh,push_auth')
+      .eq('activo', true)
+      .eq('notificaciones', true)
+      .eq('recordatorios', true)
+      .not('push_endpoint', 'is', null),
+  ]);
+  const chats = new Map<string, string>();
+  for (const c of canales.data || []) chats.set(clavePersona(c), String(c.destino));
+  const pushes = new Map<string, any[]>();
+  for (const d of dispositivos.data || []) {
+    const k = clavePersona(d);
+    if (!pushes.has(k)) pushes.set(k, []);
+    pushes.get(k)!.push({ ...d, device_id: d.id });
+  }
+  return { chats, pushes };
+}
+
+// ---------- Envíos ----------
+
+async function enviarResumen(admin: any, ctx: any, token: string) {
   const fecha = localDate();
-  const { data, error } = await admin.rpc('appi_pendientes_resumen', { p_fecha: fecha });
+  const { data, error } = await admin.rpc('appi_pendientes_canales', { p_fecha: fecha });
   if (error) throw error;
   const pendientes = Array.isArray(data) ? data : [];
   let enviados = 0;
   let fallidos = 0;
 
   for (const row of pendientes) {
-    // Se reserva el aviso ANTES de enviarlo: si el push falla, el registro
-    // queda como 'error' y no se reintenta el mismo día.
-    const reservado = await registrar(admin, {
+    const claveFiltro = {
       user_id: row.user_id,
       persona_tipo: row.persona_tipo,
-      tipo: 'resumen_diario',
+      tipo: 'resumen_diario' as const,
       clave: fecha,
-      detalle: {
-        nuevos: row.nuevos,
-        hoy: row.hoy,
-        vencidos: row.vencidos,
-        presentaciones: row.presentaciones,
-        encuestas_nuevas: row.encuestas_nuevas,
-        total: row.total,
-      },
+    };
+    // Se reserva el aviso ANTES de enviarlo (el estado final se ajusta abajo).
+    const reservado = await registrar(admin, {
+      ...claveFiltro,
+      detalle: { nuevos: row.nuevos, hoy: row.hoy, vencidos: row.vencidos, presentaciones: row.presentaciones, encuestas_nuevas: row.encuestas_nuevas, total: row.total },
       estado: 'enviado',
     });
     if (!reservado) continue;
 
     const nombre = firstName(row.nombre);
-    const bodyTxt = summaryBody(row);
-    const title = nombre ? `Buen día, ${nombre}` : 'Mi Gestión';
-    const result = row.push_endpoint ? await sendPush(admin, row, {
-      type: 'daily_summary',
-      title,
-      body: bodyTxt,
-      url: './?gestion=hoy',
-      total: row.total,
-    }, 3600) : { ok: false as const };
-    const chat = row.chat_id || await chatTelegram(admin, row.user_id, row.persona_tipo);
-    const tg = chat ? await sendTelegram(chat, `${title}\n${bodyTxt}`) : { ok: false as const };
+    const targets = ctx.pushes.get(clavePersona(row)) || [];
+    const chat = ctx.chats.get(clavePersona(row)) || '';
 
-    if (result.ok || tg.ok) enviados++;
+    const canales: Record<string, unknown> = {};
+    let llego = false;
+
+    // Web Push a todos los teléfonos aptos de esa persona.
+    let pushOk = 0;
+    for (const t of targets) {
+      const r = await sendPush(admin, t, {
+        type: 'daily_summary',
+        title: nombre ? `Buen día, ${nombre}` : 'Mi Gestión',
+        body: summaryBody(row),
+        url: './?gestion=hoy',
+        total: row.total,
+      }, 3600);
+      if (r.ok) { pushOk++; llego = true; }
+    }
+    canales.push = pushOk > 0 ? { ok: pushOk } : targets.length ? { ok: 0, err: true } : { sin: true };
+
+    // Telegram como canal alternativo (mismo resumen).
+    if (chat && token) {
+      const texto = `Buen día, ${nombre || 'distribuidor'} 👋\n\n${summaryBody(row)}\n\n📱 Abrí APPI para ver el detalle.`;
+      const r = await telegramSend(admin, chat, token, texto);
+      if (r.ok) { canales.telegram = { ok: true }; llego = true; }
+      else canales.telegram = { ok: false, err: r.motivo };
+    } else if (chat) {
+      canales.telegram = { ok: false, err: 'sin_token' };
+    }
+
+    if (llego) enviados++;
     else {
       fallidos++;
-      await admin.from('appi_recordatorios_enviados')
-        .update({ estado: 'error' })
-        .eq('user_id', row.user_id)
-        .eq('persona_tipo', row.persona_tipo)
-        .eq('tipo', 'resumen_diario')
-        .eq('clave', fecha);
-    }
-  }
-
-  const { data: soloTg, error: tgError } = await admin.rpc('appi_pendientes_telegram', { p_fecha: fecha });
-  if (!tgError) {
-    const extra = Array.isArray(soloTg) ? soloTg : [];
-    for (const row of extra) {
-      const reservado = await registrar(admin, {
-        user_id: row.user_id,
-        persona_tipo: row.persona_tipo,
-        tipo: 'resumen_diario',
-        clave: fecha,
-        detalle: { canal: 'telegram', total: row.total },
-        estado: 'enviado',
-      });
-      if (!reservado) continue;
-      const nombre = firstName(row.nombre);
-      const title = nombre ? `Buen día, ${nombre}` : 'Mi Gestión';
-      const tg = await sendTelegram(row.chat_id, `${title}\n${summaryBody(row)}`);
-      if (tg.ok) enviados++;
-      else {
-        fallidos++;
-        await admin.from('appi_recordatorios_enviados')
-          .update({ estado: 'error' })
-          .eq('user_id', row.user_id)
-          .eq('persona_tipo', row.persona_tipo)
-          .eq('tipo', 'resumen_diario')
-          .eq('clave', fecha);
-      }
+      await marcarEstado(admin, claveFiltro, {
+        ...canales,
+        nuevos: row.nuevos, hoy: row.hoy, vencidos: row.vencidos,
+        presentaciones: row.presentaciones, encuestas_nuevas: row.encuestas_nuevas,
+        total: row.total,
+      }, 'error');
     }
   }
 
   return { modo: 'resumen', fecha, candidatos: pendientes.length, enviados, fallidos };
 }
 
-async function enviarPresentaciones(admin: any) {
-  const { data, error } = await admin.rpc('appi_presentaciones_proximas', { p_minutos: AVISO_MINUTOS });
+async function enviarPresentaciones(admin: any, ctx: any, token: string) {
+  const { data, error } = await admin.rpc('appi_presentaciones_canales', { p_minutos: AVISO_MINUTOS });
   if (error) throw error;
   const proximas = Array.isArray(data) ? data : [];
   let enviados = 0;
   let fallidos = 0;
 
   for (const row of proximas) {
-    const clave = `${row.contacto_id}|${row.fecha}`;
-    const reservado = await registrar(admin, {
+    const claveFiltro = {
       user_id: row.user_id,
       persona_tipo: row.persona_tipo,
-      tipo: 'presentacion',
-      clave,
+      tipo: 'presentacion' as const,
+      clave: `${row.contacto_id}|${row.fecha}`,
+    };
+    const reservado = await registrar(admin, {
+      ...claveFiltro,
       contacto_id: row.contacto_id,
-      detalle: { fecha: row.fecha, hora: row.hora, nombre: row.contacto_nombre },
+      detalle: { fecha: row.fecha, hora: String(row.hora || '').slice(0, 5), nombre: row.contacto_nombre },
       estado: 'enviado',
     });
     if (!reservado) continue;
 
     const hora = shortTime(row.hora);
     const nombre = String(row.contacto_nombre || 'un contacto');
-    const result = await sendPush(admin, row, {
-      type: 'presentation_reminder',
-      title: 'Presentación en 30 minutos',
-      body: hora ? `${nombre} · ${hora}` : nombre,
-      url: `./?gestion=contacto&contacto=${row.contacto_id}`,
-      contacto_id: row.contacto_id,
-    }, 1800);
+    const targets = ctx.pushes.get(clavePersona(row)) || [];
+    const chat = ctx.chats.get(clavePersona(row)) || '';
 
-    if (result.ok) enviados++;
+    const canales: Record<string, unknown> = {};
+    let llego = false;
+
+    let pushOk = 0;
+    for (const t of targets) {
+      const r = await sendPush(admin, t, {
+        type: 'presentation_reminder',
+        title: 'Presentación en 30 minutos',
+        body: hora ? `${nombre} · ${hora}` : nombre,
+        url: `./?gestion=contacto&contacto=${row.contacto_id}`,
+        contacto_id: row.contacto_id,
+      }, 1800);
+      if (r.ok) { pushOk++; llego = true; }
+    }
+    canales.push = pushOk > 0 ? { ok: pushOk } : targets.length ? { ok: 0, err: true } : { sin: true };
+
+    if (chat && token) {
+      const texto = `⏰ Presentación en 30 minutos\n\n${nombre}${hora ? ` · ${hora}` : ''}\n\n📱 Abrí APPI para ver el contacto.`;
+      const r = await telegramSend(admin, chat, token, texto);
+      if (r.ok) { canales.telegram = { ok: true }; llego = true; }
+      else canales.telegram = { ok: false, err: r.motivo };
+    } else if (chat) {
+      canales.telegram = { ok: false, err: 'sin_token' };
+    }
+
+    if (llego) enviados++;
     else {
       fallidos++;
-      await admin.from('appi_recordatorios_enviados')
-        .update({ estado: 'error' })
-        .eq('user_id', row.user_id)
-        .eq('persona_tipo', row.persona_tipo)
-        .eq('tipo', 'presentacion')
-        .eq('clave', clave);
+      await marcarEstado(admin, claveFiltro, { ...canales, fecha: row.fecha, hora: String(row.hora || '').slice(0, 5), nombre: row.contacto_nombre }, 'error');
     }
   }
 
@@ -245,10 +293,7 @@ Deno.serve(async request => {
   const publicKey = Deno.env.get('VAPID_PUBLIC_KEY') || '';
   const privateKey = Deno.env.get('VAPID_PRIVATE_KEY') || '';
   const subject = Deno.env.get('VAPID_SUBJECT') || 'https://somospopups.github.io/appi/';
-  const hasPush = !!(publicKey && privateKey);
-  const hasTg = !!Deno.env.get('TELEGRAM_BOT_TOKEN');
-  if (!hasPush && !hasTg) return json({ error: 'Las notificaciones no están configuradas.' }, 503);
-  if (hasPush) webpush.setVapidDetails(subject, publicKey, privateKey);
+  const telegramToken = Deno.env.get('TELEGRAM_BOT_TOKEN') || '';
 
   const admin = createClient(supabaseUrl, serviceRole, {
     auth: { autoRefreshToken: false, persistSession: false }
@@ -257,8 +302,13 @@ Deno.serve(async request => {
   try {
     const body = await request.json().catch(() => ({}));
     const modo = String((body as any)?.modo || 'resumen');
-    if (modo === 'resumen') return json(await enviarResumen(admin));
-    if (modo === 'presentaciones') return json(await enviarPresentaciones(admin));
+    const ctx = await contextoEnvios(admin);
+
+    if (publicKey && privateKey) {
+      webpush.setVapidDetails(subject, publicKey, privateKey);
+    }
+    if (modo === 'resumen') return json(await enviarResumen(admin, ctx, telegramToken));
+    if (modo === 'presentaciones') return json(await enviarPresentaciones(admin, ctx, telegramToken));
     return json({ error: 'Modo desconocido.' }, 400);
   } catch (error) {
     console.error('recordatorios-gestion', error);
