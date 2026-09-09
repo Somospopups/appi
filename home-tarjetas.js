@@ -537,8 +537,8 @@
     var html = '';
     if (a) html += '<p class="ht-frase">' + esc(a.detalle) + '</p>';
     if (filas.length){
-      html += '<ul class="ht-lista">' + filas.join('') + '</ul>';
       html += '<p class="ht-nota">Tocá a la persona y sale la propuesta por WhatsApp.</p>';
+      html += '<ul class="ht-lista">' + filas.join('') + '</ul>';
     }
     var titulo = a ? a.titulo : (gente.length === 1 ? 'Un Bonus al alcance de la mano' : gente.length + ' Bonus al alcance de la mano');
     return {
@@ -572,7 +572,7 @@
     return {
       cat: 'canje', icono: '🔄', kicker: 'Plan Canje',
       titulo: lista.length === 1 ? 'Hay 1 equipo para canjear' : 'Hay ' + lista.length + ' equipos para canjear',
-      html: '<ul class="ht-lista">' + filas.join('') + '</ul><p class="ht-nota">Ya conocen el producto. Un toque y sale el mensaje del canje.</p>',
+      html: '<p class="ht-nota">Ya conocen el producto. Un toque y sale el mensaje.</p><ul class="ht-lista">' + filas.join('') + '</ul>',
       items: items,
       cta: { label: 'Escribirle al primero', go: items[0] }
     };
@@ -602,7 +602,7 @@
     return {
       cat: 'jornada', icono: '📅', kicker: 'Tu jornada',
       titulo: lista.length === 1 ? '1 contacto te espera hoy' : lista.length + ' contactos te esperan hoy',
-      html: '<ul class="ht-lista">' + filas.join('') + '</ul><p class="ht-nota">Tocá a la persona y se abre su ficha, lista para escribirle o llamarla.</p>',
+      html: '<p class="ht-nota">Tocá a la persona y se abre su ficha.</p><ul class="ht-lista">' + filas.join('') + '</ul>',
       items: items,
       cta: { label: 'Ir con ' + primero, go: items[0] }
     };
@@ -689,7 +689,7 @@
     return {
       cat: 'cumples', icono: '🎂', kicker: 'Cumpleaños',
       titulo: total === 1 ? 'Hoy hay un cumpleaños' : 'Hoy hay ' + total + ' cumpleaños',
-      html: '<ul class="ht-lista">' + filas.join('') + '</ul><p class="ht-nota">Tocá a la persona y sale el saludo por WhatsApp.</p>',
+      html: '<p class="ht-nota">Tocá a la persona y sale el saludo por WhatsApp.</p><ul class="ht-lista">' + filas.join('') + '</ul>',
       items: items,
       cta: { label: 'Revisar los cumpleaños del mes', go: verCumplesDelMes }
     };
@@ -894,7 +894,7 @@
     lista.forEach(function(p){
       var a = parseAlta(p);
       var hecho = reempYa(p);
-      filas.push('<li data-reemp-id="' + esc(reempId(p)) + '" class="' + (hecho ? 'ht-hecho' : '') + '">📝 <b>' + esc(p.nombre || '') + '</b> · ' + esc(p.cat || '—') + ' · alta ' + esc(fechaAltaTxt(a)) + '</li>');
+      filas.push('<li data-reemp-id="' + esc(reempId(p)) + '" class="' + (hecho ? 'ht-hecho' : '') + '"><span class="ht-li-nom">📝 <b>' + esc(nombreLindo(p.nombre) || p.nombre || '') + '</b></span><span class="ht-li-meta">' + esc(p.cat || '—') + ' · ' + esc(fechaAltaTxt(a)) + '</span></li>');
       items.push(escribirReempA(p, mesNom));
     });
     return {
@@ -902,8 +902,8 @@
       titulo: n === 1
         ? '1 persona para reempadronar en ' + mesNom
         : n + ' personas para reempadronar en ' + mesNom,
-      html: '<ul class="ht-lista">' + filas.join('') + '</ul>' +
-            '<p class="ht-nota">Tocá un nombre para escribirle. Mantené la tarjeta para enviar el listado.</p>',
+      html: '<p class="ht-nota">Tocá un nombre para escribirle. Mantené la tarjeta para enviar el listado.</p>' +
+            '<ul class="ht-lista">' + filas.join('') + '</ul>',
       items: items,
       alMantener: function(){ enviarReempadronar(lista, mesNom, anio); },
       cta: null
@@ -960,7 +960,7 @@
     return {
       cat: 'panel', icono: '📇', kicker: 'Panel de Contactos',
       titulo: 'Hay gente esperando tu mensaje',
-      html: '<ul class="ht-lista">' + filas.join('') + '</ul><p class="ht-nota">Tocá a la persona y se abre su ficha. Las primeras 24 horas pesan más que una semana.</p>',
+      html: '<p class="ht-nota">Tocá a la persona y se abre su ficha.</p><ul class="ht-lista">' + filas.join('') + '</ul>',
       items: items,
       cta: nuevos.length
         ? { label: 'Ir con ' + (String(nuevos[0].nombre || '').split(/\s+|,/)[0] || 'la primera'), go: items[0] }
@@ -988,9 +988,9 @@
         titulo: r.pendientes === 1
         ? 'Queda 1 de ' + r.total
         : 'Quedan ' + r.pendientes + ' de ' + r.total,
-        html: '<ul class="ht-lista">' + filas.join('') + '</ul>' +
-              '<div class="ht-chips"><span>✓ ' + r.hechas + '</span><span>✗ ' + r.noHechas + '</span><span>quedan ' + r.pendientes + '</span></div>' +
-              '<p class="ht-nota">Tocá un motivo y se abre el carrusel para mandar y marcar ✓/✗.</p>',
+        html: '<p class="ht-nota">Tocá un motivo y se abre el carrusel.</p>' +
+              '<ul class="ht-lista">' + filas.join('') + '</ul>' +
+              '<div class="ht-chips"><span>✓ ' + r.hechas + '</span><span>✗ ' + r.noHechas + '</span><span>quedan ' + r.pendientes + '</span></div>',
         items: items,
         cta: { label: 'Ir a marcar', go: items[0] || function(){ if (typeof window.showView === 'function') window.showView('view-usuarios'); } }
       };
@@ -1068,9 +1068,8 @@
     return {
       cat: 'rinnova', icono: '🚿', kicker: 'PSA Ducha · 5 días',
       titulo: lista.length === 1 ? 'Mandale el video de Rinnova' : 'Mandales el video de Rinnova',
-      html: '<img class="ht-foto" src="./img/rinnova-ducha.jpg" alt="">' +
-            '<ul class="ht-lista">' + filas.join('') + '</ul>' +
-            '<p class="ht-nota">Vigentes y vencidos. Un toque y sale el video. Hasta el 30 de agosto.</p>',
+      html: '<p class="ht-nota">Vigentes y vencidos. Un toque y sale el video.</p>' +
+            '<ul class="ht-lista">' + filas.join('') + '</ul>',
       items: items,
       cta: { label: 'Enviar a ' + (pilaDe(lista[0].usuario || lista[0].nombre) || 'la primera'), go: items[0] }
     };
@@ -1114,11 +1113,13 @@
       '.ht-cab .ht-ico{font-size:24px;line-height:1}',
       '.ht-card .ht-kicker{flex:1;min-width:0;color:#3d63c9;font-size:11.5px;font-weight:950;letter-spacing:.7px;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
       '.ht-card h3{margin:4px 0 8px;color:#1d1d2c;font-size:21px;line-height:1.2;letter-spacing:-.4px;min-height:2.4em;flex:0 0 auto}',
-      '.ht-cuerpo{flex:1 1 auto;display:flex;flex-direction:column;justify-content:flex-start;gap:8px;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;min-height:0;padding-bottom:8px;touch-action:pan-y;z-index:0}',
+      '.ht-cuerpo{flex:1 1 auto;display:flex;flex-direction:column;justify-content:flex-start;gap:8px;overflow:hidden;min-height:0;z-index:0}',
       '.ht-frase{margin:0;color:#41424f;font-size:17.5px;line-height:1.55;font-weight:700}',
-      '.ht-lista{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;flex:0 0 auto;gap:8px}',
-      '.ht-lista li{display:flex;align-items:center;gap:8px;flex:0 0 auto;min-height:46px;padding:10px 12px;border-radius:14px;background:rgba(91,141,239,.08);color:#33343f;font-size:14.5px;font-weight:750;cursor:pointer;transition:background .14s}',
+      '.ht-lista{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;flex:1 1 auto;gap:6px;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch}',
+      '.ht-lista li{display:flex;align-items:center;gap:8px;flex:0 0 auto;height:46px;padding:0 12px;border-radius:14px;background:rgba(91,141,239,.08);color:#33343f;font-size:14px;font-weight:750;cursor:pointer;overflow:hidden;transition:background .14s}',
       '.ht-lista li:hover{background:rgba(91,141,239,.16)}',
+      '.ht-li-nom{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
+      '.ht-li-meta{flex:0 0 auto;font-size:12px;font-weight:700;opacity:.9;white-space:nowrap}',
       '.ht-lista li::after{content:"›";margin-left:auto;color:#3d63c9;font-weight:900;font-size:17px}',
       '.ht-lista.ht-plain li{cursor:default}',
       '.ht-lista.ht-plain li::after{content:none}',
@@ -1127,7 +1128,7 @@
       'body.dark .ht-lista li.ht-hecho{background:rgba(58,208,164,.2);color:#d8f5e6}',
       'body.dark .ht-lista li.ht-hecho::after{color:#3ad0a4}',
       '.ht-lista li i{color:#c0392b;font-style:normal;font-size:12px;font-weight:900}',
-      '.ht-nota{margin:2px 0 0;color:#8a8b98;font-size:12.5px;line-height:1.4;flex:0 0 auto}',
+      '.ht-nota{margin:0;color:#8a8b98;font-size:12.5px;line-height:1.35;flex:0 0 auto}',
       '.ht-pasos{margin:12px 0 0;padding:0;list-style:none;display:grid;gap:8px}',
       '.ht-pasos li{padding:11px 13px;border-radius:14px;background:rgba(91,141,239,.08);color:#33343f;font-size:14.5px;line-height:1.4;font-weight:650}',
       '.ht-pasos li b{font-weight:900}',
