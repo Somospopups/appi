@@ -38,10 +38,6 @@ test.describe('Avisos por Telegram', () => {
       localStorage.setItem('appi_tarjetas_auto', '0');
       localStorage.setItem('tutoVisto_v2', '1');
     });
-    page.on('console', m => console.log('ZZCON', m.type(), m.text().slice(0,220)));
-    page.on('pageerror', e => console.log('ZZPERR', String(e).slice(0,220)));
-    page.on('framenavigated', f => console.log('ZZNAV', f.url().slice(0,120)));
-
     const errs = [];
     page.on('pageerror', e => errs.push('pageerror: ' + e.message));
     await page.goto('/index.html', { waitUntil: 'networkidle' });
@@ -50,13 +46,13 @@ test.describe('Avisos por Telegram', () => {
     await page.locator('#btnDistributorLogin').click();
     await expect(page.locator('#lockScreen')).toHaveClass(/hidden/);
 
-    // Entrada visible: el engranaje ⚙️ del Home abre el menú con el item.
-    await page.locator('#view-home .tools-btn').click();
-    await expect(page.locator('#toolsMenu')).toHaveClass(/open/);
-    await expect(page.locator('#btnToolsTelegram')).toContainText('Avisos por Telegram');
+    // Entrada visible: el botón «Avisos por Telegram» vive en el menú de
+    // herramientas del Home (sidebar), como la entrada original.
+    await expect(page.locator('#btnSidebarTelegram')).toBeVisible();
+    await expect(page.locator('#btnSidebarTelegram')).toContainText('Avisos por Telegram');
 
-    // Abrir el panel desde el engranaje, como lo haría el usuario.
-    await page.locator('#btnToolsTelegram').click();
+    // Abrir el panel desde ahí, como lo haría el usuario.
+    await page.locator('#btnSidebarTelegram').click();
     await expect(page.locator('#avisoTgOv')).toBeVisible();
     await expect(page.locator('#avisoTgOv')).toContainText('Conectar Telegram');
 
