@@ -38,6 +38,10 @@ test.describe('Avisos por Telegram', () => {
       localStorage.setItem('appi_tarjetas_auto', '0');
       localStorage.setItem('tutoVisto_v2', '1');
     });
+    page.on('console', m => console.log('ZZCON', m.type(), m.text().slice(0,220)));
+    page.on('pageerror', e => console.log('ZZPERR', String(e).slice(0,220)));
+    page.on('framenavigated', f => console.log('ZZNAV', f.url().slice(0,120)));
+
     const errs = [];
     page.on('pageerror', e => errs.push('pageerror: ' + e.message));
     await page.goto('/index.html', { waitUntil: 'networkidle' });
@@ -62,15 +66,30 @@ test.describe('Avisos por Telegram', () => {
     await expect(page.locator('#avisoTgOv .aviso-tg-cod')).toBeVisible();
     await expect(page.locator('#avisoTgOv img')).toHaveCount(0); // sin QR
 
-    // El botón Abrir Telegram es un enlace nativo a t.me (lo resuelve el SO
-    // abriendo la app o la web) en ventana nueva: nunca navega la app.
-    const tgLink = page.locator('#avisoTgOv a.aviso-tg-btn.primary');
-    await expect(tgLink).toHaveAttribute('href', 'https://t.me/appi_avisos_bot?start=ABCD1234');
-    await expect(tgLink).toHaveAttribute('target', '_blank');
+    // El botón Abrir Telegram dispara el deep link nativo tg:// (abre la app
+    // instalada) y, si la app no lo tomó, abre la web t.me en otra ventana.
+    // La ventana de APPI nunca navega (no se reinicia).
+    await page.evaluate(() => {
+      window.__tgNav = [];
+      window.__avisoTgNav = u => { window.__tgNav.push(u); };
+      window.open = u => { (window.__tgOpen = window.__tgOpen || []).push(u); return { closed: false }; };
+    });
+    await page.locator('#avisoTgOv').getByRole('button', { name: 'Abrir Telegram' }).click();
+    await page.waitForTimeout(1100); // deja correr el fallback de 700ms
+    const nav = await page.evaluate(() => window.__tgNav || []);
+    expect(nav).toEqual(['tg://resolve?domain=appi_avisos_bot&start=ABCD1234']);
+    const abiertas = await page.evaluate(() => window.__tgOpen || []);
+    expect(abiertas).toEqual(['https://t.me/appi_avisos_bot?start=ABCD1234']);
+    // APPI sigue viva (no navegó, no se reinició).
+    await expect(page.locator('#avisoTgOv')).toBeVisible();
+    await expect(page.locator('#avisoTgOv')).toContainText('ABCD1234');
+    // Respaldo visible: abrir en el navegador.
+    const webLink = page.locator('#avisoTgOv a.aviso-tg-btn.ghost');
+    await expect(webLink).toHaveAttribute('href', 'https://t.me/appi_avisos_bot?start=ABCD1234');
 
     // Simular que el usuario tocó «Iniciar» en Telegram: el canal pasa a
     // conectado y el panel lo detecta al verificar.
-    Object.assign(mock, { estado: 'conectado', chat: '987654321' });
+    Object.assign(mock, { estado: 'conectado', chat: '987654321', link: 'https://t.me/appi_avisos_bot' });
     await page.locator('#avisoTgOv').getByText('verificar').click();
     await expect(page.locator('#avisoTgOv')).toContainText('Chat vinculado');
     await expect(page.locator('#avisoTgOv')).toContainText('Desconectar este chat');

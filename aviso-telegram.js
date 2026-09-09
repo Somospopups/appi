@@ -17,6 +17,10 @@
   var CSS = 'avisoTgCss';
   var POLL_MS = 2500;
   var timer = null;
+  var urlActual = ''; // https://t.me/<bot>... vigente
+  var botNombre = '';
+  var peticionSeq = 0; // descarta respuestas viejas (evita pisar la UI)
+
 
   function config() {
     try {
@@ -128,8 +132,41 @@
       '<button class="aviso-tg-btn ghost" onclick="window.__avisoTgAbrirOv()">Reintentar</button>');
   }
 
-  // El botón «Abrir Telegram» es un enlace real a t.me: lo resuelve
-  // el sistema operativo (abre la app instalada o, si no, la web).
+  // ---------- apertura (deep link nativo, sin navegar la PWA) ----------
+  // En una PWA instalada los enlaces t.me navegan la ventana de la app y la
+  // «reinician». El deep link tg:// lo resuelve el sistema operativo: abre
+  // Telegram instalado sin tocar APPI. Si a los 700 ms la página sigue
+  // visible, la app no tomó el enlace y se abre la web t.me en otra ventana.
+  function parsearTme(url) {
+    try {
+      var u = new URL(String(url || ''));
+      if (u.protocol !== 'https:' && u.protocol !== 'http:') return null;
+      if (u.hostname !== 't.me' && u.hostname !== 'telegram.me') return null;
+      var domain = decodeURIComponent(u.pathname.replace(/^\//, '').split('/')[0] || '');
+      if (!domain) return null;
+      var start = (u.searchParams && u.searchParams.get('start')) ? String(u.searchParams.get('start')) : '';
+      return { tme: String(url), domain: domain, start: start };
+    } catch (e) { return null; }
+  }
+  function abrirTelegram() {
+    var p = parsearTme(urlActual);
+    if (!p) return;
+    var deep = 'tg://resolve?domain=' + encodeURIComponent(p.domain) +
+      (p.start ? '&start=' + encodeURIComponent(p.start) : '');
+    try {
+      // Hook de navegación (lo usa el e2e; en producción no existe y se ignora).
+      if (typeof window.__avisoTgNav === 'function') { window.__avisoTgNav(deep); }
+      else window.location.href = deep;
+    } catch (e) {}
+    setTimeout(function () {
+      try {
+        if (document.visibilityState === 'visible') {
+          var w = window.open(p.tme, '_blank');
+          if (w) w.opener = null;
+        }
+      } catch (e2) {}
+    }, 700);
+  }
 
   function copiarCodigo() {
     var d = ov();
@@ -159,24 +196,29 @@
 
   // ---------- estados ----------
   function renderConectado(r) {
+    urlActual = String(r.link || 'https://t.me/');
+    botNombre = String(r.bot || '');
     pintar(head() +
       '<div class="aviso-tg-ok"><div class="chk">✓</div><div><b>Chat vinculado</b>' +
       '<p>Recibís el resumen de cada día a las 8:00 y los avisos de presentaciones en este chat.</p></div></div>' +
-      '<a class="aviso-tg-btn primary" href="' + esc(String(r.link || 'https://t.me/')) + '" target="_blank" rel="noopener noreferrer">Abrir chat de Telegram</a>' +
+      '<button class="aviso-tg-btn primary" onclick="window.__avisoTgAbrirTg()">Abrir chat de Telegram</button>' +
+      '<a class="aviso-tg-btn ghost" href="' + esc(urlActual) + '" target="_blank" rel="noopener noreferrer">¿No abre? Abrir en el navegador</a>' +
       '<button class="aviso-tg-btn danger" onclick="window.__avisoTgDesvincular()">Desconectar este chat</button>' +
       '<div class="aviso-tg-note">Si algún día no te llega, abrí el chat y tocá «Iniciar» una vez.</div>'
     );
   }
 
   function renderPendiente(r) {
-    var url = String(r.url || '');
-    var bot = String(r.bot || '');
+    urlActual = String(r.url || '');
+    botNombre = String(r.bot || '');
+    var bot = botNombre;
     var codigo = String(r.codigo || '');
     pintar(head() +
       '<div class="aviso-tg-hero"><b>Casi listo</b><p>Dos pasos y quedás conectado:</p>' +
       '<p><b>1.</b> Tocá «Abrir Telegram» y entrá al chat del bot.</p>' +
       '<p><b>2.</b> Tocá «Iniciar» y volvé acá.</p></div>' +
-      '<a class="aviso-tg-btn primary" href="' + esc(url) + '" target="_blank" rel="noopener noreferrer">Abrir Telegram</a>' +
+      '<button class="aviso-tg-btn primary" onclick="window.__avisoTgAbrirTg()">Abrir Telegram</button>' +
+      '<a class="aviso-tg-btn ghost" href="' + esc(urlActual) + '" target="_blank" rel="noopener noreferrer">¿No abre? Abrir en el navegador</a>' +
       '<button class="aviso-tg-btn ghost" onclick="window.__avisoTgRefrescar()">Ya toqué «Iniciar» — verificar</button>' +
       (codigo ? '<span class="aviso-tg-cod" onclick="window.__avisoTgCopiar()" title="Tocá para copiar">' + esc(codigo) + '</span>' : '') +
       '<div class="aviso-tg-note">' + (bot ? '¿No abre el chat? Tocá el código para copiarlo, entrá al bot @' + esc(bot.replace(/^@/, '')) + ' y pegalo ahí. ' : '') +
@@ -200,7 +242,9 @@
   // ---------- estado y acciones ----------
   function refrescarEstado(automatico) {
     if (timer) { clearInterval(timer); timer = null; }
+    var mi = ++peticionSeq;
     llamar('estado').then(function (r) {
+        if (mi !== peticionSeq) return; // llegó una petición más nueva
       if (r && r.estado) {
         if (r.estado === 'conectado') { renderConectado(r); return; }
         if (r.estado === 'pendiente') { renderPendiente(r); return; }
@@ -209,27 +253,34 @@
       }
       if (automatico && ov() && ov().hidden) return;
       renderError(r && r.error ? r.error : 'No se pudo consultar el estado.');
-    }).catch(function () {
+    }).catch(function (e) {
+        if (mi !== peticionSeq) return;
       if (automatico) return;
       renderError('Sin conexión. Revisá internet y probá de nuevo.');
     });
   }
 
   function conectar() {
+    var mi = ++peticionSeq;
     llamar('vincular').then(function (r) {
+        if (mi !== peticionSeq) return;
       if (r && r.estado === 'pendiente') { renderPendiente(r); return; }
       if (r && r.estado === 'conectado') { renderConectado(r); return; }
       renderError(r && r.error ? r.error : 'Todavía no está habilitado. Probá más tarde.');
-    }).catch(function () {
+    }).catch(function (e) {
+        if (mi !== peticionSeq) return;
       renderError('Sin conexión. Revisá internet y probá de nuevo.');
     });
   }
 
   function desvincular() {
+    var mi = ++peticionSeq;
     llamar('desvincular').then(function () {
+      if (mi !== peticionSeq) return;
       toast('Avisos por Telegram desactivados');
       refrescarEstado(false);
     }).catch(function () {
+      if (mi !== peticionSeq) return;
       renderError('Sin conexión. Revisá internet y probá de nuevo.');
     });
   }
@@ -241,6 +292,7 @@
   window.__avisoTgCerrar = cerrar;
   window.__avisoTgCopiar = copiarCodigo;
   window.__avisoTgRefrescar = function () { refrescarEstado(false); };
+  window.__avisoTgAbrirTg = abrirTelegram;
   window.__avisoTgConectar = conectar;
   window.__avisoTgDesvincular = desvincular;
 })();
