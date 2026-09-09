@@ -465,6 +465,27 @@
         if (tel) window.open('tel:' + tel, '_self');
       };
     });
+
+    asegurarPilares();
+  }
+
+  function asegurarPilares(){
+    var limpio = $('homeLimpio');
+    if (!limpio) return;
+    var hoy = $('hoyUsuarios');
+    if (!hoy) {
+      hoy = document.createElement('div');
+      hoy.id = 'hoyUsuarios';
+    }
+    if (hoy.previousElementSibling !== limpio) limpio.insertAdjacentElement('afterend', hoy);
+    var tools = $('toolsList');
+    if (!tools) {
+      tools = document.createElement('div');
+      tools.id = 'toolsList';
+      tools.className = 'tools-list home-tools-grid';
+    }
+    if (tools.previousElementSibling !== hoy) hoy.insertAdjacentElement('afterend', tools);
+    try { if (window.APPIPilares && window.APPIPilares.pintar) window.APPIPilares.pintar(); } catch (e) {}
   }
 
   /* ---- Limpiar home viejo ---- */
@@ -472,7 +493,6 @@
     var host = $('view-home');
     if (!host) return;
     var head = host.querySelector('.home-section-head'); if (head) head.remove();
-    var tools = $('toolsList'); if (tools) tools.remove();
     var backup = $('backupCollapsible');
     if (backup) backup.style.display = 'none';
   }
