@@ -61,31 +61,91 @@ GRUPO_ORDEN = {"equipos": 0, "recargas": 1, "griferia": 2, "botellas": 3, "otros
 
 # Canal @PSAPurificadores. El primero que matchea gana.
 VIDEOS = [
-    (("SENIOR4", "SENIOR 4"), "ZGPO3UHxzE0", "PSA Senior 4 — La evolución en la purificación del agua"),
-    (("SENIK",), "ucPCBNzhCMk", "PSA Senik"),
-    (("S-1000", "S·1000", "S•1000"), "kz31j16L_cQ", "Mantenimiento PSA S-1000 II"),
-    (("QUANTUM",), "E9w3szPfIIk", "Mantenimiento PSA Quantum"),
+    # Videos oficiales del canal de PSA (youtube.com/@PSAPurificadores).
+    # El orden importa: primero las claves más específicas. Un producto sin
+    # coincidencia NO recibe video (la ficha se dibuja sin botón "Ver video"
+    # en lugar de mostrar el video de otro equipo).
+    (("SENIOR4", "SENIOR 4"), "ZGPO3UHxzE0", "PSA Senior 4 - La evolución en la purificación del agua."),
+    (("SENIK",), "ucPCBNzhCMk", "PSA Senik - 2025"),
+    (("S-1000", "S·1000", "S•1000"), "BS7UWVGkyXY", "Purificador de agua PSA S•1000•2 - 2025"),
+    (("QUANTUM",), "HfTdeEr2V6E", "PSA Quantum - 2025"),
     (("VERO",), "EEXBGZNXAYg", "Purificador de agua PSA Vero"),
-    (("MINI",), "kRXtseGEA8M", "PSA Mini"),
-    (("RINNOVA", "DUCHA"), "tQV4c9p9TBQ", "PSA Rinnova — Una renovación en tu ducha"),
-    (("C3",), "tQV4c9p9TBQ", "PSA Rinnova — Una renovación en tu ducha"),
-    (("IONTRIX",), "kgeNCoHLCL0", "PSA Iontrix"),
+    (("MINI",), "kRXtseGEA8M", "PSA Mini - 2025"),
+    (("RINNOVA",), "tQV4c9p9TBQ", "PSA Rinnova - Una renovación en tu ducha"),
+    (("DUCHA II",), "wII81hqX9MU", "PSA Ducha II"),
+    (("DUCHA",), "tQV4c9p9TBQ", "PSA Rinnova - Una renovación en tu ducha"),
+    (("IONTRIX 2", "IONTRIX2"), "kgeNCoHLCL0", "PSA Iontrix /PSA Iontrix 2"),
+    (("IONTRIX",), "LUyjCSVjF_c", "PSA Iontrix 3 - 2025"),
     (("BICO",), "2qL60kBDUlU", "Nueva Grifería Bicomando PSA"),
     (("GRIFER", "BY PASS", "BYPASS"), "2qL60kBDUlU", "Nueva Grifería Bicomando PSA"),
-    (("SODA", "GASIFICADOR", "BURBY"), "f8Jb7wtu0tw", "SodaBurby — Gasificador de Agua PSA"),
+    (("SODA", "GASIFICADOR", "BURBY"), "f8Jb7wtu0tw", "SodaBurby - Gasificador de Agua PSA 2025"),
     (("TÉRMICA", "TERMICA"), "lMJQB3PGIeI", "Nuevas botellas térmicas PSA"),
     (("NEO",), "s566uSsra_w", "Botella Neo reutilizable"),
     (("VIDRIO",), "UOTr9jI26Og", "Nueva Botella de vidrio PSA"),
     (("KIT MATERO", "MATE", "TERMO"), "gg_xh3VwuUI", "Nuevo mate y termo PSA"),
     (("SENIOR",), "__ISvWioYow", "Purificador de Agua PSA Senior"),
-    (("AIRE",), "VV3CgvUgD78", "Purificador de Aire PSA"),
-    (("ROPOT", "ÓSMOSIS", "OSMOSIS", "MEMBRANA"), "yh4dwgb21Xc", "PSA ROPOT — Reemplazo de módulos"),
-    (("POLI",), "E9w3szPfIIk", "Mantenimiento PSA Quantum"),
-    (("STOPPER",), "kRXtseGEA8M", "PSA Mini"),
-    (("PORTÁTIL", "PORTATIL"), "kRXtseGEA8M", "PSA Mini"),
-    (("FIPOR",), "__ISvWioYow", "Purificador de Agua PSA Senior"),
-    (("BACTERIO",), "kz31j16L_cQ", "Mantenimiento PSA S-1000 II"),
+    (("AIRE",), "VV3CgvUgD78", "Purificador de Aire PSA - 2025"),
+    (("ROPOT", "ÓSMOSIS", "OSMOSIS", "MEMBRANA"), "yh4dwgb21Xc", "PSA ROPOT - Reemplazo de módulos agotados"),
+    (("BACTERIO",), "kz31j16L_cQ", "Mantenimiento PSA S•1000 II"),
 ]
+
+# Familias para la verificación de coherencia: (claves del nombre, claves que
+# el título del video tiene que mencionar). Mismo orden que VIDEOS: se elige la
+# primera familia que aparezca en el nombre del producto.
+FAMILIAS = [
+    (("SENIOR4",), ("SENIOR4",)),
+    (("SENIK",), ("SENIK",)),
+    (("S1000",), ("S1000",)),
+    (("QUANTUM",), ("QUANTUM",)),
+    (("VERO",), ("VERO",)),
+    (("MINI",), ("MINI",)),
+    (("RINNOVA",), ("RINNOVA",)),
+    (("DUCHAII",), ("DUCHAII",)),
+    (("DUCHA",), ("RINNOVA", "DUCHA")),
+    (("IONTRIX2", "IONTRIX"), ("IONTRIX",)),
+    (("BICOMANDO", "BICO"), ("GRIFER", "BICOMANDO")),
+    (("GRIFER", "BYPASS"), ("GRIFER", "BICOMANDO")),
+    (("SODABURBY", "SODA", "BURBY", "GASIFICADOR"), ("SODABURBY", "GASIFICADOR")),
+    (("TERMICA",), ("TERMICA",)),
+    (("NEO",), ("NEO",)),
+    (("VIDRIO",), ("VIDRIO",)),
+    (("MATERO", "MATE", "TERMO", "VASO"), ("MATE", "TERMO")),
+    (("SENIOR",), ("SENIOR",)),
+    (("AIRE",), ("AIRE",)),
+    (("ROPOT", "MEMBRANA", "OSMOSIS"), ("ROPOT",)),
+    (("BACTERIO",), ("S1000",)),
+]
+
+def _norm(s):
+    # Para comparar sin ruido: mayúsculas, sin acentos y sin separadores.
+    s = (s or "").upper()
+    for a, b in (("Á", "A"), ("É", "E"), ("Í", "I"), ("Ó", "O"), ("Ú", "U"), ("Ü", "U"), ("Ñ", "N"), ("·", ""), ("•", ""), ("-", "")):
+        s = s.replace(a, b)
+    return re.sub(r"[^A-Z0-9]", "", s)
+
+
+def verificar_videos(productos):
+    """Cada producto con video debe matchear una familia conocida y el título
+    del video tiene que nombrar esa familia. Si no, el sync falla: así un video
+    ajeno nunca vuelve a colarse en una ficha."""
+    errores = []
+    for p in productos or []:
+        if not (p.get("video") or ""):
+            continue
+        n = _norm(p.get("nombre"))
+        t = _norm(p.get("videoTitulo"))
+        elegida = None
+        for claves_n, _ct in FAMILIAS:
+            if any(c in n for c in claves_n):
+                elegida = (_ct, claves_n)
+                break
+        if elegida is None:
+            errores.append(f"{p.get('sku')} {p.get('nombre')}: video {p.get('video')} sin familia conocida")
+            continue
+        ct, cn = elegida
+        if not any(c in t for c in ct):
+            errores.append(f"{p.get('sku')} {p.get('nombre')}: el video ({p.get('video')}) habla de '{p.get('videoTitulo')}', no de {cn}")
+    return errores
 
 
 def fecha_ar(now=None):
@@ -187,7 +247,7 @@ def video_de(nombre):
     for keys, vid, titulo in VIDEOS:
         if any(k in n for k in keys):
             return "https://www.youtube.com/watch?v=" + vid, titulo
-    return "https://www.youtube.com/watch?v=ZGPO3UHxzE0", "PSA Senior 4"
+    return None, None
 
 
 def grupo(name, cats):
@@ -281,8 +341,8 @@ def graphql_catalogo():
                 "cats": cats,
                 "para": para,
                 "desc": desc,
-                "video": vurl,
-                "videoTitulo": vtit,
+                "video": vurl or "",
+                "videoTitulo": vtit or "",
                 "foto": bajar_foto(sku, ((it.get("small_image") or {}).get("url") or "").strip()),
             }
         )
@@ -530,6 +590,10 @@ def main():
 
     if not precios and not productos:
         raise SystemExit("la tienda no devolvió precios")
+
+    errores_video = verificar_videos(productos)
+    if errores_video:
+        raise SystemExit("Videos inconsistentes en el catálogo:\n" + "\n".join(errores_video))
 
     fecha = fecha_ar()
     OUT_CAT.write_text(

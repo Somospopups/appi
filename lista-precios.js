@@ -518,22 +518,30 @@
     if (p && p.video) return p.video;
     var n = String((p && p.nombre) || '').toUpperCase();
     var pares = [
+      // Espejo del catálogo (scripts/actualizar-precios-psa.py): videos
+      // oficiales del canal de PSA. Sin match no se inventa un video: la
+      // ficha queda sin botón "Ver video" antes que mostrar otro producto.
       ['SENIOR4', 'https://www.youtube.com/watch?v=ZGPO3UHxzE0'],
       ['SENIOR 4', 'https://www.youtube.com/watch?v=ZGPO3UHxzE0'],
       ['SENIK', 'https://www.youtube.com/watch?v=ucPCBNzhCMk'],
-      ['S-1000', 'https://www.youtube.com/watch?v=kz31j16L_cQ'],
-      ['QUANTUM', 'https://www.youtube.com/watch?v=E9w3szPfIIk'],
+      ['S-1000', 'https://www.youtube.com/watch?v=BS7UWVGkyXY'],
+      ['S·1000', 'https://www.youtube.com/watch?v=BS7UWVGkyXY'],
+      ['S•1000', 'https://www.youtube.com/watch?v=BS7UWVGkyXY'],
+      ['QUANTUM', 'https://www.youtube.com/watch?v=HfTdeEr2V6E'],
       ['VERO', 'https://www.youtube.com/watch?v=EEXBGZNXAYg'],
       ['MINI', 'https://www.youtube.com/watch?v=kRXtseGEA8M'],
       ['RINNOVA', 'https://www.youtube.com/watch?v=tQV4c9p9TBQ'],
+      ['DUCHA II', 'https://www.youtube.com/watch?v=wII81hqX9MU'],
       ['DUCHA', 'https://www.youtube.com/watch?v=tQV4c9p9TBQ'],
-      ['C3', 'https://www.youtube.com/watch?v=tQV4c9p9TBQ'],
-      ['IONTRIX', 'https://www.youtube.com/watch?v=kgeNCoHLCL0'],
+      ['IONTRIX 2', 'https://www.youtube.com/watch?v=kgeNCoHLCL0'],
+      ['IONTRIX2', 'https://www.youtube.com/watch?v=kgeNCoHLCL0'],
+      ['IONTRIX', 'https://www.youtube.com/watch?v=LUyjCSVjF_c'],
       ['BICO', 'https://www.youtube.com/watch?v=2qL60kBDUlU'],
       ['GRIFER', 'https://www.youtube.com/watch?v=2qL60kBDUlU'],
       ['BY PASS', 'https://www.youtube.com/watch?v=2qL60kBDUlU'],
       ['BURBY', 'https://www.youtube.com/watch?v=f8Jb7wtu0tw'],
       ['SODA', 'https://www.youtube.com/watch?v=f8Jb7wtu0tw'],
+      ['GASIFICADOR', 'https://www.youtube.com/watch?v=f8Jb7wtu0tw'],
       ['TÉRMICA', 'https://www.youtube.com/watch?v=lMJQB3PGIeI'],
       ['TERMICA', 'https://www.youtube.com/watch?v=lMJQB3PGIeI'],
       ['NEO', 'https://www.youtube.com/watch?v=s566uSsra_w'],
@@ -545,17 +553,13 @@
       ['ROPOT', 'https://www.youtube.com/watch?v=yh4dwgb21Xc'],
       ['OSMOSIS', 'https://www.youtube.com/watch?v=yh4dwgb21Xc'],
       ['ÓSMOSIS', 'https://www.youtube.com/watch?v=yh4dwgb21Xc'],
-      ['POLI', 'https://www.youtube.com/watch?v=E9w3szPfIIk'],
-      ['STOPPER', 'https://www.youtube.com/watch?v=kRXtseGEA8M'],
-      ['PORTÁTIL', 'https://www.youtube.com/watch?v=kRXtseGEA8M'],
-      ['PORTATIL', 'https://www.youtube.com/watch?v=kRXtseGEA8M'],
-      ['FIPOR', 'https://www.youtube.com/watch?v=__ISvWioYow'],
+      ['MEMBRANA', 'https://www.youtube.com/watch?v=yh4dwgb21Xc'],
       ['BACTERIO', 'https://www.youtube.com/watch?v=kz31j16L_cQ']
     ];
     for (var i = 0; i < pares.length; i++) {
       if (n.indexOf(pares[i][0]) >= 0) return pares[i][1];
     }
-    return 'https://www.youtube.com/watch?v=ZGPO3UHxzE0';
+    return '';
   }
   function trataDe(p) {
     var n = String((p && p.nombre) || '').toUpperCase();
