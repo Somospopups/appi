@@ -492,7 +492,7 @@
       cat: 'especial', icono: '💙', kicker: 'Para vos' + (nombre ? ', ' + nombre : ''),
       titulo: 'Tu impulso de hoy',
       html: '<div class="ht-esp-centro"><span class="ht-esp-comilla">“</span>' +
-            '<p class="ht-frase ht-esp-frase">' + esc(frase) + '</p></div>' +
+            '<p class="ht-frase ht-esp-frase">' + esc(frase) + '<span class="ht-esp-cierre" aria-hidden="true">”</span></p></div>' +
             (chips.length ? '<div class="ht-chips">' + chips.map(function(c){ return '<span>' + esc(c) + '</span>'; }).join('') + '</div>' : ''),
       cta: null
     };
@@ -1146,8 +1146,9 @@
       '.ht-card.ht-esp h3{color:#fff;text-shadow:0 1px 6px rgba(20,20,60,.25)}',
       '.ht-card.ht-esp .ht-cuerpo{display:flex;flex-direction:column;justify-content:flex-start;gap:10px}',
       '.ht-esp-centro{margin:0;flex:0 0 auto;display:flex;align-items:flex-start;position:relative;padding:0}',
-      '.ht-esp-comilla{position:absolute;top:-6px;left:-2px;font-size:42px;line-height:1;color:rgba(255,255,255,.35);font-weight:900;pointer-events:none}',
-      '.ht-esp-frase{margin:0;padding-left:14px;color:#fff;font-size:21px;line-height:1.45;font-weight:800;letter-spacing:-.2px;text-shadow:0 1px 8px rgba(20,20,60,.22)}',
+      '.ht-esp-comilla{position:absolute;top:-6px;left:-2px;font-size:42px;line-height:1;color:rgba(255,255,255,.45);font-weight:900;pointer-events:none}',
+      '.ht-esp-cierre{display:inline;margin-left:4px;font-size:28px;line-height:0;color:rgba(255,255,255,.45);font-weight:900;pointer-events:none}',
+      '.ht-esp-frase{margin:0;padding-left:14px;padding-right:8px;color:#fff;font-size:21px;line-height:1.45;font-weight:800;letter-spacing:-.2px;text-shadow:0 1px 8px rgba(20,20,60,.22)}',
       '.ht-card.ht-esp .ht-chips{margin-top:8px;flex:0 0 auto}',
       '.ht-card.ht-esp .ht-chips span{background:rgba(255,255,255,.18);color:#fff;border:1px solid rgba(255,255,255,.22)}',
       '.ht-esp-marca{position:absolute;right:10px;bottom:2px;font-size:74px;line-height:1;opacity:.16;pointer-events:none}',
@@ -1199,7 +1200,7 @@
       'body .ht-card.ht-poster .ht-chips span,body .ht-card.ht-poster.ht-esp .ht-chips span{background:rgba(0,0,0,.28);color:#fff;border:1px solid rgba(255,255,255,.4)}',
       'body:not(.dark) .ht-card.ht-poster .ht-chips span,body:not(.dark) .ht-card.ht-poster.ht-esp .ht-chips span{background:rgba(0,0,0,.4);color:#fff;border:1px solid rgba(255,255,255,.5)}',
       'body .ht-card.ht-poster .ht-cta,body .ht-card.ht-poster.ht-hoy .ht-cta,body .ht-card.ht-poster.ht-alerta .ht-cta,body .ht-card.ht-poster.ht-ganaste .ht-cta{background:#fff;color:#111;box-shadow:0 10px 22px rgba(0,0,0,.22)}',
-      'body .ht-card.ht-poster .ht-esp-comilla{color:rgba(255,255,255,.45)}',
+      'body .ht-card.ht-poster .ht-esp-comilla,body .ht-card.ht-poster .ht-esp-cierre{color:rgba(255,255,255,.55)}',
       'body .ht-card.ht-poster .ht-foto{background:rgba(0,0,0,.18);border:1px solid rgba(255,255,255,.28)}',
       '.ht-marca{position:absolute;right:-8px;bottom:-18px;font-size:118px;line-height:1;opacity:.18;pointer-events:none}',
       '.ht-card.ht-poster.ht-cat-especial,body.dark .ht-card.ht-poster.ht-cat-especial{background:linear-gradient(150deg,#0e6a8c,#0b5878);box-shadow:0 22px 60px rgba(11,88,120,.38)}',
