@@ -1,14 +1,19 @@
 /* ============================================================
-   APPI · v546 · Avisos por Telegram
+   APPI · v550 · Avisos por Telegram
    ------------------------------------------------------------
    Vincula el chat de Telegram del distribuidor para que el
    resumen diario (8:00) y los avisos de presentación lleguen
    como mensaje, aunque APPI esté cerrada o sin instalar.
 
    Entrada: engranaje ⚙️ → «Avisos por Telegram».
-   Apertura del chat sin reiniciar la app: mismo criterio que
-   el WhatsApp de APPI — en Android un intent:// con el paquete
-   de Telegram (y fallback t.me), en el resto window.open.
+   Apertura del chat sin reiniciar la app: mismo criterio que el
+   WhatsApp de APPI (whatsapp-app.js). En Android la PWA
+   instalada no resuelve un tg:// pelado — el botón navega un
+   intent:// que nombra el paquete org.telegram.messenger y
+   Chrome lanza la app dejando APPI intacta atrás. Si Telegram
+   no está instalado, Chrome abre el respaldo t.me; fuera de
+   Android el botón abre t.me en otra ventana. La ventana de
+   APPI nunca navega.
    ============================================================ */
 (function () {
   'use strict';
@@ -132,11 +137,15 @@
       '<button class="aviso-tg-btn ghost" onclick="window.__avisoTgAbrirOv()">Reintentar</button>');
   }
 
-  // ---------- apertura (deep link nativo, sin navegar la PWA) ----------
-  // En una PWA instalada los enlaces t.me navegan la ventana de la app y la
-  // «reinician». El deep link tg:// lo resuelve el sistema operativo: abre
-  // Telegram instalado sin tocar APPI. Si a los 700 ms la página sigue
-  // visible, la app no tomó el enlace y se abre la web t.me en otra ventana.
+  // ---------- apertura (intent:// de Android, sin navegar la PWA) ----------
+  // En la PWA instalada (Android) los enlaces t.me navegan la ventana y un
+  // tg:// pelado no abre nada: el sistema lo recibe recién envuelto en un
+  // intent:// con el paquete de Telegram (igual que whatsapp-app.js con
+  // com.whatsapp). Chrome lanza la app y APPI queda intacta atrás; si la app
+  // no está instalada, Chrome sigue el browser_fallback_url (t.me).
+  function esAndroid() {
+    return /android/i.test(navigator.userAgent || '');
+  }
   function parsearTme(url) {
     try {
       var u = new URL(String(url || ''));
@@ -148,24 +157,37 @@
       return { tme: String(url), domain: domain, start: start };
     } catch (e) { return null; }
   }
-  function abrirTelegram() {
+  // Destino según plataforma: intent:// con el paquete (Android) o t.me.
+  function destinoTelegram() {
     var p = parsearTme(urlActual);
-    if (!p) return;
-    var deep = 'tg://resolve?domain=' + encodeURIComponent(p.domain) +
+    if (!p) return '';
+    var params = 'domain=' + encodeURIComponent(p.domain) +
       (p.start ? '&start=' + encodeURIComponent(p.start) : '');
+    if (esAndroid()) {
+      return 'intent://resolve?' + params +
+        '#Intent;scheme=tg;package=org.telegram.messenger;S.browser_fallback_url=' +
+        encodeURIComponent(p.tme) + ';end';
+    }
+    return p.tme;
+  }
+  function abrirTelegram() {
+    var destino = destinoTelegram();
+    if (!destino) return;
     try {
       // Hook de navegación (lo usa el e2e; en producción no existe y se ignora).
-      if (typeof window.__avisoTgNav === 'function') { window.__avisoTgNav(deep); }
-      else window.location.href = deep;
+      if (typeof window.__avisoTgNav === 'function') { window.__avisoTgNav(destino); return; }
     } catch (e) {}
-    setTimeout(function () {
-      try {
-        if (document.visibilityState === 'visible') {
-          var w = window.open(p.tme, '_blank');
-          if (w) w.opener = null;
-        }
-      } catch (e2) {}
-    }, 700);
+    if (esAndroid()) {
+      // Un intent:// no se abre en ventana nueva (quedaría en blanco): va en
+      // la pestaña actual, como el WhatsApp de APPI. APPI nunca navega.
+      try { window.location.href = destino; } catch (e) {}
+      return;
+    }
+    try {
+      var w = window.open(destino, '_blank', 'noopener,noreferrer');
+      if (w) return;
+    } catch (e) {}
+    try { window.location.href = destino; } catch (e) {}
   }
 
   function copiarCodigo() {

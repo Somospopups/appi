@@ -66,23 +66,46 @@ test.describe('Avisos por Telegram', () => {
     await expect(page.locator('#avisoTgOv .aviso-tg-cod')).toBeVisible();
     await expect(page.locator('#avisoTgOv img')).toHaveCount(0); // sin QR
 
-    // El botón Abrir Telegram dispara el deep link nativo tg:// (abre la app
-    // instalada) y, si la app no lo tomó, abre la web t.me en otra ventana.
-    // La ventana de APPI nunca navega (no se reinicia).
+    // El botón «Abrir Telegram» nunca navega la ventana de APPI (no se
+    // reinicia). En Android (PWA instalada) lanza un intent:// con el paquete
+    // de Telegram — igual que el WhatsApp de APPI, porque la PWA no resuelve
+    // un tg:// pelado; fuera de Android abre t.me en otra ventana.
+    const uaOriginal = await page.evaluate(() => navigator.userAgent);
     await page.evaluate(() => {
       window.__tgNav = [];
+      window.__tgOpen = [];
+      window.open = u => { window.__tgOpen.push(u); return { closed: false }; };
       window.__avisoTgNav = u => { window.__tgNav.push(u); };
-      window.open = u => { (window.__tgOpen = window.__tgOpen || []).push(u); return { closed: false }; };
+      // Simula el celular: la PWA instalada en Android.
+      Object.defineProperty(navigator, 'userAgent', {
+        get: () => 'Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 Chrome/120.0.0.0 Mobile Safari/537.36',
+        configurable: true
+      });
     });
     await page.locator('#avisoTgOv').getByRole('button', { name: 'Abrir Telegram' }).click();
-    await page.waitForTimeout(1100); // deja correr el fallback de 700ms
-    const nav = await page.evaluate(() => window.__tgNav || []);
-    expect(nav).toEqual(['tg://resolve?domain=appi_avisos_bot&start=ABCD1234']);
-    const abiertas = await page.evaluate(() => window.__tgOpen || []);
-    expect(abiertas).toEqual(['https://t.me/appi_avisos_bot?start=ABCD1234']);
+    const intent = (await page.evaluate(() => window.__tgNav || []))[0] || '';
+    expect(intent).toContain('intent://resolve?domain=appi_avisos_bot&start=ABCD1234');
+    expect(intent).toContain('#Intent;scheme=tg;package=org.telegram.messenger');
+    expect(intent).toContain('S.browser_fallback_url=' +
+      encodeURIComponent('https://t.me/appi_avisos_bot?start=ABCD1234'));
+    // El intent:// va en la pestaña actual, nunca en una ventana nueva.
+    expect(await page.evaluate(() => window.__tgOpen)).toEqual([]);
     // APPI sigue viva (no navegó, no se reinició).
     await expect(page.locator('#avisoTgOv')).toBeVisible();
     await expect(page.locator('#avisoTgOv')).toContainText('ABCD1234');
+    expect(page.url()).toContain('127.0.0.1:4174');
+    // Fuera de Android: el botón abre t.me en otra ventana y APPI no navega.
+    await page.evaluate((ua) => {
+      Object.defineProperty(navigator, 'userAgent', { get: () => ua, configurable: true });
+      delete window.__avisoTgNav;
+      window.__tgOpen = [];
+    }, uaOriginal);
+    await page.locator('#avisoTgOv').getByRole('button', { name: 'Abrir Telegram' }).click();
+    expect(await page.evaluate(() => window.__tgOpen))
+      .toEqual(['https://t.me/appi_avisos_bot?start=ABCD1234']);
+    await expect(page.locator('#avisoTgOv')).toBeVisible();
+    await expect(page.locator('#avisoTgOv')).toContainText('ABCD1234');
+    expect(page.url()).toContain('127.0.0.1:4174');
     // Respaldo visible: abrir en el navegador.
     const webLink = page.locator('#avisoTgOv a.aviso-tg-btn.ghost');
     await expect(webLink).toHaveAttribute('href', 'https://t.me/appi_avisos_bot?start=ABCD1234');
