@@ -199,11 +199,11 @@ test('las tarjetas son inteligentes: solo aparecen las categorías con novedades
   await entrar(page);
   const cats = await page.evaluate(() => window.APPIHomeTarjetas.armarTarjetas().map(t => t.cat));
   expect(cats[0]).toBe('especial');
-  expect(cats).toContain('hoy');           // Lucía tiene presentación hoy
+  expect(cats).toContain('hoy');           // Lucía tiene presentación hoy + María a un paso del Bonus
   expect(cats).not.toContain('canje');     // sin usuarios de garantías
   expect(cats).toContain('jornada');   // Jorge y Lucía tienen fecha para hoy
   expect(cats).toContain('panel');         // Carla está nueva sin contactar
-  expect(cats).toContain('oportunidades'); // María (DC) está en 9 PB: bonus cerca
+  expect(cats).not.toContain('oportunidades'); // v563: el Bonus vive en Hoy te conviene
   expect(cats).not.toContain('cumples');   // nadie cumple años en los datos
   expect(cats).not.toContain('usuarios');  // sin planilla de garantías cargada
 });
@@ -490,8 +490,10 @@ test('proponer el bonus abre el WhatsApp de la persona con el teléfono real de 
     window.APPITel.abrir = (tel, texto, nombre) => { window.__saludos.push({ tel, texto, nombre }); return true; };
   });
   await page.evaluate(() => window.APPIHomeTarjetas.abrir());
-  // Avanzamos hasta la tarjeta de Oportunidades y tocamos a María.
-  while (!(await page.locator('.ht-card:not(.detras1):not(.detras2):not(.ht-fantasma)').textContent()).includes('Oportunidades')) {
+  // El Bonus vive en Hoy te conviene (v563). Avanzamos hasta esa carta y tocamos a María.
+  while (true) {
+    const txt = await page.locator('.ht-card:not(.detras1):not(.detras2):not(.ht-fantasma)').textContent();
+    if (txt.includes('Hoy te conviene') && txt.includes('María')) break;
     await page.evaluate(() => window.APPIHomeTarjetas.pasar());
     await page.waitForTimeout(400);
   }
@@ -579,30 +581,41 @@ test('las tarjetas muestran nombre y apellido, no solo el apellido (v323)', asyn
     const t = window.APPIHomeTarjetas.armarTarjetas();
     return {
       cumple: (t.find(x => x.cat === 'cumples') || {}).html || '',
-      bonus: (t.find(x => x.cat === 'oportunidades') || {}).html || ''
+      bonus: (t.find(x => x.cat === 'hoy') || {}).html || ''
     };
   });
   // Cumpleaños: nombre y apellido en su orden, sin gritos.
   expect(r.cumple).toContain('Sebastian Troncoso');
   expect(r.cumple).not.toContain('TRONCOSO,');
-  // Oportunidades: María Pérez ya venía legible y sigue completa.
+  // Hoy te conviene (unificada): María Pérez ya venía legible y sigue completa.
   expect(r.bonus).toContain('María Pérez');
 });
 
-// v324 · El botón violeta de Oportunidades lleva a Mi Equipo (los renglones
-// siguen proponiendo por WhatsApp directo a cada persona).
-test('el botón de Oportunidades dice Ir a Mi Equipo y te lleva ahí (v324)', async ({ page }) => {
+// v563 · Hoy te conviene junta la jugada del día y el Bonus del equipo.
+test('Hoy te conviene junta la jugada del día y el Bonus (v563)', async ({ page }) => {
   await entrar(page);
+  const r = await page.evaluate(() => {
+    const t = window.APPIHomeTarjetas.armarTarjetas();
+    const hoy = t.find(x => x.cat === 'hoy') || {};
+    return { cats: t.map(x => x.cat), kicker: hoy.kicker, titulo: hoy.titulo, html: hoy.html, cta: hoy.cta && hoy.cta.label };
+  });
+  expect(r.cats).not.toContain('oportunidades');
+  expect(r.kicker).toMatch(/Hoy te conviene/i);
+  expect(r.titulo).toContain('Lucía');
+  expect(r.html).toContain('María Pérez');
+  expect(r.html).toContain('9 PB');
+  expect(r.cta).toMatch(/Lucía/);
   await page.evaluate(() => window.APPIHomeTarjetas.abrir());
-  while (!(await page.locator('.ht-card:not(.detras1):not(.detras2):not(.ht-fantasma)').textContent()).includes('Oportunidades')) {
+  while (true) {
+    const txt = await page.locator('.ht-card:not(.detras1):not(.detras2):not(.ht-fantasma)').textContent();
+    if (txt.includes('Hoy te conviene') && txt.includes('María')) break;
     await page.evaluate(() => window.APPIHomeTarjetas.pasar());
     await page.waitForTimeout(400);
   }
   const cta = page.locator('.ht-card:not(.detras1):not(.detras2):not(.ht-fantasma) .ht-cta');
-  await expect(cta).toHaveText('Ir a Mi Equipo');
+  await expect(cta).toHaveText(/Lucía/);
   await cta.click();
-  await expect(page.locator('#view-equipo')).toHaveClass(/active/);
-  // Y el mazo sigue vivo en el Home (v323).
+  await expect(page.locator('#view-gestion')).toHaveClass(/active/);
   await expect(page.locator('#htOverlay')).toHaveCount(1);
 });
 

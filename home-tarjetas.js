@@ -7,10 +7,9 @@
    por categoría, solo si esa categoría tiene algo para decir:
 
      💙 Especial  · aliento personalizado (siempre, 1 frase/día)
-     ⚡ Hoy te conviene · LA jugada del día (primera carta, un nombre)
+     ⚡ Hoy te conviene · la jugada del día + Bonus al alcance (una sola carta)
      🔄 Plan Canje · equipos vencidos < 1 año, listos para renovar
      📅 Tu jornada · seguimientos y presentaciones de hoy
-     🎯 Oportunidades · bonus al alcance en Mi Equipo
      🎂 Cumpleaños · equipo + clientes que cumplen hoy
      📝 Reempadronar · Alta de este mes, hace 1 año o más
      👥 Mi Equipo · Cultura + a quién invitar
@@ -499,15 +498,55 @@
     };
   }
 
+  function genteBonusHoy(){
+    try{
+      if (typeof window.personasOportunidadBonus !== 'function') return [];
+      return window.personasOportunidadBonus() || [];
+    }catch(e){ return []; }
+  }
+  function proponerBonusHoy(p){
+    var pilaB = pilaDe(p && p.nombre);
+    var crudo = (p && (p.tel || p.telefono || p.telf)) || '';
+    var tel = (window.APPITel && window.APPITel.primeroValido) ? (window.APPITel.primeroValido(crudo) || crudo) : crudo;
+    var ok = !!(tel && window.APPITel && window.APPITel.esValido && window.APPITel.esValido(tel));
+    var pb = String(Number(p && (p.pnAct || p.pb) || 0)).replace('.', ',');
+    return function(){
+      if (ok){
+        window.APPITel.abrir(tel, 'Hola ' + pilaB + '! 😊 Vi que ya estás en ' + pb + ' PB… ¡a nada del Bonus! ¿Te ayudo a llegar? Podemos invitar a alguien y trabajarlo juntos esta semana. 💪', pilaB);
+      } else if (window.APPITel && window.APPITel.avisarInvalido){
+        window.APPITel.avisarInvalido(tel, pilaB || 'Esta persona', p);
+      } else if (window.APPIDialog && window.APPIDialog.alert){
+        window.APPIDialog.alert((pilaB || 'Esta persona') + ' no tiene un teléfono válido cargado en la planilla de Línea Descendente. Cuando subas una planilla con su número, el mensaje sale a un toque.', { title: 'Sin teléfono en la planilla', icon: '📵' });
+      } else abrirEquipo();
+    };
+  }
   function tarjetaHoyConviene(){
     var a = mejorAccionHoy();
-    if (!a) return null;
-    var motor = a.motor === 'venta' ? 'Venta' : a.motor === 'canje' ? 'Plan Canje' : 'Equipo';
+    var gente = genteBonusHoy();
+    if (!a && !gente.length) return null;
+    var motor = !a ? 'Bonus' : (a.motor === 'venta' ? 'Venta' : a.motor === 'canje' ? 'Plan Canje' : 'Equipo');
+    var filas = [], items = [];
+    gente.slice(0, 3).forEach(function(p){
+      var pb = Number(p.pnAct || p.pb || 0);
+      var crudo = p.tel || p.telefono || p.telf || '';
+      var tel = (window.APPITel && window.APPITel.primeroValido) ? (window.APPITel.primeroValido(crudo) || crudo) : crudo;
+      var ok = !!(tel && window.APPITel && window.APPITel.esValido && window.APPITel.esValido(tel));
+      filas.push('<li>🎯 <b>' + esc(nombreLindo(p.nombre)) + '</b> está en ' + String(pb).replace('.', ',') + ' PB' + (ok ? '' : ' <i>sin teléfono</i>') + '</li>');
+      items.push(proponerBonusHoy(p));
+    });
+    var html = '';
+    if (a) html += '<p class="ht-frase">' + esc(a.detalle) + '</p>';
+    if (filas.length){
+      html += '<ul class="ht-lista">' + filas.join('') + '</ul>';
+      html += '<p class="ht-nota">Tocá a la persona y sale la propuesta por WhatsApp.</p>';
+    }
+    var titulo = a ? a.titulo : (gente.length === 1 ? 'Un Bonus al alcance de la mano' : gente.length + ' Bonus al alcance de la mano');
     return {
       cat: 'hoy', icono: '⚡', kicker: 'Hoy te conviene · ' + motor,
-      titulo: a.titulo,
-      html: '<p class="ht-frase">' + esc(a.detalle) + '</p>',
-      cta: { label: a.cta, go: a.go }
+      titulo: titulo,
+      html: html,
+      items: items.length ? items : null,
+      cta: a ? { label: a.cta, go: a.go } : { label: 'Ir a Mi Equipo', go: abrirEquipo }
     };
   }
 
@@ -570,43 +609,7 @@
   }
 
   function tarjetaOportunidades(){
-    try{
-      if (typeof window.personasOportunidadBonus !== 'function') return null;
-      var gente = window.personasOportunidadBonus() || [];
-      if (!gente.length) return null;
-      var pilaB = function(n){
-        try{ if (typeof window.nombreDePila === 'function'){ var v = window.nombreDePila(n); if (v) return v; } }catch(e){}
-        var t = String(n || '').trim();
-        if (t.indexOf(',') >= 0) t = (t.split(',')[1] || t.split(',')[0]);
-        return (t.trim().split(/\s+/)[0] || '');
-      };
-      var abrirEquipo = function(){ if (typeof window.openEquipo === 'function') window.openEquipo(); else if (typeof window.showView === 'function') window.showView('view-equipo'); };
-      var telDeB = function(p){ var c = p.tel || p.telefono || p.telf || ''; var v = window.APPITel && window.APPITel.primeroValido ? window.APPITel.primeroValido(c) : ''; return v || c; };
-      var telValidoB = function(p){ var t = telDeB(p); return !!(t && window.APPITel && window.APPITel.esValido(t)); };
-      var proponer = function(p){ return function(){
-        var pb = String(Number(p.pnAct || p.pb || 0)).replace('.', ',');
-        if (telValidoB(p)){
-          window.APPITel.abrir(telDeB(p), 'Hola ' + pilaB(p.nombre) + '! 😊 Vi que ya estás en ' + pb + ' PB… ¡a nada del Bonus! ¿Te ayudo a llegar? Podemos invitar a alguien y trabajarlo juntos esta semana. 💪', pilaB(p.nombre));
-        } else if (window.APPIDialog && window.APPIDialog.alert){
-          // Sin teléfono en la planilla, decirlo de frente (v322).
-          if (window.APPITel && window.APPITel.avisarInvalido) window.APPITel.avisarInvalido(telDeB(p), pilaB(p.nombre), p);
-          else if (window.APPIDialog && window.APPIDialog.alert) window.APPIDialog.alert((pilaB(p.nombre) || 'Esta persona') + ' no tiene un teléfono válido cargado en la planilla de Línea Descendente. Cuando subas una planilla con su número, el mensaje sale a un toque.', { title: 'Sin teléfono en la planilla', icon: '📵' });
-        } else abrirEquipo();
-      }; };
-      var filas = [], items = [];
-      gente.slice(0, 3).forEach(function(p){
-        var pb = Number(p.pnAct || p.pb || 0);
-        filas.push('<li>🎯 <b>' + esc(nombreLindo(p.nombre)) + '</b> está en ' + String(pb).replace('.', ',') + ' PB' + (telValidoB(p) ? '' : ' <i>sin teléfono</i>') + '</li>');
-        items.push(proponer(p));
-      });
-      return {
-        cat: 'oportunidades', icono: '🎯', kicker: 'Oportunidades',
-        titulo: gente.length === 1 ? 'Un Bonus al alcance de la mano' : gente.length + ' Bonus al alcance de la mano',
-        html: '<ul class="ht-lista">' + filas.join('') + '</ul><p class="ht-nota">Tocá a la persona y sale la propuesta por WhatsApp.</p>',
-        items: items,
-        cta: { label: 'Ir a Mi Equipo', go: abrirEquipo }
-      };
-    }catch(e){ return null; }
+    return null; // v563: el Bonus vive en Hoy te conviene
   }
 
   function tarjetaCumples(){
@@ -1076,7 +1079,7 @@
   function armarTarjetas(){
     var lista = [tarjetaEspecial()];
     try{ if (window.APPIMensajes && window.APPIMensajes.registrarPartido) window.APPIMensajes.registrarPartido(); }catch(e){}
-    [tarjetaHoyConviene(), tarjetaGanaste(), tarjetaMetodoEnvio(), tarjetaLlegamos(), tarjetaDuchaRinnova(), tarjetaCanje(), tarjetaJornada(), tarjetaOportunidades(), tarjetaCumples(), tarjetaReempadronar(), tarjetaEquipo(), tarjetaPanel(), tarjetaUsuarios()].forEach(function(t){
+    [tarjetaHoyConviene(), tarjetaGanaste(), tarjetaMetodoEnvio(), tarjetaLlegamos(), tarjetaDuchaRinnova(), tarjetaCanje(), tarjetaJornada(), tarjetaCumples(), tarjetaReempadronar(), tarjetaEquipo(), tarjetaPanel(), tarjetaUsuarios()].forEach(function(t){
       if (t) lista.push(t);
     });
     return lista;
