@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "554.0.0",
-  "cacheName": "appi-v554-telegram",
+  "version": "555.0.0",
+  "cacheName": "appi-v555-telegram",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

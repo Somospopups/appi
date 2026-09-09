@@ -46,13 +46,11 @@ test.describe('Avisos por Telegram', () => {
     await page.locator('#btnDistributorLogin').click();
     await expect(page.locator('#lockScreen')).toHaveClass(/hidden/);
 
-    // Entrada visible: el botón «Avisos por Telegram» vive en el menú de
-    // herramientas del Home (sidebar), como la entrada original.
-    await expect(page.locator('#btnSidebarTelegram')).toBeVisible();
-    await expect(page.locator('#btnSidebarTelegram')).toContainText('Avisos por Telegram');
-
-    // Abrir el panel desde ahí, como lo haría el usuario.
-    await page.locator('#btnSidebarTelegram').click();
+    // Entrada: engranaje ⚙️ → Avisos por Telegram.
+    await page.locator('button.tools-btn').first().click();
+    await expect(page.locator('#btnToolsTelegram')).toBeVisible();
+    await expect(page.locator('#btnToolsTelegram')).toContainText('Avisos por Telegram');
+    await page.locator('#btnToolsTelegram').click();
     await expect(page.locator('#avisoTgOv')).toBeVisible();
     await expect(page.locator('#avisoTgOv')).toContainText('Conectar Telegram');
 
@@ -78,7 +76,7 @@ test.describe('Avisos por Telegram', () => {
         configurable: true
       });
     });
-    await page.locator('#avisoTgOv').getByRole('button', { name: 'Abrir Telegram' }).click();
+    await page.locator('#avisoTgOv').getByRole('link', { name: 'Abrir Telegram' }).first().click();
     const intent = (await page.evaluate(() => window.__tgNav || []))[0] || '';
     expect(intent).toContain('intent://resolve?domain=appi_avisos_bot&start=ABCD1234');
     expect(intent).toContain('#Intent;scheme=tg;package=org.telegram.messenger');
@@ -96,7 +94,7 @@ test.describe('Avisos por Telegram', () => {
       delete window.__avisoTgNav;
       window.__tgOpen = [];
     }, uaOriginal);
-    await page.locator('#avisoTgOv').getByRole('button', { name: 'Abrir Telegram' }).click();
+    await page.locator('#avisoTgOv').getByRole('link', { name: 'Abrir Telegram' }).first().click();
     expect(await page.evaluate(() => window.__tgOpen))
       .toEqual(['https://t.me/appi_avisos_bot?start=ABCD1234']);
     await expect(page.locator('#avisoTgOv')).toBeVisible();
