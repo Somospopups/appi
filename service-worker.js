@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v557-pilares';
+const CACHE_NAME = 'appi-v558-home';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
