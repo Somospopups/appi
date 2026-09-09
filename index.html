@@ -132,6 +132,7 @@ window.openStock=function(){
   <script src="./device-bridge.js?v=523"></script>
   <script src="./anuncios.js?v=521"></script>
   <script src="./aviso-telegram.js?v=555"></script>
+  <script src="./home-pilares.js?v=556"></script>
   <script src="./reuniones.js?v=530"></script>
 <style id="historico-inline-css">
 /* APPI · Histórico mensual */
@@ -4301,7 +4302,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v555 · Segura</div>
+  <div class="ds-foot">APPI · v556 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4585,7 +4586,7 @@ body.dark #pageTabs button.active{color:#c5d6ff}
       <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
 
       <div class="home-brand-row">
-        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · v555</span></span>
+        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · v556</span></span>
       </div>
 
       <div class="home-hero-card">
@@ -4609,10 +4610,12 @@ body.dark #pageTabs button.active{color:#c5d6ff}
 
     <div id="culturaWrap"></div>
 
+    <div id="hoyUsuarios"></div>
+
     <div class="home-section-head">
       <div>
-        <span>Herramientas</span>
-        <h2>Accesos rápidos</h2>
+        <span>Tres pilares</span>
+        <h2>Tu día</h2>
       </div>
     </div>
 
@@ -11914,6 +11917,7 @@ function renderHomeCompleto(){
   try{ renderBonusNotifs(); }catch(e){ console.error(e); }
   try{ renderScoreCompact(); }catch(e){ console.error(e); }
   try{ renderToolsList(); }catch(e){ console.error(e); }
+  try{ if(window.APPIPilares) window.APPIPilares.pintar(); }catch(e){ console.error(e); }
 }
 
 
@@ -12806,8 +12810,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='555';
-      const CACHE_NAME='appi-v555-telegram';
+      const swVersion='556';
+      const CACHE_NAME='appi-v556-pilares';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · v'+swVersion;
       const hadController=Boolean(navigator.serviceWorker.controller);
