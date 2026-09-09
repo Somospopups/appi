@@ -143,6 +143,8 @@ def verificar_videos(productos):
     ajeno nunca vuelve a colarse en una ficha."""
     errores = []
     for p in productos or []:
+        if (p.get("grupo") or "") == "recargas" and p.get("video"):
+            errores.append(f"{p.get('sku')} {p.get('nombre')}: está en 'Recargas y adaptadores' pero lleva video {p.get('video')}")
         if sin_video_de(p.get("nombre")):
             if p.get("video"):
                 errores.append(f"{p.get('sku')} {p.get('nombre')}: está en SIN_VIDEO pero lleva video {p.get('video')}")
@@ -259,8 +261,11 @@ def recortar(s, n=720):
     return cut.rsplit(" ", 1)[0] + "…"
 
 
-def video_de(nombre):
-    if sin_video_de(nombre):
+def video_de(nombre, grupo=None):
+    """Video del producto, si corresponde. La sección "Recargas y
+    adaptadores" (grupo recargas) nunca lleva video: son repuestos y
+    accesorios, la ficha va sin botón ni QR. SIN_VIDEO gana igual."""
+    if grupo == "recargas" or sin_video_de(nombre):
         return None, None
     n = (nombre or "").upper()
     for keys, vid, titulo in VIDEOS:
@@ -347,7 +352,8 @@ def graphql_catalogo():
         if meta and meta.lower() == nombre.lower():
             meta = ""
         para = recortar(meta or short or (desc.split("\n")[0] if desc else ""), 220)
-        vurl, vtit = video_de(nombre)
+        grp = grupo(nombre, it.get("categories") or [])
+        vurl, vtit = video_de(nombre, grp)
         productos.append(
             {
                 "sku": sku,
@@ -355,7 +361,7 @@ def graphql_catalogo():
                 "precio": int(round(float(pr or 0))),
                 "lista": int(round(float(rg or pr or 0))),
                 "url": ("https://tienda.psa.com.ar/" + uk + ".html") if uk else "",
-                "grupo": grupo(nombre, it.get("categories") or []),
+                "grupo": grp,
                 "stock": it.get("stock_status") or "",
                 "cats": cats,
                 "para": para,
