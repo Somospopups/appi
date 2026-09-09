@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v551-cover';
+const CACHE_NAME = 'appi-v552-telegram';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
