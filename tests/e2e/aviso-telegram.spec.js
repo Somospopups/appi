@@ -64,7 +64,7 @@ test.describe('Avisos por Telegram', () => {
 
     // El botón Abrir Telegram abre el enlace en una ventana nueva (no navega
     // la app en la misma ventana: eso reiniciaba APPI).
-    await page.evaluate(() => { window.open = url => { window.__tgAbiertas = (window.__tgAbiertas || []).concat([url]); return null; }; });
+    await page.evaluate(() => { window.open = url => { window.__tgAbiertas = (window.__tgAbiertas || []).concat([url]); return { closed: false }; }; });
     await page.locator('#avisoTgOv').getByRole('button', { name: 'Abrir Telegram' }).click();
     const abiertas = await page.evaluate(() => window.__tgAbiertas || []);
     expect(abiertas).toEqual(['https://t.me/appi_avisos_bot?start=ABCD1234']);

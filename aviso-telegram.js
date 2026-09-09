@@ -134,23 +134,60 @@
   }
 
   // ---------- apertura del chat (sin reiniciar la app) ----------
-  function abrirTelegram() {
-    if (!urlActual) return;
-    // En Android va por intent:// con el paquete de Telegram: Chrome abre la
-    // app y APPI queda intacta atrás. En el resto, ventana nueva. Nunca
-    // navegamos la ventana actual: eso reinicia APPI. Si no se abrió, el
-    // usuario tiene el código a mano para pegarlo en el bot (ver abajo).
-    if (esAndroid()) {
-      try {
-        window.location.href = 'intent://t.me' + urlActual.replace(/^https?:\/\/t\.me/i, '') +
-          '#Intent;scheme=https;package=org.telegram.messenger;S.browser_fallback_url=' +
-          encodeURIComponent(urlActual) + ';end';
-        return;
-      } catch (e) {}
-    }
+  // Interpreta un enlace https://t.me/<bot>?start=<código> y abre la app de
+  // Telegram instalada (Android: intent con scheme=tg, como el WhatsApp de
+  // APPI; iOS/escritorio: ventana nueva con ancla real). Nunca navegamos la
+  // ventana actual: eso reinicia APPI.
+  function parsearTme(url) {
     try {
-      window.open(urlActual, '_blank');
+      var u = new URL(String(url || ''));
+      if (u.protocol !== 'https:' && u.protocol !== 'http:') return null;
+      if (u.hostname !== 't.me' && u.hostname !== 'telegram.me') return null;
+      var seg = u.pathname.replace(/^\//, '').split('/');
+      var domain = decodeURIComponent(seg[0] || '');
+      if (!domain) return null;
+      var start = (u.searchParams && u.searchParams.get('start')) ? String(u.searchParams.get('start')) : '';
+      return { tme: String(url), domain: domain, start: start };
+    } catch (e) { return null; }
+  }
+
+  function abrirExterno(url) {
+    try {
+      var w = window.open(url, '_blank', 'noopener,noreferrer');
+      if (w) return;
     } catch (e) {}
+    // Ancla real como respaldo: funciona también en la PWA instalada.
+    try {
+      var a = document.createElement('a');
+      a.href = url;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    } catch (e2) {}
+  }
+
+  function abrirTelegram() {
+    var p = parsearTme(urlActual);
+    if (!p) return;
+    if (esAndroid()) {
+      // Salto directo a la app instalada (igual que el intent de WhatsApp).
+      // Si la app no está instalada, Chrome abre el enlace t.me como respaldo.
+      var intentUrl = 'intent://resolve?domain=' + encodeURIComponent(p.domain) +
+        (p.start ? '&start=' + encodeURIComponent(p.start) : '') +
+        '#Intent;scheme=tg;package=org.telegram.messenger;S.browser_fallback_url=' +
+        encodeURIComponent(p.tme) + ';end';
+      try {
+        window.location.href = intentUrl;
+        return;
+      } catch (e) {
+        abrirExterno(p.tme);
+        return;
+      }
+    }
+    abrirExterno(p.tme);
   }
 
   function copiarCodigo() {
