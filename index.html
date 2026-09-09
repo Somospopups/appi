@@ -4301,7 +4301,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v558 · Segura</div>
+  <div class="ds-foot">APPI · v559 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4585,7 +4585,7 @@ body.dark #pageTabs button.active{color:#c5d6ff}
       <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
 
       <div class="home-brand-row">
-        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · v558</span></span>
+        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · v559</span></span>
       </div>
 
       <div class="home-hero-card">
@@ -12806,8 +12806,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='558';
-      const CACHE_NAME='appi-v558-home';
+      const swVersion='559';
+      const CACHE_NAME='appi-v559-home';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · v'+swVersion;
       const hadController=Boolean(navigator.serviceWorker.controller);
@@ -13946,9 +13946,6 @@ body.dark .presu-select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:
   </button>
   <button class="tools-item" id="btnToolsWhatsApp" onclick="cerrarToolsMenu(); window.APPIWhatsApp && window.APPIWhatsApp.elegirDesdeAjustes()" hidden>
     <span class="ti-ico">💬</span><span id="toolsWhatsAppTxt">¿Qué WhatsApp utilizás?</span>
-  </button>
-  <button class="tools-item" id="btnToolsNotif" onclick="window.APPINotif&&window.APPINotif.probar()">
-    <span class="ti-ico">🔔</span><span>Probar notificación</span>
   </button>
   <button class="tools-item" id="btnToolsAccount" onclick="abrirCuentaDesdeMenu()" hidden>
     <span class="ti-ico">👤</span><span>Mi cuenta</span>
