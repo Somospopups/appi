@@ -131,6 +131,7 @@ window.openStock=function(){
   <script src="./home-tarjetas.js?v=543"></script>
   <script src="./device-bridge.js?v=523"></script>
   <script src="./anuncios.js?v=521"></script>
+  <script src="./aviso-telegram.js?v=544"></script>
   <script src="./reuniones.js?v=530"></script>
 <style id="historico-inline-css">
 /* APPI · Histórico mensual */
@@ -4294,13 +4295,14 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-demo" onclick="openDemo()"><span>🎯</span> Coach de Demo</button>
     <button class="ds-btn" data-ds="view-botella" onclick="openBotella()"><span>🍾</span> Comparativas</button>
     <button class="ds-btn" data-ds="view-lista" onclick="openLista()"><span>📋</span> Lista de precios</button>
+    <button class="ds-btn" onclick="openAvisosTelegram()"><span>📲</span> Avisos por Telegram</button>
     <button class="ds-btn" data-ds="view-reuniones" onclick="openReuniones()"><span>🎥</span> Reuniones</button>
     <button class="ds-btn" onclick="abrirBancoImagenes()"><span>🖼️</span> Banco de Imágenes</button>
     <button class="ds-btn" data-ds="view-simulador" onclick="openCalculadora()"><span>🧮</span> Simulador</button>
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v543 · Segura</div>
+  <div class="ds-foot">APPI · v544 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -11399,6 +11401,11 @@ function renderToolsList(){
       statusVal:'Live', statusClass:'pending', progressPct:100,
       timeAgo:'Nuevo o unirse', onClick:'openReuniones()', accent:'#0b5878', gradient:'linear-gradient(135deg,#0b5878,#5b8def)'
     });
+    const hTg = renderHomeQuickCard({
+      icon:'📲', title:'Avisos por Telegram', sub:'Tu día a las 8:00, donde siempre lo ves',
+      statusVal:'Canal', statusClass:'pending', progressPct:100,
+      timeAgo:'Resumen + presentaciones', onClick:'openAvisosTelegram()', accent:'#2aabee', gradient:'linear-gradient(135deg,#2aabee,#5b8def)'
+    });
     const hBanco = renderHomeQuickCard({
       icon:'🖼️', title:'Banco de Imágenes', sub:'Imágenes oficiales PSA',
       statusVal:'Web', statusClass:'pending', progressPct:100,
@@ -11434,7 +11441,7 @@ function renderToolsList(){
       timeAgo: nAgenda ? 'Listos para importar' : 'Sin teléfonos',
       onClick:'exportarAgendaTelefono()', accent:'#25d366', gradient:'linear-gradient(135deg,#25d366,#128c7e)'
     });
-    herrHost.innerHTML = h1 + h2 + h3 + h4 + hLista + hReu + hBanco + h5 + hStock + h6 + h7 + hAgenda;
+    herrHost.innerHTML = h1 + h2 + h3 + h4 + hLista + hReu + hTg + hBanco + h5 + hStock + h6 + h7 + hAgenda;
   }
   if(!mesHost){const toolsList=document.getElementById('toolsList');if(toolsList)toolsList.innerHTML = `
     <details class="home-section-block" data-home-sec="mes" ${openMes?'open':''}>
@@ -12805,8 +12812,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='543';
-      const CACHE_NAME='appi-v543-cover';
+      const swVersion='544';
+      const CACHE_NAME='appi-v544-cover';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · v'+swVersion;
       const hadController=Boolean(navigator.serviceWorker.controller);

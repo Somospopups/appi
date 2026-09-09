@@ -94,9 +94,10 @@ test('el botón Cambiar mensaje reemplaza el texto del carrusel', async ({ page 
   });
   await page.locator('[data-mu-hoy="retro"]').click();
 
-  // Primer contacto: la fila arranca con el hielo, sin marca y sin el botón
-  // de cambiar mensaje (el cambio es para el aviso del motivo).
-  await expect(page.locator('#muPrevTxt')).toContainText('¡Hola');
+  // Primer contacto: la fila arranca con el hielo (frase al azar que varía
+  // con la hora del día; lo estable es el nombre de la cuenta), sin marca y
+  // sin el botón de cambiar mensaje.
+  await expect(page.locator('#muPrevTxt')).toContainText('María');
   await expect(page.locator('#muCambiarMensaje')).toHaveCount(0);
 
   // Mandado el saludo, el aviso por defecto habla de retrolavado genérico.
@@ -105,7 +106,7 @@ test('el botón Cambiar mensaje reemplaza el texto del carrusel', async ({ page 
   await expect(page.locator('#muCambiarMensaje')).toBeVisible();
   const ice = await page.evaluate(() => window.__wa);
   expect(ice).toHaveLength(1);
-  expect(decodeURIComponent(ice[0])).toContain('¡Hola');
+  expect(decodeURIComponent(ice[0])).toContain('María');
 
   await page.locator('#muCambiarMensaje').click();
   await expect(page.locator('#muTitulo')).toContainText('Elegir mensaje');

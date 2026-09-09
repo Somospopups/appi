@@ -1,0 +1,58 @@
+name: Configurar bot de Telegram (una vez)
+
+# Ejecutar UNA VEZ después de crear el bot con @BotFather y guardar los
+# secrets en el repo (Settings → Secrets and variables → Actions):
+#   TELEGRAM_BOT_TOKEN      token que te da @BotFather (123456:ABC-...)
+#   TELEGRAM_BOT_USERNAME   username del bot, sin @ (appi_avisos_bot)
+#   TELEGRAM_WEBHOOK_SECRET contraseña larga al azar para firmar el webhook
+# Guarda los secretos en la Edge Function y registra el webhook en Telegram.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  configurar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_PROJECT_ID: tqwnjfnaywjmyfplvatm
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_BOT_USERNAME: ${{ secrets.TELEGRAM_BOT_USERNAME }}
+      TELEGRAM_WEBHOOK_SECRET: ${{ secrets.TELEGRAM_WEBHOOK_SECRET }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verificar credenciales
+        run: |
+          test -n "$SUPABASE_ACCESS_TOKEN" || (echo "Falta SUPABASE_ACCESS_TOKEN" && exit 1)
+          test -n "$TELEGRAM_BOT_TOKEN" || (echo "Falta TELEGRAM_BOT_TOKEN (crealo con @BotFather)" && exit 1)
+          test -n "$TELEGRAM_BOT_USERNAME" || (echo "Falta TELEGRAM_BOT_USERNAME" && exit 1)
+          test -n "$TELEGRAM_WEBHOOK_SECRET" || (echo "Falta TELEGRAM_WEBHOOK_SECRET" && exit 1)
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Guardar secretos en las Edge Functions
+        run: |
+          supabase secrets set \
+            TELEGRAM_BOT_TOKEN="$TELEGRAM_BOT_TOKEN" \
+            TELEGRAM_BOT_USERNAME="$TELEGRAM_BOT_USERNAME" \
+            TELEGRAM_WEBHOOK_SECRET="$TELEGRAM_WEBHOOK_SECRET" \
+            --project-ref "$SUPABASE_PROJECT_ID"
+
+      - name: Registrar el webhook en Telegram
+        run: |
+          curl --fail-with-body --silent --show-error \
+            "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/setWebhook" \
+            --data-urlencode "url=https://${SUPABASE_PROJECT_ID}.supabase.co/functions/v1/telegram-webhook" \
+            --data-urlencode "secret_token=${TELEGRAM_WEBHOOK_SECRET}" \
+            --data-urlencode 'allowed_updates=["message"]' | jq .
+
+      - name: Verificar el webhook
+        run: |
+          curl --fail-with-body --silent --show-error \
+            "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getWebhookInfo" | jq .
