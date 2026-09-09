@@ -130,8 +130,8 @@ window.openStock=function(){
 <script src="./home-limpio.js?v=520"></script>
   <script src="./home-tarjetas.js?v=543"></script>
   <script src="./device-bridge.js?v=523"></script>
+  <script src="./telegram-avisos.js?v=544"></script>
   <script src="./anuncios.js?v=521"></script>
-  <script src="./aviso-telegram.js?v=551"></script>
   <script src="./reuniones.js?v=530"></script>
 <style id="historico-inline-css">
 /* APPI · Histórico mensual */
@@ -4295,14 +4295,12 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-demo" onclick="openDemo()"><span>🎯</span> Coach de Demo</button>
     <button class="ds-btn" data-ds="view-botella" onclick="openBotella()"><span>🍾</span> Comparativas</button>
     <button class="ds-btn" data-ds="view-lista" onclick="openLista()"><span>📋</span> Lista de precios</button>
-    <button class="ds-btn" id="btnSidebarTelegram" onclick="openAvisosTelegram()"><span>📲</span> Avisos por Telegram</button>
     <button class="ds-btn" data-ds="view-reuniones" onclick="openReuniones()"><span>🎥</span> Reuniones</button>
-    <button class="ds-btn" onclick="abrirBancoImagenes()"><span>🖼️</span> Banco de Imágenes</button>
     <button class="ds-btn" data-ds="view-simulador" onclick="openCalculadora()"><span>🧮</span> Simulador</button>
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v551 · Segura</div>
+  <div class="ds-foot">APPI · v544 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4586,7 +4584,7 @@ body.dark #pageTabs button.active{color:#c5d6ff}
       <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
 
       <div class="home-brand-row">
-        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · v551</span></span>
+        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · v544</span></span>
       </div>
 
       <div class="home-hero-card">
@@ -11401,16 +11399,6 @@ function renderToolsList(){
       statusVal:'Live', statusClass:'pending', progressPct:100,
       timeAgo:'Nuevo o unirse', onClick:'openReuniones()', accent:'#0b5878', gradient:'linear-gradient(135deg,#0b5878,#5b8def)'
     });
-    const hTg = renderHomeQuickCard({
-      icon:'📲', title:'Avisos por Telegram', sub:'Tu día a las 8:00, donde siempre lo ves',
-      statusVal:'Canal', statusClass:'pending', progressPct:100,
-      timeAgo:'Resumen + presentaciones', onClick:'openAvisosTelegram()', accent:'#2aabee', gradient:'linear-gradient(135deg,#2aabee,#5b8def)'
-    });
-    const hBanco = renderHomeQuickCard({
-      icon:'🖼️', title:'Banco de Imágenes', sub:'Imágenes oficiales PSA',
-      statusVal:'Web', statusClass:'pending', progressPct:100,
-      timeAgo:'Fotos para vender', onClick:'abrirBancoImagenes()', accent:'#e07b39', gradient:'linear-gradient(135deg,#ff8f6b,#f5b301)'
-    });
     const h5 = renderHomeQuickCard({
       icon:'🧮', title:'Simulador', sub:'Calculá tu negocio',
       statusVal:'Calc', statusClass:'pending', progressPct:100,
@@ -11441,7 +11429,7 @@ function renderToolsList(){
       timeAgo: nAgenda ? 'Listos para importar' : 'Sin teléfonos',
       onClick:'exportarAgendaTelefono()', accent:'#25d366', gradient:'linear-gradient(135deg,#25d366,#128c7e)'
     });
-    herrHost.innerHTML = h1 + h2 + h3 + h4 + hLista + hReu + hTg + hBanco + h5 + hStock + h6 + h7 + hAgenda;
+    herrHost.innerHTML = h1 + h2 + h3 + h4 + hLista + hReu + h5 + hStock + h6 + h7 + hAgenda;
   }
   if(!mesHost){const toolsList=document.getElementById('toolsList');if(toolsList)toolsList.innerHTML = `
     <details class="home-section-block" data-home-sec="mes" ${openMes?'open':''}>
@@ -11482,10 +11470,6 @@ function openLista(){
   } else {
     if(typeof showToast==='function') showToast('📋 Lista no disponible', 2000);
   }
-}
-function abrirBancoImagenes(){
-  // Banco de imágenes oficial de PSA, en pestaña nueva (fuera de APPI).
-  window.open('https://info.psa.com.ar/landings/banco-imagenes-PSA/indexAR.html', '_blank', 'noopener');
 }
 function openCalculadora(){
   if(typeof window.abrirSimulador === 'function') {
@@ -12384,6 +12368,9 @@ function actualizarCuentaUI(){
   if(distributor&&window.APPIDeviceBridge&&!window.APPIDeviceBridge.state.loading){
     window.APPIDeviceBridge.loadDevices().then(updateDeviceText).catch(()=>{});
   }
+  if(distributor&&window.APPITelegram&&window.APPITelegram.refreshMenu){
+    window.APPITelegram.refreshMenu();
+  }
 }
 async function abrirDispositivosDesdeMenu(){
   try{cerrarToolsMenu()}catch(e){}
@@ -12812,8 +12799,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='551';
-      const CACHE_NAME='appi-v551-cover';
+      const swVersion='544';
+      const CACHE_NAME='appi-v544-telegram';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · v'+swVersion;
       const hadController=Boolean(navigator.serviceWorker.controller);
@@ -13946,6 +13933,9 @@ body.dark .presu-select{background:rgba(30,30,50,.7);color:#f0f0f5;border-color:
   </button>
   <button class="tools-item" id="btnToolsDevices" onclick="abrirDispositivosDesdeMenu()" hidden>
     <span class="ti-ico">📲</span><span id="toolsDevicesTxt">Vincular teléfono</span>
+  </button>
+  <button class="tools-item" id="btnToolsTelegram" onclick="window.APPITelegram&&window.APPITelegram.abrir()" hidden>
+    <span class="ti-ico">✈️</span><span id="toolsTelegramTxt">Vincular Telegram</span>
   </button>
   <button class="tools-item" id="btnToolsWhatsApp" onclick="cerrarToolsMenu(); window.APPIWhatsApp && window.APPIWhatsApp.elegirDesdeAjustes()" hidden>
     <span class="ti-ico">💬</span><span id="toolsWhatsAppTxt">¿Qué WhatsApp utilizás?</span>
