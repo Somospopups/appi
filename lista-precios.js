@@ -515,7 +515,11 @@
     return null;
   }
   function videoDe(p) {
-    if (p && p.video) return p.video;
+    // El catálogo manda: si trae el campo video (aunque sea '' = sin video
+    // oficial, como la Válvula By Pass de la C3), se respeta tal cual.
+    // Los pares de abajo son solo un espejo de emergencia para filas viejas
+    // que no tengan el campo.
+    if (p && p.video !== undefined && p.video !== null) return String(p.video);
     var n = String((p && p.nombre) || '').toUpperCase();
     var pares = [
       // Espejo del catálogo (scripts/actualizar-precios-psa.py): videos

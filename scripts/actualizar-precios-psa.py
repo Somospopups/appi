@@ -116,6 +116,19 @@ FAMILIAS = [
     (("BACTERIO",), ("S1000",)),
 ]
 
+# Productos sin video oficial: aunque el nombre mencione una familia (p. ej.
+# la Válvula By Pass de la C3), la ficha va sin botón ni QR. Gana sobre VIDEOS.
+# Se comparan los tokens contra el nombre normalizado (sin acentos/separadores).
+SIN_VIDEO = [
+    ("REPUESTO", "VALVULA", "BYPASS", "C3"),
+]
+
+
+def sin_video_de(nombre):
+    n = _norm(nombre)
+    return any(all(tok in n for tok in toks) for toks in SIN_VIDEO)
+
+
 def _norm(s):
     # Para comparar sin ruido: mayúsculas, sin acentos y sin separadores.
     s = (s or "").upper()
@@ -130,6 +143,10 @@ def verificar_videos(productos):
     ajeno nunca vuelve a colarse en una ficha."""
     errores = []
     for p in productos or []:
+        if sin_video_de(p.get("nombre")):
+            if p.get("video"):
+                errores.append(f"{p.get('sku')} {p.get('nombre')}: está en SIN_VIDEO pero lleva video {p.get('video')}")
+            continue
         if not (p.get("video") or ""):
             continue
         n = _norm(p.get("nombre"))
@@ -243,6 +260,8 @@ def recortar(s, n=720):
 
 
 def video_de(nombre):
+    if sin_video_de(nombre):
+        return None, None
     n = (nombre or "").upper()
     for keys, vid, titulo in VIDEOS:
         if any(k in n for k in keys):
