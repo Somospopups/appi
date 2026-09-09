@@ -160,14 +160,12 @@ Deno.serve(async request => {
       if (row.total > 0) {
         await botFetch(token, 'sendMessage', {
           chat_id: chatId,
-          text: `📨 *Así llega tu resumen cada mañana (8:00)*:\n\n${resumenTexto(row, nombre)}`,
-          parse_mode: 'Markdown',
+          text: `📨 Así llega tu resumen cada mañana (8:00):\n\n${resumenTexto(row, nombre)}\n\n📱 Abrí APPI para ver el detalle.`,
         });
       } else {
         await botFetch(token, 'sendMessage', {
           chat_id: chatId,
-          text: `📨 *Prueba del resumen diario*\n\nHoy no tenés acciones pendientes en Mi Gestión 🙌 así que te muestro un ejemplo de cómo llega cuando las hay:\n\nBuen día, ${nombre} 👋\n\nTenés 2 seguimientos vencidos, 1 presentación para hoy y 3 contactos nuevos.\n\n📱 Abrí APPI para ver el detalle.\n\nVas a recibir este aviso cada mañana a las 8:00, con tus números reales.`,
-          parse_mode: 'Markdown',
+          text: `📨 Así llega tu resumen cada mañana (8:00)\n\nBuen día, ${nombre} 👋\n\nTenés 2 seguimientos vencidos, 1 presentación para hoy y 3 contactos nuevos.\n\n📱 Abrí APPI para ver el detalle.\n\nHoy no tenés acciones pendientes en Mi Gestión 🙌 esto fue un ejemplo: cuando haya pendientes vas a ver tus números reales.`,
         });
       }
       return json({ ok: true });
