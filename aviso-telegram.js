@@ -17,7 +17,6 @@
   var CSS = 'avisoTgCss';
   var POLL_MS = 2500;
   var timer = null;
-  var urlActual = '';
 
   function config() {
     try {
@@ -56,10 +55,6 @@
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
     });
   }
-  function esAndroid() {
-    return /android/i.test(navigator.userAgent || '');
-  }
-
   // ---------- estilos ----------
   function estilos() {
     if (document.getElementById(CSS)) return;
@@ -77,7 +72,7 @@
       '.aviso-tg-hero{border-radius:16px;padding:14px 16px;margin-bottom:12px;color:#fff;background:linear-gradient(135deg,#2aabee,#7a5bf0)}' +
       '.aviso-tg-hero b{display:block;font-size:15.5px;margin-bottom:3px}' +
       '.aviso-tg-hero p{margin:0;opacity:.95;font-size:13px;line-height:1.5}' +
-      '.aviso-tg-btn{display:block;width:100%;min-height:50px;margin-top:10px;border:0;border-radius:15px;font:inherit;font-size:15px;font-weight:800;cursor:pointer;text-align:center;text-decoration:none;box-sizing:border-box}' +
+      '.aviso-tg-btn{display:flex;align-items:center;justify-content:center;width:100%;min-height:50px;margin-top:10px;padding:12px 16px;border:0;border-radius:15px;font:inherit;font-size:15px;font-weight:800;cursor:pointer;text-align:center;text-decoration:none;box-sizing:border-box;line-height:1.35}' +
       '.aviso-tg-btn.primary{color:#fff;background:linear-gradient(135deg,#2aabee,#5b8def);box-shadow:0 10px 22px rgba(42,140,220,.3)}' +
       '.aviso-tg-btn.ghost{color:#3d5fc0;background:rgba(80,110,220,.09)}' +
       '.aviso-tg-btn.danger{color:#c2454e;background:rgba(220,80,90,.09)}' +
@@ -133,62 +128,8 @@
       '<button class="aviso-tg-btn ghost" onclick="window.__avisoTgAbrirOv()">Reintentar</button>');
   }
 
-  // ---------- apertura del chat (sin reiniciar la app) ----------
-  // Interpreta un enlace https://t.me/<bot>?start=<código> y abre la app de
-  // Telegram instalada (Android: intent con scheme=tg, como el WhatsApp de
-  // APPI; iOS/escritorio: ventana nueva con ancla real). Nunca navegamos la
-  // ventana actual: eso reinicia APPI.
-  function parsearTme(url) {
-    try {
-      var u = new URL(String(url || ''));
-      if (u.protocol !== 'https:' && u.protocol !== 'http:') return null;
-      if (u.hostname !== 't.me' && u.hostname !== 'telegram.me') return null;
-      var seg = u.pathname.replace(/^\//, '').split('/');
-      var domain = decodeURIComponent(seg[0] || '');
-      if (!domain) return null;
-      var start = (u.searchParams && u.searchParams.get('start')) ? String(u.searchParams.get('start')) : '';
-      return { tme: String(url), domain: domain, start: start };
-    } catch (e) { return null; }
-  }
-
-  function abrirExterno(url) {
-    try {
-      var w = window.open(url, '_blank', 'noopener,noreferrer');
-      if (w) return;
-    } catch (e) {}
-    // Ancla real como respaldo: funciona también en la PWA instalada.
-    try {
-      var a = document.createElement('a');
-      a.href = url;
-      a.target = '_blank';
-      a.rel = 'noopener noreferrer';
-      a.style.display = 'none';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    } catch (e2) {}
-  }
-
-  function abrirTelegram() {
-    var p = parsearTme(urlActual);
-    if (!p) return;
-    if (esAndroid()) {
-      // Salto directo a la app instalada (igual que el intent de WhatsApp).
-      // Si la app no está instalada, Chrome abre el enlace t.me como respaldo.
-      var intentUrl = 'intent://resolve?domain=' + encodeURIComponent(p.domain) +
-        (p.start ? '&start=' + encodeURIComponent(p.start) : '') +
-        '#Intent;scheme=tg;package=org.telegram.messenger;S.browser_fallback_url=' +
-        encodeURIComponent(p.tme) + ';end';
-      try {
-        window.location.href = intentUrl;
-        return;
-      } catch (e) {
-        abrirExterno(p.tme);
-        return;
-      }
-    }
-    abrirExterno(p.tme);
-  }
+  // El botón «Abrir Telegram» es un enlace real a t.me: lo resuelve
+  // el sistema operativo (abre la app instalada o, si no, la web).
 
   function copiarCodigo() {
     var d = ov();
@@ -221,23 +162,21 @@
     pintar(head() +
       '<div class="aviso-tg-ok"><div class="chk">✓</div><div><b>Chat vinculado</b>' +
       '<p>Recibís el resumen de cada día a las 8:00 y los avisos de presentaciones en este chat.</p></div></div>' +
-      '<button class="aviso-tg-btn primary" onclick="window.__avisoTgAbrirTg()">Abrir chat de Telegram</button>' +
+      '<a class="aviso-tg-btn primary" href="' + esc(String(r.link || 'https://t.me/')) + '" target="_blank" rel="noopener noreferrer">Abrir chat de Telegram</a>' +
       '<button class="aviso-tg-btn danger" onclick="window.__avisoTgDesvincular()">Desconectar este chat</button>' +
       '<div class="aviso-tg-note">Si algún día no te llega, abrí el chat y tocá «Iniciar» una vez.</div>'
     );
-    urlActual = String(r.link || 'https://t.me/');
   }
 
   function renderPendiente(r) {
     var url = String(r.url || '');
-    urlActual = url;
     var bot = String(r.bot || '');
     var codigo = String(r.codigo || '');
     pintar(head() +
       '<div class="aviso-tg-hero"><b>Casi listo</b><p>Dos pasos y quedás conectado:</p>' +
       '<p><b>1.</b> Tocá «Abrir Telegram» y entrá al chat del bot.</p>' +
       '<p><b>2.</b> Tocá «Iniciar» y volvé acá.</p></div>' +
-      '<button class="aviso-tg-btn primary" onclick="window.__avisoTgAbrirTg()">Abrir Telegram</button>' +
+      '<a class="aviso-tg-btn primary" href="' + esc(url) + '" target="_blank" rel="noopener noreferrer">Abrir Telegram</a>' +
       '<button class="aviso-tg-btn ghost" onclick="window.__avisoTgRefrescar()">Ya toqué «Iniciar» — verificar</button>' +
       (codigo ? '<span class="aviso-tg-cod" onclick="window.__avisoTgCopiar()" title="Tocá para copiar">' + esc(codigo) + '</span>' : '') +
       '<div class="aviso-tg-note">' + (bot ? '¿No abre el chat? Tocá el código para copiarlo, entrá al bot @' + esc(bot.replace(/^@/, '')) + ' y pegalo ahí. ' : '') +
@@ -300,7 +239,6 @@
   window.openAvisosTelegram = abrir;
   window.__avisoTgAbrirOv = abrir;
   window.__avisoTgCerrar = cerrar;
-  window.__avisoTgAbrirTg = abrirTelegram;
   window.__avisoTgCopiar = copiarCodigo;
   window.__avisoTgRefrescar = function () { refrescarEstado(false); };
   window.__avisoTgConectar = conectar;

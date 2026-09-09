@@ -62,12 +62,11 @@ test.describe('Avisos por Telegram', () => {
     await expect(page.locator('#avisoTgOv .aviso-tg-cod')).toBeVisible();
     await expect(page.locator('#avisoTgOv img')).toHaveCount(0); // sin QR
 
-    // El botón Abrir Telegram abre el enlace en una ventana nueva (no navega
-    // la app en la misma ventana: eso reiniciaba APPI).
-    await page.evaluate(() => { window.open = url => { window.__tgAbiertas = (window.__tgAbiertas || []).concat([url]); return { closed: false }; }; });
-    await page.locator('#avisoTgOv').getByRole('button', { name: 'Abrir Telegram' }).click();
-    const abiertas = await page.evaluate(() => window.__tgAbiertas || []);
-    expect(abiertas).toEqual(['https://t.me/appi_avisos_bot?start=ABCD1234']);
+    // El botón Abrir Telegram es un enlace nativo a t.me (lo resuelve el SO
+    // abriendo la app o la web) en ventana nueva: nunca navega la app.
+    const tgLink = page.locator('#avisoTgOv a.aviso-tg-btn.primary');
+    await expect(tgLink).toHaveAttribute('href', 'https://t.me/appi_avisos_bot?start=ABCD1234');
+    await expect(tgLink).toHaveAttribute('target', '_blank');
 
     // Simular que el usuario tocó «Iniciar» en Telegram: el canal pasa a
     // conectado y el panel lo detecta al verificar.
