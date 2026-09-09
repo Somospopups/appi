@@ -665,8 +665,7 @@ test('la tarjeta especial se viste distinta y sin espacio muerto (v325)', async 
       fondo: getComputedStyle(el).backgroundImage,
       colorFrase: getComputedStyle(el.querySelector('.ht-esp-frase')).color,
       comilla: !!el.querySelector('.ht-esp-comilla'),
-      marca: !!el.querySelector('.ht-esp-marca'),
-      // La frase vive centrada: el cuerpo es una columna flex con margin auto.
+      marca: !!el.querySelector('.ht-marca'),
       centro: getComputedStyle(el.querySelector('.ht-esp-centro')).marginTop
     };
   });
@@ -674,7 +673,7 @@ test('la tarjeta especial se viste distinta y sin espacio muerto (v325)', async 
   expect(r.colorFrase).toBe('rgb(255, 255, 255)');
   expect(r.comilla).toBe(true);
   expect(r.marca).toBe(true);
-  expect(r.centro).not.toBe('0px');   // margin:auto reparte el espacio, no queda muerto
+  expect(r.centro).toBe('0px');   // v564: el contenido arranca arriba y usa todo el alto
   // La siguiente tarjeta NO lleva el vestido especial.
   await page.evaluate(() => window.APPIHomeTarjetas.pasar());
   await page.waitForTimeout(450);
