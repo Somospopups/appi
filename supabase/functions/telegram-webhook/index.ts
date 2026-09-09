@@ -132,11 +132,52 @@ Deno.serve(async request => {
       return json({ ok: true });
     }
 
+    // ---------- /demo: muestra cómo llega el resumen de la mañana ----------
+    if (comando === '/demo' || comando === '/prueba') {
+      const { data: canal } = await admin
+        .from('appi_canales_aviso')
+        .select('id,user_id,persona_tipo,activo')
+        .eq('destino', chatId)
+        .eq('canal', 'telegram')
+        .maybeSingle();
+      if (!canal || !canal.activo) {
+        await botFetch(token, 'sendMessage', {
+          chat_id: chatId,
+          text: 'Este chat todavía no está vinculado a una cuenta de APPI.\n\nPara vincularlo: abrí APPI → engranaje ⚙️ → «Avisos por Telegram» → Conectar. Después volvé y mandame /demo.',
+        });
+        return json({ ok: true });
+      }
+      const { data: perfil } = await admin
+        .from('appi_perfiles')
+        .select('nombre,socio_nombre')
+        .eq('user_id', canal.user_id)
+        .maybeSingle();
+      const nombre = canal.persona_tipo === 'socio'
+        ? firstName(perfil?.socio_nombre || 'Socio')
+        : firstName(perfil?.nombre || 'Distribuidor');
+      const { data: resumen } = await admin.rpc('appi_resumen_gestion', { p_user_id: canal.user_id, p_fecha: localDate() });
+      const row = resumen || { nuevos: 0, hoy: 0, vencidos: 0, presentaciones: 0, encuestas_nuevas: 0, total: 0 };
+      if (row.total > 0) {
+        await botFetch(token, 'sendMessage', {
+          chat_id: chatId,
+          text: `📨 *Así llega tu resumen cada mañana (8:00)*:\n\n${resumenTexto(row, nombre)}`,
+          parse_mode: 'Markdown',
+        });
+      } else {
+        await botFetch(token, 'sendMessage', {
+          chat_id: chatId,
+          text: `📨 *Prueba del resumen diario*\n\nHoy no tenés acciones pendientes en Mi Gestión 🙌 así que te muestro un ejemplo de cómo llega cuando las hay:\n\nBuen día, ${nombre} 👋\n\nTenés 2 seguimientos vencidos, 1 presentación para hoy y 3 contactos nuevos.\n\n📱 Abrí APPI para ver el detalle.\n\nVas a recibir este aviso cada mañana a las 8:00, con tus números reales.`,
+          parse_mode: 'Markdown',
+        });
+      }
+      return json({ ok: true });
+    }
+
     // ---------- Comandos del chat ----------
     if (comando === '/start' || comando === '/ayuda' || comando === '/help') {
       await botFetch(token, 'sendMessage', {
         chat_id: chatId,
-        text: 'Soy el bot de avisos de APPI 📲\n\n• Vinculación: tocá «Conectar Telegram» dentro de la app.\n• /pausa — dejar de recibir avisos\n• /reanudar — volver a recibirlos\n\nRecibís el resumen del día a las 8:00 y los avisos de presentaciones.',
+        text: 'Soy el bot de avisos de APPI 📲\n\n• Vinculación: tocá «Avisos por Telegram» en el engranaje ⚙️ de APPI.\n• /demo — ver cómo llega el resumen de la mañana\n• /pausa — dejar de recibir avisos\n• /reanudar — volver a recibirlos\n\nRecibís el resumen del día a las 8:00 y los avisos de presentaciones.',
       });
       return json({ ok: true });
     }

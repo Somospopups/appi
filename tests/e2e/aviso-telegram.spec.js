@@ -46,12 +46,13 @@ test.describe('Avisos por Telegram', () => {
     await page.locator('#btnDistributorLogin').click();
     await expect(page.locator('#lockScreen')).toHaveClass(/hidden/);
 
-    // Entradas visibles: tarjeta en Herramientas del Home y botón en el sidebar.
-    await expect(page.locator('.ds-btn', { hasText: 'Avisos por Telegram' })).toBeVisible();
-    await expect(page.locator('#herrGrid')).toContainText('Avisos por Telegram');
+    // Entrada visible: el engranaje ⚙️ del Home abre el menú con el item.
+    await page.locator('#view-home .tools-btn').click();
+    await expect(page.locator('#toolsMenu')).toHaveClass(/open/);
+    await expect(page.locator('#btnToolsTelegram')).toContainText('Avisos por Telegram');
 
-    // Abrir el panel (desde el sidebar, como lo haría el usuario).
-    await page.locator('.ds-btn', { hasText: 'Avisos por Telegram' }).click();
+    // Abrir el panel desde el engranaje, como lo haría el usuario.
+    await page.locator('#btnToolsTelegram').click();
     await expect(page.locator('#avisoTgOv')).toBeVisible();
     await expect(page.locator('#avisoTgOv')).toContainText('Conectar Telegram');
 
