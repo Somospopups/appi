@@ -1269,6 +1269,36 @@
     inlineAbierto = false;
   }
 
+  function ajustarFraseEspecial(el){
+    var caja = el && el.querySelector('.ht-esp-centro');
+    var frase = el && el.querySelector('.ht-esp-frase');
+    if (!caja || !frase) return;
+    frase.style.fontSize = '';
+    var h = caja.clientHeight, w = caja.clientWidth;
+    if (h < 20 || w < 40) return;
+    var lo = 16, hi = Math.min(30, Math.max(22, Math.round(w / 13))), best = 16, n;
+    for (n = 0; n < 12; n++){
+      var mid = (lo + hi) / 2;
+      frase.style.fontSize = mid.toFixed(1) + 'px';
+      if (frase.scrollHeight <= h + 1 && frase.scrollWidth <= w + 1){ best = mid; lo = mid; }
+      else hi = mid;
+    }
+    frase.style.fontSize = best.toFixed(1) + 'px';
+  }
+  function ajustarFrasesDelMazo(){
+    var deck = document.getElementById('htDeck');
+    if (!deck) return;
+    deck.querySelectorAll('.ht-card.ht-esp').forEach(ajustarFraseEspecial);
+  }
+
+
+  if (!window.__htFraseResize){
+    window.__htFraseResize = 1;
+    window.addEventListener('resize', function(){
+      if (document.getElementById('htOverlay')) ajustarFrasesDelMazo();
+    });
+  }
+
   function crearCarta(t){
     var el = document.createElement('div');
     var cat = t && t.cat ? t.cat : 'otra';
@@ -1444,8 +1474,11 @@
             el.style.transform = transformCover(d, stageW);
             el.style.opacity = op;
           });
+          ajustarFrasesDelMazo();
         });
       });
+    } else {
+      requestAnimationFrame(function(){ ajustarFrasesDelMazo(); });
     }
   }
 
@@ -1483,6 +1516,7 @@
       }
       deck.appendChild(el);
     }
+    requestAnimationFrame(function(){ ajustarFrasesDelMazo(); });
   }
 
   function cablearTope(el, t){
