@@ -491,8 +491,8 @@
     return {
       cat: 'especial', icono: '💙', kicker: 'Para vos' + (nombre ? ', ' + nombre : ''),
       titulo: 'Tu impulso de hoy',
-      html: '<div class="ht-esp-centro"><span class="ht-esp-comilla">“</span>' +
-            '<p class="ht-frase ht-esp-frase">' + esc(frase) + '<span class="ht-esp-cierre" aria-hidden="true">”</span></p></div>' +
+      html: '<div class="ht-esp-centro"><p class="ht-frase ht-esp-frase"><span class="ht-esp-comilla" aria-hidden="true">“</span>' +
+            esc(frase) + '<span class="ht-esp-cierre" aria-hidden="true">”</span></p></div>' +
             (chips.length ? '<div class="ht-chips">' + chips.map(function(c){ return '<span>' + esc(c) + '</span>'; }).join('') + '</div>' : ''),
       cta: null
     };
@@ -1146,9 +1146,9 @@
       '.ht-card.ht-esp h3{color:#fff;text-shadow:0 1px 6px rgba(20,20,60,.25)}',
       '.ht-card.ht-esp .ht-cuerpo{display:flex;flex-direction:column;justify-content:flex-start;gap:10px}',
       '.ht-esp-centro{margin:0;flex:0 0 auto;display:flex;align-items:flex-start;position:relative;padding:0}',
-      '.ht-esp-comilla{position:absolute;top:-6px;left:-2px;font-size:42px;line-height:1;color:rgba(255,255,255,.45);font-weight:900;pointer-events:none}',
-      '.ht-esp-cierre{display:inline;margin-left:4px;font-size:28px;line-height:0;color:rgba(255,255,255,.45);font-weight:900;pointer-events:none}',
-      '.ht-esp-frase{margin:0;padding-left:14px;padding-right:8px;color:#fff;font-size:21px;line-height:1.45;font-weight:800;letter-spacing:-.2px;text-shadow:0 1px 8px rgba(20,20,60,.22)}',
+      '.ht-esp-comilla{display:inline;margin-right:10px;font-size:30px;line-height:1;color:rgba(255,255,255,.55);font-weight:900;vertical-align:-4px;pointer-events:none}
+      '.ht-esp-cierre{display:inline;margin-left:10px;font-size:30px;line-height:1;color:rgba(255,255,255,.55);font-weight:900;vertical-align:-4px;pointer-events:none}
+      '.ht-esp-frase{margin:0;padding:0;color:#fff;font-size:21px;line-height:1.45;font-weight:800;letter-spacing:-.2px;text-shadow:0 1px 8px rgba(20,20,60,.22)}
       '.ht-card.ht-esp .ht-chips{margin-top:8px;flex:0 0 auto}',
       '.ht-card.ht-esp .ht-chips span{background:rgba(255,255,255,.18);color:#fff;border:1px solid rgba(255,255,255,.22)}',
       '.ht-esp-marca{position:absolute;right:10px;bottom:2px;font-size:74px;line-height:1;opacity:.16;pointer-events:none}',
