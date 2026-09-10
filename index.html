@@ -128,9 +128,9 @@ window.openStock=function(){
 
 <script src="./porque-vivo.js"></script>
 <script src="./home-limpio.js?v=520"></script>
-  <script src="./home-tarjetas.js?v=628"></script>
-  <script src="./appi-eventos.js?v=628"></script>
-  <script src="./tu-mes.js?v=628"></script>
+  <script src="./home-tarjetas.js?v=629"></script>
+  <script src="./appi-eventos.js?v=629"></script>
+  <script src="./tu-mes.js?v=629"></script>
   <script src="./device-bridge.js?v=523"></script>
   <script src="./anuncios.js?v=521"></script>
   <script src="./aviso-telegram.js?v=555"></script>
@@ -4362,7 +4362,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v628 · Segura</div>
+  <div class="ds-foot">APPI · v629 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -8213,7 +8213,27 @@ function renderEquipo(){
     if(fechaEl){
       const d = new Date(equipoData.fechaCarga);
       const fechaTxt = isNaN(d.getTime()) ? '' : d.toLocaleString('es-AR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
-      fechaEl.textContent = fechaTxt ? ('LÍNEA DESCENDENTE · ' + fechaTxt) : 'LÍNEA DESCENDENTE · Última carga';
+      const lastOrg = localStorage.getItem('lastUpdate_garantiasOrg');
+      let orgTxt = '';
+      if(lastOrg){
+        const od = new Date(parseInt(lastOrg));
+        orgTxt = isNaN(od.getTime()) ? '' : od.toLocaleString('es-AR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+      }
+      const parts = [];
+      if(fechaTxt) parts.push('LÍNEA DESCENDENTE · ' + fechaTxt);
+      if(orgTxt) parts.push('GARANTÍAS ORG · ' + orgTxt);
+      if(!orgTxt){
+        const autoSync = localStorage.getItem('appsi_psa_lastSync');
+        const filesStr = localStorage.getItem('appsi_psa_files');
+        let files = {garantiasOrg:true};
+        try{ if(filesStr) files=JSON.parse(filesStr); }catch(e){}
+        if(files.garantiasOrg && autoSync){
+          const ad = new Date(autoSync);
+          const atxt = isNaN(ad.getTime()) ? '' : ad.toLocaleString('es-AR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+          if(atxt) parts.push('GARANTÍAS ORG · ' + atxt);
+        }
+      }
+      fechaEl.textContent = parts.length ? parts.join(' · ') : 'Última carga';
     }
   }
   if(equipoActiveTab === 'dashboard') renderEquipoDashboard();
@@ -12933,8 +12953,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='628';
-      const CACHE_NAME='appi-v628-poster';
+      const swVersion='629';
+      const CACHE_NAME='appi-v629-poster';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · v'+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
@@ -17250,44 +17270,25 @@ function actualizarUsuariosMetaBar(){
   try{
     const bar=document.getElementById('usuariosMetaBar');
     if(!bar) return;
-    const lastGarantias=localStorage.getItem('lastUpdate_garantias');
-    const lastOrg=localStorage.getItem('lastUpdate_garantiasOrg') || localStorage.getItem('lastUpdate_usuarios');
-    const autoLinea=localStorage.getItem('appsi_psa_lastSync');
+    const lastGarantias=localStorage.getItem('lastUpdate_garantias') || localStorage.getItem('lastUpdate_usuarios');
+    const autoSync=localStorage.getItem('appsi_psa_lastSync');
     const filesStr=localStorage.getItem('appsi_psa_files');
-    let files={linea:true,garantiasOrg:true,garantias:true};
+    let files={garantias:true};
     try{ if(filesStr) files=JSON.parse(filesStr); }catch(e){}
-    const parts=[];
-    if(files.garantias){
-      if(lastGarantias){
-        const d=new Date(parseInt(lastGarantias));
-        const txt=isNaN(d.getTime())? lastGarantias : d.toLocaleString('es-AR', {day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'});
-        parts.push('GARANTÍAS · '+txt);
-      } else if(autoLinea){
-        const d=new Date(autoLinea);
-        const txt=isNaN(d.getTime())? '' : d.toLocaleString('es-AR', {day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'});
-        if(txt) parts.push('GARANTÍAS · '+txt);
-      } else {
-        parts.push('GARANTÍAS · —');
-      }
-    }
-    if(files.garantiasOrg){
-      if(lastOrg){
-        const d=new Date(parseInt(lastOrg));
-        const txt=isNaN(d.getTime())? lastOrg : d.toLocaleString('es-AR', {day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'});
-        parts.push('GARANTÍAS ORG · '+txt);
-      } else if(lastGarantias){
-        const d=new Date(parseInt(lastGarantias));
-        const txt=isNaN(d.getTime())? '' : d.toLocaleString('es-AR', {day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'});
-        if(txt) parts.push('GARANTÍAS ORG · '+txt);
-      } else {
-        parts.push('GARANTÍAS ORG · —');
-      }
-    }
-    if(parts.length){
-      bar.textContent=parts.join(' · ');
+    if(!files.garantias){ bar.style.display='none'; return; }
+    if(lastGarantias){
+      const d=new Date(parseInt(lastGarantias));
+      const txt=isNaN(d.getTime())? lastGarantias : d.toLocaleString('es-AR', {day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'});
+      bar.textContent='GARANTÍAS · '+txt;
       bar.style.display='block';
+    } else if(autoSync){
+      const d=new Date(autoSync);
+      const txt=isNaN(d.getTime())? '' : d.toLocaleString('es-AR', {day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'});
+      if(txt){ bar.textContent='GARANTÍAS · '+txt; bar.style.display='block'; }
+      else { bar.textContent='GARANTÍAS · —'; bar.style.display='block'; }
     } else {
-      bar.style.display='none';
+      bar.textContent='GARANTÍAS · —';
+      bar.style.display='block';
     }
   }catch(e){}
 }
