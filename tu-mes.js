@@ -1,7 +1,7 @@
-/* APPI · Tu mes v618 — cerebro
+/* APPI · Tu mes v619 — cerebro
    El mes es un tablero de cartas. Cada día, las 10 de la jornada.
    La puerta es la franja de septiembre del Home.
-   v618: mantenimiento cada 3 meses (antes 6) - placeholder real ambos marcan y llevan (robusto) a la tarea (como diaria) - abre fila del motivo a Home (solo marca y refresca día), real sí lleva directo a WhatsApp/panel (solo iba al Home) a la acción (WhatsApp saludo para cumple, panel Ya lo hice/No para retro) (marca recuperado + abre chat hoy) (mismo renglón) lista vacía (Edge) v598 lista incompleta dice No falta nadie verde con 9 pendientes + info faltas · sin maquillar el hábito (v600 detalle) · popup + v599 cerebro — timeline al abrir día + métricas sutiles arriba.
+   v619: quita píldoras del detalle por día (filtros) (antes 6) - placeholder real ambos marcan y llevan (robusto) a la tarea (como diaria) - abre fila del motivo a Home (solo marca y refresca día), real sí lleva directo a WhatsApp/panel (solo iba al Home) a la acción (WhatsApp saludo para cumple, panel Ya lo hice/No para retro) (marca recuperado + abre chat hoy) (mismo renglón) lista vacía (Edge) v598 lista incompleta dice No falta nadie verde con 9 pendientes + info faltas · sin maquillar el hábito (v600 detalle) · popup + v599 cerebro — timeline al abrir día + métricas sutiles arriba.
    Eventos viven en appi-eventos.js (bus central silencioso).
 */
 (function () {
@@ -1226,7 +1226,7 @@
       if(evResumen.cultura) parts.push('🌱 '+evResumen.cultura);
       chipsHtml='<div class="tm-det-summary">'+parts.map(function(p){ return '<span class="tm-det-chip">'+esc(p)+'</span>';}).join('')+'<span class="tm-det-chip" style="opacity:.65">· '+evResumen.total+' movimientos</span></div>';
     }
-    head.innerHTML = '<div class="eyebrow">Detalle por día</div><h2>'+esc(titulo)+'</h2><p>'+esc(subt)+'</p>'+chipsHtml+ htmlDetalleFiltros(filas, filtro);
+    head.innerHTML = '<div class="eyebrow">Detalle por día</div><h2>'+esc(titulo)+'</h2><p>'+esc(subt)+'</p>'+chipsHtml;
     head.querySelectorAll('[data-det-filtro]').forEach(function(b){
       b.onclick=function(){ _detFiltro=b.getAttribute('data-det-filtro')||''; renderDetalleCuerpo(); };
     });
