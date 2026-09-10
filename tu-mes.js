@@ -1,7 +1,7 @@
-/* APPI · Tu mes v603 — cerebro
+/* APPI · Tu mes v604 — cerebro
    El mes es un tablero de cartas. Cada día, las 10 de la jornada.
    La puerta es la franja de septiembre del Home.
-   v603: TU MES hotfix tarjetas · muestra Tarea del día con RECUPERADA · sin maquillar el hábito (v600 detalle) · popup + v599 cerebro — timeline al abrir día + métricas sutiles arriba.
+   v604: TU MES v601 exacto + info faltas · sin maquillar el hábito (v600 detalle) · popup + v599 cerebro — timeline al abrir día + métricas sutiles arriba.
    Eventos viven en appi-eventos.js (bus central silencioso).
 */
 (function () {
@@ -153,15 +153,7 @@
   }
   function recuperarTarea(diaOrigen, motivoId, tel, nombre, userHint){
     try{
-      // para placeholders genéricos (sin tel) generamos tel sintético
-      if(!tel && nombre==='Tarea del día'){
-        tel = 'ph_'+String(diaOrigen).replace(/-/g,'')+'_'+String(motivoId||'gen')+'_'+Math.random().toString(36).slice(2,6);
-        // asegurar que userHint tenga telf
-        if(userHint) userHint.telf = tel;
-        else userHint = {usuario:nombre||'Tarea', telf:tel};
-      }
-      if(!diaOrigen || !motivoId) { mostrarToast('Falta dato para recuperar'); return false; }
-      if(!tel){ mostrarToast('Falta teléfono para recuperar'); return false; }
+      if(!diaOrigen || !motivoId || !tel) { mostrarToast('Falta teléfono para recuperar'); return false; }
       var now=new Date().toISOString();
       var raw=leerAccionesRaw();
       if(!raw.dias) raw.dias={};
@@ -697,29 +689,19 @@
       var recuperados = dia.recuperados || {};
       var lista = dia.lista || [];
       if (lista.length){
-        return lista.map(function(it, idx){
+        return lista.map(function(it){
           var tel = it.t || '';
-          // si falta tel histórico (hueco viejo), generar sintético determinístico
-          if(!tel) tel = 'ph_'+String(k).replace(/-/g,'')+'_'+idx;
           var clave = it.m + ':' + tel;
-          var marca = marcas[clave] || null;
-          // también probar clave original vacía por compatibilidad
-          if (!marca && it.t === '') {
-            var claveVacia = it.m + ':';
-            if(marcas[claveVacia]) marca = marcas[claveVacia];
-          }
+          var marca = tel ? marcas[clave] : null;
           if (!marca && it.n){
             Object.keys(marcas).forEach(function(claveM){
               if (marca) return;
               if (claveM.split(':')[0] === it.m && marcas[claveM] && marcas[claveM].n === it.n) marca = marcas[claveM];
             });
           }
-          var rec = recuperados[clave] || null;
-          if(!rec){
-            var claveVaciaR = it.m + ':';
-            if(recuperados[claveVaciaR]) rec = recuperados[claveVaciaR];
-          }
+          var rec = tel ? recuperados[clave] : null;
           if(!rec && it.n){
+            // fallback por nombre si falta tel histórico
             Object.keys(recuperados).forEach(function(rk){
               if(rec) return;
               if(rk.split(':')[0]===it.m && recuperados[rk] && recuperados[rk].n===it.n) rec=recuperados[rk];
@@ -728,19 +710,17 @@
           var mot = M() && M().motivoPorId ? M().motivoPorId(it.m) : null;
           var hecha = !!(marca && marca.e === 'hecha');
           var recuperado = !!rec;
-          var esPh = !it.t;
           return {
             motivoId: it.m,
             icono: it.ico || (mot && mot.icono) || '✓',
             motivo: it.mot || (mot && mot.nombre) || '',
-            nombre: nombreCompleto(it.n) || (esPh ? 'Tarea del día' : ''),
+            nombre: nombreCompleto(it.n),
             tel: tel,
             hecha: hecha,
             noHecha: !!(marca && marca.e === 'no_hecha'),
             recuperado: recuperado,
             recuperadoAt: rec && rec.at || '',
-            placeholder: esPh,
-            user: {usuario: it.n || 'Tarea', telf: tel, producto: it.prod || ''}
+            user: {usuario: it.n, telf: tel, producto: it.prod || ''}
           };
         });
       }
@@ -791,13 +771,13 @@
         var freq={}; var top=''; var topN=0;
         out.forEach(function(o){ if(o.motivoId) freq[o.motivoId]=(freq[o.motivoId]||0)+1; });
         Object.keys(freq).forEach(function(k){ if(freq[k]>topN){ topN=freq[k]; top=k; }});
-        if(!top) top = 'checkin';
+        if(!top) top='checkin';
         var motTop=null; try{ motTop = M() && M().motivoPorId ? M().motivoPorId(top) : null; }catch(e){}
-        var icoTop = (motTop && motTop.icono) || '·';
+        var icoTop = (motTop && motTop.icono) || '🔧';
         var nomTop = (motTop && motTop.nombre) || 'Tarea del día';
         for (i = 0; i < faltaN; i++){
           var synTel = 'ph_'+String(k).replace(/-/g,'')+'_'+i;
-          out.push({ motivoId: top||'', icono: icoTop, motivo: nomTop, nombre: 'Tarea del día', tel:synTel, hecha: false, noHecha: false, recuperado:false, recuperadoAt:'', placeholder:true, _idx:i });
+          out.push({ motivoId: top, icono: icoTop, motivo: nomTop, nombre: 'Tarea del día', tel: synTel, hecha: false, noHecha: false, recuperado:false, recuperadoAt:'', placeholder:true });
         }
       }
     }catch(e){}
@@ -851,7 +831,6 @@
     var okItems = items.filter(function(x){ return x.hecha; });
     var recuperadosItems = items.filter(function(x){ return x.recuperado && !x.hecha; });
     var noItems = items.filter(function(x){ return !x.hecha && !x.recuperado; });
-    // si hay placeholders generic, ya tienen motivoId inferido arriba
     // Construir lista hecho
     var lista = '<p class="tm-grupo hecho">Hecho · ' + okItems.length + '</p><ul>';
     lista += okItems.length
@@ -948,22 +927,17 @@
           var motivoId = li.getAttribute('data-pend-motivo')||'';
           var tel = li.getAttribute('data-pend-tel')||'';
           var nombre = li.getAttribute('data-pend-nombre')||'';
-          var esPlaceholder = !tel && nombre==='Tarea del día';
-          if((!motivoId || !tel) && !esPlaceholder) return;
-          if(nombre==='Sin marcar') return;
+          if(!motivoId || !tel || nombre==='Sin marcar') return;
           // buscar el item original para tener user completo
           var it = null;
           for(var j=0;j<noItems.length;j++){ if(noItems[j].motivoId===motivoId && noItems[j].tel===tel){ it=noItems[j]; break; } }
           if(!it) it={motivoId:motivoId, tel:tel, nombre:nombre, user:{usuario:nombre, telf:tel}};
-          var accionesDiv = document.createElement('li');
+          var accionesDiv = document.createElement('div');
           accionesDiv.className = 'tm-pend-actions';
-          accionesDiv.style.listStyle = 'none';
           accionesDiv.style.marginLeft = '32px';
           accionesDiv.style.marginTop = '6px';
           accionesDiv.style.marginBottom = '4px';
-          accionesDiv.style.display = 'flex';
           if(it && it.placeholder){
-            // tarea sin teléfono real (hueco viejo) — solo recuperar genérico
             if(esHoyReal){
               accionesDiv.innerHTML = '<button type="button" class="tm-btn-recup" data-act="hecho">✓ Hecho · '+esc(it.motivo||'Tarea')+'</button>';
               li.parentNode.insertBefore(accionesDiv, li.nextSibling);
@@ -1137,7 +1111,7 @@
       try{ items = itemsDe(k); }catch(e){ items=[]; }
       var hechos = items.filter(function(it){ return it.hecha; });
       var recuperados = items.filter(function(it){ return it.recuperado && !it.hecha; });
-      var pendientes = items.filter(function(it){ return !it.hecha && !it.recuperado && (it.motivoId || it.placeholder) && it.nombre!=='Sin marcar'; });
+      var pendientes = items.filter(function(it){ return !it.hecha && !it.recuperado && it.motivoId && it.nombre!=='Sin marcar'; });
       var hechosFiltrados = filtro ? hechos.filter(function(it){ return String(it.motivoId||'')===String(filtro); }) : hechos;
       var pendientesFiltrados = filtro ? pendientes.filter(function(it){ return String(it.motivoId||'')===String(filtro); }) : pendientes;
       var recuperadosFiltrados = filtro ? recuperados.filter(function(it){ return String(it.motivoId||'')===String(filtro); }) : recuperados;
@@ -1189,12 +1163,7 @@
           var ico = esc(it.icono||'·');
           var key = esc(it.motivoId+'|'+it.tel+'|'+k);
           var esPh = !!it.placeholder;
-          var btns = '';
-          if(esPh){
-            btns = esHoyPend ? '<button type="button" data-det-act="hecho" data-key="'+key+'">✓ Hecho · '+esc(it.motivo||'Tarea')+'</button>' : '<button type="button" data-det-act="recup" data-key="'+key+'">↻ Recuperar · '+esc(it.motivo||'Tarea')+'</button>';
-          } else {
-            btns = esHoyPend ? '<button type="button" class="wa" data-det-act="wa" data-key="'+key+'">💬 Mensaje</button><button type="button" data-det-act="hecho" data-key="'+key+'">✓ Hecho hoy</button>' : '<button type="button" class="wa" data-det-act="wa" data-key="'+key+'">💬 Mensaje</button><button type="button" data-det-act="recup" data-key="'+key+'">↻ Recuperar</button>';
-          }
+          var btns = esPh ? (esHoyPend ? '<button type="button" data-det-act="hecho" data-key="'+key+'">✓ Hecho · '+esc(it.motivo||'Tarea')+'</button>' : '<button type="button" data-det-act="recup" data-key="'+key+'">↻ Recuperar · '+esc(it.motivo||'Tarea')+'</button>') : (esHoyPend ? '<button type="button" class="wa" data-det-act="wa" data-key="'+key+'">💬 Mensaje</button><button type="button" data-det-act="hecho" data-key="'+key+'">✓ Hecho hoy</button>' : '<button type="button" class="wa" data-det-act="wa" data-key="'+key+'">💬 Mensaje</button><button type="button" data-det-act="recup" data-key="'+key+'">↻ Recuperar</button>');
           return '<li data-pend-key="'+key+'" data-motivo="'+esc(it.motivoId)+'" data-tel="'+esc(it.tel)+'" data-nombre="'+esc(it.nombre)+'" data-dia="'+esc(k)+'" style="flex-wrap:wrap"><span class="ico">'+ico+'</span><span class="who"><b>'+esc(desc)+'</b><small>'+esc(nom)+'</small></span><span class="tm-det-recup" style="width:100%;margin-top:6px">'
             + btns
             + '</span></li>';
