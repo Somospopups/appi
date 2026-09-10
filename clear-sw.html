@@ -1,22 +1,99 @@
-<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Limpiar APPI</title><style>body{font-family:system-ui;padding:24px;text-align:center;background:#f5f8ff}button{padding:14px 22px;border:0;border-radius:12px;background:#5b8def;color:#fff;font-weight:900;font-size:16px;cursor:pointer;margin:10px}pre{background:#fff;padding:12px;border-radius:12px;text-align:left;overflow:auto;max-width:600px;margin:14px auto}</style></head><body><h2>🔄 Limpiar caché de APPI</h2><p>Si ves <b>v598</b> abajo, tocá el botón para forzar <b>v607/v608</b>.</p><button onclick="clearAll()">Limpiar y recargar APPI</button><pre id="log">Listo para limpiar...</pre><script>
-function log(m){document.getElementById('log').textContent=m}
-async function clearAll(){
-  log('Limpiando Service Workers y Cachés...');
+<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Fix APPI v598 → v608</title><style>body{font-family:system-ui;padding:18px;background:#f5f8ff;color:#1a2033;line-height:1.45}h2{margin:6px 0} .card{background:#fff;border-radius:16px;padding:16px;max-width:640px;margin:12px auto;box-shadow:0 6px 24px rgba(0,0,0,.08);text-align:left} button{display:block;width:100%;padding:16px;border:0;border-radius:12px;background:#5b8def;color:#fff;font-weight:900;font-size:17px;cursor:pointer;margin:10px 0} button:disabled{opacity:.6} .ok{color:#0a7a2e;font-weight:800} .bad{color:#c0392b;font-weight:800} pre{white-space:pre-wrap;word-break:break-word;background:#f0f3ff;padding:12px;border-radius:10px;font-size:12px;overflow:auto} .step{border-left:4px solid #5b8def;padding:8px 12px;margin:8px 0;background:#eef2ff;border-radius:8px}</style></head><body>
+<center><h2>🔧 APPI trabada en v598</h2><p>Esta página te desbloquea a <b>v608</b> (fix FALTA 7).</p></center>
+<div class="card">
+<div id="diag">Cargando diagnóstico...</div>
+<button id="btn" onclick="hardClear()">1️⃣ TOCÁ ACÁ PARA LIMPIAR CACHÉ</button>
+<div id="after" style="display:none">
+<div class="step"><b>Paso 2 — ¡MUY IMPORTANTE!:</b><br>Después de tocar arriba y ver “✅ Caché borrada”, <b>cerrá TODAS las pestañas y ventanas de APPI</b> (Brave, Edge y si la tenés instalada como App/PWA, cerrala también).<br>No alcanza con recargar.</div>
+<div class="step"><b>Paso 3:</b> Abrí una pestaña nueva y entrá a:<br><a href="https://somospopups.github.io/appi/?t=fix608" target="_blank" style="font-weight:900">https://somospopups.github.io/appi/</a><br>Tiene que decir abajo <span class="ok">APPI · v608 · Segura</span></div>
+<button onclick="location.href='https://somospopups.github.io/appi/?t='+Date.now()" style="background:#0a7a2e">3️⃣ YA CERRÉ TODO → ABRIR APPI v608</button>
+</div>
+<pre id="log"></pre>
+<p style="font-size:12px;color:#666">Si arriba dice <b>v608</b> en “Servidor”, el servidor ya está bien. Si tu APPI sigue en v598 es solo caché local trabada — con este botón se limpia.</p>
+</div>
+<script>
+function lg(m){ const el=document.getElementById('log'); el.textContent+=m+"\n"; el.scrollTop=el.scrollHeight; }
+async function diag(){
+  const d=document.getElementById('diag');
+  let html='';
+  try{
+    html+='<b>Servidor (fetch no-store):</b> ';
+    const r=await fetch('./index.html?cb='+Date.now(),{cache:'no-store'});
+    const t=await r.text();
+    const mv=t.match(/swVersion='([^']+)'/);
+    html+= mv? '<span class="'+(mv[1]==='608'?'ok':'bad')+'">v'+mv[1]+(mv[1]==='608'?' ✅':' ❌')+'</span>':'no detectada';
+    html+=' <span style="font-size:11px;color:#666">('+r.status+')</span><br>';
+    const r2=await fetch('./service-worker.js?cb='+Date.now(),{cache:'no-store'});
+    const t2=await r2.text();
+    const mc=t2.match(/CACHE_NAME\s*=\s*'([^']+)'/);
+    html+='<b>SW en servidor:</b> '+(mc?mc[1]:'no')+'<br>';
+  }catch(e){ html+='<b>Servidor:</b> error '+e.message+'<br>';}
   try{
     if('serviceWorker' in navigator){
       const regs=await navigator.serviceWorker.getRegistrations();
-      for(const r of regs) await r.unregister();
-      log('Service Workers borrados: '+regs.length);
+      html+='<b>SW registrados en ESTE navegador:</b> '+regs.length;
+      for(const re of regs){ html+='<br><span style="font-size:11px">'+re.scope+' → '+(re.active?re.active.scriptURL:'sin active')+' state:'+(re.active?re.active.state:'-')+'</span>'; }
+      html+='<br><b>Controlador actual:</b> '+(navigator.serviceWorker.controller?'SÍ — trabada':'NO')+'<br>';
+      if(navigator.serviceWorker.controller && navigator.serviceWorker.controller.scriptURL.includes('v=598')) html+='<span class="bad">→ Estás controlado por SW v598 viejo ❌</span><br>';
+    } else html+='SW no soportado<br>';
+    if(window.caches){
+      const keys=await caches.keys();
+      html+='<b>Cachés locales:</b> '+(keys.join(', ')||'ninguna')+'<br>';
+    }
+    const hv=localStorage.getItem('appi_seen_version');
+    html+='<b>Última versión vista (localStorage):</b> '+(hv||'ninguna')+'<br>';
+  }catch(e){ html+='diag error '+e.message+'<br>';}
+  d.innerHTML=html;
+  lg('Diagnóstico listo. Tocá el botón azul.');
+}
+async function hardClear(){
+  const btn=document.getElementById('btn');
+  btn.disabled=true; btn.textContent='Limpiando...';
+  lg('→ Iniciando limpieza profunda...');
+  try{
+    if('serviceWorker' in navigator){
+      const regs=await navigator.serviceWorker.getRegistrations();
+      lg('SW encontrados: '+regs.length);
+      for(const r of regs){
+        try{ await r.unregister(); lg('  unregister ok: '+r.scope); }catch(e){ lg('  unregister error: '+e.message); }
+      }
+      // intentar también forzar update antes de borrar por si queda uno
+      // y matar controlador vía message si existe
+      try{ if(navigator.serviceWorker.controller) lg('Controller antes: '+navigator.serviceWorker.controller.scriptURL); }catch(e){}
     }
     if(window.caches){
       const keys=await caches.keys();
-      for(const k of keys) await caches.delete(k);
-      log(document.getElementById('log').textContent+'\nCachés borradas: '+keys.length);
+      lg('Cachés a borrar: '+keys.length+' → '+keys.join(', '));
+      for(const k of keys){ try{ await caches.delete(k); lg('  delete '+k+' ok'); }catch(e){ lg('  delete '+k+' err '+e.message);} }
+      const keys2=await caches.keys();
+      lg('Cachés restantes: '+(keys2.length?keys2.join(', '):'ninguna ✅'));
     }
-    localStorage.setItem('appi_force_update','1');
-    log(document.getElementById('log').textContent+'\n¡Listo! Redirigiendo a APPI v608...');
-    setTimeout(()=> location.href='./?v=608&force=1&t='+Date.now(),800);
-  }catch(e){ log('Error: '+e.message)}
+    try{
+      // No borramos appi_acciones_v1_local ni otros datos de negocio, solo flags de versión
+      localStorage.removeItem('appi_seen_version');
+      localStorage.removeItem('appi_last_sw_update');
+      localStorage.setItem('appi_force_update','1');
+      lg('localStorage flags limpiados');
+    }catch(e){}
+    // Forzar que el SW se vaya sin esperar
+    if('serviceWorker' in navigator){
+      // esperar un tick para que el unregister propague
+      await new Promise(r=>setTimeout(r,600));
+      const regs2=await navigator.serviceWorker.getRegistrations();
+      lg('SW después de unregister: '+regs2.length+(regs2.length?' ❌ quedo uno':' ✅ cero'));
+      if(regs2.length===0) lg('✅ Desregistrado. AHORA CERRÁ TODAS LAS PESTAÑAS.');
+    }
+    document.getElementById('after').style.display='block';
+    btn.textContent='✅ LIMPIEZA HECHA — AHORA CERRÁ TODO';
+    lg('---');
+    lg('IMPORTANTE: No toques “Abrir APPI” sin antes CERRAR todas las pestañas/ventanas de APPI.');
+    lg('En BRAVE/EDGE: cerrá también la ventana de la App si la instalaste (icono APPI en barra).');
+  }catch(e){
+    lg('ERROR: '+e.message+' '+e.stack);
+    btn.disabled=false; btn.textContent='Reintentar';
+  }
 }
-log('APPI actual: '+(localStorage.getItem('appi_acciones_v1_local')?'datos local':'sin datos')+'\nSW: '+(navigator.serviceWorker?'soportado':'no')+'\nTocá el botón para limpiar.');
+diag();
+// Auto-intento: si el usuario no toca en 2s, mostrar que debe tocar
+setTimeout(()=>{ if(document.getElementById('btn').disabled===false) lg('Tocá el botón azul para empezar.'); },1200);
 </script></body></html>
