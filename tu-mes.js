@@ -1,7 +1,7 @@
-/* APPI · Tu mes v616 — cerebro
+/* APPI · Tu mes v617 — cerebro
    El mes es un tablero de cartas. Cada día, las 10 de la jornada.
    La puerta es la franja de septiembre del Home.
-   v616: recuperar placeholder también lleva a la tarea (como diaria) - abre fila del motivo a Home (solo marca y refresca día), real sí lleva directo a WhatsApp/panel (solo iba al Home) a la acción (WhatsApp saludo para cumple, panel Ya lo hice/No para retro) (marca recuperado + abre chat hoy) (mismo renglón) lista vacía (Edge) v598 lista incompleta dice No falta nadie verde con 9 pendientes + info faltas · sin maquillar el hábito (v600 detalle) · popup + v599 cerebro — timeline al abrir día + métricas sutiles arriba.
+   v617: fix no hace nada - placeholder real ambos marcan y llevan (robusto) a la tarea (como diaria) - abre fila del motivo a Home (solo marca y refresca día), real sí lleva directo a WhatsApp/panel (solo iba al Home) a la acción (WhatsApp saludo para cumple, panel Ya lo hice/No para retro) (marca recuperado + abre chat hoy) (mismo renglón) lista vacía (Edge) v598 lista incompleta dice No falta nadie verde con 9 pendientes + info faltas · sin maquillar el hábito (v600 detalle) · popup + v599 cerebro — timeline al abrir día + métricas sutiles arriba.
    Eventos viven en appi-eventos.js (bus central silencioso).
 */
 (function () {
@@ -215,7 +215,44 @@
       var ok = recuperarTarea(k, motivoId, tel, nombre, userHint);
       if(!ok) return false;
       var esPlaceholderOuter = !!(it && it.placeholder) || String(tel||'').indexOf('ph_')===0;
-      // Ambos - placeholder y real - llevan a la tarea como una diaria (como pediste)
+      // Siempre marcar primero (esto ya lo hizo recuperarTarea arriba), luego refrescar y llevar a la acción
+      // Para que no parezca que "no hace nada", aseguramos toast + refresco del calendario siempre
+      try{ pintar(); }catch(e){}
+      try{ renderDetalleCuerpo(); }catch(e){}
+      if(esPlaceholderOuter){
+        // Placeholder: marcar ya está hecho, ahora llevar a la tarea del motivo (como una diaria)
+        // Aunque no haya pendientes hoy de ese motivo, igual mostramos Home y abrimos la fila si existe
+        setTimeout(function(){
+          try{ cerrarCierre(); }catch(e){}
+          try{ cerrarDetalle(); }catch(e){}
+          try{ if(typeof window.showView==='function') window.showView('view-home'); }catch(e){}
+          setTimeout(function(){
+            mostrarToast('¡Recuperado! '+ (DESC_TAREA[motivoId]||motivoId) +' — ahora elegí a quién hacerlo.');
+            try{
+              if(window.APPIMensajes && typeof window.APPIMensajes.abrirFila==='function'){
+                window.APPIMensajes.abrirFila(motivoId);
+                // Si no había pendientes, abrirFila no abre nada y quedas en Home; forzamos scroll al mazo para que veas algo
+                setTimeout(function(){
+                  try{
+                    var ov=document.getElementById('muOverlay');
+                    if(!ov || !ov.classList.contains('open')){
+                      var card=document.querySelector('.home-month-card');
+                      if(card) card.scrollIntoView({behavior:'smooth', block:'center'});
+                      // como último recurso, abrir cualquier pendiente que haya hoy
+                      var todos=[]; try{ todos=planaHoy().filter(function(x){ return !x.hecha; }); }catch(e){}
+                      if(todos.length) llevarAAccionDirecta(todos[0].motivoId, todos[0].user);
+                    }
+                  }catch(e){}
+                }, 380);
+              }
+            }catch(e){}
+          }, 350);
+        }, 200);
+        // refrescar el día por si vuelve a Tu mes
+        setTimeout(function(){ try{ abrirDia(k, false, false); }catch(e){} }, 600);
+        return true;
+      }
+      // Real con persona: llevar directo a ESA persona
       setTimeout(function(){
         try{ cerrarCierre(); }catch(e){}
         try{ cerrarDetalle(); }catch(e){}
@@ -223,29 +260,8 @@
         setTimeout(function(){
           try{
             var u = userHint || (it && it.user) || {usuario:nombre, telf:tel};
-            if(esPlaceholderOuter){
-              // Placeholder sin persona: llevar a la fila general del motivo para que elijas a quién hacerlo hoy
-              mostrarToast('¡Recuperado! '+ (DESC_TAREA[motivoId]||motivoId) +' del '+k.split('-').reverse().join('/')+' — ahora hacelo.');
-              if(window.APPIMensajes && typeof window.APPIMensajes.abrirFila==='function'){
-                try{ window.APPIMensajes.abrirFila(motivoId); }catch(e){
-                  try{ var card=document.querySelector('.home-month-card'); if(card) card.scrollIntoView({behavior:'smooth', block:'center'}); }catch(err){}
-                }
-                // Si no había pendientes de ese motivo hoy, abrirFila no abre overlay y quedas en Home - lo dejamos ahí
-              } else {
-                // fallback: llevar a Home y resaltar mazo
-                try{ var card2=document.querySelector('.home-month-card'); if(card2) card2.scrollIntoView({behavior:'smooth', block:'center'}); }catch(e){}
-                // si hay cualquier pendiente hoy, abrir el primero
-                try{
-                  var todos = planaHoy().filter(function(x){ return !x.hecha; });
-                  if(todos.length) llevarAAccionDirecta(todos[0].motivoId, todos[0].user);
-                }catch(e){}
-              }
-              // refrescar calendario en segundo plano
-              setTimeout(function(){ try{ pintar(); }catch(e){} }, 400);
-            } else {
-              mostrarToast('Recuperado. Ahora hacelo con '+ (u.usuario||u.nombre||nombre) +' hoy');
-              llevarAAccionDirecta(motivoId, u);
-            }
+            mostrarToast('Recuperado. Ahora hacelo con '+ (u.usuario||u.nombre||nombre) +' hoy');
+            llevarAAccionDirecta(motivoId, u);
           }catch(e){ try{ console.error(e);}catch(err){} }
         }, 650);
       }, 280);
