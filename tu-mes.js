@@ -20,15 +20,17 @@
     return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
   }
   function hoyKey(){ return clave(hoy()); }
-  function pila(n){
-    try{ if (typeof window.nombreDePila === 'function'){ var v = window.nombreDePila(n); if (v) return v; } }catch(e){}
-    var t = String(n || '').trim();
+  function nombreCompleto(n){
+    var t = String(n == null ? '' : n).trim();
     if (!t) return '';
     if (t.indexOf(',') >= 0){
-      var der = t.split(',')[1] || '';
-      return (der.trim().split(/\s+/)[0] || t).replace(/^\w/, function(c){ return c.toUpperCase(); });
+      var partes = t.split(',');
+      t = ((partes[1] || '').trim() + ' ' + (partes[0] || '').trim()).trim();
     }
-    return t.split(/\s+/)[0];
+    if (t === t.toUpperCase()){
+      t = t.toLowerCase().replace(/(^|[\s-])([a-záéíóúüñ])/g, function(m, a, b){ return a + b.toUpperCase(); });
+    }
+    return t;
   }
 
   function planaHoy(){
@@ -43,7 +45,7 @@
             motivoId: g.motivo.id,
             icono: g.motivo.icono || '✓',
             motivo: g.motivo.nombre || '',
-            nombre: pila(u.usuario || u.nombre || '') || (u.usuario || ''),
+            nombre: nombreCompleto(u.usuario || u.nombre || ''),
             hecha: !!(m && m.e === 'hecha'),
             noHecha: !!(m && m.e === 'no_hecha'),
             user: u
@@ -354,7 +356,7 @@
             motivoId: it.m,
             icono: it.ico || (mot && mot.icono) || '✓',
             motivo: it.mot || (mot && mot.nombre) || '',
-            nombre: pila(it.n) || it.n || '',
+            nombre: nombreCompleto(it.n),
             hecha: !!(marca && marca.e === 'hecha'),
             noHecha: !!(marca && marca.e === 'no_hecha')
           };
@@ -368,7 +370,7 @@
           motivoId: motId,
           icono: (mot && mot.icono) || '✓',
           motivo: (mot && mot.nombre) || '',
-          nombre: pila(marca && marca.n) || (marca && marca.n) || '',
+          nombre: nombreCompleto(marca && marca.n),
           hecha: marca && marca.e === 'hecha',
           noHecha: marca && marca.e === 'no_hecha'
         });
