@@ -128,9 +128,9 @@ window.openStock=function(){
 
 <script src="./porque-vivo.js"></script>
 <script src="./home-limpio.js?v=520"></script>
-  <script src="./home-tarjetas.js?v=627"></script>
-  <script src="./appi-eventos.js?v=627"></script>
-  <script src="./tu-mes.js?v=627"></script>
+  <script src="./home-tarjetas.js?v=628"></script>
+  <script src="./appi-eventos.js?v=628"></script>
+  <script src="./tu-mes.js?v=628"></script>
   <script src="./device-bridge.js?v=523"></script>
   <script src="./anuncios.js?v=521"></script>
   <script src="./aviso-telegram.js?v=555"></script>
@@ -4362,7 +4362,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v627 · Segura</div>
+  <div class="ds-foot">APPI · v628 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -5205,6 +5205,7 @@ body.dark #pageTabs button.active{color:#c5d6ff}
       <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
       <h1>Usuarios</h1><div class="script">Garantías</div>
       <p>Gestión por zona y vencimiento - Estilo Mi Equipo</p>
+      <div id="usuariosMetaBar" style="display:none; margin:6px 14px 0; padding:6px 10px; border-radius:10px; background:rgba(255,255,255,0.55); border:1px solid rgba(255,255,255,0.7); font-size:11px; color:#65676b; line-height:1.3;"></div>
     </header>
 
     <div class="glass" id="usuariosUploadCard">
@@ -8211,8 +8212,8 @@ function renderEquipo(){
     const fechaEl = document.getElementById('equipoMetaFecha');
     if(fechaEl){
       const d = new Date(equipoData.fechaCarga);
-      const fechaTxt = isNaN(d.getTime()) ? '' : d.toLocaleDateString('es-AR', { day:'numeric', month:'short', year:'numeric' });
-      fechaEl.textContent = fechaTxt ? ('Última carga ' + fechaTxt) : 'Última carga';
+      const fechaTxt = isNaN(d.getTime()) ? '' : d.toLocaleString('es-AR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+      fechaEl.textContent = fechaTxt ? ('LÍNEA DESCENDENTE · ' + fechaTxt) : 'LÍNEA DESCENDENTE · Última carga';
     }
   }
   if(equipoActiveTab === 'dashboard') renderEquipoDashboard();
@@ -12932,8 +12933,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='627';
-      const CACHE_NAME='appi-v627-poster';
+      const swVersion='628';
+      const CACHE_NAME='appi-v628-poster';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · v'+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
@@ -15602,7 +15603,7 @@ function depuradosEsUsuario(u){
 function depuradosContar(){ return depuradosLeer().lista.length; }
 function depuradosAplicar(lista){ return (lista||[]).filter(function(u){ return !depuradosEsUsuario(u); }); }
 function depuradosGuardarUsuarios(){
-  try{ localStorage.setItem('usuarios_garantias', JSON.stringify(usuariosU.map(u=>({...u, fVence:u.fVence?u.fVence.toISOString():null})))); }catch(e){}
+  try{ localStorage.setItem('usuarios_garantias', JSON.stringify(usuariosU.map(u=>({...u, fVence:u.fVence?u.fVence.toISOString():null})))); localStorage.setItem('lastUpdate_usuarios', Date.now().toString()); localStorage.setItem('lastUpdate_garantias', Date.now().toString()); try{ actualizarUsuariosMetaBar(); }catch(e){} }catch(e){}
 }
 function actualizarBadgeDepurados(){
   var b=document.getElementById('usuariosBtnDepurados');
@@ -15744,7 +15745,7 @@ function cargarArchivoU(file){
         const depuradosIgnorados=parsed.length-usuariosU.length;
         if(depuradosIgnorados>0 && infoEl) infoEl.innerHTML=`✅ <b>${usuariosU.length}</b> usuarios cargados · 🧹 ${depuradosIgnorados} depurado${depuradosIgnorados===1?'':'s'} ignorado${depuradosIgnorados===1?'':'s'}`;
         try{ 
-          localStorage.setItem('usuarios_garantias', JSON.stringify(usuariosU.map(u=>({...u, fVence:u.fVence?u.fVence.toISOString():null}))));
+          localStorage.setItem('usuarios_garantias', JSON.stringify(usuariosU.map(u=>({...u, fVence:u.fVence?u.fVence.toISOString():null})))); localStorage.setItem('lastUpdate_usuarios', Date.now().toString()); localStorage.setItem('lastUpdate_garantias', Date.now().toString()); try{ actualizarUsuariosMetaBar(); }catch(e){}
           console.log('💾 Guardado en localStorage', usuariosU.length);
         }catch(err){ console.log('localStorage fail',err); }
         mostrarDashboardU();
@@ -16050,6 +16051,7 @@ function initUsuarios(){
   // Cargar de localStorage
   try{
     const saved=JSON.parse(localStorage.getItem('usuarios_garantias')||'[]');
+    try{ setTimeout(actualizarUsuariosMetaBar, 300); }catch(e){}
     if(saved.length>0){
       usuariosU=depuradosAplicar(saved.map(u=>({...u, cumpleRaw:fechaDeCeldaU(u.cumpleRaw||u.cumple||''), fVence:u.fVence? new Date(u.fVence):null, estado:u.fVence? ( (new Date(u.fVence)-new Date())/(1000*60*60*24)<0?'vencida': ( (new Date(u.fVence)-new Date())/(1000*60*60*24)<=30?'porVencer':'vigente')):'vigente'})));
       mostrarDashboardU();
@@ -17243,6 +17245,53 @@ setTimeout(initHistorico,1200);
 })();
 
 // === PSA Connect — v625 === 
+
+function actualizarUsuariosMetaBar(){
+  try{
+    const bar=document.getElementById('usuariosMetaBar');
+    if(!bar) return;
+    const lastGarantias=localStorage.getItem('lastUpdate_garantias');
+    const lastOrg=localStorage.getItem('lastUpdate_garantiasOrg') || localStorage.getItem('lastUpdate_usuarios');
+    const autoLinea=localStorage.getItem('appsi_psa_lastSync');
+    const filesStr=localStorage.getItem('appsi_psa_files');
+    let files={linea:true,garantiasOrg:true,garantias:true};
+    try{ if(filesStr) files=JSON.parse(filesStr); }catch(e){}
+    const parts=[];
+    if(files.garantias){
+      if(lastGarantias){
+        const d=new Date(parseInt(lastGarantias));
+        const txt=isNaN(d.getTime())? lastGarantias : d.toLocaleString('es-AR', {day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'});
+        parts.push('GARANTÍAS · '+txt);
+      } else if(autoLinea){
+        const d=new Date(autoLinea);
+        const txt=isNaN(d.getTime())? '' : d.toLocaleString('es-AR', {day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'});
+        if(txt) parts.push('GARANTÍAS · '+txt);
+      } else {
+        parts.push('GARANTÍAS · —');
+      }
+    }
+    if(files.garantiasOrg){
+      if(lastOrg){
+        const d=new Date(parseInt(lastOrg));
+        const txt=isNaN(d.getTime())? lastOrg : d.toLocaleString('es-AR', {day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'});
+        parts.push('GARANTÍAS ORG · '+txt);
+      } else if(lastGarantias){
+        const d=new Date(parseInt(lastGarantias));
+        const txt=isNaN(d.getTime())? '' : d.toLocaleString('es-AR', {day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'});
+        if(txt) parts.push('GARANTÍAS ORG · '+txt);
+      } else {
+        parts.push('GARANTÍAS ORG · —');
+      }
+    }
+    if(parts.length){
+      bar.textContent=parts.join(' · ');
+      bar.style.display='block';
+    } else {
+      bar.style.display='none';
+    }
+  }catch(e){}
+}
+
 function psaGetCreds(){ try{ const r=localStorage.getItem('appsi_psa_creds'); return r?JSON.parse(r):null }catch(e){ return null } }
 function psaGetFiles(){ try{ const f=localStorage.getItem('appsi_psa_files'); return f?JSON.parse(f):{linea:true,garantiasOrg:true,garantias:true} }catch(e){ return {linea:true,garantiasOrg:true,garantias:true} } }
 function psaSetStatus(msg,cls){ const el=document.getElementById('psaStatus'); if(!el) return; el.textContent=msg; el.className='psa-status'+(cls?' '+cls:''); }
@@ -17346,6 +17395,7 @@ async function psaProbar(){
     const html2=await r2.text();
     if(html2.includes('Mi PSA | Inicio') || html2.includes('Cerrar Sesion') || html2.includes('D'+c.number)){
       localStorage.setItem('appsi_psa_lastSync', new Date().toISOString());
+      try{ const ts=Date.now().toString(); const files=psaGetFiles(); if(files.linea) localStorage.setItem('lastUpdate_equipo', ts); if(files.garantias) localStorage.setItem('lastUpdate_garantias', ts); if(files.garantiasOrg) localStorage.setItem('lastUpdate_garantiasOrg', ts); localStorage.setItem('lastUpdate_usuarios', ts); setTimeout(()=>{ try{ if(typeof renderEquipo==='function') renderEquipo(); }catch(e){} try{ actualizarUsuariosMetaBar(); }catch(e){} }, 600); }catch(e){}
       try{
         const r3=await fetch('https://minegocio.psa.com.ar/', {credentials:'include'});
         const h3=await r3.text();
@@ -17369,7 +17419,8 @@ async function psaProbar(){
     try{ showToast('Guardado — probá Abrir Mi Negocio'); }catch(e2){}
   }
 }
-document.addEventListener('DOMContentLoaded', ()=>{ try{ psaRender(); const c=psaGetCreds(); if(c&&c.remember){ setTimeout(psaProbar, 1200); } }catch(e){} });
+document.addEventListener('DOMContentLoaded', ()=>{ try{ psaRender(); actualizarUsuariosMetaBar(); if(typeof renderEquipo==='function') renderEquipo(); const c=psaGetCreds(); if(c&&c.remember){ setTimeout(psaProbar, 1200); } }catch(e){} });
+setTimeout(()=>{ try{ actualizarUsuariosMetaBar(); if(typeof renderEquipo==='function') renderEquipo(); }catch(e){} }, 900);
 setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
 
 </script>
