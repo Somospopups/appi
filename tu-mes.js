@@ -1,7 +1,7 @@
-/* APPI · Tu mes v605 — cerebro
+/* APPI · Tu mes v607 — cerebro
    El mes es un tablero de cartas. Cada día, las 10 de la jornada.
    La puerta es la franja de septiembre del Home.
-   v605: URGENTE fix tarjeta verde con 9 pendientes + info faltas · sin maquillar el hábito (v600 detalle) · popup + v599 cerebro — timeline al abrir día + métricas sutiles arriba.
+   v607: fix FALTA 7 lista incompleta dice No falta nadie verde con 9 pendientes + info faltas · sin maquillar el hábito (v600 detalle) · popup + v599 cerebro — timeline al abrir día + métricas sutiles arriba.
    Eventos viven en appi-eventos.js (bus central silencioso).
 */
 (function () {
@@ -689,7 +689,7 @@
       var recuperados = dia.recuperados || {};
       var lista = dia.lista || [];
       if (lista.length){
-        return lista.map(function(it){
+        var mapped = lista.map(function(it){
           var tel = it.t || '';
           var clave = it.m + ':' + tel;
           var marca = tel ? marcas[clave] : null;
@@ -701,7 +701,6 @@
           }
           var rec = tel ? recuperados[clave] : null;
           if(!rec && it.n){
-            // fallback por nombre si falta tel histórico
             Object.keys(recuperados).forEach(function(rk){
               if(rec) return;
               if(rk.split(':')[0]===it.m && recuperados[rk] && recuperados[rk].n===it.n) rec=recuperados[rk];
@@ -723,6 +722,21 @@
             user: {usuario: it.n, telf: tel, producto: it.prod || ''}
           };
         });
+        var totalGuardado = (dia && dia.total) ? Number(dia.total)||0 : 0;
+        if(totalGuardado > mapped.length){
+          var freq2={}; var top2=''; var topN2=0;
+          mapped.forEach(function(o){ if(o.motivoId) freq2[o.motivoId]=(freq2[o.motivoId]||0)+1; });
+          Object.keys(freq2).forEach(function(k){ if(freq2[k]>topN2){ topN2=freq2[k]; top2=k; }});
+          if(!top2) top2='checkin';
+          var motTop2=null; try{ motTop2 = M() && M().motivoPorId ? M().motivoPorId(top2) : null; }catch(e){}
+          var icoTop2 = (motTop2 && motTop2.icono) || '🔧';
+          var nomTop2 = (motTop2 && motTop2.nombre) || 'Tarea del día';
+          for(var _i=mapped.length; _i<totalGuardado; _i++){
+            var synTel2 = 'ph_'+String(k).replace(/-/g,'')+'_'+_i;
+            mapped.push({ motivoId: top2, icono: icoTop2, motivo: nomTop2, nombre: 'Tarea del día', tel: synTel2, hecha: false, noHecha: false, recuperado:false, recuperadoAt:'', placeholder:true, user:{usuario:'Tarea', telf:synTel2} });
+          }
+        }
+        return mapped;
       }
       Object.keys(marcas).forEach(function(claveM){
         var motId = claveM.split(':')[0];

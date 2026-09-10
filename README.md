@@ -4,8 +4,8 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
-- Versión: **v605 · URGENTE fix tarjeta verde**.
-- Caché de la app: `appi-v605-poster` (se renueva al abrir APPI).
+- Versión: **v607 · fix FALTA 7**.
+- Caché de la app: `appi-v607-poster` (se renueva al abrir APPI).
 - Publicación: [https://somospopups.github.io/appi/](https://somospopups.github.io/appi/)
 - Acceso por número de distribuidor y contraseña.
 - Acceso administrador POPUPS mediante el candado, sin DIP ni número de distribuidor.
