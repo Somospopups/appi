@@ -4,8 +4,8 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
-- Versión: **v602 · TU MES recupera visible**.
-- Caché de la app: `appi-v602-poster` (se renueva al abrir APPI).
+- Versión: **v603 · TU MES hotfix tarjetas**.
+- Caché de la app: `appi-v603-poster` (se renueva al abrir APPI).
 - Publicación: [https://somospopups.github.io/appi/](https://somospopups.github.io/appi/)
 - Acceso por número de distribuidor y contraseña.
 - Acceso administrador POPUPS mediante el candado, sin DIP ni número de distribuidor.

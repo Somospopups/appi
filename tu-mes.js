@@ -1,7 +1,7 @@
-/* APPI · Tu mes v602 — cerebro
+/* APPI · Tu mes v603 — cerebro
    El mes es un tablero de cartas. Cada día, las 10 de la jornada.
    La puerta es la franja de septiembre del Home.
-   v602: TU MES recupera visible · muestra Tarea del día con RECUPERADA · sin maquillar el hábito (v600 detalle) · popup + v599 cerebro — timeline al abrir día + métricas sutiles arriba.
+   v603: TU MES hotfix tarjetas · muestra Tarea del día con RECUPERADA · sin maquillar el hábito (v600 detalle) · popup + v599 cerebro — timeline al abrir día + métricas sutiles arriba.
    Eventos viven en appi-eventos.js (bus central silencioso).
 */
 (function () {
@@ -697,19 +697,29 @@
       var recuperados = dia.recuperados || {};
       var lista = dia.lista || [];
       if (lista.length){
-        return lista.map(function(it){
+        return lista.map(function(it, idx){
           var tel = it.t || '';
+          // si falta tel histórico (hueco viejo), generar sintético determinístico
+          if(!tel) tel = 'ph_'+String(k).replace(/-/g,'')+'_'+idx;
           var clave = it.m + ':' + tel;
-          var marca = tel ? marcas[clave] : null;
+          var marca = marcas[clave] || null;
+          // también probar clave original vacía por compatibilidad
+          if (!marca && it.t === '') {
+            var claveVacia = it.m + ':';
+            if(marcas[claveVacia]) marca = marcas[claveVacia];
+          }
           if (!marca && it.n){
             Object.keys(marcas).forEach(function(claveM){
               if (marca) return;
               if (claveM.split(':')[0] === it.m && marcas[claveM] && marcas[claveM].n === it.n) marca = marcas[claveM];
             });
           }
-          var rec = tel ? recuperados[clave] : null;
+          var rec = recuperados[clave] || null;
+          if(!rec){
+            var claveVaciaR = it.m + ':';
+            if(recuperados[claveVaciaR]) rec = recuperados[claveVaciaR];
+          }
           if(!rec && it.n){
-            // fallback por nombre si falta tel histórico
             Object.keys(recuperados).forEach(function(rk){
               if(rec) return;
               if(rk.split(':')[0]===it.m && recuperados[rk] && recuperados[rk].n===it.n) rec=recuperados[rk];
@@ -718,17 +728,19 @@
           var mot = M() && M().motivoPorId ? M().motivoPorId(it.m) : null;
           var hecha = !!(marca && marca.e === 'hecha');
           var recuperado = !!rec;
+          var esPh = !it.t;
           return {
             motivoId: it.m,
             icono: it.ico || (mot && mot.icono) || '✓',
             motivo: it.mot || (mot && mot.nombre) || '',
-            nombre: nombreCompleto(it.n),
+            nombre: nombreCompleto(it.n) || (esPh ? 'Tarea del día' : ''),
             tel: tel,
             hecha: hecha,
             noHecha: !!(marca && marca.e === 'no_hecha'),
             recuperado: recuperado,
             recuperadoAt: rec && rec.at || '',
-            user: {usuario: it.n, telf: tel, producto: it.prod || ''}
+            placeholder: esPh,
+            user: {usuario: it.n || 'Tarea', telf: tel, producto: it.prod || ''}
           };
         });
       }
@@ -943,11 +955,13 @@
           var it = null;
           for(var j=0;j<noItems.length;j++){ if(noItems[j].motivoId===motivoId && noItems[j].tel===tel){ it=noItems[j]; break; } }
           if(!it) it={motivoId:motivoId, tel:tel, nombre:nombre, user:{usuario:nombre, telf:tel}};
-          var accionesDiv = document.createElement('div');
+          var accionesDiv = document.createElement('li');
           accionesDiv.className = 'tm-pend-actions';
+          accionesDiv.style.listStyle = 'none';
           accionesDiv.style.marginLeft = '32px';
           accionesDiv.style.marginTop = '6px';
           accionesDiv.style.marginBottom = '4px';
+          accionesDiv.style.display = 'flex';
           if(it && it.placeholder){
             // tarea sin teléfono real (hueco viejo) — solo recuperar genérico
             if(esHoyReal){
