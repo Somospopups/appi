@@ -674,12 +674,12 @@
     if (!tel) return null;
     return marcasDeHoy()[motivoId + ':' + tel] || null;
   }
-  // Sólo se guardan los últimos 60 días: alcanza para el resumen y no crece sin fin.
+  // Se guardan ~13 meses: Tu mes puede mirar para atrás.
   function limpiarViejos(d){
     var claves = Object.keys(d.dias || {});
     claves.forEach(function(k){
       var f = aFecha(k);
-      if (!f || dias(hoy(), f) > 60) delete d.dias[k];
+      if (!f || dias(hoy(), f) > 400) delete d.dias[k];
     });
   }
   function marcarAccion(motivoId, u, estado, silencioso){

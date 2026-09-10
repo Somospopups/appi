@@ -8,6 +8,7 @@
   var SEM = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
   var cssListo = false;
   var visto = {};
+  var vistaAnio = 0, vistaMes = 0;
 
   function M(){ return window.APPIMensajes || null; }
   function esc(s){
@@ -79,6 +80,12 @@
       '.home-month-card{cursor:pointer}',
       '.home-month-card:focus{outline:2px solid #e8b84a;outline-offset:2px}',
       '.tm-wrap{padding:12px 14px 28px}',
+      '.tm-nav{display:flex;align-items:center;gap:8px;margin:0 0 8px}',
+      '.tm-nav strong{flex:1;text-align:center;font-size:16px;font-weight:900;color:#0b5878;letter-spacing:-.3px}',
+      'body.dark .tm-nav strong{color:#8ec8e0}',
+      '.tm-nav button{width:36px;height:36px;border:0;border-radius:12px;background:#fff;color:#0b5878;font-size:22px;font-weight:900;cursor:pointer;line-height:1}',
+      'body.dark .tm-nav button{background:#25273a;color:#8ec8e0}',
+      '.tm-nav button[disabled]{opacity:.32;cursor:default}',
       '.tm-sub{margin:0 0 12px;font-size:12.5px;font-weight:800;color:#686977}',
       'body.dark .tm-sub{color:#b8b9c5}',
       '.tm-sem,.tm-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}',
@@ -131,11 +138,12 @@
     var cnt = {};
     orden.forEach(function(o){ cnt[o.id] = 0; });
     var kHoy = hoyKey();
+    var esActual = anio === hoy().getFullYear() && mes === hoy().getMonth();
     try{
       var raw = JSON.parse(localStorage.getItem('appi_acciones_v1_' + uid()) || '{}');
       var pref = anio + '-' + String(mes+1).padStart(2,'0') + '-';
       Object.keys(raw.dias || {}).forEach(function(k){
-        if (k.indexOf(pref) !== 0 || k === kHoy) return;
+        if (k.indexOf(pref) !== 0 || (esActual && k === kHoy)) return;
         var marcas = (raw.dias[k] && raw.dias[k].marcas) || {};
         Object.keys(marcas).forEach(function(claveM){
           var m = marcas[claveM];
@@ -146,11 +154,13 @@
         });
       });
     }catch(e){}
-    planaHoy().forEach(function(it){
-      if (!it.hecha) return;
-      if (cnt[it.motivoId] == null) cnt[it.motivoId] = 0;
-      cnt[it.motivoId]++;
-    });
+    if (esActual){
+      planaHoy().forEach(function(it){
+        if (!it.hecha) return;
+        if (cnt[it.motivoId] == null) cnt[it.motivoId] = 0;
+        cnt[it.motivoId]++;
+      });
+    }
     return orden.map(function(o){ return { icono: o.icono, nombre: o.nombre, n: cnt[o.id] || 0 }; });
   }
   function pintarKpis(anio, mes, mapa){
@@ -174,19 +184,32 @@
       }).join('') + '</ul>';
   }
 
+  function irMes(delta){
+    var d = new Date(vistaAnio, vistaMes + delta, 1);
+    var now = hoy();
+    var tope = new Date(now.getFullYear(), now.getMonth(), 1);
+    var piso = new Date(now.getFullYear(), now.getMonth() - 12, 1);
+    if (d > tope || d < piso) return;
+    vistaAnio = d.getFullYear();
+    vistaMes = d.getMonth();
+    pintar();
+  }
+
   function pintar(){
     css();
     var host = document.getElementById('tmCal');
     if (!host) return;
     var now = hoy();
-    var anio = now.getFullYear();
-    var mes = now.getMonth();
+    if (!vistaAnio){ vistaAnio = now.getFullYear(); vistaMes = now.getMonth(); }
+    var anio = vistaAnio;
+    var mes = vistaMes;
+    var esActual = anio === now.getFullYear() && mes === now.getMonth();
     var diaHoy = now.getDate();
     var mapa = diasMes(anio, mes);
     var kHoy = hoyKey();
     var partido = null;
     try{ partido = M() && M().partidoHoy && M().partidoHoy(); }catch(e){}
-    if (partido && partido.hay){
+    if (esActual && partido && partido.hay){
       mapa[kHoy] = mapa[kHoy] || {};
       mapa[kHoy].total = partido.total;
       mapa[kHoy].hechas = partido.hechas;
@@ -196,9 +219,24 @@
     Object.keys(mapa).forEach(function(k){
       if (mapa[k] && mapa[k].hechas) vivos++;
     });
+    var nav = document.getElementById('tmNav');
+    if (nav){
+      var pisoD = new Date(anio, mes, 1).getTime() <= new Date(now.getFullYear(), now.getMonth() - 12, 1).getTime();
+      nav.innerHTML = '<button type="button" id="tmPrev" aria-label="Mes anterior"' + (pisoD ? ' disabled' : '') + '>‹</button>' +
+        '<strong>' + MESES[mes] + ' ' + anio + '</strong>' +
+        '<button type="button" id="tmNext" aria-label="Mes siguiente"' + (esActual ? ' disabled' : '') + '>›</button>';
+      var prev = document.getElementById('tmPrev');
+      var next = document.getElementById('tmNext');
+      if (prev) prev.onclick = function(){ irMes(-1); };
+      if (next) next.onclick = function(){ irMes(1); };
+    }
     var sub = document.getElementById('tmSub');
-    if (sub) sub.textContent = MESES[mes] + ' ' + anio + ' · Día ' + diaHoy + ' de ' + new Date(anio, mes+1, 0).getDate() +
-      (vivos ? ' · ' + vivos + (vivos === 1 ? ' día con movimiento' : ' días con movimiento') : '');
+    if (sub){
+      var last = new Date(anio, mes+1, 0).getDate();
+      sub.textContent = esActual
+        ? ('Día ' + diaHoy + ' de ' + last + (vivos ? ' · ' + vivos + (vivos === 1 ? ' día con movimiento' : ' días con movimiento') : ''))
+        : (vivos ? (vivos + (vivos === 1 ? ' día con movimiento' : ' días con movimiento')) : 'Sin movimiento registrado');
+    }
 
     var sem = SEM.map(function(d){ return '<span>' + d + '</span>'; }).join('');
     var celdas = '';
@@ -209,20 +247,22 @@
     for (i = 1; i <= last; i++){
       var k = anio + '-' + String(mes+1).padStart(2,'0') + '-' + String(i).padStart(2,'0');
       var info = mapa[k];
-      var tipo = i > diaHoy ? 'futuro' : (i === diaHoy ? 'hoy' : (info && info.hechas ? 'hecho' : ''));
-      var marca = i === diaHoy ? 'Hoy ' + i : String(i);
+      var futuro = esActual && i > diaHoy;
+      var esHoyCel = esActual && i === diaHoy;
+      var tipo = futuro ? 'futuro' : (esHoyCel ? 'hoy' : (info && info.hechas ? 'hecho' : ''));
+      var marca = esHoyCel ? 'Hoy ' + i : String(i);
       var mini = '';
       if (info && info.total){
         mini = '<span class="m">' + (info.hechas || 0) + ' / ' + info.total + '</span>';
-      } else if (i === diaHoy && partido && partido.hay){
+      } else if (esHoyCel && partido && partido.hay){
         mini = '<span class="m">' + partido.hechas + ' / ' + partido.total + '</span>';
-      } else if (i < diaHoy){
-        mini = '<span class="m">sin movimiento</span>';
-      } else if (i > diaHoy){
+      } else if (futuro){
         mini = '<span class="m">sin abrir</span>';
+      } else {
+        mini = '<span class="m">sin movimiento</span>';
       }
       celdas += '<button type="button" class="tm-dia ' + tipo + '" data-tm-dia="' + k + '"' +
-        (i > diaHoy ? ' disabled' : '') + '><span class="n">' + esc(marca) + '</span>' + mini + '</button>';
+        (futuro ? ' disabled' : '') + '><span class="n">' + esc(marca) + '</span>' + mini + '</button>';
     }
     host.innerHTML = '<div class="tm-sem">' + sem + '</div><div class="tm-grid" style="margin-top:8px">' + celdas + '</div>';
     host.querySelectorAll('[data-tm-dia]').forEach(function(b){
@@ -352,6 +392,9 @@
 
   function abrir(){
     css();
+    var n = hoy();
+    vistaAnio = n.getFullYear();
+    vistaMes = n.getMonth();
     if (typeof window.showView === 'function') window.showView('view-tumes');
     pintar();
     enganchar();
