@@ -1,7 +1,7 @@
-/* APPI · Tu mes v611 — cerebro
+/* APPI · Tu mes v612 — cerebro
    El mes es un tablero de cartas. Cada día, las 10 de la jornada.
    La puerta es la franja de septiembre del Home.
-   v611: botón recuperar pequeño inline (mismo renglón) lista vacía (Edge) v598 lista incompleta dice No falta nadie verde con 9 pendientes + info faltas · sin maquillar el hábito (v600 detalle) · popup + v599 cerebro — timeline al abrir día + métricas sutiles arriba.
+   v612: recuperar lleva a hacerla como tarjeta Home (marca recuperado + abre chat hoy) (mismo renglón) lista vacía (Edge) v598 lista incompleta dice No falta nadie verde con 9 pendientes + info faltas · sin maquillar el hábito (v600 detalle) · popup + v599 cerebro — timeline al abrir día + métricas sutiles arriba.
    Eventos viven en appi-eventos.js (bus central silencioso).
 */
 (function () {
@@ -185,6 +185,49 @@
       try{ renderDetalleCuerpo(); }catch(e){}
       return true;
     }catch(e){ try{ console.error(e); }catch(err){} mostrarToast('No se pudo recuperar'); return false; }
+  }
+  function recuperarYHacer(k, motivoId, tel, nombre, userHint, it){
+    try{
+      var ok = recuperarTarea(k, motivoId, tel, nombre, userHint);
+      if(!ok) return false;
+      // llevar a hacerla hoy como tarjeta del Home
+      setTimeout(function(){
+        try{ cerrarCierre(); }catch(e){}
+        try{ cerrarDetalle(); }catch(e){}
+        try{ if(typeof window.showView==='function') window.showView('view-home'); }catch(e){}
+        setTimeout(function(){
+          try{
+            var u = userHint || (it && it.user) || {usuario:nombre, telf:tel};
+            var esPlaceholder = !!(it && it.placeholder) || String(tel||'').indexOf('ph_')===0;
+            if(esPlaceholder){
+              // buscar candidato real hoy para ese motivo
+              var cand = [];
+              try{ cand = planaHoy().filter(function(x){ return x.motivoId===motivoId && !x.hecha; }); }catch(e){}
+              if(cand.length && cand[0].user){
+                u = cand[0].user;
+                mostrarToast('Recuperado del '+k.split('-').reverse().join('/')+' — ahora hacelo con '+ (u.usuario||u.nombre||'') +' hoy');
+                abrirConversacion(u, motivoId);
+              } else {
+                // sin candidato hoy para ese motivo, abrir Home y resaltar mazo
+                mostrarToast('Recuperado. No hay pendientes de '+ (DESC_TAREA[motivoId]||motivoId) +' hoy — elegí otro en el Home.');
+                // intentar scrollear a la tarjeta de Las 10
+                try{ var card=document.querySelector('.home-month-card'); if(card) card.scrollIntoView({behavior:'smooth', block:'center'}); }catch(e){}
+                // si hay algún motivo hoy pendiente, abrir el primero
+                try{
+                  var todos = planaHoy().filter(function(x){ return !x.hecha; });
+                  if(todos.length) abrirConversacion(todos[0].user, todos[0].motivoId);
+                }catch(e){}
+              }
+            } else {
+              // real: abrir chat con esa misma persona/motivo para hacerlo hoy
+              mostrarToast('Recuperado. Ahora hacelo con '+ (u.usuario||u.nombre||nombre) +' hoy');
+              abrirConversacion(u, motivoId);
+            }
+          }catch(e){ try{ console.error(e);}catch(err){} }
+        }, 420);
+      }, 380);
+      return true;
+    }catch(e){ return false; }
   }
   function hacerHoy(motivoId, u){
     try{
@@ -1021,9 +1064,9 @@
               li.appendChild(inline);
               inline.querySelector('[data-act="hecho"]').onclick = function(e){ e.stopPropagation(); var ok = recuperarTarea(k, motivoId, tel, nombre, it.user); if(ok){ setTimeout(function(){ abrirDia(k, esHoy, false); pintar(); }, 300); } };
             } else {
-              inline.innerHTML = '<button type="button" class="tm-btn-sm" data-act="recup" title="Recuperar (no cambia hábito)">↻</button>';
+              inline.innerHTML = '<button type="button" class="tm-btn-sm" data-act="recup" title="Recuperar y hacer hoy">↻</button>';
               li.appendChild(inline);
-              inline.querySelector('[data-act="recup"]').onclick = function(e){ e.stopPropagation(); var ok = recuperarTarea(k, motivoId, tel, nombre, it.user); if(ok){ setTimeout(function(){ abrirDia(k, esHoy, false); }, 300); } };
+              inline.querySelector('[data-act="recup"]').onclick = function(e){ e.stopPropagation(); recuperarYHacer(k, motivoId, tel, nombre, it.user, it); };
             }
           } else if(esHoyReal){
             inline.innerHTML = '<button type="button" class="tm-btn-sm wa" data-act="wa" title="Mensaje">💬</button><button type="button" class="tm-btn-sm" data-act="hecho" title="Hecho hoy">✓</button>';
@@ -1031,10 +1074,10 @@
             inline.querySelector('[data-act="wa"]').onclick = function(e){ e.stopPropagation(); abrirConversacion(it.user || {usuario:it.nombre, telf:it.tel}, motivoId); };
             inline.querySelector('[data-act="hecho"]').onclick = function(e){ e.stopPropagation(); if(hacerHoy(motivoId, it.user || {usuario:it.nombre, telf:it.tel})){ setTimeout(function(){ abrirDia(k, esHoy, false); pintar(); }, 250); } };
           } else {
-            inline.innerHTML = '<button type="button" class="tm-btn-sm wa" data-act="wa" title="Mensaje">💬</button><button type="button" class="tm-btn-sm" data-act="recup" title="Recuperar">↻</button>';
+            inline.innerHTML = '<button type="button" class="tm-btn-sm wa" data-act="wa" title="Mensaje">💬</button><button type="button" class="tm-btn-sm" data-act="recup" title="Recuperar y hacer hoy">↻</button>';
             li.appendChild(inline);
             inline.querySelector('[data-act="wa"]').onclick = function(e){ e.stopPropagation(); abrirConversacion(it.user || {usuario:it.nombre, telf:it.tel}, motivoId); };
-            inline.querySelector('[data-act="recup"]').onclick = function(e){ e.stopPropagation(); var ok = recuperarTarea(k, motivoId, tel, nombre, it.user); if(ok){ setTimeout(function(){ abrirDia(k, esHoy, false); }, 300); } };
+            inline.querySelector('[data-act="recup"]').onclick = function(e){ e.stopPropagation(); recuperarYHacer(k, motivoId, tel, nombre, it.user, it); };
           }
         });
       }
@@ -1288,9 +1331,8 @@
               setTimeout(pintar, 300);
             }
           } else if(act==='recup' && !esHoyK){
-            var ok=recuperarTarea(dia, motivoId, tel, nombre, itUser);
+            var ok=recuperarYHacer(dia, motivoId, tel, nombre, itUser, {motivoId:motivoId, tel:tel, nombre:nombre, user:itUser, placeholder: String(tel||'').indexOf('ph_')===0});
             if(ok){
-              // feedback visual rápido
               btn.textContent='✓ Recuperado';
               btn.disabled=true;
               setTimeout(renderDetalleCuerpo, 400);
