@@ -128,9 +128,9 @@ window.openStock=function(){
 
 <script src="./porque-vivo.js"></script>
 <script src="./home-limpio.js?v=520"></script>
-  <script src="./home-tarjetas.js?v=625"></script>
-  <script src="./appi-eventos.js?v=625"></script>
-  <script src="./tu-mes.js?v=625"></script>
+  <script src="./home-tarjetas.js?v=626"></script>
+  <script src="./appi-eventos.js?v=626"></script>
+  <script src="./tu-mes.js?v=626"></script>
   <script src="./device-bridge.js?v=523"></script>
   <script src="./anuncios.js?v=521"></script>
   <script src="./aviso-telegram.js?v=555"></script>
@@ -4362,7 +4362,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v625 · Segura</div>
+  <div class="ds-foot">APPI · v626 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4778,21 +4778,6 @@ body.dark #pageTabs button.active{color:#c5d6ff}
       <h1>Mi negocio</h1>
       <div class="script">tu gente y tus números</div>
     </header>
-    <div id="psaNegocioCard" class="psa-connect-card" style="display:none">
-      <div class="psa-connect-head">
-        <div class="psa-icon">📊</div>
-        <div>
-          <h3>Mi Negocio PSA</h3>
-          <div class="psa-sub" id="psaNegocioSub">Conectá tu MI PSA arriba para ver ventas y comisión estimada acá.</div>
-        </div>
-      </div>
-      <div id="psaNegocioBody" style="margin-top:8px; display:grid; grid-template-columns:1fr 1fr; gap:8px; font-size:12px; color:#333544;"></div>
-      <div class="psa-actions" style="margin-top:8px">
-        <button type="button" class="primary" onclick="psaAbrir('https://minegocio.psa.com.ar/')">Abrir Mi Negocio →</button>
-        <button type="button" class="ghost" onclick="showView('view-herramientas')">Configurar →</button>
-      </div>
-    </div>
-
     <div class="home-tool-grid" id="negGrid" style="padding:0 14px"></div>
     <div id="negWrap"></div>
   </section>
@@ -4806,41 +4791,6 @@ body.dark #pageTabs button.active{color:#c5d6ff}
       <div class="script">tu caja de apoyo</div>
     </header>
     <div id="herrWrap"></div>
-    <div id="psaConnectCard" class="psa-connect-card">
-      <div class="psa-connect-head">
-        <div class="psa-icon">🔗</div>
-        <div>
-          <h3>Conectar MI PSA <span style="font-weight:500;color:#65676b;font-size:11px">(opcional)</span></h3>
-          <div class="psa-sub">Guardá Centro, N° y Clave PSA <b>solo en este celular</b> para auto-actualizar ventas, comisiones, facturas y stock. Queda en tu dispositivo, no en nuestros servidores. Podés borrarlo cuando quieras. Si no lo activás, APPI sigue manual.</div>
-        </div>
-      </div>
-      <div class="psa-form" id="psaForm">
-        <div class="psa-row small">
-          <label>Centro</label>
-          <input type="number" id="psaCentro" placeholder="02" min="1" max="99" inputmode="numeric">
-          <input type="number" id="psaNumero" placeholder="98020174" inputmode="numeric">
-        </div>
-        <div class="psa-row">
-          <label>Clave PSA</label>
-          <input type="password" id="psaClave" placeholder="••••••••" autocomplete="current-password">
-        </div>
-        <label class="psa-check"><input type="checkbox" id="psaRecordar" checked> Recordar en este celular y auto-actualizar al abrir APPI</label>
-        <div class="psa-actions">
-          <button type="button" class="primary" onclick="psaGuardar()">Guardar y conectar</button>
-          <button type="button" class="ghost" onclick="psaProbar()">Probar</button>
-          <button type="button" class="danger" onclick="psaBorrar()">Borrar</button>
-        </div>
-        <div id="psaStatus" class="psa-status"></div>
-        <div class="psa-note">🔒 Queda guardado solo en tu navegador (localStorage). No se sube a GitHub. Usá <b>Borrar</b> para olvidarlo. Si tenés 2FA, te lo pediré al probar. Consejo: podés usar una clave temporal.</div>
-        <div id="psaAtajos" style="display:none; gap:6px; flex-wrap:wrap; margin-top:8px;">
-          <button type="button" class="ghost" style="flex:none;padding:7px 10px;font-size:11px" onclick="psaAbrir('https://minegocio.psa.com.ar/')">Abrir Mi Negocio →</button>
-          <button type="button" class="ghost" style="flex:none;padding:7px 10px;font-size:11px" onclick="psaAbrir('https://miagenda.psa.com.ar')">Mi Agenda →</button>
-          <button type="button" class="ghost" style="flex:none;padding:7px 10px;font-size:11px" onclick="psaAbrir('https://efactura.psa.com.ar/')">Facturas →</button>
-          <button type="button" class="ghost" style="flex:none;padding:7px 10px;font-size:11px" onclick="psaAbrir('https://comprasonline.psa.com.ar/')">Portal Compras →</button>
-        </div>
-      </div>
-    </div>
-
     <div class="home-tool-grid" id="herrGrid" style="padding:0 14px"></div>
   </section>
 
@@ -12732,6 +12682,45 @@ function abrirCuentaDesdeMenu(){
         ${profile.sucursal?`<div style="color:#686977;font-size:13px">Sucursal ${escapeXml(profile.sucursal)}</div>`:''}
         <div style="margin-top:4px;color:#777887;font-size:12px">${authStatus.offline?'Modo offline':'Conectada'} · ${escapeXml(last)}</div>
       </div>
+      <div class="tip" style="border:1px solid #e4e6eb; border-radius:14px; padding:12px; background:#fff;">
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+          <span style="width:32px; height:32px; border-radius:8px; display:grid; place-items:center; background:linear-gradient(135deg,#5b8def,#a06bff); color:#fff; font-size:16px;">🔗</span>
+          <div>
+            <b style="font-size:13px;">Conectar MI PSA <span style="font-weight:500; color:#65676b; font-size:10px;">(opcional)</span></b>
+            <div style="font-size:11px; color:#65676b; line-height:1.3;">Guardá Centro/N°/Clave solo en este celular. Auto-actualiza <b>solo</b>: LÍNEA DESCENDENTE, GARANTÍAS POR ORGANIZACIÓN y GARANTÍAS.</div>
+          </div>
+        </div>
+        <div style="display:grid; gap:7px; margin-top:8px;">
+          <div style="display:grid; grid-template-columns:70px 1fr 1fr; gap:6px; align-items:center;">
+            <span style="font-size:11px; font-weight:700; color:#5b5f74;">Centro</span>
+            <input type="number" id="psaCentro" placeholder="02" min="1" max="99" inputmode="numeric" style="width:100%; padding:8px 9px; border-radius:10px; border:1px solid #e4e6eb; font-size:13px; background:#f7f8fb;">
+            <input type="number" id="psaNumero" placeholder="98020174" inputmode="numeric" style="width:100%; padding:8px 9px; border-radius:10px; border:1px solid #e4e6eb; font-size:13px; background:#f7f8fb;">
+          </div>
+          <div style="display:grid; grid-template-columns:70px 1fr; gap:6px; align-items:center;">
+            <span style="font-size:11px; font-weight:700; color:#5b5f74;">Clave PSA</span>
+            <input type="password" id="psaClave" placeholder="••••••••" autocomplete="current-password" style="width:100%; padding:8px 9px; border-radius:10px; border:1px solid #e4e6eb; font-size:13px; background:#f7f8fb;">
+          </div>
+          <label style="display:flex; align-items:center; gap:6px; font-size:11px; color:#333544; margin-top:2px;"><input type="checkbox" id="psaRecordar" checked style="width:14px; height:14px;"> Recordar en este celular y auto-actualizar al abrir APPI</label>
+          <div style="margin-top:4px; padding:8px; border-radius:10px; background:#f7f8fb; border:1px solid #e4e6eb; display:grid; gap:6px;">
+            <span style="font-size:10px; font-weight:800; color:#5b5f74; text-transform:uppercase; letter-spacing:0.4px;">Archivos a auto-actualizar</span>
+            <label style="display:flex; align-items:center; gap:6px; font-size:11px; color:#333544;"><input type="checkbox" id="psaFileLinea" checked style="width:14px; height:14px;"> LÍNEA DESCENDENTE</label>
+            <label style="display:flex; align-items:center; gap:6px; font-size:11px; color:#333544;"><input type="checkbox" id="psaFileGarantiasOrg" checked style="width:14px; height:14px;"> GARANTÍAS POR ORGANIZACIÓN</label>
+            <label style="display:flex; align-items:center; gap:6px; font-size:11px; color:#333544;"><input type="checkbox" id="psaFileGarantias" checked style="width:14px; height:14px;"> GARANTÍAS</label>
+          </div>
+          <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:4px;">
+            <button type="button" class="btn btn-primary" id="btnPsaGuardar" style="flex:1; min-width:110px; font-size:12px; padding:9px;">Guardar y conectar</button>
+            <button type="button" class="btn btn-secondary" id="btnPsaProbar" style="flex:1; min-width:80px; font-size:12px; padding:9px;">Probar</button>
+            <button type="button" class="btn btn-secondary" id="btnPsaBorrar" style="flex:none; font-size:12px; padding:9px; color:#d93025; border-color:#fce8e6; background:#fff;">Borrar</button>
+          </div>
+          <div id="psaStatus" style="font-size:11px; color:#65676b; line-height:1.4; min-height:16px;"></div>
+          <div id="psaAtajos" style="display:none; gap:6px; flex-wrap:wrap;">
+            <button type="button" class="btn btn-secondary" style="flex:none; padding:6px 9px; font-size:11px;" onclick="psaAbrir('https://minegocio.psa.com.ar/')">Mi Negocio →</button>
+            <button type="button" class="btn btn-secondary" style="flex:none; padding:6px 9px; font-size:11px;" onclick="psaAbrir('https://miagenda.psa.com.ar')">Mi Agenda →</button>
+            <button type="button" class="btn btn-secondary" style="flex:none; padding:6px 9px; font-size:11px;" onclick="psaAbrir('https://efactura.psa.com.ar/')">Facturas →</button>
+          </div>
+          <div style="font-size:10px; color:#8a8d93; line-height:1.3; background:#fff; padding:6px 8px; border-radius:8px; border:1px dashed #e4e6eb;">🔒 Solo en tu navegador (localStorage). No se sube a GitHub. “Borrar” lo olvida.</div>
+        </div>
+      </div>
       <div class="tip"><b>Cómo te nombran en los WhatsApp</b><br><input id="appiFirmaWa" type="text" maxlength="40" value="${escapeXml((window.APPIHielo&&window.APPIHielo.firma&&window.APPIHielo.firma())||'')}" placeholder="${escapeXml((window.APPIHielo&&window.APPIHielo.nombreCuenta&&window.APPIHielo.nombreCuenta())||'')}" style="width:100%;margin-top:8px;padding:10px 12px;border-radius:12px;border:1px solid rgba(80,90,130,.16);font:inherit;font-size:14px;box-sizing:border-box"><small style="display:block;margin-top:6px;color:#777887;line-height:1.4">Si lo dejás vacío, se usa tu primer nombre. Cada uno (titular o socio) tiene el suyo.</small><button type="button" class="btn btn-secondary" id="btnGuardarFirma" style="margin-top:10px">Guardar nombre</button></div>
       <div class="tip"><b>Sincronización:</b> ${syncStatus.syncing?'En curso':syncStatus.dirty?`${syncStatus.dirty} cambios pendientes`:'Actualizada'}${syncStatus.lastError?`<br><span style="color:#b13e47">${escapeXml(syncStatus.lastError)}</span>`:''}</div>
       <div class="warn-tip"><b>🎙️ Importante:</b> las grabaciones de audio quedan únicamente en el dispositivo donde se hicieron. El resto de los datos se sincroniza con tu cuenta.</div>
@@ -12748,6 +12737,17 @@ function abrirCuentaDesdeMenu(){
     const sync=document.getElementById('btnAccountSync'),devices=document.getElementById('btnAccountDevices'),password=document.getElementById('btnAccountPassword'),logout=document.getElementById('btnAccountLogout'),erase=document.getElementById('btnAccountLogoutErase'),firmaBtn=document.getElementById('btnGuardarFirma'),firmaInput=document.getElementById('appiFirmaWa');
     appiFotoMontarHero();
     if(firmaBtn&&window.APPIHielo)firmaBtn.onclick=()=>{const nombre=window.APPIHielo.guardarFirma(firmaInput?firmaInput.value:'');if(firmaInput)firmaInput.value=nombre;showToast('En los WhatsApp te van a nombrar '+nombre,2400)};
+    try{
+      const btnG=document.getElementById('btnPsaGuardar'), btnP=document.getElementById('btnPsaProbar'), btnB=document.getElementById('btnPsaBorrar');
+      if(btnG) btnG.onclick=psaGuardar;
+      if(btnP) btnP.onclick=psaProbar;
+      if(btnB) btnB.onclick=psaBorrar;
+      ['psaFileLinea','psaFileGarantiasOrg','psaFileGarantias','psaRecordar'].forEach(id=>{
+        const el=document.getElementById(id);
+        if(el) el.onchange=()=>{ const f={linea:!!document.getElementById('psaFileLinea')?.checked, garantiasOrg:!!document.getElementById('psaFileGarantiasOrg')?.checked, garantias:!!document.getElementById('psaFileGarantias')?.checked}; try{ localStorage.setItem('appsi_psa_files', JSON.stringify(f)); }catch(e){} };
+      });
+      psaRender();
+    }catch(e){}
     if(sync)sync.onclick=async()=>{sync.disabled=true;sync.textContent='Sincronizando…';try{await window.APPIDataSync.syncNow(true);showToast('Cuenta sincronizada ☁️',2200);modal.close()}catch(error){showToast(error.message||'No se pudo sincronizar',3500);sync.disabled=false;sync.textContent='☁️ Sincronizar ahora'}};
     if(devices)devices.onclick=()=>window.APPIDeviceBridge&&window.APPIDeviceBridge.openManager();
     if(password)password.onclick=abrirCambioPasswordAPPI;
@@ -12931,8 +12931,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='625';
-      const CACHE_NAME='appi-v625-poster';
+      const swVersion='626';
+      const CACHE_NAME='appi-v626-poster';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · v'+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
@@ -17243,41 +17243,31 @@ setTimeout(initHistorico,1200);
 
 // === PSA Connect — v625 === 
 function psaGetCreds(){ try{ const r=localStorage.getItem('appsi_psa_creds'); return r?JSON.parse(r):null }catch(e){ return null } }
+function psaGetFiles(){ try{ const f=localStorage.getItem('appsi_psa_files'); return f?JSON.parse(f):{linea:true,garantiasOrg:true,garantias:true} }catch(e){ return {linea:true,garantiasOrg:true,garantias:true} } }
 function psaSetStatus(msg,cls){ const el=document.getElementById('psaStatus'); if(!el) return; el.textContent=msg; el.className='psa-status'+(cls?' '+cls:''); }
 function psaRender(){
   const c=psaGetCreds();
+  const f=psaGetFiles();
   const centro=document.getElementById('psaCentro');
   const numero=document.getElementById('psaNumero');
   const clave=document.getElementById('psaClave');
   const rec=document.getElementById('psaRecordar');
+  const fLinea=document.getElementById('psaFileLinea');
+  const fOrg=document.getElementById('psaFileGarantiasOrg');
+  const fGar=document.getElementById('psaFileGarantias');
   const atajos=document.getElementById('psaAtajos');
-  const negocioCard=document.getElementById('psaNegocioCard');
-  const negocioSub=document.getElementById('psaNegocioSub');
-  const negocioBody=document.getElementById('psaNegocioBody');
   if(centro) centro.value=c?c.center:'';
   if(numero) numero.value=c?c.number:'';
   if(clave) clave.value=c?c.password:'';
   if(rec) rec.checked=c?!!c.remember:true;
+  if(fLinea) fLinea.checked=f.linea;
+  if(fOrg) fOrg.checked=f.garantiasOrg;
+  if(fGar) fGar.checked=f.garantias;
   if(atajos) atajos.style.display=c?'flex':'none';
-  if(negocioCard) negocioCard.style.display='block';
   if(c){
-    if(negocioSub) negocioSub.textContent='Conectado como D'+String(c.center).padStart(2,'0')+'-'+c.number+' · Última sync: '+(localStorage.getItem('appsi_psa_lastSync')? new Date(localStorage.getItem('appsi_psa_lastSync')).toLocaleString('es-AR') : 'recién');
-    if(negocioBody){
-      const last = localStorage.getItem('appsi_psa_cache_minegocio');
-      if(last){
-        try{
-          const j=JSON.parse(last);
-          negocioBody.innerHTML = '<div style="background:#f0f2f5;padding:8px;border-radius:8px"><b>'+(j.ventas||'—')+'</b><br><small>Mis ventas mes</small></div><div style="background:#e6f4ef;padding:8px;border-radius:8px"><b>'+(j.comision||'—')+'</b><br><small>Comisión est.</small></div>';
-        }catch(e){ negocioBody.innerHTML='<div style="grid-column:1/3;color:#65676b">Guardado. Usá <b>Probar</b> para traer números reales.</div>'; }
-      } else {
-        negocioBody.innerHTML='<div style="grid-column:1/3;color:#65676b">Guardado. Usá <b>Probar</b> para traer ventas/comisiones reales de Mi Negocio.</div>';
-      }
-    }
-    psaSetStatus('✓ Guardado en este dispositivo. Auto-actualización '+(c.remember?'activada':'desactivada')+'.','ok');
+    psaSetStatus('✓ Guardado en este dispositivo. Auto-actualizará: '+(f.linea?'LÍNEA ':'')+(f.garantiasOrg?'GARANTÍAS ORG ':'')+(f.garantias?'GARANTÍAS':''),'ok');
   } else {
-    if(negocioSub) negocioSub.textContent='Conectá tu MI PSA en Herramientas para ver ventas y comisión estimada acá.';
-    if(negocioBody) negocioBody.innerHTML='';
-    psaSetStatus('Sin conectar — APPI funciona manual. Guardá tus datos para auto-actualizar.', '');
+    psaSetStatus('Sin conectar — APPI funciona manual. Guardá tus datos para auto-actualizar esos 3 archivos.', '');
   }
 }
 function psaGuardar(){
