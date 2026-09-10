@@ -35,7 +35,7 @@
 
   var LINK_RETROLAVADO = 'https://www.youtube.com/watch?v=qa6xkQQsyg8';
   var LINK_CANJE = 'https://www.youtube.com/watch?v=evwYO9-o5MY';
-  var MESES_MANTENIMIENTO = 6;   // el ciclo que pidió el usuario
+  var MESES_MANTENIMIENTO = 3;   // el ciclo que pidió el usuario (cambiado de 6 a 3 a pedido 2026-09-10)
   var DIAS_ANIO = 365;
   var CUPO_DIA = 10;             // las 10 de hoy: mismo tope que WhatsApp
   var DIAS_CHECKIN = 90;         // vigentes sin contacto: vuelven a la cola
@@ -140,13 +140,13 @@
   /* ---------- mensajes de mantenimiento e instalación por producto (v342) ----------
      Predefinidos con el video de cada equipo. El distribuidor elige el que
      corresponde según el producto del cliente, desde el carrusel (🔁 Cambiar
-     mensaje) o desde el editor. `grupo` separa Mantenimiento (cada 6 meses)
+     mensaje) o desde el editor. `grupo` separa Mantenimiento (cada 3 meses)
      de Instalación y puesta en marcha. */
   function _mm(id, icono, grupo, nombre, texto){
     return { id: id, icono: icono, grupo: grupo, nombre: nombre, texto: texto };
   }
   var MANTENIMIENTOS = [
-    // — Grupo 1: Mantenimiento (lo que se hace cada 6 meses)
+    // — Grupo 1: Mantenimiento (lo que se hace cada 3 meses)
     _mm('mant_senik', '🔧', 'mantenimiento', 'Mantenimiento · PSA Senik',
       'Hola {nombre}! 😊\n\nTu PSA Senik ya está listo para su mantenimiento. Te dejo el video con el paso a paso:\nhttps://www.youtube.com/watch?v=RxnqnLtDjis\n\nEs simple y en 5 minutos lo tenés listo. Cualquier duda me escribís.'),
     _mm('mant_senik_bm', '🔧', 'mantenimiento', 'Mantenimiento · PSA Senik Bajo Mesada',
@@ -409,7 +409,7 @@
     });
   }
 
-  /* Próximo mantenimiento: cada 6 meses contados desde la compra.
+  /* Próximo mantenimiento: cada 3 meses contados desde la compra.
      Devuelve { vencido, fecha, dias } o null si no hay fecha de compra. */
   function mantenimiento(u){
     var compra = aFecha(u && u.fCompra);
@@ -425,7 +425,7 @@
     var previo = new Date(f);
     previo.setMonth(previo.getMonth() - MESES_MANTENIMIENTO);
     // Ojo: para alguien que compró hace poco, ese "anterior" es el día de la
-    // compra, que no es un aviso. El primero real cae recién a los 6 meses.
+    // compra, que no es un aviso. El primero real cae recién a los 3 meses.
     var hubo = previo > compra;
     var desde = dias(h, previo);
     return {
