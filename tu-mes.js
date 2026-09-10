@@ -1,7 +1,7 @@
-/* APPI · Tu mes v600 — cerebro
+/* APPI · Tu mes v601 — cerebro
    El mes es un tablero de cartas. Cada día, las 10 de la jornada.
    La puerta es la franja de septiembre del Home.
-   v600: TU MES detalle por día desde la tarjeta de resumen · popup + v599 cerebro — timeline al abrir día + métricas sutiles arriba.
+   v601: TU MES recupera pendientes · sin maquillar el hábito (v600 detalle) · popup + v599 cerebro — timeline al abrir día + métricas sutiles arriba.
    Eventos viven en appi-eventos.js (bus central silencioso).
 */
 (function () {
@@ -98,6 +98,128 @@
   function uid(){
     try{ if (window.APPIAuth && window.APPIAuth.userId) return window.APPIAuth.userId() || 'local'; }catch(e){}
     return 'local';
+  }
+  function accionesKey(){ return 'appi_acciones_v1_' + uid(); }
+  function leerAccionesRaw(){ try{ return JSON.parse(localStorage.getItem(accionesKey())||'{}'); }catch(e){ return {}; } }
+  function guardarAccionesRaw(d){ try{ localStorage.setItem(accionesKey(), JSON.stringify(d)); }catch(e){} }
+  function telDeU(u){
+    try{
+      if(!u) return '';
+      var raw = u.telf || u.telefono || u.tel || '';
+      if(window.APPITel && typeof window.APPITel.primeroValido==='function') return window.APPITel.primeroValido(raw) || '';
+      if(window.APPITel && typeof window.APPITel.normalizar==='function') return window.APPITel.normalizar(raw) || '';
+      return String(raw||'').replace(/\D/g,'').slice(-12);
+    }catch(e){ return String((u&&u.telf)||'').replace(/\D/g,''); }
+  }
+  function buscarUsuarioPorTel(tel){
+    try{
+      var norm=function(s){ return String(s||'').replace(/\D/g,''); };
+      var nTel=norm(tel);
+      if(!nTel) return null;
+      var lista=[];
+      if(typeof window.usuariosTodosActual==='function'){ try{ lista=window.usuariosTodosActual()||[]; }catch(e){} }
+      else if(Array.isArray(window.usuariosU)) lista=window.usuariosU;
+      else { try{ lista=JSON.parse(localStorage.getItem('usuarios_garantias')||'[]'); }catch(e){ lista=[]; } if(!Array.isArray(lista)) lista=[]; }
+      for(var i=0;i<lista.length;i++){
+        var u=lista[i];
+        var t=norm(u.telf||'');
+        if(t && (t===nTel || t.slice(-8)===nTel.slice(-8))) return u;
+      }
+    }catch(e){}
+    return null;
+  }
+  function claveAccionDe(motivoId, u){
+    try{ if(M() && typeof M().claveAccion==='function') return M().claveAccion(motivoId, u); }catch(e){}
+    var tel=telDeU(u)||'';
+    return motivoId+':'+tel;
+  }
+  function mostrarToast(msg){
+    try{ if(typeof window.showToast==='function') window.showToast(msg); else if(window.APPINotif && typeof window.APPINotif.toast==='function') window.APPINotif.toast(msg); }catch(e){}
+    try{ console.log('[TuMes] '+msg); }catch(e){}
+  }
+  function emitirEventoRecuperado(diaOrigen, motivoId, nombre){
+    try{
+      var desc=DESC_TAREA[motivoId]||motivoId||'tarea';
+      var titulo='Recuperado: '+desc;
+      var detalle=(nombre||'')+' · del '+diaOrigen+' (hábito intacto)';
+      if(E() && typeof E().emit==='function'){
+        E().emit({tipo:'accion', origen:'tu-mes-recupero', titulo:titulo, detalle:detalle, dia:diaOrigen, ts:Date.now()});
+      } else if(E() && typeof E().registrar==='function'){
+        E().registrar('accion','tu-mes-recupero', titulo, detalle, {dia:diaOrigen});
+      } else {
+        try{ window.dispatchEvent(new CustomEvent('appi-evento',{detail:{tipo:'accion',origen:'tu-mes-recupero',titulo:titulo,detalle:detalle,dia:diaOrigen,ts:Date.now()}})); }catch(e){}
+      }
+    }catch(e){}
+  }
+  function recuperarTarea(diaOrigen, motivoId, tel, nombre, userHint){
+    try{
+      if(!diaOrigen || !motivoId || !tel) { mostrarToast('Falta teléfono para recuperar'); return false; }
+      var now=new Date().toISOString();
+      var raw=leerAccionesRaw();
+      if(!raw.dias) raw.dias={};
+      if(!raw.dias[diaOrigen]) raw.dias[diaOrigen]={marcas:{}, total:0, hechas:0, lista:[]};
+      var dia=raw.dias[diaOrigen];
+      if(!dia.recuperados) dia.recuperados={};
+      var clave=motivoId+':'+tel;
+      if(dia.recuperados[clave]) { mostrarToast('Ya está recuperado'); return false; }
+      // si ya está hecha en origen, no necesita
+      if(dia.marcas && dia.marcas[clave] && dia.marcas[clave].e==='hecha'){ mostrarToast('Esa ya estaba hecha ese día'); return false; }
+      dia.recuperados[clave]={at:now, n:String(nombre||'').slice(0,60)};
+      // marcar ciclo como completado para que no vuelva a aparecer (sin sumar a hoy)
+      if(!raw.completadas) raw.completadas={};
+      var fullU=buscarUsuarioPorTel(tel) || userHint || {usuario:nombre, telf:tel};
+      // asegurar que fullU tenga telf normalizado para claveAccion
+      if(!fullU.telf) fullU.telf=tel;
+      var claveAcc=claveAccionDe(motivoId, fullU);
+      if(claveAcc){
+        raw.completadas[claveAcc]={e:'hecha', dia:diaOrigen, recuperado:true, at:now, n:String(nombre||'').slice(0,60), origen:diaOrigen};
+      }
+      guardarAccionesRaw(raw);
+      try{ if(M() && typeof M().invalidarJornada==='function') M().invalidarJornada(); }catch(e){}
+      emitirEventoRecuperado(diaOrigen, motivoId, nombre);
+      // aviso hábito
+      var diaFmt=diaOrigen.split('-').reverse().join('/');
+      mostrarToast('¡Recuperado! Queda hecho, pero el '+diaFmt+' sigue como estaba para tu control de hábito.');
+      // refrescar vistas
+      try{ pintar(); }catch(e){}
+      try{ renderDetalleCuerpo(); }catch(e){}
+      return true;
+    }catch(e){ try{ console.error(e); }catch(err){} mostrarToast('No se pudo recuperar'); return false; }
+  }
+  function hacerHoy(motivoId, u){
+    try{
+      if(M() && typeof M().marcarAccion==='function'){
+        M().marcarAccion(motivoId, u, 'hecha');
+        var nombre = (u&& (u.usuario||u.nombre))? String(u.usuario||u.nombre).split(',')[0].trim() : '';
+        mostrarToast('¡Hecho hoy! ✓ '+(nombre||''));
+        try{ pintar(); }catch(e){}
+        return true;
+      }
+    }catch(e){}
+    mostrarToast('No se pudo marcar');
+    return false;
+  }
+  function abrirConversacion(u, motivoId){
+    try{
+      var nombre=(u&&u.usuario)? String(u.usuario).split(',')[0].trim() : (u&&u.nombre)||'';
+      // Intentar abrir el flujo de mensajes habitual con esa persona
+      if(M() && typeof M().abrir==='function'){ M().abrir(u); return; }
+      // Fallback: abrir WhatsApp genérico si se puede resolver plantilla
+      var texto='';
+      try{
+        var p=null;
+        if(motivoId && M() && typeof M().motivoPorId==='function'){ var mot=M().motivoPorId(motivoId); if(mot) p=mot.plantilla; }
+        if(p && M() && typeof M().plantilla==='function'){ var pl=M().plantilla(p); if(pl) texto=(typeof M().completar==='function'? M().completar(pl.texto,u): pl.texto); }
+      }catch(e){}
+      if(!texto) texto='Hola '+(nombre||'')+'! ¿Cómo estás?';
+      var tel=telDeU(u);
+      if(window.APPITel && typeof window.APPITel.abrir==='function'){ window.APPITel.abrir(tel, texto, nombre, u); }
+      else {
+        var url='https://wa.me/'+String(tel||'').replace(/\D/g,'')+'?text='+encodeURIComponent(texto);
+        if(window.APPIMensajes && window.APPIMensajes.abrir) window.APPIMensajes.abrir(u);
+        else window.open(url,'_blank','noopener');
+      }
+    }catch(e){ try{ if(M() && M().abrir) M().abrir(u); }catch(err){} }
   }
 
   function css(){
@@ -251,7 +373,21 @@
       '.tm-det-list li .who b{display:block;font-size:12.5px;font-weight:900;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
       '.tm-det-list li .who small{display:block;font-size:11px;font-weight:700;opacity:.75;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
       '.tm-det-empty{padding:18px 14px;border-radius:14px;background:rgba(11,88,120,.04);border:1px dashed rgba(11,88,120,.14);text-align:center;font-size:12.5px;font-weight:700;color:#5b5a52;line-height:1.5}',
-      'body.dark .tm-det-empty{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.08);color:#b8b9c5}'
+      'body.dark .tm-det-empty{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.08);color:#b8b9c5}',
+      '.tm-pend-actions{margin-top:8px;display:flex;gap:8px;flex-wrap:wrap}',
+      '.tm-btn-recup{flex:1;min-height:36px;border:0;border-radius:12px;padding:8px 10px;background:#0b5878;color:#fff;font-size:12px;font-weight:850;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px}',
+      '.tm-btn-recup:active{transform:scale(.97)}',
+      '.tm-btn-recup.wa{background:#25D366;color:#fff}',
+      '.tm-btn-recup:disabled{opacity:.45;cursor:default}',
+      '.tm-recu{font-size:11px;font-weight:800;color:#0b5878;background:rgba(11,88,120,.08);padding:4px 8px;border-radius:999px;display:inline-block;margin-top:6px}',
+      'body.dark .tm-recu{color:#8ec8e0;background:rgba(255,255,255,.10)}',
+      '.tm-carta li.recuperado{opacity:.9;border-style:dashed;background:rgba(255,255,255,.10)}',
+      '.tm-carta li.recuperado .tm-bola{background:#ffb347;color:#1d1d2c}',
+      '.tm-carta li.pend .tm-pend-actions{margin-left:32px}',
+      '.tm-det-recup{margin-top:8px;display:flex;gap:6px}',
+      '.tm-det-recup button{border:0;border-radius:999px;padding:6px 10px;font-size:11px;font-weight:850;background:#0b5878;color:#fff;cursor:pointer}',
+      '.tm-det-recup button.wa{background:#25D366}',
+      '.tm-det-recup button:disabled{opacity:.5}'
 
     ].join('\n');
     document.head.appendChild(s);
@@ -530,10 +666,19 @@
   }
 
   function itemsDe(k){
-    if (k === hoyKey()){
+    var esHoyK = k === hoyKey();
+    if (esHoyK){
       try{ if (M() && M().registrarPartido) M().registrarPartido(); }catch(e){}
       var hoyItems = planaHoy();
-      if (hoyItems.length) return hoyItems;
+      if (hoyItems.length){
+        // enriquecer con tel y recuperado=false para uniformar
+        hoyItems.forEach(function(it){
+          if(!it.tel && it.user) it.tel = telDeU(it.user) || (it.user.telf||'');
+          it.recuperado = false;
+          it.recuperadoAt = '';
+        });
+        return hoyItems;
+      }
     }
     var out = [];
     try{
@@ -541,44 +686,90 @@
       var dia = raw.dias && raw.dias[k];
       if (!dia) return out;
       var marcas = dia.marcas || {};
+      var recuperados = dia.recuperados || {};
       var lista = dia.lista || [];
       if (lista.length){
         return lista.map(function(it){
-          var marca = it.t ? marcas[it.m + ':' + it.t] : null;
+          var tel = it.t || '';
+          var clave = it.m + ':' + tel;
+          var marca = tel ? marcas[clave] : null;
           if (!marca && it.n){
             Object.keys(marcas).forEach(function(claveM){
               if (marca) return;
               if (claveM.split(':')[0] === it.m && marcas[claveM] && marcas[claveM].n === it.n) marca = marcas[claveM];
             });
           }
+          var rec = tel ? recuperados[clave] : null;
+          if(!rec && it.n){
+            // fallback por nombre si falta tel histórico
+            Object.keys(recuperados).forEach(function(rk){
+              if(rec) return;
+              if(rk.split(':')[0]===it.m && recuperados[rk] && recuperados[rk].n===it.n) rec=recuperados[rk];
+            });
+          }
           var mot = M() && M().motivoPorId ? M().motivoPorId(it.m) : null;
+          var hecha = !!(marca && marca.e === 'hecha');
+          var recuperado = !!rec;
           return {
             motivoId: it.m,
             icono: it.ico || (mot && mot.icono) || '✓',
             motivo: it.mot || (mot && mot.nombre) || '',
             nombre: nombreCompleto(it.n),
-            hecha: !!(marca && marca.e === 'hecha'),
-            noHecha: !!(marca && marca.e === 'no_hecha')
+            tel: tel,
+            hecha: hecha,
+            noHecha: !!(marca && marca.e === 'no_hecha'),
+            recuperado: recuperado,
+            recuperadoAt: rec && rec.at || '',
+            user: {usuario: it.n, telf: tel, producto: it.prod || ''}
           };
         });
       }
       Object.keys(marcas).forEach(function(claveM){
         var motId = claveM.split(':')[0];
+        var tel = claveM.split(':')[1] || '';
         var mot = M() && M().motivoPorId ? M().motivoPorId(motId) : null;
         var marca = marcas[claveM];
+        var rec = recuperados[claveM] || null;
         out.push({
           motivoId: motId,
           icono: (mot && mot.icono) || '✓',
           motivo: (mot && mot.nombre) || '',
           nombre: nombreCompleto(marca && marca.n),
+          tel: tel,
           hecha: marca && marca.e === 'hecha',
-          noHecha: marca && marca.e === 'no_hecha'
+          noHecha: marca && marca.e === 'no_hecha',
+          recuperado: !!rec,
+          recuperadoAt: rec && rec.at || '',
+          user: {usuario: marca && marca.n || '', telf: tel}
+        });
+      });
+      // recuperados huérfanos (sin marca original)
+      Object.keys(recuperados).forEach(function(claveM){
+        if(marcas[claveM]) return;
+        var motId = claveM.split(':')[0];
+        var tel = claveM.split(':')[1] || '';
+        var rec = recuperados[claveM];
+        // evitar duplicar si ya está en out por lista vacía
+        var ya=false; for(var j=0;j<out.length;j++) if(out[j].motivoId===motId && out[j].tel===tel) ya=true;
+        if(ya) return;
+        var mot = M() && M().motivoPorId ? M().motivoPorId(motId) : null;
+        out.push({
+          motivoId: motId,
+          icono: (mot && mot.icono) || '✓',
+          motivo: (mot && mot.nombre) || '',
+          nombre: nombreCompleto(rec && rec.n),
+          tel: tel,
+          hecha: false,
+          noHecha: false,
+          recuperado: true,
+          recuperadoAt: rec && rec.at || '',
+          user: {usuario: rec && rec.n || '', telf: tel}
         });
       });
       var faltaN = Math.max(0, (Number(dia.total) || 0) - out.length);
       var i;
       for (i = 0; i < faltaN; i++){
-        out.push({ motivoId: '', icono: '·', motivo: '', nombre: 'Sin marcar', hecha: false, noHecha: false });
+        out.push({ motivoId: '', icono: '·', motivo: '', nombre: 'Sin marcar', tel:'', hecha: false, noHecha: false, recuperado:false, recuperadoAt:'' });
       }
     }catch(e){}
     return out;
@@ -595,43 +786,100 @@
       document.body.appendChild(velo);
       velo.addEventListener('click', function(e){ if (e.target === velo) cerrarCierre(); });
     }
+    var esHoyReal = k === hoyKey();
+    // hechas = solo hechas reales, recuperados no cuentan para hábito
     var hechas = items.filter(function(x){ return x.hecha; }).length;
     var total = items.length;
     var ganado = total > 0 && hechas === total;
     var sem = semaforo(hechas, total);
     var partes = String(k).split('-');
-    var tit = esHoy ? 'Tu día' : 'Tu día · ' + parseInt(partes[2],10) + ' ' + MESES[parseInt(partes[1],10)-1].toLowerCase();
+    var tit = esHoyReal ? 'Tu día' : 'Tu día · ' + parseInt(partes[2],10) + ' ' + MESES[parseInt(partes[1],10)-1].toLowerCase();
     function fila(it, ok){
       var desc = descTarea(it);
       var nom = it.nombre && it.nombre !== 'Sin marcar' ? it.nombre : '';
       var cuerpo = '<span class="d"><b>' + esc(it.icono || '') + ' ' + esc(desc) + '</b>' +
         (nom ? '<small>' + esc(nom) + '</small>' : '') + '</span>';
-      return '<li class="' + (ok ? 'ok' : 'pend') + '"><span class="tm-bola">' + (ok ? '✓' : '·') + '</span>' + cuerpo + '</li>';
+      // recuperado se muestra como intermedio: no ok ni pend
+      var cls = it.recuperado ? 'recuperado' : (ok ? 'ok' : 'pend');
+      var bola = it.recuperado ? '↻' : (ok ? '✓' : '·');
+      var recBadge = it.recuperado ? '<span class="tm-recu">↻ Recuperado</span>' : '';
+      return '<li class="' + cls + '" data-motivo="'+esc(it.motivoId||'')+'" data-tel="'+esc(it.tel||'')+'" data-nombre="'+esc(it.nombre||'')+'"><span class="tm-bola">' + bola + '</span>' + cuerpo + recBadge + '</li>';
+    }
+    function filaPendiente(it){
+      // para pendientes no recuperados, con acciones
+      var desc = descTarea(it);
+      var nom = it.nombre && it.nombre !== 'Sin marcar' ? it.nombre : '';
+      var tieneTel = !!(it.tel && String(it.tel).replace(/\D/g,'').length >= 8);
+      var motivoOk = !!(it.motivoId);
+      var puedeRecuperar = motivoOk && tieneTel && !it.recuperado && !it.hecha;
+      var esHoyPend = esHoyReal;
+      var html = '<li class="pend" data-motivo="'+esc(it.motivoId||'')+'" data-tel="'+esc(it.tel||'')+'" data-nombre="'+esc(it.nombre||'')+'">';
+      html += '<span class="tm-bola">·</span><span class="d"><b>' + esc(it.icono||'·') + ' ' + esc(desc) + '</b>' + (nom?'<small>'+esc(nom)+'</small>':'') + '</span>';
+      html += '</li>';
+      // acciones debajo de la lista, se inyectan como bloque separado
+      return html;
     }
     var okItems = items.filter(function(x){ return x.hecha; });
-    var noItems = items.filter(function(x){ return !x.hecha; });
+    var recuperadosItems = items.filter(function(x){ return x.recuperado && !x.hecha; });
+    var noItems = items.filter(function(x){ return !x.hecha && !x.recuperado; });
+    // Construir lista hecho
     var lista = '<p class="tm-grupo hecho">Hecho · ' + okItems.length + '</p><ul>';
     lista += okItems.length
       ? okItems.map(function(it){ return fila(it, true); }).join('')
       : '<li class="pend"><span class="tm-bola">·</span>Todavía nadie.</li>';
-    lista += '</ul><p class="tm-grupo falta">Falta · ' + noItems.length + '</p><ul>';
-    lista += noItems.length
-      ? noItems.map(function(it){ return fila(it, false); }).join('')
-      : '<li class="ok"><span class="tm-bola">✓</span>No falta nadie.</li>';
     lista += '</ul>';
+    if(recuperadosItems.length){
+      lista += '<p class="tm-grupo hecho" style="background:rgba(255,179,71,.18);color:#1d1d2c">↻ Recuperados · ' + recuperadosItems.length + ' <span style="font-size:11px;font-weight:700;opacity:.7">(no cambian tu hábito)</span></p><ul>';
+      lista += recuperadosItems.map(function(it){ return fila(it, false); }).join('') + '</ul>';
+    }
+    lista += '<p class="tm-grupo falta">Falta · ' + noItems.length + '</p><ul id="tmFaltaList">';
+    if(noItems.length){
+      // render pendientes con contenedor para acciones
+      lista += noItems.map(function(it){
+        var desc = descTarea(it);
+        var nom = it.nombre && it.nombre !== 'Sin marcar' ? it.nombre : '';
+        var tieneTel = !!(it.tel && String(it.tel).replace(/\D/g,'').length >= 8);
+        var motivoOk = !!(it.motivoId);
+        var puede = motivoOk && tieneTel && !it.recuperado && !it.hecha && it.nombre!=='Sin marcar';
+        var base = '<li class="pend" data-pend-motivo="'+esc(it.motivoId||'')+'" data-pend-tel="'+esc(it.tel||'')+'" data-pend-nombre="'+esc(it.nombre||'')+'"><span class="tm-bola">·</span><span class="d"><b>' + esc(it.icono||'·') + ' ' + esc(desc) + '</b>' + (nom?'<small>'+esc(nom)+'</small>':'') + '</span></li>';
+        return base;
+      }).join('');
+    } else {
+      lista += '<li class="ok"><span class="tm-bola">✓</span>No falta nadie.</li>';
+    }
+    lista += '</ul>';
+    // bloque de acciones pendientes (botones) debajo de la lista
+    if(noItems.length){
+      var pendientesConAccion = noItems.filter(function(it){ return it.motivoId && it.tel && it.nombre!=='Sin marcar'; });
+      if(pendientesConAccion.length){
+        if(esHoyReal){
+          lista += '<div class="tm-pend-actions" style="margin-top:10px"><div style="font-size:11px;font-weight:800;opacity:.8;margin-bottom:6px;width:100%">¿Hacer ahora? Queda para hoy y suma a tu hábito.</div></div>';
+          lista += '<div id="tmPendBtns" style="display:flex;flex-direction:column;gap:8px;margin-top:4px">';
+          pendientesConAccion.forEach(function(it){
+            // se renderiza un bloque por persona con 2 botones
+            // pero para no duplicar por motivo, mostramos por cada item un par
+            // simplificamos: un botón por item que abre flujo hoy
+          });
+          lista += '</div>';
+          // en realidad renderizamos botones individuales dentro de cada li arriba: mejor inyectar después
+        } else {
+          lista += '<div style="margin-top:10px;padding:10px 11px;border-radius:12px;background:rgba(255,255,255,.12);border:1px dashed rgba(255,255,255,.18);font-size:11.5px;font-weight:700;line-height:1.4">Podés recuperar lo que faltó. Queda <b>hecho</b> pero <b>el día sigue como estaba</b> para tu control de hábito.</div>';
+        }
+      }
+    }
     var pct = total ? Math.round(hechas * 100 / total) : 0;
     var pie = !total
-      ? (esHoy ? 'Todavía no hay movimiento. Las 10 te esperan.' : 'Ese día no tuvo movimiento.')
+      ? (esHoyReal ? 'Todavía no hay movimiento. Las 10 te esperan.' : 'Ese día no tuvo movimiento.')
       : (ganado
-          ? (esHoy ? 'Hoy el negocio estuvo en movimiento. Eso vale.' : 'Ese día quedó marcado. Eso vale.')
-          : (esHoy ? ('Vas ' + hechas + ' de ' + total + ' · ' + pct + '%. El día todavía está abierto.') : (hechas + ' de ' + total + ' · ' + pct + '%.')));
+          ? (esHoyReal ? 'Hoy el negocio estuvo en movimiento. Eso vale.' : 'Ese día quedó marcado. Eso vale.')
+          : (esHoyReal ? ('Vas ' + hechas + ' de ' + total + ' · ' + pct + '%. El día todavía está abierto.') : (hechas + ' de ' + total + ' · ' + pct + '%.' + (recuperadosItems.length ? ' + '+recuperadosItems.length+' recuperado'+(recuperadosItems.length>1?'s':'') : ''))));
+    if(!esHoyReal && total) pie += ' Recuperar no cambia el color del día.';
 
     // — timeline cerebro v599 — //
     var tlHtml = '';
     try{
       var evDay = E() ? E().listar({dia: k}) : [];
       if(evDay && evDay.length){
-        // ordenar cronológico
         evDay.sort(function(a,b){ return (a.ts||0)-(b.ts||0); });
         tlHtml = '<div class="tm-tl"><h4>Movimientos del día · ' + evDay.length + '</h4>' +
           evDay.map(function(ev){
@@ -661,9 +909,53 @@
     document.getElementById('tmCarta').querySelector('.tm-x').onclick = function(e){
       e.preventDefault(); e.stopPropagation(); cerrarCierre();
     };
+    // — enganchar botones de pendientes —
+    try{
+      var faltaList = document.getElementById('tmFaltaList');
+      if(faltaList){
+        var pends = faltaList.querySelectorAll('li.pend');
+        pends.forEach(function(li, idx){
+          var motivoId = li.getAttribute('data-pend-motivo')||'';
+          var tel = li.getAttribute('data-pend-tel')||'';
+          var nombre = li.getAttribute('data-pend-nombre')||'';
+          if(!motivoId || !tel || nombre==='Sin marcar') return;
+          // buscar el item original para tener user completo
+          var it = null;
+          for(var j=0;j<noItems.length;j++){ if(noItems[j].motivoId===motivoId && noItems[j].tel===tel){ it=noItems[j]; break; } }
+          if(!it) it={motivoId:motivoId, tel:tel, nombre:nombre, user:{usuario:nombre, telf:tel}};
+          var accionesDiv = document.createElement('div');
+          accionesDiv.className = 'tm-pend-actions';
+          accionesDiv.style.marginLeft = '32px';
+          accionesDiv.style.marginTop = '6px';
+          accionesDiv.style.marginBottom = '4px';
+          if(esHoyReal){
+            accionesDiv.innerHTML = '<button type="button" class="tm-btn-recup wa" data-act="wa">💬 Mensaje</button><button type="button" class="tm-btn-recup" data-act="hecho">✓ Hecho hoy</button>';
+            li.parentNode.insertBefore(accionesDiv, li.nextSibling);
+            accionesDiv.querySelector('[data-act="wa"]').onclick = function(){ abrirConversacion(it.user || {usuario:it.nombre, telf:it.tel}, motivoId); };
+            accionesDiv.querySelector('[data-act="hecho"]').onclick = function(){
+              if(hacerHoy(motivoId, it.user || {usuario:it.nombre, telf:it.tel})){
+                // refrescar modal
+                setTimeout(function(){ abrirDia(k, esHoy, false); pintar(); }, 250);
+              }
+            };
+          } else {
+            accionesDiv.innerHTML = '<button type="button" class="tm-btn-recup wa" data-act="wa">💬 Mensaje</button><button type="button" class="tm-btn-recup" data-act="recup">↻ Recuperar</button>';
+            li.parentNode.insertBefore(accionesDiv, li.nextSibling);
+            accionesDiv.querySelector('[data-act="wa"]').onclick = function(){ abrirConversacion(it.user || {usuario:it.nombre, telf:it.tel}, motivoId); };
+            accionesDiv.querySelector('[data-act="recup"]').onclick = function(){
+              var ok = recuperarTarea(k, motivoId, tel, nombre, it.user);
+              if(ok){
+                setTimeout(function(){ abrirDia(k, esHoy, false); }, 300);
+              }
+            };
+          }
+        });
+      }
+    }catch(e){ try{ console.error(e);}catch(err){} }
     velo.className = 'on';
-    picado(!!fiesta || (esHoy && ganado));
+    picado(!!fiesta || (esHoyReal && ganado));
   }
+
 
   function cerrarCierre(){
     var velo = document.getElementById('tmCierre');
@@ -731,7 +1023,6 @@
   function renderDetalleCuerpo(){
     var anio=_detAnio, mes=_detMes, filtro=_detFiltro;
     var mapa = diasMes(anio, mes);
-    // incluir hoy si es mes actual
     var now=hoy();
     var esActual = anio===now.getFullYear() && mes===now.getMonth();
     if(esActual){
@@ -756,7 +1047,6 @@
     Object.keys(mapa).forEach(function(k){ var d=mapa[k]; if(d && d.hechas){ vivos++; personas+=Number(d.hechas)||0; }});
     if(vivos) subt = vivos+(vivos===1?' día con movimiento':' días con movimiento')+' · '+(personas||0)+(personas===1?' persona atendida':' personas atendidas');
     else subt = 'Aún sin movimiento este mes. Cada Hecho va a aparecer acá, día por día.';
-    // chips cerebro
     var evResumen=null; try{ if(E() && E().resumenMes) evResumen=E().resumenMes(anio,mes); }catch(e){}
     var chipsHtml='';
     if(evResumen && evResumen.total){
@@ -768,14 +1058,11 @@
       chipsHtml='<div class="tm-det-summary">'+parts.map(function(p){ return '<span class="tm-det-chip">'+esc(p)+'</span>';}).join('')+'<span class="tm-det-chip" style="opacity:.65">· '+evResumen.total+' movimientos</span></div>';
     }
     head.innerHTML = '<div class="eyebrow">Detalle por día</div><h2>'+esc(titulo)+'</h2><p>'+esc(subt)+'</p>'+chipsHtml+ htmlDetalleFiltros(filas, filtro);
-    // attach filtro handlers
     head.querySelectorAll('[data-det-filtro]').forEach(function(b){
       b.onclick=function(){ _detFiltro=b.getAttribute('data-det-filtro')||''; renderDetalleCuerpo(); };
     });
 
-    // construir lista de días con movimiento (orden cronológico)
     var diasOrden = Object.keys(mapa).sort();
-    // también incluir días que tienen eventos pero no marca hechas (movimiento sutil)
     try{
       if(E() && E().listarMes){
         var evs=E().listarMes(anio,mes);
@@ -783,20 +1070,12 @@
         diasOrden.sort();
       }
     }catch(e){}
-    // filtrar días futuros en mes actual
     if(esActual){
       var hoyD = now.getDate();
       diasOrden = diasOrden.filter(function(k){
         var diaNum = parseInt(String(k).split('-')[2],10);
         return diaNum <= hoyD;
       });
-      // asegurar que hoy aparezca aunque no tenga hechas (para ver timeline)
-      var kHoy2=hoyKey();
-      if(diasOrden.indexOf(kHoy2)<0){
-        // solo si hay al menos un movimiento en el mes o es hoy mismo con partido?
-        // lo agregamos al final para no vaciar si mes vacío
-        // Si mes totalmente vacío, dejamos lista vacía y mostramos empty
-      }
     }
 
     var htmlDays='';
@@ -806,25 +1085,28 @@
       var hechas = info ? (Number(info.hechas)||0) : 0;
       var total = info ? (Number(info.total)||0) : 0;
       var sem = semaforo(hechas, total);
-      // items del día
       var items = [];
       try{ items = itemsDe(k); }catch(e){ items=[]; }
       var hechos = items.filter(function(it){ return it.hecha; });
+      var recuperados = items.filter(function(it){ return it.recuperado && !it.hecha; });
+      var pendientes = items.filter(function(it){ return !it.hecha && !it.recuperado && it.motivoId && it.nombre!=='Sin marcar' && it.tel; });
       var hechosFiltrados = filtro ? hechos.filter(function(it){ return String(it.motivoId||'')===String(filtro); }) : hechos;
-      // si filtro activo y no hay hechos de ese tipo ese día, saltear día a menos que tenga eventos que coincidan? Para no vaciar, saltamos
-      if(filtro && !hechosFiltrados.length){
-        // pero si el día tiene eventos y filtro es de tipo tarea, no mostrarlo (para foco)
+      var pendientesFiltrados = filtro ? pendientes.filter(function(it){ return String(it.motivoId||'')===String(filtro); }) : pendientes;
+      var recuperadosFiltrados = filtro ? recuperados.filter(function(it){ return String(it.motivoId||'')===String(filtro); }) : recuperados;
+      var esHoyK = k===hoyKey();
+      if(filtro && !hechosFiltrados.length && !pendientesFiltrados.length && !recuperadosFiltrados.length){
         return;
       }
-      // si no hay hechos ni eventos y no es hoy, saltear (no aporta)
       var evDay=[];
       try{ if(E() && E().listar) evDay = E().listar({dia:k})||[]; }catch(e){}
-      if(!hechosFiltrados.length && !evDay.length && hechas===0) return;
+      // si no hay hechos ni pendientes ni recuperados ni eventos y no es hoy, saltear
+      if(!hechosFiltrados.length && !pendientesFiltrados.length && !recuperadosFiltrados.length && !evDay.length && hechas===0) return;
       diasConAlgo++;
       var fmt = formatoDiaDetalle(k);
       var semCls = sem || (hechosFiltrados.length ? 'neutro' : 'neutro');
       var badge = total ? (hechas+'/'+total) : (hechosFiltrados.length ? (hechosFiltrados.length+' hecho'+(hechosFiltrados.length>1?'s':'')) : '');
       if(evDay.length && !total) badge = badge ? (badge+' · '+evDay.length+' mov.') : (evDay.length+' mov.');
+      if(recuperadosFiltrados.length) badge += (badge?' · ':'') + recuperadosFiltrados.length + ' recup.';
       var dotEvent = evDay.length ? ' <span style="font-size:11px">· 💬</span>' : '';
       htmlDays += '<div class="tm-det-day" data-det-dia="'+esc(k)+'" role="button" tabindex="0" aria-label="Abrir '+esc(fmt.etiqu)+'">'
         + '<div class="tm-det-day-head"><strong>'+esc(fmt.etiqu)+(fmt.esHoy?' · Hoy':'')+'</strong><span class="right"><i class="sema '+esc(semCls)+'" aria-hidden="true"></i><span>'+esc(badge)+'</span>'+dotEvent+'</span></div>';
@@ -836,14 +1118,36 @@
           return '<li><span class="ico">'+ico+'</span><span class="who"><b>'+esc(desc)+'</b>'+(nom?'<small>'+esc(nom)+'</small>':'')+'</span></li>';
         }).join('') + '</ul>';
       } else if(filtro){
-        var __fNom=''+filtro; try{ var __ff=filas.find(function(f){return f.id===filtro;}); if(__ff && __ff.nombre) __fNom=__ff.nombre; }catch(e){}
-        htmlDays += '<div style="font-size:12px;font-weight:700;opacity:.6;padding:6px 0">Sin '+esc(__fNom)+' este día.</div>';
-      } else if(evDay.length){
-        // sin hechos pero con eventos: mostrar hint
-        htmlDays += '<div style="font-size:12px;font-weight:700;opacity:.65;padding:6px 0">Sin tareas marcadas, pero hay '+evDay.length+' movimiento'+(evDay.length>1?'s':'')+' registrado'+(evDay.length>1?'s':'')+'.</div>';
+        htmlDays += '<div style="font-size:12px;font-weight:700;opacity:.6;padding:6px 0">Sin '+esc((function(){ var __fNom=''+filtro; try{ var __ff=filas.find(function(f){return f.id===filtro;}); if(__ff && __ff.nombre) __fNom=__ff.nombre; }catch(e){} return __fNom; })())+' hechos este día.</div>';
+      } else if(evDay.length && !pendientesFiltrados.length && !hechosFiltrados.length){
+        htmlDays += '<div style="font-size:12px;font-weight:700;opacity:.65;padding:6px 0">Sin tareas marcadas, pero hay '+evDay.length+' movimiento'+(evDay.length>1?'s':'')+' registrado.</div>';
+      }
+      if(recuperadosFiltrados.length){
+        htmlDays += '<div style="margin-top:8px"><div style="font-size:11px;font-weight:850;color:#0b5878;opacity:.8;margin-bottom:4px">↻ Recuperados ('+recuperadosFiltrados.length+')</div><ul class="tm-det-list">';
+        htmlDays += recuperadosFiltrados.map(function(it){
+          var desc = descTarea(it);
+          var nom = it.nombre || '';
+          var ico = esc(it.icono||'↻');
+          return '<li style="background:rgba(255,179,71,.12);border-style:dashed"><span class="ico">'+ico+'</span><span class="who"><b>'+esc(desc)+'</b><small>'+esc(nom)+' · recuperado</small></span></li>';
+        }).join('') + '</ul></div>';
+      }
+      if(pendientesFiltrados.length){
+        var esHoyPend = esHoyK;
+        var tituloPend = esHoyPend ? 'Faltan · '+pendientesFiltrados.length : 'Faltaban · '+pendientesFiltrados.length+' <span style="font-weight:700;opacity:.6">(podés recuperar)</span>';
+        htmlDays += '<div style="margin-top:10px"><div style="font-size:11px;font-weight:850;color:#5b5a52;margin-bottom:6px">'+tituloPend+'</div><ul class="tm-det-list">';
+        htmlDays += pendientesFiltrados.slice(0,4).map(function(it){
+          var desc = descTarea(it);
+          var nom = it.nombre || '';
+          var ico = esc(it.icono||'·');
+          var key = esc(it.motivoId+'|'+it.tel+'|'+k);
+          return '<li data-pend-key="'+key+'" data-motivo="'+esc(it.motivoId)+'" data-tel="'+esc(it.tel)+'" data-nombre="'+esc(it.nombre)+'" data-dia="'+esc(k)+'" style="flex-wrap:wrap"><span class="ico">'+ico+'</span><span class="who"><b>'+esc(desc)+'</b><small>'+esc(nom)+'</small></span><span class="tm-det-recup" style="width:100%;margin-top:6px">'
+            + (esHoyPend ? '<button type="button" class="wa" data-det-act="wa" data-key="'+key+'">💬 Mensaje</button><button type="button" data-det-act="hecho" data-key="'+key+'">✓ Hecho hoy</button>' : '<button type="button" class="wa" data-det-act="wa" data-key="'+key+'">💬 Mensaje</button><button type="button" data-det-act="recup" data-key="'+key+'">↻ Recuperar</button>')
+            + '</span></li>';
+        }).join('') + '</ul>';
+        if(pendientesFiltrados.length>4) htmlDays += '<div style="font-size:11px;font-weight:700;opacity:.6;margin-top:4px">+ '+(pendientesFiltrados.length-4)+' más · abrí el día para ver todos</div>';
+        if(!esHoyPend) htmlDays += '<div style="font-size:11px;font-weight:700;color:#0b5878;background:rgba(11,88,120,.06);padding:6px 8px;border-radius:10px;margin-top:6px">Recuperar marca como hecho sin cambiar el color del día.</div>';
       }
       if(evDay.length){
-        // mini timeline resumido (hasta 3)
         var evShow = evDay.slice(-3).reverse();
         htmlDays += '<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px">'+evShow.map(function(ev){
           return '<span class="tm-det-chip" style="font-size:10.5px;padding:4px 8px">'+esc(iconoEv(ev.tipo))+' '+esc((ev.titulo||textoTipo(ev.tipo)).slice(0,22))+' · '+esc(horaDe(ev.ts))+'</span>';
@@ -858,15 +1162,57 @@
         : '<div class="tm-det-empty">Este mes todavía no tiene días con Hecho.<br>Cuando marques ✓ en Las 10 o envíes un mensaje, va a aparecer acá — día por día, sin tocar nada extra.</div>';
     } else {
       body.innerHTML = htmlDays;
-      // click en día → abrir modal del día (y cerrar detalle)
       body.querySelectorAll('[data-det-dia]').forEach(function(card){
         var k=card.getAttribute('data-det-dia');
-        function go(){ cerrarDetalle(); setTimeout(function(){ abrirDia(k, k===hoyKey()); }, 120); }
+        function go(e){
+          // si cliqueó un botón de recuperar, no navegar
+          if(e && e.target && e.target.closest && e.target.closest('button[data-det-act]')) return;
+          cerrarDetalle(); setTimeout(function(){ abrirDia(k, k===hoyKey()); }, 120);
+        }
         card.addEventListener('click', go);
-        card.addEventListener('keydown', function(e){ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); go(); }});
+        card.addEventListener('keydown', function(e){ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); go(e); }});
+      });
+      // enganchar botones recuperar dentro del detalle
+      body.querySelectorAll('button[data-det-act]').forEach(function(btn){
+        btn.addEventListener('click', function(e){
+          e.preventDefault(); e.stopPropagation();
+          var act=btn.getAttribute('data-det-act');
+          var li=btn.closest('li[data-pend-key]');
+          if(!li) return;
+          var motivoId=li.getAttribute('data-motivo')||'';
+          var tel=li.getAttribute('data-tel')||'';
+          var nombre=li.getAttribute('data-nombre')||'';
+          var dia=li.getAttribute('data-dia')||'';
+          var esHoyK=dia===hoyKey();
+          // buscar user
+          var itUser=null;
+          try{
+            var items=itemsDe(dia);
+            for(var i=0;i<items.length;i++) if(items[i].motivoId===motivoId && items[i].tel===tel){ itUser=items[i].user; break; }
+          }catch(err){}
+          if(!itUser) itUser={usuario:nombre, telf:tel};
+          if(act==='wa'){
+            abrirConversacion(itUser, motivoId);
+          } else if(act==='hecho' && esHoyK){
+            if(hacerHoy(motivoId, itUser)){
+              setTimeout(renderDetalleCuerpo, 300);
+              setTimeout(pintar, 300);
+            }
+          } else if(act==='recup' && !esHoyK){
+            var ok=recuperarTarea(dia, motivoId, tel, nombre, itUser);
+            if(ok){
+              // feedback visual rápido
+              btn.textContent='✓ Recuperado';
+              btn.disabled=true;
+              setTimeout(renderDetalleCuerpo, 400);
+              setTimeout(pintar, 400);
+            }
+          }
+        });
       });
     }
   }
+
   function abrirDetalleMes(anio, mes, filtro){
     css();
     _detAnio = Number(anio)||hoy().getFullYear();
