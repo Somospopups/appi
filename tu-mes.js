@@ -1,7 +1,7 @@
-/* APPI · Tu mes v612 — cerebro
+/* APPI · Tu mes v613 — cerebro
    El mes es un tablero de cartas. Cada día, las 10 de la jornada.
    La puerta es la franja de septiembre del Home.
-   v612: recuperar lleva a hacerla como tarjeta Home (marca recuperado + abre chat hoy) (mismo renglón) lista vacía (Edge) v598 lista incompleta dice No falta nadie verde con 9 pendientes + info faltas · sin maquillar el hábito (v600 detalle) · popup + v599 cerebro — timeline al abrir día + métricas sutiles arriba.
+   v613: recuperar lleva DIRECTO a la acción (WhatsApp saludo para cumple, panel Ya lo hice/No para retro) (marca recuperado + abre chat hoy) (mismo renglón) lista vacía (Edge) v598 lista incompleta dice No falta nadie verde con 9 pendientes + info faltas · sin maquillar el hábito (v600 detalle) · popup + v599 cerebro — timeline al abrir día + métricas sutiles arriba.
    Eventos viven en appi-eventos.js (bus central silencioso).
 */
 (function () {
@@ -186,11 +186,46 @@
       return true;
     }catch(e){ try{ console.error(e); }catch(err){} mostrarToast('No se pudo recuperar'); return false; }
   }
+  function llevarAAccionDirecta(motivoId, u){
+    try{
+      var esRetro = String(motivoId||'')==='retro';
+      var esCumple = String(motivoId||'')==='cumple';
+      // Para retrolavado el usuario quiere el panel Ya lo hice / No lo hice, no WhatsApp
+      if(esRetro && window.APPIMensajes && typeof window.APPIMensajes.abrirFila==='function'){
+        try{ window.APPIMensajes.abrirFila('retro'); }catch(e){}
+        // intentar posicionar en el cliente exacto si lo tenemos
+        setTimeout(function(){
+          try{
+            var ov=document.getElementById('muOverlay');
+            if(!ov || !u || !u.usuario) return;
+            var target=(String(u.usuario||'').split(',')[0]||'').trim().toLowerCase();
+            if(!target) return;
+            var tries=0;
+            function buscar(){
+              try{
+                var nameEl=ov.querySelector('.mu-fila-quien b');
+                var cur=nameEl? String(nameEl.textContent||'').toLowerCase() : '';
+                if(cur.indexOf(target)>=0) return;
+                if(tries++>12) return;
+                var next=document.getElementById('muFilaNext');
+                if(next && !next.disabled){ next.click(); setTimeout(buscar, 180); }
+              }catch(e){}
+            }
+            setTimeout(buscar, 250);
+          }catch(e){}
+        }, 420);
+        return true;
+      }
+      // Para cumple y resto (porvencer, renovacion, checkin) el usuario quiere WhatsApp con saludo/plantilla
+      // usar abrirConversacion que abre el flujo de mensajes con plantilla
+      abrirConversacion(u, motivoId);
+      return true;
+    }catch(e){ try{ abrirConversacion(u, motivoId); }catch(err){} return true; }
+  }
   function recuperarYHacer(k, motivoId, tel, nombre, userHint, it){
     try{
       var ok = recuperarTarea(k, motivoId, tel, nombre, userHint);
       if(!ok) return false;
-      // llevar a hacerla hoy como tarjeta del Home
       setTimeout(function(){
         try{ cerrarCierre(); }catch(e){}
         try{ cerrarDetalle(); }catch(e){}
@@ -200,28 +235,21 @@
             var u = userHint || (it && it.user) || {usuario:nombre, telf:tel};
             var esPlaceholder = !!(it && it.placeholder) || String(tel||'').indexOf('ph_')===0;
             if(esPlaceholder){
-              // buscar candidato real hoy para ese motivo
-              var cand = [];
+              var cand=[];
               try{ cand = planaHoy().filter(function(x){ return x.motivoId===motivoId && !x.hecha; }); }catch(e){}
               if(cand.length && cand[0].user){
-                u = cand[0].user;
+                u=cand[0].user;
                 mostrarToast('Recuperado del '+k.split('-').reverse().join('/')+' — ahora hacelo con '+ (u.usuario||u.nombre||'') +' hoy');
-                abrirConversacion(u, motivoId);
+                llevarAAccionDirecta(motivoId, u);
               } else {
-                // sin candidato hoy para ese motivo, abrir Home y resaltar mazo
                 mostrarToast('Recuperado. No hay pendientes de '+ (DESC_TAREA[motivoId]||motivoId) +' hoy — elegí otro en el Home.');
-                // intentar scrollear a la tarjeta de Las 10
                 try{ var card=document.querySelector('.home-month-card'); if(card) card.scrollIntoView({behavior:'smooth', block:'center'}); }catch(e){}
-                // si hay algún motivo hoy pendiente, abrir el primero
-                try{
-                  var todos = planaHoy().filter(function(x){ return !x.hecha; });
-                  if(todos.length) abrirConversacion(todos[0].user, todos[0].motivoId);
-                }catch(e){}
+                // abrir la fila general de ese motivo para que elija
+                try{ if(window.APPIMensajes && window.APPIMensajes.abrirFila) window.APPIMensajes.abrirFila(motivoId); }catch(e){}
               }
             } else {
-              // real: abrir chat con esa misma persona/motivo para hacerlo hoy
               mostrarToast('Recuperado. Ahora hacelo con '+ (u.usuario||u.nombre||nombre) +' hoy');
-              abrirConversacion(u, motivoId);
+              llevarAAccionDirecta(motivoId, u);
             }
           }catch(e){ try{ console.error(e);}catch(err){} }
         }, 420);
