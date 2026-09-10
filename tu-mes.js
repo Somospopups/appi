@@ -105,7 +105,7 @@
       '.tm-dia.amarillo .n,.tm-dia.amarillo .m{color:#1d1d2c;opacity:.9}',
       '.tm-dia .n{font-size:10px;letter-spacing:.06em;text-transform:uppercase;opacity:.85}',
       '.tm-dia .ok{margin-top:auto;display:block;font-size:10.5px;font-weight:900;line-height:1.2}',
-      '.tm-dia .no{display:block;font-size:9.5px;font-weight:800;line-height:1.2;opacity:.95}',
+      '.tm-dia .no{display:block;font-size:8.5px;font-weight:800;line-height:1.2;opacity:.95;max-height:2.5em;overflow:hidden}',
       '.tm-dia .m{margin-top:auto;font-size:9.5px;opacity:.8}',
       '#tmCierre{display:none;position:fixed;inset:0;z-index:45000;align-items:center;justify-content:center;background:rgba(16,20,28,.38);padding:16px}',
       '#tmCierre.on{display:flex}',
@@ -128,6 +128,9 @@
       '.tm-carta h2{margin:6px 0 10px;font-size:26px;letter-spacing:-.4px}',
       '.tm-carta ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}',
       '.tm-carta li{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.16);font-size:13.5px;font-weight:800}',
+      '.tm-carta li .d{display:flex;flex-direction:column;gap:1px;min-width:0}',
+      '.tm-carta li .d b{font-size:13.5px;font-weight:900;line-height:1.25}',
+      '.tm-carta li .d small{font-size:11.5px;font-weight:800;opacity:.85}',
       '.tm-carta li.pend{opacity:.72}',
       '.tm-bola{flex:0 0 22px;width:22px;height:22px;border-radius:50%;background:#7dcc6a;color:#163512;display:grid;place-items:center;font-size:13px;font-weight:900}',
       '.tm-carta li.pend .tm-bola{background:rgba(255,255,255,.2);color:#fff}',
@@ -204,6 +207,17 @@
       }).join('') + '</ul>';
   }
 
+  var DESC_TAREA = {
+    cumple: 'Saludar el cumpleaños',
+    retro: 'Pedir el retrolavado',
+    porvencer: 'Avisar que vence la garantía',
+    renovacion: 'Proponer el canje del equipo',
+    checkin: 'Preguntar cómo viene el equipo'
+  };
+  function descTarea(it){
+    if (!it) return 'Tarea del día';
+    return DESC_TAREA[it.motivoId] || it.motivo || 'Tarea del día';
+  }
   function semaforo(hechas, total){
     if (!total) return '';
     var p = hechas / total;
@@ -284,7 +298,20 @@
       var mini = '';
       if (tDia){
         var falta = Math.max(0, tDia - hDia);
-        mini = '<span class="ok">✓ ' + hDia + '</span><span class="no">' + (falta ? ('falta ' + falta) : 'completo') + '</span>';
+        var faltaTxt = 'completo';
+        if (falta){
+          var pend = [];
+          try{
+            itemsDe(k).forEach(function(it){
+              if (!it.hecha){
+                var d = descTarea(it);
+                if (pend.indexOf(d) < 0) pend.push(d);
+              }
+            });
+          }catch(e){}
+          faltaTxt = pend.length ? pend.join(' · ') : ('falta ' + falta);
+        }
+        mini = '<span class="ok">✓ ' + hDia + '</span><span class="no">' + esc(faltaTxt) + '</span>';
       } else if (futuro){
         mini = '<span class="m">sin abrir</span>';
       } else {
@@ -373,9 +400,11 @@
     var partes = String(k).split('-');
     var tit = esHoy ? 'Tu día' : 'Tu día · ' + parseInt(partes[2],10) + ' ' + MESES[parseInt(partes[1],10)-1].toLowerCase();
     function fila(it, ok){
-      var nom = it.nombre ? it.nombre : it.motivo;
-      var txt = it.icono + ' ' + nom + (it.motivo && it.nombre ? ' · ' + it.motivo : '');
-      return '<li class="' + (ok ? 'ok' : 'pend') + '"><span class="tm-bola">' + (ok ? '✓' : '·') + '</span>' + esc(txt) + '</li>';
+      var desc = descTarea(it);
+      var nom = it.nombre && it.nombre !== 'Sin marcar' ? it.nombre : '';
+      var cuerpo = '<span class="d"><b>' + esc(it.icono || '') + ' ' + esc(desc) + '</b>' +
+        (nom ? '<small>' + esc(nom) + '</small>' : '') + '</span>';
+      return '<li class="' + (ok ? 'ok' : 'pend') + '"><span class="tm-bola">' + (ok ? '✓' : '·') + '</span>' + cuerpo + '</li>';
     }
     var okItems = items.filter(function(x){ return x.hecha; });
     var noItems = items.filter(function(x){ return !x.hecha; });
