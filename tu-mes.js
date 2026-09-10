@@ -1,7 +1,7 @@
-/* APPI · Tu mes v613 — cerebro
+/* APPI · Tu mes v614 — cerebro
    El mes es un tablero de cartas. Cada día, las 10 de la jornada.
    La puerta es la franja de septiembre del Home.
-   v613: recuperar lleva DIRECTO a la acción (WhatsApp saludo para cumple, panel Ya lo hice/No para retro) (marca recuperado + abre chat hoy) (mismo renglón) lista vacía (Edge) v598 lista incompleta dice No falta nadie verde con 9 pendientes + info faltas · sin maquillar el hábito (v600 detalle) · popup + v599 cerebro — timeline al abrir día + métricas sutiles arriba.
+   v614: recuperar lleva DIRECTO y funciona (solo iba al Home) a la acción (WhatsApp saludo para cumple, panel Ya lo hice/No para retro) (marca recuperado + abre chat hoy) (mismo renglón) lista vacía (Edge) v598 lista incompleta dice No falta nadie verde con 9 pendientes + info faltas · sin maquillar el hábito (v600 detalle) · popup + v599 cerebro — timeline al abrir día + métricas sutiles arriba.
    Eventos viven en appi-eventos.js (bus central silencioso).
 */
 (function () {
@@ -188,37 +188,25 @@
   }
   function llevarAAccionDirecta(motivoId, u){
     try{
-      var esRetro = String(motivoId||'')==='retro';
-      var esCumple = String(motivoId||'')==='cumple';
-      // Para retrolavado el usuario quiere el panel Ya lo hice / No lo hice, no WhatsApp
-      if(esRetro && window.APPIMensajes && typeof window.APPIMensajes.abrirFila==='function'){
-        try{ window.APPIMensajes.abrirFila('retro'); }catch(e){}
-        // intentar posicionar en el cliente exacto si lo tenemos
-        setTimeout(function(){
-          try{
-            var ov=document.getElementById('muOverlay');
-            if(!ov || !u || !u.usuario) return;
-            var target=(String(u.usuario||'').split(',')[0]||'').trim().toLowerCase();
-            if(!target) return;
-            var tries=0;
-            function buscar(){
-              try{
-                var nameEl=ov.querySelector('.mu-fila-quien b');
-                var cur=nameEl? String(nameEl.textContent||'').toLowerCase() : '';
-                if(cur.indexOf(target)>=0) return;
-                if(tries++>12) return;
-                var next=document.getElementById('muFilaNext');
-                if(next && !next.disabled){ next.click(); setTimeout(buscar, 180); }
-              }catch(e){}
-            }
-            setTimeout(buscar, 250);
-          }catch(e){}
-        }, 420);
-        return true;
+      var id=String(motivoId||'');
+      // Para retrolavado el usuario quiere el panel Ya lo hice / No lo hice directo para esa persona
+      if(id==='retro'){
+        if(window.APPIMensajes && typeof window.APPIMensajes.abrirFilaUsuario==='function' && u && (u.usuario||u.nombre)){
+          try{ window.APPIMensajes.abrirFilaUsuario('retro', u); return true; }catch(e){}
+        }
+        if(window.APPIMensajes && typeof window.APPIMensajes.abrirFila==='function'){
+          try{ window.APPIMensajes.abrirFila('retro'); return true; }catch(e){}
+        }
       }
-      // Para cumple y resto (porvencer, renovacion, checkin) el usuario quiere WhatsApp con saludo/plantilla
-      // usar abrirConversacion que abre el flujo de mensajes con plantilla
-      abrirConversacion(u, motivoId);
+      // Para cumple / porvencer / renovacion / checkin -> WhatsApp con plantilla/saludo
+      // usar abrirConversacion que abre el flujo de mensajes
+      if(u && (u.telf || u.telefono || u.tel)){
+        abrirConversacion(u, motivoId);
+      } else if(window.APPIMensajes && typeof window.APPIMensajes.abrir==='function'){
+        try{ window.APPIMensajes.abrir(u); }catch(e){ abrirConversacion(u, motivoId); }
+      } else {
+        abrirConversacion(u, motivoId);
+      }
       return true;
     }catch(e){ try{ abrirConversacion(u, motivoId); }catch(err){} return true; }
   }
@@ -242,18 +230,21 @@
                 mostrarToast('Recuperado del '+k.split('-').reverse().join('/')+' — ahora hacelo con '+ (u.usuario||u.nombre||'') +' hoy');
                 llevarAAccionDirecta(motivoId, u);
               } else {
-                mostrarToast('Recuperado. No hay pendientes de '+ (DESC_TAREA[motivoId]||motivoId) +' hoy — elegí otro en el Home.');
-                try{ var card=document.querySelector('.home-month-card'); if(card) card.scrollIntoView({behavior:'smooth', block:'center'}); }catch(e){}
-                // abrir la fila general de ese motivo para que elija
-                try{ if(window.APPIMensajes && window.APPIMensajes.abrirFila) window.APPIMensajes.abrirFila(motivoId); }catch(e){}
+                // placeholder sin candidato hoy: abrir fila general del motivo para que elija (si es retro abre panel, si no abre WhatsApp genérico)
+                if(String(motivoId)==='retro' && window.APPIMensajes && window.APPIMensajes.abrirFila){
+                  try{ window.APPIMensajes.abrirFila(motivoId); mostrarToast('Recuperado. Elegí a quién marcar en la lista.'); }catch(e){ try{ var card=document.querySelector('.home-month-card'); if(card) card.scrollIntoView({behavior:'smooth', block:'center'}); }catch(err){} }
+                } else {
+                  mostrarToast('Recuperado. No hay pendientes de '+ (DESC_TAREA[motivoId]||motivoId) +' hoy.');
+                  try{ var card2=document.querySelector('.home-month-card'); if(card2) card2.scrollIntoView({behavior:'smooth', block:'center'}); }catch(e){}
+                }
               }
             } else {
               mostrarToast('Recuperado. Ahora hacelo con '+ (u.usuario||u.nombre||nombre) +' hoy');
               llevarAAccionDirecta(motivoId, u);
             }
           }catch(e){ try{ console.error(e);}catch(err){} }
-        }, 420);
-      }, 380);
+        }, 650);
+      }, 280);
       return true;
     }catch(e){ return false; }
   }

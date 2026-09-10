@@ -1067,6 +1067,13 @@
     fila = { motivo: g.motivo, gente: g.gente.slice(), i: 0, textoActual: null };
     pintarFila();
   }
+  function abrirFilaUsuario(motivoId, u){
+    var m = motivoPorId(motivoId);
+    if (!m || !u) { abrirFila(motivoId); return; }
+    // Abrir directo el panel Ya lo hice/No para ese usuario/motivo aunque no esté en las 10 de hoy
+    fila = { motivo: m, gente: [u], i: 0, textoActual: null };
+    pintarFila();
+  }
 
   function pintarFila(){
     var ov = overlay();
@@ -2133,6 +2140,7 @@
     textoRacha: textoRacha,
     pintarHoy: pintarHoy,
     abrirFila: abrirFila,
+    abrirFilaUsuario: abrirFilaUsuario,
     escritoHoy: escritoHoy,
     cerrar: cerrar,
     montar: montar,
