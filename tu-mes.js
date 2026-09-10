@@ -1,0 +1,334 @@
+/* APPI · Tu mes
+   El mes es un tablero de cartas. Cada día, las 10 de la jornada.
+   La puerta es la franja de septiembre del Home. */
+(function () {
+  'use strict';
+
+  var MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  var SEM = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
+  var cssListo = false;
+  var visto = {};
+
+  function M(){ return window.APPIMensajes || null; }
+  function esc(s){
+    return String(s == null ? '' : s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  function hoy(){ return new Date(); }
+  function clave(d){
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  }
+  function hoyKey(){ return clave(hoy()); }
+  function pila(n){
+    try{ if (typeof window.nombreDePila === 'function'){ var v = window.nombreDePila(n); if (v) return v; } }catch(e){}
+    var t = String(n || '').trim();
+    if (!t) return '';
+    if (t.indexOf(',') >= 0){
+      var der = t.split(',')[1] || '';
+      return (der.trim().split(/\s+/)[0] || t).replace(/^\w/, function(c){ return c.toUpperCase(); });
+    }
+    return t.split(/\s+/)[0];
+  }
+
+  function planaHoy(){
+    var api = M();
+    var out = [];
+    if (!api || typeof api.deHoy !== 'function') return out;
+    try{
+      api.deHoy().forEach(function(g){
+        (g.gente || []).forEach(function(u){
+          var m = api.marcaDe ? api.marcaDe(g.motivo.id, u) : null;
+          out.push({
+            motivoId: g.motivo.id,
+            icono: g.motivo.icono || '✓',
+            motivo: g.motivo.nombre || '',
+            nombre: pila(u.usuario || u.nombre || '') || (u.usuario || ''),
+            hecha: !!(m && m.e === 'hecha'),
+            noHecha: !!(m && m.e === 'no_hecha'),
+            user: u
+          });
+        });
+      });
+    }catch(e){}
+    return out;
+  }
+
+  function diasMes(anio, mes){
+    var api = M();
+    var mapa = {};
+    if (!api) return mapa;
+    try{
+      var raw = JSON.parse(localStorage.getItem('appi_acciones_v1_' + uid()) || '{}');
+      var pref = anio + '-' + String(mes+1).padStart(2,'0') + '-';
+      Object.keys(raw.dias || {}).forEach(function(k){
+        if (k.indexOf(pref) === 0) mapa[k] = raw.dias[k];
+      });
+    }catch(e){}
+    return mapa;
+  }
+  function uid(){
+    try{ if (window.APPIAuth && window.APPIAuth.userId) return window.APPIAuth.userId() || 'local'; }catch(e){}
+    return 'local';
+  }
+
+  function css(){
+    if (cssListo) return;
+    cssListo = true;
+    var s = document.createElement('style');
+    s.textContent = [
+      '.home-month-card{cursor:pointer}',
+      '.home-month-card:focus{outline:2px solid #e8b84a;outline-offset:2px}',
+      '.tm-wrap{padding:12px 14px 28px}',
+      '.tm-sub{margin:0 0 12px;font-size:12.5px;font-weight:800;color:#686977}',
+      'body.dark .tm-sub{color:#b8b9c5}',
+      '.tm-sem,.tm-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}',
+      '.tm-sem span{text-align:center;font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#8a8678}',
+      '.tm-dia{aspect-ratio:3/3.7;border:0;border-radius:12px;padding:6px 5px 5px;background:#efeae0;color:#5c5a52;font:inherit;font-size:11px;font-weight:800;text-align:left;cursor:pointer;display:flex;flex-direction:column;min-width:0;overflow:hidden}',
+      'body.dark .tm-dia{background:#25273a;color:#b8b9c5}',
+      '.tm-dia[disabled]{opacity:.28;cursor:default}',
+      '.tm-dia.futuro{background:transparent;border:1px dashed rgba(11,88,120,.22)}',
+      '.tm-dia.hecho{background:linear-gradient(150deg,#1278a0,#0b5878);color:#fff;box-shadow:0 8px 18px rgba(11,88,120,.22)}',
+      '.tm-dia.hoy{background:linear-gradient(150deg,#1278a0,#0b5878);color:#fff;box-shadow:0 12px 28px rgba(11,88,120,.32);outline:2px solid #e8b84a;outline-offset:1px}',
+      '.tm-dia .n{font-size:10px;letter-spacing:.06em;text-transform:uppercase;opacity:.85}',
+      '.tm-dia .m{margin-top:auto;font-size:9.5px;opacity:.8}',
+      '#tmCierre{display:none;position:fixed;inset:0;z-index:45000;align-items:center;justify-content:center;background:rgba(16,20,28,.38);padding:16px}',
+      '#tmCierre.on{display:flex}',
+      '#tmPicado{position:absolute;inset:0;overflow:hidden;pointer-events:none}',
+      '#tmPicado i{position:absolute;top:-24px;animation:tmCae linear infinite}',
+      '@keyframes tmCae{to{transform:translate3d(var(--dx),110vh,0) rotate(var(--rot))}}',
+      '.tm-carta{position:relative;z-index:2;width:min(380px,100%);max-height:86vh;overflow:auto;border-radius:24px;padding:16px 16px 14px;background:linear-gradient(150deg,#1278a0,#0b5878 58%,#063652);color:#fff;box-shadow:0 22px 60px rgba(10,12,40,.4);display:flex;flex-direction:column}',
+      '.tm-carta .cab{font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;opacity:.9}',
+      '.tm-carta h2{margin:6px 0 10px;font-size:26px;letter-spacing:-.4px}',
+      '.tm-carta ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}',
+      '.tm-carta li{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.16);font-size:13.5px;font-weight:800}',
+      '.tm-carta li.pend{opacity:.72}',
+      '.tm-bola{flex:0 0 22px;width:22px;height:22px;border-radius:50%;background:#7dcc6a;color:#163512;display:grid;place-items:center;font-size:13px;font-weight:900}',
+      '.tm-carta li.pend .tm-bola{background:rgba(255,255,255,.2);color:#fff}',
+      '.tm-pie{margin-top:12px;text-align:center;font-size:13px;font-weight:800}',
+      '.tm-x{position:absolute;top:8px;right:10px;border:0;background:transparent;color:#fff;font-size:22px;cursor:pointer;line-height:1}'
+    ].join('\n');
+    document.head.appendChild(s);
+  }
+
+  function pintar(){
+    css();
+    var host = document.getElementById('tmCal');
+    if (!host) return;
+    var now = hoy();
+    var anio = now.getFullYear();
+    var mes = now.getMonth();
+    var diaHoy = now.getDate();
+    var mapa = diasMes(anio, mes);
+    var kHoy = hoyKey();
+    var partido = null;
+    try{ partido = M() && M().partidoHoy && M().partidoHoy(); }catch(e){}
+    if (partido && partido.hay){
+      mapa[kHoy] = mapa[kHoy] || {};
+      mapa[kHoy].total = partido.total;
+      mapa[kHoy].hechas = partido.hechas;
+      mapa[kHoy].ganado = partido.ganado;
+    }
+    var vivos = 0;
+    Object.keys(mapa).forEach(function(k){
+      if (mapa[k] && mapa[k].hechas) vivos++;
+    });
+    var sub = document.getElementById('tmSub');
+    if (sub) sub.textContent = MESES[mes] + ' ' + anio + ' · Día ' + diaHoy + ' de ' + new Date(anio, mes+1, 0).getDate() +
+      (vivos ? ' · ' + vivos + (vivos === 1 ? ' día con movimiento' : ' días con movimiento') : '');
+
+    var sem = SEM.map(function(d){ return '<span>' + d + '</span>'; }).join('');
+    var celdas = '';
+    var shift = (new Date(anio, mes, 1).getDay() + 6) % 7;
+    var i;
+    for (i = 0; i < shift; i++) celdas += '<button type="button" class="tm-dia" disabled></button>';
+    var last = new Date(anio, mes+1, 0).getDate();
+    for (i = 1; i <= last; i++){
+      var k = anio + '-' + String(mes+1).padStart(2,'0') + '-' + String(i).padStart(2,'0');
+      var info = mapa[k];
+      var tipo = i > diaHoy ? 'futuro' : (i === diaHoy ? 'hoy' : (info && info.hechas ? 'hecho' : ''));
+      var marca = i === diaHoy ? 'Hoy ' + i : String(i);
+      var mini = '';
+      if (info && info.total){
+        mini = '<span class="m">' + (info.hechas || 0) + ' / ' + info.total + '</span>';
+      } else if (i === diaHoy && partido && partido.hay){
+        mini = '<span class="m">' + partido.hechas + ' / ' + partido.total + '</span>';
+      } else if (i < diaHoy){
+        mini = '<span class="m">sin movimiento</span>';
+      } else if (i > diaHoy){
+        mini = '<span class="m">sin abrir</span>';
+      }
+      celdas += '<button type="button" class="tm-dia ' + tipo + '" data-tm-dia="' + k + '"' +
+        (i > diaHoy ? ' disabled' : '') + '><span class="n">' + esc(marca) + '</span>' + mini + '</button>';
+    }
+    host.innerHTML = '<div class="tm-sem">' + sem + '</div><div class="tm-grid" style="margin-top:8px">' + celdas + '</div>';
+    host.querySelectorAll('[data-tm-dia]').forEach(function(b){
+      b.onclick = function(){ abrirDia(b.getAttribute('data-tm-dia'), b.classList.contains('hoy')); };
+    });
+  }
+
+  function itemsDe(k){
+    if (k === hoyKey()) return planaHoy();
+    var out = [];
+    try{
+      var raw = JSON.parse(localStorage.getItem('appi_acciones_v1_' + uid()) || '{}');
+      var marcas = raw.dias && raw.dias[k] && raw.dias[k].marcas;
+      if (!marcas) return out;
+      Object.keys(marcas).forEach(function(claveM){
+        var motId = claveM.split(':')[0];
+        var mot = M() && M().motivoPorId ? M().motivoPorId(motId) : null;
+        var marca = marcas[claveM];
+        out.push({
+          motivoId: motId,
+          icono: (mot && mot.icono) || '✓',
+          motivo: (mot && mot.nombre) || '',
+          nombre: pila(marca && marca.n) || (marca && marca.n) || '',
+          hecha: marca && marca.e === 'hecha',
+          noHecha: marca && marca.e === 'no_hecha'
+        });
+      });
+    }catch(e){}
+    return out;
+  }
+
+  function abrirDia(k, esHoy, fiesta){
+    css();
+    var items = itemsDe(k);
+    var velo = document.getElementById('tmCierre');
+    if (!velo){
+      velo = document.createElement('div');
+      velo.id = 'tmCierre';
+      velo.innerHTML = '<div id="tmPicado" aria-hidden="true"></div><article class="tm-carta" id="tmCarta"></article>';
+      document.body.appendChild(velo);
+      velo.addEventListener('click', function(e){ if (e.target === velo) cerrarCierre(); });
+    }
+    var hechas = items.filter(function(x){ return x.hecha; }).length;
+    var total = items.length;
+    var ganado = total > 0 && hechas === total;
+    var partes = String(k).split('-');
+    var tit = esHoy ? 'Tu día' : 'Tu día · ' + parseInt(partes[2],10) + ' ' + MESES[parseInt(partes[1],10)-1].toLowerCase();
+    var lista = items.length ? items.map(function(it){
+      var nom = it.nombre ? it.nombre : it.motivo;
+      var txt = it.icono + ' ' + nom + (it.motivo && it.nombre ? ' · ' + it.motivo : '');
+      return '<li class="' + (it.hecha ? '' : 'pend') + '"><span class="tm-bola">' + (it.hecha ? '✓' : '·') + '</span>' + esc(txt) + '</li>';
+    }).join('') : '<li class="pend"><span class="tm-bola">·</span>Este día no tuvo las 10 cargadas.</li>';
+    var pie = ganado
+      ? 'Hoy el negocio estuvo en movimiento. Eso vale.'
+      : (esHoy ? (hechas ? 'Vas ' + hechas + ' de ' + total + '. El día todavía está abierto.' : 'Todavía no hay movimiento. Las 10 te esperan.')
+               : (hechas ? 'Ese día quedó marcado.' : 'Ese día no tuvo movimiento.'));
+    if (!esHoy && ganado) pie = 'Ese día quedó marcado. Eso vale.';
+    document.getElementById('tmCarta').innerHTML =
+      '<button type="button" class="tm-x" aria-label="Cerrar">×</button>' +
+      '<div class="cab">💙 Para vos</div>' +
+      '<h2>' + esc(tit) + '</h2>' +
+      '<ul>' + lista + '</ul>' +
+      '<p class="tm-pie">' + esc(pie) + '</p>';
+    document.getElementById('tmCarta').querySelector('.tm-x').onclick = cerrarCierre;
+    velo.className = 'on';
+    picado(!!fiesta || (esHoy && ganado));
+  }
+
+  function cerrarCierre(){
+    var velo = document.getElementById('tmCierre');
+    if (velo) velo.className = '';
+    var p = document.getElementById('tmPicado');
+    if (p) p.innerHTML = '';
+  }
+
+  function picado(on){
+    var box = document.getElementById('tmPicado');
+    if (!box) return;
+    box.innerHTML = '';
+    if (!on) return;
+    var colores = ['#0b5878','#e8b84a','#f3eee3','#d4891a','#7dcc6a','#ff6b6b','#5b8def','#ffffff','#b03e12','#9a2d58'];
+    var n = 200, i;
+    for (i = 0; i < n; i++){
+      var b = document.createElement('i');
+      var w = 6 + Math.random() * 11;
+      b.style.width = w + 'px';
+      b.style.height = (8 + Math.random() * 16) + 'px';
+      b.style.left = (Math.random() * 100) + 'vw';
+      b.style.background = colores[i % colores.length];
+      b.style.borderRadius = Math.random() > 0.65 ? '50%' : '2px';
+      b.style.setProperty('--dx', (Math.random() * 120 - 60) + 'px');
+      b.style.setProperty('--rot', (220 + Math.random() * 700) + 'deg');
+      b.style.animationDuration = (3 + Math.random() * 3.2) + 's';
+      b.style.animationDelay = (-Math.random() * 5) + 's';
+      box.appendChild(b);
+    }
+  }
+
+  function fiestaSiGano(){
+    var api = M();
+    if (!api || !api.partidoHoy) return;
+    var p = api.partidoHoy();
+    if (!p || !p.ganado) return;
+    var k = hoyKey();
+    var flag = 'appi_tumes_fiesta_' + k;
+    try{ if (localStorage.getItem(flag)) return; localStorage.setItem(flag, '1'); }catch(e){ if (visto[k]) return; visto[k] = 1; }
+    abrirDia(k, true, true);
+  }
+
+  function enganchar(){
+    var api = M();
+    if (!api || api.__tmHook) return;
+    if (typeof api.marcarAccion !== 'function') return;
+    api.__tmHook = true;
+    var orig = api.marcarAccion;
+    api.marcarAccion = function(){
+      var r = orig.apply(this, arguments);
+      try{
+        var v = document.getElementById('view-tumes');
+        if (v && v.classList.contains('active')) pintar();
+        setTimeout(fiestaSiGano, 80);
+      }catch(e){}
+      return r;
+    };
+  }
+
+  function abrir(){
+    css();
+    if (typeof window.showView === 'function') window.showView('view-tumes');
+    pintar();
+    enganchar();
+  }
+
+  function cablearHome(){
+    css();
+    var card = document.querySelector('.home-month-card');
+    if (!card || card.__tm) return;
+    card.__tm = true;
+    card.setAttribute('role', 'button');
+    card.setAttribute('tabindex', '0');
+    card.setAttribute('aria-label', 'Abrir Tu mes');
+    card.addEventListener('click', abrir);
+    card.addEventListener('keydown', function(e){
+      if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); abrir(); }
+    });
+  }
+
+  window.openTuMes = abrir;
+  window.APPITuMes = { pintar: pintar, abrir: abrir, abrirDia: abrirDia };
+
+  function init(){
+    cablearHome();
+    enganchar();
+    var v = document.getElementById('view-tumes');
+    if (v && v.classList.contains('active')) pintar();
+  }
+  function envolverShow(){
+    if (window.__tmShowDone || typeof window.showView !== 'function') return;
+    window.__tmShowDone = 1;
+    var orig = window.showView;
+    window.showView = function(id){
+      var r = orig.apply(this, arguments);
+      try{ if (id === 'view-tumes') setTimeout(pintar, 40); }catch(e){}
+      return r;
+    };
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+  window.addEventListener('appi-datasync-applied', function(){ try{ pintar(); }catch(e){} });
+  setTimeout(init, 700);
+  setTimeout(envolverShow, 200);
+  setTimeout(envolverShow, 900);
+})();

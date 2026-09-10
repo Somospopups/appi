@@ -129,6 +129,7 @@ window.openStock=function(){
 <script src="./porque-vivo.js"></script>
 <script src="./home-limpio.js?v=520"></script>
   <script src="./home-tarjetas.js?v=574"></script>
+  <script src="./tu-mes.js?v=575"></script>
   <script src="./device-bridge.js?v=523"></script>
   <script src="./anuncios.js?v=521"></script>
   <script src="./aviso-telegram.js?v=555"></script>
@@ -4279,6 +4280,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
   <nav class="ds-nav">
     <button class="ds-btn active" data-ds="view-home" onclick="showView('view-home'); renderHomeCompleto();"><span>🏠</span> Home</button>
     <div class="ds-section-label">Mi mes</div>
+    <button class="ds-btn" data-ds="view-tumes" onclick="openTuMes()"><span>📅</span> Tu mes</button>
     <button class="ds-btn" data-ds="view-siete" onclick="openSiete()"><span>🚀</span> Las 7 P</button>
     <button class="ds-btn" data-ds="view-presu" onclick="openPresu()"><span>💰</span> Presupuesto</button>
     <button class="ds-btn" data-ds="rueda-vida" onclick="openRueda('vida')"><span>⚖️</span> Rueda de la Vida</button>
@@ -4301,7 +4303,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v574 · Segura</div>
+  <div class="ds-foot">APPI · v575 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4585,7 +4587,7 @@ body.dark #pageTabs button.active{color:#c5d6ff}
       <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
 
       <div class="home-brand-row">
-        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · v574</span></span>
+        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · v575</span></span>
       </div>
 
       <div class="home-hero-card">
@@ -4594,7 +4596,7 @@ body.dark #pageTabs button.active{color:#c5d6ff}
           <span class="home-subtitle" id="todayText" style="margin:0;font-size:12px;color:#5c5c66;">—</span>
         </div>
 
-        <div class="home-month-card">
+        <div class="home-month-card" id="homeMonthCard" role="button" tabindex="0" aria-label="Abrir Tu mes">
           <div class="home-month-row">
             <span id="homeMonthName">Este mes</span>
             <strong id="dayInfo">—</strong>
@@ -4602,7 +4604,7 @@ body.dark #pageTabs button.active{color:#c5d6ff}
           <div class="month-progress home-month-progress">
             <div class="fill" id="monthProgressFill" style="width:0%"></div>
           </div>
-          <div class="home-month-caption"><span id="monthProgressPct">0%</span> del mes recorrido</div>
+          <div class="home-month-caption"><span id="monthProgressPct">0%</span> del mes recorrido · Tu mes ›</div>
         </div>
       </div>
     </header>
@@ -4755,6 +4757,20 @@ body.dark #pageTabs button.active{color:#c5d6ff}
       <p>Lo que tenés y lo que prestaste</p>
     </header>
     <div class="st-wrap" id="stockCont"></div>
+  </section>
+
+  <section id="view-tumes" class="view">
+    <header class="top">
+      <button class="back-btn" id="btnBackTuMes" aria-label="Volver">‹</button>
+      <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
+      <h1>Tu</h1>
+      <div class="script">mes</div>
+      <p>Las cartas de cada día</p>
+    </header>
+    <div class="tm-wrap">
+      <p class="tm-sub" id="tmSub">Este mes</p>
+      <div id="tmCal"></div>
+    </div>
   </section>
 
   <section id="view-siete" class="view">
@@ -6595,16 +6611,16 @@ function showView(id,opts){
     b.classList.toggle('active', b.dataset.view===id);
   });
   // Sidebar escritorio: marcar activo (con equivalencias de sub-vistas)
-  const dsMap = {'view-home':'view-home','view-presu':'view-presu','view-presu-hist':'view-presu','view-equipo':'view-equipo','view-historico':'view-historico','view-usuarios':'view-usuarios','view-seguimiento':'view-seguimiento','view-encuesta':'view-encuesta','view-gestion':'view-gestion','view-grabadora':'view-grabadora','view-notas':'view-notas','view-siete':'view-siete','view-siete-detail':'view-siete','view-ocho':'view-ocho','view-suenos':'view-suenos','view-demo':'view-demo','view-botella':'view-botella','view-simulador':'view-simulador','view-stock':'view-stock','view-reuniones':'view-reuniones'};
+  const dsMap = {'view-home':'view-home','view-presu':'view-presu','view-presu-hist':'view-presu','view-equipo':'view-equipo','view-historico':'view-historico','view-usuarios':'view-usuarios','view-seguimiento':'view-seguimiento','view-encuesta':'view-encuesta','view-gestion':'view-gestion','view-grabadora':'view-grabadora','view-notas':'view-notas','view-tumes':'view-tumes','view-siete':'view-siete','view-siete-detail':'view-siete','view-ocho':'view-ocho','view-suenos':'view-suenos','view-demo':'view-demo','view-botella':'view-botella','view-simulador':'view-simulador','view-stock':'view-stock','view-reuniones':'view-reuniones'};
   const dsTarget = (id==='view-wheel'||id==='view-eval') ? `rueda-${currentRueda||'vida'}` : (dsMap[id] || '');
   document.querySelectorAll('#deskSidebar .ds-btn').forEach(b=>{
     b.classList.toggle('active', b.dataset.ds===dsTarget);
   });
-  const hideTabsOn = ['view-home','view-siete','view-siete-detail','view-ocho','view-suenos','view-demo','view-botella','view-simulador','view-stock','view-presu','view-presu-hist','view-equipo','view-historico','view-seguimiento','view-planning','view-encuesta','view-gestion','view-grabadora','view-notas','view-usuarios','view-admin'];
+  const hideTabsOn = ['view-home','view-tumes','view-siete','view-siete-detail','view-ocho','view-suenos','view-demo','view-botella','view-simulador','view-stock','view-presu','view-presu-hist','view-equipo','view-historico','view-seguimiento','view-planning','view-encuesta','view-gestion','view-grabadora','view-notas','view-usuarios','view-admin'];
   document.getElementById('tabs').style.display = (id==='view-wheel'||id==='view-eval') ? 'flex' : 'none';
   const _pageHub={
     'view-home':'view-home',
-    'view-mes':'view-mes','view-siete':'view-mes','view-siete-detail':'view-mes','view-presu':'view-mes','view-presu-hist':'view-mes','view-wheel':'view-mes','view-eval':'view-mes','view-planning':'view-mes',
+    'view-mes':'view-mes','view-tumes':'view-mes','view-siete':'view-mes','view-siete-detail':'view-mes','view-presu':'view-mes','view-presu-hist':'view-mes','view-wheel':'view-mes','view-eval':'view-mes','view-planning':'view-mes',
     'view-negocio':'view-negocio','view-equipo':'view-negocio','view-historico':'view-negocio','view-usuarios':'view-negocio','view-seguimiento':'view-negocio','view-gestion':'view-negocio',
     'view-herramientas':'view-herramientas','view-stock':'view-herramientas','view-ocho':'view-herramientas','view-suenos':'view-herramientas','view-demo':'view-herramientas','view-botella':'view-herramientas','view-simulador':'view-herramientas','view-grabadora':'view-herramientas','view-notas':'view-herramientas','view-encuesta':'view-herramientas'
   };
@@ -6722,6 +6738,7 @@ function openRueda(id){
 
 document.getElementById('btnBack1').addEventListener('click', ()=> showView('view-home'));
 document.getElementById('btnBack2').addEventListener('click', ()=> showView('view-home'));
+document.getElementById('btnBackTuMes').addEventListener('click', ()=> showView('view-home'));
 document.getElementById('btnBackSiete').addEventListener('click', ()=> showView('view-home'));
 document.getElementById('btnBackSieteDetail').addEventListener('click', ()=> { showView('view-siete'); renderSieteHome(); });
 document.getElementById('btnBackPresu').addEventListener('click', ()=> showView('view-home'));
@@ -12806,8 +12823,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='574';
-      const CACHE_NAME='appi-v574-poster';
+      const swVersion='575';
+      const CACHE_NAME='appi-v575-poster';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · v'+swVersion;
       const hadController=Boolean(navigator.serviceWorker.controller);
