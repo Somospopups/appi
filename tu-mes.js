@@ -1,7 +1,7 @@
-/* APPI · Tu mes v599 — cerebro
+/* APPI · Tu mes v600 — cerebro
    El mes es un tablero de cartas. Cada día, las 10 de la jornada.
    La puerta es la franja de septiembre del Home.
-   v599: TU MES es cerebro — timeline al abrir día + métricas sutiles arriba.
+   v600: TU MES detalle por día desde la tarjeta de resumen · popup + v599 cerebro — timeline al abrir día + métricas sutiles arriba.
    Eventos viven en appi-eventos.js (bus central silencioso).
 */
 (function () {
@@ -201,7 +201,58 @@
       'body.dark .tm-kpis li{border-top-color:rgba(255,255,255,.08)}',
       '.tm-kpis li:first-child{border-top:0}',
       '.tm-kpis li i{font-style:normal;color:#0b5878;font-size:16px;font-weight:900}',
-      'body.dark .tm-kpis li i{color:#8ec8e0}'
+      'body.dark .tm-kpis li i{color:#8ec8e0}',
+      '.tm-kpis{cursor:pointer;transition:transform .12s,box-shadow .12s}',
+      '.tm-kpis:active{transform:scale(.98)}',
+      '.tm-kpis:focus{outline:2px solid #0b5878;outline-offset:2px}',
+      '.tm-kpis-hint{margin-top:10px;text-align:center;font-size:11px;font-weight:850;color:#0b5878;opacity:.75;letter-spacing:.02em}',
+      'body.dark .tm-kpis-hint{color:#8ec8e0}',
+      '.tm-kpis li.tm-kpi-row{cursor:pointer;border-radius:10px;margin:0 -6px;padding:9px 6px;transition:background .15s}',
+      '.tm-kpis li.tm-kpi-row:hover{background:rgba(11,88,120,.06)}',
+      'body.dark .tm-kpis li.tm-kpi-row:hover{background:rgba(255,255,255,.06)}',
+      '#tmDetalle{display:none;position:fixed;inset:0;z-index:46000;align-items:center;justify-content:center;background:rgba(16,20,28,.44);padding:16px}',
+      '#tmDetalle.on{display:flex}',
+      '.tm-det-card{position:relative;width:min(440px,100%);max-height:88vh;overflow:hidden;display:flex;flex-direction:column;border-radius:22px;background:#fff;color:#1d1d2c;box-shadow:0 22px 60px rgba(10,12,40,.38)}',
+      'body.dark .tm-det-card{background:#1e1f30;color:#f0f0f5}',
+      '.tm-det-head{position:sticky;top:0;z-index:2;padding:16px 16px 12px;background:inherit;border-bottom:1px solid rgba(11,88,120,.07)}',
+      'body.dark .tm-det-head{border-bottom-color:rgba(255,255,255,.08)}',
+      '.tm-det-head .eyebrow{font-size:10px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:#0b5878;opacity:.85}',
+      'body.dark .tm-det-head .eyebrow{color:#8ec8e0}',
+      '.tm-det-head h2{margin:4px 0 6px;font-size:20px;font-weight:900;letter-spacing:-.3px;line-height:1.2}',
+      '.tm-det-head p{margin:0;font-size:12.5px;font-weight:700;color:#5b5a52;line-height:1.4}',
+      'body.dark .tm-det-head p{color:#b8b9c5}',
+      '.tm-det-close{position:absolute;top:10px;right:10px;width:40px;height:40px;border:0;border-radius:50%;background:rgba(0,0,0,.08);color:#1d1d2c;font-size:22px;font-weight:700;display:grid;place-items:center;cursor:pointer}',
+      'body.dark .tm-det-close{background:rgba(255,255,255,.10);color:#fff}',
+      '.tm-det-body{overflow:auto;flex:1;min-height:0;padding:14px 16px 16px;-webkit-overflow-scrolling:touch}',
+      '.tm-det-summary{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 14px}',
+      '.tm-det-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:rgba(11,88,120,.07);border:1px solid rgba(11,88,120,.06);font-size:11px;font-weight:850;color:#1d1d2c}',
+      'body.dark .tm-det-chip{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.06);color:#f0f0f5}',
+      '.tm-det-filt{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 14px}',
+      '.tm-det-filt button{border:1px solid rgba(11,88,120,.12);background:rgba(11,88,120,.04);color:#0b5878;padding:6px 10px;border-radius:999px;font-size:11px;font-weight:850;cursor:pointer}',
+      '.tm-det-filt button.on{background:#0b5878;color:#fff;border-color:#0b5878}',
+      'body.dark .tm-det-filt button{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.08);color:#d6d7de}',
+      'body.dark .tm-det-filt button.on{background:#8ec8e0;color:#0b2a3a;border-color:#8ec8e0}',
+      '.tm-det-day{margin-bottom:10px;padding:12px;border-radius:16px;background:#f8f7f3;border:1px solid rgba(11,88,120,.06)}',
+      'body.dark .tm-det-day{background:rgba(37,41,64,.52);border-color:rgba(255,255,255,.06)}',
+      '.tm-det-day-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}',
+      '.tm-det-day-head strong{font-size:13.5px;font-weight:900;letter-spacing:-.2px}',
+      '.tm-det-day-head .right{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:850}',
+      '.tm-det-day .sema{width:8px;height:8px;border-radius:50%;display:inline-block}',
+      '.tm-det-day .sema.verde{background:#1aa36e}',
+      '.tm-det-day .sema.amarillo{background:#d4891a}',
+      '.tm-det-day .sema.rojo{background:#e05545}',
+      '.tm-det-day .sema.neutro{background:rgba(11,88,120,.18)}',
+      'body.dark .tm-det-day .sema.neutro{background:rgba(255,255,255,.18)}',
+      '.tm-det-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}',
+      '.tm-det-list li{display:flex;align-items:flex-start;gap:8px;padding:7px 8px;border-radius:10px;background:rgba(255,255,255,.72);border:1px solid rgba(11,88,120,.06);font-size:12.5px;font-weight:750;line-height:1.3}',
+      'body.dark .tm-det-list li{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.06)}',
+      '.tm-det-list li .ico{flex:0 0 auto;font-size:13px;margin-top:1px}',
+      '.tm-det-list li .who{flex:1;min-width:0}',
+      '.tm-det-list li .who b{display:block;font-size:12.5px;font-weight:900;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+      '.tm-det-list li .who small{display:block;font-size:11px;font-weight:700;opacity:.75;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+      '.tm-det-empty{padding:18px 14px;border-radius:14px;background:rgba(11,88,120,.04);border:1px dashed rgba(11,88,120,.14);text-align:center;font-size:12.5px;font-weight:700;color:#5b5a52;line-height:1.5}',
+      'body.dark .tm-det-empty{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.08);color:#b8b9c5}'
+
     ].join('\n');
     document.head.appendChild(s);
   }
@@ -240,7 +291,7 @@
         cnt[it.motivoId]++;
       });
     }
-    return orden.map(function(o){ return { icono: o.icono, nombre: o.nombre, n: cnt[o.id] || 0 }; });
+    return orden.map(function(o){ return { id: o.id, icono: o.icono, nombre: o.nombre, n: cnt[o.id] || 0 }; });
   }
   function pintarKpis(anio, mes, mapa){
     var box = document.getElementById('tmKpis');
@@ -257,8 +308,6 @@
     var frase = vivos
       ? (vivos + (vivos === 1 ? ' día' : ' días') + ' el negocio estuvo vivo. Atendiste ' + personas + (personas === 1 ? ' persona.' : ' personas.'))
       : 'Este mes todavía no hay movimiento. Las 10 van a ir llenando esto.';
-
-    // Métricas de cerebro (eventos) — sutiles dentro del KPI box
     var evResumen = null;
     try{
       if(E() && typeof E().resumenMes==='function') evResumen = E().resumenMes(anio, mes);
@@ -276,11 +325,55 @@
           '<span class="tm-metric muted" style="font-size:10.5px;padding:4px 8px">· '+evResumen.total+' movimientos</span></div>';
       }
     }
-
+    var hint = '<div class="tm-kpis-hint">Tocar para ver detalle por día ›</div>';
     box.innerHTML = '<p class="tm-frase">' + esc(frase) + '</p><ul>' +
       filas.map(function(f){
-        return '<li><span>' + f.icono + ' ' + esc(f.nombre) + '</span><i>' + f.n + '</i></li>';
-      }).join('') + '</ul>' + extraEventos;
+        return '<li class="tm-kpi-row" data-tipo="'+esc(f.id||'')+'"><span>' + f.icono + ' ' + esc(f.nombre) + '</span><i>' + f.n + '</i></li>';
+      }).join('') + '</ul>' + extraEventos + hint;
+    // — hacer la tarjeta tocable → popup por día (v600) —
+    try{
+      box.setAttribute('role','button');
+      box.setAttribute('tabindex','0');
+      box.setAttribute('aria-label','Ver detalle por día de '+MESES[mes]+' '+anio);
+      box.__tmDetalleAnio = anio; box.__tmDetalleMes = mes;
+      if(!box.__tmDetalleHook){
+        box.__tmDetalleHook = true;
+        box.addEventListener('click', function(e){
+          var row = e.target.closest && e.target.closest('.tm-kpi-row');
+          if(row){
+            var tipo = row.getAttribute('data-tipo')||'';
+            // evitar que el click general también dispare
+            e.stopPropagation();
+            abrirDetalleMes(box.__tmDetalleAnio, box.__tmDetalleMes, tipo);
+            return;
+          }
+          abrirDetalleMes(box.__tmDetalleAnio, box.__tmDetalleMes);
+        });
+        box.addEventListener('keydown', function(e){
+          if(e.key==='Enter' || e.key===' '){
+            e.preventDefault();
+            var active = document.activeElement;
+            if(active && active.classList.contains('tm-kpi-row')){
+              var tipo = active.getAttribute('data-tipo')||'';
+              abrirDetalleMes(box.__tmDetalleAnio, box.__tmDetalleMes, tipo);
+            } else {
+              abrirDetalleMes(box.__tmDetalleAnio, box.__tmDetalleMes);
+            }
+          }
+        });
+        // también hacer cada fila focable para teclado
+        box.querySelectorAll('.tm-kpi-row').forEach(function(r){
+          r.setAttribute('tabindex','0');
+          r.setAttribute('role','button');
+        });
+      } else {
+        // actualizar filas focables en re-render
+        box.querySelectorAll('.tm-kpi-row').forEach(function(r){
+          r.setAttribute('tabindex','0');
+          r.setAttribute('role','button');
+        });
+      }
+    }catch(e){}
   }
 
   var DESC_TAREA = {
@@ -579,6 +672,215 @@
     if (p) p.innerHTML = '';
   }
 
+  // — Detalle por día desde la tarjeta de resumen (v600) —
+  var _detAnio = 0, _detMes = 0, _detFiltro = '';
+  var DIAS_LARGO = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+  var DIAS_CORTO = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  function formatoDiaDetalle(k){
+    try{
+      var partes = String(k).split('-');
+      var y = parseInt(partes[0],10), m = parseInt(partes[1],10)-1, d = parseInt(partes[2],10);
+      var dt = new Date(y,m,d);
+      var wd = dt.getDay();
+      var esHoy = k === hoyKey();
+      return {
+        d: d,
+        mTexto: MESES[m].toLowerCase(),
+        wdLargo: DIAS_LARGO[wd],
+        wdCorto: DIAS_CORTO[wd],
+        etiqu: (esHoy ? 'Hoy · ' : '') + DIAS_CORTO[wd] + ' ' + d + ' ' + MESES[m].slice(0,3).toLowerCase(),
+        esHoy: esHoy
+      };
+    }catch(e){ return {d:0,mTexto:'',wdLargo:'',wdCorto:'',etiqu:k,esHoy:false}; }
+  }
+  function cerrarDetalle(){
+    var v = document.getElementById('tmDetalle');
+    if(v) v.classList.remove('on');
+    // liberar scroll si se había bloqueado
+    try{ document.body.classList.remove('appi-scroll-lock'); }catch(e){}
+  }
+  function asegurarDetalleDom(){
+    var v = document.getElementById('tmDetalle');
+    if(v) return v;
+    v = document.createElement('div');
+    v.id = 'tmDetalle';
+    v.setAttribute('role','dialog');
+    v.setAttribute('aria-modal','true');
+    v.innerHTML = '<div class="tm-det-card" id="tmDetCard"><button type="button" class="tm-det-close" aria-label="Cerrar">×</button><div class="tm-det-head" id="tmDetHead"></div><div class="tm-det-body" id="tmDetBody"></div></div>';
+    document.body.appendChild(v);
+    v.addEventListener('click', function(e){ if(e.target===v) cerrarDetalle(); });
+    var btn = v.querySelector('.tm-det-close');
+    if(btn) btn.onclick = function(e){ e.preventDefault(); cerrarDetalle(); };
+    document.addEventListener('keydown', function(e){
+      if(e.key==='Escape'){
+        var vv=document.getElementById('tmDetalle');
+        if(vv && vv.classList.contains('on')) cerrarDetalle();
+      }
+    });
+    return v;
+  }
+  function htmlDetalleFiltros(filas, activo){
+    var allN = filas.reduce(function(s,f){ return s+ (f.n||0); },0);
+    var chips = [{id:'', nombre:'Todos', n: allN, icono:'✦'}].concat(filas);
+    return '<div class="tm-det-filt">' + chips.map(function(c){
+      var on = String(activo||'')===String(c.id||'');
+      var label = c.icono ? (c.icono+' '+c.nombre) : c.nombre;
+      return '<button type="button" class="'+(on?'on':'')+'" data-det-filtro="'+esc(c.id||'')+'">'+esc(label)+' <b>'+(c.n||0)+'</b></button>';
+    }).join('') + '</div>';
+  }
+  function renderDetalleCuerpo(){
+    var anio=_detAnio, mes=_detMes, filtro=_detFiltro;
+    var mapa = diasMes(anio, mes);
+    // incluir hoy si es mes actual
+    var now=hoy();
+    var esActual = anio===now.getFullYear() && mes===now.getMonth();
+    if(esActual){
+      try{
+        var partido = M() && M().partidoHoy && M().partidoHoy();
+        if(partido && partido.hay){
+          var kHoy=hoyKey();
+          mapa[kHoy]=mapa[kHoy]||{};
+          mapa[kHoy].total=partido.total;
+          mapa[kHoy].hechas=partido.hechas;
+          mapa[kHoy].ganado=partido.ganado;
+        }
+      }catch(e){}
+    }
+    var filas = desgloseMes(anio, mes, mapa);
+    var head = document.getElementById('tmDetHead');
+    var body = document.getElementById('tmDetBody');
+    if(!head || !body) return;
+    var titulo = MESES[mes]+' '+anio;
+    var subt = '';
+    var vivos=0, personas=0;
+    Object.keys(mapa).forEach(function(k){ var d=mapa[k]; if(d && d.hechas){ vivos++; personas+=Number(d.hechas)||0; }});
+    if(vivos) subt = vivos+(vivos===1?' día con movimiento':' días con movimiento')+' · '+(personas||0)+(personas===1?' persona atendida':' personas atendidas');
+    else subt = 'Aún sin movimiento este mes. Cada Hecho va a aparecer acá, día por día.';
+    // chips cerebro
+    var evResumen=null; try{ if(E() && E().resumenMes) evResumen=E().resumenMes(anio,mes); }catch(e){}
+    var chipsHtml='';
+    if(evResumen && evResumen.total){
+      var parts=[];
+      if(evResumen.mensajes) parts.push('💬 '+evResumen.mensajes);
+      if(evResumen.acciones) parts.push('✓ '+evResumen.acciones);
+      if(evResumen.contactos) parts.push('👤 '+evResumen.contactos);
+      if(evResumen.cultura) parts.push('🌱 '+evResumen.cultura);
+      chipsHtml='<div class="tm-det-summary">'+parts.map(function(p){ return '<span class="tm-det-chip">'+esc(p)+'</span>';}).join('')+'<span class="tm-det-chip" style="opacity:.65">· '+evResumen.total+' movimientos</span></div>';
+    }
+    head.innerHTML = '<div class="eyebrow">Detalle por día</div><h2>'+esc(titulo)+'</h2><p>'+esc(subt)+'</p>'+chipsHtml+ htmlDetalleFiltros(filas, filtro);
+    // attach filtro handlers
+    head.querySelectorAll('[data-det-filtro]').forEach(function(b){
+      b.onclick=function(){ _detFiltro=b.getAttribute('data-det-filtro')||''; renderDetalleCuerpo(); };
+    });
+
+    // construir lista de días con movimiento (orden cronológico)
+    var diasOrden = Object.keys(mapa).sort();
+    // también incluir días que tienen eventos pero no marca hechas (movimiento sutil)
+    try{
+      if(E() && E().listarMes){
+        var evs=E().listarMes(anio,mes);
+        evs.forEach(function(ev){ if(diasOrden.indexOf(ev.dia)<0) diasOrden.push(ev.dia); });
+        diasOrden.sort();
+      }
+    }catch(e){}
+    // filtrar días futuros en mes actual
+    if(esActual){
+      var hoyD = now.getDate();
+      diasOrden = diasOrden.filter(function(k){
+        var diaNum = parseInt(String(k).split('-')[2],10);
+        return diaNum <= hoyD;
+      });
+      // asegurar que hoy aparezca aunque no tenga hechas (para ver timeline)
+      var kHoy2=hoyKey();
+      if(diasOrden.indexOf(kHoy2)<0){
+        // solo si hay al menos un movimiento en el mes o es hoy mismo con partido?
+        // lo agregamos al final para no vaciar si mes vacío
+        // Si mes totalmente vacío, dejamos lista vacía y mostramos empty
+      }
+    }
+
+    var htmlDays='';
+    var diasConAlgo=0;
+    diasOrden.forEach(function(k){
+      var info = mapa[k] || null;
+      var hechas = info ? (Number(info.hechas)||0) : 0;
+      var total = info ? (Number(info.total)||0) : 0;
+      var sem = semaforo(hechas, total);
+      // items del día
+      var items = [];
+      try{ items = itemsDe(k); }catch(e){ items=[]; }
+      var hechos = items.filter(function(it){ return it.hecha; });
+      var hechosFiltrados = filtro ? hechos.filter(function(it){ return String(it.motivoId||'')===String(filtro); }) : hechos;
+      // si filtro activo y no hay hechos de ese tipo ese día, saltear día a menos que tenga eventos que coincidan? Para no vaciar, saltamos
+      if(filtro && !hechosFiltrados.length){
+        // pero si el día tiene eventos y filtro es de tipo tarea, no mostrarlo (para foco)
+        return;
+      }
+      // si no hay hechos ni eventos y no es hoy, saltear (no aporta)
+      var evDay=[];
+      try{ if(E() && E().listar) evDay = E().listar({dia:k})||[]; }catch(e){}
+      if(!hechosFiltrados.length && !evDay.length && hechas===0) return;
+      diasConAlgo++;
+      var fmt = formatoDiaDetalle(k);
+      var semCls = sem || (hechosFiltrados.length ? 'neutro' : 'neutro');
+      var badge = total ? (hechas+'/'+total) : (hechosFiltrados.length ? (hechosFiltrados.length+' hecho'+(hechosFiltrados.length>1?'s':'')) : '');
+      if(evDay.length && !total) badge = badge ? (badge+' · '+evDay.length+' mov.') : (evDay.length+' mov.');
+      var dotEvent = evDay.length ? ' <span style="font-size:11px">· 💬</span>' : '';
+      htmlDays += '<div class="tm-det-day" data-det-dia="'+esc(k)+'" role="button" tabindex="0" aria-label="Abrir '+esc(fmt.etiqu)+'">'
+        + '<div class="tm-det-day-head"><strong>'+esc(fmt.etiqu)+(fmt.esHoy?' · Hoy':'')+'</strong><span class="right"><i class="sema '+esc(semCls)+'" aria-hidden="true"></i><span>'+esc(badge)+'</span>'+dotEvent+'</span></div>';
+      if(hechosFiltrados.length){
+        htmlDays += '<ul class="tm-det-list">' + hechosFiltrados.map(function(it){
+          var desc = descTarea(it);
+          var nom = it.nombre && it.nombre!=='Sin marcar' ? it.nombre : '';
+          var ico = esc(it.icono||'✓');
+          return '<li><span class="ico">'+ico+'</span><span class="who"><b>'+esc(desc)+'</b>'+(nom?'<small>'+esc(nom)+'</small>':'')+'</span></li>';
+        }).join('') + '</ul>';
+      } else if(filtro){
+        var __fNom=''+filtro; try{ var __ff=filas.find(function(f){return f.id===filtro;}); if(__ff && __ff.nombre) __fNom=__ff.nombre; }catch(e){}
+        htmlDays += '<div style="font-size:12px;font-weight:700;opacity:.6;padding:6px 0">Sin '+esc(__fNom)+' este día.</div>';
+      } else if(evDay.length){
+        // sin hechos pero con eventos: mostrar hint
+        htmlDays += '<div style="font-size:12px;font-weight:700;opacity:.65;padding:6px 0">Sin tareas marcadas, pero hay '+evDay.length+' movimiento'+(evDay.length>1?'s':'')+' registrado'+(evDay.length>1?'s':'')+'.</div>';
+      }
+      if(evDay.length){
+        // mini timeline resumido (hasta 3)
+        var evShow = evDay.slice(-3).reverse();
+        htmlDays += '<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px">'+evShow.map(function(ev){
+          return '<span class="tm-det-chip" style="font-size:10.5px;padding:4px 8px">'+esc(iconoEv(ev.tipo))+' '+esc((ev.titulo||textoTipo(ev.tipo)).slice(0,22))+' · '+esc(horaDe(ev.ts))+'</span>';
+        }).join('')+'</div>';
+      }
+      htmlDays += '</div>';
+    });
+    if(!diasConAlgo){
+      var filtroNombre=''; if(filtro){ try{ var __ff2=filas.find(function(f){return f.id===filtro;}); filtroNombre=(__ff2 && __ff2.nombre)?__ff2.nombre:filtro; }catch(e){ filtroNombre=filtro; } }
+      body.innerHTML = filtro
+        ? '<div class="tm-det-empty">No hay “'+esc(filtroNombre)+'” marcados como Hecho en '+esc(MESES[mes])+'.<br>Probá con “Todos” o tocá otro filtro arriba.</div>'
+        : '<div class="tm-det-empty">Este mes todavía no tiene días con Hecho.<br>Cuando marques ✓ en Las 10 o envíes un mensaje, va a aparecer acá — día por día, sin tocar nada extra.</div>';
+    } else {
+      body.innerHTML = htmlDays;
+      // click en día → abrir modal del día (y cerrar detalle)
+      body.querySelectorAll('[data-det-dia]').forEach(function(card){
+        var k=card.getAttribute('data-det-dia');
+        function go(){ cerrarDetalle(); setTimeout(function(){ abrirDia(k, k===hoyKey()); }, 120); }
+        card.addEventListener('click', go);
+        card.addEventListener('keydown', function(e){ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); go(); }});
+      });
+    }
+  }
+  function abrirDetalleMes(anio, mes, filtro){
+    css();
+    _detAnio = Number(anio)||hoy().getFullYear();
+    _detMes = Number(mes)||hoy().getMonth();
+    _detFiltro = String(filtro||'');
+    asegurarDetalleDom();
+    renderDetalleCuerpo();
+    var v=document.getElementById('tmDetalle');
+    if(v){ v.classList.add('on'); try{ document.body.classList.add('appi-scroll-lock'); }catch(e){} }
+    // foco al cierre para accesibilidad
+    setTimeout(function(){ try{ var c=document.querySelector('#tmDetalle .tm-det-close'); if(c) c.focus(); }catch(e){} }, 50);
+  }
+
+
   function picado(on){
     var box = document.getElementById('tmPicado');
     if (!box) return;
@@ -685,7 +987,7 @@
   }
 
   window.openTuMes = abrir;
-  window.APPITuMes = { pintar: pintar, abrir: abrir, abrirDia: abrirDia };
+  window.APPITuMes = { pintar: pintar, abrir: abrir, abrirDia: abrirDia, abrirDetalle: abrirDetalleMes, cerrarDetalle: cerrarDetalle };
 
   function init(){
     cablearHome();
@@ -699,7 +1001,10 @@
     var orig = window.showView;
     window.showView = function(id){
       var r = orig.apply(this, arguments);
-      try{ if (id === 'view-tumes') setTimeout(pintar, 40); }catch(e){}
+      try{
+        if (id === 'view-tumes') setTimeout(pintar, 40);
+        else cerrarDetalle();
+      }catch(e){}
       return r;
     };
   }
