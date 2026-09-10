@@ -96,8 +96,11 @@
       'body.dark .tm-dia{background:#25273a;color:#b8b9c5}',
       '.tm-dia[disabled]{opacity:.28;cursor:default}',
       '.tm-dia.futuro{background:transparent;border:1px dashed rgba(11,88,120,.22)}',
-      '.tm-dia.hecho{background:linear-gradient(150deg,#1278a0,#0b5878);color:#fff;box-shadow:0 8px 18px rgba(11,88,120,.22)}',
-      '.tm-dia.hoy{background:linear-gradient(150deg,#1278a0,#0b5878);color:#fff;box-shadow:0 12px 28px rgba(11,88,120,.32);outline:2px solid #e8b84a;outline-offset:1px}',
+      '.tm-dia.rojo{background:linear-gradient(150deg,#e05545,#9a2a1c);color:#fff;box-shadow:0 8px 18px rgba(154,42,28,.28)}',
+      '.tm-dia.amarillo{background:linear-gradient(150deg,#f0c85a,#d4891a);color:#1d1d2c;box-shadow:0 8px 18px rgba(212,137,26,.28)}',
+      '.tm-dia.verde{background:linear-gradient(150deg,#1aa36e,#0f5a46);color:#fff;box-shadow:0 8px 18px rgba(15,90,70,.28)}',
+      '.tm-dia.hoy{outline:2px solid #0b5878;outline-offset:1px;box-shadow:0 12px 28px rgba(11,88,120,.32)}',
+      '.tm-dia.amarillo .n,.tm-dia.amarillo .m{color:#1d1d2c;opacity:.9}',
       '.tm-dia .n{font-size:10px;letter-spacing:.06em;text-transform:uppercase;opacity:.85}',
       '.tm-dia .m{margin-top:auto;font-size:9.5px;opacity:.8}',
       '#tmCierre{display:none;position:fixed;inset:0;z-index:45000;align-items:center;justify-content:center;background:rgba(16,20,28,.38);padding:16px}',
@@ -106,6 +109,12 @@
       '#tmPicado i{position:absolute;top:-24px;animation:tmCae linear infinite}',
       '@keyframes tmCae{to{transform:translate3d(var(--dx),110vh,0) rotate(var(--rot))}}',
       '.tm-carta{position:relative;z-index:2;width:min(380px,100%);max-height:86vh;overflow:hidden;border-radius:24px;padding:16px 16px 14px;background:linear-gradient(150deg,#1278a0,#0b5878 58%,#063652);color:#fff;box-shadow:0 22px 60px rgba(10,12,40,.4);display:flex;flex-direction:column}',
+      '.tm-carta.rojo{background:linear-gradient(150deg,#e05545,#9a2a1c 58%,#5c1810)}',
+      '.tm-carta.amarillo{background:linear-gradient(150deg,#f0c85a,#d4891a 58%,#8a6410);color:#1d1d2c}',
+      '.tm-carta.verde{background:linear-gradient(150deg,#1aa36e,#0f5a46 58%,#08382c)}',
+      '.tm-carta.amarillo .cab,.tm-carta.amarillo .tm-pie,.tm-carta.amarillo .tm-grupo,.tm-carta.amarillo .tm-x{color:#1d1d2c}',
+      '.tm-carta.amarillo li{background:rgba(0,0,0,.08);border-color:rgba(0,0,0,.12);color:#1d1d2c}',
+      '.tm-grupo{margin:10px 0 6px;font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.85}',
       '.tm-carta-cuerpo{overflow:auto;flex:1;min-height:0;-webkit-overflow-scrolling:touch}',
       '.tm-carta .cab{font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;opacity:.9}',
       '.tm-carta h2{margin:6px 0 10px;font-size:26px;letter-spacing:-.4px}',
@@ -187,6 +196,13 @@
       }).join('') + '</ul>';
   }
 
+  function semaforo(hechas, total){
+    if (!total) return '';
+    var p = hechas / total;
+    if (p >= 0.8) return 'verde';
+    if (p >= 0.4) return 'amarillo';
+    return 'rojo';
+  }
   function irMes(delta){
     var d = new Date(vistaAnio, vistaMes + delta, 1);
     var now = hoy();
@@ -252,13 +268,14 @@
       var info = mapa[k];
       var futuro = esActual && i > diaHoy;
       var esHoyCel = esActual && i === diaHoy;
-      var tipo = futuro ? 'futuro' : (esHoyCel ? 'hoy' : (info && info.hechas ? 'hecho' : ''));
+      var hDia = info && info.total ? (Number(info.hechas)||0) : (esHoyCel && partido && partido.hay ? partido.hechas : 0);
+      var tDia = info && info.total ? info.total : (esHoyCel && partido && partido.hay ? partido.total : 0);
+      var sem = futuro ? '' : semaforo(hDia, tDia);
+      var tipo = (futuro ? 'futuro' : '') + (esHoyCel ? ' hoy' : '') + (sem ? ' ' + sem : '');
       var marca = esHoyCel ? 'Hoy ' + i : String(i);
       var mini = '';
-      if (info && info.total){
-        mini = '<span class="m">' + (info.hechas || 0) + ' / ' + info.total + '</span>';
-      } else if (esHoyCel && partido && partido.hay){
-        mini = '<span class="m">' + partido.hechas + ' / ' + partido.total + '</span>';
+      if (tDia){
+        mini = '<span class="m">' + hDia + ' / ' + tDia + '</span>';
       } else if (futuro){
         mini = '<span class="m">sin abrir</span>';
       } else {
@@ -312,24 +329,34 @@
     var hechas = items.filter(function(x){ return x.hecha; }).length;
     var total = items.length;
     var ganado = total > 0 && hechas === total;
+    var sem = semaforo(hechas, total);
     var partes = String(k).split('-');
     var tit = esHoy ? 'Tu día' : 'Tu día · ' + parseInt(partes[2],10) + ' ' + MESES[parseInt(partes[1],10)-1].toLowerCase();
-    var lista = items.length ? items.map(function(it){
+    function fila(it, ok){
       var nom = it.nombre ? it.nombre : it.motivo;
       var txt = it.icono + ' ' + nom + (it.motivo && it.nombre ? ' · ' + it.motivo : '');
-      return '<li class="' + (it.hecha ? '' : 'pend') + '"><span class="tm-bola">' + (it.hecha ? '✓' : '·') + '</span>' + esc(txt) + '</li>';
-    }).join('') : '<li class="pend"><span class="tm-bola">·</span>Este día no tuvo las 10 cargadas.</li>';
-    var pie = ganado
-      ? 'Hoy el negocio estuvo en movimiento. Eso vale.'
-      : (esHoy ? (hechas ? 'Vas ' + hechas + ' de ' + total + '. El día todavía está abierto.' : 'Todavía no hay movimiento. Las 10 te esperan.')
-               : (hechas ? 'Ese día quedó marcado.' : 'Ese día no tuvo movimiento.'));
-    if (!esHoy && ganado) pie = 'Ese día quedó marcado. Eso vale.';
-    document.getElementById('tmCarta').innerHTML =
+      return '<li class="' + (ok ? 'ok' : 'pend') + '"><span class="tm-bola">' + (ok ? '✓' : '·') + '</span>' + esc(txt) + '</li>';
+    }
+    var okItems = items.filter(function(x){ return x.hecha; });
+    var noItems = items.filter(function(x){ return !x.hecha; });
+    var lista = '';
+    if (okItems.length) lista += '<p class="tm-grupo">Hecho · ' + okItems.length + '</p><ul>' + okItems.map(function(it){ return fila(it, true); }).join('') + '</ul>';
+    if (noItems.length) lista += '<p class="tm-grupo">Falta · ' + noItems.length + '</p><ul>' + noItems.map(function(it){ return fila(it, false); }).join('') + '</ul>';
+    if (!items.length) lista = '<p class="tm-grupo">Sin lista</p><ul><li class="pend"><span class="tm-bola">·</span>Este día no tuvo las 10 cargadas.</li></ul>';
+    var pct = total ? Math.round(hechas * 100 / total) : 0;
+    var pie = !total
+      ? (esHoy ? 'Todavía no hay movimiento. Las 10 te esperan.' : 'Ese día no tuvo movimiento.')
+      : (ganado
+          ? (esHoy ? 'Hoy el negocio estuvo en movimiento. Eso vale.' : 'Ese día quedó marcado. Eso vale.')
+          : (esHoy ? ('Vas ' + hechas + ' de ' + total + ' · ' + pct + '%. El día todavía está abierto.') : (hechas + ' de ' + total + ' · ' + pct + '%.')));
+    var carta = document.getElementById('tmCarta');
+    carta.className = 'tm-carta' + (sem ? ' ' + sem : '');
+    carta.innerHTML =
       '<button type="button" class="tm-x" aria-label="Cerrar">×</button>' +
       '<div class="tm-carta-cuerpo">' +
       '<div class="cab">💙 Para vos</div>' +
       '<h2>' + esc(tit) + '</h2>' +
-      '<ul>' + lista + '</ul>' +
+      lista +
       '<p class="tm-pie">' + esc(pie) + '</p></div>';
     document.getElementById('tmCarta').querySelector('.tm-x').onclick = function(e){
       e.preventDefault(); e.stopPropagation(); cerrarCierre();
