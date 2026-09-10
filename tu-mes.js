@@ -80,14 +80,14 @@
       '.home-month-card{cursor:pointer}',
       '.home-month-card:focus{outline:2px solid #e8b84a;outline-offset:2px}',
       '.tm-wrap{padding:12px 14px 28px}',
-      '.tm-nav{display:grid;grid-template-columns:40px 1fr 40px;align-items:center;margin:2px 0 4px;width:100%}',
-      '.tm-nav-mes{min-width:168px;text-align:center}',
+      '#tmNav.tm-nav{display:grid;grid-template-columns:48px 1fr 48px;align-items:center;margin:4px 0 6px;width:100%}',
+      '.tm-nav-mes{text-align:center;min-width:0}',
       '.tm-nav-mes strong{display:block;font-size:22px;font-weight:900;color:#0b5878;letter-spacing:-.5px;line-height:1.15}',
       'body.dark .tm-nav-mes strong{color:#8ec8e0}',
       '.tm-nav-mes span{display:block;margin-top:2px;font-size:11px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#8a8678}',
-      '.tm-nav button{width:40px;height:40px;border:1px solid rgba(11,88,120,.16);border-radius:50%;background:transparent;color:#0b5878;font-size:22px;font-weight:700;cursor:pointer;line-height:1;display:grid;place-items:center;padding:0}',
-      'body.dark .tm-nav button{border-color:rgba(255,255,255,.16);color:#8ec8e0}',
-      '.tm-nav button[disabled]{opacity:.28;cursor:default}',
+      '#tmNav button{width:48px;height:48px;border:0;border-radius:50%;background:#0b5878;color:#fff;font-size:30px;font-weight:900;line-height:1;cursor:pointer;box-shadow:0 10px 24px rgba(11,88,120,.3);display:grid;place-items:center;padding:0}',
+      '#tmNav button:active{transform:scale(.94)}',
+      '#tmNav button[disabled]{opacity:.34;cursor:default;box-shadow:none}',
       '.tm-sub{margin:0 0 14px;text-align:center;font-size:12.5px;font-weight:800;color:#686977}',
       'body.dark .tm-sub{color:#b8b9c5}',
       '.tm-sem,.tm-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}',
@@ -105,7 +105,8 @@
       '#tmPicado{position:absolute;inset:0;overflow:hidden;pointer-events:none}',
       '#tmPicado i{position:absolute;top:-24px;animation:tmCae linear infinite}',
       '@keyframes tmCae{to{transform:translate3d(var(--dx),110vh,0) rotate(var(--rot))}}',
-      '.tm-carta{position:relative;z-index:2;width:min(380px,100%);max-height:86vh;overflow:auto;border-radius:24px;padding:16px 16px 14px;background:linear-gradient(150deg,#1278a0,#0b5878 58%,#063652);color:#fff;box-shadow:0 22px 60px rgba(10,12,40,.4);display:flex;flex-direction:column}',
+      '.tm-carta{position:relative;z-index:2;width:min(380px,100%);max-height:86vh;overflow:hidden;border-radius:24px;padding:16px 16px 14px;background:linear-gradient(150deg,#1278a0,#0b5878 58%,#063652);color:#fff;box-shadow:0 22px 60px rgba(10,12,40,.4);display:flex;flex-direction:column}',
+      '.tm-carta-cuerpo{overflow:auto;flex:1;min-height:0;-webkit-overflow-scrolling:touch}',
       '.tm-carta .cab{font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;opacity:.9}',
       '.tm-carta h2{margin:6px 0 10px;font-size:26px;letter-spacing:-.4px}',
       '.tm-carta ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}',
@@ -114,7 +115,7 @@
       '.tm-bola{flex:0 0 22px;width:22px;height:22px;border-radius:50%;background:#7dcc6a;color:#163512;display:grid;place-items:center;font-size:13px;font-weight:900}',
       '.tm-carta li.pend .tm-bola{background:rgba(255,255,255,.2);color:#fff}',
       '.tm-pie{margin-top:12px;text-align:center;font-size:13px;font-weight:800}',
-      '.tm-x{position:absolute;top:8px;right:10px;border:0;background:transparent;color:#fff;font-size:22px;cursor:pointer;line-height:1}',
+      '.tm-x{position:absolute;top:4px;right:4px;z-index:6;width:44px;height:44px;border:0;border-radius:50%;background:rgba(0,0,0,.22);color:#fff;font-size:22px;font-weight:700;line-height:1;cursor:pointer;display:grid;place-items:center;padding:0}',
       '.tm-kpis{margin-top:16px;background:#fff;border-radius:18px;padding:14px 16px 10px;border:1px solid rgba(11,88,120,.08)}',
       'body.dark .tm-kpis{background:#25273a;border-color:rgba(255,255,255,.08)}',
       '.tm-kpis .tm-frase{margin:0 0 10px;font-size:14.5px;font-weight:800;line-height:1.4;color:#1d1d2c}',
@@ -325,11 +326,14 @@
     if (!esHoy && ganado) pie = 'Ese día quedó marcado. Eso vale.';
     document.getElementById('tmCarta').innerHTML =
       '<button type="button" class="tm-x" aria-label="Cerrar">×</button>' +
+      '<div class="tm-carta-cuerpo">' +
       '<div class="cab">💙 Para vos</div>' +
       '<h2>' + esc(tit) + '</h2>' +
       '<ul>' + lista + '</ul>' +
-      '<p class="tm-pie">' + esc(pie) + '</p>';
-    document.getElementById('tmCarta').querySelector('.tm-x').onclick = cerrarCierre;
+      '<p class="tm-pie">' + esc(pie) + '</p></div>';
+    document.getElementById('tmCarta').querySelector('.tm-x').onclick = function(e){
+      e.preventDefault(); e.stopPropagation(); cerrarCierre();
+    };
     velo.className = 'on';
     picado(!!fiesta || (esHoy && ganado));
   }
