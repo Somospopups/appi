@@ -1381,10 +1381,10 @@
       '.ht-promo .ht-promo-txt .ht-frase{margin:0;font-size:15px;line-height:1.38}',
       '.ht-promo .ht-promo-txt .ht-nota{margin:0}',
       '@media(max-width:360px){.ht-promo{flex-direction:column}.ht-promo .ht-foto-promo{width:100%;height:148px;flex:none;min-height:148px}}',
-      '.ht-psa-fab{position:absolute;top:10px;right:10px;z-index:4;width:38px;height:38px;border-radius:50%;border:0;background:#25D366;color:#fff;display:grid;place-items:center;box-shadow:0 8px 18px rgba(0,0,0,.18);cursor:pointer;transition:transform .12s}',
+      '.ht-psa-fab{position:absolute;top:12px;right:12px;left:auto;z-index:5;width:38px;height:38px;border-radius:50%;border:0;background:#25D366;color:#fff;display:grid;place-items:center;box-shadow:0 8px 18px rgba(0,0,0,.18);cursor:pointer;transition:transform .12s;pointer-events:auto}',
       '.ht-psa-fab:hover{transform:scale(1.06)}',
       '.ht-psa-fab:active{transform:scale(.96)}',
-      '.ht-card.ht-cat-promo .ht-cab{padding-right:44px}',
+      '.ht-card.ht-cat-promo .ht-cab{padding-right:48px}',
       /* La tarjeta especial se viste distinta: fondo pleno, frase grande y
          centrada, chips vidriosos y el corazón de marca de agua (v325). */
       '.ht-card.ht-esp{background:linear-gradient(150deg,#1278a0,#0b5878 58%,#063652);}',
