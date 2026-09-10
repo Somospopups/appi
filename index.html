@@ -128,9 +128,9 @@ window.openStock=function(){
 
 <script src="./porque-vivo.js"></script>
 <script src="./home-limpio.js?v=520"></script>
-  <script src="./home-tarjetas.js?v=622"></script>
-  <script src="./appi-eventos.js?v=622"></script>
-  <script src="./tu-mes.js?v=622"></script>
+  <script src="./home-tarjetas.js?v=624"></script>
+  <script src="./appi-eventos.js?v=624"></script>
+  <script src="./tu-mes.js?v=624"></script>
   <script src="./device-bridge.js?v=523"></script>
   <script src="./anuncios.js?v=521"></script>
   <script src="./aviso-telegram.js?v=555"></script>
@@ -946,7 +946,7 @@ body.dark .hist-action-drawer{background:linear-gradient(155deg,#151827,#252036 
     display: flex; align-items: center; gap: 10px;
     margin-top: 4px;
   }
-  .quick-progress-line, .business-progress, .home-month-progress { display:none !important; }
+  .quick-progress-line, .business-progress { display:none !important; }
   .tool-card .tool-progress .mini-bar {
     flex: 1; height: 6px; border-radius: 999px;
     background: rgba(80,90,130,0.10); overflow: hidden;
@@ -3473,14 +3473,27 @@ body.dark .admin-login-card{background:#242638}body.dark .admin-login-card h2{co
     height: 6px;
     border-radius: 999px;
     background: rgba(80,90,130,0.12);
-    overflow: hidden;
+    overflow: visible;
+    position: relative;
   }
   .home-month-progress .fill {
     height: 100%;
     border-radius: 999px;
-    background: linear-gradient(90deg, #5b8def, #a06bff, #ff6b9d);
-    box-shadow: 0 0 16px rgba(160,107,255,0.35);
-    transition: width .55s ease;
+    background: linear-gradient(135deg, #5b8def, #a06bff);
+    box-shadow: 0 0 10px rgba(91,141,239,0.30);
+    transition: width .45s cubic-bezier(.22,1,.36,1);
+    position: relative;
+  }
+  .home-month-progress .fill .emoji-marker {
+    position: absolute;
+    right: -11px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 13px;
+    line-height: 1;
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,.18));
+    transition: right .45s cubic-bezier(.22,1,.36,1);
+    pointer-events: none;
   }
   .home-month-caption {
     margin-top: 4px;
@@ -4305,7 +4318,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v622 · Segura</div>
+  <div class="ds-foot">APPI · v624 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4436,7 +4449,7 @@ body.dark #pageTabs button.active{color:#c5d6ff}
 /* Clase aplicada al header de cada página al entrar */
 .view.page-enter header.top h1,
 .view.page-enter header.top .home-hero-card h1{
-  animation:titleSlideDown .55s cubic-bezier(.34,1.3,.64,1) both;
+  animation:titleSlideDown .35s cubic-bezier(.22,1,.36,1) both;
 }
 .view.page-enter header.top button{
   animation:none !important;
@@ -4447,11 +4460,11 @@ body.dark #pageTabs button.active{color:#c5d6ff}
 .view.page-enter header.top .script,
 .view.page-enter header.top .home-subtitle,
 .view.page-enter header.top .home-kicker{
-  animation:subtitleSlideDown .5s cubic-bezier(.22,1,.36,1) .1s both;
+  animation:subtitleSlideDown .30s cubic-bezier(.22,1,.36,1) .04s both;
 }
 .view.page-enter header.top p,
 .view.page-enter header.top .home-month-card{
-  animation:subtitleSlideDown .45s cubic-bezier(.22,1,.36,1) .18s both;
+  animation:subtitleSlideDown .28s cubic-bezier(.22,1,.36,1) .06s both;
 }
 .view.page-enter .home-tool-grid,
 .view.page-enter #mesGrid,
@@ -4462,7 +4475,7 @@ body.dark #pageTabs button.active{color:#c5d6ff}
 .view.page-enter .hl-duo,
 .view.page-enter .hl-porque,
 .view.page-enter .hl-titulo{
-  animation:contentFadeUp .5s cubic-bezier(.22,1,.36,1) .12s both;
+  animation:contentFadeUp .28s cubic-bezier(.22,1,.36,1) .04s both;
 }
 
 /* Transición de slide entre páginas */
@@ -4604,7 +4617,7 @@ body.dark #pageTabs button.active{color:#c5d6ff}
             <strong id="dayInfo">—</strong>
           </div>
           <div class="month-progress home-month-progress">
-            <div class="fill" id="monthProgressFill" style="width:0%"></div>
+            <div class="fill" id="monthProgressFill" style="width:0%"><span class="emoji-marker">📅</span></div>
           </div>
           <div class="home-month-caption"><span id="monthProgressPct">0%</span> del mes recorrido · Tu mes ›</div>
         </div>
@@ -6639,7 +6652,7 @@ function showView(id,opts){
   // Animar título de entrada
   if(_isPage){
     const el = document.getElementById(id);
-    if(el){ el.classList.remove('page-enter'); void el.offsetWidth; el.classList.add('page-enter'); setTimeout(()=>el.classList.remove('page-enter'), 700); }
+    if(el){ el.classList.remove('page-enter'); void el.offsetWidth; el.classList.add('page-enter'); setTimeout(()=>el.classList.remove('page-enter'), 380); }
   }
   if(id==='view-eval')    try{ renderAreas(); }catch(e){ console.error(e); }
   if(id==='view-wheel')   try{ renderWheel(); }catch(e){ console.error(e); }
@@ -12824,8 +12837,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='622';
-      const CACHE_NAME='appi-v622-poster';
+      const swVersion='624';
+      const CACHE_NAME='appi-v624-poster';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · v'+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
