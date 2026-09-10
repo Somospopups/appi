@@ -1,7 +1,7 @@
-/* APPI · Tu mes v614 — cerebro
+/* APPI · Tu mes v615 — cerebro
    El mes es un tablero de cartas. Cada día, las 10 de la jornada.
    La puerta es la franja de septiembre del Home.
-   v614: recuperar lleva DIRECTO y funciona (solo iba al Home) a la acción (WhatsApp saludo para cumple, panel Ya lo hice/No para retro) (marca recuperado + abre chat hoy) (mismo renglón) lista vacía (Edge) v598 lista incompleta dice No falta nadie verde con 9 pendientes + info faltas · sin maquillar el hábito (v600 detalle) · popup + v599 cerebro — timeline al abrir día + métricas sutiles arriba.
+   v615: recuperar placeholder no navega a Home (solo marca y refresca día), real sí lleva directo a WhatsApp/panel (solo iba al Home) a la acción (WhatsApp saludo para cumple, panel Ya lo hice/No para retro) (marca recuperado + abre chat hoy) (mismo renglón) lista vacía (Edge) v598 lista incompleta dice No falta nadie verde con 9 pendientes + info faltas · sin maquillar el hábito (v600 detalle) · popup + v599 cerebro — timeline al abrir día + métricas sutiles arriba.
    Eventos viven en appi-eventos.js (bus central silencioso).
 */
 (function () {
@@ -214,6 +214,14 @@
     try{
       var ok = recuperarTarea(k, motivoId, tel, nombre, userHint);
       if(!ok) return false;
+      var esPlaceholderOuter = !!(it && it.placeholder) || String(tel||'').indexOf('ph_')===0;
+      if(esPlaceholderOuter){
+        // Placeholder: solo marcar y refrescar el mismo día, sin ir al Home
+        mostrarToast('¡Recuperado! '+ (DESC_TAREA[motivoId]||motivoId) +' del '+k.split('-').reverse().join('/')+' — queda como hecho sin tocar tu hábito.');
+        setTimeout(function(){ try{ abrirDia(k, false, false); }catch(e){} try{ pintar(); }catch(e){} }, 280);
+        return true;
+      }
+      // Real con persona: marcar y llevar directo a la acción
       setTimeout(function(){
         try{ cerrarCierre(); }catch(e){}
         try{ cerrarDetalle(); }catch(e){}
@@ -221,27 +229,8 @@
         setTimeout(function(){
           try{
             var u = userHint || (it && it.user) || {usuario:nombre, telf:tel};
-            var esPlaceholder = !!(it && it.placeholder) || String(tel||'').indexOf('ph_')===0;
-            if(esPlaceholder){
-              var cand=[];
-              try{ cand = planaHoy().filter(function(x){ return x.motivoId===motivoId && !x.hecha; }); }catch(e){}
-              if(cand.length && cand[0].user){
-                u=cand[0].user;
-                mostrarToast('Recuperado del '+k.split('-').reverse().join('/')+' — ahora hacelo con '+ (u.usuario||u.nombre||'') +' hoy');
-                llevarAAccionDirecta(motivoId, u);
-              } else {
-                // placeholder sin candidato hoy: abrir fila general del motivo para que elija (si es retro abre panel, si no abre WhatsApp genérico)
-                if(String(motivoId)==='retro' && window.APPIMensajes && window.APPIMensajes.abrirFila){
-                  try{ window.APPIMensajes.abrirFila(motivoId); mostrarToast('Recuperado. Elegí a quién marcar en la lista.'); }catch(e){ try{ var card=document.querySelector('.home-month-card'); if(card) card.scrollIntoView({behavior:'smooth', block:'center'}); }catch(err){} }
-                } else {
-                  mostrarToast('Recuperado. No hay pendientes de '+ (DESC_TAREA[motivoId]||motivoId) +' hoy.');
-                  try{ var card2=document.querySelector('.home-month-card'); if(card2) card2.scrollIntoView({behavior:'smooth', block:'center'}); }catch(e){}
-                }
-              }
-            } else {
-              mostrarToast('Recuperado. Ahora hacelo con '+ (u.usuario||u.nombre||nombre) +' hoy');
-              llevarAAccionDirecta(motivoId, u);
-            }
+            mostrarToast('Recuperado. Ahora hacelo con '+ (u.usuario||u.nombre||nombre) +' hoy');
+            llevarAAccionDirecta(motivoId, u);
           }catch(e){ try{ console.error(e);}catch(err){} }
         }, 650);
       }, 280);
