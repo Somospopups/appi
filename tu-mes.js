@@ -1,7 +1,7 @@
-/* APPI · Tu mes v601 — cerebro
+/* APPI · Tu mes v602 — cerebro
    El mes es un tablero de cartas. Cada día, las 10 de la jornada.
    La puerta es la franja de septiembre del Home.
-   v601: TU MES recupera pendientes · sin maquillar el hábito (v600 detalle) · popup + v599 cerebro — timeline al abrir día + métricas sutiles arriba.
+   v602: TU MES recupera visible · muestra Tarea del día con RECUPERADA · sin maquillar el hábito (v600 detalle) · popup + v599 cerebro — timeline al abrir día + métricas sutiles arriba.
    Eventos viven en appi-eventos.js (bus central silencioso).
 */
 (function () {
@@ -153,7 +153,15 @@
   }
   function recuperarTarea(diaOrigen, motivoId, tel, nombre, userHint){
     try{
-      if(!diaOrigen || !motivoId || !tel) { mostrarToast('Falta teléfono para recuperar'); return false; }
+      // para placeholders genéricos (sin tel) generamos tel sintético
+      if(!tel && nombre==='Tarea del día'){
+        tel = 'ph_'+String(diaOrigen).replace(/-/g,'')+'_'+String(motivoId||'gen')+'_'+Math.random().toString(36).slice(2,6);
+        // asegurar que userHint tenga telf
+        if(userHint) userHint.telf = tel;
+        else userHint = {usuario:nombre||'Tarea', telf:tel};
+      }
+      if(!diaOrigen || !motivoId) { mostrarToast('Falta dato para recuperar'); return false; }
+      if(!tel){ mostrarToast('Falta teléfono para recuperar'); return false; }
       var now=new Date().toISOString();
       var raw=leerAccionesRaw();
       if(!raw.dias) raw.dias={};
@@ -767,9 +775,18 @@
         });
       });
       var faltaN = Math.max(0, (Number(dia.total) || 0) - out.length);
-      var i;
-      for (i = 0; i < faltaN; i++){
-        out.push({ motivoId: '', icono: '·', motivo: '', nombre: 'Sin marcar', tel:'', hecha: false, noHecha: false, recuperado:false, recuperadoAt:'' });
+      if(faltaN>0){
+        var freq={}; var top=''; var topN=0;
+        out.forEach(function(o){ if(o.motivoId) freq[o.motivoId]=(freq[o.motivoId]||0)+1; });
+        Object.keys(freq).forEach(function(k){ if(freq[k]>topN){ topN=freq[k]; top=k; }});
+        if(!top) top = 'checkin';
+        var motTop=null; try{ motTop = M() && M().motivoPorId ? M().motivoPorId(top) : null; }catch(e){}
+        var icoTop = (motTop && motTop.icono) || '·';
+        var nomTop = (motTop && motTop.nombre) || 'Tarea del día';
+        for (i = 0; i < faltaN; i++){
+          var synTel = 'ph_'+String(k).replace(/-/g,'')+'_'+i;
+          out.push({ motivoId: top||'', icono: icoTop, motivo: nomTop, nombre: 'Tarea del día', tel:synTel, hecha: false, noHecha: false, recuperado:false, recuperadoAt:'', placeholder:true, _idx:i });
+        }
       }
     }catch(e){}
     return out;
@@ -822,6 +839,7 @@
     var okItems = items.filter(function(x){ return x.hecha; });
     var recuperadosItems = items.filter(function(x){ return x.recuperado && !x.hecha; });
     var noItems = items.filter(function(x){ return !x.hecha && !x.recuperado; });
+    // si hay placeholders generic, ya tienen motivoId inferido arriba
     // Construir lista hecho
     var lista = '<p class="tm-grupo hecho">Hecho · ' + okItems.length + '</p><ul>';
     lista += okItems.length
@@ -918,7 +936,9 @@
           var motivoId = li.getAttribute('data-pend-motivo')||'';
           var tel = li.getAttribute('data-pend-tel')||'';
           var nombre = li.getAttribute('data-pend-nombre')||'';
-          if(!motivoId || !tel || nombre==='Sin marcar') return;
+          var esPlaceholder = !tel && nombre==='Tarea del día';
+          if((!motivoId || !tel) && !esPlaceholder) return;
+          if(nombre==='Sin marcar') return;
           // buscar el item original para tener user completo
           var it = null;
           for(var j=0;j<noItems.length;j++){ if(noItems[j].motivoId===motivoId && noItems[j].tel===tel){ it=noItems[j]; break; } }
@@ -928,13 +948,29 @@
           accionesDiv.style.marginLeft = '32px';
           accionesDiv.style.marginTop = '6px';
           accionesDiv.style.marginBottom = '4px';
-          if(esHoyReal){
+          if(it && it.placeholder){
+            // tarea sin teléfono real (hueco viejo) — solo recuperar genérico
+            if(esHoyReal){
+              accionesDiv.innerHTML = '<button type="button" class="tm-btn-recup" data-act="hecho">✓ Hecho · '+esc(it.motivo||'Tarea')+'</button>';
+              li.parentNode.insertBefore(accionesDiv, li.nextSibling);
+              accionesDiv.querySelector('[data-act="hecho"]').onclick = function(){
+                var ok = recuperarTarea(k, motivoId, tel, nombre, it.user);
+                if(ok){ setTimeout(function(){ abrirDia(k, esHoy, false); pintar(); }, 300); }
+              };
+            } else {
+              accionesDiv.innerHTML = '<button type="button" class="tm-btn-recup" data-act="recup">↻ Recuperar · '+esc(it.motivo||'Tarea')+'</button>';
+              li.parentNode.insertBefore(accionesDiv, li.nextSibling);
+              accionesDiv.querySelector('[data-act="recup"]').onclick = function(){
+                var ok = recuperarTarea(k, motivoId, tel, nombre, it.user);
+                if(ok){ setTimeout(function(){ abrirDia(k, esHoy, false); }, 300); }
+              };
+            }
+          } else if(esHoyReal){
             accionesDiv.innerHTML = '<button type="button" class="tm-btn-recup wa" data-act="wa">💬 Mensaje</button><button type="button" class="tm-btn-recup" data-act="hecho">✓ Hecho hoy</button>';
             li.parentNode.insertBefore(accionesDiv, li.nextSibling);
             accionesDiv.querySelector('[data-act="wa"]').onclick = function(){ abrirConversacion(it.user || {usuario:it.nombre, telf:it.tel}, motivoId); };
             accionesDiv.querySelector('[data-act="hecho"]').onclick = function(){
               if(hacerHoy(motivoId, it.user || {usuario:it.nombre, telf:it.tel})){
-                // refrescar modal
                 setTimeout(function(){ abrirDia(k, esHoy, false); pintar(); }, 250);
               }
             };
@@ -944,9 +980,7 @@
             accionesDiv.querySelector('[data-act="wa"]').onclick = function(){ abrirConversacion(it.user || {usuario:it.nombre, telf:it.tel}, motivoId); };
             accionesDiv.querySelector('[data-act="recup"]').onclick = function(){
               var ok = recuperarTarea(k, motivoId, tel, nombre, it.user);
-              if(ok){
-                setTimeout(function(){ abrirDia(k, esHoy, false); }, 300);
-              }
+              if(ok){ setTimeout(function(){ abrirDia(k, esHoy, false); }, 300); }
             };
           }
         });
@@ -1089,7 +1123,7 @@
       try{ items = itemsDe(k); }catch(e){ items=[]; }
       var hechos = items.filter(function(it){ return it.hecha; });
       var recuperados = items.filter(function(it){ return it.recuperado && !it.hecha; });
-      var pendientes = items.filter(function(it){ return !it.hecha && !it.recuperado && it.motivoId && it.nombre!=='Sin marcar' && it.tel; });
+      var pendientes = items.filter(function(it){ return !it.hecha && !it.recuperado && (it.motivoId || it.placeholder) && it.nombre!=='Sin marcar'; });
       var hechosFiltrados = filtro ? hechos.filter(function(it){ return String(it.motivoId||'')===String(filtro); }) : hechos;
       var pendientesFiltrados = filtro ? pendientes.filter(function(it){ return String(it.motivoId||'')===String(filtro); }) : pendientes;
       var recuperadosFiltrados = filtro ? recuperados.filter(function(it){ return String(it.motivoId||'')===String(filtro); }) : recuperados;
@@ -1140,8 +1174,15 @@
           var nom = it.nombre || '';
           var ico = esc(it.icono||'·');
           var key = esc(it.motivoId+'|'+it.tel+'|'+k);
+          var esPh = !!it.placeholder;
+          var btns = '';
+          if(esPh){
+            btns = esHoyPend ? '<button type="button" data-det-act="hecho" data-key="'+key+'">✓ Hecho · '+esc(it.motivo||'Tarea')+'</button>' : '<button type="button" data-det-act="recup" data-key="'+key+'">↻ Recuperar · '+esc(it.motivo||'Tarea')+'</button>';
+          } else {
+            btns = esHoyPend ? '<button type="button" class="wa" data-det-act="wa" data-key="'+key+'">💬 Mensaje</button><button type="button" data-det-act="hecho" data-key="'+key+'">✓ Hecho hoy</button>' : '<button type="button" class="wa" data-det-act="wa" data-key="'+key+'">💬 Mensaje</button><button type="button" data-det-act="recup" data-key="'+key+'">↻ Recuperar</button>';
+          }
           return '<li data-pend-key="'+key+'" data-motivo="'+esc(it.motivoId)+'" data-tel="'+esc(it.tel)+'" data-nombre="'+esc(it.nombre)+'" data-dia="'+esc(k)+'" style="flex-wrap:wrap"><span class="ico">'+ico+'</span><span class="who"><b>'+esc(desc)+'</b><small>'+esc(nom)+'</small></span><span class="tm-det-recup" style="width:100%;margin-top:6px">'
-            + (esHoyPend ? '<button type="button" class="wa" data-det-act="wa" data-key="'+key+'">💬 Mensaje</button><button type="button" data-det-act="hecho" data-key="'+key+'">✓ Hecho hoy</button>' : '<button type="button" class="wa" data-det-act="wa" data-key="'+key+'">💬 Mensaje</button><button type="button" data-det-act="recup" data-key="'+key+'">↻ Recuperar</button>')
+            + btns
             + '</span></li>';
         }).join('') + '</ul>';
         if(pendientesFiltrados.length>4) htmlDays += '<div style="font-size:11px;font-weight:700;opacity:.6;margin-top:4px">+ '+(pendientesFiltrados.length-4)+' más · abrí el día para ver todos</div>';
