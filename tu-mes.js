@@ -294,12 +294,38 @@
   }
 
   function itemsDe(k){
-    if (k === hoyKey()) return planaHoy();
+    if (k === hoyKey()){
+      try{ if (M() && M().registrarPartido) M().registrarPartido(); }catch(e){}
+      var hoyItems = planaHoy();
+      if (hoyItems.length) return hoyItems;
+    }
     var out = [];
     try{
       var raw = JSON.parse(localStorage.getItem('appi_acciones_v1_' + uid()) || '{}');
-      var marcas = raw.dias && raw.dias[k] && raw.dias[k].marcas;
-      if (!marcas) return out;
+      var dia = raw.dias && raw.dias[k];
+      if (!dia) return out;
+      var marcas = dia.marcas || {};
+      var lista = dia.lista || [];
+      if (lista.length){
+        return lista.map(function(it){
+          var marca = it.t ? marcas[it.m + ':' + it.t] : null;
+          if (!marca && it.n){
+            Object.keys(marcas).forEach(function(claveM){
+              if (marca) return;
+              if (claveM.split(':')[0] === it.m && marcas[claveM] && marcas[claveM].n === it.n) marca = marcas[claveM];
+            });
+          }
+          var mot = M() && M().motivoPorId ? M().motivoPorId(it.m) : null;
+          return {
+            motivoId: it.m,
+            icono: it.ico || (mot && mot.icono) || '✓',
+            motivo: it.mot || (mot && mot.nombre) || '',
+            nombre: pila(it.n) || it.n || '',
+            hecha: !!(marca && marca.e === 'hecha'),
+            noHecha: !!(marca && marca.e === 'no_hecha')
+          };
+        });
+      }
       Object.keys(marcas).forEach(function(claveM){
         var motId = claveM.split(':')[0];
         var mot = M() && M().motivoPorId ? M().motivoPorId(motId) : null;
@@ -313,6 +339,11 @@
           noHecha: marca && marca.e === 'no_hecha'
         });
       });
+      var faltaN = Math.max(0, (Number(dia.total) || 0) - out.length);
+      var i;
+      for (i = 0; i < faltaN; i++){
+        out.push({ motivoId: '', icono: '·', motivo: '', nombre: 'Sin marcar', hecha: false, noHecha: false });
+      }
     }catch(e){}
     return out;
   }
@@ -341,10 +372,15 @@
     }
     var okItems = items.filter(function(x){ return x.hecha; });
     var noItems = items.filter(function(x){ return !x.hecha; });
-    var lista = '';
-    if (okItems.length) lista += '<p class="tm-grupo">Hecho · ' + okItems.length + '</p><ul>' + okItems.map(function(it){ return fila(it, true); }).join('') + '</ul>';
-    if (noItems.length) lista += '<p class="tm-grupo">Falta · ' + noItems.length + '</p><ul>' + noItems.map(function(it){ return fila(it, false); }).join('') + '</ul>';
-    if (!items.length) lista = '<p class="tm-grupo">Sin lista</p><ul><li class="pend"><span class="tm-bola">·</span>Este día no tuvo las 10 cargadas.</li></ul>';
+    var lista = '<p class="tm-grupo">Hecho · ' + okItems.length + '</p><ul>';
+    lista += okItems.length
+      ? okItems.map(function(it){ return fila(it, true); }).join('')
+      : '<li class="pend"><span class="tm-bola">·</span>Todavía nadie.</li>';
+    lista += '</ul><p class="tm-grupo">Falta · ' + noItems.length + '</p><ul>';
+    lista += noItems.length
+      ? noItems.map(function(it){ return fila(it, false); }).join('')
+      : '<li class="ok"><span class="tm-bola">✓</span>No falta nadie.</li>';
+    lista += '</ul>';
     var pct = total ? Math.round(hechas * 100 / total) : 0;
     var pie = !total
       ? (esHoy ? 'Todavía no hay movimiento. Las 10 te esperan.' : 'Ese día no tuvo movimiento.')

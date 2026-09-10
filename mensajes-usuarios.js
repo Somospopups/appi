@@ -770,6 +770,21 @@
     d.dias[k].hechas = r.hechas;
     d.dias[k].noHechas = r.noHechas;
     d.dias[k].ganado = !!(r.total && r.hechas === r.total);
+    try{
+      var lista = [];
+      deHoy().forEach(function(g){
+        (g.gente || []).forEach(function(u){
+          lista.push({
+            m: g.motivo.id,
+            ico: g.motivo.icono,
+            mot: g.motivo.nombre,
+            n: String((u && (u.usuario || u.nombre)) || '').slice(0, 60),
+            t: telefonoDe(u) || ''
+          });
+        });
+      });
+      if (lista.length) d.dias[k].lista = lista;
+    }catch(e){}
     guardarAcciones(d);
   }
   function rachaGanados(){
