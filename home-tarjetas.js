@@ -1381,7 +1381,7 @@
       '.ht-promo .ht-promo-txt .ht-frase{margin:0;font-size:15px;line-height:1.38}',
       '.ht-promo .ht-promo-txt .ht-nota{margin:0}',
       '@media(max-width:360px){.ht-promo{flex-direction:column}.ht-promo .ht-foto-promo{width:100%;height:148px;flex:none;min-height:148px}}',
-      '.ht-psa-fab{position:absolute;top:10px;right:10px;z-index:4;width:38px;height:38px;border-radius:50%;border:0;background:#0b5878;color:#fff;font-size:11px;font-weight:950;letter-spacing:.3px;display:grid;place-items:center;box-shadow:0 8px 18px rgba(11,88,120,.28);cursor:pointer;transition:transform .12s}',
+      '.ht-psa-fab{position:absolute;top:10px;right:10px;z-index:4;width:38px;height:38px;border-radius:50%;border:0;background:#25D366;color:#fff;display:grid;place-items:center;box-shadow:0 8px 18px rgba(0,0,0,.18);cursor:pointer;transition:transform .12s}',
       '.ht-psa-fab:hover{transform:scale(1.06)}',
       '.ht-psa-fab:active{transform:scale(.96)}',
       '.ht-card.ht-cat-promo .ht-cab{padding-right:44px}',
@@ -1556,7 +1556,7 @@
       (cat === 'hoy' ? ' ht-hoy' : '') +
       (cat === 'ganaste' || cat === 'llegamos' ? ' ht-ganaste' : '');
     el.innerHTML = '<span class="ht-marca" aria-hidden="true">' + (t.icono || '') + '</span>' +
-      (t.fab ? '<button type="button" class="ht-psa-fab" title="Compartir promo por WhatsApp">PSA</button>' : '') +
+      (t.fab ? '<button type="button" class="ht-psa-fab" title="Compartir promo por WhatsApp" aria-label="Compartir por WhatsApp"><svg width="20" height="20" viewBox="0 0 24 24" fill="white" aria-hidden="true"><path d="M19.05 4.94A9.91 9.91 0 0 0 12.02 2C6.58 2 2.15 6.45 2.15 11.89c0 1.74.46 3.45 1.32 4.95L2 22l5.26-1.38a8.2 8.2 0 0 0 4.76 1.21h.01c5.44 0 9.88-4.44 9.88-9.89a9.86 9.86 0 0 0-2.86-6.99zm-7.03 14.6a8.2 8.2 0 0 1-4.18-1.15l-.3-.18-3.12.82.82-3.04-.2-.31a8.2 8.2 0 0 1-1.26-4.41c0-4.53 3.69-8.22 8.23-8.22a8.18 8.18 0 0 1 5.81 2.41 8.18 8.18 0 0 1 2.41 5.82c0 4.54-3.69 8.23-8.21 8.23zm6.83-6.17c-.37-.19-2.2-1.09-2.54-1.21-.34-.12-.59-.19-.84.19-.25.37-.96 1.21-1.18 1.46-.22.25-.44.28-.81.09-.37-.19-1.57-.58-2.99-1.85-1.11-.99-1.85-2.21-2.07-2.58-.22-.37-.02-.57.16-.76.16-.16.37-.42.56-.63.19-.21.25-.37.37-.62.12-.25.06-.46-.03-.64-.09-.19-.84-2.02-1.15-2.77-.3-.72-.6-.62-.84-.63l-.72-.01c-.25 0-.64.09-.98.46-.34.37-1.29 1.26-1.29 3.08s1.32 3.57 1.5 3.82c.19.25 2.6 3.97 6.3 5.57.88.38 1.57.61 2.11.78.89.28 1.69.24 2.33.15.71-.11 2.2-.9 2.51-1.77.31-.87.31-1.62.22-1.77-.09-.16-.34-.25-.71-.43z"/></svg></button>' : '') +
       '<div class="ht-cab"><span class="ht-ico">' + t.icono + '</span>' +
       '<span class="ht-kicker">' + esc(t.kicker) + '</span></div>' +
       '<h3>' + esc(t.titulo) + '</h3>' +
