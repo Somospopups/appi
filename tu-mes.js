@@ -1,7 +1,7 @@
-/* APPI · Tu mes v610 — cerebro
+/* APPI · Tu mes v611 — cerebro
    El mes es un tablero de cartas. Cada día, las 10 de la jornada.
    La puerta es la franja de septiembre del Home.
-   v610: fix FALTA 7 emergency lista vacía (Edge) v598 lista incompleta dice No falta nadie verde con 9 pendientes + info faltas · sin maquillar el hábito (v600 detalle) · popup + v599 cerebro — timeline al abrir día + métricas sutiles arriba.
+   v611: botón recuperar pequeño inline (mismo renglón) lista vacía (Edge) v598 lista incompleta dice No falta nadie verde con 9 pendientes + info faltas · sin maquillar el hábito (v600 detalle) · popup + v599 cerebro — timeline al abrir día + métricas sutiles arriba.
    Eventos viven en appi-eventos.js (bus central silencioso).
 */
 (function () {
@@ -376,6 +376,13 @@
       'body.dark .tm-det-empty{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.08);color:#b8b9c5}',
       '.tm-pend-actions{margin-top:8px;display:flex;gap:8px;flex-wrap:wrap}',
       '.tm-btn-recup{flex:1;min-height:36px;border:0;border-radius:12px;padding:8px 10px;background:#0b5878;color:#fff;font-size:12px;font-weight:850;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px}',
+      '.tm-pend-inline{margin-left:auto;display:inline-flex;gap:4px;align-items:center;flex:0 0 auto}',
+      '.tm-btn-sm{flex:0 0 auto;min-height:22px;min-width:28px;padding:3px 8px;border:0;border-radius:999px;background:#0b5878;color:#fff;font-size:10px;font-weight:850;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:3px;line-height:1}',
+      '.tm-btn-sm.wa{background:#25D366}',
+      '.tm-btn-sm:active{transform:scale(.94)}',
+      '.tm-carta li.pend{gap:8px}',
+      '.tm-carta li .d{flex:1}',
+
       '.tm-btn-recup:active{transform:scale(.97)}',
       '.tm-btn-recup.wa{background:#25D366;color:#fff}',
       '.tm-btn-recup:disabled{opacity:.45;cursor:default}',
@@ -1005,44 +1012,29 @@
           var it = null;
           for(var j=0;j<noItems.length;j++){ if(noItems[j].motivoId===motivoId && noItems[j].tel===tel){ it=noItems[j]; break; } }
           if(!it) it={motivoId:motivoId, tel:tel, nombre:nombre, user:{usuario:nombre, telf:tel}};
-          var accionesDiv = document.createElement('div');
-          accionesDiv.className = 'tm-pend-actions';
-          accionesDiv.style.marginLeft = '32px';
-          accionesDiv.style.marginTop = '6px';
-          accionesDiv.style.marginBottom = '4px';
+          // v611: botones pequeños inline en el mismo renglón (no agranda lista)
+          var inline = document.createElement('span');
+          inline.className = 'tm-pend-inline';
           if(it && it.placeholder){
             if(esHoyReal){
-              accionesDiv.innerHTML = '<button type="button" class="tm-btn-recup" data-act="hecho">✓ Hecho · '+esc(it.motivo||'Tarea')+'</button>';
-              li.parentNode.insertBefore(accionesDiv, li.nextSibling);
-              accionesDiv.querySelector('[data-act="hecho"]').onclick = function(){
-                var ok = recuperarTarea(k, motivoId, tel, nombre, it.user);
-                if(ok){ setTimeout(function(){ abrirDia(k, esHoy, false); pintar(); }, 300); }
-              };
+              inline.innerHTML = '<button type="button" class="tm-btn-sm" data-act="hecho" title="Marcar hecho hoy">✓</button>';
+              li.appendChild(inline);
+              inline.querySelector('[data-act="hecho"]').onclick = function(e){ e.stopPropagation(); var ok = recuperarTarea(k, motivoId, tel, nombre, it.user); if(ok){ setTimeout(function(){ abrirDia(k, esHoy, false); pintar(); }, 300); } };
             } else {
-              accionesDiv.innerHTML = '<button type="button" class="tm-btn-recup" data-act="recup">↻ Recuperar · '+esc(it.motivo||'Tarea')+'</button>';
-              li.parentNode.insertBefore(accionesDiv, li.nextSibling);
-              accionesDiv.querySelector('[data-act="recup"]').onclick = function(){
-                var ok = recuperarTarea(k, motivoId, tel, nombre, it.user);
-                if(ok){ setTimeout(function(){ abrirDia(k, esHoy, false); }, 300); }
-              };
+              inline.innerHTML = '<button type="button" class="tm-btn-sm" data-act="recup" title="Recuperar (no cambia hábito)">↻</button>';
+              li.appendChild(inline);
+              inline.querySelector('[data-act="recup"]').onclick = function(e){ e.stopPropagation(); var ok = recuperarTarea(k, motivoId, tel, nombre, it.user); if(ok){ setTimeout(function(){ abrirDia(k, esHoy, false); }, 300); } };
             }
           } else if(esHoyReal){
-            accionesDiv.innerHTML = '<button type="button" class="tm-btn-recup wa" data-act="wa">💬 Mensaje</button><button type="button" class="tm-btn-recup" data-act="hecho">✓ Hecho hoy</button>';
-            li.parentNode.insertBefore(accionesDiv, li.nextSibling);
-            accionesDiv.querySelector('[data-act="wa"]').onclick = function(){ abrirConversacion(it.user || {usuario:it.nombre, telf:it.tel}, motivoId); };
-            accionesDiv.querySelector('[data-act="hecho"]').onclick = function(){
-              if(hacerHoy(motivoId, it.user || {usuario:it.nombre, telf:it.tel})){
-                setTimeout(function(){ abrirDia(k, esHoy, false); pintar(); }, 250);
-              }
-            };
+            inline.innerHTML = '<button type="button" class="tm-btn-sm wa" data-act="wa" title="Mensaje">💬</button><button type="button" class="tm-btn-sm" data-act="hecho" title="Hecho hoy">✓</button>';
+            li.appendChild(inline);
+            inline.querySelector('[data-act="wa"]').onclick = function(e){ e.stopPropagation(); abrirConversacion(it.user || {usuario:it.nombre, telf:it.tel}, motivoId); };
+            inline.querySelector('[data-act="hecho"]').onclick = function(e){ e.stopPropagation(); if(hacerHoy(motivoId, it.user || {usuario:it.nombre, telf:it.tel})){ setTimeout(function(){ abrirDia(k, esHoy, false); pintar(); }, 250); } };
           } else {
-            accionesDiv.innerHTML = '<button type="button" class="tm-btn-recup wa" data-act="wa">💬 Mensaje</button><button type="button" class="tm-btn-recup" data-act="recup">↻ Recuperar</button>';
-            li.parentNode.insertBefore(accionesDiv, li.nextSibling);
-            accionesDiv.querySelector('[data-act="wa"]').onclick = function(){ abrirConversacion(it.user || {usuario:it.nombre, telf:it.tel}, motivoId); };
-            accionesDiv.querySelector('[data-act="recup"]').onclick = function(){
-              var ok = recuperarTarea(k, motivoId, tel, nombre, it.user);
-              if(ok){ setTimeout(function(){ abrirDia(k, esHoy, false); }, 300); }
-            };
+            inline.innerHTML = '<button type="button" class="tm-btn-sm wa" data-act="wa" title="Mensaje">💬</button><button type="button" class="tm-btn-sm" data-act="recup" title="Recuperar">↻</button>';
+            li.appendChild(inline);
+            inline.querySelector('[data-act="wa"]').onclick = function(e){ e.stopPropagation(); abrirConversacion(it.user || {usuario:it.nombre, telf:it.tel}, motivoId); };
+            inline.querySelector('[data-act="recup"]').onclick = function(e){ e.stopPropagation(); var ok = recuperarTarea(k, motivoId, tel, nombre, it.user); if(ok){ setTimeout(function(){ abrirDia(k, esHoy, false); }, 300); } };
           }
         });
       }
