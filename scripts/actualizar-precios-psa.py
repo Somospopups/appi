@@ -380,13 +380,22 @@ def scrape_uno(pid, url):
     m = re.search(r'"sku"\s*:\s*"(\d+)"', html)
     sku_ok = not m or m.group(1) == SKUS.get(pid)
     price = None
+    # 1) JSON-LD offers
     ld = re.search(r'"offers"[^\}]{0,400}"price"\s*:\s*"?([\d.]+)', html)
     if ld:
-        price = int(round(float(ld.group(1))))
+        try: price = int(round(float(ld.group(1))))
+        except: pass
+    # 2) HTML class="price" (tienda actual, sin JSON-LD)
     if not price:
-        m2 = re.search(r'"price"\s*:\s*"?(\d[\d.]*)', html)
+        m2 = re.search(r'class="price"[^>]*>\s*\$?\s*([\d\.\,]+)', html)
         if m2:
-            price = int(round(float(m2.group(1))))
+            try: price = int(m2.group(1).split(',')[0].replace('.', '').strip())
+            except: pass
+    if not price:
+        m3 = re.search(r'"price"\s*:\s*"?(\d[\d.]*)', html)
+        if m3:
+            try: price = int(round(float(m3.group(1))))
+            except: pass
     name = ""
     nm = re.search(r'"name"\s*:\s*"([^"]{3,80})"', html)
     if nm:
@@ -394,6 +403,33 @@ def scrape_uno(pid, url):
     if not price or not sku_ok:
         return None, name
     return price, name
+
+
+def scrape_todos(productos):
+    """Cuando GraphQL falla, actualiza los precios de los 63 productos vía HTML."""
+    import time
+    actualizados = 0
+    for p in productos:
+        url = p.get('url') or ''
+        if not url: continue
+        try:
+            html = get(url, timeout=25)
+            m = re.search(r'class="price"[^>]*>\s*\$?\s*([\d\.\,]+)', html)
+            if m:
+                try:
+                    v = int(m.group(1).split(',')[0].replace('.', '').strip())
+                    if v and v != p.get('precio'):
+                        p['precio'] = v
+                        p['lista'] = v
+                        actualizados += 1
+                except: pass
+            time.sleep(0.35)
+        except Exception as e:
+            print(f"  html precio {p.get('sku')}: {e}")
+            continue
+    if actualizados:
+        print(f"html scrape actualizados {actualizados}/{len(productos)}")
+    return actualizados
 
 
 def scrape_precios(faltan):
@@ -590,7 +626,11 @@ def main():
         productos = list((prev_cat.get("productos") or [])) if isinstance(prev_cat, dict) else []
         if not productos:
             raise SystemExit("la tienda no devolvió el catálogo")
-        print("catálogo anterior conservado")
+        print("catálogo anterior conservado — scrapeando precios vía HTML")
+        try:
+            scrape_todos(productos)
+        except Exception as e:
+            print(f"scrape_todos falló: {e}")
 
     by_sku = {p.get("sku"): p for p in productos if p.get("sku")}
     precios = {}

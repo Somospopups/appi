@@ -168,7 +168,7 @@ Deno.serve(async (req) => {
     }
   }
 
-  // Planes: mantener vigente, solo actualizar fecha
+  // Planes: intentar actualizar vigencia desde el PDF de promociones
   let planesObj: any = null;
   try {
     const { data } = await supabase.storage.from(BUCKET).download(PLAN_FILE);
@@ -180,7 +180,40 @@ Deno.serve(async (req) => {
       if (r.ok) planesObj = await r.json();
     } catch (_) {}
   }
-  if (planesObj) planesObj.actualizado = nuevaFecha;
+  if (planesObj) {
+    planesObj.actualizado = nuevaFecha;
+    // Intentar extraer vigencia nueva del PDF (si cambió)
+    try {
+      const promoHtml = await fetchText('https://tienda.psa.com.ar/promociones_vigentes', 15000);
+      const mPdf = promoHtml.match(/https:\/\/contenidos\.psa\.com\.ar\/[^"'\s]+\.pdf/i) || promoHtml.match(/https:\/\/[^"'\s]+legales[^"'\s]+\.pdf/i);
+      if (mPdf) {
+        const pdfUrl = mPdf[0];
+        // El nombre del PDF suele traer la fecha, ej: legales-financiacion-vigencia_8-9-2026ok.pdf
+        const mDate = pdfUrl.match(/(\d{1,2})[-_](\d{1,2})[-_](\d{4})/);
+        if (mDate) {
+          const d1 = parseInt(mDate[1], 10), m1 = parseInt(mDate[2], 10), y1 = mDate[3];
+          // Si el PDF trae una sola fecha, la usamos como inicio; si trae rango, el HTML del PDF lo tendría
+          // Por ahora, si la vigencia actual está vencida o es distinta, la actualizamos al mes del PDF
+          const meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+          const nuevaVig = `${d1}-${meses[m1-1]}-${y1}`;
+          // Si la vigencia actual no contiene la nueva fecha, la reemplazamos (mejor que dejar la vieja vencida)
+          if (!String(planesObj.vigencia || '').includes(nuevaVig)) {
+            // Intentar también extraer el rango completo del PDF si está disponible vía texto del HTML
+            // Por simplicidad, dejamos la vigencia del PDF como inicio y mantenemos el fin anterior si existe
+            if (planesObj.vigencia && planesObj.vigencia.includes(' al ')) {
+              const fin = String(planesObj.vigencia).split(' al ')[1] || '';
+              planesObj.vigencia = `${nuevaVig} al ${fin}`;
+            } else {
+              planesObj.vigencia = nuevaVig;
+            }
+          }
+        }
+        planesObj.fuente = 'https://tienda.psa.com.ar/promociones_vigentes';
+      }
+    } catch (_) {
+      // Si falla el fetch del PDF, mantenemos la vigencia anterior
+    }
+  }
 
   // Guardar en Storage (público, upsert)
   const up = async (name: string, obj: any) => {
