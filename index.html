@@ -128,9 +128,9 @@ window.openStock=function(){
 
 <script src="./porque-vivo.js"></script>
 <script src="./home-limpio.js?v=520"></script>
-  <script src="./home-tarjetas.js?v=621"></script>
-  <script src="./appi-eventos.js?v=621"></script>
-  <script src="./tu-mes.js?v=621"></script>
+  <script src="./home-tarjetas.js?v=622"></script>
+  <script src="./appi-eventos.js?v=622"></script>
+  <script src="./tu-mes.js?v=622"></script>
   <script src="./device-bridge.js?v=523"></script>
   <script src="./anuncios.js?v=521"></script>
   <script src="./aviso-telegram.js?v=555"></script>
@@ -892,24 +892,28 @@ body.dark .hist-action-drawer{background:linear-gradient(155deg,#151827,#252036 
 
   .tools-list { display: flex; flex-direction: column; gap: 12px; }
   .tool-card {
-    padding: 14px 16px; border-radius: 14px; cursor: pointer;
-    background: #fff;
-    border: 1px solid #e4e6eb;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.06);
-    transition: transform .15s ease, box-shadow .15s ease;
+    padding: 16px 18px; border-radius: 22px; cursor: pointer;
+    background: rgba(255,255,255,0.6);
+    -webkit-backdrop-filter: blur(20px) saturate(180%); backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255,255,255,0.75);
+    box-shadow: 0 6px 22px rgba(80,90,130,0.08);
+    transition: transform .15s ease;
     position: relative; overflow: hidden;
   }
-  .tool-card::before { display:none; }
-  .tool-card:active { transform: scale(0.99); box-shadow: 0 1px 2px rgba(0,0,0,0.10); }
+  .tool-card::before {
+    content: ""; position: absolute; top: 0; left: 0; bottom: 0;
+    width: 4px; background: var(--accent, #5b8def);
+    opacity: 0.7;
+  }
+  .tool-card:active { transform: scale(0.98); }
   .tool-card .tool-head {
-    display: flex; align-items: center; gap: 12px; margin-bottom: 8px;
+    display: flex; align-items: center; gap: 14px; margin-bottom: 10px;
   }
   .tool-card .tool-icon {
-    width: 40px; height: 40px; border-radius: 10px;
+    width: 46px; height: 46px; border-radius: 14px;
     display: flex; align-items: center; justify-content: center;
     flex: none;
-    font-size: 20px;
-    box-shadow: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
   }
   .tool-card .tool-icon.presu { background: linear-gradient(135deg,#f5b301,#ff8f6b); }
   .tool-card .tool-icon.siete { background: linear-gradient(135deg,#3ad0a4,#5b8def); }
@@ -918,16 +922,16 @@ body.dark .hist-action-drawer{background:linear-gradient(155deg,#151827,#252036 
   .tool-card .tool-icon.equipo { background: linear-gradient(135deg,#3ad0a4,#a06bff); }
   .tool-card .tool-title-block { flex: 1; min-width: 0; }
   .tool-card .tool-title-block h3 {
-    margin: 0; font-size: 15px; font-weight: 800; letter-spacing: -0.2px; color: #050505;
+    margin: 0; font-size: 16px; font-weight: 800; letter-spacing: -0.2px;
   }
   .tool-card .tool-title-block .tool-sub {
-    font-size: 13px; color: #65676b; font-weight: 400; margin-top: 2px; line-height: 1.35;
+    font-size: 11.5px; color: #8a8a94; font-weight: 500; margin-top: 2px;
   }
   .tool-card .tool-status {
     text-align: right; flex: none;
   }
   .tool-card .tool-status .status-val {
-    font-size: 15px; font-weight: 800; letter-spacing: -0.3px;
+    font-size: 17px; font-weight: 800; letter-spacing: -0.3px;
     line-height: 1.1;
   }
   .tool-card .tool-status .status-val.pos { color: #1d7a5c; }
@@ -935,7 +939,7 @@ body.dark .hist-action-drawer{background:linear-gradient(155deg,#151827,#252036 
   .tool-card .tool-status .status-val.neutral { color: #3d63c9; }
   .tool-card .tool-status .status-val.empty { color: #b0b0ba; font-size: 12.5px; font-weight: 600; }
   .tool-card .tool-status .status-lbl {
-    font-size: 10.5px; color: #65676b; font-weight: 600;
+    font-size: 10.5px; color: #8a8a94; font-weight: 600;
     text-transform: uppercase; letter-spacing: 0.3px; margin-top: 2px;
   }
   .tool-card .tool-progress {
@@ -3905,17 +3909,27 @@ body.dark .admin-login-card{background:#242638}body.dark .admin-login-card h2{co
   body.dark .home-mini-txt strong{color:#f0f0f5}
   body.dark .home-mini-txt small{color:#a0a0b0}
   .quick-tool-card {
-    padding: 14px; border-radius: 14px; cursor: pointer;
-    background: #fff;
-    border: 1px solid #e4e6eb;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.06);
+    width: 100%;
+    display: block;
+    position: relative;
+    overflow: hidden;
+    min-height: 120px;
+    padding: 11px;
+    border-radius: 18px;
+    border: 1px solid rgba(255,255,255,0.75);
+    background: rgba(255,255,255,0.58);
+    box-shadow: 0 8px 20px rgba(80,90,130,0.08);
+    text-align: left;
     transition: transform .15s ease, box-shadow .15s ease;
-    position: relative; overflow: hidden;
-    display: flex; flex-direction: column; gap: 0;
-    text-align: left; width: 100%;
-    min-height: 132px;
   }
-    .quick-tool-card::before { display:none; }
+  .quick-tool-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 18% 0%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 48%);
+    opacity: .9;
+    pointer-events: none;
+  }
   .quick-tool-card:active,
   .business-card:active { transform: scale(.98); }
   .quick-tool-top {
@@ -3924,51 +3938,54 @@ body.dark .admin-login-card{background:#242638}body.dark .admin-login-card h2{co
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    gap: 8px;
-    margin-bottom: 10px;
+    gap: 6px;
+    margin-bottom: 8px;
   }
   .quick-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
+    width: 34px;
+    height: 34px;
+    border-radius: 12px;
     display: grid;
     place-items: center;
     color: #fff;
-    font-size: 20px;
+    font-size: 17px;
     background: var(--accent);
-    box-shadow: none;
+    box-shadow: 0 6px 14px color-mix(in srgb, var(--accent) 28%, transparent);
   }
   .quick-state {
     max-width: 86px;
-    padding: 4px 8px;
+    padding: 4px 7px;
     border-radius: 999px;
-    font-size: 11px;
-    line-height: 1;
-    font-weight: 700;
-    text-align: center;
-    background: #f0f2f5;
-    color: #65676b;
+    font-size: 10.5px;
+    line-height: 1.1;
+    font-weight: 950;
+    text-align: right;
+    background: rgba(80,90,130,0.09);
+    color: #777887;
   }
   .quick-state.pos,
-  .quick-state.done { background: #e6f4ef; color: #1d7a5c; }
-  .quick-state.neg { background: #fce8e6; color: #d93025; }
-  .quick-state.pending { background: #e8f0fe; color: #1a73e8; }
-  .quick-state.empty { background: #f0f2f5; color: #8a8d93; }
+  .quick-state.done { background: rgba(58,208,164,0.16); color: #1d7a5c; }
+  .quick-state.neg { background: rgba(217,83,79,0.13); color: #d9534f; }
+  .quick-state.pending { background: rgba(91,141,239,0.13); color: #3d63c9; }
+  .quick-state.empty { background: rgba(80,90,130,0.08); color: #8a8a94; }
   .quick-tool-card h3 {
-    margin: 0 0 4px; font-size: 15px; font-weight: 800; line-height: 1.2;
-    letter-spacing: -0.2px; color: #050505;
+    position: relative;
+    z-index: 1;
+    margin: 0 0 3px;
+    color: #1c1c27;
+    font-size: 13px;
+    font-weight: 950;
+    letter-spacing: -0.2px;
   }
   .quick-tool-card p {
-    margin: 0; font-size: 13px; font-weight: 400; line-height: 1.35;
-    color: #65676b; flex: 1;
+    position: relative;
+    z-index: 1;
+    margin: 0 0 6px;
+    color: #777887;
+    font-size: 10px;
+    line-height: 1.25;
+    font-weight: 650;
   }
-  .quick-tool-card .meta-cta {
-    display: inline-flex; align-items: center; justify-content: center;
-    margin-top: 12px; padding: 6px 14px; border-radius: 999px;
-    background: #e7f3ff; color: #0064d1; font-size: 12px; font-weight: 700;
-    line-height: 1; align-self: flex-start;
-  }
-  .quick-tool-card:active { transform: scale(0.99); }
   .quick-progress-line {
     position: relative;
     z-index: 1;
@@ -4119,7 +4136,6 @@ body.dark .admin-login-card{background:#242638}body.dark .admin-login-card h2{co
   body.dark .score-dashboard .score-pill,
   body.dark .business-card .business-status { color: #a8b8ff; }
   body.dark .score-compact.score-dashboard,
-  body.dark .quick-tool-card .meta-cta { background:#2d3a4a; color:#5ea8ff; }
   body.dark .quick-tool-card {
     background: rgba(30,30,50,0.55);
   }
@@ -4289,7 +4305,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v621 · Segura</div>
+  <div class="ds-foot">APPI · v622 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -11260,14 +11276,11 @@ function renderToolCard(cfg){
         <div class="tool-title-block"><h3>${title}</h3><div class="tool-sub">${sub}</div></div>
         <div class="tool-status"><div class="status-val ${statusClass || ''}">${statusVal}</div><div class="status-lbl">${statusLbl}</div></div>
       </div>
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:2px">
-        <span style="display:inline-flex;align-items:center;justify-content:center;padding:6px 14px;border-radius:999px;background:#e7f3ff;color:#0064d1;font-size:12px;font-weight:700;line-height:1">Ver</span>
-        ${timeAgo ? `<span class="time-ago" style="font-size:11px;color:#65676b">🕐 ${timeAgo}</span>` : '<span></span>'}
-      </div>
+      ${timeAgo ? `<div class="tool-progress"><span class="time-ago">🕐 ${timeAgo}</span></div>` : ''}
     </div>`;
 }
 function renderHomeQuickCard(cfg){
-  const updated = cfg.timeAgo ? `<span class="quick-updated" style="font-size:10.5px;color:#8a8d93;margin-top:6px;display:inline-block">🕐 ${cfg.timeAgo}</span>` : '';
+  const updated = cfg.timeAgo ? `<span class="quick-updated">🕐 ${cfg.timeAgo}</span>` : '';
   return `
     <button type="button" class="quick-tool-card" style="--accent:${cfg.accent}" onclick="${cfg.onClick}">
       <div class="quick-tool-top">
@@ -11276,7 +11289,6 @@ function renderHomeQuickCard(cfg){
       </div>
       <h3>${escapeXml(cfg.title)}</h3>
       <p>${escapeXml(cfg.sub)}</p>
-      <span class="meta-cta">Ver</span>
       ${updated}
     </button>
   `;
@@ -12812,8 +12824,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='621';
-      const CACHE_NAME='appi-v621-poster';
+      const swVersion='622';
+      const CACHE_NAME='appi-v622-poster';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · v'+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
