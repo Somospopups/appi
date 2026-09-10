@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v598-poster';
+const CACHE_NAME = 'appi-v599-poster';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
@@ -34,6 +34,7 @@ const APP_SHELL = [
   './porque-vivo.js',
   './home-limpio.js',
   './home-tarjetas.js',
+  './appi-eventos.js',
   './tu-mes.js',
   './device-bridge.js',
   './anuncios.js',

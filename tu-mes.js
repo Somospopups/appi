@@ -1,6 +1,9 @@
-/* APPI · Tu mes
+/* APPI · Tu mes v599 — cerebro
    El mes es un tablero de cartas. Cada día, las 10 de la jornada.
-   La puerta es la franja de septiembre del Home. */
+   La puerta es la franja de septiembre del Home.
+   v599: TU MES es cerebro — timeline al abrir día + métricas sutiles arriba.
+   Eventos viven en appi-eventos.js (bus central silencioso).
+*/
 (function () {
   'use strict';
 
@@ -11,9 +14,10 @@
   var vistaAnio = 0, vistaMes = 0;
 
   function M(){ return window.APPIMensajes || null; }
+  function E(){ return window.APPIEventos || null; }
   function esc(s){
     return String(s == null ? '' : s)
-      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;');
   }
   function hoy(){ return new Date(); }
   function clave(d){
@@ -31,6 +35,28 @@
       t = t.toLowerCase().replace(/(^|[\s-])([a-záéíóúüñ])/g, function(m, a, b){ return a + b.toUpperCase(); });
     }
     return t;
+  }
+  function horaDe(ts){
+    try{
+      var d = new Date(Number(ts)||0);
+      return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+    }catch(e){ return ''; }
+  }
+  function iconoEv(tipo){
+    if(tipo==='mensaje') return '💬';
+    if(tipo==='accion') return '✓';
+    if(tipo==='contacto') return '👤';
+    if(tipo==='cultura') return '🌱';
+    if(tipo==='promo') return '🎁';
+    return '•';
+  }
+  function textoTipo(tipo){
+    if(tipo==='mensaje') return 'Mensaje';
+    if(tipo==='accion') return 'Acción';
+    if(tipo==='contacto') return 'Contacto';
+    if(tipo==='cultura') return 'Cultura';
+    if(tipo==='promo') return 'Promo';
+    return tipo||'';
   }
 
   function planaHoy(){
@@ -92,8 +118,14 @@
       '#tmNav button{width:48px;height:48px;border:0;border-radius:50%;background:#0b5878;color:#fff;font-size:30px;font-weight:900;line-height:1;cursor:pointer;box-shadow:0 10px 24px rgba(11,88,120,.3);display:grid;place-items:center;padding:0}',
       '#tmNav button:active{transform:scale(.94)}',
       '#tmNav button[disabled]{opacity:.34;cursor:default;box-shadow:none}',
-      '.tm-sub{margin:0 0 14px;text-align:center;font-size:12.5px;font-weight:800;color:#686977}',
+      '.tm-sub{margin:0 0 10px;text-align:center;font-size:12.5px;font-weight:800;color:#686977}',
       'body.dark .tm-sub{color:#b8b9c5}',
+      /* métricas sutiles arriba — v599 */
+      '.tm-metrics{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:0 0 12px}',
+      '.tm-metric{display:inline-flex;align-items:center;gap:5px;padding:5px 9px;border-radius:999px;background:rgba(255,255,255,.68);border:1px solid rgba(11,88,120,.08);font-size:11px;font-weight:850;color:#3a3a48;box-shadow:0 4px 12px rgba(80,90,130,.06)}',
+      'body.dark .tm-metric{background:rgba(37,41,64,.62);border-color:rgba(255,255,255,.08);color:#d6d7de}',
+      '.tm-metric b{font-weight:900}',
+      '.tm-metric.muted{opacity:.72}',
       '.tm-sem,.tm-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}',
       '.tm-sem span{text-align:center;font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#8a8678}',
       '.tm-dia{aspect-ratio:3/3.7;border:0;border-radius:12px;padding:6px 5px 5px;background:#efeae0;color:#5c5a52;font:inherit;font-size:11px;font-weight:800;text-align:left;cursor:pointer;display:flex;flex-direction:column;min-width:0;overflow:hidden}',
@@ -109,6 +141,9 @@
       '.tm-dia .ok{margin-top:auto;display:block;font-size:10.5px;font-weight:900;line-height:1.2}',
       '.tm-dia .no{display:block;font-size:8.5px;font-weight:800;line-height:1.2;opacity:.95;max-height:2.5em;overflow:hidden}',
       '.tm-dia .m{margin-top:auto;font-size:9.5px;opacity:.8}',
+      '.tm-dia .tm-dot{width:6px;height:6px;border-radius:50%;display:inline-block;margin-left:4px;vertical-align:middle;background:rgba(11,88,120,.22)}',
+      '.tm-dia.con-evento .tm-dot{background:#0b5878}',
+      'body.dark .tm-dia.con-evento .tm-dot{background:#8ec8e0}',
       '#tmCierre{display:none;position:fixed;inset:0;z-index:45000;align-items:center;justify-content:center;background:rgba(16,20,28,.38);padding:16px}',
       '#tmCierre.on{display:flex}',
       '#tmPicado{position:absolute;inset:0;overflow:hidden;pointer-events:none}',
@@ -138,6 +173,25 @@
       '.tm-carta li.pend .tm-bola{background:rgba(255,255,255,.2);color:#fff}',
       '.tm-pie{margin-top:12px;text-align:center;font-size:13px;font-weight:800}',
       '.tm-x{position:absolute;top:4px;right:4px;z-index:6;width:44px;height:44px;border:0;border-radius:50%;background:rgba(0,0,0,.22);color:#fff;font-size:22px;font-weight:700;line-height:1;cursor:pointer;display:grid;place-items:center;padding:0}',
+      /* timeline dentro del día — v599 */
+      '.tm-tl{margin-top:14px;padding-top:12px;border-top:1px dashed rgba(255,255,255,.22)}',
+      '.tm-carta.amarillo .tm-tl{border-top-color:rgba(0,0,0,.14)}',
+      '.tm-tl h4{margin:0 0 8px;font-size:11px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;opacity:.88}',
+      '.tm-tl-empty{padding:10px 11px;border-radius:12px;background:rgba(255,255,255,.10);border:1px dashed rgba(255,255,255,.18);font-size:12.5px;font-weight:700;opacity:.9}',
+      '.tm-carta.amarillo .tm-tl-empty{background:rgba(0,0,0,.06);border-color:rgba(0,0,0,.12)}',
+      '.tm-ev{display:flex;gap:9px;align-items:flex-start;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.12)}',
+      '.tm-carta.amarillo .tm-ev{border-bottom-color:rgba(0,0,0,.10)}',
+      '.tm-ev:last-child{border-bottom:0}',
+      '.tm-ev .tm-ev-ico{flex:0 0 26px;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:12px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.14)}',
+      '.tm-carta.amarillo .tm-ev .tm-ev-ico{background:rgba(0,0,0,.08);border-color:rgba(0,0,0,.10)}',
+      '.tm-ev.mensaje .tm-ev-ico{background:rgba(37,211,102,.22)}',
+      '.tm-ev.accion .tm-ev-ico{background:rgba(125,204,106,.28)}',
+      '.tm-ev.contacto .tm-ev-ico{background:rgba(91,141,239,.20)}',
+      '.tm-ev.cultura .tm-ev-ico{background:rgba(232,184,74,.22)}',
+      '.tm-ev .tm-ev-body{flex:1;min-width:0}',
+      '.tm-ev .tm-ev-title{font-size:12.5px;font-weight:900;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+      '.tm-ev .tm-ev-detail{margin-top:2px;font-size:11.5px;font-weight:700;opacity:.88;line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+      '.tm-ev .tm-ev-hora{flex:0 0 auto;font-size:11px;font-weight:800;opacity:.75;margin-top:2px}',
       '.tm-kpis{margin-top:16px;background:#fff;border-radius:18px;padding:14px 16px 10px;border:1px solid rgba(11,88,120,.08)}',
       'body.dark .tm-kpis{background:#25273a;border-color:rgba(255,255,255,.08)}',
       '.tm-kpis .tm-frase{margin:0 0 10px;font-size:14.5px;font-weight:800;line-height:1.4;color:#1d1d2c}',
@@ -203,10 +257,30 @@
     var frase = vivos
       ? (vivos + (vivos === 1 ? ' día' : ' días') + ' el negocio estuvo vivo. Atendiste ' + personas + (personas === 1 ? ' persona.' : ' personas.'))
       : 'Este mes todavía no hay movimiento. Las 10 van a ir llenando esto.';
+
+    // Métricas de cerebro (eventos) — sutiles dentro del KPI box
+    var evResumen = null;
+    try{
+      if(E() && typeof E().resumenMes==='function') evResumen = E().resumenMes(anio, mes);
+    }catch(e){}
+    var extraEventos = '';
+    if(evResumen && evResumen.total){
+      var chips=[];
+      if(evResumen.mensajes) chips.push('💬 '+evResumen.mensajes);
+      if(evResumen.acciones) chips.push('✓ '+evResumen.acciones);
+      if(evResumen.contactos) chips.push('👤 '+evResumen.contactos);
+      if(evResumen.cultura) chips.push('🌱 '+evResumen.cultura);
+      if(chips.length){
+        extraEventos = '<div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:6px">'+
+          chips.map(function(ch){ return '<span class="tm-metric" style="font-size:10.5px;padding:4px 8px">'+esc(ch)+'</span>'; }).join('')+
+          '<span class="tm-metric muted" style="font-size:10.5px;padding:4px 8px">· '+evResumen.total+' movimientos</span></div>';
+      }
+    }
+
     box.innerHTML = '<p class="tm-frase">' + esc(frase) + '</p><ul>' +
       filas.map(function(f){
         return '<li><span>' + f.icono + ' ' + esc(f.nombre) + '</span><i>' + f.n + '</i></li>';
-      }).join('') + '</ul>';
+      }).join('') + '</ul>' + extraEventos;
   }
 
   var DESC_TAREA = {
@@ -236,6 +310,25 @@
     vistaAnio = d.getFullYear();
     vistaMes = d.getMonth();
     pintar();
+  }
+
+  function htmlMetricasSutiles(anio, mes){
+    try{
+      var ev = E();
+      if(!ev || typeof ev.resumenMes!=='function') return '';
+      var r = ev.resumenMes(anio, mes);
+      if(!r || !r.total) return '<div class="tm-metrics"><span class="tm-metric muted">Sin movimientos aún</span></div>';
+      var parts=[];
+      if(r.mensajes) parts.push('<span class="tm-metric">💬 '+r.mensajes+' mensajes</span>');
+      if(r.acciones) parts.push('<span class="tm-metric">✓ '+r.acciones+' acciones</span>');
+      if(r.contactos) parts.push('<span class="tm-metric">👤 '+r.contactos+' contactos</span>');
+      if(r.cultura) parts.push('<span class="tm-metric">🌱 '+r.cultura+' cultura</span>');
+      // Mostrar total solo si hay más de 2 tipos para no recargar
+      var totalTxt = r.total+' movimientos';
+      if(parts.length) parts.push('<span class="tm-metric muted">'+esc(totalTxt)+'</span>');
+      else parts.push('<span class="tm-metric muted">'+esc(totalTxt)+'</span>');
+      return '<div class="tm-metrics">'+parts.join('')+'</div>';
+    }catch(e){ return ''; }
   }
 
   function pintar(){
@@ -281,12 +374,23 @@
         : (vivos ? (vivos + (vivos === 1 ? ' día con movimiento' : ' días con movimiento')) : 'Sin movimiento registrado');
     }
 
+    // Métricas sutiles (eventos del cerebro) — justo debajo del subtítulo, sin romper calendario
+    var metricsHtml = htmlMetricasSutiles(anio, mes);
+
     var sem = SEM.map(function(d){ return '<span>' + d + '</span>'; }).join('');
     var celdas = '';
     var shift = (new Date(anio, mes, 1).getDay() + 6) % 7;
     var i;
     for (i = 0; i < shift; i++) celdas += '<button type="button" class="tm-dia" disabled></button>';
     var last = new Date(anio, mes+1, 0).getDate();
+    // Para puntitos de evento, precomputar días con eventos
+    var diasConEvento = {};
+    try{
+      if(E() && typeof E().listarMes==='function'){
+        var evMes = E().listarMes(anio, mes);
+        evMes.forEach(function(ev){ diasConEvento[ev.dia]=1; });
+      }
+    }catch(e){}
     for (i = 1; i <= last; i++){
       var k = anio + '-' + String(mes+1).padStart(2,'0') + '-' + String(i).padStart(2,'0');
       var info = mapa[k];
@@ -294,8 +398,9 @@
       var esHoyCel = esActual && i === diaHoy;
       var hDia = info && info.total ? (Number(info.hechas)||0) : (esHoyCel && partido && partido.hay ? partido.hechas : 0);
       var tDia = info && info.total ? info.total : (esHoyCel && partido && partido.hay ? partido.total : 0);
-      var sem = futuro ? '' : semaforo(hDia, tDia);
-      var tipo = (futuro ? 'futuro' : '') + (esHoyCel ? ' hoy' : '') + (sem ? ' ' + sem : '');
+      var semCol = futuro ? '' : semaforo(hDia, tDia);
+      var conEvento = !!diasConEvento[k];
+      var tipo = (futuro ? 'futuro' : '') + (esHoyCel ? ' hoy' : '') + (semCol ? ' ' + semCol : '') + (conEvento ? ' con-evento' : '');
       var marca = esHoyCel ? 'Hoy ' + i : String(i);
       var mini = '';
       if (tDia){
@@ -317,12 +422,14 @@
       } else if (futuro){
         mini = '<span class="m">sin abrir</span>';
       } else {
-        mini = '<span class="m">sin movimiento</span>';
+        mini = conEvento ? '<span class="m">movimiento</span>' : '<span class="m">sin movimiento</span>';
       }
+      // puntito sutil si hubo evento ese día (mensajes/acciones/etc)
+      var dot = conEvento ? '<i class="tm-dot" aria-hidden="true"></i>' : '';
       celdas += '<button type="button" class="tm-dia ' + tipo + '" data-tm-dia="' + k + '"' +
-        (futuro ? ' disabled' : '') + '><span class="n">' + esc(marca) + '</span>' + mini + '</button>';
+        (futuro ? ' disabled' : '') + '><span class="n">' + esc(marca) + dot + '</span>' + mini + '</button>';
     }
-    host.innerHTML = '<div class="tm-sem">' + sem + '</div><div class="tm-grid" style="margin-top:8px">' + celdas + '</div>';
+    host.innerHTML = metricsHtml + '<div class="tm-sem">' + sem + '</div><div class="tm-grid" style="margin-top:8px">' + celdas + '</div>';
     host.querySelectorAll('[data-tm-dia]').forEach(function(b){
       b.onclick = function(){ abrirDia(b.getAttribute('data-tm-dia'), b.classList.contains('hoy')); };
     });
@@ -425,6 +532,29 @@
       : (ganado
           ? (esHoy ? 'Hoy el negocio estuvo en movimiento. Eso vale.' : 'Ese día quedó marcado. Eso vale.')
           : (esHoy ? ('Vas ' + hechas + ' de ' + total + ' · ' + pct + '%. El día todavía está abierto.') : (hechas + ' de ' + total + ' · ' + pct + '%.')));
+
+    // — timeline cerebro v599 — //
+    var tlHtml = '';
+    try{
+      var evDay = E() ? E().listar({dia: k}) : [];
+      if(evDay && evDay.length){
+        // ordenar cronológico
+        evDay.sort(function(a,b){ return (a.ts||0)-(b.ts||0); });
+        tlHtml = '<div class="tm-tl"><h4>Movimientos del día · ' + evDay.length + '</h4>' +
+          evDay.map(function(ev){
+            var cls = esc(String(ev.tipo||'otro'));
+            var titEv = esc(ev.titulo|| textoTipo(ev.tipo));
+            var detEv = esc(ev.detalle||'');
+            var hr = esc(horaDe(ev.ts));
+            var ico = esc(iconoEv(ev.tipo));
+            return '<div class="tm-ev '+cls+'"><span class="tm-ev-ico">'+ico+'</span><div class="tm-ev-body"><div class="tm-ev-title">'+titEv+'</div>'+(detEv?'<div class="tm-ev-detail">'+detEv+'</div>':'')+'</div><span class="tm-ev-hora">'+hr+'</span></div>';
+          }).join('') +
+          '</div>';
+      } else {
+        tlHtml = '<div class="tm-tl"><h4>Movimientos del día</h4><div class="tm-tl-empty">Aún no hay movimientos registrados este día. En cuanto envíes un mensaje, marques una acción o sumes un contacto, va a aparecer acá — sin tocar nada.</div></div>';
+      }
+    }catch(e){ tlHtml=''; }
+
     var carta = document.getElementById('tmCarta');
     carta.className = 'tm-carta' + (sem ? ' ' + sem : '');
     carta.innerHTML =
@@ -433,6 +563,7 @@
       '<div class="cab">💙 Para vos</div>' +
       '<h2>' + esc(tit) + '</h2>' +
       lista +
+      tlHtml +
       '<p class="tm-pie">' + esc(pie) + '</p></div>';
     document.getElementById('tmCarta').querySelector('.tm-x').onclick = function(e){
       e.preventDefault(); e.stopPropagation(); cerrarCierre();
@@ -484,19 +615,49 @@
 
   function enganchar(){
     var api = M();
-    if (!api || api.__tmHook) return;
-    if (typeof api.marcarAccion !== 'function') return;
-    api.__tmHook = true;
-    var orig = api.marcarAccion;
-    api.marcarAccion = function(){
-      var r = orig.apply(this, arguments);
-      try{
-        var v = document.getElementById('view-tumes');
-        if (v && v.classList.contains('active')) pintar();
-        setTimeout(fiestaSiGano, 80);
-      }catch(e){}
-      return r;
-    };
+    if (api && !api.__tmHook && typeof api.marcarAccion === 'function'){
+      api.__tmHook = true;
+      var orig = api.marcarAccion;
+      api.marcarAccion = function(){
+        var r = orig.apply(this, arguments);
+        try{
+          var v = document.getElementById('view-tumes');
+          if (v && v.classList.contains('active')) pintar();
+          setTimeout(fiestaSiGano, 80);
+        }catch(e){}
+        return r;
+      };
+    }
+    // cerebro: repintar si llega un evento y la vista está activa
+    try{
+      if(E() && !E().__tmLinked){
+        E().__tmLinked = true;
+        E()._onEmit = function(ev){
+          try{
+            var v = document.getElementById('view-tumes');
+            if(v && v.classList.contains('active')) pintar();
+          }catch(e){}
+          // Si el modal de día está abierto y el evento es de ese día, refrescar modal
+          try{
+            var velo = document.getElementById('tmCierre');
+            if(velo && velo.classList.contains('on')){
+              var tit = document.querySelector('#tmCarta h2');
+              // Si el evento es del día abierto, reabrir para mostrar nuevo timeline (suave)
+              if(ev && ev.dia){
+                var ya = document.querySelector('.tm-tl');
+                if(ya){
+                  // Re-render simple: cerrar y reabrir con mismo k sería brusco; mejor solo repintar métricas si hace falta
+                  // Por ahora, pintar() ya actualiza puntitos; el timeline se verá al reabrir
+                }
+              }
+            }
+          }catch(e){}
+        };
+        window.addEventListener('appi-evento', function(e){
+          try{ if(E()._onEmit) E()._onEmit(e.detail); }catch(err){}
+        });
+      }
+    }catch(e){}
   }
 
   function abrir(){
@@ -545,6 +706,7 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();
   window.addEventListener('appi-datasync-applied', function(){ try{ pintar(); }catch(e){} });
+  window.addEventListener('appi-evento', function(){ try{ var v=document.getElementById('view-tumes'); if(v&&v.classList.contains('active')) pintar(); }catch(e){} });
   setTimeout(init, 700);
   setTimeout(envolverShow, 200);
   setTimeout(envolverShow, 900);
