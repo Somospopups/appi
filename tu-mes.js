@@ -80,13 +80,15 @@
       '.home-month-card{cursor:pointer}',
       '.home-month-card:focus{outline:2px solid #e8b84a;outline-offset:2px}',
       '.tm-wrap{padding:12px 14px 28px}',
-      '.tm-nav{display:flex;align-items:center;gap:8px;margin:0 0 8px}',
-      '.tm-nav strong{flex:1;text-align:center;font-size:16px;font-weight:900;color:#0b5878;letter-spacing:-.3px}',
-      'body.dark .tm-nav strong{color:#8ec8e0}',
-      '.tm-nav button{width:36px;height:36px;border:0;border-radius:12px;background:#fff;color:#0b5878;font-size:22px;font-weight:900;cursor:pointer;line-height:1}',
-      'body.dark .tm-nav button{background:#25273a;color:#8ec8e0}',
-      '.tm-nav button[disabled]{opacity:.32;cursor:default}',
-      '.tm-sub{margin:0 0 12px;font-size:12.5px;font-weight:800;color:#686977}',
+      '.tm-nav{display:flex;align-items:center;justify-content:center;gap:14px;margin:2px 0 4px}',
+      '.tm-nav-mes{min-width:168px;text-align:center}',
+      '.tm-nav-mes strong{display:block;font-size:22px;font-weight:900;color:#0b5878;letter-spacing:-.5px;line-height:1.15}',
+      'body.dark .tm-nav-mes strong{color:#8ec8e0}',
+      '.tm-nav-mes span{display:block;margin-top:2px;font-size:11px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#8a8678}',
+      '.tm-nav button{width:40px;height:40px;border:1px solid rgba(11,88,120,.16);border-radius:50%;background:transparent;color:#0b5878;font-size:22px;font-weight:700;cursor:pointer;line-height:1;display:grid;place-items:center;padding:0}',
+      'body.dark .tm-nav button{border-color:rgba(255,255,255,.16);color:#8ec8e0}',
+      '.tm-nav button[disabled]{opacity:.28;cursor:default}',
+      '.tm-sub{margin:0 0 14px;text-align:center;font-size:12.5px;font-weight:800;color:#686977}',
       'body.dark .tm-sub{color:#b8b9c5}',
       '.tm-sem,.tm-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}',
       '.tm-sem span{text-align:center;font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#8a8678}',
@@ -223,7 +225,7 @@
     if (nav){
       var pisoD = new Date(anio, mes, 1).getTime() <= new Date(now.getFullYear(), now.getMonth() - 12, 1).getTime();
       nav.innerHTML = '<button type="button" id="tmPrev" aria-label="Mes anterior"' + (pisoD ? ' disabled' : '') + '>‹</button>' +
-        '<strong>' + MESES[mes] + ' ' + anio + '</strong>' +
+        '<div class="tm-nav-mes"><strong>' + MESES[mes] + '</strong><span>' + anio + '</span></div>' +
         '<button type="button" id="tmNext" aria-label="Mes siguiente"' + (esActual ? ' disabled' : '') + '>›</button>';
       var prev = document.getElementById('tmPrev');
       var next = document.getElementById('tmNext');
