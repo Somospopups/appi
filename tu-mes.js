@@ -106,53 +106,52 @@
       '.tm-carta li.pend .tm-bola{background:rgba(255,255,255,.2);color:#fff}',
       '.tm-pie{margin-top:12px;text-align:center;font-size:13px;font-weight:800}',
       '.tm-x{position:absolute;top:8px;right:10px;border:0;background:transparent;color:#fff;font-size:22px;cursor:pointer;line-height:1}',
-      '.tm-kpis{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px}',
-      '.tm-kpi{background:#fff;border-radius:16px;padding:12px 12px 10px;border:1px solid rgba(11,88,120,.08);text-align:left;min-height:92px;display:flex;flex-direction:column}',
-      'body.dark .tm-kpi{background:#25273a;border-color:rgba(255,255,255,.08)}',
-      '.tm-kpi b{display:block;font-size:22px;line-height:1.1;color:#0b5878;letter-spacing:-.4px;font-weight:900}',
-      'body.dark .tm-kpi b{color:#8ec8e0}',
-      '.tm-kpi em{display:block;margin-top:4px;font-style:normal;font-size:11.5px;font-weight:800;color:#6b6a62}',
-      'body.dark .tm-kpi em{color:#b8b9c5}',
-      '.tm-kpi .row{margin-top:auto;display:flex;gap:6px;padding-top:8px}',
-      '.tm-kpi button{flex:0 0 32px;height:32px;border:0;border-radius:10px;background:#0b5878;color:#fff;font-size:18px;font-weight:900;cursor:pointer;line-height:1}',
-      '.tm-kpi button.menos{background:#d9d3c6;color:#0b5878}',
-      '.tm-kpi.ir{cursor:pointer}'
+      '.tm-kpis{margin-top:16px;background:#fff;border-radius:18px;padding:14px 16px 10px;border:1px solid rgba(11,88,120,.08)}',
+      'body.dark .tm-kpis{background:#25273a;border-color:rgba(255,255,255,.08)}',
+      '.tm-kpis .tm-frase{margin:0 0 10px;font-size:14.5px;font-weight:800;line-height:1.4;color:#1d1d2c}',
+      'body.dark .tm-kpis .tm-frase{color:#f3eee3}',
+      '.tm-kpis ul{list-style:none;margin:0;padding:0}',
+      '.tm-kpis li{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-top:1px solid #efeae0;font-size:14px;font-weight:800}',
+      'body.dark .tm-kpis li{border-top-color:rgba(255,255,255,.08)}',
+      '.tm-kpis li:first-child{border-top:0}',
+      '.tm-kpis li i{font-style:normal;color:#0b5878;font-size:16px;font-weight:900}',
+      'body.dark .tm-kpis li i{color:#8ec8e0}'
     ].join('\n');
     document.head.appendChild(s);
   }
 
-  function kpiKey(anio, mes){ return 'appi_tumes_kpi_' + anio + '-' + String(mes+1).padStart(2,'0') + '_' + uid(); }
-  function leerKpi(anio, mes){
-    try{ var o = JSON.parse(localStorage.getItem(kpiKey(anio, mes)) || '{}'); return o && typeof o === 'object' ? o : {}; }
-    catch(e){ return {}; }
-  }
-  function guardarKpi(anio, mes, o){
-    try{ localStorage.setItem(kpiKey(anio, mes), JSON.stringify(o)); }catch(e){}
-  }
-  function plata(n){
-    n = Math.round(Number(n) || 0);
-    return '$ ' + String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-  }
-  function recaudadoMes(anio, mes){
+  function desgloseMes(anio, mes, mapa){
+    var orden = [
+      { id: 'cumple', icono: '🎂', nombre: 'Cumpleaños' },
+      { id: 'retro', icono: '🔧', nombre: 'Retrolavados' },
+      { id: 'porvencer', icono: '⏰', nombre: 'Garantías por vencer' },
+      { id: 'renovacion', icono: '🔄', nombre: 'Equipos para canjear' },
+      { id: 'checkin', icono: '👋', nombre: '¿Cómo viene el equipo?' }
+    ];
+    var cnt = {};
+    orden.forEach(function(o){ cnt[o.id] = 0; });
+    var kHoy = hoyKey();
     try{
-      var raw = localStorage.getItem('presu_' + anio + '_' + String(mes+1).padStart(2,'0'));
-      if (!raw) return 0;
-      var s = JSON.parse(raw);
-      var tot = 0;
-      (s.incomes || []).forEach(function(i){ tot += Number(i.val) || 0; });
-      if (!tot && typeof s.ingreso === 'number') tot = s.ingreso;
-      return tot;
-    }catch(e){ return 0; }
-  }
-  function culturaNums(){
-    try{
-      var data = JSON.parse(localStorage.getItem('cultura_crecimiento_v1') || '{}');
-      var d = hoy();
-      var id = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
-      var row = data[id] || {};
-      var inv = Array.isArray(row.invitados) ? row.invitados.length : Number(row.invitados) || 0;
-      return { pb: Number(row.pb) || 0, inv: inv };
-    }catch(e){ return { pb: 0, inv: 0 }; }
+      var raw = JSON.parse(localStorage.getItem('appi_acciones_v1_' + uid()) || '{}');
+      var pref = anio + '-' + String(mes+1).padStart(2,'0') + '-';
+      Object.keys(raw.dias || {}).forEach(function(k){
+        if (k.indexOf(pref) !== 0 || k === kHoy) return;
+        var marcas = (raw.dias[k] && raw.dias[k].marcas) || {};
+        Object.keys(marcas).forEach(function(claveM){
+          var m = marcas[claveM];
+          if (!m || m.e !== 'hecha') return;
+          var id = claveM.split(':')[0];
+          if (cnt[id] == null) cnt[id] = 0;
+          cnt[id]++;
+        });
+      });
+    }catch(e){}
+    planaHoy().forEach(function(it){
+      if (!it.hecha) return;
+      if (cnt[it.motivoId] == null) cnt[it.motivoId] = 0;
+      cnt[it.motivoId]++;
+    });
+    return orden.map(function(o){ return { icono: o.icono, nombre: o.nombre, n: cnt[o.id] || 0 }; });
   }
   function pintarKpis(anio, mes, mapa){
     var box = document.getElementById('tmKpis');
@@ -165,30 +164,14 @@
       personas += h;
       if (h) vivos++;
     });
-    var demos = Number(leerKpi(anio, mes).demos) || 0;
-    var plataMes = recaudadoMes(anio, mes);
-    var cul = culturaNums();
-    box.innerHTML =
-      '<article class="tm-kpi"><b>' + personas + '</b><em>personas atendidas</em></article>' +
-      '<article class="tm-kpi"><b>' + vivos + '</b><em>días con movimiento</em></article>' +
-      '<article class="tm-kpi"><b>' + demos + '</b><em>presentaciones</em><div class="row">' +
-        '<button type="button" class="menos" data-tm-demo="-1" aria-label="Quitar">−</button>' +
-        '<button type="button" data-tm-demo="1" aria-label="Sumar">+</button></div></article>' +
-      '<article class="tm-kpi ir" id="tmPlata"><b>' + plata(plataMes) + '</b><em>' +
-        (plataMes ? 'recaudado (Presupuesto)' : 'recaudado · tocá para anotar') + '</em></article>' +
-      (cul.pb || cul.inv ? '<article class="tm-kpi" style="grid-column:1/-1"><b>' +
-        String(cul.pb).replace('.', ',') + ' PB · ' + cul.inv + ' invitados</b><em>Cultura de este mes</em></article>' : '');
-    box.querySelectorAll('[data-tm-demo]').forEach(function(b){
-      b.onclick = function(e){
-        e.stopPropagation();
-        var k = leerKpi(anio, mes);
-        k.demos = Math.max(0, (Number(k.demos) || 0) + Number(b.getAttribute('data-tm-demo')));
-        guardarKpi(anio, mes, k);
-        pintar();
-      };
-    });
-    var pl = document.getElementById('tmPlata');
-    if (pl) pl.onclick = function(){ try{ if (typeof window.openPresu === 'function') window.openPresu(); }catch(e){} };
+    var filas = desgloseMes(anio, mes, mapa);
+    var frase = vivos
+      ? (vivos + (vivos === 1 ? ' día' : ' días') + ' el negocio estuvo vivo. Atendiste ' + personas + (personas === 1 ? ' persona.' : ' personas.'))
+      : 'Este mes todavía no hay movimiento. Las 10 van a ir llenando esto.';
+    box.innerHTML = '<p class="tm-frase">' + esc(frase) + '</p><ul>' +
+      filas.map(function(f){
+        return '<li><span>' + f.icono + ' ' + esc(f.nombre) + '</span><i>' + f.n + '</i></li>';
+      }).join('') + '</ul>';
   }
 
   function pintar(){
