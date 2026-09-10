@@ -1220,7 +1220,7 @@
     }
     // Sin equipo en absoluto -> tarjeta genérica para compartir con cualquiera
     if (!lista.length){
-      var promoImgTag2 = '<img class="ht-foto" src="' + PROMO_BOTELLA_IMG + '" alt="Botella térmica PSA 500 ml" loading="lazy" onerror="this.style.display=\'none\'">';
+      var promoImgTag2 = '<img class="ht-foto ht-foto-promo" src="' + PROMO_BOTELLA_IMG + '" alt="Botella térmica PSA 500 ml" loading="lazy" onerror="this.style.display=\'none\'">';
       var textoGen = textoPromoBotella({ nombre: '' });
       var compartirGenerico = function(){
         // Sin nombre concreto: deja elegir contacto en WhatsApp
@@ -1241,9 +1241,8 @@
       return {
         cat: 'promo', icono: '🎁', kicker: 'Promo PSA · 9 al 17 de septiembre',
         titulo: 'Compartí la promo de la botella',
-        html: promoImgTag2 +
-              '<p class="ht-frase">Con 5 PB personales se lleva la botella térmica blanca de 500 ml. Es la excusa perfecta para volver a hablar.</p>' +
-              '<p class="ht-nota">No detectamos equipo en tu planilla, pero podés reenviar la promo a cualquier contacto — la foto queda copiada para pegarla 📎</p>',
+        html: '<div class="ht-promo">' + promoImgTag2 + '<div class="ht-promo-txt"><p class="ht-frase">Con 5 PB personales se lleva la botella térmica blanca de 500 ml. Es la excusa perfecta para volver a hablar.</p>' +
+              '<p class="ht-nota">No detectamos equipo en tu planilla, pero podés reenviar la promo a cualquier contacto — la foto queda copiada para pegarla 📎</p></div></div>',
         items: null,
         cta: { label: 'Compartir por WhatsApp', go: compartirGenerico }
       };
@@ -1282,7 +1281,7 @@
         }
       }
     }catch(e){}
-    var promoImgTag = '<img class="ht-foto" src="' + PROMO_BOTELLA_IMG + '" alt="Botella térmica PSA 500 ml" loading="lazy" onerror="this.style.display=\'none\'">';
+    var promoImgTag = '<img class="ht-foto ht-foto-promo" src="' + PROMO_BOTELLA_IMG + '" alt="Botella térmica PSA 500 ml" loading="lazy" onerror="this.style.display=\'none\'">';
     var nota = modoFallback
       ? '<p class="ht-nota">No hay inactivos con &lt;5 PB, pero estos son de tu equipo — tocá un nombre y sale el mensaje con la foto 📎</p>'
       : '<p class="ht-nota">Tocá un nombre: abre WhatsApp con el texto y la foto queda copiada — pegala en el chat 📎</p>';
@@ -1291,9 +1290,8 @@
     return {
       cat: 'promo', icono: '🎁', kicker: 'Promo PSA · 9 al 17 de septiembre',
       titulo: titulo,
-      html: promoImgTag +
-            '<p class="ht-frase">Con 5 PB personales se lleva la botella térmica blanca de 500 ml. Es la excusa perfecta para volver a hablar.</p>' +
-            nota +
+      html: '<div class="ht-promo">' + promoImgTag + '<div class="ht-promo-txt"><p class="ht-frase">Con 5 PB personales se lleva la botella térmica blanca de 500 ml. Es la excusa perfecta para volver a hablar.</p>' +
+            nota + '</div></div>' +
             '<ul class="ht-lista">' + filas.join('') + '</ul>',
       items: items,
       cta: { label: 'Escribirle a ' + (pilaDe(lista[0].nombre) || 'la primera'), go: items[0] }
@@ -1363,6 +1361,12 @@
       '.ht-chips span{padding:7px 12px;border-radius:999px;background:rgba(91,141,239,.1);color:#3d63c9;font-size:12.5px;font-weight:900}',
       '.ht-cta{margin-top:auto;flex:0 0 auto;position:relative;z-index:2;min-height:48px;border:0;border-radius:15px;background:linear-gradient(135deg,#5b8def,#8b63e8);color:#fff;font:inherit;font-size:15px;font-weight:900;cursor:pointer}',
       '.ht-foto{display:block;width:100%;height:148px;object-fit:contain;background:#eef2f7;border-radius:16px;margin:0 0 12px}',
+      '.ht-promo{display:flex;gap:12px;align-items:stretch;margin:0 0 12px}',
+      '.ht-promo .ht-foto-promo{flex:0 0 42%;width:42%;height:auto;min-height:156px;max-height:188px;object-fit:cover;object-position:center;background:#eef2f7;border-radius:16px;margin:0;display:block}',
+      '.ht-promo .ht-promo-txt{flex:1;display:flex;flex-direction:column;justify-content:center;gap:8px;min-width:0}',
+      '.ht-promo .ht-promo-txt .ht-frase{margin:0;font-size:15px;line-height:1.38}',
+      '.ht-promo .ht-promo-txt .ht-nota{margin:0}',
+      '@media(max-width:360px){.ht-promo{flex-direction:column}.ht-promo .ht-foto-promo{width:100%;height:148px;flex:none;min-height:148px}}',
       /* La tarjeta especial se viste distinta: fondo pleno, frase grande y
          centrada, chips vidriosos y el corazón de marca de agua (v325). */
       '.ht-card.ht-esp{background:linear-gradient(150deg,#1278a0,#0b5878 58%,#063652);}',
