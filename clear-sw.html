@@ -14,7 +14,7 @@ async function clearAll(){
       log(document.getElementById('log').textContent+'\nCachés borradas: '+keys.length);
     }
     localStorage.setItem('appi_force_update','1');
-    log(document.getElementById('log').textContent+'\n¡Listo! Redirigiendo a APPI v607...');
+    log(document.getElementById('log').textContent+'\n¡Listo! Redirigiendo a APPI v608...');
     setTimeout(()=> location.href='./?v=608&force=1&t='+Date.now(),800);
   }catch(e){ log('Error: '+e.message)}
 }
