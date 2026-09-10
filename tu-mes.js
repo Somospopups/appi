@@ -1,7 +1,7 @@
-/* APPI · Tu mes v609 — cerebro
+/* APPI · Tu mes v610 — cerebro
    El mes es un tablero de cartas. Cada día, las 10 de la jornada.
    La puerta es la franja de septiembre del Home.
-   v609: fix footer v598 v598 lista incompleta dice No falta nadie verde con 9 pendientes + info faltas · sin maquillar el hábito (v600 detalle) · popup + v599 cerebro — timeline al abrir día + métricas sutiles arriba.
+   v610: fix FALTA 7 emergency lista vacía (Edge) v598 lista incompleta dice No falta nadie verde con 9 pendientes + info faltas · sin maquillar el hábito (v600 detalle) · popup + v599 cerebro — timeline al abrir día + métricas sutiles arriba.
    Eventos viven en appi-eventos.js (bus central silencioso).
 */
 (function () {
@@ -879,6 +879,26 @@
     var okItems = items.filter(function(x){ return x.hecha; });
     var recuperadosItems = items.filter(function(x){ return x.recuperado && !x.hecha; });
     var noItems = items.filter(function(x){ return !x.hecha && !x.recuperado; });
+    // EMERGENCY fallback v610: si el header dice que faltan pero la lista está vacía (datos viejos truncados), forzar placeholders para que no muestre "No falta nadie" con HECHO 3 FALTA 7
+    try{
+      var __faltaHeaderCalc = Math.max(0, total - hechas - recuperadosItems.length);
+      if(__faltaHeaderCalc > noItems.length){
+        var __faltantes = __faltaHeaderCalc - noItems.length;
+        var __freq={}, __top='', __topN=0;
+        items.forEach(function(o){ if(o.motivoId) __freq[o.motivoId]=(__freq[o.motivoId]||0)+1; });
+        Object.keys(__freq).forEach(function(k){ if(__freq[k]>__topN){ __topN=__freq[k]; __top=k; }});
+        if(!__top && noItems[0] && noItems[0].motivoId) __top=noItems[0].motivoId;
+        if(!__top && okItems[0] && okItems[0].motivoId) __top=okItems[0].motivoId;
+        if(!__top) __top='checkin';
+        var __motTop=null; try{ __motTop = M() && M().motivoPorId ? M().motivoPorId(__top) : null; }catch(e){}
+        var __icoTop = (__motTop && __motTop.icono) || '🔧';
+        var __nomTop = (__motTop && __motTop.nombre) || 'Tarea del día';
+        for(var __fi=0; __fi<__faltantes; __fi++){
+          var __synTel='ph_'+String(k).replace(/-/g,'')+'_em_'+__fi+'_'+Date.now().toString().slice(-3);
+          noItems.push({ motivoId: __top, icono: __icoTop, motivo: __nomTop, nombre: 'Tarea del día', tel: __synTel, hecha: false, noHecha: false, recuperado:false, recuperadoAt:'', placeholder:true, user:{usuario:'Tarea', telf:__synTel} });
+        }
+      }
+    }catch(e){}
     // headers con números del guardado (coincide con tarjeta) para no confundir
     var hechasHeader = hechas;
     var faltaHeader = Math.max(0, total - hechas - recuperadosItems.length);
