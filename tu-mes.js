@@ -104,6 +104,8 @@
       '.tm-dia.hoy{outline:2px solid #0b5878;outline-offset:1px;box-shadow:0 12px 28px rgba(11,88,120,.32)}',
       '.tm-dia.amarillo .n,.tm-dia.amarillo .m{color:#1d1d2c;opacity:.9}',
       '.tm-dia .n{font-size:10px;letter-spacing:.06em;text-transform:uppercase;opacity:.85}',
+      '.tm-dia .ok{margin-top:auto;display:block;font-size:10.5px;font-weight:900;line-height:1.2}',
+      '.tm-dia .no{display:block;font-size:9.5px;font-weight:800;line-height:1.2;opacity:.95}',
       '.tm-dia .m{margin-top:auto;font-size:9.5px;opacity:.8}',
       '#tmCierre{display:none;position:fixed;inset:0;z-index:45000;align-items:center;justify-content:center;background:rgba(16,20,28,.38);padding:16px}',
       '#tmCierre.on{display:flex}',
@@ -116,7 +118,11 @@
       '.tm-carta.verde{background:linear-gradient(150deg,#1aa36e,#0f5a46 58%,#08382c)}',
       '.tm-carta.amarillo .cab,.tm-carta.amarillo .tm-pie,.tm-carta.amarillo .tm-grupo,.tm-carta.amarillo .tm-x{color:#1d1d2c}',
       '.tm-carta.amarillo li{background:rgba(0,0,0,.08);border-color:rgba(0,0,0,.12);color:#1d1d2c}',
-      '.tm-grupo{margin:10px 0 6px;font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.85}',
+      '.tm-grupo{margin:12px 0 6px;padding:7px 10px;border-radius:10px;font-size:13px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;background:rgba(0,0,0,.18)}',
+      '.tm-grupo.hecho{background:rgba(125,204,106,.4)}',
+      '.tm-grupo.falta{background:rgba(0,0,0,.28)}',
+      '.tm-carta.amarillo .tm-grupo.hecho{background:rgba(22,80,30,.25);color:#163512}',
+      '.tm-carta.amarillo .tm-grupo.falta{background:rgba(0,0,0,.18)}',
       '.tm-carta-cuerpo{overflow:auto;flex:1;min-height:0;-webkit-overflow-scrolling:touch}',
       '.tm-carta .cab{font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;opacity:.9}',
       '.tm-carta h2{margin:6px 0 10px;font-size:26px;letter-spacing:-.4px}',
@@ -277,7 +283,8 @@
       var marca = esHoyCel ? 'Hoy ' + i : String(i);
       var mini = '';
       if (tDia){
-        mini = '<span class="m">' + hDia + ' / ' + tDia + '</span>';
+        var falta = Math.max(0, tDia - hDia);
+        mini = '<span class="ok">✓ ' + hDia + '</span><span class="no">' + (falta ? ('falta ' + falta) : 'completo') + '</span>';
       } else if (futuro){
         mini = '<span class="m">sin abrir</span>';
       } else {
@@ -372,11 +379,11 @@
     }
     var okItems = items.filter(function(x){ return x.hecha; });
     var noItems = items.filter(function(x){ return !x.hecha; });
-    var lista = '<p class="tm-grupo">Hecho · ' + okItems.length + '</p><ul>';
+    var lista = '<p class="tm-grupo hecho">Hecho · ' + okItems.length + '</p><ul>';
     lista += okItems.length
       ? okItems.map(function(it){ return fila(it, true); }).join('')
       : '<li class="pend"><span class="tm-bola">·</span>Todavía nadie.</li>';
-    lista += '</ul><p class="tm-grupo">Falta · ' + noItems.length + '</p><ul>';
+    lista += '</ul><p class="tm-grupo falta">Falta · ' + noItems.length + '</p><ul>';
     lista += noItems.length
       ? noItems.map(function(it){ return fila(it, false); }).join('')
       : '<li class="ok"><span class="tm-bola">✓</span>No falta nadie.</li>';
