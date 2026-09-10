@@ -128,9 +128,9 @@ window.openStock=function(){
 
 <script src="./porque-vivo.js"></script>
 <script src="./home-limpio.js?v=520"></script>
-  <script src="./home-tarjetas.js?v=626"></script>
-  <script src="./appi-eventos.js?v=626"></script>
-  <script src="./tu-mes.js?v=626"></script>
+  <script src="./home-tarjetas.js?v=627"></script>
+  <script src="./appi-eventos.js?v=627"></script>
+  <script src="./tu-mes.js?v=627"></script>
   <script src="./device-bridge.js?v=523"></script>
   <script src="./anuncios.js?v=521"></script>
   <script src="./aviso-telegram.js?v=555"></script>
@@ -4362,7 +4362,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v626 · Segura</div>
+  <div class="ds-foot">APPI · v627 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -12713,6 +12713,7 @@ function abrirCuentaDesdeMenu(){
             <button type="button" class="btn btn-secondary" id="btnPsaBorrar" style="flex:none; font-size:12px; padding:9px; color:#d93025; border-color:#fce8e6; background:#fff;">Borrar</button>
           </div>
           <div id="psaStatus" style="font-size:11px; color:#65676b; line-height:1.4; min-height:16px;"></div>
+          <div id="psaLastSync" style="font-size:10.5px; color:#8a8d93; margin-top:4px; display:none;">Última actualización: —</div>
           <div id="psaAtajos" style="display:none; gap:6px; flex-wrap:wrap;">
             <button type="button" class="btn btn-secondary" style="flex:none; padding:6px 9px; font-size:11px;" onclick="psaAbrir('https://minegocio.psa.com.ar/')">Mi Negocio →</button>
             <button type="button" class="btn btn-secondary" style="flex:none; padding:6px 9px; font-size:11px;" onclick="psaAbrir('https://miagenda.psa.com.ar')">Mi Agenda →</button>
@@ -12931,8 +12932,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='626';
-      const CACHE_NAME='appi-v626-poster';
+      const swVersion='627';
+      const CACHE_NAME='appi-v627-poster';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · v'+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
@@ -17264,10 +17265,20 @@ function psaRender(){
   if(fOrg) fOrg.checked=f.garantiasOrg;
   if(fGar) fGar.checked=f.garantias;
   if(atajos) atajos.style.display=c?'flex':'none';
+  const lastEl=document.getElementById('psaLastSync');
   if(c){
     psaSetStatus('✓ Guardado en este dispositivo. Auto-actualizará: '+(f.linea?'LÍNEA ':'')+(f.garantiasOrg?'GARANTÍAS ORG ':'')+(f.garantias?'GARANTÍAS':''),'ok');
+    const last=localStorage.getItem('appsi_psa_lastSync');
+    if(lastEl){
+      if(last){
+        try{ const d=new Date(last); lastEl.textContent='Última actualización: '+d.toLocaleString('es-AR', {day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'}); lastEl.style.display='block'; }catch(e){ lastEl.textContent='Última actualización: '+last; lastEl.style.display='block'; }
+      } else {
+        lastEl.textContent='Última actualización: — nunca'; lastEl.style.display='block';
+      }
+    }
   } else {
     psaSetStatus('Sin conectar — APPI funciona manual. Guardá tus datos para auto-actualizar esos 3 archivos.', '');
+    if(lastEl) lastEl.style.display='none';
   }
 }
 function psaGuardar(){
