@@ -1244,7 +1244,8 @@
         html: '<div class="ht-promo">' + promoImgTag2 + '<div class="ht-promo-txt"><p class="ht-frase">Con 5 PB personales se lleva la botella térmica blanca de 500 ml. Es la excusa perfecta para volver a hablar.</p>' +
               '<p class="ht-nota">No detectamos equipo en tu planilla, pero podés reenviar la promo a cualquier contacto — la foto queda copiada para pegarla 📎</p></div></div>',
         items: null,
-        cta: { label: 'Compartir por WhatsApp', go: compartirGenerico }
+        cta: null,
+        fab: { label: 'PSA', go: compartirGenerico }
       };
     }
     var filas = [], items = [];
@@ -1294,7 +1295,20 @@
             nota + '</div></div>' +
             '<ul class="ht-lista">' + filas.join('') + '</ul>',
       items: items,
-      cta: { label: 'Escribirle a ' + (pilaDe(lista[0].nombre) || 'la primera'), go: items[0] }
+      cta: null,
+      fab: { label: 'PSA', go: (function(){
+        var textoGen = textoPromoBotella({ nombre: '' });
+        return function(){
+          window.open('https://wa.me/?text=' + encodeURIComponent(textoGen), '_blank', 'noopener');
+          try{ getPromoImgBlob().then(function(blob){
+            if (!blob || !(navigator.clipboard && window.ClipboardItem)) return;
+            var mime = blob.type || 'image/jpeg'; var it={}; it[mime]=blob;
+            navigator.clipboard.write([new window.ClipboardItem(it)]).then(function(){
+              if (window.showToast) window.showToast('Foto copiada ✓ — pegala en el chat');
+            }).catch(function(){});
+          }); }catch(e){}
+        };
+      })() }
     };
   }
 
@@ -1367,6 +1381,10 @@
       '.ht-promo .ht-promo-txt .ht-frase{margin:0;font-size:15px;line-height:1.38}',
       '.ht-promo .ht-promo-txt .ht-nota{margin:0}',
       '@media(max-width:360px){.ht-promo{flex-direction:column}.ht-promo .ht-foto-promo{width:100%;height:148px;flex:none;min-height:148px}}',
+      '.ht-psa-fab{position:absolute;top:10px;right:10px;z-index:4;width:38px;height:38px;border-radius:50%;border:0;background:#0b5878;color:#fff;font-size:11px;font-weight:950;letter-spacing:.3px;display:grid;place-items:center;box-shadow:0 8px 18px rgba(11,88,120,.28);cursor:pointer;transition:transform .12s}',
+      '.ht-psa-fab:hover{transform:scale(1.06)}',
+      '.ht-psa-fab:active{transform:scale(.96)}',
+      '.ht-card.ht-cat-promo .ht-cab{padding-right:44px}',
       /* La tarjeta especial se viste distinta: fondo pleno, frase grande y
          centrada, chips vidriosos y el corazón de marca de agua (v325). */
       '.ht-card.ht-esp{background:linear-gradient(150deg,#1278a0,#0b5878 58%,#063652);}',
@@ -1538,6 +1556,7 @@
       (cat === 'hoy' ? ' ht-hoy' : '') +
       (cat === 'ganaste' || cat === 'llegamos' ? ' ht-ganaste' : '');
     el.innerHTML = '<span class="ht-marca" aria-hidden="true">' + (t.icono || '') + '</span>' +
+      (t.fab ? '<button type="button" class="ht-psa-fab" title="Compartir promo por WhatsApp">PSA</button>' : '') +
       '<div class="ht-cab"><span class="ht-ico">' + t.icono + '</span>' +
       '<span class="ht-kicker">' + esc(t.kicker) + '</span></div>' +
       '<h3>' + esc(t.titulo) + '</h3>' +
@@ -1755,6 +1774,10 @@
     // La acción se ejecuta con el mazo quieto: las tarjetas quedan donde
     // estaban, listas para seguir cuando se vuelve al Home (v323).
     var ejecutar = function(ir){ return function(){ try{ ir(); }catch(e){} }; };
+    if (t && t.fab){
+      var fab = el.querySelector('.ht-psa-fab');
+      if (fab) fab.onclick = ejecutar(t.fab.go);
+    }
     if (t && t.cta){
       var cta = el.querySelector('.ht-cta');
       if (cta) cta.onclick = ejecutar(t.cta.go);

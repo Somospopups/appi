@@ -2,17 +2,16 @@
 <html lang="es">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Preview Promo Botella — v594 — imagen izquierda / texto derecha</title>
+<title>Preview Promo Botella — v595 — imagen izquierda / texto derecha + fab PSA</title>
 <style>
   *{box-sizing:border-box}
   body{margin:0;font-family:system-ui,Inter,sans-serif;background:#eef2f7;padding:20px;color:#1d1d2c}
   h1{font-size:18px;margin:0 0 8px}
-  .sub{color:#666;font-size:13px;margin:0 0 16px}
-  .ht-card{max-width:420px;margin:0 auto;padding:14px 16px 12px;border-radius:24px;background:linear-gradient(160deg,#ffffff,#f4f6ff);box-shadow:0 22px 60px rgba(10,12,40,.18)}
-  .ht-cab{display:flex;align-items:center;gap:8px;margin-bottom:2px}
+  .sub{color:#666;font-size:13px;margin:0 0 16px;line-height:1.4}
+  .ht-card{position:relative;max-width:420px;margin:0 auto;padding:14px 16px 14px;border-radius:24px;background:linear-gradient(160deg,#ffffff,#f4f6ff);box-shadow:0 22px 60px rgba(10,12,40,.18)}
+  .ht-cab{display:flex;align-items:center;gap:8px;margin-bottom:2px;padding-right:44px}
   .ht-kicker{flex:1;color:#3d63c9;font-size:11.5px;font-weight:950;letter-spacing:.7px;text-transform:uppercase}
   .ht-card h3{margin:4px 0 12px;font-size:21px;line-height:1.2}
-  /* nuevo layout promo */
   .ht-foto{display:block;width:100%;height:148px;object-fit:contain;background:#eef2f7;border-radius:16px}
   .ht-promo{display:flex;gap:12px;align-items:stretch;margin:0 0 12px}
   .ht-promo .ht-foto-promo{flex:0 0 42%;width:42%;height:auto;min-height:156px;max-height:188px;object-fit:cover;object-position:center;background:#eef2f7;border-radius:16px;margin:0;display:block}
@@ -24,14 +23,15 @@
   .ht-lista{margin:12px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px}
   .ht-lista li{display:flex;align-items:center;gap:8px;height:46px;padding:0 12px;border-radius:14px;background:rgba(91,141,239,.08);color:#33343f;font-size:14px;font-weight:750}
   .ht-lista li::after{content:"›";margin-left:auto;color:#3d63c9;font-weight:900;font-size:17px}
-  .ht-cta{margin-top:12px;width:100%;min-height:48px;border:0;border-radius:15px;background:linear-gradient(135deg,#5b8def,#8b63e8);color:#fff;font:inherit;font-size:15px;font-weight:900;cursor:pointer}
+  .ht-psa-fab{position:absolute;top:10px;right:10px;z-index:4;width:38px;height:38px;border-radius:50%;border:0;background:#0b5878;color:#fff;font-size:11px;font-weight:950;letter-spacing:.3px;display:grid;place-items:center;box-shadow:0 8px 18px rgba(11,88,120,.28);cursor:pointer}
   .badge{display:inline-block;padding:4px 8px;border-radius:999px;background:#0b5878;color:#fff;font-size:11px;font-weight:800;margin-left:8px}
   @media(max-width:360px){.ht-promo{flex-direction:column}.ht-promo .ht-foto-promo{width:100%;height:148px;flex:none;min-height:148px}}
 </style>
-<h1>Preview Promo Botella <span class="badge">v594</span></h1>
-<p class="sub">Imagen grande a la izquierda (42% del ancho, cover, 156–188px), texto a la derecha. En &lt;360px se apila.</p>
+<h1>Preview Promo Botella <span class="badge">v595</span></h1>
+<p class="sub">Sin botón abajo — más lugar para la lista de distribuidores.<br>Arriba a la derecha botón flotante <b>PSA</b> (38px, #0b5878) para compartir la promo genérica por WhatsApp (texto sin nombre + foto copiada).</p>
 
 <div class="ht-card">
+  <button class="ht-psa-fab" title="Compartir promo por WhatsApp">PSA</button>
   <div class="ht-cab"><span>🎁</span><span class="ht-kicker">Promo PSA · 9 al 17 de septiembre</span></div>
   <h3>Reactivá a 3 de tu equipo</h3>
   <div class="ht-promo">
@@ -45,12 +45,14 @@
     <li><b>Sebastian Troncoso</b> · 2 PB</li>
     <li><b>Ana Lopez</b> · 0 PB</li>
     <li><b>Marta Garcia</b> · 4 PB</li>
+    <li><b>Lucia Fernandez</b> · 1 PB</li>
+    <li><b>Carlos Gomez</b> · 3 PB</li>
   </ul>
-  <button class="ht-cta">Escribirle a Sebastian</button>
 </div>
 
-<p class="sub" style="margin-top:18px">Variante sin equipo: mismo layout, cambia el botón a “Compartir por WhatsApp”.</p>
+<p class="sub" style="margin-top:18px">Variante sin equipo: mismo layout + mismo fab arriba a la derecha (comparte genérico).</p>
 <div class="ht-card" style="margin-top:12px">
+  <button class="ht-psa-fab" title="Compartir promo por WhatsApp">PSA</button>
   <div class="ht-cab"><span>🎁</span><span class="ht-kicker">Promo PSA · 9 al 17 de septiembre</span></div>
   <h3>Compartí la promo de la botella</h3>
   <div class="ht-promo">
@@ -60,5 +62,6 @@
       <p class="ht-nota">No detectamos equipo en tu planilla, pero podés reenviar la promo a cualquier contacto — la foto queda copiada 📎</p>
     </div>
   </div>
-  <button class="ht-cta">Compartir por WhatsApp</button>
 </div>
+
+<p class="sub" style="margin-top:16px;opacity:.7">Tocá un nombre para mensaje personalizado · Tocá PSA arriba para mensaje genérico a cualquier contacto.</p>
