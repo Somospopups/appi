@@ -1,7 +1,7 @@
-/* APPI · Tu mes v604 — cerebro
+/* APPI · Tu mes v605 — cerebro
    El mes es un tablero de cartas. Cada día, las 10 de la jornada.
    La puerta es la franja de septiembre del Home.
-   v604: TU MES v601 exacto + info faltas · sin maquillar el hábito (v600 detalle) · popup + v599 cerebro — timeline al abrir día + métricas sutiles arriba.
+   v605: URGENTE fix tarjeta verde con 9 pendientes + info faltas · sin maquillar el hábito (v600 detalle) · popup + v599 cerebro — timeline al abrir día + métricas sutiles arriba.
    Eventos viven en appi-eventos.js (bus central silencioso).
 */
 (function () {
@@ -796,11 +796,45 @@
       velo.addEventListener('click', function(e){ if (e.target === velo) cerrarCierre(); });
     }
     var esHoyReal = k === hoyKey();
-    // hechas = solo hechas reales, recuperados no cuentan para hábito
-    var hechas = items.filter(function(x){ return x.hecha; }).length;
-    var total = items.length;
+    // hechas/total para semáforo y encabezado: usar dato guardado (coincide con tarjeta) para no invertir colores
+    var hechasItems = items.filter(function(x){ return x.hecha; }).length;
+    var totalItems = items.length;
+    var hechas = hechasItems;
+    var total = totalItems;
+    try{
+      var __raw = leerAccionesRaw();
+      var __dia = __raw.dias && __raw.dias[k];
+      if(__dia && typeof __dia.hechas !== 'undefined' && typeof __dia.total !== 'undefined'){
+        // para días pasados, el guardado es la verdad (coincide con grilla)
+        // para hoy, partidoHoy ya está en mapa y items es la verdad
+        if(!esHoyReal){
+          hechas = Number(__dia.hechas)||0;
+          total = Number(__dia.total)||0;
+        } else {
+          // hoy: si hay discrepancia, priorizar items (más fresco)
+          // pero si total guardado > items, usar guardado para no mostrar verde falso
+          if(totalItems < (Number(__dia.total)||0)) total = Number(__dia.total)||0;
+          if(hechasItems !== (Number(__dia.hechas)||0)){
+            // usar el mayor para evitar verde falso cuando items está incompleto
+            hechas = Math.max(hechasItems, Number(__dia.hechas)||0);
+            // si hechas guardado es menor que items, usar items (puede haber hecho reciente no guardado)
+            if(hechasItems > (Number(__dia.hechas)||0) && totalItems=== (Number(__dia.total)||0)) hechas = hechasItems;
+            // fallback: si total es 0, usar items
+            if(!total) { hechas=hechasItems; total=totalItems; }
+          }
+        }
+        // si aún hay mismatch grande (ej 9 pendientes vs 9 hechas), forzar rojo si pendientes>hechas
+        // no tocar sem, pero asegurar que verde no aparezca con 9 pendientes
+      }
+    }catch(e){}
     var ganado = total > 0 && hechas === total;
     var sem = semaforo(hechas, total);
+    // salvaguarda: si en grilla ese día tenía 9 pendientes (total-hechas>=8) nunca puede ser verde
+    try{
+      var __pendGrid = total - hechas;
+      if(__pendGrid >= 7 && sem==='verde') sem='rojo';
+      if(__pendGrid >= 4 && sem==='verde') sem='amarillo';
+    }catch(e){}
     var partes = String(k).split('-');
     var tit = esHoyReal ? 'Tu día' : 'Tu día · ' + parseInt(partes[2],10) + ' ' + MESES[parseInt(partes[1],10)-1].toLowerCase();
     function fila(it, ok){
@@ -831,8 +865,13 @@
     var okItems = items.filter(function(x){ return x.hecha; });
     var recuperadosItems = items.filter(function(x){ return x.recuperado && !x.hecha; });
     var noItems = items.filter(function(x){ return !x.hecha && !x.recuperado; });
-    // Construir lista hecho
-    var lista = '<p class="tm-grupo hecho">Hecho · ' + okItems.length + '</p><ul>';
+    // headers con números del guardado (coincide con tarjeta) para no confundir
+    var hechasHeader = hechas;
+    var faltaHeader = Math.max(0, total - hechas - recuperadosItems.length);
+    // si items y guardado difieren, mostrar el mayor falta para no ocultar pendientes
+    if(noItems.length > faltaHeader) faltaHeader = noItems.length;
+    if(okItems.length > hechasHeader) hechasHeader = okItems.length;
+    var lista = '<p class="tm-grupo hecho">Hecho · ' + hechasHeader + '</p><ul>';
     lista += okItems.length
       ? okItems.map(function(it){ return fila(it, true); }).join('')
       : '<li class="pend"><span class="tm-bola">·</span>Todavía nadie.</li>';
@@ -841,7 +880,7 @@
       lista += '<p class="tm-grupo hecho" style="background:rgba(255,179,71,.18);color:#1d1d2c">↻ Recuperados · ' + recuperadosItems.length + ' <span style="font-size:11px;font-weight:700;opacity:.7">(no cambian tu hábito)</span></p><ul>';
       lista += recuperadosItems.map(function(it){ return fila(it, false); }).join('') + '</ul>';
     }
-    lista += '<p class="tm-grupo falta">Falta · ' + noItems.length + '</p><ul id="tmFaltaList">';
+    lista += '<p class="tm-grupo falta">Falta · ' + faltaHeader + '</p><ul id="tmFaltaList">';
     if(noItems.length){
       // render pendientes con contenedor para acciones
       lista += noItems.map(function(it){
