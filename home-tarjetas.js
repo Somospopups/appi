@@ -306,6 +306,20 @@
     var h = hoyKey();
     return h >= PROMO_BOTELLA_DESDE && h <= PROMO_BOTELLA_HASTA;
   }
+  // Cache del blob de la promo para copiarla sin esperar en cada toque
+  var promoImgBlobPromise = null;
+  function getPromoImgBlob(){
+    if (promoImgBlobPromise) return promoImgBlobPromise;
+    try{
+      promoImgBlobPromise = fetch(PROMO_BOTELLA_IMG).then(function(r){
+        if (!r.ok) throw new Error('no img');
+        return r.blob();
+      }).catch(function(){ promoImgBlobPromise = null; return null; });
+    }catch(e){ return Promise.resolve(null); }
+    return promoImgBlobPromise;
+  }
+  // Precarga en segundo plano cuando la tarjeta está vigente
+  try{ if (ventanaPromoBotella()) setTimeout(function(){ getPromoImgBlob(); }, 900); }catch(e){}
   function listaUsuariosHome(){
     try{
       if (typeof window.usuariosTodosActual === 'function'){
@@ -421,14 +435,49 @@
       if (!ok){
         if (window.APPITel && window.APPITel.avisarInvalido) { window.APPITel.avisarInvalido(tel, nombre, p); return; }
       }
+      var texto = textoPromoBotella(p);
+      // 1) Intento de copiar la foto al portapapeles en segundo plano
+      //    (no bloquea la apertura del chat; si falla no pasa nada)
+      try{
+        getPromoImgBlob().then(function(blob){
+          if (!blob) return null;
+          if (navigator.clipboard && window.ClipboardItem){
+            var mime = blob.type || 'image/jpeg';
+            // Algunos navegadores solo aceptan image/png en el portapapeles
+            var item = {};
+            item[mime] = blob;
+            return navigator.clipboard.write([new window.ClipboardItem(item)]).then(function(){
+              try{
+                if (window.showToast) window.showToast('Foto copiada ✓ — pegala en el chat');
+                else if (window.APPIDialog && window.APPIDialog.toast) window.APPIDialog.toast('Foto copiada ✓ — pegala en el chat');
+              }catch(e){}
+            }).catch(function(){ return null; });
+          }
+          return null;
+        }).catch(function(){});
+      }catch(e){}
+      // 2) Abrir WhatsApp enseguida (gesto del usuario, sin esperar la foto)
       var abierto = false;
       if (window.APPITel && window.APPITel.abrir){
-        abierto = !!window.APPITel.abrir(tel, textoPromoBotella(p), nombre, p);
+        abierto = !!window.APPITel.abrir(tel, texto, nombre, p);
       } else if (window.APPIWhatsApp && window.APPIWhatsApp.abrir){
-        window.APPIWhatsApp.abrir('https://wa.me/' + String(tel).replace(/\D/g,'') + '?text=' + encodeURIComponent(textoPromoBotella(p)));
+        window.APPIWhatsApp.abrir('https://wa.me/' + String(tel).replace(/\D/g,'') + '?text=' + encodeURIComponent(texto));
+        abierto = true;
+      } else {
+        window.open('https://wa.me/' + String(tel).replace(/\D/g,'') + '?text=' + encodeURIComponent(texto), '_blank', 'noopener');
         abierto = true;
       }
       if (abierto){
+        // Aviso suave: si el portapapeles no funcionó, igual le dice que adjunte
+        setTimeout(function(){
+          try{
+            // Si no se pudo copiar, algunas veces igual conviene avisar
+            // Solo si el navegador no soporta ClipboardItem mostramos ayuda
+            if (!(navigator.clipboard && window.ClipboardItem)){
+              if (window.showToast) window.showToast('Tip: adjuntá la foto de la botella que ves en la tarjeta 📎');
+            }
+          }catch(e){}
+        }, 900);
         marcarPromoBotellaPedido(tel);
         if (mazo){ mazo.tarjetas = armarTarjetas(); pintar(); }
       }
@@ -1188,7 +1237,7 @@
       titulo: lista.length === 1 ? 'Reactivá a ' + (pilaDe(lista[0].nombre) || 'tu equipo') + ' con la botella' : 'Reactivá a ' + lista.length + ' de tu equipo',
       html: promoImgTag +
             '<p class="ht-frase">Con 5 PB personales se lleva la botella térmica blanca de 500 ml. Es la excusa perfecta para volver a hablar.</p>' +
-            '<p class="ht-nota">Tocá un nombre y sale el mensaje por WhatsApp. Pensado para que te contesten.</p>' +
+            '<p class="ht-nota">Tocá un nombre: abre WhatsApp con el texto y la foto queda copiada — pegala en el chat 📎</p>' +
             '<ul class="ht-lista">' + filas.join('') + '</ul>',
       items: items,
       cta: { label: 'Escribirle a ' + (pilaDe(lista[0].nombre) || 'la primera'), go: items[0] }
