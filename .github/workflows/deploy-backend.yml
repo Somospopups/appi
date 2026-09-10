@@ -82,3 +82,6 @@ jobs:
 
       - name: Publicar webhook del bot de Telegram
         run: supabase functions deploy telegram-webhook --no-verify-jwt --project-ref "$SUPABASE_PROJECT_ID"
+
+      - name: Publicar actualizador de precios PSA
+        run: supabase functions deploy actualizar-precios --project-ref "$SUPABASE_PROJECT_ID"

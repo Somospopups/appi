@@ -135,7 +135,11 @@
     var css = '' +
       '#view-lista{background:#f3eee3}' +
       '.lp-wrap{padding:10px 12px calc(env(safe-area-inset-bottom) + 168px)}' +
-      '.lp-note{margin:0 0 10px;font-size:11px;font-weight:750;color:#686977;line-height:1.35}' +
+      '.lp-note{margin:0 0 10px;font-size:11px;font-weight:750;color:#686977;line-height:1.35;display:flex;align-items:center;gap:8px;flex-wrap:wrap}' +
+      '.lp-actualizar{flex:0 0 auto;border:1px solid rgba(11,88,120,.22);border-radius:999px;padding:6px 10px;background:#fff;color:#0b5878;font:inherit;font-size:11px;font-weight:850;cursor:pointer}' +
+      '.lp-actualizar:disabled{opacity:.55;cursor:wait}' +
+      '.lp-actualizar.ok{background:#e6f4ee;color:#1a6b4a;border-color:rgba(26,107,74,.18)}' +
+      '.lp-note small{font-size:10px;font-weight:700;color:#8a8d9e}' +
       '.lp-search{width:100%;min-height:44px;border:1px solid rgba(196,164,92,.45);border-radius:14px;padding:10px 12px;font:inherit;font-size:14px;background:#faf6ee;color:#2a2a32;margin:0 0 10px}' +
       '.lp-chips-wrap{position:relative;margin:0 0 6px}' +
       '.lp-chips-wrap.lp-more:after{content:"";position:absolute;right:0;top:0;bottom:10px;width:52px;pointer-events:none;background:linear-gradient(90deg,rgba(243,238,227,0),#f3eee3 70%)}' +
@@ -266,7 +270,8 @@
       return '<button type="button" class="lp-chip' + (filtro === g.id ? ' on' : '') + '" data-g="' + g.id + '">' + esc(g.t) + '</button>';
     }).join('');
     return '<div class="lp-wrap">' +
-      '<p class="lp-note">Lista de tienda.psa.com.ar' + (fecha ? ' · ' + esc(fecha) : '') + '. Elegí productos y cotizá.</p>' +
+      '<p class="lp-note"><span>Lista de tienda.psa.com.ar' + (fecha ? ' · ' + esc(fecha) : '') + '. Elegí productos y cotizá.</span>' +
+      '<button type="button" class="lp-actualizar" id="lpActualizar" title="Actualizar precios desde la tienda">🔄 Actualizar precios</button></p>' +
       '<input class="lp-search" id="lpSearch" type="search" placeholder="Buscar modelo, recarga o SKU" value="' + esc(busca) + '">' +
       '<div class="lp-chips" id="lpChips">' + chips + '</div>' +
       '<div id="lpList"></div></div>';
@@ -1353,6 +1358,7 @@
   function bind() {
     var s = $('lpSearch');
     if (s) s.oninput = function () { busca = s.value || ''; pintarItems(); };
+    var actBtn=$('lpActualizar'); if(actBtn && !actBtn._lpBound){ actBtn._lpBound=true; actBtn.onclick=actualizarPrecios; }
     var chips = $('lpChips');
     if (chips) chips.onclick = function (e) {
       var b = e.target.closest('[data-g]');
@@ -1393,14 +1399,49 @@
     }
   }
 
+  var _lpActualizando = false;
+  function supabaseCfg(){ try{ return (window.APPI_AUTH && window.APPI_AUTH.url && window.APPI_AUTH.anonKey) ? window.APPI_AUTH : null; }catch(e){ return null; } }
+  function tokenActual(){ try{ var v=JSON.parse(localStorage.getItem('appi_auth_session_v1')||'null'); return v&&v.session&&v.session.access_token||''; }catch(e){ return ''; } }
+  function actualizarPrecios(){
+    if(_lpActualizando) return;
+    var btn=$('lpActualizar');
+    var cfg=supabaseCfg();
+    if(!cfg){ aviso('No se pudo conectar para actualizar.'); return; }
+    _lpActualizando=true;
+    if(btn){ btn.disabled=true; btn.textContent='⏳ Actualizando…'; btn.classList.remove('ok'); }
+    var token=tokenActual();
+    fetch(cfg.url + '/functions/v1/actualizar-precios', { method:'POST', headers: { 'Content-Type':'application/json', 'apikey': cfg.anonKey, 'Authorization': token ? 'Bearer ' + token : 'Bearer ' + cfg.anonKey } })
+      .then(function(r){ return r.json().then(function(j){ return { ok:r.ok, j:j }; }); })
+      .then(function(res){
+        var j=res.j||{};
+        if(!res.ok){ throw new Error(j.error||'No se pudo actualizar.'); }
+        if(j.yaActualizado){ if(btn){ btn.textContent='✓ Al día (' + (j.actualizado||'') + ')'; btn.classList.add('ok'); } aviso(j.mensaje||'Ya está al día.'); }
+        else { if(btn){ btn.textContent='✓ Actualizado (' + (j.actualizado||'') + ')'; btn.classList.add('ok'); } aviso('Precios actualizados: ' + (j.cambiados||0) + ' productos.'); cargar(function(){ var c=$('lpCont'); if(c) c.innerHTML=htmlLista(); bind(); pintarTodo(); }); }
+      })
+      .catch(function(e){ aviso(String(e.message||e)); if(btn){ btn.textContent='🔄 Actualizar precios'; } })
+      .finally(function(){ _lpActualizando=false; if(btn) btn.disabled=false; setTimeout(function(){ if(btn && btn.classList.contains('ok')){ btn.textContent='🔄 Actualizar precios'; btn.classList.remove('ok'); } }, 3500); });
+  }
   function cargar(done) {
     var bust = '?t=' + Date.now();
-    Promise.all([
+    var cfg=supabaseCfg();
+    var supaCat = cfg ? cfg.url + '/storage/v1/object/public/catalogo-psa/psa-catalogo.json' + bust : null;
+    var supaPlan = cfg ? cfg.url + '/storage/v1/object/public/catalogo-psa/psa-planes.json' + bust : null;
+    var pCat = supaCat ? fetch(supaCat, { cache:'no-store' }).then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; }) : Promise.resolve(null);
+    var pPlanS = supaPlan ? fetch(supaPlan, { cache:'no-store' }).then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; }) : Promise.resolve(null);
+    Promise.all([ pCat,
+      pPlanS,
       fetch('./psa-catalogo.json' + bust, { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }),
       fetch('./psa-planes.json' + bust, { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; })
     ]).then(function (arr) {
-      if (arr[0] && arr[0].productos) CAT = arr[0];
-      if (arr[1] && (arr[1].cuotas || arr[1].bancos)) PLANES = arr[1];
+      var supaCatJ = arr[0], supaPlanJ = arr[1], fileCat = arr[2], filePlan = arr[3];
+      var catElegido = null;
+      if(supaCatJ && supaCatJ.productos) catElegido = supaCatJ;
+      else if(fileCat && fileCat.productos) catElegido = fileCat;
+      var planElegido = null;
+      if(supaPlanJ && (supaPlanJ.cuotas || supaPlanJ.bancos)) planElegido = supaPlanJ;
+      else if(filePlan && (filePlan.cuotas || filePlan.bancos)) planElegido = filePlan;
+      if (catElegido) CAT = catElegido;
+      if (planElegido) PLANES = planElegido;
       if (done) done();
     }).catch(function () { if (done) done(); });
   }
