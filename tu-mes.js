@@ -1,7 +1,7 @@
-/* APPI · Tu mes v615 — cerebro
+/* APPI · Tu mes v616 — cerebro
    El mes es un tablero de cartas. Cada día, las 10 de la jornada.
    La puerta es la franja de septiembre del Home.
-   v615: recuperar placeholder no navega a Home (solo marca y refresca día), real sí lleva directo a WhatsApp/panel (solo iba al Home) a la acción (WhatsApp saludo para cumple, panel Ya lo hice/No para retro) (marca recuperado + abre chat hoy) (mismo renglón) lista vacía (Edge) v598 lista incompleta dice No falta nadie verde con 9 pendientes + info faltas · sin maquillar el hábito (v600 detalle) · popup + v599 cerebro — timeline al abrir día + métricas sutiles arriba.
+   v616: recuperar placeholder también lleva a la tarea (como diaria) - abre fila del motivo a Home (solo marca y refresca día), real sí lleva directo a WhatsApp/panel (solo iba al Home) a la acción (WhatsApp saludo para cumple, panel Ya lo hice/No para retro) (marca recuperado + abre chat hoy) (mismo renglón) lista vacía (Edge) v598 lista incompleta dice No falta nadie verde con 9 pendientes + info faltas · sin maquillar el hábito (v600 detalle) · popup + v599 cerebro — timeline al abrir día + métricas sutiles arriba.
    Eventos viven en appi-eventos.js (bus central silencioso).
 */
 (function () {
@@ -215,13 +215,7 @@
       var ok = recuperarTarea(k, motivoId, tel, nombre, userHint);
       if(!ok) return false;
       var esPlaceholderOuter = !!(it && it.placeholder) || String(tel||'').indexOf('ph_')===0;
-      if(esPlaceholderOuter){
-        // Placeholder: solo marcar y refrescar el mismo día, sin ir al Home
-        mostrarToast('¡Recuperado! '+ (DESC_TAREA[motivoId]||motivoId) +' del '+k.split('-').reverse().join('/')+' — queda como hecho sin tocar tu hábito.');
-        setTimeout(function(){ try{ abrirDia(k, false, false); }catch(e){} try{ pintar(); }catch(e){} }, 280);
-        return true;
-      }
-      // Real con persona: marcar y llevar directo a la acción
+      // Ambos - placeholder y real - llevan a la tarea como una diaria (como pediste)
       setTimeout(function(){
         try{ cerrarCierre(); }catch(e){}
         try{ cerrarDetalle(); }catch(e){}
@@ -229,8 +223,29 @@
         setTimeout(function(){
           try{
             var u = userHint || (it && it.user) || {usuario:nombre, telf:tel};
-            mostrarToast('Recuperado. Ahora hacelo con '+ (u.usuario||u.nombre||nombre) +' hoy');
-            llevarAAccionDirecta(motivoId, u);
+            if(esPlaceholderOuter){
+              // Placeholder sin persona: llevar a la fila general del motivo para que elijas a quién hacerlo hoy
+              mostrarToast('¡Recuperado! '+ (DESC_TAREA[motivoId]||motivoId) +' del '+k.split('-').reverse().join('/')+' — ahora hacelo.');
+              if(window.APPIMensajes && typeof window.APPIMensajes.abrirFila==='function'){
+                try{ window.APPIMensajes.abrirFila(motivoId); }catch(e){
+                  try{ var card=document.querySelector('.home-month-card'); if(card) card.scrollIntoView({behavior:'smooth', block:'center'}); }catch(err){}
+                }
+                // Si no había pendientes de ese motivo hoy, abrirFila no abre overlay y quedas en Home - lo dejamos ahí
+              } else {
+                // fallback: llevar a Home y resaltar mazo
+                try{ var card2=document.querySelector('.home-month-card'); if(card2) card2.scrollIntoView({behavior:'smooth', block:'center'}); }catch(e){}
+                // si hay cualquier pendiente hoy, abrir el primero
+                try{
+                  var todos = planaHoy().filter(function(x){ return !x.hecha; });
+                  if(todos.length) llevarAAccionDirecta(todos[0].motivoId, todos[0].user);
+                }catch(e){}
+              }
+              // refrescar calendario en segundo plano
+              setTimeout(function(){ try{ pintar(); }catch(e){} }, 400);
+            } else {
+              mostrarToast('Recuperado. Ahora hacelo con '+ (u.usuario||u.nombre||nombre) +' hoy');
+              llevarAAccionDirecta(motivoId, u);
+            }
           }catch(e){ try{ console.error(e);}catch(err){} }
         }, 650);
       }, 280);
