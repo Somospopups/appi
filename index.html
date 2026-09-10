@@ -128,9 +128,9 @@ window.openStock=function(){
 
 <script src="./porque-vivo.js"></script>
 <script src="./home-limpio.js?v=520"></script>
-  <script src="./home-tarjetas.js?v=619"></script>
-  <script src="./appi-eventos.js?v=619"></script>
-  <script src="./tu-mes.js?v=619"></script>
+  <script src="./home-tarjetas.js?v=620"></script>
+  <script src="./appi-eventos.js?v=620"></script>
+  <script src="./tu-mes.js?v=620"></script>
   <script src="./device-bridge.js?v=523"></script>
   <script src="./anuncios.js?v=521"></script>
   <script src="./aviso-telegram.js?v=555"></script>
@@ -946,6 +946,7 @@ body.dark .hist-action-drawer{background:linear-gradient(155deg,#151827,#252036 
     display: flex; align-items: center; gap: 10px;
     margin-top: 4px;
   }
+  .quick-progress-line, .business-progress, .home-month-progress { display:none !important; }
   .tool-card .tool-progress .mini-bar {
     flex: 1; height: 6px; border-radius: 999px;
     background: rgba(80,90,130,0.10); overflow: hidden;
@@ -4304,7 +4305,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v619 · Segura</div>
+  <div class="ds-foot">APPI · v620 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -11267,7 +11268,7 @@ function renderScoreCompact(){
   }
 }
 function renderToolCard(cfg){
-  const { icon, iconClass, title, sub, statusVal, statusLbl, statusClass, progressPct, progressColor, timeAgo, onClick, accent } = cfg;
+  const { icon, iconClass, title, sub, statusVal, statusLbl, statusClass, timeAgo, onClick, accent } = cfg;
   return `
     <div class="tool-card" style="--accent:${accent}" onclick="${onClick}">
       <div class="tool-head">
@@ -11275,21 +11276,19 @@ function renderToolCard(cfg){
         <div class="tool-title-block"><h3>${title}</h3><div class="tool-sub">${sub}</div></div>
         <div class="tool-status"><div class="status-val ${statusClass || ''}">${statusVal}</div><div class="status-lbl">${statusLbl}</div></div>
       </div>
-      ${progressPct !== undefined ? `<div class="tool-progress"><div class="mini-bar"><div class="fill" style="width:${progressPct}%; background:${progressColor}"></div></div>${timeAgo ? `<span class="time-ago">🕐 ${timeAgo}</span>` : ''}</div>` : (timeAgo ? `<div class="tool-progress"><div class="mini-bar" style="visibility:hidden"></div><span class="time-ago">🕐 ${timeAgo}</span></div>` : '')}
+      ${timeAgo ? `<div class="tool-progress"><span class="time-ago">🕐 ${timeAgo}</span></div>` : ''}
     </div>`;
 }
 function renderHomeQuickCard(cfg){
-  const pct = cfg.progressPct === undefined ? 0 : Math.max(0, Math.min(100, Math.round(cfg.progressPct)));
   const updated = cfg.timeAgo ? `<span class="quick-updated">🕐 ${cfg.timeAgo}</span>` : '';
   return `
-    <button type="button" class="quick-tool-card" style="--accent:${cfg.accent}; --pct:${pct}%" onclick="${cfg.onClick}">
+    <button type="button" class="quick-tool-card" style="--accent:${cfg.accent}" onclick="${cfg.onClick}">
       <div class="quick-tool-top">
         <div class="quick-icon" style="background:${cfg.gradient || cfg.accent}">${cfg.icon}</div>
         <span class="quick-state ${cfg.statusClass || 'empty'}">${cfg.statusVal}</span>
       </div>
       <h3>${escapeXml(cfg.title)}</h3>
       <p>${escapeXml(cfg.sub)}</p>
-      <div class="quick-progress-line"><span></span></div>
       ${updated}
     </button>
   `;
@@ -12825,8 +12824,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='619';
-      const CACHE_NAME='appi-v619-poster';
+      const swVersion='620';
+      const CACHE_NAME='appi-v620-poster';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · v'+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
