@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v590-poster';
+const CACHE_NAME = 'appi-v591-poster';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
@@ -56,7 +56,8 @@ const APP_SHELL = [
   './icon-192-maskable.png',
   './icon-512-maskable.png',
   './apple-touch-icon.png',
-  './img/rinnova-ducha.jpg'
+  './img/rinnova-ducha.jpg',
+  './promo-botella-psa-500ml.jpg'
 ];
 
 self.addEventListener('install', event => {

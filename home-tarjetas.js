@@ -299,6 +299,13 @@
     var h = hoyKey();
     return h >= RINNOVA_DESDE && h <= RINNOVA_HASTA;
   }
+  var PROMO_BOTELLA_DESDE = '2026-09-09';
+  var PROMO_BOTELLA_HASTA = '2026-09-17';
+  var PROMO_BOTELLA_IMG = './promo-botella-psa-500ml.jpg';
+  function ventanaPromoBotella(){
+    var h = hoyKey();
+    return h >= PROMO_BOTELLA_DESDE && h <= PROMO_BOTELLA_HASTA;
+  }
   function listaUsuariosHome(){
     try{
       if (typeof window.usuariosTodosActual === 'function'){
@@ -353,6 +360,76 @@
       }
       if (abierto){
         marcarRinnovaPedido(tel);
+        if (mazo){ mazo.tarjetas = armarTarjetas(); pintar(); }
+      }
+    };
+  }
+  /* ---------- promo botella térmica 9–17 septiembre (5 PB) ---------- */
+  function promoBotellaPedidos(){
+    var clave = 'appi_promo_botella_v1_' + uid();
+    var set = leerLS(clave, []);
+    return { clave: clave, set: Array.isArray(set) ? set : [] };
+  }
+  function marcarPromoBotellaPedido(tel){
+    var st = promoBotellaPedidos();
+    var n = String(tel || '').replace(/\D/g, '');
+    if (!n || st.set.indexOf(n) >= 0) return;
+    st.set.push(n);
+    try{ localStorage.setItem(st.clave, JSON.stringify(st.set)); }catch(e){}
+  }
+  function textoPromoBotella(p){
+    var nombre = pilaDe(p && (p.nombre || p.usuario)) || '';
+    // Mensaje cálido pensado para recibir respuesta (no suena a spam)
+    return 'Hola ' + (nombre || '') + '! ¿Cómo estás? 😊\n\n'
+      + 'Te quería compartir una promo que lanzó PSA y me hizo acordar a vos: del 9 al 17 de septiembre, sumando 5 PB personales te llevás de regalo una botella térmica PSA blanca de 500 ml 🎁\n\n'
+      + 'Es una linda oportunidad para volver a poner el negocio en movimiento, sin presión y a tu ritmo.\n\n'
+      + 'Si tenés ganas de aprovecharla te ayudo a armarlo juntos, paso a paso. ¿Te gustaría que lo veamos? 💙';
+  }
+  function colaPromoBotella(){
+    if (!ventanaPromoBotella()) return [];
+    var st = promoBotellaPedidos();
+    var todos = personasEquipo();
+    // Distribuidores con poco movimiento este mes: PB personal < 5
+    // (la promo pide justo 5, así que es la excusa perfecta). Se excluye
+    // el titular (nivel 0) porque el mensaje es para tu equipo.
+    var filtrados = todos.filter(function(p){
+      if (!p) return false;
+      if (p.nivel === 0) return false;
+      var pb = Number(p.pnAct);
+      if (isNaN(pb)) pb = 0;
+      if (pb >= 5) return false;
+      if (!enLasDiez(p)) return false;
+      var tel = telDeEquipo(p);
+      var digits = String(tel || '').replace(/\D/g, '');
+      if (digits && st.set.indexOf(digits) >= 0) return false;
+      return true;
+    });
+    // Los más flojos primero (0 PB arriba), así arrancás por donde más duele
+    filtrados.sort(function(a,b){ return (Number(a.pnAct)||0) - (Number(b.pnAct)||0); });
+    return filtrados;
+  }
+  function mandarPromoBotellaA(p){
+    return function(){
+      var nombre = pilaDe(p.nombre || p.usuario) || '';
+      var tel = telDeEquipo(p);
+      if (!tel){
+        if (window.APPITel && window.APPITel.avisarInvalido) window.APPITel.avisarInvalido('', nombre || 'Esta persona', p);
+        else if (window.APPIDialog && window.APPIDialog.alert) window.APPIDialog.alert((nombre || 'Esta persona') + ' no tiene un teléfono válido cargado en la planilla de Línea Descendente. Cuando subas una planilla con su número, el mensaje sale a un toque.', { title: 'Sin teléfono en la planilla', icon: '📵' });
+        return;
+      }
+      var ok = !!(window.APPITel && window.APPITel.esValido && window.APPITel.esValido(tel));
+      if (!ok){
+        if (window.APPITel && window.APPITel.avisarInvalido) { window.APPITel.avisarInvalido(tel, nombre, p); return; }
+      }
+      var abierto = false;
+      if (window.APPITel && window.APPITel.abrir){
+        abierto = !!window.APPITel.abrir(tel, textoPromoBotella(p), nombre, p);
+      } else if (window.APPIWhatsApp && window.APPIWhatsApp.abrir){
+        window.APPIWhatsApp.abrir('https://wa.me/' + String(tel).replace(/\D/g,'') + '?text=' + encodeURIComponent(textoPromoBotella(p)));
+        abierto = true;
+      }
+      if (abierto){
+        marcarPromoBotellaPedido(tel);
         if (mazo){ mazo.tarjetas = armarTarjetas(); pintar(); }
       }
     };
@@ -1075,10 +1152,53 @@
     };
   }
 
+  function tarjetaPromoBotella(){
+    if (!ventanaPromoBotella()) return null;
+    if (!quedanLinea()) return null;
+    var lista = colaPromoBotella();
+    if (!lista.length) return null;
+    var filas = [], items = [];
+    lista.slice(0, 5).forEach(function(p){
+      var pb = Number(p.pnAct || 0);
+      var pbTxt = String(pb).replace('.', ',');
+      var crudo = p.tel || p.telefono || p.telf || '';
+      var tel = (window.APPITel && window.APPITel.primeroValido) ? (window.APPITel.primeroValido(crudo) || crudo) : crudo;
+      var ok = !!(tel && window.APPITel && window.APPITel.esValido && window.APPITel.esValido(tel));
+      filas.push('<li>' + (ok ? '🎁' : '📵') + ' <b>' + esc(nombreLindo(p.nombre)) + '</b> · ' + pbTxt + ' PB' + (ok ? '' : ' <i>sin teléfono</i>') + '</li>');
+      if (ok) items.push(mandarPromoBotellaA(p));
+      else {
+        (function(persona){
+          items.push(function(){
+            var nombre = pilaDe(persona.nombre) || 'Esta persona';
+            var t = telDeEquipo(persona);
+            if (window.APPITel && window.APPITel.avisarInvalido) window.APPITel.avisarInvalido(t, nombre, persona);
+            else if (window.APPIDialog && window.APPIDialog.alert) window.APPIDialog.alert(nombre + ' no tiene un teléfono válido cargado en la planilla de Línea Descendente. Cuando subas una planilla con su número, el mensaje sale a un toque.', { title: 'Sin teléfono en la planilla', icon: '📵' });
+            else abrirEquipo();
+          });
+        })(p);
+      }
+    });
+    if (lista.length > 5){
+      filas.push('<li>… y ' + (lista.length - 5) + ' más</li>');
+      items.push(function(){ abrirEquipo(); });
+    }
+    var promoImgTag = '<img class="ht-foto" src="' + PROMO_BOTELLA_IMG + '" alt="Botella térmica PSA 500 ml" loading="lazy" onerror="this.style.display=\'none\'">';
+    return {
+      cat: 'promo', icono: '🎁', kicker: 'Promo PSA · 9 al 17 de septiembre',
+      titulo: lista.length === 1 ? 'Reactivá a ' + (pilaDe(lista[0].nombre) || 'tu equipo') + ' con la botella' : 'Reactivá a ' + lista.length + ' de tu equipo',
+      html: promoImgTag +
+            '<p class="ht-frase">Con 5 PB personales se lleva la botella térmica blanca de 500 ml. Es la excusa perfecta para volver a hablar.</p>' +
+            '<p class="ht-nota">Tocá un nombre y sale el mensaje por WhatsApp. Pensado para que te contesten.</p>' +
+            '<ul class="ht-lista">' + filas.join('') + '</ul>',
+      items: items,
+      cta: { label: 'Escribirle a ' + (pilaDe(lista[0].nombre) || 'la primera'), go: items[0] }
+    };
+  }
+
   function armarTarjetas(){
     var lista = [tarjetaEspecial()];
     try{ if (window.APPIMensajes && window.APPIMensajes.registrarPartido) window.APPIMensajes.registrarPartido(); }catch(e){}
-    [tarjetaHoyConviene(), tarjetaGanaste(), tarjetaMetodoEnvio(), tarjetaLlegamos(), tarjetaDuchaRinnova(), tarjetaCanje(), tarjetaJornada(), tarjetaCumples(), tarjetaReempadronar(), tarjetaEquipo(), tarjetaPanel(), tarjetaUsuarios()].forEach(function(t){
+    [tarjetaHoyConviene(), tarjetaPromoBotella(), tarjetaGanaste(), tarjetaMetodoEnvio(), tarjetaLlegamos(), tarjetaDuchaRinnova(), tarjetaCanje(), tarjetaJornada(), tarjetaCumples(), tarjetaReempadronar(), tarjetaEquipo(), tarjetaPanel(), tarjetaUsuarios()].forEach(function(t){
       if (t) lista.push(t);
     });
     return lista;
@@ -1216,6 +1336,7 @@
       '.ht-card.ht-poster.ht-cat-panel,body.dark .ht-card.ht-poster.ht-cat-panel{background:linear-gradient(150deg,#3a4a6b,#2c3852)}',
       '.ht-card.ht-poster.ht-cat-usuarios,body.dark .ht-card.ht-poster.ht-cat-usuarios{background:linear-gradient(150deg,#0e6a90,#0b5878)}',
       '.ht-card.ht-poster.ht-cat-rinnova,body.dark .ht-card.ht-poster.ht-cat-rinnova{background:linear-gradient(150deg,#b8441c,#8f3314)}',
+      '.ht-card.ht-poster.ht-cat-promo,body.dark .ht-card.ht-poster.ht-cat-promo{background:linear-gradient(150deg,#0e6a8c,#0b5878 58%,#1a9ab0);border:0;box-shadow:0 22px 60px rgba(14,106,140,.34)}',
       '.ht-card.ht-poster.ht-cat-otra,body.dark .ht-card.ht-poster.ht-cat-otra{background:linear-gradient(150deg,#0e6a8c,#0b5878)}',
       'body.dark .ht-card.ht-poster h3,body.dark .ht-card.ht-poster.ht-esp h3,body.dark .ht-card.ht-poster.ht-hoy h3,body.dark .ht-card.ht-poster.ht-alerta h3,body.dark .ht-card.ht-poster.ht-ganaste h3{color:#fff}',
       'body.dark .ht-card.ht-poster .ht-frase,body.dark .ht-card.ht-poster.ht-alerta .ht-frase,body.dark .ht-card.ht-poster .ht-kicker,body.dark .ht-card.ht-poster.ht-hoy .ht-kicker,body.dark .ht-card.ht-poster.ht-alerta .ht-kicker,body.dark .ht-card.ht-poster.ht-ganaste .ht-kicker{color:#fff}',
@@ -1766,14 +1887,18 @@
     fraseDelDia: fraseDelDia,
     FRASES: FRASES,
     ventanaRinnova: ventanaRinnova,
+    ventanaPromoBotella: ventanaPromoBotella,
     esDucha: esDucha,
     colaDuchaRinnova: colaDuchaRinnova,
     colaCanje: colaCanje,
+    colaPromoBotella: colaPromoBotella,
+    textoPromoBotella: textoPromoBotella,
     enLasDiez: enLasDiez,
     topeHoy: topeHoy,
     tarjetaMetodoEnvio: tarjetaMetodoEnvio,
     tarjetaLlegamos: tarjetaLlegamos,
     tarjetaGanaste: tarjetaGanaste,
+    tarjetaPromoBotella: tarjetaPromoBotella,
     textoMarcador: textoMarcador
   };
 
