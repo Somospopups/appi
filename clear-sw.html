@@ -1,0 +1,22 @@
+<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Limpiar APPI</title><style>body{font-family:system-ui;padding:24px;text-align:center;background:#f5f8ff}button{padding:14px 22px;border:0;border-radius:12px;background:#5b8def;color:#fff;font-weight:900;font-size:16px;cursor:pointer;margin:10px}pre{background:#fff;padding:12px;border-radius:12px;text-align:left;overflow:auto;max-width:600px;margin:14px auto}</style></head><body><h2>🔄 Limpiar caché de APPI</h2><p>Si ves <b>v598</b> abajo, tocá el botón para forzar <b>v607/v608</b>.</p><button onclick="clearAll()">Limpiar y recargar APPI</button><pre id="log">Listo para limpiar...</pre><script>
+function log(m){document.getElementById('log').textContent=m}
+async function clearAll(){
+  log('Limpiando Service Workers y Cachés...');
+  try{
+    if('serviceWorker' in navigator){
+      const regs=await navigator.serviceWorker.getRegistrations();
+      for(const r of regs) await r.unregister();
+      log('Service Workers borrados: '+regs.length);
+    }
+    if(window.caches){
+      const keys=await caches.keys();
+      for(const k of keys) await caches.delete(k);
+      log(document.getElementById('log').textContent+'\nCachés borradas: '+keys.length);
+    }
+    localStorage.setItem('appi_force_update','1');
+    log(document.getElementById('log').textContent+'\n¡Listo! Redirigiendo a APPI v607...');
+    setTimeout(()=> location.href='./?v=608&force=1&t='+Date.now(),800);
+  }catch(e){ log('Error: '+e.message)}
+}
+log('APPI actual: '+(localStorage.getItem('appi_acciones_v1_local')?'datos local':'sin datos')+'\nSW: '+(navigator.serviceWorker?'soportado':'no')+'\nTocá el botón para limpiar.');
+</script></body></html>

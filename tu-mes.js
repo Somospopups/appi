@@ -1,7 +1,7 @@
-/* APPI · Tu mes v607 — cerebro
+/* APPI · Tu mes v608 — cerebro
    El mes es un tablero de cartas. Cada día, las 10 de la jornada.
    La puerta es la franja de septiembre del Home.
-   v607: fix FALTA 7 lista incompleta dice No falta nadie verde con 9 pendientes + info faltas · sin maquillar el hábito (v600 detalle) · popup + v599 cerebro — timeline al abrir día + métricas sutiles arriba.
+   v608: fix deadlock v598 lista incompleta dice No falta nadie verde con 9 pendientes + info faltas · sin maquillar el hábito (v600 detalle) · popup + v599 cerebro — timeline al abrir día + métricas sutiles arriba.
    Eventos viven en appi-eventos.js (bus central silencioso).
 */
 (function () {

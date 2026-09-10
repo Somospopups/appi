@@ -128,9 +128,9 @@ window.openStock=function(){
 
 <script src="./porque-vivo.js"></script>
 <script src="./home-limpio.js?v=520"></script>
-  <script src="./home-tarjetas.js?v=607"></script>
-  <script src="./appi-eventos.js?v=607"></script>
-  <script src="./tu-mes.js?v=607"></script>
+  <script src="./home-tarjetas.js?v=608"></script>
+  <script src="./appi-eventos.js?v=608"></script>
+  <script src="./tu-mes.js?v=608"></script>
   <script src="./device-bridge.js?v=523"></script>
   <script src="./anuncios.js?v=521"></script>
   <script src="./aviso-telegram.js?v=555"></script>
@@ -12825,10 +12825,23 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='607';
-      const CACHE_NAME='appi-v607-poster';
+      const swVersion='608';
+      const CACHE_NAME='appi-v608-poster';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · v'+swVersion;
+      try{
+        const seen=localStorage.getItem('appi_seen_version');
+        if(seen && seen!==swVersion){
+          const last=Number(localStorage.getItem('appi_last_sw_update')||0);
+          if(Date.now()-last>120000){
+            localStorage.setItem('appi_last_sw_update', String(Date.now()));
+            if(navigator.serviceWorker && navigator.serviceWorker.getRegistrations){
+              navigator.serviceWorker.getRegistrations().then(rs=> rs.forEach(r=> r.update().catch(()=>{})));
+            }
+          }
+        }
+        localStorage.setItem('appi_seen_version', swVersion);
+      }catch(e){}
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 
@@ -12846,7 +12859,7 @@ function abrirBackupDesdeMenu(){
 
       try{
         const registration=await navigator.serviceWorker.register(
-          './service-worker.js?v='+swVersion+'&cache='+encodeURIComponent(CACHE_NAME),
+          './service-worker.js',
           {updateViaCache:'none'}
         );
         // No esperar al chequeo periódico del navegador: consultar la versión
