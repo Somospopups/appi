@@ -1,0 +1,135 @@
+<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Diag 2 septiembre</title><style>body{font-family:system-ui;padding:12px;background:#f5f8ff;color:#1a2033}pre{white-space:pre-wrap;word-break:break-word;background:#fff;padding:10px;border-radius:10px;border:1px solid #ddd;font-size:11px;max-height:60vh;overflow:auto}.card{background:#fff;padding:14px;border-radius:14px;margin:10px 0;box-shadow:0 4px 16px rgba(0,0,0,.06)}</style></head><body>
+<h2>🔍 Diagnóstico 2 septiembre</h2>
+<div class="card"><b>Fecha hoy (sistema):</b> <span id="hoy"></span><br><b>Keys en localStorage:</b> <span id="keys"></span></div>
+<div class="card"><b>Mapa días TU MES (septiembre):</b><pre id="mapa"></pre></div>
+<div class="card"><b>Raw día 2 septiembre (todas las keys):</b><pre id="raw"></pre></div>
+<div class="card"><b>itemsDe('2026-09-02') y ('2025-09-02'):</b><pre id="items"></pre></div>
+<div class="card"><b>Head cálculo abrirDia:</b><pre id="head"></pre></div>
+<script>
+function uid(){ try{ if(window.APPIAuth && window.APPIAuth.userId) return window.APPIAuth.userId()||'local'; }catch(e){} return 'local'; }
+function esc(s){ return String(s); }
+document.getElementById('hoy').textContent = new Date().toString() + ' | hoyKey='+(new Date().getFullYear()+'-'+String(new Date().getMonth()+1).padStart(2,'0')+'-'+String(new Date().getDate()).padStart(2,'0'));
+let keys=[];
+for(let i=0;i<localStorage.length;i++){ let k=localStorage.key(i); if(k && k.indexOf('appi_acciones')>=0) keys.push(k); }
+if(!keys.length) keys=['(ninguna appi_acciones, probando local)'];
+document.getElementById('keys').textContent = keys.join(', ') + ' | uid()='+uid();
+let outMap='';
+try{
+  let mapa={};
+  // try to find year for view
+  let now=new Date();
+  let anio=now.getFullYear(), mes=now.getMonth();
+  // check localStorage for dias
+  let allDias={};
+  keys.forEach(k=>{
+    try{ let raw=JSON.parse(localStorage.getItem(k)||'{}'); if(raw.dias) Object.keys(raw.dias).forEach(dk=> allDias[dk]=raw.dias[dk]); }catch(e){}
+  });
+  // also try local generic
+  try{ let raw=JSON.parse(localStorage.getItem('appi_acciones_v1_local')||'{}'); if(raw.dias) Object.keys(raw.dias).forEach(dk=> allDias[dk]=raw.dias[dk]); }catch(e){}
+  outMap = 'Total dias en storage: '+Object.keys(allDias).length+'\n';
+  Object.keys(allDias).sort().forEach(k=>{
+    let d=allDias[k];
+    outMap += k+' → total:'+(d.total||0)+' hechas:'+(d.hechas||0)+' lista:'+((d.lista||[]).length)+' marcas:'+Object.keys(d.marcas||{}).length+' recuperados:'+Object.keys(d.recuperados||{}).length+'\n';
+    if(k.indexOf('-09-02')>=0) outMap += '  FULL: '+JSON.stringify(d).slice(0,1500)+'\n';
+  });
+  // filter septiembre
+  let pref=anio+'-'+String(mes+1).padStart(2,'0')+'-';
+  let sept = Object.keys(allDias).filter(k=>k.indexOf(pref)===0).sort();
+  outMap += '\nSeptiembre '+pref+'* : '+sept.join(', ')+'\n';
+}catch(e){ outMap='error '+e.message; }
+document.getElementById('mapa').textContent=outMap;
+
+let rawOut='';
+['2026-09-02','2025-09-02','2026-09-02','2025-09-02'].forEach(k=>{
+  // dedup
+});
+let uniq=['2026-09-02','2025-09-02'];
+uniq.forEach(k=>{
+  rawOut+='\n=== '+k+' ===\n';
+  keys.forEach(key=>{
+    try{
+      let raw=JSON.parse(localStorage.getItem(key)||'{}');
+      let dia=raw.dias && raw.dias[k];
+      rawOut += 'key '+key+': '+(dia? JSON.stringify(dia, null, 2).slice(0,3000) : 'NO EXISTE')+'\n';
+    }catch(e){ rawOut+='err '+e.message+'\n'; }
+  });
+  // also check appi_acciones_v1_local explicit
+  try{ let raw=JSON.parse(localStorage.getItem('appi_acciones_v1_local')||'{}'); let dia=raw.dias&&raw.dias[k]; rawOut+='key appi_acciones_v1_local (explicit): '+(dia?JSON.stringify(dia).slice(0,2000):'NO')+'\n'; }catch(e){}
+  // check plantaHoy?
+  rawOut+='---\n';
+});
+document.getElementById('raw').textContent=rawOut;
+
+let itemsOut='';
+try{
+  uniq.forEach(k=>{
+    itemsOut+='\n=== itemsDe('+k+') ===\n';
+    if(window.APPITuMes && window.APPITuMes.pintar){
+      // itemsDe is internal, try to call via inspection
+      // we will try to replicate itemsDe logic by calling the private function if exposed? not, so we try to call via window.APPITuMes? not exposed
+      // So we directly try to see if window has itemsDe via tu-mes closure? We'll try to eval the function by fetching tu-mes.js? fallback: show what abrirDia would compute
+      itemsOut+='(no direct access, will compute via abrirDia head)\n';
+    }
+    // manual replication: try to run same code as tu-mes.itemsDe if we can find it via parsing localStorage ourselves
+    // Instead, we will just show what the app would see: call a synthetic itemsDe by loading the script's function if available
+    // Try to access via window.itemsDe?
+    if(typeof window.itemsDe==='function') itemsOut+='found window.itemsDe\n';
+    // fallback: show raw mapping
+  });
+  // Attempt to brute force by executing tu-mes's itemsDe via hack: it is inside closure, not accessible, so we will simulate placeholder logic here for diagnosis
+  function simulateItemsDe(k){
+    let uid2=uid();
+    let raw=null;
+    try{ raw=JSON.parse(localStorage.getItem('appi_acciones_v1_'+uid2)||'{}'); }catch(e){ raw={}; }
+    let dia=raw.dias&&raw.dias[k];
+    if(!dia) return {dia:null, note:'dia null for uid '+uid2};
+    let out=[];
+    let lista=dia.lista||[];
+    if(lista.length){
+      let mapped=lista.map(it=>{
+        let tel=it.t||'';
+        let clave=it.m+':'+tel;
+        let marca=dia.marcas&&dia.marcas[clave];
+        return {m:it.m, t:tel, n:it.n, marca:marca?marca.e:'', tel:tel};
+      });
+      return {dia:dia, mappedLen:mapped.length, total:dia.total, listaLen:lista.length, mapped:mapped.slice(0,5)};
+    } else {
+      let marcas=dia.marcas||{};
+      let cnt=Object.keys(marcas).length;
+      return {dia:dia, marcasCnt:cnt, total:dia.total, note:'lista vacia, marcas cnt '+cnt};
+    }
+  }
+  uniq.forEach(k=>{ itemsOut+='\nSIM '+k+': '+JSON.stringify(simulateItemsDe(k), null, 2)+'\n'; });
+  // Also try to call the actual itemsDe by injecting a hook if tu-mes exposes it
+  if(window.APPITuMes && window.APPITuMes.abrirDia){
+    itemsOut+='\n(APPITuMes disponible, abrirDia existe)\n';
+  }
+}catch(e){ itemsOut+='error '+e.message; }
+document.getElementById('items').textContent=itemsOut;
+
+let headOut='';
+try{
+  uniq.forEach(k=>{
+    headOut+='\n=== head '+k+' ===\n';
+    // replicate abrirDia hechas/total logic
+    keys.forEach(key=>{
+      try{
+        let raw=JSON.parse(localStorage.getItem(key)||'{}');
+        let dia=raw.dias&&raw.dias[k];
+        if(dia) headOut+='key '+key+' hechas:'+dia.hechas+' total:'+dia.total+' marcas:'+Object.keys(dia.marcas||{}).length+' lista:'+((dia.lista||[]).length)+'\n';
+      }catch(e){}
+    });
+  });
+}catch(e){ headOut='err '+e.message; }
+document.getElementById('head').textContent=headOut;
+
+// Auto try to call tu-mes itemsDe if we can patch it
+setTimeout(()=>{
+  try{
+    // Try to find itemsDe via debugging the closure? We'll just call abrirDia and intercept
+    // Hook to log items
+    let orig=null;
+    // Not needed
+  }catch(e){}
+}, 500);
+</script></body></html>
