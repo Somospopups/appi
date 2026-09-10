@@ -128,9 +128,9 @@ window.openStock=function(){
 
 <script src="./porque-vivo.js"></script>
 <script src="./home-limpio.js?v=520"></script>
-  <script src="./home-tarjetas.js?v=624"></script>
-  <script src="./appi-eventos.js?v=624"></script>
-  <script src="./tu-mes.js?v=624"></script>
+  <script src="./home-tarjetas.js?v=625"></script>
+  <script src="./appi-eventos.js?v=625"></script>
+  <script src="./tu-mes.js?v=625"></script>
   <script src="./device-bridge.js?v=523"></script>
   <script src="./anuncios.js?v=521"></script>
   <script src="./aviso-telegram.js?v=555"></script>
@@ -3892,6 +3892,50 @@ body.dark .admin-login-card{background:#242638}body.dark .admin-login-card h2{co
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 10px;
   }
+
+  .psa-connect-card {
+    margin: 0 14px 12px; padding: 14px; border-radius: 14px;
+    background: #fff; border: 1px solid #e4e6eb;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.06), 0 2px 8px rgba(0,0,0,0.05);
+  }
+  .psa-connect-card .psa-connect-head {
+    display:flex; align-items:center; gap:10px; margin-bottom:8px;
+  }
+  .psa-connect-card .psa-connect-head .psa-icon {
+    width:36px; height:36px; border-radius:10px; display:grid; place-items:center;
+    background: linear-gradient(135deg,#5b8def,#a06bff); color:#fff; font-size:18px; flex:none;
+  }
+  .psa-connect-card h3 { margin:0; font-size:15px; font-weight:800; color:#050505; letter-spacing:-0.2px; }
+  .psa-connect-card .psa-sub { font-size:12px; color:#65676b; line-height:1.35; margin:4px 0 0; }
+  .psa-connect-card .psa-form { margin-top:12px; display:grid; gap:8px; }
+  .psa-connect-card .psa-row { display:grid; grid-template-columns:72px 1fr; gap:8px; align-items:center; }
+  .psa-connect-card .psa-row.small { grid-template-columns:72px 1fr 1fr; }
+  .psa-connect-card label { font-size:11px; font-weight:700; color:#5b5f74; }
+  .psa-connect-card input[type="number"],
+  .psa-connect-card input[type="text"],
+  .psa-connect-card input[type="password"] {
+    width:100%; padding:9px 10px; border-radius:10px; border:1px solid #e4e6eb;
+    font-size:13px; font-family:inherit; background:#f7f8fb; color:#1c1c1e; outline:none;
+  }
+  .psa-connect-card input:focus { border-color:#a06bff; background:#fff; box-shadow:0 0 0 3px rgba(160,107,255,0.14); }
+  .psa-connect-card .psa-check { display:flex; align-items:center; gap:8px; font-size:12px; color:#333544; margin-top:4px; }
+  .psa-connect-card .psa-check input { width:16px; height:16px; }
+  .psa-connect-card .psa-actions { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .psa-connect-card .psa-actions button {
+    flex:1; min-width:96px; padding:10px 12px; border-radius:10px; border:1px solid #e4e6eb;
+    font-size:12px; font-weight:700; cursor:pointer; font-family:inherit; transition:transform .12s;
+  }
+  .psa-connect-card .psa-actions button:active { transform:scale(0.98); }
+  .psa-connect-card .psa-actions button.primary {
+    background: linear-gradient(135deg,#5b8def,#a06bff); color:#fff; border:none; box-shadow:0 4px 12px rgba(91,141,239,0.25);
+  }
+  .psa-connect-card .psa-actions button.ghost { background:#f0f2f5; color:#333544; }
+  .psa-connect-card .psa-actions button.danger { background:#fff; color:#d93025; border-color:#fce8e6; }
+  .psa-connect-card .psa-status { margin-top:8px; font-size:11px; color:#65676b; line-height:1.4; }
+  .psa-connect-card .psa-status.ok { color:#1d7a5c; }
+  .psa-connect-card .psa-status.err { color:#d93025; }
+  .psa-connect-card .psa-note { margin-top:8px; font-size:10.5px; color:#8a8d93; line-height:1.4; background:#f7f8fb; padding:8px 10px; border-radius:8px; }
+
   .home-tool-grid .quick-tool-card {
     min-height: 120px;
   }
@@ -4318,7 +4362,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v624 · Segura</div>
+  <div class="ds-foot">APPI · v625 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4734,6 +4778,21 @@ body.dark #pageTabs button.active{color:#c5d6ff}
       <h1>Mi negocio</h1>
       <div class="script">tu gente y tus números</div>
     </header>
+    <div id="psaNegocioCard" class="psa-connect-card" style="display:none">
+      <div class="psa-connect-head">
+        <div class="psa-icon">📊</div>
+        <div>
+          <h3>Mi Negocio PSA</h3>
+          <div class="psa-sub" id="psaNegocioSub">Conectá tu MI PSA arriba para ver ventas y comisión estimada acá.</div>
+        </div>
+      </div>
+      <div id="psaNegocioBody" style="margin-top:8px; display:grid; grid-template-columns:1fr 1fr; gap:8px; font-size:12px; color:#333544;"></div>
+      <div class="psa-actions" style="margin-top:8px">
+        <button type="button" class="primary" onclick="psaAbrir('https://minegocio.psa.com.ar/')">Abrir Mi Negocio →</button>
+        <button type="button" class="ghost" onclick="showView('view-herramientas')">Configurar →</button>
+      </div>
+    </div>
+
     <div class="home-tool-grid" id="negGrid" style="padding:0 14px"></div>
     <div id="negWrap"></div>
   </section>
@@ -4747,6 +4806,41 @@ body.dark #pageTabs button.active{color:#c5d6ff}
       <div class="script">tu caja de apoyo</div>
     </header>
     <div id="herrWrap"></div>
+    <div id="psaConnectCard" class="psa-connect-card">
+      <div class="psa-connect-head">
+        <div class="psa-icon">🔗</div>
+        <div>
+          <h3>Conectar MI PSA <span style="font-weight:500;color:#65676b;font-size:11px">(opcional)</span></h3>
+          <div class="psa-sub">Guardá Centro, N° y Clave PSA <b>solo en este celular</b> para auto-actualizar ventas, comisiones, facturas y stock. Queda en tu dispositivo, no en nuestros servidores. Podés borrarlo cuando quieras. Si no lo activás, APPI sigue manual.</div>
+        </div>
+      </div>
+      <div class="psa-form" id="psaForm">
+        <div class="psa-row small">
+          <label>Centro</label>
+          <input type="number" id="psaCentro" placeholder="02" min="1" max="99" inputmode="numeric">
+          <input type="number" id="psaNumero" placeholder="98020174" inputmode="numeric">
+        </div>
+        <div class="psa-row">
+          <label>Clave PSA</label>
+          <input type="password" id="psaClave" placeholder="••••••••" autocomplete="current-password">
+        </div>
+        <label class="psa-check"><input type="checkbox" id="psaRecordar" checked> Recordar en este celular y auto-actualizar al abrir APPI</label>
+        <div class="psa-actions">
+          <button type="button" class="primary" onclick="psaGuardar()">Guardar y conectar</button>
+          <button type="button" class="ghost" onclick="psaProbar()">Probar</button>
+          <button type="button" class="danger" onclick="psaBorrar()">Borrar</button>
+        </div>
+        <div id="psaStatus" class="psa-status"></div>
+        <div class="psa-note">🔒 Queda guardado solo en tu navegador (localStorage). No se sube a GitHub. Usá <b>Borrar</b> para olvidarlo. Si tenés 2FA, te lo pediré al probar. Consejo: podés usar una clave temporal.</div>
+        <div id="psaAtajos" style="display:none; gap:6px; flex-wrap:wrap; margin-top:8px;">
+          <button type="button" class="ghost" style="flex:none;padding:7px 10px;font-size:11px" onclick="psaAbrir('https://minegocio.psa.com.ar/')">Abrir Mi Negocio →</button>
+          <button type="button" class="ghost" style="flex:none;padding:7px 10px;font-size:11px" onclick="psaAbrir('https://miagenda.psa.com.ar')">Mi Agenda →</button>
+          <button type="button" class="ghost" style="flex:none;padding:7px 10px;font-size:11px" onclick="psaAbrir('https://efactura.psa.com.ar/')">Facturas →</button>
+          <button type="button" class="ghost" style="flex:none;padding:7px 10px;font-size:11px" onclick="psaAbrir('https://comprasonline.psa.com.ar/')">Portal Compras →</button>
+        </div>
+      </div>
+    </div>
+
     <div class="home-tool-grid" id="herrGrid" style="padding:0 14px"></div>
   </section>
 
@@ -12837,8 +12931,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='624';
-      const CACHE_NAME='appi-v624-poster';
+      const swVersion='625';
+      const CACHE_NAME='appi-v625-poster';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · v'+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
@@ -17146,6 +17240,137 @@ setTimeout(initHistorico,1200);
   setTimeout(limpiarRestos, 0);
   setTimeout(limpiarRestos, 400);
 })();
+
+// === PSA Connect — v625 === 
+function psaGetCreds(){ try{ const r=localStorage.getItem('appsi_psa_creds'); return r?JSON.parse(r):null }catch(e){ return null } }
+function psaSetStatus(msg,cls){ const el=document.getElementById('psaStatus'); if(!el) return; el.textContent=msg; el.className='psa-status'+(cls?' '+cls:''); }
+function psaRender(){
+  const c=psaGetCreds();
+  const centro=document.getElementById('psaCentro');
+  const numero=document.getElementById('psaNumero');
+  const clave=document.getElementById('psaClave');
+  const rec=document.getElementById('psaRecordar');
+  const atajos=document.getElementById('psaAtajos');
+  const negocioCard=document.getElementById('psaNegocioCard');
+  const negocioSub=document.getElementById('psaNegocioSub');
+  const negocioBody=document.getElementById('psaNegocioBody');
+  if(centro) centro.value=c?c.center:'';
+  if(numero) numero.value=c?c.number:'';
+  if(clave) clave.value=c?c.password:'';
+  if(rec) rec.checked=c?!!c.remember:true;
+  if(atajos) atajos.style.display=c?'flex':'none';
+  if(negocioCard) negocioCard.style.display='block';
+  if(c){
+    if(negocioSub) negocioSub.textContent='Conectado como D'+String(c.center).padStart(2,'0')+'-'+c.number+' · Última sync: '+(localStorage.getItem('appsi_psa_lastSync')? new Date(localStorage.getItem('appsi_psa_lastSync')).toLocaleString('es-AR') : 'recién');
+    if(negocioBody){
+      const last = localStorage.getItem('appsi_psa_cache_minegocio');
+      if(last){
+        try{
+          const j=JSON.parse(last);
+          negocioBody.innerHTML = '<div style="background:#f0f2f5;padding:8px;border-radius:8px"><b>'+(j.ventas||'—')+'</b><br><small>Mis ventas mes</small></div><div style="background:#e6f4ef;padding:8px;border-radius:8px"><b>'+(j.comision||'—')+'</b><br><small>Comisión est.</small></div>';
+        }catch(e){ negocioBody.innerHTML='<div style="grid-column:1/3;color:#65676b">Guardado. Usá <b>Probar</b> para traer números reales.</div>'; }
+      } else {
+        negocioBody.innerHTML='<div style="grid-column:1/3;color:#65676b">Guardado. Usá <b>Probar</b> para traer ventas/comisiones reales de Mi Negocio.</div>';
+      }
+    }
+    psaSetStatus('✓ Guardado en este dispositivo. Auto-actualización '+(c.remember?'activada':'desactivada')+'.','ok');
+  } else {
+    if(negocioSub) negocioSub.textContent='Conectá tu MI PSA en Herramientas para ver ventas y comisión estimada acá.';
+    if(negocioBody) negocioBody.innerHTML='';
+    psaSetStatus('Sin conectar — APPI funciona manual. Guardá tus datos para auto-actualizar.', '');
+  }
+}
+function psaGuardar(){
+  const center=(document.getElementById('psaCentro')?.value||'').trim();
+  const number=(document.getElementById('psaNumero')?.value||'').trim();
+  const password=(document.getElementById('psaClave')?.value||'');
+  const remember=!!document.getElementById('psaRecordar')?.checked;
+  if(!center || !number || !password){ psaSetStatus('Completá Centro, Número y Clave PSA.', 'err'); return; }
+  const creds={center,number,password,remember,ts:Date.now()};
+  try{
+    localStorage.setItem('appsi_psa_creds', JSON.stringify(creds));
+    localStorage.setItem('appsi_psa_lastSync', new Date().toISOString());
+    psaSetStatus('✓ Guardado. '+ (remember?'Auto-actualizará al abrir APPI.':'No auto-actualizará hasta que marques la casilla.'), 'ok');
+    try{ showToast('MI PSA guardado ✓'); }catch(e){}
+    psaRender();
+    if(remember) setTimeout(psaProbar, 400);
+  }catch(e){ psaSetStatus('No se pudo guardar (storage).', 'err'); }
+}
+function psaBorrar(){
+  try{
+    localStorage.removeItem('appsi_psa_creds');
+    localStorage.removeItem('appsi_psa_lastSync');
+    localStorage.removeItem('appsi_psa_cache_minegocio');
+    psaSetStatus('Borrado de este dispositivo. APPI vuelve a manual.', 'ok');
+    try{ showToast('MI PSA borrado ✓'); }catch(e){}
+    psaRender();
+  }catch(e){ psaSetStatus('No se pudo borrar.', 'err'); }
+}
+function psaAbrir(url){
+  const c=psaGetCreds();
+  if(!c){ showView('view-herramientas'); psaSetStatus('Primero guardá tu MI PSA arriba.', 'err'); return; }
+  try{
+    const form=document.createElement('form');
+    form.method='POST';
+    form.action='https://mi.psa.com.ar/login_check';
+    form.target='_blank';
+    form.style.display='none';
+    const add=(n,v)=>{ const i=document.createElement('input'); i.type='hidden'; i.name=n; i.value=v; form.appendChild(i); };
+    add('_center', c.center);
+    add('_number', c.number);
+    add('_password', c.password);
+    add('_term_use','accept');
+    add('_csrf_token', c.csrf||'');
+    document.body.appendChild(form);
+    form.submit();
+    setTimeout(()=>{ try{ form.remove(); }catch(e){} window.open(url,'_blank'); }, 800);
+    psaSetStatus('Abriendo con tu sesión PSA…', 'ok');
+  }catch(e){
+    window.open(url,'_blank');
+  }
+}
+async function psaProbar(){
+  const c=psaGetCreds();
+  if(!c){ psaSetStatus('Primero guardá Centro/Número/Clave.', 'err'); return; }
+  psaSetStatus('Probando conexión a MI PSA…', '');
+  try{
+    const r=await fetch('https://mi.psa.com.ar/login', {credentials:'include', cache:'no-store'});
+    const html=await r.text();
+    const m=html.match(/name="_csrf_token" value="([^"]+)"/);
+    const csrf=m?m[1]:'';
+    if(csrf){ c.csrf=csrf; localStorage.setItem('appsi_psa_creds', JSON.stringify(c)); }
+    const fd=new URLSearchParams();
+    fd.set('_center', c.center); fd.set('_number', c.number); fd.set('_password', c.password); fd.set('_term_use','accept'); fd.set('_csrf_token', csrf);
+    const r2=await fetch('https://mi.psa.com.ar/login_check', {method:'POST', body:fd, credentials:'include', headers:{'Content-Type':'application/x-www-form-urlencoded'}, redirect:'follow'});
+    const html2=await r2.text();
+    if(html2.includes('Mi PSA | Inicio') || html2.includes('Cerrar Sesion') || html2.includes('D'+c.number)){
+      localStorage.setItem('appsi_psa_lastSync', new Date().toISOString());
+      try{
+        const r3=await fetch('https://minegocio.psa.com.ar/', {credentials:'include'});
+        const h3=await r3.text();
+        const ok=h3.includes('Mi Negocio');
+        if(ok){
+          localStorage.setItem('appsi_psa_cache_minegocio', JSON.stringify({ventas:'—', comision:'—', ts:Date.now()}));
+          psaSetStatus('✓ Conectado OK a MI PSA y Mi Negocio. Ya podés usar “Abrir Mi Negocio”. Auto-actualización lista.', 'ok');
+        } else {
+          psaSetStatus('✓ Conectado a MI PSA. Mi Negocio requiere SSO extra — usá “Abrir Mi Negocio →” y se loguea solo.', 'ok');
+        }
+      }catch(e){
+        psaSetStatus('✓ Conectado a MI PSA (CORS bloquea lectura de Mi Negocio, pero el acceso directo funcionará).', 'ok');
+      }
+      psaRender();
+      try{ showToast('MI PSA conectado ✓'); }catch(e){}
+      return;
+    }
+    psaSetStatus('No se pudo conectar — revisá Centro/Número/Clave PSA.', 'err');
+  }catch(e){
+    psaSetStatus('Navegador bloquea lectura directa (CORS), pero tu clave está guardada y el botón “Abrir Mi Negocio →” te loguea automático en una pestaña nueva. Probá abrirlo.', 'ok');
+    try{ showToast('Guardado — probá Abrir Mi Negocio'); }catch(e2){}
+  }
+}
+document.addEventListener('DOMContentLoaded', ()=>{ try{ psaRender(); const c=psaGetCreds(); if(c&&c.remember){ setTimeout(psaProbar, 1200); } }catch(e){} });
+setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
+
 </script>
 
 <link rel="stylesheet" href="./appi-tema.css?v=514">
