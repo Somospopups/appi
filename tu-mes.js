@@ -80,6 +80,8 @@
       '.home-month-card{cursor:pointer}',
       '.home-month-card:focus{outline:2px solid #e8b84a;outline-offset:2px}',
       '.tm-wrap{padding:12px 14px 28px}',
+      '#view-tumes header.top h1{display:flex;align-items:baseline;justify-content:center;gap:8px}',
+      '#view-tumes header.top h1 .script{margin-top:0;font-size:36px;line-height:1}',
       '#tmNav.tm-nav{display:grid;grid-template-columns:48px 1fr 48px;align-items:center;margin:4px 0 6px;width:100%}',
       '.tm-nav-mes{text-align:center;min-width:0}',
       '.tm-nav-mes strong{display:block;font-size:22px;font-weight:900;color:#0b5878;letter-spacing:-.5px;line-height:1.15}',
