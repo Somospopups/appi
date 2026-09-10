@@ -1205,7 +1205,49 @@
     if (!ventanaPromoBotella()) return null;
     if (!quedanLinea()) return null;
     var lista = colaPromoBotella();
-    if (!lista.length) return null;
+    var modoFallback = false;
+    // Si no hay inactivos <5 PB, igual mostramos la promo: proponemos a cualquiera del equipo
+    if (!lista.length){
+      try{
+        var todosEquipo = personasEquipo().filter(function(p){ return p && p.nivel !== 0; });
+        // ordenar por PB asc para que igual proponga a los más flojos primero
+        todosEquipo.sort(function(a,b){ return (Number(a.pnAct)||0) - (Number(b.pnAct)||0); });
+        if (todosEquipo.length){
+          lista = todosEquipo.slice(0, 5);
+          modoFallback = true;
+        }
+      }catch(e){}
+    }
+    // Sin equipo en absoluto -> tarjeta genérica para compartir con cualquiera
+    if (!lista.length){
+      var promoImgTag2 = '<img class="ht-foto" src="' + PROMO_BOTELLA_IMG + '" alt="Botella térmica PSA 500 ml" loading="lazy" onerror="this.style.display=\'none\'">';
+      var textoGen = textoPromoBotella({ nombre: '' });
+      var compartirGenerico = function(){
+        // Sin nombre concreto: deja elegir contacto en WhatsApp
+        if (window.APPITel && window.APPITel.abrir){
+          // truco: abrir con texto genérico y sin tel concreto -> wa.me/?text=
+          window.open('https://wa.me/?text=' + encodeURIComponent(textoGen), '_blank', 'noopener');
+          try{ getPromoImgBlob().then(function(blob){
+            if (!blob || !(navigator.clipboard && window.ClipboardItem)) return;
+            var mime = blob.type || 'image/jpeg'; var it={}; it[mime]=blob;
+            navigator.clipboard.write([new window.ClipboardItem(it)]).then(function(){
+              if (window.showToast) window.showToast('Foto copiada ✓ — pegala en el chat');
+            }).catch(function(){});
+          }); }catch(e){}
+        } else {
+          window.open('https://wa.me/?text=' + encodeURIComponent(textoGen), '_blank', 'noopener');
+        }
+      };
+      return {
+        cat: 'promo', icono: '🎁', kicker: 'Promo PSA · 9 al 17 de septiembre',
+        titulo: 'Compartí la promo de la botella',
+        html: promoImgTag2 +
+              '<p class="ht-frase">Con 5 PB personales se lleva la botella térmica blanca de 500 ml. Es la excusa perfecta para volver a hablar.</p>' +
+              '<p class="ht-nota">No detectamos equipo en tu planilla, pero podés reenviar la promo a cualquier contacto — la foto queda copiada para pegarla 📎</p>',
+        items: null,
+        cta: { label: 'Compartir por WhatsApp', go: compartirGenerico }
+      };
+    }
     var filas = [], items = [];
     lista.slice(0, 5).forEach(function(p){
       var pb = Number(p.pnAct || 0);
@@ -1231,13 +1273,27 @@
       filas.push('<li>… y ' + (lista.length - 5) + ' más</li>');
       items.push(function(){ abrirEquipo(); });
     }
+    // Si estamos en fallback (no había <5 PB) contamos todos los que había antes
+    try{
+      if (modoFallback){
+        var totalEquipo = personasEquipo().filter(function(p){ return p && p.nivel !== 0; }).length;
+        if (totalEquipo > 5){
+          // ya agregamos el … y N más arriba, no duplicar
+        }
+      }
+    }catch(e){}
     var promoImgTag = '<img class="ht-foto" src="' + PROMO_BOTELLA_IMG + '" alt="Botella térmica PSA 500 ml" loading="lazy" onerror="this.style.display=\'none\'">';
+    var nota = modoFallback
+      ? '<p class="ht-nota">No hay inactivos con &lt;5 PB, pero estos son de tu equipo — tocá un nombre y sale el mensaje con la foto 📎</p>'
+      : '<p class="ht-nota">Tocá un nombre: abre WhatsApp con el texto y la foto queda copiada — pegala en el chat 📎</p>';
+    var titulo = lista.length === 1 ? 'Reactivá a ' + (pilaDe(lista[0].nombre) || 'tu equipo') + ' con la botella' : 'Reactivá a ' + lista.length + ' de tu equipo';
+    if (modoFallback && lista.length > 1) titulo = 'Compartí la promo con tu equipo';
     return {
       cat: 'promo', icono: '🎁', kicker: 'Promo PSA · 9 al 17 de septiembre',
-      titulo: lista.length === 1 ? 'Reactivá a ' + (pilaDe(lista[0].nombre) || 'tu equipo') + ' con la botella' : 'Reactivá a ' + lista.length + ' de tu equipo',
+      titulo: titulo,
       html: promoImgTag +
             '<p class="ht-frase">Con 5 PB personales se lleva la botella térmica blanca de 500 ml. Es la excusa perfecta para volver a hablar.</p>' +
-            '<p class="ht-nota">Tocá un nombre: abre WhatsApp con el texto y la foto queda copiada — pegala en el chat 📎</p>' +
+            nota +
             '<ul class="ht-lista">' + filas.join('') + '</ul>',
       items: items,
       cta: { label: 'Escribirle a ' + (pilaDe(lista[0].nombre) || 'la primera'), go: items[0] }
