@@ -128,9 +128,9 @@ window.openStock=function(){
 
 <script src="./porque-vivo.js"></script>
 <script src="./home-limpio.js?v=520"></script>
-  <script src="./home-tarjetas.js?v=641"></script>
-  <script src="./appi-eventos.js?v=641"></script>
-  <script src="./tu-mes.js?v=641"></script>
+  <script src="./home-tarjetas.js?v=642"></script>
+  <script src="./appi-eventos.js?v=642"></script>
+  <script src="./tu-mes.js?v=642"></script>
   <script src="./device-bridge.js?v=523"></script>
   <script src="./anuncios.js?v=521"></script>
   <script src="./aviso-telegram.js?v=555"></script>
@@ -11686,7 +11686,7 @@ function culturaMonthOfKey(id){
   const d=culturaDateFromId(id);
   return d?culturaMonthId(d):'';
 }
-function culturaFmt(n){return Number(n||0).toLocaleString('es-AR',{maximumFractionDigits:1})}
+function culturaFmt(n){return Number(n||0).toLocaleString('es-AR',{minimumFractionDigits:0,maximumFractionDigits:2})}
 function loadCulturaAll(){
   try{const data=JSON.parse(localStorage.getItem(CULTURA_KEY)||'{}');return data&&typeof data==='object'?data:{}}catch(e){return {}}
 }
@@ -13008,7 +13008,7 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='641';
+      const swVersion='642';
       const CACHE_NAME='appi-v632-poster';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · v'+swVersion;
