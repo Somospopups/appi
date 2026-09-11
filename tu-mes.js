@@ -1,4 +1,4 @@
-/* APPI · Tu mes v643 — cerebro
+/* APPI · Tu mes v644 — cerebro
    El mes es un tablero de cartas. Cada día, las 10 de la jornada.
    La puerta es la franja de septiembre del Home.
    v628: fecha/hora debajo de MI EQUIPO y USUARIOS (LÍNEA + GARANTÍAS) (engranaje) → Conectar MI PSA solo 3 archivos (Centro/Número/Clave guardados solo en este celular, auto-actualiza) 📅 color carta principal + pulido mazo (aparece rápido) con emoji movil ☀️ (solo Home, mantiene sin barra adentro) - vuelve a v620 sin barra de botones Mi mes/Mi equipo/Herramientas del detalle por día (filtros) (antes 6) - placeholder real ambos marcan y llevan (robusto) a la tarea (como diaria) - abre fila del motivo a Home (solo marca y refresca día), real sí lleva directo a WhatsApp/panel (solo iba al Home) a la acción (WhatsApp saludo para cumple, panel Ya lo hice/No para retro) (marca recuperado + abre chat hoy) (mismo renglón) lista vacía (Edge) v598 lista incompleta dice No falta nadie verde con 9 pendientes + info faltas · sin maquillar el hábito (v600 detalle) · popup + v599 cerebro — timeline al abrir día + métricas sutiles arriba.
@@ -658,21 +658,32 @@
         }
       }
     }catch(e){}
-    // Fallback: mock completo de Autoconsulta → Bonus → Cheque (datos que faltaban en APPI) - cómodo pero completo
-    // Si no hay cheque guardado, mostramos el ejemplo real del usuario para que se vea todo de entrada
+    // Fallback: mock completo por mes - cada mes muestra sus números (histórico navegable)
+    var _mesPedido = (typeof anio==='number' && typeof mes==='number') ? (anio+'-'+String(mes+1).padStart(2,'0')) : null;
+    var _diffMeses = 0;
+    try{
+      if(_mesPedido){
+        var _now=new Date(); _diffMeses = (_now.getFullYear()-anio)*12 + (_now.getMonth()-mes);
+        if(_diffMeses<0) _diffMeses=0;
+      }
+    }catch(e){}
+    // Variamos levemente por mes para que se note el historial
+    var _basePB = Math.max(0.5, 2.95 - _diffMeses*0.22);
+    var _baseLider = Math.max(10, 238.46 - _diffMeses*8.4);
+    var _baseAsist = Math.max(5, 30.34 - _diffMeses*1.8);
     var mockResumen = [
-      {codigo:'1', rel:'Volumen Personal', pb:2.95, pbInt:0.00},
-      {codigo:'3', rel:'Org. de Dist. Junior', pb:2.95, pbInt:0.00},
-      {codigo:'4', rel:'Org. de Distribuidores', pb:14.75, pbInt:0.00},
-      {codigo:'5', rel:'Asist. DC', pb:30.34, pbInt:0.00},
-      {codigo:'8', rel:'Lider', pb:238.46, pbInt:0.00},
+      {codigo:'1', rel:'Volumen Personal', pb:Math.round(_basePB*100)/100, pbInt:0.00},
+      {codigo:'3', rel:'Org. de Dist. Junior', pb:Math.round(_basePB*100)/100, pbInt:0.00},
+      {codigo:'4', rel:'Org. de Distribuidores', pb:Math.round(_basePB*5*100)/100, pbInt:0.00},
+      {codigo:'5', rel:'Asist. DC', pb:Math.round(_baseAsist*100)/100, pbInt:0.00},
+      {codigo:'8', rel:'Lider', pb:Math.round(_baseLider*100)/100, pbInt:0.00},
       {codigo:'9', rel:'Asistencia Lider', pb:0.00, pbInt:0.00}
     ];
     var mockBonos = [
       {desc:'Capacitaciones básicas', pct:0, pcTotal:0, mov:0, faltan:0, importe:0.01, estado:'Calificó'},
-      {desc:'Sobre Org. Distribuidor Junior', pct:15, pcTotal:2.95, mov:0, faltan:0, importe:50445.00, estado:'Calificó'},
-      {desc:'Sobre Distribuidores', pct:10, pcTotal:14.75, mov:0, faltan:0, importe:168150.00, estado:'Calificó'},
-      {desc:'Asist. Org. DC (A+B+C)', pct:5, pcTotal:30.34, mov:20.65, faltan:0, importe:174423.00, estado:'Calificó'},
+      {desc:'Sobre Org. Distribuidor Junior', pct:15, pcTotal:Math.round(_basePB*100)/100, mov:0, faltan:0, importe:Math.round(50445 - _diffMeses*1200), estado:'Calificó'},
+      {desc:'Sobre Distribuidores', pct:10, pcTotal:Math.round(_basePB*5*100)/100, mov:0, faltan:0, importe:Math.round(168150 - _diffMeses*4200), estado:'Calificó'},
+      {desc:'Asist. Org. DC (A+B+C)', pct:5, pcTotal:Math.round(_baseAsist*100)/100, mov:Math.max(0, Math.round((20.65 - _diffMeses*0.8)*100)/100), faltan:0, importe:Math.round(174423 - _diffMeses*3800), estado:'Calificó'},
       {desc:'Org.Lider I', pct:2, pcTotal:0, mov:241.41, faltan:478.59, importe:0.00, estado:'Faltan'},
       {desc:'Org.Lider II', pct:1, pcTotal:0, mov:241.41, faltan:708.59, importe:0.00, estado:'Faltan'},
       {desc:'Org.Lider III', pct:1, pcTotal:0, mov:241.41, faltan:918.59, importe:0.00, estado:'Faltan'},
@@ -702,7 +713,7 @@
       }
     }catch(e){}
     // Sin equipoData también mostramos mock demo para que se vea la comodidad
-    var out = {pbPersonal: 2.95, pbEquipo: 238.46, cheque: 393018.01, bonus: 'Calificó', resumen: mockResumen, bonos: mockBonos, ts: Date.now(), fuente: 'mock-demo'};
+    var out = {pbPersonal: Math.round(_basePB*100)/100, pbEquipo: Math.round(_baseLider*100)/100, cheque: Math.round((393018.01 - _diffMeses*15400)*100)/100, bonus: 'Calificó', resumen: mockResumen, bonos: mockBonos, ts: new Date(anio, mes, 15).getTime(), fuente: 'mock-demo'};
     try{
       localStorage.setItem('appsi_psa_cheque', JSON.stringify(out));
       var nowM = new Date(); var kNow = nowM.getFullYear()+'-'+String(nowM.getMonth()+1).padStart(2,'0');
