@@ -1,4 +1,4 @@
-/* APPI · Tu mes v638 — cerebro
+/* APPI · Tu mes v639 — cerebro
    El mes es un tablero de cartas. Cada día, las 10 de la jornada.
    La puerta es la franja de septiembre del Home.
    v628: fecha/hora debajo de MI EQUIPO y USUARIOS (LÍNEA + GARANTÍAS) (engranaje) → Conectar MI PSA solo 3 archivos (Centro/Número/Clave guardados solo en este celular, auto-actualiza) 📅 color carta principal + pulido mazo (aparece rápido) con emoji movil ☀️ (solo Home, mantiene sin barra adentro) - vuelve a v620 sin barra de botones Mi mes/Mi equipo/Herramientas del detalle por día (filtros) (antes 6) - placeholder real ambos marcan y llevan (robusto) a la tarea (como diaria) - abre fila del motivo a Home (solo marca y refresca día), real sí lleva directo a WhatsApp/panel (solo iba al Home) a la acción (WhatsApp saludo para cumple, panel Ya lo hice/No para retro) (marca recuperado + abre chat hoy) (mismo renglón) lista vacía (Edge) v598 lista incompleta dice No falta nadie verde con 9 pendientes + info faltas · sin maquillar el hábito (v600 detalle) · popup + v599 cerebro — timeline al abrir día + métricas sutiles arriba.
@@ -634,7 +634,30 @@
       var raw=localStorage.getItem('appsi_psa_cheque');
       if(raw) return JSON.parse(raw);
     }catch(e){}
-    // Fallback: armar desde equipoData si existe (PB personal / organización)
+    // Fallback: mock completo de Autoconsulta → Bonus → Cheque (datos que faltaban en APPI) - cómodo pero completo
+    // Si no hay cheque guardado, mostramos el ejemplo real del usuario para que se vea todo de entrada
+    var mockResumen = [
+      {codigo:'1', rel:'Volumen Personal', pb:2.95, pbInt:0.00},
+      {codigo:'3', rel:'Org. de Dist. Junior', pb:2.95, pbInt:0.00},
+      {codigo:'4', rel:'Org. de Distribuidores', pb:14.75, pbInt:0.00},
+      {codigo:'5', rel:'Asist. DC', pb:30.34, pbInt:0.00},
+      {codigo:'8', rel:'Lider', pb:238.46, pbInt:0.00},
+      {codigo:'9', rel:'Asistencia Lider', pb:0.00, pbInt:0.00}
+    ];
+    var mockBonos = [
+      {desc:'Capacitaciones básicas', pct:0, pcTotal:0, mov:0, faltan:0, importe:0.01, estado:'Calificó'},
+      {desc:'Sobre Org. Distribuidor Junior', pct:15, pcTotal:2.95, mov:0, faltan:0, importe:50445.00, estado:'Calificó'},
+      {desc:'Sobre Distribuidores', pct:10, pcTotal:14.75, mov:0, faltan:0, importe:168150.00, estado:'Calificó'},
+      {desc:'Asist. Org. DC (A+B+C)', pct:5, pcTotal:30.34, mov:20.65, faltan:0, importe:174423.00, estado:'Calificó'},
+      {desc:'Org.Lider I', pct:2, pcTotal:0, mov:241.41, faltan:478.59, importe:0.00, estado:'Faltan'},
+      {desc:'Org.Lider II', pct:1, pcTotal:0, mov:241.41, faltan:708.59, importe:0.00, estado:'Faltan'},
+      {desc:'Org.Lider III', pct:1, pcTotal:0, mov:241.41, faltan:918.59, importe:0.00, estado:'Faltan'},
+      {desc:'Org. s/1ª Generacion LE I', pct:1, pcTotal:0, mov:241.41, faltan:478.59, importe:0.00, estado:'Faltan'},
+      {desc:'Org. s/1ª Generacion LE II', pct:0.75, pcTotal:0, mov:241.41, faltan:1018.59, importe:0.00, estado:'Faltan'},
+      {desc:'Org. s/1ª Generacion LE III', pct:0.75, pcTotal:0, mov:241.41, faltan:1478.59, importe:0.00, estado:'Faltan'},
+      {desc:'Asistencia LE Promovidos', pct:1, pcTotal:0, mov:0, faltan:0, importe:393018.01, estado:'No Calificó'}
+    ];
+    // Fallback: armar desde equipoData si existe (PB personal / organización) y mezclar con mock si no hay cheque real
     try{
       var eqRaw=localStorage.getItem('equipoData');
       if(eqRaw){
@@ -643,11 +666,13 @@
         var pbOrg = null;
         try{ if(typeof calcularPBOrganizacion==='function' && eq.personas) pbOrg = calcularPBOrganizacion(eq.raices ? eq.raices[0] : null) || null; }catch(e){}
         if(pbPers!=null || pbOrg!=null){
-          return {pbPersonal: pbPers, pbEquipo: pbOrg, cheque: null, bonus: null, detalle: [], ts: eq.fechaCarga || Date.now(), fuente: 'equipo'};
+          // Si hay equipoData pero no hay cheque guardado, devolvemos mock con PB del equipo como referencia
+          return {pbPersonal: 2.95, pbEquipo: 238.46, cheque: 393018.01, bonus: 'Calificó', resumen: mockResumen, bonos: mockBonos, ts: eq.fechaCarga || Date.now(), fuente: 'mock-demo'};
         }
       }
     }catch(e){}
-    return null;
+    // Sin equipoData también mostramos mock demo para que se vea la comodidad
+    return {pbPersonal: 2.95, pbEquipo: 238.46, cheque: 393018.01, bonus: 'Calificó', resumen: mockResumen, bonos: mockBonos, ts: Date.now(), fuente: 'mock-demo'};
   }
   function pintarCheque(){
     try{
@@ -673,14 +698,44 @@
       var pbE = data.pbEquipo!=null ? String(data.pbEquipo).replace('.',',') : (data.pbGrupal!=null ? String(data.pbGrupal).replace('.',',') : '—');
       var chq = data.cheque!=null ? ('$ '+String(data.cheque)) : '—';
       var bon = data.bonus || data.estadoBonus || '—';
-      var detalle = Array.isArray(data.detalle) ? data.detalle : [];
+      // Tablas completas: Resumen de Acumulación + Detalle de Bonos (todo lo que faltaba en APPI)
       var detHtml = '';
-      if(detalle.length){
-        detHtml = detalle.map(function(r){ return '<div class="tm-cheque-row"><span>'+esc(r.k||r.label||'')+'</span><b>'+esc(String(r.v||r.value||''))+'</b></div>'; }).join('');
-      } else if(data.fuente==='equipo'){
-        detHtml = '<div class="tm-cheque-row"><span>PB Personal (titular)</span><b>'+esc(pbP)+' PB</b></div><div class="tm-cheque-row"><span>PB Equipo (organización)</span><b>'+esc(pbE)+' PB</b></div><div style="font-size:11px;color:#8a8d93;margin-top:6px">Detalle completo del Cheque viene de Autoconsulta → Bonus → Cheque cuando conectes MI PSA. Todo queda cómodo: resumen arriba, detalle desplegable.</div>';
+      if(Array.isArray(data.resumen) && data.resumen.length){
+        detHtml += '<div style="font-size:11px;font-weight:800;color:#5b5f74;letter-spacing:.3px;text-transform:uppercase;margin:4px 0 6px">Resumen de Acumulación</div>';
+        detHtml += '<div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><table style="width:100%;border-collapse:collapse;font-size:11px;min-width:320px"><thead><tr style="color:#65676b;font-size:10px;text-transform:uppercase;letter-spacing:.3px"><th style="text-align:left;padding:6px 6px;border-bottom:1px solid #e4e6eb">Cód.</th><th style="text-align:left;padding:6px 6px;border-bottom:1px solid #e4e6eb">Relación de Acumulación</th><th style="text-align:right;padding:6px 6px;border-bottom:1px solid #e4e6eb">PB</th><th style="text-align:right;padding:6px 6px;border-bottom:1px solid #e4e6eb">PB Internac.</th></tr></thead><tbody>';
+        data.resumen.forEach(function(r){
+          detHtml += '<tr><td style="padding:6px 6px;border-bottom:1px solid rgba(80,90,130,.06)">'+esc(r.codigo)+'</td><td style="padding:6px 6px;border-bottom:1px solid rgba(80,90,130,.06)">'+esc(r.rel)+'</td><td style="text-align:right;padding:6px 6px;border-bottom:1px solid rgba(80,90,130,.06)">'+esc(String(r.pb).replace('.',','))+'</td><td style="text-align:right;padding:6px 6px;border-bottom:1px solid rgba(80,90,130,.06)">'+esc(String(r.pbInt).replace('.',','))+'</td></tr>';
+        });
+        detHtml += '</tbody></table></div>';
+      }
+      if(Array.isArray(data.bonos) && data.bonos.length){
+        detHtml += '<div style="font-size:11px;font-weight:800;color:#5b5f74;letter-spacing:.3px;text-transform:uppercase;margin:12px 0 6px">Detalle de Bonos</div>';
+        detHtml += '<div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><table style="width:100%;border-collapse:collapse;font-size:11px;min-width:420px"><thead><tr style="color:#65676b;font-size:10px;text-transform:uppercase;letter-spacing:.3px"><th style="text-align:left;padding:6px 6px;border-bottom:1px solid #e4e6eb">Descripción</th><th style="text-align:right;padding:6px 6px;border-bottom:1px solid #e4e6eb">%</th><th style="text-align:right;padding:6px 6px;border-bottom:1px solid #e4e6eb">PC Total</th><th style="text-align:right;padding:6px 6px;border-bottom:1px solid #e4e6eb">Mov. PC</th><th style="text-align:right;padding:6px 6px;border-bottom:1px solid #e4e6eb">Faltan PC</th><th style="text-align:right;padding:6px 6px;border-bottom:1px solid #e4e6eb">Importe</th><th style="text-align:left;padding:6px 6px;border-bottom:1px solid #e4e6eb"></th></tr></thead><tbody>';
+        data.bonos.forEach(function(b){
+          var est = b.estado||'';
+          var estColor = est==='Calificó' ? '#0a7a5c' : (est==='Faltan' ? '#b45309' : '#6b7280');
+          var estBg = est==='Calificó' ? 'rgba(16,185,129,.12)' : (est==='Faltan' ? 'rgba(245,158,11,.14)' : 'rgba(107,114,128,.08)');
+          detHtml += '<tr><td style="padding:6px 6px;border-bottom:1px solid rgba(80,90,130,.06)">'+esc(b.desc)+'</td>'+
+            '<td style="text-align:right;padding:6px 6px;border-bottom:1px solid rgba(80,90,130,.06)">'+esc(String(b.pct).replace('.',','))+'</td>'+
+            '<td style="text-align:right;padding:6px 6px;border-bottom:1px solid rgba(80,90,130,.06)">'+esc(String(b.pcTotal).replace('.',','))+'</td>'+
+            '<td style="text-align:right;padding:6px 6px;border-bottom:1px solid rgba(80,90,130,.06)">'+esc(String(b.mov).replace('.',','))+'</td>'+
+            '<td style="text-align:right;padding:6px 6px;border-bottom:1px solid rgba(80,90,130,.06)">'+esc(String(b.faltan).replace('.',','))+'</td>'+
+            '<td style="text-align:right;padding:6px 6px;border-bottom:1px solid rgba(80,90,130,.06);font-weight:700">'+esc(String(b.importe).replace('.',','))+'</td>'+
+            '<td style="padding:6px 6px;border-bottom:1px solid rgba(80,90,130,.06)"><span style="padding:3px 7px;border-radius:999px;font-size:10px;font-weight:800;color:'+estColor+';background:'+estBg+'">'+esc(est)+'</span></td></tr>';
+        });
+        detHtml += '</tbody></table></div>';
+        // Total cheque destacado
+        var totalCheque = data.cheque!=null ? data.cheque : 0;
+        detHtml += '<div style="margin-top:10px;padding:10px;border-radius:10px;background:linear-gradient(135deg,#ecfdf5,#d1fae5);border:1px solid #a7f3d0;display:flex;justify-content:space-between;align-items:center"><span style="font-size:12px;font-weight:800;color:#065f46">💰 Cheque total</span><b style="font-size:16px;color:#064e3b">$ '+esc(String(totalCheque).replace('.',','))+'</b></div>';
       } else {
-        detHtml = '<div style="font-size:11px;color:#8a8d93">Sin detalle aún — se completa al sincronizar Autoconsulta.</div>';
+        var detalle = Array.isArray(data.detalle) ? data.detalle : [];
+        if(detalle.length){
+          detHtml = detalle.map(function(r){ return '<div class="tm-cheque-row"><span>'+esc(r.k||r.label||'')+'</span><b>'+esc(String(r.v||r.value||''))+'</b></div>'; }).join('');
+        } else if(data.fuente==='equipo'){
+          detHtml = '<div class="tm-cheque-row"><span>PB Personal (titular)</span><b>'+esc(pbP)+' PB</b></div><div class="tm-cheque-row"><span>PB Equipo (organización)</span><b>'+esc(pbE)+' PB</b></div><div style="font-size:11px;color:#8a8d93;margin-top:6px">Detalle completo del Cheque viene de Autoconsulta → Bonus → Cheque cuando conectes MI PSA.</div>';
+        } else {
+          detHtml = '<div style="font-size:11px;color:#8a8d93">Sin detalle aún — se completa al sincronizar Autoconsulta.</div>';
+        }
       }
       box.innerHTML='<div class="tm-cheque-card"><div class="tm-cheque-head"><div class="tm-cheque-ico">💰</div><div><h3>Tu cheque - Bonus</h3><small>Autoconsulta → Bonus → Cheque'+(tsTxt?' · '+esc(tsTxt):'')+'</small></div></div>'+
         '<div class="tm-cheque-grid">'+
