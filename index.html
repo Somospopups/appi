@@ -128,9 +128,9 @@ window.openStock=function(){
 
 <script src="./porque-vivo.js"></script>
 <script src="./home-limpio.js?v=520"></script>
-  <script src="./home-tarjetas.js?v=631"></script>
-  <script src="./appi-eventos.js?v=631"></script>
-  <script src="./tu-mes.js?v=631"></script>
+  <script src="./home-tarjetas.js?v=632"></script>
+  <script src="./appi-eventos.js?v=632"></script>
+  <script src="./tu-mes.js?v=632"></script>
   <script src="./device-bridge.js?v=523"></script>
   <script src="./anuncios.js?v=521"></script>
   <script src="./aviso-telegram.js?v=555"></script>
@@ -1844,7 +1844,7 @@ body.dark .hist-action-drawer{background:linear-gradient(155deg,#151827,#252036 
 
   .equipo-meta {
     display: flex; align-items: center; justify-content: center; gap: 8px;
-    margin: 6px 14px 0; padding: 6px 10px 6px 10px; border-radius: 10px;
+    margin: 6px 14px 10px; padding: 6px 10px 6px 10px; border-radius: 10px;
     background: rgba(255,255,255,0.55); border: 1px solid rgba(255,255,255,0.70);
     font-size: 11px; color: #65676b; line-height: 1.3;
   }
@@ -4368,7 +4368,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v631 · Segura</div>
+  <div class="ds-foot">APPI · v632 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -5211,7 +5211,10 @@ body.dark #pageTabs button.active{color:#c5d6ff}
       <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
       <h1>Usuarios</h1><div class="script">Garantías</div>
       <p>Gestión por zona y vencimiento - Estilo Mi Equipo</p>
-      <div id="usuariosMetaBar" style="display:none; margin:6px 14px 0; padding:6px 10px; border-radius:10px; background:rgba(255,255,255,0.55); border:1px solid rgba(255,255,255,0.7); font-size:11px; color:#65676b; line-height:1.3;"></div>
+      <div id="usuariosMetaBar" style="display:none; margin:6px 14px 10px; padding:6px 10px 6px 10px; border-radius:10px; background:rgba(255,255,255,0.55); border:1px solid rgba(255,255,255,0.7); font-size:11px; color:#65676b; line-height:1.3; display:flex; align-items:center; gap:8px;">
+        <div id="usuariosMetaFecha" style="flex:1; text-align:center; display:flex; flex-wrap:wrap; justify-content:center; gap:4px 6px;"></div>
+        <button type="button" class="eq-meta-refresh" id="btnUsuariosActualizar" aria-label="Actualizar Garantías" title="Actualizar Garantías">↻</button>
+      </div>
     </header>
 
     <div class="glass" id="usuariosUploadCard">
@@ -8370,7 +8373,28 @@ document.getElementById('equipoFileInput').onchange = (e)=>{
 };
 document.getElementById('btnEquipoReload').onclick = ()=> document.getElementById('equipoFileInput').click();
 const btnEquipoCambiar = document.getElementById('btnEquipoCambiar');
-if(btnEquipoCambiar) btnEquipoCambiar.onclick = ()=> document.getElementById('equipoFileInput').click();
+if(btnEquipoCambiar) btnEquipoCambiar.onclick = ()=>{
+  const c=psaGetCreds();
+  const f=psaGetFiles();
+  if(c && c.remember && f.linea){
+    psaProbar();
+    showToast('Actualizando LÍNEA y GARANTÍAS ORG desde MI PSA…', 2200);
+  } else {
+    document.getElementById('equipoFileInput').click();
+  }
+};
+const btnUsuariosActualizar = document.getElementById('btnUsuariosActualizar');
+if(btnUsuariosActualizar) btnUsuariosActualizar.onclick = ()=>{
+  const c=psaGetCreds();
+  const f=psaGetFiles();
+  if(c && c.remember && f.garantias){
+    psaProbar();
+    showToast('Actualizando GARANTÍAS desde MI PSA…', 2200);
+  } else {
+    const inp=document.getElementById('usuariosFileInput');
+    if(inp) inp.click();
+  }
+};
 /* ============ CARGA DE GARANTÍAS ============ */
 document.getElementById('btnCargarGarantias').onclick = ()=> {
   if(!equipoData || !equipoData.personas){
@@ -12963,8 +12987,8 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='631';
-      const CACHE_NAME='appi-v631-poster';
+      const swVersion='632';
+      const CACHE_NAME='appi-v632-poster';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · v'+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
@@ -17279,7 +17303,8 @@ setTimeout(initHistorico,1200);
 function actualizarUsuariosMetaBar(){
   try{
     const bar=document.getElementById('usuariosMetaBar');
-    if(!bar) return;
+    const fechaEl=document.getElementById('usuariosMetaFecha');
+    if(!bar || !fechaEl) return;
     const lastGarantias=localStorage.getItem('lastUpdate_garantias') || localStorage.getItem('lastUpdate_usuarios');
     const autoSync=localStorage.getItem('appsi_psa_lastSync');
     const filesStr=localStorage.getItem('appsi_psa_files');
