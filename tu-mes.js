@@ -1,4 +1,4 @@
-/* APPI · Tu mes v640 — cerebro
+/* APPI · Tu mes v641 — cerebro
    El mes es un tablero de cartas. Cada día, las 10 de la jornada.
    La puerta es la franja de septiembre del Home.
    v628: fecha/hora debajo de MI EQUIPO y USUARIOS (LÍNEA + GARANTÍAS) (engranaje) → Conectar MI PSA solo 3 archivos (Centro/Número/Clave guardados solo en este celular, auto-actualiza) 📅 color carta principal + pulido mazo (aparece rápido) con emoji movil ☀️ (solo Home, mantiene sin barra adentro) - vuelve a v620 sin barra de botones Mi mes/Mi equipo/Herramientas del detalle por día (filtros) (antes 6) - placeholder real ambos marcan y llevan (robusto) a la tarea (como diaria) - abre fila del motivo a Home (solo marca y refresca día), real sí lleva directo a WhatsApp/panel (solo iba al Home) a la acción (WhatsApp saludo para cumple, panel Ya lo hice/No para retro) (marca recuperado + abre chat hoy) (mismo renglón) lista vacía (Edge) v598 lista incompleta dice No falta nadie verde con 9 pendientes + info faltas · sin maquillar el hábito (v600 detalle) · popup + v599 cerebro — timeline al abrir día + métricas sutiles arriba.
@@ -667,12 +667,16 @@
         try{ if(typeof calcularPBOrganizacion==='function' && eq.personas) pbOrg = calcularPBOrganizacion(eq.raices ? eq.raices[0] : null) || null; }catch(e){}
         if(pbPers!=null || pbOrg!=null){
           // Si hay equipoData pero no hay cheque guardado, devolvemos mock con PB del equipo como referencia
-          return {pbPersonal: 2.95, pbEquipo: 238.46, cheque: 393018.01, bonus: 'Calificó', resumen: mockResumen, bonos: mockBonos, ts: eq.fechaCarga || Date.now(), fuente: 'mock-demo'};
+          var out2 = {pbPersonal: 2.95, pbEquipo: 238.46, cheque: 393018.01, bonus: 'Calificó', resumen: mockResumen, bonos: mockBonos, ts: eq.fechaCarga || Date.now(), fuente: 'mock-demo'};
+          try{ localStorage.setItem('appsi_psa_cheque', JSON.stringify(out2)); }catch(e){}
+          return out2;
         }
       }
     }catch(e){}
     // Sin equipoData también mostramos mock demo para que se vea la comodidad
-    return {pbPersonal: 2.95, pbEquipo: 238.46, cheque: 393018.01, bonus: 'Calificó', resumen: mockResumen, bonos: mockBonos, ts: Date.now(), fuente: 'mock-demo'};
+    var out = {pbPersonal: 2.95, pbEquipo: 238.46, cheque: 393018.01, bonus: 'Calificó', resumen: mockResumen, bonos: mockBonos, ts: Date.now(), fuente: 'mock-demo'};
+    try{ localStorage.setItem('appsi_psa_cheque', JSON.stringify(out)); }catch(e){}
+    return out;
   }
   function pintarCheque(){
     try{
@@ -686,17 +690,29 @@
       if(data && data.ts){
         try{ var d=new Date(Number(data.ts)); tsTxt=d.toLocaleString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}); }catch(e){}
       }
-      // PB personales se suman solos en Cultura de Crecimiento
+      // PB personales se suman solos en Cultura de Crecimiento (persistimos para que culturaPbOficial lo lea)
       try{
         if(data && data.pbPersonal!=null){
+          try{ localStorage.setItem('appsi_psa_cheque', JSON.stringify(data)); }catch(e){}
           var curId = (typeof culturaMonthId==='function' ? culturaMonthId() : null);
           if(curId && typeof getCulturaMonth==='function' && typeof saveCulturaMonth==='function'){
             var cur = getCulturaMonth(curId);
             var nuevoPb = Math.max(0, Math.round(Number(data.pbPersonal)*100)/100);
             if(Number(cur.pb)!==nuevoPb){
               saveCulturaMonth(curId, Object.assign({}, cur, {pb: nuevoPb}));
-              try{ if(typeof renderCulturaCrecimiento==='function') renderCulturaCrecimiento(); }catch(e){}
             }
+            // Siempre re-renderizamos cultura para que se vea la suma sola
+            try{ if(typeof renderCulturaCrecimiento==='function') renderCulturaCrecimiento(); }catch(e){}
+          } else {
+            // Fallback directo a localStorage cultura si las funciones no están cargadas aún
+            try{
+              var id = new Date().getFullYear()+'-'+String(new Date().getMonth()+1).padStart(2,'0');
+              var all = JSON.parse(localStorage.getItem('cultura_crecimiento_v1')||'{}');
+              if(!all[id]) all[id]={pb:0,invitados:[],acciones:[],slots:3};
+              all[id].pb = Math.max(0, Math.round(Number(data.pbPersonal)*100)/100);
+              localStorage.setItem('cultura_crecimiento_v1', JSON.stringify(all));
+              try{ if(typeof renderCulturaCrecimiento==='function') renderCulturaCrecimiento(); }catch(e){}
+            }catch(e2){}
           }
         }
       }catch(e){}
