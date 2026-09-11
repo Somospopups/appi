@@ -128,9 +128,9 @@ window.openStock=function(){
 
 <script src="./porque-vivo.js"></script>
 <script src="./home-limpio.js?v=520"></script>
-  <script src="./home-tarjetas.js?v=639"></script>
-  <script src="./appi-eventos.js?v=639"></script>
-  <script src="./tu-mes.js?v=639"></script>
+  <script src="./home-tarjetas.js?v=640"></script>
+  <script src="./appi-eventos.js?v=640"></script>
+  <script src="./tu-mes.js?v=640"></script>
   <script src="./device-bridge.js?v=523"></script>
   <script src="./anuncios.js?v=521"></script>
   <script src="./aviso-telegram.js?v=555"></script>
@@ -11857,6 +11857,16 @@ function culturaEquipoActual(){
   try{return JSON.parse(localStorage.getItem('equipoData')||'null')}catch(e){return null}
 }
 function culturaPbOficial(eq){
+  // Si hay cheque guardado con PB personal, usarlo como fuente (se suma solo)
+  try{
+    var chRaw=localStorage.getItem('appsi_psa_cheque');
+    if(chRaw){
+      var ch=JSON.parse(chRaw);
+      if(ch && ch.pbPersonal!=null && !isNaN(Number(ch.pbPersonal))){
+        return {pb: Number(ch.pbPersonal), fuente: 'cheque'};
+      }
+    }
+  }catch(e){}
   eq=eq||culturaEquipoActual();
   if(!eq) return null;
   const titular=Object.assign({},eq.titular||{});
@@ -12998,7 +13008,7 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='639';
+      const swVersion='640';
       const CACHE_NAME='appi-v632-poster';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · v'+swVersion;

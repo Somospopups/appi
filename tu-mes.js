@@ -1,4 +1,4 @@
-/* APPI · Tu mes v639 — cerebro
+/* APPI · Tu mes v640 — cerebro
    El mes es un tablero de cartas. Cada día, las 10 de la jornada.
    La puerta es la franja de septiembre del Home.
    v628: fecha/hora debajo de MI EQUIPO y USUARIOS (LÍNEA + GARANTÍAS) (engranaje) → Conectar MI PSA solo 3 archivos (Centro/Número/Clave guardados solo en este celular, auto-actualiza) 📅 color carta principal + pulido mazo (aparece rápido) con emoji movil ☀️ (solo Home, mantiene sin barra adentro) - vuelve a v620 sin barra de botones Mi mes/Mi equipo/Herramientas del detalle por día (filtros) (antes 6) - placeholder real ambos marcan y llevan (robusto) a la tarea (como diaria) - abre fila del motivo a Home (solo marca y refresca día), real sí lleva directo a WhatsApp/panel (solo iba al Home) a la acción (WhatsApp saludo para cumple, panel Ya lo hice/No para retro) (marca recuperado + abre chat hoy) (mismo renglón) lista vacía (Edge) v598 lista incompleta dice No falta nadie verde con 9 pendientes + info faltas · sin maquillar el hábito (v600 detalle) · popup + v599 cerebro — timeline al abrir día + métricas sutiles arriba.
@@ -686,6 +686,20 @@
       if(data && data.ts){
         try{ var d=new Date(Number(data.ts)); tsTxt=d.toLocaleString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}); }catch(e){}
       }
+      // PB personales se suman solos en Cultura de Crecimiento
+      try{
+        if(data && data.pbPersonal!=null){
+          var curId = (typeof culturaMonthId==='function' ? culturaMonthId() : null);
+          if(curId && typeof getCulturaMonth==='function' && typeof saveCulturaMonth==='function'){
+            var cur = getCulturaMonth(curId);
+            var nuevoPb = Math.max(0, Math.round(Number(data.pbPersonal)*100)/100);
+            if(Number(cur.pb)!==nuevoPb){
+              saveCulturaMonth(curId, Object.assign({}, cur, {pb: nuevoPb}));
+              try{ if(typeof renderCulturaCrecimiento==='function') renderCulturaCrecimiento(); }catch(e){}
+            }
+          }
+        }
+      }catch(e){}
       if(!data){
         box.innerHTML='<div class="tm-cheque-card"><div class="tm-cheque-head"><div class="tm-cheque-ico">💰</div><div><h3>Tu cheque - Bonus</h3><small>Datos de Autoconsulta → Bonus → Cheque · debajo de todo, cómodo</small></div></div>'+
           '<p style="font-size:12px;color:#65676b;line-height:1.4;margin:8px 0 0">Conectá <b>MI PSA</b> en el engranaje (MI CUENTA) para traer tu cheque automáticamente. Mientras tanto ves tu PB desde la planilla cargada.</p>'+
