@@ -1,4 +1,4 @@
-/* APPI · Tu mes v642 — cerebro
+/* APPI · Tu mes v643 — cerebro
    El mes es un tablero de cartas. Cada día, las 10 de la jornada.
    La puerta es la franja de septiembre del Home.
    v628: fecha/hora debajo de MI EQUIPO y USUARIOS (LÍNEA + GARANTÍAS) (engranaje) → Conectar MI PSA solo 3 archivos (Centro/Número/Clave guardados solo en este celular, auto-actualiza) 📅 color carta principal + pulido mazo (aparece rápido) con emoji movil ☀️ (solo Home, mantiene sin barra adentro) - vuelve a v620 sin barra de botones Mi mes/Mi equipo/Herramientas del detalle por día (filtros) (antes 6) - placeholder real ambos marcan y llevan (robusto) a la tarea (como diaria) - abre fila del motivo a Home (solo marca y refresca día), real sí lleva directo a WhatsApp/panel (solo iba al Home) a la acción (WhatsApp saludo para cumple, panel Ya lo hice/No para retro) (marca recuperado + abre chat hoy) (mismo renglón) lista vacía (Edge) v598 lista incompleta dice No falta nadie verde con 9 pendientes + info faltas · sin maquillar el hábito (v600 detalle) · popup + v599 cerebro — timeline al abrir día + métricas sutiles arriba.
@@ -629,10 +629,34 @@
       '.tm-cheque-actions .primary{background:linear-gradient(135deg,#5b8def,#a06bff);color:#fff;border:none}';
     document.head.appendChild(s);
   }
-  function getChequeData(){
+  function getChequeData(anio, mes){
+    var keyMes = null;
+    if(typeof anio==='number' && typeof mes==='number'){
+      keyMes = anio+'-'+String(mes+1).padStart(2,'0');
+      try{
+        var rawMes=localStorage.getItem('appsi_psa_cheque_'+keyMes);
+        if(rawMes) return JSON.parse(rawMes);
+      }catch(e){}
+    }
     try{
       var raw=localStorage.getItem('appsi_psa_cheque');
-      if(raw) return JSON.parse(raw);
+      if(raw){
+        var parsed=JSON.parse(raw);
+        // Si pide mes específico y el cheque guardado es de otro mes, intentar usar historial
+        if(keyMes && parsed && parsed.ts){
+          try{
+            var d=new Date(Number(parsed.ts));
+            var k2=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+            if(k2!==keyMes){
+              // No es del mes pedido, seguimos a fallback para no mostrar datos cruzados
+            } else {
+              return parsed;
+            }
+          }catch(e){ return parsed; }
+        } else {
+          return parsed;
+        }
+      }
     }catch(e){}
     // Fallback: mock completo de Autoconsulta → Bonus → Cheque (datos que faltaban en APPI) - cómodo pero completo
     // Si no hay cheque guardado, mostramos el ejemplo real del usuario para que se vea todo de entrada
@@ -668,32 +692,55 @@
         if(pbPers!=null || pbOrg!=null){
           // Si hay equipoData pero no hay cheque guardado, devolvemos mock con PB del equipo como referencia
           var out2 = {pbPersonal: 2.95, pbEquipo: 238.46, cheque: 393018.01, bonus: 'Calificó', resumen: mockResumen, bonos: mockBonos, ts: eq.fechaCarga || Date.now(), fuente: 'mock-demo'};
-          try{ localStorage.setItem('appsi_psa_cheque', JSON.stringify(out2)); }catch(e){}
+          try{
+            localStorage.setItem('appsi_psa_cheque', JSON.stringify(out2));
+            var d2=new Date(Number(out2.ts)||Date.now()); var k2=d2.getFullYear()+'-'+String(d2.getMonth()+1).padStart(2,'0');
+            localStorage.setItem('appsi_psa_cheque_'+k2, JSON.stringify(out2));
+          }catch(e){}
           return out2;
         }
       }
     }catch(e){}
     // Sin equipoData también mostramos mock demo para que se vea la comodidad
     var out = {pbPersonal: 2.95, pbEquipo: 238.46, cheque: 393018.01, bonus: 'Calificó', resumen: mockResumen, bonos: mockBonos, ts: Date.now(), fuente: 'mock-demo'};
-    try{ localStorage.setItem('appsi_psa_cheque', JSON.stringify(out)); }catch(e){}
+    try{
+      localStorage.setItem('appsi_psa_cheque', JSON.stringify(out));
+      var nowM = new Date(); var kNow = nowM.getFullYear()+'-'+String(nowM.getMonth()+1).padStart(2,'0');
+      localStorage.setItem('appsi_psa_cheque_'+kNow, JSON.stringify(out));
+    }catch(e){}
     return out;
   }
-  function pintarCheque(){
+  function pintarCheque(anio, mes){
     try{
       ensureChequeCss();
       var box=document.getElementById('tmCheque');
       if(!box) return;
-      var data=getChequeData();
+      // Si no vienen anio/mes, usar vista actual
+      if(typeof anio!=='number' || typeof mes!=='number'){
+        try{ anio=vistaAnio; mes=vistaMes; }catch(e){ anio=null; mes=null; }
+        if(typeof anio!=='number'){
+          var now=new Date(); anio=now.getFullYear(); mes=now.getMonth();
+        }
+      }
+      var data=getChequeData(anio, mes);
+      var esMesActual = (function(){ try{ var n=new Date(); return anio===n.getFullYear() && mes===n.getMonth(); }catch(e){ return false; } })();
       var hasCreds=false;
       try{ var c=JSON.parse(localStorage.getItem('appsi_psa_creds')||'null'); hasCreds=!!(c && c.remember); }catch(e){}
       var tsTxt='';
       if(data && data.ts){
         try{ var d=new Date(Number(data.ts)); tsTxt=d.toLocaleString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}); }catch(e){}
       }
-      // PB personales se suman solos en Cultura de Crecimiento (persistimos para que culturaPbOficial lo lea)
+      // PB personales se suman solos en Cultura de Crecimiento (persistimos para que culturaPbOficial lo lea) + historial por mes
       try{
         if(data && data.pbPersonal!=null){
-          try{ localStorage.setItem('appsi_psa_cheque', JSON.stringify(data)); }catch(e){}
+          try{
+            localStorage.setItem('appsi_psa_cheque', JSON.stringify(data));
+            if(typeof anio==='number' && typeof mes==='number'){
+              var kMes = anio+'-'+String(mes+1).padStart(2,'0');
+              localStorage.setItem('appsi_psa_cheque_'+kMes, JSON.stringify(data));
+              // Guardar también timestamp del mes para historial
+            }
+          }catch(e){}
           var curId = (typeof culturaMonthId==='function' ? culturaMonthId() : null);
           if(curId && typeof getCulturaMonth==='function' && typeof saveCulturaMonth==='function'){
             var cur = getCulturaMonth(curId);
@@ -717,11 +764,17 @@
         }
       }catch(e){}
       if(!data){
+        var mesLabel = (typeof MESES!=='undefined' && MESES[mes] ? MESES[mes]+' '+anio : '');
+        if(!esMesActual){
+          box.innerHTML='<div class="tm-cheque-card"><div class="tm-cheque-head"><div class="tm-cheque-ico">💰</div><div><h3>Tu cheque - Bonus</h3><small>'+esc(mesLabel)+' · sin cheque guardado</small></div></div>'+
+            '<p style="font-size:12px;color:#65676b;line-height:1.4;margin:8px 0 0">No hay cheque guardado para '+esc(mesLabel)+'.</p><p style="font-size:11px;color:#8a8d93">El historial queda mes a mes cuando sincronizás con MI PSA. El mes actual sí trae tu PB.</p></div>';
+          return;
+        }
         box.innerHTML='<div class="tm-cheque-card"><div class="tm-cheque-head"><div class="tm-cheque-ico">💰</div><div><h3>Tu cheque - Bonus</h3><small>Datos de Autoconsulta → Bonus → Cheque · debajo de todo, cómodo</small></div></div>'+
           '<p style="font-size:12px;color:#65676b;line-height:1.4;margin:8px 0 0">Conectá <b>MI PSA</b> en el engranaje (MI CUENTA) para traer tu cheque automáticamente. Mientras tanto ves tu PB desde la planilla cargada.</p>'+
           '<div class="tm-cheque-actions"><button type="button" onclick="try{showView(\'view-herramientas\')}catch(e){} try{abrirCuentaDesdeMenu()}catch(e){}">Conectar MI PSA →</button></div>'+
           (hasCreds?'<small style="display:block;margin-top:8px;color:#8a8d93;font-size:11px">Ya tenés MI PSA guardado — tocá Actualizar cheque</small>':'')+
-          '<div class="tm-cheque-actions"><button type="button" class="primary" onclick="try{window.psaProbar && window.psaProbar();}catch(e){} setTimeout(function(){try{pintarCheque()}catch(e){}},900)">Actualizar cheque ↻</button></div></div>';
+          '<div class="tm-cheque-actions"><button type="button" class="primary" onclick="try{window.psaProbar && window.psaProbar();}catch(e){} setTimeout(function(){try{pintarCheque(anio,mes)}catch(e){}},900)">Actualizar cheque ↻</button></div></div>';
         return;
       }
       var pbP = data.pbPersonal!=null ? String(data.pbPersonal).replace('.',',') : '—';
@@ -774,7 +827,7 @@
           '<div class="tm-cheque-kpi"><b>'+esc(chq)+'</b><span>Cheque</span></div>'+
           '<div class="tm-cheque-kpi"><b>'+esc(bon)+'</b><span>Bonus</span></div>'+
         '</div>'+
-        '<div class="tm-cheque-actions"><button type="button" onclick="var d=this.closest(\'.tm-cheque-card\').querySelector(\'.tm-cheque-det\'); if(d) d.classList.toggle(\'open\'); this.textContent=d && d.classList.contains(\'open\')?\'Ocultar detalle ✕\':\'Ver detalle completo →\'">Ver detalle completo →</button><button type="button" class="primary" onclick="try{window.psaProbar && window.psaProbar();}catch(e){} this.textContent=\'Actualizando…\'; setTimeout(function(){try{pintarCheque()}catch(e){}},900)">Actualizar ↻</button></div>'+
+        '<div class="tm-cheque-actions"><button type="button" onclick="var d=this.closest(\'.tm-cheque-card\').querySelector(\'.tm-cheque-det\'); if(d) d.classList.toggle(\'open\'); this.textContent=d && d.classList.contains(\'open\')?\'Ocultar detalle ✕\':\'Ver detalle completo →\'">Ver detalle completo →</button><button type="button" class="primary" onclick="try{window.psaProbar && window.psaProbar();}catch(e){} this.textContent=\'Actualizando…\'; setTimeout(function(){try{pintarCheque(anio,mes)}catch(e){}},900)">Actualizar ↻</button></div>'+
         '<div class="tm-cheque-det">'+detHtml+'</div></div>';
     }catch(e){}
   }
@@ -929,7 +982,7 @@
       b.onclick = function(){ abrirDia(b.getAttribute('data-tm-dia'), b.classList.contains('hoy')); };
     });
     pintarKpis(anio, mes, mapa);
-    try{ pintarCheque(); }catch(e){}
+    try{ pintarCheque(anio, mes); }catch(e){}
   }
 
   function itemsDe(k){
