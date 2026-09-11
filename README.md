@@ -4,8 +4,8 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
-- Versión: **v630 · fix deadlock v598**.
-- Caché de la app: `appi-v630-poster` (se renueva al abrir APPI).
+- Versión: **v631 · fix deadlock v598**.
+- Caché de la app: `appi-v631-poster` (se renueva al abrir APPI).
 - Publicación: [https://somospopups.github.io/appi/](https://somospopups.github.io/appi/)
 - Acceso por número de distribuidor y contraseña.
 - Acceso administrador POPUPS mediante el candado, sin DIP ni número de distribuidor.
