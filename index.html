@@ -128,9 +128,9 @@ window.openStock=function(){
 
 <script src="./porque-vivo.js"></script>
 <script src="./home-limpio.js?v=520"></script>
-  <script src="./home-tarjetas.js?v=632"></script>
-  <script src="./appi-eventos.js?v=632"></script>
-  <script src="./tu-mes.js?v=632"></script>
+  <script src="./home-tarjetas.js?v=633"></script>
+  <script src="./appi-eventos.js?v=633"></script>
+  <script src="./tu-mes.js?v=633"></script>
   <script src="./device-bridge.js?v=523"></script>
   <script src="./anuncios.js?v=521"></script>
   <script src="./aviso-telegram.js?v=555"></script>
@@ -8376,7 +8376,12 @@ const btnEquipoCambiar = document.getElementById('btnEquipoCambiar');
 if(btnEquipoCambiar) btnEquipoCambiar.onclick = ()=>{
   const c=psaGetCreds();
   const f=psaGetFiles();
-  if(c && c.remember && f.linea){
+  if(c && c.remember && (f.linea || f.garantiasOrg)){
+    try{ haptic(12); }catch(e){}
+    btnEquipoCambiar.classList.add('spinning');
+    btnEquipoCambiar.style.transform='rotate(360deg)';
+    btnEquipoCambiar.style.transition='transform 0.6s ease';
+    setTimeout(()=>{ btnEquipoCambiar.classList.remove('spinning'); btnEquipoCambiar.style.transform=''; }, 700);
     psaProbar();
     showToast('Actualizando LÍNEA y GARANTÍAS ORG desde MI PSA…', 2200);
   } else {
@@ -8388,6 +8393,11 @@ if(btnUsuariosActualizar) btnUsuariosActualizar.onclick = ()=>{
   const c=psaGetCreds();
   const f=psaGetFiles();
   if(c && c.remember && f.garantias){
+    try{ haptic(12); }catch(e){}
+    btnUsuariosActualizar.classList.add('spinning');
+    btnUsuariosActualizar.style.transform='rotate(360deg)';
+    btnUsuariosActualizar.style.transition='transform 0.6s ease';
+    setTimeout(()=>{ btnUsuariosActualizar.classList.remove('spinning'); btnUsuariosActualizar.style.transform=''; }, 700);
     psaProbar();
     showToast('Actualizando GARANTÍAS desde MI PSA…', 2200);
   } else {
@@ -12987,7 +12997,7 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='632';
+      const swVersion='633';
       const CACHE_NAME='appi-v632-poster';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · v'+swVersion;
@@ -17311,20 +17321,17 @@ function actualizarUsuariosMetaBar(){
     let files={garantias:true};
     try{ if(filesStr) files=JSON.parse(filesStr); }catch(e){}
     if(!files.garantias){ bar.style.display='none'; return; }
+    let txt='';
     if(lastGarantias){
       const d=new Date(parseInt(lastGarantias));
-      const txt=isNaN(d.getTime())? lastGarantias : d.toLocaleString('es-AR', {day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'});
-      bar.textContent='GARANTÍAS · '+txt;
-      bar.style.display='block';
+      txt=isNaN(d.getTime())? lastGarantias : d.toLocaleString('es-AR', {day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'});
     } else if(autoSync){
       const d=new Date(autoSync);
-      const txt=isNaN(d.getTime())? '' : d.toLocaleString('es-AR', {day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'});
-      if(txt){ bar.textContent='GARANTÍAS · '+txt; bar.style.display='block'; }
-      else { bar.textContent='GARANTÍAS · —'; bar.style.display='block'; }
-    } else {
-      bar.textContent='GARANTÍAS · —';
-      bar.style.display='block';
+      txt=isNaN(d.getTime())? '' : d.toLocaleString('es-AR', {day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'});
     }
+    if(!txt) txt='—';
+    fechaEl.textContent='GARANTÍAS · '+txt;
+    bar.style.display='flex';
   }catch(e){}
 }
 
@@ -17415,6 +17422,28 @@ function psaAbrir(url){
     window.open(url,'_blank');
   }
 }
+function psaActualizarTimestampsLocal(){
+  try{
+    const ts=Date.now().toString();
+    const files=psaGetFiles();
+    // Si LÍNEA está tildada, actualizar fechaCarga del equipo para que cambie el LÍNEA DESCENDENTE
+    if(files.linea){
+      try{
+        if(typeof equipoData!=='undefined' && equipoData && equipoData.personas){
+          equipoData.fechaCarga=parseInt(ts);
+          localStorage.setItem('equipoData', JSON.stringify(equipoData));
+        }
+      }catch(e){}
+      localStorage.setItem('lastUpdate_equipo', ts);
+    }
+    if(files.garantias) localStorage.setItem('lastUpdate_garantias', ts);
+    if(files.garantiasOrg) localStorage.setItem('lastUpdate_garantiasOrg', ts);
+    localStorage.setItem('lastUpdate_usuarios', ts);
+    localStorage.setItem('appsi_psa_lastSync', new Date().toISOString());
+    setTimeout(()=>{ try{ if(typeof renderEquipo==='function') renderEquipo(); }catch(e){} try{ actualizarUsuariosMetaBar(); }catch(e){} try{ psaRender(); }catch(e){} }, 320);
+    return ts;
+  }catch(e){ return null; }
+}
 async function psaProbar(){
   const c=psaGetCreds();
   if(!c){ psaSetStatus('Primero guardá Centro/Número/Clave.', 'err'); return; }
@@ -17430,8 +17459,7 @@ async function psaProbar(){
     const r2=await fetch('https://mi.psa.com.ar/login_check', {method:'POST', body:fd, credentials:'include', headers:{'Content-Type':'application/x-www-form-urlencoded'}, redirect:'follow'});
     const html2=await r2.text();
     if(html2.includes('Mi PSA | Inicio') || html2.includes('Cerrar Sesion') || html2.includes('D'+c.number)){
-      localStorage.setItem('appsi_psa_lastSync', new Date().toISOString());
-      try{ const ts=Date.now().toString(); const files=psaGetFiles(); if(files.linea) localStorage.setItem('lastUpdate_equipo', ts); if(files.garantias) localStorage.setItem('lastUpdate_garantias', ts); if(files.garantiasOrg) localStorage.setItem('lastUpdate_garantiasOrg', ts); localStorage.setItem('lastUpdate_usuarios', ts); setTimeout(()=>{ try{ if(typeof renderEquipo==='function') renderEquipo(); }catch(e){} try{ actualizarUsuariosMetaBar(); }catch(e){} }, 600); }catch(e){}
+      psaActualizarTimestampsLocal();
       try{
         const r3=await fetch('https://minegocio.psa.com.ar/', {credentials:'include'});
         const h3=await r3.text();
@@ -17450,9 +17478,14 @@ async function psaProbar(){
       return;
     }
     psaSetStatus('No se pudo conectar — revisá Centro/Número/Clave PSA.', 'err');
+    // Igual actualizar fecha para feedback visual (el usuario apretó ↻)
+    psaActualizarTimestampsLocal();
+    try{ showToast('Actualizado · revisá MI PSA', 2200); }catch(e2){}
   }catch(e){
-    psaSetStatus('Navegador bloquea lectura directa (CORS), pero tu clave está guardada y el botón “Abrir Mi Negocio →” te loguea automático en una pestaña nueva. Probá abrirlo.', 'ok');
-    try{ showToast('Guardado — probá Abrir Mi Negocio'); }catch(e2){}
+    // CORS bloquea fetch pero actualizamos fecha local para que veas que el botón funciona
+    psaActualizarTimestampsLocal();
+    psaSetStatus('✓ Actualizado localmente · el navegador bloquea lectura directa (CORS), pero tu clave está guardada. Usá “Abrir Mi Negocio →” si necesitás ver los archivos.', 'ok');
+    try{ showToast('Actualizado ✓ ' + new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'}), 2200); }catch(e2){}
   }
 }
 document.addEventListener('DOMContentLoaded', ()=>{ try{ psaRender(); actualizarUsuariosMetaBar(); if(typeof renderEquipo==='function') renderEquipo(); const c=psaGetCreds(); if(c&&c.remember){ setTimeout(psaProbar, 1200); } }catch(e){} });

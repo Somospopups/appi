@@ -1,9 +1,9 @@
 {
   "name": "appi",
-  "version": "632.0.0",
-  "cacheName": "appi-v632-poster",
+  "version": "633.0.0",
+  "cacheName": "appi-v633-poster",
   "private": true,
-  "description": "Pruebas de regresi\u00f3n de APPI",
+  "description": "Pruebas de regresión de APPI",
   "scripts": {
     "test": "playwright test",
     "test:e2e": "playwright test",
