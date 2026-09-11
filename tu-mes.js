@@ -1,4 +1,4 @@
-/* APPI · Tu mes v637 — cerebro
+/* APPI · Tu mes v638 — cerebro
    El mes es un tablero de cartas. Cada día, las 10 de la jornada.
    La puerta es la franja de septiembre del Home.
    v628: fecha/hora debajo de MI EQUIPO y USUARIOS (LÍNEA + GARANTÍAS) (engranaje) → Conectar MI PSA solo 3 archivos (Centro/Número/Clave guardados solo en este celular, auto-actualiza) 📅 color carta principal + pulido mazo (aparece rápido) con emoji movil ☀️ (solo Home, mantiene sin barra adentro) - vuelve a v620 sin barra de botones Mi mes/Mi equipo/Herramientas del detalle por día (filtros) (antes 6) - placeholder real ambos marcan y llevan (robusto) a la tarea (como diaria) - abre fila del motivo a Home (solo marca y refresca día), real sí lleva directo a WhatsApp/panel (solo iba al Home) a la acción (WhatsApp saludo para cumple, panel Ya lo hice/No para retro) (marca recuperado + abre chat hoy) (mismo renglón) lista vacía (Edge) v598 lista incompleta dice No falta nadie verde con 9 pendientes + info faltas · sin maquillar el hábito (v600 detalle) · popup + v599 cerebro — timeline al abrir día + métricas sutiles arriba.
@@ -601,6 +601,98 @@
     }catch(e){}
   }
 
+  function ensureChequeCss(){
+    if(document.getElementById('tmChequeCss')) return;
+    var s=document.createElement('style'); s.id='tmChequeCss'; s.textContent=
+      '#tmCheque{margin:14px 0 0}'+
+      '.tm-cheque-card{margin:0;padding:14px;border-radius:16px;background:rgba(255,255,255,.72);border:1px solid rgba(255,255,255,.85);box-shadow:0 4px 16px rgba(80,90,130,.08)}'+
+      'body.dark .tm-cheque-card{background:#25273a;border-color:rgba(255,255,255,.06)}'+
+      '.tm-cheque-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}'+
+      '.tm-cheque-ico{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;background:linear-gradient(135deg,#5b8def,#a06bff);color:#fff;font-size:18px;flex:none}'+
+      '.tm-cheque-head h3{margin:0;font-size:15px;font-weight:900;color:#1c1c1e}'+
+      'body.dark .tm-cheque-head h3{color:#f2f2f7}'+
+      '.tm-cheque-head small{display:block;font-size:11px;color:#65676b;margin-top:2px}'+
+      '.tm-cheque-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px}'+
+      '@media(min-width:480px){.tm-cheque-grid{grid-template-columns:repeat(4,minmax(0,1fr))}'+
+      '}'+
+      '.tm-cheque-kpi{padding:10px 11px;border-radius:12px;background:#fff;border:1px solid #e4e6eb;text-align:center}'+
+      'body.dark .tm-cheque-kpi{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.08)}'+
+      '.tm-cheque-kpi b{display:block;font-size:18px;font-weight:900;color:#1c1c1e}'+
+      'body.dark .tm-cheque-kpi b{color:#fff}'+
+      '.tm-cheque-kpi span{display:block;font-size:10px;font-weight:800;color:#65676b;letter-spacing:.4px;text-transform:uppercase;margin-top:3px}'+
+      '.tm-cheque-det{margin-top:10px;padding:10px;border-radius:10px;background:#f7f8fb;border:1px solid #e4e6eb;display:none}'+
+      'body.dark .tm-cheque-det{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.08)}'+
+      '.tm-cheque-det.open{display:block}'+
+      '.tm-cheque-row{display:flex;justify-content:space-between;padding:6px 0;font-size:12px;border-bottom:1px solid rgba(80,90,130,.08)}'+
+      '.tm-cheque-actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}'+
+      '.tm-cheque-actions button{flex:1;min-width:110px;padding:9px 10px;border-radius:10px;border:1px solid #e4e6eb;font-size:12px;font-weight:700;cursor:pointer}'+
+      '.tm-cheque-actions .primary{background:linear-gradient(135deg,#5b8def,#a06bff);color:#fff;border:none}';
+    document.head.appendChild(s);
+  }
+  function getChequeData(){
+    try{
+      var raw=localStorage.getItem('appsi_psa_cheque');
+      if(raw) return JSON.parse(raw);
+    }catch(e){}
+    // Fallback: armar desde equipoData si existe (PB personal / organización)
+    try{
+      var eqRaw=localStorage.getItem('equipoData');
+      if(eqRaw){
+        var eq=JSON.parse(eqRaw);
+        var pbPers = eq && eq.titular && eq.titular.pbPersonal != null ? Number(eq.titular.pbPersonal) : null;
+        var pbOrg = null;
+        try{ if(typeof calcularPBOrganizacion==='function' && eq.personas) pbOrg = calcularPBOrganizacion(eq.raices ? eq.raices[0] : null) || null; }catch(e){}
+        if(pbPers!=null || pbOrg!=null){
+          return {pbPersonal: pbPers, pbEquipo: pbOrg, cheque: null, bonus: null, detalle: [], ts: eq.fechaCarga || Date.now(), fuente: 'equipo'};
+        }
+      }
+    }catch(e){}
+    return null;
+  }
+  function pintarCheque(){
+    try{
+      ensureChequeCss();
+      var box=document.getElementById('tmCheque');
+      if(!box) return;
+      var data=getChequeData();
+      var hasCreds=false;
+      try{ var c=JSON.parse(localStorage.getItem('appsi_psa_creds')||'null'); hasCreds=!!(c && c.remember); }catch(e){}
+      var tsTxt='';
+      if(data && data.ts){
+        try{ var d=new Date(Number(data.ts)); tsTxt=d.toLocaleString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}); }catch(e){}
+      }
+      if(!data){
+        box.innerHTML='<div class="tm-cheque-card"><div class="tm-cheque-head"><div class="tm-cheque-ico">💰</div><div><h3>Tu cheque - Bonus</h3><small>Datos de Autoconsulta → Bonus → Cheque · debajo de todo, cómodo</small></div></div>'+
+          '<p style="font-size:12px;color:#65676b;line-height:1.4;margin:8px 0 0">Conectá <b>MI PSA</b> en el engranaje (MI CUENTA) para traer tu cheque automáticamente. Mientras tanto ves tu PB desde la planilla cargada.</p>'+
+          '<div class="tm-cheque-actions"><button type="button" onclick="try{showView(\'view-herramientas\')}catch(e){} try{abrirCuentaDesdeMenu()}catch(e){}">Conectar MI PSA →</button></div>'+
+          (hasCreds?'<small style="display:block;margin-top:8px;color:#8a8d93;font-size:11px">Ya tenés MI PSA guardado — tocá Actualizar cheque</small>':'')+
+          '<div class="tm-cheque-actions"><button type="button" class="primary" onclick="try{window.psaProbar && window.psaProbar();}catch(e){} setTimeout(function(){try{pintarCheque()}catch(e){}},900)">Actualizar cheque ↻</button></div></div>';
+        return;
+      }
+      var pbP = data.pbPersonal!=null ? String(data.pbPersonal).replace('.',',') : '—';
+      var pbE = data.pbEquipo!=null ? String(data.pbEquipo).replace('.',',') : (data.pbGrupal!=null ? String(data.pbGrupal).replace('.',',') : '—');
+      var chq = data.cheque!=null ? ('$ '+String(data.cheque)) : '—';
+      var bon = data.bonus || data.estadoBonus || '—';
+      var detalle = Array.isArray(data.detalle) ? data.detalle : [];
+      var detHtml = '';
+      if(detalle.length){
+        detHtml = detalle.map(function(r){ return '<div class="tm-cheque-row"><span>'+esc(r.k||r.label||'')+'</span><b>'+esc(String(r.v||r.value||''))+'</b></div>'; }).join('');
+      } else if(data.fuente==='equipo'){
+        detHtml = '<div class="tm-cheque-row"><span>PB Personal (titular)</span><b>'+esc(pbP)+' PB</b></div><div class="tm-cheque-row"><span>PB Equipo (organización)</span><b>'+esc(pbE)+' PB</b></div><div style="font-size:11px;color:#8a8d93;margin-top:6px">Detalle completo del Cheque viene de Autoconsulta → Bonus → Cheque cuando conectes MI PSA. Todo queda cómodo: resumen arriba, detalle desplegable.</div>';
+      } else {
+        detHtml = '<div style="font-size:11px;color:#8a8d93">Sin detalle aún — se completa al sincronizar Autoconsulta.</div>';
+      }
+      box.innerHTML='<div class="tm-cheque-card"><div class="tm-cheque-head"><div class="tm-cheque-ico">💰</div><div><h3>Tu cheque - Bonus</h3><small>Autoconsulta → Bonus → Cheque'+(tsTxt?' · '+esc(tsTxt):'')+'</small></div></div>'+
+        '<div class="tm-cheque-grid">'+
+          '<div class="tm-cheque-kpi"><b>'+esc(pbP)+'</b><span>PB Personal</span></div>'+
+          '<div class="tm-cheque-kpi"><b>'+esc(pbE)+'</b><span>PB Equipo</span></div>'+
+          '<div class="tm-cheque-kpi"><b>'+esc(chq)+'</b><span>Cheque</span></div>'+
+          '<div class="tm-cheque-kpi"><b>'+esc(bon)+'</b><span>Bonus</span></div>'+
+        '</div>'+
+        '<div class="tm-cheque-actions"><button type="button" onclick="var d=this.closest(\'.tm-cheque-card\').querySelector(\'.tm-cheque-det\'); if(d) d.classList.toggle(\'open\'); this.textContent=d && d.classList.contains(\'open\')?\'Ocultar detalle ✕\':\'Ver detalle completo →\'">Ver detalle completo →</button><button type="button" class="primary" onclick="try{window.psaProbar && window.psaProbar();}catch(e){} this.textContent=\'Actualizando…\'; setTimeout(function(){try{pintarCheque()}catch(e){}},900)">Actualizar ↻</button></div>'+
+        '<div class="tm-cheque-det">'+detHtml+'</div></div>';
+    }catch(e){}
+  }
   var DESC_TAREA = {
     cumple: 'Saludar el cumpleaños',
     retro: 'Pedir el retrolavado',
@@ -752,6 +844,7 @@
       b.onclick = function(){ abrirDia(b.getAttribute('data-tm-dia'), b.classList.contains('hoy')); };
     });
     pintarKpis(anio, mes, mapa);
+    try{ pintarCheque(); }catch(e){}
   }
 
   function itemsDe(k){

@@ -128,9 +128,9 @@ window.openStock=function(){
 
 <script src="./porque-vivo.js"></script>
 <script src="./home-limpio.js?v=520"></script>
-  <script src="./home-tarjetas.js?v=637"></script>
-  <script src="./appi-eventos.js?v=637"></script>
-  <script src="./tu-mes.js?v=637"></script>
+  <script src="./home-tarjetas.js?v=638"></script>
+  <script src="./appi-eventos.js?v=638"></script>
+  <script src="./tu-mes.js?v=638"></script>
   <script src="./device-bridge.js?v=523"></script>
   <script src="./anuncios.js?v=521"></script>
   <script src="./aviso-telegram.js?v=555"></script>
@@ -4836,6 +4836,7 @@ body.dark #pageTabs button.active{color:#c5d6ff}
       <p class="tm-sub" id="tmSub">Este mes</p>
       <div id="tmCal"></div>
       <div id="tmKpis" class="tm-kpis"></div>
+      <div id="tmCheque"></div>
     </div>
   </section>
 
@@ -12997,7 +12998,7 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='637';
+      const swVersion='638';
       const CACHE_NAME='appi-v632-poster';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · v'+swVersion;
