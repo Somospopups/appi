@@ -252,6 +252,15 @@
     return 0;
   }
   function quedanLinea(){ return Math.max(0, topeHoy() - usadosWA()); }
+  function esHecha(motivoId, u){
+    try{
+      if(window.APPIMensajes && window.APPIMensajes.marcaDe){
+        var m = window.APPIMensajes.marcaDe(motivoId, u);
+        return !!(m && m.e === 'hecha');
+      }
+    }catch(e){}
+    return false;
+  }
   function partidoDe(){
     try{
       if (window.APPIMensajes && window.APPIMensajes.partidoHoy) return window.APPIMensajes.partidoHoy();
@@ -681,12 +690,18 @@
     var lista = colaCanje();
     if (!lista.length) return null;
     var filas = [], items = [];
+    // Mantener tareas hechas visibles verdes tachadas, no desaparecer
     lista.slice(0, 5).forEach(function(u){
-      filas.push('<li>🔄 <b>' + esc(nombreLindo(u.usuario)) + '</b> · canje listo</li>');
+      var hecha = esHecha('renovacion', u);
+      filas.push('<li class="' + (hecha ? 'ht-hecho' : '') + '">🔄 <b>' + esc(nombreLindo(u.usuario)) + '</b> · canje listo' + (hecha ? ' <i>✓ hecho</i>' : '') + '</li>');
       items.push(function(){
         if (window.APPIMensajes && window.APPIMensajes.mandar) window.APPIMensajes.mandar('renovacion', u);
         else if (typeof window.showView === 'function') window.showView('view-usuarios');
       });
+      // Pintar verde al instante si se marca hoy, sin esperar recarga
+      if(hecha && items[items.length-1]){
+        // nada extra, el próximo pintar ya vendrá verde
+      }
     });
     if (lista.length > 3){
       filas.push('<li>… y ' + (lista.length - 3) + ' más</li>');
@@ -706,18 +721,37 @@
 
   function tarjetaJornada(){
     var hoy = hoyKey();
-    var lista = contactosGestion().filter(function(c){
+    var listaBase = contactosGestion().filter(function(c){
       return c && ['seguimiento','presentacion'].indexOf(c.estado) >= 0 && c.proximo_contacto && c.proximo_contacto <= hoy;
     });
+    // Mantener hechos del día: si hoy ya abriste la ficha, queda verde tachado en vez de desaparecer
+    var hechosHoy = leerLS('appi_jornada_hechos_' + hoy, []);
+    if(!Array.isArray(hechosHoy)) hechosHoy=[];
+    var idsBase = {};
+    listaBase.forEach(function(c){ idsBase[String(c.id)]=true; });
+    // Agregar al listado los que ya estaban hoy y ahora tienen fecha movida (hechos)
+    var listaHechos = hechosHoy.map(function(id){
+      try{ return contactosGestion().find(function(x){ return String(x.id)===String(id); }) || {id:id, nombre:'(contacto)', estado:'seguimiento', proximo_contacto:hoy, _hecho:true}; }catch(e){ return null; }
+    }).filter(Boolean).filter(function(c){ return !idsBase[String(c.id)]; });
+    var lista = listaBase.concat(listaHechos);
+    // Guardar snapshot del día para poder reconstruir mañana si hace falta
+    try{ if(listaBase.length) localStorage.setItem('appi_jornada_snapshot_' + hoy, JSON.stringify(listaBase.map(function(c){return c.id}))); }catch(e){}
     if (!lista.length) return null;
     var ficha = function(c){ return function(){
+      try{
+        var k='appi_jornada_hechos_' + hoyKey();
+        var arr=leerLS(k, []); if(!Array.isArray(arr)) arr=[];
+        if(arr.indexOf(c.id)<0){ arr.push(c.id); localStorage.setItem(k, JSON.stringify(arr)); }
+      }catch(e){}
       if (window.APPIGestion && window.APPIGestion.abrirContacto) window.APPIGestion.abrirContacto(c.id);
       else if (typeof window.openMiGestion === 'function') window.openMiGestion();
+      setTimeout(function(){ try{ if(mazo){ mazo.tarjetas = armarTarjetas(); pintar(); } }catch(e){} }, 400);
     }; };
     var filas = [], items = [];
     lista.slice(0, 5).forEach(function(c){
-      filas.push('<li>' + (c.estado === 'presentacion' ? '🎤 ' : '📞 ') + esc(c.nombre || 'Sin nombre') +
-                 (c.proximo_contacto < hoy ? ' <i>(atrasado)</i>' : '') + '</li>');
+      var esHecho = c._hecho || hechosHoy.indexOf(c.id)>=0;
+      filas.push('<li class="' + (esHecho ? 'ht-hecho' : '') + '">' + (c.estado === 'presentacion' ? '🎤 ' : '📞 ') + esc(c.nombre || 'Sin nombre') +
+                 (esHecho ? ' <i>✓ visto</i>' : (c.proximo_contacto < hoy ? ' <i>(atrasado)</i>' : '')) + '</li>');
       items.push(ficha(c));
     });
     if (lista.length > 3){
@@ -790,11 +824,25 @@
 
     var filas = [], items = [];
     equipo.slice(0, 4).forEach(function(p){
-      filas.push('<li>🎂 <b>' + esc(nombreLindo(p.nombre)) + '</b> · de tu equipo' + (telValido(p) ? '' : ' <i>sin teléfono</i>') + '</li>');
-      items.push(saludarEquipo(p));
+      // Equipo cumple no tiene marcaDe persistente, pero si ya se abrió WhatsApp hoy lo dejamos marcado via storage simple
+      var hechaEq = false;
+      try{
+        var kEq = 'appi_cumple_equipo_' + hoyKey() + '_' + String(p.codigo||p.nombre||'').replace(/\W+/g,'_');
+        hechaEq = !!localStorage.getItem(kEq);
+      }catch(e){}
+      filas.push('<li class="' + (hechaEq ? 'ht-hecho' : '') + '">🎂 <b>' + esc(nombreLindo(p.nombre)) + '</b> · de tu equipo' + (telValido(p) ? '' : ' <i>sin teléfono</i>') + (hechaEq ? ' <i>✓ saludado</i>' : '') + '</li>');
+      items.push((function(pp, key){ return function(){
+        var fn = saludarEquipo(pp);
+        var res = fn();
+        try{ localStorage.setItem(key, '1'); }catch(e){}
+        // pintar verde al instante
+        setTimeout(function(){ try{ if(mazo){ mazo.tarjetas = armarTarjetas(); pintar(); } }catch(e){} }, 300);
+        return res;
+      }; })(p, 'appi_cumple_equipo_' + hoyKey() + '_' + String(p.codigo||p.nombre||'').replace(/\W+/g,'_')));
     });
     clientes.slice(0, 4).forEach(function(u){
-      filas.push('<li>🎂 <b>' + esc(nombreLindo(u.usuario)) + '</b> · cliente</li>');
+      var hechaCl = esHecha('cumple', u);
+      filas.push('<li class="' + (hechaCl ? 'ht-hecho' : '') + '">🎂 <b>' + esc(nombreLindo(u.usuario)) + '</b> · cliente' + (hechaCl ? ' <i>✓ saludado</i>' : '') + '</li>');
       items.push(saludarCliente(u));
     });
     if (total > 4){
@@ -1098,15 +1146,29 @@
     try{
       if (!window.APPIMensajes || !window.APPIMensajes.resumenHoy) return null;
       var r = window.APPIMensajes.resumenHoy();
-      if (!r.pendientes) return null;
+      if (!r.total) return null;
       var alCarrusel = function(motivoId){ return function(){
         if (typeof window.showView === 'function') window.showView('view-usuarios');
         setTimeout(function(){ try{ window.APPIMensajes.abrirFila(motivoId); }catch(e){} }, 480);
       }; };
       var filas = [], items = [];
-      (window.APPIMensajes.pendientes ? window.APPIMensajes.pendientes() : []).forEach(function(g){
-        var n = g.gente.length;
-        filas.push('<li>' + g.motivo.icono + ' <b>' + n + '</b> ' + esc(n === 1 ? g.motivo.uno : g.motivo.varios) + '</li>');
+      // Mostrar todos los motivos del día, no solo pendientes: los hechos quedan verdes tachados
+      var gruposHoy = (window.APPIMensajes.deHoy ? window.APPIMensajes.deHoy() : []);
+      if(!gruposHoy.length && window.APPIMensajes.pendientes) gruposHoy = window.APPIMensajes.pendientes();
+      gruposHoy.forEach(function(g){
+        var hechas = 0; try{ hechas = g.gente.filter(function(u){ return esHecha(g.motivo.id, u); }).length; }catch(e){}
+        var total = g.gente.length;
+        var pendientes = total - hechas;
+        var clase = pendientes===0 && total>0 ? 'ht-hecho' : '';
+        var txt = hechas===total && total>0 ? '✓ ' + total + ' hecho' + (total>1?'s':'') : (n=> n+' pendiente'+(n!==1?'s':''))(pendientes);
+        // Si todas hechas, mostrar verde
+        var icon = g.motivo.icono;
+        var label = total===1 ? g.motivo.uno : g.motivo.varios;
+        if(hechas===total){
+          filas.push('<li class="ht-hecho">' + icon + ' <b>' + total + '</b> ' + esc(label) + ' <i>✓</i></li>');
+        } else {
+          filas.push('<li class="' + clase + '">' + icon + ' <b>' + pendientes + '</b> ' + esc(pendientes===1 ? g.motivo.uno : g.motivo.varios) + (hechas?' <small style="opacity:.7">· '+hechas+' ✓</small>':'') + '</li>');
+        }
         items.push(alCarrusel(g.motivo.id));
       });
       return {
@@ -1362,9 +1424,9 @@
       '.ht-lista li::after{content:"›";margin-left:auto;color:#3d63c9;font-weight:900;font-size:17px}',
       '.ht-lista.ht-plain li{cursor:default}',
       '.ht-lista.ht-plain li::after{content:none}',
-      '.ht-lista li.ht-hecho{background:rgba(58,208,164,.22);color:#146b54}',
+      '.ht-lista li.ht-hecho{background:rgba(58,208,164,.22);color:#146b54;text-decoration:line-through;text-decoration-color:rgba(20,107,84,.5);text-decoration-thickness:1.5px}',
       '.ht-lista li.ht-hecho::after{content:"✓";color:#168765}',
-      'body.dark .ht-lista li.ht-hecho{background:rgba(58,208,164,.2);color:#d8f5e6}',
+      'body.dark .ht-lista li.ht-hecho{background:rgba(58,208,164,.2);color:#d8f5e6;text-decoration:line-through;text-decoration-color:rgba(216,245,230,.6);text-decoration-thickness:1.5px}',
       'body.dark .ht-lista li.ht-hecho::after{color:#3ad0a4}',
       '.ht-lista li i{color:#c0392b;font-style:normal;font-size:12px;font-weight:900}',
       '.ht-nota{margin:0;color:#8a8b98;font-size:12.5px;line-height:1.35;flex:0 0 auto}',
