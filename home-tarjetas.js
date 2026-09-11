@@ -2038,7 +2038,7 @@
     (function esperar(){
       if (!esHome() || document.getElementById('htOverlay')) return;
       if (++intentos > 100) return;
-      if (!appTerminoDeCargar()){ setTimeout(esperar, 80); return; }
+      if (!appTerminoDeCargar()){ setTimeout(esperar, 16); return; }
       if (esHome() && !document.getElementById('htOverlay')) abrir();
     })();
   }
@@ -2102,9 +2102,10 @@
   });
 
   function intentarEnvolver(){
+    try{ css(); }catch(e){}
     envolver();
     if (window.__htWrapped) return;
-    setTimeout(intentarEnvolver, 80);
+    setTimeout(intentarEnvolver, 16);
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', intentarEnvolver);
   else intentarEnvolver();
