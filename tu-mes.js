@@ -1,4 +1,4 @@
-/* APPI · Tu mes v645 — cerebro
+/* APPI · Tu mes v646 — cerebro
    El mes es un tablero de cartas. Cada día, las 10 de la jornada.
    La puerta es la franja de septiembre del Home.
    v628: fecha/hora debajo de MI EQUIPO y USUARIOS (LÍNEA + GARANTÍAS) (engranaje) → Conectar MI PSA solo 3 archivos (Centro/Número/Clave guardados solo en este celular, auto-actualiza) 📅 color carta principal + pulido mazo (aparece rápido) con emoji movil ☀️ (solo Home, mantiene sin barra adentro) - vuelve a v620 sin barra de botones Mi mes/Mi equipo/Herramientas del detalle por día (filtros) (antes 6) - placeholder real ambos marcan y llevan (robusto) a la tarea (como diaria) - abre fila del motivo a Home (solo marca y refresca día), real sí lleva directo a WhatsApp/panel (solo iba al Home) a la acción (WhatsApp saludo para cumple, panel Ya lo hice/No para retro) (marca recuperado + abre chat hoy) (mismo renglón) lista vacía (Edge) v598 lista incompleta dice No falta nadie verde con 9 pendientes + info faltas · sin maquillar el hábito (v600 detalle) · popup + v599 cerebro — timeline al abrir día + métricas sutiles arriba.
@@ -631,11 +631,33 @@
   }
   function getChequeData(anio, mes){
     var keyMes = null;
+    var _mesPedidoTmp = null; var _diffTmp=0;
+    try{
+      if(typeof anio==='number' && typeof mes==='number'){
+        _mesPedidoTmp = anio+'-'+String(mes+1).padStart(2,'0');
+        var _nowTmp=new Date(); _diffTmp = (_nowTmp.getFullYear()-anio)*12 + (_nowTmp.getMonth()-mes);
+        if(_diffTmp<0) _diffTmp=0;
+      }
+    }catch(e){}
     if(typeof anio==='number' && typeof mes==='number'){
       keyMes = anio+'-'+String(mes+1).padStart(2,'0');
       try{
         var rawMes=localStorage.getItem('appsi_psa_cheque_'+keyMes);
-        if(rawMes) return JSON.parse(rawMes);
+        if(rawMes){
+          var parsedMes=JSON.parse(rawMes);
+          // Invalida caché viejo de v644 que guardó septiembre en todos los meses
+          if(_diffTmp>0 && parsedMes && parsedMes.fuente==='mock-demo'){
+            var expPB = Math.max(0.5, 2.95 - _diffTmp*0.22);
+            expPB = Math.round(expPB*100)/100;
+            if(Math.abs(Number(parsedMes.pbPersonal)-expPB)>0.01){
+              try{ localStorage.removeItem('appsi_psa_cheque_'+keyMes); }catch(e){}
+            } else {
+              return parsedMes;
+            }
+          } else {
+            return parsedMes;
+          }
+        }
       }catch(e){}
     }
     try{
