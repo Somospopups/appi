@@ -1,4 +1,4 @@
-/* APPI · Tu mes v644 — cerebro
+/* APPI · Tu mes v645 — cerebro
    El mes es un tablero de cartas. Cada día, las 10 de la jornada.
    La puerta es la franja de septiembre del Home.
    v628: fecha/hora debajo de MI EQUIPO y USUARIOS (LÍNEA + GARANTÍAS) (engranaje) → Conectar MI PSA solo 3 archivos (Centro/Número/Clave guardados solo en este celular, auto-actualiza) 📅 color carta principal + pulido mazo (aparece rápido) con emoji movil ☀️ (solo Home, mantiene sin barra adentro) - vuelve a v620 sin barra de botones Mi mes/Mi equipo/Herramientas del detalle por día (filtros) (antes 6) - placeholder real ambos marcan y llevan (robusto) a la tarea (como diaria) - abre fila del motivo a Home (solo marca y refresca día), real sí lleva directo a WhatsApp/panel (solo iba al Home) a la acción (WhatsApp saludo para cumple, panel Ya lo hice/No para retro) (marca recuperado + abre chat hoy) (mismo renglón) lista vacía (Edge) v598 lista incompleta dice No falta nadie verde con 9 pendientes + info faltas · sin maquillar el hábito (v600 detalle) · popup + v599 cerebro — timeline al abrir día + métricas sutiles arriba.
@@ -692,26 +692,31 @@
       {desc:'Org. s/1ª Generacion LE III', pct:0.75, pcTotal:0, mov:241.41, faltan:1478.59, importe:0.00, estado:'Faltan'},
       {desc:'Asistencia LE Promovidos', pct:1, pcTotal:0, mov:0, faltan:0, importe:393018.01, estado:'No Calificó'}
     ];
-    // Fallback: armar desde equipoData si existe (PB personal / organización) y mezclar con mock si no hay cheque real
-    try{
-      var eqRaw=localStorage.getItem('equipoData');
-      if(eqRaw){
-        var eq=JSON.parse(eqRaw);
-        var pbPers = eq && eq.titular && eq.titular.pbPersonal != null ? Number(eq.titular.pbPersonal) : null;
-        var pbOrg = null;
-        try{ if(typeof calcularPBOrganizacion==='function' && eq.personas) pbOrg = calcularPBOrganizacion(eq.raices ? eq.raices[0] : null) || null; }catch(e){}
-        if(pbPers!=null || pbOrg!=null){
-          // Si hay equipoData pero no hay cheque guardado, devolvemos mock con PB del equipo como referencia
-          var out2 = {pbPersonal: 2.95, pbEquipo: 238.46, cheque: 393018.01, bonus: 'Calificó', resumen: mockResumen, bonos: mockBonos, ts: eq.fechaCarga || Date.now(), fuente: 'mock-demo'};
-          try{
-            localStorage.setItem('appsi_psa_cheque', JSON.stringify(out2));
-            var d2=new Date(Number(out2.ts)||Date.now()); var k2=d2.getFullYear()+'-'+String(d2.getMonth()+1).padStart(2,'0');
-            localStorage.setItem('appsi_psa_cheque_'+k2, JSON.stringify(out2));
-          }catch(e){}
-          return out2;
+    // Si pide un mes histórico (no actual), no usar el PB actual de equipoData — generar mock histórico por mes
+    if(_mesPedido && _diffMeses>0){
+      // No usar equipoData del mes actual para históricos, va directo a mock por mes
+    } else {
+      // Fallback: armar desde equipoData si existe (solo para mes actual)
+      try{
+        var eqRaw=localStorage.getItem('equipoData');
+        if(eqRaw){
+          var eq=JSON.parse(eqRaw);
+          var pbPers = eq && eq.titular && eq.titular.pbPersonal != null ? Number(eq.titular.pbPersonal) : null;
+          var pbOrg = null;
+          try{ if(typeof calcularPBOrganizacion==='function' && eq.personas) pbOrg = calcularPBOrganizacion(eq.raices ? eq.raices[0] : null) || null; }catch(e){}
+          if(pbPers!=null || pbOrg!=null){
+            var out2 = {pbPersonal: Math.round(_basePB*100)/100, pbEquipo: Math.round(_baseLider*100)/100, cheque: Math.round((393018.01 - _diffMeses*15400)*100)/100, bonus: 'Calificó', resumen: mockResumen, bonos: mockBonos, ts: _mesPedido ? new Date(anio, mes, 15).getTime() : (eq.fechaCarga || Date.now()), fuente: 'mock-demo'};
+            try{
+              localStorage.setItem('appsi_psa_cheque', JSON.stringify(out2));
+              var d2=new Date(Number(out2.ts)||Date.now()); var k2=d2.getFullYear()+'-'+String(d2.getMonth()+1).padStart(2,'0');
+              localStorage.setItem('appsi_psa_cheque_'+k2, JSON.stringify(out2));
+              if(_mesPedido) localStorage.setItem('appsi_psa_cheque_'+_mesPedido, JSON.stringify(out2));
+            }catch(e){}
+            return out2;
+          }
         }
-      }
-    }catch(e){}
+      }catch(e){}
+    }
     // Sin equipoData también mostramos mock demo para que se vea la comodidad
     var out = {pbPersonal: Math.round(_basePB*100)/100, pbEquipo: Math.round(_baseLider*100)/100, cheque: Math.round((393018.01 - _diffMeses*15400)*100)/100, bonus: 'Calificó', resumen: mockResumen, bonos: mockBonos, ts: new Date(anio, mes, 15).getTime(), fuente: 'mock-demo'};
     try{
