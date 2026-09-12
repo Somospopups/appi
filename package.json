@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "705.0.0",
-  "cacheName": "appi-v705-realizadas-faltan",
+  "version": "706.0.0",
+  "cacheName": "appi-v706-movil-fix",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {
