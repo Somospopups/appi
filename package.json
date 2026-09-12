@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "715.0.0",
-  "cacheName": "appi-v715-banner-fix",
+  "version": "716.0.0",
+  "cacheName": "appi-v716-alinea-x",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

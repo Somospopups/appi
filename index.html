@@ -128,9 +128,9 @@ window.openStock=function(){
 
 <script src="./porque-vivo.js"></script>
 <script src="./home-limpio.js?v=520"></script>
-  <script src="./home-tarjetas.js?v=715"></script>
-  <script src="./appi-eventos.js?v=715"></script>
-  <script src="./tu-mes.js?v=715"></script>
+  <script src="./home-tarjetas.js?v=716"></script>
+  <script src="./appi-eventos.js?v=716"></script>
+  <script src="./tu-mes.js?v=716"></script>
   <script src="./device-bridge.js?v=523"></script>
   <script src="./anuncios.js?v=521"></script>
   <script src="./aviso-telegram.js?v=555"></script>
@@ -2744,13 +2744,18 @@ body.dark .hist-action-drawer{background:linear-gradient(155deg,#151827,#252036 
   }
   .modal-body .warn-tip strong { color: #d9534f; }
   .modal-close {
-    position: absolute; top: 16px; right: 16px;
-    width: 32px; height: 32px; border-radius: 50%;
-    background: rgba(0,0,0,0.06); border: none;
-    font-size: 18px; font-weight: 700; color: #6b6b76;
-    cursor: pointer; display: flex; align-items: center; justify-content: center;
-    line-height: 1;
+    position: absolute; top: 14px; right: 14px;
+    width: 30px; height: 30px; border-radius: 50%;
+    background: #f2f2f7; border: 0.5px solid rgba(0,0,0,0.06);
+    font-size: 0; color: #8e8e93;
+    cursor: pointer; display: grid; place-items: center;
+    line-height: 1; transition: background .15s, transform .12s;
+    z-index: 5;
   }
+  .modal-close svg{width:12px;height:12px;display:block}
+  .modal-close:active{transform:scale(0.94);background:#e5e5ea}
+  body.dark .modal-close{background:#2c2c2e;border-color:rgba(255,255,255,0.08);color:#98989d}
+  body.dark .modal-close:active{background:#3a3a3c}
   .modal-footer { padding: 4px 22px 20px; display: flex; gap: 10px; }
   .modal-footer button {
     flex: 1; padding: 12px; border-radius: 14px;
@@ -4290,7 +4295,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
 </head>
 <body>
 
-<div id="appiUpdateBanner" role="status" aria-live="polite"><span style="font-size:18px">✨</span><b>Nueva versión disponible — APPI Renovada v715</b><button type="button" id="btnUpdateAppi">Actualizar ahora</button></div>
+<div id="appiUpdateBanner" role="status" aria-live="polite"><span style="font-size:18px">✨</span><b>Nueva versión disponible — APPI Renovada v716</b><button type="button" id="btnUpdateAppi">Actualizar ahora</button></div>
 <div id="offlineDot"><span style="width:8px;height:8px;border-radius:50%;background:#ffd66b;display:inline-block"></span> Sin conexión — seguís offline 100%</div>
 <div id="globalSearchOverlay" role="dialog" aria-modal="true"><div class="gs-box"><input id="gsInput" placeholder="Buscar persona, código, categoría, PB…  (Esc para cerrar)" autocomplete="off" /><div id="gsResults" class="gs-results"></div><div style="padding:10px 14px;font-size:11px;color:#777887;text-align:center">Tip: presioná <b>Ctrl + K</b> en cualquier pantalla para buscar</div></div></div>
 
@@ -5844,7 +5849,7 @@ body.dark #pageTabs button.active{color:#c5d6ff}
 <!-- MODAL -->
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal" id="modalBox">
-    <button class="modal-close" id="modalClose" aria-label="Cerrar">✕</button>
+    <button class="modal-close" id="modalClose" aria-label="Cerrar"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M1 1L11 11M11 1L1 11"/></svg></button>
     <div class="modal-head">
       <div class="modal-icon" id="modalIcon">💡</div>
       <h3 class="modal-title" id="modalTitle">Ayuda</h3>
@@ -12807,7 +12812,7 @@ function abrirCuentaDesdeMenu(){
           </div>
           <label class="ios-row" for="psaCentro">
             <span class="ios-row-label">Centro</span>
-            <input type="number" id="psaCentro" placeholder="02" min="1" max="99" inputmode="numeric" class="ios-row-input" style="text-align:center">
+            <input type="number" id="psaCentro" placeholder="02" min="1" max="99" inputmode="numeric" class="ios-row-input" style="text-align:right">
           </label>
           <label class="ios-row" for="psaNumero">
             <span class="ios-row-label">Número</span>
@@ -13124,7 +13129,7 @@ function cerrarToolsMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='715';
+      const swVersion='716';
       const CACHE_NAME='appi-v632-poster';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · v'+swVersion;
@@ -14376,7 +14381,7 @@ body.dark .tools-distri small{color:#a0a0b0}
 body.dark .tools-arrow{background:rgba(91,141,239,.18);color:#a8b8ff}
 body.dark .tools-perfil-header{border-color:rgba(255,255,255,.08)}
 
-/* ===== MI PERFIL iOS PRO v715 ===== */
+/* ===== MI PERFIL iOS PRO v716 ===== */
 .ios-perfil{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','SF Pro Display','Helvetica Neue',Helvetica,Arial,sans-serif;max-width:100%;overflow-x:hidden;box-sizing:border-box}
 .ios-perfil-hero{background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.08);border:1px solid rgba(0,0,0,.04)}
 body.dark .ios-perfil-hero{background:#1c1c1e;border-color:rgba(255,255,255,.08);box-shadow:0 1px 3px rgba(0,0,0,.3)}
@@ -17703,7 +17708,7 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
 
 <link rel="stylesheet" href="./appi-tema.css?v=514">
 
-<script>/* APPI Renovada v715 · Todo funcional */
+<script>/* APPI Renovada v716 · Todo funcional */
 (function(){
   // PWA update banner con skipWaiting real
   try{
@@ -17782,7 +17787,7 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
   // Perf badge: mostrar tiempo carga
   try{
     const t=Math.round(performance.now());
-    console.log('[APPI Renovada v715] Cargada en '+t+'ms · Offline:'+(!navigator.onLine)+' · Buscador Ctrl+K listo');
+    console.log('[APPI Renovada v716] Cargada en '+t+'ms · Offline:'+(!navigator.onLine)+' · Buscador Ctrl+K listo');
   }catch(e){}
 
   // Fix scroll lock antiguo que dejaba body bloqueado
