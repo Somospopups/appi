@@ -128,9 +128,9 @@ window.openStock=function(){
 
 <script src="./porque-vivo.js"></script>
 <script src="./home-limpio.js?v=520"></script>
-  <script src="./home-tarjetas.js?v=710"></script>
-  <script src="./appi-eventos.js?v=710"></script>
-  <script src="./tu-mes.js?v=710"></script>
+  <script src="./home-tarjetas.js?v=711"></script>
+  <script src="./appi-eventos.js?v=711"></script>
+  <script src="./tu-mes.js?v=711"></script>
   <script src="./device-bridge.js?v=523"></script>
   <script src="./anuncios.js?v=521"></script>
   <script src="./aviso-telegram.js?v=555"></script>
@@ -4290,7 +4290,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
 </head>
 <body>
 
-<div id="appiUpdateBanner" role="status" aria-live="polite"><span style="font-size:18px">✨</span><b>Nueva versión disponible — APPI Renovada v710</b><button type="button" id="btnUpdateAppi">Actualizar ahora</button></div>
+<div id="appiUpdateBanner" role="status" aria-live="polite"><span style="font-size:18px">✨</span><b>Nueva versión disponible — APPI Renovada v711</b><button type="button" id="btnUpdateAppi">Actualizar ahora</button></div>
 <div id="offlineDot"><span style="width:8px;height:8px;border-radius:50%;background:#ffd66b;display:inline-block"></span> Sin conexión — seguís offline 100%</div>
 <div id="globalSearchOverlay" role="dialog" aria-modal="true"><div class="gs-box"><input id="gsInput" placeholder="Buscar persona, código, categoría, PB…  (Esc para cerrar)" autocomplete="off" /><div id="gsResults" class="gs-results"></div><div style="padding:10px 14px;font-size:11px;color:#777887;text-align:center">Tip: presioná <b>Ctrl + K</b> en cualquier pantalla para buscar</div></div></div>
 
@@ -12805,9 +12805,11 @@ function abrirCuentaDesdeMenu(){
           </div>
           <label class="ios-row" for="psaCentro">
             <span class="ios-row-label">Centro</span>
-            <input type="number" id="psaCentro" placeholder="02" min="1" max="99" inputmode="numeric" class="ios-row-input" style="text-align:center;max-width:70px;margin-left:auto">
-            <span style="font-size:15px;color:#8e8e93">·</span>
-            <input type="number" id="psaNumero" placeholder="98020174" inputmode="numeric" class="ios-row-input" style="flex:1;min-width:0">
+            <input type="number" id="psaCentro" placeholder="02" min="1" max="99" inputmode="numeric" class="ios-row-input" style="text-align:center">
+          </label>
+          <label class="ios-row" for="psaNumero">
+            <span class="ios-row-label">Número</span>
+            <input type="number" id="psaNumero" placeholder="98020174" inputmode="numeric" class="ios-row-input">
           </label>
           <label class="ios-row" for="psaClave">
             <span class="ios-row-label">Clave PSA</span>
@@ -12840,10 +12842,10 @@ function abrirCuentaDesdeMenu(){
       </div>
 
       <!-- Acciones PSA -->
-      <div style="display:flex;gap:8px">
-        <button type="button" class="ios-primary-btn" id="btnPsaGuardar" style="flex:1.2">Guardar y conectar</button>
-        <button type="button" class="ios-secondary-btn" id="btnPsaProbar">Probar</button>
-        <button type="button" class="ios-danger-btn" id="btnPsaBorrar">Borrar</button>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button type="button" class="ios-primary-btn" id="btnPsaGuardar" style="flex:1 1 140px;min-width:140px">Guardar y conectar</button>
+        <button type="button" class="ios-secondary-btn" id="btnPsaProbar" style="flex:1 1 80px;min-width:80px">Probar</button>
+        <button type="button" class="ios-danger-btn" id="btnPsaBorrar" style="flex:1 1 70px;min-width:70px">Borrar</button>
       </div>
       <div id="psaStatus" class="ios-status" style="min-height:18px;display:none"></div>
       <div id="psaLastSync" style="font-size:12px;color:#8e8e93;margin:0 16px;display:none"></div>
@@ -13138,7 +13140,7 @@ function cerrarToolsMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='710';
+      const swVersion='711';
       const CACHE_NAME='appi-v632-poster';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · v'+swVersion;
@@ -14390,14 +14392,14 @@ body.dark .tools-distri small{color:#a0a0b0}
 body.dark .tools-arrow{background:rgba(91,141,239,.18);color:#a8b8ff}
 body.dark .tools-perfil-header{border-color:rgba(255,255,255,.08)}
 
-/* ===== MI PERFIL iOS PRO v710 ===== */
-.ios-perfil{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','SF Pro Display','Helvetica Neue',Helvetica,Arial,sans-serif}
+/* ===== MI PERFIL iOS PRO v711 ===== */
+.ios-perfil{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','SF Pro Display','Helvetica Neue',Helvetica,Arial,sans-serif;max-width:100%;overflow-x:hidden;box-sizing:border-box}
 .ios-perfil-hero{background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.08);border:1px solid rgba(0,0,0,.04)}
 body.dark .ios-perfil-hero{background:#1c1c1e;border-color:rgba(255,255,255,.08);box-shadow:0 1px 3px rgba(0,0,0,.3)}
 .ios-section-header{margin:0 0 6px 16px;font-size:13px;font-weight:400;color:#8e8e93;text-transform:uppercase;letter-spacing:-.08px}
 .ios-group{background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.08);border:0.5px solid rgba(0,0,0,.04)}
 body.dark .ios-group{background:#1c1c1e;border-color:rgba(255,255,255,.08);box-shadow:0 1px 3px rgba(0,0,0,.3)}
-.ios-row{display:flex;align-items:center;gap:12px;padding:0 16px;min-height:46px;border-bottom:0.5px solid #e5e5ea;background:#fff}
+.ios-row{display:flex;align-items:center;gap:12px;padding:0 16px;min-height:46px;border-bottom:0.5px solid #e5e5ea;background:#fff;max-width:100%;box-sizing:border-box;overflow:hidden}
 .ios-group .ios-row:last-child{border-bottom:0}
 body.dark .ios-row{background:#1c1c1e;border-bottom-color:rgba(255,255,255,.08)}
 .ios-row:active{background:#f2f2f7}
@@ -14405,7 +14407,7 @@ body.dark .ios-row:active{background:#2c2c2e}
 .ios-row-icon{width:28px;height:28px;border-radius:7px;display:grid;place-items:center;color:#fff;font-size:14px;flex:none}
 .ios-row-label{width:86px;font-size:15px;color:#1c1c1e;flex:none;font-weight:400}
 body.dark .ios-row-label{color:#f2f2f7}
-.ios-row-input{flex:1;border:0;background:transparent;text-align:right;font-size:15px;color:#1c1c1e;outline:none;padding:8px 0;font-family:inherit}
+.ios-row-input{flex:1;min-width:0;max-width:100%;border:0;background:transparent;text-align:right;font-size:15px;color:#1c1c1e;outline:none;padding:8px 0;font-family:inherit;box-sizing:border-box}
 .ios-row-input::placeholder{color:#c7c7cc}
 body.dark .ios-row-input{color:#f2f2f7}
 .ios-row-input:focus{color:#007AFF}
@@ -17712,7 +17714,7 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
 
 <link rel="stylesheet" href="./appi-tema.css?v=514">
 
-<script>/* APPI Renovada v710 · Todo funcional */
+<script>/* APPI Renovada v711 · Todo funcional */
 (function(){
   // PWA update banner con skipWaiting real
   try{
@@ -17791,7 +17793,7 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
   // Perf badge: mostrar tiempo carga
   try{
     const t=Math.round(performance.now());
-    console.log('[APPI Renovada v710] Cargada en '+t+'ms · Offline:'+(!navigator.onLine)+' · Buscador Ctrl+K listo');
+    console.log('[APPI Renovada v711] Cargada en '+t+'ms · Offline:'+(!navigator.onLine)+' · Buscador Ctrl+K listo');
   }catch(e){}
 
   // Fix scroll lock antiguo que dejaba body bloqueado

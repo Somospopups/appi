@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v710-ios-perfil';
+const CACHE_NAME = 'appi-v711-sin-slide';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
