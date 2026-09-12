@@ -128,12 +128,13 @@ window.openStock=function(){
 
 <script src="./porque-vivo.js"></script>
 <script src="./home-limpio.js?v=520"></script>
-  <script src="./home-tarjetas.js?v=700"></script>
-  <script src="./appi-eventos.js?v=700"></script>
-  <script src="./tu-mes.js?v=700"></script>
+  <script src="./home-tarjetas.js?v=701"></script>
+  <script src="./appi-eventos.js?v=701"></script>
+  <script src="./tu-mes.js?v=701"></script>
   <script src="./device-bridge.js?v=523"></script>
   <script src="./anuncios.js?v=521"></script>
-  <script src="./aviso-telegram.js?v=555"></script>
+  <script src="./nuevo-habitos.js?v=701"></script>
+<script src="./aviso-telegram.js?v=555"></script>
   <script src="./reuniones.js?v=530"></script>
 <style id="historico-inline-css">
 /* APPI · Histórico mensual */
@@ -4263,7 +4264,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
 
 
 <style id="apii-renovada-css">
-/* APPI RENOVADA v700 · Update banner + Buscador global + Offline + Perf */
+/* APPI RENOVADA v701 · Update banner + Buscador global + Offline + Perf */
 #appiUpdateBanner{position:fixed;left:12px;right:12px;bottom:calc(18px + env(safe-area-inset-bottom));z-index:60000;display:none;align-items:center;gap:12px;padding:14px 16px;border-radius:18px;background:linear-gradient(135deg,#5b8def,#a06bff);color:#fff;box-shadow:0 14px 32px rgba(72,82,180,.28);animation:bannerIn .45s cubic-bezier(.22,.9,.28,1)}
 #appiUpdateBanner.show{display:flex}
 #appiUpdateBanner b{flex:1;font-size:13px;line-height:1.35}
@@ -4285,7 +4286,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
 </head>
 <body>
 
-<div id="appiUpdateBanner" role="status" aria-live="polite"><span style="font-size:18px">✨</span><b>Nueva versión disponible — APPI Renovada v700</b><button type="button" id="btnUpdateAppi">Actualizar ahora</button></div>
+<div id="appiUpdateBanner" role="status" aria-live="polite"><span style="font-size:18px">✨</span><b>Nueva versión disponible — APPI Renovada v701</b><button type="button" id="btnUpdateAppi">Actualizar ahora</button></div>
 <div id="offlineDot"><span style="width:8px;height:8px;border-radius:50%;background:#ffd66b;display:inline-block"></span> Sin conexión — seguís offline 100%</div>
 <div id="globalSearchOverlay" role="dialog" aria-modal="true"><div class="gs-box"><input id="gsInput" placeholder="Buscar persona, código, categoría, PB…  (Esc para cerrar)" autocomplete="off" /><div id="gsResults" class="gs-results"></div><div style="padding:10px 14px;font-size:11px;color:#777887;text-align:center">Tip: presioná <b>Ctrl + K</b> en cualquier pantalla para buscar</div></div></div>
 
@@ -4370,6 +4371,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
   <nav class="ds-nav">
     <button class="ds-btn active" data-ds="view-home" onclick="showView('view-home'); renderHomeCompleto();"><span>🏠</span> Home</button>
     <div class="ds-section-label">Mi mes</div>
+    <button class="ds-btn" data-ds="view-nuevo" onclick="openNuevo()"><span>🌱</span> Acompañar al nuevo</button>
     <button class="ds-btn" data-ds="view-tumes" onclick="openTuMes()"><span>📅</span> Tu mes</button>
     <button class="ds-btn" data-ds="view-siete" onclick="openSiete()"><span>🚀</span> Las 7 P</button>
     <button class="ds-btn" data-ds="view-presu" onclick="openPresu()"><span>💰</span> Presupuesto</button>
@@ -4708,6 +4710,15 @@ body.dark #pageTabs button.active{color:#c5d6ff}
       </div>
     </div>
 
+        <div id="homeNuevoCard" class="tool-card" onclick="openNuevo()" style="--accent:#3ad0a4;cursor:pointer;margin-bottom:12px">
+      <div class="tool-head">
+        <div class="tool-icon" style="background:linear-gradient(135deg,#3ad0a4,#5b8def)">🌱</div>
+        <div class="tool-title-block"><h3>Acompañar al nuevo</h3><div class="tool-sub">5 hábitos diarios: USUARIOS · referidos · llamados · demos · presentaciones</div></div>
+        <div class="tool-status"><div class="status-val neutral" id="homeNuevoPct">—</div><div class="status-lbl">hoy</div></div>
+      </div>
+      <div class="tool-progress"><div class="mini-bar"><div class="fill" id="homeNuevoBar" style="width:0%;background:linear-gradient(90deg,#3ad0a4,#5b8def)"></div></div><span class="time-ago">tocá para marcar →</span></div>
+    </div>
+    
     <div class="tools-list home-tools-grid" id="toolsList"></div>
 
     <div class="backup-collapsible" id="backupCollapsible">
@@ -4847,6 +4858,57 @@ body.dark #pageTabs button.active{color:#c5d6ff}
       <p>Lo que tenés y lo que prestaste</p>
     </header>
     <div class="st-wrap" id="stockCont"></div>
+  </section>
+
+  
+  <section id="view-nuevo" class="view">
+    <header class="top">
+      <button class="back-btn" onclick="showView('view-home')" aria-label="Volver">‹</button>
+      <button class="help-btn" onclick="try{window.APPIDialog && window.APPIDialog.alert('Acompañá a tu nuevo DISTRIBUIDOR día a día. Los 5 hábitos generan USUARIOS, demostraciones y presentaciones. Los PB son del DISTRIBUIDOR. Valores en pesos: consultá lista vigente en Herramientas → Lista de precios.',{title:'Ayuda Nuevo',icon:'🌱'})}catch(e){alert('Acompañar al nuevo')}" aria-label="Ayuda">?</button>
+      <h1>Acompañar <span class="script">al nuevo</span></h1>
+      <p>5 hábitos diarios para tu nuevo DISTRIBUIDOR</p>
+    </header>
+    <div class="nuevo-hero">
+      <div style="font-size:10px;font-weight:900;letter-spacing:1px;opacity:.78">NUEVO DISTRIBUIDOR · PRIMEROS 30 DÍAS</div>
+      <h2>Que no se pierda — hábitos que crean hábito</h2>
+      <p>Buscar USUARIOS, pedir referidos, llamados, demostraciones del purificador y presentaciones de negocio. Repetilo cada día.</p>
+      <div class="nuevo-progress"><div class="bar"><i id="nuevoBarFill" style="width:0%"></i></div><b id="nuevoPct">0%</b></div>
+      <div style="margin-top:8px;font-size:11px;font-weight:700;opacity:.9"><span id="nuevoHechos">0 / 5</span> hoy · Racha <span id="nuevoStreak">—</span></div>
+    </div>
+    <div class="nuevo-kpis">
+      <div class="nuevo-kpi"><b>13 PB</b><span>Para ser D</span></div>
+      <div class="nuevo-kpi"><b>12 PB + 9 PB</b><span>Bonus: 12 PB + 1-2 patrocinios 9 PB</span></div>
+      <div class="nuevo-kpi"><b>30 → 10</b><span>Demos → cierres (sin $ fijo)</span></div>
+    </div>
+    <div class="nuevo-card">
+      <h3>📌 Recordá</h3>
+      <p><b>Producto = PURIFICADOR</b> (tiene garantía). <b>PREFILTRO</b> es el repuesto. <b>PLAN CANJE</b> es al final de la vida útil si el USUARIO lo decide. <b>PB = del DISTRIBUIDOR.</b> Los valores en pesos cambian, consultá siempre <b>Herramientas → Lista de precios</b> vigente.</p>
+    </div>
+    <div class="nuevo-card">
+      <h3>✅ Hoy — tocá para marcar</h3>
+      <p style="margin-bottom:10px">Cada toque suma. Si completás los 5, tu racha sube. Esto lo ve tu ascenso en su seguimiento.</p>
+      <div id="nuevoHabitosList"></div>
+    </div>
+    <div class="nuevo-card">
+      <h3>📅 Últimos 7 días</h3>
+      <div id="nuevoHist"></div>
+      <div class="nuevo-aviso" style="margin-top:10px">💡 Tip: el hábito se genera pidiendo <b>referidos</b> después de cada demostración y agendando la <b>presentación de negocio</b> en el momento.</div>
+    </div>
+    <div class="nuevo-card">
+      <h3>🎯 Camino DJ → D → DC</h3>
+      <p style="margin-bottom:10px"><b>DJ</b>: adhesión + kit + primer purificador. <b>D</b>: 13 PB personales + DJ directos + Capacitación Básica (1 mes). <b>DC</b>: 13 PB en 3 org. de D. Mantenimiento por trimestre.</p>
+      <div style="display:grid;gap:8px">
+        <div><div style="display:flex;justify-content:space-between;font-size:11px;font-weight:800"><span>DJ → D</span><span>13 PB</span></div><div class="nuevo-pb-bar"><i style="width:100%"></i></div></div>
+        <div><div style="display:flex;justify-content:space-between;font-size:11px;font-weight:800"><span>D → DC</span><span>13 PB en 3 org.</span></div><div class="nuevo-pb-bar"><i style="width:62%"></i></div></div>
+      </div>
+      <div style="margin-top:12px;display:flex;gap:8px">
+        <button class="hist-secondary" style="flex:1" onclick="try{showView('view-equipo')}catch(e){}">Ver Mi Equipo →</button>
+        <button class="hist-primary" style="flex:1" onclick="try{window.openGlobalSearch && window.openGlobalSearch()}catch(e){}">Buscar USUARIO 🔍</button>
+      </div>
+    </div>
+    <div class="nuevo-card" style="text-align:center">
+      <p style="font-size:11px;color:#777887">Basado en <b>NEGOCIO_PSA_INFORMACION_COMPLETA.md</b> y Material de acompañamiento PP — sin valores fijos en pesos.</p>
+    </div>
   </section>
 
   <section id="view-tumes" class="view">
@@ -6706,16 +6768,15 @@ function showView(id,opts){
     b.classList.toggle('active', b.dataset.view===id);
   });
   // Sidebar escritorio: marcar activo (con equivalencias de sub-vistas)
-  const dsMap = {'view-home':'view-home','view-presu':'view-presu','view-presu-hist':'view-presu','view-equipo':'view-equipo','view-historico':'view-historico','view-usuarios':'view-usuarios','view-seguimiento':'view-seguimiento','view-encuesta':'view-encuesta','view-gestion':'view-gestion','view-grabadora':'view-grabadora','view-notas':'view-notas','view-tumes':'view-tumes','view-siete':'view-siete','view-siete-detail':'view-siete','view-ocho':'view-ocho','view-suenos':'view-suenos','view-demo':'view-demo','view-botella':'view-botella','view-simulador':'view-simulador','view-stock':'view-stock','view-reuniones':'view-reuniones'};
+  const dsMap = {'view-nuevo':'view-nuevo','view-home':'view-home','view-presu':'view-presu','view-presu-hist':'view-presu','view-equipo':'view-equipo','view-historico':'view-historico','view-usuarios':'view-usuarios','view-seguimiento':'view-seguimiento','view-encuesta':'view-encuesta','view-gestion':'view-gestion','view-grabadora':'view-grabadora','view-notas':'view-notas','view-tumes':'view-tumes','view-siete':'view-siete','view-siete-detail':'view-siete','view-ocho':'view-ocho','view-suenos':'view-suenos','view-demo':'view-demo','view-botella':'view-botella','view-simulador':'view-simulador','view-stock':'view-stock','view-reuniones':'view-reuniones'};
   const dsTarget = (id==='view-wheel'||id==='view-eval') ? `rueda-${currentRueda||'vida'}` : (dsMap[id] || '');
   document.querySelectorAll('#deskSidebar .ds-btn').forEach(b=>{
     b.classList.toggle('active', b.dataset.ds===dsTarget);
   });
-  const hideTabsOn = ['view-home','view-tumes','view-siete','view-siete-detail','view-ocho','view-suenos','view-demo','view-botella','view-simulador','view-stock','view-presu','view-presu-hist','view-equipo','view-historico','view-seguimiento','view-planning','view-encuesta','view-gestion','view-grabadora','view-notas','view-usuarios','view-admin'];
+  const hideTabsOn = ['view-home','view-nuevo','view-tumes','view-siete','view-siete-detail','view-ocho','view-suenos','view-demo','view-botella','view-simulador','view-stock','view-presu','view-presu-hist','view-equipo','view-historico','view-seguimiento','view-planning','view-encuesta','view-gestion','view-grabadora','view-notas','view-usuarios','view-admin'];
   document.getElementById('tabs').style.display = (id==='view-wheel'||id==='view-eval') ? 'flex' : 'none';
   const _pageHub={
-    'view-home':'view-home',
-    'view-mes':'view-mes','view-tumes':'view-mes','view-siete':'view-mes','view-siete-detail':'view-mes','view-presu':'view-mes','view-presu-hist':'view-mes','view-wheel':'view-mes','view-eval':'view-mes','view-planning':'view-mes',
+    'view-nuevo':'view-nuevo','view-home':'view-home','view-mes':'view-mes','view-tumes':'view-mes','view-siete':'view-mes','view-siete-detail':'view-mes','view-presu':'view-mes','view-presu-hist':'view-mes','view-wheel':'view-mes','view-eval':'view-mes','view-planning':'view-mes',
     'view-negocio':'view-negocio','view-equipo':'view-negocio','view-historico':'view-negocio','view-usuarios':'view-negocio','view-seguimiento':'view-negocio','view-gestion':'view-negocio',
     'view-herramientas':'view-herramientas','view-stock':'view-herramientas','view-ocho':'view-herramientas','view-suenos':'view-herramientas','view-demo':'view-herramientas','view-botella':'view-herramientas','view-simulador':'view-herramientas','view-grabadora':'view-herramientas','view-notas':'view-herramientas','view-encuesta':'view-herramientas'
   };
@@ -13032,7 +13093,7 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='700';
+      const swVersion='701';
       const CACHE_NAME='appi-v632-poster';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · v'+swVersion;
@@ -17531,7 +17592,7 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
 
 <link rel="stylesheet" href="./appi-tema.css?v=514">
 
-<script>/* APPI Renovada v700 · Todo funcional */
+<script>/* APPI Renovada v701 · Todo funcional */
 (function(){
   // PWA update banner con skipWaiting real
   try{
@@ -17610,13 +17671,13 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
   // Perf badge: mostrar tiempo carga
   try{
     const t=Math.round(performance.now());
-    console.log('[APPI Renovada v700] Cargada en '+t+'ms · Offline:'+(!navigator.onLine)+' · Buscador Ctrl+K listo');
+    console.log('[APPI Renovada v701] Cargada en '+t+'ms · Offline:'+(!navigator.onLine)+' · Buscador Ctrl+K listo');
   }catch(e){}
 
   // Fix scroll lock antiguo que dejaba body bloqueado
   try{ document.body.classList.remove('appi-scroll-lock'); }catch(e){}
   // Marcar como renovada
-  try{ localStorage.setItem('appsi_renovada_v700','1'); }catch(e){}
+  try{ localStorage.setItem('appsi_renovada_v701','1'); }catch(e){}
 
   // Embudo rápido: si hay datos, inyectar mini KPI en home si no existe
   setTimeout(()=>{
