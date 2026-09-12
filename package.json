@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "703.0.0",
-  "cacheName": "appi-v703-limpia",
+  "version": "704.0.0",
+  "cacheName": "appi-v704-cartas-grandes",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {
