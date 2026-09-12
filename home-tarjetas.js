@@ -126,7 +126,7 @@
     'El que muestra el plan dos veces por día no tiene meses malos.',
     'Sonreí antes de llamar: se escucha del otro lado.',
     'Hoy es un buen día para pedir un referido. Pedilo.',
-    'La cultura se contagia: cargá tus PB y tu equipo te copia.',
+    'Cargá tus PB: tu ejemplo inspira a tu equipo.',
     'Cuando el equipo te ve marcar, el equipo marca.',
     'Tu demo número cien empieza por la de hoy.',
     'Invitar no es molestar: es dar la posibilidad de elegir.',
@@ -183,16 +183,7 @@
       return data && Array.isArray(data.personas) ? data.personas : [];
     }catch(e){ return []; }
   }
-  function culturaMes(){
-    try{
-      var data = leerLS('cultura_crecimiento_v1', {});
-      var d = new Date();
-      var id = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
-      var row = data[id] || {};
-      var inv = Array.isArray(row.invitados) ? row.invitados.length : Number(row.invitados) || 0;
-      return { pb: Number(row.pb) || 0, invitados: inv, metaPb: 15, metaInv: 2 };
-    }catch(e){ return { pb: 0, invitados: 0, metaPb: 15, metaInv: 2 }; }
-  }
+  function culturaMes(){ return {pb:0, ratio:0, pct:0, invit:0, label:'', id:''}; }
   function pilaDe(n){
     try{ if (typeof window.nombreDePila === 'function'){ var v = window.nombreDePila(n); if (v) return v; } }catch(e){}
     var t = String(n == null ? '' : n).trim();

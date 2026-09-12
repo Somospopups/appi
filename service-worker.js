@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v701-nuevo';
+const CACHE_NAME = 'appi-v703-limpia';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
@@ -39,7 +39,6 @@ const APP_SHELL = [
   './device-bridge.js',
   './anuncios.js',
   './reuniones.js',
-  './nuevo-habitos.js',
   './aviso-telegram.js',
   './css/membership-admin.css',
   './appi-tema.css',

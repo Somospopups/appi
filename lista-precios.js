@@ -1007,7 +1007,7 @@
       y += 18;
 
       var pago = pagoActual();
-      var ops = opsCuotas(pago.banco);
+      var ops = pago.banco ? opsCuotas(pago.banco) : [];
       var filasFin = 1 + ops.length;
       var altoFin = 10 + filasFin * 7.2 + 6;
       if (y + altoFin > H - 28) {

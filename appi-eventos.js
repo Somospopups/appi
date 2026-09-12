@@ -164,7 +164,7 @@
       if(pbDelta>0) detalles.push('+' + pbDelta + ' PB');
       if(invNuevos.length) detalles.push(invNuevos.join(', ') + (invNuevos.length===1?' se suma':' se suman'));
       else if(metas.invitadosDelta) detalles.push('+' + metas.invitadosDelta + ' invitado' + (metas.invitadosDelta>1?'s':''));
-      var titulo = 'Cultura de crecimiento';
+      var titulo = 'Seguimiento'; // cultura quitada v703
       if(pbDelta>0 && invNuevos.length) titulo = 'PB + invitado · cultura';
       else if(pbDelta>0) titulo = 'PB registrados';
       else titulo = 'Invitado registrado';
@@ -172,7 +172,7 @@
     }catch(e){}
   }
   // Inicializar snapshot cultura
-  try{ _ultimoCulturaRaw = localStorage.getItem('cultura_crecimiento_v1')||''; }catch(e){}
+  try{ _ultimoCulturaRaw = localStorage.getItem('cultura_quitada_v703')||''; }catch(e){}
 
   // Parchear localStorage DESPUÉS de data-sync (si ya envolvió, lo envolvemos de nuevo conservando dirty)
   try{
@@ -182,7 +182,7 @@
       var newSet = function(k, v){
         var res = origSet.call(this, k, v);
         try{
-          if(String(k)==='cultura_crecimiento_v1' && this===localStorage){
+          if(String(k)==='cultura_quitada_v703' && this===localStorage){
             onCulturaSet(String(v));
           }
         }catch(e){}
