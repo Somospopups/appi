@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "649.0.0",
-  "cacheName": "appi-v649-poster",
+  "version": "650.0.0",
+  "cacheName": "appi-v650-poster",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {
