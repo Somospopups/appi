@@ -128,9 +128,9 @@ window.openStock=function(){
 
 <script src="./porque-vivo.js"></script>
 <script src="./home-limpio.js?v=520"></script>
-  <script src="./home-tarjetas.js?v=716"></script>
-  <script src="./appi-eventos.js?v=716"></script>
-  <script src="./tu-mes.js?v=716"></script>
+  <script src="./home-tarjetas.js?v=717"></script>
+  <script src="./appi-eventos.js?v=717"></script>
+  <script src="./tu-mes.js?v=717"></script>
   <script src="./device-bridge.js?v=523"></script>
   <script src="./anuncios.js?v=521"></script>
   <script src="./aviso-telegram.js?v=555"></script>
@@ -4295,7 +4295,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
 </head>
 <body>
 
-<div id="appiUpdateBanner" role="status" aria-live="polite"><span style="font-size:18px">✨</span><b>Nueva versión disponible — APPI Renovada v716</b><button type="button" id="btnUpdateAppi">Actualizar ahora</button></div>
+<div id="appiUpdateBanner" role="status" aria-live="polite"><span style="font-size:18px">✨</span><b>Nueva versión disponible — APPI Renovada v717</b><button type="button" id="btnUpdateAppi">Actualizar ahora</button></div>
 <div id="offlineDot"><span style="width:8px;height:8px;border-radius:50%;background:#ffd66b;display:inline-block"></span> Sin conexión — seguís offline 100%</div>
 <div id="globalSearchOverlay" role="dialog" aria-modal="true"><div class="gs-box"><input id="gsInput" placeholder="Buscar persona, código, categoría, PB…  (Esc para cerrar)" autocomplete="off" /><div id="gsResults" class="gs-results"></div><div style="padding:10px 14px;font-size:11px;color:#777887;text-align:center">Tip: presioná <b>Ctrl + K</b> en cualquier pantalla para buscar</div></div></div>
 
@@ -12857,11 +12857,7 @@ function abrirCuentaDesdeMenu(){
         </div>
       </div>
 
-      <div>
-        <div class="ios-group">
-          <button type="button" class="ios-action" id="btnAccountLogout"><span class="ios-action-title center" style="color:#007AFF">Cerrar sesión</span></button>
-        </div>
-      </div>
+      <!-- Cerrar sesión oculto a pedido 12/09 -->
 
       <!-- Cerrar y borrar oculto a pedido -->
     </div>`
@@ -13129,7 +13125,7 @@ function cerrarToolsMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='716';
+      const swVersion='717';
       const CACHE_NAME='appi-v632-poster';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · v'+swVersion;
@@ -14381,7 +14377,7 @@ body.dark .tools-distri small{color:#a0a0b0}
 body.dark .tools-arrow{background:rgba(91,141,239,.18);color:#a8b8ff}
 body.dark .tools-perfil-header{border-color:rgba(255,255,255,.08)}
 
-/* ===== MI PERFIL iOS PRO v716 ===== */
+/* ===== MI PERFIL iOS PRO v717 ===== */
 .ios-perfil{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','SF Pro Display','Helvetica Neue',Helvetica,Arial,sans-serif;max-width:100%;overflow-x:hidden;box-sizing:border-box}
 .ios-perfil-hero{background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.08);border:1px solid rgba(0,0,0,.04)}
 body.dark .ios-perfil-hero{background:#1c1c1e;border-color:rgba(255,255,255,.08);box-shadow:0 1px 3px rgba(0,0,0,.3)}
@@ -17708,7 +17704,7 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
 
 <link rel="stylesheet" href="./appi-tema.css?v=514">
 
-<script>/* APPI Renovada v716 · Todo funcional */
+<script>/* APPI Renovada v717 · Todo funcional */
 (function(){
   // PWA update banner con skipWaiting real
   try{
@@ -17787,7 +17783,7 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
   // Perf badge: mostrar tiempo carga
   try{
     const t=Math.round(performance.now());
-    console.log('[APPI Renovada v716] Cargada en '+t+'ms · Offline:'+(!navigator.onLine)+' · Buscador Ctrl+K listo');
+    console.log('[APPI Renovada v717] Cargada en '+t+'ms · Offline:'+(!navigator.onLine)+' · Buscador Ctrl+K listo');
   }catch(e){}
 
   // Fix scroll lock antiguo que dejaba body bloqueado
