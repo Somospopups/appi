@@ -128,9 +128,9 @@ window.openStock=function(){
 
 <script src="./porque-vivo.js"></script>
 <script src="./home-limpio.js?v=520"></script>
-  <script src="./home-tarjetas.js?v=650"></script>
-  <script src="./appi-eventos.js?v=650"></script>
-  <script src="./tu-mes.js?v=650"></script>
+  <script src="./home-tarjetas.js?v=700"></script>
+  <script src="./appi-eventos.js?v=700"></script>
+  <script src="./tu-mes.js?v=700"></script>
   <script src="./device-bridge.js?v=523"></script>
   <script src="./anuncios.js?v=521"></script>
   <script src="./aviso-telegram.js?v=555"></script>
@@ -4262,8 +4262,33 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
 
 
 
+<style id="apii-renovada-css">
+/* APPI RENOVADA v700 · Update banner + Buscador global + Offline + Perf */
+#appiUpdateBanner{position:fixed;left:12px;right:12px;bottom:calc(18px + env(safe-area-inset-bottom));z-index:60000;display:none;align-items:center;gap:12px;padding:14px 16px;border-radius:18px;background:linear-gradient(135deg,#5b8def,#a06bff);color:#fff;box-shadow:0 14px 32px rgba(72,82,180,.28);animation:bannerIn .45s cubic-bezier(.22,.9,.28,1)}
+#appiUpdateBanner.show{display:flex}
+#appiUpdateBanner b{flex:1;font-size:13px;line-height:1.35}
+#appiUpdateBanner button{flex:none;min-height:40px;padding:0 16px;border:0;border-radius:12px;background:#fff;color:#4a3ec9;font:inherit;font-size:13px;font-weight:900;cursor:pointer}
+@keyframes bannerIn{from{transform:translateY(14px);opacity:0}to{transform:none;opacity:1}}
+#offlineDot{position:fixed;top:10px;right:12px;z-index:59999;display:none;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:rgba(24,26,42,.88);color:#ffd66b;font-size:11px;font-weight:800;backdrop-filter:blur(8px)}
+#offlineDot.on{display:flex}
+#globalSearchOverlay{position:fixed;inset:0;z-index:62000;display:none;background:rgba(16,20,28,.42);backdrop-filter:blur(6px);padding:18px}
+#globalSearchOverlay.open{display:block}
+.gs-box{max-width:560px;margin:14vh auto 0;background:#fff;border-radius:20px;box-shadow:0 22px 50px rgba(30,35,75,.22);overflow:hidden}
+.gs-box input{width:100%;height:56px;border:0;border-bottom:1px solid rgba(80,90,130,.12);padding:0 18px;font:inherit;font-size:16px;outline:0}
+.gs-results{max-height:52vh;overflow:auto}
+.gs-item{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid rgba(80,90,130,.06);cursor:pointer}
+.gs-item:hover{background:rgba(91,141,239,.06)}
+.gs-item b{flex:1;font-size:13px}
+.gs-item small{color:#777887;font-size:11px}
+.renewed-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 9px;border-radius:999px;background:linear-gradient(135deg,#5b8def22,#a06bff22);border:1px solid rgba(91,141,239,.14);font-size:10px;font-weight:900;color:#4a3ec9;letter-spacing:.3px}
+</style>
 </head>
 <body>
+
+<div id="appiUpdateBanner" role="status" aria-live="polite"><span style="font-size:18px">✨</span><b>Nueva versión disponible — APPI Renovada v700</b><button type="button" id="btnUpdateAppi">Actualizar ahora</button></div>
+<div id="offlineDot"><span style="width:8px;height:8px;border-radius:50%;background:#ffd66b;display:inline-block"></span> Sin conexión — seguís offline 100%</div>
+<div id="globalSearchOverlay" role="dialog" aria-modal="true"><div class="gs-box"><input id="gsInput" placeholder="Buscar persona, código, categoría, PB…  (Esc para cerrar)" autocomplete="off" /><div id="gsResults" class="gs-results"></div><div style="padding:10px 14px;font-size:11px;color:#777887;text-align:center">Tip: presioná <b>Ctrl + K</b> en cualquier pantalla para buscar</div></div></div>
+
 
 <div id="bootScreen" role="status" aria-live="polite" aria-busy="true" aria-label="APPI se está preparando">
   <div class="boot-ambience" aria-hidden="true">
@@ -13007,7 +13032,7 @@ function abrirBackupDesdeMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='650';
+      const swVersion='700';
       const CACHE_NAME='appi-v632-poster';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · v'+swVersion;
@@ -17505,5 +17530,115 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
 </script>
 
 <link rel="stylesheet" href="./appi-tema.css?v=514">
+
+<script>/* APPI Renovada v700 · Todo funcional */
+(function(){
+  // PWA update banner con skipWaiting real
+  try{
+    if('serviceWorker' in navigator){
+      let reg=null;
+      navigator.serviceWorker.register('./service-worker.js').then(r=>{reg=r;
+        r.addEventListener('updatefound',()=>{
+          const nw=r.installing;
+          if(!nw) return;
+          nw.addEventListener('statechange',()=>{
+            if(nw.state==='installed' && navigator.serviceWorker.controller){
+              const b=document.getElementById('appiUpdateBanner');
+              if(b) b.classList.add('show');
+            }
+          });
+        });
+      });
+      let refreshing=false;
+      navigator.serviceWorker.addEventListener('controllerchange',()=>{ if(refreshing) return; refreshing=true; location.reload(); });
+      document.getElementById('btnUpdateAppi')?.addEventListener('click',()=>{
+        if(reg && reg.waiting){ reg.waiting.postMessage({type:'SKIP_WAITING'}); }
+        else location.reload();
+      });
+      // escucha mensaje del SW
+      navigator.serviceWorker.addEventListener('message',e=>{ if(e.data && e.data.type==='SKIP_WAITING') location.reload(); });
+    }
+  }catch(e){}
+
+  // Offline indicator 100% funcional
+  function updOff(){ const d=document.getElementById('offlineDot'); if(!d) return; d.classList.toggle('on', !navigator.onLine); }
+  window.addEventListener('online',updOff); window.addEventListener('offline',updOff); updOff();
+
+  // Buscador global: Ctrl+K / tap en header
+  const ov=document.getElementById('globalSearchOverlay'), inp=document.getElementById('gsInput'), res=document.getElementById('gsResults');
+  function openGS(){ if(!ov) return; ov.classList.add('open'); setTimeout(()=>inp && inp.focus(),40); renderGS('');}
+  function closeGS(){ ov && ov.classList.remove('open'); }
+  window.openGlobalSearch=openGS;
+  ov && ov.addEventListener('click',e=>{ if(e.target===ov) closeGS(); });
+  document.addEventListener('keydown',e=>{
+    if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='k'){ e.preventDefault(); ov.classList.contains('open')?closeGS():openGS(); }
+    if(e.key==='Escape' && ov.classList.contains('open')) closeGS();
+  });
+  // tap en título para buscar (mobile)
+  document.querySelectorAll('header.top h1').forEach(h=>{ h.style.cursor='pointer'; h.title='Buscar (Ctrl+K)'; h.addEventListener('click',openGS); });
+
+  function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function renderGS(q){
+    if(!res) return;
+    q=(q||'').trim().toLowerCase();
+    let data=[];
+    try{
+      const raw=localStorage.getItem('equipoData'); if(raw){ const j=JSON.parse(raw); const personas=j.personas||[]; data=personas.slice(0,800).map(p=>({nombre:p.nombre||p.nombreCompleto||'Sin nombre', codigo:p.codigo||p.dip||'', cat:p.cat||p.categoria||'', pb: (p.pnAct!=null?p.pnAct:(p.pbPersonal||0)), tel:p.tel||'' })); }
+    }catch(e){}
+    let out=data;
+    if(q){ out=data.filter(p=> (p.nombre+' '+p.codigo+' '+p.cat).toLowerCase().includes(q) ); out=out.slice(0,50); }
+    else { out=data.slice(0,12); }
+    if(!out.length){ res.innerHTML='<div style="padding:28px;text-align:center;color:#777887;font-size:13px">Sin resultados para "'+esc(q)+'"<br><small style="font-size:11px">Probá con nombre, código o categoría</small></div>'; return; }
+    res.innerHTML=out.map(p=>`<div class="gs-item" data-codigo="${esc(p.codigo)}"><span style="width:36px;height:36px;border-radius:10px;display:grid;place-items:center;background:linear-gradient(135deg,#5b8def,#a06bff);color:#fff;font-weight:900">${esc((p.nombre||'?').trim().charAt(0).toUpperCase())}</span><b>${esc(p.nombre)}<br><small>${esc(p.codigo)} · ${esc(p.cat)} · ${esc(String(p.pb))} PB</small></b><small>›</small></div>`).join('');
+    res.querySelectorAll('.gs-item').forEach(el=>{
+      el.addEventListener('click',()=>{
+        closeGS();
+        const cod=el.getAttribute('data-codigo');
+        // llevar a Mi Equipo y filtrar si existe
+        try{ if(typeof window.showView==='function') window.showView('view-equipo'); }catch(e){}
+        setTimeout(()=>{
+          const input=document.querySelector('#view-equipo input[type="search"], #view-equipo input[placeholder*="Buscar"], .hist-search input, input[placeholder*="Buscar persona"]');
+          if(input){ input.value=cod||''; input.dispatchEvent(new Event('input',{bubbles:true})); input.focus(); }
+          // toast
+          try{ if(typeof window.showToast==='function') window.showToast('Mostrando '+cod); }catch(e){}
+        },300);
+      });
+    });
+  }
+  inp && inp.addEventListener('input',e=>renderGS(e.target.value));
+
+  // Perf badge: mostrar tiempo carga
+  try{
+    const t=Math.round(performance.now());
+    console.log('[APPI Renovada v700] Cargada en '+t+'ms · Offline:'+(!navigator.onLine)+' · Buscador Ctrl+K listo');
+  }catch(e){}
+
+  // Fix scroll lock antiguo que dejaba body bloqueado
+  try{ document.body.classList.remove('appi-scroll-lock'); }catch(e){}
+  // Marcar como renovada
+  try{ localStorage.setItem('appsi_renovada_v700','1'); }catch(e){}
+
+  // Embudo rápido: si hay datos, inyectar mini KPI en home si no existe
+  setTimeout(()=>{
+    try{
+      const home=document.getElementById('view-home');
+      if(!home) return;
+      if(document.getElementById('embudoKpi')) return;
+      let personas=0, activos=0, pb=0;
+      try{ const r=JSON.parse(localStorage.getItem('equipoData')||'null'); if(r&&r.personas){ personas=r.personas.length; r.personas.forEach(p=>{ const v=Number(p.pnAct||p.pbPersonal||0); pb+=v; if(v>0) activos++; }); } }catch(e){}
+      if(!personas) return;
+      const pct=personas?Math.round(activos/personas*100):0;
+      const bar=document.createElement('div');
+      bar.id='embudoKpi';
+      bar.style.cssText='margin:10px 0 14px;padding:14px 16px;border-radius:18px;background:rgba(255,255,255,.62);border:1px solid rgba(255,255,255,.78);display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;text-align:center';
+      bar.innerHTML=`<div><b style="font-size:20px;color:#3d63c9">${personas}</b><br><small style="font-size:10px;color:#777887;font-weight:800">PERSONAS</small></div><div><b style="font-size:20px;color:#1d7a5c">${pct}%</b><br><small style="font-size:10px;color:#777887;font-weight:800">ACTIVOS</small></div><div><b style="font-size:20px;color:#5b8def">${pb.toFixed?pb.toFixed(1):pb} PB</b><br><small style="font-size:10px;color:#777887;font-weight:800">TOTAL PB</small></div>`;
+      const anchor=home.querySelector('.tools-list') || home.querySelector('.score-compact') || home.querySelector('header');
+      if(anchor && anchor.parentNode) anchor.parentNode.insertBefore(bar, anchor.nextSibling);
+    }catch(e){}
+  },900);
+
+})();
+</script>
+
 </body>
 </html>

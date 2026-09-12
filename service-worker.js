@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v650-poster';
+const CACHE_NAME = 'appi-v700-renewed';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
@@ -61,6 +61,7 @@ const APP_SHELL = [
   './promo-botella-psa-500ml.jpg'
 ];
 
+self.addEventListener('message', event=>{ if(event.data && event.data.type==='SKIP_WAITING') self.skipWaiting(); });
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
