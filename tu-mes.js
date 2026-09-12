@@ -1,4 +1,4 @@
-/* APPI · Tu mes v704 — cerebro
+/* APPI · Tu mes v705 — cerebro
    El mes es un tablero de cartas. Cada día, las 10 de la jornada.
    La puerta es la franja de septiembre del Home.
    v628: fecha/hora debajo de MI EQUIPO y USUARIOS (LÍNEA + GARANTÍAS) (engranaje) → Conectar MI PSA solo 3 archivos (Centro/Número/Clave guardados solo en este celular, auto-actualiza) 📅 color carta principal + pulido mazo (aparece rápido) con emoji movil ☀️ (solo Home, mantiene sin barra adentro) - vuelve a v620 sin barra de botones Mi mes/Mi equipo/Herramientas del detalle por día (filtros) (antes 6) - placeholder real ambos marcan y llevan (robusto) a la tarea (como diaria) - abre fila del motivo a Home (solo marca y refresca día), real sí lleva directo a WhatsApp/panel (solo iba al Home) a la acción (WhatsApp saludo para cumple, panel Ya lo hice/No para retro) (marca recuperado + abre chat hoy) (mismo renglón) lista vacía (Edge) v598 lista incompleta dice No falta nadie verde con 9 pendientes + info faltas · sin maquillar el hábito (v600 detalle) · popup + v599 cerebro — timeline al abrir día + métricas sutiles arriba.
@@ -344,8 +344,8 @@
       '.tm-dia.amarillo .no{background:rgba(0,0,0,.11);color:#1d1d2c}',
       '.tm-dia.verde .no,.tm-dia.rojo .no{background:rgba(255,255,255,.20);color:#fff}',
       '.tm-dia .n{font-size:10px;letter-spacing:.06em;text-transform:uppercase;opacity:.85}',
-      '.tm-dia .ok{margin-top:auto;display:flex;align-items:center;justify-content:center;gap:4px;font-size:17px;font-weight:950;line-height:1;letter-spacing:-.4px;text-align:center;padding:6px 0 2px}',
-      '.tm-dia .no{display:grid;font-size:12px;font-weight:900;line-height:1.3;opacity:1;max-height:4.2em;overflow:hidden;text-align:center;margin-top:6px;padding:6px 6px 7px;border-radius:10px;background:rgba(255,255,255,.18);min-height:38px;display:grid;place-items:center}',
+      '.tm-dia .ok{margin-top:auto;display:grid;place-items:center;font-size:14px;font-weight:950;line-height:1.1;letter-spacing:-.2px;text-align:center;padding:4px 2px 1px}',
+      '.tm-dia .no{display:grid;place-items:center;font-size:14px;font-weight:950;line-height:1.1;opacity:1;max-height:4em;overflow:hidden;text-align:center;margin-top:2px;padding:4px 2px 6px;border-radius:10px;background:rgba(255,255,255,.22);min-height:34px}',
       '.tm-dia .m{margin-top:auto;font-size:9.5px;opacity:.8}',
             '@media(min-width:1024px){.tm-dia{padding:10px 8px 10px}.tm-dia .ok{font-size:19px}.tm-dia .no{font-size:13px;min-height:44px}}',
       '.tm-dia .tm-dot{width:6px;height:6px;border-radius:50%;display:inline-block;margin-left:4px;vertical-align:middle;background:rgba(11,88,120,.22)}',
@@ -656,7 +656,7 @@
   }
 
   function pintar(){
-    try{ var h=document.querySelector('#view-tumes header.top p'); if(h && h.textContent==='Las cartas de cada día') h.innerHTML='Las cartas de cada día <span class="renewed-badge">✨ Renovada v704</span>'; }catch(e){}
+    try{ var h=document.querySelector('#view-tumes header.top p'); if(h && h.textContent==='Las cartas de cada día') h.innerHTML='Las cartas de cada día <span class="renewed-badge">✨ Renovada v705</span>'; }catch(e){}
     css();
     var host = document.getElementById('tmCal');
     if (!host) return;
@@ -730,20 +730,7 @@
       var mini = '';
       if (tDia){
         var falta = Math.max(0, tDia - hDia);
-        var faltaTxt = 'completo';
-        if (falta){
-          var pend = [];
-          try{
-            itemsDe(k).forEach(function(it){
-              if (!it.hecha){
-                var d = descTarea(it);
-                if (pend.indexOf(d) < 0) pend.push(d);
-              }
-            });
-          }catch(e){}
-          faltaTxt = pend.length ? pend.join(' · ') : ('falta ' + falta);
-        }
-        mini = '<span class="ok">✓ ' + hDia + '</span><span class="no">' + esc(faltaTxt) + '</span>';
+        mini = '<span class="ok">' + hDia + ' REALIZADAS</span><span class="no">' + falta + ' FALTAN</span>';
       } else if (futuro){
         mini = '<span class="m">sin abrir</span>';
       } else {
@@ -759,7 +746,7 @@
       b.onclick = function(){ abrirDia(b.getAttribute('data-tm-dia'), b.classList.contains('hoy')); };
     });
     pintarKpis(anio, mes, mapa);
-    // tmCheque removido v704
+    // tmCheque removido v705
   }
 
   function itemsDe(k){
