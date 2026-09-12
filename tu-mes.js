@@ -1,4 +1,4 @@
-/* APPI · Tu mes v706 — cerebro
+/* APPI · Tu mes v707 — cerebro
    El mes es un tablero de cartas. Cada día, las 10 de la jornada.
    La puerta es la franja de septiembre del Home.
    v628: fecha/hora debajo de MI EQUIPO y USUARIOS (LÍNEA + GARANTÍAS) (engranaje) → Conectar MI PSA solo 3 archivos (Centro/Número/Clave guardados solo en este celular, auto-actualiza) 📅 color carta principal + pulido mazo (aparece rápido) con emoji movil ☀️ (solo Home, mantiene sin barra adentro) - vuelve a v620 sin barra de botones Mi mes/Mi equipo/Herramientas del detalle por día (filtros) (antes 6) - placeholder real ambos marcan y llevan (robusto) a la tarea (como diaria) - abre fila del motivo a Home (solo marca y refresca día), real sí lleva directo a WhatsApp/panel (solo iba al Home) a la acción (WhatsApp saludo para cumple, panel Ya lo hice/No para retro) (marca recuperado + abre chat hoy) (mismo renglón) lista vacía (Edge) v598 lista incompleta dice No falta nadie verde con 9 pendientes + info faltas · sin maquillar el hábito (v600 detalle) · popup + v599 cerebro — timeline al abrir día + métricas sutiles arriba.
@@ -658,7 +658,7 @@
   }
 
   function pintar(){
-    try{ var h=document.querySelector('#view-tumes header.top p'); if(h && h.textContent==='Las cartas de cada día') h.innerHTML='Las cartas de cada día <span class="renewed-badge">✨ Renovada v706</span>'; }catch(e){}
+    try{ var h=document.querySelector('#view-tumes header.top p'); if(h && h.textContent==='Las cartas de cada día') h.innerHTML='Las cartas de cada día <span class="renewed-badge">✨ Renovada v707</span>'; }catch(e){}
     css();
     var host = document.getElementById('tmCal');
     if (!host) return;
@@ -748,7 +748,7 @@
       b.onclick = function(){ abrirDia(b.getAttribute('data-tm-dia'), b.classList.contains('hoy')); };
     });
     pintarKpis(anio, mes, mapa);
-    // tmCheque removido v706
+    // tmCheque removido v707
   }
 
   function itemsDe(k){

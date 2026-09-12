@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v706-movil-fix';
+const CACHE_NAME = 'appi-v707-engranaje-perfil';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
