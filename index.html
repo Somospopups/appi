@@ -128,9 +128,9 @@ window.openStock=function(){
 
 <script src="./porque-vivo.js"></script>
 <script src="./home-limpio.js?v=520"></script>
-  <script src="./home-tarjetas.js?v=709"></script>
-  <script src="./appi-eventos.js?v=709"></script>
-  <script src="./tu-mes.js?v=709"></script>
+  <script src="./home-tarjetas.js?v=710"></script>
+  <script src="./appi-eventos.js?v=710"></script>
+  <script src="./tu-mes.js?v=710"></script>
   <script src="./device-bridge.js?v=523"></script>
   <script src="./anuncios.js?v=521"></script>
   <script src="./aviso-telegram.js?v=555"></script>
@@ -4283,14 +4283,14 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
 .renewed-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 9px;border-radius:999px;background:linear-gradient(135deg,#5b8def22,#a06bff22);border:1px solid rgba(91,141,239,.14);font-size:10px;font-weight:900;color:#4a3ec9;letter-spacing:.3px}
 </style>
 <style>
-/* v709 quita cultura crecimiento */
+/* v710 quita cultura crecimiento */
 #culturaWrap{display:none !important;}
 .cultura-card{display:none !important;}
 </style>
 </head>
 <body>
 
-<div id="appiUpdateBanner" role="status" aria-live="polite"><span style="font-size:18px">✨</span><b>Nueva versión disponible — APPI Renovada v709</b><button type="button" id="btnUpdateAppi">Actualizar ahora</button></div>
+<div id="appiUpdateBanner" role="status" aria-live="polite"><span style="font-size:18px">✨</span><b>Nueva versión disponible — APPI Renovada v710</b><button type="button" id="btnUpdateAppi">Actualizar ahora</button></div>
 <div id="offlineDot"><span style="width:8px;height:8px;border-radius:50%;background:#ffd66b;display:inline-block"></span> Sin conexión — seguís offline 100%</div>
 <div id="globalSearchOverlay" role="dialog" aria-modal="true"><div class="gs-box"><input id="gsInput" placeholder="Buscar persona, código, categoría, PB…  (Esc para cerrar)" autocomplete="off" /><div id="gsResults" class="gs-results"></div><div style="padding:10px 14px;font-size:11px;color:#777887;text-align:center">Tip: presioná <b>Ctrl + K</b> en cualquier pantalla para buscar</div></div></div>
 
@@ -4704,7 +4704,7 @@ body.dark #pageTabs button.active{color:#c5d6ff}
       </div>
     </header>
 
-    <div id="culturaWrap" style="display:none"></div><!-- cultura quitada v709 -->
+    <div id="culturaWrap" style="display:none"></div><!-- cultura quitada v710 -->
 
     <div class="home-section-head">
       <div>
@@ -11915,7 +11915,7 @@ function culturaSincronizarPbOficial(){
 window.culturaPbOficial=culturaPbOficial;
 window.culturaSincronizarPbOficial=culturaSincronizarPbOficial;
 window.renderCulturaCrecimiento=function(){return;}; /* cultura removida */
-function renderCulturaCrecimiento(){ return; /* cultura quitada v709 */ if(false){
+function renderCulturaCrecimiento(){ return; /* cultura quitada v710 */ if(false){
   const wrap=document.querySelector('#culturaWrap');
   if(!wrap) return;
   culturaReconciliarInvitados();
@@ -12776,62 +12776,130 @@ function abrirCuentaDesdeMenu(){
   const last=authStatus.lastValidatedAt?new Date(authStatus.lastValidatedAt).toLocaleString('es-AR'):'Sin validar';
   modal.open({
     icon:'📷',iconBg:'#0b5878',title:'Mi cuenta',sub:activePerson?.nombre||profile.nombre||`Distribuidor ${profile.dip||''}`,
-    html:`<div style="display:grid;gap:9px;text-align:left">
-      <div class="tip">
-        <div style="font-weight:950;font-size:16px">${escapeXml(activePerson?.nombre||profile.nombre||'—')}</div>
-        <div style="margin-top:3px;color:#686977;font-size:13px">${activePerson?.tipo==='socio'?'Socio/a':'Titular'} · Distribuidor ${escapeXml(profile.dip||'—')}</div>
-        ${profile.sucursal?`<div style="color:#686977;font-size:13px">Sucursal ${escapeXml(profile.sucursal)}</div>`:''}
-        <div style="margin-top:4px;color:#777887;font-size:12px">${authStatus.offline?'Modo offline':'Conectada'} · ${escapeXml(last)}</div>
-      </div>
-      <div class="tip" style="border:1px solid #e4e6eb; border-radius:14px; padding:12px; background:#fff;">
-        <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
-          <span style="width:32px; height:32px; border-radius:8px; display:grid; place-items:center; background:linear-gradient(135deg,#5b8def,#a06bff); color:#fff; font-size:16px;">🔗</span>
-          <div>
-            <b style="font-size:13px;">Conectar MI PSA <span style="font-weight:500; color:#65676b; font-size:10px;">(opcional)</span></b>
-            <div style="font-size:11px; color:#65676b; line-height:1.3;">Guardá Centro/N°/Clave solo en este celular. Auto-actualiza <b>solo</b>: LÍNEA DESCENDENTE, GARANTÍAS POR ORGANIZACIÓN y GARANTÍAS.</div>
+    html:`<div class="ios-perfil" style="display:grid;gap:18px;text-align:left">
+      <!-- Perfil Hero iOS -->
+      <div class="ios-perfil-hero">
+        <div style="padding:16px;display:flex;align-items:center;gap:12px">
+          <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#5b8def,#a06bff);display:grid;place-items:center;color:#fff;font-weight:900;font-size:20px;flex:none;overflow:hidden" id="iosPerfilAvatar">${(() => { try{ const s=(typeof appiFotoPerfil==='function'?appiFotoPerfil():''); return s?`<img src="${s.replace(/"/g,'&quot;')}" style="width:100%;height:100%;object-fit:cover">` : (escapeXml((activePerson?.nombre||profile.nombre||'—').trim().charAt(0).toUpperCase())||'—'); }catch(e){return '—';}})()}</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:17px;font-weight:600;color:#1c1c1e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeXml(activePerson?.nombre||profile.nombre||'—')}</div>
+            <div style="font-size:13px;color:#8e8e93;margin-top:1px">${activePerson?.tipo==='socio'?'Socio/a':'Titular'} · Distribuidor ${escapeXml(profile.dip||'—')}${profile.sucursal?` · Sucursal ${escapeXml(profile.sucursal)}`:''}</div>
+            <div style="margin-top:6px;display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border-radius:999px;background:${authStatus.offline?'#fff3e0':'#e8f5e9'};border:0.5px solid ${authStatus.offline?'#ffcc02':'#c8e6c9'}">
+              <span style="width:7px;height:7px;border-radius:50%;background:${authStatus.offline?'#ff9500':'#34c759'}"></span>
+              <span style="font-size:11px;font-weight:600;color:${authStatus.offline?'#9c6f00':'#1b7a3d'}">${authStatus.offline?'Modo offline':'Conectada'} · ${escapeXml(last)}</span>
+            </div>
           </div>
         </div>
-        <div style="display:grid; gap:7px; margin-top:8px;">
-          <div style="display:grid; grid-template-columns:70px 1fr 1fr; gap:6px; align-items:center;">
-            <span style="font-size:11px; font-weight:700; color:#5b5f74;">Centro</span>
-            <input type="number" id="psaCentro" placeholder="02" min="1" max="99" inputmode="numeric" style="width:100%; padding:8px 9px; border-radius:10px; border:1px solid #e4e6eb; font-size:13px; background:#f7f8fb;">
-            <input type="number" id="psaNumero" placeholder="98020174" inputmode="numeric" style="width:100%; padding:8px 9px; border-radius:10px; border:1px solid #e4e6eb; font-size:13px; background:#f7f8fb;">
+      </div>
+
+      <!-- MI PSA iOS Grouped -->
+      <div>
+        <div class="ios-section-header">Mi PSA — Conexión automática</div>
+        <div class="ios-group">
+          <div class="ios-row" style="padding:12px 16px;gap:12px;align-items:flex-start;min-height:auto">
+            <div class="ios-row-icon" style="background:linear-gradient(135deg,#5b8def,#a06bff)">🔗</div>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:15px;font-weight:600;color:#1c1c1e">Conectar MI PSA <span style="font-weight:400;color:#8e8e93;font-size:12px">(opcional)</span></div>
+              <div style="font-size:12px;color:#8e8e93;line-height:1.35;margin-top:2px">Guardá Centro, Número y Clave solo en este celular. Auto-actualiza <b style="color:#1c1c1e">solo</b>: LÍNEA, GARANTÍAS POR ORG. y GARANTÍAS.</div>
+            </div>
           </div>
-          <div style="display:grid; grid-template-columns:70px 1fr; gap:6px; align-items:center;">
-            <span style="font-size:11px; font-weight:700; color:#5b5f74;">Clave PSA</span>
-            <input type="password" id="psaClave" placeholder="••••••••" autocomplete="current-password" style="width:100%; padding:8px 9px; border-radius:10px; border:1px solid #e4e6eb; font-size:13px; background:#f7f8fb;">
+          <label class="ios-row" for="psaCentro">
+            <span class="ios-row-label">Centro</span>
+            <input type="number" id="psaCentro" placeholder="02" min="1" max="99" inputmode="numeric" class="ios-row-input" style="text-align:center;max-width:70px;margin-left:auto">
+            <span style="font-size:15px;color:#8e8e93">·</span>
+            <input type="number" id="psaNumero" placeholder="98020174" inputmode="numeric" class="ios-row-input" style="flex:1;min-width:0">
+          </label>
+          <label class="ios-row" for="psaClave">
+            <span class="ios-row-label">Clave PSA</span>
+            <input type="password" id="psaClave" placeholder="••••••••" autocomplete="current-password" class="ios-row-input">
+          </label>
+          <div class="ios-row" style="justify-content:space-between">
+            <span style="font-size:15px;color:#1c1c1e;flex:1;padding-right:12px">Recordar y auto-actualizar</span>
+            <label class="ios-switch"><input type="checkbox" id="psaRecordar" checked><span class="ios-switch-slider"></span></label>
           </div>
-          <label style="display:flex; align-items:center; gap:6px; font-size:11px; color:#333544; margin-top:2px;"><input type="checkbox" id="psaRecordar" checked style="width:14px; height:14px;"> Recordar en este celular y auto-actualizar al abrir APPI</label>
-          <div style="margin-top:4px; padding:8px; border-radius:10px; background:#f7f8fb; border:1px solid #e4e6eb; display:grid; gap:6px;">
-            <span style="font-size:10px; font-weight:800; color:#5b5f74; text-transform:uppercase; letter-spacing:0.4px;">Archivos a auto-actualizar</span>
-            <label style="display:flex; align-items:center; gap:6px; font-size:11px; color:#333544;"><input type="checkbox" id="psaFileLinea" checked style="width:14px; height:14px;"> LÍNEA DESCENDENTE</label>
-            <label style="display:flex; align-items:center; gap:6px; font-size:11px; color:#333544;"><input type="checkbox" id="psaFileGarantiasOrg" checked style="width:14px; height:14px;"> GARANTÍAS POR ORGANIZACIÓN</label>
-            <label style="display:flex; align-items:center; gap:6px; font-size:11px; color:#333544;"><input type="checkbox" id="psaFileGarantias" checked style="width:14px; height:14px;"> GARANTÍAS</label>
+        </div>
+        <div class="ios-desc">🔒 Solo en tu navegador (localStorage). No se sube a GitHub.</div>
+      </div>
+
+      <div>
+        <div class="ios-section-header">Archivos a auto-actualizar</div>
+        <div class="ios-group">
+          <div class="ios-row" style="justify-content:space-between">
+            <div style="display:flex;align-items:center;gap:10px"><div class="ios-row-icon" style="background:#34c759;font-size:11px">≡</div><span style="font-size:15px;color:#1c1c1e">LÍNEA DESCENDENTE</span></div>
+            <label class="ios-switch"><input type="checkbox" id="psaFileLinea" checked><span class="ios-switch-slider"></span></label>
           </div>
-          <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:4px;">
-            <button type="button" class="btn btn-primary" id="btnPsaGuardar" style="flex:1; min-width:110px; font-size:12px; padding:9px;">Guardar y conectar</button>
-            <button type="button" class="btn btn-secondary" id="btnPsaProbar" style="flex:1; min-width:80px; font-size:12px; padding:9px;">Probar</button>
-            <button type="button" class="btn btn-secondary" id="btnPsaBorrar" style="flex:none; font-size:12px; padding:9px; color:#d93025; border-color:#fce8e6; background:#fff;">Borrar</button>
+          <div class="ios-row" style="justify-content:space-between">
+            <div style="display:flex;align-items:center;gap:10px"><div class="ios-row-icon" style="background:#007AFF;font-size:11px">◈</div><span style="font-size:15px;color:#1c1c1e">GARANTÍAS POR ORG.</span></div>
+            <label class="ios-switch"><input type="checkbox" id="psaFileGarantiasOrg" checked><span class="ios-switch-slider"></span></label>
           </div>
-          <div id="psaStatus" style="font-size:11px; color:#65676b; line-height:1.4; min-height:16px;"></div>
-          <div id="psaLastSync" style="font-size:10.5px; color:#8a8d93; margin-top:4px; display:none;">Última actualización: —</div>
-          <div id="psaAtajos" style="display:none; gap:6px; flex-wrap:wrap;">
-            <button type="button" class="btn btn-secondary" style="flex:none; padding:6px 9px; font-size:11px;" onclick="psaAbrir('https://minegocio.psa.com.ar/')">Mi Negocio →</button>
-            <button type="button" class="btn btn-secondary" style="flex:none; padding:6px 9px; font-size:11px;" onclick="psaAbrir('https://miagenda.psa.com.ar')">Mi Agenda →</button>
-            <button type="button" class="btn btn-secondary" style="flex:none; padding:6px 9px; font-size:11px;" onclick="psaAbrir('https://efactura.psa.com.ar/')">Facturas →</button>
+          <div class="ios-row" style="justify-content:space-between">
+            <div style="display:flex;align-items:center;gap:10px"><div class="ios-row-icon" style="background:#ff9500;font-size:11px">⬢</div><span style="font-size:15px;color:#1c1c1e">GARANTÍAS</span></div>
+            <label class="ios-switch"><input type="checkbox" id="psaFileGarantias" checked><span class="ios-switch-slider"></span></label>
           </div>
-          <div style="font-size:10px; color:#8a8d93; line-height:1.3; background:#fff; padding:6px 8px; border-radius:8px; border:1px dashed #e4e6eb;">🔒 Solo en tu navegador (localStorage). No se sube a GitHub. “Borrar” lo olvida.</div>
         </div>
       </div>
-      <div class="tip"><b>Cómo te nombran en los WhatsApp</b><br><input id="appiFirmaWa" type="text" maxlength="40" value="${escapeXml((window.APPIHielo&&window.APPIHielo.firma&&window.APPIHielo.firma())||'')}" placeholder="${escapeXml((window.APPIHielo&&window.APPIHielo.nombreCuenta&&window.APPIHielo.nombreCuenta())||'')}" style="width:100%;margin-top:8px;padding:10px 12px;border-radius:12px;border:1px solid rgba(80,90,130,.16);font:inherit;font-size:14px;box-sizing:border-box"><small style="display:block;margin-top:6px;color:#777887;line-height:1.4">Si lo dejás vacío, se usa tu primer nombre. Cada uno (titular o socio) tiene el suyo.</small><button type="button" class="btn btn-secondary" id="btnGuardarFirma" style="margin-top:10px">Guardar nombre</button></div>
-      <div class="tip"><b>Sincronización:</b> ${syncStatus.syncing?'En curso':syncStatus.dirty?`${syncStatus.dirty} cambios pendientes`:'Actualizada'}${syncStatus.lastError?`<br><span style="color:#b13e47">${escapeXml(syncStatus.lastError)}</span>`:''}</div>
-      <div class="warn-tip"><b>🎙️ Importante:</b> las grabaciones de audio quedan únicamente en el dispositivo donde se hicieron. El resto de los datos se sincroniza con tu cuenta.</div>
-      <button type="button" class="btn btn-primary" id="btnAccountSync">☁️ Sincronizar ahora</button>
-      <button type="button" class="btn btn-secondary" id="btnAccountDevices">📲 Teléfonos vinculados</button>
-      <button type="button" class="btn btn-secondary" id="btnAccountPassword">🔐 Cambiar contraseña</button>
-      <button type="button" class="btn btn-secondary" id="btnAccountLogout">Cerrar sesión</button>
-      <button type="button" class="btn btn-danger-outline" id="btnAccountLogoutErase">Cerrar y borrar la copia de este dispositivo</button>
-      <small style="color:#777887;line-height:1.4">Cerrar sesión quita tus datos de la vista y los deja separados por cuenta. Usá “borrar la copia” solamente en un equipo compartido y con conexión.</small>
+
+      <!-- Acciones PSA -->
+      <div style="display:flex;gap:8px">
+        <button type="button" class="ios-primary-btn" id="btnPsaGuardar" style="flex:1.2">Guardar y conectar</button>
+        <button type="button" class="ios-secondary-btn" id="btnPsaProbar">Probar</button>
+        <button type="button" class="ios-danger-btn" id="btnPsaBorrar">Borrar</button>
+      </div>
+      <div id="psaStatus" class="ios-status" style="min-height:18px;display:none"></div>
+      <div id="psaLastSync" style="font-size:12px;color:#8e8e93;margin:0 16px;display:none"></div>
+      <div id="psaAtajos" style="display:none;gap:8px;flex-wrap:wrap">
+        <button type="button" class="ios-secondary-btn" style="flex:1;min-width:100px" onclick="psaAbrir('https://minegocio.psa.com.ar/')">Mi Negocio →</button>
+        <button type="button" class="ios-secondary-btn" style="flex:1;min-width:100px" onclick="psaAbrir('https://miagenda.psa.com.ar')">Mi Agenda →</button>
+        <button type="button" class="ios-secondary-btn" style="flex:1;min-width:100px" onclick="psaAbrir('https://efactura.psa.com.ar/')">Facturas →</button>
+      </div>
+
+      <!-- WhatsApp nombre -->
+      <div>
+        <div class="ios-section-header">WhatsApp</div>
+        <div class="ios-group">
+          <label class="ios-row" for="appiFirmaWa">
+            <span class="ios-row-label" style="width:auto;flex:1">Cómo te nombran</span>
+            <input id="appiFirmaWa" type="text" maxlength="40" value="${escapeXml((window.APPIHielo&&window.APPIHielo.firma&&window.APPIHielo.firma())||'')}" placeholder="${escapeXml((window.APPIHielo&&window.APPIHielo.nombreCuenta&&window.APPIHielo.nombreCuenta())||'Tu nombre')}" class="ios-row-input" style="max-width:150px">
+          </label>
+        </div>
+        <div class="ios-desc">Si lo dejás vacío, se usa tu primer nombre. Cada uno (titular o socio) tiene el suyo.</div>
+        <button type="button" class="ios-secondary-btn" id="btnGuardarFirma" style="margin-top:8px;width:100%;background:#007AFF;color:#fff">Guardar nombre</button>
+      </div>
+
+      <!-- Sincronización -->
+      <div>
+        <div class="ios-section-header">Sincronización</div>
+        <div class="ios-group">
+          <div class="ios-row" style="justify-content:space-between">
+            <span style="font-size:15px;color:#1c1c1e">Estado</span>
+            <span style="font-size:15px;color:#8e8e93;text-align:right;flex:1">${syncStatus.syncing?'En curso':syncStatus.dirty?`${syncStatus.dirty} pendientes`:'Actualizada'}${syncStatus.lastError?` · <span style="color:#FF3B30">${escapeXml(syncStatus.lastError)}</span>`:''}</span>
+          </div>
+        </div>
+        <div class="ios-desc">🎙️ Las grabaciones de audio quedan solo en este dispositivo. El resto se sincroniza con tu cuenta.</div>
+      </div>
+
+      <!-- Acciones cuenta iOS -->
+      <div>
+        <div class="ios-section-header">Cuenta</div>
+        <div class="ios-group">
+          <button type="button" class="ios-action" id="btnAccountSync"><div class="ios-row-icon" style="background:#007AFF">☁️</div><span class="ios-action-title">Sincronizar ahora</span><span class="ios-chevron">›</span></button>
+          <button type="button" class="ios-action" id="btnAccountDevices"><div class="ios-row-icon" style="background:#5856D6">📲</div><span class="ios-action-title" style="color:#1c1c1e">Teléfonos vinculados</span><span class="ios-chevron">›</span></button>
+          <button type="button" class="ios-action" id="btnAccountPassword"><div class="ios-row-icon" style="background:#8e8e93">🔐</div><span class="ios-action-title" style="color:#1c1c1e">Cambiar contraseña</span><span class="ios-chevron">›</span></button>
+        </div>
+      </div>
+
+      <div>
+        <div class="ios-group">
+          <button type="button" class="ios-action" id="btnAccountLogout"><span class="ios-action-title center" style="color:#007AFF">Cerrar sesión</span></button>
+        </div>
+      </div>
+
+      <div>
+        <div class="ios-group">
+          <button type="button" class="ios-action" id="btnAccountLogoutErase"><span class="ios-action-title center danger">Cerrar y borrar copia de este dispositivo</span></button>
+        </div>
+        <div class="ios-desc" style="text-align:center">Quita tus datos de la vista y los deja separados por cuenta. Usá “borrar copia” solo en equipo compartido y con conexión.</div>
+      </div>
     </div>`
   });
   appiFotoMontarHero();
@@ -12978,7 +13046,7 @@ function abrirBackupDesdeMenu(){
     const menu=document.getElementById('toolsMenu');
     if(!menu) return;
     if(typeof actualizarCuentaUI==='function')actualizarCuentaUI();
-    // Poblar foto + datos distribuidor v709
+    // Poblar foto + datos distribuidor v710
     try{
       const ph=document.getElementById('toolsFotoPh');
       const btn=document.getElementById('toolsFotoBtn');
@@ -13070,7 +13138,7 @@ function cerrarToolsMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='709';
+      const swVersion='710';
       const CACHE_NAME='appi-v632-poster';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · v'+swVersion;
@@ -14304,7 +14372,7 @@ body.dark .tools-item:hover{background:rgba(91,141,239,.22); color:#a8b8ff}
 .tools-menu.open .tools-item:nth-child(7){animation-delay:.28s}
 .tools-menu.open .tools-item:nth-child(8){animation-delay:.32s}
 
-/* ===== ENGRENALE PERFIL HEADER v709 ===== */
+/* ===== ENGRENALE PERFIL HEADER v710 ===== */
 .tools-perfil-header{display:flex;flex-direction:column;align-items:center;gap:10px;padding:14px 14px 10px;min-width:240px}
 .tools-foto{width:72px;height:72px;border-radius:50%;border:2px solid rgba(255,255,255,.9);background:linear-gradient(135deg,#5b8def,#a06bff);color:#fff;font-size:26px;display:grid;place-items:center;cursor:pointer;overflow:hidden;box-shadow:0 6px 18px rgba(80,90,130,.18)}
 .tools-foto img{width:100%;height:100%;object-fit:cover;display:block}
@@ -14321,6 +14389,51 @@ body.dark .tools-distri small{color:#a0a0b0}
 .tools-extra[hidden]{display:none !important}
 body.dark .tools-arrow{background:rgba(91,141,239,.18);color:#a8b8ff}
 body.dark .tools-perfil-header{border-color:rgba(255,255,255,.08)}
+
+/* ===== MI PERFIL iOS PRO v710 ===== */
+.ios-perfil{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','SF Pro Display','Helvetica Neue',Helvetica,Arial,sans-serif}
+.ios-perfil-hero{background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.08);border:1px solid rgba(0,0,0,.04)}
+body.dark .ios-perfil-hero{background:#1c1c1e;border-color:rgba(255,255,255,.08);box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.ios-section-header{margin:0 0 6px 16px;font-size:13px;font-weight:400;color:#8e8e93;text-transform:uppercase;letter-spacing:-.08px}
+.ios-group{background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.08);border:0.5px solid rgba(0,0,0,.04)}
+body.dark .ios-group{background:#1c1c1e;border-color:rgba(255,255,255,.08);box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.ios-row{display:flex;align-items:center;gap:12px;padding:0 16px;min-height:46px;border-bottom:0.5px solid #e5e5ea;background:#fff}
+.ios-group .ios-row:last-child{border-bottom:0}
+body.dark .ios-row{background:#1c1c1e;border-bottom-color:rgba(255,255,255,.08)}
+.ios-row:active{background:#f2f2f7}
+body.dark .ios-row:active{background:#2c2c2e}
+.ios-row-icon{width:28px;height:28px;border-radius:7px;display:grid;place-items:center;color:#fff;font-size:14px;flex:none}
+.ios-row-label{width:86px;font-size:15px;color:#1c1c1e;flex:none;font-weight:400}
+body.dark .ios-row-label{color:#f2f2f7}
+.ios-row-input{flex:1;border:0;background:transparent;text-align:right;font-size:15px;color:#1c1c1e;outline:none;padding:8px 0;font-family:inherit}
+.ios-row-input::placeholder{color:#c7c7cc}
+body.dark .ios-row-input{color:#f2f2f7}
+.ios-row-input:focus{color:#007AFF}
+.ios-switch{position:relative;width:51px;height:31px;flex:none;display:inline-block}
+.ios-switch input{opacity:0;width:0;height:0}
+.ios-switch-slider{position:absolute;inset:0;background:#e9e9eb;border-radius:999px;transition:.22s;cursor:pointer;box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)}
+.ios-switch-slider:before{content:'';position:absolute;width:27px;height:27px;left:2px;top:2px;background:#fff;border-radius:50%;box-shadow:0 2px 4px rgba(0,0,0,.2),0 0 1px rgba(0,0,0,.1);transition:.22s}
+.ios-switch input:checked + .ios-switch-slider{background:#34c759;box-shadow:none}
+.ios-switch input:checked + .ios-switch-slider:before{transform:translateX(20px)}
+.ios-desc{margin:6px 16px 0;font-size:12px;color:#8e8e93;line-height:1.35}
+.ios-action{width:100%;display:flex;align-items:center;gap:12px;padding:0 16px;min-height:46px;border:0;background:#fff;text-align:left;cursor:pointer;font:inherit;border-bottom:0.5px solid #e5e5ea}
+.ios-group .ios-action:last-child{border-bottom:0}
+.ios-action:active{background:#f2f2f7}
+body.dark .ios-action{background:#1c1c1e;border-bottom-color:rgba(255,255,255,.08)}
+body.dark .ios-action:active{background:#2c2c2e}
+.ios-action-title{flex:1;font-size:15px;color:#007AFF;font-weight:400;text-align:left}
+.ios-action-title.danger{color:#FF3B30}
+.ios-action-title.center{color:#007AFF;text-align:center;width:100%}
+.ios-chevron{color:#c7c7cc;font-size:17px;font-weight:300}
+.ios-primary-btn{width:100%;min-height:46px;border:0;border-radius:12px;background:#007AFF;color:#fff;font-family:inherit;font-size:15px;font-weight:600;cursor:pointer;box-shadow:0 4px 12px rgba(0,122,255,.22)}
+.ios-primary-btn:active{opacity:.88;transform:scale(.98)}
+.ios-secondary-btn{flex:1;min-height:40px;border:0;border-radius:10px;background:#f2f2f7;color:#007AFF;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer}
+body.dark .ios-secondary-btn{background:#2c2c2e;color:#0A84FF}
+.ios-danger-btn{flex:none;min-height:40px;padding:0 14px;border:0;border-radius:10px;background:#fff;color:#FF3B30;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;border:0.5px solid #e5e5ea}
+body.dark .ios-danger-btn{background:#1c1c1e;border-color:rgba(255,255,255,.12);color:#FF453A}
+.ios-status{font-size:11px;padding:7px 10px;border-radius:10px;background:#f2f2f7;color:#8e8e93;line-height:1.4}
+body.dark .ios-status{background:#2c2c2e;color:#98989d}
+
 
 @keyframes toolsIn{
   from{opacity:0; transform:translateX(26px) scale(.9)}
@@ -17599,7 +17712,7 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
 
 <link rel="stylesheet" href="./appi-tema.css?v=514">
 
-<script>/* APPI Renovada v709 · Todo funcional */
+<script>/* APPI Renovada v710 · Todo funcional */
 (function(){
   // PWA update banner con skipWaiting real
   try{
@@ -17678,13 +17791,13 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
   // Perf badge: mostrar tiempo carga
   try{
     const t=Math.round(performance.now());
-    console.log('[APPI Renovada v709] Cargada en '+t+'ms · Offline:'+(!navigator.onLine)+' · Buscador Ctrl+K listo');
+    console.log('[APPI Renovada v710] Cargada en '+t+'ms · Offline:'+(!navigator.onLine)+' · Buscador Ctrl+K listo');
   }catch(e){}
 
   // Fix scroll lock antiguo que dejaba body bloqueado
   try{ document.body.classList.remove('appi-scroll-lock'); }catch(e){}
   // Marcar como renovada
-  try{ localStorage.setItem('appsi_renovada_v709','1'); }catch(e){}
+  try{ localStorage.setItem('appsi_renovada_v710','1'); }catch(e){}
 
   // Embudo rápido: si hay datos, inyectar mini KPI en home si no existe
   setTimeout(()=>{
