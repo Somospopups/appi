@@ -128,9 +128,9 @@ window.openStock=function(){
 
 <script src="./porque-vivo.js"></script>
 <script src="./home-limpio.js?v=520"></script>
-  <script src="./home-tarjetas.js?v=718"></script>
-  <script src="./appi-eventos.js?v=718"></script>
-  <script src="./tu-mes.js?v=718"></script>
+  <script src="./home-tarjetas.js?v=719"></script>
+  <script src="./appi-eventos.js?v=719"></script>
+  <script src="./tu-mes.js?v=719"></script>
   <script src="./device-bridge.js?v=523"></script>
   <script src="./anuncios.js?v=521"></script>
   <script src="./aviso-telegram.js?v=555"></script>
@@ -4301,7 +4301,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
 </head>
 <body>
 
-<div id="appiUpdateBanner" role="status" aria-live="polite"><span style="font-size:18px">✨</span><b>Nueva versión disponible — APPI Renovada v718</b><button type="button" id="btnUpdateAppi">Actualizar ahora</button></div>
+<div id="appiUpdateBanner" role="status" aria-live="polite"><span style="font-size:18px">✨</span><b>Nueva versión disponible — APPI Renovada v719</b><button type="button" id="btnUpdateAppi">Actualizar ahora</button></div>
 <div id="offlineDot"><span style="width:8px;height:8px;border-radius:50%;background:#ffd66b;display:inline-block"></span> Sin conexión — seguís offline 100%</div>
 <div id="globalSearchOverlay" role="dialog" aria-modal="true"><div class="gs-box"><input id="gsInput" placeholder="Buscar persona, código, categoría, PB…  (Esc para cerrar)" autocomplete="off" /><div id="gsResults" class="gs-results"></div><div style="padding:10px 14px;font-size:11px;color:#777887;text-align:center">Tip: presioná <b>Ctrl + K</b> en cualquier pantalla para buscar</div></div></div>
 
@@ -13131,7 +13131,7 @@ function cerrarToolsMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='718';
+      const swVersion='719';
       const CACHE_NAME='appi-v632-poster';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · v'+swVersion;
@@ -14383,7 +14383,7 @@ body.dark .tools-distri small{color:#a0a0b0}
 body.dark .tools-arrow{background:rgba(91,141,239,.18);color:#a8b8ff}
 body.dark .tools-perfil-header{border-color:rgba(255,255,255,.08)}
 
-/* ===== MI PERFIL iOS PRO v718 ===== */
+/* ===== MI PERFIL iOS PRO v719 ===== */
 .ios-perfil{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','SF Pro Display','Helvetica Neue',Helvetica,Arial,sans-serif;max-width:100%;overflow-x:hidden;box-sizing:border-box}
 .ios-perfil-hero{background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.08);border:1px solid rgba(0,0,0,.04)}
 body.dark .ios-perfil-hero{background:#1c1c1e;border-color:rgba(255,255,255,.08);box-shadow:0 1px 3px rgba(0,0,0,.3)}
@@ -17710,7 +17710,7 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
 
 <link rel="stylesheet" href="./appi-tema.css?v=514">
 
-<script>/* APPI Renovada v718 · Todo funcional */
+<script>/* APPI Renovada v719 · Todo funcional */
 (function(){
   // PWA update banner con skipWaiting real
   try{
@@ -17789,7 +17789,7 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
   // Perf badge: mostrar tiempo carga
   try{
     const t=Math.round(performance.now());
-    console.log('[APPI Renovada v718] Cargada en '+t+'ms · Offline:'+(!navigator.onLine)+' · Buscador Ctrl+K listo');
+    console.log('[APPI Renovada v719] Cargada en '+t+'ms · Offline:'+(!navigator.onLine)+' · Buscador Ctrl+K listo');
   }catch(e){}
 
   // Fix scroll lock antiguo que dejaba body bloqueado
@@ -17816,6 +17816,103 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
     }catch(e){}
   },900);
 
+})();
+</script>
+
+
+<style id="psa-auto-only-style">
+/* PSA AUTO ONLY - ocultar carga manual */
+#equipoFileInput, #garantiasFileInput, #usuariosFileInput,
+#histFileEquipo, #histFileGarantias, #histFileIngresos, #histRestoreInput,
+#btnUpload, #btnEquipoReload, #btnCargarGarantias, #equipoGarantiasActions,
+#usuariosDropZone, .upload-zone, .hist-file-slot, .hist-upload,
+#usuariosUploadCard { display:none !important; }
+/* Ocultar ayudas de carga manual histórico */
+.hist-annual-help b { display:none; }
+</style>
+<script id="psa-auto-only-script">
+(function(){
+  function psaConectado(){
+    try{
+      const c = JSON.parse(localStorage.getItem('appsi_psa_creds')||'null');
+      return !!(c && c.center && c.number && c.password);
+    }catch(e){ return false; }
+  }
+  function mostrarAvisoPSA(){
+    const aviso = `
+      <div class="psa-auto-banner" style="margin:12px 0;padding:14px 16px;border-radius:14px;background:linear-gradient(135deg,rgba(91,141,239,.10),rgba(160,107,255,.10));border:1px solid rgba(91,141,239,.18);display:flex;align-items:center;gap:12px">
+        <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#5b8def,#a06bff);display:grid;place-items:center;color:#fff;font-size:18px;flex:none">🔗</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:800;font-size:13px;color:#292938">Actualización automática vía MI PSA</div>
+          <div style="font-size:11.5px;color:#5c5c66;line-height:1.35;margin-top:2px">${psaConectado() ? 'Conectado ✓ — Tus datos se actualizan solos al abrir APPI. Si necesitás forzar, tocá ↻ en Mi Equipo/Usuarios.' : 'Conectá tu cuenta en <b>⚙️ → Mi perfil</b> → <b>MI PSA</b> para ver tu equipo, garantías y usuarios siempre actualizados. Ya no hace falta subir Excels.'}</div>
+        </div>
+        <button type="button" onclick="if(typeof abrirCuentaDesdeMenu==='function') abrirCuentaDesdeMenu()" style="flex:none;padding:8px 12px;border-radius:10px;border:0;background:#0b5878;color:#fff;font:inherit;font-size:12px;font-weight:800;cursor:pointer">Conectar</button>
+      </div>`;
+    // Inyectar en Usuarios
+    const usuariosCard = document.getElementById('usuariosUploadCard');
+    if(usuariosCard && !document.getElementById('psaAvisoUsuarios')){
+      const div = document.createElement('div');
+      div.id='psaAvisoUsuarios';
+      div.innerHTML=aviso;
+      usuariosCard.parentNode.insertBefore(div, usuariosCard.nextSibling);
+    }
+    // Inyectar en Equipo (antes de equipoContent)
+    const equipoContent = document.getElementById('equipoContent');
+    if(equipoContent && !document.getElementById('psaAvisoEquipo')){
+      const div=document.createElement('div');
+      div.id='psaAvisoEquipo';
+      div.innerHTML=aviso;
+      equipoContent.parentNode.insertBefore(div, equipoContent);
+    }
+    // Inyectar en Histórico - después del help
+    const histHelp = document.querySelector('.hist-annual-help');
+    if(histHelp && !document.getElementById('psaAvisoHist')){
+      const div=document.createElement('div');
+      div.id='psaAvisoHist';
+      div.innerHTML=aviso;
+      histHelp.parentNode.insertBefore(div, histHelp.nextSibling);
+    }
+  }
+  // Bloquear triggers manuales restantes
+  function bloquearCargaManual(){
+    const ids=['equipoFileInput','garantiasFileInput','usuariosFileInput','histFileEquipo','histFileGarantias','histFileIngresos'];
+    ids.forEach(id=>{
+      const el=document.getElementById(id);
+      if(el){
+        el.addEventListener('click', function(e){
+          e.preventDefault(); e.stopPropagation();
+          if(window.APPIDialog) window.APPIDialog.alert('La carga manual fue desactivada. Conectá tu MI PSA en ⚙️ → Mi perfil y se actualiza solo.',{title:'Actualización automática',icon:'🔗'});
+          else alert('Carga manual desactivada. Usá MI PSA.');
+          return false;
+        }, true);
+      }
+    });
+    // Interceptar botones que abrían file input
+    const btns=['btnEquipoReload','btnCargarGarantias','btnUpload'];
+    btns.forEach(id=>{
+      const b=document.getElementById(id);
+      if(b) b.onclick = function(e){
+        e.preventDefault();
+        if(typeof abrirCuentaDesdeMenu==='function') abrirCuentaDesdeMenu();
+        if(window.APPIDialog) window.APPIDialog.alert('Conectá tu MI PSA para actualización automática.',{title:'MI PSA',icon:'🔗'});
+      };
+    });
+  }
+  document.addEventListener('DOMContentLoaded', ()=>{
+    mostrarAvisoPSA();
+    bloquearCargaManual();
+    setTimeout(mostrarAvisoPSA, 800);
+  });
+  setTimeout(()=>{ mostrarAvisoPSA(); bloquearCargaManual(); }, 1200);
+  // Observar cambios de vista
+  const origShowView = window.showView;
+  if(origShowView){
+    window.showView = function(id,opts){
+      const r=origShowView.apply(this, arguments);
+      setTimeout(()=>{ mostrarAvisoPSA(); bloquearCargaManual(); }, 200);
+      return r;
+    };
+  }
 })();
 </script>
 

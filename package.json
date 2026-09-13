@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "718.0.0",
-  "cacheName": "appi-v718-x-glass",
+  "version": "719.0.0",
+  "cacheName": "appi-v719-psa-auto",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {
