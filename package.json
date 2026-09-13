@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "719.0.0",
-  "cacheName": "appi-v719-psa-auto",
+  "version": "720.0.0",
+  "cacheName": "appi-v720-quitar-cuenta",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {
