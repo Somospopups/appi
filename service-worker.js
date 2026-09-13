@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v723-no-browser-popup';
+const CACHE_NAME = 'appi-v724-dos-pasos';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
