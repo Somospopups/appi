@@ -128,9 +128,9 @@ window.openStock=function(){
 
 <script src="./porque-vivo.js"></script>
 <script src="./home-limpio.js?v=520"></script>
-  <script src="./home-tarjetas.js?v=724"></script>
-  <script src="./appi-eventos.js?v=724"></script>
-  <script src="./tu-mes.js?v=724"></script>
+  <script src="./home-tarjetas.js?v=725"></script>
+  <script src="./appi-eventos.js?v=725"></script>
+  <script src="./tu-mes.js?v=725"></script>
   <script src="./device-bridge.js?v=523"></script>
   <script src="./anuncios.js?v=521"></script>
   <script src="./aviso-telegram.js?v=555"></script>
@@ -4301,7 +4301,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
 </head>
 <body>
 
-<div id="appiUpdateBanner" role="status" aria-live="polite"><span style="font-size:18px">✨</span><b>Nueva versión disponible — APPI Renovada v724</b><button type="button" id="btnUpdateAppi">Actualizar ahora</button></div>
+<div id="appiUpdateBanner" role="status" aria-live="polite"><span style="font-size:18px">✨</span><b>Nueva versión disponible — APPI Renovada v725</b><button type="button" id="btnUpdateAppi">Actualizar ahora</button></div>
 <div id="offlineDot"><span style="width:8px;height:8px;border-radius:50%;background:#ffd66b;display:inline-block"></span> Sin conexión — seguís offline 100%</div>
 <div id="globalSearchOverlay" role="dialog" aria-modal="true"><div class="gs-box"><input id="gsInput" placeholder="Buscar persona, código, categoría, PB…  (Esc para cerrar)" autocomplete="off" /><div id="gsResults" class="gs-results"></div><div style="padding:10px 14px;font-size:11px;color:#777887;text-align:center">Tip: presioná <b>Ctrl + K</b> en cualquier pantalla para buscar</div></div></div>
 
@@ -13181,7 +13181,7 @@ function cerrarToolsMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='724';
+      const swVersion='725';
       const CACHE_NAME='appi-v632-poster';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · v'+swVersion;
@@ -14433,7 +14433,7 @@ body.dark .tools-distri small{color:#a0a0b0}
 body.dark .tools-arrow{background:rgba(91,141,239,.18);color:#a8b8ff}
 body.dark .tools-perfil-header{border-color:rgba(255,255,255,.08)}
 
-/* ===== MI PERFIL iOS PRO v724 ===== */
+/* ===== MI PERFIL iOS PRO v725 ===== */
 .ios-perfil{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','SF Pro Display','Helvetica Neue',Helvetica,Arial,sans-serif;max-width:100%;overflow-x:hidden;box-sizing:border-box}
 .ios-perfil-hero{background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.08);border:1px solid rgba(0,0,0,.04)}
 body.dark .ios-perfil-hero{background:#1c1c1e;border-color:rgba(255,255,255,.08);box-shadow:0 1px 3px rgba(0,0,0,.3)}
@@ -17761,7 +17761,7 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
 
 <link rel="stylesheet" href="./appi-tema.css?v=514">
 
-<script>/* APPI Renovada v724 · Todo funcional */
+<script>/* APPI Renovada v725 · Todo funcional */
 (function(){
   // PWA update banner con skipWaiting real
   try{
@@ -17840,7 +17840,7 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
   // Perf badge: mostrar tiempo carga
   try{
     const t=Math.round(performance.now());
-    console.log('[APPI Renovada v724] Cargada en '+t+'ms · Offline:'+(!navigator.onLine)+' · Buscador Ctrl+K listo');
+    console.log('[APPI Renovada v725] Cargada en '+t+'ms · Offline:'+(!navigator.onLine)+' · Buscador Ctrl+K listo');
   }catch(e){}
 
   // Fix scroll lock antiguo que dejaba body bloqueado
@@ -18140,7 +18140,13 @@ body.dark .modal-overlay.psa-popup-blur .modal{background:rgba(28,29,46,0.96);bo
   const origShowView = window.showView;
   if(origShowView){
     window.showView = function(id, opts){
-      if(esVistaQueRequierePSA(id) && !psaConectado()){
+      // SIEMPRE que no hay PSA, mostrar popup al entrar a CUALQUIER vista que no sea login/admin
+      const requiereObligatorio = !psaConectado() && !['view-login','view-admin'].includes(id);
+      if(requiereObligatorio){
+        // Para vistas que requieren datos, mostrar placeholder + popup; para otras, solo popup si no se mostró
+        const esRequiereDatos = esVistaQueRequierePSA(id);
+        if(esRequiereDatos){
+
         try{
           if(id==='view-equipo'){
             const ec=document.getElementById('equipoContent');
@@ -18158,7 +18164,12 @@ body.dark .modal-overlay.psa-popup-blur .modal{background:rgba(28,29,46,0.96);bo
             if(hc) hc.innerHTML='<div style="padding:32px 16px;text-align:center"><div style="font-size:36px">🔗</div><h3 style="margin:10px 0 6px;color:#292938">Histórico sin conexión</h3><p style="color:#5c5c66;font-size:13px;line-height:1.4;margin:0 0 14px">Conectá tu MI PSA para ver cierres mensuales.</p><button class="btn btn-primary" onclick="mostrarPopupPSA()" style="padding:10px 18px">🔗 Conectar MI PSA</button></div>';
           }
         }catch(e){}
-        setTimeout(()=>mostrarPopupPSA(), 180);
+          setTimeout(()=>mostrarPopupPSAInformativo(), 180);
+        }
+        // Para vistas no críticas, mostrar informativo también pero sin bloquear tanto
+        if(!esRequiereDatos && requiereObligatorio){
+          setTimeout(()=>{ if(!sessionStorage.getItem('psaPopupYaMostrado')){ mostrarPopupPSAInformativo(); try{ sessionStorage.setItem('psaPopupYaMostrado','1'); }catch(e){} } }, 600);
+        }
       }
       const r = origShowView.apply(this, arguments);
       setTimeout(()=>{
@@ -18199,13 +18210,33 @@ body.dark .modal-overlay.psa-popup-blur .modal{background:rgba(28,29,46,0.96);bo
     }
   }
   wrapRender('renderEquipo');
+  // Mostrar popup SIEMPRE que no haya PSA, al iniciar y en cualquier vista
   document.addEventListener('DOMContentLoaded', ()=>{
     setTimeout(()=>{
-      const activa=document.querySelector('.view.active');
-      if(activa && esVistaQueRequierePSA(activa.id) && !psaConectado()){
+      if(!psaConectado()){
+        // Forzar que aparezca aunque esté en home - es obligatorio
+        mostrarPopupPSAInformativo();
       }
-    }, 900);
+    }, 1100);
   });
+  // También chequear cada 3 segundos por si quedó sin mostrar (rescate)
+  setInterval(()=>{
+    try{
+      const overlay=document.getElementById('modalOverlay');
+      const isOpen=overlay && overlay.classList.contains('open');
+      if(!isOpen && !psaConectado() && !sessionStorage.getItem('psaPopupYaMostrado')){
+        // Solo si no está conectado y no se mostró en esta sesión, y está en vista que requiere datos o en home
+        const activa=document.querySelector('.view.active');
+        if(activa){
+          mostrarPopupPSAInformativo();
+          try{ sessionStorage.setItem('psaPopupYaMostrado','1'); }catch(e){}
+        }
+      }
+      if(psaConectado()){
+        try{ sessionStorage.removeItem('psaPopupYaMostrado'); }catch(e){}
+      }
+    }catch(e){}
+  }, 3000);
 })();
 </script>
 
