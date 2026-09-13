@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v720-quitar-cuenta';
+const CACHE_NAME = 'appi-v721-psa-guard';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

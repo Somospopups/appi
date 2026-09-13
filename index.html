@@ -128,9 +128,9 @@ window.openStock=function(){
 
 <script src="./porque-vivo.js"></script>
 <script src="./home-limpio.js?v=520"></script>
-  <script src="./home-tarjetas.js?v=720"></script>
-  <script src="./appi-eventos.js?v=720"></script>
-  <script src="./tu-mes.js?v=720"></script>
+  <script src="./home-tarjetas.js?v=721"></script>
+  <script src="./appi-eventos.js?v=721"></script>
+  <script src="./tu-mes.js?v=721"></script>
   <script src="./device-bridge.js?v=523"></script>
   <script src="./anuncios.js?v=521"></script>
   <script src="./aviso-telegram.js?v=555"></script>
@@ -4301,7 +4301,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
 </head>
 <body>
 
-<div id="appiUpdateBanner" role="status" aria-live="polite"><span style="font-size:18px">✨</span><b>Nueva versión disponible — APPI Renovada v720</b><button type="button" id="btnUpdateAppi">Actualizar ahora</button></div>
+<div id="appiUpdateBanner" role="status" aria-live="polite"><span style="font-size:18px">✨</span><b>Nueva versión disponible — APPI Renovada v721</b><button type="button" id="btnUpdateAppi">Actualizar ahora</button></div>
 <div id="offlineDot"><span style="width:8px;height:8px;border-radius:50%;background:#ffd66b;display:inline-block"></span> Sin conexión — seguís offline 100%</div>
 <div id="globalSearchOverlay" role="dialog" aria-modal="true"><div class="gs-box"><input id="gsInput" placeholder="Buscar persona, código, categoría, PB…  (Esc para cerrar)" autocomplete="off" /><div id="gsResults" class="gs-results"></div><div style="padding:10px 14px;font-size:11px;color:#777887;text-align:center">Tip: presioná <b>Ctrl + K</b> en cualquier pantalla para buscar</div></div></div>
 
@@ -12917,34 +12917,47 @@ function abrirCuentaDesdeMenu(){
         if(el) el.addEventListener('blur', ()=>{ try{ const c=document.getElementById('psaCentro')?.value.trim(), n=document.getElementById('psaNumero')?.value.trim(), pw=document.getElementById('psaClave')?.value||''; if(c&&n&&pw) psaGuardar(); }catch(e){} });
       });
       psaRender();
-      // QUITAR CUENTA PSA
+      // QUITAR CUENTA PSA - borrado total y ocultar datos de inmediato
       try{
         const quitarBtn=document.getElementById('btnPsaQuitarCuenta');
         if(quitarBtn) quitarBtn.onclick=async()=>{
-          if(!await window.APPIDialog.confirm('¿Quitar la cuenta PSA? Se borrará la conexión y no verás datos hasta volver a conectar.',{title:'Quitar cuenta',icon:'🔗',okText:'Quitar cuenta',danger:true})) return;
-          quitarBtn.disabled=true;
+          if(!await window.APPIDialog.confirm('¿Quitar la cuenta PSA? Se borrarán TODOS los datos (equipo, garantías, usuarios) y no verás nada hasta volver a conectar tu MI PSA.',{title:'Quitar cuenta',icon:'🔗',okText:'Quitar cuenta',danger:true})) return;
+          quitarBtn.disabled=true; quitarBtn.textContent='Quitando...';
           try{
+            // 1. Borrar credenciales PSA
             localStorage.removeItem('appsi_psa_creds');
             localStorage.removeItem('appsi_psa_lastSync');
             localStorage.removeItem('appsi_psa_cache_minegocio');
-            // Borrar datos para que quede sin datos hasta reconectar
-            localStorage.removeItem('equipoData');
-            localStorage.removeItem('usuarios_garantias');
-            localStorage.removeItem('lastUpdate_equipo');
-            localStorage.removeItem('lastUpdate_garantias');
-            localStorage.removeItem('lastUpdate_usuarios');
-            localStorage.removeItem('lastUpdate_garantiasOrg');
+            localStorage.removeItem('appsi_psa_files');
+            localStorage.setItem('appsi_psa_desconectado','1');
+            // 2. Borrar TODOS los datos que vienen de PSA
+            const keysBorrar=['equipoData','usuarios_garantias','historicoData','appsi_historico','lastUpdate_equipo','lastUpdate_garantias','lastUpdate_usuarios','lastUpdate_garantiasOrg','lastUpdate_historico','appsi_psa_cheque','equipoData_backup','usuarios_garantias_backup'];
+            keysBorrar.forEach(k=>{ try{ localStorage.removeItem(k); }catch(e){} });
+            // 3. Limpiar variables en memoria
             try{ window.equipoData=null; }catch(e){}
+            try{ if(typeof equipoData!=='undefined') equipoData=null; }catch(e){}
             try{ if(typeof window.usuariosU!=='undefined') window.usuariosU=[]; }catch(e){}
+            try{ if(typeof usuariosU!=='undefined') usuariosU=[]; }catch(e){}
+            try{ if(typeof window.APPIDataSync!=='undefined' && window.APPIDataSync.clearLocal) window.APPIDataSync.clearLocal(); }catch(e){}
+            // 4. Forzar UI a estado vacío de inmediato (sin esperar reload)
+            try{
+              const ec=document.getElementById('equipoContent'); if(ec) ec.innerHTML='<div style="padding:28px 16px;text-align:center;color:#8e8e93"><div style="font-size:32px">🔗</div><b style="display:block;margin-top:8px;color:#292938">Sin conexión PSA</b><p style="margin:6px 0 0;font-size:12px;line-height:1.4">Conectá tu cuenta para ver tus datos.</p></div>';
+              const ed=document.getElementById('equipoFileInfo'); if(ed) ed.style.display='none';
+              const ud=document.getElementById('usuariosDashboard'); if(ud) ud.style.display='none';
+              const uc=document.getElementById('usuariosUploadCard'); if(uc) uc.style.display='none';
+              const hc=document.getElementById('historicoContent'); if(hc) hc.innerHTML='<div style="padding:28px 16px;text-align:center;color:#8e8e93"><div style="font-size:32px">🔗</div><b style="display:block;margin-top:8px;color:#292938">Histórico sin datos</b><p style="margin:6px 0 0;font-size:12px">Conectá PSA para ver cierres.</p></div>';
+            }catch(e){}
             try{ if(typeof renderEquipo==='function') renderEquipo(); }catch(e){}
             try{ if(typeof actualizarUsuariosMetaBar==='function') actualizarUsuariosMetaBar(); }catch(e){}
+            try{ if(typeof renderUsuarios==='function') renderUsuarios(); }catch(e){}
             try{ psaRender(); }catch(e){}
             const ce=document.getElementById('psaCentro'); if(ce) ce.value='';
             const nu=document.getElementById('psaNumero'); if(nu) nu.value='';
             const cl=document.getElementById('psaClave'); if(cl) cl.value='';
-            try{ showToast('Cuenta PSA quitada — sin datos hasta reconectar', 2600); }catch(e){}
-            setTimeout(()=>{ try{ location.reload(); }catch(e){} }, 900);
-          }catch(e){ try{ showToast('No se pudo quitar', 2000); }catch(_){} quitarBtn.disabled=false; }
+            try{ showToast('Cuenta PSA quitada — datos borrados', 2600); }catch(e){}
+            modal.close();
+            setTimeout(()=>{ try{ location.reload(); }catch(e){} }, 700);
+          }catch(e){ try{ showToast('No se pudo quitar', 2000); }catch(_){} quitarBtn.disabled=false; quitarBtn.textContent='Quitar cuenta'; }
         };
       }catch(e){}
     }catch(e){}
@@ -13168,7 +13181,7 @@ function cerrarToolsMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='720';
+      const swVersion='721';
       const CACHE_NAME='appi-v632-poster';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · v'+swVersion;
@@ -14420,7 +14433,7 @@ body.dark .tools-distri small{color:#a0a0b0}
 body.dark .tools-arrow{background:rgba(91,141,239,.18);color:#a8b8ff}
 body.dark .tools-perfil-header{border-color:rgba(255,255,255,.08)}
 
-/* ===== MI PERFIL iOS PRO v720 ===== */
+/* ===== MI PERFIL iOS PRO v721 ===== */
 .ios-perfil{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','SF Pro Display','Helvetica Neue',Helvetica,Arial,sans-serif;max-width:100%;overflow-x:hidden;box-sizing:border-box}
 .ios-perfil-hero{background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.08);border:1px solid rgba(0,0,0,.04)}
 body.dark .ios-perfil-hero{background:#1c1c1e;border-color:rgba(255,255,255,.08);box-shadow:0 1px 3px rgba(0,0,0,.3)}
@@ -17634,6 +17647,7 @@ function psaGuardar(){
   try{
     localStorage.setItem('appsi_psa_creds', JSON.stringify(creds));
     localStorage.setItem('appsi_psa_lastSync', new Date().toISOString());
+    try{ localStorage.removeItem('appsi_psa_desconectado'); }catch(e){}
     psaSetStatus('✓ Guardado. '+ (remember?'Auto-actualizará al abrir APPI.':'No auto-actualizará hasta que marques la casilla.'), 'ok');
     try{ showToast('MI PSA guardado ✓'); }catch(e){}
     psaRender();
@@ -17747,7 +17761,7 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
 
 <link rel="stylesheet" href="./appi-tema.css?v=514">
 
-<script>/* APPI Renovada v720 · Todo funcional */
+<script>/* APPI Renovada v721 · Todo funcional */
 (function(){
   // PWA update banner con skipWaiting real
   try{
@@ -17826,7 +17840,7 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
   // Perf badge: mostrar tiempo carga
   try{
     const t=Math.round(performance.now());
-    console.log('[APPI Renovada v720] Cargada en '+t+'ms · Offline:'+(!navigator.onLine)+' · Buscador Ctrl+K listo');
+    console.log('[APPI Renovada v721] Cargada en '+t+'ms · Offline:'+(!navigator.onLine)+' · Buscador Ctrl+K listo');
   }catch(e){}
 
   // Fix scroll lock antiguo que dejaba body bloqueado
@@ -17950,6 +17964,133 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
       return r;
     };
   }
+})();
+</script>
+
+
+<script id="psa-guard-popup">
+(function(){
+  function psaConectado(){
+    try{ const c=JSON.parse(localStorage.getItem('appsi_psa_creds')||'null'); return !!(c && c.center && c.number && c.password); }catch(e){ return false; }
+  }
+  function mostrarPopupPSA(){
+    if(psaConectado()) return false;
+    if(window.APPIDialog && window.APPIDialog.alert){
+      // Usar modal nativo
+      const html = '<p>Para ver tu <b>equipo, garantías, usuarios e histórico</b> necesitás conectar tu cuenta PSA.</p><div class="tip">Tocá <b>Conectar MI PSA</b> y cargá Centro, Número y Clave. Es solo en tu celular y se actualiza solo.</div>';
+      // Usamos modal.open directamente para controlar botón
+      if(window.modal && window.modal.open){
+        window.modal.open({
+          icon:'🔗',
+          iconBg:'linear-gradient(135deg,#5b8def,#a06bff)',
+          title:'Conectá tu MI PSA',
+          sub:'Actualización automática',
+          html: html,
+          okText:'Conectar MI PSA',
+          cancelText:'Más tarde',
+          confirm:true,
+          onConfirm:()=>{ try{ if(typeof abrirCuentaDesdeMenu==='function') setTimeout(()=>abrirCuentaDesdeMenu(), 200); }catch(e){} }
+        });
+        setTimeout(()=>{
+          const ok=document.getElementById('modalConfirmBtn');
+          const cancel=document.getElementById('modalCancelBtn');
+          if(ok){ ok.textContent='Conectar MI PSA'; ok.style.background='#0b5878'; }
+          if(cancel) cancel.textContent='Más tarde';
+        }, 60);
+        return true;
+      }
+    }
+    // Fallback
+    if(confirm('Necesitás conectar tu MI PSA para ver tus datos. ¿Conectar ahora?')){
+      if(typeof abrirCuentaDesdeMenu==='function') abrirCuentaDesdeMenu();
+    }
+    return true;
+  }
+  function esVistaQueRequierePSA(id){
+    return ['view-equipo','view-usuarios','view-historico','view-negocio'].includes(id);
+  }
+  // Interceptar showView
+  const origShowView = window.showView;
+  if(origShowView){
+    window.showView = function(id, opts){
+      if(esVistaQueRequierePSA(id) && !psaConectado()){
+        // Mostrar popup y no dejar ver datos viejos - limpiar contenido
+        try{
+          if(id==='view-equipo'){
+            const ec=document.getElementById('equipoContent');
+            if(ec) ec.innerHTML='<div style="padding:32px 16px;text-align:center"><div style="font-size:36px">🔗</div><h3 style="margin:10px 0 6px;color:#292938">Conectá tu MI PSA</h3><p style="color:#5c5c66;font-size:13px;line-height:1.4;margin:0 0 14px">Tu equipo, garantías y usuarios se actualizan solos.<br>Necesitás Centro, Número y Clave.</p><button class="btn btn-primary" onclick="if(typeof abrirCuentaDesdeMenu==\'function\') abrirCuentaDesdeMenu()" style="padding:10px 18px">🔗 Conectar MI PSA</button></div>';
+          }
+          if(id==='view-usuarios'){
+            const ud=document.getElementById('usuariosDashboard');
+            const uc=document.getElementById('usuariosUploadCard');
+            if(ud) ud.style.display='none';
+            // Mostrar banner en lugar de upload
+            const aviso=document.getElementById('psaAvisoUsuarios');
+            if(aviso) aviso.style.display='block';
+          }
+          if(id==='view-historico'){
+            const hc=document.getElementById('historicoContent');
+            if(hc) hc.innerHTML='<div style="padding:32px 16px;text-align:center"><div style="font-size:36px">🔗</div><h3 style="margin:10px 0 6px;color:#292938">Histórico sin conexión</h3><p style="color:#5c5c66;font-size:13px;line-height:1.4;margin:0 0 14px">Conectá tu MI PSA para ver cierres mensuales.</p><button class="btn btn-primary" onclick="if(typeof abrirCuentaDesdeMenu==\'function\') abrirCuentaDesdeMenu()" style="padding:10px 18px">🔗 Conectar MI PSA</button></div>';
+          }
+        }catch(e){}
+        mostrarPopupPSA();
+        // Igual dejar que showView cambie de vista, pero con contenido bloqueado
+      }
+      const r = origShowView.apply(this, arguments);
+      // Después de cambiar, asegurar banner visible si no conectado
+      setTimeout(()=>{
+        if(!psaConectado() && esVistaQueRequierePSA(id)){
+          // Re-ocultar datos que se hayan renderizado
+          try{
+            const ec=document.getElementById('equipoContent');
+            if(ec && ec.innerHTML.includes('data-equipo') || (ec && !ec.innerHTML.includes('Conectá tu MI PSA'))){
+              // Si tiene datos viejos y no hay PSA, vaciar
+              if(!psaConectado() && localStorage.getItem('appsi_psa_desconectado')==='1'){
+                ec.innerHTML='<div style="padding:32px 16px;text-align:center"><div style="font-size:36px">🔗</div><h3 style="margin:10px 0 6px;color:#292938">Sin conexión PSA</h3><p style="color:#5c5c66;font-size:13px">Conectá tu cuenta para ver datos.</p><button class="btn btn-primary" onclick="if(typeof abrirCuentaDesdeMenu==\'function\') abrirCuentaDesdeMenu()" style="padding:10px 18px">🔗 Conectar</button></div>';
+              }
+            }
+          }catch(e){}
+        }
+        // Si se conectó, quitar flag
+        if(psaConectado()){
+          try{ localStorage.removeItem('appsi_psa_desconectado'); }catch(e){}
+        }
+      }, 250);
+      return r;
+    };
+  }
+  // También interceptar renderEquipo y renderUsuarios para ocultar si no hay PSA
+  function wrapRender(nombre){
+    const orig = window[nombre];
+    if(typeof orig==='function'){
+      window[nombre]=function(){
+        if(!psaConectado() && localStorage.getItem('appsi_psa_desconectado')==='1'){
+          // Si está desconectado a propósito, no renderizar datos viejos
+          try{
+            if(nombre==='renderEquipo'){
+              const ec=document.getElementById('equipoContent');
+              if(ec) ec.innerHTML='<div style="padding:32px 16px;text-align:center"><div style="font-size:36px">🔗</div><h3 style="margin:10px 0 6px;color:#292938">Sin conexión PSA</h3><p style="color:#5c5c66;font-size:13px">Conectá tu MI PSA.</p></div>';
+              return;
+            }
+            if(nombre==='renderUsuarios' || nombre==='actualizarUsuariosMetaBar'){
+              // Dejar que el showView se encargue
+            }
+          }catch(e){}
+        }
+        return orig.apply(this, arguments);
+      };
+    }
+  }
+  wrapRender('renderEquipo');
+  // Mostrar popup al cargar si ya está en una vista que requiere PSA y no hay conexión
+  document.addEventListener('DOMContentLoaded', ()=>{
+    setTimeout(()=>{
+      const activa=document.querySelector('.view.active');
+      if(activa && esVistaQueRequierePSA(activa.id) && !psaConectado()){
+        mostrarPopupPSA();
+      }
+    }, 900);
+  });
 })();
 </script>
 
