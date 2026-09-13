@@ -128,9 +128,9 @@ window.openStock=function(){
 
 <script src="./porque-vivo.js"></script>
 <script src="./home-limpio.js?v=520"></script>
-  <script src="./home-tarjetas.js?v=722"></script>
-  <script src="./appi-eventos.js?v=722"></script>
-  <script src="./tu-mes.js?v=722"></script>
+  <script src="./home-tarjetas.js?v=723"></script>
+  <script src="./appi-eventos.js?v=723"></script>
+  <script src="./tu-mes.js?v=723"></script>
   <script src="./device-bridge.js?v=523"></script>
   <script src="./anuncios.js?v=521"></script>
   <script src="./aviso-telegram.js?v=555"></script>
@@ -4301,7 +4301,7 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(255,107,157,.1
 </head>
 <body>
 
-<div id="appiUpdateBanner" role="status" aria-live="polite"><span style="font-size:18px">✨</span><b>Nueva versión disponible — APPI Renovada v722</b><button type="button" id="btnUpdateAppi">Actualizar ahora</button></div>
+<div id="appiUpdateBanner" role="status" aria-live="polite"><span style="font-size:18px">✨</span><b>Nueva versión disponible — APPI Renovada v723</b><button type="button" id="btnUpdateAppi">Actualizar ahora</button></div>
 <div id="offlineDot"><span style="width:8px;height:8px;border-radius:50%;background:#ffd66b;display:inline-block"></span> Sin conexión — seguís offline 100%</div>
 <div id="globalSearchOverlay" role="dialog" aria-modal="true"><div class="gs-box"><input id="gsInput" placeholder="Buscar persona, código, categoría, PB…  (Esc para cerrar)" autocomplete="off" /><div id="gsResults" class="gs-results"></div><div style="padding:10px 14px;font-size:11px;color:#777887;text-align:center">Tip: presioná <b>Ctrl + K</b> en cualquier pantalla para buscar</div></div></div>
 
@@ -13181,7 +13181,7 @@ function cerrarToolsMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='722';
+      const swVersion='723';
       const CACHE_NAME='appi-v632-poster';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · v'+swVersion;
@@ -14433,7 +14433,7 @@ body.dark .tools-distri small{color:#a0a0b0}
 body.dark .tools-arrow{background:rgba(91,141,239,.18);color:#a8b8ff}
 body.dark .tools-perfil-header{border-color:rgba(255,255,255,.08)}
 
-/* ===== MI PERFIL iOS PRO v722 ===== */
+/* ===== MI PERFIL iOS PRO v723 ===== */
 .ios-perfil{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','SF Pro Display','Helvetica Neue',Helvetica,Arial,sans-serif;max-width:100%;overflow-x:hidden;box-sizing:border-box}
 .ios-perfil-hero{background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.08);border:1px solid rgba(0,0,0,.04)}
 body.dark .ios-perfil-hero{background:#1c1c1e;border-color:rgba(255,255,255,.08);box-shadow:0 1px 3px rgba(0,0,0,.3)}
@@ -17761,7 +17761,7 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
 
 <link rel="stylesheet" href="./appi-tema.css?v=514">
 
-<script>/* APPI Renovada v722 · Todo funcional */
+<script>/* APPI Renovada v723 · Todo funcional */
 (function(){
   // PWA update banner con skipWaiting real
   try{
@@ -17840,7 +17840,7 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
   // Perf badge: mostrar tiempo carga
   try{
     const t=Math.round(performance.now());
-    console.log('[APPI Renovada v722] Cargada en '+t+'ms · Offline:'+(!navigator.onLine)+' · Buscador Ctrl+K listo');
+    console.log('[APPI Renovada v723] Cargada en '+t+'ms · Offline:'+(!navigator.onLine)+' · Buscador Ctrl+K listo');
   }catch(e){}
 
   // Fix scroll lock antiguo que dejaba body bloqueado
@@ -17933,7 +17933,7 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
         el.addEventListener('click', function(e){
           e.preventDefault(); e.stopPropagation();
           if(window.APPIDialog) window.APPIDialog.alert('La carga manual fue desactivada. Conectá tu MI PSA en ⚙️ → Mi perfil y se actualiza solo.',{title:'Actualización automática',icon:'🔗'});
-          else alert('Carga manual desactivada. Usá MI PSA.');
+          else if(window.APPIDialog) window.APPIDialog.alert('Carga manual desactivada. Usá MI PSA.',{title:'MI PSA',icon:'🔗'});
           return false;
         }, true);
       }
@@ -18082,9 +18082,9 @@ body.dark .modal-overlay.psa-popup-blur .modal{background:rgba(28,29,46,0.96);bo
       }
       return true;
     }
-    if(confirm('Necesitás conectar tu MI PSA para ver tus datos. ¿Conectar ahora?')){
-      if(typeof abrirCuentaDesdeMenu==='function') abrirCuentaDesdeMenu();
-    }
+    if(window.APPIDialog && window.APPIDialog.confirm){
+      window.APPIDialog.confirm('Necesitás conectar tu MI PSA para ver tus datos.',{title:'Conectá tu MI PSA',icon:'🔗',okText:'Conectar',cancelText:'Más tarde'}).then(ok=>{ if(ok && typeof abrirCuentaDesdeMenu==='function') abrirCuentaDesdeMenu(); });
+    } else if(typeof window.mostrarPopupPSA==='function'){ window.mostrarPopupPSA(); } else if(typeof abrirCuentaDesdeMenu==='function'){ abrirCuentaDesdeMenu(); }
     return true;
   }
   function esVistaQueRequierePSA(id){

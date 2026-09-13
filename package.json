@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "722.0.0",
-  "cacheName": "appi-v722-popup-psa",
+  "version": "723.0.0",
+  "cacheName": "appi-v723-no-browser-popup",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {
