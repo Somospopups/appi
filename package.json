@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "725.0.0",
-  "cacheName": "appi-v725-popup-obligatorio",
+  "version": "726.0.0",
+  "cacheName": "appi-v726-sin-banners",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

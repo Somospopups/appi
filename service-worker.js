@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v725-popup-obligatorio';
+const CACHE_NAME = 'appi-v726-sin-banners';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
