@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v721-psa-guard';
+const CACHE_NAME = 'appi-v722-popup-psa';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
