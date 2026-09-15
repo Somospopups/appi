@@ -85,3 +85,6 @@ jobs:
 
       - name: Publicar actualizador de precios PSA
         run: supabase functions deploy actualizar-precios --project-ref "$SUPABASE_PROJECT_ID"
+
+      - name: Publicar consulta de seriales y garantías PSA
+        run: supabase functions deploy consulta-serial --project-ref "$SUPABASE_PROJECT_ID"

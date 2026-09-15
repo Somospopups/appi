@@ -118,7 +118,7 @@ window.openStock=function(){
 <script src="./tarjetas-promos.js"></script>
 <script src="./usuarios-botones.js?v=423"></script>
 <script src="./mensajes-hielo.js"></script>
-<script src="./mensajes-usuarios.js?v=584"></script>
+<script src="./mensajes-usuarios.js?v=796"></script>
 <script src="./reactivacion.js"></script>
 
 <script src="./escalera-suenos.js"></script>
@@ -126,7 +126,7 @@ window.openStock=function(){
 <script src="./tablero-negocio.js?v=510"></script>
 <script src="./lista-precios.js?v=791"></script>
 <script src="./vendor/zxing.min.js"></script>
-<script src="./stock-personal.js?v=795"></script>
+<script src="./stock-personal.js?v=796"></script>
 
 <script src="./porque-vivo.js"></script>
 <script src="./home-limpio.js?v=520"></script>
@@ -4589,7 +4589,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v795 · Segura</div>
+  <div class="ds-foot">APPI · v796 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4873,7 +4873,7 @@ body.dark #pageTabs button.active{color:#c5d6ff}
       <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
 
       <div class="home-brand-row">
-        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · v795</span></span>
+        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · v796</span></span>
       </div>
 
       <div class="home-hero-card">
@@ -5438,16 +5438,20 @@ body.dark #pageTabs button.active{color:#c5d6ff}
     <div class="glass" id="usuariosUploadCard">
       <div style="text-align:center;margin-bottom:12px">
         <div style="font-size:32px">📂</div>
-        <h3 style="margin:8px 0 4px">Cargar archivo de Garantías / Usuarios</h3>
+        <h3 style="margin:8px 0 4px">Garantías y Usuarios</h3>
+        <p style="margin:0 0 10px;font-size:12px;color:#6b6b76">Sincronizá automáticamente tus clientes de MI PSA o cargá tu archivo Excel de respaldo</p>
       </div>
-      <a class="btn-ir-psa" href="https://minegocio.psa.com.ar/login" target="_blank" rel="noopener noreferrer">Descargar archivos</a>
+      <div style="display:flex;gap:8px;justify-content:center;margin-bottom:14px;flex-wrap:wrap">
+        <button type="button" class="btn btn-primary" id="btnSyncPSAAuto" onclick="if(typeof psaAbrirPopup==='function')psaAbrirPopup();else if(typeof psaProbar==='function')psaProbar();" style="display:inline-flex;align-items:center;gap:6px">🔗 Conectar / Sincronizar MI PSA</button>
+        <a class="btn btn-secondary" href="https://minegocio.psa.com.ar/login" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;text-decoration:none">🌐 Abrir MI PSA</a>
+      </div>
       <label class="upload-zone" id="usuariosDropZone" for="usuariosFileInput" role="button" tabindex="0" aria-label="Cargar archivo Excel" style="display:block;cursor:pointer;position:relative;overflow:hidden">
         <input type="file" id="usuariosFileInput" accept=".xls,.xlsx,.csv,.ods" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;z-index:2">
         <div style="position:relative;z-index:1;pointer-events:none">
           <div style="font-size:26px">📤</div>
-          <b>Arrastrá tu archivo acá o clic para elegir</b>
-          <div style="margin-top:14px"><span class="btn btn-secondary">Elegir archivo</span></div>
-          <small style="display:block;margin-top:10px;color:#6b6b76;font-size:10.5px;line-height:1.3">💡 Tip: Si acabás de guardar el Excel y no aparece en la ventana, presioná F5 en el explorador o arrastrá el archivo directamente acá — el arrastre siempre está actualizado (es caché del sistema, no de APPI)</small>
+          <b>Arrastrá tu archivo Excel acá o clic para elegir</b>
+          <div style="margin-top:10px"><span class="btn btn-secondary">Elegir archivo Excel</span></div>
+          <small style="display:block;margin-top:10px;color:#6b6b76;font-size:10.5px;line-height:1.3">Carga de respaldo si no usás sincronización directa.</small>
         </div>
       </label>
       <div id="usuariosFileInfo" style="display:none;margin-top:12px;padding:12px;border-radius:14px;background:rgba(58,208,164,0.14);backdrop-filter:blur(10px);border:1px solid rgba(58,208,164,0.18);font-size:12px;font-weight:600"></div>
@@ -8612,18 +8616,20 @@ if(btnEquipoCambiar) btnEquipoCambiar.onclick = ()=>{
 const btnUsuariosActualizar = document.getElementById('btnUsuariosActualizar');
 if(btnUsuariosActualizar) btnUsuariosActualizar.onclick = ()=>{
   const c=psaGetCreds();
-  const f=psaGetFiles();
-  if(c && c.remember && f.garantias){
+  if(c && c.center && c.number && c.password){
     try{ haptic(12); }catch(e){}
     btnUsuariosActualizar.classList.add('spinning');
     btnUsuariosActualizar.style.transform='rotate(360deg)';
     btnUsuariosActualizar.style.transition='transform 0.6s ease';
     setTimeout(()=>{ btnUsuariosActualizar.classList.remove('spinning'); btnUsuariosActualizar.style.transform=''; }, 700);
-    psaProbar();
-    showToast('Actualizando GARANTÍAS desde MI PSA…', 2200);
+    if(typeof sincronizarGarantiasPSA==='function') sincronizarGarantiasPSA(c);
+    else psaProbar();
   } else {
-    const inp=document.getElementById('usuariosFileInput');
-    if(inp) inp.click();
+    if(typeof psaAbrirPopup==='function') psaAbrirPopup();
+    else {
+      const inp=document.getElementById('usuariosFileInput');
+      if(inp) inp.click();
+    }
   }
 };
 /* ============ CARGA DE GARANTÍAS ============ */
@@ -13366,8 +13372,8 @@ function cerrarToolsMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='795';
-      const CACHE_NAME='appi-v795-stock-compartir-sin-firma';
+      const swVersion='796';
+      const CACHE_NAME='appi-v796-auto-sync-psa';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · v'+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
@@ -16283,6 +16289,7 @@ function cargarArchivoU(file){
           return;
         }
         usuariosU=depuradosAplicar(parsed);
+        window.usuariosU=usuariosU;
         const depuradosIgnorados=parsed.length-usuariosU.length;
         if(depuradosIgnorados>0 && infoEl) infoEl.innerHTML=`✅ <b>${usuariosU.length}</b> usuarios cargados · 🧹 ${depuradosIgnorados} depurado${depuradosIgnorados===1?'':'s'} ignorado${depuradosIgnorados===1?'':'s'}`;
         try{ 
@@ -16483,7 +16490,7 @@ function initUsuarios(){
   if(btnClear) btnClear.onclick=async()=>{
     if(await window.APPIDialog.confirm('Se borrará la lista de usuarios cargada en este dispositivo.',{title:'Limpiar lista',icon:'🗑️',okText:'Borrar',danger:true})){
       try{ localStorage.removeItem('usuarios_garantias'); }catch(_){}
-      usuariosU=[]; filtradosU=[];
+      usuariosU=[]; filtradosU=[]; window.usuariosU=[];
       const dash=document.getElementById('usuariosDashboard');
       if(dash) dash.style.display='none';
       const upCard=document.getElementById('usuariosUploadCard');
@@ -16589,19 +16596,33 @@ function initUsuarios(){
   const btnCumples=document.getElementById('usuariosBtnCumples');
   if(btnCumples) btnCumples.onclick=()=>abrirCumplesUsuarios();
 
+  function recargarUsuariosDeStorage(){
+    try{
+      const saved=JSON.parse(localStorage.getItem('usuarios_garantias')||'[]');
+      try{ setTimeout(actualizarUsuariosMetaBar, 300); }catch(e){}
+      if(saved.length>0){
+        usuariosU=depuradosAplicar(saved.map(u=>({...u, cumpleRaw:fechaDeCeldaU(u.cumpleRaw||u.cumple||''), fVence:u.fVence? new Date(u.fVence):null, estado:u.fVence? ( (new Date(u.fVence)-new Date())/(1000*60*60*24)<0?'vencida': ( (new Date(u.fVence)-new Date())/(1000*60*60*24)<=30?'porVencer':'vigente')):'vigente'})));
+        window.usuariosU=usuariosU;
+        mostrarDashboardU();
+        const info=document.getElementById('usuariosFileInfo');
+        if(info){ info.style.display='block'; info.innerHTML=`💾 ${usuariosU.length} usuarios recuperados de memoria`; }
+        const bc=document.getElementById('usuariosBtnClear');
+        if(bc) bc.style.display='inline-flex';
+      } else {
+        usuariosU=[];
+        window.usuariosU=[];
+        const dash=document.getElementById('usuariosDashboard');
+        if(dash) dash.style.display='none';
+        const upCard=document.getElementById('usuariosUploadCard');
+        if(upCard) upCard.style.display='block';
+      }
+    }catch(e){ console.log('load usuarios fail',e); }
+  }
+  window.recargarUsuariosDeStorage=recargarUsuariosDeStorage;
+  window.mostrarDashboardU=mostrarDashboardU;
+
   // Cargar de localStorage
-  try{
-    const saved=JSON.parse(localStorage.getItem('usuarios_garantias')||'[]');
-    try{ setTimeout(actualizarUsuariosMetaBar, 300); }catch(e){}
-    if(saved.length>0){
-      usuariosU=depuradosAplicar(saved.map(u=>({...u, cumpleRaw:fechaDeCeldaU(u.cumpleRaw||u.cumple||''), fVence:u.fVence? new Date(u.fVence):null, estado:u.fVence? ( (new Date(u.fVence)-new Date())/(1000*60*60*24)<0?'vencida': ( (new Date(u.fVence)-new Date())/(1000*60*60*24)<=30?'porVencer':'vigente')):'vigente'})));
-      mostrarDashboardU();
-      const info=document.getElementById('usuariosFileInfo');
-      if(info){ info.style.display='block'; info.innerHTML=`💾 ${usuariosU.length} usuarios recuperados de memoria`; }
-      const bc=document.getElementById('usuariosBtnClear');
-      if(bc) bc.style.display='inline-flex';
-    }
-  }catch(e){ console.log('load usuarios fail',e); }
+  recargarUsuariosDeStorage();
 }
 document.addEventListener('DOMContentLoaded', initUsuarios);
 setTimeout(initUsuarios, 1200);
@@ -17934,51 +17955,146 @@ function psaActualizarTimestampsLocal(){
     return ts;
   }catch(e){ return null; }
 }
-async function psaProbar(){
-  const c=psaGetCreds();
-  if(!c){ psaSetStatus('Primero guardá Centro/Número/Clave.', 'err'); return; }
-  psaSetStatus('Probando conexión a MI PSA…', '');
+async function sincronizarGarantiasPSA(creds, done){
+  if(typeof creds === 'function'){ done = creds; creds = null; }
+  const c = creds || psaGetCreds();
+  if(!c || !c.center || !c.number || !c.password){
+    if(typeof psaSetStatus === 'function') psaSetStatus('Primero guardá Centro/Número/Clave.', 'err');
+    if(typeof done === 'function') done(false, 'Faltan credenciales');
+    return false;
+  }
+  
+  const cfg = (window.APPI_AUTH && window.APPI_AUTH.url && window.APPI_AUTH.anonKey) ? window.APPI_AUTH : null;
+  if(!cfg){
+    if(typeof psaSetStatus === 'function') psaSetStatus('Sin conexión con la nube de APPI.', 'err');
+    if(typeof done === 'function') done(false, 'Sin configuración');
+    return false;
+  }
+  
+  let token = '';
   try{
-    const r=await fetch('https://minegocio.psa.com.ar/login', {credentials:'include', cache:'no-store'});
-    const html=await r.text();
-    const m=html.match(/name="_csrf_token" value="([^"]+)"/);
-    const csrf=m?m[1]:'';
-    if(csrf){ c.csrf=csrf; localStorage.setItem('appsi_psa_creds', JSON.stringify(c)); }
-    const fd=new URLSearchParams();
-    fd.set('_center', c.center); fd.set('_number', c.number); fd.set('_password', c.password); fd.set('_term_use','accept'); fd.set('_csrf_token', csrf);
-    const r2=await fetch('https://minegocio.psa.com.ar/login_check', {method:'POST', body:fd, credentials:'include', headers:{'Content-Type':'application/x-www-form-urlencoded'}, redirect:'follow'});
-    const html2=await r2.text();
-    if(html2.includes('Mi PSA | Inicio') || html2.includes('Cerrar Sesion') || html2.includes('D'+c.number)){
-      psaActualizarTimestampsLocal();
-      try{
-        const r3=await fetch('https://minegocio.psa.com.ar/', {credentials:'include'});
-        const h3=await r3.text();
-        const ok=h3.includes('Mi Negocio');
-        if(ok){
-          localStorage.setItem('appsi_psa_cache_minegocio', JSON.stringify({ventas:'—', comision:'—', ts:Date.now()}));
-          psaSetStatus('✓ Conectado OK a MI PSA y Mi Negocio. Ya podés usar “Abrir Mi Negocio”. Auto-actualización lista.', 'ok');
-        } else {
-          psaSetStatus('✓ Conectado a MI PSA. Mi Negocio requiere SSO extra — usá “Abrir Mi Negocio →” y se loguea solo.', 'ok');
-        }
-      }catch(e){
-        psaSetStatus('✓ Conectado a MI PSA (CORS bloquea lectura de Mi Negocio, pero el acceso directo funcionará).', 'ok');
-      }
-      psaRender();
-      try{ showToast('MI PSA conectado ✓'); }catch(e){}
-      return;
+    if(window.APPIAuth && typeof window.APPIAuth.accessToken === 'function') token = window.APPIAuth.accessToken();
+    if(!token){
+      const v = JSON.parse(localStorage.getItem('appi_auth_session_v1') || 'null');
+      token = v && v.session && v.session.access_token || '';
     }
-    psaSetStatus('No se pudo conectar — revisá Centro/Número/Clave PSA.', 'err');
-    // Igual actualizar fecha para feedback visual (el usuario apretó ↻)
-    psaActualizarTimestampsLocal();
-    try{ showToast('Actualizado · revisá MI PSA', 2200); }catch(e2){}
+  }catch(e){}
+
+  if(typeof psaSetStatus === 'function') psaSetStatus('Conectando a MI PSA y descargando garantías…', '');
+
+  try{
+    const r = await fetch(cfg.url + '/functions/v1/consulta-serial', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': cfg.anonKey,
+        'Authorization': 'Bearer ' + (token || cfg.anonKey)
+      },
+      body: JSON.stringify({
+        action: 'report',
+        center: c.center,
+        number: c.number,
+        password: c.password
+      })
+    });
+    const j = await r.json().catch(() => ({}));
+    if(r.ok && j && j.ok && Array.isArray(j.filas) && j.filas.length){
+      const parsed = j.filas.map((f, idx) => {
+        let fv = null;
+        const vRaw = String(f.v || '').trim();
+        const m = vRaw.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/);
+        if(m){
+          let d = parseInt(m[1], 10), mo = parseInt(m[2], 10) - 1, y = parseInt(m[3], 10);
+          if(y < 100) y += (y > 50 ? 1900 : 2000);
+          fv = new Date(y, mo, d);
+        } else if(vRaw) {
+          const dt = new Date(vRaw);
+          if(!isNaN(dt.getTime())) fv = dt;
+        }
+        let est = 'vigente';
+        if(fv && !isNaN(fv.getTime())){
+          const diffDays = (fv.getTime() - Date.now()) / (1000 * 60 * 60 * 24);
+          if(diffDays < 0) est = 'vencida';
+          else if(diffDays <= 30) est = 'porVencer';
+        }
+        return {
+          id: idx + 1,
+          usuario: String(f.u || '').trim(),
+          telf: String(f.t || '').trim(),
+          domicilio: String(f.d || '').trim(),
+          cp: String(f.c || '').trim(),
+          localidad: String(f.l || '').trim(),
+          producto: String(f.p || '').trim(),
+          serie: String(f.s || '').trim(),
+          fCompra: String(f.c2 || '').trim(),
+          fVenceRaw: vRaw,
+          fVence: fv ? fv.toISOString() : null,
+          cumpleRaw: '',
+          email: '',
+          estado: est,
+          nombreNorm: String(f.u || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim()
+        };
+      });
+
+      try{
+        localStorage.setItem('usuarios_garantias', JSON.stringify(parsed));
+        localStorage.setItem('lastUpdate_usuarios', Date.now().toString());
+        localStorage.setItem('lastUpdate_garantias', Date.now().toString());
+        localStorage.setItem('appsi_psa_lastSync', new Date().toISOString());
+        if(window.APPIDataSync && typeof window.APPIDataSync.saveKey === 'function'){
+          window.APPIDataSync.saveKey('usuarios_garantias', localStorage.getItem('usuarios_garantias'));
+        }
+      }catch(e){}
+
+      if(typeof window.recargarUsuariosDeStorage === 'function'){
+        window.recargarUsuariosDeStorage();
+      } else {
+        window.usuariosU = parsed;
+        if(typeof window.mostrarDashboardU === 'function') window.mostrarDashboardU();
+      }
+
+      psaActualizarTimestampsLocal();
+      try{ actualizarUsuariosMetaBar(); }catch(e){}
+      try{
+        if(window.APPIMensajes && typeof window.APPIMensajes.invalidarJornada === 'function'){
+          window.APPIMensajes.invalidarJornada();
+          window.APPIMensajes.pintarHoy();
+        }
+      }catch(e){}
+
+      const count = (window.usuariosU || parsed).length;
+      const msg = '✓ Conectado a MI PSA · ' + count + ' garantías sincronizadas automáticamente.';
+      if(typeof psaSetStatus === 'function') psaSetStatus(msg, 'ok');
+      try{ showToast('✓ ' + count + ' garantías sincronizadas de MI PSA', 2600); }catch(e){}
+      if(typeof done === 'function') done(true, count);
+      return true;
+    } else {
+      const err = (j && j.error) || 'No se pudo conectar a PSA. Verificá Centro/Número/Clave.';
+      if(typeof psaSetStatus === 'function') psaSetStatus(err, 'err');
+      psaActualizarTimestampsLocal();
+      if(typeof done === 'function') done(false, err);
+      return false;
+    }
   }catch(e){
-    // CORS bloquea fetch pero actualizamos fecha local para que veas que el botón funciona
     psaActualizarTimestampsLocal();
-    psaSetStatus('✓ Actualizado localmente · el navegador bloquea lectura directa (CORS), pero tu clave está guardada. Usá “Abrir Mi Negocio →” si necesitás ver los archivos.', 'ok');
-    try{ showToast('Actualizado ✓ ' + new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'}), 2200); }catch(e2){}
+    const errMsg = 'Error de conexión con PSA.';
+    if(typeof psaSetStatus === 'function') psaSetStatus(errMsg, 'err');
+    if(typeof done === 'function') done(false, errMsg);
+    return false;
   }
 }
-document.addEventListener('DOMContentLoaded', ()=>{ try{ psaRender(); actualizarUsuariosMetaBar(); if(typeof renderEquipo==='function') renderEquipo(); const c=psaGetCreds(); if(c&&c.remember){ setTimeout(psaProbar, 1200); } }catch(e){} });
+window.sincronizarGarantiasPSA = sincronizarGarantiasPSA;
+
+async function psaProbar(){
+  const c = psaGetCreds();
+  if(!c || !c.center || !c.number || !c.password){
+    if(typeof psaSetStatus === 'function') psaSetStatus('Primero guardá Centro/Número/Clave.', 'err');
+    return;
+  }
+  await sincronizarGarantiasPSA(c);
+  if(typeof psaRender === 'function') psaRender();
+}
+document.addEventListener('DOMContentLoaded', ()=>{ try{ psaRender(); actualizarUsuariosMetaBar(); if(typeof renderEquipo==='function') renderEquipo(); const c=psaGetCreds(); if(c&&c.remember&&c.center&&c.number&&c.password){ setTimeout(psaProbar, 1200); } }catch(e){} });
 setTimeout(()=>{ try{ actualizarUsuariosMetaBar(); if(typeof renderEquipo==='function') renderEquipo(); }catch(e){} }, 900);
 setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
 
@@ -18097,13 +18213,9 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
 
 
 <style id="psa-auto-only-style">
-/* PSA AUTO ONLY - ocultar carga manual */
+/* Ocultar inputs nativos crudos (se usan mediante sus botones / zonas estilizadas) */
 #equipoFileInput, #garantiasFileInput, #usuariosFileInput,
-#histFileEquipo, #histFileGarantias, #histFileIngresos, #histRestoreInput,
-#btnUpload, #btnEquipoReload, #btnCargarGarantias, #equipoGarantiasActions,
-#usuariosDropZone, .upload-zone, .hist-file-slot, .hist-upload,
-#usuariosUploadCard { display:none !important; }
-/* Ocultar ayudas de carga manual histórico */
+#histFileEquipo, #histFileGarantias, #histFileIngresos, #histRestoreInput { display:none !important; }
 .hist-annual-help b { display:none; }
 </style>
 <script id="psa-auto-only-script">
@@ -18115,46 +18227,20 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
     }catch(e){ return false; }
   }
   function mostrarAvisoPSA(){
-    // Banners eliminados a pedido 13/09 - solo popup, no banners
     return;
   }
-  // Bloquear triggers manuales restantes
   function bloquearCargaManual(){
-    const ids=['equipoFileInput','garantiasFileInput','usuariosFileInput','histFileEquipo','histFileGarantias','histFileIngresos'];
-    ids.forEach(id=>{
-      const el=document.getElementById(id);
-      if(el){
-        el.addEventListener('click', function(e){
-          e.preventDefault(); e.stopPropagation();
-          if(window.APPIDialog) window.APPIDialog.alert('La carga manual fue desactivada. Conectá tu MI PSA en ⚙️ → Mi perfil y se actualiza solo.',{title:'Actualización automática',icon:'🔗'});
-          else if(window.APPIDialog) window.APPIDialog.alert('Carga manual desactivada. Usá MI PSA.',{title:'MI PSA',icon:'🔗'});
-          return false;
-        }, true);
-      }
-    });
-    // Interceptar botones que abrían file input
-    const btns=['btnEquipoReload','btnCargarGarantias','btnUpload'];
-    btns.forEach(id=>{
-      const b=document.getElementById(id);
-      if(b) b.onclick = function(e){
-        e.preventDefault();
-        if(typeof abrirCuentaDesdeMenu==='function') abrirCuentaDesdeMenu();
-        if(window.APPIDialog) window.APPIDialog.alert('Conectá tu MI PSA para actualización automática.',{title:'MI PSA',icon:'🔗'});
-      };
-    });
+    // Permitir selección y carga manual como alternativa de respaldo
   }
   document.addEventListener('DOMContentLoaded', ()=>{
     mostrarAvisoPSA();
     bloquearCargaManual();
-    setTimeout(mostrarAvisoPSA, 800);
   });
-  setTimeout(()=>{ mostrarAvisoPSA(); bloquearCargaManual(); }, 1200);
   // Observar cambios de vista
   const origShowView = window.showView;
   if(origShowView){
     window.showView = function(id,opts){
       const r=origShowView.apply(this, arguments);
-      setTimeout(()=>{ mostrarAvisoPSA(); bloquearCargaManual(); }, 200);
       return r;
     };
   }

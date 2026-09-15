@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v795-stock-compartir-sin-firma';
+const CACHE_NAME = 'appi-v796-auto-sync-psa';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

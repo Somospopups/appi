@@ -1376,7 +1376,7 @@
   function armarTarjetas(){
     var lista = [tarjetaEspecial()];
     try{ if (window.APPIMensajes && window.APPIMensajes.registrarPartido) window.APPIMensajes.registrarPartido(); }catch(e){}
-    [tarjetaHoyConviene(), tarjetaPromoBotella(), tarjetaGanaste(), tarjetaMetodoEnvio(), tarjetaLlegamos(), tarjetaDuchaRinnova(), tarjetaCanje(), tarjetaJornada(), tarjetaCumples(), tarjetaReempadronar(), tarjetaEquipo(), tarjetaPanel(), tarjetaUsuarios()].forEach(function(t){
+    [tarjetaJornada(), tarjetaHoyConviene(), tarjetaPromoBotella(), tarjetaGanaste(), tarjetaMetodoEnvio(), tarjetaLlegamos(), tarjetaDuchaRinnova(), tarjetaCanje(), tarjetaCumples(), tarjetaReempadronar(), tarjetaEquipo(), tarjetaPanel(), tarjetaUsuarios()].forEach(function(t){
       if (t) lista.push(t);
     });
     return lista;

@@ -35,7 +35,7 @@
 
   var LINK_RETROLAVADO = 'https://www.youtube.com/watch?v=qa6xkQQsyg8';
   var LINK_CANJE = 'https://www.youtube.com/watch?v=evwYO9-o5MY';
-  var MESES_MANTENIMIENTO = 3;   // el ciclo que pidió el usuario (cambiado de 6 a 3 a pedido 2026-09-10)
+  var MESES_MANTENIMIENTO = 6;   // ciclo de mantenimiento acordado (6 meses)
   var DIAS_ANIO = 365;
   var CUPO_DIA = 10;             // las 10 de hoy: mismo tope que WhatsApp
   var DIAS_CHECKIN = 90;         // vigentes sin contacto: vuelven a la cola
