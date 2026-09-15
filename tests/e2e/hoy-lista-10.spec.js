@@ -170,3 +170,5 @@ test('los colores persisten al volver a armar la tarjeta', async ({ page }) => {
   expect(html).not.toContain('data-mu-no');
 });
 
+
+module.exports = { entrar, irATarjetaHoy };
