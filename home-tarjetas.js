@@ -604,30 +604,12 @@
   function tarjetaEspecial(){
     var nombre = nombrePila();
     var frase = fraseDelDia().replace('{nombre}', nombre || 'campeón/a');
-    var chips = [];
-    try{
-      var cul = culturaMes();
-      chips.push('💎 ' + String(cul.pb).replace('.', ',') + ' / ' + cul.metaPb + ' PB');
-      chips.push('🤝 ' + cul.invitados + ' / ' + cul.metaInv + ' invitados');
-    }catch(e){}
-    try{
-      if (window.APPIMensajes && window.APPIMensajes.resumenHoy){
-        var r = window.APPIMensajes.resumenHoy();
-        if (r.total) chips.push('✓ ' + r.hechas + ' / ' + r.total);
-      }
-    }catch(e){}
-    try{
-      if (window.APPITel && window.APPITel.cuidado && window.APPITel.cuidado.estado){
-        var linea = window.APPITel.cuidado.estado('');
-        chips.push('💬 ' + linea.usados + ' / ' + linea.tope + ' hoy');
-      }
-    }catch(e){}
+    // v805: sin píldoras de información abajo — la tarjeta es la frase, pura.
     return {
       cat: 'especial', icono: '💙', kicker: 'Para vos' + (nombre ? ', ' + nombre : ''),
       titulo: 'Tu impulso de hoy',
       html: '<div class="ht-esp-centro"><p class="ht-frase ht-esp-frase"><span class="ht-esp-comilla" aria-hidden="true">“</span>' +
-            esc(frase) + '<span class="ht-esp-cierre" aria-hidden="true">”</span></p></div>' +
-            (chips.length ? '<div class="ht-chips">' + chips.map(function(c){ return '<span>' + esc(c) + '</span>'; }).join('') + '</div>' : ''),
+            esc(frase) + '<span class="ht-esp-cierre" aria-hidden="true">”</span></p></div>',
       cta: null
     };
   }
@@ -757,13 +739,12 @@
       filas.push('<li>… y ' + (lista.length - 3) + ' más</li>');
       items.push(function(){ if (typeof window.openMiGestion === 'function') window.openMiGestion(); });
     }
-    var primero = String(lista[0].nombre || '').split(/\s+|,/)[0] || 'la primera';
     return {
       cat: 'jornada', icono: '📅', kicker: 'Tu jornada',
       titulo: lista.length === 1 ? '1 contacto te espera hoy' : lista.length + ' contactos te esperan hoy',
       html: '<p class="ht-nota">Tocá a la persona y se abre su ficha.</p><ul class="ht-lista">' + filas.join('') + '</ul>',
       items: items,
-      cta: { label: 'Ir con ' + primero, go: items[0] }
+      cta: null // v805: sin botón abajo — la acción vive en la fila
     };
   }
 
@@ -864,7 +845,7 @@
       titulo: total === 1 ? 'Hoy hay un cumpleaños' : 'Hoy hay ' + total + ' cumpleaños',
       html: '<p class="ht-nota">Tocá a la persona y sale el saludo por WhatsApp.</p><ul class="ht-lista">' + filas.join('') + '</ul>',
       items: items,
-      cta: { label: 'Revisar los cumpleaños del mes', go: verCumplesDelMes }
+      cta: null // v805: sin botón abajo — el saludo vive en la fila
     };
   }
 
@@ -1104,7 +1085,7 @@
       html: '<p class="ht-frase">Te falta' + (partes.length > 1 ? 'n' : '') + ' ' + partes.join(' y ') + ' para completar el mes.</p>' + extra +
             '<div class="ht-chips"><span>💎 ' + String(cul.pb).replace('.', ',') + ' / ' + cul.metaPb + '</span><span>🤝 ' + cul.invitados + ' / ' + cul.metaInv + '</span></div>',
       items: prospecto ? [abrirContacto(prospecto)] : (ref ? [pedirReferidoA(ref)] : null),
-      cta: { label: prospecto ? 'Ir con ' + (pilaDe(prospecto.nombre) || 'esa persona') : (faltaInv ? 'Cargar un invitado' : 'Cargar mi avance'), go: prospecto ? abrirContacto(prospecto) : abrirCultura }
+      cta: null // v805: sin botón abajo — la acción vive en la fila
     };
   }
 
@@ -1135,9 +1116,7 @@
       titulo: 'Hay gente esperando tu mensaje',
       html: '<p class="ht-nota">Tocá a la persona y se abre su ficha.</p><ul class="ht-lista">' + filas.join('') + '</ul>',
       items: items,
-      cta: nuevos.length
-        ? { label: 'Ir con ' + (String(nuevos[0].nombre || '').split(/\s+|,/)[0] || 'la primera'), go: items[0] }
-        : { label: 'Ver los vencidos de hoy', go: vistaHoy }
+      cta: null // v805: sin botón abajo — la ficha vive en la fila
     };
   }
 
@@ -1180,7 +1159,7 @@
               '<ul class="ht-lista">' + filas.join('') + '</ul>' +
               '<div class="ht-chips"><span>✓ ' + r.hechas + '</span><span>✗ ' + r.noHechas + '</span><span>quedan ' + r.pendientes + '</span></div>',
         items: items,
-        cta: { label: todas ? 'Ver en Usuarios' : 'Ir a marcar', go: items[0] || function(){ if (typeof window.showView === 'function') window.showView('view-usuarios'); } }
+        cta: null // v805: sin botón abajo — el carrusel vive en la fila
       };
     }catch(e){ return null; }
   }
@@ -1210,7 +1189,7 @@
             '<li><b>' + tope + ' personas distintas por día.</b> A la misma podés escribirle de nuevo.</li>' +
             '<li><b>Un minuto entre cada una.</b> Mañana otros ' + tope + '. En dos semanas, ' + (tope * 14) + ' — y tu número sigue vivo.</li>' +
             '</ol>',
-      cta: { label: 'Entendido, cuido mi línea', go: entendido }
+      cta: null // v805: sin botón abajo (aviso informativo)
     };
   }
 
@@ -1259,7 +1238,7 @@
       html: '<p class="ht-nota">Vigentes y vencidos. Un toque y sale el video.</p>' +
             '<ul class="ht-lista">' + filas.join('') + '</ul>',
       items: items,
-      cta: { label: 'Enviar a ' + (pilaDe(lista[0].usuario || lista[0].nombre) || 'la primera'), go: items[0] }
+      cta: null // v805: sin botón abajo — el envío vive en la fila
     };
   }
 
@@ -1377,7 +1356,10 @@
   function armarTarjetas(){
     var lista = [tarjetaEspecial()];
     try{ if (window.APPIMensajes && window.APPIMensajes.registrarPartido) window.APPIMensajes.registrarPartido(); }catch(e){}
-    [tarjetaJornada(), tarjetaHoyConviene(), tarjetaPromoBotella(), tarjetaGanaste(), tarjetaMetodoEnvio(), tarjetaLlegamos(), tarjetaDuchaRinnova(), tarjetaCanje(), tarjetaCumples(), tarjetaReempadronar(), tarjetaEquipo(), tarjetaPanel(), tarjetaUsuarios()].forEach(function(t){
+    // v805: mazo unificado sobre el modelo de reempadronamiento (lista de
+    // gente + colores por estado, sin botones abajo). "Hoy te conviene" se
+    // quitó a pedido y el Plan Canje vive dentro de la tarjeta Usuarios.
+    [tarjetaJornada(), tarjetaPromoBotella(), tarjetaGanaste(), tarjetaMetodoEnvio(), tarjetaLlegamos(), tarjetaDuchaRinnova(), tarjetaCumples(), tarjetaReempadronar(), tarjetaEquipo(), tarjetaPanel(), tarjetaUsuarios()].forEach(function(t){
       if (t) lista.push(t);
     });
     return lista;
@@ -1522,14 +1504,14 @@
       '.ht-card.ht-poster.ht-cat-ganaste,body.dark .ht-card.ht-poster.ht-cat-ganaste,.ht-card.ht-poster.ht-cat-llegamos,body.dark .ht-card.ht-poster.ht-cat-llegamos{background:linear-gradient(150deg,#157a60,#0f5a46);border:0;box-shadow:0 22px 60px rgba(15,90,70,.4)}',
       '.ht-card.ht-poster.ht-cat-metodo,body.dark .ht-card.ht-poster.ht-cat-metodo{background:linear-gradient(150deg,#b03e12,#8e2e0e);border:0;box-shadow:0 22px 60px rgba(142,46,14,.4)}',
       '.ht-card.ht-poster.ht-cat-canje,body.dark .ht-card.ht-poster.ht-cat-canje{background:linear-gradient(150deg,#3d63c9,#2c4aa3)}',
-      '.ht-card.ht-poster.ht-cat-jornada,body.dark .ht-card.ht-poster.ht-cat-jornada{background:linear-gradient(150deg,#5b3d9c,#452e78)}',
+      '.ht-card.ht-poster.ht-cat-jornada,body.dark .ht-card.ht-poster.ht-cat-jornada{background:linear-gradient(150deg,#8a6410,#6b4e0c)}',
       '.ht-card.ht-poster.ht-cat-oportunidades,body.dark .ht-card.ht-poster.ht-cat-oportunidades{background:linear-gradient(150deg,#7a2e7a,#5e225e)}',
       '.ht-card.ht-poster.ht-cat-cumples,body.dark .ht-card.ht-poster.ht-cat-cumples{background:linear-gradient(150deg,#9a2d58,#7a2145)}',
       '.ht-card.ht-poster.ht-cat-reempadronar,body.dark .ht-card.ht-poster.ht-cat-reempadronar{background:linear-gradient(150deg,#2f5d4a,#234538)}',
       '.ht-card.ht-poster.ht-cat-equipo,body.dark .ht-card.ht-poster.ht-cat-equipo{background:linear-gradient(150deg,#1f4e79,#173a5a)}',
       '.ht-card.ht-poster.ht-cat-panel,body.dark .ht-card.ht-poster.ht-cat-panel{background:linear-gradient(150deg,#3a4a6b,#2c3852)}',
-      '.ht-card.ht-poster.ht-cat-usuarios,body.dark .ht-card.ht-poster.ht-cat-usuarios{background:linear-gradient(150deg,#0e6a90,#0b5878)}',
-      '.ht-card.ht-poster.ht-cat-rinnova,body.dark .ht-card.ht-poster.ht-cat-rinnova{background:linear-gradient(150deg,#b8441c,#8f3314)}',
+      '.ht-card.ht-poster.ht-cat-usuarios,body.dark .ht-card.ht-poster.ht-cat-usuarios{background:linear-gradient(150deg,#6d28d9,#4c1d95)}',
+      '.ht-card.ht-poster.ht-cat-rinnova,body.dark .ht-card.ht-poster.ht-cat-rinnova{background:linear-gradient(150deg,#7f1d1d,#5b1313)}',
       '.ht-card.ht-poster.ht-cat-promo,body.dark .ht-card.ht-poster.ht-cat-promo{background:linear-gradient(150deg,#0e6a8c,#0b5878 58%,#1a9ab0);border:0;box-shadow:0 22px 60px rgba(14,106,140,.34)}',
       '.ht-card.ht-poster.ht-cat-otra,body.dark .ht-card.ht-poster.ht-cat-otra{background:linear-gradient(150deg,#0e6a8c,#0b5878)}',
       'body.dark .ht-card.ht-poster h3,body.dark .ht-card.ht-poster.ht-esp h3,body.dark .ht-card.ht-poster.ht-hoy h3,body.dark .ht-card.ht-poster.ht-alerta h3,body.dark .ht-card.ht-poster.ht-ganaste h3{color:#fff}',

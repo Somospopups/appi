@@ -199,11 +199,11 @@ test('las tarjetas son inteligentes: solo aparecen las categorías con novedades
   await entrar(page);
   const cats = await page.evaluate(() => window.APPIHomeTarjetas.armarTarjetas().map(t => t.cat));
   expect(cats[0]).toBe('especial');
-  expect(cats).toContain('hoy');           // Lucía tiene presentación hoy + María a un paso del Bonus
-  expect(cats).not.toContain('canje');     // sin usuarios de garantías
+  expect(cats).not.toContain('hoy');   // v805: «Hoy te conviene» se quitó del mazo
+  expect(cats).not.toContain('canje');     // v805: Plan Canje vive dentro de Usuarios
   expect(cats).toContain('jornada');   // Jorge y Lucía tienen fecha para hoy
   expect(cats).toContain('panel');         // Carla está nueva sin contactar
-  expect(cats).not.toContain('oportunidades'); // v563: el Bonus vive en Hoy te conviene
+  expect(cats).not.toContain('oportunidades'); // v805: el bonus no vive en ninguna tarjeta
   expect(cats).not.toContain('cumples');   // nadie cumple años en los datos
   expect(cats).not.toContain('usuarios');  // sin planilla de garantías cargada
 });
@@ -379,16 +379,17 @@ test('un toque con temblor de dedo sobre el botón dispara la acción igual', as
   }
   await expect(page.locator('#htOverlay')).toContainText('Tu jornada');
   // El dedo real no baja quieto: baja, tiembla ~9px y suelta. Eso es un TOQUE.
+  // v805: el objetivo es la fila de Jorge (los botones abajo ya no existen).
   await page.evaluate(() => {
-    const cta = document.querySelector('.ht-card:not(.detras1):not(.detras2) .ht-cta');
-    const r = cta.getBoundingClientRect();
+    const fila = [...document.querySelectorAll('.ht-card:not(.detras1):not(.detras2) .ht-lista li')].find(li => li.textContent.includes('Jorge'));
+    const r = fila.getBoundingClientRect();
     const x = r.x + r.width / 2, y = r.y + r.height / 2;
-    const fire = (type, cx) => cta.dispatchEvent(new PointerEvent(type, { bubbles: true, clientX: cx, clientY: y, pointerId: 1, pointerType: 'touch' }));
+    const fire = (type, cx) => fila.dispatchEvent(new PointerEvent(type, { bubbles: true, clientX: cx, clientY: y, pointerId: 1, pointerType: 'touch' }));
     fire('pointerdown', x);
     fire('pointermove', x + 5);
     fire('pointermove', x + 9);
     fire('pointerup', x + 9);
-    cta.dispatchEvent(new MouseEvent('click', { bubbles: true, clientX: x + 9, clientY: y }));
+    fila.dispatchEvent(new MouseEvent('click', { bubbles: true, clientX: x + 9, clientY: y }));
   });
   await expect(page.locator('#gestionDrawer')).toContainText('Jorge Salas', { timeout: 5000 });
   // Y el mazo quedó vivo en el Home (v323).
@@ -473,39 +474,6 @@ test('deslizar a la derecha vuela con el mismo gesto que a la izquierda, espejad
   await expect(page.locator('.ht-card:not(.detras1):not(.detras2)')).toContainText('Tu impulso de hoy');
 });
 
-// v320 · Los cumpleañeros y las oportunidades de bonus del equipo salen de la
-// planilla de Línea Descendente, donde el teléfono se llama `tel`. Las
-// tarjetas buscaban `telefono`/`telf` (campos que la planilla no genera), así
-// que con datos reales nunca encontraban el número y en vez de abrir el
-// WhatsApp del cumpleañero mandaban a Mi Equipo.
-test('proponer el bonus abre el WhatsApp de la persona con el teléfono real de la planilla (v320)', async ({ page }) => {
-  await entrar(page);
-  await page.evaluate(() => {
-    // María viene de la planilla con su teléfono en `tel`, como en la vida real.
-    const data = JSON.parse(localStorage.getItem('equipoData'));
-    data.personas[0].tel = '351 766-9967';
-    localStorage.setItem('equipoData', JSON.stringify(data));
-    if (typeof loadEquipoFromStorage === 'function') loadEquipoFromStorage();
-    window.__saludos = [];
-    window.APPITel.abrir = (tel, texto, nombre) => { window.__saludos.push({ tel, texto, nombre }); return true; };
-  });
-  await page.evaluate(() => window.APPIHomeTarjetas.abrir());
-  // El Bonus vive en Hoy te conviene (v563). Avanzamos hasta esa carta y tocamos a María.
-  while (true) {
-    const txt = await page.locator('.ht-card:not(.detras1):not(.detras2):not(.ht-fantasma)').textContent();
-    if (txt.includes('Hoy te conviene') && txt.includes('María')) break;
-    await page.evaluate(() => window.APPIHomeTarjetas.pasar());
-    await page.waitForTimeout(400);
-  }
-  await page.locator('.ht-lista li', { hasText: 'María' }).click();
-  const saludos = await page.evaluate(() => window.__saludos);
-  expect(saludos).toHaveLength(1);
-  expect(saludos[0].texto).toContain('Bonus');
-  expect(saludos[0].tel).toContain('351');
-});
-
-// v322 · Con dos cumpleañeros en la tarjeta, el primero saludaba por WhatsApp
-// pero el segundo no. Este test toca el SEGUNDO renglón y exige su saludo.
 test('con dos cumpleañeros, el segundo renglón también saluda por WhatsApp (v322)', async ({ page }) => {
   await entrar(page);
   const hoyLocal = new Date();
@@ -579,49 +547,13 @@ test('las tarjetas muestran nombre y apellido, no solo el apellido (v323)', asyn
   }, cumpleHoy);
   const r = await page.evaluate(() => {
     const t = window.APPIHomeTarjetas.armarTarjetas();
-    return {
-      cumple: (t.find(x => x.cat === 'cumples') || {}).html || '',
-      bonus: (t.find(x => x.cat === 'hoy') || {}).html || ''
-    };
+    return (t.find(x => x.cat === 'cumples') || {}).html || '';
   });
   // Cumpleaños: nombre y apellido en su orden, sin gritos.
-  expect(r.cumple).toContain('Sebastian Troncoso');
-  expect(r.cumple).not.toContain('TRONCOSO,');
-  // Hoy te conviene (unificada): María Pérez ya venía legible y sigue completa.
-  expect(r.bonus).toContain('María Pérez');
+  expect(r).toContain('Sebastian Troncoso');
+  expect(r).not.toContain('TRONCOSO,');
 });
 
-// v563 · Hoy te conviene junta la jugada del día y el Bonus del equipo.
-test('Hoy te conviene junta la jugada del día y el Bonus (v563)', async ({ page }) => {
-  await entrar(page);
-  const r = await page.evaluate(() => {
-    const t = window.APPIHomeTarjetas.armarTarjetas();
-    const hoy = t.find(x => x.cat === 'hoy') || {};
-    return { cats: t.map(x => x.cat), kicker: hoy.kicker, titulo: hoy.titulo, html: hoy.html, cta: hoy.cta && hoy.cta.label };
-  });
-  expect(r.cats).not.toContain('oportunidades');
-  expect(r.kicker).toMatch(/Hoy te conviene/i);
-  expect(r.titulo).toContain('Lucía');
-  expect(r.html).toContain('María Pérez');
-  expect(r.html).toContain('9 PB');
-  expect(r.cta).toMatch(/Lucía/);
-  await page.evaluate(() => window.APPIHomeTarjetas.abrir());
-  while (true) {
-    const txt = await page.locator('.ht-card:not(.detras1):not(.detras2):not(.ht-fantasma)').textContent();
-    if (txt.includes('Hoy te conviene') && txt.includes('María')) break;
-    await page.evaluate(() => window.APPIHomeTarjetas.pasar());
-    await page.waitForTimeout(400);
-  }
-  const cta = page.locator('.ht-card:not(.detras1):not(.detras2):not(.ht-fantasma) .ht-cta');
-  await expect(cta).toHaveText(/Lucía/);
-  await cta.click();
-  await expect(page.locator('#view-gestion')).toHaveClass(/active/);
-  await expect(page.locator('#htOverlay')).toHaveCount(1);
-});
-
-// v324 · Mientras se arrastra, atrás asoma la tarjeta que DE VERDAD viene:
-// a la izquierda la siguiente, a la derecha la anterior. Antes asomaba
-// siempre la siguiente y al volver aparecía otra: quedaba feo.
 test('al arrastrar asoma la tarjeta correcta según la dirección (v324)', async ({ page }) => {
   await entrar(page);
   await page.evaluate(() => window.APPIHomeTarjetas.abrir());
@@ -680,26 +612,3 @@ test('la tarjeta especial se viste distinta y sin espacio muerto (v325)', async 
   await expect(page.locator('.ht-card:not(.detras1):not(.detras2):not(.ht-fantasma)')).not.toHaveClass(/ht-esp/);
 });
 
-// v325 · El botón grande de Cumpleaños lleva a la lista del mes en Mi Equipo.
-test('el botón de Cumpleaños dice Revisar los cumpleaños del mes y va a Mi Equipo (v325)', async ({ page }) => {
-  await entrar(page);
-  const hoyLocal = new Date();
-  const cumpleHoy = `1980-${String(hoyLocal.getMonth() + 1).padStart(2, '0')}-${String(hoyLocal.getDate()).padStart(2, '0')}`;
-  await page.evaluate((cumple) => {
-    const data = JSON.parse(localStorage.getItem('equipoData'));
-    data.personas.push({ id: 9, nivel: 1, codigo: '02-111', nombre: 'LOPEZ, ANA', cat: 'D', pnAct: 2, cumple, tel: '351 766-9967', hijos: [] });
-    localStorage.setItem('equipoData', JSON.stringify(data));
-    if (typeof loadEquipoFromStorage === 'function') loadEquipoFromStorage();
-  }, cumpleHoy);
-  await page.evaluate(() => window.APPIHomeTarjetas.abrir());
-  while (!(await page.locator('.ht-card:not(.detras1):not(.detras2):not(.ht-fantasma)').textContent()).includes('cumpleaños')) {
-    await page.evaluate(() => window.APPIHomeTarjetas.pasar());
-    await page.waitForTimeout(400);
-  }
-  const cta = page.locator('.ht-card:not(.detras1):not(.detras2):not(.ht-fantasma) .ht-cta');
-  await expect(cta).toHaveText('Revisar los cumpleaños del mes');
-  await cta.click();
-  await expect(page.locator('#view-equipo')).toHaveClass(/active/);
-  // Y la lista de cumpleaños del mes está ahí para revisar.
-  await expect(page.locator('#bdayListWrap')).toBeVisible({ timeout: 5000 });
-});

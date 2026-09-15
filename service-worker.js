@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v804-sin-botones';
+const CACHE_NAME = 'appi-v805-mazo-unificado';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
