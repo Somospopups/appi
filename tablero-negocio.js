@@ -812,17 +812,9 @@
   /* ---------------- hooks ---------------- */
   function inyectarHome(){
     estilo();
-    // Inyectar GPS en view-negocio
-    var negocioView = $('view-negocio');
-    if (negocioView && !$('gpsBlock')) {
-      var header = negocioView.querySelector('header');
-      if (header) header.insertAdjacentHTML('afterend', htmlGps());
-    } else if ($('gpsBlock')) {
-      var g = $('gpsBlock');
-      g.outerHTML = htmlGps();
-    }
-    // La botella y el simulador viven en Herramientas. El Home ya no mantiene
-    // la grilla antigua homeExtraKeep, eliminada con el timeline de v247.
+    // v802: el GPS del mes deja de mostrarse en Mi negocio a pedido del
+    // usuario: su lugar lo ocupa la Ruleta PSA (la inyecta ruleta-psa.js).
+    // El cálculo (datosGps) queda intacto por si se lo quiere volver a poner.
   }
 
   // Enganches suaves: este script vive en el <head> y las funciones del

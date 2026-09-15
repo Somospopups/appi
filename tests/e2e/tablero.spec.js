@@ -60,15 +60,14 @@ async function entrar(page) {
   await page.evaluate(() => window.showView('view-negocio'));
 }
 
-test('el GPS del mes lee la Línea y el Panel', async ({ page }) => {
+test('Mi negocio muestra la Ruleta PSA en el lugar del GPS (v802)', async ({ page }) => {
   await entrar(page);
-  const gps = page.locator('#gpsBlock');
-  await expect(gps).toBeVisible();
-  await expect(gps).toContainText('12 / 12');   // PB personales
-  await expect(gps).toContainText('1 / 2');     // patrocinios con 9 PB
-  await expect(gps).toContainText('2 / 30');    // demos autoregistradas
-  await expect(gps).toContainText('1 / 10');    // cierres
-  await expect(gps).toContainText('Vas encaminado');
+  // El GPS del mes deja de mostrarse: su lugar lo ocupa la ruleta.
+  expect(await page.locator('#gpsBlock').count()).toBe(0);
+  const ruleta = page.locator('#ruletaNegCard');
+  await expect(ruleta).toBeVisible({ timeout: 10000 });
+  await expect(ruleta).toContainText('Ruleta PSA');
+  await expect(ruleta).toContainText('GIRAR');
 });
 
 test('la botella calcula conciencia y se comparte', async ({ page }) => {

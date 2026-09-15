@@ -1,12 +1,17 @@
 /* ============================================================
-   APPI · Ruleta PSA (v801)
+   APPI · Ruleta PSA (v801 → v802)
    ------------------------------------------------------------
    Una ruleta animada y con sonido para jugar con el trabajo del
    día: la girás y cae una tarea de PSA real (escribirle a 3
-   clientes, llamar, pedir referido, demo, revisar stock…) o el
-   premio "¡Ya fue mucho por hoy!".
+   clientes, llamar, pedir referido, demo, revisar stock…) o un
+   premio ("¡Ya fue mucho por hoy!" o "⭐⭐ Doble").
+   - v802: la entrada vive en Mi negocio (en el lugar donde estaba
+     el GPS del mes). Cada tarea trae su botón "IR →" que te lleva
+     directo a la sección (stock → Mi Stock, negocio → Mi negocio,
+     tareas de cliente → la ficha de ese cliente lista para escribir).
+   - Racha 🔥: días consecutivos con al menos una ⭐.
+   - ⭐⭐ Doble: si cae, cada ✓ del día vale 2 ⭐.
    - Los nombres salen de la base del teléfono (usuariosTodosActual).
-   - Cada tarea hecha suma una ⭐ al día (appi_ruleta_v1_<uid>).
    - Sin archivos externos: canvas + WebAudio (bips, ticks y
      campanita), funciona offline como el resto de la app.
    ============================================================ */
@@ -31,6 +36,9 @@ function hoyISO(){
   var h = new Date();
   return h.getFullYear() + '-' + String(h.getMonth()+1).padStart(2,'0') + '-' + String(h.getDate()).padStart(2,'0');
 }
+function claveDe(d){
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
 function leerEstado(){
   try{
     var raw = JSON.parse(localStorage.getItem(storeKey()) || '{}');
@@ -39,16 +47,42 @@ function leerEstado(){
 }
 function estadoHoy(){
   var d = leerEstado();
-  return d[hoyISO()] || { tareas: 0, log: [] };
+  return d[hoyISO()] || { tareas: 0, log: [], doble: false };
 }
-function sumarTarea(detalle){
+function rachaRuleta(){
+  // Días seguidos con al menos una ⭐. Si hoy todavía no se marcó
+  // nada, la racha se cuenta desde ayer (el día de hoy no la corta).
+  var d = leerEstado();
+  var n = 0;
+  var fecha = new Date();
+  if (!estadoHoy().tareas) fecha.setDate(fecha.getDate() - 1);
+  for (var i = 0; i < 60; i++){
+    var dia = d[claveDe(fecha)];
+    if (!dia || !(dia.tareas > 0)) break;
+    n++;
+    fecha.setDate(fecha.getDate() - 1);
+  }
+  return n;
+}
+function setDoble(){
   var d = leerEstado();
   var k = hoyISO();
-  if (!d[k]) d[k] = { tareas: 0, log: [] };
-  d[k].tareas = (d[k].tareas || 0) + 1;
-  d[k].log.push({ t: Date.now(), detalle: String(detalle || '').slice(0, 80) });
+  if (!d[k]) d[k] = { tareas: 0, log: [], doble: false };
+  d[k].doble = true;
+  d[k].log.push({ t: Date.now(), detalle: '⭐⭐ Doble activado' });
   try{ localStorage.setItem(storeKey(), JSON.stringify(d)); }catch(e){}
-  pintarCta();
+  pintarTarjeta();
+}
+function sumarTarea(detalle, ganancia){
+  var d = leerEstado();
+  var k = hoyISO();
+  if (!d[k]) d[k] = { tareas: 0, log: [], doble: false };
+  var g = ganancia || (d[k].doble ? 2 : 1);
+  d[k].tareas = (d[k].tareas || 0) + g;
+  d[k].log.push({ t: Date.now(), detalle: String(detalle || '').slice(0, 80), g: g });
+  try{ localStorage.setItem(storeKey(), JSON.stringify(d)); }catch(e){}
+  pintarTarjeta();
+  return g;
 }
 
 function contactos(){
@@ -65,7 +99,6 @@ function nombreDe(u){
 function telDigitos(u){
   return String((u && (u.telf || u.telefono)) || '').replace(/\D/g, '');
 }
-// Reparte los contactos por segmentos sin repetir dentro de la misma ruleta.
 function repartir(cs, n){
   var out = [], copia = cs.slice();
   for (var i = 0; i < n; i++){
@@ -84,6 +117,7 @@ function armarSegmentos(){
     { id: 'llamada', ico: '📞', corto: 'LLAMAR',        color: '#168765', kind: 'llamada', user: r[0] },
     { id: 'referido',ico: '🗣️', corto: 'REFERIDO',      color: '#b8860b', kind: 'referido', user: r[1] },
     { id: 'mucho',   ico: '🏆', corto: 'MUCHO POR HOY', color: '#3a7bd5', kind: 'mucho' },
+    { id: 'doble',   ico: '⭐⭐', corto: 'DOBLE',        color: '#e8a020', kind: 'doble' },
     { id: 'demo',    ico: '💧', corto: 'DEMO',          color: '#0e9594', kind: 'demo',    user: r[2] },
     { id: 'stock',   ico: '📦', corto: 'STOCK',         color: '#8e44ad', kind: 'stock' },
     { id: 'retro',   ico: '🔧', corto: 'RETOLAVADO',    color: '#c0392b', kind: 'retro' },
@@ -145,6 +179,51 @@ function campana(ganadora){
   }catch(e){}
 }
 
+/* ---------- navegación (sistema de las tarjetas) ---------- */
+function irPara(seg){
+  function go(fn){
+    return function(){
+      try{ fn(); }catch(e){}
+      try{ cerrar(); }catch(e2){}
+    };
+  }
+  switch (seg.kind){
+    case 'stock':
+      return { label: 'IR → Mi Stock', go: go(function(){
+        if (typeof window.openStock === 'function') window.openStock();
+        else if (typeof window.showView === 'function') window.showView('view-stock');
+      }) };
+    case 'negocio':
+      return { label: 'IR → Mi negocio', go: go(function(){
+        if (typeof window.showView === 'function') window.showView('view-negocio');
+      }) };
+    case 'retro':
+    case 'msg3':
+      return { label: 'IR → Mis clientes', go: go(function(){
+        if (typeof window.showView === 'function') window.showView('view-usuarios');
+      }) };
+    case 'llamada': case 'referido': case 'demo': case 'escribir': case 'checkin':
+      if (seg.user){
+        var u = seg.user;
+        return { label: 'IR → Ficha de ' + nombreDe(u), go: go(function(){
+          if (typeof window.showView === 'function') window.showView('view-usuarios');
+          try{
+            if (window.APPIMensajes && window.APPIMensajes.abrirFilaUsuario){
+              setTimeout(function(){
+                try{ window.APPIMensajes.abrirFilaUsuario('checkin', u); }catch(e){}
+              }, 250);
+            }
+          }catch(e){}
+        }) };
+      }
+      return { label: 'IR → Mis clientes', go: go(function(){
+        if (typeof window.showView === 'function') window.showView('view-usuarios');
+      }) };
+    default:
+      return null; // premios: no hay destino
+  }
+}
+
 /* ---------- DOM ---------- */
 var overlay, canvas, card, pointer, girando = false, rotacion = 0, segs = [];
 
@@ -153,13 +232,14 @@ function css(){
   var st = document.createElement('style');
   st.id = 'ruletaCss';
   st.textContent = [
-    '.ruleta-cta{display:flex;align-items:center;gap:10px;width:100%;box-sizing:border-box;margin:0 0 10px;padding:10px 12px;border:0;border-radius:16px;background:linear-gradient(135deg,#0b5878,#3ad0a4);color:#fff;cursor:pointer;text-align:left;box-shadow:0 6px 18px rgba(11,88,120,.28)}',
+    '.ruleta-cta{display:flex;align-items:center;gap:10px;width:100%;box-sizing:border-box;margin:0;padding:10px 12px;border:0;border-radius:16px;background:linear-gradient(135deg,#0b5878,#3ad0a4);color:#fff;cursor:pointer;text-align:left;box-shadow:0 6px 18px rgba(11,88,120,.28)}',
     '.ruleta-cta:active{transform:scale(.985)}',
     '.ruleta-cta-ico{font-size:26px;filter:drop-shadow(0 2px 3px rgba(0,0,0,.25))}',
     '.ruleta-cta-txt{flex:1;min-width:0;font:inherit}',
     '.ruleta-cta-txt b{display:block;font-size:14px}',
     '.ruleta-cta-txt span{display:block;font-size:11.5px;opacity:.92}',
     '.ruleta-cta-go{font-size:12px;font-weight:900;background:rgba(255,255,255,.18);padding:7px 12px;border-radius:999px;letter-spacing:.4px}',
+    '.ruleta-neg-sub{font-size:12.5px;color:#8a8a94;margin:2px 0 10px}',
     '.ruleta-ov{position:fixed;inset:0;z-index:9999;background:rgba(16,18,30,.72);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .22s}',
     '.ruleta-ov.open{opacity:1;pointer-events:auto}',
     '.ruleta-box{position:relative;width:min(92vw,380px);text-align:center}',
@@ -173,7 +253,7 @@ function css(){
     '.ruleta-hub{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:34%;height:34%;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ffffff,#dfe6ee 70%,#c8d2de);border:5px solid #fff;box-shadow:0 6px 16px rgba(0,0,0,.35);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:2;cursor:pointer;font:inherit;color:#0b5878}',
     '.ruleta-hub span{font-size:11px;font-weight:900;letter-spacing:.6px}',
     '.ruleta-confetti{position:absolute;inset:0;pointer-events:none;z-index:4}',
-    '.ruleta-card{position:relative;margin-top:16px;background:#fff;border-radius:18px;padding:16px;text-align:left;box-shadow:0 18px 44px rgba(0,0,0,.4);display:none;max-height:52vh;overflow:auto}',
+    '.ruleta-card{position:relative;margin-top:16px;background:#fff;border-radius:18px;padding:16px;text-align:left;box-shadow:0 18px 44px rgba(0,0,0,.4);display:none;max-height:56vh;overflow:auto}',
     '.ruleta-card.show{display:block;animation:ruletaUp .3s cubic-bezier(.2,1.4,.4,1)}',
     '@keyframes ruletaUp{from{transform:translateY(24px) scale(.96);opacity:0}to{transform:none;opacity:1}}',
     '.ruleta-card-h{display:flex;align-items:center;gap:10px;margin-bottom:8px}',
@@ -188,7 +268,9 @@ function css(){
     '.ruleta-call{flex:0 0 auto;border:1px solid #168765;border-radius:11px;background:#fff;color:#168765;font:inherit;font-size:12px;font-weight:800;padding:9px 12px;cursor:pointer;text-decoration:none}',
     '.ruleta-card-foot{display:flex;gap:8px;margin-top:12px}',
     '.ruleta-done{flex:1;border:0;border-radius:12px;background:linear-gradient(135deg,#0b5878,#3ad0a4);color:#fff;font:inherit;font-size:14px;font-weight:900;padding:12px;cursor:pointer}',
-    '.ruleta-close{flex:0 0 auto;border:1px solid #d8dbe4;border-radius:12px;background:#fff;color:#5c5c66;font:inherit;font-size:13px;font-weight:700;padding:12px 14px;cursor:pointer}'
+    '.ruleta-close{flex:0 0 auto;border:1px solid #d8dbe4;border-radius:12px;background:#fff;color:#5c5c66;font:inherit;font-size:13px;font-weight:700;padding:12px 14px;cursor:pointer}',
+    '.ruleta-ir{display:block;width:100%;margin-top:8px;border:0;border-radius:12px;background:linear-gradient(135deg,#3a7bd5,#5b8def);color:#fff;font:inherit;font-size:13.5px;font-weight:800;padding:12px;cursor:pointer}',
+    '.ruleta-ir:active{transform:scale(.985)}'
   ].join('\n');
   document.head.appendChild(st);
 }
@@ -202,7 +284,7 @@ function montar(){
   overlay.innerHTML =
     '<div class="ruleta-box">' +
       '<h3 class="ruleta-title">🎰 Ruleta PSA</h3>' +
-      '<p class="ruleta-sub">Girala y sabé qué hacer ahora mismo.</p>' +
+      '<p class="ruleta-sub" id="ruletaSub">Girala y sabé qué hacer ahora.</p>' +
       '<div class="ruleta-wheel">' +
         '<div class="ruleta-pointer" id="ruletaPointer"></div>' +
         '<canvas id="ruletaCanvas"></canvas>' +
@@ -227,6 +309,11 @@ function abrir(){
   rotacion = 0;
   girando = false;
   card.classList.remove('show');
+  var sub = overlay.querySelector('#ruletaSub');
+  if (sub){
+    var racha = rachaRuleta();
+    sub.textContent = 'Girala y sabé qué hacer ahora.' + (racha > 1 ? ' · 🔥 racha ' + racha + ' días' : '');
+  }
   overlay.classList.add('open');
   if (typeof window.bloquearScrollCuerpo === 'function') { try{ window.bloquearScrollCuerpo(); }catch(e){} }
   redibujar();
@@ -264,14 +351,13 @@ function redibujar(){
     c.strokeStyle = 'rgba(255,255,255,.85)';
     c.lineWidth = 2;
     c.stroke();
-    // etiqueta
     var mid = a0 + ang / 2;
     c.save();
     c.rotate(mid);
     c.textAlign = 'right';
     c.textBaseline = 'middle';
     c.fillStyle = '#fff';
-    c.font = '900 ' + Math.round(size * 0.038) + 'px system-ui, sans-serif';
+    c.font = '900 ' + Math.round(size * 0.036) + 'px system-ui, sans-serif';
     c.fillText(segs[i].ico + ' ' + segs[i].corto, R * 0.86, 0);
     c.restore();
   }
@@ -289,7 +375,8 @@ function segBajoAguja(rot){
 }
 function girar(forzado, opts){
   opts = opts || {};
-  if (girando || !segs.length) { if (!segs.length) { segs = armarSegmentos(); redibujar(); } if (girando) return; }
+  if (!segs.length) { segs = armarSegmentos(); redibujar(); }
+  if (girando) return;
   girando = true;
   card.classList.remove('show');
   var dur = opts.dur || 5200;
@@ -342,7 +429,7 @@ function mensajePara(kind, n){
   n = n || 'cliente';
   switch (kind){
     case 'llamada':  return 'Hola ' + n + '! Te llamo en unos minutos, ¿estás?';
-    case 'referido': return 'Hola ' + n + '! Si conocés a alguien que esté pensando en un purificador, te agradezco que me lo/a presentes. 🙌';
+    case 'referido': return 'Hola ' + n + '! Si conocés a alguien que esté pensando en un purificador, te agradezco que me lo/a presente. 🙌';
     case 'demo':     return 'Hola ' + n + '! ¿Te parece si te muestro el purificador en persona? Le sacamos 15 minutos.';
     case 'escribir': return 'Hola ' + n + '! 👋 Pasando a saludarte. ¿Cómo andás con tu purificador? Cualquier cosa, acá estoy.';
     case 'checkin':  return 'Hola ' + n + '! ¿Cómo viene el equipo? Si necesitás algo o querés saber cómo mantenerlo, me escribís.';
@@ -363,9 +450,14 @@ function personaHTML(u, kind){
   }
   return '<div class="ruleta-persona"><div><b>' + nombre + '</b><span>' + (u.telf || u.telefono || '') + '</span></div><div style="display:flex;gap:6px">' + botones + '</div></div>';
 }
+function toastMsg(msg){
+  try{
+    if (window.APPIDialog && window.APPIDialog.toast) { window.APPIDialog.toast(msg); return; }
+    if (typeof toast === 'function') toast(msg);
+  }catch(e){}
+}
 function mostrarResultado(seg){
-  var html = '';
-  var ganadora = seg.kind === 'mucho';
+  var ganadora = seg.kind === 'mucho' || seg.kind === 'doble';
   if (ganadora) campana(true); else campana(false);
   if (ganadora) confetti();
   var h = { ico: seg.ico, t: '', p: '', cuerpo: '' };
@@ -388,11 +480,11 @@ function mostrarResultado(seg){
       break;
     case 'demo':
       h.t = 'Agendá una demo con ' + (seg.user ? nombreDe(seg.user) : 'un cliente');
-      h.p = 'Diez minutos con el purificador encendido convencen más que mil palabras. Proponé un día y hora.';
+      h.p = 'Diez minutos con el purificador encendido convencen más que mil palabras. Proponé un día y una hora.';
       h.cuerpo = personaHTML(seg.user, 'demo');
       break;
     case 'stock':
-      h.t = 'Revisá entregas y stock personal';
+      h.t = 'Acordá entregas y acomodá el stock';
       h.p = 'Mirá qué está en tu stock, qué se está por entregar y qué falta. Un stock ordenado es una venta lista.';
       break;
     case 'retro':
@@ -406,21 +498,39 @@ function mostrarResultado(seg){
       break;
     case 'mucho':
       h.t = '🏆 ¡Ya fue mucho por hoy!';
-      h.p = 'La ruleta te exime: hoy ya hiciste lo suficiente. Descansá con la cabeza tranquila, mañana se vuelve a girar.';
+      h.p = 'La ruleta te exime: hoy ya hiciste lo suficiente. Descansá con la cabeza tranquila, mañana se vuelve a girar. Tu racha sigue intacta.';
+      break;
+    case 'doble':
+      h.t = '⭐⭐ ¡Hoy rinde DOBLE!';
+      h.p = 'Cada tarea que marques hoy suma 2 ⭐. Aprovechá el día: la racha también cuenta doble.';
+      break;
+    case 'escribir':
+      h.t = 'Escribile a ' + (seg.user ? nombreDe(seg.user) : 'un cliente');
+      h.p = 'Un mensaje corto y a tiempo mantiene vivo el vínculo. Tocá IR para abrir la ficha con el texto listo.';
+      h.cuerpo = personaHTML(seg.user, 'escribir');
+      break;
+    case 'checkin':
+      h.t = 'Check-in con ' + (seg.user ? nombreDe(seg.user) : 'un cliente');
+      h.p = 'Preguntale cómo viene el equipo. Un check-in a tiempo es la mitad de la renovación.';
+      h.cuerpo = personaHTML(seg.user, 'checkin');
       break;
     default:
       h.t = seg.corto;
       h.p = 'Tarea de PSA del día.';
   }
-  html = '<div class="ruleta-card-h"><span class="ruleta-card-ico">' + h.ico + '</span><b>' + h.t + '</b></div>' +
+  var ir = irPara(seg);
+  var html = '<div class="ruleta-card-h"><span class="ruleta-card-ico">' + h.ico + '</span><b>' + h.t + '</b></div>' +
     (h.p ? '<p>' + h.p + '</p>' : '') +
     h.cuerpo +
     '<div class="ruleta-card-foot">' +
-      (ganadora
-        ? '<button type="button" class="ruleta-done" data-ruleta-ok="1">🏆 ¡Lo tomo! Cierro el día</button>'
-        : '<button type="button" class="ruleta-done" data-ruleta-ok="1">✓ Ya la hice (o la hago ahora)</button>') +
+      (seg.kind === 'doble'
+        ? '<button type="button" class="ruleta-done" data-ruleta-doble>⭐⭐ ¡Doblar el día!</button>'
+        : (ganadora
+          ? '<button type="button" class="ruleta-done" data-ruleta-ok="1">🏆 ¡Lo tomo! Cierro el día</button>'
+          : '<button type="button" class="ruleta-done" data-ruleta-ok="1">✓ Ya la hice (o la hago ahora)</button>')) +
       '<button type="button" class="ruleta-close" data-ruleta-cerrar>×</button>' +
-    '</div>';
+    '</div>' +
+    (ir ? '<button type="button" class="ruleta-ir" data-ruleta-ir>➜ ' + ir.label + '</button>' : '');
   card.innerHTML = html;
   card.classList.add('show');
   card.querySelectorAll('[data-ruleta-wa]').forEach(function(b){
@@ -428,16 +538,24 @@ function mostrarResultado(seg){
       waAbrir('https://wa.me/?text=' + b.getAttribute('data-ruleta-wa'));
     });
   });
-  var ok = card.querySelector('[data-ruleta-ok]');
-  if (ok) ok.addEventListener('click', function(){
-    sumarTarea(h.t);
+  var irBtn = card.querySelector('[data-ruleta-ir]');
+  if (irBtn && ir) irBtn.addEventListener('click', ir.go);
+  var dobleBtn = card.querySelector('[data-ruleta-doble]');
+  if (dobleBtn) dobleBtn.addEventListener('click', function(){
+    setDoble();
     campana(true);
     confetti();
     cerrar();
-    try{
-      if (window.APPIDialog && window.APPIDialog.toast) window.APPIDialog.toast('+1 ⭐ · ' + h.t);
-      else if (typeof toast === 'function') toast('+1 ⭐');
-    }catch(e){}
+    toastMsg('⭐⭐ ¡Hoy rinde x2!');
+  });
+  var ok = card.querySelector('[data-ruleta-ok]');
+  if (ok) ok.addEventListener('click', function(){
+    var g = sumarTarea(h.t);
+    var racha = rachaRuleta();
+    campana(true);
+    confetti();
+    cerrar();
+    toastMsg('+' + g + ' ⭐' + (racha > 1 ? ' · 🔥 racha ' + racha : ''));
   });
   var x = card.querySelector('[data-ruleta-cerrar]');
   if (x) x.addEventListener('click', cerrar);
@@ -483,43 +601,43 @@ function confetti(){
   }catch(e){}
 }
 
-/* ---------- CTA en el panel Hoy ---------- */
-function pintarCta(){
-  var vista = document.getElementById('view-usuarios');
-  if (!vista) return;
-  if (vista.style.display === 'none') return;
-  var cta = vista.querySelector('.ruleta-cta');
+/* ---------- tarjeta en Mi negocio (v802: el lugar del GPS) ---------- */
+function pintarTarjeta(){
+  var vista = document.getElementById('view-negocio');
+  if (!vista || vista.style.display === 'none') return;
   var est = estadoHoy();
-  var html = '<span class="ruleta-cta-ico">🎰</span>' +
-    '<span class="ruleta-cta-txt"><b>Ruleta PSA</b><span>Girala y sabé qué hacer ahora · Hoy: ' + (est.tareas || 0) + ' ⭐</span></span>' +
-    '<span class="ruleta-cta-go">GIRAR</span>';
-  if (!cta){
-    cta = document.createElement('button');
-    cta.type = 'button';
-    cta.className = 'ruleta-cta';
-    vista.appendChild(cta);
+  var racha = rachaRuleta();
+  var cardN = vista.querySelector('#ruletaNegCard');
+  if (!cardN){
+    var header = vista.querySelector('header');
+    if (!header) return;
+    cardN = document.createElement('div');
+    cardN.id = 'ruletaNegCard';
+    cardN.className = 'tb-card';
+    cardN.style.margin = '0 0 12px';
+    header.insertAdjacentElement('afterend', cardN);
   }
-  cta.innerHTML = html;
-  cta.onclick = function(){ abrir(); };
-  // Lo mantiene visible arriba, al lado de la franja del día.
-  var muHoy = vista.querySelector('#muHoy');
-  var stats = vista.querySelector('.stats');
-  var destino = muHoy || stats || null;
-  // Deseado: pegado arriba, justo antes de la franja del día (o al tope).
-  if (!destino){
-    if (vista.firstChild !== cta) vista.insertBefore(cta, vista.firstChild);
-  } else {
-    if (cta.nextSibling !== destino) destino.parentNode.insertBefore(cta, destino);
-  }
+  cardN.innerHTML =
+    '<div class="tb-title">🎰 Ruleta PSA</div>' +
+    '<div class="ruleta-neg-sub">Girala y sabé qué hacer ahora. Cada ✓ suma una ⭐' +
+      (est.doble ? ' <b style="color:#e8a020">(hoy rinde x2)</b>' : '') + '</div>' +
+    '<button type="button" class="ruleta-cta" id="ruletaNegGirar">' +
+      '<span class="ruleta-cta-ico">🎰</span>' +
+      '<span class="ruleta-cta-txt"><b>GIRAR</b><span>Hoy: ' + (est.tareas || 0) + ' ⭐' +
+        (racha > 1 ? ' · 🔥 racha ' + racha + ' días' : '') + '</span></span>' +
+      '<span class="ruleta-cta-go">GIRAR</span>' +
+    '</button>';
+  var btn = cardN.querySelector('#ruletaNegGirar');
+  if (btn) btn.onclick = function(){ abrir(); };
 }
+
 function observar(){
-  // showView ya está envuelto por otros módulos: envolver de nuevo suma.
   try{
     var orig = window.showView;
     if (orig && !orig.__ruletaEnv){
       var env = function(id, opts){
         var r = orig.apply(this, arguments);
-        try{ if (id === 'view-usuarios' || id === 'usuarios') setTimeout(pintarCta, 60); }catch(e){}
+        try{ if (id === 'view-negocio') setTimeout(pintarTarjeta, 60); }catch(e){}
         return r;
       };
       env.__ruletaEnv = true;
@@ -528,8 +646,8 @@ function observar(){
   }catch(e){}
   setInterval(function(){
     try{
-      var v = document.getElementById('view-usuarios');
-      if (v && v.style.display !== 'none' && v.offsetParent !== null) pintarCta();
+      var v = document.getElementById('view-negocio');
+      if (v && v.style.display !== 'none' && v.offsetParent !== null) pintarTarjeta();
     }catch(e){}
   }, 1200);
 }
@@ -542,6 +660,9 @@ window.APPIRuleta = {
   girar: girar,
   armarSegmentos: armarSegmentos,
   estadoHoy: estadoHoy,
-  contactos: contactos
+  rachaRuleta: rachaRuleta,
+  setDoble: setDoble,
+  contactos: contactos,
+  irPara: irPara
 };
 })();

@@ -119,7 +119,7 @@ window.openStock=function(){
 <script src="./usuarios-botones.js?v=423"></script>
 <script src="./mensajes-hielo.js"></script>
 <script src="./mensajes-usuarios.js?v=800"></script>
-<script src="./ruleta-psa.js?v=801"></script>
+<script src="./ruleta-psa.js?v=802"></script>
 <script src="./reactivacion.js"></script>
 
 <script src="./escalera-suenos.js"></script>
@@ -4590,7 +4590,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v801 · Segura</div>
+  <div class="ds-foot">APPI · v802 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -6204,13 +6204,11 @@ const HELP = {
     title:'Mi Negocio', sub:'Tu gente, tus números y tu evolución',
     html:`<p>Esta pantalla es tu <strong>centro de gestión del negocio</strong>. Acá tenés todo lo relacionado con tu equipo, tus contactos y tu evolución mensual.</p>
 
-    <div class="tip"><strong>🛰️ GPS DEL MES</strong><br/>
-    Tu brújula para llegar al bonus. Te muestra:<br/>
-    • <strong>Bonus:</strong> necesitás 12 PB personales<br/>
-    • <strong>Patrocinios:</strong> necesitás 2 personas con 9+ PB<br/>
-    • <strong>Ritmo:</strong> cuántas demos llevás (meta: 30)<br/>
-    • <strong>Cierres:</strong> cuántas ventas cerraste (meta: 10)<br/>
-    Las barras te dicen cuánto te falta. ¡Verde = objetivo cumplido!</div>
+    <div class="tip"><strong>🎰 RULETA PSA</strong><br/>
+    Girala y sabé qué hacer ahora: cae una tarea real del día (escribir, llamar, demo, stock…) o un premio. Cada tarea que marcás suma una ⭐ y mantiene viva tu racha 🔥.<br/>
+    • <strong>IR →</strong>: cada tarea te lleva directo a su lugar (Mi Stock, Mi negocio, la ficha del cliente)<br/>
+    • <strong>⭐⭐ Doble:</strong> si cae, el día rinde x2<br/>
+    • <strong>🏆 Mucho por hoy:</strong> hoy ya hiciste lo suficiente</div>
 
     <div class="tip"><strong>📇 PANEL DE CONTACTOS</strong><br/>
     Tu CRM personal. Acá están todas las personas que contactaste:<br/>
@@ -6234,7 +6232,7 @@ const HELP = {
     Todos los hogares que tienen un equipo tuyo. Tocá <b>Descargar archivos</b>, cargá las garantías y mirá cuáles vencen. ¡Es tu tesoro!</div>
 
     <div class="tip"><strong>💡 CONSEJO</strong><br/>
-    Revisá el GPS todos los días. Si estás lejos del bonus, enfocá tus esfuerzos en patrocinios y demos. El Panel te dice a quién contactar hoy.</div>`
+    Girá la Ruleta PSA todos los días: te dice una tarea concreta y, al marcarla, suma una ⭐ que mantiene tu racha 🔥. El Panel te dice a quién contactar hoy.</div>`
   },
   herramientas: {
     icon:'🧰', iconBg:'linear-gradient(135deg,#128C7E,#ff6bcf)',
@@ -6369,7 +6367,7 @@ const HELP = {
 
     <div class="tip"><strong>💼 MI NEGOCIO</strong><br/>
     Tu centro de gestión del negocio. Acá tenés:<br/>
-    • <strong>GPS del mes</strong> — tu brújula para llegar al bonus (12 PB, 2 patrocinios, 30 demos, 10 cierres)<br/>
+    • <strong>Ruleta PSA</strong> — girala y sabé qué hacer ahora (tareas + ⭐, racha 🔥, IR → directo al lugar)<br/>
     • <strong>Panel de Contactos</strong> — tu CRM con nuevos, seguimientos, presentaciones y cerrados<br/>
     • <strong>Mi Equipo</strong> — toda tu línea descendente con tablero, árbol y lista<br/>
     • <strong>Histórico</strong> — tu evolución mes a mes<br/>
@@ -13373,8 +13371,8 @@ function cerrarToolsMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='801';
-      const CACHE_NAME='appi-v801-ruleta';
+      const swVersion='802';
+      const CACHE_NAME='appi-v802-ruleta';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · v'+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}

@@ -1,7 +1,8 @@
 const { test, expect } = require('@playwright/test');
 
-// Ruleta PSA (v801): ruleta animada con sonido que entrega tareas del
-// día con los contactos reales de la base. En tests se fuerza el
+// Ruleta PSA (v802): ruleta animada con sonido que entrega tareas del
+// día con los contactos reales de la base. La entrada vive en Mi negocio
+// (en el lugar donde estaba el GPS del mes). En tests se fuerza el
 // segmento de caída (girar(idx, {dur})) para que sea determinista.
 
 const USER_ID = '11111111-1111-4111-8111-111111111112';
@@ -56,35 +57,39 @@ async function entrar(page, users = BASE) {
   await page.locator('#distributorPassword').fill('Clave1234');
   await page.locator('#btnDistributorLogin').click();
   await expect(page.locator('#lockScreen')).toHaveClass(/hidden/);
-  await page.evaluate(() => window.showView('view-usuarios'));
-  await expect(page.locator('#usuariosBtnZonas')).toBeVisible();
 }
 
-test('la ruleta aparece en el panel Hoy y abre la rueda', async ({ page }) => {
+async function girarEn(page, kind) {
+  const idx = await page.evaluate((k) => window.APPIRuleta.armarSegmentos().findIndex(s => s.kind === k), kind);
+  expect(idx).toBeGreaterThanOrEqual(0);
+  await page.evaluate((i) => { window.APPIRuleta.abrir(); window.APPIRuleta.girar(i, { dur: 500 }); }, idx);
+  await expect(page.locator('#ruletaCard')).toHaveClass(/show/, { timeout: 15000 });
+}
+
+test('la ruleta vive en Mi negocio (en el lugar del GPS) y abre la rueda', async ({ page }) => {
   await entrar(page);
-  const cta = page.locator('.ruleta-cta');
-  await expect(cta).toBeVisible({ timeout: 10000 });
-  await expect(cta).toContainText('Ruleta PSA');
-  await cta.click();
+  await page.evaluate(() => window.showView('view-negocio'));
+  const card = page.locator('#ruletaNegCard');
+  await expect(card).toBeVisible({ timeout: 10000 });
+  await expect(card).toContainText('Ruleta PSA');
+  await expect(card).toContainText('GIRAR');
+  // El GPS del mes ya no se muestra en la pantalla.
+  expect(await page.locator('#gpsBlock').count()).toBe(0);
+  await page.locator('#ruletaNegGirar').click();
   await expect(page.locator('#ruletaOv')).toHaveClass(/open/);
   await expect(page.locator('#ruletaCanvas')).toBeVisible();
 });
 
 test('girar cae en el segmento forzado (premio "ya fue mucho")', async ({ page }) => {
   await entrar(page);
-  const idx = await page.evaluate(() => window.APPIRuleta.armarSegmentos().findIndex(s => s.kind === 'mucho'));
-  expect(idx).toBeGreaterThanOrEqual(0);
-  await page.evaluate((i) => { window.APPIRuleta.abrir(); window.APPIRuleta.girar(i, { dur: 500 }); }, idx);
-  await expect(page.locator('#ruletaCard')).toHaveClass(/show/, { timeout: 15000 });
+  await girarEn(page, 'mucho');
   await expect(page.locator('#ruletaCard')).toContainText('Ya fue mucho por hoy');
   await expect(page.locator('#ruletaCard')).toContainText('ya hiciste lo suficiente');
 });
 
 test('el premio de 3 mensajes elige 3 contactos con su botón de WhatsApp', async ({ page }) => {
   await entrar(page);
-  const idx = await page.evaluate(() => window.APPIRuleta.armarSegmentos().findIndex(s => s.kind === 'msg3'));
-  await page.evaluate((i) => { window.APPIRuleta.abrir(); window.APPIRuleta.girar(i, { dur: 500 }); }, idx);
-  await expect(page.locator('#ruletaCard')).toHaveClass(/show/, { timeout: 15000 });
+  await girarEn(page, 'msg3');
   await expect(page.locator('#ruletaCard')).toContainText('3 mensajes');
   const personas = page.locator('#ruletaCard .ruleta-persona');
   await expect(personas).toHaveCount(3);
@@ -95,17 +100,16 @@ test('el premio de 3 mensajes elige 3 contactos con su botón de WhatsApp', asyn
   expect(decodeURIComponent(url)).toMatch(/Hola/);
 });
 
-test('"Ya la hice" suma una ⭐ al día y persiste', async ({ page }) => {
+test('"Ya la hice" suma una ⭐ al día y persiste en la tarjeta', async ({ page }) => {
   await entrar(page);
-  const idx = await page.evaluate(() => window.APPIRuleta.armarSegmentos().findIndex(s => s.kind === 'stock'));
-  await page.evaluate((i) => { window.APPIRuleta.abrir(); window.APPIRuleta.girar(i, { dur: 500 }); }, idx);
-  await expect(page.locator('#ruletaCard')).toHaveClass(/show/, { timeout: 15000 });
+  await girarEn(page, 'stock');
   await page.locator('[data-ruleta-ok]').click();
   await expect(page.locator('#ruletaOv')).not.toHaveClass(/open/);
   const st = await page.evaluate(() => window.APPIRuleta.estadoHoy());
   expect(st.tareas).toBe(1);
-  // La CTA lo refleja.
-  await expect(page.locator('.ruleta-cta')).toContainText('Hoy: 1 ⭐', { timeout: 5000 });
+  // La tarjeta de Mi negocio lo refleja.
+  await page.evaluate(() => window.showView('view-negocio'));
+  await expect(page.locator('#ruletaNegCard')).toContainText('Hoy: 1 ⭐', { timeout: 5000 });
   // Persistió en localStorage.
   const raw = await page.evaluate(() => {
     const k = Object.keys(localStorage).find(x => x.startsWith('appi_ruleta_v1_'));
@@ -120,9 +124,63 @@ test('con una base chica la ruleta sigue funcionando (tareas genéricas)', async
   // Un solo cliente: los segmentos de demo no encuentran a nadie y
   // ofrecen la tarea genérica, sin romperse.
   await entrar(page, BASE.slice(0, 1));
-  const idx = await page.evaluate(() => window.APPIRuleta.armarSegmentos().findIndex(s => s.kind === 'demo'));
-  await page.evaluate((i) => { window.APPIRuleta.abrir(); window.APPIRuleta.girar(i, { dur: 500 }); }, idx);
-  await expect(page.locator('#ruletaCard')).toHaveClass(/show/, { timeout: 15000 });
+  await girarEn(page, 'demo');
   await expect(page.locator('#ruletaCard')).toContainText('un cliente');
   expect(await page.locator('#ruletaCard .ruleta-persona').count()).toBe(0);
+});
+
+test('IR → lleva a Mi Stock cuando cae la tarea de stock', async ({ page }) => {
+  await entrar(page);
+  await girarEn(page, 'stock');
+  const ir = page.locator('[data-ruleta-ir]');
+  await expect(ir).toBeVisible();
+  await expect(ir).toContainText('Mi Stock');
+  await ir.click();
+  // La ruleta se cerró y la vista de stock quedó activa.
+  await expect(page.locator('#ruletaOv')).not.toHaveClass(/open/);
+  await expect(page.locator('#view-stock')).toHaveClass(/active/, { timeout: 5000 });
+});
+
+test('la tarea de un cliente ofrece IR → a su ficha', async ({ page }) => {
+  await entrar(page);
+  await girarEn(page, 'escribir');
+  const ir = page.locator('[data-ruleta-ir]');
+  await expect(ir).toBeVisible();
+  await expect(ir).toContainText('IR → Ficha de');
+});
+
+test('⭐⭐ Doble hace que cada tarea valga 2 ⭐', async ({ page }) => {
+  await entrar(page);
+  // Primero cae el doble.
+  await girarEn(page, 'doble');
+  await expect(page.locator('#ruletaCard')).toContainText('rinde DOBLE');
+  await page.locator('[data-ruleta-doble]').click();
+  const st = await page.evaluate(() => window.APPIRuleta.estadoHoy());
+  expect(st.doble).toBe(true);
+  expect(st.tareas).toBe(0);
+  // Y después marca una tarea: vale doble.
+  await girarEn(page, 'stock');
+  await page.locator('[data-ruleta-ok]').click();
+  const st2 = await page.evaluate(() => window.APPIRuleta.estadoHoy());
+  expect(st2.tareas).toBe(2);
+});
+
+test('la racha 🔥 cuenta días consecutivos con ⭐', async ({ page }) => {
+  await entrar(page);
+  // Ayer se marcó una tarea → hoy, al marcar, la racha debe ser 2.
+  await page.evaluate(() => {
+    const d = new Date(Date.now() - 86400000);
+    const k = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    const key = 'appi_ruleta_v1_' + window.APPIAuth.userId();
+    const estado = JSON.parse(localStorage.getItem(key) || '{}');
+    estado[k] = { tareas: 1, log: [{ t: Date.now(), detalle: 'ayer' }] };
+    localStorage.setItem(key, JSON.stringify(estado));
+  });
+  expect(await page.evaluate(() => window.APPIRuleta.rachaRuleta())).toBe(1);
+  await girarEn(page, 'stock');
+  await page.locator('[data-ruleta-ok]').click();
+  expect(await page.evaluate(() => window.APPIRuleta.rachaRuleta())).toBe(2);
+  // La tarjeta de Mi negocio lo muestra.
+  await page.evaluate(() => window.showView('view-negocio'));
+  await expect(page.locator('#ruletaNegCard')).toContainText('🔥 racha 2', { timeout: 5000 });
 });
