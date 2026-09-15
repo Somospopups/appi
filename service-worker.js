@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v797-fab-catalogo';
+const CACHE_NAME = 'appi-v800-canje-acciones';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

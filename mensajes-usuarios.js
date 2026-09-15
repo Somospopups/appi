@@ -9,10 +9,11 @@
    El panel "Hoy" con los pendientes viene en la etapa 2, y se
    apoya en las reglas de vigencia que ya viven acá abajo.
 
-   Quién recibe qué (decidido con el usuario):
+   Quién recibe qué (decidido con el usuario; v798 amplía el canje):
      - vigente ................. mantenimiento + cumpleaños
-     - vencido hace < 1 año .... sólo renovación
-     - vencido hace > 1 año .... nada
+     - vencido hace < 1 año .... renovación (Plan Canje)
+     - vencido hace > 1 año .... renovación (Plan Canje): en PSA un equipo
+     vencido hace 1, 2 o 3 años es el candidato ideal de renovación
 
    Jornada de usuarios (v397): las 10 de hoy, mismo tope que WhatsApp.
    Partido del día (v398): ganar es hacer las que hay (✓). La ✗ no suma.
@@ -23,12 +24,16 @@
      1. cumpleaños de hoy (entran primero y cuentan)
      2. garantía a 0–30 días, las más cercanas primero
      3. mantenimiento caído, los más viejos primero
-     4. canje (vencido < 1 año), los más antiguos primero
+     4. canje (todos los vencidos, v798: sin límite de 1 año),
+        de los más recientes a los más antiguos
      5. check-in a vigentes sin escribirles en 90 días
    Si el calendario está flojo, los usuarios rellenan. Si hay 20
    vencimientos, se reparte: hoy salen 10, mañana los que siguen.
    Una persona no aparece dos veces el mismo día. El mazo del Home
    no ofrece a nadie que no esté en estas 10.
+   Red de seguridad (v798): si no hay tareas de clientes (distribuidor
+   nuevo o día agotado), el panel muestra las 5 acciones comerciales
+   del día con su ✓: el día nunca se queda en blanco.
    ============================================================ */
 (function(){
   'use strict';
@@ -527,6 +532,42 @@
     return h.getFullYear() + '-' + String(h.getMonth()+1).padStart(2,'0') + '-' + String(h.getDate()).padStart(2,'0');
   }
 
+  /* Acciones comerciales del día (v798): la red de seguridad para que la
+     pantalla NUNCA se quede en blanco. Si la jornada no tiene tareas de
+     clientes (distribuidor nuevo sin garantías en PSA, o el día se
+     agotó), el panel Hoy muestra estas acciones con su ✓. Hacerlas todas
+     gana el partido del día y mantiene la racha. */
+  var ACCIONES_DIA = [
+    { id: 'llamadas',  ico: '📞', txt: 'Hacer 3 llamados a prospectos o conocidos' },
+    { id: 'referidos', ico: '🗣️', txt: 'Pedir 2 referidos a clientes satisfechos' },
+    { id: 'demo',      ico: '💧', txt: 'Ofrecer / agendar 1 demostración de purificador' },
+    { id: 'negocio',   ico: '💼', txt: 'Presentar la oportunidad de negocio a 1 persona' },
+    { id: 'stock',     ico: '📦', txt: 'Revisar entregas y stock personal' }
+  ];
+  function diaHoyRef(){
+    var d = leerAcciones();
+    if (!d.dias) d.dias = {};
+    var k = hoyKey();
+    if (!d.dias[k]) d.dias[k] = { marcas: {} };
+    if (!d.dias[k].acc) d.dias[k].acc = {};
+    return { d: d, k: k };
+  }
+  function resumenAcc(){
+    var ref = diaHoyRef();
+    var acc = ref.d.dias[ref.k].acc;
+    var hechas = 0;
+    var map = {};
+    ACCIONES_DIA.forEach(function(a){ map[a.id] = !!acc[a.id]; if (acc[a.id]) hechas++; });
+    return { total: ACCIONES_DIA.length, hechas: hechas, noHechas: 0, pendientes: ACCIONES_DIA.length - hechas, map: map };
+  }
+  function toggleAccionDia(id){
+    var ref = diaHoyRef();
+    var acc = ref.d.dias[ref.k].acc;
+    if (acc[id]) delete acc[id]; else acc[id] = true;
+    guardarAcciones(ref.d);
+    return !!acc[id];
+  }
+
   /* La marca diaria responde "qué pasó hoy"; esta clave responde "qué ciclo
      ya quedó resuelto". Así una acción hecha ayer no vuelve a entrar mañana,
      pero sí puede volver cuando llegue el próximo mantenimiento, cumpleaños o
@@ -744,6 +785,7 @@
      no es partido y no corta la racha. */
   function partidoHoy(){
     var r = resumenHoy();
+    if (!r.total) r = resumenAcc(); // v798: red de seguridad
     return {
       total: r.total,
       hechas: r.hechas,
@@ -761,7 +803,7 @@
   }
   function registrarPartido(){
     var r = resumenHoy();
-    if (!r.total) return;
+    if (!r.total){ r = resumenAcc(); if (!r.total) return; } // v798
     var d = leerAcciones();
     if (!d.dias) d.dias = {};
     var k = hoyKey();
@@ -859,7 +901,9 @@
     {
       id: 'renovacion', icono: '🔄', plantilla: 'renovacion', nombre: 'Equipo para canjear',
       uno: 'tiene el equipo vencido', varios: 'tienen el equipo vencido', capa: 2, cupo: true,
-      aplica: function(u){ return grupoDe(u) === 'vencido'; }
+      // v798: sin límite de 1 año — vencido hace 1, 2 o 3 años sigue
+      // siendo candidato ideal de Plan Canje.
+      aplica: function(u){ var g = grupoDe(u); return g === 'vencido' || g === 'inactivo'; }
     },
     {
       id: 'checkin', icono: '👋', plantilla: 'saludo', nombre: '¿Cómo viene el equipo?',
@@ -905,6 +949,9 @@
       if (!fa && !fb) return 0;
       if (!fa) return 1;
       if (!fb) return -1;
+      // Canje: de los más recientes a los más antiguos — el que venció
+      // ayer es el candidato más fresco para el Plan Canje.
+      if (motivo.id === 'renovacion') return fb - fa;
       return fa - fb;
     });
   }
@@ -994,7 +1041,48 @@
     try{ registrarPartido(); }catch(e){}
 
     if (!res.total){
-      if (host) host.remove();
+      // v798 · Red de seguridad: sin tareas de clientes se juega el
+      // partido con las acciones comerciales del día. La pantalla nunca
+      // más se queda en blanco ni desaparece.
+      var ra = resumenAcc();
+      var raTitulo = (ra.total > 0 && ra.hechas === ra.total)
+        ? 'Hoy ganaste · ' + ra.hechas + ' / ' + ra.total
+        : 'Acciones del día · ' + ra.hechas + ' / ' + ra.total;
+      var raRacha = textoRacha() ? ' · ' + textoRacha() : '';
+      if (!host){
+        host = document.createElement('div');
+        host.id = 'muHoy';
+        stats.parentNode.insertBefore(host, stats);
+      }
+      var raHtml = '<div class="mu-hoy-top"><span class="mu-hoy-ico">🎯</span>' +
+        '<div class="mu-hoy-heading"><b>' + esc(raTitulo) + '</b>' +
+        '<span class="mu-hoy-fecha">📅 ' + esc(fmtFecha(hoy())) + esc(raRacha) + '</span></div>' +
+        '<span class="mu-hoy-res"><i class="ok">✓ ' + ra.hechas + '</i>' +
+        (ra.pendientes ? '<i>quedan ' + ra.pendientes + '</i>' : '') + '</span></div>' +
+        '<div class="mu-hoy-list">' +
+        '<div style="font-size:12px;color:#8a8a94;padding:2px 4px 8px">No hay clientes para hoy: jugá el partido con las acciones del día.</div>';
+      ACCIONES_DIA.forEach(function(a){
+        if (ra.map[a.id]){
+          // Hecha también se puede tocar para corregirla (desmarcarla).
+          raHtml += '<button type="button" class="mu-hoy-item done" data-mu-acc="' + a.id + '">' +
+            '<span class="mu-hoy-n">' + a.ico + '</span>' +
+            '<span class="mu-hoy-txt"><span style="font-weight:700">' + esc(a.txt) + ' · hecha</span></span>' +
+            '<span class="mu-hoy-est"><i class="ok">✓</i></span><span class="mu-hoy-go">✓</span></button>';
+        } else {
+          raHtml += '<button type="button" class="mu-hoy-item" data-mu-acc="' + a.id + '">' +
+            '<span class="mu-hoy-n">' + a.ico + '</span>' +
+            '<span class="mu-hoy-txt"><span style="font-weight:700">' + esc(a.txt) + '</span></span>' +
+            '<span class="mu-hoy-est"></span><span class="mu-hoy-go">✓</span></button>';
+        }
+      });
+      raHtml += '</div>';
+      host.innerHTML = raHtml;
+      host.querySelectorAll('[data-mu-acc]').forEach(function(b){
+        b.onclick = function(){
+          toggleAccionDia(b.getAttribute('data-mu-acc'));
+          try{ pintarHoy(); }catch(e){}
+        };
+      });
       return;
     }
     if (!host){
@@ -2136,6 +2224,9 @@
     resumenHoy: resumenHoy,
     partidoHoy: partidoHoy,
     registrarPartido: registrarPartido,
+    ACCIONES_DIA: ACCIONES_DIA,
+    resumenAcc: resumenAcc,
+    toggleAccionDia: toggleAccionDia,
     rachaGanados: rachaGanados,
     textoRacha: textoRacha,
     pintarHoy: pintarHoy,

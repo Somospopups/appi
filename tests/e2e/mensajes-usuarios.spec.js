@@ -2,8 +2,10 @@ const { test, expect } = require('@playwright/test');
 
 // Plantillas de mensajes para los clientes de Garantías.
 // Lo más delicado es a quién le corresponde cada cosa: vigentes reciben
-// mantenimiento y cumpleaños, los vencidos hace menos de un año sólo
-// renovación, y los vencidos hace más de un año quedan afuera de todo.
+// mantenimiento y cumpleaños, y los vencidos —sin límite de 1 año desde
+// v798— reciben renovación (Plan Canje), de los más recientes a los más
+// antiguos. Sin tareas de clientes, la red de seguridad muestra las 5
+// acciones comerciales del día (v798).
 
 const USER_ID = '11111111-1111-4111-8111-111111111111';
 
@@ -372,22 +374,34 @@ test('la franja del día junta los pendientes y no inventa ninguno', async ({ pa
   await entrar(page, PENDIENTES);
   const hoy = page.locator('#muHoy');
   await expect(hoy).toBeVisible();
-  await expect(hoy).toContainText('Hoy 0 / 3');
+  await expect(hoy).toContainText('Hoy 0 / 4');
 
-  // Un renglón por motivo, con su cuenta.
-  await expect(page.locator('[data-mu-hoy]')).toHaveCount(3);
+  // Un renglón por motivo, con su cuenta (v798: PEREZ vencido hace 500
+  // días entra como canje, sin límite de 1 año).
+  await expect(page.locator('[data-mu-hoy]')).toHaveCount(4);
   await expect(page.locator('[data-mu-hoy="cumple"]')).toContainText('1');
   await expect(page.locator('[data-mu-hoy="retro"]')).toContainText('1');
   await expect(page.locator('[data-mu-hoy="porvencer"]')).toContainText('1');
+  await expect(page.locator('[data-mu-hoy="renovacion"]')).toContainText('1');
 });
 
-test('sin pendientes la franja no se dibuja y la pantalla queda igual', async ({ page }) => {
+test('v798: sin pendientes de clientes aparece la red de seguridad con las 5 acciones', async ({ page }) => {
   // Todos vigentes, recién comprados y sin cumpleaños cargado.
   await entrar(page, [
     { id: 1, usuario: 'GOMEZ, ANA MARIA', telf: '3515551001', localidad: 'Alta Gracia', producto: 'PSA',
       fCompra: ddmmyyyy(-20), fVenceRaw: ddmmyyyy(300), fVence: dias(300), estado: 'vigente' }
   ]);
-  await expect(page.locator('#muHoy')).toHaveCount(0);
+  // No se inventa trabajo de clientes…
+  expect(await page.evaluate(() => window.APPIMensajes.deHoy().reduce((n, g) => n + g.gente.length, 0))).toBe(0);
+  // …pero la pantalla tampoco se queda vacía: las acciones del día.
+  const hoy = page.locator('#muHoy');
+  await expect(hoy).toContainText('Acciones del día · 0 / 5');
+  await expect(hoy).toContainText('3 llamados a prospectos o conocidos');
+  await expect(hoy).toContainText('2 referidos a clientes satisfechos');
+  await expect(hoy).toContainText('demostración de purificador');
+  await expect(hoy).toContainText('oportunidad de negocio');
+  await expect(hoy).toContainText('entregas y stock personal');
+  expect(await page.locator('[data-mu-acc]').count()).toBe(5);
 });
 
 test('la franja muestra la fecha de la agenda y de cada accion', async ({ page }) => {
@@ -541,14 +555,14 @@ test('la regla roja de vencida existe en los estilos', async ({ page }) => {
 test('el contactado no desaparece: queda marcado ✓ y la franja dura todo el día', async ({ page }) => {
   await entrar(page, PENDIENTES);
   await page.evaluate(() => { window.APPIWhatsApp.abrir = () => {}; });
-  await expect(page.locator('#muHoy')).toContainText('Hoy 0 / 3');
+  await expect(page.locator('#muHoy')).toContainText('Hoy 0 / 4');
 
   await page.locator('[data-mu-hoy="cumple"]').click();
   await page.locator('#muFilaHecha').click();
   await page.locator('#muFinCerrar').click();
 
   // La franja no se achica: la acción hecha queda a la vista con su ✓.
-  await expect(page.locator('#muHoy')).toContainText('Hoy 1 / 3');
+  await expect(page.locator('#muHoy')).toContainText('Hoy 1 / 4');
   await expect(page.locator('#muHoy .mu-hoy-res')).toContainText('✓ 1');
   // El motivo completado deja de ser un botón: ya no hay nada para abrir ahí.
   await expect(page.locator('[data-mu-hoy="cumple"]')).toHaveCount(0);
@@ -723,12 +737,12 @@ test('volver con la flechita muestra la marca y deja corregirla', async ({ page 
 });
 
 
-test('el vencido hace más de un año nunca entra en los pendientes', async ({ page }) => {
+test('v800: el vencido hace más de un año sí entra en los pendientes (canje)', async ({ page }) => {
   await entrar(page, PENDIENTES);
   const nombres = await page.evaluate(() =>
     window.APPIMensajes.pendientes().flatMap(g => g.gente.map(u => u.usuario)));
-  expect(nombres).not.toContain('PEREZ, JUAN');
-  expect(nombres).toHaveLength(3);
+  expect(nombres).toContain('PEREZ, JUAN');
+  expect(nombres).toHaveLength(4);
 });
 
 /* ---------- retoques: el texto habla de "tu equipo" y la ficha se ordena ---------- */
@@ -907,11 +921,13 @@ test('el cupo diario es 10 y no inventa más', async ({ page }) => {
   await expect(page.locator('#muHoy')).toContainText('Hoy 0 / 10');
 });
 
-test('usuarios recién comprados siguen sin franja: no se inventa trabajo', async ({ page }) => {
+test('v798: recién comprados no generan tareas de clientes, sí acciones del día', async ({ page }) => {
   await entrar(page, usuariosDe(12, { fCompra: ddmmyyyy(-20), fVence: dias(300), fVenceRaw: ddmmyyyy(300) }));
   const total = await page.evaluate(() => window.APPIMensajes.deHoy().reduce((n, g) => n + g.gente.length, 0));
   expect(total).toBe(0);
-  await expect(page.locator('#muHoy')).toHaveCount(0);
+  // La red de seguridad toma el lugar de la franja vacía.
+  await expect(page.locator('#muHoy')).toContainText('Acciones del día');
+  expect(await page.locator('[data-mu-acc]').count()).toBe(5);
 });
 
 test('el vencido de menos de un año entra como canje cuando el calendario está flojo', async ({ page }) => {
@@ -930,15 +946,43 @@ test('el vencido de menos de un año entra como canje cuando el calendario está
   await expect(page.locator('[data-mu-hoy="renovacion"]')).toContainText('Venció:');
 });
 
-test('el vencido hace más de un año sigue afuera aunque el día esté vacío', async ({ page }) => {
+test('v798: el vencido hace más de un año ahora entra como canje (el más reciente primero)', async ({ page }) => {
   await entrar(page, [
     { id: 4, usuario: 'PEREZ, JUAN', telf: '3515551004', localidad: 'Centro', producto: 'PSA VERO',
-      fCompra: ddmmyyyy(-1500), fVenceRaw: ddmmyyyy(-500), fVence: dias(-500), estado: 'vencida' }
+      fCompra: ddmmyyyy(-1500), fVenceRaw: ddmmyyyy(-500), fVence: dias(-500), estado: 'vencida' },
+    { id: 5, usuario: 'LOPEZ, SUSENA', telf: '3515551005', localidad: 'Centro', producto: 'PSA VERO',
+      fCompra: ddmmyyyy(-900), fVenceRaw: ddmmyyyy(-90), fVence: dias(-90), estado: 'vencida' }
   ]);
-  const nombres = await page.evaluate(() =>
-    window.APPIMensajes.deHoy().flatMap(g => g.gente.map(u => u.usuario)));
-  expect(nombres).toEqual([]);
-  await expect(page.locator('#muHoy')).toHaveCount(0);
+  const r = await page.evaluate(() => {
+    const g = window.APPIMensajes.deHoy();
+    return { n: g.length, id: g[0] && g[0].motivo.id, gente: g.flatMap(x => x.gente.map(u => u.usuario)) };
+  });
+  expect(r.n).toBe(1);
+  expect(r.id).toBe('renovacion');
+  // LOPEZ (venció hace 90 días) antes que PEREZ (venció hace 500 días).
+  expect(r.gente).toEqual(['LOPEZ, SUSENA', 'PEREZ, JUAN']);
+  await expect(page.locator('[data-mu-hoy="renovacion"]')).toBeVisible();
+});
+
+test('v800: marcar acciones del día suma al partido y persiste', async ({ page }) => {
+  await entrar(page, [
+    { id: 1, usuario: 'GOMEZ, ANA MARIA', telf: '3515551001', localidad: 'Alta Gracia', producto: 'PSA',
+      fCompra: ddmmyyyy(-20), fVenceRaw: ddmmyyyy(300), fVence: dias(300), estado: 'vigente' }
+  ]);
+  const hoy = page.locator('#muHoy');
+  await expect(hoy).toContainText('Acciones del día · 0 / 5');
+  await page.locator('[data-mu-acc="llamadas"]').click();
+  await page.locator('[data-mu-acc="referidos"]').click();
+  await expect(hoy).toContainText('Acciones del día · 2 / 5');
+  const p = await page.evaluate(() => window.APPIMensajes.partidoHoy());
+  expect(p).toMatchObject({ total: 5, hechas: 2, hay: true, ganado: false });
+  const mapa = await page.evaluate(() => window.APPIMensajes.resumenAcc().map);
+  expect(mapa.llamadas).toBe(true);
+  expect(mapa.referidos).toBe(true);
+  expect(mapa.demo).toBeFalsy();
+  // Desmarcar resta.
+  await page.locator('[data-mu-acc="llamadas"]').click();
+  await expect(hoy).toContainText('Acciones del día · 1 / 5');
 });
 
 test('los cumpleaños entran primero y cuentan en las 10', async ({ page }) => {
@@ -1074,7 +1118,7 @@ test('hacer las que hay gana el partido; la ✗ no', async ({ page }) => {
   expect(r.racha).toBe(0);
 });
 
-test('un día vacío no es partido y no corta la racha', async ({ page }) => {
+test('v800: un día sin clientes es partido de acciones (y no corta la racha)', async ({ page }) => {
   await entrar(page, usuariosDe(1, { fCompra: ddmmyyyy(-20), fVence: dias(300), fVenceRaw: ddmmyyyy(300) }));
   const r = await page.evaluate(() => {
     const M = window.APPIMensajes;
@@ -1087,8 +1131,11 @@ test('un día vacío no es partido y no corta la racha', async ({ page }) => {
     }));
     return { hoy: M.partidoHoy(), racha: M.rachaGanados() };
   });
-  expect(r.hoy.hay).toBe(false);
+  expect(r.hoy.hay).toBe(true);
+  expect(r.hoy.total).toBe(5);
+  expect(r.hoy.hechas).toBe(0);
   expect(r.hoy.ganado).toBe(false);
+  // Ayer se ganó y hoy está en curso: la racha sigue viva.
   expect(r.racha).toBe(1);
 });
 
@@ -1181,12 +1228,11 @@ test('la firma se guarda en Mi cuenta y sale en el hielo', async ({ page }) => {
   await page.evaluate(() => window.abrirCuentaDesdeMenu());
   await expect(page.locator('#appiFirmaWa')).toBeVisible();
   await expect(page.locator('#appiFirmaWa')).toHaveValue('María');
-  await page.waitForFunction(() => {
-    const b = document.getElementById('btnGuardarFirma');
-    return !!(b && b.onclick);
-  });
+  // El botón propio de firma quedó oculto: ahora se guarda con
+  // "GUARDAR CAMBIOS" del modal (pie).
+  await expect(page.locator('#modalOkBtn')).toHaveText('GUARDAR CAMBIOS');
   await page.locator('#appiFirmaWa').fill('Juanchi');
-  await page.locator('#btnGuardarFirma').click();
+  await page.locator('#modalOkBtn').click();
   const r = await page.evaluate(() => ({
     guardada: localStorage.getItem('appi_firma_wa_v1'),
     hielo: window.APPIHielo.hielo()

@@ -55,7 +55,9 @@ test('Hoy te conviene prioriza la presentación de hoy', async ({ page }) => {
     const acc = window.APPIHomeTarjetas.mejorAccionHoy();
     return { cats: t.map(x => x.cat), titulo: hoyCard && hoyCard.titulo, tipo: acc && acc.tipo };
   });
-  expect(r.cats[1]).toBe('hoy');
+  // "Hoy te conviene" sigue existiendo (su posición en el mazo cambió cuando
+  // se sumó la tarjeta "Tu jornada").
+  expect(r.cats).toContain('hoy');
   expect(r.tipo).toBe('presentacion');
   expect(r.titulo).toContain('Lucía');
 });
