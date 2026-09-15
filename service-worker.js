@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v808-calendario-home';
+const CACHE_NAME = 'appi-v809-bonos-equipo';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

@@ -127,6 +127,110 @@ async function ssoDip(mi: Jar): Promise<Jar | null> {
   }
 }
 
+/* ================= Reporte de Bonos (Mi Equipo, v809) =================
+   El tablero de PSA → "Bonos y Bonus" → "Reporte de Bonos" es la
+   autoconsulta idx=169. Ojo con dos diferencias con Garantías (88):
+     · el período se pide como YYYY-MM (2026-09), no MM-YYYY
+     · el HTML viene en ISO-8859-1 (hay que decodificar los bytes)
+   Con el formato de período mal, PSA responde un reporte "en blanco"
+   (importe cero y período "-09"), por eso se valida el nombre del mes. */
+
+interface AcumFila { c: string; r: string; pb: string; pi: string }
+interface BonoFila { d: string; pct: string; total: string; mov: string; estado: string; imp: string }
+interface BonosReporte {
+  dip: string; nombre: string; socio: string; sucursal: string; categoria: string; pais: string;
+  periodo: string;
+  acumulacion: AcumFila[];
+  bonos: BonoFila[];
+  total: string;
+  aviso: string;
+}
+
+function decodificarHtml(t: string): string {
+  return String(t || '')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&amp;/gi, '&')
+    .replace(/&eacute;/gi, 'é')
+    .replace(/&iacute;/gi, 'í')
+    .replace(/&oacute;/gi, 'ó')
+    .replace(/&aacute;/gi, 'á')
+    .replace(/&uacute;/gi, 'ú')
+    .replace(/&iexcl;/gi, '¡')
+    .replace(/&iquest;/gi, '¿')
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;/gi, "'");
+}
+function limpiarCelda(c: string): string {
+  return decodificarHtml(c.replace(/<[^>]+>/g, ' ')).replace(/\s+/g, ' ').trim();
+}
+function filasHtml(h: string): string[][] {
+  const trs = h.match(/<tr[^>]*>[\s\S]*?<\/tr>/g) || [];
+  return trs.map(tr => (tr.match(/<t[dh][^>]*>[\s\S]*?<\/t[dh]>/g) || []).map(limpiarCelda));
+}
+/** ISO-8859-1 → texto (los bytes 0x80-0xFF son 1:1 con los codepoints). */
+function decodificarLatin1(bytes: Uint8Array): string {
+  try { return new TextDecoder('iso-8859-1').decode(bytes); }
+  catch (_) { let t = ''; for (let i = 0; i < bytes.length; i++) t += String.fromCharCode(bytes[i]); return t; }
+}
+/** Período actual (YYYY-MM) en hora de Buenos Aires. */
+function periodoActualBA(): string {
+  const z = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Argentina/Buenos_Aires' }));
+  return z.getFullYear() + '-' + String(z.getMonth() + 1).padStart(2, '0');
+}
+
+/** Parsea el Reporte de Bonos (idx=169). Devuelve null si el período no se generó. */
+function parsearBonos(html: string): BonosReporte | null {
+  const out: BonosReporte = { dip: '', nombre: '', socio: '', sucursal: '', categoria: '', pais: '', periodo: '', acumulacion: [], bonos: [], total: '', aviso: '' };
+  const filas = filasHtml(html);
+  let zona: '' | 'periodo' | 'res' | 'acum' | 'det' | 'brows' = '';
+  for (const f of filas) {
+    const joined = f.join(' | ');
+    if (!zona) {
+      if (/DIP\s*Nro/i.test(joined)) {
+        const g = (re: RegExp) => { const m = joined.match(re); return m ? m[1].trim() : ''; };
+        out.dip = g(/DIP\s*Nro\s*:\s*([0-9][0-9\-]*)/i);
+        out.nombre = g(/Nombre\s*y\s*Apellido\s*:\s*(.*?)\s*Socio\s*:/i);
+        out.socio = g(/Socio\s*:\s*(.*?)\s*Sucursal\s*:/i);
+        out.sucursal = g(/Sucursal\s*:\s*(.*?)\s*Categor/i);
+        out.categoria = g(/Categor[ií]a\s*:\s*(.*?)\s*Pa[ií]s\s*:/i);
+        out.pais = g(/Pa[ií]s\s*:\s*(.*?)\s*$/i);
+        zona = 'periodo';
+      }
+      continue;
+    }
+    if (zona === 'periodo') {
+      const m = joined.match(/Consultado\s*:\s*([A-Za-zÁÉÍÓÚÑáéíóúñ]+-\d{4})/i);
+      if (m) { out.periodo = m[1].trim(); zona = 'res'; }
+      continue;
+    }
+    if (zona === 'res') {
+      if (/Resumen de Acumulaci/i.test(joined)) { zona = 'acum'; continue; }
+      if (/Detalle de Bonos/i.test(joined)) { zona = 'det'; continue; }
+      continue;
+    }
+    if (zona === 'acum') {
+      if (/Detalle de Bonos/i.test(joined)) { zona = 'det'; continue; }
+      if (f.length >= 3 && /^\d+$/.test(f[0]) && /\d/.test(f[2] || '')) {
+        out.acumulacion.push({ c: f[0], r: f[1] || '', pb: f[2] || '0.00', pi: f[3] || '0.00' });
+      }
+      continue;
+    }
+    if (zona === 'det') {
+      if (/Descripci/i.test(joined)) { zona = 'brows'; continue; }
+      continue;
+    }
+    // brows: [ '', desc, %, PC total, Mov. PC, estado, importe ]  · total: [ '', importe ]
+    if (f.length === 2 && f[0] === '' && /\d/.test(f[1] || '')) { out.total = f[1]; continue; }
+    if (f.length >= 6 && f[0] === '' && f[1]) {
+      out.bonos.push({ d: f[1], pct: f[2] || '0.00', total: f[3] || '0.00', mov: f[4] || '0.00', estado: f[5] || '', imp: f[6] || '0.00' });
+      continue;
+    }
+    if (/^Aviso$/i.test(f[0] || '') && f[1]) out.aviso = f[1];
+  }
+  if (!out.periodo) return null; // período mal → PSA no generó el reporte
+  return out;
+}
+
 interface Fila { usuario: string; telefono: string; domicilio: string; cp: string; localidad: string; serie: string; producto: string; compra: string; vence: string; canje: string }
 
 /** Parsea el reporte de Garantías (tabla HTML de 12 columnas). */
@@ -174,7 +278,7 @@ Deno.serve(async (req) => {
   let body: any;
   try { body = await req.json(); } catch (_) { body = {}; }
   const serie = normSerie(body.serie || '');
-  if (body.action !== 'report' && serie.length < 4) return json({ error: 'Escribí el número de serie (el del QR de la base).' }, 400);
+  if (body.action !== 'report' && body.action !== 'bonos' && serie.length < 4) return json({ error: 'Escribí el número de serie (el del QR de la base).' }, 400);
 
   // Credenciales PSA: las trae la app (sección MI PSA) o secrets del proyecto.
   const center = String(body.center || Deno.env.get('PSA_CENTER') || '').trim();
@@ -213,6 +317,24 @@ Deno.serve(async (req) => {
       },
       body: opts.body
     });
+
+  // 3B) Reporte de Bonos (tablero PSA → Bonos y Bonus). La app lo pide al
+  //     entrar y lo muestra en la parte superior de Mi Equipo (v809).
+  if (body.action === 'bonos') {
+    const periodo = (body.periodo ? String(body.periodo) : periodoActualBA()).replace(/[^0-9\-]/g, '');
+    let htmlB = '';
+    try {
+      const rb = await dipReq(DIP_EXEC + '?idx=169&periodo=' + periodo + '&Consulta=Bonos');
+      htmlB = decodificarLatin1(new Uint8Array(await rb.arrayBuffer()));
+    } catch (e) {
+      return json({ error: 'No se pudo abrir el reporte de Bonos de PSA: ' + String((e as any)?.message || e) }, 502);
+    }
+    const bonos = parsearBonos(htmlB);
+    if (!bonos) {
+      return json({ error: 'PSA todavía no calculó los bonos de ese período (o cambió el formato del reporte).' }, 502);
+    }
+    return json({ ok: true, bonos });
+  }
 
   // 3) Formulario del reporte Garantías → trae centro/dip/clave del DIP logueado
   let htmlForm = '';
