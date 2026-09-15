@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "792.0.0",
-  "cacheName": "appi-v792-campana-toast",
+  "version": "793.0.0",
+  "cacheName": "appi-v793-pendientes-manual",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

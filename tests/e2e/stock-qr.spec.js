@@ -557,8 +557,11 @@ test('pendientes: serie no encontrada se guarda sin datos y se completa después
   await entrar(page);
   await page.evaluate(() => window.openStock());
   await page.locator('[data-st-tab="pendientes"]').click();
-  await page.locator('#stPSerieBuscar').fill('ZZZ9999');
-  await page.locator('#stPBuscar').click();
+  await page.locator('#stFabMainP').click();
+  await page.locator('#stFabManualP').click();
+  await expect(page.locator('#appiDialogInput')).toBeVisible();
+  await page.locator('#appiDialogInput').fill('ZZZ9999');
+  await page.locator('#appiDialogOk').click();
   await expect(page.locator('#appiDialogTitle')).toHaveText('Consulta PSA');
   await page.locator('#appiDialogOk').click();
   await expect(page.locator('#stPSerie')).toBeVisible();

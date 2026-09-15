@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v792-campana-toast';
+const CACHE_NAME = 'appi-v793-pendientes-manual';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

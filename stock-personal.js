@@ -1461,56 +1461,17 @@
       function closeFabP(){ setFabP(false); }
       if(mainP) mainP.onclick=function(e){ e.stopPropagation(); toggleFabP(); };
       if(qrP) qrP.onclick=function(e){ e.stopPropagation(); closeFabP(); abrirEscan('pendientes'); };
-      if(manP) manP.onclick=function(e){ e.stopPropagation(); closeFabP(); abrirFichaPendiente(-1); };
+      if(manP) manP.onclick=function(e){
+        e.stopPropagation();
+        closeFabP();
+        iniciarCargaManualPendiente();
+      };
       if(backP) backP.onclick=closeFabP;
       document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeFabP(); });
       window._stFabClosePend = closeFabP;
     })();
     // cerrar ambos FAB al cambiar de tab / pintar
     try{ if(window._stFabCloseStock) window._stFabCloseStock(); if(window._stFabClosePend) window._stFabClosePend(); }catch(e){}
-    var pb = $('stPBuscar');
-    if (pb) pb.onclick = function(){
-      var s = String($('stPSerieBuscar') && $('stPSerieBuscar').value || '').trim().toUpperCase();
-      if (s.length < 4){ if (window.APPIDialog) window.APPIDialog.alert('Escribí el N° de serie (el del QR de la base).', { title:'Falta la serie', icon:'🔄' }); return; }
-      // Primero la base del teléfono: al instante, sin internet.
-      var localB = buscarSerieLocal(s);
-      if (localB && localB.encontrado){
-        abrirFichaPendiente(-1, localB.serieReal || s);
-        setTimeout(function(){
-          var pr = $('stPProducto'), qu = $('stPQuien'), tt = $('stPTel');
-          if (pr) pr.value = nombreLimpio(localB.u.producto || '');
-          if (qu) qu.value = String(localB.u.usuario || '').trim();
-          if (tt) tt.value = String(localB.u.telf || '').trim();
-        }, 60);
-        toast('Encontrado en tu base de usuarios ✓');
-        return;
-      }
-      var lupa = lupaPSA(s);
-      consultBasePSA(s, function(res){
-        if (res && res.encontrado){
-          var prod = nombreLimpio(res.producto || ''), q = String(res.usuario || '').trim(), t = String(res.telefono || '').trim();
-          lupa.ok((prod || 'Equipo') + (q ? ' · ' + q : ''), [t, res.domicilio].filter(Boolean).join(' · '));
-          setTimeout(function(){
-            lupa.close();
-            abrirFichaPendiente(-1, res.serieReal || s);
-            setTimeout(function(){
-              var pr = $('stPProducto'), qu = $('stPQuien'), tt = $('stPTel');
-              if (pr) pr.value = prod;
-              if (qu) qu.value = q;
-              if (tt) tt.value = t;
-            }, 60);
-          }, 1500);
-        } else {
-          if (res && res.error) lupa.warn('Sin conexión con la base de PSA', String(res.error));
-          else lupa.warn('No figura en la base de PSA', 'Se guarda igual: lo completas cuando hables con la empresa.');
-          setTimeout(function(){
-            lupa.close();
-            abrirFichaPendiente(-1, s);
-            if (window.APPIDialog) window.APPIDialog.alert((res && res.error) || 'No encontré esa serie en la base de PSA. Te dejo la serie cargada en la ficha: guardala sin datos y, cuando hables con la empresa, completas a quién era.', { title:'Consulta PSA', icon:'🔄' });
-          }, 1400);
-        }
-      });
-    };
     document.querySelectorAll('[data-st-pedit]').forEach(function(r){
       r.style.cursor = 'pointer';
       r.onclick = function(e){
@@ -1961,6 +1922,75 @@
     return p.length === 3 ? p[2] + '/' + p[1] + '/' + p[0] : iso;
   }
 
+  function buscarSeriePendiente(s){
+    s = String(s || '').trim().toUpperCase();
+    if (!s){
+      abrirFichaPendiente(-1);
+      return;
+    }
+    if (s.length < 4){
+      if (window.APPIDialog) window.APPIDialog.alert('Escribí el N° de serie (el del QR de la base).', { title:'Falta la serie', icon:'🔄' });
+      return;
+    }
+    // Primero la base del teléfono: al instante, sin internet.
+    var localB = buscarSerieLocal(s);
+    if (localB && localB.encontrado){
+      abrirFichaPendiente(-1, localB.serieReal || s, {
+        producto: nombreLimpio(localB.u.producto || ''),
+        quien: String(localB.u.usuario || '').trim(),
+        telefono: String(localB.u.telf || '').trim(),
+        domicilio: String(localB.u.domicilio || '').trim()
+      });
+      toast('Encontrado en tu base de usuarios ✓');
+      return;
+    }
+    var lupa = lupaPSA(s);
+    consultBasePSA(s, function(res){
+      if (res && res.encontrado){
+        var prod = nombreLimpio(res.producto || ''), q = String(res.usuario || '').trim(), t = String(res.telefono || '').trim();
+        var dPSA = {
+          producto: prod,
+          quien: q,
+          telefono: t,
+          domicilio: res.domicilio || ''
+        };
+        lupa.ok((prod || 'Equipo') + (q ? ' · ' + q : ''), [t, res.domicilio].filter(Boolean).join(' · '));
+        setTimeout(function(){
+          lupa.close();
+          abrirFichaPendiente(-1, res.serieReal || s, dPSA);
+          toast('Encontrado en PSA ✓');
+        }, 1500);
+      } else {
+        if (res && res.error) lupa.warn('Sin conexión con la base de PSA', String(res.error));
+        else lupa.warn('No figura en la base de PSA', 'Se guarda igual: lo completas cuando hables con la empresa.');
+        setTimeout(function(){
+          lupa.close();
+          abrirFichaPendiente(-1, s);
+          if (window.APPIDialog) window.APPIDialog.alert((res && res.error) || 'No encontré esa serie en la base de PSA. Te dejo la serie cargada en la ficha: guardala sin datos y, cuando hables con la empresa, completas a quién era.', { title:'Consulta PSA', icon:'🔄' });
+        }, 1400);
+      }
+    });
+  }
+
+  function iniciarCargaManualPendiente(){
+    if (window.APPIDialog && window.APPIDialog.prompt){
+      window.APPIDialog.prompt('Ingresá el N° de serie de la base (o purificador) para buscar los datos.', '', {
+        title: 'Carga manual de canje',
+        icon: '🔄',
+        placeholder: 'Ej: IR5624',
+        okText: 'Buscar',
+        cancelText: 'Cancelar'
+      }).then(function(s){
+        if (s === null) return;
+        buscarSeriePendiente(s);
+      });
+    } else {
+      var s = prompt('Ingresá el N° de serie de la base:');
+      if (s === null) return;
+      buscarSeriePendiente(s);
+    }
+  }
+
   function htmlPendientes(){
     var items = leerPendientes().slice().sort(cmpProducto);
     var total = items.length;
@@ -1980,37 +2010,57 @@
     }).join('');
     return '<div class="st-card"><div class="st-name">🔄 Pendientes de canje</div>' +
       '<div class="st-meta" style="margin:4px 0 8px">' + total + ' equipo' + (total === 1 ? '' : 's') + ' para entregar a la empresa</div>' +
-      (filas || '<div class="st-empty">Nada pendiente. Al hacer un canje, cargá la base del equipo viejo con la cámara.</div>') +
-      '<div class="st-add">' +
-        '<div class="st-add-row" style="background:rgba(255,255,255,0.72);backdrop-filter:blur(14px) saturate(160%);-webkit-backdrop-filter:blur(14px) saturate(160%);border:1px solid rgba(0,0,0,0.06);border-radius:14px;padding:6px;gap:8px;box-shadow:0 8px 24px rgba(0,0,0,0.08)"><input id="stPSerieBuscar" placeholder="…o escribí el N° de serie" autocomplete="off" style="flex:1;border:none;outline:none;background:transparent;font-family:-apple-system,BlinkMacSystemFont,SF Pro,sans-serif;font-size:15px;color:#1c1c1e;padding:8px 10px"><button type="button" id="stPBuscar" aria-label="Buscar serie en la base de PSA" style="background:rgba(91,141,239,0.12);border:none;border-radius:10px;padding:8px 12px;font-size:16px">🔍</button></div>' +
-      '</div></div><div class="st-scan-foot"><div class="st-fab-group" id="stFabGroupP"><button type="button" id="stQrP" class="st-fab st-fab-child fab-scan" aria-label="Escanear base" title="Apuntá al QR de la base"><span class="st-fab-lbl">Escanear</span><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:26px;height:26px;display:block"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="4" height="4" rx="1"/><rect x="18" y="14" width="3" height="3" rx="1"/><rect x="15.5" y="18.5" width="2.5" height="2.5" rx="0.7"/><path d="M7 7h1v1H7zM17 7h1v1h-1zM7 17h1v1H7z"/><path d="M14 8.5h2M8.5 14v2M14 16.2h.8M18 18.5h-2"/></svg></button><button type="button" id="stFabManualP" class="st-fab st-fab-child fab-manual" aria-label="Carga manual" title="Cargar manual"><span class="st-fab-lbl">Manual</span><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" style="width:26px;height:26px;display:block"><path d="M12 20H21"/><path d="M16.5 3.5a2.22 2.22 0 0 1 3.14 3.14L7 19.3 3.5 20.5 4.7 17 16.5 3.5z"/><path d="M13.5 6.5L17.5 10.5"/></svg></button><button type="button" id="stFabMainP" class="st-fab st-fab-main" aria-label="Acciones" title="Opciones"><span class="st-fab-plus"></span></button></div></div><div class="st-fab-backdrop" id="stFabBackdropP"></div>' +'';
+      (filas || '<div class="st-empty">Nada pendiente. Al hacer un canje, cargá la base del equipo viejo con la cámara o con Carga manual.</div>') +
+      '</div><div class="st-scan-foot"><div class="st-fab-group" id="stFabGroupP"><button type="button" id="stQrP" class="st-fab st-fab-child fab-scan" aria-label="Escanear base" title="Apuntá al QR de la base"><span class="st-fab-lbl">Escanear</span><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:26px;height:26px;display:block"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="4" height="4" rx="1"/><rect x="18" y="14" width="3" height="3" rx="1"/><rect x="15.5" y="18.5" width="2.5" height="2.5" rx="0.7"/><path d="M7 7h1v1H7zM17 7h1v1h-1zM7 17h1v1H7z"/><path d="M14 8.5h2M8.5 14v2M14 16.2h.8M18 18.5h-2"/></svg></button><button type="button" id="stFabManualP" class="st-fab st-fab-child fab-manual" aria-label="Carga manual" title="Cargar manual"><span class="st-fab-lbl">Manual</span><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" style="width:26px;height:26px;display:block"><path d="M12 20H21"/><path d="M16.5 3.5a2.22 2.22 0 0 1 3.14 3.14L7 19.3 3.5 20.5 4.7 17 16.5 3.5z"/><path d="M13.5 6.5L17.5 10.5"/></svg></button><button type="button" id="stFabMainP" class="st-fab st-fab-main" aria-label="Acciones" title="Opciones"><span class="st-fab-plus"></span></button></div></div><div class="st-fab-backdrop" id="stFabBackdropP"></div>';
   }
 
   // Abre el formulario para una pendiente (i = -1 → nueva).
-  function abrirFichaPendiente(i, serieInicial){
+  function abrirFichaPendiente(i, serieInicial, prefill){
     var items = leerPendientes();
-    var p = (i >= 0) ? items[i] : { serie: serieInicial || '', producto: '', quien: '', telefono: '', domicilio: '', fecha: hoyISO() };
+    var p = (i >= 0) ? items[i] : {
+      serie: serieInicial || '',
+      producto: (prefill && prefill.producto) || '',
+      quien: (prefill && prefill.quien) || '',
+      telefono: (prefill && prefill.telefono) || '',
+      domicilio: (prefill && prefill.domicilio) || '',
+      fecha: hoyISO()
+    };
     editPIdx = i;
     css();
     ensureOverlay();
     $('stSheet').innerHTML =
       '<h3>' + (i >= 0 ? 'Corregir equipo canjeado' : 'Equipo canjeado') + '</h3>' +
-      '<p>Al hacer un plan canje te quedás con el equipo viejo: acá se anota para entregárselo a la empresa. Si la serie no figura en la base de PSA, guardala solo con la serie y completá a quién era cuando hables con la empresa (o buscá en tus usuarios).</p>' +
+      '<p>Al hacer un plan canje te quedás con el equipo viejo: acá se anota para entregárselo a la empresa. Si la serie no figura en la base de PSA, guardala solo con la serie y completá a quién era cuando hables con la empresa.</p>' +
       '<label class="st-field"><span>N° de serie (base)</span><input id="stPSerie" autocomplete="off" value="' + esc(p.serie) + '"></label>' +
       '<label class="st-field"><span>Producto</span><input id="stPProducto" list="stCatDl" autocomplete="off" placeholder="Ej: PSA VERO" value="' + esc(p.producto || '') + '"></label>' +
       '<label class="st-field"><span>De quién era (nombre)</span><input id="stPQuien" autocomplete="name" placeholder="Ej: GÓMEZ, MARÍA" value="' + esc(p.quien || '') + '"></label>' +
       '<label class="st-field"><span>Teléfono del dueño</span><input id="stPTel" type="tel" inputmode="tel" autocomplete="tel" placeholder="Ej: 0351 455 2272" value="' + esc(p.telefono || '') + '"></label>' +
-      (p.domicilio ? '<label class="st-field"><span>Domicilio (según PSA)</span><input id="stPDomicilio" autocomplete="street-address" value="' + esc(p.domicilio) + '" style="opacity:.7"></label>' : '') +
+      (p.domicilio ? '<label class="st-field" id="stRowDom"><span>Domicilio (según PSA)</span><input id="stPDomicilio" autocomplete="street-address" value="' + esc(p.domicilio) + '" style="opacity:.7"></label>' : '<span id="stRowDom"></span>') +
       '<label class="st-field"><span>FECHA DE FABRICACION</span><input id="stPFecha" type="date" value="' + esc(p.fecha || '') + '"></label>' +
-      (i < 0 && !p.quien ? '<button type="button" class="st-cancel" id="stPMisUsuarios" style="margin-bottom:10px">📇 Buscar en mis usuarios</button>' : '') +
       '<button type="button" class="st-save" id="stSaveP">Guardar pendiente</button>' +
       '<button type="button" class="st-cancel" id="stCancelP">Cancelar</button>';
     $('stOverlay').classList.add('open');
     if (window.bloquearScrollCuerpo) window.bloquearScrollCuerpo();
     $('stCancelP').onclick = cerrarFichaPendiente;
     $('stSaveP').onclick = guardarFichaPendiente;
-    var bu = $('stPMisUsuarios');
-    if (bu) bu.onclick = function(){ buscarMisUsuarios($('stPQuien') ? $('stPQuien').value : ''); };
+
+    var inpSerie = $('stPSerie');
+    if (inpSerie){
+      inpSerie.addEventListener('change', function(){
+        var val = String(inpSerie.value || '').trim().toUpperCase();
+        if (val.length >= 4){
+          var loc = buscarSerieLocal(val);
+          if (loc && loc.encontrado){
+            var pr = $('stPProducto'), qu = $('stPQuien'), tt = $('stPTel');
+            if (pr && (!pr.value || pr.value === 'Equipo canje')) pr.value = nombreLimpio(loc.u.producto || '');
+            if (qu && !qu.value) qu.value = String(loc.u.usuario || '').trim();
+            if (tt && !tt.value) tt.value = String(loc.u.telf || '').trim();
+            toast('Encontrado en tus usuarios ✓');
+          }
+        }
+      });
+    }
+
     setTimeout(function(){ var el = $('stPSerie'); if (el) el.focus(); }, 40);
   }
   var editPIdx = -1;
@@ -2332,6 +2382,8 @@
     abrirEscan: abrirEscan, cerrarEscan: cerrarEscan, sonidoQR: sonidoQR,
     ocrCanvas: ocrCanvas, cargarMotorOCR: cargarMotorOCR,
     qrVivo: qrVivo, evaluarLectura: evaluarLectura,
-    matchCatalogo: matchCatalogo, cargarCatalogo: cargarCatalogo
+    matchCatalogo: matchCatalogo, cargarCatalogo: cargarCatalogo,
+    buscarSeriePendiente: buscarSeriePendiente,
+    iniciarCargaManualPendiente: iniciarCargaManualPendiente
   };
 })();
