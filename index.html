@@ -4390,15 +4390,25 @@ html{ scroll-behavior:smooth }
 </style>
 
 
-<style id="fix-fab-dock-v789">
-/* FIX FAB Mi Stock/Pendientes sobre dock — override JS-injected */
+<style id="fix-fab-dock-v790">
+/* FIX FAB Mi Stock/Pendientes sobre dock */
+#view-stock,
+#view-stock.view,
+#view-stock.view.active{
+  animation:none !important;
+  transform:none !important;
+  filter:none !important;
+  perspective:none !important;
+  contain:none !important;
+  will-change:auto !important;
+}
 html body .st-scan-foot{
   position:fixed !important;
   left:50% !important;
   transform:translateX(-50%) !important;
   top:auto !important;
-  bottom:140px !important;
-  bottom:calc(env(safe-area-inset-bottom) + 140px) !important;
+  bottom:98px !important;
+  bottom:calc(env(safe-area-inset-bottom) + 98px) !important;
   z-index:80 !important;
   pointer-events:none !important;
   display:flex !important;
@@ -4411,12 +4421,16 @@ html body .st-scan-foot{
 html body .st-scan-foot .st-fab-group{
   pointer-events:auto !important;
 }
-/* Asegura que ningún ancestor con transform rompa el fixed */
-html, body, .app, #app, .view, .st-wrap{
+/* Asegura padding inferior suficiente para que ningún producto quede tapado detrás del FAB y dock */
+.st-wrap{
+  padding-bottom:calc(env(safe-area-inset-bottom) + 180px) !important;
   transform:none !important;
   filter:none !important;
 }
 @media(min-width:1024px){
+  .st-wrap{
+    padding-bottom:40px !important;
+  }
   html body .st-scan-foot{
     position:sticky !important;
     bottom:28px !important;
@@ -4425,6 +4439,7 @@ html, body, .app, #app, .view, .st-wrap{
     width:100% !important;
     max-width:520px !important;
     margin:14px auto 0 !important;
+    pointer-events:auto !important;
   }
 }
 </style>
