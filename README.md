@@ -4,8 +4,9 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
-- Versión: **v796 · Segura** · Sincronización automática de garantías y usuarios desde MI PSA mediante consulta de reportes seriales en Edge Function sin bloqueos de CORS, 10 tareas diarias garantizadas y carga manual por Excel restaurada como respaldo. Mi Stock y Pendientes de canje en tiempo real con lupa pensante y compartir por WhatsApp.
-- Caché de la app: `appi-v796-auto-sync-psa` (se renueva al abrir APPI).
+- Versión: **v797 · Segura** · Mi Stock, Prestados y Pendientes de canje sincronizados entre dispositivos (los tres). Pendientes en tiempo real (lupa pensante + pitido); la fecha de una pendiente se etiqueta **FAB** (fecha de fabricación), no "recibido". Fila con N° de serie = equipo único (sin +/−, cantidad siempre 1). Al prestar se elige a quién de tu lista de usuarios (o carga manual); al devolver se pregunta si es la misma serie. Se restauró el catálogo oficial `psa-catalogo.json` (312 productos) que faltaba y se corrigió el auto-focus de las fichas para que no robe el teclado mientras se tipea.
+- v796: Sincronización automática de garantías y usuarios desde MI PSA mediante consulta de reportes seriales en Edge Function sin bloqueos de CORS, 10 tareas diarias garantizadas y carga manual por Excel restaurada como respaldo. Mi Stock y Pendientes de canje en tiempo real con lupa pensante y compartir por WhatsApp.
+- Caché de la app: `appi-v797-fab-catalogo` (se renueva al abrir APPI).
 - Publicación: [https://somospopups.github.io/appi/](https://somospopups.github.io/appi/)
 - Acceso por número de distribuidor y contraseña.
 - Acceso administrador POPUPS mediante el candado, sin DIP ni número de distribuidor.

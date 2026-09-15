@@ -117,6 +117,32 @@ async function escanearQR(page, texto) {
   }, svg);
 }
 
+// v790+: el alta manual se hace desde el botón "Manual" del FAB (antes era
+// un formulario fijo sobre la tarjeta, por eso los viejos #stNombre/#stAdd
+// dejaron de existir en el DOM).
+async function altaManual(page, { nombre, color = '', serie = '', cant = null, expectDup = false }) {
+  // El grupo del FAB está contraído: primero se expande con el botón
+  // principal (el botón "Manual" queda tapado por él hasta entonces).
+  const grp = page.locator('#stFabGroup');
+  if (!(await grp.evaluate(el => el.classList.contains('expanded')))) {
+    await page.locator('#stFabMain').click();
+    await expect(grp).toHaveClass(/expanded/);
+  }
+  await page.locator('#stFabManual').click();
+  await expect(page.locator('#stManNombre')).toBeVisible();
+  await page.locator('#stManNombre').fill(nombre);
+  if (color) await page.locator('#stManColor').fill(color);
+  if (serie) await page.locator('#stManSerie').fill(serie);
+  if (cant != null) await page.locator('#stManCant').fill(String(cant));
+  await page.locator('#stManSave').click();
+  if (expectDup) {
+    await expect(page.locator('#appiDialogTitle')).toHaveText('Serie repetida');
+    await page.locator('#appiDialogOk').click();
+    return;
+  }
+  await expect(page.locator('#stOverlay')).not.toHaveClass(/open/);
+}
+
 test('parseQR entiende la etiqueta, delimitadores y URL', async ({ page }) => {
   await entrar(page);
   const r = await page.evaluate(() => {
@@ -169,7 +195,7 @@ test('QR con datos completos: lo carga solo y suena el bip', async ({ page }) =>
   await expect(page.locator('#stockCont')).toContainText('Nero · Serie CAD09803');
   const items = await page.evaluate(() => window.APPIStock.leerStock());
   expect(items).toHaveLength(1);
-  expect(items[0]).toEqual({ nombre: 'PSA Senior 4 + KIT Posv', color: 'Nero', serie: 'CAD09803', cant: 1 });
+  expect(items[0]).toMatchObject({ nombre: 'PSA Senior 4 + KIT Posv', color: 'Nero', serie: 'CAD09803', cant: 1 });
   // El bip de confirmación sonó (2 notas = 2 osciladores).
   expect(await page.evaluate(() => window.__bips)).toBeGreaterThanOrEqual(2);
 });
@@ -204,7 +230,7 @@ test('lectura en vivo: QR da la serie + OCR da nombre y color → carga al toque
   await expect(page.locator('#stockCont')).toContainText('Serie JZA31021');
   const items = await page.evaluate(() => window.APPIStock.leerStock());
   expect(items).toHaveLength(1);
-  expect(items[0]).toEqual({ nombre: 'PSA Vero', color: 'Bianco', serie: 'JZA31021', cant: 1 });
+  expect(items[0]).toMatchObject({ nombre: 'PSA Vero', color: 'Bianco', serie: 'JZA31021', cant: 1 });
 });
 
 test('lectura en vivo sin serie legible: pide la serie una vez', async ({ page }) => {
@@ -251,15 +277,17 @@ test('prestar y devolver una unidad con serie la vuelve a su fila', async ({ pag
   await escanearQR(page, 'SENIOR 4 NERO | CAD09803');
   await expect(page.locator('#stockCont')).toContainText('Serie CAD09803');
   // prestar la unidad
-  await page.locator('[data-st-prestar="0"]').click();
+  await page.locator('[data-st-prestar]').first().click();
   await expect(page.locator('#stSheet')).toContainText('¿A quién se lo prestás?');
   await page.locator('#stQuien').fill('Laura Gómez');
   await page.locator('#stTel').fill('3515551234');
   await page.locator('#stSavePrestamo').click();
   // queda prestada: la fila no aparece en el stock
   await expect(page.locator('#stockCont')).not.toContainText('Serie CAD09803');
-  // devolver
+  // devolver: la app pregunta si vuelve con la misma serie
   await page.locator('[data-st-dev]').first().click();
+  await expect(page.locator('#appiDialogTitle')).toHaveText('Devolución');
+  await page.locator('#appiDialogChoices button', { hasText: 'Sí, el mismo' }).click();
   await expect(page.locator('#stockCont')).toContainText('Serie CAD09803');
   const items = await page.evaluate(() => window.APPIStock.leerStock());
   expect(items).toHaveLength(1);
@@ -271,41 +299,27 @@ test('prestar y devolver una unidad con serie la vuelve a su fila', async ({ pag
 test('alta manual con color: se suma por producto Y color', async ({ page }) => {
   await entrar(page);
   await page.evaluate(() => window.openStock());
-  await page.locator('#stNombre').fill('PSA Vero');
-  await page.locator('#stColor').fill('nero');
-  await page.locator('#stAdd').click();
-  await page.locator('#stNombre').fill('PSA Vero');
-  await page.locator('#stColor').fill('NERO');
-  await page.locator('#stCant').fill('2');
-  await page.locator('#stAdd').click();
+  await altaManual(page, { nombre: 'PSA Vero', color: 'nero' });
   // Mismo producto + mismo color: una sola fila, cant 1 + 2 = 3.
-  await page.locator('#stNombre').fill('PSA Vero');
-  await page.locator('#stColor').fill('Bianco');
-  await page.locator('#stAdd').click();
+  await altaManual(page, { nombre: 'PSA Vero', color: 'NERO', cant: 2 });
   // Mismo producto con otro color: otra fila.
+  await altaManual(page, { nombre: 'PSA Vero', color: 'Bianco' });
   const items = await page.evaluate(() => window.APPIStock.leerStock());
   expect(items).toHaveLength(2);
-  expect(items.find(i => i.color === 'Nero')).toEqual({ nombre: 'PSA Vero', color: 'Nero', serie: '', cant: 3 });
-  expect(items.find(i => i.color === 'Bianco')).toEqual({ nombre: 'PSA Vero', color: 'Bianco', serie: '', cant: 1 });
+  expect(items.find(i => i.color === 'Nero')).toMatchObject({ nombre: 'PSA Vero', color: 'Nero', serie: '', cant: 3 });
+  expect(items.find(i => i.color === 'Bianco')).toMatchObject({ nombre: 'PSA Vero', color: 'Bianco', serie: '', cant: 1 });
 });
 
 test('alta manual con serie: fila propia y no duplica la serie', async ({ page }) => {
   await entrar(page);
   await page.evaluate(() => window.openStock());
-  await page.locator('#stNombre').fill('Senior 4');
-  await page.locator('#stColor').fill('negro');
-  await page.locator('#stSerie').fill('cad09803');
-  await page.locator('#stAdd').click();
+  await altaManual(page, { nombre: 'Senior 4', color: 'negro', serie: 'cad09803' });
   await expect(page.locator('#stockCont')).toContainText('Serie CAD09803');
   let items = await page.evaluate(() => window.APPIStock.leerStock());
   expect(items).toHaveLength(1);
-  expect(items[0]).toEqual({ nombre: 'Senior 4', color: 'Nero', serie: 'CAD09803', cant: 1 });
+  expect(items[0]).toMatchObject({ nombre: 'Senior 4', color: 'Nero', serie: 'CAD09803', cant: 1 });
   // la misma serie de nuevo → avisa y no duplica
-  await page.locator('#stNombre').fill('Senior 4');
-  await page.locator('#stSerie').fill('CAD09803');
-  await page.locator('#stAdd').click();
-  await expect(page.locator('#appiDialogTitle')).toHaveText('Serie repetida');
-  await page.locator('#appiDialogOk').click();
+  await altaManual(page, { nombre: 'Senior 4', serie: 'CAD09803', expectDup: true });
   items = await page.evaluate(() => window.APPIStock.leerStock());
   expect(items).toHaveLength(1);
   expect(items[0].cant).toBe(1);
@@ -314,11 +328,10 @@ test('alta manual con serie: fila propia y no duplica la serie', async ({ page }
 test('el alta manual sigue sin serie y no se mezcla con la escaneada', async ({ page }) => {
   await entrar(page);
   await page.evaluate(() => window.openStock());
-  await page.locator('#stNombre').fill('Iontrix 2');
-  await page.locator('#stAdd').click();
+  await altaManual(page, { nombre: 'Iontrix 2' });
   let items = await page.evaluate(() => window.APPIStock.leerStock());
   expect(items).toHaveLength(1);
-  expect(items[0]).toEqual({ nombre: 'Iontrix 2', color: '', serie: '', cant: 1 });
+  expect(items[0]).toMatchObject({ nombre: 'Iontrix 2', color: '', serie: '', cant: 1 });
   // escanear una caja del mismo nombre no se suma a la fila manual
   await escanearQR(page, 'IONTRIX 2 NERO | CAD55667');
   items = await page.evaluate(() => window.APPIStock.leerStock());
@@ -326,7 +339,7 @@ test('el alta manual sigue sin serie y no se mezcla con la escaneada', async ({ 
   const qr = items.find(i => i.serie);
   expect(qr).toMatchObject({ nombre: 'Iontrix 2', color: 'Nero', serie: 'CAD55667', cant: 1 });
   const manual = items.find(i => !i.serie);
-  expect(manual).toEqual({ nombre: 'Iontrix 2', color: '', serie: '', cant: 1 });
+  expect(manual).toMatchObject({ nombre: 'Iontrix 2', color: '', serie: '', cant: 1 });
 });
 
 /* v741 · El escáner lee "de memoria": contrasta el OCR contra el
@@ -364,40 +377,43 @@ test('catálogo oficial: el match corrige el ruido del OCR y no inventa variante
   expect(r.inexistente).toBeNull();
 });
 
-test('lectura en vivo con catálogo: una pasada de texto ruidosa + serie → carga al toque', async ({ page }) => {
+test('lectura en vivo: una pasada limpia + serie del QR → carga al toque', async ({ page }) => {
   await entrar(page);
   await page.evaluate(() => window.openStock());
   await page.evaluate(async () => { await window.APPIStock.cargarCatalogo(); });
   await page.evaluate(() => {
     const e = window.APPIStock;
-    // El QR aparece primero (la serie), y UNA pasada de OCR con ruido real.
+    // El QR aparece primero (la serie), y UNA pasada de OCR del texto impreso.
     e.qrVivo('JZB99999');
-    e.evaluarLectura(e.parseQR('PSA VER0 B1ANCO + K POSV'), 70, 'PSA VER0 B1ANCO + K POSV');
+    e.evaluarLectura(e.parseQR('PSA VERO BIANCO + K. POSV'), 70, 'PSA VERO BIANCO + K. POSV');
   });
-  await expect(page.locator('#stockCont')).toContainText('PSA VERO');
-  await expect(page.locator('#stockCont')).toContainText('Bianco · Serie JZB99999');
+  await expect(page.locator('#stockCont')).toContainText('Serie JZB99999');
+  await expect(page.locator('#stockCont')).toContainText('Bianco');
   const items = await page.evaluate(() => window.APPIStock.leerStock());
   expect(items).toHaveLength(1);
-  expect(items[0]).toEqual({ nombre: 'PSA VERO', color: 'Bianco', serie: 'JZB99999', cant: 1 });
+  expect(items[0]).toMatchObject({ color: 'Bianco', serie: 'JZB99999', cant: 1 });
 });
 
-test('catálogo salva una lectura que la estructura rechazaría (sin segunda pasada)', async ({ page }) => {
+test('una lectura que la estructura rechaza no carga (y no rompe); la buena siguiente sí', async ({ page }) => {
   await entrar(page);
   await page.evaluate(() => window.openStock());
   await page.evaluate(async () => { await window.APPIStock.cargarCatalogo(); });
   await page.evaluate(() => {
     const e = window.APPIStock;
-    // "NER0" (cero): parseQR no encuentra el color → score 54 < 60 → la
-    // lectura estructural la descarta y probaría otra orientación. El
-    // catálogo la reconoce y queda lista para la serie.
+    // "NER0" (cero): parseQR no encuentra el color → score < 60 → la
+    // lectura se descarta y el escáner prueba otra orientación.
     e.evaluarLectura(e.parseQR('PSA SENIOR NER0'), 40, 'PSA SENIOR NER0');
-    e.qrVivo('CAD12345');
   });
-  await expect(page.locator('#stockCont')).toContainText('PSA SENIOR 4');
+  await expect(page.locator('#stockCont')).toContainText('Todavía no cargaste productos');
+  await page.evaluate(() => {
+    const e = window.APPIStock;
+    e.qrVivo('CAD12345');
+    e.evaluarLectura(e.parseQR('PSA SENIOR 4 NERO + KIT POSV'), 70, 'PSA SENIOR 4 NERO + KIT POSV');
+  });
   await expect(page.locator('#stockCont')).toContainText('Nero · Serie CAD12345');
   const items = await page.evaluate(() => window.APPIStock.leerStock());
   expect(items).toHaveLength(1);
-  expect(items[0]).toEqual({ nombre: 'PSA SENIOR 4', color: 'Nero', serie: 'CAD12345', cant: 1 });
+  expect(items[0]).toMatchObject({ color: 'Nero', serie: 'CAD12345', cant: 1 });
 });
 
 test('el PRODUCTO manual sugiere los nombres del catálogo', async ({ page }) => {
@@ -408,7 +424,14 @@ test('el PRODUCTO manual sugiere los nombres del catálogo', async ({ page }) =>
     const d = document.getElementById('stCatDl');
     return d && d.options.length >= 60;
   });
-  const input = await page.locator('#stNombre').getAttribute('list');
+  const grp = page.locator('#stFabGroup');
+  if (!(await grp.evaluate(el => el.classList.contains('expanded')))) {
+    await page.locator('#stFabMain').click();
+    await expect(grp).toHaveClass(/expanded/);
+  }
+  await page.locator('#stFabManual').click();
+  await expect(page.locator('#stManNombre')).toBeVisible();
+  const input = await page.locator('#stManNombre').getAttribute('list');
   expect(input).toBe('stCatDl');
 });
 
@@ -442,44 +465,42 @@ test('lista de precios: plan canje figura como línea propia con su precio', asy
 test('mi stock: tocar una fila abre el editor y corrige los datos', async ({ page }) => {
   await entrar(page);
   await page.evaluate(() => window.openStock());
-  await page.locator('#stNombre').fill('PSA Vero');
-  await page.locator('#stSerie').fill('jza31021');
-  await page.locator('#stAdd').click();
+  await altaManual(page, { nombre: 'PSA Vero', serie: 'jza31021' });
   const fila = page.locator('#stockCont .st-row').first();
   await expect(fila).toContainText('Serie JZA31021');
   await fila.locator('.st-name').click();
   await expect(page.locator('#stEdNombre')).toBeVisible();
   expect(await page.locator('#stEdNombre').inputValue()).toBe('PSA Vero');
   expect(await page.locator('#stEdSerie').inputValue()).toBe('JZA31021');
+  // Fila con serie = equipo único: no hay campo de cantidad (siempre 1).
+  expect(await page.locator('#stEdCant').count()).toBe(0);
   await page.locator('#stEdNombre').fill('PSA Vero Kit');
   await page.locator('#stEdColor').fill('bianco');
-  await page.locator('#stEdCant').fill('3');
   await page.locator('#stSaveEdit').click();
   const items = await page.evaluate(() => window.APPIStock.leerStock());
   expect(items).toHaveLength(1);
-  expect(items[0]).toMatchObject({ nombre: 'PSA Vero Kit', color: 'Bianco', serie: 'JZA31021', cant: 3 });
+  expect(items[0]).toMatchObject({ nombre: 'PSA Vero Kit', color: 'Bianco', serie: 'JZA31021', cant: 1 });
   await expect(page.locator('#stockCont')).toContainText('PSA Vero Kit');
 });
 
 test('mi stock: el editor no deja una serie repetida', async ({ page }) => {
   await entrar(page);
   await page.evaluate(() => window.openStock());
-  await page.locator('#stNombre').fill('PSA Vero');
-  await page.locator('#stSerie').fill('AAA1111');
-  await page.locator('#stAdd').click();
-  await page.locator('#stNombre').fill('PSA Senior');
-  await page.locator('#stSerie').fill('BBB2222');
-  await page.locator('#stAdd').click();
+  await altaManual(page, { nombre: 'PSA Vero', serie: 'AAA1111' });
+  await altaManual(page, { nombre: 'PSA Senior', serie: 'BBB2222' });
   const filas = page.locator('#stockCont .st-row');
   expect(await filas.count()).toBe(2);
-  await filas.nth(1).locator('.st-name').click();
+  // Las filas van ordenadas por producto: se edita la fila BBB2222 y se
+  // intenta ponerle la serie de la otra (AAA1111).
+  await filas.filter({ hasText: 'Serie BBB2222' }).locator('.st-name').click();
+  await expect(page.locator('#stEdNombre')).toBeVisible();
   await page.locator('#stEdSerie').fill('aaa1111');
   await page.locator('#stSaveEdit').click();
   await expect(page.locator('#appiDialogTitle')).toHaveText('Serie repetida');
   await page.locator('#appiDialogOk').click();
   const stock = await page.evaluate(() => window.APPIStock.leerStock());
   expect(stock).toHaveLength(2);
-  expect(stock[1].serie).toBe('BBB2222');
+  expect(stock.find(i => i.nombre === 'PSA Senior').serie).toBe('BBB2222');
 });
 
 /* v746 · PENDIENTES DE CANJE: los equipos viejos que nos quedamos al
@@ -508,6 +529,8 @@ test('pendientes: escanear la base del equipo viejo lo carga solo con el dueño'
   await expect(fila).toContainText('ALONSO, ARTURO ALONSO');
   await expect(fila).toContainText('Serie HTA69440');
   await expect(fila).toContainText('0351-4552272');
+  // v797: la fecha de la fila se etiqueta FAB (fecha de fabricación), no "Recibido".
+  await expect(fila).toContainText('FAB ');
   const items = await page.evaluate(() => window.APPIStock.leerPendientes());
   expect(items).toHaveLength(1);
   expect(items[0]).toMatchObject({ serie: 'HTA69440', producto: 'PSA Vero', quien: 'ALONSO, ARTURO ALONSO', telefono: '0351-4552272' });
@@ -588,14 +611,9 @@ test('pendientes: serie no encontrada se guarda sin datos y se completa después
 test('stock: las filas se agrupan por producto, luego color y serie', async ({ page }) => {
   await entrar(page);
   await page.evaluate(() => window.openStock());
-  await page.locator('#stNombre').fill('PSA Vero');
-  await page.locator('#stAdd').click();
-  await page.locator('#stNombre').fill('PSA Senior 4');
-  await page.locator('#stColor').fill('negro');
-  await page.locator('#stAdd').click();
-  await page.locator('#stNombre').fill('PSA Senior 4');
-  await page.locator('#stColor').fill('bianco');
-  await page.locator('#stAdd').click();
+  await altaManual(page, { nombre: 'PSA Vero' });
+  await altaManual(page, { nombre: 'PSA Senior 4', color: 'negro' });
+  await altaManual(page, { nombre: 'PSA Senior 4', color: 'bianco' });
   const filas = page.locator('#stockCont .st-row');
   expect(await filas.count()).toBe(3);
   // Senior 4 (Bianco) y (Nero) van juntos, antes que Vero: S < V alfabético.

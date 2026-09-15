@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "796.0.0",
-  "cacheName": "appi-v796-auto-sync-psa",
+  "version": "797.0.0",
+  "cacheName": "appi-v797-fab-catalogo",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

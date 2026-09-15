@@ -126,7 +126,7 @@ window.openStock=function(){
 <script src="./tablero-negocio.js?v=510"></script>
 <script src="./lista-precios.js?v=791"></script>
 <script src="./vendor/zxing.min.js"></script>
-<script src="./stock-personal.js?v=796"></script>
+<script src="./stock-personal.js?v=797"></script>
 
 <script src="./porque-vivo.js"></script>
 <script src="./home-limpio.js?v=520"></script>
@@ -4589,7 +4589,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v796 · Segura</div>
+  <div class="ds-foot">APPI · v797 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -13372,8 +13372,8 @@ function cerrarToolsMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='796';
-      const CACHE_NAME='appi-v796-auto-sync-psa';
+      const swVersion='797';
+      const CACHE_NAME='appi-v797-fab-catalogo';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · v'+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}

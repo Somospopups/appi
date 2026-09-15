@@ -1665,7 +1665,7 @@
     if (window.bloquearScrollCuerpo) window.bloquearScrollCuerpo();
     $('stCancelEdit').onclick = cerrarEditar;
     $('stSaveEdit').onclick = guardarEditar;
-    setTimeout(function(){ var el = $('stEdNombre'); if (el) el.focus(); }, 40);
+    setTimeout(function(){ var el = $('stEdNombre'), sh = $('stSheet'); if (el && !(sh && sh.contains(document.activeElement))) el.focus(); }, 40);
   }
   function cerrarEditar(){
     var ov = $('stOverlay');
@@ -1722,7 +1722,7 @@
       ov.classList.remove('open'); if(window.liberarScrollCuerpo) window.liberarScrollCuerpo();
       pintar(); toast('Producto cargado 📦');
     };
-    setTimeout(function(){ var el=$('stManNombre'); if(el) el.focus(); }, 80);
+    setTimeout(function(){ var el=$('stManNombre'), sh=$('stSheet'); if(el && !(sh && sh.contains(document.activeElement))) el.focus(); }, 80);
   }
 
   // ------------------------------------------------------------------
@@ -2091,7 +2091,7 @@
       if (p.quien) meta.push('De: ' + p.quien);
       if (p.telefono) meta.push(p.telefono);
       meta.push('Serie ' + p.serie);
-      if (p.fecha) meta.push('Recibido ' + fechaTxtCorta(p.fecha));
+      if (p.fecha) meta.push('FAB ' + fechaTxtCorta(p.fecha));
       var sid = esc(p.serie);
       return '<div class="st-row" data-st-pedit="' + sid + '" title="Tocá para corregir">' +
         '<div><span class="st-name">' + esc(p.producto || 'Equipo canje') + '</span><span class="st-meta">' + esc(meta.join(' · ')) + '</span></div>' +
@@ -2153,7 +2153,7 @@
       });
     }
 
-    setTimeout(function(){ var el = $('stPSerie'); if (el) el.focus(); }, 40);
+    setTimeout(function(){ var el = $('stPSerie'), sh = $('stSheet'); if (el && !(sh && sh.contains(document.activeElement))) el.focus(); }, 40);
   }
   var editPIdx = -1;
   function cerrarFichaPendiente(){
