@@ -262,6 +262,8 @@ test.describe('Pendientes de canje: carga manual y sin botón Buscar en mis usua
     expect(decoded).toContain('PSA Senior 4');
     expect(decoded).toContain('SE8811');
     expect(decoded).toContain('PÉREZ, JUAN');
+    expect(decoded).not.toContain('APPI');
+    expect(decoded).not.toContain('Gestión de Canjes PSA');
   });
 
   test('si no hay pendientes y se toca COMPARTIR, avisa que no hay equipos para compartir', async ({ page }) => {

@@ -1966,11 +1966,8 @@
       if (p.telefono) lineas.push('   • *Tel:* ' + String(p.telefono).trim());
       if (p.domicilio) lineas.push('   • *Domicilio:* ' + String(p.domicilio).trim());
       if (p.fecha) lineas.push('   • *Fecha recepción:* ' + fechaTxtCorta(p.fecha));
-      lineas.push('');
+      if (idx < items.length - 1) lineas.push('');
     });
-
-    lineas.push('───────────────────');
-    lineas.push('📱 _APPI · Gestión de Canjes PSA_');
 
     abrirWhatsAppTexto(lineas.join('\n'));
     toast('Abriendo WhatsApp...');
@@ -1989,7 +1986,7 @@
     var lineas = [];
     var fechaHoy = fechaTxtCorta(hoyISO());
 
-    lineas.push('📦 *MI STOCK PERSONAL - PSA*');
+    lineas.push('📦 *MI STOCK PERSONAL*');
     lineas.push('📅 _' + fechaHoy + '_');
     lineas.push('');
 
@@ -2001,9 +1998,9 @@
         lineas.push('• ' + (Number(s.cant) || 1) + 'x ' + s.producto);
       });
     }
-    lineas.push('');
 
     if (totalPrestados > 0){
+      lineas.push('');
       lineas.push('🤝 *EN LA CALLE / PRESTADOS (' + totalPrestados + '):*');
       prestamos.forEach(function(p){
         var t = '• ' + p.producto + ' → Prestado a ' + p.quien;
@@ -2011,11 +2008,7 @@
         if (p.fecha) t += ' [' + fechaTxtCorta(p.fecha) + ']';
         lineas.push(t);
       });
-      lineas.push('');
     }
-
-    lineas.push('───────────────────');
-    lineas.push('📱 _APPI · Gestión de Stock PSA_');
 
     abrirWhatsAppTexto(lineas.join('\n'));
     toast('Abriendo WhatsApp...');

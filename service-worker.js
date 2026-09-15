@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v794-stock-compartir-wa';
+const CACHE_NAME = 'appi-v795-stock-compartir-sin-firma';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

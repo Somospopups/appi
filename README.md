@@ -4,8 +4,8 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
-- Versión: **v794 · Segura** · El escáner de Pendientes busca primero en tu planilla de Usuarios (ahora sí lee la columna Serie): si la serie está en el teléfono, carga al instante y sin internet; si no, consulta la base de PSA. Pendientes de canje en tiempo real: al abrir la cámara se pre-carga la base de garantías de PSA (el escaneo busca al instante), con lupa animada "pensando", check verde al encontrar al dueño y pitido de confirmación. Si la serie no figura, se guarda sin datos para completar cuando se habla con la empresa. Mi Stock editable y filas agrupadas por producto.
-- Caché de la app: `appi-v794-stock-compartir-wa` (se renueva al abrir APPI).
+- Versión: **v795 · Segura** · El escáner de Pendientes busca primero en tu planilla de Usuarios (ahora sí lee la columna Serie): si la serie está en el teléfono, carga al instante y sin internet; si no, consulta la base de PSA. Pendientes de canje en tiempo real: al abrir la cámara se pre-carga la base de garantías de PSA (el escaneo busca al instante), con lupa animada "pensando", check verde al encontrar al dueño y pitido de confirmación. Si la serie no figura, se guarda sin datos para completar cuando se habla con la empresa. Mi Stock editable y filas agrupadas por producto.
+- Caché de la app: `appi-v795-stock-compartir-sin-firma` (se renueva al abrir APPI).
 - Publicación: [https://somospopups.github.io/appi/](https://somospopups.github.io/appi/)
 - Acceso por número de distribuidor y contraseña.
 - Acceso administrador POPUPS mediante el candado, sin DIP ni número de distribuidor.
