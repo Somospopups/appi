@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "803.0.0",
-  "cacheName": "appi-v803-hoy-lista",
+  "version": "804.0.0",
+  "cacheName": "appi-v804-sin-botones",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

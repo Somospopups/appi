@@ -1150,10 +1150,10 @@
         if (typeof window.showView === 'function') window.showView('view-usuarios');
         setTimeout(function(){ try{ window.APPIMensajes.abrirFila(motivoId); }catch(e){} }, 480);
       }; };
-      // v803: el listado completo, persona por persona, SIEMPRE visible.
-      // Verde = ya la hice (✓), roja = no la hice (✗), neutra = pendiente.
-      // Cada fila trae sus botones ✓ / ✗ para marcar sin salir del Home.
-      var filas = [], items = [], hoyFilas = [];
+      // v804: como la tarjeta de reempadronamiento — sin botones por fila.
+      // La marca se hace en la tarea (Usuarios) y la fila refleja el estado
+      // en color: verde = ya la hice, roja = no la hice, neutra = pendiente.
+      var filas = [], items = [];
       var grupos = (window.APPIMensajes.deHoy ? window.APPIMensajes.deHoy() : []);
       if(!grupos.length && window.APPIMensajes.pendientes) grupos = window.APPIMensajes.pendientes();
       grupos.forEach(function(g){
@@ -1161,16 +1161,9 @@
           var m = null;
           try{ m = window.APPIMensajes.marcaDe(g.motivo.id, u); }catch(e){}
           var cls = m ? (m.e === 'hecha' ? 'ht-hecho' : 'ht-no-hecha') : '';
-          var i = hoyFilas.length;
-          hoyFilas.push({ motivoId: g.motivo.id, u: u });
-          filas.push('<li data-mu-marcas="' + i + '" class="' + cls + '">' +
-            '<span class="ht-li-nom">' + g.motivo.icono + ' <b>' + esc(nombreLindo(u.usuario)) + '</b>' +
-              '<small class="ht-li-motivo">· ' + esc(g.motivo.uno || g.motivo.varios || '') + '</small></span>' +
-            (m ? '<i class="' + (m.e === 'hecha' ? 'ok' : 'no') + '">' + (m.e === 'hecha' ? '✓ ya la hice' : '✗ no la hice') + '</i>' : '') +
-            '<span class="ht-marcas">' +
-              '<button type="button" class="ok' + (m && m.e === 'hecha' ? ' on' : '') + '" data-mu-ok="1" aria-label="Ya la hice">✓</button>' +
-              '<button type="button" class="no' + (m && m.e === 'no_hecha' ? ' on' : '') + '" data-mu-no="1" aria-label="No la hice">✗</button>' +
-            '</span>' +
+          filas.push('<li class="' + cls + '">' +
+            '<span class="ht-li-nom">' + g.motivo.icono + ' <b>' + esc(nombreLindo(u.usuario)) + '</b></span>' +
+            '<span class="ht-li-meta">' + esc(g.motivo.uno || g.motivo.varios || '') + '</span>' +
           '</li>');
           items.push(alCarrusel(g.motivo.id));
         });
@@ -1183,33 +1176,10 @@
       return {
         cat: 'usuarios', icono: '💧', kicker: 'Usuarios',
         titulo: titulo,
-        html: '<p class="ht-nota">Verde = ya la hice · Roja = no la hice. Tocá ✓ o ✗ y se colorean al toque.</p>' +
+        html: '<p class="ht-nota">Verde = ya la hice · Roja = no la hice. Se colorean al marcarlas en la tarea.</p>' +
               '<ul class="ht-lista">' + filas.join('') + '</ul>' +
               '<div class="ht-chips"><span>✓ ' + r.hechas + '</span><span>✗ ' + r.noHechas + '</span><span>quedan ' + r.pendientes + '</span></div>',
         items: items,
-        cablear: function(el){
-          el.querySelectorAll('[data-mu-marcas]').forEach(function(li){
-            var row = hoyFilas[parseInt(li.getAttribute('data-mu-marcas'), 10)];
-            if (!row || !window.APPIMensajes || !window.APPIMensajes.marcarAccion) return;
-            var marcar = function(estado){
-              return function(e){
-                if (e && e.stopPropagation) e.stopPropagation();
-                try{ window.APPIMensajes.marcarAccion(row.motivoId, row.u, estado); }catch(err){}
-                try{ if (navigator.vibrate) navigator.vibrate(12); }catch(err){}
-                // Recolorear al instante: se re-arma el mazo y se repinta,
-                // quedando la misma tarjeta en la cima. coverDOM=false fuerza
-                // que el cover de PC re-dibuje las cartas con el nuevo estado.
-                setTimeout(function(){
-                  try{ if (mazo){ mazo.tarjetas = armarTarjetas(); mazo.coverDOM = false; pintar(); } }catch(err){}
-                }, 220);
-              };
-            };
-            var okB = li.querySelector('[data-mu-ok]');
-            var noB = li.querySelector('[data-mu-no]');
-            if (okB) okB.onclick = marcar('hecha');
-            if (noB) noB.onclick = marcar('no_hecha');
-          });
-        },
         cta: { label: todas ? 'Ver en Usuarios' : 'Ir a marcar', go: items[0] || function(){ if (typeof window.showView === 'function') window.showView('view-usuarios'); } }
       };
     }catch(e){ return null; }
@@ -1462,18 +1432,6 @@
       '.ht-lista li.ht-no-hecha::after{content:"✗";color:#b91c1c}',
       'body.dark .ht-lista li.ht-no-hecha{background:#b91c1c !important;color:#fee2e2 !important;border:1px solid #ef4444 !important}',
       'body.dark .ht-lista li.ht-no-hecha::after{color:#fecaca}',
-      '.ht-li-motivo{font-size:11.5px;font-weight:700;opacity:.72;white-space:nowrap}',
-      '.ht-lista li[data-mu-marcas]::after{content:none}',
-      '.ht-lista li[data-mu-marcas] > i{flex:0 0 auto;margin-left:4px;white-space:nowrap;font-style:normal;font-size:11.5px;font-weight:900}',
-      '.ht-lista li.ht-hecho > i.ok{color:#065f46 !important}',
-      '.ht-lista li.ht-no-hecha > i.no{color:#7f1d1d !important}',
-      '.ht-marcas{display:flex;gap:6px;flex:0 0 auto;margin-left:auto}',
-      '.ht-marcas button{width:30px;height:30px;border-radius:50%;border:2px solid;font:inherit;font-size:14px;font-weight:900;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;background:rgba(255,255,255,.88);transition:transform .1s}',
-      '.ht-marcas button:active{transform:scale(.88)}',
-      '.ht-marcas .ok{border-color:#16a34a;color:#16a34a}',
-      '.ht-marcas .no{border-color:#dc2626;color:#dc2626}',
-      '.ht-marcas .ok.on{background:#16a34a;color:#fff}',
-      '.ht-marcas .no.on{background:#dc2626;color:#fff}',
       '.ht-lista li i{color:#c0392b;font-style:normal;font-size:12px;font-weight:900}',
       '.ht-nota{margin:0;color:#8a8b98;font-size:12.5px;line-height:1.35;flex:0 0 auto}',
       '.ht-pasos{margin:12px 0 0;padding:0;list-style:none;display:grid;gap:8px}',
@@ -1899,11 +1857,6 @@
         })(accion, li);
       }
     });
-    // Hook de tarjetas para cablear sus propios controles (v803: los
-    // botones ✓ / ✗ del listado del día).
-    if (t && typeof t.cablear === 'function'){
-      try{ t.cablear(el); }catch(e){}
-    }
     if (t && typeof t.alMantener === 'function'){
       var holdT = null;
       var clearHold = function(){ if (holdT){ clearTimeout(holdT); holdT = null; } };
@@ -2102,6 +2055,9 @@
     window.showView = function(id){
       var r = orig.apply(this, arguments);
       try{
+        // v804: al volver al Home, home-limpio reconstruye #homeLimpio (con el
+        // mazo adentro) y alEntrarAlHome re-abre el mazo con tarjetas nuevas:
+        // el listado del día y sus colores (verde/rojo) quedan a punto.
         if (id === 'view-home'){ autoAbierto = false; alEntrarAlHome(); }
         else { autoAbierto = false; }
       }catch(e){}

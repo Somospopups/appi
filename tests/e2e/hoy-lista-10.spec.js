@@ -1,8 +1,10 @@
 const { test, expect } = require('@playwright/test');
 
-// El listado del día (v803): la tarjeta Usuarios del mazo del Home muestra
-// SIEMPRE a la gente del día, persona por persona. Al marcar ✓ (ya la hice)
-// la fila se colorea verde; al marcar ✗ (no la hice), roja.
+// El listado del día (v804): la tarjeta Usuarios del mazo del Home muestra
+// SIEMPRE a la gente del día, persona por persona (como la tarjeta de
+// reempadronamiento: sin botones por fila). El color refleja la marca de la
+// tarea: verde = ya la hice, roja = no la hice. Al volver al Home el listado
+// se re-arma y los colores quedan a punto.
 
 const USER_ID = '11111111-1111-4111-8111-111111111113';
 
@@ -81,54 +83,81 @@ async function irATarjetaHoy(page) {
   throw new Error('no se encontró la tarjeta del listado del día');
 }
 
-// La tarjeta del listado, identificada por su categoría (funciona en cover
-// y en mazo de celular).
 const topCard = (page) => page.locator('#htDeck .ht-card.ht-cat-usuarios').first();
-const fila = (page, i) => topCard(page).locator('[data-mu-marcas]').nth(i);
+const fila = (page, i) => topCard(page).locator('.ht-lista li').nth(i);
 
-test('el listado se muestra completo y ✓ lo colorea verde', async ({ page }) => {
+// Marca a la gente del día como lo hace la propia tarea (APPIMensajes) y
+// simula el regreso al Home: el Home se reconstruye y el mazo vuelve a
+// armarse con tarjetas nuevas (colores a punto), como para el usuario real.
+// Se marca por teléfono para no depender del orden de los grupos.
+async function marcarYVolver(page, marcas) {
+  await page.evaluate((marcas) => {
+    const M = window.APPIMensajes;
+    const grupos = M.deHoy();
+    marcas.forEach(({ telf, estado }) => {
+      let ok = false;
+      for (const g of grupos) {
+        const u = g.gente.find(x => String(x.telf || '').replace(/\D/g, '') === telf);
+        if (u) { M.marcarAccion(g.motivo.id, u, estado); ok = true; break; }
+      }
+      if (!ok) throw new Error('no se encontró al usuario ' + telf);
+    });
+  }, marcas);
+  await page.evaluate(() => {
+    window.showView('view-usuarios');
+    window.showView('view-home');
+  });
+  await page.waitForTimeout(300);
+  await irATarjetaHoy(page); // re-abre el mazo reconstruido con lo nuevo
+}
+
+test('el listado se muestra completo, sin botones, y la ✓ de la tarea lo pinta verde', async ({ page }) => {
   await entrar(page);
   const total = await page.evaluate(() => window.APPIMensajes.resumenHoy().total);
   expect(total).toBe(3);
   await irATarjetaHoy(page);
   // Las 3 personas del día, persona por persona, siempre visibles.
-  await expect(topCard(page).locator('[data-mu-marcas]')).toHaveCount(3);
+  await expect(topCard(page).locator('.ht-lista li')).toHaveCount(3);
   await expect(topCard(page)).toContainText('Gomez');
   await expect(topCard(page)).toContainText('Ruiz');
   await expect(topCard(page)).toContainText('Diaz');
-  // Tocarle ✓ a la primera: se colorea verde al instante.
-  await fila(page, 0).locator('[data-mu-ok]').click();
+  // Sin botones ✓/✗ por fila (como la tarjeta de reempadronamiento).
+  expect(await topCard(page).locator('button[data-mu-ok]').count()).toBe(0);
+  expect(await topCard(page).locator('button[data-mu-no]').count()).toBe(0);
+  expect(await topCard(page).locator('[data-mu-marcas]').count()).toBe(0);
+  // La tarea marca a la primera persona…
+  await marcarYVolver(page, [{ telf: '3515551001', estado: 'hecha' }]); // Gomez (fila 0)
+  // …y la fila se colorea verde.
   await expect(fila(page, 0)).toHaveClass(/ht-hecho/, { timeout: 5000 });
-  await expect(fila(page, 0)).toContainText('ya la hice');
   await expect(topCard(page).locator('.ht-chips')).toContainText('✓ 1');
-  // La marca quedó guardada en el estado del día.
   const st = await page.evaluate(() => window.APPIMensajes.resumenHoy());
   expect(st.hechas).toBe(1);
   expect(st.pendientes).toBe(2);
 });
 
-test('✗ lo colorea rojo y el mazo se mantiene en la misma tarjeta', async ({ page }) => {
+test('la ✗ de la tarea pinta la fila roja y tocarla abre el carrusel', async ({ page }) => {
   await entrar(page);
   await irATarjetaHoy(page);
-  await expect(topCard(page).locator('[data-mu-marcas]')).toHaveCount(3);
-  await fila(page, 1).locator('[data-mu-no]').click();
+  // Ruiz (fila 1) la marca sin hacer.
+  await marcarYVolver(page, [{ telf: '3515551002', estado: 'no_hecha' }]);
   await expect(fila(page, 1)).toHaveClass(/ht-no-hecha/, { timeout: 5000 });
-  await expect(fila(page, 1)).toContainText('no la hice');
   await expect(topCard(page).locator('.ht-chips')).toContainText('✗ 1');
-  // El mazo sigue en la tarjeta del listado (no saltó ni se cerró).
-  expect(await topCard(page).textContent()).toMatch(/Quedan? ?\d+ de \d+/);
   const st = await page.evaluate(() => window.APPIMensajes.resumenHoy());
   expect(st.noHechas).toBe(1);
+  // Tocar la fila abre el carrusel de Usuarios (la marca se hace ahí).
+  await fila(page, 1).click();
+  await expect(page.locator('#view-usuarios')).toHaveClass(/active/, { timeout: 5000 });
 });
 
-test('el color persiste al volver a armar la tarjeta', async ({ page }) => {
+test('los colores persisten al volver a armar la tarjeta', async ({ page }) => {
   await entrar(page);
   await irATarjetaHoy(page);
-  // ✓ en la primera, ✗ en la segunda.
-  await fila(page, 0).locator('[data-mu-ok]').click();
-  await expect(fila(page, 0)).toHaveClass(/ht-hecho/, { timeout: 5000 });
-  await fila(page, 2).locator('[data-mu-no]').click();
-  await expect(fila(page, 2)).toHaveClass(/ht-no-hecha/, { timeout: 5000 });
+  await marcarYVolver(page, [
+    { telf: '3515551001', estado: 'hecha' },    // Gomez (fila 0)
+    { telf: '3515551003', estado: 'no_hecha' }  // Diaz (fila 2)
+  ]);
+  await expect(fila(page, 0)).toHaveClass(/ht-hecho/);
+  await expect(fila(page, 2)).toHaveClass(/ht-no-hecha/);
   // Se cierra el mazo y se vuelve a armar: los colores siguen.
   await page.evaluate(() => window.APPIHomeTarjetas.cerrar());
   const html = await page.evaluate(() => {
@@ -137,6 +166,7 @@ test('el color persiste al volver a armar la tarjeta', async ({ page }) => {
   });
   expect(html).toContain('ht-hecho');
   expect(html).toContain('ht-no-hecha');
-  expect(html).toContain('ya la hice');
-  expect(html).toContain('no la hice');
+  expect(html).not.toContain('data-mu-ok');
+  expect(html).not.toContain('data-mu-no');
 });
+
