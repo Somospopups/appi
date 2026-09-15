@@ -147,15 +147,23 @@ test('en PC la barra trae las mismas herramientas que el celular', async ({ page
   expect(leaked).not.toMatch(/limpiarRestos|initHistorico|<\/html>/);
 });
 
-test('la tarjeta de la jornada abre el calendario y guarda tareas', async ({ page }) => {
+test('el calendario de la jornada vive en el home, justo debajo de Tu jornada (v808)', async ({ page }) => {
   await entrar(page);
-  await page.locator('#hlCardOpen').click();
-  await expect(page.locator('#calOverlay')).toHaveClass(/open/);
+  // Sin abrir nada: el calendario es visible en el home.
+  await expect(page.locator('#calInline')).toBeVisible();
+  // Y está justo debajo de la card de Tu jornada.
+  const orden = await page.evaluate(() => {
+    const card = document.querySelector('#hlCardOpen');
+    const cal = document.querySelector('#calInlineCard');
+    if (!card || !cal) return null;
+    const r1 = card.getBoundingClientRect(), r2 = cal.getBoundingClientRect();
+    return r2.top >= r1.bottom - 2 && r2.top < r1.bottom + 40;
+  });
+  expect(orden).toBe(true);
   await page.locator('#calNewTask').fill('Preparar demostración');
   await page.locator('#calAddBtn').click();
-  await expect(page.locator('#calModal')).toContainText('Preparar demostración');
-  await page.locator('#calClose').click();
-  await expect(page.locator('#calOverlay')).not.toHaveClass(/open/);
+  await expect(page.locator('#calInline')).toContainText('Preparar demostración');
+  // Y la línea de tiempo de Tu jornada la muestra al instante.
   await expect(page.locator('#homeLimpio')).toContainText('Preparar demostración');
 });
 
@@ -398,8 +406,7 @@ test('un toque con temblor de dedo sobre el botón dispara la acción igual', as
 
 test('las tareas del calendario aceptan hora y se ordenan por ella', async ({ page }) => {
   await entrar(page);
-  await page.locator('#hlCardOpen').click();
-  await expect(page.locator('.cal-overlay')).toBeVisible();
+  await expect(page.locator('#calInline')).toBeVisible();
   // Una tarea a las 18:30…
   await page.locator('#calNewHora').fill('18:30');
   await page.locator('#calNewTask').fill('Demo con Marta');
@@ -419,18 +426,14 @@ test('las tareas del calendario aceptan hora y se ordenan por ella', async ({ pa
   await expect(tareas.nth(1)).toContainText('18:30');
   await expect(tareas.nth(2)).toContainText('Ordenar el stock');
   // Y en Tu jornada, la tarea sale con su hora en la línea de tiempo.
-  await page.locator('#calClose').click();
   await expect(page.locator('#homeLimpio')).toContainText('09:15');
   await expect(page.locator('#homeLimpio')).toContainText('Llamar a Pedro');
 });
 
-test('cerrar el calendario devuelve el scroll en toda la app (regresión v300)', async ({ page }) => {
+test('el calendario visible en el home no bloquea el scroll (v808)', async ({ page }) => {
   await entrar(page);
-  // Abrir y cerrar el calendario bloqueaba el scroll para siempre: el guard
-  // de overlays veía el popup oculto de Crear cuenta y nunca liberaba.
-  await page.locator('#hlCardOpen').click();
-  await expect(page.locator('.cal-overlay')).toBeVisible();
-  await page.locator('#calClose').click();
+  // El calendario ya no es un overlay: nunca bloquea el scroll del cuerpo.
+  await expect(page.locator('#calInline')).toBeVisible();
   const overflow = await page.evaluate(() => document.body.style.overflow);
   expect(overflow).not.toBe('hidden');
   // Y en Mi Equipo se scrollea normal.

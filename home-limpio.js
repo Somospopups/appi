@@ -122,21 +122,14 @@
       'body.dark .hl-link{background:#25273a;color:#c6cbea}' +
 
       /* Calendario modal */
-      '.cal-overlay{position:fixed;inset:0;z-index:200;background:rgba(20,20,30,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);display:none;align-items:flex-end;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .25s ease}' +
-      '.cal-overlay.open{display:flex;opacity:1;pointer-events:auto}' +
-      '.cal-modal{background:#f3eee3;border-radius:24px 24px 0 0;width:100%;max-width:480px;max-height:85vh;overflow-y:auto;box-shadow:0 -10px 40px rgba(30,24,12,.18);transform:translateY(20px);transition:transform .3s cubic-bezier(.34,1.56,.64,1);padding-bottom:calc(env(safe-area-inset-bottom) + 12px)}' +
-      '.cal-overlay.open .cal-modal{transform:translateY(0)}' +
-      'body.dark .cal-modal{background:#1c2430}' +
-      '.cal-head{padding:18px 18px 8px;display:flex;align-items:center;gap:8px;position:sticky;top:0;background:#f3eee3;border-radius:24px 24px 0 0;z-index:2}' +
-      'body.dark .cal-head{background:#1c2430}' +
+      '.cal-inline{cursor:default;margin-top:14px}' +
+      '.cal-head{padding:2px 2px 8px;display:flex;align-items:center;gap:8px}' +
       '.cal-head h2{margin:0;font-size:18px;font-weight:900;color:#23263a;letter-spacing:-.3px;flex:1;min-width:0}' +
       'body.dark .cal-head h2{color:#f2f2f7}' +
       '.cal-nav{display:flex;gap:6px;flex:none}' +
       '.cal-nav button{width:34px;height:34px;border-radius:10px;border:0;background:rgba(11,88,120,.1);color:#0b5878;font-size:16px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center}' +
       '.cal-nav button:active{transform:scale(.9)}' +
       'body.dark .cal-nav button{background:rgba(11,88,120,.28);color:#d7e8f0}' +
-      '.cal-close{width:30px;height:30px;border-radius:50%;background:rgba(0,0,0,.06);border:0;font-size:16px;font-weight:700;color:#6b6b76;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:none}' +
-      'body.dark .cal-close{background:rgba(255,255,255,.1);color:#a0a0b0}' +
 
       '.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;padding:4px 14px 8px}' +
       '.cal-day-name{text-align:center;font-size:9px;font-weight:900;color:#8a8fae;letter-spacing:.5px;text-transform:uppercase;padding:6px 0}' +
@@ -286,11 +279,14 @@
         '<div class="hl-kicker">Tu jornada</div>' +
         timelineHtml +
       '</div>' +
+      '<div class="hl-card cal-inline" id="calInlineCard">' +
+        '<div id="calInline"></div>' +
+      '</div>' +
       (acts.length > 0 ? '<button class="hl-link" onclick="openMiGestion()">Ver todo el Panel ›</button>' : '') +
       '</div>';
   }
 
-  /* ---- Calendario modal ---- */
+  /* ---- Calendario (v808: visible en el home, abajo de Tu jornada) ---- */
   var calState = { year: 0, month: 0, selected: '' };
 
   function initCalState(){
@@ -300,39 +296,19 @@
     calState.selected = now.toISOString().slice(0,10);
   }
 
-  function ensureCalOverlay(){
-    if($('calOverlay')) return;
-    var ov = document.createElement('div');
-    ov.id = 'calOverlay';
-    ov.className = 'cal-overlay';
-    ov.innerHTML = '<div class="cal-modal" id="calModal"></div>';
-    document.body.appendChild(ov);
-    ov.addEventListener('click', function(e){ if(e.target === ov) closeCal(); });
-  }
-
   function openCal(){
-    css();
-    initCalState();
-    ensureCalOverlay();
-    renderCal();
-    setTimeout(function(){
-      var ov = $('calOverlay');
-      if(ov) ov.classList.add('open');
-      if(window.bloquearScrollCuerpo) window.bloquearScrollCuerpo();
-    }, 10);
+    // v808: el calendario ya es visible en el home; "abrir" lo lleva a la vista.
+    var c = $('calInlineCard');
+    if (c) c.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
   function closeCal(){
-    var ov = $('calOverlay');
-    if(ov) ov.classList.remove('open');
-    if(window.liberarScrollCuerpo) window.liberarScrollCuerpo();
-    render(); // re-render home to show updated tasks
+    // v808: sin modal que cerrar; el calendario vive en el home.
   }
 
-  function renderCal(){
-    var modal = $('calModal');
+  function renderCalInline(){
+    var modal = $('calInline');
     if(!modal) return;
-    // Si el gesto de atrás lo escondió a lo bruto (hidden), reabrir lo revive (v317).
-    modal.hidden = false;
+    if(!calState.year) initCalState();
     var y = calState.year, m = calState.month;
     var firstDay = new Date(y, m, 1).getDay();
     var daysInMonth = new Date(y, m + 1, 0).getDate();
@@ -345,7 +321,6 @@
         '<button id="calPrev">‹</button>' +
         '<button id="calNext">›</button>' +
       '</div>' +
-      '<button class="cal-close" id="calClose" aria-label="Cerrar">×</button>' +
     '</div>';
 
     html += '<div class="cal-grid">';
@@ -396,20 +371,20 @@
     modal.innerHTML = html;
 
     // Bind events
-    $('calPrev').onclick = function(){ calState.month--; if(calState.month < 0){ calState.month = 11; calState.year--; } renderCal(); };
-    $('calNext').onclick = function(){ calState.month++; if(calState.month > 11){ calState.month = 0; calState.year++; } renderCal(); };
-    $('calClose').onclick = closeCal;
+    $('calPrev').onclick = function(){ calState.month--; if(calState.month < 0){ calState.month = 11; calState.year--; } renderCalInline(); };
+    $('calNext').onclick = function(){ calState.month++; if(calState.month > 11){ calState.month = 0; calState.year++; } renderCalInline(); };
 
     modal.querySelectorAll('.cal-day:not(.empty)').forEach(function(el){
-      el.onclick = function(){ calState.selected = el.dataset.date; renderCal(); };
+      el.onclick = function(){ calState.selected = el.dataset.date; renderCalInline(); };
     });
 
+    // Cambiar tareas también refresca la línea de tiempo de Tu jornada.
     modal.querySelectorAll('.cal-task-check').forEach(function(el){
-      el.onclick = function(){ toggleTarea(el.dataset.taskDate, Number(el.dataset.taskId)); renderCal(); };
+      el.onclick = function(){ toggleTarea(el.dataset.taskDate, Number(el.dataset.taskId)); render(); };
     });
 
     modal.querySelectorAll('.cal-task-del').forEach(function(el){
-      el.onclick = function(){ eliminarTarea(el.dataset.taskDate, Number(el.dataset.taskDel)); renderCal(); };
+      el.onclick = function(){ eliminarTarea(el.dataset.taskDate, Number(el.dataset.taskDel)); render(); };
     });
 
     var addBtn = $('calAddBtn');
@@ -426,7 +401,7 @@
       agregarTarea(calState.selected, txt, addHora ? addHora.value : '');
       addInput.value = '';
       if (addHora) addHora.value = '';
-      renderCal();
+      render();
     }
     addBtn.onclick = doAdd;
     addInput.onkeydown = function(e){ if(e.key === 'Enter') doAdd(); };
@@ -442,7 +417,10 @@
     var header = host.querySelector('header');
     header.insertAdjacentHTML('afterend', html());
 
-    // Abrir calendario al tocar la card
+    // El calendario vive en el home, abajo de Tu jornada (v808).
+    renderCalInline();
+
+    // Al tocar la card, bajar al calendario
     var cardOpen = $('hlCardOpen');
     if(cardOpen) cardOpen.onclick = function(e){
       if(e.target.closest('.hl-ev-btn')) return; // no abrir si tocó un botón de acción

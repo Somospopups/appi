@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "807.0.0",
-  "cacheName": "appi-v807-sin-ruleta",
+  "version": "808.0.0",
+  "cacheName": "appi-v808-calendario-home",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {
