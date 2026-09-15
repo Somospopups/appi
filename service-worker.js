@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v800-canje-acciones';
+const CACHE_NAME = 'appi-v801-ruleta';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

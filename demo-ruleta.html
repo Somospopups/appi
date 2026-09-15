@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ruleta PSA · Demo</title>
+<style>
+  html, body { margin: 0; height: 100%; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; }
+  body {
+    background: radial-gradient(1200px 700px at 50% -10%, #14495f 0%, #0d2b3d 45%, #0a1c29 100%);
+    color: #fff;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 14px; padding: 24px; box-sizing: border-box; text-align: center;
+  }
+  .tag {
+    font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: #3ad0a4;
+    background: rgba(58,208,164,.12); border: 1px solid rgba(58,208,164,.35);
+    padding: 5px 12px; border-radius: 999px;
+  }
+  h1 { margin: 0; font-size: 30px; }
+  p.sub { margin: 0; font-size: 14px; color: rgba(255,255,255,.72); max-width: 420px; line-height: 1.5; }
+  .btn {
+    border: 0; border-radius: 16px; background: linear-gradient(135deg, #0b5878, #3ad0a4);
+    color: #fff; font: inherit; font-size: 17px; font-weight: 900; padding: 16px 34px;
+    cursor: pointer; box-shadow: 0 10px 30px rgba(58,208,164,.35);
+  }
+  .btn:active { transform: scale(.97); }
+  .nota { font-size: 11.5px; color: rgba(255,255,255,.45); max-width: 380px; line-height: 1.5; }
+  #stars { font-size: 13px; color: #ffd166; min-height: 18px; }
+</style>
+</head>
+<body>
+  <span class="tag">DEMO · APPI v801</span>
+  <h1>🎰 Ruleta PSA</h1>
+  <p class="sub">Girala y cae una tarea real de tu día: 3 mensajes, una llamada, un referido, una demo… o el premio <b>“¡Ya fue mucho por hoy!”</b>. Con sonido, confeti y todo.</p>
+  <button class="btn" id="btnAbrir">GIRAR LA RULETA</button>
+  <div id="stars"></div>
+  <p class="nota">Demo con contactos de muestra. En la app (v801) la ruleta usa <b>tus</b> clientes de la base de garantías, con sus botones de WhatsApp y llamada.</p>
+  <script src="./ruleta-psa.js?v=demo1"></script>
+  <script>
+    // Base de muestra (en la app real vienen de la base de garantías del teléfono).
+    window.usuariosTodosActual = function () {
+      return [
+        { usuario: 'GIMENEZ, CARLA', telf: '3515550001', producto: 'PSA SENIOR 4' },
+        { usuario: 'ALONSO, ARTURO', telf: '3514552272', producto: 'PSA VERO' },
+        { usuario: 'MOLINA, SOSTENES', telf: '3515550003', producto: 'PSA VERO' },
+        { usuario: 'FERNANDEZ, LUCIA', telf: '3515550004', producto: 'SODA BURBY' },
+        { usuario: 'ROMERO, HECTOR', telf: '3515550005', producto: 'PSA SENIOR 4' }
+      ];
+    };
+    function pintaStars(){
+      var e = window.APPIRuleta.estadoHoy();
+      document.getElementById('stars').textContent = e.tareas ? ('Hoy ya hiciste ' + e.tareas + ' tarea' + (e.tareas > 1 ? 's' : '') + ' ⭐') : '';
+    }
+    setInterval(pintaStars, 1500);
+    document.getElementById('btnAbrir').addEventListener('click', function(){
+      window.APPIRuleta.abrir();
+      setTimeout(function(){ window.APPIRuleta.girar(); }, 350);
+    });
+    // Apertura automática para que la demo salte de lleno.
+    window.addEventListener('load', function(){
+      setTimeout(function(){
+        window.APPIRuleta.abrir();
+        setTimeout(function(){ window.APPIRuleta.girar(); }, 450);
+      }, 700);
+    });
+  </script>
+</body>
+</html>

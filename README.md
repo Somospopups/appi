@@ -4,7 +4,7 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
-- Versión: **v800 · Segura** · Plan Canje sin límite de 1 año: los vencidos hace 1, 2 o 3 años entran como candidatos de renovación, de los más recientes a los más antiguos. Red de seguridad: si no hay tareas de clientes (distribuidor nuevo o día agotado), el panel muestra las 5 acciones comerciales del día (3 llamados, 2 referidos, 1 demostración, 1 oportunidad de negocio, 1 revisión de entregas/stock) con su ✓, que suman al partido del día sin que la pantalla se quede en blanco.
+- Versión: **v801 · Segura** · 🎰 Ruleta PSA: una ruleta animada con sonido (bips, ticks y campanita, confeti) que entrega la tarea del día con tus clientes reales: 3 mensajes, llamada, referido, demo, stock, retrolavado, negocio… o el premio "¡Ya fue mucho por hoy!". Cada tarea hecha suma una ⭐ al día. En Usuarios (panel Hoy) está el botón GIRAR.
 - v796: Sincronización automática de garantías y usuarios desde MI PSA mediante consulta de reportes seriales en Edge Function sin bloqueos de CORS, 10 tareas diarias garantizadas y carga manual por Excel restaurada como respaldo. Mi Stock y Pendientes de canje en tiempo real con lupa pensante y compartir por WhatsApp.
 - Caché de la app: `appi-v797-fab-catalogo` (se renueva al abrir APPI).
 - Publicación: [https://somospopups.github.io/appi/](https://somospopups.github.io/appi/)

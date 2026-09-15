@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "800.0.0",
-  "cacheName": "appi-v800-canje-acciones",
+  "version": "801.0.0",
+  "cacheName": "appi-v801-ruleta",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

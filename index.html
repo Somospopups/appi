@@ -119,6 +119,7 @@ window.openStock=function(){
 <script src="./usuarios-botones.js?v=423"></script>
 <script src="./mensajes-hielo.js"></script>
 <script src="./mensajes-usuarios.js?v=800"></script>
+<script src="./ruleta-psa.js?v=801"></script>
 <script src="./reactivacion.js"></script>
 
 <script src="./escalera-suenos.js"></script>
@@ -4589,7 +4590,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v800 · Segura</div>
+  <div class="ds-foot">APPI · v801 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -13372,8 +13373,8 @@ function cerrarToolsMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='800';
-      const CACHE_NAME='appi-v800-canje-acciones';
+      const swVersion='801';
+      const CACHE_NAME='appi-v801-ruleta';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · v'+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
