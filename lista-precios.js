@@ -4,6 +4,7 @@
 
   var LS = 'appi_lista_carrito_v1';
   var LS_FAB = 'appi_lista_fab_v1';
+  try { localStorage.removeItem(LS_FAB); } catch (e) {}
   var LS_PAGO = 'appi_lista_pago_v1';
   var LS_BOT = 'appi_lista_bot_v1';
   var CAT = null;
@@ -198,11 +199,11 @@
       '.lp-qty button.ghost{background:rgba(11,88,120,.12);color:#0b5878}' +
       '.lp-qty i{min-width:18px;text-align:center;font-style:normal;font-size:13px;font-weight:900;color:#2a2a32}' +
       '.lp-empty{padding:28px 8px;text-align:center;font-size:13px;font-weight:750;color:#686977}' +
-      '.lp-fab{display:none;position:fixed;right:14px;bottom:108px;bottom:calc(env(safe-area-inset-bottom) + 108px);z-index:70;align-items:center;gap:8px;border:0;border-radius:999px;padding:12px 16px;background:#0b5878;color:#fff;font:inherit;font-size:13px;font-weight:900;box-shadow:0 8px 24px rgba(11,88,120,.38);cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}' +
+      '.lp-fab{display:none;position:fixed;right:14px;left:auto;top:auto;bottom:98px;bottom:calc(env(safe-area-inset-bottom) + 98px);z-index:70;align-items:center;gap:8px;border:0;border-radius:999px;padding:12px 16px;background:#0b5878;color:#fff;font:inherit;font-size:13px;font-weight:900;box-shadow:0 8px 24px rgba(11,88,120,.38);cursor:pointer;touch-action:manipulation;user-select:none;-webkit-user-select:none}' +
       '.lp-fab.on{display:flex}' +
-      '.lp-fab.arrastre{cursor:grabbing;opacity:.92}' +
       '.lp-fab i{min-width:22px;height:22px;padding:0 6px;border-radius:99px;background:#fff;color:#0b5878;font-style:normal;font-size:12px;font-weight:950;display:flex;align-items:center;justify-content:center;pointer-events:none}' +
       '.lp-fab span{pointer-events:none}' +
+      '@media (min-width:1024px){.lp-fab{bottom:24px;right:28px;left:auto}.lp-wrap{padding-bottom:88px}}' +
       '#lpSheet{display:none;position:fixed;inset:0;z-index:80;background:rgba(20,24,32,.45);align-items:flex-end}' +
       '#lpSheet.open{display:flex}' +
       '.lp-sheet{width:100%;max-height:86%;overflow:auto;background:#f3eee3;border-radius:22px 22px 0 0;padding:14px 14px calc(18px + env(safe-area-inset-bottom))}' +
@@ -340,70 +341,6 @@
     host.innerHTML = html;
   }
 
-  function fabGuardado() {
-    try { return JSON.parse(localStorage.getItem(LS_FAB) || 'null'); } catch (e) { return null; }
-  }
-  function aplicarFabPos(fab) {
-    var pos = fabGuardado();
-    if (!pos || pos.x == null || pos.y == null) return;
-    var w = fab.offsetWidth || 120;
-    var h = fab.offsetHeight || 48;
-    var x = Math.round(pos.x * (window.innerWidth - w));
-    var y = Math.round(pos.y * (window.innerHeight - h));
-    x = Math.max(8, Math.min(window.innerWidth - w - 8, x));
-    y = Math.max(8, Math.min(window.innerHeight - h - 8, y));
-    fab.style.left = x + 'px';
-    fab.style.top = y + 'px';
-    fab.style.right = 'auto';
-    fab.style.bottom = 'auto';
-  }
-  function bindFab(fab) {
-    if (!fab || fab._lpDrag) return;
-    fab._lpDrag = true;
-    var sx = 0, sy = 0, sl = 0, st = 0, moved = false, activo = false;
-    function punto(e) {
-      var t = (e.touches && e.touches[0]) || e;
-      return { x: t.clientX, y: t.clientY };
-    }
-    function down(e) {
-      var p = punto(e);
-      var r = fab.getBoundingClientRect();
-      sx = p.x; sy = p.y; sl = r.left; st = r.top; moved = false; activo = true;
-      fab.classList.add('arrastre');
-      try { fab.setPointerCapture(e.pointerId); } catch (err) {}
-      e.preventDefault();
-    }
-    function move(e) {
-      if (!activo) return;
-      var p = punto(e);
-      var dx = p.x - sx, dy = p.y - sy;
-      if (!moved && (dx * dx + dy * dy) < 64) return;
-      moved = true;
-      var w = fab.offsetWidth, h = fab.offsetHeight;
-      var x = Math.max(8, Math.min(window.innerWidth - w - 8, sl + dx));
-      var y = Math.max(8, Math.min(window.innerHeight - h - 8, st + dy));
-      fab.style.left = x + 'px';
-      fab.style.top = y + 'px';
-      fab.style.right = 'auto';
-      fab.style.bottom = 'auto';
-      e.preventDefault();
-    }
-    function up() {
-      if (!activo) return;
-      activo = false;
-      fab.classList.remove('arrastre');
-      if (!moved) { abrirSheet(); return; }
-      var r = fab.getBoundingClientRect();
-      var maxX = Math.max(1, window.innerWidth - r.width);
-      var maxY = Math.max(1, window.innerHeight - r.height);
-      try { localStorage.setItem(LS_FAB, JSON.stringify({ x: r.left / maxX, y: r.top / maxY })); } catch (err) {}
-    }
-    fab.addEventListener('pointerdown', down);
-    fab.addEventListener('pointermove', move);
-    fab.addEventListener('pointerup', up);
-    fab.addEventListener('pointercancel', up);
-  }
-
   function pintarFab() {
     var fab = $('lpFab');
     if (!fab) return;
@@ -416,8 +353,10 @@
     fab.hidden = false;
     fab.classList.add('on');
     fab.innerHTML = '<i>' + r.n + '</i><span>' + money(r.tot) + '</span>';
-    bindFab(fab);
-    aplicarFabPos(fab);
+    if (!fab._lpBound) {
+      fab._lpBound = true;
+      fab.onclick = abrirSheet;
+    }
   }
 
 
