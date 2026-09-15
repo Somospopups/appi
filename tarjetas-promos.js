@@ -170,8 +170,8 @@
     var s = document.createElement('style');
     s.id = 'tpStyle';
     s.textContent = '' +
-      '.tp-bar{margin:14px 0 0;padding:14px;border-radius:16px;background:linear-gradient(160deg,rgba(61,99,201,.10),rgba(160,107,255,.10));border:1px solid rgba(91,141,239,.18)}' +
-      'body.dark .tp-bar{background:linear-gradient(160deg,rgba(61,99,201,.16),rgba(160,107,255,.14));border-color:rgba(255,255,255,.08)}' +
+      '.tp-bar{margin:14px 0 0;padding:14px;border-radius:16px;background:linear-gradient(160deg,rgba(61,99,201,.10),rgba(58,208,164,.10));border:1px solid rgba(91,141,239,.18)}' +
+      'body.dark .tp-bar{background:linear-gradient(160deg,rgba(61,99,201,.16),rgba(58,208,164,.14));border-color:rgba(255,255,255,.08)}' +
       '.tp-bar h3{margin:0 0 4px;font-size:14px;font-weight:950;color:#2b2c3a}' +
       'body.dark .tp-bar h3{color:#f2f2f7}' +
       '.tp-bar p{margin:0 0 10px;font-size:11px;font-weight:700;color:#686977;line-height:1.4}' +
@@ -184,7 +184,7 @@
       '.tp-msg{min-height:72px;resize:vertical;margin-top:8px}' +
       '.tp-tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px}' +
       '.tp-chip{border:0;border-radius:999px;padding:7px 10px;font:inherit;font-size:11px;font-weight:900;cursor:pointer;background:rgba(91,141,239,.12);color:#3d63c9}' +
-      '.tp-chip.on{background:linear-gradient(135deg,#5b8def,#875fdd);color:#fff}' +
+      '.tp-chip.on{background:linear-gradient(135deg,#0b5878,#3ad0a4);color:#fff}' +
       '.tp-count{margin-left:auto;font-size:11px;font-weight:900;color:#3d63c9}' +
       /* En la ficha de Usuarios el separador lo pone .u-fila (un solo
          renglón, v335): acá sólo se mantiene el aire. */
@@ -202,9 +202,9 @@
       '.tp-sheet h3{margin:0 0 6px;font-size:17px}' +
       '.tp-opts{display:flex;flex-wrap:wrap;gap:7px;margin:8px 0 14px}' +
       '.tp-opt{border:1px solid rgba(80,90,130,.14);border-radius:12px;padding:8px 10px;background:rgba(255,255,255,.8);font:inherit;font-size:12px;font-weight:850;cursor:pointer}' +
-      '.tp-opt.on{border-color:transparent;background:linear-gradient(135deg,#5b8def,#875fdd);color:#fff}' +
+      '.tp-opt.on{border-color:transparent;background:linear-gradient(135deg,#0b5878,#3ad0a4);color:#fff}' +
       'body.dark .tp-opt{background:rgba(255,255,255,.06);color:#e8e8ec;border-color:rgba(255,255,255,.1)}' +
-      '.tp-save{width:100%;min-height:44px;border:0;border-radius:13px;background:linear-gradient(135deg,#5b8def,#875fdd);color:#fff;font:inherit;font-size:13px;font-weight:950;cursor:pointer}' +
+      '.tp-save{width:100%;min-height:44px;border:0;border-radius:13px;background:linear-gradient(135deg,#0b5878,#3ad0a4);color:#fff;font:inherit;font-size:13px;font-weight:950;cursor:pointer}' +
       '.tp-cancel{width:100%;margin-top:8px;border:0;background:transparent;color:#686977;font:inherit;font-size:12px;font-weight:800;cursor:pointer}';
     document.head.appendChild(s);
   }

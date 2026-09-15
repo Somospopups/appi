@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v789-fab-dock-fix';
+const CACHE_NAME = 'appi-v790-fab-dock';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

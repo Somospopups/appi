@@ -1383,15 +1383,15 @@
     var st = document.createElement('style');
     st.id = 'htEstilos';
     st.textContent = [
-      '#htOverlay{position:relative;margin:0 0 14px;padding:14px 12px 12px;border-radius:22px;background:linear-gradient(160deg,rgba(91,141,239,.09),rgba(160,107,255,.08));border:1px solid rgba(255,255,255,.7)}',
-      'body.dark #htOverlay{background:linear-gradient(160deg,rgba(91,141,239,.13),rgba(160,107,255,.11));border-color:rgba(255,255,255,.08)}',
+      '#htOverlay{position:relative;margin:0 0 14px;padding:14px 12px 12px;border-radius:22px;background:linear-gradient(160deg,rgba(91,141,239,.09),rgba(58,208,164,.08));border:1px solid rgba(255,255,255,.7)}',
+      'body.dark #htOverlay{background:linear-gradient(160deg,rgba(91,141,239,.13),rgba(58,208,164,.11));border-color:rgba(255,255,255,.08)}',
       '.ht-top{display:flex;align-items:center;gap:10px;padding:0 4px 10px}',
       '.ht-top b{font-size:14px;color:#30303d}.ht-top span{font-size:11px;color:#777887;font-weight:800;margin-left:auto;margin-right:2px}',
       '.ht-tope{display:block;font-size:10px;color:#777887;font-weight:800;letter-spacing:.2px}',
       'body.dark .ht-top b{color:#f2f2f7}',
       '.ht-centro{display:flex;flex-direction:column;align-items:center;gap:11px}',
       '.ht-deck{position:relative;width:100%;max-width:400px;height:min(56vh,440px);margin:0 auto}',
-      '.ht-card{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-start;padding:14px 16px 12px;border-radius:24px;background:linear-gradient(160deg,#ffffff,#f4f6ff);box-shadow:0 22px 60px rgba(10,12,40,.35);touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab;will-change:transform;transition:transform .32s cubic-bezier(.22,.9,.35,1),opacity .32s ease}',
+      '.ht-card{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-start;padding:14px 16px 12px;border-radius:24px;background:linear-gradient(160deg,#ffffff,#f4f6ff);box-shadow:0 22px 60px rgba(10,12,40,.35);touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab;will-change:transform;transition:transform .32s var(--ease-appi),opacity .32s ease}',
       '.ht-card.ht-cat-promo{overflow:visible}',
       '.ht-card,.ht-card *{touch-action:none;-webkit-user-drag:none}',
       '.ht-card.demo{animation:htVaiven 1.1s ease .08s 1}',
@@ -1427,7 +1427,7 @@
       'body.dark .ht-pasos li{background:rgba(255,255,255,.07);color:#d4d5e2}',
       '.ht-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;flex:0 0 auto}',
       '.ht-chips span{padding:7px 12px;border-radius:999px;background:rgba(91,141,239,.1);color:#3d63c9;font-size:12.5px;font-weight:900}',
-      '.ht-cta{margin-top:auto;flex:0 0 auto;position:relative;z-index:2;min-height:48px;border:0;border-radius:15px;background:linear-gradient(135deg,#5b8def,#8b63e8);color:#fff;font:inherit;font-size:15px;font-weight:900;cursor:pointer}',
+      '.ht-cta{margin-top:auto;flex:0 0 auto;position:relative;z-index:2;min-height:48px;border:0;border-radius:15px;background:linear-gradient(135deg,#0b5878,#3ad0a4);color:#fff;font:inherit;font-size:15px;font-weight:900;cursor:pointer}',
       '.ht-foto{display:block;width:100%;height:148px;object-fit:contain;background:#eef2f7;border-radius:16px;margin:0 0 12px}',
       '.ht-promo{display:flex;gap:12px;align-items:stretch;margin:0 0 12px}',
       '.ht-promo .ht-foto-promo{flex:0 0 42%;width:42%;height:auto;min-height:156px;max-height:188px;object-fit:cover;object-position:center;background:#eef2f7;border-radius:16px;margin:0;display:block}',
@@ -1759,7 +1759,7 @@
         el.style.transform = 'translate(-50%,-50%) translateZ(-220px) rotateY(0deg) scale(.42)';
         el.style.opacity = '0';
       } else {
-        el.style.transition = 'transform .6s cubic-bezier(.22,.82,.2,1), opacity .45s ease';
+        el.style.transition = 'transform .6s var(--ease-appi), opacity .45s ease';
         el.style.transform = dest;
         el.style.opacity = op;
       }
@@ -1773,7 +1773,7 @@
             var d = offsetCover(k, mazo.i, len);
             var abs = Math.abs(d);
             var op = abs > 2 ? '0' : (d === 0 ? '1' : String(Math.max(0.62, 0.95 - abs * 0.14)));
-            el.style.transition = 'transform .7s cubic-bezier(.22,.82,.2,1) ' + (abs * 50) + 'ms, opacity .45s ease ' + (abs * 50) + 'ms';
+            el.style.transition = 'transform .7s var(--ease-appi) ' + (abs * 50) + 'ms, opacity .45s ease ' + (abs * 50) + 'ms';
             el.style.transform = transformCover(d, stageW);
             el.style.opacity = op;
           });

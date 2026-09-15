@@ -44,7 +44,7 @@ const ACTION_ALERTS={
   active_drop:{title:'Reactivar personas inactivas',priority:'Alta',tone:'#d9534f'},
   active_growth:{title:'Consolidar la mejora de actividad',priority:'Positiva',tone:'#168765'},
   pending:{title:'Reducir garantías pendientes',priority:'Alta',tone:'#e18a18'},
-  consecutive:{title:'Atender inactividad consecutiva',priority:'Media',tone:'#a06bff'},
+  consecutive:{title:'Atender inactividad consecutiva',priority:'Media',tone:'#3ad0a4'},
   income_no_purchase:{title:'Acompañar ingresos sin compra posterior',priority:'Alta',tone:'#d9534f'},
   contact_incomplete:{title:'Completar datos de contacto',priority:'Media',tone:'#e18a18'},
   branch_balance:{title:'Diversificar el aporte de las ramas',priority:'Media',tone:'#5b8def'},
@@ -478,7 +478,7 @@ const HIST_CHART_METRICS={
   pbPersonal:{label:'PB del equipo',suffix:' PB',color:'#5b8def',hint:'Evolución del PB de la organización'},
   activePct:{label:'Actividad',suffix:'%',color:'#3ad0a4',hint:'Porcentaje de personas con PB personal'},
   pending:{label:'Pendientes',suffix:'',color:'#f5b301',hint:'Garantías pendientes entre cierres'},
-  incomeCount:{label:'Ingresos',suffix:'',color:'#a06bff',hint:'Cantidad de ingresos por cierre'},
+  incomeCount:{label:'Ingresos',suffix:'',color:'#3ad0a4',hint:'Cantidad de ingresos por cierre'},
   people:{label:'Personas',suffix:'',color:'#e87fa9',hint:'Tamaño del equipo en cada cierre'}
 };
 function currentChartMetric(){
@@ -1117,7 +1117,7 @@ function renderCloud(c){
 
 function showHelp(){
   const html=`<p>El Histórico guarda una fotografía independiente de cada cierre mensual.</p><div class="tip"><b>Necesitás tres archivos del mismo período:</b><br>1. Línea Descendente.<br>2. Garantías por Organización.<br>3. Ingresos.</div><div class="tip"><b>Descargar archivos</b><br>En Mi Equipo y en Usuarios, tocá Descargar archivos: se abre el sitio de PSA. Entrá allá con tu clave. APPI no la ve. Después cargá el Excel acá.</div><p><b>Resumen y análisis:</b> reúne el Resumen Anual, los gráficos, las comparaciones y las estrategias.<br><b>Cargar y administrar:</b> permite cargar meses, descargar originales, respaldar o eliminar cierres.</p><p style="font-size:11px;color:#777887">Un archivo de Ingresos sin personas es válido y representa cero ingresos. El archivo único de Usuarios / Garantías continúa en su sección habitual.</p>`;
-  try{modal.open({icon:'📈',iconBg:'linear-gradient(135deg,#5b8def,#a06bff)',title:'Cómo usar el Histórico',sub:'Control mensual y anual',html})}catch(e){window.APPIDialog.alert('Cargá los tres archivos de cada mes y compará los cierres dentro de Resumen y análisis.',{title:'Cómo usar el Histórico',icon:'📈'})}
+  try{modal.open({icon:'📈',iconBg:'linear-gradient(135deg,#0b5878,#3ad0a4)',title:'Cómo usar el Histórico',sub:'Control mensual y anual',html})}catch(e){window.APPIDialog.alert('Cargá los tres archivos de cada mes y compará los cierres dentro de Resumen y análisis.',{title:'Cómo usar el Histórico',icon:'📈'})}
 }
 async function openHistorico(){
   showView('view-historico');const c=$('historicoContent');if(c)c.innerHTML='<div class="hist-loading"><span></span>Abriendo cierres mensuales…</div>';

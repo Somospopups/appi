@@ -10,6 +10,11 @@ module.exports = defineConfig({
   reporter: [['list']],
   use: {
     baseURL: 'http://127.0.0.1:4174',
+    // La app ya trae su hoja prefers-reduced-motion completa: correr las
+    // pruebas con esa preferencia las hace deterministas (los overlays
+    // con animaciones infinitas dejan de moverse y los clics son estables)
+    // y además cubren el camino real de los usuarios que la activan.
+    reducedMotion: 'reduce',
     serviceWorkers: 'block',
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
@@ -23,7 +28,11 @@ module.exports = defineConfig({
         origin: 'http://127.0.0.1:4174',
         localStorage: [
           { name: 'appi_notif_listo_v1', value: '1' },
-          { name: 'appi_notif_popup_later', value: '4102444800000' }
+          { name: 'appi_notif_popup_later', value: '4102444800000' },
+          // Cuenta PSA "conectada": sin esto el popup obligatorio de PSA
+          // (v725) abre sobre el modal compartido y le roba los clics a
+          // cualquier prueba que entre al panel.
+          { name: 'appsi_psa_creds', value: '{"center":"02","number":"9802014","password":"clave-de-prueba","remember":true,"ts":0}' }
         ]
       }]
     },

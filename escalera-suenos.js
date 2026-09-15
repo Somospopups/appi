@@ -39,12 +39,12 @@
       '.suenos-pq textarea{width:100%;min-height:64px;border:1px solid rgba(80,90,130,.2);border-radius:12px;padding:9px;font:inherit;font-size:12px;background:rgba(255,255,255,.8);color:#292938}' +
       'body.dark .suenos-pq textarea{background:#1d1f31;color:#f2f2f7}' +
       '.sueno-item{display:flex;align-items:center;gap:9px;margin:0 0 8px}' +
-      '.sueno-num{min-width:30px;height:30px;border-radius:10px;display:grid;place-items:center;background:linear-gradient(135deg,#5b8def,#8b63e8);color:#fff;font-size:12px;font-weight:950}' +
+      '.sueno-num{min-width:30px;height:30px;border-radius:10px;display:grid;place-items:center;background:linear-gradient(135deg,#0b5878,#3ad0a4);color:#fff;font-size:12px;font-weight:950}' +
       '.sueno-item input{flex:1;min-width:0;border:1px solid rgba(80,90,130,.2);border-radius:12px;padding:10px;font:inherit;font-size:12.5px;background:rgba(255,255,255,.8);color:#292938}' +
       'body.dark .sueno-item input{background:#1d1f31;color:#f2f2f7}' +
       '.suenos-acciones{display:flex;gap:8px;margin-top:12px}' +
       '.suenos-acciones button{flex:1;min-height:44px;border:0;border-radius:13px;font:inherit;font-size:12.5px;font-weight:900;cursor:pointer}' +
-      '.suenos-share{background:linear-gradient(135deg,#3ad0a4,#5b8def);color:#fff}';
+      '.suenos-share{background:linear-gradient(135deg,#0b5878,#3ad0a4);color:#fff}';
     document.head.appendChild(s);
   }
 

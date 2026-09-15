@@ -125,4 +125,6 @@ reutilizarla para el alta.
 
 ---
 
-⚠️ **Pendiente de siempre: revocar el token** → https://github.com/settings/tokens
+⚠️ **Pendiente: revocar el token** → https://github.com/settings/tokens.
+*El usuario pidió conservar el token actual (v736, 14/09) porque sigue
+haciendo cambios; revocar cuando se terminen de publicar.*

@@ -165,12 +165,21 @@ function renderUsers(){
     if(prueba){const dias=Math.max(0,Math.ceil((new Date(prueba).getTime()-Date.now())/86400000));membership={label:dias===0?'🧪 PRUEBA · VENCE HOY':`🧪 PRUEBA · ${dias}D`,cls:'trial',days:dias}}
     const expires=user.membresia_vence?new Date(user.membresia_vence).toLocaleDateString('es-AR'):'—';
     const abierto=state.userAbierto===user.user_id;
+    const diaPago = user.dia_pago;
+    const diaPagoHtml = `<div class="admin-mem-label" style="margin-top:10px">Día de pago — compromiso</div>
+      <div class="dia-pago-row" style="display:flex;gap:8px;align-items:center;margin:6px 0 8px">
+        <button type="button" class="dia-pago-btn ${diaPago===12?'active':''}" data-admin-action="dia_pago" data-dia="12" style="flex:1;padding:10px;border-radius:12px;border:1.5px solid ${diaPago===12?'#5b8def':'rgba(0,0,0,.08)'};background:${diaPago===12?'linear-gradient(135deg,#0b5878,#3ad0a4)':'#fff'};color:${diaPago===12?'#fff':'#3d3e4c'};font-weight:800;font-size:14px;cursor:pointer">12</button>
+        <button type="button" class="dia-pago-btn ${diaPago===22?'active':''}" data-admin-action="dia_pago" data-dia="22" style="flex:1;padding:10px;border-radius:12px;border:1.5px solid ${diaPago===22?'#5b8def':'rgba(0,0,0,.08)'};background:${diaPago===22?'linear-gradient(135deg,#0b5878,#3ad0a4)':'#fff'};color:${diaPago===22?'#fff':'#3d3e4c'};font-weight:800;font-size:14px;cursor:pointer">22</button>
+        <span style="font-size:11px;color:${diaPago?'#5b8def':'#9a9aab'};font-weight:700;white-space:nowrap">${diaPago?`→ día ${diaPago}`:'sin asignar'}</span>
+      </div>
+      <div style="font-size:11px;color:#777887;line-height:1.3;margin:-4px 0 8px">Elegí 12 o 22. El usuario verá un popup sutil 2 días antes (10-12 o 20-22).</div>`;
     const acciones=abierto?`<div class="admin-user-acciones">
       <div class="admin-mem-label">Membresía</div>
       <button type="button" class="trial" data-admin-action="trial">🧪 Prueba 5 días</button>
       <button type="button" class="mes" data-admin-action="month">📅 1 mes completo</button>
       <button type="button" class="forever" data-admin-action="forever">♾️ Para siempre</button>
       <button type="button" class="prorroga" data-admin-action="grace_period">📅 Prórroga</button>
+      ${diaPagoHtml}
       <div class="admin-mem-label">Acciones</div>
       <button type="button" class="wa" data-admin-action="whatsapp_dist">💬 WhatsApp</button>
       <button type="button" class="ticket" data-admin-action="ticket">🎫 Ticket</button>
@@ -184,7 +193,7 @@ function renderUsers(){
     return `<article class="admin-user-row" data-admin-user="${esc(user.user_id)}">
       <button type="button" class="admin-user-head" data-user-toggle="${esc(user.user_id)}">
         <div><h3>${esc(user.nombre||'Sin nombre')}${user.socio_nombre?` + ${esc(user.socio_nombre)}`:''}</h3>
-        <p>${esc(user.dip||'Sin número')} · Vence ${esc(expires)}${state.telefonos.get(user.user_id)?` · 📱 ${esc(state.telefonos.get(user.user_id))}`:''}</p></div>
+        <p>${esc(user.dip||'Sin número')} · Vence ${esc(expires)}${user.dia_pago?` · 💳 Día ${user.dia_pago}`:''}${state.telefonos.get(user.user_id)?` · 📱 ${esc(state.telefonos.get(user.user_id))}`:''}</p></div>
         <span class="admin-user-badges"><span class="admin-user-badge ${user.activo?'':'blocked'}">${user.activo?'ACTIVA':'BLOQUEADA'}</span><span class="membership-state ${membership.cls}">${membership.label}</span></span>
         <span class="admin-user-chev ${abierto?'open':''}">›</span>
       </button>${acciones}</article>`}).join('');
@@ -552,7 +561,7 @@ async function handleUserAction(button){
     if(action==='month'){
       const info=membershipInfo(user);
       if(info.days>20000){await window.APPIDialog.alert('Esta cuenta ya tiene acceso permanente.',{title:'1 mes completo',icon:'📅'});return}
-      const baseMs=Math.max(Date.now(),user.membresia_vence?new Date(user.membresia_vence).getTime():0);
+      const baseMs=Date.now(); // desde hoy, no se suma a lo que ya tiene
       const hasta=new Date(baseMs);const dia=hasta.getDate();hasta.setDate(1);hasta.setMonth(hasta.getMonth()+1);hasta.setDate(Math.min(dia,new Date(hasta.getFullYear(),hasta.getMonth()+1,0).getDate()));
       const fecha=hasta.toLocaleDateString('es-AR');
       const enPrueba=state.pruebas.has(user.user_id);
@@ -560,7 +569,7 @@ async function handleUserAction(button){
         ?`La prueba de ${user.nombre||user.dip} pasa a 1 mes completo, hasta el ${fecha}. ¿Confirmás?`
         :(info.days<0
           ?`${user.nombre||user.dip} va a tener 1 mes completo de APPI, hasta el ${fecha}. ¿Confirmás?`
-          :`${user.nombre||user.dip} va a tener 1 mes completo más de APPI, hasta el ${fecha}. Los días que le quedan se suman. ¿Confirmás?`);
+          :`${user.nombre||user.dip} va a tener APPI hasta el ${fecha} (1 mes desde hoy, 14/09 → 14/10). ¿Confirmás?`);
       const okMes=await window.APPIDialog.confirm(texto,{title:'1 mes completo',icon:'📅',okText:'Dar 1 mes'});
       if(!okMes)return;
       const data=await callAdmin({action:'grant_month',user_id:userId});
@@ -599,6 +608,24 @@ async function handleUserAction(button){
     if(action==='ticket'){
       await enviarTicketWhatsApp(user);
       return;
+    }
+    if(action==='dia_pago'){
+      const dia=Number(button.dataset.dia);
+      if(![12,22].includes(dia)){await window.APPIDialog.alert('Elegí 12 o 22.',{title:'Día de pago',icon:'💳'});return}
+      const ok=await window.APPIDialog.confirm(`${user.nombre||user.dip} tendrá compromiso de pago el día <b>${dia}</b> de cada mes. Verá un popup sutil el ${dia===12?'10, 11 y 12':'20, 21 y 22'}. ¿Confirmás?`,{title:'Día de pago',icon:'💳',okText:`Poner día ${dia}`});
+      if(!ok) return;
+      try{
+        await callAdmin({action:'set_dia_pago',user_id:userId,dia_pago:dia});
+      }catch(e){
+        const msg=String(e.message||'');
+        if(msg.includes('Acción desconocida')||msg.includes('column')||msg.includes('dia_pago')){
+          await window.APPIDialog.alert('El backend aún se está actualizando (5-10 min). Probá de nuevo en unos minutos, ya queda guardado en v753.',{title:'Un momento',icon:'⏳'});
+          return;
+        }
+        throw e;
+      }
+      await window.APPIDialog.alert(`Listo: día ${dia} asignado a ${user.nombre||user.dip}.`,{title:'Día de pago',icon:'✓'});
+      await load();return;
     }
     if(action==='payment'){
       if(window.APPIAdminMembership&&window.APPIAdminMembership.showPaymentModal){

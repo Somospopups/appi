@@ -43,7 +43,7 @@
       '.pk-input{width:100%;min-height:46px;border:1px solid rgba(80,90,130,.2);border-radius:12px;padding:9px 11px;font:inherit;font-size:13px;background:rgba(255,255,255,.85);color:#292938}' +
       'body.dark .pk-input{background:#1d1f31;color:#f2f2f7}' +
       '.pk-actions{display:flex;gap:8px;margin-top:9px}' +
-      '.pk-next{flex:1;border:0;border-radius:12px;padding:10px;background:linear-gradient(135deg,#ff6b9d,#8b63e8);color:#fff;font:inherit;font-size:12.5px;font-weight:900;cursor:pointer}' +
+      '.pk-next{flex:1;border:0;border-radius:12px;padding:10px;background:linear-gradient(135deg,#3ad0a4,#128C7E);color:#fff;font:inherit;font-size:12.5px;font-weight:900;cursor:pointer}' +
       '.pk-fondo{border:0;border-radius:12px;padding:10px 12px;background:rgba(80,90,130,.1);color:#666776;font:inherit;font-size:11px;font-weight:850;cursor:pointer}' +
       '.pk-nivel{display:flex;gap:9px;align-items:flex-start;margin:7px 0}' +
       '.pk-nivel .pk-flecha{color:#c2417a;font-weight:950}' +

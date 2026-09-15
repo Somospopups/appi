@@ -36,11 +36,11 @@ function installStyles(){if($('appiDeviceBridgeStyles'))return;const style=docum
 .appi-device-head p{margin:6px 0 0;color:#666776;font-size:14px;line-height:1.45}
 .appi-device-close{width:42px;height:42px;flex:0 0 42px;border:0;border-radius:13px;background:rgba(80,90,130,.09);color:#5d5e6c;font-size:24px;cursor:pointer}
 .appi-device-close:focus-visible,.appi-device-btn:focus-visible,.appi-device-remove:focus-visible,.appi-device-refresh:focus-visible{outline:3px solid rgba(61,99,201,.35);outline-offset:2px}
-.appi-device-hero{padding:17px;border-radius:20px;color:#fff;background:linear-gradient(135deg,#4d78dd,#785bd9 65%,#a06bff);box-shadow:0 12px 28px rgba(76,82,184,.2);margin-bottom:12px}
+.appi-device-hero{padding:17px;border-radius:20px;color:#fff;background:linear-gradient(135deg,#4d78dd,#785bd9 65%,#3ad0a4);box-shadow:0 12px 28px rgba(76,82,184,.2);margin-bottom:12px}
 .appi-device-hero b{display:block;font-size:17px}.appi-device-hero p{margin:6px 0 0;font-size:13px;line-height:1.45;opacity:.9}
 .appi-device-actions{display:grid;grid-template-columns:1fr;gap:8px;margin:8px 0 13px}
 .appi-device-btn{min-height:48px;border:0;border-radius:14px;padding:11px 14px;font:inherit;font-size:14px;font-weight:850;cursor:pointer}
-.appi-device-btn.primary{color:#fff;background:linear-gradient(135deg,#5b8def,#875fdd);box-shadow:0 8px 20px rgba(91,112,210,.24)}
+.appi-device-btn.primary{color:#fff;background:linear-gradient(135deg,#0b5878,#3ad0a4);box-shadow:0 8px 20px rgba(91,112,210,.24)}
 .appi-device-btn.secondary{color:#3d63c9;background:rgba(91,141,239,.1)}
 .appi-device-btn.success{min-height:58px;color:#fff;background:linear-gradient(135deg,#159d77,#397ed7);box-shadow:0 11px 25px rgba(35,137,139,.28);font-size:17px;letter-spacing:.1px}
 .appi-device-btn.danger{color:#bd4149;background:rgba(217,83,89,.09)}
@@ -64,7 +64,7 @@ function installStyles(){if($('appiDeviceBridgeStyles'))return;const style=docum
 .appi-device-auto{color:#667085;font-size:11px;font-weight:750}
 .appi-device-refresh{border:0;border-radius:10px;padding:8px 11px;background:rgba(91,141,239,.1);color:#3d63c9;font:inherit;font-size:12px;font-weight:850;cursor:pointer}
 .appi-device-item{display:grid;grid-template-columns:46px minmax(0,1fr) auto;gap:8px 11px;align-items:center;padding:12px;border-radius:18px;background:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.88)}
-.appi-device-icon{width:42px;height:42px;grid-row:1 / span 2;border-radius:14px;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,#3ad0a4,#5b8def);font-size:20px}
+.appi-device-icon{width:42px;height:42px;grid-row:1 / span 2;border-radius:14px;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,#0b5878,#3ad0a4);font-size:20px}
 .appi-device-item b{display:block;font-size:14px;line-height:1.25}
 .appi-device-item small{display:block;margin-top:4px;color:#6e7080;font-size:11px;line-height:1.35}
 .appi-device-state{padding:6px 9px;border-radius:999px;background:rgba(58,208,164,.12);color:#207659;font-size:10px;font-weight:900;white-space:nowrap}

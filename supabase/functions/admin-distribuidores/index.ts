@@ -94,7 +94,16 @@ Deno.serve(async request => {
   try {
     const body = await request.json(), action = String(body?.action || '');
     if (action === 'list') {
-      const { data, error } = await admin.from('appi_perfiles').select('user_id,username,dip,sucursal,numero_distribuidor,nombre,socio_nombre,rol,activo,debe_cambiar_password,membresia_meses,membresia_inicio,membresia_vence,created_at,updated_at').order('dip', { ascending: true });
+      let data, error;
+      {
+        const res = await admin.from('appi_perfiles').select('user_id,username,dip,sucursal,numero_distribuidor,nombre,socio_nombre,rol,activo,debe_cambiar_password,membresia_meses,membresia_inicio,membresia_vence,dia_pago,created_at,updated_at').order('dip', { ascending: true });
+        data = res.data; error = res.error;
+        if (error && String(error.message||'').includes('dia_pago')) {
+          const fallback = await admin.from('appi_perfiles').select('user_id,username,dip,sucursal,numero_distribuidor,nombre,socio_nombre,rol,activo,debe_cambiar_password,membresia_meses,membresia_inicio,membresia_vence,created_at,updated_at').order('dip', { ascending: true });
+          data = fallback.data; error = fallback.error;
+          if (data) data.forEach(u=>{ if(u.dia_pago===undefined) u.dia_pago=null; });
+        }
+      }
       if (error) throw error; return json({ users: data || [] });
     }
     if (action === 'list_requests') {
@@ -206,7 +215,7 @@ Deno.serve(async request => {
       if (!Number.isNaN(current.getTime()) && current.getTime() - now.getTime() > 20000 * 86400000) {
         return json({ error: 'Esta cuenta ya tiene acceso permanente.' }, 400);
       }
-      const base = current.getTime() > now.getTime() ? current : now;
+      const base = now; // desde hoy, no se suma a lo que ya tiene (14/09 → 14/10 si o si)
       const startedAt = now, expiresAt = addUtcMonths(base, 1);
       const { data, error } = await admin.from('appi_perfiles').update({
         membresia_meses: 1,
@@ -227,6 +236,14 @@ Deno.serve(async request => {
       await syncMembership(targetId, { status: 'active', starts_at: startedAt.toISOString(), expires_at: expiresAt.toISOString(), grace_period_until: null, grace_period_notes: null });
       await admin.auth.admin.updateUserById(targetId, { ban_duration: 'none' }).catch(() => null);
       return json({ user: data });
+    }
+    if (action === 'set_dia_pago') {
+      const dia = Number(body?.dia_pago);
+      if (![12, 22].includes(dia)) return json({ error: 'Elegí día 12 o 22.' }, 400);
+      const { data, error } = await admin.from('appi_perfiles').update({ dia_pago: dia }).eq('user_id', targetId).eq('rol', 'usuario').select('user_id,dia_pago').single();
+      if (error) throw error;
+      if (!data) return json({ error: 'La cuenta no existe.' }, 404);
+      return json({ user: data, dia_pago: dia });
     }
     if (action === 'delete_user') {
       const { error } = await admin.auth.admin.deleteUser(targetId); if (error) throw error;

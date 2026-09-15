@@ -105,17 +105,53 @@
   }
 
   function productos() { return (CAT && CAT.productos) ? CAT.productos : []; }
+  // Clave de carrito: el sku; para los productos que solo figuran en la
+  // lista con acuerdo (sin sku de tienda) se usa el nombre, para que cada
+  // uno tenga su propia línea en el presupuesto.
+  function claveSku(p) {
+    if (p && p.sku) return p.sku;
+    return 'n:' + String((p && p.nombre) || '').toLowerCase().trim();
+  }
+  // Líneas "Plan canje" de la lista con acuerdo: sublínea del mismo
+  // producto al precio de canje (el PDF las imprime debajo del producto).
+  // En la Lista de precios figuran como línea propia para poder cotizar
+  // al precio de canje (buscá "canje" y aparecen todas).
+  var CANJE_SUF = '::canje';
+  function esClaveCanje(key) { return String(key || '').slice(-CANJE_SUF.length) === CANJE_SUF; }
+  function lineaCanje(p) {
+    return {
+      clave: claveSku(p) + CANJE_SUF, sku: p.sku || '',
+      nombre: p.nombre + ' (PLAN CANJE)', precio: p.plan_canje,
+      foto: p.foto, grupo: p.grupo, seccion: p.seccion, canje: true
+    };
+  }
+  function lineasLista() {
+    var out = [];
+    productos().forEach(function (p) {
+      out.push({ clave: claveSku(p), sku: p.sku || '', nombre: p.nombre, precio: p.precio, foto: p.foto, grupo: p.grupo, seccion: p.seccion });
+      if (p.plan_canje) out.push(lineaCanje(p));
+    });
+    return out;
+  }
   function porSku(sku) {
     var list = productos();
-    for (var i = 0; i < list.length; i++) if (list[i].sku === sku) return list[i];
+    if (esClaveCanje(sku)) {
+      var base = String(sku).slice(0, -CANJE_SUF.length);
+      for (var j = 0; j < list.length; j++) {
+        if (list[j].plan_canje && claveSku(list[j]) === base) return lineaCanje(list[j]);
+      }
+      return null;
+    }
+    for (var i = 0; i < list.length; i++) if (claveSku(list[i]) === sku) return list[i];
     return null;
   }
   function filtrados() {
     var q = busca.trim().toLowerCase();
-    return productos().filter(function (p) {
-      if (filtro !== 'todos' && p.grupo !== filtro) return false;
+    var list = lineasLista();
+    return list.filter(function (L) {
+      if (filtro !== 'todos' && L.grupo !== filtro) return false;
       if (!q) return true;
-      return (p.nombre || '').toLowerCase().indexOf(q) >= 0 || String(p.sku).indexOf(q) >= 0;
+      return (L.nombre || '').toLowerCase().indexOf(q) >= 0 || String(L.sku).indexOf(q) >= 0;
     });
   }
   function resumen() {
@@ -152,7 +188,7 @@
       '.lp-cuotas-in{animation:lpIn .35s ease}' +
       'body.dark .lp-chips-wrap.lp-more:after{background:linear-gradient(90deg,rgba(28,30,42,0),#1c1e2a)}' +
       '.lp-sec{margin:12px 0 6px;font-size:11px;font-weight:900;color:#0b5878;letter-spacing:.4px;text-transform:uppercase}' +
-      '.lp-item{display:flex;align-items:center;gap:10px;padding:10px 12px;margin:0 0 8px;border-radius:16px;background:rgba(255,255,255,.72);border:1px solid rgba(255,255,255,.8)}' +
+      '.lp-canje{ background:rgba(91,141,239,0.06); border-left:3px solid #5b8def; } .lp-canje .lp-item-txt b{ color:#3d63c9; } .lp-item{display:flex;align-items:center;gap:10px;padding:10px 12px;margin:0 0 8px;border-radius:16px;background:rgba(255,255,255,.72);border:1px solid rgba(255,255,255,.8)}' +
       '.lp-item-txt{flex:1;min-width:0}' +
       '.lp-item-txt b{display:block;font-size:13px;font-weight:900;color:#2a2a32;line-height:1.25}' +
       '.lp-item-txt span{display:block;margin-top:2px;font-size:11px;font-weight:750;color:#686977}' +
@@ -162,7 +198,7 @@
       '.lp-qty button.ghost{background:rgba(11,88,120,.12);color:#0b5878}' +
       '.lp-qty i{min-width:18px;text-align:center;font-style:normal;font-size:13px;font-weight:900;color:#2a2a32}' +
       '.lp-empty{padding:28px 8px;text-align:center;font-size:13px;font-weight:750;color:#686977}' +
-      '.lp-fab{display:none;position:fixed;right:14px;bottom:calc(env(safe-area-inset-bottom) + 108px);z-index:55;align-items:center;gap:8px;border:0;border-radius:999px;padding:12px 16px;background:#0b5878;color:#fff;font:inherit;font-size:13px;font-weight:900;box-shadow:0 8px 24px rgba(11,88,120,.38);cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}' +
+      '.lp-fab{display:none;position:fixed;right:14px;bottom:108px;bottom:calc(env(safe-area-inset-bottom) + 108px);z-index:70;align-items:center;gap:8px;border:0;border-radius:999px;padding:12px 16px;background:#0b5878;color:#fff;font:inherit;font-size:13px;font-weight:900;box-shadow:0 8px 24px rgba(11,88,120,.38);cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}' +
       '.lp-fab.on{display:flex}' +
       '.lp-fab.arrastre{cursor:grabbing;opacity:.92}' +
       '.lp-fab i{min-width:22px;height:22px;padding:0 6px;border-radius:99px;background:#fff;color:#0b5878;font-style:normal;font-size:12px;font-weight:950;display:flex;align-items:center;justify-content:center;pointer-events:none}' +
@@ -270,8 +306,8 @@
       return '<button type="button" class="lp-chip' + (filtro === g.id ? ' on' : '') + '" data-g="' + g.id + '">' + esc(g.t) + '</button>';
     }).join('');
     return '<div class="lp-wrap">' +
-      '<p class="lp-note"><span>Lista de tienda.psa.com.ar' + (fecha ? ' · ' + esc(fecha) : '') + '. Elegí productos y cotizá.</span>' +
-      '<button type="button" class="lp-actualizar" id="lpActualizar" title="Actualizar precios desde la tienda">🔄 Actualizar precios</button></p>' +
+      '<p class="lp-note"><span>Lista \'Precios Sugeridos con Acuerdo\' de PSA' + (fecha ? ' · ' + esc(fecha) : '') + '. Elegí productos y cotizá.</span>' +
+      '<button type="button" class="lp-actualizar" id="lpActualizar" title="Actualizar precios desde la lista de PSA">🔄 Actualizar precios</button></p>' +
       '<input class="lp-search" id="lpSearch" type="search" placeholder="Buscar modelo, recarga o SKU" value="' + esc(busca) + '">' +
       '<div class="lp-chips" id="lpChips">' + chips + '</div>' +
       '<div id="lpList"></div></div>';
@@ -287,14 +323,15 @@
     }
     var html = '';
     var last = '';
-    list.forEach(function (p) {
-      if (filtro === 'todos' && p.grupo !== last) {
-        last = p.grupo;
-        html += '<div class="lp-sec">' + esc(GRUPO_TIT[p.grupo] || p.grupo) + '</div>';
+    list.forEach(function (L) {
+      if (filtro === 'todos' && L.grupo !== last) {
+        last = L.grupo;
+        html += '<div class="lp-sec">' + esc(GRUPO_TIT[L.grupo] || L.grupo) + '</div>';
       }
-      var q = qty(p.sku);
-      html += '<div class="lp-item" data-sku="' + esc(p.sku) + '">' +
-        '<div class="lp-item-txt"><b>' + esc(p.nombre) + '</b><span>SKU ' + esc(p.sku) + '</span><em>' + money(p.precio) + '</em></div>' +
+      var q = qty(L.clave);
+      var esCanje = !!L.canje;
+      html += '<div class="lp-item' + (esCanje ? ' lp-canje' : '') + '" data-sku="' + esc(L.clave) + '">' +
+        '<div class="lp-item-txt"><b>' + (esCanje ? '🔄 ' : '') + esc(L.nombre) + '</b><span>' + (L.sku ? 'SKU ' + esc(L.sku) : esc(L.seccion || 'Lista con acuerdo')) + (esCanje ? ' · Plan canje' : '') + '</span><em>' + money(L.precio) + '</em></div>' +
         '<div class="lp-qty">' +
           (q ? '<button type="button" class="ghost" data-act="menos" aria-label="Quitar">−</button><i>' + q + '</i>' : '') +
           '<button type="button" data-act="mas" aria-label="Agregar">+</button>' +
@@ -717,7 +754,7 @@
       return;
     }
     host.innerHTML = r.lineas.map(function (ln) {
-      return '<div class="lp-line" data-sku="' + esc(ln.p.sku) + '">' +
+      return '<div class="lp-line" data-sku="' + esc(ln.p.clave || claveSku(ln.p)) + '">' +
         '<div class="lp-qty"><button type="button" class="ghost" data-act="menos">−</button><i>' + ln.q + '</i>' +
         '<button type="button" data-act="mas">+</button></div>' +
         '<b>' + esc(ln.p.nombre) + '</b><span>' + money(ln.q * ln.p.precio) + '</span></div>';

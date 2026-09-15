@@ -235,7 +235,7 @@ begin
   for update;
   if not found then raise exception 'La cuenta no existe.'; end if;
 
-  v_base := greatest(now(),coalesce(v_profile.membresia_vence,now()));
+  v_base := now(); -- desde hoy, no se suma a lo que ya tiene (14/09 -> 14/10 si o si)
   v_expires := v_base + interval '1 month';
 
   update public.appi_perfiles

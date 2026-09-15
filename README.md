@@ -4,8 +4,8 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
-- Versión: **v707 · fix deadlock v598**.
-- Caché de la app: `appi-v707-engranaje-perfil` (se renueva al abrir APPI).
+- Versión: **v750 · Segura** · El escáner de Pendientes busca primero en tu planilla de Usuarios (ahora sí lee la columna Serie): si la serie está en el teléfono, carga al instante y sin internet; si no, consulta la base de PSA. Pendientes de canje en tiempo real: al abrir la cámara se pre-carga la base de garantías de PSA (el escaneo busca al instante), con lupa animada "pensando", check verde al encontrar al dueño y pitido de confirmación. Si la serie no figura, se guarda sin datos para completar cuando se habla con la empresa. Mi Stock editable y filas agrupadas por producto.
+- Caché de la app: `appi-v750-serie-local` (se renueva al abrir APPI).
 - Publicación: [https://somospopups.github.io/appi/](https://somospopups.github.io/appi/)
 - Acceso por número de distribuidor y contraseña.
 - Acceso administrador POPUPS mediante el candado, sin DIP ni número de distribuidor.
@@ -13,6 +13,128 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 - Sincronización automática por cuenta.
 - Funcionamiento offline por hasta 7 días desde la última validación.
 - Grabaciones y transcripciones de audio locales: no se suben a la nube.
+
+## Lector de Mi Stock: lectura en vivo, rápida, sin fotos (v733–v750)
+
+En **Mi Stock** hay un solo botón, **📷 Cargar equipo con la cámara**.
+No hay que sacar ninguna foto ni subir ninguna: con el escáner abierto
+y el marco alargado (forma de etiqueta, con línea vertical que barre de
+derecha a izquierda), al apuntar a la caja la unidad **se lee sola** y
+se carga sola, en unos pocos segundos:
+
+- **El QR** (ZXing, fijo en `vendor/zxing.min.js`, Apache 2.0) se lee de
+  fondo cada ~450 ms: los QR actuales traen únicamente el número de
+  serie, y es la serie confiable.
+- **El texto impreso** (nombre + color) se transcribe con **OCR local**
+  (Tesseract.js, fijo en `vendor/tesseract/`, Apache 2.0). Para que sea
+  rápido y certero (v737–v738):
+  - el motor OCR se **calienta al abrir Mi Stock** (v738, antes de tocar
+    la cámara): cuando se abre el escáner ya está listo;
+  - el OCR **recorta la región del cuadro** (donde se enmarca la
+    etiqueta), la agranda a ~1000 px y pasa a **grises con contraste**:
+    menos fondo, texto más nítido, lectura mucho más fiable;
+  - la orientación se prueba por pasadas (0/90/180/270°): si una
+    orientación no da nada, pasa a la siguiente; si dio algo, se queda
+    en esa y la **confirmación sale a los ~0,9 s**;
+  - cuando hay **nombre + color + serie**, la unidad **se carga al
+    toque**: suena el **bip de confirmación** (Web Audio, sin
+    archivos, v734) y el escáner se cierra;
+  - **carga exacta** (v739): el texto se interpreta por la estructura
+    de la etiqueta ("PSA \<NOMBRE\> \<COLOR\> + K. POSV." + serie): el
+    nombre es todo lo que va **antes del color**, más el kit; lo que
+    venga después (ruido de la caja o de otra etiqueta pegada) se
+    descarta, así "OF AO) AE" jamas entra en la fila;
+  - **solo lo que ves** (v740): el lector **solo mira dentro del
+    cuadro** — el texto se recorta exacto al campo y el QR se lee con
+    su zona de silencio (18%); todo lo que quede afuera (otra
+    etiqueta, texto de la caja) queda bloqueado y no se lee;
+  - **lee de memoria con TODOS los productos** (v743): cada lectura
+    de OCR se contrasta contra el **catálogo completo de PSA**
+    (`psa-catalogo.json`, 312 productos = TODOS los de la lista
+    oficial "Precios Sugeridos con Acuerdo" —la de mi.psa.com.ar, con
+    el precio de la primera columna— + los que solo vende la tienda;
+    se publica también en Supabase y queda en caché para funcionar
+    sin internet). Si el texto coincide con un producto conocido
+    —aunque el OCR haya leído "VER0 B1ANCO" o haya soltado el "4" de
+    Senior4—, el nombre y el color se escriben **exactos, como
+    figuran en la lista oficial**, y la unidad **se carga en una sola
+    pasada** apenas aparece la serie del QR: sin segunda lectura de
+    confirmación y sin probar orientaciones de a ciegas. Si no hay
+    coincidencia clara (o dos productos empatados, ej. Senior vs.
+    Senior4), se usa la lectura estructural clásica. El campo
+    PRODUCTO del alta manual sugiere los nombres oficiales del
+    catálogo;
+  - **super rápido** (v742): el OCR pasa a ser más veloz y limpio —
+    el recorte se procesa a **760 px** (antes 1000), con **whitelist
+    de caracteres** (solo mayúsculas, números, "+", "." y "-", que es
+    todo lo que trae una etiqueta PSA: menos reconocimiento y menos
+    ruido tipo "OF AO) AE") y modo **PSM 6** (bloque corto de texto).
+    Las pasadas de texto se repiten cada **1,2 s** (antes 1,8) y,
+    cuando el catálogo ya dio el producto, el OCR se aparta para no
+    robarle CPU al QR. Con todo esto, apuntando quieto, la carga sale
+    en la primera pasada (~2 s).
+- El motor OCR (~8 MB) se descarga **una sola vez** y queda en caché
+  (service worker + IndexedDB): después funciona sin internet.
+- Si falta la serie, se pide **una vez** en un diálogo; si el QR trae
+  los datos completos (nombre + color + serie), carga directo sin
+  esperar al OCR.
+- No existe carga por foto manual: si no hay cámara, el escáner avisa.
+
+- **Pendientes de canje** (v746): tab dentro de Mi Stock para los
+  equipos viejos que nos quedamos al hacer un plan canje y hay que
+  entregar a la empresa. Con el botón **📷 CARGAR BASE DEL EQUIPO
+  VIEJO** se apunta al QR de la BASE del purificador (el que trae el
+  N° de serie): la app lo consulta en la base de PSA (función
+  `consulta-serial` → reporte de Garantías de dip.psa.com.ar, con la
+  sesión MI PSA) y carga sola el equipo **con a quién pertenecía**
+  (nombre, teléfono y producto). Si la serie no figura en la base de
+  PSA, la app avisa con un popup y te deja guardarla **solo con la
+  serie** (sin datos): después se toca la fila y se completa cuando
+  se habla con la empresa (también hay buscador de la propia base de
+  usuarios de APPI). **ENTREGADO** (🚚) confirma la entrega y baja
+  la fila.
+- **Primero el teléfono, después PSA** (v750): la planilla de
+  Usuarios ahora parsea la columna **Serie** (antes la ignoraba) y la
+  muestra en la ficha de cada usuario (🔖). Al escanear (o buscar) una
+  base en Pendientes, la app busca primero en esa planilla local: si
+  figura, carga al instante y sin internet; si no, consulta la base de
+  PSA.
+- **Rápido de verdad** (v749): al abrir la cámara de Pendientes, la app
+  pre-carga en segundo plano la base completa de Garantías de PSA
+  (reporte `consulta-serial` con `action:"report"`). Cuando se lee el QR,
+  la búsqueda se hace en el teléfono al instante; la primera carga de la
+  base (5-6 s) no se nota porque pasa mientras se apunta.
+- **Pitido de confirmación en Pendientes** (v749): pitido único al leer
+  el QR (feedback inmediato) y el doble bip de siempre al cargar el
+  equipo (la acción se realizó).
+- **Lupa "pensando"** (v749): mientras se busca la serie, una lupa
+  recorriendo ficheros en pantalla completa; check verde con los datos
+  cuando la encuentra, marca ámbar cuando no figura (y se guarda igual
+  para completar después).
+- **Cuadradito en Pendientes** (v748): el escáner del tab Pendientes
+  vuelve a ser el cuadro cuadrado de siempre (solo hay que enmarcar el
+  QR de la base); en Stock personal sigue alargado para la etiqueta
+  completa (QR + OCR).
+- **Agrupado por producto** (v746): en Stock personal, Prestados y
+  Pendientes las filas van ordenadas por producto (todos los Senior
+  juntos, los Senior 4 por otro lado…), y dentro, por color y serie.
+
+Alta manual, con sus campos (v738): **PRODUCTO · COLOR · N° DE
+SERIE** + cantidad. Si cargás serie, la fila es propia (igual que la
+escaneada) y una serie repetida avisa sin duplicar; sin serie, el
+producto se suma a la fila del mismo nombre **y color** (los colores
+nero/negro, blanco/bianco y grigio/gris se reconocen).
+
+Reglas de la fila:
+
+- Cada unidad es su propia fila (la serie la identifica); escanear dos
+  veces la misma caja no duplica: la serie ya cargada se detecta y avisa.
+- PRESTAR de una unidad con serie conserva la serie: al devolvérsela, la
+  unidad vuelve a su fila original, no crea una fila manual nueva.
+- El alta manual sin serie no se mezcla con las filas escaneadas.
+- El bucle en vivo reutiliza dos canvases fijos (no crea uno nuevo cada
+  ciclo) para no trabar el teléfono; una pasada de OCR a la vez y un
+  try/catch por frame: un frame malo nunca detiene el escáner.
 
 ## Arranque con el logo de vidrio
 

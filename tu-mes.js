@@ -1,4 +1,4 @@
-/* APPI · Tu mes 726 — cerebro
+/* APPI · Tu mes 727 — cerebro
    El mes es un tablero de cartas. Cada día, las 10 de la jornada.
    La puerta es la franja de septiembre del Home.
    v628: fecha/hora debajo de MI EQUIPO y USUARIOS (LÍNEA + GARANTÍAS) (engranaje) → Conectar MI PSA solo 3 archivos (Centro/Número/Clave guardados solo en este celular, auto-actualiza) 📅 color carta principal + pulido mazo (aparece rápido) con emoji movil ☀️ (solo Home, mantiene sin barra adentro) - vuelve a v620 sin barra de botones Mi mes/Mi equipo/Herramientas del detalle por día (filtros) (antes 6) - placeholder real ambos marcan y llevan (robusto) a la tarea (como diaria) - abre fila del motivo a Home (solo marca y refresca día), real sí lleva directo a WhatsApp/panel (solo iba al Home) a la acción (WhatsApp saludo para cumple, panel Ya lo hice/No para retro) (marca recuperado + abre chat hoy) (mismo renglón) lista vacía (Edge) v598 lista incompleta dice No falta nadie verde con 9 pendientes + info faltas · sin maquillar el hábito (v600 detalle) · popup + v599 cerebro — timeline al abrir día + métricas sutiles arriba.
@@ -453,7 +453,7 @@
       '.tm-det-day .sema.neutro{background:rgba(11,88,120,.18)}',
       'body.dark .tm-det-day .sema.neutro{background:rgba(255,255,255,.18)}',
       '.tm-det-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}',
-      '.tm-det-list li{display:flex;align-items:flex-start;gap:8px;padding:7px 8px;border-radius:10px;background:rgba(255,255,255,.72);border:1px solid rgba(11,88,120,.06);font-size:12.5px;font-weight:750;line-height:1.3}',
+      '.tm-det-list li{display:flex;align-items:flex-start;gap:8px;padding:7px 8px;border-radius:10px;background:rgba(255,255,255,.72);border:1px solid rgba(11,88,120,.06);font-size:12.5px;font-weight:775;line-height:1.3}',
       'body.dark .tm-det-list li{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.06)}',
       '.tm-det-list li .ico{flex:0 0 auto;font-size:13px;margin-top:1px}',
       '.tm-det-list li .who{flex:1;min-width:0}',
@@ -658,7 +658,7 @@
   }
 
   function pintar(){
-    try{ var h=document.querySelector('#view-tumes header.top p'); if(h && h.textContent==='Las cartas de cada día') h.innerHTML='Las cartas de cada día <span class="renewed-badge">✨ Renovada 726</span>'; }catch(e){}
+    try{ var h=document.querySelector('#view-tumes header.top p'); if(h && h.textContent==='Las cartas de cada día') h.innerHTML='Las cartas de cada día <span class="renewed-badge">✨ Renovada 727</span>'; }catch(e){}
     css();
     var host = document.getElementById('tmCal');
     if (!host) return;
@@ -748,7 +748,7 @@
       b.onclick = function(){ abrirDia(b.getAttribute('data-tm-dia'), b.classList.contains('hoy')); };
     });
     pintarKpis(anio, mes, mapa);
-    // tmCheque removido 726
+    // tmCheque removido 727
   }
 
   function itemsDe(k){

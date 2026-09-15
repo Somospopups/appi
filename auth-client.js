@@ -132,8 +132,17 @@ function diasMembresiaRestantes(fin){
 async function fetchProfile(session){
   const payload=jwtPayload(session&&session.access_token);
   if(!payload||!payload.sub)throw authError('La sesión recibida no es válida.','invalid_session');
-  const query=`/rest/v1/appi_perfiles?select=user_id,username,dip,sucursal,numero_distribuidor,nombre,socio_nombre,rol,activo,debe_cambiar_password,membresia_meses,membresia_inicio,membresia_vence&user_id=eq.${encodeURIComponent(payload.sub)}&limit=1`;
-  const rows=await request(query,{headers:{Accept:'application/json'}},session.access_token);
+  const query=`/rest/v1/appi_perfiles?select=user_id,username,dip,sucursal,numero_distribuidor,nombre,socio_nombre,rol,activo,debe_cambiar_password,membresia_meses,membresia_inicio,membresia_vence,dia_pago&user_id=eq.${encodeURIComponent(payload.sub)}&limit=1`;
+  let rows;
+  try{
+    rows=await request(query,{headers:{Accept:'application/json'}},session.access_token);
+  }catch(e){
+    if(String(e.message||'').includes('dia_pago')){
+      const q2=query.replace(',dia_pago','');
+      rows=await request(q2,{headers:{Accept:'application/json'}},session.access_token);
+      if(Array.isArray(rows)) rows.forEach(r=>{ if(r.dia_pago===undefined) r.dia_pago=null; });
+    }else throw e;
+  }
   const profile=Array.isArray(rows)?rows[0]:null;
   if(!profile)throw authError('La cuenta no tiene un perfil de distribuidor.','profile_missing',403);
   if(profile.activo===false)throw authError('Esta cuenta está desactivada. Contactá al administrador.','account_disabled',403);
