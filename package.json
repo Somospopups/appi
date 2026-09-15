@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "802.0.0",
-  "cacheName": "appi-v802-ruleta",
+  "version": "803.0.0",
+  "cacheName": "appi-v803-hoy-lista",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

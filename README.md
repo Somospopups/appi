@@ -4,7 +4,8 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
-- Versión: **v802 · Segura** · 🎰 Ruleta PSA v2: una ruleta animada con sonido (bips, ticks y campanita, confeti) que entrega la tarea del día con tus clientes reales: 3 mensajes, llamada, referido, demo, stock, retrolavado, negocio… o el premio "¡Ya fue mucho por hoy!". Cada tarea hecha suma una ⭐ al día, suma a la racha 🔥 y trae un botón **IR →** que lleva directo a su lugar (Mi Stock, Mi negocio, la ficha del cliente). La entrada GIRAR vive en Mi negocio (reemplazó al GPS del mes).
+- Versión: **v803 · Segura** · 📋 Listado del día en el Home: la tarjeta Usuarios del mazo muestra SIEMPRE a toda la gente del día, persona por persona, con su botón ✓ / ✗. Verde = ya la hice, roja = no la hice; se colorean al toque y los colores persisten.
+- Versión anterior: **v802 · Segura** · 🎰 Ruleta PSA v2: una ruleta animada con sonido (bips, ticks y campanita, confeti) que entrega la tarea del día con tus clientes reales: 3 mensajes, llamada, referido, demo, stock, retrolavado, negocio… o el premio "¡Ya fue mucho por hoy!". Cada tarea hecha suma una ⭐ al día, suma a la racha 🔥 y trae un botón **IR →** que lleva directo a su lugar (Mi Stock, Mi negocio, la ficha del cliente). La entrada GIRAR vive en Mi negocio (reemplazó al GPS del mes).
 - v796: Sincronización automática de garantías y usuarios desde MI PSA mediante consulta de reportes seriales en Edge Function sin bloqueos de CORS, 10 tareas diarias garantizadas y carga manual por Excel restaurada como respaldo. Mi Stock y Pendientes de canje en tiempo real con lupa pensante y compartir por WhatsApp.
 - Caché de la app: `appi-v797-fab-catalogo` (se renueva al abrir APPI).
 - Publicación: [https://somospopups.github.io/appi/](https://somospopups.github.io/appi/)
