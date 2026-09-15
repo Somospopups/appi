@@ -812,8 +812,8 @@
   /* ---------------- hooks ---------------- */
   function inyectarHome(){
     estilo();
-    // v802: el GPS del mes deja de mostrarse en Mi negocio a pedido del
-    // usuario: su lugar lo ocupa la Ruleta PSA (la inyecta ruleta-psa.js).
+    // El GPS del mes no se muestra en Mi negocio (a pedido del usuario, v802).
+    // La Ruleta PSA que ocupó su lugar se quitó en v807 a pedido del usuario.
     // El cálculo (datosGps) queda intacto por si se lo quiere volver a poner.
   }
 

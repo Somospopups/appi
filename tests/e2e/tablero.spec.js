@@ -60,14 +60,11 @@ async function entrar(page) {
   await page.evaluate(() => window.showView('view-negocio'));
 }
 
-test('Mi negocio muestra la Ruleta PSA en el lugar del GPS (v802)', async ({ page }) => {
+test('Mi negocio no muestra el GPS del mes ni la Ruleta (v807)', async ({ page }) => {
   await entrar(page);
-  // El GPS del mes deja de mostrarse: su lugar lo ocupa la ruleta.
   expect(await page.locator('#gpsBlock').count()).toBe(0);
-  const ruleta = page.locator('#ruletaNegCard');
-  await expect(ruleta).toBeVisible({ timeout: 10000 });
-  await expect(ruleta).toContainText('Ruleta PSA');
-  await expect(ruleta).toContainText('GIRAR');
+  // La Ruleta PSA que ocupó el lugar del GPS se quitó en v807.
+  expect(await page.locator('#ruletaNegCard').count()).toBe(0);
 });
 
 test('la botella calcula conciencia y se comparte', async ({ page }) => {
