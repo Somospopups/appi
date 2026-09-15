@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "791.0.0",
-  "cacheName": "appi-v791-precios-fab",
+  "version": "792.0.0",
+  "cacheName": "appi-v792-campana-toast",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

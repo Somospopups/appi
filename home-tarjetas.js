@@ -318,8 +318,16 @@
     }catch(e){ return Promise.resolve(null); }
     return promoImgBlobPromise;
   }
-  // Precarga en segundo plano cuando la tarjeta está vigente
-  try{ if (ventanaPromoBotella()) setTimeout(function(){ getPromoImgBlob(); }, 900); }catch(e){}
+  // Precarga en segundo plano cuando la tarjeta está vigente y el splash ya salió
+  try{
+    if (ventanaPromoBotella()){
+      setTimeout(function(){
+        var b = document.getElementById('bootScreen');
+        if (b && !b.classList.contains('gone')) return;
+        getPromoImgBlob();
+      }, 2500);
+    }
+  }catch(e){}
   function listaUsuariosHome(){
     try{
       if (typeof window.usuariosTodosActual === 'function'){

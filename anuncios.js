@@ -299,15 +299,25 @@
       'body.dark .an-ev b{color:#f0f1f8}',
       'body.dark .an-b-tel{background:rgba(255,255,255,.08);color:#bcd0ff}',
       /* campanita */
-      '#anBell{position:fixed;top:calc(12px + env(safe-area-inset-top));right:104px;z-index:9000;width:42px;height:42px;',
-      'border:0;border-radius:50%;background:linear-gradient(135deg,#0b5878,#3ad0a4);color:#fff;font-size:18px;',
-      'cursor:pointer;box-shadow:0 8px 20px rgba(91,141,239,.4);display:none;place-items:center}',
-      '#anBell.on{display:grid}',
-      '#anBell i{position:absolute;top:-2px;right:-2px;width:12px;height:12px;border-radius:50%;display:none;',
-      'background:#ff5b5b;box-shadow:0 0 0 2.5px #fff;font-style:normal}',
+      '#anBell, .home-header #anBell, header.top #anBell{',
+      'position:absolute !important;right:88px !important;top:4px !important;z-index:10 !important;',
+      'width:38px !important;height:38px !important;border-radius:50% !important;',
+      'background:rgba(255,255,255,0.6) !important;-webkit-backdrop-filter:blur(14px) !important;',
+      'backdrop-filter:blur(14px) !important;border:1px solid rgba(255,255,255,0.7) !important;',
+      'box-shadow:0 4px 14px rgba(80,90,130,0.06) !important;color:#3d63c9 !important;',
+      'font-size:17px !important;line-height:1 !important;display:none;align-items:center !important;',
+      'justify-content:center !important;cursor:pointer !important;padding:0 !important;box-sizing:border-box !important;',
+      'transition:transform .15s ease, background .15s ease}',
+      '.home-header #anBell, header.top.home-header #anBell{top:0 !important}',
+      '#anBell.on, .home-header #anBell.on, header.top #anBell.on{display:flex !important}',
+      '#anBell:hover{background:rgba(255,255,255,0.85) !important}',
+      '#anBell:active{transform:scale(.92) !important}',
+      'body.dark #anBell, body.dark .home-header #anBell{background:rgba(40,40,60,.7) !important;border-color:rgba(255,255,255,.1) !important;color:#a0e6d0 !important}',
+      '#anBell i{position:absolute;top:-1px;right:-1px;width:10px;height:10px;border-radius:50%;display:none;',
+      'background:#ff5b5b;box-shadow:0 0 0 2px #fff;font-style:normal}',
       '#anBell.nuevo i{display:block;animation:anPulse 1.6s infinite}',
       '@keyframes anPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.35)}}',
-      'body.dark #anBell i{box-shadow:0 0 0 2.5px #1b2238}'
+      'body.dark #anBell i{box-shadow:0 0 0 2px #1b2238}'
     ].join('');
     document.head.appendChild(st);
   }
@@ -381,16 +391,29 @@
   }
 
   /* ---------- campanita ---------- */
+  function targetHeader(){
+    var activeView = document.querySelector('.view.active header.top');
+    if (activeView) return activeView;
+    var homeHeader = document.querySelector('.home-header');
+    if (homeHeader) return homeHeader;
+    return document.querySelector('header.top') || document.body;
+  }
   function bell(){
     var b = document.getElementById('anBell');
-    if (b) return b;
-    b = document.createElement('button');
-    b.id = 'anBell';
-    b.type = 'button';
-    b.setAttribute('aria-label', 'Anuncio de administración');
-    b.innerHTML = '🔔<i></i>';
-    b.onclick = function(){ if (ACTUAL) mostrar(ACTUAL); };
-    document.body.appendChild(b);
+    var target = targetHeader();
+    if (!b){
+      b = document.createElement('button');
+      b.id = 'anBell';
+      b.type = 'button';
+      b.className = 'bell-btn';
+      b.setAttribute('aria-label', 'Anuncio de administración');
+      b.innerHTML = '🔔<i></i>';
+      b.onclick = function(){ if (ACTUAL) mostrar(ACTUAL); };
+      if (target) target.appendChild(b);
+      else document.body.appendChild(b);
+    } else if (target && b.parentElement !== target){
+      target.appendChild(b);
+    }
     return b;
   }
   function pintarBell(){
@@ -399,9 +422,6 @@
     if (!ACTUAL){ b.classList.remove('on', 'nuevo'); return; }
     b.classList.add('on');
     b.classList.toggle('nuevo', ACTUAL.id !== vistoId());
-    // Si está la franja de versión de prueba, la campanita baja un escalón.
-    var franja = document.getElementById('appiPruebaBar');
-    b.style.top = franja ? 'calc(52px + env(safe-area-inset-top))' : '';
   }
   function quitarBell(){
     var b = document.getElementById('anBell');
