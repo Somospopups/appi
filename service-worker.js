@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v726-sin-banners';
+const CACHE_NAME = 'appi-v789-fab-dock-fix';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
@@ -16,6 +16,7 @@ const APP_SHELL = [
   './data-sync.js',
   './js/membership-admin.js',
   './admin-panel.js',
+  './js/compromiso-pago.js',
   './account-request.js',
   './qr-code.js',
   './gestion-client.js',
@@ -31,6 +32,7 @@ const APP_SHELL = [
   './tablero-negocio.js',
   './lista-precios.js',
   './stock-personal.js',
+  './vendor/zxing.min.js',
   './porque-vivo.js',
   './home-limpio.js',
   './home-tarjetas.js',
