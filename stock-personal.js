@@ -1225,6 +1225,8 @@
       '.st-fab-group.expanded .st-fab-child .st-fab-lbl{opacity:1;transform:translateX(-50%) translateY(0)}' +
       '.st-fab-group.expanded .fab-scan{transform:translateX(-84px) translateY(-6px) scale(1);transition-delay:.06s}' +
       '.st-fab-group.expanded .fab-scan .st-fab-lbl{transition-delay:.14s}' +
+      '.st-fab-group.expanded .fab-share{transform:translateX(0) translateY(-84px) scale(1);transition-delay:.08s}' +
+      '.st-fab-group.expanded .fab-share .st-fab-lbl{transition-delay:.16s}' +
       '.st-fab-group.expanded .fab-manual{transform:translateX(84px) translateY(-6px) scale(1);transition-delay:.11s}' +
       '.st-fab-group.expanded .fab-manual .st-fab-lbl{transition-delay:.19s}' +
       '.st-fab-group.expanded .st-fab-main{box-shadow:0 16px 36px rgba(80,90,130,.22)}' +
@@ -1333,7 +1335,7 @@
     }).join('');
     return '<div class="st-card"><div class="st-name">📦 En casa</div><div class="st-meta" style="margin:4px 0 8px">' + total + ' unidad' + (total === 1 ? '' : 'es') + ' disponibles</div>' +
       (filas || '<div class="st-empty">Todavía no cargaste productos.</div>') +
-      '</div><div class="st-scan-foot"><div class="st-fab-group" id="stFabGroup"><button type="button" id="stQr" class="st-fab st-fab-child fab-scan" aria-label="Escanear" title="Apuntá a la etiqueta: lee QR"><span class="st-fab-lbl">Escanear</span><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:26px;height:26px;display:block"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="4" height="4" rx="1"/><rect x="18" y="14" width="3" height="3" rx="1"/><rect x="15.5" y="18.5" width="2.5" height="2.5" rx="0.7"/><path d="M7 7h1v1H7zM17 7h1v1h-1zM7 17h1v1H7z"/><path d="M14 8.5h2M8.5 14v2M14 16.2h.8M18 18.5h-2"/></svg></button><button type="button" id="stFabManual" class="st-fab st-fab-child fab-manual" aria-label="Carga manual" title="Cargar manual"><span class="st-fab-lbl">Manual</span><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" style="width:26px;height:26px;display:block"><path d="M12 20H21"/><path d="M16.5 3.5a2.22 2.22 0 0 1 3.14 3.14L7 19.3 3.5 20.5 4.7 17 16.5 3.5z"/><path d="M13.5 6.5L17.5 10.5"/></svg></button><button type="button" id="stFabMain" class="st-fab st-fab-main" aria-label="Acciones" title="Agregar producto"><span class="st-fab-plus"></span></button></div></div><div class="st-fab-backdrop" id="stFabBackdrop"></div>' +
+      '</div><div class="st-scan-foot"><div class="st-fab-group" id="stFabGroup"><button type="button" id="stQr" class="st-fab st-fab-child fab-scan" aria-label="Escanear" title="Apuntá a la etiqueta: lee QR"><span class="st-fab-lbl">Escanear</span><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:26px;height:26px;display:block"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="4" height="4" rx="1"/><rect x="18" y="14" width="3" height="3" rx="1"/><rect x="15.5" y="18.5" width="2.5" height="2.5" rx="0.7"/><path d="M7 7h1v1H7zM17 7h1v1h-1zM7 17h1v1H7z"/><path d="M14 8.5h2M8.5 14v2M14 16.2h.8M18 18.5h-2"/></svg></button><button type="button" id="stFabShare" class="st-fab st-fab-child fab-share" aria-label="Compartir stock" title="Compartir stock por WhatsApp"><span class="st-fab-lbl">Compartir</span><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:26px;height:26px;display:block"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg></button><button type="button" id="stFabManual" class="st-fab st-fab-child fab-manual" aria-label="Carga manual" title="Cargar manual"><span class="st-fab-lbl">Manual</span><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" style="width:26px;height:26px;display:block"><path d="M12 20H21"/><path d="M16.5 3.5a2.22 2.22 0 0 1 3.14 3.14L7 19.3 3.5 20.5 4.7 17 16.5 3.5z"/><path d="M13.5 6.5L17.5 10.5"/></svg></button><button type="button" id="stFabMain" class="st-fab st-fab-main" aria-label="Acciones" title="Agregar producto"><span class="st-fab-plus"></span></button></div></div><div class="st-fab-backdrop" id="stFabBackdrop"></div>' +
       '';
   }
 
@@ -1382,7 +1384,7 @@
     });
     // FAB expandable horizontal — Stock
     (function(){
-      var grp=$('stFabGroup'), main=$('stFabMain'), qr=$('stQr'), man=$('stFabManual'), back=$('stFabBackdrop');
+      var grp=$('stFabGroup'), main=$('stFabMain'), qr=$('stQr'), man=$('stFabManual'), share=$('stFabShare'), back=$('stFabBackdrop');
       function setFab(open){
         if(grp) grp.classList.toggle('expanded', !!open);
         if(back) back.classList.toggle('on', !!open);
@@ -1392,6 +1394,10 @@
       function closeFab(){ setFab(false); }
       if(main) main.onclick=function(e){ e.stopPropagation(); toggleFab(); };
       if(qr) qr.onclick=function(e){ e.stopPropagation(); closeFab(); abrirEscan(); };
+      if(share) share.onclick=function(e){
+        e.stopPropagation(); closeFab();
+        compartirStockWhatsApp();
+      };
       if(man) man.onclick=function(e){
         e.stopPropagation(); closeFab();
         abrirManualStock();
@@ -1451,7 +1457,7 @@
     // Pendientes de canje: cámara, búsqueda por serie, edición y entrega.
     // FAB expandable horizontal — Pendientes
     (function(){
-      var grpP=$('stFabGroupP'), mainP=$('stFabMainP'), qrP=$('stQrP'), manP=$('stFabManualP'), backP=$('stFabBackdropP');
+      var grpP=$('stFabGroupP'), mainP=$('stFabMainP'), qrP=$('stQrP'), manP=$('stFabManualP'), shareP=$('stFabShareP'), backP=$('stFabBackdropP');
       function setFabP(open){
         if(grpP) grpP.classList.toggle('expanded', !!open);
         if(backP) backP.classList.toggle('on', !!open);
@@ -1461,6 +1467,11 @@
       function closeFabP(){ setFabP(false); }
       if(mainP) mainP.onclick=function(e){ e.stopPropagation(); toggleFabP(); };
       if(qrP) qrP.onclick=function(e){ e.stopPropagation(); closeFabP(); abrirEscan('pendientes'); };
+      if(shareP) shareP.onclick=function(e){
+        e.stopPropagation();
+        closeFabP();
+        compartirPendientesWhatsApp();
+      };
       if(manP) manP.onclick=function(e){
         e.stopPropagation();
         closeFabP();
@@ -1922,6 +1933,94 @@
     return p.length === 3 ? p[2] + '/' + p[1] + '/' + p[0] : iso;
   }
 
+  function abrirWhatsAppTexto(texto){
+    var url = 'https://wa.me/?text=' + encodeURIComponent(texto);
+    if (window.APPIWhatsApp && typeof window.APPIWhatsApp.abrir === 'function'){
+      window.APPIWhatsApp.abrir(url);
+    } else {
+      window.open(url, '_blank', 'noopener');
+    }
+  }
+
+  function compartirPendientesWhatsApp(){
+    var items = leerPendientes().slice().sort(cmpProducto);
+    if (!items.length){
+      if (window.APPIDialog) window.APPIDialog.alert('No tenés equipos pendientes de canje para compartir.', { title:'Sin pendientes', icon:'🔄' });
+      else toast('No hay pendientes para compartir');
+      return;
+    }
+    var lineas = [];
+    var total = items.length;
+    var fechaHoy = fechaTxtCorta(hoyISO());
+
+    lineas.push('🔄 *EQUIPOS CANJEADOS PENDIENTES DE ENTREGA*');
+    lineas.push('📅 _' + fechaHoy + '_ · *' + total + ' equipo' + (total === 1 ? '' : 's') + '*');
+    lineas.push('');
+
+    items.forEach(function(p, idx){
+      var prod = String(p.producto || 'Equipo canje').trim();
+      lineas.push((idx + 1) + '. *' + prod + '*');
+      if (p.serie) lineas.push('   • *Serie:* ' + String(p.serie).trim());
+      if (p.quien) lineas.push('   • *Titular:* ' + String(p.quien).trim());
+      else lineas.push('   • *Titular:* _(A confirmar con la empresa)_');
+      if (p.telefono) lineas.push('   • *Tel:* ' + String(p.telefono).trim());
+      if (p.domicilio) lineas.push('   • *Domicilio:* ' + String(p.domicilio).trim());
+      if (p.fecha) lineas.push('   • *Fecha recepción:* ' + fechaTxtCorta(p.fecha));
+      lineas.push('');
+    });
+
+    lineas.push('───────────────────');
+    lineas.push('📱 _APPI · Gestión de Canjes PSA_');
+
+    abrirWhatsAppTexto(lineas.join('\n'));
+    toast('Abriendo WhatsApp...');
+  }
+
+  function compartirStockWhatsApp(){
+    var stock = leerStock().slice().sort(cmpProducto);
+    var prestamos = leerPrestamos().slice().sort(cmpProducto);
+    var totalEnCasa = stock.reduce(function(acc, x){ return acc + (Number(x.cant) || 0); }, 0);
+    var totalPrestados = prestamos.length;
+    if (!totalEnCasa && !totalPrestados){
+      if (window.APPIDialog) window.APPIDialog.alert('No tenés productos cargados en tu stock para compartir.', { title:'Stock vacío', icon:'📦' });
+      else toast('No hay stock para compartir');
+      return;
+    }
+    var lineas = [];
+    var fechaHoy = fechaTxtCorta(hoyISO());
+
+    lineas.push('📦 *MI STOCK PERSONAL - PSA*');
+    lineas.push('📅 _' + fechaHoy + '_');
+    lineas.push('');
+
+    lineas.push('🏠 *EN CASA (' + totalEnCasa + ' unidad' + (totalEnCasa === 1 ? '' : 'es') + '):*');
+    if (!stock.length){
+      lineas.push('_(Sin productos en casa)_');
+    } else {
+      stock.forEach(function(s){
+        lineas.push('• ' + (Number(s.cant) || 1) + 'x ' + s.producto);
+      });
+    }
+    lineas.push('');
+
+    if (totalPrestados > 0){
+      lineas.push('🤝 *EN LA CALLE / PRESTADOS (' + totalPrestados + '):*');
+      prestamos.forEach(function(p){
+        var t = '• ' + p.producto + ' → Prestado a ' + p.quien;
+        if (p.telefono) t += ' (' + p.telefono + ')';
+        if (p.fecha) t += ' [' + fechaTxtCorta(p.fecha) + ']';
+        lineas.push(t);
+      });
+      lineas.push('');
+    }
+
+    lineas.push('───────────────────');
+    lineas.push('📱 _APPI · Gestión de Stock PSA_');
+
+    abrirWhatsAppTexto(lineas.join('\n'));
+    toast('Abriendo WhatsApp...');
+  }
+
   function buscarSeriePendiente(s){
     s = String(s || '').trim().toUpperCase();
     if (!s){
@@ -2011,7 +2110,7 @@
     return '<div class="st-card"><div class="st-name">🔄 Pendientes de canje</div>' +
       '<div class="st-meta" style="margin:4px 0 8px">' + total + ' equipo' + (total === 1 ? '' : 's') + ' para entregar a la empresa</div>' +
       (filas || '<div class="st-empty">Nada pendiente. Al hacer un canje, cargá la base del equipo viejo con la cámara o con Carga manual.</div>') +
-      '</div><div class="st-scan-foot"><div class="st-fab-group" id="stFabGroupP"><button type="button" id="stQrP" class="st-fab st-fab-child fab-scan" aria-label="Escanear base" title="Apuntá al QR de la base"><span class="st-fab-lbl">Escanear</span><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:26px;height:26px;display:block"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="4" height="4" rx="1"/><rect x="18" y="14" width="3" height="3" rx="1"/><rect x="15.5" y="18.5" width="2.5" height="2.5" rx="0.7"/><path d="M7 7h1v1H7zM17 7h1v1h-1zM7 17h1v1H7z"/><path d="M14 8.5h2M8.5 14v2M14 16.2h.8M18 18.5h-2"/></svg></button><button type="button" id="stFabManualP" class="st-fab st-fab-child fab-manual" aria-label="Carga manual" title="Cargar manual"><span class="st-fab-lbl">Manual</span><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" style="width:26px;height:26px;display:block"><path d="M12 20H21"/><path d="M16.5 3.5a2.22 2.22 0 0 1 3.14 3.14L7 19.3 3.5 20.5 4.7 17 16.5 3.5z"/><path d="M13.5 6.5L17.5 10.5"/></svg></button><button type="button" id="stFabMainP" class="st-fab st-fab-main" aria-label="Acciones" title="Opciones"><span class="st-fab-plus"></span></button></div></div><div class="st-fab-backdrop" id="stFabBackdropP"></div>';
+      '</div><div class="st-scan-foot"><div class="st-fab-group" id="stFabGroupP"><button type="button" id="stQrP" class="st-fab st-fab-child fab-scan" aria-label="Escanear base" title="Apuntá al QR de la base"><span class="st-fab-lbl">Escanear</span><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:26px;height:26px;display:block"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="4" height="4" rx="1"/><rect x="18" y="14" width="3" height="3" rx="1"/><rect x="15.5" y="18.5" width="2.5" height="2.5" rx="0.7"/><path d="M7 7h1v1H7zM17 7h1v1h-1zM7 17h1v1H7z"/><path d="M14 8.5h2M8.5 14v2M14 16.2h.8M18 18.5h-2"/></svg></button><button type="button" id="stFabShareP" class="st-fab st-fab-child fab-share" aria-label="Compartir listado" title="Compartir listado por WhatsApp"><span class="st-fab-lbl">Compartir</span><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:26px;height:26px;display:block"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg></button><button type="button" id="stFabManualP" class="st-fab st-fab-child fab-manual" aria-label="Carga manual" title="Cargar manual"><span class="st-fab-lbl">Manual</span><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" style="width:26px;height:26px;display:block"><path d="M12 20H21"/><path d="M16.5 3.5a2.22 2.22 0 0 1 3.14 3.14L7 19.3 3.5 20.5 4.7 17 16.5 3.5z"/><path d="M13.5 6.5L17.5 10.5"/></svg></button><button type="button" id="stFabMainP" class="st-fab st-fab-main" aria-label="Acciones" title="Opciones"><span class="st-fab-plus"></span></button></div></div><div class="st-fab-backdrop" id="stFabBackdropP"></div>';
   }
 
   // Abre el formulario para una pendiente (i = -1 → nueva).
@@ -2384,6 +2483,8 @@
     qrVivo: qrVivo, evaluarLectura: evaluarLectura,
     matchCatalogo: matchCatalogo, cargarCatalogo: cargarCatalogo,
     buscarSeriePendiente: buscarSeriePendiente,
-    iniciarCargaManualPendiente: iniciarCargaManualPendiente
+    iniciarCargaManualPendiente: iniciarCargaManualPendiente,
+    compartirPendientesWhatsApp: compartirPendientesWhatsApp,
+    compartirStockWhatsApp: compartirStockWhatsApp
   };
 })();

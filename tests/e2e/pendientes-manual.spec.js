@@ -162,4 +162,131 @@ test.describe('Pendientes de canje: carga manual y sin botón Buscar en mis usua
     await expect(page.locator('#stPQuien')).toHaveValue('LÓPEZ, CARLOS');
     await expect(page.locator('#stPTel')).toHaveValue('0351 987 6543');
   });
+
+  test('el botón flotante incluye el tercer botón COMPARTIR en la parte superior con ícono de listado y abre WhatsApp detallado', async ({ page }) => {
+    const mockUsers = [
+      {
+        serie: 'IR5624',
+        producto: 'PSA VERO',
+        usuario: 'GÓMEZ, MARÍA',
+        telf: '0351 455 2272',
+        domicilio: 'Av. Colón 1234'
+      }
+    ];
+
+    await entrar(page, mockUsers);
+    await page.evaluate(() => {
+      const uid = (window.APPIAuth && window.APPIAuth.userId) ? window.APPIAuth.userId() : 'local';
+      const data = [
+        {
+          serie: 'IR5624',
+          producto: 'PSA Vero',
+          quien: 'GÓMEZ, MARÍA',
+          telefono: '0351 455 2272',
+          domicilio: 'Av. Colón 1234',
+          fecha: '2026-09-15'
+        },
+        {
+          serie: 'SE8811',
+          producto: 'PSA Senior 4',
+          quien: 'PÉREZ, JUAN',
+          telefono: '0351 111 2233',
+          domicilio: '',
+          fecha: '2026-09-10'
+        }
+      ];
+      localStorage.setItem('appi_pendientes_v1_' + uid, JSON.stringify(data));
+      localStorage.setItem('appi_pendientes_v1_local', JSON.stringify(data));
+    });
+
+    await page.evaluate(() => window.openStock());
+    await page.waitForTimeout(200);
+
+    await page.locator('[data-st-tab="pendientes"]').click();
+    await page.waitForTimeout(200);
+
+    // El botón #stFabShareP existe y tiene el label Compartir y el SVG de hoja/listado
+    const shareBtn = page.locator('#stFabShareP');
+    await expect(shareBtn).toBeAttached();
+    await expect(shareBtn.locator('.st-fab-lbl')).toHaveText('Compartir');
+    await expect(shareBtn.locator('svg line')).toHaveCount(3); // Las líneas del listado en el SVG
+
+    // Abrir el FAB
+    const mainBtn = page.locator('#stFabMainP');
+    await mainBtn.click();
+    await page.waitForTimeout(300);
+
+    // Verificar que el grupo está expandido y el botón Compartir está arriba del botón central
+    const grp = page.locator('#stFabGroupP');
+    await expect(grp).toHaveClass(/expanded/);
+
+    const shareBox = await shareBtn.boundingBox();
+    const mainBox = await mainBtn.boundingBox();
+    expect(shareBox).not.toBeNull();
+    expect(mainBox).not.toBeNull();
+
+    // shareBox está arriba del botón central (y menor) y centrado horizontalmente
+    expect(shareBox.y).toBeLessThan(mainBox.y);
+    const shareCenterX = shareBox.x + shareBox.width / 2;
+    const mainCenterX = mainBox.x + mainBox.width / 2;
+    expect(Math.abs(shareCenterX - mainCenterX)).toBeLessThan(15);
+
+    // Mock de WhatsApp para interceptar el mensaje compartido
+    await page.evaluate(() => {
+      window._waOpenedUrl = null;
+      if (!window.APPIWhatsApp) window.APPIWhatsApp = {};
+      window.APPIWhatsApp.abrir = (url) => { window._waOpenedUrl = url; };
+      window.open = (url) => { window._waOpenedUrl = url; };
+    });
+
+    // Clic en Compartir
+    await shareBtn.click();
+    await page.waitForTimeout(100);
+
+    // FAB se cierra tras clic
+    await expect(grp).not.toHaveClass(/expanded/);
+
+    // Verificar la URL y el texto detallado para WhatsApp
+    const openedUrl = await page.evaluate(() => window._waOpenedUrl);
+    expect(openedUrl).not.toBeNull();
+    expect(openedUrl).toContain('https://wa.me/?text=');
+
+    const decoded = decodeURIComponent(openedUrl);
+    expect(decoded).toContain('EQUIPOS CANJEADOS PENDIENTES DE ENTREGA');
+    expect(decoded).toContain('2 equipos');
+    expect(decoded).toContain('PSA Vero');
+    expect(decoded).toContain('IR5624');
+    expect(decoded).toContain('GÓMEZ, MARÍA');
+    expect(decoded).toContain('0351 455 2272');
+    expect(decoded).toContain('Av. Colón 1234');
+    expect(decoded).toContain('PSA Senior 4');
+    expect(decoded).toContain('SE8811');
+    expect(decoded).toContain('PÉREZ, JUAN');
+  });
+
+  test('si no hay pendientes y se toca COMPARTIR, avisa que no hay equipos para compartir', async ({ page }) => {
+    await entrar(page);
+    await page.evaluate(() => {
+      const uid = (window.APPIAuth && window.APPIAuth.userId) ? window.APPIAuth.userId() : 'local';
+      localStorage.removeItem('appi_pendientes_v1_' + uid);
+      localStorage.removeItem('appi_pendientes_v1_local');
+    });
+
+    await page.evaluate(() => window.openStock());
+    await page.waitForTimeout(200);
+
+    await page.locator('[data-st-tab="pendientes"]').click();
+    await page.waitForTimeout(200);
+
+    const mainBtn = page.locator('#stFabMainP');
+    await mainBtn.click();
+    await page.waitForTimeout(200);
+
+    const shareBtn = page.locator('#stFabShareP');
+    await shareBtn.click();
+
+    // Diálogo de aviso
+    await expect(page.locator('#appiDialogTitle')).toHaveText('Sin pendientes');
+    await expect(page.locator('#appiDialogMessage')).toContainText('No tenés equipos pendientes de canje para compartir');
+  });
 });

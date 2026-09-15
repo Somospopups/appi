@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "793.0.0",
-  "cacheName": "appi-v793-pendientes-manual",
+  "version": "794.0.0",
+  "cacheName": "appi-v794-stock-compartir-wa",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {
