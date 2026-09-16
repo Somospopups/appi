@@ -102,7 +102,6 @@ window.openStock=function(){
 <script src="./appi-dialog.js?v=512"></script>
 <script src="./appi-notif.js?v=524"></script>
 <script src="./recordatorios-app.js?v=1"></script>
-<script src="./google-calendar.js?v=4"></script>
 <script src="./telefono.js"></script>
 <script src="./whatsapp-app.js"></script>
 <script src="./auth-client.js?v=441"></script>
@@ -4592,7 +4591,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v824 · Segura</div>
+  <div class="ds-foot">APPI · v825 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -5026,11 +5025,6 @@ body.dark #pageTabs button.active{color:#c5d6ff}
         <div><button type="button" id="recBtnPermiso" style="margin-top:7px;padding:7px 14px;border-radius:10px;border:1px solid rgba(122,91,6,0.4);background:#fff;color:#7a5b06;font:inherit;font-size:11px;font-weight:800;cursor:pointer">Activar avisos</button></div>
       </div>
       <div id="recList" style="margin-top:12px;display:flex;flex-direction:column;gap:8px"></div>
-      <!-- v822: Calendario de Google (un toque, ID+secret quemados) -->
-      <div style="margin-top:12px;padding:14px;border-radius:14px;background:rgba(255,255,255,0.72);border:1px solid rgba(80,90,130,0.12);box-shadow:0 4px 14px rgba(65,75,120,0.05)">
-        <div style="font-size:13px;font-weight:800;color:#292938;margin-bottom:6px">📅 Calendario de Google</div>
-        <div id="recGoogle"></div>
-      </div>
       <div style="margin-top:14px;font-size:10.5px;color:#777887;font-weight:600;line-height:1.5">
         En iPhone, si no te llegan: compartí la app → "Agregar a pantalla de inicio" y activá los avisos desde Ajustes del teléfono.
       </div>
@@ -13411,8 +13405,8 @@ function cerrarToolsMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='824';
-      const CACHE_NAME='appi-v824-auto-migra';
+      const swVersion='825';
+      const CACHE_NAME='appi-v825-sin-google';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · v'+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}

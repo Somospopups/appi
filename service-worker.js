@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v824-auto-migra';
+const CACHE_NAME = 'appi-v825-sin-google';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
@@ -10,7 +10,6 @@ const APP_SHELL = [
   './appi-dialog.js',
   './appi-notif.js',
   './recordatorios-app.js',
-  './google-calendar.js',
   './telefono.js',
   './whatsapp-app.js',
   './auth-client.js',
