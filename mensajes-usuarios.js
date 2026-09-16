@@ -1691,6 +1691,44 @@
     };
     ov.classList.add('open');
   }
+  /* v813: usuario REASIGNADO — la empresa le cambió el distribuidor y la
+     planilla trae el nombre del ex en "DIP reasignado". El primer mensaje
+     es el de recontacto: garantías de la empresa, el ex distribuidor ya no
+     está en el sistema y quién lo atiende ahora (el nombre del campo
+     "¿Cómo te gustaría que te llamemos?"; si está vacío, el del Reporte
+     de Bonos). */
+  function textoReasignado(u){
+    var ex = String(u && u.dipReasignado || '').trim() || 'anterior';
+    var miNombre = (window.APPIHielo && window.APPIHielo.firma) ? String(window.APPIHielo.firma() || '').trim() : '';
+    if (!miNombre || miNombre === 'yo') {
+      try { var bc = JSON.parse(localStorage.getItem('appi_bonos_v1') || 'null'); if (bc && bc.bonos && bc.bonos.nombre) miNombre = String(bc.bonos.nombre).trim(); } catch (e) {}
+    }
+    if (!miNombre) miNombre = 'tu distribuidor/a';
+    return 'Hola ' + ((u && String(u.usuario || '').trim()) || 'cliente') +
+      '! La empresa tiene un sistema de garantías cargado y el distribuidor ' + ex +
+      ', quien supo ser tu distribuidor, ya no está más en el sistema. Mi nombre es ' +
+      miNombre + ' y ahora estoy a tu disposición para cualquier consulta o mantenimiento.';
+  }
+  function pintarReasignado(u){
+    var ov = overlay();
+    ctx.persona = u || null;
+    ctx.plantilla = null;
+    var nombre = nombreCortoDe(u);
+    var texto = textoReasignado(u);
+    ov.querySelector('#muTitulo').textContent = 'Recontacto para ' + nombre;
+    ov.querySelector('#muSub').textContent = 'Usuario reasignado por la empresa';
+    var cuerpo = ov.querySelector('#muCuerpo');
+    cuerpo.innerHTML = '<div class="mu-ayuda">Este usuario fue reasignado por la empresa (de: <b>' + esc(String(u.dipReasignado || '')) + '</b>). ' +
+      'El primer mensaje explica el cambio y deja claro quién lo atiende ahora.</div>' +
+      '<div class="mu-prev"><div class="mu-prev-head"><b>Así lo va a recibir</b></div>' +
+      '<span id="muPrevTxt">' + esc(texto) + '</span></div>' +
+      '<div class="mu-acciones"><button type="button" class="mu-enviar" id="muMandarReasig">💬 Mandar el mensaje</button></div>';
+    cuerpo.querySelector('#muMandarReasig').onclick = function(){
+      enviar(u, cuerpo.querySelector('#muPrevTxt').textContent, { sinMarcar: true });
+      pintarGrupos(u);
+    };
+    ov.classList.add('open');
+  }
   function pintarGrupos(u){
     var ov = overlay();
     ctx.persona = u || null;
@@ -1806,6 +1844,10 @@
       return;
     }
 
+    if (u && u.reasignado && !ultimoEnvio(u)){
+      pintarReasignado(u);
+      return;
+    }
     if (u && !ultimoEnvio(u)){
       pintarHielo(u);
       return;
@@ -2177,6 +2219,8 @@
 
   window.APPIMensajes = {
     BASE: BASE,
+    textoReasignado: textoReasignado,
+    pintarReasignado: pintarReasignado,
     ETIQUETAS: ETIQUETAS,
     LINK_RETROLAVADO: LINK_RETROLAVADO,
     LINK_CANJE: LINK_CANJE,
