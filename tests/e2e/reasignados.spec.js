@@ -68,8 +68,11 @@ test('el reasignado lleva pildora ↻ y al abrirlo dice de quién es (v813)', as
   const filaPedro = page.locator('#usuariosList .tree-node', { hasText: 'PEDRO LUIZ' });
   await expect(filaPedro).not.toContainText('↻');
 
-  // Contador del botón de filtro
+  // Contador del botón de filtro (badge con la cantidad)
   await expect(page.locator('#usuariosStReasig')).toHaveText('1');
+  await expect(page.locator('#usuariosStReasig')).toHaveClass(/on/);
+  // La etiqueta del botón no lleva los paréntesis: solo "Reasignados"
+  await expect(page.locator('#usuariosBtnReasig')).not.toContainText('(');
 
   // Al expandir la fila aparece "Reasignado de: JUAN CARLOS PEREZ"
   await filaMaria.click();
@@ -106,6 +109,7 @@ test('el filtro Reasignados está siempre visible, aunque no haya ninguno (v814)
   const btn = page.locator('#usuariosBtnReasig');
   await expect(btn).toBeVisible();
   await expect(page.locator('#usuariosStReasig')).toHaveText('0');
+  await expect(page.locator('#usuariosStReasig')).not.toHaveClass(/on/);
   // Filtrar con 0 reasignados muestra el estado vacío y se puede volver
   await btn.click();
   await expect(page.locator('#usuariosList')).toContainText('Sin usuarios con esos filtros');

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v814-filtro-reasig';
+const CACHE_NAME = 'appi-v815-reasig-badge';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
