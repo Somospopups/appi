@@ -231,9 +231,10 @@ function parsearBonos(html: string): BonosReporte | null {
   return out;
 }
 
-interface Fila { usuario: string; telefono: string; domicilio: string; cp: string; localidad: string; serie: string; producto: string; compra: string; vence: string; canje: string }
+interface Fila { usuario: string; telefono: string; domicilio: string; cp: string; localidad: string; serie: string; producto: string; compra: string; vence: string; canje: string; dr: string; e: string; cn: string }
 
-/** Parsea el reporte de Garantías (tabla HTML de 12 columnas). */
+/** Parsea el reporte de Garantías (tabla HTML; col 12 = "Dip reasignado",
+ *    col 13 = "E Mail", col 14 = "Cumpleaños", v817). */
 function parsearGarantias(html: string): Fila[] {
   const out: Fila[] = [];
   const trs = html.match(/<tr[^>]*>[\s\S]*?<\/tr>/g) || [];
@@ -245,7 +246,8 @@ function parsearGarantias(html: string): Fila[] {
     if (!serie) continue;
     out.push({
       usuario: cells[0], telefono: cells[1], domicilio: cells[2], cp: cells[3],
-      localidad: cells[4], serie, producto: cells[6], compra: cells[7], vence: cells[8], canje: cells[11] || ''
+      localidad: cells[4], serie, producto: cells[6], compra: cells[7], vence: cells[8], canje: cells[11] || '',
+      dr: cells[12] || '', e: cells[13] || '', cn: cells[14] || ''
     });
   }
   return out;
@@ -384,10 +386,11 @@ Deno.serve(async (req) => {
   // action:'report' → la app baja la base completa UNA vez (al abrir la
   // cámara de Pendientes) y después busca en el teléfono al instante.
   if (body.action === 'report') {
+    // v817: dr = "Dip reasignado" (ex distribuidor), e = E Mail, cn = Cumpleaños.
     return json({
       ok: true,
       total: filas.length,
-      filas: filas.map(f => ({ s: f.serie, u: f.usuario, t: f.telefono, d: f.domicilio, c: f.cp, l: f.localidad, p: f.producto, c2: f.compra, v: f.vence }))
+      filas: filas.map(f => ({ s: f.serie, u: f.usuario, t: f.telefono, d: f.domicilio, c: f.cp, l: f.localidad, p: f.producto, c2: f.compra, v: f.vence, dr: f.dr, e: f.e, cn: f.cn }))
     });
   }
   const hit = filas.find(f => f.serie === serie) || null;

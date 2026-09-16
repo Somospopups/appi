@@ -10,6 +10,13 @@ const base = require('./hoy-lista-10.spec.js');
 // 4) al tocarles 💬 WhatsApp, abrir el mensaje de recontacto (garantías +
 //    ex distribuidor fuera del sistema + mi nombre del campo de Mi Perfil).
 
+const USER_ID = '22222222-2222-4222-8222-222222222222';
+function tokenFor(sub) {
+  const h = Buffer.from(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).toString('base64url');
+  const p = Buffer.from(JSON.stringify({ sub, exp: Math.floor(Date.now() / 1000) + 3600 })).toString('base64url');
+  return `${h}.${p}.firma`;
+}
+
 const USUARIOS = [
   {
     id: 0, usuario: 'MARIA GONZALEZ', telf: '3515550123', domicilio: 'Calle 1 123',
@@ -181,4 +188,74 @@ test('planilla anterior a la v813: aviso visible y "Recargar planilla" abre el s
     page.locator('#usuariosBtnReasigRecargar').click()
   ]);
   expect(chooser).toBeTruthy();
+});
+
+test('la sync automática de PSA trae los reasignados sola, sin carga manual (v817)', async ({ page }) => {
+  // Mock de la nube: auth-config + edge function consulta-serial (action:'report')
+  // devolviendo filas CON los campos nuevos: dr = Dip reasignado, e = mail, cn = cumpleaños.
+  await page.route('**/auth-config.js', route => route.fulfill({
+    contentType: 'application/javascript',
+    body: "window.APPI_AUTH={enabled:true,url:'https://mock.supabase.co',anonKey:'anon-key-publica-de-prueba',distributorEmailDomain:'distribuidores.appi.invalid',adminLogin:{username:'popups',email:'admin-popups@appi.invalid'},loginAliases:{},offlineDays:7};"
+  }));
+  await page.route('https://mock.supabase.co/**', route => {
+    const url = new URL(route.request().url());
+    const cors = { 'access-control-allow-origin': '*', 'content-type': 'application/json' };
+    if (url.pathname === '/auth/v1/token') {
+      return route.fulfill({ status: 200, headers: cors, body: JSON.stringify({ access_token: tokenFor(USER_ID), refresh_token: 'r', expires_in: 3600, user: { id: USER_ID } }) });
+    }
+    if (url.pathname === '/functions/v1/consulta-serial') {
+      const body = route.request().postDataJSON() || {};
+      if (body.action === 'report') {
+        return route.fulfill({
+          status: 200, headers: cors,
+          body: JSON.stringify({
+            ok: true, total: 2,
+            filas: [
+              { s: 'HTA69440', u: 'ALONSO, ARTURO ALONSO', t: '0351-4552272', d: 'ANDALUCIA 1936', c: 'X5014', l: 'BARRIO COLON', p: 'PSA VERO', c2: '17/04/2022', v: '17/10/2025', dr: 'PECORA, NORMA BEATRIZ', e: 'alonso@mail.com', cn: '08/03' },
+              { s: 'HTA69441', u: 'GARCIA, MARTA ELENA', t: '3515551001', d: 'COLON 1200', c: '5000', l: 'CENTRO', p: 'PSA SENIOR', c2: '10/01/2023', v: '10/01/2026', dr: '', e: '', cn: '' }
+            ]
+          })
+        });
+      }
+    }
+    return route.fulfill({ status: 200, headers: cors, body: '[]' });
+  });
+  await page.addInitScript(() => {
+    localStorage.setItem('welcomeSeen', '1');
+    localStorage.setItem('appi_tarjetas_auto', '0');
+    localStorage.setItem('tutoVisto_v2', '1');
+    localStorage.setItem('appsi_psa_creds', JSON.stringify({ center: '02', number: '9802014', password: 'clave-secreta', remember: true }));
+    localStorage.removeItem('usuarios_garantias');
+  });
+  await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
+  await page.evaluate(() => {
+    const lock = document.getElementById('lockScreen');
+    if (lock) lock.classList.add('hidden');
+    const boot = document.getElementById('bootScreen');
+    if (boot) { boot.classList.add('gone'); boot.remove(); }
+    document.body.classList.remove('appi-login-abierto');
+    window.showView('view-usuarios');
+  });
+
+  // La sync (la misma que corre sola al abrir la app) puebla la base
+  const res = await page.evaluate(async () => new Promise(resolve => {
+    window.sincronizarGarantiasPSA(success => {
+      resolve({ success, count: (window.usuariosU || []).length, stored: JSON.parse(localStorage.getItem('usuarios_garantias') || '[]') });
+    });
+  }));
+  expect(res.success).toBe(true);
+  expect(res.count).toBe(2);
+  // Los campos nuevos quedan guardados en la base (y en la nube, vía saveKey)
+  expect(res.stored[0].dipReasignado).toBe('PECORA, NORMA BEATRIZ');
+  expect(res.stored[0].reasignado).toBe(true);
+  expect(res.stored[0].email).toBe('alonso@mail.com');
+  expect(res.stored[0].cumpleRaw).toBe('08/03');
+  expect(res.stored[1].reasignado).toBe(false);
+
+  // El badge del botón Reasignados muestra 1 y la fila lleva la pildora ↻
+  await expect(page.locator('#usuariosStReasig')).toHaveText('1');
+  await expect(page.locator('#usuariosStReasig')).toHaveClass(/on/);
+  await expect(page.locator('#usuariosList .tree-node', { hasText: 'ALONSO, ARTURO ALONSO' })).toContainText('↻');
+  // La base es "nueva" (trae el campo) → no aparece el aviso de planilla vieja
+  await expect(page.locator('#usuariosAvisoReasig')).toBeHidden();
 });

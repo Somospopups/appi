@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v816-aviso-reasig';
+const CACHE_NAME = 'appi-v817-sync-reasig';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
