@@ -104,9 +104,9 @@ test('el botón Dormidos aparece sólo si hay dormidos', async ({ page }) => {
 test('sin dormidos la barra queda como estaba', async ({ page }) => {
   await entrar(page, [LISTA[0], LISTA[1]]);   // sólo vigente y vencido reciente
   await expect(page.locator('#usuariosBtnDormidos')).toHaveCount(0);
-  // Siete de base (Mapa se quitó en v332; Depurados se sumó en v350;
-  // Plantillas en v412; Cumpleaños en v543).
-  await expect(page.locator('.u-tools button:visible')).toHaveCount(7);
+  // Ocho de base (Mapa se quitó en v332; Depurados se sumó en v350;
+  // Plantillas en v412; Cumpleaños en v543; Reasignados siempre visible en v814).
+  await expect(page.locator('.u-tools button:visible')).toHaveCount(8);
 });
 
 test('se ven los dormidos separados en olas por antigüedad', async ({ page }) => {
@@ -301,13 +301,16 @@ test('el texto de la campaña se puede editar y vuelve al original', async ({ pa
   await expect(page.locator('#reTexto')).toContainText('seguís teniendo el equipo');
 });
 
-test('los dormidos siguen fuera de los pendientes del día', async ({ page }) => {
+test('los dormidos entran a los pendientes por Plan Canje, de recientes a viejos (v800)', async ({ page }) => {
   await entrar(page);
-  // La franja "Hoy" no puede llenarse con gente de hace 10 años.
+  // v800: sin límite de 1 año — el vencido entra al Plan Canje como cualquier
+  // vencido, de los más recientes a los más antiguos (y el cupo diario de 10
+  // evita que la franja se llene con la gente más vieja de la lista).
   const nombres = await page.evaluate(() =>
     window.APPIMensajes.pendientes().flatMap(g => g.gente.map(u => u.usuario)));
-  expect(nombres).not.toContain('SOSA, ELENA');
-  expect(nombres).not.toContain('GOMEZ, ANA');
+  expect(nombres).toContain('GOMEZ, ANA');
+  expect(nombres).toContain('SOSA, ELENA');
+  expect(nombres.indexOf('GOMEZ, ANA')).toBeLessThan(nombres.indexOf('SOSA, ELENA'));
 });
 
 test('el gesto de atrás cierra la campaña', async ({ page }) => {

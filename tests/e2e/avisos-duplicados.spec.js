@@ -124,18 +124,9 @@ test('el Bonus vive en el mazo: sin aviso duplicado en el Home (v425)', async ({
   expect(cerca).toContain('Casi Bonus');
 });
 
-test('Cultura de Crecimiento muestra el PB automático, no un input', async ({ page }) => {
-  await abrirApp(page);
-  await page.evaluate(() => window.renderCulturaCrecimiento && window.renderCulturaCrecimiento());
-  await page.waitForTimeout(300);
-
-  expect(await page.locator('#culturaWrap [data-cultura-pb]').count()).toBe(1);
-  expect(await page.evaluate(() => document.querySelectorAll('#culturaWrap input[data-cultura-pb], #culturaPbInput').length)).toBe(0);
-  const campo = page.locator('#culturaWrap [data-cultura-pb]').first();
-  await expect(campo).toBeVisible();
-  await expect(campo).toContainText('Cargá tu Línea');
-});
-
+// (v710: la sección Cultura de Crecimiento se quitó de la app; su test de
+// PB automático se retira junto con ella. La fuente del mazo, personasOportunidadBonus,
+// sigue cubierta en el test anterior.)
 
 test('el cumpleañero sigue cubierto: la tarjeta del mazo lo trae (v321)', async ({ page }) => {
   await abrirApp(page);

@@ -61,7 +61,7 @@ test('el arranque completa una secuencia fluida antes de mostrar el acceso', asy
   await expect(page.locator('.boot-message-label')).toHaveText('Todo listo');
   await expect(page.locator('.boot-ready-mark')).toBeVisible();
   await expect(boot).toHaveCount(0, { timeout: 1600 });
-  await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute('content', '#eef4ff');
+  await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute('content', '#f3eee3'); // v826: crema de la app en modo día
 
   const timing = await page.evaluate(() => ({
     start: window.__appiBootStartedAt,

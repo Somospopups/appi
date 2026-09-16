@@ -91,7 +91,7 @@ test('el selector de páginas navega y cada página tiene lo suyo', async ({ pag
 
   await page.locator('#pageTabs button[data-view="view-negocio"]').click();
   await expect(page.locator('#view-negocio')).toHaveClass(/active/);
-  await expect(page.locator('#gpsBlock')).toBeVisible();
+  await expect(page.locator('#gpsBlock')).toHaveCount(0); // GPS del mes: se quitó en v807
   await expect(page.locator('#negGrid')).toContainText('Panel de Contactos');
 
   await page.locator('#pageTabs button[data-view="view-mes"]').click();

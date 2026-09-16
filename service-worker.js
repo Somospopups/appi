@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v827-ganancia-presu';
+const CACHE_NAME = 'appi-v828-ci-verde';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

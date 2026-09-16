@@ -182,6 +182,7 @@ test('Mi Encuesta y Mi Gestión usan la cuenta autenticada y guardan el seguimie
     if (url.pathname === '/auth/v1/token') return route.fulfill({ status: 200, headers: cors, body: JSON.stringify({ access_token: accessToken, refresh_token: 'refresh', expires_in: 3600, user: { id: USER_ID } }) });
     if (url.pathname === '/rest/v1/appi_perfiles') return route.fulfill({ status: 200, headers: cors, body: JSON.stringify([profile]) });
     if (url.pathname === '/rest/v1/appi_datos' && request.method() === 'GET') return route.fulfill({ status: 200, headers: cors, body: '[]' });
+    if (url.pathname === '/rest/v1/appi_datos' && request.method() === 'POST') return route.fulfill({ status: 204, headers: cors, body: '' });
     if (url.pathname === '/rest/v1/rpc/appi_crear_invitacion_encuesta') {
       invitationPeople.push(request.postDataJSON()?.p_persona_tipo || 'titular');
       const issued = invitationTokens[Math.min(invitationIndex++, invitationTokens.length - 1)];

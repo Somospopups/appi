@@ -146,7 +146,7 @@ test('cada cuenta puede recibir 1 mes completo sin registrar un pago (v411)', ()
   expect(js).toContain('data-admin-action="month"');
   expect(js).toContain("action:'grant_month'");
   expect(js).toContain('1 mes completo');
-  expect(js).toContain('Los días que le quedan se suman');
+  expect(js).toContain('suma un mes a lo que le queda'); // v81x: se reescribía la frase
   const edge = fs.readFileSync('supabase/functions/admin-distribuidores/index.ts', 'utf8');
   expect(edge).toContain("action === 'grant_month'");
   expect(edge).toContain('addUtcMonths(base, 1)');

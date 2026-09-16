@@ -132,7 +132,7 @@ window.openStock=function(){
 <script src="./porque-vivo.js"></script>
 <script src="./home-limpio.js?v=521"></script>
 <script src="./reporte-bonos.js?v=4"></script>
-  <script src="./home-tarjetas.js?v=807"></script>
+  <script src="./home-tarjetas.js?v=828"></script>
   <script src="./appi-eventos.js?v=726"></script>
   <script src="./tu-mes.js?v=732"></script>
   <script src="./device-bridge.js?v=523"></script>
@@ -4591,7 +4591,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v827 · Segura</div>
+  <div class="ds-foot">APPI · v828 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -12594,11 +12594,23 @@ async function asegurarPersonaActiva(){
 }
 async function completarIngresoDistribuidor(){
   await asegurarPersonaActiva();
-  const sync=window.APPIDataSync?await window.APPIDataSync.start({claimLegacy:true}):null,lock=document.getElementById('lockScreen');
+  // La sync de la cuenta no puede bloquear el ingreso: si falla (red, 404,
+  // qué sea) la persona ya eligió y la app abre igual — funciona en modo
+  // offline con la copia local y la sync se reintenta desde la cuenta.
+  const lock=document.getElementById('lockScreen');
   localStorage.removeItem('appi_activada');
   ocultarLockScreen();
-  liberarScrollCuerpo();iniciarApp();
-  if(sync&&sync.claimedLegacy)setTimeout(()=>showToast('Tus datos de este dispositivo quedaron asociados a tu cuenta',3600),500);
+  liberarScrollCuerpo();
+  iniciarApp();
+  // La sync corre en segundo plano: si se demora no puede demorar el ingreso,
+  // ni pisar la vista a la que la persona ya navegó (iniciarApp muestra Home
+  // una sola vez, al arrancar). La app abre con la copia local y se actualiza
+  // sola cuando la sync termina (evento appi-datasync-applied).
+  if(window.APPIDataSync){
+    window.APPIDataSync.start({claimLegacy:true}).then(function(sync){
+      if(sync&&sync.claimedLegacy)setTimeout(()=>showToast('Tus datos de este dispositivo quedaron asociados a tu cuenta',3600),500);
+    }).catch(function(error){ console.error('Sincronización inicial', error); });
+  }
 }
 function mostrarCambioPasswordObligatorio(){
   const lock=document.getElementById('lockScreen'),overlay=document.getElementById('forcedPasswordOverlay'),first=document.getElementById('forcedNewPassword'),confirmation=document.getElementById('forcedConfirmPassword'),save=document.getElementById('btnForcedPasswordSave'),error=document.getElementById('forcedPasswordError');
@@ -12740,8 +12752,11 @@ function iniciarApp() {
     document.body.classList.remove('appi-admin');
     loadEquipoFromStorage();
     
-    // Mostrar home directamente
-    showView('view-home');
+    // Mostrar home directamente — salvo que la persona ya navegó a otra
+    // pantalla: el arranque se demora (elección de persona + sync) y forzar
+    // Home a los 2-3s les sacaba a quienes abrieron el Panel justo a tiempo.
+    const _curView=document.querySelector('.view.active');
+    if(!_curView||_curView.id==='view-home')showView('view-home');
     
     if(window.initHistoricoAPPI)setTimeout(()=>window.initHistoricoAPPI(),0);
     if(typeof mostrarTutorialSiNuevo==='function')setTimeout(mostrarTutorialSiNuevo,700);
@@ -13405,8 +13420,8 @@ function cerrarToolsMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='827';
-      const CACHE_NAME='appi-v827-ganancia-presu';
+      const swVersion='828';
+      const CACHE_NAME='appi-v828-ci-verde';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · v'+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
@@ -18230,7 +18245,7 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
   try{
     if('serviceWorker' in navigator){
       let reg=null;
-      navigator.serviceWorker.register('./service-worker.js').then(r=>{reg=r;
+      navigator.serviceWorker.register('./service-worker.js').then(r=>{if(!r) return; reg=r;
         r.addEventListener('updatefound',()=>{
           const nw=r.installing;
           if(!nw) return;

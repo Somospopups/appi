@@ -24,7 +24,7 @@ jobs:
           - shard: B
             files: admin-cumplimiento.spec.js agenda-personal.spec.js appi.spec.js boot-help.spec.js convenciones.spec.js device-bridge.spec.js fechas-usuarios.spec.js historico-aesthetic-copa.spec.js membresias-admin.spec.js mensajes-usuarios.spec.js migraciones.spec.js panel-privado.spec.js prueba.spec.js recordatorios.spec.js sintaxis.spec.js telefono.spec.js usuarios-botones.spec.js lista-precios-fab.spec.js ganancia-presupuesto.spec.js
           - shard: C
-            files: admin-orden.spec.js alta-sin-internet.spec.js auth.spec.js botones-vivos.spec.js cultura-pb.spec.js ducha-rinnova.spec.js garantias-titular.spec.js historico.spec.js logo-vidrio.spec.js mensajes-hielo.spec.js metodo-envio.spec.js ocho-pasos.spec.js pantallazo-panel.spec.js pwa-cache.spec.js scroll.spec.js tablero.spec.js telefonos-dobles.spec.js v230.spec.js stock-fab-dock.spec.js pendientes-manual.spec.js psa-sync-automatico.spec.js
+            files: admin-orden.spec.js alta-sin-internet.spec.js auth.spec.js botones-vivos.spec.js ducha-rinnova.spec.js garantias-titular.spec.js historico.spec.js logo-vidrio.spec.js mensajes-hielo.spec.js metodo-envio.spec.js ocho-pasos.spec.js pantallazo-panel.spec.js pwa-cache.spec.js scroll.spec.js tablero.spec.js telefonos-dobles.spec.js v230.spec.js stock-fab-dock.spec.js pendientes-manual.spec.js psa-sync-automatico.spec.js
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

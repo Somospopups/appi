@@ -109,6 +109,17 @@ test('al tocar la notificación abre APPI cerrada o enfoca la ventana existente'
 });
 
 test('vincula por QR y envía una llamada de la PC al teléfono', async ({ page }) => {
+  // El menú de herramientas guarda los ítems de cuenta en la sección extra
+  // (se expande con la flecha ⌄); el botón de dispositivos vive ahí.
+  const abrirMenuConExtra = async () => {
+    await page.locator('#view-home .tools-btn').click();
+    await expect(page.locator('#toolsMenu')).toHaveClass(/open/);
+    const extra = page.locator('#toolsExtra');
+    if (await extra.isHidden()) {
+      await page.locator('#toolsArrowBtn').click();
+      await expect(extra).toBeVisible();
+    }
+  };
   const nativeDialogs = [];
   const bridgeCalls = [];
   page.on('dialog', dialog => { nativeDialogs.push(dialog.type()); dialog.dismiss(); });
@@ -187,8 +198,7 @@ test('vincula por QR y envía una llamada de la PC al teléfono', async ({ page 
   await expect(page.locator('#appiDeviceOverlay')).toBeHidden();
   await expect.poll(() => page.url().includes('bridge_call')).toBe(false);
 
-  await page.locator('#view-home .tools-btn').click();
-  await expect(page.locator('#toolsMenu')).toHaveClass(/open/);
+  await abrirMenuConExtra();
   await expect(page.locator('#btnToolsDevices')).toBeVisible();
   await expect(page.locator('#toolsDevicesTxt')).toHaveText('Desvincular teléfono');
   await expect(page.locator('#btnToolsOrient')).toHaveCount(0);
@@ -202,7 +212,7 @@ test('vincula por QR y envía una llamada de la PC al teléfono', async ({ page 
   await page.locator('#appiDialogCancel').click();
   expect(bridgeCalls.filter(item => item.action === 'remove_device')).toHaveLength(0);
 
-  await page.locator('#view-home .tools-btn').click();
+  await abrirMenuConExtra();
   await page.locator('#btnToolsDevices').click();
   await expect(page.locator('#appiDialogTitle')).toHaveText('Desvincular teléfono');
   await page.locator('#appiDialogOk').click();
@@ -210,7 +220,7 @@ test('vincula por QR y envía una llamada de la PC al teléfono', async ({ page 
   await expect.poll(() => bridgeCalls.filter(item => item.action === 'remove_device').length).toBe(1);
   expect(bridgeCalls.find(item => item.action === 'remove_device')).toMatchObject({ device_id: DEVICE_ID, persona_tipo: 'titular' });
 
-  await page.locator('#view-home .tools-btn').click();
+  await abrirMenuConExtra();
   await expect(page.locator('#toolsDevicesTxt')).toHaveText('Vincular teléfono');
   await page.locator('#btnToolsDevices').click();
   await expect(page.locator('#appiDeviceOverlay')).toBeVisible();

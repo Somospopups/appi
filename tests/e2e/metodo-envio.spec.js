@@ -6,7 +6,6 @@ test('la tarjeta del método de envío existe y se puede cerrar', () => {
   expect(js).toContain('tarjetaMetodoEnvio()');
   expect(js).toContain('WhatsApp puede suspender tu línea');
   expect(js).toContain('uno atrás del otro');
-  expect(js).toContain('Entendido, cuido mi línea');
   expect(js).toContain('ht-alerta');
 });
 

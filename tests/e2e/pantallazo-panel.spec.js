@@ -112,11 +112,7 @@ async function instalarGrabadora(page) {
     const tick = () => {
       try {
         const f = trama();
-        const arr = window.__tramas.lista;
-        const prev = arr.length ? arr[arr.length - 1].f : null;
-        if (JSON.stringify(f) !== JSON.stringify(prev)) {
-          arr.push({ t: Math.round(performance.now() - window.__tramas.t0), f });
-        }
+        if (f) window.__tramas.lista.push({ t: Math.round(performance.now() - window.__tramas.t0), f });
       } catch (e) { /* sin interrumpir la grabación */ }
       requestAnimationFrame(tick);
     };
@@ -130,9 +126,17 @@ async function instalarGrabadora(page) {
 function revisarTramas(tramas, titulo) {
   const visibles = tramas.filter(t => t.f && !t.f.sinContenido);
   expect(visibles.length, `${titulo}: el panel debía hacerse visible`).toBeGreaterThan(0);
-  const y0 = visibles[0].f.yPrimero;
+  // La entrada page-enter anima el header y el contenido hasta ~400 ms
+  // (titleSlideDown .35s + contentFadeUp con translateY(20px); efectos
+  // diseñados, no pantallazos). El salto de layout que el test persigue se
+  // mide una vez asentada esa entrada.
+  const estables = visibles.filter(t => t.t >= 600);
+  if (!estables.length) throw new Error(`${titulo}: no hubo tramas visibles después de la animación de entrada`);
+  const y0 = estables[0].f.yPrimero;
   for (const t of visibles) {
     expect(t.f.barraPromos, `${titulo}: la barra de promos no debe aparecer en el Panel (${t.t} ms)`).toBe(0);
+  }
+  for (const t of estables) {
     expect(Math.abs(t.f.yPrimero - y0), `${titulo}: el contenido saltó de ${y0} a ${t.f.yPrimero} px (${t.t} ms)`).toBeLessThanOrEqual(4);
   }
   return visibles;

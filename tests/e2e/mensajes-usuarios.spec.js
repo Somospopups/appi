@@ -277,8 +277,9 @@ test('la barra tiene Mensajes con el logo de WhatsApp', async ({ page }) => {
   await expect(page.locator('#usuariosBtnMensajes')).toContainText('Mensajes');
   await expect(page.locator('#usuariosBtnMensajes svg')).toBeVisible();
   await expect(page.locator('#usuariosBtnPlantillas')).toHaveCount(0);
-  // Base + Depurados + Dormidos + Mensajes (v413) + Cumpleaños (v543).
-  await expect(page.locator('.u-tools button:visible')).toHaveCount(8);
+  // Base + Depurados + Dormidos + Mensajes (v413) + Cumpleaños (v543)
+  // + Reasignados siempre visible (v814).
+  await expect(page.locator('.u-tools button:visible')).toHaveCount(9);
   await expect(page.locator('#usuariosBtnDormidos')).toBeVisible();
 });
 

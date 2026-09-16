@@ -1924,6 +1924,7 @@
       arrastrando = true; modo = '';
       x0 = e.clientX; y0 = e.clientY; lastY = e.clientY; dx = 0; dy = 0; dir = 0; el.__arrastro = false;
       lista = (e.target && e.target.closest) ? e.target.closest('.ht-lista') : null;
+      el.__downTarget = e.target;
       try{ el.setPointerCapture(e.pointerId); }catch(err){}
     }, true);
     el.addEventListener('pointermove', function(e){
@@ -1968,12 +1969,26 @@
         if (dir === -1) asomar(1);
       }
       dir = 0;
+      el.__arrastro = false; // un gesto que no pasó no bloquea el próximo toque
     }
     el.addEventListener('pointerup', soltar, true);
     el.addEventListener('pointercancel', soltar, true);
     el.addEventListener('click', function(e){
       if (el.__arrastro || (modo === 'scroll' && Math.abs(dy) > 10)){
+        e.stopPropagation(); e.preventDefault(); return;
+      }
+      // El setPointerCapture del arrastre puede hacer que el click final
+      // llegue a la CARTA en vez del renglón/botón tocado (lo que dejaba
+      // muertas las filas de la lista). Si el toque empezó en un elemento
+      // accionable, se re-dirige el click a ese elemento.
+      if (e.target.closest && e.target.closest('.ht-lista li')) return; // llegó directo a la fila: curso normal
+      var orig = el.__downTarget;
+      if (!orig || orig === el) return;
+      var acc = orig;
+      while (acc && acc !== el && !acc.onclick) acc = acc.parentNode;
+      if (acc && acc !== el && acc.onclick){
         e.stopPropagation(); e.preventDefault();
+        try{ acc.onclick(e); }catch(err){}
       }
     }, true);
   }
@@ -2023,7 +2038,7 @@
     var intentos = 0;
     (function esperar(){
       if (!esHome() || document.getElementById('htOverlay')) return;
-      if (++intentos > 100) return;
+      if (++intentos > 400) return;
       if (!appTerminoDeCargar()){ setTimeout(esperar, 16); return; }
       if (esHome() && !document.getElementById('htOverlay')) abrir();
     })();
