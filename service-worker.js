@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v810-bonos-negocio';
+const CACHE_NAME = 'appi-v811-privacy-kpi';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

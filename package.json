@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "810.0.0",
-  "cacheName": "appi-v810-bonos-negocio",
+  "version": "811.0.0",
+  "cacheName": "appi-v811-privacy-kpi",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

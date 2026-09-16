@@ -79,6 +79,73 @@ test('el reporte de bonos vive arriba de Mi negocio, no oculto', async ({ page }
   expect(orden).toBe(true);
   // Sin overlay/modal: el card es hijo directo de la vista
   expect(await page.locator('#calOverlay.open, .cal-overlay.open').count()).toBe(0);
+
+  // v811: los datos nacen TAPADOS; el ojito los muestra; al salir y volver, se retapan
+  const card = page.locator('#bonosCard .bns-card');
+  await expect(card).toHaveClass(/bns-tapado/);
+  expect(await page.locator('#bonosCard .bns-d').count()).toBeGreaterThan(3);
+  await page.locator('#bonosCard #bnsOjito').click();
+  await expect(card).not.toHaveClass(/bns-tapado/);
+  await expect(page.locator('#bonosCard #bnsOjito')).toHaveText('🙈');
+  await page.locator('#bonosCard #bnsOjito').click();
+  await expect(card).toHaveClass(/bns-tapado/);
+  // Salir y volver a entrar: vuelve a taparse solo
+  await page.evaluate(() => window.APBon.mostrar());
+  await page.evaluate(() => window.showView('view-home'));
+  await page.evaluate(() => window.showView('view-negocio'));
+  await expect(card).toHaveClass(/bns-tapado/);
+});
+
+test('los estados amarillos (faltan…) quedan alineados a la derecha (v811)', async ({ page }) => {
+  await credsInit(page);
+  await base.entrar(page);
+  mockBonos(page);
+  await page.evaluate(() => window.APBon.fetch());
+  await expect(page.locator('#bonosCard')).toContainText('Septiembre-2026', { timeout: 15000 });
+  await page.evaluate(() => window.showView('view-negocio'));
+  const align = await page.evaluate(() => {
+    const falta = document.querySelector('#bonosCard .bns-b-est.falta');
+    const total = document.querySelector('#bonosCard .bns-total b');
+    if (!falta || !total) return null;
+    const r1 = falta.getBoundingClientRect().right;
+    const r2 = total.getBoundingClientRect().right;
+    return Math.abs(r1 - r2) <= 3;
+  });
+  expect(align).toBe(true);
+});
+
+test('el banner personas/activos/PB vive en Mi negocio, entre el reporte y los botones (v811)', async ({ page }) => {
+  await page.addInitScript(() => {
+    try {
+      localStorage.setItem('equipoData', JSON.stringify({ personas: [
+        { nombre: 'Ana Perez', cat: 'L', pnAct: 12 },
+        { nombre: 'Luis Gomez', cat: 'D', pnAct: 30 }
+      ] }));
+    } catch (e) {}
+  });
+  await base.entrar(page);
+  // La inyección corre a los ~900 ms de cargar la app; la vista tiene que estar activa
+  await page.evaluate(() => window.showView('view-negocio'));
+  await expect(page.locator('#embudoKpi')).toBeVisible({ timeout: 20000 });
+  await expect(page.locator('#embudoKpi')).toContainText('PERSONAS');
+  await expect(page.locator('#embudoKpi')).toContainText('ACTIVOS');
+  await expect(page.locator('#embudoKpi')).toContainText('TOTAL PB');
+  const pos = await page.evaluate(() => {
+    const kpi = document.getElementById('embudoKpi');
+    const bonos = document.getElementById('bonosCard');
+    const grid = document.getElementById('negGrid');
+    const home = document.getElementById('view-home');
+    if (!kpi || !bonos || !grid) return { ok: false, enNegocio: false, enHome: home ? home.contains(kpi) : null };
+    const r1 = bonos.getBoundingClientRect(), r2 = kpi.getBoundingClientRect(), r3 = grid.getBoundingClientRect();
+    return {
+      ok: r2.top >= r1.bottom - 4 && r2.bottom <= r3.top + 4,
+      enNegocio: !home.contains(kpi) && !!document.getElementById('view-negocio').contains(kpi),
+      enHome: home.contains(kpi)
+    };
+  });
+  expect(pos.enNegocio).toBe(true);
+  expect(pos.enHome).toBe(false);
+  expect(pos.ok).toBe(true);
 });
 
 test('al entrar a la app se dispara la consulta de bonos (action bonos)', async ({ page }) => {

@@ -1,10 +1,14 @@
-/* APPI · Reporte de Bonos (v809, v810: movido de Mi Equipo a Mi negocio)
+/* APPI · Reporte de Bonos (v809 · v810: en Mi negocio · v811: ojo de privacidad)
    La información del tablero de PSA → "Bonos y Bonus" → Reporte de Bonos,
    siempre visible en la parte SUPERIOR de Mi negocio (no oculto).
+   - v811: los datos nacen TAPADOS (blur) por privacidad. El ojito 👁 los
+     muestra; al salir o volver a entrar a Mi negocio vuelven a taparse.
+   - v811: los estados amarillos ("faltan…") se alinean a la derecha,
+     como el resto de los renglones.
    - Se actualiza SOLO al entrar a la app (función consulta-serial, action:'bonos').
    - Queda cacheada en el teléfono: si no hay internet se ve la última copia
      con su fecha, y un botón ↻ para reintentar.
-   - Abajo del reporte siguen los botones/tablero de siempre. */
+   - Abajo del reporte siguen el banner de personas/activos/PB y los botones. */
 (function(){
   if (window.APBon) return;
 
@@ -12,6 +16,7 @@
   var EN_VUELO_MS = 30 * 60 * 1000; // refresco al abrir la vista si pasaron 30 min
   var enVuelo = null;
   var ultimoError = '';
+  var datosVisibles = false; // v811: por defecto, tapados
 
   function supabaseCfg(){ try{ return (window.APPI_AUTH && window.APPI_AUTH.url && window.APPI_AUTH.anonKey) ? window.APPI_AUTH : null; }catch(e){ return null; } }
   function tokenActual(){ try{ var v = JSON.parse(localStorage.getItem('appi_auth_session_v1') || 'null'); return v && v.session && v.session.access_token || ''; }catch(e){ return ''; } }
@@ -85,6 +90,11 @@
     if (vencida && !enVuelo){ fetchBonos().catch(function(){}); }
   }
 
+  /* ---------- v811: privacidad (ojito) ---------- */
+  function ocultar(){ if (datosVisibles){ datosVisibles = false; render(); } }
+  function mostrar(){ if (!datosVisibles){ datosVisibles = true; render(); } }
+  function toggle(){ datosVisibles = !datosVisibles; render(); }
+
   /* ---------- vista ---------- */
   function asegurarHost(){
     var view = document.getElementById('view-negocio');
@@ -129,9 +139,14 @@
         '<button type="button" class="bns-retry" id="bnsCreds">Vincular MI PSA</button></div>';
     }
 
+    // v811: ojo de privacidad (👁 muestra · 🙈 tapa). Los datos nacen tapados.
+    var ojo = datosVisibles ? '🙈' : '👁';
+    var ojoTit = datosVisibles ? 'Ocultar datos' : 'Mostrar datos';
+
     var html = '<div class="bns-cab">' +
       '<div class="bns-titulo">💰 Reporte de Bonos</div>' +
-      '<div class="bns-per">' + esc(b.periodo || '') + (cargando ? ' <span class="bns-mini">actualizando…</span>' : '') +
+      '<div class="bns-per"><span class="bns-d">' + esc(b.periodo || '') + '</span>' + (cargando ? ' <span class="bns-mini">actualizando…</span>' : '') +
+      '<button type="button" class="bns-oculto" id="bnsOjito" title="' + ojoTit + '" aria-label="' + ojoTit + '">' + ojo + '</button>' +
       '<button type="button" class="bns-refresh" id="bnsRefresh" title="Actualizar desde MI PSA">↻</button></div>' +
     '</div>';
 
@@ -140,15 +155,15 @@
     }
 
     html += '<div class="bns-meta">' +
-      'DIP ' + esc(b.dip || '—') + ' · ' + esc(b.nombre || '—') + '<br>' +
-      'Socio: ' + esc(b.socio || '—') + ' · Sucursal: ' + esc(b.sucursal || '—') + '<br>' +
-      'Categoría: ' + esc(b.categoria || '—') +
+      'DIP <span class="bns-d">' + esc(b.dip || '—') + '</span> · <span class="bns-d">' + esc(b.nombre || '—') + '</span><br>' +
+      'Socio: <span class="bns-d">' + esc(b.socio || '—') + '</span> · Sucursal: <span class="bns-d">' + esc(b.sucursal || '—') + '</span><br>' +
+      'Categoría: <span class="bns-d">' + esc(b.categoria || '—') + '</span>' +
     '</div>';
 
     if (b.acumulacion && b.acumulacion.length){
       html += '<div class="bns-seccion">Acumulación del mes</div><div class="bns-acum">';
       b.acumulacion.forEach(function(a){
-        html += '<div class="bns-acum-f"><span class="bns-acum-n">' + esc(a.r) + '</span><span class="bns-acum-v">' + fmtNum(a.pb) + '</span></div>';
+        html += '<div class="bns-acum-f"><span class="bns-acum-n">' + esc(a.r) + '</span><span class="bns-acum-v bns-d">' + fmtNum(a.pb) + '</span></div>';
       });
       html += '</div>';
     }
@@ -158,13 +173,15 @@
       b.bonos.forEach(function(x){
         var est = estadoBono(x);
         var imp = (x.imp && x.imp !== '0.00') ? '$ ' + fmtNum(x.imp) : (est.cls === 'ok' ? '$ 0' : '');
-        html += '<div class="bns-b"><span class="bns-b-n" title="' + esc(x.d) + '">' + esc(x.d) + '</span>' +
-          '<span class="bns-b-est ' + est.cls + '">' + esc(est.txt) + '</span>' +
-          '<span class="bns-b-imp">' + esc(imp) + '</span></div>';
+        // v811: estado + importe van juntos, alineados a la derecha
+        // (si no hay importe, el estado amarillo queda en el borde derecho).
+        html += '<div class="bns-b"><span class="bns-b-n bns-d" title="' + esc(x.d) + '">' + esc(x.d) + '</span>' +
+          '<span class="bns-b-derecha"><span class="bns-b-est ' + est.cls + ' bns-d">' + esc(est.txt) + '</span>' +
+          (imp ? '<span class="bns-b-imp bns-d">' + esc(imp) + '</span>' : '') + '</span></div>';
       });
       html += '</div>';
       if (b.total){
-        html += '<div class="bns-total"><span>Total del período</span><b>$ ' + fmtNum(b.total) + '</b></div>';
+        html += '<div class="bns-total"><span>Total del período</span><b class="bns-d">$ ' + fmtNum(b.total) + '</b></div>';
       }
     }
 
@@ -182,13 +199,16 @@
     var html = htmlCard();
     if (!html){ host.style.display = 'none'; return; }
     host.style.display = '';
-    host.innerHTML = '<div class="bns-card">' + html + '</div>';
+    // v811: sin "bns-tapado" los datos se ven; con ella, tapados.
+    host.innerHTML = '<div class="bns-card' + (datosVisibles ? '' : ' bns-tapado') + '">' + html + '</div>';
     var retry = document.getElementById('bnsRetry');
     if (retry) retry.onclick = function(){ fetchBonos().catch(function(){}); };
     var creds = document.getElementById('bnsCreds');
     if (creds) creds.onclick = function(){ try{ if (typeof window.psaAbrirPopup === 'function') window.psaAbrirPopup(); }catch(e){} };
     var ref = document.getElementById('bnsRefresh');
     if (ref) ref.onclick = function(){ try{ haptic(8); }catch(e){} fetchBonos().catch(function(){}); };
+    var ojo = document.getElementById('bnsOjito');
+    if (ojo) ojo.onclick = function(){ try{ haptic(6); }catch(e){} toggle(); };
   }
 
   function css(){
@@ -196,7 +216,7 @@
     var st = document.createElement('style');
     st.id = 'bonosEstilos';
     st.textContent =
-      '#bonosCard{margin:10px 10px 2px}' +
+      '#bonosCard{margin:10px 10px 0}' +
       '.bns-card{background:#f3eee3;border:1px solid rgba(40,36,28,.08);border-radius:18px;padding:14px 14px 10px;box-shadow:0 10px 26px rgba(30,24,12,.10)}' +
       'body.dark .bns-card{background:#25273a;border-color:rgba(255,255,255,.08);box-shadow:0 10px 26px rgba(0,0,0,.28)}' +
       '.bns-cab{display:flex;align-items:center;justify-content:space-between;gap:8px}' +
@@ -207,6 +227,11 @@
       '.bns-mini{font-size:9.5px;font-weight:600;color:#8a8a94}' +
       '.bns-refresh{width:28px;height:28px;border-radius:50%;border:0;background:rgba(11,88,120,.10);color:#0b5878;font-size:14px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center}' +
       'body.dark .bns-refresh{background:rgba(11,88,120,.3);color:#d7e8f0}' +
+      '.bns-oculto{width:30px;height:30px;border-radius:50%;border:1px solid rgba(40,36,28,.14);background:rgba(255,255,255,.55);font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}' +
+      'body.dark .bns-oculto{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.16)}' +
+      '.bns-oculto:active{transform:scale(.94)}' +
+      /* v811: privacidad — datos tapados con blur hasta tocar el ojito */
+      '.bns-card.bns-tapado .bns-d{filter:blur(7px) saturate(.4);user-select:none;pointer-events:none}' +
       '.bns-meta{margin-top:8px;font-size:11px;line-height:1.55;color:#5c5c68}' +
       'body.dark .bns-meta{color:#a8adc8}' +
       '.bns-seccion{margin:11px 0 5px;font-size:10px;font-weight:800;letter-spacing:.9px;text-transform:uppercase;color:#8a8a94}' +
@@ -217,10 +242,12 @@
       'body.dark .bns-acum-n{color:#c6cbea}' +
       '.bns-acum-v{font-weight:800;color:#23263a;font-variant-numeric:tabular-nums}' +
       'body.dark .bns-acum-v{color:#f2f2f7}' +
-      '.bns-b{display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:8px;padding:4.5px 0;font-size:12px;border-bottom:1px dashed rgba(40,36,28,.10)}' +
+      '.bns-b{display:grid;grid-template-columns:1fr auto;align-items:center;gap:8px;padding:4.5px 0;font-size:12px;border-bottom:1px dashed rgba(40,36,28,.10)}' +
       'body.dark .bns-b{border-bottom-color:rgba(255,255,255,.09)}' +
       '.bns-b-n{font-weight:600;color:#343441;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}' +
       'body.dark .bns-b-n{color:#c6cbea}' +
+      /* v811: grupo derecha (estado + importe) siempre en el borde derecho */
+      '.bns-b-derecha{display:flex;align-items:center;justify-content:flex-end;gap:8px;min-width:86px}' +
       '.bns-b-est{font-size:10.5px;font-weight:800;padding:2px 7px;border-radius:999px;white-space:nowrap}' +
       '.bns-b-est.ok{background:rgba(37,208,164,.14);color:#0f8f6d}' +
       'body.dark .bns-b-est.ok{background:rgba(37,208,164,.2);color:#25d0a4}' +
@@ -228,7 +255,7 @@
       'body.dark .bns-b-est.falta{background:rgba(245,179,1,.18);color:#f5b301}' +
       '.bns-b-est.no{background:rgba(120,120,135,.14);color:#6b6b76}' +
       'body.dark .bns-b-est.no{background:rgba(255,255,255,.1);color:#a0a0b0}' +
-      '.bns-b-imp{font-weight:800;font-size:12px;color:#23263a;font-variant-numeric:tabular-nums;min-width:56px;text-align:right}' +
+      '.bns-b-imp{font-weight:800;font-size:12px;color:#23263a;font-variant-numeric:tabular-nums;text-align:right}' +
       'body.dark .bns-b-imp{color:#f2f2f7}' +
       '.bns-total{display:flex;align-items:center;justify-content:space-between;margin-top:8px;padding-top:8px;border-top:2px solid rgba(11,88,120,.25);font-size:13px;font-weight:800;color:#23263a}' +
       'body.dark .bns-total{border-top-color:rgba(11,88,120,.5);color:#f2f2f7}' +
@@ -255,14 +282,18 @@
       // Al entrar a la app se actualiza solo (no depende de "recordar").
       setTimeout(function(){ fetchBonos().catch(function(){}); }, 1500);
     }
-    // Refresco (con tope de 30 min) cada vez que se abre Mi negocio.
+    // Refresco (con tope de 30 min) al abrir Mi negocio, y privacidad:
+    // los datos vuelven a taparse al salir o al volver a entrar.
     try{
       var orig = window.showView;
       if (typeof orig === 'function' && !window.__apBonViewWrapped){
         window.__apBonViewWrapped = true;
         window.showView = function(id){
           var r = orig.apply(this, arguments);
-          try{ if (id === 'view-negocio') refrescarSiEsNecesario(); }catch(e){}
+          try{
+            if (id === 'view-negocio'){ datosVisibles = false; render(); refrescarSiEsNecesario(); }
+            else { ocultar(); }
+          }catch(e){}
           return r;
         };
       }
@@ -273,7 +304,12 @@
     fetch: fetchBonos,
     render: render,
     refrescarSiEsNecesario: refrescarSiEsNecesario,
-    cache: leerCache
+    cache: leerCache,
+    // v811: control de privacidad (también lo usan los tests)
+    ocultar: ocultar,
+    mostrar: mostrar,
+    toggle: toggle,
+    estaVisible: function(){ return datosVisibles; }
   };
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);

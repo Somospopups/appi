@@ -130,7 +130,7 @@ window.openStock=function(){
 
 <script src="./porque-vivo.js"></script>
 <script src="./home-limpio.js?v=521"></script>
-<script src="./reporte-bonos.js?v=2"></script>
+<script src="./reporte-bonos.js?v=3"></script>
   <script src="./home-tarjetas.js?v=807"></script>
   <script src="./appi-eventos.js?v=726"></script>
   <script src="./tu-mes.js?v=732"></script>
@@ -4590,7 +4590,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v810 · Segura</div>
+  <div class="ds-foot">APPI · v811 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -13363,8 +13363,8 @@ function cerrarToolsMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='810';
-      const CACHE_NAME='appi-v810-bonos-negocio';
+      const swVersion='811';
+      const CACHE_NAME='appi-v811-privacy-kpi';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · v'+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
@@ -18182,11 +18182,12 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
   // Marcar como renovada
   try{ localStorage.setItem('appsi_renovada_v710','1'); }catch(e){}
 
-  // Embudo rápido: si hay datos, inyectar mini KPI en home si no existe
+  // Embudo rápido (v811: movido del home a Mi negocio): si hay datos,
+  // inyectar el mini KPI entre el Reporte de Bonos y la grilla de botones.
   setTimeout(()=>{
     try{
-      const home=document.getElementById('view-home');
-      if(!home) return;
+      const view=document.getElementById('view-negocio');
+      if(!view) return;
       if(document.getElementById('embudoKpi')) return;
       let personas=0, activos=0, pb=0;
       try{ const r=JSON.parse(localStorage.getItem('equipoData')||'null'); if(r&&r.personas){ personas=r.personas.length; r.personas.forEach(p=>{ const v=Number(p.pnAct||p.pbPersonal||0); pb+=v; if(v>0) activos++; }); } }catch(e){}
@@ -18194,10 +18195,11 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
       const pct=personas?Math.round(activos/personas*100):0;
       const bar=document.createElement('div');
       bar.id='embudoKpi';
-      bar.style.cssText='margin:10px 0 14px;padding:14px 16px;border-radius:18px;background:rgba(255,255,255,.62);border:1px solid rgba(255,255,255,.78);display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;text-align:center';
+      bar.style.cssText='margin:12px 10px 12px;padding:14px 16px;border-radius:18px;background:rgba(255,255,255,.62);border:1px solid rgba(255,255,255,.78);display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;text-align:center';
       bar.innerHTML=`<div><b style="font-size:20px;color:#3d63c9">${personas}</b><br><small style="font-size:10px;color:#777887;font-weight:800">PERSONAS</small></div><div><b style="font-size:20px;color:#1d7a5c">${pct}%</b><br><small style="font-size:10px;color:#777887;font-weight:800">ACTIVOS</small></div><div><b style="font-size:20px;color:#5b8def">${pb.toFixed?pb.toFixed(1):pb} PB</b><br><small style="font-size:10px;color:#777887;font-weight:800">TOTAL PB</small></div>`;
-      const anchor=home.querySelector('.tools-list') || home.querySelector('.score-compact') || home.querySelector('header');
-      if(anchor && anchor.parentNode) anchor.parentNode.insertBefore(bar, anchor.nextSibling);
+      const grid=view.querySelector('#negGrid');
+      if(grid) view.insertBefore(bar, grid);
+      else view.appendChild(bar);
     }catch(e){}
   },900);
 
