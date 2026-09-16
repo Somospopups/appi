@@ -204,3 +204,46 @@ test('la UI es de un toque: Client ID quemado, sin input, botón directo', async
   await expect(async () => { expect(vistos.clientId).toBeTruthy(); }, { timeout: 15000 }).toPass();
   expect(vistos.clientId).toBe(es.clientId);
 });
+
+test('v821: si Google devuelve un error, la UI lo muestra (no queda mudo)', async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.removeItem('appi_google_v1');
+    localStorage.setItem('usuarios_garantias', '[]');
+  });
+  page.route('https://accounts.google.com/o/oauth2/v2/auth*', (route) => {
+    return route.fulfill({ status: 302, headers: { location: 'http://127.0.0.1:4174/?error=access_denied' } });
+  });
+  await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
+  await page.waitForFunction(() => window.APPIGoogle, null, { timeout: 20000 });
+  await page.evaluate(() => {
+    const lock = document.getElementById('lockScreen');
+    if (lock) lock.classList.add('hidden');
+    const boot = document.getElementById('bootScreen');
+    if (boot) { boot.classList.add('gone'); boot.remove(); }
+    document.body.classList.remove('appi-login-abierto');
+  });
+  await page.waitForTimeout(2400);
+  await page.evaluate(() => window.showView('view-recordatorios'));
+  await page.waitForTimeout(900);
+  await page.locator('#recGoogleConnect').click();
+
+  // Google (mock) devuelve ?error=access_denied → recarga completa → la app
+  // registra el error y lo muestra en la sección (antes quedaba mudo)
+  await page.waitForFunction(() => window.APPIGoogle && window.APPIGoogle.estado().last_error, null, { timeout: 20000 });
+  await page.evaluate(() => {
+    const lock = document.getElementById('lockScreen');
+    if (lock) lock.classList.add('hidden');
+    const boot = document.getElementById('bootScreen');
+    if (boot) { boot.classList.add('gone'); boot.remove(); }
+    document.body.classList.remove('appi-login-abierto');
+  });
+  await page.evaluate(() => window.showView('view-recordatorios'));
+  await page.waitForTimeout(900);
+  await expect(page.locator('#recGoogleError')).toBeVisible({ timeout: 10000 });
+  expect(await page.evaluate(() => window.APPIGoogle.estado().connected)).toBe(false);
+  expect(await page.evaluate(() => window.APPIGoogle.estado().last_error)).toContain('access_denied');
+
+  // "Ocultar" limpia el aviso
+  await page.locator('#recGoogleErrorClose').click();
+  await expect(page.locator('#recGoogleError')).toHaveCount(0);
+});

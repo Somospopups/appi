@@ -1,5 +1,5 @@
 /* ============================================================
-   APPI · Calendario de Google (v820)
+   APPI · Calendario de Google (v821)
    ------------------------------------------------------------
    Conecta la app con el Calendario de Google del usuario
    (OAuth 2.0 + PKCE, sin backend ni secret):
@@ -83,6 +83,7 @@
   function iniciarConexion() {
     var cid = clientIdEfectivo();
     if (!cid) return 'sin_client_id';
+    try { var st0 = load() || {}; st0.last_error = ''; save(st0); } catch (e) {}
     generarPKCE().then(function (pkce) {
       var state = Math.random().toString(36).slice(2, 12) + Date.now().toString(36);
       try { localStorage.setItem(LS_PENDING, JSON.stringify({ state: state, verifier: pkce.verifier })); } catch (e) {}
@@ -116,6 +117,7 @@
     st.expires_at = 0;
     st.calendar_id = '';
     st.events = [];
+    st.last_error = '';
     save(st);
   }
 
@@ -126,11 +128,23 @@
     if (!code && !err) return;
     try { history.replaceState(null, '', location.pathname + location.hash); } catch (e) {}
     var st = load() || {};
-    if (err) { st.connected = false; save(st); return 'error:' + err; }
+    if (err) {
+      st.connected = false;
+      st.last_error = 'Google devolvió un error («' + err + '»). Revisá que tu cuenta esté en "Usuarios de prueba" del proyecto y probá de nuevo.';
+      st.last_error_at = Date.now();
+      save(st);
+      return 'error:' + err;
+    }
     var pend = null;
     try { pend = JSON.parse(localStorage.getItem(LS_PENDING) || 'null'); } catch (e) {}
     try { localStorage.removeItem(LS_PENDING); } catch (e) {}
-    if (!pend || !state || pend.state !== state) { st.connected = false; save(st); return 'state_mismatch'; }
+    if (!pend || !state || pend.state !== state) {
+      st.connected = false;
+      st.last_error = 'No se pudo validar la vuelta de Google (se perdió el state). Probá de nuevo.';
+      st.last_error_at = Date.now();
+      save(st);
+      return 'state_mismatch';
+    }
     var body = new URLSearchParams({
       code: code,
       client_id: clientIdEfectivo(),
@@ -147,10 +161,17 @@
         st.expires_at = Date.now() + (j.expires_in || 3600) * 1000;
         st.connected = true;
         st.events = [];
+        st.last_error = '';
         save(st);
         return 'ok';
       })
-      .catch(function (e) { st.connected = false; save(st); return 'error:' + (e && e.message); });
+      .catch(function (e) {
+        st.connected = false;
+        st.last_error = 'No se pudo completar la conexión: ' + (e && e.message);
+        st.last_error_at = Date.now();
+        save(st);
+        return 'error:' + (e && e.message);
+      });
   }
 
   /* ---------------- Token (con refresh automático) ------------------- */
@@ -323,7 +344,7 @@
 
   function estado() {
     var st = load() || {};
-    var res = { connected: !!st.connected, clientId: clientIdEfectivo(), last_sync: st.last_sync || 0, total: (st.events || []).length, calendar_id: st.calendar_id || '' };
+    var res = { connected: !!st.connected, clientId: clientIdEfectivo(), last_sync: st.last_sync || 0, total: (st.events || []).length, calendar_id: st.calendar_id || '', last_error: st.last_error || '' };
     if (res.last_sync && Date.now() - res.last_sync > 30 * 24 * 3600 * 1000) res.expired = true;
     return res;
   }
@@ -335,6 +356,12 @@
     var es = estado();
     var html = '';
     if (!es.connected) {
+      if (es.last_error) {
+        var safe = String(es.last_error).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        html +=
+          '<div id="recGoogleError" style="margin-bottom:8px;padding:9px 11px;border-radius:11px;background:rgba(217,83,79,0.09);border:1px solid rgba(217,83,79,0.28);color:#b23b34;font:inherit;font-size:11.5px;font-weight:700;line-height:1.45">⚠️ ' + safe + '</div>' +
+          '<button type="button" id="recGoogleErrorClose" style="background:none;border:0;color:#777887;font:inherit;font-size:10.5px;font-weight:700;cursor:pointer;margin:-2px 0 8px">Ocultar</button>';
+      }
       html +=
         '<div style="font-size:11.5px;color:#777887;font-weight:600;line-height:1.5;margin-bottom:8px">Conectá tu cuenta de Google y la app creará el calendario <b>APPI</b> con los cumpleaños y las garantías por vencer (con sus avisos). Es un toque: elegís tu cuenta y dais "Permitir".</div>' +
         '<button type="button" id="recGoogleConnect" style="width:100%;padding:11px;border-radius:12px;border:0;background:linear-gradient(135deg,#0b5878,#3ad0a4);color:#fff;font:inherit;font-size:13px;font-weight:800;cursor:pointer"> Conectar mi Google</button>';
@@ -353,6 +380,11 @@
     }
     box.innerHTML = html;
 
+    var btnErrClose = document.getElementById('recGoogleErrorClose');
+    if (btnErrClose) btnErrClose.onclick = function () {
+      try { var stc = load() || {}; stc.last_error = ''; save(stc); } catch (e) {}
+      renderGoogle();
+    };
     var btnConnect = document.getElementById('recGoogleConnect');
     if (btnConnect) btnConnect.onclick = function () {
       btnConnect.disabled = true;

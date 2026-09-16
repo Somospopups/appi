@@ -1,6 +1,6 @@
 {
   "name": "appi",
-  "version": "820.0.0",
+  "version": "821.0.0",
   "cacheName": "appi-v819-google-calendar",
   "private": true,
   "description": "Pruebas de regresión de APPI",
