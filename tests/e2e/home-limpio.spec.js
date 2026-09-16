@@ -614,4 +614,3 @@ test('la tarjeta especial se viste distinta y sin espacio muerto (v325)', async 
   await page.waitForTimeout(450);
   await expect(page.locator('.ht-card:not(.detras1):not(.detras2):not(.ht-fantasma)')).not.toHaveClass(/ht-esp/);
 });
-

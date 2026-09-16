@@ -127,9 +127,13 @@ test.describe('Campana de anuncios fija en header y toast sobre modals', () => {
 
     const toast = page.locator('#toast');
     await expect(toast).toBeVisible();
-
-    const toastBox = await toast.boundingBox();
     const brandBox = await page.locator('.home-brand-mark').boundingBox();
+    // El toast entra deslizándose (translateY -100px → 0 en 350 ms): esperar
+    // a que se asiente antes de medir, o en máquinas lentas se lo muestra a
+    // mitad de vuelo (y negativo, fuera de la pantalla).
+    await expect.poll(async () => (await toast.boundingBox()).y)
+      .toBeGreaterThanOrEqual(brandBox.y + brandBox.height);
+    const toastBox = await toast.boundingBox();
 
     // El toast no tapa el texto de versión APPI
     expect(toastBox.y).toBeGreaterThanOrEqual(brandBox.y + brandBox.height);

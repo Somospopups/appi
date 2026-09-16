@@ -5,6 +5,11 @@ async function entrar(page) {
   await page.evaluate(() => {
     localStorage.clear();
     sessionStorage.clear();
+    // El clear borra las banderas del storageState global: re-ponerlas para
+    // que el cartel "¿Recibís los avisos de APPI?" (appi-notif) no salte y
+    // tape los clics (pasa cuando el arranque tarda y el popup gana la carrera).
+    localStorage.setItem('appi_notif_listo_v1', '1');
+    localStorage.setItem('appi_notif_popup_later', String(Date.now() + 400 * 24 * 3600 * 1000));
     const mockUser = {
       id: 'mock-user-fab',
       aud: 'authenticated',

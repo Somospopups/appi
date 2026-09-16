@@ -122,13 +122,24 @@ test('demos y cierres se mueven con la regla 3 a 1', async ({ page }) => {
   await expect(page.locator('#simCierres')).toHaveValue('0');
 });
 
+
+// UI actual de stock (FAB v7xx): el producto entra por el botón de acción
+// (⊕) → "Manual" → hoja de carga (#stManNombre…#stManSave).
+async function cargarProducto(page, nombre, cant) {
+  await page.locator('#stFabMain').click();
+  await page.locator('#stFabManual').click();
+  await expect(page.locator('#stManNombre')).toBeVisible();
+  await page.locator('#stManNombre').fill(nombre);
+  if (cant) await page.locator('#stManCant').fill(cant);
+  await page.locator('#stManSave').click();
+}
+
 test('el stock se carga en Mis herramientas y sobrevive el refresco', async ({ page }) => {
   await entrar(page);
   await page.evaluate(() => window.openStock());
   await expect(page.locator('#view-stock')).toHaveClass(/active/);
   await expect(page.locator('#view-presu #stockCard')).toHaveCount(0);
-  await page.locator('#stNombre').fill('Iontrix 2');
-  await page.locator('#stAdd').click();
+  await cargarProducto(page, 'Iontrix 2');
   await expect(page.locator('#stockCont')).toContainText('Iontrix 2');
   await page.reload({ waitUntil: 'networkidle' });
   await page.evaluate(() => window.openStock());
@@ -138,12 +149,18 @@ test('el stock se carga en Mis herramientas y sobrevive el refresco', async ({ p
 test('prestar saca una unidad y devolverla la vuelve al stock', async ({ page }) => {
   await entrar(page);
   await page.evaluate(() => window.openStock());
-  await page.locator('#stNombre').fill('Senior 4');
-  await page.locator('#stCant').fill('2');
-  await page.locator('#stAdd').click();
+  await cargarProducto(page, 'Senior 4', '2');
   await expect(page.locator('#stockCont')).toContainText('2 unidades');
   await page.locator('[data-st-prestar]').click();
-  await expect(page.locator('#stOverlay')).toHaveClass(/open/);
+  // UI actual: si hay planilla, abre el picker de equipo y la opción
+  // "Carga manual" lleva a la hoja clásica de nombre/teléfono; sin
+  // planilla la hoja sale directa.
+  await expect.poll(async () => {
+    const manual = page.locator('[data-prestamo-manual]');
+    if (await manual.isVisible()) await manual.click();
+    const cls = (await page.locator('#stOverlay').getAttribute('class')) || '';
+    return cls.includes('open');
+  }).toBe(true);
   await page.locator('#stQuien').fill('Laura Gómez');
   await page.locator('#stTel').fill('3515551234');
   await page.locator('#stSavePrestamo').click();
@@ -156,6 +173,9 @@ test('prestar saca una unidad y devolverla la vuelve al stock', async ({ page })
   if (await page.locator('[data-st-tab="prestados"]').count()) {
     await page.locator('[data-st-tab="prestados"]').click();
   }
+  // La devolución pregunta por el N° de serie (UI actual): contestar
+  // "Sí, el mismo" para que la unidad vuelva al stock.
+  await page.evaluate(() => { window.APPIDialog.choose = async () => 'si'; });
   await page.locator('[data-st-dev]').click();
   await expect(page.locator('#stockCont')).toContainText('2 unidades');
 });
@@ -163,9 +183,14 @@ test('prestar saca una unidad y devolverla la vuelve al stock', async ({ page })
 test('eliminar un préstamo no devuelve la unidad al stock', async ({ page }) => {
   await entrar(page);
   await page.evaluate(() => window.openStock());
-  await page.locator('#stNombre').fill('Iontrix 2');
-  await page.locator('#stAdd').click();
+  await cargarProducto(page, 'Iontrix 2');
   await page.locator('[data-st-prestar]').click();
+  await expect.poll(async () => {
+    const manual = page.locator('[data-prestamo-manual]');
+    if (await manual.isVisible()) await manual.click();
+    const cls = (await page.locator('#stOverlay').getAttribute('class')) || '';
+    return cls.includes('open');
+  }).toBe(true);
   await page.locator('#stQuien').fill('Pedro');
   await page.locator('#stSavePrestamo').click();
   await page.evaluate(() => { window.APPIDialog.confirm = async () => true; });

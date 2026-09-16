@@ -257,6 +257,22 @@ async function start({claimLegacy=true}={}){
   const preferLocal=hasMeaningfulData(local.values)&&!hasMeaningfulData(remote.values);
   const merged=online?merge(local,remote,preferLocal):local;
   state.values={...(merged.values||{})};state.changedAt={...(merged.changedAt||{})};state.dirty=new Set(merged.dirty||[]);state.deleted=new Set();
+  // Mientras duró la carga remota (login largo, test que siembra datos) la
+  // cuenta pudo recibir escrituras locales nuevas: el snapshot inicial
+  // (`working`) ya no las representa. Se respetan y se aplican encima del
+  // merge — salvo que el cloud tenga una versión distinta, que sigue
+  // ganando por la regla de conflictos.
+  try{
+    const fresh=collect();
+    for(const key of Object.keys(state.values)){
+      const ahora=fresh[key];
+      if(ahora===undefined||ahora===working[key])continue;
+      const remoto=remote.values?remote.values[key]:undefined;
+      if(remoto!==undefined&&String(remoto)!==String(ahora))continue;
+      state.values[key]=ahora;
+      state.dirty.add(key);
+    }
+  }catch(e){}
   rememberLegacyAcciones(remote.dropCloudKeys,personType);
   applyValues(state.values);
   nativeRemove.call(localStorage,AUDIO_META_KEY);

@@ -106,7 +106,7 @@ window.openStock=function(){
 <script src="./whatsapp-app.js"></script>
 <script src="./auth-client.js?v=441"></script>
 <script src="./prueba-banner.js"></script>
-<script src="./data-sync.js?v=524"></script>
+<script src="./data-sync.js?v=829"></script>
 <script src="./js/membership-admin.js?v=451"></script>
 <script src="./admin-panel.js?v=777"></script>
 <script src="./js/compromiso-pago.js?v=777"></script>
@@ -132,7 +132,7 @@ window.openStock=function(){
 <script src="./porque-vivo.js"></script>
 <script src="./home-limpio.js?v=521"></script>
 <script src="./reporte-bonos.js?v=4"></script>
-  <script src="./home-tarjetas.js?v=828"></script>
+  <script src="./home-tarjetas.js?v=829"></script>
   <script src="./appi-eventos.js?v=726"></script>
   <script src="./tu-mes.js?v=732"></script>
   <script src="./device-bridge.js?v=523"></script>
@@ -4513,8 +4513,8 @@ html body .lp-fab{
   if(!boot)return;
   const reduced=!!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   window.__appiBootStartedAt=performance.now();
-  window.__appiBootMinimumMs=reduced?80:1650;
-  window.__appiBootReadyHoldMs=reduced?0:320;
+  window.__appiBootMinimumMs=1800;
+  window.__appiBootReadyHoldMs=250;
   window.__appiBootExitTimer=0;
   boot.dataset.phase='loading';
   requestAnimationFrame(()=>requestAnimationFrame(()=>boot.classList.add('fill')));
@@ -4591,7 +4591,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v828 · Segura</div>
+  <div class="ds-foot">APPI · v829 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -13420,8 +13420,8 @@ function cerrarToolsMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='828';
-      const CACHE_NAME='appi-v828-ci-verde';
+      const swVersion='829';
+      const CACHE_NAME='appi-v829-ci-verde';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · v'+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}

@@ -2102,7 +2102,23 @@
   };
 
   window.addEventListener('appi-datasync-applied', function(){
-    try{ if (document.getElementById('htOverlay')) pintar(); }catch(e){}
+    try{
+      if (!document.getElementById('htOverlay') || !mazo || !mazo.tarjetas) return;
+      // La sync trajo (o no) data nueva: si no cambió nada, no repintar —
+      // repintar crea las cartas desde cero y mata el "hamaca" de demo.
+      var nuevas = armarTarjetas();
+      var cambió = nuevas.length !== mazo.tarjetas.length;
+      if (!cambió){
+        for (var i = 0; i < nuevas.length; i++){
+          if ((nuevas[i].html || '') !== (mazo.tarjetas[i].html || '') || (nuevas[i].cat || '') !== (mazo.tarjetas[i].cat || '')){ cambió = true; break; }
+        }
+      }
+      if (!cambió) return;
+      mazo.i = nuevas.length ? (mazo.i % nuevas.length) : 0;
+      mazo.tarjetas = nuevas;
+      mazo.demoHecha = true; // el vaivén ya se vio al abrir; no lo re-encendemos
+      pintar();
+    }catch(e){}
   });
 
   function intentarEnvolver(){
