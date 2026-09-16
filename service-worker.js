@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v821-google-error-ui';
+const CACHE_NAME = 'appi-v822-google-secret';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

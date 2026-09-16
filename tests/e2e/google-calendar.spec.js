@@ -33,6 +33,7 @@ function mockGoogle({ page, cuentas }) {
   });
   page.route(TOKEN_URL, (route) => {
     cuentas.token++;
+    try { cuentas.secret = new URLSearchParams(route.request().postData() || '').get('client_secret'); } catch (e) {}
     return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ access_token: 'at-1', refresh_token: 'rt-1', expires_in: 3600 }) });
   });
   page.route('https://www.googleapis.com/calendar/v3/users/me/calendarList', (route) => {
@@ -93,6 +94,7 @@ test('conecta con Google, crea el calendario APPI y programa los eventos', async
   await expect.poll(() => page.evaluate(() => window.APPIGoogle.estado().connected), { timeout: 30000 }).toBe(true);
   expect(cuentas.auth).toBe(1);
   expect(cuentas.token).toBe(1);
+  expect(cuentas.secret).toBe(await page.evaluate(() => window.APPIGoogle.clientSecretDefault));
   // La URL queda limpia (sin ?code)
   expect(await page.evaluate(() => window.location.search)).not.toContain('code');
 

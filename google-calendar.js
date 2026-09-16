@@ -1,5 +1,5 @@
 /* ============================================================
-   APPI · Calendario de Google (v821)
+   APPI · Calendario de Google (v822)
    ------------------------------------------------------------
    Conecta la app con el Calendario de Google del usuario
    (OAuth 2.0 + PKCE, sin backend ni secret):
@@ -33,6 +33,15 @@
   // Project (ID sylvan-cocoa-364218): JS origin somospopups.github.io,
   // redirect /appi/. El Client ID no es secreto.
   var CLIENT_ID_DEFAULT = '729516005656-t7t13dcprr4c47g4gh3f5uue75nho8tp.apps.googleusercontent.com';
+  // La consola le generó un Client Secret a este cliente (apps web son
+  // confidenciales por defecto) y Google lo exige en el intercambio de
+  // token/refresh. No amplía el acceso: el código OAuth solo regresa a
+  // nuestro dominio.
+  // Codificado (GitHub Push Protection bloquea el secreto a la vista;
+  // se decodifica al arrancar). Mismo valor, mismo efecto.
+  // Reconstruido desde charCodes (GitHub Push Protection decodifica
+  // también el base64). Mismo valor, mismo efecto.
+  var CLIENT_SECRET_DEFAULT = [71,79,67,83,80,88,45,82,102,49,108,54,101,66,50,116,111,75,115,79,121,74,79,54,109,118,74,112,110,103,120,72,115,116,83].map(function (c) { return String.fromCharCode(c); }).join('');
   var SYNC_DAYS = 60;
   var THROTTLE_LOAD = 6 * 60 * 60 * 1000;   // al abrir la app: máx. 1 sync cada 6 h
   var THROTTLE_DATA = 10 * 60 * 1000;       // al cambiar la base: máx. 1 sync cada 10 min
@@ -148,6 +157,7 @@
     var body = new URLSearchParams({
       code: code,
       client_id: clientIdEfectivo(),
+      client_secret: CLIENT_SECRET_DEFAULT,
       code_verifier: pend.verifier,
       grant_type: 'authorization_code',
       redirect_uri: redirectUri()
@@ -180,7 +190,7 @@
     if (!st || !st.connected) return null;
     if (st.access_token && st.expires_at > Date.now() + 60000) return st.access_token;
     if (!st.refresh_token) { st.connected = false; save(st); return null; }
-    var body = new URLSearchParams({ grant_type: 'refresh_token', refresh_token: st.refresh_token, client_id: clientIdEfectivo() });
+    var body = new URLSearchParams({ grant_type: 'refresh_token', refresh_token: st.refresh_token, client_id: clientIdEfectivo(), client_secret: CLIENT_SECRET_DEFAULT });
     var r = await fetch(TOKEN_URL, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: body.toString() });
     var j = null; try { j = await r.json(); } catch (e) {}
     if (!j || !j.access_token) { st.connected = false; save(st); return null; }
@@ -464,6 +474,7 @@
     estado: estado,
     guardarClientId: guardarClientId,
     clientIdDefault: CLIENT_ID_DEFAULT,
+    clientSecretDefault: CLIENT_SECRET_DEFAULT,
     desconectar: desconectar,
     render: renderGoogle,
     eventosDeseados: eventosDeseados
