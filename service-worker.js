@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v811-privacy-kpi';
+const CACHE_NAME = 'appi-v812-bonos-popup';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

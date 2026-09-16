@@ -1,14 +1,14 @@
-/* APPI · Reporte de Bonos (v809 · v810: en Mi negocio · v811: ojo de privacidad)
+/* APPI · Reporte de Bonos (v809 · v810: en Mi negocio · v811: ojo · v812: botón + popup)
    La información del tablero de PSA → "Bonos y Bonus" → Reporte de Bonos,
-   siempre visible en la parte SUPERIOR de Mi negocio (no oculto).
-   - v811: los datos nacen TAPADOS (blur) por privacidad. El ojito 👁 los
-     muestra; al salir o volver a entrar a Mi negocio vuelven a taparse.
-   - v811: los estados amarillos ("faltan…") se alinean a la derecha,
-     como el resto de los renglones.
+   en la parte SUPERIOR de Mi negocio.
+   - v812: el reporte NO se muestra a texto abierto. En su lugar hay un
+     BOTÓN ALARGADO ("💰 Reporte de Bonos · <período>"); al presionarlo se
+     abre un POPUP (hoja inferior) con todos los datos. Al salir de Mi
+     negocio el popup se cierra solo. (Reemplaza al ojito de v811.)
    - Se actualiza SOLO al entrar a la app (función consulta-serial, action:'bonos').
    - Queda cacheada en el teléfono: si no hay internet se ve la última copia
      con su fecha, y un botón ↻ para reintentar.
-   - Abajo del reporte siguen el banner de personas/activos/PB y los botones. */
+   - Abajo del botón siguen el banner de personas/activos/PB y los botones. */
 (function(){
   if (window.APBon) return;
 
@@ -16,7 +16,7 @@
   var EN_VUELO_MS = 30 * 60 * 1000; // refresco al abrir la vista si pasaron 30 min
   var enVuelo = null;
   var ultimoError = '';
-  var datosVisibles = false; // v811: por defecto, tapados
+  var popupAbierto = false;
 
   function supabaseCfg(){ try{ return (window.APPI_AUTH && window.APPI_AUTH.url && window.APPI_AUTH.anonKey) ? window.APPI_AUTH : null; }catch(e){ return null; } }
   function tokenActual(){ try{ var v = JSON.parse(localStorage.getItem('appi_auth_session_v1') || 'null'); return v && v.session && v.session.access_token || ''; }catch(e){ return ''; } }
@@ -90,12 +90,7 @@
     if (vencida && !enVuelo){ fetchBonos().catch(function(){}); }
   }
 
-  /* ---------- v811: privacidad (ojito) ---------- */
-  function ocultar(){ if (datosVisibles){ datosVisibles = false; render(); } }
-  function mostrar(){ if (!datosVisibles){ datosVisibles = true; render(); } }
-  function toggle(){ datosVisibles = !datosVisibles; render(); }
-
-  /* ---------- vista ---------- */
+  /* ---------- vista: botón alargado ---------- */
   function asegurarHost(){
     var view = document.getElementById('view-negocio');
     if (!view) return null;
@@ -109,6 +104,18 @@
     return host;
   }
 
+  function asegurarOverlay(){
+    var ov = document.getElementById('bnsOverlay');
+    if (ov) return ov;
+    ov = document.createElement('div');
+    ov.id = 'bnsOverlay';
+    ov.className = 'bns-overlay';
+    ov.innerHTML = '<div class="bns-backdrop"></div><div class="bns-sheet" id="bnsSheet"></div>';
+    document.body.appendChild(ov);
+    ov.addEventListener('click', function(e){ if (e.target === ov || e.target.className === 'bns-backdrop') cerrar(); });
+    return ov;
+  }
+
   function estadoBono(b){
     var e = String(b.estado || '');
     if (/^Califico|^Calificó/i.test(e)) return { cls: 'ok', txt: '✓' };
@@ -118,7 +125,30 @@
     return { cls: '', txt: e };
   }
 
-  function htmlCard(){
+  /* El botón alargado: nunca muestra datos, solo título + período. */
+  function htmlBoton(){
+    var cache = leerCache();
+    var b = cache && cache.bonos;
+    var cargando = !!enVuelo;
+    var right;
+    if (b){
+      right = '<span class="bns-btn-per">' + esc(b.periodo || '') + '</span><span class="bns-btn-chev">›</span>';
+    } else if (cargando){
+      right = '<span class="bns-btn-per bns-btn-busy">consultando PSA…</span>';
+    } else if (psaCreds()){
+      right = '<span class="bns-btn-per">ver</span><span class="bns-btn-chev">›</span>';
+    } else {
+      right = '<span class="bns-btn-per">vincular MI PSA</span><span class="bns-btn-chev">›</span>';
+    }
+    return '<button type="button" class="bns-btn" id="bonosBtn" aria-label="Abrir Reporte de Bonos">' +
+      '<span class="bns-btn-ico">💰</span>' +
+      '<span class="bns-btn-titulo">Reporte de Bonos</span>' +
+      right +
+    '</button>';
+  }
+
+  /* El contenido del popup (cuerpo completo del reporte). */
+  function htmlCuerpo(){
     var cache = leerCache();
     var b = cache && cache.bonos;
     var cargando = !!enVuelo;
@@ -139,15 +169,11 @@
         '<button type="button" class="bns-retry" id="bnsCreds">Vincular MI PSA</button></div>';
     }
 
-    // v811: ojo de privacidad (👁 muestra · 🙈 tapa). Los datos nacen tapados.
-    var ojo = datosVisibles ? '🙈' : '👁';
-    var ojoTit = datosVisibles ? 'Ocultar datos' : 'Mostrar datos';
-
     var html = '<div class="bns-cab">' +
       '<div class="bns-titulo">💰 Reporte de Bonos</div>' +
-      '<div class="bns-per"><span class="bns-d">' + esc(b.periodo || '') + '</span>' + (cargando ? ' <span class="bns-mini">actualizando…</span>' : '') +
-      '<button type="button" class="bns-oculto" id="bnsOjito" title="' + ojoTit + '" aria-label="' + ojoTit + '">' + ojo + '</button>' +
-      '<button type="button" class="bns-refresh" id="bnsRefresh" title="Actualizar desde MI PSA">↻</button></div>' +
+      '<div class="bns-per"><span>' + esc(b.periodo || '') + '</span>' + (cargando ? ' <span class="bns-mini">actualizando…</span>' : '') +
+      '<button type="button" class="bns-refresh" id="bnsRefresh" title="Actualizar desde MI PSA">↻</button>' +
+      '<button type="button" class="bns-close" id="bnsClose" title="Cerrar" aria-label="Cerrar">✕</button></div>' +
     '</div>';
 
     if (ultimoError && !cargando){
@@ -155,15 +181,15 @@
     }
 
     html += '<div class="bns-meta">' +
-      'DIP <span class="bns-d">' + esc(b.dip || '—') + '</span> · <span class="bns-d">' + esc(b.nombre || '—') + '</span><br>' +
-      'Socio: <span class="bns-d">' + esc(b.socio || '—') + '</span> · Sucursal: <span class="bns-d">' + esc(b.sucursal || '—') + '</span><br>' +
-      'Categoría: <span class="bns-d">' + esc(b.categoria || '—') + '</span>' +
+      'DIP ' + esc(b.dip || '—') + ' · ' + esc(b.nombre || '—') + '<br>' +
+      'Socio: ' + esc(b.socio || '—') + ' · Sucursal: ' + esc(b.sucursal || '—') + '<br>' +
+      'Categoría: ' + esc(b.categoria || '—') +
     '</div>';
 
     if (b.acumulacion && b.acumulacion.length){
       html += '<div class="bns-seccion">Acumulación del mes</div><div class="bns-acum">';
       b.acumulacion.forEach(function(a){
-        html += '<div class="bns-acum-f"><span class="bns-acum-n">' + esc(a.r) + '</span><span class="bns-acum-v bns-d">' + fmtNum(a.pb) + '</span></div>';
+        html += '<div class="bns-acum-f"><span class="bns-acum-n">' + esc(a.r) + '</span><span class="bns-acum-v">' + fmtNum(a.pb) + '</span></div>';
       });
       html += '</div>';
     }
@@ -174,14 +200,13 @@
         var est = estadoBono(x);
         var imp = (x.imp && x.imp !== '0.00') ? '$ ' + fmtNum(x.imp) : (est.cls === 'ok' ? '$ 0' : '');
         // v811: estado + importe van juntos, alineados a la derecha
-        // (si no hay importe, el estado amarillo queda en el borde derecho).
-        html += '<div class="bns-b"><span class="bns-b-n bns-d" title="' + esc(x.d) + '">' + esc(x.d) + '</span>' +
-          '<span class="bns-b-derecha"><span class="bns-b-est ' + est.cls + ' bns-d">' + esc(est.txt) + '</span>' +
-          (imp ? '<span class="bns-b-imp bns-d">' + esc(imp) + '</span>' : '') + '</span></div>';
+        html += '<div class="bns-b"><span class="bns-b-n" title="' + esc(x.d) + '">' + esc(x.d) + '</span>' +
+          '<span class="bns-b-derecha"><span class="bns-b-est ' + est.cls + '">' + esc(est.txt) + '</span>' +
+          (imp ? '<span class="bns-b-imp">' + esc(imp) + '</span>' : '') + '</span></div>';
       });
       html += '</div>';
       if (b.total){
-        html += '<div class="bns-total"><span>Total del período</span><b class="bns-d">$ ' + fmtNum(b.total) + '</b></div>';
+        html += '<div class="bns-total"><span>Total del período</span><b>$ ' + fmtNum(b.total) + '</b></div>';
       }
     }
 
@@ -193,22 +218,43 @@
     return html;
   }
 
-  function render(){
-    var host = asegurarHost();
-    if (!host) return;
-    var html = htmlCard();
-    if (!html){ host.style.display = 'none'; return; }
-    host.style.display = '';
-    // v811: sin "bns-tapado" los datos se ven; con ella, tapados.
-    host.innerHTML = '<div class="bns-card' + (datosVisibles ? '' : ' bns-tapado') + '">' + html + '</div>';
+  function alambreSheet(){
     var retry = document.getElementById('bnsRetry');
     if (retry) retry.onclick = function(){ fetchBonos().catch(function(){}); };
     var creds = document.getElementById('bnsCreds');
     if (creds) creds.onclick = function(){ try{ if (typeof window.psaAbrirPopup === 'function') window.psaAbrirPopup(); }catch(e){} };
     var ref = document.getElementById('bnsRefresh');
     if (ref) ref.onclick = function(){ try{ haptic(8); }catch(e){} fetchBonos().catch(function(){}); };
-    var ojo = document.getElementById('bnsOjito');
-    if (ojo) ojo.onclick = function(){ try{ haptic(6); }catch(e){} toggle(); };
+    var close = document.getElementById('bnsClose');
+    if (close) close.onclick = function(){ cerrar(); };
+  }
+
+  function abrir(){
+    var ov = asegurarOverlay();
+    var sheet = document.getElementById('bnsSheet');
+    sheet.innerHTML = htmlCuerpo();
+    alambreSheet();
+    ov.classList.add('bns-open');
+    popupAbierto = true;
+  }
+  function cerrar(){
+    if (!popupAbierto) return;
+    var ov = document.getElementById('bnsOverlay');
+    if (ov) ov.classList.remove('bns-open');
+    popupAbierto = false;
+  }
+
+  function render(){
+    var host = asegurarHost();
+    if (!host) return;
+    host.innerHTML = htmlBoton();
+    var btn = document.getElementById('bonosBtn');
+    if (btn) btn.onclick = function(){ try{ haptic(6); }catch(e){} abrir(); };
+    // Si el popup está abierto, refrescar su contenido con los nuevos datos.
+    if (popupAbierto){
+      var sheet = document.getElementById('bnsSheet');
+      if (sheet){ sheet.innerHTML = htmlCuerpo(); alambreSheet(); }
+    }
   }
 
   function css(){
@@ -217,8 +263,20 @@
     st.id = 'bonosEstilos';
     st.textContent =
       '#bonosCard{margin:10px 10px 0}' +
-      '.bns-card{background:#f3eee3;border:1px solid rgba(40,36,28,.08);border-radius:18px;padding:14px 14px 10px;box-shadow:0 10px 26px rgba(30,24,12,.10)}' +
-      'body.dark .bns-card{background:#25273a;border-color:rgba(255,255,255,.08);box-shadow:0 10px 26px rgba(0,0,0,.28)}' +
+      /* v812: botón alargado (sin datos, solo título + período) */
+      '.bns-btn{width:100%;display:flex;align-items:center;gap:10px;padding:14px 16px;border:0;border-radius:18px;background:linear-gradient(135deg,#0b5878,#12708f);color:#fff;font:inherit;cursor:pointer;box-shadow:0 10px 26px rgba(11,88,120,.28);text-align:left}' +
+      '.bns-btn:active{transform:scale(.985)}' +
+      '.bns-btn-ico{font-size:19px}' +
+      '.bns-btn-titulo{font-size:14.5px;font-weight:900;letter-spacing:-.2px;flex:1}' +
+      '.bns-btn-per{font-size:11.5px;font-weight:700;color:rgba(255,255,255,.85);white-space:nowrap}' +
+      '.bns-btn-busy{color:rgba(255,255,255,.65);font-weight:600}' +
+      '.bns-btn-chev{font-size:18px;font-weight:900;color:rgba(255,255,255,.75);line-height:1}' +
+      /* v812: popup (hoja inferior) con los datos */
+      '.bns-overlay{position:fixed;inset:0;z-index:999;display:none}' +
+      '.bns-overlay.bns-open{display:block}' +
+      '.bns-backdrop{position:absolute;inset:0;background:rgba(15,16,26,.5)}' +
+      '.bns-sheet{position:absolute;left:0;right:0;bottom:0;max-height:88vh;overflow-y:auto;background:#f3eee3;border-radius:22px 22px 0 0;padding:16px 14px calc(14px + env(safe-area-inset-bottom));box-shadow:0 -14px 44px rgba(0,0,0,.30)}' +
+      'body.dark .bns-sheet{background:#25273a}' +
       '.bns-cab{display:flex;align-items:center;justify-content:space-between;gap:8px}' +
       '.bns-titulo{font-size:15px;font-weight:900;color:#23263a;letter-spacing:-.2px}' +
       'body.dark .bns-titulo{color:#f2f2f7}' +
@@ -227,12 +285,9 @@
       '.bns-mini{font-size:9.5px;font-weight:600;color:#8a8a94}' +
       '.bns-refresh{width:28px;height:28px;border-radius:50%;border:0;background:rgba(11,88,120,.10);color:#0b5878;font-size:14px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center}' +
       'body.dark .bns-refresh{background:rgba(11,88,120,.3);color:#d7e8f0}' +
-      '.bns-oculto{width:30px;height:30px;border-radius:50%;border:1px solid rgba(40,36,28,.14);background:rgba(255,255,255,.55);font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}' +
-      'body.dark .bns-oculto{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.16)}' +
-      '.bns-oculto:active{transform:scale(.94)}' +
-      /* v811: privacidad — datos tapados con blur hasta tocar el ojito */
-      '.bns-card.bns-tapado .bns-d{filter:blur(7px) saturate(.4);user-select:none;pointer-events:none}' +
-      '.bns-meta{margin-top:8px;font-size:11px;line-height:1.55;color:#5c5c68}' +
+      '.bns-close{width:28px;height:28px;border-radius:50%;border:0;background:rgba(40,36,28,.08);color:#5c5c68;font-size:13px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center}' +
+      'body.dark .bns-close{background:rgba(255,255,255,.1);color:#c6cbea}' +
+      '.bns-meta{margin-top:10px;font-size:11px;line-height:1.55;color:#5c5c68}' +
       'body.dark .bns-meta{color:#a8adc8}' +
       '.bns-seccion{margin:11px 0 5px;font-size:10px;font-weight:800;letter-spacing:.9px;text-transform:uppercase;color:#8a8a94}' +
       'body.dark .bns-seccion{color:#7d8298}' +
@@ -282,8 +337,8 @@
       // Al entrar a la app se actualiza solo (no depende de "recordar").
       setTimeout(function(){ fetchBonos().catch(function(){}); }, 1500);
     }
-    // Refresco (con tope de 30 min) al abrir Mi negocio, y privacidad:
-    // los datos vuelven a taparse al salir o al volver a entrar.
+    // Al abrir Mi negocio: refresco (tope 30 min). En cualquier cambio de
+    // vista: el popup se cierra (los datos nunca quedan a la vista).
     try{
       var orig = window.showView;
       if (typeof orig === 'function' && !window.__apBonViewWrapped){
@@ -291,13 +346,15 @@
         window.showView = function(id){
           var r = orig.apply(this, arguments);
           try{
-            if (id === 'view-negocio'){ datosVisibles = false; render(); refrescarSiEsNecesario(); }
-            else { ocultar(); }
+            cerrar();
+            if (id === 'view-negocio') refrescarSiEsNecesario();
           }catch(e){}
           return r;
         };
       }
     }catch(e){}
+    // Esc también cierra el popup
+    document.addEventListener('keydown', function(e){ if (e.key === 'Escape') cerrar(); });
   }
 
   window.APBon = {
@@ -305,11 +362,10 @@
     render: render,
     refrescarSiEsNecesario: refrescarSiEsNecesario,
     cache: leerCache,
-    // v811: control de privacidad (también lo usan los tests)
-    ocultar: ocultar,
-    mostrar: mostrar,
-    toggle: toggle,
-    estaVisible: function(){ return datosVisibles; }
+    // v812: control del popup (también lo usan los tests)
+    abrir: abrir,
+    cerrar: cerrar,
+    estaAbierto: function(){ return popupAbierto; }
   };
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
