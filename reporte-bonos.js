@@ -67,6 +67,7 @@
         if (rr.http && rr.j.ok && rr.j.bonos){
           ultimoError = '';
           guardarCache(rr.j.bonos);
+          try{ window.dispatchEvent(new Event('appi-bonos-cambiaron')); }catch(e){}
           return rr.j.bonos;
         }
         throw new Error((rr.j && rr.j.error) || 'Sin respuesta de PSA.');

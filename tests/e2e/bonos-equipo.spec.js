@@ -46,6 +46,30 @@ function mockBonos(page, { falla = false } = {}) {
   });
 }
 
+test('el banner PERSONAS/ACTIVOS/TOTAL PB usa el renglón "Lider" del reporte (v826)', async ({ page }) => {
+  // equipoData con sumatorio propio (15.5) DISTINTO del Lider (285.41):
+  // el KPI debe mostrar el del reporte, no la suma del equipo.
+  await page.addInitScript(() => {
+    try {
+      localStorage.setItem('equipoData', JSON.stringify({ personas: [ { pnAct: '10.00' }, { pnAct: '5.50' }, { pnAct: '0' } ] }));
+    } catch (e) {}
+  });
+  await credsInit(page);
+  await base.entrar(page);
+  mockBonos(page);
+  await page.evaluate(() => window.APBon.fetch());
+  await page.waitForFunction(() => {
+    const c = JSON.parse(localStorage.getItem('appi_bonos_v1') || 'null');
+    return c && c.bonos;
+  });
+  await page.evaluate(() => window.showView('view-negocio'));
+  await expect(page.locator('#embudoKpi')).toBeVisible({ timeout: 15000 });
+  await expect(page.locator('#embudoKpi')).toContainText('285.4 PB', { timeout: 15000 });
+  await expect(page.locator('#embudoKpi')).toContainText('3');
+  await expect(page.locator('#embudoKpi')).toContainText('67%');
+  expect(await page.locator('#embudoKpi').innerText()).not.toContain('15.5');
+});
+
 test('el botón alargado vive arriba de Mi negocio y abre el popup con los datos (v812)', async ({ page }) => {
   await credsInit(page);
   await base.entrar(page);

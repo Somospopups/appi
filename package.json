@@ -1,6 +1,6 @@
 {
   "name": "appi",
-  "version": "825.0.0",
+  "version": "826.0.0",
   "cacheName": "appi-v825-sin-google",
   "private": true,
   "description": "Pruebas de regresión de APPI",
