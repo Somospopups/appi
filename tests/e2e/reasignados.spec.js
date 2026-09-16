@@ -73,6 +73,8 @@ test('el reasignado lleva pildora ↻ y al abrirlo dice de quién es (v813)', as
   await expect(page.locator('#usuariosStReasig')).toHaveClass(/on/);
   // La etiqueta del botón no lleva los paréntesis: solo "Reasignados"
   await expect(page.locator('#usuariosBtnReasig')).not.toContainText('(');
+  // La planilla trae el campo → no hay aviso de planilla vieja (v816)
+  await expect(page.locator('#usuariosAvisoReasig')).toBeHidden();
 
   // Al expandir la fila aparece "Reasignado de: JUAN CARLOS PEREZ"
   await filaMaria.click();
@@ -155,4 +157,28 @@ test('💬 WhatsApp de un reasignado ofrece el mensaje de recontacto primero (v8
   await page.locator('#usuariosList .tree-node', { hasText: 'PEDRO LUIZ' }).click();
   await page.locator('#usuariosList .tree-children .action-btn.wa').nth(1).click();
   await expect(page.locator('#muOverlay.open #muTitulo')).toHaveText(/Saludo para/);
+});
+
+test('planilla anterior a la v813: aviso visible y "Recargar planilla" abre el selector (v816)', async ({ page }) => {
+  await base.entrar(page);
+  await page.evaluate(() => {
+    // Objetos SIN el campo "dipReasignado" (planilla cargada con app vieja).
+    const viejos = [
+      { id: 0, usuario: 'PEDRO LUIZ', telf: '3515550456', domicilio: 'Av. 2 456', cp: '5000', localidad: 'Centro', producto: 'PSA Domus', serie: '', fCompra: '01/05/2025', fVenceRaw: '15/01/2027', fVence: '2027-01-15T00:00:00.000Z', email: '', reasignado: false, estado: 'vigente', nombreNorm: 'pedro luiz' }
+    ];
+    localStorage.setItem('usuarios_garantias', JSON.stringify(viejos));
+    if (typeof window.recargarUsuariosDeStorage === 'function') window.recargarUsuariosDeStorage();
+    window.showView('view-usuarios');
+  });
+  const aviso = page.locator('#usuariosAvisoReasig');
+  await expect(aviso).toBeVisible();
+  await expect(aviso).toContainText('antes de la v813');
+  // El badge queda en 0 (no hay datos para contar)
+  await expect(page.locator('#usuariosStReasig')).toHaveText('0');
+  // El botón del aviso abre el selector de archivo
+  const [chooser] = await Promise.all([
+    page.waitForEvent('filechooser'),
+    page.locator('#usuariosBtnReasigRecargar').click()
+  ]);
+  expect(chooser).toBeTruthy();
 });

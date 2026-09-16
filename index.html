@@ -4590,7 +4590,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v815 · Segura</div>
+  <div class="ds-foot">APPI · v816 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -5463,6 +5463,14 @@ body.dark #pageTabs button.active{color:#c5d6ff}
     </div>
 
     <div id="usuariosDashboard" style="display:none">
+      <!-- v816: si la planilla guardada se cargó antes de la v813, sus objetos
+           no traen el campo "dipReasignado" y el filtro Reasignados marca 0.
+           La app se lo explica y ofrece recargar el archivo con un toque. -->
+      <div id="usuariosAvisoReasig" style="display:none;margin-bottom:10px;padding:10px 12px;border-radius:14px;background:rgba(245,179,1,0.14);border:1px solid rgba(245,179,1,0.35);font-size:11.5px;font-weight:600;color:#7a5b06;line-height:1.45">
+        ⚠️ <b>Tu planilla se cargó antes de la v813</b> y no trae la columna «Dip reasignado», por eso el filtro muestra 0. Recargá el archivo para actualizarla.
+        <br>
+        <button type="button" id="usuariosBtnReasigRecargar" style="margin-top:7px;padding:6px 12px;border-radius:10px;border:1px solid rgba(122,91,6,0.4);background:#fff;color:#7a5b06;font:inherit;font-size:11px;font-weight:800;cursor:pointer">🔄 Recargar planilla</button>
+      </div>
       <div class="stats">
         <div class="stat stat-clickable active" data-f="all" id="statAll"><b id="usuariosStTotal">0</b><small>Total</small></div>
         <div class="stat stat-clickable" data-f="vencida" id="statVenc"><b id="usuariosStVencidas" style="color:#d9534f">0</b><small>Vencidas</small></div>
@@ -13364,8 +13372,8 @@ function cerrarToolsMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='815';
-      const CACHE_NAME='appi-v815-reasig-badge';
+      const swVersion='816';
+      const CACHE_NAME='appi-v816-aviso-reasig';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · v'+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
@@ -16372,6 +16380,13 @@ function mostrarDashboardU(){
   const reasigTotal=usuariosU.filter(u=>u.reasignado).length;
   const stReasig=document.getElementById('usuariosStReasig');
   if(stReasig){ stReasig.textContent=reasigTotal; stReasig.classList.toggle('on', reasigTotal>0); }
+  // v816: planilla anterior a la v813 → objetos sin campo "dipReasignado" →
+  // el filtro no puede marcar reasignados. Se avisa y se ofrece recargar.
+  const avisReasig=document.getElementById('usuariosAvisoReasig');
+  if(avisReasig){
+    const planillaVieja=usuariosU.length>0 && !usuariosU.some(u=>'dipReasignado' in u);
+    avisReasig.style.display=planillaVieja?'block':'none';
+  }
   // v814: el botón de filtro está siempre visible (aunque haya 0 reasignados).
   // Actualizar también total en statAll si existe
   renderZonasU();
@@ -16628,6 +16643,14 @@ function initUsuarios(){
     filtroReasigU=!filtroReasigU;
     btnReasig.classList.toggle('activo',filtroReasigU);
     aplicarFiltrosU();
+  };
+  // v816: el botón del aviso de planilla vieja abre el selector de archivo.
+  const btnReasigRecargar=document.getElementById('usuariosBtnReasigRecargar');
+  if(btnReasigRecargar) btnReasigRecargar.onclick=()=>{
+    try{
+      const fi=document.getElementById('usuariosFileInput');
+      if(fi) fi.click();
+    }catch(e){ console.log('reasar recargar fail',e); }
   };
   const btnMensajes=document.getElementById('usuariosBtnMensajes');
   if(btnMensajes) btnMensajes.onclick=()=>{
