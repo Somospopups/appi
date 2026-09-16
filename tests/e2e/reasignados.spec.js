@@ -166,28 +166,33 @@ test('💬 WhatsApp de un reasignado ofrece el mensaje de recontacto primero (v8
   await expect(page.locator('#muOverlay.open #muTitulo')).toHaveText(/Saludo para/);
 });
 
-test('planilla anterior a la v813: aviso visible y "Recargar planilla" abre el selector (v816)', async ({ page }) => {
+test('planilla anterior a la v813: la app migra los campos sola, sin pedir nada (v824)', async ({ page }) => {
   await base.entrar(page);
   await page.evaluate(() => {
-    // Objetos SIN el campo "dipReasignado" (planilla cargada con app vieja).
+    // Objetos SIN los campos nuevos (planilla cargada con app vieja).
     const viejos = [
-      { id: 0, usuario: 'PEDRO LUIZ', telf: '3515550456', domicilio: 'Av. 2 456', cp: '5000', localidad: 'Centro', producto: 'PSA Domus', serie: '', fCompra: '01/05/2025', fVenceRaw: '15/01/2027', fVence: '2027-01-15T00:00:00.000Z', email: '', reasignado: false, estado: 'vigente', nombreNorm: 'pedro luiz' }
+      { id: 0, usuario: 'PEDRO LUIZ', telf: '3515550456', domicilio: 'Av. 2 456', cp: '5000', localidad: 'Centro', producto: 'PSA Domus', serie: '', fCompra: '01/05/2025', fVenceRaw: '15/01/2027', fVence: '2027-01-15T00:00:00.000Z', estado: 'vigente', nombreNorm: 'pedro luiz' }
     ];
     localStorage.setItem('usuarios_garantias', JSON.stringify(viejos));
     if (typeof window.recargarUsuariosDeStorage === 'function') window.recargarUsuariosDeStorage();
     window.showView('view-usuarios');
   });
+  // v824: NADA de aviso ni botón pidiendo recargar a mano
   const aviso = page.locator('#usuariosAvisoReasig');
-  await expect(aviso).toBeVisible();
-  await expect(aviso).toContainText('antes de la v813');
-  // El badge queda en 0 (no hay datos para contar)
+  await expect(aviso).toBeHidden();
+  await expect(page.locator('#usuariosBtnReasigRecargar')).toBeHidden();
+  // El badge de Reasignados queda en 0 (no hay datos para contar, sin drama)
   await expect(page.locator('#usuariosStReasig')).toHaveText('0');
-  // El botón del aviso abre el selector de archivo
-  const [chooser] = await Promise.all([
-    page.waitForEvent('filechooser'),
-    page.locator('#usuariosBtnReasigRecargar').click()
-  ]);
-  expect(chooser).toBeTruthy();
+  // Los campos se migraron y persistieron en localStorage
+  const st = await page.evaluate(() => {
+    const u = JSON.parse(localStorage.getItem('usuarios_garantias'))[0];
+    return { dr: 'dipReasignado' in u, val: u.dipReasignado, reasig: 'reasignado' in u, mail: 'email' in u, cn: 'cumpleRaw' in u };
+  });
+  expect(st.dr).toBe(true);
+  expect(st.val).toBe('');
+  expect(st.reasig).toBe(true);
+  expect(st.mail).toBe(true);
+  expect(st.cn).toBe(true);
 });
 
 test('la sync automática de PSA trae los reasignados sola, sin carga manual (v817)', async ({ page }) => {

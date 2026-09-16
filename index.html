@@ -4592,7 +4592,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v823 · Segura</div>
+  <div class="ds-foot">APPI · v824 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -5492,9 +5492,8 @@ body.dark #pageTabs button.active{color:#c5d6ff}
     </div>
 
     <div id="usuariosDashboard" style="display:none">
-      <!-- v816: si la planilla guardada se cargó antes de la v813, sus objetos
-           no traen el campo "dipReasignado" y el filtro Reasignados marca 0.
-           La app se lo explica y ofrece recargar el archivo con un toque. -->
+      <!-- v816→v824: planilla antigua sin campo "dipReasignado": la app migra
+           los campos sola al renderizar (el aviso queda oculto para siempre). -->
       <div id="usuariosAvisoReasig" style="display:none;margin-bottom:10px;padding:10px 12px;border-radius:14px;background:rgba(245,179,1,0.14);border:1px solid rgba(245,179,1,0.35);font-size:11.5px;font-weight:600;color:#7a5b06;line-height:1.45">
         ⚠️ <b>Tu planilla se cargó antes de la v813</b> y no trae la columna «Dip reasignado», por eso el filtro muestra 0. Recargá el archivo para actualizarla.
         <br>
@@ -13412,8 +13411,8 @@ function cerrarToolsMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='823';
-      const CACHE_NAME='appi-v823-theme-bar';
+      const swVersion='824';
+      const CACHE_NAME='appi-v824-auto-migra';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · v'+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
@@ -16421,12 +16420,26 @@ function mostrarDashboardU(){
   const reasigTotal=usuariosU.filter(u=>u.reasignado).length;
   const stReasig=document.getElementById('usuariosStReasig');
   if(stReasig){ stReasig.textContent=reasigTotal; stReasig.classList.toggle('on', reasigTotal>0); }
-  // v816: planilla anterior a la v813 → objetos sin campo "dipReasignado" →
-  // el filtro no puede marcar reasignados. Se avisa y se ofrece recargar.
+  // v816→v824: planilla anterior a la v813 → objetos sin campo "dipReasignado".
+  // Antes pedíamos recargar el archivo a mano; ahora la app MIGRA los campos
+  // sola (valores vacíos; los datos reales llegan solos con la sync de MI PSA
+  // que corre al abrir la app). El aviso ya no se muestra nunca más.
   const avisReasig=document.getElementById('usuariosAvisoReasig');
   if(avisReasig){
     const planillaVieja=usuariosU.length>0 && !usuariosU.some(u=>'dipReasignado' in u);
-    avisReasig.style.display=planillaVieja?'block':'none';
+    if(planillaVieja){
+      try{
+        usuariosU.forEach(u=>{
+          if(!('dipReasignado' in u)) u.dipReasignado='';
+          if(!('reasignado' in u)) u.reasignado=false;
+          if(!('email' in u)) u.email='';
+          if(!('cumpleRaw' in u)) u.cumpleRaw='';
+        });
+        localStorage.setItem('usuarios_garantias', JSON.stringify(usuariosU.map(u=>({...u, fVence:u.fVence?u.fVence.toISOString():null}))));
+        try{ if(window.APPIDataSync&&typeof window.APPIDataSync.saveKey==='function') window.APPIDataSync.saveKey('usuarios_garantias', localStorage.getItem('usuarios_garantias')); }catch(e){}
+      }catch(e){}
+    }
+    avisReasig.style.display='none';
   }
   // v814: el botón de filtro está siempre visible (aunque haya 0 reasignados).
   // Actualizar también total en statAll si existe

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v823-theme-bar';
+const CACHE_NAME = 'appi-v824-auto-migra';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
