@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v822-google-secret';
+const CACHE_NAME = 'appi-v823-theme-bar';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
