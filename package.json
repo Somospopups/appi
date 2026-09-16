@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "813.0.0",
-  "cacheName": "appi-v813-reasignados",
+  "version": "814.0.0",
+  "cacheName": "appi-v814-filtro-reasig",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

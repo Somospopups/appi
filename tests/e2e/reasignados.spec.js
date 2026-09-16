@@ -93,6 +93,26 @@ test('el filtro "solo reasignados" muestra únicamente esos usuarios (v813)', as
   await expect(page.locator('#usuariosList .tree-node')).toHaveCount(2);
 });
 
+test('el filtro Reasignados está siempre visible, aunque no haya ninguno (v814)', async ({ page }) => {
+  await base.entrar(page);
+  await page.evaluate(() => {
+    const sinReasig = [
+      { id: 0, usuario: 'PEDRO LUIZ', telf: '3515550456', domicilio: 'Av. 2 456', cp: '5000', localidad: 'Centro', producto: 'PSA Domus', serie: '', fCompra: '01/05/2025', fVenceRaw: '15/01/2027', fVence: '2027-01-15T00:00:00.000Z', email: '', dipReasignado: '', reasignado: false, estado: 'vigente', nombreNorm: 'pedro luiz' }
+    ];
+    localStorage.setItem('usuarios_garantias', JSON.stringify(sinReasig));
+    if (typeof window.recargarUsuariosDeStorage === 'function') window.recargarUsuariosDeStorage();
+    window.showView('view-usuarios');
+  });
+  const btn = page.locator('#usuariosBtnReasig');
+  await expect(btn).toBeVisible();
+  await expect(page.locator('#usuariosStReasig')).toHaveText('0');
+  // Filtrar con 0 reasignados muestra el estado vacío y se puede volver
+  await btn.click();
+  await expect(page.locator('#usuariosList')).toContainText('Sin usuarios con esos filtros');
+  await btn.click();
+  await expect(page.locator('#usuariosList .tree-node')).toHaveCount(1);
+});
+
 test('💬 WhatsApp de un reasignado ofrece el mensaje de recontacto primero (v813)', async ({ page }) => {
   await abrirUsuarios(page);
 

@@ -4590,7 +4590,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v813 · Segura</div>
+  <div class="ds-foot">APPI · v814 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -5475,7 +5475,7 @@ body.dark #pageTabs button.active{color:#c5d6ff}
         <button type="button" id="usuariosBtnTarjetas"><span>💳</span>Tarjetas</button>
         <button type="button" id="usuariosBtnOrdenVence"><span>📅</span>Ordenar</button>
         <button type="button" id="usuariosBtnZonas"><span>📍</span>Zonas</button>
-        <button type="button" id="usuariosBtnReasig" style="display:none"><span>↻</span>Reasignados (<b id="usuariosStReasig">0</b>)</button>
+        <button type="button" id="usuariosBtnReasig"><span>↻</span>Reasignados (<b id="usuariosStReasig">0</b>)</button>
         <button type="button" id="usuariosBtnMensajes"><span class="u-wa-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path fill="#25D366" d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2zm.01 1.67c2.2 0 4.26.86 5.82 2.42a8.19 8.19 0 0 1 2.41 5.83c0 4.54-3.7 8.23-8.24 8.23-1.48 0-2.93-.39-4.19-1.15l-.3-.17-3.12.82.83-3.04-.2-.32a8.2 8.2 0 0 1-1.26-4.38c0-4.54 3.7-8.24 8.25-8.24z"/><path fill="#25D366" d="M9.79 7.54c-.2 0-.52.07-.79.37-.26.3-1.02 1-1.02 2.43s1.04 2.82 1.19 3.01c.15.2 2.03 3.25 5.01 4.43 2.48.98 2.98.79 3.52.74.54-.05 1.73-.7 1.97-1.38.24-.67.24-1.25.17-1.37-.07-.12-.26-.2-.54-.35-.28-.15-1.73-.85-2-.95-.27-.1-.46-.15-.66.15s-.76.95-.93 1.14c-.17.2-.34.22-.63.07-.28-.14-1.2-.44-2.29-1.4-.85-.75-1.42-1.69-1.58-1.97-.17-.28-.02-.43.13-.58.13-.13.28-.34.43-.51.14-.17.19-.29.28-.48.1-.2.05-.36-.02-.51-.08-.14-.65-1.57-.9-2.15-.23-.55-.48-.48-.66-.48z"/></svg></span>Mensajes</button>
         <button type="button" id="usuariosBtnCambiarArchivo"><span>📂</span>Cambiar archivo</button>
         <button type="button" id="usuariosBtnDepurados"><span>🧹</span>Depurados</button>
@@ -13364,8 +13364,8 @@ function cerrarToolsMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='813';
-      const CACHE_NAME='appi-v813-reasignados';
+      const swVersion='814';
+      const CACHE_NAME='appi-v814-filtro-reasig';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · v'+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
@@ -16369,8 +16369,7 @@ function mostrarDashboardU(){
   const reasigTotal=usuariosU.filter(u=>u.reasignado).length;
   const stReasig=document.getElementById('usuariosStReasig');
   if(stReasig) stReasig.textContent=reasigTotal;
-  const btnReasig=document.getElementById('usuariosBtnReasig');
-  if(btnReasig) btnReasig.style.display=reasigTotal>0?'':'none';
+  // v814: el botón de filtro está siempre visible (aunque haya 0 reasignados).
   // Actualizar también total en statAll si existe
   renderZonasU();
   if(window.APPITarjetas&&window.APPITarjetas.montarBarraUsuarios) window.APPITarjetas.montarBarraUsuarios();
