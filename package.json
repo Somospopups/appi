@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "818.0.0",
-  "cacheName": "appi-v818-recordatorios",
+  "version": "819.0.0",
+  "cacheName": "appi-v819-google-calendar",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

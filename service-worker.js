@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v818-recordatorios';
+const CACHE_NAME = 'appi-v819-google-calendar';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
@@ -10,6 +10,7 @@ const APP_SHELL = [
   './appi-dialog.js',
   './appi-notif.js',
   './recordatorios-app.js',
+  './google-calendar.js',
   './telefono.js',
   './whatsapp-app.js',
   './auth-client.js',

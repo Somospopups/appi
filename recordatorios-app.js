@@ -255,8 +255,16 @@
       if (!permisoOk()) return false;
       var cuerpo = META[key] && META[key].build();
       if (cuerpo == null) cuerpo = META[key] ? META[key].titulo : 'APPI';
-      soltar(key, cuerpo, new Date());
-      return true;
+      // "Probar" siempre emite (acción explícita del usuario), sin dedupe.
+      try {
+        var o = opciones(key, cuerpo);
+        var o2 = Object.assign({}, o);
+        delete o2.actions;
+        new Notification('APPI', o2);
+        return true;
+      } catch (e) {
+        try { new Notification('APPI', { body: String(cuerpo).slice(0, 180) }); return true; } catch (e2) { return false; }
+      }
     },
     META: META,
     hoyLocal: hoyLocal
