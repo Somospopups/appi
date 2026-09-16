@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "817.0.0",
-  "cacheName": "appi-v817-sync-reasig",
+  "version": "818.0.0",
+  "cacheName": "appi-v818-recordatorios",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

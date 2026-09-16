@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v817-sync-reasig';
+const CACHE_NAME = 'appi-v818-recordatorios';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
@@ -9,6 +9,7 @@ const APP_SHELL = [
   './auth-config.js',
   './appi-dialog.js',
   './appi-notif.js',
+  './recordatorios-app.js',
   './telefono.js',
   './whatsapp-app.js',
   './auth-client.js',

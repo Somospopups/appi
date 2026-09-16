@@ -100,7 +100,8 @@ window.openStock=function(){
 <script src="./panel-atras.js"></script>
 <script src="./auth-config.js"></script>
 <script src="./appi-dialog.js?v=512"></script>
-<script src="./appi-notif.js?v=523"></script>
+<script src="./appi-notif.js?v=524"></script>
+<script src="./recordatorios-app.js?v=1"></script>
 <script src="./telefono.js"></script>
 <script src="./whatsapp-app.js"></script>
 <script src="./auth-client.js?v=441"></script>
@@ -4590,7 +4591,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v817 · Segura</div>
+  <div class="ds-foot">APPI · v818 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -5006,6 +5007,28 @@ body.dark #pageTabs button.active{color:#c5d6ff}
     </header>
     <div class="home-tool-grid" id="negGrid" style="padding:0 14px"></div>
     <div id="negWrap"></div>
+  </section>
+
+  <!-- v818: Recordatorios del teléfono (Mi Perfil → Notificaciones y recordatorios) -->
+  <section id="view-recordatorios" class="view">
+    <header class="top">
+      <button class="back-btn" onclick="showView('view-home')" aria-label="Volver">‹</button>
+      <h1>Notificaciones</h1>
+      <div class="script">recordatorios del teléfono</div>
+    </header>
+    <div style="padding:0 14px 24px">
+      <div style="padding:10px 14px;border-radius:14px;background:rgba(91,141,239,0.10);border:1px solid rgba(91,141,239,0.18);font-size:11.5px;font-weight:600;color:#3d63c9;line-height:1.45">
+        🔔 Estos avisos salen del teléfono (Android e iPhone) aunque APPI esté cerrada. Se programan solos cada vez que abrís la app.
+      </div>
+      <div id="recPermisosHint" style="display:none;margin-top:10px;padding:10px 14px;border-radius:14px;background:rgba(245,179,1,0.14);border:1px solid rgba(245,179,1,0.35);font-size:11.5px;font-weight:600;color:#7a5b06;line-height:1.45">
+        ⚠️ Primero tocá <b>Activar avisos</b> para dar el permiso del teléfono.
+        <div><button type="button" id="recBtnPermiso" style="margin-top:7px;padding:7px 14px;border-radius:10px;border:1px solid rgba(122,91,6,0.4);background:#fff;color:#7a5b06;font:inherit;font-size:11px;font-weight:800;cursor:pointer">Activar avisos</button></div>
+      </div>
+      <div id="recList" style="margin-top:12px;display:flex;flex-direction:column;gap:8px"></div>
+      <div style="margin-top:14px;font-size:10.5px;color:#777887;font-weight:600;line-height:1.5">
+        En iPhone, si no te llegan: compartí la app → "Agregar a pantalla de inicio" y activá los avisos desde Ajustes del teléfono.
+      </div>
+    </div>
   </section>
 
   <section id="view-herramientas" class="view">
@@ -13050,6 +13073,15 @@ function abrirCuentaDesdeMenu(){
 
       <!-- Sincronización oculto a pedido -->
 
+      <!-- v818: Notificaciones y recordatorios del teléfono -->
+      <div>
+        <div class="ios-section-header">Avisos</div>
+        <div class="ios-group">
+          <button type="button" class="ios-action" id="btnAccountRecordatorios"><div class="ios-row-icon" style="background:#34c759">🔔</div><span class="ios-action-title">Notificaciones y recordatorios</span><span class="ios-chevron">›</span></button>
+        </div>
+        <div class="ios-desc">Cumpleaños, acciones del día, garantías por vencer y reasignados: avisos programados que salen del teléfono.</div>
+      </div>
+
       <!-- Acciones cuenta iOS -->
       <div>
         <div class="ios-section-header">Cuenta</div>
@@ -13154,6 +13186,8 @@ function abrirCuentaDesdeMenu(){
     }catch(e){}
     if(sync)sync.onclick=async()=>{sync.disabled=true;sync.textContent='Sincronizando…';try{await window.APPIDataSync.syncNow(true);showToast('Cuenta sincronizada ☁️',2200);modal.close()}catch(error){showToast(error.message||'No se pudo sincronizar',3500);sync.disabled=false;sync.textContent='☁️ Sincronizar ahora'}};
     if(devices)devices.onclick=()=>window.APPIDeviceBridge&&window.APPIDeviceBridge.openManager();
+    const recBtn=document.getElementById('btnAccountRecordatorios');
+    if(recBtn)recBtn.onclick=()=>{ try{modal.close()}catch(e){}; try{window.showView('view-recordatorios')}catch(e){} };
     if(password)password.onclick=abrirCambioPasswordAPPI;
     if(logout)logout.onclick=async()=>{if(!await window.APPIDialog.confirm('¿Cerrar sesión en este dispositivo?',{title:'Cerrar sesión',icon:'↪',okText:'Cerrar sesión'}))return;logout.disabled=true;try{await window.APPIDataSync.logoutAndLock({removeCache:false});location.reload()}catch(error){showToast(error.message,3500);logout.disabled=false}};
     // Cerrar y borrar oculto
@@ -13372,8 +13406,8 @@ function cerrarToolsMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='817';
-      const CACHE_NAME='appi-v817-sync-reasig';
+      const swVersion='818';
+      const CACHE_NAME='appi-v818-recordatorios';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · v'+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
@@ -16326,6 +16360,7 @@ function cargarArchivoU(file){
         }
         usuariosU=depuradosAplicar(parsed);
         window.usuariosU=usuariosU;
+        try{ window.dispatchEvent(new Event('appi-usuarios-cambiaron')); }catch(e){}
         const depuradosIgnorados=parsed.length-usuariosU.length;
         if(depuradosIgnorados>0 && infoEl) infoEl.innerHTML=`✅ <b>${usuariosU.length}</b> usuarios cargados · 🧹 ${depuradosIgnorados} depurado${depuradosIgnorados===1?'':'s'} ignorado${depuradosIgnorados===1?'':'s'}`;
         try{ 
@@ -16667,6 +16702,8 @@ function initUsuarios(){
         usuariosU=depuradosAplicar(saved.map(u=>({...u, cumpleRaw:fechaDeCeldaU(u.cumpleRaw||u.cumple||''), fVence:u.fVence? new Date(u.fVence):null, estado:u.fVence? ( (new Date(u.fVence)-new Date())/(1000*60*60*24)<0?'vencida': ( (new Date(u.fVence)-new Date())/(1000*60*60*24)<=30?'porVencer':'vigente')):'vigente'})));
         window.usuariosU=usuariosU;
         mostrarDashboardU();
+        try{ window.dispatchEvent(new Event('appi-usuarios-cambiaron')); }catch(e){}
+
         const info=document.getElementById('usuariosFileInfo');
         if(info){ info.style.display='block'; info.innerHTML=`💾 ${usuariosU.length} usuarios recuperados de memoria`; }
         const bc=document.getElementById('usuariosBtnClear');
@@ -18119,6 +18156,8 @@ async function sincronizarGarantiasPSA(creds, done){
       } else {
         window.usuariosU = parsed;
         if(typeof window.mostrarDashboardU === 'function') window.mostrarDashboardU();
+        try{ window.dispatchEvent(new Event('appi-usuarios-cambiaron')); }catch(e){}
+
       }
 
       psaActualizarTimestampsLocal();

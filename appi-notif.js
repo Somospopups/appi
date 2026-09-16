@@ -130,6 +130,15 @@
         else if (typeof window.openHistorico === 'function') window.openHistorico();
       } catch (e) {}
     }
+    // v818: recordatorios programados → a la vista que cada uno mira.
+    var recView = String(d.rec_view || '');
+    if (!recView) {
+      var mRec = String(url).match(/[?&]rec=(view-[a-z0-9-]+)/i);
+      if (mRec) recView = mRec[1];
+    }
+    if (recView && /^view-/.test(recView)) {
+      try { if (typeof showView === 'function') showView(recView); } catch (e) {}
+    }
   }
 
   function estilosPopup() {
