@@ -210,6 +210,23 @@
       '.lp-sheet h2{margin:0;font-size:16px;font-weight:950;color:#2a2a32}' +
       '.lp-sheet-top{display:flex;align-items:center;justify-content:space-between;margin:0 0 10px}' +
       '.lp-sheet-top button{border:0;background:transparent;font-size:22px;line-height:1;color:#2a2a32;cursor:pointer}' +
+      '.lp-gan{margin:0 0 12px;border:1px solid rgba(11,88,120,.22);border-radius:14px;background:linear-gradient(135deg,rgba(11,88,120,.07),rgba(58,208,164,.10));padding:10px 12px}' +
+      '.lp-gan-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px}' +
+      '.lp-gan-head b{font-size:11px;font-weight:950;color:#0b5878;letter-spacing:.4px}' +
+      '.lp-gan-head span{font-size:10px;color:#686977}' +
+      '.lp-gan-num{font-size:24px;font-weight:950;color:#0b5878;margin:2px 0 6px}' +
+      '.lp-gan-num i{font-style:normal;font-size:11px;font-weight:850;color:#23826b;margin-left:8px}' +
+      '.lp-gan-detalle{display:flex;flex-direction:column;gap:2px;margin-bottom:6px;max-height:96px;overflow:auto}' +
+      '.lp-gan-detalle span{font-size:11px;color:#4a4b57}' +
+      '.lp-gan-detalle b{color:#0b5878}' +
+      '.lp-gan-detalle em{font-style:normal;font-size:9px;background:#fff3cd;color:#8a6d1a;padding:1px 5px;border-radius:6px;font-weight:850}' +
+      '.lp-gan-foot{font-size:10px;color:#85889a;margin-bottom:8px;line-height:1.4}' +
+      '.lp-gan-saldo{font-size:10px;font-weight:800;color:#23826b;margin-bottom:8px}' +
+      '.lp-gan-wa{width:100%;border:0;border-radius:12px;background:#23826b;color:#fff;font-size:13px;font-weight:950;padding:10px 0;cursor:pointer}' +
+      'body.dark .lp-gan{background:rgba(11,88,120,.18);border-color:rgba(58,208,164,.35)}' +
+      'body.dark .lp-gan-head b,body.dark .lp-gan-num,body.dark .lp-gan-num i{color:#3ad0a4}' +
+      'body.dark .lp-gan-detalle span{color:#c9cbdb}' +
+      'body.dark .lp-gan-detalle b{color:#3ad0a4}' +
       '.lp-para{width:100%;min-height:42px;border:1px solid rgba(196,164,92,.45);border-radius:12px;padding:8px 10px;font:inherit;font-size:14px;background:#faf6ee;margin:0 0 10px}' +
       '.lp-line{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid rgba(42,42,50,.08)}' +
       '.lp-line b{flex:1;font-size:13px;font-weight:850;color:#2a2a32}' +
@@ -286,6 +303,7 @@
       sh.setAttribute('aria-hidden', 'true');
       sh.innerHTML = '<div class="lp-sheet" role="dialog" aria-label="Presupuesto">' +
         '<div class="lp-sheet-top"><h2>Presupuesto</h2><button type="button" data-cerrar aria-label="Cerrar">×</button></div>' +
+        '<div id="lpSheetGanancia"></div>' +
         '<div id="lpSheetLines"></div>' +
         '<div class="lp-tot" id="lpSheetTot"></div>' +
         '<div class="lp-sec">Pago</div>' +
@@ -699,6 +717,7 @@
         '<b>' + esc(ln.p.nombre) + '</b><span>' + money(ln.q * ln.p.precio) + '</span></div>';
     }).join('');
     if (tot) tot.textContent = 'Total ' + money(r.tot);
+    pintarGanancia();
     pintarPago();
     var eco = $('lpEco'); if (eco) eco.innerHTML = '';
     var pdfBtn = $('lpSheetPdf'); if (pdfBtn && !pdfBtn.disabled) pdfBtn.textContent = 'Cotizar';
@@ -709,6 +728,7 @@
     if (!sh) return;
     pintarSheet();
     sh.classList.add('open');
+    cargarPerfil();
     sh.setAttribute('aria-hidden', 'false');
     setTimeout(function () { hintChips($('lpBancos')); }, 280);
     var clr = $('lpSheetClear');
@@ -1404,12 +1424,14 @@
     var supaPlan = cfg ? cfg.url + '/storage/v1/object/public/catalogo-psa/psa-planes.json' + bust : null;
     var pCat = supaCat ? fetch(supaCat, { cache:'no-store' }).then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; }) : Promise.resolve(null);
     var pPlanS = supaPlan ? fetch(supaPlan, { cache:'no-store' }).then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; }) : Promise.resolve(null);
+    var pGan = fetch('./psa-ganancias.json' + bust, { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; });
     Promise.all([ pCat,
       pPlanS,
+      pGan,
       fetch('./psa-catalogo.json' + bust, { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }),
       fetch('./psa-planes.json' + bust, { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; })
     ]).then(function (arr) {
-      var supaCatJ = arr[0], supaPlanJ = arr[1], fileCat = arr[2], filePlan = arr[3];
+      var supaCatJ = arr[0], supaPlanJ = arr[1], ganJ = arr[2], fileCat = arr[3], filePlan = arr[4];
       var catElegido = null;
       if(supaCatJ && supaCatJ.productos) catElegido = supaCatJ;
       else if(fileCat && fileCat.productos) catElegido = fileCat;
@@ -1418,8 +1440,10 @@
       else if(filePlan && (filePlan.cuotas || filePlan.bancos)) planElegido = filePlan;
       if (catElegido) CAT = catElegido;
       if (planElegido) PLANES = planElegido;
+      if (ganJ && ganJ.productos) GAN = ganJ;
+      GAN_STATE = GAN ? 'ok' : 'fail';
       if (done) done();
-    }).catch(function () { if (done) done(); });
+    }).catch(function () { GAN_STATE = 'fail'; if (done) done(); });
   }
 
   function abrirLista() {
@@ -1436,6 +1460,133 @@
       bind();
       pintarTodo();
     });
+  }
+
+  /* ===== v827 · Tu ganancia (SOLO para el distribuidor): margen real del
+     presupuesto con las listas oficiales de PSA (psa-ganancias.json) + la
+     columna de costo de SU cuenta (perfil sincronizado desde PSA).
+     NUNCA se imprime en el PDF que ve el cliente. ===== */
+  var LS_PERFIL = 'appi_dip_perfil_v1';
+  var GAN = null;
+  var GAN_STATE = 'loading';
+  var PERFIL = null;
+  function perfilLoad() {
+    try {
+      var j = JSON.parse(localStorage.getItem(LS_PERFIL) || 'null');
+      if (j && j.perfil && j.ts) PERFIL = j.perfil;
+    } catch (e) {}
+  }
+  function perfilSave(perfil) {
+    try { localStorage.setItem(LS_PERFIL, JSON.stringify({ ts: Date.now(), perfil: perfil })); } catch (e) {}
+    PERFIL = perfil;
+  }
+  function perfilFresco() {
+    try {
+      var j = JSON.parse(localStorage.getItem(LS_PERFIL) || 'null');
+      return !!(j && j.ts && (Date.now() - j.ts) < 24 * 3600 * 1000 && j.perfil);
+    } catch (e) { return false; }
+  }
+  function cargarPerfil(force) {
+    perfilLoad();
+    if (!force && perfilFresco()) { pintarGanancia(); return; }
+    var cfg = supabaseCfg();
+    var creds = null;
+    try { creds = JSON.parse(localStorage.getItem('appsi_psa_creds') || 'null'); } catch (e) {}
+    if (!cfg || !creds || !creds.center || !creds.number || !creds.password) { pintarGanancia(); return; }
+    fetch(cfg.url + '/functions/v1/consulta-serial', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'apikey': cfg.anonKey, 'Authorization': 'Bearer ' + (tokenActual() || cfg.anonKey) },
+      body: JSON.stringify({ action: 'perfil', center: creds.center, number: creds.number, password: creds.password })
+    }).then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+      .then(function (res) { if (res.ok && res.j && res.j.ok && res.j.perfil) perfilSave(res.j.perfil); pintarGanancia(); })
+      .catch(function () { pintarGanancia(); });
+  }
+  function columnaPerfil() {
+    var f = PERFIL || {};
+    var trib = String(f.tributaria || '').toLowerCase();
+    var cat = String(f.categoria || '').toLowerCase();
+    var t = (trib.indexOf('no cat') >= 0 || trib.indexOf('no insc') >= 0) ? 'nc' : 'ri';
+    var c = !cat ? 'c'
+      : (cat.indexOf('lider') >= 0 || cat.indexOf('coordinador') >= 0 || cat.indexOf('calificado') >= 0) ? 'c'
+      : (cat.indexOf('junior') >= 0) ? 'j' : 'd';
+    return t + '_' + c;
+  }
+  function entradaGanancia(p) {
+    if (!GAN || !GAN.productos) return null;
+    var keys = [];
+    if (p.sku) keys.push(p.sku);
+    var base = String(p.nombre || '').replace(/\s*\(PLAN CANJE\)\s*$/i, '').trim();
+    keys.push('n:' + base.toLowerCase());
+    for (var i = 0; i < keys.length; i++) { var e = GAN.productos[keys[i]]; if (e) return e; }
+    return null;
+  }
+  function gananciaResumen() {
+    var r = resumen();
+    var col = columnaPerfil();
+    var colLab = (GAN && GAN.columnas && GAN.columnas[col]) || col;
+    var total = 0, cobro = 0, lineas = [], faltan = 0;
+    r.lineas.forEach(function (ln) {
+      var p = ln.p, q = ln.q;
+      var e = entradaGanancia(p);
+      var fuentes = e ? (p.canje ? (e.costos_canje || e.costos) : e.costos) : null;
+      var costo = fuentes ? Number(fuentes[col]) || 0 : 0;
+      var estimado = !fuentes || !costo;
+      if (estimado) { costo = Number(p.precio) * 0.70; faltan++; }
+      var ganU = Number(p.precio) - costo;
+      var g = ganU * q;
+      total += g; cobro += Number(p.precio) * q;
+      lineas.push({ nombre: p.nombre, q: q, gan: g, ganU: ganU, costo: costo, estimado: estimado });
+    });
+    return {
+      total: total, cobro: cobro, margen: cobro > 0 ? (total / cobro) : 0,
+      lineas: lineas, faltan: faltan, col: col, colLab: colLab, perfil: !!PERFIL,
+      saldo: (PERFIL || {}).saldo || 0, dev: (PERFIL || {}).ultimaDevolucion || null,
+      vigencia: (GAN && GAN.vigencia) || ''
+    };
+  }
+  function msgGanancia(g) {
+    var L = ['🔒 *Tu ganancia (presupuesto)* — solo para vos'];
+    L.push('Cobro total: $' + Math.round(g.cobro).toLocaleString('es-AR'));
+    L.push('*Ganancia: $' + Math.round(g.total).toLocaleString('es-AR') + ' (' + Math.round(g.margen * 100) + '%)*');
+    g.lineas.forEach(function (l) {
+      L.push('• ' + l.q + '× ' + String(l.nombre).replace(/\s*\(PLAN CANJE\)\s*$/i, '') + ': $' + Math.round(l.ganU).toLocaleString('es-AR') + '/u' + (l.estimado ? ' (est. 30%)' : ''));
+    });
+    L.push('Costo: ' + g.colLab + (g.vigencia ? ' · Lista PSA ' + g.vigencia : ''));
+    L.push(new Date().toLocaleDateString('es-AR'));
+    return L.join('\n');
+  }
+  function enviarGananciaWa() {
+    var g = gananciaResumen();
+    if (!g.lineas.length) return;
+    // Convención de la app: solo telefono.js arma números (APPITel.link).
+    var f = PERFIL || {};
+    var url = (window.APPITel && window.APPITel.link) ? window.APPITel.link(f.telefono || '', msgGanancia(g)) : '';
+    if (url) window.open(url, '_blank', 'noopener');
+  }
+  function pintarGanancia() {
+    var host = $('lpSheetGanancia');
+    if (!host) return;
+    var r = resumen();
+    if (!r.lineas.length) { host.innerHTML = ''; return; }
+    if (GAN_STATE === 'loading') {
+      host.innerHTML = '<div class="lp-gan"><div class="lp-gan-foot">🔒 Calculando tu ganancia con las listas de PSA…</div></div>';
+      return;
+    }
+    var g = gananciaResumen();
+    var pct = Math.round(g.margen * 100);
+    var html = '<div class="lp-gan">' +
+      '<div class="lp-gan-head"><b>🔒 SOLO PARA VOS</b><span>tú nunca ves esto · solo el distribuidor</span></div>' +
+      '<div class="lp-gan-num">$' + Math.round(g.total).toLocaleString('es-AR') + '<i>≈ ' + pct + '% del total</i></div>' +
+      '<div class="lp-gan-detalle">' + g.lineas.map(function (l) {
+        return '<span>' + l.q + '× ' + esc(String(l.nombre).replace(/\s*\(PLAN CANJE\)\s*$/i, '')) + ' <b>$' + Math.round(l.ganU).toLocaleString('es-AR') + '/u</b>' + (l.estimado ? ' <em>est. 30%</em>' : '') + '</span>';
+      }).join('') + '</div>' +
+      '<div class="lp-gan-foot">Costo: ' + esc(g.colLab) + (g.vigencia ? ' · Lista PSA ' + esc(g.vigencia) : '') + (g.faltan ? ' · ' + g.faltan + ' ítem(s) sin lista (estimados al 30%)' : '') + '</div>' +
+      (g.saldo ? '<div class="lp-gan-saldo">💳 Saldo en tu cuenta PSA: $' + Math.round(g.saldo).toLocaleString('es-AR') + (g.dev ? ' · última devolución ' + esc(g.dev.fecha) : '') + ' · la pedís del 1° al 5 (se acredita el 12)</div>' : '') +
+      '<button type="button" class="lp-gan-wa" data-wa>📲 Enviarme a WhatsApp</button>' +
+      '</div>';
+    host.innerHTML = html;
+    var wa = host.querySelector('[data-wa]');
+    if (wa) wa.onclick = enviarGananciaWa;
   }
 
   window.abrirLista = abrirLista;

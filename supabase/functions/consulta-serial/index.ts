@@ -253,6 +253,58 @@ function parsearGarantias(html: string): Fila[] {
   return out;
 }
 
+/* ===== Perfil del distribuidor (v827) =====
+   1) saldo en cuenta corriente    → dip autoconsulta idx=32
+   2) última devolución de saldos  → dip idx=51 (CuentaCorriente)
+   3) categoría / tributaria / tel → minegocio.psa.com.ar /account (SSO)  */
+
+/** "1.234.567,89" | "1234567,89" | "1234.56" → number */
+function numAR(raw: string): number {
+  const clean = String(raw || '').replace(/[^0-9.,]/g, '');
+  if (!clean) return 0;
+  const lastComma = clean.lastIndexOf(','), lastDot = clean.lastIndexOf('.');
+  let int = clean, dec = '0';
+  if (lastComma > lastDot) { int = clean.slice(0, lastComma).replace(/\./g, ''); dec = clean.slice(lastComma + 1); }
+  else if (lastDot > -1 && clean.slice(lastDot + 1).length === 2) { int = clean.slice(0, lastDot).replace(/\./g, ''); dec = clean.slice(lastDot + 1); }
+  else { int = clean.replace(/[.,]/g, ''); }
+  const n = parseFloat(int + '.' + dec);
+  return isNaN(n) ? 0 : n;
+}
+
+/** SSO a minegocio.psa.com.ar (misma familia que dip: mi → app → login?p=token).
+ *  Devuelve el HTML del /account o null si la sesión no calza. */
+async function ssoMinegocio(mi: Jar): Promise<string | null> {
+  const mn: Jar = {};
+  const hop = async (url: string, jar: Jar, withMi: boolean): Promise<string | null> => {
+    const h: Record<string, string> = { 'User-Agent': UA };
+    if (jar['PHPSESSID'] || jar['PSA_AC'] || jar['minegocio_session']) h['Cookie'] = cookieH(jar);
+    if (withMi) h['Cookie'] = cookieH(mi);
+    const r = await fetch(url, { headers: h, redirect: 'manual' });
+    putCookies(r.headers, mn);
+    return r.headers.get('location');
+  };
+  try {
+    let loc = await hop('https://minegocio.psa.com.ar/', mn, false);
+    if (!loc) return null;
+    let u = new URL(loc, 'https://minegocio.psa.com.ar/').href;
+    for (let i = 0; i < 7 && loc; i++) {
+      if (u.startsWith('https://mi.psa.com.ar')) {
+        loc = await hop(u, mn, true);
+        if (loc) u = new URL(loc, u).href;
+      } else {
+        loc = await hop(u, mn, false);
+        if (loc) u = new URL(loc, u).href;
+      }
+    }
+    const ra = await fetch('https://minegocio.psa.com.ar/account', { headers: { 'User-Agent': UA, Cookie: cookieH(mn) }, redirect: 'manual' });
+    const html = decodificarLatin1(new Uint8Array(await ra.arrayBuffer()));
+    if (!/Categor/i.test(html)) return null;
+    return html;
+  } catch (_) {
+    return null;
+  }
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
   if (req.method !== 'POST') return json({ error: 'Método no permitido.' }, 405);
@@ -280,7 +332,7 @@ Deno.serve(async (req) => {
   let body: any;
   try { body = await req.json(); } catch (_) { body = {}; }
   const serie = normSerie(body.serie || '');
-  if (body.action !== 'report' && body.action !== 'bonos' && serie.length < 4) return json({ error: 'Escribí el número de serie (el del QR de la base).' }, 400);
+  if (body.action !== 'report' && body.action !== 'bonos' && body.action !== 'perfil' && serie.length < 4) return json({ error: 'Escribí el número de serie (el del QR de la base).' }, 400);
 
   // Credenciales PSA: las trae la app (sección MI PSA) o secrets del proyecto.
   const center = String(body.center || Deno.env.get('PSA_CENTER') || '').trim();
@@ -336,6 +388,41 @@ Deno.serve(async (req) => {
       return json({ error: 'PSA todavía no calculó los bonos de ese período (o cambió el formato del reporte).' }, 502);
     }
     return json({ ok: true, bonos });
+  }
+
+  /* ===== v827 · PERFIL DEL DISTRIBUIDOR (0 interacción del user) ===== */
+  if (body.action === 'perfil') {
+    let saldo = 0;
+    try {
+      const rs = await dipReq(DIP_EXEC + '?idx=32&periodo=' + periodoActualBA() + '&Consulta=SaldoEnCuenta');
+      const ts = decodificarLatin1(new Uint8Array(await rs.arrayBuffer()));
+      const m = ts.match(/SALDO DISPONIBLE A LA FECHA[^0-9]{0,24}([0-9][0-9.,]*)/i);
+      if (m) saldo = numAR(m[1]);
+    } catch (_) {}
+    let ultimaDevolucion: { fecha: string; importe: number } | null = null;
+    try {
+      const rc = await dipReq(DIP_EXEC + '?idx=51&periodo=' + periodoActualBA() + '&Consulta=CuentaCorriente');
+      const tc = decodificarLatin1(new Uint8Array(await rc.arrayBuffer()));
+      const all = [...tc.matchAll(/(\d{2}\/\d{2}\/\d{4})\s+Devoluci[oó]n de saldos\s*\[[^\]]*\]\s+([0-9][0-9.,]*)/g)];
+      if (all.length) {
+        const u = all[all.length - 1];
+        ultimaDevolucion = { fecha: u[1], importe: numAR(u[2]) };
+      }
+    } catch (_) {}
+    let categoria = '', tributaria = '', telefono = '';
+    try {
+      const htmlMn = await ssoMinegocio(mi);
+      if (htmlMn) {
+        const t = decodificarHtml(htmlMn);
+        const mc = t.match(/Categor[ií]a Comercial\s+([A-ZÁÉÍÓÚÑ ]+?)\s+Categor/i);
+        if (mc) categoria = mc[1].trim();
+        const mt = t.match(/Categor[ií]a Tributaria\s+([A-Za-zÁÉÍÓÚñ ]+?)\s+Sucursal/i);
+        if (mt) tributaria = mt[1].trim();
+        const mtel = t.match(/Tel[eé]fono celular\s*\+?(\d[\d\s-]{6,20})/);
+        if (mtel) telefono = '+' + mtel[1].replace(/[\s-]/g, '');
+      }
+    } catch (_) {}
+    return json({ ok: true, perfil: { categoria, tributaria, telefono, saldo, ultimaDevolucion, ts: new Date().toISOString() } });
   }
 
   // 3) Formulario del reporte Garantías → trae centro/dip/clave del DIP logueado

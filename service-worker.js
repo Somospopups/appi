@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v825-sin-google';
+const CACHE_NAME = 'appi-v827-ganancia-presu';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
@@ -10,6 +10,7 @@ const APP_SHELL = [
   './appi-dialog.js',
   './appi-notif.js',
   './recordatorios-app.js',
+  './reporte-bonos.js',
   './telefono.js',
   './whatsapp-app.js',
   './auth-client.js',
@@ -100,7 +101,7 @@ self.addEventListener('fetch', event => {
   if (url.origin !== self.location.origin) return;
 
   // Precios de lista: siempre la red, nunca el cache del SW.
-  if (/\/psa-(precios|catalogo|planes)\.json$/.test(url.pathname)) {
+  if (/\/psa-(precios|catalogo|planes|ganancias)\.json$/.test(url.pathname)) {
     event.respondWith(
       fetch(event.request, { cache: 'no-store' }).catch(function(){
         return new Response('{}', { status: 503, headers: { 'Content-Type': 'application/json' } });

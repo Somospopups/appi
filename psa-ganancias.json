@@ -1,0 +1,4722 @@
+{
+  "actualizado": "16-SEP-2026",
+  "vigencia": "9-SEP-2026",
+  "fuente": {
+    "contado": "https://dip.psa.com.ar/adjuntos/Image/promociones/exterior/listas-precios/vigente/argentina/argentina-contado-unificado.pdf",
+    "sugeridos": "https://dip.psa.com.ar/adjuntos/Image/promociones/exterior/listas-precios/vigente/argentina/argentina-sugeridos-con-acuerdo.pdf"
+  },
+  "columnas": {
+    "ri_j": "RI/Mono · Dist. Junior",
+    "ri_d": "RI/Mono · Distrib.",
+    "ri_c": "RI/Mono · DC/CE/LE",
+    "nc_j": "No Cat. · Junior",
+    "nc_d": "No Cat. · Distrib.",
+    "nc_c": "No Cat. · DC/CE/LE"
+  },
+  "productos": {
+    "n:ablandador psa domus": {
+      "nombre": "ABLANDADOR PSA DOMUS",
+      "pb": 3.8,
+      "publico": 2782000.0,
+      "costos": {
+        "ri_j": 2214300.0,
+        "ri_d": 2214300.0,
+        "ri_c": 2214300.0,
+        "nc_j": 2446801.5,
+        "nc_d": 2446801.5,
+        "nc_c": 2446801.5
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:ablandador psa domus + instalacion": {
+      "nombre": "ABLANDADOR PSA DOMUS + INSTALACION",
+      "pb": 3.8,
+      "publico": 2961000.0,
+      "costos": {
+        "ri_j": 2357080.0,
+        "ri_d": 2357080.0,
+        "ri_c": 2357080.0,
+        "nc_j": 2604573.4,
+        "nc_d": 2604573.4,
+        "nc_c": 2604573.4
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:ablandador psa mini domus": {
+      "nombre": "ABLANDADOR PSA MINI DOMUS",
+      "pb": 3.5,
+      "publico": 2198000.0,
+      "costos": {
+        "ri_j": 1750870.0,
+        "ri_d": 1750870.0,
+        "ri_c": 1750870.0,
+        "nc_j": 1934711.35,
+        "nc_d": 1934711.35,
+        "nc_c": 1934711.35
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:ablandador psa mini domus + instalacion": {
+      "nombre": "ABLANDADOR PSA MINI DOMUS + INSTALACION",
+      "pb": 3.5,
+      "publico": 2369000.0,
+      "costos": {
+        "ri_j": 1891230.0,
+        "ri_d": 1891230.0,
+        "ri_c": 1891230.0,
+        "nc_j": 2089809.15,
+        "nc_d": 2089809.15,
+        "nc_c": 2089809.15
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "611010510": {
+      "nombre": "PSA SENIOR 4 BIANCO + KIT POSV.",
+      "pb": 3.3,
+      "publico": 950000.0,
+      "costos": {
+        "ri_j": 612260.0,
+        "ri_d": 593892.2,
+        "ri_c": 569401.8,
+        "nc_j": 676547.3,
+        "nc_d": 656250.88,
+        "nc_c": 629188.99
+      },
+      "publico_canje": 855000.0,
+      "costos_canje": {
+        "ri_j": 551034.0,
+        "ri_d": 534502.98,
+        "ri_c": 512461.62,
+        "nc_j": 608892.57,
+        "nc_d": 590625.79,
+        "nc_c": 566270.09
+      }
+    },
+    "611010550": {
+      "nombre": "PSA SENIOR 4 BM + KIT POSV",
+      "pb": 2.9,
+      "publico": 840000.0,
+      "costos": {
+        "ri_j": 539660.0,
+        "ri_d": 523470.2,
+        "ri_c": 501883.8,
+        "nc_j": 596324.3,
+        "nc_d": 578434.57,
+        "nc_c": 554581.6
+      },
+      "publico_canje": 756000.0,
+      "costos_canje": {
+        "ri_j": 485694.0,
+        "ri_d": 471123.18,
+        "ri_c": 451695.42,
+        "nc_j": 536691.87,
+        "nc_d": 520591.11,
+        "nc_c": 499123.44
+      }
+    },
+    "611010560": {
+      "nombre": "PSA SENIOR 4 GRIGIO + KIT POSV",
+      "pb": 3.3,
+      "publico": 950000.0,
+      "costos": {
+        "ri_j": 612260.0,
+        "ri_d": 593892.2,
+        "ri_c": 569401.8,
+        "nc_j": 676547.3,
+        "nc_d": 656250.88,
+        "nc_c": 629188.99
+      },
+      "publico_canje": 855000.0,
+      "costos_canje": {
+        "ri_j": 551034.0,
+        "ri_d": 534502.98,
+        "ri_c": 512461.62,
+        "nc_j": 608892.57,
+        "nc_d": 590625.79,
+        "nc_c": 566270.09
+      }
+    },
+    "611010530": {
+      "nombre": "PSA SENIOR 4 NERO + KIT POSV.",
+      "pb": 3.3,
+      "publico": 950000.0,
+      "costos": {
+        "ri_j": 612260.0,
+        "ri_d": 593892.2,
+        "ri_c": 569401.8,
+        "nc_j": 676547.3,
+        "nc_d": 656250.88,
+        "nc_c": 629188.99
+      },
+      "publico_canje": 855000.0,
+      "costos_canje": {
+        "ri_j": 551034.0,
+        "ri_d": 534502.98,
+        "ri_c": 512461.62,
+        "nc_j": 608892.57,
+        "nc_d": 590625.79,
+        "nc_c": 566270.09
+      }
+    },
+    "611010580": {
+      "nombre": "PSA SENIOR BIANCO + KIT POSV.",
+      "pb": 2.7,
+      "publico": 781000.0,
+      "costos": {
+        "ri_j": 502150.0,
+        "ri_d": 487085.5,
+        "ri_c": 466999.5,
+        "nc_j": 554875.75,
+        "nc_d": 538229.48,
+        "nc_c": 516034.45
+      },
+      "publico_canje": 702900.0,
+      "costos_canje": {
+        "ri_j": 451935.0,
+        "ri_d": 438376.95,
+        "ri_c": 420299.55,
+        "nc_j": 499388.18,
+        "nc_d": 484406.53,
+        "nc_c": 464431.0
+      }
+    },
+    "611020010": {
+      "nombre": "PSA 1-P PORTATIL",
+      "pb": 0.35,
+      "publico": 127000.0,
+      "costos": {
+        "ri_j": 86212.5,
+        "ri_d": 83626.13,
+        "ri_c": 80177.63,
+        "nc_j": 95264.81,
+        "nc_d": 92406.87,
+        "nc_c": 88596.28
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "611030430": {
+      "nombre": "PSA C3 GRIGIO",
+      "pb": 0.55,
+      "publico": 216000.0,
+      "costos": {
+        "ri_j": 150040.0,
+        "ri_d": 145538.8,
+        "ri_c": 139537.2,
+        "nc_j": 165794.2,
+        "nc_d": 160820.37,
+        "nc_c": 154188.61
+      },
+      "publico_canje": 194400.0,
+      "costos_canje": {
+        "ri_j": 135036.0,
+        "ri_d": 130984.92,
+        "ri_c": 125583.48,
+        "nc_j": 149214.78,
+        "nc_d": 144738.34,
+        "nc_c": 138769.75
+      }
+    },
+    "n:psa duo sm bianco (sin purificador)": {
+      "nombre": "PSA DUO SM BIANCO (SIN PURIFICADOR)",
+      "pb": null,
+      "publico": 1600000.0,
+      "costos": {
+        "ri_j": 1331000.0,
+        "ri_d": 1331000.0,
+        "ri_c": 1331000.0,
+        "nc_j": 1470755.0,
+        "nc_d": 1470755.0,
+        "nc_c": 1470755.0
+      },
+      "publico_canje": 1520000.0,
+      "costos_canje": {
+        "ri_j": 1264450.0,
+        "ri_d": 1264450.0,
+        "ri_c": 1264450.0,
+        "nc_j": 1397217.25,
+        "nc_d": 1397217.25,
+        "nc_c": 1397217.25
+      }
+    },
+    "n:psa duo pie bianco (sin purificador)": {
+      "nombre": "PSA DUO PIE BIANCO (SIN PURIFICADOR)",
+      "pb": null,
+      "publico": 1600000.0,
+      "costos": {
+        "ri_j": 1331000.0,
+        "ri_d": 1331000.0,
+        "ri_c": 1331000.0,
+        "nc_j": 1470755.0,
+        "nc_d": 1470755.0,
+        "nc_c": 1470755.0
+      },
+      "publico_canje": 1520000.0,
+      "costos_canje": {
+        "ri_j": 1264450.0,
+        "ri_d": 1264450.0,
+        "ri_c": 1264450.0,
+        "nc_j": 1397217.25,
+        "nc_d": 1397217.25,
+        "nc_c": 1397217.25
+      }
+    },
+    "611290050": {
+      "nombre": "PSA IONTRIX 3",
+      "pb": 3.1,
+      "publico": 1223000.0,
+      "costos": {
+        "ri_j": 878460.0,
+        "ri_d": 878460.0,
+        "ri_c": 878460.0,
+        "nc_j": 970698.3,
+        "nc_d": 970698.3,
+        "nc_c": 970698.3
+      },
+      "publico_canje": 1100700.0,
+      "costos_canje": {
+        "ri_j": 790614.0,
+        "ri_d": 790614.0,
+        "ri_c": 790614.0,
+        "nc_j": 873628.47,
+        "nc_d": 873628.47,
+        "nc_c": 873628.47
+      }
+    },
+    "611030410": {
+      "nombre": "PSA MINI BIANCO + KIT POSV.",
+      "pb": 1.15,
+      "publico": 427000.0,
+      "costos": {
+        "ri_j": 289190.0,
+        "ri_d": 280514.3,
+        "ri_c": 268946.7,
+        "nc_j": 319554.95,
+        "nc_d": 309968.3,
+        "nc_c": 297186.1
+      },
+      "publico_canje": 384300.0,
+      "costos_canje": {
+        "ri_j": 260271.0,
+        "ri_d": 252462.87,
+        "ri_c": 242052.03,
+        "nc_j": 287599.46,
+        "nc_d": 278971.47,
+        "nc_c": 267467.49
+      }
+    },
+    "611030400": {
+      "nombre": "PSA MINI NERO + KIT POSV.",
+      "pb": 1.15,
+      "publico": 427000.0,
+      "costos": {
+        "ri_j": 289190.0,
+        "ri_d": 280514.3,
+        "ri_c": 268946.7,
+        "nc_j": 319554.95,
+        "nc_d": 309968.3,
+        "nc_c": 297186.1
+      },
+      "publico_canje": 384300.0,
+      "costos_canje": {
+        "ri_j": 260271.0,
+        "ri_d": 252462.87,
+        "ri_c": 242052.03,
+        "nc_j": 287599.46,
+        "nc_d": 278971.47,
+        "nc_c": 267467.49
+      }
+    },
+    "612280190": {
+      "nombre": "PSA POLI 2 BIANCO",
+      "pb": 0.85,
+      "publico": 291000.0,
+      "costos": {
+        "ri_j": 211750.0,
+        "ri_d": 205397.5,
+        "ri_c": 196927.5,
+        "nc_j": 233983.75,
+        "nc_d": 226964.24,
+        "nc_c": 217604.89
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "611030610": {
+      "nombre": "PSA QUANTUM 2 BM BIANCO + KIT POSV.",
+      "pb": 3.5,
+      "publico": 1322000.0,
+      "costos": {
+        "ri_j": 929280.0,
+        "ri_d": 901401.6,
+        "ri_c": 864230.4,
+        "nc_j": 1026854.4,
+        "nc_d": 996048.77,
+        "nc_c": 954974.59
+      },
+      "publico_canje": 1189800.0,
+      "costos_canje": {
+        "ri_j": 836352.0,
+        "ri_d": 811261.44,
+        "ri_c": 777807.36,
+        "nc_j": 924168.96,
+        "nc_d": 896443.89,
+        "nc_c": 859477.13
+      }
+    },
+    "611030620": {
+      "nombre": "PSA QUANTUM 2 SM BIANCO + KIT POSV.",
+      "pb": 3.5,
+      "publico": 1322000.0,
+      "costos": {
+        "ri_j": 929280.0,
+        "ri_d": 901401.6,
+        "ri_c": 864230.4,
+        "nc_j": 1026854.4,
+        "nc_d": 996048.77,
+        "nc_c": 954974.59
+      },
+      "publico_canje": 1189800.0,
+      "costos_canje": {
+        "ri_j": 836352.0,
+        "ri_d": 811261.44,
+        "ri_c": 777807.36,
+        "nc_j": 924168.96,
+        "nc_d": 896443.89,
+        "nc_c": 859477.13
+      }
+    },
+    "611120220": {
+      "nombre": "PSA S-1000 2 BM BIANCO + POSV.",
+      "pb": 3.45,
+      "publico": 1100000.0,
+      "costos": {
+        "ri_j": 778030.0,
+        "ri_d": 754689.1,
+        "ri_c": 723567.9,
+        "nc_j": 859723.15,
+        "nc_d": 833931.46,
+        "nc_c": 799542.53
+      },
+      "publico_canje": 990000.0,
+      "costos_canje": {
+        "ri_j": 700227.0,
+        "ri_d": 679220.19,
+        "ri_c": 651211.11,
+        "nc_j": 773750.84,
+        "nc_d": 750538.31,
+        "nc_c": 719588.28
+      }
+    },
+    "611120200": {
+      "nombre": "PSA S-1000 2 SM BIANCO + POSV.",
+      "pb": 3.45,
+      "publico": 1100000.0,
+      "costos": {
+        "ri_j": 778030.0,
+        "ri_d": 754689.1,
+        "ri_c": 723567.9,
+        "nc_j": 859723.15,
+        "nc_d": 833931.46,
+        "nc_c": 799542.53
+      },
+      "publico_canje": 990000.0,
+      "costos_canje": {
+        "ri_j": 700227.0,
+        "ri_d": 679220.19,
+        "ri_c": 651211.11,
+        "nc_j": 773750.84,
+        "nc_d": 750538.31,
+        "nc_c": 719588.28
+      }
+    },
+    "611120210": {
+      "nombre": "PSA S-1000 2 SM NERO + POSV.",
+      "pb": 3.45,
+      "publico": 1100000.0,
+      "costos": {
+        "ri_j": 778030.0,
+        "ri_d": 754689.1,
+        "ri_c": 723567.9,
+        "nc_j": 859723.15,
+        "nc_d": 833931.46,
+        "nc_c": 799542.53
+      },
+      "publico_canje": 990000.0,
+      "costos_canje": {
+        "ri_j": 700227.0,
+        "ri_d": 679220.19,
+        "ri_c": 651211.11,
+        "nc_j": 773750.84,
+        "nc_d": 750538.31,
+        "nc_c": 719588.28
+      }
+    },
+    "611030560": {
+      "nombre": "PSA SENIK BM BIANCO + POSV.",
+      "pb": 3.75,
+      "publico": 1298000.0,
+      "costos": {
+        "ri_j": 912340.0,
+        "ri_d": 884969.8,
+        "ri_c": 848476.2,
+        "nc_j": 1008135.7,
+        "nc_d": 977891.63,
+        "nc_c": 937566.2
+      },
+      "publico_canje": 1168200.0,
+      "costos_canje": {
+        "ri_j": 821106.0,
+        "ri_d": 796472.82,
+        "ri_c": 763628.58,
+        "nc_j": 907322.13,
+        "nc_d": 880102.47,
+        "nc_c": 843809.58
+      }
+    },
+    "611030540": {
+      "nombre": "PSA SENIK SM BIANCO + POSV.",
+      "pb": 3.75,
+      "publico": 1298000.0,
+      "costos": {
+        "ri_j": 912340.0,
+        "ri_d": 884969.8,
+        "ri_c": 848476.2,
+        "nc_j": 1008135.7,
+        "nc_d": 977891.63,
+        "nc_c": 937566.2
+      },
+      "publico_canje": 1168200.0,
+      "costos_canje": {
+        "ri_j": 821106.0,
+        "ri_d": 796472.82,
+        "ri_c": 763628.58,
+        "nc_j": 907322.13,
+        "nc_d": 880102.47,
+        "nc_c": 843809.58
+      }
+    },
+    "611030060": {
+      "nombre": "PSA STOPPER",
+      "pb": 0.5,
+      "publico": 250000.0,
+      "costos": {
+        "ri_j": 187550.0,
+        "ri_d": 181923.5,
+        "ri_c": 174421.5,
+        "nc_j": 207242.75,
+        "nc_d": 201025.47,
+        "nc_c": 192735.76
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "611030420": {
+      "nombre": "PSA VERO BIANCO + KIT POSV.",
+      "pb": 1.45,
+      "publico": 549000.0,
+      "costos": {
+        "ri_j": 326700.0,
+        "ri_d": 316899.0,
+        "ri_c": 303831.0,
+        "nc_j": 361003.5,
+        "nc_d": 350173.4,
+        "nc_c": 335733.26
+      },
+      "publico_canje": 494100.0,
+      "costos_canje": {
+        "ri_j": 294030.0,
+        "ri_d": 285209.1,
+        "ri_c": 273447.9,
+        "nc_j": 324903.15,
+        "nc_d": 315156.06,
+        "nc_c": 302159.93
+      }
+    },
+    "617110040": {
+      "nombre": "PSA SODA BURBY BIANCO",
+      "pb": 2.15,
+      "publico": 444000.0,
+      "costos": {
+        "ri_j": 314600.0,
+        "ri_d": 305162.0,
+        "ri_c": 292578.0,
+        "nc_j": 347633.0,
+        "nc_d": 337204.01,
+        "nc_c": 323298.69
+      },
+      "publico_canje": 399600.0,
+      "costos_canje": {
+        "ri_j": 283140.0,
+        "ri_d": 274645.8,
+        "ri_c": 263320.2,
+        "nc_j": 312869.7,
+        "nc_d": 303483.61,
+        "nc_c": 290968.82
+      }
+    },
+    "n:psa osmosis ropot": {
+      "nombre": "PSA OSMOSIS ROPOT",
+      "pb": 3.5,
+      "publico": 1975000.0,
+      "costos": {
+        "ri_j": 1605670.0,
+        "ri_d": 1605670.0,
+        "ri_c": 1605670.0,
+        "nc_j": 1774265.35,
+        "nc_d": 1774265.35,
+        "nc_c": 1774265.35
+      },
+      "publico_canje": 1777500.0,
+      "costos_canje": {
+        "ri_j": 1445103.0,
+        "ri_d": 1445103.0,
+        "ri_c": 1445103.0,
+        "nc_j": 1596838.82,
+        "nc_d": 1596838.82,
+        "nc_c": 1596838.82
+      }
+    },
+    "n:psa purificador de aire": {
+      "nombre": "PSA PURIFICADOR DE AIRE",
+      "pb": 4.5,
+      "publico": 1599000.0,
+      "costos": {
+        "ri_j": 1109570.0,
+        "ri_d": 1076282.9,
+        "ri_c": 1031900.1,
+        "nc_j": 1226074.85,
+        "nc_d": 1189292.6,
+        "nc_c": 1140249.61
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:(001) adapt. universal c/manguera": {
+      "nombre": "(001) ADAPT. UNIVERSAL C/MANGUERA",
+      "pb": null,
+      "publico": 23150.0,
+      "costos": {
+        "ri_j": 13733.5,
+        "ri_d": 13733.5,
+        "ri_c": 13733.5,
+        "nc_j": 15175.52,
+        "nc_d": 15175.52,
+        "nc_c": 15175.52
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:(002) adapt. rosca (fv tipo unimix)": {
+      "nombre": "(002) ADAPT. ROSCA (FV TIPO UNIMIX)",
+      "pb": null,
+      "publico": 18700.0,
+      "costos": {
+        "ri_j": 10890.0,
+        "ri_d": 10890.0,
+        "ri_c": 10890.0,
+        "nc_j": 12033.45,
+        "nc_d": 12033.45,
+        "nc_c": 12033.45
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:(003) adapt. rosca corta": {
+      "nombre": "(003) ADAPT. ROSCA CORTA",
+      "pb": null,
+      "publico": 18700.0,
+      "costos": {
+        "ri_j": 10890.0,
+        "ri_d": 10890.0,
+        "ri_c": 10890.0,
+        "nc_j": 12033.45,
+        "nc_d": 12033.45,
+        "nc_c": 12033.45
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:(004) adapt. rosca larga": {
+      "nombre": "(004) ADAPT. ROSCA LARGA",
+      "pb": null,
+      "publico": 18700.0,
+      "costos": {
+        "ri_j": 10890.0,
+        "ri_d": 10890.0,
+        "ri_c": 10890.0,
+        "nc_j": 12033.45,
+        "nc_d": 12033.45,
+        "nc_c": 12033.45
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:(005) adapt. univ.mariposa diam.11-12": {
+      "nombre": "(005) ADAPT. UNIV.MARIPOSA DIAM.11-12",
+      "pb": null,
+      "publico": 18700.0,
+      "costos": {
+        "ri_j": 10890.0,
+        "ri_d": 10890.0,
+        "ri_c": 10890.0,
+        "nc_j": 12033.45,
+        "nc_d": 12033.45,
+        "nc_c": 12033.45
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:(006) adapt. univ.mariposa diam.14": {
+      "nombre": "(006) ADAPT. UNIV.MARIPOSA DIAM.14",
+      "pb": null,
+      "publico": 18700.0,
+      "costos": {
+        "ri_j": 10890.0,
+        "ri_d": 10890.0,
+        "ri_c": 10890.0,
+        "nc_j": 12033.45,
+        "nc_d": 12033.45,
+        "nc_c": 12033.45
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:(007) adapt. univ.mariposa diam.16": {
+      "nombre": "(007) ADAPT. UNIV.MARIPOSA DIAM.16",
+      "pb": null,
+      "publico": 18700.0,
+      "costos": {
+        "ri_j": 10890.0,
+        "ri_d": 10890.0,
+        "ri_c": 10890.0,
+        "nc_j": 12033.45,
+        "nc_d": 12033.45,
+        "nc_c": 12033.45
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:(008) adapt. univ.mariposa diam.18": {
+      "nombre": "(008) ADAPT. UNIV.MARIPOSA DIAM.18",
+      "pb": null,
+      "publico": 18700.0,
+      "costos": {
+        "ri_j": 10890.0,
+        "ri_d": 10890.0,
+        "ri_c": 10890.0,
+        "nc_j": 12033.45,
+        "nc_d": 12033.45,
+        "nc_c": 12033.45
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:(009) adapt. univ.mariposa diam.20": {
+      "nombre": "(009) ADAPT. UNIV.MARIPOSA DIAM.20",
+      "pb": null,
+      "publico": 18700.0,
+      "costos": {
+        "ri_j": 10890.0,
+        "ri_d": 10890.0,
+        "ri_c": 10890.0,
+        "nc_j": 12033.45,
+        "nc_d": 12033.45,
+        "nc_c": 12033.45
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:(010) adapt. rosca hembra-hembra": {
+      "nombre": "(010) ADAPT. ROSCA HEMBRA-HEMBRA",
+      "pb": null,
+      "publico": 18700.0,
+      "costos": {
+        "ri_j": 10890.0,
+        "ri_d": 10890.0,
+        "ri_c": 10890.0,
+        "nc_j": 12033.45,
+        "nc_d": 12033.45,
+        "nc_c": 12033.45
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:(016) adapt. rosca hembra o.n.": {
+      "nombre": "(016) ADAPT. ROSCA HEMBRA O.N.",
+      "pb": null,
+      "publico": 18700.0,
+      "costos": {
+        "ri_j": 10890.0,
+        "ri_d": 10890.0,
+        "ri_c": 10890.0,
+        "nc_j": 12033.45,
+        "nc_d": 12033.45,
+        "nc_c": 12033.45
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:(017) adapt. rosca 3/4 poli 2": {
+      "nombre": "(017) ADAPT. ROSCA 3/4 POLI 2",
+      "pb": null,
+      "publico": 28000.0,
+      "costos": {
+        "ri_j": 17061.0,
+        "ri_d": 17061.0,
+        "ri_c": 17061.0,
+        "nc_j": 18852.41,
+        "nc_d": 18852.41,
+        "nc_c": 18852.41
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:(018) adapt. rosca canilla tipo patio": {
+      "nombre": "(018) ADAPT. ROSCA CANILLA TIPO PATIO",
+      "pb": null,
+      "publico": 18700.0,
+      "costos": {
+        "ri_j": 10890.0,
+        "ri_d": 10890.0,
+        "ri_c": 10890.0,
+        "nc_j": 12033.45,
+        "nc_d": 12033.45,
+        "nc_c": 12033.45
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:(019) adapt. rosca macho 18.1": {
+      "nombre": "(019) ADAPT. ROSCA MACHO 18.1",
+      "pb": null,
+      "publico": 18700.0,
+      "costos": null,
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:(020) adapt. rosca especial": {
+      "nombre": "(020) ADAPT. ROSCA ESPECIAL",
+      "pb": null,
+      "publico": 25800.0,
+      "costos": {
+        "ri_j": 15125.0,
+        "ri_d": 15125.0,
+        "ri_c": 15125.0,
+        "nc_j": 16713.13,
+        "nc_d": 16713.13,
+        "nc_c": 16713.13
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:(024) adapt. rosca hembra 20.1": {
+      "nombre": "(024) ADAPT. ROSCA HEMBRA 20.1",
+      "pb": null,
+      "publico": 18700.0,
+      "costos": null,
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:(027) adapt. rosca larga paso fino": {
+      "nombre": "(027) ADAPT. ROSCA LARGA PASO FINO",
+      "pb": null,
+      "publico": 18700.0,
+      "costos": {
+        "ri_j": 10890.0,
+        "ri_d": 10890.0,
+        "ri_c": 10890.0,
+        "nc_j": 12033.45,
+        "nc_d": 12033.45,
+        "nc_c": 12033.45
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:(030) adapt. h-m 1/2 c/tuerca ducha ii": {
+      "nombre": "(030) ADAPT. H-M 1/2 C/TUERCA DUCHA II",
+      "pb": null,
+      "publico": 37250.0,
+      "costos": {
+        "ri_j": 23474.0,
+        "ri_d": 23474.0,
+        "ri_c": 23474.0,
+        "nc_j": 25938.77,
+        "nc_d": 25938.77,
+        "nc_c": 25938.77
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:(032) adapt. h-m 1/2 ducha ii salida": {
+      "nombre": "(032) ADAPT. H-M 1/2 DUCHA II SALIDA",
+      "pb": null,
+      "publico": 37250.0,
+      "costos": {
+        "ri_j": 23474.0,
+        "ri_d": 23474.0,
+        "ri_c": 23474.0,
+        "nc_j": 25938.77,
+        "nc_d": 25938.77,
+        "nc_c": 25938.77
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:(033) adapt. m-m 3/4 bg ducha ii c/tuerca": {
+      "nombre": "(033) ADAPT. M-M 3/4 BG DUCHA II C/TUERCA",
+      "pb": null,
+      "publico": 37250.0,
+      "costos": {
+        "ri_j": 23474.0,
+        "ri_d": 23474.0,
+        "ri_c": 23474.0,
+        "nc_j": 25938.77,
+        "nc_d": 25938.77,
+        "nc_c": 25938.77
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:(036) adapt. m-m 3/4 bg ducha ii": {
+      "nombre": "(036) ADAPT. M-M 3/4 BG DUCHA II",
+      "pb": null,
+      "publico": 37250.0,
+      "costos": {
+        "ri_j": 23474.0,
+        "ri_d": 23474.0,
+        "ri_c": 23474.0,
+        "nc_j": 25938.77,
+        "nc_d": 25938.77,
+        "nc_c": 25938.77
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:(037) adapt. rosca macho (fv swing plus)": {
+      "nombre": "(037) ADAPT. ROSCA MACHO (FV SWING PLUS)",
+      "pb": null,
+      "publico": 18700.0,
+      "costos": {
+        "ri_j": 10890.0,
+        "ri_d": 10890.0,
+        "ri_c": 10890.0,
+        "nc_j": 12033.45,
+        "nc_d": 12033.45,
+        "nc_c": 12033.45
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:(039) adapt. rosca hembra-hembra diám.22": {
+      "nombre": "(039) ADAPT. ROSCA HEMBRA-HEMBRA DIÁM.22",
+      "pb": null,
+      "publico": 18700.0,
+      "costos": {
+        "ri_j": 10890.0,
+        "ri_d": 10890.0,
+        "ri_c": 10890.0,
+        "nc_j": 12033.45,
+        "nc_d": 12033.45,
+        "nc_c": 12033.45
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:(041) adapt. rosca canilla piazza": {
+      "nombre": "(041) ADAPT. ROSCA CANILLA PIAZZA",
+      "pb": null,
+      "publico": 18700.0,
+      "costos": {
+        "ri_j": 10890.0,
+        "ri_d": 10890.0,
+        "ri_c": 10890.0,
+        "nc_j": 12033.45,
+        "nc_d": 12033.45,
+        "nc_c": 12033.45
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:(051) adapt. sin rosca diam. 17": {
+      "nombre": "(051) ADAPT. SIN ROSCA DIAM. 17",
+      "pb": null,
+      "publico": 18700.0,
+      "costos": {
+        "ri_j": 10890.0,
+        "ri_d": 10890.0,
+        "ri_c": 10890.0,
+        "nc_j": 12033.45,
+        "nc_d": 12033.45,
+        "nc_c": 12033.45
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:(053) adapt. rosca bsp 3/4 x 14 hilos": {
+      "nombre": "(053) ADAPT. ROSCA BSP 3/4 X 14 HILOS",
+      "pb": null,
+      "publico": 18700.0,
+      "costos": {
+        "ri_j": 10890.0,
+        "ri_d": 10890.0,
+        "ri_c": 10890.0,
+        "nc_j": 12033.45,
+        "nc_d": 12033.45,
+        "nc_c": 12033.45
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:(073) adapt. rosca múltiple": {
+      "nombre": "(073) ADAPT. ROSCA MÚLTIPLE",
+      "pb": null,
+      "publico": 18700.0,
+      "costos": {
+        "ri_j": 10890.0,
+        "ri_d": 10890.0,
+        "ri_c": 10890.0,
+        "nc_j": 12033.45,
+        "nc_d": 12033.45,
+        "nc_c": 12033.45
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:(078) adapt. rosca diam. 23.5": {
+      "nombre": "(078) ADAPT. ROSCA DIAM. 23.5",
+      "pb": null,
+      "publico": 18700.0,
+      "costos": null,
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:(083) adapt. rosca macho 22 x 1": {
+      "nombre": "(083) ADAPT. ROSCA MACHO 22 X 1",
+      "pb": null,
+      "publico": 18700.0,
+      "costos": {
+        "ri_j": 10890.0,
+        "ri_d": 10890.0,
+        "ri_c": 10890.0,
+        "nc_j": 12033.45,
+        "nc_d": 12033.45,
+        "nc_c": 12033.45
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:(100) adapt. rosca hembra bsp 1/2": {
+      "nombre": "(100) ADAPT. ROSCA HEMBRA BSP 1/2",
+      "pb": null,
+      "publico": 18700.0,
+      "costos": {
+        "ri_j": 10890.0,
+        "ri_d": 10890.0,
+        "ri_c": 10890.0,
+        "nc_j": 12033.45,
+        "nc_d": 12033.45,
+        "nc_c": 12033.45
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:(102) adapt. rosca macho fv diám 18.6": {
+      "nombre": "(102) ADAPT. ROSCA MACHO FV DIÁM 18.6",
+      "pb": null,
+      "publico": 18700.0,
+      "costos": null,
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:(103) adapt. rosca hembra p/hidromet": {
+      "nombre": "(103) ADAPT. ROSCA HEMBRA P/HIDROMET",
+      "pb": null,
+      "publico": 18700.0,
+      "costos": {
+        "ri_j": 10890.0,
+        "ri_d": 10890.0,
+        "ri_c": 10890.0,
+        "nc_j": 12033.45,
+        "nc_d": 12033.45,
+        "nc_c": 12033.45
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:(135) adapt. rosca macho 21 x 1": {
+      "nombre": "(135) ADAPT. ROSCA MACHO 21 X 1",
+      "pb": null,
+      "publico": 18700.0,
+      "costos": {
+        "ri_j": 10890.0,
+        "ri_d": 10890.0,
+        "ri_c": 10890.0,
+        "nc_j": 12033.45,
+        "nc_d": 12033.45,
+        "nc_c": 12033.45
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:(142) adapt. rosca macho 16.3 x 1": {
+      "nombre": "(142) ADAPT. ROSCA MACHO 16.3 X 1",
+      "pb": null,
+      "publico": 18700.0,
+      "costos": {
+        "ri_j": 10890.0,
+        "ri_d": 10890.0,
+        "ri_c": 10890.0,
+        "nc_j": 12033.45,
+        "nc_d": 12033.45,
+        "nc_c": 12033.45
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:(144) adapt. rosca macho 18.2 x 1": {
+      "nombre": "(144) ADAPT. ROSCA MACHO 18.2 X 1",
+      "pb": null,
+      "publico": 18700.0,
+      "costos": {
+        "ri_j": 10890.0,
+        "ri_d": 10890.0,
+        "ri_c": 10890.0,
+        "nc_j": 12033.45,
+        "nc_d": 12033.45,
+        "nc_c": 12033.45
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:(147) adapt. rosca tipo racor m. 24 x 1": {
+      "nombre": "(147) ADAPT. ROSCA TIPO RACOR M. 24 X 1",
+      "pb": null,
+      "publico": 18700.0,
+      "costos": {
+        "ri_j": 10890.0,
+        "ri_d": 10890.0,
+        "ri_c": 10890.0,
+        "nc_j": 12033.45,
+        "nc_d": 12033.45,
+        "nc_c": 12033.45
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:(148) adapt. rosca hembra (swing plus) m. 24x1": {
+      "nombre": "(148) ADAPT. ROSCA HEMBRA (SWING PLUS) M. 24X1",
+      "pb": null,
+      "publico": 18700.0,
+      "costos": {
+        "ri_j": 10890.0,
+        "ri_d": 10890.0,
+        "ri_c": 10890.0,
+        "nc_j": 12033.45,
+        "nc_d": 12033.45,
+        "nc_c": 12033.45
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:(149) adapt. rosca p/lavarropa m 24 x 1": {
+      "nombre": "(149) ADAPT. ROSCA P/LAVARROPA M 24 X 1",
+      "pb": null,
+      "publico": 18700.0,
+      "costos": {
+        "ri_j": 10890.0,
+        "ri_d": 10890.0,
+        "ri_c": 10890.0,
+        "nc_j": 12033.45,
+        "nc_d": 12033.45,
+        "nc_c": 12033.45
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:(155) adapt. s-1000 c/oring. p/manometro": {
+      "nombre": "(155) ADAPT. S-1000 C/ORING. P/MANOMETRO",
+      "pb": null,
+      "publico": 18700.0,
+      "costos": {
+        "ri_j": 10890.0,
+        "ri_d": 10890.0,
+        "ri_c": 10890.0,
+        "nc_j": 12033.45,
+        "nc_d": 12033.45,
+        "nc_c": 12033.45
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:(164) adapt. rosca macho 20 x 1": {
+      "nombre": "(164) ADAPT. ROSCA MACHO 20 X 1",
+      "pb": null,
+      "publico": 18700.0,
+      "costos": {
+        "ri_j": 10890.0,
+        "ri_d": 10890.0,
+        "ri_c": 10890.0,
+        "nc_j": 12033.45,
+        "nc_d": 12033.45,
+        "nc_c": 12033.45
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:(174) adapt. rosca aireador m 24 x 1": {
+      "nombre": "(174) ADAPT. ROSCA AIREADOR M 24 X 1",
+      "pb": null,
+      "publico": 18700.0,
+      "costos": {
+        "ri_j": 10890.0,
+        "ri_d": 10890.0,
+        "ri_c": 10890.0,
+        "nc_j": 12033.45,
+        "nc_d": 12033.45,
+        "nc_c": 12033.45
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:(177) adapt. rectangular p/pegar": {
+      "nombre": "(177) ADAPT. RECTANGULAR P/PEGAR",
+      "pb": null,
+      "publico": 56750.0,
+      "costos": {
+        "ri_j": 33638.0,
+        "ri_d": 33638.0,
+        "ri_c": 33638.0,
+        "nc_j": 37169.99,
+        "nc_d": 37169.99,
+        "nc_c": 37169.99
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:(179) adapt. rosca macho diam 18 x 1 largo": {
+      "nombre": "(179) ADAPT. ROSCA MACHO DIAM 18 X 1 LARGO",
+      "pb": null,
+      "publico": 18700.0,
+      "costos": {
+        "ri_j": 10890.0,
+        "ri_d": 10890.0,
+        "ri_c": 10890.0,
+        "nc_j": 12033.45,
+        "nc_d": 12033.45,
+        "nc_c": 12033.45
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:(180) adapt. rosca hembra diam 22 x 1 corto": {
+      "nombre": "(180) ADAPT. ROSCA HEMBRA DIAM 22 X 1 CORTO",
+      "pb": null,
+      "publico": 18700.0,
+      "costos": {
+        "ri_j": 10890.0,
+        "ri_d": 10890.0,
+        "ri_c": 10890.0,
+        "nc_j": 12033.45,
+        "nc_d": 12033.45,
+        "nc_c": 12033.45
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:(181) adapt. h-m 1/2 ducha salida": {
+      "nombre": "(181) ADAPT. H-M 1/2 DUCHA SALIDA",
+      "pb": null,
+      "publico": 37250.0,
+      "costos": {
+        "ri_j": 23474.0,
+        "ri_d": 23474.0,
+        "ri_c": 23474.0,
+        "nc_j": 25938.77,
+        "nc_d": 25938.77,
+        "nc_c": 25938.77
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:(19) adapt. m-m bg 3/4 p/ducha cr": {
+      "nombre": "(19) ADAPT. M-M BG 3/4 P/DUCHA CR",
+      "pb": null,
+      "publico": 37250.0,
+      "costos": {
+        "ri_j": 23474.0,
+        "ri_d": 23474.0,
+        "ri_c": 23474.0,
+        "nc_j": 25938.77,
+        "nc_d": 25938.77,
+        "nc_c": 25938.77
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:(20) adapt. m-h bg 3/4 p/ ducha cr": {
+      "nombre": "(20) ADAPT. M-H BG 3/4 P/ DUCHA CR",
+      "pb": null,
+      "publico": 37250.0,
+      "costos": {
+        "ri_j": 23474.0,
+        "ri_d": 23474.0,
+        "ri_c": 23474.0,
+        "nc_j": 25938.77,
+        "nc_d": 25938.77,
+        "nc_c": 25938.77
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:(228) adapt. ovalado": {
+      "nombre": "(228) ADAPT. OVALADO",
+      "pb": null,
+      "publico": 56750.0,
+      "costos": {
+        "ri_j": 33638.0,
+        "ri_d": 33638.0,
+        "ri_c": 33638.0,
+        "nc_j": 37169.99,
+        "nc_d": 37169.99,
+        "nc_c": 37169.99
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:(229) adapt. rosca h-h 22 x 1 largo": {
+      "nombre": "(229) ADAPT. ROSCA H-H 22 X 1 LARGO",
+      "pb": null,
+      "publico": 18700.0,
+      "costos": {
+        "ri_j": 10890.0,
+        "ri_d": 10890.0,
+        "ri_c": 10890.0,
+        "nc_j": 12033.45,
+        "nc_d": 12033.45,
+        "nc_c": 12033.45
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:(232) adapt. rosca h-h 22 x 1 corto": {
+      "nombre": "(232) ADAPT. ROSCA H-H 22 X 1 CORTO",
+      "pb": null,
+      "publico": 18700.0,
+      "costos": {
+        "ri_j": 10890.0,
+        "ri_d": 10890.0,
+        "ri_c": 10890.0,
+        "nc_j": 12033.45,
+        "nc_d": 12033.45,
+        "nc_c": 12033.45
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:(239) adapt. rosca h-m 18 x 1 corto": {
+      "nombre": "(239) ADAPT. ROSCA H-M 18 X 1 CORTO",
+      "pb": null,
+      "publico": 18700.0,
+      "costos": {
+        "ri_j": 10890.0,
+        "ri_d": 10890.0,
+        "ri_c": 10890.0,
+        "nc_j": 12033.45,
+        "nc_d": 12033.45,
+        "nc_c": 12033.45
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:(245) adapt. rosca h-m 23 x 1": {
+      "nombre": "(245) ADAPT. ROSCA H-M 23 X 1",
+      "pb": null,
+      "publico": 18700.0,
+      "costos": {
+        "ri_j": 10890.0,
+        "ri_d": 10890.0,
+        "ri_c": 10890.0,
+        "nc_j": 12033.45,
+        "nc_d": 12033.45,
+        "nc_c": 12033.45
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:(246) adapt. rosca macho 23 x 1": {
+      "nombre": "(246) ADAPT. ROSCA MACHO 23 X 1",
+      "pb": null,
+      "publico": 18700.0,
+      "costos": {
+        "ri_j": 10890.0,
+        "ri_d": 10890.0,
+        "ri_c": 10890.0,
+        "nc_j": 12033.45,
+        "nc_d": 12033.45,
+        "nc_c": 12033.45
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:(537) adapt. rosca h 22,4 x 1": {
+      "nombre": "(537) ADAPT. ROSCA H 22,4 X 1",
+      "pb": null,
+      "publico": 18700.0,
+      "costos": {
+        "ri_j": 10890.0,
+        "ri_d": 10890.0,
+        "ri_c": 10890.0,
+        "nc_j": 12033.45,
+        "nc_d": 12033.45,
+        "nc_c": 12033.45
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:(550) adapt. rosca h 22 x 1 largo 36 cromado": {
+      "nombre": "(550) ADAPT. ROSCA H 22 X 1 LARGO 36 CROMADO",
+      "pb": null,
+      "publico": 18700.0,
+      "costos": {
+        "ri_j": 10890.0,
+        "ri_d": 10890.0,
+        "ri_c": 10890.0,
+        "nc_j": 12033.45,
+        "nc_d": 12033.45,
+        "nc_c": 12033.45
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:(553) adapt. esp. h-m 16,3 x 1 largo": {
+      "nombre": "(553) ADAPT. ESP. H-M 16,3 X 1 LARGO",
+      "pb": null,
+      "publico": 18700.0,
+      "costos": {
+        "ri_j": 10890.0,
+        "ri_d": 10890.0,
+        "ri_c": 10890.0,
+        "nc_j": 12033.45,
+        "nc_d": 12033.45,
+        "nc_c": 12033.45
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:(573) adapt. universal c/manguera nero": {
+      "nombre": "(573) ADAPT. UNIVERSAL C/MANGUERA NERO",
+      "pb": null,
+      "publico": 23150.0,
+      "costos": {
+        "ri_j": 13733.5,
+        "ri_d": 13733.5,
+        "ri_c": 13733.5,
+        "nc_j": 15175.52,
+        "nc_d": 15175.52,
+        "nc_c": 15175.52
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:adapt. especial kit 90°": {
+      "nombre": "ADAPT. ESPECIAL KIT 90°",
+      "pb": null,
+      "publico": 83200.0,
+      "costos": {
+        "ri_j": 61710.0,
+        "ri_d": 61710.0,
+        "ri_c": 61710.0,
+        "nc_j": 68189.55,
+        "nc_d": 68189.55,
+        "nc_c": 68189.55
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:arandela adaptador diám. 19 x 5": {
+      "nombre": "ARANDELA ADAPTADOR DIÁM. 19 X 5",
+      "pb": null,
+      "publico": 7450.0,
+      "costos": {
+        "ri_j": 5566.0,
+        "ri_d": 5566.0,
+        "ri_c": 5566.0,
+        "nc_j": 6150.43,
+        "nc_d": 6150.43,
+        "nc_c": 6150.43
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:arandela adaptador diám. 21 x 5": {
+      "nombre": "ARANDELA ADAPTADOR DIÁM. 21 X 5",
+      "pb": null,
+      "publico": 7450.0,
+      "costos": {
+        "ri_j": 5566.0,
+        "ri_d": 5566.0,
+        "ri_c": 5566.0,
+        "nc_j": 6150.43,
+        "nc_d": 6150.43,
+        "nc_c": 6150.43
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:buje de derivación canilla bm": {
+      "nombre": "BUJE DE DERIVACIÓN CANILLA BM",
+      "pb": null,
+      "publico": 10950.0,
+      "costos": {
+        "ri_j": 7865.0,
+        "ri_d": 7865.0,
+        "ri_c": 7865.0,
+        "nc_j": 8690.83,
+        "nc_d": 8690.83,
+        "nc_c": 8690.83
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:conect.cocodrilo s-1000 x 5 unid": {
+      "nombre": "CONECT.COCODRILO S-1000 X 5 UNID",
+      "pb": null,
+      "publico": 15700.0,
+      "costos": {
+        "ri_j": 11616.0,
+        "ri_d": 11616.0,
+        "ri_c": 11616.0,
+        "nc_j": 12835.68,
+        "nc_d": 12835.68,
+        "nc_c": 12835.68
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:conector rapido de salida psa 10kd": {
+      "nombre": "CONECTOR RAPIDO DE SALIDA PSA 10KD",
+      "pb": null,
+      "publico": 35300.0,
+      "costos": {
+        "ri_j": 27043.5,
+        "ri_d": 27043.5,
+        "ri_c": 27043.5,
+        "nc_j": 29883.07,
+        "nc_d": 29883.07,
+        "nc_c": 29883.07
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:conj.soporte acrilico p/mini": {
+      "nombre": "CONJ.SOPORTE ACRILICO P/MINI",
+      "pb": null,
+      "publico": 23000.0,
+      "costos": {
+        "ri_j": 16758.5,
+        "ri_d": 16758.5,
+        "ri_c": 16758.5,
+        "nc_j": 18518.14,
+        "nc_d": 18518.14,
+        "nc_c": 18518.14
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:conj.soporte acrilico p/senior 4": {
+      "nombre": "CONJ.SOPORTE ACRILICO P/SENIOR 4",
+      "pb": null,
+      "publico": 28550.0,
+      "costos": {
+        "ri_j": 21175.0,
+        "ri_d": 21175.0,
+        "ri_c": 21175.0,
+        "nc_j": 23398.38,
+        "nc_d": 23398.38,
+        "nc_c": 23398.38
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:conj.soporte acrilico senior/vero": {
+      "nombre": "CONJ.SOPORTE ACRILICO SENIOR/VERO",
+      "pb": null,
+      "publico": 28550.0,
+      "costos": {
+        "ri_j": 21175.0,
+        "ri_d": 21175.0,
+        "ri_c": 21175.0,
+        "nc_j": 23398.38,
+        "nc_d": 23398.38,
+        "nc_c": 23398.38
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:conj.soporte psa stopper": {
+      "nombre": "CONJ.SOPORTE PSA STOPPER",
+      "pb": null,
+      "publico": 23050.0,
+      "costos": {
+        "ri_j": 16758.5,
+        "ri_d": 16758.5,
+        "ri_c": 16758.5,
+        "nc_j": 18518.14,
+        "nc_d": 18518.14,
+        "nc_c": 18518.14
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:funda psa domus": {
+      "nombre": "FUNDA PSA DOMUS",
+      "pb": null,
+      "publico": 72500.0,
+      "costos": {
+        "ri_j": 60500.0,
+        "ri_d": 60500.0,
+        "ri_c": 60500.0,
+        "nc_j": 66852.5,
+        "nc_d": 66852.5,
+        "nc_c": 66852.5
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:funda psa mini domus": {
+      "nombre": "FUNDA PSA MINI DOMUS",
+      "pb": null,
+      "publico": 61200.0,
+      "costos": {
+        "ri_j": 51425.0,
+        "ri_d": 51425.0,
+        "ri_c": 51425.0,
+        "nc_j": 56824.63,
+        "nc_d": 56824.63,
+        "nc_c": 56824.63
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "612031380": {
+      "nombre": "GRIFERÍA PSA BICOMANDO",
+      "pb": null,
+      "publico": 538000.0,
+      "costos": {
+        "ri_j": 427130.0,
+        "ri_d": 427130.0,
+        "ri_c": 427130.0,
+        "nc_j": 471978.65,
+        "nc_d": 471978.65,
+        "nc_c": 471978.65
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "612031390": {
+      "nombre": "GRIFERÍA PSA BICOMANDO NERO",
+      "pb": null,
+      "publico": 538000.0,
+      "costos": {
+        "ri_j": 427130.0,
+        "ri_d": 427130.0,
+        "ri_c": 427130.0,
+        "nc_j": 471978.65,
+        "nc_d": 471978.65,
+        "nc_c": 471978.65
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "612031210": {
+      "nombre": "GRIFERÍA PSA BM",
+      "pb": null,
+      "publico": 219000.0,
+      "costos": {
+        "ri_j": 183920.0,
+        "ri_d": 183920.0,
+        "ri_c": 183920.0,
+        "nc_j": 203231.6,
+        "nc_d": 203231.6,
+        "nc_c": 203231.6
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "612031300": {
+      "nombre": "GRIFERÍA PSA BM NERO",
+      "pb": null,
+      "publico": 219000.0,
+      "costos": {
+        "ri_j": 183920.0,
+        "ri_d": 183920.0,
+        "ri_c": 183920.0,
+        "nc_j": 203231.6,
+        "nc_d": 203231.6,
+        "nc_c": 203231.6
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:kit adapt.p/canilla no tradicional ducha ii": {
+      "nombre": "KIT ADAPT.P/CANILLA NO TRADICIONAL DUCHA II",
+      "pb": null,
+      "publico": 56750.0,
+      "costos": {
+        "ri_j": 42047.5,
+        "ri_d": 42047.5,
+        "ri_c": 42047.5,
+        "nc_j": 46462.49,
+        "nc_d": 46462.49,
+        "nc_c": 46462.49
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:kit adapt.rectos p/canillas psa ducha ii": {
+      "nombre": "KIT ADAPT.RECTOS P/CANILLAS PSA DUCHA II",
+      "pb": null,
+      "publico": 75150.0,
+      "costos": {
+        "ri_j": 53482.0,
+        "ri_d": 53482.0,
+        "ri_c": 53482.0,
+        "nc_j": 59097.61,
+        "nc_d": 59097.61,
+        "nc_c": 59097.61
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:kit para baja presion universal": {
+      "nombre": "KIT PARA BAJA PRESION UNIVERSAL",
+      "pb": null,
+      "publico": 23150.0,
+      "costos": {
+        "ri_j": 17061.0,
+        "ri_d": 17061.0,
+        "ri_c": 17061.0,
+        "nc_j": 18852.41,
+        "nc_d": 18852.41,
+        "nc_c": 18852.41
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:lap bm 8 x 8": {
+      "nombre": "LAP BM 8 X 8",
+      "pb": null,
+      "publico": 55000.0,
+      "costos": {
+        "ri_j": 46524.5,
+        "ri_d": 46524.5,
+        "ri_c": 46524.5,
+        "nc_j": 51409.57,
+        "nc_d": 51409.57,
+        "nc_c": 51409.57
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:lap ducha ii hembra-macho 1/2 x 1/2": {
+      "nombre": "LAP DUCHA II HEMBRA-MACHO 1/2 X 1/2",
+      "pb": null,
+      "publico": 61600.0,
+      "costos": {
+        "ri_j": 50578.0,
+        "ri_d": 50578.0,
+        "ri_c": 50578.0,
+        "nc_j": 55888.69,
+        "nc_d": 55888.69,
+        "nc_c": 55888.69
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:lap ducha ii macho-macho 1/2 x 1/2": {
+      "nombre": "LAP DUCHA II MACHO-MACHO 1/2 X 1/2",
+      "pb": null,
+      "publico": 61600.0,
+      "costos": {
+        "ri_j": 50578.0,
+        "ri_d": 50578.0,
+        "ri_c": 50578.0,
+        "nc_j": 55888.69,
+        "nc_d": 55888.69,
+        "nc_c": 55888.69
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:lap sm 24 x 1": {
+      "nombre": "LAP SM 24 X 1",
+      "pb": null,
+      "publico": 55000.0,
+      "costos": {
+        "ri_j": 46524.5,
+        "ri_d": 46524.5,
+        "ri_c": 46524.5,
+        "nc_j": 51409.57,
+        "nc_d": 51409.57,
+        "nc_c": 51409.57
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:lap sm p/ manguera by pass": {
+      "nombre": "LAP SM P/ MANGUERA BY PASS",
+      "pb": null,
+      "publico": 97300.0,
+      "costos": {
+        "ri_j": 81312.0,
+        "ri_d": 81312.0,
+        "ri_c": 81312.0,
+        "nc_j": 89849.76,
+        "nc_d": 89849.76,
+        "nc_c": 89849.76
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:llave de ajuste p/tapa prefiltro 40k-d": {
+      "nombre": "LLAVE DE AJUSTE P/TAPA PREFILTRO 40K-D",
+      "pb": null,
+      "publico": 6500.0,
+      "costos": {
+        "ri_j": 5142.5,
+        "ri_d": 5142.5,
+        "ri_c": 5142.5,
+        "nc_j": 5682.46,
+        "nc_d": 5682.46,
+        "nc_c": 5682.46
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:llave de corte s-1000 macho/hembra": {
+      "nombre": "LLAVE DE CORTE S-1000 MACHO/HEMBRA",
+      "pb": null,
+      "publico": 38500.0,
+      "costos": {
+        "ri_j": 28132.5,
+        "ri_d": 28132.5,
+        "ri_c": 28132.5,
+        "nc_j": 31086.41,
+        "nc_d": 31086.41,
+        "nc_c": 31086.41
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:llave de corte s-1000 macho/macho": {
+      "nombre": "LLAVE DE CORTE S-1000 MACHO/MACHO",
+      "pb": null,
+      "publico": 38500.0,
+      "costos": {
+        "ri_j": 28132.5,
+        "ri_d": 28132.5,
+        "ri_c": 28132.5,
+        "nc_j": 31086.41,
+        "nc_d": 31086.41,
+        "nc_c": 31086.41
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:precinto x 25": {
+      "nombre": "PRECINTO X 25",
+      "pb": null,
+      "publico": 6200.0,
+      "costos": {
+        "ri_j": 5142.5,
+        "ri_d": 5142.5,
+        "ri_c": 5142.5,
+        "nc_j": 5682.46,
+        "nc_d": 5682.46,
+        "nc_c": 5682.46
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:prolongador de 3/4 psa poli": {
+      "nombre": "PROLONGADOR DE 3/4 PSA POLI",
+      "pb": null,
+      "publico": 20650.0,
+      "costos": {
+        "ri_j": 11011.0,
+        "ri_d": 11011.0,
+        "ri_c": 11011.0,
+        "nc_j": 12167.16,
+        "nc_d": 12167.16,
+        "nc_c": 12167.16
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:prolongador psa ducha ii": {
+      "nombre": "PROLONGADOR PSA DUCHA II",
+      "pb": null,
+      "publico": 43000.0,
+      "costos": {
+        "ri_j": 35937.0,
+        "ri_d": 35937.0,
+        "ri_c": 35937.0,
+        "nc_j": 39710.39,
+        "nc_d": 39710.39,
+        "nc_c": 39710.39
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:regulador de caudal": {
+      "nombre": "REGULADOR DE CAUDAL",
+      "pb": null,
+      "publico": 112000.0,
+      "costos": {
+        "ri_j": 82643.0,
+        "ri_d": 82643.0,
+        "ri_c": 82643.0,
+        "nc_j": 91320.52,
+        "nc_d": 91320.52,
+        "nc_c": 91320.52
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:set adaptacion retro p/kit canilla": {
+      "nombre": "SET ADAPTACION RETRO P/KIT CANILLA",
+      "pb": null,
+      "publico": 35300.0,
+      "costos": {
+        "ri_j": 25349.5,
+        "ri_d": 25349.5,
+        "ri_c": 25349.5,
+        "nc_j": 28011.2,
+        "nc_d": 28011.2,
+        "nc_c": 28011.2
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:tapon regulador p/ducha x 5 unidades": {
+      "nombre": "TAPON REGULADOR P/DUCHA X 5 UNIDADES",
+      "pb": null,
+      "publico": 9000.0,
+      "costos": {
+        "ri_j": 5929.0,
+        "ri_d": 5929.0,
+        "ri_c": 5929.0,
+        "nc_j": 6551.55,
+        "nc_d": 6551.55,
+        "nc_c": 6551.55
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:te c/llave de corte p/grifería psa y eco-d": {
+      "nombre": "TE C/LLAVE DE CORTE P/GRIFERÍA PSA Y ECO-D",
+      "pb": null,
+      "publico": 83750.0,
+      "costos": {
+        "ri_j": 62920.0,
+        "ri_d": 62920.0,
+        "ri_c": 62920.0,
+        "nc_j": 69526.6,
+        "nc_d": 69526.6,
+        "nc_c": 69526.6
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:varilla inst. eco-d sm": {
+      "nombre": "VARILLA INST. ECO-D SM",
+      "pb": null,
+      "publico": 57800.0,
+      "costos": {
+        "ri_j": 43620.5,
+        "ri_d": 43620.5,
+        "ri_c": 43620.5,
+        "nc_j": 48200.65,
+        "nc_d": 48200.65,
+        "nc_c": 48200.65
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:reposicion psa 10k-d": {
+      "nombre": "REPOSICION PSA 10K-D",
+      "pb": 0.8,
+      "publico": 270000.0,
+      "costos": {
+        "ri_j": 208120.0,
+        "ri_d": 201876.4,
+        "ri_c": 193551.6,
+        "nc_j": 229972.6,
+        "nc_d": 223073.42,
+        "nc_c": 213874.52
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:reposicion psa 40k-d": {
+      "nombre": "REPOSICION PSA 40K-D",
+      "pb": 1.3,
+      "publico": 419000.0,
+      "costos": {
+        "ri_j": 341220.0,
+        "ri_d": 330983.4,
+        "ri_c": 317334.6,
+        "nc_j": 377048.1,
+        "nc_d": 365736.66,
+        "nc_c": 350654.73
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:accesorio para cebar mate": {
+      "nombre": "ACCESORIO PARA CEBAR MATE",
+      "pb": null,
+      "publico": 5100.0,
+      "costos": {
+        "ri_j": 3811.5,
+        "ri_d": 3811.5,
+        "ri_c": 3811.5,
+        "nc_j": 4211.71,
+        "nc_d": 4211.71,
+        "nc_c": 4211.71
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:bolsa material regenerante x 2": {
+      "nombre": "BOLSA MATERIAL REGENERANTE X 2",
+      "pb": null,
+      "publico": 30250.0,
+      "costos": {
+        "ri_j": 22264.0,
+        "ri_d": 22264.0,
+        "ri_c": 22264.0,
+        "nc_j": 24601.72,
+        "nc_d": 24601.72,
+        "nc_c": 24601.72
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:buje de conexion p/canilla dispenser": {
+      "nombre": "BUJE DE CONEXION P/CANILLA DISPENSER",
+      "pb": null,
+      "publico": 57750.0,
+      "costos": {
+        "ri_j": 42713.0,
+        "ri_d": 42713.0,
+        "ri_c": 42713.0,
+        "nc_j": 47197.87,
+        "nc_d": 47197.87,
+        "nc_c": 47197.87
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:campana p/psa ducha": {
+      "nombre": "CAMPANA P/PSA DUCHA",
+      "pb": null,
+      "publico": 6200.0,
+      "costos": {
+        "ri_j": 5142.5,
+        "ri_d": 5142.5,
+        "ri_c": 5142.5,
+        "nc_j": 5682.46,
+        "nc_d": 5682.46,
+        "nc_c": 5682.46
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:canilla agua caliente dispenser 2": {
+      "nombre": "CANILLA AGUA CALIENTE DISPENSER 2",
+      "pb": null,
+      "publico": 38500.0,
+      "costos": {
+        "ri_j": 22627.0,
+        "ri_d": 22627.0,
+        "ri_c": 22627.0,
+        "nc_j": 25002.84,
+        "nc_d": 25002.84,
+        "nc_c": 25002.84
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:canilla agua caliente dispenser ds": {
+      "nombre": "CANILLA AGUA CALIENTE DISPENSER DS",
+      "pb": null,
+      "publico": 38500.0,
+      "costos": {
+        "ri_j": 22627.0,
+        "ri_d": 22627.0,
+        "ri_c": 22627.0,
+        "nc_j": 25002.84,
+        "nc_d": 25002.84,
+        "nc_c": 25002.84
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:canilla agua caliente dispenser mesa/pie": {
+      "nombre": "CANILLA AGUA CALIENTE DISPENSER MESA/PIE",
+      "pb": null,
+      "publico": 38500.0,
+      "costos": {
+        "ri_j": 22627.0,
+        "ri_d": 22627.0,
+        "ri_c": 22627.0,
+        "nc_j": 25002.84,
+        "nc_d": 25002.84,
+        "nc_c": 25002.84
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:canilla agua caliente p/eco-d pie y sm": {
+      "nombre": "CANILLA AGUA CALIENTE P/ECO-D PIE Y SM",
+      "pb": null,
+      "publico": 41450.0,
+      "costos": {
+        "ri_j": 25531.0,
+        "ri_d": 25531.0,
+        "ri_c": 25531.0,
+        "nc_j": 28211.76,
+        "nc_d": 28211.76,
+        "nc_c": 28211.76
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:canilla agua fria dispenser 2": {
+      "nombre": "CANILLA AGUA FRIA DISPENSER 2",
+      "pb": null,
+      "publico": 38500.0,
+      "costos": {
+        "ri_j": 22627.0,
+        "ri_d": 22627.0,
+        "ri_c": 22627.0,
+        "nc_j": 25002.84,
+        "nc_d": 25002.84,
+        "nc_c": 25002.84
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:canilla agua fria dispenser ds": {
+      "nombre": "CANILLA AGUA FRIA DISPENSER DS",
+      "pb": null,
+      "publico": 38500.0,
+      "costos": {
+        "ri_j": 22627.0,
+        "ri_d": 22627.0,
+        "ri_c": 22627.0,
+        "nc_j": 25002.84,
+        "nc_d": 25002.84,
+        "nc_c": 25002.84
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:canilla agua fria dispenser mesa/pie": {
+      "nombre": "CANILLA AGUA FRIA DISPENSER MESA/PIE",
+      "pb": null,
+      "publico": 38500.0,
+      "costos": {
+        "ri_j": 22627.0,
+        "ri_d": 22627.0,
+        "ri_c": 22627.0,
+        "nc_j": 25002.84,
+        "nc_d": 25002.84,
+        "nc_c": 25002.84
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:canilla agua fria p/eco-d pie y sm": {
+      "nombre": "CANILLA AGUA FRIA P/ECO-D PIE Y SM",
+      "pb": null,
+      "publico": 41450.0,
+      "costos": {
+        "ri_j": 25531.0,
+        "ri_d": 25531.0,
+        "ri_c": 25531.0,
+        "nc_j": 28211.76,
+        "nc_d": 28211.76,
+        "nc_c": 28211.76
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:canula p/botella termica x 5 unid": {
+      "nombre": "CANULA P/BOTELLA TERMICA X 5 UNID",
+      "pb": null,
+      "publico": 8800.0,
+      "costos": {
+        "ri_j": 6050.0,
+        "ri_d": 6050.0,
+        "ri_c": 6050.0,
+        "nc_j": 6685.25,
+        "nc_d": 6685.25,
+        "nc_c": 6685.25
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:canula p/botellas 500 x 5 unid.(nueva)": {
+      "nombre": "CANULA P/BOTELLAS 500 X 5 UNID.(NUEVA)",
+      "pb": null,
+      "publico": 8800.0,
+      "costos": {
+        "ri_j": 6050.0,
+        "ri_d": 6050.0,
+        "ri_c": 6050.0,
+        "nc_j": 6685.25,
+        "nc_d": 6685.25,
+        "nc_c": 6685.25
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:canula p/botellas 750 x 5 unid.(nueva)": {
+      "nombre": "CANULA P/BOTELLAS 750 X 5 UNID.(NUEVA)",
+      "pb": null,
+      "publico": 8800.0,
+      "costos": {
+        "ri_j": 6050.0,
+        "ri_d": 6050.0,
+        "ri_c": 6050.0,
+        "nc_j": 6685.25,
+        "nc_d": 6685.25,
+        "nc_c": 6685.25
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:cepillo de acero p/iontrix": {
+      "nombre": "CEPILLO DE ACERO P/IONTRIX",
+      "pb": null,
+      "publico": 23000.0,
+      "costos": {
+        "ri_j": 17061.0,
+        "ri_d": 17061.0,
+        "ri_c": 17061.0,
+        "nc_j": 18852.41,
+        "nc_d": 18852.41,
+        "nc_c": 18852.41
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:conj.soporte escuadra p/dispenser pie c/conectores": {
+      "nombre": "CONJ.SOPORTE ESCUADRA P/DISPENSER PIE C/CONECTORES",
+      "pb": null,
+      "publico": 148700.0,
+      "costos": {
+        "ri_j": 119306.0,
+        "ri_d": 119306.0,
+        "ri_c": 119306.0,
+        "nc_j": 131833.13,
+        "nc_d": 131833.13,
+        "nc_c": 131833.13
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "612290100": {
+      "nombre": "ELECTRODO P/IONTRIX",
+      "pb": null,
+      "publico": 182000.0,
+      "costos": {
+        "ri_j": 128260.0,
+        "ri_d": 128260.0,
+        "ri_c": 128260.0,
+        "nc_j": 141727.3,
+        "nc_d": 141727.3,
+        "nc_c": 141727.3
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:fipor n° 3 x 2 unid.": {
+      "nombre": "FIPOR N° 3 X 2 UNID.",
+      "pb": null,
+      "publico": 31300.0,
+      "costos": null,
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:fipor n° 3 x 4 unid.": {
+      "nombre": "FIPOR N° 3 X 4 UNID.",
+      "pb": null,
+      "publico": 56750.0,
+      "costos": null,
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:fipor n° 3 x 6 unid.": {
+      "nombre": "FIPOR N° 3 X 6 UNID.",
+      "pb": null,
+      "publico": 84850.0,
+      "costos": null,
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "612050360": {
+      "nombre": "FIPOR N° 3 X 8 UNIDADES",
+      "pb": null,
+      "publico": 103000.0,
+      "costos": {
+        "ri_j": 42713.0,
+        "ri_d": 42713.0,
+        "ri_c": 42713.0,
+        "nc_j": 47197.87,
+        "nc_d": 47197.87,
+        "nc_c": 47197.87
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:flor psa ducha blanco/bianco c/codo cromado": {
+      "nombre": "FLOR PSA DUCHA BLANCO/BIANCO C/CODO CROMADO",
+      "pb": null,
+      "publico": 31300.0,
+      "costos": {
+        "ri_j": 22929.5,
+        "ri_d": 22929.5,
+        "ri_c": 22929.5,
+        "nc_j": 25337.1,
+        "nc_d": 25337.1,
+        "nc_c": 25337.1
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:flor psa ducha grigio c/codo cromado": {
+      "nombre": "FLOR PSA DUCHA GRIGIO C/CODO CROMADO",
+      "pb": null,
+      "publico": 31300.0,
+      "costos": {
+        "ri_j": 22929.5,
+        "ri_d": 22929.5,
+        "ri_c": 22929.5,
+        "nc_j": 25337.1,
+        "nc_d": 25337.1,
+        "nc_c": 25337.1
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:fuente de alimentacion osmosis psa ropot": {
+      "nombre": "FUENTE DE ALIMENTACION OSMOSIS PSA ROPOT",
+      "pb": null,
+      "publico": 74900.0,
+      "costos": {
+        "ri_j": 59895.0,
+        "ri_d": 59895.0,
+        "ri_c": 59895.0,
+        "nc_j": 66183.98,
+        "nc_d": 66183.98,
+        "nc_c": 66183.98
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:fuente de alimentacion p/domus-mini domus": {
+      "nombre": "FUENTE DE ALIMENTACION P/DOMUS-MINI DOMUS",
+      "pb": null,
+      "publico": 58350.0,
+      "costos": {
+        "ri_j": 47492.5,
+        "ri_d": 47492.5,
+        "ri_c": 47492.5,
+        "nc_j": 52479.21,
+        "nc_d": 52479.21,
+        "nc_c": 52479.21
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:fuente de alimentacion p/iontrix": {
+      "nombre": "FUENTE DE ALIMENTACION P/IONTRIX",
+      "pb": null,
+      "publico": 185000.0,
+      "costos": {
+        "ri_j": 152460.0,
+        "ri_d": 152460.0,
+        "ri_c": 152460.0,
+        "nc_j": 168468.3,
+        "nc_d": 168468.3,
+        "nc_c": 168468.3
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:gatillo p/canilla bajo mesada psa": {
+      "nombre": "GATILLO P/CANILLA BAJO MESADA PSA",
+      "pb": null,
+      "publico": 15700.0,
+      "costos": {
+        "ri_j": 6050.0,
+        "ri_d": 6050.0,
+        "ri_c": 6050.0,
+        "nc_j": 6685.25,
+        "nc_d": 6685.25,
+        "nc_c": 6685.25
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "611300020": {
+      "nombre": "JARRA AGUA OSMOSIS PSA ROPOT",
+      "pb": null,
+      "publico": 64250.0,
+      "costos": {
+        "ri_j": 47311.0,
+        "ri_d": 47311.0,
+        "ri_c": 47311.0,
+        "nc_j": 52278.66,
+        "nc_d": 52278.66,
+        "nc_c": 52278.66
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:juego juntas poli 2": {
+      "nombre": "JUEGO JUNTAS POLI 2",
+      "pb": null,
+      "publico": 2550.0,
+      "costos": {
+        "ri_j": 2238.5,
+        "ri_d": 2238.5,
+        "ri_c": 2238.5,
+        "nc_j": 2473.54,
+        "nc_d": 2473.54,
+        "nc_c": 2473.54
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:kit p/determinación dureza (10 tiras)": {
+      "nombre": "KIT P/DETERMINACIÓN DUREZA (10 TIRAS)",
+      "pb": null,
+      "publico": 27150.0,
+      "costos": {
+        "ri_j": 21780.0,
+        "ri_d": 21780.0,
+        "ri_c": 21780.0,
+        "nc_j": 24066.9,
+        "nc_d": 24066.9,
+        "nc_c": 24066.9
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:kit p/medicion de cloro p/iontrix": {
+      "nombre": "KIT P/MEDICION DE CLORO P/IONTRIX",
+      "pb": null,
+      "publico": 11300.0,
+      "costos": {
+        "ri_j": 8530.5,
+        "ri_d": 8530.5,
+        "ri_c": 8530.5,
+        "nc_j": 9426.2,
+        "nc_d": 9426.2,
+        "nc_c": 9426.2
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:kit p/medicion de iones p/iontrix": {
+      "nombre": "KIT P/MEDICION DE IONES P/IONTRIX",
+      "pb": null,
+      "publico": 39600.0,
+      "costos": {
+        "ri_j": 30250.0,
+        "ri_d": 30250.0,
+        "ri_c": 30250.0,
+        "nc_j": 33426.25,
+        "nc_d": 33426.25,
+        "nc_c": 33426.25
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:kit p/medicion de ph p/iontrix": {
+      "nombre": "KIT P/MEDICION DE PH P/IONTRIX",
+      "pb": null,
+      "publico": 20650.0,
+      "costos": {
+        "ri_j": 14701.5,
+        "ri_d": 14701.5,
+        "ri_c": 14701.5,
+        "nc_j": 16245.16,
+        "nc_d": 16245.16,
+        "nc_c": 16245.16
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:kit posventa 1 año osmosis psa ropot": {
+      "nombre": "KIT POSVENTA 1 AÑO OSMOSIS PSA ROPOT",
+      "pb": 0.7,
+      "publico": 322400.0,
+      "costos": {
+        "ri_j": 251680.0,
+        "ri_d": 251680.0,
+        "ri_c": 251680.0,
+        "nc_j": 278106.4,
+        "nc_d": 278106.4,
+        "nc_c": 278106.4
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:kit posventa purif. aire psa": {
+      "nombre": "KIT POSVENTA PURIF. AIRE PSA",
+      "pb": 0.25,
+      "publico": 165000.0,
+      "costos": {
+        "ri_j": 115252.5,
+        "ri_d": 115252.5,
+        "ri_c": 115252.5,
+        "nc_j": 127354.01,
+        "nc_d": 127354.01,
+        "nc_c": 127354.01
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:kit psa lab p/iontrix": {
+      "nombre": "KIT PSA LAB P/IONTRIX",
+      "pb": null,
+      "publico": 113350.0,
+      "costos": {
+        "ri_j": 85365.5,
+        "ri_d": 85365.5,
+        "ri_c": 85365.5,
+        "nc_j": 94328.88,
+        "nc_d": 94328.88,
+        "nc_c": 94328.88
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:mang. black diám. 8,5 x 1600 c/conec. sen4/s1000": {
+      "nombre": "MANG. BLACK DIÁM. 8,5 X 1600 C/CONEC. SEN4/S1000",
+      "pb": null,
+      "publico": 14100.0,
+      "costos": {
+        "ri_j": 9438.0,
+        "ri_d": 9438.0,
+        "ri_c": 9438.0,
+        "nc_j": 10428.99,
+        "nc_d": 10428.99,
+        "nc_c": 10428.99
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:mang. black diám. 8,5 x 700 c/conec. sen4/s1000": {
+      "nombre": "MANG. BLACK DIÁM. 8,5 X 700 C/CONEC. SEN4/S1000",
+      "pb": null,
+      "publico": 10950.0,
+      "costos": {
+        "ri_j": 7562.5,
+        "ri_d": 7562.5,
+        "ri_c": 7562.5,
+        "nc_j": 8356.56,
+        "nc_d": 8356.56,
+        "nc_c": 8356.56
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:mang. semirrígida azul diám.8 (x metro)": {
+      "nombre": "MANG. SEMIRRÍGIDA AZUL DIÁM.8 (X METRO)",
+      "pb": null,
+      "publico": 7800.0,
+      "costos": {
+        "ri_j": 5929.0,
+        "ri_d": 5929.0,
+        "ri_c": 5929.0,
+        "nc_j": 6551.55,
+        "nc_d": 6551.55,
+        "nc_c": 6551.55
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:mang. semirrígida blanca diám.8 (x metro)": {
+      "nombre": "MANG. SEMIRRÍGIDA BLANCA DIÁM.8 (X METRO)",
+      "pb": null,
+      "publico": 7800.0,
+      "costos": {
+        "ri_j": 5929.0,
+        "ri_d": 5929.0,
+        "ri_c": 5929.0,
+        "nc_j": 6551.55,
+        "nc_d": 6551.55,
+        "nc_c": 6551.55
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:mang. semirrígida verde diám.8 (x metro)": {
+      "nombre": "MANG. SEMIRRÍGIDA VERDE DIÁM.8 (X METRO)",
+      "pb": null,
+      "publico": 7800.0,
+      "costos": {
+        "ri_j": 5929.0,
+        "ri_d": 5929.0,
+        "ri_c": 5929.0,
+        "nc_j": 6551.55,
+        "nc_d": 6551.55,
+        "nc_c": 6551.55
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:mang.plata diám. 8,5 x 1000 conec. sen/vero/s1000": {
+      "nombre": "MANG.PLATA DIÁM. 8,5 X 1000 CONEC. SEN/VERO/S1000",
+      "pb": null,
+      "publico": 10950.0,
+      "costos": {
+        "ri_j": 7562.5,
+        "ri_d": 7562.5,
+        "ri_c": 7562.5,
+        "nc_j": 8356.56,
+        "nc_d": 8356.56,
+        "nc_c": 8356.56
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:mang.plata diám. 8,5 x 1600 conec. sen/vero/s1000": {
+      "nombre": "MANG.PLATA DIÁM. 8,5 X 1600 CONEC. SEN/VERO/S1000",
+      "pb": null,
+      "publico": 10950.0,
+      "costos": {
+        "ri_j": 7562.5,
+        "ri_d": 7562.5,
+        "ri_c": 7562.5,
+        "nc_j": 8356.56,
+        "nc_d": 8356.56,
+        "nc_c": 8356.56
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:mang.plata diám. 8.5 x 1600 conec. p/mini": {
+      "nombre": "MANG.PLATA DIÁM. 8.5 X 1600 CONEC. P/MINI",
+      "pb": null,
+      "publico": 9000.0,
+      "costos": {
+        "ri_j": 5929.0,
+        "ri_d": 5929.0,
+        "ri_c": 5929.0,
+        "nc_j": 6551.55,
+        "nc_d": 6551.55,
+        "nc_c": 6551.55
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:mang.plata diám. 8.5 x 700 conec. p/mini": {
+      "nombre": "MANG.PLATA DIÁM. 8.5 X 700 CONEC. P/MINI",
+      "pb": null,
+      "publico": 4900.0,
+      "costos": {
+        "ri_j": 3690.5,
+        "ri_d": 3690.5,
+        "ri_c": 3690.5,
+        "nc_j": 4078.0,
+        "nc_d": 4078.0,
+        "nc_c": 4078.0
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:mariposa de fijacion p/iontrix": {
+      "nombre": "MARIPOSA DE FIJACION P/IONTRIX",
+      "pb": null,
+      "publico": 9000.0,
+      "costos": {
+        "ri_j": 5929.0,
+        "ri_d": 5929.0,
+        "ri_c": 5929.0,
+        "nc_j": 6551.55,
+        "nc_d": 6551.55,
+        "nc_c": 6551.55
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:mariposa de fijacion p/iontrix 3": {
+      "nombre": "MARIPOSA DE FIJACION P/IONTRIX 3",
+      "pb": null,
+      "publico": 9000.0,
+      "costos": {
+        "ri_j": 5929.0,
+        "ri_d": 5929.0,
+        "ri_c": 5929.0,
+        "nc_j": 6551.55,
+        "nc_d": 6551.55,
+        "nc_c": 6551.55
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:material regenerante x 2.5 kg p/domus": {
+      "nombre": "MATERIAL REGENERANTE X 2.5 KG P/DOMUS",
+      "pb": null,
+      "publico": 33200.0,
+      "costos": {
+        "ri_j": 26559.5,
+        "ri_d": 26559.5,
+        "ri_c": 26559.5,
+        "nc_j": 29348.25,
+        "nc_d": 29348.25,
+        "nc_c": 29348.25
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:modulo potenciador p/iontrix 3": {
+      "nombre": "MODULO POTENCIADOR P/IONTRIX 3",
+      "pb": null,
+      "publico": 38500.0,
+      "costos": {
+        "ri_j": 29221.5,
+        "ri_d": 29221.5,
+        "ri_c": 29221.5,
+        "nc_j": 32289.76,
+        "nc_d": 32289.76,
+        "nc_c": 32289.76
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:o-ring interno tapa cuerpo psa ducha (juego)": {
+      "nombre": "O-RING INTERNO TAPA CUERPO PSA DUCHA (JUEGO)",
+      "pb": null,
+      "publico": 5000.0,
+      "costos": {
+        "ri_j": 4295.5,
+        "ri_d": 4295.5,
+        "ri_c": 4295.5,
+        "nc_j": 4746.53,
+        "nc_d": 4746.53,
+        "nc_c": 4746.53
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:pastilla hidrosensible p/eco-d": {
+      "nombre": "PASTILLA HIDROSENSIBLE P/ECO-D",
+      "pb": null,
+      "publico": 34300.0,
+      "costos": {
+        "ri_j": 27830.0,
+        "ri_d": 27830.0,
+        "ri_c": 27830.0,
+        "nc_j": 30752.15,
+        "nc_d": 30752.15,
+        "nc_c": 30752.15
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:pastilla sanitizante max x 8 unid.": {
+      "nombre": "PASTILLA SANITIZANTE MAX X 8 UNID.",
+      "pb": null,
+      "publico": 4900.0,
+      "costos": {
+        "ri_j": 3690.5,
+        "ri_d": 3690.5,
+        "ri_c": 3690.5,
+        "nc_j": 4078.0,
+        "nc_d": 4078.0,
+        "nc_c": 4078.0
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:paño alta turbidez 24 x 21 x 3 unid.": {
+      "nombre": "PAÑO ALTA TURBIDEZ 24 X 21 X 3 UNID.",
+      "pb": null,
+      "publico": 27000.0,
+      "costos": {
+        "ri_j": 21719.5,
+        "ri_d": 21719.5,
+        "ri_c": 21719.5,
+        "nc_j": 24000.05,
+        "nc_d": 24000.05,
+        "nc_c": 24000.05
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:pico de descarga griferia nero": {
+      "nombre": "PICO DE DESCARGA GRIFERIA NERO",
+      "pb": null,
+      "publico": 98600.0,
+      "costos": {
+        "ri_j": 72600.0,
+        "ri_d": 72600.0,
+        "ri_c": 72600.0,
+        "nc_j": 80223.0,
+        "nc_d": 80223.0,
+        "nc_c": 80223.0
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:pico descarga canilla bm2/griferia psa": {
+      "nombre": "PICO DESCARGA CANILLA BM2/GRIFERIA PSA",
+      "pb": null,
+      "publico": 98600.0,
+      "costos": {
+        "ri_j": 72600.0,
+        "ri_d": 72600.0,
+        "ri_c": 72600.0,
+        "nc_j": 80223.0,
+        "nc_d": 80223.0,
+        "nc_c": 80223.0
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:prefiltro entrada purif. de aire psa": {
+      "nombre": "PREFILTRO ENTRADA PURIF. DE AIRE PSA",
+      "pb": null,
+      "publico": 50550.0,
+      "costos": {
+        "ri_j": 36905.0,
+        "ri_d": 36905.0,
+        "ri_c": 36905.0,
+        "nc_j": 40780.03,
+        "nc_d": 40780.03,
+        "nc_c": 40780.03
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:prefiltro p/10 kd": {
+      "nombre": "PREFILTRO P/10 KD",
+      "pb": null,
+      "publico": 20650.0,
+      "costos": {
+        "ri_j": 13249.5,
+        "ri_d": 13249.5,
+        "ri_c": 13249.5,
+        "nc_j": 14640.7,
+        "nc_d": 14640.7,
+        "nc_c": 14640.7
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:prolongador p/ pico psa senior 3": {
+      "nombre": "PROLONGADOR P/ PICO PSA SENIOR 3",
+      "pb": null,
+      "publico": 20650.0,
+      "costos": {
+        "ri_j": 12886.5,
+        "ri_d": 12886.5,
+        "ri_c": 12886.5,
+        "nc_j": 14239.58,
+        "nc_d": 14239.58,
+        "nc_c": 14239.58
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:prolongador p/pico psa senior": {
+      "nombre": "PROLONGADOR P/PICO PSA SENIOR",
+      "pb": null,
+      "publico": 20650.0,
+      "costos": {
+        "ri_j": 12886.5,
+        "ri_d": 12886.5,
+        "ri_c": 12886.5,
+        "nc_j": 14239.58,
+        "nc_d": 14239.58,
+        "nc_c": 14239.58
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:promo cilindro + pack rendimiento ii": {
+      "nombre": "PROMO CILINDRO + PACK RENDIMIENTO II",
+      "pb": null,
+      "publico": 116000.0,
+      "costos": {
+        "ri_j": 85305.0,
+        "ri_d": 85305.0,
+        "ri_c": 85305.0,
+        "nc_j": 94262.03,
+        "nc_d": 94262.03,
+        "nc_c": 94262.03
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:reactivo de cloro": {
+      "nombre": "REACTIVO DE CLORO",
+      "pb": null,
+      "publico": 6650.0,
+      "costos": {
+        "ri_j": 5142.5,
+        "ri_d": 5142.5,
+        "ri_c": 5142.5,
+        "nc_j": 5682.46,
+        "nc_d": 5682.46,
+        "nc_c": 5682.46
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:recarga p/soda burby": {
+      "nombre": "RECARGA P/SODA BURBY",
+      "pb": null,
+      "publico": 29550.0,
+      "costos": {
+        "ri_j": 22929.5,
+        "ri_d": 22929.5,
+        "ri_c": 22929.5,
+        "nc_j": 25337.1,
+        "nc_d": 25337.1,
+        "nc_c": 25337.1
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:recipiente p/agua entrada osmosis psa ropot": {
+      "nombre": "RECIPIENTE P/AGUA ENTRADA OSMOSIS PSA ROPOT",
+      "pb": null,
+      "publico": 50850.0,
+      "costos": {
+        "ri_j": 38720.0,
+        "ri_d": 38720.0,
+        "ri_c": 38720.0,
+        "nc_j": 42785.6,
+        "nc_d": 42785.6,
+        "nc_c": 42785.6
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "612050260": {
+      "nombre": "REPUESTO BACTERIOSTÁTICO 25 MIC S-1000/QUA/SEN",
+      "pb": 0.17,
+      "publico": 79000.0,
+      "costos": {
+        "ri_j": 53482.0,
+        "ri_d": 53482.0,
+        "ri_c": 53482.0,
+        "nc_j": 59097.61,
+        "nc_d": 59097.61,
+        "nc_c": 59097.61
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "612050250": {
+      "nombre": "REPUESTO BACTERIOSTÁTICO 5 MIC S-1000/QUA/SEN",
+      "pb": 0.17,
+      "publico": 79000.0,
+      "costos": {
+        "ri_j": 53482.0,
+        "ri_d": 53482.0,
+        "ri_c": 53482.0,
+        "nc_j": 59097.61,
+        "nc_d": 59097.61,
+        "nc_c": 59097.61
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:repuesto bacteriostático 50 mic s-1000/qua/sen": {
+      "nombre": "REPUESTO BACTERIOSTÁTICO 50 MIC S-1000/QUA/SEN",
+      "pb": 0.17,
+      "publico": 79000.0,
+      "costos": {
+        "ri_j": 53482.0,
+        "ri_d": 53482.0,
+        "ri_c": 53482.0,
+        "nc_j": 59097.61,
+        "nc_d": 59097.61,
+        "nc_c": 59097.61
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:repuesto cuerpo psa ducha bianco": {
+      "nombre": "REPUESTO CUERPO PSA DUCHA BIANCO",
+      "pb": null,
+      "publico": 21950.0,
+      "costos": {
+        "ri_j": 16637.5,
+        "ri_d": 16637.5,
+        "ri_c": 16637.5,
+        "nc_j": 18384.44,
+        "nc_d": 18384.44,
+        "nc_c": 18384.44
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:repuesto cuerpo psa ducha grigio": {
+      "nombre": "REPUESTO CUERPO PSA DUCHA GRIGIO",
+      "pb": null,
+      "publico": 21950.0,
+      "costos": {
+        "ri_j": 16637.5,
+        "ri_d": 16637.5,
+        "ri_c": 16637.5,
+        "nc_j": 18384.44,
+        "nc_d": 18384.44,
+        "nc_c": 18384.44
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "612060010": {
+      "nombre": "REPUESTO N°1 SEDIMENTOS OSMOSIS PSA ROPOT",
+      "pb": 0.15,
+      "publico": 50550.0,
+      "costos": {
+        "ri_j": 40595.5,
+        "ri_d": 40595.5,
+        "ri_c": 40595.5,
+        "nc_j": 44858.03,
+        "nc_d": 44858.03,
+        "nc_c": 44858.03
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "612060030": {
+      "nombre": "REPUESTO N°2 CARBON BLOQUE OSMOSIS PSA ROPOT",
+      "pb": 0.15,
+      "publico": 56750.0,
+      "costos": {
+        "ri_j": 44346.5,
+        "ri_d": 44346.5,
+        "ri_c": 44346.5,
+        "nc_j": 49002.88,
+        "nc_d": 49002.88,
+        "nc_c": 49002.88
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "612060020": {
+      "nombre": "REPUESTO N°3 MEMBRANA OSMOSIS PSA ROPOT",
+      "pb": 0.25,
+      "publico": 164300.0,
+      "costos": {
+        "ri_j": 129470.0,
+        "ri_d": 129470.0,
+        "ri_c": 129470.0,
+        "nc_j": 143064.35,
+        "nc_d": 143064.35,
+        "nc_c": 143064.35
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:repuesto n°4 post membrana osmosis psa ropot": {
+      "nombre": "REPUESTO N°4 POST MEMBRANA OSMOSIS PSA ROPOT",
+      "pb": 0.15,
+      "publico": 57800.0,
+      "costos": {
+        "ri_j": 45133.0,
+        "ri_d": 45133.0,
+        "ri_c": 45133.0,
+        "nc_j": 49871.97,
+        "nc_d": 49871.97,
+        "nc_c": 49871.97
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "612100030": {
+      "nombre": "REPUESTO PSA DUCHA C/KDF",
+      "pb": 0.23,
+      "publico": 149000.0,
+      "costos": {
+        "ri_j": 105451.5,
+        "ri_d": 105451.5,
+        "ri_c": 105451.5,
+        "nc_j": 116523.91,
+        "nc_d": 116523.91,
+        "nc_c": 116523.91
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "612100080": {
+      "nombre": "REPUESTO PSA DUCHA C/KDF/POLIFOSFATO",
+      "pb": 0.23,
+      "publico": 149000.0,
+      "costos": {
+        "ri_j": 105451.5,
+        "ri_d": 105451.5,
+        "ri_c": 105451.5,
+        "nc_j": 116523.91,
+        "nc_d": 116523.91,
+        "nc_c": 116523.91
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:repuesto psa poli": {
+      "nombre": "REPUESTO PSA POLI",
+      "pb": 0.17,
+      "publico": 86500.0,
+      "costos": {
+        "ri_j": 63767.0,
+        "ri_d": 63767.0,
+        "ri_c": 63767.0,
+        "nc_j": 70462.54,
+        "nc_d": 70462.54,
+        "nc_c": 70462.54
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "612280150": {
+      "nombre": "REPUESTO PSA POLI 2",
+      "pb": 0.17,
+      "publico": 86500.0,
+      "costos": {
+        "ri_j": 63767.0,
+        "ri_d": 63767.0,
+        "ri_c": 63767.0,
+        "nc_j": 70462.54,
+        "nc_d": 70462.54,
+        "nc_c": 70462.54
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "612020010": {
+      "nombre": "REPUESTO PSA PORTÁTIL",
+      "pb": 0.17,
+      "publico": 92000.0,
+      "costos": {
+        "ri_j": 55660.0,
+        "ri_d": 55660.0,
+        "ri_c": 55660.0,
+        "nc_j": 61504.3,
+        "nc_d": 61504.3,
+        "nc_c": 61504.3
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:reservorio completo p/eco-d": {
+      "nombre": "RESERVORIO COMPLETO P/ECO-D",
+      "pb": null,
+      "publico": 37250.0,
+      "costos": {
+        "ri_j": 25349.5,
+        "ri_d": 25349.5,
+        "ri_c": 25349.5,
+        "nc_j": 28011.2,
+        "nc_d": 28011.2,
+        "nc_c": 28011.2
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:tapa acrilico p/stopper/40k-d": {
+      "nombre": "TAPA ACRILICO P/STOPPER/40K-D",
+      "pb": null,
+      "publico": 80850.0,
+      "costos": {
+        "ri_j": 50154.5,
+        "ri_d": 50154.5,
+        "ri_c": 50154.5,
+        "nc_j": 55420.72,
+        "nc_d": 55420.72,
+        "nc_c": 55420.72
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:tapa centradora p/iontrix": {
+      "nombre": "TAPA CENTRADORA P/IONTRIX",
+      "pb": null,
+      "publico": 11750.0,
+      "costos": {
+        "ri_j": 9438.0,
+        "ri_d": 9438.0,
+        "ri_c": 9438.0,
+        "nc_j": 10428.99,
+        "nc_d": 10428.99,
+        "nc_c": 10428.99
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:tapa centradora p/iontrix 3": {
+      "nombre": "TAPA CENTRADORA P/IONTRIX 3",
+      "pb": null,
+      "publico": 11750.0,
+      "costos": {
+        "ri_j": 9438.0,
+        "ri_d": 9438.0,
+        "ri_c": 9438.0,
+        "nc_j": 10428.99,
+        "nc_d": 10428.99,
+        "nc_c": 10428.99
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:tapa con flotante p/dispenser": {
+      "nombre": "TAPA CON FLOTANTE P/DISPENSER",
+      "pb": null,
+      "publico": 159000.0,
+      "costos": {
+        "ri_j": 120637.0,
+        "ri_d": 120637.0,
+        "ri_c": 120637.0,
+        "nc_j": 133303.89,
+        "nc_d": 133303.89,
+        "nc_c": 133303.89
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:tapa p/botella psa termica pico sport": {
+      "nombre": "TAPA P/BOTELLA PSA TERMICA PICO SPORT",
+      "pb": null,
+      "publico": 8800.0,
+      "costos": {
+        "ri_j": 6050.0,
+        "ri_d": 6050.0,
+        "ri_c": 6050.0,
+        "nc_j": 6685.25,
+        "nc_d": 6685.25,
+        "nc_c": 6685.25
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:tapa p/botella psa termica pico sport (nueva)": {
+      "nombre": "TAPA P/BOTELLA PSA TERMICA PICO SPORT (NUEVA)",
+      "pb": null,
+      "publico": 16000.0,
+      "costos": {
+        "ri_j": 11011.0,
+        "ri_d": 11011.0,
+        "ri_c": 11011.0,
+        "nc_j": 12167.16,
+        "nc_d": 12167.16,
+        "nc_c": 12167.16
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:tapa p/cuerpo psa ducha cr marfil": {
+      "nombre": "TAPA P/CUERPO PSA DUCHA CR MARFIL",
+      "pb": null,
+      "publico": 21950.0,
+      "costos": {
+        "ri_j": 16637.5,
+        "ri_d": 16637.5,
+        "ri_c": 16637.5,
+        "nc_j": 18384.44,
+        "nc_d": 18384.44,
+        "nc_c": 18384.44
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:tapa p/cuerpo psa ducha plata": {
+      "nombre": "TAPA P/CUERPO PSA DUCHA PLATA",
+      "pb": null,
+      "publico": 21950.0,
+      "costos": {
+        "ri_j": 16637.5,
+        "ri_d": 16637.5,
+        "ri_c": 16637.5,
+        "nc_j": 18384.44,
+        "nc_d": 18384.44,
+        "nc_c": 18384.44
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:tapa prefiltro c/autopurga": {
+      "nombre": "TAPA PREFILTRO C/AUTOPURGA",
+      "pb": null,
+      "publico": 18950.0,
+      "costos": {
+        "ri_j": 8046.5,
+        "ri_d": 8046.5,
+        "ri_c": 8046.5,
+        "nc_j": 8891.38,
+        "nc_d": 8891.38,
+        "nc_c": 8891.38
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:tapa prefiltro psa s-1000 ii": {
+      "nombre": "TAPA PREFILTRO PSA S-1000 II",
+      "pb": null,
+      "publico": 26550.0,
+      "costos": {
+        "ri_j": 17061.0,
+        "ri_d": 17061.0,
+        "ri_c": 17061.0,
+        "nc_j": 18852.41,
+        "nc_d": 18852.41,
+        "nc_c": 18852.41
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:tapa prefiltro senior 3": {
+      "nombre": "TAPA PREFILTRO SENIOR 3",
+      "pb": null,
+      "publico": 18950.0,
+      "costos": {
+        "ri_j": 8046.5,
+        "ri_d": 8046.5,
+        "ri_c": 8046.5,
+        "nc_j": 8891.38,
+        "nc_d": 8891.38,
+        "nc_c": 8891.38
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:tapa prefiltro senior 4": {
+      "nombre": "TAPA PREFILTRO SENIOR 4",
+      "pb": null,
+      "publico": 33650.0,
+      "costos": {
+        "ri_j": 14520.0,
+        "ri_d": 14520.0,
+        "ri_c": 14520.0,
+        "nc_j": 16044.6,
+        "nc_d": 16044.6,
+        "nc_c": 16044.6
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:tapon p/conector de recarga p/iontrix": {
+      "nombre": "TAPON P/CONECTOR DE RECARGA P/IONTRIX",
+      "pb": null,
+      "publico": 11750.0,
+      "costos": {
+        "ri_j": 9438.0,
+        "ri_d": 9438.0,
+        "ri_c": 9438.0,
+        "nc_j": 10428.99,
+        "nc_d": 10428.99,
+        "nc_c": 10428.99
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:termostato agua caliente 85° p/dispenser": {
+      "nombre": "TERMOSTATO AGUA CALIENTE 85° P/DISPENSER",
+      "pb": null,
+      "publico": 38500.0,
+      "costos": {
+        "ri_j": 27043.5,
+        "ri_d": 27043.5,
+        "ri_c": 27043.5,
+        "nc_j": 29883.07,
+        "nc_d": 29883.07,
+        "nc_c": 29883.07
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:tubo conexion psa ducha c/o-ring": {
+      "nombre": "TUBO CONEXION PSA DUCHA C/O-RING",
+      "pb": null,
+      "publico": 37250.0,
+      "costos": {
+        "ri_j": 23474.0,
+        "ri_d": 23474.0,
+        "ri_c": 23474.0,
+        "nc_j": 25938.77,
+        "nc_d": 25938.77,
+        "nc_c": 25938.77
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:vaso acrilico psa poli 2": {
+      "nombre": "VASO ACRILICO PSA POLI 2",
+      "pb": null,
+      "publico": 70250.0,
+      "costos": {
+        "ri_j": 55660.0,
+        "ri_d": 55660.0,
+        "ri_c": 55660.0,
+        "nc_j": 61504.3,
+        "nc_d": 61504.3,
+        "nc_c": 61504.3
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:válvula by pass c3 grigio": {
+      "nombre": "VÁLVULA BY PASS C3 GRIGIO",
+      "pb": null,
+      "publico": 23150.0,
+      "costos": {
+        "ri_j": 13249.5,
+        "ri_d": 13249.5,
+        "ri_c": 13249.5,
+        "nc_j": 14640.7,
+        "nc_d": 14640.7,
+        "nc_c": 14640.7
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:válvula by pass nero": {
+      "nombre": "VÁLVULA BY PASS NERO",
+      "pb": null,
+      "publico": 23150.0,
+      "costos": {
+        "ri_j": 13249.5,
+        "ri_d": 13249.5,
+        "ri_c": 13249.5,
+        "nc_j": 14640.7,
+        "nc_d": 14640.7,
+        "nc_c": 14640.7
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:válvula by pass universal": {
+      "nombre": "VÁLVULA BY PASS UNIVERSAL",
+      "pb": null,
+      "publico": 23150.0,
+      "costos": {
+        "ri_j": 13249.5,
+        "ri_d": 13249.5,
+        "ri_c": 13249.5,
+        "nc_j": 14640.7,
+        "nc_d": 14640.7,
+        "nc_c": 14640.7
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:adicional inst. hasta 60 km (psa poli x 2)": {
+      "nombre": "ADICIONAL INST. HASTA 60 KM (PSA POLI X 2)",
+      "pb": null,
+      "publico": 238000.0,
+      "costos": {
+        "ri_j": 189970.0,
+        "ri_d": 189970.0,
+        "ri_c": 189970.0,
+        "nc_j": 209916.85,
+        "nc_d": 209916.85,
+        "nc_c": 209916.85
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:adicional inst. hasta 60 km (psa poli)": {
+      "nombre": "ADICIONAL INST. HASTA 60 KM (PSA POLI)",
+      "pb": null,
+      "publico": 174000.0,
+      "costos": {
+        "ri_j": 124630.0,
+        "ri_d": 124630.0,
+        "ri_c": 124630.0,
+        "nc_j": 137716.15,
+        "nc_d": 137716.15,
+        "nc_c": 137716.15
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:adicional instal. hasta 60 km": {
+      "nombre": "ADICIONAL INSTAL. HASTA 60 KM",
+      "pb": null,
+      "publico": 153000.0,
+      "costos": {
+        "ri_j": 122210.0,
+        "ri_d": 122210.0,
+        "ri_c": 122210.0,
+        "nc_j": 135042.05,
+        "nc_d": 135042.05,
+        "nc_c": 135042.05
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:adicional por kilometraje excedido": {
+      "nombre": "ADICIONAL POR KILOMETRAJE EXCEDIDO",
+      "pb": null,
+      "publico": 4850.0,
+      "costos": {
+        "ri_j": 3872.0,
+        "ri_d": 3872.0,
+        "ri_c": 3872.0,
+        "nc_j": 4278.56,
+        "nc_d": 4278.56,
+        "nc_c": 4278.56
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:grifería psa bicomando + inst.": {
+      "nombre": "GRIFERÍA PSA BICOMANDO + INST.",
+      "pb": null,
+      "publico": 691000.0,
+      "costos": {
+        "ri_j": 549340.0,
+        "ri_d": 549340.0,
+        "ri_c": 549340.0,
+        "nc_j": 607020.7,
+        "nc_d": 607020.7,
+        "nc_c": 607020.7
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:grifería psa bicomando nero + inst.": {
+      "nombre": "GRIFERÍA PSA BICOMANDO NERO + INST.",
+      "pb": null,
+      "publico": 691000.0,
+      "costos": {
+        "ri_j": 549340.0,
+        "ri_d": 549340.0,
+        "ri_c": 549340.0,
+        "nc_j": 607020.7,
+        "nc_d": 607020.7,
+        "nc_c": 607020.7
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:grifería psa bm + inst.": {
+      "nombre": "GRIFERÍA PSA BM + INST.",
+      "pb": null,
+      "publico": 372000.0,
+      "costos": {
+        "ri_j": 306130.0,
+        "ri_d": 306130.0,
+        "ri_c": 306130.0,
+        "nc_j": 338273.65,
+        "nc_d": 338273.65,
+        "nc_c": 338273.65
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:grifería psa bm nero + inst.": {
+      "nombre": "GRIFERÍA PSA BM NERO + INST.",
+      "pb": null,
+      "publico": 372000.0,
+      "costos": {
+        "ri_j": 306130.0,
+        "ri_d": 306130.0,
+        "ri_c": 306130.0,
+        "nc_j": 338273.65,
+        "nc_d": 338273.65,
+        "nc_c": 338273.65
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:instalacion dispenser psa (hasta 60 km)": {
+      "nombre": "INSTALACION DISPENSER PSA (HASTA 60 KM)",
+      "pb": null,
+      "publico": 198000.0,
+      "costos": {
+        "ri_j": 164560.0,
+        "ri_d": 164560.0,
+        "ri_c": 164560.0,
+        "nc_j": 181838.8,
+        "nc_d": 181838.8,
+        "nc_c": 181838.8
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:instalacion psa domus/mini domus (hasta 60 km)": {
+      "nombre": "INSTALACION PSA DOMUS/MINI DOMUS (HASTA 60 KM)",
+      "pb": null,
+      "publico": 198000.0,
+      "costos": {
+        "ri_j": 164560.0,
+        "ri_d": 164560.0,
+        "ri_c": 164560.0,
+        "nc_j": 181838.8,
+        "nc_d": 181838.8,
+        "nc_c": 181838.8
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:mantenimiento anual dispenser psa": {
+      "nombre": "MANTENIMIENTO ANUAL DISPENSER PSA",
+      "pb": null,
+      "publico": 171000.0,
+      "costos": {
+        "ri_j": 136730.0,
+        "ri_d": 136730.0,
+        "ri_c": 136730.0,
+        "nc_j": 151086.65,
+        "nc_d": 151086.65,
+        "nc_c": 151086.65
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:modulo reparacion de producto": {
+      "nombre": "MODULO REPARACION DE PRODUCTO",
+      "pb": null,
+      "publico": 12500.0,
+      "costos": {
+        "ri_j": 8591.0,
+        "ri_d": 8591.0,
+        "ri_c": 8591.0,
+        "nc_j": 9493.06,
+        "nc_d": 9493.06,
+        "nc_c": 9493.06
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:service con instalador hasta 60 km.": {
+      "nombre": "SERVICE CON INSTALADOR HASTA 60 KM.",
+      "pb": null,
+      "publico": 118000.0,
+      "costos": {
+        "ri_j": 97163.0,
+        "ri_d": 97163.0,
+        "ri_c": 97163.0,
+        "nc_j": 107365.12,
+        "nc_d": 107365.12,
+        "nc_c": 107365.12
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:transf.sm/bm + grif.psa bicomando": {
+      "nombre": "TRANSF.SM/BM + GRIF.PSA BICOMANDO",
+      "pb": null,
+      "publico": 563000.0,
+      "costos": {
+        "ri_j": 446490.0,
+        "ri_d": 446490.0,
+        "ri_c": 446490.0,
+        "nc_j": 493371.45,
+        "nc_d": 493371.45,
+        "nc_c": 493371.45
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:transf.sm/bm + grif.psa bicomando + inst.": {
+      "nombre": "TRANSF.SM/BM + GRIF.PSA BICOMANDO + INST.",
+      "pb": null,
+      "publico": 716000.0,
+      "costos": {
+        "ri_j": 568700.0,
+        "ri_d": 568700.0,
+        "ri_c": 568700.0,
+        "nc_j": 628413.5,
+        "nc_d": 628413.5,
+        "nc_c": 628413.5
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:transf.sm/bm + grif.psa bicomando nero": {
+      "nombre": "TRANSF.SM/BM + GRIF.PSA BICOMANDO NERO",
+      "pb": null,
+      "publico": 563000.0,
+      "costos": {
+        "ri_j": 446490.0,
+        "ri_d": 446490.0,
+        "ri_c": 446490.0,
+        "nc_j": 493371.45,
+        "nc_d": 493371.45,
+        "nc_c": 493371.45
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:transf.sm/bm + grif.psa bicomando nero + inst.": {
+      "nombre": "TRANSF.SM/BM + GRIF.PSA BICOMANDO NERO + INST.",
+      "pb": null,
+      "publico": 716000.0,
+      "costos": {
+        "ri_j": 568700.0,
+        "ri_d": 568700.0,
+        "ri_c": 568700.0,
+        "nc_j": 628413.5,
+        "nc_d": 628413.5,
+        "nc_c": 628413.5
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:transf.sm/bm + grifería psa bm": {
+      "nombre": "TRANSF.SM/BM + GRIFERÍA PSA BM",
+      "pb": null,
+      "publico": 230000.0,
+      "costos": {
+        "ri_j": 191180.0,
+        "ri_d": 191180.0,
+        "ri_c": 191180.0,
+        "nc_j": 211253.9,
+        "nc_d": 211253.9,
+        "nc_c": 211253.9
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:transf.sm/bm + grifería psa bm + instal.": {
+      "nombre": "TRANSF.SM/BM + GRIFERÍA PSA BM + INSTAL.",
+      "pb": null,
+      "publico": 383000.0,
+      "costos": {
+        "ri_j": 313390.0,
+        "ri_d": 313390.0,
+        "ri_c": 313390.0,
+        "nc_j": 346295.95,
+        "nc_d": 346295.95,
+        "nc_c": 346295.95
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:transf.sm/bm + grifería psa bm nero": {
+      "nombre": "TRANSF.SM/BM + GRIFERÍA PSA BM NERO",
+      "pb": null,
+      "publico": 230000.0,
+      "costos": {
+        "ri_j": 191180.0,
+        "ri_d": 191180.0,
+        "ri_c": 191180.0,
+        "nc_j": 211253.9,
+        "nc_d": 211253.9,
+        "nc_c": 211253.9
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:transf.sm/bm + grifería psa bm nero + instal.": {
+      "nombre": "TRANSF.SM/BM + GRIFERÍA PSA BM NERO + INSTAL.",
+      "pb": null,
+      "publico": 383000.0,
+      "costos": {
+        "ri_j": 313390.0,
+        "ri_d": 313390.0,
+        "ri_c": 313390.0,
+        "nc_j": 346295.95,
+        "nc_d": 346295.95,
+        "nc_c": 346295.95
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:botella 600 cc no gasf amar-amar 100 % reciclada": {
+      "nombre": "BOTELLA 600 CC NO GASF AMAR-AMAR 100 % RECICLADA",
+      "pb": null,
+      "publico": 37150.0,
+      "costos": {
+        "ri_j": 26801.5,
+        "ri_d": 26801.5,
+        "ri_c": 26801.5,
+        "nc_j": 29615.66,
+        "nc_d": 29615.66,
+        "nc_c": 29615.66
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:botella 600 cc no gasf amar-aqua % reciclada": {
+      "nombre": "BOTELLA 600 CC NO GASF AMAR-AQUA % RECICLADA",
+      "pb": null,
+      "publico": 37150.0,
+      "costos": {
+        "ri_j": 26801.5,
+        "ri_d": 26801.5,
+        "ri_c": 26801.5,
+        "nc_j": 29615.66,
+        "nc_d": 29615.66,
+        "nc_c": 29615.66
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:botella 600 cc no gasf amar-ros 100 % reciclada": {
+      "nombre": "BOTELLA 600 CC NO GASF AMAR-ROS 100 % RECICLADA",
+      "pb": null,
+      "publico": 37150.0,
+      "costos": {
+        "ri_j": 26801.5,
+        "ri_d": 26801.5,
+        "ri_c": 26801.5,
+        "nc_j": 29615.66,
+        "nc_d": 29615.66,
+        "nc_c": 29615.66
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:botella 600 cc no gasf amar-ver 100 % reciclada": {
+      "nombre": "BOTELLA 600 CC NO GASF AMAR-VER 100 % RECICLADA",
+      "pb": null,
+      "publico": 37150.0,
+      "costos": {
+        "ri_j": 26801.5,
+        "ri_d": 26801.5,
+        "ri_c": 26801.5,
+        "nc_j": 29615.66,
+        "nc_d": 29615.66,
+        "nc_c": 29615.66
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:botella 600 cc no gasf aqua-amar 100 % reciclada": {
+      "nombre": "BOTELLA 600 CC NO GASF AQUA-AMAR 100 % RECICLADA",
+      "pb": null,
+      "publico": 37150.0,
+      "costos": {
+        "ri_j": 26801.5,
+        "ri_d": 26801.5,
+        "ri_c": 26801.5,
+        "nc_j": 29615.66,
+        "nc_d": 29615.66,
+        "nc_c": 29615.66
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:botella 600 cc no gasf aqua-aqua 100 % reciclada": {
+      "nombre": "BOTELLA 600 CC NO GASF AQUA-AQUA 100 % RECICLADA",
+      "pb": null,
+      "publico": 37150.0,
+      "costos": {
+        "ri_j": 26801.5,
+        "ri_d": 26801.5,
+        "ri_c": 26801.5,
+        "nc_j": 29615.66,
+        "nc_d": 29615.66,
+        "nc_c": 29615.66
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:botella 600 cc no gasf aqua-rosa 100% reciclada": {
+      "nombre": "BOTELLA 600 CC NO GASF AQUA-ROSA 100% RECICLADA",
+      "pb": null,
+      "publico": 37150.0,
+      "costos": {
+        "ri_j": 26801.5,
+        "ri_d": 26801.5,
+        "ri_c": 26801.5,
+        "nc_j": 29615.66,
+        "nc_d": 29615.66,
+        "nc_c": 29615.66
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:botella 600 cc no gasf aqua-verde 100% reciclada": {
+      "nombre": "BOTELLA 600 CC NO GASF AQUA-VERDE 100% RECICLADA",
+      "pb": null,
+      "publico": 37150.0,
+      "costos": {
+        "ri_j": 26801.5,
+        "ri_d": 26801.5,
+        "ri_c": 26801.5,
+        "nc_j": 29615.66,
+        "nc_d": 29615.66,
+        "nc_c": 29615.66
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:botella 600 cc no gasf ros-amar 100 % reciclada": {
+      "nombre": "BOTELLA 600 CC NO GASF ROS-AMAR 100 % RECICLADA",
+      "pb": null,
+      "publico": 37150.0,
+      "costos": {
+        "ri_j": 26801.5,
+        "ri_d": 26801.5,
+        "ri_c": 26801.5,
+        "nc_j": 29615.66,
+        "nc_d": 29615.66,
+        "nc_c": 29615.66
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:botella 600 cc no gasf ros-aqua 100 % reciclada": {
+      "nombre": "BOTELLA 600 CC NO GASF ROS-AQUA 100 % RECICLADA",
+      "pb": null,
+      "publico": 37150.0,
+      "costos": {
+        "ri_j": 26801.5,
+        "ri_d": 26801.5,
+        "ri_c": 26801.5,
+        "nc_j": 29615.66,
+        "nc_d": 29615.66,
+        "nc_c": 29615.66
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:botella 600 cc no gasf ros-ros 100 % reciclada": {
+      "nombre": "BOTELLA 600 CC NO GASF ROS-ROS 100 % RECICLADA",
+      "pb": null,
+      "publico": 37150.0,
+      "costos": {
+        "ri_j": 26801.5,
+        "ri_d": 26801.5,
+        "ri_c": 26801.5,
+        "nc_j": 29615.66,
+        "nc_d": 29615.66,
+        "nc_c": 29615.66
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:botella 600 cc no gasf ros-ver 100 % reciclada": {
+      "nombre": "BOTELLA 600 CC NO GASF ROS-VER 100 % RECICLADA",
+      "pb": null,
+      "publico": 37150.0,
+      "costos": {
+        "ri_j": 26801.5,
+        "ri_d": 26801.5,
+        "ri_c": 26801.5,
+        "nc_j": 29615.66,
+        "nc_d": 29615.66,
+        "nc_c": 29615.66
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:botella 600 cc no gasf ver-amar 100 % reciclada": {
+      "nombre": "BOTELLA 600 CC NO GASF VER-AMAR 100 % RECICLADA",
+      "pb": null,
+      "publico": 37150.0,
+      "costos": {
+        "ri_j": 26801.5,
+        "ri_d": 26801.5,
+        "ri_c": 26801.5,
+        "nc_j": 29615.66,
+        "nc_d": 29615.66,
+        "nc_c": 29615.66
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:botella 600 cc no gasf ver-aqua 100 % reciclada": {
+      "nombre": "BOTELLA 600 CC NO GASF VER-AQUA 100 % RECICLADA",
+      "pb": null,
+      "publico": 37150.0,
+      "costos": {
+        "ri_j": 26801.5,
+        "ri_d": 26801.5,
+        "ri_c": 26801.5,
+        "nc_j": 29615.66,
+        "nc_d": 29615.66,
+        "nc_c": 29615.66
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:botella 600 cc no gasf ver-ros 100 % reciclada": {
+      "nombre": "BOTELLA 600 CC NO GASF VER-ROS 100 % RECICLADA",
+      "pb": null,
+      "publico": 37150.0,
+      "costos": {
+        "ri_j": 26801.5,
+        "ri_d": 26801.5,
+        "ri_c": 26801.5,
+        "nc_j": 29615.66,
+        "nc_d": 29615.66,
+        "nc_c": 29615.66
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:botella 600 cc no gasf ver-ver 100 % reciclada": {
+      "nombre": "BOTELLA 600 CC NO GASF VER-VER 100 % RECICLADA",
+      "pb": null,
+      "publico": 37150.0,
+      "costos": {
+        "ri_j": 26801.5,
+        "ri_d": 26801.5,
+        "ri_c": 26801.5,
+        "nc_j": 29615.66,
+        "nc_d": 29615.66,
+        "nc_c": 29615.66
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:botella neo aqua-aqua reutiliz.": {
+      "nombre": "BOTELLA NEO AQUA-AQUA REUTILIZ.",
+      "pb": null,
+      "publico": 64200.0,
+      "costos": {
+        "ri_j": 46585.0,
+        "ri_d": 46585.0,
+        "ri_c": 46585.0,
+        "nc_j": 51476.43,
+        "nc_d": 51476.43,
+        "nc_c": 51476.43
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:botella psa no gas. 1 litro x 1 reutilizable": {
+      "nombre": "BOTELLA PSA NO GAS. 1 LITRO X 1 REUTILIZABLE",
+      "pb": null,
+      "publico": 12000.0,
+      "costos": {
+        "ri_j": 9075.0,
+        "ri_d": 9075.0,
+        "ri_c": 9075.0,
+        "nc_j": 10027.88,
+        "nc_d": 10027.88,
+        "nc_c": 10027.88
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:botella psa no gas. x 1000 ml pack x2 reutiliz.": {
+      "nombre": "BOTELLA PSA NO GAS. X 1000 ML PACK X2 REUTILIZ.",
+      "pb": null,
+      "publico": 19150.0,
+      "costos": {
+        "ri_j": 14520.0,
+        "ri_d": 14520.0,
+        "ri_c": 14520.0,
+        "nc_j": 16044.6,
+        "nc_d": 16044.6,
+        "nc_c": 16044.6
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "612110230": {
+      "nombre": "BOTELLA PSA P/SODA BURBY X 1100 ML X2 REUTILIZ.",
+      "pb": null,
+      "publico": 25150.0,
+      "costos": {
+        "ri_j": 19178.5,
+        "ri_d": 19178.5,
+        "ri_c": 19178.5,
+        "nc_j": 21192.24,
+        "nc_d": 21192.24,
+        "nc_c": 21192.24
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:botella psa térmica 500 cc blanca": {
+      "nombre": "BOTELLA PSA TÉRMICA 500 CC BLANCA",
+      "pb": null,
+      "publico": 61200.0,
+      "costos": {
+        "ri_j": 46585.0,
+        "ri_d": 46585.0,
+        "ri_c": 46585.0,
+        "nc_j": 51476.43,
+        "nc_d": 51476.43,
+        "nc_c": 51476.43
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:botella psa térmica 500 cc negra": {
+      "nombre": "BOTELLA PSA TÉRMICA 500 CC NEGRA",
+      "pb": null,
+      "publico": 61200.0,
+      "costos": {
+        "ri_j": 46585.0,
+        "ri_d": 46585.0,
+        "ri_c": 46585.0,
+        "nc_j": 51476.43,
+        "nc_d": 51476.43,
+        "nc_c": 51476.43
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "612111290": {
+      "nombre": "BOTELLA PSA TÉRMICA 750 CC BLANCA",
+      "pb": null,
+      "publico": 71150.0,
+      "costos": {
+        "ri_j": 53482.0,
+        "ri_d": 53482.0,
+        "ri_c": 53482.0,
+        "nc_j": 59097.61,
+        "nc_d": 59097.61,
+        "nc_c": 59097.61
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "612111300": {
+      "nombre": "BOTELLA PSA TÉRMICA 750 CC NEGRA",
+      "pb": null,
+      "publico": 71150.0,
+      "costos": {
+        "ri_j": 53482.0,
+        "ri_d": 53482.0,
+        "ri_c": 53482.0,
+        "nc_j": 59097.61,
+        "nc_d": 59097.61,
+        "nc_c": 59097.61
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "614066050": {
+      "nombre": "KIT MATE 2 PSA BIANCO (MATE+BOMBILLA)",
+      "pb": null,
+      "publico": 38500.0,
+      "costos": {
+        "ri_j": 29403.0,
+        "ri_d": 29403.0,
+        "ri_c": 29403.0,
+        "nc_j": 32490.32,
+        "nc_d": 32490.32,
+        "nc_c": 32490.32
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "614066040": {
+      "nombre": "KIT MATE 2 PSA NERO (MATE+BOMBILLA)",
+      "pb": null,
+      "publico": 38500.0,
+      "costos": {
+        "ri_j": 29403.0,
+        "ri_d": 29403.0,
+        "ri_c": 29403.0,
+        "nc_j": 32490.32,
+        "nc_d": 32490.32,
+        "nc_c": 32490.32
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:lapiz grafito negro psa x 10 unid.": {
+      "nombre": "LAPIZ GRAFITO NEGRO PSA X 10 UNID.",
+      "pb": null,
+      "publico": 4400.0,
+      "costos": {
+        "ri_j": 3267.0,
+        "ri_d": 3267.0,
+        "ri_c": 3267.0,
+        "nc_j": 3610.04,
+        "nc_d": 3610.04,
+        "nc_c": 3610.04
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:rejillex blanco": {
+      "nombre": "REJILLEX BLANCO",
+      "pb": 0.01,
+      "publico": 9000.0,
+      "costos": {
+        "ri_j": 5929.0,
+        "ri_d": 5929.0,
+        "ri_c": 5929.0,
+        "nc_j": 6551.55,
+        "nc_d": 6551.55,
+        "nc_c": 6551.55
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:rejillex grigio": {
+      "nombre": "REJILLEX GRIGIO",
+      "pb": 0.01,
+      "publico": 9000.0,
+      "costos": {
+        "ri_j": 5929.0,
+        "ri_d": 5929.0,
+        "ri_c": 5929.0,
+        "nc_j": 6551.55,
+        "nc_d": 6551.55,
+        "nc_c": 6551.55
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "630139150": {
+      "nombre": "SET MATE 2 PSA BIANCO (TERMO+MATE+BOMBILLA)",
+      "pb": null,
+      "publico": 131000.0,
+      "costos": {
+        "ri_j": 100006.5,
+        "ri_d": 100006.5,
+        "ri_c": 100006.5,
+        "nc_j": 110507.18,
+        "nc_d": 110507.18,
+        "nc_c": 110507.18
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "630139160": {
+      "nombre": "SET MATE 2 PSA NERO (TERMO+MATE+BOMBILLA)",
+      "pb": null,
+      "publico": 131000.0,
+      "costos": {
+        "ri_j": 100006.5,
+        "ri_d": 100006.5,
+        "ri_c": 100006.5,
+        "nc_j": 110507.18,
+        "nc_d": 110507.18,
+        "nc_c": 110507.18
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "614066070": {
+      "nombre": "TERMO 2 PSA BLANCO",
+      "pb": null,
+      "publico": 92550.0,
+      "costos": {
+        "ri_j": 70603.5,
+        "ri_d": 70603.5,
+        "ri_c": 70603.5,
+        "nc_j": 78016.87,
+        "nc_d": 78016.87,
+        "nc_c": 78016.87
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "614066060": {
+      "nombre": "TERMO 2 PSA NEGRO",
+      "pb": null,
+      "publico": 92550.0,
+      "costos": {
+        "ri_j": 70603.5,
+        "ri_d": 70603.5,
+        "ri_c": 70603.5,
+        "nc_j": 78016.87,
+        "nc_d": 78016.87,
+        "nc_c": 78016.87
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:analisis especificos": {
+      "nombre": "ANALISIS ESPECIFICOS",
+      "pb": null,
+      "publico": 81550.0,
+      "costos": {
+        "ri_j": 67034.0,
+        "ri_d": 67034.0,
+        "ri_c": 67034.0,
+        "nc_j": 74072.57,
+        "nc_d": 74072.57,
+        "nc_c": 74072.57
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:botella p/analisis de agua": {
+      "nombre": "BOTELLA P/ANALISIS DE AGUA",
+      "pb": null,
+      "publico": 4900.0,
+      "costos": {
+        "ri_j": 3690.5,
+        "ri_d": 3690.5,
+        "ri_c": 3690.5,
+        "nc_j": 4078.0,
+        "nc_d": 4078.0,
+        "nc_c": 4078.0
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:modulo a. fisico quimico basico": {
+      "nombre": "MODULO A. FISICO QUIMICO BASICO",
+      "pb": null,
+      "publico": 131000.0,
+      "costos": {
+        "ri_j": 95469.0,
+        "ri_d": 95469.0,
+        "ri_c": 95469.0,
+        "nc_j": 105493.25,
+        "nc_d": 105493.25,
+        "nc_c": 105493.25
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:modulo b. fisico quimico intermedio": {
+      "nombre": "MODULO B. FISICO QUIMICO INTERMEDIO",
+      "pb": null,
+      "publico": 296000.0,
+      "costos": {
+        "ri_j": 198440.0,
+        "ri_d": 198440.0,
+        "ri_c": 198440.0,
+        "nc_j": 219276.2,
+        "nc_d": 219276.2,
+        "nc_c": 219276.2
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:modulo c. fisico quimico completo": {
+      "nombre": "MODULO C. FISICO QUIMICO COMPLETO",
+      "pb": null,
+      "publico": 438000.0,
+      "costos": {
+        "ri_j": 364210.0,
+        "ri_d": 364210.0,
+        "ri_c": 364210.0,
+        "nc_j": 402452.05,
+        "nc_d": 402452.05,
+        "nc_c": 402452.05
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:modulo d. bacteriologico": {
+      "nombre": "MODULO D. BACTERIOLOGICO",
+      "pb": null,
+      "publico": 131000.0,
+      "costos": {
+        "ri_j": 97163.0,
+        "ri_d": 97163.0,
+        "ri_c": 97163.0,
+        "nc_j": 107365.12,
+        "nc_d": 107365.12,
+        "nc_c": 107365.12
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:modulo e. solidos en suspension": {
+      "nombre": "MODULO E. SOLIDOS EN SUSPENSION",
+      "pb": null,
+      "publico": 63100.0,
+      "costos": {
+        "ri_j": 42229.0,
+        "ri_d": 42229.0,
+        "ri_c": 42229.0,
+        "nc_j": 46663.05,
+        "nc_d": 46663.05,
+        "nc_c": 46663.05
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:recipiente p/analisis de agua": {
+      "nombre": "RECIPIENTE P/ANALISIS DE AGUA",
+      "pb": null,
+      "publico": 11300.0,
+      "costos": {
+        "ri_j": 8530.5,
+        "ri_d": 8530.5,
+        "ri_c": 8530.5,
+        "nc_j": 9426.2,
+        "nc_d": 9426.2,
+        "nc_c": 9426.2
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:aceitunas negras olivare 220 grs": {
+      "nombre": "ACEITUNAS NEGRAS OLIVARE 220 GRS",
+      "pb": null,
+      "publico": 9700.0,
+      "costos": {
+        "ri_j": 7417.3,
+        "ri_d": 7417.3,
+        "ri_c": 7417.3,
+        "nc_j": 8196.12,
+        "nc_d": 8196.12,
+        "nc_c": 8196.12
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:aceitunas verdes olivare 220 grs": {
+      "nombre": "ACEITUNAS VERDES OLIVARE 220 GRS",
+      "pb": null,
+      "publico": 8500.0,
+      "costos": {
+        "ri_j": 6655.0,
+        "ri_d": 6655.0,
+        "ri_c": 6655.0,
+        "nc_j": 7353.78,
+        "nc_d": 7353.78,
+        "nc_c": 7353.78
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:ninina 500 cc - aceite oliva virgen extra": {
+      "nombre": "NININA 500 CC - ACEITE OLIVA VIRGEN EXTRA",
+      "pb": null,
+      "publico": 40000.0,
+      "costos": {
+        "ri_j": 30250.0,
+        "ri_d": 30250.0,
+        "ri_c": 30250.0,
+        "nc_j": 33426.25,
+        "nc_d": 33426.25,
+        "nc_c": 33426.25
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:olivare 1 litro - aceite oliva ve": {
+      "nombre": "OLIVARE 1 LITRO - ACEITE OLIVA VE",
+      "pb": null,
+      "publico": 35300.0,
+      "costos": {
+        "ri_j": 26862.0,
+        "ri_d": 26862.0,
+        "ri_c": 26862.0,
+        "nc_j": 29682.51,
+        "nc_d": 29682.51,
+        "nc_c": 29682.51
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:olivare 250 cc - aceite oliva ve": {
+      "nombre": "OLIVARE 250 CC - ACEITE OLIVA VE",
+      "pb": null,
+      "publico": 11600.0,
+      "costos": {
+        "ri_j": 8724.1,
+        "ri_d": 8724.1,
+        "ri_c": 8724.1,
+        "nc_j": 9640.13,
+        "nc_d": 9640.13,
+        "nc_c": 9640.13
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:olivare 250 cc caja x 12 unid. - aceite oliva ve": {
+      "nombre": "OLIVARE 250 CC CAJA X 12 UNID. - ACEITE OLIVA VE",
+      "pb": 0.35,
+      "publico": 125200.0,
+      "costos": {
+        "ri_j": 94259.0,
+        "ri_d": 94259.0,
+        "ri_c": 94259.0,
+        "nc_j": 104156.2,
+        "nc_d": 104156.2,
+        "nc_c": 104156.2
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:olivare 5 lts - aceite oliva ve": {
+      "nombre": "OLIVARE 5 LTS - ACEITE OLIVA VE",
+      "pb": null,
+      "publico": 143200.0,
+      "costos": {
+        "ri_j": 109505.0,
+        "ri_d": 109505.0,
+        "ri_c": 109505.0,
+        "nc_j": 121003.03,
+        "nc_d": 121003.03,
+        "nc_c": 121003.03
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:olivare 5 lts x 2 unid. - aceite oliva ve": {
+      "nombre": "OLIVARE 5 LTS X 2 UNID. - ACEITE OLIVA VE",
+      "pb": null,
+      "publico": 286400.0,
+      "costos": {
+        "ri_j": 219010.0,
+        "ri_d": 219010.0,
+        "ri_c": 219010.0,
+        "nc_j": 242006.05,
+        "nc_d": 242006.05,
+        "nc_c": 242006.05
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:olivare 500 cc - aceite oliva ve": {
+      "nombre": "OLIVARE 500 CC - ACEITE OLIVA VE",
+      "pb": null,
+      "publico": 18500.0,
+      "costos": {
+        "ri_j": 14023.9,
+        "ri_d": 14023.9,
+        "ri_c": 14023.9,
+        "nc_j": 15496.41,
+        "nc_d": 15496.41,
+        "nc_c": 15496.41
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:olivare 500 cc caja x 12 unid. - aceite oliva ve": {
+      "nombre": "OLIVARE 500 CC CAJA X 12 UNID. - ACEITE OLIVA VE",
+      "pb": 0.55,
+      "publico": 199700.0,
+      "costos": {
+        "ri_j": 151492.0,
+        "ri_d": 151492.0,
+        "ri_c": 151492.0,
+        "nc_j": 167398.66,
+        "nc_d": 167398.66,
+        "nc_c": 167398.66
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:pasas de uva ninina pack x 5 unid. 150 gm c/u": {
+      "nombre": "PASAS DE UVA NININA PACK X 5 UNID. 150 GM C/U",
+      "pb": null,
+      "publico": 18500.0,
+      "costos": {
+        "ri_j": 14036.0,
+        "ri_d": 14036.0,
+        "ri_c": 14036.0,
+        "nc_j": 15509.78,
+        "nc_d": 15509.78,
+        "nc_c": 15509.78
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:pasta de aceituna natural olivare": {
+      "nombre": "PASTA DE ACEITUNA NATURAL OLIVARE",
+      "pb": null,
+      "publico": 8800.0,
+      "costos": {
+        "ri_j": 7417.3,
+        "ri_d": 7417.3,
+        "ri_c": 7417.3,
+        "nc_j": 8196.12,
+        "nc_d": 8196.12,
+        "nc_c": 8196.12
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "611100240": {
+      "nombre": "Ducha PSA Rinnova - Bianco con KDF",
+      "pb": null,
+      "publico": null,
+      "costos": null,
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "611100250": {
+      "nombre": "Ducha PSA Rinnova - Bianco con KDF Y POLI",
+      "pb": null,
+      "publico": null,
+      "costos": null,
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "611100280": {
+      "nombre": "Ducha PSA Rinnova - Grigio con KDF",
+      "pb": null,
+      "publico": null,
+      "costos": null,
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "611100290": {
+      "nombre": "Ducha PSA Rinnova - Grigio con KDF Y POLI",
+      "pb": null,
+      "publico": null,
+      "costos": null,
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "611100320": {
+      "nombre": "Ducha PSA Rinnova - Nero con KDF",
+      "pb": null,
+      "publico": null,
+      "costos": null,
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "611100330": {
+      "nombre": "Ducha PSA Rinnova - Nero con KDF y Poli",
+      "pb": null,
+      "publico": null,
+      "costos": null,
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "612060040": {
+      "nombre": "CARTUCHO MEMBRANA ÓSMOSIS PSA ROPOT 4",
+      "pb": null,
+      "publico": null,
+      "costos": null,
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "612012530": {
+      "nombre": "KIT POSVENTA PURIFICADOR DE AIRE II",
+      "pb": null,
+      "publico": null,
+      "costos": null,
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "612050270": {
+      "nombre": "Repuesto Bacteriostático - 50 micrones",
+      "pb": null,
+      "publico": null,
+      "costos": null,
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "612011080": {
+      "nombre": "Repuesto Válvula By Pass - C3",
+      "pb": null,
+      "publico": null,
+      "costos": null,
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "612012480": {
+      "nombre": "Repuesto Válvula By Pass Nero",
+      "pb": null,
+      "publico": null,
+      "costos": null,
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "612010120": {
+      "nombre": "Repuesto Válvula By Pass Universal",
+      "pb": null,
+      "publico": null,
+      "costos": null,
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "612111250": {
+      "nombre": "Botella de Vidrio PSA",
+      "pb": null,
+      "publico": null,
+      "costos": null,
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "612111050": {
+      "nombre": "BOTELLA PSA NEO AQUA",
+      "pb": null,
+      "publico": null,
+      "costos": null,
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "612111280": {
+      "nombre": "Botella Térmica 500ml Roja",
+      "pb": null,
+      "publico": null,
+      "costos": null,
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "612111310": {
+      "nombre": "Botella Térmica 750ml Roja",
+      "pb": null,
+      "publico": null,
+      "costos": null,
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "614065560": {
+      "nombre": "Termo PSA - Aqua 1 lt",
+      "pb": null,
+      "publico": null,
+      "costos": null,
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:psa rinnova bianco c/kdf-poli": {
+      "nombre": "PSA RINNOVA BIANCO C/KDF-POLI",
+      "pb": 1.15,
+      "publico": 296000.0,
+      "costos": {
+        "ri_j": 215380.0,
+        "ri_d": 208918.6,
+        "ri_c": 200303.4,
+        "nc_j": 237994.9,
+        "nc_d": 230855.05,
+        "nc_c": 221335.26
+      },
+      "publico_canje": 266400.0,
+      "costos_canje": null
+    },
+    "n:psa rinnova grigio c/kdf-poli": {
+      "nombre": "PSA RINNOVA GRIGIO C/KDF-POLI",
+      "pb": 1.15,
+      "publico": 296000.0,
+      "costos": {
+        "ri_j": 215380.0,
+        "ri_d": 208918.6,
+        "ri_c": 200303.4,
+        "nc_j": 237994.9,
+        "nc_d": 230855.05,
+        "nc_c": 221335.26
+      },
+      "publico_canje": 266400.0,
+      "costos_canje": null
+    },
+    "n:psa rinnova nero c/kdf-poli": {
+      "nombre": "PSA RINNOVA NERO C/KDF-POLI",
+      "pb": 1.15,
+      "publico": 296000.0,
+      "costos": {
+        "ri_j": 215380.0,
+        "ri_d": 208918.6,
+        "ri_c": 200303.4,
+        "nc_j": 237994.9,
+        "nc_d": 230855.05,
+        "nc_c": 221335.26
+      },
+      "publico_canje": 266400.0,
+      "costos_canje": null
+    }
+  }
+}
