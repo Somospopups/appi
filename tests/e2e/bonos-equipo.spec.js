@@ -1,9 +1,10 @@
 const { test, expect } = require('@playwright/test');
 const base = require('./hoy-lista-10.spec.js');
 
-// El Reporte de Bonos (v809): la info del tablero PSA "Bonos y Bonus" vive
-// SIEMPRE VISIBLE en la parte superior de Mi Equipo y se actualiza al
-// ingresar a la app. Acá la función consulta-serial va mockeada.
+// El Reporte de Bonos (v809, v810: en Mi negocio): la info del tablero PSA
+// "Bonos y Bonus" vive SIEMPRE VISIBLE en la parte superior de MI NEGOCIO
+// (los botones quedan abajo) y se actualiza al ingresar a la app.
+// Acá la función consulta-serial va mockeada.
 
 const BONOS = {
   dip: '2-98020174', nombre: 'SILVIA DEL VALLE TOLEDO', socio: 'DIAZ,GERMAN EZEQUIEL',
@@ -45,14 +46,14 @@ function mockBonos(page, { falla = false } = {}) {
   });
 }
 
-test('el reporte de bonos vive arriba de Mi Equipo, no oculto', async ({ page }) => {
+test('el reporte de bonos vive arriba de Mi negocio, no oculto', async ({ page }) => {
   await credsInit(page);
   await base.entrar(page);
   mockBonos(page);
   await page.evaluate(() => window.APBon.fetch());
   await expect(page.locator('#bonosCard')).toContainText('Reporte de Bonos', { timeout: 15000 });
 
-  await page.evaluate(() => window.showView('view-equipo'));
+  await page.evaluate(() => window.showView('view-negocio'));
   await expect(page.locator('#bonosCard .bns-card')).toBeVisible();
 
   // Datos del tablero PSA con formato argentino
@@ -65,17 +66,15 @@ test('el reporte de bonos vive arriba de Mi Equipo, no oculto', async ({ page })
   await expect(page.locator('#bonosCard')).toContainText('$ 466.488,01');
   await expect(page.locator('#bonosCard .bns-b-est.falta')).toHaveText('faltan 431,64');
 
-  // Justo arriba del tablero/botones (no debajo ni en un modal)
+  // Justo arriba de los botones (grilla #negGrid), no debajo ni en un modal
   const orden = await page.evaluate(() => {
     const bonos = document.querySelector('#bonosCard .bns-card');
-    const tabs = document.querySelector('#equipoTabsWrap');
-    const cont = document.querySelector('#equipoContent');
+    const grid = document.querySelector('#negGrid');
     if (!bonos) return null;
     const rb = bonos.getBoundingClientRect();
     if (rb.height === 0) return false;
-    const ref = (tabs && tabs.offsetWidth) ? tabs : cont;
-    if (!ref) return true;
-    return rb.top < ref.getBoundingClientRect().top && rb.bottom > 0;
+    if (!grid || !grid.offsetWidth) return true;
+    return rb.top < grid.getBoundingClientRect().top && rb.bottom > 0;
   });
   expect(orden).toBe(true);
   // Sin overlay/modal: el card es hijo directo de la vista

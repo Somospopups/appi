@@ -130,7 +130,7 @@ window.openStock=function(){
 
 <script src="./porque-vivo.js"></script>
 <script src="./home-limpio.js?v=521"></script>
-<script src="./reporte-bonos.js?v=1"></script>
+<script src="./reporte-bonos.js?v=2"></script>
   <script src="./home-tarjetas.js?v=807"></script>
   <script src="./appi-eventos.js?v=726"></script>
   <script src="./tu-mes.js?v=732"></script>
@@ -4590,7 +4590,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v809 · Segura</div>
+  <div class="ds-foot">APPI · v810 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -8394,7 +8394,6 @@ function procesarExcel(rows){
 
 function openEquipo(){
   loadEquipoFromStorage();
-  try{ if(window.APBon && window.APBon.refrescarSiEsNecesario) window.APBon.refrescarSiEsNecesario(); }catch(e){}
   equipoActiveTab = 'dashboard';
   document.querySelectorAll('.equipo-tab').forEach(b=>b.classList.toggle('active', b.dataset.eqtab==='dashboard'));
   showView('view-equipo');
@@ -13364,8 +13363,8 @@ function cerrarToolsMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='809';
-      const CACHE_NAME='appi-v809-bonos-equipo';
+      const swVersion='810';
+      const CACHE_NAME='appi-v810-bonos-negocio';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · v'+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}

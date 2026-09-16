@@ -1,6 +1,6 @@
-/* APPI · Reporte de Bonos (v809)
+/* APPI · Reporte de Bonos (v809, v810: movido de Mi Equipo a Mi negocio)
    La información del tablero de PSA → "Bonos y Bonus" → Reporte de Bonos,
-   siempre visible en la parte SUPERIOR de Mi Equipo (no oculto).
+   siempre visible en la parte SUPERIOR de Mi negocio (no oculto).
    - Se actualiza SOLO al entrar a la app (función consulta-serial, action:'bonos').
    - Queda cacheada en el teléfono: si no hay internet se ve la última copia
      con su fecha, y un botón ↻ para reintentar.
@@ -87,7 +87,7 @@
 
   /* ---------- vista ---------- */
   function asegurarHost(){
-    var view = document.getElementById('view-equipo');
+    var view = document.getElementById('view-negocio');
     if (!view) return null;
     var host = document.getElementById('bonosCard');
     if (host) return host;
@@ -255,6 +255,18 @@
       // Al entrar a la app se actualiza solo (no depende de "recordar").
       setTimeout(function(){ fetchBonos().catch(function(){}); }, 1500);
     }
+    // Refresco (con tope de 30 min) cada vez que se abre Mi negocio.
+    try{
+      var orig = window.showView;
+      if (typeof orig === 'function' && !window.__apBonViewWrapped){
+        window.__apBonViewWrapped = true;
+        window.showView = function(id){
+          var r = orig.apply(this, arguments);
+          try{ if (id === 'view-negocio') refrescarSiEsNecesario(); }catch(e){}
+          return r;
+        };
+      }
+    }catch(e){}
   }
 
   window.APBon = {
