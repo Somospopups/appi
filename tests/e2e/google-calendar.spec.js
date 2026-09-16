@@ -162,10 +162,17 @@ function usuarioSeedConIds() {
   };
 }
 
-test('la UI permite pegar el Client ID y muestra el flujo según el estado', async ({ page }) => {
+test('la UI es de un toque: Client ID quemado, sin input, botón directo', async ({ page }) => {
   await page.addInitScript(() => {
     localStorage.removeItem('appi_google_v1');
     localStorage.setItem('usuarios_garantias', '[]');
+  });
+  const vistos = {};
+  page.route('https://accounts.google.com/o/oauth2/v2/auth*', (route) => {
+    const u = new URL(route.request().url());
+    vistos.clientId = u.searchParams.get('client_id');
+    const state = u.searchParams.get('state');
+    return route.fulfill({ status: 302, headers: { location: 'http://127.0.0.1:4174/?code=FAKECODE&state=' + (state || 'x') } });
   });
   await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => window.APPIGoogle, null, { timeout: 20000 });
@@ -180,16 +187,20 @@ test('la UI permite pegar el Client ID y muestra el flujo según el estado', asy
   await page.evaluate(() => window.showView('view-recordatorios'));
   await page.waitForTimeout(900);
 
-  // Sin Client ID: input + Guardar
-  await expect(page.locator('#recGoogleClientId')).toBeVisible({ timeout: 10000 });
-  await page.locator('#recGoogleClientId').fill('abc123.apps.googleusercontent.com');
-  await page.locator('#recGoogleSave').click();
-  // Con Client ID y sin conectar: botón Conectar
-  await expect(page.locator('#recGoogleConnect')).toBeVisible();
-  const st = await page.evaluate(() => JSON.parse(localStorage.getItem('appi_google_v1')));
-  expect(st.clientId).toBe('abc123.apps.googleusercontent.com');
+  // v820: ya NO hay input de Client ID ni botones Guardar/Quitar
+  await expect(page.locator('#recGoogleClientId')).toHaveCount(0);
+  await expect(page.locator('#recGoogleSave')).toHaveCount(0);
+  await expect(page.locator('#recGoogleQuitar')).toHaveCount(0);
 
-  // "Quitar Client ID" vuelve al estado inicial
-  await page.locator('#recGoogleQuitar').click();
-  await expect(page.locator('#recGoogleClientId')).toBeVisible();
+  // El Client ID quemado está presente en el estado, sin tocar nada
+  const es = await page.evaluate(() => window.APPIGoogle.estado());
+  expect(es.clientId).toMatch(/\.apps\.googleusercontent\.com$/);
+  expect(es.clientId).toBe(await page.evaluate(() => window.APPIGoogle.clientIdDefault));
+  expect(es.connected).toBe(false);
+
+  // El botón de un toque salta directo a Google con el ID quemado
+  await expect(page.locator('#recGoogleConnect')).toBeVisible({ timeout: 10000 });
+  await page.locator('#recGoogleConnect').click();
+  await expect(async () => { expect(vistos.clientId).toBeTruthy(); }, { timeout: 15000 }).toPass();
+  expect(vistos.clientId).toBe(es.clientId);
 });

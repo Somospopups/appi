@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v819-google-calendar';
+const CACHE_NAME = 'appi-v820-google-clientid';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
