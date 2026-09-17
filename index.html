@@ -149,7 +149,7 @@ window.openStock=function(){
 <link rel="stylesheet" href="./appi-tema.css?v=515">
 <script src="./account-request.js"></script>
 <script src="./qr-code.js"></script>
-<script src="./gestion-client.js?v=846"></script>
+<script src="./gestion-client.js?v=847"></script>
   <script src="./agenda-personal.js"></script>
 <script src="./tarjetas-promos.js"></script>
 <script src="./usuarios-botones.js?v=423"></script>
@@ -166,10 +166,10 @@ window.openStock=function(){
 
 <script src="./porque-vivo.js"></script>
 <script src="./home-limpio.js?v=521"></script>
-<script src="./reporte-bonos.js?v=845?v=4"></script>
+<script src="./reporte-bonos.js?v=847?v=4"></script>
   <script src="./home-tarjetas.js?v=833"></script>
   <script src="./appi-eventos.js?v=726"></script>
-  <script src="./tu-mes.js?v=845"></script>
+  <script src="./tu-mes.js?v=847"></script>
   <script src="./device-bridge.js?v=523"></script>
   <script src="./anuncios.js?v=792"></script>
   <script src="./aviso-telegram.js?v=555"></script>
@@ -4626,7 +4626,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v846 · Segura</div>
+  <div class="ds-foot">APPI · v847 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -13455,8 +13455,8 @@ function cerrarToolsMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='846';
-      const CACHE_NAME='appi-v846-scroll-panel';
+      const swVersion='847';
+      const CACHE_NAME='appi-v847-whatsapp-ios';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · v'+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}

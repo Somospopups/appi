@@ -268,36 +268,43 @@ function renderSurveyTool(){
 // Un solo toque: se crea la invitación, vuela el avión y WhatsApp abre su
 // propio selector de contactos. Elegir a la persona es tarea de WhatsApp.
 async function startShareFlow(){
-  const button=$('surveyShareBtn');
+  const button=$("surveyShareBtn");
   if(!button||button.disabled)return;
 
-  // En Android el envío viaja por un intent:// en la pestaña actual, así que no
-  // hace falta (ni conviene) abrir una ventana: quedaría un about:blank vacío.
-  // En el resto de las plataformas seguimos abriéndola dentro del gesto del
-  // usuario, porque pedirla después de esperar al servidor la bloquearía.
-  const usaIntent=!!(window.APPIWhatsApp&&window.APPIWhatsApp.esAndroid());
-  const popup=usaIntent?null:window.open('about:blank','_blank');
+  // Detección de iOS/iPhone/iPad
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent || "") || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  const usaIntent = !!(window.APPIWhatsApp && window.APPIWhatsApp.esAndroid());
+
+  // En iOS o Android no abrimos un popup en blanco (en iOS el popup window.open("about:blank")
+  // redirigido a wa.me pierde el query param ?text o queda congelado en Safari).
+  const popup = (usaIntent || isIOS) ? null : window.open("about:blank","_blank");
+
   button.disabled=true;
-  // Mientras vuela el avión, un refresco automático no puede borrar el botón.
   state.enviando=true;
   try{
-    // La invitación se crea primero: la animación confirma un envío real.
     const invitation=await createSurveyInvitation(false),url=surveyUrl(invitation);
     await playShareAnimation(button);
-    const wa=`https://wa.me/?text=${encodeURIComponent(shareMessage(url))}`;
-    // El popup ya está abierto dentro del gesto; APPIWhatsApp lo redirige a la app elegida.
-    if(window.APPIWhatsApp) await window.APPIWhatsApp.abrir(wa,{popup});
-    else if(popup)popup.location.href=wa;else location.href=wa;
+    const msg = shareMessage(url);
+
+    if(isIOS){
+      // En iOS whatsapp://send?text=... abre la app nativa directamente con el texto intacto
+      const scheme = "whatsapp://send?text=" + encodeURIComponent(msg);
+      window.location.href = scheme;
+    } else {
+      const wa = "https://wa.me/?text=" + encodeURIComponent(msg);
+      if(window.APPIWhatsApp) await window.APPIWhatsApp.abrir(wa,{popup});
+      else if(popup) popup.location.href = wa;
+      else location.href = wa;
+    }
   }catch(error){
-    if(popup)popup.close();
-    button.classList.remove('sending','done');
-    await window.APPIDialog.alert(error.message,{title:'No pudimos crear la invitación',icon:'!'});
+    if(popup) popup.close();
+    button.classList.remove("sending","done");
+    await window.APPIDialog.alert(error.message,{title:"No pudimos crear la invitación",icon:"!"});
   }finally{
     button.disabled=false;state.enviando=false;
     if(state.reRender){state.reRender=false;renderManagement()}
   }
 }
-
 // El avión cruza la tarjeta y deja el tilde de confirmación.
 function playShareAnimation(button){
   return new Promise(resolve=>{

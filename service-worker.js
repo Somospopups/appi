@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v846-scroll-panel';
+const CACHE_NAME = 'appi-v847-whatsapp-ios';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
