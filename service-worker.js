@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v851-toast-perfeccion';
+const CACHE_NAME = 'appi-v852-toast-home-only';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

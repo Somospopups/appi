@@ -149,7 +149,7 @@ window.openStock=function(){
 <link rel="stylesheet" href="./appi-tema.css?v=515">
 <script src="./account-request.js"></script>
 <script src="./qr-code.js"></script>
-<script src="./gestion-client.js?v=851"></script>
+<script src="./gestion-client.js?v=852"></script>
   <script src="./agenda-personal.js"></script>
 <script src="./tarjetas-promos.js"></script>
 <script src="./usuarios-botones.js?v=423"></script>
@@ -166,10 +166,10 @@ window.openStock=function(){
 
 <script src="./porque-vivo.js"></script>
 <script src="./home-limpio.js?v=521"></script>
-<script src="./reporte-bonos.js?v=851?v=4"></script>
+<script src="./reporte-bonos.js?v=852?v=4"></script>
   <script src="./home-tarjetas.js?v=833"></script>
   <script src="./appi-eventos.js?v=726"></script>
-  <script src="./tu-mes.js?v=851"></script>
+  <script src="./tu-mes.js?v=852"></script>
   <script src="./device-bridge.js?v=523"></script>
   <script src="./anuncios.js?v=792"></script>
   <script src="./aviso-telegram.js?v=555"></script>
@@ -2860,6 +2860,11 @@ body.dark .hist-action-drawer{background:linear-gradient(155deg,#151827,#252036 
     will-change: transform, opacity;
   }
   .toast.show {
+    display: none !important;
+  }
+  #view-home.active ~ .toast.show,
+  body:has(#view-home.active) .toast.show {
+    display: flex !important;
     opacity: 1;
     transform: translateX(0) scale(1);
   }
@@ -4643,7 +4648,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v851 · Segura</div>
+  <div class="ds-foot">APPI · v852 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -6165,6 +6170,9 @@ function nombreDePila(nombre){
 
 let toastTimer = null;
 function showToast(msg = 'Guardado', duration = 1200){
+  const homeView = document.getElementById('view-home');
+  const isHome = !!(homeView && homeView.classList.contains('active'));
+  if(!isHome) return; // La píldora verde solo debe aparecer en el home
   const t = document.getElementById('toast');
   const txt = document.getElementById('toastTxt');
   let limpio = String(msg || '').replace(/^[✓✔vV]\s*/, '').replace(/\s*✓$/, '');
@@ -6980,6 +6988,14 @@ function showView(id,opts){
     try{ history.pushState({appiVista:true,view:id,from:_curId},''); }catch(e){}
   }
   liberarScrollCuerpo();
+  if(id !== 'view-home'){
+    try{
+      const _t = document.getElementById('toast');
+      if(_t) _t.classList.remove('show');
+      document.body.classList.remove('toast-active');
+      if(typeof toastTimer !== 'undefined') clearTimeout(toastTimer);
+    }catch(e){}
+  }
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   target.classList.add('active');
   document.querySelectorAll('nav.tabs button').forEach(b=>{
@@ -13477,8 +13493,8 @@ function cerrarToolsMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='851';
-      const CACHE_NAME='appi-v851-toast-perfeccion';
+      const swVersion='852';
+      const CACHE_NAME='appi-v852-toast-home-only';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
