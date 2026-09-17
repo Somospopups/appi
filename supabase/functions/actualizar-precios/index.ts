@@ -262,8 +262,8 @@ function mergeCatalogo(base: CatProd[], lista: ProdLista[], vigencia: string): C
 // catálogo publicado de GitHub Pages está siempre en sync con los archivos.
 // Si un producto con sku perdió su "foto" en la base (p. ej. el bucket se
 // regeneró con una versión vieja), se la devuelve desde ahí.
-async function fotosDeRepo(): Promise<Record<string, string>> {
-  const out: Record<string, string> = {};
+async function fotosDeRepo(): Promise<{ porSku: Record<string, string>; porNombre: Record<string, string>; skuPorNombre: Record<string, string> }> {
+  const out: { porSku: Record<string, string>; porNombre: Record<string, string>; skuPorNombre: Record<string, string> } = { porSku: {}, porNombre: {}, skuPorNombre: {} };
   try {
     const r = await fetch('https://somospopups.github.io/appi/psa-catalogo.json?nocache=' + Date.now());
     if (!r.ok) return out;
@@ -271,7 +271,12 @@ async function fotosDeRepo(): Promise<Record<string, string>> {
     for (const p of j?.productos || []) {
       const sku = String(p?.sku || '').trim();
       const foto = String(p?.foto || '').trim();
-      if (sku && foto) out[sku] = foto;
+      const nombre = String(p?.nombre || '').trim();
+      if (sku && foto) out.porSku[sku] = foto;
+      if (nombre) {
+        if (foto) out.porNombre[nombre] = foto;
+        if (sku) out.skuPorNombre[nombre] = sku;
+      }
     }
   } catch (_) {}
   return out;
@@ -346,12 +351,19 @@ Deno.serve(async (req) => {
   // 2) Fusionar: lista con acuerdo (precios de la primera columna) + lo que
   //    solo existe en la tienda (se conserva con su precio).
   const nuevos = mergeCatalogo(actual.productos as CatProd[], lista.productos, lista.vigencia);
-  // Self-heal de fotos: si un producto con sku perdió su "foto" en la base,
-  // se la recupera desde el catálogo del repo (donde viven los archivos).
+  // Self-heal desde el catálogo del repo (donde viven los archivos): si un
+  // producto perdió su SKU o su "foto" en la base, se los recupera — el SKU
+  // por nombre exacto (los de la lista ya lo tienen en el repo) y la foto
+  // por SKU o por nombre. Así "Actualizar precios" deja el catálogo
+  // publicado completo, sin que la UI tenga que compensar.
   const fotos = await fotosDeRepo();
   for (const p of nuevos) {
+    const nombre = String(p.nombre || '').trim();
+    if (!String(p.sku || '').trim() && nombre && fotos.skuPorNombre[nombre]) p.sku = fotos.skuPorNombre[nombre];
+    if (String(p.foto || '').trim()) continue;
     const sku = String(p.sku || '').trim();
-    if (sku && !String(p.foto || '').trim() && fotos[sku]) p.foto = fotos[sku];
+    if (sku && fotos.porSku[sku]) p.foto = fotos.porSku[sku];
+    else if (nombre && fotos.porNombre[nombre]) p.foto = fotos.porNombre[nombre];
   }
   const nuevaFecha = fechaAR();
 

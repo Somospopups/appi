@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "842",
-  "cacheName": "appi-v842-tumes-score",
+  "version": "843.0.0",
+  "cacheName": "appi-v843-fotos-pcd",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {
