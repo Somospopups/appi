@@ -208,7 +208,8 @@
       "grupo": "equipos",
       "plan_canje": null,
       "seccion": "Purificadores",
-      "foto": "catalogo-img/626030750.png"
+      "foto": "catalogo-img/626030750.png",
+      "desc": "Ablandador de agua automático para toda la casa. Trata la dureza mediante resina catiónica con regeneración automática por sal, eliminando por completo el sarro en todas las canillas, duchas y electrodomésticos."
     },
     {
       "sku": "626030780",
@@ -219,7 +220,8 @@
       "grupo": "equipos",
       "plan_canje": null,
       "seccion": "Purificadores",
-      "foto": "catalogo-img/626030780.png"
+      "foto": "catalogo-img/626030780.png",
+      "desc": "Ablandador de agua automático para toda la casa. Trata la dureza mediante resina catiónica con regeneración automática por sal, eliminando por completo el sarro en todas las canillas, duchas y electrodomésticos."
     },
     {
       "sku": "626030790",
@@ -230,7 +232,8 @@
       "grupo": "equipos",
       "plan_canje": null,
       "seccion": "Purificadores",
-      "foto": "catalogo-img/626030790.png"
+      "foto": "catalogo-img/626030790.png",
+      "desc": "Purificador compacto ideal para cocinas pequeñas o consumo moderado. Con Carbón Activado Granular y CAG impregnado en plata, autopurga y nuevo elemento filtrante Fipor n.° 3. Vida útil: 12 meses o 12.000 litros."
     },
     {
       "sku": "626030810",
@@ -241,7 +244,8 @@
       "grupo": "equipos",
       "plan_canje": null,
       "seccion": "Purificadores",
-      "foto": "catalogo-img/626030810.png"
+      "foto": "catalogo-img/626030810.png",
+      "desc": "Purificador compacto ideal para cocinas pequeñas o consumo moderado. Con Carbón Activado Granular y CAG impregnado en plata, autopurga y nuevo elemento filtrante Fipor n.° 3. Vida útil: 12 meses o 12.000 litros."
     },
     {
       "sku": "611010510",
@@ -252,7 +256,8 @@
       "grupo": "equipos",
       "plan_canje": 855000,
       "seccion": "Purificadores",
-      "foto": "catalogo-img/611010510.png"
+      "foto": "catalogo-img/611010510.png",
+      "desc": "Purificador para agua de red con Carbón Activado Granular con plata, KDF-55 y zeolita natural. Reduce más del 90% de cloro, trihalometanos, aluminio, plomo y hierro, y retiene más del 97% de microplásticos. Vida útil: 36 meses o 36.000 litros."
     },
     {
       "sku": "611010550",
@@ -263,7 +268,8 @@
       "grupo": "equipos",
       "plan_canje": 756000,
       "seccion": "Purificadores",
-      "foto": "catalogo-img/611010550.png"
+      "foto": "catalogo-img/611010550.png",
+      "desc": "Purificador para agua de red con Carbón Activado Granular con plata, KDF-55 y zeolita natural. Reduce más del 90% de cloro, trihalometanos, aluminio, plomo y hierro, y retiene más del 97% de microplásticos. Vida útil: 36 meses o 36.000 litros."
     },
     {
       "sku": "611010560",
@@ -274,7 +280,8 @@
       "grupo": "equipos",
       "plan_canje": 855000,
       "seccion": "Purificadores",
-      "foto": "catalogo-img/611010560.png"
+      "foto": "catalogo-img/611010560.png",
+      "desc": "Purificador para agua de red con Carbón Activado Granular con plata, KDF-55 y zeolita natural. Reduce más del 90% de cloro, trihalometanos, aluminio, plomo y hierro, y retiene más del 97% de microplásticos. Vida útil: 36 meses o 36.000 litros."
     },
     {
       "sku": "611010530",
@@ -285,7 +292,8 @@
       "grupo": "equipos",
       "plan_canje": 855000,
       "seccion": "Purificadores",
-      "foto": "catalogo-img/611010530.png"
+      "foto": "catalogo-img/611010530.png",
+      "desc": "Purificador para agua de red con Carbón Activado Granular con plata, KDF-55 y zeolita natural. Reduce más del 90% de cloro, trihalometanos, aluminio, plomo y hierro, y retiene más del 97% de microplásticos. Vida útil: 36 meses o 36.000 litros."
     },
     {
       "sku": "611010580",
@@ -296,7 +304,8 @@
       "grupo": "equipos",
       "plan_canje": 702900,
       "seccion": "Purificadores",
-      "foto": "catalogo-img/611010580.png"
+      "foto": "catalogo-img/611010580.png",
+      "desc": "Purificador de agua de red con Carbón Activado Granular con plata, KDF y resinas. Reduce cloro, derivados del cloro, turbidez y metales pesados para obtener agua fresca y segura en la cocina."
     },
     {
       "sku": "611020010",
@@ -307,7 +316,8 @@
       "grupo": "equipos",
       "plan_canje": null,
       "seccion": "Purificadores",
-      "foto": "catalogo-img/611020010.png"
+      "foto": "catalogo-img/611020010.png",
+      "desc": "Purificador portátil ultraliviano para llevar de viaje, al club, al trabajo o al aire libre. Purifica agua al paso eliminando cloro, sedimentos y sabores extraños con una capacidad de hasta 1.000 litros."
     },
     {
       "sku": "611030430",
@@ -318,7 +328,8 @@
       "grupo": "equipos",
       "plan_canje": 194400,
       "seccion": "Purificadores",
-      "foto": "catalogo-img/611030430.png"
+      "foto": "catalogo-img/611030430.png",
+      "desc": "Purificador de agua para el cuarto de baño. Se conecta a la canilla del lavatorio con casquete giratorio de 360°, brindando agua pura libre de cloro e impurezas para higiene bucal, afeitado y lavado de cutis."
     },
     {
       "sku": "613030470",
@@ -329,7 +340,8 @@
       "grupo": "equipos",
       "plan_canje": 1520000,
       "seccion": "Purificadores",
-      "foto": "catalogo-img/613030470.png"
+      "foto": "catalogo-img/613030470.png",
+      "desc": "Dispenser de agua fría y caliente para conectar a purificador PSA (sobre mesada o de pie). Provee agua purificada a temperatura de consumo inmediato o para infusiones en hogares y oficinas."
     },
     {
       "sku": "613030480",
@@ -340,7 +352,8 @@
       "grupo": "equipos",
       "plan_canje": 1520000,
       "seccion": "Purificadores",
-      "foto": "catalogo-img/613030480.png"
+      "foto": "catalogo-img/613030480.png",
+      "desc": "Dispenser de agua fría y caliente para conectar a purificador PSA (sobre mesada o de pie). Provee agua purificada a temperatura de consumo inmediato o para infusiones en hogares y oficinas."
     },
     {
       "sku": "611290050",
@@ -351,7 +364,8 @@
       "grupo": "equipos",
       "plan_canje": 1100700,
       "seccion": "Purificadores",
-      "foto": "catalogo-img/611290050.png"
+      "foto": "catalogo-img/611290050.png",
+      "desc": "Ionizador solar y electroquímico para piscinas. Reduce hasta un 85% el consumo de cloro y alguicidas mediante iones de cobre y plata activados por energía solar y módulo potenciador, manteniendo el agua cristalina sin irritar ojos ni piel."
     },
     {
       "sku": "611030410",
@@ -362,7 +376,8 @@
       "grupo": "equipos",
       "plan_canje": 384300,
       "seccion": "Purificadores",
-      "foto": "catalogo-img/611030410.png"
+      "foto": "catalogo-img/611030410.png",
+      "desc": "Purificador compacto ideal para cocinas pequeñas o consumo moderado. Con Carbón Activado Granular y CAG impregnado en plata, autopurga y nuevo elemento filtrante Fipor n.° 3. Vida útil: 12 meses o 12.000 litros."
     },
     {
       "sku": "611030400",
@@ -373,7 +388,8 @@
       "grupo": "equipos",
       "plan_canje": 384300,
       "seccion": "Purificadores",
-      "foto": "catalogo-img/611030400.png"
+      "foto": "catalogo-img/611030400.png",
+      "desc": "Purificador compacto ideal para cocinas pequeñas o consumo moderado. Con Carbón Activado Granular y CAG impregnado en plata, autopurga y nuevo elemento filtrante Fipor n.° 3. Vida útil: 12 meses o 12.000 litros."
     },
     {
       "sku": "612280190",
@@ -384,7 +400,8 @@
       "grupo": "equipos",
       "plan_canje": null,
       "seccion": "Purificadores",
-      "foto": "catalogo-img/612280190.png"
+      "foto": "catalogo-img/612280190.png",
+      "desc": "Dispositivo antisarro para cañerías, termotanques, calderas y lavarropas. Su carga de polifosfatos de grado alimenticio neutraliza la cristalización del sarro impidiendo que se incruste en caños y artefactos."
     },
     {
       "sku": "611030610",
@@ -395,7 +412,8 @@
       "grupo": "equipos",
       "plan_canje": 1189800,
       "seccion": "Purificadores",
-      "foto": "catalogo-img/611030610.png"
+      "foto": "catalogo-img/611030610.png",
+      "desc": "Purificador específico antisarro y declorador con resina de intercambio catiónico, carbón activado con plata y KDF. Ablanda el agua reteniendo carbonatos de calcio y magnesio a la vez que elimina el cloro y los malos sabores. Vida útil: 24 meses o 20.000 litros."
     },
     {
       "sku": "611030620",
@@ -406,7 +424,8 @@
       "grupo": "equipos",
       "plan_canje": 1189800,
       "seccion": "Purificadores",
-      "foto": "catalogo-img/611030620.png"
+      "foto": "catalogo-img/611030620.png",
+      "desc": "Purificador específico antisarro y declorador con resina de intercambio catiónico, carbón activado con plata y KDF. Ablanda el agua reteniendo carbonatos de calcio y magnesio a la vez que elimina el cloro y los malos sabores. Vida útil: 24 meses o 20.000 litros."
     },
     {
       "sku": "611120220",
@@ -417,7 +436,8 @@
       "grupo": "equipos",
       "plan_canje": 990000,
       "seccion": "Purificadores",
-      "foto": "catalogo-img/611120220.png"
+      "foto": "catalogo-img/611120220.png",
+      "desc": "Purificador de alto rendimiento con capacidad de 80.000 litros y 36 meses de vida útil. Desarrollado con CAG, KDF y zeolitas para retención de cloro, subproductos de la desinfección y metales, con cartucho bacteriostático recambiable anual."
     },
     {
       "sku": "611120200",
@@ -428,7 +448,8 @@
       "grupo": "equipos",
       "plan_canje": 990000,
       "seccion": "Purificadores",
-      "foto": "catalogo-img/611120200.png"
+      "foto": "catalogo-img/611120200.png",
+      "desc": "Purificador de alto rendimiento con capacidad de 80.000 litros y 36 meses de vida útil. Desarrollado con CAG, KDF y zeolitas para retención de cloro, subproductos de la desinfección y metales, con cartucho bacteriostático recambiable anual."
     },
     {
       "sku": "611120210",
@@ -439,7 +460,8 @@
       "grupo": "equipos",
       "plan_canje": 990000,
       "seccion": "Purificadores",
-      "foto": "catalogo-img/611120210.png"
+      "foto": "catalogo-img/611120210.png",
+      "desc": "Purificador de alto rendimiento con capacidad de 80.000 litros y 36 meses de vida útil. Desarrollado con CAG, KDF y zeolitas para retención de cloro, subproductos de la desinfección y metales, con cartucho bacteriostático recambiable anual."
     },
     {
       "sku": "611030560",
@@ -450,7 +472,8 @@
       "grupo": "equipos",
       "plan_canje": 1168200,
       "seccion": "Purificadores",
-      "foto": "catalogo-img/611030560.png"
+      "foto": "catalogo-img/611030560.png",
+      "desc": "Purificador selectivo de arsénico con resina arsénico-selectiva, carbón activado granular con plata y KDF. Diseñado especialmente para zonas con presencia de arsénico en agua potable o de red. Vida útil: 18 meses u 8.000 litros."
     },
     {
       "sku": "611030540",
@@ -461,7 +484,8 @@
       "grupo": "equipos",
       "plan_canje": 1168200,
       "seccion": "Purificadores",
-      "foto": "catalogo-img/611030540.png"
+      "foto": "catalogo-img/611030540.png",
+      "desc": "Purificador selectivo de arsénico con resina arsénico-selectiva, carbón activado granular con plata y KDF. Diseñado especialmente para zonas con presencia de arsénico en agua potable o de red. Vida útil: 18 meses u 8.000 litros."
     },
     {
       "sku": "611030060",
@@ -472,7 +496,8 @@
       "grupo": "equipos",
       "plan_canje": null,
       "seccion": "Purificadores",
-      "foto": "catalogo-img/611030060.png"
+      "foto": "catalogo-img/611030060.png",
+      "desc": "Filtro de sedimentos de polipropileno de alta densidad que retiene partículas gruesas, arena, óxido, arcilla y desprendimientos de cañerías o tanques, protegiendo bombas, griferías y purificadores."
     },
     {
       "sku": "611030420",
@@ -483,7 +508,8 @@
       "grupo": "equipos",
       "plan_canje": 494100,
       "seccion": "Purificadores",
-      "foto": "catalogo-img/611030420.png"
+      "foto": "catalogo-img/611030420.png",
+      "desc": "Purificador de mesada compacto y práctico que combina Carbón Activado Granular, KDF y resina mineral. Reduce cloro, trihalometanos, sedimentos y metales pesados con regulador automático de caudal."
     },
     {
       "sku": "617110040",
@@ -494,7 +520,8 @@
       "grupo": "equipos",
       "plan_canje": 399600,
       "seccion": "Gasificador",
-      "foto": "catalogo-img/617110040.png"
+      "foto": "catalogo-img/617110040.png",
+      "desc": "Gasificador de agua para preparar soda al instante con Agua Purificada PSA. Incluye cilindro de dióxido de carbono (CO2) de calidad alimentaria para hasta 60 litros y botella reutilizable libre de BPA."
     },
     {
       "sku": "611310070",
@@ -505,7 +532,8 @@
       "grupo": "equipos",
       "plan_canje": 1777500,
       "seccion": "Purificador Osmosis Inversa",
-      "foto": "catalogo-img/611310070.png"
+      "foto": "catalogo-img/611310070.png",
+      "desc": "Sistema de purificación por ósmosis inversa de 4 etapas sin instalación fija (solo requiere tomacorriente). Reduce eficazmente arsénico, flúor, nitratos, metales pesados y dureza, con panel digital inteligente y jarra de servicio."
     },
     {
       "sku": "611012500",
@@ -516,7 +544,8 @@
       "grupo": "equipos",
       "plan_canje": null,
       "seccion": "Purificador de Aire",
-      "foto": "catalogo-img/611012500.png"
+      "foto": "catalogo-img/611012500.png",
+      "desc": "Purifica el aire en 4 etapas: prefiltro electrostático, filtro de sólidos G4 (polen), carbón activado (olores y COV) y filtro HEPA de alta eficiencia que retiene más del 99% de microorganismos, bacterias y humo de tabaco. Función ionizadora para máxima frescura."
     },
     {
       "sku": "612010010",
@@ -527,7 +556,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612010010.png"
+      "foto": "catalogo-img/612010010.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes ((001) ADAPT. UNIVERSAL C/MANGUERA)."
     },
     {
       "sku": "612010020",
@@ -538,7 +568,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612010020.png"
+      "foto": "catalogo-img/612010020.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes ((002) ADAPT. ROSCA (FV TIPO UNIMIX))."
     },
     {
       "sku": "612010030",
@@ -549,7 +580,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612010030.png"
+      "foto": "catalogo-img/612010030.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes ((003) ADAPT. ROSCA CORTA)."
     },
     {
       "sku": "612010040",
@@ -560,7 +592,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612010040.png"
+      "foto": "catalogo-img/612010040.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes ((004) ADAPT. ROSCA LARGA)."
     },
     {
       "sku": "612010050",
@@ -571,7 +604,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612010050.png"
+      "foto": "catalogo-img/612010050.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes ((005) ADAPT. UNIV.MARIPOSA DIAM.11-12)."
     },
     {
       "sku": "612010060",
@@ -582,7 +616,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612010060.png"
+      "foto": "catalogo-img/612010060.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes ((006) ADAPT. UNIV.MARIPOSA DIAM.14)."
     },
     {
       "sku": "612010070",
@@ -593,7 +628,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612010070.png"
+      "foto": "catalogo-img/612010070.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes ((007) ADAPT. UNIV.MARIPOSA DIAM.16)."
     },
     {
       "sku": "612010080",
@@ -604,7 +640,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612010080.png"
+      "foto": "catalogo-img/612010080.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes ((008) ADAPT. UNIV.MARIPOSA DIAM.18)."
     },
     {
       "sku": "612010090",
@@ -615,7 +652,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612010090.png"
+      "foto": "catalogo-img/612010090.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes ((009) ADAPT. UNIV.MARIPOSA DIAM.20)."
     },
     {
       "sku": "612010100",
@@ -626,7 +664,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612010100.png"
+      "foto": "catalogo-img/612010100.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes ((010) ADAPT. ROSCA HEMBRA-HEMBRA)."
     },
     {
       "sku": "612010160",
@@ -637,7 +676,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612010160.png"
+      "foto": "catalogo-img/612010160.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes ((016) ADAPT. ROSCA HEMBRA O.N.)."
     },
     {
       "sku": "612280170",
@@ -648,7 +688,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612280170.png"
+      "foto": "catalogo-img/612280170.png",
+      "desc": "Dispositivo antisarro para cañerías, termotanques, calderas y lavarropas. Su carga de polifosfatos de grado alimenticio neutraliza la cristalización del sarro impidiendo que se incruste en caños y artefactos."
     },
     {
       "sku": "612010180",
@@ -659,7 +700,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612010180.png"
+      "foto": "catalogo-img/612010180.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes ((018) ADAPT. ROSCA CANILLA TIPO PATIO)."
     },
     {
       "sku": "612010190",
@@ -670,7 +712,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612010190.png"
+      "foto": "catalogo-img/612010190.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes ((019) ADAPT. ROSCA MACHO 18.1)."
     },
     {
       "sku": "612010200",
@@ -681,7 +724,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612010200.png"
+      "foto": "catalogo-img/612010200.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes ((020) ADAPT. ROSCA ESPECIAL)."
     },
     {
       "sku": "612010240",
@@ -692,7 +736,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612010240.png"
+      "foto": "catalogo-img/612010240.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes ((024) ADAPT. ROSCA HEMBRA 20.1)."
     },
     {
       "sku": "612010270",
@@ -703,7 +748,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612010270.png"
+      "foto": "catalogo-img/612010270.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes ((027) ADAPT. ROSCA LARGA PASO FINO)."
     },
     {
       "sku": "612100300",
@@ -714,7 +760,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612100300.png"
+      "foto": "catalogo-img/612100300.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes ((030) ADAPT. H-M 1/2 C/TUERCA DUCHA II)."
     },
     {
       "sku": "612100320",
@@ -725,7 +772,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612100320.png"
+      "foto": "catalogo-img/612100320.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes ((032) ADAPT. H-M 1/2 DUCHA II SALIDA)."
     },
     {
       "sku": "612100330",
@@ -736,7 +784,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612100330.png"
+      "foto": "catalogo-img/612100330.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes ((033) ADAPT. M-M 3/4 BG DUCHA II C/TUERCA)."
     },
     {
       "sku": "612100360",
@@ -747,7 +796,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612100360.png"
+      "foto": "catalogo-img/612100360.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes ((036) ADAPT. M-M 3/4 BG DUCHA II)."
     },
     {
       "sku": "612010370",
@@ -758,7 +808,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612010370.png"
+      "foto": "catalogo-img/612010370.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes ((037) ADAPT. ROSCA MACHO (FV SWING PLUS))."
     },
     {
       "sku": "612010390",
@@ -769,7 +820,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612010390.png"
+      "foto": "catalogo-img/612010390.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes ((039) ADAPT. ROSCA HEMBRA-HEMBRA DIÁM.22)."
     },
     {
       "sku": "612010410",
@@ -780,7 +832,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612010410.png"
+      "foto": "catalogo-img/612010410.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes ((041) ADAPT. ROSCA CANILLA PIAZZA)."
     },
     {
       "sku": "612010510",
@@ -791,7 +844,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612010510.png"
+      "foto": "catalogo-img/612010510.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes ((051) ADAPT. SIN ROSCA DIAM. 17)."
     },
     {
       "sku": "612010530",
@@ -802,7 +856,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612010530.png"
+      "foto": "catalogo-img/612010530.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes ((053) ADAPT. ROSCA BSP 3/4 X 14 HILOS)."
     },
     {
       "sku": "612010730",
@@ -813,7 +868,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612010730.png"
+      "foto": "catalogo-img/612010730.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes ((073) ADAPT. ROSCA MÚLTIPLE)."
     },
     {
       "sku": "612010780",
@@ -824,7 +880,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612010780.png"
+      "foto": "catalogo-img/612010780.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes ((078) ADAPT. ROSCA DIAM. 23.5)."
     },
     {
       "sku": "612010830",
@@ -835,7 +892,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612010830.png"
+      "foto": "catalogo-img/612010830.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes ((083) ADAPT. ROSCA MACHO 22 X 1)."
     },
     {
       "sku": "612011000",
@@ -846,7 +904,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612011000.png"
+      "foto": "catalogo-img/612011000.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes ((100) ADAPT. ROSCA HEMBRA BSP 1/2)."
     },
     {
       "sku": "612011020",
@@ -857,7 +916,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612011020.png"
+      "foto": "catalogo-img/612011020.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes ((102) ADAPT. ROSCA MACHO FV DIÁM 18.6)."
     },
     {
       "sku": "612011030",
@@ -868,7 +928,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612011030.png"
+      "foto": "catalogo-img/612011030.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes ((103) ADAPT. ROSCA HEMBRA P/HIDROMET)."
     },
     {
       "sku": "612011350",
@@ -879,7 +940,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612011350.png"
+      "foto": "catalogo-img/612011350.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes ((135) ADAPT. ROSCA MACHO 21 X 1)."
     },
     {
       "sku": "612011420",
@@ -890,7 +952,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612011420.png"
+      "foto": "catalogo-img/612011420.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes ((142) ADAPT. ROSCA MACHO 16.3 X 1)."
     },
     {
       "sku": "612011440",
@@ -901,7 +964,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612011440.png"
+      "foto": "catalogo-img/612011440.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes ((144) ADAPT. ROSCA MACHO 18.2 X 1)."
     },
     {
       "sku": "612011470",
@@ -912,7 +976,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612011470.png"
+      "foto": "catalogo-img/612011470.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes ((147) ADAPT. ROSCA TIPO RACOR M. 24 X 1)."
     },
     {
       "sku": "612011480",
@@ -923,7 +988,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612011480.png"
+      "foto": "catalogo-img/612011480.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes ((148) ADAPT. ROSCA HEMBRA (SWING PLUS) M. 24X1)."
     },
     {
       "sku": "612011490",
@@ -934,7 +1000,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612011490.png"
+      "foto": "catalogo-img/612011490.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes ((149) ADAPT. ROSCA P/LAVARROPA M 24 X 1)."
     },
     {
       "sku": "612011550",
@@ -945,7 +1012,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612011550.png"
+      "foto": "catalogo-img/612011550.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes ((155) ADAPT. S-1000 C/ORING. P/MANOMETRO)."
     },
     {
       "sku": "612011640",
@@ -956,7 +1024,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612011640.png"
+      "foto": "catalogo-img/612011640.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes ((164) ADAPT. ROSCA MACHO 20 X 1)."
     },
     {
       "sku": "612011740",
@@ -967,7 +1036,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612011740.png"
+      "foto": "catalogo-img/612011740.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes ((174) ADAPT. ROSCA AIREADOR M 24 X 1)."
     },
     {
       "sku": "612011770",
@@ -978,7 +1048,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612011770.png"
+      "foto": "catalogo-img/612011770.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes ((177) ADAPT. RECTANGULAR P/PEGAR)."
     },
     {
       "sku": "612011790",
@@ -989,7 +1060,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612011790.png"
+      "foto": "catalogo-img/612011790.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes ((179) ADAPT. ROSCA MACHO DIAM 18 X 1 LARGO)."
     },
     {
       "sku": "612011800",
@@ -1000,7 +1072,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612011800.png"
+      "foto": "catalogo-img/612011800.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes ((180) ADAPT. ROSCA HEMBRA DIAM 22 X 1 CORTO)."
     },
     {
       "sku": "612011810",
@@ -1011,7 +1084,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612011810.png"
+      "foto": "catalogo-img/612011810.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes ((181) ADAPT. H-M 1/2 DUCHA SALIDA)."
     },
     {
       "sku": "612100190",
@@ -1022,7 +1096,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612100190.png"
+      "foto": "catalogo-img/612100190.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes ((19) ADAPT. M-M BG 3/4 P/DUCHA CR)."
     },
     {
       "sku": "612100200",
@@ -1033,7 +1108,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612100200.png"
+      "foto": "catalogo-img/612100200.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes ((20) ADAPT. M-H BG 3/4 P/ DUCHA CR)."
     },
     {
       "sku": "612012280",
@@ -1044,7 +1120,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612012280.png"
+      "foto": "catalogo-img/612012280.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes ((228) ADAPT. OVALADO)."
     },
     {
       "sku": "612012290",
@@ -1055,7 +1132,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612012290.png"
+      "foto": "catalogo-img/612012290.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes ((229) ADAPT. ROSCA H-H 22 X 1 LARGO)."
     },
     {
       "sku": "612012320",
@@ -1066,7 +1144,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612012320.png"
+      "foto": "catalogo-img/612012320.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes ((232) ADAPT. ROSCA H-H 22 X 1 CORTO)."
     },
     {
       "sku": "612012390",
@@ -1077,7 +1156,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612012390.png"
+      "foto": "catalogo-img/612012390.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes ((239) ADAPT. ROSCA H-M 18 X 1 CORTO)."
     },
     {
       "sku": "612012450",
@@ -1088,7 +1168,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612012450.png"
+      "foto": "catalogo-img/612012450.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes ((245) ADAPT. ROSCA H-M 23 X 1)."
     },
     {
       "sku": "612012460",
@@ -1099,7 +1180,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612012460.png"
+      "foto": "catalogo-img/612012460.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes ((246) ADAPT. ROSCA MACHO 23 X 1)."
     },
     {
       "sku": "612015370",
@@ -1110,7 +1192,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612015370.png"
+      "foto": "catalogo-img/612015370.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes ((537) ADAPT. ROSCA H 22,4 X 1)."
     },
     {
       "sku": "612015500",
@@ -1121,7 +1204,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612015500.png"
+      "foto": "catalogo-img/612015500.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes ((550) ADAPT. ROSCA H 22 X 1 LARGO 36 CROMADO)."
     },
     {
       "sku": "612015530",
@@ -1132,7 +1216,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612015530.png"
+      "foto": "catalogo-img/612015530.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes ((553) ADAPT. ESP. H-M 16,3 X 1 LARGO)."
     },
     {
       "sku": "612015730",
@@ -1143,7 +1228,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612015730.png"
+      "foto": "catalogo-img/612015730.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes ((573) ADAPT. UNIVERSAL C/MANGUERA NERO)."
     },
     {
       "sku": "612012470",
@@ -1154,7 +1240,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612012470.png"
+      "foto": "catalogo-img/612012470.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (ADAPT. ESPECIAL KIT 90°)."
     },
     {
       "sku": "612010760",
@@ -1165,7 +1252,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612010760.png"
+      "foto": "catalogo-img/612010760.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (ARANDELA ADAPTADOR DIÁM. 19 X 5)."
     },
     {
       "sku": "612010770",
@@ -1176,7 +1264,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612010770.png"
+      "foto": "catalogo-img/612010770.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (ARANDELA ADAPTADOR DIÁM. 21 X 5)."
     },
     {
       "sku": "612011150",
@@ -1187,7 +1276,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612011150.png"
+      "foto": "catalogo-img/612011150.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (BUJE DE DERIVACIÓN CANILLA BM)."
     },
     {
       "sku": "612011200",
@@ -1198,7 +1288,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612011200.png"
+      "foto": "catalogo-img/612011200.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (CONECT.COCODRILO S-1000 X 5 UNID)."
     },
     {
       "sku": "612011140",
@@ -1209,7 +1300,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612011140.png"
+      "foto": "catalogo-img/612011140.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (CONECTOR RAPIDO DE SALIDA PSA 10KD)."
     },
     {
       "sku": "612030010",
@@ -1220,7 +1312,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612030010.png"
+      "foto": "catalogo-img/612030010.png",
+      "desc": "Purificador compacto ideal para cocinas pequeñas o consumo moderado. Con Carbón Activado Granular y CAG impregnado en plata, autopurga y nuevo elemento filtrante Fipor n.° 3. Vida útil: 12 meses o 12.000 litros."
     },
     {
       "sku": "612015780",
@@ -1231,7 +1324,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612015780.png"
+      "foto": "catalogo-img/612015780.png",
+      "desc": "Purificador para agua de red con Carbón Activado Granular con plata, KDF-55 y zeolita natural. Reduce más del 90% de cloro, trihalometanos, aluminio, plomo y hierro, y retiene más del 97% de microplásticos. Vida útil: 36 meses o 36.000 litros."
     },
     {
       "sku": "612010170",
@@ -1242,7 +1336,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612010170.png"
+      "foto": "catalogo-img/612010170.png",
+      "desc": "Purificador de mesada compacto y práctico que combina Carbón Activado Granular, KDF y resina mineral. Reduce cloro, trihalometanos, sedimentos y metales pesados con regulador automático de caudal."
     },
     {
       "sku": "612030040",
@@ -1253,7 +1348,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612030040.png"
+      "foto": "catalogo-img/612030040.png",
+      "desc": "Filtro de sedimentos de polipropileno de alta densidad que retiene partículas gruesas, arena, óxido, arcilla y desprendimientos de cañerías o tanques, protegiendo bombas, griferías y purificadores."
     },
     {
       "sku": "612031500",
@@ -1264,7 +1360,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612031500.png"
+      "foto": "catalogo-img/612031500.png",
+      "desc": "Ablandador de agua automático para toda la casa. Trata la dureza mediante resina catiónica con regeneración automática por sal, eliminando por completo el sarro en todas las canillas, duchas y electrodomésticos."
     },
     {
       "sku": "612031510",
@@ -1275,7 +1372,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612031510.png"
+      "foto": "catalogo-img/612031510.png",
+      "desc": "Purificador compacto ideal para cocinas pequeñas o consumo moderado. Con Carbón Activado Granular y CAG impregnado en plata, autopurga y nuevo elemento filtrante Fipor n.° 3. Vida útil: 12 meses o 12.000 litros."
     },
     {
       "sku": "612031380",
@@ -1286,7 +1384,8 @@
       "grupo": "griferia",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612031380.png"
+      "foto": "catalogo-img/612031380.png",
+      "desc": "Grifería de diseño exclusivo para purificadores bajo mesada PSA. Cuenta con vías independientes para agua corriente (fría/caliente) y Agua Purificada PSA en una única perforación con cierre cerámico."
     },
     {
       "sku": "612031390",
@@ -1297,7 +1396,8 @@
       "grupo": "griferia",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612031390.png"
+      "foto": "catalogo-img/612031390.png",
+      "desc": "Grifería de diseño exclusivo para purificadores bajo mesada PSA. Cuenta con vías independientes para agua corriente (fría/caliente) y Agua Purificada PSA en una única perforación con cierre cerámico."
     },
     {
       "sku": "612031210",
@@ -1308,7 +1408,8 @@
       "grupo": "griferia",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612031210.png"
+      "foto": "catalogo-img/612031210.png",
+      "desc": "Canilla cuello de cisne con cierre cerámico de 1/4 de vuelta para purificadores PSA bajo mesada."
     },
     {
       "sku": "612031300",
@@ -1319,7 +1420,8 @@
       "grupo": "griferia",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612031300.png"
+      "foto": "catalogo-img/612031300.png",
+      "desc": "Canilla cuello de cisne con cierre cerámico de 1/4 de vuelta para purificadores PSA bajo mesada."
     },
     {
       "sku": "612100350",
@@ -1330,7 +1432,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612100350.png"
+      "foto": "catalogo-img/612100350.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (KIT ADAPT.P/CANILLA NO TRADICIONAL DUCHA II)."
     },
     {
       "sku": "612100310",
@@ -1341,7 +1444,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612100310.png"
+      "foto": "catalogo-img/612100310.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (KIT ADAPT.RECTOS P/CANILLAS PSA DUCHA II)."
     },
     {
       "sku": "612011340",
@@ -1352,7 +1456,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612011340.png"
+      "foto": "catalogo-img/612011340.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (KIT PARA BAJA PRESION UNIVERSAL)."
     },
     {
       "sku": "612011670",
@@ -1363,7 +1468,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612011670.png"
+      "foto": "catalogo-img/612011670.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (LAP BM 8 X 8)."
     },
     {
       "sku": "612011880",
@@ -1374,7 +1480,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612011880.png"
+      "foto": "catalogo-img/612011880.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (LAP DUCHA II HEMBRA-MACHO 1/2 X 1/2)."
     },
     {
       "sku": "612011710",
@@ -1385,7 +1492,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612011710.png"
+      "foto": "catalogo-img/612011710.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (LAP DUCHA II MACHO-MACHO 1/2 X 1/2)."
     },
     {
       "sku": "612011650",
@@ -1396,7 +1504,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612011650.png"
+      "foto": "catalogo-img/612011650.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (LAP SM 24 X 1)."
     },
     {
       "sku": "612012540",
@@ -1407,7 +1516,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612012540.png"
+      "foto": "catalogo-img/612012540.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (LAP SM P/ MANGUERA BY PASS)."
     },
     {
       "sku": "612011320",
@@ -1418,7 +1528,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612011320.png"
+      "foto": "catalogo-img/612011320.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (LLAVE DE AJUSTE P/TAPA PREFILTRO 40K-D)."
     },
     {
       "sku": "612010840",
@@ -1429,7 +1540,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612010840.png"
+      "foto": "catalogo-img/612010840.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (LLAVE DE CORTE S-1000 MACHO/HEMBRA)."
     },
     {
       "sku": "612010360",
@@ -1440,7 +1552,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612010360.png"
+      "foto": "catalogo-img/612010360.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (LLAVE DE CORTE S-1000 MACHO/MACHO)."
     },
     {
       "sku": "612010420",
@@ -1451,7 +1564,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612010420.png"
+      "foto": "catalogo-img/612010420.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (PRECINTO X 25)."
     },
     {
       "sku": "612280090",
@@ -1462,7 +1576,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612280090.png"
+      "foto": "catalogo-img/612280090.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (PROLONGADOR DE 3/4 PSA POLI)."
     },
     {
       "sku": "612100270",
@@ -1473,7 +1588,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612100270.png"
+      "foto": "catalogo-img/612100270.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (PROLONGADOR PSA DUCHA II)."
     },
     {
       "sku": "612010540",
@@ -1484,7 +1600,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612010540.png"
+      "foto": "catalogo-img/612010540.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (REGULADOR DE CAUDAL)."
     },
     {
       "sku": "612030620",
@@ -1495,7 +1612,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612030620.png"
+      "foto": "catalogo-img/612030620.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (SET ADAPTACION RETRO P/KIT CANILLA)."
     },
     {
       "sku": "612100220",
@@ -1506,7 +1624,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/612100220.png"
+      "foto": "catalogo-img/612100220.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (TAPON REGULADOR P/DUCHA X 5 UNIDADES)."
     },
     {
       "sku": "621010100",
@@ -1517,7 +1636,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/621010100.png"
+      "foto": "catalogo-img/621010100.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (TE C/LLAVE DE CORTE P/GRIFERÍA PSA Y ECO-D)."
     },
     {
       "sku": "621010090",
@@ -1528,7 +1648,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "catalogo-img/621010090.png"
+      "foto": "catalogo-img/621010090.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (VARILLA INST. ECO-D SM)."
     },
     {
       "sku": "650030500",
@@ -1539,7 +1660,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Reposiciones",
-      "foto": "catalogo-img/650030500.png"
+      "foto": "catalogo-img/650030500.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (REPOSICION PSA 10K-D)."
     },
     {
       "sku": "650030600",
@@ -1550,7 +1672,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Reposiciones",
-      "foto": "catalogo-img/650030600.png"
+      "foto": "catalogo-img/650030600.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (REPOSICION PSA 40K-D)."
     },
     {
       "sku": "612110770",
@@ -1561,7 +1684,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612110770.png"
+      "foto": "catalogo-img/612110770.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (ACCESORIO PARA CEBAR MATE)."
     },
     {
       "sku": "612050100",
@@ -1572,7 +1696,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612050100.png"
+      "foto": "catalogo-img/612050100.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (BOLSA MATERIAL REGENERANTE X 2)."
     },
     {
       "sku": "612030350",
@@ -1583,7 +1708,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612030350.png"
+      "foto": "catalogo-img/612030350.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (BUJE DE CONEXION P/CANILLA DISPENSER)."
     },
     {
       "sku": "612100180",
@@ -1594,7 +1720,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612100180.png"
+      "foto": "catalogo-img/612100180.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (CAMPANA P/PSA DUCHA)."
     },
     {
       "sku": "612030930",
@@ -1605,7 +1732,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612030930.png"
+      "foto": "catalogo-img/612030930.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (CANILLA AGUA CALIENTE DISPENSER 2)."
     },
     {
       "sku": "612030940",
@@ -1616,7 +1744,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612030940.png"
+      "foto": "catalogo-img/612030940.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (CANILLA AGUA CALIENTE DISPENSER DS)."
     },
     {
       "sku": "612030320",
@@ -1627,7 +1756,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612030320.png"
+      "foto": "catalogo-img/612030320.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (CANILLA AGUA CALIENTE DISPENSER MESA/PIE)."
     },
     {
       "sku": "612031290",
@@ -1638,7 +1768,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612031290.png"
+      "foto": "catalogo-img/612031290.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (CANILLA AGUA CALIENTE P/ECO-D PIE Y SM)."
     },
     {
       "sku": "612030920",
@@ -1649,7 +1780,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612030920.png"
+      "foto": "catalogo-img/612030920.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (CANILLA AGUA FRIA DISPENSER 2)."
     },
     {
       "sku": "612030260",
@@ -1660,7 +1792,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612030260.png"
+      "foto": "catalogo-img/612030260.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (CANILLA AGUA FRIA DISPENSER DS)."
     },
     {
       "sku": "612030310",
@@ -1671,7 +1804,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612030310.png"
+      "foto": "catalogo-img/612030310.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (CANILLA AGUA FRIA DISPENSER MESA/PIE)."
     },
     {
       "sku": "612031280",
@@ -1682,7 +1816,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612031280.png"
+      "foto": "catalogo-img/612031280.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (CANILLA AGUA FRIA P/ECO-D PIE Y SM)."
     },
     {
       "sku": "612110750",
@@ -1693,7 +1828,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612110750.png"
+      "foto": "catalogo-img/612110750.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (CANULA P/BOTELLA TERMICA X 5 UNID)."
     },
     {
       "sku": "612111220",
@@ -1704,7 +1840,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612111220.png"
+      "foto": "catalogo-img/612111220.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (CANULA P/BOTELLAS 500 X 5 UNID.(NUEVA))."
     },
     {
       "sku": "612111210",
@@ -1715,7 +1852,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612111210.png"
+      "foto": "catalogo-img/612111210.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (CANULA P/BOTELLAS 750 X 5 UNID.(NUEVA))."
     },
     {
       "sku": "612290040",
@@ -1726,7 +1864,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612290040.png"
+      "foto": "catalogo-img/612290040.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (CEPILLO DE ACERO P/IONTRIX)."
     },
     {
       "sku": "612030390",
@@ -1737,7 +1876,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612030390.png"
+      "foto": "catalogo-img/612030390.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (CONJ.SOPORTE ESCUADRA P/DISPENSER PIE C/CONECTORES)."
     },
     {
       "sku": "612290100",
@@ -1748,7 +1888,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612290100.png"
+      "foto": "catalogo-img/612290100.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (ELECTRODO P/IONTRIX)."
     },
     {
       "sku": "612050360",
@@ -1759,7 +1900,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612050360.png"
+      "foto": "catalogo-img/612050360.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (FIPOR N° 3 X 2 UNID.)."
     },
     {
       "sku": "612050360",
@@ -1770,7 +1912,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612050360.png"
+      "foto": "catalogo-img/612050360.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (FIPOR N° 3 X 4 UNID.)."
     },
     {
       "sku": "612050360",
@@ -1781,7 +1924,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612050360.png"
+      "foto": "catalogo-img/612050360.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (FIPOR N° 3 X 6 UNID.)."
     },
     {
       "sku": "612050360",
@@ -1792,7 +1936,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612050360.png"
+      "foto": "catalogo-img/612050360.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (FIPOR N° 3 X 8 UNIDADES)."
     },
     {
       "sku": "612100260",
@@ -1803,7 +1948,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612100260.png"
+      "foto": "catalogo-img/612100260.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (FLOR PSA DUCHA BLANCO/BIANCO C/CODO CROMADO)."
     },
     {
       "sku": "612100370",
@@ -1814,7 +1960,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612100370.png"
+      "foto": "catalogo-img/612100370.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (FLOR PSA DUCHA GRIGIO C/CODO CROMADO)."
     },
     {
       "sku": "612310020",
@@ -1825,7 +1972,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612310020.png"
+      "foto": "catalogo-img/612310020.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (FUENTE DE ALIMENTACION OSMOSIS PSA ROPOT)."
     },
     {
       "sku": "626030800",
@@ -1836,7 +1984,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/626030800.png"
+      "foto": "catalogo-img/626030800.png",
+      "desc": "Purificador compacto ideal para cocinas pequeñas o consumo moderado. Con Carbón Activado Granular y CAG impregnado en plata, autopurga y nuevo elemento filtrante Fipor n.° 3. Vida útil: 12 meses o 12.000 litros."
     },
     {
       "sku": "612290200",
@@ -1847,7 +1996,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612290200.png"
+      "foto": "catalogo-img/612290200.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (FUENTE DE ALIMENTACION P/IONTRIX)."
     },
     {
       "sku": "612030280",
@@ -1858,7 +2008,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612030280.png"
+      "foto": "catalogo-img/612030280.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (GATILLO P/CANILLA BAJO MESADA PSA)."
     },
     {
       "sku": "611300020",
@@ -1869,7 +2020,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/611300020.png"
+      "foto": "catalogo-img/611300020.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (JARRA AGUA OSMOSIS PSA ROPOT)."
     },
     {
       "sku": "612280160",
@@ -1880,7 +2032,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612280160.png"
+      "foto": "catalogo-img/612280160.png",
+      "desc": "Dispositivo antisarro para cañerías, termotanques, calderas y lavarropas. Su carga de polifosfatos de grado alimenticio neutraliza la cristalización del sarro impidiendo que se incruste en caños y artefactos."
     },
     {
       "sku": "612030290",
@@ -1891,7 +2044,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612030290.png"
+      "foto": "catalogo-img/612030290.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (KIT P/DETERMINACIÓN DUREZA (10 TIRAS))."
     },
     {
       "sku": "612290130",
@@ -1902,7 +2056,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612290130.png"
+      "foto": "catalogo-img/612290130.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (KIT P/MEDICION DE CLORO P/IONTRIX)."
     },
     {
       "sku": "612290120",
@@ -1913,7 +2068,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612290120.png"
+      "foto": "catalogo-img/612290120.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (KIT P/MEDICION DE IONES P/IONTRIX)."
     },
     {
       "sku": "612290140",
@@ -1924,7 +2080,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612290140.png"
+      "foto": "catalogo-img/612290140.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (KIT P/MEDICION DE PH P/IONTRIX)."
     },
     {
       "sku": "612060070",
@@ -1935,7 +2092,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612060070.png"
+      "foto": "catalogo-img/612060070.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (KIT POSVENTA 1 AÑO OSMOSIS PSA ROPOT)."
     },
     {
       "sku": "612012530",
@@ -1946,7 +2104,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612012530.png"
+      "foto": "catalogo-img/612012530.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (KIT POSVENTA PURIF. AIRE PSA)."
     },
     {
       "sku": "612290220",
@@ -1957,7 +2116,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612290220.png"
+      "foto": "catalogo-img/612290220.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (KIT PSA LAB P/IONTRIX)."
     },
     {
       "sku": "612012520",
@@ -1968,7 +2128,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612012520.png"
+      "foto": "catalogo-img/612012520.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (MANG. BLACK DIÁM. 8,5 X 1600 C/CONEC. SEN4/S1000)."
     },
     {
       "sku": "612012490",
@@ -1979,7 +2140,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612012490.png"
+      "foto": "catalogo-img/612012490.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (MANG. BLACK DIÁM. 8,5 X 700 C/CONEC. SEN4/S1000)."
     },
     {
       "sku": "612030270",
@@ -1990,7 +2152,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612030270.png"
+      "foto": "catalogo-img/612030270.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (MANG. SEMIRRÍGIDA AZUL DIÁM.8 (X METRO))."
     },
     {
       "sku": "612030400",
@@ -2001,7 +2164,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612030400.png"
+      "foto": "catalogo-img/612030400.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (MANG. SEMIRRÍGIDA BLANCA DIÁM.8 (X METRO))."
     },
     {
       "sku": "612030370",
@@ -2012,7 +2176,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612030370.png"
+      "foto": "catalogo-img/612030370.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (MANG. SEMIRRÍGIDA VERDE DIÁM.8 (X METRO))."
     },
     {
       "sku": "612011370",
@@ -2023,7 +2188,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612011370.png"
+      "foto": "catalogo-img/612011370.png",
+      "desc": "Purificador de mesada compacto y práctico que combina Carbón Activado Granular, KDF y resina mineral. Reduce cloro, trihalometanos, sedimentos y metales pesados con regulador automático de caudal."
     },
     {
       "sku": "612011870",
@@ -2034,7 +2200,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612011870.png"
+      "foto": "catalogo-img/612011870.png",
+      "desc": "Purificador de mesada compacto y práctico que combina Carbón Activado Granular, KDF y resina mineral. Reduce cloro, trihalometanos, sedimentos y metales pesados con regulador automático de caudal."
     },
     {
       "sku": "612011280",
@@ -2045,7 +2212,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612011280.png"
+      "foto": "catalogo-img/612011280.png",
+      "desc": "Purificador compacto ideal para cocinas pequeñas o consumo moderado. Con Carbón Activado Granular y CAG impregnado en plata, autopurga y nuevo elemento filtrante Fipor n.° 3. Vida útil: 12 meses o 12.000 litros."
     },
     {
       "sku": "612011270",
@@ -2056,7 +2224,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612011270.png"
+      "foto": "catalogo-img/612011270.png",
+      "desc": "Purificador compacto ideal para cocinas pequeñas o consumo moderado. Con Carbón Activado Granular y CAG impregnado en plata, autopurga y nuevo elemento filtrante Fipor n.° 3. Vida útil: 12 meses o 12.000 litros."
     },
     {
       "sku": "612290110",
@@ -2067,7 +2236,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612290110.png"
+      "foto": "catalogo-img/612290110.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (MARIPOSA DE FIJACION P/IONTRIX)."
     },
     {
       "sku": "612290240",
@@ -2078,7 +2248,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612290240.png"
+      "foto": "catalogo-img/612290240.png",
+      "desc": "Ionizador solar y electroquímico para piscinas. Reduce hasta un 85% el consumo de cloro y alguicidas mediante iones de cobre y plata activados por energía solar y módulo potenciador, manteniendo el agua cristalina sin irritar ojos ni piel."
     },
     {
       "sku": "612050440",
@@ -2089,7 +2260,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612050440.png"
+      "foto": "catalogo-img/612050440.png",
+      "desc": "Ablandador de agua automático para toda la casa. Trata la dureza mediante resina catiónica con regeneración automática por sal, eliminando por completo el sarro en todas las canillas, duchas y electrodomésticos."
     },
     {
       "sku": "612290210",
@@ -2100,7 +2272,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612290210.png"
+      "foto": "catalogo-img/612290210.png",
+      "desc": "Ionizador solar y electroquímico para piscinas. Reduce hasta un 85% el consumo de cloro y alguicidas mediante iones de cobre y plata activados por energía solar y módulo potenciador, manteniendo el agua cristalina sin irritar ojos ni piel."
     },
     {
       "sku": "612100130",
@@ -2111,7 +2284,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612100130.png"
+      "foto": "catalogo-img/612100130.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (O-RING INTERNO TAPA CUERPO PSA DUCHA (JUEGO))."
     },
     {
       "sku": "612030960",
@@ -2122,7 +2296,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612030960.png"
+      "foto": "catalogo-img/612030960.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (PASTILLA HIDROSENSIBLE P/ECO-D)."
     },
     {
       "sku": "612050200",
@@ -2133,7 +2308,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612050200.png"
+      "foto": "catalogo-img/612050200.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (PASTILLA SANITIZANTE MAX X 8 UNID.)."
     },
     {
       "sku": "612050430",
@@ -2144,7 +2320,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612050430.png"
+      "foto": "catalogo-img/612050430.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (PAÑO ALTA TURBIDEZ 24 X 21 X 3 UNID.)."
     },
     {
       "sku": "612015910",
@@ -2155,7 +2332,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612015910.png"
+      "foto": "catalogo-img/612015910.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (PICO DE DESCARGA GRIFERIA NERO)."
     },
     {
       "sku": "612016110",
@@ -2166,7 +2344,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612016110.png"
+      "foto": "catalogo-img/612016110.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (PICO DESCARGA CANILLA BM2/GRIFERIA PSA)."
     },
     {
       "sku": "612040070",
@@ -2177,7 +2356,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612040070.png"
+      "foto": "catalogo-img/612040070.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (PREFILTRO ENTRADA PURIF. DE AIRE PSA)."
     },
     {
       "sku": "612040060",
@@ -2188,7 +2368,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612040060.png"
+      "foto": "catalogo-img/612040060.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (PREFILTRO P/10 KD)."
     },
     {
       "sku": "612012500",
@@ -2199,7 +2380,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612012500.png"
+      "foto": "catalogo-img/612012500.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (PROLONGADOR P/ PICO PSA SENIOR 3)."
     },
     {
       "sku": "612011390",
@@ -2210,7 +2392,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612011390.png"
+      "foto": "catalogo-img/612011390.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (PROLONGADOR P/PICO PSA SENIOR)."
     },
     {
       "sku": "618110150",
@@ -2221,7 +2404,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/618110150.png"
+      "foto": "catalogo-img/618110150.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (PROMO CILINDRO + PACK RENDIMIENTO II)."
     },
     {
       "sku": "614070010",
@@ -2232,7 +2416,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/614070010.png"
+      "foto": "catalogo-img/614070010.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (REACTIVO DE CLORO)."
     },
     {
       "sku": "618110060",
@@ -2243,7 +2428,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/618110060.png"
+      "foto": "catalogo-img/618110060.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (RECARGA P/SODA BURBY)."
     },
     {
       "sku": "622070080",
@@ -2254,7 +2440,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/622070080.png"
+      "foto": "catalogo-img/622070080.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (RECIPIENTE P/AGUA ENTRADA OSMOSIS PSA ROPOT)."
     },
     {
       "sku": "612050260",
@@ -2265,7 +2452,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612050260.png"
+      "foto": "catalogo-img/612050260.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (REPUESTO BACTERIOSTÁTICO 25 MIC S-1000/QUA/SEN)."
     },
     {
       "sku": "612050250",
@@ -2276,7 +2464,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612050250.png"
+      "foto": "catalogo-img/612050250.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (REPUESTO BACTERIOSTÁTICO 5 MIC S-1000/QUA/SEN)."
     },
     {
       "sku": "612050270",
@@ -2287,7 +2476,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612050270.png"
+      "foto": "catalogo-img/612050270.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (REPUESTO BACTERIOSTÁTICO 50 MIC S-1000/QUA/SEN)."
     },
     {
       "sku": "612100280",
@@ -2298,7 +2488,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612100280.png"
+      "foto": "catalogo-img/612100280.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (REPUESTO CUERPO PSA DUCHA BIANCO)."
     },
     {
       "sku": "612100290",
@@ -2309,7 +2500,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612100290.png"
+      "foto": "catalogo-img/612100290.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (REPUESTO CUERPO PSA DUCHA GRIGIO)."
     },
     {
       "sku": "612060010",
@@ -2320,7 +2512,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612060010.png"
+      "foto": "catalogo-img/612060010.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (REPUESTO N°1 SEDIMENTOS OSMOSIS PSA ROPOT)."
     },
     {
       "sku": "612060030",
@@ -2331,7 +2524,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612060030.png"
+      "foto": "catalogo-img/612060030.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (REPUESTO N°2 CARBON BLOQUE OSMOSIS PSA ROPOT)."
     },
     {
       "sku": "612060020",
@@ -2342,7 +2536,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612060020.png"
+      "foto": "catalogo-img/612060020.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (REPUESTO N°3 MEMBRANA OSMOSIS PSA ROPOT)."
     },
     {
       "sku": "612060040",
@@ -2353,7 +2548,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612060040.png"
+      "foto": "catalogo-img/612060040.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (REPUESTO N°4 POST MEMBRANA OSMOSIS PSA ROPOT)."
     },
     {
       "sku": "612100030",
@@ -2364,7 +2560,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612100030.png"
+      "foto": "catalogo-img/612100030.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (REPUESTO PSA DUCHA C/KDF)."
     },
     {
       "sku": "612100080",
@@ -2375,7 +2572,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612100080.png"
+      "foto": "catalogo-img/612100080.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (REPUESTO PSA DUCHA C/KDF/POLIFOSFATO)."
     },
     {
       "sku": "612280030",
@@ -2386,7 +2584,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612280030.png"
+      "foto": "catalogo-img/612280030.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (REPUESTO PSA POLI)."
     },
     {
       "sku": "612280150",
@@ -2397,7 +2596,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612280150.png"
+      "foto": "catalogo-img/612280150.png",
+      "desc": "Dispositivo antisarro para cañerías, termotanques, calderas y lavarropas. Su carga de polifosfatos de grado alimenticio neutraliza la cristalización del sarro impidiendo que se incruste en caños y artefactos."
     },
     {
       "sku": "612020010",
@@ -2408,7 +2608,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612020010.png"
+      "foto": "catalogo-img/612020010.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (REPUESTO PSA PORTÁTIL)."
     },
     {
       "sku": "612031070",
@@ -2419,7 +2620,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612031070.png"
+      "foto": "catalogo-img/612031070.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (RESERVORIO COMPLETO P/ECO-D)."
     },
     {
       "sku": "612010850",
@@ -2430,7 +2632,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612010850.png"
+      "foto": "catalogo-img/612010850.png",
+      "desc": "Filtro de sedimentos de polipropileno de alta densidad que retiene partículas gruesas, arena, óxido, arcilla y desprendimientos de cañerías o tanques, protegiendo bombas, griferías y purificadores."
     },
     {
       "sku": "612290180",
@@ -2441,7 +2644,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612290180.png"
+      "foto": "catalogo-img/612290180.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (TAPA CENTRADORA P/IONTRIX)."
     },
     {
       "sku": "612290230",
@@ -2452,7 +2656,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612290230.png"
+      "foto": "catalogo-img/612290230.png",
+      "desc": "Ionizador solar y electroquímico para piscinas. Reduce hasta un 85% el consumo de cloro y alguicidas mediante iones de cobre y plata activados por energía solar y módulo potenciador, manteniendo el agua cristalina sin irritar ojos ni piel."
     },
     {
       "sku": "612030340",
@@ -2463,7 +2668,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612030340.png"
+      "foto": "catalogo-img/612030340.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (TAPA CON FLOTANTE P/DISPENSER)."
     },
     {
       "sku": "612110310",
@@ -2474,7 +2680,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612110310.png"
+      "foto": "catalogo-img/612110310.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (TAPA P/BOTELLA PSA TERMICA PICO SPORT)."
     },
     {
       "sku": "612111200",
@@ -2485,7 +2692,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612111200.png"
+      "foto": "catalogo-img/612111200.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (TAPA P/BOTELLA PSA TERMICA PICO SPORT (NUEVA))."
     },
     {
       "sku": "612100100",
@@ -2496,7 +2704,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612100100.png"
+      "foto": "catalogo-img/612100100.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (TAPA P/CUERPO PSA DUCHA CR MARFIL)."
     },
     {
       "sku": "612100110",
@@ -2507,7 +2716,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612100110.png"
+      "foto": "catalogo-img/612100110.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (TAPA P/CUERPO PSA DUCHA PLATA)."
     },
     {
       "sku": "612031030",
@@ -2518,7 +2728,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612031030.png"
+      "foto": "catalogo-img/612031030.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (TAPA PREFILTRO C/AUTOPURGA)."
     },
     {
       "sku": "612030950",
@@ -2529,7 +2740,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612030950.png"
+      "foto": "catalogo-img/612030950.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (TAPA PREFILTRO PSA S-1000 II)."
     },
     {
       "sku": "612030980",
@@ -2540,7 +2752,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612030980.png"
+      "foto": "catalogo-img/612030980.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (TAPA PREFILTRO SENIOR 3)."
     },
     {
       "sku": "612031320",
@@ -2551,7 +2764,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612031320.png"
+      "foto": "catalogo-img/612031320.png",
+      "desc": "Purificador para agua de red con Carbón Activado Granular con plata, KDF-55 y zeolita natural. Reduce más del 90% de cloro, trihalometanos, aluminio, plomo y hierro, y retiene más del 97% de microplásticos. Vida útil: 36 meses o 36.000 litros."
     },
     {
       "sku": "612290190",
@@ -2562,7 +2776,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612290190.png"
+      "foto": "catalogo-img/612290190.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (TAPON P/CONECTOR DE RECARGA P/IONTRIX)."
     },
     {
       "sku": "612030330",
@@ -2573,7 +2788,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612030330.png"
+      "foto": "catalogo-img/612030330.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (TERMOSTATO AGUA CALIENTE 85° P/DISPENSER)."
     },
     {
       "sku": "612100120",
@@ -2584,7 +2800,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612100120.png"
+      "foto": "catalogo-img/612100120.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (TUBO CONEXION PSA DUCHA C/O-RING)."
     },
     {
       "sku": "612280180",
@@ -2595,7 +2812,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612280180.png"
+      "foto": "catalogo-img/612280180.png",
+      "desc": "Dispositivo antisarro para cañerías, termotanques, calderas y lavarropas. Su carga de polifosfatos de grado alimenticio neutraliza la cristalización del sarro impidiendo que se incruste en caños y artefactos."
     },
     {
       "sku": "612015790",
@@ -2606,7 +2824,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612015790.png"
+      "foto": "catalogo-img/612015790.png",
+      "desc": "Purificador de agua para el cuarto de baño. Se conecta a la canilla del lavatorio con casquete giratorio de 360°, brindando agua pura libre de cloro e impurezas para higiene bucal, afeitado y lavado de cutis."
     },
     {
       "sku": "612012480",
@@ -2617,7 +2836,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612012480.png"
+      "foto": "catalogo-img/612012480.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (VÁLVULA BY PASS NERO)."
     },
     {
       "sku": "612011510",
@@ -2628,7 +2848,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "catalogo-img/612011510.png"
+      "foto": "catalogo-img/612011510.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (VÁLVULA BY PASS UNIVERSAL)."
     },
     {
       "sku": "623280020",
@@ -2639,7 +2860,8 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Servicios",
-      "foto": "catalogo-img/623280020.png"
+      "foto": "catalogo-img/623280020.png",
+      "desc": "Servicio, análisis o accesorio oficial PSA (ADICIONAL INST. HASTA 60 KM (PSA POLI X 2))."
     },
     {
       "sku": "623280010",
@@ -2650,7 +2872,8 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Servicios",
-      "foto": "catalogo-img/623280010.png"
+      "foto": "catalogo-img/623280010.png",
+      "desc": "Servicio, análisis o accesorio oficial PSA (ADICIONAL INST. HASTA 60 KM (PSA POLI))."
     },
     {
       "sku": "623010020",
@@ -2661,7 +2884,8 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Servicios",
-      "foto": "catalogo-img/623010020.png"
+      "foto": "catalogo-img/623010020.png",
+      "desc": "Servicio, análisis o accesorio oficial PSA (ADICIONAL INSTAL. HASTA 60 KM)."
     },
     {
       "sku": "623030090",
@@ -2672,7 +2896,8 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Servicios",
-      "foto": "catalogo-img/623030090.png"
+      "foto": "catalogo-img/623030090.png",
+      "desc": "Servicio, análisis o accesorio oficial PSA (ADICIONAL POR KILOMETRAJE EXCEDIDO)."
     },
     {
       "sku": "612031400",
@@ -2683,7 +2908,8 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Servicios",
-      "foto": "catalogo-img/612031400.png"
+      "foto": "catalogo-img/612031400.png",
+      "desc": "Grifería de diseño exclusivo para purificadores bajo mesada PSA. Cuenta con vías independientes para agua corriente (fría/caliente) y Agua Purificada PSA en una única perforación con cierre cerámico."
     },
     {
       "sku": "612031410",
@@ -2694,7 +2920,8 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Servicios",
-      "foto": "catalogo-img/612031410.png"
+      "foto": "catalogo-img/612031410.png",
+      "desc": "Grifería de diseño exclusivo para purificadores bajo mesada PSA. Cuenta con vías independientes para agua corriente (fría/caliente) y Agua Purificada PSA en una única perforación con cierre cerámico."
     },
     {
       "sku": "612031220",
@@ -2705,7 +2932,8 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Servicios",
-      "foto": "catalogo-img/612031220.png"
+      "foto": "catalogo-img/612031220.png",
+      "desc": "Canilla cuello de cisne con cierre cerámico de 1/4 de vuelta para purificadores PSA bajo mesada."
     },
     {
       "sku": "612031310",
@@ -2716,7 +2944,8 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Servicios",
-      "foto": "catalogo-img/612031310.png"
+      "foto": "catalogo-img/612031310.png",
+      "desc": "Canilla cuello de cisne con cierre cerámico de 1/4 de vuelta para purificadores PSA bajo mesada."
     },
     {
       "sku": "623030120",
@@ -2727,7 +2956,8 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Servicios",
-      "foto": "catalogo-img/623030120.png"
+      "foto": "catalogo-img/623030120.png",
+      "desc": "Servicio, análisis o accesorio oficial PSA (INSTALACION DISPENSER PSA (HASTA 60 KM))."
     },
     {
       "sku": "623030150",
@@ -2738,7 +2968,8 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Servicios",
-      "foto": "catalogo-img/623030150.png"
+      "foto": "catalogo-img/623030150.png",
+      "desc": "Purificador compacto ideal para cocinas pequeñas o consumo moderado. Con Carbón Activado Granular y CAG impregnado en plata, autopurga y nuevo elemento filtrante Fipor n.° 3. Vida útil: 12 meses o 12.000 litros."
     },
     {
       "sku": "623030130",
@@ -2749,7 +2980,8 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Servicios",
-      "foto": "catalogo-img/623030130.png"
+      "foto": "catalogo-img/623030130.png",
+      "desc": "Servicio, análisis o accesorio oficial PSA (MANTENIMIENTO ANUAL DISPENSER PSA)."
     },
     {
       "sku": "623010010",
@@ -2760,7 +2992,8 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Servicios",
-      "foto": "catalogo-img/623010010.png"
+      "foto": "catalogo-img/623010010.png",
+      "desc": "Servicio, análisis o accesorio oficial PSA (MODULO REPARACION DE PRODUCTO)."
     },
     {
       "sku": "623010040",
@@ -2771,7 +3004,8 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Servicios",
-      "foto": "catalogo-img/623010040.png"
+      "foto": "catalogo-img/623010040.png",
+      "desc": "Servicio, análisis o accesorio oficial PSA (SERVICE CON INSTALADOR HASTA 60 KM.)."
     },
     {
       "sku": "612031420",
@@ -2782,7 +3016,8 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Servicios",
-      "foto": "catalogo-img/612031420.png"
+      "foto": "catalogo-img/612031420.png",
+      "desc": "Servicio, análisis o accesorio oficial PSA (TRANSF.SM/BM + GRIF.PSA BICOMANDO)."
     },
     {
       "sku": "612031430",
@@ -2793,7 +3028,8 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Servicios",
-      "foto": "catalogo-img/612031430.png"
+      "foto": "catalogo-img/612031430.png",
+      "desc": "Servicio, análisis o accesorio oficial PSA (TRANSF.SM/BM + GRIF.PSA BICOMANDO + INST.)."
     },
     {
       "sku": "612031440",
@@ -2804,7 +3040,8 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Servicios",
-      "foto": "catalogo-img/612031440.png"
+      "foto": "catalogo-img/612031440.png",
+      "desc": "Servicio, análisis o accesorio oficial PSA (TRANSF.SM/BM + GRIF.PSA BICOMANDO NERO)."
     },
     {
       "sku": "612031450",
@@ -2815,7 +3052,8 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Servicios",
-      "foto": "catalogo-img/612031450.png"
+      "foto": "catalogo-img/612031450.png",
+      "desc": "Servicio, análisis o accesorio oficial PSA (TRANSF.SM/BM + GRIF.PSA BICOMANDO NERO + INST.)."
     },
     {
       "sku": "612031230",
@@ -2826,7 +3064,8 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Servicios",
-      "foto": "catalogo-img/612031230.png"
+      "foto": "catalogo-img/612031230.png",
+      "desc": "Canilla cuello de cisne con cierre cerámico de 1/4 de vuelta para purificadores PSA bajo mesada."
     },
     {
       "sku": "612031240",
@@ -2837,7 +3076,8 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Servicios",
-      "foto": "catalogo-img/612031240.png"
+      "foto": "catalogo-img/612031240.png",
+      "desc": "Canilla cuello de cisne con cierre cerámico de 1/4 de vuelta para purificadores PSA bajo mesada."
     },
     {
       "sku": "612031340",
@@ -2848,7 +3088,8 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Servicios",
-      "foto": "catalogo-img/612031340.png"
+      "foto": "catalogo-img/612031340.png",
+      "desc": "Canilla cuello de cisne con cierre cerámico de 1/4 de vuelta para purificadores PSA bajo mesada."
     },
     {
       "sku": "612031350",
@@ -2859,7 +3100,8 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Servicios",
-      "foto": "catalogo-img/612031350.png"
+      "foto": "catalogo-img/612031350.png",
+      "desc": "Canilla cuello de cisne con cierre cerámico de 1/4 de vuelta para purificadores PSA bajo mesada."
     },
     {
       "sku": "612110830",
@@ -2870,7 +3112,8 @@
       "grupo": "botellas",
       "plan_canje": null,
       "seccion": "Botellas",
-      "foto": "catalogo-img/612110830.png"
+      "foto": "catalogo-img/612110830.png",
+      "desc": "Botella deportiva sustentable 100% reciclada y reciclable, libre de BPA, con pico deportivo para hidratación práctica."
     },
     {
       "sku": "612110840",
@@ -2881,7 +3124,8 @@
       "grupo": "botellas",
       "plan_canje": null,
       "seccion": "Botellas",
-      "foto": "catalogo-img/612110840.png"
+      "foto": "catalogo-img/612110840.png",
+      "desc": "Botella deportiva sustentable 100% reciclada y reciclable, libre de BPA, con pico deportivo para hidratación práctica."
     },
     {
       "sku": "612110850",
@@ -2892,7 +3136,8 @@
       "grupo": "botellas",
       "plan_canje": null,
       "seccion": "Botellas",
-      "foto": "catalogo-img/612110850.png"
+      "foto": "catalogo-img/612110850.png",
+      "desc": "Botella deportiva sustentable 100% reciclada y reciclable, libre de BPA, con pico deportivo para hidratación práctica."
     },
     {
       "sku": "612110860",
@@ -2903,7 +3148,8 @@
       "grupo": "botellas",
       "plan_canje": null,
       "seccion": "Botellas",
-      "foto": "catalogo-img/612110860.png"
+      "foto": "catalogo-img/612110860.png",
+      "desc": "Botella deportiva sustentable 100% reciclada y reciclable, libre de BPA, con pico deportivo para hidratación práctica."
     },
     {
       "sku": "612110870",
@@ -2914,7 +3160,8 @@
       "grupo": "botellas",
       "plan_canje": null,
       "seccion": "Botellas",
-      "foto": "catalogo-img/612110870.png"
+      "foto": "catalogo-img/612110870.png",
+      "desc": "Botella deportiva sustentable 100% reciclada y reciclable, libre de BPA, con pico deportivo para hidratación práctica."
     },
     {
       "sku": "612110880",
@@ -2925,7 +3172,8 @@
       "grupo": "botellas",
       "plan_canje": null,
       "seccion": "Botellas",
-      "foto": "catalogo-img/612110880.png"
+      "foto": "catalogo-img/612110880.png",
+      "desc": "Botella deportiva sustentable 100% reciclada y reciclable, libre de BPA, con pico deportivo para hidratación práctica."
     },
     {
       "sku": "612110890",
@@ -2936,7 +3184,8 @@
       "grupo": "botellas",
       "plan_canje": null,
       "seccion": "Botellas",
-      "foto": "catalogo-img/612110890.png"
+      "foto": "catalogo-img/612110890.png",
+      "desc": "Botella deportiva sustentable 100% reciclada y reciclable, libre de BPA, con pico deportivo para hidratación práctica."
     },
     {
       "sku": "612110900",
@@ -2947,7 +3196,8 @@
       "grupo": "botellas",
       "plan_canje": null,
       "seccion": "Botellas",
-      "foto": "catalogo-img/612110900.png"
+      "foto": "catalogo-img/612110900.png",
+      "desc": "Botella deportiva sustentable 100% reciclada y reciclable, libre de BPA, con pico deportivo para hidratación práctica."
     },
     {
       "sku": "612110910",
@@ -2958,7 +3208,8 @@
       "grupo": "botellas",
       "plan_canje": null,
       "seccion": "Botellas",
-      "foto": "catalogo-img/612110910.png"
+      "foto": "catalogo-img/612110910.png",
+      "desc": "Botella deportiva sustentable 100% reciclada y reciclable, libre de BPA, con pico deportivo para hidratación práctica."
     },
     {
       "sku": "612110920",
@@ -2969,7 +3220,8 @@
       "grupo": "botellas",
       "plan_canje": null,
       "seccion": "Botellas",
-      "foto": "catalogo-img/612110920.png"
+      "foto": "catalogo-img/612110920.png",
+      "desc": "Botella deportiva sustentable 100% reciclada y reciclable, libre de BPA, con pico deportivo para hidratación práctica."
     },
     {
       "sku": "612110930",
@@ -2980,7 +3232,8 @@
       "grupo": "botellas",
       "plan_canje": null,
       "seccion": "Botellas",
-      "foto": "catalogo-img/612110930.png"
+      "foto": "catalogo-img/612110930.png",
+      "desc": "Botella deportiva sustentable 100% reciclada y reciclable, libre de BPA, con pico deportivo para hidratación práctica."
     },
     {
       "sku": "612110940",
@@ -2991,7 +3244,8 @@
       "grupo": "botellas",
       "plan_canje": null,
       "seccion": "Botellas",
-      "foto": "catalogo-img/612110940.png"
+      "foto": "catalogo-img/612110940.png",
+      "desc": "Botella deportiva sustentable 100% reciclada y reciclable, libre de BPA, con pico deportivo para hidratación práctica."
     },
     {
       "sku": "612110950",
@@ -3002,7 +3256,8 @@
       "grupo": "botellas",
       "plan_canje": null,
       "seccion": "Botellas",
-      "foto": "catalogo-img/612110950.png"
+      "foto": "catalogo-img/612110950.png",
+      "desc": "Botella deportiva sustentable 100% reciclada y reciclable, libre de BPA, con pico deportivo para hidratación práctica."
     },
     {
       "sku": "612110960",
@@ -3013,7 +3268,8 @@
       "grupo": "botellas",
       "plan_canje": null,
       "seccion": "Botellas",
-      "foto": "catalogo-img/612110960.png"
+      "foto": "catalogo-img/612110960.png",
+      "desc": "Botella deportiva sustentable 100% reciclada y reciclable, libre de BPA, con pico deportivo para hidratación práctica."
     },
     {
       "sku": "612110970",
@@ -3024,7 +3280,8 @@
       "grupo": "botellas",
       "plan_canje": null,
       "seccion": "Botellas",
-      "foto": "catalogo-img/612110970.png"
+      "foto": "catalogo-img/612110970.png",
+      "desc": "Botella deportiva sustentable 100% reciclada y reciclable, libre de BPA, con pico deportivo para hidratación práctica."
     },
     {
       "sku": "612110980",
@@ -3035,7 +3292,8 @@
       "grupo": "botellas",
       "plan_canje": null,
       "seccion": "Botellas",
-      "foto": "catalogo-img/612110980.png"
+      "foto": "catalogo-img/612110980.png",
+      "desc": "Botella deportiva sustentable 100% reciclada y reciclable, libre de BPA, con pico deportivo para hidratación práctica."
     },
     {
       "sku": "612111060",
@@ -3046,7 +3304,8 @@
       "grupo": "botellas",
       "plan_canje": null,
       "seccion": "Botellas",
-      "foto": "catalogo-img/612111060.png"
+      "foto": "catalogo-img/612111060.png",
+      "desc": "Botella deportiva reutilizable ergonómica, libre de BPA, ultraliviana para hidratación diaria."
     },
     {
       "sku": "612110320",
@@ -3057,7 +3316,8 @@
       "grupo": "botellas",
       "plan_canje": null,
       "seccion": "Botellas",
-      "foto": "catalogo-img/612110320.png"
+      "foto": "catalogo-img/612110320.png",
+      "desc": "Accesorio de hidratación reutilizable oficial PSA libre de BPA."
     },
     {
       "sku": "612110220",
@@ -3068,7 +3328,8 @@
       "grupo": "botellas",
       "plan_canje": null,
       "seccion": "Botellas",
-      "foto": "catalogo-img/612110220.png"
+      "foto": "catalogo-img/612110220.png",
+      "desc": "Accesorio de hidratación reutilizable oficial PSA libre de BPA."
     },
     {
       "sku": "612110230",
@@ -3079,7 +3340,8 @@
       "grupo": "botellas",
       "plan_canje": null,
       "seccion": "Botellas",
-      "foto": "catalogo-img/612110230.png"
+      "foto": "catalogo-img/612110230.png",
+      "desc": "Botella reutilizable de alta resistencia especialmente diseñada para soportar la presión del gasificado con PSA SodaBurby. Libre de BPA."
     },
     {
       "sku": "612111260",
@@ -3090,7 +3352,8 @@
       "grupo": "botellas",
       "plan_canje": null,
       "seccion": "Botellas",
-      "foto": "catalogo-img/612111260.png"
+      "foto": "catalogo-img/612111260.png",
+      "desc": "Botella térmica de doble pared de acero inoxidable aislada al vacío. Mantiene bebidas frías por 24 horas o calientes por 12 horas, libre de condensación exterior."
     },
     {
       "sku": "612111270",
@@ -3101,7 +3364,8 @@
       "grupo": "botellas",
       "plan_canje": null,
       "seccion": "Botellas",
-      "foto": "catalogo-img/612111270.png"
+      "foto": "catalogo-img/612111270.png",
+      "desc": "Botella térmica de doble pared de acero inoxidable aislada al vacío. Mantiene bebidas frías por 24 horas o calientes por 12 horas, libre de condensación exterior."
     },
     {
       "sku": "612111290",
@@ -3112,7 +3376,8 @@
       "grupo": "botellas",
       "plan_canje": null,
       "seccion": "Botellas",
-      "foto": "catalogo-img/612111290.png"
+      "foto": "catalogo-img/612111290.png",
+      "desc": "Botella térmica de doble pared de acero inoxidable aislada al vacío. Mantiene bebidas frías por 24 horas o calientes por 12 horas, libre de condensación exterior."
     },
     {
       "sku": "612111300",
@@ -3123,7 +3388,8 @@
       "grupo": "botellas",
       "plan_canje": null,
       "seccion": "Botellas",
-      "foto": "catalogo-img/612111300.png"
+      "foto": "catalogo-img/612111300.png",
+      "desc": "Botella térmica de doble pared de acero inoxidable aislada al vacío. Mantiene bebidas frías por 24 horas o calientes por 12 horas, libre de condensación exterior."
     },
     {
       "sku": "614065630",
@@ -3134,7 +3400,8 @@
       "grupo": "botellas",
       "plan_canje": null,
       "seccion": "Material Promocional",
-      "foto": "catalogo-img/614065630.png"
+      "foto": "catalogo-img/614065630.png",
+      "desc": "Mate térmico de acero inoxidable con bombilla ergonómica de acero inoxidable."
     },
     {
       "sku": "614065640",
@@ -3145,7 +3412,8 @@
       "grupo": "botellas",
       "plan_canje": null,
       "seccion": "Material Promocional",
-      "foto": "catalogo-img/614065640.png"
+      "foto": "catalogo-img/614065640.png",
+      "desc": "Mate térmico de acero inoxidable con bombilla ergonómica de acero inoxidable."
     },
     {
       "sku": "630060740",
@@ -3156,7 +3424,8 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Material Promocional",
-      "foto": "catalogo-img/630060740.png"
+      "foto": "catalogo-img/630060740.png",
+      "desc": "Servicio, análisis o accesorio oficial PSA (LAPIZ GRAFITO NEGRO PSA X 10 UNID.)."
     },
     {
       "sku": "623120090",
@@ -3167,7 +3436,8 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Material Promocional",
-      "foto": "catalogo-img/623120090.png"
+      "foto": "catalogo-img/623120090.png",
+      "desc": "Servicio, análisis o accesorio oficial PSA (REJILLEX BLANCO)."
     },
     {
       "sku": "623120100",
@@ -3178,7 +3448,8 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Material Promocional",
-      "foto": "catalogo-img/623120100.png"
+      "foto": "catalogo-img/623120100.png",
+      "desc": "Servicio, análisis o accesorio oficial PSA (REJILLEX GRIGIO)."
     },
     {
       "sku": "630139150",
@@ -3189,7 +3460,8 @@
       "grupo": "botellas",
       "plan_canje": null,
       "seccion": "Material Promocional",
-      "foto": "catalogo-img/630139150.png"
+      "foto": "catalogo-img/630139150.png",
+      "desc": "Set matero que incluye Termo de acero inoxidable, mate térmico y bombilla de acero inoxidable de diseño exclusivo."
     },
     {
       "sku": "630139160",
@@ -3200,7 +3472,8 @@
       "grupo": "botellas",
       "plan_canje": null,
       "seccion": "Material Promocional",
-      "foto": "catalogo-img/630139160.png"
+      "foto": "catalogo-img/630139160.png",
+      "desc": "Set matero que incluye Termo de acero inoxidable, mate térmico y bombilla de acero inoxidable de diseño exclusivo."
     },
     {
       "sku": "614066070",
@@ -3211,7 +3484,8 @@
       "grupo": "botellas",
       "plan_canje": null,
       "seccion": "Material Promocional",
-      "foto": "catalogo-img/614066070.png"
+      "foto": "catalogo-img/614066070.png",
+      "desc": "Termo de acero inoxidable con aislamiento al vacío de 1 litro de capacidad con tapón cebador de precisión para mate."
     },
     {
       "sku": "614066060",
@@ -3222,7 +3496,8 @@
       "grupo": "botellas",
       "plan_canje": null,
       "seccion": "Material Promocional",
-      "foto": "catalogo-img/614066060.png"
+      "foto": "catalogo-img/614066060.png",
+      "desc": "Termo de acero inoxidable con aislamiento al vacío de 1 litro de capacidad con tapón cebador de precisión para mate."
     },
     {
       "sku": "622070060",
@@ -3233,7 +3508,8 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Análisis de laboratorio",
-      "foto": "catalogo-img/622070060.png"
+      "foto": "catalogo-img/622070060.png",
+      "desc": "Servicio, análisis o accesorio oficial PSA (ANALISIS ESPECIFICOS)."
     },
     {
       "sku": "622070260",
@@ -3244,7 +3520,8 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Análisis de laboratorio",
-      "foto": "catalogo-img/622070260.png"
+      "foto": "catalogo-img/622070260.png",
+      "desc": "Servicio, análisis o accesorio oficial PSA (BOTELLA P/ANALISIS DE AGUA)."
     },
     {
       "sku": "622070010",
@@ -3255,7 +3532,8 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Análisis de laboratorio",
-      "foto": "catalogo-img/622070010.png"
+      "foto": "catalogo-img/622070010.png",
+      "desc": "Servicio, análisis o accesorio oficial PSA (MODULO A. FISICO QUIMICO BASICO)."
     },
     {
       "sku": "622070020",
@@ -3266,7 +3544,8 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Análisis de laboratorio",
-      "foto": "catalogo-img/622070020.png"
+      "foto": "catalogo-img/622070020.png",
+      "desc": "Servicio, análisis o accesorio oficial PSA (MODULO B. FISICO QUIMICO INTERMEDIO)."
     },
     {
       "sku": "622070030",
@@ -3277,7 +3556,8 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Análisis de laboratorio",
-      "foto": "catalogo-img/622070030.png"
+      "foto": "catalogo-img/622070030.png",
+      "desc": "Servicio, análisis o accesorio oficial PSA (MODULO C. FISICO QUIMICO COMPLETO)."
     },
     {
       "sku": "622070040",
@@ -3288,7 +3568,8 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Análisis de laboratorio",
-      "foto": "catalogo-img/622070040.png"
+      "foto": "catalogo-img/622070040.png",
+      "desc": "Servicio, análisis o accesorio oficial PSA (MODULO D. BACTERIOLOGICO)."
     },
     {
       "sku": "622070050",
@@ -3299,7 +3580,8 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Análisis de laboratorio",
-      "foto": "catalogo-img/622070050.png"
+      "foto": "catalogo-img/622070050.png",
+      "desc": "Servicio, análisis o accesorio oficial PSA (MODULO E. SOLIDOS EN SUSPENSION)."
     },
     {
       "sku": "622070070",
@@ -3310,7 +3592,8 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Análisis de laboratorio",
-      "foto": "catalogo-img/622070070.png"
+      "foto": "catalogo-img/622070070.png",
+      "desc": "Servicio, análisis o accesorio oficial PSA (RECIPIENTE P/ANALISIS DE AGUA)."
     },
     {
       "sku": "625111910",
@@ -3321,7 +3604,8 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Olivare",
-      "foto": "catalogo-img/625111910.png"
+      "foto": "catalogo-img/625111910.png",
+      "desc": "Servicio, análisis o accesorio oficial PSA (ACEITUNAS NEGRAS OLIVARE 220 GRS)."
     },
     {
       "sku": "625110630",
@@ -3332,7 +3616,8 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Olivare",
-      "foto": "catalogo-img/625110630.png"
+      "foto": "catalogo-img/625110630.png",
+      "desc": "Servicio, análisis o accesorio oficial PSA (ACEITUNAS VERDES OLIVARE 220 GRS)."
     },
     {
       "sku": "625112520",
@@ -3343,7 +3628,8 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Olivare",
-      "foto": "catalogo-img/625112520.png"
+      "foto": "catalogo-img/625112520.png",
+      "desc": "Servicio, análisis o accesorio oficial PSA (NININA 500 CC - ACEITE OLIVA VIRGEN EXTRA)."
     },
     {
       "sku": "625111060",
@@ -3354,7 +3640,8 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Olivare",
-      "foto": "catalogo-img/625111060.png"
+      "foto": "catalogo-img/625111060.png",
+      "desc": "Servicio, análisis o accesorio oficial PSA (OLIVARE 1 LITRO - ACEITE OLIVA VE)."
     },
     {
       "sku": "625110590",
@@ -3365,7 +3652,8 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Olivare",
-      "foto": "catalogo-img/625110590.png"
+      "foto": "catalogo-img/625110590.png",
+      "desc": "Servicio, análisis o accesorio oficial PSA (OLIVARE 250 CC - ACEITE OLIVA VE)."
     },
     {
       "sku": "625111150",
@@ -3376,7 +3664,8 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Olivare",
-      "foto": "catalogo-img/625111150.png"
+      "foto": "catalogo-img/625111150.png",
+      "desc": "Servicio, análisis o accesorio oficial PSA (OLIVARE 250 CC CAJA X 12 UNID. - ACEITE OLIVA VE)."
     },
     {
       "sku": "625110620",
@@ -3387,7 +3676,8 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Olivare",
-      "foto": "catalogo-img/625110620.png"
+      "foto": "catalogo-img/625110620.png",
+      "desc": "Servicio, análisis o accesorio oficial PSA (OLIVARE 5 LTS - ACEITE OLIVA VE)."
     },
     {
       "sku": "625111200",
@@ -3398,7 +3688,8 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Olivare",
-      "foto": "catalogo-img/625111200.png"
+      "foto": "catalogo-img/625111200.png",
+      "desc": "Servicio, análisis o accesorio oficial PSA (OLIVARE 5 LTS X 2 UNID. - ACEITE OLIVA VE)."
     },
     {
       "sku": "625110610",
@@ -3409,7 +3700,8 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Olivare",
-      "foto": "catalogo-img/625110610.png"
+      "foto": "catalogo-img/625110610.png",
+      "desc": "Servicio, análisis o accesorio oficial PSA (OLIVARE 500 CC - ACEITE OLIVA VE)."
     },
     {
       "sku": "625110540",
@@ -3420,7 +3712,8 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Olivare",
-      "foto": "catalogo-img/625110540.png"
+      "foto": "catalogo-img/625110540.png",
+      "desc": "Servicio, análisis o accesorio oficial PSA (OLIVARE 500 CC CAJA X 12 UNID. - ACEITE OLIVA VE)."
     },
     {
       "sku": "625112510",
@@ -3431,7 +3724,8 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Olivare",
-      "foto": "catalogo-img/625112510.png"
+      "foto": "catalogo-img/625112510.png",
+      "desc": "Servicio, análisis o accesorio oficial PSA (PASAS DE UVA NININA PACK X 5 UNID. 150 GM C/U)."
     },
     {
       "sku": "625111240",
@@ -3442,7 +3736,8 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Olivare",
-      "foto": "catalogo-img/625111240.png"
+      "foto": "catalogo-img/625111240.png",
+      "desc": "Servicio, análisis o accesorio oficial PSA (PASTA DE ACEITUNA NATURAL OLIVARE)."
     },
     {
       "sku": "611100240",
@@ -3453,7 +3748,8 @@
       "grupo": "equipos",
       "plan_canje": null,
       "seccion": "Tienda",
-      "foto": "catalogo-img/611100240.png"
+      "foto": "catalogo-img/611100240.png",
+      "desc": "Filtro purificador para ducha con aleación KDF de alta pureza. Remueve más del 90% del cloro y metales pesados en agua caliente o fría, protegiendo el cabello teñido y pieles sensibles."
     },
     {
       "sku": "611100250",
@@ -3464,7 +3760,8 @@
       "grupo": "equipos",
       "plan_canje": null,
       "seccion": "Tienda",
-      "foto": "catalogo-img/611100250.png"
+      "foto": "catalogo-img/611100250.png",
+      "desc": "Filtro purificador para ducha con KDF-55 y polifosfato. Elimina el cloro que reseca la piel y el cabello y neutraliza el sarro en la flor de ducha y cañerías, brindando un baño más saludable."
     },
     {
       "sku": "611100280",
@@ -3475,7 +3772,8 @@
       "grupo": "equipos",
       "plan_canje": null,
       "seccion": "Tienda",
-      "foto": "catalogo-img/611100280.png"
+      "foto": "catalogo-img/611100280.png",
+      "desc": "Filtro purificador para ducha con aleación KDF de alta pureza. Remueve más del 90% del cloro y metales pesados en agua caliente o fría, protegiendo el cabello teñido y pieles sensibles."
     },
     {
       "sku": "611100290",
@@ -3486,7 +3784,8 @@
       "grupo": "equipos",
       "plan_canje": null,
       "seccion": "Tienda",
-      "foto": "catalogo-img/611100290.png"
+      "foto": "catalogo-img/611100290.png",
+      "desc": "Filtro purificador para ducha con KDF-55 y polifosfato. Elimina el cloro que reseca la piel y el cabello y neutraliza el sarro en la flor de ducha y cañerías, brindando un baño más saludable."
     },
     {
       "sku": "611100320",
@@ -3497,7 +3796,8 @@
       "grupo": "equipos",
       "plan_canje": null,
       "seccion": "Tienda",
-      "foto": "catalogo-img/611100320.png"
+      "foto": "catalogo-img/611100320.png",
+      "desc": "Filtro purificador para ducha con aleación KDF de alta pureza. Remueve más del 90% del cloro y metales pesados en agua caliente o fría, protegiendo el cabello teñido y pieles sensibles."
     },
     {
       "sku": "611100330",
@@ -3508,7 +3808,8 @@
       "grupo": "equipos",
       "plan_canje": null,
       "seccion": "Tienda",
-      "foto": "catalogo-img/611100330.png"
+      "foto": "catalogo-img/611100330.png",
+      "desc": "Filtro purificador para ducha con KDF-55 y polifosfato. Elimina el cloro que reseca la piel y el cabello y neutraliza el sarro en la flor de ducha y cañerías, brindando un baño más saludable."
     },
     {
       "sku": "612060040",
@@ -3519,7 +3820,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Tienda",
-      "foto": "catalogo-img/612060040.png"
+      "foto": "catalogo-img/612060040.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (CARTUCHO MEMBRANA ÓSMOSIS PSA ROPOT 4)."
     },
     {
       "sku": "612012530",
@@ -3530,7 +3832,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Tienda",
-      "foto": "catalogo-img/612012530.png"
+      "foto": "catalogo-img/612012530.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (KIT POSVENTA PURIFICADOR DE AIRE II)."
     },
     {
       "sku": "612050270",
@@ -3541,7 +3844,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Tienda",
-      "foto": "catalogo-img/612050270.png"
+      "foto": "catalogo-img/612050270.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (Repuesto Bacteriostático - 50 micrones)."
     },
     {
       "sku": "612015790",
@@ -3552,7 +3856,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Tienda",
-      "foto": "catalogo-img/612015790.png"
+      "foto": "catalogo-img/612015790.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (Repuesto Válvula By Pass - C3)."
     },
     {
       "sku": "612012480",
@@ -3563,7 +3868,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Tienda",
-      "foto": "catalogo-img/612012480.png"
+      "foto": "catalogo-img/612012480.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (Repuesto Válvula By Pass Nero)."
     },
     {
       "sku": "612011510",
@@ -3574,7 +3880,8 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Tienda",
-      "foto": "catalogo-img/612011510.png"
+      "foto": "catalogo-img/612011510.png",
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (Repuesto Válvula By Pass Universal)."
     },
     {
       "sku": "612111250",
@@ -3585,7 +3892,8 @@
       "grupo": "botellas",
       "plan_canje": null,
       "seccion": "Tienda",
-      "foto": "catalogo-img/612111250.png"
+      "foto": "catalogo-img/612111250.png",
+      "desc": "Botella de vidrio de alta pureza reutilizable para conservar el Agua Purificada PSA en la heladera o mesa sin alterar su sabor ni pureza."
     },
     {
       "sku": "612111060",
@@ -3596,7 +3904,8 @@
       "grupo": "botellas",
       "plan_canje": null,
       "seccion": "Tienda",
-      "foto": "catalogo-img/612111060.png"
+      "foto": "catalogo-img/612111060.png",
+      "desc": "Accesorio de hidratación reutilizable oficial PSA libre de BPA."
     },
     {
       "sku": "612111280",
@@ -3607,7 +3916,8 @@
       "grupo": "botellas",
       "plan_canje": null,
       "seccion": "Tienda",
-      "foto": "catalogo-img/612111280.png"
+      "foto": "catalogo-img/612111280.png",
+      "desc": "Accesorio de hidratación reutilizable oficial PSA libre de BPA."
     },
     {
       "sku": "612111310",
@@ -3618,7 +3928,8 @@
       "grupo": "botellas",
       "plan_canje": null,
       "seccion": "Tienda",
-      "foto": "catalogo-img/612111310.png"
+      "foto": "catalogo-img/612111310.png",
+      "desc": "Accesorio de hidratación reutilizable oficial PSA libre de BPA."
     },
     {
       "sku": "614065560",
@@ -3629,7 +3940,8 @@
       "grupo": "botellas",
       "plan_canje": null,
       "seccion": "Tienda",
-      "foto": "catalogo-img/614065560.png"
+      "foto": "catalogo-img/614065560.png",
+      "desc": "Accesorio de hidratación reutilizable oficial PSA libre de BPA."
     }
   ]
 }

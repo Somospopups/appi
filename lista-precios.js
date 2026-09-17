@@ -1429,7 +1429,8 @@
         pdf.setFontSize(8);
         var cuerpo = p.composicion ? ('Incluye: ' + p.composicion) : sinMarca(p.desc || p.para || 'Sin descripción cargada.').replace(/\n+/g, ' ');
         var lineasTxt = pdf.splitTextToSize(cuerpo, usable);
-        if (lineasTxt.length > 2) lineasTxt = lineasTxt.slice(0, 2);
+        var maxL = keys.length ? 4 : 8;
+        if (lineasTxt.length > maxL) lineasTxt = lineasTxt.slice(0, maxL);
         pdf.text(lineasTxt, m, yy);
         yy += lineasTxt.length * 3.8 + 7;
         if (keys.length) {
