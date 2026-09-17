@@ -408,7 +408,7 @@
       }
       html += '<div class="lp-item' + (esCanje ? ' lp-canje' : '') + '" data-sku="' + esc(L.clave) + '">' +
         fotoHtml +
-        '<div class="lp-item-txt"><b>' + (esCanje ? '🔄 ' : '') + esc(L.nombre) + '</b><span>' + (L.sku ? 'SKU ' + esc(L.sku) : esc(L.seccion || 'Lista con acuerdo')) + (esCanje ? ' · Plan canje' : '') + '</span><em>' + money(L.precio) + '</em></div>' +
+        '<div class="lp-item-txt"><b>' + esc(L.nombre) + '</b><span>' + (L.sku ? 'SKU ' + esc(L.sku) : esc(L.seccion || 'Lista con acuerdo')) + (esCanje ? ' · Plan canje' : '') + '</span><em>' + money(L.precio) + '</em></div>' +
         '<div class="lp-qty">' +
           (q ? '<button type="button" class="ghost" data-act="menos" aria-label="Quitar">−</button><i>' + q + '</i>' : '') +
           '<button type="button" data-act="mas" aria-label="Agregar">+</button>' +
