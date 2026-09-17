@@ -160,13 +160,15 @@ const usados = new Set();
 const salida = [];
 const info = { fusionados: 0, nuevos: 0, soloTienda: [] };
 
-// Foto del producto (la descarga scripts/actualizar-precios-psa.py en
-// catalogo-img/{sku}.jpg). Si el catálogo viejo no la llevó pero el archivo
-// existe, se recupera igual: la foto no se pierde en el merge.
+// Foto del producto: la del Portal PCD de compras (scripts/actualizar-precios-
+// psa.py la descarga en catalogo-img/{sku}.png; .jpg de la tienda como legado).
+// Si el catálogo viejo no la llevó pero el archivo existe, se recupera igual:
+// la foto no se pierde en el merge.
 function fotoDe(vp) {
   const f = vp.foto || '';
   if (f) return f;
   const sku = vp.sku || '';
+  if (sku && fs.existsSync(path.join(ROOT, 'catalogo-img', sku + '.png'))) return 'catalogo-img/' + sku + '.png';
   if (sku && fs.existsSync(path.join(ROOT, 'catalogo-img', sku + '.jpg'))) return 'catalogo-img/' + sku + '.jpg';
   return '';
 }

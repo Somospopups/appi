@@ -219,7 +219,7 @@ const ALIAS_VIEJO: Record<string, string> = {
   'Termo PSA - Negro': 'TERMO 2 PSA NEGRO'
 };
 
-interface CatProd { sku?: string; nombre: string; precio?: number; lista?: number; url?: string; grupo?: string; plan_canje?: number | null; seccion?: string }
+interface CatProd { sku?: string; nombre: string; precio?: number; lista?: number; url?: string; foto?: string; grupo?: string; plan_canje?: number | null; seccion?: string }
 
 function mergeCatalogo(base: CatProd[], lista: ProdLista[], vigencia: string): CatProd[] {
   const viejos = base.map(p => ({ p, tk: tokensNombre(ALIAS_VIEJO[p.nombre] || p.nombre) }));
@@ -237,12 +237,12 @@ function mergeCatalogo(base: CatProd[], lista: ProdLista[], vigencia: string): C
       const vp = viejos[match].p;
       salida.push({
         sku: vp.sku, nombre: np.nombre, precio: np.precio!, lista: np.precio!,
-        url: vp.url, grupo: vp.grupo, plan_canje: np.plan_canje, seccion: np.seccion
+        url: vp.url, foto: vp.foto || '', grupo: vp.grupo, plan_canje: np.plan_canje, seccion: np.seccion
       });
     } else {
       salida.push({
         sku: '', nombre: np.nombre, precio: np.precio!, lista: np.precio!,
-        url: '', grupo: SECCION_A_GRUPO[np.seccion] || 'otros', plan_canje: np.plan_canje, seccion: np.seccion
+        url: '', foto: '', grupo: SECCION_A_GRUPO[np.seccion] || 'otros', plan_canje: np.plan_canje, seccion: np.seccion
       });
     }
   }
@@ -251,11 +251,30 @@ function mergeCatalogo(base: CatProd[], lista: ProdLista[], vigencia: string): C
     const vp = viejos[i].p;
     salida.push({
       sku: vp.sku, nombre: vp.nombre, precio: vp.precio, lista: vp.lista != null ? vp.lista : vp.precio,
-      url: vp.url, grupo: vp.grupo, plan_canje: vp.plan_canje ?? null, seccion: vp.seccion || 'Tienda'
+      url: vp.url, foto: vp.foto || '', grupo: vp.grupo, plan_canje: vp.plan_canje ?? null, seccion: vp.seccion || 'Tienda'
     });
   }
   void vigencia;
   return salida;
+}
+
+// Las fotos viven en el repo (catalogo-img/<sku>.png, del Portal PCD) y el
+// catálogo publicado de GitHub Pages está siempre en sync con los archivos.
+// Si un producto con sku perdió su "foto" en la base (p. ej. el bucket se
+// regeneró con una versión vieja), se la devuelve desde ahí.
+async function fotosDeRepo(): Promise<Record<string, string>> {
+  const out: Record<string, string> = {};
+  try {
+    const r = await fetch('https://somospopups.github.io/appi/psa-catalogo.json?nocache=' + Date.now());
+    if (!r.ok) return out;
+    const j: any = await r.json();
+    for (const p of j?.productos || []) {
+      const sku = String(p?.sku || '').trim();
+      const foto = String(p?.foto || '').trim();
+      if (sku && foto) out[sku] = foto;
+    }
+  } catch (_) {}
+  return out;
 }
 
 // ----------------------- main -----------------------
@@ -327,6 +346,13 @@ Deno.serve(async (req) => {
   // 2) Fusionar: lista con acuerdo (precios de la primera columna) + lo que
   //    solo existe en la tienda (se conserva con su precio).
   const nuevos = mergeCatalogo(actual.productos as CatProd[], lista.productos, lista.vigencia);
+  // Self-heal de fotos: si un producto con sku perdió su "foto" en la base,
+  // se la recupera desde el catálogo del repo (donde viven los archivos).
+  const fotos = await fotosDeRepo();
+  for (const p of nuevos) {
+    const sku = String(p.sku || '').trim();
+    if (sku && !String(p.foto || '').trim() && fotos[sku]) p.foto = fotos[sku];
+  }
   const nuevaFecha = fechaAR();
 
   // 3) Cotejo (psa-precios.json): precios de la lista para los SKUs que figuran

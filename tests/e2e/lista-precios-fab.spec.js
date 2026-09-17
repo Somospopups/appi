@@ -48,7 +48,7 @@ async function entrar(page) {
   });
 }
 
-test('cada producto de la tienda muestra su foto en la lista de precios', async ({ page }) => {
+test('cada producto muestra la foto del Portal PCD en la lista de precios', async ({ page }) => {
   await entrar(page);
   await page.evaluate(() => {
     if (typeof openLista === 'function') openLista();
@@ -58,12 +58,24 @@ test('cada producto de la tienda muestra su foto en la lista de precios', async 
   await page.fill('#lpSearch', 'SENIOR 4 BIANCO');
   await page.waitForTimeout(300);
 
-  // El Senior 4 Bianco (SKU 611010510) tiene foto descargada en catalogo-img/.
+  // El Senior 4 Bianco (SKU 611010510) tiene la foto del Portal PCD de
+  // compras en catalogo-img/ (PNG 200x200, la misma que ve el distribuidor
+  // al comprar en comprasonline.psa.com.ar).
   const img = page.locator('.lp-item .lp-item-foto').first();
   await expect(img).toBeVisible();
-  await expect(img).toHaveAttribute('src', 'catalogo-img/611010510.jpg');
+  await expect(img).toHaveAttribute('src', 'catalogo-img/611010510.png');
+  // La miniatura debe CARGAR (el archivo vive en el repo → anda offline).
+  await expect(async () => {
+    const w = await img.evaluate(el => el.naturalWidth);
+    expect(w).toBeGreaterThan(0);
+  }).toPass({ timeout: 10000 });
   // El resto de la fila sigue intacto (nombre + precio).
   await expect(page.locator('.lp-item').first()).toContainText('PSA SENIOR 4 BIANCO');
+  // Un producto sin foto no muestra miniatura ni se rompe.
+  await page.fill('#lpSearch', 'ABLANDADOR');
+  await page.waitForTimeout(300);
+  await expect(page.locator('.lp-item').first()).toBeVisible();
+  await expect(page.locator('.lp-item .lp-item-foto')).toHaveCount(0);
 });
 
 test.describe('Píldora de Lista de Precios sobre el dock', () => {

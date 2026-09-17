@@ -15,6 +15,9 @@ OUT_CAT = ROOT / "psa-catalogo.json"
 OUT_PRE = ROOT / "psa-precios.json"
 OUT_PLAN = ROOT / "psa-planes.json"
 IMG_DIR = ROOT / "catalogo-img"
+# CDN público de PSA: las fotos del Portal PCD de compras (PNG 200x200),
+# la MISMA imagen que el distribuidor ve al comprar.
+PCD_IMG = "https://assets.psa.com.ar/uploads/normal/ipsaem/sol/tecnica/articulo/{}.png"
 PROMO_URL = "https://tienda.psa.com.ar/promociones_vigentes"
 GQL = "https://tienda.psa.com.ar/graphql"
 UA = "APPI-precios/1.0"
@@ -188,9 +191,28 @@ def get_bytes(url, timeout=25):
         return res.read()
 
 
-def bajar_foto(sku, url):
+def bajar_foto(sku):
+    """Foto del producto: la del Portal PCD de compras (la que ve el
+    distribuidor al comprar), servida por el CDN público de PSA como PNG
+    200x200 con el SKU como nombre. Se guarda en catalogo-img/ para que
+    la app la tenga en caché y ande sin internet. La imagen de la tienda
+    (small_image) ya no se usa: era otra foto y no era la del portal."""
     from io import BytesIO
     from PIL import Image
+
+    IMG_DIR.mkdir(exist_ok=True)
+    dest = IMG_DIR / f"{sku}.png"
+    rel = f"catalogo-img/{sku}.png"
+    try:
+        raw = get_bytes(PCD_IMG.format(sku), timeout=20)
+        im = Image.open(BytesIO(raw))
+        im.verify()
+        dest.write_bytes(raw)
+        return rel
+    except Exception as e:
+        print(f"  foto {sku}: {e}")
+        return rel if dest.exists() else ""
+
 
     IMG_DIR.mkdir(exist_ok=True)
     dest = IMG_DIR / f"{sku}.jpg"
@@ -368,7 +390,7 @@ def graphql_catalogo():
                 "desc": desc,
                 "video": vurl or "",
                 "videoTitulo": vtit or "",
-                "foto": bajar_foto(sku, ((it.get("small_image") or {}).get("url") or "").strip()),
+                "foto": bajar_foto(sku),
             }
         )
     productos.sort(key=lambda p: (GRUPO_ORDEN.get(p["grupo"], 9), p["nombre"].lower()))
