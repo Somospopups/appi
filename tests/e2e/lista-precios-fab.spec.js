@@ -71,11 +71,15 @@ test('cada producto muestra la foto del Portal PCD en la lista de precios', asyn
   }).toPass({ timeout: 10000 });
   // El resto de la fila sigue intacto (nombre + precio).
   await expect(page.locator('.lp-item').first()).toContainText('PSA SENIOR 4 BIANCO');
-  // Un producto sin foto no muestra miniatura ni se rompe.
-  await page.fill('#lpSearch', 'ABLANDADOR');
+  // En v834 TODOS los productos tienen foto, incluyendo adaptadores y ablandadores.
+  await page.fill('#lpSearch', 'ABLANDADOR PSA DOMUS');
   await page.waitForTimeout(300);
-  await expect(page.locator('.lp-item').first()).toBeVisible();
-  await expect(page.locator('.lp-item .lp-item-foto')).toHaveCount(0);
+  const domusImg = page.locator('.lp-item .lp-item-foto').first();
+  await expect(domusImg).toBeVisible();
+  await expect(async () => {
+    const w = await domusImg.evaluate(el => el.naturalWidth);
+    expect(w).toBeGreaterThan(0);
+  }).toPass({ timeout: 10000 });
 });
 
 test.describe('Píldora de Lista de Precios sobre el dock', () => {

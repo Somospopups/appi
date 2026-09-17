@@ -3,7 +3,7 @@
   "fuente": "https://tienda.psa.com.ar/",
   "productos": [
     {
-      "sku": "",
+      "sku": "626030750",
       "nombre": "ABLANDADOR PSA DOMUS",
       "precio": 2782000,
       "lista": 2782000,
@@ -11,10 +11,10 @@
       "grupo": "equipos",
       "plan_canje": null,
       "seccion": "Purificadores",
-      "foto": ""
+      "foto": "catalogo-img/626030750.png"
     },
     {
-      "sku": "",
+      "sku": "626030780",
       "nombre": "ABLANDADOR PSA DOMUS + INSTALACION",
       "precio": 2961000,
       "lista": 2961000,
@@ -22,10 +22,10 @@
       "grupo": "equipos",
       "plan_canje": null,
       "seccion": "Purificadores",
-      "foto": ""
+      "foto": "catalogo-img/626030780.png"
     },
     {
-      "sku": "",
+      "sku": "626030790",
       "nombre": "ABLANDADOR PSA MINI DOMUS",
       "precio": 2198000,
       "lista": 2198000,
@@ -33,10 +33,10 @@
       "grupo": "equipos",
       "plan_canje": null,
       "seccion": "Purificadores",
-      "foto": ""
+      "foto": "catalogo-img/626030790.png"
     },
     {
-      "sku": "",
+      "sku": "626030810",
       "nombre": "ABLANDADOR PSA MINI DOMUS + INSTALACION",
       "precio": 2369000,
       "lista": 2369000,
@@ -44,7 +44,7 @@
       "grupo": "equipos",
       "plan_canje": null,
       "seccion": "Purificadores",
-      "foto": ""
+      "foto": "catalogo-img/626030810.png"
     },
     {
       "sku": "611010510",
@@ -124,7 +124,7 @@
       "foto": "catalogo-img/611030430.png"
     },
     {
-      "sku": "",
+      "sku": "613030470",
       "nombre": "PSA DUO SM BIANCO (SIN PURIFICADOR)",
       "precio": 1600000,
       "lista": 1600000,
@@ -132,10 +132,10 @@
       "grupo": "equipos",
       "plan_canje": 1520000,
       "seccion": "Purificadores",
-      "foto": ""
+      "foto": "catalogo-img/613030470.png"
     },
     {
-      "sku": "",
+      "sku": "613030480",
       "nombre": "PSA DUO PIE BIANCO (SIN PURIFICADOR)",
       "precio": 1600000,
       "lista": 1600000,
@@ -143,7 +143,7 @@
       "grupo": "equipos",
       "plan_canje": 1520000,
       "seccion": "Purificadores",
-      "foto": ""
+      "foto": "catalogo-img/613030480.png"
     },
     {
       "sku": "611290050",
@@ -300,7 +300,7 @@
       "foto": "catalogo-img/617110040.png"
     },
     {
-      "sku": "",
+      "sku": "611310070",
       "nombre": "PSA OSMOSIS ROPOT",
       "precio": 1975000,
       "lista": 1975000,
@@ -308,10 +308,10 @@
       "grupo": "equipos",
       "plan_canje": 1777500,
       "seccion": "Purificador Osmosis Inversa",
-      "foto": ""
+      "foto": "catalogo-img/611310070.png"
     },
     {
-      "sku": "",
+      "sku": "611012500",
       "nombre": "PSA PURIFICADOR DE AIRE",
       "precio": 1599000,
       "lista": 1599000,
@@ -319,10 +319,10 @@
       "grupo": "equipos",
       "plan_canje": null,
       "seccion": "Purificador de Aire",
-      "foto": ""
+      "foto": "catalogo-img/611012500.png"
     },
     {
-      "sku": "",
+      "sku": "612010010",
       "nombre": "(001) ADAPT. UNIVERSAL C/MANGUERA",
       "precio": 23150,
       "lista": 23150,
@@ -330,10 +330,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612010010.png"
     },
     {
-      "sku": "",
+      "sku": "612010020",
       "nombre": "(002) ADAPT. ROSCA (FV TIPO UNIMIX)",
       "precio": 18700,
       "lista": 18700,
@@ -341,10 +341,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612010020.png"
     },
     {
-      "sku": "",
+      "sku": "612010030",
       "nombre": "(003) ADAPT. ROSCA CORTA",
       "precio": 18700,
       "lista": 18700,
@@ -352,10 +352,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612010030.png"
     },
     {
-      "sku": "",
+      "sku": "612010040",
       "nombre": "(004) ADAPT. ROSCA LARGA",
       "precio": 18700,
       "lista": 18700,
@@ -363,10 +363,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612010040.png"
     },
     {
-      "sku": "",
+      "sku": "612010050",
       "nombre": "(005) ADAPT. UNIV.MARIPOSA DIAM.11-12",
       "precio": 18700,
       "lista": 18700,
@@ -374,10 +374,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612010050.png"
     },
     {
-      "sku": "",
+      "sku": "612010060",
       "nombre": "(006) ADAPT. UNIV.MARIPOSA DIAM.14",
       "precio": 18700,
       "lista": 18700,
@@ -385,10 +385,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612010060.png"
     },
     {
-      "sku": "",
+      "sku": "612010070",
       "nombre": "(007) ADAPT. UNIV.MARIPOSA DIAM.16",
       "precio": 18700,
       "lista": 18700,
@@ -396,10 +396,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612010070.png"
     },
     {
-      "sku": "",
+      "sku": "612010080",
       "nombre": "(008) ADAPT. UNIV.MARIPOSA DIAM.18",
       "precio": 18700,
       "lista": 18700,
@@ -407,10 +407,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612010080.png"
     },
     {
-      "sku": "",
+      "sku": "612010090",
       "nombre": "(009) ADAPT. UNIV.MARIPOSA DIAM.20",
       "precio": 18700,
       "lista": 18700,
@@ -418,10 +418,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612010090.png"
     },
     {
-      "sku": "",
+      "sku": "612010100",
       "nombre": "(010) ADAPT. ROSCA HEMBRA-HEMBRA",
       "precio": 18700,
       "lista": 18700,
@@ -429,10 +429,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612010100.png"
     },
     {
-      "sku": "",
+      "sku": "612010160",
       "nombre": "(016) ADAPT. ROSCA HEMBRA O.N.",
       "precio": 18700,
       "lista": 18700,
@@ -440,10 +440,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612010160.png"
     },
     {
-      "sku": "",
+      "sku": "612280170",
       "nombre": "(017) ADAPT. ROSCA 3/4 POLI 2",
       "precio": 28000,
       "lista": 28000,
@@ -451,10 +451,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612280170.png"
     },
     {
-      "sku": "",
+      "sku": "612010180",
       "nombre": "(018) ADAPT. ROSCA CANILLA TIPO PATIO",
       "precio": 18700,
       "lista": 18700,
@@ -462,10 +462,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612010180.png"
     },
     {
-      "sku": "",
+      "sku": "612010190",
       "nombre": "(019) ADAPT. ROSCA MACHO 18.1",
       "precio": 18700,
       "lista": 18700,
@@ -473,10 +473,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612010190.png"
     },
     {
-      "sku": "",
+      "sku": "612010200",
       "nombre": "(020) ADAPT. ROSCA ESPECIAL",
       "precio": 25800,
       "lista": 25800,
@@ -484,10 +484,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612010200.png"
     },
     {
-      "sku": "",
+      "sku": "612010240",
       "nombre": "(024) ADAPT. ROSCA HEMBRA 20.1",
       "precio": 18700,
       "lista": 18700,
@@ -495,10 +495,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612010240.png"
     },
     {
-      "sku": "",
+      "sku": "612010270",
       "nombre": "(027) ADAPT. ROSCA LARGA PASO FINO",
       "precio": 18700,
       "lista": 18700,
@@ -506,10 +506,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612010270.png"
     },
     {
-      "sku": "",
+      "sku": "612100300",
       "nombre": "(030) ADAPT. H-M 1/2 C/TUERCA DUCHA II",
       "precio": 37250,
       "lista": 37250,
@@ -517,10 +517,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612100300.png"
     },
     {
-      "sku": "",
+      "sku": "612100320",
       "nombre": "(032) ADAPT. H-M 1/2 DUCHA II SALIDA",
       "precio": 37250,
       "lista": 37250,
@@ -528,10 +528,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612100320.png"
     },
     {
-      "sku": "",
+      "sku": "612100330",
       "nombre": "(033) ADAPT. M-M 3/4 BG DUCHA II C/TUERCA",
       "precio": 37250,
       "lista": 37250,
@@ -539,10 +539,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612100330.png"
     },
     {
-      "sku": "",
+      "sku": "612100360",
       "nombre": "(036) ADAPT. M-M 3/4 BG DUCHA II",
       "precio": 37250,
       "lista": 37250,
@@ -550,10 +550,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612100360.png"
     },
     {
-      "sku": "",
+      "sku": "612010370",
       "nombre": "(037) ADAPT. ROSCA MACHO (FV SWING PLUS)",
       "precio": 18700,
       "lista": 18700,
@@ -561,10 +561,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612010370.png"
     },
     {
-      "sku": "",
+      "sku": "612010390",
       "nombre": "(039) ADAPT. ROSCA HEMBRA-HEMBRA DIÁM.22",
       "precio": 18700,
       "lista": 18700,
@@ -572,10 +572,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612010390.png"
     },
     {
-      "sku": "",
+      "sku": "612010410",
       "nombre": "(041) ADAPT. ROSCA CANILLA PIAZZA",
       "precio": 18700,
       "lista": 18700,
@@ -583,10 +583,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612010410.png"
     },
     {
-      "sku": "",
+      "sku": "612010510",
       "nombre": "(051) ADAPT. SIN ROSCA DIAM. 17",
       "precio": 18700,
       "lista": 18700,
@@ -594,10 +594,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612010510.png"
     },
     {
-      "sku": "",
+      "sku": "612010530",
       "nombre": "(053) ADAPT. ROSCA BSP 3/4 X 14 HILOS",
       "precio": 18700,
       "lista": 18700,
@@ -605,10 +605,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612010530.png"
     },
     {
-      "sku": "",
+      "sku": "612010730",
       "nombre": "(073) ADAPT. ROSCA MÚLTIPLE",
       "precio": 18700,
       "lista": 18700,
@@ -616,10 +616,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612010730.png"
     },
     {
-      "sku": "",
+      "sku": "612010780",
       "nombre": "(078) ADAPT. ROSCA DIAM. 23.5",
       "precio": 18700,
       "lista": 18700,
@@ -627,10 +627,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612010780.png"
     },
     {
-      "sku": "",
+      "sku": "612010830",
       "nombre": "(083) ADAPT. ROSCA MACHO 22 X 1",
       "precio": 18700,
       "lista": 18700,
@@ -638,10 +638,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612010830.png"
     },
     {
-      "sku": "",
+      "sku": "612011000",
       "nombre": "(100) ADAPT. ROSCA HEMBRA BSP 1/2",
       "precio": 18700,
       "lista": 18700,
@@ -649,10 +649,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612011000.png"
     },
     {
-      "sku": "",
+      "sku": "612011020",
       "nombre": "(102) ADAPT. ROSCA MACHO FV DIÁM 18.6",
       "precio": 18700,
       "lista": 18700,
@@ -660,10 +660,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612011020.png"
     },
     {
-      "sku": "",
+      "sku": "612011030",
       "nombre": "(103) ADAPT. ROSCA HEMBRA P/HIDROMET",
       "precio": 18700,
       "lista": 18700,
@@ -671,10 +671,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612011030.png"
     },
     {
-      "sku": "",
+      "sku": "612011350",
       "nombre": "(135) ADAPT. ROSCA MACHO 21 X 1",
       "precio": 18700,
       "lista": 18700,
@@ -682,10 +682,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612011350.png"
     },
     {
-      "sku": "",
+      "sku": "612011420",
       "nombre": "(142) ADAPT. ROSCA MACHO 16.3 X 1",
       "precio": 18700,
       "lista": 18700,
@@ -693,10 +693,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612011420.png"
     },
     {
-      "sku": "",
+      "sku": "612011440",
       "nombre": "(144) ADAPT. ROSCA MACHO 18.2 X 1",
       "precio": 18700,
       "lista": 18700,
@@ -704,10 +704,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612011440.png"
     },
     {
-      "sku": "",
+      "sku": "612011470",
       "nombre": "(147) ADAPT. ROSCA TIPO RACOR M. 24 X 1",
       "precio": 18700,
       "lista": 18700,
@@ -715,10 +715,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612011470.png"
     },
     {
-      "sku": "",
+      "sku": "612011480",
       "nombre": "(148) ADAPT. ROSCA HEMBRA (SWING PLUS) M. 24X1",
       "precio": 18700,
       "lista": 18700,
@@ -726,10 +726,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612011480.png"
     },
     {
-      "sku": "",
+      "sku": "612011490",
       "nombre": "(149) ADAPT. ROSCA P/LAVARROPA M 24 X 1",
       "precio": 18700,
       "lista": 18700,
@@ -737,10 +737,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612011490.png"
     },
     {
-      "sku": "",
+      "sku": "612011550",
       "nombre": "(155) ADAPT. S-1000 C/ORING. P/MANOMETRO",
       "precio": 18700,
       "lista": 18700,
@@ -748,10 +748,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612011550.png"
     },
     {
-      "sku": "",
+      "sku": "612011640",
       "nombre": "(164) ADAPT. ROSCA MACHO 20 X 1",
       "precio": 18700,
       "lista": 18700,
@@ -759,10 +759,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612011640.png"
     },
     {
-      "sku": "",
+      "sku": "612011740",
       "nombre": "(174) ADAPT. ROSCA AIREADOR M 24 X 1",
       "precio": 18700,
       "lista": 18700,
@@ -770,10 +770,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612011740.png"
     },
     {
-      "sku": "",
+      "sku": "612011770",
       "nombre": "(177) ADAPT. RECTANGULAR P/PEGAR",
       "precio": 56750,
       "lista": 56750,
@@ -781,10 +781,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612011770.png"
     },
     {
-      "sku": "",
+      "sku": "612011790",
       "nombre": "(179) ADAPT. ROSCA MACHO DIAM 18 X 1 LARGO",
       "precio": 18700,
       "lista": 18700,
@@ -792,10 +792,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612011790.png"
     },
     {
-      "sku": "",
+      "sku": "612011800",
       "nombre": "(180) ADAPT. ROSCA HEMBRA DIAM 22 X 1 CORTO",
       "precio": 18700,
       "lista": 18700,
@@ -803,10 +803,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612011800.png"
     },
     {
-      "sku": "",
+      "sku": "612011810",
       "nombre": "(181) ADAPT. H-M 1/2 DUCHA SALIDA",
       "precio": 37250,
       "lista": 37250,
@@ -814,10 +814,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612011810.png"
     },
     {
-      "sku": "",
+      "sku": "612100190",
       "nombre": "(19) ADAPT. M-M BG 3/4 P/DUCHA CR",
       "precio": 37250,
       "lista": 37250,
@@ -825,10 +825,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612100190.png"
     },
     {
-      "sku": "",
+      "sku": "612100200",
       "nombre": "(20) ADAPT. M-H BG 3/4 P/ DUCHA CR",
       "precio": 37250,
       "lista": 37250,
@@ -836,10 +836,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612100200.png"
     },
     {
-      "sku": "",
+      "sku": "612012280",
       "nombre": "(228) ADAPT. OVALADO",
       "precio": 56750,
       "lista": 56750,
@@ -847,10 +847,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612012280.png"
     },
     {
-      "sku": "",
+      "sku": "612012290",
       "nombre": "(229) ADAPT. ROSCA H-H 22 X 1 LARGO",
       "precio": 18700,
       "lista": 18700,
@@ -858,10 +858,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612012290.png"
     },
     {
-      "sku": "",
+      "sku": "612012320",
       "nombre": "(232) ADAPT. ROSCA H-H 22 X 1 CORTO",
       "precio": 18700,
       "lista": 18700,
@@ -869,10 +869,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612012320.png"
     },
     {
-      "sku": "",
+      "sku": "612012390",
       "nombre": "(239) ADAPT. ROSCA H-M 18 X 1 CORTO",
       "precio": 18700,
       "lista": 18700,
@@ -880,10 +880,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612012390.png"
     },
     {
-      "sku": "",
+      "sku": "612012450",
       "nombre": "(245) ADAPT. ROSCA H-M 23 X 1",
       "precio": 18700,
       "lista": 18700,
@@ -891,10 +891,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612012450.png"
     },
     {
-      "sku": "",
+      "sku": "612012460",
       "nombre": "(246) ADAPT. ROSCA MACHO 23 X 1",
       "precio": 18700,
       "lista": 18700,
@@ -902,10 +902,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612012460.png"
     },
     {
-      "sku": "",
+      "sku": "612015370",
       "nombre": "(537) ADAPT. ROSCA H 22,4 X 1",
       "precio": 18700,
       "lista": 18700,
@@ -913,10 +913,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612015370.png"
     },
     {
-      "sku": "",
+      "sku": "612015500",
       "nombre": "(550) ADAPT. ROSCA H 22 X 1 LARGO 36 CROMADO",
       "precio": 18700,
       "lista": 18700,
@@ -924,10 +924,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612015500.png"
     },
     {
-      "sku": "",
+      "sku": "612015530",
       "nombre": "(553) ADAPT. ESP. H-M 16,3 X 1 LARGO",
       "precio": 18700,
       "lista": 18700,
@@ -935,10 +935,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612015530.png"
     },
     {
-      "sku": "",
+      "sku": "612015730",
       "nombre": "(573) ADAPT. UNIVERSAL C/MANGUERA NERO",
       "precio": 23150,
       "lista": 23150,
@@ -946,10 +946,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612015730.png"
     },
     {
-      "sku": "",
+      "sku": "612012470",
       "nombre": "ADAPT. ESPECIAL KIT 90°",
       "precio": 83200,
       "lista": 83200,
@@ -957,10 +957,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612012470.png"
     },
     {
-      "sku": "",
+      "sku": "612010760",
       "nombre": "ARANDELA ADAPTADOR DIÁM. 19 X 5",
       "precio": 7450,
       "lista": 7450,
@@ -968,10 +968,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612010760.png"
     },
     {
-      "sku": "",
+      "sku": "612010770",
       "nombre": "ARANDELA ADAPTADOR DIÁM. 21 X 5",
       "precio": 7450,
       "lista": 7450,
@@ -979,10 +979,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612010770.png"
     },
     {
-      "sku": "",
+      "sku": "612011150",
       "nombre": "BUJE DE DERIVACIÓN CANILLA BM",
       "precio": 10950,
       "lista": 10950,
@@ -990,10 +990,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612011150.png"
     },
     {
-      "sku": "",
+      "sku": "612011200",
       "nombre": "CONECT.COCODRILO S-1000 X 5 UNID",
       "precio": 15700,
       "lista": 15700,
@@ -1001,10 +1001,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612011200.png"
     },
     {
-      "sku": "",
+      "sku": "612011140",
       "nombre": "CONECTOR RAPIDO DE SALIDA PSA 10KD",
       "precio": 35300,
       "lista": 35300,
@@ -1012,10 +1012,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612011140.png"
     },
     {
-      "sku": "",
+      "sku": "612030010",
       "nombre": "CONJ.SOPORTE ACRILICO P/MINI",
       "precio": 23000,
       "lista": 23000,
@@ -1023,10 +1023,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612030010.png"
     },
     {
-      "sku": "",
+      "sku": "612015780",
       "nombre": "CONJ.SOPORTE ACRILICO P/SENIOR 4",
       "precio": 28550,
       "lista": 28550,
@@ -1034,10 +1034,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612015780.png"
     },
     {
-      "sku": "",
+      "sku": "612010170",
       "nombre": "CONJ.SOPORTE ACRILICO SENIOR/VERO",
       "precio": 28550,
       "lista": 28550,
@@ -1045,10 +1045,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612010170.png"
     },
     {
-      "sku": "",
+      "sku": "612030040",
       "nombre": "CONJ.SOPORTE PSA STOPPER",
       "precio": 23050,
       "lista": 23050,
@@ -1056,10 +1056,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612030040.png"
     },
     {
-      "sku": "",
+      "sku": "612031500",
       "nombre": "FUNDA PSA DOMUS",
       "precio": 72500,
       "lista": 72500,
@@ -1067,10 +1067,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612031500.png"
     },
     {
-      "sku": "",
+      "sku": "612031510",
       "nombre": "FUNDA PSA MINI DOMUS",
       "precio": 61200,
       "lista": 61200,
@@ -1078,7 +1078,7 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612031510.png"
     },
     {
       "sku": "612031380",
@@ -1125,7 +1125,7 @@
       "foto": "catalogo-img/612031300.png"
     },
     {
-      "sku": "",
+      "sku": "612100350",
       "nombre": "KIT ADAPT.P/CANILLA NO TRADICIONAL DUCHA II",
       "precio": 56750,
       "lista": 56750,
@@ -1133,10 +1133,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612100350.png"
     },
     {
-      "sku": "",
+      "sku": "612100310",
       "nombre": "KIT ADAPT.RECTOS P/CANILLAS PSA DUCHA II",
       "precio": 75150,
       "lista": 75150,
@@ -1144,10 +1144,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612100310.png"
     },
     {
-      "sku": "",
+      "sku": "612011340",
       "nombre": "KIT PARA BAJA PRESION UNIVERSAL",
       "precio": 23150,
       "lista": 23150,
@@ -1155,10 +1155,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612011340.png"
     },
     {
-      "sku": "",
+      "sku": "612011670",
       "nombre": "LAP BM 8 X 8",
       "precio": 55000,
       "lista": 55000,
@@ -1166,10 +1166,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612011670.png"
     },
     {
-      "sku": "",
+      "sku": "612011880",
       "nombre": "LAP DUCHA II HEMBRA-MACHO 1/2 X 1/2",
       "precio": 61600,
       "lista": 61600,
@@ -1177,10 +1177,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612011880.png"
     },
     {
-      "sku": "",
+      "sku": "612011710",
       "nombre": "LAP DUCHA II MACHO-MACHO 1/2 X 1/2",
       "precio": 61600,
       "lista": 61600,
@@ -1188,10 +1188,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612011710.png"
     },
     {
-      "sku": "",
+      "sku": "612011650",
       "nombre": "LAP SM 24 X 1",
       "precio": 55000,
       "lista": 55000,
@@ -1199,10 +1199,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612011650.png"
     },
     {
-      "sku": "",
+      "sku": "612012540",
       "nombre": "LAP SM P/ MANGUERA BY PASS",
       "precio": 97300,
       "lista": 97300,
@@ -1210,10 +1210,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612012540.png"
     },
     {
-      "sku": "",
+      "sku": "612011320",
       "nombre": "LLAVE DE AJUSTE P/TAPA PREFILTRO 40K-D",
       "precio": 6500,
       "lista": 6500,
@@ -1221,10 +1221,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612011320.png"
     },
     {
-      "sku": "",
+      "sku": "612010840",
       "nombre": "LLAVE DE CORTE S-1000 MACHO/HEMBRA",
       "precio": 38500,
       "lista": 38500,
@@ -1232,10 +1232,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612010840.png"
     },
     {
-      "sku": "",
+      "sku": "612010360",
       "nombre": "LLAVE DE CORTE S-1000 MACHO/MACHO",
       "precio": 38500,
       "lista": 38500,
@@ -1243,10 +1243,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612010360.png"
     },
     {
-      "sku": "",
+      "sku": "612010420",
       "nombre": "PRECINTO X 25",
       "precio": 6200,
       "lista": 6200,
@@ -1254,10 +1254,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612010420.png"
     },
     {
-      "sku": "",
+      "sku": "612280090",
       "nombre": "PROLONGADOR DE 3/4 PSA POLI",
       "precio": 20650,
       "lista": 20650,
@@ -1265,10 +1265,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612280090.png"
     },
     {
-      "sku": "",
+      "sku": "612100270",
       "nombre": "PROLONGADOR PSA DUCHA II",
       "precio": 43000,
       "lista": 43000,
@@ -1276,10 +1276,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612100270.png"
     },
     {
-      "sku": "",
+      "sku": "612010540",
       "nombre": "REGULADOR DE CAUDAL",
       "precio": 112000,
       "lista": 112000,
@@ -1287,10 +1287,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612010540.png"
     },
     {
-      "sku": "",
+      "sku": "612030620",
       "nombre": "SET ADAPTACION RETRO P/KIT CANILLA",
       "precio": 35300,
       "lista": 35300,
@@ -1298,10 +1298,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612030620.png"
     },
     {
-      "sku": "",
+      "sku": "612100220",
       "nombre": "TAPON REGULADOR P/DUCHA X 5 UNIDADES",
       "precio": 9000,
       "lista": 9000,
@@ -1309,10 +1309,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/612100220.png"
     },
     {
-      "sku": "",
+      "sku": "621010100",
       "nombre": "TE C/LLAVE DE CORTE P/GRIFERÍA PSA Y ECO-D",
       "precio": 83750,
       "lista": 83750,
@@ -1320,10 +1320,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/621010100.png"
     },
     {
-      "sku": "",
+      "sku": "621010090",
       "nombre": "VARILLA INST. ECO-D SM",
       "precio": 57800,
       "lista": 57800,
@@ -1331,10 +1331,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": ""
+      "foto": "catalogo-img/621010090.png"
     },
     {
-      "sku": "",
+      "sku": "650030500",
       "nombre": "REPOSICION PSA 10K-D",
       "precio": 270000,
       "lista": 270000,
@@ -1342,10 +1342,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Reposiciones",
-      "foto": ""
+      "foto": "catalogo-img/650030500.png"
     },
     {
-      "sku": "",
+      "sku": "650030600",
       "nombre": "REPOSICION PSA 40K-D",
       "precio": 419000,
       "lista": 419000,
@@ -1353,10 +1353,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Reposiciones",
-      "foto": ""
+      "foto": "catalogo-img/650030600.png"
     },
     {
-      "sku": "",
+      "sku": "612110770",
       "nombre": "ACCESORIO PARA CEBAR MATE",
       "precio": 5100,
       "lista": 5100,
@@ -1364,10 +1364,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612110770.png"
     },
     {
-      "sku": "",
+      "sku": "612050100",
       "nombre": "BOLSA MATERIAL REGENERANTE X 2",
       "precio": 30250,
       "lista": 30250,
@@ -1375,10 +1375,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612050100.png"
     },
     {
-      "sku": "",
+      "sku": "612030350",
       "nombre": "BUJE DE CONEXION P/CANILLA DISPENSER",
       "precio": 57750,
       "lista": 57750,
@@ -1386,10 +1386,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612030350.png"
     },
     {
-      "sku": "",
+      "sku": "612100180",
       "nombre": "CAMPANA P/PSA DUCHA",
       "precio": 6200,
       "lista": 6200,
@@ -1397,10 +1397,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612100180.png"
     },
     {
-      "sku": "",
+      "sku": "612030930",
       "nombre": "CANILLA AGUA CALIENTE DISPENSER 2",
       "precio": 38500,
       "lista": 38500,
@@ -1408,10 +1408,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612030930.png"
     },
     {
-      "sku": "",
+      "sku": "612030940",
       "nombre": "CANILLA AGUA CALIENTE DISPENSER DS",
       "precio": 38500,
       "lista": 38500,
@@ -1419,10 +1419,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612030940.png"
     },
     {
-      "sku": "",
+      "sku": "612030320",
       "nombre": "CANILLA AGUA CALIENTE DISPENSER MESA/PIE",
       "precio": 38500,
       "lista": 38500,
@@ -1430,10 +1430,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612030320.png"
     },
     {
-      "sku": "",
+      "sku": "612031290",
       "nombre": "CANILLA AGUA CALIENTE P/ECO-D PIE Y SM",
       "precio": 41450,
       "lista": 41450,
@@ -1441,10 +1441,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612031290.png"
     },
     {
-      "sku": "",
+      "sku": "612030920",
       "nombre": "CANILLA AGUA FRIA DISPENSER 2",
       "precio": 38500,
       "lista": 38500,
@@ -1452,10 +1452,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612030920.png"
     },
     {
-      "sku": "",
+      "sku": "612030260",
       "nombre": "CANILLA AGUA FRIA DISPENSER DS",
       "precio": 38500,
       "lista": 38500,
@@ -1463,10 +1463,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612030260.png"
     },
     {
-      "sku": "",
+      "sku": "612030310",
       "nombre": "CANILLA AGUA FRIA DISPENSER MESA/PIE",
       "precio": 38500,
       "lista": 38500,
@@ -1474,10 +1474,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612030310.png"
     },
     {
-      "sku": "",
+      "sku": "612031280",
       "nombre": "CANILLA AGUA FRIA P/ECO-D PIE Y SM",
       "precio": 41450,
       "lista": 41450,
@@ -1485,10 +1485,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612031280.png"
     },
     {
-      "sku": "",
+      "sku": "612110750",
       "nombre": "CANULA P/BOTELLA TERMICA X 5 UNID",
       "precio": 8800,
       "lista": 8800,
@@ -1496,10 +1496,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612110750.png"
     },
     {
-      "sku": "",
+      "sku": "612111220",
       "nombre": "CANULA P/BOTELLAS 500 X 5 UNID.(NUEVA)",
       "precio": 8800,
       "lista": 8800,
@@ -1507,10 +1507,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612111220.png"
     },
     {
-      "sku": "",
+      "sku": "612111210",
       "nombre": "CANULA P/BOTELLAS 750 X 5 UNID.(NUEVA)",
       "precio": 8800,
       "lista": 8800,
@@ -1518,10 +1518,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612111210.png"
     },
     {
-      "sku": "",
+      "sku": "612290040",
       "nombre": "CEPILLO DE ACERO P/IONTRIX",
       "precio": 23000,
       "lista": 23000,
@@ -1529,10 +1529,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612290040.png"
     },
     {
-      "sku": "",
+      "sku": "612030390",
       "nombre": "CONJ.SOPORTE ESCUADRA P/DISPENSER PIE C/CONECTORES",
       "precio": 148700,
       "lista": 148700,
@@ -1540,7 +1540,7 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612030390.png"
     },
     {
       "sku": "612290100",
@@ -1554,7 +1554,7 @@
       "foto": "catalogo-img/612290100.png"
     },
     {
-      "sku": "",
+      "sku": "612050360",
       "nombre": "FIPOR N° 3 X 2 UNID.",
       "precio": 31300,
       "lista": 31300,
@@ -1562,10 +1562,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612050360.png"
     },
     {
-      "sku": "",
+      "sku": "612050360",
       "nombre": "FIPOR N° 3 X 4 UNID.",
       "precio": 56750,
       "lista": 56750,
@@ -1573,10 +1573,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612050360.png"
     },
     {
-      "sku": "",
+      "sku": "612050360",
       "nombre": "FIPOR N° 3 X 6 UNID.",
       "precio": 84850,
       "lista": 84850,
@@ -1584,7 +1584,7 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612050360.png"
     },
     {
       "sku": "612050360",
@@ -1598,7 +1598,7 @@
       "foto": "catalogo-img/612050360.png"
     },
     {
-      "sku": "",
+      "sku": "612100260",
       "nombre": "FLOR PSA DUCHA BLANCO/BIANCO C/CODO CROMADO",
       "precio": 31300,
       "lista": 31300,
@@ -1606,10 +1606,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612100260.png"
     },
     {
-      "sku": "",
+      "sku": "612100370",
       "nombre": "FLOR PSA DUCHA GRIGIO C/CODO CROMADO",
       "precio": 31300,
       "lista": 31300,
@@ -1617,10 +1617,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612100370.png"
     },
     {
-      "sku": "",
+      "sku": "612310020",
       "nombre": "FUENTE DE ALIMENTACION OSMOSIS PSA ROPOT",
       "precio": 74900,
       "lista": 74900,
@@ -1628,10 +1628,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612310020.png"
     },
     {
-      "sku": "",
+      "sku": "626030800",
       "nombre": "FUENTE DE ALIMENTACION P/DOMUS-MINI DOMUS",
       "precio": 58350,
       "lista": 58350,
@@ -1639,10 +1639,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/626030800.png"
     },
     {
-      "sku": "",
+      "sku": "612290200",
       "nombre": "FUENTE DE ALIMENTACION P/IONTRIX",
       "precio": 185000,
       "lista": 185000,
@@ -1650,10 +1650,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612290200.png"
     },
     {
-      "sku": "",
+      "sku": "612030280",
       "nombre": "GATILLO P/CANILLA BAJO MESADA PSA",
       "precio": 15700,
       "lista": 15700,
@@ -1661,7 +1661,7 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612030280.png"
     },
     {
       "sku": "611300020",
@@ -1675,7 +1675,7 @@
       "foto": "catalogo-img/611300020.png"
     },
     {
-      "sku": "",
+      "sku": "612280160",
       "nombre": "JUEGO JUNTAS POLI 2",
       "precio": 2550,
       "lista": 2550,
@@ -1683,10 +1683,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612280160.png"
     },
     {
-      "sku": "",
+      "sku": "612030290",
       "nombre": "KIT P/DETERMINACIÓN DUREZA (10 TIRAS)",
       "precio": 27150,
       "lista": 27150,
@@ -1694,10 +1694,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612030290.png"
     },
     {
-      "sku": "",
+      "sku": "612290130",
       "nombre": "KIT P/MEDICION DE CLORO P/IONTRIX",
       "precio": 11300,
       "lista": 11300,
@@ -1705,10 +1705,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612290130.png"
     },
     {
-      "sku": "",
+      "sku": "612290120",
       "nombre": "KIT P/MEDICION DE IONES P/IONTRIX",
       "precio": 39600,
       "lista": 39600,
@@ -1716,10 +1716,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612290120.png"
     },
     {
-      "sku": "",
+      "sku": "612290140",
       "nombre": "KIT P/MEDICION DE PH P/IONTRIX",
       "precio": 20650,
       "lista": 20650,
@@ -1727,10 +1727,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612290140.png"
     },
     {
-      "sku": "",
+      "sku": "612060070",
       "nombre": "KIT POSVENTA 1 AÑO OSMOSIS PSA ROPOT",
       "precio": 322400,
       "lista": 322400,
@@ -1738,10 +1738,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612060070.png"
     },
     {
-      "sku": "",
+      "sku": "612012530",
       "nombre": "KIT POSVENTA PURIF. AIRE PSA",
       "precio": 165000,
       "lista": 165000,
@@ -1749,10 +1749,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612012530.png"
     },
     {
-      "sku": "",
+      "sku": "612290220",
       "nombre": "KIT PSA LAB P/IONTRIX",
       "precio": 113350,
       "lista": 113350,
@@ -1760,10 +1760,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612290220.png"
     },
     {
-      "sku": "",
+      "sku": "612012520",
       "nombre": "MANG. BLACK DIÁM. 8,5 X 1600 C/CONEC. SEN4/S1000",
       "precio": 14100,
       "lista": 14100,
@@ -1771,10 +1771,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612012520.png"
     },
     {
-      "sku": "",
+      "sku": "612012490",
       "nombre": "MANG. BLACK DIÁM. 8,5 X 700 C/CONEC. SEN4/S1000",
       "precio": 10950,
       "lista": 10950,
@@ -1782,10 +1782,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612012490.png"
     },
     {
-      "sku": "",
+      "sku": "612030270",
       "nombre": "MANG. SEMIRRÍGIDA AZUL DIÁM.8 (X METRO)",
       "precio": 7800,
       "lista": 7800,
@@ -1793,10 +1793,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612030270.png"
     },
     {
-      "sku": "",
+      "sku": "612030400",
       "nombre": "MANG. SEMIRRÍGIDA BLANCA DIÁM.8 (X METRO)",
       "precio": 7800,
       "lista": 7800,
@@ -1804,10 +1804,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612030400.png"
     },
     {
-      "sku": "",
+      "sku": "612030370",
       "nombre": "MANG. SEMIRRÍGIDA VERDE DIÁM.8 (X METRO)",
       "precio": 7800,
       "lista": 7800,
@@ -1815,10 +1815,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612030370.png"
     },
     {
-      "sku": "",
+      "sku": "612011370",
       "nombre": "MANG.PLATA DIÁM. 8,5 X 1000 CONEC. SEN/VERO/S1000",
       "precio": 10950,
       "lista": 10950,
@@ -1826,10 +1826,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612011370.png"
     },
     {
-      "sku": "",
+      "sku": "612011870",
       "nombre": "MANG.PLATA DIÁM. 8,5 X 1600 CONEC. SEN/VERO/S1000",
       "precio": 10950,
       "lista": 10950,
@@ -1837,10 +1837,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612011870.png"
     },
     {
-      "sku": "",
+      "sku": "612011280",
       "nombre": "MANG.PLATA DIÁM. 8.5 X 1600 CONEC. P/MINI",
       "precio": 9000,
       "lista": 9000,
@@ -1848,10 +1848,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612011280.png"
     },
     {
-      "sku": "",
+      "sku": "612011270",
       "nombre": "MANG.PLATA DIÁM. 8.5 X 700 CONEC. P/MINI",
       "precio": 4900,
       "lista": 4900,
@@ -1859,10 +1859,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612011270.png"
     },
     {
-      "sku": "",
+      "sku": "612290110",
       "nombre": "MARIPOSA DE FIJACION P/IONTRIX",
       "precio": 9000,
       "lista": 9000,
@@ -1870,10 +1870,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612290110.png"
     },
     {
-      "sku": "",
+      "sku": "612290240",
       "nombre": "MARIPOSA DE FIJACION P/IONTRIX 3",
       "precio": 9000,
       "lista": 9000,
@@ -1881,10 +1881,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612290240.png"
     },
     {
-      "sku": "",
+      "sku": "612050440",
       "nombre": "MATERIAL REGENERANTE X 2.5 KG P/DOMUS",
       "precio": 33200,
       "lista": 33200,
@@ -1892,10 +1892,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612050440.png"
     },
     {
-      "sku": "",
+      "sku": "612290210",
       "nombre": "MODULO POTENCIADOR P/IONTRIX 3",
       "precio": 38500,
       "lista": 38500,
@@ -1903,10 +1903,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612290210.png"
     },
     {
-      "sku": "",
+      "sku": "612100130",
       "nombre": "O-RING INTERNO TAPA CUERPO PSA DUCHA (JUEGO)",
       "precio": 5000,
       "lista": 5000,
@@ -1914,10 +1914,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612100130.png"
     },
     {
-      "sku": "",
+      "sku": "612030960",
       "nombre": "PASTILLA HIDROSENSIBLE P/ECO-D",
       "precio": 34300,
       "lista": 34300,
@@ -1925,10 +1925,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612030960.png"
     },
     {
-      "sku": "",
+      "sku": "612050200",
       "nombre": "PASTILLA SANITIZANTE MAX X 8 UNID.",
       "precio": 4900,
       "lista": 4900,
@@ -1936,10 +1936,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612050200.png"
     },
     {
-      "sku": "",
+      "sku": "612050430",
       "nombre": "PAÑO ALTA TURBIDEZ 24 X 21 X 3 UNID.",
       "precio": 27000,
       "lista": 27000,
@@ -1947,10 +1947,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612050430.png"
     },
     {
-      "sku": "",
+      "sku": "612015910",
       "nombre": "PICO DE DESCARGA GRIFERIA NERO",
       "precio": 98600,
       "lista": 98600,
@@ -1958,10 +1958,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612015910.png"
     },
     {
-      "sku": "",
+      "sku": "612016110",
       "nombre": "PICO DESCARGA CANILLA BM2/GRIFERIA PSA",
       "precio": 98600,
       "lista": 98600,
@@ -1969,10 +1969,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612016110.png"
     },
     {
-      "sku": "",
+      "sku": "612040070",
       "nombre": "PREFILTRO ENTRADA PURIF. DE AIRE PSA",
       "precio": 50550,
       "lista": 50550,
@@ -1980,10 +1980,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612040070.png"
     },
     {
-      "sku": "",
+      "sku": "612040060",
       "nombre": "PREFILTRO P/10 KD",
       "precio": 20650,
       "lista": 20650,
@@ -1991,10 +1991,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612040060.png"
     },
     {
-      "sku": "",
+      "sku": "612012500",
       "nombre": "PROLONGADOR P/ PICO PSA SENIOR 3",
       "precio": 20650,
       "lista": 20650,
@@ -2002,10 +2002,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612012500.png"
     },
     {
-      "sku": "",
+      "sku": "612011390",
       "nombre": "PROLONGADOR P/PICO PSA SENIOR",
       "precio": 20650,
       "lista": 20650,
@@ -2013,10 +2013,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612011390.png"
     },
     {
-      "sku": "",
+      "sku": "618110150",
       "nombre": "PROMO CILINDRO + PACK RENDIMIENTO II",
       "precio": 116000,
       "lista": 116000,
@@ -2024,10 +2024,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/618110150.png"
     },
     {
-      "sku": "",
+      "sku": "614070010",
       "nombre": "REACTIVO DE CLORO",
       "precio": 6650,
       "lista": 6650,
@@ -2035,10 +2035,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/614070010.png"
     },
     {
-      "sku": "",
+      "sku": "618110060",
       "nombre": "RECARGA P/SODA BURBY",
       "precio": 29550,
       "lista": 29550,
@@ -2046,10 +2046,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/618110060.png"
     },
     {
-      "sku": "",
+      "sku": "622070080",
       "nombre": "RECIPIENTE P/AGUA ENTRADA OSMOSIS PSA ROPOT",
       "precio": 50850,
       "lista": 50850,
@@ -2057,7 +2057,7 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/622070080.png"
     },
     {
       "sku": "612050260",
@@ -2082,7 +2082,7 @@
       "foto": "catalogo-img/612050250.png"
     },
     {
-      "sku": "",
+      "sku": "612050270",
       "nombre": "REPUESTO BACTERIOSTÁTICO 50 MIC S-1000/QUA/SEN",
       "precio": 79000,
       "lista": 79000,
@@ -2090,10 +2090,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612050270.png"
     },
     {
-      "sku": "",
+      "sku": "612100280",
       "nombre": "REPUESTO CUERPO PSA DUCHA BIANCO",
       "precio": 21950,
       "lista": 21950,
@@ -2101,10 +2101,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612100280.png"
     },
     {
-      "sku": "",
+      "sku": "612100290",
       "nombre": "REPUESTO CUERPO PSA DUCHA GRIGIO",
       "precio": 21950,
       "lista": 21950,
@@ -2112,7 +2112,7 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612100290.png"
     },
     {
       "sku": "612060010",
@@ -2148,7 +2148,7 @@
       "foto": "catalogo-img/612060020.png"
     },
     {
-      "sku": "",
+      "sku": "612060040",
       "nombre": "REPUESTO N°4 POST MEMBRANA OSMOSIS PSA ROPOT",
       "precio": 57800,
       "lista": 57800,
@@ -2156,7 +2156,7 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612060040.png"
     },
     {
       "sku": "612100030",
@@ -2181,7 +2181,7 @@
       "foto": "catalogo-img/612100080.png"
     },
     {
-      "sku": "",
+      "sku": "612280030",
       "nombre": "REPUESTO PSA POLI",
       "precio": 86500,
       "lista": 86500,
@@ -2189,7 +2189,7 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612280030.png"
     },
     {
       "sku": "612280150",
@@ -2214,7 +2214,7 @@
       "foto": "catalogo-img/612020010.png"
     },
     {
-      "sku": "",
+      "sku": "612031070",
       "nombre": "RESERVORIO COMPLETO P/ECO-D",
       "precio": 37250,
       "lista": 37250,
@@ -2222,10 +2222,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612031070.png"
     },
     {
-      "sku": "",
+      "sku": "612010850",
       "nombre": "TAPA ACRILICO P/STOPPER/40K-D",
       "precio": 80850,
       "lista": 80850,
@@ -2233,10 +2233,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612010850.png"
     },
     {
-      "sku": "",
+      "sku": "612290180",
       "nombre": "TAPA CENTRADORA P/IONTRIX",
       "precio": 11750,
       "lista": 11750,
@@ -2244,10 +2244,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612290180.png"
     },
     {
-      "sku": "",
+      "sku": "612290230",
       "nombre": "TAPA CENTRADORA P/IONTRIX 3",
       "precio": 11750,
       "lista": 11750,
@@ -2255,10 +2255,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612290230.png"
     },
     {
-      "sku": "",
+      "sku": "612030340",
       "nombre": "TAPA CON FLOTANTE P/DISPENSER",
       "precio": 159000,
       "lista": 159000,
@@ -2266,10 +2266,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612030340.png"
     },
     {
-      "sku": "",
+      "sku": "612110310",
       "nombre": "TAPA P/BOTELLA PSA TERMICA PICO SPORT",
       "precio": 8800,
       "lista": 8800,
@@ -2277,10 +2277,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612110310.png"
     },
     {
-      "sku": "",
+      "sku": "612111200",
       "nombre": "TAPA P/BOTELLA PSA TERMICA PICO SPORT (NUEVA)",
       "precio": 16000,
       "lista": 16000,
@@ -2288,10 +2288,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612111200.png"
     },
     {
-      "sku": "",
+      "sku": "612100100",
       "nombre": "TAPA P/CUERPO PSA DUCHA CR MARFIL",
       "precio": 21950,
       "lista": 21950,
@@ -2299,10 +2299,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612100100.png"
     },
     {
-      "sku": "",
+      "sku": "612100110",
       "nombre": "TAPA P/CUERPO PSA DUCHA PLATA",
       "precio": 21950,
       "lista": 21950,
@@ -2310,10 +2310,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612100110.png"
     },
     {
-      "sku": "",
+      "sku": "612031030",
       "nombre": "TAPA PREFILTRO C/AUTOPURGA",
       "precio": 18950,
       "lista": 18950,
@@ -2321,10 +2321,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612031030.png"
     },
     {
-      "sku": "",
+      "sku": "612030950",
       "nombre": "TAPA PREFILTRO PSA S-1000 II",
       "precio": 26550,
       "lista": 26550,
@@ -2332,10 +2332,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612030950.png"
     },
     {
-      "sku": "",
+      "sku": "612030980",
       "nombre": "TAPA PREFILTRO SENIOR 3",
       "precio": 18950,
       "lista": 18950,
@@ -2343,10 +2343,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612030980.png"
     },
     {
-      "sku": "",
+      "sku": "612031320",
       "nombre": "TAPA PREFILTRO SENIOR 4",
       "precio": 33650,
       "lista": 33650,
@@ -2354,10 +2354,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612031320.png"
     },
     {
-      "sku": "",
+      "sku": "612290190",
       "nombre": "TAPON P/CONECTOR DE RECARGA P/IONTRIX",
       "precio": 11750,
       "lista": 11750,
@@ -2365,10 +2365,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612290190.png"
     },
     {
-      "sku": "",
+      "sku": "612030330",
       "nombre": "TERMOSTATO AGUA CALIENTE 85° P/DISPENSER",
       "precio": 38500,
       "lista": 38500,
@@ -2376,10 +2376,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612030330.png"
     },
     {
-      "sku": "",
+      "sku": "612100120",
       "nombre": "TUBO CONEXION PSA DUCHA C/O-RING",
       "precio": 37250,
       "lista": 37250,
@@ -2387,10 +2387,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612100120.png"
     },
     {
-      "sku": "",
+      "sku": "612280180",
       "nombre": "VASO ACRILICO PSA POLI 2",
       "precio": 70250,
       "lista": 70250,
@@ -2398,10 +2398,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612280180.png"
     },
     {
-      "sku": "",
+      "sku": "612015790",
       "nombre": "VÁLVULA BY PASS C3 GRIGIO",
       "precio": 23150,
       "lista": 23150,
@@ -2409,10 +2409,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612015790.png"
     },
     {
-      "sku": "",
+      "sku": "612012480",
       "nombre": "VÁLVULA BY PASS NERO",
       "precio": 23150,
       "lista": 23150,
@@ -2420,10 +2420,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612012480.png"
     },
     {
-      "sku": "",
+      "sku": "612011510",
       "nombre": "VÁLVULA BY PASS UNIVERSAL",
       "precio": 23150,
       "lista": 23150,
@@ -2431,10 +2431,10 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": ""
+      "foto": "catalogo-img/612011510.png"
     },
     {
-      "sku": "",
+      "sku": "623280020",
       "nombre": "ADICIONAL INST. HASTA 60 KM (PSA POLI X 2)",
       "precio": 238000,
       "lista": 238000,
@@ -2442,10 +2442,10 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Servicios",
-      "foto": ""
+      "foto": "catalogo-img/623280020.png"
     },
     {
-      "sku": "",
+      "sku": "623280010",
       "nombre": "ADICIONAL INST. HASTA 60 KM (PSA POLI)",
       "precio": 174000,
       "lista": 174000,
@@ -2453,10 +2453,10 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Servicios",
-      "foto": ""
+      "foto": "catalogo-img/623280010.png"
     },
     {
-      "sku": "",
+      "sku": "623010020",
       "nombre": "ADICIONAL INSTAL. HASTA 60 KM",
       "precio": 153000,
       "lista": 153000,
@@ -2464,10 +2464,10 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Servicios",
-      "foto": ""
+      "foto": "catalogo-img/623010020.png"
     },
     {
-      "sku": "",
+      "sku": "623030090",
       "nombre": "ADICIONAL POR KILOMETRAJE EXCEDIDO",
       "precio": 4850,
       "lista": 4850,
@@ -2475,10 +2475,10 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Servicios",
-      "foto": ""
+      "foto": "catalogo-img/623030090.png"
     },
     {
-      "sku": "",
+      "sku": "612031400",
       "nombre": "GRIFERÍA PSA BICOMANDO + INST.",
       "precio": 691000,
       "lista": 691000,
@@ -2486,10 +2486,10 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Servicios",
-      "foto": ""
+      "foto": "catalogo-img/612031400.png"
     },
     {
-      "sku": "",
+      "sku": "612031410",
       "nombre": "GRIFERÍA PSA BICOMANDO NERO + INST.",
       "precio": 691000,
       "lista": 691000,
@@ -2497,10 +2497,10 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Servicios",
-      "foto": ""
+      "foto": "catalogo-img/612031410.png"
     },
     {
-      "sku": "",
+      "sku": "612031220",
       "nombre": "GRIFERÍA PSA BM + INST.",
       "precio": 372000,
       "lista": 372000,
@@ -2508,10 +2508,10 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Servicios",
-      "foto": ""
+      "foto": "catalogo-img/612031220.png"
     },
     {
-      "sku": "",
+      "sku": "612031310",
       "nombre": "GRIFERÍA PSA BM NERO + INST.",
       "precio": 372000,
       "lista": 372000,
@@ -2519,10 +2519,10 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Servicios",
-      "foto": ""
+      "foto": "catalogo-img/612031310.png"
     },
     {
-      "sku": "",
+      "sku": "623030120",
       "nombre": "INSTALACION DISPENSER PSA (HASTA 60 KM)",
       "precio": 198000,
       "lista": 198000,
@@ -2530,10 +2530,10 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Servicios",
-      "foto": ""
+      "foto": "catalogo-img/623030120.png"
     },
     {
-      "sku": "",
+      "sku": "623030150",
       "nombre": "INSTALACION PSA DOMUS/MINI DOMUS (HASTA 60 KM)",
       "precio": 198000,
       "lista": 198000,
@@ -2541,10 +2541,10 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Servicios",
-      "foto": ""
+      "foto": "catalogo-img/623030150.png"
     },
     {
-      "sku": "",
+      "sku": "623030130",
       "nombre": "MANTENIMIENTO ANUAL DISPENSER PSA",
       "precio": 171000,
       "lista": 171000,
@@ -2552,10 +2552,10 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Servicios",
-      "foto": ""
+      "foto": "catalogo-img/623030130.png"
     },
     {
-      "sku": "",
+      "sku": "623010010",
       "nombre": "MODULO REPARACION DE PRODUCTO",
       "precio": 12500,
       "lista": 12500,
@@ -2563,10 +2563,10 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Servicios",
-      "foto": ""
+      "foto": "catalogo-img/623010010.png"
     },
     {
-      "sku": "",
+      "sku": "623010040",
       "nombre": "SERVICE CON INSTALADOR HASTA 60 KM.",
       "precio": 118000,
       "lista": 118000,
@@ -2574,10 +2574,10 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Servicios",
-      "foto": ""
+      "foto": "catalogo-img/623010040.png"
     },
     {
-      "sku": "",
+      "sku": "612031420",
       "nombre": "TRANSF.SM/BM + GRIF.PSA BICOMANDO",
       "precio": 563000,
       "lista": 563000,
@@ -2585,10 +2585,10 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Servicios",
-      "foto": ""
+      "foto": "catalogo-img/612031420.png"
     },
     {
-      "sku": "",
+      "sku": "612031430",
       "nombre": "TRANSF.SM/BM + GRIF.PSA BICOMANDO + INST.",
       "precio": 716000,
       "lista": 716000,
@@ -2596,10 +2596,10 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Servicios",
-      "foto": ""
+      "foto": "catalogo-img/612031430.png"
     },
     {
-      "sku": "",
+      "sku": "612031440",
       "nombre": "TRANSF.SM/BM + GRIF.PSA BICOMANDO NERO",
       "precio": 563000,
       "lista": 563000,
@@ -2607,10 +2607,10 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Servicios",
-      "foto": ""
+      "foto": "catalogo-img/612031440.png"
     },
     {
-      "sku": "",
+      "sku": "612031450",
       "nombre": "TRANSF.SM/BM + GRIF.PSA BICOMANDO NERO + INST.",
       "precio": 716000,
       "lista": 716000,
@@ -2618,10 +2618,10 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Servicios",
-      "foto": ""
+      "foto": "catalogo-img/612031450.png"
     },
     {
-      "sku": "",
+      "sku": "612031230",
       "nombre": "TRANSF.SM/BM + GRIFERÍA PSA BM",
       "precio": 230000,
       "lista": 230000,
@@ -2629,10 +2629,10 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Servicios",
-      "foto": ""
+      "foto": "catalogo-img/612031230.png"
     },
     {
-      "sku": "",
+      "sku": "612031240",
       "nombre": "TRANSF.SM/BM + GRIFERÍA PSA BM + INSTAL.",
       "precio": 383000,
       "lista": 383000,
@@ -2640,10 +2640,10 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Servicios",
-      "foto": ""
+      "foto": "catalogo-img/612031240.png"
     },
     {
-      "sku": "",
+      "sku": "612031340",
       "nombre": "TRANSF.SM/BM + GRIFERÍA PSA BM NERO",
       "precio": 230000,
       "lista": 230000,
@@ -2651,10 +2651,10 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Servicios",
-      "foto": ""
+      "foto": "catalogo-img/612031340.png"
     },
     {
-      "sku": "",
+      "sku": "612031350",
       "nombre": "TRANSF.SM/BM + GRIFERÍA PSA BM NERO + INSTAL.",
       "precio": 383000,
       "lista": 383000,
@@ -2662,10 +2662,10 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Servicios",
-      "foto": ""
+      "foto": "catalogo-img/612031350.png"
     },
     {
-      "sku": "",
+      "sku": "612110830",
       "nombre": "BOTELLA 600 CC NO GASF AMAR-AMAR 100 % RECICLADA",
       "precio": 37150,
       "lista": 37150,
@@ -2673,10 +2673,10 @@
       "grupo": "botellas",
       "plan_canje": null,
       "seccion": "Botellas",
-      "foto": ""
+      "foto": "catalogo-img/612110830.png"
     },
     {
-      "sku": "",
+      "sku": "612110840",
       "nombre": "BOTELLA 600 CC NO GASF AMAR-AQUA % RECICLADA",
       "precio": 37150,
       "lista": 37150,
@@ -2684,10 +2684,10 @@
       "grupo": "botellas",
       "plan_canje": null,
       "seccion": "Botellas",
-      "foto": ""
+      "foto": "catalogo-img/612110840.png"
     },
     {
-      "sku": "",
+      "sku": "612110850",
       "nombre": "BOTELLA 600 CC NO GASF AMAR-ROS 100 % RECICLADA",
       "precio": 37150,
       "lista": 37150,
@@ -2695,10 +2695,10 @@
       "grupo": "botellas",
       "plan_canje": null,
       "seccion": "Botellas",
-      "foto": ""
+      "foto": "catalogo-img/612110850.png"
     },
     {
-      "sku": "",
+      "sku": "612110860",
       "nombre": "BOTELLA 600 CC NO GASF AMAR-VER 100 % RECICLADA",
       "precio": 37150,
       "lista": 37150,
@@ -2706,10 +2706,10 @@
       "grupo": "botellas",
       "plan_canje": null,
       "seccion": "Botellas",
-      "foto": ""
+      "foto": "catalogo-img/612110860.png"
     },
     {
-      "sku": "",
+      "sku": "612110870",
       "nombre": "BOTELLA 600 CC NO GASF AQUA-AMAR 100 % RECICLADA",
       "precio": 37150,
       "lista": 37150,
@@ -2717,10 +2717,10 @@
       "grupo": "botellas",
       "plan_canje": null,
       "seccion": "Botellas",
-      "foto": ""
+      "foto": "catalogo-img/612110870.png"
     },
     {
-      "sku": "",
+      "sku": "612110880",
       "nombre": "BOTELLA 600 CC NO GASF AQUA-AQUA 100 % RECICLADA",
       "precio": 37150,
       "lista": 37150,
@@ -2728,10 +2728,10 @@
       "grupo": "botellas",
       "plan_canje": null,
       "seccion": "Botellas",
-      "foto": ""
+      "foto": "catalogo-img/612110880.png"
     },
     {
-      "sku": "",
+      "sku": "612110890",
       "nombre": "BOTELLA 600 CC NO GASF AQUA-ROSA 100% RECICLADA",
       "precio": 37150,
       "lista": 37150,
@@ -2739,10 +2739,10 @@
       "grupo": "botellas",
       "plan_canje": null,
       "seccion": "Botellas",
-      "foto": ""
+      "foto": "catalogo-img/612110890.png"
     },
     {
-      "sku": "",
+      "sku": "612110900",
       "nombre": "BOTELLA 600 CC NO GASF AQUA-VERDE 100% RECICLADA",
       "precio": 37150,
       "lista": 37150,
@@ -2750,10 +2750,10 @@
       "grupo": "botellas",
       "plan_canje": null,
       "seccion": "Botellas",
-      "foto": ""
+      "foto": "catalogo-img/612110900.png"
     },
     {
-      "sku": "",
+      "sku": "612110910",
       "nombre": "BOTELLA 600 CC NO GASF ROS-AMAR 100 % RECICLADA",
       "precio": 37150,
       "lista": 37150,
@@ -2761,10 +2761,10 @@
       "grupo": "botellas",
       "plan_canje": null,
       "seccion": "Botellas",
-      "foto": ""
+      "foto": "catalogo-img/612110910.png"
     },
     {
-      "sku": "",
+      "sku": "612110920",
       "nombre": "BOTELLA 600 CC NO GASF ROS-AQUA 100 % RECICLADA",
       "precio": 37150,
       "lista": 37150,
@@ -2772,10 +2772,10 @@
       "grupo": "botellas",
       "plan_canje": null,
       "seccion": "Botellas",
-      "foto": ""
+      "foto": "catalogo-img/612110920.png"
     },
     {
-      "sku": "",
+      "sku": "612110930",
       "nombre": "BOTELLA 600 CC NO GASF ROS-ROS 100 % RECICLADA",
       "precio": 37150,
       "lista": 37150,
@@ -2783,10 +2783,10 @@
       "grupo": "botellas",
       "plan_canje": null,
       "seccion": "Botellas",
-      "foto": ""
+      "foto": "catalogo-img/612110930.png"
     },
     {
-      "sku": "",
+      "sku": "612110940",
       "nombre": "BOTELLA 600 CC NO GASF ROS-VER 100 % RECICLADA",
       "precio": 37150,
       "lista": 37150,
@@ -2794,10 +2794,10 @@
       "grupo": "botellas",
       "plan_canje": null,
       "seccion": "Botellas",
-      "foto": ""
+      "foto": "catalogo-img/612110940.png"
     },
     {
-      "sku": "",
+      "sku": "612110950",
       "nombre": "BOTELLA 600 CC NO GASF VER-AMAR 100 % RECICLADA",
       "precio": 37150,
       "lista": 37150,
@@ -2805,10 +2805,10 @@
       "grupo": "botellas",
       "plan_canje": null,
       "seccion": "Botellas",
-      "foto": ""
+      "foto": "catalogo-img/612110950.png"
     },
     {
-      "sku": "",
+      "sku": "612110960",
       "nombre": "BOTELLA 600 CC NO GASF VER-AQUA 100 % RECICLADA",
       "precio": 37150,
       "lista": 37150,
@@ -2816,10 +2816,10 @@
       "grupo": "botellas",
       "plan_canje": null,
       "seccion": "Botellas",
-      "foto": ""
+      "foto": "catalogo-img/612110960.png"
     },
     {
-      "sku": "",
+      "sku": "612110970",
       "nombre": "BOTELLA 600 CC NO GASF VER-ROS 100 % RECICLADA",
       "precio": 37150,
       "lista": 37150,
@@ -2827,10 +2827,10 @@
       "grupo": "botellas",
       "plan_canje": null,
       "seccion": "Botellas",
-      "foto": ""
+      "foto": "catalogo-img/612110970.png"
     },
     {
-      "sku": "",
+      "sku": "612110980",
       "nombre": "BOTELLA 600 CC NO GASF VER-VER 100 % RECICLADA",
       "precio": 37150,
       "lista": 37150,
@@ -2838,10 +2838,10 @@
       "grupo": "botellas",
       "plan_canje": null,
       "seccion": "Botellas",
-      "foto": ""
+      "foto": "catalogo-img/612110980.png"
     },
     {
-      "sku": "",
+      "sku": "612111060",
       "nombre": "BOTELLA NEO AQUA-AQUA REUTILIZ.",
       "precio": 64200,
       "lista": 64200,
@@ -2849,10 +2849,10 @@
       "grupo": "botellas",
       "plan_canje": null,
       "seccion": "Botellas",
-      "foto": ""
+      "foto": "catalogo-img/612111060.png"
     },
     {
-      "sku": "",
+      "sku": "612110320",
       "nombre": "BOTELLA PSA NO GAS. 1 LITRO X 1 REUTILIZABLE",
       "precio": 12000,
       "lista": 12000,
@@ -2860,10 +2860,10 @@
       "grupo": "botellas",
       "plan_canje": null,
       "seccion": "Botellas",
-      "foto": ""
+      "foto": "catalogo-img/612110320.png"
     },
     {
-      "sku": "",
+      "sku": "612110220",
       "nombre": "BOTELLA PSA NO GAS. X 1000 ML PACK X2 REUTILIZ.",
       "precio": 19150,
       "lista": 19150,
@@ -2871,7 +2871,7 @@
       "grupo": "botellas",
       "plan_canje": null,
       "seccion": "Botellas",
-      "foto": ""
+      "foto": "catalogo-img/612110220.png"
     },
     {
       "sku": "612110230",
@@ -2885,7 +2885,7 @@
       "foto": "catalogo-img/612110230.png"
     },
     {
-      "sku": "",
+      "sku": "612111260",
       "nombre": "BOTELLA PSA TÉRMICA 500 CC BLANCA",
       "precio": 61200,
       "lista": 61200,
@@ -2893,10 +2893,10 @@
       "grupo": "botellas",
       "plan_canje": null,
       "seccion": "Botellas",
-      "foto": ""
+      "foto": "catalogo-img/612111260.png"
     },
     {
-      "sku": "",
+      "sku": "612111270",
       "nombre": "BOTELLA PSA TÉRMICA 500 CC NEGRA",
       "precio": 61200,
       "lista": 61200,
@@ -2904,7 +2904,7 @@
       "grupo": "botellas",
       "plan_canje": null,
       "seccion": "Botellas",
-      "foto": ""
+      "foto": "catalogo-img/612111270.png"
     },
     {
       "sku": "612111290",
@@ -2929,7 +2929,7 @@
       "foto": "catalogo-img/612111300.png"
     },
     {
-      "sku": "614066050",
+      "sku": "614065630",
       "nombre": "KIT MATE 2 PSA BIANCO (MATE+BOMBILLA)",
       "precio": 38500,
       "lista": 38500,
@@ -2937,10 +2937,10 @@
       "grupo": "botellas",
       "plan_canje": null,
       "seccion": "Material Promocional",
-      "foto": "catalogo-img/614066050.png"
+      "foto": "catalogo-img/614065630.png"
     },
     {
-      "sku": "614066040",
+      "sku": "614065640",
       "nombre": "KIT MATE 2 PSA NERO (MATE+BOMBILLA)",
       "precio": 38500,
       "lista": 38500,
@@ -2948,10 +2948,10 @@
       "grupo": "botellas",
       "plan_canje": null,
       "seccion": "Material Promocional",
-      "foto": "catalogo-img/614066040.png"
+      "foto": "catalogo-img/614065640.png"
     },
     {
-      "sku": "",
+      "sku": "630060740",
       "nombre": "LAPIZ GRAFITO NEGRO PSA X 10 UNID.",
       "precio": 4400,
       "lista": 4400,
@@ -2959,10 +2959,10 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Material Promocional",
-      "foto": ""
+      "foto": "catalogo-img/630060740.png"
     },
     {
-      "sku": "",
+      "sku": "623120090",
       "nombre": "REJILLEX BLANCO",
       "precio": 9000,
       "lista": 9000,
@@ -2970,10 +2970,10 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Material Promocional",
-      "foto": ""
+      "foto": "catalogo-img/623120090.png"
     },
     {
-      "sku": "",
+      "sku": "623120100",
       "nombre": "REJILLEX GRIGIO",
       "precio": 9000,
       "lista": 9000,
@@ -2981,7 +2981,7 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Material Promocional",
-      "foto": ""
+      "foto": "catalogo-img/623120100.png"
     },
     {
       "sku": "630139150",
@@ -3028,7 +3028,7 @@
       "foto": "catalogo-img/614066060.png"
     },
     {
-      "sku": "",
+      "sku": "622070060",
       "nombre": "ANALISIS ESPECIFICOS",
       "precio": 81550,
       "lista": 81550,
@@ -3036,10 +3036,10 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Análisis de laboratorio",
-      "foto": ""
+      "foto": "catalogo-img/622070060.png"
     },
     {
-      "sku": "",
+      "sku": "622070260",
       "nombre": "BOTELLA P/ANALISIS DE AGUA",
       "precio": 4900,
       "lista": 4900,
@@ -3047,10 +3047,10 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Análisis de laboratorio",
-      "foto": ""
+      "foto": "catalogo-img/622070260.png"
     },
     {
-      "sku": "",
+      "sku": "622070010",
       "nombre": "MODULO A. FISICO QUIMICO BASICO",
       "precio": 131000,
       "lista": 131000,
@@ -3058,10 +3058,10 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Análisis de laboratorio",
-      "foto": ""
+      "foto": "catalogo-img/622070010.png"
     },
     {
-      "sku": "",
+      "sku": "622070020",
       "nombre": "MODULO B. FISICO QUIMICO INTERMEDIO",
       "precio": 296000,
       "lista": 296000,
@@ -3069,10 +3069,10 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Análisis de laboratorio",
-      "foto": ""
+      "foto": "catalogo-img/622070020.png"
     },
     {
-      "sku": "",
+      "sku": "622070030",
       "nombre": "MODULO C. FISICO QUIMICO COMPLETO",
       "precio": 438000,
       "lista": 438000,
@@ -3080,10 +3080,10 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Análisis de laboratorio",
-      "foto": ""
+      "foto": "catalogo-img/622070030.png"
     },
     {
-      "sku": "",
+      "sku": "622070040",
       "nombre": "MODULO D. BACTERIOLOGICO",
       "precio": 131000,
       "lista": 131000,
@@ -3091,10 +3091,10 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Análisis de laboratorio",
-      "foto": ""
+      "foto": "catalogo-img/622070040.png"
     },
     {
-      "sku": "",
+      "sku": "622070050",
       "nombre": "MODULO E. SOLIDOS EN SUSPENSION",
       "precio": 63100,
       "lista": 63100,
@@ -3102,10 +3102,10 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Análisis de laboratorio",
-      "foto": ""
+      "foto": "catalogo-img/622070050.png"
     },
     {
-      "sku": "",
+      "sku": "622070070",
       "nombre": "RECIPIENTE P/ANALISIS DE AGUA",
       "precio": 11300,
       "lista": 11300,
@@ -3113,10 +3113,10 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Análisis de laboratorio",
-      "foto": ""
+      "foto": "catalogo-img/622070070.png"
     },
     {
-      "sku": "",
+      "sku": "625111910",
       "nombre": "ACEITUNAS NEGRAS OLIVARE 220 GRS",
       "precio": 9700,
       "lista": 9700,
@@ -3124,10 +3124,10 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Olivare",
-      "foto": ""
+      "foto": "catalogo-img/625111910.png"
     },
     {
-      "sku": "",
+      "sku": "625110630",
       "nombre": "ACEITUNAS VERDES OLIVARE 220 GRS",
       "precio": 8500,
       "lista": 8500,
@@ -3135,10 +3135,10 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Olivare",
-      "foto": ""
+      "foto": "catalogo-img/625110630.png"
     },
     {
-      "sku": "",
+      "sku": "625112520",
       "nombre": "NININA 500 CC - ACEITE OLIVA VIRGEN EXTRA",
       "precio": 40000,
       "lista": 40000,
@@ -3146,10 +3146,10 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Olivare",
-      "foto": ""
+      "foto": "catalogo-img/625112520.png"
     },
     {
-      "sku": "",
+      "sku": "625111060",
       "nombre": "OLIVARE 1 LITRO - ACEITE OLIVA VE",
       "precio": 35300,
       "lista": 35300,
@@ -3157,10 +3157,10 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Olivare",
-      "foto": ""
+      "foto": "catalogo-img/625111060.png"
     },
     {
-      "sku": "",
+      "sku": "625110590",
       "nombre": "OLIVARE 250 CC - ACEITE OLIVA VE",
       "precio": 11600,
       "lista": 11600,
@@ -3168,10 +3168,10 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Olivare",
-      "foto": ""
+      "foto": "catalogo-img/625110590.png"
     },
     {
-      "sku": "",
+      "sku": "625111150",
       "nombre": "OLIVARE 250 CC CAJA X 12 UNID. - ACEITE OLIVA VE",
       "precio": 125200,
       "lista": 125200,
@@ -3179,10 +3179,10 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Olivare",
-      "foto": ""
+      "foto": "catalogo-img/625111150.png"
     },
     {
-      "sku": "",
+      "sku": "625110620",
       "nombre": "OLIVARE 5 LTS - ACEITE OLIVA VE",
       "precio": 143200,
       "lista": 143200,
@@ -3190,10 +3190,10 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Olivare",
-      "foto": ""
+      "foto": "catalogo-img/625110620.png"
     },
     {
-      "sku": "",
+      "sku": "625111200",
       "nombre": "OLIVARE 5 LTS X 2 UNID. - ACEITE OLIVA VE",
       "precio": 286400,
       "lista": 286400,
@@ -3201,10 +3201,10 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Olivare",
-      "foto": ""
+      "foto": "catalogo-img/625111200.png"
     },
     {
-      "sku": "",
+      "sku": "625110610",
       "nombre": "OLIVARE 500 CC - ACEITE OLIVA VE",
       "precio": 18500,
       "lista": 18500,
@@ -3212,10 +3212,10 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Olivare",
-      "foto": ""
+      "foto": "catalogo-img/625110610.png"
     },
     {
-      "sku": "",
+      "sku": "625110540",
       "nombre": "OLIVARE 500 CC CAJA X 12 UNID. - ACEITE OLIVA VE",
       "precio": 199700,
       "lista": 199700,
@@ -3223,10 +3223,10 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Olivare",
-      "foto": ""
+      "foto": "catalogo-img/625110540.png"
     },
     {
-      "sku": "",
+      "sku": "625112510",
       "nombre": "PASAS DE UVA NININA PACK X 5 UNID. 150 GM C/U",
       "precio": 18500,
       "lista": 18500,
@@ -3234,10 +3234,10 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Olivare",
-      "foto": ""
+      "foto": "catalogo-img/625112510.png"
     },
     {
-      "sku": "",
+      "sku": "625111240",
       "nombre": "PASTA DE ACEITUNA NATURAL OLIVARE",
       "precio": 8800,
       "lista": 8800,
@@ -3245,7 +3245,7 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Olivare",
-      "foto": ""
+      "foto": "catalogo-img/625111240.png"
     },
     {
       "sku": "611100240",
@@ -3347,7 +3347,7 @@
       "foto": "catalogo-img/612050270.png"
     },
     {
-      "sku": "612011080",
+      "sku": "612015790",
       "nombre": "Repuesto Válvula By Pass - C3",
       "precio": 22250,
       "lista": 22250,
@@ -3355,7 +3355,7 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Tienda",
-      "foto": "catalogo-img/612011080.png"
+      "foto": "catalogo-img/612015790.png"
     },
     {
       "sku": "612012480",
@@ -3369,7 +3369,7 @@
       "foto": "catalogo-img/612012480.png"
     },
     {
-      "sku": "612010120",
+      "sku": "612011510",
       "nombre": "Repuesto Válvula By Pass Universal",
       "precio": 23150,
       "lista": 23150,
@@ -3377,7 +3377,7 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Tienda",
-      "foto": "catalogo-img/612010120.png"
+      "foto": "catalogo-img/612011510.png"
     },
     {
       "sku": "612111250",
@@ -3391,7 +3391,7 @@
       "foto": "catalogo-img/612111250.png"
     },
     {
-      "sku": "612111050",
+      "sku": "612111060",
       "nombre": "BOTELLA PSA NEO AQUA",
       "precio": 32100,
       "lista": 32100,
@@ -3399,7 +3399,7 @@
       "grupo": "botellas",
       "plan_canje": null,
       "seccion": "Tienda",
-      "foto": "catalogo-img/612111050.png"
+      "foto": "catalogo-img/612111060.png"
     },
     {
       "sku": "612111280",

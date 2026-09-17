@@ -1446,10 +1446,24 @@
         // de Supabase es el elegido y no lleva la foto, se recupera por SKU
         // desde el catálogo local: la foto nunca queda atrás por la copia.
         if (fileCat && fileCat.productos && catElegido !== fileCat) {
-          var fotoPorSku = {};
-          fileCat.productos.forEach(function (p) { if (p && p.sku && p.foto) fotoPorSku[p.sku] = p.foto; });
+          var fotoPorSku = {}, skuPorNombre = {}, fotoPorNombre = {};
+          fileCat.productos.forEach(function (p) {
+            if (p && p.foto) {
+              if (p.sku) fotoPorSku[p.sku] = p.foto;
+              if (p.nombre) {
+                fotoPorNombre[p.nombre.trim().toUpperCase()] = p.foto;
+                if (p.sku) skuPorNombre[p.nombre.trim().toUpperCase()] = p.sku;
+              }
+            }
+          });
           catElegido.productos.forEach(function (p) {
-            if (p && p.sku && !p.foto && fotoPorSku[p.sku]) p.foto = fotoPorSku[p.sku];
+            if (!p) return;
+            var nom = (p.nombre || "").trim().toUpperCase();
+            if (!p.sku && skuPorNombre[nom]) p.sku = skuPorNombre[nom];
+            if (!p.foto) {
+              if (p.sku && fotoPorSku[p.sku]) p.foto = fotoPorSku[p.sku];
+              else if (nom && fotoPorNombre[nom]) p.foto = fotoPorNombre[nom];
+            }
           });
         }
         CAT = catElegido;
