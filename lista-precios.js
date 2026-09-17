@@ -41,7 +41,12 @@
     solidos: { nom: 'Sólidos en suspensión', txt: 'Tierra, óxido y partículas del tanque o de la red. El agua se ve turbia o deja poso: eso también se toma. Pueden llevar microbios y tapan los medios de adentro. Si se ve sucia, no es “solo tierra”: es lo que está entrando al vaso.' },
     dureza: { nom: 'Sarro / dureza', txt: 'Calcio y magnesio. No es un veneno, pero el consumo constante deja sarro en el cuerpo de la casa: cafetera, termo, flor de ducha, caños, y la piel queda áspera. Tratarlo es otra agua al tacto y menos incrustación. El estudio dice si esa casa la tiene dura.' },
     arsenico: { nom: 'Arsénico', txt: 'En varias zonas de Argentina (también Córdoba) está en el agua de pozo, de origen natural. No se ve ni se siente. Tomarlo años se asocia a lesiones en la piel y a más riesgo de cáncer de piel, pulmón y vejiga. No es un maybe de un vaso: es el agua de esa casa, todos los días.' },
-    algas: { nom: 'Bacterias y algas (pileta)', txt: 'En la pileta se reproducen con el calor y el uso. Tragar esa agua o bañarse con exceso de cloro irrita ojos, piel y puede sentar mal la panza. Ionizar es otra agua para el cuerpo que se mete a nadar, con menos químico.' }
+    algas: { nom: 'Bacterias y algas (pileta)', txt: 'En la pileta se reproducen con el calor y el uso. Tragar esa agua o bañarse con exceso de cloro irrita ojos, piel y puede sentar mal la panza. Ionizar es otra agua para el cuerpo que se mete a nadar, con menos químico.' },
+    aire_particulas: { nom: 'Ácaros, polvo y alérgenos', txt: 'Partículas microscópicas en suspensión en ambientes cerrados. Provocan alergias respiratorias, congestión y asma. Retenerlas con filtro HEPA purifica el aire que respirás en tu hogar u oficina todo el día.' },
+    aire_humo_olores: { nom: 'Humo, COV y malos olores', txt: 'Gases de combustión, humo de tabaco, compuestos orgánicos volátiles y olor a encierro o humedad. Su inhalación continua afecta las vías respiratorias. El carbón activado los neutraliza eficazmente.' },
+    gasificado_salud: { nom: 'Consumo de gaseosas y plásticos', txt: 'Las bebidas comerciales contienen exceso de sodio, azúcares y conservantes, además de generar miles de botellas plásticas descartables. Preparar soda en casa con agua purificada cuida tu salud y el planeta.' },
+    sarro_vivienda: { nom: 'Incrustaciones en cañerías y artefactos', txt: 'El agua dura genera sarro que obstruye termotanques, calderas, lavarropas y griferías, aumentando el consumo de gas/luz y arruinando prendas y vajilla. Ablandar el agua protege toda la instalación.' },
+    hidra_toxinas: { nom: 'Bisfenol A (BPA) y microplásticos', txt: 'Las botellas plásticas descartables liberan toxinas y microplásticos en el agua que bebemos. Utilizar recipientes reutilizables seguros y térmicos protege tu cuerpo y mantiene tu agua siempre fresca.' }
   };
   var TRATA_ORDEN = ['cloro', 'thm', 'hierro', 'plomo', 'solidos', 'dureza', 'arsenico', 'algas'];
   var TRATA_EQ = [
@@ -59,7 +64,13 @@
     { k: ['STOPPER'], keys: ['solidos'] },
     { k: ['PORTÁTIL', 'PORTATIL'], keys: ['cloro'] },
     { k: ['POLI 2', 'POLI2'], keys: ['dureza'] },
-    { k: ['ROPOT', 'OSMOSIS', 'ÓSMOSIS'], keys: ['arsenico', 'dureza', 'cloro', 'thm', 'hierro', 'plomo'] }
+    { k: ['ROPOT', 'OSMOSIS', 'ÓSMOSIS'], keys: ['arsenico', 'dureza', 'cloro', 'thm', 'hierro', 'plomo'] },
+    { k: ['AIRE'], keys: ['aire_particulas', 'aire_humo_olores'] },
+    { k: ['SODA', 'BURBY'], keys: ['gasificado_salud'] },
+    { k: ['DOMUS'], keys: ['dureza', 'sarro_vivienda'] },
+    { k: ['DUO'], keys: ['cloro', 'thm'] },
+    { k: ['GRIFERÍA', 'GRIFERIA', 'BICOMANDO'], keys: ['cloro', 'plomo'] },
+    { k: ['BOTELLA', 'TERMO', 'MATE'], keys: ['hidra_toxinas'] }
   ];
   var PLANES = { cuotas: [3, 6, 9, 12, 15, 18], bancos: [], vigencia: '' };
   var filtro = 'todos';
@@ -644,8 +655,7 @@
   }
   function trataDe(p) {
     var n = String((p && p.nombre) || '').toUpperCase();
-    if (!n || (p && p.grupo && p.grupo !== 'equipos')) return [];
-    if (/BURBY|SODA/.test(n) && n.indexOf('DUCHA') < 0) return [];
+    if (!n) return [];
     // Poli 2 (cañerías) vs ducha con poli
     if (/POLI\s*2|POLI2/.test(n) && n.indexOf('DUCHA') < 0 && n.indexOf('RINNOVA') < 0) return ['dureza'];
     for (var i = 0; i < TRATA_EQ.length; i++) {
@@ -653,6 +663,8 @@
         if (n.indexOf(TRATA_EQ[i].k[j]) >= 0) return TRATA_EQ[i].keys.slice();
       }
     }
+    // Default si es de agua
+    if (p.grupo === 'equipos') return ['cloro', 'thm'];
     return [];
   }
   function botFmt(n, d) {
