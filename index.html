@@ -149,7 +149,7 @@ window.openStock=function(){
 <link rel="stylesheet" href="./appi-tema.css?v=515">
 <script src="./account-request.js"></script>
 <script src="./qr-code.js"></script>
-<script src="./gestion-client.js?v=850"></script>
+<script src="./gestion-client.js?v=851"></script>
   <script src="./agenda-personal.js"></script>
 <script src="./tarjetas-promos.js"></script>
 <script src="./usuarios-botones.js?v=423"></script>
@@ -166,10 +166,10 @@ window.openStock=function(){
 
 <script src="./porque-vivo.js"></script>
 <script src="./home-limpio.js?v=521"></script>
-<script src="./reporte-bonos.js?v=850?v=4"></script>
+<script src="./reporte-bonos.js?v=851?v=4"></script>
   <script src="./home-tarjetas.js?v=833"></script>
   <script src="./appi-eventos.js?v=726"></script>
-  <script src="./tu-mes.js?v=850"></script>
+  <script src="./tu-mes.js?v=851"></script>
   <script src="./device-bridge.js?v=523"></script>
   <script src="./anuncios.js?v=792"></script>
   <script src="./aviso-telegram.js?v=555"></script>
@@ -2838,23 +2838,25 @@ body.dark .hist-action-drawer{background:linear-gradient(155deg,#151827,#252036 
 
   .toast {
     position: fixed;
-    top: calc(env(safe-area-inset-top) + 16px);
+    top: calc(env(safe-area-inset-top) + 21px);
     left: 14px;
-    max-width: calc(100vw - 160px);
-    transform: translateX(65px) scale(0.85);
-    background: rgba(46,196,154,0.92);
-    color: #fff; font-weight: 750; font-size: 10.5px;
-    padding: 5px 11px; border-radius: 999px;
-    box-shadow: 0 4px 14px rgba(29,122,92,0.28);
-    z-index: 9; opacity: 0;
-    transition: transform .38s cubic-bezier(0.34,1.3,0.64,1), opacity .25s ease;
+    max-width: calc(100vw - 200px);
+    height: 24px;
+    box-sizing: border-box;
+    transform: translateX(85px) scale(0.8);
+    background: rgba(46,196,154,0.95);
+    color: #fff; font-weight: 800; font-size: 10.5px;
+    padding: 0 10px; border-radius: 999px;
+    box-shadow: 0 4px 14px rgba(29,122,92,0.25);
+    z-index: 8; opacity: 0;
+    transition: transform .42s cubic-bezier(0.34,1.25,0.64,1), opacity .25s ease;
     display: flex; align-items: center; gap: 5px;
     pointer-events: none;
     -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(255,255,255,0.3);
+    border: 1px solid rgba(255,255,255,0.32);
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    line-height: 1.2;
+    line-height: 22px;
     will-change: transform, opacity;
   }
   .toast.show {
@@ -3425,7 +3427,9 @@ body.dark .admin-login-card{background:#242638}body.dark .admin-login-card h2{co
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 4px 11px;
+    height: 24px;
+    box-sizing: border-box;
+    padding: 0 11px;
     border-radius: 999px;
     background: rgba(255,255,255,0.52);
     border: 1px solid rgba(255,255,255,0.76);
@@ -3434,7 +3438,8 @@ body.dark .admin-login-card{background:#242638}body.dark .admin-login-card h2{co
     font-size: 11px;
     font-weight: 950;
     letter-spacing: 1.2px;
-    transition: transform .38s cubic-bezier(0.34,1.3,0.64,1);
+    line-height: 22px;
+    transition: transform .42s cubic-bezier(0.34,1.25,0.64,1);
     will-change: transform;
   }
   .home-brand-ver { display: none; }
@@ -3446,7 +3451,12 @@ body.dark .admin-login-card{background:#242638}body.dark .admin-login-card h2{co
     }
   }
   body.toast-active .home-brand-mark {
-    transform: translateX(48px);
+    transform: translateX(calc(50vw - 146px));
+  }
+  @media (min-width: 520px) {
+    body.toast-active .home-brand-mark {
+      transform: translateX(114px);
+    }
   }
   .home-hero-card {
     position: relative;
@@ -4633,7 +4643,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v850 · Segura</div>
+  <div class="ds-foot">APPI · v851 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -6154,10 +6164,11 @@ function nombreDePila(nombre){
 }
 
 let toastTimer = null;
-function showToast(msg = 'Guardado ✓', duration = 1200){
+function showToast(msg = 'Guardado', duration = 1200){
   const t = document.getElementById('toast');
   const txt = document.getElementById('toastTxt');
-  txt.textContent = msg;
+  let limpio = String(msg || '').replace(/^[✓✔vV]\s*/, '').replace(/\s*✓$/, '');
+  txt.textContent = limpio;
   t.classList.add('show');
   try{ document.body.classList.add('toast-active'); }catch(e){}
   clearTimeout(toastTimer);
@@ -13466,8 +13477,8 @@ function cerrarToolsMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='850';
-      const CACHE_NAME='appi-v850-limpiar-banners';
+      const swVersion='851';
+      const CACHE_NAME='appi-v851-toast-perfeccion';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
@@ -18246,7 +18257,7 @@ async function sincronizarGarantiasPSA(creds, done){
       const count = (window.usuariosU || parsed).length;
       const msg = '✓ Conectado a MI PSA · ' + count + ' garantías sincronizadas automáticamente.';
       if(typeof psaSetStatus === 'function') psaSetStatus(msg, 'ok');
-      try{ showToast('✓ ' + count + ' garantías sincronizadas de MI PSA', 2600); }catch(e){}
+      try{ showToast(count + ' garantías sincronizadas de MI PSA', 2600); }catch(e){}
       if(typeof done === 'function') done(true, count);
       return true;
     } else {

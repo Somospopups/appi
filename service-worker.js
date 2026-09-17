@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v850-limpiar-banners';
+const CACHE_NAME = 'appi-v851-toast-perfeccion';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
