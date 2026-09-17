@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v835-canje-fotos-popup';
+const CACHE_NAME = 'appi-v836-packs-pdf';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
