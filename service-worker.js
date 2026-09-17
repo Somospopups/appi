@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v839-texto-ganancia';
+const CACHE_NAME = 'appi-v840-ganancia-dos-lineas';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

@@ -262,7 +262,7 @@
       '.lp-gan{margin:0 0 12px;border:1px solid rgba(11,88,120,.22);border-radius:14px;background:linear-gradient(135deg,rgba(11,88,120,.07),rgba(58,208,164,.10));padding:10px 12px}' +
       '.lp-gan-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px}' +
       '.lp-gan-head b{font-size:11px;font-weight:950;color:#0b5878;letter-spacing:.4px}' +
-      '.lp-gan-head span{font-size:10px;color:#686977}' +
+      '.lp-gan-head span{font-size:10px;color:#686977;text-align:right;line-height:1.25}' +
       '.lp-gan-num{font-size:24px;font-weight:950;color:#0b5878;margin:2px 0 6px}' +
       '.lp-gan-num i{font-style:normal;font-size:11px;font-weight:850;color:#23826b;margin-left:8px}' +
       '.lp-gan-detalle{display:flex;flex-direction:column;gap:2px;margin-bottom:6px;max-height:96px;overflow:auto}' +
@@ -1795,7 +1795,7 @@
     var g = gananciaResumen();
     var pct = Math.round(g.margen * 100);
     var html = '<div class="lp-gan">' +
-      '<div class="lp-gan-head"><b>🔒 SOLO PARA VOS</b><span>Estos datos solo quedan para vos, nunca serán entregados a tus usuarios</span></div>' +
+      '<div class="lp-gan-head"><b>🔒 SOLO PARA VOS</b><span>Estos datos solo quedan para vos.<br/>Nunca serán entregados a tus usuarios</span></div>' +
       '<div class="lp-gan-num">$' + Math.round(g.total).toLocaleString('es-AR') + '<i>≈ ' + pct + '% del total</i></div>' +
       '<div class="lp-gan-detalle">' + g.lineas.map(function (l) {
         return '<span>' + l.q + '× ' + esc(String(l.nombre).replace(/\s*\(PLAN CANJE\)\s*$/i, '')) + ' <b>$' + Math.round(l.ganU).toLocaleString('es-AR') + '/u</b>' + (l.estimado ? ' <em>est. 30%</em>' : '') + '</span>';

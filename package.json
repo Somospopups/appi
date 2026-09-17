@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "839",
-  "cacheName": "appi-v839-texto-ganancia",
+  "version": "840",
+  "cacheName": "appi-v840-ganancia-dos-lineas",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {
