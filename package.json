@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "843.0.0",
-  "cacheName": "appi-v843-fotos-pcd",
+  "version": "844.0.0",
+  "cacheName": "appi-v844-negocio-pb",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

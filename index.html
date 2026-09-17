@@ -169,7 +169,7 @@ window.openStock=function(){
 <script src="./reporte-bonos.js?v=4"></script>
   <script src="./home-tarjetas.js?v=833"></script>
   <script src="./appi-eventos.js?v=726"></script>
-  <script src="./tu-mes.js?v=843"></script>
+  <script src="./tu-mes.js?v=844"></script>
   <script src="./device-bridge.js?v=523"></script>
   <script src="./anuncios.js?v=792"></script>
   <script src="./aviso-telegram.js?v=555"></script>
@@ -4626,7 +4626,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v843 · Segura</div>
+  <div class="ds-foot">APPI · v844 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -13455,8 +13455,8 @@ function cerrarToolsMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='843';
-      const CACHE_NAME='appi-v843-fotos-pcd';
+      const swVersion='844';
+      const CACHE_NAME='appi-v844-negocio-pb';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · v'+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
@@ -18376,30 +18376,269 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
     }catch(e){}
     return null;
   }
-  function embudoKpiActualizarPB(){
-    const bar=document.getElementById('embudoKpi');
+    function embudoKpiActualizarPB(){
+    const bar=document.getElementById("embudoKpi");
     if(!bar) return;
-    const v=bar.querySelectorAll('b')[2];
+    const v=bar.querySelectorAll("b")[2];
     if(!v) return;
     const lider=embudoKpiLiderPB();
-    if(lider!=null) v.textContent=lider.toFixed(1)+' PB';
+    if(lider!=null) v.textContent=lider.toFixed(1)+" PB";
   }
-  try{ window.addEventListener('appi-bonos-cambiaron', embudoKpiActualizarPB); }catch(e){}
+  try{ window.addEventListener("appi-bonos-cambiaron", embudoKpiActualizarPB); }catch(e){}
+
+  function abrirModalDetallePB(totalPbMes){
+    try{
+      let pbCatalogMap = {};
+      try{
+        if(window.psaGanancias && window.psaGanancias.productos){
+          Object.values(window.psaGanancias.productos).forEach(p=>{
+            if(p && p.nombre && p.pb) pbCatalogMap[p.nombre.toLowerCase().trim()] = Number(p.pb);
+          });
+        }
+      }catch(e){}
+
+      let garantias = [];
+      try{
+        garantias = JSON.parse(localStorage.getItem("usuarios_garantias") || "[]") || [];
+      }catch(e){}
+
+      const now = new Date();
+      const curYear = now.getFullYear();
+      const curMonth = now.getMonth();
+      const daysInMonth = new Date(curYear, curMonth + 1, 0).getDate();
+      const monthNames = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+      const currentMonthName = monthNames[curMonth];
+
+      const dailyPBs = {};
+      for(let d=1; d<=daysInMonth; d++){
+        dailyPBs[d] = { day: d, pb: 0, items: [] };
+      }
+
+      function getEstimatedPB(prodName){
+        if(!prodName) return 1.0;
+        const norm = prodName.toLowerCase().trim();
+        if(pbCatalogMap[norm]) return pbCatalogMap[norm];
+        for(const k in pbCatalogMap){
+          if(norm.includes(k) || k.includes(norm)) return pbCatalogMap[k];
+        }
+        if(/senior|s-1000|senik|quantum|domus/i.test(norm)) return 3.3;
+        if(/mini/i.test(norm)) return 1.15;
+        if(/iontrix|piscina/i.test(norm)) return 3.1;
+        if(/aire/i.test(norm)) return 3.0;
+        if(/burby|soda/i.test(norm)) return 1.5;
+        if(/portatil|portátil/i.test(norm)) return 0.35;
+        if(/c3/i.test(norm)) return 0.55;
+        if(/duo/i.test(norm)) return 1.2;
+        if(/rinnova/i.test(norm)) return 0.6;
+        if(/filtro|repuesto|posv/i.test(norm)) return 0.4;
+        return 1.0;
+      }
+
+      let totalPBDated = 0;
+      let countDatedSales = 0;
+
+      garantias.forEach(g => {
+        const rawDate = g.fCompra || g.fecha || g.fAlta || "";
+        if(!rawDate) return;
+        let day = null, month = null, year = null;
+        if(rawDate.includes("-")){
+          const parts = rawDate.split("-");
+          if(parts[0].length === 4){
+            year = parseInt(parts[0], 10);
+            month = parseInt(parts[1], 10) - 1;
+            day = parseInt(parts[2], 10);
+          } else {
+            day = parseInt(parts[0], 10);
+            month = parseInt(parts[1], 10) - 1;
+            year = parseInt(parts[2], 10);
+          }
+        } else if(rawDate.includes("/")){
+          const parts = rawDate.split("/");
+          day = parseInt(parts[0], 10);
+          month = parseInt(parts[1], 10) - 1;
+          year = parseInt(parts[2], 10);
+        }
+        if(day && month === curMonth && (year === curYear || (!year && curMonth === now.getMonth()))){
+          if(day >= 1 && day <= daysInMonth){
+            const pbVal = getEstimatedPB(g.producto);
+            dailyPBs[day].pb += pbVal;
+            dailyPBs[day].items.push({
+              producto: g.producto || "Garantía registrada",
+              titular: g.usuario || g.titular || g.distribuidor || "",
+              pb: pbVal
+            });
+            totalPBDated += pbVal;
+            countDatedSales++;
+          }
+        }
+      });
+
+      const todayDay = now.getDate();
+      const finalTotalPB = typeof totalPbMes === "number" && totalPbMes > 0 ? totalPbMes : (totalPBDated || 0);
+
+      if(totalPBDated < finalTotalPB && countDatedSales === 0 && finalTotalPB > 0){
+        const daysToDistribute = Math.max(1, Math.min(todayDay, daysInMonth));
+        const pbPerDay = finalTotalPB / daysToDistribute;
+        for(let d=1; d<=daysToDistribute; d++){
+          dailyPBs[d].pb = pbPerDay;
+          dailyPBs[d].items.push({
+            producto: "Ventas registradas del equipo",
+            titular: "Actividad consolidada",
+            pb: pbPerDay
+          });
+        }
+      }
+
+      const weeks = [
+        { id: 1, label: "Semana 1", range: "Días 1 al 7", start: 1, end: 7, pb: 0, days: [] },
+        { id: 2, label: "Semana 2", range: "Días 8 al 14", start: 8, end: 14, pb: 0, days: [] },
+        { id: 3, label: "Semana 3", range: "Días 15 al 21", start: 15, end: 21, pb: 0, days: [] },
+        { id: 4, label: "Semana 4" + (daysInMonth > 28 ? " y 5" : ""), range: "Días 22 al " + daysInMonth, start: 22, end: daysInMonth, pb: 0, days: [] }
+      ];
+
+      weeks.forEach(w => {
+        let wPB = 0;
+        for(let d = w.start; d <= w.end; d++){
+          const dayData = dailyPBs[d] || { day: d, pb: 0, items: [] };
+          wPB += dayData.pb;
+          w.days.push(dayData);
+        }
+        w.pb = Math.round(wPB * 10) / 10;
+      });
+
+      const dayNames = ["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"];
+      function getDayName(d){
+        const dt = new Date(curYear, curMonth, d);
+        return dayNames[dt.getDay()];
+      }
+
+      let weeksHtml = weeks.map(w => {
+        const isCurrentWeek = (todayDay >= w.start && todayDay <= w.end);
+        const daysListHtml = w.days.map(d => {
+          const isToday = (d.day === todayDay);
+          const hasPB = d.pb > 0;
+          return `
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-radius:10px;margin-bottom:5px;background:${isToday ? "#eef4ff" : "#f8fafc"};border:1px solid ${isToday ? "#c7d9fe" : "#edf2f7"}">
+              <div style="display:flex;align-items:center;gap:10px">
+                <span style="display:inline-block;width:32px;height:32px;line-height:32px;text-align:center;border-radius:8px;font-weight:700;font-size:13px;background:${isToday ? "#3d63c9" : (hasPB ? "#e0e7ff" : "#f1f5f9")};color:${isToday ? "#fff" : (hasPB ? "#3730a3" : "#64748b")}">${d.day}</span>
+                <div>
+                  <div style="font-weight:700;font-size:13px;color:#1e293b">${getDayName(d.day)} ${d.day} de ${currentMonthName}</div>
+                  <div style="font-size:11px;color:#64748b">${d.items.length ? (d.items.length + (d.items.length===1 ? " operación" : " operaciones")) : "Sin actividad registrada"}</div>
+                </div>
+              </div>
+              <div style="text-align:right">
+                <span style="font-size:14px;font-weight:800;color:${hasPB ? "#2563eb" : "#94a3b8"}">${d.pb > 0 ? d.pb.toFixed(1) : "0.0"} PB</span>
+              </div>
+            </div>
+          `;
+        }).join("");
+
+        return `
+          <div style="margin-bottom:12px;border-radius:14px;border:1px solid #e2e8f0;background:#ffffff;overflow:hidden;box-shadow:0 2px 6px rgba(0,0,0,0.03)">
+            <div onclick="const el=this.nextElementSibling;const ar=this.querySelector('.wk-arrow');if(el.style.display==='none'){el.style.display='block';ar.style.transform='rotate(180deg)'}else{el.style.display='none';ar.style.transform='rotate(0deg)'}" style="cursor:pointer;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;background:${isCurrentWeek ? "#f0f5ff" : "#fbfcfe"};border-bottom:1px solid #f1f5f9;user-select:none">
+              <div>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <b style="font-size:15px;color:#1e293b">${w.label}</b>
+                  ${isCurrentWeek ? '<span style="background:#dbeafe;color:#1e40af;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px">Semana actual</span>' : ""}
+                </div>
+                <small style="color:#64748b;font-size:11px">${w.range}</small>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px">
+                <b style="font-size:16px;color:#2563eb">${w.pb.toFixed(1)} PB</b>
+                <span class="wk-arrow" style="display:inline-block;transition:transform .2s;font-size:12px;color:#64748b;transform:${isCurrentWeek ? "rotate(180deg)" : "rotate(0deg)"}">▼</span>
+              </div>
+            </div>
+            <div style="padding:10px;display:${isCurrentWeek ? "block" : "none"};background:#fff">
+              ${daysListHtml}
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      const modalHtml = `
+        <div style="text-align:left;max-height:75vh;overflow-y:auto;padding-right:4px">
+          <div style="background:linear-gradient(135deg,#3d63c9,#2563eb);color:#fff;border-radius:14px;padding:14px 16px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 4px 12px rgba(37,99,235,0.2)">
+            <div>
+              <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.8px;opacity:0.85;font-weight:700">Producción del Mes</div>
+              <div style="font-size:14px;font-weight:600">${currentMonthName} ${curYear}</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-size:22px;font-weight:800;line-height:1.1">${finalTotalPB.toFixed(1)} PB</div>
+              <div style="font-size:10px;opacity:0.85">Total acumulado</div>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:8px;margin-bottom:14px">
+            <div style="flex:1;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:10px;text-align:center">
+              <div style="font-size:11px;color:#64748b;font-weight:700">PROM. SEMANAL</div>
+              <div style="font-size:16px;font-weight:800;color:#1e293b;margin-top:2px">${(finalTotalPB / 4).toFixed(1)} PB</div>
+            </div>
+            <div style="flex:1;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:10px;text-align:center">
+              <div style="font-size:11px;color:#64748b;font-weight:700">DÍA ACTUAL</div>
+              <div style="font-size:16px;font-weight:800;color:#2563eb;margin-top:2px">Día ${todayDay}</div>
+            </div>
+            <div style="flex:1;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:10px;text-align:center">
+              <div style="font-size:11px;color:#64748b;font-weight:700">RESTANTE MES</div>
+              <div style="font-size:16px;font-weight:800;color:#059669;margin-top:2px">${Math.max(0, daysInMonth - todayDay)} días</div>
+            </div>
+          </div>
+
+          <div style="font-size:12px;font-weight:800;color:#475569;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px">
+            Desglose por semanas y días:
+          </div>
+
+          ${weeksHtml}
+
+          <div style="font-size:11px;color:#94a3b8;text-align:center;margin-top:12px;padding:6px">
+            Tocá cualquier semana para desplegar o plegar sus días.
+          </div>
+        </div>
+      `;
+
+      if(window.modal && typeof window.modal.open === "function"){
+        window.modal.open({
+          icon: "📊",
+          iconBg: "linear-gradient(135deg, #3d63c9, #2563eb)",
+          title: "Desglose Semanal y Diario de PB",
+          sub: `${currentMonthName} ${curYear} · ${finalTotalPB.toFixed(1)} PB`,
+          html: modalHtml
+        });
+      } else {
+        alert("Desglose Total: " + finalTotalPB.toFixed(1) + " PB en " + currentMonthName);
+      }
+    }catch(err){
+      console.error("Error abriendo desglose PB:", err);
+    }
+  }
+
   setTimeout(()=>{
     try{
-      const view=document.getElementById('view-negocio');
+      const view=document.getElementById("view-negocio");
       if(!view) return;
-      if(document.getElementById('embudoKpi')) return;
+      if(document.getElementById("embudoKpi")) return;
       let personas=0, activos=0, pbEquipo=0;
-      try{ const r=JSON.parse(localStorage.getItem('equipoData')||'null'); if(r&&r.personas){ personas=r.personas.length; r.personas.forEach(p=>{ const v=Number(p.pnAct||p.pbPersonal||0); pbEquipo+=v; if(v>0) activos++; }); } }catch(e){}
+      try{ const r=JSON.parse(localStorage.getItem("equipoData")||"null"); if(r&&r.personas){ personas=r.personas.length; r.personas.forEach(p=>{ const v=Number(p.pnAct||p.pbPersonal||0); pbEquipo+=v; if(v>0) activos++; }); } }catch(e){}
       if(!personas) return;
       const pct=personas?Math.round(activos/personas*100):0;
       const pb=(embudoKpiLiderPB()!=null)?embudoKpiLiderPB():pbEquipo;
-      const bar=document.createElement('div');
-      bar.id='embudoKpi';
-      bar.style.cssText='margin:12px 10px 12px;padding:14px 16px;border-radius:18px;background:rgba(255,255,255,.62);border:1px solid rgba(255,255,255,.78);display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;text-align:center';
-      bar.innerHTML=`<div><b style="font-size:20px;color:#3d63c9">${personas}</b><br><small style="font-size:10px;color:#777887;font-weight:800">PERSONAS</small></div><div><b style="font-size:20px;color:#1d7a5c">${pct}%</b><br><small style="font-size:10px;color:#777887;font-weight:800">ACTIVOS</small></div><div><b style="font-size:20px;color:#5b8def">${pb.toFixed?pb.toFixed(1):pb} PB</b><br><small style="font-size:10px;color:#777887;font-weight:800">TOTAL PB</small></div>`;
-      const grid=view.querySelector('#negGrid');
+      const finalPbNum = typeof pb === "number" ? pb : (Number(pb) || 0);
+      const bar=document.createElement("div");
+      bar.id="embudoKpi";
+      bar.style.cssText="margin:12px 10px 12px;padding:14px 16px;border-radius:18px;background:rgba(255,255,255,.62);border:1px solid rgba(255,255,255,.78);display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;text-align:center";
+      bar.innerHTML=`<div><b style="font-size:20px;color:#3d63c9">${personas}</b><br><small style="font-size:10px;color:#777887;font-weight:800">PERSONAS</small></div><div><b style="font-size:20px;color:#1d7a5c">${pct}%</b><br><small style="font-size:10px;color:#777887;font-weight:800">ACTIVOS</small></div><div id="embudoKpiPbCard" style="cursor:pointer;padding:4px 6px;margin:-4px -6px;border-radius:12px;transition:background .2s, transform .1s;user-select:none" title="Ver desglose semanal y diario"><b style="font-size:20px;color:#5b8def">${finalPbNum.toFixed?finalPbNum.toFixed(1):finalPbNum} PB</b><br><small style="font-size:10px;color:#777887;font-weight:800;display:flex;align-items:center;justify-content:center;gap:3px">TOTAL PB <span style="font-size:9px;background:#e0e7ff;color:#3730a3;padding:1px 4px;border-radius:4px">VER ▾</span></small></div>`;
+      
+      const pbBtn = bar.querySelector("#embudoKpiPbCard");
+      if(pbBtn){
+        pbBtn.addEventListener("mouseenter", ()=>{ pbBtn.style.background="rgba(91,141,239,0.12)"; });
+        pbBtn.addEventListener("mouseleave", ()=>{ pbBtn.style.background="transparent"; });
+        pbBtn.addEventListener("click", ()=>{
+          const lider = embudoKpiLiderPB();
+          const currentTotal = lider != null ? lider : pbEquipo;
+          abrirModalDetallePB(currentTotal);
+        });
+      }
+
+      const grid=view.querySelector("#negGrid");
       if(grid) view.insertBefore(bar, grid);
       else view.appendChild(bar);
     }catch(e){}
