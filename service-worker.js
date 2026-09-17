@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v844-negocio-pb';
+const CACHE_NAME = 'appi-v845-popup-bonos';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

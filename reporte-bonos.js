@@ -276,7 +276,7 @@
       '.bns-overlay{position:fixed;inset:0;z-index:999;display:none}' +
       '.bns-overlay.bns-open{display:block}' +
       '.bns-backdrop{position:absolute;inset:0;background:rgba(15,16,26,.5)}' +
-      '.bns-sheet{position:absolute;left:0;right:0;bottom:0;max-height:88vh;overflow-y:auto;background:#f3eee3;border-radius:22px 22px 0 0;padding:16px 14px calc(14px + env(safe-area-inset-bottom));box-shadow:0 -14px 44px rgba(0,0,0,.30)}' +
+      '.bns-sheet{position:absolute;left:12px;right:12px;bottom:12px;margin:0 auto;max-width:540px;max-height:86vh;overflow-y:auto;background:#f8f6f0;border-radius:24px;border:1px solid rgba(255,255,255,.8);padding:20px 18px calc(18px + env(safe-area-inset-bottom));box-shadow:0 16px 48px rgba(0,0,0,.35)}' +
       'body.dark .bns-sheet{background:#25273a}' +
       '.bns-cab{display:flex;align-items:center;justify-content:space-between;gap:8px}' +
       '.bns-titulo{font-size:15px;font-weight:900;color:#23263a;letter-spacing:-.2px}' +
