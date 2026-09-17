@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v845-popup-bonos';
+const CACHE_NAME = 'appi-v846-scroll-panel';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
