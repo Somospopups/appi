@@ -111,4 +111,53 @@ test.describe('Packs PSA en Lista de Precios', () => {
     await expect(sheetLine.locator('b')).toHaveText('PACK BÁSICO');
     await expect(sheetLine.locator('span')).toHaveText('$1.376.000');
   });
+
+  test('generación de PDF de Pack desglosa componentes en tabla sin precios y genera fichas individuales', async ({ page }) => {
+    await entrar(page);
+    await page.waitForSelector('#app', { state: 'attached' });
+
+    await page.evaluate(() => {
+      localStorage.setItem('appi_lista_carro_v1', JSON.stringify({ 'PACK-BASICO': 1 }));
+      if (typeof window.abrirListaPrecios === 'function') {
+        window.abrirListaPrecios();
+      }
+    });
+
+    const fabBadge = page.locator('#lpFabBadge');
+    await expect(fabBadge).toHaveText('1');
+
+    await page.locator('#lpFab').click();
+    await expect(page.locator('#lpSheet')).toBeVisible();
+
+    await page.evaluate(() => {
+      window._pdfResult = null;
+      window.navigator.canShare = null;
+      if (!window.APPIDialog) window.APPIDialog = {};
+      window.APPIDialog.prompt = function() { return Promise.resolve('Cliente Test'); };
+
+      const Orig = window.jspdf.jsPDF;
+      window.jspdf.jsPDF = function(...args) {
+        const inst = new Orig(...args);
+        const origSave = inst.save.bind(inst);
+        inst.save = function(name) {
+          window._pdfResult = {
+            totalPages: inst.internal.getNumberOfPages(),
+            name: name
+          };
+          return origSave(name);
+        };
+        return inst;
+      };
+    });
+
+    await page.locator('#lpSheetPdf').click();
+
+    await page.waitForFunction(() => !!window._pdfResult, { timeout: 15000 });
+    const res = await page.evaluate(() => window._pdfResult);
+
+    expect(res).toBeDefined();
+    // PACK BÁSICO tiene 3 componentes: Senior 4, 1-P Portatil, Ducha Rinnova.
+    // Con la página 1 de presupuesto + 3 páginas de fichas individuales = 4 páginas.
+    expect(res.totalPages).toBe(4);
+  });
 });

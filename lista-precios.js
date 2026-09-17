@@ -910,8 +910,26 @@
         fotoRaw = (fo && (fo.preview || fo.img)) || '';
       } catch (e2) { fotoRaw = ''; }
     }
+    var prodMap = {};
+    productos().forEach(function (p) { if (p && p.sku) prodMap[p.sku] = p; });
+
+    var fichasProd = [];
+    r.lineas.forEach(function (ln) {
+      var p = ln.p;
+      if (p.grupo === "packs" && Array.isArray(p.items_skus) && p.items_skus.length > 0) {
+        p.items_skus.forEach(function (sku) {
+          var subP = prodMap[sku];
+          if (subP) {
+            fichasProd.push({ p: subP, q: ln.q, packPadre: p });
+          }
+        });
+      } else {
+        fichasProd.push({ p: p, q: ln.q, packPadre: null });
+      }
+    });
+
     Promise.all([
-      Promise.all(r.lineas.map(function (ln) { return loadFoto(ln.p); })),
+      Promise.all(fichasProd.map(function (fp) { return loadFoto(fp.p); })),
       loadFotoCirculo(fotoRaw)
     ]).then(function (pack) {
     var fotos = pack[0];
@@ -1024,7 +1042,44 @@
       pdf.text('Subtotal', W - m - 3, y + 6, { align: 'right' });
       y += 9;
       var yTable = y;
-      r.lineas.forEach(function (ln, i) {
+      var filasTabla = [];
+      r.lineas.forEach(function (ln) {
+        var p = ln.p;
+        if (p.grupo === "packs" && Array.isArray(p.items_skus) && p.items_skus.length > 0) {
+          filasTabla.push({
+            nom: sinMarca(p.nombre) || p.nombre || "",
+            cant: String(ln.q),
+            unit: money(p.precio),
+            subt: money(ln.q * p.precio),
+            esSub: false,
+            esPack: true
+          });
+          p.items_skus.forEach(function (sku) {
+            var subP = prodMap[sku];
+            if (subP) {
+              filasTabla.push({
+                nom: "  • " + (sinMarca(subP.nombre) || subP.nombre || ""),
+                cant: String(ln.q),
+                unit: "",
+                subt: "",
+                esSub: true,
+                esPack: false
+              });
+            }
+          });
+        } else {
+          filasTabla.push({
+            nom: sinMarca(p.nombre) || p.nombre || "",
+            cant: String(ln.q),
+            unit: money(p.precio),
+            subt: money(ln.q * p.precio),
+            esSub: false,
+            esPack: false
+          });
+        }
+      });
+
+      filasTabla.forEach(function (row, i) {
         if (y > H - 56) {
           pdf.setDrawColor.apply(pdf, azul);
           pdf.setLineWidth(0.35);
@@ -1050,15 +1105,34 @@
           pdf.setFillColor(252, 249, 242);
           pdf.rect(m, y, usable, rowH, 'F');
         }
-        pdf.setFont('helvetica', 'normal');
-        pdf.setFontSize(8.5);
-        pdf.setTextColor.apply(pdf, oscuro);
-        var nom = pdf.splitTextToSize(sinMarca(ln.p.nombre) || ln.p.nombre || '', xCant - m - 6);
+        if (row.esSub) {
+          pdf.setFont('helvetica', 'italic');
+          pdf.setFontSize(8);
+          pdf.setTextColor.apply(pdf, gris);
+        } else if (row.esPack) {
+          pdf.setFont('helvetica', 'bold');
+          pdf.setFontSize(8.5);
+          pdf.setTextColor.apply(pdf, azul);
+        } else {
+          pdf.setFont('helvetica', 'normal');
+          pdf.setFontSize(8.5);
+          pdf.setTextColor.apply(pdf, oscuro);
+        }
+        var nom = pdf.splitTextToSize(row.nom, xCant - m - 6);
         pdf.text(nom[0] || '', m + 3, y + 6);
-        pdf.text(String(ln.q), xCant + 8, y + 6);
-        pdf.text(money(ln.p.precio), xPre, y + 6);
-        pdf.setFont('helvetica', 'bold');
-        pdf.text(money(ln.q * ln.p.precio), W - m - 3, y + 6, { align: 'right' });
+        if (row.cant) {
+          pdf.text(row.cant, xCant + 8, y + 6);
+        }
+        if (row.unit) {
+          pdf.setFont('helvetica', 'normal');
+          pdf.setTextColor.apply(pdf, oscuro);
+          pdf.text(row.unit, xPre, y + 6);
+        }
+        if (row.subt) {
+          pdf.setFont('helvetica', 'bold');
+          pdf.setTextColor.apply(pdf, oscuro);
+          pdf.text(row.subt, W - m - 3, y + 6, { align: 'right' });
+        }
         y += rowH;
       });
       pdf.setDrawColor.apply(pdf, azul);
@@ -1280,10 +1354,11 @@
         return nuevaFicha();
       }
 
-      r.lineas.forEach(function (ln, ix) {
+      fichasProd.forEach(function (itemFicha, ix) {
         var yy = nuevaFicha();
-        var p = ln.p;
+        var p = itemFicha.p;
         var foto = fotos[ix] || '';
+        var packPadre = itemFicha.packPadre;
         var imgW = 36;
         var c = cmpDe(p, ln.q);
         var keys = trataDe(p);
@@ -1312,11 +1387,17 @@
         pdf.setFont('helvetica', 'normal');
         pdf.setFontSize(8);
         pdf.setTextColor.apply(pdf, gris);
-        pdf.text('SKU ' + (p.sku || ''), tx, yTit + 3);
-        pdf.setTextColor.apply(pdf, oscuro);
-        pdf.setFont('helvetica', 'bold');
-        pdf.setFontSize(10);
-        pdf.text(ln.q + ' × ' + money(p.precio) + '   ·   ' + money(ln.q * p.precio), tx, yTit + 10);
+        var subTxtSku = 'SKU ' + (p.sku || '');
+        if (packPadre) {
+          subTxtSku += '   ·   Incluido en ' + (sinMarca(packPadre.nombre) || packPadre.nombre || 'Pack');
+        }
+        pdf.text(subTxtSku, tx, yTit + 3);
+        if (!packPadre) {
+          pdf.setTextColor.apply(pdf, oscuro);
+          pdf.setFont('helvetica', 'bold');
+          pdf.setFontSize(10);
+          pdf.text(itemFicha.q + ' × ' + money(p.precio) + '   ·   ' + money(itemFicha.q * p.precio), tx, yTit + 10);
+        }
         if (c && c.litroEq) {
           pdf.setFont('helvetica', 'normal');
           pdf.setFontSize(7.5);

@@ -12,7 +12,12 @@
       "plan_canje": null,
       "seccion": "Packs PSA",
       "foto": "catalogo-img/packs/pack_basico.png",
-      "composicion": "Senior4 + Portátil + Rinnova Ducha + Regalo: Botella Neo Aqua 1000cc + Botella Neo Aqua 600cc + Botella de Vidrio"
+      "composicion": "Senior4 + Portátil + Rinnova Ducha + Regalo: Botella Neo Aqua 1000cc + Botella Neo Aqua 600cc + Botella de Vidrio",
+      "items_skus": [
+        "611010510",
+        "611020010",
+        "611100240"
+      ]
     },
     {
       "sku": "PACK-BELLEZA",
@@ -24,7 +29,12 @@
       "plan_canje": null,
       "seccion": "Packs PSA",
       "foto": "catalogo-img/packs/pack_belleza.png",
-      "composicion": "Senior4 + Rinnova Ducha + C3 Grigio + Regalo: Botella Neo Aqua 1000cc + Botella Neo Aqua 600cc"
+      "composicion": "Senior4 + Rinnova Ducha + C3 Grigio + Regalo: Botella Neo Aqua 1000cc + Botella Neo Aqua 600cc",
+      "items_skus": [
+        "611010510",
+        "611100240",
+        "611030430"
+      ]
     },
     {
       "sku": "PACK-ALTO-RENDIMIENTO",
@@ -36,7 +46,12 @@
       "plan_canje": null,
       "seccion": "Packs PSA",
       "foto": "catalogo-img/packs/pack_alto.png",
-      "composicion": "S-1000 II + Rinnova Ducha + C3 Grigio + Regalo: Botella Neo Aqua 1000cc + Botella Neo Aqua 600cc"
+      "composicion": "S-1000 II + Rinnova Ducha + C3 Grigio + Regalo: Botella Neo Aqua 1000cc + Botella Neo Aqua 600cc",
+      "items_skus": [
+        "611120220",
+        "611100240",
+        "611030430"
+      ]
     },
     {
       "sku": "PACK-ALTO-RENDIMIENTO-NERO",
@@ -48,7 +63,12 @@
       "plan_canje": null,
       "seccion": "Packs PSA",
       "foto": "catalogo-img/packs/pack_alto_nero.png",
-      "composicion": "S-1000 II Black + Rinnova Ducha Black + C3 Grigio + Regalo: Botella Neo Aqua 1000cc + Botella Neo Aqua 600cc"
+      "composicion": "S-1000 II Black + Rinnova Ducha Black + C3 Grigio + Regalo: Botella Neo Aqua 1000cc + Botella Neo Aqua 600cc",
+      "items_skus": [
+        "611120210",
+        "611100320",
+        "611030430"
+      ]
     },
     {
       "sku": "PACK-SENIK",
@@ -60,7 +80,12 @@
       "plan_canje": null,
       "seccion": "Packs PSA",
       "foto": "catalogo-img/packs/pack_senik.png",
-      "composicion": "Senik + Portátil + Rinnova Ducha + Regalo: Botella Neo Aqua 1000cc + Botella Neo Aqua 600cc"
+      "composicion": "Senik + Portátil + Rinnova Ducha + Regalo: Botella Neo Aqua 1000cc + Botella Neo Aqua 600cc",
+      "items_skus": [
+        "611030560",
+        "611020010",
+        "611100240"
+      ]
     },
     {
       "sku": "PACK-DUREZA",
@@ -72,7 +97,12 @@
       "plan_canje": null,
       "seccion": "Packs PSA",
       "foto": "catalogo-img/packs/pack_dureza.png",
-      "composicion": "Quantum + Poli 2 + Rinnova Ducha + Regalo: Botella Neo Aqua 1000cc + Botella Neo Aqua 600cc + Botella de Vidrio"
+      "composicion": "Quantum + Poli 2 + Rinnova Ducha + Regalo: Botella Neo Aqua 1000cc + Botella Neo Aqua 600cc + Botella de Vidrio",
+      "items_skus": [
+        "611030610",
+        "612280190",
+        "611100240"
+      ]
     },
     {
       "sku": "PACK-BURBUJAS",
@@ -84,7 +114,14 @@
       "plan_canje": null,
       "seccion": "Packs PSA",
       "foto": "catalogo-img/packs/pack_burbujas.png",
-      "composicion": "Senior4 + SodaBurby + Poli 2 + Portátil + Rinnova Ducha + Regalo: Botella Neo Aqua 1000cc + Botella Neo Aqua 600cc + Botella de Vidrio"
+      "composicion": "Senior4 + SodaBurby + Poli 2 + Portátil + Rinnova Ducha + Regalo: Botella Neo Aqua 1000cc + Botella Neo Aqua 600cc + Botella de Vidrio",
+      "items_skus": [
+        "611010510",
+        "617110040",
+        "612280190",
+        "611020010",
+        "611100240"
+      ]
     },
     {
       "sku": "PACK-INTEGRAL",
@@ -96,7 +133,12 @@
       "plan_canje": null,
       "seccion": "Packs PSA",
       "foto": "catalogo-img/packs/pack_integral.png",
-      "composicion": "ROPOT + Portátil + Rinnova Ducha + Regalo: Botella Neo Aqua 1000cc + Botella Neo Aqua 600cc"
+      "composicion": "ROPOT + Portátil + Rinnova Ducha + Regalo: Botella Neo Aqua 1000cc + Botella Neo Aqua 600cc",
+      "items_skus": [
+        "611310070",
+        "611020010",
+        "611100240"
+      ]
     },
     {
       "sku": "PACK-PISCINA",
@@ -108,7 +150,14 @@
       "plan_canje": null,
       "seccion": "Packs PSA",
       "foto": "catalogo-img/packs/pack_piscina.png",
-      "composicion": "Iontrix 3 + Senior4 + Poli 2 + Portátil + Rinnova Ducha + Regalo: Botella Neo Aqua 1000cc + Botella Neo Aqua 600cc"
+      "composicion": "Iontrix 3 + Senior4 + Poli 2 + Portátil + Rinnova Ducha + Regalo: Botella Neo Aqua 1000cc + Botella Neo Aqua 600cc",
+      "items_skus": [
+        "611290050",
+        "611010510",
+        "612280190",
+        "611020010",
+        "611100240"
+      ]
     },
     {
       "sku": "SUPER-PACK",
@@ -120,7 +169,15 @@
       "plan_canje": null,
       "seccion": "Packs PSA",
       "foto": "catalogo-img/packs/pack_superpack.png",
-      "composicion": "Purificador de Aire + Senior4 + SodaBurby + Poli 2 + Portátil + Rinnova Ducha + Regalo: Botella Neo Aqua 1000cc + Botella Neo Aqua 600cc + Botella de Vidrio"
+      "composicion": "Purificador de Aire + Senior4 + SodaBurby + Poli 2 + Portátil + Rinnova Ducha + Regalo: Botella Neo Aqua 1000cc + Botella Neo Aqua 600cc + Botella de Vidrio",
+      "items_skus": [
+        "611012500",
+        "611010510",
+        "617110040",
+        "612280190",
+        "611020010",
+        "611100240"
+      ]
     },
     {
       "sku": "PACK-INTEGRAL-PLUS",
@@ -132,7 +189,15 @@
       "plan_canje": null,
       "seccion": "Packs PSA",
       "foto": "catalogo-img/packs/pack_integral_plus.png",
-      "composicion": "ROPOT + Purificador de Aire + SodaBurby + Poli 2 + Portátil + Rinnova Ducha + Regalo: 2 Botellas Neo Aqua 1000cc + 3 Botellas Neo Aqua 600cc + Botella de Vidrio"
+      "composicion": "ROPOT + Purificador de Aire + SodaBurby + Poli 2 + Portátil + Rinnova Ducha + Regalo: 2 Botellas Neo Aqua 1000cc + 3 Botellas Neo Aqua 600cc + Botella de Vidrio",
+      "items_skus": [
+        "611310070",
+        "611012500",
+        "617110040",
+        "612280190",
+        "611020010",
+        "611100240"
+      ]
     },
     {
       "sku": "626030750",
