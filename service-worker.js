@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v829-ci-verde';
+const CACHE_NAME = 'appi-v830-ios-panel';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

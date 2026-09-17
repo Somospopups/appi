@@ -1,6 +1,41 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+<script>
+/* v830 · Red de seguridad de errores: ningún fallo queda en pantalla
+   blanca en silencio. Se guarda un anillo en localStorage (para
+   diagnosticar a distancia) y se muestra una barra visible con el error. */
+(function(){
+  function esc(t){return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+  function reportar(msg, extra){
+    try{
+      msg=String(msg||'').trim();
+      if(!msg||msg.indexOf('ResizeObserver')>=0||msg.indexOf('Autoplay')>=0)return;
+      try{
+        var ring=JSON.parse(localStorage.getItem('appi_err_v1')||'[]');
+        if(!Array.isArray(ring))ring=[];
+        ring.push({at:new Date().toISOString(),msg:msg.slice(0,300),extra:extra||''});
+        localStorage.setItem('appi_err_v1',JSON.stringify(ring.slice(-25)));
+      }catch(e){}
+      if(document.getElementById('appiErrBar')||!document.body)return;
+      var bar=document.createElement('div');
+      bar.id='appiErrBar';
+      bar.style='position:fixed;left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:2147483647;background:#7f1d1d;color:#fff;border-radius:14px;padding:10px 12px;font:700 12px/1.4 -apple-system,system-ui,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.35);display:flex;gap:10px;align-items:center';
+      bar.innerHTML='<span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+esc(msg)+'">⚠️ '+esc(msg.slice(0,140))+'</span><button type="button" style="flex:none;border:0;border-radius:10px;padding:8px 12px;font:900 11px/1 -apple-system,system-ui,sans-serif;background:#fff;color:#7f1d1d;cursor:pointer">Recargar</button>';
+      bar.querySelector('button').onclick=function(){try{localStorage.removeItem('appi_err_v1')}catch(e){}location.reload()};
+      document.body.appendChild(bar);
+    }catch(e){}
+  }
+  window.addEventListener('error',function(e){
+    if(e.target&&e.target!==window&&e.target!==document)return; // recursos: sin barra
+    reportar(e.message||'Error de script', (e.filename||'')+':'+(e.lineno||0));
+  });
+  window.addEventListener('unhandledrejection',function(e){
+    var r=e.reason;
+    reportar((r&&(r.message||r.description))||String(r).slice(0,200),'promesa');
+  });
+})();
+</script>
 <script>window._pendingFile=null; window.cargarArchivoU = function(f){ console.log('cargarArchivoU early stub, queuing'); window._pendingFile=f; if(window._pendingFile) setTimeout(()=>{ if(window.cargarArchivoUReal && window._pendingFile){ const file=window._pendingFile; window._pendingFile=null; window.cargarArchivoUReal(file); } }, 800); };</script>
 <script>
 window.openHistorico=function(){
@@ -106,7 +141,7 @@ window.openStock=function(){
 <script src="./whatsapp-app.js"></script>
 <script src="./auth-client.js?v=441"></script>
 <script src="./prueba-banner.js"></script>
-<script src="./data-sync.js?v=829"></script>
+<script src="./data-sync.js?v=830"></script>
 <script src="./js/membership-admin.js?v=451"></script>
 <script src="./admin-panel.js?v=777"></script>
 <script src="./js/compromiso-pago.js?v=777"></script>
@@ -132,7 +167,7 @@ window.openStock=function(){
 <script src="./porque-vivo.js"></script>
 <script src="./home-limpio.js?v=521"></script>
 <script src="./reporte-bonos.js?v=4"></script>
-  <script src="./home-tarjetas.js?v=829"></script>
+  <script src="./home-tarjetas.js?v=830"></script>
   <script src="./appi-eventos.js?v=726"></script>
   <script src="./tu-mes.js?v=732"></script>
   <script src="./device-bridge.js?v=523"></script>
@@ -4591,7 +4626,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v829 · Segura</div>
+  <div class="ds-foot">APPI · v830 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -13420,8 +13455,8 @@ function cerrarToolsMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='829';
-      const CACHE_NAME='appi-v829-ci-verde';
+      const swVersion='830';
+      const CACHE_NAME='appi-v830-ios-panel';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · v'+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}

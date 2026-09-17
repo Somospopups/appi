@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "829.0.0",
-  "cacheName": "appi-v829-ci-verde",
+  "version": "830.0.0",
+  "cacheName": "appi-v830-ios-panel",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

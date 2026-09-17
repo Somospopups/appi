@@ -850,6 +850,8 @@
       '.ap-select-all{display:inline-flex;align-items:center;gap:7px;cursor:pointer}',
       '.ap-select-all input{width:15px;height:15px;cursor:pointer;accent-color:#5b8def}',
       '.ap-count-tag{font-size:12px;color:#8a8a98;font-weight:700}',
+      '.ap-mostrar-mas{display:block;width:100%;margin:12px 0 4px;padding:12px 14px;border:0;border-radius:12px;background:#eef2ff;color:#5b8def;font:800 13px/1 -apple-system,system-ui,sans-serif;cursor:pointer;box-shadow:0 4px 14px rgba(91,141,239,.18)}',
+      'body.dark .ap-mostrar-mas{background:#1c2340;color:#8fb0ff}',
       '.ap-elegir{flex:0 0 auto;min-height:0;padding:6px 10px;border:0;border-radius:999px;background:rgba(91,141,239,.10);color:#3d63c9;font:inherit;font-size:12px;font-weight:850;cursor:pointer;white-space:nowrap}',
       '.ap-elegir.activa{background:linear-gradient(135deg,#0b5878,#3ad0a4);color:#fff}',
       'body.dark .ap-elegir{background:rgba(91,141,239,.18);color:#a8c0ff}',
@@ -959,6 +961,10 @@
     '</div>';
   }
 
+  // Render limitado por tanda: agendas grandes (miles de contactos del
+  // teléfono) armaban un DOM gigante que en iOS dejaba la pantalla blanca.
+  var AP_POR_TANDA = 150, apMostrarHasta = 150;
+
   function html(){
     css();
     cargar();
@@ -1007,9 +1013,11 @@
     } else if (!listado.length){
       salida += '<div class="ap-vacio"><span class="ico">🔍</span>No hay contactos que coincidan con la búsqueda.</div>';
     } else {
+      var visiblesLista = listado.slice(0, apMostrarHasta);
+      var quedanLista = listado.length - visiblesLista.length;
       var grupos = '';
       var letraAnt = '';
-      listado.forEach(function(c){
+      visiblesLista.forEach(function(c){
         var L = letraDe(c.nombre);
         if (L !== letraAnt){
           grupos += '<div class="ap-letra">' + L + '</div>';
@@ -1018,6 +1026,9 @@
         grupos += filaHTML(c);
       });
       salida += '<div id="apLista"' + (modoSeleccion ? ' class="ap-modo"' : '') + '>' + grupos + '</div>';
+      if (quedanLista > 0){
+        salida += '<button type="button" id="apMostrarMas" class="ap-mostrar-mas">Mostrar ' + Math.min(AP_POR_TANDA, quedanLista) + ' más de ' + quedanLista + '</button>';
+      }
       salida += bulkBarHTML();
     }
     return salida;
@@ -1101,10 +1112,19 @@
     if (buscar){
       buscar.oninput = function(e){
         busqueda = e.target.value;
+        apMostrarHasta = AP_POR_TANDA;
         var pos = e.target.selectionStart;
         repintarSiVisible();
         var nuevo = $('apBuscar');
         if (nuevo){ nuevo.focus(); try{ nuevo.setSelectionRange(pos, pos); }catch(err){} }
+      };
+    }
+
+    var mostrarMas = $('apMostrarMas');
+    if (mostrarMas){
+      mostrarMas.onclick = function(){
+        apMostrarHasta = (Number(apMostrarHasta) || AP_POR_TANDA) + AP_POR_TANDA;
+        repintarSiVisible();
       };
     }
 
