@@ -344,12 +344,13 @@
       '.tm-dia.amarillo .no{background:rgba(0,0,0,.11);color:#1d1d2c}',
       '.tm-dia.verde .no,.tm-dia.rojo .no{background:rgba(255,255,255,.20);color:#fff}',
       '.tm-dia .n{font-size:10px;letter-spacing:.06em;text-transform:uppercase;opacity:.85}',
-      '.tm-dia .ok{margin-top:auto;display:grid;place-items:center;font-size:clamp(9px,2.6vw,14px);font-weight:950;line-height:1.05;letter-spacing:-.2px;text-align:center;padding:5px 2px 1px;word-break:break-word}',
-      '.tm-dia .no{display:grid;place-items:center;font-size:clamp(9px,2.6vw,14px);font-weight:950;line-height:1.05;opacity:1;max-height:4.2em;overflow:hidden;text-align:center;margin-top:3px;padding:5px 3px 6px;border-radius:9px;background:rgba(255,255,255,.22);min-height:36px;word-break:break-word}',
-            '@media(max-width:700px){.tm-dia{aspect-ratio:3/3.6;padding:7px 4px 6px}.tm-dia .n{font-size:9px}.tm-dia .ok{font-size:clamp(8.5px,2.4vw,11px);padding:3px 1px 1px}.tm-dia .no{font-size:clamp(8.5px,2.4vw,11px);min-height:30px;padding:4px 3px;margin-top:2px}}',
-      '@media(max-width:400px){.tm-dia .ok{font-size:8.5px}.tm-dia .no{font-size:8.5px;min-height:28px}.tm-dia{gap:2px;padding:5px 3px}}',
-      '.tm-dia .m{margin-top:auto;font-size:9.5px;opacity:.8}',
-            '@media(min-width:1024px){.tm-dia{padding:10px 8px 10px}.tm-dia .ok{font-size:19px}.tm-dia .no{font-size:13px;min-height:44px}}',
+      '.tm-dia .tm-score{margin-top:auto;display:flex;align-items:baseline;justify-content:center;gap:2px;padding:4px 0 2px}',
+      '.tm-dia .ok{font-size:18px;font-weight:950;line-height:1;letter-spacing:-.5px}',
+      '.tm-dia .tot{font-size:11px;font-weight:800;opacity:.78;line-height:1}',
+      '@media(max-width:700px){.tm-dia{aspect-ratio:3/3.2;padding:6px 4px 5px}.tm-dia .n{font-size:9px}.tm-dia .ok{font-size:15px}.tm-dia .tot{font-size:10px}}',
+      '@media(max-width:400px){.tm-dia{padding:5px 3px 4px}.tm-dia .ok{font-size:14px}.tm-dia .tot{font-size:9.5px}}',
+      '.tm-dia .m{margin-top:auto;font-size:9px;opacity:.8;text-align:center;line-height:1.15;padding-bottom:2px}',
+      '@media(min-width:1024px){.tm-dia{padding:8px 6px}.tm-dia .ok{font-size:20px}.tm-dia .tot{font-size:12px}}',
       '.tm-dia .tm-dot{width:6px;height:6px;border-radius:50%;display:inline-block;margin-left:4px;vertical-align:middle;background:rgba(11,88,120,.22)}',
       '.tm-dia.con-evento .tm-dot{background:#0b5878}',
       'body.dark .tm-dia.con-evento .tm-dot{background:#8ec8e0}',
@@ -731,8 +732,7 @@
       var marca = esHoyCel ? 'Hoy ' + i : String(i);
       var mini = '';
       if (tDia){
-        var falta = Math.max(0, tDia - hDia);
-        mini = '<span class="ok">' + hDia + ' REALIZADAS</span><span class="no">' + falta + ' FALTAN</span>';
+        mini = '<div class="tm-score"><span class="ok">' + hDia + '</span><span class="tot">/' + tDia + '</span></div>';
       } else if (futuro){
         mini = '<span class="m">sin abrir</span>';
       } else {

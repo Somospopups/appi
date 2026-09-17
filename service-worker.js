@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v841-que-trata-completo';
+const CACHE_NAME = 'appi-v842-tumes-score';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
