@@ -65,13 +65,14 @@
   var busca = '';
   var GRUPOS = [
     { id: 'todos', t: 'Todos' },
+    { id: 'packs', t: 'Packs PSA' },
     { id: 'equipos', t: 'Equipos' },
     { id: 'recargas', t: 'Recargas' },
     { id: 'griferia', t: 'Grifería' },
     { id: 'botellas', t: 'Botellas' },
     { id: 'otros', t: 'Otros' }
   ];
-  var GRUPO_TIT = { equipos: 'Equipos', recargas: 'Recargas y adaptadores', griferia: 'Grifería', botellas: 'Botellas y mates', otros: 'Otros' };
+  var GRUPO_TIT = { packs: 'Packs PSA', equipos: 'Equipos', recargas: 'Recargas y adaptadores', griferia: 'Grifería', botellas: 'Botellas y mates', otros: 'Otros' };
 
   function $(id) { return document.getElementById(id); }
   function esc(s) {
@@ -129,7 +130,17 @@
   function lineasLista() {
     var out = [];
     productos().forEach(function (p) {
-      out.push({ clave: claveSku(p), sku: p.sku || '', nombre: p.nombre, precio: p.precio, foto: p.foto, grupo: p.grupo, seccion: p.seccion });
+      out.push({
+        clave: claveSku(p),
+        sku: p.sku || '',
+        nombre: p.nombre,
+        precio: p.precio,
+        foto: p.foto,
+        grupo: p.grupo,
+        seccion: p.seccion,
+        composicion: p.composicion || '',
+        url: p.url || ''
+      });
       if (p.plan_canje) out.push(lineaCanje(p));
     });
     return out;
@@ -228,6 +239,9 @@
       '.lp-item-txt b{display:block;font-size:13px;font-weight:900;color:#2a2a32;line-height:1.25}' +
       '.lp-item-txt span{display:block;margin-top:2px;font-size:11px;font-weight:750;color:#686977}' +
       '.lp-item-txt em{display:block;margin-top:2px;font-size:13px;font-weight:950;color:#0b5878;font-style:normal}' +
+      '.lp-item-pack-desc{display:block;margin-top:3px;font-size:10.5px;font-weight:700;color:#496677;line-height:1.3}' +
+      'body.dark .lp-item-pack-desc{color:#8ea6b8}' +
+      '.lp-item-is-pack{border-left:3px solid #1493a8;background:rgba(20,147,168,0.05)}' +
       '.lp-qty{display:flex;align-items:center;gap:6px;flex-shrink:0}' +
       '.lp-qty button{width:32px;height:32px;border:0;border-radius:10px;background:#0b5878;color:#fff;font:inherit;font-size:18px;font-weight:900;line-height:1;cursor:pointer}' +
       '.lp-qty button.ghost{background:rgba(11,88,120,.12);color:#0b5878}' +
@@ -406,9 +420,14 @@
           (esCanje ? '<span class="lp-badge-canje" title="Plan Canje">🔄</span>' : '') +
           '</div>';
       }
-      html += '<div class="lp-item' + (esCanje ? ' lp-canje' : '') + '" data-sku="' + esc(L.clave) + '">' +
+      var descHtml = '';
+      if (L.composicion) {
+        descHtml = '<span class="lp-item-pack-desc">📦 ' + esc(L.composicion) + '</span>';
+      }
+      var subTxt = (L.sku ? 'SKU ' + esc(L.sku) : esc(L.seccion || 'Lista con acuerdo')) + (esCanje ? ' · Plan canje' : '');
+      html += '<div class="lp-item' + (esCanje ? ' lp-canje' : '') + (L.grupo === 'packs' ? ' lp-item-is-pack' : '') + '" data-sku="' + esc(L.clave) + '">' +
         fotoHtml +
-        '<div class="lp-item-txt"><b>' + esc(L.nombre) + '</b><span>' + (L.sku ? 'SKU ' + esc(L.sku) : esc(L.seccion || 'Lista con acuerdo')) + (esCanje ? ' · Plan canje' : '') + '</span><em>' + money(L.precio) + '</em></div>' +
+        '<div class="lp-item-txt"><b>' + esc(L.nombre) + '</b><span>' + subTxt + '</span>' + descHtml + '<em>' + money(L.precio) + '</em></div>' +
         '<div class="lp-qty">' +
           (q ? '<button type="button" class="ghost" data-act="menos" aria-label="Quitar">−</button><i>' + q + '</i>' : '') +
           '<button type="button" data-act="mas" aria-label="Agregar">+</button>' +
@@ -1322,12 +1341,12 @@
         pdf.setTextColor.apply(pdf, azul);
         pdf.setFont('helvetica', 'bold');
         pdf.setFontSize(8);
-        pdf.text('Para qué sirve', m, yy);
+        pdf.text(p.grupo === 'packs' ? 'Qué incluye este Pack' : 'Para qué sirve', m, yy);
         yy += 4.5;
         pdf.setFont('helvetica', 'normal');
         pdf.setTextColor.apply(pdf, oscuro);
         pdf.setFontSize(8);
-        var cuerpo = sinMarca(p.desc || p.para || 'Sin descripción cargada.').replace(/\n+/g, ' ');
+        var cuerpo = p.composicion ? ('Incluye: ' + p.composicion) : sinMarca(p.desc || p.para || 'Sin descripción cargada.').replace(/\n+/g, ' ');
         var lineasTxt = pdf.splitTextToSize(cuerpo, usable);
         if (lineasTxt.length > 2) lineasTxt = lineasTxt.slice(0, 2);
         pdf.text(lineasTxt, m, yy);
@@ -1503,10 +1522,22 @@
       if(supaPlanJ && (supaPlanJ.cuotas || supaPlanJ.bancos)) planElegido = supaPlanJ;
       else if(filePlan && (filePlan.cuotas || filePlan.bancos)) planElegido = filePlan;
       if (catElegido) {
-        // Las fotos viven en el repo de la app (catalogo-img/). Si el catálogo
-        // de Supabase es el elegido y no lleva la foto, se recupera por SKU
-        // desde el catálogo local: la foto nunca queda atrás por la copia.
+        // Asegurar que los packs del catálogo local siempre estén presentes
+        // incluso si catElegido proviene del storage de Supabase (que aún no tiene los packs sincronizados).
         if (fileCat && fileCat.productos && catElegido !== fileCat) {
+          var packsLocales = fileCat.productos.filter(function (p) { return p && p.grupo === 'packs'; });
+          var skusExistentes = {};
+          catElegido.productos.forEach(function (p) { if (p && p.sku) skusExistentes[p.sku] = true; });
+          packsLocales.forEach(function (pk) {
+            if (!skusExistentes[pk.sku]) {
+              catElegido.productos.unshift(pk);
+              skusExistentes[pk.sku] = true;
+            }
+          });
+
+          // Las fotos viven en el repo de la app (catalogo-img/). Si el catálogo
+          // de Supabase es el elegido y no lleva la foto, se recupera por SKU
+          // desde el catálogo local: la foto nunca queda atrás por la copia.
           var fotoPorSku = {}, skuPorNombre = {}, fotoPorNombre = {};
           fileCat.productos.forEach(function (p) {
             if (p && p.foto) {

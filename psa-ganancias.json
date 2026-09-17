@@ -4717,6 +4717,149 @@
       },
       "publico_canje": 266400.0,
       "costos_canje": null
+    },
+    "n:pack básico": {
+      "nombre": "PACK BÁSICO",
+      "pb": 1.97,
+      "publico": 1376000.0,
+      "costos": {
+        "ri_j": 1100800,
+        "ri_d": 1032000,
+        "ri_c": 935680,
+        "nc_j": 1210880,
+        "nc_d": 1142080,
+        "nc_c": 1032000
+      }
+    },
+    "n:pack belleza": {
+      "nombre": "PACK BELLEZA",
+      "pb": 2.09,
+      "publico": 1465000.0,
+      "costos": {
+        "ri_j": 1172000,
+        "ri_d": 1098750,
+        "ri_c": 996200,
+        "nc_j": 1289200,
+        "nc_d": 1215950,
+        "nc_c": 1098750
+      }
+    },
+    "n:pack alto rendimiento": {
+      "nombre": "PACK ALTO RENDIMIENTO",
+      "pb": 2.31,
+      "publico": 1615000.0,
+      "costos": {
+        "ri_j": 1292000,
+        "ri_d": 1211250,
+        "ri_c": 1098200,
+        "nc_j": 1421200,
+        "nc_d": 1340450,
+        "nc_c": 1211250
+      }
+    },
+    "n:pack alto rendimiento nero": {
+      "nombre": "PACK ALTO RENDIMIENTO NERO",
+      "pb": 2.31,
+      "publico": 1615000.0,
+      "costos": {
+        "ri_j": 1292000,
+        "ri_d": 1211250,
+        "ri_c": 1098200,
+        "nc_j": 1421200,
+        "nc_d": 1340450,
+        "nc_c": 1211250
+      }
+    },
+    "n:pack senik": {
+      "nombre": "PACK SENIK",
+      "pb": 2.46,
+      "publico": 1724000.0,
+      "costos": {
+        "ri_j": 1379200,
+        "ri_d": 1293000,
+        "ri_c": 1172320,
+        "nc_j": 1517120,
+        "nc_d": 1430920,
+        "nc_c": 1293000
+      }
+    },
+    "n:pack dureza": {
+      "nombre": "PACK DUREZA",
+      "pb": 2.73,
+      "publico": 1912000.0,
+      "costos": {
+        "ri_j": 1529600,
+        "ri_d": 1434000,
+        "ri_c": 1300160,
+        "nc_j": 1682560,
+        "nc_d": 1586960,
+        "nc_c": 1434000
+      }
+    },
+    "n:pack burbujas": {
+      "nombre": "PACK BURBUJAS",
+      "pb": 3.32,
+      "publico": 2327000.0,
+      "costos": {
+        "ri_j": 1861600,
+        "ri_d": 1745250,
+        "ri_c": 1582360,
+        "nc_j": 2047760,
+        "nc_d": 1931410,
+        "nc_c": 1745250
+      }
+    },
+    "n:pack integral": {
+      "nombre": "PACK INTEGRAL",
+      "pb": 2.91,
+      "publico": 2037000.0,
+      "costos": {
+        "ri_j": 1629600,
+        "ri_d": 1527750,
+        "ri_c": 1385160,
+        "nc_j": 1792560,
+        "nc_d": 1690710,
+        "nc_c": 1527750
+      }
+    },
+    "n:pack piscina": {
+      "nombre": "PACK PISCINA",
+      "pb": 4.44,
+      "publico": 3106000.0,
+      "costos": {
+        "ri_j": 2484800,
+        "ri_d": 2329500,
+        "ri_c": 2112080,
+        "nc_j": 2733280,
+        "nc_d": 2577980,
+        "nc_c": 2329500
+      }
+    },
+    "n:super pack": {
+      "nombre": "SUPER PACK",
+      "pb": 5.61,
+      "publico": 3926000.0,
+      "costos": {
+        "ri_j": 3140800,
+        "ri_d": 2944500,
+        "ri_c": 2669680,
+        "nc_j": 3454880,
+        "nc_d": 3258580,
+        "nc_c": 2944500
+      }
+    },
+    "n:pack integral plus": {
+      "nombre": "PACK INTEGRAL PLUS",
+      "pb": 6.24,
+      "publico": 4371000.0,
+      "costos": {
+        "ri_j": 3496800,
+        "ri_d": 3278250,
+        "ri_c": 2972280,
+        "nc_j": 3846480,
+        "nc_d": 3627930,
+        "nc_c": 3278250
+      }
     }
   }
 }
