@@ -1795,7 +1795,7 @@
     var g = gananciaResumen();
     var pct = Math.round(g.margen * 100);
     var html = '<div class="lp-gan">' +
-      '<div class="lp-gan-head"><b>🔒 SOLO PARA VOS</b><span>tú nunca ves esto · solo el distribuidor</span></div>' +
+      '<div class="lp-gan-head"><b>🔒 SOLO PARA VOS</b><span>Estos datos solo quedan para vos, nunca serán entregados a tus usuarios</span></div>' +
       '<div class="lp-gan-num">$' + Math.round(g.total).toLocaleString('es-AR') + '<i>≈ ' + pct + '% del total</i></div>' +
       '<div class="lp-gan-detalle">' + g.lineas.map(function (l) {
         return '<span>' + l.q + '× ' + esc(String(l.nombre).replace(/\s*\(PLAN CANJE\)\s*$/i, '')) + ' <b>$' + Math.round(l.ganU).toLocaleString('es-AR') + '/u</b>' + (l.estimado ? ' <em>est. 30%</em>' : '') + '</span>';
