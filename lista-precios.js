@@ -168,6 +168,40 @@
     return { n: n, tot: tot, lineas: lineas };
   }
 
+
+  function cerrarFotoModal() {
+    var m = $('lpFotoModal');
+    if (!m) return;
+    m.classList.remove('open');
+    setTimeout(function () { m.style.display = 'none'; }, 200);
+  }
+
+  function abrirFotoModal(src, tit, sub) {
+    var m = $('lpFotoModal');
+    if (!m) {
+      m = document.createElement('div');
+      m.id = 'lpFotoModal';
+      m.innerHTML = '<div class="lp-foto-card">' +
+        '<img class="lp-foto-card-img" id="lpFotoModalImg" src="" alt="">' +
+        '<div class="lp-foto-card-tit" id="lpFotoModalTit"></div>' +
+        '<div class="lp-foto-card-sub" id="lpFotoModalSub"></div>' +
+        '<button type="button" class="lp-foto-card-close" id="lpFotoModalClose">Cerrar</button>' +
+        '</div>';
+      document.body.appendChild(m);
+      m.addEventListener('click', function (e) {
+        if (e.target === m || e.target.id === 'lpFotoModalClose') cerrarFotoModal();
+      });
+    }
+    var img = $('lpFotoModalImg');
+    var t = $('lpFotoModalTit');
+    var s = $('lpFotoModalSub');
+    if (img) img.src = src || '';
+    if (t) t.textContent = tit || '';
+    if (s) s.textContent = sub || '';
+    m.style.display = 'flex';
+    requestAnimationFrame(function () { m.classList.add('open'); });
+  }
+
   function estilo() {
     var css = '' +
       '#view-lista{background:#f3eee3}' +
@@ -271,7 +305,21 @@
       '.lp-actions .lp-clear{background:rgba(42,42,50,.08);color:#2a2a32}' +
       'body.dark #view-lista,.dark .lp-sheet{background:#1c1e2a}' +
       'body.dark .lp-item{background:#25273a;border-color:rgba(255,255,255,.08)}' +
-      '.lp-item-foto{width:44px;height:44px;flex:none;border-radius:10px;object-fit:contain;background:#fff;border:1px solid rgba(0,0,0,.07);padding:3px}' +
+      '.lp-item-foto-wrap{position:relative;width:44px;height:44px;flex:none;cursor:pointer}' +
+      '.lp-item-foto{width:44px;height:44px;border-radius:10px;object-fit:contain;background:#fff;border:1px solid rgba(0,0,0,.07);padding:3px;display:block;transition:transform .15s ease}' +
+      '.lp-item-foto-wrap:active .lp-item-foto{transform:scale(0.95)}' +
+      '.lp-badge-canje{position:absolute;bottom:-3px;right:-3px;background:#0b5878;color:#fff;font-size:10px;font-weight:900;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:1.5px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.25);pointer-events:none}' +
+      'body.dark .lp-badge-canje{background:#1680aa;border-color:#1c1e2e}' +
+      '#lpFotoModal{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);z-index:9999;display:none;align-items:center;justify-content:center;padding:20px;opacity:0;transition:opacity .2s ease}' +
+      '#lpFotoModal.open{display:flex;opacity:1}' +
+      '.lp-foto-card{background:#fff;border-radius:20px;padding:20px;max-width:340px;width:100%;text-align:center;box-shadow:0 20px 40px rgba(0,0,0,.4);position:relative;transform:scale(0.92);transition:transform .2s ease}' +
+      '#lpFotoModal.open .lp-foto-card{transform:scale(1)}' +
+      'body.dark .lp-foto-card{background:#232536;color:#f2f2f7}' +
+      '.lp-foto-card-img{width:220px;height:220px;object-fit:contain;margin:0 auto 14px;display:block;background:#fff;border-radius:14px;padding:8px;border:1px solid rgba(0,0,0,.06)}' +
+      '.lp-foto-card-tit{font-size:14px;font-weight:800;margin-bottom:6px;line-height:1.3}' +
+      '.lp-foto-card-sub{font-size:12px;color:#70707a;margin-bottom:16px}' +
+      'body.dark .lp-foto-card-sub{color:#a0a0aa}' +
+      '.lp-foto-card-close{width:100%;padding:11px;border-radius:12px;border:0;background:#0b5878;color:#fff;font-weight:700;font-size:13px;cursor:pointer}' + '.lp-item-foto{width:44px;height:44px;flex:none;border-radius:10px;object-fit:contain;background:#fff;border:1px solid rgba(0,0,0,.07);padding:3px}' +
       'body.dark .lp-item-foto{background:#1c1e2e;border-color:rgba(255,255,255,.09)}' +
       'body.dark .lp-item-txt b,body.dark .lp-sheet h2,body.dark .lp-line b{color:#f2f2f7}' +
       'body.dark .lp-search,body.dark .lp-para{background:#25273a;color:#f2f2f7}' +
@@ -351,8 +399,15 @@
       }
       var q = qty(L.clave);
       var esCanje = !!L.canje;
+      var fotoHtml = '';
+      if (L.foto) {
+        fotoHtml = '<div class="lp-item-foto-wrap" data-foto-popup="' + esc(L.foto) + '" data-foto-tit="' + esc(L.nombre) + '" data-foto-sub="' + esc((L.sku ? 'SKU ' + L.sku : (L.seccion || '')) + (esCanje ? ' · Plan canje' : '')) + '">' +
+          '<img class="lp-item-foto" loading="lazy" src="' + esc(L.foto) + '" alt="" onerror="this.parentElement.remove()">' +
+          (esCanje ? '<span class="lp-badge-canje" title="Plan Canje">🔄</span>' : '') +
+          '</div>';
+      }
       html += '<div class="lp-item' + (esCanje ? ' lp-canje' : '') + '" data-sku="' + esc(L.clave) + '">' +
-        (L.foto && !esCanje ? '<img class="lp-item-foto" loading="lazy" src="' + esc(L.foto) + '" alt="" onerror="this.remove()">' : '') +
+        fotoHtml +
         '<div class="lp-item-txt"><b>' + (esCanje ? '🔄 ' : '') + esc(L.nombre) + '</b><span>' + (L.sku ? 'SKU ' + esc(L.sku) : esc(L.seccion || 'Lista con acuerdo')) + (esCanje ? ' · Plan canje' : '') + '</span><em>' + money(L.precio) + '</em></div>' +
         '<div class="lp-qty">' +
           (q ? '<button type="button" class="ghost" data-act="menos" aria-label="Quitar">−</button><i>' + q + '</i>' : '') +
@@ -1374,6 +1429,12 @@
     };
     var list = $('lpList');
     if (list) list.onclick = function (e) {
+      var fotoBtn = e.target.closest('[data-foto-popup]');
+      if (fotoBtn) {
+        e.stopPropagation();
+        abrirFotoModal(fotoBtn.getAttribute('data-foto-popup'), fotoBtn.getAttribute('data-foto-tit'), fotoBtn.getAttribute('data-foto-sub'));
+        return;
+      }
       var btn = e.target.closest('[data-act]');
       var row = e.target.closest('[data-sku]');
       if (!row) return;

@@ -206,3 +206,40 @@ test.describe('Píldora de Lista de Precios sobre el dock', () => {
     expect(metrics.winWidth - metrics.fRight).toBeLessThanOrEqual(40);
   });
 });
+
+test("productos de canje tienen foto con insignia y abrir popup al clickear", async ({ page }) => {
+  await entrar(page);
+  await page.evaluate(() => {
+    if (typeof openLista === "function") openLista();
+  });
+  await page.waitForSelector(".lp-item", { timeout: 10000 });
+
+  await page.fill("#lpSearch", "SENIOR 4 BIANCO");
+  await page.waitForTimeout(300);
+
+  // Fila de canje
+  const canjeRow = page.locator(".lp-item.lp-canje").first();
+  await expect(canjeRow).toBeVisible();
+
+  // Debe tener foto y badge de canje
+  const canjeFoto = canjeRow.locator(".lp-item-foto");
+  await expect(canjeFoto).toBeVisible();
+  const canjeBadge = canjeRow.locator(".lp-badge-canje");
+  await expect(canjeBadge).toBeVisible();
+
+  // Click en la foto abre el modal popup
+  await canjeFoto.click();
+  await page.waitForTimeout(300);
+
+  const modal = page.locator("#lpFotoModal");
+  await expect(modal).toHaveClass(/open/);
+  const modalImg = page.locator("#lpFotoModalImg");
+  await expect(modalImg).toBeVisible();
+  await expect(modalImg).toHaveAttribute("src", "catalogo-img/611010510.png");
+
+  // Cerrar modal
+  const closeBtn = page.locator("#lpFotoModalClose");
+  await closeBtn.click();
+  await page.waitForTimeout(300);
+  await expect(modal).not.toHaveClass(/open/);
+});
