@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "848.0.0",
-  "cacheName": "appi-v848-toast-compact",
+  "version": "849.0.0",
+  "cacheName": "appi-v849-toast-slide",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {
