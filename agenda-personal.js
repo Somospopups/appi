@@ -965,7 +965,16 @@
   // teléfono) armaban un DOM gigante que en iOS dejaba la pantalla blanca.
   var AP_POR_TANDA = 150, apMostrarHasta = 150;
 
+  // v831: la agenda personal nunca tumba el Panel. Si algo falla, se muestra
+  // el aviso acá (los contactos siguen a salvo en la nube).
   function html(){
+    try{ return htmlInterno(); }
+    catch(err){
+      return '<div class="ap-aviso">⚠️ No se pudo dibujar la agenda personal (' + esc(String(err.message || err)) + '). Tus contactos están a salvo; volvé a entrar o tocá “Sincronizar dispositivo”.</div>';
+    }
+  }
+
+  function htmlInterno(){
     css();
     cargar();
     var q = busqueda.trim().toLowerCase();
@@ -1017,14 +1026,20 @@
       var quedanLista = listado.length - visiblesLista.length;
       var grupos = '';
       var letraAnt = '';
+      var filasMalas = 0;
       visiblesLista.forEach(function(c){
-        var L = letraDe(c.nombre);
-        if (L !== letraAnt){
-          grupos += '<div class="ap-letra">' + L + '</div>';
-          letraAnt = L;
-        }
-        grupos += filaHTML(c);
+        try{
+          var L = letraDe(c.nombre);
+          if (L !== letraAnt){
+            grupos += '<div class="ap-letra">' + L + '</div>';
+            letraAnt = L;
+          }
+          grupos += filaHTML(c);
+        }catch(e){ filasMalas++; }
       });
+      if (filasMalas){
+        grupos += '<div class="ap-aviso">⚠️ ' + filasMalas + ' contacto' + (filasMalas === 1 ? '' : 's') + ' con datos incompletos no se pudo mostrar; la agenda completa sigue a salvo.</div>';
+      }
       salida += '<div id="apLista"' + (modoSeleccion ? ' class="ap-modo"' : '') + '>' + grupos + '</div>';
       if (quedanLista > 0){
         salida += '<button type="button" id="apMostrarMas" class="ap-mostrar-mas">Mostrar ' + Math.min(AP_POR_TANDA, quedanLista) + ' más de ' + quedanLista + '</button>';
