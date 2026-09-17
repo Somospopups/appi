@@ -58,7 +58,8 @@
     { k: ['SENIOR'], keys: ['cloro', 'thm', 'hierro', 'plomo'] },
     { k: ['STOPPER'], keys: ['solidos'] },
     { k: ['PORTÁTIL', 'PORTATIL'], keys: ['cloro'] },
-    { k: ['POLI 2', 'POLI2'], keys: ['dureza'] }
+    { k: ['POLI 2', 'POLI2'], keys: ['dureza'] },
+    { k: ['ROPOT', 'OSMOSIS', 'ÓSMOSIS'], keys: ['arsenico', 'dureza', 'cloro', 'thm', 'hierro', 'plomo'] }
   ];
   var PLANES = { cuotas: [3, 6, 9, 12, 15, 18], bancos: [], vigencia: '' };
   var filtro = 'todos';
@@ -1619,17 +1620,25 @@
             }
           });
 
-          // Las fotos viven en el repo de la app (catalogo-img/). Si el catálogo
-          // de Supabase es el elegido y no lleva la foto, se recupera por SKU
-          // desde el catálogo local: la foto nunca queda atrás por la copia.
+          // Las fotos y descripciones técnicas oficiales viven en el repo de la app.
+          // Si el catálogo de Supabase es el elegido y no lleva foto, descripción, composición o items_skus,
+          // se recuperan por SKU / Nombre desde el catálogo local para que las fichas del presupuesto
+          // siempre tengan su información completa.
           var fotoPorSku = {}, skuPorNombre = {}, fotoPorNombre = {};
+          var descPorSku = {}, descPorNombre = {}, compPorSku = {}, itemsPorSku = {};
           fileCat.productos.forEach(function (p) {
-            if (p && p.foto) {
-              if (p.sku) fotoPorSku[p.sku] = p.foto;
-              if (p.nombre) {
-                fotoPorNombre[p.nombre.trim().toUpperCase()] = p.foto;
-                if (p.sku) skuPorNombre[p.nombre.trim().toUpperCase()] = p.sku;
-              }
+            if (!p) return;
+            var nomNorm = (p.nombre || "").trim().toUpperCase();
+            if (p.sku) {
+              if (p.foto) fotoPorSku[p.sku] = p.foto;
+              if (p.desc) descPorSku[p.sku] = p.desc;
+              if (p.composicion) compPorSku[p.sku] = p.composicion;
+              if (p.items_skus) itemsPorSku[p.sku] = p.items_skus;
+            }
+            if (nomNorm) {
+              if (p.foto) fotoPorNombre[nomNorm] = p.foto;
+              if (p.desc) descPorNombre[nomNorm] = p.desc;
+              if (p.sku) skuPorNombre[nomNorm] = p.sku;
             }
           });
           catElegido.productos.forEach(function (p) {
@@ -1640,6 +1649,12 @@
               if (p.sku && fotoPorSku[p.sku]) p.foto = fotoPorSku[p.sku];
               else if (nom && fotoPorNombre[nom]) p.foto = fotoPorNombre[nom];
             }
+            if (!p.desc) {
+              if (p.sku && descPorSku[p.sku]) p.desc = descPorSku[p.sku];
+              else if (nom && descPorNombre[nom]) p.desc = descPorNombre[nom];
+            }
+            if (!p.composicion && p.sku && compPorSku[p.sku]) p.composicion = compPorSku[p.sku];
+            if (!p.items_skus && p.sku && itemsPorSku[p.sku]) p.items_skus = itemsPorSku[p.sku];
           });
         }
         CAT = catElegido;

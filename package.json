@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "837",
-  "cacheName": "appi-v837-descripciones",
+  "version": "838",
+  "cacheName": "appi-v838-descripciones-fichas",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {
