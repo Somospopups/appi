@@ -271,6 +271,8 @@
       '.lp-actions .lp-clear{background:rgba(42,42,50,.08);color:#2a2a32}' +
       'body.dark #view-lista,.dark .lp-sheet{background:#1c1e2a}' +
       'body.dark .lp-item{background:#25273a;border-color:rgba(255,255,255,.08)}' +
+      '.lp-item-foto{width:44px;height:44px;flex:none;border-radius:10px;object-fit:contain;background:#fff;border:1px solid rgba(0,0,0,.07);padding:3px}' +
+      'body.dark .lp-item-foto{background:#1c1e2e;border-color:rgba(255,255,255,.09)}' +
       'body.dark .lp-item-txt b,body.dark .lp-sheet h2,body.dark .lp-line b{color:#f2f2f7}' +
       'body.dark .lp-search,body.dark .lp-para{background:#25273a;color:#f2f2f7}' +
       '@media (min-width:1024px){' +
@@ -350,6 +352,7 @@
       var q = qty(L.clave);
       var esCanje = !!L.canje;
       html += '<div class="lp-item' + (esCanje ? ' lp-canje' : '') + '" data-sku="' + esc(L.clave) + '">' +
+        (L.foto && !esCanje ? '<img class="lp-item-foto" loading="lazy" src="' + esc(L.foto) + '" alt="" onerror="this.remove()">' : '') +
         '<div class="lp-item-txt"><b>' + (esCanje ? '🔄 ' : '') + esc(L.nombre) + '</b><span>' + (L.sku ? 'SKU ' + esc(L.sku) : esc(L.seccion || 'Lista con acuerdo')) + (esCanje ? ' · Plan canje' : '') + '</span><em>' + money(L.precio) + '</em></div>' +
         '<div class="lp-qty">' +
           (q ? '<button type="button" class="ghost" data-act="menos" aria-label="Quitar">−</button><i>' + q + '</i>' : '') +
@@ -1438,7 +1441,19 @@
       var planElegido = null;
       if(supaPlanJ && (supaPlanJ.cuotas || supaPlanJ.bancos)) planElegido = supaPlanJ;
       else if(filePlan && (filePlan.cuotas || filePlan.bancos)) planElegido = filePlan;
-      if (catElegido) CAT = catElegido;
+      if (catElegido) {
+        // Las fotos viven en el repo de la app (catalogo-img/). Si el catálogo
+        // de Supabase es el elegido y no lleva la foto, se recupera por SKU
+        // desde el catálogo local: la foto nunca queda atrás por la copia.
+        if (fileCat && fileCat.productos && catElegido !== fileCat) {
+          var fotoPorSku = {};
+          fileCat.productos.forEach(function (p) { if (p && p.sku && p.foto) fotoPorSku[p.sku] = p.foto; });
+          catElegido.productos.forEach(function (p) {
+            if (p && p.sku && !p.foto && fotoPorSku[p.sku]) p.foto = fotoPorSku[p.sku];
+          });
+        }
+        CAT = catElegido;
+      }
       if (planElegido) PLANES = planElegido;
       if (ganJ && ganJ.productos) GAN = ganJ;
       GAN_STATE = GAN ? 'ok' : 'fail';

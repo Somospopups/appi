@@ -11,8 +11,10 @@
 //  - "Plan canje" no es un producto: es el precio alternativo del mismo.
 
 import fs from 'node:fs';
+import path from 'node:path';
 import { parseListaPDF } from './parse-lista-psa.mjs';
 
+const ROOT = new URL('..', import.meta.url).pathname;
 const FUENTE_PDF = 'https://dip.psa.com.ar/adjuntos/Image/promociones/exterior/listas-precios/vigente/argentina/argentina-sugeridos-con-acuerdo.pdf';
 
 // Sección del PDF → grupo de la app
@@ -158,6 +160,17 @@ const usados = new Set();
 const salida = [];
 const info = { fusionados: 0, nuevos: 0, soloTienda: [] };
 
+// Foto del producto (la descarga scripts/actualizar-precios-psa.py en
+// catalogo-img/{sku}.jpg). Si el catálogo viejo no la llevó pero el archivo
+// existe, se recupera igual: la foto no se pierde en el merge.
+function fotoDe(vp) {
+  const f = vp.foto || '';
+  if (f) return f;
+  const sku = vp.sku || '';
+  if (sku && fs.existsSync(path.join(ROOT, 'catalogo-img', sku + '.jpg'))) return 'catalogo-img/' + sku + '.jpg';
+  return '';
+}
+
 for (const np of lista.productos) {
   const ntk = tokensNombre(np.nombre);
   // ¿es el mismo producto que alguno del catálogo viejo?
@@ -172,13 +185,15 @@ for (const np of lista.productos) {
     info.fusionados++;
     salida.push({
       sku: vp.sku, nombre: np.nombre, precio: np.precio, lista: np.precio,
-      url: vp.url, grupo: vp.grupo, plan_canje: np.plan_canje || null, seccion: np.seccion
+      url: vp.url, grupo: vp.grupo, plan_canje: np.plan_canje || null, seccion: np.seccion,
+      foto: fotoDe(vp)
     });
   } else {
     info.nuevos++;
     salida.push({
       sku: '', nombre: np.nombre, precio: np.precio, lista: np.precio,
-      url: '', grupo: SECCION_A_GRUPO[np.seccion] || 'otros', plan_canje: np.plan_canje || null, seccion: np.seccion
+      url: '', grupo: SECCION_A_GRUPO[np.seccion] || 'otros', plan_canje: np.plan_canje || null, seccion: np.seccion,
+      foto: ''
     });
   }
 }
@@ -189,7 +204,8 @@ for (let i = 0; i < viejosTokens.length; i++) {
   info.soloTienda.push(vp.nombre);
   salida.push({
     sku: vp.sku, nombre: vp.nombre, precio: vp.precio, lista: vp.lista != null ? vp.lista : vp.precio,
-    url: vp.url, grupo: vp.grupo, plan_canje: null, seccion: 'Tienda'
+    url: vp.url, grupo: vp.grupo, plan_canje: null, seccion: 'Tienda',
+    foto: fotoDe(vp)
   });
 }
 

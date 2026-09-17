@@ -48,6 +48,24 @@ async function entrar(page) {
   });
 }
 
+test('cada producto de la tienda muestra su foto en la lista de precios', async ({ page }) => {
+  await entrar(page);
+  await page.evaluate(() => {
+    if (typeof openLista === 'function') openLista();
+  });
+  await page.waitForSelector('.lp-item', { timeout: 10000 });
+
+  await page.fill('#lpSearch', 'SENIOR 4 BIANCO');
+  await page.waitForTimeout(300);
+
+  // El Senior 4 Bianco (SKU 611010510) tiene foto descargada en catalogo-img/.
+  const img = page.locator('.lp-item .lp-item-foto').first();
+  await expect(img).toBeVisible();
+  await expect(img).toHaveAttribute('src', 'catalogo-img/611010510.jpg');
+  // El resto de la fila sigue intacto (nombre + precio).
+  await expect(page.locator('.lp-item').first()).toContainText('PSA SENIOR 4 BIANCO');
+});
+
 test.describe('Píldora de Lista de Precios sobre el dock', () => {
   test.use({ viewport: { width: 390, height: 844 } });
 
