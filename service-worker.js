@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v847-whatsapp-ios';
+const CACHE_NAME = 'appi-v848-toast-compact';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

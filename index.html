@@ -149,7 +149,7 @@ window.openStock=function(){
 <link rel="stylesheet" href="./appi-tema.css?v=515">
 <script src="./account-request.js"></script>
 <script src="./qr-code.js"></script>
-<script src="./gestion-client.js?v=847"></script>
+<script src="./gestion-client.js?v=848"></script>
   <script src="./agenda-personal.js"></script>
 <script src="./tarjetas-promos.js"></script>
 <script src="./usuarios-botones.js?v=423"></script>
@@ -166,10 +166,10 @@ window.openStock=function(){
 
 <script src="./porque-vivo.js"></script>
 <script src="./home-limpio.js?v=521"></script>
-<script src="./reporte-bonos.js?v=847?v=4"></script>
+<script src="./reporte-bonos.js?v=848?v=4"></script>
   <script src="./home-tarjetas.js?v=833"></script>
   <script src="./appi-eventos.js?v=726"></script>
-  <script src="./tu-mes.js?v=847"></script>
+  <script src="./tu-mes.js?v=848"></script>
   <script src="./device-bridge.js?v=523"></script>
   <script src="./anuncios.js?v=792"></script>
   <script src="./aviso-telegram.js?v=555"></script>
@@ -2841,23 +2841,27 @@ body.dark .hist-action-drawer{background:linear-gradient(155deg,#151827,#252036 
 
   .toast {
     position: fixed;
-    top: calc(env(safe-area-inset-top) + 52px);
-    left: 50%; transform: translateX(-50%) translateY(-100px);
-    background: rgba(58,208,164,0.95);
-    color: #fff; font-weight: 700; font-size: 13px;
-    padding: 8px 16px; border-radius: 999px;
-    box-shadow: 0 6px 20px rgba(29,122,92,0.4);
+    top: calc(env(safe-area-inset-top) + 16px);
+    left: 12px;
+    max-width: calc(100vw - 148px);
+    transform: translateY(-80px);
+    background: rgba(46,196,154,0.92);
+    color: #fff; font-weight: 750; font-size: 10.5px;
+    padding: 5px 11px; border-radius: 999px;
+    box-shadow: 0 4px 14px rgba(29,122,92,0.28);
     z-index: 100000; opacity: 0;
-    transition: transform .35s cubic-bezier(0.34,1.56,0.64,1), opacity .25s ease;
-    display: flex; align-items: center; gap: 6px;
+    transition: transform .3s cubic-bezier(0.34,1.4,0.64,1), opacity .2s ease;
+    display: flex; align-items: center; gap: 5px;
     pointer-events: none;
-    -webkit-backdrop-filter: blur(8px);
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(255,255,255,0.25);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.3);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    line-height: 1.2;
   }
   .toast.show {
     opacity: 1;
-    transform: translateX(-50%) translateY(0);
+    transform: translateY(0);
   }
   body.appi-prueba .toast {
     top: calc(env(safe-area-inset-top) + 90px);
@@ -4626,7 +4630,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v847 · Segura</div>
+  <div class="ds-foot">APPI · v848 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -13455,8 +13459,8 @@ function cerrarToolsMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='847';
-      const CACHE_NAME='appi-v847-whatsapp-ios';
+      const swVersion='848';
+      const CACHE_NAME='appi-v848-toast-compact';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · v'+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}

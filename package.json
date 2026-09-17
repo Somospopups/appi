@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "847.0.0",
-  "cacheName": "appi-v847-whatsapp-ios",
+  "version": "848.0.0",
+  "cacheName": "appi-v848-toast-compact",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {
