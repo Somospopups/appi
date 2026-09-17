@@ -1360,7 +1360,7 @@
         var foto = fotos[ix] || '';
         var packPadre = itemFicha.packPadre;
         var imgW = 36;
-        var c = cmpDe(p, ln.q);
+        var c = cmpDe(p, itemFicha.q);
         var keys = trataDe(p);
         var hasVid = !!videoDe(p);
         var qrW = hasVid ? 24 : 0;
@@ -1493,11 +1493,13 @@
         pdf.save(nombre);
       }
     } catch (e) {
-      aviso('No se pudo armar el PDF.');
+      console.error("ERROR ARMAR PDF:", e);
+      aviso('No se pudo armar el PDF: ' + (e && e.message || e));
     }
     if (btn) { btn.disabled = false; btn.textContent = 'Cotizar'; }
-    }).catch(function () {
-      aviso('No se pudo armar el PDF.');
+    }).catch(function (err) {
+      console.error("ERROR PROMISE PDF:", err);
+      aviso('No se pudo armar el PDF: ' + (err && err.message || err));
       if (btn) { btn.disabled = false; btn.textContent = 'Cotizar'; }
     });
     });

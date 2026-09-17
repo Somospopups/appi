@@ -114,20 +114,22 @@ test.describe('Packs PSA en Lista de Precios', () => {
 
   test('generación de PDF de Pack desglosa componentes en tabla sin precios y genera fichas individuales', async ({ page }) => {
     await entrar(page);
-    await page.waitForSelector('#app', { state: 'attached' });
-
     await page.evaluate(() => {
-      localStorage.setItem('appi_lista_carro_v1', JSON.stringify({ 'PACK-BASICO': 1 }));
-      if (typeof window.abrirListaPrecios === 'function') {
-        window.abrirListaPrecios();
-      }
+      if (typeof openLista === 'function') openLista();
     });
+    await page.waitForSelector('.lp-item', { timeout: 10000 });
 
-    const fabBadge = page.locator('#lpFabBadge');
-    await expect(fabBadge).toHaveText('1');
+    const chipPacks = page.locator('.lp-chip[data-g="packs"]');
+    await chipPacks.click();
 
-    await page.locator('#lpFab').click();
-    await expect(page.locator('#lpSheet')).toBeVisible();
+    const packBasico = page.locator('.lp-item[data-sku="PACK-BASICO"]');
+    await expect(packBasico).toBeVisible();
+    await packBasico.locator('button[data-act="mas"]').click();
+
+    const fab = page.locator('#lpFab');
+    await expect(fab).toBeVisible();
+    await fab.click();
+    await expect(page.locator('#lpSheet')).toHaveClass(/open/);
 
     await page.evaluate(() => {
       window._pdfResult = null;
