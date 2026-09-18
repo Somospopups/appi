@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v866-canillas-home-swipe-desc';
+const CACHE_NAME = 'appi-v867-canillas-clean-bleed';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

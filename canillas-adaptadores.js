@@ -1,8 +1,10 @@
 /* ============================================================
    APPI · Canillas & Adaptadores PSA
-   - Vista comparativa: Foto izquierda + Mazo animado estilo Home derecha
-   - Deslizamiento swipe idéntico al mazo del Home (vaivén, rotación y vuelo)
-   - Descripción completa en el espacio inferior debajo de ambas columnas
+   - Vista dividida limpia: Foto a la izquierda + PDF a tamaño máximo a la derecha
+   - Sin flechitas ni títulos en la carta: la imagen ocupa todo el espacio
+   - Sin botón redundante de ver ficha: se toca directamente la carta para ampliar
+   - Animación de arrastre/vuelo idéntica al Home
+   - Descripción completa en el panel inferior
    ============================================================ */
 (function () {
   "use strict";
@@ -143,9 +145,9 @@
         align-items: center;
         justify-content: center;
         background: #f1f5f9;
-        border-radius: 12px;
+        border-radius: 14px;
         overflow: hidden;
-        height: 250px;
+        height: 290px;
         border: 1px solid rgba(0,0,0,0.06);
       }
       body.dark .can-user-img-box {
@@ -158,11 +160,11 @@
         display: block;
       }
 
-      /* Mazo estilo Home */
+      /* Mazo a tamaño máximo sin títulos ni flechitas */
       .can-deck-stage {
         position: relative;
         width: 100%;
-        height: 250px;
+        height: 290px;
         perspective: 800px;
         user-select: none;
         -webkit-user-select: none;
@@ -175,14 +177,15 @@
         background: #ffffff;
         box-shadow: 0 8px 24px rgba(10, 12, 40, 0.15);
         display: flex;
-        flex-direction: column;
+        align-items: center;
+        justify-content: center;
         overflow: hidden;
         cursor: grab;
         will-change: transform;
         transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.32s ease;
       }
       body.dark .can-card-stack {
-        background: #1e1e2e;
+        background: #181826;
         box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
       }
       .can-card-stack.detras1 {
@@ -215,117 +218,15 @@
         z-index: 20;
       }
 
-      .can-deck-top-bar {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 6px 8px;
-        background: rgba(11, 88, 120, 0.05);
-        border-bottom: 1px solid rgba(0,0,0,0.05);
-      }
-      body.dark .can-deck-top-bar {
-        background: rgba(255, 255, 255, 0.04);
-        border-color: rgba(255, 255, 255, 0.06);
-      }
-      .can-deck-badge {
-        background: #0b5878;
-        color: #ffffff;
-        font-size: 11px;
-        font-weight: 900;
-        padding: 3px 7px;
-        border-radius: 6px;
-      }
-      body.dark .can-deck-badge {
-        background: #3ad0a4;
-        color: #10101c;
-      }
-      .can-deck-model-title {
-        font-size: 11px;
-        font-weight: 850;
-        color: #1e293b;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-width: 120px;
-      }
-      body.dark .can-deck-model-title {
-        color: #f2f2f7;
-      }
-
-      .can-card-img-content {
-        flex: 1;
-        position: relative;
-        background: #ffffff;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        overflow: hidden;
-      }
-      body.dark .can-card-img-content {
-        background: #181826;
-      }
-      .can-card-page-img {
+      .can-card-full-img {
         width: 100%;
         height: 100%;
         object-fit: contain;
         display: block;
         pointer-events: none;
       }
-      .can-card-tap-zoom {
-        position: absolute;
-        bottom: 6px;
-        right: 6px;
-        background: rgba(11, 88, 120, 0.9);
-        color: #ffffff;
-        font-size: 9.5px;
-        font-weight: 800;
-        padding: 3px 7px;
-        border-radius: 6px;
-        backdrop-filter: blur(4px);
-        pointer-events: auto;
-        cursor: pointer;
-      }
 
-      /* Barra de navegación inferior del mazo */
-      .can-deck-nav {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-top: 8px;
-        padding: 0 2px;
-      }
-      .can-nav-arrow {
-        background: rgba(11, 88, 120, 0.12);
-        border: 1px solid rgba(11, 88, 120, 0.2);
-        color: #0b5878;
-        font-size: 15px;
-        font-weight: 900;
-        width: 32px;
-        height: 32px;
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-      }
-      body.dark .can-nav-arrow {
-        background: rgba(58, 208, 164, 0.15);
-        border-color: rgba(58, 208, 164, 0.3);
-        color: #3ad0a4;
-      }
-      .can-nav-arrow:active {
-        transform: scale(0.92);
-      }
-      .can-deck-pos {
-        font-size: 11px;
-        font-weight: 850;
-        color: #64748b;
-      }
-      body.dark .can-deck-pos {
-        color: #94a3b8;
-      }
-
-      /* Panel de descripción inferior debajo de la imagen y las cartas */
+      /* Panel de descripción inferior */
       .can-desc-panel {
         background: rgba(11, 88, 120, 0.06);
         border: 1.5px solid rgba(11, 88, 120, 0.18);
@@ -343,10 +244,11 @@
         to { opacity: 1; transform: translateY(0); }
       }
       .can-desc-badge {
-        font-size: 22px;
+        font-size: 24px;
         font-weight: 950;
         color: #0b5878;
         letter-spacing: -0.3px;
+        margin: 2px 0 4px;
       }
       body.dark .can-desc-badge {
         color: #3ad0a4;
@@ -534,41 +436,23 @@
     }
   };
 
+  /* Renderiza las cartas del mazo ocupando el 100% del espacio, sin títulos ni flechitas */
   function renderDeckCards() {
     var stage = document.getElementById("canDeckStage");
-    var pos = document.getElementById("canDeckPos");
     if (!stage) return;
-
-    if (pos) pos.textContent = (deckIndex + 1) + " / " + DECK.length;
 
     var cur = DECK[deckIndex];
     var next = DECK[(deckIndex + 1) % DECK.length];
 
-    // Mantener sólo las dos cartas necesarias (la actual y la que está detrás)
     stage.innerHTML = `
       <!-- Carta de atrás (detras1) -->
       <div class="can-card-stack detras1">
-        <div class="can-deck-top-bar">
-          <span class="can-deck-badge">${next.adapter_id}</span>
-          <span class="can-deck-model-title">${next.name}</span>
-        </div>
-        <div class="can-card-img-content">
-          <img src="${next.page_img}" class="can-card-page-img" alt="${next.name}">
-        </div>
+        <img src="${next.page_img}" class="can-card-full-img" alt="${next.name}">
       </div>
 
-      <!-- Carta del frente (interactiva) -->
+      <!-- Carta del frente interactiva -->
       <div class="can-card-stack" id="canTopCard">
-        <div class="can-deck-top-bar">
-          <span class="can-deck-badge">${cur.adapter_id}</span>
-          <span class="can-deck-model-title" title="${cur.name}">${cur.name}</span>
-        </div>
-        <div class="can-card-img-content">
-          <img src="${cur.page_img}" class="can-card-page-img" alt="${cur.name}">
-          <span class="can-card-tap-zoom" onclick="event.stopPropagation(); window.canillasOpenImagePopup('${cur.page_img}', 'Ficha oficial ${cur.name} - ${cur.adapter_id}')">
-            🔍 Ampliar
-          </span>
-        </div>
+        <img src="${cur.page_img}" class="can-card-full-img" alt="${cur.name}">
       </div>
     `;
 
@@ -587,32 +471,21 @@
 
     host.innerHTML = `
       <div class="can-desc-panel">
-        
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
-          <div>
-            <span style="font-size: 10px; font-weight: 900; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">
-              Adaptador requerido
-            </span>
-            <div class="can-desc-badge">${cur.adapter_id}</div>
-          </div>
-          
-          <button type="button" class="can-btn-cam" onclick="window.canillasOpenImagePopup('${cur.page_img}', 'Ficha oficial ${cur.name} - ${cur.adapter_id}')" style="flex: none; padding: 7px 12px; font-size: 11px; border-radius: 10px;">
-            Ver ficha completa ↗
-          </button>
+        <div style="font-size: 10px; font-weight: 900; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">
+          ADAPTADOR REQUERIDO
         </div>
+        
+        <div class="can-desc-badge">${cur.adapter_id}</div>
 
-        <div style="font-size: 14px; font-weight: 850; color: #1e293b; margin-bottom: 3px;">
+        <div style="font-size: 14.5px; font-weight: 850; color: #1e293b; margin: 3px 0;">
           ${cur.name}
         </div>
 
-        <div style="font-size: 11.5px; color: #64748b; margin-bottom: 6px;">
-          ${cur.thread ? "Rosca: " + cur.thread : ""}
-        </div>
+        ${cur.thread ? `<div style="font-size: 12px; color: #64748b; margin-bottom: 6px;">Rosca: ${cur.thread}</div>` : ""}
 
-        <div style="background: rgba(255,255,255,0.7); border-radius: 10px; padding: 9px 12px; font-size: 12px; color: #0b5878; line-height: 1.4;">
+        <div style="background: rgba(255,255,255,0.7); border-radius: 10px; padding: 10px 12px; font-size: 12px; color: #0b5878; line-height: 1.4;">
           💡 ${cur.tip || "Identificá la rosca del pico para enroscar el adaptador correspondiente."}
         </div>
-
       </div>
     `;
   }
@@ -644,7 +517,6 @@
 
       if (el.__arrastro) {
         if (e.cancelable) e.preventDefault();
-        // Rotación proporcional igual que en el Home
         el.style.transform = "translateX(" + dx + "px) rotate(" + (dx / 18) + "deg)";
       }
     }, { capture: true, passive: false });
@@ -654,13 +526,11 @@
       arrastrando = false;
       el.classList.remove("arrastre");
 
-      // Umbral para pasar o volver
       if (el.__arrastro && dx < -50) {
         window.canillasDeckNext();
       } else if (el.__arrastro && dx > 50) {
         window.canillasDeckPrev();
       } else if (el.__arrastro) {
-        // Volver elástico al centro
         el.classList.add("volver");
         el.style.transform = "";
         setTimeout(function () {
@@ -673,7 +543,7 @@
     el.addEventListener("pointerup", soltar, true);
     el.addEventListener("pointercancel", soltar, true);
 
-    // Si se hizo tap normal (sin arrastre) en la carta, se abre el popup
+    // Al presionar directamente en el PDF, se agranda en pantalla completa
     el.addEventListener("click", function (e) {
       if (el.__arrastro || Math.abs(dx) > 10) {
         e.stopPropagation();
@@ -772,24 +642,16 @@
               </div>
             </div>
 
-            <!-- Columna Derecha: Mazo de cartas estilo Home -->
+            <!-- Columna Derecha: Mazo a tamaño completo -->
             <div class="can-col-deck">
               <div class="can-label-tag">Catálogo PSA (Deslizá)</div>
               
               <div class="can-deck-stage" id="canDeckStage"></div>
-
-              <!-- Flechas y contador de posición -->
-              <div class="can-deck-nav">
-                <button type="button" class="can-nav-arrow" onclick="window.canillasDeckPrev()" title="Anterior">‹</button>
-                <span class="can-deck-pos" id="canDeckPos">1 / ${DECK.length}</span>
-                <button type="button" class="can-nav-arrow" onclick="window.canillasDeckNext()" title="Siguiente">›</button>
-              </div>
-
             </div>
 
           </div>
 
-          <!-- Panel de Descripción en el espacio inferior -->
+          <!-- Panel de Descripción en el espacio inferior (sin botón repetido) -->
           <div id="canDescPanelHost"></div>
 
           <!-- Buscador para saltar directo a una carta del mazo -->
