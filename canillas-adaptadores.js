@@ -1,8 +1,10 @@
 /* ============================================================
    APPI · Canillas & Adaptadores PSA
-   - 2 botones: Sacar foto / Buscar imagen
-   - Guía oficial en botón que abre Popup modal
-   - Imagen completa de la página / adaptador con zoom en Popup
+   - 2 botones principales: Sacar foto / Buscar imagen
+   - Guía oficial en botón que abre PDF directo en Popup modal
+   - Sin botones extra dentro del popup del PDF
+   - Gesto de "Atrás" cierra únicamente el Popup y se queda en la herramienta
+   - Imagen completa de la página con popup de ampliación
    - Sin iconos en el título, sin botón de WhatsApp
    ============================================================ */
 (function () {
@@ -157,7 +159,7 @@
       body.dark .can-res-title {
         color: #3ad0a4;
       }
-      /* Modal Popup Styles */
+      /* Modal Popups */
       .can-modal-overlay {
         position: fixed;
         top: 0;
@@ -182,6 +184,7 @@
         background: #ffffff;
         width: 100%;
         max-width: 600px;
+        height: 92vh;
         max-height: 92vh;
         border-radius: 24px 24px 0 0;
         display: flex;
@@ -202,7 +205,7 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 14px 18px;
+        padding: 12px 18px;
         border-bottom: 1px solid rgba(0,0,0,0.08);
       }
       body.dark .can-modal-header {
@@ -212,26 +215,28 @@
         flex: 1;
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
-        padding: 12px;
-        text-align: center;
       }
       .can-close-btn {
         background: rgba(0,0,0,0.06);
         border: none;
-        width: 34px;
-        height: 34px;
+        width: 36px;
+        height: 36px;
         border-radius: 50%;
-        font-size: 16px;
+        font-size: 17px;
         font-weight: 800;
         cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
         color: #1e293b;
+        transition: background 0.15s ease;
       }
       body.dark .can-close-btn {
         background: rgba(255,255,255,0.12);
         color: #ffffff;
+      }
+      .can-close-btn:active {
+        background: rgba(0,0,0,0.12);
       }
     `;
     document.head.appendChild(st);
@@ -273,7 +278,6 @@
   };
 
   function analyzePhoto() {
-    // Adapter recommendation based on faucet characteristics
     currentResult = {
       adapter: "PSA 142",
       name: "Adaptador Rosca Macho 16,3 x 1 mm",
@@ -287,6 +291,8 @@
 
   /* Popup para ver la imagen completa de la página */
   window.canillasOpenImagePopup = function (imgSrc, title) {
+    window.canillasCloseModal();
+
     var modal = document.createElement("div");
     modal.className = "can-modal-overlay";
     modal.id = "canImgModal";
@@ -295,12 +301,12 @@
     };
 
     modal.innerHTML = `
-      <div class="can-modal-content" style="max-height: 94vh;">
+      <div class="can-modal-content">
         <div class="can-modal-header">
           <span style="font-weight: 850; font-size: 15px;">${title || "Guía del adaptador"}</span>
-          <button type="button" class="can-close-btn" onclick="window.canillasCloseModal()">✕</button>
+          <button type="button" class="can-close-btn" aria-label="Cerrar" data-cerrar="true" onclick="window.canillasCloseModal()">✕</button>
         </div>
-        <div class="can-modal-body" style="background: #f1f5f9; padding: 10px;">
+        <div class="can-modal-body" style="background: #f1f5f9; padding: 10px; text-align: center;">
           <img src="${imgSrc}" style="width: 100%; height: auto; max-width: 520px; display: block; margin: 0 auto; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.15);">
         </div>
       </div>
@@ -309,8 +315,10 @@
     document.body.appendChild(modal);
   };
 
-  /* Popup para abrir el PDF completo oficial */
+  /* Popup para abrir el PDF completo oficial DIRECTO sin botones extra */
   window.canillasOpenPdfPopup = function () {
+    window.canillasCloseModal();
+
     var modal = document.createElement("div");
     modal.className = "can-modal-overlay";
     modal.id = "canPdfModal";
@@ -319,18 +327,13 @@
     };
 
     modal.innerHTML = `
-      <div class="can-modal-content" style="height: 92vh;">
+      <div class="can-modal-content" style="height: 94vh; max-height: 94vh;">
         <div class="can-modal-header">
-          <div>
-            <div style="font-weight: 850; font-size: 15px;">Guía oficial de adaptadores</div>
-            <a href="./guia-adaptadores-psa.pdf" target="_blank" style="font-size: 11px; color: #0b5878; font-weight: 750; text-decoration: none;">
-              Abrir archivo externo ↗
-            </a>
-          </div>
-          <button type="button" class="can-close-btn" onclick="window.canillasCloseModal()">✕</button>
+          <span style="font-weight: 850; font-size: 15px;">Guía oficial de adaptadores PSA</span>
+          <button type="button" class="can-close-btn" aria-label="Cerrar" data-cerrar="true" onclick="window.canillasCloseModal()">✕</button>
         </div>
-        <div class="can-modal-body" style="padding: 0; height: 100%;">
-          <iframe src="./guia-adaptadores-psa.pdf#toolbar=1" style="width: 100%; height: 100%; border: none;"></iframe>
+        <div class="can-modal-body" style="padding: 0; height: 100%; overflow: hidden;">
+          <iframe src="./guia-adaptadores-psa.pdf#toolbar=1" style="width: 100%; height: 100%; border: none; display: block;"></iframe>
         </div>
       </div>
     `;
@@ -340,9 +343,9 @@
 
   window.canillasCloseModal = function () {
     var m1 = document.getElementById("canImgModal");
-    if (m1) m1.parentNode.removeChild(m1);
+    if (m1 && m1.parentNode) m1.parentNode.removeChild(m1);
     var m2 = document.getElementById("canPdfModal");
-    if (m2) m2.parentNode.removeChild(m2);
+    if (m2 && m2.parentNode) m2.parentNode.removeChild(m2);
   };
 
   function render() {
@@ -379,7 +382,7 @@
             </button>
           </div>
 
-          <!-- Botón que abre el PDF en Popup -->
+          <!-- Botón directo del PDF en Popup -->
           <button type="button" class="can-btn-pdf-trigger" onclick="window.canillasOpenPdfPopup()">
             <span>Ver Guía oficial de adaptadores PSA</span>
           </button>
