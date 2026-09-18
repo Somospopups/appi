@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v854-canillas-clean';
+const CACHE_NAME = 'appi-v855-canillas-ultrasimple';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
@@ -34,6 +34,7 @@ const APP_SHELL = [
   './tablero-negocio.js',
   './lista-precios.js',
   './canillas-adaptadores.js',
+  './guia-adaptadores-psa.pdf',
   './stock-personal.js',
   './vendor/zxing.min.js',
   './porque-vivo.js',
