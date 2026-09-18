@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v871-productos-terra';
+const CACHE_NAME = 'appi-v872-lista-precios-terra';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

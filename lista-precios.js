@@ -1632,6 +1632,14 @@
             }
           });
 
+          // Incorporar cualquier nuevo producto del catalogo local (ej. Senior 4 Terra, Burby Terra, Soporte Celular, Promo Combo)
+          fileCat.productos.forEach(function (fp) {
+            if (fp && fp.sku && !skusExistentes[fp.sku]) {
+              catElegido.productos.push(fp);
+              skusExistentes[fp.sku] = true;
+            }
+          });
+
           // Las fotos y descripciones técnicas oficiales viven en el repo de la app.
           // Si el catálogo de Supabase es el elegido y no lleva foto, descripción, composición o items_skus,
           // se recuperan por SKU / Nombre desde el catálogo local para que las fichas del presupuesto
