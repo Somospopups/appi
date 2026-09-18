@@ -1,6 +1,6 @@
 {
-  "actualizado": "17-Sep-2026",
-  "vigencia": "8-Sep-2026 al 17-Sep-2026",
+  "actualizado": "18-Sep-2026",
+  "vigencia": "18-Sep-2026 al 23-Sep-2026",
   "fuente": "https://tienda.psa.com.ar/promociones_vigentes",
   "cuotas": [
     3,
@@ -8,7 +8,8 @@
     9,
     12,
     15,
-    18
+    18,
+    24
   ],
   "bancos": [
     {
@@ -41,17 +42,19 @@
         3,
         6,
         9,
-        12,
-        15,
-        18
+        12
       ],
-      "tarjetas": "Visa, Mastercard, American Express"
+      "tarjetas": "Visa, American Express"
     },
     {
       "id": "bbva",
       "nombre": "BBVA",
       "cuotas": [
+        3,
         6,
+        9,
+        12,
+        15,
         18
       ],
       "tarjetas": "Visa, Mastercard"
@@ -65,7 +68,8 @@
         9,
         12,
         15,
-        18
+        18,
+        24
       ],
       "tarjetas": "Visa, Mastercard"
     },
@@ -78,9 +82,10 @@
         9,
         12,
         15,
-        18
+        18,
+        24
       ],
-      "tarjetas": "Visa, Mastercard, American Express"
+      "tarjetas": "Visa, Mastercard"
     },
     {
       "id": "santander",
@@ -91,7 +96,8 @@
         9,
         12,
         15,
-        18
+        18,
+        24
       ],
       "tarjetas": "Visa, Mastercard"
     },
@@ -104,7 +110,8 @@
         9,
         12,
         15,
-        18
+        18,
+        24
       ],
       "tarjetas": "Visa, Mastercard"
     },
@@ -129,7 +136,8 @@
         9,
         12,
         15,
-        18
+        18,
+        24
       ],
       "tarjetas": "American Express"
     },
@@ -142,7 +150,8 @@
         9,
         12,
         15,
-        18
+        18,
+        24
       ],
       "tarjetas": ""
     },
@@ -155,7 +164,8 @@
         9,
         12,
         15,
-        18
+        18,
+        24
       ],
       "tarjetas": ""
     },
@@ -168,7 +178,8 @@
         9,
         12,
         15,
-        18
+        18,
+        24
       ],
       "tarjetas": ""
     },
@@ -181,7 +192,8 @@
         9,
         12,
         15,
-        18
+        18,
+        24
       ],
       "tarjetas": ""
     },
@@ -194,7 +206,8 @@
         9,
         12,
         15,
-        18
+        18,
+        24
       ],
       "tarjetas": ""
     }
