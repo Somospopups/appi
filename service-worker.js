@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v865-canillas-deck-aligned';
+const CACHE_NAME = 'appi-v866-canillas-home-swipe-desc';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

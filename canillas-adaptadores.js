@@ -1,8 +1,8 @@
 /* ============================================================
    APPI · Canillas & Adaptadores PSA
-   - Vista dividida: Tu foto a la izquierda + Mazo de cartas a la derecha
-   - Desplazamiento fluido entre cartas del PDF para comparar visualmente
-   - Popups con gesto de Atrás integrado a panel-atras.js
+   - Vista comparativa: Foto izquierda + Mazo animado estilo Home derecha
+   - Deslizamiento swipe idéntico al mazo del Home (vaivén, rotación y vuelo)
+   - Descripción completa en el espacio inferior debajo de ambas columnas
    ============================================================ */
 (function () {
   "use strict";
@@ -11,8 +11,6 @@
 
   var currentPhotoSrc = null;
   var deckIndex = 0;
-  var touchStartX = 0;
-  var touchEndX = 0;
 
   function injectStyles() {
     if (document.getElementById("canillas-simple-styles")) return;
@@ -87,7 +85,7 @@
         transform: scale(0.97);
       }
 
-      /* Split View: Izquierda Foto / Derecha Mazo */
+      /* Split View */
       .can-split-row {
         display: flex;
         gap: 10px;
@@ -98,14 +96,14 @@
         min-width: 0;
         display: flex;
         flex-direction: column;
-        background: rgba(255, 255, 255, 0.9);
+        background: rgba(255, 255, 255, 0.92);
         border-radius: 18px;
         padding: 10px 8px;
         border: 1.5px solid rgba(11, 88, 120, 0.2);
         box-shadow: 0 4px 14px rgba(0,0,0,0.04);
       }
       body.dark .can-col-user {
-        background: rgba(40, 40, 60, 0.8);
+        background: rgba(40, 40, 60, 0.85);
         border-color: rgba(58, 208, 164, 0.25);
       }
       .can-col-deck {
@@ -147,7 +145,7 @@
         background: #f1f5f9;
         border-radius: 12px;
         overflow: hidden;
-        height: 220px;
+        height: 250px;
         border: 1px solid rgba(0,0,0,0.06);
       }
       body.dark .can-user-img-box {
@@ -156,79 +154,145 @@
       .can-user-img {
         width: 100%;
         height: 100%;
-        max-height: 300px;
         object-fit: contain;
         display: block;
       }
 
-      /* Mazo de cartas */
+      /* Mazo estilo Home */
+      .can-deck-stage {
+        position: relative;
+        width: 100%;
+        height: 250px;
+        perspective: 800px;
+        user-select: none;
+        -webkit-user-select: none;
+        touch-action: pan-y;
+      }
+      .can-card-stack {
+        position: absolute;
+        inset: 0;
+        border-radius: 14px;
+        background: #ffffff;
+        box-shadow: 0 8px 24px rgba(10, 12, 40, 0.15);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        cursor: grab;
+        will-change: transform;
+        transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.32s ease;
+      }
+      body.dark .can-card-stack {
+        background: #1e1e2e;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+      }
+      .can-card-stack.detras1 {
+        transform: translateY(8px) scale(0.95);
+        opacity: 0.65;
+        pointer-events: none;
+        z-index: 1;
+      }
+      .can-card-stack.arrastre {
+        transition: none !important;
+        cursor: grabbing;
+        z-index: 10;
+      }
+      .can-card-stack.volver {
+        transition: transform 0.35s cubic-bezier(0.28, 1.45, 0.45, 1) !important;
+        z-index: 10;
+      }
+      .can-card-stack.vuela-izq {
+        transition: transform 0.42s cubic-bezier(0.3, 0.7, 0.4, 1), opacity 0.35s ease-out !important;
+        transform: translateX(-140%) rotate(-22deg) !important;
+        opacity: 0;
+        pointer-events: none;
+        z-index: 20;
+      }
+      .can-card-stack.vuela-der {
+        transition: transform 0.42s cubic-bezier(0.3, 0.7, 0.4, 1), opacity 0.35s ease-out !important;
+        transform: translateX(140%) rotate(22deg) !important;
+        opacity: 0;
+        pointer-events: none;
+        z-index: 20;
+      }
+
+      .can-deck-top-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 6px 8px;
+        background: rgba(11, 88, 120, 0.05);
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+      }
+      body.dark .can-deck-top-bar {
+        background: rgba(255, 255, 255, 0.04);
+        border-color: rgba(255, 255, 255, 0.06);
+      }
       .can-deck-badge {
-        display: inline-block;
         background: #0b5878;
         color: #ffffff;
-        font-size: 13px;
-        font-weight: 950;
-        padding: 3px 8px;
-        border-radius: 8px;
-        letter-spacing: -0.3px;
+        font-size: 11px;
+        font-weight: 900;
+        padding: 3px 7px;
+        border-radius: 6px;
       }
       body.dark .can-deck-badge {
         background: #3ad0a4;
         color: #10101c;
       }
-      .can-deck-model {
-        font-size: 12px;
+      .can-deck-model-title {
+        font-size: 11px;
         font-weight: 850;
         color: #1e293b;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        margin: 4px 0;
+        max-width: 120px;
       }
-      body.dark .can-deck-model {
+      body.dark .can-deck-model-title {
         color: #f2f2f7;
       }
-      .can-card-img-box {
-        background: #ffffff;
-        border-radius: 12px;
-        overflow: hidden;
-        border: 1px solid rgba(11, 88, 120, 0.18);
-        cursor: pointer;
+
+      .can-card-img-content {
+        flex: 1;
         position: relative;
-        height: 190px;
+        background: #ffffff;
         display: flex;
         align-items: center;
         justify-content: center;
+        overflow: hidden;
       }
-      body.dark .can-card-img-box {
-        background: #1a1a28;
+      body.dark .can-card-img-content {
+        background: #181826;
       }
-      .can-card-img {
+      .can-card-page-img {
         width: 100%;
         height: 100%;
-        max-height: 240px;
         object-fit: contain;
         display: block;
+        pointer-events: none;
       }
-      .can-card-zoom-hint {
+      .can-card-tap-zoom {
         position: absolute;
         bottom: 6px;
         right: 6px;
         background: rgba(11, 88, 120, 0.9);
         color: #ffffff;
-        font-size: 9px;
+        font-size: 9.5px;
         font-weight: 800;
-        padding: 2px 6px;
+        padding: 3px 7px;
         border-radius: 6px;
+        backdrop-filter: blur(4px);
+        pointer-events: auto;
+        cursor: pointer;
       }
 
-      /* Navegación del Mazo */
+      /* Barra de navegación inferior del mazo */
       .can-deck-nav {
         display: flex;
         align-items: center;
         justify-content: space-between;
         margin-top: 8px;
-        gap: 4px;
+        padding: 0 2px;
       }
       .can-nav-arrow {
         background: rgba(11, 88, 120, 0.12);
@@ -243,7 +307,6 @@
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        transition: transform 0.1s ease;
       }
       body.dark .can-nav-arrow {
         background: rgba(58, 208, 164, 0.15);
@@ -255,17 +318,44 @@
       }
       .can-deck-pos {
         font-size: 11px;
-        font-weight: 800;
+        font-weight: 850;
         color: #64748b;
       }
       body.dark .can-deck-pos {
         color: #94a3b8;
       }
 
+      /* Panel de descripción inferior debajo de la imagen y las cartas */
+      .can-desc-panel {
+        background: rgba(11, 88, 120, 0.06);
+        border: 1.5px solid rgba(11, 88, 120, 0.18);
+        border-radius: 16px;
+        padding: 14px 16px;
+        margin-top: 14px;
+        animation: canFadeUp 0.25s ease-out;
+      }
+      body.dark .can-desc-panel {
+        background: rgba(58, 208, 164, 0.08);
+        border-color: rgba(58, 208, 164, 0.22);
+      }
+      @keyframes canFadeUp {
+        from { opacity: 0; transform: translateY(6px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      .can-desc-badge {
+        font-size: 22px;
+        font-weight: 950;
+        color: #0b5878;
+        letter-spacing: -0.3px;
+      }
+      body.dark .can-desc-badge {
+        color: #3ad0a4;
+      }
+
       .can-search-input {
         width: 100%;
         box-sizing: border-box;
-        padding: 10px 12px;
+        padding: 11px 13px;
         border-radius: 12px;
         border: 1px solid rgba(40, 36, 28, 0.15);
         background: rgba(255, 255, 255, 0.95);
@@ -273,7 +363,7 @@
         font-size: 12.5px;
         color: #1e293b;
         outline: none;
-        margin-top: 8px;
+        margin-top: 10px;
       }
       body.dark .can-search-input {
         background: rgba(45, 45, 65, 0.8);
@@ -351,7 +441,6 @@
         align-items: center;
         justify-content: center;
         color: #1e293b;
-        transition: background 0.15s ease;
       }
       body.dark .can-close-btn {
         background: rgba(255,255,255,0.12);
@@ -378,11 +467,6 @@
     if (el) el.click();
   };
 
-  window.canillasReset = function () {
-    currentPhotoSrc = null;
-    render();
-  };
-
   window.canillasOnFile = function (e) {
     var file = e.target.files && e.target.files[0];
     if (!file) return;
@@ -401,24 +485,39 @@
     render();
   };
 
-  window.canillasDeckPrev = function () {
-    if (deckIndex > 0) {
-      deckIndex--;
-    } else {
-      deckIndex = DECK.length - 1;
-    }
-    updateDeckView();
-  };
-
+  /* Pasar carta siguiente con animación de vuelo idéntica al Home */
   window.canillasDeckNext = function () {
-    if (deckIndex < DECK.length - 1) {
-      deckIndex++;
-    } else {
-      deckIndex = 0;
+    var stage = document.getElementById("canDeckStage");
+    if (!stage) return;
+    var top = stage.querySelector(".can-card-stack:not(.detras1)");
+    if (top) {
+      top.classList.add("vuela-izq");
+      setTimeout(function () {
+        if (top && top.parentNode) top.parentNode.removeChild(top);
+      }, 400);
     }
-    updateDeckView();
+    deckIndex = (deckIndex + 1) % DECK.length;
+    renderDeckCards();
+    updateDescriptionPanel();
   };
 
+  /* Volver carta anterior con animación de vuelo idéntica al Home */
+  window.canillasDeckPrev = function () {
+    var stage = document.getElementById("canDeckStage");
+    if (!stage) return;
+    var top = stage.querySelector(".can-card-stack:not(.detras1)");
+    if (top) {
+      top.classList.add("vuela-der");
+      setTimeout(function () {
+        if (top && top.parentNode) top.parentNode.removeChild(top);
+      }, 400);
+    }
+    deckIndex = (deckIndex - 1 + DECK.length) % DECK.length;
+    renderDeckCards();
+    updateDescriptionPanel();
+  };
+
+  /* Búsqueda rápida para saltar a una carta */
   window.canillasSearchDeck = function (val) {
     if (!val || val.trim().length < 2) return;
     var q = val.toLowerCase().trim();
@@ -428,35 +527,164 @@
           (f.adapter_id && f.adapter_id.toLowerCase().includes(q)) ||
           (f.brand && f.brand.toLowerCase().includes(q))) {
         deckIndex = i;
-        updateDeckView();
+        renderDeckCards();
+        updateDescriptionPanel();
         break;
       }
     }
   };
 
-  function updateDeckView() {
-    var host = document.getElementById("canDeckCardHost");
+  function renderDeckCards() {
+    var stage = document.getElementById("canDeckStage");
     var pos = document.getElementById("canDeckPos");
-    if (!host || !DECK[deckIndex]) return;
+    if (!stage) return;
 
-    var card = DECK[deckIndex];
     if (pos) pos.textContent = (deckIndex + 1) + " / " + DECK.length;
 
-    host.innerHTML = `
-      <div style="text-align: center; margin-bottom: 6px;">
-        <span class="can-deck-badge">${card.adapter_id}</span>
-        <div class="can-deck-model" title="${card.name}">${card.name}</div>
+    var cur = DECK[deckIndex];
+    var next = DECK[(deckIndex + 1) % DECK.length];
+
+    // Mantener sólo las dos cartas necesarias (la actual y la que está detrás)
+    stage.innerHTML = `
+      <!-- Carta de atrás (detras1) -->
+      <div class="can-card-stack detras1">
+        <div class="can-deck-top-bar">
+          <span class="can-deck-badge">${next.adapter_id}</span>
+          <span class="can-deck-model-title">${next.name}</span>
+        </div>
+        <div class="can-card-img-content">
+          <img src="${next.page_img}" class="can-card-page-img" alt="${next.name}">
+        </div>
       </div>
 
-      <div class="can-card-img-box" onclick="window.canillasOpenImagePopup('${card.page_img}', '${card.name} - ${card.adapter_id}')" title="Tocar para ampliar">
-        <img src="${card.page_img}" class="can-card-img" alt="${card.name}">
-        <span class="can-card-zoom-hint">🔍 Ampliar</span>
-      </div>
-
-      <div style="font-size: 10.5px; color: #0b5878; font-weight: 750; margin-top: 6px; text-align: center; line-height: 1.3; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
-        ${card.tip || card.thread}
+      <!-- Carta del frente (interactiva) -->
+      <div class="can-card-stack" id="canTopCard">
+        <div class="can-deck-top-bar">
+          <span class="can-deck-badge">${cur.adapter_id}</span>
+          <span class="can-deck-model-title" title="${cur.name}">${cur.name}</span>
+        </div>
+        <div class="can-card-img-content">
+          <img src="${cur.page_img}" class="can-card-page-img" alt="${cur.name}">
+          <span class="can-card-tap-zoom" onclick="event.stopPropagation(); window.canillasOpenImagePopup('${cur.page_img}', 'Ficha oficial ${cur.name} - ${cur.adapter_id}')">
+            🔍 Ampliar
+          </span>
+        </div>
       </div>
     `;
+
+    var topCard = document.getElementById("canTopCard");
+    if (topCard) {
+      activarSwipeCard(topCard);
+    }
+  }
+
+  /* Actualiza la descripción en el espacio inferior debajo de ambas columnas */
+  function updateDescriptionPanel() {
+    var host = document.getElementById("canDescPanelHost");
+    if (!host || !DECK[deckIndex]) return;
+
+    var cur = DECK[deckIndex];
+
+    host.innerHTML = `
+      <div class="can-desc-panel">
+        
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+          <div>
+            <span style="font-size: 10px; font-weight: 900; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">
+              Adaptador requerido
+            </span>
+            <div class="can-desc-badge">${cur.adapter_id}</div>
+          </div>
+          
+          <button type="button" class="can-btn-cam" onclick="window.canillasOpenImagePopup('${cur.page_img}', 'Ficha oficial ${cur.name} - ${cur.adapter_id}')" style="flex: none; padding: 7px 12px; font-size: 11px; border-radius: 10px;">
+            Ver ficha completa ↗
+          </button>
+        </div>
+
+        <div style="font-size: 14px; font-weight: 850; color: #1e293b; margin-bottom: 3px;">
+          ${cur.name}
+        </div>
+
+        <div style="font-size: 11.5px; color: #64748b; margin-bottom: 6px;">
+          ${cur.thread ? "Rosca: " + cur.thread : ""}
+        </div>
+
+        <div style="background: rgba(255,255,255,0.7); border-radius: 10px; padding: 9px 12px; font-size: 12px; color: #0b5878; line-height: 1.4;">
+          💡 ${cur.tip || "Identificá la rosca del pico para enroscar el adaptador correspondiente."}
+        </div>
+
+      </div>
+    `;
+  }
+
+  /* Física de swipe interactivo idéntica a home-tarjetas.js */
+  function activarSwipeCard(el) {
+    var x0 = 0, y0 = 0, dx = 0, dy = 0, arrastrando = false;
+
+    el.addEventListener("pointerdown", function (e) {
+      if (e.button != null && e.button !== 0) return;
+      arrastrando = true;
+      x0 = e.clientX;
+      y0 = e.clientY;
+      dx = 0;
+      dy = 0;
+      el.__arrastro = false;
+      try { el.setPointerCapture(e.pointerId); } catch (err) {}
+    }, true);
+
+    el.addEventListener("pointermove", function (e) {
+      if (!arrastrando) return;
+      dx = e.clientX - x0;
+      dy = e.clientY - y0;
+
+      if (!el.__arrastro && Math.abs(dx) > 6) {
+        el.__arrastro = true;
+        el.classList.add("arrastre");
+      }
+
+      if (el.__arrastro) {
+        if (e.cancelable) e.preventDefault();
+        // Rotación proporcional igual que en el Home
+        el.style.transform = "translateX(" + dx + "px) rotate(" + (dx / 18) + "deg)";
+      }
+    }, { capture: true, passive: false });
+
+    function soltar() {
+      if (!arrastrando) return;
+      arrastrando = false;
+      el.classList.remove("arrastre");
+
+      // Umbral para pasar o volver
+      if (el.__arrastro && dx < -50) {
+        window.canillasDeckNext();
+      } else if (el.__arrastro && dx > 50) {
+        window.canillasDeckPrev();
+      } else if (el.__arrastro) {
+        // Volver elástico al centro
+        el.classList.add("volver");
+        el.style.transform = "";
+        setTimeout(function () {
+          el.classList.remove("volver");
+        }, 350);
+      }
+      el.__arrastro = false;
+    }
+
+    el.addEventListener("pointerup", soltar, true);
+    el.addEventListener("pointercancel", soltar, true);
+
+    // Si se hizo tap normal (sin arrastre) en la carta, se abre el popup
+    el.addEventListener("click", function (e) {
+      if (el.__arrastro || Math.abs(dx) > 10) {
+        e.stopPropagation();
+        e.preventDefault();
+        return;
+      }
+      var cur = DECK[deckIndex];
+      if (cur) {
+        window.canillasOpenImagePopup(cur.page_img, "Ficha oficial " + cur.name + " - " + cur.adapter_id);
+      }
+    }, true);
   }
 
   /* Popup para ver la imagen completa de la ficha */
@@ -518,7 +746,7 @@
 
         </div>
 
-        <!-- Vista Comparador: Foto izquierda + Mazo de cartas derecha -->
+        <!-- Vista Comparador: Foto izquierda + Mazo estilo Home derecha -->
         <div class="can-simple-card" style="padding: 12px 10px;">
           
           <div class="can-split-row">
@@ -544,13 +772,13 @@
               </div>
             </div>
 
-            <!-- Columna Derecha: Mazo de cartas del catálogo -->
-            <div class="can-col-deck" id="canDeckBox">
-              <div class="can-label-tag">Catálogo PSA</div>
+            <!-- Columna Derecha: Mazo de cartas estilo Home -->
+            <div class="can-col-deck">
+              <div class="can-label-tag">Catálogo PSA (Deslizá)</div>
               
-              <div id="canDeckCardHost" style="flex: 1; display: flex; flex-direction: column; justify-content: space-between;"></div>
+              <div class="can-deck-stage" id="canDeckStage"></div>
 
-              <!-- Navegación del mazo de cartas -->
+              <!-- Flechas y contador de posición -->
               <div class="can-deck-nav">
                 <button type="button" class="can-nav-arrow" onclick="window.canillasDeckPrev()" title="Anterior">‹</button>
                 <span class="can-deck-pos" id="canDeckPos">1 / ${DECK.length}</span>
@@ -561,6 +789,9 @@
 
           </div>
 
+          <!-- Panel de Descripción en el espacio inferior -->
+          <div id="canDescPanelHost"></div>
+
           <!-- Buscador para saltar directo a una carta del mazo -->
           <input type="text" class="can-search-input" placeholder="🔍 Buscá en el mazo (ej. Libby, Arizona, Epuyen, Swing)..." oninput="window.canillasSearchDeck(this.value)">
 
@@ -569,25 +800,8 @@
       </div>
     `;
 
-    updateDeckView();
-
-    // Soporte para gestos táctiles (swipe) en el mazo
-    var deckBox = document.getElementById("canDeckBox");
-    if (deckBox) {
-      deckBox.addEventListener("touchstart", function (e) {
-        touchStartX = e.changedTouches[0].screenX;
-      }, { passive: true });
-
-      deckBox.addEventListener("touchend", function (e) {
-        touchEndX = e.changedTouches[0].screenX;
-        var diff = touchStartX - touchEndX;
-        if (diff > 40) {
-          window.canillasDeckNext();
-        } else if (diff < -40) {
-          window.canillasDeckPrev();
-        }
-      }, { passive: true });
-    }
+    renderDeckCards();
+    updateDescriptionPanel();
   }
 
 })();
