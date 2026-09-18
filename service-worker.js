@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v868-canillas-zero-ghost';
+const CACHE_NAME = 'appi-v869-canillas-ios-style';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

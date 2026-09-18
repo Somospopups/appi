@@ -1,9 +1,9 @@
 /* ============================================================
-   APPI · Canillas & Adaptadores PSA
-   - Carta única sin capas fantasma ni superposiciones
-   - Imagen 100% limpia a tamaño máximo
-   - Deslizamiento swipe fluido y natural con slide in/out
-   - Panel de descripción completo en el espacio inferior
+   APPI · Canillas & Adaptadores PSA (Diseño iOS Premium)
+   - Botones cuadrados superiores con iconos vectoriales
+   - Mazo de cartas a pantalla completa sin capas fantasma
+   - Al tocar la descripción, pasa a la siguiente carta del PDF
+   - Estética iOS: Glassmorphism, esquinas continuas y sombras suaves
    ============================================================ */
 (function () {
   "use strict";
@@ -20,126 +20,153 @@
     st.id = "canillas-simple-styles";
     st.textContent = `
       .can-simple-wrap {
-        padding: 12px 10px 80px;
-        max-width: 600px;
+        padding: 10px 12px 80px;
+        max-width: 540px;
         margin: 0 auto;
-        font-family: inherit;
-      }
-      .can-simple-card {
-        background: rgba(255, 255, 255, 0.75);
-        backdrop-filter: blur(18px) saturate(180%);
-        -webkit-backdrop-filter: blur(18px) saturate(180%);
-        border: 1px solid rgba(255, 255, 255, 0.85);
-        border-radius: 20px;
-        padding: 18px 14px;
-        box-shadow: 0 6px 20px rgba(30, 24, 12, 0.05);
-        margin-bottom: 14px;
-      }
-      body.dark .can-simple-card {
-        background: rgba(35, 35, 55, 0.75);
-        border-color: rgba(255, 255, 255, 0.08);
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
-      }
-      .can-btn-cam {
-        flex: 1;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 6px;
-        padding: 13px 10px;
-        border-radius: 14px;
-        border: none;
-        background: linear-gradient(135deg, #0b5878, #3ad0a4);
-        color: #ffffff;
-        font-family: inherit;
-        font-size: 13.5px;
-        font-weight: 800;
-        cursor: pointer;
-        box-shadow: 0 4px 14px rgba(11, 88, 120, 0.25);
-        transition: transform 0.12s ease;
-      }
-      .can-btn-cam:active {
-        transform: scale(0.97);
-      }
-      .can-btn-gal {
-        flex: 1;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 6px;
-        padding: 13px 10px;
-        border-radius: 14px;
-        border: 1px solid rgba(40, 36, 28, 0.15);
-        background: rgba(255, 255, 255, 0.9);
-        color: #2a2a32;
-        font-family: inherit;
-        font-size: 13.5px;
-        font-weight: 800;
-        cursor: pointer;
-        transition: transform 0.12s ease;
-      }
-      body.dark .can-btn-gal {
-        background: rgba(45, 45, 65, 0.8);
-        border-color: rgba(255, 255, 255, 0.12);
-        color: #f2f2f7;
-      }
-      .can-btn-gal:active {
-        transform: scale(0.97);
+        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        -webkit-font-smoothing: antialiased;
       }
 
-      /* Split View */
-      .can-split-row {
+      /* iOS Grid de Botones Cuadrados */
+      .ios-action-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-bottom: 14px;
+      }
+      .ios-square-btn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 18px 12px 16px;
+        border-radius: 22px;
+        border: 1px solid rgba(255, 255, 255, 0.85);
+        background: rgba(255, 255, 255, 0.78);
+        backdrop-filter: blur(20px) saturate(180%);
+        -webkit-backdrop-filter: blur(20px) saturate(180%);
+        box-shadow: 0 8px 20px rgba(11, 88, 120, 0.06), 0 2px 6px rgba(0, 0, 0, 0.03);
+        cursor: pointer;
+        transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.15s ease;
+        touch-action: manipulation;
+        user-select: none;
+        -webkit-user-select: none;
+      }
+      body.dark .ios-square-btn {
+        background: rgba(35, 35, 52, 0.78);
+        border-color: rgba(255, 255, 255, 0.08);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+      }
+      .ios-square-btn:active {
+        transform: scale(0.95);
+        box-shadow: 0 2px 8px rgba(11, 88, 120, 0.04);
+      }
+
+      .ios-icon-circle {
+        width: 48px;
+        height: 48px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.15s ease;
+      }
+      .ios-icon-circle.cam {
+        background: linear-gradient(135deg, #0b5878, #3ad0a4);
+        color: #ffffff;
+        box-shadow: 0 4px 12px rgba(11, 88, 120, 0.25);
+      }
+      .ios-icon-circle.gal {
+        background: linear-gradient(135deg, rgba(11, 88, 120, 0.12), rgba(58, 208, 164, 0.15));
+        color: #0b5878;
+        border: 1px solid rgba(11, 88, 120, 0.15);
+      }
+      body.dark .ios-icon-circle.gal {
+        background: rgba(58, 208, 164, 0.15);
+        color: #3ad0a4;
+        border-color: rgba(58, 208, 164, 0.25);
+      }
+
+      .ios-btn-label {
+        font-size: 13px;
+        font-weight: 750;
+        color: #1e293b;
+        letter-spacing: -0.2px;
+      }
+      body.dark .ios-btn-label {
+        color: #f2f2f7;
+      }
+
+      /* Tarjeta Principal Glassmorphic estilo iOS */
+      .ios-main-card {
+        background: rgba(255, 255, 255, 0.78);
+        backdrop-filter: blur(24px) saturate(190%);
+        -webkit-backdrop-filter: blur(24px) saturate(190%);
+        border: 1px solid rgba(255, 255, 255, 0.85);
+        border-radius: 24px;
+        padding: 16px 12px;
+        box-shadow: 0 10px 30px -5px rgba(11, 88, 120, 0.08), 0 4px 12px rgba(0, 0, 0, 0.03);
+        margin-bottom: 14px;
+      }
+      body.dark .ios-main-card {
+        background: rgba(32, 32, 48, 0.78);
+        border-color: rgba(255, 255, 255, 0.08);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+      }
+
+      /* Comparador Dividido */
+      .ios-split-row {
         display: flex;
         gap: 10px;
         align-items: stretch;
       }
-      .can-col-user {
+      .ios-col-user {
         flex: 1;
         min-width: 0;
         display: flex;
         flex-direction: column;
-        background: rgba(255, 255, 255, 0.92);
-        border-radius: 18px;
+        background: rgba(248, 250, 252, 0.85);
+        border-radius: 20px;
         padding: 10px 8px;
-        border: 1.5px solid rgba(11, 88, 120, 0.2);
-        box-shadow: 0 4px 14px rgba(0,0,0,0.04);
+        border: 1px solid rgba(0, 0, 0, 0.06);
       }
-      body.dark .can-col-user {
-        background: rgba(40, 40, 60, 0.85);
-        border-color: rgba(58, 208, 164, 0.25);
+      body.dark .ios-col-user {
+        background: rgba(40, 40, 58, 0.75);
+        border-color: rgba(255, 255, 255, 0.08);
       }
-      .can-col-deck {
+      .ios-col-deck {
         flex: 1.25;
         min-width: 0;
         display: flex;
         flex-direction: column;
-        background: rgba(255, 255, 255, 0.95);
-        border-radius: 18px;
+        background: #ffffff;
+        border-radius: 20px;
         padding: 10px 8px;
-        border: 1.5px solid #0b5878;
-        box-shadow: 0 6px 20px rgba(11, 88, 120, 0.12);
+        border: 1.5px solid rgba(11, 88, 120, 0.25);
+        box-shadow: 0 6px 18px rgba(11, 88, 120, 0.08);
         position: relative;
         overflow: hidden;
       }
-      body.dark .can-col-deck {
-        background: rgba(40, 40, 60, 0.95);
-        border-color: #3ad0a4;
+      body.dark .ios-col-deck {
+        background: #1c1c2b;
+        border-color: rgba(58, 208, 164, 0.3);
       }
 
-      .can-label-tag {
+      .ios-tag-label {
         font-size: 10px;
-        font-weight: 900;
+        font-weight: 850;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
+        letter-spacing: 0.6px;
         color: #64748b;
         margin-bottom: 6px;
         text-align: center;
       }
-      body.dark .can-label-tag {
+      body.dark .ios-tag-label {
         color: #94a3b8;
       }
 
-      .can-user-img-box {
+      .ios-user-box {
         flex: 1;
         display: flex;
         align-items: center;
@@ -148,36 +175,50 @@
         border-radius: 14px;
         overflow: hidden;
         height: 290px;
-        border: 1px solid rgba(0,0,0,0.06);
       }
-      body.dark .can-user-img-box {
-        background: #1e1e2d;
+      body.dark .ios-user-box {
+        background: #181826;
       }
-      .can-user-img {
+      .ios-user-img {
         width: 100%;
         height: 100%;
         object-fit: contain;
         display: block;
       }
 
-      /* Escenario de carta única sólida */
-      .can-deck-stage {
+      .ios-cambiar-btn {
+        margin-top: 8px;
+        padding: 8px 10px;
+        border-radius: 12px;
+        border: none;
+        background: linear-gradient(135deg, #0b5878, #3ad0a4);
+        color: #ffffff;
+        font-size: 11.5px;
+        font-weight: 800;
+        cursor: pointer;
+        transition: transform 0.12s ease;
+      }
+      .ios-cambiar-btn:active {
+        transform: scale(0.95);
+      }
+
+      /* Escenario de carta del PDF */
+      .ios-deck-stage {
         position: relative;
         width: 100%;
         height: 290px;
         overflow: hidden;
         border-radius: 14px;
         background: #ffffff;
-        box-shadow: 0 4px 14px rgba(10, 12, 40, 0.08);
         user-select: none;
         -webkit-user-select: none;
         touch-action: pan-y;
       }
-      body.dark .can-deck-stage {
+      body.dark .ios-deck-stage {
         background: #181826;
       }
 
-      .can-card-stack {
+      .ios-card {
         position: absolute;
         inset: 0;
         background: #ffffff;
@@ -189,102 +230,184 @@
         will-change: transform;
         z-index: 5;
       }
-      body.dark .can-card-stack {
+      body.dark .ios-card {
         background: #181826;
       }
 
-      .can-card-full-img {
+      .ios-card-img {
         width: 100%;
         height: 100%;
         object-fit: contain;
         display: block;
         pointer-events: none;
-        background: #ffffff;
-      }
-      body.dark .can-card-full-img {
-        background: #181826;
       }
 
       /* Animaciones de cambio */
-      @keyframes canSlideInRight {
-        from { transform: translateX(60px); opacity: 0.3; }
-        to { transform: translateX(0); opacity: 1; }
+      @keyframes iosSlideInRight {
+        from { transform: translateX(50px) scale(0.97); opacity: 0.3; }
+        to { transform: translateX(0) scale(1); opacity: 1; }
       }
-      @keyframes canSlideInLeft {
-        from { transform: translateX(-60px); opacity: 0.3; }
-        to { transform: translateX(0); opacity: 1; }
+      @keyframes iosSlideInLeft {
+        from { transform: translateX(-50px) scale(0.97); opacity: 0.3; }
+        to { transform: translateX(0) scale(1); opacity: 1; }
       }
-      .can-anim-in-right {
-        animation: canSlideInRight 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      .ios-anim-right {
+        animation: iosSlideInRight 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
       }
-      .can-anim-in-left {
-        animation: canSlideInLeft 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      .ios-anim-left {
+        animation: iosSlideInLeft 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
       }
-      .can-card-stack.arrastre {
+      .ios-card.arrastre {
         transition: none !important;
         cursor: grabbing;
       }
-      .can-card-stack.volver {
+      .ios-card.volver {
         transition: transform 0.28s cubic-bezier(0.28, 1.45, 0.45, 1) !important;
       }
 
-      /* Panel de descripción inferior */
-      .can-desc-panel {
-        background: rgba(11, 88, 120, 0.06);
+      /* Panel de Descripción Clickeable estilo Tarjeta iOS */
+      .ios-desc-card {
+        background: linear-gradient(135deg, rgba(11, 88, 120, 0.07), rgba(58, 208, 164, 0.08));
         border: 1.5px solid rgba(11, 88, 120, 0.18);
-        border-radius: 16px;
-        padding: 14px 16px;
+        border-radius: 20px;
+        padding: 16px 16px 14px;
         margin-top: 14px;
-        animation: canFadeUp 0.25s ease-out;
+        cursor: pointer;
+        user-select: none;
+        -webkit-user-select: none;
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), background 0.15s ease, box-shadow 0.15s ease;
       }
-      body.dark .can-desc-panel {
-        background: rgba(58, 208, 164, 0.08);
-        border-color: rgba(58, 208, 164, 0.22);
+      body.dark .ios-desc-card {
+        background: linear-gradient(135deg, rgba(58, 208, 164, 0.1), rgba(11, 88, 120, 0.12));
+        border-color: rgba(58, 208, 164, 0.25);
       }
-      @keyframes canFadeUp {
-        from { opacity: 0; transform: translateY(6px); }
-        to { opacity: 1; transform: translateY(0); }
+      .ios-desc-card:active {
+        transform: scale(0.98);
+        background: linear-gradient(135deg, rgba(11, 88, 120, 0.12), rgba(58, 208, 164, 0.14));
       }
-      .can-desc-badge {
-        font-size: 24px;
-        font-weight: 950;
+
+      .ios-desc-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 2px;
+      }
+      .ios-desc-eyebrow {
+        font-size: 10px;
+        font-weight: 850;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+      }
+      body.dark .ios-desc-eyebrow {
+        color: #94a3b8;
+      }
+      .ios-tap-advance-hint {
+        font-size: 11px;
+        font-weight: 750;
         color: #0b5878;
-        letter-spacing: -0.3px;
-        margin: 2px 0 4px;
+        display: flex;
+        align-items: center;
+        gap: 3px;
       }
-      body.dark .can-desc-badge {
+      body.dark .ios-tap-advance-hint {
         color: #3ad0a4;
       }
 
-      .can-search-input {
+      .ios-badge-row {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+        margin: 2px 0 6px;
+      }
+      .ios-badge-main {
+        font-size: 26px;
+        font-weight: 950;
+        color: #0b5878;
+        letter-spacing: -0.5px;
+      }
+      body.dark .ios-badge-main {
+        color: #3ad0a4;
+      }
+      .ios-badge-counter {
+        font-size: 11.5px;
+        font-weight: 800;
+        color: #64748b;
+        margin-left: auto;
+      }
+
+      .ios-model-name {
+        font-size: 15px;
+        font-weight: 850;
+        color: #1e293b;
+        letter-spacing: -0.2px;
+        margin-bottom: 2px;
+      }
+      body.dark .ios-model-name {
+        color: #f2f2f7;
+      }
+      .ios-thread-info {
+        font-size: 12px;
+        color: #64748b;
+        margin-bottom: 8px;
+      }
+
+      .ios-tip-bubble {
+        background: rgba(255, 255, 255, 0.85);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        border-radius: 12px;
+        padding: 9px 12px;
+        font-size: 12px;
+        color: #0b5878;
+        line-height: 1.4;
+      }
+      body.dark .ios-tip-bubble {
+        background: rgba(30, 30, 45, 0.7);
+        border-color: rgba(255, 255, 255, 0.06);
+        color: #e2e8f0;
+      }
+
+      /* Buscador iOS estilo SearchBar */
+      .ios-search-bar {
         width: 100%;
         box-sizing: border-box;
-        padding: 11px 13px;
-        border-radius: 12px;
-        border: 1px solid rgba(40, 36, 28, 0.15);
-        background: rgba(255, 255, 255, 0.95);
+        padding: 11px 14px 11px 36px;
+        border-radius: 14px;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        background: rgba(241, 245, 249, 0.85);
         font-family: inherit;
-        font-size: 12.5px;
+        font-size: 13px;
         color: #1e293b;
         outline: none;
         margin-top: 10px;
+        transition: border-color 0.15s ease, background 0.15s ease;
       }
-      body.dark .can-search-input {
-        background: rgba(45, 45, 65, 0.8);
-        border-color: rgba(255, 255, 255, 0.15);
+      body.dark .ios-search-bar {
+        background: rgba(45, 45, 65, 0.75);
+        border-color: rgba(255, 255, 255, 0.1);
         color: #f2f2f7;
       }
+      .ios-search-bar:focus {
+        background: #ffffff;
+        border-color: #0b5878;
+      }
+      body.dark .ios-search-bar:focus {
+        background: #202030;
+        border-color: #3ad0a4;
+      }
 
-      /* Modal Popups */
+      /* Modal Popups estilo iOS Sheet */
       .can-modal-overlay {
         position: fixed;
         top: 0;
         left: 0;
         right: 0;
         bottom: 0;
-        background: rgba(15, 23, 42, 0.82);
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
+        background: rgba(15, 23, 42, 0.75);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
         z-index: 999999;
         display: flex;
         flex-direction: column;
@@ -302,7 +425,7 @@
         max-width: 600px;
         height: 94vh;
         max-height: 94vh;
-        border-radius: 24px 24px 0 0;
+        border-radius: 26px 26px 0 0;
         display: flex;
         flex-direction: column;
         overflow: hidden;
@@ -321,8 +444,8 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 12px 18px;
-        border-bottom: 1px solid rgba(0,0,0,0.08);
+        padding: 14px 18px;
+        border-bottom: 1px solid rgba(0,0,0,0.06);
       }
       body.dark .can-modal-header {
         border-color: rgba(255,255,255,0.08);
@@ -335,10 +458,10 @@
       .can-close-btn {
         background: rgba(0,0,0,0.06);
         border: none;
-        width: 36px;
-        height: 36px;
+        width: 34px;
+        height: 34px;
         border-radius: 50%;
-        font-size: 17px;
+        font-size: 16px;
         font-weight: 800;
         cursor: pointer;
         display: flex;
@@ -432,11 +555,11 @@
     if (!stage || !DECK[deckIndex]) return;
 
     var cur = DECK[deckIndex];
-    var animClass = dir === "next" ? "can-anim-in-right" : (dir === "prev" ? "can-anim-in-left" : "");
+    var animClass = dir === "next" ? "ios-anim-right" : (dir === "prev" ? "ios-anim-left" : "");
 
     stage.innerHTML = `
-      <div class="can-card-stack ${animClass}" id="canTopCard">
-        <img src="${cur.page_img}" class="can-card-full-img" alt="${cur.name}">
+      <div class="ios-card ${animClass}" id="canTopCard">
+        <img src="${cur.page_img}" class="ios-card-img" alt="${cur.name}">
       </div>
     `;
 
@@ -446,7 +569,7 @@
     }
   }
 
-  /* Actualiza la descripción en el espacio inferior debajo de ambas columnas */
+  /* Actualiza la descripción en el espacio inferior (clicleable para pasar carta) */
   function updateDescriptionPanel() {
     var host = document.getElementById("canDescPanelHost");
     if (!host || !DECK[deckIndex]) return;
@@ -454,27 +577,31 @@
     var cur = DECK[deckIndex];
 
     host.innerHTML = `
-      <div class="can-desc-panel">
-        <div style="font-size: 10px; font-weight: 900; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">
-          ADAPTADOR REQUERIDO
+      <div class="ios-desc-card" onclick="window.canillasDeckNext()" title="Tocá para ver la siguiente carta">
+        
+        <div class="ios-desc-header">
+          <span class="ios-desc-eyebrow">Adaptador requerido</span>
+          <span class="ios-tap-advance-hint">Pasar carta ›</span>
         </div>
         
-        <div class="can-desc-badge">${cur.adapter_id}</div>
-
-        <div style="font-size: 14.5px; font-weight: 850; color: #1e293b; margin: 3px 0;">
-          ${cur.name}
+        <div class="ios-badge-row">
+          <span class="ios-badge-main">${cur.adapter_id}</span>
+          <span class="ios-badge-counter">${deckIndex + 1} de ${DECK.length}</span>
         </div>
 
-        ${cur.thread ? `<div style="font-size: 12px; color: #64748b; margin-bottom: 6px;">Rosca: ${cur.thread}</div>` : ""}
+        <div class="ios-model-name">${cur.name}</div>
 
-        <div style="background: rgba(255,255,255,0.7); border-radius: 10px; padding: 10px 12px; font-size: 12px; color: #0b5878; line-height: 1.4;">
+        ${cur.thread ? `<div class="ios-thread-info">Rosca: ${cur.thread}</div>` : ""}
+
+        <div class="ios-tip-bubble">
           💡 ${cur.tip || "Identificá la rosca del pico para enroscar el adaptador correspondiente."}
         </div>
+
       </div>
     `;
   }
 
-  /* Swipe interactivo natural */
+  /* Swipe táctil interactivo */
   function activarSwipeCard(el) {
     var x0 = 0, y0 = 0, dx = 0, dy = 0, arrastrando = false;
 
@@ -519,7 +646,7 @@
         el.style.transform = "";
         setTimeout(function () {
           el.classList.remove("volver");
-        }, 300);
+        }, 280);
       }
       el.__arrastro = false;
     }
@@ -559,7 +686,7 @@
           <button type="button" class="can-close-btn" aria-label="Cerrar" data-cerrar="true" onclick="window.canillasCloseModal()">✕</button>
         </div>
         <div class="can-modal-body" style="background: #f1f5f9; padding: 12px; text-align: center;">
-          <img src="${imgSrc}" style="width: 100%; height: auto; max-width: 520px; display: block; margin: 0 auto; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.15);">
+          <img src="${imgSrc}" style="width: 100%; height: auto; max-width: 520px; display: block; margin: 0 auto; border-radius: 14px; box-shadow: 0 4px 16px rgba(0,0,0,0.15);">
         </div>
       </div>
     `;
@@ -581,65 +708,77 @@
     cont.innerHTML = `
       <div class="can-simple-wrap">
         
-        <!-- Tarjeta Superior: Botones para foto / imagen -->
-        <div class="can-simple-card" style="text-align: center; padding: 14px;">
+        <!-- Botones Cuadrados Superiores estilo iPhone -->
+        <div class="ios-action-grid">
           
-          <div style="display: flex; gap: 8px;">
-            <button type="button" class="can-btn-cam" onclick="window.canillasTriggerCam()">
-              <span>Sacar foto</span>
-            </button>
+          <button type="button" class="ios-square-btn" onclick="window.canillasTriggerCam()">
+            <div class="ios-icon-circle cam">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                <circle cx="12" cy="13" r="4"></circle>
+              </svg>
+            </div>
+            <span class="ios-btn-label">Sacar foto</span>
+          </button>
 
-            <button type="button" class="can-btn-gal" onclick="window.canillasTriggerGal()">
-              <span>Buscar imagen</span>
-            </button>
-          </div>
-
-          <!-- Inputs invisibles -->
-          <input type="file" id="canNativeCam" accept="image/*" capture="environment" style="display:none" onchange="window.canillasOnFile(event)">
-          <input type="file" id="canNativeGal" accept="image/*" style="display:none" onchange="window.canillasOnFile(event)">
+          <button type="button" class="ios-square-btn" onclick="window.canillasTriggerGal()">
+            <div class="ios-icon-circle gal">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                <polyline points="21 15 16 10 5 21"></polyline>
+              </svg>
+            </div>
+            <span class="ios-btn-label">Buscar imagen</span>
+          </button>
 
         </div>
 
-        <!-- Vista Comparador: Foto izquierda + Carta PDF derecha -->
-        <div class="can-simple-card" style="padding: 12px 10px;">
+        <!-- Inputs invisibles para captura de cámara y galería -->
+        <input type="file" id="canNativeCam" accept="image/*" capture="environment" style="display:none" onchange="window.canillasOnFile(event)">
+        <input type="file" id="canNativeGal" accept="image/*" style="display:none" onchange="window.canillasOnFile(event)">
+
+        <!-- Tarjeta Principal: Comparador Dividido estilo iOS -->
+        <div class="ios-main-card">
           
-          <div class="can-split-row">
+          <div class="ios-split-row">
             
             <!-- Columna Izquierda: Tu foto -->
-            <div class="can-col-user">
-              <div class="can-label-tag">Tu foto</div>
+            <div class="ios-col-user">
+              <div class="ios-tag-label">Tu foto</div>
               
-              <div class="can-user-img-box">
+              <div class="ios-user-box">
                 ${currentPhotoSrc ? `
-                  <img src="${currentPhotoSrc}" class="can-user-img">
+                  <img src="${currentPhotoSrc}" class="ios-user-img">
                 ` : `
-                  <div style="padding: 16px 8px; text-align: center; color: #94a3b8; font-size: 11px; font-weight: 750;">
+                  <div style="padding: 16px 8px; text-align: center; color: #94a3b8; font-size: 11.5px; font-weight: 700; line-height: 1.4;">
                     Subí una foto para comparar
                   </div>
                 `}
               </div>
 
-              <div style="display: flex; gap: 4px; margin-top: 8px;">
-                <button type="button" class="can-btn-cam" onclick="window.canillasTriggerCam()" style="padding: 7px; font-size: 11px; border-radius: 10px;">
-                  Cambiar
-                </button>
-              </div>
+              <button type="button" class="ios-cambiar-btn" onclick="window.canillasTriggerCam()">
+                Cambiar foto
+              </button>
             </div>
 
-            <!-- Columna Derecha: PDF a tamaño completo -->
-            <div class="can-col-deck">
-              <div class="can-label-tag">Catálogo PSA (Deslizá)</div>
+            <!-- Columna Derecha: Carta PDF limpia a tamaño completo -->
+            <div class="ios-col-deck">
+              <div class="ios-tag-label">Catálogo PSA (Deslizá)</div>
               
-              <div class="can-deck-stage" id="canDeckStage"></div>
+              <div class="ios-deck-stage" id="canDeckStage"></div>
             </div>
 
           </div>
 
-          <!-- Panel de Descripción en el espacio inferior -->
+          <!-- Panel de Descripción (Tocar para pasar carta) -->
           <div id="canDescPanelHost"></div>
 
-          <!-- Buscador para saltar directo a una carta del mazo -->
-          <input type="text" class="can-search-input" placeholder="🔍 Buscá en el mazo (ej. Libby, Arizona, Epuyen, Swing)..." oninput="window.canillasSearchDeck(this.value)">
+          <!-- Buscador instantáneo con estilo iOS Search -->
+          <div style="position: relative; margin-top: 10px;">
+            <span style="position: absolute; left: 12px; top: 22px; font-size: 13px; color: #94a3b8; pointer-events: none;">🔍</span>
+            <input type="text" class="ios-search-bar" placeholder="Buscar en el catálogo (ej. Libby, Arizona, Epuyen)..." oninput="window.canillasSearchDeck(this.value)">
+          </div>
 
         </div>
 
