@@ -1,9 +1,9 @@
 /* ============================================================
-   APPI · Canillas & Adaptadores PSA (Diseño iOS Premium)
-   - Botones cuadrados superiores con iconos vectoriales
-   - Mazo de cartas a pantalla completa sin capas fantasma
-   - Al tocar la descripción, pasa a la siguiente carta del PDF
-   - Estética iOS: Glassmorphism, esquinas continuas y sombras suaves
+   APPI · Canillas & Adaptadores PSA
+   - Botones cuadrados superiores estilo iPhone
+   - Sin botón redundante de cambiar foto
+   - Botón directo "Compartir por WhatsApp" que envía el cuadro completo
+   - Deslizamiento swipe y tap para pasar carta
    ============================================================ */
 (function () {
   "use strict";
@@ -174,7 +174,7 @@
         background: #f1f5f9;
         border-radius: 14px;
         overflow: hidden;
-        height: 290px;
+        height: 310px;
       }
       body.dark .ios-user-box {
         background: #181826;
@@ -186,27 +186,11 @@
         display: block;
       }
 
-      .ios-cambiar-btn {
-        margin-top: 8px;
-        padding: 8px 10px;
-        border-radius: 12px;
-        border: none;
-        background: linear-gradient(135deg, #0b5878, #3ad0a4);
-        color: #ffffff;
-        font-size: 11.5px;
-        font-weight: 800;
-        cursor: pointer;
-        transition: transform 0.12s ease;
-      }
-      .ios-cambiar-btn:active {
-        transform: scale(0.95);
-      }
-
       /* Escenario de carta del PDF */
       .ios-deck-stage {
         position: relative;
         width: 100%;
-        height: 290px;
+        height: 310px;
         overflow: hidden;
         border-radius: 14px;
         background: #ffffff;
@@ -277,7 +261,7 @@
         -webkit-user-select: none;
         position: relative;
         overflow: hidden;
-        transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), background 0.15s ease, box-shadow 0.15s ease;
+        transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), background 0.15s ease;
       }
       body.dark .ios-desc-card {
         background: linear-gradient(135deg, rgba(58, 208, 164, 0.1), rgba(11, 88, 120, 0.12));
@@ -367,6 +351,32 @@
         background: rgba(30, 30, 45, 0.7);
         border-color: rgba(255, 255, 255, 0.06);
         color: #e2e8f0;
+      }
+
+      /* Botón Compartir WhatsApp */
+      .ios-wa-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        width: 100%;
+        box-sizing: border-box;
+        padding: 14px 16px;
+        border-radius: 16px;
+        border: none;
+        background: linear-gradient(135deg, #25D366, #128C7E);
+        color: #ffffff;
+        font-family: inherit;
+        font-size: 14px;
+        font-weight: 850;
+        cursor: pointer;
+        margin-top: 12px;
+        box-shadow: 0 6px 18px rgba(37, 211, 102, 0.28);
+        transition: transform 0.12s ease, box-shadow 0.12s ease;
+      }
+      .ios-wa-btn:active {
+        transform: scale(0.97);
+        box-shadow: 0 2px 8px rgba(37, 211, 102, 0.15);
       }
 
       /* Buscador iOS estilo SearchBar */
@@ -601,6 +611,55 @@
     `;
   }
 
+  /* Compartir el cuadro completo por WhatsApp */
+  window.canillasShareWhatsApp = async function () {
+    var cur = DECK[deckIndex];
+    if (!cur) return;
+
+    var textMsg = "🚰 *Identificación de Adaptador PSA*\n\n" +
+                  "*Modelo:* " + cur.name + "\n" +
+                  "*Adaptador:* " + cur.adapter_id + "\n" +
+                  (cur.thread ? "*Rosca:* " + cur.thread + "\n" : "") +
+                  (cur.tip ? "\n💡 " + cur.tip : "");
+
+    var targetEl = document.getElementById("canCompareCaptureArea");
+
+    if (window.html2canvas && targetEl) {
+      try {
+        var canvas = await window.html2canvas(targetEl, {
+          backgroundColor: "#ffffff",
+          scale: 2,
+          useCORS: true,
+          logging: false
+        });
+
+        canvas.toBlob(async function (blob) {
+          if (blob && navigator.share && navigator.canShare) {
+            var file = new File([blob], "adaptador-psa.png", { type: "image/png" });
+            if (navigator.canShare({ files: [file] })) {
+              try {
+                await navigator.share({
+                  title: "Adaptador PSA - " + cur.adapter_id,
+                  text: textMsg,
+                  files: [file]
+                });
+                return;
+              } catch (e) {}
+            }
+          }
+          var waUrl = "https://wa.me/?text=" + encodeURIComponent(textMsg);
+          window.open(waUrl, "_blank");
+        }, "image/png");
+        return;
+      } catch (err) {
+        console.warn("Capture error, fallback text:", err);
+      }
+    }
+
+    var waUrl = "https://wa.me/?text=" + encodeURIComponent(textMsg);
+    window.open(waUrl, "_blank");
+  };
+
   /* Swipe táctil interactivo */
   function activarSwipeCard(el) {
     var x0 = 0, y0 = 0, dx = 0, dy = 0, arrastrando = false;
@@ -738,12 +797,12 @@
         <input type="file" id="canNativeCam" accept="image/*" capture="environment" style="display:none" onchange="window.canillasOnFile(event)">
         <input type="file" id="canNativeGal" accept="image/*" style="display:none" onchange="window.canillasOnFile(event)">
 
-        <!-- Tarjeta Principal: Comparador Dividido estilo iOS -->
-        <div class="ios-main-card">
+        <!-- Tarjeta Principal: Cuadro para Captura y Compartir -->
+        <div class="ios-main-card" id="canCompareCaptureArea">
           
           <div class="ios-split-row">
             
-            <!-- Columna Izquierda: Tu foto -->
+            <!-- Columna Izquierda: Tu foto (sin botón redundante de cambiar) -->
             <div class="ios-col-user">
               <div class="ios-tag-label">Tu foto</div>
               
@@ -756,10 +815,6 @@
                   </div>
                 `}
               </div>
-
-              <button type="button" class="ios-cambiar-btn" onclick="window.canillasTriggerCam()">
-                Cambiar foto
-              </button>
             </div>
 
             <!-- Columna Derecha: Carta PDF limpia a tamaño completo -->
@@ -774,12 +829,20 @@
           <!-- Panel de Descripción (Tocar para pasar carta) -->
           <div id="canDescPanelHost"></div>
 
-          <!-- Buscador instantáneo con estilo iOS Search -->
-          <div style="position: relative; margin-top: 10px;">
-            <span style="position: absolute; left: 12px; top: 22px; font-size: 13px; color: #94a3b8; pointer-events: none;">🔍</span>
-            <input type="text" class="ios-search-bar" placeholder="Buscar en el catálogo (ej. Libby, Arizona, Epuyen)..." oninput="window.canillasSearchDeck(this.value)">
-          </div>
+        </div>
 
+        <!-- Botón Compartir por WhatsApp -->
+        <button type="button" class="ios-wa-btn" onclick="window.canillasShareWhatsApp()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.664-.698c.969.586 1.777.947 2.8.947 3.181 0 5.767-2.587 5.768-5.766.001-3.18-2.585-5.767-5.766-5.767zm7.48 5.766c-.001 4.137-3.364 7.5-7.502 7.5-1.309 0-2.388-.344-3.419-.955l-4.59 1.203 1.226-4.475c-.694-1.109-1.065-2.227-1.066-3.473.001-4.137 3.364-7.5 7.502-7.5 4.138.001 7.499 3.363 7.499 7.5z"/>
+          </svg>
+          <span>Compartir por WhatsApp</span>
+        </button>
+
+        <!-- Buscador instantáneo con estilo iOS Search -->
+        <div style="position: relative; margin-top: 10px;">
+          <span style="position: absolute; left: 12px; top: 22px; font-size: 13px; color: #94a3b8; pointer-events: none;">🔍</span>
+          <input type="text" class="ios-search-bar" placeholder="Buscar en el catálogo (ej. Libby, Arizona, Epuyen)..." oninput="window.canillasSearchDeck(this.value)">
         </div>
 
       </div>
