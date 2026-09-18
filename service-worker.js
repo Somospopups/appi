@@ -33,6 +33,7 @@ const APP_SHELL = [
   './demo-guia.js',
   './tablero-negocio.js',
   './lista-precios.js',
+  './canillas-adaptadores.js',
   './stock-personal.js',
   './vendor/zxing.min.js',
   './porque-vivo.js',
