@@ -1,8 +1,8 @@
 /* ============================================================
    APPI · Canillas & Adaptadores PSA
    - 2 botones principales: Sacar foto / Buscar imagen
-   - Botón de Guía oficial abre DIRECTAMENTE el PDF (sin popup intermedio)
-   - Gesto de "Atrás" cierra el popup de la imagen y permanece en la herramienta
+   - Visor de Guía Oficial integrado con PDF.js (sin pantallas negras ni botones externos)
+   - Gesto de "Atrás" cierra el popup y permanece en la herramienta
    - Imagen completa de la página con popup de ampliación
    - Sin iconos en el título, sin botón de WhatsApp
    ============================================================ */
@@ -11,6 +11,10 @@
 
   var currentPhotoSrc = null;
   var currentResult = null;
+  var pdfDoc = null;
+  var pdfCurrentPage = 1;
+  var pdfTotalPages = 1;
+  var pdfLoading = false;
 
   function injectStyles() {
     if (document.getElementById("canillas-simple-styles")) return;
@@ -100,7 +104,6 @@
         font-weight: 850;
         cursor: pointer;
         box-sizing: border-box;
-        text-decoration: none;
         transition: all 0.15s ease;
       }
       body.dark .can-btn-pdf-trigger {
@@ -159,7 +162,7 @@
       body.dark .can-res-title {
         color: #3ad0a4;
       }
-      /* Modal Popup para la imagen */
+      /* Modal Popup */
       .can-modal-overlay {
         position: fixed;
         top: 0;
@@ -184,8 +187,8 @@
         background: #ffffff;
         width: 100%;
         max-width: 600px;
-        height: 92vh;
-        max-height: 92vh;
+        height: 94vh;
+        max-height: 94vh;
         border-radius: 24px 24px 0 0;
         display: flex;
         flex-direction: column;
@@ -238,8 +241,64 @@
       .can-close-btn:active {
         background: rgba(0,0,0,0.12);
       }
+      /* PDF Controls */
+      .can-pdf-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 16px;
+        background: rgba(0,0,0,0.03);
+        border-bottom: 1px solid rgba(0,0,0,0.06);
+      }
+      body.dark .can-pdf-bar {
+        background: rgba(255,255,255,0.04);
+        border-color: rgba(255,255,255,0.06);
+      }
+      .can-nav-btn {
+        background: rgba(11, 88, 120, 0.1);
+        border: 1px solid rgba(11, 88, 120, 0.2);
+        color: #0b5878;
+        font-size: 13px;
+        font-weight: 800;
+        padding: 6px 14px;
+        border-radius: 10px;
+        cursor: pointer;
+      }
+      body.dark .can-nav-btn {
+        background: rgba(58, 208, 164, 0.15);
+        border-color: rgba(58, 208, 164, 0.3);
+        color: #3ad0a4;
+      }
     `;
     document.head.appendChild(st);
+  }
+
+  function ensurePdfJs(callback) {
+    if (window.pdfjsLib) {
+      callback();
+      return;
+    }
+    var script = document.createElement("script");
+    script.src = "./vendor/pdf.min.js";
+    script.onload = function () {
+      if (window.pdfjsLib) {
+        window.pdfjsLib.GlobalWorkerOptions.workerSrc = "./vendor/pdf.worker.min.js";
+      }
+      callback();
+    };
+    script.onerror = function () {
+      // Fallback to CDN if local fails
+      var cdn = document.createElement("script");
+      cdn.src = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";
+      cdn.onload = function () {
+        if (window.pdfjsLib) {
+          window.pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+        }
+        callback();
+      };
+      document.head.appendChild(cdn);
+    };
+    document.head.appendChild(script);
   }
 
   window.openCanillas = function () {
@@ -282,6 +341,7 @@
       adapter: "PSA 142",
       name: "Adaptador Rosca Macho 16,3 x 1 mm",
       pageImg: "./adapters/page_18.jpg",
+      pageNumber: 18,
       thread: "Rosca métrica 16,3 x 1 mm (Casquillo)",
       code: "6-12-01-142-0",
       tip: "Desenroscá el casquillo cromado de la punta del pico y retirá el aireador interno para colocar este adaptador."
@@ -289,7 +349,7 @@
     renderResult();
   }
 
-  /* Popup para ver la imagen completa de la página con gesto atrás */
+  /* Popup para ver la imagen completa de la ficha */
   window.canillasOpenImagePopup = function (imgSrc, title) {
     window.canillasCloseModal();
 
@@ -315,9 +375,121 @@
     document.body.appendChild(modal);
   };
 
+  /* Visor oficial nativo de la Guía PSA con PDF.js */
+  window.canillasOpenPdfPopup = function (startPage) {
+    window.canillasCloseModal();
+    pdfCurrentPage = startPage || 1;
+
+    var modal = document.createElement("div");
+    modal.className = "can-modal-overlay";
+    modal.id = "canPdfModal";
+    modal.onclick = function (e) {
+      if (e.target === modal) window.canillasCloseModal();
+    };
+
+    modal.innerHTML = `
+      <div class="can-modal-content">
+        <div class="can-modal-header">
+          <span style="font-weight: 850; font-size: 15px;">Guía oficial de adaptadores</span>
+          <button type="button" class="can-close-btn" aria-label="Cerrar" data-cerrar="true" onclick="window.canillasCloseModal()">✕</button>
+        </div>
+        
+        <div class="can-pdf-bar">
+          <button type="button" class="can-nav-btn" onclick="window.canillasPdfPrev()">‹ Anterior</button>
+          <span id="canPdfPageInfo" style="font-size: 13px; font-weight: 800; color: #1e293b;">Cargando...</span>
+          <button type="button" class="can-nav-btn" onclick="window.canillasPdfNext()">Siguiente ›</button>
+        </div>
+
+        <div class="can-modal-body" style="background: #e2e8f0; display: flex; flex-direction: column; align-items: center; padding: 12px; overflow-y: auto;">
+          <div id="canPdfLoading" style="padding: 40px; text-align: center; color: #64748b; font-weight: 700; font-size: 14px;">
+            Cargando guía oficial...
+          </div>
+          <canvas id="canPdfCanvas" style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.12); display: none;"></canvas>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    ensurePdfJs(function () {
+      loadPdfDocument();
+    });
+  };
+
+  function loadPdfDocument() {
+    if (pdfDoc) {
+      renderPdfPage(pdfCurrentPage);
+      return;
+    }
+
+    if (!window.pdfjsLib) return;
+
+    var loadingTask = window.pdfjsLib.getDocument("./guia-adaptadores-psa.pdf");
+    loadingTask.promise.then(function (pdf) {
+      pdfDoc = pdf;
+      pdfTotalPages = pdf.numPages;
+      renderPdfPage(pdfCurrentPage);
+    }).catch(function (err) {
+      console.error("PDF load error:", err);
+      var info = document.getElementById("canPdfPageInfo");
+      if (info) info.textContent = "Error al abrir";
+    });
+  }
+
+  function renderPdfPage(num) {
+    if (!pdfDoc) return;
+    pdfLoading = true;
+
+    var pageInfo = document.getElementById("canPdfPageInfo");
+    var canvas = document.getElementById("canPdfCanvas");
+    var loader = document.getElementById("canPdfLoading");
+
+    if (pageInfo) pageInfo.textContent = "Pág " + num + " de " + pdfTotalPages;
+
+    pdfDoc.getPage(num).then(function (page) {
+      var containerWidth = Math.min(window.innerWidth - 30, 560);
+      var unscaledViewport = page.getViewport({ scale: 1 });
+      var scale = (containerWidth * 1.5) / unscaledViewport.width;
+      var viewport = page.getViewport({ scale: scale });
+
+      if (canvas) {
+        var context = canvas.getContext("2d");
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
+        canvas.style.width = Math.min(viewport.width / 1.5, containerWidth) + "px";
+        canvas.style.height = "auto";
+
+        var renderContext = {
+          canvasContext: context,
+          viewport: viewport
+        };
+
+        page.render(renderContext).promise.then(function () {
+          pdfLoading = false;
+          if (loader) loader.style.display = "none";
+          if (canvas) canvas.style.display = "block";
+        });
+      }
+    });
+  }
+
+  window.canillasPdfPrev = function () {
+    if (!pdfDoc || pdfCurrentPage <= 1) return;
+    pdfCurrentPage--;
+    renderPdfPage(pdfCurrentPage);
+  };
+
+  window.canillasPdfNext = function () {
+    if (!pdfDoc || pdfCurrentPage >= pdfTotalPages) return;
+    pdfCurrentPage++;
+    renderPdfPage(pdfCurrentPage);
+  };
+
   window.canillasCloseModal = function () {
-    var m = document.getElementById("canImgModal");
-    if (m && m.parentNode) m.parentNode.removeChild(m);
+    var m1 = document.getElementById("canImgModal");
+    if (m1 && m1.parentNode) m1.parentNode.removeChild(m1);
+    var m2 = document.getElementById("canPdfModal");
+    if (m2 && m2.parentNode) m2.parentNode.removeChild(m2);
   };
 
   function render() {
@@ -354,10 +526,10 @@
             </button>
           </div>
 
-          <!-- Botón que abre DIRECTAMENTE el PDF (sin popup intermedio) -->
-          <a href="./guia-adaptadores-psa.pdf" target="_blank" class="can-btn-pdf-trigger">
+          <!-- Botón de la Guía oficial en popup nativo directo -->
+          <button type="button" class="can-btn-pdf-trigger" onclick="window.canillasOpenPdfPopup(1)">
             <span>Ver Guía oficial de adaptadores PSA</span>
-          </a>
+          </button>
 
         </div>
 

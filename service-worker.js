@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v859-canillas-directpdf';
+const CACHE_NAME = 'appi-v860-canillas-pdfjs-native';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
