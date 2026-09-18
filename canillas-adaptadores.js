@@ -19,6 +19,19 @@
   };
 
   function $(id) { return document.getElementById(id); }
+  if (typeof window.$ === "undefined") {
+    window.$ = function(id) { return document.getElementById(id); };
+  }
+
+  window.canillasTriggerCam = function() {
+    var el = document.getElementById("canFileCam");
+    if (el) el.click();
+  };
+
+  window.canillasTriggerGal = function() {
+    var el = document.getElementById("canFileGal");
+    if (el) el.click();
+  };
   function esc(s) {
     return String(s == null ? "" : s).replace(/[&<>"\']/g, function (c) {
       return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
@@ -374,7 +387,7 @@
         <input type="file" id="canFileGal" accept="image/*" style="display:none" onchange="window.canillasOnFile(event)">
 
         <!-- Dropzone / Preview -->
-        <div class="can-dropzone" onclick="$('canFileGal').click()">
+        <div class="can-dropzone" onclick="window.canillasTriggerGal()">
           <div id="canDropPlaceholder" style="${state.userPhotoSrc ? "display:none" : ""}">
             <div style="font-size:42px; margin-bottom:8px">📸</div>
             <div style="font-size:14px; font-weight:850; color:#1e293b">Tomar o subir foto de la canilla</div>
@@ -387,10 +400,10 @@
         </div>
 
         <div class="can-actions-row">
-          <button type="button" class="can-btn-cam" onclick="$('canFileCam').click()">
+          <button type="button" class="can-btn-cam" onclick="window.canillasTriggerCam()">
             <span>📷</span> Sacar Foto
           </button>
-          <button type="button" class="can-btn-gal" onclick="$('canFileGal').click()">
+          <button type="button" class="can-btn-gal" onclick="window.canillasTriggerGal()">
             <span>📁</span> Galería
           </button>
         </div>
