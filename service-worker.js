@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v867-canillas-clean-bleed';
+const CACHE_NAME = 'appi-v868-canillas-zero-ghost';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

@@ -1,10 +1,9 @@
 /* ============================================================
    APPI · Canillas & Adaptadores PSA
-   - Vista dividida limpia: Foto a la izquierda + PDF a tamaño máximo a la derecha
-   - Sin flechitas ni títulos en la carta: la imagen ocupa todo el espacio
-   - Sin botón redundante de ver ficha: se toca directamente la carta para ampliar
-   - Animación de arrastre/vuelo idéntica al Home
-   - Descripción completa en el panel inferior
+   - Carta única sin capas fantasma ni superposiciones
+   - Imagen 100% limpia a tamaño máximo
+   - Deslizamiento swipe fluido y natural con slide in/out
+   - Panel de descripción completo en el espacio inferior
    ============================================================ */
 (function () {
   "use strict";
@@ -13,6 +12,7 @@
 
   var currentPhotoSrc = null;
   var deckIndex = 0;
+  var animando = false;
 
   function injectStyles() {
     if (document.getElementById("canillas-simple-styles")) return;
@@ -160,62 +160,37 @@
         display: block;
       }
 
-      /* Mazo a tamaño máximo sin títulos ni flechitas */
+      /* Escenario de carta única sólida */
       .can-deck-stage {
         position: relative;
         width: 100%;
         height: 290px;
-        perspective: 800px;
+        overflow: hidden;
+        border-radius: 14px;
+        background: #ffffff;
+        box-shadow: 0 4px 14px rgba(10, 12, 40, 0.08);
         user-select: none;
         -webkit-user-select: none;
         touch-action: pan-y;
       }
+      body.dark .can-deck-stage {
+        background: #181826;
+      }
+
       .can-card-stack {
         position: absolute;
         inset: 0;
-        border-radius: 14px;
         background: #ffffff;
-        box-shadow: 0 8px 24px rgba(10, 12, 40, 0.15);
         display: flex;
         align-items: center;
         justify-content: center;
         overflow: hidden;
         cursor: grab;
         will-change: transform;
-        transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.32s ease;
+        z-index: 5;
       }
       body.dark .can-card-stack {
         background: #181826;
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
-      }
-      .can-card-stack.detras1 {
-        transform: translateY(8px) scale(0.95);
-        opacity: 0.65;
-        pointer-events: none;
-        z-index: 1;
-      }
-      .can-card-stack.arrastre {
-        transition: none !important;
-        cursor: grabbing;
-        z-index: 10;
-      }
-      .can-card-stack.volver {
-        transition: transform 0.35s cubic-bezier(0.28, 1.45, 0.45, 1) !important;
-        z-index: 10;
-      }
-      .can-card-stack.vuela-izq {
-        transition: transform 0.42s cubic-bezier(0.3, 0.7, 0.4, 1), opacity 0.35s ease-out !important;
-        transform: translateX(-140%) rotate(-22deg) !important;
-        opacity: 0;
-        pointer-events: none;
-        z-index: 20;
-      }
-      .can-card-stack.vuela-der {
-        transition: transform 0.42s cubic-bezier(0.3, 0.7, 0.4, 1), opacity 0.35s ease-out !important;
-        transform: translateX(140%) rotate(22deg) !important;
-        opacity: 0;
-        pointer-events: none;
-        z-index: 20;
       }
 
       .can-card-full-img {
@@ -224,6 +199,33 @@
         object-fit: contain;
         display: block;
         pointer-events: none;
+        background: #ffffff;
+      }
+      body.dark .can-card-full-img {
+        background: #181826;
+      }
+
+      /* Animaciones de cambio */
+      @keyframes canSlideInRight {
+        from { transform: translateX(60px); opacity: 0.3; }
+        to { transform: translateX(0); opacity: 1; }
+      }
+      @keyframes canSlideInLeft {
+        from { transform: translateX(-60px); opacity: 0.3; }
+        to { transform: translateX(0); opacity: 1; }
+      }
+      .can-anim-in-right {
+        animation: canSlideInRight 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      }
+      .can-anim-in-left {
+        animation: canSlideInLeft 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      }
+      .can-card-stack.arrastre {
+        transition: none !important;
+        cursor: grabbing;
+      }
+      .can-card-stack.volver {
+        transition: transform 0.28s cubic-bezier(0.28, 1.45, 0.45, 1) !important;
       }
 
       /* Panel de descripción inferior */
@@ -387,36 +389,24 @@
     render();
   };
 
-  /* Pasar carta siguiente con animación de vuelo idéntica al Home */
+  /* Desplazamiento a la siguiente carta */
   window.canillasDeckNext = function () {
-    var stage = document.getElementById("canDeckStage");
-    if (!stage) return;
-    var top = stage.querySelector(".can-card-stack:not(.detras1)");
-    if (top) {
-      top.classList.add("vuela-izq");
-      setTimeout(function () {
-        if (top && top.parentNode) top.parentNode.removeChild(top);
-      }, 400);
-    }
+    if (animando) return;
+    animando = true;
     deckIndex = (deckIndex + 1) % DECK.length;
-    renderDeckCards();
+    renderSingleCard("next");
     updateDescriptionPanel();
+    setTimeout(function () { animando = false; }, 230);
   };
 
-  /* Volver carta anterior con animación de vuelo idéntica al Home */
+  /* Desplazamiento a la carta anterior */
   window.canillasDeckPrev = function () {
-    var stage = document.getElementById("canDeckStage");
-    if (!stage) return;
-    var top = stage.querySelector(".can-card-stack:not(.detras1)");
-    if (top) {
-      top.classList.add("vuela-der");
-      setTimeout(function () {
-        if (top && top.parentNode) top.parentNode.removeChild(top);
-      }, 400);
-    }
+    if (animando) return;
+    animando = true;
     deckIndex = (deckIndex - 1 + DECK.length) % DECK.length;
-    renderDeckCards();
+    renderSingleCard("prev");
     updateDescriptionPanel();
+    setTimeout(function () { animando = false; }, 230);
   };
 
   /* Búsqueda rápida para saltar a una carta */
@@ -429,29 +419,23 @@
           (f.adapter_id && f.adapter_id.toLowerCase().includes(q)) ||
           (f.brand && f.brand.toLowerCase().includes(q))) {
         deckIndex = i;
-        renderDeckCards();
+        renderSingleCard("next");
         updateDescriptionPanel();
         break;
       }
     }
   };
 
-  /* Renderiza las cartas del mazo ocupando el 100% del espacio, sin títulos ni flechitas */
-  function renderDeckCards() {
+  /* Renderiza UNA SOLA carta sólida y limpia: 0 superposiciones */
+  function renderSingleCard(dir) {
     var stage = document.getElementById("canDeckStage");
-    if (!stage) return;
+    if (!stage || !DECK[deckIndex]) return;
 
     var cur = DECK[deckIndex];
-    var next = DECK[(deckIndex + 1) % DECK.length];
+    var animClass = dir === "next" ? "can-anim-in-right" : (dir === "prev" ? "can-anim-in-left" : "");
 
     stage.innerHTML = `
-      <!-- Carta de atrás (detras1) -->
-      <div class="can-card-stack detras1">
-        <img src="${next.page_img}" class="can-card-full-img" alt="${next.name}">
-      </div>
-
-      <!-- Carta del frente interactiva -->
-      <div class="can-card-stack" id="canTopCard">
+      <div class="can-card-stack ${animClass}" id="canTopCard">
         <img src="${cur.page_img}" class="can-card-full-img" alt="${cur.name}">
       </div>
     `;
@@ -490,7 +474,7 @@
     `;
   }
 
-  /* Física de swipe interactivo idéntica a home-tarjetas.js */
+  /* Swipe interactivo natural */
   function activarSwipeCard(el) {
     var x0 = 0, y0 = 0, dx = 0, dy = 0, arrastrando = false;
 
@@ -517,7 +501,7 @@
 
       if (el.__arrastro) {
         if (e.cancelable) e.preventDefault();
-        el.style.transform = "translateX(" + dx + "px) rotate(" + (dx / 18) + "deg)";
+        el.style.transform = "translateX(" + dx + "px) rotate(" + (dx / 22) + "deg)";
       }
     }, { capture: true, passive: false });
 
@@ -526,16 +510,16 @@
       arrastrando = false;
       el.classList.remove("arrastre");
 
-      if (el.__arrastro && dx < -50) {
+      if (el.__arrastro && dx < -45) {
         window.canillasDeckNext();
-      } else if (el.__arrastro && dx > 50) {
+      } else if (el.__arrastro && dx > 45) {
         window.canillasDeckPrev();
       } else if (el.__arrastro) {
         el.classList.add("volver");
         el.style.transform = "";
         setTimeout(function () {
           el.classList.remove("volver");
-        }, 350);
+        }, 300);
       }
       el.__arrastro = false;
     }
@@ -616,7 +600,7 @@
 
         </div>
 
-        <!-- Vista Comparador: Foto izquierda + Mazo estilo Home derecha -->
+        <!-- Vista Comparador: Foto izquierda + Carta PDF derecha -->
         <div class="can-simple-card" style="padding: 12px 10px;">
           
           <div class="can-split-row">
@@ -642,7 +626,7 @@
               </div>
             </div>
 
-            <!-- Columna Derecha: Mazo a tamaño completo -->
+            <!-- Columna Derecha: PDF a tamaño completo -->
             <div class="can-col-deck">
               <div class="can-label-tag">Catálogo PSA (Deslizá)</div>
               
@@ -651,7 +635,7 @@
 
           </div>
 
-          <!-- Panel de Descripción en el espacio inferior (sin botón repetido) -->
+          <!-- Panel de Descripción en el espacio inferior -->
           <div id="canDescPanelHost"></div>
 
           <!-- Buscador para saltar directo a una carta del mazo -->
@@ -662,7 +646,7 @@
       </div>
     `;
 
-    renderDeckCards();
+    renderSingleCard();
     updateDescriptionPanel();
   }
 
