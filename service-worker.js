@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v864-canillas-deck-comparator';
+const CACHE_NAME = 'appi-v865-canillas-deck-aligned';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

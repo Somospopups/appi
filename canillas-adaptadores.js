@@ -147,8 +147,7 @@
         background: #f1f5f9;
         border-radius: 12px;
         overflow: hidden;
-        min-height: 180px;
-        max-height: 320px;
+        height: 220px;
         border: 1px solid rgba(0,0,0,0.06);
       }
       body.dark .can-user-img-box {
@@ -196,8 +195,7 @@
         border: 1px solid rgba(11, 88, 120, 0.18);
         cursor: pointer;
         position: relative;
-        min-height: 180px;
-        max-height: 250px;
+        height: 190px;
         display: flex;
         align-items: center;
         justify-content: center;
