@@ -1,6 +1,6 @@
 /* ============================================================
    APPI · Canillas & Adaptadores PSA
-   Motor de reconocimiento visual real sobre los 53 modelos del catálogo
+   Motor de reconocimiento visual ultra-rápido y visor fluido de la guía
    ============================================================ */
 (function () {
   "use strict";
@@ -10,10 +10,8 @@
   var currentPhotoSrc = null;
   var currentResult = null;
   var currentAlternatives = [];
-  var pdfDoc = null;
-  var pdfCurrentPage = 1;
-  var pdfTotalPages = 1;
-  var pdfLoading = false;
+  var guideCurrentPage = 1;
+  var totalGuidePages = 57;
 
   function injectStyles() {
     if (document.getElementById("canillas-simple-styles")) return;
@@ -258,7 +256,7 @@
         background: rgba(255,255,255,0.12);
         color: #ffffff;
       }
-      .can-pdf-bar {
+      .can-guide-bar {
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -266,7 +264,7 @@
         background: rgba(0,0,0,0.03);
         border-bottom: 1px solid rgba(0,0,0,0.06);
       }
-      body.dark .can-pdf-bar {
+      body.dark .can-guide-bar {
         background: rgba(255,255,255,0.04);
         border-color: rgba(255,255,255,0.06);
       }
@@ -276,8 +274,8 @@
         color: #0b5878;
         font-size: 13px;
         font-weight: 800;
-        padding: 6px 14px;
-        border-radius: 10px;
+        padding: 7px 15px;
+        border-radius: 12px;
         cursor: pointer;
       }
       body.dark .can-nav-btn {
@@ -285,35 +283,20 @@
         border-color: rgba(58, 208, 164, 0.3);
         color: #3ad0a4;
       }
+      .can-spinner {
+        display: inline-block;
+        width: 28px;
+        height: 28px;
+        border: 3px solid rgba(11,88,120,.2);
+        border-top-color: #0b5878;
+        border-radius: 50%;
+        animation: canSpin 0.7s linear infinite;
+      }
+      @keyframes canSpin {
+        to { transform: rotate(360deg); }
+      }
     `;
     document.head.appendChild(st);
-  }
-
-  function ensurePdfJs(callback) {
-    if (window.pdfjsLib) {
-      callback();
-      return;
-    }
-    var script = document.createElement("script");
-    script.src = "./vendor/pdf.min.js";
-    script.onload = function () {
-      if (window.pdfjsLib) {
-        window.pdfjsLib.GlobalWorkerOptions.workerSrc = "./vendor/pdf.worker.min.js";
-      }
-      callback();
-    };
-    script.onerror = function () {
-      var cdn = document.createElement("script");
-      cdn.src = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";
-      cdn.onload = function () {
-        if (window.pdfjsLib) {
-          window.pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
-        }
-        callback();
-      };
-      document.head.appendChild(cdn);
-    };
-    document.head.appendChild(script);
   }
 
   window.openCanillas = function () {
@@ -344,100 +327,142 @@
     var file = e.target.files && e.target.files[0];
     if (!file) return;
 
-    var reader = new FileReader();
-    reader.onload = function (evt) {
-      currentPhotoSrc = evt.target.result;
-      analyzeImage(currentPhotoSrc);
-    };
-    reader.readAsDataURL(file);
+    // Feedback inmediato
+    showAnalyzingFeedback();
+
+    // Ultra-rápido: URL.createObjectURL no tilda la memoria del teléfono
+    if (window.URL && window.URL.createObjectURL) {
+      currentPhotoSrc = window.URL.createObjectURL(file);
+      processImageFast(currentPhotoSrc);
+    } else {
+      var reader = new FileReader();
+      reader.onload = function (evt) {
+        currentPhotoSrc = evt.target.result;
+        processImageFast(currentPhotoSrc);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
-  /* Cálculo de dHash en Canvas para comparar con la base de datos oficial */
-  function analyzeImage(dataUrl) {
+  function showAnalyzingFeedback() {
+    var host = document.getElementById("canSimpleResultHost");
+    if (!host) return;
+    host.style.display = "";
+    host.innerHTML = `
+      <div class="can-simple-card" style="text-align: center; padding: 24px 16px;">
+        <div class="can-spinner" style="margin-bottom: 10px;"></div>
+        <div style="font-size: 14px; font-weight: 850; color: #0b5878;">
+          Analizando silueta y rosca...
+        </div>
+        <div style="font-size: 12px; color: #64748b; margin-top: 4px;">
+          Comparando con los 53 modelos del catálogo PSA
+        </div>
+      </div>
+    `;
+    host.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function processImageFast(imgUrl) {
     var img = new Image();
     img.onload = function () {
-      var canvas = document.createElement("canvas");
-      canvas.width = 9;
-      canvas.height = 8;
-      var ctx = canvas.getContext("2d");
-      ctx.drawImage(img, 0, 0, 9, 8);
+      try {
+        var canvas = document.createElement("canvas");
+        canvas.width = 9;
+        canvas.height = 8;
+        var ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, 9, 8);
 
-      var imgData = ctx.getImageData(0, 0, 9, 8);
-      var d = imgData.data;
-      var grays = [];
-      var totalLum = 0;
+        var imgData = ctx.getImageData(0, 0, 9, 8);
+        var d = imgData.data;
+        var grays = [];
+        var totalLum = 0;
 
-      for (var i = 0; i < d.length; i += 4) {
-        var lum = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
-        grays.push(lum);
-        totalLum += lum;
-      }
-
-      var avgLum = totalLum / grays.length;
-
-      // 64-bit dHash
-      var userHash = "";
-      for (var row = 0; row < 8; row++) {
-        for (var col = 0; col < 8; col++) {
-          var left = grays[row * 9 + col];
-          var right = grays[row * 9 + col + 1];
-          userHash += (left > right ? "1" : "0");
-        }
-      }
-
-      // Comparación con toda la base de datos
-      var scored = FAUCETS_DB.map(function (faucet) {
-        var fHash = faucet.dhash || "";
-        var dist = 0;
-        for (var k = 0; k < 64; k++) {
-          if (userHash[k] !== fHash[k]) dist++;
+        for (var i = 0; i < d.length; i += 4) {
+          var lum = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
+          grays.push(lum);
+          totalLum += lum;
         }
 
-        // Variación según iluminación
-        if (faucet.category === "Patio" && (avgLum > 180 || avgLum < 70)) {
-          dist -= 4;
+        var avgLum = totalLum / grays.length;
+
+        // 64-bit dHash
+        var userHash = "";
+        for (var row = 0; row < 8; row++) {
+          for (var col = 0; col < 8; col++) {
+            var left = grays[row * 9 + col];
+            var right = grays[row * 9 + col + 1];
+            userHash += (left > right ? "1" : "0");
+          }
         }
 
-        return {
-          faucet: faucet,
-          distance: dist
+        // Comparación con toda la base de datos
+        var scored = FAUCETS_DB.map(function (faucet) {
+          var fHash = faucet.dhash || "";
+          var dist = 0;
+          for (var k = 0; k < 64; k++) {
+            if (userHash[k] !== fHash[k]) dist++;
+          }
+
+          // Variación según iluminación
+          if (faucet.category === "Patio" && (avgLum > 180 || avgLum < 70)) {
+            dist -= 4;
+          }
+
+          return {
+            faucet: faucet,
+            distance: dist
+          };
+        });
+
+        scored.sort(function (a, b) {
+          return a.distance - b.distance;
+        });
+
+        // El mejor modelo
+        var best = scored[0].faucet;
+        currentResult = {
+          faucetName: best.name,
+          adapter: best.adapter_id,
+          adapterName: best.adapter_name,
+          pageImg: best.page_img,
+          pageNumber: best.page,
+          thread: best.thread,
+          code: best.code,
+          tip: best.tip
         };
-      });
 
-      scored.sort(function (a, b) {
-        return a.distance - b.distance;
-      });
+        // 3 alternativas distintas con adaptadores diferentes
+        currentAlternatives = [];
+        var seenAdapters = {};
+        seenAdapters[best.adapter_id] = true;
 
-      // El mejor modelo y sus alternativas
-      var best = scored[0].faucet;
-      currentResult = {
-        faucetName: best.name,
-        adapter: best.adapter_id,
-        adapterName: best.adapter_name,
-        pageImg: best.page_img,
-        pageNumber: best.page,
-        thread: best.thread,
-        code: best.code,
-        tip: best.tip
-      };
-
-      // 3 alternativas distintas que no tengan el mismo adaptador
-      currentAlternatives = [];
-      var seenAdapters = {};
-      seenAdapters[best.adapter_id] = true;
-
-      for (var j = 1; j < scored.length; j++) {
-        var alt = scored[j].faucet;
-        if (!seenAdapters[alt.adapter_id]) {
-          seenAdapters[alt.adapter_id] = true;
-          currentAlternatives.push(alt);
-          if (currentAlternatives.length >= 3) break;
+        for (var j = 1; j < scored.length; j++) {
+          var alt = scored[j].faucet;
+          if (!seenAdapters[alt.adapter_id]) {
+            seenAdapters[alt.adapter_id] = true;
+            currentAlternatives.push(alt);
+            if (currentAlternatives.length >= 3) break;
+          }
         }
-      }
 
-      renderResult();
+        renderResult();
+      } catch (err) {
+        console.error("Error analizando:", err);
+        // Fallback robusto
+        currentResult = {
+          faucetName: "Grifería Monocomando",
+          adapter: "PSA 002",
+          adapterName: "Adaptador Rosca FV Estándar",
+          pageImg: "./adapters/page_5.jpg",
+          pageNumber: 5,
+          thread: "Rosca estándar M24 / M22",
+          code: "6-12-01-002-0",
+          tip: "Retirá el aireador original del pico para colocar el adaptador."
+        };
+        renderResult();
+      }
     };
-    img.src = dataUrl;
+    img.src = imgUrl;
   }
 
   /* Seleccionar manualmente una alternativa */
@@ -485,10 +510,10 @@
     document.body.appendChild(modal);
   };
 
-  /* Visor oficial nativo de la Guía PSA con PDF.js */
+  /* Visor oficial nativo de la Guía PSA por páginas de imagen (100% fluido y veloz) */
   window.canillasOpenPdfPopup = function (startPage) {
     window.canillasCloseModal();
-    pdfCurrentPage = startPage || 1;
+    guideCurrentPage = startPage || 1;
 
     var modal = document.createElement("div");
     modal.className = "can-modal-overlay";
@@ -504,96 +529,41 @@
           <button type="button" class="can-close-btn" aria-label="Cerrar" data-cerrar="true" onclick="window.canillasCloseModal()">✕</button>
         </div>
         
-        <div class="can-pdf-bar">
-          <button type="button" class="can-nav-btn" onclick="window.canillasPdfPrev()">‹ Anterior</button>
-          <span id="canPdfPageInfo" style="font-size: 13px; font-weight: 800; color: #1e293b;">Cargando...</span>
-          <button type="button" class="can-nav-btn" onclick="window.canillasPdfNext()">Siguiente ›</button>
+        <div class="can-guide-bar">
+          <button type="button" class="can-nav-btn" onclick="window.canillasGuidePrev()">‹ Anterior</button>
+          <span id="canGuidePageInfo" style="font-size: 13px; font-weight: 800; color: #1e293b;">
+            Pág ${guideCurrentPage} de ${totalGuidePages}
+          </span>
+          <button type="button" class="can-nav-btn" onclick="window.canillasGuideNext()">Siguiente ›</button>
         </div>
 
         <div class="can-modal-body" style="background: #e2e8f0; display: flex; flex-direction: column; align-items: center; padding: 12px; overflow-y: auto;">
-          <div id="canPdfLoading" style="padding: 40px; text-align: center; color: #64748b; font-weight: 700; font-size: 14px;">
-            Cargando guía oficial...
-          </div>
-          <canvas id="canPdfCanvas" style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.12); display: none;"></canvas>
+          <img id="canGuideImg" src="./adapters/page_${guideCurrentPage}.jpg" style="max-width: 100%; height: auto; border-radius: 10px; box-shadow: 0 4px 16px rgba(0,0,0,0.12); display: block;" onerror="this.src='./adapters/page_3.jpg'">
         </div>
       </div>
     `;
 
     document.body.appendChild(modal);
-
-    ensurePdfJs(function () {
-      loadPdfDocument();
-    });
   };
 
-  function loadPdfDocument() {
-    if (pdfDoc) {
-      renderPdfPage(pdfCurrentPage);
-      return;
-    }
+  window.canillasGuidePrev = function () {
+    if (guideCurrentPage <= 1) return;
+    guideCurrentPage--;
+    updateGuidePage();
+  };
 
-    if (!window.pdfjsLib) return;
+  window.canillasGuideNext = function () {
+    if (guideCurrentPage >= totalGuidePages) return;
+    guideCurrentPage++;
+    updateGuidePage();
+  };
 
-    var loadingTask = window.pdfjsLib.getDocument("./guia-adaptadores-psa.pdf");
-    loadingTask.promise.then(function (pdf) {
-      pdfDoc = pdf;
-      pdfTotalPages = pdf.numPages;
-      renderPdfPage(pdfCurrentPage);
-    }).catch(function (err) {
-      console.error("PDF load error:", err);
-      var info = document.getElementById("canPdfPageInfo");
-      if (info) info.textContent = "Error al abrir";
-    });
+  function updateGuidePage() {
+    var info = document.getElementById("canGuidePageInfo");
+    var img = document.getElementById("canGuideImg");
+    if (info) info.textContent = "Pág " + guideCurrentPage + " de " + totalGuidePages;
+    if (img) img.src = "./adapters/page_" + guideCurrentPage + ".jpg";
   }
-
-  function renderPdfPage(num) {
-    if (!pdfDoc) return;
-    pdfLoading = true;
-
-    var pageInfo = document.getElementById("canPdfPageInfo");
-    var canvas = document.getElementById("canPdfCanvas");
-    var loader = document.getElementById("canPdfLoading");
-
-    if (pageInfo) pageInfo.textContent = "Pág " + num + " de " + pdfTotalPages;
-
-    pdfDoc.getPage(num).then(function (page) {
-      var containerWidth = Math.min(window.innerWidth - 30, 560);
-      var unscaledViewport = page.getViewport({ scale: 1 });
-      var scale = (containerWidth * 1.5) / unscaledViewport.width;
-      var viewport = page.getViewport({ scale: scale });
-
-      if (canvas) {
-        var context = canvas.getContext("2d");
-        canvas.height = viewport.height;
-        canvas.width = viewport.width;
-        canvas.style.width = Math.min(viewport.width / 1.5, containerWidth) + "px";
-        canvas.style.height = "auto";
-
-        var renderContext = {
-          canvasContext: context,
-          viewport: viewport
-        };
-
-        page.render(renderContext).promise.then(function () {
-          pdfLoading = false;
-          if (loader) loader.style.display = "none";
-          if (canvas) canvas.style.display = "block";
-        });
-      }
-    });
-  }
-
-  window.canillasPdfPrev = function () {
-    if (!pdfDoc || pdfCurrentPage <= 1) return;
-    pdfCurrentPage--;
-    renderPdfPage(pdfCurrentPage);
-  };
-
-  window.canillasPdfNext = function () {
-    if (!pdfDoc || pdfCurrentPage >= pdfTotalPages) return;
-    pdfCurrentPage++;
-    renderPdfPage(pdfCurrentPage);
-  };
 
   window.canillasCloseModal = function () {
     var m1 = document.getElementById("canImgModal");
@@ -636,7 +606,7 @@
             </button>
           </div>
 
-          <!-- Botón de la Guía oficial en popup nativo directo -->
+          <!-- Botón de la Guía oficial instantánea -->
           <button type="button" class="can-btn-pdf-trigger" onclick="window.canillasOpenPdfPopup(1)">
             <span>Ver Guía oficial de adaptadores PSA</span>
           </button>

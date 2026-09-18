@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v861-canillas-real-vision';
+const CACHE_NAME = 'appi-v862-canillas-fast-fluid';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
