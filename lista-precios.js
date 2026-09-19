@@ -508,18 +508,9 @@
           precioHtml = '<div class="lp-precio-promo-row"><s class="lp-precio-tachado">' + money(L.promo.precio_original) + '</s><em>' + money(L.precio) + '</em></div>';
         }
       }
-      var flyerHtml = '';
-      if (isPromo && L.promo.flyer) {
-        flyerHtml = '<div class="lp-flyer-thumb-wrap" data-flyer-popup="' + esc(L.promo.flyer) + '" data-foto-tit="' + esc('Flyer oficial: ' + L.nombre) + '" data-foto-sub="' + esc((L.promo.vigencia || 'Promoción oficial PSA') + ' · ' + (L.promo.detalle || '')) + '" title="Tocar para ver flyer oficial">' +
-          '<img class="lp-flyer-thumb-img" src="' + esc(L.promo.flyer) + '" alt="Flyer" loading="lazy">' +
-          '<span class="lp-flyer-thumb-lbl">Flyer 📄</span>' +
-        '</div>';
-      }
-      var leftColHtml = '<div class="lp-item-left-col">' + fotoHtml + flyerHtml + '</div>';
-
       var clsItem = 'lp-item' + (isPromo ? ' lp-promo-card' : (isNovedad ? ' lp-novedad-card' : '')) + (esCanje ? ' lp-canje' : '') + (L.grupo === 'packs' ? ' lp-item-is-pack' : '');
       html += '<div class="' + clsItem + '" data-sku="' + esc(L.clave) + '">' +
-        leftColHtml +
+        fotoHtml +
         '<div class="lp-item-txt">' + novedadBadgeHtml + promoBadgeHtml + '<b>' + esc(L.nombre) + '</b><span>' + subTxt + '</span>' + descHtml + precioHtml + '</div>' +
         '<div class="lp-qty">' +
           (q ? '<button type="button" class="ghost" data-act="menos" aria-label="Quitar">−</button><i>' + q + '</i>' : '') +
@@ -1719,11 +1710,20 @@
             }
           });
 
-          // Incorporar cualquier nuevo producto del catalogo local (ej. Senior 4 Terra, Burby Terra, Soporte Celular, Promo Combo)
+          // Incorporar CUALQUIER producto del catálogo local que no esté en Supabase (por SKU o por nombre)
+          var nombresExistentes = {};
+          catElegido.productos.forEach(function(p){
+            if (p && p.nombre) nombresExistentes[p.nombre.trim().toUpperCase()] = true;
+          });
           fileCat.productos.forEach(function (fp) {
-            if (fp && fp.sku && !skusExistentes[fp.sku]) {
+            if (!fp) return;
+            var nomK = (fp.nombre || '').trim().toUpperCase();
+            var faltaSku = fp.sku && !skusExistentes[fp.sku];
+            var faltaNom = !nombresExistentes[nomK];
+            if (faltaSku || faltaNom) {
               catElegido.productos.push(fp);
-              skusExistentes[fp.sku] = true;
+              if (fp.sku) skusExistentes[fp.sku] = true;
+              if (nomK) nombresExistentes[nomK] = true;
             }
           });
 

@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "878.0.0",
-  "cacheName": "appi-v878-novedades-catalog-auto",
+  "version": "879.0.0",
+  "cacheName": "appi-v879-catalogo-completo-psa",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {
