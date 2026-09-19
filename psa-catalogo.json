@@ -482,7 +482,8 @@
         "precio_original": 1370000,
         "desde": "01/09/2026",
         "hasta": "30/09/2026",
-        "vigencia": "Del 01/09 al 30/09/2026"
+        "vigencia": "Del 01/09 al 30/09/2026",
+        "flyer": "https://tienda.psa.com.ar/media/wysiwyg/sliders-promos-tienda_PSA_1_Desktop_30.jpg"
       }
     },
     {
@@ -504,7 +505,8 @@
         "precio_original": 1370000,
         "desde": "01/09/2026",
         "hasta": "30/09/2026",
-        "vigencia": "Del 01/09 al 30/09/2026"
+        "vigencia": "Del 01/09 al 30/09/2026",
+        "flyer": "https://tienda.psa.com.ar/media/wysiwyg/sliders-promos-tienda_PSA_1_Desktop_30.jpg"
       }
     },
     {
@@ -550,7 +552,8 @@
         "precio_original": 468600,
         "desde": "01/09/2026",
         "hasta": "30/09/2026",
-        "vigencia": "Del 01/09 al 30/09/2026"
+        "vigencia": "Del 01/09 al 30/09/2026",
+        "flyer": "https://tienda.psa.com.ar/media/wysiwyg/SodaBurby-detalle-1.jpg"
       }
     },
     {
@@ -2444,7 +2447,8 @@
         "precio_original": 136500,
         "desde": "01/09/2026",
         "hasta": "30/09/2026",
-        "vigencia": "Del 01/09 al 30/09/2026"
+        "vigencia": "Del 01/09 al 30/09/2026",
+        "flyer": "https://tienda.psa.com.ar/media/wysiwyg/sliders-promos-tienda_PSA_3_Desktop_20.jpg"
       }
     },
     {
@@ -4014,7 +4018,8 @@
         "precio_original": 468600,
         "desde": "01/09/2026",
         "hasta": "30/09/2026",
-        "vigencia": "Del 01/09 al 30/09/2026"
+        "vigencia": "Del 01/09 al 30/09/2026",
+        "flyer": "https://tienda.psa.com.ar/media/wysiwyg/SodaBurby-detalle-1.jpg"
       }
     },
     {
@@ -4048,7 +4053,8 @@
         "precio_original": 1548000,
         "desde": "01/09/2026",
         "hasta": "30/09/2026",
-        "vigencia": "Del 01/09 al 30/09/2026"
+        "vigencia": "Del 01/09 al 30/09/2026",
+        "flyer": "https://tienda.psa.com.ar/media/wysiwyg/sliders-promos-tienda_PSA_2_Desktop_27.jpg"
       }
     }
   ]

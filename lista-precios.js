@@ -217,28 +217,49 @@
     setTimeout(function () { m.style.display = 'none'; }, 200);
   }
 
-  function abrirFotoModal(src, tit, sub) {
+  function compartirFlyerWA(src, tit) {
+    try {
+      var txt = '¡Mirá esta promoción oficial de PSA! 🔥\n*' + (tit || 'Promoción PSA') + '*\n' + (src || '');
+      var waUrl = 'https://api.whatsapp.com/send?text=' + encodeURIComponent(txt);
+      window.open(waUrl, '_blank');
+    } catch(e) {}
+  }
+
+  function abrirFotoModal(src, tit, sub, isFlyer) {
     var m = $('lpFotoModal');
     if (!m) {
       m = document.createElement('div');
       m.id = 'lpFotoModal';
       m.innerHTML = '<div class="lp-foto-card">' +
+        '<div class="lp-foto-card-header">' +
+          '<span class="lp-foto-card-tag" id="lpFotoModalTag" style="display:none">🔥 Promoción Oficial</span>' +
+          '<button type="button" class="lp-foto-card-x" id="lpFotoModalX">✕</button>' +
+        '</div>' +
         '<img class="lp-foto-card-img" id="lpFotoModalImg" src="" alt="">' +
         '<div class="lp-foto-card-tit" id="lpFotoModalTit"></div>' +
         '<div class="lp-foto-card-sub" id="lpFotoModalSub"></div>' +
-        '<button type="button" class="lp-foto-card-close" id="lpFotoModalClose">Cerrar</button>' +
+        '<div class="lp-foto-card-actions">' +
+          '<button type="button" class="lp-foto-card-wa" id="lpFotoModalWA"><span>💬</span> Compartir por WhatsApp</button>' +
+          '<button type="button" class="lp-foto-card-close" id="lpFotoModalClose">Cerrar</button>' +
+        '</div>' +
         '</div>';
       document.body.appendChild(m);
       m.addEventListener('click', function (e) {
-        if (e.target === m || e.target.id === 'lpFotoModalClose') cerrarFotoModal();
+        if (e.target === m || e.target.id === 'lpFotoModalClose' || e.target.id === 'lpFotoModalX') cerrarFotoModal();
       });
     }
     var img = $('lpFotoModalImg');
     var t = $('lpFotoModalTit');
     var s = $('lpFotoModalSub');
+    var tag = $('lpFotoModalTag');
+    var btnWa = $('lpFotoModalWA');
     if (img) img.src = src || '';
     if (t) t.textContent = tit || '';
     if (s) s.textContent = sub || '';
+    if (tag) tag.style.display = isFlyer ? 'inline-block' : 'none';
+    if (btnWa) {
+      btnWa.onclick = function() { compartirFlyerWA(src, tit); };
+    }
     m.style.display = 'flex';
     requestAnimationFrame(function () { m.classList.add('open'); });
   }
@@ -363,7 +384,7 @@
       '.lp-foto-card-tit{font-size:14px;font-weight:800;margin-bottom:6px;line-height:1.3}' +
       '.lp-foto-card-sub{font-size:12px;color:#70707a;margin-bottom:16px}' +
       'body.dark .lp-foto-card-sub{color:#a0a0aa}' +
-      '.lp-foto-card-close{width:100%;padding:11px;border-radius:12px;border:0;background:#0b5878;color:#fff;font-weight:700;font-size:13px;cursor:pointer}' + '.lp-item-foto{width:44px;height:44px;flex:none;border-radius:10px;object-fit:contain;background:#fff;border:1px solid rgba(0,0,0,.07);padding:3px}' +
+      '.lp-foto-card{max-width:360px!important;width:92%!important;padding:16px!important;border-radius:24px!important}' + '.lp-foto-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}' + '.lp-foto-card-tag{background:linear-gradient(135deg,#ea580c,#f97316);color:#fff;font-size:10px;font-weight:900;padding:3px 8px;border-radius:6px;text-transform:uppercase;letter-spacing:.3px}' + '.lp-foto-card-x{border:0;background:rgba(0,0,0,.08);color:#555;width:28px;height:28px;border-radius:50%;cursor:pointer;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center}' + 'body.dark .lp-foto-card-x{background:rgba(255,255,255,.12);color:#eee}' + '.lp-foto-card-img{width:100%!important;max-height:260px!important;height:auto!important;object-fit:contain!important;border-radius:14px!important;margin:0 0 12px!important;background:#fafafa!important;border:1px solid rgba(0,0,0,.06)!important}' + 'body.dark .lp-foto-card-img{background:#1c1e2a!important;border-color:rgba(255,255,255,.08)!important}' + '.lp-foto-card-actions{display:flex;flex-direction:column;gap:8px;margin-top:14px}' + '.lp-foto-card-wa{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:11px;border-radius:12px;border:0;background:#25d366;color:#fff;font-weight:900;font-size:13px;cursor:pointer;box-shadow:0 3px 10px rgba(37,211,102,.3)}' + '.lp-foto-card-close{width:100%;padding:9px;border-radius:12px;border:0;background:rgba(0,0,0,.07);color:#333;font-weight:750;font-size:12px;cursor:pointer}' + 'body.dark .lp-foto-card-close{background:rgba(255,255,255,.1);color:#eee}' + '.lp-item-left-col{display:flex;flex-direction:column;align-items:center;gap:6px;flex:none;width:52px}' + '.lp-flyer-thumb-wrap{position:relative;width:48px;cursor:pointer;border-radius:8px;overflow:hidden;border:1.5px solid #f97316;background:#fff;box-shadow:0 2px 6px rgba(249,115,22,.2);transition:transform .15s ease}' + '.lp-flyer-thumb-wrap:active{transform:scale(0.94)}' + '.lp-flyer-thumb-img{width:100%;height:32px;object-fit:cover;display:block}' + '.lp-flyer-thumb-lbl{display:block;background:linear-gradient(135deg,#ea580c,#f97316);color:#fff;font-size:7.5px;font-weight:900;text-align:center;padding:1px 0;text-transform:uppercase;letter-spacing:.3px}' + '.lp-item-foto{width:44px;height:44px;flex:none;border-radius:10px;object-fit:contain;background:#fff;border:1px solid rgba(0,0,0,.07);padding:3px}' +
       'body.dark .lp-item-foto{background:#1c1e2e;border-color:rgba(255,255,255,.09)}' +
       'body.dark .lp-item-txt b,body.dark .lp-sheet h2,body.dark .lp-line b{color:#f2f2f7}' +
       'body.dark .lp-search,body.dark .lp-para{background:#25273a;color:#f2f2f7}' +
@@ -475,9 +496,18 @@
           precioHtml = '<div class="lp-precio-promo-row"><s class="lp-precio-tachado">' + money(L.promo.precio_original) + '</s><em>' + money(L.precio) + '</em></div>';
         }
       }
+      var flyerHtml = '';
+      if (isPromo && L.promo.flyer) {
+        flyerHtml = '<div class="lp-flyer-thumb-wrap" data-flyer-popup="' + esc(L.promo.flyer) + '" data-foto-tit="' + esc('Flyer oficial: ' + L.nombre) + '" data-foto-sub="' + esc((L.promo.vigencia || 'Promoción oficial PSA') + ' · ' + (L.promo.detalle || '')) + '" title="Tocar para ver flyer oficial">' +
+          '<img class="lp-flyer-thumb-img" src="' + esc(L.promo.flyer) + '" alt="Flyer" loading="lazy">' +
+          '<span class="lp-flyer-thumb-lbl">Flyer 📄</span>' +
+        '</div>';
+      }
+      var leftColHtml = '<div class="lp-item-left-col">' + fotoHtml + flyerHtml + '</div>';
+
       var clsItem = 'lp-item' + (isPromo ? ' lp-promo-card' : '') + (esCanje ? ' lp-canje' : '') + (L.grupo === 'packs' ? ' lp-item-is-pack' : '');
       html += '<div class="' + clsItem + '" data-sku="' + esc(L.clave) + '">' +
-        fotoHtml +
+        leftColHtml +
         '<div class="lp-item-txt">' + promoBadgeHtml + '<b>' + esc(L.nombre) + '</b><span>' + subTxt + '</span>' + descHtml + precioHtml + '</div>' +
         '<div class="lp-qty">' +
           (q ? '<button type="button" class="ghost" data-act="menos" aria-label="Quitar">−</button><i>' + q + '</i>' : '') +
@@ -1584,10 +1614,16 @@
     };
     var list = $('lpList');
     if (list) list.onclick = function (e) {
+      var flyerBtn = e.target.closest('[data-flyer-popup]');
+      if (flyerBtn) {
+        e.stopPropagation();
+        abrirFotoModal(flyerBtn.getAttribute('data-flyer-popup'), flyerBtn.getAttribute('data-foto-tit'), flyerBtn.getAttribute('data-foto-sub'), true);
+        return;
+      }
       var fotoBtn = e.target.closest('[data-foto-popup]');
       if (fotoBtn) {
         e.stopPropagation();
-        abrirFotoModal(fotoBtn.getAttribute('data-foto-popup'), fotoBtn.getAttribute('data-foto-tit'), fotoBtn.getAttribute('data-foto-sub'));
+        abrirFotoModal(fotoBtn.getAttribute('data-foto-popup'), fotoBtn.getAttribute('data-foto-tit'), fotoBtn.getAttribute('data-foto-sub'), false);
         return;
       }
       var btn = e.target.closest('[data-act]');
