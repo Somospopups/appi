@@ -473,7 +473,14 @@
       "plan_canje": 1168200,
       "seccion": "Purificadores",
       "foto": "catalogo-img/611030560.png",
-      "desc": "Purificador selectivo de arsénico con resina arsénico-selectiva, carbón activado granular con plata y KDF. Diseñado especialmente para zonas con presencia de arsénico en agua potable o de red. Vida útil: 18 meses u 8.000 litros."
+      "desc": "Purificador selectivo de arsénico con resina arsénico-selectiva, carbón activado granular con plata y KDF. Diseñado especialmente para zonas con presencia de arsénico en agua potable o de red. Vida útil: 18 meses u 8.000 litros.",
+      "promo": {
+        "activa": true,
+        "etiqueta": "10% OFF",
+        "detalle": "10% OFF Promoción especial PSA Senik",
+        "descuento": 10,
+        "precio_original": 1370000
+      }
     },
     {
       "sku": "611030540",
@@ -485,7 +492,14 @@
       "plan_canje": 1168200,
       "seccion": "Purificadores",
       "foto": "catalogo-img/611030540.png",
-      "desc": "Purificador selectivo de arsénico con resina arsénico-selectiva, carbón activado granular con plata y KDF. Diseñado especialmente para zonas con presencia de arsénico en agua potable o de red. Vida útil: 18 meses u 8.000 litros."
+      "desc": "Purificador selectivo de arsénico con resina arsénico-selectiva, carbón activado granular con plata y KDF. Diseñado especialmente para zonas con presencia de arsénico en agua potable o de red. Vida útil: 18 meses u 8.000 litros.",
+      "promo": {
+        "activa": true,
+        "etiqueta": "10% OFF",
+        "detalle": "10% OFF Promoción especial PSA Senik",
+        "descuento": 10,
+        "precio_original": 1370000
+      }
     },
     {
       "sku": "611030060",
@@ -521,7 +535,14 @@
       "plan_canje": 399600,
       "seccion": "Gasificador",
       "foto": "catalogo-img/617110040.png",
-      "desc": "Gasificador de agua para preparar soda al instante con Agua Purificada PSA. Incluye cilindro de dióxido de carbono (CO2) de calidad alimentaria para hasta 60 litros y botella reutilizable libre de BPA."
+      "desc": "Gasificador de agua para preparar soda al instante con Agua Purificada PSA. Incluye cilindro de dióxido de carbono (CO2) de calidad alimentaria para hasta 60 litros y botella reutilizable libre de BPA.",
+      "promo": {
+        "activa": true,
+        "etiqueta": "10% OFF",
+        "detalle": "10% OFF Promoción Soda Burby",
+        "descuento": 10,
+        "precio_original": 468600
+      }
     },
     {
       "sku": "611310070",
@@ -2405,7 +2426,14 @@
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
       "foto": "catalogo-img/618110150.png",
-      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (PROMO CILINDRO + PACK RENDIMIENTO II)."
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (PROMO CILINDRO + PACK RENDIMIENTO II).",
+      "promo": {
+        "activa": true,
+        "etiqueta": "PROMO PACK",
+        "detalle": "Cilindro de CO2 + Pack Rendimiento II bonificado",
+        "descuento": 15,
+        "precio_original": 136500
+      }
     },
     {
       "sku": "614070010",
@@ -3965,7 +3993,14 @@
       "plan_canje": 399600,
       "seccion": "Gasificador",
       "foto": "catalogo-img/617110050.png",
-      "desc": "Gasificador de agua edición especial color Terra para preparar soda al instante con Agua Purificada PSA. Incluye cilindro de dióxido de carbono (CO2) de calidad alimentaria para hasta 60 litros y botella reutilizable libre de BPA."
+      "desc": "Gasificador de agua edición especial color Terra para preparar soda al instante con Agua Purificada PSA. Incluye cilindro de dióxido de carbono (CO2) de calidad alimentaria para hasta 60 litros y botella reutilizable libre de BPA.",
+      "promo": {
+        "activa": true,
+        "etiqueta": "10% OFF",
+        "detalle": "10% OFF Promoción Soda Burby",
+        "descuento": 10,
+        "precio_original": 468600
+      }
     },
     {
       "sku": "614065680",
@@ -3989,7 +4024,14 @@
       "plan_canje": null,
       "seccion": "Purificadores",
       "foto": "catalogo-img/630139850.png",
-      "desc": "Combo promocional edición especial Terra: Purificador PSA Senior 4 Terra con Kit Posventa + Gasificador PSA Soda Burby Terra."
+      "desc": "Combo promocional edición especial Terra: Purificador PSA Senior 4 Terra con Kit Posventa + Gasificador PSA Soda Burby Terra.",
+      "promo": {
+        "activa": true,
+        "etiqueta": "COMBO PROMO",
+        "detalle": "Lanzamiento Terra: S4 + Soda Burby bonificado",
+        "descuento": 10,
+        "precio_original": 1548000
+      }
     }
   ]
 }

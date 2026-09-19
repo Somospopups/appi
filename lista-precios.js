@@ -77,6 +77,7 @@
   var busca = '';
   var GRUPOS = [
     { id: 'todos', t: 'Todos' },
+    { id: 'promos', t: '🔥 Promos' },
     { id: 'packs', t: 'Packs PSA' },
     { id: 'equipos', t: 'Equipos' },
     { id: 'recargas', t: 'Recargas' },
@@ -84,7 +85,7 @@
     { id: 'botellas', t: 'Botellas' },
     { id: 'otros', t: 'Otros' }
   ];
-  var GRUPO_TIT = { packs: 'Packs PSA', equipos: 'Equipos', recargas: 'Recargas y adaptadores', griferia: 'Grifería', botellas: 'Botellas y mates', otros: 'Otros' };
+  var GRUPO_TIT = { promos: '🔥 Promociones vigentes', packs: 'Packs PSA', equipos: 'Equipos', recargas: 'Recargas y adaptadores', griferia: 'Grifería', botellas: 'Botellas y mates', otros: 'Otros' };
 
   function $(id) { return document.getElementById(id); }
   function esc(s) {
@@ -142,6 +143,10 @@
   function lineasLista() {
     var out = [];
     productos().forEach(function (p) {
+      var promo = p.promo || null;
+      if (!promo && p.nombre && (p.nombre.toUpperCase().indexOf('PROMO') >= 0 || p.nombre.toUpperCase().indexOf('COMBO') >= 0)) {
+        promo = { activa: true, etiqueta: 'PROMO', detalle: 'Promoción especial vigente' };
+      }
       out.push({
         clave: claveSku(p),
         sku: p.sku || '',
@@ -151,7 +156,8 @@
         grupo: p.grupo,
         seccion: p.seccion,
         composicion: p.composicion || '',
-        url: p.url || ''
+        url: p.url || '',
+        promo: promo
       });
       if (p.plan_canje) out.push(lineaCanje(p));
     });
@@ -172,11 +178,23 @@
   function filtrados() {
     var q = busca.trim().toLowerCase();
     var list = lineasLista();
-    return list.filter(function (L) {
-      if (filtro !== 'todos' && L.grupo !== filtro) return false;
+    var res = list.filter(function (L) {
+      if (filtro === 'promos') {
+        if (!L.promo || !L.promo.activa) return false;
+      } else if (filtro !== 'todos' && L.grupo !== filtro) {
+        return false;
+      }
       if (!q) return true;
       return (L.nombre || '').toLowerCase().indexOf(q) >= 0 || String(L.sku).indexOf(q) >= 0;
     });
+    // Promociones siempre arriba de todo
+    res.sort(function (a, b) {
+      var aP = (a.promo && a.promo.activa) ? 1 : 0;
+      var bP = (b.promo && b.promo.activa) ? 1 : 0;
+      if (aP !== bP) return bP - aP;
+      return 0;
+    });
+    return res;
   }
   function resumen() {
     var c = carrito(), n = 0, tot = 0, lineas = [];
@@ -246,7 +264,7 @@
       '.lp-cuotas-in{animation:lpIn .35s ease}' +
       'body.dark .lp-chips-wrap.lp-more:after{background:linear-gradient(90deg,rgba(28,30,42,0),#1c1e2a)}' +
       '.lp-sec{margin:12px 0 6px;font-size:11px;font-weight:900;color:#0b5878;letter-spacing:.4px;text-transform:uppercase}' +
-      '.lp-canje{ background:rgba(91,141,239,0.06); border-left:3px solid #5b8def; } .lp-canje .lp-item-txt b{ color:#3d63c9; } .lp-item{display:flex;align-items:center;gap:10px;padding:10px 12px;margin:0 0 8px;border-radius:16px;background:rgba(255,255,255,.72);border:1px solid rgba(255,255,255,.8)}' +
+      '.lp-canje{ background:rgba(91,141,239,0.06); border-left:3px solid #5b8def; } .lp-canje .lp-item-txt b{ color:#3d63c9; } .lp-item{display:flex;align-items:center;gap:10px;padding:10px 12px;margin:0 0 8px;border-radius:16px;background:rgba(255,255,255,.72);border:1px solid rgba(255,255,255,.8);position:relative;transition:all .2s ease}' + '.lp-promo-card{background:linear-gradient(135deg,rgba(255,247,237,.96),rgba(255,237,213,.85))!important;border:1.5px solid #fb923c!important;box-shadow:0 4px 14px rgba(249,115,22,.12)!important}' + 'body.dark .lp-promo-card{background:linear-gradient(135deg,rgba(124,45,18,.35),rgba(154,52,18,.45))!important;border-color:#ea580c!important;box-shadow:0 4px 14px rgba(234,88,12,.2)!important}' + '.lp-promo-badge{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:4px}' + '.lp-promo-badge span:first-child{background:linear-gradient(135deg,#ea580c,#f97316);color:#fff;font-size:10px;font-weight:950;padding:2px 7px;border-radius:6px;letter-spacing:.3px;text-transform:uppercase;display:inline-flex;align-items:center;box-shadow:0 2px 6px rgba(234,88,12,.3)}' + '.lp-promo-det{font-size:10.5px;font-weight:750;color:#c2410c;line-height:1.2}' + 'body.dark .lp-promo-det{color:#fdba74}' + '.lp-precio-promo-row{display:flex;align-items:baseline;gap:8px;margin-top:2px}' + '.lp-precio-tachado{font-size:11px;font-weight:700;color:#9ca3af;text-decoration:line-through}' + 'body.dark .lp-precio-tachado{color:#6b7280}' +
       '.lp-item-txt{flex:1;min-width:0}' +
       '.lp-item-txt b{display:block;font-size:13px;font-weight:900;color:#2a2a32;line-height:1.25}' +
       '.lp-item-txt span{display:block;margin-top:2px;font-size:11px;font-weight:750;color:#686977}' +
@@ -437,9 +455,21 @@
         descHtml = '<span class="lp-item-pack-desc">📦 ' + esc(L.composicion) + '</span>';
       }
       var subTxt = (L.sku ? 'SKU ' + esc(L.sku) : esc(L.seccion || 'Lista con acuerdo')) + (esCanje ? ' · Plan canje' : '');
-      html += '<div class="lp-item' + (esCanje ? ' lp-canje' : '') + (L.grupo === 'packs' ? ' lp-item-is-pack' : '') + '" data-sku="' + esc(L.clave) + '">' +
+      var isPromo = !!(L.promo && L.promo.activa);
+      var promoBadgeHtml = '';
+      var precioHtml = '<em>' + money(L.precio) + '</em>';
+      if (isPromo) {
+        var etiq = L.promo.etiqueta || 'PROMO';
+        var det = L.promo.detalle ? '<span class="lp-promo-det">' + esc(L.promo.detalle) + '</span>' : '';
+        promoBadgeHtml = '<div class="lp-promo-badge"><span>🔥 ' + esc(etiq) + '</span>' + det + '</div>';
+        if (L.promo.precio_original && Number(L.promo.precio_original) > Number(L.precio)) {
+          precioHtml = '<div class="lp-precio-promo-row"><s class="lp-precio-tachado">' + money(L.promo.precio_original) + '</s><em>' + money(L.precio) + '</em></div>';
+        }
+      }
+      var clsItem = 'lp-item' + (isPromo ? ' lp-promo-card' : '') + (esCanje ? ' lp-canje' : '') + (L.grupo === 'packs' ? ' lp-item-is-pack' : '');
+      html += '<div class="' + clsItem + '" data-sku="' + esc(L.clave) + '">' +
         fotoHtml +
-        '<div class="lp-item-txt"><b>' + esc(L.nombre) + '</b><span>' + subTxt + '</span>' + descHtml + '<em>' + money(L.precio) + '</em></div>' +
+        '<div class="lp-item-txt">' + promoBadgeHtml + '<b>' + esc(L.nombre) + '</b><span>' + subTxt + '</span>' + descHtml + precioHtml + '</div>' +
         '<div class="lp-qty">' +
           (q ? '<button type="button" class="ghost" data-act="menos" aria-label="Quitar">−</button><i>' + q + '</i>' : '') +
           '<button type="button" data-act="mas" aria-label="Agregar">+</button>' +
@@ -1661,6 +1691,13 @@
               if (p.sku) skuPorNombre[nomNorm] = p.sku;
             }
           });
+          var promoPorSku = {}, promoPorNombre = {};
+          fileCat.productos.forEach(function(p){
+            if (p && p.promo) {
+              if (p.sku) promoPorSku[p.sku] = p.promo;
+              if (p.nombre) promoPorNombre[(p.nombre || "").trim().toUpperCase()] = p.promo;
+            }
+          });
           catElegido.productos.forEach(function (p) {
             if (!p) return;
             var nom = (p.nombre || "").trim().toUpperCase();
@@ -1675,6 +1712,10 @@
             }
             if (!p.composicion && p.sku && compPorSku[p.sku]) p.composicion = compPorSku[p.sku];
             if (!p.items_skus && p.sku && itemsPorSku[p.sku]) p.items_skus = itemsPorSku[p.sku];
+            if (!p.promo) {
+              if (p.sku && promoPorSku[p.sku]) p.promo = promoPorSku[p.sku];
+              else if (nom && promoPorNombre[nom]) p.promo = promoPorNombre[nom];
+            }
           });
         }
         CAT = catElegido;
