@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v883-pildoras-pdf-fotos-exactas';
+const CACHE_NAME = 'appi-v884-pildoras-activas-catalogo-puro';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

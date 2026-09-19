@@ -1723,12 +1723,35 @@
       fetch('./psa-planes.json' + bust, { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; })
     ]).then(function (arr) {
       var supaCatJ = arr[0], supaPlanJ = arr[1], ganJ = arr[2], fileCat = arr[3], filePlan = arr[4];
-      var catElegido = null;
-      if(supaCatJ && supaCatJ.productos) catElegido = supaCatJ;
-      else if(fileCat && fileCat.productos) catElegido = fileCat;
-      var planElegido = null;
-      if(supaPlanJ && (supaPlanJ.cuotas || supaPlanJ.bancos)) planElegido = supaPlanJ;
-      else if(filePlan && (filePlan.cuotas || filePlan.bancos)) planElegido = filePlan;
+      // La fuente de verdad del catálogo oficial, sus categorías exactas del PDF y fotos del PCD
+      // es psa-catalogo.json auditado del repositorio. Si Supabase tiene precios actualizados más recientes,
+      // se aplican sobre la estructura oficial sin alterar su orden ni duplicar productos.
+      var catElegido = fileCat && fileCat.productos ? fileCat : supaCatJ;
+      var planElegido = filePlan && (filePlan.cuotas || filePlan.bancos) ? filePlan : supaPlanJ;
+
+      if (catElegido && supaCatJ && supaCatJ.productos && catElegido === fileCat) {
+        var precioPorSku = {}, precioPorNom = {}, canjePorSku = {}, canjePorNom = {};
+        supaCatJ.productos.forEach(function(sp){
+          if (!sp) return;
+          if (sp.sku) {
+            if (sp.precio) precioPorSku[sp.sku] = sp.precio;
+            if (sp.plan_canje) canjePorSku[sp.sku] = sp.plan_canje;
+          }
+          if (sp.nombre) {
+            var n = sp.nombre.trim().toUpperCase();
+            if (sp.precio) precioPorNom[n] = sp.precio;
+            if (sp.plan_canje) canjePorNom[n] = sp.plan_canje;
+          }
+        });
+        catElegido.productos.forEach(function(p){
+          if (!p) return;
+          var n = (p.nombre || '').trim().toUpperCase();
+          var nuevoPre = (p.sku && precioPorSku[p.sku]) || precioPorNom[n];
+          var nuevoCanje = (p.sku && canjePorSku[p.sku]) || canjePorNom[n];
+          if (nuevoPre && nuevoPre > 0) { p.precio = nuevoPre; p.lista = nuevoPre; }
+          if (nuevoCanje && nuevoCanje > 0) { p.plan_canje = nuevoCanje; }
+        });
+      }
       if (catElegido) {
         // Asegurar que los packs del catálogo local siempre estén presentes
         // incluso si catElegido proviene del storage de Supabase (que aún no tiene los packs sincronizados).

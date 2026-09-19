@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "883.0.0",
-  "cacheName": "appi-v883-pildoras-pdf-fotos-exactas",
+  "version": "884.0.0",
+  "cacheName": "appi-v884-pildoras-activas-catalogo-puro",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {
