@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "852.0.0",
-  "cacheName": "appi-v852-toast-home-only",
+  "version": "853.0.0",
+  "cacheName": "appi-v853-pb-detalle-notif",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

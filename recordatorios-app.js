@@ -28,8 +28,8 @@
   var LS_SENT = 'appi_rec_enviados_v1';
 
   var DEFAULTS = {
-    hab: { cumples: true, manana: true, vence: true, reasig: true, cierre: true },
-    hora: { cumples: '08:00', manana: '09:00', vence: '09:30', reasig: '10:00', cierre: '18:00' }
+    hab: { cumples: true, manana: true, vence: true, reasig: true, cierre: true, pb_mov: true },
+    hora: { cumples: '08:00', manana: '09:00', vence: '09:30', reasig: '10:00', cierre: '18:00', pb_mov: '12:00' }
   };
 
   function hoyLocal() {
@@ -137,6 +137,24 @@
           }
         } catch (e) {}
         return '🌙 Cierre del día: revisá cómo te fue antes de descansar.' + extra;
+      }
+    },
+    pb_mov: {
+      titulo: 'Movimiento de PB en equipo', vista: 'view-equipo',
+      build: function () {
+        try {
+          var eq = JSON.parse(localStorage.getItem('equipoData') || 'null');
+          if (eq && eq.personas && eq.personas.length) {
+            var activos = eq.personas.filter(function(p){ return Number(p.pnAct || p.pbPersonal || 0) > 0; });
+            if (activos.length) {
+              var top = [...activos].sort(function(a,b){ return (Number(b.pnAct||b.pbPersonal||0)) - (Number(a.pnAct||a.pbPersonal||0)); })[0];
+              var nom = top.nombre ? top.nombre.split(',')[0].trim() : 'Distribuidor';
+              var pb = Number(top.pnAct || top.pbPersonal || 0).toFixed(1);
+              return '⚡ Actividad en el equipo: ' + activos.length + ' distribuidores con PB este mes. ' + nom + ' lidera con ' + pb + ' PB.';
+            }
+          }
+        } catch(e) {}
+        return '⚡ Hay actividad y movimientos de PB en tu equipo.';
       }
     }
   };
@@ -276,7 +294,8 @@
     manana: ['☀️', 'Acciones del día'],
     vence: ['📅', 'Garantías por vencer'],
     reasig: ['↻', 'Reasignados para recontactar'],
-    cierre: ['🌙', 'Cierre del día']
+    cierre: ['🌙', 'Cierre del día'],
+    pb_mov: ['⚡', 'Movimientos de PB en equipo']
   };
 
   function permisoOk() {
@@ -375,6 +394,73 @@
   /* La base de usuarios se recarga en varios momentos (sync PSA, subida de
      planilla, arranque): ahí también repasamos los recordatorios. */
   if (typeof window.addEventListener === 'function') {
-    window.addEventListener('appi-usuarios-cambiaron', function () { try { planear(); } catch (e) {} });
+      function emitirAvisoMovimientoPB(nombre, pbNuevo, delta) {
+    try {
+      var c = conf();
+      if (!c.hab.pb_mov) return;
+      if (!permisoOk()) return;
+      var cuerpo = delta > 0
+        ? ('⚡ ' + nombre + ' sumó +' + delta.toFixed(1) + ' PB (Total: ' + pbNuevo.toFixed(1) + ' PB)')
+        : ('⚡ ' + nombre + ' registró ' + pbNuevo.toFixed(1) + ' PB');
+      try {
+        if (window.APPINotif && typeof window.APPINotif.mostrar === 'function') {
+          window.APPINotif.mostrar({
+            body: cuerpo,
+            type: 'equipo',
+            url: './?rec=view-equipo',
+            tag: 'appi-pb-mov-' + Date.now()
+          });
+        } else if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+          new Notification('APPI', { body: cuerpo, icon: './icon-192.png' });
+        }
+      } catch(e) {}
+    } catch(e) {}
+  }
+  window.APPIRecordatorios.notificarMovimientoPB = emitirAvisoMovimientoPB;
+
+  function detectarMovimientosPB(nuevoEquipo) {
+    try {
+      if (!nuevoEquipo || !nuevoEquipo.personas || !Array.isArray(nuevoEquipo.personas)) return;
+      var c = conf();
+      if (!c.hab.pb_mov) return;
+      var snapshot = leer('appi_pb_snapshot_distribuidores', null);
+      var currentSnap = {};
+      var cambios = [];
+      nuevoEquipo.personas.forEach(function(p) {
+        if (!p) return;
+        var cod = String(p.codigo || p.id || p.nombre || '').trim();
+        var pb = Number(p.pnAct != null ? p.pnAct : (p.pbPersonal || 0));
+        currentSnap[cod] = pb;
+        if (snapshot && snapshot[cod] !== undefined) {
+          var anterior = Number(snapshot[cod]) || 0;
+          if (pb > anterior && pb > 0) {
+            cambios.push({
+              nombre: (p.nombre || 'Distribuidor').split(',')[0].trim(),
+              pbNuevo: pb,
+              delta: pb - anterior
+            });
+          }
+        }
+      });
+      try { localStorage.setItem('appi_pb_snapshot_distribuidores', JSON.stringify(currentSnap)); } catch(e) {}
+      if (cambios.length > 0 && snapshot) {
+        cambios.slice(0, 3).forEach(function(ch, idx) {
+          setTimeout(function() {
+            emitirAvisoMovimientoPB(ch.nombre, ch.pbNuevo, ch.delta);
+          }, idx * 1200);
+        });
+      }
+    } catch(e) {}
+  }
+  window.APPIRecordatorios.detectarMovimientosPB = detectarMovimientosPB;
+
+  window.addEventListener('appi-usuarios-cambiaron', function () { try { planear(); } catch (e) {} });
+  window.addEventListener('appi-equipo-cambio', function (e) {
+    try {
+      var eq = (e && e.detail) || JSON.parse(localStorage.getItem('equipoData') || 'null');
+      detectarMovimientosPB(eq);
+      planear();
+    } catch(err) {}
+  });
   }
 })();
