@@ -4650,7 +4650,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v873 · Segura</div>
+  <div class="ds-foot">APPI · v874 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4934,7 +4934,7 @@ body.dark #pageTabs button.active{color:#c5d6ff}
       <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
 
       <div class="home-brand-row">
-        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · 873</span></span>
+        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · 874</span></span>
       </div>
 
       <div class="home-hero-card">
@@ -8087,6 +8087,7 @@ function saveEquipoToStorage(){
   try {
     localStorage.setItem('equipoData', JSON.stringify(equipoData));
     localStorage.setItem('lastUpdate_equipo', Date.now().toString());
+    try { window.dispatchEvent(new CustomEvent('appi-equipo-cambio', { detail: equipoData })); } catch(e){}
   } catch(e){ modal.open({ icon:'⚠️', title:'Error al guardar', html:'<p>El archivo puede ser muy grande. Probá con menos personas.</p>' }); }
 }
 
@@ -13181,11 +13182,18 @@ function abrirCuentaDesdeMenu(){
 
       <!-- v818: Notificaciones y recordatorios del teléfono -->
       <div>
-        <div class="ios-section-header">Avisos</div>
+        <div class="ios-section-header">Avisos y Notificaciones</div>
         <div class="ios-group">
           <button type="button" class="ios-action" id="btnAccountRecordatorios"><div class="ios-row-icon" style="background:#34c759">🔔</div><span class="ios-action-title">Notificaciones y recordatorios</span><span class="ios-chevron">›</span></button>
+          <div class="ios-row" style="justify-content:space-between;padding:12px 16px">
+            <div style="flex:1;min-width:0;padding-right:12px">
+              <div style="font-size:15px;font-weight:600;color:#1c1c1e;display:flex;align-items:center;gap:6px"><span>⚡</span> Avisar movimientos de PB</div>
+              <div style="font-size:12px;color:#8e8e93;line-height:1.35;margin-top:2px">Notificación en tu teléfono cada vez que un distribuidor de tu equipo sume o mueva PB.</div>
+            </div>
+            <label class="ios-switch" style="flex:none"><input type="checkbox" id="switchNotifPbMov" ${(() => { try { const c = window.APPIRecordatorios ? window.APPIRecordatorios.conf() : JSON.parse(localStorage.getItem('appi_recordatorios_v1')||'{}'); return (c && c.hab && c.hab.pb_mov !== false) ? 'checked' : ''; } catch(e){ return 'checked'; } })()}><span class="ios-switch-slider"></span></label>
+          </div>
         </div>
-        <div class="ios-desc">Cumpleaños, acciones del día, garantías por vencer y reasignados: avisos programados que salen del teléfono.</div>
+        <div class="ios-desc">Cumpleaños, acciones del día, garantías por vencer, reasignados y movimientos de PB en tu equipo.</div>
       </div>
 
       <!-- Acciones cuenta iOS -->
@@ -13294,6 +13302,26 @@ function abrirCuentaDesdeMenu(){
     if(devices)devices.onclick=()=>window.APPIDeviceBridge&&window.APPIDeviceBridge.openManager();
     const recBtn=document.getElementById('btnAccountRecordatorios');
     if(recBtn)recBtn.onclick=()=>{ try{modal.close()}catch(e){}; try{window.showView('view-recordatorios')}catch(e){} };
+    const swPbMov = document.getElementById('switchNotifPbMov');
+    if(swPbMov){
+      swPbMov.onchange = ()=>{
+        try {
+          const val = !!swPbMov.checked;
+          if(window.APPIRecordatorios && typeof window.APPIRecordatorios.guardar === 'function'){
+            window.APPIRecordatorios.guardar({ hab: { pb_mov: val } });
+          } else {
+            const raw = JSON.parse(localStorage.getItem('appi_recordatorios_v1') || '{}');
+            raw.hab = raw.hab || {};
+            raw.hab.pb_mov = val;
+            localStorage.setItem('appi_recordatorios_v1', JSON.stringify(raw));
+          }
+          if(val && window.APPIRecordatorios && typeof window.APPIRecordatorios.pedirPermiso === 'function'){
+            window.APPIRecordatorios.pedirPermiso();
+          }
+          try { showToast(val ? 'Avisos de PB activados ⚡' : 'Avisos de PB desactivados', 1800); } catch(e){}
+        } catch(e){}
+      };
+    }
     if(password)password.onclick=abrirCambioPasswordAPPI;
     if(logout)logout.onclick=async()=>{if(!await window.APPIDialog.confirm('¿Cerrar sesión en este dispositivo?',{title:'Cerrar sesión',icon:'↪',okText:'Cerrar sesión'}))return;logout.disabled=true;try{await window.APPIDataSync.logoutAndLock({removeCache:false});location.reload()}catch(error){showToast(error.message,3500);logout.disabled=false}};
     // Cerrar y borrar oculto
@@ -13512,8 +13540,8 @@ function cerrarToolsMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='873';
-      const CACHE_NAME='appi-v873-terra-update';
+      const swVersion='874';
+      const CACHE_NAME='appi-v874-pb-detalle-notif';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
@@ -18459,6 +18487,12 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
         garantias = JSON.parse(localStorage.getItem("usuarios_garantias") || "[]") || [];
       }catch(e){}
 
+      let equipoPersonas = [];
+      try{
+        const eqRaw = JSON.parse(localStorage.getItem("equipoData") || "null");
+        if(eqRaw && Array.isArray(eqRaw.personas)) equipoPersonas = eqRaw.personas;
+      }catch(e){}
+
       const now = new Date();
       const curYear = now.getFullYear();
       const curMonth = now.getMonth();
@@ -18519,9 +18553,11 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
           if(day >= 1 && day <= daysInMonth){
             const pbVal = getEstimatedPB(g.producto);
             dailyPBs[day].pb += pbVal;
+            const distName = g.distribuidor || g.titular || g.usuario || "Distribuidor registrado";
             dailyPBs[day].items.push({
               producto: g.producto || "Garantía registrada",
-              titular: g.usuario || g.titular || g.distribuidor || "",
+              titular: distName,
+              usuario: g.usuario || "",
               pb: pbVal
             });
             totalPBDated += pbVal;
@@ -18533,18 +18569,36 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
       const todayDay = now.getDate();
       const finalTotalPB = typeof totalPbMes === "number" && totalPbMes > 0 ? totalPbMes : (totalPBDated || 0);
 
+      // Si no hay ventas con fecha exacta, distribuir el PB activo entre los distribuidores del equipo
       if(totalPBDated < finalTotalPB && countDatedSales === 0 && finalTotalPB > 0){
         const daysToDistribute = Math.max(1, Math.min(todayDay, daysInMonth));
-        const pbPerDay = finalTotalPB / daysToDistribute;
-        for(let d=1; d<=daysToDistribute; d++){
-          dailyPBs[d].pb = pbPerDay;
-          dailyPBs[d].items.push({
-            producto: "Ventas registradas del equipo",
-            titular: "Actividad consolidada",
-            pb: pbPerDay
+        const activeDistributors = equipoPersonas.filter(p => Number(p.pnAct || p.pbPersonal || 0) > 0);
+        if(activeDistributors.length > 0){
+          activeDistributors.forEach((dist, idx) => {
+            const assignedDay = 1 + (idx % daysToDistribute);
+            const distPB = Number(dist.pnAct || dist.pbPersonal || 0);
+            dailyPBs[assignedDay].pb += distPB;
+            dailyPBs[assignedDay].items.push({
+              producto: "Ventas registradas del mes",
+              titular: dist.nombre || "Distribuidor del equipo",
+              categoria: dist.cat || "Distribuidor",
+              pb: distPB
+            });
           });
+        } else {
+          const pbPerDay = finalTotalPB / daysToDistribute;
+          for(let d=1; d<=daysToDistribute; d++){
+            dailyPBs[d].pb = pbPerDay;
+            dailyPBs[d].items.push({
+              producto: "Ventas registradas del equipo",
+              titular: "Actividad consolidada",
+              pb: pbPerDay
+            });
+          }
         }
       }
+
+      window.__dailyPBsCache = dailyPBs;
 
       const weeks = [
         { id: 1, label: "Semana 1", range: "Días 1 al 7", start: 1, end: 7, pb: 0, days: [] },
@@ -18575,12 +18629,15 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
           const isToday = (d.day === todayDay);
           const hasPB = d.pb > 0;
           return `
-            <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-radius:10px;margin-bottom:5px;background:${isToday ? "#eef4ff" : "#f8fafc"};border:1px solid ${isToday ? "#c7d9fe" : "#edf2f7"}">
+            <div class="day-card-drill" onclick="event.stopPropagation();window.abrirDetalleDiaPB(${d.day},${finalTotalPB})" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:12px;margin-bottom:6px;background:${isToday ? "#eef4ff" : "#f8fafc"};border:1px solid ${isToday ? "#c7d9fe" : "#edf2f7"};transition:transform .12s,background .12s" onmousedown="this.style.transform='scale(0.99)'" onmouseup="this.style.transform='none'">
               <div style="display:flex;align-items:center;gap:10px">
-                <span style="display:inline-block;width:32px;height:32px;line-height:32px;text-align:center;border-radius:8px;font-weight:700;font-size:13px;background:${isToday ? "#3d63c9" : (hasPB ? "#e0e7ff" : "#f1f5f9")};color:${isToday ? "#fff" : (hasPB ? "#3730a3" : "#64748b")}">${d.day}</span>
+                <span style="display:inline-block;width:34px;height:34px;line-height:34px;text-align:center;border-radius:9px;font-weight:800;font-size:13px;background:${isToday ? "#3d63c9" : (hasPB ? "#e0e7ff" : "#f1f5f9")};color:${isToday ? "#fff" : (hasPB ? "#3730a3" : "#64748b")}">${d.day}</span>
                 <div>
                   <div style="font-weight:700;font-size:13px;color:#1e293b">${getDayName(d.day)} ${d.day} de ${currentMonthName}</div>
-                  <div style="font-size:11px;color:#64748b">${d.items.length ? (d.items.length + (d.items.length===1 ? " operación" : " operaciones")) : "Sin actividad registrada"}</div>
+                  <div style="font-size:11px;color:#64748b;display:flex;align-items:center;gap:4px">
+                    ${d.items.length ? (d.items.length + (d.items.length===1 ? " compra / operación" : " compras / operaciones")) : "Sin actividad registrada"}
+                    <span style="color:#2563eb;font-weight:700">· Ver quién compró ›</span>
+                  </div>
                 </div>
               </div>
               <div style="text-align:right">
@@ -18647,7 +18704,7 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
           ${weeksHtml}
 
           <div style="font-size:11px;color:#94a3b8;text-align:center;margin-top:12px;padding:6px">
-            Tocá cualquier semana para desplegar o plegar sus días.
+            💡 Tocá cualquier día para ver el detalle de distribuidores, productos y PB.
           </div>
         </div>
       `;
@@ -18668,7 +18725,90 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
     }
   }
 
-  setTimeout(()=>{
+  // Drill-down para ver qué distribuidor compró y los PB de ese día
+  window.abrirDetalleDiaPB = function(dayNum, totalMes){
+    try {
+      const dailyPBs = window.__dailyPBsCache || {};
+      const dayData = dailyPBs[dayNum] || { day: dayNum, pb: 0, items: [] };
+      const now = new Date();
+      const monthNames = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+      const dayNames = ["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"];
+      const dt = new Date(now.getFullYear(), now.getMonth(), dayNum);
+      const diaTexto = `${dayNames[dt.getDay()]} ${dayNum} de ${monthNames[now.getMonth()]}`;
+
+      let itemsHtml = '';
+      if(!dayData.items || !dayData.items.length){
+        itemsHtml = `
+          <div style="text-align:center;padding:28px 16px;color:#8e8e93;background:#f8fafc;border-radius:14px;border:1px dashed #cbd5e1">
+            <span style="font-size:28px;display:block;margin-bottom:6px">☕</span>
+            <b style="font-size:13px;color:#475569">Sin movimientos de PB en este día</b>
+            <div style="font-size:11px;margin-top:4px">No se registraron compras ni garantías en esta fecha.</div>
+          </div>
+        `;
+      } else {
+        itemsHtml = dayData.items.map((item, idx) => {
+          const pbFmt = (Number(item.pb) || 0).toFixed(1);
+          return `
+            <div style="padding:12px 14px;border-radius:14px;background:#ffffff;border:1px solid #e2e8f0;margin-bottom:8px;box-shadow:0 2px 6px rgba(0,0,0,0.02);display:flex;align-items:center;justify-content:space-between;gap:12px">
+              <div style="display:flex;align-items:center;gap:10px;min-width:0;flex:1">
+                <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#0b5878,#3ad0a4);color:#fff;display:grid;place-items:center;font-weight:800;font-size:14px;flex:none">
+                  ${(item.titular || 'D').charAt(0).toUpperCase()}
+                </div>
+                <div style="min-width:0;flex:1">
+                  <div style="font-weight:700;font-size:13.5px;color:#1e293b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+                    ${escapeXml(item.titular || "Distribuidor")}
+                  </div>
+                  <div style="font-size:11px;color:#64748b;margin-top:1px">
+                    📦 ${escapeXml(item.producto || "Producto")} ${item.usuario ? ('· Cliente: ' + escapeXml(item.usuario)) : ''}
+                  </div>
+                </div>
+              </div>
+              <div style="text-align:right;flex:none">
+                <span style="display:inline-block;padding:4px 8px;border-radius:8px;background:#dbeafe;color:#1e40af;font-size:13px;font-weight:800">
+                  +${pbFmt} PB
+                </span>
+              </div>
+            </div>
+          `;
+        }).join("");
+      }
+
+      const drillHtml = `
+        <div style="text-align:left;max-height:75vh;overflow-y:auto;padding-right:2px">
+          <button type="button" onclick="abrirModalDetallePB(${totalMes||0})" style="background:none;border:none;color:#2563eb;font-weight:700;font-size:13px;cursor:pointer;padding:0;margin-bottom:12px;display:inline-flex;align-items:center;gap:4px">
+            ‹ Volver al desglose semanal
+          </button>
+          <div style="background:linear-gradient(135deg,#0b5878,#3ad0a4);color:#fff;border-radius:14px;padding:14px 16px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.8px;opacity:0.85;font-weight:700">Detalle del día</div>
+              <div style="font-size:15px;font-weight:700">${diaTexto}</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-size:22px;font-weight:900;line-height:1.1">${(Number(dayData.pb)||0).toFixed(1)} PB</div>
+              <div style="font-size:10px;opacity:0.85">${dayData.items ? dayData.items.length : 0} compras</div>
+            </div>
+          </div>
+          <div style="font-size:12px;font-weight:800;color:#475569;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px">
+            Distribuidores y compras:
+          </div>
+          ${itemsHtml}
+        </div>
+      `;
+
+      if(window.modal && typeof window.modal.open === "function"){
+        window.modal.open({
+          icon: "📅",
+          iconBg: "linear-gradient(135deg, #0b5878, #3ad0a4)",
+          title: `Día ${dayNum}: ${(Number(dayData.pb)||0).toFixed(1)} PB`,
+          sub: diaTexto,
+          html: drillHtml
+        });
+      }
+    } catch(err){
+      console.error("Error abriendo detalle de día PB:", err);
+    }
+  };
+setTimeout(()=>{
     try{
       const view=document.getElementById("view-negocio");
       if(!view) return;
