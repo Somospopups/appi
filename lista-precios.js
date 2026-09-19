@@ -404,7 +404,7 @@
       'body.dark .lp-eco-item{background:#1c1e2a}' +
       'body.dark .lp-cmp{background:#25273a;border-color:rgba(255,255,255,.08)}' +
       'body.dark .lp-cmp-sub,body.dark .lp-cmp-tb td,body.dark .lp-cmp-plst{color:#f2f2f7}' +
-      '.lp-actions{display:flex;gap:8px}' +
+      '.lp-actions{display:flex;gap:8px;flex-wrap:wrap}' +'.lp-actions .lp-comprar{background:linear-gradient(135deg,#059669,#10b981);color:#fff;display:inline-flex;align-items:center;justify-content:center;gap:6px}' +
       '.lp-actions button{flex:1;border:0;border-radius:12px;padding:12px;font:inherit;font-size:13px;font-weight:900;cursor:pointer}' +
       '.lp-actions .lp-pdf{background:#0b5878;color:#fff}' +
       '.lp-actions .lp-clear{background:rgba(42,42,50,.08);color:#2a2a32}' +
@@ -465,7 +465,7 @@
         '<div class="lp-chips-wrap"><div class="lp-chips" id="lpBancos"></div></div>' +
         '<div class="lp-sec" id="lpCuotasLab" hidden>Cuotas</div>' +
         '<div class="lp-chips-wrap" id="lpCuotasWrap" hidden><div class="lp-chips" id="lpCuotas"></div></div>' +
-        '<div class="lp-actions"><button type="button" class="lp-pdf" id="lpSheetPdf">Cotizar</button>' +
+        '<div class="lp-actions"><button type="button" class="lp-comprar" id="lpSheetComprar">🛒 COMPRAR</button><button type="button" class="lp-pdf" id="lpSheetPdf">Cotizar</button>' +
         '<button type="button" class="lp-clear" id="lpSheetClear">Vaciar</button></div></div>';
       document.body.appendChild(sh);
       sh.addEventListener('click', function (e) { if (e.target === sh) cerrarSheet(); });
@@ -935,7 +935,121 @@
     };
     var pdfBtn = $('lpSheetPdf');
     if (pdfBtn) pdfBtn.onclick = armarPdf;
+    var cmpBtn = $('lpSheetComprar');
+    if (cmpBtn) cmpBtn.onclick = comprarPcd;
   }
+
+  async function comprarPcd() {
+    var r = resumen();
+    if (!r.lineas.length) {
+      aviso('El carrito está vacío. Sumá productos para comprar.');
+      return;
+    }
+    var creds = null;
+    try { creds = JSON.parse(localStorage.getItem('appsi_psa_creds') || 'null'); } catch (e) {}
+
+    // Lista de SKUs y cantidades
+    var items = [];
+    r.lineas.forEach(function (l) {
+      var sku = l.p.sku || '';
+      items.push({
+        nombre: l.p.nombre,
+        sku: sku,
+        cantidad: l.q,
+        canje: !!l.p.canje,
+        precio: l.p.precio
+      });
+    });
+
+    var skusTxt = items.map(function(it){
+      return (it.sku ? '[' + it.sku + '] ' : '') + it.cantidad + 'x ' + it.nombre;
+    }).join('\n');
+
+    // Si tiene credenciales de Mi PSA guardadas, abrimos directo con login automático al Portal PCD
+    if (creds && creds.center && creds.number && creds.password) {
+      if (typeof window.APPIDialog !== 'undefined' && window.APPIDialog.confirm) {
+        var htmlModal = '<div style="text-align:left;font-size:13px;color:#334155;line-height:1.5">' +
+          '<p style="margin:0 0 10px"><b>Estás por ingresar al Portal de Compras PCD</b> con tu cuenta de Distribuidor <b>(' + creds.center + '-' + creds.number + ')</b>.</p>' +
+          '<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:10px;margin-bottom:12px;font-size:12px;max-height:140px;overflow-y:auto">' +
+          '<b>Productos a cargar en tu pedido:</b><br>' +
+          items.map(function(it){
+            return '• ' + it.cantidad + 'x ' + esc(it.nombre) + (it.sku ? ' <code style="background:#e2e8f0;padding:1px 4px;border-radius:4px">SKU ' + it.sku + '</code>' : '');
+          }).join('<br>') +
+          '</div>' +
+          '<p style="font-size:11px;color:#64748b;margin:0">💡 Se abrirá el Portal de Compras con tu sesión activa para continuar los pasos del pedido y medios de pago.</p>' +
+          '</div>';
+
+        var ok = await window.APPIDialog.confirm(htmlModal, {
+          title: 'Comprar en Portal PCD',
+          icon: '🛒',
+          okText: 'Ir al Portal PCD 🚀',
+          cancelText: 'Volver'
+        });
+        if (!ok) return;
+      }
+
+      // Enviar formulario POST autenticado a comprasonline.psa.com.ar / login_check
+      try {
+        var form = document.createElement('form');
+        form.method = 'POST';
+        form.action = 'https://mi.psa.com.ar/login_check';
+        form.target = '_blank';
+        form.style.display = 'none';
+
+        var addInp = function(name, val) {
+          var inp = document.createElement('input');
+          inp.type = 'hidden';
+          inp.name = name;
+          inp.value = val;
+          form.appendChild(inp);
+        };
+
+        addInp('_center', creds.center);
+        addInp('_number', creds.number);
+        addInp('_password', creds.password);
+        addInp('_term_use', 'accept');
+        if (creds.csrf) addInp('_csrf_token', creds.csrf);
+
+        document.body.appendChild(form);
+        form.submit();
+        setTimeout(function () { try { form.remove(); } catch (e) {} }, 1500);
+
+        // Copiar SKUs al portapapeles por comodidad
+        try {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(skusTxt);
+            aviso('¡Sesión abierta en el PCD! Códigos de pedido copiados al portapapeles 📋');
+          }
+        } catch (e) {}
+      } catch (err) {
+        window.open('https://comprasonline.psa.com.ar/', '_blank');
+      }
+    } else {
+      // No tiene credenciales vinculadas en Mi PSA
+      if (typeof window.APPIDialog !== 'undefined' && window.APPIDialog.alert) {
+        var noCredsHtml = '<div style="text-align:left;font-size:13px;color:#334155;line-height:1.5">' +
+          '<p>Para ingresar automáticamente al Portal PCD con tu carrito, primero vinculá tu cuenta de Distribuidor en <b>Ajustes ⚙️ › MI PSA</b> (Centro, Número y Clave).</p>' +
+          '<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:10px;margin-bottom:12px;font-size:12px">' +
+          '<b>Tu pedido actual:</b><br>' +
+          items.map(function(it){
+            return '• ' + it.cantidad + 'x ' + esc(it.nombre) + (it.sku ? ' <code>[' + it.sku + ']</code>' : '');
+          }).join('<br>') +
+          '</div>' +
+          '</div>';
+
+        window.APPIDialog.alert(noCredsHtml, {
+          title: 'Iniciar Compra en PCD',
+          icon: '🛒',
+          okText: 'Abrir Portal PCD'
+        }).then(function(){
+          window.open('https://comprasonline.psa.com.ar/', '_blank');
+        });
+      } else {
+        window.open('https://comprasonline.psa.com.ar/', '_blank');
+      }
+    }
+  }
+
   function cerrarSheet() {
     var sh = $('lpSheet');
     if (!sh) return;

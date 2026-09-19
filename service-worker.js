@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v885-pildoras-fijas-sin-teclado';
+const CACHE_NAME = 'appi-v886-boton-comprar-pcd';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

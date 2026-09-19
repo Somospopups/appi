@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "885.0.0",
-  "cacheName": "appi-v885-pildoras-fijas-sin-teclado",
+  "version": "886.0.0",
+  "cacheName": "appi-v886-boton-comprar-pcd",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {
