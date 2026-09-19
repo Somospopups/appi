@@ -3997,7 +3997,10 @@
       "plan_canje": 855000,
       "seccion": "Purificadores",
       "foto": "catalogo-img/611010730.png",
-      "desc": "Purificador para agua de red edición especial color Terra con Carbón Activado Granular con plata, KDF-55 y zeolita natural. Reduce más del 90% de cloro, trihalometanos, aluminio, plomo y hierro, y retiene más del 97% de microplásticos. Vida útil: 36 meses o 36.000 litros."
+      "desc": "Purificador para agua de red edición especial color Terra con Carbón Activado Granular con plata, KDF-55 y zeolita natural. Reduce más del 90% de cloro, trihalometanos, aluminio, plomo y hierro, y retiene más del 97% de microplásticos. Vida útil: 36 meses o 36.000 litros.",
+      "novedad": true,
+      "novedad_tag": "NUEVO LANZAMIENTO",
+      "novedad_desc": "Lanzamiento oficial línea Terra y accesorios 2026"
     },
     {
       "sku": "617110050",
@@ -4020,7 +4023,10 @@
         "hasta": "30/09/2026",
         "vigencia": "Del 01/09 al 30/09/2026",
         "flyer": "https://tienda.psa.com.ar/media/wysiwyg/SodaBurby-detalle-1.jpg"
-      }
+      },
+      "novedad": true,
+      "novedad_tag": "NUEVO LANZAMIENTO",
+      "novedad_desc": "Lanzamiento oficial línea Terra y accesorios 2026"
     },
     {
       "sku": "614065680",
@@ -4032,7 +4038,10 @@
       "plan_canje": null,
       "seccion": "Material Promocional",
       "foto": "catalogo-img/614065680.png",
-      "desc": "Soporte oficial PSA para celular o tablet, ideal para escritorio o mesa de trabajo."
+      "desc": "Soporte oficial PSA para celular o tablet, ideal para escritorio o mesa de trabajo.",
+      "novedad": true,
+      "novedad_tag": "NUEVO LANZAMIENTO",
+      "novedad_desc": "Lanzamiento oficial línea Terra y accesorios 2026"
     },
     {
       "sku": "630139850",
@@ -4055,7 +4064,10 @@
         "hasta": "30/09/2026",
         "vigencia": "Del 01/09 al 30/09/2026",
         "flyer": "https://tienda.psa.com.ar/media/wysiwyg/sliders-promos-tienda_PSA_2_Desktop_27.jpg"
-      }
+      },
+      "novedad": true,
+      "novedad_tag": "NUEVO LANZAMIENTO",
+      "novedad_desc": "Lanzamiento oficial línea Terra y accesorios 2026"
     }
   ]
 }

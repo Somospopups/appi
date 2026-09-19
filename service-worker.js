@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v877-promos-flyers-wa';
+const CACHE_NAME = 'appi-v878-novedades-catalog-auto';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

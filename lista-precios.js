@@ -77,6 +77,7 @@
   var busca = '';
   var GRUPOS = [
     { id: 'todos', t: 'Todos' },
+    { id: 'novedades', t: '✨ Novedades' },
     { id: 'promos', t: '🔥 Promos' },
     { id: 'packs', t: 'Packs PSA' },
     { id: 'equipos', t: 'Equipos' },
@@ -85,7 +86,7 @@
     { id: 'botellas', t: 'Botellas' },
     { id: 'otros', t: 'Otros' }
   ];
-  var GRUPO_TIT = { promos: '🔥 Promociones vigentes', packs: 'Packs PSA', equipos: 'Equipos', recargas: 'Recargas y adaptadores', griferia: 'Grifería', botellas: 'Botellas y mates', otros: 'Otros' };
+  var GRUPO_TIT = { novedades: '✨ Novedades y Nuevos Lanzamientos', promos: '🔥 Promociones vigentes', packs: 'Packs PSA', equipos: 'Equipos', recargas: 'Recargas y adaptadores', griferia: 'Grifería', botellas: 'Botellas y mates', otros: 'Otros' };
 
   function $(id) { return document.getElementById(id); }
   function esc(s) {
@@ -147,6 +148,7 @@
       if (!promo && p.nombre && (p.nombre.toUpperCase().indexOf('PROMO') >= 0 || p.nombre.toUpperCase().indexOf('COMBO') >= 0)) {
         promo = { activa: true, etiqueta: 'PROMO', detalle: 'Promoción especial vigente', vigencia: 'Hasta fin de mes' };
       }
+      var esNovedad = !!(p.novedad || (p.nombre && /TERRA|SOPORTE CELULAR/i.test(p.nombre)));
       out.push({
         clave: claveSku(p),
         sku: p.sku || '',
@@ -157,7 +159,10 @@
         seccion: p.seccion,
         composicion: p.composicion || '',
         url: p.url || '',
-        promo: promo
+        promo: promo,
+        novedad: esNovedad,
+        novedad_tag: p.novedad_tag || 'NUEVO',
+        novedad_desc: p.novedad_desc || ''
       });
       if (p.plan_canje) out.push(lineaCanje(p));
     });
@@ -181,6 +186,8 @@
     var res = list.filter(function (L) {
       if (filtro === 'promos') {
         if (!L.promo || !L.promo.activa) return false;
+      } else if (filtro === 'novedades') {
+        if (!L.novedad) return false;
       } else if (filtro !== 'todos' && L.grupo !== filtro) {
         return false;
       }
@@ -285,7 +292,7 @@
       '.lp-cuotas-in{animation:lpIn .35s ease}' +
       'body.dark .lp-chips-wrap.lp-more:after{background:linear-gradient(90deg,rgba(28,30,42,0),#1c1e2a)}' +
       '.lp-sec{margin:12px 0 6px;font-size:11px;font-weight:900;color:#0b5878;letter-spacing:.4px;text-transform:uppercase}' +
-      '.lp-canje{ background:rgba(91,141,239,0.06); border-left:3px solid #5b8def; } .lp-canje .lp-item-txt b{ color:#3d63c9; } .lp-item{display:flex;align-items:center;gap:10px;padding:10px 12px;margin:0 0 8px;border-radius:16px;background:rgba(255,255,255,.72);border:1px solid rgba(255,255,255,.8);position:relative;transition:all .2s ease}' + '.lp-promo-card{background:linear-gradient(135deg,rgba(255,247,237,.96),rgba(255,237,213,.85))!important;border:1.5px solid #fb923c!important;box-shadow:0 4px 14px rgba(249,115,22,.12)!important}' + 'body.dark .lp-promo-card{background:linear-gradient(135deg,rgba(124,45,18,.35),rgba(154,52,18,.45))!important;border-color:#ea580c!important;box-shadow:0 4px 14px rgba(234,88,12,.2)!important}' + '.lp-promo-badge{display:flex;flex-direction:column;gap:3px;margin-bottom:4px}' + '.lp-promo-badge-top{display:flex;align-items:center;gap:6px;flex-wrap:wrap}' + '.lp-promo-vig{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:800;color:#9a3412;background:rgba(251,146,60,.18);border:1px solid rgba(234,88,12,.22);border-radius:6px;padding:1px 6px;width:fit-content;margin-top:1px}' + 'body.dark .lp-promo-vig{color:#fdba74;background:rgba(234,88,12,.25);border-color:rgba(234,88,12,.45)}' + '.lp-promo-badge span:first-child{background:linear-gradient(135deg,#ea580c,#f97316);color:#fff;font-size:10px;font-weight:950;padding:2px 7px;border-radius:6px;letter-spacing:.3px;text-transform:uppercase;display:inline-flex;align-items:center;box-shadow:0 2px 6px rgba(234,88,12,.3)}' + '.lp-promo-det{font-size:10.5px;font-weight:750;color:#c2410c;line-height:1.2}' + 'body.dark .lp-promo-det{color:#fdba74}' + '.lp-precio-promo-row{display:flex;align-items:baseline;gap:8px;margin-top:2px}' + '.lp-precio-tachado{font-size:11px;font-weight:700;color:#9ca3af;text-decoration:line-through}' + 'body.dark .lp-precio-tachado{color:#6b7280}' +
+      '.lp-canje{ background:rgba(91,141,239,0.06); border-left:3px solid #5b8def; } .lp-canje .lp-item-txt b{ color:#3d63c9; } .lp-item{display:flex;align-items:center;gap:10px;padding:10px 12px;margin:0 0 8px;border-radius:16px;background:rgba(255,255,255,.72);border:1px solid rgba(255,255,255,.8);position:relative;transition:all .2s ease}' + '.lp-novedad-card{background:linear-gradient(135deg,rgba(238,242,255,.96),rgba(224,231,255,.82))!important;border:1.5px solid #6366f1!important;box-shadow:0 4px 14px rgba(99,102,241,.12)!important}' + 'body.dark .lp-novedad-card{background:linear-gradient(135deg,rgba(49,46,129,.35),rgba(67,56,202,.45))!important;border-color:#818cf8!important;box-shadow:0 4px 14px rgba(99,102,241,.2)!important}' + '.lp-novedad-badge{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:4px}' + '.lp-novedad-badge span:first-child{background:linear-gradient(135deg,#4f46e5,#6366f1);color:#fff;font-size:10px;font-weight:950;padding:2px 7px;border-radius:6px;letter-spacing:.3px;text-transform:uppercase;display:inline-flex;align-items:center;box-shadow:0 2px 6px rgba(79,70,229,.3)}' + '.lp-novedad-det{font-size:10.5px;font-weight:750;color:#4338ca;line-height:1.2}' + 'body.dark .lp-novedad-det{color:#a5b4fc}' + '.lp-promo-card{background:linear-gradient(135deg,rgba(255,247,237,.96),rgba(255,237,213,.85))!important;border:1.5px solid #fb923c!important;box-shadow:0 4px 14px rgba(249,115,22,.12)!important}' + 'body.dark .lp-promo-card{background:linear-gradient(135deg,rgba(124,45,18,.35),rgba(154,52,18,.45))!important;border-color:#ea580c!important;box-shadow:0 4px 14px rgba(234,88,12,.2)!important}' + '.lp-promo-badge{display:flex;flex-direction:column;gap:3px;margin-bottom:4px}' + '.lp-promo-badge-top{display:flex;align-items:center;gap:6px;flex-wrap:wrap}' + '.lp-promo-vig{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:800;color:#9a3412;background:rgba(251,146,60,.18);border:1px solid rgba(234,88,12,.22);border-radius:6px;padding:1px 6px;width:fit-content;margin-top:1px}' + 'body.dark .lp-promo-vig{color:#fdba74;background:rgba(234,88,12,.25);border-color:rgba(234,88,12,.45)}' + '.lp-promo-badge span:first-child{background:linear-gradient(135deg,#ea580c,#f97316);color:#fff;font-size:10px;font-weight:950;padding:2px 7px;border-radius:6px;letter-spacing:.3px;text-transform:uppercase;display:inline-flex;align-items:center;box-shadow:0 2px 6px rgba(234,88,12,.3)}' + '.lp-promo-det{font-size:10.5px;font-weight:750;color:#c2410c;line-height:1.2}' + 'body.dark .lp-promo-det{color:#fdba74}' + '.lp-precio-promo-row{display:flex;align-items:baseline;gap:8px;margin-top:2px}' + '.lp-precio-tachado{font-size:11px;font-weight:700;color:#9ca3af;text-decoration:line-through}' + 'body.dark .lp-precio-tachado{color:#6b7280}' +
       '.lp-item-txt{flex:1;min-width:0}' +
       '.lp-item-txt b{display:block;font-size:13px;font-weight:900;color:#2a2a32;line-height:1.25}' +
       '.lp-item-txt span{display:block;margin-top:2px;font-size:11px;font-weight:750;color:#686977}' +
@@ -477,6 +484,11 @@
       }
       var subTxt = (L.sku ? 'SKU ' + esc(L.sku) : esc(L.seccion || 'Lista con acuerdo')) + (esCanje ? ' · Plan canje' : '');
       var isPromo = !!(L.promo && L.promo.activa);
+      var isNovedad = !!L.novedad;
+      var novedadBadgeHtml = '';
+      if (isNovedad && !isPromo) {
+        novedadBadgeHtml = '<div class="lp-novedad-badge"><span>✨ ' + esc(L.novedad_tag || 'NUEVO') + '</span>' + (L.novedad_desc ? '<span class="lp-novedad-det">' + esc(L.novedad_desc) + '</span>' : '') + '</div>';
+      }
       var promoBadgeHtml = '';
       var precioHtml = '<em>' + money(L.precio) + '</em>';
       if (isPromo) {
@@ -505,10 +517,10 @@
       }
       var leftColHtml = '<div class="lp-item-left-col">' + fotoHtml + flyerHtml + '</div>';
 
-      var clsItem = 'lp-item' + (isPromo ? ' lp-promo-card' : '') + (esCanje ? ' lp-canje' : '') + (L.grupo === 'packs' ? ' lp-item-is-pack' : '');
+      var clsItem = 'lp-item' + (isPromo ? ' lp-promo-card' : (isNovedad ? ' lp-novedad-card' : '')) + (esCanje ? ' lp-canje' : '') + (L.grupo === 'packs' ? ' lp-item-is-pack' : '');
       html += '<div class="' + clsItem + '" data-sku="' + esc(L.clave) + '">' +
         leftColHtml +
-        '<div class="lp-item-txt">' + promoBadgeHtml + '<b>' + esc(L.nombre) + '</b><span>' + subTxt + '</span>' + descHtml + precioHtml + '</div>' +
+        '<div class="lp-item-txt">' + novedadBadgeHtml + promoBadgeHtml + '<b>' + esc(L.nombre) + '</b><span>' + subTxt + '</span>' + descHtml + precioHtml + '</div>' +
         '<div class="lp-qty">' +
           (q ? '<button type="button" class="ghost" data-act="menos" aria-label="Quitar">−</button><i>' + q + '</i>' : '') +
           '<button type="button" data-act="mas" aria-label="Agregar">+</button>' +
