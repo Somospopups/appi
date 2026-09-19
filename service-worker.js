@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v881-novedades-hidratacion-fix';
+const CACHE_NAME = 'appi-v882-pcd-fotos-cuotas-tarjetas';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

@@ -4315,19 +4315,7 @@
       "fecha_novedad": "2026-09-01"
     },
     {
-      "sku": "",
-      "nombre": "PSA RINNOVA NERO C/KDF-POLI C/CONC. S/F",
-      "precio": 296000,
-      "lista": 296000,
-      "url": "",
-      "grupo": "equipos",
-      "plan_canje": 266400,
-      "seccion": "Purificadores",
-      "foto": "",
-      "novedad": false
-    },
-    {
-      "sku": "",
+      "sku": "611300020",
       "nombre": "PSA OSMOSIS ROTECH BM UV",
       "precio": 2500000,
       "lista": 2500000,
@@ -4335,14 +4323,14 @@
       "grupo": "equipos",
       "plan_canje": 2250000,
       "seccion": "Purificador Osmosis Inversa",
-      "foto": "",
+      "foto": "catalogo-img/611300020.png",
       "novedad": true,
       "novedad_tag": "NUEVO LANZAMIENTO",
       "novedad_desc": "Novedad oficial del mes en catálogo PSA",
       "fecha_novedad": "2026-09-01"
     },
     {
-      "sku": "",
+      "sku": "611300020",
       "nombre": "PSA OSMOSIS ROTECH SM UV",
       "precio": 2500000,
       "lista": 2500000,
@@ -4350,14 +4338,14 @@
       "grupo": "equipos",
       "plan_canje": 2250000,
       "seccion": "Purificador Osmosis Inversa",
-      "foto": "",
+      "foto": "catalogo-img/611300020.png",
       "novedad": true,
       "novedad_tag": "NUEVO LANZAMIENTO",
       "novedad_desc": "Novedad oficial del mes en catálogo PSA",
       "fecha_novedad": "2026-09-01"
     },
     {
-      "sku": "",
+      "sku": "611012500",
       "nombre": "PSA AIRPURIFIER 220V",
       "precio": 1599000,
       "lista": 1599000,
@@ -4365,14 +4353,14 @@
       "grupo": "equipos",
       "plan_canje": 1439100,
       "seccion": "Purificador de Aire",
-      "foto": "",
+      "foto": "catalogo-img/611012500.png",
       "novedad": true,
       "novedad_tag": "NUEVO LANZAMIENTO",
       "novedad_desc": "Novedad oficial del mes en catálogo PSA",
       "fecha_novedad": "2026-09-01"
     },
     {
-      "sku": "",
+      "sku": "612100190",
       "nombre": "(025) ADAPT. M-M 1/2 DUCHA CR C/ORING",
       "precio": 37250,
       "lista": 37250,
@@ -4380,11 +4368,11 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "",
+      "foto": "catalogo-img/612100190.png",
       "novedad": false
     },
     {
-      "sku": "",
+      "sku": "612011470",
       "nombre": "( 448) ADAPT. ROSCA H-M M24X1 X M16X1 CROMADO",
       "precio": 18700,
       "lista": 18700,
@@ -4392,11 +4380,11 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "",
+      "foto": "catalogo-img/612011470.png",
       "novedad": false
     },
     {
-      "sku": "",
+      "sku": "612031380",
       "nombre": "GRIFERÍA ROTECH BICOMANDO",
       "precio": 470000,
       "lista": 470000,
@@ -4404,11 +4392,11 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "",
+      "foto": "catalogo-img/612031380.png",
       "novedad": false
     },
     {
-      "sku": "",
+      "sku": "612031210",
       "nombre": "GRIFERÍA ROTECH BM",
       "precio": 250000,
       "lista": 250000,
@@ -4416,11 +4404,11 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "",
+      "foto": "catalogo-img/612031210.png",
       "novedad": false
     },
     {
-      "sku": "",
+      "sku": "612031300",
       "nombre": "GRIFERÍA ROTECH BM NERO",
       "precio": 250000,
       "lista": 250000,
@@ -4428,11 +4416,11 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Accesorios para la instalación",
-      "foto": "",
+      "foto": "catalogo-img/612031300.png",
       "novedad": false
     },
     {
-      "sku": "",
+      "sku": "612060030",
       "nombre": "KIT POSVENTA PSA ROTECH UV",
       "precio": 380000,
       "lista": 380000,
@@ -4440,11 +4428,11 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "",
+      "foto": "catalogo-img/612060030.png",
       "novedad": false
     },
     {
-      "sku": "",
+      "sku": "623010010",
       "nombre": "MODULO CARBON 1200",
       "precio": 282000,
       "lista": 282000,
@@ -4452,11 +4440,11 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "",
+      "foto": "catalogo-img/623010010.png",
       "novedad": false
     },
     {
-      "sku": "",
+      "sku": "623010010",
       "nombre": "MODULO RESINA 1200",
       "precio": 274000,
       "lista": 274000,
@@ -4464,23 +4452,11 @@
       "grupo": "recargas",
       "plan_canje": null,
       "seccion": "Repuestos/mantenim. productos",
-      "foto": "",
+      "foto": "catalogo-img/623010010.png",
       "novedad": false
     },
     {
-      "sku": "",
-      "nombre": "BOTELLA DE VIDRIO 1 LT. PSA",
-      "precio": 42800,
-      "lista": 42800,
-      "url": "",
-      "grupo": "botellas",
-      "plan_canje": null,
-      "seccion": "Botellas",
-      "foto": "",
-      "novedad": false
-    },
-    {
-      "sku": "",
+      "sku": "612110240",
       "nombre": "BOTELLA PSA P/SODA BURBY TERRA X 1100 ML X2 REUTI.",
       "precio": 25150,
       "lista": 25150,
@@ -4488,38 +4464,14 @@
       "grupo": "botellas",
       "plan_canje": null,
       "seccion": "Botellas",
-      "foto": "",
+      "foto": "catalogo-img/612110240.png",
       "novedad": true,
       "novedad_tag": "NUEVO LANZAMIENTO",
       "novedad_desc": "Novedad oficial del mes en catálogo PSA",
       "fecha_novedad": "2026-09-01"
     },
     {
-      "sku": "",
-      "nombre": "BOTELLA PSA TÉRMICA 500 CC ROJA",
-      "precio": 61200,
-      "lista": 61200,
-      "url": "",
-      "grupo": "botellas",
-      "plan_canje": null,
-      "seccion": "Botellas",
-      "foto": "",
-      "novedad": false
-    },
-    {
-      "sku": "",
-      "nombre": "BOTELLA PSA TÉRMICA 750 CC ROJA",
-      "precio": 71150,
-      "lista": 71150,
-      "url": "",
-      "grupo": "botellas",
-      "plan_canje": null,
-      "seccion": "Botellas",
-      "foto": "",
-      "novedad": false
-    },
-    {
-      "sku": "",
+      "sku": "625110610",
       "nombre": "OLIVARE 500 CC ESTUCHE X 2 UNID. - ACEITE OLIVA VE",
       "precio": 35300,
       "lista": 35300,
@@ -4527,7 +4479,7 @@
       "grupo": "otros",
       "plan_canje": null,
       "seccion": "Olivare",
-      "foto": "",
+      "foto": "catalogo-img/625110610.png",
       "novedad": false
     }
   ]
