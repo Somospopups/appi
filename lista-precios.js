@@ -148,7 +148,17 @@
       if (!promo && p.nombre && (p.nombre.toUpperCase().indexOf('PROMO') >= 0 || p.nombre.toUpperCase().indexOf('COMBO') >= 0)) {
         promo = { activa: true, etiqueta: 'PROMO', detalle: 'Promoción especial vigente', vigencia: 'Hasta fin de mes' };
       }
-      var esNovedad = !!(p.novedad || (p.nombre && /TERRA|SOPORTE CELULAR/i.test(p.nombre)));
+      var esNovedad = false;
+      if (p.novedad) {
+        if (p.fecha_novedad) {
+          try {
+            var diffDias = (Date.now() - new Date(p.fecha_novedad).getTime()) / (1000 * 60 * 60 * 24);
+            esNovedad = diffDias <= 31;
+          } catch(e) { esNovedad = true; }
+        } else {
+          esNovedad = true;
+        }
+      }
       out.push({
         clave: claveSku(p),
         sku: p.sku || '',
