@@ -80,13 +80,36 @@
     { id: 'novedades', t: '✨ Novedades' },
     { id: 'promos', t: '🔥 Promos' },
     { id: 'packs', t: 'Packs PSA' },
-    { id: 'equipos', t: 'Equipos' },
-    { id: 'recargas', t: 'Recargas' },
-    { id: 'griferia', t: 'Grifería' },
-    { id: 'botellas', t: 'Botellas' },
-    { id: 'otros', t: 'Otros' }
+    { id: 'Purificadores', t: 'Purificadores' },
+    { id: 'Gasificador', t: 'Gasificador' },
+    { id: 'Purificador Osmosis Inversa', t: 'Ósmosis Inversa' },
+    { id: 'Purificador de Aire', t: 'Purificador de Aire' },
+    { id: 'Accesorios para la instalación', t: 'Instalación y Canillas' },
+    { id: 'Reposiciones', t: 'Reposiciones' },
+    { id: 'Repuestos/mantenim. productos', t: 'Repuestos y Mantenimiento' },
+    { id: 'Servicios', t: 'Servicios' },
+    { id: 'Botellas', t: 'Botellas y Mates' },
+    { id: 'Material Promocional', t: 'Material Promocional' },
+    { id: 'Análisis de laboratorio', t: 'Análisis de Laboratorio' },
+    { id: 'Olivare', t: 'Olivare' }
   ];
-  var GRUPO_TIT = { novedades: '✨ Novedades y Nuevos Lanzamientos', promos: '🔥 Promociones vigentes', packs: 'Packs PSA', equipos: 'Equipos', recargas: 'Recargas y adaptadores', griferia: 'Grifería', botellas: 'Botellas y mates', otros: 'Otros' };
+  var GRUPO_TIT = {
+    novedades: '✨ Novedades y Nuevos Lanzamientos',
+    promos: '🔥 Promociones vigentes',
+    packs: 'Packs PSA',
+    'Purificadores': 'Purificadores',
+    'Gasificador': 'Gasificador',
+    'Purificador Osmosis Inversa': 'Purificador Ósmosis Inversa',
+    'Purificador de Aire': 'Purificador de Aire',
+    'Accesorios para la instalación': 'Accesorios para la Instalación',
+    'Reposiciones': 'Reposiciones',
+    'Repuestos/mantenim. productos': 'Repuestos y Mantenimiento de Productos',
+    'Servicios': 'Servicios',
+    'Botellas': 'Botellas',
+    'Material Promocional': 'Material Promocional',
+    'Análisis de laboratorio': 'Análisis de Laboratorio',
+    'Olivare': 'Olivare'
+  };
 
   function $(id) { return document.getElementById(id); }
   function esc(s) {

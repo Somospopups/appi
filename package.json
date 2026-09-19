@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "882.0.0",
-  "cacheName": "appi-v882-pcd-fotos-cuotas-tarjetas",
+  "version": "883.0.0",
+  "cacheName": "appi-v883-pildoras-pdf-fotos-exactas",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {
