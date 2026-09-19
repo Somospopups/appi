@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v884-pildoras-activas-catalogo-puro';
+const CACHE_NAME = 'appi-v885-pildoras-fijas-sin-teclado';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

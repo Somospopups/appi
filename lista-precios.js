@@ -479,8 +479,9 @@
     var chips = GRUPOS.map(function (g) {
       return '<button type="button" class="lp-chip' + (filtro === g.id ? ' on' : '') + '" data-g="' + g.id + '">' + esc(g.t) + '</button>';
     }).join('');
+    var totalProds = (CAT && CAT.productos) ? CAT.productos.length : 0;
     return '<div class="lp-wrap">' +
-      '<p class="lp-note"><span>Lista \'Precios Sugeridos con Acuerdo\' de PSA' + (fecha ? ' · ' + esc(fecha) : '') + '. Elegí productos y cotizá.</span>' +
+      '<p class="lp-note"><span>Lista \'Precios Sugeridos con Acuerdo\' de PSA' + (fecha ? ' · ' + esc(fecha) : '') + (totalProds ? ' <b style="opacity:.85;font-weight:700">(' + totalProds + ' productos)</b>' : '') + '. Elegí productos y cotizá.</span>' +
       '<button type="button" class="lp-actualizar" id="lpActualizar" title="Actualizar precios desde la lista de PSA">🔄 Actualizar precios</button></p>' +
       '<input class="lp-search" id="lpSearch" type="search" placeholder="Buscar modelo, recarga o SKU" value="' + esc(busca) + '">' +
       '<div class="lp-chips" id="lpChips">' + chips + '</div>' +
@@ -1639,14 +1640,10 @@
       var b = e.target.closest('[data-g]');
       if (!b) return;
       filtro = b.getAttribute('data-g') || 'todos';
-      var wrap = $('lpCont');
-      if (wrap) {
-        wrap.innerHTML = htmlLista();
-        bind();
-        pintarTodo();
-        var ns = $('lpSearch');
-        if (ns) { ns.value = busca; ns.focus(); }
-      }
+      chips.querySelectorAll('.lp-chip').forEach(function(c){
+        c.classList.toggle('on', c === b);
+      });
+      pintarItems();
     };
     var list = $('lpList');
     if (list) list.onclick = function (e) {

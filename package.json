@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "884.0.0",
-  "cacheName": "appi-v884-pildoras-activas-catalogo-puro",
+  "version": "885.0.0",
+  "cacheName": "appi-v885-pildoras-fijas-sin-teclado",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {
