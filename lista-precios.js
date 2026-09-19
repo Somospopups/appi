@@ -1759,10 +1759,17 @@
             }
           });
           var promoPorSku = {}, promoPorNombre = {};
+          var novedadPorSku = {}, novedadPorNombre = {};
           fileCat.productos.forEach(function(p){
+            var nomK = (p.nombre || "").trim().toUpperCase();
             if (p && p.promo) {
               if (p.sku) promoPorSku[p.sku] = p.promo;
-              if (p.nombre) promoPorNombre[(p.nombre || "").trim().toUpperCase()] = p.promo;
+              if (nomK) promoPorNombre[nomK] = p.promo;
+            }
+            if (p && p.novedad) {
+              var novData = { novedad: true, novedad_tag: p.novedad_tag, novedad_desc: p.novedad_desc, fecha_novedad: p.fecha_novedad };
+              if (p.sku) novedadPorSku[p.sku] = novData;
+              if (nomK) novedadPorNombre[nomK] = novData;
             }
           });
           catElegido.productos.forEach(function (p) {
@@ -1782,6 +1789,15 @@
             if (!p.promo) {
               if (p.sku && promoPorSku[p.sku]) p.promo = promoPorSku[p.sku];
               else if (nom && promoPorNombre[nom]) p.promo = promoPorNombre[nom];
+            }
+            if (!p.novedad) {
+              var nd = (p.sku && novedadPorSku[p.sku]) || (nom && novedadPorNombre[nom]);
+              if (nd) {
+                p.novedad = true;
+                p.novedad_tag = nd.novedad_tag || 'NUEVO';
+                p.novedad_desc = nd.novedad_desc || '';
+                p.fecha_novedad = nd.fecha_novedad;
+              }
             }
           });
         }

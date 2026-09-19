@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "880.0.0",
-  "cacheName": "appi-v880-depuracion-novedades-mes",
+  "version": "881.0.0",
+  "cacheName": "appi-v881-novedades-hidratacion-fix",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {
