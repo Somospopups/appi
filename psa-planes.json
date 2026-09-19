@@ -1,6 +1,6 @@
 {
-  "actualizado": "18-Sep-2026",
-  "vigencia": "18 de Septiembre al 23 de Septiembre de 2026",
+  "actualizado": "19-Sep-2026",
+  "vigencia": "18-Sep-2026 al 23-Sep-2026",
   "fuente": "https://tienda.psa.com.ar/promociones_vigentes",
   "cuotas": [
     3,
@@ -24,32 +24,29 @@
         18,
         24
       ],
-      "tarjetas": "Visa, Mastercard bancarias, Cordobesa (a través de MODO)"
-    },
-    {
-      "id": "bapro",
-      "nombre": "Banco Provincia (BAPRO)",
-      "cuotas": [
-        3,
-        6,
-        9,
-        12,
-        15,
-        18,
-        24
-      ],
-      "tarjetas": "Visa y Mastercard emitidas por Banco Provincia"
+      "tarjetas": "Visa, Mastercard, American Express, Cordobesa"
     },
     {
       "id": "tarjeta-naranja",
-      "nombre": "Tarjeta Naranja",
+      "nombre": "Naranja",
       "cuotas": [
         6,
         9,
         12,
         18
       ],
-      "tarjetas": "Naranja (Link de Pago / ATM)"
+      "tarjetas": "Naranja"
+    },
+    {
+      "id": "banco-galicia",
+      "nombre": "Galicia",
+      "cuotas": [
+        3,
+        6,
+        9,
+        12
+      ],
+      "tarjetas": "Visa, Mastercard, American Express"
     },
     {
       "id": "bbva",
@@ -63,11 +60,11 @@
         18,
         24
       ],
-      "tarjetas": "Visa y Mastercard Banco BBVA (a través de MODO)"
+      "tarjetas": "Visa, Mastercard"
     },
     {
       "id": "banco-nacion",
-      "nombre": "Banco Nación (BNA)",
+      "nombre": "Nación",
       "cuotas": [
         3,
         6,
@@ -77,11 +74,11 @@
         18,
         24
       ],
-      "tarjetas": "Visa y Mastercard Banco Nación (a través de MODO)"
+      "tarjetas": "Visa, Mastercard"
     },
     {
       "id": "macro",
-      "nombre": "Banco Macro",
+      "nombre": "Macro",
       "cuotas": [
         3,
         6,
@@ -91,7 +88,7 @@
         18,
         24
       ],
-      "tarjetas": "Visa, Mastercard y Amex Banco Macro (a través de MODO)"
+      "tarjetas": "Visa, Mastercard, American Express"
     },
     {
       "id": "santander",
@@ -105,22 +102,11 @@
         18,
         24
       ],
-      "tarjetas": "Visa y Mastercard Banco Santander (a través de MODO)"
-    },
-    {
-      "id": "banco-galicia",
-      "nombre": "Banco Galicia",
-      "cuotas": [
-        3,
-        6,
-        9,
-        12
-      ],
-      "tarjetas": "Visa, Mastercard y Amex Banco Galicia (a través de MODO)"
+      "tarjetas": "Visa, Mastercard"
     },
     {
       "id": "hipotecario",
-      "nombre": "Banco Hipotecario",
+      "nombre": "Hipotecario",
       "cuotas": [
         3,
         6,
@@ -130,11 +116,11 @@
         18,
         24
       ],
-      "tarjetas": "Visa y Mastercard Banco Hipotecario"
+      "tarjetas": "Visa, Mastercard"
     },
     {
       "id": "cabal",
-      "nombre": "Cabal / Credicoop",
+      "nombre": "Cabal",
       "cuotas": [
         3,
         6,
@@ -142,7 +128,7 @@
         12,
         18
       ],
-      "tarjetas": "Cabal emitida por Banco Credicoop (a través de MODO)"
+      "tarjetas": "Cabal"
     },
     {
       "id": "american-express",
@@ -156,11 +142,11 @@
         18,
         24
       ],
-      "tarjetas": "American Express (propias y bancarias)"
+      "tarjetas": "American Express"
     },
     {
       "id": "tarjeta-data",
-      "nombre": "Tarjeta Data",
+      "nombre": "Data",
       "cuotas": [
         3,
         6,
@@ -170,7 +156,7 @@
         18,
         24
       ],
-      "tarjetas": "Tarjeta Data"
+      "tarjetas": ""
     },
     {
       "id": "tarjeta-patagonia-365",
@@ -184,11 +170,11 @@
         18,
         24
       ],
-      "tarjetas": "Tarjeta Patagonia 365"
+      "tarjetas": ""
     },
     {
       "id": "tarjeta-tuya",
-      "nombre": "Tarjeta Tuya",
+      "nombre": "Tuya",
       "cuotas": [
         3,
         6,
@@ -198,11 +184,11 @@
         18,
         24
       ],
-      "tarjetas": "Tarjeta Tuya (Chaco)"
+      "tarjetas": ""
     },
     {
       "id": "tarjeta-sol",
-      "nombre": "Tarjeta Sol",
+      "nombre": "Sol",
       "cuotas": [
         3,
         6,
@@ -212,11 +198,11 @@
         18,
         24
       ],
-      "tarjetas": "Tarjeta Sol"
+      "tarjetas": ""
     },
     {
       "id": "banco-del-sol",
-      "nombre": "Banco del Sol",
+      "nombre": "Del Sol",
       "cuotas": [
         3,
         6,
@@ -226,7 +212,7 @@
         18,
         24
       ],
-      "tarjetas": "Banco del Sol"
+      "tarjetas": ""
     }
   ]
 }
