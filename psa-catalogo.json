@@ -479,7 +479,10 @@
         "etiqueta": "10% OFF",
         "detalle": "10% OFF Promoción especial PSA Senik",
         "descuento": 10,
-        "precio_original": 1370000
+        "precio_original": 1370000,
+        "desde": "01/09/2026",
+        "hasta": "30/09/2026",
+        "vigencia": "Del 01/09 al 30/09/2026"
       }
     },
     {
@@ -498,7 +501,10 @@
         "etiqueta": "10% OFF",
         "detalle": "10% OFF Promoción especial PSA Senik",
         "descuento": 10,
-        "precio_original": 1370000
+        "precio_original": 1370000,
+        "desde": "01/09/2026",
+        "hasta": "30/09/2026",
+        "vigencia": "Del 01/09 al 30/09/2026"
       }
     },
     {
@@ -541,7 +547,10 @@
         "etiqueta": "10% OFF",
         "detalle": "10% OFF Promoción Soda Burby",
         "descuento": 10,
-        "precio_original": 468600
+        "precio_original": 468600,
+        "desde": "01/09/2026",
+        "hasta": "30/09/2026",
+        "vigencia": "Del 01/09 al 30/09/2026"
       }
     },
     {
@@ -2432,7 +2441,10 @@
         "etiqueta": "PROMO PACK",
         "detalle": "Cilindro de CO2 + Pack Rendimiento II bonificado",
         "descuento": 15,
-        "precio_original": 136500
+        "precio_original": 136500,
+        "desde": "01/09/2026",
+        "hasta": "30/09/2026",
+        "vigencia": "Del 01/09 al 30/09/2026"
       }
     },
     {
@@ -3999,7 +4011,10 @@
         "etiqueta": "10% OFF",
         "detalle": "10% OFF Promoción Soda Burby",
         "descuento": 10,
-        "precio_original": 468600
+        "precio_original": 468600,
+        "desde": "01/09/2026",
+        "hasta": "30/09/2026",
+        "vigencia": "Del 01/09 al 30/09/2026"
       }
     },
     {
@@ -4030,7 +4045,10 @@
         "etiqueta": "COMBO PROMO",
         "detalle": "Lanzamiento Terra: S4 + Soda Burby bonificado",
         "descuento": 10,
-        "precio_original": 1548000
+        "precio_original": 1548000,
+        "desde": "01/09/2026",
+        "hasta": "30/09/2026",
+        "vigencia": "Del 01/09 al 30/09/2026"
       }
     }
   ]

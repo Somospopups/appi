@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v875-promos-destacadas';
+const CACHE_NAME = 'appi-v876-promos-vigencia';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
