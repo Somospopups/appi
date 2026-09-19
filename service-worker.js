@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v886-boton-comprar-pcd';
+const CACHE_NAME = 'appi-v887-comprar-pcd-sesion-limpia';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "886.0.0",
-  "cacheName": "appi-v886-boton-comprar-pcd",
+  "version": "887.0.0",
+  "cacheName": "appi-v887-comprar-pcd-sesion-limpia",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

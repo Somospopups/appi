@@ -976,7 +976,7 @@
             return '• ' + it.cantidad + 'x ' + esc(it.nombre) + (it.sku ? ' <code style="background:#e2e8f0;padding:1px 4px;border-radius:4px">SKU ' + it.sku + '</code>' : '');
           }).join('<br>') +
           '</div>' +
-          '<p style="font-size:11px;color:#64748b;margin:0">💡 Se abrirá el Portal de Compras con tu sesión activa para continuar los pasos del pedido y medios de pago.</p>' +
+          '<p style="font-size:11.5px;color:#0284c7;background:#f0f9ff;border:1px solid #bae6fd;padding:8px 10px;border-radius:8px;margin:0">📋 <b>Se copiarán los códigos automáticamente</b> y se abrirá el Portal de Compras directo para ingresar tus productos.</p>' +
           '</div>';
 
         var ok = await window.APPIDialog.confirm(htmlModal, {
@@ -988,42 +988,17 @@
         if (!ok) return;
       }
 
-      // Enviar formulario POST autenticado a comprasonline.psa.com.ar / login_check
+      // Copiar SKUs al portapapeles por comodidad
       try {
-        var form = document.createElement('form');
-        form.method = 'POST';
-        form.action = 'https://mi.psa.com.ar/login_check';
-        form.target = '_blank';
-        form.style.display = 'none';
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(skusTxt);
+          aviso('¡Códigos de pedido copiados al portapapeles! 📋');
+        }
+      } catch (e) {}
 
-        var addInp = function(name, val) {
-          var inp = document.createElement('input');
-          inp.type = 'hidden';
-          inp.name = name;
-          inp.value = val;
-          form.appendChild(inp);
-        };
-
-        addInp('_center', creds.center);
-        addInp('_number', creds.number);
-        addInp('_password', creds.password);
-        addInp('_term_use', 'accept');
-        if (creds.csrf) addInp('_csrf_token', creds.csrf);
-
-        document.body.appendChild(form);
-        form.submit();
-        setTimeout(function () { try { form.remove(); } catch (e) {} }, 1500);
-
-        // Copiar SKUs al portapapeles por comodidad
-        try {
-          if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(skusTxt);
-            aviso('¡Sesión abierta en el PCD! Códigos de pedido copiados al portapapeles 📋');
-          }
-        } catch (e) {}
-      } catch (err) {
-        window.open('https://comprasonline.psa.com.ar/', '_blank');
-      }
+      // Abrir el Portal PCD
+      // Si el navegador ya tiene la sesión abierta en PSA, ingresar directo evita el choque de sesión activa (401:04)
+      window.open('https://comprasonline.psa.com.ar/', '_blank');
     } else {
       // No tiene credenciales vinculadas en Mi PSA
       if (typeof window.APPIDialog !== 'undefined' && window.APPIDialog.alert) {
