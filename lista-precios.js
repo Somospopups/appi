@@ -77,14 +77,39 @@
   var busca = '';
   var GRUPOS = [
     { id: 'todos', t: 'Todos' },
+    { id: 'novedades', t: '✨ Novedades' },
+    { id: 'promos', t: '🔥 Promos' },
     { id: 'packs', t: 'Packs PSA' },
-    { id: 'equipos', t: 'Equipos' },
-    { id: 'recargas', t: 'Recargas' },
-    { id: 'griferia', t: 'Grifería' },
-    { id: 'botellas', t: 'Botellas' },
-    { id: 'otros', t: 'Otros' }
+    { id: 'Purificadores', t: 'Purificadores' },
+    { id: 'Gasificador', t: 'Gasificador' },
+    { id: 'Purificador Osmosis Inversa', t: 'Ósmosis Inversa' },
+    { id: 'Purificador de Aire', t: 'Purificador de Aire' },
+    { id: 'Accesorios para la instalación', t: 'Instalación y Canillas' },
+    { id: 'Reposiciones', t: 'Reposiciones' },
+    { id: 'Repuestos/mantenim. productos', t: 'Repuestos y Mantenimiento' },
+    { id: 'Servicios', t: 'Servicios' },
+    { id: 'Botellas', t: 'Botellas y Mates' },
+    { id: 'Material Promocional', t: 'Material Promocional' },
+    { id: 'Análisis de laboratorio', t: 'Análisis de Laboratorio' },
+    { id: 'Olivare', t: 'Olivare' }
   ];
-  var GRUPO_TIT = { packs: 'Packs PSA', equipos: 'Equipos', recargas: 'Recargas y adaptadores', griferia: 'Grifería', botellas: 'Botellas y mates', otros: 'Otros' };
+  var GRUPO_TIT = {
+    novedades: '✨ Novedades y Nuevos Lanzamientos',
+    promos: '🔥 Promociones vigentes',
+    packs: 'Packs PSA',
+    'Purificadores': 'Purificadores',
+    'Gasificador': 'Gasificador',
+    'Purificador Osmosis Inversa': 'Purificador Ósmosis Inversa',
+    'Purificador de Aire': 'Purificador de Aire',
+    'Accesorios para la instalación': 'Accesorios para la Instalación',
+    'Reposiciones': 'Reposiciones',
+    'Repuestos/mantenim. productos': 'Repuestos y Mantenimiento de Productos',
+    'Servicios': 'Servicios',
+    'Botellas': 'Botellas',
+    'Material Promocional': 'Material Promocional',
+    'Análisis de laboratorio': 'Análisis de Laboratorio',
+    'Olivare': 'Olivare'
+  };
 
   function $(id) { return document.getElementById(id); }
   function esc(s) {
@@ -142,6 +167,21 @@
   function lineasLista() {
     var out = [];
     productos().forEach(function (p) {
+      var promo = p.promo || null;
+      if (!promo && p.nombre && (p.nombre.toUpperCase().indexOf('PROMO') >= 0 || p.nombre.toUpperCase().indexOf('COMBO') >= 0)) {
+        promo = { activa: true, etiqueta: 'PROMO', detalle: 'Promoción especial vigente', vigencia: 'Hasta fin de mes' };
+      }
+      var esNovedad = false;
+      if (p.novedad) {
+        if (p.fecha_novedad) {
+          try {
+            var diffDias = (Date.now() - new Date(p.fecha_novedad).getTime()) / (1000 * 60 * 60 * 24);
+            esNovedad = diffDias <= 31;
+          } catch(e) { esNovedad = true; }
+        } else {
+          esNovedad = true;
+        }
+      }
       out.push({
         clave: claveSku(p),
         sku: p.sku || '',
@@ -151,7 +191,11 @@
         grupo: p.grupo,
         seccion: p.seccion,
         composicion: p.composicion || '',
-        url: p.url || ''
+        url: p.url || '',
+        promo: promo,
+        novedad: esNovedad,
+        novedad_tag: p.novedad_tag || 'NUEVO',
+        novedad_desc: p.novedad_desc || ''
       });
       if (p.plan_canje) out.push(lineaCanje(p));
     });
@@ -172,11 +216,25 @@
   function filtrados() {
     var q = busca.trim().toLowerCase();
     var list = lineasLista();
-    return list.filter(function (L) {
-      if (filtro !== 'todos' && L.grupo !== filtro) return false;
+    var res = list.filter(function (L) {
+      if (filtro === 'promos') {
+        if (!L.promo || !L.promo.activa) return false;
+      } else if (filtro === 'novedades') {
+        if (!L.novedad) return false;
+      } else if (filtro !== 'todos' && L.grupo !== filtro) {
+        return false;
+      }
       if (!q) return true;
       return (L.nombre || '').toLowerCase().indexOf(q) >= 0 || String(L.sku).indexOf(q) >= 0;
     });
+    // Promociones siempre arriba de todo
+    res.sort(function (a, b) {
+      var aP = (a.promo && a.promo.activa) ? 1 : 0;
+      var bP = (b.promo && b.promo.activa) ? 1 : 0;
+      if (aP !== bP) return bP - aP;
+      return 0;
+    });
+    return res;
   }
   function resumen() {
     var c = carrito(), n = 0, tot = 0, lineas = [];
@@ -199,28 +257,49 @@
     setTimeout(function () { m.style.display = 'none'; }, 200);
   }
 
-  function abrirFotoModal(src, tit, sub) {
+  function compartirFlyerWA(src, tit) {
+    try {
+      var txt = '¡Mirá esta promoción oficial de PSA! 🔥\n*' + (tit || 'Promoción PSA') + '*\n' + (src || '');
+      var waUrl = 'https://api.whatsapp.com/send?text=' + encodeURIComponent(txt);
+      window.open(waUrl, '_blank');
+    } catch(e) {}
+  }
+
+  function abrirFotoModal(src, tit, sub, isFlyer) {
     var m = $('lpFotoModal');
     if (!m) {
       m = document.createElement('div');
       m.id = 'lpFotoModal';
       m.innerHTML = '<div class="lp-foto-card">' +
+        '<div class="lp-foto-card-header">' +
+          '<span class="lp-foto-card-tag" id="lpFotoModalTag" style="display:none">🔥 Promoción Oficial</span>' +
+          '<button type="button" class="lp-foto-card-x" id="lpFotoModalX">✕</button>' +
+        '</div>' +
         '<img class="lp-foto-card-img" id="lpFotoModalImg" src="" alt="">' +
         '<div class="lp-foto-card-tit" id="lpFotoModalTit"></div>' +
         '<div class="lp-foto-card-sub" id="lpFotoModalSub"></div>' +
-        '<button type="button" class="lp-foto-card-close" id="lpFotoModalClose">Cerrar</button>' +
+        '<div class="lp-foto-card-actions">' +
+          '<button type="button" class="lp-foto-card-wa" id="lpFotoModalWA"><span>💬</span> Compartir por WhatsApp</button>' +
+          '<button type="button" class="lp-foto-card-close" id="lpFotoModalClose">Cerrar</button>' +
+        '</div>' +
         '</div>';
       document.body.appendChild(m);
       m.addEventListener('click', function (e) {
-        if (e.target === m || e.target.id === 'lpFotoModalClose') cerrarFotoModal();
+        if (e.target === m || e.target.id === 'lpFotoModalClose' || e.target.id === 'lpFotoModalX') cerrarFotoModal();
       });
     }
     var img = $('lpFotoModalImg');
     var t = $('lpFotoModalTit');
     var s = $('lpFotoModalSub');
+    var tag = $('lpFotoModalTag');
+    var btnWa = $('lpFotoModalWA');
     if (img) img.src = src || '';
     if (t) t.textContent = tit || '';
     if (s) s.textContent = sub || '';
+    if (tag) tag.style.display = isFlyer ? 'inline-block' : 'none';
+    if (btnWa) {
+      btnWa.onclick = function() { compartirFlyerWA(src, tit); };
+    }
     m.style.display = 'flex';
     requestAnimationFrame(function () { m.classList.add('open'); });
   }
@@ -246,7 +325,7 @@
       '.lp-cuotas-in{animation:lpIn .35s ease}' +
       'body.dark .lp-chips-wrap.lp-more:after{background:linear-gradient(90deg,rgba(28,30,42,0),#1c1e2a)}' +
       '.lp-sec{margin:12px 0 6px;font-size:11px;font-weight:900;color:#0b5878;letter-spacing:.4px;text-transform:uppercase}' +
-      '.lp-canje{ background:rgba(91,141,239,0.06); border-left:3px solid #5b8def; } .lp-canje .lp-item-txt b{ color:#3d63c9; } .lp-item{display:flex;align-items:center;gap:10px;padding:10px 12px;margin:0 0 8px;border-radius:16px;background:rgba(255,255,255,.72);border:1px solid rgba(255,255,255,.8)}' +
+      '.lp-canje{ background:rgba(91,141,239,0.06); border-left:3px solid #5b8def; } .lp-canje .lp-item-txt b{ color:#3d63c9; } .lp-item{display:flex;align-items:center;gap:10px;padding:10px 12px;margin:0 0 8px;border-radius:16px;background:rgba(255,255,255,.72);border:1px solid rgba(255,255,255,.8);position:relative;transition:all .2s ease}' + '.lp-novedad-card{background:linear-gradient(135deg,rgba(238,242,255,.96),rgba(224,231,255,.82))!important;border:1.5px solid #6366f1!important;box-shadow:0 4px 14px rgba(99,102,241,.12)!important}' + 'body.dark .lp-novedad-card{background:linear-gradient(135deg,rgba(49,46,129,.35),rgba(67,56,202,.45))!important;border-color:#818cf8!important;box-shadow:0 4px 14px rgba(99,102,241,.2)!important}' + '.lp-novedad-badge{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:4px}' + '.lp-novedad-badge span:first-child{background:linear-gradient(135deg,#4f46e5,#6366f1);color:#fff;font-size:10px;font-weight:950;padding:2px 7px;border-radius:6px;letter-spacing:.3px;text-transform:uppercase;display:inline-flex;align-items:center;box-shadow:0 2px 6px rgba(79,70,229,.3)}' + '.lp-novedad-det{font-size:10.5px;font-weight:750;color:#4338ca;line-height:1.2}' + 'body.dark .lp-novedad-det{color:#a5b4fc}' + '.lp-promo-card{background:linear-gradient(135deg,rgba(255,247,237,.96),rgba(255,237,213,.85))!important;border:1.5px solid #fb923c!important;box-shadow:0 4px 14px rgba(249,115,22,.12)!important}' + 'body.dark .lp-promo-card{background:linear-gradient(135deg,rgba(124,45,18,.35),rgba(154,52,18,.45))!important;border-color:#ea580c!important;box-shadow:0 4px 14px rgba(234,88,12,.2)!important}' + '.lp-promo-badge{display:flex;flex-direction:column;gap:3px;margin-bottom:4px}' + '.lp-promo-badge-top{display:flex;align-items:center;gap:6px;flex-wrap:wrap}' + '.lp-promo-vig{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:800;color:#9a3412;background:rgba(251,146,60,.18);border:1px solid rgba(234,88,12,.22);border-radius:6px;padding:1px 6px;width:fit-content;margin-top:1px}' + 'body.dark .lp-promo-vig{color:#fdba74;background:rgba(234,88,12,.25);border-color:rgba(234,88,12,.45)}' + '.lp-promo-badge span:first-child{background:linear-gradient(135deg,#ea580c,#f97316);color:#fff;font-size:10px;font-weight:950;padding:2px 7px;border-radius:6px;letter-spacing:.3px;text-transform:uppercase;display:inline-flex;align-items:center;box-shadow:0 2px 6px rgba(234,88,12,.3)}' + '.lp-promo-det{font-size:10.5px;font-weight:750;color:#c2410c;line-height:1.2}' + 'body.dark .lp-promo-det{color:#fdba74}' + '.lp-precio-promo-row{display:flex;align-items:baseline;gap:8px;margin-top:2px}' + '.lp-precio-tachado{font-size:11px;font-weight:700;color:#9ca3af;text-decoration:line-through}' + 'body.dark .lp-precio-tachado{color:#6b7280}' +
       '.lp-item-txt{flex:1;min-width:0}' +
       '.lp-item-txt b{display:block;font-size:13px;font-weight:900;color:#2a2a32;line-height:1.25}' +
       '.lp-item-txt span{display:block;margin-top:2px;font-size:11px;font-weight:750;color:#686977}' +
@@ -325,10 +404,13 @@
       'body.dark .lp-eco-item{background:#1c1e2a}' +
       'body.dark .lp-cmp{background:#25273a;border-color:rgba(255,255,255,.08)}' +
       'body.dark .lp-cmp-sub,body.dark .lp-cmp-tb td,body.dark .lp-cmp-plst{color:#f2f2f7}' +
-      '.lp-actions{display:flex;gap:8px}' +
-      '.lp-actions button{flex:1;border:0;border-radius:12px;padding:12px;font:inherit;font-size:13px;font-weight:900;cursor:pointer}' +
-      '.lp-actions .lp-pdf{background:#0b5878;color:#fff}' +
-      '.lp-actions .lp-clear{background:rgba(42,42,50,.08);color:#2a2a32}' +
+      '.lp-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}' +
+      '.lp-actions button{border:0;border-radius:14px;padding:12px 10px;font:inherit;font-size:13px;font-weight:800;letter-spacing:-0.2px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:transform .12s ease,box-shadow .15s ease,background .15s ease}' +
+      '.lp-actions button:active{transform:scale(0.97)}' +
+      '.lp-actions .lp-pdf{background:#0b5878;color:#ffffff;box-shadow:0 2px 8px rgba(11,88,120,.25)}' +
+      '.lp-actions .lp-clear{background:#fff1f2;color:#be123c;border:1px solid #fecdd3}' +
+      'body.dark .lp-actions .lp-pdf{background:#1680aa;color:#fff}' +
+      'body.dark .lp-actions .lp-clear{background:#2a1b24;color:#fda4af;border-color:#4c1d2e}' +
       'body.dark #view-lista,.dark .lp-sheet{background:#1c1e2a}' +
       'body.dark .lp-item{background:#25273a;border-color:rgba(255,255,255,.08)}' +
       '.lp-item-foto-wrap{position:relative;width:44px;height:44px;flex:none;cursor:pointer}' +
@@ -345,7 +427,7 @@
       '.lp-foto-card-tit{font-size:14px;font-weight:800;margin-bottom:6px;line-height:1.3}' +
       '.lp-foto-card-sub{font-size:12px;color:#70707a;margin-bottom:16px}' +
       'body.dark .lp-foto-card-sub{color:#a0a0aa}' +
-      '.lp-foto-card-close{width:100%;padding:11px;border-radius:12px;border:0;background:#0b5878;color:#fff;font-weight:700;font-size:13px;cursor:pointer}' + '.lp-item-foto{width:44px;height:44px;flex:none;border-radius:10px;object-fit:contain;background:#fff;border:1px solid rgba(0,0,0,.07);padding:3px}' +
+      '.lp-foto-card{max-width:360px!important;width:92%!important;padding:16px!important;border-radius:24px!important}' + '.lp-foto-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}' + '.lp-foto-card-tag{background:linear-gradient(135deg,#ea580c,#f97316);color:#fff;font-size:10px;font-weight:900;padding:3px 8px;border-radius:6px;text-transform:uppercase;letter-spacing:.3px}' + '.lp-foto-card-x{border:0;background:rgba(0,0,0,.08);color:#555;width:28px;height:28px;border-radius:50%;cursor:pointer;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center}' + 'body.dark .lp-foto-card-x{background:rgba(255,255,255,.12);color:#eee}' + '.lp-foto-card-img{width:100%!important;max-height:260px!important;height:auto!important;object-fit:contain!important;border-radius:14px!important;margin:0 0 12px!important;background:#fafafa!important;border:1px solid rgba(0,0,0,.06)!important}' + 'body.dark .lp-foto-card-img{background:#1c1e2a!important;border-color:rgba(255,255,255,.08)!important}' + '.lp-foto-card-actions{display:flex;flex-direction:column;gap:8px;margin-top:14px}' + '.lp-foto-card-wa{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:11px;border-radius:12px;border:0;background:#25d366;color:#fff;font-weight:900;font-size:13px;cursor:pointer;box-shadow:0 3px 10px rgba(37,211,102,.3)}' + '.lp-foto-card-close{width:100%;padding:9px;border-radius:12px;border:0;background:rgba(0,0,0,.07);color:#333;font-weight:750;font-size:12px;cursor:pointer}' + 'body.dark .lp-foto-card-close{background:rgba(255,255,255,.1);color:#eee}' + '.lp-item-left-col{display:flex;flex-direction:column;align-items:center;gap:6px;flex:none;width:52px}' + '.lp-flyer-thumb-wrap{position:relative;width:48px;cursor:pointer;border-radius:8px;overflow:hidden;border:1.5px solid #f97316;background:#fff;box-shadow:0 2px 6px rgba(249,115,22,.2);transition:transform .15s ease}' + '.lp-flyer-thumb-wrap:active{transform:scale(0.94)}' + '.lp-flyer-thumb-img{width:100%;height:32px;object-fit:cover;display:block}' + '.lp-flyer-thumb-lbl{display:block;background:linear-gradient(135deg,#ea580c,#f97316);color:#fff;font-size:7.5px;font-weight:900;text-align:center;padding:1px 0;text-transform:uppercase;letter-spacing:.3px}' + '.lp-item-foto{width:44px;height:44px;flex:none;border-radius:10px;object-fit:contain;background:#fff;border:1px solid rgba(0,0,0,.07);padding:3px}' +
       'body.dark .lp-item-foto{background:#1c1e2e;border-color:rgba(255,255,255,.09)}' +
       'body.dark .lp-item-txt b,body.dark .lp-sheet h2,body.dark .lp-line b{color:#f2f2f7}' +
       'body.dark .lp-search,body.dark .lp-para{background:#25273a;color:#f2f2f7}' +
@@ -386,8 +468,10 @@
         '<div class="lp-chips-wrap"><div class="lp-chips" id="lpBancos"></div></div>' +
         '<div class="lp-sec" id="lpCuotasLab" hidden>Cuotas</div>' +
         '<div class="lp-chips-wrap" id="lpCuotasWrap" hidden><div class="lp-chips" id="lpCuotas"></div></div>' +
-        '<div class="lp-actions"><button type="button" class="lp-pdf" id="lpSheetPdf">Cotizar</button>' +
-        '<button type="button" class="lp-clear" id="lpSheetClear">Vaciar</button></div></div>';
+        '<div class="lp-actions">' +
+        '<button type="button" class="lp-pdf" id="lpSheetPdf">📝 Presupuestar</button>' +
+        '<button type="button" class="lp-clear" id="lpSheetClear">🗑️ Vaciar</button>' +
+        '</div></div>';
       document.body.appendChild(sh);
       sh.addEventListener('click', function (e) { if (e.target === sh) cerrarSheet(); });
       var x = sh.querySelector('[data-cerrar]');
@@ -400,8 +484,9 @@
     var chips = GRUPOS.map(function (g) {
       return '<button type="button" class="lp-chip' + (filtro === g.id ? ' on' : '') + '" data-g="' + g.id + '">' + esc(g.t) + '</button>';
     }).join('');
+    var totalProds = (CAT && CAT.productos) ? CAT.productos.length : 0;
     return '<div class="lp-wrap">' +
-      '<p class="lp-note"><span>Lista \'Precios Sugeridos con Acuerdo\' de PSA' + (fecha ? ' · ' + esc(fecha) : '') + '. Elegí productos y cotizá.</span>' +
+      '<p class="lp-note"><span>Lista \'Precios Sugeridos con Acuerdo\' de PSA' + (fecha ? ' · ' + esc(fecha) : '') + (totalProds ? ' <b style="opacity:.85;font-weight:700">(' + totalProds + ' productos)</b>' : '') + '. Elegí productos y cotizá.</span>' +
       '<button type="button" class="lp-actualizar" id="lpActualizar" title="Actualizar precios desde la lista de PSA">🔄 Actualizar precios</button></p>' +
       '<input class="lp-search" id="lpSearch" type="search" placeholder="Buscar modelo, recarga o SKU" value="' + esc(busca) + '">' +
       '<div class="lp-chips" id="lpChips">' + chips + '</div>' +
@@ -437,9 +522,35 @@
         descHtml = '<span class="lp-item-pack-desc">📦 ' + esc(L.composicion) + '</span>';
       }
       var subTxt = (L.sku ? 'SKU ' + esc(L.sku) : esc(L.seccion || 'Lista con acuerdo')) + (esCanje ? ' · Plan canje' : '');
-      html += '<div class="lp-item' + (esCanje ? ' lp-canje' : '') + (L.grupo === 'packs' ? ' lp-item-is-pack' : '') + '" data-sku="' + esc(L.clave) + '">' +
+      var isPromo = !!(L.promo && L.promo.activa);
+      var isNovedad = !!L.novedad;
+      var novedadBadgeHtml = '';
+      if (isNovedad && !isPromo) {
+        novedadBadgeHtml = '<div class="lp-novedad-badge"><span>✨ ' + esc(L.novedad_tag || 'NUEVO') + '</span>' + (L.novedad_desc ? '<span class="lp-novedad-det">' + esc(L.novedad_desc) + '</span>' : '') + '</div>';
+      }
+      var promoBadgeHtml = '';
+      var precioHtml = '<em>' + money(L.precio) + '</em>';
+      if (isPromo) {
+        var etiq = L.promo.etiqueta || 'PROMO';
+        var det = L.promo.detalle ? '<span class="lp-promo-det">' + esc(L.promo.detalle) + '</span>' : '';
+        var vigTxt = '';
+        if (L.promo.vigencia) {
+          vigTxt = L.promo.vigencia;
+        } else if (L.promo.desde && L.promo.hasta) {
+          vigTxt = 'Del ' + L.promo.desde + ' al ' + L.promo.hasta;
+        } else if (L.promo.hasta) {
+          vigTxt = 'Hasta el ' + L.promo.hasta;
+        }
+        var vigHtml = vigTxt ? '<span class="lp-promo-vig">📅 ' + esc(vigTxt) + '</span>' : '';
+        promoBadgeHtml = '<div class="lp-promo-badge"><div class="lp-promo-badge-top"><span>🔥 ' + esc(etiq) + '</span>' + det + '</div>' + vigHtml + '</div>';
+        if (L.promo.precio_original && Number(L.promo.precio_original) > Number(L.precio)) {
+          precioHtml = '<div class="lp-precio-promo-row"><s class="lp-precio-tachado">' + money(L.promo.precio_original) + '</s><em>' + money(L.precio) + '</em></div>';
+        }
+      }
+      var clsItem = 'lp-item' + (isPromo ? ' lp-promo-card' : (isNovedad ? ' lp-novedad-card' : '')) + (esCanje ? ' lp-canje' : '') + (L.grupo === 'packs' ? ' lp-item-is-pack' : '');
+      html += '<div class="' + clsItem + '" data-sku="' + esc(L.clave) + '">' +
         fotoHtml +
-        '<div class="lp-item-txt"><b>' + esc(L.nombre) + '</b><span>' + subTxt + '</span>' + descHtml + '<em>' + money(L.precio) + '</em></div>' +
+        '<div class="lp-item-txt">' + novedadBadgeHtml + promoBadgeHtml + '<b>' + esc(L.nombre) + '</b><span>' + subTxt + '</span>' + descHtml + precioHtml + '</div>' +
         '<div class="lp-qty">' +
           (q ? '<button type="button" class="ghost" data-act="menos" aria-label="Quitar">−</button><i>' + q + '</i>' : '') +
           '<button type="button" data-act="mas" aria-label="Agregar">+</button>' +
@@ -810,7 +921,7 @@
     pintarGanancia();
     pintarPago();
     var eco = $('lpEco'); if (eco) eco.innerHTML = '';
-    var pdfBtn = $('lpSheetPdf'); if (pdfBtn && !pdfBtn.disabled) pdfBtn.textContent = 'Cotizar';
+    var pdfBtn = $('lpSheetPdf'); if (pdfBtn && !pdfBtn.disabled) pdfBtn.textContent = '📝 Presupuestar';
   }
 
   function abrirSheet() {
@@ -829,7 +940,42 @@
     };
     var pdfBtn = $('lpSheetPdf');
     if (pdfBtn) pdfBtn.onclick = armarPdf;
+    var cmpBtn = $('lpSheetComprar');
+    if (cmpBtn) cmpBtn.onclick = comprarPcd;
   }
+
+  function comprarPcd() {
+    var r = resumen();
+    if (!r.lineas.length) {
+      aviso('El carrito está vacío. Sumá productos para comprar.');
+      return;
+    }
+
+    var items = [];
+    r.lineas.forEach(function (l) {
+      items.push({
+        nombre: l.p.nombre,
+        sku: l.p.sku || '',
+        cantidad: l.q
+      });
+    });
+
+    var skusTxt = items.map(function(it){
+      return (it.sku ? '[' + it.sku + '] ' : '') + it.cantidad + 'x ' + it.nombre;
+    }).join('\n');
+
+    // Copiar de inmediato al portapapeles sin molestar
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(skusTxt);
+      }
+    } catch (e) {}
+
+    // Mensaje discreto y apertura directa de PCD
+    aviso('Abriendo Portal PCD... Códigos copiados al portapapeles 📋');
+    window.open('https://comprasonline.psa.com.ar/', '_blank');
+  }
+
   function cerrarSheet() {
     var sh = $('lpSheet');
     if (!sh) return;
@@ -1534,21 +1680,23 @@
       var b = e.target.closest('[data-g]');
       if (!b) return;
       filtro = b.getAttribute('data-g') || 'todos';
-      var wrap = $('lpCont');
-      if (wrap) {
-        wrap.innerHTML = htmlLista();
-        bind();
-        pintarTodo();
-        var ns = $('lpSearch');
-        if (ns) { ns.value = busca; ns.focus(); }
-      }
+      chips.querySelectorAll('.lp-chip').forEach(function(c){
+        c.classList.toggle('on', c === b);
+      });
+      pintarItems();
     };
     var list = $('lpList');
     if (list) list.onclick = function (e) {
+      var flyerBtn = e.target.closest('[data-flyer-popup]');
+      if (flyerBtn) {
+        e.stopPropagation();
+        abrirFotoModal(flyerBtn.getAttribute('data-flyer-popup'), flyerBtn.getAttribute('data-foto-tit'), flyerBtn.getAttribute('data-foto-sub'), true);
+        return;
+      }
       var fotoBtn = e.target.closest('[data-foto-popup]');
       if (fotoBtn) {
         e.stopPropagation();
-        abrirFotoModal(fotoBtn.getAttribute('data-foto-popup'), fotoBtn.getAttribute('data-foto-tit'), fotoBtn.getAttribute('data-foto-sub'));
+        abrirFotoModal(fotoBtn.getAttribute('data-foto-popup'), fotoBtn.getAttribute('data-foto-tit'), fotoBtn.getAttribute('data-foto-sub'), false);
         return;
       }
       var btn = e.target.closest('[data-act]');
@@ -1612,12 +1760,35 @@
       fetch('./psa-planes.json' + bust, { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; })
     ]).then(function (arr) {
       var supaCatJ = arr[0], supaPlanJ = arr[1], ganJ = arr[2], fileCat = arr[3], filePlan = arr[4];
-      var catElegido = null;
-      if(supaCatJ && supaCatJ.productos) catElegido = supaCatJ;
-      else if(fileCat && fileCat.productos) catElegido = fileCat;
-      var planElegido = null;
-      if(supaPlanJ && (supaPlanJ.cuotas || supaPlanJ.bancos)) planElegido = supaPlanJ;
-      else if(filePlan && (filePlan.cuotas || filePlan.bancos)) planElegido = filePlan;
+      // La fuente de verdad del catálogo oficial, sus categorías exactas del PDF y fotos del PCD
+      // es psa-catalogo.json auditado del repositorio. Si Supabase tiene precios actualizados más recientes,
+      // se aplican sobre la estructura oficial sin alterar su orden ni duplicar productos.
+      var catElegido = fileCat && fileCat.productos ? fileCat : supaCatJ;
+      var planElegido = filePlan && (filePlan.cuotas || filePlan.bancos) ? filePlan : supaPlanJ;
+
+      if (catElegido && supaCatJ && supaCatJ.productos && catElegido === fileCat) {
+        var precioPorSku = {}, precioPorNom = {}, canjePorSku = {}, canjePorNom = {};
+        supaCatJ.productos.forEach(function(sp){
+          if (!sp) return;
+          if (sp.sku) {
+            if (sp.precio) precioPorSku[sp.sku] = sp.precio;
+            if (sp.plan_canje) canjePorSku[sp.sku] = sp.plan_canje;
+          }
+          if (sp.nombre) {
+            var n = sp.nombre.trim().toUpperCase();
+            if (sp.precio) precioPorNom[n] = sp.precio;
+            if (sp.plan_canje) canjePorNom[n] = sp.plan_canje;
+          }
+        });
+        catElegido.productos.forEach(function(p){
+          if (!p) return;
+          var n = (p.nombre || '').trim().toUpperCase();
+          var nuevoPre = (p.sku && precioPorSku[p.sku]) || precioPorNom[n];
+          var nuevoCanje = (p.sku && canjePorSku[p.sku]) || canjePorNom[n];
+          if (nuevoPre && nuevoPre > 0) { p.precio = nuevoPre; p.lista = nuevoPre; }
+          if (nuevoCanje && nuevoCanje > 0) { p.plan_canje = nuevoCanje; }
+        });
+      }
       if (catElegido) {
         // Asegurar que los packs del catálogo local siempre estén presentes
         // incluso si catElegido proviene del storage de Supabase (que aún no tiene los packs sincronizados).
@@ -1629,6 +1800,23 @@
             if (!skusExistentes[pk.sku]) {
               catElegido.productos.unshift(pk);
               skusExistentes[pk.sku] = true;
+            }
+          });
+
+          // Incorporar CUALQUIER producto del catálogo local que no esté en Supabase (por SKU o por nombre)
+          var nombresExistentes = {};
+          catElegido.productos.forEach(function(p){
+            if (p && p.nombre) nombresExistentes[p.nombre.trim().toUpperCase()] = true;
+          });
+          fileCat.productos.forEach(function (fp) {
+            if (!fp) return;
+            var nomK = (fp.nombre || '').trim().toUpperCase();
+            var faltaSku = fp.sku && !skusExistentes[fp.sku];
+            var faltaNom = !nombresExistentes[nomK];
+            if (faltaSku || faltaNom) {
+              catElegido.productos.push(fp);
+              if (fp.sku) skusExistentes[fp.sku] = true;
+              if (nomK) nombresExistentes[nomK] = true;
             }
           });
 
@@ -1653,6 +1841,20 @@
               if (p.sku) skuPorNombre[nomNorm] = p.sku;
             }
           });
+          var promoPorSku = {}, promoPorNombre = {};
+          var novedadPorSku = {}, novedadPorNombre = {};
+          fileCat.productos.forEach(function(p){
+            var nomK = (p.nombre || "").trim().toUpperCase();
+            if (p && p.promo) {
+              if (p.sku) promoPorSku[p.sku] = p.promo;
+              if (nomK) promoPorNombre[nomK] = p.promo;
+            }
+            if (p && p.novedad) {
+              var novData = { novedad: true, novedad_tag: p.novedad_tag, novedad_desc: p.novedad_desc, fecha_novedad: p.fecha_novedad };
+              if (p.sku) novedadPorSku[p.sku] = novData;
+              if (nomK) novedadPorNombre[nomK] = novData;
+            }
+          });
           catElegido.productos.forEach(function (p) {
             if (!p) return;
             var nom = (p.nombre || "").trim().toUpperCase();
@@ -1667,6 +1869,19 @@
             }
             if (!p.composicion && p.sku && compPorSku[p.sku]) p.composicion = compPorSku[p.sku];
             if (!p.items_skus && p.sku && itemsPorSku[p.sku]) p.items_skus = itemsPorSku[p.sku];
+            if (!p.promo) {
+              if (p.sku && promoPorSku[p.sku]) p.promo = promoPorSku[p.sku];
+              else if (nom && promoPorNombre[nom]) p.promo = promoPorNombre[nom];
+            }
+            if (!p.novedad) {
+              var nd = (p.sku && novedadPorSku[p.sku]) || (nom && novedadPorNombre[nom]);
+              if (nd) {
+                p.novedad = true;
+                p.novedad_tag = nd.novedad_tag || 'NUEVO';
+                p.novedad_desc = nd.novedad_desc || '';
+                p.fecha_novedad = nd.fecha_novedad;
+              }
+            }
           });
         }
         CAT = catElegido;

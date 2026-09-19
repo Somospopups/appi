@@ -4860,6 +4860,154 @@
         "nc_d": 3627930,
         "nc_c": 3278250
       }
+    },
+    "611010730": {
+      "nombre": "PSA SENIOR 4 TERRA + KIT POSV.",
+      "pb": 3.3,
+      "publico": 950000.0,
+      "costos": {
+        "ri_j": 612260.0,
+        "ri_d": 593892.2,
+        "ri_c": 569401.8,
+        "nc_j": 676547.3,
+        "nc_d": 656250.88,
+        "nc_c": 629188.99
+      },
+      "publico_canje": 855000.0,
+      "costos_canje": {
+        "ri_j": 551034.0,
+        "ri_d": 534502.98,
+        "ri_c": 512461.62,
+        "nc_j": 608892.57,
+        "nc_d": 590625.79,
+        "nc_c": 566270.09
+      }
+    },
+    "n:psa senior 4 terra + kit posv.": {
+      "nombre": "PSA SENIOR 4 TERRA + KIT POSV.",
+      "pb": 3.3,
+      "publico": 950000.0,
+      "costos": {
+        "ri_j": 612260.0,
+        "ri_d": 593892.2,
+        "ri_c": 569401.8,
+        "nc_j": 676547.3,
+        "nc_d": 656250.88,
+        "nc_c": 629188.99
+      },
+      "publico_canje": 855000.0,
+      "costos_canje": {
+        "ri_j": 551034.0,
+        "ri_d": 534502.98,
+        "ri_c": 512461.62,
+        "nc_j": 608892.57,
+        "nc_d": 590625.79,
+        "nc_c": 566270.09
+      }
+    },
+    "617110050": {
+      "nombre": "PSA SODA BURBY TERRA",
+      "pb": 2.15,
+      "publico": 444000.0,
+      "costos": {
+        "ri_j": 314600.0,
+        "ri_d": 305162.0,
+        "ri_c": 292578.0,
+        "nc_j": 347633.0,
+        "nc_d": 337204.01,
+        "nc_c": 323298.69
+      },
+      "publico_canje": 399600.0,
+      "costos_canje": {
+        "ri_j": 283140.0,
+        "ri_d": 274645.8,
+        "ri_c": 263320.2,
+        "nc_j": 312869.7,
+        "nc_d": 303483.61,
+        "nc_c": 290968.82
+      }
+    },
+    "n:psa soda burby terra": {
+      "nombre": "PSA SODA BURBY TERRA",
+      "pb": 2.15,
+      "publico": 444000.0,
+      "costos": {
+        "ri_j": 314600.0,
+        "ri_d": 305162.0,
+        "ri_c": 292578.0,
+        "nc_j": 347633.0,
+        "nc_d": 337204.01,
+        "nc_c": 323298.69
+      },
+      "publico_canje": 399600.0,
+      "costos_canje": {
+        "ri_j": 283140.0,
+        "ri_d": 274645.8,
+        "ri_c": 263320.2,
+        "nc_j": 312869.7,
+        "nc_d": 303483.61,
+        "nc_c": 290968.82
+      }
+    },
+    "614065680": {
+      "nombre": "SOPORTE P/CELULAR",
+      "pb": 0.0,
+      "publico": 3000.0,
+      "costos": {
+        "ri_j": 3000.0,
+        "ri_d": 3000.0,
+        "ri_c": 3000.0,
+        "nc_j": 3000.0,
+        "nc_d": 3000.0,
+        "nc_c": 3000.0
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:soporte p/celular": {
+      "nombre": "SOPORTE P/CELULAR",
+      "pb": 0.0,
+      "publico": 3000.0,
+      "costos": {
+        "ri_j": 3000.0,
+        "ri_d": 3000.0,
+        "ri_c": 3000.0,
+        "nc_j": 3000.0,
+        "nc_d": 3000.0,
+        "nc_c": 3000.0
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "630139850": {
+      "nombre": "PROMO S4 TERRA + BURBY TERRA",
+      "pb": 5.45,
+      "publico": 1394000.0,
+      "costos": {
+        "ri_j": 926860.0,
+        "ri_d": 899054.2,
+        "ri_c": 861979.8,
+        "nc_j": 1024180.3,
+        "nc_d": 993454.89,
+        "nc_c": 952487.6799999999
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:promo s4 terra + burby terra": {
+      "nombre": "PROMO S4 TERRA + BURBY TERRA",
+      "pb": 5.45,
+      "publico": 1394000.0,
+      "costos": {
+        "ri_j": 926860.0,
+        "ri_d": 899054.2,
+        "ri_c": 861979.8,
+        "nc_j": 1024180.3,
+        "nc_d": 993454.89,
+        "nc_c": 952487.6799999999
+      },
+      "publico_canje": null,
+      "costos_canje": null
     }
   }
 }

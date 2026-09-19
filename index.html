@@ -132,7 +132,7 @@ window.openStock=function(){
 <link rel="apple-touch-startup-image" href="./splash/apple-splash-2732x2048.png" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)" />
 <!-- Primero de todos: su escucha de popstate tiene que correr antes que la de
      la app, para que el gesto de atrás cierre el panel abierto y no navegue. -->
-<script src="./panel-atras.js?v=846"></script>
+<script src="./panel-atras.js?v=847"></script>
 <script src="./auth-config.js"></script>
 <script src="./appi-dialog.js?v=512"></script>
 <script src="./appi-notif.js?v=524"></script>
@@ -160,7 +160,8 @@ window.openStock=function(){
 <script src="./escalera-suenos.js"></script>
 <script src="./demo-guia.js"></script>
 <script src="./tablero-negocio.js?v=511"></script>
-<script src="./lista-precios.js?v=841"></script>
+<script src="./lista-precios.js?v=857"></script>
+<script src="./canillas-adaptadores.js?v=19"></script>
 <script src="./vendor/zxing.min.js"></script>
 <script src="./stock-personal.js?v=797"></script>
 
@@ -4641,6 +4642,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-suenos" onclick="openSuenos()"><span>🪜</span> Escalera de Sueños</button>
     <button class="ds-btn" data-ds="view-demo" onclick="openDemo()"><span>🎯</span> Coach de Demo</button>
     <button class="ds-btn" data-ds="view-botella" onclick="openBotella()"><span>🍾</span> Comparativas</button>
+    <button class="ds-btn" data-ds="view-canillas" onclick="openCanillas()"><span>🚰</span> Canillas y adaptadores</button>
     <button class="ds-btn" data-ds="view-lista" onclick="openLista()"><span>📋</span> Lista de precios</button>
     <button class="ds-btn" data-ds="view-reuniones" onclick="openReuniones()"><span>🎥</span> Reuniones</button>
     <button class="ds-btn" onclick="abrirBancoImagenes()"><span>🖼️</span> Banco de Imágenes</button>
@@ -4648,7 +4650,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v874 · Segura</div>
+  <div class="ds-foot">APPI · v889 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4932,7 +4934,7 @@ body.dark #pageTabs button.active{color:#c5d6ff}
       <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
 
       <div class="home-brand-row">
-        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · 848</span></span>
+        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · 889</span></span>
       </div>
 
       <div class="home-hero-card">
@@ -5098,6 +5100,18 @@ body.dark #pageTabs button.active{color:#c5d6ff}
     </header>
     <div id="herrWrap"></div>
     <div class="home-tool-grid" id="herrGrid" style="padding:0 14px"></div>
+  </section>
+
+  <!-- CANILLAS Y ADAPTADORES PSA -->
+  <section id="view-canillas" class="view">
+    <header class="top">
+      <button class="back-btn" onclick="showView('view-herramientas')" aria-label="Volver">‹</button>
+      <button class="help-btn" id="btnHelpCanillas" aria-label="Ayuda">?</button>
+      <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
+      <h1>Canillas y <span class="script">adaptadores</span></h1>
+      <p>Identificador oficial PSA · Guía V02-21</p>
+    </header>
+    <div id="canillasCont"></div>
   </section>
 
   <section id="view-reuniones" class="view">
@@ -7002,17 +7016,17 @@ function showView(id,opts){
     b.classList.toggle('active', b.dataset.view===id);
   });
   // Sidebar escritorio: marcar activo (con equivalencias de sub-vistas)
-  const dsMap = {'view-home':'view-home','view-presu':'view-presu','view-presu-hist':'view-presu','view-equipo':'view-equipo','view-historico':'view-historico','view-usuarios':'view-usuarios','view-seguimiento':'view-seguimiento','view-encuesta':'view-encuesta','view-gestion':'view-gestion','view-grabadora':'view-grabadora','view-notas':'view-notas','view-tumes':'view-tumes','view-siete':'view-siete','view-siete-detail':'view-siete','view-ocho':'view-ocho','view-suenos':'view-suenos','view-demo':'view-demo','view-botella':'view-botella','view-simulador':'view-simulador','view-stock':'view-stock','view-reuniones':'view-reuniones','view-lista':'view-lista'};
+  const dsMap = {'view-home':'view-home','view-presu':'view-presu','view-presu-hist':'view-presu','view-equipo':'view-equipo','view-historico':'view-historico','view-usuarios':'view-usuarios','view-seguimiento':'view-seguimiento','view-encuesta':'view-encuesta','view-gestion':'view-gestion','view-grabadora':'view-grabadora','view-notas':'view-notas','view-tumes':'view-tumes','view-siete':'view-siete','view-siete-detail':'view-siete','view-ocho':'view-ocho','view-suenos':'view-suenos','view-demo':'view-demo','view-botella':'view-botella','view-simulador':'view-simulador','view-stock':'view-stock','view-reuniones':'view-reuniones','view-lista':'view-lista','view-canillas':'view-canillas'};
   const dsTarget = (id==='view-wheel'||id==='view-eval') ? `rueda-${currentRueda||'vida'}` : (dsMap[id] || '');
   document.querySelectorAll('#deskSidebar .ds-btn').forEach(b=>{
     b.classList.toggle('active', b.dataset.ds===dsTarget);
   });
-  const hideTabsOn = ['view-home','view-tumes','view-siete','view-siete-detail','view-ocho','view-suenos','view-demo','view-botella','view-simulador','view-stock','view-presu','view-presu-hist','view-equipo','view-historico','view-seguimiento','view-planning','view-encuesta','view-gestion','view-grabadora','view-notas','view-usuarios','view-admin'];
+  const hideTabsOn = ['view-home','view-tumes','view-siete','view-siete-detail','view-ocho','view-suenos','view-demo','view-botella','view-simulador','view-stock','view-presu','view-presu-hist','view-equipo','view-historico','view-seguimiento','view-planning','view-encuesta','view-gestion','view-grabadora','view-notas','view-usuarios','view-admin','view-canillas'];
   document.getElementById('tabs').style.display = (id==='view-wheel'||id==='view-eval') ? 'flex' : 'none';
   const _pageHub={
     'view-home':'view-home','view-mes':'view-mes','view-tumes':'view-mes','view-siete':'view-mes','view-siete-detail':'view-mes','view-presu':'view-mes','view-presu-hist':'view-mes','view-wheel':'view-mes','view-eval':'view-mes','view-planning':'view-mes',
     'view-negocio':'view-negocio','view-equipo':'view-negocio','view-historico':'view-negocio','view-usuarios':'view-negocio','view-seguimiento':'view-negocio','view-gestion':'view-negocio',
-    'view-herramientas':'view-herramientas','view-stock':'view-herramientas','view-ocho':'view-herramientas','view-suenos':'view-herramientas','view-demo':'view-herramientas','view-botella':'view-herramientas','view-simulador':'view-herramientas','view-grabadora':'view-herramientas','view-notas':'view-herramientas','view-encuesta':'view-herramientas','view-lista':'view-herramientas'
+    'view-herramientas':'view-herramientas','view-stock':'view-herramientas','view-ocho':'view-herramientas','view-suenos':'view-herramientas','view-demo':'view-herramientas','view-botella':'view-herramientas','view-simulador':'view-herramientas','view-grabadora':'view-herramientas','view-notas':'view-herramientas','view-encuesta':'view-herramientas','view-lista':'view-herramientas','view-canillas':'view-herramientas'
   };
   const _hub=_pageHub[id]||'view-home';
   const _isPage = ['view-home','view-mes','view-negocio','view-herramientas'].includes(id);
@@ -11858,6 +11872,11 @@ function renderToolsList(){
       statusVal:'Lista', statusClass:'pending', progressPct:100,
       timeAgo:'Equipos y recargas', onClick:'openLista()', accent:'#0b5878', gradient:'linear-gradient(135deg,#0b5878,#3ad0a4)'
     });
+    const hCanillas = renderHomeQuickCard({
+      icon:'🚰', title:'Canillas y adaptadores', sub:'Identificador por foto · Guía PSA',
+      statusVal:'Foto / IA', statusClass:'done', progressPct:100,
+      timeAgo:'53 modelos', onClick:'openCanillas()', accent:'#0284c7', gradient:'linear-gradient(135deg,#0284c7,#38bdf8)'
+    });
     const hReu = renderHomeQuickCard({
       icon:'🎥', title:'Reuniones', sub:'Un botón, como Meet',
       statusVal:'Live', statusClass:'pending', progressPct:100,
@@ -11905,7 +11924,7 @@ function renderToolsList(){
         <span style="font-size:14px;font-weight:900;letter-spacing:-0.2px;color:#fff">Tablero PSA</span>
         <span style="font-size:11px;font-weight:700;color:rgba(255,255,255,.90);line-height:1.2">Acceso directo · Mi PSA Distribuidor</span>
       </button>`;
-    herrHost.innerHTML = h1 + h2 + h3 + h4 + hLista + hReu + hBanco + h5 + hStock + h6 + h7 + hAgenda + hPSA;
+    herrHost.innerHTML = h1 + h2 + h3 + h4 + hCanillas + hLista + hReu + hBanco + h5 + hStock + h6 + h7 + hAgenda + hPSA;
   }
   if(!mesHost){const toolsList=document.getElementById('toolsList');if(toolsList)toolsList.innerHTML = `
     <details class="home-section-block" data-home-sec="mes" ${openMes?'open':''}>
@@ -13521,8 +13540,8 @@ function cerrarToolsMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='852';
-      const CACHE_NAME='appi-v874-pb-detalle-notif';
+      const swVersion='889';
+      const CACHE_NAME='appi-v889-simplificar-acciones-carrito';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}

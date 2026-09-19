@@ -165,7 +165,8 @@
   var COLORES_QR = {
     'nero': 'Nero', 'negro': 'Nero', 'black': 'Nero',
     'bianco': 'Bianco', 'blanco': 'Bianco', 'white': 'Bianco',
-    'grigio': 'Grigio', 'gris': 'Grigio', 'gray': 'Grigio'
+    'grigio': 'Grigio', 'gris': 'Grigio',
+    'terra': 'Terra', 'gray': 'Grigio'
   };
 
   function serieLike(s){
@@ -461,7 +462,8 @@
   var COLORES_CATALOGO = {
     'bianco': 'Bianco', 'blanco': 'Bianco', 'blanca': 'Bianco',
     'nero': 'Nero', 'negro': 'Nero', 'negra': 'Nero',
-    'grigio': 'Grigio', 'gris': 'Grigio'
+    'grigio': 'Grigio', 'gris': 'Grigio',
+    'terra': 'Terra'
   };
   // Sufijos de kit/posventa: figuran en el nombre de la lista con acuerdo
   // ("… + KIT POSV.") y en la etiqueta, pero el OCR a veces los lee y a

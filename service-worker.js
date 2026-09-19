@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v874-pb-detalle-notif';
+const CACHE_NAME = 'appi-v889-simplificar-acciones-carrito';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
@@ -33,6 +33,8 @@ const APP_SHELL = [
   './demo-guia.js',
   './tablero-negocio.js',
   './lista-precios.js',
+  './canillas-adaptadores.js',
+  './guia-adaptadores-psa.pdf',
   './stock-personal.js',
   './vendor/zxing.min.js',
   './porque-vivo.js',
