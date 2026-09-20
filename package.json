@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "918.0.0",
-  "cacheName": "appi-v918-organigrama-nav-hooks",
+  "version": "919.0.0",
+  "cacheName": "appi-v919-pase-lider-ejecutivo-filtro-categoria",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

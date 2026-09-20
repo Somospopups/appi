@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v918-organigrama-nav-hooks';
+const CACHE_NAME = 'appi-v919-pase-lider-ejecutivo-filtro-categoria';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
