@@ -4653,7 +4653,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v902 · Segura</div>
+  <div class="ds-foot">APPI · v903 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4937,7 +4937,7 @@ body.dark #pageTabs button.active{color:#c5d6ff}
       <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
 
       <div class="home-brand-row">
-        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · 902</span></span>
+        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · 903</span></span>
       </div>
 
       <div class="home-hero-card">
@@ -13543,8 +13543,8 @@ function cerrarToolsMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='902';
-      const CACHE_NAME='appi-v902-devolucion-saldo-vs-en-mano-contado';
+      const swVersion='903';
+      const CACHE_NAME='appi-v903-fix-doble-recarga-sw';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
@@ -18380,8 +18380,8 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
           });
         });
       });
+      // Listener unificado de controllerchange gestionado en el bloque principal del Service Worker
       let refreshing=false;
-      navigator.serviceWorker.addEventListener('controllerchange',()=>{ if(refreshing) return; refreshing=true; location.reload(); });
       document.getElementById('btnUpdateAppi')?.addEventListener('click',()=>{
         if(reg && reg.waiting){ reg.waiting.postMessage({type:'SKIP_WAITING'}); }
         else location.reload();

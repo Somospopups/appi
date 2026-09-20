@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v902-devolucion-saldo-vs-en-mano-contado';
+const CACHE_NAME = 'appi-v903-fix-doble-recarga-sw';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
