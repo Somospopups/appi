@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "894.0.0",
-  "cacheName": "appi-v894-motion-graphics-pildora-fab",
+  "version": "895.0.0",
+  "cacheName": "appi-v895-gotita-audio-smooth-motion",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

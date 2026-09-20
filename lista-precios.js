@@ -338,12 +338,12 @@
       '.lp-qty button.ghost{background:rgba(11,88,120,.12);color:#0b5878}' +
       '.lp-qty i{min-width:18px;text-align:center;font-style:normal;font-size:13px;font-weight:900;color:#2a2a32}' +
       '.lp-empty{padding:28px 8px;text-align:center;font-size:13px;font-weight:750;color:#686977}' +
-      '@keyframes lpFabAppear{0%{opacity:0;transform:translateX(-50%) translateY(75px) scale(0.75)}65%{opacity:1;transform:translateX(-50%) translateY(-6px) scale(1.03)}100%{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}}' +
+      '@keyframes lpFabAppear{0%{opacity:0;transform:translateX(-50%) translateY(95px) scale(0.85)}70%{opacity:1;transform:translateX(-50%) translateY(-4px) scale(1.015)}100%{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}}' +
       '@keyframes lpFabPulse{0%{transform:translateX(-50%) scale(1)}40%{transform:translateX(-50%) scale(1.08);box-shadow:0 14px 34px rgba(11,88,120,.6), 0 0 0 6px rgba(11,88,120,.2)}100%{transform:translateX(-50%) scale(1)}}' +
       '@keyframes lpBadgePop{0%{transform:scale(1)}50%{transform:scale(1.35) rotate(-6deg)}100%{transform:scale(1)}}' +
       '.lp-fab{display:none;position:fixed;left:50%;right:auto;transform:translateX(-50%);top:auto;bottom:98px;bottom:calc(env(safe-area-inset-bottom) + 98px);z-index:55;align-items:center;gap:10px;border:1.5px solid rgba(255,255,255,.35);border-radius:999px;padding:10px 18px 10px 12px;background:linear-gradient(135deg,#074a66,#0b5878);color:#fff;font:inherit;font-size:14px;font-weight:900;box-shadow:0 10px 28px -4px rgba(11,88,120,.45), 0 4px 12px rgba(0,0,0,.15);cursor:pointer;touch-action:manipulation;user-select:none;-webkit-user-select:none;backdrop-filter:blur(8px);transition:box-shadow .15s ease}' +
       '.lp-fab.on{display:flex}' +
-      '.lp-fab.anim-enter{animation:lpFabAppear .45s cubic-bezier(.34,1.56,.64,1) both}' +
+      '.lp-fab.anim-enter{animation:lpFabAppear .75s cubic-bezier(.16,1,.3,1) both}' +
       '.lp-fab.anim-bump{animation:lpFabPulse .35s cubic-bezier(.34,1.56,.64,1) both}' +
       '.lp-fab:active{transform:translateX(-50%) scale(0.96)!important}' +
       '.lp-fab-badge{min-width:26px;height:26px;padding:0 7px;border-radius:999px;background:#fff;color:#0b5878;font-style:normal;font-size:12.5px;font-weight:950;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.18);pointer-events:none;transition:transform .2s ease}' +
@@ -585,16 +585,49 @@
     fab.classList.add('on');
     fab.innerHTML = '<span class="lp-fab-badge">' + r.n + '</span><span class="lp-fab-txt">Ver presupuesto:</span><span class="lp-fab-tot">' + money(r.tot) + '</span>';
     
+    // Sonido sutil y nítido de gota de agua (Water Drop)
+    function sonarGotita() {
+      try {
+        var AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        if (!window._lpAudioCtx) window._lpAudioCtx = new AudioCtx();
+        var ctx = window._lpAudioCtx;
+        if (ctx.state === 'suspended') ctx.resume();
+
+        var t0 = ctx.currentTime;
+        var osc = ctx.createOscillator();
+        var gain = ctx.createGain();
+
+        // Tono sinusoidal puro con modulación de frecuencia ascendente típica de gota (pitch scoop)
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(650, t0);
+        osc.frequency.exponentialRampToValueAtTime(1450, t0 + 0.08);
+
+        // Curva de volumen percusiva corta (fade in de 5ms y decaimiento rápido y resonante)
+        gain.gain.setValueAtTime(0, t0);
+        gain.gain.linearRampToValueAtTime(0.18, t0 + 0.006);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.14);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start(t0);
+        osc.stop(t0 + 0.15);
+      } catch (e) {}
+    }
+
     // Animación motion graphics
     if (eraOculto) {
       fab.classList.remove('anim-bump');
       fab.classList.remove('anim-enter');
       void fab.offsetWidth; // forzar reflow
       fab.classList.add('anim-enter');
+      sonarGotita();
     } else if (r.n !== _prevFabCount) {
       fab.classList.remove('anim-bump');
       void fab.offsetWidth;
       fab.classList.add('anim-bump');
+      if (r.n > _prevFabCount) sonarGotita();
     }
     _prevFabCount = r.n;
 
