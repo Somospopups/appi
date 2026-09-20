@@ -610,19 +610,20 @@
       var osc = ctx.createOscillator();
       var gain = ctx.createGain();
 
+      // Clic seco y orgánico tipo woodblock sutil
       osc.type = "sine";
-      osc.frequency.setValueAtTime(800, t0);
-      osc.frequency.exponentialRampToValueAtTime(320, t0 + 0.09);
+      osc.frequency.setValueAtTime(440, t0);
+      osc.frequency.exponentialRampToValueAtTime(210, t0 + 0.045);
 
       gain.gain.setValueAtTime(0, t0);
-      gain.gain.linearRampToValueAtTime(0.15, t0 + 0.005);
-      gain.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.11);
+      gain.gain.linearRampToValueAtTime(0.12, t0 + 0.003);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.05);
 
       osc.connect(gain);
       gain.connect(ctx.destination);
 
       osc.start(t0);
-      osc.stop(t0 + 0.12);
+      osc.stop(t0 + 0.055);
     } catch (e) {}
   }
 
@@ -635,36 +636,41 @@
       if (ctx.state === "suspended") ctx.resume();
 
       var t0 = ctx.currentTime;
+      var dur = 0.28;
 
-      var osc = ctx.createOscillator();
+      // Generar ráfaga de crujido de papel (Paper Crumple & Toss) usando buffer de ruido
+      var bufferSize = Math.floor(ctx.sampleRate * dur);
+      var noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      var output = noiseBuffer.getChannelData(0);
+      for (var i = 0; i < bufferSize; i++) {
+        // Ruido con picos esporádicos característicos de crujido de papel
+        var r = Math.random() * 2 - 1;
+        output[i] = r * (Math.random() > 0.6 ? 1.0 : 0.35);
+      }
+
+      var whiteNoise = ctx.createBufferSource();
+      whiteNoise.buffer = noiseBuffer;
+
+      // Filtro pasa-banda centrado en frecuencias de papel arrugándose (800Hz - 2200Hz)
+      var filter = ctx.createBiquadFilter();
+      filter.type = "bandpass";
+      filter.frequency.setValueAtTime(1400, t0);
+      filter.frequency.linearRampToValueAtTime(750, t0 + dur);
+      filter.Q.setValueAtTime(1.8, t0);
+
+      // Envolvente de volumen: crujido inicial al arrugar y desvanecimiento al caer
       var gain = ctx.createGain();
-      osc.type = "triangle";
-      osc.frequency.setValueAtTime(420, t0);
-      osc.frequency.exponentialRampToValueAtTime(110, t0 + 0.22);
-
       gain.gain.setValueAtTime(0, t0);
-      gain.gain.linearRampToValueAtTime(0.22, t0 + 0.015);
-      gain.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.24);
+      gain.gain.linearRampToValueAtTime(0.19, t0 + 0.02);
+      gain.gain.setValueAtTime(0.15, t0 + 0.08);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
 
-      osc.connect(gain);
+      whiteNoise.connect(filter);
+      filter.connect(gain);
       gain.connect(ctx.destination);
-      osc.start(t0);
-      osc.stop(t0 + 0.25);
 
-      var osc2 = ctx.createOscillator();
-      var gain2 = ctx.createGain();
-      osc2.type = "sawtooth";
-      osc2.frequency.setValueAtTime(260, t0 + 0.04);
-      osc2.frequency.exponentialRampToValueAtTime(60, t0 + 0.20);
-
-      gain2.gain.setValueAtTime(0, t0);
-      gain2.gain.setValueAtTime(0.09, t0 + 0.04);
-      gain2.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.22);
-
-      osc2.connect(gain2);
-      gain2.connect(ctx.destination);
-      osc2.start(t0 + 0.04);
-      osc2.stop(t0 + 0.23);
+      whiteNoise.start(t0);
+      whiteNoise.stop(t0 + dur);
     } catch (e) {}
   }
 

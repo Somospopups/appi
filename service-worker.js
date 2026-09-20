@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v897-fix-scope-sonidos';
+const CACHE_NAME = 'appi-v898-sonido-arrugar-papel-y-restar-organico';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
