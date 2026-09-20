@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "917.0.0",
-  "cacheName": "appi-v917-organigrama-nativo-appi",
+  "version": "918.0.0",
+  "cacheName": "appi-v918-organigrama-nav-hooks",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

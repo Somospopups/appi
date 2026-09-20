@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v917-organigrama-nativo-appi';
+const CACHE_NAME = 'appi-v918-organigrama-nav-hooks';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

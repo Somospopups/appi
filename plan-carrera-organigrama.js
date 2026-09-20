@@ -620,6 +620,22 @@
     if (v) observer.observe(v, { childList: true });
 
     window.addEventListener('appi-bonos-cambiaron', reordenarSeccionNegocio);
+  // Enganche automático al sistema de navegación de vistas de APPI
+  var origShowView = window.showView;
+  if (typeof origShowView === 'function') {
+    window.showView = function(id, opts) {
+      var res = origShowView.apply(this, arguments);
+      if (id === 'view-negocio') {
+        setTimeout(function() { reordenarSeccionNegocio(); renderOrganigrama(); }, 50);
+      }
+      return res;
+    };
+  }
+
+  // Evento global y polling suave en caso de carga demorada de datos
+  window.addEventListener('pageshow', function() { setTimeout(reordenarSeccionNegocio, 100); });
+  document.addEventListener('visibilitychange', function() { if (!document.hidden) reordenarSeccionNegocio(); });
+
     window.addEventListener('storage', function(e){
       if (e.key === 'equipoData' || e.key === LS_SAVED_PICKS) {
         renderOrganigrama();
