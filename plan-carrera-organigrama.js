@@ -355,6 +355,10 @@
     var pbFaltanTotal = Math.max(0, regla.equipoPbTotal - pbTotalProyectado);
 
     var queFaltaTexto = '';
+    var prodHint = '';
+    if (pbFaltanVos > 0) {
+      prodHint = '<div class="org-prod-hint">💡 <i>Tus ' + pbFaltanVos.toFixed(1) + ' PB equivalen ' + traducirPbaProductos(pbFaltanVos) + '.</i></div>';
+    }
     if (vosCumple && lineasFaltan === 0 && pbFaltanTotal === 0) {
       queFaltaTexto = '🎉 <b>¡Estructura completa para calificar!</b> Mantené el ritmo del mes para asegurar el pase a ' + esc(regla.nombre) + '.';
     } else {
@@ -836,7 +840,8 @@
   window.APPIPlanCarrera = {
     render: renderOrganigrama,
     reordenar: reordenarSeccionNegocio,
-    abrirSelector: abrirSelectorDistribuidor
+    abrirSelector: abrirSelectorDistribuidor,
+    autocompletar: autocompletarMejores
   };
 
   if (document.readyState === 'loading') {
