@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v901-fix-layout-shift-y-entrada-suave';
+const CACHE_NAME = 'appi-v902-devolucion-saldo-vs-en-mano-contado';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

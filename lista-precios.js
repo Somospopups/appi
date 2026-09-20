@@ -816,7 +816,7 @@
         var b = e.target.closest('[data-banco]');
         if (!b) return;
         var id = b.getAttribute('data-banco') || '';
-        if (!id) { pagoSet(1, ''); pintarPago(); return; }
+        if (!id) { pagoSet(1, ''); pintarPago(); pintarGanancia(); return; }
         var lista = PLANES.bancos || [];
         var ent = null;
         for (var i = 0; i < lista.length; i++) if (lista[i].id === id) ent = lista[i];
@@ -825,6 +825,7 @@
         var c = ops.indexOf(cur) >= 0 ? cur : ops[ops.length - 1];
         pagoSet(c, id);
         pintarPago();
+        pintarGanancia();
         hintChips($('lpCuotas'));
       };
       hostB.addEventListener('scroll', function () { markOverflow(hostB); }, { passive: true });
@@ -838,6 +839,7 @@
         var cur = pagoGet();
         pagoSet(n, cur.banco || '');
         pintarPago();
+        pintarGanancia();
       };
       hostC.addEventListener('scroll', function () { markOverflow(hostC); }, { passive: true });
     }
@@ -2193,31 +2195,48 @@
     var g = gananciaResumen();
     var pct = Math.round(g.margen * 100);
 
-    // Liquidación con tarjeta de crédito:
-    // Retiro en mano: hasta el 30% del total cobrado (o el total de ganancia si fuera menor al 30%)
-    // Saldo en cuenta PSA: el remanente de ganancia que supere el 30%
-    var maxEnMano30 = Math.round(g.cobro * 0.30);
-    var enMano = Math.min(Math.round(g.total), maxEnMano30);
-    var saldoPsa = Math.max(0, Math.round(g.total) - enMano);
+    var pago = pagoActual();
+    var esContado = !pago.banco;
 
-    var pctSaldo = g.cobro > 0 ? ((saldoPsa / g.cobro) * 100) : 0;
-    var pctSaldoTxt = pctSaldo > 0 ? (pctSaldo >= 1 ? Math.round(pctSaldo) : pctSaldo.toFixed(1)) + '%' : '0%';
+    var cardsHtml = '';
+    if (esContado) {
+      // PAGO CONTADO: El 100% de la ganancia queda en mano
+      cardsHtml = '<div class="lp-gan-cards" style="grid-template-columns:1fr">' +
+        '<div class="lp-gan-card">' +
+          '<div class="lp-gan-card-tit">💵 EN MANO (100% de tu ganancia)</div>' +
+          '<div class="lp-gan-card-val">$' + Math.round(g.total).toLocaleString('es-AR') + '</div>' +
+          '<div class="lp-gan-card-sub">Cobro directo de contado (efectivo / transferencia)</div>' +
+        '</div>' +
+      '</div>';
+    } else {
+      // PAGO CON TARJETA DE CRÉDITO:
+      // PSA solo permite sacar hasta el 30% del total de la venta bruta (DEVOLUCION DE SALDO)
+      // Lo que supera el 30% queda como Saldo en Cuenta PSA
+      var maxDevolucion30 = Math.round(g.cobro * 0.30);
+      var devSaldo = Math.min(Math.round(g.total), maxDevolucion30);
+      var saldoPsa = Math.max(0, Math.round(g.total) - devSaldo);
+
+      var pctSaldo = g.cobro > 0 ? ((saldoPsa / g.cobro) * 100) : 0;
+      var pctSaldoTxt = pctSaldo > 0 ? (pctSaldo >= 1 ? Math.round(pctSaldo) : pctSaldo.toFixed(1)) + '%' : '0%';
+
+      cardsHtml = '<div class="lp-gan-cards">' +
+        '<div class="lp-gan-card">' +
+          '<div class="lp-gan-card-tit">💵 DEVOLUCIÓN DE SALDO (30%)</div>' +
+          '<div class="lp-gan-card-val">$' + devSaldo.toLocaleString('es-AR') + '</div>' +
+          '<div class="lp-gan-card-sub">Pedís 1° al 5 (se acredita el 12 a tu CBU)</div>' +
+        '</div>' +
+        '<div class="lp-gan-card saldo-card">' +
+          '<div class="lp-gan-card-tit">💳 SALDO EN CUENTA PSA (' + pctSaldoTxt + ')</div>' +
+          '<div class="lp-gan-card-val">$' + saldoPsa.toLocaleString('es-AR') + '</div>' +
+          '<div class="lp-gan-card-sub">' + (saldoPsa > 0 ? 'A favor p/ pedidos o canjes' : 'Sin remanente') + '</div>' +
+        '</div>' +
+      '</div>';
+    }
 
     var html = '<div class="lp-gan">' +
       '<div class="lp-gan-head"><b>🔒 SOLO PARA VOS</b><span>Estos datos solo quedan para vos.<br/>Nunca serán entregados a tus usuarios</span></div>' +
       '<div class="lp-gan-num">$' + Math.round(g.total).toLocaleString('es-AR') + '<i>≈ ' + pct + '% ganancia real</i></div>' +
-      '<div class="lp-gan-cards">' +
-        '<div class="lp-gan-card">' +
-          '<div class="lp-gan-card-tit">💵 En mano (30%)</div>' +
-          '<div class="lp-gan-card-val">$' + enMano.toLocaleString('es-AR') + '</div>' +
-          '<div class="lp-gan-card-sub">Pedís 1° al 5 (a tu CBU)</div>' +
-        '</div>' +
-        '<div class="lp-gan-card saldo-card">' +
-          '<div class="lp-gan-card-tit">💳 Saldo PSA (' + pctSaldoTxt + ')</div>' +
-          '<div class="lp-gan-card-val">$' + saldoPsa.toLocaleString('es-AR') + '</div>' +
-          '<div class="lp-gan-card-sub">' + (saldoPsa > 0 ? 'A favor p/ compras PSA' : 'Sin remanente') + '</div>' +
-        '</div>' +
-      '</div>' +
+      cardsHtml +
       '<div class="lp-gan-detalle">' + g.lineas.map(function (l) {
         return '<span>' + l.q + '× ' + esc(String(l.nombre).replace(/\s*\(PLAN CANJE\)\s*$/i, '')) + ' <b>$' + Math.round(l.ganU).toLocaleString('es-AR') + '/u</b>' + (l.estimado ? ' <em>est. 30%</em>' : '') + '</span>';
       }).join('') + '</div>' +
