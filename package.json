@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "915.0.0",
-  "cacheName": "appi-v915-organigrama-proxima-categoria",
+  "version": "916.0.0",
+  "cacheName": "appi-v916-organigrama-proxima-categoria-foco",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

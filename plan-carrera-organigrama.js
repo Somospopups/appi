@@ -128,7 +128,8 @@
     if (!wrap) return;
 
     var titular = obtenerTitularInfo();
-    var targetCat = localStorage.getItem(LS_TARGET_CAT) || siguienteCatSugerida(titular.cat);
+    // Determinamos estrictamente la única categoría siguiente que corresponde según el titular
+    var targetCat = siguienteCatSugerida(titular.cat);
     if (!PLAN_REGLAS[targetCat]) targetCat = 'DC';
 
     var regla = PLAN_REGLAS[targetCat];
@@ -152,11 +153,6 @@
 
     var pbTotalProyectado = pbVos + pbEquipoSum;
     var pctTotal = Math.min(100, Math.round((pbTotalProyectado / (regla.equipoPbTotal || 1)) * 100));
-
-    var tabsHtml = ['D', 'DC', 'CE', 'L'].map(function(k){
-      var active = k === targetCat ? 'active' : '';
-      return '<button type="button" class="org-cat-tab ' + active + '" data-set-cat="' + k + '">' + k + '</button>';
-    }).join('');
 
     var slotsHtml = regla.slots.map(function(slot, idx){
       var dipElegido = picks[idx];
@@ -188,16 +184,16 @@
         '<div class="org-header">' +
           '<div class="org-title-group">' +
             '<span class="org-kicker">🎯 PLAN DE CALIFICACIÓN PSA</span>' +
-            '<h3 class="org-title">Pase a ' + esc(regla.nombre) + '</h3>' +
+            '<h3 class="org-title">Tu Próximo Pase: ' + esc(regla.nombre) + '</h3>' +
             '<p class="org-desc">' + esc(regla.nota) + '</p>' +
           '</div>' +
-          '<div class="org-cat-switcher">' + tabsHtml + '</div>' +
+          '<div class="org-single-badge"><span class="org-target-pill">Siguiente: <b>' + esc(targetCat) + '</b></span></div>' +
         '</div>' +
 
         '<div class="org-tree-canvas">' +
           '<!-- NODO SUPERIOR VOS -->' +
           '<div class="org-node-vos">' +
-            '<div class="org-vos-badge">VOS</div>' +
+            '<div class="org-vos-badge">VOS · ' + esc(titular.cat || 'D') + '</div>' +
             '<div class="org-vos-avatar">👑</div>' +
             '<div class="org-vos-name">' + esc(titular.nombre) + '</div>' +
             '<div class="org-vos-pb"><b>' + pbVos.toFixed(1) + ' PB</b> <span class="org-badge-rule">Requisito: ' + regla.personalReq + ' PB</span></div>' +
@@ -223,15 +219,6 @@
           '<div class="org-footer-note">⏱ <b>Período:</b> ' + esc(regla.tiempo) + ' · Tocá cualquier casillero para elegir a tu distribuidor.</div>' +
         '</div>' +
       '</div>';
-
-    // Eventos del organigrama
-    wrap.querySelectorAll('[data-set-cat]').forEach(function(btn){
-      btn.onclick = function(){
-        var c = btn.getAttribute('data-set-cat');
-        localStorage.setItem(LS_TARGET_CAT, c);
-        renderOrganigrama();
-      };
-    });
 
     wrap.querySelectorAll('[data-pick-slot]').forEach(function(slotEl){
       slotEl.onclick = function(e){
@@ -299,10 +286,20 @@
 
     function renderLista(query){
       var q = (query || '').toLowerCase().trim();
+      var rolTarget = (slotConfig.rol || '').toUpperCase();
       var filtrados = padron.filter(function(p){
         var n = (p.nombre || '').toLowerCase();
         var d = (p.codigo || p.dip || '').toLowerCase();
-        return (!q || n.indexOf(q) >= 0 || d.indexOf(q) >= 0);
+        var matchTexto = (!q || n.indexOf(q) >= 0 || d.indexOf(q) >= 0);
+        if (!matchTexto) return false;
+        // Filtrar según la categoría que exige este casillero
+        if (!q && rolTarget) {
+          var pCat = (p.cat || '').toUpperCase();
+          if (rolTarget === 'D') return (pCat === 'D' || pCat === 'DJ' || !pCat);
+          if (rolTarget === 'DC') return (pCat === 'DC' || pCat === 'D');
+          if (rolTarget === 'CE') return (pCat === 'CE' || pCat === 'DC');
+        }
+        return true;
       });
 
       // Ordenar: primero los que tienen PB y luego alfabético
@@ -363,9 +360,9 @@
       '.org-kicker{font-size:9.5px;font-weight:900;letter-spacing:1px;color:#3ad0a4;display:block;margin-bottom:3px;}' +
       '.org-title{margin:0;font-size:16px;font-weight:900;letter-spacing:-0.3px;color:#fff;}' +
       '.org-desc{margin:3px 0 0;font-size:11px;color:#94a3b8;line-height:1.35;}' +
-      '.org-cat-switcher{display:flex;background:rgba(255,255,255,0.06);padding:3px;border-radius:12px;border:1px solid rgba(255,255,255,0.08);gap:3px;}' +
-      '.org-cat-tab{background:transparent;border:0;color:#94a3b8;font-size:11px;font-weight:800;padding:5px 9px;border-radius:9px;cursor:pointer;transition:all .18s;}' +
-      '.org-cat-tab.active{background:#3ad0a4;color:#0b1926;box-shadow:0 2px 8px rgba(58,208,164,0.35);}' +
+      '.org-single-badge{display:flex;align-items:center;}' +
+      '.org-target-pill{background:rgba(58,208,164,0.14);border:1px solid rgba(58,208,164,0.3);color:#6ee7b7;padding:4px 10px;border-radius:10px;font-size:11px;font-weight:700;}' +
+      '.org-target-pill b{color:#3ad0a4;font-weight:900;}' +
       '.org-tree-canvas{display:flex;flex-direction:column;align-items:center;margin:10px 0 14px;position:relative;}' +
       '.org-node-vos{background:linear-gradient(135deg,#1e293b,#0f172a);border:1.5px solid #3ad0a4;border-radius:16px;padding:8px 14px;display:flex;flex-direction:column;align-items:center;min-width:140px;box-shadow:0 0 18px rgba(58,208,164,0.22);position:relative;z-index:2;}' +
       '.org-vos-badge{position:absolute;top:-8px;background:#3ad0a4;color:#0b1926;font-size:8.5px;font-weight:900;padding:1px 6px;border-radius:6px;letter-spacing:0.5px;}' +
