@@ -28,113 +28,77 @@
    LE (Líder Ejecutivo) -> EJ (Ejecutivo)
   */
 
-    var PLAN_REGLAS = {
+      var PLAN_REGLAS = {
     "D": {
       metaCat: "D",
       nombre: "Distribuidor (D)",
       metaBadge: "Subir a Distribuidor",
-      tiempo: "Meta mensual",
       personalReq: 13,
-      personalDesc: "13 PB (tu consumo, ventas o junto a tus DJ)",
       slots: [
-        { rol: "DJ", rolesPermitidos: ["DJ", "JUNIOR"], pbMin: 0, desc: "Línea 1 · Distribuidor Junior" },
-        { rol: "DJ", rolesPermitidos: ["DJ", "JUNIOR"], pbMin: 0, desc: "Línea 2 · Distribuidor Junior" }
+        { rol: "DJ", rolesPermitidos: ["DJ", "JUNIOR"], pbMin: 0, desc: "Línea 1 · Junior" },
+        { rol: "DJ", rolesPermitidos: ["DJ", "JUNIOR"], pbMin: 0, desc: "Línea 2 · Junior" }
       ],
       equipoPbTotal: 13,
-      porQueSubir: "Ganás más con menos esfuerzo: comprás con 3% de descuento extra y empezás a cobrar el 5% de las compras de tus directos.",
-      gananciasClave: [
-        "🎁 3% de descuento inmediato en tus compras",
-        "💵 5% de ganancia sobre tus Distribuidores Junior",
-        "🌟 Categoría oficial consolidada en PSA"
-      ],
-      queFalta: "Llegar a 13 PB entre tus pedidos y tus directos (aprox. 1 purificador Senior 4)."
+      premioPrincipal: "+3% de descuento en tus compras y 5% de comisión sobre tus directos.",
+      claveMeta: "Tus 13 PB entre tus pedidos y tus directos (aprox. 1 Senior 4)."
     },
     "DC": {
       metaCat: "DC",
       nombre: "Distribuidor Calificado (DC)",
-      metaBadge: "Subir a Distribuidor Calificado",
-      tiempo: "Meta mensual",
+      metaBadge: "Subir a Calificado (DC)",
       personalReq: 13,
-      personalDesc: "13 PB personales mínimos",
       slots: [
-        { rol: "D", rolesPermitidos: ["D", "DISTRIBUIDOR"], pbMin: 13, desc: "Línea 1 · Distribuidor activo" },
-        { rol: "D", rolesPermitidos: ["D", "DISTRIBUIDOR"], pbMin: 13, desc: "Línea 2 · Distribuidor activo" },
-        { rol: "D", rolesPermitidos: ["D", "DISTRIBUIDOR"], pbMin: 13, desc: "Línea 3 · Distribuidor activo" }
+        { rol: "D", rolesPermitidos: ["D", "DISTRIBUIDOR"], pbMin: 13, desc: "Distribuidor 1" },
+        { rol: "D", rolesPermitidos: ["D", "DISTRIBUIDOR"], pbMin: 13, desc: "Distribuidor 2" },
+        { rol: "D", rolesPermitidos: ["D", "DISTRIBUIDOR"], pbMin: 13, desc: "Distribuidor 3" }
       ],
       equipoPbTotal: 52,
-      porQueSubir: "Duplicás tus ganancias de red: pasás a cobrar 15% sobre tus Juniors y 10% de comisión pura sobre tus Distribuidores.",
-      gananciasClave: [
-        "💰 10% directo sobre lo que compren tus 3 distribuidores",
-        "🚀 15% de comisión sobre distribuidores junior",
-        "🏷️ 7% de descuento permanente en tus pedidos con PB",
-        "🛡️ 5% extra por asistencia a tus líneas"
-      ],
-      queFalta: "Tus 13 PB personales y 3 distribuidores activos con 13 PB cada uno este mes."
+      premioPrincipal: "10% de comisión directa de tus 3 distribuidores + 7% de descuento permanente.",
+      claveMeta: "Tus 13 PB personales y 3 distribuidores con 13 PB cada uno."
     },
     "CE": {
       metaCat: "CE",
       nombre: "Coordinador de Equipo (CE)",
-      metaBadge: "Subir a Coordinador de Equipo",
-      tiempo: "Calificación 2 meses",
+      metaBadge: "Subir a Coordinador (CE)",
       personalReq: 50,
-      personalDesc: "50 PB personales o grupo base",
       slots: [
-        { rol: "DC", rolesPermitidos: ["DC", "CALIFICADO", "DISTRIBUIDOR CALIFICADO"], pbMin: 50, desc: "Línea 1 · Calificado activo" },
-        { rol: "DC", rolesPermitidos: ["DC", "CALIFICADO", "DISTRIBUIDOR CALIFICADO"], pbMin: 50, desc: "Línea 2 · Calificado activo" },
-        { rol: "DC", rolesPermitidos: ["DC", "CALIFICADO", "DISTRIBUIDOR CALIFICADO"], pbMin: 50, desc: "Línea 3 · Calificado activo" }
+        { rol: "DC", rolesPermitidos: ["DC", "CALIFICADO", "DISTRIBUIDOR CALIFICADO"], pbMin: 50, desc: "Calificado 1" },
+        { rol: "DC", rolesPermitidos: ["DC", "CALIFICADO", "DISTRIBUIDOR CALIFICADO"], pbMin: 50, desc: "Calificado 2" },
+        { rol: "DC", rolesPermitidos: ["DC", "CALIFICADO", "DISTRIBUIDOR CALIFICADO"], pbMin: 50, desc: "Calificado 3" }
       ],
       equipoPbTotal: 200,
-      porQueSubir: "Tu negocio empieza a trabajar para vos: cobrás hasta un 18% de comisiones por toda tu red y bonificaciones por volumen grupal.",
-      gananciasClave: [
-        "📈 Hasta 18% en compensaciones sobre compras de tu red",
-        "💎 Ingresos pasivos por el volumen de tus 3 organizaciones",
-        "🏆 Reconocimiento oficial y acceso a premios anuales PSA"
-      ],
-      queFalta: "3 líneas de Distribuidores Calificados con 50 PB cada una durante 2 meses consecutivos."
+      premioPrincipal: "Cobrás hasta 18% de comisiones por toda tu red y bonos por volumen.",
+      claveMeta: "3 Calificados con 50 PB cada uno durante 2 meses consecutivos."
     },
     "L": {
       metaCat: "L",
       nombre: "Líder de Equipo (L)",
-      metaBadge: "Subir a Líder de Equipo",
-      tiempo: "Meta de liderazgo",
+      metaBadge: "Subir a Líder de Equipo (L)",
       personalReq: 50,
-      personalDesc: "50 PB calificación personal",
       slots: [
-        { rol: "CE", rolesPermitidos: ["CE", "COORDINADOR"], pbMin: 180, desc: "Línea Coordinador (180+ PB)" },
-        { rol: "DC", rolesPermitidos: ["DC", "CALIFICADO"], pbMin: 50, desc: "Línea Calificado (50+ PB)" },
-        { rol: "DC", rolesPermitidos: ["DC", "CALIFICADO"], pbMin: 50, desc: "Línea Calificado (50+ PB)" },
-        { rol: "D", rolesPermitidos: ["D", "DISTRIBUIDOR"], pbMin: 13, desc: "Línea Distribuidor (13+ PB)" }
+        { rol: "CE", rolesPermitidos: ["CE", "COORDINADOR"], pbMin: 180, desc: "Coordinador" },
+        { rol: "DC", rolesPermitidos: ["DC", "CALIFICADO"], pbMin: 50, desc: "Calificado 1" },
+        { rol: "DC", rolesPermitidos: ["DC", "CALIFICADO"], pbMin: 50, desc: "Calificado 2" },
+        { rol: "D", rolesPermitidos: ["D", "DISTRIBUIDOR"], pbMin: 13, desc: "Distribuidor" }
       ],
       equipoPbTotal: 400,
-      porQueSubir: "Entrás en las grandes ligas: cobrás regalías de por vida, Bonus 1 y Bonus 2 de red y premios internacionales.",
-      gananciasClave: [
-        "👑 Regalías mensuales sobre todo el volumen de tu red",
-        "🔥 Acceso a Bonus 1 y Bonus 2 en efectivo",
-        "✈️ Calificación a viajes nacionales e internacionales de PSA"
-      ],
-      queFalta: "Tener 1 Coordinador (180 PB), 2 Calificados (50 PB c/u) y 1 Distribuidor (13 PB) sumando 400 PB totales."
+      premioPrincipal: "Regalías mensuales de red, premios internacionales y Bonus 1 y 2 en efectivo.",
+      claveMeta: "1 CE (180 PB), 2 DC (50 PB c/u) y 1 D (13 PB) sumando 400 PB totales."
     },
     "LE": {
       metaCat: "LE",
       nombre: "Líder Ejecutivo (LE)",
-      metaBadge: "Subir a Líder Ejecutivo",
-      tiempo: "Máximo escalafón directivo",
+      metaBadge: "Subir a Líder Ejecutivo (LE)",
       personalReq: 50,
-      personalDesc: "50 PB personales o base",
       slots: [
-        { rol: "L", rolesPermitidos: ["L", "LIDER", "LÍDER", "LÍDER DE EQUIPO", "LÍDER PIONERO"], rolDesarrollo: ["CE", "COORDINADOR"], pbMin: 300, desc: "Línea 1 · Líder calificado" },
-        { rol: "L", rolesPermitidos: ["L", "LIDER", "LÍDER", "LÍDER DE EQUIPO", "LÍDER PIONERO"], rolDesarrollo: ["CE", "COORDINADOR"], pbMin: 300, desc: "Línea 2 · Líder calificado" },
-        { rol: "CE", rolesPermitidos: ["CE", "COORDINADOR"], rolDesarrollo: ["DC", "CALIFICADO"], pbMin: 180, desc: "Línea 3 · Coordinador" },
-        { rol: "DC", rolesPermitidos: ["DC", "CALIFICADO"], rolDesarrollo: ["D", "DISTRIBUIDOR"], pbMin: 50, desc: "Línea 4 · Calificado" }
+        { rol: "L", rolesPermitidos: ["L", "LIDER", "LÍDER", "LÍDER DE EQUIPO", "LÍDER PIONERO"], rolDesarrollo: ["CE", "COORDINADOR"], pbMin: 300, desc: "Líder 1" },
+        { rol: "L", rolesPermitidos: ["L", "LIDER", "LÍDER", "LÍDER DE EQUIPO", "LÍDER PIONERO"], rolDesarrollo: ["CE", "COORDINADOR"], pbMin: 300, desc: "Líder 2" },
+        { rol: "CE", rolesPermitidos: ["CE", "COORDINADOR"], rolDesarrollo: ["DC", "CALIFICADO"], pbMin: 180, desc: "Coordinador" },
+        { rol: "DC", rolesPermitidos: ["DC", "CALIFICADO"], rolDesarrollo: ["D", "DISTRIBUIDOR"], pbMin: 50, desc: "Calificado" }
       ],
       equipoPbTotal: 850,
-      porQueSubir: "El cheque más alto de tu carrera: cobrás regalías ampliadas, bono de liderazgo I, II y III, y asistencia ejecutiva sobre todas tus organizaciones.",
-      gananciasClave: [
-        "🚀 Bonos de Liderazgo Ejecutivo I, II y III todos los meses",
-        "💎 Asistencia LE del 1% sobre líderes promovidos de tu red",
-        "⭐ Máxima autoridad y prestigio en la convención nacional PSA"
-      ],
-      queFalta: "2 Líderes directos calificados (300 PB c/u), 1 Coordinador (180 PB) y 1 Calificado (50 PB)."
+      premioPrincipal: "Bonos de Liderazgo Ejecutivo I, II y III todos los meses + Regalías ampliadas.",
+      claveMeta: "2 Líderes calificados (300 PB c/u), 1 CE (180 PB) y 1 DC (50 PB)."
     }
   };
 
@@ -228,13 +192,42 @@
     return '≈ ' + s4 + ' purificadores (Senior 4)';
   }
 
-  function formatearTel(tel){
-    if (!tel) return '';
-    var clean = String(tel).replace(/[^0-9]/g, '');
-    if (!clean) return '';
-    if (clean.length === 10 && clean.charAt(0) !== '5') return '549' + clean;
-    if (clean.indexOf('54') === 0 && clean.indexOf('549') !== 0) return '549' + clean.slice(2);
-    return clean;
+    function obtenerEnlaceWhatsApp(persona, textoMsg){
+    if (!persona) return "";
+    var raw = persona.tel || persona.telefono || persona.celular || "";
+    if (!raw) return "";
+
+    // Si APPITel está disponible en la app, usar primeroValido
+    if (window.APPITel && typeof window.APPITel.primeroValido === "function") {
+      var nVal = window.APPITel.primeroValido(raw);
+      if (nVal) {
+        return (window.APPITel.link ? window.APPITel.link(nVal, textoMsg) : ("https://wa.me/" + nVal + "?text=" + encodeURIComponent(textoMsg)));
+      }
+    }
+
+    // Separar por barras, guiones, comas, espacios o saltos de línea
+    var partes = String(raw).split(/[\/,;\n\r|]|\s{2,}|\s*-\s*/);
+    for (var i = 0; i < partes.length; i++) {
+      var p = partes[i].trim();
+      if (!p) continue;
+      var d = p.replace(/\D/g, "");
+      if (d.length >= 8 && d.length <= 15) {
+        if (d.slice(0, 2) === "00") d = d.slice(2);
+        if (d.slice(0, 2) === "54") d = d.slice(2);
+        if (d.charAt(0) === "9" && d.length >= 11) d = d.slice(1);
+        if (d.charAt(0) === "0") d = d.slice(1);
+        if (d.length === 12 && d.indexOf("15") > 0) d = d.replace("15", "");
+        if (d.length === 10) return "https://wa.me/549" + d + "?text=" + encodeURIComponent(textoMsg);
+      }
+    }
+
+    // Si los dos teléfonos se concatenaron sin espacio (ej. 20 dígitos)
+    var soloD = String(raw).replace(/\D/g, "");
+    if (soloD.length >= 20) {
+      var d1 = soloD.substring(0, 10);
+      if (d1.length === 10) return "https://wa.me/549" + d1 + "?text=" + encodeURIComponent(textoMsg);
+    }
+    return "";
   }
 
   function personaCalificaParaSlot(persona, slotConfig, permitirDesarrollo){
@@ -337,15 +330,15 @@
         var cumpleMin = pbP >= slot.pbMin;
         var pClass = cumpleMin ? "ok" : "falta";
         var catBadge = persona.cat || slot.rol;
-        var tel = formatearTel(persona.telefono || persona.celular || persona.tel || '');
-        var waBtn = '';
-        if (tel) {
-          var pNombreCorto = (persona.nombre || '').split(' ')[0];
-          var faltanP = Math.max(0, slot.pbMin - pbP);
-          var textoMsg = cumpleMin ? ('¡Felicitaciones ' + pNombreCorto + '! Llevás ' + pbP.toFixed(1) + ' PB este mes y tu línea está calificada 🎉. ¡Sigamos con todo!') : ('¡Hola ' + pNombreCorto + '! Llevás ' + pbP.toFixed(1) + ' PB este mes, estás a solo ' + faltanP.toFixed(1) + ' PB de calificar tu línea. ¿Coordinamos unas demos esta semana para cerrarlo? 💪');
-          var msj = encodeURIComponent(textoMsg);
-          waBtn = '<a class="org-slot-wa-btn" href="https://wa.me/' + tel + '?text=' + msj + '" target="_blank" onclick="event.stopPropagation();" title="Escribir por WhatsApp">💬</a>';
-        }
+        var pNombreCorto = (persona.nombre || "").split(" ")[0];
+        var faltanP = Math.max(0, slot.pbMin - pbP);
+        var textoMsg = cumpleMin
+          ? ("¡Felicitaciones " + pNombreCorto + "! Ya tenés " + pbP.toFixed(1) + " PB este mes y tu línea está calificada 🎉. ¡Sigamos con todo!")
+          : ("¡Hola " + pNombreCorto + "! Llevás " + pbP.toFixed(1) + " PB este mes, estás a solo " + faltanP.toFixed(1) + " PB de calificar tu línea. ¿Coordinamos unas demos esta semana para cerrarlo? 💪");
+
+        var waUrl = obtenerEnlaceWhatsApp(persona, textoMsg);
+        var waBtn = waUrl ? ('<a class="org-slot-wa-btn" href="' + waUrl + '" target="_blank" onclick="event.stopPropagation();" title="Escribir por WhatsApp">💬</a>') : "";
+
         return '<div class="org-slot-card filled ' + pClass + '" data-pick-slot="' + idx + '" title="Tocar para cambiar">' +
           '<div class="org-slot-top">' +
             '<span class="org-cat-tag">' + esc(catBadge) + '</span>' +
@@ -355,10 +348,10 @@
             '</div>' +
           '</div>' +
           '<div class="org-slot-avatar-wrap">' +
-            '<div class="org-slot-avatar">' + esc((persona.nombre || 'D').substring(0, 2).toUpperCase()) + '</div>' +
-            (cumpleMin ? '<span class="org-slot-check">✓</span>' : '') +
+            '<div class="org-slot-avatar">' + esc((persona.nombre || "D").substring(0, 2).toUpperCase()) + '</div>' +
+            (cumpleMin ? '<span class="org-slot-check">✓</span>' : "") +
           '</div>' +
-          '<div class="org-slot-name">' + esc(persona.nombre || 'Distribuidor') + '</div>' +
+          '<div class="org-slot-name">' + esc(persona.nombre || "Distribuidor") + '</div>' +
           '<div class="org-slot-pb-badge ' + pClass + '">' +
             '<b>' + pbP.toFixed(1) + ' PB</b>' +
             '<small>/ ' + slot.pbMin + ' mín</small>' +
@@ -367,118 +360,92 @@
       } else {
         return '<div class="org-slot-card empty" data-pick-slot="' + idx + '">' +
           '<div class="org-slot-plus-circle">+</div>' +
-          '<div class="org-slot-empty-title">Elegir ' + esc(slot.rol) + '</div>' +
-          '<div class="org-slot-empty-sub">Solo categoría ' + esc(slot.rol) + '</div>' +
+          '<div class="org-slot-empty-title">' + esc(slot.desc || ("Línea " + slot.rol)) + '</div>' +
           '<div class="org-slot-empty-min">Mín. ' + slot.pbMin + ' PB</div>' +
         '</div>';
       }
-    }).join('');
+    }).join("");
 
-    // Diagnóstico claro: qué te falta para subir a la próxima categoría
+    // Diagnóstico claro y corto sin textos dando vueltas
     var pbFaltanVos = Math.max(0, regla.personalReq - pbVos);
     var lineasFaltan = Math.max(0, regla.slots.length - lineasCompletas);
     var pbFaltanTotal = Math.max(0, regla.equipoPbTotal - pbTotalProyectado);
 
-    var queFaltaTexto = '';
-    var prodHint = '';
-    if (pbFaltanVos > 0) {
-      prodHint = '<div class="org-prod-hint">💡 <i>Tus ' + pbFaltanVos.toFixed(1) + ' PB equivalen ' + traducirPbaProductos(pbFaltanVos) + '.</i></div>';
-    }
+    var queFaltaTexto = "";
     if (vosCumple && lineasFaltan === 0 && pbFaltanTotal === 0) {
-      queFaltaTexto = '🎉 <b>¡Estructura completa para calificar!</b> Mantené el ritmo del mes para asegurar el pase a ' + esc(regla.nombre) + '.';
+      queFaltaTexto = "🎉 <b>¡Completaste todos los requisitos!</b> Mantené este volumen para cerrar el mes como " + esc(regla.nombre) + ".";
     } else {
       var partes = [];
-      var prodHint = '';
-      if (pbFaltanVos > 0) {
-        partes.push('<b>' + pbFaltanVos.toFixed(1) + ' PB personales</b>');
-        prodHint = '<div class="org-prod-hint">💡 <i>Tus ' + pbFaltanVos.toFixed(1) + ' PB equivalen ' + traducirPbaProductos(pbFaltanVos) + '.</i></div>';
-      }
-      if (lineasFaltan > 0) partes.push('<b>' + lineasFaltan + ' línea' + (lineasFaltan === 1 ? '' : 's') + ' calificada' + (lineasFaltan === 1 ? '' : 's') + '</b>');
-      if (pbFaltanTotal > 0 && lineasFaltan === 0) partes.push('<b>' + pbFaltanTotal.toFixed(1) + ' PB de equipo</b>');
-      queFaltaTexto = 'Para ser <b>' + esc(regla.nombre) + '</b> necesitás: ' + partes.join(' y ') + '.';
+      if (pbFaltanVos > 0) partes.push("<b>" + pbFaltanVos.toFixed(1) + " PB tuyos</b>");
+      if (lineasFaltan > 0) partes.push("<b>" + lineasFaltan + " línea" + (lineasFaltan === 1 ? "" : "s") + " activa" + (lineasFaltan === 1 ? "" : "s") + "</b>");
+      if (pbFaltanTotal > 0 && lineasFaltan === 0) partes.push("<b>" + pbFaltanTotal.toFixed(1) + " PB grupales</b>");
+      queFaltaTexto = "Te falta: " + partes.join(" · ");
     }
 
-        var beneficiosHtml = (regla.gananciasClave || []).map(function(item){
-      return "<div class=\"org-perk-pill\">" + esc(item) + "</div>";
-    }).join("");
-
     wrap.innerHTML =
-      "<div class=\"org-card\">" +
-        "<!-- ENCABEZADO MOTIVACIONAL Y ACCIONABLE -->" +
-        "<div class=\"org-head\">" +
-          "<div class=\"org-head-info\">" +
-            "<div class=\"org-eyebrow\">🎯 TU SIGUIENTE SALTO DE NIVEL</div>" +
-            "<h2 class=\"org-title\">" + esc(regla.metaBadge) + "</h2>" +
-            "<p class=\"org-subtitle\"><b>" + esc(titular.nombre) + "</b> (" + esc(titular.cat) + ") ➔ Pasás a <span class=\"org-target-hl\">" + esc(regla.nombre) + "</span></p>" +
-          "</div>" +
-          "<div class=\"org-head-actions\">" +
-            "<button type=\"button\" class=\"org-magic-btn\" id=\"orgMagicSuggestBtn\" title=\"Armar equipo óptimo con un toque\">⚡ Auto-ubicar equipo</button>" +
-            "<span class=\"org-target-badge\">" + esc(targetCat) + "</span>" +
-          "</div>" +
-        "</div>" +
+      '<div class="org-card">' +
+        '<!-- ENCABEZADO MINIMALISTA -->' +
+        '<div class="org-head">' +
+          '<div class="org-head-info">' +
+            '<div class="org-eyebrow">🚀 TU PRÓXIMO RANGO</div>' +
+            '<h2 class="org-title">' + esc(regla.metaBadge) + '</h2>' +
+          '</div>' +
+          '<div class="org-head-actions">' +
+            '<button type="button" class="org-magic-btn" id="orgMagicSuggestBtn" title="Ubicar a tus mejores distribuidores automáticamente">⚡ Auto-ubicar</button>' +
+          '</div>' +
+        '</div>' +
 
-        "<!-- POR QUÉ TE CONVIENE DAR EL PASO (MOTIVADOR DIRECTO) -->" +
-        "<div class=\"org-why-box\">" +
-          "<div class=\"org-why-title\">💎 ¿Por qué te conviene subir este mes?</div>" +
-          "<p class=\"org-why-desc\">" + esc(regla.porQueSubir || regla.beneficios) + "</p>" +
-          "<div class=\"org-perks-grid\">" + beneficiosHtml + "</div>" +
-        "</div>" +
+        '<!-- BENEFICIO DIRECTO EN UNA LÍNEA -->' +
+        '<div class="org-benefit-strip">' +
+          '<span class="org-benefit-icon">🎁</span> ' +
+          '<span class="org-benefit-txt"><b>Qué ganás al subir:</b> ' + esc(regla.premioPrincipal) + '</span>' +
+        '</div>' +
 
-        "<!-- INSTRUCCIÓN CLARA Y VISUAL -->" +
-        "<div class=\"org-howto-chip\">" +
-          "<span>👇 Tocá los casilleros vacíos <b>(+)</b> o dale a <b>⚡ Auto-ubicar</b> para proyectar a tu gente clave:</span>" +
-        "</div>" +
+        '<!-- ÁRBOL VISUAL COMPACTO Y CÓMODO -->' +
+        '<div class="org-tree-stage">' +
+          '<!-- NODO VOS -->' +
+          '<div class="org-vos-card ' + (vosCumple ? "ok" : "") + '">' +
+            '<span class="org-vos-pill">VOS · ' + esc(titular.cat || "L") + '</span>' +
+            '<div class="org-vos-avatar-wrap">' +
+              '<div class="org-vos-avatar">👑</div>' +
+              (vosCumple ? '<span class="org-vos-check">✓</span>' : "") +
+            '</div>' +
+            '<div class="org-vos-name">' + esc(titular.nombre) + '</div>' +
+            '<div class="org-vos-pb">' +
+              '<b>' + pbVos.toFixed(1) + ' PB</b>' +
+              '<small>/ mín. ' + regla.personalReq + ' PB</small>' +
+            '</div>' +
+          '</div>' +
 
-        "<!-- ÁRBOL VISUAL INTERACTIVO -->" +
-        "<div class=\"org-tree-stage\">" +
-          "<!-- NODO VOS -->" +
-          "<div class=\"org-vos-card " + (vosCumple ? "ok" : "") + "\">" +
-            "<span class=\"org-vos-pill\">TU ROL · " + esc(titular.cat || "L") + "</span>" +
-            "<div class=\"org-vos-avatar-wrap\">" +
-              "<div class=\"org-vos-avatar\">👑</div>" +
-              (vosCumple ? "<span class=\"org-vos-check\">✓</span>" : "") +
-            "</div>" +
-            "<div class=\"org-vos-name\">" + esc(titular.nombre) + "</div>" +
-            "<div class=\"org-vos-pb\">" +
-              "<b>" + pbVos.toFixed(1) + " PB</b>" +
-              "<small>/ mín. " + regla.personalReq + " PB propios</small>" +
-            "</div>" +
-          "</div>" +
+          '<!-- LÍNEAS CONECTORAS -->' +
+          '<div class="org-stem"></div>' +
+          '<div class="org-branch-line"></div>' +
 
-          "<!-- LÍNEAS CONECTORAS -->" +
-          "<div class=\"org-stem\"></div>" +
-          "<div class=\"org-branch-line\"></div>" +
-
-          "<!-- CASILLEROS DE LÍNEAS FILTRADAS POR ROL -->" +
-          "<div class=\"org-slots-grid count-" + regla.slots.length + "\">" +
+          '<!-- CASILLEROS INTERACTIVOS -->' +
+          '<div class="org-slots-grid count-' + regla.slots.length + '">' +
             slotsHtml +
-          "</div>" +
-        "</div>" +
+          '</div>' +
+        '</div>' +
 
-        "<!-- DIAGNÓSTICO EN LENGUAJE DIRECTO Y AMABLE -->" +
-        "<div class=\"org-status-box\">" +
-          "<div class=\"org-status-row\">" +
-            "<span class=\"org-status-label\">Avance de equipo hacia " + esc(targetCat) + "</span>" +
-            "<span class=\"org-status-val\"><b>" + pbTotalProyectado.toFixed(1) + "</b> / " + regla.equipoPbTotal + " PB</span>" +
-          "</div>" +
-          "<div class=\"org-progress-track\">" +
-            "<div class=\"org-progress-bar\" style=\"width:" + pctTotal + "%\"></div>" +
-          "</div>" +
-          "<div class=\"org-status-hint\">" + queFaltaTexto + "</div>" + (typeof prodHint !== "undefined" ? prodHint : "") +
-        "</div>" +
-
-        "<!-- META EXACTA CLARA -->" +
-        "<div class=\"org-rule-note\">" +
-          "🎯 <b>La clave del mes:</b> " + esc(regla.queFalta) +
-        "</div>" +
-      "</div>";
+        '<!-- BARRA Y DIAGNÓSTICO EN 1 LÍNEA -->' +
+        '<div class="org-status-box">' +
+          '<div class="org-status-row">' +
+            '<span class="org-status-label">Progreso hacia ' + esc(targetCat) + '</span>' +
+            '<span class="org-status-val"><b>' + pbTotalProyectado.toFixed(1) + '</b> / ' + regla.equipoPbTotal + ' PB</span>' +
+          '</div>' +
+          '<div class="org-progress-track">' +
+            '<div class="org-progress-bar" style="width:' + pctTotal + '%"></div>' +
+          '</div>' +
+          '<div class="org-status-hint">' + queFaltaTexto + '</div>' +
+        '</div>' +
+      '</div>';
 
     // Eventos de interacción
     var mBtn = wrap.querySelector('#orgMagicSuggestBtn'); if (mBtn) mBtn.onclick = function(){ autocompletarMejores(targetCat); };
 
     wrap.querySelectorAll('[data-pick-slot]').forEach(function(slotEl){
       slotEl.onclick = function(e){
-        if (e.target.closest('[data-remove-slot]')) return;
+        if (e.target.closest('[data-remove-slot]') || e.target.closest('.org-slot-wa-btn')) return;
         var idx = parseInt(slotEl.getAttribute('data-pick-slot'), 10);
         abrirSelectorDistribuidor(targetCat, idx);
       };
@@ -627,170 +594,147 @@
      ESTILOS NATIVOS INTEGRADOS AL DISEÑO DE APPI
   ------------------------------------------------------------ */
   function inyectarEstilos(){
-    if (document.getElementById('planCarreraEstilos')) return;
-    var st = document.createElement('style');
-    st.id = 'planCarreraEstilos';
+    if (document.getElementById("planCarreraEstilos")) return;
+    var st = document.createElement("style");
+    st.id = "planCarreraEstilos";
     st.textContent =
-      '#carreraOrganigramaCard{margin:10px 14px 14px;}' +
-      '.org-card{' +
-        'background:rgba(255,255,255,0.78);' +
-        'border:1px solid rgba(255,255,255,0.85);' +
-        'border-radius:24px;' +
-        'padding:16px 14px 14px;' +
-        'box-shadow:0 10px 28px rgba(11,88,120,0.07),0 1px 3px rgba(0,0,0,0.03);' +
-        'backdrop-filter:blur(20px);' +
-        '-webkit-backdrop-filter:blur(20px);' +
-        'color:#1c1c1e;' +
-        'position:relative;' +
-        'transition:all .25s ease;' +
-      '}' +
-      'body.dark .org-card{background:rgba(28,28,30,0.85);border-color:rgba(255,255,255,0.12);color:#f4f4f6;box-shadow:0 12px 32px rgba(0,0,0,0.35);}' +
-      '.org-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:14px;}' +
-      '.org-head-info{flex:1;min-width:0;}' +
-      '.org-eyebrow{font-size:10px;font-weight:900;letter-spacing:0.8px;color:#1d7a5c;text-transform:uppercase;margin-bottom:2px;}' +
-      'body.dark .org-eyebrow{color:#3ad0a4;}' +
-      '.org-title{margin:0;font-size:18px;font-weight:900;letter-spacing:-0.4px;color:#0b5878;line-height:1.2;}' +
-      'body.dark .org-title{color:#7dd3fc;}' +
-      '.org-subtitle{margin:3px 0 0;font-size:11.5px;color:#777887;font-weight:600;line-height:1.35;}' +
-      'body.dark .org-subtitle{color:#94a3b8;}' +
-      '.org-target-badge{background:linear-gradient(135deg,#0b5878,#3ad0a4);color:#fff;font-size:13px;font-weight:900;padding:6px 12px;border-radius:12px;box-shadow:0 4px 12px rgba(11,88,120,0.22);display:inline-block;letter-spacing:0.3px;}' +
-      '.org-tree-stage{display:flex;flex-direction:column;align-items:center;margin:10px 0 14px;position:relative;}' +
-      /* Nodo Vos */
-      '.org-vos-card{' +
-        'background:linear-gradient(135deg,#ffffff,#f8fafc);' +
-        'border:1.5px solid #0b5878;' +
-        'border-radius:18px;' +
-        'padding:10px 16px;' +
-        'display:flex;flex-direction:column;align-items:center;' +
-        'min-width:145px;max-width:200px;' +
-        'box-shadow:0 6px 18px rgba(11,88,120,0.12);' +
-        'position:relative;z-index:2;transition:all .2s;' +
-      '}' +
-      'body.dark .org-vos-card{background:linear-gradient(135deg,#1e293b,#0f172a);border-color:#38bdf8;box-shadow:0 6px 20px rgba(0,0,0,0.4);}' +
-      '.org-vos-card.ok{border-color:#10b981;box-shadow:0 6px 18px rgba(16,185,129,0.18);}' +
-      '.org-vos-pill{position:absolute;top:-9px;background:#0b5878;color:#fff;font-size:9px;font-weight:900;padding:2px 8px;border-radius:8px;letter-spacing:0.5px;box-shadow:0 2px 6px rgba(11,88,120,0.25);}' +
-      '.org-vos-card.ok .org-vos-pill{background:#10b981;}' +
-      '.org-vos-avatar-wrap{position:relative;margin-top:2px;margin-bottom:3px;}' +
-      '.org-vos-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#e0f2fe,#bae6fd);display:flex;align-items:center;justify-content:center;font-size:18px;}' +
-      '.org-vos-check{position:absolute;bottom:-2px;right:-4px;background:#10b981;color:#fff;font-size:10px;width:15px;height:15px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:1.5px solid #fff;font-weight:900;}' +
-      '.org-vos-name{font-size:13px;font-weight:850;color:#1c1c1e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px;}' +
-      'body.dark .org-vos-name{color:#fff;}' +
-      '.org-vos-pb{font-size:11.5px;color:#0b5878;margin-top:2px;display:flex;flex-direction:column;align-items:center;line-height:1.2;}' +
-      'body.dark .org-vos-pb{color:#38bdf8;}' +
-      '.org-vos-pb b{font-size:13px;font-weight:900;}' +
-      '.org-vos-pb small{font-size:10px;color:#777887;font-weight:600;}' +
-      'body.dark .org-vos-pb small{color:#94a3b8;}' +
-      /* Líneas conectoras */
-      '.org-stem{width:2px;height:16px;background:#0b5878;opacity:0.3;}' +
-      'body.dark .org-stem{background:#38bdf8;opacity:0.5;}' +
-      '.org-branch-line{width:80%;height:10px;border-top:2px solid rgba(11,88,120,0.3);border-left:2px solid rgba(11,88,120,0.3);border-right:2px solid rgba(11,88,120,0.3);border-radius:4px 4px 0 0;margin-bottom:8px;}' +
-      'body.dark .org-branch-line{border-color:rgba(56,189,248,0.45);}' +
-      /* Casilleros */
-      '.org-slots-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(105px,1fr));gap:8px;width:100%;z-index:2;}' +
-      '.org-slot-card{' +
-        'border-radius:18px;' +
-        'padding:10px 8px;' +
-        'text-align:center;' +
-        'cursor:pointer;' +
-        'transition:all .2s cubic-bezier(.22,1,.36,1);' +
-        'position:relative;' +
-        'display:flex;flex-direction:column;align-items:center;justify-content:center;' +
-        'min-height:110px;' +
-      '}' +
-      '.org-slot-card.empty{' +
-        'border:1.5px dashed rgba(11,88,120,0.3);' +
-        'background:rgba(255,255,255,0.45);' +
-      '}' +
-      'body.dark .org-slot-card.empty{border-color:rgba(255,255,255,0.22);background:rgba(255,255,255,0.03);}' +
-      '.org-slot-card.empty:hover{border-color:#0b5878;background:rgba(11,88,120,0.06);transform:translateY(-2px);}' +
-      '.org-slot-card.empty:active{transform:scale(.97);}' +
-      '.org-slot-card.filled{' +
-        'background:#ffffff;' +
-        'border:1.5px solid rgba(11,88,120,0.22);' +
-        'box-shadow:0 4px 14px rgba(11,88,120,0.06);' +
-      '}' +
-      'body.dark .org-slot-card.filled{background:#1e293b;border-color:rgba(255,255,255,0.14);box-shadow:0 6px 16px rgba(0,0,0,0.3);}' +
-      '.org-slot-card.filled.ok{border-color:#10b981;box-shadow:0 4px 14px rgba(16,185,129,0.12);}' +
-      '.org-slot-card.filled:hover{transform:translateY(-2px);}' +
-      '.org-slot-card.filled:active{transform:scale(.97);}' +
-      '.org-slot-top{display:flex;justify-content:space-between;align-items:center;width:100%;margin-bottom:4px;}' +
-      '.org-cat-tag{font-size:9px;font-weight:900;background:rgba(11,88,120,0.1);color:#0b5878;padding:1px 6px;border-radius:6px;}' +
-      'body.dark .org-cat-tag{background:rgba(56,189,248,0.2);color:#7dd3fc;}' +
-      '.org-slot-actions-top{display:flex;align-items:center;gap:4px;}.org-slot-wa-btn{background:rgba(16,185,129,0.15);border:none;color:#059669;font-size:12px;padding:2px 5px;border-radius:6px;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;}.org-slot-wa-btn:hover{background:#10b981;color:#fff;}.org-slot-remove-btn{background:none;border:none;color:#94a3b8;font-size:16px;cursor:pointer;padding:0 2px;line-height:1;border-radius:4px;}' +
-      '.org-slot-remove-btn:hover{color:#ef4444;background:rgba(239,68,68,0.1);}' +
-      '.org-slot-avatar-wrap{position:relative;margin-bottom:4px;}' +
-      '.org-slot-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#3d63c9,#5b8def);color:#fff;font-size:11px;font-weight:900;display:flex;align-items:center;justify-content:center;}' +
-      '.org-slot-check{position:absolute;bottom:-2px;right:-4px;background:#10b981;color:#fff;font-size:9px;width:13px;height:13px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:1.5px solid #fff;font-weight:900;}' +
-      '.org-slot-name{font-size:11.5px;font-weight:800;color:#1c1c1e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:92px;line-height:1.2;}' +
-      'body.dark .org-slot-name{color:#f1f5f9;}' +
-      '.org-slot-pb-badge{font-size:10px;margin-top:3px;padding:2px 6px;border-radius:6px;line-height:1.2;}' +
-      '.org-slot-pb-badge.ok{background:rgba(16,185,129,0.12);color:#059669;}' +
-      'body.dark .org-slot-pb-badge.ok{background:rgba(16,185,129,0.2);color:#34d399;}' +
-      '.org-slot-pb-badge.falta{background:rgba(245,158,11,0.12);color:#b45309;}' +
-      'body.dark .org-slot-pb-badge.falta{background:rgba(245,158,11,0.2);color:#fbbf24;}' +
-      '.org-slot-pb-badge b{font-size:11.5px;font-weight:900;}' +
-      '.org-slot-pb-badge small{font-size:9px;opacity:0.85;}' +
-      '.org-slot-plus-circle{width:30px;height:30px;border-radius:50%;background:rgba(11,88,120,0.1);color:#0b5878;font-size:18px;font-weight:800;display:flex;align-items:center;justify-content:center;margin-bottom:3px;transition:transform .2s;}' +
-      'body.dark .org-slot-plus-circle{background:rgba(56,189,248,0.15);color:#38bdf8;}' +
-      '.org-slot-card.empty:hover .org-slot-plus-circle{transform:scale(1.1);background:#0b5878;color:#fff;}' +
-      '.org-slot-empty-title{font-size:11px;font-weight:800;color:#0b5878;}' +
-      'body.dark .org-slot-empty-title{color:#7dd3fc;}' +
-      '.org-slot-empty-sub{font-size:9.5px;color:#777887;font-weight:600;margin-top:1px;}' +
-      'body.dark .org-slot-empty-sub{color:#94a3b8;}' +
-      '.org-slot-empty-min{font-size:9px;color:#10b981;font-weight:800;margin-top:2px;}' +
-      'body.dark .org-slot-empty-min{color:#34d399;}' +
-      /* Diagnóstico & Barra */
-      '.org-status-box{background:rgba(255,255,255,0.65);border:1px solid rgba(11,88,120,0.12);border-radius:16px;padding:12px 14px;margin-top:10px;}' +
-      'body.dark .org-status-box{background:rgba(15,23,42,0.6);border-color:rgba(255,255,255,0.1);}' +
-      '.org-status-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-size:12px;font-weight:700;color:#1c1c1e;}' +
-      'body.dark .org-status-row{color:#e2e8f0;}' +
-      '.org-status-val b{color:#0b5878;font-weight:900;font-size:13.5px;}' +
-      'body.dark .org-status-val b{color:#38bdf8;}' +
-      '.org-progress-track{height:7px;background:rgba(11,88,120,0.1);border-radius:99px;overflow:hidden;margin-bottom:8px;}' +
-      'body.dark .org-progress-track{background:rgba(255,255,255,0.1);}' +
-      '.org-progress-bar{height:100%;background:linear-gradient(90deg,#3ad0a4,#0b5878);border-radius:99px;transition:width .4s ease;}' +
-      '.org-status-hint{font-size:11.5px;color:#1c1c1e;line-height:1.4;}' +
-      'body.dark .org-status-hint{color:#e2e8f0;}' +
-      '.org-rule-note{font-size:11px;color:#777887;margin-top:8px;line-height:1.45;padding:0 4px;}' +
-      'body.dark .org-rule-note{color:#94a3b8;}' +
-      /* Modal Selector Estilo APPI */
-      '.org-modal-overlay{position:fixed;inset:0;background:rgba(15,23,42,0.6);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);z-index:99999;display:none;align-items:flex-end;justify-content:center;opacity:0;transition:opacity .22s cubic-bezier(.22,1,.36,1);}' +
-      '.org-modal-overlay.open{opacity:1;}' +
-      '.org-modal-card{background:#ffffff;border:1px solid rgba(255,255,255,0.9);border-radius:26px 26px 0 0;width:100%;max-width:540px;max-height:85vh;padding:18px 16px 26px;display:flex;flex-direction:column;box-shadow:0 -12px 36px rgba(0,0,0,0.2);transform:translateY(30px);transition:transform .24s cubic-bezier(.22,1,.36,1);}' +
-      'body.dark .org-modal-card{background:#1e293b;border-color:rgba(255,255,255,0.12);color:#fff;}' +
-      '.org-modal-overlay.open .org-modal-card{transform:translateY(0);}' +
-      '.org-modal-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;}' +
-      '.org-modal-header h4{margin:0;font-size:16px;font-weight:900;color:#0b5878;letter-spacing:-0.2px;}' +
-      'body.dark .org-modal-header h4{color:#7dd3fc;}' +
-      '.org-modal-header p{margin:2px 0 0;font-size:12px;color:#777887;font-weight:600;}' +
-      'body.dark .org-modal-header p{color:#94a3b8;}' +
-      '.org-modal-close{background:rgba(11,88,120,0.08);border:0;color:#0b5878;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;font-weight:900;}' +
-      'body.dark .org-modal-close{background:rgba(255,255,255,0.1);color:#fff;}' +
-      '.org-modal-search{margin-bottom:10px;}' +
-      '.org-modal-search input{width:100%;background:#f1f5f9;border:1px solid rgba(11,88,120,0.14);border-radius:14px;padding:10px 14px;font:inherit;font-size:13px;color:#1c1c1e;outline:none;box-sizing:border-box;}' +
-      'body.dark .org-modal-search input{background:rgba(255,255,255,0.06);border-color:rgba(255,255,255,0.14);color:#fff;}' +
-      '.org-modal-search input:focus{border-color:#0b5878;background:#fff;box-shadow:0 0 0 3px rgba(11,88,120,0.1);}' +
-      '.org-modal-list{overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:6px;max-height:55vh;padding-right:2px;}' +
-      '.org-dist-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;background:#f8fafc;border:1px solid rgba(11,88,120,0.08);cursor:pointer;transition:all .18s;}' +
-      'body.dark .org-dist-item{background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.08);}' +
-      '.org-dist-item:hover{background:rgba(11,88,120,0.06);border-color:#0b5878;transform:translateX(2px);}' +
-      'body.dark .org-dist-item:hover{background:rgba(56,189,248,0.12);border-color:#38bdf8;}' +
-      '.org-dist-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#0b5878,#3ad0a4);color:#fff;font-size:11px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;}' +
-      '.org-dist-info{flex:1;min-width:0;}' +
-      '.org-dist-name{font-size:13px;font-weight:850;color:#1c1c1e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}' +
-      'body.dark .org-dist-name{color:#fff;}' +
-      '.org-dist-sub{font-size:10.5px;color:#777887;display:flex;align-items:center;gap:6px;margin-top:1px;font-weight:600;}' +
-      'body.dark .org-dist-sub{color:#94a3b8;}' +
-      '.org-cat-pill{background:#e2e8f0;color:#1e293b;padding:1px 6px;border-radius:4px;font-weight:800;font-size:9.5px;}' +
-      '.org-dist-pb{display:flex;flex-direction:column;align-items:flex-end;font-size:13px;font-weight:900;}' +
-      '.org-dist-pb.ok{color:#059669;}' +
-      '.org-dist-pb.falta{color:#b45309;}' +
-      'body.dark .org-dist-pb.ok{color:#34d399;}' +
-      'body.dark .org-dist-pb.falta{color:#fbbf24;}' +
-      '.org-dist-pb small{font-size:9.5px;font-weight:700;}' +
-      '.org-empty-list{text-align:center;padding:36px 12px;font-size:12.5px;color:#777887;line-height:1.45;}';
-    st.textContent += ' .org-head-actions{display:flex;align-items:center;gap:6px;} .org-magic-btn{background:rgba(11,88,120,0.1);border:1px solid rgba(11,88,120,0.2);color:#0b5878;font-size:11px;font-weight:900;padding:5px 9px;border-radius:10px;cursor:pointer;display:inline-flex;align-items:center;gap:3px;transition:all .18s;} body.dark .org-magic-btn{background:rgba(56,189,248,0.15);border-color:rgba(56,189,248,0.3);color:#7dd3fc;} .org-magic-btn:hover{background:#0b5878;color:#fff;transform:translateY(-1px);} .org-prod-hint{font-size:11px;color:#0b5878;margin-top:4px;font-weight:600;} body.dark .org-prod-hint{color:#7dd3fc;} .org-modal-tabs{display:flex;gap:6px;margin-bottom:10px;} .org-m-tab{flex:1;padding:7px 10px;border-radius:10px;border:1px solid rgba(11,88,120,0.14);background:#f1f5f9;color:#0b5878;font-size:11.5px;font-weight:800;cursor:pointer;transition:all .18s;} body.dark .org-m-tab{background:rgba(255,255,255,0.06);border-color:rgba(255,255,255,0.12);color:#94a3b8;} .org-m-tab.active{background:#0b5878;color:#fff;border-color:#0b5878;box-shadow:0 3px 8px rgba(11,88,120,0.22);} body.dark .org-m-tab.active{background:#38bdf8;color:#0f172a;border-color:#38bdf8;}';
-    st.textContent += ' .org-target-hl{color:#0b5878;font-weight:900;} body.dark .org-target-hl{color:#38bdf8;} .org-why-box{background:linear-gradient(135deg,rgba(58,208,164,0.12),rgba(11,88,120,0.06));border:1px solid rgba(58,208,164,0.3);border-radius:18px;padding:12px 14px;margin-bottom:12px;} body.dark .org-why-box{background:linear-gradient(135deg,rgba(58,208,164,0.1),rgba(15,23,42,0.6));border-color:rgba(58,208,164,0.25);} .org-why-title{font-size:12.5px;font-weight:900;color:#0b5878;display:flex;align-items:center;gap:5px;margin-bottom:4px;} body.dark .org-why-title{color:#3ad0a4;} .org-why-desc{font-size:12px;color:#334155;line-height:1.4;margin:0 0 8px;font-weight:550;} body.dark .org-why-desc{color:#cbd5e1;} .org-perks-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:6px;} .org-perk-pill{background:#ffffff;border:1px solid rgba(11,88,120,0.12);padding:6px 10px;border-radius:10px;font-size:11px;font-weight:750;color:#0b5878;box-shadow:0 1px 3px rgba(0,0,0,0.03);line-height:1.3;} body.dark .org-perk-pill{background:rgba(30,41,59,0.8);border-color:rgba(255,255,255,0.08);color:#e2e8f0;} .org-howto-chip{text-align:center;font-size:11px;color:#64748b;margin:6px 0 10px;font-weight:600;} body.dark .org-howto-chip{color:#94a3b8;}';
+      "#carreraOrganigramaCard{margin:10px 14px 14px;}" +
+      ".org-card{" +
+        "background:rgba(255,255,255,0.85);" +
+        "border:1px solid rgba(255,255,255,0.9);" +
+        "border-radius:22px;" +
+        "padding:16px 14px 14px;" +
+        "box-shadow:0 8px 24px rgba(11,88,120,0.06),0 1px 3px rgba(0,0,0,0.02);" +
+        "backdrop-filter:blur(20px);" +
+        "-webkit-backdrop-filter:blur(20px);" +
+        "color:#1c1c1e;" +
+        "position:relative;" +
+      "}" +
+      "body.dark .org-card{background:rgba(28,28,30,0.9);border-color:rgba(255,255,255,0.12);color:#f4f4f6;box-shadow:0 10px 28px rgba(0,0,0,0.4);}" +
+      ".org-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}" +
+      ".org-head-info{min-width:0;}" +
+      ".org-eyebrow{font-size:9.5px;font-weight:900;letter-spacing:0.8px;color:#10b981;text-transform:uppercase;margin-bottom:2px;}" +
+      "body.dark .org-eyebrow{color:#34d399;}" +
+      ".org-title{margin:0;font-size:17px;font-weight:900;letter-spacing:-0.3px;color:#0b5878;line-height:1.2;}" +
+      "body.dark .org-title{color:#7dd3fc;}" +
+      ".org-magic-btn{background:linear-gradient(135deg,#e0f2fe,#bae6fd);border:1px solid #7dd3fc;color:#0369a1;font-size:11.5px;font-weight:800;padding:6px 12px;border-radius:12px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;transition:all .18s;}" +
+      "body.dark .org-magic-btn{background:rgba(56,189,248,0.18);border-color:#38bdf8;color:#7dd3fc;}" +
+      ".org-magic-btn:active{transform:scale(.96);}" +
+      /* Tira de beneficio limpia en 1 sola línea */
+      ".org-benefit-strip{display:flex;align-items:center;gap:8px;background:rgba(16,185,129,0.09);border:1px solid rgba(16,185,129,0.22);border-radius:12px;padding:8px 12px;margin-bottom:12px;}" +
+      "body.dark .org-benefit-strip{background:rgba(16,185,129,0.14);border-color:rgba(52,211,153,0.3);}" +
+      ".org-benefit-icon{font-size:15px;line-height:1;}" +
+      ".org-benefit-txt{font-size:11.5px;color:#065f46;line-height:1.35;}" +
+      "body.dark .org-benefit-txt{color:#a7f3d0;}" +
+      ".org-benefit-txt b{font-weight:850;}" +
+      /* Árbol */
+      ".org-tree-stage{display:flex;flex-direction:column;align-items:center;margin:6px 0 12px;position:relative;}" +
+      ".org-vos-card{background:#ffffff;border:1.5px solid #0b5878;border-radius:16px;padding:8px 14px;display:flex;flex-direction:column;align-items:center;min-width:130px;max-width:180px;box-shadow:0 4px 14px rgba(11,88,120,0.08);position:relative;z-index:2;}" +
+      "body.dark .org-vos-card{background:#1e293b;border-color:#38bdf8;box-shadow:0 6px 16px rgba(0,0,0,0.3);}" +
+      ".org-vos-card.ok{border-color:#10b981;}" +
+      ".org-vos-pill{position:absolute;top:-8px;background:#0b5878;color:#fff;font-size:8.5px;font-weight:900;padding:2px 7px;border-radius:6px;letter-spacing:0.4px;}" +
+      ".org-vos-card.ok .org-vos-pill{background:#10b981;}" +
+      ".org-vos-avatar-wrap{position:relative;margin:2px 0;}" +
+      ".org-vos-avatar{width:30px;height:30px;border-radius:50%;background:#e0f2fe;display:flex;align-items:center;justify-content:center;font-size:16px;}" +
+      ".org-vos-check{position:absolute;bottom:-2px;right:-4px;background:#10b981;color:#fff;font-size:9px;width:13px;height:13px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:1px solid #fff;font-weight:900;}" +
+      ".org-vos-name{font-size:12px;font-weight:850;color:#1c1c1e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px;}" +
+      "body.dark .org-vos-name{color:#fff;}" +
+      ".org-vos-pb{font-size:11px;color:#0b5878;margin-top:1px;display:flex;flex-direction:column;align-items:center;line-height:1.2;}" +
+      "body.dark .org-vos-pb{color:#38bdf8;}" +
+      ".org-vos-pb b{font-size:12px;font-weight:900;}" +
+      ".org-vos-pb small{font-size:9px;color:#777887;font-weight:600;}" +
+      "body.dark .org-vos-pb small{color:#94a3b8;}" +
+      ".org-stem{width:2px;height:12px;background:#0b5878;opacity:0.25;}" +
+      "body.dark .org-stem{background:#38bdf8;opacity:0.4;}" +
+      ".org-branch-line{width:75%;height:8px;border-top:2px solid rgba(11,88,120,0.25);border-left:2px solid rgba(11,88,120,0.25);border-right:2px solid rgba(11,88,120,0.25);border-radius:4px 4px 0 0;margin-bottom:6px;}" +
+      "body.dark .org-branch-line{border-color:rgba(56,189,248,0.4);}" +
+      /* Slots de Distribuidores */
+      ".org-slots-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(95px,1fr));gap:6px;width:100%;z-index:2;}" +
+      ".org-slot-card{border-radius:14px;padding:8px 6px;text-align:center;cursor:pointer;transition:all .18s;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:95px;}" +
+      ".org-slot-card.empty{border:1.5px dashed rgba(11,88,120,0.25);background:rgba(255,255,255,0.4);}" +
+      "body.dark .org-slot-card.empty{border-color:rgba(255,255,255,0.18);background:rgba(255,255,255,0.03);}" +
+      ".org-slot-card.empty:hover{border-color:#0b5878;background:rgba(11,88,120,0.05);}" +
+      ".org-slot-card.filled{background:#ffffff;border:1px solid rgba(11,88,120,0.18);box-shadow:0 2px 8px rgba(0,0,0,0.04);}" +
+      "body.dark .org-slot-card.filled{background:#1e293b;border-color:rgba(255,255,255,0.12);box-shadow:0 4px 12px rgba(0,0,0,0.25);}" +
+      ".org-slot-card.filled.ok{border-color:#10b981;}" +
+      ".org-slot-top{display:flex;justify-content:space-between;align-items:center;width:100%;margin-bottom:2px;}" +
+      ".org-cat-tag{font-size:8.5px;font-weight:900;background:rgba(11,88,120,0.08);color:#0b5878;padding:1px 5px;border-radius:4px;}" +
+      "body.dark .org-cat-tag{background:rgba(56,189,248,0.16);color:#7dd3fc;}" +
+      ".org-slot-actions-top{display:flex;align-items:center;gap:3px;}" +
+      ".org-slot-wa-btn{background:rgba(16,185,129,0.12);color:#059669;font-size:12px;padding:2px 5px;border-radius:6px;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;line-height:1;}" +
+      ".org-slot-wa-btn:hover{background:#10b981;color:#fff;}" +
+      ".org-slot-remove-btn{background:none;border:none;color:#94a3b8;font-size:14px;cursor:pointer;padding:0 2px;line-height:1;}" +
+      ".org-slot-remove-btn:hover{color:#ef4444;}" +
+      ".org-slot-avatar-wrap{position:relative;margin-bottom:3px;}" +
+      ".org-slot-avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#3d63c9,#5b8def);color:#fff;font-size:10px;font-weight:900;display:flex;align-items:center;justify-content:center;}" +
+      ".org-slot-check{position:absolute;bottom:-2px;right:-3px;background:#10b981;color:#fff;font-size:8px;width:12px;height:12px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:1px solid #fff;font-weight:900;}" +
+      ".org-slot-name{font-size:11px;font-weight:800;color:#1c1c1e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:85px;line-height:1.2;}" +
+      "body.dark .org-slot-name{color:#f1f5f9;}" +
+      ".org-slot-pb-badge{font-size:9.5px;margin-top:2px;padding:2px 5px;border-radius:5px;line-height:1.2;}" +
+      ".org-slot-pb-badge.ok{background:rgba(16,185,129,0.12);color:#059669;}" +
+      "body.dark .org-slot-pb-badge.ok{background:rgba(16,185,129,0.2);color:#34d399;}" +
+      ".org-slot-pb-badge.falta{background:rgba(245,158,11,0.12);color:#b45309;}" +
+      "body.dark .org-slot-pb-badge.falta{background:rgba(245,158,11,0.2);color:#fbbf24;}" +
+      ".org-slot-pb-badge b{font-size:10.5px;font-weight:900;}" +
+      ".org-slot-pb-badge small{font-size:8.5px;opacity:0.85;}" +
+      ".org-slot-plus-circle{width:26px;height:26px;border-radius:50%;background:rgba(11,88,120,0.08);color:#0b5878;font-size:16px;font-weight:800;display:flex;align-items:center;justify-content:center;margin-bottom:2px;}" +
+      "body.dark .org-slot-plus-circle{background:rgba(56,189,248,0.12);color:#38bdf8;}" +
+      ".org-slot-empty-title{font-size:10px;font-weight:800;color:#0b5878;line-height:1.2;}" +
+      "body.dark .org-slot-empty-title{color:#7dd3fc;}" +
+      ".org-slot-empty-min{font-size:8.5px;color:#10b981;font-weight:800;margin-top:2px;}" +
+      "body.dark .org-slot-empty-min{color:#34d399;}" +
+      /* Barra y Estado */
+      ".org-status-box{background:rgba(255,255,255,0.7);border:1px solid rgba(11,88,120,0.1);border-radius:14px;padding:10px 12px;margin-top:6px;}" +
+      "body.dark .org-status-box{background:rgba(15,23,42,0.5);border-color:rgba(255,255,255,0.08);}" +
+      ".org-status-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;font-size:11.5px;font-weight:750;color:#1c1c1e;}" +
+      "body.dark .org-status-row{color:#e2e8f0;}" +
+      ".org-status-val b{color:#0b5878;font-weight:900;}" +
+      "body.dark .org-status-val b{color:#38bdf8;}" +
+      ".org-progress-track{height:6px;background:rgba(11,88,120,0.08);border-radius:99px;overflow:hidden;margin-bottom:6px;}" +
+      "body.dark .org-progress-track{background:rgba(255,255,255,0.08);}" +
+      ".org-progress-bar{height:100%;background:linear-gradient(90deg,#3ad0a4,#0b5878);border-radius:99px;transition:width .4s ease;}" +
+      ".org-status-hint{font-size:11px;color:#475569;line-height:1.35;}" +
+      "body.dark .org-status-hint{color:#cbd5e1;}" +
+      ".org-status-hint b{color:#0b5878;}" +
+      "body.dark .org-status-hint b{color:#7dd3fc;}" +
+      /* Modal Selector */
+      ".org-modal-overlay{position:fixed;inset:0;background:rgba(15,23,42,0.55);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);z-index:99999;display:none;align-items:flex-end;justify-content:center;opacity:0;transition:opacity .2s ease;}" +
+      ".org-modal-overlay.open{opacity:1;}" +
+      ".org-modal-card{background:#ffffff;border:1px solid rgba(255,255,255,0.9);border-radius:24px 24px 0 0;width:100%;max-width:520px;max-height:82vh;padding:16px 14px 22px;display:flex;flex-direction:column;box-shadow:0 -10px 30px rgba(0,0,0,0.18);transform:translateY(24px);transition:transform .22s ease;}" +
+      "body.dark .org-modal-card{background:#1e293b;border-color:rgba(255,255,255,0.12);color:#fff;}" +
+      ".org-modal-overlay.open .org-modal-card{transform:translateY(0);}" +
+      ".org-modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}" +
+      ".org-modal-header h4{margin:0;font-size:15px;font-weight:900;color:#0b5878;}" +
+      "body.dark .org-modal-header h4{color:#7dd3fc;}" +
+      ".org-modal-close{background:rgba(11,88,120,0.08);border:0;color:#0b5878;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;font-weight:900;}" +
+      "body.dark .org-modal-close{background:rgba(255,255,255,0.1);color:#fff;}" +
+      ".org-modal-tabs{display:flex;gap:6px;margin-bottom:8px;}" +
+      ".org-m-tab{flex:1;padding:6px 10px;border-radius:8px;border:1px solid rgba(11,88,120,0.12);background:#f1f5f9;color:#0b5878;font-size:11px;font-weight:800;cursor:pointer;transition:all .15s;}" +
+      "body.dark .org-m-tab{background:rgba(255,255,255,0.06);border-color:rgba(255,255,255,0.1);color:#94a3b8;}" +
+      ".org-m-tab.active{background:#0b5878;color:#fff;border-color:#0b5878;}" +
+      "body.dark .org-m-tab.active{background:#38bdf8;color:#0f172a;border-color:#38bdf8;}" +
+      ".org-modal-search{margin-bottom:8px;}" +
+      ".org-modal-search input{width:100%;background:#f1f5f9;border:1px solid rgba(11,88,120,0.12);border-radius:12px;padding:9px 12px;font:inherit;font-size:12.5px;color:#1c1c1e;outline:none;box-sizing:border-box;}" +
+      "body.dark .org-modal-search input{background:rgba(255,255,255,0.06);border-color:rgba(255,255,255,0.12);color:#fff;}" +
+      ".org-modal-search input:focus{border-color:#0b5878;background:#fff;}" +
+      ".org-modal-list{overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:5px;max-height:50vh;padding-right:2px;}" +
+      ".org-dist-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:12px;background:#f8fafc;border:1px solid rgba(11,88,120,0.06);cursor:pointer;transition:all .15s;}" +
+      "body.dark .org-dist-item{background:rgba(255,255,255,0.03);border-color:rgba(255,255,255,0.06);}" +
+      ".org-dist-item:hover{background:rgba(11,88,120,0.05);border-color:#0b5878;}" +
+      ".org-dist-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#0b5878,#3ad0a4);color:#fff;font-size:11px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;}" +
+      ".org-dist-info{flex:1;min-width:0;}" +
+      ".org-dist-name{font-size:12.5px;font-weight:800;color:#1c1c1e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}" +
+      "body.dark .org-dist-name{color:#fff;}" +
+      ".org-dist-sub{font-size:10px;color:#777887;display:flex;align-items:center;gap:5px;margin-top:1px;font-weight:600;}" +
+      "body.dark .org-dist-sub{color:#94a3b8;}" +
+      ".org-cat-pill{background:#e2e8f0;color:#1e293b;padding:1px 5px;border-radius:4px;font-weight:800;font-size:9px;}" +
+      ".org-dist-pb{display:flex;flex-direction:column;align-items:flex-end;font-size:12px;font-weight:900;}" +
+      ".org-dist-pb.ok{color:#059669;}" +
+      ".org-dist-pb.falta{color:#b45309;}" +
+      "body.dark .org-dist-pb.ok{color:#34d399;}" +
+      "body.dark .org-dist-pb.falta{color:#fbbf24;}" +
+      ".org-dist-pb small{font-size:9px;font-weight:700;}" +
+      ".org-empty-list{text-align:center;padding:28px 12px;font-size:12px;color:#777887;line-height:1.4;}";
     document.head.appendChild(st);
   }
 
