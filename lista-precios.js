@@ -408,12 +408,12 @@
       'body.dark .lp-eco-item{background:#1c1e2a}' +
       'body.dark .lp-cmp{background:#25273a;border-color:rgba(255,255,255,.08)}' +
       'body.dark .lp-cmp-sub,body.dark .lp-cmp-tb td,body.dark .lp-cmp-plst{color:#f2f2f7}' +
-      '.lp-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}' +
-      '.lp-actions button{border:0;border-radius:14px;padding:12px 10px;font:inherit;font-size:13px;font-weight:800;letter-spacing:-0.2px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:transform .12s ease,box-shadow .15s ease,background .15s ease}' +
-      '.lp-actions button:active{transform:scale(0.97)}' +
-      '.lp-actions .lp-pdf{background:#0b5878;color:#ffffff;box-shadow:0 2px 8px rgba(11,88,120,.25)}' +
-      '.lp-actions .lp-clear{background:#fff1f2;color:#be123c;border:1px solid #fecdd3}' +
-      'body.dark .lp-actions .lp-pdf{background:#1680aa;color:#fff}' +
+      '.lp-actions{display:flex;align-items:center;gap:10px;margin-top:16px;width:100%}' +
+      '.lp-actions .lp-pdf{flex:1;border:0;border-radius:14px;padding:14px 18px;font:inherit;font-size:14.5px;font-weight:900;letter-spacing:-0.2px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,#074a66,#0b5878);color:#ffffff;box-shadow:0 3px 12px rgba(11,88,120,.28);transition:transform .12s ease,box-shadow .15s ease}' +
+      '.lp-actions .lp-pdf:active{transform:scale(0.98)}' +
+      '.lp-actions .lp-clear{width:44px;height:44px;flex:none;border-radius:50%;border:1px solid #fecdd3;background:#fff1f2;color:#be123c;font-size:18px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 6px rgba(190,18,60,.12);transition:transform .12s ease,background .15s ease}' +
+      '.lp-actions .lp-clear:active{transform:scale(0.92);background:#ffe4e6}' +
+      'body.dark .lp-actions .lp-pdf{background:linear-gradient(135deg,#0e6b91,#137ea8);color:#fff;box-shadow:0 3px 12px rgba(0,0,0,.35)}' +
       'body.dark .lp-actions .lp-clear{background:#2a1b24;color:#fda4af;border-color:#4c1d2e}' +
       'body.dark #view-lista,.dark .lp-sheet{background:#1c1e2a}' +
       'body.dark .lp-item{background:#25273a;border-color:rgba(255,255,255,.08)}' +
@@ -474,7 +474,7 @@
         '<div class="lp-chips-wrap" id="lpCuotasWrap" hidden><div class="lp-chips" id="lpCuotas"></div></div>' +
         '<div class="lp-actions">' +
         '<button type="button" class="lp-pdf" id="lpSheetPdf">📝 Presupuestar</button>' +
-        '<button type="button" class="lp-clear" id="lpSheetClear">🗑️ Vaciar</button>' +
+        '<button type="button" class="lp-clear" id="lpSheetClear" title="Vaciar pedido" aria-label="Vaciar pedido">🗑️</button>' +
         '</div></div>';
       document.body.appendChild(sh);
       sh.addEventListener('click', function (e) { if (e.target === sh) cerrarSheet(); });
