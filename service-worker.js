@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v892-boton-presupuestar-expandido-cesto-circular';
+const CACHE_NAME = 'appi-v893-cesto-rojo-mas-fuerte';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
