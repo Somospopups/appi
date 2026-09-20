@@ -240,8 +240,7 @@
   function autocompletarMejores(targetCat){
     var regla = PLAN_REGLAS[targetCat];
     var padron = obtenerPadrón();
-    var pestañaActual = 'exacta';
-    var p = leerPicks();
+        var p = leerPicks();
     if (!p[targetCat]) p[targetCat] = [];
     var usados = {};
 
@@ -463,6 +462,7 @@
     var regla = PLAN_REGLAS[targetCat];
     var slotConfig = regla.slots[slotIndex];
     var padron = obtenerPadrón();
+    var tabActual = 'exacta';
 
     var m = document.getElementById('orgSelectorModal');
     if (!m) {
@@ -508,7 +508,7 @@
       var q = (query || '').toLowerCase().trim();
 
       // FILTRAR ESTRICTAMENTE por la categoría que corresponde al casillero
-      var esDesarrollo = (pestañaActual === 'desarrollo');
+      var esDesarrollo = (tabActual === 'desarrollo');
       var filtrados = padron.filter(function(p){
         var califica = false;
         if (!esDesarrollo) { califica = personaCalificaParaSlot(p, slotConfig, false); }
@@ -573,7 +573,7 @@
         tb.onclick = function(){
           m.querySelectorAll('.org-m-tab').forEach(function(b){ b.classList.remove('active'); });
           tb.classList.add('active');
-          pestañaActual = tb.getAttribute('data-tab');
+          tabActual = tb.getAttribute('data-tab');
           renderLista(searchInp.value);
         };
       });

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v924-admin-ficha-clean';
+const CACHE_NAME = 'appi-v925-fix-tab-selector';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
