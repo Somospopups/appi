@@ -1393,7 +1393,7 @@
         var delta = actual - inicio;
         pbHoy += delta;
         var p = eq.find(function(item){ return String(item.codigo || item.id || item.nombre || "").trim() === cod; });
-        if (p) movimientosHoy.push({ nombre: pilaDe(p.nombre || "Distribuidor"), delta: delta, total: actual, cat: p.cat || "" });
+        if (p) movimientosHoy.push({ nombre: nombreLindo(p.nombre) || "Distribuidor", delta: delta, total: actual, cat: p.cat || "" });
       }
     });
 
@@ -1429,7 +1429,7 @@
           topProductores.map(function(p, i){
             var medallas = ["🥇", "🥈", "🥉"];
             var v = Number(p.pnAct != null ? p.pnAct : (p.pbPersonal || 0));
-            return '<div class="ht-pb-mov-row"><span>' + medallas[i] + ' ' + esc(pilaDe(p.nombre || "Distribuidor")) + (p.cat ? ' <small>(' + p.cat + ')</small>' : '') + '</span><b>' + fmtPB(v) + ' PB</b></div>';
+            return '<div class="ht-pb-mov-row"><span>' + medallas[i] + ' ' + esc(nombreLindo(p.nombre) || "Distribuidor") + (p.cat ? ' <small>(' + p.cat + ')</small>' : '') + '</span><b>' + fmtPB(v) + ' PB</b></div>';
           }).join("") +
         '</div>' +
       '</div>';

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v908-pulir-tarjeta-pb-equipo';
+const CACHE_NAME = 'appi-v909-tarjeta-pb-nombre-apellido';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
