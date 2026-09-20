@@ -246,15 +246,243 @@
     setTimeout(function () { m.style.display = 'none'; }, 200);
   }
 
-  function compartirFlyerWA(src, tit) {
+  function compartirFlyerWA(src, tit, ficha) {
     try {
-      var txt = '¡Mirá esta promoción oficial de PSA! 🔥\n*' + (tit || 'Promoción PSA') + '*\n' + (src || '');
+      var txt = '';
+      if (ficha) {
+        txt = '📄 *FICHA TÉCNICA OFICIAL PSA*\n\n' +
+          '💧 *' + (ficha.nombre || tit || 'Producto PSA') + '*\n' +
+          (ficha.sub ? '_' + ficha.sub + '_\n\n' : '\n') +
+          '⏱ *Rendimiento:* ' + ficha.rendimiento + '\n' +
+          '🛡 *Garantía:* ' + ficha.garantia + '\n' +
+          '🔬 *Medios activos:* ' + ficha.medios + '\n' +
+          '🚰 *Qué retiene:* ' + ficha.retiene + '\n' +
+          '⚡ *Caudal:* ' + ficha.caudal + '\n' +
+          '🏅 *Certificación:* ' + ficha.cert + '\n\n' +
+          '🔗 *Más información y manual oficial:* ' + ficha.manual;
+      } else {
+        txt = '¡Mirá este producto oficial de PSA! 🔥\n*' + (tit || 'Producto PSA') + '*\n' + (src || '');
+      }
       var waUrl = 'https://api.whatsapp.com/send?text=' + encodeURIComponent(txt);
       window.open(waUrl, '_blank');
     } catch(e) {}
   }
 
-  function abrirFotoModal(src, tit, sub, isFlyer) {
+  function obtenerFichaTecnica(tit, sub, sku) {
+    var t = (String(tit || '') + ' ' + String(sub || '') + ' ' + String(sku || '')).toUpperCase();
+    
+    if (t.indexOf('SENIOR 4') >= 0 || t.indexOf('SENIOR4') >= 0) {
+      return {
+        nombre: 'PSA Senior 4',
+        sub: 'Purificador sobre/bajo mesada para beber, cocinar y lavar alimentos',
+        rendimiento: '36.000 litros · 36 meses',
+        garantia: '36 meses de garantía oficial',
+        medios: 'Carbón Activado Granular (CAG), CAG con plata, KDF® y Zeolita natural',
+        retiene: 'Cloro (>90%), Trihalometanos (>70%), metales pesados (plomo, hierro, aluminio) y microplásticos (>97%)',
+        caudal: '250 l/h (aprox. 15 seg. por litro de agua)',
+        cert: 'ANMAT RNPUD Nº 0250026 · Norma IRAM 27.300',
+        manual: 'https://www.psa.com.ar/productos/purificadores-de-agua/beber-y-cocinar/psa-senior-4'
+      };
+    }
+    if (t.indexOf('SENIOR') >= 0 && (t.indexOf('BIANCO') >= 0 || t.indexOf('S-1000') < 0)) {
+      return {
+        nombre: 'PSA Senior',
+        sub: 'Purificador clásico sobre mesada para agua pura en tu cocina',
+        rendimiento: '36.000 litros · 36 meses',
+        garantia: '36 meses de garantía oficial',
+        medios: 'Carbón activado granular impregnado en plata y KDF®',
+        retiene: 'Cloro, sedimentos, turbidez, malos olores, sabores y metales',
+        caudal: '250 l/h con regulador de caudal',
+        cert: 'Aprobado por ANMAT · Norma IRAM 27.300',
+        manual: 'https://info.psa.com.ar/landings/manuales/senior3/senior3.html'
+      };
+    }
+    if (t.indexOf('QUANTUM') >= 0) {
+      return {
+        nombre: 'PSA Quantum 2',
+        sub: 'Especial para agua dura: reduce sarro e incrustaciones',
+        rendimiento: '20.000 litros · 24 meses',
+        garantia: '24 meses de garantía oficial',
+        medios: 'Resina catiónica (ablandamiento), KDF®, CAG con plata y prefiltro bacteriostático',
+        retiene: 'Dureza mineral (sarro), cloro, trihalometanos, plomo y sedimentos',
+        caudal: 'Caudal controlado para intercambio catiónico eficiente',
+        cert: 'ANMAT RNPUD Nº 0250015 · Norma IRAM 27.300',
+        manual: 'https://info.psa.com.ar/landings/manuales/quantum2/PSAquantum2.html'
+      };
+    }
+    if (t.indexOf('SENIK') >= 0) {
+      return {
+        nombre: 'PSA Senik',
+        sub: 'Especial para aguas con arsénico y metales pesados',
+        rendimiento: '8.000 litros · 18 meses',
+        garantia: '18 meses de garantía oficial',
+        medios: 'Resina adsorbente específica para arsénico, CAG con plata y KDF®',
+        retiene: 'Arsénico (reduce hasta 10 veces el límite del CAA), cloro y metales',
+        caudal: 'Tiempo de contacto regulado',
+        cert: 'Autorizado por INAL / Ministerio de Salud de la Nación',
+        manual: 'https://info.psa.com.ar/landings/manuales/senik/senik.html'
+      };
+    }
+    if (t.indexOf('ROPOT') >= 0 || t.indexOf('OSMOSIS') >= 0) {
+      return {
+        nombre: 'PSA Ropot · Ósmosis Inversa',
+        sub: 'Sistema inteligente de ósmosis inversa para mesada sin instalación fija',
+        rendimiento: 'Membrana RO + filtros de reposición programada',
+        garantia: '36 meses de garantía oficial',
+        medios: '4 etapas: Sedimentos, Bloque de Carbón, Membrana RO y Post-Carbón',
+        retiene: 'Arsénico, nitratos, flúor, plomo, sodio, dureza, sulfatos y cloro',
+        caudal: 'Jarra interna con sensor TDS y pantalla digital interactiva',
+        cert: 'ANMAT RNPUD Nº 0830022 · Norma IRAM 27.300',
+        manual: 'https://www.psa.com.ar/productos/purificadores-de-agua/beber-y-cocinar/psa-ropot'
+      };
+    }
+    if (t.indexOf('S-1000') >= 0 || t.indexOf('S1000') >= 0) {
+      return {
+        nombre: 'PSA S-1000 II',
+        sub: 'Acondicionador de gran volumen para alto rendimiento familiar o comercial',
+        rendimiento: '40.000 litros · 36 meses',
+        garantia: '36 meses de garantía oficial',
+        medios: 'Doble lecho de CAG con plata, aleación KDF® y prefiltro bacteriostático',
+        retiene: 'Cloro, sedimentos, turbidez, sabores, olores desagradables y metales',
+        caudal: '250 l/h (aprox. 15 seg. por litro)',
+        cert: 'ANMAT RNPUD Nº 0250019 · ISO 9001:2015',
+        manual: 'https://www.psa.com.ar/sites/default/files/2024-12/Manual-usuario-S1000II-web-v02-19_5_8_0_1.pdf'
+      };
+    }
+    if (t.indexOf('RINNOVA') >= 0 || (t.indexOf('DUCHA') >= 0 && t.indexOf('FLOR') < 0 && t.indexOf('ADAPT') < 0 && t.indexOf('CAMPANA') < 0)) {
+      return {
+        nombre: 'PSA Ducha Rinnova / Ducha 2',
+        sub: 'Purificador de ducha para agua caliente sin cloro ni sarro',
+        rendimiento: '150.000 litros · 12 meses',
+        garantia: '12 meses de garantía oficial',
+        medios: 'KDF® (cobre y zinc) de alta pureza y polifosfatos anticalcáreos',
+        retiene: 'Cloro libre en agua caliente, sarro en cañerías/flor y partículas suspendidas',
+        caudal: 'Pleno flujo de baño confortable sin alterar la presión',
+        cert: 'Garantía y aval oficial PSA',
+        manual: 'https://catalogo.psa.com.ar/productos/purificadores-de-agua/linea-bano/psa-ducha-2'
+      };
+    }
+    if (t.indexOf('C3') >= 0) {
+      return {
+        nombre: 'PSA C3 Grigio',
+        sub: 'Acondicionador para bacha de baño (afeitado, higiene facial y bucal)',
+        rendimiento: '12.000 litros · 12 meses',
+        garantia: '12 meses de garantía oficial',
+        medios: 'Carbón activado granular bacteriostático impregnado en plata',
+        retiene: 'Cloro, sedimentos y olores molestos en el agua del lavamanos',
+        caudal: 'Regulado para griferías de baño',
+        cert: 'Aprobación oficial PSA · ANMAT RNPUD',
+        manual: 'https://www.psa.com.ar/productos/purificadores-de-agua/linea-bano'
+      };
+    }
+    if (t.indexOf('PORTATIL') >= 0 || t.indexOf('PORTÁTIL') >= 0 || t.indexOf('1-P') >= 0) {
+      return {
+        nombre: 'PSA Portátil (1-P)',
+        sub: 'Purificador compacto ideal para viajes, motorhomes y traslados',
+        rendimiento: '2.000 litros · 12 meses',
+        garantia: '12 meses de garantía oficial',
+        medios: 'Carbón activado granular impregnado en plata y membranas',
+        retiene: 'Cloro, trihalometanos, turbidez, malos olores y sabores',
+        caudal: 'Acople rápido universal a cualquier canilla de red',
+        cert: 'ANMAT RNPUD Nº 0250005 · Ministerio de Salud',
+        manual: 'https://www.psa.com.ar/sites/default/files/2024-04/PSA-Manual-web-Portatil.pdf'
+      };
+    }
+    if (t.indexOf('MINI') >= 0 && t.indexOf('DOMUS') < 0) {
+      return {
+        nombre: 'PSA Mini',
+        sub: 'Purificador compacto de sobre mesada',
+        rendimiento: '18.000 litros · 18 meses',
+        garantia: '18 meses de garantía oficial',
+        medios: 'CAG impregnado en plata y elemento filtrante Fipor Nº 2',
+        retiene: 'Cloro, contaminantes orgánicos y sedimentos',
+        caudal: '180 a 200 l/h con sistema de autopurgado',
+        cert: 'ANMAT RNPUD Nº 0250002 · ISO 9001:2015',
+        manual: 'https://info.psa.com.ar/landings/manuales/mini/mini.html'
+      };
+    }
+    if (t.indexOf('VERO') >= 0) {
+      return {
+        nombre: 'PSA Vero',
+        sub: 'Purificador clásico para beber y cocinar',
+        rendimiento: '12.000 litros · 12 meses',
+        garantia: '12 meses de garantía oficial',
+        medios: 'Carbón activado granular impregnado en plata y Fipor',
+        retiene: 'Cloro, sedimentos, turbidez, sabores y olores',
+        caudal: 'Caudal regulado para cocina',
+        cert: 'ANMAT RNPUD Nº 0250010 · ISO 9001:2015',
+        manual: 'https://info.psa.com.ar/landings/manuales/vero/vero.html'
+      };
+    }
+    if (t.indexOf('IONTRIX') >= 0) {
+      return {
+        nombre: 'PSA Iontrix 3',
+        sub: 'Purificador ionizador solar para piscinas',
+        rendimiento: 'Ahorro de hasta un 90% en cloro y químicos',
+        garantia: '24 meses de garantía oficial',
+        medios: 'Panel solar fotovoltaico + electrodos de aleación metálica + potenciador',
+        retiene: 'Bacterias, hongos y algas por ionización mineral permanente inocua',
+        caudal: 'Apto piscinas de hasta 80.000 litros',
+        cert: 'RNE Nº 020033995 · 100% Energía Renovable',
+        manual: 'https://info.psa.com.ar/landings/manuales/iontrix3/iontrix3.html'
+      };
+    }
+    if (t.indexOf('AIRE') >= 0 || t.indexOf('AIRPURIFIER') >= 0) {
+      return {
+        nombre: 'Purificador de Aire PSA',
+        sub: 'Ambientes puros y libres de contaminantes, humo y alérgenos',
+        rendimiento: 'Filtro HEPA H13 + Carbón Activo + Prefiltro G4',
+        garantia: '24 meses de garantía oficial',
+        medios: 'Prefiltro G4, Carbón activado granular, Filtro HEPA y Descarga de Iones Negativos',
+        retiene: 'Polvo, polen, ácaros, bacterias, moho, humo de tabaco y olores',
+        caudal: '3 velocidades y modo silencioso nocturno (bajo consumo 220V)',
+        cert: 'Certificación de Seguridad Eléctrica IRAM',
+        manual: 'https://www.psa.com.ar/productos/purificador-de-aire/purificador-de-aire-psa'
+      };
+    }
+    if (t.indexOf('BURBY') >= 0 || t.indexOf('SODA') >= 0) {
+      return {
+        nombre: 'PSA SodaBurby',
+        sub: 'Gasificador doméstico para preparar soda fresca al instante',
+        rendimiento: 'Cilindro de CO2 rinde hasta 60 litros de soda',
+        garantia: '12 meses de garantía oficial',
+        medios: 'Sistema de gasificación por pulsos sin electricidad',
+        retiene: 'Soda 100% pura y personalizada sobre Agua Purificada PSA',
+        caudal: 'Instantáneo a demanda con botellas reutilizables libres de BPA',
+        cert: 'Aval y garantía oficial PSA',
+        manual: 'https://catalogo.psa.com.ar/productos/gasificador-de-agua/sodaburby'
+      };
+    }
+    if (t.indexOf('DOMUS') >= 0) {
+      return {
+        nombre: 'PSA Domus / Mini Domus',
+        sub: 'Ablandador central inteligente para toda la casa',
+        rendimiento: 'Regeneración automática volumétrica por salmuera',
+        garantia: '24 meses de garantía oficial',
+        medios: 'Resina catiónica de alta capacidad con cabezal programable',
+        retiene: 'Sarro en toda la instalación, cañerías, termotanques, calderas y electrodomésticos',
+        caudal: 'Flujo continuo domiciliario hasta 2.000 l/h',
+        cert: 'RNE Nº 020033995 · Calidad industrial certificada',
+        manual: 'https://info.psa.com.ar/landings/manuales/psa-domus/domus.html'
+      };
+    }
+    if (t.indexOf('POLI') >= 0) {
+      return {
+        nombre: 'PSA Poli 2',
+        sub: 'Prefiltro de sedimentos y partículas en suspensión',
+        rendimiento: 'Cartucho lavable y reutilizable',
+        garantia: '12 meses de garantía oficial',
+        medios: 'Malla filtrante de polipropileno de alta densidad',
+        retiene: 'Arenas, óxidos, tierra y sedimentos gruesos',
+        caudal: 'Acompaña la instalación para proteger el purificador',
+        cert: 'Certificación oficial PSA',
+        manual: 'https://catalogo.psa.com.ar/productos-psa'
+      };
+    }
+    return null;
+  }
+
+  function abrirFotoModal(src, tit, sub, isFlyer, sku) {
     var m = $('lpFotoModal');
     if (!m) {
       m = document.createElement('div');
@@ -267,6 +495,7 @@
         '<img class="lp-foto-card-img" id="lpFotoModalImg" src="" alt="">' +
         '<div class="lp-foto-card-tit" id="lpFotoModalTit"></div>' +
         '<div class="lp-foto-card-sub" id="lpFotoModalSub"></div>' +
+        '<div class="lp-foto-ficha-box" id="lpFotoModalFicha" style="display:none"></div>' +
         '<div class="lp-foto-card-actions">' +
           '<button type="button" class="lp-foto-card-wa" id="lpFotoModalWA"><span>💬</span> Compartir por WhatsApp</button>' +
           '<button type="button" class="lp-foto-card-close" id="lpFotoModalClose">Cerrar</button>' +
@@ -281,13 +510,38 @@
     var t = $('lpFotoModalTit');
     var s = $('lpFotoModalSub');
     var tag = $('lpFotoModalTag');
+    var fBox = $('lpFotoModalFicha');
     var btnWa = $('lpFotoModalWA');
     if (img) img.src = src || '';
     if (t) t.textContent = tit || '';
     if (s) s.textContent = sub || '';
     if (tag) tag.style.display = isFlyer ? 'inline-block' : 'none';
+
+    var ficha = !isFlyer ? obtenerFichaTecnica(tit, sub, sku) : null;
+    if (fBox) {
+      if (ficha) {
+        fBox.style.display = 'block';
+        fBox.innerHTML = '<div class="lp-ficha-head">' +
+          '<span class="lp-ficha-badge">📄 Ficha Técnica Oficial</span>' +
+          '<a href="' + esc(ficha.manual) + '" target="_blank" rel="noopener" class="lp-ficha-link">Manual oficial ↗</a>' +
+        '</div>' +
+        '<div class="lp-ficha-grid">' +
+          '<div class="lp-ficha-row"><b>Rendimiento:</b> <span>' + esc(ficha.rendimiento) + '</span></div>' +
+          '<div class="lp-ficha-row"><b>Garantía:</b> <span>' + esc(ficha.garantia) + '</span></div>' +
+          '<div class="lp-ficha-row"><b>Medios activos:</b> <span>' + esc(ficha.medios) + '</span></div>' +
+          '<div class="lp-ficha-row"><b>Retiene:</b> <span>' + esc(ficha.retiene) + '</span></div>' +
+          '<div class="lp-ficha-row"><b>Caudal:</b> <span>' + esc(ficha.caudal) + '</span></div>' +
+          '<div class="lp-ficha-row"><b>Certificación:</b> <span>' + esc(ficha.cert) + '</span></div>' +
+        '</div>';
+      } else {
+        fBox.style.display = 'none';
+        fBox.innerHTML = '';
+      }
+    }
+
     if (btnWa) {
-      btnWa.onclick = function() { compartirFlyerWA(src, tit); };
+      btnWa.innerHTML = ficha ? '<span>💬</span> Compartir Ficha por WhatsApp' : '<span>💬</span> Compartir por WhatsApp';
+      btnWa.onclick = function() { compartirFlyerWA(src, tit, ficha); };
     }
     m.style.display = 'flex';
     requestAnimationFrame(function () { m.classList.add('open'); });
@@ -445,7 +699,7 @@
       '.lp-foto-card-tit{font-size:14px;font-weight:800;margin-bottom:6px;line-height:1.3}' +
       '.lp-foto-card-sub{font-size:12px;color:#70707a;margin-bottom:16px}' +
       'body.dark .lp-foto-card-sub{color:#a0a0aa}' +
-      '.lp-foto-card{max-width:360px!important;width:92%!important;padding:16px!important;border-radius:24px!important}' + '.lp-foto-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}' + '.lp-foto-card-tag{background:linear-gradient(135deg,#ea580c,#f97316);color:#fff;font-size:10px;font-weight:900;padding:3px 8px;border-radius:6px;text-transform:uppercase;letter-spacing:.3px}' + '.lp-foto-card-x{border:0;background:rgba(0,0,0,.08);color:#555;width:28px;height:28px;border-radius:50%;cursor:pointer;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center}' + 'body.dark .lp-foto-card-x{background:rgba(255,255,255,.12);color:#eee}' + '.lp-foto-card-img{width:100%!important;max-height:260px!important;height:auto!important;object-fit:contain!important;border-radius:14px!important;margin:0 0 12px!important;background:#fafafa!important;border:1px solid rgba(0,0,0,.06)!important}' + 'body.dark .lp-foto-card-img{background:#1c1e2a!important;border-color:rgba(255,255,255,.08)!important}' + '.lp-foto-card-actions{display:flex;flex-direction:column;gap:8px;margin-top:14px}' + '.lp-foto-card-wa{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:11px;border-radius:12px;border:0;background:#25d366;color:#fff;font-weight:900;font-size:13px;cursor:pointer;box-shadow:0 3px 10px rgba(37,211,102,.3)}' + '.lp-foto-card-close{width:100%;padding:9px;border-radius:12px;border:0;background:rgba(0,0,0,.07);color:#333;font-weight:750;font-size:12px;cursor:pointer}' + 'body.dark .lp-foto-card-close{background:rgba(255,255,255,.1);color:#eee}' + '.lp-item-left-col{display:flex;flex-direction:column;align-items:center;gap:6px;flex:none;width:52px}' + '.lp-flyer-thumb-wrap{position:relative;width:48px;cursor:pointer;border-radius:8px;overflow:hidden;border:1.5px solid #f97316;background:#fff;box-shadow:0 2px 6px rgba(249,115,22,.2);transition:transform .15s ease}' + '.lp-flyer-thumb-wrap:active{transform:scale(0.94)}' + '.lp-flyer-thumb-img{width:100%;height:32px;object-fit:cover;display:block}' + '.lp-flyer-thumb-lbl{display:block;background:linear-gradient(135deg,#ea580c,#f97316);color:#fff;font-size:7.5px;font-weight:900;text-align:center;padding:1px 0;text-transform:uppercase;letter-spacing:.3px}' + '.lp-item-foto{width:44px;height:44px;flex:none;border-radius:10px;object-fit:contain;background:#fff;border:1px solid rgba(0,0,0,.07);padding:3px}' +
+      '.lp-foto-card{max-width:360px!important;width:92%!important;padding:16px!important;border-radius:24px!important}' + '.lp-foto-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}' + '.lp-foto-card-tag{background:linear-gradient(135deg,#ea580c,#f97316);color:#fff;font-size:10px;font-weight:900;padding:3px 8px;border-radius:6px;text-transform:uppercase;letter-spacing:.3px}' + '.lp-foto-card-x{border:0;background:rgba(0,0,0,.08);color:#555;width:28px;height:28px;border-radius:50%;cursor:pointer;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center}' + 'body.dark .lp-foto-card-x{background:rgba(255,255,255,.12);color:#eee}' + '.lp-foto-card-img{width:100%!important;max-height:260px!important;height:auto!important;object-fit:contain!important;border-radius:14px!important;margin:0 0 12px!important;background:#fafafa!important;border:1px solid rgba(0,0,0,.06)!important}' + 'body.dark .lp-foto-card-img{background:#1c1e2a!important;border-color:rgba(255,255,255,.08)!important}' + '.lp-foto-ficha-box{margin:10px 0 14px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:14px;padding:12px;text-align:left;font-size:11px;line-height:1.45;max-height:220px;overflow-y:auto}' + 'body.dark .lp-foto-ficha-box{background:#1a1c28;border-color:rgba(255,255,255,.1)}' + '.lp-ficha-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid rgba(0,0,0,.06)}' + 'body.dark .lp-ficha-head{border-bottom-color:rgba(255,255,255,.08)}' + '.lp-ficha-badge{background:#e0f2fe;color:#0369a1;font-weight:900;font-size:10px;padding:3px 8px;border-radius:6px;text-transform:uppercase;letter-spacing:.2px}' + 'body.dark .lp-ficha-badge{background:#075985;color:#bae6fd}' + '.lp-ficha-link{font-size:11px;font-weight:850;color:#0b5878;text-decoration:none}' + 'body.dark .lp-ficha-link{color:#38bdf8}' + '.lp-ficha-grid{display:flex;flex-direction:column;gap:5px}' + '.lp-ficha-row{display:flex;gap:6px;font-size:11px;line-height:1.35}' + '.lp-ficha-row b{color:#334155;flex:none;font-weight:850}' + 'body.dark .lp-ficha-row b{color:#cbd5e1}' + '.lp-ficha-row span{color:#64748b;font-weight:600}' + 'body.dark .lp-ficha-row span{color:#94a3b8}' + '.lp-foto-card-actions{display:flex;flex-direction:column;gap:8px;margin-top:14px}' + '.lp-foto-card-wa{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:11px;border-radius:12px;border:0;background:#25d366;color:#fff;font-weight:900;font-size:13px;cursor:pointer;box-shadow:0 3px 10px rgba(37,211,102,.3)}' + '.lp-foto-card-close{width:100%;padding:9px;border-radius:12px;border:0;background:rgba(0,0,0,.07);color:#333;font-weight:750;font-size:12px;cursor:pointer}' + 'body.dark .lp-foto-card-close{background:rgba(255,255,255,.1);color:#eee}' + '.lp-item-left-col{display:flex;flex-direction:column;align-items:center;gap:6px;flex:none;width:52px}' + '.lp-flyer-thumb-wrap{position:relative;width:48px;cursor:pointer;border-radius:8px;overflow:hidden;border:1.5px solid #f97316;background:#fff;box-shadow:0 2px 6px rgba(249,115,22,.2);transition:transform .15s ease}' + '.lp-flyer-thumb-wrap:active{transform:scale(0.94)}' + '.lp-flyer-thumb-img{width:100%;height:32px;object-fit:cover;display:block}' + '.lp-flyer-thumb-lbl{display:block;background:linear-gradient(135deg,#ea580c,#f97316);color:#fff;font-size:7.5px;font-weight:900;text-align:center;padding:1px 0;text-transform:uppercase;letter-spacing:.3px}' + '.lp-item-foto{width:44px;height:44px;flex:none;border-radius:10px;object-fit:contain;background:#fff;border:1px solid rgba(0,0,0,.07);padding:3px}' +
       'body.dark .lp-item-foto{background:#1c1e2e;border-color:rgba(255,255,255,.09)}' +
       'body.dark .lp-item-txt b,body.dark .lp-sheet h2,body.dark .lp-line b{color:#f2f2f7}' +
       'body.dark .lp-search,body.dark .lp-para{background:#25273a;color:#f2f2f7}' +
@@ -530,7 +784,7 @@
       var esCanje = !!L.canje;
       var fotoHtml = '';
       if (L.foto) {
-        fotoHtml = '<div class="lp-item-foto-wrap" data-foto-popup="' + esc(L.foto) + '" data-foto-tit="' + esc(L.nombre) + '" data-foto-sub="' + esc((L.sku ? 'SKU ' + L.sku : (L.seccion || '')) + (esCanje ? ' · Plan canje' : '')) + '">' +
+        fotoHtml = '<div class="lp-item-foto-wrap" data-foto-popup="' + esc(L.foto) + '" data-foto-tit="' + esc(L.nombre) + '" data-foto-sub="' + esc((L.sku ? 'SKU ' + L.sku : (L.seccion || '')) + (esCanje ? ' · Plan canje' : '')) + '" data-foto-sku="' + esc(L.sku || '') + '">' +
           '<img class="lp-item-foto" loading="lazy" src="' + esc(L.foto) + '" alt="" onerror="this.parentElement.remove()">' +
           (esCanje ? '<span class="lp-badge-canje" title="Plan Canje">🔄</span>' : '') +
           '</div>';
@@ -1852,13 +2106,13 @@
       var flyerBtn = e.target.closest('[data-flyer-popup]');
       if (flyerBtn) {
         e.stopPropagation();
-        abrirFotoModal(flyerBtn.getAttribute('data-flyer-popup'), flyerBtn.getAttribute('data-foto-tit'), flyerBtn.getAttribute('data-foto-sub'), true);
+        abrirFotoModal(flyerBtn.getAttribute('data-flyer-popup'), flyerBtn.getAttribute('data-foto-tit'), flyerBtn.getAttribute('data-foto-sub'), true, flyerBtn.getAttribute('data-foto-sku') || '');
         return;
       }
       var fotoBtn = e.target.closest('[data-foto-popup]');
       if (fotoBtn) {
         e.stopPropagation();
-        abrirFotoModal(fotoBtn.getAttribute('data-foto-popup'), fotoBtn.getAttribute('data-foto-tit'), fotoBtn.getAttribute('data-foto-sub'), false);
+        abrirFotoModal(fotoBtn.getAttribute('data-foto-popup'), fotoBtn.getAttribute('data-foto-tit'), fotoBtn.getAttribute('data-foto-sub'), false, fotoBtn.getAttribute('data-foto-sku') || '');
         return;
       }
       var btn = e.target.closest('[data-act]');

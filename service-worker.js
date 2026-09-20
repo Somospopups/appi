@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v910-scroll-top-dock-pantallas';
+const CACHE_NAME = 'appi-v911-fichas-tecnicas-lista-precios';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

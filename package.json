@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "910.0.0",
-  "cacheName": "appi-v910-scroll-top-dock-pantallas",
+  "version": "911.0.0",
+  "cacheName": "appi-v911-fichas-tecnicas-lista-precios",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {
