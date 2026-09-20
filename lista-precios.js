@@ -349,7 +349,7 @@
         manual: 'https://info.psa.com.ar/landings/manuales/s10002/s10002.html'
       };
     }
-    if (t.indexOf('RINNOVA') >= 0) {
+    if (t.indexOf('RINNOVA') >= 0 || (t.indexOf('DUCHA') >= 0 && t.indexOf('FLOR') < 0 && t.indexOf('ADAPT') < 0 && t.indexOf('CAMPANA') < 0)) {
       return {
         nombre: 'PSA Ducha Rinnova',
         sub: 'Purificador de ducha para agua caliente sin cloro ni sarro',
@@ -360,19 +360,6 @@
         caudal: 'Pleno flujo de baño confortable sin alterar la presión',
         cert: 'Garantía y aval oficial PSA',
         manual: 'https://info.psa.com.ar/landings/manuales/rinnova/rinnova.html'
-      };
-    }
-    if (t.indexOf('DUCHA') >= 0 && t.indexOf('FLOR') < 0 && t.indexOf('ADAPT') < 0 && t.indexOf('CAMPANA') < 0) {
-      return {
-        nombre: 'PSA Ducha 2',
-        sub: 'Purificador de ducha para agua tibia y caliente',
-        rendimiento: '150.000 litros · 12 meses',
-        garantia: '12 meses de garantía oficial',
-        medios: 'KDF® (cobre y zinc) de alta pureza y polifosfatos anticalcáreos',
-        retiene: 'Cloro libre en agua de ducha y sarro en cañerías',
-        caudal: 'Pleno flujo de baño confortable sin alterar la presión',
-        cert: 'Garantía y aval oficial PSA',
-        manual: 'https://info.psa.com.ar/landings/manuales/ducha/ducha.html'
       };
     }
     if (t.indexOf('C3') >= 0) {

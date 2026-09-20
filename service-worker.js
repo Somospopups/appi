@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v913-manuales-interactivos-oficiales';
+const CACHE_NAME = 'appi-v914-manual-ducha-rinnova';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
