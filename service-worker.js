@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v896-sonidos-eliminar-y-cesto';
+const CACHE_NAME = 'appi-v897-fix-scope-sonidos';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "896.0.0",
-  "cacheName": "appi-v896-sonidos-eliminar-y-cesto",
+  "version": "897.0.0",
+  "cacheName": "appi-v897-fix-scope-sonidos",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {
