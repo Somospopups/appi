@@ -99,9 +99,9 @@
     if (host) return host;
     host = document.createElement('div');
     host.id = 'bonosCard';
-    var header = view.querySelector('header');
-    if (header) header.insertAdjacentElement('afterend', host);
-    else view.insertBefore(host, view.firstChild);
+    var grid = view.querySelector('#negGrid');
+    if (grid) grid.insertAdjacentElement('afterend', host);
+    else view.appendChild(host);
     return host;
   }
 
