@@ -372,10 +372,19 @@
       '.lp-gan-card-val{font-size:15px;font-weight:950;color:#0b5878;line-height:1.2}' +
       '.lp-gan-card-sub{font-size:9.5px;color:#71717a;margin-top:3px;line-height:1.2}' +
       '.lp-gan-card.saldo-card .lp-gan-card-val{color:#059669}' +
-      '.lp-gan-detalle{display:flex;flex-direction:column;gap:3px;margin:6px 0;max-height:96px;overflow:auto;text-align:center}' +
-      '.lp-gan-detalle span{font-size:11px;color:#4a4b57;display:block;text-align:center}' +
-      '.lp-gan-detalle b{color:#0b5878}' +
+      '.lp-gan-detalle{display:flex;flex-direction:column;gap:6px;margin:8px 0;max-height:160px;overflow:auto}' +
+      '.lp-gan-row{background:rgba(255,255,255,.65);border-radius:10px;padding:7px 10px;border:1px solid rgba(0,0,0,.05);display:flex;flex-direction:column;gap:2px}' +
+      '.lp-gan-row-top{display:flex;align-items:baseline;justify-content:space-between;gap:6px}' +
+      '.lp-gan-row-tit{font-size:11px;font-weight:850;color:#27272a;text-align:left}' +
+      '.lp-gan-row-val{font-size:11px;font-weight:750;color:#52525b;white-space:nowrap;text-align:right}' +
+      '.lp-gan-row-val b{color:#0b5878}' +
+      '.lp-gan-row-sub{font-size:9.5px;font-weight:800;color:#059669;text-align:left;letter-spacing:-0.1px}' +
       '.lp-gan-detalle em{font-style:normal;font-size:9px;background:#fff3cd;color:#8a6d1a;padding:1px 5px;border-radius:6px;font-weight:850}' +
+      'body.dark .lp-gan-row{background:rgba(37,39,58,.7);border-color:rgba(255,255,255,.06)}' +
+      'body.dark .lp-gan-row-tit{color:#f4f4f5}' +
+      'body.dark .lp-gan-row-val{color:#d4d4d8}' +
+      'body.dark .lp-gan-row-val b{color:#38bdf8}' +
+      'body.dark .lp-gan-row-sub{color:#34d399}' +
       '.lp-gan-foot{font-size:10px;color:#85889a;margin-top:6px;line-height:1.4;text-align:center}' +
       'body.dark .lp-gan{background:rgba(11,88,120,.18);border-color:rgba(58,208,164,.35)}' +
       'body.dark .lp-gan-head b,body.dark .lp-gan-num,body.dark .lp-gan-num i{color:#3ad0a4}' +
@@ -2145,6 +2154,7 @@
     var col = columnaPerfil();
     var colLab = (GAN && GAN.columnas && GAN.columnas[col]) || col;
     var total = 0, cobro = 0, lineas = [], faltan = 0;
+    var totalDev30 = 0, totalSaldoPsa = 0;
     r.lineas.forEach(function (ln) {
       var p = ln.p, q = ln.q;
       var e = entradaGanancia(p);
@@ -2153,15 +2163,49 @@
       var estimado = !fuentes || !costo;
       if (estimado) { costo = Number(p.precio) * 0.70; faltan++; }
       var ganU = Number(p.precio) - costo;
+      var pctU = Number(p.precio) > 0 ? ((ganU / Number(p.precio)) * 100) : 0;
       var g = ganU * q;
-      total += g; cobro += Number(p.precio) * q;
-      lineas.push({ nombre: p.nombre, q: q, gan: g, ganU: ganU, costo: costo, estimado: estimado });
+      var c = Number(p.precio) * q;
+
+      // Devolución 30% tope y saldo en cuenta PSA calculados individualmente
+      var maxDevU = Number(p.precio) * 0.30;
+      var devU = Math.min(ganU, maxDevU);
+      var saldoU = Math.max(0, ganU - devU);
+      var pctSaldoU = Number(p.precio) > 0 ? ((saldoU / Number(p.precio)) * 100) : 0;
+
+      total += g;
+      cobro += c;
+      totalDev30 += devU * q;
+      totalSaldoPsa += saldoU * q;
+
+      lineas.push({
+        nombre: p.nombre,
+        q: q,
+        precio: Number(p.precio),
+        costo: costo,
+        ganU: ganU,
+        pctU: pctU,
+        devU: devU,
+        saldoU: saldoU,
+        pctSaldoU: pctSaldoU,
+        gan: g,
+        estimado: estimado
+      });
     });
     return {
-      total: total, cobro: cobro, margen: cobro > 0 ? (total / cobro) : 0,
-      lineas: lineas, faltan: faltan, col: col, colLab: colLab, perfil: !!PERFIL,
-      saldo: (PERFIL || {}).saldo || 0, dev: (PERFIL || {}).ultimaDevolucion || null,
-      vigencia: (GAN && GAN.vigencia) || ''
+      total: total,
+      cobro: cobro,
+      totalDev30: Math.round(totalDev30),
+      totalSaldoPsa: Math.round(totalSaldoPsa),
+      margen: cobro > 0 ? (total / cobro) : 0,
+      lineas: lineas,
+      faltan: faltan,
+      col: col,
+      colLab: colLab,
+      perfil: !!PERFIL,
+      saldo: (PERFIL || {}).saldo || 0,
+      dev: (PERFIL || {}).ultimaDevolucion || null,
+      vigencia: (GAN && GAN.vigencia) || ""
     };
   }
   function msgGanancia(g) {
@@ -2200,7 +2244,6 @@
 
     var cardsHtml = '';
     if (esContado) {
-      // PAGO CONTADO: El 100% de la ganancia queda en mano
       cardsHtml = '<div class="lp-gan-cards" style="grid-template-columns:1fr">' +
         '<div class="lp-gan-card">' +
           '<div class="lp-gan-card-tit">💵 EN MANO (100% de tu ganancia)</div>' +
@@ -2209,19 +2252,18 @@
         '</div>' +
       '</div>';
     } else {
-      // PAGO CON TARJETA DE CRÉDITO:
-      // PSA solo permite sacar hasta el 30% del total de la venta bruta (DEVOLUCION DE SALDO)
-      // Lo que supera el 30% queda como Saldo en Cuenta PSA
-      var maxDevolucion30 = Math.round(g.cobro * 0.30);
-      var devSaldo = Math.min(Math.round(g.total), maxDevolucion30);
-      var saldoPsa = Math.max(0, Math.round(g.total) - devSaldo);
+      var devSaldo = g.totalDev30;
+      var saldoPsa = g.totalSaldoPsa;
 
       var pctSaldo = g.cobro > 0 ? ((saldoPsa / g.cobro) * 100) : 0;
       var pctSaldoTxt = pctSaldo > 0 ? (pctSaldo >= 1 ? Math.round(pctSaldo) : pctSaldo.toFixed(1)) + '%' : '0%';
 
+      var pctDev = g.cobro > 0 ? ((devSaldo / g.cobro) * 100) : 0;
+      var pctDevTxt = pctDev > 0 ? (pctDev >= 1 ? Math.round(pctDev) : pctDev.toFixed(1)) + '%' : '0%';
+
       cardsHtml = '<div class="lp-gan-cards">' +
         '<div class="lp-gan-card">' +
-          '<div class="lp-gan-card-tit">💵 DEVOLUCIÓN DE SALDO (30%)</div>' +
+          '<div class="lp-gan-card-tit">💵 DEVOLUCIÓN DE SALDO (' + pctDevTxt + ')</div>' +
           '<div class="lp-gan-card-val">$' + devSaldo.toLocaleString('es-AR') + '</div>' +
           '<div class="lp-gan-card-sub">Pedís 1° al 5 (se acredita el 12 a tu CBU)</div>' +
         '</div>' +
@@ -2233,18 +2275,37 @@
       '</div>';
     }
 
+    var detalleHtml = g.lineas.map(function (l) {
+      var nom = esc(String(l.nombre).replace(/\s*\(PLAN CANJE\)\s*$/i, ''));
+      var pctRedondo = Math.round(l.pctU);
+      if (esContado) {
+        return '<div class="lp-gan-row">' +
+          '<div class="lp-gan-row-top">' +
+            '<span class="lp-gan-row-tit">' + l.q + '× ' + nom + '</span>' +
+            '<span class="lp-gan-row-val"><b>$' + Math.round(l.ganU).toLocaleString('es-AR') + '/u</b> (' + pctRedondo + '%)' + (l.estimado ? ' <em>est. 30%</em>' : '') + '</span>' +
+          '</div>' +
+        '</div>';
+      }
+      var devTxt = '💵 CBU: $' + Math.round(l.devU).toLocaleString('es-AR');
+      var salTxt = l.saldoU > 0 ? (' · 💳 Saldo PSA: $' + Math.round(l.saldoU).toLocaleString('es-AR') + ' (' + Math.round(l.pctSaldoU) + '%)') : ' · 💳 Saldo PSA: $0';
+      return '<div class="lp-gan-row">' +
+        '<div class="lp-gan-row-top">' +
+          '<span class="lp-gan-row-tit">' + l.q + '× ' + nom + '</span>' +
+          '<span class="lp-gan-row-val"><b>$' + Math.round(l.ganU).toLocaleString('es-AR') + '/u</b> (' + pctRedondo + '%)' + (l.estimado ? ' <em>est. 30%</em>' : '') + '</span>' +
+        '</div>' +
+        '<div class="lp-gan-row-sub">' + devTxt + salTxt + '</div>' +
+      '</div>';
+    }).join('');
+
     var html = '<div class="lp-gan">' +
       '<div class="lp-gan-head"><b>🔒 SOLO PARA VOS</b><span>Estos datos solo quedan para vos.<br/>Nunca serán entregados a tus usuarios</span></div>' +
       '<div class="lp-gan-num">$' + Math.round(g.total).toLocaleString('es-AR') + '<i>≈ ' + pct + '% ganancia real</i></div>' +
       cardsHtml +
-      '<div class="lp-gan-detalle">' + g.lineas.map(function (l) {
-        return '<span>' + l.q + '× ' + esc(String(l.nombre).replace(/\s*\(PLAN CANJE\)\s*$/i, '')) + ' <b>$' + Math.round(l.ganU).toLocaleString('es-AR') + '/u</b>' + (l.estimado ? ' <em>est. 30%</em>' : '') + '</span>';
-      }).join('') + '</div>' +
+      '<div class="lp-gan-detalle">' + detalleHtml + '</div>' +
       '<div class="lp-gan-foot">Costo: ' + esc(g.colLab) + (g.vigencia ? ' · Lista PSA ' + esc(g.vigencia) : '') + (g.faltan ? ' · ' + g.faltan + ' ítem(s) sin lista (estimados al 30%)' : '') + '</div>' +
       (g.saldo ? '<div style="font-size:10px;font-weight:800;color:#059669;margin-top:5px;text-align:center">💳 Tu saldo actual registrado en PSA: $' + Math.round(g.saldo).toLocaleString('es-AR') + (g.dev ? ' · dev. ' + esc(g.dev.fecha) : '') + '</div>' : '') +
       '</div>';
     host.innerHTML = html;
   }
-
   window.abrirLista = abrirLista;
 })();

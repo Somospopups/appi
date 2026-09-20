@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v903-fix-doble-recarga-sw';
+const CACHE_NAME = 'appi-v904-desglose-individual-exacto-ganancias';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
