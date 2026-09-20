@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "893.0.0",
-  "cacheName": "appi-v893-cesto-rojo-mas-fuerte",
+  "version": "894.0.0",
+  "cacheName": "appi-v894-motion-graphics-pildora-fab",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {
