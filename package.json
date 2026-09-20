@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "900.0.0",
-  "cacheName": "appi-v900-porcentaje-saldo-textos-centrados",
+  "version": "901.0.0",
+  "cacheName": "appi-v901-fix-layout-shift-y-entrada-suave",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

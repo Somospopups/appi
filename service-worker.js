@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v900-porcentaje-saldo-textos-centrados';
+const CACHE_NAME = 'appi-v901-fix-layout-shift-y-entrada-suave';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
