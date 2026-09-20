@@ -359,21 +359,30 @@
       '.lp-sheet h2{margin:0;font-size:16px;font-weight:950;color:#2a2a32}' +
       '.lp-sheet-top{display:flex;align-items:center;justify-content:space-between;margin:0 0 10px}' +
       '.lp-sheet-top button{border:0;background:transparent;font-size:22px;line-height:1;color:#2a2a32;cursor:pointer}' +
-      '.lp-gan{margin:0 0 12px;border:1px solid rgba(11,88,120,.22);border-radius:14px;background:linear-gradient(135deg,rgba(11,88,120,.07),rgba(58,208,164,.10));padding:10px 12px}' +
+      '.lp-gan{margin:0 0 14px;border:1px solid rgba(11,88,120,.22);border-radius:16px;background:linear-gradient(135deg,rgba(11,88,120,.07),rgba(58,208,164,.10));padding:12px 14px}' +
       '.lp-gan-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px}' +
       '.lp-gan-head b{font-size:11px;font-weight:950;color:#0b5878;letter-spacing:.4px}' +
       '.lp-gan-head span{font-size:10px;color:#686977;text-align:right;line-height:1.25}' +
-      '.lp-gan-num{font-size:24px;font-weight:950;color:#0b5878;margin:2px 0 6px}' +
-      '.lp-gan-num i{font-style:normal;font-size:11px;font-weight:850;color:#23826b;margin-left:8px}' +
-      '.lp-gan-detalle{display:flex;flex-direction:column;gap:2px;margin-bottom:6px;max-height:96px;overflow:auto}' +
+      '.lp-gan-num{font-size:24px;font-weight:950;color:#0b5878;margin:2px 0 8px}' +
+      '.lp-gan-num i{font-style:normal;font-size:11.5px;font-weight:850;color:#23826b;margin-left:8px}' +
+      '.lp-gan-cards{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0 10px}' +
+      '.lp-gan-card{background:#ffffff;border-radius:12px;padding:9px 10px;border:1px solid rgba(0,0,0,.08);box-shadow:0 2px 6px rgba(0,0,0,.04);display:flex;flex-direction:column}' +
+      '.lp-gan-card-tit{font-size:10.5px;font-weight:800;color:#52525b;display:flex;align-items:center;gap:4px;margin-bottom:3px}' +
+      '.lp-gan-card-val{font-size:15px;font-weight:950;color:#0b5878;line-height:1.2}' +
+      '.lp-gan-card-sub{font-size:9.5px;color:#71717a;margin-top:3px;line-height:1.2}' +
+      '.lp-gan-card.saldo-card .lp-gan-card-val{color:#059669}' +
+      '.lp-gan-detalle{display:flex;flex-direction:column;gap:3px;margin:6px 0;max-height:96px;overflow:auto}' +
       '.lp-gan-detalle span{font-size:11px;color:#4a4b57}' +
       '.lp-gan-detalle b{color:#0b5878}' +
       '.lp-gan-detalle em{font-style:normal;font-size:9px;background:#fff3cd;color:#8a6d1a;padding:1px 5px;border-radius:6px;font-weight:850}' +
-      '.lp-gan-foot{font-size:10px;color:#85889a;margin-bottom:8px;line-height:1.4}' +
-      '.lp-gan-saldo{font-size:10px;font-weight:800;color:#23826b;margin-bottom:8px}' +
-      '.lp-gan-wa{width:100%;border:0;border-radius:12px;background:#23826b;color:#fff;font-size:13px;font-weight:950;padding:10px 0;cursor:pointer}' +
+      '.lp-gan-foot{font-size:10px;color:#85889a;margin-top:6px;line-height:1.4}' +
       'body.dark .lp-gan{background:rgba(11,88,120,.18);border-color:rgba(58,208,164,.35)}' +
       'body.dark .lp-gan-head b,body.dark .lp-gan-num,body.dark .lp-gan-num i{color:#3ad0a4}' +
+      'body.dark .lp-gan-card{background:#25273a;border-color:rgba(255,255,255,.08)}' +
+      'body.dark .lp-gan-card-tit{color:#a1a1aa}' +
+      'body.dark .lp-gan-card-sub{color:#94a3b8}' +
+      'body.dark .lp-gan-card-val{color:#38bdf8}' +
+      'body.dark .lp-gan-card.saldo-card .lp-gan-card-val{color:#34d399}' +
       'body.dark .lp-gan-detalle span{color:#c9cbdb}' +
       'body.dark .lp-gan-detalle b{color:#3ad0a4}' +
       '.lp-para{width:100%;min-height:42px;border:1px solid rgba(196,164,92,.45);border-radius:12px;padding:8px 10px;font:inherit;font-size:14px;background:#faf6ee;margin:0 0 10px}' +
@@ -2165,14 +2174,34 @@
     }
     var g = gananciaResumen();
     var pct = Math.round(g.margen * 100);
+
+    // Liquidación con tarjeta de crédito:
+    // Retiro en mano: hasta el 30% del total cobrado (o el total de ganancia si fuera menor al 30%)
+    // Saldo en cuenta PSA: el remanente de ganancia que supere el 30%
+    var maxEnMano30 = Math.round(g.cobro * 0.30);
+    var enMano = Math.min(Math.round(g.total), maxEnMano30);
+    var saldoPsa = Math.max(0, Math.round(g.total) - enMano);
+
     var html = '<div class="lp-gan">' +
       '<div class="lp-gan-head"><b>🔒 SOLO PARA VOS</b><span>Estos datos solo quedan para vos.<br/>Nunca serán entregados a tus usuarios</span></div>' +
-      '<div class="lp-gan-num">$' + Math.round(g.total).toLocaleString('es-AR') + '<i>≈ ' + pct + '% del total</i></div>' +
+      '<div class="lp-gan-num">$' + Math.round(g.total).toLocaleString('es-AR') + '<i>≈ ' + pct + '% ganancia real</i></div>' +
+      '<div class="lp-gan-cards">' +
+        '<div class="lp-gan-card">' +
+          '<div class="lp-gan-card-tit">💵 En mano (30%)</div>' +
+          '<div class="lp-gan-card-val">$' + enMano.toLocaleString('es-AR') + '</div>' +
+          '<div class="lp-gan-card-sub">Pedís 1° al 5 (a tu CBU)</div>' +
+        '</div>' +
+        '<div class="lp-gan-card saldo-card">' +
+          '<div class="lp-gan-card-tit">💳 Saldo en Cuenta PSA</div>' +
+          '<div class="lp-gan-card-val">$' + saldoPsa.toLocaleString('es-AR') + '</div>' +
+          '<div class="lp-gan-card-sub">' + (saldoPsa > 0 ? 'A favor p/ pedidos o canjes' : 'Sin remanente') + '</div>' +
+        '</div>' +
+      '</div>' +
       '<div class="lp-gan-detalle">' + g.lineas.map(function (l) {
         return '<span>' + l.q + '× ' + esc(String(l.nombre).replace(/\s*\(PLAN CANJE\)\s*$/i, '')) + ' <b>$' + Math.round(l.ganU).toLocaleString('es-AR') + '/u</b>' + (l.estimado ? ' <em>est. 30%</em>' : '') + '</span>';
       }).join('') + '</div>' +
       '<div class="lp-gan-foot">Costo: ' + esc(g.colLab) + (g.vigencia ? ' · Lista PSA ' + esc(g.vigencia) : '') + (g.faltan ? ' · ' + g.faltan + ' ítem(s) sin lista (estimados al 30%)' : '') + '</div>' +
-      (g.saldo ? '<div class="lp-gan-saldo">💳 Saldo en tu cuenta PSA: $' + Math.round(g.saldo).toLocaleString('es-AR') + (g.dev ? ' · última devolución ' + esc(g.dev.fecha) : '') + ' · la pedís del 1° al 5 (se acredita el 12)</div>' : '') +
+      (g.saldo ? '<div style="font-size:10px;font-weight:800;color:#059669;margin-top:5px">💳 Tu saldo actual registrado en PSA: $' + Math.round(g.saldo).toLocaleString('es-AR') + (g.dev ? ' · dev. ' + esc(g.dev.fecha) : '') + '</div>' : '') +
       '</div>';
     host.innerHTML = html;
   }

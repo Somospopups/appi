@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v898-sonido-arrugar-papel-y-restar-organico';
+const CACHE_NAME = 'appi-v899-desglose-ganancias-tarjeta-saldo';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

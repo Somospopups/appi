@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "898.0.0",
-  "cacheName": "appi-v898-sonido-arrugar-papel-y-restar-organico",
+  "version": "899.0.0",
+  "cacheName": "appi-v899-desglose-ganancias-tarjeta-saldo",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {
