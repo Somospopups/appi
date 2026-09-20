@@ -171,30 +171,71 @@ function renderUsers(){
     const expires=user.membresia_vence?new Date(user.membresia_vence).toLocaleDateString('es-AR'):'—';
     const abierto=state.userAbierto===user.user_id;
     const diaPago = user.dia_pago;
-    const diaPagoHtml = `<div class="admin-mem-label" style="margin-top:10px">Día de pago — compromiso</div>
-      <div class="dia-pago-row" style="display:flex;gap:8px;align-items:center;margin:6px 0 8px">
-        <button type="button" class="dia-pago-btn ${diaPago===12?'active':''}" data-admin-action="dia_pago" data-dia="12" style="flex:1;padding:10px;border-radius:12px;border:1.5px solid ${diaPago===12?'#5b8def':'rgba(0,0,0,.08)'};background:${diaPago===12?'linear-gradient(135deg,#0b5878,#3ad0a4)':'#fff'};color:${diaPago===12?'#fff':'#3d3e4c'};font-weight:800;font-size:14px;cursor:pointer">12</button>
-        <button type="button" class="dia-pago-btn ${diaPago===22?'active':''}" data-admin-action="dia_pago" data-dia="22" style="flex:1;padding:10px;border-radius:12px;border:1.5px solid ${diaPago===22?'#5b8def':'rgba(0,0,0,.08)'};background:${diaPago===22?'linear-gradient(135deg,#0b5878,#3ad0a4)':'#fff'};color:${diaPago===22?'#fff':'#3d3e4c'};font-weight:800;font-size:14px;cursor:pointer">22</button>
-        <span style="font-size:11px;color:${diaPago?'#5b8def':'#9a9aab'};font-weight:700;white-space:nowrap">${diaPago?`→ día ${diaPago}`:'sin asignar'}</span>
+    const tel = state.telefonos.get(user.user_id) || "";
+    const tCuenta = tipoCuenta(user);
+
+    const acciones = abierto ? `<div class="admin-ficha-clean">
+      <!-- 1. ACCIONES PRIORITARIAS -->
+      <div class="admin-prio-actions">
+        <button type="button" class="admin-btn-hero-wa" data-admin-action="whatsapp_dist">
+          <span class="icon">💬</span> WhatsApp
+        </button>
+        <button type="button" class="admin-btn-hero-pago" data-admin-action="payment">
+          <span class="icon">💳</span> Registrar pago
+        </button>
       </div>
-      <div style="font-size:11px;color:#777887;line-height:1.3;margin:-4px 0 8px">Elegí 12 o 22. El usuario verá un popup sutil 2 días antes (10-12 o 20-22).</div>`;
-    const acciones=abierto?`<div class="admin-user-acciones">
-      <div class="admin-mem-label">Membresía</div>
-      <button type="button" class="trial" data-admin-action="trial">🧪 Prueba 5 días</button>
-      <button type="button" class="mes" data-admin-action="month">📅 1 mes completo</button>
-      <button type="button" class="forever" data-admin-action="forever">♾️ Para siempre</button>
-      <button type="button" class="prorroga" data-admin-action="grace_period">📅 Prórroga</button>
-      ${diaPagoHtml}
-      <div class="admin-mem-label">Acciones</div>
-      <button type="button" class="wa" data-admin-action="whatsapp_dist">💬 WhatsApp</button>
-      <button type="button" class="ticket" data-admin-action="ticket">🎫 Ticket</button>
-      <button type="button" class="pago" data-admin-action="payment">💳 Registrar pago</button>
-      <button type="button" data-admin-action="password">🔑 Nueva contraseña</button>
-      <button type="button" data-admin-action="people">👥 Personas</button>
-      <button type="button" data-admin-action="phone">📱 Teléfono</button>
-      <button type="button" class="${user.activo?'danger':'good'}" data-admin-action="active" data-active="${user.activo?'0':'1'}">${user.activo?'⛔ Bloquear':'✓ Activar'}</button>
-      <button type="button" class="danger" data-admin-action="delete" style="grid-column:1/-1">🗑 Eliminar la cuenta</button>
-    </div>`:'';
+
+      <!-- 2. MEMBRESÍA Y DÍA DE PAGO COMPACTOS -->
+      <div class="admin-section-box">
+        <div class="admin-sec-title">MEMBRESÍA & COMPROMISO</div>
+        <div class="admin-pill-group">
+          <button type="button" class="admin-pill ${tCuenta==='prueba'?'active':''}" data-admin-action="trial">🧪 Prueba 5d</button>
+          <button type="button" class="admin-pill ${tCuenta==='mes'?'active':''}" data-admin-action="month">📅 1 Mes</button>
+          <button type="button" class="admin-pill ${tCuenta==='siempre'?'active':''}" data-admin-action="forever">♾️ Siempre</button>
+          <button type="button" class="admin-pill ${tCuenta==='prorroga'?'active':''}" data-admin-action="grace_period">⏳ Prórroga</button>
+        </div>
+        <div class="admin-pago-selector">
+          <span>Día de pago:</span>
+          <div class="admin-pago-pills">
+            <button type="button" class="dia-pago-btn ${diaPago===12?'active':''}" data-admin-action="dia_pago" data-dia="12">12</button>
+            <button type="button" class="dia-pago-btn ${diaPago===22?'active':''}" data-admin-action="dia_pago" data-dia="22">22</button>
+            <span class="dia-pago-tag">${diaPago ? `Día ${diaPago}` : 'Sin asignar'}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. GESTIÓN Y HERRAMIENTAS -->
+      <div class="admin-section-box">
+        <div class="admin-sec-title">DATOS & HERRAMIENTAS</div>
+        <div class="admin-tools-grid">
+          <button type="button" class="admin-tool-btn" data-admin-action="phone">
+            <span>📱</span> Tel: ${tel ? esc(tel) : 'Cargar'}
+          </button>
+          <button type="button" class="admin-tool-btn" data-admin-action="password">
+            <span>🔑</span> Cambiar clave
+          </button>
+          <button type="button" class="admin-tool-btn" data-admin-action="ticket">
+            <span>🎫</span> Ver Ticket
+          </button>
+          <button type="button" class="admin-tool-btn" data-admin-action="people">
+            <span>👥</span> Equipo
+          </button>
+        </div>
+      </div>
+
+      <!-- 4. ZONA DE SEGURIDAD DISCRETA -->
+      <details class="admin-danger-details">
+        <summary>⚙️ Más opciones (Bloquear / Eliminar)</summary>
+        <div class="admin-danger-body">
+          <button type="button" class="admin-sec-btn ${user.activo?'warn':'good'}" data-admin-action="active" data-active="${user.activo?'0':'1'}">
+            ${user.activo ? '⛔ Bloquear acceso' : '✓ Desbloquear cuenta'}
+          </button>
+          <button type="button" class="admin-sec-btn danger" data-admin-action="delete">
+            🗑 Eliminar cuenta definitivamente
+          </button>
+        </div>
+      </details>
+    </div>` : '';
     return `<article class="admin-user-row" data-admin-user="${esc(user.user_id)}">
       <button type="button" class="admin-user-head" data-user-toggle="${esc(user.user_id)}">
         <div><h3>${esc(user.nombre||'Sin nombre')}${user.socio_nombre?` + ${esc(user.socio_nombre)}`:''}</h3>

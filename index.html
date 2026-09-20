@@ -4654,7 +4654,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v923 · Segura</div>
+  <div class="ds-foot">APPI · v924 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4938,7 +4938,7 @@ body.dark #pageTabs button.active{color:#c5d6ff}
       <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
 
       <div class="home-brand-row">
-        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · 923</span></span>
+        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · 924</span></span>
       </div>
 
       <div class="home-hero-card">
@@ -6102,6 +6102,284 @@ body.dark .admin-user-acciones .admin-mem-label {
   border-radius: 14px !important;
   padding: 8px 10px !important;
   transition: all 0.2s !important;
+}
+
+  /* ============================================================
+   APPI · Estilos Ficha Limpia de Cuenta (Admin)
+   ============================================================ */
+
+.admin-ficha-clean {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(80, 90, 130, 0.1);
+}
+
+/* 1. Botones Principales (WhatsApp y Registrar Pago) */
+.admin-prio-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.admin-btn-hero-wa,
+.admin-btn-hero-pago {
+  border: none !important;
+  border-radius: 14px !important;
+  padding: 10px 12px !important;
+  font-size: 13.5px !important;
+  font-weight: 850 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  cursor: pointer;
+  transition: all 0.18s cubic-bezier(0.2, 0.8, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.admin-btn-hero-wa {
+  background: linear-gradient(135deg, #25d366, #128c7e) !important;
+  color: #ffffff !important;
+}
+.admin-btn-hero-wa:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(37, 211, 102, 0.25);
+}
+
+.admin-btn-hero-pago {
+  background: linear-gradient(135deg, #0b5878, #3ad0a4) !important;
+  color: #ffffff !important;
+}
+.admin-btn-hero-pago:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(11, 88, 120, 0.25);
+}
+
+/* 2. Cajas de Sección */
+.admin-section-box {
+  background: rgba(248, 250, 252, 0.7);
+  border: 1px solid rgba(80, 90, 130, 0.1);
+  border-radius: 14px;
+  padding: 10px 12px;
+}
+body.dark .admin-section-box {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.admin-sec-title {
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.6px;
+  color: #777887;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+body.dark .admin-sec-title {
+  color: #94a3b8;
+}
+
+/* Pastillas de Membresía */
+.admin-pill-group {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 5px;
+  margin-bottom: 8px;
+}
+
+.admin-pill {
+  background: #ffffff;
+  border: 1.5px solid rgba(80, 90, 130, 0.14);
+  border-radius: 10px;
+  padding: 7px 4px;
+  font-size: 11px;
+  font-weight: 800;
+  color: #1c1c1e;
+  cursor: pointer;
+  transition: all 0.16s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+}
+body.dark .admin-pill {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.12);
+  color: #f1f5f9;
+}
+.admin-pill.active {
+  background: #0b5878 !important;
+  color: #ffffff !important;
+  border-color: #0b5878 !important;
+  box-shadow: 0 3px 8px rgba(11, 88, 120, 0.25);
+}
+body.dark .admin-pill.active {
+  background: #38bdf8 !important;
+  color: #0f172a !important;
+  border-color: #38bdf8 !important;
+}
+
+/* Selector Día de Pago */
+.admin-pago-selector {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 6px;
+  border-top: 1px dashed rgba(80, 90, 130, 0.12);
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #1c1c1e;
+}
+body.dark .admin-pago-selector {
+  color: #e2e8f0;
+}
+
+.admin-pago-pills {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dia-pago-btn {
+  width: 32px;
+  height: 30px;
+  border-radius: 8px;
+  border: 1.5px solid rgba(80, 90, 130, 0.16);
+  background: #ffffff;
+  font-size: 12px;
+  font-weight: 850;
+  color: #1c1c1e;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+body.dark .dia-pago-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+.dia-pago-btn.active {
+  background: #0b5878 !important;
+  color: #ffffff !important;
+  border-color: #0b5878 !important;
+}
+body.dark .dia-pago-btn.active {
+  background: #38bdf8 !important;
+  color: #0f172a !important;
+  border-color: #38bdf8 !important;
+}
+
+.dia-pago-tag {
+  font-size: 10.5px;
+  color: #0b5878;
+  font-weight: 800;
+  margin-left: 2px;
+}
+body.dark .dia-pago-tag {
+  color: #7dd3fc;
+}
+
+/* 3. Grilla de Herramientas */
+.admin-tools-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+}
+
+.admin-tool-btn {
+  background: #ffffff;
+  border: 1px solid rgba(80, 90, 130, 0.12);
+  border-radius: 10px;
+  padding: 8px 10px;
+  font-size: 11.5px;
+  font-weight: 750;
+  color: #1c1c1e;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s;
+}
+body.dark .admin-tool-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #f1f5f9;
+}
+.admin-tool-btn:hover {
+  background: rgba(11, 88, 120, 0.06);
+  border-color: #0b5878;
+  transform: translateY(-1px);
+}
+body.dark .admin-tool-btn:hover {
+  background: rgba(56, 189, 248, 0.12);
+  border-color: #38bdf8;
+}
+
+/* 4. Menú de Seguridad Desplegable */
+.admin-danger-details {
+  border-radius: 12px;
+  background: transparent;
+}
+.admin-danger-details summary {
+  font-size: 11px;
+  font-weight: 800;
+  color: #777887;
+  cursor: pointer;
+  user-select: none;
+  padding: 4px 6px;
+  border-radius: 6px;
+  transition: color 0.15s;
+}
+.admin-danger-details summary:hover {
+  color: #ef4444;
+}
+.admin-danger-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 6px;
+  padding: 8px;
+  border-radius: 12px;
+  background: rgba(239, 68, 68, 0.05);
+  border: 1px dashed rgba(239, 68, 68, 0.2);
+}
+.admin-sec-btn {
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-size: 11.5px;
+  font-weight: 800;
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-align: center;
+}
+.admin-sec-btn.warn {
+  background: #fff;
+  border-color: rgba(245, 158, 11, 0.3);
+  color: #b45309;
+}
+body.dark .admin-sec-btn.warn {
+  background: #1e293b;
+  color: #fbbf24;
+}
+.admin-sec-btn.good {
+  background: #fff;
+  border-color: rgba(16, 185, 129, 0.3);
+  color: #059669;
+}
+.admin-sec-btn.danger {
+  background: #fff;
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #dc2626;
+}
+body.dark .admin-sec-btn.danger {
+  background: #1e293b;
+  color: #f87171;
 }
 
   </style>
@@ -13745,8 +14023,8 @@ function cerrarToolsMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='923';
-      const CACHE_NAME='appi-v923-admin-redesign-sort';
+      const swVersion='924';
+      const CACHE_NAME='appi-v924-admin-ficha-clean';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
