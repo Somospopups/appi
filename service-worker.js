@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v889-simplificar-acciones-carrito';
+const CACHE_NAME = 'appi-v890-quitar-wa-ganancias';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

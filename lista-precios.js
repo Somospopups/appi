@@ -2029,11 +2029,8 @@
       }).join('') + '</div>' +
       '<div class="lp-gan-foot">Costo: ' + esc(g.colLab) + (g.vigencia ? ' · Lista PSA ' + esc(g.vigencia) : '') + (g.faltan ? ' · ' + g.faltan + ' ítem(s) sin lista (estimados al 30%)' : '') + '</div>' +
       (g.saldo ? '<div class="lp-gan-saldo">💳 Saldo en tu cuenta PSA: $' + Math.round(g.saldo).toLocaleString('es-AR') + (g.dev ? ' · última devolución ' + esc(g.dev.fecha) : '') + ' · la pedís del 1° al 5 (se acredita el 12)</div>' : '') +
-      '<button type="button" class="lp-gan-wa" data-wa>📲 Enviarme a WhatsApp</button>' +
       '</div>';
     host.innerHTML = html;
-    var wa = host.querySelector('[data-wa]');
-    if (wa) wa.onclick = enviarGananciaWa;
   }
 
   window.abrirLista = abrirLista;
