@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "895.0.0",
-  "cacheName": "appi-v895-gotita-audio-smooth-motion",
+  "version": "896.0.0",
+  "cacheName": "appi-v896-sonidos-eliminar-y-cesto",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

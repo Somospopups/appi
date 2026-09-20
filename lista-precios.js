@@ -616,6 +616,81 @@
       } catch (e) {}
     }
 
+    // Sonido de restar / quitar producto (Pop descendente suave)
+    function sonarQuitar() {
+      try {
+        var AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        if (!window._lpAudioCtx) window._lpAudioCtx = new AudioCtx();
+        var ctx = window._lpAudioCtx;
+        if (ctx.state === 'suspended') ctx.resume();
+
+        var t0 = ctx.currentTime;
+        var osc = ctx.createOscillator();
+        var gain = ctx.createGain();
+
+        osc.type = 'sine';
+        // Pitch descendente suave de 800Hz a 320Hz
+        osc.frequency.setValueAtTime(800, t0);
+        osc.frequency.exponentialRampToValueAtTime(320, t0 + 0.09);
+
+        gain.gain.setValueAtTime(0, t0);
+        gain.gain.linearRampToValueAtTime(0.15, t0 + 0.005);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.11);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start(t0);
+        osc.stop(t0 + 0.12);
+      } catch (e) {}
+    }
+
+    // Sonido de papelera / vaciar pedido completo (Efecto whoosh acústico de descarte)
+    function sonarVaciar() {
+      try {
+        var AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        if (!window._lpAudioCtx) window._lpAudioCtx = new AudioCtx();
+        var ctx = window._lpAudioCtx;
+        if (ctx.state === 'suspended') ctx.resume();
+
+        var t0 = ctx.currentTime;
+
+        // Oscilador 1: Tono grave que cae con resonancia de cesto metálico
+        var osc = ctx.createOscillator();
+        var gain = ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(420, t0);
+        osc.frequency.exponentialRampToValueAtTime(110, t0 + 0.22);
+
+        gain.gain.setValueAtTime(0, t0);
+        gain.gain.linearRampToValueAtTime(0.22, t0 + 0.015);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.24);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(t0);
+        osc.stop(t0 + 0.25);
+
+        // Ruido simulado con modulación rápida (swish / papelera)
+        var osc2 = ctx.createOscillator();
+        var gain2 = ctx.createGain();
+        osc2.type = 'sawtooth';
+        osc2.frequency.setValueAtTime(260, t0 + 0.04);
+        osc2.frequency.exponentialRampToValueAtTime(60, t0 + 0.20);
+
+        gain2.gain.setValueAtTime(0, t0);
+        gain2.gain.setValueAtTime(0.09, t0 + 0.04);
+        gain2.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.22);
+
+        osc2.connect(gain2);
+        gain2.connect(ctx.destination);
+        osc2.start(t0 + 0.04);
+        osc2.stop(t0 + 0.23);
+      } catch (e) {}
+    }
+
     // Animación motion graphics
     if (eraOculto) {
       fab.classList.remove('anim-bump');
@@ -994,6 +1069,7 @@
     setTimeout(function () { hintChips($('lpBancos')); }, 280);
     var clr = $('lpSheetClear');
     if (clr) clr.onclick = function () {
+      sonarVaciar();
       guardarCarrito({});
       cerrarSheet();
       pintarTodo();
@@ -1765,7 +1841,12 @@
       var sku = row.getAttribute('data-sku');
       var act = btn ? btn.getAttribute('data-act') : 'mas';
       var n = qty(sku);
-      setQty(sku, act === 'menos' ? n - 1 : n + 1);
+      if (act === 'menos') {
+        sonarQuitar();
+        setQty(sku, n - 1);
+      } else {
+        setQty(sku, n + 1);
+      }
       pintarTodo();
     };
     var sheet = $('lpSheetLines');
@@ -1777,7 +1858,9 @@
         if (!btn || !row) return;
         var sku = row.getAttribute('data-sku');
         var n = qty(sku);
-        setQty(sku, btn.getAttribute('data-act') === 'menos' ? n - 1 : n + 1);
+        var isMenos = btn.getAttribute('data-act') === 'menos';
+        if (isMenos) sonarQuitar();
+        setQty(sku, isMenos ? n - 1 : n + 1);
         pintarTodo();
       };
     }
