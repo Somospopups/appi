@@ -1359,7 +1359,6 @@
     if (!eq || !eq.length) return null;
 
     var hoy = hoyKey();
-    var now = new Date();
 
     // PB Total Acumulado del equipo en el mes
     var sumaPersonas = 0;
@@ -1394,7 +1393,7 @@
         var delta = actual - inicio;
         pbHoy += delta;
         var p = eq.find(function(item){ return String(item.codigo || item.id || item.nombre || "").trim() === cod; });
-        if (p) movimientosHoy.push({ nombre: pilaDe(p.nombre || "Distribuidor"), delta: delta, total: actual });
+        if (p) movimientosHoy.push({ nombre: pilaDe(p.nombre || "Distribuidor"), delta: delta, total: actual, cat: p.cat || "" });
       }
     });
 
@@ -1406,13 +1405,33 @@
     var activos = eq.filter(function(p){ return Number(p.pnAct != null ? p.pnAct : (p.pbPersonal || 0)) > 0; }).length;
     var pctActivos = eq.length ? Math.round((activos / eq.length) * 100) : 0;
 
-    var detalleMov = "";
+    // Top 3 distribuidores destacados para llenar el espacio con contenido valioso
+    var topProductores = [...eq].filter(function(p){
+      return Number(p.pnAct != null ? p.pnAct : (p.pbPersonal || 0)) > 0;
+    }).sort(function(a,b){
+      return (Number(b.pnAct != null ? b.pnAct : (b.pbPersonal || 0))) - (Number(a.pnAct != null ? a.pnAct : (a.pbPersonal || 0)));
+    }).slice(0, 3);
+
+    var bloqueDetalle = "";
     if (movimientosHoy.length > 0) {
-      detalleMov = '<div class="ht-pb-mov-list">' +
-        movimientosHoy.slice(0, 3).map(function(m){
-          return '<span>⭐ <b>+' + fmtPB(m.delta) + ' PB</b> ' + esc(m.nombre) + '</span>';
-        }).join("") +
-        (movimientosHoy.length > 3 ? '<small>y ' + (movimientosHoy.length - 3) + ' más</small>' : "") +
+      bloqueDetalle = '<div class="ht-pb-destacados">' +
+        '<span class="ht-pb-dest-tit">🔥 Sumaron hoy:</span>' +
+        '<div class="ht-pb-mov-list">' +
+          movimientosHoy.slice(0, 3).map(function(m){
+            return '<div class="ht-pb-mov-row"><span>' + esc(m.nombre) + (m.cat ? ' <small>(' + m.cat + ')</small>' : '') + '</span><b>+' + fmtPB(m.delta) + ' PB</b></div>';
+          }).join("") +
+        '</div>' +
+      '</div>';
+    } else if (topProductores.length > 0) {
+      bloqueDetalle = '<div class="ht-pb-destacados">' +
+        '<span class="ht-pb-dest-tit">🏆 Mayor volumen acumulado:</span>' +
+        '<div class="ht-pb-mov-list">' +
+          topProductores.map(function(p, i){
+            var medallas = ["🥇", "🥈", "🥉"];
+            var v = Number(p.pnAct != null ? p.pnAct : (p.pbPersonal || 0));
+            return '<div class="ht-pb-mov-row"><span>' + medallas[i] + ' ' + esc(pilaDe(p.nombre || "Distribuidor")) + (p.cat ? ' <small>(' + p.cat + ')</small>' : '') + '</span><b>' + fmtPB(v) + ' PB</b></div>';
+          }).join("") +
+        '</div>' +
       '</div>';
     }
 
@@ -1420,14 +1439,14 @@
       '<div class="ht-pb-card pb-hoy">' +
         '<span class="ht-pb-card-lbl">⚡ PB de Hoy</span>' +
         '<b class="ht-pb-card-val">' + (pbHoy > 0 ? ("+" + fmtPB(pbHoy)) : "0") + ' <small>PB</small></b>' +
-        '<span class="ht-pb-card-sub">' + (pbHoy > 0 ? (movimientosHoy.length + " sumaron hoy") : "Sin cargas hoy aún") + '</span>' +
+        '<span class="ht-pb-card-sub">' + (pbHoy > 0 ? (movimientosHoy.length + (movimientosHoy.length === 1 ? " sumó hoy" : " sumaron hoy")) : "Sin cargas hoy") + '</span>' +
       '</div>' +
       '<div class="ht-pb-card pb-acum">' +
-        '<span class="ht-pb-card-lbl">📈 Acumulado del Mes</span>' +
+        '<span class="ht-pb-card-lbl">📈 Total del Mes</span>' +
         '<b class="ht-pb-card-val">' + fmtPB(totalAcumulado) + ' <small>PB</small></b>' +
-        '<span class="ht-pb-card-sub">' + activos + ' activos (' + pctActivos + '%)</span>' +
+        '<span class="ht-pb-card-sub">' + activos + ' de ' + eq.length + ' activos (' + pctActivos + '%)</span>' +
       '</div>' +
-    '</div>' + detalleMov;
+    '</div>' + bloqueDetalle;
 
     return {
       cat: "pb_equipo",
@@ -1435,12 +1454,11 @@
       kicker: "Producción · Mi Equipo",
       titulo: pbHoy > 0 ? ("¡Hoy el equipo sumó " + fmtPB(pbHoy) + " PB!") : "Producción del Equipo",
       html: html,
-      fab: {
-        ico: "👥",
-        label: "Ver Mi Equipo",
+      fab: null,
+      cta: {
+        label: "Ver Mi Equipo 👥",
         go: function(){ if (typeof window.openEquipo === "function") window.openEquipo(); else if (typeof window.showView === "function") window.showView("view-equipo"); }
-      },
-      cta: null
+      }
     };
   }
 
@@ -1559,32 +1577,37 @@
       '.ht-card.ht-ganaste{background:linear-gradient(160deg,#f3fff8,#d8f5e6);border:2px solid #3ad0a4;box-shadow:0 22px 60px rgba(18,140,126,.22)}',
       'body.dark .ht-card.ht-ganaste{background:linear-gradient(160deg,#1a3328,#152820);border-color:#3ad0a4}',
       '.ht-card.ht-ganaste .ht-kicker{color:#178a6c}',
-      '.ht-pb-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:8px 0 10px}',
-      '.ht-pb-card{background:rgba(255,255,255,.9);border:1.5px solid rgba(11,88,120,.12);border-radius:16px;padding:12px 10px;display:flex;flex-direction:column;align-items:center;text-align:center;box-shadow:0 3px 10px rgba(0,0,0,.04)}',
-      '.ht-pb-card.pb-hoy{background:linear-gradient(145deg,rgba(254,249,195,.7),rgba(255,255,255,.95));border-color:rgba(234,179,8,.3)}',
-      '.ht-pb-card.pb-acum{background:linear-gradient(145deg,rgba(238,242,255,.7),rgba(255,255,255,.95));border-color:rgba(99,102,241,.25)}',
-      '.ht-pb-card-lbl{font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.3px;color:#71717a;margin-bottom:4px}',
+      '.ht-pb-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:6px 0 10px}',
+      '.ht-pb-card{background:rgba(255,255,255,.9);border:1.5px solid rgba(11,88,120,.12);border-radius:18px;padding:12px 10px;display:flex;flex-direction:column;align-items:center;text-align:center;box-shadow:0 4px 14px rgba(0,0,0,.05)}',
+      '.ht-pb-card.pb-hoy{background:linear-gradient(145deg,rgba(254,249,195,.75),rgba(255,255,255,.95));border-color:rgba(234,179,8,.35)}',
+      '.ht-pb-card.pb-acum{background:linear-gradient(145deg,rgba(238,242,255,.75),rgba(255,255,255,.95));border-color:rgba(99,102,241,.3)}',
+      '.ht-pb-card-lbl{font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.3px;color:#71717a;margin-bottom:3px}',
       '.ht-pb-card.pb-hoy .ht-pb-card-lbl{color:#b45309}',
       '.ht-pb-card.pb-acum .ht-pb-card-lbl{color:#4338ca}',
-      '.ht-pb-card-val{font-size:22px;font-weight:950;line-height:1.1;color:#1e293b}',
+      '.ht-pb-card-val{font-size:23px;font-weight:950;line-height:1.15;color:#1e293b}',
       '.ht-pb-card.pb-hoy .ht-pb-card-val{color:#d97706}',
       '.ht-pb-card.pb-acum .ht-pb-card-val{color:#4f46e5}',
       '.ht-pb-card-val small{font-size:11px;font-weight:900;opacity:.85}',
-      '.ht-pb-card-sub{font-size:10px;font-weight:750;color:#64748b;margin-top:4px;line-height:1.2}',
-      '.ht-pb-mov-list{display:flex;flex-direction:column;gap:4px;background:rgba(0,0,0,.03);border-radius:12px;padding:8px 10px;margin-top:4px}',
-      '.ht-pb-mov-list span{font-size:11px;font-weight:750;color:#334155;text-align:left}',
-      '.ht-pb-mov-list span b{color:#0b5878}',
-      '.ht-pb-mov-list small{font-size:9.5px;color:#94a3b8;font-weight:700}',
+      '.ht-pb-card-sub{font-size:10px;font-weight:750;color:#64748b;margin-top:3px;line-height:1.2}',
+      '.ht-pb-destacados{background:rgba(255,255,255,.65);border:1px solid rgba(0,0,0,.06);border-radius:14px;padding:9px 12px;margin-top:4px;display:flex;flex-direction:column;gap:5px}',
+      '.ht-pb-dest-tit{font-size:10.5px;font-weight:900;color:#475569;text-align:left;letter-spacing:.2px}',
+      '.ht-pb-mov-list{display:flex;flex-direction:column;gap:5px}',
+      '.ht-pb-mov-row{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:11.5px;font-weight:800;color:#1e293b}',
+      '.ht-pb-mov-row span{display:flex;align-items:center;gap:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
+      '.ht-pb-mov-row span small{font-size:9.5px;color:#64748b;font-weight:700}',
+      '.ht-pb-mov-row b{color:#0b5878;font-size:12px;font-weight:950;flex:none}',
       'body.dark .ht-pb-card{background:#232536;border-color:rgba(255,255,255,.1)}',
-      'body.dark .ht-pb-card.pb-hoy{background:linear-gradient(145deg,rgba(180,83,9,.2),#232536);border-color:rgba(245,158,11,.35)}',
-      'body.dark .ht-pb-card.pb-acum{background:linear-gradient(145deg,rgba(79,70,229,.2),#232536);border-color:rgba(99,102,241,.35)}',
+      'body.dark .ht-pb-card.pb-hoy{background:linear-gradient(145deg,rgba(180,83,9,.25),#232536);border-color:rgba(245,158,11,.35)}',
+      'body.dark .ht-pb-card.pb-acum{background:linear-gradient(145deg,rgba(79,70,229,.25),#232536);border-color:rgba(99,102,241,.35)}',
       'body.dark .ht-pb-card-val{color:#f8fafc}',
       'body.dark .ht-pb-card.pb-hoy .ht-pb-card-val{color:#fbbf24}',
       'body.dark .ht-pb-card.pb-acum .ht-pb-card-val{color:#818cf8}',
       'body.dark .ht-pb-card-sub{color:#94a3b8}',
-      'body.dark .ht-pb-mov-list{background:rgba(255,255,255,.05)}',
-      'body.dark .ht-pb-mov-list span{color:#e2e8f0}',
-      'body.dark .ht-pb-mov-list span b{color:#38bdf8}',
+      'body.dark .ht-pb-destacados{background:rgba(35,37,54,.7);border-color:rgba(255,255,255,.08)}',
+      'body.dark .ht-pb-dest-tit{color:#cbd5e1}',
+      'body.dark .ht-pb-mov-row{color:#f1f5f9}',
+      'body.dark .ht-pb-mov-row span small{color:#94a3b8}',
+      'body.dark .ht-pb-mov-row b{color:#38bdf8}',
       'body.dark .ht-card.ht-ganaste .ht-kicker{color:#3ad0a4}',
       '.ht-card.ht-ganaste h3{color:#146b54}',
       'body.dark .ht-card.ht-ganaste h3{color:#d8f5e6}',
