@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v922-organigrama-estable';
+const CACHE_NAME = 'appi-v923-admin-redesign-sort';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

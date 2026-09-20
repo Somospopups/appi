@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "922.0.0",
-  "cacheName": "appi-v922-organigrama-estable",
+  "version": "923.0.0",
+  "cacheName": "appi-v923-admin-redesign-sort",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

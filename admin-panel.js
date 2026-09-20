@@ -124,11 +124,16 @@ function tipoCuenta(user){
 }
 function filteredUsers(){
   const term=state.filter.toLowerCase().trim();
-  return state.users.filter(user=>{
+  const list = state.users.filter(user=>{
     if(user.rol==='admin') return false;
     if(state.cuentaFiltro && tipoCuenta(user)!==state.cuentaFiltro) return false;
     if(term && !`${user.nombre} ${user.socio_nombre||''} ${user.dip} ${user.sucursal} ${user.numero_distribuidor}`.toLowerCase().includes(term)) return false;
     return true;
+  });
+  return list.sort((a,b)=>{
+    const nA = (a.nombre||'').trim().toLowerCase();
+    const nB = (b.nombre||'').trim().toLowerCase();
+    return nA.localeCompare(nB, 'es', { numeric: true });
   });
 }
 function pintarFiltrosCuentas(){

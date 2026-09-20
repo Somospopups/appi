@@ -4654,7 +4654,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v922 · Segura</div>
+  <div class="ds-foot">APPI · v923 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4938,7 +4938,7 @@ body.dark #pageTabs button.active{color:#c5d6ff}
       <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
 
       <div class="home-brand-row">
-        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · 922</span></span>
+        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · 923</span></span>
       </div>
 
       <div class="home-hero-card">
@@ -5943,6 +5943,167 @@ body.dark #pageTabs button.active{color:#c5d6ff}
   body.dark .admin-user-acciones button.mes{background:rgba(39,181,196,.16);color:#7ee0c8;border-color:rgba(39,181,196,.28)}
   body.dark .admin-quick .q,body.dark .admin-atencion-row{background:rgba(31,32,49,.74);border-color:rgba(255,255,255,.08)}
   body.dark .admin-atencion-row b{color:#f1f1f6}
+  /* ============================================================
+   APPI · Rediseño Integral Panel de Administrador (Mobile & PC)
+   ============================================================ */
+
+/* Contenedor general */
+.admin-dashboard {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 12px 14px 80px;
+}
+
+/* En pantallas grandes (PC / Tablets): Disposición ejecutiva en dos columnas */
+@media (min-width: 900px) {
+  #adminPane-hoy {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 16px;
+    align-items: start;
+  }
+  #adminPane-hoy #adminHero {
+    grid-column: 1 / -1;
+  }
+  .admin-dashboard {
+    padding: 20px 24px 80px;
+  }
+}
+
+/* Tarjeta y lista de usuarios con estética glassmorphic suave */
+.admin-user-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.admin-user-row {
+  background: rgba(255, 255, 255, 0.82) !important;
+  border: 1px solid rgba(80, 90, 130, 0.12) !important;
+  border-radius: 18px !important;
+  padding: 12px 14px !important;
+  box-shadow: 0 4px 14px rgba(11, 88, 120, 0.04);
+  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+body.dark .admin-user-row {
+  background: rgba(28, 28, 30, 0.85) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+}
+
+.admin-user-row:hover {
+  border-color: rgba(11, 88, 120, 0.3) !important;
+  transform: translateY(-1px);
+}
+
+.admin-user-head {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 0;
+  text-align: left;
+  cursor: pointer;
+}
+
+.admin-user-head h3 {
+  font-size: 14.5px !important;
+  font-weight: 800 !important;
+  color: #1c1c1e !important;
+  letter-spacing: -0.2px;
+}
+body.dark .admin-user-head h3 {
+  color: #f4f4f6 !important;
+}
+
+.admin-user-head p {
+  font-size: 11.5px !important;
+  color: #777887 !important;
+  margin-top: 3px !important;
+  font-weight: 600;
+}
+body.dark .admin-user-head p {
+  color: #94a3b8 !important;
+}
+
+/* Badges de membresía limpios */
+.admin-user-badge {
+  font-size: 9.5px !important;
+  font-weight: 900 !important;
+  padding: 4px 9px !important;
+  border-radius: 99px !important;
+  letter-spacing: 0.3px;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Acciones agrupadas desplegables de cada cuenta */
+.admin-user-acciones {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed rgba(80, 90, 130, 0.15);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 8px;
+}
+
+.admin-user-acciones .admin-mem-label {
+  grid-column: 1 / -1;
+  font-size: 10.5px;
+  font-weight: 900;
+  color: #0b5878;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 4px;
+}
+body.dark .admin-user-acciones .admin-mem-label {
+  color: #7dd3fc;
+}
+
+.admin-user-acciones button {
+  min-height: 38px;
+  border-radius: 12px !important;
+  font-size: 11.5px !important;
+  font-weight: 750 !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.18s ease;
+  border: 1px solid rgba(80, 90, 130, 0.12);
+  cursor: pointer;
+}
+
+.admin-user-acciones button:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+}
+
+.admin-user-acciones button.wa {
+  background: #25d366 !important;
+  color: #ffffff !important;
+  border: none !important;
+  font-weight: 850 !important;
+}
+
+/* Barra de filtros de cuentas en PC y Móvil */
+.admin-cuentas-filtros {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)) !important;
+  gap: 8px !important;
+  margin-top: 10px !important;
+}
+
+.admin-cuentas-filtros button {
+  border-radius: 14px !important;
+  padding: 8px 10px !important;
+  transition: all 0.2s !important;
+}
+
   </style>
   <section id="view-admin" class="view admin-view">
     <header class="top admin-top">
@@ -13584,8 +13745,8 @@ function cerrarToolsMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='922';
-      const CACHE_NAME='appi-v922-organigrama-estable';
+      const swVersion='923';
+      const CACHE_NAME='appi-v923-admin-redesign-sort';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
