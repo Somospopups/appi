@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v925-fix-tab-selector';
+const CACHE_NAME = 'appi-v926-carrera-motivacional-limpia';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

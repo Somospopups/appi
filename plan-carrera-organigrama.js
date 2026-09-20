@@ -28,87 +28,113 @@
    LE (Líder Ejecutivo) -> EJ (Ejecutivo)
   */
 
-  var PLAN_REGLAS = {
-    'D': {
-      metaCat: 'D',
-      nombre: 'Distribuidor (D)',
-      metaBadge: 'Pase a Distribuidor',
-      tiempo: '1 mes calendario o arrastre',
+    var PLAN_REGLAS = {
+    "D": {
+      metaCat: "D",
+      nombre: "Distribuidor (D)",
+      metaBadge: "Subir a Distribuidor",
+      tiempo: "Meta mensual",
       personalReq: 13,
-      personalDesc: 'Tu volumen personal + DJ directos',
+      personalDesc: "13 PB (tu consumo, ventas o junto a tus DJ)",
       slots: [
-        { rol: 'DJ', rolesPermitidos: ['DJ', 'JUNIOR'], pbMin: 0, desc: 'Línea 1 · DJ directo' },
-        { rol: 'DJ', rolesPermitidos: ['DJ', 'JUNIOR'], pbMin: 0, desc: 'Línea 2 · DJ directo' }
+        { rol: "DJ", rolesPermitidos: ["DJ", "JUNIOR"], pbMin: 0, desc: "Línea 1 · Distribuidor Junior" },
+        { rol: "DJ", rolesPermitidos: ["DJ", "JUNIOR"], pbMin: 0, desc: "Línea 2 · Distribuidor Junior" }
       ],
       equipoPbTotal: 13,
-      beneficios: 'Descuento 3% en compras con PB + 5% sobre DJ directos + categoría confirmada.',
-      queFalta: 'Alcanzar 13 PB entre tus ventas y tus DJ directos, y completar la Capacitación Básica.'
-    },
-    'DC': {
-      metaCat: 'DC',
-      nombre: 'Distribuidor Calificado (DC)',
-      metaBadge: 'Pase a Distribuidor Calificado',
-      tiempo: '1 mes calendario',
-      personalReq: 13,
-      personalDesc: 'Tus PB personales (mín. 13 PB)',
-      slots: [
-        { rol: 'D', rolesPermitidos: ['D', 'DISTRIBUIDOR'], pbMin: 13, desc: 'Línea 1 · Distribuidor (mín. 13 PB)' },
-        { rol: 'D', rolesPermitidos: ['D', 'DISTRIBUIDOR'], pbMin: 13, desc: 'Línea 2 · Distribuidor (mín. 13 PB)' },
-        { rol: 'D', rolesPermitidos: ['D', 'DISTRIBUIDOR'], pbMin: 13, desc: 'Línea 3 · Distribuidor (mín. 13 PB)' }
+      porQueSubir: "Ganás más con menos esfuerzo: comprás con 3% de descuento extra y empezás a cobrar el 5% de las compras de tus directos.",
+      gananciasClave: [
+        "🎁 3% de descuento inmediato en tus compras",
+        "💵 5% de ganancia sobre tus Distribuidores Junior",
+        "🌟 Categoría oficial consolidada en PSA"
       ],
-      equipoPbTotal: 52, // 13 personal + 3x13 líneas
-      beneficios: 'Descuento 7% con PB, 15% sobre DJ, 10% sobre Distribuidores directos y 5% de asistencia.',
-      queFalta: 'Tener tus 13 PB personales y 3 Distribuidores directos con al menos 13 PB cada uno en el mes.'
+      queFalta: "Llegar a 13 PB entre tus pedidos y tus directos (aprox. 1 purificador Senior 4)."
     },
-    'CE': {
-      metaCat: 'CE',
-      nombre: 'Coordinador de Equipo (CE)',
-      metaBadge: 'Pase a Coordinador de Equipo',
-      tiempo: '2 meses calendario consecutivos',
-      personalReq: 50,
-      personalDesc: 'Volumen personal y grupo base (mín. 50 PB)',
+    "DC": {
+      metaCat: "DC",
+      nombre: "Distribuidor Calificado (DC)",
+      metaBadge: "Subir a Distribuidor Calificado",
+      tiempo: "Meta mensual",
+      personalReq: 13,
+      personalDesc: "13 PB personales mínimos",
       slots: [
-        { rol: 'DC', rolesPermitidos: ['DC', 'CALIFICADO', 'DISTRIBUIDOR CALIFICADO'], pbMin: 50, desc: 'Línea 1 · Distribuidor Calificado (mín. 50 PB)' },
-        { rol: 'DC', rolesPermitidos: ['DC', 'CALIFICADO', 'DISTRIBUIDOR CALIFICADO'], pbMin: 50, desc: 'Línea 2 · Distribuidor Calificado (mín. 50 PB)' },
-        { rol: 'DC', rolesPermitidos: ['DC', 'CALIFICADO', 'DISTRIBUIDOR CALIFICADO'], pbMin: 50, desc: 'Línea 3 · Distribuidor Calificado (mín. 50 PB)' }
+        { rol: "D", rolesPermitidos: ["D", "DISTRIBUIDOR"], pbMin: 13, desc: "Línea 1 · Distribuidor activo" },
+        { rol: "D", rolesPermitidos: ["D", "DISTRIBUIDOR"], pbMin: 13, desc: "Línea 2 · Distribuidor activo" },
+        { rol: "D", rolesPermitidos: ["D", "DISTRIBUIDOR"], pbMin: 13, desc: "Línea 3 · Distribuidor activo" }
+      ],
+      equipoPbTotal: 52,
+      porQueSubir: "Duplicás tus ganancias de red: pasás a cobrar 15% sobre tus Juniors y 10% de comisión pura sobre tus Distribuidores.",
+      gananciasClave: [
+        "💰 10% directo sobre lo que compren tus 3 distribuidores",
+        "🚀 15% de comisión sobre distribuidores junior",
+        "🏷️ 7% de descuento permanente en tus pedidos con PB",
+        "🛡️ 5% extra por asistencia a tus líneas"
+      ],
+      queFalta: "Tus 13 PB personales y 3 distribuidores activos con 13 PB cada uno este mes."
+    },
+    "CE": {
+      metaCat: "CE",
+      nombre: "Coordinador de Equipo (CE)",
+      metaBadge: "Subir a Coordinador de Equipo",
+      tiempo: "Calificación 2 meses",
+      personalReq: 50,
+      personalDesc: "50 PB personales o grupo base",
+      slots: [
+        { rol: "DC", rolesPermitidos: ["DC", "CALIFICADO", "DISTRIBUIDOR CALIFICADO"], pbMin: 50, desc: "Línea 1 · Calificado activo" },
+        { rol: "DC", rolesPermitidos: ["DC", "CALIFICADO", "DISTRIBUIDOR CALIFICADO"], pbMin: 50, desc: "Línea 2 · Calificado activo" },
+        { rol: "DC", rolesPermitidos: ["DC", "CALIFICADO", "DISTRIBUIDOR CALIFICADO"], pbMin: 50, desc: "Línea 3 · Calificado activo" }
       ],
       equipoPbTotal: 200,
-      beneficios: 'Compensaciones Flex del 18% sobre DJ, 13% sobre D y hasta 8% sobre organizaciones DC.',
-      queFalta: '3 Organizaciones de DC con 50 PB cada una durante 2 meses consecutivos + 5 Corazones en el año.'
+      porQueSubir: "Tu negocio empieza a trabajar para vos: cobrás hasta un 18% de comisiones por toda tu red y bonificaciones por volumen grupal.",
+      gananciasClave: [
+        "📈 Hasta 18% en compensaciones sobre compras de tu red",
+        "💎 Ingresos pasivos por el volumen de tus 3 organizaciones",
+        "🏆 Reconocimiento oficial y acceso a premios anuales PSA"
+      ],
+      queFalta: "3 líneas de Distribuidores Calificados con 50 PB cada una durante 2 meses consecutivos."
     },
-    'L': {
-      metaCat: 'L',
-      nombre: 'Líder de Equipo (L)',
-      metaBadge: 'Pase a Líder de Equipo',
-      tiempo: '2 a 3 meses consecutivos',
+    "L": {
+      metaCat: "L",
+      nombre: "Líder de Equipo (L)",
+      metaBadge: "Subir a Líder de Equipo",
+      tiempo: "Meta de liderazgo",
       personalReq: 50,
-      personalDesc: 'Volumen personal de calificación',
+      personalDesc: "50 PB calificación personal",
       slots: [
-        { rol: 'CE', rolesPermitidos: ['CE', 'COORDINADOR'], pbMin: 180, desc: 'Línea Coordinador (180+ PB)' },
-        { rol: 'DC', rolesPermitidos: ['DC', 'CALIFICADO'], pbMin: 50, desc: 'Línea 1 · Distribuidor Calificado (50+ PB)' },
-        { rol: 'DC', rolesPermitidos: ['DC', 'CALIFICADO'], pbMin: 50, desc: 'Línea 2 · Distribuidor Calificado (50+ PB)' },
-        { rol: 'D', rolesPermitidos: ['D', 'DISTRIBUIDOR'], pbMin: 13, desc: 'Línea Distribuidor Activo (13+ PB)' }
+        { rol: "CE", rolesPermitidos: ["CE", "COORDINADOR"], pbMin: 180, desc: "Línea Coordinador (180+ PB)" },
+        { rol: "DC", rolesPermitidos: ["DC", "CALIFICADO"], pbMin: 50, desc: "Línea Calificado (50+ PB)" },
+        { rol: "DC", rolesPermitidos: ["DC", "CALIFICADO"], pbMin: 50, desc: "Línea Calificado (50+ PB)" },
+        { rol: "D", rolesPermitidos: ["D", "DISTRIBUIDOR"], pbMin: 13, desc: "Línea Distribuidor (13+ PB)" }
       ],
       equipoPbTotal: 400,
-      beneficios: 'Máximo nivel de liderazgo, regalías de organización, Bonus 1 y Bonus 2 de red.',
-      queFalta: 'Desarrollar Coordinadores y DCs activos alcanzando 400 PB totales de red.'
+      porQueSubir: "Entrás en las grandes ligas: cobrás regalías de por vida, Bonus 1 y Bonus 2 de red y premios internacionales.",
+      gananciasClave: [
+        "👑 Regalías mensuales sobre todo el volumen de tu red",
+        "🔥 Acceso a Bonus 1 y Bonus 2 en efectivo",
+        "✈️ Calificación a viajes nacionales e internacionales de PSA"
+      ],
+      queFalta: "Tener 1 Coordinador (180 PB), 2 Calificados (50 PB c/u) y 1 Distribuidor (13 PB) sumando 400 PB totales."
     },
-    'LE': {
-      metaCat: 'LE',
-      nombre: 'Líder Ejecutivo (LE)',
-      metaBadge: 'Pase a Líder Ejecutivo',
-      tiempo: 'Calificación con Líderes calificados y volumen de grupo',
+    "LE": {
+      metaCat: "LE",
+      nombre: "Líder Ejecutivo (LE)",
+      metaBadge: "Subir a Líder Ejecutivo",
+      tiempo: "Máximo escalafón directivo",
       personalReq: 50,
-      personalDesc: 'Volumen personal y grupo base (mín. 50 PB)',
+      personalDesc: "50 PB personales o base",
       slots: [
-        { rol: 'L', rolesPermitidos: ['L', 'LIDER', 'LÍDER', 'LÍDER DE EQUIPO', 'LÍDER PIONERO'], rolDesarrollo: ['CE', 'COORDINADOR'], pbMin: 300, desc: 'Línea 1 · Líder calificado directo' },
-        { rol: 'L', rolesPermitidos: ['L', 'LIDER', 'LÍDER', 'LÍDER DE EQUIPO', 'LÍDER PIONERO'], rolDesarrollo: ['CE', 'COORDINADOR'], pbMin: 300, desc: 'Línea 2 · Líder calificado directo' },
-        { rol: 'CE', rolesPermitidos: ['CE', 'COORDINADOR'], rolDesarrollo: ['DC', 'CALIFICADO'], pbMin: 180, desc: 'Coordinador (CE) activo' },
-        { rol: 'DC', rolesPermitidos: ['DC', 'CALIFICADO'], rolDesarrollo: ['D', 'DISTRIBUIDOR'], pbMin: 50, desc: 'Distribuidor Calificado (DC)' }
+        { rol: "L", rolesPermitidos: ["L", "LIDER", "LÍDER", "LÍDER DE EQUIPO", "LÍDER PIONERO"], rolDesarrollo: ["CE", "COORDINADOR"], pbMin: 300, desc: "Línea 1 · Líder calificado" },
+        { rol: "L", rolesPermitidos: ["L", "LIDER", "LÍDER", "LÍDER DE EQUIPO", "LÍDER PIONERO"], rolDesarrollo: ["CE", "COORDINADOR"], pbMin: 300, desc: "Línea 2 · Líder calificado" },
+        { rol: "CE", rolesPermitidos: ["CE", "COORDINADOR"], rolDesarrollo: ["DC", "CALIFICADO"], pbMin: 180, desc: "Línea 3 · Coordinador" },
+        { rol: "DC", rolesPermitidos: ["DC", "CALIFICADO"], rolDesarrollo: ["D", "DISTRIBUIDOR"], pbMin: 50, desc: "Línea 4 · Calificado" }
       ],
       equipoPbTotal: 850,
-      beneficios: 'Regalías ampliadas, Asistencia LE Promovidos (1%), Bono Organizacional Liderazgo I, II y III.',
-      queFalta: 'Desarrollar y trabajar a tus Líderes directos calificados, Coordinadores y DCs con volumen organizacional calificado.'
+      porQueSubir: "El cheque más alto de tu carrera: cobrás regalías ampliadas, bono de liderazgo I, II y III, y asistencia ejecutiva sobre todas tus organizaciones.",
+      gananciasClave: [
+        "🚀 Bonos de Liderazgo Ejecutivo I, II y III todos los meses",
+        "💎 Asistencia LE del 1% sobre líderes promovidos de tu red",
+        "⭐ Máxima autoridad y prestigio en la convención nacional PSA"
+      ],
+      queFalta: "2 Líderes directos calificados (300 PB c/u), 1 Coordinador (180 PB) y 1 Calificado (50 PB)."
     }
   };
 
@@ -372,65 +398,80 @@
       queFaltaTexto = 'Para ser <b>' + esc(regla.nombre) + '</b> necesitás: ' + partes.join(' y ') + '.';
     }
 
+        var beneficiosHtml = (regla.gananciasClave || []).map(function(item){
+      return "<div class=\"org-perk-pill\">" + esc(item) + "</div>";
+    }).join("");
+
     wrap.innerHTML =
-      '<div class="org-card">' +
-        '<!-- ENCABEZADO TIPO APPI -->' +
-        '<div class="org-head">' +
-          '<div class="org-head-info">' +
-            '<div class="org-eyebrow">🚀 TU PRÓXIMO PASO EN LA CARRERA PSA</div>' +
-            '<h2 class="org-title">' + esc(regla.metaBadge) + '</h2>' +
-            '<p class="org-subtitle">' + esc(titular.nombre) + ' (actual: ' + esc(titular.cat) + ') ➔ <b>' + esc(regla.nombre) + '</b></p>' +
-          '</div>' +
-          '<div class="org-head-actions">' +
-            '<button type="button" class="org-magic-btn" id="orgMagicSuggestBtn" title="Completar con los mejores candidatos por PB">⚡ Sugerir</button>' +
-            '<span class="org-target-badge">' + esc(targetCat) + '</span>' +
-          '</div>' +
-        '</div>' +
+      "<div class=\"org-card\">" +
+        "<!-- ENCABEZADO MOTIVACIONAL Y ACCIONABLE -->" +
+        "<div class=\"org-head\">" +
+          "<div class=\"org-head-info\">" +
+            "<div class=\"org-eyebrow\">🎯 TU SIGUIENTE SALTO DE NIVEL</div>" +
+            "<h2 class=\"org-title\">" + esc(regla.metaBadge) + "</h2>" +
+            "<p class=\"org-subtitle\"><b>" + esc(titular.nombre) + "</b> (" + esc(titular.cat) + ") ➔ Pasás a <span class=\"org-target-hl\">" + esc(regla.nombre) + "</span></p>" +
+          "</div>" +
+          "<div class=\"org-head-actions\">" +
+            "<button type=\"button\" class=\"org-magic-btn\" id=\"orgMagicSuggestBtn\" title=\"Armar equipo óptimo con un toque\">⚡ Auto-ubicar equipo</button>" +
+            "<span class=\"org-target-badge\">" + esc(targetCat) + "</span>" +
+          "</div>" +
+        "</div>" +
 
-        '<!-- ÁRBOL VISUAL INTERACTIVO -->' +
-        '<div class="org-tree-stage">' +
-          '<!-- NODO VOS -->' +
-          '<div class="org-vos-card ' + (vosCumple ? 'ok' : '') + '">' +
-            '<span class="org-vos-pill">VOS · ' + esc(titular.cat || 'L') + '</span>' +
-            '<div class="org-vos-avatar-wrap">' +
-              '<div class="org-vos-avatar">👑</div>' +
-              (vosCumple ? '<span class="org-vos-check">✓</span>' : '') +
-            '</div>' +
-            '<div class="org-vos-name">' + esc(titular.nombre) + '</div>' +
-            '<div class="org-vos-pb">' +
-              '<b>' + pbVos.toFixed(1) + ' PB</b>' +
-              '<small>/ mín. ' + regla.personalReq + ' PB</small>' +
-            '</div>' +
-          '</div>' +
+        "<!-- POR QUÉ TE CONVIENE DAR EL PASO (MOTIVADOR DIRECTO) -->" +
+        "<div class=\"org-why-box\">" +
+          "<div class=\"org-why-title\">💎 ¿Por qué te conviene subir este mes?</div>" +
+          "<p class=\"org-why-desc\">" + esc(regla.porQueSubir || regla.beneficios) + "</p>" +
+          "<div class=\"org-perks-grid\">" + beneficiosHtml + "</div>" +
+        "</div>" +
 
-          '<!-- LÍNEAS CONECTORAS -->' +
-          '<div class="org-stem"></div>' +
-          '<div class="org-branch-line"></div>' +
+        "<!-- INSTRUCCIÓN CLARA Y VISUAL -->" +
+        "<div class=\"org-howto-chip\">" +
+          "<span>👇 Tocá los casilleros vacíos <b>(+)</b> o dale a <b>⚡ Auto-ubicar</b> para proyectar a tu gente clave:</span>" +
+        "</div>" +
 
-          '<!-- CASILLEROS DE LÍNEAS FILTRADAS POR ROL -->' +
-          '<div class="org-slots-grid count-' + regla.slots.length + '">' +
+        "<!-- ÁRBOL VISUAL INTERACTIVO -->" +
+        "<div class=\"org-tree-stage\">" +
+          "<!-- NODO VOS -->" +
+          "<div class=\"org-vos-card " + (vosCumple ? "ok" : "") + "\">" +
+            "<span class=\"org-vos-pill\">TU ROL · " + esc(titular.cat || "L") + "</span>" +
+            "<div class=\"org-vos-avatar-wrap\">" +
+              "<div class=\"org-vos-avatar\">👑</div>" +
+              (vosCumple ? "<span class=\"org-vos-check\">✓</span>" : "") +
+            "</div>" +
+            "<div class=\"org-vos-name\">" + esc(titular.nombre) + "</div>" +
+            "<div class=\"org-vos-pb\">" +
+              "<b>" + pbVos.toFixed(1) + " PB</b>" +
+              "<small>/ mín. " + regla.personalReq + " PB propios</small>" +
+            "</div>" +
+          "</div>" +
+
+          "<!-- LÍNEAS CONECTORAS -->" +
+          "<div class=\"org-stem\"></div>" +
+          "<div class=\"org-branch-line\"></div>" +
+
+          "<!-- CASILLEROS DE LÍNEAS FILTRADAS POR ROL -->" +
+          "<div class=\"org-slots-grid count-" + regla.slots.length + "\">" +
             slotsHtml +
-          '</div>' +
-        '</div>' +
+          "</div>" +
+        "</div>" +
 
-        '<!-- DIAGNÓSTICO DE PROGRESO -->' +
-        '<div class="org-status-box">' +
-          '<div class="org-status-row">' +
-            '<span class="org-status-label">Volumen hacia ' + esc(targetCat) + '</span>' +
-            '<span class="org-status-val"><b>' + pbTotalProyectado.toFixed(1) + '</b> / ' + regla.equipoPbTotal + ' PB</span>' +
-          '</div>' +
-          '<div class="org-progress-track">' +
-            '<div class="org-progress-bar" style="width:' + pctTotal + '%"></div>' +
-          '</div>' +
-          '<div class="org-status-hint">' + queFaltaTexto + '</div>' + (typeof prodHint !== 'undefined' ? prodHint : '') +
-        '</div>' +
+        "<!-- DIAGNÓSTICO EN LENGUAJE DIRECTO Y AMABLE -->" +
+        "<div class=\"org-status-box\">" +
+          "<div class=\"org-status-row\">" +
+            "<span class=\"org-status-label\">Avance de equipo hacia " + esc(targetCat) + "</span>" +
+            "<span class=\"org-status-val\"><b>" + pbTotalProyectado.toFixed(1) + "</b> / " + regla.equipoPbTotal + " PB</span>" +
+          "</div>" +
+          "<div class=\"org-progress-track\">" +
+            "<div class=\"org-progress-bar\" style=\"width:" + pctTotal + "%\"></div>" +
+          "</div>" +
+          "<div class=\"org-status-hint\">" + queFaltaTexto + "</div>" + (typeof prodHint !== "undefined" ? prodHint : "") +
+        "</div>" +
 
-        '<!-- REQUISITOS OFICIALES Y BENEFICIOS -->' +
-        '<div class="org-rule-note">' +
-          '📌 <b>Requisitos para calificar:</b> ' + esc(regla.queFalta) + '<br>' +
-          '🎁 <b>Beneficios al alcanzar ' + esc(targetCat) + ':</b> ' + esc(regla.beneficios) +
-        '</div>' +
-      '</div>';
+        "<!-- META EXACTA CLARA -->" +
+        "<div class=\"org-rule-note\">" +
+          "🎯 <b>La clave del mes:</b> " + esc(regla.queFalta) +
+        "</div>" +
+      "</div>";
 
     // Eventos de interacción
     var mBtn = wrap.querySelector('#orgMagicSuggestBtn'); if (mBtn) mBtn.onclick = function(){ autocompletarMejores(targetCat); };
@@ -749,6 +790,7 @@
       '.org-dist-pb small{font-size:9.5px;font-weight:700;}' +
       '.org-empty-list{text-align:center;padding:36px 12px;font-size:12.5px;color:#777887;line-height:1.45;}';
     st.textContent += ' .org-head-actions{display:flex;align-items:center;gap:6px;} .org-magic-btn{background:rgba(11,88,120,0.1);border:1px solid rgba(11,88,120,0.2);color:#0b5878;font-size:11px;font-weight:900;padding:5px 9px;border-radius:10px;cursor:pointer;display:inline-flex;align-items:center;gap:3px;transition:all .18s;} body.dark .org-magic-btn{background:rgba(56,189,248,0.15);border-color:rgba(56,189,248,0.3);color:#7dd3fc;} .org-magic-btn:hover{background:#0b5878;color:#fff;transform:translateY(-1px);} .org-prod-hint{font-size:11px;color:#0b5878;margin-top:4px;font-weight:600;} body.dark .org-prod-hint{color:#7dd3fc;} .org-modal-tabs{display:flex;gap:6px;margin-bottom:10px;} .org-m-tab{flex:1;padding:7px 10px;border-radius:10px;border:1px solid rgba(11,88,120,0.14);background:#f1f5f9;color:#0b5878;font-size:11.5px;font-weight:800;cursor:pointer;transition:all .18s;} body.dark .org-m-tab{background:rgba(255,255,255,0.06);border-color:rgba(255,255,255,0.12);color:#94a3b8;} .org-m-tab.active{background:#0b5878;color:#fff;border-color:#0b5878;box-shadow:0 3px 8px rgba(11,88,120,0.22);} body.dark .org-m-tab.active{background:#38bdf8;color:#0f172a;border-color:#38bdf8;}';
+    st.textContent += ' .org-target-hl{color:#0b5878;font-weight:900;} body.dark .org-target-hl{color:#38bdf8;} .org-why-box{background:linear-gradient(135deg,rgba(58,208,164,0.12),rgba(11,88,120,0.06));border:1px solid rgba(58,208,164,0.3);border-radius:18px;padding:12px 14px;margin-bottom:12px;} body.dark .org-why-box{background:linear-gradient(135deg,rgba(58,208,164,0.1),rgba(15,23,42,0.6));border-color:rgba(58,208,164,0.25);} .org-why-title{font-size:12.5px;font-weight:900;color:#0b5878;display:flex;align-items:center;gap:5px;margin-bottom:4px;} body.dark .org-why-title{color:#3ad0a4;} .org-why-desc{font-size:12px;color:#334155;line-height:1.4;margin:0 0 8px;font-weight:550;} body.dark .org-why-desc{color:#cbd5e1;} .org-perks-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:6px;} .org-perk-pill{background:#ffffff;border:1px solid rgba(11,88,120,0.12);padding:6px 10px;border-radius:10px;font-size:11px;font-weight:750;color:#0b5878;box-shadow:0 1px 3px rgba(0,0,0,0.03);line-height:1.3;} body.dark .org-perk-pill{background:rgba(30,41,59,0.8);border-color:rgba(255,255,255,0.08);color:#e2e8f0;} .org-howto-chip{text-align:center;font-size:11px;color:#64748b;margin:6px 0 10px;font-weight:600;} body.dark .org-howto-chip{color:#94a3b8;}';
     document.head.appendChild(st);
   }
 
