@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v920-organigrama-dinamico-por-usuario-wa';
+const CACHE_NAME = 'appi-v921-organigrama-supercharged';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

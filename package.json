@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "920.0.0",
-  "cacheName": "appi-v920-organigrama-dinamico-por-usuario-wa",
+  "version": "921.0.0",
+  "cacheName": "appi-v921-organigrama-supercharged",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

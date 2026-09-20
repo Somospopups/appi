@@ -101,10 +101,10 @@
       personalReq: 50,
       personalDesc: 'Volumen personal y grupo base (mín. 50 PB)',
       slots: [
-        { rol: 'L', rolesPermitidos: ['L', 'LIDER', 'LÍDER', 'LÍDER DE EQUIPO', 'LÍDER PIONERO'], pbMin: 300, desc: 'Línea 1 · Líder calificado directo' },
-        { rol: 'L', rolesPermitidos: ['L', 'LIDER', 'LÍDER', 'LÍDER DE EQUIPO', 'LÍDER PIONERO'], pbMin: 300, desc: 'Línea 2 · Líder calificado directo' },
-        { rol: 'CE', rolesPermitidos: ['CE', 'COORDINADOR'], pbMin: 180, desc: 'Línea Coordinador activo' },
-        { rol: 'DC', rolesPermitidos: ['DC', 'CALIFICADO'], pbMin: 50, desc: 'Línea Distribuidor Calificado' }
+        { rol: 'L', rolesPermitidos: ['L', 'LIDER', 'LÍDER', 'LÍDER DE EQUIPO', 'LÍDER PIONERO'], rolDesarrollo: ['CE', 'COORDINADOR'], pbMin: 300, desc: 'Línea 1 · Líder calificado directo' },
+        { rol: 'L', rolesPermitidos: ['L', 'LIDER', 'LÍDER', 'LÍDER DE EQUIPO', 'LÍDER PIONERO'], rolDesarrollo: ['CE', 'COORDINADOR'], pbMin: 300, desc: 'Línea 2 · Líder calificado directo' },
+        { rol: 'CE', rolesPermitidos: ['CE', 'COORDINADOR'], rolDesarrollo: ['DC', 'CALIFICADO'], pbMin: 180, desc: 'Coordinador (CE) activo' },
+        { rol: 'DC', rolesPermitidos: ['DC', 'CALIFICADO'], rolDesarrollo: ['D', 'DISTRIBUIDOR'], pbMin: 50, desc: 'Distribuidor Calificado (DC)' }
       ],
       equipoPbTotal: 850,
       beneficios: 'Regalías ampliadas, Asistencia LE Promovidos (1%), Bono Organizacional Liderazgo I, II y III.',
@@ -192,6 +192,16 @@
 
   // Verifica si una persona califica según la categoría requerida por el casillero
   
+  
+  function traducirPbaProductos(pb){
+    if (pb <= 0) return '';
+    var s4 = Math.ceil(pb / 14);
+    if (pb < 14) return '≈ ' + pb.toFixed(1) + ' PB (ej. 1 Senior 4 o repuestos)';
+    if (s4 === 1) return '≈ 1 Senior 4 (14 PB) o 1 Ducha Rinnova';
+    if (s4 === 2) return '≈ 2 Senior 4 o 1 Pack Hogar';
+    return '≈ ' + s4 + ' purificadores (Senior 4)';
+  }
+
   function formatearTel(tel){
     if (!tel) return '';
     var clean = String(tel).replace(/[^0-9]/g, '');
@@ -201,12 +211,20 @@
     return clean;
   }
 
-  function personaCalificaParaSlot(persona, slotConfig){
+  function personaCalificaParaSlot(persona, slotConfig, permitirDesarrollo){
+    if (!persona) return false;
     if (!persona) return false;
     var pCatCode = normalizarCodigoCat(persona.cat || persona.categoria || '');
     var rolTarget = normalizarCodigoCat(slotConfig.rol);
 
     if (pCatCode === rolTarget) return true;
+    if (permitirDesarrollo && Array.isArray(slotConfig.rolDesarrollo)) {
+      for (var j = 0; j < slotConfig.rolDesarrollo.length; j++) {
+        var des = norm(slotConfig.rolDesarrollo[j]);
+        var rawCat = norm(persona.cat || persona.categoria || '');
+        if (rawCat === des || rawCat.indexOf(des) >= 0) return true;
+      }
+    }
 
     var raw = norm(persona.cat || persona.categoria || '');
     if (Array.isArray(slotConfig.rolesPermitidos)) {
@@ -216,6 +234,43 @@
       }
     }
     return false;
+  }
+
+  
+  function autocompletarMejores(targetCat){
+    var regla = PLAN_REGLAS[targetCat];
+    var padron = obtenerPadrón();
+    var pestañaActual = 'exacta';
+    var p = leerPicks();
+    if (!p[targetCat]) p[targetCat] = [];
+    var usados = {};
+
+    regla.slots.forEach(function(slot, idx){
+      var candidatos = padron.filter(function(cand){
+        var dip = cand.codigo || cand.dip || cand.id;
+        if (usados[dip]) return false;
+        return personaCalificaParaSlot(cand, slot, false);
+      });
+      if (!candidatos.length) {
+        candidatos = padron.filter(function(cand){
+          var dip = cand.codigo || cand.dip || cand.id;
+          if (usados[dip]) return false;
+          return personaCalificaParaSlot(cand, slot, true);
+        });
+      }
+      candidatos.sort(function(a, b){
+        var pbA = Number(a.pnAct || a.pbPersonal || a.pb || 0);
+        var pbB = Number(b.pnAct || b.pbPersonal || b.pb || 0);
+        return pbB - pbA;
+      });
+      if (candidatos.length > 0) {
+        var elegidoDip = candidatos[0].codigo || candidatos[0].dip || candidatos[0].id;
+        p[targetCat][idx] = elegidoDip;
+        usados[elegidoDip] = true;
+      }
+    });
+    guardarPicks(p);
+    renderOrganigrama();
   }
 
   function renderOrganigrama(){
@@ -261,7 +316,9 @@
         var waBtn = '';
         if (tel) {
           var pNombreCorto = (persona.nombre || '').split(' ')[0];
-          var msj = encodeURIComponent('¡Hola ' + pNombreCorto + '! Te escribo para coordinar ventas y objetivos de este mes 💪');
+          var faltanP = Math.max(0, slot.pbMin - pbP);
+          var textoMsg = cumpleMin ? ('¡Felicitaciones ' + pNombreCorto + '! Llevás ' + pbP.toFixed(1) + ' PB este mes y tu línea está calificada 🎉. ¡Sigamos con todo!') : ('¡Hola ' + pNombreCorto + '! Llevás ' + pbP.toFixed(1) + ' PB este mes, estás a solo ' + faltanP.toFixed(1) + ' PB de calificar tu línea. ¿Coordinamos unas demos esta semana para cerrarlo? 💪');
+          var msj = encodeURIComponent(textoMsg);
           waBtn = '<a class="org-slot-wa-btn" href="https://wa.me/' + tel + '?text=' + msj + '" target="_blank" onclick="event.stopPropagation();" title="Escribir por WhatsApp">💬</a>';
         }
         return '<div class="org-slot-card filled ' + pClass + '" data-pick-slot="' + idx + '" title="Tocar para cambiar">' +
@@ -302,7 +359,11 @@
       queFaltaTexto = '🎉 <b>¡Estructura completa para calificar!</b> Mantené el ritmo del mes para asegurar el pase a ' + esc(regla.nombre) + '.';
     } else {
       var partes = [];
-      if (pbFaltanVos > 0) partes.push('<b>' + pbFaltanVos.toFixed(1) + ' PB personales</b>');
+      var prodHint = '';
+      if (pbFaltanVos > 0) {
+        partes.push('<b>' + pbFaltanVos.toFixed(1) + ' PB personales</b>');
+        prodHint = '<div class="org-prod-hint">💡 <i>Tus ' + pbFaltanVos.toFixed(1) + ' PB equivalen ' + traducirPbaProductos(pbFaltanVos) + '.</i></div>';
+      }
       if (lineasFaltan > 0) partes.push('<b>' + lineasFaltan + ' línea' + (lineasFaltan === 1 ? '' : 's') + ' calificada' + (lineasFaltan === 1 ? '' : 's') + '</b>');
       if (pbFaltanTotal > 0 && lineasFaltan === 0) partes.push('<b>' + pbFaltanTotal.toFixed(1) + ' PB de equipo</b>');
       queFaltaTexto = 'Para ser <b>' + esc(regla.nombre) + '</b> necesitás: ' + partes.join(' y ') + '.';
@@ -317,7 +378,8 @@
             '<h2 class="org-title">' + esc(regla.metaBadge) + '</h2>' +
             '<p class="org-subtitle">' + esc(titular.nombre) + ' (actual: ' + esc(titular.cat) + ') ➔ <b>' + esc(regla.nombre) + '</b></p>' +
           '</div>' +
-          '<div class="org-head-badge">' +
+          '<div class="org-head-actions">' +
+            '<button type="button" class="org-magic-btn" id="orgMagicSuggestBtn" title="Completar con los mejores candidatos por PB">⚡ Sugerir</button>' +
             '<span class="org-target-badge">' + esc(targetCat) + '</span>' +
           '</div>' +
         '</div>' +
@@ -357,7 +419,7 @@
           '<div class="org-progress-track">' +
             '<div class="org-progress-bar" style="width:' + pctTotal + '%"></div>' +
           '</div>' +
-          '<div class="org-status-hint">' + queFaltaTexto + '</div>' +
+          '<div class="org-status-hint">' + queFaltaTexto + '</div>' + (typeof prodHint !== 'undefined' ? prodHint : '') +
         '</div>' +
 
         '<!-- REQUISITOS OFICIALES Y BENEFICIOS -->' +
@@ -368,6 +430,8 @@
       '</div>';
 
     // Eventos de interacción
+    var mBtn = wrap.querySelector('#orgMagicSuggestBtn'); if (mBtn) mBtn.onclick = function(){ autocompletarMejores(targetCat); };
+
     wrap.querySelectorAll('[data-pick-slot]').forEach(function(slotEl){
       slotEl.onclick = function(e){
         if (e.target.closest('[data-remove-slot]')) return;
@@ -413,6 +477,10 @@
           '</div>' +
           '<button type="button" class="org-modal-close" id="orgModalClose">✕</button>' +
         '</div>' +
+        '<div class="org-modal-tabs">' +
+          '<button type="button" class="org-m-tab active" data-tab="exacta">Solo ' + esc(slotConfig.rol) + '</button>' +
+          (slotConfig.rolDesarrollo && slotConfig.rolDesarrollo.length ? '<button type="button" class="org-m-tab" data-tab="desarrollo">En desarrollo (' + slotConfig.rolDesarrollo.join('/') + ')</button>' : '') +
+        '</div>' +
         '<div class="org-modal-search">' +
           '<input type="text" id="orgSearchInp" placeholder="Buscar por nombre o DIP..." autocomplete="off">' +
         '</div>' +
@@ -436,8 +504,12 @@
       var q = (query || '').toLowerCase().trim();
 
       // FILTRAR ESTRICTAMENTE por la categoría que corresponde al casillero
+      var esDesarrollo = (pestañaActual === 'desarrollo');
       var filtrados = padron.filter(function(p){
-        if (!personaCalificaParaSlot(p, slotConfig)) return false;
+        var califica = false;
+        if (!esDesarrollo) { califica = personaCalificaParaSlot(p, slotConfig, false); }
+        else { califica = !personaCalificaParaSlot(p, slotConfig, false) && personaCalificaParaSlot(p, slotConfig, true); }
+        if (!califica) return false;
         var n = (p.nombre || '').toLowerCase();
         var d = (p.codigo || p.dip || '').toLowerCase();
         return (!q || n.indexOf(q) >= 0 || d.indexOf(q) >= 0);
@@ -493,7 +565,15 @@
       });
     }
 
-    renderLista('');
+    m.querySelectorAll('.org-m-tab').forEach(function(tb){
+        tb.onclick = function(){
+          m.querySelectorAll('.org-m-tab').forEach(function(b){ b.classList.remove('active'); });
+          tb.classList.add('active');
+          pestañaActual = tb.getAttribute('data-tab');
+          renderLista(searchInp.value);
+        };
+      });
+      renderLista('');
     searchInp.oninput = function(){ renderLista(searchInp.value); };
     setTimeout(function(){ searchInp.focus(); }, 150);
   }
@@ -664,6 +744,7 @@
       'body.dark .org-dist-pb.falta{color:#fbbf24;}' +
       '.org-dist-pb small{font-size:9.5px;font-weight:700;}' +
       '.org-empty-list{text-align:center;padding:36px 12px;font-size:12.5px;color:#777887;line-height:1.45;}';
+    st.textContent += ' .org-head-actions{display:flex;align-items:center;gap:6px;} .org-magic-btn{background:rgba(11,88,120,0.1);border:1px solid rgba(11,88,120,0.2);color:#0b5878;font-size:11px;font-weight:900;padding:5px 9px;border-radius:10px;cursor:pointer;display:inline-flex;align-items:center;gap:3px;transition:all .18s;} body.dark .org-magic-btn{background:rgba(56,189,248,0.15);border-color:rgba(56,189,248,0.3);color:#7dd3fc;} .org-magic-btn:hover{background:#0b5878;color:#fff;transform:translateY(-1px);} .org-prod-hint{font-size:11px;color:#0b5878;margin-top:4px;font-weight:600;} body.dark .org-prod-hint{color:#7dd3fc;} .org-modal-tabs{display:flex;gap:6px;margin-bottom:10px;} .org-m-tab{flex:1;padding:7px 10px;border-radius:10px;border:1px solid rgba(11,88,120,0.14);background:#f1f5f9;color:#0b5878;font-size:11.5px;font-weight:800;cursor:pointer;transition:all .18s;} body.dark .org-m-tab{background:rgba(255,255,255,0.06);border-color:rgba(255,255,255,0.12);color:#94a3b8;} .org-m-tab.active{background:#0b5878;color:#fff;border-color:#0b5878;box-shadow:0 3px 8px rgba(11,88,120,0.22);} body.dark .org-m-tab.active{background:#38bdf8;color:#0f172a;border-color:#38bdf8;}';
     document.head.appendChild(st);
   }
 
