@@ -279,9 +279,9 @@
         garantia: '36 meses de garantía oficial',
         medios: 'Carbón Activado Granular (CAG), CAG con plata, KDF® y Zeolita natural',
         retiene: 'Cloro (>90%), Trihalometanos (>70%), metales pesados (plomo, hierro, aluminio) y microplásticos (>97%)',
-        caudal: '250 l/h (aprox. 15 seg. por litro de agua)',
+        caudal: '100 l/h (aprox. 36 seg. por litro de agua)',
         cert: 'ANMAT RNPUD Nº 0250026 · Norma IRAM 27.300',
-        manual: 'https://www.psa.com.ar/productos/purificadores-de-agua/beber-y-cocinar/psa-senior-4'
+        manual: 'https://info.psa.com.ar/landings/manuales/psa-senior_4/psa-senior_4.html'
       };
     }
     if (t.indexOf('SENIOR') >= 0 && (t.indexOf('BIANCO') >= 0 || t.indexOf('S-1000') < 0)) {
@@ -294,7 +294,7 @@
         retiene: 'Cloro, sedimentos, turbidez, malos olores, sabores y metales',
         caudal: '250 l/h con regulador de caudal',
         cert: 'Aprobado por ANMAT · Norma IRAM 27.300',
-        manual: 'https://info.psa.com.ar/landings/manuales/senior3/senior3.html'
+        manual: 'https://info.psa.com.ar/landings/manuales/seniorCR/seniorCR.html'
       };
     }
     if (t.indexOf('QUANTUM') >= 0) {
@@ -333,7 +333,7 @@
         retiene: 'Arsénico, nitratos, flúor, plomo, sodio, dureza, sulfatos y cloro',
         caudal: 'Jarra interna con sensor TDS y pantalla digital interactiva',
         cert: 'ANMAT RNPUD Nº 0830022 · Norma IRAM 27.300',
-        manual: 'https://www.psa.com.ar/productos/purificadores-de-agua/beber-y-cocinar/psa-ropot'
+        manual: 'https://info.psa.com.ar/landings/manuales/ropot/ropot.html'
       };
     }
     if (t.indexOf('S-1000') >= 0 || t.indexOf('S1000') >= 0) {
@@ -346,7 +346,7 @@
         retiene: 'Cloro, sedimentos, turbidez, sabores, olores desagradables y metales',
         caudal: '250 l/h (aprox. 15 seg. por litro)',
         cert: 'ANMAT RNPUD Nº 0250019 · ISO 9001:2015',
-        manual: 'https://www.psa.com.ar/sites/default/files/2024-12/Manual-usuario-S1000II-web-v02-19_5_8_0_1.pdf'
+        manual: 'https://info.psa.com.ar/landings/manuales/s10002/s10002.html'
       };
     }
     if (t.indexOf('RINNOVA') >= 0 || (t.indexOf('DUCHA') >= 0 && t.indexOf('FLOR') < 0 && t.indexOf('ADAPT') < 0 && t.indexOf('CAMPANA') < 0)) {
@@ -359,7 +359,7 @@
         retiene: 'Cloro libre en agua caliente, sarro en cañerías/flor y partículas suspendidas',
         caudal: 'Pleno flujo de baño confortable sin alterar la presión',
         cert: 'Garantía y aval oficial PSA',
-        manual: 'https://catalogo.psa.com.ar/productos/purificadores-de-agua/linea-bano/psa-ducha-2'
+        manual: 'https://info.psa.com.ar/landings/manuales/ducha/ducha.html'
       };
     }
     if (t.indexOf('C3') >= 0) {
@@ -372,7 +372,7 @@
         retiene: 'Cloro, sedimentos y olores molestos en el agua del lavamanos',
         caudal: 'Regulado para griferías de baño',
         cert: 'Aprobación oficial PSA · ANMAT RNPUD',
-        manual: 'https://www.psa.com.ar/productos/purificadores-de-agua/linea-bano'
+        manual: 'https://info.psa.com.ar/landings/manuales/c3/c3.html'
       };
     }
     if (t.indexOf('PORTATIL') >= 0 || t.indexOf('PORTÁTIL') >= 0 || t.indexOf('1-P') >= 0) {
@@ -437,7 +437,7 @@
         retiene: 'Polvo, polen, ácaros, bacterias, moho, humo de tabaco y olores',
         caudal: '3 velocidades y modo silencioso nocturno (bajo consumo 220V)',
         cert: 'Certificación de Seguridad Eléctrica IRAM',
-        manual: 'https://www.psa.com.ar/productos/purificador-de-aire/purificador-de-aire-psa'
+        manual: 'https://info.psa.com.ar/landings/manuales/purificador_aire/index.html'
       };
     }
     if (t.indexOf('BURBY') >= 0 || t.indexOf('SODA') >= 0) {
@@ -450,7 +450,7 @@
         retiene: 'Soda 100% pura y personalizada sobre Agua Purificada PSA',
         caudal: 'Instantáneo a demanda con botellas reutilizables libres de BPA',
         cert: 'Aval y garantía oficial PSA',
-        manual: 'https://catalogo.psa.com.ar/productos/gasificador-de-agua/sodaburby'
+        manual: 'https://info.psa.com.ar/landings/garantia/certificado-garantia-sodaburby.pdf'
       };
     }
     if (t.indexOf('DOMUS') >= 0) {
@@ -476,7 +476,20 @@
         retiene: 'Arenas, óxidos, tierra y sedimentos gruesos',
         caudal: 'Acompaña la instalación para proteger el purificador',
         cert: 'Certificación oficial PSA',
-        manual: 'https://catalogo.psa.com.ar/productos-psa'
+        manual: 'https://info.psa.com.ar/landings/manuales/poli/poli.html'
+      };
+    }
+    if (t.indexOf('BICOMANDO') >= 0) {
+      return {
+        nombre: 'Grifería Bicomando PSA',
+        sub: 'Agua fría, caliente y purificada en un solo comando sin perforaciones extra',
+        rendimiento: 'Cierre cerámico de alta durabilidad',
+        garantia: 'Garantía oficial PSA',
+        medios: 'Cuerpo metálico cromado / nero con ductos independientes para agua purificada',
+        retiene: 'Conexión directa bajo mesada para Senior 4, Quantum, Senik y S-1000',
+        caudal: 'Flujo pleno sanitario y purificado',
+        cert: 'RNE Nº 020033995',
+        manual: 'https://info.psa.com.ar/landings/manuales/griferia-bicomando/griferia-bicomando.html'
       };
     }
     return null;

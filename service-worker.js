@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v911-fichas-tecnicas-lista-precios';
+const CACHE_NAME = 'appi-v912-manuales-oficiales-directos';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
