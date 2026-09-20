@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v906-tarjeta-mazo-pb-equipo';
+const CACHE_NAME = 'appi-v907-sincronizar-pb-mi-equipo-con-banner';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

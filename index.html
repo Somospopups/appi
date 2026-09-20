@@ -168,7 +168,7 @@ window.openStock=function(){
 <script src="./porque-vivo.js"></script>
 <script src="./home-limpio.js?v=521"></script>
 <script src="./reporte-bonos.js?v=852?v=4"></script>
-  <script src="./home-tarjetas.js?v=834"></script>
+  <script src="./home-tarjetas.js?v=835"></script>
   <script src="./appi-eventos.js?v=726"></script>
   <script src="./tu-mes.js?v=852"></script>
   <script src="./device-bridge.js?v=523"></script>
@@ -4653,7 +4653,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v906 · Segura</div>
+  <div class="ds-foot">APPI · v907 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4937,7 +4937,7 @@ body.dark #pageTabs button.active{color:#c5d6ff}
       <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
 
       <div class="home-brand-row">
-        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · 906</span></span>
+        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · 907</span></span>
       </div>
 
       <div class="home-hero-card">
@@ -8985,7 +8985,9 @@ function renderEquipoDashboard(){
   const activos = personas.filter(p => (p.pnAct||0) > 0).length;
   const inactivos = total - activos;
   const pctActivos = total ? Math.round((activos/total)*100) : 0;
-  const ptsTotal = personas.reduce((s,p)=> s + (p.pnAct||0), 0);
+  const ptsSumaPersonas = personas.reduce((s,p)=> s + (p.pnAct||0), 0);
+  const pbOficialBanner = (typeof embudoKpiLiderPB === "function") ? embudoKpiLiderPB() : null;
+  const ptsTotal = (pbOficialBanner != null && !isNaN(pbOficialBanner)) ? pbOficialBanner : ptsSumaPersonas;
   const porCat = {};
   personas.forEach(p=>{ const k = p.cat || '?'; porCat[k] = (porCat[k]||0) + 1; });
   const catsOrden = ['E','LE','L','CE','DC','D','DJ'];
@@ -13543,8 +13545,8 @@ function cerrarToolsMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='906';
-      const CACHE_NAME='appi-v906-tarjeta-mazo-pb-equipo';
+      const swVersion='907';
+      const CACHE_NAME='appi-v907-sincronizar-pb-mi-equipo-con-banner';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
@@ -18454,6 +18456,7 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
   // real del mes según PSA), con respaldo de la suma del archivo de equipo si
   // el reporte no está cargado; se actualiza solo cuando llega el reporte.
   function embudoKpiLiderPB(){
+  window.embudoKpiLiderPB = embudoKpiLiderPB;
     try{
       const c=JSON.parse(localStorage.getItem('appi_bonos_v1')||'null');
       const a=c&&c.bonos&&c.bonos.acumulacion;

@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "906.0.0",
-  "cacheName": "appi-v906-tarjeta-mazo-pb-equipo",
+  "version": "907.0.0",
+  "cacheName": "appi-v907-sincronizar-pb-mi-equipo-con-banner",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

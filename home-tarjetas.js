@@ -1362,15 +1362,18 @@
     var now = new Date();
 
     // PB Total Acumulado del equipo en el mes
-    var totalAcumulado = 0;
+    var sumaPersonas = 0;
     var snapActual = {};
     eq.forEach(function(p){
       if (!p) return;
       var pb = Number(p.pnAct != null ? p.pnAct : (p.pbPersonal || 0));
-      if (!isNaN(pb)) totalAcumulado += pb;
+      if (!isNaN(pb)) sumaPersonas += pb;
       var cod = String(p.codigo || p.id || p.nombre || "").trim();
       if (cod) snapActual[cod] = pb;
     });
+    // Sincronizar con el valor oficial del banner de Mi Negocio (Reporte de Bonos PSA)
+    var pbOficial = (typeof window.embudoKpiLiderPB === "function") ? window.embudoKpiLiderPB() : null;
+    var totalAcumulado = (pbOficial != null && !isNaN(pbOficial)) ? pbOficial : sumaPersonas;
 
     // Tracking de PB hechos hoy:
     // Compara el snapshot guardado al inicio del día con el estado actual
