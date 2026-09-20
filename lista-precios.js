@@ -371,11 +371,11 @@
       '.lp-gan-card-val{font-size:15px;font-weight:950;color:#0b5878;line-height:1.2}' +
       '.lp-gan-card-sub{font-size:9.5px;color:#71717a;margin-top:3px;line-height:1.2}' +
       '.lp-gan-card.saldo-card .lp-gan-card-val{color:#059669}' +
-      '.lp-gan-detalle{display:flex;flex-direction:column;gap:3px;margin:6px 0;max-height:96px;overflow:auto}' +
-      '.lp-gan-detalle span{font-size:11px;color:#4a4b57}' +
+      '.lp-gan-detalle{display:flex;flex-direction:column;gap:3px;margin:6px 0;max-height:96px;overflow:auto;text-align:center}' +
+      '.lp-gan-detalle span{font-size:11px;color:#4a4b57;display:block;text-align:center}' +
       '.lp-gan-detalle b{color:#0b5878}' +
       '.lp-gan-detalle em{font-style:normal;font-size:9px;background:#fff3cd;color:#8a6d1a;padding:1px 5px;border-radius:6px;font-weight:850}' +
-      '.lp-gan-foot{font-size:10px;color:#85889a;margin-top:6px;line-height:1.4}' +
+      '.lp-gan-foot{font-size:10px;color:#85889a;margin-top:6px;line-height:1.4;text-align:center}' +
       'body.dark .lp-gan{background:rgba(11,88,120,.18);border-color:rgba(58,208,164,.35)}' +
       'body.dark .lp-gan-head b,body.dark .lp-gan-num,body.dark .lp-gan-num i{color:#3ad0a4}' +
       'body.dark .lp-gan-card{background:#25273a;border-color:rgba(255,255,255,.08)}' +
@@ -2182,6 +2182,9 @@
     var enMano = Math.min(Math.round(g.total), maxEnMano30);
     var saldoPsa = Math.max(0, Math.round(g.total) - enMano);
 
+    var pctSaldo = g.cobro > 0 ? ((saldoPsa / g.cobro) * 100) : 0;
+    var pctSaldoTxt = pctSaldo > 0 ? (pctSaldo >= 1 ? Math.round(pctSaldo) : pctSaldo.toFixed(1)) + '%' : '0%';
+
     var html = '<div class="lp-gan">' +
       '<div class="lp-gan-head"><b>🔒 SOLO PARA VOS</b><span>Estos datos solo quedan para vos.<br/>Nunca serán entregados a tus usuarios</span></div>' +
       '<div class="lp-gan-num">$' + Math.round(g.total).toLocaleString('es-AR') + '<i>≈ ' + pct + '% ganancia real</i></div>' +
@@ -2192,16 +2195,16 @@
           '<div class="lp-gan-card-sub">Pedís 1° al 5 (a tu CBU)</div>' +
         '</div>' +
         '<div class="lp-gan-card saldo-card">' +
-          '<div class="lp-gan-card-tit">💳 Saldo en Cuenta PSA</div>' +
+          '<div class="lp-gan-card-tit">💳 Saldo PSA (' + pctSaldoTxt + ')</div>' +
           '<div class="lp-gan-card-val">$' + saldoPsa.toLocaleString('es-AR') + '</div>' +
-          '<div class="lp-gan-card-sub">' + (saldoPsa > 0 ? 'A favor p/ pedidos o canjes' : 'Sin remanente') + '</div>' +
+          '<div class="lp-gan-card-sub">' + (saldoPsa > 0 ? 'A favor p/ compras PSA' : 'Sin remanente') + '</div>' +
         '</div>' +
       '</div>' +
       '<div class="lp-gan-detalle">' + g.lineas.map(function (l) {
         return '<span>' + l.q + '× ' + esc(String(l.nombre).replace(/\s*\(PLAN CANJE\)\s*$/i, '')) + ' <b>$' + Math.round(l.ganU).toLocaleString('es-AR') + '/u</b>' + (l.estimado ? ' <em>est. 30%</em>' : '') + '</span>';
       }).join('') + '</div>' +
       '<div class="lp-gan-foot">Costo: ' + esc(g.colLab) + (g.vigencia ? ' · Lista PSA ' + esc(g.vigencia) : '') + (g.faltan ? ' · ' + g.faltan + ' ítem(s) sin lista (estimados al 30%)' : '') + '</div>' +
-      (g.saldo ? '<div style="font-size:10px;font-weight:800;color:#059669;margin-top:5px">💳 Tu saldo actual registrado en PSA: $' + Math.round(g.saldo).toLocaleString('es-AR') + (g.dev ? ' · dev. ' + esc(g.dev.fecha) : '') + '</div>' : '') +
+      (g.saldo ? '<div style="font-size:10px;font-weight:800;color:#059669;margin-top:5px;text-align:center">💳 Tu saldo actual registrado en PSA: $' + Math.round(g.saldo).toLocaleString('es-AR') + (g.dev ? ' · dev. ' + esc(g.dev.fecha) : '') + '</div>' : '') +
       '</div>';
     host.innerHTML = html;
   }

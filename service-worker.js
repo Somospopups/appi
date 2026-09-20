@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v899-desglose-ganancias-tarjeta-saldo';
+const CACHE_NAME = 'appi-v900-porcentaje-saldo-textos-centrados';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

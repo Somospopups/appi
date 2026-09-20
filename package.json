@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "899.0.0",
-  "cacheName": "appi-v899-desglose-ganancias-tarjeta-saldo",
+  "version": "900.0.0",
+  "cacheName": "appi-v900-porcentaje-saldo-textos-centrados",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {
