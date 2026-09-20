@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v905-quitar-apartado-promos-lista';
+const CACHE_NAME = 'appi-v906-tarjeta-mazo-pb-equipo';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

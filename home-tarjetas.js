@@ -1353,13 +1353,101 @@
     };
   }
 
-  function armarTarjetas(){
+  /* ---------- tarjeta PB del Equipo (Hoy y Acumulado del Mes) ---------- */
+  function tarjetaPbEquipo(){
+    var eq = personasEquipo();
+    if (!eq || !eq.length) return null;
+
+    var hoy = hoyKey();
+    var now = new Date();
+
+    // PB Total Acumulado del equipo en el mes
+    var totalAcumulado = 0;
+    var snapActual = {};
+    eq.forEach(function(p){
+      if (!p) return;
+      var pb = Number(p.pnAct != null ? p.pnAct : (p.pbPersonal || 0));
+      if (!isNaN(pb)) totalAcumulado += pb;
+      var cod = String(p.codigo || p.id || p.nombre || "").trim();
+      if (cod) snapActual[cod] = pb;
+    });
+
+    // Tracking de PB hechos hoy:
+    // Compara el snapshot guardado al inicio del día con el estado actual
+    var snapKey = "appi_pb_start_day_" + hoy;
+    var snapDia = leerLS(snapKey, null);
+    if (!snapDia) {
+      try { localStorage.setItem(snapKey, JSON.stringify(snapActual)); } catch(e){}
+      snapDia = snapActual;
+    }
+
+    // Calcular cuánto se sumó hoy en todo el equipo
+    var pbHoy = 0;
+    var movimientosHoy = [];
+    Object.keys(snapActual).forEach(function(cod){
+      var actual = Number(snapActual[cod]) || 0;
+      var inicio = snapDia && snapDia[cod] !== undefined ? (Number(snapDia[cod]) || 0) : 0;
+      if (actual > inicio) {
+        var delta = actual - inicio;
+        pbHoy += delta;
+        var p = eq.find(function(item){ return String(item.codigo || item.id || item.nombre || "").trim() === cod; });
+        if (p) movimientosHoy.push({ nombre: pilaDe(p.nombre || "Distribuidor"), delta: delta, total: actual });
+      }
+    });
+
+    function fmtPB(n) {
+      var num = Number(n) || 0;
+      return num % 1 === 0 ? num.toLocaleString("es-AR", { maximumFractionDigits: 0 }) : num.toLocaleString("es-AR", { minimumFractionDigits: 1, maximumFractionDigits: 2 });
+    }
+
+    var activos = eq.filter(function(p){ return Number(p.pnAct != null ? p.pnAct : (p.pbPersonal || 0)) > 0; }).length;
+    var pctActivos = eq.length ? Math.round((activos / eq.length) * 100) : 0;
+
+    var detalleMov = "";
+    if (movimientosHoy.length > 0) {
+      detalleMov = '<div class="ht-pb-mov-list">' +
+        movimientosHoy.slice(0, 3).map(function(m){
+          return '<span>⭐ <b>+' + fmtPB(m.delta) + ' PB</b> ' + esc(m.nombre) + '</span>';
+        }).join("") +
+        (movimientosHoy.length > 3 ? '<small>y ' + (movimientosHoy.length - 3) + ' más</small>' : "") +
+      '</div>';
+    }
+
+    var html = '<div class="ht-pb-grid">' +
+      '<div class="ht-pb-card pb-hoy">' +
+        '<span class="ht-pb-card-lbl">⚡ PB de Hoy</span>' +
+        '<b class="ht-pb-card-val">' + (pbHoy > 0 ? ("+" + fmtPB(pbHoy)) : "0") + ' <small>PB</small></b>' +
+        '<span class="ht-pb-card-sub">' + (pbHoy > 0 ? (movimientosHoy.length + " sumaron hoy") : "Sin cargas hoy aún") + '</span>' +
+      '</div>' +
+      '<div class="ht-pb-card pb-acum">' +
+        '<span class="ht-pb-card-lbl">📈 Acumulado del Mes</span>' +
+        '<b class="ht-pb-card-val">' + fmtPB(totalAcumulado) + ' <small>PB</small></b>' +
+        '<span class="ht-pb-card-sub">' + activos + ' activos (' + pctActivos + '%)</span>' +
+      '</div>' +
+    '</div>' + detalleMov;
+
+    return {
+      cat: "pb_equipo",
+      icono: "⭐",
+      kicker: "Producción · Mi Equipo",
+      titulo: pbHoy > 0 ? ("¡Hoy el equipo sumó " + fmtPB(pbHoy) + " PB!") : "Producción del Equipo",
+      html: html,
+      fab: {
+        ico: "👥",
+        label: "Ver Mi Equipo",
+        go: function(){ if (typeof window.openEquipo === "function") window.openEquipo(); else if (typeof window.showView === "function") window.showView("view-equipo"); }
+      },
+      cta: null
+    };
+  }
+
+    function armarTarjetas(){
     var lista = [tarjetaEspecial()];
     try{ if (window.APPIMensajes && window.APPIMensajes.registrarPartido) window.APPIMensajes.registrarPartido(); }catch(e){}
     // v805: mazo unificado sobre el modelo de reempadronamiento (lista de
     // gente + colores por estado, sin botones abajo). "Hoy te conviene" se
     // quitó a pedido y el Plan Canje vive dentro de la tarjeta Usuarios.
-    [tarjetaJornada(), tarjetaPromoBotella(), tarjetaGanaste(), tarjetaMetodoEnvio(), tarjetaLlegamos(), tarjetaDuchaRinnova(), tarjetaCumples(), tarjetaReempadronar(), tarjetaEquipo(), tarjetaPanel(), tarjetaUsuarios()].forEach(function(t){
+    [tarjetaPbEquipo(), tarjetaJornada(), tarjetaPromoBotella(), tarjetaGanaste(), tarjetaMetodoEnvio(), tarjetaLlegamos(), tarjetaDuchaRinnova(), tarjetaCumples(), tarjetaReempadronar(), tarjetaEquipo(), tarjetaPanel(), tarjetaUsuarios()].forEach(function(t){
       if (t) lista.push(t);
     });
     return lista;
@@ -1468,6 +1556,32 @@
       '.ht-card.ht-ganaste{background:linear-gradient(160deg,#f3fff8,#d8f5e6);border:2px solid #3ad0a4;box-shadow:0 22px 60px rgba(18,140,126,.22)}',
       'body.dark .ht-card.ht-ganaste{background:linear-gradient(160deg,#1a3328,#152820);border-color:#3ad0a4}',
       '.ht-card.ht-ganaste .ht-kicker{color:#178a6c}',
+      '.ht-pb-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:8px 0 10px}',
+      '.ht-pb-card{background:rgba(255,255,255,.9);border:1.5px solid rgba(11,88,120,.12);border-radius:16px;padding:12px 10px;display:flex;flex-direction:column;align-items:center;text-align:center;box-shadow:0 3px 10px rgba(0,0,0,.04)}',
+      '.ht-pb-card.pb-hoy{background:linear-gradient(145deg,rgba(254,249,195,.7),rgba(255,255,255,.95));border-color:rgba(234,179,8,.3)}',
+      '.ht-pb-card.pb-acum{background:linear-gradient(145deg,rgba(238,242,255,.7),rgba(255,255,255,.95));border-color:rgba(99,102,241,.25)}',
+      '.ht-pb-card-lbl{font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.3px;color:#71717a;margin-bottom:4px}',
+      '.ht-pb-card.pb-hoy .ht-pb-card-lbl{color:#b45309}',
+      '.ht-pb-card.pb-acum .ht-pb-card-lbl{color:#4338ca}',
+      '.ht-pb-card-val{font-size:22px;font-weight:950;line-height:1.1;color:#1e293b}',
+      '.ht-pb-card.pb-hoy .ht-pb-card-val{color:#d97706}',
+      '.ht-pb-card.pb-acum .ht-pb-card-val{color:#4f46e5}',
+      '.ht-pb-card-val small{font-size:11px;font-weight:900;opacity:.85}',
+      '.ht-pb-card-sub{font-size:10px;font-weight:750;color:#64748b;margin-top:4px;line-height:1.2}',
+      '.ht-pb-mov-list{display:flex;flex-direction:column;gap:4px;background:rgba(0,0,0,.03);border-radius:12px;padding:8px 10px;margin-top:4px}',
+      '.ht-pb-mov-list span{font-size:11px;font-weight:750;color:#334155;text-align:left}',
+      '.ht-pb-mov-list span b{color:#0b5878}',
+      '.ht-pb-mov-list small{font-size:9.5px;color:#94a3b8;font-weight:700}',
+      'body.dark .ht-pb-card{background:#232536;border-color:rgba(255,255,255,.1)}',
+      'body.dark .ht-pb-card.pb-hoy{background:linear-gradient(145deg,rgba(180,83,9,.2),#232536);border-color:rgba(245,158,11,.35)}',
+      'body.dark .ht-pb-card.pb-acum{background:linear-gradient(145deg,rgba(79,70,229,.2),#232536);border-color:rgba(99,102,241,.35)}',
+      'body.dark .ht-pb-card-val{color:#f8fafc}',
+      'body.dark .ht-pb-card.pb-hoy .ht-pb-card-val{color:#fbbf24}',
+      'body.dark .ht-pb-card.pb-acum .ht-pb-card-val{color:#818cf8}',
+      'body.dark .ht-pb-card-sub{color:#94a3b8}',
+      'body.dark .ht-pb-mov-list{background:rgba(255,255,255,.05)}',
+      'body.dark .ht-pb-mov-list span{color:#e2e8f0}',
+      'body.dark .ht-pb-mov-list span b{color:#38bdf8}',
       'body.dark .ht-card.ht-ganaste .ht-kicker{color:#3ad0a4}',
       '.ht-card.ht-ganaste h3{color:#146b54}',
       'body.dark .ht-card.ht-ganaste h3{color:#d8f5e6}',

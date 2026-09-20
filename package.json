@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "905.0.0",
-  "cacheName": "appi-v905-quitar-apartado-promos-lista",
+  "version": "906.0.0",
+  "cacheName": "appi-v906-tarjeta-mazo-pb-equipo",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {
