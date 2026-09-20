@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v916-organigrama-proxima-categoria-foco';
+const CACHE_NAME = 'appi-v917-organigrama-nativo-appi';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
