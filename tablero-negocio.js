@@ -68,7 +68,7 @@
       '.tb-big{font-size:20px;font-weight:950;color:#3d63c9}' +
       '.tb-btn{border:0;border-radius:12px;padding:10px 14px;background:linear-gradient(135deg,#0b5878,#3ad0a4);color:#fff;font:inherit;font-size:12px;font-weight:900;cursor:pointer}' +
       '.tb-mini{border:1px solid rgba(91,141,239,.25);border-radius:10px;padding:6px 10px;background:rgba(91,141,239,.08);color:#3d63c9;font:inherit;font-size:11px;font-weight:850;cursor:pointer}' +
-      'body.dark .tb-mini{background:rgba(91,141,239,.15);color:#a8c0ff}' +
+      'body.dark .tb-mini{background:rgba(91,141,239,.15);color:#a8c0ff}' +"\n      .bot-type-toggle{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0 14px;}\n      .bot-type-btn{padding:10px 8px;border-radius:14px;border:1.5px solid rgba(11,88,120,0.18);background:rgba(255,255,255,0.7);color:#0b5878;font:inherit;font-size:12px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .18s;}\n      body.dark .bot-type-btn{background:rgba(30,41,59,0.7);border-color:rgba(255,255,255,0.12);color:#7dd3fc;}\n      .bot-type-btn.active{background:linear-gradient(135deg,#0b5878,#3ad0a4);border-color:#0b5878;color:#fff;box-shadow:0 4px 14px rgba(11,88,120,0.22);}\n      body.dark .bot-type-btn.active{background:linear-gradient(135deg,#0284c7,#3ad0a4);border-color:#38bdf8;}\n      .bot-mountain-box{background:linear-gradient(180deg,rgba(224,242,254,0.4) 0%,rgba(186,230,253,0.2) 100%);border:1px solid rgba(56,189,248,0.25);border-radius:18px;padding:14px 12px;margin:12px 0 14px;text-align:center;}\n      body.dark .bot-mountain-box{background:linear-gradient(180deg,rgba(15,23,42,0.6),rgba(30,41,59,0.4));border-color:rgba(56,189,248,0.2);}\n      .bot-mountain-title{font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:0.7px;color:#0369a1;margin-bottom:6px;}\n      body.dark .bot-mountain-title{color:#7dd3fc;}\n      .bot-mountain-icons{font-size:22px;letter-spacing:2px;line-height:1.5;margin:8px 0;word-break:break-all;user-select:none;}\n      .bot-mountain-stat{font-size:13.5px;font-weight:900;color:#0f172a;margin-top:4px;}\n      body.dark .bot-mountain-stat{color:#f8fafc;}\n      .bot-mountain-stat span{color:#0284c7;}\n      body.dark .bot-mountain-stat span{color:#38bdf8;}\n      .bot-ahorro-hero{background:linear-gradient(135deg,#10b981,#059669);border-radius:18px;padding:14px 16px;color:#fff;margin:12px 0;box-shadow:0 8px 20px rgba(16,185,129,0.25);}\n      .bot-ahorro-hero-label{font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:0.8px;opacity:0.9;}\n      .bot-ahorro-hero-val{font-size:24px;font-weight:950;margin:2px 0 4px;line-height:1.1;}\n      .bot-ahorro-hero-equiv{font-size:11.5px;font-weight:700;line-height:1.35;opacity:0.95;background:rgba(0,0,0,0.14);padding:8px 10px;border-radius:10px;margin-top:6px;}\n" +
       '.bot-eco{margin-top:14px;padding:14px;border-radius:16px;background:linear-gradient(160deg,rgba(34,168,120,.12),rgba(91,141,239,.10) 55%,rgba(58,208,164,.08));border:1px solid rgba(34,168,120,.22)}' +
       'body.dark .bot-eco{background:linear-gradient(160deg,rgba(34,168,120,.16),rgba(91,141,239,.12));border-color:rgba(58,208,164,.22)}' +
       '.bot-eco-kicker{margin:0 0 4px;color:#168765;font-size:10px;font-weight:950;letter-spacing:.6px;text-transform:uppercase}' +
@@ -412,13 +412,19 @@
       '<button type="button" class="cmp-btn" id="cmpShare">📤 Mandarla por WhatsApp</button>' +
       '<p class="cmp-note" id="cmpNotePrecios">Fichas de catalogo.psa.com.ar. Precios de lista tienda ' + cmpFechaLista() + '. Cambiá el precio si cotizás otro.</p>';
   }
-  function htmlCmpBot(){
-    return '<div class="tb-sub">Mostrala en la demo: la plata y el planeta despiertan conciencia</div>' +
-      '<div class="tb-row"><span>Botellas de 2 L por día</span><input class="tb-input" style="max-width:90px" id="botPorDia" type="number" min="1" max="40" value="2"></div>' +
-      '<div class="tb-row"><span>Precio por botella ($)</span><input class="tb-input" style="max-width:120px" id="botPrecio" type="number" min="0" step="50" value="1500"></div>' +
-      '<div id="botResult"></div>' +
-      '<div class="bot-eco" id="botEco"></div>' +
-      '<button type="button" class="tb-btn" id="botShare" style="width:100%;margin-top:12px">📤 Compartirla por WhatsApp</button>';
+    function htmlCmpBot(){
+    var tipoActual = (window.__botTipo || "bidon");
+    return "<div class=\"tb-sub\">Mostrala en la demo al cliente: la plata tirada y el plástico acumulado despiertan conciencia al instante</div>" +
+      "<div class=\"bot-type-toggle\">" +
+        "<button type=\"button\" class=\"bot-type-btn " + (tipoActual === "bidon" ? "active" : "") + "\" id=\"btnTipoBidon\">🛢️ Bidones (12 / 20 L)</button>" +
+        "<button type=\"button\" class=\"bot-type-btn " + (tipoActual === "botella" ? "active" : "") + "\" id=\"btnTipoBotella\">🍾 Botellas (2 L)</button>" +
+      "</div>" +
+      "<div class=\"tb-row\"><span id=\"lblCantConsumo\">" + (tipoActual === "bidon" ? "Bidones por semana" : "Botellas (2 L) por día") + "</span><input class=\"tb-input\" style=\"max-width:90px\" id=\"botPorDia\" type=\"number\" min=\"1\" max=\"100\" value=\"" + (tipoActual === "bidon" ? "3" : "2") + "\"></div>" +
+      "<div class=\"tb-row\"><span id=\"lblPrecioConsumo\">" + (tipoActual === "bidon" ? "Precio por bidón ($)" : "Precio por botella ($)") + "</span><input class=\"tb-input\" style=\"max-width:120px\" id=\"botPrecio\" type=\"number\" min=\"0\" step=\"50\" value=\"" + (tipoActual === "bidon" ? "5500" : "1800") + "\"></div>" +
+      "<div id=\"botMountain\"></div>" +
+      "<div id=\"botResult\"></div>" +
+      "<div class=\"bot-eco\" id=\"botEco\"></div>" +
+      "<button type=\"button\" class=\"tb-btn\" id=\"botShare\" style=\"width:100%;margin-top:12px;background:linear-gradient(135deg,#25D366,#128C7E);font-size:13px;padding:12px\">📲 Enviar este informe al cliente por WhatsApp</button>";
   }
   function cmpCelda(val, win){
     return '<td class="' + (win ? 'cmp-win' : '') + '">' + val + '</td>';
@@ -576,45 +582,98 @@
       '<div class="tb-title">Comparativas</div>' +
       '<div class="cmp-tabs">' +
         '<button type="button" class="cmp-tab" id="cmpTabProd">Productos</button>' +
-        '<button type="button" class="cmp-tab" id="cmpTabBot">Botellas</button>' +
+        '<button type="button" class="cmp-tab" id="cmpTabBot">PSA vs Bidones / Botellas</button>' +
       '</div>' +
       '<div id="cmpPaneProd"' + (cmpTab() === 'prod' ? '' : ' hidden') + '>' + htmlCmpProd() + '</div>' +
       '<div id="cmpPaneBot"' + (cmpTab() === 'bot' ? '' : ' hidden') + '>' + htmlCmpBot() + '</div></div>';
   }
-  function calcBotella(){
-    if (!$('botPorDia') || !$('botResult')) return;
-    var d = Math.max(1, Number($('botPorDia').value) || 2);
-    var p = Math.max(0, Number($('botPrecio').value) || 0);
-    var dia = d * p, mes = dia * 30, anio = mes * 12, tres = anio * 3;
-    var f = function(n){ return '$' + Math.round(n).toLocaleString('es-AR'); };
-    var botellasAnio = d * 365;
-    var botellasTres = botellasAnio * 3;
-    var kgAnio = botellasAnio * BOT_G / 1000;
+    function calcBotella(){
+    if (!$("botPorDia") || !$("botResult")) return;
+    var esBidon = (window.__botTipo !== "botella");
+    var cant = Math.max(1, Number($("botPorDia").value) || (esBidon ? 3 : 2));
+    var p = Math.max(0, Number($("botPrecio").value) || 0);
+
+    var gastoSemana = esBidon ? (cant * p) : (cant * 7 * p);
+    var gastoMes = gastoSemana * 4.33;
+    var gastoAnio = gastoSemana * 52;
+    var gastoTres = gastoAnio * 3;
+
+    var f = function(n){ return "$" + Math.round(n).toLocaleString("es-AR"); };
+
+    var unidadesAnio = esBidon ? (cant * 52) : (cant * 365);
+    var unidadesTres = unidadesAnio * 3;
+    var litrosAnio = esBidon ? (unidadesAnio * 20) : (unidadesAnio * 2);
+
+    var gPorUnidad = esBidon ? 750 : 44;
+    var kgAnio = (unidadesAnio * gPorUnidad) / 1000;
     var kgTres = kgAnio * 3;
-    var m2Anio = botellasAnio * BOT_M2;
-    var petroleo = kgAnio * BOT_PETROLEO;
-    var arboles = (kgAnio * BOT_CO2) / BOT_ARBOL;
-    var horizonte = new Date().getFullYear() + BOT_ANIOS;
+    var m2Anio = unidadesAnio * (esBidon ? 0.09 : 0.015);
+    var petroleo = kgAnio * 2;
+    var arboles = Math.max(0.5, (kgAnio * 3) / 22);
     var areaTxt = botEquivArea(m2Anio);
-    $('botResult').innerHTML =
-      '<div class="tb-row"><span>Por día</span><span>' + f(dia) + '</span></div>' +
-      '<div class="tb-row"><span>Por mes (30 días)</span><span>' + f(mes) + '</span></div>' +
-      '<div class="tb-row"><span>Por año</span><span class="tb-big">' + f(anio) + '</span></div>' +
-      '<div class="tb-row"><span>En 3 años</span><span class="tb-big tb-no">' + f(tres) + '</span></div>' +
-      '<div class="tb-sub" style="margin-top:6px">Con el sistema, ese dinero vuelve a tu bolsillo: ' + f(anio) + ' por año que hoy se van en botellas.</div>';
-    var eco = $('botEco');
+
+    var equivTexto = "";
+    if (gastoTres >= 4000000) {
+      equivTexto = "🏖️ Equivale a unas vacaciones familiares completas o un viaje inolvidable.";
+    } else if (gastoTres >= 2000000) {
+      equivTexto = "🎒 Equivale a un año completo de cuotas del colegio o renovar los electrodomésticos del hogar.";
+    } else {
+      equivTexto = "🛒 Equivale a varios meses de compras completas de supermercado que hoy se van en plástico.";
+    }
+
+    var maxIconos = 28;
+    var cantIconos = Math.min(maxIconos, Math.max(6, Math.round(unidadesAnio / (esBidon ? 6 : 40))));
+    var iconoItem = esBidon ? "🛢️" : "🍾";
+    var montanaVisual = "";
+    for (var mi = 0; mi < cantIconos; mi++) {
+      montanaVisual += iconoItem + " ";
+      if ((mi + 1) % 7 === 0) montanaVisual += "<br>";
+    }
+
+    var mountEl = $("botMountain");
+    if (mountEl) {
+      mountEl.innerHTML =
+        "<div class=\"bot-mountain-box\">" +
+          "<div class=\"bot-mountain-title\">Montaña de plástico que entra a esa casa en 1 año</div>" +
+          "<div class=\"bot-mountain-icons\">" + montanaVisual + "</div>" +
+          "<div class=\"bot-mountain-stat\">Son <span>" + unidadesAnio.toLocaleString("es-AR") + " " + (esBidon ? "bidones" : "botellas") + "</span> acumulados por año (" + Math.round(litrosAnio).toLocaleString("es-AR") + " litros transportados a mano)</div>" +
+        "</div>";
+    }
+
+    $("botResult").innerHTML =
+      "<div class=\"bot-ahorro-hero\">" +
+        "<div class=\"bot-ahorro-hero-label\">Dinero que se va en agua envasada</div>" +
+        "<div class=\"bot-ahorro-hero-val\">" + f(gastoTres) + " <small style=\"font-size:13px;font-weight:700\">en 3 años</small></div>" +
+        "<div class=\"bot-ahorro-hero-equiv\">" + equivTexto + "</div>" +
+      "</div>" +
+      "<div class=\"tb-row\"><span>Gasto por mes</span><span style=\"font-weight:800\">" + f(gastoMes) + "</span></div>" +
+      "<div class=\"tb-row\"><span>Gasto por año</span><span class=\"tb-big\" style=\"color:#0b5878\">" + f(gastoAnio) + "</span></div>" +
+      "<div class=\"tb-row\"><span>En 3 años (vida útil purificador)</span><span class=\"tb-big tb-no\">" + f(gastoTres) + "</span></div>" +
+      "<div class=\"tb-sub\" style=\"margin-top:8px;font-weight:600\">Con un purificador PSA en la cocina, tenés agua pura ilimitada por una fracción mínima de este valor y dejás de cargar peso.</div>";
+
+    var eco = $("botEco");
     if (eco) eco.innerHTML =
-      '<div class="bot-eco-kicker">Impacto ambiental</div>' +
-      '<h3>Lo que le ahorrás al planeta</h3>' +
-      '<p class="bot-eco-lead">Si esa familia deja las botellas, este plástico no se fabrica. Los números se mueven con lo que cargaste arriba.</p>' +
-      '<div class="bot-eco-grid">' +
-        '<div class="bot-eco-item"><span>♻️</span><b>' + botKgTxt(kgAnio) + ' kg</b><small>de plástico por año</small></div>' +
-        '<div class="bot-eco-item"><span>📐</span><b>' + botFmt(m2Anio, 1) + ' m²</b><small>si las tirás al piso · ' + esc(areaTxt) + '</small></div>' +
-        '<div class="bot-eco-item"><span>⏳</span><b>' + botFmt(BOT_ANIOS) + ' años</b><small>tarda cada botella en descomponerse</small></div>' +
-        '<div class="bot-eco-item"><span>🛢️</span><b>' + botFmt(petroleo, 0) + ' L</b><small>de petróleo para fabricar ese plástico</small></div>' +
-      '</div>' +
-      '<p class="bot-eco-nota">La botella no crece en un árbol: el plástico PET se hace con petróleo. Evitar <b>' + botKgTxt(kgAnio) + ' kg</b> es no usar unos <b>' + botFmt(petroleo, 0) + ' litros</b> (más o menos un tanque de nafta). En 3 años son <b>' + botFmt(botellasTres) + ' botellas</b> y <b>' + botKgTxt(kgTres) + ' kg</b> de plástico, que seguirían en la Tierra en el <b>año ' + horizonte + '</b>. Dejarlas equivale a plantar unos <b>' + botFmt(arboles, 1) + ' árboles</b> en absorción de CO₂.</p>';
-    window.__botTexto = '🍶 Comparativa de la botella (2 L):\n' + d + ' botellas por día a ' + f(p) + ' cada una.\nPor mes: ' + f(mes) + '\nPor año: ' + f(anio) + '\nEn 3 años: ' + f(tres) + '\nCon el sistema de purificación, ese dinero vuelve a tu bolsillo.\n\n🌍 Lo que le ahorrás al planeta:\n• ' + botKgTxt(kgAnio) + ' kg de plástico por año\n• ' + botFmt(m2Anio, 1) + ' m² si las tirás al piso (' + areaTxt + ')\n• Cada botella tarda ' + BOT_ANIOS + ' años en descomponerse\n• El PET se fabrica con petróleo: ' + botFmt(petroleo, 0) + ' litros para hacer ese plástico (un tanque de nafta)\nEn 3 años: ' + botKgTxt(kgTres) + ' kg. Ese plástico seguiría en la Tierra en el año ' + horizonte + '.';
+      "<div class=\"bot-eco-kicker\">Impacto ambiental y de salud</div>" +
+      "<h3>Lo que le ahorrás al planeta y al cuerpo</h3>" +
+      "<p class=\"bot-eco-lead\">Al instalar un purificador, todo este plástico deja de fabricarse, transportarse y acumular microplásticos en el agua que toma la familia.</p>" +
+      "<div class=\"bot-eco-grid\">" +
+        "<div class=\"bot-eco-item\"><span>♻️</span><b>" + botKgTxt(kgAnio) + " kg</b><small>de plástico evitados al año</small></div>" +
+        "<div class=\"bot-eco-item\"><span>🗑️</span><b>" + unidadesTres.toLocaleString("es-AR") + "</b><small>" + (esBidon ? "bidones" : "botellas") + " menos tirados en 3 años</small></div>" +
+        "<div class=\"bot-eco-item\"><span>⏳</span><b>450 años</b><small>tarda este plástico en degradarse</small></div>" +
+        "<div class=\"bot-eco-item\"><span>🌳</span><b>" + botFmt(arboles, 1) + "</b><small>árboles equivalentes en CO₂ absorbido</small></div>" +
+      "</div>" +
+      "<p class=\"bot-eco-nota\">En 3 años esa casa evita trasladar y almacenar <b>" + unidadesTres.toLocaleString("es-AR") + " " + (esBidon ? "bidones" : "botellas") + "</b> y <b>" + botKgTxt(kgTres) + " kg</b> de plástico descartable. Dejar de comprar bidones equivale a plantar <b>" + botFmt(arboles, 1) + " árboles</b> y recuperar la comodidad de abrir la canilla y tomar agua pura al instante.</p>";
+
+    window.__botTexto =
+      "💧 Comparativa de Ahorro: PSA vs " + (esBidon ? "Bidones" : "Agua Embotellada") + "\n\n" +
+      "Consumo actual: " + cant + " " + (esBidon ? "bidones por semana" : "botellas por día") + " ($" + p.toLocaleString("es-AR") + " c/u)\n" +
+      "• Gasto mensual: " + f(gastoMes) + "\n" +
+      "• Gasto en 1 año: " + f(gastoAnio) + "\n" +
+      "• Gasto en 3 años: " + f(gastoTres) + "\n\n" +
+      "💡 Con un purificador PSA en tu casa:\n" +
+      "1. Ahorrás " + f(gastoTres) + " en 3 años (" + equivTexto.replace(/^[^w]+/, "") + ")\n" +
+      "2. Evitás acumular " + unidadesAnio.toLocaleString("es-AR") + " " + (esBidon ? "bidones" : "botellas") + " de plástico al año.\n" +
+      "3. Agua pura, segura e ilimitada directo de la canilla sin cargar bidones pesados.";
   }
 
   /* ---------------- 3 · SIMULADOR DE GANANCIAS ---------------- */
@@ -784,15 +843,39 @@
     var d=$('botPorDia'), p=$('botPrecio'), sh=$('botShare');
     if (d) d.oninput = calcBotella;
     if (p) p.oninput = calcBotella;
+
+    function activarTipo(tipo){
+      window.__botTipo = tipo;
+      var btnBid = $('btnTipoBidon'), btnBot = $('btnTipoBotella');
+      var lblC = $('lblCantConsumo'), lblP = $('lblPrecioConsumo');
+      if (btnBid) btnBid.classList.toggle('active', tipo === 'bidon');
+      if (btnBot) btnBot.classList.toggle('active', tipo === 'botella');
+      if (tipo === 'bidon') {
+        if (lblC) lblC.textContent = "Bidones por semana";
+        if (lblP) lblP.textContent = "Precio por bidón ($)";
+        if (d && (!d.value || d.value === "2")) d.value = "3";
+        if (p && (!p.value || p.value === "1800" || p.value === "1500")) p.value = "5500";
+      } else {
+        if (lblC) lblC.textContent = "Botellas (2 L) por día";
+        if (lblP) lblP.textContent = "Precio por botella ($)";
+        if (d && (!d.value || d.value === "3")) d.value = "2";
+        if (p && (!p.value || p.value === "5500")) p.value = "1800";
+      }
+      calcBotella();
+    }
+
+    var btnBid = $('btnTipoBidon'), btnBot = $('btnTipoBotella');
+    if (btnBid) btnBid.onclick = function(){ activarTipo('bidon'); };
+    if (btnBot) btnBot.onclick = function(){ activarTipo('botella'); };
+
     if (sh) sh.onclick = function(){
       var url = 'https://wa.me/?text=' + encodeURIComponent(window.__botTexto || '');
       if (window.APPIWhatsApp && window.APPIWhatsApp.abrir) window.APPIWhatsApp.abrir(url);
       else window.open(url, '_blank', 'noopener');
     };
     bindCmp();
-    // Entrar a la botella muestra la botella, no la solapa Productos que
-    // quedó guardada del comparador (v479): el acceso directo manda.
     cmpMostrar('bot');
+    activarTipo(window.__botTipo || 'bidon');
   }
   function abrirSimulador(){
     crearVistas();
