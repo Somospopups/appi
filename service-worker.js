@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v909-tarjeta-pb-nombre-apellido';
+const CACHE_NAME = 'appi-v910-scroll-top-dock-pantallas';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
