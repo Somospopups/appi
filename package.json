@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "927.0.0",
-  "cacheName": "appi-v927-carrera-ultra-limpia",
+  "version": "928.0.0",
+  "cacheName": "appi-v928-limpieza-carrera",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

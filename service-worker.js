@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v927-carrera-ultra-limpia';
+const CACHE_NAME = 'appi-v928-limpieza-carrera';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
