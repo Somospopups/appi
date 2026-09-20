@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v904-desglose-individual-exacto-ganancias';
+const CACHE_NAME = 'appi-v905-quitar-apartado-promos-lista';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

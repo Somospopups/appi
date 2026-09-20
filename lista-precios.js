@@ -78,7 +78,6 @@
   var GRUPOS = [
     { id: 'todos', t: 'Todos' },
     { id: 'novedades', t: '✨ Novedades' },
-    { id: 'promos', t: '🔥 Promos' },
     { id: 'packs', t: 'Packs PSA' },
     { id: 'Purificadores', t: 'Purificadores' },
     { id: 'Gasificador', t: 'Gasificador' },
@@ -95,7 +94,6 @@
   ];
   var GRUPO_TIT = {
     novedades: '✨ Novedades y Nuevos Lanzamientos',
-    promos: '🔥 Promociones vigentes',
     packs: 'Packs PSA',
     'Purificadores': 'Purificadores',
     'Gasificador': 'Gasificador',
@@ -217,22 +215,13 @@
     var q = busca.trim().toLowerCase();
     var list = lineasLista();
     var res = list.filter(function (L) {
-      if (filtro === 'promos') {
-        if (!L.promo || !L.promo.activa) return false;
-      } else if (filtro === 'novedades') {
+      if (filtro === 'novedades') {
         if (!L.novedad) return false;
       } else if (filtro !== 'todos' && L.grupo !== filtro) {
         return false;
       }
       if (!q) return true;
       return (L.nombre || '').toLowerCase().indexOf(q) >= 0 || String(L.sku).indexOf(q) >= 0;
-    });
-    // Promociones siempre arriba de todo
-    res.sort(function (a, b) {
-      var aP = (a.promo && a.promo.activa) ? 1 : 0;
-      var bP = (b.promo && b.promo.activa) ? 1 : 0;
-      if (aP !== bP) return bP - aP;
-      return 0;
     });
     return res;
   }
