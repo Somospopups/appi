@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "919.0.0",
-  "cacheName": "appi-v919-pase-lider-ejecutivo-filtro-categoria",
+  "version": "920.0.0",
+  "cacheName": "appi-v920-organigrama-dinamico-por-usuario-wa",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

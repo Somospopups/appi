@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v919-pase-lider-ejecutivo-filtro-categoria';
+const CACHE_NAME = 'appi-v920-organigrama-dinamico-por-usuario-wa';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

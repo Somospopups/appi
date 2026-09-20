@@ -191,6 +191,16 @@
   }
 
   // Verifica si una persona califica según la categoría requerida por el casillero
+  
+  function formatearTel(tel){
+    if (!tel) return '';
+    var clean = String(tel).replace(/[^0-9]/g, '');
+    if (!clean) return '';
+    if (clean.length === 10 && clean.charAt(0) !== '5') return '549' + clean;
+    if (clean.indexOf('54') === 0 && clean.indexOf('549') !== 0) return '549' + clean.slice(2);
+    return clean;
+  }
+
   function personaCalificaParaSlot(persona, slotConfig){
     if (!persona) return false;
     var pCatCode = normalizarCodigoCat(persona.cat || persona.categoria || '');
@@ -245,12 +255,22 @@
       if (persona) {
         var pbP = Number(persona.pnAct || persona.pbPersonal || persona.pb || 0);
         var cumpleMin = pbP >= slot.pbMin;
-        var pClass = cumpleMin ? 'ok' : 'falta';
+        var pClass = cumpleMin ? "ok" : "falta";
         var catBadge = persona.cat || slot.rol;
+        var tel = formatearTel(persona.telefono || persona.celular || persona.tel || '');
+        var waBtn = '';
+        if (tel) {
+          var pNombreCorto = (persona.nombre || '').split(' ')[0];
+          var msj = encodeURIComponent('¡Hola ' + pNombreCorto + '! Te escribo para coordinar ventas y objetivos de este mes 💪');
+          waBtn = '<a class="org-slot-wa-btn" href="https://wa.me/' + tel + '?text=' + msj + '" target="_blank" onclick="event.stopPropagation();" title="Escribir por WhatsApp">💬</a>';
+        }
         return '<div class="org-slot-card filled ' + pClass + '" data-pick-slot="' + idx + '" title="Tocar para cambiar">' +
           '<div class="org-slot-top">' +
             '<span class="org-cat-tag">' + esc(catBadge) + '</span>' +
-            '<button type="button" class="org-slot-remove-btn" data-remove-slot="' + idx + '" title="Quitar">×</button>' +
+            '<div class="org-slot-actions-top">' +
+              waBtn +
+              '<button type="button" class="org-slot-remove-btn" data-remove-slot="' + idx + '" title="Quitar">×</button>' +
+            '</div>' +
           '</div>' +
           '<div class="org-slot-avatar-wrap">' +
             '<div class="org-slot-avatar">' + esc((persona.nombre || 'D').substring(0, 2).toUpperCase()) + '</div>' +
@@ -571,7 +591,7 @@
       '.org-slot-top{display:flex;justify-content:space-between;align-items:center;width:100%;margin-bottom:4px;}' +
       '.org-cat-tag{font-size:9px;font-weight:900;background:rgba(11,88,120,0.1);color:#0b5878;padding:1px 6px;border-radius:6px;}' +
       'body.dark .org-cat-tag{background:rgba(56,189,248,0.2);color:#7dd3fc;}' +
-      '.org-slot-remove-btn{background:none;border:none;color:#94a3b8;font-size:16px;cursor:pointer;padding:0 2px;line-height:1;border-radius:4px;}' +
+      '.org-slot-actions-top{display:flex;align-items:center;gap:4px;}.org-slot-wa-btn{background:rgba(16,185,129,0.15);border:none;color:#059669;font-size:12px;padding:2px 5px;border-radius:6px;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;}.org-slot-wa-btn:hover{background:#10b981;color:#fff;}.org-slot-remove-btn{background:none;border:none;color:#94a3b8;font-size:16px;cursor:pointer;padding:0 2px;line-height:1;border-radius:4px;}' +
       '.org-slot-remove-btn:hover{color:#ef4444;background:rgba(239,68,68,0.1);}' +
       '.org-slot-avatar-wrap{position:relative;margin-bottom:4px;}' +
       '.org-slot-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#3d63c9,#5b8def);color:#fff;font-size:11px;font-weight:900;display:flex;align-items:center;justify-content:center;}' +
