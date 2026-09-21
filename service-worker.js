@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v932-limpieza-absoluta';
+const CACHE_NAME = 'appi-v933-promos-discriminadas';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

@@ -3,6 +3,7 @@
   'use strict';
 
   var LS = 'appi_lista_carrito_v1';
+  var LS_DESC = 'appi_lista_desc_v1';
   var LS_FAB = 'appi_lista_fab_v1';
   try { localStorage.removeItem(LS_FAB); } catch (e) {}
   var LS_PAGO = 'appi_lista_pago_v1';
@@ -126,6 +127,22 @@
       .trim();
   }
 
+
+  function descuentos() {
+    try { return JSON.parse(localStorage.getItem(LS_DESC) || '{}') || {}; } catch (e) { return {}; }
+  }
+  function guardarDescuentos(d) {
+    try { localStorage.setItem(LS_DESC, JSON.stringify(d)); } catch (e) {}
+  }
+  function getDesc(sku) { return Number(descuentos()[sku]) || 0; }
+  function setDesc(sku, pct) {
+    var d = descuentos();
+    pct = Number(pct) || 0;
+    if (pct <= 0) delete d[sku];
+    else d[sku] = pct;
+    guardarDescuentos(d);
+  }
+
   function carrito() {
     try { return JSON.parse(localStorage.getItem(LS) || '{}') || {}; } catch (e) { return {}; }
   }
@@ -232,8 +249,11 @@
       var q = Number(c[sku]) || 0;
       if (!p || q <= 0) return;
       n += q;
-      tot += q * (Number(p.precio) || 0);
-      lineas.push({ p: p, q: q });
+      var pctDesc = getDesc(sku);
+      var precioBase = Number(p.precio) || 0;
+      var precioFinal = pctDesc > 0 ? Math.round(precioBase * (1 - pctDesc / 100)) : precioBase;
+      tot += q * precioFinal;
+      lineas.push({ p: p, q: q, descPct: pctDesc, precioOriginal: precioBase, precioFinal: precioFinal });
     });
     return { n: n, tot: tot, lineas: lineas };
   }
@@ -1325,10 +1345,26 @@
       return;
     }
     host.innerHTML = r.lineas.map(function (ln) {
-      return '<div class="lp-line" data-sku="' + esc(ln.p.clave || claveSku(ln.p)) + '">' +
-        '<div class="lp-qty"><button type="button" class="ghost" data-act="menos">−</button><i>' + ln.q + '</i>' +
-        '<button type="button" data-act="mas">+</button></div>' +
-        '<b>' + esc(ln.p.nombre) + '</b><span>' + money(ln.q * ln.p.precio) + '</span></div>';
+      var k = esc(ln.p.clave || claveSku(ln.p));
+      var d = ln.descPct || 0;
+      var promoPill = d > 0 ? ('<span class="lp-line-promo-tag">*PROMO ' + d + '% DESCUENTO*</span>') : '';
+      var precioStr = d > 0 ? ('<s style="font-size:11px;opacity:0.6;margin-right:4px">' + money(ln.q * ln.precioOriginal) + '</s>' + money(ln.q * ln.precioFinal)) : money(ln.q * ln.precioFinal);
+      return '<div class="lp-line-wrap" data-sku="' + k + '">' +
+        '<div class="lp-line">' +
+          '<div class="lp-qty"><button type="button" class="ghost" data-act="menos">−</button><i>' + ln.q + '</i>' +
+          '<button type="button" data-act="mas">+</button></div>' +
+          '<div class="lp-line-info"><b>' + esc(ln.p.nombre) + '</b>' + promoPill + '</div>' +
+          '<span>' + precioStr + '</span>' +
+        '</div>' +
+        '<div class="lp-line-desc-bar">' +
+          '<span class="lp-desc-bar-lbl">Descuento:</span>' +
+          '<button type="button" class="lp-desc-btn ' + (d === 0 ? 'active' : '') + '" data-set-desc="0">Lista</button>' +
+          '<button type="button" class="lp-desc-btn ' + (d === 5 ? 'active' : '') + '" data-set-desc="5">Promo 5%</button>' +
+          '<button type="button" class="lp-desc-btn ' + (d === 10 ? 'active' : '') + '" data-set-desc="10">Promo 10%</button>' +
+          '<button type="button" class="lp-desc-btn ' + (d === 15 ? 'active' : '') + '" data-set-desc="15">Promo 15%</button>' +
+          '<button type="button" class="lp-desc-btn ' + (d === 20 ? 'active' : '') + '" data-set-desc="20">20%</button>' +
+        '</div>' +
+      '</div>';
     }).join('');
     if (tot) tot.textContent = 'Total ' + money(r.tot);
     pintarGanancia();
@@ -1349,6 +1385,7 @@
     if (clr) clr.onclick = function () {
       sonarVaciar();
       guardarCarrito({});
+      guardarDescuentos({});
       cerrarSheet();
       pintarTodo();
     };
@@ -1618,12 +1655,18 @@
       var filasTabla = [];
       r.lineas.forEach(function (ln) {
         var p = ln.p;
+        var descP = ln.descPct || 0;
+        var pFinal = ln.precioFinal || (Number(p.precio) || 0);
+        var nomBase = sinMarca(p.nombre) || p.nombre || "";
+        if (descP > 0) {
+          nomBase += " *PROMO " + descP + "% DESCUENTO*";
+        }
         if (p.grupo === "packs" && Array.isArray(p.items_skus) && p.items_skus.length > 0) {
           filasTabla.push({
-            nom: sinMarca(p.nombre) || p.nombre || "",
+            nom: nomBase,
             cant: String(ln.q),
-            unit: money(p.precio),
-            subt: money(ln.q * p.precio),
+            unit: money(pFinal),
+            subt: money(ln.q * pFinal),
             esSub: false,
             esPack: true
           });
@@ -1642,10 +1685,10 @@
           });
         } else {
           filasTabla.push({
-            nom: sinMarca(p.nombre) || p.nombre || "",
+            nom: nomBase,
             cant: String(ln.q),
-            unit: money(p.precio),
-            subt: money(ln.q * p.precio),
+            unit: money(pFinal),
+            subt: money(ln.q * pFinal),
             esSub: false,
             esPack: false
           });
@@ -2148,8 +2191,16 @@
     if (sheet && !sheet._lpBound) {
       sheet._lpBound = true;
       sheet.onclick = function (e) {
-        var btn = e.target.closest('[data-act]');
+        var descBtn = e.target.closest('[data-set-desc]');
         var row = e.target.closest('[data-sku]');
+        if (descBtn && row) {
+          var skuD = row.getAttribute('data-sku');
+          var pVal = Number(descBtn.getAttribute('data-set-desc')) || 0;
+          setDesc(skuD, pVal);
+          pintarSheet();
+          return;
+        }
+        var btn = e.target.closest('[data-act]');
         if (!btn || !row) return;
         var sku = row.getAttribute('data-sku');
         var n = qty(sku);
