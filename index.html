@@ -163,7 +163,8 @@ window.openStock=function(){
 <script src="./lista-precios.js?v=936"></script>
 <script src="./vendor/zxing.min.js"></script>
 <script src="./stock-personal.js?v=797"></script>
-<script src="./canillas-adaptadores.js?v=939"></script>
+<script src="./vendor/tesseract/tesseract.min.js"></script>
+<script src="./canillas-adaptadores.js?v=941"></script>
 
 <script src="./porque-vivo.js"></script>
 <script src="./home-limpio.js?v=521"></script>
@@ -4653,7 +4654,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v939 · Segura</div>
+  <div class="ds-foot">APPI · v941 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -12335,7 +12336,7 @@ function renderToolsList(){
       timeAgo:'Ahorro real', onClick:'openBotella()', accent:'#10b981', gradient:'linear-gradient(135deg,#10b981,#059669)'
     });
     const hCanillas = renderHomeQuickCard({
-      icon:'🔩', title:'Canillas y adaptadores', sub:'Identificador paso a paso · Guía PSA',
+      icon:'🔩', title:'Canillas y adaptadores', sub:'Saca una foto, la IA la deja arriba · Guía PSA',
       statusVal:'Guía', statusClass:'done', progressPct:100,
       timeAgo:'53 modelos', onClick:'openCanillas()', accent:'#0284c7', gradient:'linear-gradient(135deg,#0284c7,#38bdf8)'
     });
@@ -14007,8 +14008,8 @@ function cerrarToolsMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='939';
-      const CACHE_NAME='appi-v939-guia';
+      const swVersion='941';
+      const CACHE_NAME='appi-v941-deck';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}

@@ -4,6 +4,9 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+- Versión: **v941 · Segura** · 🔩 **Canillas y adaptadores como mazo deslizable**: a la izquierda **Tu foto** (sacás o subís una foto de tu pieza) y a la derecha el **catálogo PSA en cartas tipo Tinder**, con “Pasar carta X de N”. La IA lee la imagen (OCR) y la compara con las fotos del catálogo, deja arriba la carta más parecida con su “Cód. adaptador PSA” y el % de coincidencia; igual podés deslizar todas las cartas (gesto o botones) hasta encontrar la tuya. · Cache `appi-v941-deck`.
+- Versión anterior: **v939 · Segura** · 🔩 **Canillas y adaptadores con la guía adentro**: el identificador asistido (uso → tipo de boca → medida) ahora abre la **Guía V02-21** completa en un modal (PDF oficial embebido, con enlace para abrirla aparte), además de las 84 piezas con foto y SKU. · Cache `appi-v939-guia`.
+
 ## v830 · iOS: panel de contactos liviano (sin pantalla blanca)
 · Los listados grandes del Panel (Prioridad de hoy, Todos, Agenda personal) ahora se pintan por tandas (50/100/150) con botón “Mostrar más”: antes, con miles de contactos, el DOM de varios megas dejaba la pantalla blanca en iOS (Safari mata el webview por memoria).
 · Red de seguridad global: cualquier error de script o promesa se guarda (anillo en `appi_err_v1`) y muestra una barra roja con “Recargar” — nada vuelve a fallar en blanco silencio.
@@ -13,7 +16,7 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 - `renderManagement`, `openMiGestion` (cola de la agenda personal) y `openContactDetail` quedan dentro de try/catch con tarjeta de error visible y botón “Reintentar” dentro del Panel: el peor caso posible es un aviso, nunca un blanco.
 - Agenda personal: la misma protección fila por fila (una fila corrupta se cuenta y se avisa, no explota).
 - Test de regresión `panel-blindado.spec.js`: abre el Panel con contactos sucios y verifica que se dibuja, que la ficha sucia abre y que no hay pageerrors.
-- Versión: **v939 · Segura** · 🔩 **Canillas y adaptadores con la guía adentro**: el identificador asistido (uso → tipo de boca → medida) ahora abre la **Guía V02-21** completa en un modal (PDF oficial embebido, con enlace para abrirla aparte), además de las 84 piezas con foto y SKU. · Cache `appi-v939-guia`.
+- Versión anterior: **v939 · Segura** · 🔩 **Canillas y adaptadores con la guía adentro**: el identificador asistido (uso → tipo de boca → medida) ahora abre la **Guía V02-21** completa en un modal (PDF oficial embebido, con enlace para abrirla aparte), además de las 84 piezas con foto y SKU. · Cache `appi-v939-guia`.
 - Versión anterior: **v938 · Segura** · 🔩 **Canillas y adaptadores (identificador asistido)**: elegís uso, tipo de boca y medida y te deja el modelo justo de la Guía V02-21 (84 piezas, con foto oficial y SKU). Se recupera el gesto de atrás para los modales, la tarjeta del Home y el botón del menú. · Cache `appi-v938-canillas`.
 - Versión anterior: **v852 · Segura** · 🏠✨ **Píldora verde exclusiva de Home (restringida a view-home)** + cancelación instantánea al navegar. · Cache `appi-v852-toast-home-only`.
 - Versión anterior: **v831 · Segura**

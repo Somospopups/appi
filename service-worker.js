@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v939-guia';
+const CACHE_NAME = 'appi-v941-deck';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
@@ -36,6 +36,10 @@ const APP_SHELL = [
   './stock-personal.js',
   './canillas-adaptadores.js',
   './guia-adaptadores-psa.pdf',
+  './vendor/tesseract/tesseract.min.js',
+  './vendor/tesseract/worker.min.js',
+  './vendor/tesseract/tesseract-core-simd-lstm.wasm.js',
+  './vendor/tesseract/eng.traineddata',
   './vendor/zxing.min.js',
   './porque-vivo.js',
   './home-limpio.js',

@@ -88,44 +88,78 @@
   { num:'', n:'VARILLA INST. ECO-D SM', sku:'621010090', f:["ecod"], t:'', m:'', nt:[] }
   ];
 
-  var ESTILOS_ID = 'canillasEstilosV938';
+  var ESTILOS_ID = 'canillasEstilosV941';
   var GIA_PDF = './guia-adaptadores-psa.pdf';
   var CAT = null;
-  var estado = { uso: null, tipo: null, medida: null, q: '' };
+  var DECK = { items: [], idx: 0, q: '', aiSku: null };
+  var ID = { dataUrl: null, nombre: '', buscando: false, res: null, refs: null };
+  var TESE_OPTS = {
+    workerPath: './vendor/tesseract/worker.min.js',
+    corePath: './vendor/tesseract/tesseract-core-simd-lstm.wasm.js',
+    langPath: './vendor/tesseract/',
+    gzip: false
+  };
 
   function inyectarEstilos(){
     if (document.getElementById(ESTILOS_ID)) return;
     var css = '' +
-      '#canillasCont{display:flex;flex-direction:column;gap:14px;padding:14px;padding-bottom:34px;max-width:760px;margin:0 auto}' +
-      '.can-intro{background:rgba(255,255,255,.72);border:1px solid rgba(80,90,130,.12);border-radius:16px;padding:14px;font-size:13px;line-height:1.5;color:#3a3a48}' +
-      '.can-intro b{color:#0b5878}' +
-      '.can-barra{display:flex;gap:8px;flex-wrap:wrap;align-items:center}' +
-      '.can-count{font-size:12px;font-weight:800;color:#0b5878;background:rgba(91,141,239,.12);padding:6px 10px;border-radius:999px}' +
-      '.can-search{flex:1;min-width:180px;padding:9px 12px;border-radius:12px;border:1px solid rgba(80,90,130,.18);background:rgba(255,255,255,.85);font:inherit;font-size:13px;outline:none}' +
-      '.can-paso{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:900;color:#0b5878;text-transform:uppercase;letter-spacing:.3px}' +
-      '.can-paso em{font-style:normal;font-weight:800;color:#fff;background:#3ad0a4;border-radius:8px;padding:2px 7px;font-size:11px}' +
-      '.can-chips{display:flex;gap:8px;flex-wrap:wrap}' +
-      '.can-chip{border:1px solid rgba(80,90,130,.16);background:#fff;color:#3a3a48;border-radius:12px;padding:9px 12px;font:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:all .12s}' +
-      '.can-chip:hover{transform:translateY(-1px);border-color:#5b8def}' +
-      '.can-chip.sel{background:linear-gradient(135deg,#0b5878,#3ad0a4);color:#fff;border-color:transparent}' +
-      '.can-chip.saltar{background:none;color:#5b8def;border-style:dashed}' +
-      '.can-selecs{display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:12px}' +
-      '.can-selecs span{background:rgba(11,88,120,.08);color:#0b5878;border-radius:999px;padding:4px 9px;font-weight:800;cursor:pointer}' +
-      '.can-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}' +
-      '@media(min-width:600px){.can-cards{grid-template-columns:repeat(auto-fill,minmax(280px,1fr))}}' +
-      '.can-card{background:#fff;border:1px solid rgba(80,90,130,.14);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:8px;box-shadow:0 2px 6px rgba(30,40,90,.04)}' +
-      '.can-card .can-foto{display:block;width:100%;height:120px;object-fit:contain;background:#fff;border-radius:12px;border:1px solid rgba(80,90,130,.10);cursor:pointer}' +
-      '.can-card .can-num{font-size:10px;font-weight:900;color:#fff;background:#0284c7;border-radius:6px;padding:2px 7px;align-self:flex-start}' +
-      '.can-card h3{margin:0;font-size:13.5px;font-weight:800;color:#23233a;line-height:1.3}' +
-      '.can-card .can-sku{font-size:11px;color:#8a8a99;font-weight:700}' +
+      '#canillasCont{display:flex;flex-direction:column;gap:14px;padding:14px;padding-bottom:34px;max-width:980px;margin:0 auto}' +
+      '.can-cols{display:flex;flex-direction:column;gap:14px}' +
+      '@media(min-width:820px){.can-cols{flex-direction:row;align-items:flex-start}.can-idpanel{flex:0 0 300px;position:sticky;top:10px}.can-deckcol{flex:1;min-width:0}}' +
+      '.can-idpanel{display:flex;flex-direction:column;gap:12px;background:rgba(255,255,255,.82);border:1px solid rgba(80,90,130,.13);border-radius:20px;padding:16px;box-shadow:0 8px 24px rgba(30,40,90,.06);min-height:320px}' +
+      '.can-idhead{display:flex;align-items:center;justify-content:space-between;gap:8px}' +
+      '.can-idtag{font-size:10px;font-weight:900;letter-spacing:1.2px;color:#0b5878;text-transform:uppercase}' +
+      '.can-cambia{border:none;background:none;font:inherit;font-size:11.5px;font-weight:800;color:#0284c7;cursor:pointer;text-decoration:underline;display:none}' +
+      '.can-cambia.on{display:inline-block}' +
+      '.can-idhero{display:flex;flex-direction:column;gap:8px;align-items:center;text-align:center}' +
+      '.can-idi{width:64px;height:64px;border-radius:20px;background:linear-gradient(135deg,#0284c7,#38bdf8);display:grid;place-items:center;font-size:30px;color:#fff;box-shadow:0 10px 22px rgba(2,132,199,.30)}' +
+      '.can-idhero strong{font-size:15px;color:#23233a}' +
+      '.can-idhero p{margin:0;font-size:12px;color:#5a5b6b;line-height:1.5}' +
+      '.can-idacc{display:flex;flex-direction:column;gap:8px;width:100%}' +
+      '.can-idacc button{border:none;border-radius:12px;padding:11px 12px;font:inherit;font-size:13px;font-weight:800;cursor:pointer;color:#fff;background:linear-gradient(135deg,#0284c7,#38bdf8);display:flex;align-items:center;justify-content:center;gap:8px}' +
+      '.can-idacc button.sec{background:#fff;color:#0b5878;border:1px solid rgba(2,132,199,.32)}' +
+      '.can-idpre{position:relative;border-radius:16px;overflow:hidden;border:1px solid rgba(80,90,130,.14);background:#fff;box-shadow:0 8px 20px rgba(30,40,90,.10)}' +
+      '.can-idpre img{width:100%;max-height:170px;object-fit:contain;display:block}' +
+      '.can-idest{display:flex;flex-direction:column;gap:9px;align-items:center;text-align:center}' +
+      '.can-idest strong{color:#23233a;font-size:14px}' +
+      '.can-msg{margin:0;font-size:12px;color:#7a7b8b;line-height:1.45}' +
+      '.can-spin{width:24px;height:24px;border:3px solid rgba(91,141,239,.25);border-top-color:#5b8def;border-radius:50%;animation:canSpin .8s linear infinite}' +
+      '@keyframes canSpin{to{transform:rotate(360deg)}}' +
+      '.can-match{background:linear-gradient(135deg,rgba(22,135,101,.10),rgba(58,208,164,.14));border:1px solid rgba(22,135,101,.35);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:6px;align-items:center;text-align:center}' +
+      '.can-match .can-mlabel{font-size:10px;font-weight:900;letter-spacing:1px;color:#168765;text-transform:uppercase}' +
+      '.can-match b{color:#23233a;font-size:14px;line-height:1.35}' +
+      '.can-match .can-mnum{font-size:11px;font-weight:900;color:#fff;background:#168765;border-radius:8px;padding:3px 9px}' +
+      '.can-match .can-mpct{font-size:11px;font-weight:800;color:#168765}' +
+      '.can-nomatch{background:rgba(195,76,83,.08);border:1px solid rgba(195,76,83,.30);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:6px;align-items:center;text-align:center}' +
+      '.can-nomatch strong{color:#c34c53;font-size:13.5px}' +
+      '.can-deckhead{display:flex;align-items:center;justify-content:space-between;gap:8px}' +
+      '.can-decktitle{font-size:13px;font-weight:900;color:#0b5878;letter-spacing:.4px;text-transform:uppercase}' +
+      '.can-decktitle small{font-weight:700;color:#8a8a99;letter-spacing:.2px}' +
+      '.can-guialink{border:none;background:none;font:inherit;font-size:12px;font-weight:800;color:#0284c7;cursor:pointer;text-decoration:underline}' +
+      '.can-deckbar{display:flex;gap:8px;align-items:center}' +
+      '.can-decksearch{flex:1;min-width:0;padding:9px 12px;border-radius:12px;border:1px solid rgba(80,90,130,.18);background:rgba(255,255,255,.85);font:inherit;font-size:13px;outline:none}' +
+      '.can-deckwrap{position:relative;min-height:400px;margin-top:10px}' +
+      '.can-deck{position:absolute;inset:0;touch-action:pan-y;user-select:none;-webkit-user-select:none;transform-origin:50% 100%}' +
+      '.can-carta{position:absolute;inset:0;border-radius:24px;overflow:hidden;display:flex;flex-direction:column;background:#fff;border:1px solid rgba(80,90,130,.16);box-shadow:0 18px 44px rgba(20,30,70,.14)}' +
+      '.can-carta .can-cfoto{flex:1;min-height:0;display:grid;place-items:center;padding:18px;background:linear-gradient(160deg,#f6f9ff,#eef2fb)}' +
+      '.can-carta .can-cfoto img{max-width:100%;max-height:100%;object-fit:contain}' +
+      '.can-carta .can-cfoto .can-sinfoto{font-size:34px;opacity:.45}' +
+      '.can-carta .can-cdato{display:flex;flex-direction:column;gap:7px;padding:14px 16px 16px}' +
+      '.can-carta h3{margin:0;font-size:15px;font-weight:800;color:#23233a;line-height:1.3}' +
+      '.can-csoku{font-size:11px;color:#8a8a99;font-weight:700}' +
       '.can-tags{display:flex;gap:5px;flex-wrap:wrap}' +
       '.can-tags i{font-style:normal;font-size:10.5px;font-weight:800;color:#0b5878;background:rgba(91,141,239,.10);border-radius:6px;padding:2px 6px}' +
-      '.can-actions{display:flex;gap:6px;margin-top:auto}' +
-      '.can-actions button{flex:1;border:none;border-radius:9px;padding:8px 6px;font:inherit;font-size:11.5px;font-weight:800;cursor:pointer;color:#fff;background:linear-gradient(135deg,#0b5878,#3ad0a4)}' +
-      '.can-actions button.ghost{background:#fff;color:#0284c7;border:1px solid rgba(2,132,199,.35)}' +
-      '.can-actions a{flex:1;text-align:center;text-decoration:none;border-radius:9px;padding:8px 6px;font-size:11.5px;font-weight:800;color:#fff;background:linear-gradient(135deg,#25d366,#128c7e)}' +
-      '.can-vacio{padding:26px 12px;text-align:center;color:#8a8a99;font-size:13px;background:rgba(255,255,255,.6);border-radius:14px}' +
-      '.can-reiniciar{border:none;background:none;color:#0284c7;font:inherit;font-size:12px;font-weight:800;cursor:pointer;text-decoration:underline}' +
+      '.can-psa{font-size:12px;font-weight:900;color:#0284c7}' +
+      '.can-ai{display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:900;color:#fff;background:linear-gradient(135deg,#4f7df9,#168765);border-radius:999px;padding:6px 12px;align-self:center;margin-top:12px;box-shadow:0 6px 16px rgba(79,125,249,.35)}' +
+      '.can-acciones{display:flex;gap:6px;margin-top:2px}' +
+      '.can-acciones button,.can-acciones a{flex:1;border:none;border-radius:10px;padding:9px 6px;font:inherit;font-size:11.5px;font-weight:800;cursor:pointer;color:#fff;background:linear-gradient(135deg,#0b5878,#3ad0a4);text-decoration:none;text-align:center}' +
+      '.can-acciones button.ghost{background:#fff;color:#0284c7;border:1px solid rgba(2,132,199,.35)}' +
+      '.can-peek{transform:translateY(16px) scale(.96);opacity:.45;filter:blur(1.4px);pointer-events:none}' +
+      '.can-deckvacio{padding:34px 14px;text-align:center;color:#8a8a99;font-size:13px;background:rgba(255,255,255,.6);border-radius:16px}' +
+      '.can-deckvacio button{border:none;background:none;color:#0284c7;font:inherit;font-size:12px;font-weight:800;cursor:pointer;text-decoration:underline}' +
+      '.can-decknav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:12px;padding:0 4px}' +
+      '.can-decknav button{border:none;border-radius:50%;width:40px;height:40px;font-size:16px;cursor:pointer;color:#fff;background:linear-gradient(135deg,#0284c7,#38bdf8);display:grid;place-items:center}' +
+      '.can-decknav span{font-size:13px;font-weight:900;color:#0b5878}' +
       '.can-modal-overlay{position:fixed;inset:0;background:rgba(10,16,34,.62);z-index:260;display:flex;align-items:center;justify-content:center;padding:18px;backdrop-filter:blur(3px)}' +
       '.can-modal-overlay[hidden]{display:none}' +
       '.can-modal{position:relative;background:#fff;border-radius:18px;max-width:640px;width:100%;max-height:88vh;overflow:auto;padding:16px;box-shadow:0 22px 60px rgba(0,0,0,.35)}' +
@@ -135,16 +169,27 @@
       '.can-pdf-tool{margin-bottom:9px;display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12px;font-weight:900;color:#0b5878}' +
       '.can-pdf-tool a{font-size:12px;font-weight:800;color:#0284c7;text-decoration:none}' +
       '#canPdfFrame{width:100%;height:68vh;border:1px solid rgba(80,90,130,.14);border-radius:10px;background:#fff}' +
-      'body.dark .can-card{background:#1f2031;border-color:rgba(255,255,255,.09)}' +
-      'body.dark .can-card h3{color:#e6e7f0}' +
-      'body.dark .can-chip{background:#2a2c42;color:#cfd0dd;border-color:rgba(255,255,255,.10)}' +
-      'body.dark .can-intro{background:rgba(31,32,49,.74);color:#c9cad6;border-color:rgba(255,255,255,.08)}' +
-      'body.dark .can-search{background:#2a2c42;color:#e6e7f0;border-color:rgba(255,255,255,.10)}' +
-      'body.dark .can-vacio{background:rgba(31,32,49,.6);color:#9a9bae}' +
+      'body.dark .can-idpanel{background:rgba(31,32,49,.82);border-color:rgba(255,255,255,.09)}' +
+      'body.dark .can-idtag{color:#3ad0a4}' +
+      'body.dark .can-idhero strong{color:#f0f0f5}' +
+      'body.dark .can-idhero p{color:#a0a0b0}' +
+      'body.dark .can-idest strong{color:#f0f0f5}' +
+      'body.dark .can-msg{color:#9a9aaa}' +
+      'body.dark .can-idpre{background:#2a2c42}' +
+      'body.dark .can-idacc button.sec{background:#2a2c42;color:#a0e6d0;border-color:rgba(255,255,255,.16)}' +
+      'body.dark .can-carta{background:#1f2031;border-color:rgba(255,255,255,.09)}' +
+      'body.dark .can-carta .can-cfoto{background:linear-gradient(160deg,#23243a,#2a2c42)}' +
+      'body.dark .can-carta h3{color:#e6e7f0}' +
+      'body.dark .can-csoku{color:#9a9bae}' +
+      'body.dark .can-decksearch{background:#2a2c42;color:#e6e7f0;border-color:rgba(255,255,255,.10)}' +
+      'body.dark .can-decktitle{color:#b8c8ff}' +
+      'body.dark .can-decknav span{color:#b8c8ff}' +
+      'body.dark .can-deckvacio{background:rgba(31,32,49,.6);color:#9a9bae}' +
+      'body.dark .can-match b{color:#f0f0f5}' +
       'body.dark .can-modal{background:#1f2031}' +
       'body.dark .can-modal .cap{color:#c9cad6}' +
-      'body.dark .can-sku{color:#9a9bae}' +
-      'body.dark .can-pdf-tool{color:#b8c8ff}';
+      'body.dark .can-pdf-tool{color:#b8c8ff}' +
+      'body.dark .can-guialink{color:#8ab4f8}';
     var st = document.createElement('style');
     st.id = ESTILOS_ID;
     st.textContent = css;
@@ -160,7 +205,7 @@
   }
 
   function normQuitar(s){
-    return String(s || '').replace(/^\(?\s*(?:•\s*)?\d+\)?\s*/, '').replace(/ADAPT\.\s*/i,'').trim();
+    return String(s || '').replace(/^\(?\s*(?:•\s*)?\d+\)?\s*/, '').replace(/ADAPT\.\s*/i,'').replace(/ADAPTADOR\s+/i,'').trim();
   }
 
   function tipoLabel(t){
@@ -168,148 +213,395 @@
     return map[t] || '';
   }
 
-  function clasificarUso(item){
-    var f = item.f || [];
-    if (f.indexOf('ducha') !== -1) return 'ducha';
-    if (f.indexOf('lavarropas') !== -1) return 'lavarropas';
-    if (f.indexOf('hidrometro') !== -1 || f.indexOf('manometro') !== -1) return 'medidores';
-    if (item.t === 'presion' || f.indexOf('mariposa') !== -1 || f.indexOf('universal') !== -1 || f.indexOf('rectangular') !== -1 || f.indexOf('ovalado') !== -1) return 'presion';
-    if (item.t === '' && f.indexOf('especial') === -1 && f.indexOf('racor') === -1 && f.indexOf('aireador') === -1 && f.indexOf('multiple') === -1 && f.indexOf('pasoFino') === -1 && f.indexOf('unimix') === -1 && f.indexOf('swingPlus') === -1) return 'canilla';
-    return 'especial';
-  }
-
-  var USOS = [
-    { id:'canilla', ico:'🚰', label:'Canilla / grifería' },
-    { id:'ducha', ico:'🚿', label:'Ducha' },
-    { id:'presion', ico:'🤏', label:'A presión, sin rosca' },
-    { id:'lavarropas', ico:'🧺', label:'Lavarropas' },
-    { id:'medidores', ico:'📟', label:'Hidrómetro / manómetro' },
-    { id:'especial', ico:'🔧', label:'Otros / especiales' }
-  ];
-
-  function pasar(item, k){
-    if (k === 'uso') return !estado.uso || clasificarUso(item) === estado.uso;
-    if (k === 'tipo') return !estado.tipo || (item.t || '') === estado.tipo;
-    if (k === 'medida') return !estado.medida || (item.m || 'sin medida') === estado.medida;
-    return true;
-  }
-
-  function filtrados(){
-    var q = (estado.q || '').trim().toLowerCase();
-    return (CAT || []).filter(function(it){
-      if (!pasar(it, 'uso')) return false;
-      if (!pasar(it, 'tipo')) return false;
-      if (!pasar(it, 'medida')) return false;
-      if (q){
-        var hay = false;
-        if (it.num && it.num.toLowerCase().indexOf(q) !== -1) hay = true;
-        if (it.n && String(it.n).toLowerCase().indexOf(q) !== -1) hay = true;
-        if (it.sku && String(it.sku).indexOf(q) !== -1) hay = true;
-        if (!hay) return false;
-      }
-      return true;
-    });
-  }
-
-  function unicos(items, k){
-    var out = [];
-    items.forEach(function(it){
-      var v = k === 'tipo' ? (it.t || '') : (it.m || 'sin medida');
-      if (v && out.indexOf(v) === -1) out.push(v);
-    });
-    var orden = [];
-    if (k === 'tipo') orden = ['hembra','macho','h-h','m-m','h-m','m-h','presion'];
-    if (k === 'medida'){
-      orden = out.slice().sort(function(a,b){ return a.localeCompare(b, 'es', {numeric:true}); });
-    }
-    return orden.filter(function(v){ return out.indexOf(v) !== -1; }).concat(out.filter(function(v){ return orden.indexOf(v) === -1; }));
-  }
-
-  function chipHtml(val, label, key, activo){
-    return '<button type="button" class="can-chip' + (activo ? ' sel' : '') + '" data-can-f="' + key + '" data-can-v="' + esc(val) + '">' + esc(label) + '</button>';
-  }
-
-  function tarjetaHtml(it){
+  function tagsDe(it){
     var tags = [];
     if (it.num) tags.push('Nº ' + esc(it.num));
     var tl = tipoLabel(it.t);
     if (tl) tags.push(tl);
     if (it.m) tags.push(esc(it.m));
     (it.nt || []).forEach(function(t){ tags.push(esc(t)); });
-    var foto = fotoDe(it.sku);
-    var nombre = normQuitar(it.n);
-    var actions = '';
-    if (foto) actions += '<button type="button" data-can-foto="' + esc(foto) + '" data-can-cap="' + esc(nombre + (it.num ? ' · Nº ' + it.num : '')) + '">🔍 Foto</button>';
-    if (it.sku) actions += '<button type="button" class="ghost" data-can-guia>📖 En la guía</button>';
-    actions += '<a href="https://wa.me/?text=' + encodeURIComponent('APPI · ¿Me pasás el ' + it.n + (it.num ? ' (Nº ' + it.num + ')' : '') + '? SKU ' + it.sku) + '" target="_blank" rel="noopener">💬 WhatsApp</a>';
-    return '<article class="can-card">' +
-      (foto ? '<img class="can-foto" loading="lazy" src="' + esc(foto) + '" alt="' + esc(nombre) + '" data-can-foto="' + esc(foto) + '" data-can-cap="' + esc(nombre + (it.num ? ' · Nº ' + it.num : '')) + '">' : '') +
-      '<div class="can-tags">' + tags.map(function(t){ return '<i>' + t + '</i>'; }).join('') + '</div>' +
-      '<h3>' + esc(nombre) + '</h3>' +
-      (it.sku ? '<div class="can-sku">SKU ' + esc(it.sku) + '</div>' : '') +
-      '<div class="can-actions">' + actions + '</div>' +
-      '</article>';
+    return tags;
   }
 
-  function pasoUsoHTML(){
-    return '<div class="can-paso"><em>1</em> ¿Qué vas a conectar?</div>' +
-      '<div class="can-chips">' +
-      USOS.map(function(u){
-        return chipHtml(u.id, u.ico + ' ' + u.label, 'uso', estado.uso === u.id);
-      }).join('') +
+  function dHashBits(im){
+    var cw = 9, ch = 8;
+    var c = document.createElement('canvas');
+    c.width = cw; c.height = ch;
+    var x = c.getContext('2d');
+    x.drawImage(im, 0, 0, cw, ch);
+    var d = x.getImageData(0, 0, cw, ch).data;
+    var gris = [];
+    for (var y = 0; y < ch; y++){
+      for (var x2 = 0; x2 < cw; x2++){
+        var i = (y * cw + x2) * 4;
+        gris.push((d[i] * 0.299 + d[i + 1] * 0.587 + d[i + 2] * 0.114) | 0);
+      }
+    }
+    var bits = '';
+    for (var y2 = 0; y2 < ch; y2++){
+      for (var x3 = 1; x3 < cw; x3++){
+        bits += gris[y2 * cw + x3] >= gris[y2 * cw + x3 - 1] ? '1' : '0';
+      }
+    }
+    return bits;
+  }
+
+  function hamming(a, b){
+    var d = 0;
+    for (var i = 0; i < a.length; i++) if (a[i] !== b[i]) d++;
+    return d;
+  }
+
+  function cargarImagen(src){
+    return new Promise(function(res, rej){
+      var im = new Image();
+      im.onload = function(){ res(im); };
+      im.onerror = function(){ rej(new Error('img')); };
+      im.src = src;
+    });
+  }
+
+  function obtenerRefHashes(){
+    if (ID.refs) return Promise.resolve(ID.refs);
+    var pendientes = (CAT || []).filter(function(it){ return it.sku; }).map(function(it){ return it.sku; });
+    var refs = {};
+    var next = function(){
+      if (!pendientes.length){
+        ID.refs = refs;
+        return Promise.resolve(ID.refs);
+      }
+      var sku = pendientes.shift();
+      return cargarImagen(fotoDe(sku)).then(function(im){
+        refs[sku] = dHashBits(im);
+      }, function(){ return null; }).then(next);
+    };
+    return next();
+  }
+
+  function ocrDe(dataUrl){
+    if (!window.Tesseract || typeof window.Tesseract.recognize !== 'function') return Promise.resolve('');
+    return Promise.race([
+      window.Tesseract.recognize(dataUrl, 'eng', TESE_OPTS).then(function(r){
+        return (r && (r.text || (r.data && r.data.text))) ? String(r.text || r.data.text) : '';
+      }),
+      new Promise(function(res){ setTimeout(function(){ res(''); }, 30000); })
+    ]).catch(function(){ return ''; });
+  }
+
+  function puntuarTexto(txt, it){
+    var s = 0;
+    if (!txt) return s;
+    var up = ' ' + txt.toUpperCase().replace(/\s+/g, ' ') + ' ';
+    if (it.num && up.indexOf(it.num) !== -1) s += 50;
+    if (it.sku && up.indexOf(it.sku) !== -1) s += 50;
+    if (it.sku && it.sku.length >= 6 && up.indexOf(it.sku.slice(0, 6)) !== -1) s += 20;
+    (normQuitar(it.n).split(' ') || []).forEach(function(w){
+      if (w.length >= 4 && up.indexOf(w.toUpperCase()) !== -1) s += 5;
+    });
+    if (s > 100) s = 100;
+    return s;
+  }
+
+  function compararConGuia(txt){
+    var items = CAT || [];
+    var mapa = {};
+    items.forEach(function(it){
+      mapa[it.sku || ('k' + it.n)] = { it: it, ocr: puntuarTexto(txt, it), img: 0, s: 0 };
+    });
+    return obtenerRefHashes().then(function(hashes){
+      return cargarImagen(ID.dataUrl).then(function(im){
+        var bits = dHashBits(im);
+        Object.keys(mapa).forEach(function(k){
+          var e = mapa[k];
+          var ref = e.it.sku && hashes[e.it.sku] !== undefined ? hashes[e.it.sku] : null;
+          e.img = ref === null ? 0 : Math.max(0, Math.round(100 * (1 - hamming(bits, ref) / 64)));
+          e.s = e.ocr + e.img;
+        });
+      }, function(){
+        Object.keys(mapa).forEach(function(k){
+          var e = mapa[k];
+          e.img = 0;
+          e.s = e.ocr;
+        });
+      });
+    }).then(function(){
+      return Object.keys(mapa).map(function(k){ return mapa[k]; })
+        .filter(function(e){ return e.s > 0; })
+        .sort(function(a, b){ return b.s - a.s; });
+    });
+  }
+
+  function asegurarCatalogo(){ return cargar().catch(function(){ return CAT; }); }
+
+  function elegirFoto(file){
+    var r = new FileReader();
+    r.onload = function(){
+      ID.dataUrl = r.result;
+      ID.nombre = file && file.name ? file.name : '';
+      ID.res = null;
+      renderPanel();
+      identificar();
+    };
+    r.onerror = function(){
+      ID.res = null;
+      renderPanel();
+    };
+    r.readAsDataURL(file);
+  }
+
+  function resetIdent(){
+    ID.dataUrl = null;
+    ID.nombre = '';
+    ID.buscando = false;
+    ID.res = null;
+    DECK.aiSku = null;
+    renderPanel();
+    if (CAT) renderDeck();
+  }
+
+  function identificar(){
+    if (!ID.dataUrl || ID.buscando) return;
+    ID.buscando = true;
+    ID.res = null;
+    DECK.aiSku = null;
+    renderPanel();
+    if (CAT) renderDeck();
+    asegurarCatalogo().then(function(){
+      return ocrDe(ID.dataUrl);
+    }).then(function(txt){
+      return compararConGuia(txt);
+    }).then(function(res){
+      ID.res = res || [];
+      ID.buscando = false;
+      if (res.length){
+        var topSku = res[0].it.sku;
+        var encontrada = -1;
+        (CAT || []).forEach(function(it, i){
+          if (it.sku && it.sku === topSku) encontrada = i;
+        });
+        if (encontrada !== -1){
+          DECK.idx = encontrada;
+          DECK.aiSku = topSku;
+        }
+      }
+      renderPanel();
+      renderDeck();
+    }).catch(function(){
+      ID.res = null;
+      ID.buscando = false;
+      renderPanel();
+      renderDeck();
+    });
+  }
+
+  function itemsDeck(){
+    var base = (CAT || []).filter(function(it){ return it.sku; });
+    var q = (DECK.q || '').trim().toLowerCase();
+    if (!q) return base;
+    return base.filter(function(it){
+      if (it.num && String(it.num).toLowerCase().indexOf(q) !== -1) return true;
+      if (it.n && String(it.n).toLowerCase().indexOf(q) !== -1) return true;
+      if (it.sku && String(it.sku).toLowerCase().indexOf(q) !== -1) return true;
+      return false;
+    });
+  }
+
+  function cartaDatoHtml(it){
+    var nombre = normQuitar(it.n);
+    var tags = tagsDe(it);
+    return '<div class="can-cdato">' +
+      (it.num ? '<span class="can-psa">Cód. adaptador PSA: <b>Nº ' + esc(it.num) + '</b></span>' : '') +
+      '<div class="can-tags">' + tags.map(function(t){ return '<i>' + t + '</i>'; }).join('') + '</div>' +
+      '<h3>' + esc(nombre) + '</h3>' +
+      (it.sku ? '<div class="can-csoku">SKU ' + esc(it.sku) + '</div>' : '') +
       '</div>';
   }
 
-  function pasoComunHTML(app){
-    var restantes = filtrados();
-    var vals = unicos(restantes, app);
-    if (vals.length <= 1 && !estado[app]) return '';
-    var label = app === 'tipo' ? '¿La boca es?' : '¿Medida?';
-    var n = app === 'tipo' ? 2 : 3;
-    var chips = vals.map(function(v){
-      var lb = app === 'tipo' ? tipoLabel(v) : v;
-      if (!lb) lb = v;
-      return chipHtml(v, lb, app, estado[app] === v);
-    }).join('');
-    chips += '<button type="button" class="can-chip saltar" data-can-f="' + app + '" data-can-v="__skip__">No la sé · ver todo</button>';
-    return '<div class="can-paso"><em>' + n + '</em> ' + label + '</div><div class="can-chips">' + chips + '</div>';
+  function cartaFotoHtml(it){
+    var foto = fotoDe(it.sku);
+    return foto
+      ? '<img loading="lazy" src="' + esc(foto) + '" alt="' + esc(normQuitar(it.n)) + '">'
+      : '<span class="can-sinfoto">🔩</span>';
+  }
+
+  function renderDeck(){
+    var sec = document.getElementById('canDeckSec');
+    if (!sec) return;
+    DECK.items = itemsDeck();
+    if (DECK.idx >= DECK.items.length && DECK.items.length) DECK.idx = 0;
+    var n = DECK.items.length;
+    var h;
+if (!n){
+      h = '<div class="can-deckvacio">No encontré modelos con ese dato.<br/><button type="button" data-can-reset-deck>Mostrar todo el catálogo</button></div>' +
+        '<div class="can-decknav"><button type="button" data-can-prev disabled aria-label="Carta anterior"><</button><span>Pasar carta 0 de 0</span><button type="button" data-can-next disabled aria-label="Carta siguiente">></button></div>';
+      sec.innerHTML = h;
+      deckNav();
+      return;
+    }
+    var act = DECK.items[DECK.idx];
+    var nxt = DECK.items[(DECK.idx + 1) % n];
+    var ai = (act.sku && act.sku === DECK.aiSku)
+      ? '<div class="can-ai">✨ La IA encontró esta · mira si coincide con tu foto</div>'
+      : '';
+    h = '<div class="can-deckwrap" id="canDeckWrap">' +
+      '<div class="can-deck can-peek"><div class="can-carta">' + cartaFotoHtml(nxt) + cartaDatoHtml(nxt) + '</div></div>' +
+      '<div class="can-deck" id="canDeckTop"><div class="can-carta">' +
+      (ai || '') +
+      cartaFotoHtml(act) + cartaDatoHtml(act) +
+      '<div class="can-acciones" style="padding:0 16px 16px">' +
+      '<button type="button" data-can-foto="' + esc(fotoDe(act.sku)) + '" data-can-cap="' + esc(normQuitar(act.n) + (act.num ? ' · Nº ' + act.num : '')) + '">🔍 Foto</button>' +
+      '<button type="button" class="ghost" data-can-guia>📖 En la guía</button>' +
+      '<a href="https://wa.me/?text=' + encodeURIComponent('APPI · ¿Me pasás el ' + act.n + (act.num ? ' (Nº ' + act.num + ')' : '') + '? SKU ' + act.sku) + '" target="_blank" rel="noopener">💬 WhatsApp</a>' +
+      '</div>' +
+      '</div></div>' +
+      '</div>' +
+      '<div class="can-decknav">' +
+      '<button type="button" data-can-prev aria-label="Carta anterior">‹</button>' +
+      '<span id="canDeckCounter">Pasar carta ' + (DECK.idx + 1) + ' de ' + n + '</span>' +
+      '<button type="button" data-can-next aria-label="Pasar carta">›</button>' +
+      '</div>';
+    sec.innerHTML = h;
+    deckDrag();
+    deckNav();
+  }
+
+  function deckDrag(){
+    var el = document.getElementById('canDeckTop');
+    if (!el || el._canDrag) return;
+    el._canDrag = true;
+    var activo = false, ix = 0, iy = 0, cur = 0;
+    el.addEventListener('pointerdown', function(e){
+      if (e.target.closest && e.target.closest('button, a, input, textarea')) return;
+      activo = true;
+      ix = e.clientX;
+      iy = e.clientY;
+      cur = 0;
+      try { el.setPointerCapture(e.pointerId); } catch (err) {}
+    });
+    el.addEventListener('pointermove', function(e){
+      if (!activo) return;
+      var dx = e.clientX - ix;
+      var dy = Math.abs(e.clientY - iy);
+      if (dy > Math.abs(dx) * 1.6 && dy > 8){
+        activo = false;
+        el.style.transform = '';
+        return;
+      }
+      cur = dx;
+      el.style.transition = 'none';
+      el.style.transform = 'translateX(' + dx + 'px) rotate(' + (dx * 0.06) + 'deg)';
+    });
+    function soltar(){
+      if (!activo) return;
+      activo = false;
+      el.style.transition = '';
+      el.style.transform = '';
+      if (Math.abs(cur) > 70) pasar(cur < 0 ? 1 : -1);
+    }
+    el.addEventListener('pointerup', soltar);
+    el.addEventListener('pointercancel', soltar);
+  }
+
+  function pasar(dir){
+    var n = itemsDeck().length;
+    if (!n) return;
+    DECK.aiSku = null;
+    if (dir > 0) DECK.idx = (DECK.idx + 1) % n;
+    else DECK.idx = (DECK.idx - 1 + n) % n;
+    renderDeck();
+  }
+
+  function renderPanel(){
+    var sec = document.getElementById('canIDPanel');
+    if (!sec) return;
+    var h = '<div class="can-idhead">' +
+      '<span class="can-idtag">Tu foto</span>' +
+      '<button type="button" class="can-cambia' + (ID.dataUrl ? ' on' : '') + '" data-can-cambiar>Cambiar foto</button>' +
+      '</div>';
+    if (!ID.dataUrl){
+      h += '<div class="can-idhero">' +
+        '<div class="can-idi">📷</div>' +
+        '<strong>Sacale una foto a la pieza</strong>' +
+        '<p>La IA busca en el <b>catálogo PSA</b> y deja arriba la carta que se parece a tu canilla. Después podés deslizar para revisar todas.</p>' +
+        '<div class="can-idacc">' +
+        '<button type="button" data-can-cam>📷 Sacar foto</button>' +
+        '<button type="button" class="sec" data-can-sube>⬆️ Subir imagen</button>' +
+        '</div>' +
+        '</div>';
+    } else if (ID.buscando){
+      h += '<div class="can-idest">' +
+        '<div class="can-idpre"><img src="' + esc(ID.dataUrl) + '" alt="Tu foto"></div>' +
+        '<div class="can-spin"></div>' +
+        '<strong>Buscando en el catálogo…</strong>' +
+        '<p class="can-msg">Leyendo el número y comparando la forma con las fotos de la guía.</p>' +
+        '</div>';
+    } else if (ID.res && ID.res.length){
+      var pc = Math.max(0, Math.min(100, Math.round(ID.res[0].s)));
+      h += '<div class="can-match">' +
+        '<span class="can-mlabel">Adaptador requerido</span>' +
+        '<b>' + esc(normQuitar(ID.res[0].it.n)) + '</b>' +
+        '<span class="can-mnum">Nº ' + esc(ID.res[0].it.num || '—') + '</span>' +
+        '<span class="can-mpct">Coincidencia ' + pc + '% · dejé arriba la carta más parecida</span>' +
+        '</div>' +
+        '<p class="can-msg">Si no es exactamente tu pieza, deslizá las cartas hasta encontrar la que más se le parezca.</p>';
+    } else {
+      h += '<div class="can-nomatch">' +
+        '<strong>No pude compararla</strong>' +
+        '<p class="can-msg">Probá con otra foto, más de cerca y con buena luz.</p>' +
+        '</div>';
+    }
+    h += '<div class="can-idacc">' +
+      '<button type="button" data-can-cam>📷 ' + (ID.dataUrl ? 'Sacar otra foto' : 'Sacar foto') + '</button>' +
+      '<button type="button" class="sec" data-can-sube>⬆️ Subir imagen</button>' +
+      '</div>';
+    sec.innerHTML = h;
   }
 
   function render(){
     var cont = document.getElementById('canillasCont');
     if (!cont) return;
-    var lista = filtrados();
-    var aplicados = [];
-    if (estado.uso) aplicados.push({ k:'uso', v:estado.uso, lb:(USOS.filter(function(u){return u.id===estado.uso;})[0]||{}).label || estado.uso });
-    if (estado.tipo) aplicados.push({ k:'tipo', v:estado.tipo, lb:tipoLabel(estado.tipo) || estado.tipo });
-    if (estado.medida) aplicados.push({ k:'medida', v:estado.medida, lb:estado.medida });
-    var selHtml = aplicados.length
-      ? '<div class="can-selecs">' + aplicados.map(function(a){ return '<span data-can-f="' + a.k + '" data-can-v="">✕ ' + esc(a.lb) + '</span>'; }).join('') +
-        ' <button type="button" class="can-reiniciar" data-can-reset>Reiniciar</button></div>'
-      : '';
-    var resultado;
-    if (lista.length === 0){
-      resultado = '<div class="can-vacio">No encontré un modelo con esos datos.<br/><button type="button" class="can-reiniciar" data-can-reset>Empecemos de nuevo</button></div>';
-    } else if (lista.length <= 14){
-      resultado = '<div class="can-paso"><em>✔</em> Resultado · ' + lista.length + ' pieza' + (lista.length === 1 ? '' : 's') + '</div>' +
-        '<div class="can-cards">' + lista.map(tarjetaHtml).join('') + '</div>';
-    } else {
-      resultado = '<div class="can-vacio">Seguí afinando las opciones: ' + lista.length + ' piezas coinciden.</div>';
-    }
     cont.innerHTML =
-      '<div class="can-intro">Identificá la pieza por sus características: boca(<b>hembra/macho</b>) y <b>medida</b> te dejan en el modelo justo de la <b>Guía V02-21</b>. Con el número de ítem o el nombre podés buscarlo directo.</div>' +
-      '<div class="can-barra">' +
-      (aplicados.length ? '<button type="button" class="can-reiniciar" data-can-reset>↺ Reiniciar</button>' : '') +
-      '<input id="canillasSearch" class="can-search" type="search" placeholder="Buscar por nombre, ítem o SKU…" value="' + esc(estado.q) + '">' +
-      '<span class="can-count">' + lista.length + ' / ' + (CAT ? CAT.length : 0) + '</span>' +
+      '<div class="can-cols">' +
+      '<aside class="can-idpanel" id="canIDPanel"></aside>' +
+      '<div class="can-deckcol">' +
+      '<div class="can-deckhead">' +
+      '<span class="can-decktitle">Catálogo PSA <small>· deslizá las cartas</small></span>' +
+      '<button type="button" class="can-guialink" data-can-guia>📖 Abrir la guía</button>' +
       '</div>' +
-      selHtml +
-      '<div id="canillasPasos">' +
-      pasoUsoHTML() + pasoComunHTML('tipo') + pasoComunHTML('medida') +
-      resultado +
-      '</div>';
-    var q = document.getElementById('canillasSearch');
-    if (q) q.addEventListener('input', function(){ estado.q = q.value; render(); });
+      '<div class="can-deckbar">' +
+      '<input id="canDeckSearch" class="can-decksearch" type="search" placeholder="Buscar por nombre, ítem o SKU…" value="' + esc(DECK.q) + '">' +
+      '</div>' +
+      '<div id="canDeckSec"></div>' +
+      '</div>' +
+      '</div>' +
+      '<input id="canFotoCam" type="file" accept="image/*" capture="environment" hidden>' +
+      '<input id="canFotoSube" type="file" accept="image/*" hidden>';
+    renderPanel();
+    renderDeck();
+    var q = document.getElementById('canDeckSearch');
+    if (q) q.addEventListener('input', function(){ DECK.q = q.value; DECK.idx = 0; DECK.aiSku = null; renderDeck(); });
+    var cam = document.getElementById('canFotoCam');
+    var sube = document.getElementById('canFotoSube');
+    if (cam) cam.onchange = function(){ if (cam.files && cam.files[0]) elegirFoto(cam.files[0]); };
+    if (sube) sube.onchange = function(){ if (sube.files && sube.files[0]) elegirFoto(sube.files[0]); };
+  }
+
+  function deckNav(){
+    var sec = document.getElementById('canDeckSec');
+    if (!sec) return;
+    var prev = sec.querySelector('[data-can-prev]');
+    var nxt = sec.querySelector('[data-can-next]');
+    if (prev) prev.onclick = function(){ pasar(-1); };
+    if (nxt) nxt.onclick = function(){ pasar(1); };
+    var reset = sec.querySelector('[data-can-reset-deck]');
+    if (reset) reset.onclick = function(){
+      DECK.q = '';
+      var qs = document.getElementById('canDeckSearch');
+      if (qs) qs.value = '';
+      DECK.idx = 0;
+      DECK.aiSku = null;
+      renderDeck();
+    };
   }
 
   function enganchar(){
@@ -317,28 +609,32 @@
     if (!cont || cont._canillasEnganchado) return;
     cont._canillasEnganchado = true;
     cont.addEventListener('click', function(e){
-      var chip = e.target.closest('[data-can-f]');
-      if (chip){
-        var k = chip.getAttribute('data-can-f');
-        var v = chip.getAttribute('data-can-v');
-        estado[k] = (v === '__skip__' || v === '') ? null : v;
-        render();
+      var cam = e.target.closest('[data-can-cam]');
+      if (cam){
+        var inp = document.getElementById('canFotoCam');
+        if (inp) inp.click();
         return;
       }
-      var reset = e.target.closest('[data-can-reset]');
-      if (reset){
-        estado.uso = estado.tipo = estado.medida = null; estado.q = '';
-        render();
+      var sube = e.target.closest('[data-can-sube]');
+      if (sube){
+        var inp2 = document.getElementById('canFotoSube');
+        if (inp2) inp2.click();
         return;
       }
-      var foto = e.target.closest('[data-can-foto]');
-      if (foto){
-        openCanillasFoto(foto.getAttribute('data-can-foto'), foto.getAttribute('data-can-cap') || '');
+      var cambiar = e.target.closest('[data-can-cambiar]');
+      if (cambiar){
+        var inp3 = document.getElementById('canFotoSube');
+        if (inp3) inp3.click();
         return;
       }
       var guia = e.target.closest('[data-can-guia]');
       if (guia){
         openCanillasGuia();
+        return;
+      }
+      var foto = e.target.closest('[data-can-foto]');
+      if (foto){
+        openCanillasFoto(foto.getAttribute('data-can-foto'), foto.getAttribute('data-can-cap') || '');
       }
     });
   }
@@ -512,7 +808,7 @@
     enganchar();
     var cont = document.getElementById('canillasCont');
     if (cont && !cont.innerHTML){
-      cont.innerHTML = '<div class="can-vacio">Cargando catálogo…</div>';
+      cont.innerHTML = '<div class="can-deckvacio">Cargando catálogo…</div>';
     }
     var btnHelp = document.getElementById('btnHelpCanillas');
     if (btnHelp) btnHelp.onclick = function(){ openCanillasGuia(); };
