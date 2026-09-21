@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "944.0.0",
-  "cacheName": "appi-v944-mazo-canillas-comparador",
+  "version": "945.0.0",
+  "cacheName": "appi-v945-canillas-captura-exacta",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

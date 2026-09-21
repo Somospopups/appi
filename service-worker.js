@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v944-mazo-canillas-comparador';
+const CACHE_NAME = 'appi-v945-canillas-captura-exacta';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
