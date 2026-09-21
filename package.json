@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "933.0.0",
-  "cacheName": "appi-v933-promos-discriminadas",
+  "version": "934.0.0",
+  "cacheName": "appi-v934-estetica-promos-nativa",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

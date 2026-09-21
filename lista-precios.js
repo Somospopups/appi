@@ -1347,22 +1347,30 @@
     host.innerHTML = r.lineas.map(function (ln) {
       var k = esc(ln.p.clave || claveSku(ln.p));
       var d = ln.descPct || 0;
-      var promoPill = d > 0 ? ('<span class="lp-line-promo-tag">*PROMO ' + d + '% DESCUENTO*</span>') : '';
-      var precioStr = d > 0 ? ('<s style="font-size:11px;opacity:0.6;margin-right:4px">' + money(ln.q * ln.precioOriginal) + '</s>' + money(ln.q * ln.precioFinal)) : money(ln.q * ln.precioFinal);
-      return '<div class="lp-line-wrap" data-sku="' + k + '">' +
-        '<div class="lp-line">' +
-          '<div class="lp-qty"><button type="button" class="ghost" data-act="menos">−</button><i>' + ln.q + '</i>' +
-          '<button type="button" data-act="mas">+</button></div>' +
-          '<div class="lp-line-info"><b>' + esc(ln.p.nombre) + '</b>' + promoPill + '</div>' +
-          '<span>' + precioStr + '</span>' +
+      var tagPromo = d > 0 ? ('<span class="lp-pill-promo">-' + d + '% PROMO</span>') : '';
+      var precioStr = d > 0
+        ? ('<span class="lp-price-group"><s class="lp-old-price">' + money(ln.q * ln.precioOriginal) + '</s><b>' + money(ln.q * ln.precioFinal) + '</b></span>')
+        : ('<b class="lp-main-price">' + money(ln.q * ln.precioFinal) + '</b>');
+
+      return '<div class="lp-item-presu-clean" data-sku="' + k + '">' +
+        '<div class="lp-item-row-top">' +
+          '<div class="lp-qty-pill">' +
+            '<button type="button" class="ghost" data-act="menos">−</button>' +
+            '<i>' + ln.q + '</i>' +
+            '<button type="button" data-act="mas">+</button>' +
+          '</div>' +
+          '<div class="lp-item-title-box">' +
+            '<div class="lp-item-name">' + esc(ln.p.nombre) + '</div>' +
+            (tagPromo ? '<div class="lp-item-badge-row">' + tagPromo + '</div>' : '') +
+          '</div>' +
+          '<div class="lp-item-amount">' + precioStr + '</div>' +
         '</div>' +
-        '<div class="lp-line-desc-bar">' +
-          '<span class="lp-desc-bar-lbl">Descuento:</span>' +
-          '<button type="button" class="lp-desc-btn ' + (d === 0 ? 'active' : '') + '" data-set-desc="0">Lista</button>' +
-          '<button type="button" class="lp-desc-btn ' + (d === 5 ? 'active' : '') + '" data-set-desc="5">Promo 5%</button>' +
-          '<button type="button" class="lp-desc-btn ' + (d === 10 ? 'active' : '') + '" data-set-desc="10">Promo 10%</button>' +
-          '<button type="button" class="lp-desc-btn ' + (d === 15 ? 'active' : '') + '" data-set-desc="15">Promo 15%</button>' +
-          '<button type="button" class="lp-desc-btn ' + (d === 20 ? 'active' : '') + '" data-set-desc="20">20%</button>' +
+        '<div class="lp-discount-segment">' +
+          '<button type="button" class="lp-seg-btn ' + (d === 0 ? 'active' : '') + '" data-set-desc="0">Precio lista</button>' +
+          '<button type="button" class="lp-seg-btn ' + (d === 5 ? 'active' : '') + '" data-set-desc="5">-5%</button>' +
+          '<button type="button" class="lp-seg-btn ' + (d === 10 ? 'active' : '') + '" data-set-desc="10">-10%</button>' +
+          '<button type="button" class="lp-seg-btn ' + (d === 15 ? 'active' : '') + '" data-set-desc="15">-15%</button>' +
+          '<button type="button" class="lp-seg-btn ' + (d === 20 ? 'active' : '') + '" data-set-desc="20">-20%</button>' +
         '</div>' +
       '</div>';
     }).join('');
