@@ -33,7 +33,10 @@
     '#orgCanvas',              // organización del equipo
     '#adminLoginOverlay',      // ingreso de administración
     '.appi-dialog-overlay',    // avisos y confirmaciones
-    '#appiDialogOverlay'
+    '#appiDialogOverlay',
+    '.can-modal-overlay',      // foto o PDF del identificador de canillas
+    '#canImgModal',
+    '#canPdfModal'
   ];
 
   // Estos no: son pasos que hay que completar, no paneles que se descartan.
@@ -80,6 +83,9 @@
   function cerrar(el){
     if (el && el.id === "gestionDetailOverlay" && typeof window.closeGestionDetail === "function"){
       try { window.closeGestionDetail(); return true; } catch (err) {}
+    }
+    if (el && (el.id === "canImgModal" || el.id === "canPdfModal" || (el.classList && el.classList.contains("can-modal-overlay"))) && typeof window.canillasCloseModal === "function"){
+      try { window.canillasCloseModal(); return true; } catch (err) {}
     }
     var botones = [
       '#gestionDetailClose', '#ubCerrar', '#tpCancel', '#histDetailClose', '#histActionClose',
