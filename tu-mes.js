@@ -135,7 +135,7 @@
   }
   function mostrarToast(msg){
     try{ if(typeof window.showToast==='function') window.showToast(msg); else if(window.APPINotif && typeof window.APPINotif.toast==='function') window.APPINotif.toast(msg); }catch(e){}
-    try{ console.debug('[TuMes] '+msg); }catch(e){}
+    try{ console.log('[TuMes] '+msg); }catch(e){}
   }
   function emitirEventoRecuperado(diaOrigen, motivoId, nombre){
     try{

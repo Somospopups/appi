@@ -34,7 +34,7 @@
     '#adminLoginOverlay',      // ingreso de administración
     '.appi-dialog-overlay',    // avisos y confirmaciones
     '#appiDialogOverlay',
-    '.can-modal-overlay',      // foto o PDF del identificador de canillas
+    '.can-modal-overlay',
     '#canImgModal',
     '#canPdfModal'
   ];
@@ -81,11 +81,11 @@
   // Cierra un panel por la puerta que tenga: primero su propio botón de cerrar,
   // que además desengancha lo que haga falta; si no hay, se le quita la clase.
   function cerrar(el){
-    if (el && el.id === "gestionDetailOverlay" && typeof window.closeGestionDetail === "function"){
-      try { window.closeGestionDetail(); return true; } catch (err) {}
-    }
     if (el && (el.id === "canImgModal" || el.id === "canPdfModal" || (el.classList && el.classList.contains("can-modal-overlay"))) && typeof window.canillasCloseModal === "function"){
       try { window.canillasCloseModal(); return true; } catch (err) {}
+    }
+    if (el && el.id === "gestionDetailOverlay" && typeof window.closeGestionDetail === "function"){
+      try { window.closeGestionDetail(); return true; } catch (err) {}
     }
     var botones = [
       '#gestionDetailClose', '#ubCerrar', '#tpCancel', '#histDetailClose', '#histActionClose',

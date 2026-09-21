@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v941-deck';
+const CACHE_NAME = 'appi-v942-restaurar-canillas-original';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
@@ -11,6 +11,7 @@ const APP_SHELL = [
   './appi-notif.js',
   './recordatorios-app.js',
   './reporte-bonos.js',
+  './plan-carrera-organigrama.js',
   './telefono.js',
   './whatsapp-app.js',
   './auth-client.js',
@@ -33,13 +34,9 @@ const APP_SHELL = [
   './demo-guia.js',
   './tablero-negocio.js',
   './lista-precios.js',
-  './stock-personal.js',
   './canillas-adaptadores.js',
   './guia-adaptadores-psa.pdf',
-  './vendor/tesseract/tesseract.min.js',
-  './vendor/tesseract/worker.min.js',
-  './vendor/tesseract/tesseract-core-simd-lstm.wasm.js',
-  './vendor/tesseract/eng.traineddata',
+  './stock-personal.js',
   './vendor/zxing.min.js',
   './porque-vivo.js',
   './home-limpio.js',
@@ -52,6 +49,8 @@ const APP_SHELL = [
   './aviso-telegram.js',
   './css/membership-admin.css',
   './appi-tema.css',
+  './historico.css',
+  './historico.js',
   './vendor/xlsx.full.min.js',
   './vendor/html2canvas.min.js',
   './vendor/jspdf.umd.min.js',

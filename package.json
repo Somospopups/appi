@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "941.0.0",
-  "cacheName": "appi-v941-deck",
+  "version": "942.0.0",
+  "cacheName": "appi-v942-restaurar-canillas-original",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {
