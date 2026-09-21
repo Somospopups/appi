@@ -1,8 +1,7 @@
 const { test, expect } = require('@playwright/test');
 
-// El identificador de canillas y adaptadores compara una foto subida contra
-// las imágenes de la Guía V02-21 (número + forma), con flujo guiado de
-// respaldo anclado al mismo catálogo.
+// El identificador de canillas y adaptadores sigue el flujo asistido por
+// características: pasos, chips y resultado anclados a la Guía V02-21.
 
 const USER_ID = '11111111-1111-4111-8111-111111111111';
 
@@ -104,34 +103,4 @@ test('la tarjeta de resultado abre la foto en el modal', async ({ page }) => {
   await tarjeta.locator('button', { hasText: 'Foto' }).click();
   await expect(page.locator('#canImgModal')).toBeVisible();
   await expect(page.locator('#canImgModal img')).toHaveAttribute('src', /catalogo-img\//);
-});
-
-test('subir una foto la compara contra la guía y muestra coincidencias', async ({ page }) => {
-  await entrar(page);
-  await abrirCanillas(page);
-  await page.evaluate(() => {
-    window.Tesseract = { recognize: async () => ({ text: '006 ADAPT UNIVERSAL MARIPOSA' }) };
-  });
-  await page.setInputFiles('#canFotoSube', {
-    name: 'pieza.png',
-    mimeType: 'image/png',
-    buffer: Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==', 'base64')
-  });
-  await expect(page.locator('#canillasId .can-prev')).toBeVisible();
-  await expect(page.locator('#canillasId')).toContainText('Coincidencias', { timeout: 30000 });
-  await expect(page.locator('#canillasId')).toContainText('MARIPOSA');
-});
-
-test('una imagen inválida avisa para probar otra foto', async ({ page }) => {
-  await entrar(page);
-  await abrirCanillas(page);
-  await page.evaluate(() => {
-    window.Tesseract = { recognize: async () => ({ text: '' }) };
-  });
-  await page.setInputFiles('#canFotoSube', {
-    name: 'nota.txt',
-    mimeType: 'text/plain',
-    buffer: Buffer.from('esto no es una foto', 'utf8')
-  });
-  await expect(page.locator('#canillasId')).toContainText('No pude compararla', { timeout: 30000 });
 });

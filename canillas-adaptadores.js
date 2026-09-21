@@ -135,29 +135,6 @@
       '.can-pdf-tool{margin-bottom:9px;display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12px;font-weight:900;color:#0b5878}' +
       '.can-pdf-tool a{font-size:12px;font-weight:800;color:#0284c7;text-decoration:none}' +
       '#canPdfFrame{width:100%;height:68vh;border:1px solid rgba(80,90,130,.14);border-radius:10px;background:#fff}' +
-      '.can-id{display:flex;flex-direction:column;gap:12px}' +
-      '.can-idhero{background:linear-gradient(135deg,rgba(91,141,239,.14),rgba(58,208,164,.12));border:1px solid rgba(58,208,164,.4);border-radius:18px;padding:16px;text-align:center;display:flex;flex-direction:column;gap:8px;align-items:center}' +
-      '.can-idhero .can-idi{width:54px;height:54px;border-radius:16px;background:linear-gradient(135deg,#0284c7,#38bdf8);display:grid;place-items:center;font-size:26px;color:#fff;box-shadow:0 8px 18px rgba(2,132,199,.28)}' +
-      '.can-idhero strong{font-size:15px;color:#23233a}' +
-      '.can-idhero p{margin:0;font-size:12px;color:#5a5b6b;line-height:1.45;max-width:430px}' +
-      '.can-idacc{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;align-items:center}' +
-      '.can-idacc button{border:none;border-radius:12px;padding:10px 14px;font:inherit;font-size:13px;font-weight:800;cursor:pointer;color:#fff;background:linear-gradient(135deg,#0284c7,#38bdf8)}' +
-      '.can-idacc button.sec{background:#fff;color:#0b5878;border:1px solid rgba(2,132,199,.32)}' +
-      '.can-idpre{position:relative;border-radius:16px;overflow:hidden;border:1px solid rgba(80,90,130,.14);background:#fff;max-width:250px;margin:0 auto;box-shadow:0 8px 20px rgba(30,40,90,.10)}' +
-      '.can-idpre img{width:100%;max-height:190px;object-fit:contain;display:block}' +
-      '.can-idest{display:flex;flex-direction:column;gap:8px;align-items:center;text-align:center}' +
-      '.can-idest strong{color:#23233a;font-size:14px}' +
-      '.can-msg{margin:0;font-size:12px;color:#7a7b8b}' +
-      '.can-spin{width:22px;height:22px;border:3px solid rgba(91,141,239,.25);border-top-color:#5b8def;border-radius:50%;animation:canSpin .8s linear infinite}' +
-      '@keyframes canSpin{to{transform:rotate(360deg)}}' +
-      '.can-idres{display:flex;flex-direction:column;gap:10px}' +
-      '.can-idres .can-paso em{background:#0284c7}' +
-      '.can-acierto{align-self:flex-start;font-size:10px;font-weight:900;color:#fff;border-radius:6px;padding:2px 7px}' +
-      '.can-acierto.alta{background:#168765}' +
-      '.can-acierto.media{background:#c99013}' +
-      '.can-acierto.baja{background:#c34c53}' +
-      '.can-sep{display:flex;align-items:center;gap:8px;color:#8a8a99;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.4px}' +
-      '.can-sep:before,.can-sep:after{content:"";flex:1;height:1px;background:rgba(80,90,130,.15)}' +
       'body.dark .can-card{background:#1f2031;border-color:rgba(255,255,255,.09)}' +
       'body.dark .can-card h3{color:#e6e7f0}' +
       'body.dark .can-chip{background:#2a2c42;color:#cfd0dd;border-color:rgba(255,255,255,.10)}' +
@@ -167,15 +144,7 @@
       'body.dark .can-modal{background:#1f2031}' +
       'body.dark .can-modal .cap{color:#c9cad6}' +
       'body.dark .can-sku{color:#9a9bae}' +
-      'body.dark .can-pdf-tool{color:#b8c8ff}' +
-      'body.dark .can-idhero{background:linear-gradient(135deg,rgba(91,141,239,.12),rgba(58,208,164,.10));border-color:rgba(255,255,255,.12)}' +
-      'body.dark .can-idhero strong{color:#f0f0f5}' +
-      'body.dark .can-idhero p{color:#a0a0b0}' +
-      'body.dark .can-idest strong{color:#f0f0f5}' +
-      'body.dark .can-msg{color:#9a9aaa}' +
-      'body.dark .can-idpre{background:#2a2c42}' +
-      'body.dark .can-idacc button.sec{background:#2a2c42;color:#a0e6d0;border-color:rgba(255,255,255,.16)}' +
-      'body.dark .can-sep{color:#9090a2}';
+      'body.dark .can-pdf-tool{color:#b8c8ff}';
     var st = document.createElement('style');
     st.id = ESTILOS_ID;
     st.textContent = css;
@@ -306,224 +275,9 @@
     return '<div class="can-paso"><em>' + n + '</em> ' + label + '</div><div class="can-chips">' + chips + '</div>';
   }
 
-  var ID = { dataUrl: null, nombre: '', buscando: false, resultados: null, refs: null };
-
-  function dHashBits(im){
-    var cw = 9, ch = 8, side = 9;
-    var c = document.createElement('canvas');
-    c.width = cw; c.height = ch;
-    var x = c.getContext('2d');
-    x.drawImage(im, 0, 0, cw, ch);
-    var d = x.getImageData(0, 0, cw, ch).data;
-    var gris = [];
-    for (var y = 0; y < ch; y++){
-      for (var x2 = 0; x2 < cw; x2++){
-        var i = (y * cw + x2) * 4;
-        gris.push((d[i] * 0.299 + d[i + 1] * 0.587 + d[i + 2] * 0.114) | 0);
-      }
-    }
-    var bits = '';
-    for (var y2 = 0; y2 < ch; y2++){
-      for (var x3 = 1; x3 < cw; x3++){
-        bits += gris[y2 * cw + x3] >= gris[y2 * cw + x3 - 1] ? '1' : '0';
-      }
-    }
-    return bits;
-  }
-
-  function hamming(a, b){
-    var d = 0;
-    for (var i = 0; i < a.length; i++) if (a[i] !== b[i]) d++;
-    return d;
-  }
-
-  function cargarImagen(src){
-    return new Promise(function(res, rej){
-      var im = new Image();
-      im.onload = function(){ res(im); };
-      im.onerror = function(){ rej(new Error('img')); };
-      im.src = src;
-    });
-  }
-
-  function obtenerRefHashes(){
-    if (ID.refs) return Promise.resolve(ID.refs);
-    var pendientes = (CAT || []).filter(function(it){ return it.sku; }).map(function(it){ return it.sku; });
-    var refs = {};
-    var next = function(){
-      if (!pendientes.length){
-        ID.refs = refs;
-        return Promise.resolve(ID.refs);
-      }
-      var sku = pendientes.shift();
-      return cargarImagen(fotoDe(sku)).then(function(im){
-        refs[sku] = dHashBits(im);
-      }, function(){ return null; }).then(next);
-    };
-    return next();
-  }
-
-  function ocrDe(dataUrl){
-    if (!window.Tesseract || typeof window.Tesseract.recognize !== 'function') return Promise.resolve('');
-    return Promise.race([
-      window.Tesseract.recognize(dataUrl, 'eng').then(function(r){
-        return (r && (r.text || (r.data && r.data.text))) ? String(r.text || r.data.text) : '';
-      }),
-      new Promise(function(res){ setTimeout(function(){ res(''); }, 30000); })
-    ]).catch(function(){ return ''; });
-  }
-
-  function puntuarTexto(txt, it){
-    var s = 0;
-    if (!txt) return s;
-    var up = ' ' + txt.toUpperCase().replace(/\s+/g, ' ') + ' ';
-    if (it.num && up.indexOf(it.num) !== -1) s += 50;
-    if (it.sku && up.indexOf(it.sku) !== -1) s += 50;
-    if (up.indexOf(it.sku && it.sku.slice(0, 6)) !== -1) s += 20;
-    (normQuitar(it.n).split(' ') || []).forEach(function(w){
-      if (w.length >= 4 && up.indexOf(w.toUpperCase()) !== -1) s += 5;
-    });
-    if (s > 100) s = 100;
-    return s;
-  }
-
-  function compararConGuia(txt){
-    var items = CAT || [];
-    var mapa = {};
-    items.forEach(function(it){
-      mapa[it.sku || ('k' + it.n)] = { it: it, ocr: puntuarTexto(txt, it), img: 0, s: 0 };
-    });
-    return obtenerRefHashes().then(function(hashes){
-      return cargarImagen(ID.dataUrl).then(function(im){
-        var bits = dHashBits(im);
-        Object.keys(mapa).forEach(function(k){
-          var e = mapa[k];
-          var ref = e.it.sku && hashes[e.it.sku] !== undefined ? hashes[e.it.sku] : null;
-          e.img = ref === null ? 0 : Math.max(0, Math.round(100 * (1 - hamming(bits, ref) / 64)));
-          e.s = e.ocr + e.img;
-        });
-      }, function(){
-        Object.keys(mapa).forEach(function(k){
-          var e = mapa[k];
-          e.img = 0;
-          e.s = e.ocr;
-        });
-      });
-    }).then(function(){
-      return Object.keys(mapa).map(function(k){ return mapa[k]; })
-        .filter(function(e){ return e.s > 0; })
-        .sort(function(a, b){ return b.s - a.s; });
-    });
-  }
-
-  function asegurarCatalogo(){ return cargar().catch(function(){ return CAT; }); }
-
-  function elegirFoto(file){
-    var r = new FileReader();
-    r.onload = function(){
-      ID.dataUrl = r.result;
-      ID.nombre = file && file.name ? file.name : '';
-      ID.resultados = null;
-      renderId();
-      identificar();
-    };
-    r.onerror = function(){
-      ID.resultados = null;
-      renderId();
-    };
-    r.readAsDataURL(file);
-  }
-
-  function resetIdent(){
-    ID.dataUrl = null;
-    ID.nombre = '';
-    ID.buscando = false;
-    ID.resultados = null;
-    renderId();
-  }
-
-  function identificar(){
-    if (!ID.dataUrl || ID.buscando) return;
-    ID.buscando = true;
-    ID.resultados = null;
-    renderId();
-    asegurarCatalogo().then(function(){
-      return ocrDe(ID.dataUrl);
-    }).then(function(txt){
-      return compararConGuia(txt);
-    }).then(function(res){
-      ID.resultados = res || [];
-      ID.buscando = false;
-      renderId();
-      render();
-    }).catch(function(){
-      ID.resultados = null;
-      ID.buscando = false;
-      renderId();
-      render();
-    });
-  }
-
-  function renderId(){
-    var sec = document.getElementById('canillasId');
-    if (!sec) return;
-    var h;
-    if (!ID.dataUrl){
-      h = '<div class="can-idhero">' +
-        '<div class="can-idi">📷</div>' +
-        '<strong>Sacale una foto a la pieza</strong>' +
-        '<p>Se compara con las fotos de la <b>Guía V02-21</b> y te muestra el modelo indicado con su ítem.</p>' +
-        '<div class="can-idacc">' +
-        '<button type="button" data-can-cam>📸 Sacar foto</button>' +
-        '<button type="button" class="sec" data-can-sube>⬆️ Subir imagen</button>' +
-        '</div>' +
-        '<button type="button" class="can-chip saltar" data-can-guia-link>O abrí la guía y mirá vos</button>' +
-        '</div>' +
-        '<input id="canFotoCam" type="file" accept="image/*" capture="environment" hidden>' +
-        '<input id="canFotoSube" type="file" accept="image/*" hidden>';
-    } else if (ID.buscando){
-      h = '<div class="can-idest">' +
-        '<div class="can-idpre"><img class="can-prev" src="' + esc(ID.dataUrl) + '" alt="Tu foto"></div>' +
-        '<div class="can-spin"></div>' +
-        '<strong>Buscando en la guía…</strong>' +
-        '<p class="can-msg">Leyendo el número y comparando la forma con las fotos del catálogo.</p>' +
-        '</div>';
-    } else if (ID.resultados && ID.resultados.length){
-      var top = ID.resultados.slice(0, 8);
-      var max = top[0].s;
-      var cards = top.map(function(o){
-        var pct = max > 0 ? Math.round(100 * o.s / max) : 0;
-        var lvl = pct >= 85 ? 'alta' : (pct >= 60 ? 'media' : 'baja');
-        var lb = pct >= 85 ? 'Alta coincidencia' : (pct >= 60 ? 'Media' : 'A revisar');
-        return '<div style="display:flex;flex-direction:column;gap:8px">' +
-          '<span class="can-acierto ' + lvl + '">' + (pct >= 85 ? '🎯 ' : '') + lb + ' · ' + pct + '%</span>' +
-          tarjetaHtml(o.it) +
-          '</div>';
-      }).join('');
-      h = '<div class="can-idres">' +
-        '<div class="can-idpre"><img class="can-prev" src="' + esc(ID.dataUrl) + '" alt="Tu foto"></div>' +
-        '<div class="can-paso"><em>✔</em> Coincidencias cerca de tu pieza</div>' +
-        '<div class="can-cards"><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;grid-column:1/-1">' + cards + '</div></div>' +
-        '<div class="can-idacc"><button type="button" data-can-nueva>📷 Probar otra foto</button></div>' +
-        '</div>';
-    } else {
-      h = '<div class="can-idest">' +
-        '<div class="can-idpre"><img class="can-prev" src="' + esc(ID.dataUrl) + '" alt="Tu foto"></div>' +
-        '<strong>No pude compararla</strong>' +
-        '<p class="can-msg">Probá con otra foto del adaptador, más de cerca y con buena luz.</p>' +
-        '<div class="can-idacc"><button type="button" data-can-nueva>📷 Probar otra foto</button></div>' +
-        '</div>';
-    }
-    sec.innerHTML = h;
-    var cam = document.getElementById('canFotoCam');
-    var sube = document.getElementById('canFotoSube');
-    if (cam) cam.onchange = function(){ if (cam.files && cam.files[0]) elegirFoto(cam.files[0]); };
-    if (sube) sube.onchange = function(){ if (sube.files && sube.files[0]) elegirFoto(sube.files[0]); };
-  }
-
   function render(){
-    var gido = document.getElementById('canillasGuido');
-    if (!gido) return;
+    var cont = document.getElementById('canillasCont');
+    if (!cont) return;
     var lista = filtrados();
     var aplicados = [];
     if (estado.uso) aplicados.push({ k:'uso', v:estado.uso, lb:(USOS.filter(function(u){return u.id===estado.uso;})[0]||{}).label || estado.uso });
@@ -542,8 +296,8 @@
     } else {
       resultado = '<div class="can-vacio">Seguí afinando las opciones: ' + lista.length + ' piezas coinciden.</div>';
     }
-    gido.innerHTML =
-      '<div class="can-intro">También podés identificarla guiándote por características: boca(<b>hembra/macho</b>) y <b>medida</b>, o por nombre / ítem / SKU con la búsqueda.</div>' +
+    cont.innerHTML =
+      '<div class="can-intro">Identificá la pieza por sus características: boca(<b>hembra/macho</b>) y <b>medida</b> te dejan en el modelo justo de la <b>Guía V02-21</b>. Con el número de ítem o el nombre podés buscarlo directo.</div>' +
       '<div class="can-barra">' +
       (aplicados.length ? '<button type="button" class="can-reiniciar" data-can-reset>↺ Reiniciar</button>' : '') +
       '<input id="canillasSearch" class="can-search" type="search" placeholder="Buscar por nombre, ítem o SKU…" value="' + esc(estado.q) + '">' +
@@ -563,28 +317,6 @@
     if (!cont || cont._canillasEnganchado) return;
     cont._canillasEnganchado = true;
     cont.addEventListener('click', function(e){
-      var cam = e.target.closest('[data-can-cam]');
-      if (cam){
-        var inp = document.getElementById('canFotoCam');
-        if (inp) inp.click();
-        return;
-      }
-      var sube = e.target.closest('[data-can-sube]');
-      if (sube){
-        var inp2 = document.getElementById('canFotoSube');
-        if (inp2) inp2.click();
-        return;
-      }
-      var nueva = e.target.closest('[data-can-nueva]');
-      if (nueva){
-        resetIdent();
-        return;
-      }
-      var gLink = e.target.closest('[data-can-guia-link]');
-      if (gLink){
-        openCanillasGuia();
-        return;
-      }
       var chip = e.target.closest('[data-can-f]');
       if (chip){
         var k = chip.getAttribute('data-can-f');
@@ -779,16 +511,11 @@
     montarModales();
     enganchar();
     var cont = document.getElementById('canillasCont');
-    if (cont && !cont._canillasArmado){
-      cont._canillasArmado = true;
-      cont.innerHTML =
-        '<div id="canillasId"></div>' +
-        '<div class="can-sep">En modo guiado</div>' +
-        '<div id="canillasGuido"></div>';
+    if (cont && !cont.innerHTML){
+      cont.innerHTML = '<div class="can-vacio">Cargando catálogo…</div>';
     }
     var btnHelp = document.getElementById('btnHelpCanillas');
     if (btnHelp) btnHelp.onclick = function(){ openCanillasGuia(); };
-    renderId();
     cargar().then(render);
   }
 
