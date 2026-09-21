@@ -1,53 +1,4 @@
-function pintarSheet(r) {
-    var host = $('lpSheetLines');
-    if (!host) return;
-    if (!r.lineas.length) {
-      host.innerHTML = '<div class="lp-empty">No hay productos en el presupuesto</div>';
-      return;
-    }
-
-    host.innerHTML = r.lineas.map(function (ln) {
-      var k = esc(ln.p.clave || claveSku(ln.p));
-      var d = ln.descPct || 0;
-      var hasDesc = d > 0;
-      
-      var precioDisplay = hasDesc
-        ? ('<div class="lp-item-p-split"><span class="lp-item-p-tachado">' + money(ln.q * ln.precioOriginal) + '</span><span class="lp-item-p-promo">' + money(ln.q * ln.precioFinal) + '</span></div>')
-        : ('<span class="lp-item-p-orig">' + money(ln.q * ln.precioFinal) + '</span>');
-
-      return '<div class="lp-line-card" data-sku="' + k + '">' +
-        '<div class="lp-line-main">' +
-          '<div class="lp-qty-capsule">' +
-            '<button type="button" class="ghost" data-act="menos" aria-label="Restar">−</button>' +
-            '<i>' + ln.q + '</i>' +
-            '<button type="button" data-act="mas" aria-label="Sumar">+</button>' +
-          '</div>' +
-          '<div class="lp-line-details">' +
-            '<div class="lp-line-title">' + esc(ln.p.nombre) + '</div>' +
-            '<div class="lp-line-subrow">' +
-              '<span class="lp-unit-hint">' + money(ln.precioFinal) + ' c/u</span>' +
-              (hasDesc ? '<span class="lp-tag-promo-pill">Promo -' + d + '%</span>' : '') +
-            '</div>' +
-          '</div>' +
-          '<div class="lp-line-total-col">' +
-            precioDisplay +
-          '</div>' +
-        '</div>' +
-        '<div class="lp-line-promo-selector">' +
-          '<label class="lp-promo-label">Promoción:</label>' +
-          '<div class="lp-promo-chips">' +
-            '<button type="button" class="lp-pchip ' + (d === 0 ? 'active' : '') + '" data-set-desc="0">Precio lista</button>' +
-            '<button type="button" class="lp-pchip ' + (d === 5 ? 'active' : '') + '" data-set-desc="5">5% off</button>' +
-            '<button type="button" class="lp-pchip ' + (d === 10 ? 'active' : '') + '" data-set-desc="10">10% off</button>' +
-            '<button type="button" class="lp-pchip ' + (d === 15 ? 'active' : '') + '" data-set-desc="15">15% off</button>' +
-            '<button type="button" class="lp-pchip ' + (d === 20 ? 'active' : '') + '" data-set-desc="20">20% off</button>' +
-          '</div>' +
-        '</div>' +
-      '</div>';
-    }).join('');
-  }
-
-  /* APPI · Lista de precios tienda PSA + presupuesto PDF */
+/* APPI · Lista de precios tienda PSA + presupuesto PDF */
 (function () {
   'use strict';
 
@@ -1396,30 +1347,22 @@ function pintarSheet(r) {
     host.innerHTML = r.lineas.map(function (ln) {
       var k = esc(ln.p.clave || claveSku(ln.p));
       var d = ln.descPct || 0;
-      var tagPromo = d > 0 ? ('<span class="lp-pill-promo">-' + d + '% PROMO</span>') : '';
       var precioStr = d > 0
-        ? ('<span class="lp-price-group"><s class="lp-old-price">' + money(ln.q * ln.precioOriginal) + '</s><b>' + money(ln.q * ln.precioFinal) + '</b></span>')
-        : ('<b class="lp-main-price">' + money(ln.q * ln.precioFinal) + '</b>');
+        ? ('<s style="font-size:11px;font-weight:600;opacity:0.45;margin-right:5px">' + money(ln.q * ln.precioOriginal) + '</s><b style="color:#0b5878">' + money(ln.q * ln.precioFinal) + '</b>')
+        : money(ln.q * ln.precioFinal);
 
-      return '<div class="lp-item-presu-clean" data-sku="' + k + '">' +
-        '<div class="lp-item-row-top">' +
-          '<div class="lp-qty-pill">' +
-            '<button type="button" class="ghost" data-act="menos">−</button>' +
-            '<i>' + ln.q + '</i>' +
-            '<button type="button" data-act="mas">+</button>' +
-          '</div>' +
-          '<div class="lp-item-title-box">' +
-            '<div class="lp-item-name">' + esc(ln.p.nombre) + '</div>' +
-            (tagPromo ? '<div class="lp-item-badge-row">' + tagPromo + '</div>' : '') +
-          '</div>' +
-          '<div class="lp-item-amount">' + precioStr + '</div>' +
+      return '<div class="lp-line-block" data-sku="' + k + '">' +
+        '<div class="lp-line">' +
+          '<div class="lp-qty"><button type="button" class="ghost" data-act="menos">−</button><i>' + ln.q + '</i><button type="button" data-act="mas">+</button></div>' +
+          '<b>' + esc(ln.p.nombre) + '</b>' +
+          '<span>' + precioStr + '</span>' +
         '</div>' +
-        '<div class="lp-discount-segment">' +
-          '<button type="button" class="lp-seg-btn ' + (d === 0 ? 'active' : '') + '" data-set-desc="0">Precio lista</button>' +
-          '<button type="button" class="lp-seg-btn ' + (d === 5 ? 'active' : '') + '" data-set-desc="5">-5%</button>' +
-          '<button type="button" class="lp-seg-btn ' + (d === 10 ? 'active' : '') + '" data-set-desc="10">-10%</button>' +
-          '<button type="button" class="lp-seg-btn ' + (d === 15 ? 'active' : '') + '" data-set-desc="15">-15%</button>' +
-          '<button type="button" class="lp-seg-btn ' + (d === 20 ? 'active' : '') + '" data-set-desc="20">-20%</button>' +
+        '<div class="lp-chips-in" style="padding:4px 0 10px 0;gap:6px">' +
+          '<button type="button" class="lp-chip' + (d === 0 ? ' on' : '') + '" data-set-desc="0">Precio lista</button>' +
+          '<button type="button" class="lp-chip' + (d === 5 ? ' on' : '') + '" data-set-desc="5">-5%</button>' +
+          '<button type="button" class="lp-chip' + (d === 10 ? ' on' : '') + '" data-set-desc="10">-10%</button>' +
+          '<button type="button" class="lp-chip' + (d === 15 ? ' on' : '') + '" data-set-desc="15">-15%</button>' +
+          '<button type="button" class="lp-chip' + (d === 20 ? ' on' : '') + '" data-set-desc="20">-20%</button>' +
         '</div>' +
       '</div>';
     }).join('');
