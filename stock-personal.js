@@ -1054,7 +1054,7 @@
   // El catálogo queda solo como referencia para el buscador, no para corregir automático. Esto evita que se cargue un producto que no está en la caja.
   function evaluarLectura(parsed, conf, textoBruto){
     // Log para depurar: qué vio realmente el OCR
-    try{ if(textoBruto) console.log('[OCR literal]', JSON.stringify(textoBruto).slice(0,120), '->', parsed); }catch(e){}
+    try{ if(textoBruto) console.debug('[OCR literal]', JSON.stringify(textoBruto).slice(0,120), '->', parsed); }catch(e){}
     // Si el motor leyó algo pero parseQR no reconoció producto, mostrar el texto bruto para que el usuario vea qué se intentó
     if(!parsed || !parsed.producto){
       // No se pudo interpretar como producto — probar siguiente orientación, pero avisar qué se vio si hay confianza media

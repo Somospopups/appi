@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "936.0.0",
-  "cacheName": "appi-v936-botones-nativos-originales",
+  "version": "937.0.0",
+  "cacheName": "appi-v937-calidad",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

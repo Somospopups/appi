@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v936-botones-nativos-originales';
+const CACHE_NAME = 'appi-v937-calidad';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
@@ -11,7 +11,6 @@ const APP_SHELL = [
   './appi-notif.js',
   './recordatorios-app.js',
   './reporte-bonos.js',
-  './plan-carrera-organigrama.js',
   './telefono.js',
   './whatsapp-app.js',
   './auth-client.js',
@@ -34,8 +33,6 @@ const APP_SHELL = [
   './demo-guia.js',
   './tablero-negocio.js',
   './lista-precios.js',
-  './canillas-adaptadores.js',
-  './guia-adaptadores-psa.pdf',
   './stock-personal.js',
   './vendor/zxing.min.js',
   './porque-vivo.js',
@@ -49,8 +46,6 @@ const APP_SHELL = [
   './aviso-telegram.js',
   './css/membership-admin.css',
   './appi-tema.css',
-  './historico.css',
-  './historico.js',
   './vendor/xlsx.full.min.js',
   './vendor/html2canvas.min.js',
   './vendor/jspdf.umd.min.js',

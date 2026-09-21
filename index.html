@@ -36,7 +36,7 @@
   });
 })();
 </script>
-<script>window._pendingFile=null; window.cargarArchivoU = function(f){ console.log('cargarArchivoU early stub, queuing'); window._pendingFile=f; if(window._pendingFile) setTimeout(()=>{ if(window.cargarArchivoUReal && window._pendingFile){ const file=window._pendingFile; window._pendingFile=null; window.cargarArchivoUReal(file); } }, 800); };</script>
+<script>window._pendingFile=null; window.cargarArchivoU = function(f){ window._pendingFile=f; if(window._pendingFile) setTimeout(()=>{ if(window.cargarArchivoUReal && window._pendingFile){ const file=window._pendingFile; window._pendingFile=null; window.cargarArchivoUReal(file); } }, 800); };</script>
 <script>
 window.openHistorico=function(){
   window.__histOpenRequested=true;
@@ -161,7 +161,6 @@ window.openStock=function(){
 <script src="./demo-guia.js"></script>
 <script src="./tablero-negocio.js?v=929"></script>
 <script src="./lista-precios.js?v=936"></script>
-<script src="./canillas-adaptadores.js?v=19"></script>
 <script src="./vendor/zxing.min.js"></script>
 <script src="./stock-personal.js?v=797"></script>
 
@@ -4645,7 +4644,6 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-suenos" onclick="openSuenos()"><span>🪜</span> Escalera de Sueños</button>
     <button class="ds-btn" data-ds="view-demo" onclick="openDemo()"><span>🎯</span> Coach de Demo</button>
     <button class="ds-btn" data-ds="view-botella" onclick="openBotella()"><span>🚰</span> PSA vs Bidones</button>
-    <button class="ds-btn" data-ds="view-canillas" onclick="openCanillas()"><span>🚰</span> Canillas y adaptadores</button>
     <button class="ds-btn" data-ds="view-lista" onclick="openLista()"><span>📋</span> Lista de precios</button>
     <button class="ds-btn" data-ds="view-reuniones" onclick="openReuniones()"><span>🎥</span> Reuniones</button>
     <button class="ds-btn" onclick="abrirBancoImagenes()"><span>🖼️</span> Banco de Imágenes</button>
@@ -4653,7 +4651,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v936 · Segura</div>
+  <div class="ds-foot">APPI · v937 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -5104,18 +5102,6 @@ body.dark #pageTabs button.active{color:#c5d6ff}
     </header>
     <div id="herrWrap"></div>
     <div class="home-tool-grid" id="herrGrid" style="padding:0 14px"></div>
-  </section>
-
-  <!-- CANILLAS Y ADAPTADORES PSA -->
-  <section id="view-canillas" class="view">
-    <header class="top">
-      <button class="back-btn" onclick="showView('view-herramientas')" aria-label="Volver">‹</button>
-      <button class="help-btn" id="btnHelpCanillas" aria-label="Ayuda">?</button>
-      <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
-      <h1>Canillas y <span class="script">adaptadores</span></h1>
-      <p>Identificador oficial PSA · Guía V02-21</p>
-    </header>
-    <div id="canillasCont"></div>
   </section>
 
   <section id="view-reuniones" class="view">
@@ -7459,17 +7445,17 @@ function showView(id,opts){
     b.classList.toggle('active', b.dataset.view===id);
   });
   // Sidebar escritorio: marcar activo (con equivalencias de sub-vistas)
-  const dsMap = {'view-home':'view-home','view-presu':'view-presu','view-presu-hist':'view-presu','view-equipo':'view-equipo','view-historico':'view-historico','view-usuarios':'view-usuarios','view-seguimiento':'view-seguimiento','view-encuesta':'view-encuesta','view-gestion':'view-gestion','view-grabadora':'view-grabadora','view-notas':'view-notas','view-tumes':'view-tumes','view-siete':'view-siete','view-siete-detail':'view-siete','view-ocho':'view-ocho','view-suenos':'view-suenos','view-demo':'view-demo','view-botella':'view-botella','view-simulador':'view-simulador','view-stock':'view-stock','view-reuniones':'view-reuniones','view-lista':'view-lista','view-canillas':'view-canillas'};
+  const dsMap = {'view-home':'view-home','view-presu':'view-presu','view-presu-hist':'view-presu','view-equipo':'view-equipo','view-historico':'view-historico','view-usuarios':'view-usuarios','view-seguimiento':'view-seguimiento','view-encuesta':'view-encuesta','view-gestion':'view-gestion','view-grabadora':'view-grabadora','view-notas':'view-notas','view-tumes':'view-tumes','view-siete':'view-siete','view-siete-detail':'view-siete','view-ocho':'view-ocho','view-suenos':'view-suenos','view-demo':'view-demo','view-botella':'view-botella','view-simulador':'view-simulador','view-stock':'view-stock','view-reuniones':'view-reuniones','view-lista':'view-lista'};
   const dsTarget = (id==='view-wheel'||id==='view-eval') ? `rueda-${currentRueda||'vida'}` : (dsMap[id] || '');
   document.querySelectorAll('#deskSidebar .ds-btn').forEach(b=>{
     b.classList.toggle('active', b.dataset.ds===dsTarget);
   });
-  const hideTabsOn = ['view-home','view-tumes','view-siete','view-siete-detail','view-ocho','view-suenos','view-demo','view-botella','view-simulador','view-stock','view-presu','view-presu-hist','view-equipo','view-historico','view-seguimiento','view-planning','view-encuesta','view-gestion','view-grabadora','view-notas','view-usuarios','view-admin','view-canillas'];
+  const hideTabsOn = ['view-home','view-tumes','view-siete','view-siete-detail','view-ocho','view-suenos','view-demo','view-botella','view-simulador','view-stock','view-presu','view-presu-hist','view-equipo','view-historico','view-seguimiento','view-planning','view-encuesta','view-gestion','view-grabadora','view-notas','view-usuarios','view-admin'];
   document.getElementById('tabs').style.display = (id==='view-wheel'||id==='view-eval') ? 'flex' : 'none';
   const _pageHub={
     'view-home':'view-home','view-mes':'view-mes','view-tumes':'view-mes','view-siete':'view-mes','view-siete-detail':'view-mes','view-presu':'view-mes','view-presu-hist':'view-mes','view-wheel':'view-mes','view-eval':'view-mes','view-planning':'view-mes',
     'view-negocio':'view-negocio','view-equipo':'view-negocio','view-historico':'view-negocio','view-usuarios':'view-negocio','view-seguimiento':'view-negocio','view-gestion':'view-negocio',
-    'view-herramientas':'view-herramientas','view-stock':'view-herramientas','view-ocho':'view-herramientas','view-suenos':'view-herramientas','view-demo':'view-herramientas','view-botella':'view-herramientas','view-simulador':'view-herramientas','view-grabadora':'view-herramientas','view-notas':'view-herramientas','view-encuesta':'view-herramientas','view-lista':'view-herramientas','view-canillas':'view-herramientas'
+    'view-herramientas':'view-herramientas','view-stock':'view-herramientas','view-ocho':'view-herramientas','view-suenos':'view-herramientas','view-demo':'view-herramientas','view-botella':'view-herramientas','view-simulador':'view-herramientas','view-grabadora':'view-herramientas','view-notas':'view-herramientas','view-encuesta':'view-herramientas','view-lista':'view-herramientas'
   };
   const _hub=_pageHub[id]||'view-home';
   const _isPage = ['view-home','view-mes','view-negocio','view-herramientas'].includes(id);
@@ -8800,7 +8786,6 @@ function garantiasPlanillaAjena(personas,garantiasMap){
 }
 window.garantiasPlanillaAjena=garantiasPlanillaAjena;
 function procesarExcel(rows){
-  console.log('📊 Total de filas leídas:', rows.length);
   // Sin volcar el contenido: estas filas traen nombres, DIP y teléfonos.
 
   let headerRow = -1;
@@ -8822,7 +8807,6 @@ function procesarExcel(rows){
     });
     if(tieneNombre && keywordCount >= 4){
       headerRow = i;
-      console.log('✅ Encabezado REAL encontrado en fila:', i);
       break;
     }
   }
@@ -8858,12 +8842,10 @@ function procesarExcel(rows){
       if(pbHead && (titular.pbPersonal==null || titular.pbPersonal==='')) titular.pbPersonal = parsePB(pbHead[1]);
     });
   }
-  console.log('👤 Titular detectado:', titular ? 'sí' : 'no');
   validarTitularContraCuenta(titular);
 
   const headerRawRow = rows[headerRow] || [];
   const headers = headerRawRow.map(c => (c==null?'':c).toString().toLowerCase().trim());
-  console.log('📋 Headers detectados:', headers);
 
   const findCol = (patterns) => {
     for(let i = 0; i < headers.length; i++){
@@ -8918,8 +8900,6 @@ function procesarExcel(rows){
   if(idx.cumple < 0) idx.cumple = idx.nombre + 9;
   if(idx.email < 0) idx.email = idx.nombre + 10;
 
-  console.log('📍 Índices detectados:', idx);
-
   const personas = [];
   for(let i = headerRow + 1; i < rows.length; i++){
     const r = rows[i] || [];
@@ -8956,8 +8936,6 @@ function procesarExcel(rows){
     };
     personas.push(p);
   }
-
-  console.log('👥 Personas detectadas:', personas.length);
 
   if(personas.length === 0){
     modal.open({
@@ -9109,7 +9087,6 @@ document.getElementById('equipoFileInput').onchange = (e)=>{
       
       let rows;
       if(esHTML){
-        console.log('📄 Archivo detectado como HTML (Excel disfrazado). Parseando como HTML...');
         let htmlText;
         try {
           htmlText = new TextDecoder('windows-1252').decode(uint8);
@@ -9119,14 +9096,12 @@ document.getElementById('equipoFileInput').onchange = (e)=>{
         const parser = new DOMParser();
         const doc = parser.parseFromString(htmlText, 'text/html');
         const tables = doc.querySelectorAll('table');
-        console.log('🗂️ Tablas encontradas:', tables.length);
         if(tables.length === 0){
           throw new Error('El archivo HTML no contiene tablas.');
         }
         rows = [];
         tables.forEach((table, tIdx) => {
           const trs = table.getElementsByTagName('tr');
-          console.log(`  Tabla ${tIdx+1}: ${trs.length} filas`);
           for(let i = 0; i < trs.length; i++){
             const tr = trs[i];
             const cells = [];
@@ -9144,7 +9119,6 @@ document.getElementById('equipoFileInput').onchange = (e)=>{
             if(cells.length > 0) rows.push(cells);
           }
         });
-        console.log('📊 Filas TOTALES extraídas del HTML:', rows.length);
       } else {
         const wb = XLSX.read(uint8, { type: 'array', cellDates: false });
         const ws = wb.Sheets[wb.SheetNames[0]];
@@ -11548,7 +11522,7 @@ async function procesarExportacionSimple(datos){
       compartido = true;
       haptic(20);
     } catch(e){
-      console.log('Share cancelado:', e);
+      console.debug('Share cancelado:', e);
     }
   }
   
@@ -11614,7 +11588,7 @@ async function procesarExportacion(datos){
         compartido = true;
         haptic(20);
       } catch(e){
-        console.log('Share cancelado:', e);
+        console.debug('Share cancelado:', e);
       }
     }
     // Fallback: descargar
@@ -11730,10 +11704,7 @@ function descargarArchivo(blob, fileName){
       scaleFinal = Math.min(MAX_CANVAS / anchoRender, MAX_CANVAS / altoRender);
       // Buscar el mejor scale posible entre 1 y 4
       scaleFinal = Math.max(1, Math.min(scaleFinal, 4));
-      console.log(`⚙️ Imagen muy grande. Ajustando escala a ${scaleFinal.toFixed(2)}x`);
     }
-    
-    console.log(`📐 Render: ${anchoRender}x${altoRender}px | Canvas final: ${Math.round(anchoRender*scaleFinal)}x${Math.round(altoRender*scaleFinal)}px | Scale: ${scaleFinal}`);
     
         // Generar canvas con máxima nitidez
     const canvas = await html2canvas(renderEl, {
@@ -12355,11 +12326,6 @@ function renderToolsList(){
       statusVal:'Lista', statusClass:'pending', progressPct:100,
       timeAgo:'Equipos y recargas', onClick:'openLista()', accent:'#0b5878', gradient:'linear-gradient(135deg,#0b5878,#3ad0a4)'
     });
-    const hCanillas = renderHomeQuickCard({
-      icon:'🚰', title:'Canillas y adaptadores', sub:'Identificador por foto · Guía PSA',
-      statusVal:'Foto / IA', statusClass:'done', progressPct:100,
-      timeAgo:'53 modelos', onClick:'openCanillas()', accent:'#0284c7', gradient:'linear-gradient(135deg,#0284c7,#38bdf8)'
-    });
     const hReu = renderHomeQuickCard({
       icon:'🎥', title:'Reuniones', sub:'Un botón, como Meet',
       statusVal:'Live', statusClass:'pending', progressPct:100,
@@ -12407,7 +12373,7 @@ function renderToolsList(){
         <span style="font-size:14px;font-weight:900;letter-spacing:-0.2px;color:#fff">Tablero PSA</span>
         <span style="font-size:11px;font-weight:700;color:rgba(255,255,255,.90);line-height:1.2">Acceso directo · Mi PSA Distribuidor</span>
       </button>`;
-    herrHost.innerHTML = h1 + h2 + h3 + h4 + hCanillas + hLista + hReu + hBanco + h5 + hStock + h6 + h7 + hAgenda + hPSA;
+    herrHost.innerHTML = h1 + h2 + h3 + h4 + hLista + hReu + hBanco + h5 + hStock + h6 + h7 + hAgenda + hPSA;
   }
   if(!mesHost){const toolsList=document.getElementById('toolsList');if(toolsList)toolsList.innerHTML = `
     <details class="home-section-block" data-home-sec="mes" ${openMes?'open':''}>
@@ -14023,8 +13989,8 @@ function cerrarToolsMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='936';
-      const CACHE_NAME='appi-v936-botones-nativos-originales';
+      const swVersion='937';
+      const CACHE_NAME='appi-v937-calidad';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
@@ -16922,7 +16888,6 @@ function cargarArchivoU(file){
       if(infoEl) infoEl.innerHTML=`❌ La librería para leer Excel no cargó. Cerrá y volvé a abrir APPI.`;
       return;
     }
-    console.log('📂 Archivo seleccionado:', file.size, file.type);
     const reader=new FileReader();
     reader.onerror=(e)=>{ 
       console.error('FileReader error', e);
@@ -16931,7 +16896,6 @@ function cargarArchivoU(file){
     };
     reader.onload=e=>{
       try{
-        console.log('📖 ArrayBuffer listo, bytes:', e.target.result.byteLength);
         if(infoEl) infoEl.innerHTML=`⏳ Procesando <b>${escU(file.name)}</b>...<br/><small>Leyendo hojas Excel</small>`;
         const data=new Uint8Array(e.target.result);
         let wb;
@@ -16943,7 +16907,6 @@ function cargarArchivoU(file){
           let binary=''; for(let i=0;i<data.length;i++) binary+=String.fromCharCode(data[i]);
           wb=XLSX.read(binary,{type:'binary'});
         }
-        console.log('📑 Hojas encontradas:', wb.SheetNames);
         if(infoEl) infoEl.innerHTML=`⏳ Hojas: <b>${escU(wb.SheetNames.join(', '))}</b> - analizando...`;
         let mejor={data:[], debug:''};
         let debugAll=[];
@@ -16951,7 +16914,6 @@ function cargarArchivoU(file){
           try{
             const ws=wb.Sheets[name];
             const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:'', blankrows:false, raw:true, dateNF:'dd/mm/yyyy'});
-            console.log(`Hoja ${name}: ${rows.length} filas`);
             const res=parseRowsU(rows);
             debugAll.push(`Hoja "${name}": ${rows.length} filas, ${res.data.length} usuarios detectados | Header: ${res.debug.substring(0,120)}`);
             if(res.data.length>mejor.data.length) mejor=res;
@@ -16963,7 +16925,6 @@ function cargarArchivoU(file){
         const fullDebug=debugAll.join('\n\n') + '\n\n' + (mejor.debug||'');
         if(dbgEl) dbgEl.textContent=fullDebug;
         const parsed=mejor.data;
-        console.log('✅ Total usuarios parseados:', parsed.length);
         if(parsed.length===0){
           const msg='No se detectaron usuarios. Revisá que el Excel tenga columnas Usuario, Domicilio, etc.\n\n'+fullDebug.substring(0,800);
           window.APPIDialog.alert(msg,{title:'No se detectaron usuarios',icon:'🤔'});
@@ -16982,8 +16943,7 @@ function cargarArchivoU(file){
         if(depuradosIgnorados>0 && infoEl) infoEl.innerHTML=`✅ <b>${usuariosU.length}</b> usuarios cargados · 🧹 ${depuradosIgnorados} depurado${depuradosIgnorados===1?'':'s'} ignorado${depuradosIgnorados===1?'':'s'}`;
         try{ 
           localStorage.setItem('usuarios_garantias', JSON.stringify(usuariosU.map(u=>({...u, fVence:u.fVence?u.fVence.toISOString():null})))); localStorage.setItem('lastUpdate_usuarios', Date.now().toString()); localStorage.setItem('lastUpdate_garantias', Date.now().toString()); try{ actualizarUsuariosMetaBar(); }catch(e){}
-          console.log('💾 Guardado en localStorage', usuariosU.length);
-        }catch(err){ console.log('localStorage fail',err); }
+        }catch(err){ console.warn('localStorage fail',err); }
         mostrarDashboardU();
         const info=document.getElementById('usuariosFileInfo');
         if(info){ info.style.display='block'; info.innerHTML=`✅ <b>${parsed.length} usuarios</b> cargados de <b>${escU(file.name)}</b> · ${new Date().toLocaleString('es-AR')}<br/><small>Hojas analizadas: ${escU(wb.SheetNames.join(', '))}</small>`; }
@@ -17010,7 +16970,6 @@ function cargarArchivoU(file){
 window.cargarArchivoU = cargarArchivoU;
 window.cargarArchivoUReal = cargarArchivoU;
 if(window._pendingFile){
-  console.log('Procesando archivo pendiente');
   const pf=window._pendingFile; window._pendingFile=null;
   setTimeout(()=>{ try{ cargarArchivoU(pf); }catch(e){ console.error(e); } }, 300);
 }
@@ -17155,7 +17114,7 @@ function initUsuarios(){
         // No reseteamos antes, reseteamos después para asegurar onchange
         fileInput.click();
       }
-    }catch(e){ console.log('trigger file fail',e); }
+    }catch(e){ console.warn('trigger file fail',e); }
   };
 
   if(btnChoose){
@@ -17167,7 +17126,6 @@ function initUsuarios(){
   const onFileSelected=e=>{
     const f=e.target.files && e.target.files[0];
     if(f){
-      console.log('Archivo elegido',f.size);
       try{ cargarArchivoU(f); }catch(err){ console.error(err); window.APPIDialog.alert('Error al leer el archivo: '+err.message,{title:'Error',icon:'⚠️'}); }
     }
     setTimeout(()=>{ try{ e.target.value=''; }catch(_){} },600);
@@ -17316,7 +17274,7 @@ function initUsuarios(){
     try{
       const fi=document.getElementById('usuariosFileInput');
       if(fi) fi.click();
-    }catch(e){ console.log('reasar recargar fail',e); }
+    }catch(e){ console.warn('recargar errores al abrir el selector',e); }
   };
   const btnMensajes=document.getElementById('usuariosBtnMensajes');
   if(btnMensajes) btnMensajes.onclick=()=>{
@@ -17347,7 +17305,7 @@ function initUsuarios(){
         const upCard=document.getElementById('usuariosUploadCard');
         if(upCard) upCard.style.display='block';
       }
-    }catch(e){ console.log('load usuarios fail',e); }
+    }catch(e){ console.warn('carga de usuarios desde memoria falló',e); }
   }
   window.recargarUsuariosDeStorage=recargarUsuariosDeStorage;
   window.mostrarDashboardU=mostrarDashboardU;
@@ -18918,12 +18876,6 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
   }
   inp && inp.addEventListener('input',e=>renderGS(e.target.value));
 
-  // Perf badge: mostrar tiempo carga
-  try{
-    const t=Math.round(performance.now());
-    console.log('[APPI Renovada v728] Cargada en '+t+'ms · Offline:'+(!navigator.onLine)+' · Buscador Ctrl+K listo');
-  }catch(e){}
-
   // Fix scroll lock antiguo que dejaba body bloqueado
   try{ document.body.classList.remove('appi-scroll-lock'); }catch(e){}
   // Marcar como renovada
@@ -19202,7 +19154,9 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
           html: modalHtml
         });
       } else {
-        alert("Desglose Total: " + finalTotalPB.toFixed(1) + " PB en " + currentMonthName);
+        if(window.APPIDialog && typeof window.APPIDialog.alert === "function"){
+          window.APPIDialog.alert("Desglose Total: " + finalTotalPB.toFixed(1) + " PB en " + currentMonthName, { title: "Desglose" });
+        }
       }
     }catch(err){
       console.error("Error abriendo desglose PB:", err);
