@@ -149,47 +149,41 @@
     var st = document.createElement('style');
     st.id = 'canillasEstilosCaptura';
     st.textContent = [
-      '#view-canillas{background:#f3eee3;min-height:100vh;padding:12px 14px 90px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}',
-      'body.dark #view-canillas{background:#121820}',
-      '.can-layout-wrap{max-width:540px;margin:0 auto;display:flex;flex-direction:column;gap:14px}',
+      '#view-canillas{background:#f3eee3;min-height:100vh;padding:14px 14px 100px;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Helvetica Neue",sans-serif;-webkit-font-smoothing:antialiased}',
+      'body.dark #view-canillas{background:#1c1e2a}',
+      '.can-layout-wrap{max-width:500px;margin:0 auto;display:flex;flex-direction:column;gap:14px}',
       '.can-top-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}',
-      '.can-box-panel{background:#fff;border-radius:24px;border:1.5px solid rgba(160,185,175,.35);padding:14px 10px 14px;display:flex;flex-direction:column;align-items:center;box-shadow:0 6px 18px rgba(0,0,0,.03);min-height:360px;position:relative}',
-      'body.dark .can-box-panel{background:#1c232d;border-color:rgba(255,255,255,.08)}',
-      '.can-box-title{font-size:11.5px;font-weight:900;letter-spacing:0.8px;color:#5a6e75;text-transform:uppercase;margin-bottom:12px;text-align:center}',
-      'body.dark .can-box-title{color:#94a3b8}',
-      '.can-photo-frame{width:100%;flex:1;background:#f3f6f5;border-radius:18px;overflow:hidden;display:flex;align-items:center;justify-content:center;position:relative;min-height:240px}',
-      'body.dark .can-photo-frame{background:#151b22}',
+      '.can-box-panel{background:rgba(255,255,255,0.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-radius:22px;border:1px solid rgba(0,0,0,0.06);box-shadow:0 8px 24px rgba(0,0,0,0.04);padding:14px 10px 12px;display:flex;flex-direction:column;align-items:center;min-height:350px;position:relative}',
+      'body.dark .can-box-panel{background:rgba(35,37,54,0.9);border-color:rgba(255,255,255,0.08);box-shadow:0 8px 24px rgba(0,0,0,0.25)}',
+      '.can-box-title{font-size:11px;font-weight:800;letter-spacing:0.6px;color:#71717a;text-transform:uppercase;margin-bottom:10px;text-align:center}',
+      'body.dark .can-box-title{color:#a1a1aa}',
+      '.can-photo-frame{width:100%;flex:1;background:#fafaf9;border-radius:18px;overflow:hidden;display:flex;align-items:center;justify-content:center;position:relative;min-height:240px;box-shadow:inset 0 0 0 1px rgba(0,0,0,0.04)}',
+      'body.dark .can-photo-frame{background:#161722;box-shadow:inset 0 0 0 1px rgba(255,255,255,0.05)}',
       '.can-photo-frame img{width:100%;height:100%;object-fit:cover;display:block}',
-      '.can-btn-cambiar{margin-top:12px;width:100%;border:none;border-radius:14px;background:#0d7a82;color:#fff;font:inherit;font-size:13px;font-weight:850;padding:11px 8px;cursor:pointer;transition:transform .12s ease;box-shadow:0 3px 8px rgba(13,122,130,.25)}',
-      '.can-btn-cambiar:active{transform:scale(0.97)}',
-      '.can-card-sheet{width:100%;flex:1;background:#fff;border-radius:18px;overflow:hidden;position:relative;display:flex;flex-direction:column;box-shadow:inset 0 0 0 1px rgba(0,0,0,.04)}',
-      'body.dark .can-card-sheet{background:#232d3a}',
-      '.can-psa-wave-top{position:relative;background:#074a66;height:65px;border-radius:0 0 50% 50% / 0 0 24px 24px;display:flex;align-items:center;justify-content:center;margin-bottom:8px}',
-      '.can-psa-logo-badge{width:34px;height:34px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.2);border:2px solid #074a66;position:absolute;bottom:-12px;left:50%;transform:translateX(-50%)}',
-      '.can-sheet-head{display:flex;align-items:center;justify-content:space-between;padding:12px 10px 4px;margin-top:4px}',
-      '.can-pill-brand{background:#0a4866;color:#fff;font-size:10px;font-weight:950;padding:2px 8px;border-radius:6px;letter-spacing:0.3px}',
-      '.can-fab-code{font-size:8.5px;color:#7a8e95;font-weight:700;line-height:1.1;text-align:right}',
-      '.can-faucet-draw{flex:1;display:flex;align-items:center;justify-content:center;padding:10px;position:relative}',
-      '.can-faucet-draw img{max-width:100%;max-height:140px;object-fit:contain;filter:drop-shadow(0 4px 6px rgba(0,0,0,.08))}',
-      '.can-rings-group{position:absolute;right:10px;bottom:24px;display:flex;gap:3px;background:rgba(255,255,255,.9);padding:2px;border-radius:999px;border:1px solid rgba(0,0,0,.08)}',
-      '.can-ring-item{width:24px;height:24px;border-radius:50%;border:1.5px solid #0d7a82;display:flex;align-items:center;justify-content:center;font-size:7.5px;font-weight:950;color:#0d7a82;background:#eef6f5}',
-      '.can-sheet-footer-wave{height:46px;background:#0d7a82;border-radius:60% 0 0 0 / 28px 0 0 0;margin-top:auto;position:relative;display:flex;align-items:flex-end;justify-content:flex-end;padding:4px 8px}',
-      '.can-sheet-page-lbl{font-size:8.5px;font-weight:900;color:rgba(255,255,255,.95)}',
-      '.can-bottom-card{background:#fff;border-radius:24px;border:1.5px solid rgba(160,185,175,.35);padding:18px 20px;box-shadow:0 6px 18px rgba(0,0,0,.03);display:flex;flex-direction:column;gap:6px}',
-      'body.dark .can-bottom-card{background:#1c232d;border-color:rgba(255,255,255,.08)}',
+      '.can-ios-icon-btns{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;margin-top:10px}',
+      '.can-ios-btn{width:46px;height:46px;border-radius:50%;border:none;background:#ffffff;box-shadow:0 4px 12px rgba(0,0,0,0.08);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:20px;transition:transform .12s cubic-bezier(0.34,1.56,0.64,1);color:#0b5878}',
+      'body.dark .can-ios-btn{background:#2a2d3e;color:#38bdf8;box-shadow:0 4px 14px rgba(0,0,0,0.3)}',
+      '.can-ios-btn:active{transform:scale(0.9)}',
+      '.can-card-sheet{width:100%;flex:1;background:#fff;border-radius:18px;overflow:hidden;position:relative;display:flex;flex-direction:column;box-shadow:inset 0 0 0 1px rgba(0,0,0,0.05)}',
+      'body.dark .can-card-sheet{background:#242738}',
+      '.can-pdf-canvas-wrap{width:100%;height:100%;min-height:240px;display:flex;align-items:center;justify-content:center;position:relative;background:#fff}',
+      'body.dark .can-pdf-canvas-wrap{background:#1e202e}',
+      '.can-pdf-canvas-wrap canvas{width:100%!important;height:100%!important;object-fit:contain;display:block;border-radius:16px}',
+      '.can-bottom-card{background:rgba(255,255,255,0.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-radius:24px;border:1px solid rgba(0,0,0,0.06);box-shadow:0 10px 30px rgba(0,0,0,0.05);padding:18px 20px;display:flex;flex-direction:column;gap:6px}',
+      'body.dark .can-bottom-card{background:rgba(35,37,54,0.9);border-color:rgba(255,255,255,0.08);box-shadow:0 10px 30px rgba(0,0,0,0.25)}',
       '.can-req-top{display:flex;align-items:center;justify-content:space-between}',
-      '.can-req-label{font-size:11.5px;font-weight:900;letter-spacing:0.8px;color:#5a6e75;text-transform:uppercase}',
-      'body.dark .can-req-label{color:#94a3b8}',
-      '.can-nav-link-btn{background:none;border:none;color:#074a66;font:inherit;font-size:13.5px;font-weight:950;cursor:pointer;display:flex;align-items:center;gap:3px;padding:0}',
+      '.can-req-label{font-size:11px;font-weight:800;letter-spacing:0.8px;color:#71717a;text-transform:uppercase}',
+      'body.dark .can-req-label{color:#a1a1aa}',
+      '.can-nav-link-btn{background:none;border:none;color:#0b5878;font:inherit;font-size:13.5px;font-weight:900;cursor:pointer;display:flex;align-items:center;gap:3px;padding:0}',
       'body.dark .can-nav-link-btn{color:#38bdf8}',
-      '.can-main-title{font-size:26px;font-weight:950;color:#074a66;letter-spacing:-0.4px;margin:2px 0 0}',
+      '.can-main-title{font-size:26px;font-weight:900;color:#0b5878;letter-spacing:-0.5px;margin:2px 0 0}',
       'body.dark .can-main-title{color:#38bdf8}',
-      '.can-model-name{font-size:16px;font-weight:900;color:#2a363b;margin:0}',
-      'body.dark .can-model-name{color:#f1f5f9}',
-      '.can-thread-desc{font-size:13.5px;color:#71828a;font-weight:600;margin:0}',
-      'body.dark .can-thread-desc{color:#94a3b8}',
-      '.can-alert-pill{margin-top:8px;background:#f8faf9;border:1px solid rgba(13,122,130,.15);border-radius:14px;padding:10px 14px;display:flex;align-items:flex-start;gap:8px;font-size:13px;color:#2c4046;font-weight:650;line-height:1.4}',
-      'body.dark .can-alert-pill{background:#151b22;border-color:rgba(255,255,255,.08);color:#cbd5e1}',
+      '.can-model-name{font-size:16px;font-weight:850;color:#18181b;margin:0}',
+      'body.dark .can-model-name{color:#f4f4f5}',
+      '.can-thread-desc{font-size:13px;color:#71717a;font-weight:600;margin:0}',
+      'body.dark .can-thread-desc{color:#a1a1aa}',
+      '.can-alert-pill{margin-top:8px;background:rgba(11,88,120,0.05);border:1px solid rgba(11,88,120,0.12);border-radius:14px;padding:10px 14px;display:flex;align-items:flex-start;gap:8px;font-size:12.5px;color:#27272a;font-weight:650;line-height:1.4}',
+      'body.dark .can-alert-pill{background:rgba(56,189,248,0.08);border-color:rgba(56,189,248,0.2);color:#e2e8f0}',
       '.can-alert-pill span{font-size:15px;flex-shrink:0}'
     ].join('\n');
     document.head.appendChild(st);
@@ -201,52 +195,40 @@
 
     var cur = CANILLAS[state.idx] || CANILLAS[0];
     var numDisplay = (cur.id || (state.idx + 1)) + ' de 53';
-
     var imgUser = state.userImg || 'https://raw.githubusercontent.com/Somospopups/appi/main/catalogo-img/canilla_piazza_dot.png';
 
     var html = '<div class="can-layout-wrap">' +
       '<div class="can-top-grid">' +
+        // Panel izquierdo: TU FOTO con botones SOLO ICONOS estilo iOS
         '<div class="can-box-panel">' +
           '<div class="can-box-title">TU FOTO</div>' +
           '<div class="can-photo-frame">' +
             '<img id="canUserPhotoImg" src="' + esc(imgUser) + '" alt="Tu foto">' +
           '</div>' +
-          '<div style="display:flex;gap:6px;width:100%;margin-top:10px"><button type="button" class="can-btn-cambiar" id="canBtnSubir" style="margin-top:0;flex:1;background:#0b5878">📁 Galería</button><button type="button" class="can-btn-cambiar" id="canBtnCamara" style="margin-top:0;flex:1;background:#0d7a82">📷 Cámara</button></div>' +
+          '<div class="can-ios-icon-btns">' +
+            '<button type="button" class="can-ios-btn" id="canBtnGaleria" title="Subir desde galería" aria-label="Galería">📁</button>' +
+            '<button type="button" class="can-ios-btn" id="canBtnCamara" title="Sacar foto" aria-label="Cámara">📷</button>' +
+          '</div>' +
         '</div>' +
 
+        // Panel derecho: CATÁLOGO PSA (DESLIZÁ) con Renderizador Canvas del PDF
         '<div class="can-box-panel" id="canCatalogCard">' +
           '<div class="can-box-title">CATÁLOGO PSA (DESLIZÁ)</div>' +
           '<div class="can-card-sheet">' +
-            '<div class="can-psa-wave-top">' +
-              '<div class="can-psa-logo-badge">' +
-                '<span style="font-weight:950;font-size:9px;color:#074a66">PSA</span>' +
-              '</div>' +
-            '</div>' +
-            '<div class="can-sheet-head">' +
-              '<span class="can-pill-brand">' + esc(cur.marca) + '</span>' +
-              '<div class="can-fab-code">' + esc(cur.modelo) + '<br/>Cod. Fabricante: ' + esc(cur.codFab) + '</div>' +
-            '</div>' +
-            '<div class="can-faucet-draw">' +
-              '<iframe src="guia-adaptadores-psa.pdf#page=' + cur.pag + '&toolbar=0&navpanes=0&scrollbar=0&view=FitH" style="width:100%;height:100%;border:none;pointer-events:none;min-height:220px;border-radius:12px;background:#fff"></iframe>' +
-              '<div class="can-rings-group">' +
-                (cur.adaptadoresImg || ['002','073']).map(function(num){
-                  return '<div class="can-ring-item">' + esc(num) + '</div>';
-                }).join('') +
-              '</div>' +
-            '</div>' +
-            '<div class="can-sheet-footer-wave">' +
-              '<span class="can-sheet-page-lbl">Página ' + esc(cur.pag) + '</span>' +
+            '<div class="can-pdf-canvas-wrap" id="canPdfWrap">' +
+              '<canvas id="canPdfCanvas"></canvas>' +
             '</div>' +
           '</div>' +
         '</div>' +
       '</div>' +
 
+      // Tarjeta inferior: ADAPTADOR REQUERIDO
       '<div class="can-bottom-card">' +
         '<div class="can-req-top">' +
           '<span class="can-req-label">ADAPTADOR REQUERIDO</span>' +
           '<button type="button" class="can-nav-link-btn" id="canBtnPasar">Pasar carta ›</button>' +
         '</div>' +
-        '<div style="text-align:right;font-size:12.5px;font-weight:850;color:#71828a;margin-top:-4px">' + numDisplay + '</div>' +
+        '<div style="text-align:right;font-size:12px;font-weight:800;color:#71717a;margin-top:-4px">' + numDisplay + '</div>' +
         '<h2 class="can-main-title">' + esc(cur.adaptador) + '</h2>' +
         '<h3 class="can-model-name">' + esc(cur.marca + ' ' + cur.modelo) + '</h3>' +
         '<p class="can-thread-desc">Rosca: ' + esc(cur.rosca) + '</p>' +
@@ -256,10 +238,13 @@
         '</div>' +
       '</div>' +
 
-      '<input type="file" id="canFileGaleria" accept="image/*" style="display:none"><input type="file" id="canFileCamara" accept="image/*" capture="environment" style="display:none">' +
+      '<input type="file" id="canFileGaleria" accept="image/*" style="display:none">' +
+      '<input type="file" id="canFileCamara" accept="image/*" capture="environment" style="display:none">' +
     '</div>';
 
     host.innerHTML = html;
+
+    renderPdfPage(cur.pag);
 
     var btnPasar = document.getElementById('canBtnPasar');
     if (btnPasar) {
@@ -289,7 +274,7 @@
       }, {passive:true});
     }
 
-    var btnSubir = document.getElementById('canBtnSubir');
+    var btnGaleria = document.getElementById('canBtnGaleria');
     var btnCamara = document.getElementById('canBtnCamara');
     var fileGaleria = document.getElementById('canFileGaleria');
     var fileCamara = document.getElementById('canFileCamara');
@@ -305,8 +290,8 @@
       reader.readAsDataURL(file);
     }
 
-    if (btnSubir && fileGaleria) {
-      btnSubir.onclick = function() { fileGaleria.click(); };
+    if (btnGaleria && fileGaleria) {
+      btnGaleria.onclick = function() { fileGaleria.click(); };
       fileGaleria.onchange = function(e) { procesarArchivo(e.target.files && e.target.files[0]); };
     }
     if (btnCamara && fileCamara) {
@@ -315,6 +300,31 @@
     }
   }
 
+  var _pdfDocPromise = null;
+  function getPdfDoc() {
+    if (!_pdfDocPromise && window.pdfjsLib) {
+      window.pdfjsLib.GlobalWorkerOptions.workerSrc = './vendor/pdf.worker.min.js';
+      _pdfDocPromise = window.pdfjsLib.getDocument('guia-para-la-seleccion-de-adaptadores-psa.pdf').promise;
+    }
+    return _pdfDocPromise;
+  }
+
+  function renderPdfPage(pageNum) {
+    if (!window.pdfjsLib) return;
+    getPdfDoc().then(function(pdf) {
+      return pdf.getPage(pageNum);
+    }).then(function(page) {
+      var canvas = document.getElementById('canPdfCanvas');
+      if (!canvas) return;
+      var ctx = canvas.getContext('2d');
+      var viewport = page.getViewport({ scale: 1.5 });
+      canvas.width = viewport.width;
+      canvas.height = viewport.height;
+      page.render({ canvasContext: ctx, viewport: viewport });
+    }).catch(function(err) {
+      console.warn('PDF render error:', err);
+    });
+  }
   function openCanillas(){
     if (typeof showView === 'function') {
       showView('view-canillas');

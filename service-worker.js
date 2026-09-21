@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v946-canillas-fondo-crema-subir-pdf';
+const CACHE_NAME = 'appi-v947-canillas-iphone-icons-pdf';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
@@ -34,7 +34,7 @@ const APP_SHELL = [
   './demo-guia.js',
   './tablero-negocio.js',
   './lista-precios.js',
-  './canillas-adaptadores.js',
+  './canillas-adaptadores.js',\n  './vendor/pdf.min.js',\n  './vendor/pdf.worker.min.js',\n  './guia-para-la-seleccion-de-adaptadores-psa.pdf',
   './guia-adaptadores-psa.pdf',
   './stock-personal.js',
   './vendor/zxing.min.js',
