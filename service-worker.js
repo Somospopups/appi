@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v931-limpieza-anillos';
+const CACHE_NAME = 'appi-v932-limpieza-absoluta';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
