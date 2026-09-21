@@ -149,7 +149,7 @@
     var st = document.createElement('style');
     st.id = 'canillasEstilosCaptura';
     st.textContent = [
-      '#view-canillas{background:#edf4f2;min-height:100vh;padding:12px 14px 90px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}',
+      '#view-canillas{background:#f3eee3;min-height:100vh;padding:12px 14px 90px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}',
       'body.dark #view-canillas{background:#121820}',
       '.can-layout-wrap{max-width:540px;margin:0 auto;display:flex;flex-direction:column;gap:14px}',
       '.can-top-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}',
@@ -211,7 +211,7 @@
           '<div class="can-photo-frame">' +
             '<img id="canUserPhotoImg" src="' + esc(imgUser) + '" alt="Tu foto">' +
           '</div>' +
-          '<button type="button" class="can-btn-cambiar" id="canBtnCambiar">Cambiar foto</button>' +
+          '<div style="display:flex;gap:6px;width:100%;margin-top:10px"><button type="button" class="can-btn-cambiar" id="canBtnSubir" style="margin-top:0;flex:1;background:#0b5878">📁 Galería</button><button type="button" class="can-btn-cambiar" id="canBtnCamara" style="margin-top:0;flex:1;background:#0d7a82">📷 Cámara</button></div>' +
         '</div>' +
 
         '<div class="can-box-panel" id="canCatalogCard">' +
@@ -227,7 +227,7 @@
               '<div class="can-fab-code">' + esc(cur.modelo) + '<br/>Cod. Fabricante: ' + esc(cur.codFab) + '</div>' +
             '</div>' +
             '<div class="can-faucet-draw">' +
-              '<img src="https://raw.githubusercontent.com/Somospopups/appi/main/catalogo-img/canilla_piazza_dot.png" alt="' + esc(cur.modelo) + '">' +
+              '<iframe src="guia-adaptadores-psa.pdf#page=' + cur.pag + '&toolbar=0&navpanes=0&scrollbar=0&view=FitH" style="width:100%;height:100%;border:none;pointer-events:none;min-height:220px;border-radius:12px;background:#fff"></iframe>' +
               '<div class="can-rings-group">' +
                 (cur.adaptadoresImg || ['002','073']).map(function(num){
                   return '<div class="can-ring-item">' + esc(num) + '</div>';
@@ -256,7 +256,7 @@
         '</div>' +
       '</div>' +
 
-      '<input type="file" id="canFileInputHidden" accept="image/*" capture="environment" style="display:none">' +
+      '<input type="file" id="canFileGaleria" accept="image/*" style="display:none"><input type="file" id="canFileCamara" accept="image/*" capture="environment" style="display:none">' +
     '</div>';
 
     host.innerHTML = html;
@@ -289,24 +289,29 @@
       }, {passive:true});
     }
 
-    var btnCambiar = document.getElementById('canBtnCambiar');
-    var fileInp = document.getElementById('canFileInputHidden');
-    if (btnCambiar && fileInp) {
-      btnCambiar.onclick = function() {
-        fileInp.click();
+    var btnSubir = document.getElementById('canBtnSubir');
+    var btnCamara = document.getElementById('canBtnCamara');
+    var fileGaleria = document.getElementById('canFileGaleria');
+    var fileCamara = document.getElementById('canFileCamara');
+
+    function procesarArchivo(file) {
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function(evt) {
+        state.userImg = evt.target.result;
+        try { localStorage.setItem('appi_canilla_user_img', state.userImg); } catch(err) {}
+        render();
       };
-      fileInp.onchange = function(e) {
-        var file = e.target.files && e.target.files[0];
-        if (file) {
-          var reader = new FileReader();
-          reader.onload = function(evt) {
-            state.userImg = evt.target.result;
-            try { localStorage.setItem('appi_canilla_user_img', state.userImg); } catch(err) {}
-            render();
-          };
-          reader.readAsDataURL(file);
-        }
-      };
+      reader.readAsDataURL(file);
+    }
+
+    if (btnSubir && fileGaleria) {
+      btnSubir.onclick = function() { fileGaleria.click(); };
+      fileGaleria.onchange = function(e) { procesarArchivo(e.target.files && e.target.files[0]); };
+    }
+    if (btnCamara && fileCamara) {
+      btnCamara.onclick = function() { fileCamara.click(); };
+      fileCamara.onchange = function(e) { procesarArchivo(e.target.files && e.target.files[0]); };
     }
   }
 

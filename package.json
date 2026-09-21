@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "945.0.0",
-  "cacheName": "appi-v945-canillas-captura-exacta",
+  "version": "946.0.0",
+  "cacheName": "appi-v946-canillas-fondo-crema-subir-pdf",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

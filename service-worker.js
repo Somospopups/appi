@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v945-canillas-captura-exacta';
+const CACHE_NAME = 'appi-v946-canillas-fondo-crema-subir-pdf';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
