@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v942-restaurar-canillas-original';
+const CACHE_NAME = 'appi-v943-canillas-guia-original';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
