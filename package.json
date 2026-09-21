@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "934.0.0",
-  "cacheName": "appi-v934-estetica-promos-nativa",
+  "version": "935.0.0",
+  "cacheName": "appi-v935-tarjetas-elegantes-promos",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

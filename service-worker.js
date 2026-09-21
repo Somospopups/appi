@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v934-estetica-promos-nativa';
+const CACHE_NAME = 'appi-v935-tarjetas-elegantes-promos';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

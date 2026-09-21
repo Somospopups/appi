@@ -1,4 +1,53 @@
-/* APPI · Lista de precios tienda PSA + presupuesto PDF */
+function pintarSheet(r) {
+    var host = $('lpSheetLines');
+    if (!host) return;
+    if (!r.lineas.length) {
+      host.innerHTML = '<div class="lp-empty">No hay productos en el presupuesto</div>';
+      return;
+    }
+
+    host.innerHTML = r.lineas.map(function (ln) {
+      var k = esc(ln.p.clave || claveSku(ln.p));
+      var d = ln.descPct || 0;
+      var hasDesc = d > 0;
+      
+      var precioDisplay = hasDesc
+        ? ('<div class="lp-item-p-split"><span class="lp-item-p-tachado">' + money(ln.q * ln.precioOriginal) + '</span><span class="lp-item-p-promo">' + money(ln.q * ln.precioFinal) + '</span></div>')
+        : ('<span class="lp-item-p-orig">' + money(ln.q * ln.precioFinal) + '</span>');
+
+      return '<div class="lp-line-card" data-sku="' + k + '">' +
+        '<div class="lp-line-main">' +
+          '<div class="lp-qty-capsule">' +
+            '<button type="button" class="ghost" data-act="menos" aria-label="Restar">−</button>' +
+            '<i>' + ln.q + '</i>' +
+            '<button type="button" data-act="mas" aria-label="Sumar">+</button>' +
+          '</div>' +
+          '<div class="lp-line-details">' +
+            '<div class="lp-line-title">' + esc(ln.p.nombre) + '</div>' +
+            '<div class="lp-line-subrow">' +
+              '<span class="lp-unit-hint">' + money(ln.precioFinal) + ' c/u</span>' +
+              (hasDesc ? '<span class="lp-tag-promo-pill">Promo -' + d + '%</span>' : '') +
+            '</div>' +
+          '</div>' +
+          '<div class="lp-line-total-col">' +
+            precioDisplay +
+          '</div>' +
+        '</div>' +
+        '<div class="lp-line-promo-selector">' +
+          '<label class="lp-promo-label">Promoción:</label>' +
+          '<div class="lp-promo-chips">' +
+            '<button type="button" class="lp-pchip ' + (d === 0 ? 'active' : '') + '" data-set-desc="0">Precio lista</button>' +
+            '<button type="button" class="lp-pchip ' + (d === 5 ? 'active' : '') + '" data-set-desc="5">5% off</button>' +
+            '<button type="button" class="lp-pchip ' + (d === 10 ? 'active' : '') + '" data-set-desc="10">10% off</button>' +
+            '<button type="button" class="lp-pchip ' + (d === 15 ? 'active' : '') + '" data-set-desc="15">15% off</button>' +
+            '<button type="button" class="lp-pchip ' + (d === 20 ? 'active' : '') + '" data-set-desc="20">20% off</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  /* APPI · Lista de precios tienda PSA + presupuesto PDF */
 (function () {
   'use strict';
 
