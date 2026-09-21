@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "929.0.0",
-  "cacheName": "appi-v929-simulador-bidones",
+  "version": "930.0.0",
+  "cacheName": "appi-v930-modo-triunfo",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

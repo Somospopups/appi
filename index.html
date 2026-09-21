@@ -4653,7 +4653,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v929 · Segura</div>
+  <div class="ds-foot">APPI · v930 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4937,7 +4937,7 @@ body.dark #pageTabs button.active{color:#c5d6ff}
       <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
 
       <div class="home-brand-row">
-        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · 929</span></span>
+        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · 930</span></span>
       </div>
 
       <div class="home-hero-card">
@@ -4958,6 +4958,9 @@ body.dark #pageTabs button.active{color:#c5d6ff}
         </div>
       </div>
     </header>
+
+    <!-- CHISPA DIARIA Y ANILLOS DE ACTIVIDAD (MODO TRIUNFO) -->
+    <div id="homeModoTriunfoWrap"></div>
 
     <div id="culturaWrap" style="display:none"></div><!-- cultura quitada v710 -->
 
@@ -12891,6 +12894,7 @@ function openCulturaInvitado(monthId,slot){
 }
 function renderHomeCompleto(){
   try{ renderDateContext(); }catch(e){ console.error(e); }
+  try{ renderHomeModoTriunfo(); }catch(e){ console.error(e); }
   try{ renderCulturaCrecimiento(); }catch(e){ console.error(e); }
   try{ renderBonusNotifs(); }catch(e){ console.error(e); }
   try{ renderScoreCompact(); }catch(e){ console.error(e); }
@@ -14022,8 +14026,8 @@ function cerrarToolsMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='929';
-      const CACHE_NAME='appi-v929-simulador-bidones';
+      const swVersion='930';
+      const CACHE_NAME='appi-v930-modo-triunfo';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
@@ -19587,5 +19591,156 @@ body.dark .modal-overlay.psa-popup-blur .modal{background:rgba(28,29,46,0.96);bo
 })();
 </script>
 
+<script>
+// ============================================================
+// APPI · CHISPA DIARIA Y ANILLOS DE ACTIVIDAD (MODO TRIUNFO)
+// ============================================================
+function renderHomeModoTriunfo(){
+  const wrap = document.getElementById('homeModoTriunfoWrap');
+  if(!wrap) return;
+
+  const chispas = [
+    "“El éxito no es magia, es constancia: 1 demo hoy puede cambiar tu mes entero.” 💪",
+    "“No salgas a vender un producto, salí a transformar el agua de una familia.” 💧",
+    "“Las objeciones son solo preguntas disfrazadas de miedo. Escuchá con el corazón.” ✨",
+    "“Tu negocio crece al ritmo de las decisiones que tomás hoy antes del mediodía.” 🚀",
+    "“Cada NO te acerca más al próximo gran líder de tu organización.” 🏆",
+    "“La disciplina de hoy es la libertad y las regalías de tus próximos 10 años.” 👑",
+    "“Poné el foco en servir y los puntos de bonificación vienen solos.” 🌟"
+  ];
+  const dNum = new Date().getDate();
+  const fraseHoy = chispas[dNum % chispas.length];
+
+  let pbTotal = 0;
+  let personasCount = 0;
+  let activosCount = 0;
+  try{
+    const r = JSON.parse(localStorage.getItem('equipoData')||'null');
+    if(r && r.personas){
+      personasCount = r.personas.length;
+      r.personas.forEach(p=>{
+        const v = Number(p.pnAct||p.pbPersonal||0);
+        pbTotal += v;
+        if(v > 0) activosCount++;
+      });
+    }
+  }catch(e){}
+
+  try{
+    if(typeof embudoKpiLiderPB === 'function'){
+      const l = embudoKpiLiderPB();
+      if(l != null && !isNaN(l)) pbTotal = l;
+    }
+  }catch(e){}
+
+  let pendCount = 0;
+  try{
+    if(typeof seguimientoPendientes === 'function') pendCount = seguimientoPendientes();
+  }catch(e){}
+
+  const metaPb = 100;
+  const pctPb = Math.min(100, Math.round((pbTotal / metaPb) * 100));
+  const circPb = 113;
+  const strokePb = circPb - (circPb * pctPb / 100);
+
+  const pctAct = Math.min(100, Math.round((activosCount / Math.max(1, personasCount || 10)) * 100));
+  const strokeAct = circPb - (circPb * pctAct / 100);
+
+  const metaContactos = 8;
+  const pctCont = Math.min(100, Math.round((Math.max(1, 8 - pendCount) / metaContactos) * 100));
+  const strokeCont = circPb - (circPb * pctCont / 100);
+
+  wrap.innerHTML = `
+    <div class="home-sparks-banner">
+      <span class="home-sparks-icon">⚡</span>
+      <div class="home-sparks-txt"><b>Chispa de hoy:</b> ${fraseHoy}</div>
+    </div>
+
+    <div class="home-rings-board">
+      <div class="home-rings-head">
+        <span class="home-rings-title">🔥 Actividad y Ritmo del Mes</span>
+        <button type="button" class="home-rings-action-btn" onclick="festejarVentaConfeti()">🎉 ¡Cerré una venta!</button>
+      </div>
+
+      <div class="home-rings-grid">
+        <div class="home-ring-item" onclick="showView('view-negocio')" style="cursor:pointer" title="Ver Mi Negocio">
+          <div class="home-ring-circle">
+            <svg width="44" height="44" viewBox="0 0 44 44">
+              <circle cx="22" cy="22" r="18" fill="none" stroke="rgba(11,88,120,0.12)" stroke-width="4"/>
+              <circle cx="22" cy="22" r="18" fill="none" stroke="#3ad0a4" stroke-width="4" stroke-linecap="round"
+                stroke-dasharray="${circPb}" stroke-dashoffset="${strokePb}"/>
+            </svg>
+            <span class="home-ring-emoji">💎</span>
+          </div>
+          <div class="home-ring-val">${pbTotal.toFixed(1)} PB</div>
+          <div class="home-ring-lbl">Volumen</div>
+        </div>
+
+        <div class="home-ring-item" onclick="openEquipo()" style="cursor:pointer" title="Ver Mi Equipo">
+          <div class="home-ring-circle">
+            <svg width="44" height="44" viewBox="0 0 44 44">
+              <circle cx="22" cy="22" r="18" fill="none" stroke="rgba(91,141,239,0.15)" stroke-width="4"/>
+              <circle cx="22" cy="22" r="18" fill="none" stroke="#5b8def" stroke-width="4" stroke-linecap="round"
+                stroke-dasharray="${circPb}" stroke-dashoffset="${strokeAct}"/>
+            </svg>
+            <span class="home-ring-emoji">👥</span>
+          </div>
+          <div class="home-ring-val">${activosCount} / ${personasCount || 0}</div>
+          <div class="home-ring-lbl">Activos</div>
+        </div>
+
+        <div class="home-ring-item" onclick="openMiGestion()" style="cursor:pointer" title="Ver Contactos">
+          <div class="home-ring-circle">
+            <svg width="44" height="44" viewBox="0 0 44 44">
+              <circle cx="22" cy="22" r="18" fill="none" stroke="rgba(245,158,11,0.15)" stroke-width="4"/>
+              <circle cx="22" cy="22" r="18" fill="none" stroke="#f59e0b" stroke-width="4" stroke-linecap="round"
+                stroke-dasharray="${circPb}" stroke-dashoffset="${strokeCont}"/>
+            </svg>
+            <span class="home-ring-emoji">🎯</span>
+          </div>
+          <div class="home-ring-val">${pendCount > 0 ? pendCount + ' pend.' : 'Al día'}</div>
+          <div class="home-ring-lbl">Contactos</div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function festejarVentaConfeti(){
+  try{
+    if(window.navigator && window.navigator.vibrate) window.navigator.vibrate([100, 50, 150]);
+  }catch(e){}
+
+  if(typeof showToast === 'function') showToast('🎉 ¡FELICITACIONES POR ESA VENTA! ¡A seguir con todo! 🚀', 3500);
+
+  const colores = ['#3ad0a4', '#5b8def', '#f59e0b', '#ec4899', '#8b5cf6', '#10b981'];
+  for(let i = 0; i < 45; i++){
+    const conf = document.createElement('div');
+    conf.style.position = 'fixed';
+    conf.style.zIndex = '999999';
+    conf.style.width = Math.random() * 9 + 6 + 'px';
+    conf.style.height = Math.random() * 8 + 5 + 'px';
+    conf.style.backgroundColor = colores[Math.floor(Math.random() * colores.length)];
+    conf.style.left = Math.random() * 100 + 'vw';
+    conf.style.top = '-10px';
+    conf.style.borderRadius = Math.random() > 0.5 ? '50%' : '3px';
+    conf.style.opacity = '1';
+    conf.style.transform = 'rotate(' + Math.random() * 360 + 'deg)';
+    conf.style.transition = 'top ' + (Math.random() * 2 + 1.5) + 's cubic-bezier(.25,.46,.45,.94), transform 2.5s linear, opacity 1s ease';
+    document.body.appendChild(conf);
+
+    setTimeout(()=>{
+      conf.style.top = '105vh';
+      conf.style.transform = 'rotate(' + (Math.random() * 720) + 'deg)';
+    }, 20);
+
+    setTimeout(()=>{
+      conf.style.opacity = '0';
+      setTimeout(()=> conf.remove(), 1000);
+    }, 2200);
+  }
+}
+window.festejarVentaConfeti = festejarVentaConfeti;
+</script>
 </body>
 </html>
