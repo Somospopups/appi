@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "948.0.0",
-  "cacheName": "appi-v948-restauracion-inmediata",
+  "version": "949.0.0",
+  "cacheName": "appi-v949-app-blindada",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

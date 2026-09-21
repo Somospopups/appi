@@ -10,7 +10,7 @@
   function reportar(msg, extra){
     try{
       msg=String(msg||'').trim();
-      if(!msg||msg.indexOf('ResizeObserver')>=0||msg.indexOf('Autoplay')>=0)return;
+      if(!msg||msg.indexOf('ResizeObserver')>=0||msg.indexOf('Autoplay')>=0||msg.toLowerCase().indexOf('serviceworker')>=0)return;
       try{
         var ring=JSON.parse(localStorage.getItem('appi_err_v1')||'[]');
         if(!Array.isArray(ring))ring=[];
@@ -4654,7 +4654,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v948 · Segura</div>
+  <div class="ds-foot">APPI · v949 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4938,7 +4938,7 @@ body.dark #pageTabs button.active{color:#c5d6ff}
       <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
 
       <div class="home-brand-row">
-        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · 948</span></span>
+        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · 949</span></span>
       </div>
 
       <div class="home-hero-card">
@@ -14024,8 +14024,8 @@ function cerrarToolsMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='948';
-      const CACHE_NAME='appi-v948-restauracion-inmediata';
+      const swVersion='949';
+      const CACHE_NAME='appi-v949-app-blindada';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
@@ -18849,7 +18849,7 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
   try{
     if('serviceWorker' in navigator){
       let reg=null;
-      navigator.serviceWorker.register('./service-worker.js').then(r=>{if(!r) return; reg=r;
+      navigator.serviceWorker.register('./service-worker.js').catch(function(err){ console.warn('SW register info:', err); }).then(r=>{if(!r) return; reg=r;
         r.addEventListener('updatefound',()=>{
           const nw=r.installing;
           if(!nw) return;

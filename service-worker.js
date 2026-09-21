@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v948-restauracion-inmediata';
+const CACHE_NAME = 'appi-v949-app-blindada';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
