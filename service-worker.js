@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v938-canillas';
+const CACHE_NAME = 'appi-v939-guia';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
@@ -35,6 +35,7 @@ const APP_SHELL = [
   './lista-precios.js',
   './stock-personal.js',
   './canillas-adaptadores.js',
+  './guia-adaptadores-psa.pdf',
   './vendor/zxing.min.js',
   './porque-vivo.js',
   './home-limpio.js',

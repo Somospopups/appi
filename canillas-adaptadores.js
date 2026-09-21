@@ -132,7 +132,7 @@
       '.can-modal .can-close{position:absolute;top:10px;right:10px;border:none;background:rgba(120,130,170,.14);color:#3a3a48;width:32px;height:32px;border-radius:50%;font-size:15px;cursor:pointer;z-index:2}' +
       '.can-modal img.rel{width:100%;max-height:62vh;object-fit:contain}' +
       '.can-modal .cap{font-size:12px;color:#5a5b6b;font-weight:700;margin-top:8px;text-align:center}' +
-      '.can-pdf-tool{margin-bottom:9px;display:flex;justify-content:flex-end}' +
+      '.can-pdf-tool{margin-bottom:9px;display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12px;font-weight:900;color:#0b5878}' +
       '.can-pdf-tool a{font-size:12px;font-weight:800;color:#0284c7;text-decoration:none}' +
       '#canPdfFrame{width:100%;height:68vh;border:1px solid rgba(80,90,130,.14);border-radius:10px;background:#fff}' +
       'body.dark .can-card{background:#1f2031;border-color:rgba(255,255,255,.09)}' +
@@ -143,7 +143,8 @@
       'body.dark .can-vacio{background:rgba(31,32,49,.6);color:#9a9bae}' +
       'body.dark .can-modal{background:#1f2031}' +
       'body.dark .can-modal .cap{color:#c9cad6}' +
-      'body.dark .can-sku{color:#9a9bae}';
+      'body.dark .can-sku{color:#9a9bae}' +
+      'body.dark .can-pdf-tool{color:#b8c8ff}';
     var st = document.createElement('style');
     st.id = ESTILOS_ID;
     st.textContent = css;
@@ -362,7 +363,7 @@
     pdf.setAttribute('aria-hidden', 'true');
     pdf.innerHTML = '<div class="can-modal">' +
       '<button type="button" class="can-close" data-can-close aria-label="Cerrar">✕</button>' +
-      '<div class="can-pdf-tool"><a id="canPdfAbrir" target="_blank" rel="noopener">Abrir la guía en una pestaña ↗</a></div>' +
+      '<div class="can-pdf-tool"><b>Guía V02-21 · Canillas y adaptadores</b><a id="canPdfAbrir" target="_blank" rel="noopener">Abrir en una pestaña ↗</a></div>' +
       '<iframe id="canPdfFrame" src="' + esc(GIA_PDF) + '" title="Guía de canillas y adaptadores"></iframe>' +
       '</div>';
     body.appendChild(img);
