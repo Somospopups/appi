@@ -19,17 +19,18 @@ test('Mi Margarita vive en Mi negocio, tiene ocho pétalos centrados y recuerda 
   await expect(page.locator('#margaritaCont')).toContainText('Presentación de negocio');
   await expect(page.locator('#margaritaCont')).toContainText('Pedir un referido');
 
-  // Los ocho extremos inferiores coinciden en el centro: no quedan pétalos
-  // corridos, aun cuando el contenido se mantiene derecho con --counter.
+  // Los ocho pétalos parten alineados desde el borde del círculo central,
+  // sin cruzarlo; el contenido se conserva derecho con --counter.
   const geometria = await page.locator('[data-mg-group]').evaluateAll(nodes => nodes.map(node => {
     const style = getComputedStyle(node);
-    return { origin: style.transformOrigin, angle: node.style.getPropertyValue('--angle'), counter: node.style.getPropertyValue('--counter') };
+    return { origin: style.transformOrigin, angle: node.style.getPropertyValue('--angle'), counter: node.style.getPropertyValue('--counter'), outset: node.style.getPropertyValue('--petal-outset') };
   }));
   expect(geometria).toHaveLength(8);
   geometria.forEach((p, i) => {
     expect(p.origin).toMatch(/57px 180px/);
     expect(p.angle).toBe(`${i * 45}deg`);
     expect(p.counter).toBe(`-${i * 45}deg`);
+    expect(p.outset).toBe('-78px');
   });
 
   await page.evaluate(() => {
