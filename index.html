@@ -2,6 +2,8 @@
 <html lang="es">
 <head>
 <script>
+window.abrirVisor3D = function(){};
+
 /* v830 · Red de seguridad de errores: ningún fallo queda en pantalla
    blanca en silencio. Se guarda un anillo en localStorage (para
    diagnosticar a distancia) y se muestra una barra visible con el error. */
@@ -164,7 +166,7 @@ window.openStock=function(){
 <script src="./tablero-negocio.js?v=929"></script>
 <script src="./lista-precios.js?v=936"></script>
 <script src="./vendor/pdf.min.js"></script>
-<script src="./canillas-adaptadores.js?v=561"></script>
+<script src="./canillas-adaptadores.js?v=562"></script>
 <script src="./vendor/zxing.min.js"></script>
 <script src="./stock-personal.js?v=797"></script>
 
@@ -4664,7 +4666,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v567 · Segura</div>
+  <div class="ds-foot">APPI · v562 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4948,7 +4950,7 @@ body.dark #pageTabs button.active{color:#c5d6ff}
       <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
 
       <div class="home-brand-row">
-        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · 561</span></span>
+        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · 562</span></span>
       </div>
 
       <div class="home-hero-card">
@@ -14086,8 +14088,8 @@ function cerrarToolsMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='567';
-      const CACHE_NAME='appi-v567-margarita-contactos';
+      const swVersion='562';
+      const CACHE_NAME='appi-v562-sin-errores';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
