@@ -1,3 +1,9 @@
+
+  function getPdfPageImg(num) {
+    var p = String(num || 1);
+    if (p.length === 1) p = '0' + p;
+    return 'paginas-guia-pdf/page-' + p + '.jpg';
+  }
 (function(){
   'use strict';
 
@@ -194,7 +200,13 @@
       // Modal popup para agrandar el PDF
       '#canPdfZoomModal{position:fixed;inset:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);z-index:999999;display:none;align-items:center;justify-content:center;padding:14px}',
       '#canPdfZoomModal.open{display:flex}',
-      '.can-zoom-card{background:#fff;border-radius:24px;width:100%;max-width:440px;height:84vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,0.5);position:relative}',
+      '#canPdfZoomModal{position:fixed;inset:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);z-index:999999;display:none;align-items:center;justify-content:center;padding:12px}',
+      '#canPdfZoomModal.open{display:flex}',
+      '.can-zoom-card{background:#ffffff;border-radius:24px;width:100%;max-width:480px;height:88vh;max-height:850px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,0.6);position:relative}',
+      'body.dark .can-zoom-card{background:#18181b}',
+      '.can-zoom-body{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;display:flex;align-items:flex-start;justify-content:center;padding:6px;background:#f4f4f5}',
+      'body.dark .can-zoom-body{background:#09090b}',
+      '#canPdfZoomFallbackImg{width:100%;height:auto;object-fit:contain;display:block;border-radius:14px;box-shadow:0 4px 18px rgba(0,0,0,0.12)}',
       'body.dark .can-zoom-card{background:#1e202e}',
       '.can-zoom-close{position:absolute;top:12px;right:12px;width:34px;height:34px;border-radius:50%;border:none;background:rgba(0,0,0,0.6);color:#fff;font-size:18px;font-weight:900;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:10}'
     ].join('\n');
@@ -255,9 +267,9 @@
       // Modal Zoom
       '<div id="canPdfZoomModal">' +
         '<div class="can-zoom-card">' +
-          '<button type="button" class="can-zoom-close" id="canZoomClose">×</button>' +
-          '<div style="flex:1;overflow:auto;display:flex;align-items:center;justify-content:center;background:#fff">' +
-            '<img id="canPdfZoomFallbackImg" style="max-width:100%;max-height:100%;object-fit:contain;display:none"><canvas id="canPdfZoomCanvas"></canvas>' +
+          '<button type="button" class="can-zoom-close" id="canZoomClose" title="Cerrar">×</button>' +
+          '<div class="can-zoom-body">' +
+            '<img id="canPdfZoomFallbackImg" src="' + getPdfPageImg(cur.pag) + '" alt="Guía Oficial PSA PDF">' +
           '</div>' +
         '</div>' +
       '</div>' +
@@ -409,7 +421,7 @@
     function renderPdfPage(pageNum) {
     var imgFallback = document.getElementById('canPdfFallbackImg');
     var canvas = document.getElementById('canPdfCanvas');
-    var imgPath = 'catalogo-adaptadores-img/img_' + pageNum + '.jpg';
+    var imgPath = getPdfPageImg(pageNum);
     
     // Renderizado instantáneo de la lámina del catálogo
     if (imgFallback) {
@@ -425,14 +437,10 @@
     var modal = document.getElementById('canPdfZoomModal');
     if (!modal) return;
     modal.classList.add('open');
-    var imgFallback = document.getElementById('canPdfZoomFallbackImg');
-    var canvas = document.getElementById('canPdfZoomCanvas');
-    var imgPath = 'catalogo-adaptadores-img/img_' + pageNum + '.jpg';
-    if (imgFallback) {
-      imgFallback.src = imgPath;
-      imgFallback.style.display = 'block';
+    var img = document.getElementById('canPdfZoomFallbackImg');
+    if (img) {
+      img.src = getPdfPageImg(pageNum);
     }
-    if (canvas) canvas.style.display = 'none';
   }
 
   function openCanillas(){

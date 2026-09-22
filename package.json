@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "554.0.0",
-  "cacheName": "appi-v554-canillas-inframe-slide",
+  "version": "555.0.0",
+  "cacheName": "appi-v555-canillas-pdf-autentico",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {
