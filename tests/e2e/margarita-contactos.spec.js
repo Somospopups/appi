@@ -30,6 +30,15 @@ test('Mi Margarita vive en Mi negocio, tiene ocho pétalos centrados y recuerda 
     expect(item.color).toBe('rgb(21, 63, 82)');
   });
 
+  // La vista no impone otro color de página: deja visible el fondo propio de
+  // APPI, mientras la tarjeta usa un cielo suave que contrasta los pétalos.
+  const fondos = await page.evaluate(() => ({
+    view: getComputedStyle(document.querySelector('#view-margarita')).backgroundImage,
+    garden: getComputedStyle(document.querySelector('.mg-garden')).backgroundImage
+  }));
+  expect(fondos.view).toBe('none');
+  expect(fondos.garden).toContain('radial-gradient');
+
   await expect(page.locator('#margaritaCont')).toContainText('Demostración');
   await expect(page.locator('#margaritaCont')).toContainText('Presentación de negocio');
   await expect(page.locator('#margaritaCont')).toContainText('Pedir un referido');
