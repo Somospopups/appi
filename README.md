@@ -4,12 +4,13 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
-## v564 · Mi Margarita y Campus: composición beige corregida
+## v565 · Mi Margarita: cabecera y composición móvil corregidas
 - **Mi Margarita** conserva sus pétalos editables alineados directamente con el borde externo del centro, sin atravesarlo, con textos e íconos legibles en escritorio y móvil.
+- En móviles, la cabecera ahora respeta la barra de estado y el mensaje inferior queda debajo de la flor, sin tapar el pétalo de Familia.
 - Cada pétalo permite elegir contactos desde el selector del teléfono cuando está disponible o desde la **Agenda Personal de APPI**, y deja listos grupos para demostraciones, presentaciones de negocio y pedidos de referidos.
 - La margarita se accede desde **Mi negocio**, guarda el progreso local por cuenta y participa de la sincronización habitual.
 - El fondo beige APPI unifica **Mi Margarita** y **Campus PSA**.
-- Versión: **v564 · Segura** · Cache `appi-v564-margarita-contactos`.
+- Versión: **v565 · Segura** · Cache `appi-v565-margarita-contactos`.
 
 ## v562 · Campus PSA: aprendizaje que activa acción
 - **Campus PSA × APPI** suma un recorrido de aprendizaje visual, personalizado por categoría comercial (incluye el itinerario de **Líder de Equipo** relevado).

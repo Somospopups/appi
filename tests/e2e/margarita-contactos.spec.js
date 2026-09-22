@@ -52,6 +52,25 @@ test('en móvil mantiene la flor centrada y abre un pétalo al tocarlo', async (
   await abrirMargarita(page);
   await expect(page.locator('.mg-stage')).toBeVisible();
   await expect(page.locator('[data-mg-group="amigos"]')).toBeVisible();
+
+  // Android puede informar safe-area 0 aun con la barra de estado superpuesta:
+  // la cabecera completa debe reservar espacio real y el pie no tapar Familia.
+  const movil = await page.evaluate(() => {
+    const app = document.querySelector('.app').getBoundingClientRect();
+    const header = document.querySelector('#view-margarita > header.top').getBoundingClientRect();
+    const family = document.querySelector('[data-mg-group="familia"]').getBoundingClientRect();
+    const foot = document.querySelector('.mg-garden-foot').getBoundingClientRect();
+    return {
+      appTop: Number(getComputedStyle(document.querySelector('.app')).paddingTop.replace('px','')),
+      headerTop: header.top - app.top,
+      familyBottom: family.bottom,
+      footTop: foot.top
+    };
+  });
+  expect(movil.appTop).toBeGreaterThanOrEqual(48);
+  expect(movil.headerTop).toBeGreaterThanOrEqual(0);
+  expect(movil.footTop).toBeGreaterThanOrEqual(movil.familyBottom);
+
   await page.locator('[data-mg-group="amigos"] .mg-petal-content').click();
   await expect(page.locator('#mgSheet')).toContainText('Elegí personas para este pétalo');
 });
