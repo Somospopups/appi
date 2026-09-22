@@ -224,13 +224,11 @@
         '</div>' +
 
         // Panel derecho: CATÁLOGO PSA (DESLIZÁ) con física idéntica al Home
-        '<div class="can-box-panel">' +
+        '<div class="can-box-panel" style="overflow:hidden">' +
           '<div class="can-box-title">CATÁLOGO PSA (DESLIZÁ)</div>' +
-          '<div class="can-deck-stage">' +
-            '<div class="can-card-sheet" id="canCardSwipe" title="Tocá para agrandar la página de la guía">' +
-              '<div class="can-pdf-canvas-wrap">' +
-                '<img id="canPdfFallbackImg" style="width:100%;height:100%;object-fit:contain;display:none"><canvas id="canPdfCanvas"></canvas>' +
-              '</div>' +
+          '<div class="can-deck-stage" style="width:100%;height:100%;position:relative;overflow:hidden;border-radius:18px">' +
+            '<div class="can-card-sheet" id="canCardSwipe" style="width:100%;height:100%;position:absolute;inset:0;overflow:hidden;border-radius:18px;background:#fff;display:flex;align-items:center;justify-content:center" title="Tocá para agrandar la página">' +
+              '<img id="canPdfFallbackImg" src="catalogo-adaptadores-img/img_' + cur.pag + '.jpg" style="width:100%;height:100%;object-fit:contain;display:block;user-select:none;-webkit-user-drag:none;pointer-events:none">' +
             '</div>' +
           '</div>' +
         '</div>' +
@@ -332,7 +330,7 @@
     }
   }
 
-  // Físicas y movimiento idénticos al mazo del Home
+  // Físicas y movimiento idénticos al mazo del Home pero confinados al marco
   function cablearSwipe(el) {
     if (!el) return;
     var arrastrando = false, x0 = 0, y0 = 0, dx = 0, dy = 0, modo = '';
@@ -347,6 +345,7 @@
       dx = 0;
       dy = 0;
       el._hasSwiped = false;
+      el.style.transition = 'none';
       try { el.setPointerCapture(e.pointerId); } catch(err) {}
     }, true);
 
@@ -361,35 +360,36 @@
       }
       if (modo === 'swipe') {
         if (e.cancelable) e.preventDefault();
-        if (!el._hasSwiped) {
-          el._hasSwiped = true;
-          el.classList.add('arrastre');
-        }
-        el.style.transform = 'translateX(' + dx + 'px) rotate(' + (dx / 20) + 'deg)';
+        el._hasSwiped = true;
+        // Confinar movimiento dentro del marco
+        var maxMove = 120;
+        var clampedDx = Math.max(-maxMove, Math.min(maxMove, dx));
+        el.style.transform = 'translateX(' + clampedDx + 'px) rotate(' + (clampedDx * 0.04) + 'deg)';
       }
     }, { capture: true, passive: false });
 
     function soltar(){
       if (!arrastrando) return;
       arrastrando = false;
-      el.classList.remove('arrastre');
-      if (el._hasSwiped && Math.abs(dx) > 60) {
-        el.classList.add('vuela');
+      if (el._hasSwiped && Math.abs(dx) > 45) {
+        // Pasar carta de inmediato
         var dir = dx < 0 ? 1 : -1;
-        el.style.transform = 'translateX(' + (dx < 0 ? '-115%' : '115%') + ') rotate(' + (dx < 0 ? '-14deg' : '14deg') + ')';
+        el.style.transition = 'transform 0.16s ease-out, opacity 0.16s ease-out';
+        el.style.transform = 'translateX(' + (dir > 0 ? '-100%' : '100%') + ')';
+        el.style.opacity = '0.3';
         setTimeout(function(){
           state.idx = (state.idx + dir + CANILLAS.length) % CANILLAS.length;
           render();
-        }, 180);
-      } else if (el._hasSwiped) {
-        el.style.transition = 'transform .28s cubic-bezier(0.2, 0.8, 0.2, 1)';
-        el.style.transform = '';
+        }, 160);
+      } else {
+        // Volver suavemente
+        el.style.transition = 'transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1)';
+        el.style.transform = 'translateX(0px) rotate(0deg)';
         setTimeout(function(){
-          el.style.transition = '';
           el._hasSwiped = false;
-        }, 290);
+          el.style.transition = '';
+        }, 220);
       }
-      arrastrando = false;
     }
 
     el.addEventListener('pointerup', soltar, true);
