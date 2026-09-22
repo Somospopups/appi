@@ -1,4 +1,25 @@
 
+  function asegurarModalZoom() {
+    var modal = document.getElementById('canPdfZoomModal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'canPdfZoomModal';
+      modal.innerHTML = '<div class="can-zoom-card">' +
+        '<button type="button" class="can-zoom-close" id="canZoomClose" title="Cerrar" aria-label="Cerrar">✕</button>' +
+        '<div class="can-zoom-body" id="canZoomBody">' +
+          '<img id="canPdfZoomFallbackImg" alt="Guía Oficial PSA PDF">' +
+        '</div>' +
+      '</div>';
+      document.body.appendChild(modal);
+
+      modal.addEventListener('click', function(e){
+        if (e.target === modal || e.target.id === 'canZoomClose') {
+          modal.classList.remove('open');
+        }
+      });
+    }
+  }
+
   function getPdfPageImg(num) {
     var p = String(num || 1);
     if (p.length === 1) p = '0' + p;
@@ -198,15 +219,14 @@
       '.can-btn-wa{margin-top:10px;width:100%;border:none;border-radius:14px;background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;font:inherit;font-size:13.5px;font-weight:900;padding:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 14px rgba(34,197,94,0.3);transition:transform .12s ease}',
       '.can-btn-wa:active{transform:scale(0.97)}',
       // Modal popup para agrandar el PDF
-      '#canPdfZoomModal{position:fixed;inset:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);z-index:999999;display:none;align-items:center;justify-content:center;padding:14px}',
-      '#canPdfZoomModal.open{display:flex}',
-      '#canPdfZoomModal{position:fixed;inset:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);z-index:999999;display:none;align-items:center;justify-content:center;padding:12px}',
-      '#canPdfZoomModal.open{display:flex}',
-      '.can-zoom-card{background:#ffffff;border-radius:24px;width:100%;max-width:480px;height:88vh;max-height:850px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,0.6);position:relative}',
-      'body.dark .can-zoom-card{background:#18181b}',
-      '.can-zoom-body{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;display:flex;align-items:flex-start;justify-content:center;padding:6px;background:#f4f4f5}',
-      'body.dark .can-zoom-body{background:#09090b}',
-      '#canPdfZoomFallbackImg{width:100%;height:auto;object-fit:contain;display:block;border-radius:14px;box-shadow:0 4px 18px rgba(0,0,0,0.12)}',
+            '#canPdfZoomModal{position:fixed!important;inset:0!important;background:rgba(10,12,20,0.88)!important;backdrop-filter:blur(16px)!important;-webkit-backdrop-filter:blur(16px)!important;z-index:9999999!important;display:none;align-items:center;justify-content:center;padding:12px;box-sizing:border-box}',
+      '#canPdfZoomModal.open{display:flex!important}',
+      '.can-zoom-card{background:#ffffff!important;border-radius:24px!important;width:100%!important;max-width:540px!important;height:90vh!important;max-height:860px!important;display:flex!important;flex-direction:column!important;overflow:hidden!important;box-shadow:0 30px 80px rgba(0,0,0,0.6)!important;position:relative!important}',
+      'body.dark .can-zoom-card{background:#18181b!important}',
+      '.can-zoom-close{position:absolute!important;top:14px!important;right:14px!important;width:38px!important;height:38px!important;border-radius:50%!important;border:none!important;background:rgba(0,0,0,0.7)!important;color:#ffffff!important;font-size:18px!important;font-weight:900!important;display:flex!important;align-items:center!important;justify-content:center!important;cursor:pointer!important;z-index:100!important;box-shadow:0 4px 14px rgba(0,0,0,0.4)!important}',
+      '.can-zoom-body{flex:1!important;overflow-y:auto!important;overflow-x:hidden!important;-webkit-overflow-scrolling:touch!important;display:flex!important;justify-content:center!important;align-items:flex-start!important;padding:12px!important;background:#f1f3f8!important}',
+      'body.dark .can-zoom-body{background:#09090b!important}',
+      '#canPdfZoomFallbackImg{width:100%!important;height:auto!important;max-width:100%!important;display:block!important;border-radius:14px!important;box-shadow:0 6px 24px rgba(0,0,0,0.15)!important}',
       'body.dark .can-zoom-card{background:#1e202e}',
       '.can-zoom-close{position:absolute;top:12px;right:12px;width:34px;height:34px;border-radius:50%;border:none;background:rgba(0,0,0,0.6);color:#fff;font-size:18px;font-weight:900;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:10}'
     ].join('\n');
@@ -264,15 +284,7 @@
         '</button>' +
       '</div>' +
 
-      // Modal Zoom
-      '<div id="canPdfZoomModal">' +
-        '<div class="can-zoom-card">' +
-          '<button type="button" class="can-zoom-close" id="canZoomClose" title="Cerrar">×</button>' +
-          '<div class="can-zoom-body">' +
-            '<img id="canPdfZoomFallbackImg" src="' + getPdfPageImg(cur.pag) + '" alt="Guía Oficial PSA PDF">' +
-          '</div>' +
-        '</div>' +
-      '</div>' +
+
 
       '<input type="file" id="canFileGaleria" accept="image/*" style="display:none">' +
       '<input type="file" id="canFileCamara" accept="image/*" capture="environment" style="display:none">' +
@@ -348,6 +360,7 @@
     var arrastrando = false, x0 = 0, y0 = 0, dx = 0, dy = 0, modo = '';
     el._hasSwiped = false;
 
+    var clickStartT = 0;
     el.addEventListener('pointerdown', function(e){
       if (e.button != null && e.button !== 0) return;
       arrastrando = true;
@@ -356,6 +369,7 @@
       y0 = e.clientY;
       dx = 0;
       dy = 0;
+      clickStartT = Date.now();
       el._hasSwiped = false;
       el.style.transition = 'none';
       try { el.setPointerCapture(e.pointerId); } catch(err) {}
@@ -383,24 +397,33 @@
     function soltar(){
       if (!arrastrando) return;
       arrastrando = false;
-      if (el._hasSwiped && Math.abs(dx) > 45) {
-        // Pasar carta de inmediato
+      var elapsed = Date.now() - clickStartT;
+      if (!el._hasSwiped || (Math.abs(dx) < 10 && elapsed < 350)) {
+        // TAP directo sobre la carta -> ABRIR ZOOM POPUP INMEDIATO
+        el.style.transform = 'translateX(0px) rotate(0deg)';
+        el._hasSwiped = false;
+        var curCanilla = CANILLAS[state.idx] || CANILLAS[0];
+        abrirZoom(curCanilla.pag);
+        return;
+      }
+      if (el._hasSwiped && Math.abs(dx) > 40) {
+        // Pasar carta de inmediato dentro de la caja
         var dir = dx < 0 ? 1 : -1;
-        el.style.transition = 'transform 0.16s ease-out, opacity 0.16s ease-out';
-        el.style.transform = 'translateX(' + (dir > 0 ? '-100%' : '100%') + ')';
-        el.style.opacity = '0.3';
+        el.style.transition = 'transform 0.15s ease-out, opacity 0.15s ease-out';
+        el.style.transform = 'translateX(' + (dir > 0 ? '-105%' : '105%') + ')';
+        el.style.opacity = '0.2';
         setTimeout(function(){
           state.idx = (state.idx + dir + CANILLAS.length) % CANILLAS.length;
           render();
-        }, 160);
+        }, 150);
       } else {
-        // Volver suavemente
-        el.style.transition = 'transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1)';
+        // Volver suavemente al centro
+        el.style.transition = 'transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1)';
         el.style.transform = 'translateX(0px) rotate(0deg)';
         setTimeout(function(){
           el._hasSwiped = false;
           el.style.transition = '';
-        }, 220);
+        }, 210);
       }
     }
 
@@ -434,13 +457,14 @@
   }
 
   function abrirZoom(pageNum) {
+    asegurarModalZoom();
     var modal = document.getElementById('canPdfZoomModal');
     if (!modal) return;
-    modal.classList.add('open');
     var img = document.getElementById('canPdfZoomFallbackImg');
     if (img) {
       img.src = getPdfPageImg(pageNum);
     }
+    modal.classList.add('open');
   }
 
   function openCanillas(){
