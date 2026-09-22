@@ -42,7 +42,8 @@
   var LINK_CANJE = 'https://www.youtube.com/watch?v=evwYO9-o5MY';
   var MESES_MANTENIMIENTO = 6;   // ciclo de mantenimiento acordado (6 meses)
   var DIAS_ANIO = 365;
-  var CUPO_DIA = 10;             // las 10 de hoy: mismo tope que WhatsApp
+  var CUPO_DIA = 10;             // las 10 acciones base de hoy
+  var BONUS_CAMPUS = 3;          // se habilita sólo tras el desafío del Campus
   var DIAS_CHECKIN = 90;         // vigentes sin contacto: vuelven a la cola
 
   /* ---------- plantillas de fábrica ----------
@@ -723,6 +724,16 @@
       if (!f || dias(hoy(), f) > 400) delete d.dias[k];
     });
   }
+  // El cupo se amplía recién cuando Campus PSA persiste el Impulso del día.
+  // La consulta es defensiva: si Campus no está cargado, la jornada sigue siendo 10.
+  function cupoHoy(){
+    var extra = 0;
+    try{
+      if (window.APPICampusPSA && typeof window.APPICampusPSA.bonusAccionesHoy === 'function') extra = Number(window.APPICampusPSA.bonusAccionesHoy()) || 0;
+    }catch(e){}
+    return CUPO_DIA + Math.max(0, Math.min(BONUS_CAMPUS, extra));
+  }
+
   function marcarAccion(motivoId, u, estado, silencioso){
     var tel = telefonoDe(u);
     if (!tel) return;
@@ -760,11 +771,14 @@
     guardarAcciones(d);
     invalidarJornada();
     if (!silencioso){ try{ pintarHoy(); }catch(e){} }
+    // La celebración consulta siempre la lista base de 10, antes de que el
+    // bonus cambie el cupo a 13. Es seguro si el módulo aún no cargó.
+    try{ if (window.APPICampusPSA && window.APPICampusPSA.revisarJornada) window.APPICampusPSA.revisarJornada(); }catch(e){}
   }
-  function resumenCon(d){
+  function resumenCon(d, limite){
     var marcas = (d.dias && d.dias[hoyKey()] && d.dias[hoyKey()].marcas) || {};
     var total = 0, hechas = 0, noHechas = 0, pendientes = 0;
-    deHoy().forEach(function(g){
+    deHoy(limite).forEach(function(g){
       g.gente.forEach(function(u){
         total++;
         var m = marcas[g.motivo.id + ':' + telefonoDe(u)];
@@ -776,9 +790,12 @@
     return { total: total, hechas: hechas, noHechas: noHechas, pendientes: pendientes };
   }
   function resumenHoy(){ return resumenCon(leerAcciones()); }
+  // Resumen fijo de la jornada original. Campus usa este contrato para
+  // detectar las 10 acciones logradas sin entrar en un ciclo con el bonus.
+  function resumenBaseHoy(){ return resumenCon(leerAcciones(), CUPO_DIA); }
   /* deHoy() recorre toda la planilla. Sin memo, el mazo lo llamaba
      una vez por cliente (enJornada) y el Home se clavaba. */
-  var jornadaMemo = { gen: 0, genHecho: -1, deHoy: null, tels: null };
+  var jornadaMemo = { gen: 0, genHecho: -1, porCupo: {}, tels: null };
 
   /* Partido del día (v398): el marcador es hechas / las que hay.
      Ganar es hacerlas todas (✓). La ✗ no cuenta. Un día sin tareas
@@ -798,7 +815,7 @@
   }
   function invalidarJornada(){
     jornadaMemo.gen++;
-    jornadaMemo.deHoy = null;
+    jornadaMemo.porCupo = {};
     jornadaMemo.tels = null;
   }
   function registrarPartido(){
@@ -966,10 +983,14 @@
     return dias(hoy(), new Date(d.getFullYear(), d.getMonth(), d.getDate())) === 0;
   }
 
-  // Las 10 de hoy: ni una más. Los cumpleaños entran primero y cuentan.
-  // El resto se reparte por urgencia. Mismo tope que WhatsApp.
-  function deHoy(){
-    if (jornadaMemo.genHecho === jornadaMemo.gen && jornadaMemo.deHoy) return jornadaMemo.deHoy;
+  // Las 10 acciones base del día, o hasta 13 cuando Campus habilitó el
+  // Impulso. El parámetro permite leer siempre las primeras 10 originales.
+  function deHoy(limite){
+    limite = Number(limite);
+    if (!isFinite(limite) || limite <= 0) limite = cupoHoy();
+    limite = Math.floor(limite);
+    var cache = jornadaMemo.porCupo[limite];
+    if (jornadaMemo.genHecho === jornadaMemo.gen && cache) return cache;
     var usados = {};
     var grupos = [];
     function tomar(motivo, max){
@@ -984,12 +1005,12 @@
       grupos.push({ motivo: motivo, gente: gente });
       return gente.length;
     }
-    var faltan = CUPO_DIA;
+    var faltan = limite;
     ['cumple', 'porvencer', 'retro', 'renovacion', 'checkin'].forEach(function(id){
       if (faltan <= 0) return;
       faltan -= tomar(motivoPorId(id), faltan);
     });
-    jornadaMemo.deHoy = grupos;
+    jornadaMemo.porCupo[limite] = grupos;
     jornadaMemo.tels = null;
     jornadaMemo.genHecho = jornadaMemo.gen;
     return grupos;
@@ -2258,6 +2279,8 @@
     invalidarJornada: invalidarJornada,
     colaMotivo: colaMotivo,
     CUPO_DIA: CUPO_DIA,
+    BONUS_CAMPUS: BONUS_CAMPUS,
+    cupoHoy: cupoHoy,
     DIAS_CHECKIN: DIAS_CHECKIN,
     aplicaCheckin: aplicaCheckin,
     motivoPorId: motivoPorId,
@@ -2266,6 +2289,7 @@
     claveAccion: claveAccion,
     completadaDe: completadaDe,
     resumenHoy: resumenHoy,
+    resumenBaseHoy: resumenBaseHoy,
     partidoHoy: partidoHoy,
     registrarPartido: registrarPartido,
     ACCIONES_DIA: ACCIONES_DIA,

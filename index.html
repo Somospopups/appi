@@ -141,7 +141,7 @@ window.openStock=function(){
 <script src="./whatsapp-app.js"></script>
 <script src="./auth-client.js?v=441"></script>
 <script src="./prueba-banner.js"></script>
-<script src="./data-sync.js?v=833"></script>
+<script src="./data-sync.js?v=834"></script>
 <script src="./js/membership-admin.js?v=451"></script>
 <script src="./admin-panel.js?v=777"></script>
 <script src="./js/compromiso-pago.js?v=777"></script>
@@ -154,7 +154,8 @@ window.openStock=function(){
 <script src="./tarjetas-promos.js"></script>
 <script src="./usuarios-botones.js?v=423"></script>
 <script src="./mensajes-hielo.js"></script>
-<script src="./mensajes-usuarios.js?v=813"></script>
+<script src="./mensajes-usuarios.js?v=814"></script>
+<script src="./campus-psa.js?v=2"></script>
 <script src="./reactivacion.js"></script>
 
 <script src="./escalera-suenos.js"></script>
@@ -169,7 +170,7 @@ window.openStock=function(){
 <script src="./porque-vivo.js"></script>
 <script src="./home-limpio.js?v=521"></script>
 <script src="./reporte-bonos.js?v=915"></script>
-  <script src="./home-tarjetas.js?v=835"></script>
+  <script src="./home-tarjetas.js?v=836"></script>
   <script src="./appi-eventos.js?v=726"></script>
   <script src="./tu-mes.js?v=852"></script>
   <script src="./device-bridge.js?v=523"></script>
@@ -4639,6 +4640,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-equipo" onclick="openEquipo()"><span>🌳</span> Mi Equipo</button>
     <button class="ds-btn" data-ds="view-historico" onclick="openHistorico()"><span>📈</span> Histórico</button>
     <button class="ds-btn" data-ds="view-usuarios" onclick="showView('view-usuarios')"><span>📍</span> Usuarios</button>
+    <button class="ds-btn" data-ds="view-campus" onclick="openCampusPSA()"><span>🎓</span> Campus PSA</button>
     <button class="ds-btn" data-ds="view-gestion" onclick="openMiGestion()"><span>📇</span> Panel de Contactos <span class="gestion-sidebar-badge" id="gestionSidebarBadge" hidden>0</span></button>
     <button type="button" class="ds-section-label ds-section-go" onclick="showView('view-herramientas'); if(typeof renderHomeCompleto==='function') renderHomeCompleto();">Mis herramientas</button>
     <button class="ds-btn" data-ds="view-stock" onclick="openStock()"><span>📦</span> Mi stock</button>
@@ -4654,7 +4656,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v561 · Segura</div>
+  <div class="ds-foot">APPI · v562 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -5071,6 +5073,17 @@ body.dark #pageTabs button.active{color:#c5d6ff}
     </header>
     <div class="home-tool-grid" id="negGrid" style="padding:0 14px"></div>
     <div id="negWrap"></div>
+  </section>
+
+  <!-- Campus PSA · contenido original APPI, personalizado por categoría. -->
+  <section id="view-campus" class="view">
+    <header class="top" style="padding-bottom:4px">
+      <button class="back-btn" onclick="showView('view-home')" aria-label="Volver">‹</button>
+      <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
+      <h1>Campus PSA</h1>
+      <div class="script">aprendé y aplicá</div>
+    </header>
+    <div id="campusCont"></div>
   </section>
 
   <!-- v818: Recordatorios del teléfono (Mi Perfil → Notificaciones y recordatorios) -->
@@ -7470,7 +7483,7 @@ function showView(id,opts){
     b.classList.toggle('active', b.dataset.view===id);
   });
   // Sidebar escritorio: marcar activo (con equivalencias de sub-vistas)
-  const dsMap = {'view-home':'view-home','view-presu':'view-presu','view-presu-hist':'view-presu','view-equipo':'view-equipo','view-historico':'view-historico','view-usuarios':'view-usuarios','view-seguimiento':'view-seguimiento','view-encuesta':'view-encuesta','view-gestion':'view-gestion','view-grabadora':'view-grabadora','view-notas':'view-notas','view-tumes':'view-tumes','view-siete':'view-siete','view-siete-detail':'view-siete','view-ocho':'view-ocho','view-suenos':'view-suenos','view-demo':'view-demo','view-botella':'view-botella','view-simulador':'view-simulador','view-stock':'view-stock','view-reuniones':'view-reuniones','view-lista':'view-lista','view-canillas':'view-canillas'};
+  const dsMap = {'view-home':'view-home','view-presu':'view-presu','view-presu-hist':'view-presu','view-equipo':'view-equipo','view-historico':'view-historico','view-usuarios':'view-usuarios','view-campus':'view-campus','view-seguimiento':'view-seguimiento','view-encuesta':'view-encuesta','view-gestion':'view-gestion','view-grabadora':'view-grabadora','view-notas':'view-notas','view-tumes':'view-tumes','view-siete':'view-siete','view-siete-detail':'view-siete','view-ocho':'view-ocho','view-suenos':'view-suenos','view-demo':'view-demo','view-botella':'view-botella','view-simulador':'view-simulador','view-stock':'view-stock','view-reuniones':'view-reuniones','view-lista':'view-lista','view-canillas':'view-canillas'};
   const dsTarget = (id==='view-wheel'||id==='view-eval') ? `rueda-${currentRueda||'vida'}` : (dsMap[id] || '');
   document.querySelectorAll('#deskSidebar .ds-btn').forEach(b=>{
     b.classList.toggle('active', b.dataset.ds===dsTarget);
@@ -12331,12 +12344,22 @@ function renderToolsList(){
     onClick:`showView('view-usuarios')`, accent:'#3ad0a4', gradient:'linear-gradient(135deg,#0b5878,#3ad0a4)'
   });
 
+  const campusActivo = !!(window.APPICampusPSA && window.APPICampusPSA.retoDesbloqueado && window.APPICampusPSA.retoDesbloqueado());
+  const campusListo = !!(window.APPICampusPSA && window.APPICampusPSA.desafioDisponible && window.APPICampusPSA.desafioDisponible());
+  const campusCard = renderHomeQuickCard({
+    icon:'🎓', title:'Campus PSA', sub: campusActivo ? 'Impulso diario activado' : campusListo ? 'Desafío listo: ganá 3 más' : 'Aprendé y llevalo a la acción',
+    statusVal: campusActivo ? '+3' : campusListo ? 'Listo' : 'Campus',
+    statusClass: campusActivo ? 'done' : campusListo ? 'pending' : 'empty',
+    progressPct: campusActivo ? 100 : campusListo ? 75 : 20,
+    timeAgo: campusActivo ? 'Hasta 13 acciones hoy' : 'Tu categoría PSA',
+    onClick:'openCampusPSA()', accent:'#7566dc', gradient:'linear-gradient(135deg,#7566dc,#32c7bd)'
+  });
   const openMes=localStorage.getItem('home_sec_mes')==='1';
   const openNeg=localStorage.getItem('home_sec_neg')==='1';
   const mesHost=document.getElementById('mesGrid');
   const negHost=document.getElementById('negGrid');
   if(mesHost) mesHost.innerHTML = c2 + c1 + c3 + c4;
-  if(negHost) negHost.innerHTML = seguimientoCard + equipoCard + historicoCard + usuariosCard;
+  if(negHost) negHost.innerHTML = seguimientoCard + equipoCard + historicoCard + usuariosCard + campusCard;
   
   // === HERRAMIENTAS GRID ===
   const herrHost = document.getElementById('herrGrid');
@@ -12428,7 +12451,7 @@ function renderToolsList(){
     </details>
     <details class="home-section-block" data-home-sec="neg" ${openNeg?'open':''}>
       <summary class="mini-section-label"><span>🌱</span> Mi negocio<em>⌄</em></summary>
-      <div class="home-tool-grid">${equipoCard + historicoCard + usuariosCard + seguimientoCard}</div>
+      <div class="home-tool-grid">${equipoCard + historicoCard + usuariosCard + seguimientoCard + campusCard}</div>
     </details>
   `;}
   document.querySelectorAll('#toolsList [data-home-sec]').forEach(el=>{
@@ -14034,8 +14057,8 @@ function cerrarToolsMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='561';
-      const CACHE_NAME='appi-v561-clean';
+      const swVersion='562';
+      const CACHE_NAME='appi-v562-campus-impulso';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
@@ -19206,8 +19229,8 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
           sub: `${currentMonthName} ${curYear} · ${finalTotalPB.toFixed(1)} PB`,
           html: modalHtml
         });
-      } else {
-        alert("Desglose Total: " + finalTotalPB.toFixed(1) + " PB en " + currentMonthName);
+      } else if(window.APPIDialog && typeof window.APPIDialog.alert === "function"){
+        window.APPIDialog.alert("Desglose Total: " + finalTotalPB.toFixed(1) + " PB en " + currentMonthName, { title:"Desglose de PB", icon:"📊", okText:"Entendido" });
       }
     }catch(err){
       console.error("Error abriendo desglose PB:", err);

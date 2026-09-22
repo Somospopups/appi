@@ -18,7 +18,7 @@ const PREFIXES=[
   'rueda','siete_','presu_','lastUpdate_','bonus_notif_',
   'appi_suenos_v1_','appi_porque_v1_','appi_stock_v1_','appi_prestamos_v1_','appi_pendientes_v1_','appi_cal_tareas_v1_','appi_tarjetas_v1_',
   'appi_acciones_v1_','appi_agenda_personal_v1_','appi_wa_cuidado_','appi_ducha_rinnova_v1_','appi_metodo_envio_v1_','appi_metodo_envio_v2_',
-  'appi_mensajes_v1_','appi_tu_mes_eventos_v1_'
+  'appi_mensajes_v1_','appi_tu_mes_eventos_v1_','appi_campus_psa_v1_'
 ];
 const state={ready:false,userId:'',workspaceId:'',personType:'titular',values:{},changedAt:{},dirty:new Set(),deleted:new Set(),dropCloudKeys:new Set(),cacheTimer:null,syncTimer:null,syncing:false,lastError:''};
 const nativeSet=Storage.prototype.setItem;
@@ -32,10 +32,13 @@ function isDataKey(key){
 function activePersonType(){const person=window.APPIAuth&&window.APPIAuth.activePerson?window.APPIAuth.activePerson():null;return person&&person.tipo==='socio'?'socio':'titular'}
 function isAccionesKey(key){return String(key||'').startsWith('appi_acciones_v1_')}
 function isMensajesKey(key){return String(key||'').startsWith('appi_mensajes_v1_')}
+function isCampusKey(key){return String(key||'').startsWith('appi_campus_psa_v1_')}
 function accionesLegacyCloudKey(key){return String(key||'').startsWith(PERSON_PREFIX+'appi_acciones_v1_')}
 function isSharedKey(key){
   key=String(key||'');
-  return SHARED_KEYS.has(key)||isAccionesKey(key)||isMensajesKey(key);
+  // La jornada y su Impulso pertenecen a la cuenta: titular y socio comparten
+  // las mismas acciones y no pueden ganar el bonus dos veces en un día.
+  return SHARED_KEYS.has(key)||isAccionesKey(key)||isMensajesKey(key)||isCampusKey(key);
 }
 function cloudDataKey(key,personType=state.personType){return personType==='socio'&&!isSharedKey(key)?PERSON_PREFIX+key:key}
 function localDataKey(cloudKey,personType=state.personType){

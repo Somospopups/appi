@@ -1193,6 +1193,22 @@
     };
   }
 
+  // Campus aparece dentro del mazo cuando la jornada base está completa.
+  // El popup del módulo se dispara al marcar la décima acción; esta carta deja
+  // una puerta permanente para retomarlo si se cerró la celebración.
+  function tarjetaCampus(){
+    try{
+      if (!window.APPICampusPSA || !window.APPICampusPSA.desafioDisponible || !window.APPICampusPSA.desafioDisponible()) return null;
+      if (window.APPICampusPSA.retoDesbloqueado && window.APPICampusPSA.retoDesbloqueado()) return null;
+      return {
+        cat:'campus', icono:'🎓', kicker:'Campus PSA × APPI',
+        titulo:'¡Día cumplido! ¿Vamos por 3 más?',
+        html:'<p class="ht-nota">Completaste tus 10 acciones base. Respondé 5 preguntas de tu categoría y desbloqueá hasta 3 nuevas prioridades reales para hoy.</p><div class="ht-chips"><span>✓ 10 acciones</span><span>✦ 5 aciertos</span><span>⚡ +3 oportunidades</span></div>',
+        cta:{ label:'Ganar 3 más 🎓', go:function(){ if (window.openCampusPSA) window.openCampusPSA(); setTimeout(function(){ try{ if(window.APPICampusPSA) window.APPICampusPSA.iniciarDesafio(); }catch(e){} }, 120); } }
+      };
+    }catch(e){ return null; }
+  }
+
   function tarjetaGanaste(){
     var p = partidoDe();
     if (!p.ganado) return null;
@@ -1468,7 +1484,7 @@
     // v805: mazo unificado sobre el modelo de reempadronamiento (lista de
     // gente + colores por estado, sin botones abajo). "Hoy te conviene" se
     // quitó a pedido y el Plan Canje vive dentro de la tarjeta Usuarios.
-    [tarjetaPbEquipo(), tarjetaJornada(), tarjetaPromoBotella(), tarjetaGanaste(), tarjetaMetodoEnvio(), tarjetaLlegamos(), tarjetaDuchaRinnova(), tarjetaCumples(), tarjetaReempadronar(), tarjetaEquipo(), tarjetaPanel(), tarjetaUsuarios()].forEach(function(t){
+    [tarjetaPbEquipo(), tarjetaJornada(), tarjetaPromoBotella(), tarjetaGanaste(), tarjetaCampus(), tarjetaMetodoEnvio(), tarjetaLlegamos(), tarjetaDuchaRinnova(), tarjetaCumples(), tarjetaReempadronar(), tarjetaEquipo(), tarjetaPanel(), tarjetaUsuarios()].forEach(function(t){
       if (t) lista.push(t);
     });
     return lista;
@@ -2237,9 +2253,21 @@
     tarjetaMetodoEnvio: tarjetaMetodoEnvio,
     tarjetaLlegamos: tarjetaLlegamos,
     tarjetaGanaste: tarjetaGanaste,
+    tarjetaCampus: tarjetaCampus,
     tarjetaPromoBotella: tarjetaPromoBotella,
     textoMarcador: textoMarcador
   };
+
+  window.addEventListener('appi-campus-unlocked', function(){
+    try{
+      if (typeof window.renderHomeCompleto === 'function') window.renderHomeCompleto();
+      if (!esHome() || !mazo) return;
+      var nuevas = armarTarjetas();
+      mazo.i = nuevas.length ? Math.min(mazo.i, nuevas.length - 1) : 0;
+      mazo.tarjetas = nuevas;
+      pintar();
+    }catch(e){}
+  });
 
   window.addEventListener('appi-datasync-applied', function(){
     try{

@@ -4,6 +4,14 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v562 · Campus PSA: aprendizaje que activa acción
+- **Campus PSA × APPI** suma un recorrido de aprendizaje visual, personalizado por categoría comercial (incluye el itinerario de **Líder de Equipo** relevado).
+- Al completar las **10 acciones base** de la jornada aparece una celebración y un desafío original de cinco preguntas sobre comercialización, crecimiento, posventa y autoliderazgo.
+- Cinco respuestas correctas activan el **Impulso del día**: hasta **3 prioridades reales adicionales** (jornada de 10 a 13 cuando existen candidatas), compartidas por titular y socio.
+- El progreso se guarda localmente por cuenta y día, participa de la sincronización habitual de APPI y no consulta ni almacena credenciales de PSA Campus.
+- Versión: **v562 · Segura** · Cache `appi-v562-campus-impulso`.
+
+
 ## v830 · iOS: panel de contactos liviano (sin pantalla blanca)
 · Los listados grandes del Panel (Prioridad de hoy, Todos, Agenda personal) ahora se pintan por tandas (50/100/150) con botón “Mostrar más”: antes, con miles de contactos, el DOM de varios megas dejaba la pantalla blanca en iOS (Safari mata el webview por memoria).
 · Red de seguridad global: cualquier error de script o promesa se guarda (anillo en `appi_err_v1`) y muestra una barra roja con “Recargar” — nada vuelve a fallar en blanco silencio.

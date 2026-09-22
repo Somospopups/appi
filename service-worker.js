@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v561-clean';
+const CACHE_NAME = 'appi-v562-campus-impulso';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
@@ -11,7 +11,6 @@ const APP_SHELL = [
   './appi-notif.js',
   './recordatorios-app.js',
   './reporte-bonos.js',
-  './plan-carrera-organigrama.js',
   './telefono.js',
   './whatsapp-app.js',
   './auth-client.js',
@@ -29,6 +28,7 @@ const APP_SHELL = [
   './usuarios-botones.js',
   './mensajes-hielo.js',
   './mensajes-usuarios.js',
+  './campus-psa.js',
   './reactivacion.js',
   './escalera-suenos.js',
   './demo-guia.js',

@@ -1,5 +1,5 @@
 const { test, expect } = require('@playwright/test');
-const base = require('./hoy-lista-10.spec.js');
+const base = require('./helpers/app-entrar.js');
 
 // El Reporte de Bonos (v809 · v810: en Mi negocio · v812: botón + popup):
 // en la parte SUPERIOR de MI NEGOCIO hay un BOTÓN ALARGADO; al presionarlo

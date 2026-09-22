@@ -1,5 +1,5 @@
 const { test, expect } = require('@playwright/test');
-const base = require('./hoy-lista-10.spec.js');
+const base = require('./helpers/app-entrar.js');
 
 // v813 — Usuarios reasignados:
 // La planilla trae una columna "DIP reasignado" con el nombre del ex
