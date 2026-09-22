@@ -166,10 +166,10 @@
       'body.dark .can-ios-btn{background:#2a2d3e;color:#38bdf8;box-shadow:0 4px 14px rgba(0,0,0,0.3)}',
       '.can-ios-btn:active{transform:scale(0.88)}',
       // Mazo animado de cartas idéntico al Home
-      '.can-deck-stage{position:relative;width:100%;flex:1;min-height:245px;perspective:1000px}',
+      '.can-deck-stage{position:relative;width:100%;flex:1;min-height:245px;overflow:hidden!important;border-radius:18px}',
       '.can-card-sheet{position:absolute;inset:0;background:#fff;border-radius:20px;overflow:hidden;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;box-shadow:0 12px 30px rgba(0,0,0,0.08);transition:transform .32s cubic-bezier(.25,.8,.25,1),opacity .32s ease}',
       '.can-card-sheet.arrastre{transition:none;cursor:grabbing}',
-      '.can-card-sheet.vuela{transition:transform .42s cubic-bezier(.3,.7,.4,1),opacity .35s ease-out;opacity:0;pointer-events:none}',
+      '.can-card-sheet.vuela{transition:transform .18s cubic-bezier(.25,.8,.25,1),opacity .18s ease-out;opacity:0;pointer-events:none}',
       '.can-pdf-canvas-wrap{width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#fff;position:relative}',
       '.can-pdf-canvas-wrap canvas{width:100%!important;height:100%!important;object-fit:contain;display:block}',
       // Tarjeta inferior
@@ -376,11 +376,11 @@
       if (el._hasSwiped && Math.abs(dx) > 60) {
         el.classList.add('vuela');
         var dir = dx < 0 ? 1 : -1;
-        el.style.transform = 'translateX(' + (dx < 0 ? '-130vw' : '130vw') + ') rotate(' + (dx < 0 ? '-22deg' : '22deg') + ')';
+        el.style.transform = 'translateX(' + (dx < 0 ? '-115%' : '115%') + ') rotate(' + (dx < 0 ? '-14deg' : '14deg') + ')';
         setTimeout(function(){
           state.idx = (state.idx + dir + CANILLAS.length) % CANILLAS.length;
           render();
-        }, 280);
+        }, 180);
       } else if (el._hasSwiped) {
         el.style.transition = 'transform .28s cubic-bezier(0.2, 0.8, 0.2, 1)';
         el.style.transform = '';
@@ -406,53 +406,33 @@
     return _pdfDocPromise;
   }
 
-  function renderPdfPage(pageNum) {
-    var canvas = document.getElementById('canPdfCanvas');
+    function renderPdfPage(pageNum) {
     var imgFallback = document.getElementById('canPdfFallbackImg');
+    var canvas = document.getElementById('canPdfCanvas');
     var imgPath = 'catalogo-adaptadores-img/img_' + pageNum + '.jpg';
     
-    // Si tenemos imagen directa, mostrarla de inmediato para máxima velocidad y nitidez sin lag
+    // Renderizado instantáneo de la lámina del catálogo
     if (imgFallback) {
       imgFallback.src = imgPath;
       imgFallback.style.display = 'block';
     }
-
-    if (!window.pdfjsLib) return;
-    getPdfDoc().then(function(pdf) {
-      return pdf.getPage(pageNum);
-    }).then(function(page) {
-      if (!canvas) return;
-      var ctx = canvas.getContext('2d');
-      var viewport = page.getViewport({ scale: 1.5 });
-      canvas.width = viewport.width;
-      canvas.height = viewport.height;
-      page.render({ canvasContext: ctx, viewport: viewport }).promise.then(function(){
-        if (imgFallback) imgFallback.style.display = 'none';
-        canvas.style.display = 'block';
-      });
-    }).catch(function(err) {
-      console.warn('PDF render fallback a imagen:', err);
-      if (imgFallback) imgFallback.style.display = 'block';
-      if (canvas) canvas.style.display = 'none';
-    });
+    if (canvas) {
+      canvas.style.display = 'none';
+    }
   }
 
   function abrirZoom(pageNum) {
     var modal = document.getElementById('canPdfZoomModal');
     if (!modal) return;
     modal.classList.add('open');
-    if (!window.pdfjsLib) return;
-    getPdfDoc().then(function(pdf) {
-      return pdf.getPage(pageNum);
-    }).then(function(page) {
-      var canvas = document.getElementById('canPdfZoomCanvas');
-      if (!canvas) return;
-      var ctx = canvas.getContext('2d');
-      var viewport = page.getViewport({ scale: 2.2 });
-      canvas.width = viewport.width;
-      canvas.height = viewport.height;
-      page.render({ canvasContext: ctx, viewport: viewport });
-    });
+    var imgFallback = document.getElementById('canPdfZoomFallbackImg');
+    var canvas = document.getElementById('canPdfZoomCanvas');
+    var imgPath = 'catalogo-adaptadores-img/img_' + pageNum + '.jpg';
+    if (imgFallback) {
+      imgFallback.src = imgPath;
+      imgFallback.style.display = 'block';
+    }
+    if (canvas) canvas.style.display = 'none';
   }
 
   function openCanillas(){

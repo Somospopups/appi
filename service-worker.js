@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v552-canillas-definitivo';
+const CACHE_NAME = 'appi-v553-canillas-fast-slide';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
