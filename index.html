@@ -151,12 +151,12 @@ window.openStock=function(){
 <script src="./qr-code.js"></script>
 <script src="./gestion-client.js?v=852"></script>
   <script src="./agenda-personal.js"></script>
-<script src="./margarita-contactos.js?v=565"></script>
+<script src="./margarita-contactos.js?v=566"></script>
 <script src="./tarjetas-promos.js"></script>
 <script src="./usuarios-botones.js?v=423"></script>
 <script src="./mensajes-hielo.js"></script>
 <script src="./mensajes-usuarios.js?v=814"></script>
-<script src="./campus-psa.js?v=565"></script>
+<script src="./campus-psa.js?v=566"></script>
 <script src="./reactivacion.js"></script>
 
 <script src="./escalera-suenos.js"></script>
@@ -4664,7 +4664,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v565 · Segura</div>
+  <div class="ds-foot">APPI · v566 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -14086,8 +14086,8 @@ function cerrarToolsMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='565';
-      const CACHE_NAME='appi-v565-margarita-contactos';
+      const swVersion='566';
+      const CACHE_NAME='appi-v566-margarita-contactos';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}

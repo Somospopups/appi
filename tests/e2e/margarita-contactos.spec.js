@@ -15,6 +15,21 @@ test('Mi Margarita vive en Mi negocio, tiene ocho pétalos centrados y recuerda 
   await expect(petalos).toHaveCount(8);
   await expect(petalos.nth(0)).toContainText('Amigos');
   await expect(petalos.nth(7)).toContainText(/Clientes\s*PSA/);
+
+  // Las etiquetas se leen como títulos normales, ubicados en la parte ancha
+  // de cada pétalo: no se parte una palabra por línea ni se usan tonos tenues.
+  const textosPetalos = await page.locator('.mg-petal-content b').evaluateAll(nodes => nodes.map(node => {
+    const s = getComputedStyle(node);
+    return { text: node.textContent.trim(), breaks: node.querySelectorAll('br').length, fontSize: s.fontSize, color: s.color };
+  }));
+  expect(textosPetalos).toHaveLength(8);
+  textosPetalos.forEach(item => {
+    expect(item.text.length).toBeGreaterThan(0);
+    expect(item.breaks).toBe(0);
+    expect(Number.parseFloat(item.fontSize)).toBeGreaterThanOrEqual(11.5);
+    expect(item.color).toBe('rgb(21, 63, 82)');
+  });
+
   await expect(page.locator('#margaritaCont')).toContainText('Demostración');
   await expect(page.locator('#margaritaCont')).toContainText('Presentación de negocio');
   await expect(page.locator('#margaritaCont')).toContainText('Pedir un referido');
