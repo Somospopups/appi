@@ -4,6 +4,12 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v563 · Mi Margarita: tu gente cercana, en movimiento
+- **Mi Margarita** organiza los círculos cotidianos del distribuidor en pétalos editables: amigos, vecinos, familia, trabajo, comunidad y los grupos que cada persona quiera nombrar.
+- Cada pétalo permite elegir contactos desde el selector del teléfono cuando está disponible o desde la **Agenda Personal de APPI**, y deja listos grupos para demostraciones, presentaciones de negocio y pedidos de referidos.
+- La margarita se accede desde **Mi negocio**, guarda el progreso local por cuenta y participa de la sincronización habitual.
+- Versión: **v563 · Segura** · Cache `appi-v563-margarita-contactos`.
+
 ## v562 · Campus PSA: aprendizaje que activa acción
 - **Campus PSA × APPI** suma un recorrido de aprendizaje visual, personalizado por categoría comercial (incluye el itinerario de **Líder de Equipo** relevado).
 - Al completar las **10 acciones base** de la jornada aparece una celebración y un desafío original de cinco preguntas sobre comercialización, crecimiento, posventa y autoliderazgo.

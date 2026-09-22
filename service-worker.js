@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v562-campus-impulso';
+const CACHE_NAME = 'appi-v563-margarita-contactos';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
@@ -23,6 +23,7 @@ const APP_SHELL = [
   './qr-code.js',
   './gestion-client.js',
   './agenda-personal.js',
+  './margarita-contactos.js',
   './panel-atras.js',
   './tarjetas-promos.js',
   './usuarios-botones.js',
