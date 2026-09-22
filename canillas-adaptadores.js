@@ -921,7 +921,7 @@
     render();
   }
 
-  
-  
+  window.openCanillas = openCanillas;
+  window.abrirVisor3D = function(){};
 
 })();
