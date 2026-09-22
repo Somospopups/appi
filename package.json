@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "559.0.0",
-  "cacheName": "appi-v559-visor3d-definido",
+  "version": "560.0.0",
+  "cacheName": "appi-v560-canillas-limpio-oficial",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

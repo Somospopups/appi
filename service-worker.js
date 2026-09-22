@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v559-visor3d-definido';
+const CACHE_NAME = 'appi-v560-canillas-limpio-oficial';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

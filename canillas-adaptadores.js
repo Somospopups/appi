@@ -723,9 +723,7 @@
           '<span>💡</span>' +
           '<div>' + esc(cur.obs) + '</div>' +
         '</div>' +
-        '<button type="button" id="canBtnVer3D" style="width:100%;margin-top:10px;margin-bottom:6px;border:none;border-radius:14px;background:linear-gradient(135deg,#0284c7,#0369a1);color:#fff;font:inherit;font-size:13.5px;font-weight:900;padding:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 14px rgba(2,132,199,0.3)">' +
-          '<span>🔄</span> Girar Canilla en 3D (360°)' +
-        '</button>' +
+        
         '<button type="button" class="can-btn-wa" id="canBtnShareWA">' +
           '<span>💬</span> Compartir por WhatsApp' +
         '</button>' +
@@ -761,12 +759,7 @@
     }
 
     // Botón WhatsApp
-    var btn3D = document.getElementById('canBtnVer3D');
-    if (btn3D) {
-      btn3D.onclick = function() {
-        abrirVisor3D(cur.marca + ' ' + cur.modelo);
-      };
-    }
+    
     var btnWA = document.getElementById('canBtnShareWA');
     if (btnWA) {
       btnWA.onclick = function() {
@@ -929,172 +922,6 @@
   }
 
   
-  // Visor 3D Interactivo Three.js
-  var _scene3D, _camera3D, _renderer3D, _controls3D, _faucetGroup3D, _animFrame3D;
-
-  function abrirVisor3D(modeloNombre) {
-    var modal = document.getElementById('canModal3D');
-    if (!modal) {
-      modal = document.createElement('div');
-      modal.id = 'canModal3D';
-      modal.style.cssText = 'position:fixed;inset:0;background:rgba(10,12,20,0.94);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);z-index:99999999;display:none;flex-direction:column;align-items:center;justify-content:center;touch-action:none';
-      modal.innerHTML = '<header style="position:absolute;top:0;left:0;right:0;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;z-index:10;background:rgba(0,0,0,0.5)">' +
-        '<div>' +
-          '<h3 id="can3DTitle" style="margin:0;font-size:16px;font-weight:800;color:#fff">Canilla 3D Interactiva</h3>' +
-          '<p style="margin:2px 0 0;font-size:11.5px;color:#94a3b8">Arrastrá para girar 360° · Pellizcá para hacer zoom al pico</p>' +
-        '</div>' +
-        '<button type="button" id="canClose3D" style="width:38px;height:38px;border-radius:50%;border:none;background:rgba(255,255,255,0.18);color:#fff;font-size:20px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center">✕</button>' +
-      '</header>' +
-      '<div id="can3DCanvasHost" style="width:100%;height:100%;flex:1;cursor:grab"></div>' +
-      '<div style="position:absolute;bottom:20px;left:50%;transform:translateX(-50%);background:rgba(15,23,42,0.85);border:1px solid rgba(255,255,255,0.15);border-radius:99px;padding:8px 18px;display:flex;align-items:center;gap:10px;font-size:12px;color:#cbd5e1;pointer-events:none">' +
-        '<span style="background:#0284c7;color:#fff;padding:2px 8px;border-radius:99px;font-size:10px;font-weight:800">3D REAL</span>' +
-        '<span>Inspección 360° de pico y rosca PSA</span>' +
-      '</div>';
-      document.body.appendChild(modal);
-
-      document.getElementById('canClose3D').onclick = function() {
-        modal.style.display = 'none';
-        if (_animFrame3D) cancelAnimationFrame(_animFrame3D);
-      };
-    }
-
-    document.getElementById('can3DTitle').textContent = modeloNombre || 'Canilla 3D Interactiva';
-    modal.style.display = 'flex';
-
-    initThree3D();
-  }
-
-  function initThree3D() {
-    var host = document.getElementById('can3DCanvasHost');
-    if (!host || !window.THREE) return;
-    host.innerHTML = '';
-
-    _scene3D = new THREE.Scene();
-    _camera3D = new THREE.PerspectiveCamera(45, host.clientWidth / host.clientHeight, 0.1, 100);
-    _camera3D.position.set(2.8, 2.2, 3.8);
-
-    _renderer3D = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    _renderer3D.setSize(host.clientWidth, host.clientHeight);
-    _renderer3D.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    _renderer3D.toneMapping = THREE.ACESFilmicToneMapping;
-    _renderer3D.toneMappingExposure = 1.25;
-    host.appendChild(_renderer3D.domElement);
-
-    _controls3D = new THREE.OrbitControls(_camera3D, _renderer3D.domElement);
-    _controls3D.enableDamping = true;
-    _controls3D.dampingFactor = 0.05;
-    _controls3D.minDistance = 1.2;
-    _controls3D.maxDistance = 6.0;
-    _controls3D.target.set(0, 0.8, 0);
-
-    var ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
-    _scene3D.add(ambientLight);
-
-    var dirLight1 = new THREE.DirectionalLight(0xffffff, 1.8);
-    dirLight1.position.set(4, 8, 4);
-    _scene3D.add(dirLight1);
-
-    var dirLight2 = new THREE.DirectionalLight(0x7dd3fc, 1.2);
-    dirLight2.position.set(-4, 3, -3);
-    _scene3D.add(dirLight2);
-
-    var chromeMaterial = new THREE.MeshStandardMaterial({
-      color: 0xf1f5f9,
-      metalness: 0.95,
-      roughness: 0.12,
-    });
-
-    var brassGoldMaterial = new THREE.MeshStandardMaterial({
-      color: 0xd97706,
-      metalness: 0.85,
-      roughness: 0.25,
-    });
-
-    var rubberMaterial = new THREE.MeshStandardMaterial({
-      color: 0x1e293b,
-      metalness: 0.1,
-      roughness: 0.7,
-    });
-
-    _faucetGroup3D = new THREE.Group();
-
-    // 1. Base
-    var baseGeo = new THREE.CylinderGeometry(0.38, 0.44, 0.18, 48);
-    var baseMesh = new THREE.Mesh(baseGeo, chromeMaterial);
-    baseMesh.position.y = 0.09;
-    _faucetGroup3D.add(baseMesh);
-
-    var ringGeo = new THREE.CylinderGeometry(0.44, 0.45, 0.03, 48);
-    var ringMesh = new THREE.Mesh(ringGeo, rubberMaterial);
-    ringMesh.position.y = 0.015;
-    _faucetGroup3D.add(ringMesh);
-
-    // 2. Columna
-    var columnGeo = new THREE.CylinderGeometry(0.24, 0.28, 0.8, 48);
-    var columnMesh = new THREE.Mesh(columnGeo, chromeMaterial);
-    columnMesh.position.y = 0.55;
-    _faucetGroup3D.add(columnMesh);
-
-    // 3. Pico de cisne
-    var curve = new THREE.CatmullRomCurve3([
-      new THREE.Vector3(0, 0.85, 0),
-      new THREE.Vector3(0, 1.45, 0),
-      new THREE.Vector3(0.08, 1.95, 0),
-      new THREE.Vector3(0.45, 2.15, 0),
-      new THREE.Vector3(0.95, 1.85, 0),
-      new THREE.Vector3(1.15, 1.35, 0),
-      new THREE.Vector3(1.18, 0.95, 0)
-    ]);
-    var tubeGeo = new THREE.TubeGeometry(curve, 64, 0.13, 32, false);
-    var tubeMesh = new THREE.Mesh(tubeGeo, chromeMaterial);
-    _faucetGroup3D.add(tubeMesh);
-
-    // 4. Pico extremo y rosca para adaptador PSA
-    var spoutTipGeo = new THREE.CylinderGeometry(0.155, 0.145, 0.22, 36);
-    var spoutTip = new THREE.Mesh(spoutTipGeo, chromeMaterial);
-    spoutTip.position.set(1.18, 0.86, 0);
-    _faucetGroup3D.add(spoutTip);
-
-    var threadGeo = new THREE.CylinderGeometry(0.125, 0.125, 0.08, 36);
-    var threadMesh = new THREE.Mesh(threadGeo, brassGoldMaterial);
-    threadMesh.position.set(1.18, 0.72, 0);
-    _faucetGroup3D.add(threadMesh);
-
-    // 5. Monocomando
-    var leverJointGeo = new THREE.SphereGeometry(0.17, 32, 32);
-    var leverJoint = new THREE.Mesh(leverJointGeo, chromeMaterial);
-    leverJoint.position.set(-0.25, 0.65, 0);
-    _faucetGroup3D.add(leverJoint);
-
-    var leverArmGeo = new THREE.CylinderGeometry(0.05, 0.07, 0.55, 32);
-    var leverArm = new THREE.Mesh(leverArmGeo, chromeMaterial);
-    leverArm.position.set(-0.45, 0.85, 0);
-    leverArm.rotation.z = Math.PI / 4;
-    _faucetGroup3D.add(leverArm);
-
-    var plateGeo = new THREE.CylinderGeometry(1.6, 1.6, 0.04, 64);
-    var plateMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.4, metalness: 0.1 });
-    var plate = new THREE.Mesh(plateGeo, plateMat);
-    plate.position.y = -0.02;
-    _scene3D.add(plate);
-
-    _scene3D.add(_faucetGroup3D);
-
-    var userInteracted = false;
-    _controls3D.addEventListener('start', function(){ userInteracted = true; });
-
-    function anim() {
-      _animFrame3D = requestAnimationFrame(anim);
-      if (!userInteracted) {
-        _faucetGroup3D.rotation.y += 0.006;
-      }
-      _controls3D.update();
-      _renderer3D.render(_scene3D, _camera3D);
-    }
-    anim();
-  }
-
-  window.openCanillas = openCanillas;
-  window.abrirVisor3D = abrirVisor3D;
+  
 
 })();
