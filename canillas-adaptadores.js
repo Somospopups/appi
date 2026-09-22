@@ -723,6 +723,9 @@
           '<span>💡</span>' +
           '<div>' + esc(cur.obs) + '</div>' +
         '</div>' +
+        '<button type="button" id="canBtnVer3D" style="width:100%;margin-top:10px;margin-bottom:6px;border:none;border-radius:14px;background:linear-gradient(135deg,#0284c7,#0369a1);color:#fff;font:inherit;font-size:13.5px;font-weight:900;padding:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 14px rgba(2,132,199,0.3)">' +
+          '<span>🔄</span> Girar Canilla en 3D (360°)' +
+        '</button>' +
         '<button type="button" class="can-btn-wa" id="canBtnShareWA">' +
           '<span>💬</span> Compartir por WhatsApp' +
         '</button>' +
@@ -758,6 +761,12 @@
     }
 
     // Botón WhatsApp
+    var btn3D = document.getElementById('canBtnVer3D');
+    if (btn3D) {
+      btn3D.onclick = function() {
+        abrirVisor3D(cur.marca + ' ' + cur.modelo);
+      };
+    }
     var btnWA = document.getElementById('canBtnShareWA');
     if (btnWA) {
       btnWA.onclick = function() {
