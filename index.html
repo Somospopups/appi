@@ -162,7 +162,7 @@ window.openStock=function(){
 <script src="./tablero-negocio.js?v=929"></script>
 <script src="./lista-precios.js?v=936"></script>
 <script src="./vendor/pdf.min.js"></script>
-<script src="./canillas-adaptadores.js?v=948"></script>
+<script src="./canillas-adaptadores.js?v=552"></script>
 <script src="./vendor/zxing.min.js"></script>
 <script src="./stock-personal.js?v=797"></script>
 
@@ -4654,7 +4654,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v949 · Segura</div>
+  <div class="ds-foot">APPI · v552 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4938,7 +4938,7 @@ body.dark #pageTabs button.active{color:#c5d6ff}
       <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
 
       <div class="home-brand-row">
-        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · 949</span></span>
+        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · 552</span></span>
       </div>
 
       <div class="home-hero-card">
@@ -5109,11 +5109,12 @@ body.dark #pageTabs button.active{color:#c5d6ff}
 
   <!-- CANILLAS Y ADAPTADORES PSA -->
   <section id="view-canillas" class="view">
-    <header class="top">
+    <header class="top canillas-top-header">
       <button class="back-btn" onclick="showView('view-herramientas')" aria-label="Volver">‹</button>
       <button class="help-btn" id="btnHelpCanillas" aria-label="Ayuda">?</button>
       <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
-      <h1>Canillas y <span class="script">adaptadores</span></h1>
+      <h1>Canillas</h1>
+      <div class="script">y adaptadores</div>
       <p>Identificador oficial PSA · Guía V02-21</p>
     </header>
     <div id="canillasCont"></div>
@@ -6720,6 +6721,14 @@ function confirmarAccion({title, sub, html, okText, cancelText, danger, onConfir
 }
 
 const HELP = {
+  canillas: {
+    icon:'🚰', iconBg:'linear-gradient(135deg,#0284c7,#38bdf8)',
+    title:'Canillas y adaptadores', sub:'Identificador oficial PSA · Guía V02-21',
+    html:`<p>Comparador visual rápido para saber qué adaptador PSA necesita la canilla de tu cliente:</p>
+    <div class="tip"><strong>📸 TU FOTO</strong><br/>Subí desde tu galería o sacá una foto del pico de la canilla para tenerla siempre a la vista.</div>
+    <div class="tip"><strong>📖 CATÁLOGO PSA</strong><br/>Deslizá la carta hacia los lados como en el Home para recorrer los 53 modelos de la guía. Tocá la carta para verla ampliada en alta resolución.</div>
+    <div class="tip"><strong>💬 COMPARTIR</strong><br/>Tocá el botón verde para enviarle a tu cliente o al equipo el modelo exacto y el código de adaptador por WhatsApp.</div>`
+  },
   mes: {
     icon:'📅', iconBg:'linear-gradient(135deg,#0b5878,#3ad0a4)',
     title:'Mi Mes', sub:'Tu planificación mensual completa',
@@ -7221,6 +7230,7 @@ document.getElementById('btnHelpUsuarios')?.addEventListener('click', ()=>showHe
 document.getElementById('btnHelpOcho')?.addEventListener('click', ()=>showHelp('ocho'));
 document.getElementById('btnHelpSuenos')?.addEventListener('click', ()=>showHelp('suenos'));
 document.getElementById('btnHelpDemo')?.addEventListener('click', ()=>showHelp('demo'));
+document.getElementById('btnHelpCanillas')?.addEventListener('click', ()=>showHelp('canillas'));
 document.getElementById('btnBackGrabadora')?.addEventListener('click', ()=>{ showView('view-home'); renderHomeCompleto(); });
 document.getElementById('btnBackNotas')?.addEventListener('click', ()=>{ showView('view-home'); renderHomeCompleto(); });
 document.getElementById('btnBackUsuarios')?.addEventListener('click', ()=>{ showView('view-home'); renderHomeCompleto(); });
@@ -14024,8 +14034,8 @@ function cerrarToolsMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='949';
-      const CACHE_NAME='appi-v949-app-blindada';
+      const swVersion='552';
+      const CACHE_NAME='appi-v552-canillas-definitivo';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
@@ -14045,15 +14055,9 @@ function cerrarToolsMenu(){
       const hadController=Boolean(navigator.serviceWorker.controller);
       let reloadingForUpdate=false;
 
-      // Solo recargar en el splash. Recargar siempre causa un loop y deja
-      // la pantalla en blanco.
       navigator.serviceWorker.addEventListener('controllerchange', () => {
-        const boot=document.getElementById('bootScreen');
-        const reloadKey='appi-sw-reloaded-'+swVersion;
-        if(!hadController || reloadingForUpdate || !boot || boot.classList.contains('gone'))return;
-        if(sessionStorage.getItem(reloadKey))return;
-        reloadingForUpdate=true;
-        sessionStorage.setItem(reloadKey,'1');
+        if (!hadController || reloadingForUpdate) return;
+        reloadingForUpdate = true;
         window.location.reload();
       });
 

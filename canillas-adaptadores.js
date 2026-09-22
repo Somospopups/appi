@@ -131,7 +131,7 @@
   ];
 
   var state = {
-    idx: CANILLAS.findIndex(function(c){ return c.id === 41; }) !== -1 ? CANILLAS.findIndex(function(c){ return c.id === 41; }) : 0,
+    idx: 2, // Empezar en FV Chess (3 de 53) como en la captura
     userImg: null
   };
 
@@ -149,42 +149,54 @@
     var st = document.createElement('style');
     st.id = 'canillasEstilosCaptura';
     st.textContent = [
-      '#view-canillas{background:#f3eee3;min-height:100vh;padding:14px 14px 100px;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Helvetica Neue",sans-serif;-webkit-font-smoothing:antialiased}',
+      '#view-canillas header.top h1{padding:0 85px 0 45px!important;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
+      '#view-canillas{background:#f3eee3;min-height:100vh;padding:14px 14px 110px;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Helvetica Neue",sans-serif;-webkit-font-smoothing:antialiased}',
       'body.dark #view-canillas{background:#1c1e2a}',
       '.can-layout-wrap{max-width:500px;margin:0 auto;display:flex;flex-direction:column;gap:14px}',
       '.can-top-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}',
-      '.can-box-panel{background:rgba(255,255,255,0.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-radius:22px;border:1px solid rgba(0,0,0,0.06);box-shadow:0 8px 24px rgba(0,0,0,0.04);padding:14px 10px 12px;display:flex;flex-direction:column;align-items:center;min-height:350px;position:relative}',
+      '.can-box-panel{background:rgba(255,255,255,0.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-radius:24px;border:1px solid rgba(0,0,0,0.06);box-shadow:0 8px 24px rgba(0,0,0,0.04);padding:14px 10px 14px;display:flex;flex-direction:column;align-items:center;min-height:360px;position:relative}',
       'body.dark .can-box-panel{background:rgba(35,37,54,0.9);border-color:rgba(255,255,255,0.08);box-shadow:0 8px 24px rgba(0,0,0,0.25)}',
-      '.can-box-title{font-size:11px;font-weight:800;letter-spacing:0.6px;color:#71717a;text-transform:uppercase;margin-bottom:10px;text-align:center}',
+      '.can-box-title{font-size:11px;font-weight:900;letter-spacing:0.8px;color:#71717a;text-transform:uppercase;margin-bottom:12px;text-align:center}',
       'body.dark .can-box-title{color:#a1a1aa}',
-      '.can-photo-frame{width:100%;flex:1;background:#fafaf9;border-radius:18px;overflow:hidden;display:flex;align-items:center;justify-content:center;position:relative;min-height:240px;box-shadow:inset 0 0 0 1px rgba(0,0,0,0.04)}',
-      'body.dark .can-photo-frame{background:#161722;box-shadow:inset 0 0 0 1px rgba(255,255,255,0.05)}',
+      '.can-photo-frame{width:100%;flex:1;background:#fafaf9;border-radius:18px;overflow:hidden;display:flex;align-items:center;justify-content:center;position:relative;min-height:245px;box-shadow:inset 0 0 0 1px rgba(0,0,0,0.04)}',
+      'body.dark .can-photo-frame{background:#161722}',
       '.can-photo-frame img{width:100%;height:100%;object-fit:cover;display:block}',
-      '.can-ios-icon-btns{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;margin-top:10px}',
-      '.can-ios-btn{width:46px;height:46px;border-radius:50%;border:none;background:#ffffff;box-shadow:0 4px 12px rgba(0,0,0,0.08);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:20px;transition:transform .12s cubic-bezier(0.34,1.56,0.64,1);color:#0b5878}',
+      '.can-ios-icon-btns{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;margin-top:12px}',
+      '.can-ios-btn{width:46px;height:46px;border-radius:50%;border:none;background:#ffffff;box-shadow:0 4px 14px rgba(0,0,0,0.08);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:22px;transition:transform .14s cubic-bezier(0.34,1.56,0.64,1);color:#0b5878}',
       'body.dark .can-ios-btn{background:#2a2d3e;color:#38bdf8;box-shadow:0 4px 14px rgba(0,0,0,0.3)}',
-      '.can-ios-btn:active{transform:scale(0.9)}',
-      '.can-card-sheet{width:100%;flex:1;background:#fff;border-radius:18px;overflow:hidden;position:relative;display:flex;flex-direction:column;box-shadow:inset 0 0 0 1px rgba(0,0,0,0.05)}',
-      'body.dark .can-card-sheet{background:#242738}',
-      '.can-pdf-canvas-wrap{width:100%;height:100%;min-height:240px;display:flex;align-items:center;justify-content:center;position:relative;background:#fff}',
-      'body.dark .can-pdf-canvas-wrap{background:#1e202e}',
-      '.can-pdf-canvas-wrap canvas{width:100%!important;height:100%!important;object-fit:contain;display:block;border-radius:16px}',
-      '.can-bottom-card{background:rgba(255,255,255,0.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-radius:24px;border:1px solid rgba(0,0,0,0.06);box-shadow:0 10px 30px rgba(0,0,0,0.05);padding:18px 20px;display:flex;flex-direction:column;gap:6px}',
+      '.can-ios-btn:active{transform:scale(0.88)}',
+      // Mazo animado de cartas idéntico al Home
+      '.can-deck-stage{position:relative;width:100%;flex:1;min-height:245px;perspective:1000px}',
+      '.can-card-sheet{position:absolute;inset:0;background:#fff;border-radius:20px;overflow:hidden;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;box-shadow:0 12px 30px rgba(0,0,0,0.08);transition:transform .32s cubic-bezier(.25,.8,.25,1),opacity .32s ease}',
+      '.can-card-sheet.arrastre{transition:none;cursor:grabbing}',
+      '.can-card-sheet.vuela{transition:transform .42s cubic-bezier(.3,.7,.4,1),opacity .35s ease-out;opacity:0;pointer-events:none}',
+      '.can-pdf-canvas-wrap{width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#fff;position:relative}',
+      '.can-pdf-canvas-wrap canvas{width:100%!important;height:100%!important;object-fit:contain;display:block}',
+      // Tarjeta inferior
+      '.can-bottom-card{background:rgba(255,255,255,0.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-radius:24px;border:1px solid rgba(0,0,0,0.06);box-shadow:0 10px 30px rgba(0,0,0,0.04);padding:18px 20px;display:flex;flex-direction:column;gap:6px}',
       'body.dark .can-bottom-card{background:rgba(35,37,54,0.9);border-color:rgba(255,255,255,0.08);box-shadow:0 10px 30px rgba(0,0,0,0.25)}',
       '.can-req-top{display:flex;align-items:center;justify-content:space-between}',
-      '.can-req-label{font-size:11px;font-weight:800;letter-spacing:0.8px;color:#71717a;text-transform:uppercase}',
+      '.can-req-label{font-size:11px;font-weight:900;letter-spacing:0.8px;color:#71717a;text-transform:uppercase}',
       'body.dark .can-req-label{color:#a1a1aa}',
-      '.can-nav-link-btn{background:none;border:none;color:#0b5878;font:inherit;font-size:13.5px;font-weight:900;cursor:pointer;display:flex;align-items:center;gap:3px;padding:0}',
-      'body.dark .can-nav-link-btn{color:#38bdf8}',
+      '.can-counter-badge{font-size:12.5px;font-weight:900;color:#71717a}',
+      'body.dark .can-counter-badge{color:#a1a1aa}',
       '.can-main-title{font-size:26px;font-weight:900;color:#0b5878;letter-spacing:-0.5px;margin:2px 0 0}',
       'body.dark .can-main-title{color:#38bdf8}',
       '.can-model-name{font-size:16px;font-weight:850;color:#18181b;margin:0}',
       'body.dark .can-model-name{color:#f4f4f5}',
       '.can-thread-desc{font-size:13px;color:#71717a;font-weight:600;margin:0}',
       'body.dark .can-thread-desc{color:#a1a1aa}',
-      '.can-alert-pill{margin-top:8px;background:rgba(11,88,120,0.05);border:1px solid rgba(11,88,120,0.12);border-radius:14px;padding:10px 14px;display:flex;align-items:flex-start;gap:8px;font-size:12.5px;color:#27272a;font-weight:650;line-height:1.4}',
+      '.can-alert-pill{margin-top:6px;background:rgba(11,88,120,0.05);border:1px solid rgba(11,88,120,0.12);border-radius:14px;padding:10px 14px;display:flex;align-items:flex-start;gap:8px;font-size:12.5px;color:#27272a;font-weight:650;line-height:1.4}',
       'body.dark .can-alert-pill{background:rgba(56,189,248,0.08);border-color:rgba(56,189,248,0.2);color:#e2e8f0}',
-      '.can-alert-pill span{font-size:15px;flex-shrink:0}'
+      // Botón WhatsApp flotante integrado
+      '.can-btn-wa{margin-top:10px;width:100%;border:none;border-radius:14px;background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;font:inherit;font-size:13.5px;font-weight:900;padding:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 14px rgba(34,197,94,0.3);transition:transform .12s ease}',
+      '.can-btn-wa:active{transform:scale(0.97)}',
+      // Modal popup para agrandar el PDF
+      '#canPdfZoomModal{position:fixed;inset:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);z-index:999999;display:none;align-items:center;justify-content:center;padding:14px}',
+      '#canPdfZoomModal.open{display:flex}',
+      '.can-zoom-card{background:#fff;border-radius:24px;width:100%;max-width:440px;height:84vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,0.5);position:relative}',
+      'body.dark .can-zoom-card{background:#1e202e}',
+      '.can-zoom-close{position:absolute;top:12px;right:12px;width:34px;height:34px;border-radius:50%;border:none;background:rgba(0,0,0,0.6);color:#fff;font-size:18px;font-weight:900;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:10}'
     ].join('\n');
     document.head.appendChild(st);
   }
@@ -194,29 +206,31 @@
     if (!host) return;
 
     var cur = CANILLAS[state.idx] || CANILLAS[0];
-    var numDisplay = (cur.id || (state.idx + 1)) + ' de 53';
+    var numDisplay = (state.idx + 1) + ' de ' + CANILLAS.length;
     var imgUser = state.userImg || 'https://raw.githubusercontent.com/Somospopups/appi/main/catalogo-img/canilla_piazza_dot.png';
 
     var html = '<div class="can-layout-wrap">' +
       '<div class="can-top-grid">' +
-        // Panel izquierdo: TU FOTO con botones SOLO ICONOS estilo iOS
+        // Panel izquierdo: TU FOTO
         '<div class="can-box-panel">' +
           '<div class="can-box-title">TU FOTO</div>' +
           '<div class="can-photo-frame">' +
             '<img id="canUserPhotoImg" src="' + esc(imgUser) + '" alt="Tu foto">' +
           '</div>' +
           '<div class="can-ios-icon-btns">' +
-            '<button type="button" class="can-ios-btn" id="canBtnGaleria" title="Subir desde galería" aria-label="Galería">📁</button>' +
-            '<button type="button" class="can-ios-btn" id="canBtnCamara" title="Sacar foto" aria-label="Cámara">📷</button>' +
+            '<button type="button" class="can-ios-btn" id="canBtnGaleria" title="Galería" aria-label="Galería">📁</button>' +
+            '<button type="button" class="can-ios-btn" id="canBtnCamara" title="Cámara" aria-label="Cámara">📷</button>' +
           '</div>' +
         '</div>' +
 
-        // Panel derecho: CATÁLOGO PSA (DESLIZÁ) con Renderizador Canvas del PDF
-        '<div class="can-box-panel" id="canCatalogCard">' +
+        // Panel derecho: CATÁLOGO PSA (DESLIZÁ) con física idéntica al Home
+        '<div class="can-box-panel">' +
           '<div class="can-box-title">CATÁLOGO PSA (DESLIZÁ)</div>' +
-          '<div class="can-card-sheet">' +
-            '<div class="can-pdf-canvas-wrap" id="canPdfWrap">' +
-              '<canvas id="canPdfCanvas"></canvas>' +
+          '<div class="can-deck-stage">' +
+            '<div class="can-card-sheet" id="canCardSwipe" title="Tocá para agrandar la página de la guía">' +
+              '<div class="can-pdf-canvas-wrap">' +
+                '<img id="canPdfFallbackImg" style="width:100%;height:100%;object-fit:contain;display:none"><canvas id="canPdfCanvas"></canvas>' +
+              '</div>' +
             '</div>' +
           '</div>' +
         '</div>' +
@@ -226,15 +240,27 @@
       '<div class="can-bottom-card">' +
         '<div class="can-req-top">' +
           '<span class="can-req-label">ADAPTADOR REQUERIDO</span>' +
-          '<button type="button" class="can-nav-link-btn" id="canBtnPasar">Pasar carta ›</button>' +
+          '<span class="can-counter-badge">' + numDisplay + '</span>' +
         '</div>' +
-        '<div style="text-align:right;font-size:12px;font-weight:800;color:#71717a;margin-top:-4px">' + numDisplay + '</div>' +
         '<h2 class="can-main-title">' + esc(cur.adaptador) + '</h2>' +
         '<h3 class="can-model-name">' + esc(cur.marca + ' ' + cur.modelo) + '</h3>' +
         '<p class="can-thread-desc">Rosca: ' + esc(cur.rosca) + '</p>' +
         '<div class="can-alert-pill">' +
           '<span>💡</span>' +
           '<div>' + esc(cur.obs) + '</div>' +
+        '</div>' +
+        '<button type="button" class="can-btn-wa" id="canBtnShareWA">' +
+          '<span>💬</span> Compartir por WhatsApp' +
+        '</button>' +
+      '</div>' +
+
+      // Modal Zoom
+      '<div id="canPdfZoomModal">' +
+        '<div class="can-zoom-card">' +
+          '<button type="button" class="can-zoom-close" id="canZoomClose">×</button>' +
+          '<div style="flex:1;overflow:auto;display:flex;align-items:center;justify-content:center;background:#fff">' +
+            '<img id="canPdfZoomFallbackImg" style="max-width:100%;max-height:100%;object-fit:contain;display:none"><canvas id="canPdfZoomCanvas"></canvas>' +
+          '</div>' +
         '</div>' +
       '</div>' +
 
@@ -246,34 +272,40 @@
 
     renderPdfPage(cur.pag);
 
-    var btnPasar = document.getElementById('canBtnPasar');
-    if (btnPasar) {
-      btnPasar.onclick = function() {
-        state.idx = (state.idx + 1) % CANILLAS.length;
-        render();
+    // Cablear mazo con gestos exactos del Home
+    cablearSwipe(document.getElementById('canCardSwipe'));
+
+    // Click en la carta para agrandar
+    var cardEl = document.getElementById('canCardSwipe');
+    if (cardEl) {
+      cardEl.onclick = function(e) {
+        if (cardEl._hasSwiped) return;
+        abrirZoom(cur.pag);
       };
     }
 
-    var cardEl = document.getElementById('canCatalogCard');
-    if (cardEl) {
-      var startX = 0;
-      cardEl.addEventListener('touchstart', function(e){
-        startX = e.touches[0].clientX;
-      }, {passive:true});
-      cardEl.addEventListener('touchend', function(e){
-        var endX = e.changedTouches[0].clientX;
-        var diff = endX - startX;
-        if (Math.abs(diff) > 40) {
-          if (diff < 0) {
-            state.idx = (state.idx + 1) % CANILLAS.length;
-          } else {
-            state.idx = (state.idx - 1 + CANILLAS.length) % CANILLAS.length;
-          }
-          render();
-        }
-      }, {passive:true});
+    var btnCloseZoom = document.getElementById('canZoomClose');
+    if (btnCloseZoom) {
+      btnCloseZoom.onclick = function() {
+        document.getElementById('canPdfZoomModal').classList.remove('open');
+      };
     }
 
+    // Botón WhatsApp
+    var btnWA = document.getElementById('canBtnShareWA');
+    if (btnWA) {
+      btnWA.onclick = function() {
+        var msg = '¡Hola! Te comparto la compatibilidad oficial PSA para tu canilla:\n\n' +
+          '*' + cur.marca + ' ' + cur.modelo + '*\n' +
+          'Rosca: ' + cur.rosca + '\n\n' +
+          '👉 *Adaptador requerido:* ' + cur.adaptador + '\n' +
+          '💡 ' + cur.obs + '\n\n' +
+          'Guía oficial PSA - Página ' + cur.pag;
+        window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+      };
+    }
+
+    // Galería y Cámara
     var btnGaleria = document.getElementById('canBtnGaleria');
     var btnCamara = document.getElementById('canBtnCamara');
     var fileGaleria = document.getElementById('canFileGaleria');
@@ -300,31 +332,129 @@
     }
   }
 
+  // Físicas y movimiento idénticos al mazo del Home
+  function cablearSwipe(el) {
+    if (!el) return;
+    var arrastrando = false, x0 = 0, y0 = 0, dx = 0, dy = 0, modo = '';
+    el._hasSwiped = false;
+
+    el.addEventListener('pointerdown', function(e){
+      if (e.button != null && e.button !== 0) return;
+      arrastrando = true;
+      modo = '';
+      x0 = e.clientX;
+      y0 = e.clientY;
+      dx = 0;
+      dy = 0;
+      el._hasSwiped = false;
+      try { el.setPointerCapture(e.pointerId); } catch(err) {}
+    }, true);
+
+    el.addEventListener('pointermove', function(e){
+      if (!arrastrando) return;
+      dx = e.clientX - x0;
+      dy = e.clientY - y0;
+      if (!modo) {
+        if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
+        if (Math.abs(dx) >= Math.abs(dy)) modo = 'swipe';
+        else modo = 'vertical';
+      }
+      if (modo === 'swipe') {
+        if (e.cancelable) e.preventDefault();
+        if (!el._hasSwiped) {
+          el._hasSwiped = true;
+          el.classList.add('arrastre');
+        }
+        el.style.transform = 'translateX(' + dx + 'px) rotate(' + (dx / 20) + 'deg)';
+      }
+    }, { capture: true, passive: false });
+
+    function soltar(){
+      if (!arrastrando) return;
+      arrastrando = false;
+      el.classList.remove('arrastre');
+      if (el._hasSwiped && Math.abs(dx) > 60) {
+        el.classList.add('vuela');
+        var dir = dx < 0 ? 1 : -1;
+        el.style.transform = 'translateX(' + (dx < 0 ? '-130vw' : '130vw') + ') rotate(' + (dx < 0 ? '-22deg' : '22deg') + ')';
+        setTimeout(function(){
+          state.idx = (state.idx + dir + CANILLAS.length) % CANILLAS.length;
+          render();
+        }, 280);
+      } else if (el._hasSwiped) {
+        el.style.transition = 'transform .28s cubic-bezier(0.2, 0.8, 0.2, 1)';
+        el.style.transform = '';
+        setTimeout(function(){
+          el.style.transition = '';
+          el._hasSwiped = false;
+        }, 290);
+      }
+      arrastrando = false;
+    }
+
+    el.addEventListener('pointerup', soltar, true);
+    el.addEventListener('pointercancel', soltar, true);
+  }
+
+  // PDF.js render
   var _pdfDocPromise = null;
   function getPdfDoc() {
     if (!_pdfDocPromise && window.pdfjsLib) {
       window.pdfjsLib.GlobalWorkerOptions.workerSrc = './vendor/pdf.worker.min.js';
-      _pdfDocPromise = window.pdfjsLib.getDocument('guia-para-la-seleccion-de-adaptadores-psa.pdf').promise;
+      _pdfDocPromise = window.pdfjsLib.getDocument('guia-adaptadores-psa.pdf').promise;
     }
     return _pdfDocPromise;
   }
 
   function renderPdfPage(pageNum) {
+    var canvas = document.getElementById('canPdfCanvas');
+    var imgFallback = document.getElementById('canPdfFallbackImg');
+    var imgPath = 'catalogo-adaptadores-img/img_' + pageNum + '.jpg';
+    
+    // Si tenemos imagen directa, mostrarla de inmediato para máxima velocidad y nitidez sin lag
+    if (imgFallback) {
+      imgFallback.src = imgPath;
+      imgFallback.style.display = 'block';
+    }
+
     if (!window.pdfjsLib) return;
     getPdfDoc().then(function(pdf) {
       return pdf.getPage(pageNum);
     }).then(function(page) {
-      var canvas = document.getElementById('canPdfCanvas');
       if (!canvas) return;
       var ctx = canvas.getContext('2d');
       var viewport = page.getViewport({ scale: 1.5 });
       canvas.width = viewport.width;
       canvas.height = viewport.height;
-      page.render({ canvasContext: ctx, viewport: viewport });
+      page.render({ canvasContext: ctx, viewport: viewport }).promise.then(function(){
+        if (imgFallback) imgFallback.style.display = 'none';
+        canvas.style.display = 'block';
+      });
     }).catch(function(err) {
-      console.warn('PDF render error:', err);
+      console.warn('PDF render fallback a imagen:', err);
+      if (imgFallback) imgFallback.style.display = 'block';
+      if (canvas) canvas.style.display = 'none';
     });
   }
+
+  function abrirZoom(pageNum) {
+    var modal = document.getElementById('canPdfZoomModal');
+    if (!modal) return;
+    modal.classList.add('open');
+    if (!window.pdfjsLib) return;
+    getPdfDoc().then(function(pdf) {
+      return pdf.getPage(pageNum);
+    }).then(function(page) {
+      var canvas = document.getElementById('canPdfZoomCanvas');
+      if (!canvas) return;
+      var ctx = canvas.getContext('2d');
+      var viewport = page.getViewport({ scale: 2.2 });
+      canvas.width = viewport.width;
+      canvas.height = viewport.height;
+      page.render({ canvasContext: ctx, viewport: viewport });
+    });
+  }
+
   function openCanillas(){
     if (typeof showView === 'function') {
       showView('view-canillas');

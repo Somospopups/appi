@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "949.0.0",
-  "cacheName": "appi-v949-app-blindada",
+  "version": "552.0.0",
+  "cacheName": "appi-v552-canillas-definitivo",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {
