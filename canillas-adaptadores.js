@@ -29,133 +29,577 @@
   'use strict';
 
   var CANILLAS = [
-    {
-      id: 1, marca: 'FV', modelo: 'Alerce', codFab: '0411.04/89',
-      rosca: 'Rosca macho estándar / múltiple',
-      adaptador: 'PSA 002 (o PSA 073)',
-      obs: 'Lleva PSA 002. También es posible colocar el Adaptador Múltiple PSA 073.',
-      pag: 5, adaptadoresImg: ['002', '073']
-    },
-    {
-      id: 2, marca: 'FV', modelo: 'Arizona', codFab: '0411.01/B1',
-      rosca: 'Rosca macho estándar / múltiple',
-      adaptador: 'PSA 002 (o PSA 073)',
-      obs: 'Lleva PSA 002. También es posible colocar el Adaptador Múltiple PSA 073.',
-      pag: 6, adaptadoresImg: ['002', '073']
-    },
-    {
-      id: 3, marca: 'FV', modelo: 'Chess', codFab: '0411.04/C2',
-      rosca: 'Rosca macho estándar / múltiple',
-      adaptador: 'PSA 002 (o PSA 073)',
-      obs: 'Lleva PSA 002. Compatible con Adaptador Múltiple PSA 073.',
-      pag: 7, adaptadoresImg: ['002', '073']
-    },
-    {
-      id: 4, marca: 'FV', modelo: 'Cisne', codFab: '0413/15',
-      rosca: 'Rosca hembra aireador M24x1',
-      adaptador: 'PSA 003',
-      obs: 'Lleva PSA 003 (Rosca corta) retirando el aireador original.',
-      pag: 8, adaptadoresImg: ['003']
-    },
-    {
-      id: 5, marca: 'FV', modelo: 'Denise', codFab: '0411.01/85',
-      rosca: 'Rosca macho estándar',
-      adaptador: 'PSA 002',
-      obs: 'Lleva PSA 002 rosca Unimix.',
-      pag: 9, adaptadoresImg: ['002']
-    },
-    {
-      id: 6, marca: 'FV', modelo: 'Dominic New', codFab: '0412.01/85',
-      rosca: 'Rosca hembra embutida M24',
-      adaptador: 'PSA 004 (o PSA 027)',
-      obs: 'Lleva PSA 004 (Rosca larga) por profundidad del pico.',
-      pag: 10, adaptadoresImg: ['004']
-    },
-    {
-      id: 7, marca: 'FV', modelo: 'Epuyén', codFab: '0411.01/L2',
-      rosca: 'Rosca macho estándar / múltiple',
-      adaptador: 'PSA 002 (o PSA 073)',
-      obs: 'Lleva PSA 002. También es posible colocar el Adaptador Múltiple PSA 073.',
-      pag: 11, adaptadoresImg: ['002', '073']
-    },
-    {
-      id: 8, marca: 'FV', modelo: 'Libby', codFab: '0412/39',
-      rosca: 'Rosca hembra 22x1',
-      adaptador: 'PSA 010 (o PSA 039)',
-      obs: 'Lleva PSA 010 hembra-hembra estándar.',
-      pag: 12, adaptadoresImg: ['010']
-    },
-    {
-      id: 9, marca: 'FV', modelo: 'Margot', codFab: '0411.04/B6',
-      rosca: 'Rosca macho estándar',
-      adaptador: 'PSA 002 (o PSA 073)',
-      obs: 'Lleva PSA 002 con acople directo.',
-      pag: 13, adaptadoresImg: ['002', '073']
-    },
-    {
-      id: 10, marca: 'FV', modelo: 'Pampa', codFab: '0411.01/B6',
-      rosca: 'Rosca macho estándar',
-      adaptador: 'PSA 002',
-      obs: 'Lleva PSA 002 estándar.',
-      pag: 14, adaptadoresImg: ['002']
-    },
-    {
-      id: 11, marca: 'FV', modelo: 'Smile', codFab: '0411.04/E2',
-      rosca: 'Rosca macho estándar / múltiple',
-      adaptador: 'PSA 002 (o PSA 073)',
-      obs: 'Lleva PSA 002. También es posible colocar el Adaptador Múltiple PSA 073.',
-      pag: 15, adaptadoresImg: ['002', '073']
-    },
-    {
-      id: 12, marca: 'FV', modelo: 'Swing Plus', codFab: '0416/91',
-      rosca: 'Rosca especial Swing Plus',
-      adaptador: 'PSA 037 (o PSA 148)',
-      obs: 'Lleva adaptador específico PSA 037 macho o PSA 148 según terminación.',
-      pag: 16, adaptadoresImg: ['037', '148']
-    },
-    {
-      id: 13, marca: 'FV', modelo: 'Temple', codFab: '0411.04/87',
-      rosca: 'Rosca macho estándar / múltiple',
-      adaptador: 'PSA 002 (o PSA 073)',
-      obs: 'Lleva PSA 002. Compatible con Adaptador Múltiple PSA 073.',
-      pag: 17, adaptadoresImg: ['002', '073']
-    },
-    {
-      id: 14, marca: 'FV', modelo: 'Unimix Tradicional', codFab: '0411/24',
-      rosca: 'Rosca Unimix original',
-      adaptador: 'PSA 002',
-      obs: 'Lleva PSA 002 (diseñado específicamente para el paso Unimix).',
-      pag: 18, adaptadoresImg: ['002']
-    },
-    {
-      id: 15, marca: 'FV', modelo: 'Vermont', codFab: '0411.04/90',
-      rosca: 'Rosca macho estándar / múltiple',
-      adaptador: 'PSA 002 (o PSA 073)',
-      obs: 'Lleva PSA 002. También es posible en esta canilla colocar el Adaptador Múltiple PSA 073.',
-      pag: 19, adaptadoresImg: ['002', '073']
-    },
-    {
-      id: 16, marca: 'Peirano', modelo: 'Adagio', codFab: '60-120',
-      rosca: 'Rosca macho estándar',
-      adaptador: 'PSA 002 (o PSA 073)',
-      obs: 'Lleva PSA 002. También es compatible con PSA 073.',
-      pag: 21, adaptadoresImg: ['002', '073']
-    },
-    {
-      id: 17, marca: 'Peirano', modelo: 'Capri', codFab: '20-110',
-      rosca: 'Rosca macho estándar / múltiple',
-      adaptador: 'PSA 002 (o PSA 073)',
-      obs: 'Lleva PSA 002 estándar.',
-      pag: 22, adaptadoresImg: ['002', '073']
-    },
-    {
-      id: 41, marca: 'Piazza', modelo: 'Dot', codFab: '10112',
-      rosca: 'Rosca macho estándar / múltiple',
-      adaptador: 'PSA 002 (o PSA 073)',
-      obs: 'Lleva PSA 002. También es posible en esta canilla colocar el Adaptador Múltiple PSA 073.',
-      pag: 45, adaptadoresImg: ['002', '073']
-    }
-  ];
+  {
+    "id": 1,
+    "marca": "FV",
+    "modelo": "Alabama",
+    "codFab": "411.04/27",
+    "rosca": "(102) Adapt. Rosca macho",
+    "adaptador": "PSA 102",
+    "obs": "Verificar ficha de la Guía Oficial PSA",
+    "pag": 3
+  },
+  {
+    "id": 2,
+    "marca": "FV",
+    "modelo": "Allegro",
+    "codFab": "0434.01/15-B-CR",
+    "rosca": "(018) Adapt. Rosca Canilla",
+    "adaptador": "PSA 018",
+    "obs": "Verificar ficha de la Guía Oficial PSA",
+    "pag": 4
+  },
+  {
+    "id": 3,
+    "marca": "FV",
+    "modelo": "Areco",
+    "codFab": "424/99",
+    "rosca": "(002) Adapt. Rosca FV Unimix",
+    "adaptador": "PSA 002",
+    "obs": "Verificar ficha de la Guía Oficial PSA",
+    "pag": 5
+  },
+  {
+    "id": 4,
+    "marca": "FV",
+    "modelo": "Arizona",
+    "codFab": "406/B1",
+    "rosca": "(002) Adapt. Rosca FV Unimix",
+    "adaptador": "PSA 002",
+    "obs": "Verificar ficha de la Guía Oficial PSA",
+    "pag": 6
+  },
+  {
+    "id": 5,
+    "marca": "FV",
+    "modelo": "Chess",
+    "codFab": "418/84",
+    "rosca": "(002) Adapt. Rosca FV Unimix",
+    "adaptador": "PSA 002",
+    "obs": "Verificar ficha de la Guía Oficial PSA",
+    "pag": 7
+  },
+  {
+    "id": 6,
+    "marca": "FV",
+    "modelo": "Cibeles",
+    "codFab": "0411/97",
+    "rosca": "(073) Adapt. Múltiple",
+    "adaptador": "PSA 073",
+    "obs": "Verificar ficha de la Guía Oficial PSA",
+    "pag": 8
+  },
+  {
+    "id": 7,
+    "marca": "FV",
+    "modelo": "C7 Radal",
+    "codFab": "0410/C7",
+    "rosca": "(039) Adapt. Rosca Hembra",
+    "adaptador": "PSA 039",
+    "obs": "Verificar ficha de la Guía Oficial PSA",
+    "pag": 9
+  },
+  {
+    "id": 8,
+    "marca": "FV",
+    "modelo": "D7 Alerce",
+    "codFab": "428/D7",
+    "rosca": "(144) Adapt. Rosca Macho",
+    "adaptador": "PSA 144",
+    "obs": "Verificar ficha de la Guía Oficial PSA",
+    "pag": 10
+  },
+  {
+    "id": 9,
+    "marca": "FV",
+    "modelo": "Denisse",
+    "codFab": "0416/64",
+    "rosca": "(002) Adapt. Rosca FV Unimix",
+    "adaptador": "PSA 002",
+    "obs": "Verificar ficha de la Guía Oficial PSA",
+    "pag": 11
+  },
+  {
+    "id": 10,
+    "marca": "FV",
+    "modelo": "Eclipse",
+    "codFab": "411.01/94",
+    "rosca": "(002) Adapt. Rosca",
+    "adaptador": "PSA 002",
+    "obs": "Verificar ficha de la Guía Oficial PSA",
+    "pag": 12
+  },
+  {
+    "id": 11,
+    "marca": "FV",
+    "modelo": "Epuyen Negra",
+    "codFab": "411.04/L2",
+    "rosca": "(073) Adapt. Múltiple",
+    "adaptador": "PSA 073",
+    "obs": "Verificar ficha de la Guía Oficial PSA",
+    "pag": 13
+  },
+  {
+    "id": 12,
+    "marca": "FV",
+    "modelo": "Flow",
+    "codFab": "411/01/B3",
+    "rosca": "(002) Adapt. Rosca FV Unimix",
+    "adaptador": "PSA 002",
+    "obs": "Verificar ficha de la Guía Oficial PSA",
+    "pag": 14
+  },
+  {
+    "id": 13,
+    "marca": "FV",
+    "modelo": "Gran Gala",
+    "codFab": "418/72",
+    "rosca": "(002) Adapt. Rosca FV Unimix",
+    "adaptador": "PSA 002",
+    "obs": "Verificar ficha de la Guía Oficial PSA",
+    "pag": 15
+  },
+  {
+    "id": 14,
+    "marca": "FV",
+    "modelo": "Kansas",
+    "codFab": "411.04/24",
+    "rosca": "(102) Adapt. Rosca macho",
+    "adaptador": "PSA 102",
+    "obs": "Verificar ficha de la Guía Oficial PSA",
+    "pag": 16
+  },
+  {
+    "id": 15,
+    "marca": "FV",
+    "modelo": "Libby",
+    "codFab": "411.04/39",
+    "rosca": "(135) Adapt. Rosca Macho",
+    "adaptador": "PSA 135",
+    "obs": "Verificar ficha de la Guía Oficial PSA",
+    "pag": 17
+  },
+  {
+    "id": 16,
+    "marca": "FV",
+    "modelo": "Libby",
+    "codFab": "0426/39",
+    "rosca": "(142) Adapt. Rosca Macho",
+    "adaptador": "PSA 142",
+    "obs": "Verificar ficha de la Guía Oficial PSA",
+    "pag": 18
+  },
+  {
+    "id": 17,
+    "marca": "FV",
+    "modelo": "Libby",
+    "codFab": "0428/39",
+    "rosca": "(144) Adapt. Rosca Macho",
+    "adaptador": "PSA 144",
+    "obs": "Verificar ficha de la Guía Oficial PSA",
+    "pag": 19
+  },
+  {
+    "id": 18,
+    "marca": "FV",
+    "modelo": "Libby Pared monocomando",
+    "codFab": "406.03/39-CR",
+    "rosca": "(002) Adapt. Rosca FV Unimix",
+    "adaptador": "PSA 002",
+    "obs": "Verificar ficha de la Guía Oficial PSA",
+    "pag": 20
+  },
+  {
+    "id": 19,
+    "marca": "FV",
+    "modelo": "Melody",
+    "codFab": "0203/28",
+    "rosca": "(142) Adapt. Rosca Macho",
+    "adaptador": "PSA 142",
+    "obs": "Verificar ficha de la Guía Oficial PSA",
+    "pag": 21
+  },
+  {
+    "id": 20,
+    "marca": "FV",
+    "modelo": "Nerea Lever",
+    "codFab": "0426/59L",
+    "rosca": "(142) Adapt. Rosca Macho",
+    "adaptador": "PSA 142",
+    "obs": "Verificar ficha de la Guía Oficial PSA",
+    "pag": 22
+  },
+  {
+    "id": 21,
+    "marca": "FV",
+    "modelo": "Newport",
+    "codFab": "0411.01/B2",
+    "rosca": "(002) Adapt. Rosca FV Unimix",
+    "adaptador": "PSA 002",
+    "obs": "Verificar ficha de la Guía Oficial PSA",
+    "pag": 23
+  },
+  {
+    "id": 22,
+    "marca": "FV",
+    "modelo": "Oregon",
+    "codFab": "0428/18",
+    "rosca": "(144) Adapt. Rosca Macho",
+    "adaptador": "PSA 144",
+    "obs": "Verificar ficha de la Guía Oficial PSA",
+    "pag": 24
+  },
+  {
+    "id": 23,
+    "marca": "FV",
+    "modelo": "Puelo",
+    "codFab": "411.04/B5",
+    "rosca": "(144) Adapt. Rosca Macho",
+    "adaptador": "PSA 144",
+    "obs": "Verificar ficha de la Guía Oficial PSA",
+    "pag": 25
+  },
+  {
+    "id": 24,
+    "marca": "FV",
+    "modelo": "Puelo",
+    "codFab": "423/B5",
+    "rosca": "(002) Adapt. Rosca FV Unimix",
+    "adaptador": "PSA 002",
+    "obs": "Verificar ficha de la Guía Oficial PSA",
+    "pag": 26
+  },
+  {
+    "id": 25,
+    "marca": "FV",
+    "modelo": "Swing",
+    "codFab": "411.01/90",
+    "rosca": "(002) Adapt. Rosca FV Unimix",
+    "adaptador": "PSA 002",
+    "obs": "Verificar ficha de la Guía Oficial PSA",
+    "pag": 27
+  },
+  {
+    "id": 26,
+    "marca": "FV",
+    "modelo": "Swing Duo",
+    "codFab": "411.03/94",
+    "rosca": "(002) Adapt. Rosca FV Unimix",
+    "adaptador": "PSA 002",
+    "obs": "Verificar ficha de la Guía Oficial PSA",
+    "pag": 28
+  },
+  {
+    "id": 27,
+    "marca": "FV",
+    "modelo": "Swing Plus",
+    "codFab": "",
+    "rosca": "(073) Adapt. Múltiple",
+    "adaptador": "PSA 073",
+    "obs": "Verificar ficha de la Guía Oficial PSA",
+    "pag": 29
+  },
+  {
+    "id": 28,
+    "marca": "FV",
+    "modelo": "Swing Plus",
+    "codFab": "",
+    "rosca": "(148) Adapt. Rosca Hembra",
+    "adaptador": "PSA 148",
+    "obs": "Verificar ficha de la Guía Oficial PSA",
+    "pag": 30
+  },
+  {
+    "id": 29,
+    "marca": "FV",
+    "modelo": "Swing Plus",
+    "codFab": "",
+    "rosca": "Conexión con adapt. Swing Plus",
+    "adaptador": "Consultar Guía",
+    "obs": "Verificar ficha de la Guía Oficial PSA",
+    "pag": 31
+  },
+  {
+    "id": 30,
+    "marca": "FV",
+    "modelo": "Swing Plus",
+    "codFab": "",
+    "rosca": "Conexión con adapt. múltiple",
+    "adaptador": "Consultar Guía",
+    "obs": "Verificar ficha de la Guía Oficial PSA",
+    "pag": 32
+  },
+  {
+    "id": 31,
+    "marca": "FV",
+    "modelo": "Temple",
+    "codFab": "0412/87",
+    "rosca": "(073) Adapt. Múltiple",
+    "adaptador": "PSA 073",
+    "obs": "Verificar ficha de la Guía Oficial PSA",
+    "pag": 33
+  },
+  {
+    "id": 32,
+    "marca": "FV",
+    "modelo": "Temple",
+    "codFab": "0412/87",
+    "rosca": "(037) Adapt. Rosca Macho",
+    "adaptador": "PSA 037",
+    "obs": "Verificar ficha de la Guía Oficial PSA",
+    "pag": 34
+  },
+  {
+    "id": 33,
+    "marca": "FV",
+    "modelo": "Temple",
+    "codFab": "0411/87",
+    "rosca": "(073) Adapt. Múltiple",
+    "adaptador": "PSA 073",
+    "obs": "Verificar ficha de la Guía Oficial PSA",
+    "pag": 35
+  },
+  {
+    "id": 34,
+    "marca": "FV",
+    "modelo": "Tronic",
+    "codFab": "0363.05P",
+    "rosca": "(142) Adapt. Rosca Macho",
+    "adaptador": "PSA 142",
+    "obs": "Verificar ficha de la Guía Oficial PSA",
+    "pag": 36
+  },
+  {
+    "id": 35,
+    "marca": "FV",
+    "modelo": "Unimix Dos",
+    "codFab": "411/91",
+    "rosca": "(002) Adapt. Rosca FV Unimix",
+    "adaptador": "PSA 002",
+    "obs": "También es posible en esta",
+    "pag": 37
+  },
+  {
+    "id": 36,
+    "marca": "Duke",
+    "modelo": "(100) Adapt. Rosca Hembra",
+    "codFab": "",
+    "rosca": "(100) Adapt. Rosca Hembra",
+    "adaptador": "PSA 100",
+    "obs": "Verificar ficha de la Guía Oficial PSA",
+    "pag": 38
+  },
+  {
+    "id": 37,
+    "marca": "FGR",
+    "modelo": "Monocomando",
+    "codFab": "905",
+    "rosca": "(144) Adapt. Rosca Macho",
+    "adaptador": "PSA 144",
+    "obs": "Verificar ficha de la Guía Oficial PSA",
+    "pag": 39
+  },
+  {
+    "id": 38,
+    "marca": "FGR",
+    "modelo": "Monocomando",
+    "codFab": "910",
+    "rosca": "(144) Adapt. Rosca Macho",
+    "adaptador": "PSA 144",
+    "obs": "Verificar ficha de la Guía Oficial PSA",
+    "pag": 40
+  },
+  {
+    "id": 39,
+    "marca": "FGR",
+    "modelo": "Monocomando",
+    "codFab": "6380",
+    "rosca": "(144) Adapt. Rosca Macho",
+    "adaptador": "PSA 144",
+    "obs": "Verificar ficha de la Guía Oficial PSA",
+    "pag": 41
+  },
+  {
+    "id": 40,
+    "marca": "FGR",
+    "modelo": "Monocomando",
+    "codFab": "6370",
+    "rosca": "(144) Adapt. Rosca Macho",
+    "adaptador": "PSA 144",
+    "obs": "Verificar ficha de la Guía Oficial PSA",
+    "pag": 42
+  },
+  {
+    "id": 41,
+    "marca": "FGR",
+    "modelo": "Unicontrol",
+    "codFab": "4001/4015/4070/4075",
+    "rosca": "(142) Adapt. Rosca Macho",
+    "adaptador": "PSA 142",
+    "obs": "Verificar ficha de la Guía Oficial PSA",
+    "pag": 43
+  },
+  {
+    "id": 42,
+    "marca": "FGR",
+    "modelo": "Unicontrol",
+    "codFab": "3001/3015/3070",
+    "rosca": "(142) Adapt. Rosca Macho",
+    "adaptador": "PSA 142",
+    "obs": "Verificar ficha de la Guía Oficial PSA",
+    "pag": 44
+  },
+  {
+    "id": 43,
+    "marca": "Piazza",
+    "modelo": "Piazza",
+    "codFab": "10112",
+    "rosca": "(002) Adapt. Rosca FV Unimix",
+    "adaptador": "PSA 002",
+    "obs": "También es posible en esta",
+    "pag": 45
+  },
+  {
+    "id": 44,
+    "marca": "Piazza",
+    "modelo": "Piazza",
+    "codFab": "10014",
+    "rosca": "(142) Adapt. Rosca Macho",
+    "adaptador": "PSA 142",
+    "obs": "Verificar ficha de la Guía Oficial PSA",
+    "pag": 46
+  },
+  {
+    "id": 45,
+    "marca": "Piazza",
+    "modelo": "Piazza",
+    "codFab": "10016NE",
+    "rosca": "(039) Adapt. Rosca Hembra",
+    "adaptador": "PSA 039",
+    "obs": "Verificar ficha de la Guía Oficial PSA",
+    "pag": 47
+  },
+  {
+    "id": 46,
+    "marca": "Piazza",
+    "modelo": "Página 42",
+    "codFab": "400.28",
+    "rosca": "(019) Adapt. Rosca M-H 18,1",
+    "adaptador": "PSA 019",
+    "obs": "Verificar ficha de la Guía Oficial PSA",
+    "pag": 48
+  },
+  {
+    "id": 47,
+    "marca": "Radisson",
+    "modelo": "RADISSON",
+    "codFab": "GB4C",
+    "rosca": "(177) Adapt. Rectangular",
+    "adaptador": "PSA 177",
+    "obs": "Verificar ficha de la Guía Oficial PSA",
+    "pag": 49
+  },
+  {
+    "id": 48,
+    "marca": "Robinet",
+    "modelo": "Betis",
+    "codFab": "20-134",
+    "rosca": "(142) Adapt. Rosca Macho",
+    "adaptador": "PSA 142",
+    "obs": "Verificar ficha de la Guía Oficial PSA",
+    "pag": 50
+  },
+  {
+    "id": 49,
+    "marca": "Robinet",
+    "modelo": "Mallorca",
+    "codFab": "60-131",
+    "rosca": "(164) Adapt. rosca macho 20 x 1",
+    "adaptador": "PSA 164",
+    "obs": "Verificar ficha de la Guía Oficial PSA",
+    "pag": 51
+  },
+  {
+    "id": 50,
+    "marca": "Robinet",
+    "modelo": "Santander",
+    "codFab": "20-135",
+    "rosca": "(164) Adapt. rosca macho 20 x 1",
+    "adaptador": "PSA 164",
+    "obs": "Verificar ficha de la Guía Oficial PSA",
+    "pag": 52
+  },
+  {
+    "id": 51,
+    "marca": "Clever",
+    "modelo": "Saona Infinity",
+    "codFab": "97856",
+    "rosca": "(177) Adapt. Rectangular",
+    "adaptador": "PSA 177",
+    "obs": "Verificar ficha de la Guía Oficial PSA",
+    "pag": 53
+  },
+  {
+    "id": 52,
+    "marca": "Peirano",
+    "modelo": "Perugia",
+    "codFab": "",
+    "rosca": "(002) Adapt. Rosca FV Unimix",
+    "adaptador": "PSA 002",
+    "obs": "Verificar ficha de la Guía Oficial PSA",
+    "pag": 54
+  },
+  {
+    "id": 53,
+    "marca": "Ginyplas",
+    "modelo": "Modern",
+    "codFab": "08510F",
+    "rosca": "(002) Adapt. Rosca FV Unimix",
+    "adaptador": "PSA 002",
+    "obs": "Verificar ficha de la Guía Oficial PSA",
+    "pag": 55
+  },
+  {
+    "id": 54,
+    "marca": "Otras canillas",
+    "modelo": "Otras canillas De patio 1/2”",
+    "codFab": "",
+    "rosca": "(100) Adapt. Rosca Hembra",
+    "adaptador": "PSA 100",
+    "obs": "Verificar ficha de la Guía Oficial PSA",
+    "pag": 56
+  },
+  {
+    "id": 55,
+    "marca": "Otras canillas",
+    "modelo": "Otras canillas De patio 3/4”",
+    "codFab": "",
+    "rosca": "(018) Adapt. Rosca Canilla",
+    "adaptador": "PSA 018",
+    "obs": "Verificar ficha de la Guía Oficial PSA",
+    "pag": 57
+  },
+  {
+    "id": 56,
+    "marca": "Otras canillas",
+    "modelo": "Otras canillas De patio 1/2”",
+    "codFab": "",
+    "rosca": "(100) Adapt. Rosca Hembra",
+    "adaptador": "PSA 100",
+    "obs": "Verificar ficha de la Guía Oficial PSA",
+    "pag": 58
+  },
+  {
+    "id": 57,
+    "marca": "Otras canillas",
+    "modelo": "Otras canillas De patio 3/4”",
+    "codFab": "",
+    "rosca": "(018) Adapt. Rosca Canilla",
+    "adaptador": "PSA 018",
+    "obs": "Verificar ficha de la Guía Oficial PSA",
+    "pag": 59
+  }
+];
 
   var state = {
     idx: 2, // Empezar en FV Chess (3 de 53) como en la captura

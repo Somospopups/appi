@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v556-canillas-pdf-popup-perfeccion';
+const CACHE_NAME = 'appi-v557-catalogo-oficial-psa';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
