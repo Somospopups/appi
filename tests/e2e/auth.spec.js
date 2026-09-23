@@ -339,13 +339,13 @@ test('administración ingresa por el candado y no tiene distribuidor asociado', 
   await expect(page.locator('#adminUserList')).toContainText('Distribuidor A');
   await page.locator('.admin-user-head').first().click();
   await expect(page.locator('[data-admin-action="people"]').first()).toBeVisible();
-  await expect(page.locator('[data-admin-action="grace_period"]').first()).toBeVisible();
   await expect(page.locator('[data-admin-action="payment"]').first()).toBeVisible();
+  await expect(page.locator('[data-admin-action="set_vence"]').first()).toBeVisible();
   await expect(page.locator('[data-admin-action="delete"]').first()).toBeVisible();
-  await page.locator('[data-admin-action="grace_period"]').first().click();
-  await expect(page.locator('.grace-period-modal')).toBeVisible();
-  await page.locator('.grace-period-modal .modal-close').click();
-  await expect(page.locator('.grace-period-modal')).toHaveCount(0);
+  await page.locator('[data-admin-action="set_vence"]').first().click();
+  await expect(page.locator('#venceDia')).toBeVisible();
+  await page.locator('[data-vence-cancel]').click();
+  await expect(page.locator('#venceDia')).toHaveCount(0);
   expect(nativeDialogs).toEqual([]);
   const profile=await page.evaluate(()=>APPIAuth.currentProfile());
   expect(profile).toMatchObject({username:'popups',dip:null,rol:'admin'});

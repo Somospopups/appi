@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v579-vence-panel';
+const CACHE_NAME = 'appi-v580-sin-prorroga';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

@@ -192,7 +192,6 @@ function renderUsers(){
           <button type="button" class="admin-pill ${tCuenta==='prueba'?'active':''}" data-admin-action="trial">🧪 Prueba 5d</button>
           <button type="button" class="admin-pill ${tCuenta==='mes'?'active':''}" data-admin-action="month">📅 1 Mes</button>
           <button type="button" class="admin-pill ${tCuenta==='siempre'?'active':''}" data-admin-action="forever">♾️ Siempre</button>
-          <button type="button" class="admin-pill ${tCuenta==='prorroga'?'active':''}" data-admin-action="grace_period">⏳ Prórroga</button>
           <button type="button" class="admin-pill" data-admin-action="set_vence">📆 Vence el</button>
         </div>
         <div class="admin-pago-selector">
@@ -738,14 +737,6 @@ async function handleUserAction(button){
     if(action==='password'){
       const password=await window.APPIDialog.prompt('Se copiará al portapapeles y el distribuidor deberá cambiarla al ingresar.',randomPassword(),{title:'Nueva contraseña temporal',icon:'🔐',inputType:'text',okText:'Actualizar'});if(!password)return;
       await callAdmin({action:'set_password',user_id:userId,password});await navigator.clipboard.writeText(password).catch(()=>{});await window.APPIDialog.alert('Contraseña actualizada y copiada.',{title:'Listo',icon:'✓'});return;
-    }
-    if(action==='grace_period'){
-      if(window.APPIAdminMembership&&window.APPIAdminMembership.showGracePeriodModal){
-        window.APPIAdminMembership.showGracePeriodModal(userId,user.nombre||user.dip);
-      }else{
-        await window.APPIDialog.alert('El sistema de membresías no está disponible.',{title:'Error',icon:'!'});
-      }
-      return;
     }
     if(action==='set_vence'){
       const vence=await pedirFechaVence(user);

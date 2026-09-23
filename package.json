@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "579.0.0",
-  "cacheName": "appi-v579-vence-panel",
+  "version": "580.0.0",
+  "cacheName": "appi-v580-sin-prorroga",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {
