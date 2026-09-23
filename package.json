@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "566.0.0",
-  "cacheName": "appi-v566-margarita-reparada-total",
+  "version": "567.0.0",
+  "cacheName": "appi-v567-margarita-perfecta-desplegada",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

@@ -141,11 +141,10 @@
     css();
     var host = document.getElementById('margaritaCont'); if(!host) return;
     var state = cargar(), n = total(state);
-    var petals = state.grupos.map(function(g, i){
+        var petals = state.grupos.map(function(g, i){
       var count = (state.contactos[g.id] || []).length;
       var label = esc(g.label);
-      var ang = i * 45;
-      return '<button type="button" class="mg-petal ' + (count ? 'has-contacts' : '') + '" style="transform:translate(-50%,-50%) rotate(' + ang + 'deg) translateY(-112px);--counter:-' + ang + 'deg;--i:' + i + '" data-mg-group="' + esc(g.id) + '">' +
+      return '<button type="button" class="mg-petal ' + (count ? 'has-contacts' : '') + '" style="--angle:' + (i * 45) + 'deg;--counter:-' + (i * 45) + 'deg;--i:' + i + '" data-mg-group="' + esc(g.id) + '">' +
         '<span class="mg-petal-shape"></span>' +
         '<span class="mg-petal-content">' +
           '<i>' + esc(g.icon) + '</i>' +
