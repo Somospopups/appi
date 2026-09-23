@@ -116,7 +116,7 @@ test.describe('Sincronización automática de MI PSA y tareas garantizadas', () 
     await expect(page.locator('#usuariosStTotal')).toContainText('2');
   });
 
-  test('la tarjeta de carga manual #usuariosUploadCard queda visible cuando no hay garantías y sirve como respaldo', async ({ page }) => {
+  test('sin garantías se pide conectar MI PSA y no hay zona para subir Excel', async ({ page }) => {
     await page.route('**/auth-config.js', route => route.fulfill({
       contentType: 'application/javascript',
       body: "window.APPI_AUTH={enabled:true,url:'https://mock.supabase.co',anonKey:'anon-key-publica-de-prueba',distributorEmailDomain:'distribuidores.appi.invalid',adminLogin:{username:'popups',email:'admin-popups@appi.invalid'},loginAliases:{},offlineDays:7};"
@@ -139,16 +139,14 @@ test.describe('Sincronización automática de MI PSA y tareas garantizadas', () 
       window.showView('view-usuarios');
     });
 
-    // Sin garantías, la tarjeta de carga manual y sincronización debe ser visible
     const uploadCard = page.locator('#usuariosUploadCard');
     await expect(uploadCard).toBeVisible();
     await expect(uploadCard).toContainText('Garantías y Usuarios');
+    await expect(uploadCard).toContainText('conectar tu cuenta');
     await expect(uploadCard.locator('#btnSyncPSAAuto')).toBeVisible();
-    await expect(uploadCard.locator('#usuariosDropZone')).toBeVisible();
-
-    // El input de archivo existe y está habilitado como respaldo
-    const fileInput = page.locator('#usuariosFileInput');
-    await expect(fileInput).toBeAttached();
+    await expect(page.locator('#usuariosDropZone')).toHaveCount(0);
+    await expect(uploadCard).not.toContainText('Excel');
+    await expect(uploadCard).not.toContainText('Elegir archivo');
   });
 
   test('el botón ↻ en usuariosMetaBar dispara la sincronización automática de PSA', async ({ page }) => {

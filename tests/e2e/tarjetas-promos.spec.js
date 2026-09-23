@@ -153,7 +153,16 @@ test('recargar el Excel no borra las tarjetas guardadas', async ({ page }) => {
     tarjetas: { byKey: { 'tel:3511234567': [{ marca: 'naranja', banco: 'naranja_x' }] } }
   });
   await abrirUsuarios(page);
-  await page.setInputFiles('#usuariosFileInput', 'test_garantias.xlsx');
+  await page.evaluate(() => {
+    const rows = [
+      {id:1,usuario:'ALONSO, ARTURO',telf:'0351-4552272',localidad:'BARRIO COLON',producto:'PSA VERO',fVence:'2003-10-17T12:00:00.000Z',estado:'vencida'},
+      {id:2,usuario:'CAALLAGIU, NANCY BEATRIZ',telf:'0351-4892333',localidad:'BARRIO ALTO ALBERDI',producto:'PSA VERO',fVence:'2004-02-23T12:00:00.000Z',estado:'vencida'},
+      {id:3,usuario:'GOMEZ, JUAN PEREZ',telf:'0351-1234567',localidad:'CENTRO',producto:'SENIOR 4',fVence:'2025-01-10T12:00:00.000Z',estado:'vencida'},
+      {id:4,usuario:'RODRIGUEZ, MARIA',telf:'0351-999888',localidad:'ALTO ALBERDI',producto:'SODA BURBY',fVence:'2025-12-15T12:00:00.000Z',estado:'vencida'}
+    ];
+    localStorage.setItem('usuarios_garantias', JSON.stringify(rows));
+    if (window.recargarUsuariosDeStorage) window.recargarUsuariosDeStorage();
+  });
   await expect(page.locator('#usuariosStTotal')).toHaveText('4');
   await expect(page.locator('#usuariosList .tree-node')).toHaveCount(4);
 

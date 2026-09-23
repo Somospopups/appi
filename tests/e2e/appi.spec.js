@@ -83,14 +83,23 @@ test('arranca, navega e importa Garantías una sola vez', async ({ page }) => {
   ]);
   await page.evaluate(() => showView('view-usuarios'));
 
-  // Un solo selector de archivo a la vista: el de emergencia quedó eliminado.
-  await expect(page.locator('#usuariosUploadCard input[type="file"]')).toHaveCount(1);
+  await expect(page.locator('#usuariosDropZone')).toHaveCount(0);
+  await expect(page.locator('#usuariosUploadCard')).not.toContainText('Excel');
   await expect(page.locator('#usuariosUploadCard')).not.toContainText('emergencia');
 
-  await page.setInputFiles('#usuariosFileInput', 'test_garantias.xlsx');
+  await page.evaluate(() => {
+    const rows = [
+      {id:1,usuario:'ALONSO, ARTURO',telf:'0351-4552272',domicilio:'ANDALUCIA 1936',cp:'X5014',localidad:'BARRIO COLON',producto:'PSA VERO',serie:'123',fVence:'2003-10-17T12:00:00.000Z',estado:'vencida'},
+      {id:2,usuario:'CAALLAGIU, NANCY BEATRIZ',telf:'0351-4892333',domicilio:'DUARTE QUIROS 2546',cp:'X5010',localidad:'BARRIO ALTO ALBERDI',producto:'PSA VERO',serie:'456',fVence:'2004-02-23T12:00:00.000Z',estado:'vencida'},
+      {id:3,usuario:'GOMEZ, JUAN PEREZ',telf:'0351-1234567',domicilio:'AVENIDA VELEZ SARSFIELD 100',cp:'X5000',localidad:'CENTRO',producto:'SENIOR 4',serie:'789',fVence:'2025-01-10T12:00:00.000Z',estado:'vencida'},
+      {id:4,usuario:'RODRIGUEZ, MARIA',telf:'0351-999888',domicilio:'SANTA ROSA 500',cp:'X5002',localidad:'ALTO ALBERDI',producto:'SODA BURBY',serie:'101',fVence:'2025-12-15T12:00:00.000Z',estado:'vencida'}
+    ];
+    localStorage.setItem('usuarios_garantias', JSON.stringify(rows));
+    if (window.recargarUsuariosDeStorage) window.recargarUsuariosDeStorage();
+  });
   await expect(page.locator('#usuariosStTotal')).toHaveText('4');
   await expect(page.locator('#usuariosList .tree-node')).toHaveCount(4);
-  expect(importLogs).toHaveLength(1);
+  expect(importLogs).toHaveLength(0);
 
   await page.evaluate(() => {
     window.__appiLastOpen = null;
@@ -129,15 +138,13 @@ test('trata el contenido importado como texto y no ejecuta HTML', async ({ page 
   await abrirAppActivada(page);
   await page.evaluate(() => showView('view-usuarios'));
 
-  const csv = [
-    'Usuario,Teléf.,Domicilio,C.P.,Localidad,Producto,F.Compra,F.Vence',
-    '"<img src=x onerror=""window.__xssProof=\'executed\'"">",3515555555,Calle 123,X5000,Centro,PSA VERO,1/1/2026,1/1/2027'
-  ].join('\n');
-
-  await page.setInputFiles('#usuariosFileInput', {
-    name: 'usuarios-seguridad.csv',
-    mimeType: 'text/csv',
-    buffer: Buffer.from(csv, 'utf8')
+  await page.evaluate(() => {
+    localStorage.setItem('usuarios_garantias', JSON.stringify([{
+      id: 1, usuario: '<img src=x onerror="window.__xssProof=\'executed\'">', telf: '3515555555',
+      domicilio: 'Calle 123', cp: 'X5000', localidad: 'Centro', producto: 'PSA VERO',
+      fVence: '2027-01-01T12:00:00.000Z', estado: 'vigente'
+    }]));
+    if (window.recargarUsuariosDeStorage) window.recargarUsuariosDeStorage();
   });
 
   await expect(page.locator('#usuariosStTotal')).toHaveText('1');

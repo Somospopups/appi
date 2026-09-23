@@ -4,6 +4,11 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v575 · PSA automático: sin carga manual de archivos
+
+- Se sacaron los campos para subir Excel de Mi Equipo y Usuarios. Un distribuidor nuevo solo ve **Conectar MI PSA**.
+- Versión: **v575 · Segura** · Cache `appi-v575-psa-auto`.
+
 ## v574 · Opciones de ingreso: solo las 22 del flyer
 - Se **sacaron** los 3 Kit de Acceso de la lista (Mini Bianco, Mini Nero y Portátil).
 - Quedan **solo las 22** combinaciones del flyer oficial (11 Portátil + 11 Mini), con foto de combo y badge de PB.

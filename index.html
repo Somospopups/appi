@@ -164,7 +164,7 @@ window.openStock=function(){
 <script src="./escalera-suenos.js"></script>
 <script src="./demo-guia.js"></script>
 <script src="./tablero-negocio.js?v=929"></script>
-<script src="./lista-precios.js?v=574"></script>
+<script src="./lista-precios.js?v=575"></script>
 <script src="./vendor/pdf.min.js"></script>
 <script src="./canillas-adaptadores.js?v=562"></script>
 <script src="./vendor/zxing.min.js"></script>
@@ -4666,7 +4666,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v574 · Segura</div>
+  <div class="ds-foot">APPI · v575 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -5436,12 +5436,12 @@ body.dark #pageTabs button.active{color:#c5d6ff}
       <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
       <h1>Mi</h1>
       <div class="script">Equipo</div>
-      <p id="equipoSubtitle">Cargá tu planilla para empezar</p>
+      <p id="equipoSubtitle">Conectá tu cuenta PSA para traer tu equipo</p>
     </header>
 
     <div class="equipo-meta" id="equipoMetaBar" style="display:none">
       <div class="eq-meta-fecha" id="equipoMetaFecha"></div>
-      <button type="button" class="eq-meta-refresh" id="btnEquipoCambiar" aria-label="Actualizar archivos" title="Actualizar archivos">↻</button>
+      <button type="button" class="eq-meta-refresh" id="btnEquipoCambiar" aria-label="Actualizar desde PSA" title="Actualizar desde PSA">↻</button>
     </div>
 
     <div class="equipo-tabs" id="equipoTabsWrap" style="display:none">
@@ -5572,23 +5572,15 @@ body.dark #pageTabs button.active{color:#c5d6ff}
 
     <div class="glass" id="usuariosUploadCard">
       <div style="text-align:center;margin-bottom:12px">
-        <div style="font-size:32px">📂</div>
+        <div style="font-size:32px">🔗</div>
         <h3 style="margin:8px 0 4px">Garantías y Usuarios</h3>
-        <p style="margin:0 0 10px;font-size:12px;color:#6b6b76">Sincronizá automáticamente tus clientes de MI PSA o cargá tu archivo Excel de respaldo</p>
+        <p style="margin:0 0 10px;font-size:12px;color:#6b6b76">Se actualizan solas al conectar tu cuenta de distribuidor PSA. No hace falta cargar archivos.</p>
       </div>
       <div style="display:flex;gap:8px;justify-content:center;margin-bottom:14px;flex-wrap:wrap">
-        <button type="button" class="btn btn-primary" id="btnSyncPSAAuto" onclick="if(typeof psaAbrirPopup==='function')psaAbrirPopup();else if(typeof psaProbar==='function')psaProbar();" style="display:inline-flex;align-items:center;gap:6px">🔗 Conectar / Sincronizar MI PSA</button>
-        <a class="btn btn-secondary" href="https://minegocio.psa.com.ar/login" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;text-decoration:none">🌐 Abrir MI PSA</a>
+        <button type="button" class="btn btn-primary" id="btnSyncPSAAuto" style="display:inline-flex;align-items:center;gap:6px">🔗 Conectar MI PSA</button>
       </div>
-      <label class="upload-zone" id="usuariosDropZone" for="usuariosFileInput" role="button" tabindex="0" aria-label="Cargar archivo Excel" style="display:block;cursor:pointer;position:relative;overflow:hidden">
-        <input type="file" id="usuariosFileInput" accept=".xls,.xlsx,.csv,.ods" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;z-index:2">
-        <div style="position:relative;z-index:1;pointer-events:none">
-          <div style="font-size:26px">📤</div>
-          <b>Arrastrá tu archivo Excel acá o clic para elegir</b>
-          <div style="margin-top:10px"><span class="btn btn-secondary">Elegir archivo Excel</span></div>
-          <small style="display:block;margin-top:10px;color:#6b6b76;font-size:10.5px;line-height:1.3">Carga de respaldo si no usás sincronización directa.</small>
-        </div>
-      </label>
+            <input type="file" id="usuariosFileInput" accept=".xls,.xlsx,.csv,.ods" hidden disabled>
+
       <div id="usuariosFileInfo" style="display:none;margin-top:12px;padding:12px;border-radius:14px;background:rgba(58,208,164,0.14);backdrop-filter:blur(10px);border:1px solid rgba(58,208,164,0.18);font-size:12px;font-weight:600"></div>
       <div id="usuariosDebug" style="display:none;margin-top:8px;padding:10px;border-radius:12px;background:rgba(0,0,0,0.05);font-size:11px;font-family:monospace;white-space:pre-wrap;max-height:200px;overflow:auto"></div>
       <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
@@ -5600,7 +5592,7 @@ body.dark #pageTabs button.active{color:#c5d6ff}
       <!-- v816→v824: planilla antigua sin campo "dipReasignado": la app migra
            los campos sola al renderizar (el aviso queda oculto para siempre). -->
       <div id="usuariosAvisoReasig" style="display:none;margin-bottom:10px;padding:10px 12px;border-radius:14px;background:rgba(245,179,1,0.14);border:1px solid rgba(245,179,1,0.35);font-size:11.5px;font-weight:600;color:#7a5b06;line-height:1.45">
-        ⚠️ <b>Tu planilla se cargó antes de la v813</b> y no trae la columna «Dip reasignado», por eso el filtro muestra 0. Recargá el archivo para actualizarla.
+        ⚠️ <b>Estos datos se sincronizaron antes de la v813</b> y no traen la columna «Dip reasignado», por eso el filtro muestra 0. Conectá de nuevo MI PSA para actualizarlos.
         <br>
         <button type="button" id="usuariosBtnReasigRecargar" style="margin-top:7px;padding:6px 12px;border-radius:10px;border:1px solid rgba(122,91,6,0.4);background:#fff;color:#7a5b06;font:inherit;font-size:11px;font-weight:800;cursor:pointer">🔄 Recargar planilla</button>
       </div>
@@ -5618,7 +5610,7 @@ body.dark #pageTabs button.active{color:#c5d6ff}
         <button type="button" id="usuariosBtnZonas"><span>📍</span>Zonas</button>
         <button type="button" id="usuariosBtnReasig" style="position:relative"><span>↻</span>Reasignados<b id="usuariosStReasig" class="u-re-badge">0</b></button>
         <button type="button" id="usuariosBtnMensajes"><span class="u-wa-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path fill="#25D366" d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2zm.01 1.67c2.2 0 4.26.86 5.82 2.42a8.19 8.19 0 0 1 2.41 5.83c0 4.54-3.7 8.23-8.24 8.23-1.48 0-2.93-.39-4.19-1.15l-.3-.17-3.12.82.83-3.04-.2-.32a8.2 8.2 0 0 1-1.26-4.38c0-4.54 3.7-8.24 8.25-8.24z"/><path fill="#25D366" d="M9.79 7.54c-.2 0-.52.07-.79.37-.26.3-1.02 1-1.02 2.43s1.04 2.82 1.19 3.01c.15.2 2.03 3.25 5.01 4.43 2.48.98 2.98.79 3.52.74.54-.05 1.73-.7 1.97-1.38.24-.67.24-1.25.17-1.37-.07-.12-.26-.2-.54-.35-.28-.15-1.73-.85-2-.95-.27-.1-.46-.15-.66.15s-.76.95-.93 1.14c-.17.2-.34.22-.63.07-.28-.14-1.2-.44-2.29-1.4-.85-.75-1.42-1.69-1.58-1.97-.17-.28-.02-.43.13-.58.13-.13.28-.34.43-.51.14-.17.19-.29.28-.48.1-.2.05-.36-.02-.51-.08-.14-.65-1.57-.9-2.15-.23-.55-.48-.48-.66-.48z"/></svg></span>Mensajes</button>
-        <button type="button" id="usuariosBtnCambiarArchivo"><span>📂</span>Cambiar archivo</button>
+        <button type="button" id="usuariosBtnCambiarArchivo" hidden><span>🔗</span>Conectar MI PSA</button>
         <button type="button" id="usuariosBtnDepurados"><span>🧹</span>Depurados</button>
         <button type="button" id="usuariosBtnCumples"><span>🎂</span>Cumpleaños</button>
         <!-- Aparece sólo con un filtro puesto. -->
@@ -7054,16 +7046,16 @@ const HELP = {
     icon:'🌳', iconBg:'linear-gradient(135deg,#0b5878,#3ad0a4)',
     title:'Mi Equipo',
     sub:'Tu equipo, siempre a mano',
-    html:`<p>Primero bajá el Excel en PSA y después cargalo acá.</p>
+    html:`<p>Conectá tu cuenta de distribuidor PSA. APPI trae la línea y las garantías sola.</p>
 
-    <div class="tip"><strong>1. DESCARGAR ARCHIVOS</strong><br/>
-    Tocá <b>Descargar archivos</b>. Se abre el sitio de PSA. Entrá allá con tu DIP y Clave PSA. APPI no ve ni guarda esa clave.</div>
+    <div class="tip"><strong>1. CONECTAR MI PSA</strong><br/>
+    Sucursal, número y clave. Quedan en este dispositivo. APPI actualiza al entrar.</div>
 
-    <div class="tip"><strong>2. ELEGIR ARCHIVO</strong><br/>
-    Bajá <b>Línea Descendente</b> y acá elegí el Excel. Podés actualizarlo cada mes.</div>
+    <div class="tip"><strong>2. LÍNEA DESCENDENTE</strong><br/>
+    Se sincroniza con tu cuenta. El botón ↻ vuelve a pedirla a PSA.</div>
 
-    <div class="tip"><strong>3. CARGAR GARANTÍAS</strong><br/>
-    Después te pregunta por <b>Garantías por Organización</b>. Así ves presentadas, vencidas y pendientes en cada persona.</div>
+    <div class="tip"><strong>3. GARANTÍAS</strong><br/>
+    Van juntas con la sync. Ves presentadas, vencidas y pendientes en cada persona.</div>
 
     <p><strong>3 VISTAS</strong></p>
     <ul>
@@ -7195,12 +7187,12 @@ const HELP = {
     icon:'📍', iconBg:'linear-gradient(135deg,#0b5878,#3ad0a4)',
     title:'Usuarios / Garantías',
     sub:'Zona y vencimiento',
-    html:`<p>Primero bajá la planilla en PSA y después cargala acá.</p>
-    <div class="tip"><strong>Descargar archivos</strong> — se abre el sitio de PSA. Entrá allá con tu clave. APPI no la ve ni la guarda.</div>
-    <div class="tip"><strong>Elegir archivo</strong> — Excel o CSV con Usuario, teléfono, domicilio, localidad, producto y fechas.</div>
+    html:`<p>Conectá tu cuenta PSA. Las garantías se sincronizan solas.</p>
+    <div class="tip"><strong>Conectar MI PSA</strong> — sucursal, número y clave. APPI no sube la clave a ningún lado: queda en este dispositivo.</div>
+    <div class="tip"><strong>Actualizar</strong> — el botón ↻ vuelve a pedir las garantías a PSA.</div>
     <div class="tip"><strong>Dashboard</strong> — total, vencidas, por vencer y vigentes.</div>
     <div class="tip"><strong>Filtros</strong> — buscador, zona, orden por vencimiento y tarjetas (marca + banco) para avisar una promo.</div>
-    <div class="tip"><strong>Tarjetas</strong> — en la ficha de cada usuario cargá Visa Galicia, Naranja, etc. Se guardan aparte: recargar la planilla no las borra. En el mensaje de la promo usá {nombre} y {tarjeta}.</div>
+    <div class="tip"><strong>Tarjetas</strong> — en la ficha de cada usuario cargá Visa Galicia, Naranja, etc. Se guardan aparte: sincronizar de nuevo no las borra. En el mensaje de la promo usá {nombre} y {tarjeta}.</div>
     <div class="warn-tip"><strong>🔒 Privacidad:</strong> La planilla queda en tu cuenta, en cualquier dispositivo. La Clave PSA no pasa por APPI.</div>`
   },
   lista: {
@@ -9057,16 +9049,20 @@ function renderEquipo(){
     if(metaBar) metaBar.style.display = 'none';
     cont.innerHTML = `
       <div class="equipo-upload">
-        <span class="up-ico">📤</span>
-        <h3>Cargá tu planilla</h3>
-        <p>Descargá el reporte de <strong>Línea Descendente</strong> desde la empresa (.xls o .xlsx) y cargalo acá.</p>
-        <a class="btn-ir-psa" href="https://minegocio.psa.com.ar/login" target="_blank" rel="noopener noreferrer">Descargar archivos</a>
-        <button class="btn-upload" id="btnUpload">📁 Elegir archivo</button>
+        <span class="up-ico">🔗</span>
+        <h3>Conectá tu cuenta PSA</h3>
+        <p>Al guardar sucursal, número y clave, APPI trae tu línea y tus garantías sola. No hace falta elegir ningún archivo.</p>
+        <button class="btn-upload" id="btnUploadPsa" type="button">Conectar MI PSA</button>
       </div>
-      <div class="footer-quote" style="margin-top:12px">Tu equipo, siempre a mano.<br/>La planilla queda en tu cuenta.</div>
+      <div class="footer-quote" style="margin-top:12px">Tu equipo se actualiza solo, cada vez que entras.</div>
     `;
-    document.getElementById('btnUpload').onclick = ()=> document.getElementById('equipoFileInput').click();
-    document.getElementById('equipoSubtitle').textContent = 'Cargá tu planilla para empezar';
+    var btnPsa = document.getElementById('btnUploadPsa');
+    if(btnPsa) btnPsa.onclick = function(){
+      if(typeof window.mostrarPopupPSA==='function') window.mostrarPopupPSA();
+      else if(typeof window.psaAbrirPopup==='function') window.psaAbrirPopup();
+      else if(typeof window.psaProbar==='function') window.psaProbar();
+    };
+    document.getElementById('equipoSubtitle').textContent = 'Conectá tu cuenta PSA para traer tu equipo';
     return;
   }
   tabsWrap.style.display = 'grid';
@@ -9214,7 +9210,7 @@ document.getElementById('equipoFileInput').onchange = (e)=>{
             okText: 'Sí, cargar garantías',
             cancelText: 'No, ahora no',
             onConfirm: () => {
-              document.getElementById('garantiasFileInput').click();
+              ((typeof window.mostrarPopupPSA==='function')?window.mostrarPopupPSA():(typeof window.psaAbrirPopup==='function'?window.psaAbrirPopup():(typeof window.psaProbar==='function'&&window.psaProbar())));
             }
           });
         }, 400);
@@ -9232,7 +9228,7 @@ document.getElementById('equipoFileInput').onchange = (e)=>{
   reader.readAsArrayBuffer(file);
   e.target.value = '';
 };
-document.getElementById('btnEquipoReload').onclick = ()=> document.getElementById('equipoFileInput').click();
+document.getElementById('btnEquipoReload').onclick = ()=>{ if(typeof window.mostrarPopupPSA==='function') window.mostrarPopupPSA(); else if(typeof window.psaAbrirPopup==='function') window.psaAbrirPopup(); else if(typeof window.psaProbar==='function') window.psaProbar(); };
 const btnEquipoCambiar = document.getElementById('btnEquipoCambiar');
 if(btnEquipoCambiar) btnEquipoCambiar.onclick = ()=>{
   const c=psaGetCreds();
@@ -9246,7 +9242,9 @@ if(btnEquipoCambiar) btnEquipoCambiar.onclick = ()=>{
     psaProbar();
     showToast('Actualizando LÍNEA y GARANTÍAS ORG desde MI PSA…', 2200);
   } else {
-    document.getElementById('equipoFileInput').click();
+    if(typeof window.mostrarPopupPSA==='function') window.mostrarPopupPSA();
+    else if(typeof window.psaAbrirPopup==='function') window.psaAbrirPopup();
+    else if(typeof window.psaProbar==='function') window.psaProbar();
   }
 };
 const btnUsuariosActualizar = document.getElementById('btnUsuariosActualizar');
@@ -9261,11 +9259,9 @@ if(btnUsuariosActualizar) btnUsuariosActualizar.onclick = ()=>{
     if(typeof sincronizarGarantiasPSA==='function') sincronizarGarantiasPSA(c);
     else psaProbar();
   } else {
-    if(typeof psaAbrirPopup==='function') psaAbrirPopup();
-    else {
-      const inp=document.getElementById('usuariosFileInput');
-      if(inp) inp.click();
-    }
+    if(typeof window.mostrarPopupPSA==='function') window.mostrarPopupPSA();
+    else if(typeof window.psaAbrirPopup==='function') window.psaAbrirPopup();
+    else if(typeof window.psaProbar==='function') window.psaProbar();
   }
 };
 /* ============ CARGA DE GARANTÍAS ============ */
@@ -9281,10 +9277,10 @@ document.getElementById('btnCargarGarantias').onclick = ()=> {
       title:'¿Reemplazar garantías?',
       html:'<p>Ya tenés datos de garantías cargados. ¿Querés reemplazarlos con el archivo nuevo?</p>',
       okText:'Sí, reemplazar', danger:true,
-      onConfirm: ()=> document.getElementById('garantiasFileInput').click()
+      onConfirm: ()=> ((typeof window.mostrarPopupPSA==='function')?window.mostrarPopupPSA():(typeof window.psaAbrirPopup==='function'?window.psaAbrirPopup():(typeof window.psaProbar==='function'&&window.psaProbar())))
     });
   } else {
-    document.getElementById('garantiasFileInput').click();
+    ((typeof window.mostrarPopupPSA==='function')?window.mostrarPopupPSA():(typeof window.psaAbrirPopup==='function'?window.psaAbrirPopup():(typeof window.psaProbar==='function'&&window.psaProbar())));
   }
 };
 
@@ -9447,7 +9443,7 @@ if(btnEquipoDelete){
   btnEquipoDelete.onclick = ()=>{
     confirmarAccion({
       title:'¿Eliminar equipo cargado?',
-      html:'<p>Se borrarán todos los datos del equipo. Podrás volver a cargar el Excel cuando quieras.</p>',
+      html:'<p>Se borrarán todos los datos del equipo. Podés volver a traerlos conectando MI PSA.</p>',
       okText:'Eliminar', danger:true,
       onConfirm: ()=>{
         window.__appiForgetPlanilla=true;
@@ -14088,20 +14084,20 @@ function cerrarToolsMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='574';
-      const CACHE_NAME='appi-v574-opciones-ingreso';
+      const swVersion='575';
+      const CACHE_NAME='appi-v575-psa-auto';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
       try{
         const seen=localStorage.getItem('appi_seen_version');
         if(seen && seen!==swVersion){
-          const last=Number(localStorage.getItem('appi_last_sw_update')||0);
-          if(Date.now()-last>120000){
-            localStorage.setItem('appi_last_sw_update', String(Date.now()));
-            if(navigator.serviceWorker && navigator.serviceWorker.getRegistrations){
-              navigator.serviceWorker.getRegistrations().then(rs=> rs.forEach(r=> r.update().catch(()=>{})));
-            }
+          localStorage.setItem('appi_last_sw_update', String(Date.now()));
+          if(navigator.serviceWorker && navigator.serviceWorker.getRegistrations){
+            navigator.serviceWorker.getRegistrations().then(rs=> rs.forEach(r=>{
+              r.update().catch(()=>{});
+              try{ if(r.waiting) r.waiting.postMessage({type:'SKIP_WAITING'}); }catch(e){}
+            }));
           }
         }
         localStorage.setItem('appi_seen_version', swVersion);
@@ -14120,9 +14116,16 @@ function cerrarToolsMenu(){
           './service-worker.js',
           {updateViaCache:'none'}
         );
-        // No esperar al chequeo periódico del navegador: consultar la versión
-        // publicada en cada arranque, sin reutilizar el HTTP cache del script.
         await registration.update();
+        const wake=function(w){ try{ if(w) w.postMessage({type:'SKIP_WAITING'}); }catch(e){} };
+        if(registration.waiting) wake(registration.waiting);
+        registration.addEventListener('updatefound', function(){
+          const w=registration.installing;
+          if(!w) return;
+          w.addEventListener('statechange', function(){
+            if(w.state==='installed' && navigator.serviceWorker.controller) wake(w);
+          });
+        });
       }catch(error){
         console.warn('No se pudo registrar el modo offline de APPI', error);
       }
@@ -17208,13 +17211,21 @@ function initUsuarios(){
   const btnChoose=document.getElementById('usuariosBtnChoose');
   const dz=document.getElementById('usuariosDropZone');
 
+  const btnSync=document.getElementById('btnSyncPSAAuto');
+  if(btnSync){
+    btnSync.onclick=function(){
+      if(typeof window.mostrarPopupPSA==='function') window.mostrarPopupPSA();
+      else if(typeof window.psaAbrirPopup==='function') window.psaAbrirPopup();
+      else if(typeof window.psaProbar==='function') window.psaProbar();
+    };
+  }
+
   const triggerFile=()=>{
     try{
-      if(fileInput){
-        // No reseteamos antes, reseteamos después para asegurar onchange
-        fileInput.click();
-      }
-    }catch(e){ console.log('trigger file fail',e); }
+      if(typeof window.mostrarPopupPSA==='function') window.mostrarPopupPSA();
+      else if(typeof window.psaAbrirPopup==='function') window.psaAbrirPopup();
+      else if(typeof window.psaProbar==='function') window.psaProbar();
+    }catch(e){ console.log('trigger psa fail',e); }
   };
 
   if(btnChoose){
@@ -17373,8 +17384,9 @@ function initUsuarios(){
   const btnReasigRecargar=document.getElementById('usuariosBtnReasigRecargar');
   if(btnReasigRecargar) btnReasigRecargar.onclick=()=>{
     try{
-      const fi=document.getElementById('usuariosFileInput');
-      if(fi) fi.click();
+      if(typeof window.mostrarPopupPSA==='function') window.mostrarPopupPSA();
+      else if(typeof window.psaAbrirPopup==='function') window.psaAbrirPopup();
+      else if(typeof window.psaProbar==='function') window.psaProbar();
     }catch(e){ console.log('reasar recargar fail',e); }
   };
   const btnMensajes=document.getElementById('usuariosBtnMensajes');
@@ -19406,7 +19418,16 @@ setTimeout(()=>{
     return;
   }
   function bloquearCargaManual(){
-    // Permitir selección y carga manual como alternativa de respaldo
+    var dz=document.getElementById('usuariosDropZone');
+    if(dz) dz.style.display='none';
+    ['usuariosFileInput','equipoFileInput','garantiasFileInput'].forEach(function(id){
+      var el=document.getElementById(id);
+      if(!el) return;
+      el.disabled=true;
+      el.style.display='none';
+    });
+    var btn=document.getElementById('btnUpload');
+    if(btn) btn.style.display='none';
   }
   document.addEventListener('DOMContentLoaded', ()=>{
     mostrarAvisoPSA();

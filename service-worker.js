@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v574-opciones-ingreso';
+const CACHE_NAME = 'appi-v575-psa-auto';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
