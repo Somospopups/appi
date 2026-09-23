@@ -141,14 +141,11 @@
     css();
     var host = document.getElementById('margaritaCont'); if(!host) return;
     var state = cargar(), n = total(state);
-    var backPetals = [22.5, 67.5, 112.5, 157.5, 202.5, 247.5, 292.5, 337.5].map(function(ang, idx){
-      return '<div class="mg-back-petal" style="--angle:' + ang + 'deg;--i:' + idx + '"></div>';
-    }).join('');
-
     var petals = state.grupos.map(function(g, i){
       var count = (state.contactos[g.id] || []).length;
       var label = esc(g.label);
-      return '<button type="button" class="mg-petal ' + (count ? 'has-contacts' : '') + '" style="--angle:' + (i * 45) + 'deg;--counter:-' + (i * 45) + 'deg;--i:' + i + '" data-mg-group="' + esc(g.id) + '">' +
+      var ang = i * 45;
+      return '<button type="button" class="mg-petal ' + (count ? 'has-contacts' : '') + '" style="transform:translate(-50%,-50%) rotate(' + ang + 'deg) translateY(-112px);--counter:-' + ang + 'deg;--i:' + i + '" data-mg-group="' + esc(g.id) + '">' +
         '<span class="mg-petal-shape"></span>' +
         '<span class="mg-petal-content">' +
           '<i>' + esc(g.icon) + '</i>' +
@@ -159,7 +156,7 @@
     }).join('');
     host.innerHTML =
       '<div class="mg-wrap"><section class="mg-hero"><div><span class="mg-kicker">MI GENTE · EN FLOR</span><h2>Tu negocio empieza<br>por <em>tu mundo.</em></h2><p>Mirar con cariño a las personas que ya tenés cerca convierte vínculos reales en conversaciones con propósito.</p></div><div class="mg-hero-actions"><span class="mg-chip"><b>✦ Tocá</b> un pétalo</span><span class="mg-chip"><b>＋ Elegí</b> contactos</span><span class="mg-chip"><b>→ Activá</b> una acción</span></div></section>' +
-      '<div class="mg-layout"><section class="mg-garden"><div class="mg-garden-head"><b>Tu margarita de contactos</b><span><strong>' + n + '</strong> personas elegidas</span><button type="button" class="mg-edit-groups" id="mgEditGroups">✎ Editar pétalos</button></div><div class="mg-stage"><div class="mg-orbit"></div><div class="mg-flower">' + backPetals + petals + '<button type="button" class="mg-center" id="mgEditName"><span class="mg-center-inner"><small>LA MARGARITA DE</small><span class="mg-name">' + esc(state.nombre) + '</span><em>tocá para editar</em></span></button></div></div><div class="mg-garden-foot"><i>✦</i> Cada pétalo puede convertirse en una conversación que abra una oportunidad.</div></section>' +
+      '<div class="mg-layout"><section class="mg-garden"><div class="mg-garden-head"><b>Tu margarita de contactos</b><span><strong>' + n + '</strong> personas elegidas</span><button type="button" class="mg-edit-groups" id="mgEditGroups">✎ Editar pétalos</button></div><div class="mg-stage"><div class="mg-orbit"></div><div class="mg-flower">' + petals + '<button type="button" class="mg-center" id="mgEditName"><span class="mg-center-inner"><small>LA MARGARITA DE</small><span class="mg-name">' + esc(state.nombre) + '</span><em>tocá para editar</em></span></button></div></div><div class="mg-garden-foot"><i>✦</i> Cada pétalo puede convertirse en una conversación que abra una oportunidad.</div></section>' +
       '<aside class="mg-side"><section class="mg-card"><h3>¿Qué querés sembrar hoy?</h3><p>Elegí una acción y después el pétalo que mejor la acompañe.</p><div class="mg-action-list">' + accionesHTML() + '</div></section><section class="mg-card mg-growth"><h3>Tu jardín está creciendo</h3><p>Personas cercanas, oportunidades reales.</p><div class="mg-number"><strong>' + n + '</strong><span>contactos<br>en tu margarita</span></div><div class="mg-progress"><i style="width:' + Math.min(100,Math.max(8,n*12)) + '%"></i></div></section></aside></div></div>' +
       '<div class="mg-toast" id="mgToast"></div>';
     host.querySelectorAll('[data-mg-group]').forEach(function(b){ b.onclick=function(){ abrirGrupo(b.getAttribute('data-mg-group')); }; });

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v565-margarita-realista-3d';
+const CACHE_NAME = 'appi-v566-margarita-reparada-total';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

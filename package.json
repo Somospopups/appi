@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "565.0.0",
-  "cacheName": "appi-v565-margarita-realista-3d",
+  "version": "566.0.0",
+  "cacheName": "appi-v566-margarita-reparada-total",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {
