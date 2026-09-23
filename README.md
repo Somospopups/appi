@@ -4,6 +4,12 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v578 · Vencimiento: se guarda de verdad (sin esperar el backend nuevo)
+
+- **📆 Vence el** graba el día usando la prórroga que ya está en el servidor.
+- El popup muestra la fecha sin `<b>`.
+- Versión: **v578 · Segura** · Cache `appi-v578-vence-rpc`.
+
 ## v577 · Popup de vencimiento: fecha sin etiquetas HTML
 
 - El aviso de confirmación muestra la fecha normal (ya no aparece `<b>24/9/2026</b>`).

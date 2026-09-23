@@ -754,9 +754,13 @@ async function handleUserAction(button){
       const fechaTxt=fecha?fecha.toLocaleDateString('es-AR'):vence;
       const ok=await window.APPIDialog.confirm(`${user.nombre||user.dip} va a poder entrar a APPI hasta el ${fechaTxt}. ¿Confirmás?`,{title:'Día de vencimiento',icon:'📆',okText:'Guardar'});
       if(!ok) return;
-      const data=await callAdmin({action:'set_vence',user_id:userId,vence});
-      const real=data&&data.expires_at?new Date(data.expires_at).toLocaleDateString('es-AR'):fechaTxt;
-      await window.APPIDialog.alert(`Listo: ${user.nombre||user.dip} vence el ${real}.`,{title:'Día de vencimiento',icon:'📆'});
+      const until=new Date(`${vence}T23:59:59.999-03:00`);
+      if(isNaN(until.getTime()) || until.getTime()<=Date.now()){
+        await window.APPIDialog.alert('Elegí un día futuro.',{title:'Día de vencimiento',icon:'📆'});
+        return;
+      }
+      await rpcAdmin('appi_admin_prorrogar_membresia',{p_user_id:userId,p_until:until.toISOString(),p_notes:'Vencimiento fijado desde el panel'});
+      await window.APPIDialog.alert(`Listo: ${user.nombre||user.dip} vence el ${fechaTxt}.`,{title:'Día de vencimiento',icon:'📆'});
       await load();return;
     }
     if(action==='ticket'){

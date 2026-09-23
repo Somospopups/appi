@@ -145,7 +145,7 @@ window.openStock=function(){
 <script src="./prueba-banner.js"></script>
 <script src="./data-sync.js?v=835"></script>
 <script src="./js/membership-admin.js?v=451"></script>
-<script src="./admin-panel.js?v=577"></script>
+<script src="./admin-panel.js?v=578"></script>
 <script src="./js/compromiso-pago.js?v=777"></script>
 <link rel="stylesheet" href="./css/membership-admin.css">
 <link rel="stylesheet" href="./appi-tema.css?v=515">
@@ -164,7 +164,7 @@ window.openStock=function(){
 <script src="./escalera-suenos.js"></script>
 <script src="./demo-guia.js"></script>
 <script src="./tablero-negocio.js?v=929"></script>
-<script src="./lista-precios.js?v=577"></script>
+<script src="./lista-precios.js?v=578"></script>
 <script src="./vendor/pdf.min.js"></script>
 <script src="./canillas-adaptadores.js?v=562"></script>
 <script src="./vendor/zxing.min.js"></script>
@@ -4666,7 +4666,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v577 · Segura</div>
+  <div class="ds-foot">APPI · v578 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -14084,8 +14084,8 @@ function cerrarToolsMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='577';
-      const CACHE_NAME='appi-v577-popup-fecha';
+      const swVersion='578';
+      const CACHE_NAME='appi-v578-vence-rpc';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
