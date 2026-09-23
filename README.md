@@ -4,6 +4,11 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v577 · Popup de vencimiento: fecha sin etiquetas HTML
+
+- El aviso de confirmación muestra la fecha normal (ya no aparece `<b>24/9/2026</b>`).
+- Versión: **v577 · Segura** · Cache `appi-v577-popup-fecha`.
+
 ## v576 · Panel admin: período en el ticket y día de vencimiento
 
 - **Ver Ticket** pide fecha **desde** y **hasta** y las imprime en el comprobante.

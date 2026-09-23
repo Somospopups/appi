@@ -752,7 +752,7 @@ async function handleUserAction(button){
       if(!vence) return;
       const fecha=fechaDeISOLocal(vence);
       const fechaTxt=fecha?fecha.toLocaleDateString('es-AR'):vence;
-      const ok=await window.APPIDialog.confirm(`${user.nombre||user.dip} va a poder entrar a APPI hasta el <b>${fechaTxt}</b>. ¿Confirmás?`,{title:'Día de vencimiento',icon:'📆',okText:'Guardar'});
+      const ok=await window.APPIDialog.confirm(`${user.nombre||user.dip} va a poder entrar a APPI hasta el ${fechaTxt}. ¿Confirmás?`,{title:'Día de vencimiento',icon:'📆',okText:'Guardar'});
       if(!ok) return;
       const data=await callAdmin({action:'set_vence',user_id:userId,vence});
       const real=data&&data.expires_at?new Date(data.expires_at).toLocaleDateString('es-AR'):fechaTxt;
@@ -766,7 +766,7 @@ async function handleUserAction(button){
     if(action==='dia_pago'){
       const dia=Number(button.dataset.dia);
       if(![12,22].includes(dia)){await window.APPIDialog.alert('Elegí 12 o 22.',{title:'Día de pago',icon:'💳'});return}
-      const ok=await window.APPIDialog.confirm(`${user.nombre||user.dip} tendrá compromiso de pago el día <b>${dia}</b> de cada mes. Verá un popup sutil el ${dia===12?'10, 11 y 12':'20, 21 y 22'}. ¿Confirmás?`,{title:'Día de pago',icon:'💳',okText:`Poner día ${dia}`});
+      const ok=await window.APPIDialog.confirm(`${user.nombre||user.dip} tendrá compromiso de pago el día ${dia} de cada mes. Verá un popup sutil el ${dia===12?'10, 11 y 12':'20, 21 y 22'}. ¿Confirmás?`,{title:'Día de pago',icon:'💳',okText:`Poner día ${dia}`});
       if(!ok) return;
       try{
         await callAdmin({action:'set_dia_pago',user_id:userId,dia_pago:dia});
