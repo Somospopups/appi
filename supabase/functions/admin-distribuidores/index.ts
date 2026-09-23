@@ -237,6 +237,28 @@ Deno.serve(async request => {
       await admin.auth.admin.updateUserById(targetId, { ban_duration: 'none' }).catch(() => null);
       return json({ user: data });
     }
+    if (action === 'set_vence') {
+      const rawDate = String(body?.vence || '');
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(rawDate)) return json({ error: 'Elegí una fecha de vencimiento.' }, 400);
+      const expiresAt = new Date(`${rawDate}T23:59:59.999-03:00`);
+      if (Number.isNaN(expiresAt.getTime())) return json({ error: 'Fecha inválida.' }, 400);
+      const { data: target, error: targetError } = await admin.from('appi_perfiles').select('user_id,membresia_inicio,membresia_vence').eq('user_id', targetId).eq('rol', 'usuario').maybeSingle();
+      if (targetError) throw targetError;
+      if (!target) return json({ error: 'La cuenta no existe.' }, 404);
+      let startedAt = target.membresia_inicio ? new Date(target.membresia_inicio) : new Date();
+      if (Number.isNaN(startedAt.getTime()) || startedAt.getTime() > expiresAt.getTime()) startedAt = new Date();
+      if (startedAt.getTime() > expiresAt.getTime()) startedAt = expiresAt;
+      const { data, error } = await admin.from('appi_perfiles').update({
+        membresia_meses: 1,
+        membresia_inicio: startedAt.toISOString(),
+        membresia_vence: expiresAt.toISOString(),
+        activo: true
+      }).eq('user_id', targetId).select('user_id,dip,nombre,membresia_meses,membresia_inicio,membresia_vence,activo').single();
+      if (error) throw error;
+      await syncMembership(targetId, { status: expiresAt.getTime() > Date.now() ? 'active' : 'expired', starts_at: startedAt.toISOString(), expires_at: expiresAt.toISOString(), grace_period_until: null, grace_period_notes: null });
+      if (expiresAt.getTime() > Date.now()) await admin.auth.admin.updateUserById(targetId, { ban_duration: 'none' }).catch(() => null);
+      return json({ user: data, expires_at: expiresAt.toISOString() });
+    }
     if (action === 'set_dia_pago') {
       const dia = Number(body?.dia_pago);
       if (![12, 22].includes(dia)) return json({ error: 'Elegí día 12 o 22.' }, 400);

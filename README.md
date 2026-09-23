@@ -4,6 +4,12 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v576 · Panel admin: período en el ticket y día de vencimiento
+
+- **Ver Ticket** pide fecha **desde** y **hasta** y las imprime en el comprobante.
+- Botón **📆 Vence el** para elegir el día en que se le corta APPI a esa cuenta.
+- Versión: **v576 · Segura** · Cache `appi-v576-ticket-vence`.
+
 ## v575 · PSA automático: sin carga manual de archivos
 
 - Se sacaron los campos para subir Excel de Mi Equipo y Usuarios. Un distribuidor nuevo solo ve **Conectar MI PSA**.

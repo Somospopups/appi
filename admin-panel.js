@@ -193,6 +193,7 @@ function renderUsers(){
           <button type="button" class="admin-pill ${tCuenta==='mes'?'active':''}" data-admin-action="month">📅 1 Mes</button>
           <button type="button" class="admin-pill ${tCuenta==='siempre'?'active':''}" data-admin-action="forever">♾️ Siempre</button>
           <button type="button" class="admin-pill ${tCuenta==='prorroga'?'active':''}" data-admin-action="grace_period">⏳ Prórroga</button>
+          <button type="button" class="admin-pill" data-admin-action="set_vence">📆 Vence el</button>
         </div>
         <div class="admin-pago-selector">
           <span>Día de pago:</span>
@@ -443,7 +444,7 @@ function dibujarQrTicket(ctx,cx,cy,size,seed){
   }
 }
 function dibujarTicketTermico(d){
-  const W=420,H=680,pad=28;
+  const W=420,H=710,pad=28;
   const canvas=document.createElement('canvas');
   canvas.width=W+pad*2; canvas.height=H+pad*2;
   const ctx=canvas.getContext('2d');
@@ -499,6 +500,7 @@ function dibujarTicketTermico(d){
   ctx.fillText('ESTADO: PAGADO',cx,y);
   y+=28;
   ctx.textAlign='left';
+  renglón('MEMBRESIA DESDE: '+String(d.desdeTxt||'—'));
   renglón('MEMBRESIA HASTA: '+String(d.hastaTxt));
   renglón('Transacción: '+String(d.txn));
   renglón('MÉTODO: '+String(d.metodoTxt));
@@ -540,29 +542,123 @@ async function compartirImagenWhatsApp(blob,titulo,fileName){
   descargarBlobCump(blob,fileName);
   if(typeof showToast==='function') showToast('WhatsApp abre el listado. Adjuntá la imagen.',3200);
 }
+function isoDeFechaLocal(d){
+  if(!d||isNaN(d.getTime())) return '';
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function fechaDeISOLocal(s){
+  const m=String(s||'').match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if(!m) return null;
+  return new Date(+m[1],+m[2]-1,+m[3]);
+}
+function defaultPeriodoTicket(user){
+  const hasta=fechaTicketDesdeVence(user.membresia_vence);
+  let desde=fechaTicketDesdeVence(user.membresia_inicio);
+  const ultimo=ultimoPagoTicket(user);
+  if(!desde && ultimo && ultimo.fecha) desde=fechaTicketDesdeVence(ultimo.fecha);
+  if(!desde && hasta){
+    const d=new Date(hasta.getFullYear(),hasta.getMonth()-1,hasta.getDate());
+    desde=d;
+  }
+  if(!desde) desde=new Date();
+  if(!hasta){
+    const h=new Date(desde.getFullYear(),desde.getMonth()+1,desde.getDate());
+    return {desde:isoDeFechaLocal(desde), hasta:isoDeFechaLocal(h)};
+  }
+  return {desde:isoDeFechaLocal(desde), hasta:isoDeFechaLocal(hasta)};
+}
+function pedirPeriodoTicket(user){
+  return new Promise(resolve=>{
+    const def=defaultPeriodoTicket(user);
+    const overlay=document.createElement('div');
+    overlay.className='modal-overlay membership-modal-overlay';
+    overlay.innerHTML=`<div class="modal payment-modal" role="dialog" aria-modal="true">
+      <div class="modal-header"><h2>🎫 Período del comprobante</h2><button type="button" class="modal-close" aria-label="Cerrar">×</button></div>
+      <div class="modal-body">
+        <p>Estas fechas salen en el ticket de <strong>${esc(user.nombre||user.dip)}</strong>.</p>
+        <div class="form-group"><label for="ticketDesde">Desde</label><input type="date" id="ticketDesde" class="form-input" value="${esc(def.desde)}"></div>
+        <div class="form-group"><label for="ticketHasta">Hasta</label><input type="date" id="ticketHasta" class="form-input" value="${esc(def.hasta)}"></div>
+        <div class="admin-inline-status" id="ticketFechasStatus" role="status"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-ticket-cancel>Cancelar</button>
+        <button type="button" class="btn btn-primary" id="ticketFechasOk">Armar comprobante</button>
+      </div>
+    </div>`;
+    document.body.appendChild(overlay);
+    const close=val=>{ overlay.remove(); resolve(val); };
+    overlay.querySelector('.modal-close').onclick=()=>close(null);
+    overlay.querySelector('[data-ticket-cancel]').onclick=()=>close(null);
+    overlay.querySelector('#ticketFechasOk').onclick=()=>{
+      const desde=String(overlay.querySelector('#ticketDesde').value||'');
+      const hasta=String(overlay.querySelector('#ticketHasta').value||'');
+      const status=overlay.querySelector('#ticketFechasStatus');
+      if(!/^\d{4}-\d{2}-\d{2}$/.test(desde) || !/^\d{4}-\d{2}-\d{2}$/.test(hasta)){
+        status.textContent='Elegí las dos fechas.'; status.className='admin-inline-status show error'; return;
+      }
+      if(hasta<desde){
+        status.textContent='La fecha hasta no puede ser anterior a desde.'; status.className='admin-inline-status show error'; return;
+      }
+      close({desde,hasta});
+    };
+  });
+}
+function pedirFechaVence(user){
+  return new Promise(resolve=>{
+    const actual=isoDeFechaLocal(fechaTicketDesdeVence(user.membresia_vence)) || isoDeFechaLocal(new Date());
+    const overlay=document.createElement('div');
+    overlay.className='modal-overlay membership-modal-overlay';
+    overlay.innerHTML=`<div class="modal payment-modal" role="dialog" aria-modal="true">
+      <div class="modal-header"><h2>📆 Día de vencimiento</h2><button type="button" class="modal-close" aria-label="Cerrar">×</button></div>
+      <div class="modal-body">
+        <p>Elegí hasta qué día <strong>${esc(user.nombre||user.dip)}</strong> puede entrar a APPI.</p>
+        <div class="form-group"><label for="venceDia">Vence el</label><input type="date" id="venceDia" class="form-input" value="${esc(actual)}"></div>
+        <div class="admin-inline-status" id="venceDiaStatus" role="status"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-vence-cancel>Cancelar</button>
+        <button type="button" class="btn btn-primary" id="venceDiaOk">Guardar vencimiento</button>
+      </div>
+    </div>`;
+    document.body.appendChild(overlay);
+    const close=val=>{ overlay.remove(); resolve(val); };
+    overlay.querySelector('.modal-close').onclick=()=>close(null);
+    overlay.querySelector('[data-vence-cancel]').onclick=()=>close(null);
+    overlay.querySelector('#venceDiaOk').onclick=()=>{
+      const vence=String(overlay.querySelector('#venceDia').value||'');
+      const status=overlay.querySelector('#venceDiaStatus');
+      if(!/^\d{4}-\d{2}-\d{2}$/.test(vence)){
+        status.textContent='Elegí una fecha.'; status.className='admin-inline-status show error'; return;
+      }
+      close(vence);
+    };
+  });
+}
 async function enviarTicketWhatsApp(user){
+  const periodo=await pedirPeriodoTicket(user);
+  if(!periodo) return;
+  const desdeDt=fechaDeISOLocal(periodo.desde);
+  const hastaDt=fechaDeISOLocal(periodo.hasta);
+  if(!desdeDt||!hastaDt){
+    await window.APPIDialog.alert('Elegí las dos fechas del período.',{title:'Ticket',icon:'🎫'});
+    return;
+  }
   const hoy=new Date();
   const pagoTxt=fechaTicketTermico(hoy);
   const horaTxt=horaTicketTermico(hoy);
-  const info=membershipInfo(user);
-  let hastaTxt='';
-  let mesNom=mesTicketNom(hoy);
-  if(info.days>20000) hastaTxt='Para siempre';
-  else {
-    const dv=fechaTicketDesdeVence(user.membresia_vence);
-    if(!dv){ await window.APPIDialog.alert('Esta cuenta no tiene fecha de membresía. Dale 1 mes y después mandá el ticket.',{title:'Ticket',icon:'🎫'}); return; }
-    hastaTxt=fechaTicketTermico(dv);
-  }
+  const desdeTxt=fechaTicketTermico(desdeDt);
+  const hastaTxt=fechaTicketTermico(hastaDt);
+  const mesNom=mesTicketNom(hastaDt);
   const ultimo=ultimoPagoTicket(user);
   const montoTxt=moneyTicket(ultimo&&ultimo.monto?ultimo.monto:50000);
   const metodoTxt=metodoTicketNom(ultimo&&ultimo.metodo);
   const dip=user.dip||'—';
   const txn='#TXN-'+String(Date.now()).slice(-9);
   const nombre=user.nombre||'Sin nombre';
-  const titulo=`Comprobante APPI · ${nombre} · pagó ${pagoTxt} · membresía hasta ${hastaTxt}`;
+  const titulo=`Comprobante APPI · ${nombre} · ${desdeTxt} al ${hastaTxt}`;
   const fileName=`ticket-appi-${String(nombre).replace(/\s+/g,'-')}.png`;
   try{
-    const blob=await capturarTicketCine({nombre,dip,pagoTxt,horaTxt,hastaTxt,mesNom,montoTxt,metodoTxt,txn});
+    const blob=await capturarTicketCine({nombre,dip,pagoTxt,horaTxt,desdeTxt,hastaTxt,mesNom,montoTxt,metodoTxt,txn});
     await compartirImagenWhatsApp(blob,titulo,fileName);
   }catch(error){
     await window.APPIDialog.alert(error.message||'No se pudo armar el ticket.',{title:'Ticket',icon:'🎫'});
@@ -650,6 +746,18 @@ async function handleUserAction(button){
         await window.APPIDialog.alert('El sistema de membresías no está disponible.',{title:'Error',icon:'!'});
       }
       return;
+    }
+    if(action==='set_vence'){
+      const vence=await pedirFechaVence(user);
+      if(!vence) return;
+      const fecha=fechaDeISOLocal(vence);
+      const fechaTxt=fecha?fecha.toLocaleDateString('es-AR'):vence;
+      const ok=await window.APPIDialog.confirm(`${user.nombre||user.dip} va a poder entrar a APPI hasta el <b>${fechaTxt}</b>. ¿Confirmás?`,{title:'Día de vencimiento',icon:'📆',okText:'Guardar'});
+      if(!ok) return;
+      const data=await callAdmin({action:'set_vence',user_id:userId,vence});
+      const real=data&&data.expires_at?new Date(data.expires_at).toLocaleDateString('es-AR'):fechaTxt;
+      await window.APPIDialog.alert(`Listo: ${user.nombre||user.dip} vence el ${real}.`,{title:'Día de vencimiento',icon:'📆'});
+      await load();return;
     }
     if(action==='ticket'){
       await enviarTicketWhatsApp(user);
@@ -1156,7 +1264,7 @@ SOLICITUDES PENDIENTES
 Las personas que piden acceso desde la app aparecen acá. Al aprobar elegís 1 mes o PRUEBA, y podés mandar las credenciales por WhatsApp.
 
 CUENTAS (Distribuidores)
-La sección arranca minimizada con el resumen; tocala para abrir. Cada distribuidor es un renglón: tocalo y se despliegan todas sus acciones, cómodas y con nombre: 💬 WhatsApp (va directo si la cuenta tiene el número guardado — al aprobar una solicitud queda solo; con 📱 Teléfono lo cargás o corregís cuando quieras), 🎫 Ticket (manda el comprobante por WhatsApp, con fecha de pago y hasta cuándo vale), 💳 Registrar pago y 📅 Prórroga (ambos sacan del modo prueba solos), 🔑 Nueva contraseña, 👥 Personas, 🧪 Prueba 5 días, 📅 1 mes completo (suma un mes a lo que le queda, sin registrar un pago), ♾️ Para siempre (acceso permanente), Bloquear y Eliminar.
+La sección arranca minimizada con el resumen; tocala para abrir. Cada distribuidor es un renglón: tocalo y se despliegan todas sus acciones, cómodas y con nombre: 💬 WhatsApp (va directo si la cuenta tiene el número guardado — al aprobar una solicitud queda solo; con 📱 Teléfono lo cargás o corregís cuando quieras), 🎫 Ticket (elegís desde–hasta y salen en el comprobante), 📆 Vence el (elegís el día en que se le corta APPI), 💳 Registrar pago y 📅 Prórroga (ambos sacan del modo prueba solos), 🔑 Nueva contraseña, 👥 Personas, 🧪 Prueba 5 días, 📅 1 mes completo (suma un mes a lo que le queda, sin registrar un pago), ♾️ Para siempre (acceso permanente), Bloquear y Eliminar.
 
 CUMPLIMIENTO DIARIO
 Lo que cada cuenta marcó con ✓ y ✗ en sus acciones del día: hoy y últimos 7 días. La sección arranca minimizada con el resumen a la vista; tocala para abrir el detalle y usá el buscador por nombre o DIP.

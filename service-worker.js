@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v575-psa-auto';
+const CACHE_NAME = 'appi-v576-ticket-vence';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
