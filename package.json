@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "583.0.0",
-  "cacheName": "appi-v583-ficha-colores",
+  "version": "584.0.0",
+  "cacheName": "appi-v584-tarjeta-color",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {
