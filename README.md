@@ -4,6 +4,11 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v572 · Opciones de ingreso en Lista de precios
+- Chip **Opciones de ingreso** (Presentación oficial del Sitio Privado DIP) con los tres Kit de Acceso de la lista Argentina: Mini Bianco, Mini Nero y Portátil.
+- Mismo formato de cards: foto PCD, composición, precio Dist. Junior RI y popup al tocar la imagen.
+- Versión: **v572 · Segura** · Cache `appi-v572-opciones-ingreso`.
+
 ## v571 · Margarita más flor: pétalos más largos, tallo con dos hojitas y centrada
 - Los pétalos **sobresalen más** del centro dorado para que se lea como una flor abierta.
 - Suma **tallo verde con dos hojitas** debajo del círculo.

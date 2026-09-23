@@ -3,6 +3,54 @@
   "fuente": "https://tienda.psa.com.ar/",
   "productos": [
     {
+      "sku": "KIT-ACCESO-MINI-BIANCO",
+      "nombre": "KIT DE ACCESO C/MINI BIANCO ARG.",
+      "precio": 724790,
+      "lista": 599000,
+      "url": "https://dip.psa.com.ar/home/PN-ARG.php",
+      "grupo": "ingreso",
+      "plan_canje": null,
+      "seccion": "Opciones de ingreso",
+      "foto": "catalogo-img/ingreso/kit-acceso-mini-bianco.png",
+      "composicion": "Kit de Acceso + Mini Bianco + Kit Posventa",
+      "items_skus": [
+        "611030410"
+      ],
+      "desc": "Opción de ingreso al sistema PSA: Kit de Acceso (material de trabajo) más Mini Bianco con kit posventa. Lista oficial DIP Argentina, vigencia desde el 9 de septiembre de 2026."
+    },
+    {
+      "sku": "KIT-ACCESO-MINI-NERO",
+      "nombre": "KIT DE ACCESO C/MINI NERO ARG.",
+      "precio": 724790,
+      "lista": 599000,
+      "url": "https://dip.psa.com.ar/home/PN-ARG.php",
+      "grupo": "ingreso",
+      "plan_canje": null,
+      "seccion": "Opciones de ingreso",
+      "foto": "catalogo-img/ingreso/kit-acceso-mini-nero.png",
+      "composicion": "Kit de Acceso + Mini Nero + Kit Posventa",
+      "items_skus": [
+        "611030400"
+      ],
+      "desc": "Opción de ingreso al sistema PSA: Kit de Acceso (material de trabajo) más Mini Nero con kit posventa. Lista oficial DIP Argentina, vigencia desde el 9 de septiembre de 2026."
+    },
+    {
+      "sku": "KIT-ACCESO-PORTATIL",
+      "nombre": "KIT DE ACCESO C/PORTATIL ARG.",
+      "precio": 603790,
+      "lista": 499000,
+      "url": "https://dip.psa.com.ar/home/PN-ARG.php",
+      "grupo": "ingreso",
+      "plan_canje": null,
+      "seccion": "Opciones de ingreso",
+      "foto": "catalogo-img/ingreso/kit-acceso-portatil.png",
+      "composicion": "Kit de Acceso + Portátil",
+      "items_skus": [
+        "611020010"
+      ],
+      "desc": "Opción de ingreso al sistema PSA: Kit de Acceso (material de trabajo) más Portátil. Lista oficial DIP Argentina, vigencia desde el 9 de septiembre de 2026."
+    },
+    {
       "sku": "PACK-BASICO",
       "nombre": "PACK BÁSICO",
       "precio": 1376000,

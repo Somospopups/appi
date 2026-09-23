@@ -5008,6 +5008,96 @@
       },
       "publico_canje": null,
       "costos_canje": null
+    },
+    "KIT-ACCESO-MINI-BIANCO": {
+      "nombre": "KIT DE ACCESO C/MINI BIANCO ARG.",
+      "pb": null,
+      "publico": 724790,
+      "costos": {
+        "ri_j": 724790,
+        "ri_d": 724790,
+        "ri_c": 724790,
+        "nc_j": 800892.95,
+        "nc_d": 800892.95,
+        "nc_c": 800892.95
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:kit de acceso c/mini bianco arg.": {
+      "nombre": "KIT DE ACCESO C/MINI BIANCO ARG.",
+      "pb": null,
+      "publico": 724790,
+      "costos": {
+        "ri_j": 724790,
+        "ri_d": 724790,
+        "ri_c": 724790,
+        "nc_j": 800892.95,
+        "nc_d": 800892.95,
+        "nc_c": 800892.95
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "KIT-ACCESO-MINI-NERO": {
+      "nombre": "KIT DE ACCESO C/MINI NERO ARG.",
+      "pb": null,
+      "publico": 724790,
+      "costos": {
+        "ri_j": 724790,
+        "ri_d": 724790,
+        "ri_c": 724790,
+        "nc_j": 800892.95,
+        "nc_d": 800892.95,
+        "nc_c": 800892.95
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:kit de acceso c/mini nero arg.": {
+      "nombre": "KIT DE ACCESO C/MINI NERO ARG.",
+      "pb": null,
+      "publico": 724790,
+      "costos": {
+        "ri_j": 724790,
+        "ri_d": 724790,
+        "ri_c": 724790,
+        "nc_j": 800892.95,
+        "nc_d": 800892.95,
+        "nc_c": 800892.95
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "KIT-ACCESO-PORTATIL": {
+      "nombre": "KIT DE ACCESO C/PORTATIL ARG.",
+      "pb": null,
+      "publico": 603790,
+      "costos": {
+        "ri_j": 603790,
+        "ri_d": 603790,
+        "ri_c": 603790,
+        "nc_j": 667187.95,
+        "nc_d": 667187.95,
+        "nc_c": 667187.95
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "n:kit de acceso c/portatil arg.": {
+      "nombre": "KIT DE ACCESO C/PORTATIL ARG.",
+      "pb": null,
+      "publico": 603790,
+      "costos": {
+        "ri_j": 603790,
+        "ri_d": 603790,
+        "ri_c": 603790,
+        "nc_j": 667187.95,
+        "nc_d": 667187.95,
+        "nc_c": 667187.95
+      },
+      "publico_canje": null,
+      "costos_canje": null
     }
   }
 }

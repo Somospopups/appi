@@ -79,6 +79,7 @@
   var GRUPOS = [
     { id: 'todos', t: 'Todos' },
     { id: 'novedades', t: '✨ Novedades' },
+    { id: 'ingreso', t: 'Opciones de ingreso' },
     { id: 'packs', t: 'Packs PSA' },
     { id: 'Purificadores', t: 'Purificadores' },
     { id: 'Gasificador', t: 'Gasificador' },
@@ -95,6 +96,7 @@
   ];
   var GRUPO_TIT = {
     novedades: '✨ Novedades y Nuevos Lanzamientos',
+    ingreso: 'Opciones de ingreso',
     packs: 'Packs PSA',
     'Purificadores': 'Purificadores',
     'Gasificador': 'Gasificador',
@@ -852,7 +854,7 @@
           precioHtml = '<div class="lp-precio-promo-row"><s class="lp-precio-tachado">' + money(L.promo.precio_original) + '</s><em>' + money(L.precio) + '</em></div>';
         }
       }
-      var clsItem = 'lp-item' + (isPromo ? ' lp-promo-card' : (isNovedad ? ' lp-novedad-card' : '')) + (esCanje ? ' lp-canje' : '') + (L.grupo === 'packs' ? ' lp-item-is-pack' : '');
+      var clsItem = 'lp-item' + (isPromo ? ' lp-promo-card' : (isNovedad ? ' lp-novedad-card' : '')) + (esCanje ? ' lp-canje' : '') + ((L.grupo === 'packs' || L.grupo === 'ingreso') ? ' lp-item-is-pack' : '');
       html += '<div class="' + clsItem + '" data-sku="' + esc(L.clave) + '">' +
         fotoHtml +
         '<div class="lp-item-txt">' + novedadBadgeHtml + promoBadgeHtml + '<b>' + esc(L.nombre) + '</b><span>' + subTxt + '</span>' + descHtml + precioHtml + '</div>' +
@@ -2282,7 +2284,7 @@
         // Asegurar que los packs del catálogo local siempre estén presentes
         // incluso si catElegido proviene del storage de Supabase (que aún no tiene los packs sincronizados).
         if (fileCat && fileCat.productos && catElegido !== fileCat) {
-          var packsLocales = fileCat.productos.filter(function (p) { return p && p.grupo === 'packs'; });
+          var packsLocales = fileCat.productos.filter(function (p) { return p && (p.grupo === 'packs' || p.grupo === 'ingreso'); });
           var skusExistentes = {};
           catElegido.productos.forEach(function (p) { if (p && p.sku) skusExistentes[p.sku] = true; });
           packsLocales.forEach(function (pk) {
