@@ -13,6 +13,9 @@ test('Mi Margarita vive en Mi negocio, tiene ocho pétalos centrados y recuerda 
 
   const petalos = page.locator('[data-mg-group]');
   await expect(petalos).toHaveCount(8);
+  await expect(page.locator('.mg-stem')).toBeVisible();
+  await expect(page.locator('.mg-leaf-l')).toBeVisible();
+  await expect(page.locator('.mg-leaf-r')).toBeVisible();
   await expect(petalos.nth(0)).toContainText('Amigos');
   await expect(petalos.nth(7)).toContainText(/Clientes\s*PSA/);
 
@@ -51,11 +54,27 @@ test('Mi Margarita vive en Mi negocio, tiene ocho pétalos centrados y recuerda 
   }));
   expect(geometria).toHaveLength(8);
   geometria.forEach((p, i) => {
-    expect(p.origin).toMatch(/57px 180px/);
+    expect(p.origin).toMatch(/60px 208px/);
     expect(p.angle).toBe(`${i * 45}deg`);
     expect(p.counter).toBe(`-${i * 45}deg`);
     expect(p.outset).toBe('-78px');
   });
+
+  // Los 8 pétalos tienen que ABRIRSE en círculo (una margarita), no
+  // apilarse todos para el mismo lado. Cada uno ocupa un ángulo distinto.
+  const cajas = await page.locator('[data-mg-group]').evaluateAll(nodes => nodes.map(n => {
+    const r = n.getBoundingClientRect();
+    return { cx: r.left + r.width / 2, cy: r.top + r.height / 2 };
+  }));
+  const flower = await page.locator('.mg-flower').evaluate(n => {
+    const r = n.getBoundingClientRect();
+    return { cx: r.left + r.width / 2, cy: r.top + r.height / 2 };
+  });
+  const angulos = cajas.map(c => {
+    const a = Math.atan2(c.cy - flower.cy, c.cx - flower.cx) * 180 / Math.PI;
+    return Math.round(((a + 360) % 360) / 45) * 45 % 360;
+  });
+  expect(new Set(angulos).size).toBe(8);
 
   await page.evaluate(() => {
     const estado = window.APPIMargarita.cargar();

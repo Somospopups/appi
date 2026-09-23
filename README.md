@@ -4,6 +4,12 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v571 · Margarita más flor: pétalos más largos, tallo con dos hojitas y centrada
+- Los pétalos **sobresalen más** del centro dorado para que se lea como una flor abierta.
+- Suma **tallo verde con dos hojitas** debajo del círculo.
+- La flor baja un poco en la tarjeta: el espacio de arriba y el de abajo queda más parejo, y el tallo ocupa lo que sobraba abajo.
+- Versión: **v571 · Segura** · Cache `appi-v571-margarita-tallo`.
+
 ## v567 · Mi Margarita: fondo APPI y cielo difuminado
 - **Mi Margarita** conserva sus pétalos editables alineados directamente con el borde externo del centro, sin atravesarlo, con textos e íconos legibles en escritorio y móvil.
 - La vista ahora usa exactamente el fondo compartido de APPI y la tarjeta de la flor suma un cielo azul suave y difuminado para destacar los pétalos y sus textos.

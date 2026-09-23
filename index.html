@@ -153,7 +153,7 @@ window.openStock=function(){
 <script src="./qr-code.js"></script>
 <script src="./gestion-client.js?v=852"></script>
   <script src="./agenda-personal.js"></script>
-<script src="./margarita-contactos.js?v=570"></script>
+<script src="./margarita-contactos.js?v=571"></script>
 <script src="./tarjetas-promos.js"></script>
 <script src="./usuarios-botones.js?v=423"></script>
 <script src="./mensajes-hielo.js"></script>
@@ -4666,7 +4666,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v569 · Segura</div>
+  <div class="ds-foot">APPI · v571 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -14088,8 +14088,8 @@ function cerrarToolsMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='570';
-      const CACHE_NAME='appi-v570-margarita-flor-abierta';
+      const swVersion='571';
+      const CACHE_NAME='appi-v571-margarita-tallo';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
