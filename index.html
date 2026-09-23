@@ -145,7 +145,7 @@ window.openStock=function(){
 <script src="./prueba-banner.js"></script>
 <script src="./data-sync.js?v=835"></script>
 <script src="./js/membership-admin.js?v=581"></script>
-<script src="./admin-panel.js?v=582"></script>
+<script src="./admin-panel.js?v=583"></script>
 <script src="./js/compromiso-pago.js?v=777"></script>
 <link rel="stylesheet" href="./css/membership-admin.css">
 <link rel="stylesheet" href="./appi-tema.css?v=515">
@@ -6025,6 +6025,61 @@ body.dark .admin-user-row {
   border-color: rgba(11, 88, 120, 0.3) !important;
   transform: translateY(-1px);
 }
+
+/* Botones rápidos circulares sobre cada tarjeta (sin abrir la cuenta) */
+.admin-user-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.admin-user-main .admin-user-head {
+  flex: 1;
+  min-width: 0;
+}
+.admin-quick {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex: none;
+  padding-right: 2px;
+}
+.admin-quick-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid transparent;
+  display: grid;
+  place-items: center;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+  flex: none;
+}
+.admin-quick-btn:active { transform: scale(0.9); }
+.admin-quick-btn.accion-pago {
+  background: rgba(58, 208, 164, 0.14);
+  border-color: rgba(58, 208, 164, 0.4);
+}
+.admin-quick-btn.accion-vence {
+  background: rgba(91, 141, 239, 0.14);
+  border-color: rgba(91, 141, 239, 0.4);
+}
+body.dark .admin-quick-btn.accion-pago { background: rgba(58, 208, 164, 0.16); }
+body.dark .admin-quick-btn.accion-vence { background: rgba(130, 168, 255, 0.16); }
+
+/* Tarjeta coloreada según el estado de la cuenta */
+.admin-user-row { border-left-width: 4px !important; }
+.admin-user-row.admin-estado-activa { border-left-color: #2fbf8f !important; }
+.admin-user-row.admin-estado-bloqueada { border-left-color: #d9534f !important; background: rgba(217, 83, 79, 0.05) !important; }
+.admin-user-row.admin-estado-vencida { border-left-color: #d9534f !important; background: rgba(217, 83, 79, 0.04) !important; }
+.admin-user-row.admin-estado-por-vencer { border-left-color: #f5b301 !important; background: rgba(245, 179, 1, 0.06) !important; }
+.admin-user-row.admin-estado-prueba { border-left-color: #e02424 !important; background: rgba(224, 36, 36, 0.04) !important; }
+.admin-user-row.admin-estado-siempre { border-left-color: #c4a100 !important; }
+body.dark .admin-user-row.admin-estado-bloqueada,
+body.dark .admin-user-row.admin-estado-vencida { background: rgba(217, 83, 79, 0.1) !important; }
+body.dark .admin-user-row.admin-estado-por-vencer { background: rgba(245, 179, 1, 0.1) !important; }
+body.dark .admin-user-row.admin-estado-prueba { background: rgba(224, 36, 36, 0.08) !important; }
 
 .admin-user-head {
   display: flex !important;
@@ -14084,8 +14139,8 @@ function cerrarToolsMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-const swVersion='582';
-  const CACHE_NAME='appi-v582-panel-simple';
+const swVersion='583';
+  const CACHE_NAME='appi-v583-ficha-colores';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}

@@ -173,19 +173,10 @@ function renderUsers(){
     const diaPago = user.dia_pago;
     const tel = state.telefonos.get(user.user_id) || "";
     const tCuenta = tipoCuenta(user);
+    const estadoRow=!user.activo?'bloqueada':(state.pruebas.has(user.user_id)?'prueba':(membership.days<0?'vencida':(membership.days<=7?'por-vencer':(membership.days>20000?'siempre':'activa'))));
 
     const acciones = abierto ? `<div class="admin-ficha-clean">
-      <!-- LO DE TODOS LOS DÍAS: solo dos botones -->
-      <div class="admin-prio-actions">
-        <button type="button" class="admin-btn-hero-pago" data-admin-action="payment">
-          <span class="icon">💳</span> Registrar pago
-        </button>
-        <button type="button" class="admin-btn-hero-pago" data-admin-action="set_vence">
-          <span class="icon">📆</span> Vence el
-        </button>
-      </div>
-
-      <!-- EL RESTO, DETRÁS DE + MÁS ACCIONES -->
+      <!-- EL RESTO DE ACCIONES, DETRÁS DE + MÁS ACCIONES -->
       <details class="admin-danger-details">
         <summary>＋ Más acciones</summary>
         <div class="admin-danger-body">
@@ -237,13 +228,20 @@ function renderUsers(){
         </div>
       </details>
     </div>` : '';
-    return `<article class="admin-user-row" data-admin-user="${esc(user.user_id)}">
-      <button type="button" class="admin-user-head" data-user-toggle="${esc(user.user_id)}">
-        <div><h3>${esc(user.nombre||'Sin nombre')}${user.socio_nombre?` + ${esc(user.socio_nombre)}`:''}</h3>
-        <p>${esc(user.dip||'Sin número')} · Vence ${esc(expires)}${user.dia_pago?` · 💳 Día ${user.dia_pago}`:''}${state.telefonos.get(user.user_id)?` · 📱 ${esc(state.telefonos.get(user.user_id))}`:''}</p></div>
-        <span class="admin-user-badges"><span class="admin-user-badge ${user.activo?'':'blocked'}">${user.activo?'ACTIVA':'BLOQUEADA'}</span><span class="membership-state ${membership.cls}">${membership.label}</span></span>
-        <span class="admin-user-chev ${abierto?'open':''}">›</span>
-      </button>${acciones}</article>`}).join('');
+    return `<article class="admin-user-row admin-estado-${estadoRow}" data-admin-user="${esc(user.user_id)}">
+      <div class="admin-user-main">
+        <button type="button" class="admin-user-head" data-user-toggle="${esc(user.user_id)}">
+          <div><h3>${esc(user.nombre||'Sin nombre')}${user.socio_nombre?` + ${esc(user.socio_nombre)}`:''}</h3>
+          <p>${esc(user.dip||'Sin número')} · Vence ${esc(expires)}${user.dia_pago?` · 💳 Día ${user.dia_pago}`:''}${state.telefonos.get(user.user_id)?` · 📱 ${esc(state.telefonos.get(user.user_id))}`:''}</p></div>
+          <span class="admin-user-badges"><span class="admin-user-badge ${user.activo?'':'blocked'}">${user.activo?'ACTIVA':'BLOQUEADA'}</span><span class="membership-state ${membership.cls}">${membership.label}</span></span>
+          <span class="admin-user-chev ${abierto?'open':''}">›</span>
+        </button>
+        <span class="admin-quick">
+          <button type="button" class="admin-quick-btn accion-pago" data-admin-action="payment" title="Registrar pago" aria-label="Registrar pago">💳</button>
+          <button type="button" class="admin-quick-btn accion-vence" data-admin-action="set_vence" title="Cambiar vencimiento" aria-label="Cambiar vencimiento">📆</button>
+        </span>
+      </div>
+      ${acciones}</article>`}).join('');
   list.querySelectorAll('[data-user-toggle]').forEach(head=>head.onclick=()=>{
     const id=head.dataset.userToggle;
     state.userAbierto=state.userAbierto===id?'':id;
