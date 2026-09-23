@@ -1,5 +1,5 @@
 {
-  "actualizado": "22-Sep-2026",
+  "actualizado": "23-Sep-2026",
   "vigencia": "18-Sep-2026 al 23-Sep-2026",
   "fuente": "https://tienda.psa.com.ar/promociones_vigentes",
   "cuotas": [
@@ -32,8 +32,7 @@
       "cuotas": [
         6,
         9,
-        12,
-        18
+        12
       ],
       "tarjetas": "Naranja"
     },
@@ -44,7 +43,9 @@
         3,
         6,
         9,
-        12
+        12,
+        15,
+        18
       ],
       "tarjetas": "Visa, Mastercard, American Express"
     },
@@ -57,8 +58,7 @@
         9,
         12,
         15,
-        18,
-        24
+        18
       ],
       "tarjetas": "Visa, Mastercard"
     },
