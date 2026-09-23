@@ -57,9 +57,9 @@ test('la lista de precios muestra Opciones de ingreso con foto y precio oficial'
   await expect(chip).toHaveText('Opciones de ingreso');
   await chip.click();
 
-  await expect(page.locator('.lp-item')).toHaveCount(25);
-  await expect(page.locator('#lpList')).toContainText('KIT DE ACCESO C/MINI BIANCO');
-  await expect(page.locator('#lpList')).toContainText('KIT DE ACCESO C/PORTATIL');
+  await expect(page.locator('.lp-item')).toHaveCount(22);
+  await expect(page.locator('#lpList')).not.toContainText('KIT DE ACCESO C/MINI BIANCO');
+  await expect(page.locator('#lpList')).not.toContainText('KIT DE ACCESO C/PORTATIL');
   await expect(page.locator('#lpList')).toContainText('9.90 PB');
   await expect(page.locator('#lpList')).toContainText('3.30 PB');
   await expect(page.locator('#lpList')).toContainText('Senior4 Nero');
@@ -78,5 +78,5 @@ test('la lista de precios muestra Opciones de ingreso con foto y precio oficial'
 
   await img.click();
   await expect(page.locator('#lpFotoModal.open')).toBeVisible();
-  await expect(page.locator('#lpFotoModalTit')).toContainText('KIT DE ACCESO');
+  await expect(page.locator('#lpFotoModalTit')).toContainText('Senior4 Nero');
 });

@@ -4,6 +4,11 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v574 · Opciones de ingreso: solo las 22 del flyer
+- Se **sacaron** los 3 Kit de Acceso de la lista (Mini Bianco, Mini Nero y Portátil).
+- Quedan **solo las 22** combinaciones del flyer oficial (11 Portátil + 11 Mini), con foto de combo y badge de PB.
+- Versión: **v574 · Segura** · Cache `appi-v574-opciones-ingreso`.
+
 ## v573 · Las 22 opciones de ingreso del flyer oficial
 - Chip **Opciones de ingreso** con las **22 combinaciones** del flyer *Opciones de ingreso al sistema* (Argentina, vigencia 9-sep-2026): 11 con Kit de Acceso Portátil y 11 con Kit de Acceso Mini.
 - Fotos recortadas del flyer (combo + badge de PB), mismo formato de cards, precio Dist. Junior RI (categorizado) y popup al tocar la imagen.
