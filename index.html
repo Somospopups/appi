@@ -5855,6 +5855,13 @@ body.dark #pageTabs button.active{color:#c5d6ff}
     display:grid;place-items:center;line-height:1;
   }
   .admin-tab-badge[hidden]{display:none!important}
+  .admin-ver-pill{
+    position:relative;z-index:1;flex:none;margin-left:auto;
+    padding:3px 7px;border-radius:999px;
+    background:rgba(40,36,28,.06);color:#777887;
+    font-size:10px;font-weight:850;letter-spacing:.2px;line-height:1;
+  }
+  body.dark .admin-ver-pill{background:rgba(255,255,255,.09);color:#b7b8c4}
   @media(min-width:1024px){
     #adminTabs{max-width:640px}
     .admin-fab{right:calc(50% - 560px + 18px)}
@@ -6633,6 +6640,7 @@ body.dark .admin-sec-btn.danger {
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
         <span>Más</span>
       </button>
+      <span class="admin-ver-pill" id="adminVersionPill" title="Versión de APPI">v—</span>
     </nav>
   </section>
 
@@ -14140,11 +14148,12 @@ function cerrarToolsMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-const swVersion='585';
-  const CACHE_NAME='appi-v585-color-fuerte';
+const swVersion='586';
+  const CACHE_NAME='appi-v586-pill-version';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
+      try{ const _ap=document.getElementById('adminVersionPill'); if(_ap) _ap.textContent='v'+swVersion; }catch(e){}
       try{
         const seen=localStorage.getItem('appi_seen_version');
         if(seen && seen!==swVersion){
