@@ -1,5 +1,5 @@
 {
-  "actualizado": "22-Sep-2026",
+  "actualizado": "23-Sep-2026",
   "fuente": "https://tienda.psa.com.ar/",
   "productos": [
     {
@@ -49,6 +49,363 @@
         "611020010"
       ],
       "desc": "Opción de ingreso al sistema PSA: Kit de Acceso (material de trabajo) más Portátil. Lista oficial DIP Argentina, vigencia desde el 9 de septiembre de 2026."
+    },
+    {
+      "sku": "ING-P-S4-NERO",
+      "nombre": "INGRESO BÁSICO · Senior4 Nero (3.30 PB)",
+      "precio": 1216050,
+      "lista": 1216050,
+      "url": "https://dip.psa.com.ar/home/PN-ARG.php",
+      "grupo": "ingreso",
+      "plan_canje": null,
+      "seccion": "Opciones de ingreso",
+      "foto": "catalogo-img/ingreso/ing-p-s4-nero.jpg",
+      "composicion": "Kit de Acceso Portátil + 1 PSA Senior4 Nero c/Kit Posventa",
+      "items_skus": [
+        "611010530"
+      ],
+      "desc": "Opción de ingreso al sistema PSA (flyer oficial Argentina, vigencia 9-sep-2026). 3.30 PB. Contado categorizado (Dist. Junior RI). Kit de Acceso Portátil."
+    },
+    {
+      "sku": "ING-P-S4-BIANCO",
+      "nombre": "INGRESO BÁSICO · Senior4 Bianco (3.30 PB)",
+      "precio": 1216050,
+      "lista": 1216050,
+      "url": "https://dip.psa.com.ar/home/PN-ARG.php",
+      "grupo": "ingreso",
+      "plan_canje": null,
+      "seccion": "Opciones de ingreso",
+      "foto": "catalogo-img/ingreso/ing-p-s4-bianco.jpg",
+      "composicion": "Kit de Acceso Portátil + 1 PSA Senior4 Bianco c/Kit Posventa",
+      "items_skus": [
+        "611010510"
+      ],
+      "desc": "Opción de ingreso al sistema PSA (flyer oficial Argentina, vigencia 9-sep-2026). 3.30 PB. Contado categorizado (Dist. Junior RI). Kit de Acceso Portátil."
+    },
+    {
+      "sku": "ING-P-SENIOR-BIANCO",
+      "nombre": "INGRESO BÁSICO · Senior Bianco (2.70 PB)",
+      "precio": 1105940,
+      "lista": 1105940,
+      "url": "https://dip.psa.com.ar/home/PN-ARG.php",
+      "grupo": "ingreso",
+      "plan_canje": null,
+      "seccion": "Opciones de ingreso",
+      "foto": "catalogo-img/ingreso/ing-p-senior-bianco.jpg",
+      "composicion": "Kit de Acceso Portátil + 1 PSA Senior Bianco c/Kit Posventa",
+      "items_skus": [
+        "611010580"
+      ],
+      "desc": "Opción de ingreso al sistema PSA (flyer oficial Argentina, vigencia 9-sep-2026). 2.70 PB. Contado categorizado (Dist. Junior RI). Kit de Acceso Portátil."
+    },
+    {
+      "sku": "ING-P-VERO-BIANCO",
+      "nombre": "INGRESO BÁSICO · Vero Bianco (1.45 PB)",
+      "precio": 930490,
+      "lista": 930490,
+      "url": "https://dip.psa.com.ar/home/PN-ARG.php",
+      "grupo": "ingreso",
+      "plan_canje": null,
+      "seccion": "Opciones de ingreso",
+      "foto": "catalogo-img/ingreso/ing-p-vero-bianco.jpg",
+      "composicion": "Kit de Acceso Portátil + 1 PSA Vero Bianco c/Kit Posventa",
+      "items_skus": [
+        "611030420"
+      ],
+      "desc": "Opción de ingreso al sistema PSA (flyer oficial Argentina, vigencia 9-sep-2026). 1.45 PB. Contado categorizado (Dist. Junior RI). Kit de Acceso Portátil."
+    },
+    {
+      "sku": "ING-P-S1000-BIANCO",
+      "nombre": "INGRESO BÁSICO · S-1000 II SM Bianco (3.45 PB)",
+      "precio": 1381820,
+      "lista": 1381820,
+      "url": "https://dip.psa.com.ar/home/PN-ARG.php",
+      "grupo": "ingreso",
+      "plan_canje": null,
+      "seccion": "Opciones de ingreso",
+      "foto": "catalogo-img/ingreso/ing-p-s1000-bianco.jpg",
+      "composicion": "Kit de Acceso Portátil + 1 PSA S-1000 II SM Bianco c/Kit Posventa",
+      "items_skus": [
+        "611120200"
+      ],
+      "desc": "Opción de ingreso al sistema PSA (flyer oficial Argentina, vigencia 9-sep-2026). 3.45 PB. Contado categorizado (Dist. Junior RI). Kit de Acceso Portátil."
+    },
+    {
+      "sku": "ING-P-SENIK-BIANCO",
+      "nombre": "INGRESO BÁSICO · Senik Bianco (3.75 PB)",
+      "precio": 1516130,
+      "lista": 1516130,
+      "url": "https://dip.psa.com.ar/home/PN-ARG.php",
+      "grupo": "ingreso",
+      "plan_canje": null,
+      "seccion": "Opciones de ingreso",
+      "foto": "catalogo-img/ingreso/ing-p-senik-bianco.jpg",
+      "composicion": "Kit de Acceso Portátil + 1 PSA Senik Bianco c/Kit Posventa",
+      "items_skus": [
+        "611030540"
+      ],
+      "desc": "Opción de ingreso al sistema PSA (flyer oficial Argentina, vigencia 9-sep-2026). 3.75 PB. Contado categorizado (Dist. Junior RI). Kit de Acceso Portátil."
+    },
+    {
+      "sku": "ING-P-4xS4-BIANCO",
+      "nombre": "INGRESO 13 PB · 4 Senior4 Bianco (13.20 PB)",
+      "precio": 3052830,
+      "lista": 3052830,
+      "url": "https://dip.psa.com.ar/home/PN-ARG.php",
+      "grupo": "ingreso",
+      "plan_canje": null,
+      "seccion": "Opciones de ingreso",
+      "foto": "catalogo-img/ingreso/ing-p-4xs4-bianco.jpg",
+      "composicion": "Kit de Acceso Portátil + 4 PSA Senior4 Bianco c/Kit Posventa",
+      "items_skus": [
+        "611010510"
+      ],
+      "desc": "Opción de ingreso al sistema PSA (flyer oficial Argentina, vigencia 9-sep-2026). 13.20 PB. Contado categorizado (Dist. Junior RI). Kit de Acceso Portátil."
+    },
+    {
+      "sku": "ING-P-3SEN-2S4",
+      "nombre": "INGRESO 13 PB · 3 Senior + 2 Senior4 (14.70 PB)",
+      "precio": 3334760,
+      "lista": 3334760,
+      "url": "https://dip.psa.com.ar/home/PN-ARG.php",
+      "grupo": "ingreso",
+      "plan_canje": null,
+      "seccion": "Opciones de ingreso",
+      "foto": "catalogo-img/ingreso/ing-p-3sen-2s4.jpg",
+      "composicion": "Kit de Acceso Portátil + 3 PSA Senior Bianco c/Kit Posventa + 2 PSA Senior4 Bianco c/Kit Posventa",
+      "items_skus": [
+        "611010580",
+        "611010510"
+      ],
+      "desc": "Opción de ingreso al sistema PSA (flyer oficial Argentina, vigencia 9-sep-2026). 14.70 PB. Contado categorizado (Dist. Junior RI). Kit de Acceso Portátil."
+    },
+    {
+      "sku": "ING-P-3S4-SEN-RIN",
+      "nombre": "INGRESO 13 PB · 3 Senior4 + Senior + Rinnova (13.75 PB)",
+      "precio": 3160520,
+      "lista": 3160520,
+      "url": "https://dip.psa.com.ar/home/PN-ARG.php",
+      "grupo": "ingreso",
+      "plan_canje": null,
+      "seccion": "Opciones de ingreso",
+      "foto": "catalogo-img/ingreso/ing-p-3s4-sen-rin.jpg",
+      "composicion": "Kit de Acceso Portátil + 3 PSA Senior4 Bianco c/Kit Posventa + 1 PSA Senior Bianco c/Kit Posventa + 1 PSA Rinnova",
+      "items_skus": [
+        "611010510",
+        "611010580"
+      ],
+      "desc": "Opción de ingreso al sistema PSA (flyer oficial Argentina, vigencia 9-sep-2026). 13.75 PB. Contado categorizado (Dist. Junior RI). Kit de Acceso Portátil."
+    },
+    {
+      "sku": "ING-P-3S4-DUCHA-BURBY-RIN",
+      "nombre": "INGRESO 13 PB · 3 Senior4 + Ducha + Sodaburby + Rinnova (13.75 PB)",
+      "precio": 3123010,
+      "lista": 3123010,
+      "url": "https://dip.psa.com.ar/home/PN-ARG.php",
+      "grupo": "ingreso",
+      "plan_canje": null,
+      "seccion": "Opciones de ingreso",
+      "foto": "catalogo-img/ingreso/ing-p-3s4-ducha-burby-rin.jpg",
+      "composicion": "Kit de Acceso Portátil + 3 PSA Senior4 Bianco c/Kit Posventa + 1 PSA Ducha II Grigio + 1 PSA Sodaburby Bianco + 1 PSA Rinnova",
+      "items_skus": [
+        "611010510"
+      ],
+      "desc": "Opción de ingreso al sistema PSA (flyer oficial Argentina, vigencia 9-sep-2026). 13.75 PB. Contado categorizado (Dist. Junior RI). Kit de Acceso Portátil."
+    },
+    {
+      "sku": "ING-P-3xS4-BIANCO",
+      "nombre": "INGRESO 9 PB · 3 Senior4 Bianco (9.90 PB)",
+      "precio": 2440570,
+      "lista": 2440570,
+      "url": "https://dip.psa.com.ar/home/PN-ARG.php",
+      "grupo": "ingreso",
+      "plan_canje": null,
+      "seccion": "Opciones de ingreso",
+      "foto": "catalogo-img/ingreso/ing-p-3xs4-bianco.jpg",
+      "composicion": "Kit de Acceso Portátil + 3 PSA Senior4 Bianco c/Kit Posventa",
+      "items_skus": [
+        "611010510"
+      ],
+      "desc": "Opción de ingreso al sistema PSA (flyer oficial Argentina, vigencia 9-sep-2026). 9.90 PB. Contado categorizado (Dist. Junior RI). Kit de Acceso Portátil."
+    },
+    {
+      "sku": "ING-M-S4-NERO",
+      "nombre": "INGRESO BÁSICO · Senior4 Nero + Mini (3.30 PB)",
+      "precio": 1337050,
+      "lista": 1337050,
+      "url": "https://dip.psa.com.ar/home/PN-ARG.php",
+      "grupo": "ingreso",
+      "plan_canje": null,
+      "seccion": "Opciones de ingreso",
+      "foto": "catalogo-img/ingreso/ing-m-s4-nero.jpg",
+      "composicion": "Kit de Acceso Mini + 1 PSA Senior4 Nero c/Kit Posventa",
+      "items_skus": [
+        "611010530"
+      ],
+      "desc": "Opción de ingreso al sistema PSA (flyer oficial Argentina, vigencia 9-sep-2026). 3.30 PB. Contado categorizado (Dist. Junior RI). Kit de Acceso Mini."
+    },
+    {
+      "sku": "ING-M-S4-BIANCO",
+      "nombre": "INGRESO BÁSICO · Senior4 Bianco + Mini (3.30 PB)",
+      "precio": 1337050,
+      "lista": 1337050,
+      "url": "https://dip.psa.com.ar/home/PN-ARG.php",
+      "grupo": "ingreso",
+      "plan_canje": null,
+      "seccion": "Opciones de ingreso",
+      "foto": "catalogo-img/ingreso/ing-m-s4-bianco.jpg",
+      "composicion": "Kit de Acceso Mini + 1 PSA Senior4 Bianco c/Kit Posventa",
+      "items_skus": [
+        "611010510"
+      ],
+      "desc": "Opción de ingreso al sistema PSA (flyer oficial Argentina, vigencia 9-sep-2026). 3.30 PB. Contado categorizado (Dist. Junior RI). Kit de Acceso Mini."
+    },
+    {
+      "sku": "ING-M-SENIOR-BIANCO",
+      "nombre": "INGRESO BÁSICO · Senior Bianco + Mini (2.70 PB)",
+      "precio": 1226940,
+      "lista": 1226940,
+      "url": "https://dip.psa.com.ar/home/PN-ARG.php",
+      "grupo": "ingreso",
+      "plan_canje": null,
+      "seccion": "Opciones de ingreso",
+      "foto": "catalogo-img/ingreso/ing-m-senior-bianco.jpg",
+      "composicion": "Kit de Acceso Mini + 1 PSA Senior Bianco c/Kit Posventa",
+      "items_skus": [
+        "611010580"
+      ],
+      "desc": "Opción de ingreso al sistema PSA (flyer oficial Argentina, vigencia 9-sep-2026). 2.70 PB. Contado categorizado (Dist. Junior RI). Kit de Acceso Mini."
+    },
+    {
+      "sku": "ING-M-VERO-BIANCO",
+      "nombre": "INGRESO BÁSICO · Vero Bianco + Mini (1.45 PB)",
+      "precio": 1051490,
+      "lista": 1051490,
+      "url": "https://dip.psa.com.ar/home/PN-ARG.php",
+      "grupo": "ingreso",
+      "plan_canje": null,
+      "seccion": "Opciones de ingreso",
+      "foto": "catalogo-img/ingreso/ing-m-vero-bianco.jpg",
+      "composicion": "Kit de Acceso Mini + 1 PSA Vero Bianco c/Kit Posventa",
+      "items_skus": [
+        "611030420"
+      ],
+      "desc": "Opción de ingreso al sistema PSA (flyer oficial Argentina, vigencia 9-sep-2026). 1.45 PB. Contado categorizado (Dist. Junior RI). Kit de Acceso Mini."
+    },
+    {
+      "sku": "ING-M-S1000-BIANCO",
+      "nombre": "INGRESO BÁSICO · S-1000 II SM Bianco + Mini (3.45 PB)",
+      "precio": 1502820,
+      "lista": 1502820,
+      "url": "https://dip.psa.com.ar/home/PN-ARG.php",
+      "grupo": "ingreso",
+      "plan_canje": null,
+      "seccion": "Opciones de ingreso",
+      "foto": "catalogo-img/ingreso/ing-m-s1000-bianco.jpg",
+      "composicion": "Kit de Acceso Mini + 1 PSA S-1000 II SM Bianco c/Kit Posventa",
+      "items_skus": [
+        "611120200"
+      ],
+      "desc": "Opción de ingreso al sistema PSA (flyer oficial Argentina, vigencia 9-sep-2026). 3.45 PB. Contado categorizado (Dist. Junior RI). Kit de Acceso Mini."
+    },
+    {
+      "sku": "ING-M-SENIK-BIANCO",
+      "nombre": "INGRESO BÁSICO · Senik Bianco + Mini (3.75 PB)",
+      "precio": 1637130,
+      "lista": 1637130,
+      "url": "https://dip.psa.com.ar/home/PN-ARG.php",
+      "grupo": "ingreso",
+      "plan_canje": null,
+      "seccion": "Opciones de ingreso",
+      "foto": "catalogo-img/ingreso/ing-m-senik-bianco.jpg",
+      "composicion": "Kit de Acceso Mini + 1 PSA Senik Bianco c/Kit Posventa",
+      "items_skus": [
+        "611030540"
+      ],
+      "desc": "Opción de ingreso al sistema PSA (flyer oficial Argentina, vigencia 9-sep-2026). 3.75 PB. Contado categorizado (Dist. Junior RI). Kit de Acceso Mini."
+    },
+    {
+      "sku": "ING-M-4xS4-BIANCO",
+      "nombre": "INGRESO 13 PB · 4 Senior4 Bianco + Mini (13.20 PB)",
+      "precio": 3173830,
+      "lista": 3173830,
+      "url": "https://dip.psa.com.ar/home/PN-ARG.php",
+      "grupo": "ingreso",
+      "plan_canje": null,
+      "seccion": "Opciones de ingreso",
+      "foto": "catalogo-img/ingreso/ing-m-4xs4-bianco.jpg",
+      "composicion": "Kit de Acceso Mini + 4 PSA Senior4 Bianco c/Kit Posventa",
+      "items_skus": [
+        "611010510"
+      ],
+      "desc": "Opción de ingreso al sistema PSA (flyer oficial Argentina, vigencia 9-sep-2026). 13.20 PB. Contado categorizado (Dist. Junior RI). Kit de Acceso Mini."
+    },
+    {
+      "sku": "ING-M-3SEN-2S4",
+      "nombre": "INGRESO 13 PB · 3 Senior + 2 Senior4 + Mini (14.70 PB)",
+      "precio": 3455760,
+      "lista": 3455760,
+      "url": "https://dip.psa.com.ar/home/PN-ARG.php",
+      "grupo": "ingreso",
+      "plan_canje": null,
+      "seccion": "Opciones de ingreso",
+      "foto": "catalogo-img/ingreso/ing-m-3sen-2s4.jpg",
+      "composicion": "Kit de Acceso Mini + 3 PSA Senior Bianco c/Kit Posventa + 2 PSA Senior4 Bianco c/Kit Posventa",
+      "items_skus": [
+        "611010580",
+        "611010510"
+      ],
+      "desc": "Opción de ingreso al sistema PSA (flyer oficial Argentina, vigencia 9-sep-2026). 14.70 PB. Contado categorizado (Dist. Junior RI). Kit de Acceso Mini."
+    },
+    {
+      "sku": "ING-M-3S4-SEN-RIN",
+      "nombre": "INGRESO 13 PB · 3 Senior4 + Senior + Rinnova + Mini (13.75 PB)",
+      "precio": 3281520,
+      "lista": 3281520,
+      "url": "https://dip.psa.com.ar/home/PN-ARG.php",
+      "grupo": "ingreso",
+      "plan_canje": null,
+      "seccion": "Opciones de ingreso",
+      "foto": "catalogo-img/ingreso/ing-m-3s4-sen-rin.jpg",
+      "composicion": "Kit de Acceso Mini + 3 PSA Senior4 Bianco c/Kit Posventa + 1 PSA Senior Bianco c/Kit Posventa + 1 PSA Rinnova",
+      "items_skus": [
+        "611010510",
+        "611010580"
+      ],
+      "desc": "Opción de ingreso al sistema PSA (flyer oficial Argentina, vigencia 9-sep-2026). 13.75 PB. Contado categorizado (Dist. Junior RI). Kit de Acceso Mini."
+    },
+    {
+      "sku": "ING-M-3S4-C3-BURBY-RIN",
+      "nombre": "INGRESO 13 PB · 3 Senior4 + C3 + Sodaburby + Rinnova + Mini (13.75 PB)",
+      "precio": 3244010,
+      "lista": 3244010,
+      "url": "https://dip.psa.com.ar/home/PN-ARG.php",
+      "grupo": "ingreso",
+      "plan_canje": null,
+      "seccion": "Opciones de ingreso",
+      "foto": "catalogo-img/ingreso/ing-m-3s4-c3-burby-rin.jpg",
+      "composicion": "Kit de Acceso Mini + 3 PSA Senior4 Bianco c/Kit Posventa + 1 PSA Rinnova + 1 PSA Sodaburby Bianco + 1 PSA C3 Grigio",
+      "items_skus": [
+        "611010510",
+        "611030430"
+      ],
+      "desc": "Opción de ingreso al sistema PSA (flyer oficial Argentina, vigencia 9-sep-2026). 13.75 PB. Contado categorizado (Dist. Junior RI). Kit de Acceso Mini."
+    },
+    {
+      "sku": "ING-M-3xS4-BIANCO",
+      "nombre": "INGRESO 9 PB · 3 Senior4 Bianco + Mini (9.90 PB)",
+      "precio": 2561570,
+      "lista": 2561570,
+      "url": "https://dip.psa.com.ar/home/PN-ARG.php",
+      "grupo": "ingreso",
+      "plan_canje": null,
+      "seccion": "Opciones de ingreso",
+      "foto": "catalogo-img/ingreso/ing-m-3xs4-bianco.jpg",
+      "composicion": "Kit de Acceso Mini + 3 PSA Senior4 Bianco c/Kit Posventa",
+      "items_skus": [
+        "611010510"
+      ],
+      "desc": "Opción de ingreso al sistema PSA (flyer oficial Argentina, vigencia 9-sep-2026). 9.90 PB. Contado categorizado (Dist. Junior RI). Kit de Acceso Mini."
     },
     {
       "sku": "PACK-BASICO",

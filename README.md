@@ -4,6 +4,12 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v573 · Las 22 opciones de ingreso del flyer oficial
+- Chip **Opciones de ingreso** con las **22 combinaciones** del flyer *Opciones de ingreso al sistema* (Argentina, vigencia 9-sep-2026): 11 con Kit de Acceso Portátil y 11 con Kit de Acceso Mini.
+- Fotos recortadas del flyer (combo + badge de PB), mismo formato de cards, precio Dist. Junior RI (categorizado) y popup al tocar la imagen.
+- Se conservan los 3 Kit de Acceso oficiales de la lista (Mini Bianco, Mini Nero y Portátil).
+- Versión: **v573 · Segura** · Cache `appi-v573-opciones-ingreso-22`.
+
 ## v572 · Opciones de ingreso en Lista de precios
 - Chip **Opciones de ingreso** (Presentación oficial del Sitio Privado DIP) con los tres Kit de Acceso de la lista Argentina: Mini Bianco, Mini Nero y Portátil.
 - Mismo formato de cards: foto PCD, composición, precio Dist. Junior RI y popup al tocar la imagen.

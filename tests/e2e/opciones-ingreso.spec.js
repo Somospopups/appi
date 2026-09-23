@@ -57,13 +57,16 @@ test('la lista de precios muestra Opciones de ingreso con foto y precio oficial'
   await expect(chip).toHaveText('Opciones de ingreso');
   await chip.click();
 
-  await expect(page.locator('.lp-item')).toHaveCount(3);
+  await expect(page.locator('.lp-item')).toHaveCount(25);
   await expect(page.locator('#lpList')).toContainText('KIT DE ACCESO C/MINI BIANCO');
-  await expect(page.locator('#lpList')).toContainText('KIT DE ACCESO C/MINI NERO');
   await expect(page.locator('#lpList')).toContainText('KIT DE ACCESO C/PORTATIL');
-  await expect(page.locator('#lpList')).toContainText('Kit de Acceso + Mini Bianco');
-  await expect(page.locator('#lpList')).toContainText('$724.790');
-  await expect(page.locator('#lpList')).toContainText('$603.790');
+  await expect(page.locator('#lpList')).toContainText('9.90 PB');
+  await expect(page.locator('#lpList')).toContainText('3.30 PB');
+  await expect(page.locator('#lpList')).toContainText('Senior4 Nero');
+  await expect(page.locator('#lpList')).toContainText('Kit de Acceso Mini');
+  await expect(page.locator('#lpList')).toContainText('Kit de Acceso Portátil');
+  await expect(page.locator('#lpList')).toContainText('$2.440.570');
+  await expect(page.locator('#lpList')).toContainText('$1.216.050');
 
   const img = page.locator('.lp-item .lp-item-foto').first();
   await expect(img).toBeVisible();

@@ -1,5 +1,5 @@
 {
-  "actualizado": "16-SEP-2026",
+  "actualizado": "23-Sep-2026",
   "vigencia": "9-SEP-2026",
   "fuente": {
     "contado": "https://dip.psa.com.ar/adjuntos/Image/promociones/exterior/listas-precios/vigente/argentina/argentina-contado-unificado.pdf",
@@ -5095,6 +5095,336 @@
         "nc_j": 667187.95,
         "nc_d": 667187.95,
         "nc_c": 667187.95
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "ING-P-S4-NERO": {
+      "nombre": "INGRESO BÁSICO · Senior4 Nero (3.30 PB)",
+      "pb": 3.3,
+      "publico": 1216050,
+      "costos": {
+        "ri_j": 1216050,
+        "ri_d": 1216050,
+        "ri_c": 1216050,
+        "nc_j": 1343735,
+        "nc_d": 1343735,
+        "nc_c": 1343735
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "ING-P-S4-BIANCO": {
+      "nombre": "INGRESO BÁSICO · Senior4 Bianco (3.30 PB)",
+      "pb": 3.3,
+      "publico": 1216050,
+      "costos": {
+        "ri_j": 1216050,
+        "ri_d": 1216050,
+        "ri_c": 1216050,
+        "nc_j": 1343735,
+        "nc_d": 1343735,
+        "nc_c": 1343735
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "ING-P-SENIOR-BIANCO": {
+      "nombre": "INGRESO BÁSICO · Senior Bianco (2.70 PB)",
+      "pb": 2.7,
+      "publico": 1105940,
+      "costos": {
+        "ri_j": 1105940,
+        "ri_d": 1105940,
+        "ri_c": 1105940,
+        "nc_j": 1222064,
+        "nc_d": 1222064,
+        "nc_c": 1222064
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "ING-P-VERO-BIANCO": {
+      "nombre": "INGRESO BÁSICO · Vero Bianco (1.45 PB)",
+      "pb": 1.45,
+      "publico": 930490,
+      "costos": {
+        "ri_j": 930490,
+        "ri_d": 930490,
+        "ri_c": 930490,
+        "nc_j": 1028191,
+        "nc_d": 1028191,
+        "nc_c": 1028191
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "ING-P-S1000-BIANCO": {
+      "nombre": "INGRESO BÁSICO · S-1000 II SM Bianco (3.45 PB)",
+      "pb": 3.45,
+      "publico": 1381820,
+      "costos": {
+        "ri_j": 1381820,
+        "ri_d": 1381820,
+        "ri_c": 1381820,
+        "nc_j": 1526911,
+        "nc_d": 1526911,
+        "nc_c": 1526911
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "ING-P-SENIK-BIANCO": {
+      "nombre": "INGRESO BÁSICO · Senik Bianco (3.75 PB)",
+      "pb": 3.75,
+      "publico": 1516130,
+      "costos": {
+        "ri_j": 1516130,
+        "ri_d": 1516130,
+        "ri_c": 1516130,
+        "nc_j": 1675324,
+        "nc_d": 1675324,
+        "nc_c": 1675324
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "ING-P-4xS4-BIANCO": {
+      "nombre": "INGRESO 13 PB · 4 Senior4 Bianco (13.20 PB)",
+      "pb": 13.2,
+      "publico": 3052830,
+      "costos": {
+        "ri_j": 3052830,
+        "ri_d": 3052830,
+        "ri_c": 3052830,
+        "nc_j": 3373377,
+        "nc_d": 3373377,
+        "nc_c": 3373377
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "ING-P-3SEN-2S4": {
+      "nombre": "INGRESO 13 PB · 3 Senior + 2 Senior4 (14.70 PB)",
+      "pb": 14.7,
+      "publico": 3334760,
+      "costos": {
+        "ri_j": 3334760,
+        "ri_d": 3334760,
+        "ri_c": 3334760,
+        "nc_j": 3684910,
+        "nc_d": 3684910,
+        "nc_c": 3684910
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "ING-P-3S4-SEN-RIN": {
+      "nombre": "INGRESO 13 PB · 3 Senior4 + Senior + Rinnova (13.75 PB)",
+      "pb": 13.75,
+      "publico": 3160520,
+      "costos": {
+        "ri_j": 3160520,
+        "ri_d": 3160520,
+        "ri_c": 3160520,
+        "nc_j": 3492375,
+        "nc_d": 3492375,
+        "nc_c": 3492375
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "ING-P-3S4-DUCHA-BURBY-RIN": {
+      "nombre": "INGRESO 13 PB · 3 Senior4 + Ducha + Sodaburby + Rinnova (13.75 PB)",
+      "pb": 13.75,
+      "publico": 3123010,
+      "costos": {
+        "ri_j": 3123010,
+        "ri_d": 3123010,
+        "ri_c": 3123010,
+        "nc_j": 3450926,
+        "nc_d": 3450926,
+        "nc_c": 3450926
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "ING-P-3xS4-BIANCO": {
+      "nombre": "INGRESO 9 PB · 3 Senior4 Bianco (9.90 PB)",
+      "pb": 9.9,
+      "publico": 2440570,
+      "costos": {
+        "ri_j": 2440570,
+        "ri_d": 2440570,
+        "ri_c": 2440570,
+        "nc_j": 2696830,
+        "nc_d": 2696830,
+        "nc_c": 2696830
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "ING-M-S4-NERO": {
+      "nombre": "INGRESO BÁSICO · Senior4 Nero + Mini (3.30 PB)",
+      "pb": 3.3,
+      "publico": 1337050,
+      "costos": {
+        "ri_j": 1337050,
+        "ri_d": 1337050,
+        "ri_c": 1337050,
+        "nc_j": 1477440,
+        "nc_d": 1477440,
+        "nc_c": 1477440
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "ING-M-S4-BIANCO": {
+      "nombre": "INGRESO BÁSICO · Senior4 Bianco + Mini (3.30 PB)",
+      "pb": 3.3,
+      "publico": 1337050,
+      "costos": {
+        "ri_j": 1337050,
+        "ri_d": 1337050,
+        "ri_c": 1337050,
+        "nc_j": 1477440,
+        "nc_d": 1477440,
+        "nc_c": 1477440
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "ING-M-SENIOR-BIANCO": {
+      "nombre": "INGRESO BÁSICO · Senior Bianco + Mini (2.70 PB)",
+      "pb": 2.7,
+      "publico": 1226940,
+      "costos": {
+        "ri_j": 1226940,
+        "ri_d": 1226940,
+        "ri_c": 1226940,
+        "nc_j": 1355769,
+        "nc_d": 1355769,
+        "nc_c": 1355769
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "ING-M-VERO-BIANCO": {
+      "nombre": "INGRESO BÁSICO · Vero Bianco + Mini (1.45 PB)",
+      "pb": 1.45,
+      "publico": 1051490,
+      "costos": {
+        "ri_j": 1051490,
+        "ri_d": 1051490,
+        "ri_c": 1051490,
+        "nc_j": 1161896,
+        "nc_d": 1161896,
+        "nc_c": 1161896
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "ING-M-S1000-BIANCO": {
+      "nombre": "INGRESO BÁSICO · S-1000 II SM Bianco + Mini (3.45 PB)",
+      "pb": 3.45,
+      "publico": 1502820,
+      "costos": {
+        "ri_j": 1502820,
+        "ri_d": 1502820,
+        "ri_c": 1502820,
+        "nc_j": 1660616,
+        "nc_d": 1660616,
+        "nc_c": 1660616
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "ING-M-SENIK-BIANCO": {
+      "nombre": "INGRESO BÁSICO · Senik Bianco + Mini (3.75 PB)",
+      "pb": 3.75,
+      "publico": 1637130,
+      "costos": {
+        "ri_j": 1637130,
+        "ri_d": 1637130,
+        "ri_c": 1637130,
+        "nc_j": 1809029,
+        "nc_d": 1809029,
+        "nc_c": 1809029
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "ING-M-4xS4-BIANCO": {
+      "nombre": "INGRESO 13 PB · 4 Senior4 Bianco + Mini (13.20 PB)",
+      "pb": 13.2,
+      "publico": 3173830,
+      "costos": {
+        "ri_j": 3173830,
+        "ri_d": 3173830,
+        "ri_c": 3173830,
+        "nc_j": 3507082,
+        "nc_d": 3507082,
+        "nc_c": 3507082
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "ING-M-3SEN-2S4": {
+      "nombre": "INGRESO 13 PB · 3 Senior + 2 Senior4 + Mini (14.70 PB)",
+      "pb": 14.7,
+      "publico": 3455760,
+      "costos": {
+        "ri_j": 3455760,
+        "ri_d": 3455760,
+        "ri_c": 3455760,
+        "nc_j": 3818615,
+        "nc_d": 3818615,
+        "nc_c": 3818615
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "ING-M-3S4-SEN-RIN": {
+      "nombre": "INGRESO 13 PB · 3 Senior4 + Senior + Rinnova + Mini (13.75 PB)",
+      "pb": 13.75,
+      "publico": 3281520,
+      "costos": {
+        "ri_j": 3281520,
+        "ri_d": 3281520,
+        "ri_c": 3281520,
+        "nc_j": 3626080,
+        "nc_d": 3626080,
+        "nc_c": 3626080
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "ING-M-3S4-C3-BURBY-RIN": {
+      "nombre": "INGRESO 13 PB · 3 Senior4 + C3 + Sodaburby + Rinnova + Mini (13.75 PB)",
+      "pb": 13.75,
+      "publico": 3244010,
+      "costos": {
+        "ri_j": 3244010,
+        "ri_d": 3244010,
+        "ri_c": 3244010,
+        "nc_j": 3584631,
+        "nc_d": 3584631,
+        "nc_c": 3584631
+      },
+      "publico_canje": null,
+      "costos_canje": null
+    },
+    "ING-M-3xS4-BIANCO": {
+      "nombre": "INGRESO 9 PB · 3 Senior4 Bianco + Mini (9.90 PB)",
+      "pb": 9.9,
+      "publico": 2561570,
+      "costos": {
+        "ri_j": 2561570,
+        "ri_d": 2561570,
+        "ri_c": 2561570,
+        "nc_j": 2830535,
+        "nc_d": 2830535,
+        "nc_c": 2830535
       },
       "publico_canje": null,
       "costos_canje": null
