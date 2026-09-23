@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v562-sin-errores';
+const CACHE_NAME = 'appi-v563-petalos-redondeados-trivia13';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

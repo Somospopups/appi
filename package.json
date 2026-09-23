@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "562.0.0",
-  "cacheName": "appi-v562-sin-errores",
+  "version": "563.0.0",
+  "cacheName": "appi-v563-petalos-redondeados-trivia13",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

@@ -174,7 +174,17 @@
      Se guarda en la cuenta, no en el aparato: celular y PC comparten. */
   var TOPE_PERSONAS = 10;
   var PAUSA_MS = 60 * 1000;
-  function topeCuidado(){ return TOPE_PERSONAS; }
+  function topeCuidado(){
+    try {
+      if (window.APPIMensajes && typeof window.APPIMensajes.cupoHoy === 'function') {
+        return window.APPIMensajes.cupoHoy();
+      }
+      if (window.APPICampusPSA && typeof window.APPICampusPSA.bonusAccionesHoy === 'function') {
+        return TOPE_PERSONAS + (Number(window.APPICampusPSA.bonusAccionesHoy()) || 0);
+      }
+    } catch(e){}
+    return TOPE_PERSONAS;
+  }
   function uidCuidado(){
     try{
       if (window.APPIAuth && typeof window.APPIAuth.userId === 'function'){
