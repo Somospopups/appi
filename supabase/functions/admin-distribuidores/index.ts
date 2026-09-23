@@ -183,7 +183,17 @@ Deno.serve(async request => {
       if (!Number.isFinite(amount) || amount <= 0 || amount > 1_000_000_000) return json({ error: 'Ingresá un monto válido.' }, 400);
       if (!['transferencia','efectivo','mercadopago','otro'].includes(method)) return json({ error: 'El método de pago no es válido.' }, 400);
       const notes = String(body?.notes || '').trim().slice(0, 1000);
-      const { data, error } = await admin.rpc('appi_admin_registrar_pago_membresia', { p_user_id: targetId, p_amount: amount, p_method: method, p_notes: notes });
+      const rawDate = String(body?.payment_date || '');
+      let paymentDate: string | null = null;
+      if (rawDate) {
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(rawDate)) return json({ error: 'La fecha del pago no es válida.' }, 400);
+        const day = new Date(`${rawDate}T00:00:00.000-03:00`);
+        if (Number.isNaN(day.getTime())) return json({ error: 'Fecha inválida.' }, 400);
+        if (day.getTime() > Date.now() + 60000) return json({ error: 'La fecha del pago no puede ser futura.' }, 400);
+        if (day.getTime() < Date.now() - 730 * 86400000) return json({ error: 'La fecha del pago no puede ser de hace más de 2 años.' }, 400);
+        paymentDate = day.toISOString();
+      }
+      const { data, error } = await admin.rpc('appi_admin_registrar_pago_membresia', { p_user_id: targetId, p_amount: amount, p_method: method, p_notes: notes, p_payment_date: paymentDate });
       if (error) throw error;
       await admin.auth.admin.updateUserById(targetId, { ban_duration: 'none' }).catch(() => null);
       return json(data || { ok: true });

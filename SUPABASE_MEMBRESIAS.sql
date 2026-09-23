@@ -212,7 +212,8 @@ create or replace function public.appi_admin_registrar_pago_membresia(
   p_user_id uuid,
   p_amount numeric,
   p_method text,
-  p_notes text default ''
+  p_notes text default '',
+  p_payment_date timestamptz default null
 )
 returns jsonb
 language plpgsql
@@ -223,7 +224,7 @@ declare
   v_profile public.appi_perfiles%rowtype;
   v_membership public.user_memberships%rowtype;
   v_payment public.membership_payments%rowtype;
-  v_started timestamptz := now();
+  v_started timestamptz;
   v_base timestamptz;
   v_expires timestamptz;
 begin
@@ -235,8 +236,12 @@ begin
   for update;
   if not found then raise exception 'La cuenta no existe.'; end if;
 
-  v_base := now(); -- desde hoy, no se suma a lo que ya tiene (14/09 -> 14/10 si o si)
+  v_started := coalesce(p_payment_date, now());
+  v_base := v_started; -- desde la fecha del pago, no se suma a lo que ya tiene (14/09 -> 14/10 si o si)
   v_expires := v_base + interval '1 month';
+  if p_payment_date is not null then
+    v_expires := v_expires - interval '1 microsecond';
+  end if;
 
   update public.appi_perfiles
   set membresia_meses = 1,
@@ -258,9 +263,10 @@ begin
   returning * into v_membership;
 
   insert into public.membership_payments (
-    user_id,membership_id,amount,payment_method,notes
+    user_id,membership_id,amount,payment_method,notes,payment_date
   ) values (
-    p_user_id,v_membership.id,p_amount,p_method,left(coalesce(p_notes,''),1000)
+    p_user_id,v_membership.id,p_amount,p_method,left(coalesce(p_notes,''),1000),
+    coalesce(p_payment_date, now())
   ) returning * into v_payment;
 
   return jsonb_build_object(
@@ -273,9 +279,10 @@ end;
 $$;
 
 revoke all on function public.appi_admin_prorrogar_membresia(uuid,timestamptz,text) from public, anon, authenticated;
-revoke all on function public.appi_admin_registrar_pago_membresia(uuid,numeric,text,text) from public, anon, authenticated;
+drop function if exists public.appi_admin_registrar_pago_membresia(uuid,numeric,text,text);
+revoke all on function public.appi_admin_registrar_pago_membresia(uuid,numeric,text,text,timestamptz) from public, anon, authenticated;
 grant execute on function public.appi_admin_prorrogar_membresia(uuid,timestamptz,text) to service_role;
-grant execute on function public.appi_admin_registrar_pago_membresia(uuid,numeric,text,text) to service_role;
+grant execute on function public.appi_admin_registrar_pago_membresia(uuid,numeric,text,text,timestamptz) to service_role;
 
 drop function if exists public.get_revenue_stats();
 revoke all on function public.update_membership_updated_at() from public, anon, authenticated;

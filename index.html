@@ -144,7 +144,7 @@ window.openStock=function(){
 <script src="./auth-client.js?v=441"></script>
 <script src="./prueba-banner.js"></script>
 <script src="./data-sync.js?v=835"></script>
-<script src="./js/membership-admin.js?v=451"></script>
+<script src="./js/membership-admin.js?v=581"></script>
 <script src="./admin-panel.js?v=580"></script>
 <script src="./js/compromiso-pago.js?v=777"></script>
 <link rel="stylesheet" href="./css/membership-admin.css">
@@ -14084,8 +14084,8 @@ function cerrarToolsMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-const swVersion='580';
-  const CACHE_NAME='appi-v580-sin-prorroga';
+const swVersion='581';
+  const CACHE_NAME='appi-v581-fecha-pago';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
