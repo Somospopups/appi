@@ -759,8 +759,9 @@ async function handleUserAction(button){
         await window.APPIDialog.alert('Elegí un día futuro.',{title:'Día de vencimiento',icon:'📆'});
         return;
       }
-      await rpcAdmin('appi_admin_prorrogar_membresia',{p_user_id:userId,p_until:until.toISOString(),p_notes:'Vencimiento fijado desde el panel'});
-      await window.APPIDialog.alert(`Listo: ${user.nombre||user.dip} vence el ${fechaTxt}.`,{title:'Día de vencimiento',icon:'📆'});
+      const data=await callAdmin({action:'set_vence',user_id:userId,vence});
+      const real=data&&data.expires_at?new Date(data.expires_at).toLocaleDateString('es-AR'):fechaTxt;
+      await window.APPIDialog.alert(`Listo: ${user.nombre||user.dip} vence el ${real}.`,{title:'Día de vencimiento',icon:'📆'});
       await load();return;
     }
     if(action==='ticket'){
