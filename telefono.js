@@ -322,7 +322,7 @@
     abrir:      abrir,
     avisarInvalido: avisarInvalido,
     cuidado: {
-      TOPE: TOPE_PERSONAS,
+      get TOPE(){ return topeCuidado(); },
       PAUSA_MS: PAUSA_MS,
       estado: estadoCuidado,
       evaluar: evaluarCuidado,

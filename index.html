@@ -153,7 +153,7 @@ window.openStock=function(){
 <script src="./qr-code.js"></script>
 <script src="./gestion-client.js?v=852"></script>
   <script src="./agenda-personal.js"></script>
-<script src="./margarita-contactos.js?v=563"></script>
+<script src="./margarita-contactos.js?v=564"></script>
 <script src="./tarjetas-promos.js"></script>
 <script src="./usuarios-botones.js?v=423"></script>
 <script src="./mensajes-hielo.js"></script>
@@ -173,7 +173,7 @@ window.openStock=function(){
 <script src="./porque-vivo.js"></script>
 <script src="./home-limpio.js?v=521"></script>
 <script src="./reporte-bonos.js?v=915"></script>
-  <script src="./home-tarjetas.js?v=836"></script>
+  <script src="./home-tarjetas.js?v=564"></script>
   <script src="./appi-eventos.js?v=726"></script>
   <script src="./tu-mes.js?v=852"></script>
   <script src="./device-bridge.js?v=523"></script>
@@ -4666,7 +4666,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v563 · Segura</div>
+  <div class="ds-foot">APPI · v564 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4950,7 +4950,7 @@ body.dark #pageTabs button.active{color:#c5d6ff}
       <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
 
       <div class="home-brand-row">
-        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · 563</span></span>
+        <span class="home-brand-mark">APPI<span class="home-brand-ver" id="homeAppVer"> · 564</span></span>
       </div>
 
       <div class="home-hero-card">
@@ -14088,8 +14088,8 @@ function cerrarToolsMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-      const swVersion='563';
-      const CACHE_NAME='appi-v563-petalos-redondeados-trivia13';
+      const swVersion='564';
+      const CACHE_NAME='appi-v564-petalos-finos-tope13';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}

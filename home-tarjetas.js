@@ -1168,7 +1168,7 @@
     try{
       if (window.APPITel && window.APPITel.cuidado && window.APPITel.cuidado.vioMetodo && window.APPITel.cuidado.vioMetodo()) return null;
     }catch(e){}
-    var tope = 10;
+    var tope = topeHoy();
     try{
       if (window.APPITel && window.APPITel.cuidado && window.APPITel.cuidado.TOPE) tope = window.APPITel.cuidado.TOPE;
     }catch(e){}
