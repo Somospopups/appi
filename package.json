@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "567.0.0",
-  "cacheName": "appi-v567-margarita-perfecta-desplegada",
+  "version": "568.0.0",
+  "cacheName": "appi-v568-margarita-8-petalos-bajada",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {
