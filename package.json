@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "586.0.0",
-  "cacheName": "appi-v586-pill-version",
+  "version": "587.0.0",
+  "cacheName": "appi-v587-auto-fix",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

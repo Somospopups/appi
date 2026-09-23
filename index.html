@@ -14148,12 +14148,32 @@ function cerrarToolsMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-const swVersion='586';
-  const CACHE_NAME='appi-v586-pill-version';
+const swVersion='587';
+  const CACHE_NAME='appi-v587-auto-fix';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
       try{ const _ap=document.getElementById('adminVersionPill'); if(_ap) _ap.textContent='v'+swVersion; }catch(e){}
+      // Autorecarga si el navegador "desperto" la app desde su memoria (version vieja sin descargar).
+      try{
+        if(window.performance && performance.getEntriesByType && performance.getEntriesByType('navigation').length){
+          if(performance.getEntriesByType('navigation')[0].type==='back_forward') location.reload();
+        }
+      }catch(e){}
+      window.addEventListener('pageshow', function(ev){ if(ev.persisted) location.reload(); });
+      // Comprueba en red si hay una versión mas nueva y recarga sola (una vez por sesión).
+      try{
+        if(!sessionStorage.getItem('appi_sw_check')){
+          sessionStorage.setItem('appi_sw_check','1');
+          fetch('./index.html?appiCheck='+Date.now(), {cache:'no-store'})
+            .then(function(r){ return r.ok ? r.text() : ''; })
+            .then(function(t){
+              var rem=(String(t).match(/const swVersion='(\d+)'/)||[])[1];
+              if(rem && rem!==swVersion) location.reload();
+            })
+            .catch(function(){});
+        }
+      }catch(e){}
       try{
         const seen=localStorage.getItem('appi_seen_version');
         if(seen && seen!==swVersion){
