@@ -175,58 +175,59 @@ function renderUsers(){
     const tCuenta = tipoCuenta(user);
 
     const acciones = abierto ? `<div class="admin-ficha-clean">
-      <!-- 1. ACCIONES PRIORITARIAS -->
+      <!-- LO DE TODOS LOS DÍAS: solo dos botones -->
       <div class="admin-prio-actions">
-        <button type="button" class="admin-btn-hero-wa" data-admin-action="whatsapp_dist">
-          <span class="icon">💬</span> WhatsApp
-        </button>
         <button type="button" class="admin-btn-hero-pago" data-admin-action="payment">
           <span class="icon">💳</span> Registrar pago
         </button>
+        <button type="button" class="admin-btn-hero-pago" data-admin-action="set_vence">
+          <span class="icon">📆</span> Vence el
+        </button>
       </div>
 
-      <!-- 2. MEMBRESÍA Y DÍA DE PAGO COMPACTOS -->
-      <div class="admin-section-box">
-        <div class="admin-sec-title">MEMBRESÍA & COMPROMISO</div>
-        <div class="admin-pill-group">
-          <button type="button" class="admin-pill ${tCuenta==='prueba'?'active':''}" data-admin-action="trial">🧪 Prueba 5d</button>
-          <button type="button" class="admin-pill ${tCuenta==='mes'?'active':''}" data-admin-action="month">📅 1 Mes</button>
-          <button type="button" class="admin-pill ${tCuenta==='siempre'?'active':''}" data-admin-action="forever">♾️ Siempre</button>
-          <button type="button" class="admin-pill" data-admin-action="set_vence">📆 Vence el</button>
-        </div>
-        <div class="admin-pago-selector">
-          <span>Día de pago:</span>
-          <div class="admin-pago-pills">
-            <button type="button" class="dia-pago-btn ${diaPago===12?'active':''}" data-admin-action="dia_pago" data-dia="12">12</button>
-            <button type="button" class="dia-pago-btn ${diaPago===22?'active':''}" data-admin-action="dia_pago" data-dia="22">22</button>
-            <span class="dia-pago-tag">${diaPago ? `Día ${diaPago}` : 'Sin asignar'}</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- 3. GESTIÓN Y HERRAMIENTAS -->
-      <div class="admin-section-box">
-        <div class="admin-sec-title">DATOS & HERRAMIENTAS</div>
-        <div class="admin-tools-grid">
-          <button type="button" class="admin-tool-btn" data-admin-action="phone">
-            <span>📱</span> Tel: ${tel ? esc(tel) : 'Cargar'}
-          </button>
-          <button type="button" class="admin-tool-btn" data-admin-action="password">
-            <span>🔑</span> Cambiar clave
-          </button>
-          <button type="button" class="admin-tool-btn" data-admin-action="ticket">
-            <span>🎫</span> Ver Ticket
-          </button>
-          <button type="button" class="admin-tool-btn" data-admin-action="people">
-            <span>👥</span> Equipo
-          </button>
-        </div>
-      </div>
-
-      <!-- 4. ZONA DE SEGURIDAD DISCRETA -->
+      <!-- EL RESTO, DETRÁS DE + MÁS ACCIONES -->
       <details class="admin-danger-details">
-        <summary>⚙️ Más opciones (Bloquear / Eliminar)</summary>
+        <summary>＋ Más acciones</summary>
         <div class="admin-danger-body">
+          <button type="button" class="admin-btn-hero-wa" data-admin-action="whatsapp_dist">
+            <span class="icon">💬</span> WhatsApp
+          </button>
+
+          <div class="admin-section-box">
+            <div class="admin-sec-title">MEMBRESÍA & COMPROMISO</div>
+            <div class="admin-pill-group">
+              <button type="button" class="admin-pill ${tCuenta==='prueba'?'active':''}" data-admin-action="trial">🧪 Prueba 5d</button>
+              <button type="button" class="admin-pill ${tCuenta==='mes'?'active':''}" data-admin-action="month">📅 1 Mes</button>
+              <button type="button" class="admin-pill ${tCuenta==='siempre'?'active':''}" data-admin-action="forever">♾️ Siempre</button>
+            </div>
+            <div class="admin-pago-selector">
+              <span>Día de pago:</span>
+              <div class="admin-pago-pills">
+                <button type="button" class="dia-pago-btn ${diaPago===12?'active':''}" data-admin-action="dia_pago" data-dia="12">12</button>
+                <button type="button" class="dia-pago-btn ${diaPago===22?'active':''}" data-admin-action="dia_pago" data-dia="22">22</button>
+                <span class="dia-pago-tag">${diaPago ? `Día ${diaPago}` : 'Sin asignar'}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="admin-section-box">
+            <div class="admin-sec-title">DATOS & HERRAMIENTAS</div>
+            <div class="admin-tools-grid">
+              <button type="button" class="admin-tool-btn" data-admin-action="phone">
+                <span>📱</span> Tel: ${tel ? esc(tel) : 'Cargar'}
+              </button>
+              <button type="button" class="admin-tool-btn" data-admin-action="password">
+                <span>🔑</span> Cambiar clave
+              </button>
+              <button type="button" class="admin-tool-btn" data-admin-action="ticket">
+                <span>🎫</span> Ver Ticket
+              </button>
+              <button type="button" class="admin-tool-btn" data-admin-action="people">
+                <span>👥</span> Equipo
+              </button>
+            </div>
+          </div>
+
           <button type="button" class="admin-sec-btn ${user.activo?'warn':'good'}" data-admin-action="active" data-active="${user.activo?'0':'1'}">
             ${user.activo ? '⛔ Bloquear acceso' : '✓ Desbloquear cuenta'}
           </button>

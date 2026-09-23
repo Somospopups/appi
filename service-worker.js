@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v581-fecha-pago';
+const CACHE_NAME = 'appi-v582-panel-simple';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
