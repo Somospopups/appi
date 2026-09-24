@@ -1,6 +1,6 @@
 {
-  "actualizado": "23-Sep-2026",
-  "vigencia": "18-Sep-2026 al 23-Sep-2026",
+  "actualizado": "24-Sep-2026",
+  "vigencia": "24-Sep-2026 al 30-Sep-2026",
   "fuente": "https://tienda.psa.com.ar/promociones_vigentes",
   "cuotas": [
     3,
@@ -8,8 +8,7 @@
     9,
     12,
     15,
-    18,
-    24
+    18
   ],
   "bancos": [
     {
@@ -21,8 +20,7 @@
         9,
         12,
         15,
-        18,
-        24
+        18
       ],
       "tarjetas": "Visa, Mastercard, American Express, Cordobesa"
     },
@@ -31,8 +29,7 @@
       "nombre": "Naranja",
       "cuotas": [
         6,
-        9,
-        12
+        9
       ],
       "tarjetas": "Naranja"
     },
@@ -43,9 +40,7 @@
         3,
         6,
         9,
-        12,
-        15,
-        18
+        12
       ],
       "tarjetas": "Visa, Mastercard, American Express"
     },
@@ -71,8 +66,7 @@
         9,
         12,
         15,
-        18,
-        24
+        18
       ],
       "tarjetas": "Visa, Mastercard"
     },
@@ -85,8 +79,7 @@
         9,
         12,
         15,
-        18,
-        24
+        18
       ],
       "tarjetas": "Visa, Mastercard, American Express"
     },
@@ -99,8 +92,7 @@
         9,
         12,
         15,
-        18,
-        24
+        18
       ],
       "tarjetas": "Visa, Mastercard"
     },
@@ -113,8 +105,7 @@
         9,
         12,
         15,
-        18,
-        24
+        18
       ],
       "tarjetas": "Visa, Mastercard"
     },
@@ -139,8 +130,7 @@
         9,
         12,
         15,
-        18,
-        24
+        18
       ],
       "tarjetas": "American Express"
     },
@@ -153,8 +143,7 @@
         9,
         12,
         15,
-        18,
-        24
+        18
       ],
       "tarjetas": ""
     },
@@ -167,8 +156,7 @@
         9,
         12,
         15,
-        18,
-        24
+        18
       ],
       "tarjetas": ""
     },
@@ -181,8 +169,7 @@
         9,
         12,
         15,
-        18,
-        24
+        18
       ],
       "tarjetas": ""
     },
@@ -195,8 +182,7 @@
         9,
         12,
         15,
-        18,
-        24
+        18
       ],
       "tarjetas": ""
     },
@@ -209,8 +195,7 @@
         9,
         12,
         15,
-        18,
-        24
+        18
       ],
       "tarjetas": ""
     }
