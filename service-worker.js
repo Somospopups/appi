@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v607-sin-reflejo-eleccion-persona';
+const CACHE_NAME = 'appi-v608-tarjetas-persona-lado-a-lado';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

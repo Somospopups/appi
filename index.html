@@ -3377,7 +3377,7 @@ body.dark .admin-login-card{background:#242638}body.dark .admin-login-card h2{co
 #personChoiceOverlay.is-choosing .pc-title{opacity:0;transform:translateY(-18px);pointer-events:none}
 @keyframes pcTitle{from{opacity:0;transform:translateY(-18px);letter-spacing:10px;filter:blur(10px)}to{opacity:1;transform:none;filter:none}}
 .person-choice-list{display:grid;grid-template-columns:1fr 1fr;gap:16px;perspective:1100px}
-.person-choice-list:has(:only-child){grid-template-columns:minmax(0,280px);justify-content:center}
+.person-choice-list:has(> .person-choice-option:only-child){grid-template-columns:minmax(0,280px);justify-content:center}
 #personChoiceOverlay.pc-in{animation:pcOverlayIn .5s ease both}
 @keyframes pcOverlayIn{from{opacity:0}to{opacity:1}}
 .person-choice-option{position:relative;overflow:visible;appearance:none;-webkit-appearance:none;width:100%;min-height:260px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:32px 20px 28px;border:0;outline:0;-webkit-tap-highlight-color:transparent;border-radius:24px;background:#fff;color:#1c1c1e;text-align:center;font:inherit;cursor:pointer;box-shadow:0 22px 60px rgba(4,31,55,.22);transform-origin:center;transform-style:preserve-3d;animation:pcCardIn .75s cubic-bezier(.16,1.25,.32,1) both;transition:transform .62s cubic-bezier(.16,1.15,.3,1),opacity .5s ease,box-shadow .5s ease,border-color .4s ease,filter .5s ease}
@@ -14198,8 +14198,8 @@ function cerrarToolsMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-const swVersion='607';
-  const CACHE_NAME='appi-v607-sin-reflejo-eleccion-persona';
+const swVersion='608';
+  const CACHE_NAME='appi-v608-tarjetas-persona-lado-a-lado';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
