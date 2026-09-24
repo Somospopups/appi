@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "595.0.0",
-  "cacheName": "appi-v595-dock-flotante",
+  "version": "596.0.0",
+  "cacheName": "appi-v596-siempre-en-su-boton",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

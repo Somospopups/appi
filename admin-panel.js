@@ -126,7 +126,9 @@ function filteredUsers(){
   const term=state.filter.toLowerCase().trim();
   const list = state.users.filter(user=>{
     if(user.rol==='admin') return false;
-    if(state.cuentaFiltro && tipoCuenta(user)!==state.cuentaFiltro) return false;
+    const tc=tipoCuenta(user);
+    if(!state.cuentaFiltro && tc==='siempre') return false;
+    if(state.cuentaFiltro && tc!==state.cuentaFiltro) return false;
     if(term && !`${user.nombre} ${user.socio_nombre||''} ${user.dip} ${user.sucursal} ${user.numero_distribuidor}`.toLowerCase().includes(term)) return false;
     return true;
   });
@@ -156,14 +158,19 @@ function pintarFiltrosCuentas(){
 const ESTILO_ESTADO={activa:'linear-gradient(180deg,rgba(47,191,143,.32),rgba(47,191,143,.13))',bloqueada:'linear-gradient(180deg,rgba(217,83,79,.34),rgba(217,83,79,.13))',vencida:'linear-gradient(180deg,rgba(217,83,79,.27),rgba(217,83,79,.11))','por-vencer':'linear-gradient(180deg,rgba(245,179,1,.36),rgba(245,179,1,.13))',prueba:'linear-gradient(180deg,rgba(224,36,36,.3),rgba(224,36,36,.11))',siempre:'linear-gradient(180deg,rgba(196,161,0,.28),rgba(196,161,0,.11))'};
 const BORDE_ESTADO={activa:'rgba(47,191,143,.85)',bloqueada:'rgba(217,83,79,.9)',vencida:'rgba(217,83,79,.9)','por-vencer':'rgba(245,179,1,.95)',prueba:'rgba(224,36,36,.85)',siempre:'rgba(196,161,0,.85)'};
 function renderUsers(){
-  const list=$('adminUserList'),users=filteredUsers();if(!list)return;if(!users.length){list.innerHTML='<div class="empty">'+ (state.cuentaFiltro?'Nadie en este filtro.':'No hay distribuidores para mostrar.') +'</div>';pintarFiltrosCuentas();return}
+  const list=$('adminUserList'),users=filteredUsers();if(!list)return;
+  if(!users.length){
+    const haySiempre = state.users.some(u=>u.rol!=='admin'&&tipoCuenta(u)==='siempre');
+    list.innerHTML='<div class="empty">'+ (state.cuentaFiltro?'Nadie en este filtro.':(haySiempre?'No hay distribuidores visibles: los de ♾️ para siempre viven en su filtro.':'No hay distribuidores para mostrar.')) +'</div>';pintarFiltrosCuentas();return}
   const resumen=$('adminUsersResumen');
   if(resumen){
     const todos=state.users.filter(u=>u.rol!=='admin');
+    const siempre=todos.filter(u=>tipoCuenta(u)==='siempre').length;
+    const visibles=todos.filter(u=>tipoCuenta(u)!=='siempre');
     const n=users.length;
     if(!todos.length) resumen.textContent='Todavía no hay cuentas.';
     else if(state.cuentaFiltro) resumen.textContent=`${n} cuenta${n===1?'':'s'} en este filtro`;
-    else resumen.textContent=`${todos.length} cuenta${todos.length===1?'':'s'} · ${todos.filter(u=>u.activo).length} activas`;
+    else resumen.textContent=`${visibles.length} cuenta${visibles.length===1?'':'s'} · ${visibles.filter(u=>u.activo).length} activas${siempre?` · ♾️ ${siempre} para siempre`:''}`;
   }
   pintarFiltrosCuentas();
   list.innerHTML=users.map(user=>{
