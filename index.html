@@ -180,6 +180,7 @@ window.openStock=function(){
   <script src="./anuncios.js?v=792"></script>
   <script src="./aviso-telegram.js?v=555"></script>
   <script src="./reuniones.js?v=530"></script>
+  <script src="./appi-teclado.js?v=1"></script>
 <style id="historico-inline-css">
 /* APPI · Histórico mensual */
 .hist-view{padding-bottom:calc(24px + env(safe-area-inset-bottom));}
@@ -3287,9 +3288,7 @@ body.dark .lock-divider::before, body.dark .lock-divider::after {
 .lock-field{display:block;text-align:left;margin-bottom:16px}
 .lock-field span{display:block;margin:0 0 6px;color:#5c5c66;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.4px}
 body.dark .lock-field span{color:#a0a0b0}
-.lock-pass-row{display:grid;grid-template-columns:1fr 46px;gap:8px}
-.lock-pass-row button{border:0;border-radius:14px;background:rgba(91,141,239,.14);color:#3d63c9;font:inherit;font-size:12px;font-weight:900;cursor:pointer}
-body.dark .lock-pass-row button{background:rgba(91,141,239,.22);color:#a0e6d0}
+.lock-pass-row{display:grid;grid-template-columns:minmax(0,1fr)}
 .lock-input.login-input{letter-spacing:.4px;text-transform:none;font-family:inherit;text-align:left;margin-bottom:0}
 .lock-input {
   width: 100%; padding: 14px 16px;
@@ -3347,8 +3346,6 @@ body.dark .lock-error.login-info{background:rgba(91,141,239,.16);color:#a0e6d0}
 #distributorLoginPanel .lock-field{margin-bottom:14px}
 #distributorLoginPanel .lock-field>span{margin-bottom:7px}
 #distributorLoginPanel .lock-input.login-input{min-height:52px;padding:14px 15px;border-radius:15px;background:rgba(255,255,255,.82)}
-#distributorLoginPanel .lock-pass-row{grid-template-columns:minmax(0,1fr) 54px}
-#distributorLoginPanel .lock-pass-row button{min-height:52px}
 #btnDistributorLogin,#btnRequestAccount{min-height:52px;margin:8px 0 14px}
 #btnLoginSupport,.request-whatsapp-link{margin-top:12px;text-decoration:none}
 .login-tabs{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin:0 0 20px;padding:4px;border-radius:14px;background:rgba(80,90,130,.07)}
@@ -4884,7 +4881,6 @@ body.dark #pageTabs button.active{color:#c5d6ff}
           <span>Contraseña</span>
           <div class="lock-pass-row">
             <input type="password" class="lock-input login-input" id="distributorPassword" autocomplete="current-password" placeholder="Tu contraseña" />
-            <button type="button" id="toggleDistributorPassword" aria-label="Mostrar contraseña">Ver</button>
           </div>
         </label>
         <button type="button" class="lock-activate-btn" id="btnDistributorLogin">Ingresar</button>
@@ -13354,7 +13350,7 @@ function mostrarPantallaLoginDistribuidor(reason=''){
   mostrarLockScreen();
   bloquearScrollCuerpo();
   setLoginAccessTab('signin');
-  const dip=document.getElementById('distributorInput'),password=document.getElementById('distributorPassword'),button=document.getElementById('btnDistributorLogin'),toggle=document.getElementById('toggleDistributorPassword'),support=document.getElementById('btnLoginSupport'),adminOpen=document.getElementById('btnAdminLoginOpen'),tabSign=document.getElementById('loginTabSignIn'),tabCreate=document.getElementById('loginTabCreate'),requestDip=document.getElementById('requestDip'),requestButton=document.getElementById('btnRequestAccount');
+  const dip=document.getElementById('distributorInput'),password=document.getElementById('distributorPassword'),button=document.getElementById('btnDistributorLogin'),support=document.getElementById('btnLoginSupport'),adminOpen=document.getElementById('btnAdminLoginOpen'),tabSign=document.getElementById('loginTabSignIn'),tabCreate=document.getElementById('loginTabCreate'),requestDip=document.getElementById('requestDip'),requestButton=document.getElementById('btnRequestAccount');
   if(!window.APPIAuth||!window.APPIAuth.isConfigured()){
     mostrarErrorLogin('El acceso por distribuidor todavía no está configurado. El administrador debe conectar Supabase.');
     if(button)button.disabled=true;
@@ -13375,10 +13371,6 @@ function mostrarPantallaLoginDistribuidor(reason=''){
     password.dataset.bound='1';
     password.addEventListener('input',()=>mostrarErrorLogin(''));
     password.addEventListener('keydown',event=>{if(event.key==='Enter')button.click()});
-  }
-  if(toggle&&!toggle.dataset.bound){
-    toggle.dataset.bound='1';
-    toggle.onclick=()=>{const visible=password.type==='text';password.type=visible?'password':'text';toggle.textContent=visible?'Ver':'Ocultar';toggle.setAttribute('aria-label',visible?'Mostrar contraseña':'Ocultar contraseña')};
   }
   if(button&&!button.dataset.bound){
     button.dataset.bound='1';
@@ -14170,8 +14162,8 @@ function cerrarToolsMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-const swVersion='604';
-  const CACHE_NAME='appi-v604-overlay-transparente';
+const swVersion='605';
+  const CACHE_NAME='appi-v605-teclado-a-demanda';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}

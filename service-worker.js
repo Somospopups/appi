@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v604-overlay-transparente';
+const CACHE_NAME = 'appi-v605-teclado-a-demanda';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
@@ -50,6 +50,7 @@ const APP_SHELL = [
   './anuncios.js',
   './reuniones.js',
   './aviso-telegram.js',
+  './appi-teclado.js',
   './css/membership-admin.css',
   './appi-tema.css',
   './historico.css',

@@ -208,10 +208,6 @@ body.dark header.top .script{
   box-shadow:0 8px 20px rgba(11,88,120,.32);
 }
 #lockScreen .lock-input:focus{border-color:#0b5878;box-shadow:0 0 0 3px rgba(11,88,120,.18)}
-#lockScreen .lock-pass-row button{
-  background:rgba(11,88,120,.10);
-  color:#0b5878;
-}
 #lockScreen .login-tabs button.active{color:#0b5878}
 
 body.appi-admin .glass,
