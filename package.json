@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "605.0.0",
-  "cacheName": "appi-v605-teclado-a-demanda",
+  "version": "606.0.0",
+  "cacheName": "appi-v606-avatar-persona-blanca-con-foto",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

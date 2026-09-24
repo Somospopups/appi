@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v605-teclado-a-demanda';
+const CACHE_NAME = 'appi-v606-avatar-persona-blanca-con-foto';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
