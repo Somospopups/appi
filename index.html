@@ -5914,6 +5914,16 @@ body.dark #pageTabs button.active{color:#c5d6ff}
   @media(min-width:800px){
     .admin-user-acciones{grid-template-columns:repeat(4,minmax(0,1fr))}
   }
+  /* Solicitudes: tarjetas compactas, una linea, sin pildora */
+  #adminPendingList .admin-user-row{display:flex;align-items:center;gap:10px;padding:9px 12px}
+  #adminPendingList .admin-user-row h3{font-size:12px;margin:0}
+  #adminPendingList .admin-user-row p{margin:2px 0 0;font-size:9.5px;line-height:1.35}
+  #adminPendingList .admin-row-actions{margin-left:auto;flex:none}
+  #adminPendingList .admin-row-actions button{min-height:30px;padding:6px 10px}
+  @media(max-width:600px){
+    #adminPendingList .admin-row-actions{justify-content:flex-end}
+    #adminPendingList .admin-row-actions button{flex:none}
+  }
   .admin-cuentas-filtros{display:flex;flex-direction:row;flex-wrap:nowrap;gap:6px;margin:12px 0 8px}
   .admin-cuentas-filtros button{
     position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
@@ -14160,8 +14170,8 @@ function cerrarToolsMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-const swVersion='600';
-  const CACHE_NAME='appi-v600-x-visibles';
+const swVersion='601';
+  const CACHE_NAME='appi-v601-solicitudes-compactas';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}

@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "600.0.0",
-  "cacheName": "appi-v600-x-visibles",
+  "version": "601.0.0",
+  "cacheName": "appi-v601-solicitudes-compactas",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {
