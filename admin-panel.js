@@ -154,6 +154,7 @@ function pintarFiltrosCuentas(){
   });
 }
 const ESTILO_ESTADO={activa:'linear-gradient(180deg,rgba(47,191,143,.32),rgba(47,191,143,.13))',bloqueada:'linear-gradient(180deg,rgba(217,83,79,.34),rgba(217,83,79,.13))',vencida:'linear-gradient(180deg,rgba(217,83,79,.27),rgba(217,83,79,.11))','por-vencer':'linear-gradient(180deg,rgba(245,179,1,.36),rgba(245,179,1,.13))',prueba:'linear-gradient(180deg,rgba(224,36,36,.3),rgba(224,36,36,.11))',siempre:'linear-gradient(180deg,rgba(196,161,0,.28),rgba(196,161,0,.11))'};
+const BORDE_ESTADO={activa:'rgba(47,191,143,.85)',bloqueada:'rgba(217,83,79,.9)',vencida:'rgba(217,83,79,.9)','por-vencer':'rgba(245,179,1,.95)',prueba:'rgba(224,36,36,.85)',siempre:'rgba(196,161,0,.85)'};
 function renderUsers(){
   const list=$('adminUserList'),users=filteredUsers();if(!list)return;if(!users.length){list.innerHTML='<div class="empty">'+ (state.cuentaFiltro?'Nadie en este filtro.':'No hay distribuidores para mostrar.') +'</div>';pintarFiltrosCuentas();return}
   const resumen=$('adminUsersResumen');
@@ -229,7 +230,7 @@ function renderUsers(){
         </div>
       </details>
     </div>` : '';
-    return `<article class="admin-user-row admin-estado-${estadoRow}" data-admin-user="${esc(user.user_id)}" style="background:${ESTILO_ESTADO[estadoRow]}">
+    return `<article class="admin-user-row admin-estado-${estadoRow}" data-admin-user="${esc(user.user_id)}" style="background:${ESTILO_ESTADO[estadoRow]}!important;border-color:${BORDE_ESTADO[estadoRow]}!important">
       <div class="admin-user-main">
         <button type="button" class="admin-user-head" data-user-toggle="${esc(user.user_id)}">
           <div><h3>${esc(user.nombre||'Sin nombre')}${user.socio_nombre?` + ${esc(user.socio_nombre)}`:''}</h3>

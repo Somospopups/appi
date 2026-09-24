@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v587-auto-fix';
+const CACHE_NAME = 'appi-v589-tarjetas-color';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
