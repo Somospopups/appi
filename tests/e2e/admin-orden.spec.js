@@ -125,9 +125,9 @@ test('los distribuidores: minimizable, WhatsApp directo y PARA SIEMPRE (v312)', 
   // La píldora nueva de creación.
   expect(h).toContain('data-create-membership="siempre"');
   const js = panel();
-  // Cada renglón se abre con sus acciones cómodas.
+  // Cada renglón se abre con sus acciones cómodas (la grilla vive en el CSS).
   expect(js).toContain('data-user-toggle');
-  expect(js).toContain('admin-user-acciones');
+  expect(h).toContain('.admin-user-acciones');
   // WhatsApp al distribuidor con el mensaje amable.
   expect(js).toContain('whatsapp_dist');
   expect(js).toContain('¿Cómo vas con APPI?');
@@ -146,7 +146,7 @@ test('cada cuenta puede recibir 1 mes completo sin registrar un pago (v411)', ()
   expect(js).toContain('data-admin-action="month"');
   expect(js).toContain("action:'grant_month'");
   expect(js).toContain('1 mes completo');
-  expect(js).toContain('suma un mes a lo que le queda'); // v81x: se reescribía la frase
+  expect(js).toContain('Dar 1 mes'); // v411: la confirmación del mes completo
   const edge = fs.readFileSync('supabase/functions/admin-distribuidores/index.ts', 'utf8');
   expect(edge).toContain("action === 'grant_month'");
   expect(edge).toContain('addUtcMonths(base, 1)');

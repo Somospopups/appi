@@ -1065,8 +1065,6 @@ function pintarBadgeSolic(){
   if(badge){badge.hidden=!n; badge.textContent=n;}
   const btn=document.querySelector('#adminTabs [data-admin-tab="solicitudes"]');
   if(btn) btn.classList.toggle('alerta', n>0);
-  const quick=$('adminQuickPendBadge');
-  if(quick){quick.hidden=!n; quick.textContent=n;}
 }
 /* ---------- Anuncio para todos (v326) ----------
    El administrador escribe un mensaje y hasta una reunión (v343); el
