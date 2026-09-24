@@ -852,7 +852,6 @@ function salirAlLoginAdmin(){
     const fab=document.getElementById('adminFabCreate');if(fab)fab.classList.add('hid');
     if(typeof mostrarLockScreen==='function')mostrarLockScreen();
     if(typeof bloquearScrollCuerpo==='function')bloquearScrollCuerpo();
-    if(typeof mostrarAdminLoginPopup==='function')mostrarAdminLoginPopup();
   }catch(error){location.reload()}
 }
 
