@@ -4655,7 +4655,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-ocho" onclick="openOcho()"><span>🧭</span> Los 8 Pasos</button>
     <button class="ds-btn" data-ds="view-suenos" onclick="openSuenos()"><span>🪜</span> Escalera de Sueños</button>
     <button class="ds-btn" data-ds="view-demo" onclick="openDemo()"><span>🎯</span> Coach de Demo</button>
-    <button class="ds-btn" data-ds="view-botella" onclick="openBotella()"><span>🚰</span> PSA vs Bidones</button>
+    <button class="ds-btn" data-ds="view-botella" onclick="openBotella()"><span>🚰</span> Comparativas</button>
     <button class="ds-btn" data-ds="view-canillas" onclick="openCanillas()"><span>🚰</span> Canillas y adaptadores</button>
     <button class="ds-btn" data-ds="view-lista" onclick="openLista()"><span>📋</span> Lista de precios</button>
     <button class="ds-btn" data-ds="view-reuniones" onclick="openReuniones()"><span>🎥</span> Reuniones</button>
@@ -12487,7 +12487,7 @@ function renderToolsList(){
       timeAgo:'Guiones + objeciones', onClick:'openDemo()', accent:'#3ad0a4', gradient:'linear-gradient(135deg,#ff8f6b,#3ad0a4)'
     });
     const h4 = renderHomeQuickCard({
-      icon:'🚰', title:'PSA vs Bidones', sub:'Simulador de ahorro y plástico',
+      icon:'🚰', title:'Comparativas', sub:'Simulador de ahorro y plástico',
       statusVal:'Demo', statusClass:'done', progressPct:100,
       timeAgo:'Ahorro real', onClick:'openBotella()', accent:'#10b981', gradient:'linear-gradient(135deg,#10b981,#059669)'
     });
@@ -14198,8 +14198,8 @@ function cerrarToolsMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-const swVersion='609';
-  const CACHE_NAME='appi-v609-campus-appi';
+const swVersion='610';
+  const CACHE_NAME='appi-v610-herramienta-comparativas';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}

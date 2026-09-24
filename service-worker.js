@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v609-campus-appi';
+const CACHE_NAME = 'appi-v610-herramienta-comparativas';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
