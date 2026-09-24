@@ -4,6 +4,13 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v613 · Una sola carga por apertura (Service Worker consolidado)
+
+- El Service Worker se registra una sola vez: se eliminó el segundo registro del bloque de actualización que podía provocar recargas duplicadas al abrir la app.
+- Toda recarga automática (despertar desde memoria o instalación de una versión nueva) pasa por un presupuesto único por apertura: como máximo una recarga.
+- Se quitó el banner "Nueva versión disponible" obsoleto (el flujo principal ya actualiza y recarga solo, una vez).
+- Versión: **v613 · Segura** · Cache `appi-v613-una-sola-recarga`.
+
 ## v578 · Vencimiento: se guarda de verdad (sin esperar el backend nuevo)
 
 - **📆 Vence el** graba el día usando la prórroga que ya está en el servidor.

@@ -4353,11 +4353,6 @@ body.dark .person-modal-body .pm-actions .pm-mail{background:rgba(11,88,120,.18)
 
 <style id="apii-renovada-css">
 /* APPI RENOVADA v707 · Update banner + Buscador global + Offline + Perf */
-#appiUpdateBanner{position:fixed;left:12px;right:12px;bottom:calc(18px + env(safe-area-inset-bottom));z-index:60000;display:none;align-items:center;gap:12px;padding:14px 16px;border-radius:18px;background:linear-gradient(135deg,#0b5878,#3ad0a4);color:#fff;box-shadow:0 14px 32px rgba(72,82,180,.28);animation:bannerIn .45s cubic-bezier(.22,.9,.28,1)}
-#appiUpdateBanner.show{display:flex}
-#appiUpdateBanner b{flex:1;font-size:13px;line-height:1.35}
-#appiUpdateBanner button{flex:none;min-height:40px;padding:0 16px;border:0;border-radius:12px;background:#fff;color:#4a3ec9;font:inherit;font-size:13px;font-weight:900;cursor:pointer}
-@keyframes bannerIn{from{transform:translateY(14px);opacity:0}to{transform:none;opacity:1}}
 #offlineDot{position:fixed;top:10px;right:12px;z-index:59999;display:none;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:rgba(24,26,42,.88);color:#ffd66b;font-size:11px;font-weight:800;backdrop-filter:blur(8px)}
 #offlineDot.on{display:flex}
 #globalSearchOverlay{position:fixed;inset:0;z-index:62000;display:none;background:rgba(16,20,28,.42);backdrop-filter:blur(6px);padding:18px}
@@ -4553,7 +4548,6 @@ html body .lp-fab{
 </head>
 <body>
 
-<div id="appiUpdateBanner" role="status" aria-live="polite"><span style="font-size:18px">✨</span><b>Nueva versión disponible — APPI Renovada v726</b><button type="button" id="btnUpdateAppi">Actualizar ahora</button></div>
 <div id="offlineDot"><span style="width:8px;height:8px;border-radius:50%;background:#ffd66b;display:inline-block"></span> Sin conexión — seguís offline 100%</div>
 <div id="globalSearchOverlay" role="dialog" aria-modal="true"><div class="gs-box"><input id="gsInput" placeholder="Buscar persona, código, categoría, PB…  (Esc para cerrar)" autocomplete="off" /><div id="gsResults" class="gs-results"></div><div style="padding:10px 14px;font-size:11px;color:#777887;text-align:center">Tip: presioná <b>Ctrl + K</b> en cualquier pantalla para buscar</div></div></div>
 
@@ -4664,7 +4658,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v578 · Segura</div>
+  <div class="ds-foot">APPI · v613 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -14198,17 +14192,28 @@ function cerrarToolsMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-const swVersion='612';
-  const CACHE_NAME='appi-v612-icono-comparativas-agua';
+const swVersion='613';
+  const CACHE_NAME='appi-v613-una-sola-recarga';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
       try{ const _ap=document.getElementById('adminVersionPill'); if(_ap) _ap.textContent='v'+swVersion; }catch(e){}
-      // Si el navegador "desperto" la app desde su memoria, trae la version vieja:
-      // se recarga una vez para descargar la actual. Sin red no hace nada (sigue la copia guardada).
+      // Garantía de UNA sola recarga automática por apertura (presupuesto de 10s entre
+      // recargas puntuales). Cubre el "despertar" desde memoria y el update de versión.
+      const permitirRecargaUnica=function(){
+        const k='appi_ultima_recarga_auto';
+        const ahora=Date.now();
+        const ultima=Number(sessionStorage.getItem(k)||0);
+        if(ahora-ultima<10000) return false;
+        sessionStorage.setItem(k,String(ahora));
+        return true;
+      };
+      // Si el navegador "despertó" la app desde su memoria, trae la versión vieja:
+      // se recarga una sola vez (presupuesto) para descargar la actual. Sin red no hace
+      // nada (sigue la copia guardada).
       if(!sessionStorage.getItem('appi_wake_check')){
         sessionStorage.setItem('appi_wake_check','1');
-        window.addEventListener('pageshow', function(ev){ if(ev.persisted) location.reload(); });
+        window.addEventListener('pageshow', function(ev){ if(ev.persisted && permitirRecargaUnica()) location.reload(); });
       }
       try{
         const seen=localStorage.getItem('appi_seen_version');
@@ -14228,6 +14233,7 @@ const swVersion='612';
 
       navigator.serviceWorker.addEventListener('controllerchange', () => {
         if (!hadController || reloadingForUpdate) return;
+        if(!permitirRecargaUnica()) return;
         reloadingForUpdate = true;
         window.location.reload();
       });
@@ -15505,7 +15511,6 @@ body.dark .ios-secondary-btn{background:#2c2c2e;color:#0A84FF}
 body.dark .ios-danger-btn{background:#1c1c1e;border-color:rgba(255,255,255,.12);color:#FF453A}
 .ios-status{font-size:11px;padding:7px 10px;border-radius:10px;background:#f2f2f7;color:#8e8e93;line-height:1.4}
 body.dark .ios-status{background:#2c2c2e;color:#98989d}
-#appiUpdateBanner{display:none !important}
 
 
 @keyframes toolsIn{
@@ -19034,34 +19039,11 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
 
 <link rel="stylesheet" href="./appi-tema.css?v=515">
 
-<script>/* APPI Renovada v726 · Todo funcional */
+<script>/* APPI Renovada · Service Worker consolidado */
 (function(){
-  // PWA update banner con skipWaiting real
-  try{
-    if('serviceWorker' in navigator){
-      let reg=null;
-      navigator.serviceWorker.register('./service-worker.js').catch(function(err){ console.warn('SW register info:', err); }).then(r=>{if(!r) return; reg=r;
-        r.addEventListener('updatefound',()=>{
-          const nw=r.installing;
-          if(!nw) return;
-          nw.addEventListener('statechange',()=>{
-            if(nw.state==='installed' && navigator.serviceWorker.controller){
-              const b=document.getElementById('appiUpdateBanner');
-              if(b) b.classList.add('show');
-            }
-          });
-        });
-      });
-      // Listener unificado de controllerchange gestionado en el bloque principal del Service Worker
-      let refreshing=false;
-      document.getElementById('btnUpdateAppi')?.addEventListener('click',()=>{
-        if(reg && reg.waiting){ reg.waiting.postMessage({type:'SKIP_WAITING'}); }
-        else location.reload();
-      });
-      // escucha mensaje del SW
-      navigator.serviceWorker.addEventListener('message',e=>{ if(e.data && e.data.type==='SKIP_WAITING') location.reload(); });
-    }
-  }catch(e){}
+  // El bloque principal del Service Worker (más arriba) es el único dueño del flujo de
+  // actualización y la recarga automática de versión (una sola por apertura).
+  // No se vuelve a registrar el SW acá ni hay listeners de recarga sueltos.
 
   // Offline indicator 100% funcional
   function updOff(){ const d=document.getElementById('offlineDot'); if(!d) return; d.classList.toggle('on', !navigator.onLine); }
