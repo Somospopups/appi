@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v598-renglon-expandible';
+const CACHE_NAME = 'appi-v599-dock-alerta-contenida';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
