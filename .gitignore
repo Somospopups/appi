@@ -10,3 +10,6 @@ supabase/.temp/
 PROPUESTA-*.md
 ESTRATEGIA-*.md
 NOTAS-*.md
+
+.opencode/
+

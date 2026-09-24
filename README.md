@@ -4,6 +4,15 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v615 · Diario de ingresos: el desglose sigue los días que usás APPI
+
+- El desglose de **Mi negocio → TOTAL PB** funciona como un diario de tu uso de APPI: cada día que abrís la app se cargan **solo los cambios de PB** detectados (nombre y PB), nunca acumulados.
+- Día que **no abriste APPI** → figura **"No ingresaste este día"** (y el detalle lo explica). Días anteriores a tu primer ingreso del mes → "Sin datos registrados".
+- El **primer ingreso del mes** carga el estado inicial del equipo como punto de partida; los cambios se suman a partir del próximo ingreso.
+- Si hubo días sin abrir la app, los cambios acumulados en ese tramo se muestran el día que volvés a entrar (el informe de PSA no permite repartir por día calendario).
+- Con datos de la Línea activos, el desglose ya **no reparte PB acumulado** entre días: muestra solo cambios reales.
+- Versión: **v615 · Segura** · Cache `appi-v615-diario-de-ingresos`.
+
 ## v614 · PB por día con la Línea descendente de PSA
 
 - El desglose de **Mi negocio → TOTAL PB** se alimenta solo del informe **Autoconsulta → Informes de organización → Línea descendente**: muestra **nombre y PB** de cada integrante por día.

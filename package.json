@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "614.0.0",
-  "cacheName": "appi-v614-pb-por-dia",
+  "version": "615.0.0",
+  "cacheName": "appi-v615-diario-de-ingresos",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

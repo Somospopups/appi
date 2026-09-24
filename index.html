@@ -4658,7 +4658,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v614 · Segura</div>
+  <div class="ds-foot">APPI · v615 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -14195,8 +14195,8 @@ function cerrarToolsMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-const swVersion='614';
-  const CACHE_NAME='appi-v614-pb-por-dia';
+const swVersion='615';
+  const CACHE_NAME='appi-v615-diario-de-ingresos';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
@@ -19232,8 +19232,12 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
       const lineaTotal = window.appiLineaTotal ? window.appiLineaTotal() : null;
       const finalTotalPB = lineaTotal != null && lineaTotal > 0 ? lineaTotal : (typeof totalPbMes === "number" && totalPbMes > 0 ? totalPbMes : (totalPBDated || 0));
 
+      const appiDias = window.appiLineaDias ? window.appiLineaDias() : null;
+      const lineaActiva = !!(appiDias && Object.keys(appiDias).length > 0);
+
       // Si no hay ventas con fecha exacta, distribuir el PB activo entre los distribuidores del equipo
-      if(totalPBDated < finalTotalPB && countDatedSales === 0 && finalTotalPB > 0){
+      // (con Línea descendente activa el desglose solo muestra cambios reales, sin repartir acumulados)
+      if(!lineaActiva && totalPBDated < finalTotalPB && countDatedSales === 0 && finalTotalPB > 0){
         const daysToDistribute = Math.max(1, Math.min(todayDay, daysInMonth));
         const activeDistributors = equipoPersonas.filter(p => Number(p.pnAct || p.pbPersonal || 0) > 0);
         if(activeDistributors.length > 0){
@@ -19263,7 +19267,7 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
 
       // PB por día desde la Línea descendente (v614): cada día guardado con
       // los cambios de PB de cada integrante pisa el armado con garantías.
-      const appiDias = window.appiLineaDias ? window.appiLineaDias() : null;
+      const lineaDias = {};
       if(appiDias){
         for(const clave in appiDias){
           const reg = appiDias[clave];
@@ -19271,9 +19275,32 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
           const dayNum = parseInt(String(clave).slice(8,10), 10);
           if(!dayNum || dayNum < 1 || dayNum > daysInMonth) continue;
           const items = reg.cambios.filter(c => c && c.n && Number(c.pb) > 0).map(c => ({ titular:c.n, producto:'', usuario:'', pb:Number(c.pb), tipo:'linea' }));
-          if(!items.length) continue;
+          lineaDias[dayNum] = items;
+          if(reg.esInicial){
+            dailyPBs[dayNum].estado = 'inicial';
+            dailyPBs[dayNum].items = [];
+            dailyPBs[dayNum].pb = 0;
+            continue;
+          }
           dailyPBs[dayNum].items = items;
           dailyPBs[dayNum].pb = items.reduce((s,i) => s + Number(i.pb || 0), 0);
+          dailyPBs[dayNum].estado = items.length ? 'con_cambios' : 'sin_cambios';
+        }
+      }
+
+      // Días del mes sin registrar entrada de la línea: marcar su estado
+      if(lineaActiva){
+        const hoyClave = window.appiFechaBA ? window.appiFechaBA() : '';
+        const primerDia = Object.keys(appiDias).sort()[0] || '';
+        for(let d=1; d<=daysInMonth; d++){
+          if(lineaDias[d]) continue;
+          const clave = curYear + '-' + String(curMonth+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+          let estado = 'no_ingreso';
+          if(d > todayDay) estado = 'futuro';
+          else if(primerDia && clave < primerDia) estado = 'sin_datos';
+          dailyPBs[d].items = [];
+          dailyPBs[d].pb = 0;
+          dailyPBs[d].estado = estado;
         }
       }
 
@@ -19307,15 +19334,24 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
         const daysListHtml = w.days.map(d => {
           const isToday = (d.day === todayDay);
           const hasPB = d.pb > 0;
+          let sub = "Sin actividad registrada";
+          if(d.estado === 'no_ingreso') sub = '<b style="color:#b45309">No ingresaste este día</b>';
+          else if(d.estado === 'sin_datos') sub = '<span style="color:#94a3b8">Sin datos registrados</span>';
+          else if(d.estado === 'futuro') sub = '<span style="color:#cbd5e1">—</span>';
+          else if(d.estado === 'inicial') sub = '<span style="color:#64748b">Estado inicial del mes cargado</span>';
+          else if(d.estado === 'sin_cambios') sub = '<span style="color:#64748b">Ingresaste este día · sin cambios de PB</span>';
+          else if(d.items.length && d.items.every(i=>i.tipo==='linea')) sub = d.items.length + (d.items.length===1 ? " distribuidor sumó PB" : " distribuidores sumaron PB");
+          else if(d.items.length) sub = d.items.length + (d.items.length===1 ? " compra / operación" : " compras / operaciones");
+          const puedeVerDetalle = d.estado !== 'futuro' && d.estado !== 'sin_datos';
           return `
             <div class="day-card-drill" onclick="event.stopPropagation();window.abrirDetalleDiaPB(${d.day},${finalTotalPB})" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:12px;margin-bottom:6px;background:${isToday ? "#eef4ff" : "#f8fafc"};border:1px solid ${isToday ? "#c7d9fe" : "#edf2f7"};transition:transform .12s,background .12s" onmousedown="this.style.transform='scale(0.99)'" onmouseup="this.style.transform='none'">
               <div style="display:flex;align-items:center;gap:10px">
                 <span style="display:inline-block;width:34px;height:34px;line-height:34px;text-align:center;border-radius:9px;font-weight:800;font-size:13px;background:${isToday ? "#3d63c9" : (hasPB ? "#e0e7ff" : "#f1f5f9")};color:${isToday ? "#fff" : (hasPB ? "#3730a3" : "#64748b")}">${d.day}</span>
                 <div>
                   <div style="font-weight:700;font-size:13px;color:#1e293b">${getDayName(d.day)} ${d.day} de ${currentMonthName}</div>
-                  <div style="font-size:11px;color:#64748b;display:flex;align-items:center;gap:4px">
-                    ${d.items.length ? (d.items.every(i=>i.tipo==='linea') ? (d.items.length + (d.items.length===1 ? " distribuidor sumó PB" : " distribuidores sumaron PB")) : (d.items.length + (d.items.length===1 ? " compra / operación" : " compras / operaciones"))) : "Sin actividad registrada"}
-                    <span style="color:#2563eb;font-weight:700">· Ver quién compró ›</span>
+                  <div style="font-size:11px;color:#64748b;display:flex;align-items:center;gap:4px;flex-wrap:wrap">
+                    ${sub}
+                    ${puedeVerDetalle ? '<span style="color:#2563eb;font-weight:700">· Ver ›</span>' : ""}
                   </div>
                 </div>
               </div>
@@ -19417,7 +19453,29 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
       const diaTexto = `${dayNames[dt.getDay()]} ${dayNum} de ${monthNames[now.getMonth()]}`;
 
       let itemsHtml = '';
-      if(!dayData.items || !dayData.items.length){
+      const estado = dayData.estado || '';
+      let cabeceraDetalle = null;
+      if(estado === 'no_ingreso'){
+        cabeceraDetalle = { icon:"😴", titulo:"No ingresaste este día", texto:"El PB del mes se carga al abrir la app. Como no abriste APPI este día, no hay datos del día registrados." };
+      } else if(estado === 'sin_datos'){
+        cabeceraDetalle = { icon:"🗂️", titulo:"Sin datos registrados", texto:"Este día es anterior a tu primer ingreso del mes, no hay con qué comparar." };
+      } else if(estado === 'futuro'){
+        cabeceraDetalle = { icon:"🔮", titulo:"Este día todavía no llegó", texto:"Los datos de PB se cargan cuando ingreses a APPI ese día." };
+      } else if(estado === 'inicial'){
+        cabeceraDetalle = { icon:"🌱", titulo:"Estado inicial del mes cargado", texto:"Este día se cargó el PB del equipo como punto de partida; los cambios se van sumando a partir de tu próximo ingreso." };
+      } else if(estado === 'sin_cambios'){
+        cabeceraDetalle = { icon:"✅", titulo:"Ingresaste este día · sin cambios de PB", texto:"No hubo variaciones de PB con respecto a tu ingreso anterior." };
+      }
+
+      if(cabeceraDetalle){
+        itemsHtml = `
+          <div style="text-align:center;padding:28px 16px;color:#8e8e93;background:#f8fafc;border-radius:14px;border:1px dashed #cbd5e1">
+            <span style="font-size:28px;display:block;margin-bottom:6px">${cabeceraDetalle.icon}</span>
+            <b style="font-size:13px;color:#475569">${cabeceraDetalle.titulo}</b>
+            <div style="font-size:11px;margin-top:4px">${cabeceraDetalle.texto}</div>
+          </div>
+        `;
+      } else if(!dayData.items || !dayData.items.length){
         itemsHtml = `
           <div style="text-align:center;padding:28px 16px;color:#8e8e93;background:#f8fafc;border-radius:14px;border:1px dashed #cbd5e1">
             <span style="font-size:28px;display:block;margin-bottom:6px">☕</span>
@@ -19453,6 +19511,12 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
         }).join("");
       }
 
+      const drillContador = (estado === 'no_ingreso') ? 'No ingresaste este día'
+        : (estado === 'sin_datos') ? 'Sin datos registrados'
+        : (estado === 'futuro') ? 'Día futuro'
+        : (dayData.items && dayData.items.length && dayData.items.every(i=>i.tipo==='linea')) ? (dayData.items.length + (dayData.items.length===1 ? ' distribuidor' : ' distribuidores'))
+        : ((dayData.items ? dayData.items.length : 0) + ' compras');
+
       const drillHtml = `
         <div style="text-align:left;max-height:75vh;overflow-y:auto;padding-right:2px">
           <button type="button" onclick="abrirModalDetallePB(${totalMes||0})" style="background:none;border:none;color:#2563eb;font-weight:700;font-size:13px;cursor:pointer;padding:0;margin-bottom:12px;display:inline-flex;align-items:center;gap:4px">
@@ -19465,7 +19529,7 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
             </div>
             <div style="text-align:right">
               <div style="font-size:22px;font-weight:900;line-height:1.1">${(Number(dayData.pb)||0).toFixed(1)} PB</div>
-              <div style="font-size:10px;opacity:0.85">${dayData.items && dayData.items.length && dayData.items.every(i=>i.tipo==='linea') ? (dayData.items.length + (dayData.items.length===1 ? ' distribuidor' : ' distribuidores')) : (dayData.items ? dayData.items.length : 0) + ' compras'}</div>
+              <div style="font-size:10px;opacity:0.85">${drillContador}</div>
             </div>
           </div>
           <div style="font-size:12px;font-weight:800;color:#475569;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px">
@@ -19511,13 +19575,16 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
       const prevDias = Object.keys(store.dias || {}).sort();
       const prevDay = prevDias.length ? prevDias[prevDias.length-1] : null;
       const prev = prevDay && store.dias[prevDay] && store.dias[prevDay].porD ? store.dias[prevDay].porD : {};
+      const esInicial = !prevDay;
       const cambios = [];
-      for(const k in porD){
-        const antes = typeof prev[k] === 'number' ? prev[k] : 0;
-        const delta = porD[k] - antes;
-        if(delta > 0.004) cambios.push({ n: k, pb: delta });
+      if(!esInicial){
+        for(const k in porD){
+          const antes = typeof prev[k] === 'number' ? prev[k] : 0;
+          const delta = porD[k] - antes;
+          if(delta > 0.004) cambios.push({ n: k, pb: delta });
+        }
       }
-      store.dias[hoy] = { total, porD, cambios, ultima: new Date().toISOString() };
+      store.dias[hoy] = { total, porD, cambios, esInicial: esInicial || undefined, ultima: new Date().toISOString() };
       const claves = Object.keys(store.dias).sort();
       while(claves.length > 35){ delete store.dias[claves.shift()]; }
       localStorage.setItem('appi_linea_v1', JSON.stringify(store));
