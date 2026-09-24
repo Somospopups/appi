@@ -5682,9 +5682,6 @@ body.dark #pageTabs button.active{color:#c5d6ff}
   .admin-send-grid .cerrar{background:rgba(91,141,239,.11);color:#3d63c9}
   /* La sesión admin vive solo en el panel: sin sidebar ni menú de la app. */
   body.appi-admin #deskSidebar,body.appi-admin #dsReopenBtn,body.appi-admin #btnTopMenu,body.appi-admin nav.tabs,body.appi-admin #pageTabs{display:none!important}
-  /* El "?" del panel no puede taparle el cerrar sesión (v302): va tercero.
-     Orden: ? · 🔑 · ↪ */
-  header.top.admin-top .help-btn{right:96px!important;left:auto!important}
   /* hidden es hidden, aunque la clase tenga display propio. */
   .admin-blink-badge[hidden],.admin-quick-badge[hidden]{display:none!important}
   /* Cumplimiento diario (v344): tarjetas con avatar, chips y barra de progreso */
@@ -6482,7 +6479,6 @@ body.dark .admin-sec-btn.danger {
   </style>
   <section id="view-admin" class="view admin-view">
     <header class="top admin-top">
-      <button class="help-btn" id="btnHelpAdmin" aria-label="Ayuda">?</button>
       <button type="button" class="admin-round-password" id="btnAdminPanelPassword" aria-label="Cambiar contraseña" title="Cambiar contraseña">🔑</button>
       <button type="button" class="admin-round-logout" id="btnAdminPanelLogout" aria-label="Cerrar sesión" title="Cerrar sesión">↪</button>
       <h1>Panel</h1>
@@ -14154,8 +14150,8 @@ function cerrarToolsMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-const swVersion='592';
-  const CACHE_NAME='appi-v592-pill-bajo-titulo';
+const swVersion='593';
+  const CACHE_NAME='appi-v593-sin-ayuda-panel';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}

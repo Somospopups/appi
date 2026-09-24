@@ -93,11 +93,9 @@ test('al vencer la prueba, el ingreso se bloquea con su propio mensaje', () => {
   expect(js).toContain('select=membresia_prueba');
 });
 
-test('el panel de administración tiene su ayuda, como todas las pantallas', () => {
+test('el panel de administración queda sin el botón de ayuda (el administrador no lo necesita)', () => {
   const html = fs.readFileSync('index.html', 'utf8');
-  expect(html).toContain('id="btnHelpAdmin"');
+  expect(html).not.toContain('id="btnHelpAdmin"');
   const js = fs.readFileSync('admin-panel.js', 'utf8');
-  expect(js).toContain('btnHelpAdmin');
-  expect(js).toContain('CUMPLIMIENTO DIARIO');
-  expect(js).toContain('PRUEBA (5 días');
+  expect(js).not.toContain('btnHelpAdmin');
 });

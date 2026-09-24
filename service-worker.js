@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v592-pill-bajo-titulo';
+const CACHE_NAME = 'appi-v593-sin-ayuda-panel';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

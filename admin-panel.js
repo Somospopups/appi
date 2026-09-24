@@ -1239,42 +1239,7 @@ function bind(){if(state.bound)return;state.bound=true;['adminSucursal','adminNu
   if(cumpOv){cumpOv.addEventListener('click',e=>{if(e.target===cumpOv)cerrarCumpFicha()});}
   const cumpClose=$('adminCumpClose'); if(cumpClose) cumpClose.onclick=cerrarCumpFicha;
   const cumpWa=$('adminCumpWa'); if(cumpWa) cumpWa.onclick=enviarCumpWhatsApp;
-$('adminSaveWhatsapp').onclick=saveWhatsapp;$('btnAdminPanelLogout').onclick=logout;$('btnAdminPanelPassword').onclick=()=>window.abrirCambioPasswordAPPI();const helpAdmin=$('btnHelpAdmin');if(helpAdmin)helpAdmin.onclick=()=>window.APPIDialog.alert(
-`Desde acá administrás las cuentas de APPI.
-
-ABAJO
-Hoy · Solicitudes · Cuentas · Más. En el teléfono y en la PC es lo mismo.
-
-PLATA
-Los montos arrancan tapados. Tocá el 👁 para verlos. Cuando volvés a entrar, otra vez ocultos.
-
-TABLERO
-Arriba está la plata del mes con la comparación contra el mes anterior y las 12 barras del año (tocá una y saltás a ese mes). Los chips resumen el estado: activas, en prueba, por vencer y solicitudes.
-
-NECESITAN TU ATENCIÓN
-Lo urgente en un solo lugar: solicitudes sin resolver, membresías que vencen y pruebas por terminar. Tocá un renglón y te lleva.
-
-CREAR CUENTA
-Tocá el + de abajo a la derecha y completá los datos en la ventana. Elegí la duración: 1 mes, 🧪 PRUEBA (5 días con franja roja; al vencer, el ingreso se bloquea) o ♾️ PARA SIEMPRE (sin vencimiento). Al crear, podés mandar por WhatsApp la bienvenida y la contraseña en dos mensajes separados: la contraseña viaja sola para copiar y pegar fácil.
-
-SOLICITUDES PENDIENTES
-Las personas que piden acceso desde la app aparecen acá. Al aprobar elegís 1 mes o PRUEBA, y podés mandar las credenciales por WhatsApp.
-
-CUENTAS (Distribuidores)
-La sección arranca minimizada con el resumen; tocala para abrir. Cada distribuidor es un renglón: tocalo y se despliegan todas sus acciones, cómodas y con nombre: 💬 WhatsApp (va directo si la cuenta tiene el número guardado — al aprobar una solicitud queda solo; con 📱 Teléfono lo cargás o corregís cuando quieras), 🎫 Ticket (elegís desde–hasta y salen en el comprobante), 📆 Vence el (elegís el día en que se le corta APPI), 💳 Registrar pago y 📅 Prórroga (ambos sacan del modo prueba solos), 🔑 Nueva contraseña, 👥 Personas, 🧪 Prueba 5 días, 📅 1 mes completo (suma un mes a lo que le queda, sin registrar un pago), ♾️ Para siempre (acceso permanente), Bloquear y Eliminar.
-
-CUMPLIMIENTO DIARIO
-Lo que cada cuenta marcó con ✓ y ✗ en sus acciones del día: hoy y últimos 7 días. La sección arranca minimizada con el resumen a la vista; tocala para abrir el detalle y usá el buscador por nombre o DIP.
-
-INGRESOS POR MES
-Los pagos registrados, mes por mes: total recaudado, cantidad de pagos y quién pagó. Con las flechas cambiás de mes y la tira anual muestra los 12 meses del año.
-
-WHATSAPP DE SOPORTE
-El número que ven quienes piden ayuda para entrar. Se valida antes de guardarse.
-
-CON QUÉ WHATSAPP MANDÁS
-En Configuración elegís si los envíos del panel abren WhatsApp normal o Business en tu teléfono, sin preguntar cada vez.`,
-{title:'Panel de administración',icon:'🛡️'});$('adminUserSearch').oninput=event=>{state.filter=event.target.value;renderUsers()};
+$('adminSaveWhatsapp').onclick=saveWhatsapp;$('btnAdminPanelLogout').onclick=logout;$('btnAdminPanelPassword').onclick=()=>window.abrirCambioPasswordAPPI();$('adminUserSearch').oninput=event=>{state.filter=event.target.value;renderUsers()};$('adminUserSearch').oninput=event=>{state.filter=event.target.value;renderUsers()};
   const filtrosCuentas=$('adminCuentasFiltros');
   if(filtrosCuentas) filtrosCuentas.querySelectorAll('[data-cuenta-filtro]').forEach(b=>b.onclick=()=>{
     const k=b.dataset.cuentaFiltro;
