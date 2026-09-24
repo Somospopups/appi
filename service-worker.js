@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v606-avatar-persona-blanca-con-foto';
+const CACHE_NAME = 'appi-v607-sin-reflejo-eleccion-persona';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
