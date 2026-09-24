@@ -2803,7 +2803,7 @@ body.dark .hist-action-drawer{background:linear-gradient(155deg,#151827,#252036 
     backdrop-filter: blur(14px) saturate(180%);
     border: 0.5px solid rgba(255,255,255,0.65);
     box-shadow: 0 2px 10px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
-    font-size: 0; color: #8e8e93;
+    font-size: 18px; font-weight: 700; color: #8e8e93;
     cursor: pointer; display: grid; place-items: center;
     line-height: 1; transition: background .15s, transform .12s, box-shadow .15s;
     z-index: 5;
@@ -14160,8 +14160,8 @@ function cerrarToolsMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-const swVersion='599';
-  const CACHE_NAME='appi-v599-dock-alerta-contenida';
+const swVersion='600';
+  const CACHE_NAME='appi-v600-x-visibles';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
