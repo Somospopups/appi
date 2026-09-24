@@ -6073,12 +6073,12 @@ body.dark .admin-user-row {
   background: rgba(58, 208, 164, 0.14);
   border-color: rgba(58, 208, 164, 0.4);
 }
-.admin-quick-btn.accion-vence {
-  background: rgba(91, 141, 239, 0.14);
-  border-color: rgba(91, 141, 239, 0.4);
+.admin-quick-btn.accion-ticket {
+  background: rgba(245, 179, 1, 0.16);
+  border-color: rgba(245, 179, 1, 0.45);
 }
 body.dark .admin-quick-btn.accion-pago { background: rgba(58, 208, 164, 0.16); }
-body.dark .admin-quick-btn.accion-vence { background: rgba(130, 168, 255, 0.16); }
+body.dark .admin-quick-btn.accion-ticket { background: rgba(196, 161, 0, 0.18); }
 
 /* Tarjeta coloreada según el estado de la cuenta (fondo y borde completos) */
 body.appi-admin .admin-user-row.admin-estado-activa { border-color: rgba(47, 191, 143, 0.85) !important; background: linear-gradient(180deg, rgba(47, 191, 143, 0.32), rgba(47, 191, 143, 0.13)) !important; }
@@ -14151,8 +14151,8 @@ function cerrarToolsMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-const swVersion='596';
-  const CACHE_NAME='appi-v596-siempre-en-su-boton';
+const swVersion='597';
+  const CACHE_NAME='appi-v597-renglon-y-ticket';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}

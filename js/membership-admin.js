@@ -143,39 +143,44 @@
   }
 
   function showPaymentModal(userId,userName){
-    const modal=document.createElement('div');
-    modal.className='modal-overlay membership-modal-overlay';
-    modal.innerHTML=`
-      <div class="modal payment-modal" role="dialog" aria-modal="true" aria-labelledby="membershipPaymentTitle">
-        <div class="modal-header"><h2 id="membershipPaymentTitle">💳 Registrar pago</h2><button type="button" class="modal-close" aria-label="Cerrar">×</button></div>
-        <div class="modal-body">
-          <p>Registrar pago de <strong>${esc(userName)}</strong></p>
-          <div class="form-group"><label for="paymentAmount">Monto ($)</label><input type="number" id="paymentAmount" class="form-input" value="50000" min="1" max="1000000000" step="100"></div>
-          <div class="form-group"><label for="paymentMethod">Método de pago</label><select id="paymentMethod" class="form-input"><option value="transferencia">Transferencia</option><option value="efectivo">Efectivo</option><option value="mercadopago">Mercado Pago</option><option value="otro">Otro</option></select></div>
-          <div class="form-group"><label for="paymentDate">Fecha del pago</label><input type="date" id="paymentDate" class="form-input"><small class="form-hint">Viene el día de hoy. Si pagó otro día, cambiá la fecha y el mes corre desde ahí.</small></div>
-          <div class="form-group"><label for="paymentNotes">Notas</label><textarea id="paymentNotes" class="form-input" rows="2" maxlength="1000" placeholder="Notas opcionales"></textarea></div>
-          <div class="admin-inline-status" id="paymentStatus" role="status"></div>
-        </div>
-        <div class="modal-footer"><button type="button" class="btn btn-secondary" data-membership-cancel>Cancelar</button><button type="button" class="btn btn-primary" id="btnSavePayment">Registrar pago</button></div>
-      </div>`;
-    document.body.appendChild(modal);
-    const hoy=new Date(),hoyISO=`${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,'0')}-${String(hoy.getDate()).padStart(2,'0')}`;
-    const fechaEl=$('paymentDate');if(fechaEl){fechaEl.max=hoyISO;fechaEl.value=hoyISO}
-    modal.querySelector('.modal-close').onclick=()=>closeModal(modal);
-    modal.querySelector('[data-membership-cancel]').onclick=()=>closeModal(modal);
-    $('btnSavePayment').onclick=async()=>{
-      const amount=Number($('paymentAmount').value),button=$('btnSavePayment'),status=$('paymentStatus');
-      if(!Number.isFinite(amount)||amount<=0){status.textContent='Ingresá un monto válido.';status.className='admin-inline-status show error';$('paymentAmount').focus();return}
-      const paymentDate=(fechaEl&&fechaEl.value)||hoyISO;
-      button.disabled=true;button.textContent='Registrando…';status.className='admin-inline-status';status.textContent='';
-      try{
-        await registerPayment(userId,amount,$('paymentMethod').value,$('paymentNotes').value,paymentDate);
-        closeModal(modal);
-        await renderRevenuePanel();
-        if(window.APPIAdminPanel&&window.APPIAdminPanel.load)await window.APPIAdminPanel.load();
-        if(typeof window.showToast==='function')window.showToast('Pago registrado y membresía extendida ✓',2600);
-      }catch(error){status.textContent=error.message;status.className='admin-inline-status show error';button.disabled=false;button.textContent='Registrar pago'}
-    };
+    return new Promise(resolve=>{
+      let cerrado=false;
+      const fin=v=>{ if(cerrado)return; cerrado=true; resolve(v); };
+      const modal=document.createElement('div');
+      modal.className='modal-overlay membership-modal-overlay';
+      modal.innerHTML=`
+        <div class="modal payment-modal" role="dialog" aria-modal="true" aria-labelledby="membershipPaymentTitle">
+          <div class="modal-header"><h2 id="membershipPaymentTitle">💳 Registrar pago</h2><button type="button" class="modal-close" aria-label="Cerrar">×</button></div>
+          <div class="modal-body">
+            <p>Registrar pago de <strong>${esc(userName)}</strong></p>
+            <div class="form-group"><label for="paymentAmount">Monto ($)</label><input type="number" id="paymentAmount" class="form-input" value="50000" min="1" max="1000000000" step="100"></div>
+            <div class="form-group"><label for="paymentMethod">Método de pago</label><select id="paymentMethod" class="form-input"><option value="transferencia">Transferencia</option><option value="efectivo">Efectivo</option><option value="mercadopago">Mercado Pago</option><option value="otro">Otro</option></select></div>
+            <div class="form-group"><label for="paymentDate">Fecha del pago</label><input type="date" id="paymentDate" class="form-input"><small class="form-hint">Viene el día de hoy. Si pagó otro día, cambiá la fecha y el mes corre desde ahí.</small></div>
+            <div class="form-group"><label for="paymentNotes">Notas</label><textarea id="paymentNotes" class="form-input" rows="2" maxlength="1000" placeholder="Notas opcionales"></textarea></div>
+            <div class="admin-inline-status" id="paymentStatus" role="status"></div>
+          </div>
+          <div class="modal-footer"><button type="button" class="btn btn-secondary" data-membership-cancel>Cancelar</button><button type="button" class="btn btn-primary" id="btnSavePayment">Registrar pago</button></div>
+        </div>`;
+      document.body.appendChild(modal);
+      const hoy=new Date(),hoyISO=`${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,'0')}-${String(hoy.getDate()).padStart(2,'0')}`;
+      const fechaEl=$('paymentDate');if(fechaEl){fechaEl.max=hoyISO;fechaEl.value=hoyISO}
+      modal.querySelector('.modal-close').onclick=()=>{closeModal(modal);fin(null)};
+      modal.querySelector('[data-membership-cancel]').onclick=()=>{closeModal(modal);fin(null)};
+      $('btnSavePayment').onclick=async()=>{
+        const amount=Number($('paymentAmount').value),button=$('btnSavePayment'),status=$('paymentStatus');
+        if(!Number.isFinite(amount)||amount<=0){status.textContent='Ingresá un monto válido.';status.className='admin-inline-status show error';$('paymentAmount').focus();return}
+        const paymentDate=(fechaEl&&fechaEl.value)||hoyISO;
+        button.disabled=true;button.textContent='Registrando…';status.className='admin-inline-status';status.textContent='';
+        try{
+          await registerPayment(userId,amount,$('paymentMethod').value,$('paymentNotes').value,paymentDate);
+          closeModal(modal);
+          await renderRevenuePanel();
+          if(window.APPIAdminPanel&&window.APPIAdminPanel.load)await window.APPIAdminPanel.load();
+          if(typeof window.showToast==='function')window.showToast('Pago registrado y membresía extendida ✓',2600);
+          fin(true);
+        }catch(error){status.textContent=error.message;status.className='admin-inline-status show error';button.disabled=false;button.textContent='Registrar pago'}
+      };
+    });
   }
 
   window.APPIAdminMembership={

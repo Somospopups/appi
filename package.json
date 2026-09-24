@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "596.0.0",
-  "cacheName": "appi-v596-siempre-en-su-boton",
+  "version": "597.0.0",
+  "cacheName": "appi-v597-renglon-y-ticket",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

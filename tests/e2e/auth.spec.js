@@ -339,7 +339,7 @@ test('administración ingresa por el candado y no tiene distribuidor asociado', 
   await expect(page.locator('#adminUserList')).toContainText('Distribuidor A');
   await page.locator('.admin-user-head').first().click();
   await expect(page.locator('[data-admin-action="payment"]').first()).toBeVisible();
-  await expect(page.locator('[data-admin-action="set_vence"]').first()).toBeVisible();
+  await expect(page.locator('[data-admin-action="ticket"]').first()).toBeVisible();
   await expect(page.locator('[data-admin-action="people"]').first()).not.toBeVisible();
   await page.locator('.admin-danger-details summary').first().click();
   await expect(page.locator('[data-admin-action="people"]').first()).toBeVisible();

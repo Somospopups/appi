@@ -219,6 +219,9 @@ function renderUsers(){
               <button type="button" class="admin-tool-btn" data-admin-action="password">
                 <span>🔑</span> Cambiar clave
               </button>
+              <button type="button" class="admin-tool-btn" data-admin-action="set_vence">
+                <span>📆</span> Vence el
+              </button>
               <button type="button" class="admin-tool-btn" data-admin-action="ticket">
                 <span>🎫</span> Ver Ticket
               </button>
@@ -241,13 +244,13 @@ function renderUsers(){
       <div class="admin-user-main">
         <button type="button" class="admin-user-head" data-user-toggle="${esc(user.user_id)}">
           <div><h3>${esc(user.nombre||'Sin nombre')}${user.socio_nombre?` + ${esc(user.socio_nombre)}`:''}</h3>
-          <p>${esc(user.dip||'Sin número')} · Vence ${esc(expires)}${user.dia_pago?` · 💳 Día ${user.dia_pago}`:''}${state.telefonos.get(user.user_id)?` · 📱 ${esc(state.telefonos.get(user.user_id))}`:''}</p></div>
-          <span class="admin-user-badges"><span class="admin-user-badge ${user.activo?'':'blocked'}">${user.activo?'ACTIVA':'BLOQUEADA'}</span><span class="membership-state ${membership.cls}">${membership.label}</span></span>
+          <p>Vence ${esc(expires)}${user.dia_pago?` · 💳 Día ${user.dia_pago}`:''}</p></div>
+          <span class="admin-user-badges"><span class="membership-state ${membership.cls}">${membership.label}</span></span>
           <span class="admin-user-chev ${abierto?'open':''}">›</span>
         </button>
         <span class="admin-quick">
-          <button type="button" class="admin-quick-btn accion-pago" data-admin-action="payment" title="Registrar pago" aria-label="Registrar pago">💳</button>
-          <button type="button" class="admin-quick-btn accion-vence" data-admin-action="set_vence" title="Cambiar vencimiento" aria-label="Cambiar vencimiento">📆</button>
+          <button type="button" class="admin-quick-btn accion-pago" data-admin-action="payment" title="Registrar pago (y ticket)" aria-label="Registrar pago">💳</button>
+          <button type="button" class="admin-quick-btn accion-ticket" data-admin-action="ticket" title="Ticket (desde–hasta)" aria-label="Ticket">🎫</button>
         </span>
       </div>
       ${acciones}</article>`}).join('');
@@ -787,7 +790,11 @@ async function handleUserAction(button){
     }
     if(action==='payment'){
       if(window.APPIAdminMembership&&window.APPIAdminMembership.showPaymentModal){
-        window.APPIAdminMembership.showPaymentModal(userId,user.nombre||user.dip);
+        const ok=await window.APPIAdminMembership.showPaymentModal(userId,user.nombre||user.dip);
+        if(ok){
+          const fresco=state.users.find(item=>item.user_id===userId);
+          await enviarTicketWhatsApp(fresco||user);
+        }
       }else{
         await window.APPIDialog.alert('El sistema de membresías no está disponible.',{title:'Error',icon:'!'});
       }
