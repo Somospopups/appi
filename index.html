@@ -4647,7 +4647,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-equipo" onclick="openEquipo()"><span>🌳</span> Mi Equipo</button>
     <button class="ds-btn" data-ds="view-historico" onclick="openHistorico()"><span>📈</span> Histórico</button>
     <button class="ds-btn" data-ds="view-usuarios" onclick="showView('view-usuarios')"><span>📍</span> Usuarios</button>
-    <button class="ds-btn" data-ds="view-campus" onclick="openCampusPSA()"><span>🎓</span> Campus PSA</button>
+    <button class="ds-btn" data-ds="view-campus" onclick="openCampusPSA()"><span>🎓</span> Campus Appi</button>
     <button class="ds-btn" data-ds="view-margarita" onclick="openMargarita()"><span>✿</span> Mi Margarita</button>
     <button class="ds-btn" data-ds="view-gestion" onclick="openMiGestion()"><span>📇</span> Panel de Contactos <span class="gestion-sidebar-badge" id="gestionSidebarBadge" hidden>0</span></button>
     <button type="button" class="ds-section-label ds-section-go" onclick="showView('view-herramientas'); if(typeof renderHomeCompleto==='function') renderHomeCompleto();">Mis herramientas</button>
@@ -5087,7 +5087,7 @@ body.dark #pageTabs button.active{color:#c5d6ff}
     <header class="top" style="padding-bottom:4px">
       <button class="back-btn" onclick="showView('view-home')" aria-label="Volver">‹</button>
       <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
-      <h1>Campus PSA</h1>
+      <h1>Campus Appi</h1>
       <div class="script">aprendé y aplicá</div>
     </header>
     <div id="campusCont"></div>
@@ -12444,7 +12444,7 @@ function renderToolsList(){
   const campusActivo = !!(window.APPICampusPSA && window.APPICampusPSA.retoDesbloqueado && window.APPICampusPSA.retoDesbloqueado());
   const campusListo = !!(window.APPICampusPSA && window.APPICampusPSA.desafioDisponible && window.APPICampusPSA.desafioDisponible());
   const campusCard = renderHomeQuickCard({
-    icon:'🎓', title:'Campus PSA', sub: campusActivo ? 'Impulso diario activado' : campusListo ? 'Desafío listo: ganá 3 más' : 'Aprendé y llevalo a la acción',
+    icon:'🎓', title:'Campus Appi', sub: campusActivo ? 'Impulso diario activado' : campusListo ? 'Desafío listo: ganá 3 más' : 'Aprendé y llevalo a la acción',
     statusVal: campusActivo ? '+3' : campusListo ? 'Listo' : 'Campus',
     statusClass: campusActivo ? 'done' : campusListo ? 'pending' : 'empty',
     progressPct: campusActivo ? 100 : campusListo ? 75 : 20,
@@ -14198,8 +14198,8 @@ function cerrarToolsMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-const swVersion='608';
-  const CACHE_NAME='appi-v608-tarjetas-persona-lado-a-lado';
+const swVersion='609';
+  const CACHE_NAME='appi-v609-campus-appi';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}

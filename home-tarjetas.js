@@ -1201,7 +1201,7 @@
       if (!window.APPICampusPSA || !window.APPICampusPSA.desafioDisponible || !window.APPICampusPSA.desafioDisponible()) return null;
       if (window.APPICampusPSA.retoDesbloqueado && window.APPICampusPSA.retoDesbloqueado()) return null;
       return {
-        cat:'campus', icono:'🎓', kicker:'Campus PSA × APPI',
+        cat:'campus', icono:'🎓', kicker:'Campus Appi',
         titulo:'¡Día cumplido! ¿Vamos por 3 más?',
         html:'<p class="ht-nota">Completaste tus 10 acciones base. Respondé 5 preguntas de tu categoría y desbloqueá hasta 3 nuevas prioridades reales para hoy.</p><div class="ht-chips"><span>✓ 10 acciones</span><span>✦ 5 aciertos</span><span>⚡ +3 oportunidades</span></div>',
         cta:{ label:'Ganar 3 más 🎓', go:function(){ if (window.openCampusPSA) window.openCampusPSA(); setTimeout(function(){ try{ if(window.APPICampusPSA) window.APPICampusPSA.iniciarDesafio(); }catch(e){} }, 120); } }
