@@ -5862,7 +5862,7 @@ body.dark #pageTabs button.active{color:#c5d6ff}
     font-size:10px;font-weight:850;letter-spacing:.2px;line-height:1;white-space:nowrap;
   }
   .admin-ver-pill-sub{
-    margin:2px 0 0;padding:6px 12px;font-size:12px;
+    display:block;width:fit-content;margin:5px auto 0;padding:6px 12px;font-size:12px;
     background:rgba(11,88,120,.09);color:#0b5878;
     border:1px solid rgba(11,88,120,.16);
   }
@@ -14154,8 +14154,8 @@ function cerrarToolsMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-const swVersion='591';
-  const CACHE_NAME='appi-v591-pill-subtitulo';
+const swVersion='592';
+  const CACHE_NAME='appi-v592-pill-bajo-titulo';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}

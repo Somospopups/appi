@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "591.0.0",
-  "cacheName": "appi-v591-pill-subtitulo",
+  "version": "592.0.0",
+  "cacheName": "appi-v592-pill-bajo-titulo",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {
