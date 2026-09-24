@@ -4,6 +4,15 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v614 · PB por día con la Línea descendente de PSA
+
+- El desglose de **Mi negocio → TOTAL PB** se alimenta solo del informe **Autoconsulta → Informes de organización → Línea descendente**: muestra **nombre y PB** de cada integrante por día.
+- Cada vez que se abre la app se baja la Línea desde PSA (con las credenciales de MI PSA de Ajustes), se guardan los números y se acumulan los cambios de un día para el otro. Sirve para todo el que tenga organización.
+- TOTAL PB pasa a ser la suma de los PB de la Línea descendente (respaldo: Reporte de Bonos / archivo de equipo mientras no haya dato).
+- Sin conexión MI PSA o sin informe reconocido, todo queda como antes.
+- Nota técnica: el índice del informe se redescubre en Autoconsulta; si PSA lo cambia, se ajusta con el secret `PSA_LINEA_IDX`.
+- Versión: **v614 · Segura** · Cache `appi-v614-pb-por-dia`.
+
 ## v613 · Una sola carga por apertura (Service Worker consolidado)
 
 - El Service Worker se registra una sola vez: se eliminó el segundo registro del bloque de actualización que podía provocar recargas duplicadas al abrir la app.

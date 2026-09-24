@@ -4658,7 +4658,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v613 · Segura</div>
+  <div class="ds-foot">APPI · v614 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -7601,6 +7601,9 @@ function showView(id,opts){
   if(id==='view-home')    try{ if(typeof renderHomeCompleto==='function') renderHomeCompleto(); }catch(e){ console.error(e); }
   if(id==='view-planning') try{ renderPlanningTools(); }catch(e){ console.error(e); }
   if(id==='view-seguimiento') try{ renderSeguimiento(); }catch(e){ console.error(e); }
+  if(id==='view-negocio'){
+    setTimeout(function(){ try{ if(window.actualizarLineaPB) window.actualizarLineaPB({}); }catch(e){} }, 1400);
+  }
   document.body.classList.toggle('evaluar-hint', id === 'view-wheel');
   window.scrollTo(0,0);
   try{ window.scrollTo({top:0,left:0,behavior:'instant'}); }catch(e){}
@@ -14192,8 +14195,8 @@ function cerrarToolsMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-const swVersion='613';
-  const CACHE_NAME='appi-v613-una-sola-recarga';
+const swVersion='614';
+  const CACHE_NAME='appi-v614-pb-por-dia';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
@@ -19109,6 +19112,7 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
   // el reporte no está cargado; se actualiza solo cuando llega el reporte.
   function embudoKpiLiderPB(){
   window.embudoKpiLiderPB = embudoKpiLiderPB;
+    try{ const lt = window.appiLineaTotal ? window.appiLineaTotal() : null; if(lt != null) return lt; }catch(e){}
     try{
       const c=JSON.parse(localStorage.getItem('appi_bonos_v1')||'null');
       const a=c&&c.bonos&&c.bonos.acumulacion;
@@ -19225,7 +19229,8 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
       });
 
       const todayDay = now.getDate();
-      const finalTotalPB = typeof totalPbMes === "number" && totalPbMes > 0 ? totalPbMes : (totalPBDated || 0);
+      const lineaTotal = window.appiLineaTotal ? window.appiLineaTotal() : null;
+      const finalTotalPB = lineaTotal != null && lineaTotal > 0 ? lineaTotal : (typeof totalPbMes === "number" && totalPbMes > 0 ? totalPbMes : (totalPBDated || 0));
 
       // Si no hay ventas con fecha exacta, distribuir el PB activo entre los distribuidores del equipo
       if(totalPBDated < finalTotalPB && countDatedSales === 0 && finalTotalPB > 0){
@@ -19253,6 +19258,22 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
               pb: pbPerDay
             });
           }
+        }
+      }
+
+      // PB por día desde la Línea descendente (v614): cada día guardado con
+      // los cambios de PB de cada integrante pisa el armado con garantías.
+      const appiDias = window.appiLineaDias ? window.appiLineaDias() : null;
+      if(appiDias){
+        for(const clave in appiDias){
+          const reg = appiDias[clave];
+          if(!reg || !Array.isArray(reg.cambios)) continue;
+          const dayNum = parseInt(String(clave).slice(8,10), 10);
+          if(!dayNum || dayNum < 1 || dayNum > daysInMonth) continue;
+          const items = reg.cambios.filter(c => c && c.n && Number(c.pb) > 0).map(c => ({ titular:c.n, producto:'', usuario:'', pb:Number(c.pb), tipo:'linea' }));
+          if(!items.length) continue;
+          dailyPBs[dayNum].items = items;
+          dailyPBs[dayNum].pb = items.reduce((s,i) => s + Number(i.pb || 0), 0);
         }
       }
 
@@ -19293,7 +19314,7 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
                 <div>
                   <div style="font-weight:700;font-size:13px;color:#1e293b">${getDayName(d.day)} ${d.day} de ${currentMonthName}</div>
                   <div style="font-size:11px;color:#64748b;display:flex;align-items:center;gap:4px">
-                    ${d.items.length ? (d.items.length + (d.items.length===1 ? " compra / operación" : " compras / operaciones")) : "Sin actividad registrada"}
+                    ${d.items.length ? (d.items.every(i=>i.tipo==='linea') ? (d.items.length + (d.items.length===1 ? " distribuidor sumó PB" : " distribuidores sumaron PB")) : (d.items.length + (d.items.length===1 ? " compra / operación" : " compras / operaciones"))) : "Sin actividad registrada"}
                     <span style="color:#2563eb;font-weight:700">· Ver quién compró ›</span>
                   </div>
                 </div>
@@ -19337,6 +19358,7 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
             <div style="text-align:right">
               <div style="font-size:22px;font-weight:800;line-height:1.1">${finalTotalPB.toFixed(1)} PB</div>
               <div style="font-size:10px;opacity:0.85">Total acumulado</div>
+              <button type="button" onclick="window.actualizarLineaPBManual(this)" style="margin-top:4px;border:0;background:rgba(255,255,255,0.2);color:#fff;border-radius:8px;padding:3px 8px;font:700 9px inherit;cursor:pointer;white-space:nowrap"><span>↻</span> Actualizar de PSA</button>
             </div>
           </div>
 
@@ -19362,7 +19384,7 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
           ${weeksHtml}
 
           <div style="font-size:11px;color:#94a3b8;text-align:center;margin-top:12px;padding:6px">
-            💡 Tocá cualquier día para ver el detalle de distribuidores, productos y PB.
+            💡 Tocá cualquier día para ver el detalle de distribuidores y su PB.
           </div>
         </div>
       `;
@@ -19416,9 +19438,9 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
                   <div style="font-weight:700;font-size:13.5px;color:#1e293b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
                     ${escapeXml(item.titular || "Distribuidor")}
                   </div>
-                  <div style="font-size:11px;color:#64748b;margin-top:1px">
+                  ${item.tipo==='linea' ? '' : `<div style="font-size:11px;color:#64748b;margin-top:1px">
                     📦 ${escapeXml(item.producto || "Producto")} ${item.usuario ? ('· Cliente: ' + escapeXml(item.usuario)) : ''}
-                  </div>
+                  </div>`}
                 </div>
               </div>
               <div style="text-align:right;flex:none">
@@ -19443,7 +19465,7 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
             </div>
             <div style="text-align:right">
               <div style="font-size:22px;font-weight:900;line-height:1.1">${(Number(dayData.pb)||0).toFixed(1)} PB</div>
-              <div style="font-size:10px;opacity:0.85">${dayData.items ? dayData.items.length : 0} compras</div>
+              <div style="font-size:10px;opacity:0.85">${dayData.items && dayData.items.length && dayData.items.every(i=>i.tipo==='linea') ? (dayData.items.length + (dayData.items.length===1 ? ' distribuidor' : ' distribuidores')) : (dayData.items ? dayData.items.length : 0) + ' compras'}</div>
             </div>
           </div>
           <div style="font-size:12px;font-weight:800;color:#475569;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px">
@@ -19466,7 +19488,109 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
       console.error("Error abriendo detalle de día PB:", err);
     }
   };
-setTimeout(()=>{
+/* ===== PB por día · Línea descendente (v614) =====
+     Cada vez que se abre la app se baja la Línea descendente de PSA
+     (nombre + PB por integrante), se guardan los números y se acumulan
+     los cambios de un día para el otro. El desglose diario muestra solo
+     el nombre y el PB de cada uno. */
+  window.appiFechaBA = function(){
+    try{
+      const z = new Date(new Date().toLocaleString('en-US', { timeZone:'America/Argentina/Buenos_Aires' }));
+      return z.getFullYear()+'-'+String(z.getMonth()+1).padStart(2,'0')+'-'+String(z.getDate()).padStart(2,'0');
+    }catch(e){ const n=new Date(); return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0'); }
+  };
+  window.appiPeriodoBA = function(){ try{ return window.appiFechaBA().slice(0,7); }catch(e){ return ''; } };
+  function appiGuardarLinea(filas){
+    try{
+      const hoy = window.appiFechaBA(), periodo = window.appiPeriodoBA();
+      const porD = {}; let total = 0;
+      filas.forEach(f => { if(f && f.n){ const v = Number(f.pb) || 0; porD[f.n] = v; total += v; } });
+      let store = null;
+      try{ store = JSON.parse(localStorage.getItem('appi_linea_v1') || 'null'); }catch(e){}
+      if(!store || store.periodo !== periodo) store = { periodo, dias: {} };
+      const prevDias = Object.keys(store.dias || {}).sort();
+      const prevDay = prevDias.length ? prevDias[prevDias.length-1] : null;
+      const prev = prevDay && store.dias[prevDay] && store.dias[prevDay].porD ? store.dias[prevDay].porD : {};
+      const cambios = [];
+      for(const k in porD){
+        const antes = typeof prev[k] === 'number' ? prev[k] : 0;
+        const delta = porD[k] - antes;
+        if(delta > 0.004) cambios.push({ n: k, pb: delta });
+      }
+      store.dias[hoy] = { total, porD, cambios, ultima: new Date().toISOString() };
+      const claves = Object.keys(store.dias).sort();
+      while(claves.length > 35){ delete store.dias[claves.shift()]; }
+      localStorage.setItem('appi_linea_v1', JSON.stringify(store));
+      try{ window.dispatchEvent(new Event('appi-linea-cambiaron')); window.dispatchEvent(new Event('appi-bonos-cambiaron')); }catch(e){}
+      return true;
+    }catch(e){ return false; }
+  }
+  async function appiFetchLinea(){
+    const cfg = (window.APPI_AUTH && window.APPI_AUTH.url && window.APPI_AUTH.anonKey) ? window.APPI_AUTH : null;
+    const c = (typeof psaGetCreds === 'function') ? psaGetCreds() : null;
+    if(!cfg || !c || !c.center || !c.number || !c.password) return { ok:false, error:'no_creds' };
+    let token = '';
+    try{
+      if(window.APPIAuth && typeof window.APPIAuth.accessToken === 'function') token = window.APPIAuth.accessToken();
+      if(!token){ const v = JSON.parse(localStorage.getItem('appi_auth_session_v1') || 'null'); token = v && v.session && v.session.access_token || ''; }
+    }catch(e){}
+    try{
+      const r = await fetch(cfg.url + '/functions/v1/consulta-serial', {
+        method: 'POST',
+        headers: { 'Content-Type':'application/json', 'apikey': cfg.anonKey, 'Authorization': 'Bearer ' + (token || cfg.anonKey) },
+        body: JSON.stringify({ action:'linea', center:c.center, number:c.number, password:c.password })
+      });
+      const j = await r.json().catch(() => ({}));
+      if(r.ok && j && j.ok && Array.isArray(j.filas)) return { ok:true, filas:j.filas, guardado: appiGuardarLinea(j.filas) };
+      if(j && j.menu) return { ok:false, error:'no_menu', menu:j.menu };
+      return { ok:false, error: j && j.error ? j.error : 'psa' };
+    }catch(e){ return { ok:false, error:String((e && e.message) || e) }; }
+  }
+  window.actualizarLineaPB = async function(opts){
+    opts = opts || {};
+    const hoy = window.appiFechaBA(), periodo = window.appiPeriodoBA();
+    let store = null;
+    try{ store = JSON.parse(localStorage.getItem('appi_linea_v1') || 'null'); }catch(e){}
+    const tieneHoy = !!(store && store.periodo === periodo && store.dias && store.dias[hoy]);
+    let last = 0;
+    try{ last = Number(localStorage.getItem('appi_linea_lastFetch') || 0); }catch(e){}
+    if(!opts.force && tieneHoy && (Date.now() - last) < 60*60*1000) return { ok:true, cached:true };
+    const res = await appiFetchLinea();
+    if(res.ok && res.guardado){ try{ localStorage.setItem('appi_linea_lastFetch', String(Date.now())); }catch(e){} }
+    return res;
+  };
+  window.actualizarLineaPBManual = async function(btn){
+    if(btn){ const old = btn.textContent; btn.textContent = 'Actualizando…'; btn.disabled = true; }
+    const res = await window.actualizarLineaPB({ force:true });
+    if(btn){ try{ btn.textContent = '↻ Actualizar de PSA'; btn.disabled = false; }catch(e){} }
+    const t = window.appiLineaTotal ? window.appiLineaTotal() : null;
+    if(t != null) abrirModalDetallePB(t);
+    try{
+      if(res && res.cached) showToast('El PB del día ya estaba al día ✓');
+      else if(res && res.ok) showToast('PB actualizado ✓');
+      else if(res && res.error === 'no_creds') showToast('Conectá tu MI PSA primero (Ajustes → MI PSA)');
+      else showToast('No se pudo actualizar: ' + (res && res.error || 'error'));
+    }catch(e){}
+  };
+  window.appiLineaTotal = function(){
+    try{
+      const st = JSON.parse(localStorage.getItem('appi_linea_v1') || 'null');
+      if(!st || st.periodo !== window.appiPeriodoBA()) return null;
+      const keys = Object.keys(st.dias || {}).sort();
+      if(!keys.length) return null;
+      const last = st.dias[keys[keys.length-1]];
+      return last && typeof last.total === 'number' && last.total > 0 ? last.total : null;
+    }catch(e){ return null; }
+  };
+  window.appiLineaDias = function(){
+    try{
+      const st = JSON.parse(localStorage.getItem('appi_linea_v1') || 'null');
+      if(!st || st.periodo !== window.appiPeriodoBA()) return null;
+      return st.dias || null;
+    }catch(e){ return null; }
+  };
+
+  setTimeout(()=>{
     try{
       const view=document.getElementById("view-negocio");
       if(!view) return;

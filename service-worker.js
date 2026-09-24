@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v613-una-sola-recarga';
+const CACHE_NAME = 'appi-v614-pb-por-dia';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

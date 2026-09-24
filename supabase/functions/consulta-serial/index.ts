@@ -253,6 +253,67 @@ function parsearGarantias(html: string): Fila[] {
   return out;
 }
 
+/* ===== Línea descendente (Mi negocio · PB por día) =====
+   Autoconsulta → Informes de organización → Línea descendente. El
+   informe lista a cada integrante de la organización con su PB del mes.
+   Solamente interesan nombre y PB. Como PSA puede exponer el informe por
+   índices distintos, el idx se redescubre en el hub (auto_consultas.php);
+   si el hub no lo muestra, se usa el secret PSA_LINEA_IDX. */
+
+function numPB(raw: string): number {
+  const s = String(raw || '').replace(/[^0-9.,]/g, '');
+  if (!s) return 0;
+  const c = s.lastIndexOf(','), d = s.lastIndexOf('.');
+  if (c > d) {
+    return parseFloat(s.slice(0, c).replace(/\./g, '') + '.' + s.slice(c + 1)) || 0;
+  }
+  if (d > -1) {
+    const dec = s.slice(d + 1);
+    if (/^\d{1,2}$/.test(dec)) return parseFloat(s.slice(0, d).replace(/,/g, '') + '.' + dec) || 0;
+    return parseFloat(s.replace(/[.,]/g, '')) || 0;
+  }
+  return parseFloat(s) || 0;
+}
+
+function pareceNombre(s: string): boolean {
+  const t = String(s || '').trim();
+  if (t.length < 3 || t.length > 60) return false;
+  if (/\d/.test(t)) return false;
+  const palabras = t.split(/[\s]+/).filter(Boolean);
+  return palabras.length >= 2 && palabras.length <= 6;
+}
+
+interface LineaFila { n: string; pb: number }
+
+function parsearLinea(html: string): LineaFila[] | null {
+  const filas = filasHtml(html);
+  if (!filas.length) return null;
+  const out: LineaFila[] = [];
+  for (const f of filas) {
+    if (!f || f.length < 2) continue;
+    let idxNombre = -1;
+    for (let i = 0; i < f.length; i++) if (pareceNombre(f[i])) { idxNombre = i; break; }
+    if (idxNombre < 0) continue;
+    let pb: number | null = null;
+    for (let i = idxNombre + 1; i < f.length; i++) {
+      const cel = f[i] || '';
+      if (!cel || /[A-Za-z]/.test(cel)) continue;
+      if (!/[\d.,]/.test(cel)) continue;
+      pb = numPB(cel);
+      break;
+    }
+    if (pb == null) continue;
+    out.push({ n: f[idxNombre], pb });
+  }
+  return out.length ? out : null;
+}
+
+function columnasHtml(h: string): string[] {
+  const filas = filasHtml(h);
+  for (const f of filas) if (f.length > 1) return f;
+  return [];
+}
+
 /* ===== Perfil del distribuidor (v827) =====
    1) saldo en cuenta corriente    → dip autoconsulta idx=32
    2) última devolución de saldos  → dip idx=51 (CuentaCorriente)
@@ -332,7 +393,7 @@ Deno.serve(async (req) => {
   let body: any;
   try { body = await req.json(); } catch (_) { body = {}; }
   const serie = normSerie(body.serie || '');
-  if (body.action !== 'report' && body.action !== 'bonos' && body.action !== 'perfil' && serie.length < 4) return json({ error: 'Escribí el número de serie (el del QR de la base).' }, 400);
+  if (body.action !== 'report' && body.action !== 'bonos' && body.action !== 'perfil' && body.action !== 'linea' && serie.length < 4) return json({ error: 'Escribí el número de serie (el del QR de la base).' }, 400);
 
   // Credenciales PSA: las trae la app (sección MI PSA) o secrets del proyecto.
   const center = String(body.center || Deno.env.get('PSA_CENTER') || '').trim();
@@ -388,6 +449,81 @@ Deno.serve(async (req) => {
       return json({ error: 'PSA todavía no calculó los bonos de ese período (o cambió el formato del reporte).' }, 502);
     }
     return json({ ok: true, bonos });
+  }
+
+  /* ===== Línea descendente · PB por día (Mi negocio) =====
+     La app lo baja en cada apertura para guardar los números de cada
+     integrante y acumular los cambios día a día (nombre + PB). */
+  if (body.action === 'linea') {
+    // 1) Descubrir el informe en el hub de Autoconsulta.
+    let hubHtml = '';
+    try {
+      const rh = await fetch(DIP_HUB, { headers: { 'User-Agent': UA, Cookie: cookieH(dip) } });
+      hubHtml = decodificarLatin1(new Uint8Array(await rh.arrayBuffer()));
+    } catch (_) {}
+    let idxLinea = String(Deno.env.get('PSA_LINEA_IDX') || '').trim();
+    const reportes = new Map<string, string>();
+    const anchors = hubHtml.match(/<a[^>]*>[\s\S]*?<\/a>/gi) || [];
+    for (const a of anchors) {
+      const label = limpiarCelda(a);
+      if (!label || label.length < 3) continue;
+      const midx = a.match(/idx[=_]([\d]+)/i);
+      if (midx) reportes.set(String(midx[1]), label);
+    }
+    if (reportes.size) {
+      const norm = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+      let pick: string | null = null;
+      for (const [id, lbl] of reportes) if (/\blinea\b/.test(norm(lbl)) && /descend/i.test(norm(lbl))) { pick = id; break; }
+      if (!pick) for (const [id, lbl] of reportes) if (/(linea|descend)/.test(norm(lbl))) { pick = id; break; }
+      if (!pick) for (const [id, lbl] of reportes) if (/\borga/.test(norm(lbl))) { pick = id; break; }
+      if (pick) idxLinea = pick;
+    }
+    if (!idxLinea) {
+      const menu = [...reportes.entries()].slice(0, 40).map(([id, lbl]) => id + '=' + lbl);
+      return json({ ok: false, error: 'No pude ubicar el informe «Línea descendente» en Autoconsulta de PSA. Revisá la barra de direcciones cuando lo abras (idx=NN) y decime el número.', menu }, 502);
+    }
+
+    // 2) Bajar el informe del período actual.
+    const periodo = (body.periodo ? String(body.periodo) : periodoActualBA()).replace(/[^0-9\-]/g, '');
+    const mm = periodo.slice(5) + '-' + periodo.slice(0, 4);
+    const intentos: string[] = [];
+    let htmlL = '';
+    const urlGet = DIP_EXEC + '?idx=' + idxLinea + '&periodo=' + mm + '&Consulta=Linea';
+    try {
+      const rg = await dipReq(urlGet);
+      htmlL = decodificarLatin1(new Uint8Array(await rg.arrayBuffer()));
+      intentos.push('GET');
+    } catch (_) {}
+    if (!parsearLinea(htmlL)) {
+      try {
+        const rf = await dipReq(DIP_EXEC + '?idx=' + idxLinea + '&periodo=' + mm + '&Consulta=Linea');
+        const formH = decodificarLatin1(new Uint8Array(await rf.arrayBuffer()));
+        const fd = new URLSearchParams();
+        fd.set('idx', idxLinea);
+        const inputs = formH.match(/<input[^>]*>/gi) || [];
+        for (const inp of inputs) {
+          const nm = inp.match(/name="([^"]+)"/i);
+          if (!nm) continue;
+          const key = String(nm[1]);
+          const vl = (inp.match(/value="([^"]*)"/i) || ['', ''])[1];
+          const k = key.toLowerCase();
+          if (k === 'idx' || k === 'centro' || k === 'dip' || k === 'clave' || k === 'periodo' || k === 'accion' || k.startsWith('filtro') || k === 'consulta' || k.startsWith('nivel') || k.startsWith('orden')) {
+            fd.set(key, k === 'idx' ? idxLinea : (k === 'periodo' ? mm : vl));
+          }
+        }
+        if (!fd.get('accion')) fd.set('accion', 'consultar');
+        if (!fd.get('periodo')) fd.set('periodo', mm);
+        const rp = await dipReq(DIP_EXEC, { method: 'POST', body: fd.toString() });
+        htmlL = decodificarLatin1(new Uint8Array(await rp.arrayBuffer()));
+        intentos.push('POST');
+      } catch (_) {}
+    }
+
+    const filas = parsearLinea(htmlL);
+    if (!filas || !filas.length) {
+      return json({ ok: false, error: 'El informe de Línea descendente no devolvió integrantes (intentos: ' + intentos.join(', ') + '). Puede haber cambiado el formato de PSA.', columnas: columnasHtml(htmlL) }, 502);
+    }
+    return json({ ok: true, periodo, filas: filas.map(f => ({ n: f.n, pb: f.pb })) });
   }
 
   /* ===== v827 · PERFIL DEL DISTRIBUIDOR (0 interacción del user) ===== */
