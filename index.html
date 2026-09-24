@@ -5856,10 +5856,10 @@ body.dark #pageTabs button.active{color:#c5d6ff}
   }
   .admin-tab-badge[hidden]{display:none!important}
   .admin-ver-pill{
-    position:relative;z-index:1;flex:none;margin-left:auto;
-    padding:3px 7px;border-radius:999px;
+    position:relative;z-index:1;display:inline-block;vertical-align:middle;
+    margin-left:8px;padding:3px 7px;border-radius:999px;
     background:rgba(40,36,28,.06);color:#777887;
-    font-size:10px;font-weight:850;letter-spacing:.2px;line-height:1;
+    font-size:10px;font-weight:850;letter-spacing:.2px;line-height:1;white-space:nowrap;
   }
   body.dark .admin-ver-pill{background:rgba(255,255,255,.09);color:#b7b8c4}
   @media(min-width:1024px){
@@ -6481,7 +6481,7 @@ body.dark .admin-sec-btn.danger {
       <button type="button" class="admin-round-logout" id="btnAdminPanelLogout" aria-label="Cerrar sesión" title="Cerrar sesión">↪</button>
       <h1>Panel</h1>
       <div class="script">Administrador</div>
-      <p id="adminPanelIdentity">Cuenta de administración</p>
+      <p id="adminPanelIdentity">Cuenta de administración<span class="admin-ver-pill" id="adminVersionPill" title="Versión de APPI">v—</span></p>
     </header>
     <div class="admin-dashboard">
 
@@ -6640,7 +6640,6 @@ body.dark .admin-sec-btn.danger {
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
         <span>Más</span>
       </button>
-      <span class="admin-ver-pill" id="adminVersionPill" title="Versión de APPI">v—</span>
     </nav>
   </section>
 
@@ -14148,8 +14147,8 @@ function cerrarToolsMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-const swVersion='589';
-  const CACHE_NAME='appi-v589-tarjetas-color';
+const swVersion='590';
+  const CACHE_NAME='appi-v590-pill-arriba';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
