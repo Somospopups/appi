@@ -52,7 +52,7 @@ test('el cumplimiento se pinta con filas, marca de hoy y calendario mensual', as
   await page.click('#adminAccionesToggle');
   await page.waitForTimeout(300);
 
-  const hoyISO = new Date().toISOString().slice(0, 10);
+  const hoyISO = (() => { const d = new Date(); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0, 10); })();
   const filas = page.locator('.admin-cump-row');
   await expect(filas).toHaveCount(2);
 

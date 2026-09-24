@@ -4408,9 +4408,12 @@ body::before{
     radial-gradient(circle at 82% 28%, rgba(11,88,120,0.14), transparent 50%),
     radial-gradient(circle at 50% 88%, rgba(58,208,164,0.18), transparent 55%) !important;
 }
-/* Todas las vistas entran fluido */
+/* Todas las vistas entran fluido.
+   Sin fill-mode: el "both" dejaba transform:none como matriz identidad
+   (artefacto Chromium) y rompía el position:fixed del dock y el + del panel:
+   terminaban anclados al final del contenido en vez de flotar. */
 .view.active{
-  animation: appiViewEnter var(--dur-med) var(--ease-appi) both;
+  animation: appiViewEnter var(--dur-med) var(--ease-appi);
 }
 @keyframes appiViewEnter{
   from{opacity:0; transform:translateY(10px) scale(.98)}
@@ -14148,8 +14151,8 @@ function cerrarToolsMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-const swVersion='594';
-  const CACHE_NAME='appi-v594-sin-1-suelto';
+const swVersion='595';
+  const CACHE_NAME='appi-v595-dock-flotante';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
