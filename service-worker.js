@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v603-salir-al-bienvenida';
+const CACHE_NAME = 'appi-v604-overlay-transparente';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

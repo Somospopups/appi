@@ -237,9 +237,9 @@ body.appi-admin .revenue-stats{
   box-shadow:0 10px 24px rgba(11,88,120,.25);
 }
 .admin-login-overlay{
-  background:#f3eee3 !important;
-  backdrop-filter:none !important;
-  -webkit-backdrop-filter:none !important;
+  background:rgba(255,255,255,.16) !important;
+  backdrop-filter:blur(16px) saturate(170%) !important;
+  -webkit-backdrop-filter:blur(16px) saturate(170%) !important;
 }
 
 /* ---------- modo noche: nada de crema ---------- */
@@ -296,7 +296,9 @@ body.dark .ht-top b{color:#f2f2f7}
 body.dark .ht-tope,
 body.dark .ht-top span{color:#a0a0b0}
 body.dark .admin-login-overlay{
-  background:#16161e !important;
+  background:rgba(22,22,30,.55) !important;
+  backdrop-filter:blur(16px) !important;
+  -webkit-backdrop-filter:blur(16px) !important;
 }
 body.dark .lock-card,
 body.dark .admin-login-card{
