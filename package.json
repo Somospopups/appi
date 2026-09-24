@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "601.0.0",
-  "cacheName": "appi-v601-solicitudes-compactas",
+  "version": "602.0.0",
+  "cacheName": "appi-v602-login-al-salir",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

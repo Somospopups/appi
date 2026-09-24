@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v601-solicitudes-compactas';
+const CACHE_NAME = 'appi-v602-login-al-salir';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

@@ -832,14 +832,29 @@ async function handleRequestAction(button){
   }catch(error){await window.APPIDialog.alert(error.message,{title:'No se pudo completar',icon:'!'})}finally{button.disabled=false}
 }
 async function saveWhatsapp(){const button=$('adminSaveWhatsapp'),crudo=String($('adminWhatsappNumber').value||''),numero=window.APPITel?window.APPITel.normalizar(crudo):crudo.replace(/\D/g,'');button.disabled=true;try{if(!numero)throw new Error('Ese número no parece un celular argentino válido. Cargalo con código de área, por ejemplo 351 766-9967.');const data=await callAdmin({action:'set_whatsapp',numero});state.whatsapp=data.whatsapp||numero;setStatus('adminWhatsappStatus','Número de WhatsApp actualizado.');await window.APPIAccountRequest.getConfig(true).catch(()=>{})}catch(error){setStatus('adminWhatsappStatus',error.message,true)}finally{button.disabled=false}}
-async function logout(){const ok=await window.APPIDialog.confirm('Se cerrará la sesión administradora y se limpiarán los datos locales de este dispositivo.',{title:'Cerrar sesión',icon:'↪',okText:'Cerrar sesión'});if(!ok)return;const button=$('btnAdminPanelLogout');button.disabled=true;try{await window.APPIDataSync.logoutAndLock({removeCache:true});location.reload()}catch(error){
-  // La salida no puede quedar rehén de un problema de sincronización o de
-  // red: se explica qué pasó y se ofrece cerrar igual.
-  const forzar=await window.APPIDialog.confirm(`${error.message}\n\n¿Querés cerrar la sesión igual?`,{title:'No se pudo cerrar prolijo',icon:'⚠️',okText:'Cerrar igual',danger:true});
-  if(!forzar){button.disabled=false;return}
-  try{await window.APPIAuth.logout()}catch(e){}
-  location.reload();
-}}
+async function logout(){const ok=await window.APPIDialog.confirm('Se cerrará la sesión administradora y se limpiarán los datos locales de este dispositivo.',{title:'Cerrar sesión',icon:'↪',okText:'Cerrar sesión'});if(!ok)return;const button=$('btnAdminPanelLogout');button.disabled=true;
+  // La salida espera como máximo unos segundos: ni la sincronización ni la
+  // limpieza de caché pueden dejar la sesión tildada. Después se va solo al login.
+  let limpio=true;
+  try{
+    await Promise.race([
+      (async()=>{if(window.APPIDataSync&&window.APPIDataSync.logoutAndLock)await window.APPIDataSync.logoutAndLock({removeCache:true})})(),
+      new Promise(res=>setTimeout(res,4000))
+    ]);
+  }catch(error){limpio=false}
+  if(!limpio){try{await window.APPIAuth.logout()}catch(e){}}
+  salirAlLoginAdmin();
+}
+function salirAlLoginAdmin(){
+  try{
+    const vista=document.getElementById('view-admin');if(vista)vista.classList.remove('active');
+    document.body.classList.remove('appi-admin');
+    const fab=document.getElementById('adminFabCreate');if(fab)fab.classList.add('hid');
+    if(typeof mostrarLockScreen==='function')mostrarLockScreen();
+    if(typeof bloquearScrollCuerpo==='function')bloquearScrollCuerpo();
+    if(typeof mostrarAdminLoginPopup==='function')mostrarAdminLoginPopup();
+  }catch(error){location.reload()}
+}
 
 function inicialesCump(nombre){
   const partes=String(nombre||'').trim().split(/\s+/).filter(Boolean);
