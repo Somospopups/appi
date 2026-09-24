@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "611.0.0",
-  "cacheName": "appi-v611-comparativas-sin-dibujos",
+  "version": "612.0.0",
+  "cacheName": "appi-v612-icono-comparativas-agua",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

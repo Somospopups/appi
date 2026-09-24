@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v611-comparativas-sin-dibujos';
+const CACHE_NAME = 'appi-v612-icono-comparativas-agua';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
