@@ -240,22 +240,21 @@ function renderUsers(){
         </div>
       </details>
     </div>` : '';
-    return `<article class="admin-user-row admin-estado-${estadoRow}" data-admin-user="${esc(user.user_id)}" style="background:${ESTILO_ESTADO[estadoRow]}!important;border-color:${BORDE_ESTADO[estadoRow]}!important">
+    return `<article class="admin-user-row admin-estado-${estadoRow}" data-admin-user="${esc(user.user_id)}" data-user-toggle="${esc(user.user_id)}" style="background:${ESTILO_ESTADO[estadoRow]}!important;border-color:${BORDE_ESTADO[estadoRow]}!important">
       <div class="admin-user-main">
-        <button type="button" class="admin-user-head" data-user-toggle="${esc(user.user_id)}">
+        <div class="admin-user-head">
           <div><h3>${esc(user.nombre||'Sin nombre')}${user.socio_nombre?` + ${esc(user.socio_nombre)}`:''}</h3>
           <p>Vence ${esc(expires)}${user.dia_pago?` · 💳 Día ${user.dia_pago}`:''}</p></div>
-          <span class="admin-user-badges"><span class="membership-state ${membership.cls}">${membership.label}</span></span>
-          <span class="admin-user-chev ${abierto?'open':''}">›</span>
-        </button>
+        </div>
         <span class="admin-quick">
-          <button type="button" class="admin-quick-btn accion-pago" data-admin-action="payment" title="Registrar pago (y ticket)" aria-label="Registrar pago">💳</button>
-          <button type="button" class="admin-quick-btn accion-ticket" data-admin-action="ticket" title="Ticket (desde–hasta)" aria-label="Ticket">🎫</button>
+          <button type="button" class="admin-quick-btn accion-pago" data-admin-action="payment" title="Registrar pago" aria-label="Registrar pago">💳</button>
+          <button type="button" class="admin-quick-btn accion-ticket" data-admin-action="ticket" title="Periodo del comprobante" aria-label="Periodo del comprobante">🎫</button>
         </span>
       </div>
       ${acciones}</article>`}).join('');
-  list.querySelectorAll('[data-user-toggle]').forEach(head=>head.onclick=()=>{
-    const id=head.dataset.userToggle;
+  list.querySelectorAll('[data-user-toggle]').forEach(row=>row.onclick=event=>{
+    if(event.target.closest('button,summary,details,input,select,textarea,a'))return;
+    const id=row.dataset.userToggle;
     state.userAbierto=state.userAbierto===id?'':id;
     renderUsers();
   });

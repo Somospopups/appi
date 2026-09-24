@@ -5898,9 +5898,7 @@ body.dark #pageTabs button.active{color:#c5d6ff}
   .admin-user-head{display:flex;align-items:center;gap:10px;width:100%;border:0;background:none;padding:12px 4px;font:inherit;text-align:left;cursor:pointer}
   .admin-user-head h3{margin:0;color:#292938;font-size:14px}
   .admin-user-head p{margin:3px 0 0;color:#777887;font-size:10.5px}
-  .admin-user-head .admin-user-badges{margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:4px}
-  .admin-user-chev{flex:0 0 auto;width:30px;height:30px;display:grid;place-items:center;border-radius:50%;background:rgba(91,141,239,.1);color:#3d63c9;font-weight:900;transition:transform .2s}
-  .admin-user-chev.open{transform:rotate(90deg)}
+  #adminUserList .admin-user-row{max-width:640px;width:100%;margin-left:auto;margin-right:auto}
   .admin-user-acciones{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:4px 4px 10px}
   @media(min-width:800px){
     .admin-user-acciones{grid-template-columns:repeat(4,minmax(0,1fr))}
@@ -14151,8 +14149,8 @@ function cerrarToolsMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-const swVersion='597';
-  const CACHE_NAME='appi-v597-renglon-y-ticket';
+const swVersion='598';
+  const CACHE_NAME='appi-v598-renglon-expandible';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}

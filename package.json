@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "597.0.0",
-  "cacheName": "appi-v597-renglon-y-ticket",
+  "version": "598.0.0",
+  "cacheName": "appi-v598-renglon-expandible",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {
