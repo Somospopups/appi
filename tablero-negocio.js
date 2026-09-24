@@ -416,8 +416,8 @@
     var tipoActual = (window.__botTipo || "bidon");
     return "<div class=\"tb-sub\">Mostrala en la demo al cliente: la plata tirada y el plástico acumulado despiertan conciencia al instante</div>" +
       "<div class=\"bot-type-toggle\">" +
-        "<button type=\"button\" class=\"bot-type-btn " + (tipoActual === "bidon" ? "active" : "") + "\" id=\"btnTipoBidon\">🛢️ Bidones (12 / 20 L)</button>" +
-        "<button type=\"button\" class=\"bot-type-btn " + (tipoActual === "botella" ? "active" : "") + "\" id=\"btnTipoBotella\">🍾 Botellas (2 L)</button>" +
+        "<button type=\"button\" class=\"bot-type-btn " + (tipoActual === "bidon" ? "active" : "") + "\" id=\"btnTipoBidon\">Bidones (12 / 20 L)</button>" +
+        "<button type=\"button\" class=\"bot-type-btn " + (tipoActual === "botella" ? "active" : "") + "\" id=\"btnTipoBotella\">Botellas (2 L)</button>" +
       "</div>" +
       "<div class=\"tb-row\"><span id=\"lblCantConsumo\">" + (tipoActual === "bidon" ? "Bidones por semana" : "Botellas (2 L) por día") + "</span><input class=\"tb-input\" style=\"max-width:90px\" id=\"botPorDia\" type=\"number\" min=\"1\" max=\"100\" value=\"" + (tipoActual === "bidon" ? "3" : "2") + "\"></div>" +
       "<div class=\"tb-row\"><span id=\"lblPrecioConsumo\">" + (tipoActual === "bidon" ? "Precio por bidón ($)" : "Precio por botella ($)") + "</span><input class=\"tb-input\" style=\"max-width:120px\" id=\"botPrecio\" type=\"number\" min=\"0\" step=\"50\" value=\"" + (tipoActual === "bidon" ? "5500" : "1800") + "\"></div>" +
@@ -582,7 +582,7 @@
       '<div class="tb-title">Comparativas</div>' +
       '<div class="cmp-tabs">' +
         '<button type="button" class="cmp-tab" id="cmpTabProd">Productos</button>' +
-        '<button type="button" class="cmp-tab" id="cmpTabBot">PSA vs Bidones / Botellas</button>' +
+        '<button type="button" class="cmp-tab" id="cmpTabBot">Comparativas</button>' +
       '</div>' +
       '<div id="cmpPaneProd"' + (cmpTab() === 'prod' ? '' : ' hidden') + '>' + htmlCmpProd() + '</div>' +
       '<div id="cmpPaneBot"' + (cmpTab() === 'bot' ? '' : ' hidden') + '>' + htmlCmpBot() + '</div></div>';
@@ -621,21 +621,11 @@
       equivTexto = "🛒 Equivale a varios meses de compras completas de supermercado que hoy se van en plástico.";
     }
 
-    var maxIconos = 28;
-    var cantIconos = Math.min(maxIconos, Math.max(6, Math.round(unidadesAnio / (esBidon ? 6 : 40))));
-    var iconoItem = esBidon ? "🛢️" : "🍾";
-    var montanaVisual = "";
-    for (var mi = 0; mi < cantIconos; mi++) {
-      montanaVisual += iconoItem + " ";
-      if ((mi + 1) % 7 === 0) montanaVisual += "<br>";
-    }
-
     var mountEl = $("botMountain");
     if (mountEl) {
       mountEl.innerHTML =
         "<div class=\"bot-mountain-box\">" +
           "<div class=\"bot-mountain-title\">Montaña de plástico que entra a esa casa en 1 año</div>" +
-          "<div class=\"bot-mountain-icons\">" + montanaVisual + "</div>" +
           "<div class=\"bot-mountain-stat\">Son <span>" + unidadesAnio.toLocaleString("es-AR") + " " + (esBidon ? "bidones" : "botellas") + "</span> acumulados por año (" + Math.round(litrosAnio).toLocaleString("es-AR") + " litros transportados a mano)</div>" +
         "</div>";
     }

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v610-herramienta-comparativas';
+const CACHE_NAME = 'appi-v611-comparativas-sin-dibujos';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

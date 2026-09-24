@@ -12580,7 +12580,7 @@ function openBotella(){
   if(typeof window.abrirBotella === 'function') {
     window.abrirBotella();
   } else {
-    if(typeof showToast==='function') showToast('🍾 Comparativas no disponible', 2000);
+    if(typeof showToast==='function') showToast('Comparativas no disponible', 2000);
   }
 }
 function openLista(){
@@ -14198,8 +14198,8 @@ function cerrarToolsMenu(){
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-const swVersion='610';
-  const CACHE_NAME='appi-v610-herramienta-comparativas';
+const swVersion='611';
+  const CACHE_NAME='appi-v611-comparativas-sin-dibujos';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}

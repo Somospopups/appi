@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "610.0.0",
-  "cacheName": "appi-v610-herramienta-comparativas",
+  "version": "611.0.0",
+  "cacheName": "appi-v611-comparativas-sin-dibujos",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

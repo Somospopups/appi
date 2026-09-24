@@ -300,7 +300,7 @@
     var qIndex = state.questions[i];
     var focus = focusData();
     var actionExtra = '';
-    if (i === 1) actionExtra = '<button type="button" class="demo-bottle" data-demo-bottle>🍾 Abrir Comparativas</button>';
+    if (i === 1) actionExtra = '<button type="button" class="demo-bottle" data-demo-bottle>Abrir Comparativas</button>';
     if (i === 3) actionExtra = '<button type="button" class="demo-objection-open" data-demo-objections>🛡 Ver objeciones</button>';
     var nextLabel = i < 3 ? 'Listo, seguir a ' + PASOS_DEMO[i + 1].t + ' →' : 'Completar el recorrido ✓';
     return '<article class="demo-paso ' + (open ? 'active ' : '') + (state.done[i] ? 'done' : '') + '" data-demo-step="' + i + '">' +
