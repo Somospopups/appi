@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v624-margarita-contactos';
+const CACHE_NAME = 'appi-v625-contactos-fix';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

@@ -4,6 +4,13 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v625 · La Margarita no vuelve a frenar si la agenda no abre
+
+- En algunos Android (Chromium de fabricante, pestaña secundaria) el botón del teléfono existe pero la agenda se niega a abrir. Ahora el pétalo **cae solo a la hoja** con tus contactos de APPI, te avisa con un aviso breve y deja el botón "Elegir del teléfono" para reintentar — nunca más un callejón con solo un alert. Si el teléfono vuelve a funcionar, todo sigue igual.
+- El selector se pide además en pestaña de primer plano, reintenta con una sola propiedad si el combo completo no cierra, y recuerda la falla para no volver a intentar en cada toque.
+- `margarita-contactos.spec.js` suma el caso "picker roto → hoja" (6 tests).
+- Versión: **v625 · Segura** · Cache `appi-v625-contactos-fix`.
+
 ## v624 · La Margarita habla con tu teléfono y con tu Panel
 
 - Un **pétalo vacío** ahora abre **directo la agenda del teléfono** (Contact Picker) en Android: un solo toque, selección múltiple, y queda guardado con el contador al día.
