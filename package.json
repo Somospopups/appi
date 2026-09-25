@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "631.0.0",
-  "cacheName": "appi-v631-desglose-hora-ba",
+  "version": "632.0.0",
+  "cacheName": "appi-v632-sin-cambios-completa",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

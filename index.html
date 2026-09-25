@@ -4658,7 +4658,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v631 · Segura</div>
+  <div class="ds-foot">APPI · v632 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -14209,8 +14209,8 @@ function cerrarToolsMenu(){
   // con archivos viejos en pantalla.
   if ('serviceWorker' in navigator) {
     (async () => {
-const swVersion='631';
-  const CACHE_NAME='appi-v631-desglose-hora-ba';
+const swVersion='632';
+  const CACHE_NAME='appi-v632-sin-cambios-completa';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
@@ -19603,13 +19603,19 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
       // v630: la línea MANDA en los días que cubre (es autoritativa y se
       // recalcula sola contra el día anterior); el registro de movimientos solo
       // completa los días SIN registro de línea, y ahí sí muestra su acumulado.
+      // v632: la línea manda solo cuando tiene cambios reales; si el día tiene
+      // registro de línea pero vacío (PSA atrasado o sin variaciones), los
+      // movimientos detectados llenan el día (no se suman: no hay doble conteo).
+      // El día de partida del mes (esInicial) se respeta como está.
       try{
         const movDias = (window.appiPBDiario && typeof window.appiPBDiario.dias === 'function') ? window.appiPBDiario.dias() : null;
         if(movDias){
           for(const clave in movDias){
             const dayNum = parseInt(String(clave).slice(8,10), 10);
             if(!dayNum || dayNum < 1 || dayNum > daysInMonth) continue;
-            if(lineaDias[dayNum]) continue;
+            if(lineaDias[dayNum] && lineaDias[dayNum].length) continue;
+            const regLinea = appiDias ? appiDias[clave] : null;
+            if(regLinea && regLinea.esInicial) continue;
             const movs = (movDias[clave] || []).filter(m => Number(m.pb) > 0);
             if(!movs.length) continue;
             const ttDia = movs.reduce((mx, m) => Math.max(mx, Number(m.tt) || 0), 0);

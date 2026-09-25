@@ -4,6 +4,13 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v632 · La línea "sin cambios" ya no tapa los movimientos del día
+
+- Si la línea de PSA de un día se trae **sin cambios** (por ejemplo PSA va atrasado y todavía no subió el Excel), los movimientos de PB que el teléfono sí detectó quedaban tapados y el día mostraba 0.0 PB con "Ingresaste este día · sin cambios de PB". Ahora la línea manda **solo cuando tiene cambios reales**; si el registro del día está vacío, los movimientos detectados completan ese día (no se suman, así que no hay doble conteo) y conservan el acumulado de la línea.
+- El primer ingreso del mes (`esInicial`) se mantiene protegido: sigue mostrando "Estado inicial del mes cargado" aunque haya movimientos.
+- Cubierto por `psa-sync-automatico.spec.js` (día con línea sin cambios + movimiento → muestra el +3.2 PB y el acumulado de la línea; día inicial protegido).
+- Versión: **v632 · Segura** · Cache `appi-v632-sin-cambios-completa`.
+
 ## v631 · El desglose de PB se fija en la hora de Buenos Aires
 
 - El desglose semanal/diario usaba la fecha y hora del **dispositivo** mientras los registros de línea y de movimientos se guardan en hora de Buenos Aires; cerca del cambio de día o de mes podía mostrar un mes/día distinto al de los datos. Ahora mes, día actual, "día futuro" y el detalle del día se calculan con **`appiFechaBA()`** (la misma hora de los almacenes), con el reloj del dispositivo solo como respaldo si no está disponible.

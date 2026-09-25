@@ -739,4 +739,146 @@ return {
     expect(res.hoyMarcaBA).toBe(true);
     expect(res.manianaFuturo).toBe(true);
   });
+
+  test('el día con línea sin cambios se completa con el movimiento detectado (no queda en 0.0 PB)', async ({ page }) => {
+    await page.route('**/auth-config.js', route => route.fulfill({
+      contentType: 'application/javascript',
+      body: "window.APPI_AUTH={enabled:true,url:'https://mock.supabase.co',anonKey:'anon-key-publica-de-prueba',distributorEmailDomain:'distribuidores.appi.invalid',adminLogin:{username:'popups',email:'admin-popups@appi.invalid'},loginAliases:{},offlineDays:7};"
+    }));
+
+    await page.route('https://mock.supabase.co/**', route => {
+      const cors = { 'access-control-allow-origin': '*', 'content-type': 'application/json' };
+      return route.fulfill({ status: 200, headers: cors, body: '[]' });
+    });
+
+    await page.addInitScript(() => {
+      localStorage.setItem('welcomeSeen', '1');
+      localStorage.setItem('appi_tarjetas_auto', '0');
+      localStorage.setItem('tutoVisto_v2', '1');
+      localStorage.removeItem('equipoData');
+      localStorage.removeItem('usuarios_garantias');
+      localStorage.removeItem('appi_linea_v1');
+      localStorage.removeItem('appi_pb_mov_v1');
+      localStorage.removeItem('appi_pb_snapshot_distribuidores');
+    });
+
+    await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
+    await page.evaluate(() => {
+      const lock = document.getElementById('lockScreen');
+      if (lock) lock.classList.add('hidden');
+      const boot = document.getElementById('bootScreen');
+      if (boot) { boot.classList.add('gone'); boot.remove(); }
+      document.body.classList.remove('appi-login-abierto');
+      window.showView('view-equipo');
+    });
+
+    const res = await page.evaluate(() => {
+      localStorage.setItem('appi_recordatorios_v1', JSON.stringify({ hab: { pb_mov: false } }));
+      localStorage.setItem('appi_pb_snapshot_distribuidores', JSON.stringify({ '01-1': 8.2 }));
+      window.APPIRecordatorios.detectarMovimientosPB({
+        personas: [
+          { codigo: '01-1', nombre: 'GARCIA', pnAct: 11.4 },
+          { codigo: '01-2', nombre: 'LOPEZ', pnAct: 20 }
+        ]
+      });
+      const movStore = JSON.parse(localStorage.getItem('appi_pb_mov_v1') || 'null');
+      const clave = Object.keys(movStore.dias)[0];
+      const anio = clave.slice(0, 4), mes = clave.slice(5, 7);
+      // La línea del día existe pero sin cambios (PSA atrasado): no la borra.
+      localStorage.setItem('appi_linea_v1', JSON.stringify({
+        periodo: anio + '-' + mes,
+        dias: {
+          [clave]: {
+            total: 40,
+            porD: { 'GARCIA': 20, 'LOPEZ': 20 },
+            cambios: [],
+            ultima: new Date().toISOString()
+          }
+        }
+      }));
+      const dayNum = parseInt(clave.slice(8, 10), 10);
+      window.abrirModalDetallePB(0);
+      const cuerpo = (document.getElementById('modalBody') || { innerText: '' }).innerText;
+      window.abrirDetalleDiaPB(dayNum, 0);
+      const detalle = (document.getElementById('modalBody') || { innerText: '' }).innerText;
+      return {
+        noCero: !/Ingresaste este día · sin cambios de PB/.test(cuerpo),
+        filaMov: /\+3\.2 PB/.test(detalle),
+        totalMov: /Total: 11\.4 PB/.test(detalle),
+        acumLinea: /acum\. 40\.0/.test(cuerpo)
+      };
+    });
+
+    expect(res.noCero).toBe(true);
+    expect(res.filaMov).toBe(true);
+    expect(res.totalMov).toBe(true);
+    expect(res.acumLinea).toBe(true);
+  });
+
+  test('el día inicial del mes se respeta aunque haya movimientos detectados', async ({ page }) => {
+    await page.route('**/auth-config.js', route => route.fulfill({
+      contentType: 'application/javascript',
+      body: "window.APPI_AUTH={enabled:true,url:'https://mock.supabase.co',anonKey:'anon-key-publica-de-prueba',distributorEmailDomain:'distribuidores.appi.invalid',adminLogin:{username:'popups',email:'admin-popups@appi.invalid'},loginAliases:{},offlineDays:7};"
+    }));
+
+    await page.route('https://mock.supabase.co/**', route => {
+      const cors = { 'access-control-allow-origin': '*', 'content-type': 'application/json' };
+      return route.fulfill({ status: 200, headers: cors, body: '[]' });
+    });
+
+    await page.addInitScript(() => {
+      localStorage.setItem('welcomeSeen', '1');
+      localStorage.setItem('appi_tarjetas_auto', '0');
+      localStorage.setItem('tutoVisto_v2', '1');
+      localStorage.removeItem('equipoData');
+      localStorage.removeItem('usuarios_garantias');
+      localStorage.removeItem('appi_linea_v1');
+      localStorage.removeItem('appi_pb_mov_v1');
+      localStorage.removeItem('appi_pb_snapshot_distribuidores');
+    });
+
+    await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
+    await page.evaluate(() => {
+      const lock = document.getElementById('lockScreen');
+      if (lock) lock.classList.add('hidden');
+      const boot = document.getElementById('bootScreen');
+      if (boot) { boot.classList.add('gone'); boot.remove(); }
+      document.body.classList.remove('appi-login-abierto');
+      window.showView('view-equipo');
+    });
+
+    const res = await page.evaluate(() => {
+      const hoyBA = window.appiFechaBA();
+      const anio = hoyBA.slice(0, 4), mes = hoyBA.slice(5, 7);
+      // Día 1 del período con movimientos (aunque esto no suela pasar en vivo).
+      localStorage.setItem('appi_pb_mov_v1', JSON.stringify({
+        periodo: anio + '-' + mes,
+        dias: {
+          [anio + '-' + mes + '-01']: [{ n: 'GARCIA', pb: 3.2, total: 11.4, tt: 31.4, ts: Date.now() }]
+        }
+      }));
+      // La línea marcó el día 1 como estado inicial del mes.
+      localStorage.setItem('appi_linea_v1', JSON.stringify({
+        periodo: anio + '-' + mes,
+        dias: {
+          [anio + '-' + mes + '-01']: { total: 0, porD: { 'GARCIA': 8.2 }, cambios: [], esInicial: true }
+        }
+      }));
+      window.abrirModalDetallePB(0);
+      const cache = window.__dailyPBsCache ? window.__dailyPBsCache[1] : null;
+      window.abrirDetalleDiaPB(1, 0);
+      const detalle = (document.getElementById('modalBody') || { innerText: '' }).innerText;
+      return {
+        estadoInicial: !!(cache && cache.estado === 'inicial'),
+        itemsVacios: !!(cache && Array.isArray(cache.items) && cache.items.length === 0),
+        sinMovDia1: /Estado inicial del mes cargado/.test(detalle),
+        sinFilaMov: !/\+3\.2 PB/.test(detalle)
+      };
+    });
+
+    expect(res.estadoInicial).toBe(true);
+    expect(res.itemsVacios).toBe(true);
+    expect(res.sinMovDia1).toBe(true);
+    expect(res.sinFilaMov).toBe(true);
+  });
 });
