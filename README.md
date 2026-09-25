@@ -4,6 +4,13 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v631 · El desglose de PB se fija en la hora de Buenos Aires
+
+- El desglose semanal/diario usaba la fecha y hora del **dispositivo** mientras los registros de línea y de movimientos se guardan en hora de Buenos Aires; cerca del cambio de día o de mes podía mostrar un mes/día distinto al de los datos. Ahora mes, día actual, "día futuro" y el detalle del día se calculan con **`appiFechaBA()`** (la misma hora de los almacenes), con el reloj del dispositivo solo como respaldo si no está disponible.
+- Se eliminó una línea muerta (`hoyClave`) en el marcado de los días del mes.
+- Cubierto por `psa-sync-automatico.spec.js` (con `appiFechaBA` fijo: el desglose muestra el mes y el día de Buenos Aires, marca hoy el 15 y futuro el 16).
+- Versión: **v631 · Segura** · Cache `appi-v631-desglose-hora-ba`.
+
 ## v630 · El registro diario deja de borrarse y no duplica PB
 
 - Corregido el bug de fondo que podía dejar días del desglose **"sin cambios de PB"** aunque sí hubiera habido compras: al volver a traer la línea de PSA en el mismo día (la app la refresca sola cada algunos minutos), la comparación se hacía contra el propio registro de ese día y los cambios quedaban en cero. Ahora se compara siempre contra el **día anterior real** y el registro del día se recalcula sin perderse.

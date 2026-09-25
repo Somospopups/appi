@@ -4658,7 +4658,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v630 · Segura</div>
+  <div class="ds-foot">APPI · v631 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -14209,8 +14209,8 @@ function cerrarToolsMenu(){
   // con archivos viejos en pantalla.
   if ('serviceWorker' in navigator) {
     (async () => {
-const swVersion='630';
-  const CACHE_NAME='appi-v630-linea-no-borra';
+const swVersion='631';
+  const CACHE_NAME='appi-v631-desglose-hora-ba';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
@@ -19443,9 +19443,13 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
         if(eqRaw && Array.isArray(eqRaw.personas)) equipoPersonas = eqRaw.personas;
       }catch(e){}
 
+      // v631: el desglose usa la fecha de Buenos Aires (appiFechaBA), la misma
+      // que usan los almacenes de línea y movimientos; antes usaba la fecha del
+      // dispositivo y cerca del cambio de mes/día se desalineaba con los datos.
       const now = new Date();
-      const curYear = now.getFullYear();
-      const curMonth = now.getMonth();
+      const hoyBA = window.appiFechaBA ? (function(){ try{ return window.appiFechaBA(); }catch(e){} return null; })() : null;
+      const curYear = hoyBA ? parseInt(hoyBA.slice(0,4),10) : now.getFullYear();
+      const curMonth = hoyBA ? (parseInt(hoyBA.slice(5,7),10) - 1) : now.getMonth();
       const daysInMonth = new Date(curYear, curMonth + 1, 0).getDate();
       const monthNames = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
       const currentMonthName = monthNames[curMonth];
@@ -19499,7 +19503,7 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
           month = parseInt(parts[1], 10) - 1;
           year = parseInt(parts[2], 10);
         }
-        if(day && month === curMonth && (year === curYear || (!year && curMonth === now.getMonth()))){
+        if(day && month === curMonth && (year === curYear || !year)){
           if(day >= 1 && day <= daysInMonth){
             const pbVal = getEstimatedPB(g.producto);
             dailyPBs[day].pb += pbVal;
@@ -19516,7 +19520,7 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
         }
       });
 
-      const todayDay = now.getDate();
+      const todayDay = hoyBA ? parseInt(hoyBA.slice(8,10),10) : now.getDate();
       const lineaTotal = window.appiLineaTotal ? window.appiLineaTotal() : null;
       const finalTotalPB = lineaTotal != null && lineaTotal > 0 ? lineaTotal : (typeof totalPbMes === "number" && totalPbMes > 0 ? totalPbMes : (totalPBDated || 0));
 
@@ -19579,7 +19583,6 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
 
       // Días del mes sin registrar entrada de la línea: marcar su estado
       if(lineaActiva){
-        const hoyClave = window.appiFechaBA ? window.appiFechaBA() : '';
         const primerDia = Object.keys(appiDias).sort()[0] || '';
         for(let d=1; d<=daysInMonth; d++){
           if(lineaDias[d]) continue;
@@ -19779,12 +19782,16 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
       const now = new Date();
       const monthNames = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
       const dayNames = ["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"];
-      const dt = new Date(now.getFullYear(), now.getMonth(), dayNum);
-      const diaTexto = `${dayNames[dt.getDay()]} ${dayNum} de ${monthNames[now.getMonth()]}`;
+      // v631: mismo criterio que el desglose: hoy por Buenos Aires.
+      const hoyBA = window.appiFechaBA ? (function(){ try{ return window.appiFechaBA(); }catch(e){} return null; })() : null;
+      const anioBA = hoyBA ? parseInt(hoyBA.slice(0,4),10) : now.getFullYear();
+      const mesBA = hoyBA ? (parseInt(hoyBA.slice(5,7),10) - 1) : now.getMonth();
+      const dt = new Date(anioBA, mesBA, dayNum);
+      const diaTexto = `${dayNames[dt.getDay()]} ${dayNum} de ${monthNames[mesBA]}`;
 
       let itemsHtml = '';
       const estado = dayData.estado || '';
-      const esHoy = (dayNum === now.getDate());
+      const esHoy = (dayNum === (hoyBA ? parseInt(hoyBA.slice(8,10),10) : now.getDate()));
       let cabeceraDetalle = null;
       if(esHoy && !dayData.items.length){
         cabeceraDetalle = { icon:"🕒", titulo:"Todavía no hay movimientos de PB hoy", texto:"Las compras de tu equipo se detectan solas cuando se actualiza el equipo. En cuanto alguien sume PB, queda anotado en esta fecha." };

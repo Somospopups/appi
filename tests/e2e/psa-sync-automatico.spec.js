@@ -674,4 +674,69 @@ return {
     expect(res.sinTotalMov).toBe(true);
     expect(res.acumLinea).toBe(true);
   });
+
+  test('el desglose usa la fecha de Buenos Aires para el mes, el hoy y el detalle del día', async ({ page }) => {
+    await page.route('**/auth-config.js', route => route.fulfill({
+      contentType: 'application/javascript',
+      body: "window.APPI_AUTH={enabled:true,url:'https://mock.supabase.co',anonKey:'anon-key-publica-de-prueba',distributorEmailDomain:'distribuidores.appi.invalid',adminLogin:{username:'popups',email:'admin-popups@appi.invalid'},loginAliases:{},offlineDays:7};"
+    }));
+
+    await page.route('https://mock.supabase.co/**', route => {
+      const cors = { 'access-control-allow-origin': '*', 'content-type': 'application/json' };
+      return route.fulfill({ status: 200, headers: cors, body: '[]' });
+    });
+
+    await page.addInitScript(() => {
+      localStorage.setItem('welcomeSeen', '1');
+      localStorage.setItem('appi_tarjetas_auto', '0');
+      localStorage.setItem('tutoVisto_v2', '1');
+      localStorage.removeItem('equipoData');
+      localStorage.removeItem('usuarios_garantias');
+      localStorage.removeItem('appi_linea_v1');
+      localStorage.removeItem('appi_pb_mov_v1');
+      localStorage.removeItem('appi_pb_snapshot_distribuidores');
+    });
+
+    await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
+    await page.evaluate(() => {
+      const lock = document.getElementById('lockScreen');
+      if (lock) lock.classList.add('hidden');
+      const boot = document.getElementById('bootScreen');
+      if (boot) { boot.classList.add('gone'); boot.remove(); }
+      document.body.classList.remove('appi-login-abierto');
+      window.showView('view-equipo');
+    });
+
+    const res = await page.evaluate(() => {
+      // Hoy en Buenos Aires = 15/03/2026 (el dispositivo está en otro mes/día).
+      window.appiFechaBA = function(){ return '2026-03-15'; };
+      window.appiPeriodoBA = function(){ return '2026-03'; };
+      // Línea activa del período BA para que el desglose marque futuro tras el 15.
+      localStorage.setItem('appi_linea_v1', JSON.stringify({
+        periodo: '2026-03',
+        dias: { '2026-03-01': { total: 0, porD: {}, cambios: [], esInicial: true } }
+      }));
+      window.abrirModalDetallePB(0);
+      const cuerpo = (document.getElementById('modalBody') || { innerText: '' }).innerText;
+      window.abrirDetalleDiaPB(15, 0);
+      const hoy = (document.getElementById('modalBody') || { innerText: '' }).innerText;
+      window.abrirDetalleDiaPB(16, 0);
+      const maniana = (document.getElementById('modalBody') || { innerText: '' }).innerText;
+      return {
+        mesBA: /Marzo 2026/.test(cuerpo),
+        noMesDispositivo: !/Septiembre 2026/.test(cuerpo),
+        diaBA: /Día 15/.test(cuerpo),
+        noDiaDispositivo: !/Día 25/.test(cuerpo),
+        hoyMarcaBA: /Todavía no hay movimientos de PB hoy/.test(hoy),
+        manianaFuturo: /Este día todavía no llegó/.test(maniana)
+      };
+    });
+
+    expect(res.mesBA).toBe(true);
+    expect(res.noMesDispositivo).toBe(true);
+    expect(res.diaBA).toBe(true);
+    expect(res.noDiaDispositivo).toBe(true);
+    expect(res.hoyMarcaBA).toBe(true);
+    expect(res.manianaFuturo).toBe(true);
+  });
 });
