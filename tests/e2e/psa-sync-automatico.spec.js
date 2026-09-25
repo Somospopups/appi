@@ -412,4 +412,71 @@ const res = await page.evaluate(async () => {
     expect(res.tieneDeltaHoy).toBe(true);
     expect(res.tieneAcumuladoHoy).toBe(true);
   });
+
+  test('un movimiento de PB detectado (como el que avisa el teléfono) queda en el registro diario del desglose', async ({ page }) => {
+    await page.route('**/auth-config.js', route => route.fulfill({
+      contentType: 'application/javascript',
+      body: "window.APPI_AUTH={enabled:true,url:'https://mock.supabase.co',anonKey:'anon-key-publica-de-prueba',distributorEmailDomain:'distribuidores.appi.invalid',adminLogin:{username:'popups',email:'admin-popups@appi.invalid'},loginAliases:{},offlineDays:7};"
+    }));
+
+    await page.route('https://mock.supabase.co/**', route => {
+      const cors = { 'access-control-allow-origin': '*', 'content-type': 'application/json' };
+      return route.fulfill({ status: 200, headers: cors, body: '[]' });
+    });
+
+    await page.addInitScript(() => {
+      localStorage.setItem('welcomeSeen', '1');
+      localStorage.setItem('appi_tarjetas_auto', '0');
+      localStorage.setItem('tutoVisto_v2', '1');
+      localStorage.removeItem('equipoData');
+      localStorage.removeItem('usuarios_garantias');
+    });
+
+    await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
+    await page.evaluate(() => {
+      const lock = document.getElementById('lockScreen');
+      if (lock) lock.classList.add('hidden');
+      const boot = document.getElementById('bootScreen');
+      if (boot) { boot.classList.add('gone'); boot.remove(); }
+      document.body.classList.remove('appi-login-abierto');
+      window.showView('view-equipo');
+    });
+
+    const res = await page.evaluate(() => {
+      // Avisos APAGADOS: el registro diario igual tiene que quedar guardado.
+      localStorage.setItem('appi_recordatorios_v1', JSON.stringify({ hab: { pb_mov: false } }));
+      // Snapshot anterior del equipo (el detector avisa cuando alguien sube).
+      localStorage.setItem('appi_pb_snapshot_distribuidores', JSON.stringify({ '01-1': 8.2 }));
+      // Llega el equipo nuevo: JUAN GARCIA subió de 8,2 a 11,4 PB (+3,2).
+      window.APPIRecordatorios.detectarMovimientosPB({
+        personas: [{ codigo: '01-1', nombre: 'GARCIA, JUAN', pnAct: 11.4 }]
+      });
+      let claveDia = null;
+      const movStore = JSON.parse(localStorage.getItem('appi_pb_mov_v1') || 'null');
+      if (movStore && movStore.dias) {
+        const claves = Object.keys(movStore.dias);
+        if (claves.length) claveDia = claves[claves.length - 1];
+      }
+      const guardado = !!(claveDia && movStore.dias[claveDia].some(m => /GARCIA/.test(m.n) && Math.abs(m.pb - 3.2) < 0.01 && Math.abs(m.total - 11.4) < 0.01));
+      const dayNum = claveDia ? parseInt(claveDia.slice(8, 10), 10) : 1;
+      window.abrirModalDetallePB(0);
+      const cuerpo = (document.getElementById('modalBody') || { innerText: '' }).innerText;
+      const tieneTarjetaDia = new RegExp('3\\.2 PB').test(cuerpo);
+      window.abrirDetalleDiaPB(dayNum, 0);
+      const detalle = (document.getElementById('modalBody') || { innerText: '' }).innerText;
+return {
+        guardado,
+        tieneTarjetaDia,
+        detalleTieneNombre: /GARCIA/.test(detalle),
+        detalleTieneDelta: /\+3\.2 PB/.test(detalle),
+        detalleTieneTotal: /Total: 11\.4 PB/.test(detalle)
+      };
+    });
+
+    expect(res.guardado).toBe(true);
+    expect(res.tieneTarjetaDia).toBe(true);
+    expect(res.detalleTieneNombre).toBe(true);
+    expect(res.detalleTieneDelta).toBe(true);
+    expect(res.detalleTieneTotal).toBe(true);
+  });
 });

@@ -4,6 +4,14 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v628 · Los avisos de PB quedan registrados en el desglose
+
+- Cuando te llega el aviso **"⚡ Juan sumó +X PB"** (alguien de tu equipo hizo una compra), ese movimiento ya no queda solo en la notificación: **se guarda automáticamente en el registro diario** del desglose semanal y diario de PB (`Mi negocio → TOTAL PB → VER`).
+- El día de la compra muestra a los distribuidores que sumaron PB, cuánto sumó cada uno y su nuevo total — aunque ese día no haya registro propio de la línea de PSA. El total de la semana y del mes sigue calculándose igual.
+- El registro se guarda aunque tengas los avisos apagados o sin permiso de notificaciones: con que el teléfono note el movimiento, queda en el día.
+- `recordatorios-app.js` alimenta el nuevo registro (`appi_pb_mov_v1`) en el mismo detector que dispara los avisos; `index.html` lo mezcla en `abrirModalDetallePB`. Cubierto por `psa-sync-automatico.spec.js`.
+- Versión: **v628 · Segura** · Cache `appi-v628-registro-diario-pb`.
+
 ## v627 · Compartir contacto → APPI, directo desde el teléfono
 
 - Un usuario de Android con APPI instalada como app puede **compartirle un contacto desde cualquier otra app** (Contactos, WhatsApp, un archivo .vcf): APPI aparece en el menú compartir gracias al `share_target` del manifest.

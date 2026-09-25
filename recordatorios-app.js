@@ -421,8 +421,6 @@
   function detectarMovimientosPB(nuevoEquipo) {
     try {
       if (!nuevoEquipo || !nuevoEquipo.personas || !Array.isArray(nuevoEquipo.personas)) return;
-      var c = conf();
-      if (!c.hab.pb_mov) return;
       var snapshot = leer('appi_pb_snapshot_distribuidores', null);
       var currentSnap = {};
       var cambios = [];
@@ -443,6 +441,24 @@
         }
       });
       try { localStorage.setItem('appi_pb_snapshot_distribuidores', JSON.stringify(currentSnap)); } catch(e) {}
+      // v628: cada movimiento de PB (lo que avisa el teléfono cuando alguien
+      // compra) también queda guardado en el registro diario del desglose
+      // semanal/diario, estén o no habilitados los avisos ni concedido el
+      // permiso de notificaciones. Así el día muestra a los distribuidores
+      // y su PB solos.
+      if (cambios.length > 0 && snapshot) {
+        try {
+          if (window.appiPBDiario && typeof window.appiPBDiario.registrar === 'function') {
+            var claveDia = (typeof window.appiFechaBA === 'function') ? window.appiFechaBA() : hoyLocal();
+            window.appiPBDiario.registrar(claveDia, cambios.map(function(ch) {
+              return { n: ch.nombre, pb: ch.delta, total: ch.pbNuevo };
+            }));
+          }
+        } catch(e) {}
+      }
+      var c = conf();
+      if (!c.hab.pb_mov) return;
+      if (!permisoOk()) return;
       if (cambios.length > 0 && snapshot) {
         cambios.slice(0, 3).forEach(function(ch, idx) {
           setTimeout(function() {
