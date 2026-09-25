@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v625-contactos-fix';
+const CACHE_NAME = 'appi-v626-subir-agenda';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

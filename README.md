@@ -4,6 +4,14 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v626 · La Margarita mete la agenda del teléfono de una
+
+- La hoja de un pétalo ahora tiene **"Subir agenda"**: la persona elige una vez el archivo `.vcf` que exporta su teléfono (Android e iPhone) y toda su agenda entra al pétalo de una sola vez, sin tocar contacto por contacto. Se queda guardada en su cuenta y lista para siempre.
+- El botón del teléfono (**"Elegir del teléfono"**, Contact Picker de Android) pasa a vivir **dentro de la hoja**, como una opción más, no se dispara solo al tocar un pétalo vacío. Si el picker no abre en el dispositivo, **no pasa nada visible**: ni cartel, ni toast, ni guía de permisos — la hoja sigue ahí y la persona elige otra vía.
+- Se quitaron todos los mensajes que pedían configurar el dispositivo o tocar un pétalo vacío: si no hay personas para mostrar sale una línea y los dos botones ("Subir agenda" y "Ver mi Agenda APPI").
+- `margarita-contactos.spec.js` cubre la importación `.vcf`, el picker dentro de la hoja y el test de honestidad: el picker roto no muestra ningún diálogo ni texto de configuración (7 tests).
+- Versión: **v626 · Segura** · Cache `appi-v626-subir-agenda`.
+
 ## v625 · La Margarita no vuelve a frenar si la agenda no abre
 
 - En algunos Android (Chromium de fabricante, pestaña secundaria) el botón del teléfono existe pero la agenda se niega a abrir. Ahora el pétalo **cae solo a la hoja** con tus contactos de APPI, te avisa con un aviso breve y deja el botón "Elegir del teléfono" para reintentar — nunca más un callejón con solo un alert. Si el teléfono vuelve a funcionar, todo sigue igual.
