@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "629.0.0",
-  "cacheName": "appi-v629-hoy-sin-mensaje-error",
+  "version": "630.0.0",
+  "cacheName": "appi-v630-linea-no-borra",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

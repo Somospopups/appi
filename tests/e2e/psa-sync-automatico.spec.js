@@ -534,7 +534,68 @@ return {
     expect(res.detalleNoCulpa).toBe(true);
   });
 
-  test('los movimientos detectados se suman al registro del día (línea) y muestran su acumulado', async ({ page }) => {
+  test('volver a traer la línea el mismo día no borra los cambios del día', async ({ page }) => {
+    await page.route('**/auth-config.js', route => route.fulfill({
+      contentType: 'application/javascript',
+      body: "window.APPI_AUTH={enabled:true,url:'https://mock.supabase.co',anonKey:'anon-key-publica-de-prueba',distributorEmailDomain:'distribuidores.appi.invalid',adminLogin:{username:'popups',email:'admin-popups@appi.invalid'},loginAliases:{},offlineDays:7};"
+    }));
+
+    await page.route('https://mock.supabase.co/**', route => {
+      const cors = { 'access-control-allow-origin': '*', 'content-type': 'application/json' };
+      return route.fulfill({ status: 200, headers: cors, body: '[]' });
+    });
+
+    await page.addInitScript(() => {
+      localStorage.setItem('welcomeSeen', '1');
+      localStorage.setItem('appi_tarjetas_auto', '0');
+      localStorage.setItem('tutoVisto_v2', '1');
+      localStorage.removeItem('equipoData');
+      localStorage.removeItem('usuarios_garantias');
+      localStorage.removeItem('appi_linea_v1');
+      localStorage.removeItem('appi_pb_mov_v1');
+      localStorage.removeItem('appi_pb_snapshot_distribuidores');
+    });
+
+    await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
+    await page.evaluate(() => {
+      const lock = document.getElementById('lockScreen');
+      if (lock) lock.classList.add('hidden');
+      const boot = document.getElementById('bootScreen');
+      if (boot) { boot.classList.add('gone'); boot.remove(); }
+      document.body.classList.remove('appi-login-abierto');
+      window.showView('view-equipo');
+    });
+
+    const res = await page.evaluate(() => {
+      window.appiFechaBA = function(){ return '2026-03-15'; };
+      window.appiPeriodoBA = function(){ return '2026-03'; };
+      // Día anterior: GARCIA con 10 PB.
+      localStorage.setItem('appi_linea_v1', JSON.stringify({
+        periodo: '2026-03',
+        dias: { '2026-03-14': { total: 10, porD: { 'GARCIA': 10 }, cambios: [], esInicial: true } }
+      }));
+      const leer = () => JSON.parse(localStorage.getItem('appi_linea_v1') || 'null').dias['2026-03-15'];
+      // Primer traído del día: GARCIA 15 (+5).
+      window.appiGuardarLinea([{ n: 'GARCIA', pb: 15 }]);
+      const primer = leer();
+      // Segundo traído del MISMO día: GARCIA 18 (+8 vs el 14). Antes se borraba.
+      window.appiGuardarLinea([{ n: 'GARCIA', pb: 18 }]);
+      const segundo = leer();
+      return {
+        primerCambios: (primer && Array.isArray(primer.cambios) ? primer.cambios : []).length,
+        segundoCambios: (segundo && Array.isArray(segundo.cambios) ? segundo.cambios : []).length,
+        segundoTotal: segundo && typeof segundo.total === 'number' ? segundo.total : -1,
+        garcia8: !!(segundo && Array.isArray(segundo.cambios) && segundo.cambios.some(c => c.n === 'GARCIA' && Math.abs(c.pb - 8) < 0.01))
+      };
+    });
+
+    expect(res.primerCambios).toBe(1);
+    expect(res.segundoCambios).toBe(1);
+    expect(res.garcia8).toBe(true);
+    expect(res.segundoTotal).toBe(18);
+  });
+
+  test('la línea manda: un movimiento detectado no duplica el PB del día', async ({ page }) => {
     await page.route('**/auth-config.js', route => route.fulfill({
       contentType: 'application/javascript',
       body: "window.APPI_AUTH={enabled:true,url:'https://mock.supabase.co',anonKey:'anon-key-publica-de-prueba',distributorEmailDomain:'distribuidores.appi.invalid',adminLogin:{username:'popups',email:'admin-popups@appi.invalid'},loginAliases:{},offlineDays:7};"
@@ -569,7 +630,7 @@ return {
     const res = await page.evaluate(() => {
       localStorage.setItem('appi_recordatorios_v1', JSON.stringify({ hab: { pb_mov: false } }));
       localStorage.setItem('appi_pb_snapshot_distribuidores', JSON.stringify({ '01-1': 8.2 }));
-      // La detección ve a GARCIA subir +3,2 (11,4 PB) y al equipo en 31,4 totales.
+      // La detección ve a GARCIA subir +3,2 (11,4 PB) → quedará en el registro.
       window.APPIRecordatorios.detectarMovimientosPB({
         personas: [
           { codigo: '01-1', nombre: 'GARCIA', pnAct: 11.4 },
@@ -579,7 +640,7 @@ return {
       const movStore = JSON.parse(localStorage.getItem('appi_pb_mov_v1') || 'null');
       const clave = Object.keys(movStore.dias)[0];
       const anio = clave.slice(0, 4), mes = clave.slice(5, 7);
-      // La línea del día ya tenía a GARCIA con +5 (total día 40).
+      // La línea del día ya tiene a GARCIA con +5 (total día 40): manda ella.
       localStorage.setItem('appi_linea_v1', JSON.stringify({
         periodo: anio + '-' + mes,
         dias: {
@@ -597,18 +658,20 @@ return {
       window.abrirDetalleDiaPB(dayNum, 0);
       const detalle = (document.getElementById('modalBody') || { innerText: '' }).innerText;
       return {
-        tarjetaSuma: /8\.2 PB/.test(cuerpo),
-        filaSumada: /\+8\.2 PB/.test(detalle),
-        unaSolaFila: (detalle.match(/\+8\.2 PB/g) || []).length === 1,
-        totalMov: /Total: 11\.4 PB/.test(detalle),
+        tarjetaLinea: /5\.0 PB/.test(cuerpo),
+        noDoble: !/8\.2 PB/.test(cuerpo),
+        filaLinea: /\+5\.0 PB/.test(detalle),
+        unaSolaFila: (detalle.match(/\+5\.0 PB/g) || []).length === 1,
+        sinTotalMov: !/Total: 11\.4 PB/.test(detalle),
         acumLinea: /acum\. 40\.0/.test(cuerpo)
       };
     });
 
-    expect(res.tarjetaSuma).toBe(true);
-    expect(res.filaSumada).toBe(true);
+    expect(res.tarjetaLinea).toBe(true);
+    expect(res.noDoble).toBe(true);
+    expect(res.filaLinea).toBe(true);
     expect(res.unaSolaFila).toBe(true);
-    expect(res.totalMov).toBe(true);
+    expect(res.sinTotalMov).toBe(true);
     expect(res.acumLinea).toBe(true);
   });
 });

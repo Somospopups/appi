@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v629-hoy-sin-mensaje-error';
+const CACHE_NAME = 'appi-v630-linea-no-borra';
 const CACHE_PREFIX = 'appi-';
 // Donde el SW aparta una compartición hasta que la app la consume. No
 // empieza con el prefijo de la app para que el prune del activate no la borre.

@@ -4,11 +4,18 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v630 · El registro diario deja de borrarse y no duplica PB
+
+- Corregido el bug de fondo que podía dejar días del desglose **"sin cambios de PB"** aunque sí hubiera habido compras: al volver a traer la línea de PSA en el mismo día (la app la refresca sola cada algunos minutos), la comparación se hacía contra el propio registro de ese día y los cambios quedaban en cero. Ahora se compara siempre contra el **día anterior real** y el registro del día se recalcula sin perderse.
+- La línea **manda** en los días que cubre: ya no se suman arriba los movimientos detectados (medían los mismos aumentos con otra base y duplicaban PB). Los movimientos de PB solo **completan días sin registro de línea** (ahí mantienen su acumulado real, igual que v628/v629).
+- El mensaje neutral del día de hoy y el acumulado con el total del equipo se conservan tal cual.
+- Cubierto por `psa-sync-automatico.spec.js` (re-traer la línea el mismo día conserva los cambios; el día con línea muestra una sola fila sin duplicar).
+- Versión: **v630 · Segura** · Cache `appi-v630-linea-no-borra`.
+
 ## v629 · El día de hoy ya no dice "no ingresaste": se carga solo
 
 - El día de hoy sin compras mostraba "😴 No ingresaste este día / Como no abriste APPI..." — algo falso si estás con la app abierta y simplemente nadie compró todavía. Ahora dice **"Todavía no hay movimientos de PB hoy"**, y en la tarjeta del día "se cargan solos". Los días pasados conservan "No ingresaste este día" (ahí sí es cierto).
-- Los movimientos cada vez **se suman** al registro del día (línea de PSA o reparto) por persona en vez de pisarlo: si la línea ya tenía a alguien anotado y la detección suma más PB, queda una sola fila con el total.
-- Los días con movimientos de PB muestran su **acumulado real** (`acum.`) calculado con el total del equipo al momento de la detección (misma semántica que el `total` que guarda la línea).
+- Los días sin registro de línea con movimientos de PB muestran su **acumulado real** (`acum.`) calculado con el total del equipo al momento de la detección (misma semántica que el `total` que guarda la línea).
 - Cubierto por `psa-sync-automatico.spec.js`.
 - Versión: **v629 · Segura** · Cache `appi-v629-hoy-sin-mensaje-error`.
 

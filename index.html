@@ -4658,7 +4658,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v629 · Segura</div>
+  <div class="ds-foot">APPI · v630 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -14209,8 +14209,8 @@ function cerrarToolsMenu(){
   // con archivos viejos en pantalla.
   if ('serviceWorker' in navigator) {
     (async () => {
-const swVersion='629';
-  const CACHE_NAME='appi-v629-hoy-sin-mensaje-error';
+const swVersion='630';
+  const CACHE_NAME='appi-v630-linea-no-borra';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
@@ -19597,14 +19597,16 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
       // por una compra) queda registrado por día: si el día tiene movimientos,
       // el detalle muestra a los distribuidores y su PB, aunque la línea de PSA
       // de ese día no tenga registro propio.
-      // v629: esos movimientos se SUMAN al registro del día (línea/reparto) por
-      // persona en vez de pisarlo, y el día muestra su acumulado real.
+      // v630: la línea MANDA en los días que cubre (es autoritativa y se
+      // recalcula sola contra el día anterior); el registro de movimientos solo
+      // completa los días SIN registro de línea, y ahí sí muestra su acumulado.
       try{
         const movDias = (window.appiPBDiario && typeof window.appiPBDiario.dias === 'function') ? window.appiPBDiario.dias() : null;
         if(movDias){
           for(const clave in movDias){
             const dayNum = parseInt(String(clave).slice(8,10), 10);
             if(!dayNum || dayNum < 1 || dayNum > daysInMonth) continue;
+            if(lineaDias[dayNum]) continue;
             const movs = (movDias[clave] || []).filter(m => Number(m.pb) > 0);
             if(!movs.length) continue;
             const ttDia = movs.reduce((mx, m) => Math.max(mx, Number(m.tt) || 0), 0);
@@ -19616,17 +19618,7 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
               row.pb += Number(m.pb) || 0;
               if(Number(m.total) || 0) row.total = Number(m.total);
             });
-            const base = Array.isArray(dailyPBs[dayNum].items) ? dailyPBs[dayNum].items : [];
-            const items = base.slice();
-            base.forEach(i => {
-              const k = String(i.titular || '').trim().toUpperCase();
-              if(movMap.has(k)){
-                i.pb = (Number(i.pb) || 0) + movMap.get(k).pb;
-                if(movMap.get(k).total && typeof i.total !== 'number') i.total = movMap.get(k).total;
-                movMap.delete(k);
-              }
-            });
-            movMap.forEach(row => items.push({ titular: row.titular, producto: '', usuario: '', pb: row.pb, total: row.total, tipo: 'linea' }));
+            const items = Array.from(movMap.values()).map(row => ({ titular: row.titular, producto: '', usuario: '', pb: row.pb, total: row.total, tipo: 'linea' }));
             dailyPBs[dayNum].items = items;
             dailyPBs[dayNum].pb = items.reduce((s,i) => s + Number(i.pb || 0), 0);
             dailyPBs[dayNum].estado = items.length ? 'con_cambios' : 'sin_cambios';
@@ -19915,8 +19907,13 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
       let store = null;
       try{ store = JSON.parse(localStorage.getItem('appi_linea_v1') || 'null'); }catch(e){}
       if(!store || store.periodo !== periodo) store = { periodo, dias: {} };
+      // v630: la base de comparación es el día realmente anterior, no hoy.
+      // Si volvés a traer la línea el mismo día, hoy ya está en el store y antes
+      // tomaba su propio porD: los cambios daban 0 y se borraba el registro del
+      // día. Ahora se recalculan contra el día anterior de verdad.
       const prevDias = Object.keys(store.dias || {}).sort();
-      const prevDay = prevDias.length ? prevDias[prevDias.length-1] : null;
+      const previas = prevDias.filter(k => k < hoy);
+      const prevDay = previas.length ? previas[previas.length-1] : null;
       const prev = prevDay && store.dias[prevDay] && store.dias[prevDay].porD ? store.dias[prevDay].porD : {};
       const esInicial = !prevDay;
       const cambios = [];
