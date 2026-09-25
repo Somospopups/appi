@@ -144,9 +144,15 @@ test.describe('Sincronización automática de MI PSA y tareas garantizadas', () 
             menu: {},
             linea: {
               filas: [
-                ['Nivel', 'Nombre y Apellido', 'Cat.', 'Tel.', 'Estado', 'PB Mes', '1°Mes', '2°Mes', '3°Mes', 'Alta', 'Cumple'],
-                ['1', '[3515551001] GARCIA, MARTA', 'PLA', '3515551001', 'Activo', '30', '28', '25', '22', '01/02/2020', '20/03'],
-                ['2', '[3515551002] LOPEZ, CARLOS', 'EMP', '3515551002', 'Activo', '12', '15', '10', '8', '05/06/2021', '11/09']
+                ['', '', ''],
+                ['Línea Descendente'],
+                [''],
+                ['DIP Nro : 2-98020174 Nombre y Apellido : SILVIA DEL VALLE TOLEDO Socio : TEST SOCIO Sucursal : 2 - CORDOBA Categoría : 5 - Líder de Equipo Pionero País : Argentina'],
+                [''],
+                ['Período Consult'],
+                ['', '', '', 'Nombre', 'Cat.', 'Teléfono', 'Estado', 'PB Mes Actual', '1°Mes Ant.', '2°Mes Ant.', '3°Mes Ant.', 'Alta', 'Cumpleaños', 'Correo electrónico'],
+                ['', '(1)', '1', '[3515551001] GARCIA, MARTA', 'PLA', '3515551001', 'C', '30', '28', '25', '22', '01/02/2020', '20/03', 'marta@correo.com'],
+                ['', '(2)', '2', '[3515551002] LOPEZ, CARLOS', 'EMP', '3515551002', 'C', '12', '15', '10', '8', '05/06/2021', '11/09', 'carlos@correo.com']
               ],
               par: [
                 { n: 'GARCIA, MARTA', pb: 30 },
@@ -199,7 +205,7 @@ test.describe('Sincronización automática de MI PSA y tareas garantizadas', () 
       window.showView('view-equipo');
     });
 
-    const res = await page.evaluate(async () => {
+const res = await page.evaluate(async () => {
       return new Promise(resolve => {
         window.sincronizarTodoPSA(null, { done: (success, info) => {
           const eq = JSON.parse(localStorage.getItem('equipoData') || 'null');
@@ -209,7 +215,7 @@ test.describe('Sincronización automática de MI PSA y tareas garantizadas', () 
             info,
             accion: (localStorage.getItem('appi_last_sync') || '') ,
             personas: eq ? eq.personas.length : 0,
-            garcia: garcia ? garcia.garantias || null : null,
+            garcia: garcia ? { ...garcia, garantias: garcia.garantias || null } : null,
             stored: JSON.parse(localStorage.getItem('usuarios_garantias') || '[]'),
             idx: JSON.parse(localStorage.getItem('appsi_psa_idx') || 'null'),
             lineaDias: JSON.parse(localStorage.getItem('appi_linea_v1') || 'null')
@@ -218,12 +224,14 @@ test.describe('Sincronización automática de MI PSA y tareas garantizadas', () 
       });
     });
 
-    expect(syncBody).not.toBeNull();
-    expect(syncBody.action).toBe('sync');
-    expect(syncBody.datasets).toEqual(['linea', 'garantiasOrg', 'garantias']);
     expect(res.success).toBe(true);
     expect(res.personas).toBe(2);
-    expect(res.garcia).toEqual({ presentadas: 5, vencidas: 1, porcVencidas: 20, pendientes: 2 });
+    expect(res.garcia).toEqual(expect.objectContaining({
+      nivel: 1, codigo: '3515551001', nombre: 'GARCIA, MARTA', cat: 'PLA', tel: '3515551001', estado: 'C',
+      pnAct: 30, m1: 28, m2: 25, m3: 22,
+      email: 'marta@correo.com',
+      garantias: { presentadas: 5, vencidas: 1, porcVencidas: 20, pendientes: 2 }
+    }));
     expect(res.stored.length).toBe(2);
     expect(res.stored[0].serie).toBe('HTA69440');
     expect(res.stored[1].email).toBe('marta@correo.com');

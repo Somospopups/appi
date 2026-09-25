@@ -337,18 +337,6 @@ function parsearLineaHtml(html: string): LineaFila[] | null {
   return out.length ? out : null;
 }
 
-function filasLineaHtml(h: string): string[][] {
-  const filas = filasHtml(h);
-  if (!filas.length) return filas;
-  let header = -1;
-  for (let i = 0; i < filas.length && i < 60; i++) {
-    const join = filas[i].join('|');
-    if (join.includes('PB Mes Actual') && join.includes('Nombre')) { header = i; break; }
-  }
-  if (header < 0) return filas;
-  return filas.map((f, i) => (i > header ? ['', ...f] : f));
-}
-
 /* ===== Sincronización completa (v618) =====
    Los archivos que APPI actualiza al entrar (Línea descendente,
    Garantías por organización y Garantías) se bajan en UNA sola sesión
@@ -729,7 +717,7 @@ Deno.serve(async (req) => {
         const par = parsearLineaHtml(html);
         if (par && par.length) {
           out.linea = {
-            filas: filasLineaHtml(html),
+            filas: filasHtml(html),
             par: par.map(f => ({ n: f.n, pb: f.pb })),
             pb: par.reduce((s, f) => s + f.pb, 0)
           };

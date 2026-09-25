@@ -1894,7 +1894,7 @@ body.dark .hist-action-drawer{background:linear-gradient(155deg,#151827,#252036 
   }
   .btn-upload:active { transform: scale(0.96); }
 
-  .equipo-meta, #equipoMetaBar, #usuariosMetaBar {
+  .equipo-meta, #equipoMetaBar {
     display: none !important;
   }
   .eq-meta-fecha {
@@ -14209,8 +14209,8 @@ function cerrarToolsMenu(){
   // con archivos viejos en pantalla.
   if ('serviceWorker' in navigator) {
     (async () => {
-const swVersion='619';
-  const CACHE_NAME='appi-v619-desglose-pb-linea-fix';
+const swVersion='620';
+  const CACHE_NAME='appi-v620-linea-alineada-equipo';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
@@ -18775,7 +18775,7 @@ function actualizarUsuariosMetaBar(){
     }
     if(!txt) txt='—';
     fechaEl.textContent='GARANTÍAS · '+txt;
-    bar.style.display='none';
+    bar.style.display='';
   }catch(e){}
 }
 
