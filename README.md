@@ -4,6 +4,13 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v616 · Actualización de archivos desde el arranque
+
+- La actualización de archivos arranca apenas se pinta la pantalla del agua (antes esperaba el evento `load` de la página): el Service Worker se registra y revisa la versión al inicio.
+- Si el dispositivo traía una versión anterior, se actualiza el Service Worker y la app se recarga UNA sola vez con el boot todavía en pantalla, así nadie entra a APPI con archivos viejos.
+- El agua se aguanta unos segundos mientras corre la actualización: la recarga cae cubierta y el usuario nunca alcanza a usar la copia vieja.
+- Versión: **v616 · Segura** · Cache `appi-v616-actualizacion-desde-boot`.
+
 ## v615 · Diario de ingresos: el desglose sigue los días que usás APPI
 
 - El desglose de **Mi negocio → TOTAL PB** funciona como un diario de tu uso de APPI: cada día que abrís la app se cargan **solo los cambios de PB** detectados (nombre y PB), nunca acumulados.

@@ -4658,7 +4658,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v615 · Segura</div>
+  <div class="ds-foot">APPI · v616 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -13448,7 +13448,11 @@ function ocultarBoot(force){
   if(!b||b.classList.contains('gone')||b.classList.contains('leaving')||b.dataset.exitRequested==='1')return;
   b.dataset.exitRequested='1';
   const started=Number(window.__appiBootStartedAt||performance.now());
-  const minimum=Math.max(0,Number(window.__appiBootMinimumMs||0));
+  let minimum=Math.max(0,Number(window.__appiBootMinimumMs||0));
+  // Si hay una actualización de versión en curso, se aguanta el agua un poco más
+  // para que la recarga de actualización caiga con la pantalla cubierta y nadie
+  // alcance a usar la copia vieja: el nuevo Service Worker recarga la página solo.
+  if(window.__appiVersionCambio)minimum=Math.min(6000,Math.max(minimum,4200));
   const elapsed=Math.max(0,performance.now()-started);
   const wait=Math.max(0,minimum-elapsed);
   clearTimeout(window.__appiBootExitTimer);
@@ -14193,10 +14197,14 @@ function cerrarToolsMenu(){
     if(e.key==='Escape') cerrarToolsMenu();
   });
 
+  // Actualización de archivos: arranca apenas se pinta el agua (sin esperar el
+  // evento load). Si el dispositivo tenía una versión anterior, se actualiza el
+  // Service Worker y se recarga UNA vez durante el boot. Así nadie entra a APPI
+  // con archivos viejos en pantalla.
   if ('serviceWorker' in navigator) {
-    window.addEventListener('load', async () => {
-const swVersion='615';
-  const CACHE_NAME='appi-v615-diario-de-ingresos';
+    (async () => {
+const swVersion='616';
+  const CACHE_NAME='appi-v616-actualizacion-desde-boot';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
@@ -14222,6 +14230,7 @@ const swVersion='615';
         const seen=localStorage.getItem('appi_seen_version');
         if(seen && seen!==swVersion){
           localStorage.setItem('appi_last_sw_update', String(Date.now()));
+          window.__appiVersionCambio=true;
           if(navigator.serviceWorker && navigator.serviceWorker.getRegistrations){
             navigator.serviceWorker.getRegistrations().then(rs=> rs.forEach(r=>{
               r.update().catch(()=>{});
@@ -14259,7 +14268,7 @@ const swVersion='615';
       }catch(error){
         console.warn('No se pudo registrar el modo offline de APPI', error);
       }
-    });
+    })();
   }
 </script>
 

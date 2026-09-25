@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v615-diario-de-ingresos';
+const CACHE_NAME = 'appi-v616-actualizacion-desde-boot';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
