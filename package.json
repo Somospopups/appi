@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "616.0.0",
-  "cacheName": "appi-v616-actualizacion-desde-boot",
+  "version": "617.0.0",
+  "cacheName": "appi-v617-numeros-automaticos",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

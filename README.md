@@ -4,6 +4,13 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v617 · Números del equipo solos y archivos siempre nuevos
+
+- **Los números del equipo se actualizan solos**: cada vez que entrás y mientras dejás APPI abierta, la Línea de PSA se refresca automáticamente (cada 3 minutos) y el PB, personas y activos de Mi negocio / Mi equipo se repintan sin tocar nada.
+- **Los archivos siempre son la versión nueva**: todos los `.js` y `.css` se versionan con el número de release (`?v=617`) al subir cada versión, así el teléfono/CDN nunca se queda con una copia vieja al entrar por primera vez.
+- El refresco automático respeta la casilla **Auto-actualizar al abrir** de MI PSA: sin marcar, no hay descargas en segundo plano.
+- Versión: **v617 · Segura** · Cache `appi-v617-numeros-automaticos`.
+
 ## v616 · Actualización de archivos desde el arranque
 
 - La actualización de archivos arranca apenas se pinta la pantalla del agua (antes esperaba el evento `load` de la página): el Service Worker se registra y revisa la versión al inicio.

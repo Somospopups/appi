@@ -2269,10 +2269,10 @@
     }catch(e){}
   });
 
-  window.addEventListener('appi-datasync-applied', function(){
+  function repintarSiCambio(){
     try{
       if (!document.getElementById('htOverlay') || !mazo || !mazo.tarjetas) return;
-      // La sync trajo (o no) data nueva: si no cambió nada, no repintar —
+      // La sync/refresco trajo (o no) data nueva: si no cambió nada, no repintar —
       // repintar crea las cartas desde cero y mata el "hamaca" de demo.
       var nuevas = armarTarjetas();
       var cambió = nuevas.length !== mazo.tarjetas.length;
@@ -2287,7 +2287,11 @@
       mazo.demoHecha = true; // el vaivén ya se vio al abrir; no lo re-encendemos
       pintar();
     }catch(e){}
-  });
+  }
+
+  window.addEventListener('appi-datasync-applied', repintarSiCambio);
+  window.addEventListener('appi-linea-cambiaron', function(){ setTimeout(repintarSiCambio, 120); });
+  window.addEventListener('appi-bonos-cambiaron', function(){ setTimeout(repintarSiCambio, 120); });
 
   function intentarEnvolver(){
     try{ css(); }catch(e){}
