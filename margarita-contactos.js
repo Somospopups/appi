@@ -90,6 +90,8 @@
     return String(nombre || '?').trim().split(/\s+/).slice(0,2).map(function(x){ return x.charAt(0).toUpperCase(); }).join('') || '?';
   }
   var LIMITE_TANDA = 100;
+  var PICKER_FALLO = '__mg_picker_fallo__';
+  var pickerRoto = false;
   function digitos(v){ return String(v == null ? '' : v).replace(/\D/g, ''); }
   function claveNombre(n){
     return String(n || '').toLocaleLowerCase('es-AR').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '');
@@ -144,10 +146,11 @@
   function etiquetaOrigen(origen){
     return origen === 'panel' ? 'Panel APPI' : origen === 'agenda' ? 'Agenda' : 'Teléfono';
   }
-  function soportaPicker(){
-    try { return !!(navigator && 'contacts' in navigator && navigator.contacts && typeof navigator.contacts.select === 'function'); }
+  function capazPicker(){
+    try { return !!(navigator && 'contacts' in navigator && navigator.contacts && typeof navigator.contacts.select === 'function' && window.self === window.top); }
     catch(e){ return false; }
   }
+  function soportaPicker(){ return capazPicker() && !pickerRoto; }
   async function propsSoportadas(picker){
     try {
       var props = await picker.getProperties();
@@ -160,11 +163,25 @@
   async function pedirDelTelefono(){
     var picker = navigator.contacts;
     if (!picker || typeof picker.select !== 'function') return null;
-    var props = await propsSoportadas(picker), tipos = [];
-    if (props.name) tipos.push('name');
-    if (props.tel) tipos.push('tel');
-    if (!tipos.length) return null;
-    var lista = await picker.select(tipos, { multiple:true });
+    var props = await propsSoportadas(picker), planes = [], base = [];
+    if (props.name) base.push('name');
+    if (props.tel) base.push('tel');
+    if (base.length) planes.push(base.slice());
+    if (props.tel) planes.push(['tel']);
+    if (props.name) planes.push(['name']);
+    if (!planes.length) return PICKER_FALLO;
+    var lista = null, error = null;
+    for (var i = 0; i < planes.length; i++){
+      try { lista = await picker.select(planes[i], { multiple:true }); break; }
+      catch(err){
+        error = err;
+        if (err && /Abort/i.test(String(err.name || ''))) return null;
+      }
+    }
+    if (lista === null){
+      if (error) return PICKER_FALLO;
+      return null;
+    }
     var salida = [];
     (Array.isArray(lista) ? lista : []).forEach(function(c){
       var nombre = Array.isArray(c.name) ? c.name[0] : c.name;
@@ -272,7 +289,7 @@
     abrirHoja(g, state, seleccion);
   }
   function abrirHoja(g, state, seleccion){
-    var soporta = soportaPicker();
+    var soporta = capazPicker();
     var listaCompleta = [], mostrarMas = LIMITE_TANDA, programarCarga = true;
     function esta(c){ return seleccion.some(function(x){ return firma(x) && firma(x) === firma(c); }); }
     function fila(c, chosen){
@@ -299,7 +316,9 @@
         html = q
           ? '<div class="mg-empty">No encontramos a nadie para “' + esc(q) + '”.</div>'
           : '<div class="mg-empty">' + (soporta
-              ? 'Todavía no guardaste personas en APPI. Tocá un pétalo vacío para abrir la agenda del teléfono, o cargá tus contactos desde Mi Gestión.'
+              ? (pickerRoto
+                ? 'Todavía no guardaste personas en APPI. Sumalas desde Mi Gestión, o probá de nuevo con “Elegir del teléfono”.'
+                : 'Todavía no guardaste personas en APPI. Tocá un pétalo vacío para abrir la agenda del teléfono, o cargá tus contactos desde Mi Gestión.')
               : 'Todavía no guardaste personas en APPI. Traelas desde Mi Gestión → Agenda Personal (importá la agenda de tu teléfono) o invitá gente con Mi Encuesta.') + '</div>';
       }
       var list = document.getElementById('mgCandidateList');
@@ -347,12 +366,15 @@
     var agregados = 0;
     try {
       var elegidos = await pedirDelTelefono();
+      if (elegidos === PICKER_FALLO){ pickerRoto = true; if (alVolver) alVolver(0); if (window.APPIDialog && window.APPIDialog.alert) window.APPIDialog.alert('No se pudo abrir la agenda del teléfono en este dispositivo. Quedan las personas que ya guardaste en APPI.', { title:'Contactos', icon:'📱' }); return; }
       (elegidos || []).forEach(function(item){
         if (!seleccion.some(function(x){ return firma(x) === firma(item); })){ seleccion.push(item); agregados++; }
       });
+      if (agregados) pickerRoto = false;
       if (alVolver) alVolver(agregados);
     }catch(error){
       if (error && /Abort/i.test(String(error.name || ''))) return;
+      pickerRoto = true;
       if (window.APPIDialog && window.APPIDialog.alert) window.APPIDialog.alert('No pudimos abrir la agenda del teléfono. Probá otra vez o usá las personas de APPI.', { title:'Contactos', icon:'📱' });
     }
   }
@@ -360,6 +382,12 @@
     var agregados = 0;
     try {
       var elegidos = await pedirDelTelefono();
+      if (elegidos === PICKER_FALLO){
+        pickerRoto = true;
+        abrirHoja(g, state, seleccion);
+        mostrarToast('No se pudo abrir la agenda del teléfono. Elegí de tu lista APPI o probá de nuevo.');
+        return;
+      }
       (elegidos || []).forEach(function(item){
         if (!seleccion.some(function(x){ return firma(x) === firma(item); })){ seleccion.push(item); agregados++; }
       });
@@ -370,7 +398,9 @@
       mostrarToast(n ? n + ' persona' + (n === 1 ? '' : 's') + ' lista' + (n === 1 ? '' : 's') + ' para ' + accionActiva.toLocaleLowerCase('es-AR') : 'Pétalo actualizado');
     }catch(error){
       if (error && /Abort/i.test(String(error.name || ''))) return;
-      if (window.APPIDialog && window.APPIDialog.alert) window.APPIDialog.alert('No pudimos abrir la agenda del teléfono. Probá otra vez.', { title:'Contactos', icon:'📱' });
+      pickerRoto = true;
+      abrirHoja(g, state, seleccion);
+      mostrarToast('No se pudo abrir la agenda del teléfono. Elegí de tu lista APPI o probá de nuevo.');
     }
   }
 

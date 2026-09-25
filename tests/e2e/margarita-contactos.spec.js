@@ -152,6 +152,39 @@ test('en un pétalo vacío abre el Contact Picker directo y guarda la selección
   expect(guardado).toEqual(expect.arrayContaining([expect.objectContaining({ nombre: 'Lucía Contacto', telefono: '3515557788' })]));
 });
 
+test('si el Contact Picker falla, el pétalo cae a la hoja de APPI sin callejón ni reintentos en bucle', async ({ page }) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'contacts', {
+      configurable: true,
+      value: {
+        select: async () => {
+          window.__pickerCalls = (window.__pickerCalls || 0) + 1;
+          const err = new Error('Contact picker not supported');
+          err.name = 'NotSupportedError';
+          throw err;
+        }
+      }
+    });
+  });
+  await abrirMargarita(page);
+
+  // Al fallar el picker (ej. Chromium de fabricante), en vez de un alert de
+  // callejón, se abre la hoja para elegir de APPI y el botón del teléfono
+  // queda disponible para reintentar.
+  await page.locator('[data-mg-group="amigos"] .mg-petal-content').click();
+  await expect(page.locator('#mgSheet')).toContainText('Elegí personas para este pétalo');
+  await expect(page.locator('#mgPhone')).toBeVisible();
+  await expect(page.locator('#mgCandidateList')).toContainText('Todavía no guardaste personas en APPI');
+
+  // El picker roto no se vuelve a abrir solo en el siguiente toque: la hoja
+  // aparece directo y select() no se llama más.
+  await page.locator('#mgClose').click();
+  await page.locator('[data-mg-group="amigos"] .mg-petal-content').click();
+  await expect(page.locator('#mgSheet')).toContainText('Elegí personas para este pétalo');
+  const llamadas = await page.evaluate(() => window.__pickerCalls || 0);
+  expect(llamadas).toBe(3);
+});
+
 test('sin Contact Picker la hoja lista las personas de APPI y permite elegir en el pétalo', async ({ page }) => {
   await abrirMargarita(page);
 
