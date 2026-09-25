@@ -4,6 +4,15 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v624 · La Margarita habla con tu teléfono y con tu Panel
+
+- Un **pétalo vacío** ahora abre **directo la agenda del teléfono** (Contact Picker) en Android: un solo toque, selección múltiple, y queda guardado con el contador al día.
+- Donde el navegador no permite abrir la agenda del teléfono (iPhone/Safari, PC), el pétalo abre la hoja con los contactos que ya guardaste en APPI: **Mi Gestión → Panel de Contactos + Agenda Personal** unificados, sin duplicados (dedup por teléfono), ordenados por nombre y con etiqueta de origen ("Panel APPI" / "Agenda" / "Teléfono").
+- La hoja ahora muestra arriba lo que ya elegiste (para poder desmarcarlo), busca por nombre o teléfono, y con miles de contactos muestra por tandas de 100 con "mostrar más" para no colgar el teléfono. Si no tenés contactos cargados aún, refresca Mi Gestión solo y te orienta a cargarlos.
+- El selector se pide con las propiedades que el dispositivo realmente soporta (`getProperties`), se deduplican los elegidos por dígitos del teléfono y la selección guardada sigue siendo la misma de siempre (no cambia el formato sincronizado con la nube).
+- `margarita-contactos.spec.js` + 2 tests nuevos (picker directo y hoja con Panel) y el spec ya corre en CI (shard A).
+- Versión: **v624 · Segura** · Cache `appi-v624-margarita-contactos`.
+
 ## v623 · El Campus vuelve al fondo de APPI
 
 - El fondo del Campus traía unos resplandores amarillos (radiales dorados y arena) que chocaban con el resto de la app. Quedó con el mismo color crema que toda APPI (`#f3eee3`), como corresponde al idioma visual unificado.

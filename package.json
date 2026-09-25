@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "623.0.0",
-  "cacheName": "appi-v623-campus-blanco",
+  "version": "624.0.0",
+  "cacheName": "appi-v624-margarita-contactos",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

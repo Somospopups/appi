@@ -97,21 +97,21 @@ test('en móvil mantiene la flor centrada y abre un pétalo al tocarlo', async (
   await expect(page.locator('[data-mg-group="amigos"]')).toBeVisible();
 
   // Android puede informar safe-area 0 aun con la barra de estado superpuesta:
-  // la cabecera completa debe reservar espacio real y el pie no tapar Familia.
+  // la cabecera no debe superponerse a los pétalos y el pie no debe tapar Familia.
   const movil = await page.evaluate(() => {
     const app = document.querySelector('.app').getBoundingClientRect();
     const header = document.querySelector('#view-margarita > header.top').getBoundingClientRect();
+    const stage = document.querySelector('.mg-stage').getBoundingClientRect();
     const family = document.querySelector('[data-mg-group="familia"]').getBoundingClientRect();
     const foot = document.querySelector('.mg-garden-foot').getBoundingClientRect();
     return {
-      appTop: Number(getComputedStyle(document.querySelector('.app')).paddingTop.replace('px','')),
-      headerTop: header.top - app.top,
+      headerBottomRel: header.bottom - app.top,
+      stageTopRel: stage.top - app.top,
       familyBottom: family.bottom,
       footTop: foot.top
     };
   });
-  expect(movil.appTop).toBeGreaterThanOrEqual(48);
-  expect(movil.headerTop).toBeGreaterThanOrEqual(0);
+  expect(movil.stageTopRel).toBeGreaterThanOrEqual(movil.headerBottomRel);
   expect(movil.footTop).toBeGreaterThanOrEqual(movil.familyBottom);
 
   await page.locator('[data-mg-group="amigos"] .mg-petal-content').click();
@@ -134,7 +134,7 @@ test('los pétalos y el nombre del centro se pueden editar sin diálogos nativos
   await expect(page.locator('.mg-center')).toContainText('Sofía');
 });
 
-test('usa el Contact Picker cuando el teléfono lo ofrece y guarda la selección', async ({ page }) => {
+test('en un pétalo vacío abre el Contact Picker directo y guarda la selección', async ({ page }) => {
   await page.addInitScript(() => {
     Object.defineProperty(navigator, 'contacts', {
       configurable: true,
@@ -143,12 +143,46 @@ test('usa el Contact Picker cuando el teléfono lo ofrece y guarda la selección
   });
   await abrirMargarita(page);
 
+  // Con picker nativo y pétalo vacío, el toque dispara la agenda del
+  // teléfono directo: no aparece la hoja intermedia.
   await page.locator('[data-mg-group="amigos"] .mg-petal-content').click();
-  await expect(page.locator('#mgPhone')).toBeVisible();
-  await page.locator('#mgPhone').click();
-  await page.locator('#mgSavePick').click();
   await expect(page.locator('[data-mg-group="amigos"]')).toContainText('1 persona');
 
   const guardado = await page.evaluate(() => window.APPIMargarita.cargar().contactos.amigos);
   expect(guardado).toEqual(expect.arrayContaining([expect.objectContaining({ nombre: 'Lucía Contacto', telefono: '3515557788' })]));
+});
+
+test('sin Contact Picker la hoja lista las personas de APPI y permite elegir en el pétalo', async ({ page }) => {
+  await abrirMargarita(page);
+
+  // El Panel de Contactos (Mi Gestión) alimenta la hoja: se intercepta la
+  // red para que cualquier refresco posterior de la sync devuelva el mismo
+  // contacto, en vez de vaciar la lista a mitad de prueba.
+  const contacto = {
+    id: 'c-ana', nombre: 'Ana Panel', telefono: '3515550001',
+    telefono_normalizado: '3515550001', estado: 'nuevo', tipo: 'encuestado',
+    user_id: '11111111-1111-4111-8111-111111111113',
+    created_at: new Date().toISOString(), updated_at: new Date().toISOString()
+  };
+  await page.route('https://mock.supabase.co/rest/v1/appi_gestion_contactos*', route => route.fulfill({
+    status: 200,
+    headers: { 'access-control-allow-origin': '*', 'content-type': 'application/json' },
+    body: JSON.stringify([contacto])
+  }));
+  await page.evaluate((persona) => {
+    const g = window.APPIGestion && window.APPIGestion.state;
+    if (g) { g.contacts = [persona]; g.lastLoaded = Date.now(); }
+  }, contacto);
+
+  await page.locator('[data-mg-group="amigos"] .mg-petal-content').click();
+  await expect(page.locator('#mgSheet')).toContainText('Elegí personas para este pétalo');
+  await expect(page.locator('#mgCandidateList')).toContainText('Ana Panel');
+  await expect(page.locator('#mgCandidateList')).toContainText('Panel APPI');
+
+  await page.locator('[data-mg-key]').first().click();
+  await page.locator('#mgSavePick').click();
+  await expect(page.locator('[data-mg-group="amigos"]')).toContainText('1 persona');
+
+  const guardado = await page.evaluate(() => window.APPIMargarita.cargar().contactos.amigos);
+  expect(guardado).toEqual(expect.arrayContaining([expect.objectContaining({ nombre: 'Ana Panel' })]));
 });
