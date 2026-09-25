@@ -4,6 +4,13 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v619 · Arreglado el desglose semanal y diario de PB
+
+- El desglose de PB por día/semana (Mi negocio → Total PB → Ver) se alimentaba de `action:'linea'`, que seguía usando el motor viejo: descubría el informe solo con links `<a idx>`, pedía el período como `MM-YYYY` y parseaba con el formato de tabla que PSA dejó de usar. Contra el PSA real devolvía 0 integrantes y el desglose nunca juntaba datos.
+- Ahora `action:'linea'` usa el mismo motor que el sync de v618: descubrimiento real por `AutoConsulta` (idx 69 en ac_cat=20), `bajarReporte` con `periodo YYYY-MM` + el nombre exacto de la consulta y reenvío del form por POST (inputs y selects, Latin-1), y `parsearLineaHtml` con el formato real `[centro-dip] Apellido [región]` (nombre + PB).
+- Al bajar la línea con éxito la app guarda el `idx` resuelto en `appsi_psa_idx`, para que el sync posterior lo use como override. Cada día que abrís APPI se registra el día y el desglose marca los días sin ingreso (`No ingresaste este día`), el estado inicial del mes, y suma solo los cambios reales de PB por integrante.
+- Versión: **v619 · Segura** · Cache `appi-v619-desglose-pb-linea-fix`.
+
 ## v618 · Los 3 archivos de PSA al día con una sola entrada
 
 - **Al entrar con MI PSA conectado se bajan los 3 archivos en UNA sola sesión**: Línea descendente (ac_cat=20), Garantías por organización y Garantías (ac_cat=21), y se aplican al equipo, a cada persona y a la base de clientes sin que toques nada.

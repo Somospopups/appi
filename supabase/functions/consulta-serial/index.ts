@@ -649,75 +649,29 @@ Deno.serve(async (req) => {
      La app lo baja en cada apertura para guardar los números de cada
      integrante y acumular los cambios día a día (nombre + PB). */
   if (body.action === 'linea') {
-    // 1) Descubrir el informe en el hub de Autoconsulta.
-    let hubHtml = '';
-    try {
-      const rh = await fetch(DIP_HUB, { headers: { 'User-Agent': UA, Cookie: cookieH(dip) } });
-      hubHtml = decodificarLatin1(new Uint8Array(await rh.arrayBuffer()));
-    } catch (_) {}
-    let idxLinea = String(Deno.env.get('PSA_LINEA_IDX') || '').trim();
-    const reportes = new Map<string, string>();
-    const anchors = hubHtml.match(/<a[^>]*>[\s\S]*?<\/a>/gi) || [];
-    for (const a of anchors) {
-      const label = limpiarCelda(a);
-      if (!label || label.length < 3) continue;
-      const midx = a.match(/idx[=_]([\d]+)/i);
-      if (midx) reportes.set(String(midx[1]), label);
-    }
-    if (reportes.size) {
-      const norm = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-      let pick: string | null = null;
-      for (const [id, lbl] of reportes) if (/\blinea\b/.test(norm(lbl)) && /descend/i.test(norm(lbl))) { pick = id; break; }
-      if (!pick) for (const [id, lbl] of reportes) if (/(linea|descend)/.test(norm(lbl))) { pick = id; break; }
-      if (!pick) for (const [id, lbl] of reportes) if (/\borga/.test(norm(lbl))) { pick = id; break; }
-      if (pick) idxLinea = pick;
+    const periodo = (body.periodo ? String(body.periodo) : periodoActualBA()).replace(/[^0-9\-]/g, '');
+    const override: Record<string, string> = (body.idx && typeof body.idx === 'object')
+      ? Object.fromEntries(Object.entries(body.idx).map(([k, v]) => [k, String(v)])) : {};
+    const { reportes, menu } = await descubrir(dip);
+    let idxLinea = override.linea || String(Deno.env.get('PSA_LINEA_IDX') || '').trim();
+    if (!idxLinea) {
+      const e = elegir(reportes, [[/linea/, /descend/], [/linea/], [/descend/]]);
+      if (e) idxLinea = e;
     }
     if (!idxLinea) {
-      const menu = [...reportes.entries()].slice(0, 40).map(([id, lbl]) => id + '=' + lbl);
-      return json({ ok: false, error: 'No pude ubicar el informe «Línea descendente» en Autoconsulta de PSA. Revisá la barra de direcciones cuando lo abras (idx=NN) y decime el número.', menu }, 502);
+      return json({ ok: false, error: 'No pude ubicar el informe «Línea descendente» en Autoconsulta de PSA (revisá «menu»).', menu }, 502);
     }
-
-    // 2) Bajar el informe del período actual.
-    const periodo = (body.periodo ? String(body.periodo) : periodoActualBA()).replace(/[^0-9\-]/g, '');
-    const mm = periodo.slice(5) + '-' + periodo.slice(0, 4);
-    const intentos: string[] = [];
-    let htmlL = '';
-    const urlGet = DIP_EXEC + '?idx=' + idxLinea + '&periodo=' + mm + '&Consulta=Linea';
     try {
-      const rg = await dipReq(urlGet);
-      htmlL = decodificarLatin1(new Uint8Array(await rg.arrayBuffer()));
-      intentos.push('GET');
-    } catch (_) {}
-    if (!parsearLinea(htmlL)) {
-      try {
-        const rf = await dipReq(DIP_EXEC + '?idx=' + idxLinea + '&periodo=' + mm + '&Consulta=Linea');
-        const formH = decodificarLatin1(new Uint8Array(await rf.arrayBuffer()));
-        const fd = new URLSearchParams();
-        fd.set('idx', idxLinea);
-        const inputs = formH.match(/<input[^>]*>/gi) || [];
-        for (const inp of inputs) {
-          const nm = inp.match(/name="([^"]+)"/i);
-          if (!nm) continue;
-          const key = String(nm[1]);
-          const vl = (inp.match(/value="([^"]*)"/i) || ['', ''])[1];
-          const k = key.toLowerCase();
-          if (k === 'idx' || k === 'centro' || k === 'dip' || k === 'clave' || k === 'periodo' || k === 'accion' || k.startsWith('filtro') || k === 'consulta' || k.startsWith('nivel') || k.startsWith('orden')) {
-            fd.set(key, k === 'idx' ? idxLinea : (k === 'periodo' ? mm : vl));
-          }
-        }
-        if (!fd.get('accion')) fd.set('accion', 'consultar');
-        if (!fd.get('periodo')) fd.set('periodo', mm);
-        const rp = await dipReq(DIP_EXEC, { method: 'POST', body: fd.toString() });
-        htmlL = decodificarLatin1(new Uint8Array(await rp.arrayBuffer()));
-        intentos.push('POST');
-      } catch (_) {}
+      const descrip = reportes.get(idxLinea) || 'Linea';
+      const { html, via } = await bajarReporte(dip, idxLinea, descrip, periodo, h => !!parsearLineaHtml(h));
+      const filas = parsearLineaHtml(html);
+      if (!filas || !filas.length) {
+        return json({ ok: false, error: 'El informe de Línea descendente no devolvió integrantes (via: ' + via + '). Puede haber cambiado el formato de PSA.', columnas: columnasHtml(html) }, 502);
+      }
+      return json({ ok: true, periodo, via, idx: { linea: idxLinea }, filas: filas.map(f => ({ n: f.n, pb: f.pb })) });
+    } catch (e) {
+      return json({ ok: false, error: 'No se pudo bajar el informe de Línea descendente: ' + String((e as any)?.message || e) }, 502);
     }
-
-    const filas = parsearLinea(htmlL);
-    if (!filas || !filas.length) {
-      return json({ ok: false, error: 'El informe de Línea descendente no devolvió integrantes (intentos: ' + intentos.join(', ') + '). Puede haber cambiado el formato de PSA.', columnas: columnasHtml(htmlL) }, 502);
-    }
-    return json({ ok: true, periodo, filas: filas.map(f => ({ n: f.n, pb: f.pb })) });
   }
 
   /* ===== Sincronización de los 3 archivos al entrar (v618) =====

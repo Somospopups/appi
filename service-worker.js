@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v618-sync-psa-completo';
+const CACHE_NAME = 'appi-v619-desglose-pb-linea-fix';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

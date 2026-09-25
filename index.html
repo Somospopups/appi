@@ -14209,8 +14209,8 @@ function cerrarToolsMenu(){
   // con archivos viejos en pantalla.
   if ('serviceWorker' in navigator) {
     (async () => {
-const swVersion='618';
-  const CACHE_NAME='appi-v618-sync-psa-completo';
+const swVersion='619';
+  const CACHE_NAME='appi-v619-desglose-pb-linea-fix';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
@@ -19815,7 +19815,7 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
         body: JSON.stringify({ action:'linea', center:c.center, number:c.number, password:c.password })
       });
       const j = await r.json().catch(() => ({}));
-      if(r.ok && j && j.ok && Array.isArray(j.filas)) return { ok:true, filas:j.filas, guardado: appiGuardarLinea(j.filas) };
+      if(r.ok && j && j.ok && Array.isArray(j.filas)){ try{ if(j.idx && typeof psaGuardarIdx==='function') psaGuardarIdx(j.idx); }catch(e){} return { ok:true, filas:j.filas, guardado: appiGuardarLinea(j.filas) }; }
       if(j && j.menu) return { ok:false, error:'no_menu', menu:j.menu };
       return { ok:false, error: j && j.error ? j.error : 'psa' };
     }catch(e){ return { ok:false, error:String((e && e.message) || e) }; }
