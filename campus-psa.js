@@ -124,7 +124,7 @@
     var st = document.createElement('style');
     st.id = 'campusPsaStyle';
     st.textContent = [
-      '#view-campus{background:radial-gradient(circle at 4% 0,rgba(242,196,111,.22),transparent 28%),radial-gradient(circle at 95% 100%,rgba(225,194,146,.22),transparent 32%),linear-gradient(155deg,#f7f1e6,#f3ecdf 52%,#eee4d3)}',
+      '#view-campus{background:#f3eee3}',
       '.cp-wrap{max-width:780px;margin:0 auto;padding:2px 14px calc(108px + env(safe-area-inset-bottom))}',
       '.cp-hero{padding:17px 4px 15px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px}',
       '.cp-kicker{display:inline-flex;align-items:center;gap:5px;padding:5px 9px;border-radius:999px;background:#e5fbf5;color:#147a68;font-size:9px;font-weight:950;letter-spacing:.75px}',

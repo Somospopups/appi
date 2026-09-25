@@ -4,6 +4,11 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v623 · El Campus vuelve al fondo de APPI
+
+- El fondo del Campus traía unos resplandores amarillos (radiales dorados y arena) que chocaban con el resto de la app. Quedó con el mismo color crema que toda APPI (`#f3eee3`), como corresponde al idioma visual unificado.
+- Versión: **v623 · Segura** · Cache `appi-v623-campus-blanco`.
+
 ## v622 · Las tarjetas del mazo entran en cascada
 
 - En el teléfono las tarjetas del Home aparecían de golpe (o tardaban en montarse: el mazo arma ~14 cartas desde cero). Ahora, cada vez que llegás al Home, las cartas **entran en cascada** igual que el "deal" de escritorio: la de arriba aterriza primero y las de atrás la siguen, cada una asomando desde abajo con una leve respiración de escala.

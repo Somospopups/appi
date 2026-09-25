@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v622-entrada-cartas';
+const CACHE_NAME = 'appi-v623-campus-blanco';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
