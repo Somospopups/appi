@@ -4658,7 +4658,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v626 · Segura</div>
+  <div class="ds-foot">APPI · v627 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -14209,8 +14209,8 @@ function cerrarToolsMenu(){
   // con archivos viejos en pantalla.
   if ('serviceWorker' in navigator) {
     (async () => {
-const swVersion='626';
-  const CACHE_NAME='appi-v626-subir-agenda';
+const swVersion='627';
+  const CACHE_NAME='appi-v627-compartir';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
@@ -14276,6 +14276,88 @@ const swVersion='626';
       }
     })();
   }
+</script>
+
+<script>
+/* ===== Compartir contacto → APPI (share_target, Android) =====
+   Cuando otra app le comparte un contacto (.vcf) a APPI instalada, el
+   Service Worker entrega el texto acá. Se importa a la Agenda Personal
+   (Mi Gestión) y desde ahí queda disponible en cada pétalo de la Margarita.
+   En iPhone esto no aparece en el menú compartir; ahí se usa Subir agenda. */
+(function(){
+  if (window.APPICompartir) return;
+  var colaKey = 'appi_compartir_cola';
+  function leerCola(){ try { return JSON.parse(localStorage.getItem(colaKey) || '[]'); } catch(e){ return []; } }
+  function guardarCola(c){ try { localStorage.setItem(colaKey, JSON.stringify(c)); } catch(e){} }
+  var procesando = false;
+
+  function textoAItems(texto){
+    var items = [];
+    var ag = window.APPIAgendaPersonal;
+    var vcards = (ag && typeof ag.parsearVcard === 'function') ? ((ag.parsearVcard(texto) || [])) : [];
+    if (vcards.length){
+      vcards.forEach(function(c){ if (c && c.nombre) items.push({ nombre: c.nombre, telefono: String(c.telefono || '') }); });
+      return items;
+    }
+    // No era vCard: se rescata nombre y número a ojo (WhatsApp comparte "Nombre\n3515551111").
+    var t = String(texto || '').trim();
+    if (!t) return items;
+    var num = (t.match(/(\+?[\d][\d\s\-().]{5,}[\d])/) || [])[0] || '';
+    var nombre = String(t.split(/\r?\n|,/)[0]).trim() || 'Contacto';
+    items.push({ nombre: nombre, telefono: num.replace(/\s+/g, '') });
+    return items;
+  }
+
+  function recibir(src){
+    var lista = [];
+    (Array.isArray(src) ? src : []).forEach(function(it){
+      lista = lista.concat(textoAItems(String(it && it.texto || '')));
+    });
+    if (!lista.length) return;
+    guardarCola(leerCola().concat(lista));
+    procesar();
+  }
+
+  function procesar(){
+    if (procesando){ setTimeout(procesar, 400); return; }
+    var ag = window.APPIAgendaPersonal;
+    if (!ag || typeof ag.importarLista !== 'function'){ setTimeout(procesar, 400); return; }
+    var cola = leerCola();
+    if (!cola.length) return;
+    procesando = true;
+    ag.importarLista(cola, 'compartido').then(function(res){
+      procesando = false;
+      res = res || {};
+      guardarCola([]);
+      var partes = [];
+      if (res.agregados) partes.push(res.agregados + (res.agregados === 1 ? ' contacto recibido' : ' contactos recibidos'));
+      if (res.repetidos) partes.push(res.repetidos + (res.repetidos === 1 ? ' ya estaba en tu Agenda' : ' ya estaban en tu Agenda'));
+      if (res.sinTel && !res.agregados) partes.push('sin teléfono válido');
+      var mensaje = partes.length ? '📨 ' + partes.join(' · ') : 'No se pudo guardar lo compartido.';
+      try { if (typeof toast === 'function') toast(mensaje, 3200); else if (window.showToast) window.showToast(mensaje); } catch(e){}
+    }).catch(function(){ procesando = false; setTimeout(procesar, 1000); });
+  }
+
+  // (a) Mensaje directo del service worker cuando llega un share.
+  if ('serviceWorker' in navigator){
+    navigator.serviceWorker.addEventListener('message', function(event){
+      var d = event && event.data || {};
+      if (d.type === 'APPI_SHARE_RECEIVED') recibir(d.items);
+    });
+  }
+  // (b) Respaldo: drenar la cola que dejó el SW por si el mensaje se perdió.
+  function drenarRelay(){
+    fetch('./.compartir/cola-v627.json', { cache: 'no-store' })
+      .then(function(r){ return r.ok ? r.json() : []; })
+      .then(function(items){ if (Array.isArray(items) && items.length) recibir(items); })
+      .catch(function(){});
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', drenarRelay);
+  else drenarRelay();
+  window.addEventListener('appi-auth-change', procesar);
+  window.addEventListener('appi-person-change', procesar);
+  window.APPICompartir = { recibir: recibir, proceso: procesar };
+})();
 </script>
 
 <style>

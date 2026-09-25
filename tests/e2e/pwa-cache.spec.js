@@ -79,3 +79,57 @@ test('el App Shell sólo referencia archivos existentes e incluye los módulos a
     expect(shell,`${recurso} debe estar precargado para el primer uso offline`).toContain(recurso);
   }
 });
+
+test('la app declara compartir contacto (share_target) y el SW lo recibe', () => {
+  const html=read('index.html'), sw=read('service-worker.js');
+  const manifest=JSON.parse(read('manifest.json'));
+  const st=manifest.share_target;
+  expect(st, 'el manifest debería declarar share_target').toBeTruthy();
+  expect(st.method).toBe('POST');
+  expect(st.enctype).toBe('multipart/form-data');
+  expect(st.action).toBe('./');
+  expect(st.params.files.length).toBe(1);
+  expect(st.params.files[0].accept).toEqual(expect.arrayContaining(['text/vcard', '.vcf']));
+  // El service worker atrapa el POST del sistema y avisa a la página.
+  expect(sw).toContain("event.request.method === 'POST'");
+  expect(sw).toContain('APPI_SHARE_RECEIVED');
+  expect(sw).toContain('SHARE_QUEUE_CACHE');
+  expect(sw).toContain('share-queue-v627');
+  // La página lo recibe y lo importa a la Agenda Personal (visible en cada
+  // pétalo de la Margarita).
+  expect(html).toContain('APPI_SHARE_RECEIVED');
+  expect(html).toContain("ag.importarLista(cola, 'compartido')");
+  expect(html).toContain('window.APPICompartir');
+});
+
+test('un contacto compartido a APPI se importa a la Agenda Personal', async ({ page }) => {
+  await page.goto('/index.html');
+  await expect.poll(() =>
+    page.evaluate(() => !!(window.APPIAgendaPersonal && window.APPICompartir &&
+      typeof window.APPIAgendaPersonal.importarLista === 'function'))
+  ).toBe(true);
+
+  // Lo que deja Android al compartir un contacto: una tarjeta vCard.
+  const vcf = [
+    'BEGIN:VCARD', 'VERSION:3.0', 'FN:Valentina Compartida', 'TEL;TYPE=CELL:3515559090', 'END:VCARD'
+  ].join('\r\n');
+  await page.evaluate(v => window.APPICompartir.recibir([{ texto: v, origen: 'contacto' }]), vcf);
+
+  await expect.poll(() => page.evaluate(() => {
+    const lista = window.APPIAgendaPersonal.lista ? window.APPIAgendaPersonal.lista() : [];
+    return lista.some(c => String(c.nombre || '').indexOf('Valentina Compartida') >= 0);
+  }), { timeout: 15000 }).toBe(true);
+
+  // Además del vCard entero, un compartido como texto simple ("Nombre\n3515551111")
+  // rescata nombre y número sin perder nada.
+  await page.evaluate(texto => window.APPICompartir.recibir([{ texto: texto, origen: 'texto' }]),
+    'Rodrigo Texto\n3515557070');
+  await expect.poll(() => page.evaluate(() => {
+    const lista = window.APPIAgendaPersonal.lista ? window.APPIAgendaPersonal.lista() : [];
+    return lista.some(c => String(c.nombre || '').indexOf('Rodrigo Texto') >= 0);
+  })).toBe(true);
+
+  // La cola se vacía cuando se consumió.
+  const cola = await page.evaluate(() => JSON.parse(localStorage.getItem('appi_compartir_cola') || '[]'));
+  expect(cola).toEqual([]);
+});

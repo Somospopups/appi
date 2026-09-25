@@ -1,5 +1,10 @@
-const CACHE_NAME = 'appi-v626-subir-agenda';
+const CACHE_NAME = 'appi-v627-compartir';
 const CACHE_PREFIX = 'appi-';
+// Donde el SW aparta una compartición hasta que la app la consume. No
+// empieza con el prefijo de la app para que el prune del activate no la borre.
+const SHARE_QUEUE_CACHE = 'share-queue-v627';
+function shareTargetPath(){ return new URL('./', self.registration.scope).pathname; }
+function shareQueueUrl(){ return new URL('./.compartir/cola-v627.json', self.registration.scope); }
 const APP_SHELL = [
   './',
   './index.html',
@@ -101,8 +106,62 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
-  if (event.request.method !== 'GET') return;
   const url = new URL(event.request.url);
+
+  // "Compartir contacto → APPI" (share_target de Android): el sistema hace
+  // un POST multipart a la app instalada. El SW lo atrapa, aparta lo
+  // compartido para que la página lo importe y redirige a la app normal.
+  // iOS no ofrece esto; ahí se usa "Subir agenda (.vcf)".
+  if (event.request.method === 'POST' && url.origin === self.location.origin && url.pathname === shareTargetPath()) {
+    event.respondWith((async () => {
+      let form;
+      try { form = await event.request.formData(); } catch (error) { return Response.redirect(new URL('./', self.registration.scope).href, 303); }
+      const file = form.get('file');
+      let texto = '';
+      if (file && file.size){ try { texto = await file.text(); } catch (error) {} }
+      if (!texto) texto = form.get('text') || form.get('title') || '';
+      const items = texto ? [{ texto: String(texto), origen: String((file && file.name) || 'contacto'), ts: Date.now() }] : [];
+      // Respaldo: queda en una cola por si la página no está lista aún.
+      try {
+        const cache = await caches.open(SHARE_QUEUE_CACHE);
+        let prev = [];
+        try { const prevRes = await cache.match(shareQueueUrl()); prev = prevRes ? await prevRes.json() : []; } catch (e) {}
+        await cache.put(shareQueueUrl(), new Response(JSON.stringify(prev.concat(items).slice(-20)), {
+          headers: { 'Content-Type': 'application/json' }
+        }));
+      } catch (e) {}
+      // Aviso a la página abierta (o a la que está por abrirse).
+      if (items.length) {
+        const message = { type: 'APPI_SHARE_RECEIVED', items: items };
+        try {
+          const client = await self.clients.get(event.resultingClientId);
+          if (client) client.postMessage(message);
+        } catch (e) {}
+        try {
+          const windows = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+          for (const win of windows) { try { win.postMessage(message); } catch (e) {} }
+        } catch (e) {}
+      }
+      return Response.redirect(new URL('./', self.registration.scope).href, 303);
+    })());
+    return;
+  }
+
+  // Drenaje de la cola de compartición: le entrega a la página lo que quedó
+  // y lo saca de una (un solo GET lo consume entero).
+  if (event.request.method === 'GET' && url.origin === self.location.origin && url.pathname === shareQueueUrl().pathname) {
+    event.respondWith((async () => {
+      try {
+        const cache = await caches.open(SHARE_QUEUE_CACHE);
+        const hit = await cache.match(shareQueueUrl());
+        if (hit) { await cache.delete(shareQueueUrl()); return hit; }
+      } catch (e) {}
+      return new Response('[]', { headers: { 'Content-Type': 'application/json' } });
+    })());
+    return;
+  }
+
+  if (event.request.method !== 'GET') return;
 
   // Los CDN, Supabase, mapas y APIs conservan su comportamiento de red normal.
   if (url.origin !== self.location.origin) return;

@@ -4,6 +4,13 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v627 · Compartir contacto → APPI, directo desde el teléfono
+
+- Un usuario de Android con APPI instalada como app puede **compartirle un contacto desde cualquier otra app** (Contactos, WhatsApp, un archivo .vcf): APPI aparece en el menú compartir gracias al `share_target` del manifest.
+- El Service Worker atrapa el envío, lo aparta en una cola de respaldo y redirige a la app; la página importa los contactos a la **Agenda Personal** (Mi Gestión), de donde ya los lista la hoja de **cada pétalo** de la Margarita sin que nadie los vuelva a tocar.
+- Si no es una agenda (.vcf) sino un texto simple, se rescata el nombre y el número a ojo. En iPhone/Safari el menú compartir no ofrece esto: sigue valiendo "Subir agenda" dentro de la hoja.
+- Versión: **v627 · Segura** · Cache `appi-v627-compartir`.
+
 ## v626 · La Margarita mete la agenda del teléfono de una
 
 - La hoja de un pétalo ahora tiene **"Subir agenda"**: la persona elige una vez el archivo `.vcf` que exporta su teléfono (Android e iPhone) y toda su agenda entra al pétalo de una sola vez, sin tocar contacto por contacto. Se queda guardada en su cuenta y lista para siempre.
