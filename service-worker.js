@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v621-desglose-acumulado';
+const CACHE_NAME = 'appi-v622-entrada-cartas';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

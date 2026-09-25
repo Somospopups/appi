@@ -4,6 +4,13 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v622 · Las tarjetas del mazo entran en cascada
+
+- En el teléfono las tarjetas del Home aparecían de golpe (o tardaban en montarse: el mazo arma ~14 cartas desde cero). Ahora, cada vez que llegás al Home, las cartas **entran en cascada** igual que el "deal" de escritorio: la de arriba aterriza primero y las de atrás la siguen, cada una asomando desde abajo con una leve respiración de escala.
+- Respetan `prefers-reduced-motion` (sin animación si lo activaste) y si agarrás una carta en pleno vuelo, el dedo manda al instante: la entrada se corta y el arrastre funciona normal.
+- El vaivén de demostración de la primera carta espera a que la entrada termine, así no se pisan las dos animaciones.
+- Versión: **v622 · Segura** · Cache `appi-v622-entrada-cartas`.
+
 ## v621 · Desglose PB en dos columnas (delta + acumulado)
 
 - El desglose semanal/diario de Mi negocio → Total PB → Ver ahora muestra **dos números por día**: lo que se sumó ese día (delta, en azul) y el **acumulado del mes hasta ese día** (`acum.`). Lo mismo en la cabecera de cada semana (acumulado al cierre) y en el detalle de un día (`acum. X` bajo el número grande).

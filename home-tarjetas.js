@@ -1708,6 +1708,7 @@
         '<div class="ht-hint" id="htHint">' + (esPC() ? 'Usá las flechas para pasar las cartas' : '← Deslizá para un lado o para el otro: las tarjetas dan la vuelta →') + '</div></div>';
       home.insertBefore(ov, home.firstChild);
       inlineAbierto = true;
+      mazo.entrada = true; // al aterrizar recién se anima el deal (v622)
       pintar();
       cablearFlechas();
       return true;
@@ -1945,7 +1946,7 @@
     var subEl = document.getElementById('htSubCupo');
     if (subEl) subEl.textContent = textoSubMarcador();
     if (!deck) return;
-    if (esPC()){ pintarCover(!mazo.coverDeal); return; }
+    if (esPC()){ mazo.entrada = false; pintarCover(!mazo.coverDeal); return; }
     var ovOff = document.getElementById('htOverlay');
     if (ovOff) ovOff.classList.remove('ht-cover-on');
     mazo.coverDOM = false;
@@ -1958,6 +1959,10 @@
     if (pos) pos.textContent = (mazo.i + 1) + ' de ' + len;
     // Se pintan la de arriba y hasta dos de atrás; con el bucle, después de la
     // última asoma de nuevo la primera.
+    var entrar = !!mazo.entrada;          // primera pintada tras abrir el mazo
+    mazo.entrada = false;
+    var animo = entrar && !reduceMotion();
+    var demoAtrasada = null;
     for (var off = Math.min(2, len - 1); off >= 0; off--){
       var k = (mazo.i + off) % len;
       var t = mazo.tarjetas[k];
@@ -1966,9 +1971,38 @@
       if (off === 0){
         cablearTope(el, t);
         // La primera vez, la tarjeta se hamaca sola: así se entiende el gesto.
-        if (mazo.i === 0 && !mazo.demoHecha){ mazo.demoHecha = true; el.classList.add('demo'); }
+        // Si venía la entrada animada, el vaivén espera a que aterrice.
+        if (mazo.i === 0 && !mazo.demoHecha){ mazo.demoHecha = true; demoAtrasada = el; }
       }
       deck.appendChild(el);
+    }
+    if (animo){
+      // Las cartas entran en cascada igual que el deal de escritorio: la de
+      // arriba aterriza primero y las de atrás la siguen un paso en cámara
+      // lenta; cada una asoma desde abajo con una leve respiración de escala.
+      var fichas = deck.querySelectorAll('.ht-card');
+      var total = fichas.length;
+      fichas.forEach(function(c, i){
+        c.style.transition = 'none';
+        c.style.opacity = '0';
+        c.style.transform = 'translateY(' + (30 + i * 12) + 'px) scale(.96)';
+      });
+      void deck.offsetWidth; // forzar el punto de partida antes de animar
+      fichas.forEach(function(c, i){
+        var paso = ((total - 1 - i) * 70);
+        c.style.transition = 'transform .5s var(--ease-appi) ' + paso + 'ms, opacity .35s ease ' + paso + 'ms';
+        c.style.opacity = '';
+        c.style.transform = '';
+      });
+      setTimeout(function(){
+        fichas.forEach(function(c){
+          if (!c.isConnected) return;
+          c.style.transition = ''; c.style.opacity = ''; c.style.transform = '';
+        });
+        if (demoAtrasada && demoAtrasada.isConnected) demoAtrasada.classList.add('demo');
+      }, 900);
+    } else if (demoAtrasada){
+      demoAtrasada.classList.add('demo');
     }
     requestAnimationFrame(function(){ ajustarFrasesDelMazo(); });
   }
@@ -2077,6 +2111,9 @@
     el.addEventListener('pointerdown', function(e){
       if (e.button != null && e.button !== 0) return;
       el.classList.remove('demo');
+      // Deja sin efectos la entrada en cascada si el usuario agarra la carta
+      // en pleno vuelo: el dedo debe mandar enseguida (v622).
+      el.style.transition = ''; el.style.opacity = ''; el.style.transform = '';
       arrastrando = true; modo = '';
       x0 = e.clientX; y0 = e.clientY; lastY = e.clientY; dx = 0; dy = 0; dir = 0; el.__arrastro = false;
       lista = (e.target && e.target.closest) ? e.target.closest('.ht-lista') : null;
