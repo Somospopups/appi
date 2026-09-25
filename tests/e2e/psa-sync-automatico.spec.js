@@ -469,7 +469,8 @@ return {
         tieneTarjetaDia,
         detalleTieneNombre: /GARCIA/.test(detalle),
         detalleTieneDelta: /\+3\.2 PB/.test(detalle),
-        detalleTieneTotal: /Total: 11\.4 PB/.test(detalle)
+        detalleTieneTotal: /Total: 11\.4 PB/.test(detalle),
+        detalleTieneAcum: /acum\. 11\.4/.test(detalle)
       };
     });
 
@@ -478,5 +479,136 @@ return {
     expect(res.detalleTieneNombre).toBe(true);
     expect(res.detalleTieneDelta).toBe(true);
     expect(res.detalleTieneTotal).toBe(true);
+    expect(res.detalleTieneAcum).toBe(true);
+  });
+
+  test('hoy sin movimientos muestra "Todavía no hay movimientos de PB hoy" y no culpa al usuario', async ({ page }) => {
+    await page.route('**/auth-config.js', route => route.fulfill({
+      contentType: 'application/javascript',
+      body: "window.APPI_AUTH={enabled:true,url:'https://mock.supabase.co',anonKey:'anon-key-publica-de-prueba',distributorEmailDomain:'distribuidores.appi.invalid',adminLogin:{username:'popups',email:'admin-popups@appi.invalid'},loginAliases:{},offlineDays:7};"
+    }));
+
+    await page.route('https://mock.supabase.co/**', route => {
+      const cors = { 'access-control-allow-origin': '*', 'content-type': 'application/json' };
+      return route.fulfill({ status: 200, headers: cors, body: '[]' });
+    });
+
+    await page.addInitScript(() => {
+      localStorage.setItem('welcomeSeen', '1');
+      localStorage.setItem('appi_tarjetas_auto', '0');
+      localStorage.setItem('tutoVisto_v2', '1');
+      localStorage.removeItem('equipoData');
+      localStorage.removeItem('usuarios_garantias');
+      localStorage.removeItem('appi_linea_v1');
+      localStorage.removeItem('appi_pb_mov_v1');
+      localStorage.removeItem('appi_pb_snapshot_distribuidores');
+    });
+
+    await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
+    await page.evaluate(() => {
+      const lock = document.getElementById('lockScreen');
+      if (lock) lock.classList.add('hidden');
+      const boot = document.getElementById('bootScreen');
+      if (boot) { boot.classList.add('gone'); boot.remove(); }
+      document.body.classList.remove('appi-login-abierto');
+      window.showView('view-equipo');
+    });
+
+    const res = await page.evaluate(() => {
+      const hoy = new Date().getDate();
+      window.abrirModalDetallePB(0);
+      const cuerpo = (document.getElementById('modalBody') || { innerText: '' }).innerText;
+      window.abrirDetalleDiaPB(hoy, 0);
+      const detalle = (document.getElementById('modalBody') || { innerText: '' }).innerText;
+      return {
+        cuerpoTieneNeutral: /Todavía no hay movimientos de PB hoy/.test(cuerpo),
+        cuerpoNoCulpa: !/No ingresaste este día/.test(cuerpo),
+        detalleTieneNeutral: /Todavía no hay movimientos de PB hoy/.test(detalle),
+        detalleNoCulpa: !/No ingresaste este día/.test(detalle)
+      };
+    });
+
+    expect(res.cuerpoTieneNeutral).toBe(true);
+    expect(res.cuerpoNoCulpa).toBe(true);
+    expect(res.detalleTieneNeutral).toBe(true);
+    expect(res.detalleNoCulpa).toBe(true);
+  });
+
+  test('los movimientos detectados se suman al registro del día (línea) y muestran su acumulado', async ({ page }) => {
+    await page.route('**/auth-config.js', route => route.fulfill({
+      contentType: 'application/javascript',
+      body: "window.APPI_AUTH={enabled:true,url:'https://mock.supabase.co',anonKey:'anon-key-publica-de-prueba',distributorEmailDomain:'distribuidores.appi.invalid',adminLogin:{username:'popups',email:'admin-popups@appi.invalid'},loginAliases:{},offlineDays:7};"
+    }));
+
+    await page.route('https://mock.supabase.co/**', route => {
+      const cors = { 'access-control-allow-origin': '*', 'content-type': 'application/json' };
+      return route.fulfill({ status: 200, headers: cors, body: '[]' });
+    });
+
+    await page.addInitScript(() => {
+      localStorage.setItem('welcomeSeen', '1');
+      localStorage.setItem('appi_tarjetas_auto', '0');
+      localStorage.setItem('tutoVisto_v2', '1');
+      localStorage.removeItem('equipoData');
+      localStorage.removeItem('usuarios_garantias');
+      localStorage.removeItem('appi_linea_v1');
+      localStorage.removeItem('appi_pb_mov_v1');
+      localStorage.removeItem('appi_pb_snapshot_distribuidores');
+    });
+
+    await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
+    await page.evaluate(() => {
+      const lock = document.getElementById('lockScreen');
+      if (lock) lock.classList.add('hidden');
+      const boot = document.getElementById('bootScreen');
+      if (boot) { boot.classList.add('gone'); boot.remove(); }
+      document.body.classList.remove('appi-login-abierto');
+      window.showView('view-equipo');
+    });
+
+    const res = await page.evaluate(() => {
+      localStorage.setItem('appi_recordatorios_v1', JSON.stringify({ hab: { pb_mov: false } }));
+      localStorage.setItem('appi_pb_snapshot_distribuidores', JSON.stringify({ '01-1': 8.2 }));
+      // La detección ve a GARCIA subir +3,2 (11,4 PB) y al equipo en 31,4 totales.
+      window.APPIRecordatorios.detectarMovimientosPB({
+        personas: [
+          { codigo: '01-1', nombre: 'GARCIA', pnAct: 11.4 },
+          { codigo: '01-2', nombre: 'LOPEZ', pnAct: 20 }
+        ]
+      });
+      const movStore = JSON.parse(localStorage.getItem('appi_pb_mov_v1') || 'null');
+      const clave = Object.keys(movStore.dias)[0];
+      const anio = clave.slice(0, 4), mes = clave.slice(5, 7);
+      // La línea del día ya tenía a GARCIA con +5 (total día 40).
+      localStorage.setItem('appi_linea_v1', JSON.stringify({
+        periodo: anio + '-' + mes,
+        dias: {
+          [clave]: {
+            total: 40,
+            porD: { 'GARCIA': 20, 'LOPEZ': 20 },
+            cambios: [{ n: 'GARCIA', pb: 5 }],
+            ultima: new Date().toISOString()
+          }
+        }
+      }));
+      const dayNum = parseInt(clave.slice(8, 10), 10);
+      window.abrirModalDetallePB(0);
+      const cuerpo = (document.getElementById('modalBody') || { innerText: '' }).innerText;
+      window.abrirDetalleDiaPB(dayNum, 0);
+      const detalle = (document.getElementById('modalBody') || { innerText: '' }).innerText;
+      return {
+        tarjetaSuma: /8\.2 PB/.test(cuerpo),
+        filaSumada: /\+8\.2 PB/.test(detalle),
+        unaSolaFila: (detalle.match(/\+8\.2 PB/g) || []).length === 1,
+        totalMov: /Total: 11\.4 PB/.test(detalle),
+        acumLinea: /acum\. 40\.0/.test(cuerpo)
+      };
+    });
+
+    expect(res.tarjetaSuma).toBe(true);
+    expect(res.filaSumada).toBe(true);
+    expect(res.unaSolaFila).toBe(true);
+    expect(res.totalMov).toBe(true);
+    expect(res.acumLinea).toBe(true);
   });
 });

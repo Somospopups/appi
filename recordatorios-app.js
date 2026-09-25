@@ -449,9 +449,15 @@
       if (cambios.length > 0 && snapshot) {
         try {
           if (window.appiPBDiario && typeof window.appiPBDiario.registrar === 'function') {
+            // v629: total de PB del equipo en ese momento, para que el día con
+            // movimientos pueda mostrar su acumulado real (misma semántica que
+            // el total que guarda la línea de PSA).
+            var tt = nuevoEquipo.personas.reduce(function(s, p) {
+              return s + Number(p.pnAct != null ? p.pnAct : (p.pbPersonal || 0));
+            }, 0);
             var claveDia = (typeof window.appiFechaBA === 'function') ? window.appiFechaBA() : hoyLocal();
             window.appiPBDiario.registrar(claveDia, cambios.map(function(ch) {
-              return { n: ch.nombre, pb: ch.delta, total: ch.pbNuevo };
+              return { n: ch.nombre, pb: ch.delta, total: ch.pbNuevo, tt: tt };
             }));
           }
         } catch(e) {}

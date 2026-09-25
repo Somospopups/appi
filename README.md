@@ -4,6 +4,14 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v629 · El día de hoy ya no dice "no ingresaste": se carga solo
+
+- El día de hoy sin compras mostraba "😴 No ingresaste este día / Como no abriste APPI..." — algo falso si estás con la app abierta y simplemente nadie compró todavía. Ahora dice **"Todavía no hay movimientos de PB hoy"**, y en la tarjeta del día "se cargan solos". Los días pasados conservan "No ingresaste este día" (ahí sí es cierto).
+- Los movimientos cada vez **se suman** al registro del día (línea de PSA o reparto) por persona en vez de pisarlo: si la línea ya tenía a alguien anotado y la detección suma más PB, queda una sola fila con el total.
+- Los días con movimientos de PB muestran su **acumulado real** (`acum.`) calculado con el total del equipo al momento de la detección (misma semántica que el `total` que guarda la línea).
+- Cubierto por `psa-sync-automatico.spec.js`.
+- Versión: **v629 · Segura** · Cache `appi-v629-hoy-sin-mensaje-error`.
+
 ## v628 · Los avisos de PB quedan registrados en el desglose
 
 - Cuando te llega el aviso **"⚡ Juan sumó +X PB"** (alguien de tu equipo hizo una compra), ese movimiento ya no queda solo en la notificación: **se guarda automáticamente en el registro diario** del desglose semanal y diario de PB (`Mi negocio → TOTAL PB → VER`).

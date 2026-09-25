@@ -4658,7 +4658,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v628 · Segura</div>
+  <div class="ds-foot">APPI · v629 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -14209,8 +14209,8 @@ function cerrarToolsMenu(){
   // con archivos viejos en pantalla.
   if ('serviceWorker' in navigator) {
     (async () => {
-const swVersion='628';
-  const CACHE_NAME='appi-v628-registro-diario-pb';
+const swVersion='629';
+  const CACHE_NAME='appi-v629-hoy-sin-mensaje-error';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
@@ -19597,24 +19597,40 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
       // por una compra) queda registrado por día: si el día tiene movimientos,
       // el detalle muestra a los distribuidores y su PB, aunque la línea de PSA
       // de ese día no tenga registro propio.
+      // v629: esos movimientos se SUMAN al registro del día (línea/reparto) por
+      // persona en vez de pisarlo, y el día muestra su acumulado real.
       try{
         const movDias = (window.appiPBDiario && typeof window.appiPBDiario.dias === 'function') ? window.appiPBDiario.dias() : null;
         if(movDias){
           for(const clave in movDias){
             const dayNum = parseInt(String(clave).slice(8,10), 10);
             if(!dayNum || dayNum < 1 || dayNum > daysInMonth) continue;
-            const items = (movDias[clave] || []).map(m => ({
-              titular: m.n || 'Distribuidor',
-              producto: '',
-              usuario: '',
-              pb: Number(m.pb) || 0,
-              total: Number(m.total) || 0,
-              tipo: 'linea'
-            })).filter(i => i.pb > 0);
-            if(!items.length) continue;
+            const movs = (movDias[clave] || []).filter(m => Number(m.pb) > 0);
+            if(!movs.length) continue;
+            const ttDia = movs.reduce((mx, m) => Math.max(mx, Number(m.tt) || 0), 0);
+            const movMap = new Map();
+            movs.forEach(m => {
+              const k = String(m.n || '').trim().toUpperCase();
+              if(!movMap.has(k)) movMap.set(k, { titular: String(m.n || 'Distribuidor').trim(), pb: 0, total: Number(m.total) || 0 });
+              const row = movMap.get(k);
+              row.pb += Number(m.pb) || 0;
+              if(Number(m.total) || 0) row.total = Number(m.total);
+            });
+            const base = Array.isArray(dailyPBs[dayNum].items) ? dailyPBs[dayNum].items : [];
+            const items = base.slice();
+            base.forEach(i => {
+              const k = String(i.titular || '').trim().toUpperCase();
+              if(movMap.has(k)){
+                i.pb = (Number(i.pb) || 0) + movMap.get(k).pb;
+                if(movMap.get(k).total && typeof i.total !== 'number') i.total = movMap.get(k).total;
+                movMap.delete(k);
+              }
+            });
+            movMap.forEach(row => items.push({ titular: row.titular, producto: '', usuario: '', pb: row.pb, total: row.total, tipo: 'linea' }));
             dailyPBs[dayNum].items = items;
-            dailyPBs[dayNum].pb = items.reduce((s,i) => s + i.pb, 0);
-            dailyPBs[dayNum].estado = 'con_cambios';
+            dailyPBs[dayNum].pb = items.reduce((s,i) => s + Number(i.pb || 0), 0);
+            dailyPBs[dayNum].estado = items.length ? 'con_cambios' : 'sin_cambios';
+            if(typeof dailyPBs[dayNum].acum !== 'number' && ttDia > 0) dailyPBs[dayNum].acum = ttDia;
           }
         }
       }catch(e){}
@@ -19653,13 +19669,14 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
           const isToday = (d.day === todayDay);
           const hasPB = d.pb > 0;
           let sub = "Sin actividad registrada";
-          if(d.estado === 'no_ingreso') sub = '<b style="color:#b45309">No ingresaste este día</b>';
+          if(d.estado === 'no_ingreso') sub = isToday ? '<span style="color:#64748b">Todavía no hay movimientos de PB hoy · se cargan solos</span>' : '<b style="color:#b45309">No ingresaste este día</b>';
           else if(d.estado === 'sin_datos') sub = '<span style="color:#94a3b8">Sin datos registrados</span>';
           else if(d.estado === 'futuro') sub = '<span style="color:#cbd5e1">—</span>';
           else if(d.estado === 'inicial') sub = '<span style="color:#64748b">Estado inicial del mes cargado</span>';
           else if(d.estado === 'sin_cambios') sub = '<span style="color:#64748b">Ingresaste este día · sin cambios de PB</span>';
           else if(d.items.length && d.items.every(i=>i.tipo==='linea')) sub = d.items.length + (d.items.length===1 ? " distribuidor sumó PB" : " distribuidores sumaron PB");
           else if(d.items.length) sub = d.items.length + (d.items.length===1 ? " compra / operación" : " compras / operaciones");
+          if(isToday && !d.items.length) sub = '<span style="color:#64748b">Todavía no hay movimientos de PB hoy · se cargan solos</span>';
           const puedeVerDetalle = d.estado !== 'futuro' && d.estado !== 'sin_datos';
           return `
             <div class="day-card-drill" onclick="event.stopPropagation();window.abrirDetalleDiaPB(${d.day},${finalTotalPB})" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:12px;margin-bottom:6px;background:${isToday ? "#eef4ff" : "#f8fafc"};border:1px solid ${isToday ? "#c7d9fe" : "#edf2f7"};transition:transform .12s,background .12s" onmousedown="this.style.transform='scale(0.99)'" onmouseup="this.style.transform='none'">
@@ -19775,8 +19792,11 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
 
       let itemsHtml = '';
       const estado = dayData.estado || '';
+      const esHoy = (dayNum === now.getDate());
       let cabeceraDetalle = null;
-      if(estado === 'no_ingreso'){
+      if(esHoy && !dayData.items.length){
+        cabeceraDetalle = { icon:"🕒", titulo:"Todavía no hay movimientos de PB hoy", texto:"Las compras de tu equipo se detectan solas cuando se actualiza el equipo. En cuanto alguien sume PB, queda anotado en esta fecha." };
+      } else if(estado === 'no_ingreso'){
         cabeceraDetalle = { icon:"😴", titulo:"No ingresaste este día", texto:"El PB del mes se carga al abrir la app. Como no abriste APPI este día, no hay datos del día registrados." };
       } else if(estado === 'sin_datos'){
         cabeceraDetalle = { icon:"🗂️", titulo:"Sin datos registrados", texto:"Este día es anterior a tu primer ingreso del mes, no hay con qué comparar." };
@@ -19830,7 +19850,8 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
         }).join("");
       }
 
-      const drillContador = (estado === 'no_ingreso') ? 'No ingresaste este día'
+      const drillContador = (esHoy && !(dayData.items && dayData.items.length)) ? 'Todavía sin movimientos'
+        : (estado === 'no_ingreso') ? 'No ingresaste este día'
         : (estado === 'sin_datos') ? 'Sin datos registrados'
         : (estado === 'futuro') ? 'Día futuro'
         : (dayData.items && dayData.items.length && dayData.items.every(i=>i.tipo==='linea')) ? (dayData.items.length + (dayData.items.length===1 ? ' distribuidor' : ' distribuidores'))
@@ -20003,7 +20024,7 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
           if(!m || !m.n) return;
           const pb = Number(m.pb) || 0;
           if(pb <= 0) return;
-          dia.push({ n: String(m.n).trim(), pb: pb, total: Number(m.total) || 0, ts: Date.now() });
+          dia.push({ n: String(m.n).trim(), pb: pb, total: Number(m.total) || 0, tt: Number(m.tt) || 0, ts: Date.now() });
         });
         s.dias[diaISO] = dia.slice(-80);
         window.appiPBDiario.guardar(s);

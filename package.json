@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "628.0.0",
-  "cacheName": "appi-v628-registro-diario-pb",
+  "version": "629.0.0",
+  "cacheName": "appi-v629-hoy-sin-mensaje-error",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {
