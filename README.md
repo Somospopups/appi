@@ -4,6 +4,21 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v621 · Desglose PB en dos columnas (delta + acumulado)
+
+- El desglose semanal/diario de Mi negocio → Total PB → Ver ahora muestra **dos números por día**: lo que se sumó ese día (delta, en azul) y el **acumulado del mes hasta ese día** (`acum.`). Lo mismo en la cabecera de cada semana (acumulado al cierre) y en el detalle de un día (`acum. X` bajo el número grande).
+- El acumulado ya estaba guardado por día en `appi_linea_v1` (`total` = total del mes a esa fecha con la ventana de 35 días); este cambio solo lo muestra.
+- Los días sin apertura siguen marcados (`No ingresaste` / `Sin datos` / `futuro`), no se inventan números. Primer día de carga del mes: delta 0 y acumulado = total del día (punto de partida).
+- `abrirModalDetallePB` quedó expuesta en `window` para poder testearla y para los `onclick` inline.
+- Test e2e nuevo: 'el desglose semanal/diario muestra delta y acumulado por día'.
+- Versión: **v621 · Segura** · Cache `appi-v621-desglose-acumulado`.
+
+## v620 · PB del equipo al día
+
+- El PB por persona (👤 en Mi negocio y en el equipo) quedaba congelado: la Línea de PSA ya viene alineada (header y filas de 14 celdas, `PB Mes Actual` en la columna 7), pero `filasLineaHtml` le anteponía una celda vacía y `procesarExcel` descartaba a todas las personas (leía el nivel `(1)` como nombre). El total sí se movía porque el desglose usa otro parser. Ahora el sync devuelve las filas crudas y `equipoData` se refresca a cada apertura.
+- De paso quedó visible el botón de refrescar de Mis Garantías/Usuarios (un CSS viejo lo ocultaba con `!important`).
+- Versión: **v620 · Segura** · Cache `appi-v620-linea-alineada-equipo`.
+
 ## v619 · Arreglado el desglose semanal y diario de PB
 
 - El desglose de PB por día/semana (Mi negocio → Total PB → Ver) se alimentaba de `action:'linea'`, que seguía usando el motor viejo: descubría el informe solo con links `<a idx>`, pedía el período como `MM-YYYY` y parseaba con el formato de tabla que PSA dejó de usar. Contra el PSA real devolvía 0 integrantes y el desglose nunca juntaba datos.

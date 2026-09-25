@@ -339,4 +339,77 @@ const res = await page.evaluate(async () => {
     // Esperar a que la sincronización termine y haya incrementado la llamada
     await expect.poll(() => syncCallCount).toBeGreaterThan(prevCalls);
   });
+
+  test('el desglose semanal/diario muestra delta y acumulado por día', async ({ page }) => {
+    await page.route('**/auth-config.js', route => route.fulfill({
+      contentType: 'application/javascript',
+      body: "window.APPI_AUTH={enabled:true,url:'https://mock.supabase.co',anonKey:'anon-key-publica-de-prueba',distributorEmailDomain:'distribuidores.appi.invalid',adminLogin:{username:'popups',email:'admin-popups@appi.invalid'},loginAliases:{},offlineDays:7};"
+    }));
+
+    await page.route('https://mock.supabase.co/**', route => {
+      const cors = { 'access-control-allow-origin': '*', 'content-type': 'application/json' };
+      return route.fulfill({ status: 200, headers: cors, body: '[]' });
+    });
+
+    await page.addInitScript(() => {
+      localStorage.setItem('welcomeSeen', '1');
+      localStorage.setItem('appi_tarjetas_auto', '0');
+      localStorage.setItem('tutoVisto_v2', '1');
+      localStorage.removeItem('equipoData');
+      localStorage.removeItem('usuarios_garantias');
+    });
+
+    await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
+    await page.evaluate(() => {
+      const lock = document.getElementById('lockScreen');
+      if (lock) lock.classList.add('hidden');
+      const boot = document.getElementById('bootScreen');
+      if (boot) { boot.classList.add('gone'); boot.remove(); }
+      document.body.classList.remove('appi-login-abierto');
+      window.showView('view-equipo');
+    });
+
+    const res = await page.evaluate(() => {
+      const y = new Date();
+      const anio = y.getFullYear();
+      const mes = String(y.getMonth() + 1).padStart(2, '0');
+      const clave = d => anio + '-' + mes + '-' + String(d).padStart(2, '0');
+      const hoy = y.getDate();
+      const ayer = hoy === 1 ? 1 : hoy - 1;
+      const store = {
+        periodo: anio + '-' + mes,
+        dias: {}
+      };
+      if (ayer !== hoy) {
+        store.dias[clave(ayer)] = {
+          total: 20,
+          porD: { 'GARCIA, MARTA': 12, 'LOPEZ, CARLOS': 8 },
+          cambios: [],
+          esInicial: true,
+          ultima: new Date().toISOString()
+        };
+      }
+      store.dias[clave(hoy)] = {
+        total: 28,
+        porD: { 'GARCIA, MARTA': 17, 'LOPEZ, CARLOS': 11 },
+        cambios: [
+          { n: 'GARCIA, MARTA', pb: 5 },
+          { n: 'LOPEZ, CARLOS', pb: 3 }
+        ],
+        ultima: new Date().toISOString()
+      };
+      localStorage.setItem('appi_linea_v1', JSON.stringify(store));
+      window.abrirModalDetallePB();
+      const modalBody = document.getElementById('modalBody');
+      const texto = modalBody ? modalBody.innerText : '';
+      return {
+        texto,
+        tieneAcumuladoHoy: /acum\. 28\.0/.test(texto),
+        tieneDeltaHoy: /8\.0 PB/.test(texto)
+      };
+    });
+
+    expect(res.tieneDeltaHoy).toBe(true);
+    expect(res.tieneAcumuladoHoy).toBe(true);
+  });
 });

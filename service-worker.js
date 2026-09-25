@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v620-linea-alineada-equipo';
+const CACHE_NAME = 'appi-v621-desglose-acumulado';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',

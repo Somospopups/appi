@@ -4658,7 +4658,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v618 · Segura</div>
+  <div class="ds-foot">APPI · v621 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -14209,8 +14209,8 @@ function cerrarToolsMenu(){
   // con archivos viejos en pantalla.
   if ('serviceWorker' in navigator) {
     (async () => {
-const swVersion='620';
-  const CACHE_NAME='appi-v620-linea-alineada-equipo';
+const swVersion='621';
+  const CACHE_NAME='appi-v621-desglose-acumulado';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
@@ -19482,6 +19482,7 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
           if(!dayNum || dayNum < 1 || dayNum > daysInMonth) continue;
           const items = reg.cambios.filter(c => c && c.n && Number(c.pb) > 0).map(c => ({ titular:c.n, producto:'', usuario:'', pb:Number(c.pb), tipo:'linea' }));
           lineaDias[dayNum] = items;
+          dailyPBs[dayNum].acum = (typeof reg.total === 'number' ? reg.total : null);
           if(reg.esInicial){
             dailyPBs[dayNum].estado = 'inicial';
             dailyPBs[dayNum].items = [];
@@ -19521,12 +19522,15 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
 
       weeks.forEach(w => {
         let wPB = 0;
+        let wAcum = null;
         for(let d = w.start; d <= w.end; d++){
           const dayData = dailyPBs[d] || { day: d, pb: 0, items: [] };
           wPB += dayData.pb;
+          if(typeof dayData.acum === 'number') wAcum = dayData.acum;
           w.days.push(dayData);
         }
         w.pb = Math.round(wPB * 10) / 10;
+        w.acum = wAcum;
       });
 
       const dayNames = ["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"];
@@ -19561,8 +19565,9 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
                   </div>
                 </div>
               </div>
-              <div style="text-align:right">
+              <div style="text-align:right;display:flex;align-items:center;gap:8px">
                 <span style="font-size:14px;font-weight:800;color:${hasPB ? "#2563eb" : "#94a3b8"}">${d.pb > 0 ? d.pb.toFixed(1) : "0.0"} PB</span>
+                <span style="font-size:10.5px;font-weight:800;color:${typeof d.acum === 'number' && d.acum > 0 ? "#4f46e5" : "#cbd5e1"};background:${typeof d.acum === 'number' && d.acum > 0 ? "#eef2ff" : "transparent"};border-radius:999px;padding:2px 8px">acum. ${typeof d.acum === 'number' ? d.acum.toFixed(1) : "—"}</span>
               </div>
             </div>
           `;
@@ -19580,6 +19585,7 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
               </div>
               <div style="display:flex;align-items:center;gap:10px">
                 <b style="font-size:16px;color:#2563eb">${w.pb.toFixed(1)} PB</b>
+                ${typeof w.acum === 'number' ? `<span style="font-size:11px;font-weight:800;color:#4f46e5;background:#eef2ff;border-radius:999px;padding:3px 9px">acum. ${w.acum.toFixed(1)}</span>` : ""}
                 <span class="wk-arrow" style="display:inline-block;transition:transform .2s;font-size:12px;color:#64748b;transform:${isCurrentWeek ? "rotate(180deg)" : "rotate(0deg)"}">▼</span>
               </div>
             </div>
@@ -19646,6 +19652,7 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
       console.error("Error abriendo desglose PB:", err);
     }
   }
+  window.abrirModalDetallePB = abrirModalDetallePB;
 
   // Drill-down para ver qué distribuidor compró y los PB de ese día
   window.abrirDetalleDiaPB = function(dayNum, totalMes){
@@ -19734,7 +19741,10 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
               <div style="font-size:15px;font-weight:700">${diaTexto}</div>
             </div>
             <div style="text-align:right">
-              <div style="font-size:22px;font-weight:900;line-height:1.1">${(Number(dayData.pb)||0).toFixed(1)} PB</div>
+              <div style="font-size:22px;font-weight:900;line-height:1.1;display:flex;align-items:baseline;gap:8px;justify-content:flex-end">
+                <span>${(Number(dayData.pb)||0).toFixed(1)} PB</span>
+                ${typeof dayData.acum === 'number' && dayData.acum > 0 ? `<span style="font-size:11px;color:#e9d5ff;background:rgba(255,255,255,0.18);border-radius:999px;padding:2px 8px;font-weight:800">acum. ${dayData.acum.toFixed(1)}</span>` : ""}
+              </div>
               <div style="font-size:10px;opacity:0.85">${drillContador}</div>
             </div>
           </div>
