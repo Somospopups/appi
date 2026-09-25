@@ -314,6 +314,122 @@ function columnasHtml(h: string): string[] {
   return [];
 }
 
+/* ===== Sincronización completa (v618) =====
+   Los archivos que APPI actualiza al entrar (Línea descendente,
+   Garantías por organización y Garantías) se bajan en UNA sola sesión
+   con action:'sync'. Los índices de los informes se descubren por
+   categoría en el hub (ac_cat=20 → informes de organización, ac_cat=21 →
+   garantías); la app puede pasar índices ya resueltos (body.idx, cache
+   appsi_psa_idx) para saltear el discovery, y si algo no se ubica la
+   respuesta trae el `menu` de lo que PSA expone para poder avisarnos. */
+
+const dipFetch = (jar: Jar, url: string, opts: { method?: string; body?: string } = {}): Promise<Response> =>
+  fetch(url, {
+    method: opts.method || 'GET',
+    headers: {
+      'User-Agent': UA,
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'Referer': DIP_HUB,
+      Cookie: cookieH(jar)
+    },
+    body: opts.body
+  });
+
+function normL(s: string): string {
+  return String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+}
+
+/** Primer reporte del hub cuyo nombre (normalizado) cumpla alguno de los
+ *  grupos: un grupo es una lista de regex TODAS obligatorias. */
+function elegir(reportes: Map<string, string>, grupos: RegExp[][]): string | null {
+  for (const grupo of grupos) {
+    for (const [id, lbl] of reportes) {
+      const n = normL(lbl);
+      if (grupo.every(re => re.test(n))) return id;
+    }
+  }
+  return null;
+}
+
+/** Descubre los informes que el hub expone como links (idx=NN) o entradas
+ *  de select, juntando la página principal y las dos categorías que usamos. */
+function descubrirReportes(html: string): Map<string, string> {
+  const reportes = new Map<string, string>();
+  const anchors = html.match(/<a[^>]*>[\s\S]*?<\/a>/gi) || [];
+  for (const a of anchors) {
+    const label = limpiarCelda(a);
+    if (!label || label.length < 3) continue;
+    const midx = a.match(/idx[=_]([\d]+)/i);
+    if (midx) reportes.set(String(midx[1]), label);
+  }
+  const options = html.match(/<option[^>]*>[\s\S]*?<\/option>/gi) || [];
+  for (const o of options) {
+    const label = limpiarCelda(o);
+    if (!label || label.length < 3) continue;
+    const midx = o.match(/value="?([\d]+)"?/i);
+    if (midx && !reportes.has(String(midx[1]))) reportes.set(String(midx[1]), label);
+  }
+  return reportes;
+}
+
+async function descubrir(jar: Jar): Promise<{ reportes: Map<string, string>; menu: Record<string, string[]> }> {
+  const reportes = new Map<string, string>();
+  const menu: Record<string, string[]> = {};
+  for (const [clave, acCat] of [['hub', ''], ['ac_cat=20', '20'], ['ac_cat=21', '21']] as const) {
+    const url = acCat ? DIP_HUB + '?ac_cat=' + acCat : DIP_HUB;
+    try {
+      const r = await fetch(url, { headers: { 'User-Agent': UA, Cookie: cookieH(jar) } });
+      const html = decodificarLatin1(new Uint8Array(await r.arrayBuffer()));
+      const rep = descubrirReportes(html);
+      for (const [id, lbl] of rep) if (!reportes.has(id)) reportes.set(id, lbl);
+      menu[clave] = [...rep.entries()].slice(0, 60).map(([i, l]) => i + '=' + l);
+    } catch (_) {
+      menu[clave] = [];
+    }
+  }
+  return { reportes, menu };
+}
+
+/** Baja un informe de autoconsulta (GET directo con idx+periodo+Consulta;
+ *  si PSA responde un form en vez de la tabla, lo reenvía por POST
+ *  cosechando centro/dip/clave y los filtros que traiga, sin fijarlos a
+ *  mano para aguantar cambios de PSA). */
+async function bajarReporte(jar: Jar, idx: string, consulta: string, mm: string, verifica: (h: string) => boolean): Promise<{ html: string; via: string }> {
+  const urlGet = DIP_EXEC + '?idx=' + idx + '&periodo=' + mm + '&Consulta=' + consulta;
+  try {
+    const rg = await dipFetch(jar, urlGet);
+    const h1 = decodificarLatin1(new Uint8Array(await rg.arrayBuffer()));
+    if (verifica(h1) || !/<form/i.test(h1)) return { html: h1, via: 'GET' };
+  } catch (_) {}
+  const fd = new URLSearchParams();
+  fd.set('idx', idx);
+  fd.set('accion', 'consultar');
+  let accion = false;
+  try {
+    const rf = await dipFetch(jar, urlGet);
+    const formH = decodificarLatin1(new Uint8Array(await rf.arrayBuffer()));
+    const inputs = formH.match(/<input[^>]*>/gi) || [];
+    for (const inp of inputs) {
+      const nm = inp.match(/name="([^"]+)"/i);
+      if (!nm) continue;
+      const key = String(nm[1]);
+      const vl = (inp.match(/value="([^"]*)"/i) || ['', ''])[1];
+      const k = key.toLowerCase();
+      if (k === 'centro' || k === 'dip' || k === 'clave' || k === 'consulta' || k.startsWith('filtro') || k.startsWith('nivel') || k.startsWith('orden')) {
+        fd.set(key, vl);
+      }
+      if (k === 'accion') { fd.set(key, vl); accion = true; }
+    }
+    if (!accion) fd.set('accion', 'consultar');
+    fd.set('periodo', mm);
+  } catch (_) {}
+  try {
+    const rp = await dipFetch(jar, DIP_EXEC, { method: 'POST', body: fd.toString() });
+    return { html: decodificarLatin1(new Uint8Array(await rp.arrayBuffer())), via: 'POST' };
+  } catch (_) {}
+  return { html: '', via: 'NONE' };
+}
+
 /* ===== Perfil del distribuidor (v827) =====
    1) saldo en cuenta corriente    → dip autoconsulta idx=32
    2) última devolución de saldos  → dip idx=51 (CuentaCorriente)
@@ -393,7 +509,7 @@ Deno.serve(async (req) => {
   let body: any;
   try { body = await req.json(); } catch (_) { body = {}; }
   const serie = normSerie(body.serie || '');
-  if (body.action !== 'report' && body.action !== 'bonos' && body.action !== 'perfil' && body.action !== 'linea' && serie.length < 4) return json({ error: 'Escribí el número de serie (el del QR de la base).' }, 400);
+  if (body.action !== 'report' && body.action !== 'bonos' && body.action !== 'perfil' && body.action !== 'linea' && body.action !== 'sync' && serie.length < 4) return json({ error: 'Escribí el número de serie (el del QR de la base).' }, 400);
 
   // Credenciales PSA: las trae la app (sección MI PSA) o secrets del proyecto.
   const center = String(body.center || Deno.env.get('PSA_CENTER') || '').trim();
@@ -524,6 +640,100 @@ Deno.serve(async (req) => {
       return json({ ok: false, error: 'El informe de Línea descendente no devolvió integrantes (intentos: ' + intentos.join(', ') + '). Puede haber cambiado el formato de PSA.', columnas: columnasHtml(htmlL) }, 502);
     }
     return json({ ok: true, periodo, filas: filas.map(f => ({ n: f.n, pb: f.pb })) });
+  }
+
+  /* ===== Sincronización de los 3 archivos al entrar (v618) =====
+     Línea descendente (ac_cat=20), Garantías por organización y Garantías
+     (ac_cat=21) en UNA sola sesión. La app manda en body.idx los índices
+     que ya resolvió (appsi_psa_idx) para saltear el discovery. */
+  if (body.action === 'sync') {
+    const periodo = (body.periodo ? String(body.periodo) : periodoActualBA()).replace(/[^0-9\-]/g, '');
+    const mm = periodo.slice(5) + '-' + periodo.slice(0, 4);
+    const datasets: string[] = Array.isArray(body.datasets) && body.datasets.length ? body.datasets.map(String) : ['linea', 'garantiasOrg', 'garantias'];
+    const quiero = (k: string) => datasets.includes(k);
+    const override: Record<string, string> = (body.idx && typeof body.idx === 'object')
+      ? Object.fromEntries(Object.entries(body.idx).map(([k, v]) => [k, String(v)])) : {};
+
+    const idx: Record<string, string> = {};
+    const errores: string[] = [];
+    const { reportes, menu } = await descubrir(dip);
+
+    if (quiero('linea')) {
+      idx.linea = override.linea || Deno.env.get('PSA_LINEA_IDX') || '';
+      if (!idx.linea) {
+        const e = elegir(reportes, [[/linea/, /descend/], [/linea/], [/descend/]]);
+        if (e) idx.linea = e;
+      }
+      if (!idx.linea) errores.push('Línea descendente: no encontré el informe en Autoconsulta (revisá «menu»).');
+    }
+    if (quiero('garantiasOrg')) {
+      idx.garantiasOrg = override.garantiasOrg || Deno.env.get('PSA_GO_IDX') || '';
+      if (!idx.garantiasOrg) {
+        const e = elegir(reportes, [[/garant/, /por\s*org/], [/garant/, /orga/], [/orga/], [/por\s*org/]]);
+        if (e) idx.garantiasOrg = e;
+      }
+      if (!idx.garantiasOrg) errores.push('Garantías por organización: no encontré el informe en Autoconsulta (revisá «menu»).');
+    }
+    if (quiero('garantias')) {
+      idx.garantias = override.garantias || '';
+      if (!idx.garantias) {
+        let e: string | null = null;
+        for (const [id, lbl] of reportes) {
+          if (/garant/.test(normL(lbl)) && id !== idx.garantiasOrg) { e = id; break; }
+        }
+        if (!e) e = elegir(reportes, [[/garant/]]);
+        if (e) idx.garantias = e;
+      }
+      if (!idx.garantias) errores.push('Garantías: no encontré el informe en Autoconsulta (revisá «menu»).');
+    }
+
+    const out: any = { ok: true, periodo, idx, errores, menu, linea: null, garantiasOrg: null, garantias: null };
+
+    if (idx.linea) {
+      try {
+        const { html } = await bajarReporte(dip, idx.linea, 'Linea', mm, h => !!parsearLinea(h));
+        const par = parsearLinea(html);
+        if (par && par.length) {
+          out.linea = {
+            filas: filasHtml(html),
+            par: par.map(f => ({ n: f.n, pb: f.pb })),
+            pb: par.reduce((s, f) => s + f.pb, 0)
+          };
+        } else {
+          errores.push('Línea descendente: el informe salió vacío (¿cambió el formato de PSA?).');
+        }
+      } catch (_) {
+        errores.push('Línea descendente: no se pudo bajar el informe.');
+      }
+    }
+    if (idx.garantiasOrg) {
+      try {
+        const { html } = await bajarReporte(dip, idx.garantiasOrg, 'GarantiasPorOrg', mm, h => filasHtml(h).length > 1);
+        const filas = filasHtml(html).filter(f => f.length > 1);
+        if (filas.length) {
+          out.garantiasOrg = { filas };
+        } else {
+          errores.push('Garantías por organización: el informe salió vacío (¿cambió el formato de PSA?).');
+        }
+      } catch (_) {
+        errores.push('Garantías por organización: no se pudo bajar el informe.');
+      }
+    }
+    if (idx.garantias) {
+      try {
+        const { html } = await bajarReporte(dip, idx.garantias, 'Garantias', mm, h => parsearGarantias(h).length > 0);
+        const filas = parsearGarantias(html);
+        if (filas.length) {
+          out.garantias = { filas: filas.map(f => ({ s: f.serie, u: f.usuario, t: f.telefono, d: f.domicilio, c: f.cp, l: f.localidad, p: f.producto, c2: f.compra, v: f.vence, e: f.e, cn: f.cn })) };
+        } else {
+          errores.push('Garantías: el reporte salió vacío (¿cambió el formato de PSA?).');
+        }
+      } catch (_) {
+        errores.push('Garantías: no se pudo bajar el reporte.');
+      }
+    }
+
+    return json(out);
   }
 
   /* ===== v827 · PERFIL DEL DISTRIBUIDOR (0 interacción del user) ===== */

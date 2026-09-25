@@ -4,6 +4,14 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v618 · Los 3 archivos de PSA al día con una sola entrada
+
+- **Al entrar con MI PSA conectado se bajan los 3 archivos en UNA sola sesión**: Línea descendente (ac_cat=20), Garantías por organización y Garantías (ac_cat=21), y se aplican al equipo, a cada persona y a la base de clientes sin que toques nada.
+- Antes solo la base de Garantías se descargaba de verdad; la Línea y las Garantías por organización se actualizaban de a una (o quedaban solo de "nombre"). Ahora un solo `action:'sync'` trae todo y los índices resueltos quedan cacheados en el dispositivo (`appsi_psa_idx`) para no redescubrirlos cada vez.
+- El refresco respeta las casillas de MI PSA (Línea / Garantías org / Garantías) y la de **Auto-actualizar al abrir**, y cualquiera de los botones de actualizar (Mi equipo, Usuarios) dispara la misma sincronización completa.
+- Si PSA esconde algún informe detrás de un índice nuevo, la app avisa con el listado (`menu`) que expone Autoconsulta para ajustarlo sin reversionar.
+- Versión: **v618 · Segura** · Cache `appi-v618-sync-psa-completo`.
+
 ## v617 · Números del equipo solos y archivos siempre nuevos
 
 - **Los números del equipo se actualizan solos**: cada vez que entrás y mientras dejás APPI abierta, la Línea de PSA se refresca automáticamente (cada 3 minutos) y el PB, personas y activos de Mi negocio / Mi equipo se repintan sin tocar nada.

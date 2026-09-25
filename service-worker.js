@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v617-numeros-automaticos';
+const CACHE_NAME = 'appi-v618-sync-psa-completo';
 const CACHE_PREFIX = 'appi-';
 const APP_SHELL = [
   './',
