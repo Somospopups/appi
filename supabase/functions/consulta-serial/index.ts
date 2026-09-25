@@ -314,6 +314,41 @@ function columnasHtml(h: string): string[] {
   return [];
 }
 
+/* ===== Línea descendente · formato HTML real (v618 sync) =====
+   En Autoconsulta la Línea viene como tabla con el Nombre en el formato
+   "[2-00000579] APELLIDO, NOMBRE [AR-B]" y el PB del mes en la 4ª celda
+   después del nombre (Cat · Tel · Estado · PB). El header de la tabla
+   lleva una columna vacía de más que las filas de datos, así que para que
+   la app (procesarExcel, hecho para el Excel exportado) lea las filas se
+   compensa corriéndolas una celda a la derecha tras el encabezado. */
+
+function parsearLineaHtml(html: string): LineaFila[] | null {
+  const filas = filasHtml(html);
+  const out: LineaFila[] = [];
+  for (const f of filas) {
+    if (!f || f.length < 5) continue;
+    let idxNombre = -1;
+    for (let i = 0; i < f.length; i++) if (/^\[\s*\d{1,3}-\d+\s*\]/.test(f[i] || '')) { idxNombre = i; break; }
+    if (idxNombre < 0) continue;
+    const pb = numPB(f[idxNombre + 4] || '');
+    const nombre = String(f[idxNombre]).replace(/^\[\s*\d{1,3}-\d+\s*\]\s*/, '').replace(/\s*\[\s*[^\]\[]+\s*\]\s*$/, '').trim();
+    out.push({ n: nombre, pb });
+  }
+  return out.length ? out : null;
+}
+
+function filasLineaHtml(h: string): string[][] {
+  const filas = filasHtml(h);
+  if (!filas.length) return filas;
+  let header = -1;
+  for (let i = 0; i < filas.length && i < 60; i++) {
+    const join = filas[i].join('|');
+    if (join.includes('PB Mes Actual') && join.includes('Nombre')) { header = i; break; }
+  }
+  if (header < 0) return filas;
+  return filas.map((f, i) => (i > header ? ['', ...f] : f));
+}
+
 /* ===== Sincronización completa (v618) =====
    Los archivos que APPI actualiza al entrar (Línea descendente,
    Garantías por organización y Garantías) se bajan en UNA sola sesión
@@ -336,7 +371,7 @@ const dipFetch = (jar: Jar, url: string, opts: { method?: string; body?: string 
   });
 
 function normL(s: string): string {
-  return String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  return String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/_+/g, ' ');
 }
 
 /** Primer reporte del hub cuyo nombre (normalizado) cumpla alguno de los
@@ -351,16 +386,28 @@ function elegir(reportes: Map<string, string>, grupos: RegExp[][]): string | nul
   return null;
 }
 
-/** Descubre los informes que el hub expone como links (idx=NN) o entradas
- *  de select, juntando la página principal y las dos categorías que usamos. */
+/** Descubre los informes que el hub expone como links (idx=NN), entradas
+ *  de select o botones AutoConsulta('idx','exec','Nombre') — el formato con
+ *  el que PSA lista las autoconsultas de cada categoría. Las páginas vienen
+ *  en ISO-8859-1 y los nombres pueden llevar guión bajo (Búsqueda_de_Dips). */
 function descubrirReportes(html: string): Map<string, string> {
   const reportes = new Map<string, string>();
+  const reAC = /AutoConsulta\s*\(\s*['"]([\d]+)['"]\s*,\s*['"]([^'"]*)['"]\s*,\s*['"]([^'"]*)['"]\s*\)/gi;
+  let mc: RegExpExecArray | null;
+  while ((mc = reAC.exec(html)) !== null) {
+    const nombre = String(mc[3] || '').trim();
+    if (nombre.length < 3) continue;
+    // Conserva la descrip EXACTA (acentos y guiones bajos): es el parámetro
+    // Consulta= que el ejecutor de PSA espera (el <a> del hub no lo trae);
+    // para leer el nombre, normL() y el menu la dan por separado.
+    if (!reportes.has(String(mc[1]))) reportes.set(String(mc[1]), nombre);
+  }
   const anchors = html.match(/<a[^>]*>[\s\S]*?<\/a>/gi) || [];
   for (const a of anchors) {
     const label = limpiarCelda(a);
     if (!label || label.length < 3) continue;
     const midx = a.match(/idx[=_]([\d]+)/i);
-    if (midx) reportes.set(String(midx[1]), label);
+    if (midx && !reportes.has(String(midx[1]))) reportes.set(String(midx[1]), label);
   }
   const options = html.match(/<option[^>]*>[\s\S]*?<\/option>/gi) || [];
   for (const o of options) {
@@ -390,41 +437,72 @@ async function descubrir(jar: Jar): Promise<{ reportes: Map<string, string>; men
   return { reportes, menu };
 }
 
-/** Baja un informe de autoconsulta (GET directo con idx+periodo+Consulta;
- *  si PSA responde un form en vez de la tabla, lo reenvía por POST
- *  cosechando centro/dip/clave y los filtros que traiga, sin fijarlos a
- *  mano para aguantar cambios de PSA). */
-async function bajarReporte(jar: Jar, idx: string, consulta: string, mm: string, verifica: (h: string) => boolean): Promise<{ html: string; via: string }> {
-  const urlGet = DIP_EXEC + '?idx=' + idx + '&periodo=' + mm + '&Consulta=' + consulta;
+/** Codifica a Latin-1 (los forms de PSA vienen en ISO-8859-1: los nombres
+ *  de campo pueden llevar tilde, p. ej. filtro_Cumpleaños). */
+function encL1(s: string): string {
+  let out = '';
+  for (const ch of String(s || '')) {
+    const c = ch.charCodeAt(0);
+    if (c < 0x80 && /[A-Za-z0-9._~-]/.test(ch)) { out += ch; continue; }
+    out += '%' + c.toString(16).toUpperCase().padStart(2, '0');
+  }
+  return out;
+}
+
+/** Baja un informe de autoconsulta con la URL real del navegador:
+ *  autoconsulta_exec.php?idx=N&periodo=YYYY-MM&Consulta=<nombre exacto>.
+ *  Si PSA responde el form de filtros en vez de la tabla, lo reenvía por
+ *  POST a /home/autoconsulta_exec.php cosechando TODOS los campos (inputs y
+ *  selects) del form + accion=consultar, sin fijar nada a mano para aguantar
+ *  cambios de PSA. */
+async function bajarReporte(jar: Jar, idx: string, consulta: string, periodo: string, verifica: (h: string) => boolean): Promise<{ html: string; via: string }> {
+  const urlGet = DIP_EXEC + '?idx=' + idx + '&periodo=' + periodo + '&Consulta=' + encL1(consulta);
   try {
     const rg = await dipFetch(jar, urlGet);
     const h1 = decodificarLatin1(new Uint8Array(await rg.arrayBuffer()));
     if (verifica(h1) || !/<form/i.test(h1)) return { html: h1, via: 'GET' };
   } catch (_) {}
   const fd = new URLSearchParams();
-  fd.set('idx', idx);
-  fd.set('accion', 'consultar');
   let accion = false;
   try {
     const rf = await dipFetch(jar, urlGet);
     const formH = decodificarLatin1(new Uint8Array(await rf.arrayBuffer()));
+    fd.set('idx', idx);
     const inputs = formH.match(/<input[^>]*>/gi) || [];
     for (const inp of inputs) {
-      const nm = inp.match(/name="([^"]+)"/i);
+      const nm = inp.match(/name="([^"]*)"/i);
       if (!nm) continue;
       const key = String(nm[1]);
-      const vl = (inp.match(/value="([^"]*)"/i) || ['', ''])[1];
-      const k = key.toLowerCase();
-      if (k === 'centro' || k === 'dip' || k === 'clave' || k === 'consulta' || k.startsWith('filtro') || k.startsWith('nivel') || k.startsWith('orden')) {
-        fd.set(key, vl);
+      if (key === 'idx' || key === 'frmFiltros' || key.includes('cadena_iddip')) continue;
+      const typ = (inp.match(/type="([^"]*)"/i) || ['', ''])[1].toLowerCase();
+      if (typ === 'button') continue;
+      if (typ === 'radio' || typ === 'checkbox') {
+        if (/checked/i.test(inp)) fd.set(key, (inp.match(/value="([^"]*)"/i) || ['', ''])[1]);
+        continue;
       }
-      if (k === 'accion') { fd.set(key, vl); accion = true; }
+      fd.set(key, (inp.match(/value="([^"]*)"/i) || ['', ''])[1]);
     }
-    if (!accion) fd.set('accion', 'consultar');
-    fd.set('periodo', mm);
+    const selects = formH.match(/<select[^>]*>[\s\S]*?<\/select>/gi) || [];
+    for (const sel of selects) {
+      const nm = sel.match(/name="([^"]*)"/i);
+      if (!nm) continue;
+      const opts = sel.match(/<option[^>]*>[\s\S]*?<\/option>/gi) || [];
+      let choice = '';
+      for (const o of opts) {
+        if (/selected/i.test(o)) { choice = (o.match(/value="([^"]*)"/i) || ['', ''])[1]; break; }
+        if (!choice) choice = (o.match(/value="([^"]*)"/i) || ['', ''])[1];
+      }
+      fd.set(String(nm[1]), choice);
+    }
+    if (fd.has('accion')) fd.set('accion', 'consultar');
+    else fd.set('accion', 'consultar');
+    accion = true;
+    if (!fd.get('periodo')) fd.set('periodo', periodo);
   } catch (_) {}
   try {
-    const rp = await dipFetch(jar, DIP_EXEC, { method: 'POST', body: fd.toString() });
+    if (!accion) fd.set('accion', 'consultar');
+    const body = Array.from(fd.entries()).map(([k, v]) => encL1(k) + '=' + encL1(v)).join('&');
+    const rp = await dipFetch(jar, DIP_EXEC, { method: 'POST', body });
     return { html: decodificarLatin1(new Uint8Array(await rp.arrayBuffer())), via: 'POST' };
   } catch (_) {}
   return { html: '', via: 'NONE' };
@@ -648,7 +726,7 @@ Deno.serve(async (req) => {
      que ya resolvió (appsi_psa_idx) para saltear el discovery. */
   if (body.action === 'sync') {
     const periodo = (body.periodo ? String(body.periodo) : periodoActualBA()).replace(/[^0-9\-]/g, '');
-    const mm = periodo.slice(5) + '-' + periodo.slice(0, 4);
+    const descrip = (id: string, fb: string) => (reportes.get(id) || fb);
     const datasets: string[] = Array.isArray(body.datasets) && body.datasets.length ? body.datasets.map(String) : ['linea', 'garantiasOrg', 'garantias'];
     const quiero = (k: string) => datasets.includes(k);
     const override: Record<string, string> = (body.idx && typeof body.idx === 'object')
@@ -678,10 +756,12 @@ Deno.serve(async (req) => {
       idx.garantias = override.garantias || '';
       if (!idx.garantias) {
         let e: string | null = null;
+        // El reporte es el que EMPIEZA en "garantias…" (evita "Carga de datos
+        // de garantías", "Certificado de Garantía…", etc., que PSA lista antes).
         for (const [id, lbl] of reportes) {
-          if (/garant/.test(normL(lbl)) && id !== idx.garantiasOrg) { e = id; break; }
+          if (normL(lbl).startsWith('garant') && id !== idx.garantiasOrg) { e = id; break; }
         }
-        if (!e) e = elegir(reportes, [[/garant/]]);
+        if (!e) e = elegir(reportes, [[/^garant/], [/garant/]]);
         if (e) idx.garantias = e;
       }
       if (!idx.garantias) errores.push('Garantías: no encontré el informe en Autoconsulta (revisá «menu»).');
@@ -691,11 +771,11 @@ Deno.serve(async (req) => {
 
     if (idx.linea) {
       try {
-        const { html } = await bajarReporte(dip, idx.linea, 'Linea', mm, h => !!parsearLinea(h));
-        const par = parsearLinea(html);
+        const { html } = await bajarReporte(dip, idx.linea, descrip(idx.linea, 'Linea'), periodo, h => !!parsearLineaHtml(h));
+        const par = parsearLineaHtml(html);
         if (par && par.length) {
           out.linea = {
-            filas: filasHtml(html),
+            filas: filasLineaHtml(html),
             par: par.map(f => ({ n: f.n, pb: f.pb })),
             pb: par.reduce((s, f) => s + f.pb, 0)
           };
@@ -708,7 +788,7 @@ Deno.serve(async (req) => {
     }
     if (idx.garantiasOrg) {
       try {
-        const { html } = await bajarReporte(dip, idx.garantiasOrg, 'GarantiasPorOrg', mm, h => filasHtml(h).length > 1);
+        const { html } = await bajarReporte(dip, idx.garantiasOrg, descrip(idx.garantiasOrg, 'GarantiasPorOrg'), periodo, h => filasHtml(h).length > 1);
         const filas = filasHtml(html).filter(f => f.length > 1);
         if (filas.length) {
           out.garantiasOrg = { filas };
@@ -721,7 +801,7 @@ Deno.serve(async (req) => {
     }
     if (idx.garantias) {
       try {
-        const { html } = await bajarReporte(dip, idx.garantias, 'Garantias', mm, h => parsearGarantias(h).length > 0);
+        const { html } = await bajarReporte(dip, idx.garantias, descrip(idx.garantias, 'Garantias'), periodo, h => parsearGarantias(h).length > 0);
         const filas = parsearGarantias(html);
         if (filas.length) {
           out.garantias = { filas: filas.map(f => ({ s: f.serie, u: f.usuario, t: f.telefono, d: f.domicilio, c: f.cp, l: f.localidad, p: f.producto, c2: f.compra, v: f.vence, e: f.e, cn: f.cn })) };
