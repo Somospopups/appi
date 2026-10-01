@@ -1,6 +1,6 @@
 {
-  "actualizado": "30-Sep-2026",
-  "vigencia": "24-Sep-2026 al 30-Sep-2026",
+  "actualizado": "1-Oct-2026",
+  "vigencia": "1-Oct-2026",
   "fuente": "https://tienda.psa.com.ar/promociones_vigentes",
   "cuotas": [
     3,
@@ -29,7 +29,8 @@
       "nombre": "Naranja",
       "cuotas": [
         6,
-        9
+        9,
+        12
       ],
       "tarjetas": "Naranja"
     },
@@ -94,7 +95,7 @@
         15,
         18
       ],
-      "tarjetas": "Visa, Mastercard"
+      "tarjetas": "Visa, Mastercard, American Express"
     },
     {
       "id": "hipotecario",
@@ -107,7 +108,7 @@
         15,
         18
       ],
-      "tarjetas": "Visa, Mastercard"
+      "tarjetas": "Visa, Mastercard, American Express"
     },
     {
       "id": "cabal",
