@@ -1,0 +1,5 @@
+HEAD=6bb59309976e7aa504b412caf7a8793f006c63f5
+SUBJ=v636: el p├®talo de Mi Margarita muestra s├│lo a las personas elegidas
+COUNT=1340
+DIFF= margarita-contactos.js                | 245 +++++++++++++++++++++------------- ;;  tests/e2e/margarita-contactos.spec.js | 206 +++++++++++++++++++--------- ;;  2 files changed, 293 insertions(+), 158 deletions(-)
+STATUS= M margarita-contactos.js ;;  M tests/e2e/margarita-contactos.spec.js ;; ?? _full_v636.log

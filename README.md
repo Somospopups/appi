@@ -4,6 +4,15 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v637 · El pétalo abre con dos botones y su tarjeta de contacto
+
+- **Mi Margarita**: tocar un pétalo abre directo la hoja con dos botones hermosos: **Elegir dentro de APPI** y **Elegir de mis contactos**.
+- Debajo aparecen **sólo las personas que elegiste**; al tocar cada una se abre su **tarjeta de contacto** con **WhatsApp**, **teléfono** y un apartado de **notas** para escribir lo que quieras (se guarda sola y se sincroniza).
+- "Elegir de mis contactos" usa la agenda del teléfono; si el navegador no la permite aparece la opción de subir un `.vcf`.
+- Se borró el "⋯" de cada pétalo y todo lo que había adentro (buscador, panel técnico, "Agregar personas" viejo).
+- Tests: 11 en `margarita-contactos.spec.js`.
+- Versión: **v637 · Segura** · Cache `appi-v637-tarjeta-contacto`.
+
 ## v636 · El pétalo muestra sólo a las personas elegidas
 
 - **Mi Margarita**: al entrar a ver el listado de un pétalo aparecen **sólo las personas elegidas**. Antes se mezclaban con todos tus contactos de APPI (Panel + Agenda Personal), como si se hubieran metido solas en el pétalo.

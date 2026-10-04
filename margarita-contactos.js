@@ -3,18 +3,15 @@
    ------------------------------------------------------------
    Convierte los círculos cotidianos del distribuidor en grupos de
    contacto para demostraciones, presentaciones y referidos.
-   Un pétalo SIEMPRE intenta primero abrir la agenda del teléfono
-   (Contact Picker, Android): elegís y queda guardado en el pétalo.
-   Sólo si no se pudo —no hay API (iPhone, Firefox, escritorio) o no
-   anda— se abren las otras opciones en la hoja: "Subir agenda" (.vcf,
-   Android e iPhone), "Elegir del teléfono" y, sólo cuando se pide
-   "Agregar personas", el resto de tus contactos de APPI (Panel +
-   Agenda Personal); el botón "⋯" del pétalo entra directo a esa
-   hoja para administrar el grupo.
-   Ver el listado de un pétalo muestra SÓLO a las personas elegidas:
-   nadie entra a un pétalo sin que la persona lo haya elegido.
-   Ninguna vía pide permisos ni configurar el dispositivo: si el
-   picker no abre, no pasa nada visible, la persona elige otra.
+   Un toque en el pétalo abre la hoja con dos caminos: "Elegir dentro
+   de APPI" (Panel + Agenda Personal) y "Elegir de mis contactos" (la
+   agenda del teléfono con Contact Picker en Android). Si el navegador
+   no deja abrirla, aparece la vía .vcf: nunca hay permisos, ajustes
+   ni carteles.
+   Debajo sólo están las personas elegidas —nadie entra a un pétalo
+   sin que la persona lo haya elegido— y al tocar una se abre su
+   tarjeta de contacto: WhatsApp, teléfono y un apartado de notas que
+   queda guardado en la cuenta.
    ============================================================ */
 (function(){
   'use strict';
@@ -78,6 +75,13 @@
       state.contactos[g.id] = Array.isArray(lista) ? lista.filter(function(c){ return c && c.nombre; }).map(function(c){
         return { id:String(c.id || c.telefono || c.nombre), nombre:String(c.nombre).slice(0,120), telefono:String(c.telefono || '').slice(0,35) };
       }) : [];
+    });
+    // Notas de la tarjeta de contacto: una por persona (clave = teléfono o
+    // nombre), guardadas en el mismo estado que viaja por DataSync.
+    if (!state.notas || typeof state.notas !== 'object') state.notas = {};
+    Object.keys(state.notas).forEach(function(k){
+      var v = String(state.notas[k] == null ? '' : state.notas[k]).slice(0, 800);
+      if (v) state.notas[k] = v; else delete state.notas[k];
     });
     if (!state.nombre) state.nombre = nombreDistribuidor();
     return state;
@@ -154,12 +158,6 @@
   function etiquetaOrigen(origen){
     return origen === 'panel' ? 'Panel APPI' : origen === 'agenda' ? 'Agenda' : 'Teléfono';
   }
-  // Sólo para MOSTRAR los accesos (el "⋯" del pétalo y el botón de la hoja):
-  // el intento del pétalo de abrir la agenda no depende de esto.
-  function capazPicker(){
-    try { return !!(navigator && 'contacts' in navigator && navigator.contacts && typeof navigator.contacts.select === 'function' && window.self === window.top); }
-    catch(e){ return false; }
-  }
   async function propsSoportadas(picker){
     try {
       var props = await picker.getProperties();
@@ -224,7 +222,7 @@
       '.mg-modal{position:fixed;z-index:46000;inset:0;display:none;align-items:end;justify-content:center;padding:14px;background:rgba(2,28,48,.38);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px)}.mg-modal.open{display:flex}.mg-sheet{width:min(100%,565px);max-height:min(83vh,680px);overflow:auto;border:1px solid rgba(255,255,255,.82);border-radius:28px;background:#f9fffd;box-shadow:0 -18px 55px rgba(3,30,47,.27);animation:mgSheet .4s cubic-bezier(.22,1.27,.33,1)}@keyframes mgSheet{from{opacity:0;transform:translateY(75px) scale(.96)}to{opacity:1;transform:none}}.mg-sheet-head{position:sticky;top:0;z-index:2;display:flex;align-items:center;justify-content:space-between;padding:2px 4px 8px;background:linear-gradient(to bottom,#f9fffd 75%,rgba(249,255,253,.9))}.mg-sheet-title{display:flex;align-items:center;gap:10px}.mg-sheet-title i{display:grid;place-items:center;width:37px;height:37px;border-radius:13px;background:#dff8ef;color:#0b8d79;font-size:18px;font-style:normal}.mg-sheet-title b{display:block;font-size:16px;letter-spacing:-.35px}.mg-sheet-title small{display:block;margin-top:1px;color:#748e9b;font-size:10px;font-weight:700}.mg-close{display:grid;place-items:center;width:35px;height:35px;border:0;border-radius:12px;background:#e8f2f2;color:#66818e;font-size:19px}.mg-sheet-body{padding:0 19px 20px}.mg-input{width:100%;height:43px;padding:10px 12px;border:1px solid #d9e9e7;border-radius:13px;outline:none;background:#fff;color:#294b5d;font:inherit;font-size:12px;font-weight:800}.mg-input:focus{border-color:#4fc5ab;box-shadow:0 0 0 3px rgba(79,197,171,.13)}.mg-help{margin:10px 0;color:#748c9a;font-size:10px;line-height:1.45;font-weight:700}.mg-picker-tools{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:11px 0}.mg-picker-tools button{min-height:40px;border:0;border-radius:12px;background:#e7f8f2;color:#118473;font:inherit;font-size:10px;font-weight:950}.mg-picker-tools button:last-child{background:#edf4f4;color:#58747f}.mg-picker-tools .mg-wide{grid-column:1/-1}.mg-contact-list{display:grid;gap:7px}.mg-contact{display:flex;align-items:center;gap:10px;width:100%;padding:9px 10px;border:1px solid #dfebeb;border-radius:15px;background:#fff;color:#29485a;text-align:left}.mg-contact.chosen{border-color:#6dceb3;background:#f2fff9}.mg-avatar{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:linear-gradient(145deg,#b9efdf,#73d7bd);color:#126d65;font-size:11px;font-weight:1000}.mg-contact b{display:block;font-size:11px}.mg-contact small{display:block;margin-top:2px;color:#7c94a0;font-size:9px;font-weight:700}.mg-check{display:grid;place-items:center;width:21px;height:21px;margin-left:auto;border:2px solid #c5d9d9;border-radius:8px;color:#fff;font-size:12px}.mg-contact.chosen .mg-check{border-color:#1aaa89;background:#1aaa89}.mg-empty{padding:21px 12px;border:1px dashed #bedbd6;border-radius:15px;background:#f2fbf8;color:#63808b;font-size:11px;line-height:1.5;text-align:center}.mg-sheet-actions{display:flex;gap:8px;margin-top:14px}.mg-sheet-actions button{flex:1;min-height:45px;border:0;border-radius:13px;font:inherit;font-size:12px;font-weight:950}.mg-secondary{background:#eaf3f3;color:#53717e}.mg-primary{color:#fff;background:linear-gradient(135deg,#0b877e,#31c29f);box-shadow:0 7px 14px rgba(19,156,124,.22)}.mg-edit-list{display:grid;gap:8px}.mg-edit-row{display:grid;grid-template-columns:42px 1fr;gap:8px;align-items:center;padding:8px;border:1px solid #dfeeed;border-radius:14px;background:#fff}.mg-edit-row select{height:36px;border:0;border-radius:10px;background:#e6faf3;color:#138673;font-size:16px;text-align:center}.mg-edit-row input{height:36px;padding:8px 9px;border:0;outline:0;background:transparent;color:#29485a;font:inherit;font-size:11px;font-weight:850}',
       '.mg-toast{position:fixed;z-index:47000;left:50%;bottom:20px;padding:11px 15px;border-radius:15px;background:#143d55;color:#fff;font-size:11px;font-weight:800;box-shadow:0 12px 28px rgba(3,30,47,.25);transform:translate(-50%,100px);opacity:0;transition:.34s cubic-bezier(.2,1.3,.3,1)}.mg-toast.show{transform:translate(-50%,0);opacity:1}body.dark #view-margarita{background:transparent}body.dark .mg-hero h2,body.dark .mg-card h3,body.dark .mg-garden-head b{color:#edf6f5}body.dark .mg-hero p,body.dark .mg-card p,body.dark .mg-garden-head span,body.dark .mg-garden-foot{color:#a9bfca}body.dark .mg-garden,body.dark .mg-card{border-color:rgba(255,255,255,.1);background:rgba(38,48,61,.8)}body.dark .mg-action,body.dark .mg-edit-row,body.dark .mg-contact{background:#2d3746;border-color:rgba(255,255,255,.1);color:#eaf4f4}body.dark .mg-action small,body.dark .mg-contact small{color:#adc3cb}body.dark .mg-sheet{background:#202b35}body.dark .mg-sheet-head{background:linear-gradient(to bottom,#202b35 75%,rgba(32,43,53,.9))}body.dark .mg-sheet-title b{color:#f1f8f8}body.dark .mg-input{background:#2d3746;border-color:rgba(255,255,255,.1);color:#f2fbfa}.mg-src{display:inline-block;margin:4px 0 0;padding:2px 7px;border-radius:999px;background:#eef4f4;color:#6f8894;font-size:8px;font-weight:950;white-space:nowrap}.mg-picker-tools.single{grid-template-columns:1fr}.mg-more{width:100%;margin-top:10px;padding:10px 12px;border:1px solid #d9e9e7;border-radius:13px;background:#fff;color:#118473;font:inherit;font-size:10px;font-weight:950;cursor:pointer}.mg-more:hover{border-color:#74cfbb;background:#f2fff9}body.dark .mg-src{background:#2d3746;color:#a9bfca}body.dark .mg-more{background:#2d3746;border-color:rgba(255,255,255,.1);color:#7fe0c8}',
       '@media(max-width:820px){.mg-hero{display:block}.mg-hero-actions{justify-content:flex-start}.mg-layout{grid-template-columns:1fr;max-width:590px}.mg-side{grid-template-columns:1fr 1fr}}@media(max-width:515px){.mg-wrap{padding:2px 7px calc(95px + env(safe-area-inset-bottom))}.mg-hero{padding:10px 10px 13px}.mg-hero h2{font-size:27px}.mg-hero p{font-size:11.5px}.mg-hero-actions{display:none}.mg-layout{gap:10px}.mg-garden{min-height:540px;padding:10px 7px 8px;border-radius:25px}.mg-stage{height:470px;transform:scale(.9);transform-origin:center center;margin:0 auto}.mg-garden-head{padding:0 7px}.mg-garden-head span{font-size:9px}.mg-side{grid-template-columns:1fr;gap:8px}.mg-card{padding:14px;border-radius:19px}.mg-growth{display:none}.mg-modal{padding:7px}.mg-sheet{border-radius:24px}.mg-sheet-body{padding:0 14px 16px}.mg-sheet-head{padding:15px 14px 11px}}@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition-duration:.01ms!important}}',
-      '.mg-petal-more{position:absolute;z-index:2;left:50%;top:16px;transform:translateX(-50%) rotate(var(--counter));display:grid;place-items:center;width:40px;height:22px;margin:0;padding:0;border:1px solid rgba(35,108,125,.16);border-radius:999px;background:rgba(255,255,255,.94);color:#5f8493;font-size:12px;font-weight:1000;line-height:1;letter-spacing:.4px;cursor:pointer;box-shadow:0 2px 5px rgba(18,92,104,.1);transition:.2s;user-select:none}.mg-petal-more:hover{background:#eafaf4;border-color:#74cfbb;color:#0f8a76}'
+      '.mg-choices{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:2px 0 12px}.mg-choice{display:grid;gap:3px;justify-items:center;padding:16px 8px 14px;border:1.5px solid transparent;border-radius:19px;font:inherit;cursor:pointer;line-height:1.12;transition:.2s}.mg-choice i{font-size:26px;font-style:normal;line-height:1}.mg-choice b{font-size:12.5px;letter-spacing:-.2px}.mg-choice small{font-size:9px;font-weight:850;opacity:.78}.mg-choice-appi{background:linear-gradient(165deg,#ffffff,#e9fbf5);border-color:rgba(20,150,130,.22);color:#0c7f6c;box-shadow:0 6px 14px rgba(16,110,95,.10)}.mg-choice-phone{background:linear-gradient(165deg,#18a593,#0d7d74);color:#fff;box-shadow:0 9px 20px rgba(13,125,116,.30)}.mg-choice:hover{transform:translateY(-2px)}.mg-choice.active{outline:2.5px solid rgba(17,152,128,.55);outline-offset:2px}.mg-go{margin-left:auto;padding-left:6px;color:#79b7ab;font-size:19px;font-weight:1000}.mg-card-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:2px 0 15px}.mg-card-btn{display:flex;align-items:center;justify-content:center;gap:7px;min-height:48px;border:0;border-radius:16px;font:inherit;font-size:13.5px;font-weight:950;cursor:pointer;text-decoration:none}.mg-card-btn.wa{background:linear-gradient(165deg,#25d366,#12b053);color:#fff;box-shadow:0 8px 17px rgba(18,176,83,.30)}.mg-card-btn.call{background:linear-gradient(165deg,#3a95db,#1f6fb5);color:#fff;box-shadow:0 8px 17px rgba(31,111,181,.26)}.mg-card-btn:active{transform:translateY(1px)}.mg-card-notes{display:grid;gap:6px}.mg-card-notes span{color:#4d6b7a;font-size:9.5px;font-weight:950;letter-spacing:.6px;text-transform:uppercase}.mg-card-notes textarea{min-height:106px;resize:vertical;padding:11px 12px;border:1px solid #d9e9e7;border-radius:14px;outline:none;background:#fff;color:#294b5d;font:inherit;font-size:12.5px;font-weight:700;line-height:1.45}.mg-card-notes textarea:focus{border-color:#4fc5ab;box-shadow:0 0 0 3px rgba(79,197,171,.13)}.mg-card-remove{display:block;width:100%;margin:13px 0 0;padding:11px;border:1px solid #f2d3d3;border-radius:14px;background:#fff6f6;color:#bf4a44;font:inherit;font-size:11px;font-weight:950;cursor:pointer}.mg-card-remove:hover{background:#ffecec;border-color:#eab6b6}body.dark .mg-choice-appi{background:linear-gradient(165deg,#2d3746,#25323f);color:#7fe0cd;border-color:rgba(255,255,255,.12)}body.dark .mg-card-notes textarea{background:#2d3746;border-color:rgba(255,255,255,.1);color:#f2fbfa}body.dark .mg-card-remove{background:#3a2b2f;border-color:rgba(255,255,255,.12);color:#f0a9a3}body.dark .mg-card-notes span{color:#a9bfca}@media(max-width:400px){.mg-choice b{font-size:11.5px}.mg-choice small{font-size:8.5px}}'
     ].join('');
     document.head.appendChild(st);
   }
@@ -252,13 +250,8 @@
         var petals = state.grupos.map(function(g, i){
       var count = (state.contactos[g.id] || []).length;
       var label = esc(g.label);
-      // Con Contact Picker el pétalo ya no abre la hoja: abre la agenda del
-      // teléfono. Este botón es la puerta de salida para administrar el grupo:
-      // va como hijo del pétalo (no del contenido, que está contra-rotado) para
-      // que quede SIEMPRE en la punta, y con --counter queda derecho.
-      var mas = capazPicker() ? '<span class="mg-petal-more" role="button" tabindex="0" title="Administrar contactos" aria-label="Administrar ' + label + '">⋯</span>' : '';
       return '<button type="button" class="mg-petal ' + (count ? 'has-contacts' : '') + '" style="transform:rotate(' + (i * 45) + 'deg);--angle:' + (i * 45) + 'deg;--counter:-' + (i * 45) + 'deg;--petal-outset:-78px;--i:' + i + '" data-mg-group="' + esc(g.id) + '">' +
-        '<span class="mg-petal-shape"></span>' + mas +
+        '<span class="mg-petal-shape"></span>' +
         '<span class="mg-petal-content">' +
           '<i>' + esc(g.icon) + '</i>' +
           '<b>' + label + '</b>' +
@@ -272,10 +265,6 @@
       '<aside class="mg-side"><section class="mg-card"><h3>¿Qué querés sembrar hoy?</h3><p>Elegí una acción y después el pétalo que mejor la acompañe.</p><div class="mg-action-list">' + accionesHTML() + '</div></section><section class="mg-card mg-growth"><h3>Tu jardín está creciendo</h3><p>Personas cercanas, oportunidades reales.</p><div class="mg-number"><strong>' + n + '</strong><span>contactos<br>en tu margarita</span></div><div class="mg-progress"><i style="width:' + Math.min(100,Math.max(8,n*12)) + '%"></i></div></section></aside></div></div>' +
       '<div class="mg-toast" id="mgToast"></div>';
     host.querySelectorAll('[data-mg-group]').forEach(function(b){ b.onclick=function(){ abrirGrupo(b.getAttribute('data-mg-group')); }; });
-    host.querySelectorAll('.mg-petal-more').forEach(function(m){
-      m.onclick=function(ev){ ev.preventDefault(); ev.stopPropagation(); var p=m.closest('[data-mg-group]'); if(p) abrirHojaDe(p.getAttribute('data-mg-group')); };
-      m.onkeydown=function(ev){ if(ev.key==='Enter'||ev.key===' '||ev.key==='Spacebar'){ ev.preventDefault(); ev.stopPropagation(); m.click(); } };
-    });
     host.querySelectorAll('[data-mg-action]').forEach(function(b){ b.onclick=function(){ accionActiva=b.getAttribute('data-mg-action'); render(); mostrarToast('Acción elegida: ' + accionActiva); }; });
     document.getElementById('mgEditGroups').onclick = editarGrupos;
     document.getElementById('mgEditName').onclick = editarNombre;
@@ -306,39 +295,27 @@
 
   function abrirGrupo(id){
     var state = cargar(), g = grupo(state, id); if (!g) return;
-    var seleccion = (state.contactos[id] || []).slice();
-    // Primera intención, SIEMPRE: intentar abrir la agenda del teléfono. No se
-    // consulta capazPicker antes: si no hay Contact Picker o no anda, el propio
-    // intento devuelve el fallo y recién ahí se abren las otras opciones.
-    elegirTelefono(seleccion, function(agregados, fallo){
-      // fallo → no se pudo usar la agenda: hoja con las otras opciones, sin
-      // ningún cartel.
-      if (fallo){ abrirHoja(g, state, seleccion); return; }
-      // Lo elegido se guarda solo: no hay pasos intermedios.
-      state.contactos[id] = seleccion; guardar(state); render();
-      mostrarToast(agregados
-        ? '+' + agregados + ' persona' + (agregados === 1 ? '' : 's') + ' sumada' + (agregados === 1 ? '' : 's') + ' en ' + g.label
-        : (seleccion.length ? 'Ya estaban esas personas en ' + g.label : 'No elegiste a nadie en ' + g.label));
-    });
-  }
-  function abrirHojaDe(id){
-    var state = cargar(), g = grupo(state, id); if (!g) return;
+    // Un toque en el pétalo abre la hoja: dos caminos (dentro de APPI o de mis
+    // contactos) y, debajo, SÓLO las personas que ya se eligieron.
     abrirHoja(g, state, (state.contactos[id] || []).slice());
   }
   function abrirHoja(g, state, seleccion){
-    var soporta = capazPicker();
     var listaCompleta = [], mostrarMas = LIMITE_TANDA, programarCarga = true;
-    // false = se ve SÓLO el pétalo (las personas elegidas). true = además se
-    // muestran los contactos de APPI que se pueden sumar. Ver el listado
-    // nunca muestra a gente que la persona no eligió.
-    var agregando = false;
+    // 'ver' (por defecto): sólo las personas del pétalo y cada una abre su
+    // tarjeta. 'appi': se pueden elegir contactos de APPI para sumarlos.
+    var modo = 'ver';
     function esta(c){ return seleccion.some(function(x){ return firma(x) && firma(x) === firma(c); }); }
-    function fila(c, chosen){
+    // Cada cambio queda guardado en el acto: no hay botón intermedio que
+    // pueda perderse si se cierra la hoja.
+    function guardarEnPetal(){ state.contactos[g.id] = seleccion; guardar(state); render(); }
+    function fila(c, chosen, tarjeta){
       var origen = c.origen || origenDe(c);
-      return '<button type="button" class="mg-contact ' + (chosen ? 'chosen' : '') + '" data-mg-key="' + esc(firma(c)) + '">' +
+      var attr = tarjeta ? 'data-mg-card="' + esc(firma(c)) + '"' : 'data-mg-key="' + esc(firma(c)) + '"';
+      var marca = tarjeta ? '<span class="mg-go">›</span>' : '<span class="mg-check">✓</span>';
+      return '<button type="button" class="mg-contact ' + (chosen ? 'chosen' : '') + '" ' + attr + '>' +
         '<span class="mg-avatar">' + esc(iniciales(c.nombre)) + '</span>' +
         '<span><b>' + esc(c.nombre) + '</b><small>' + esc(c.telefono || 'Contacto') + '</small><span class="mg-src">' + esc(etiquetaOrigen(origen)) + '</span></span>' +
-        '<span class="mg-check">✓</span></button>';
+        marca + '</button>';
     }
     function importarVcf(archivo){
       archivo.text().then(function(texto){
@@ -352,74 +329,115 @@
           if (seleccion.some(function(x){ return firma(x) === firma(cifra); })){ repetidas++; return; }
           seleccion.push(cifra); agregadas++;
         });
+        guardarEnPetal();
         pintar();
         if (agregadas) mostrarToast('📥 ' + agregadas + (agregadas === 1 ? ' persona agregada' : ' personas agregadas') + (repetidas ? ' · ' + repetidas + ' ya estaban' : ''));
         else if (repetidas) mostrarToast('Todas esas personas ya están en el pétalo.');
       }).catch(function(){ mostrarToast('No se pudo leer el archivo de agenda.'); });
     }
-    function toolsHTML(){
-      var botones = '<button type="button" id="mgSubirAgenda"' + (capazPicker() ? '' : ' class="mg-wide"') + '>📁 Subir agenda</button>';
-      if (capazPicker()) botones += '<button type="button" id="mgPhone">📱 Elegir del teléfono</button>';
-      botones += '<button type="button" id="mgGoAgenda" class="mg-wide">📒 Ver mi Agenda APPI</button>';
-      return '<div class="mg-picker-tools">' + botones + '</div>';
-    }
     function pintar(){
       var input = document.getElementById('mgSearch');
       var q = String(input && input.value || '').toLocaleLowerCase('es-AR');
-      var todos = candidatos();
       listaCompleta = [];
       function matchea(o){ return !q || (o.nombre + ' ' + o.telefono).toLocaleLowerCase('es-AR').indexOf(q) >= 0; }
-      var elegidas = seleccion.filter(matchea);
-      var html = '';
-      elegidas.forEach(function(c){ listaCompleta.push(c); html += fila(c, true); });
-      // El resto (Panel y Agenda de APPI) sólo aparece si se pidió sumar gente:
-      // el listado del pétalo no se llena con nadie que no se haya elegido.
-      var quedan = 0;
-      if (agregando){
-        var extra = todos.filter(function(c){ return matchea(c) && !esta(c); });
+      var html = '', quedan = 0;
+      if (modo === 'appi'){
+        // Dentro de APPI: primero las que ya están en el pétalo (✓) y
+        // después las que se pueden sumar.
+        seleccion.filter(matchea).forEach(function(c){ listaCompleta.push(c); html += fila(c, true, false); });
+        var extra = candidatos().filter(function(c){ return matchea(c) && !esta(c); });
         var resto = extra.slice(0, mostrarMas);
-        resto.forEach(function(c){ listaCompleta.push(c); html += fila(c, false); });
+        resto.forEach(function(c){ listaCompleta.push(c); html += fila(c, false, false); });
         quedan = extra.length - resto.length;
+      } else {
+        // Ver el pétalo: SÓLO las personas elegidas. Tocar una abre su tarjeta.
+        seleccion.filter(matchea).forEach(function(c){ listaCompleta.push(c); html += fila(c, true, true); });
       }
       if (!listaCompleta.length){
         html = q
-          ? (agregando
-              ? '<div class="mg-empty">No encontramos a nadie para “' + esc(q) + '”.</div>'
-              : '<div class="mg-empty">Nadie de este pétalo se llama así. Tocá en <b>Agregar personas</b> para buscarlo en tus contactos.</div>')
-          : '<div class="mg-empty">Todavía no hay personas para mostrar. Subí la agenda de tu teléfono o elegí de las que ya guardaste en APPI.</div>';
+          ? '<div class="mg-empty">No encontramos a nadie para “' + esc(q) + '”.</div>'
+          : (modo === 'appi'
+              ? '<div class="mg-empty">No hay personas en APPI todavía. Probá con la agenda de tu teléfono.</div>'
+              : '<div class="mg-empty">Todavía no hay personas para mostrar. Elegí dentro de APPI o de mis contactos.</div>');
       }
       var list = document.getElementById('mgCandidateList');
       list.innerHTML = html + (quedan > 0 ? '<button type="button" class="mg-more" id="mgMore">Mostrar ' + Math.min(LIMITE_TANDA, quedan) + ' más de ' + quedan + '</button>' : '');
-      var addBtn = document.getElementById('mgAddMore');
-      if (addBtn) addBtn.textContent = agregando ? '‹ Ver las personas del pétalo' : '➕ Agregar personas';
+      // La hoja se acomoda según el modo: buscador, enlace a la Agenda y pie
+      // de guardado sólo aparecen cuando se están eligiendo contactos.
+      var search = document.getElementById('mgSearch');
+      if (search) search.hidden = (modo !== 'appi');
+      var ayuda = document.getElementById('mgHelp');
+      if (ayuda) ayuda.textContent = modo === 'appi'
+        ? 'Elegí de tus contactos de APPI los que quieras sumar a este pétalo. Los que ya están aparecen con ✓.'
+        : 'Estas son las personas de este pétalo. Tocá una para ver su tarjeta.';
+      var btnAppi = document.getElementById('mgPickAppi');
+      if (btnAppi) btnAppi.classList.toggle('active', modo === 'appi');
+      var btnAtras = document.getElementById('mgCancelPick');
+      if (btnAtras) btnAtras.textContent = modo === 'appi' ? '‹ Volver al pétalo' : 'Volver';
+      var listo = document.getElementById('mgSavePick');
+      if (listo) listo.hidden = (modo !== 'appi');
+      var agenda = document.getElementById('mgGoAgenda');
+      if (agenda) agenda.hidden = (modo !== 'appi');
       var more = document.getElementById('mgMore');
       if (more) more.onclick = function(){ mostrarMas += LIMITE_TANDA; pintar(); };
+      document.querySelectorAll('[data-mg-card]').forEach(function(b){
+        b.onclick = function(){
+          var c = listaCompleta.filter(function(x){ return firma(x) === b.getAttribute('data-mg-card'); })[0];
+          if (c) abrirTarjeta(c);
+        };
+      });
       document.querySelectorAll('[data-mg-key]').forEach(function(b){
         b.onclick = function(){
           var c = listaCompleta.filter(function(x){ return firma(x) === b.getAttribute('data-mg-key'); })[0];
           if (!c) return;
           if (esta(c)) seleccion = seleccion.filter(function(x){ return firma(x) !== firma(c); });
           else seleccion.push(c);
+          guardarEnPetal();
           pintar();
         };
       });
-      if (programarCarga && !soporta && todos.length === 0 && navigator.onLine && window.APPIGestion && window.APPIGestion.refresh){
+      if (modo === 'appi' && programarCarga && navigator.onLine && window.APPIGestion && window.APPIGestion.refresh && !candidatos().length){
         programarCarga = false;
         setTimeout(function(){ window.APPIGestion.refresh(false).then(pintar).catch(function(){}); }, 250);
       }
     }
-    var tools = toolsHTML();
     abrirModal(cabecera(g, 'Elegí personas para este pétalo') +
-      '<div class="mg-sheet-body"><input class="mg-input" id="mgSearch" placeholder="Buscar por nombre o teléfono">' +
-      '<input type="file" id="mgVcfInput" accept=".vcf,text/vcard,text/directory" hidden>' + tools +
-      '<p class="mg-help">Este pétalo guarda sólo a las personas que elegís. Subí la agenda de tu teléfono o agregá de tus contactos de APPI.</p>' +
-      '<button type="button" class="mg-more" id="mgAddMore">➕ Agregar personas</button>' +
+      '<div class="mg-sheet-body">' +
+      '<div class="mg-choices">' +
+        '<button type="button" class="mg-choice mg-choice-appi" id="mgPickAppi"><i>📒</i><b>Elegir dentro de APPI</b><small>Panel y Agenda Personal</small></button>' +
+        '<button type="button" class="mg-choice mg-choice-phone" id="mgPickPhone"><i>📱</i><b>Elegir de mis contactos</b><small>La agenda de tu teléfono</small></button>' +
+      '</div>' +
+      '<div id="mgFallback" hidden><button type="button" class="mg-more" id="mgSubirAgenda">📁 Subir agenda (.vcf)</button></div>' +
+      '<input type="file" id="mgVcfInput" accept=".vcf,text/vcard,text/directory" hidden>' +
+      '<input class="mg-input" id="mgSearch" placeholder="Buscar por nombre o teléfono" hidden>' +
+      '<p class="mg-help" id="mgHelp"></p>' +
       '<div class="mg-contact-list" id="mgCandidateList"></div>' +
-      '<div class="mg-sheet-actions"><button type="button" class="mg-secondary" id="mgCancelPick">Volver</button><button type="button" class="mg-primary" id="mgSavePick">Guardar selección</button></div></div>');
+      '<button type="button" class="mg-more" id="mgGoAgenda" hidden>📒 Ver mi Agenda APPI</button>' +
+      '<div class="mg-sheet-actions"><button type="button" class="mg-secondary" id="mgCancelPick">Volver</button><button type="button" class="mg-primary" id="mgSavePick" hidden>Listo</button></div>' +
+      '</div>');
     document.getElementById('mgClose').onclick = cerrarModal;
-    document.getElementById('mgCancelPick').onclick = cerrarModal;
+    document.getElementById('mgCancelPick').onclick = function(){
+      if (modo === 'appi'){ modo = 'ver'; mostrarMas = LIMITE_TANDA; pintar(); return; }
+      cerrarModal();
+    };
+    document.getElementById('mgSavePick').onclick = function(){ guardarEnPetal(); cerrarModal(); };
     document.getElementById('mgSearch').oninput = pintar;
-    document.getElementById('mgAddMore').onclick = function(){ agregando = !agregando; mostrarMas = LIMITE_TANDA; pintar(); };
+    // Camino 1: los contactos que ya están en APPI (Panel y Agenda Personal).
+    document.getElementById('mgPickAppi').onclick = function(){ modo = 'appi'; mostrarMas = LIMITE_TANDA; pintar(); };
+    // Camino 2: la agenda del teléfono. Si el navegador no deja abrirla, se
+    // aparece la otra vía (.vcf) sin ningún cartel ni pedido de permisos.
+    document.getElementById('mgPickPhone').onclick = function(){
+      elegirTelefono(seleccion, function(agregados, fallo){
+        if (fallo){
+          var fb = document.getElementById('mgFallback');
+          if (fb) fb.hidden = false;
+          return;
+        }
+        guardarEnPetal();
+        pintar();
+        if (agregados) mostrarToast('+' + agregados + ' persona' + (agregados === 1 ? '' : 's') + ' en ' + g.label);
+      });
+    };
     document.getElementById('mgSubirAgenda').onclick = function(){ var i = document.getElementById('mgVcfInput'); if (i) i.click(); };
     var vcfInput = document.getElementById('mgVcfInput');
     if (vcfInput) vcfInput.onchange = function(){
@@ -428,14 +446,55 @@
       if (archivo) importarVcf(archivo);
     };
     document.getElementById('mgGoAgenda').onclick = function(){ cerrarModal(); if (typeof window.openMiGestion === 'function') window.openMiGestion(); else if (typeof window.showView === 'function') window.showView('view-gestion'); };
-    var phone = document.getElementById('mgPhone');
-    if (phone) phone.onclick = function(){ elegirTelefono(seleccion, function(agregados){ pintar(); if (agregados) mostrarToast('+' + agregados + ' persona' + (agregados === 1 ? '' : 's') + ' sumada' + (agregados === 1 ? '' : 's')); }); };
-    document.getElementById('mgSavePick').onclick = function(){
-      state.contactos[g.id] = seleccion;
-      guardar(state); cerrarModal(); render();
-      var n = seleccion.length;
-      mostrarToast(n ? n + ' persona' + (n === 1 ? '' : 's') + ' lista' + (n === 1 ? '' : 's') + ' para ' + accionActiva.toLocaleLowerCase('es-AR') : 'Pétalo actualizado');
-    };
+
+    /* La tarjeta de contacto de una persona del pétalo: WhatsApp, teléfono y
+       un apartado de notas que queda guardado en la cuenta. */
+    function abrirTarjeta(c){
+      var k = firma(c), guardadas = state.notas || {};
+      // Número armado (549…) para el WhatsApp y la llamada; si no se puede
+      // normalizar, se usa el crudo tal como vino.
+      var crudo = digitos(c.telefono);
+      var internacional = (window.APPITel && typeof window.APPITel.normalizar === 'function') ? String(window.APPITel.normalizar(c.telefono) || '') : '';
+      var llamar = internacional || crudo;
+      var wa = llamar ? 'https://wa.me/' + llamar : '';
+      function guardarNota(silencio){
+        var t = document.getElementById('mgCardNota');
+        if (!t) return;
+        var texto = String(t.value || '').trim().slice(0, 800);
+        state.notas = state.notas || {};
+        if (texto) state.notas[k] = texto; else delete state.notas[k];
+        guardar(state);
+        if (!silencio) mostrarToast('Nota guardada ✓');
+      }
+      abrirModal(
+        '<header class="mg-sheet-head"><div class="mg-sheet-title"><i>' + esc(iniciales(c.nombre)) + '</i>' +
+        '<div><b>' + esc(c.nombre) + '</b><small>' + esc(c.telefono || 'Sin teléfono') + '</small></div></div>' +
+        '<button type="button" class="mg-close" id="mgClose" aria-label="Cerrar">×</button></header>' +
+        '<div class="mg-sheet-body">' +
+        '<div class="mg-card-actions">' +
+          (wa ? '<button type="button" class="mg-card-btn wa" id="mgCardWa">💬 WhatsApp</button>' : '') +
+          (llamar ? '<a class="mg-card-btn call" id="mgCardTel" href="tel:+' + esc(llamar) + '">📞 Llamar</a>' : '') +
+        '</div>' +
+        '<label class="mg-card-notes"><span>Notas</span><textarea id="mgCardNota" rows="5" placeholder="Escribí lo que quieras recordar…">' + esc(String(guardadas[k] || '')) + '</textarea></label>' +
+        '<div class="mg-sheet-actions"><button type="button" class="mg-secondary" id="mgCardBack">‹ Volver al pétalo</button><button type="button" class="mg-primary" id="mgCardSave">Guardar</button></div>' +
+        '<button type="button" class="mg-card-remove" id="mgCardRemove">Quitar de este pétalo</button>' +
+        '</div>');
+      document.getElementById('mgClose').onclick = function(){ guardarNota(true); cerrarModal(); };
+      document.getElementById('mgCardSave').onclick = function(){ guardarNota(false); };
+      document.getElementById('mgCardBack').onclick = function(){ guardarNota(true); abrirHoja(g, state, seleccion); };
+      document.getElementById('mgCardRemove').onclick = function(){
+        guardarNota(true);
+        seleccion = seleccion.filter(function(x){ return firma(x) !== k; });
+        guardarEnPetal();
+        mostrarToast(c.nombre + ' se quitó del pétalo');
+        abrirHoja(g, state, seleccion);
+      };
+      var waBtn = document.getElementById('mgCardWa');
+      if (waBtn) waBtn.onclick = function(){
+        if (window.APPIWhatsApp && typeof window.APPIWhatsApp.abrir === 'function') window.APPIWhatsApp.abrir(wa);
+        else window.open(wa, '_blank');
+      };
+    }
     pintar();
   }
   // alVolver(agregados, fallo): fallo = el picker no se pudo usar; la
