@@ -314,7 +314,7 @@ test('si el Contact Picker falla, la hoja sigue viva sin carteles ni guías de c
   expect(texto).not.toMatch(/permiso|ajustes|configura|permitir|puntitos|chrome/i);
 });
 
-test('sin Contact Picker la hoja lista las personas de APPI y permite elegir en el pétalo', async ({ page }) => {
+test('sin Contact Picker la hoja permite agregar las personas de APPI al pétalo', async ({ page }) => {
   await abrirMargarita(page);
 
   // El Panel de Contactos (Mi Gestión) alimenta la hoja: se intercepta la
@@ -338,6 +338,11 @@ test('sin Contact Picker la hoja lista las personas de APPI y permite elegir en 
 
   await page.locator('[data-mg-group="amigos"] .mg-petal-content').click();
   await expect(page.locator('#mgSheet')).toContainText('Elegí personas para este pétalo');
+  // El pétalo está vacío y el listado no se llena solo: las personas de APPI
+  // aparecen recién cuando se pide sumarlas.
+  await expect(page.locator('#mgCandidateList')).toContainText('Todavía no hay personas para mostrar');
+  await expect(page.locator('#mgCandidateList')).not.toContainText('Ana Panel');
+  await page.locator('#mgAddMore').click();
   await expect(page.locator('#mgCandidateList')).toContainText('Ana Panel');
   await expect(page.locator('#mgCandidateList')).toContainText('Panel APPI');
 
@@ -347,4 +352,67 @@ test('sin Contact Picker la hoja lista las personas de APPI y permite elegir en 
 
   const guardado = await page.evaluate(() => window.APPIMargarita.cargar().contactos.amigos);
   expect(guardado).toEqual(expect.arrayContaining([expect.objectContaining({ nombre: 'Ana Panel' })]));
+});
+
+test('ver el listado de un pétalo muestra SÓLO a las personas elegidas', async ({ page }) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'contacts', {
+      configurable: true,
+      value: {
+        getProperties: async () => ['name', 'tel'],
+        select: async () => [{ name: ['Lucía Contacto'], tel: ['3515557788'] }]
+      }
+    });
+  });
+  await abrirMargarita(page);
+
+  // Dos personas que la persona NO eligió, esperando en el Panel de APPI.
+  const otros = ['Ana Panel', 'Bruno Panel'].map((nombre, i) => ({
+    id: 'c-' + i, nombre, telefono: '351555000' + (i + 1),
+    telefono_normalizado: '351555000' + (i + 1), estado: 'nuevo', tipo: 'encuestado',
+    user_id: '11111111-1111-4111-8111-111111111113',
+    created_at: new Date().toISOString(), updated_at: new Date().toISOString()
+  }));
+  await page.route('https://mock.supabase.co/rest/v1/appi_gestion_contactos*', route => route.fulfill({
+    status: 200,
+    headers: { 'access-control-allow-origin': '*', 'content-type': 'application/json' },
+    body: JSON.stringify(otros)
+  }));
+  await page.evaluate((lista) => {
+    const g = window.APPIGestion && window.APPIGestion.state;
+    if (g) { g.contacts = lista; g.lastLoaded = Date.now(); }
+  }, otros);
+
+  // Se elige una sola persona desde la agenda del teléfono.
+  await page.locator('[data-mg-group="amigos"] .mg-petal-content b').click();
+  await expect(page.locator('[data-mg-group="amigos"]')).toContainText('1 persona');
+
+  // Ver el listado: adentro hay que ver SÓLO a la que se eligió. Ni Ana ni
+  // Bruno, aunque estén guardados en APPI.
+  await page.locator('[data-mg-group="amigos"] .mg-petal-more').click();
+  await expect(page.locator('#mgCandidateList')).toContainText('Lucía Contacto');
+  const enElPetalo = await page.locator('#mgCandidateList').innerText();
+  expect(enElPetalo).not.toContain('Ana Panel');
+  expect(enElPetalo).not.toContain('Bruno Panel');
+
+  // El resto aparece únicamente cuando se pide sumar gente, y se puede
+  // volver al pétalo sin perder a nadie.
+  await expect(page.locator('#mgAddMore')).toContainText('Agregar personas');
+  await page.locator('#mgAddMore').click();
+  const alAgregar = await page.locator('#mgCandidateList').innerText();
+  expect(alAgregar).toContain('Lucía Contacto');
+  expect(alAgregar).toContain('Ana Panel');
+  expect(alAgregar).toContain('Bruno Panel');
+
+  await page.locator('#mgAddMore').click();
+  const otraVez = await page.locator('#mgCandidateList').innerText();
+  expect(otraVez).toContain('Lucía Contacto');
+  expect(otraVez).not.toContain('Ana Panel');
+  expect(otraVez).not.toContain('Bruno Panel');
+
+  await page.locator('#mgSavePick').click();
+  const guardado = await page.evaluate(() => window.APPIMargarita.cargar().contactos.amigos);
+  expect(guardado).toHaveLength(1);
+  expect(guardado[0].nombre).toBe('Lucía Contacto');
+  await expect(page.locator('[data-mg-group="amigos"]')).toContainText('1 persona');
 });

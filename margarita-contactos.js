@@ -7,9 +7,12 @@
    (Contact Picker, Android): elegís y queda guardado en el pétalo.
    Sólo si no se pudo —no hay API (iPhone, Firefox, escritorio) o no
    anda— se abren las otras opciones en la hoja: "Subir agenda" (.vcf,
-   Android e iPhone), "Elegir del teléfono" y las personas que ya
-   guardó en APPI (Panel + Agenda Personal); el botón "⋯" del pétalo
-   entra directo a esa hoja para administrar el grupo.
+   Android e iPhone), "Elegir del teléfono" y, sólo cuando se pide
+   "Agregar personas", el resto de tus contactos de APPI (Panel +
+   Agenda Personal); el botón "⋯" del pétalo entra directo a esa
+   hoja para administrar el grupo.
+   Ver el listado de un pétalo muestra SÓLO a las personas elegidas:
+   nadie entra a un pétalo sin que la persona lo haya elegido.
    Ninguna vía pide permisos ni configurar el dispositivo: si el
    picker no abre, no pasa nada visible, la persona elige otra.
    ============================================================ */
@@ -325,6 +328,10 @@
   function abrirHoja(g, state, seleccion){
     var soporta = capazPicker();
     var listaCompleta = [], mostrarMas = LIMITE_TANDA, programarCarga = true;
+    // false = se ve SÓLO el pétalo (las personas elegidas). true = además se
+    // muestran los contactos de APPI que se pueden sumar. Ver el listado
+    // nunca muestra a gente que la persona no eligió.
+    var agregando = false;
     function esta(c){ return seleccion.some(function(x){ return firma(x) && firma(x) === firma(c); }); }
     function fila(c, chosen){
       var origen = c.origen || origenDe(c);
@@ -363,19 +370,28 @@
       listaCompleta = [];
       function matchea(o){ return !q || (o.nombre + ' ' + o.telefono).toLocaleLowerCase('es-AR').indexOf(q) >= 0; }
       var elegidas = seleccion.filter(matchea);
-      var extra = todos.filter(function(c){ return matchea(c) && !esta(c); });
       var html = '';
       elegidas.forEach(function(c){ listaCompleta.push(c); html += fila(c, true); });
-      var resto = extra.slice(0, mostrarMas);
-      resto.forEach(function(c){ listaCompleta.push(c); html += fila(c, false); });
-      var quedan = extra.length - resto.length;
+      // El resto (Panel y Agenda de APPI) sólo aparece si se pidió sumar gente:
+      // el listado del pétalo no se llena con nadie que no se haya elegido.
+      var quedan = 0;
+      if (agregando){
+        var extra = todos.filter(function(c){ return matchea(c) && !esta(c); });
+        var resto = extra.slice(0, mostrarMas);
+        resto.forEach(function(c){ listaCompleta.push(c); html += fila(c, false); });
+        quedan = extra.length - resto.length;
+      }
       if (!listaCompleta.length){
         html = q
-          ? '<div class="mg-empty">No encontramos a nadie para “' + esc(q) + '”.</div>'
+          ? (agregando
+              ? '<div class="mg-empty">No encontramos a nadie para “' + esc(q) + '”.</div>'
+              : '<div class="mg-empty">Nadie de este pétalo se llama así. Tocá en <b>Agregar personas</b> para buscarlo en tus contactos.</div>')
           : '<div class="mg-empty">Todavía no hay personas para mostrar. Subí la agenda de tu teléfono o elegí de las que ya guardaste en APPI.</div>';
       }
       var list = document.getElementById('mgCandidateList');
       list.innerHTML = html + (quedan > 0 ? '<button type="button" class="mg-more" id="mgMore">Mostrar ' + Math.min(LIMITE_TANDA, quedan) + ' más de ' + quedan + '</button>' : '');
+      var addBtn = document.getElementById('mgAddMore');
+      if (addBtn) addBtn.textContent = agregando ? '‹ Ver las personas del pétalo' : '➕ Agregar personas';
       var more = document.getElementById('mgMore');
       if (more) more.onclick = function(){ mostrarMas += LIMITE_TANDA; pintar(); };
       document.querySelectorAll('[data-mg-key]').forEach(function(b){
@@ -396,12 +412,14 @@
     abrirModal(cabecera(g, 'Elegí personas para este pétalo') +
       '<div class="mg-sheet-body"><input class="mg-input" id="mgSearch" placeholder="Buscar por nombre o teléfono">' +
       '<input type="file" id="mgVcfInput" accept=".vcf,text/vcard,text/directory" hidden>' + tools +
-      '<p class="mg-help">Sumá de tu teléfono o de las personas que ya guardaste en APPI. Lo elegido queda en este grupo.</p>' +
+      '<p class="mg-help">Este pétalo guarda sólo a las personas que elegís. Subí la agenda de tu teléfono o agregá de tus contactos de APPI.</p>' +
+      '<button type="button" class="mg-more" id="mgAddMore">➕ Agregar personas</button>' +
       '<div class="mg-contact-list" id="mgCandidateList"></div>' +
       '<div class="mg-sheet-actions"><button type="button" class="mg-secondary" id="mgCancelPick">Volver</button><button type="button" class="mg-primary" id="mgSavePick">Guardar selección</button></div></div>');
     document.getElementById('mgClose').onclick = cerrarModal;
     document.getElementById('mgCancelPick').onclick = cerrarModal;
     document.getElementById('mgSearch').oninput = pintar;
+    document.getElementById('mgAddMore').onclick = function(){ agregando = !agregando; mostrarMas = LIMITE_TANDA; pintar(); };
     document.getElementById('mgSubirAgenda').onclick = function(){ var i = document.getElementById('mgVcfInput'); if (i) i.click(); };
     var vcfInput = document.getElementById('mgVcfInput');
     if (vcfInput) vcfInput.onchange = function(){

@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "635.0.0",
-  "cacheName": "appi-v635-agenda-primero",
+  "version": "636.0.0",
+  "cacheName": "appi-v636-solo-elegidas",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

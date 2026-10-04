@@ -4,6 +4,14 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v636 · El pétalo muestra sólo a las personas elegidas
+
+- **Mi Margarita**: al entrar a ver el listado de un pétalo aparecen **sólo las personas elegidas**. Antes se mezclaban con todos tus contactos de APPI (Panel + Agenda Personal), como si se hubieran metido solas en el pétalo.
+- Para sumar gente ahora hay que tocar **➕ Agregar personas** —recién ahí aparece el resto— o usar la agenda del teléfono / subir el `.vcf`. **‹ Ver las personas del pétalo** vuelve al listado propio.
+- El buscador filtra dentro del modo en el que se está: dentro del pétalo, o al agregar.
+- Nuevo test que fija la regla: con Ana y Bruno esperando en el Panel y sólo Lucía elegida, el listado muestra a Lucía; Ana y Bruno aparecen sólo después de tocar "Agregar personas". Margarita 10/10.
+- Versión: **v636 · Segura** · Cache `appi-v636-solo-elegidas`.
+
 ## v635 · El pétalo intenta la agenda del teléfono antes que nada
 
 - **Mi Margarita**: tocar un pétalo **intenta SIEMPRE abrir la agenda del teléfono como primera intención** —sin consultar antes si el navegador "deja"— y sólo si no se pudo se abren **las otras opciones** en la hoja: subir una agenda `.vcf`, elegir del teléfono y las personas que ya están en APPI (Panel + Agenda Personal). Antes, en un navegador sin Contact Picker el pétalo iba directo a la hoja sin siquiera intentar.
