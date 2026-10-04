@@ -104,9 +104,11 @@ test('el botón Dormidos aparece sólo si hay dormidos', async ({ page }) => {
 test('sin dormidos la barra queda como estaba', async ({ page }) => {
   await entrar(page, [LISTA[0], LISTA[1]]);   // sólo vigente y vencido reciente
   await expect(page.locator('#usuariosBtnDormidos')).toHaveCount(0);
-  // Ocho de base (Mapa se quitó en v332; Depurados se sumó en v350;
-  // Plantillas en v412; Cumpleaños en v543; Reasignados siempre visible en v814).
-  await expect(page.locator('.u-tools button:visible')).toHaveCount(8);
+  // Siete de base: Tarjetas, Ordenar, Zonas, Reasignados, Mensajes,
+  // Depurados y Cumpleaños. (Mapa se quitó en v332; Depurados se sumó en
+  // v350; Cumpleaños en v543; Reasignados siempre visible en v814; el
+  // botón Plantillas salió de la barra con la llegada de Mensajes.)
+  await expect(page.locator('.u-tools button:visible')).toHaveCount(7);
 });
 
 test('se ven los dormidos separados en olas por antigüedad', async ({ page }) => {

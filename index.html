@@ -172,7 +172,7 @@ window.openStock=function(){
 
 <script src="./porque-vivo.js?v=618"></script>
 <script src="./home-limpio.js?v=618"></script>
-<script src="./reporte-bonos.js?v=618"></script>
+<script src="./reporte-bonos.js?v=633"></script>
   <script src="./home-tarjetas.js?v=618"></script>
   <script src="./appi-eventos.js?v=618"></script>
   <script src="./tu-mes.js?v=618"></script>
@@ -4658,7 +4658,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v632 · Segura</div>
+  <div class="ds-foot">APPI · v633 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -14209,8 +14209,8 @@ function cerrarToolsMenu(){
   // con archivos viejos en pantalla.
   if ('serviceWorker' in navigator) {
     (async () => {
-const swVersion='632';
-  const CACHE_NAME='appi-v632-sin-cambios-completa';
+const swVersion='633';
+  const CACHE_NAME='appi-v633-telefono-editable';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
@@ -14346,7 +14346,16 @@ const swVersion='632';
     });
   }
   // (b) Respaldo: drenar la cola que dejó el SW por si el mensaje se perdió.
+  // Sólo se pide si hay un SW controlando la página: él es el único que la
+  // escribe. Sin SW ese GET no tiene destino y devolvía 404 en cada carga.
   function drenarRelay(){
+    if (!('serviceWorker' in navigator)) return;
+    if (!navigator.serviceWorker.controller) {
+      navigator.serviceWorker.addEventListener('controllerchange', function(){
+        if (navigator.serviceWorker.controller) drenarRelay();
+      }, { once: true });
+      return;
+    }
     fetch('./.compartir/cola-v627.json', { cache: 'no-store' })
       .then(function(r){ return r.ok ? r.json() : []; })
       .then(function(items){ if (Array.isArray(items) && items.length) recibir(items); })
@@ -16703,6 +16712,72 @@ function escU(value){
 
 function normU(s){ return (s||'').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim(); }
 function normNoSpaceU(s){ return normU(s).replace(/\s/g,''); }
+
+/* El teléfono de la ficha viene de la planilla de PSA y se vuelve a bajar
+   en cada sincronización (v633). Lo que se corrige a mano queda guardado
+   aparte, por cuenta, y se aplica encima cada vez que se arma la lista:
+   la planilla puede refrescarse sin perder la corrección. */
+/* Las claves que pueden identificar a la misma persona, en orden de
+   prioridad: primero cómo la llama la gente (nombre + domicilio, que vale
+   para todas las fichas de esa persona) y después la serie del equipo, que
+   no cambia ni si la planilla reescribe el nombre o el domicilio. La
+   corrección se guarda bajo las dos y gana la primera que matchee. */
+function clavesTelfEditadoU(u){
+  if(!u) return [];
+  const serie=String(u.serie||'').trim().toLowerCase();
+  const nombre=String(u.nombreNorm||normU(u.usuario||'')).trim();
+  const dom=normNoSpaceU(u.domicilio||'');
+  const claves=[];
+  if(nombre||dom) claves.push('g:'+nombre+'|'+dom);
+  if(serie) claves.push('g:'+serie);
+  return claves;
+}
+function aplicarTelfsEditadosU(lista){
+  try{
+    if(window.APPITel && window.APPITel.edicion && window.APPITel.edicion.aplicar){
+      window.APPITel.edicion.aplicar(lista, clavesTelfEditadoU);
+      // Una corrección que ya no existe no debe seguir marcada.
+      (Array.isArray(lista)?lista:[]).forEach(u=>{
+        if(!u || !u.telfEditado) return;
+        const corregida=clavesTelfEditadoU(u).some(k=>window.APPITel.edicion.obtener(k)!==null);
+        if(!corregida) delete u.telfEditado;
+      });
+    }
+  }catch(e){}
+  return lista;
+}
+window.aplicarTelfsEditados=aplicarTelfsEditadosU;
+window.clavesTelfEditado=clavesTelfEditadoU;
+
+/* Corrige el teléfono de una ficha de Garantías (v633). La planilla de PSA
+   manda en los demás datos y se vuelve a bajar siempre, así que el número
+   que se arregla acá se guarda en su propio archivo de correcciones y se
+   vuelve a poner encima en cada carga. Dejarlo vacío también es un cambio
+   válido: hay fichas con un número que ya no sirve. */
+async function editarTelfDeU(u){
+  if(!u) return;
+  if(!window.APPITel || !window.APPITel.edicion){ return; }
+  const claves=clavesTelfEditadoU(u);
+  if(!claves.length){
+    window.APPIDialog.alert('No pudimos identificar a esta persona para guardar el cambio.',{title:'Editar teléfono',icon:'!'});
+    return;
+  }
+  const pedido=await window.APPITel.edicion.pedir({
+    titulo:'Editar teléfono',
+    mensaje:'¿Qué número tiene '+(u.usuario||'esta persona')+'?',
+    valor:u.telf||'',
+    placeholder:'Ej: 351 555 1234',
+    permitirVacio:true
+  });
+  if(!pedido || !pedido.ok) return;
+  u.telf=String(pedido.valor||'').slice(0,30);
+  claves.forEach(k=>window.APPITel.edicion.guardar(k, u.telf));
+  u.telfEditado=!!u.telf;
+  try{ depuradosGuardarUsuarios(); }catch(e){}
+  try{ window.usuariosU=usuariosU; }catch(e){}
+  try{ aplicarFiltrosU(); }catch(e){}
+  if(window.showToast) showToast(u.telf?'Teléfono actualizado ✓':'Teléfono quitado de la ficha', 2200);
+}
 function parseFechaU(str){
   if(!str) return null;
   str=str.toString().trim();
@@ -17016,7 +17091,7 @@ function renderListU(){
     </div>
     <div class="tree-children" style="padding:8px;background:rgba(255,255,255,0.5);border-radius:12px;margin-bottom:8px">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:11px">
-        <div>📞 <b>${escU(u.telf||'—')}</b></div>
+        <div>📞 <b>${escU(u.telf||'—')}</b>${u.telfEditado?' <span title="Número corregido a mano" style="font-size:9px">✏️</span>':''}</div>
         <div>🏠 <b>${escU(u.domicilio||'—')}</b></div>
         <div>📍 <b>${escU(zonaCp)}</b></div>
         <div>📦 <b>${escU(u.producto||'—')}</b></div>
@@ -17034,6 +17109,7 @@ function renderListU(){
         <button type="button" class="action-btn call" data-u-action="call" data-u-index="${index}" data-appi-call-phone="${escU(window.APPITel?window.APPITel.normalizar(u.telf||''):'')}" data-appi-call-name="${escU(u.usuario||'Contacto')}" data-appi-call-label="1">📲 Llamar en teléfono</button>`:''}
         <button type="button" class="action-btn neighbors" data-u-action="neighbors" data-u-index="${index}">👥 Vecinos</button>
         <button type="button" class="action-btn mail" data-u-action="google" data-u-index="${index}">🧭 ¿Cómo llego?</button>
+        <button type="button" class="action-btn editar-tel" data-u-action="editartel" data-u-index="${index}">✏️ Teléfono</button>
         <button type="button" class="action-btn depurar" data-u-action="depurar" data-u-index="${index}">🧹 Depurar</button>
       </div>
     </div>`;
@@ -17074,6 +17150,8 @@ function renderListU(){
       }else if(action==='google'){
         const query=[u.domicilio,u.localidad].filter(Boolean).join(' ');
         window.open('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(query),'_blank','noopener');
+      }else if(action==='editartel'){
+        editarTelfDeU(u);
       }else if(action==='depurar'){
         if(depuradosEsUsuario(u)){
           if(window.showToast) showToast('Este contacto ya está depurado', 2000);
@@ -17627,7 +17705,7 @@ function initUsuarios(){
       const saved=JSON.parse(localStorage.getItem('usuarios_garantias')||'[]');
       try{ setTimeout(actualizarUsuariosMetaBar, 300); }catch(e){}
       if(saved.length>0){
-        usuariosU=depuradosAplicar(saved.map(u=>({...u, cumpleRaw:fechaDeCeldaU(u.cumpleRaw||u.cumple||''), fVence:u.fVence? new Date(u.fVence):null, estado:u.fVence? ( (new Date(u.fVence)-new Date())/(1000*60*60*24)<0?'vencida': ( (new Date(u.fVence)-new Date())/(1000*60*60*24)<=30?'porVencer':'vigente')):'vigente'})));
+        usuariosU=depuradosAplicar(aplicarTelfsEditadosU(saved.map(u=>({...u, cumpleRaw:fechaDeCeldaU(u.cumpleRaw||u.cumple||''), fVence:u.fVence? new Date(u.fVence):null, estado:u.fVence? ( (new Date(u.fVence)-new Date())/(1000*60*60*24)<0?'vencida': ( (new Date(u.fVence)-new Date())/(1000*60*60*24)<=30?'porVencer':'vigente')):'vigente'}))));
         window.usuariosU=usuariosU;
         mostrarDashboardU();
         try{ window.dispatchEvent(new Event('appi-usuarios-cambiaron')); }catch(e){}
@@ -19028,6 +19106,7 @@ function psaMapearGarantias(filas){
 }
 function psaAplicarGarantiasBase(parsed){
   try{
+    if(window.aplicarTelfsEditados) window.aplicarTelfsEditados(parsed);
     localStorage.setItem('usuarios_garantias', JSON.stringify(parsed));
     localStorage.setItem('lastUpdate_usuarios', Date.now().toString());
     localStorage.setItem('lastUpdate_garantias', Date.now().toString());

@@ -1,7 +1,10 @@
 const { test, expect } = require('@playwright/test');
 
 const USER_ID = '11111111-1111-4111-8111-111111111111';
+// Fecha LOCAL de hoy: la app arma "hoy" con el reloj del equipo y este
+// fixture se compara contra eso. Con UTC falla entre 21:00 y 24:00.
 const hoy = new Date().toISOString();
+const hoyDia = (() => { const d = new Date(); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0, 10); })();
 
 function tokenFor(sub) {
   const header = Buffer.from(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).toString('base64url');
@@ -17,8 +20,8 @@ const EQUIPO = {
   }]
 };
 const CONTACTOS = [
-  { id: 'c1', estado: 'seguimiento', nombre: 'Jorge Salas', telefono: '3515550002', telefono_normalizado: '3515550002', tipo: 'contacto', proximo_contacto: hoy.slice(0, 10), created_at: hoy, updated_at: hoy },
-  { id: 'c2', estado: 'presentacion', nombre: 'Lucía Vega', telefono: '3515550003', telefono_normalizado: '3515550003', tipo: 'encuestado', proximo_contacto: hoy.slice(0, 10), created_at: hoy, updated_at: hoy },
+  { id: 'c1', estado: 'seguimiento', nombre: 'Jorge Salas', telefono: '3515550002', telefono_normalizado: '3515550002', tipo: 'contacto', proximo_contacto: hoyDia, created_at: hoy, updated_at: hoy },
+  { id: 'c2', estado: 'presentacion', nombre: 'Lucía Vega', telefono: '3515550003', telefono_normalizado: '3515550003', tipo: 'encuestado', proximo_contacto: hoyDia, created_at: hoy, updated_at: hoy },
   { id: 'c3', estado: 'nuevo', nombre: 'Carla Muñoz', telefono: '3515550001', telefono_normalizado: '3515550001', tipo: 'contacto', created_at: hoy, updated_at: hoy }
 ];
 

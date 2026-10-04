@@ -117,7 +117,7 @@ test.describe('Campana de anuncios fija en header y toast sobre modals', () => {
     expect(Math.abs(diffBefore - diffAfter)).toBeLessThan(2);
   });
 
-  test('el toast de actualización se ubica por debajo de la versión y por encima de modals', async ({ page }) => {
+  test('el toast de actualización comparte el renglón con la versión sin taparla', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await loginConAviso(page);
 
@@ -126,23 +126,33 @@ test.describe('Campana de anuncios fija en header y toast sobre modals', () => {
     });
 
     const toast = page.locator('#toast');
+    const marca = page.locator('.home-brand-mark');
     await expect(toast).toBeVisible();
-    const brandBox = await page.locator('.home-brand-mark').boundingBox();
-    // El toast entra deslizándose (translateY -100px → 0 en 350 ms): esperar
-    // a que se asiente antes de medir, o en máquinas lentas se lo muestra a
-    // mitad de vuelo (y negativo, fuera de la pantalla).
-    await expect.poll(async () => (await toast.boundingBox()).y)
-      .toBeGreaterThanOrEqual(brandBox.y + brandBox.height);
+
+    // Desde v849/v851 es una píldora del renglón superior: la marca de la
+    // versión se corre a la derecha (body.toast-active) para no pisarse.
+    // Hay que esperar a que asiente esa animación antes de medir.
+    await expect.poll(async () => {
+      const t = await toast.boundingBox();
+      const b = await marca.boundingBox();
+      if (!t || !b) return false;
+      return t.x + t.width <= b.x || b.x + b.width <= t.x;
+    }, { timeout: 10000 }).toBe(true);
+
     const toastBox = await toast.boundingBox();
+    const brandBox = await marca.boundingBox();
 
-    // El toast no tapa el texto de versión APPI
-    expect(toastBox.y).toBeGreaterThanOrEqual(brandBox.y + brandBox.height);
+    // Comparten el renglón: el toast queda a la izquierda de la versión.
+    expect(Math.abs(toastBox.y - brandBox.y)).toBeLessThanOrEqual(4);
+    const sePisa = toastBox.x < brandBox.x + brandBox.width && brandBox.x < toastBox.x + toastBox.width;
+    expect(sePisa, 'el toast no debe tapar el texto de versión APPI').toBe(false);
 
-    // z-index es 100000 (superior a cualquier modal de z-index 9999)
+    // Es una píldora de cabecera, no un overlay: v849 bajó el z-index de
+    // 100000 a 9, así que ya no queda por encima de los modals (9999).
     const zIndex = await page.evaluate(() => {
       return parseInt(window.getComputedStyle(document.getElementById('toast')).zIndex, 10);
     });
-    expect(zIndex).toBeGreaterThanOrEqual(100000);
+    expect(zIndex).toBeLessThan(10000);
   });
 
   test('en escritorio la campanita también se alinea en la barra superior', async ({ page }) => {

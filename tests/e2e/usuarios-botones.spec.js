@@ -150,11 +150,13 @@ test('las herramientas viven arriba y Tarjetas abre su popup', async ({ page }) 
     tarjetas: { byKey: { 'tel:3515551001': [{ marca: 'visa', banco: 'galicia' }] } }
   });
 
-  // Ocho a la vista (Mapa se quitó en v332; Depurados se sumó en v350;
-  // Plantillas se sumó en v412; Cumpleaños se sumó en v543; Reasignados
-  // siempre visible se sumó en v814). Limpiar aparece sólo con un filtro.
+  // Siete a la vista: Tarjetas, Ordenar, Zonas, Reasignados, Mensajes,
+  // Depurados y Cumpleaños (Mapa se quitó en v332; Depurados se sumó en
+  // v350; Cumpleaños en v543; Reasignados siempre visible en v814; el
+  // botón Plantillas salió de la barra con la llegada de Mensajes).
+  // Limpiar aparece sólo con un filtro.
   const tools = page.locator('.u-tools button:visible');
-  await expect(tools).toHaveCount(8);
+  await expect(tools).toHaveCount(7);
   await expect(page.locator('#usuariosBtnLimpiar')).toBeHidden();
   await expect(page.locator('#usuariosBtnTarjetas')).toBeVisible();
   await expect(page.locator('#usuariosBtnZonas')).toBeVisible();

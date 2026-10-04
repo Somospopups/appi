@@ -46,8 +46,11 @@ test.describe('Avisos por Telegram', () => {
     await page.locator('#btnDistributorLogin').click();
     await expect(page.locator('#lockScreen')).toHaveClass(/hidden/);
 
-    // Entrada: engranaje ⚙️ → Avisos por Telegram.
+    // Entrada: engranaje ⚙️ → flecha ▾ (más opciones) → Avisos por Telegram.
+    // Telegram vive dentro de #toolsExtra, el bloque "más opciones" del menú,
+    // que arranca oculto hasta que se toca la flecha del encabezado.
     await page.locator('button.tools-btn').first().click();
+    await page.locator('#toolsArrowBtn').click();
     await expect(page.locator('#btnToolsTelegram')).toBeVisible();
     await expect(page.locator('#btnToolsTelegram')).toContainText('Avisos por Telegram');
     await page.locator('#btnToolsTelegram').click();
@@ -88,15 +91,25 @@ test.describe('Avisos por Telegram', () => {
     await expect(page.locator('#avisoTgOv')).toBeVisible();
     await expect(page.locator('#avisoTgOv')).toContainText('ABCD1234');
     expect(page.url()).toContain('127.0.0.1:4174');
-    // Fuera de Android: el botón abre t.me en otra ventana y APPI no navega.
+    // Fuera de Android el handler devuelve true y deja que el anchor abra
+    // t.me en otra pestaña (target="_blank"): APPI no navega y ya no pasa
+    // por window.open. La respuesta se mockea para no depender de la red.
     await page.evaluate((ua) => {
       Object.defineProperty(navigator, 'userAgent', { get: () => ua, configurable: true });
       delete window.__avisoTgNav;
       window.__tgOpen = [];
     }, uaOriginal);
+    await page.context().route('https://t.me/**', r => r.fulfill({
+      status: 200, contentType: 'text/html', body: '<html><body>Telegram</body></html>'
+    }));
+    const popupP = page.context().waitForEvent('page');
     await page.locator('#avisoTgOv').getByRole('link', { name: 'Abrir Telegram' }).first().click();
-    expect(await page.evaluate(() => window.__tgOpen))
-      .toEqual(['https://t.me/appi_avisos_bot?start=ABCD1234']);
+    const popup = await popupP;
+    await expect.poll(() => popup.url(), { timeout: 10000 })
+      .toContain('t.me/appi_avisos_bot?start=ABCD1234');
+    // Nada de window.open en desktop: la pestaña la abre el navegador.
+    expect(await page.evaluate(() => window.__tgOpen)).toEqual([]);
+    await popup.close();
     await expect(page.locator('#avisoTgOv')).toBeVisible();
     await expect(page.locator('#avisoTgOv')).toContainText('ABCD1234');
     expect(page.url()).toContain('127.0.0.1:4174');

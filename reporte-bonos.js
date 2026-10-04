@@ -99,9 +99,14 @@
     if (host) return host;
     host = document.createElement('div');
     host.id = 'bonosCard';
-    var grid = view.querySelector('#negGrid');
-    if (grid) grid.insertAdjacentElement('afterend', host);
-    else view.appendChild(host);
+    // Tras el header y antes de la grilla (diseño v810-v927: "parte superior
+    // de Mi negocio, con los botones debajo"). v915 lo bajó para ceder el
+    // lugar al organigrama de carrera; v928 borró ese organigrama a pedido
+    // del usuario y este movimiento quedó colgado, dejando el reporte por
+    // debajo de los botones y el KPI fuera de su lugar.
+    var header = view.querySelector('header');
+    if (header) header.insertAdjacentElement('afterend', host);
+    else view.insertBefore(host, view.firstChild);
     return host;
   }
 

@@ -57,7 +57,9 @@ test('la pantalla principal rechaza la planilla ajena antes de mezclar datos', (
 });
 
 test('el Histórico valida las Garantías contra la Línea del mes en carga y cierre', () => {
-  const js = fs.readFileSync('historico.js', 'utf8');
+  // autocrlf=true deja CRLF en el working copy de Windows y el repo guarda
+  // LF: se normaliza para que las regex de salto de línea no dependan del SO.
+  const js = fs.readFileSync('historico.js', 'utf8').replace(/\r\n/g, '\n');
   expect(js).toContain('function validarGarantiasDelTitular');
   // Definición + dos controles en handleFile + el respaldo en normalizePeriod.
   expect(js.match(/validarGarantiasDelTitular\(/g).length).toBeGreaterThanOrEqual(4);

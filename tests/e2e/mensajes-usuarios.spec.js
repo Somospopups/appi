@@ -277,9 +277,10 @@ test('la barra tiene Mensajes con el logo de WhatsApp', async ({ page }) => {
   await expect(page.locator('#usuariosBtnMensajes')).toContainText('Mensajes');
   await expect(page.locator('#usuariosBtnMensajes svg')).toBeVisible();
   await expect(page.locator('#usuariosBtnPlantillas')).toHaveCount(0);
-  // Base + Depurados + Dormidos + Mensajes (v413) + Cumpleaños (v543)
-  // + Reasignados siempre visible (v814).
-  await expect(page.locator('.u-tools button:visible')).toHaveCount(9);
+  // Tarjetas + Ordenar + Zonas + Reasignados + Mensajes (v413) + Depurados
+  // + Cumpleaños (v543) + Dormidos. Ocho: Plantillas salió de la barra y
+  // quedó afuera con Mensajes, así que el total bajó de 9 a 8.
+  await expect(page.locator('.u-tools button:visible')).toHaveCount(8);
   await expect(page.locator('#usuariosBtnDormidos')).toBeVisible();
 });
 

@@ -176,7 +176,7 @@ test.describe('Píldora de Lista de Precios sobre el dock', () => {
     await expect(sheet).not.toHaveClass(/open/);
   });
 
-  test('DESKTOP: en pantalla ancha se posiciona en esquina inferior sin dock', async ({ page }) => {
+  test('DESKTOP: en pantalla ancha queda centrada abajo, sin dock', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 800 });
     await entrar(page);
     await page.evaluate(() => {
@@ -194,7 +194,7 @@ test.describe('Píldora de Lista de Precios sobre el dock', () => {
       const fRect = f.getBoundingClientRect();
       return {
         fBottom: fRect.bottom,
-        fRight: fRect.right,
+        fCenter: fRect.left + fRect.width / 2,
         winWidth: window.innerWidth,
         winHeight: window.innerHeight,
         dockDisplay: window.getComputedStyle(dock).display
@@ -203,7 +203,9 @@ test.describe('Píldora de Lista de Precios sobre el dock', () => {
 
     expect(metrics.dockDisplay).toBe('none');
     expect(metrics.winHeight - metrics.fBottom).toBeLessThanOrEqual(36);
-    expect(metrics.winWidth - metrics.fRight).toBeLessThanOrEqual(40);
+    // v891 centró la píldora en pantalla ancha (antes, esquina inferior
+    // derecha): tiene que quedar sobre el eje del viewport.
+    expect(Math.abs(metrics.winWidth / 2 - metrics.fCenter)).toBeLessThanOrEqual(4);
   });
 });
 

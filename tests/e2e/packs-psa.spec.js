@@ -97,16 +97,18 @@ test.describe('Packs PSA en Lista de Precios', () => {
     // Comprobar que la píldora FAB aparece con 1 ítem y $1.376.000
     const fab = page.locator('#lpFab');
     await expect(fab).toBeVisible();
-    await expect(fab.locator('i')).toHaveText('1');
-    await expect(fab.locator('span')).toHaveText('$1.376.000');
+    // El FAB dibuja badge + etiqueta + total (ya no usa <i>).
+    await expect(fab.locator('.lp-fab-badge')).toHaveText('1');
+    await expect(fab.locator('.lp-fab-tot')).toHaveText('$1.376.000');
 
     // Abrir el sheet del presupuesto haciendo click en el FAB
     await fab.click();
     const sheet = page.locator('#lpSheet');
     await expect(sheet).toHaveClass(/open/);
 
-    // Verificar la línea en el presupuesto
-    const sheetLine = page.locator('.lp-line[data-sku="PACK-BASICO"]');
+    // Verificar la línea en el presupuesto (el atributo data-sku vive en el
+    // bloque contenedor .lp-line-block; la línea es su primer hijo).
+    const sheetLine = page.locator('.lp-line-block[data-sku="PACK-BASICO"]');
     await expect(sheetLine).toBeVisible();
     await expect(sheetLine.locator('b')).toHaveText('PACK BÁSICO');
     await expect(sheetLine.locator('span')).toHaveText('$1.376.000');

@@ -79,7 +79,10 @@ test('Mi Gestión programa el próximo contacto y conserva metadata e historial 
 });
 
 test('reconciliación, aviso diario y copias embebidas están disponibles y sincronizadas', () => {
-  const html=fs.readFileSync('index.html','utf8'),js=fs.readFileSync('historico.js','utf8').trimEnd(),css=fs.readFileSync('historico.css','utf8').trimEnd();
+  // autocrlf=true deja CRLF en Windows y el repo guarda LF: se normaliza
+  // (si no, el match del tag embebido falla y la copia no se puede comparar).
+  const norm = s => s.replace(/\r\n/g, '\n');
+  const html=norm(fs.readFileSync('index.html','utf8')),js=norm(fs.readFileSync('historico.js','utf8')).trimEnd(),css=norm(fs.readFileSync('historico.css','utf8')).trimEnd();
   expect(js).toContain('async function reconcileActionPlans()');
   expect(js).toContain('function notifyActionDueOnce()');
   expect(js).toContain("pb_drop:{");

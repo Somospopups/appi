@@ -129,8 +129,12 @@ function revisarTramas(tramas, titulo) {
   // La entrada page-enter anima el header y el contenido hasta ~400 ms
   // (titleSlideDown .35s + contentFadeUp con translateY(20px); efectos
   // diseñados, no pantallazos). El salto de layout que el test persigue se
-  // mide una vez asentada esa entrada.
-  const estables = visibles.filter(t => t.t >= 600);
+  // mide una vez asentada esa entrada. El umbral se ancla a cuando el panel
+  // se hizo visible (visibles[0]) y no a t0: el click en la tarjeta puede
+  // caer más tarde y entonces la animación de entrada caería dentro de la
+  // ventana "estable" y se la leería como un salto de layout.
+  const desde = visibles[0].t + 600;
+  const estables = visibles.filter(t => t.t >= desde);
   if (!estables.length) throw new Error(`${titulo}: no hubo tramas visibles después de la animación de entrada`);
   const y0 = estables[0].f.yPrimero;
   for (const t of visibles) {

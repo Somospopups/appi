@@ -1,7 +1,8 @@
 const { test, expect } = require('@playwright/test');
 
 // v818 — Recordatorios del teléfono: avisos locales programados
-// (cumpleaños, acciones del día, garantías por vencer, reasignados y cierre)
+// (cumpleaños, acciones del día, garantías por vencer, reasignados, cierre
+// y movimiento de PB en equipo — pb_mov, el sexto)
 // sin "conectar" nada. En los tests el SW está bloqueado (config), así que
 // se prueba la vía in-proceso (setTimeout + new Notification) y el catch-up.
 
@@ -41,7 +42,9 @@ test('programa los recordatorios a futuro y los suelta a la hora exacta', async 
   });
   const plan = await page.evaluate(() => JSON.parse(localStorage.getItem('appi_rec_plan_v1') || 'null'));
   expect(plan).not.toBeNull();
-  expect(Object.keys(plan.items).length).toBe(5);
+  // Seis en el plan: los cinco de siempre + pb_mov (movimiento de PB en
+  // equipo), que a las 07:06 todavía no salió porque su hora es 12:00.
+  expect(Object.keys(plan.items).length).toBe(6);
   // A las 07:00 aún no salió ninguno
   expect(await page.evaluate(() => window.__notifs.length)).toBe(0);
 
@@ -64,16 +67,16 @@ test('si abrió la app tarde, emite el catch-up del día una sola vez', async ({
   await page.clock.install({ time: fake });
   await page.addInitScript(seedScript);
   await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
-  await page.waitForFunction(() => window.__notifs.length >= 5, null, { timeout: 20000 });
+  await page.waitForFunction(() => window.__notifs.length >= 6, null, { timeout: 20000 });
   // Vuelve a repasar (navegación dentro de la app): no duplica
   await page.evaluate(() => window.APPIRecordatorios.planear());
   await page.waitForTimeout(200);
-  expect(await page.evaluate(() => window.__notifs.length)).toBe(5);
+  expect(await page.evaluate(() => window.__notifs.length)).toBe(6);
   const bodies = (await page.evaluate(() => window.__notifs.map((n) => String(n.body)))).map((b) => b.toLowerCase());
   expect(bodies.filter((b) => b.includes('cumple años marta')).length).toBe(1);
 });
 
-test('la pantalla Notificaciones muestra los 5 avisos y guarda cambios', async ({ page, context }) => {
+test('la pantalla Notificaciones muestra los 6 avisos y guarda cambios', async ({ page, context }) => {
   await context.grantPermissions(['notifications'], { origin: ORIGIN });
   await page.addInitScript(seedScript);
   await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
@@ -89,8 +92,8 @@ test('la pantalla Notificaciones muestra los 5 avisos y guarda cambios', async (
   await page.waitForTimeout(2400);
 
   await page.evaluate(() => window.showView('view-recordatorios'));
-  await expect(page.locator('#recList .rec-hab')).toHaveCount(5, { timeout: 10000 });
-  await expect(page.locator('#recList .rec-hora')).toHaveCount(5);
+  await expect(page.locator('#recList .rec-hab')).toHaveCount(6, { timeout: 10000 });
+  await expect(page.locator('#recList .rec-hora')).toHaveCount(6);
 
   // Toggle de reasignados a OFF
   await page.evaluate(() => document.querySelector('#recList .rec-hab[data-key="reasig"]').click());

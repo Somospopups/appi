@@ -73,15 +73,18 @@ test('la botella calcula conciencia y se comparte', async ({ page }) => {
   // El acceso a la botella abre su solapa directo, sin depender de la última
   // solapa que quedó elegida en el comparador.
   await expect(page.locator('#cmpTabBot')).toHaveClass(/on/);
+  // El comparador arranca en modo "bidón" desde que se agregó ese tipo;
+  // este test mide la BOTELLA, así que se elige antes de cargar números.
+  await page.locator('#btnTipoBotella').click();
   await page.locator('#botPorDia').fill('3');
   await page.locator('#botPrecio').fill('1000');
-  await expect(page.locator('#botResult')).toContainText('90.000');      // por mes
-  await expect(page.locator('#botResult')).toContainText('3.240.000');   // en 3 años
+  await expect(page.locator('#botResult')).toContainText('90.930');       // por mes (4,33 semanas)
+  await expect(page.locator('#botResult')).toContainText('3.276.000');   // en 3 años
   await expect(page.locator('#botEco')).toContainText('plástico');
   await expect(page.locator('#botEco')).toContainText('kg');
-  await expect(page.locator('#botEco')).toContainText('m²');
+  await expect(page.locator('#botEco')).toContainText('árboles');
   await expect(page.locator('#botEco')).toContainText('450 años');
-  await expect(page.locator('#botEco')).toContainText('petróleo');
+  await expect(page.locator('#botEco')).toContainText('botellas');
   const kg3 = await page.locator('#botEco').innerText();
   expect(kg3).toMatch(/48[.,]2/); // 3 botellas × 365 × 44 g
   await page.locator('#botPorDia').fill('2');

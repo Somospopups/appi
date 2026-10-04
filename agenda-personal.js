@@ -724,6 +724,42 @@
     if (contactoId && window.APPIGestion && window.APPIGestion.abrirContacto) window.APPIGestion.abrirContacto(contactoId);
   }
 
+  /* El número también se corrige acá (v633). En la nube la fila se
+     identifica por el teléfono, así que el cambio se manda como dos
+     movimientos: se va el viejo y entra el nuevo con sus datos. */
+  async function editarTelefono(id){
+    cargar();
+    if (!window.APPITel || !window.APPITel.edicion) return;
+    var c = mios.find(function(x){ return x.id === id; });
+    if (!c) return;
+    var pedido = await window.APPITel.edicion.pedir({
+      titulo: 'Editar teléfono',
+      mensaje: '¿Qué número tiene ' + (c.nombre || 'este contacto') + '?',
+      valor: c.telefono
+    });
+    if (!pedido || !pedido.ok) return;
+    var nuevo = digitos(pedido.valor);
+    if (nuevo === c.tel_norm && String(pedido.valor) === String(c.telefono)) return;
+    if (!telValido(pedido.valor)){
+      toast('Ese teléfono no sirve: necesita entre 8 y 15 números', 3200);
+      return;
+    }
+    if (mios.some(function(x){ return x.id !== c.id && x.tel_norm === nuevo; })){
+      toast('Ya tenés a ese número en tu agenda', 3200);
+      return;
+    }
+    var viejo = c.tel_norm;
+    c.telefono = String(pedido.valor).slice(0, 30);
+    c.tel_norm = nuevo;
+    guardar();
+    // La cola se resuelve por teléfono: al reemplazar el "up" pendiente del
+    // número viejo por un "del", no queda en la nube un contacto duplicado.
+    encolar({ a: 'del', t: viejo });
+    encolar({ a: 'up', t: nuevo, p: filaDe(c) });
+    if (navigator.onLine) sincronizar(); else repintarSiVisible();
+    toast('Teléfono actualizado');
+  }
+
   async function quitar(id){
     cargar();
     var c = mios.find(function(x){ return x.id === id; });
@@ -927,6 +963,7 @@
           '<button type="button" class="ap-link wa" data-ap-wa="' + esc(c.id) + '">WhatsApp</button>' +
           '<a href="tel:' + esc(telLlamar) + '" class="ap-link call" data-appi-call-phone="' + esc(telLlamar) + '" data-appi-call-name="' + esc(c.nombre) + '">Llamar</a>' +
           btnAppi +
+          '<button type="button" class="ap-link editar" data-ap-editar="' + esc(c.id) + '">Editar tel</button>' +
           '<button type="button" class="ap-link borrar" data-ap-quitar="' + esc(c.id) + '">Quitar</button>' +
         '</div>')
       : '';
@@ -1253,6 +1290,14 @@
       };
     });
 
+    // Editar el teléfono
+    document.querySelectorAll('[data-ap-editar]').forEach(function(b){
+      b.onclick = function(e){
+        e.stopPropagation();
+        editarTelefono(b.getAttribute('data-ap-editar'));
+      };
+    });
+
     // Quitar individual
     document.querySelectorAll('[data-ap-quitar]').forEach(function(b){
       b.onclick = function(e){
@@ -1297,6 +1342,7 @@
     pasarSeleccionados: pasarSeleccionados,
     quitar: quitar,
     quitarSeleccionados: quitarSeleccionados,
+    editarTelefono: editarTelefono,
     abrirWa: abrirWa,
     seleccionados: function(){ return Array.from(seleccionados); },
     alternarSeleccion: alternarSeleccion,

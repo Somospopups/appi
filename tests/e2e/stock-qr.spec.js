@@ -446,12 +446,13 @@ test('lista de precios: plan canje figura como línea propia con su precio', asy
   const items = page.locator('#lpList .lp-item');
   await expect(items.first()).toBeVisible({ timeout: 15000 });
   const total = await items.count();
-  // 312 productos + 21 sublíneas canje del PDF.
-  expect(total).toBe(333);
+  // 356 productos + 35 sublíneas canje del PDF. La lista creció con la
+  // actualización de "precios: lista tienda PSA".
+  expect(total).toBe(391);
   await page.locator('#lpSearch').fill('canje');
   const canjes = page.locator('#lpList .lp-item');
   await expect(canjes.first()).toContainText('PLAN CANJE');
-  expect(await canjes.count()).toBe(21);
+  expect(await canjes.count()).toBe(35);
   // La sublínea del Senior 4 Bianco cotiza al precio de canje.
   const senior4 = canjes.filter({ hasText: 'PSA SENIOR 4 BIANCO + KIT POSV. (PLAN CANJE)' }).first();
   await expect(senior4).toContainText('$855.000');

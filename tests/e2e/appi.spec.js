@@ -53,7 +53,7 @@ test('arranca, navega e importa Garantías una sola vez', async ({ page }) => {
   expect(sidebarLabels.map(text=>text.trim())).toEqual(['Mi mes','Mi negocio','Mis herramientas']);
   const sidebarButtons=await page.locator('#deskSidebar .ds-btn').allTextContents();
   expect(sidebarButtons.map(text=>text.replace(/^[^\p{L}]+/u,'').trim())).toEqual([
-    'Home','Tu mes','Las 7 P','Presupuesto','Rueda de la Vida','Rueda del Negocio','Mi Equipo','Histórico','Usuarios','Panel de Contactos 0','Mi stock','Los 8 Pasos','Escalera de Sueños','Coach de Demo','Comparativas','Lista de precios','Reuniones','Banco de Imágenes','Simulador','Grabadora','Notas Keep'
+    'Home','Tu mes','Las 7 P','Presupuesto','Rueda de la Vida','Rueda del Negocio','Mi Equipo','Histórico','Usuarios','Campus Appi','Mi Margarita','Panel de Contactos 0','Mi stock','Los 8 Pasos','Escalera de Sueños','Coach de Demo','Comparativas','Canillas y adaptadores','Lista de precios','Reuniones','Banco de Imágenes','Simulador','Grabadora','Notas Keep'
   ]);
 
   for (const [expression, expectedView] of [
@@ -204,7 +204,9 @@ test('las notas Keep se muestran sujetas con un pin', async ({ page }) => {
 test('Contactos distingue pendientes de cerrados', async ({ page }) => {
   await abrirAppActivada(page);
   const result = await page.evaluate(() => {
-    const ayer = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+    // Fecha LOCAL: la app compara contra el día del equipo, y entre 21:00 y
+    // 24:00 el día UTC ya es el siguiente (si no, este test falla a esa hora).
+    const ayer = (() => { const d = new Date(Date.now() - 86400000); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0, 10); })();
     const contactos = [
       { id: 1, nombre: 'Terminado', estado: 'Contactado', fecha: ayer },
       { id: 2, nombre: 'Pendiente', estado: 'Seguimiento', fecha: ayer },

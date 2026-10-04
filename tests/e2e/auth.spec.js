@@ -284,7 +284,9 @@ test('la contraseña temporal obliga a crear una contraseña personal', async ({
 
 test('avisa al distribuidor una semana antes del vencimiento', async ({ page }) => {
   const backend=await mockSupabase(page);
-  backend.profiles[USER_A].membresia_vence=new Date(Date.now()+6*86400000).toISOString();
+  // Seis días de ACÁ (no de UTC): entre 21:00 y 24:00 el día UTC del
+  // vencimiento ya es el siguiente y la app avisaría "7 días".
+  backend.profiles[USER_A].membresia_vence=(()=>{const d=new Date();d.setDate(d.getDate()+6);const p=n=>String(n).padStart(2,'0');return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T12:00:00.000Z`})();
   await page.goto('/index.html',{waitUntil:'networkidle'});
   await login(page,'02-9802014');
   await expect(page.locator('#appiDialogTitle')).toHaveText('Membresía por vencer');

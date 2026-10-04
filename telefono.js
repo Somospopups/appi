@@ -313,6 +313,133 @@
     return true;
   }
 
+  /* --------------------------------------------------------------------
+     Edición de teléfonos (v633)
+     --------------------------------------------------------------------
+     Tres pantallas dejan cambiar el número de una persona: el Panel de
+     Contactos, la Agenda Personal y Usuarios/Garantías. Las tres piden el
+     número con el mismo diálogo y con la misma regla: entre 8 y 15 dígitos,
+     con característica y sin el 0 ni el 15 (la misma del alta, así un
+     número cargado a mano y uno editado se leen igual).
+
+     En Usuarios/Garantías el número viene de la planilla de PSA y vuelve a
+     bajarse en cada sincronización. La corrección se guarda aparte, por
+     cuenta, y se vuelve a aplicar encima cada vez que se carga la lista:
+     la planilla puede refrescarse sin perder lo que se arregló.  */
+
+  function digitosEditables(valor){
+    return String(valor == null ? '' : valor).replace(/\D/g, '').slice(0, 15);
+  }
+  function telefonoEditable(valor, permitirVacio){
+    var texto = String(valor == null ? '' : valor).trim();
+    if (permitirVacio && !texto) return true;
+    var d = digitosEditables(texto);
+    return d.length >= 8 && d.length <= 15;
+  }
+  function claveEditados(){
+    var uid = (window.APPIAuth && window.APPIAuth.userId) ? window.APPIAuth.userId() : 'local';
+    return 'appi_telf_editados_v1_' + uid;
+  }
+  function leerEditados(){
+    try{
+      var crudo = JSON.parse(localStorage.getItem(claveEditados()) || '{}');
+      return (crudo && typeof crudo === 'object' && !Array.isArray(crudo)) ? crudo : {};
+    }catch(e){ return {}; }
+  }
+  function guardarEditados(mapa){
+    try{ localStorage.setItem(claveEditados(), JSON.stringify(mapa)); }catch(e){}
+  }
+
+  /* Pide un número con la ventana común de APPI y devuelve {ok, valor}.
+     ok=false sólo si la persona canceló: un número mal escrito no cierra
+     la ventana, se avisa y se vuelve a pedir con lo que había escrito. */
+  function pedir(opciones){
+    var op = opciones || {};
+    var permitirVacio = op.permitirVacio === true;
+    if (!window.APPIDialog) return Promise.resolve({ ok: false, valor: '' });
+    function pedirUna(anterior){
+      return window.APPIDialog.prompt(op.mensaje || '¿Qué número cargamos?', anterior, {
+        title: op.titulo || 'Editar teléfono',
+        icon: '📱',
+        inputType: 'tel',
+        placeholder: op.placeholder || 'Ej: 351 555 1234',
+        okText: op.okText || 'Guardar'
+      }).then(function(valor){
+        if (valor === null) return { ok: false, valor: '' };
+        var texto = String(valor == null ? '' : valor).trim().slice(0, 30);
+        if (telefonoEditable(texto, permitirVacio)) return { ok: true, valor: texto };
+        return window.APPIDialog.alert('El teléfono necesita entre 8 y 15 números, con característica y sin el 0 ni el 15.', {
+          title: 'Teléfono no válido', icon: '!'
+        }).then(function(){ return pedirUna(texto); });
+      });
+    }
+    return pedirUna(String(op.valor == null ? '' : op.valor));
+  }
+
+  /* La base rechaza el número cuando otro contacto de la misma cuenta ya lo
+     usa (índice único) y esa respuesta viene en jerga de Postgres: acá se
+     traduce a la frase que entiende la persona. */
+  function esRepetido(error){
+    if (!error) return false;
+    if (error.code === '23505' || error.code === '23503') return true;
+    return /duplicate key|ya ten[eé]s|uniq|23505/i.test(String(error.message || ''));
+  }
+  function mensajeDeError(error){
+    if (esRepetido(error)) return 'Ya tenés a alguien con ese teléfono.';
+    return String((error && error.message) || error || 'No pudimos guardar el teléfono.');
+  }
+
+  var edicion = {
+    valido: telefonoEditable,
+    digitos: digitosEditables,
+    pedir: pedir,
+    esRepetido: esRepetido,
+    mensajeDeError: mensajeDeError,
+    clave: claveEditados,
+    leer: leerEditados,
+    /* Corrección guardada, o null si ese contacto nunca se editó. */
+    obtener: function(clave){
+      var mapa = leerEditados();
+      return Object.prototype.hasOwnProperty.call(mapa, clave) ? mapa[clave] : null;
+    },
+    /* Guarda la corrección ('' deja el número vacío) o la borra (null). */
+    guardar: function(clave, valor){
+      if (!clave) return;
+      var mapa = leerEditados();
+      if (valor === null || valor === undefined) delete mapa[clave];
+      else mapa[clave] = String(valor).slice(0, 30);
+      guardarEditados(mapa);
+    },
+    /* Devuelve la misma lista con la corrección aplicada encima. Marca
+       telfEditado para que la pantalla pueda mostrar que ese número es
+       una corrección y no el de la planilla.
+
+       claveDe puede devolver una clave o una lista de claves candidatas en
+       orden de prioridad (por ejemplo: nombre + domicilio primero, serie
+       del equipo como respaldo). Gana la primera que tenga corrección:
+       así, si la planilla mañana trae escrito distinto el nombre, la
+       corrección sigue encontrando a la persona por la serie. */
+    aplicar: function(filas, claveDe){
+      if (!Array.isArray(filas) || !filas.length || !claveDe) return filas;
+      var mapa = leerEditados();
+      for (var i = 0; i < filas.length; i++){
+        var fila = filas[i];
+        if (!fila) continue;
+        var candidatas = claveDe(fila);
+        if (!candidatas) continue;
+        if (!Array.isArray(candidatas)) candidatas = [candidatas];
+        for (var k = 0; k < candidatas.length; k++){
+          var clave = candidatas[k];
+          if (!clave || !Object.prototype.hasOwnProperty.call(mapa, clave)) continue;
+          fila.telf = mapa[clave];
+          fila.telfEditado = true;
+          break;
+        }
+      }
+      return filas;
+    }
+  };
+
   window.APPITel = {
     normalizar: normalizar,
     esValido:   esValido,
@@ -321,6 +448,7 @@
     link:       link,
     abrir:      abrir,
     avisarInvalido: avisarInvalido,
+    edicion:    edicion,
     cuidado: {
       get TOPE(){ return topeCuidado(); },
       PAUSA_MS: PAUSA_MS,

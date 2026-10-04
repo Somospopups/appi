@@ -56,10 +56,13 @@ test('tarjeta privada: ganancia real con la columna del perfil (RI · DC-CE-LE)'
   await expect(gan).toContainText('40%');
   await expect(gan).toContainText('RI/Mono · DC/CE/LE');
   await expect(gan).toContainText('Lista PSA 9-SEP-2026');
-  // Línea de saldo PSA (datos de la cuenta en tiempo real).
-  await expect(gan).toContainText('Saldo en tu cuenta PSA: $2.728');
-  await expect(gan).toContainText('última devolución 01/08/2026');
-  await expect(gan).toContainText('pedís del 1° al 5');
+  // Línea de saldo PSA (datos de la cuenta en tiempo real). La copia se
+  // reescribió: ahora dice "Tu saldo actual registrado en PSA" y acorta la
+  // devolución a "dev. fecha" (el recordatorio del 1° al 5 vive en la
+  // tarjeta de devolución, que sólo aparece cuando se cobra con tarjeta).
+  await expect(gan).toContainText('Tu saldo actual registrado en PSA: $2.728');
+  await expect(gan).toContainText('dev. 01/08/2026');
+  await expect(gan).toContainText('EN MANO (100% de tu ganancia)');
   // El PDF del cliente sigue siendo el mismo (botón Cotizar intacto).
   await expect(page.locator('#lpSheetPdf')).toBeVisible();
 });
@@ -83,24 +86,21 @@ test('ítem sin lista: estimación 30% marcada y columna por defecto', async ({ 
   await expect(gan).toContainText('RI/Mono · DC/CE/LE');
 });
 
-test('botón WhatsApp: abre wa.me al número del distribuidor con el mensaje', async ({ page }) => {
+test('la ganancia no se manda a WhatsApp: el botón se quitó (f2d4931, v890)', async ({ page }) => {
   await abrirSheetCon(page, { '611010580': 2, '611030420': 1 }, PERFIL);
   // 2× Senior (628.001) + 1× Vero (245.169) → 873.170 ≈ 40%.
   const gan = page.locator('#lpSheetGanancia');
   await expect(gan).toContainText('$873.170');
+  // El botón "📲 Enviarme a WhatsApp" se eliminó a propósito: la ganancia
+  // es privada y no sale de la pantalla. Si algún día vuelve, que vuelva
+  // con test — acá queda el piso que evita que reaparezca sin cubrir.
+  await expect(gan.locator('[data-wa]')).toHaveCount(0);
   await page.evaluate(() => {
     window.__waUrl = null;
     window.open = (u) => { window.__waUrl = u; return null; };
   });
-  await gan.locator('[data-wa]').click();
-  const url = await page.evaluate(() => window.__waUrl);
-  expect(url).toBeTruthy();
-  expect(url).toContain('wa.me/5493513102865?text=');
-  const texto = decodeURIComponent(url.split('text=')[1]);
-  expect(texto).toContain('Tu ganancia');
-  expect(texto).toContain('873.170');
-  expect(texto).toContain('2×');
-  expect(texto).toContain('RI/Mono · DC/CE/LE');
+  await gan.click({ position: { x: 12, y: 12 } });
+  expect(await page.evaluate(() => window.__waUrl)).toBeNull();
 });
 
 test('sync de perfil: perfil viejo → se refresca solo con action "perfil"', async ({ page }) => {
@@ -134,5 +134,5 @@ test('sync de perfil: perfil viejo → se refresca solo con action "perfil"', as
   }, null, { timeout: 15000 });
   expect(pidioPerfil).toBe(true);
   const gan = page.locator('#lpSheetGanancia');
-  await expect(gan).toContainText('Saldo en tu cuenta PSA: $10.000', { timeout: 10000 });
+  await expect(gan).toContainText('Tu saldo actual registrado en PSA: $10.000', { timeout: 10000 });
 });

@@ -4,6 +4,16 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v633 · El teléfono de una persona se puede corregir
+
+- **Panel de Contactos (Mi Gestión)**: el número pasó de ser texto de solo lectura a un campo editable dentro de la ficha de detalle. Se guarda con el mismo botón "Guardar cambios" de siempre (y con la misma cola si no hay internet) y viaja con su versión normalizada de dígitos. Si el contacto cambia, se registra en la línea de tiempo.
+- **Usuarios / Garantías**: botón **✏️ Teléfono** en la ficha expandida. La planilla de PSA se vuelve a bajar en cada sincronización, así que la corrección se guarda aparte, por cuenta (`appi_telf_editados_v1_<uid>`), se marca con ✏️ en la ficha y se vuelve a aplicar encima en cada carga: aunque la planilla refresque con otro número, la corrección manda. Queda guardada con **dos claves** —nombre + domicilio y, de respaldo, la serie del equipo— así que sobrevive aunque la planilla reescriba el nombre o la dirección; y como la clave entra en la lista de sincronización, viaja con la cuenta a otro equipo y a un "borrar datos" del navegador. Dejarlo vacío también es un cambio válido (hay fichas con un número que ya no sirve).
+- **Agenda Personal**: **Editar tel** en la fila abierta. Como en la nube la fila se identifica por el teléfono, el cambio se manda como dos movimientos —borrar el viejo y cargar el nuevo— que conviven en la cola sin pisarse.
+- Regla única en **`APPITel.edicion`** (`telefono.js`): el mismo diálogo en las tres pantallas, entre 8 y 15 dígitos con característica y sin el 0 ni el 15 (la misma regla del alta), y la respuesta `23505` de Postgres traducida a **"Ya tenés a alguien con ese teléfono"**. El índice único `(user_id, telefono_normalizado)` sigue protegiendo la tabla y la política `appi_gestion_update_own` ya permitía el UPDATE: **no hizo falta migración SQL**.
+- Cubierto por `editar-telefono.spec.js` (guardado normalizado, número corto rechazado, número repetido sin jerga de base, corrección que sobrevive a una bajada nueva de la planilla y a que la planilla cambie el nombre, agenda que sube baja + alta, y una caché sucia sin teléfono que no bloquea guardar las notas).
+- Ajustados tres contadores viejos de la barra de Usuarios/Garantías (`usuarios-botones`, `reactivacion` y `mensajes-usuarios`): pedían 8/8/9 botones y la barra quedó en 7/7/8 desde que salió el botón Plantillas. **La suite vuelve a quedar verde de punta a punta.**
+- Versión: **v633 · Segura** · Cache `appi-v633-telefono-editable`.
+
 ## v632 · La línea "sin cambios" ya no tapa los movimientos del día
 
 - Si la línea de PSA de un día se trae **sin cambios** (por ejemplo PSA va atrasado y todavía no subió el Excel), los movimientos de PB que el teléfono sí detectó quedaban tapados y el día mostraba 0.0 PB con "Ingresaste este día · sin cambios de PB". Ahora la línea manda **solo cuando tiene cambios reales**; si el registro del día está vacío, los movimientos detectados completan ese día (no se suman, así que no hay doble conteo) y conservan el acumulado de la línea.
