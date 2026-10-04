@@ -134,28 +134,70 @@ test('los pétalos y el nombre del centro se pueden editar sin diálogos nativos
   await expect(page.locator('.mg-center')).toContainText('Sofía');
 });
 
-test('el pétalo vacío abre la hoja y "Elegir del teléfono" trae los contactos al pétalo', async ({ page }) => {
+test('el pétalo abre directo la agenda del teléfono y lo elegido queda guardado', async ({ page }) => {
   await page.addInitScript(() => {
+    window.__mgPickerIntentos = 0;
     Object.defineProperty(navigator, 'contacts', {
       configurable: true,
-      value: { getProperties: async () => ['name', 'tel'], select: async () => [{ name: ['Lucía Contacto'], tel: ['3515557788'] }] }
+      value: {
+        getProperties: async () => ['name', 'tel'],
+        select: async () => { window.__mgPickerIntentos++; return [{ name: ['Lucía Contacto'], tel: ['3515557788'] }]; }
+      }
     });
   });
   await abrirMargarita(page);
 
-  // El pétalo abre la hoja (nunca dispara el picker del sistema solo); el
-  // Contact Picker vive dentro de la hoja como una opción más.
-  await page.locator('[data-mg-group="amigos"] .mg-petal-content').click();
-  await expect(page.locator('#mgSheet')).toContainText('Elegí personas para este pétalo');
-  await expect(page.locator('#mgPhone')).toBeVisible();
-
-  await page.locator('#mgPhone').click();
-  await expect(page.locator('#mgCandidateList')).toContainText('Lucía Contacto');
-  await page.locator('#mgSavePick').click();
+  // Un toque en el pétalo y se abre la agenda del teléfono: no hay hoja
+  // intermedia ni pasos de más.
+  await page.locator('[data-mg-group="amigos"] .mg-petal-content b').click();
   await expect(page.locator('[data-mg-group="amigos"]')).toContainText('1 persona');
+
+  const trasElegir = await page.evaluate(() => ({
+    intentos: window.__mgPickerIntentos,
+    hojaAbierta: (() => { const m = document.getElementById('mgModal'); return m ? m.classList.contains('open') : false; })()
+  }));
+  expect(trasElegir.intentos).toBe(1);
+  expect(trasElegir.hojaAbierta).toBe(false);
 
   const guardado = await page.evaluate(() => window.APPIMargarita.cargar().contactos.amigos);
   expect(guardado).toEqual(expect.arrayContaining([expect.objectContaining({ nombre: 'Lucía Contacto', telefono: '3515557788' })]));
+
+  // El botón "⋯" del pétalo es la puerta a la hoja, para administrar el grupo.
+  await page.locator('[data-mg-group="amigos"] .mg-petal-more').click();
+  await expect(page.locator('#mgSheet')).toContainText('Elegí personas para este pétalo');
+  await expect(page.locator('#mgPhone')).toBeVisible();
+  await expect(page.locator('#mgCandidateList')).toContainText('Lucía Contacto');
+  await page.locator('#mgSavePick').click();
+  await expect(page.locator('[data-mg-group="amigos"]')).toContainText('1 persona');
+});
+
+test('si cancela la agenda no pasa nada: ni hoja, ni carteles, ni cambios', async ({ page }) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'contacts', {
+      configurable: true,
+      value: {
+        getProperties: async () => ['name', 'tel'],
+        select: async () => { const err = new Error('abortado'); err.name = 'AbortError'; throw err; }
+      }
+    });
+  });
+  await abrirMargarita(page);
+
+  await page.locator('[data-mg-group="amigos"] .mg-petal-content b').click();
+
+  const estado = await page.evaluate(() => {
+    const modal = document.getElementById('mgModal');
+    const overlay = document.querySelector('.appi-dialog-overlay');
+    return {
+      hojaAbierta: modal ? modal.classList.contains('open') : false,
+      modalVisible: !!overlay && !overlay.hasAttribute('hidden'),
+      amigos: (window.APPIMargarita.cargar().contactos.amigos || []).length
+    };
+  });
+  expect(estado.hojaAbierta).toBe(false);
+  expect(estado.modalVisible).toBe(false);
+  expect(estado.amigos).toBe(0);
+  await expect(page.locator('[data-mg-group="amigos"]')).toContainText('0 personas');
 });
 
 test('"Subir agenda" mete una agenda .vcf entera en el pétalo', async ({ page }) => {
@@ -206,10 +248,10 @@ test('si el Contact Picker falla, la hoja sigue viva sin carteles ni guías de c
   });
   await abrirMargarita(page);
 
-  // El botón del teléfono está dentro de la hoja; al fallar (Chromium de
-  // fabricante, contexto no top-level), la hoja se queda ahí: ni alert nativo,
-  // ni modal de APPI, ni texto que pida permisos o configurar el dispositivo.
-  await page.locator('[data-mg-group="amigos"] .mg-petal-content').click();
+  // El pétalo dispara el picker y, como falla (Chromium de fabricante, contexto
+  // no top-level), se cae a la hoja: ni alert nativo, ni modal de APPI, ni
+  // texto que pida permisos o configurar el dispositivo.
+  await page.locator('[data-mg-group="amigos"] .mg-petal-content b').click();
   await expect(page.locator('#mgSheet')).toContainText('Elegí personas para este pétalo');
   await expect(page.locator('#mgSubirAgenda')).toBeVisible();
   await expect(page.locator('#mgCandidateList')).toContainText('Todavía no hay personas para mostrar');
@@ -225,7 +267,9 @@ test('si el Contact Picker falla, la hoja sigue viva sin carteles ni guías de c
   });
   expect(sinCartel.modalVisible).toBe(false);
   expect(dialogos).toBe(0);
-  expect(sinCartel.pickerIntentos).toBe(3);
+  // 3 intentos al tocar el pétalo (name+tel, tel, name) + 3 al tocar el botón
+  // de la hoja.
+  expect(sinCartel.pickerIntentos).toBe(6);
 
   const texto = await page.locator('#mgSheet').innerText();
   expect(texto).not.toMatch(/permiso|ajustes|configura|permitir|puntitos|chrome/i);

@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "633.0.0",
-  "cacheName": "appi-v633-telefono-editable",
+  "version": "634.0.0",
+  "cacheName": "appi-v634-petalo-agenda",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

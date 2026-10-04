@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v633-telefono-editable';
+const CACHE_NAME = 'appi-v634-petalo-agenda';
 const CACHE_PREFIX = 'appi-';
 // Donde el SW aparta una compartición hasta que la app la consume. No
 // empieza con el prefijo de la app para que el prune del activate no la borre.

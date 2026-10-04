@@ -3,11 +3,14 @@
    ------------------------------------------------------------
    Convierte los círculos cotidianos del distribuidor en grupos de
    contacto para demostraciones, presentaciones y referidos.
-   Un pétalo abre la hoja con "Subir agenda" (.vcf, Android e iPhone),
-   "Elegir del teléfono" (Contact Picker, Android) y las personas que
-   ya guardó en APPI (Panel + Agenda Personal). Ninguna vía pide
-   permisos ni configurar el dispositivo: si el picker no abre, no
-   pasa nada visible, la persona elige otra.
+   Un pétalo abre directo la agenda del teléfono (Contact Picker,
+   Android): elegís y queda guardado en el pétalo. Si no hay picker
+   (iPhone, escritorio) o no anda, el pétalo abre la hoja con "Subir
+   agenda" (.vcf, Android e iPhone), "Elegir del teléfono" y las
+   personas que ya guardó en APPI (Panel + Agenda Personal); el botón
+   "⋯" del pétalo entra siempre a esa hoja para administrar el grupo.
+   Ninguna vía pide permisos ni configurar el dispositivo: si el
+   picker no abre, no pasa nada visible, la persona elige otra.
    ============================================================ */
 (function(){
   'use strict';
@@ -211,7 +214,8 @@
       '.mg-side{display:grid;gap:11px}.mg-card{padding:17px;border:1px solid rgba(255,255,255,.9);border-radius:22px;background:rgba(255,255,255,.78);box-shadow:0 12px 28px rgba(36,83,102,.08)}.mg-card h3{margin:0;color:#203d51;font-size:16px;letter-spacing:-.45px}.mg-card p{margin:5px 0 0;color:#79909d;font-size:11px;line-height:1.4;font-weight:600}.mg-action-list{display:grid;gap:7px;margin-top:13px}.mg-action{display:flex;align-items:center;gap:10px;width:100%;min-height:52px;padding:8px;border:1px solid #e1ecec;border-radius:15px;background:#fff;color:#395a68;text-align:left;transition:.2s}.mg-action.active,.mg-action:hover{transform:translateX(-2px);border-color:#74cfbb;background:#f2fff9;box-shadow:0 7px 15px rgba(21,142,120,.09)}.mg-action i{display:grid;place-items:center;width:35px;height:35px;border-radius:12px;background:#e8faf4;font-size:17px;font-style:normal}.mg-action b{display:block;font-size:11px}.mg-action small{display:block;margin-top:1px;color:#8096a1;font-size:9px;font-weight:700}.mg-action span:last-child{margin-left:auto;color:#55bba3;font-size:18px}.mg-growth{position:relative;overflow:hidden;background:linear-gradient(135deg,#0a5a79,#118d8c);color:#fff}.mg-growth:after{content:"";position:absolute;width:180px;height:180px;right:-90px;top:-94px;border:29px solid rgba(182,255,235,.13);border-radius:50%}.mg-growth h3{position:relative;z-index:1;color:#fff}.mg-growth p{position:relative;z-index:1;color:#d3fffa}.mg-number{position:relative;z-index:1;display:flex;align-items:end;gap:11px;margin-top:13px}.mg-number strong{font-size:36px;line-height:.9;letter-spacing:-1.8px}.mg-number span{font-size:10px;line-height:1.25;color:#c6fdf6;font-weight:750}.mg-progress{position:relative;z-index:1;height:7px;margin-top:14px;border-radius:99px;background:rgba(255,255,255,.24);overflow:hidden}.mg-progress i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#ffdf71,#fff7c5);transition:width .35s}',
       '.mg-modal{position:fixed;z-index:46000;inset:0;display:none;align-items:end;justify-content:center;padding:14px;background:rgba(2,28,48,.38);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px)}.mg-modal.open{display:flex}.mg-sheet{width:min(100%,565px);max-height:min(83vh,680px);overflow:auto;border:1px solid rgba(255,255,255,.82);border-radius:28px;background:#f9fffd;box-shadow:0 -18px 55px rgba(3,30,47,.27);animation:mgSheet .4s cubic-bezier(.22,1.27,.33,1)}@keyframes mgSheet{from{opacity:0;transform:translateY(75px) scale(.96)}to{opacity:1;transform:none}}.mg-sheet-head{position:sticky;top:0;z-index:2;display:flex;align-items:center;justify-content:space-between;padding:2px 4px 8px;background:linear-gradient(to bottom,#f9fffd 75%,rgba(249,255,253,.9))}.mg-sheet-title{display:flex;align-items:center;gap:10px}.mg-sheet-title i{display:grid;place-items:center;width:37px;height:37px;border-radius:13px;background:#dff8ef;color:#0b8d79;font-size:18px;font-style:normal}.mg-sheet-title b{display:block;font-size:16px;letter-spacing:-.35px}.mg-sheet-title small{display:block;margin-top:1px;color:#748e9b;font-size:10px;font-weight:700}.mg-close{display:grid;place-items:center;width:35px;height:35px;border:0;border-radius:12px;background:#e8f2f2;color:#66818e;font-size:19px}.mg-sheet-body{padding:0 19px 20px}.mg-input{width:100%;height:43px;padding:10px 12px;border:1px solid #d9e9e7;border-radius:13px;outline:none;background:#fff;color:#294b5d;font:inherit;font-size:12px;font-weight:800}.mg-input:focus{border-color:#4fc5ab;box-shadow:0 0 0 3px rgba(79,197,171,.13)}.mg-help{margin:10px 0;color:#748c9a;font-size:10px;line-height:1.45;font-weight:700}.mg-picker-tools{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:11px 0}.mg-picker-tools button{min-height:40px;border:0;border-radius:12px;background:#e7f8f2;color:#118473;font:inherit;font-size:10px;font-weight:950}.mg-picker-tools button:last-child{background:#edf4f4;color:#58747f}.mg-picker-tools .mg-wide{grid-column:1/-1}.mg-contact-list{display:grid;gap:7px}.mg-contact{display:flex;align-items:center;gap:10px;width:100%;padding:9px 10px;border:1px solid #dfebeb;border-radius:15px;background:#fff;color:#29485a;text-align:left}.mg-contact.chosen{border-color:#6dceb3;background:#f2fff9}.mg-avatar{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:linear-gradient(145deg,#b9efdf,#73d7bd);color:#126d65;font-size:11px;font-weight:1000}.mg-contact b{display:block;font-size:11px}.mg-contact small{display:block;margin-top:2px;color:#7c94a0;font-size:9px;font-weight:700}.mg-check{display:grid;place-items:center;width:21px;height:21px;margin-left:auto;border:2px solid #c5d9d9;border-radius:8px;color:#fff;font-size:12px}.mg-contact.chosen .mg-check{border-color:#1aaa89;background:#1aaa89}.mg-empty{padding:21px 12px;border:1px dashed #bedbd6;border-radius:15px;background:#f2fbf8;color:#63808b;font-size:11px;line-height:1.5;text-align:center}.mg-sheet-actions{display:flex;gap:8px;margin-top:14px}.mg-sheet-actions button{flex:1;min-height:45px;border:0;border-radius:13px;font:inherit;font-size:12px;font-weight:950}.mg-secondary{background:#eaf3f3;color:#53717e}.mg-primary{color:#fff;background:linear-gradient(135deg,#0b877e,#31c29f);box-shadow:0 7px 14px rgba(19,156,124,.22)}.mg-edit-list{display:grid;gap:8px}.mg-edit-row{display:grid;grid-template-columns:42px 1fr;gap:8px;align-items:center;padding:8px;border:1px solid #dfeeed;border-radius:14px;background:#fff}.mg-edit-row select{height:36px;border:0;border-radius:10px;background:#e6faf3;color:#138673;font-size:16px;text-align:center}.mg-edit-row input{height:36px;padding:8px 9px;border:0;outline:0;background:transparent;color:#29485a;font:inherit;font-size:11px;font-weight:850}',
       '.mg-toast{position:fixed;z-index:47000;left:50%;bottom:20px;padding:11px 15px;border-radius:15px;background:#143d55;color:#fff;font-size:11px;font-weight:800;box-shadow:0 12px 28px rgba(3,30,47,.25);transform:translate(-50%,100px);opacity:0;transition:.34s cubic-bezier(.2,1.3,.3,1)}.mg-toast.show{transform:translate(-50%,0);opacity:1}body.dark #view-margarita{background:transparent}body.dark .mg-hero h2,body.dark .mg-card h3,body.dark .mg-garden-head b{color:#edf6f5}body.dark .mg-hero p,body.dark .mg-card p,body.dark .mg-garden-head span,body.dark .mg-garden-foot{color:#a9bfca}body.dark .mg-garden,body.dark .mg-card{border-color:rgba(255,255,255,.1);background:rgba(38,48,61,.8)}body.dark .mg-action,body.dark .mg-edit-row,body.dark .mg-contact{background:#2d3746;border-color:rgba(255,255,255,.1);color:#eaf4f4}body.dark .mg-action small,body.dark .mg-contact small{color:#adc3cb}body.dark .mg-sheet{background:#202b35}body.dark .mg-sheet-head{background:linear-gradient(to bottom,#202b35 75%,rgba(32,43,53,.9))}body.dark .mg-sheet-title b{color:#f1f8f8}body.dark .mg-input{background:#2d3746;border-color:rgba(255,255,255,.1);color:#f2fbfa}.mg-src{display:inline-block;margin:4px 0 0;padding:2px 7px;border-radius:999px;background:#eef4f4;color:#6f8894;font-size:8px;font-weight:950;white-space:nowrap}.mg-picker-tools.single{grid-template-columns:1fr}.mg-more{width:100%;margin-top:10px;padding:10px 12px;border:1px solid #d9e9e7;border-radius:13px;background:#fff;color:#118473;font:inherit;font-size:10px;font-weight:950;cursor:pointer}.mg-more:hover{border-color:#74cfbb;background:#f2fff9}body.dark .mg-src{background:#2d3746;color:#a9bfca}body.dark .mg-more{background:#2d3746;border-color:rgba(255,255,255,.1);color:#7fe0c8}',
-      '@media(max-width:820px){.mg-hero{display:block}.mg-hero-actions{justify-content:flex-start}.mg-layout{grid-template-columns:1fr;max-width:590px}.mg-side{grid-template-columns:1fr 1fr}}@media(max-width:515px){.mg-wrap{padding:2px 7px calc(95px + env(safe-area-inset-bottom))}.mg-hero{padding:10px 10px 13px}.mg-hero h2{font-size:27px}.mg-hero p{font-size:11.5px}.mg-hero-actions{display:none}.mg-layout{gap:10px}.mg-garden{min-height:540px;padding:10px 7px 8px;border-radius:25px}.mg-stage{height:470px;transform:scale(.9);transform-origin:center center;margin:0 auto}.mg-garden-head{padding:0 7px}.mg-garden-head span{font-size:9px}.mg-side{grid-template-columns:1fr;gap:8px}.mg-card{padding:14px;border-radius:19px}.mg-growth{display:none}.mg-modal{padding:7px}.mg-sheet{border-radius:24px}.mg-sheet-body{padding:0 14px 16px}.mg-sheet-head{padding:15px 14px 11px}}@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition-duration:.01ms!important}}'
+      '@media(max-width:820px){.mg-hero{display:block}.mg-hero-actions{justify-content:flex-start}.mg-layout{grid-template-columns:1fr;max-width:590px}.mg-side{grid-template-columns:1fr 1fr}}@media(max-width:515px){.mg-wrap{padding:2px 7px calc(95px + env(safe-area-inset-bottom))}.mg-hero{padding:10px 10px 13px}.mg-hero h2{font-size:27px}.mg-hero p{font-size:11.5px}.mg-hero-actions{display:none}.mg-layout{gap:10px}.mg-garden{min-height:540px;padding:10px 7px 8px;border-radius:25px}.mg-stage{height:470px;transform:scale(.9);transform-origin:center center;margin:0 auto}.mg-garden-head{padding:0 7px}.mg-garden-head span{font-size:9px}.mg-side{grid-template-columns:1fr;gap:8px}.mg-card{padding:14px;border-radius:19px}.mg-growth{display:none}.mg-modal{padding:7px}.mg-sheet{border-radius:24px}.mg-sheet-body{padding:0 14px 16px}.mg-sheet-head{padding:15px 14px 11px}}@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition-duration:.01ms!important}}',
+      '.mg-petal-more{position:absolute;z-index:2;left:50%;top:16px;transform:translateX(-50%) rotate(var(--counter));display:grid;place-items:center;width:40px;height:22px;margin:0;padding:0;border:1px solid rgba(35,108,125,.16);border-radius:999px;background:rgba(255,255,255,.94);color:#5f8493;font-size:12px;font-weight:1000;line-height:1;letter-spacing:.4px;cursor:pointer;box-shadow:0 2px 5px rgba(18,92,104,.1);transition:.2s;user-select:none}.mg-petal-more:hover{background:#eafaf4;border-color:#74cfbb;color:#0f8a76}'
     ].join('');
     document.head.appendChild(st);
   }
@@ -239,8 +243,13 @@
         var petals = state.grupos.map(function(g, i){
       var count = (state.contactos[g.id] || []).length;
       var label = esc(g.label);
+      // Con Contact Picker el pétalo ya no abre la hoja: abre la agenda del
+      // teléfono. Este botón es la puerta de salida para administrar el grupo:
+      // va como hijo del pétalo (no del contenido, que está contra-rotado) para
+      // que quede SIEMPRE en la punta, y con --counter queda derecho.
+      var mas = capazPicker() ? '<span class="mg-petal-more" role="button" tabindex="0" title="Administrar contactos" aria-label="Administrar ' + label + '">⋯</span>' : '';
       return '<button type="button" class="mg-petal ' + (count ? 'has-contacts' : '') + '" style="transform:rotate(' + (i * 45) + 'deg);--angle:' + (i * 45) + 'deg;--counter:-' + (i * 45) + 'deg;--petal-outset:-78px;--i:' + i + '" data-mg-group="' + esc(g.id) + '">' +
-        '<span class="mg-petal-shape"></span>' +
+        '<span class="mg-petal-shape"></span>' + mas +
         '<span class="mg-petal-content">' +
           '<i>' + esc(g.icon) + '</i>' +
           '<b>' + label + '</b>' +
@@ -254,6 +263,10 @@
       '<aside class="mg-side"><section class="mg-card"><h3>¿Qué querés sembrar hoy?</h3><p>Elegí una acción y después el pétalo que mejor la acompañe.</p><div class="mg-action-list">' + accionesHTML() + '</div></section><section class="mg-card mg-growth"><h3>Tu jardín está creciendo</h3><p>Personas cercanas, oportunidades reales.</p><div class="mg-number"><strong>' + n + '</strong><span>contactos<br>en tu margarita</span></div><div class="mg-progress"><i style="width:' + Math.min(100,Math.max(8,n*12)) + '%"></i></div></section></aside></div></div>' +
       '<div class="mg-toast" id="mgToast"></div>';
     host.querySelectorAll('[data-mg-group]').forEach(function(b){ b.onclick=function(){ abrirGrupo(b.getAttribute('data-mg-group')); }; });
+    host.querySelectorAll('.mg-petal-more').forEach(function(m){
+      m.onclick=function(ev){ ev.preventDefault(); ev.stopPropagation(); var p=m.closest('[data-mg-group]'); if(p) abrirHojaDe(p.getAttribute('data-mg-group')); };
+      m.onkeydown=function(ev){ if(ev.key==='Enter'||ev.key===' '||ev.key==='Spacebar'){ ev.preventDefault(); ev.stopPropagation(); m.click(); } };
+    });
     host.querySelectorAll('[data-mg-action]').forEach(function(b){ b.onclick=function(){ accionActiva=b.getAttribute('data-mg-action'); render(); mostrarToast('Acción elegida: ' + accionActiva); }; });
     document.getElementById('mgEditGroups').onclick = editarGrupos;
     document.getElementById('mgEditName').onclick = editarNombre;
@@ -283,6 +296,23 @@
   }
 
   function abrirGrupo(id){
+    var state = cargar(), g = grupo(state, id); if (!g) return;
+    // Un toque en el pétalo abre directo la agenda del teléfono: la forma más
+    // simple de elegir gente. Sin Contact Picker (iPhone, escritorio, iframe)
+    // o si el picker no anda, se abre la hoja como hasta ahora.
+    if (!capazPicker()){ abrirHoja(g, state, (state.contactos[id] || []).slice()); return; }
+    var seleccion = (state.contactos[id] || []).slice();
+    elegirTelefono(seleccion, function(agregados, fallo){
+      // fallo → el picker no sirve acá: se cae a la hoja sin ningún cartel.
+      if (fallo){ abrirHoja(g, state, seleccion); return; }
+      // Lo elegido se guarda solo: no hay pasos intermedios.
+      state.contactos[id] = seleccion; guardar(state); render();
+      mostrarToast(agregados
+        ? '+' + agregados + ' persona' + (agregados === 1 ? '' : 's') + ' sumada' + (agregados === 1 ? '' : 's') + ' en ' + g.label
+        : (seleccion.length ? 'Ya estaban esas personas en ' + g.label : 'No elegiste a nadie en ' + g.label));
+    });
+  }
+  function abrirHojaDe(id){
     var state = cargar(), g = grupo(state, id); if (!g) return;
     abrirHoja(g, state, (state.contactos[id] || []).slice());
   }
@@ -384,18 +414,21 @@
     };
     pintar();
   }
+  // alVolver(agregados, fallo): fallo = el picker no se pudo usar; la
+  // cancelación no avisa nada (silencio total, sin carteleras).
   async function elegirTelefono(seleccion, alVolver){
     var agregados = 0;
     try {
       var elegidos = await pedirDelTelefono();
-      if (elegidos === PICKER_FALLO){ if (alVolver) alVolver(0); return; }
+      if (elegidos === null) return;                 // la persona canceló
+      if (elegidos === PICKER_FALLO){ if (alVolver) alVolver(0, true); return; }
       (elegidos || []).forEach(function(item){
         if (!seleccion.some(function(x){ return firma(x) === firma(item); })){ seleccion.push(item); agregados++; }
       });
-      if (alVolver) alVolver(agregados);
+      if (alVolver) alVolver(agregados, false);
     }catch(error){
       if (error && /Abort/i.test(String(error.name || ''))) return;
-      if (alVolver) alVolver(0);
+      if (alVolver) alVolver(0, true);
     }
   }
 

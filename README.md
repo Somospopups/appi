@@ -4,6 +4,15 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v634 · Un toque en el pétalo abre la agenda del teléfono
+
+- **Mi Margarita**: tocar un pétalo ya no abre la hoja con las opciones: **abre directo la agenda del teléfono** (Contact Picker, Android) para elegir la gente desde ahí. Lo elegido **queda guardado solo**, con un aviso del grupo y del conteo, sin pasos intermedios. Si se cancela la agenda no pasa nada: ni hoja, ni carteles, ni cambios.
+- **Nuevo botón ⋯ en cada pétalo** para administrar el grupo desde la misma hoja de siempre (buscar, subir una agenda `.vcf`, elegir del teléfono y las personas que ya están en APPI). Se muestra únicamente donde el toque del pétalo dispara el picker.
+- **Sin Contact Picker** (iPhone, escritorio, iframe) **o si el picker no anda**, el pétalo se comporta como siempre y abre la hoja: el error cae en silencio, sin alertas nativas ni textos que pidan permisos o configurar el dispositivo.
+- `elegirTelefono` ahora distingue **cancelar** (silencio) de **fallar** (respaldo a la hoja); el resto del módulo no cambia.
+- Cubierto por `margarita-contactos.spec.js`: pétalo que abre la agenda y guarda sin hoja intermedia, cancelación sin rastro, picker roto que cae a la hoja (6 intentos: 3 del pétalo + 3 del botón) y la hoja intacta.
+- Versión: **v634 · Segura** · Cache `appi-v634-petalo-agenda`.
+
 ## v633 · El teléfono de una persona se puede corregir
 
 - **Panel de Contactos (Mi Gestión)**: el número pasó de ser texto de solo lectura a un campo editable dentro de la ficha de detalle. Se guarda con el mismo botón "Guardar cambios" de siempre (y con la misma cola si no hay internet) y viaja con su versión normalizada de dígitos. Si el contacto cambia, se registra en la línea de tiempo.
