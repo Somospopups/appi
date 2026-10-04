@@ -6,7 +6,7 @@ const { test, expect } = require('@playwright/test');
 // sin "conectar" nada. En los tests el SW está bloqueado (config), así que
 // se prueba la vía in-proceso (setTimeout + new Notification) y el catch-up.
 
-const ORIGIN = 'http://127.0.0.1:4174';
+const ORIGIN = 'http://127.0.0.1:8123';
 
 function seedScript() {
   // Spy de notificaciones + permiso simulado + base de 3 usuarios (cumple hoy, por vencer, reasignado).

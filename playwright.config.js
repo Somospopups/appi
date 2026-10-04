@@ -9,7 +9,7 @@ module.exports = defineConfig({
   retries: process.env.CI ? 1 : 0,
   reporter: [['list']],
   use: {
-    baseURL: 'http://127.0.0.1:4174',
+    baseURL: 'http://127.0.0.1:8123',
     // La app ya trae su hoja prefers-reduced-motion completa: correr las
     // pruebas con esa preferencia las hace deterministas (los overlays
     // con animaciones infinitas dejan de moverse y los clics son estables)
@@ -25,7 +25,7 @@ module.exports = defineConfig({
     storageState: {
       cookies: [],
       origins: [{
-        origin: 'http://127.0.0.1:4174',
+        origin: 'http://127.0.0.1:8123',
         localStorage: [
           { name: 'appi_notif_listo_v1', value: '1' },
           { name: 'appi_notif_popup_later', value: '4102444800000' },
@@ -39,8 +39,8 @@ module.exports = defineConfig({
     ...devices['Desktop Chrome']
   },
   webServer: {
-    command: 'python3 -m http.server 4174 --bind 127.0.0.1',
-    url: 'http://127.0.0.1:4174/index.html',
+    command: 'python3 -m http.server 8123 --bind 127.0.0.1',
+    url: 'http://127.0.0.1:8123/index.html',
     reuseExistingServer: !process.env.CI,
     timeout: 30_000
   }

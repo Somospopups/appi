@@ -90,7 +90,7 @@ test.describe('Avisos por Telegram', () => {
     // APPI sigue viva (no navegó, no se reinició).
     await expect(page.locator('#avisoTgOv')).toBeVisible();
     await expect(page.locator('#avisoTgOv')).toContainText('ABCD1234');
-    expect(page.url()).toContain('127.0.0.1:4174');
+    expect(page.url()).toContain('127.0.0.1:8123');
     // Fuera de Android el handler devuelve true y deja que el anchor abra
     // t.me en otra pestaña (target="_blank"): APPI no navega y ya no pasa
     // por window.open. La respuesta se mockea para no depender de la red.
@@ -112,7 +112,7 @@ test.describe('Avisos por Telegram', () => {
     await popup.close();
     await expect(page.locator('#avisoTgOv')).toBeVisible();
     await expect(page.locator('#avisoTgOv')).toContainText('ABCD1234');
-    expect(page.url()).toContain('127.0.0.1:4174');
+    expect(page.url()).toContain('127.0.0.1:8123');
     // Respaldo visible: abrir en el navegador.
     const webLink = page.locator('#avisoTgOv a.aviso-tg-btn.ghost');
     await expect(webLink).toHaveAttribute('href', 'https://t.me/appi_avisos_bot?start=ABCD1234');

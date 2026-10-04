@@ -4,6 +4,12 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v638 · Las pruebas corren en el puerto 8123
+
+- **Infraestructura de pruebas**: `playwright.config.js` y los specs que fijaban el origen ahora usan `http://127.0.0.1:8123`. Windows reservó el tramo 4151–4250 (rango de exclusión dinámico de Hyper-V/winnat) y con eso `4174` quedó bloqueado para cualquier proceso, así que `npm test` no podía ni arrancar el servidor (`WinError 10013`).
+- No toca la app: sólo cambia dónde se levanta el servidor de pruebas.
+- Versión: **v638 · Segura** · Cache `appi-v638-puerto-8123`.
+
 ## v637 · El pétalo abre con dos botones y su tarjeta de contacto
 
 - **Mi Margarita**: tocar un pétalo abre directo la hoja con dos botones hermosos: **Elegir dentro de APPI** y **Elegir de mis contactos**.
