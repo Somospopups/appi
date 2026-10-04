@@ -4,6 +4,14 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v635 · El pétalo intenta la agenda del teléfono antes que nada
+
+- **Mi Margarita**: tocar un pétalo **intenta SIEMPRE abrir la agenda del teléfono como primera intención** —sin consultar antes si el navegador "deja"— y sólo si no se pudo se abren **las otras opciones** en la hoja: subir una agenda `.vcf`, elegir del teléfono y las personas que ya están en APPI (Panel + Agenda Personal). Antes, en un navegador sin Contact Picker el pétalo iba directo a la hoja sin siquiera intentar.
+- `pedirDelTelefono` devuelve el mismo "no anduvo" cuando **no existe la API** (iPhone, Firefox, escritorio, iframe), así que el llamador nunca se queda mudo: o guarda lo elegido, o abre la hoja. Cancelar sigue siendo silencio total: ni hoja, ni carteles, ni cambios.
+- `capazPicker()` queda sólo para **mostrar** los accesos (el "⋯" del pétalo y el botón de la hoja), no para decidir si se intenta.
+- Nuevo test que fija la prioridad: con la agenda presente pero `capazPicker()` en false, el pétalo la usa igual y no abre la hoja.
+- Versión: **v635 · Segura** · Cache `appi-v635-agenda-primero`.
+
 ## v634 · Un toque en el pétalo abre la agenda del teléfono
 
 - **Mi Margarita**: tocar un pétalo ya no abre la hoja con las opciones: **abre directo la agenda del teléfono** (Contact Picker, Android) para elegir la gente desde ahí. Lo elegido **queda guardado solo**, con un aviso del grupo y del conteo, sin pasos intermedios. Si se cancela la agenda no pasa nada: ni hoja, ni carteles, ni cambios.

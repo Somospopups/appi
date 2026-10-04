@@ -200,6 +200,45 @@ test('si cancela la agenda no pasa nada: ni hoja, ni carteles, ni cambios', asyn
   await expect(page.locator('[data-mg-group="amigos"]')).toContainText('0 personas');
 });
 
+test('el pétalo intenta la agenda SIEMPRE antes de abrir la hoja, aunque capazPicker diga que no', async ({ page }) => {
+  await page.addInitScript(() => {
+    window.__mgSelectLlamas = 0;
+    Object.defineProperty(navigator, 'contacts', {
+      configurable: true,
+      value: {
+        getProperties: async () => ['name', 'tel'],
+        select: async () => { window.__mgSelectLlamas++; return [{ name: ['Paula Ensayo'], tel: ['3515556677'] }]; }
+      }
+    });
+  });
+  await abrirMargarita(page);
+
+  // La agenda SÍ está, pero capazPicker() queda en false (por ejemplo la app
+  // dentro de un iframe): la primera intención tiene que ser intentar usarla,
+  // y recién si no se pudo abrir la hoja con las otras opciones.
+  const condiciones = await page.evaluate(() => {
+    Object.defineProperty(window, 'self', { configurable: true, value: null });
+    return {
+      capaz: !!(navigator && 'contacts' in navigator && navigator.contacts && typeof navigator.contacts.select === 'function' && window.self === window.top),
+      conApi: !!(navigator.contacts && typeof navigator.contacts.select === 'function')
+    };
+  });
+  expect(condiciones.capaz).toBe(false);
+  expect(condiciones.conApi).toBe(true);
+
+  await page.locator('[data-mg-group="amigos"] .mg-petal-content b').click();
+  await expect(page.locator('[data-mg-group="amigos"]')).toContainText('1 persona');
+
+  const despues = await page.evaluate(() => ({
+    intentos: window.__mgSelectLlamas,
+    hojaAbierta: (() => { const m = document.getElementById('mgModal'); return m ? m.classList.contains('open') : false; })(),
+    amigos: (window.APPIMargarita.cargar().contactos.amigos || []).length
+  }));
+  expect(despues.intentos).toBe(1);
+  expect(despues.hojaAbierta).toBe(false);
+  expect(despues.amigos).toBe(1);
+});
+
 test('"Subir agenda" mete una agenda .vcf entera en el pétalo', async ({ page }) => {
   await abrirMargarita(page);
 

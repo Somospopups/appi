@@ -3,12 +3,13 @@
    ------------------------------------------------------------
    Convierte los círculos cotidianos del distribuidor en grupos de
    contacto para demostraciones, presentaciones y referidos.
-   Un pétalo abre directo la agenda del teléfono (Contact Picker,
-   Android): elegís y queda guardado en el pétalo. Si no hay picker
-   (iPhone, escritorio) o no anda, el pétalo abre la hoja con "Subir
-   agenda" (.vcf, Android e iPhone), "Elegir del teléfono" y las
-   personas que ya guardó en APPI (Panel + Agenda Personal); el botón
-   "⋯" del pétalo entra siempre a esa hoja para administrar el grupo.
+   Un pétalo SIEMPRE intenta primero abrir la agenda del teléfono
+   (Contact Picker, Android): elegís y queda guardado en el pétalo.
+   Sólo si no se pudo —no hay API (iPhone, Firefox, escritorio) o no
+   anda— se abren las otras opciones en la hoja: "Subir agenda" (.vcf,
+   Android e iPhone), "Elegir del teléfono" y las personas que ya
+   guardó en APPI (Panel + Agenda Personal); el botón "⋯" del pétalo
+   entra directo a esa hoja para administrar el grupo.
    Ninguna vía pide permisos ni configurar el dispositivo: si el
    picker no abre, no pasa nada visible, la persona elige otra.
    ============================================================ */
@@ -150,6 +151,8 @@
   function etiquetaOrigen(origen){
     return origen === 'panel' ? 'Panel APPI' : origen === 'agenda' ? 'Agenda' : 'Teléfono';
   }
+  // Sólo para MOSTRAR los accesos (el "⋯" del pétalo y el botón de la hoja):
+  // el intento del pétalo de abrir la agenda no depende de esto.
   function capazPicker(){
     try { return !!(navigator && 'contacts' in navigator && navigator.contacts && typeof navigator.contacts.select === 'function' && window.self === window.top); }
     catch(e){ return false; }
@@ -164,8 +167,11 @@
     }catch(e){ return { name:true, tel:true }; }
   }
   async function pedirDelTelefono(){
-    var picker = navigator.contacts;
-    if (!picker || typeof picker.select !== 'function') return null;
+    var picker = navigator && navigator.contacts;
+    // Sin API de contactos (iPhone, Firefox, escritorio, iframe): se reporta
+    // igual que un picker que no anduvo, para que el llamador abra las otras
+    // opciones en vez de quedarse mudo.
+    if (!picker || typeof picker.select !== 'function') return PICKER_FALLO;
     var props = await propsSoportadas(picker), planes = [], base = [];
     if (props.name) base.push('name');
     if (props.tel) base.push('tel');
@@ -297,13 +303,13 @@
 
   function abrirGrupo(id){
     var state = cargar(), g = grupo(state, id); if (!g) return;
-    // Un toque en el pétalo abre directo la agenda del teléfono: la forma más
-    // simple de elegir gente. Sin Contact Picker (iPhone, escritorio, iframe)
-    // o si el picker no anda, se abre la hoja como hasta ahora.
-    if (!capazPicker()){ abrirHoja(g, state, (state.contactos[id] || []).slice()); return; }
     var seleccion = (state.contactos[id] || []).slice();
+    // Primera intención, SIEMPRE: intentar abrir la agenda del teléfono. No se
+    // consulta capazPicker antes: si no hay Contact Picker o no anda, el propio
+    // intento devuelve el fallo y recién ahí se abren las otras opciones.
     elegirTelefono(seleccion, function(agregados, fallo){
-      // fallo → el picker no sirve acá: se cae a la hoja sin ningún cartel.
+      // fallo → no se pudo usar la agenda: hoja con las otras opciones, sin
+      // ningún cartel.
       if (fallo){ abrirHoja(g, state, seleccion); return; }
       // Lo elegido se guarda solo: no hay pasos intermedios.
       state.contactos[id] = seleccion; guardar(state); render();
