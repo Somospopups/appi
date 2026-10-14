@@ -196,6 +196,63 @@ test.describe('APPITel · primeroValido (campos con varios números)', () => {
   });
 });
 
+/* El reporte de PSA trae la celda del teléfono con dos valores separados
+   por un salto de línea, y a veces sobra un "54-" suelto al final.
+   Antes bonito() y link() pasaban por normalizar(), que ve 14 dígitos
+   seguidos y devuelve vacío: la pantalla caía al texto crudo y se veía
+   "54-3856454957⏎54-" en el listado (v639). */
+test.describe('APPITel · dos números pegados no rompen la pantalla ni el WhatsApp (v639)', () => {
+  test.beforeEach(async ({ page }) => { await cargar(page); });
+
+  const pegados = [
+    // [caso, entrada, esperado por bonito()]
+    ['salto de línea con un "54" colgando', '54-3856454957\n54-',           '+54 9 385 645-4957'],
+    ['dos números completos',               '54-3855754748\n54-3855825596', '+54 9 385 575-4748'],
+    ['separados por barra',                 '54-3516216122 / 54-3514701942', '+54 9 351 621-6122'],
+    ['caso reportado: nada sirve',          '54-3834405442254-',            ''],
+  ];
+
+  for (const [caso, entrada, esperado] of pegados) {
+    test(`bonito lo lee: ${caso}`, async ({ page }) => {
+      const salida = await page.evaluate(v => window.APPITel.bonito(v), entrada);
+      expect(salida).toBe(esperado);
+    });
+  }
+
+  test('bonito nunca devuelve el texto crudo del campo', async ({ page }) => {
+    const r = await page.evaluate(list => list.map(v => window.APPITel.bonito(v)), pegados.map(p => p[1]));
+    for (const salida of r) {
+      if (!salida) continue;
+      // O vacío, o un número ya formateado. Nunca los dígitos pegados.
+      expect(salida).toMatch(/^\+54 9 \d{2,4} \d{1,4}-\d{4}$/);
+    }
+  });
+
+  test('link: dos números pegados ya no frenan la redirección', async ({ page }) => {
+    const url = await page.evaluate(v => window.APPITel.link(v, 'Hola'), '54-3856454957\n54-');
+    expect(url).toBe('https://wa.me/5493856454957?text=Hola');
+  });
+
+  test('link: si de verdad no hay ningún número válido sigue devolviendo vacío', async ({ page }) => {
+    const url = await page.evaluate(v => window.APPITel.link(v), '54-3834405442254-');
+    expect(url).toBe('');
+    const abierto = await page.evaluate(v => {
+      window.APPIWhatsApp = { abrir: u => { window.__waUrl = u; } };
+      return window.APPITel.abrir(v, 'Hola', 'Fulano');
+    }, '54-3834405442254-');
+    expect(abierto).toBe(false);
+  });
+
+  test('normalizar y esValido siguen estrictos: el arreglo no los relaja', async ({ page }) => {
+    const r = await page.evaluate(v => ({
+      norm: window.APPITel.normalizar(v),
+      esVal: window.APPITel.esValido(v),
+    }), '3517669967 / 3514552272');
+    expect(r.norm).toBe('');
+    expect(r.esVal).toBe(false);
+  });
+});
+
 test.describe('APPITel · cuidado de la linea', () => {
   test.beforeEach(async ({ page }) => {
     await cargar(page);

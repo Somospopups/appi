@@ -81,9 +81,14 @@
     return normalizar(valor);
   }
 
-  /* Para mostrarlo en pantalla: +54 9 351 766-9967 */
+  /* Para mostrarlo en pantalla: +54 9 351 766-9967
+     Pasa por primeroValido y no por normalizar: cuando el campo trae dos
+     números pegados (o el "54-" que suelta el reporte de PSA al final de
+     la celda), se muestra el primero de ellos en vez de quedar vacío.
+     Al quedar vacío, las pantallas caían al texto crudo y se veía
+     "54-3856454957⏎54-" en el listado (v639). */
   function bonito(valor){
-    var n = normalizar(valor);
+    var n = primeroValido(valor);
     if (!n) return '';
     var nac = n.slice(3);                                  // 10 dígitos
     var a = nac.slice(0,2) === '11' ? 2 : (AREA3[nac.slice(0,3)] ? 3 : 4);
@@ -92,9 +97,13 @@
     return '+54 9 ' + area + ' ' + resto.slice(0, corte) + '-' + resto.slice(corte);
   }
 
-  /* Arma el enlace de WhatsApp. Devuelve '' si el número no sirve. */
+  /* Arma el enlace de WhatsApp. Devuelve '' si el número no sirve.
+     Como en bonito, pasa por primeroValido: es justo lo que prometía su
+     comentario, que el segundo número o un "54" suelto nunca rompan la
+     redirección. Antes dos números pegados frenaban el envío entero con
+     "Número incompleto" (v639). */
   function link(valor, texto){
-    var n = normalizar(valor);
+    var n = primeroValido(valor);
     if (!n) return '';
     return 'https://wa.me/' + n + (texto ? '?text=' + encodeURIComponent(texto) : '');
   }

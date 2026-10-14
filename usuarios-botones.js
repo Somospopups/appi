@@ -175,7 +175,11 @@
     var gente = genteDeZona(zona);
     var lineas = [zona + ' · ' + gente.length + (gente.length === 1 ? ' persona' : ' personas'), ''];
     gente.forEach(function(u){
-      var tel = (window.APPITel && window.APPITel.bonito) ? (window.APPITel.bonito(u.telf) || u.telf) : (u.telf || u.telefono || '');
+      var crudo = u.telf || u.telefono || '';
+      /* bonito vacío no significa "sin teléfono": significa "nada de esto
+         sirve". Si había texto crudo y no se pudo leer, se avisa en vez de
+         volcar dos números pegados en el mensaje de WhatsApp (v639). */
+      var tel = (window.APPITel && window.APPITel.bonito) ? (window.APPITel.bonito(crudo) || (crudo ? 'Sin teléfono válido' : '')) : crudo;
       var zonaCp = [u.localidad, u.cp ? 'CP ' + u.cp : ''].filter(Boolean).join(' ');
       lineas.push(String(u.usuario || 'Sin nombre'));
       if (tel) lineas.push('Tel: ' + tel);

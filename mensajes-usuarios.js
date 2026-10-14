@@ -1234,7 +1234,14 @@
         '<div class="mu-col">' +
           (u.localidad ? '<span>📍 ' + esc(u.localidad) + '</span>' : '') +
           (u.domicilio ? '<span>🏠 ' + esc(u.domicilio) + '</span>' : '') +
-          (function(){ var lindo = (window.APPITel && window.APPITel.bonito) ? window.APPITel.bonito(u.telf) : ''; return (lindo || u.telf) ? '<span>📞 ' + esc(lindo || u.telf) + '</span>' : ''; })() +
+          (function(){
+            var crudo = u.telf || '';
+            var lindo = (window.APPITel && window.APPITel.bonito) ? window.APPITel.bonito(crudo) : '';
+            /* bonito vacío con texto crudo = el número no se pudo leer;
+               se avisa en vez de volcar dos números pegados (v639). */
+            var queSeMuestra = lindo || (crudo ? 'Sin teléfono válido' : '');
+            return queSeMuestra ? '<span>📞 ' + esc(queSeMuestra) + '</span>' : '';
+          })() +
         '</div>' +
         '<div class="mu-col">' +
           (u.producto ? '<span>📦 ' + esc(u.producto) + '</span>' : '') +

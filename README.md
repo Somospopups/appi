@@ -4,6 +4,16 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v639 · Dos números en un solo campo ya no rompen la pantalla
+
+- **Teléfonos**: `APPITel.bonito()` y `APPITel.link()` pasan por `primeroValido()` en vez de `normalizar()`. El reporte de PSA guarda dos números en la misma celda, separados por un salto de línea, y a veces sobra un `54-` suelto al final; `normalizar()` veía 14 dígitos seguidos y devolvía vacío.
+- **Antes**: el vacío hacía que las pantallas cayeran al texto crudo — se veía `54-3856454957⏎54-` en la lista de la zona y en la ficha de contacto — y `link()` frenaba la redirección con "Número incompleto".
+- **Ahora**: se muestra el primer número legible y el chat de WhatsApp abre. Si no hay ninguno, la pantalla dice **Sin teléfono válido** en vez de tirar el texto crudo.
+- `normalizar()` y `esValido()` **no se tocaron**: siguen estrictos, para no abrir un chat con un número inventado.
+- Medido sobre la copia de la nube: 1129 personas → **363** pasan de texto crudo a número legible y **68** quedan marcadas como inválidas (400 campos traían salto de línea).
+- Tests: 7 nuevos en `telefono.spec.js`.
+- Versión: **v639 · Segura** · Cache `appi-v639-numeros-pegados`.
+
 ## v638 · Las pruebas corren en el puerto 8123
 
 - **Infraestructura de pruebas**: `playwright.config.js` y los specs que fijaban el origen ahora usan `http://127.0.0.1:8123`. Windows reservó el tramo 4151–4250 (rango de exclusión dinámico de Hyper-V/winnat) y con eso `4174` quedó bloqueado para cualquier proceso, así que `npm test` no podía ni arrancar el servidor (`WinError 10013`).
