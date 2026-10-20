@@ -4,6 +4,15 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v640 · El catálogo real del Campus PSA llega a APPI
+
+- **Catálogo vivo**: nuevo script `scripts/actualizar-campus-psa.mjs` (Node puro, sin dependencias) que ingresa a mi.psa.com.ar con las credenciales del distribuidor (variables de entorno, nunca en el repo), hace SSO a campus.psa.com.ar y rastrea todo el Campus: **9 áreas, 62 secciones, 204 clases** (cada una con el id de su stream HLS público), **10 playlists con 425 audios** y **17 transmisiones de la agenda de vivo**.
+- **Workflow** `.github/workflows/campus-psa.yml`: corre dos veces por día (11:30 y 20:30 ART), escribe `campus-catalogo.json` y lo commitea sólo si cambió. Si el parseo no alcanza los mínimos razonables (50 clases / 10 audios / 5 playlists) el script sale con error y **no se publica un catálogo roto**: queda la última versión buena.
+- **`campus-catalogo.json`**: el artefacto que la app va a leer desde red con caché offline, con el mismo patrón que `psa-catalogo.json`. Trae áreas → secciones → clases (título, autor, duración, URL y stream `V_XXXXX`), playlists de audio (con su `A_XXXXX` y el id numérico que usa el Campus para el avance) y la agenda de vivo por equipo.
+- El parser tolera los dos formatos del Campus (curso con el link envolviendo el bloque y temática con el link al final) y reutiliza los streams ya conocidos entre corridas: sólo resuelve los que faltan.
+- Tests: `tests/e2e/campus-catalogo.spec.js` fija mínimos y forma del catálogo.
+- Versión: **v640 · Segura** · Cache `appi-v640-campus-catalogo`.
+
 ## v639 · Dos números en un solo campo ya no rompen la pantalla
 
 - **Teléfonos**: `APPITel.bonito()` y `APPITel.link()` pasan por `primeroValido()` en vez de `normalizar()`. El reporte de PSA guarda dos números en la misma celda, separados por un salto de línea, y a veces sobra un `54-` suelto al final; `normalizar()` veía 14 dígitos seguidos y devolvía vacío.

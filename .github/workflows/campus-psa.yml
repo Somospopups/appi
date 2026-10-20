@@ -1,0 +1,43 @@
+name: Campus PSA catálogo
+
+# Rastrea campus.psa.com.ar y actualiza campus-catalogo.json (áreas, secciones,
+# clases con su stream HLS, playlists de audio y agenda de vivo). Dos veces por
+# día (11:30 y 20:30 ART) y a mano con workflow_dispatch.
+# Requiere los secrets PSA_DIP_NUMERO y PSA_DIP_CLAVE (credenciales del
+# distribuidor para mi.psa.com.ar; nunca se commitean).
+on:
+  schedule:
+    - cron: "30 14,23 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  actualizar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Rastrear el Campus
+        env:
+          PSA_DIP_NUMERO: ${{ secrets.PSA_DIP_NUMERO }}
+          PSA_DIP_CLAVE: ${{ secrets.PSA_DIP_CLAVE }}
+        run: node scripts/actualizar-campus-psa.mjs
+
+      - name: Publicar si cambiaron
+        run: |
+          git config user.name "APPI campus"
+          git config user.email "298482267+arena-ai-coding-agent[bot]@users.noreply.github.com"
+          git add campus-catalogo.json
+          if git diff --cached --quiet; then
+            echo "Sin cambios"
+            exit 0
+          fi
+          git commit -m "campus: catálogo PSA"
+          git push

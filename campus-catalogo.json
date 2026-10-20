@@ -1,0 +1,4313 @@
+{
+ "version": 1,
+ "generado": "2026-10-20T22:27:20.643Z",
+ "fuente": "campus.psa.com.ar",
+ "kits": [
+  {
+   "slug": "programa-de-capacitacion-basica",
+   "id": 8,
+   "titulo": "Programa de Capacitación Básica",
+   "url": "/kit/programa-de-capacitacion-basica",
+   "secciones": [
+    {
+     "id": "modulo-1-esencia-psa",
+     "tipo": "curso",
+     "titulo": "Módulo 1: Esencia PSA",
+     "url": "/kit/programa-de-capacitacion-basica/curso/modulo-1-esencia-psa",
+     "clases": [
+      {
+       "titulo": "M1 - Bloque 1: Misión, Visión y Valores",
+       "autor": "",
+       "duracion": "10:36",
+       "url": "/curso/modulo-1-esencia-psa/video/m1-bloque-1-mision-vision-y-valores",
+       "stream": "V_03564"
+      },
+      {
+       "titulo": "M1 - Bloque 2: Tu rol como DIP",
+       "autor": "",
+       "duracion": "05:29",
+       "url": "/curso/modulo-1-esencia-psa/video/m1-bloque-2-tu-rol-como-dip",
+       "stream": "V_03565"
+      },
+      {
+       "titulo": "M1 - Bloque 3: Negocios tradicionales y el Negocio PSA",
+       "autor": "",
+       "duracion": "06:20",
+       "url": "/curso/modulo-1-esencia-psa/video/m1-bloque-3-negocios-tradicionales-y-el-negocio-psa",
+       "stream": "V_03566"
+      },
+      {
+       "titulo": "M1 - Bloque 4: Tipos de ingreso",
+       "autor": "",
+       "duracion": "04:28",
+       "url": "/curso/modulo-1-esencia-psa/video/m1-bloque-4-tipos-de-ingreso",
+       "stream": "V_03567"
+      },
+      {
+       "titulo": "M1 - Bloque 5: Actitud emprendedora",
+       "autor": "",
+       "duracion": "08:32",
+       "url": "/curso/modulo-1-esencia-psa/video/m1-bloque-5-actitud-emprendedora",
+       "stream": "V_03568"
+      },
+      {
+       "titulo": "M1 - Bloque 6: ¿Qué es el éxito?",
+       "autor": "",
+       "duracion": "05:33",
+       "url": "/curso/modulo-1-esencia-psa/video/m1-bloque-6-que-es-el-exito",
+       "stream": "V_03569"
+      }
+     ]
+    },
+    {
+     "id": "modulo-2-productos-psa-1",
+     "tipo": "curso",
+     "titulo": "Módulo 2: Productos PSA",
+     "url": "/kit/programa-de-capacitacion-basica/curso/modulo-2-productos-psa-1",
+     "clases": [
+      {
+       "titulo": "B1 - Fuentes de agua",
+       "autor": "",
+       "duracion": "06:03",
+       "url": "/curso/modulo-2-productos-psa-1/video/b1-fuentes-de-agua",
+       "stream": "V_04817"
+      },
+      {
+       "titulo": "B2 - Contaminantes",
+       "autor": "",
+       "duracion": "05:56",
+       "url": "/curso/modulo-2-productos-psa-1/video/b2-contaminantes",
+       "stream": "V_04854"
+      },
+      {
+       "titulo": "B3 - Medios filtrantes y medios activos",
+       "autor": "",
+       "duracion": "04:37",
+       "url": "/curso/modulo-2-productos-psa-1/video/b3-medios-filtrantes-y-medios-activos",
+       "stream": "V_04819"
+      },
+      {
+       "titulo": "B4 - Productos y soluciones - Parte I",
+       "autor": "",
+       "duracion": "08:38",
+       "url": "/curso/modulo-2-productos-psa-1/video/b4-productos-y-soluciones-parte-i",
+       "stream": "V_04820"
+      },
+      {
+       "titulo": "B5 - Productos y soluciones - Parte II",
+       "autor": "",
+       "duracion": "12:19",
+       "url": "/curso/modulo-2-productos-psa-1/video/b5-productos-y-soluciones-parte-ii",
+       "stream": "V_04976"
+      }
+     ]
+    },
+    {
+     "id": "modulo-3-contactos",
+     "tipo": "curso",
+     "titulo": "Módulo 3: Contactos",
+     "url": "/kit/programa-de-capacitacion-basica/curso/modulo-3-contactos",
+     "clases": [
+      {
+       "titulo": "B1 - Qué es un contacto",
+       "autor": "",
+       "duracion": "02:20",
+       "url": "/curso/modulo-3-contactos/video/b1-que-es-un-contacto",
+       "stream": "V_05322"
+      },
+      {
+       "titulo": "B2 - Primera lista",
+       "autor": "",
+       "duracion": "05:41",
+       "url": "/curso/modulo-3-contactos/video/b2-primera-lista",
+       "stream": "V_05323"
+      },
+      {
+       "titulo": "B3 - Consideraciones previas al llamado",
+       "autor": "",
+       "duracion": "02:19",
+       "url": "/curso/modulo-3-contactos/video/b3-consideraciones-previas-al-llamado",
+       "stream": "V_05324"
+      },
+      {
+       "titulo": "B4 - Llamado para demo",
+       "autor": "",
+       "duracion": "04:03",
+       "url": "/curso/modulo-3-contactos/video/b4-llamado-para-demo",
+       "stream": "V_05325"
+      },
+      {
+       "titulo": "B5 - Llamado para PN",
+       "autor": "",
+       "duracion": "04:24",
+       "url": "/curso/modulo-3-contactos/video/b5-llamado-para-pn",
+       "stream": "V_05333"
+      },
+      {
+       "titulo": "B6 - Nuevas listas",
+       "autor": "",
+       "duracion": "03:10",
+       "url": "/curso/modulo-3-contactos/video/b6-nuevas-listas",
+       "stream": "V_05327"
+      }
+     ]
+    },
+    {
+     "id": "modulo-4-demostracion",
+     "tipo": "curso",
+     "titulo": "Módulo 4: Demostración",
+     "url": "/kit/programa-de-capacitacion-basica/curso/modulo-4-demostracion",
+     "clases": [
+      {
+       "titulo": "Qué es una Demostración",
+       "autor": "",
+       "duracion": "03:14",
+       "url": "/curso/modulo-4-demostracion/video/que-es-una-demostracion",
+       "stream": "V_05555"
+      },
+      {
+       "titulo": "Paso 1: Imagen",
+       "autor": "",
+       "duracion": "01:52",
+       "url": "/curso/modulo-4-demostracion/video/paso-1-imagen-1",
+       "stream": "V_05568"
+      },
+      {
+       "titulo": "Paso 2: Vínculo",
+       "autor": "",
+       "duracion": "01:54",
+       "url": "/curso/modulo-4-demostracion/video/paso-2-vinculo-1",
+       "stream": "V_05635"
+      },
+      {
+       "titulo": "Paso 3: Solicitud de Referidos",
+       "autor": "",
+       "duracion": "01:32",
+       "url": "/curso/modulo-4-demostracion/video/paso-3-solicitud-de-referidos",
+       "stream": "V_05646"
+      },
+      {
+       "titulo": "Paso 4: Demostración",
+       "autor": "",
+       "duracion": "04:14",
+       "url": "/curso/modulo-4-demostracion/video/paso-4-demostracion-1",
+       "stream": "V_05559"
+      },
+      {
+       "titulo": "Paso 5: Análisis de Referidos",
+       "autor": "",
+       "duracion": "02:24",
+       "url": "/curso/modulo-4-demostracion/video/paso-5-analisis-de-referidos-1",
+       "stream": "V_05560"
+      },
+      {
+       "titulo": "Paso 6: Comparativa",
+       "autor": "",
+       "duracion": "02:39",
+       "url": "/curso/modulo-4-demostracion/video/paso-6-comparativa",
+       "stream": "V_05566"
+      },
+      {
+       "titulo": "Paso 7: Limpieza de objeciones",
+       "autor": "",
+       "duracion": "00:52",
+       "url": "/curso/modulo-4-demostracion/video/paso-7-limpieza-de-objeciones",
+       "stream": "V_05562"
+      },
+      {
+       "titulo": "Paso 8: Cierre",
+       "autor": "",
+       "duracion": "01:15",
+       "url": "/curso/modulo-4-demostracion/video/paso-8-cierre",
+       "stream": "V_05563"
+      },
+      {
+       "titulo": "Chequeo",
+       "autor": "",
+       "duracion": "01:05",
+       "url": "/curso/modulo-4-demostracion/video/chequeo",
+       "stream": "V_05564"
+      }
+     ]
+    },
+    {
+     "id": "modulo-5-patrocinio-1",
+     "tipo": "curso",
+     "titulo": "Módulo 5: Patrocinio",
+     "url": "/kit/programa-de-capacitacion-basica/curso/modulo-5-patrocinio-1",
+     "clases": [
+      {
+       "titulo": "M5 - Bloque 1",
+       "autor": "DURACIÓN: 8:25",
+       "duracion": "",
+       "url": "/curso/modulo-5-patrocinio-1/video/m5-bloque-1",
+       "stream": "V_03913"
+      },
+      {
+       "titulo": "M5 - Bloque 2",
+       "autor": "DURACIÓN: 9:55",
+       "duracion": "",
+       "url": "/curso/modulo-5-patrocinio-1/video/m5-bloque-2",
+       "stream": "V_01116"
+      },
+      {
+       "titulo": "M5 - Bloque 3",
+       "autor": "DURACIÓN: 13:14",
+       "duracion": "",
+       "url": "/curso/modulo-5-patrocinio-1/video/m5-bloque-3",
+       "stream": "V_01117"
+      },
+      {
+       "titulo": "M5 - Bloque 4",
+       "autor": "DURACIÓN: 17:57",
+       "duracion": "",
+       "url": "/curso/modulo-5-patrocinio-1/video/m5-bloque-4",
+       "stream": "V_01118"
+      },
+      {
+       "titulo": "M5 - Bloque 5",
+       "autor": "DURACIÓN: 6:10",
+       "duracion": "",
+       "url": "/curso/modulo-5-patrocinio-1/video/m5-bloque-5",
+       "stream": "V_01119"
+      }
+     ]
+    },
+    {
+     "id": "modulo-6-posventa",
+     "tipo": "curso",
+     "titulo": "Módulo 6: Posventa",
+     "url": "/kit/programa-de-capacitacion-basica/curso/modulo-6-posventa",
+     "clases": [
+      {
+       "titulo": "B1 - Qué es la posventa",
+       "autor": "",
+       "duracion": "05:27",
+       "url": "/curso/modulo-6-posventa/video/b1-que-es-la-posventa",
+       "stream": "V_05538"
+      },
+      {
+       "titulo": "B2 - Qué es la garantía",
+       "autor": "",
+       "duracion": "10:48",
+       "url": "/curso/modulo-6-posventa/video/b2-que-es-la-garantia",
+       "stream": "V_05539"
+      },
+      {
+       "titulo": "B3 - Fidelización: cómo se construye el vínculo",
+       "autor": "",
+       "duracion": "04:57",
+       "url": "/curso/modulo-6-posventa/video/b3-fidelizacion-como-se-construye-el-vinculo",
+       "stream": "V_05533"
+      },
+      {
+       "titulo": "B4 - Herramientas para la posventa",
+       "autor": "",
+       "duracion": "04:50",
+       "url": "/curso/modulo-6-posventa/video/b4-herramientas-para-la-posventa",
+       "stream": "V_05536"
+      }
+     ]
+    },
+    {
+     "id": "modulo-7-flex-marketing-plan-psa-r",
+     "tipo": "curso",
+     "titulo": "Módulo 7: Flex Marketing Plan PSA®",
+     "url": "/kit/programa-de-capacitacion-basica/curso/modulo-7-flex-marketing-plan-psa-r",
+     "clases": [
+      {
+       "titulo": "M7 - Bloque 1 - Introducción a nuestro Sistema",
+       "autor": "",
+       "duracion": "04:40",
+       "url": "/curso/modulo-7-flex-marketing-plan-psa-r/video/m7-bloque-1-introduccion-a-nuestro-sistema",
+       "stream": "V_04328"
+      },
+      {
+       "titulo": "M7 - Bloque 2 - Categoría D",
+       "autor": "",
+       "duracion": "11:58",
+       "url": "/curso/modulo-7-flex-marketing-plan-psa-r/video/m7-bloque-2-categoria-d",
+       "stream": "V_05553"
+      },
+      {
+       "titulo": "M7 - Bloque 3 - Beneficios Categoría D",
+       "autor": "",
+       "duracion": "12:32",
+       "url": "/curso/modulo-7-flex-marketing-plan-psa-r/video/m7-bloque-3-beneficios-categoria-d",
+       "stream": "V_05725"
+      },
+      {
+       "titulo": "M7 - Bloque 4 - Categoría DC",
+       "autor": "",
+       "duracion": "10:06",
+       "url": "/curso/modulo-7-flex-marketing-plan-psa-r/video/m7-bloque-4-categoria-dc",
+       "stream": "V_04331"
+      },
+      {
+       "titulo": "M7 - Bloque 5 - Beneficios Categoría DC",
+       "autor": "",
+       "duracion": "07:18",
+       "url": "/curso/modulo-7-flex-marketing-plan-psa-r/video/m7-bloque-5-beneficios-categoria-dc",
+       "stream": "V_05726"
+      },
+      {
+       "titulo": "M7 - Bloque 6 - Categoría CE",
+       "autor": "",
+       "duracion": "12:14",
+       "url": "/curso/modulo-7-flex-marketing-plan-psa-r/video/m7-bloque-6-categoria-ce",
+       "stream": "V_05727"
+      }
+     ]
+    },
+    {
+     "id": "modulo-8-nuestra-marca",
+     "tipo": "curso",
+     "titulo": "Módulo 8: Nuestra marca",
+     "url": "/kit/programa-de-capacitacion-basica/curso/modulo-8-nuestra-marca",
+     "clases": [
+      {
+       "titulo": "M8 - Bloque 1 - La marca PSA",
+       "autor": "",
+       "duracion": "03:43",
+       "url": "/curso/modulo-8-nuestra-marca/video/m8-bloque-1-la-marca-psa",
+       "stream": "V_05411"
+      },
+      {
+       "titulo": "M8 - Bloque 2 - El DIP y la marca",
+       "autor": "",
+       "duracion": "06:24",
+       "url": "/curso/modulo-8-nuestra-marca/video/m8-bloque-2-el-dip-y-la-marca",
+       "stream": "V_05412"
+      },
+      {
+       "titulo": "M8 - Bloque 3 - La marca y la sustentabilidad",
+       "autor": "",
+       "duracion": "01:50",
+       "url": "/curso/modulo-8-nuestra-marca/video/m8-bloque-3-la-marca-y-la-sustentabilidad",
+       "stream": "V_04659"
+      },
+      {
+       "titulo": "M8 - Bloque 4 - Nuestras acciones: la comunicación",
+       "autor": "",
+       "duracion": "03:24",
+       "url": "/curso/modulo-8-nuestra-marca/video/m8-bloque-4-nuestras-acciones-la-comunicacion",
+       "stream": "V_05413"
+      },
+      {
+       "titulo": "M8 - Bloque 5 - Nuestras acciones: marketing personal",
+       "autor": "",
+       "duracion": "05:48",
+       "url": "/curso/modulo-8-nuestra-marca/video/m8-bloque-5-nuestras-acciones-marketing-personal",
+       "stream": "V_05414"
+      },
+      {
+       "titulo": "M8 - Bloque 6 - Servicio de Comercialización",
+       "autor": "",
+       "duracion": "02:38",
+       "url": "/curso/modulo-8-nuestra-marca/video/m8-bloque-6-servicio-de-comercializacion",
+       "stream": "V_05418"
+      },
+      {
+       "titulo": "M8 - Bloque 7 - Servicio de Patrocinio",
+       "autor": "",
+       "duracion": "02:44",
+       "url": "/curso/modulo-8-nuestra-marca/video/m8-bloque-7-servicio-de-patrocinio",
+       "stream": "V_05416"
+      },
+      {
+       "titulo": "M8 - Bloque 8 - Servicio de Posventa",
+       "autor": "",
+       "duracion": "03:57",
+       "url": "/curso/modulo-8-nuestra-marca/video/m8-bloque-8-servicio-de-posventa",
+       "stream": "V_05419"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "slug": "productos-psa",
+   "id": 4,
+   "titulo": "Productos PSA",
+   "url": "/kit/productos-psa",
+   "secciones": [
+    {
+     "id": "275",
+     "tipo": "tematica",
+     "titulo": "Beneficios de los Productos PSA",
+     "url": "/tematica/listadoclases/275",
+     "clases": [
+      {
+       "titulo": "Bloque 1 - PSA Mini",
+       "autor": "",
+       "duracion": "02:43",
+       "url": "/tematica/275/video/bloque-1-psa-mini",
+       "stream": "V_04081"
+      },
+      {
+       "titulo": "Bloque 2 - PSA Vero",
+       "autor": "",
+       "duracion": "01:19",
+       "url": "/tematica/275/video/bloque-2-psa-vero",
+       "stream": "V_04082"
+      },
+      {
+       "titulo": "Bloque 3 - PSA Senior",
+       "autor": "",
+       "duracion": "01:53",
+       "url": "/tematica/275/video/bloque-3-psa-senior",
+       "stream": "V_04083"
+      },
+      {
+       "titulo": "Bloque 4 - PSA Senior 4",
+       "autor": "",
+       "duracion": "08:04",
+       "url": "/tematica/275/video/bloque-4-psa-senior-4",
+       "stream": "V_04084"
+      },
+      {
+       "titulo": "Bloque 5 - PSA Senior 4 - Encuestas a Usuarios y beneficios económicos",
+       "autor": "",
+       "duracion": "05:05",
+       "url": "/tematica/275/video/bloque-5-psa-senior-4-encuestas-a-usuarios-y-beneficios-economicos",
+       "stream": "V_04085"
+      },
+      {
+       "titulo": "Bloque 6 - Beneficios de los productos en cuanto a la Carrera Empresarial",
+       "autor": "(01.21)",
+       "duracion": "",
+       "url": "/tematica/275/video/bloque-6-beneficios-de-los-productos-en-cuanto-a-la-carrera-empresarial",
+       "stream": "V_04086"
+      },
+      {
+       "titulo": "Bloque 7 - Línea S-1000 II, PSA Senik y Quantum",
+       "autor": "",
+       "duracion": "05:20",
+       "url": "/tematica/275/video/bloque-7-linea-s-1000-ii-psa-senik-y-quantum",
+       "stream": "V_04087"
+      },
+      {
+       "titulo": "Bloque 8 - Línea Belleza",
+       "autor": "",
+       "duracion": "04:13",
+       "url": "/tematica/275/video/bloque-8-linea-belleza",
+       "stream": "V_04088"
+      },
+      {
+       "titulo": "Bloque 9 - PSA Aire II",
+       "autor": "",
+       "duracion": "04:45",
+       "url": "/tematica/275/video/bloque-9-psa-aire-ii",
+       "stream": "V_04089"
+      },
+      {
+       "titulo": "Bloque 10 - Tips para transmitir beneficios",
+       "autor": "",
+       "duracion": "03:10",
+       "url": "/tematica/275/video/bloque-10-tips-para-transmitir-beneficios",
+       "stream": "V_05168"
+      }
+     ]
+    },
+    {
+     "id": "352",
+     "tipo": "tematica",
+     "titulo": "Línea de Productos",
+     "url": "/tematica/listadoclases/352",
+     "clases": [
+      {
+       "titulo": "PSA ROtech UV PSA Airpurifier PSA Rinnova PSA Senior4 PSA Iontrix3 PSA DUCHA 2 PSA S•1000•2 PSA Senik PSA Quantum PSA ROPOT PSA DOMUS PSA MINI DOMUS PSA Senior PSA Mini PSA Vero PSA eco-D Purificador de Aire PSA SodaBurby PSA C3 PSA Senior 3 PSA Dispenser 2 Video LINEA DE PRODUCTOS",
+       "autor": "",
+       "duracion": "00:18",
+       "url": "/tematica/352/video/linea-de-productos",
+       "stream": "V_05045"
+      }
+     ]
+    },
+    {
+     "id": "354",
+     "tipo": "tematica",
+     "titulo": "Problemáticas del agua y aire",
+     "url": "/tematica/listadoclases/354",
+     "clases": [
+      {
+       "titulo": "Agua salada Agua sin tratar Aire Arsénico Cloro y trihalometanos Dureza Hierro y Manganeso Metales Pesados Turbidez Video Problemáticas y soluciones",
+       "autor": "",
+       "duracion": "00:21",
+       "url": "/tematica/354/video/problematicas-y-soluciones",
+       "stream": "V_05046"
+      }
+     ]
+    },
+    {
+     "id": "300",
+     "tipo": "tematica",
+     "titulo": "Certificaciones y avales",
+     "url": "/tematica/listadoclases/300",
+     "clases": [
+      {
+       "titulo": "B1 - Empresa - Certificación B",
+       "autor": "Horacio Torti (Gerente de Producto) - Valeria Castro (Responsable de Sustentabilidad) (03.12)",
+       "duracion": "",
+       "url": "/tematica/300/video/b1-empresa-certificacion-b",
+       "stream": "V_05177"
+      },
+      {
+       "titulo": "B2 - Empresa - Continente Antártico",
+       "autor": "Horacio Torti (Gerente de Producto)",
+       "duracion": "02:51",
+       "url": "/tematica/300/video/b2-empresa-continente-antartico",
+       "stream": "V_05178"
+      },
+      {
+       "titulo": "B3 - Empresa - Sello Buen Diseño",
+       "autor": "Horacio Torti (Gerente de Producto)",
+       "duracion": "01:49",
+       "url": "/tematica/300/video/b3-empresa-sello-buen-diseno",
+       "stream": "V_05179"
+      },
+      {
+       "titulo": "B4 - Purificadores - Retención de Microcistina",
+       "autor": "Horacio Torti (Gerente de Producto)",
+       "duracion": "02:43",
+       "url": "/tematica/300/video/b4-purificadores-retencion-de-microcistina",
+       "stream": "V_05180"
+      },
+      {
+       "titulo": "B5 - Purificadores - Certificaciones Internacionales",
+       "autor": "Horacio Torti (Gerente de Producto)",
+       "duracion": "05:22",
+       "url": "/tematica/300/video/b5-purificadores-certificaciones-internacionales",
+       "stream": "V_05181"
+      }
+     ]
+    },
+    {
+     "id": "388",
+     "tipo": "tematica",
+     "titulo": "Griferías PSA",
+     "url": "/tematica/listadoclases/388",
+     "clases": [
+      {
+       "titulo": "Griferia BM Griferia Bicomando Video Lanzamiento | Grifería Bicomando",
+       "autor": "",
+       "duracion": "01:10",
+       "url": "/tematica/388/video/lanzamiento-griferia-bicomando",
+       "stream": "V_05618"
+      }
+     ]
+    },
+    {
+     "id": "instalacion",
+     "tipo": "curso",
+     "titulo": "Instalación",
+     "url": "/kit/productos-psa/curso/instalacion",
+     "clases": [
+      {
+       "titulo": "B1 - Herramientas para la instalación",
+       "autor": "Federico Meza (DC) - Sebastian Spioussas (DC)",
+       "duracion": "04:07",
+       "url": "/curso/instalacion/video/b1-herramientas-para-la-instalacion",
+       "stream": "V_05605"
+      },
+      {
+       "titulo": "B2 - Consideraciones previas",
+       "autor": "Sebastian Spioussas (DC)",
+       "duracion": "02:56",
+       "url": "/curso/instalacion/video/b2-consideraciones-previas",
+       "stream": "V_05515"
+      },
+      {
+       "titulo": "B3 - Instalación Estándar",
+       "autor": "Federico Meza (DC)",
+       "duracion": "02:29",
+       "url": "/curso/instalacion/video/b3-instalacion-estandar",
+       "stream": "V_05508"
+      },
+      {
+       "titulo": "B4 - Instalación en griferías especiales",
+       "autor": "Sebastian Spioussas (DC)",
+       "duracion": "07:03",
+       "url": "/curso/instalacion/video/b4-instalacion-en-griferias-especiales",
+       "stream": "V_05506"
+      },
+      {
+       "titulo": "B5 - Cómo usar el manómetro",
+       "autor": "Federico Meza (DC)",
+       "duracion": "02:38",
+       "url": "/curso/instalacion/video/b5-como-usar-el-manometro",
+       "stream": "V_05604"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "slug": "comercializacion",
+   "id": 23,
+   "titulo": "Comercialización",
+   "url": "/kit/comercializacion",
+   "secciones": [
+    {
+     "id": "326",
+     "tipo": "tematica",
+     "titulo": "Último estreno",
+     "url": "/tematica/listadoclases/326",
+     "clases": [
+      {
+       "titulo": "6 acciones estratégicas para la venta Video Último estreno | 6 acciones estratégicas para la venta",
+       "autor": "",
+       "duracion": "00:30",
+       "url": "/tematica/326/video/ultimo-estreno-6-acciones-estrategicas-para-la-venta",
+       "stream": "V_05810"
+      }
+     ]
+    },
+    {
+     "id": "261",
+     "tipo": "tematica",
+     "titulo": "Nivel Inicial - Comercialización",
+     "url": "/tematica/listadoclases/261",
+     "clases": [
+      {
+       "titulo": "Lista de contactos 3 claves para concretar demos Modelo de llamados Simulacro Demo Referidos Paso a paso para la concientización Video Nivel Inicial - Comercialización",
+       "autor": "",
+       "duracion": "00:27",
+       "url": "/tematica/261/video/nivel-inicial-comercializacion",
+       "stream": "V_05101"
+      }
+     ]
+    },
+    {
+     "id": "263",
+     "tipo": "tematica",
+     "titulo": "Nivel Intermedio - Comercialización",
+     "url": "/tematica/listadoclases/263",
+     "clases": [
+      {
+       "titulo": "Referidos: Claves para más efectividad Resolver la venta Los 12 cierres Pasaje de precios: todo lo que hay que saber Video Nivel Intermedio - Comercialización",
+       "autor": "",
+       "duracion": "00:31",
+       "url": "/tematica/263/video/nivel-intermedio-comercializacion",
+       "stream": "V_04035"
+      }
+     ]
+    },
+    {
+     "id": "265",
+     "tipo": "tematica",
+     "titulo": "Nivel Avanzado - Comercialización",
+     "url": "/tematica/listadoclases/265",
+     "clases": [
+      {
+       "titulo": "De la demostración a la presentación Packs PSA Productividad en el Negocio PSA Tienda PSA y Mercado Libre Video Nivel Avanzado - Comercialización",
+       "autor": "",
+       "duracion": "00:26",
+       "url": "/tematica/265/video/nivel-avanzado-comercializacion",
+       "stream": "V_04062"
+      }
+     ]
+    },
+    {
+     "id": "redes-sociales-y-el-negocio-psa",
+     "tipo": "curso",
+     "titulo": "Redes sociales y el Negocio PSA",
+     "url": "/kit/comercializacion/curso/redes-sociales-y-el-negocio-psa",
+     "clases": [
+      {
+       "titulo": "B1 - Por qué crear un perfil",
+       "autor": "",
+       "duracion": "02:10",
+       "url": "/curso/redes-sociales-y-el-negocio-psa/video/b1-por-que-crear-un-perfil",
+       "stream": "V_05652"
+      },
+      {
+       "titulo": "B2 - Consideraciones previas",
+       "autor": "",
+       "duracion": "02:17",
+       "url": "/curso/redes-sociales-y-el-negocio-psa/video/b2-consideraciones-previas-1",
+       "stream": "V_05648"
+      },
+      {
+       "titulo": "B3 - Cómo empezar a pensar tu perfil",
+       "autor": "",
+       "duracion": "02:53",
+       "url": "/curso/redes-sociales-y-el-negocio-psa/video/b3-como-empezar-a-pensar-tu-perfil",
+       "stream": "V_05649"
+      },
+      {
+       "titulo": "B4 - Cómo armar tu perfil",
+       "autor": "",
+       "duracion": "02:31",
+       "url": "/curso/redes-sociales-y-el-negocio-psa/video/b4-como-armar-tu-perfil",
+       "stream": "V_05640"
+      },
+      {
+       "titulo": "B5 - Tipos de contenidos",
+       "autor": "",
+       "duracion": "07:30",
+       "url": "/curso/redes-sociales-y-el-negocio-psa/video/b5-tipos-de-contenidos",
+       "stream": "V_05641"
+      },
+      {
+       "titulo": "B6 - Qué no se puede hacer",
+       "autor": "",
+       "duracion": "04:00",
+       "url": "/curso/redes-sociales-y-el-negocio-psa/video/b6-que-no-se-puede-hacer",
+       "stream": "V_05650"
+      },
+      {
+       "titulo": "B7 - Cómo aumentar tus seguidores",
+       "autor": "",
+       "duracion": "03:14",
+       "url": "/curso/redes-sociales-y-el-negocio-psa/video/b7-como-aumentar-tus-seguidores",
+       "stream": "V_05651"
+      }
+     ]
+    },
+    {
+     "id": "stands-todo-lo-que-necesito-saber",
+     "tipo": "curso",
+     "titulo": "STANDS: todo lo que necesito saber",
+     "url": "/kit/comercializacion/curso/stands-todo-lo-que-necesito-saber",
+     "clases": [
+      {
+       "titulo": "Bloque 1 - Por qué participar",
+       "autor": "",
+       "duracion": "03:51",
+       "url": "/curso/stands-todo-lo-que-necesito-saber/video/bloque-1-por-que-participar",
+       "stream": "V_05581"
+      },
+      {
+       "titulo": "Bloque 2 - Dónde ubicar tu stand",
+       "autor": "",
+       "duracion": "02:02",
+       "url": "/curso/stands-todo-lo-que-necesito-saber/video/bloque-2-donde-ubicar-tu-stand",
+       "stream": "V_05582"
+      },
+      {
+       "titulo": "Bloque 3 - Tipos de stand",
+       "autor": "",
+       "duracion": "03:56",
+       "url": "/curso/stands-todo-lo-que-necesito-saber/video/bloque-3-tipos-de-stand",
+       "stream": "V_05583"
+      },
+      {
+       "titulo": "Bloque 4 - Cómo vestir en el stand",
+       "autor": "",
+       "duracion": "01:38",
+       "url": "/curso/stands-todo-lo-que-necesito-saber/video/bloque-4-como-vestir-en-el-stand",
+       "stream": "V_05584"
+      },
+      {
+       "titulo": "Bloque 5 - Cómo solicitar un stand",
+       "autor": "",
+       "duracion": "04:33",
+       "url": "/curso/stands-todo-lo-que-necesito-saber/video/bloque-5-como-solicitar-un-stand",
+       "stream": "V_05585"
+      },
+      {
+       "titulo": "Bloque 6 - Qué hacer tras la aprobación",
+       "autor": "",
+       "duracion": "",
+       "url": "/curso/stands-todo-lo-que-necesito-saber/video/bloque-6-que-hacer-tras-la-aprobacion",
+       "stream": "V_05586"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "slug": "crecimiento-empresarial",
+   "id": 12,
+   "titulo": "Crecimiento Empresarial",
+   "url": "/kit/crecimiento-empresarial",
+   "secciones": [
+    {
+     "id": "262",
+     "tipo": "tematica",
+     "titulo": "Nivel Inicial - Crecimiento Empresarial",
+     "url": "/tematica/listadoclases/262",
+     "clases": [
+      {
+       "titulo": "Invitación al Negocio PSA El ABC para presentar el Negocio Seguimiento de invitados Guiar al nuevo Simulacro de Patrocinio Campus para invitados Video Nivel Inicial - Patrocinio",
+       "autor": "",
+       "duracion": "00:28",
+       "url": "/tematica/262/video/nivel-inicial-patrocinio",
+       "stream": "V_04037"
+      }
+     ]
+    },
+    {
+     "id": "264",
+     "tipo": "tematica",
+     "titulo": "Nivel Intermedio - Crecimiento Empresarial",
+     "url": "/tematica/listadoclases/264",
+     "clases": [
+      {
+       "titulo": "6 claves para hacer funcionar tu Negocio Cómo guiar los primeros 3 meses Claves para lograr permanencia en el equipo Construcción de equipos sólidos Plan de crecimiento en PSA Video Nivel Intermedio - Patrocinio",
+       "autor": "",
+       "duracion": "00:31",
+       "url": "/tematica/264/video/nivel-intermedio-patrocinio",
+       "stream": "V_04038"
+      }
+     ]
+    },
+    {
+     "id": "266",
+     "tipo": "tematica",
+     "titulo": "Nivel Avanzado - Crecimiento Empresarial",
+     "url": "/tematica/listadoclases/266",
+     "clases": [
+      {
+       "titulo": "Cómo trabajar el Negocio Integrado Principios para la construcción de redes sólidas Gestión emocional Estrategia 80/20 PSA vs Sistemas Piramidales Video Nivel Avanzado - Patrocinio",
+       "autor": "",
+       "duracion": "00:26",
+       "url": "/tematica/266/video/nivel-avanzado-patrocinio",
+       "stream": "V_04061"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "slug": "posventa",
+   "id": 21,
+   "titulo": "Posventa",
+   "url": "/kit/posventa",
+   "secciones": [
+    {
+     "id": "394",
+     "tipo": "tematica",
+     "titulo": "Cómo fidelizar a los usuarios",
+     "url": "/tematica/listadoclases/394",
+     "clases": [
+      {
+       "titulo": "B1 - Por qué fidelizar",
+       "autor": "María de los Ángeles Dancheff",
+       "duracion": "03:41",
+       "url": "/tematica/394/video/b1-por-que-fidelizar",
+       "stream": "V_05679"
+      },
+      {
+       "titulo": "B2 - Estrategias para fidelizar",
+       "autor": "María de los Ángeles Dancheff",
+       "duracion": "06:20",
+       "url": "/tematica/394/video/b2-estrategias-para-fidelizar",
+       "stream": "V_05680"
+      },
+      {
+       "titulo": "B3 - Cómo recuperar a un Usuario desatendido",
+       "autor": "María de los Ángeles Dancheff",
+       "duracion": "02:04",
+       "url": "/tematica/394/video/b3-como-recuperar-a-un-usuario-desatendido",
+       "stream": "V_05681"
+      }
+     ]
+    },
+    {
+     "id": "232",
+     "tipo": "tematica",
+     "titulo": "PSA: Somos Servicio",
+     "url": "/tematica/listadoclases/232",
+     "clases": [
+      {
+       "titulo": "Bloque 1 - Programa de fidelización",
+       "autor": "Andrea Aronis (Gerenta de Posventa)",
+       "duracion": "04:34",
+       "url": "/tematica/232/video/bloque-1-programa-de-fidelizacion",
+       "stream": "V_03396"
+      },
+      {
+       "titulo": "Bloque 2 - Encuestas a usuarios",
+       "autor": "Andrea Aronis (Gerenta de Posventa)",
+       "duracion": "06:05",
+       "url": "/tematica/232/video/bloque-2-encuestas-a-usuarios",
+       "stream": "V_03397"
+      },
+      {
+       "titulo": "Bloque 3 ¿Qué es el servicio?",
+       "autor": "María de los Ángeles Dancheff (CE)",
+       "duracion": "04:58",
+       "url": "/tematica/232/video/bloque-3-que-es-el-servicio",
+       "stream": "V_03398"
+      },
+      {
+       "titulo": "Bloque 4 - 1,2,3.. CANJE!",
+       "autor": "María de los Ángeles Dancheff (CE)",
+       "duracion": "03:29",
+       "url": "/tematica/232/video/bloque-4-1-2-3-canje",
+       "stream": "V_03399"
+      },
+      {
+       "titulo": "Bloque 5 - Las tres A",
+       "autor": "Alejandro Basotti Stein (DC)",
+       "duracion": "06:01",
+       "url": "/tematica/232/video/bloque-5-las-tres-a",
+       "stream": "V_03401"
+      },
+      {
+       "titulo": "Bloque 6 - Futuros canjes",
+       "autor": "María de los Ángeles Dancheff (CE)",
+       "duracion": "04:32",
+       "url": "/tematica/232/video/bloque-6-futuros-canjes",
+       "stream": "V_03402"
+      }
+     ]
+    },
+    {
+     "id": "350",
+     "tipo": "tematica",
+     "titulo": "Por qué realizar un canje",
+     "url": "/tematica/listadoclases/350",
+     "clases": [
+      {
+       "titulo": "Por qué realizar el canje",
+       "autor": "",
+       "duracion": "02:15",
+       "url": "/tematica/350/video/por-que-realizar-el-canje",
+       "stream": "V_05022"
+      }
+     ]
+    },
+    {
+     "id": "302",
+     "tipo": "tematica",
+     "titulo": "Cómo organizar los canjes",
+     "url": "/tematica/listadoclases/302",
+     "clases": [
+      {
+       "titulo": "Cómo organizar los canjes del mes",
+       "autor": "",
+       "duracion": "01:46",
+       "url": "/tematica/302/video/como-organizar-los-canjes-del-mes",
+       "stream": "V_04447"
+      }
+     ]
+    },
+    {
+     "id": "199",
+     "tipo": "tematica",
+     "titulo": "Cómo realizar el Canje en el mes de vencimiento",
+     "url": "/tematica/listadoclases/199",
+     "clases": [
+      {
+       "titulo": "Bloque 1: Capacitación y resultados",
+       "autor": "Daniel Di Pietro",
+       "duracion": "04:09",
+       "url": "/tematica/199/video/bloque-1-capacitacion-y-resultados",
+       "stream": "V_02693"
+      },
+      {
+       "titulo": "Bloque 2: ¿Cuándo comienza el canje?",
+       "autor": "Daniel Di Pietro",
+       "duracion": "01:12",
+       "url": "/tematica/199/video/bloque-2-cuando-comienza-el-canje",
+       "stream": "V_02694"
+      },
+      {
+       "titulo": "Bloque 3: Servicio Profesional",
+       "autor": "Daniel Di Pietro",
+       "duracion": "05:30",
+       "url": "/tematica/199/video/bloque-3-servicio-profesional",
+       "stream": "V_02695"
+      },
+      {
+       "titulo": "Bloque 4: Beneficios del Servicio Profesional",
+       "autor": "Daniel Di Pietro",
+       "duracion": "01:59",
+       "url": "/tematica/199/video/bloque-4-beneficios-del-servicio-profesional",
+       "stream": "V_02696"
+      },
+      {
+       "titulo": "Bloque 5: Por qué realizar el canje en el mes de vencimiento",
+       "autor": "Daniel Di Pietro",
+       "duracion": "01:29",
+       "url": "/tematica/199/video/bloque-5-por-que-realizar-el-canje-en-el-mes-de-vencimiento",
+       "stream": "V_02697"
+      },
+      {
+       "titulo": "Bloque 6: Cómo realizar el canje en el mes de vencimiento",
+       "autor": "Daniel Di Pietro",
+       "duracion": "05:16",
+       "url": "/tematica/199/video/bloque-6-como-realizar-el-canje-en-el-mes-de-vencimiento",
+       "stream": "V_02698"
+      },
+      {
+       "titulo": "Bloque 7: Llamado de Canje",
+       "autor": "Daniel Di Pietro",
+       "duracion": "04:51",
+       "url": "/tematica/199/video/bloque-7-llamado-de-canje",
+       "stream": "V_02699"
+      },
+      {
+       "titulo": "Bloque 8: Demo canje- Prueba visual",
+       "autor": "Daniel Di Pietro",
+       "duracion": "05:45",
+       "url": "/tematica/199/video/bloque-8-demo-canje-prueba-visual",
+       "stream": "V_02700"
+      },
+      {
+       "titulo": "Bloque 9: Demo canje- Prueba degustativa",
+       "autor": "Daniel Di Pietro",
+       "duracion": "03:39",
+       "url": "/tematica/199/video/bloque-9-demo-canje-prueba-degustativa",
+       "stream": "V_02701"
+      },
+      {
+       "titulo": "Bloque 10: Demo canje- Prueba reactivo de cloro",
+       "autor": "Daniel Di Pietro",
+       "duracion": "02:37",
+       "url": "/tematica/199/video/bloque-10-demo-canje-prueba-reactivo-de-cloro",
+       "stream": "V_02702"
+      },
+      {
+       "titulo": "Bloque 11: Demo canje- Bacteriostasis",
+       "autor": "Daniel Di Pietro",
+       "duracion": "01:28",
+       "url": "/tematica/199/video/bloque-11-demo-canje-bacteriostasis",
+       "stream": "V_02703"
+      },
+      {
+       "titulo": "Bloque 12: Demo Canje- Cierre",
+       "autor": "Daniel Di Pietro",
+       "duracion": "05:19",
+       "url": "/tematica/199/video/bloque-12-demo-canje-cierre",
+       "stream": "V_02704"
+      }
+     ]
+    },
+    {
+     "id": "398",
+     "tipo": "tematica",
+     "titulo": "Buenas prácticas para entregar un Canje",
+     "url": "/tematica/listadoclases/398",
+     "clases": [
+      {
+       "titulo": "Buenas prácticas para entregar un Canje",
+       "autor": "",
+       "duracion": "01:13",
+       "url": "/tematica/398/video/buenas-practicas-para-entregar-un-canje",
+       "stream": "V_05753"
+      }
+     ]
+    },
+    {
+     "id": "163",
+     "tipo": "tematica",
+     "titulo": "Cómo usar el SEC-KIT-O",
+     "url": "/tematica/listadoclases/163",
+     "clases": [
+      {
+       "titulo": "¿Cómo usar el SEC-KIT-O?",
+       "autor": "",
+       "duracion": "02:43",
+       "url": "/tematica/163/video/como-usar-el-sec-kit-o",
+       "stream": "V_01476"
+      }
+     ]
+    },
+    {
+     "id": "252",
+     "tipo": "tematica",
+     "titulo": "Simulacro de Canje",
+     "url": "/tematica/listadoclases/252",
+     "clases": [
+      {
+       "titulo": "Bloque 1 - Llamado de Canje",
+       "autor": "Maximiliano Alza (DC)",
+       "duracion": "01:53",
+       "url": "/tematica/252/video/bloque-1-llamado-de-canje",
+       "stream": "V_05398"
+      },
+      {
+       "titulo": "Bloque 2 - Encuesta de canje",
+       "autor": "Maximiliano Alza (DC) - Adriana Torres (D)",
+       "duracion": "05:17",
+       "url": "/tematica/252/video/bloque-2-encuesta-de-canje",
+       "stream": "V_05405"
+      },
+      {
+       "titulo": "Bloque 3 - Demostración de canje",
+       "autor": "Maximiliano Alza (DC) - Adriana Torres (D)",
+       "duracion": "08:41",
+       "url": "/tematica/252/video/bloque-3-demostracion-de-canje",
+       "stream": "V_03903"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "slug": "autoliderazgo",
+   "id": 3,
+   "titulo": "Autoliderazgo",
+   "url": "/kit/autoliderazgo",
+   "secciones": [
+    {
+     "id": "331",
+     "tipo": "tematica",
+     "titulo": "De empleado a empresario",
+     "url": "/tematica/listadoclases/331",
+     "clases": [
+      {
+       "titulo": "B1 - La vida antes de PSA - Florencia Pereira",
+       "autor": "",
+       "duracion": "01:51",
+       "url": "/tematica/331/video/b1-la-vida-antes-de-psa-florencia-pereira",
+       "stream": "V_04675"
+      },
+      {
+       "titulo": "B2 - La vida antes de PSA - Yesica Alí",
+       "autor": "",
+       "duracion": "02:30",
+       "url": "/tematica/331/video/b2-la-vida-antes-de-psa-yesica-ali",
+       "stream": "V_04707"
+      },
+      {
+       "titulo": "B3 - La vida antes de PSA - Ariel Oliva",
+       "autor": "",
+       "duracion": "03:52",
+       "url": "/tematica/331/video/b3-la-vida-antes-de-psa-ariel-oliva",
+       "stream": "V_04677"
+      },
+      {
+       "titulo": "B4 - Comenzar en PSA - Florencia Pereira",
+       "autor": "",
+       "duracion": "08:03",
+       "url": "/tematica/331/video/b4-comenzar-en-psa-florencia-pereira",
+       "stream": "V_04678"
+      },
+      {
+       "titulo": "B5 - Comenzar en PSA - Yesica Alí",
+       "autor": "",
+       "duracion": "04:06",
+       "url": "/tematica/331/video/b5-comenzar-en-psa-yesica-ali",
+       "stream": "V_04679"
+      },
+      {
+       "titulo": "B6 - Comenzar en PSA - Ariel Oliva",
+       "autor": "",
+       "duracion": "05:49",
+       "url": "/tematica/331/video/b6-comenzar-en-psa-ariel-oliva",
+       "stream": "V_04680"
+      },
+      {
+       "titulo": "B7 - Una vida diferente con PSA - Florencia Pereira",
+       "autor": "",
+       "duracion": "04:02",
+       "url": "/tematica/331/video/b7-una-vida-diferente-con-psa-florencia-pereira",
+       "stream": "V_04681"
+      },
+      {
+       "titulo": "B8 - Una vida diferente con PSA - Yesica Alí",
+       "autor": "",
+       "duracion": "07:05",
+       "url": "/tematica/331/video/b8-una-vida-diferente-con-psa-yesica-ali",
+       "stream": "V_04682"
+      },
+      {
+       "titulo": "B9 - Una vida diferente con PSA - Ariel Oliva",
+       "autor": "",
+       "duracion": "05:21",
+       "url": "/tematica/331/video/b9-una-vida-diferente-con-psa-ariel-oliva",
+       "stream": "V_04683"
+      }
+     ]
+    },
+    {
+     "id": "339",
+     "tipo": "tematica",
+     "titulo": "Los 8 pasos del patrón del éxito",
+     "url": "/tematica/listadoclases/339",
+     "clases": [
+      {
+       "titulo": "Introducción a la receta del éxito",
+       "autor": "Melisa Fardin (CE) – Sofía Stafforini (DC)",
+       "duracion": "01:53",
+       "url": "/tematica/339/video/introduccion-a-la-receta-del-exito",
+       "stream": "V_04789"
+      },
+      {
+       "titulo": "Paso 1: Sueños",
+       "autor": "Melisa Fardin (CE) – Sofía Stafforini (DC)",
+       "duracion": "04:56",
+       "url": "/tematica/339/video/paso-1-suenos",
+       "stream": "V_04790"
+      },
+      {
+       "titulo": "Paso 2: Compromiso",
+       "autor": "Melisa Fardin (CE) – Sofía Stafforini (DC)",
+       "duracion": "04:25",
+       "url": "/tematica/339/video/paso-2-compromiso",
+       "stream": "V_04791"
+      },
+      {
+       "titulo": "Paso 3: Lista de contactos",
+       "autor": "Melisa Fardin (CE) – Sofía Stafforini (DC)",
+       "duracion": "01:20",
+       "url": "/tematica/339/video/paso-3-lista-de-contactos",
+       "stream": "V_04792"
+      },
+      {
+       "titulo": "Paso 4: Contacto e invitación",
+       "autor": "Melisa Fardin (CE) – Sofía Stafforini (DC)",
+       "duracion": "05:21",
+       "url": "/tematica/339/video/paso-4-contacto-e-invitacion",
+       "stream": "V_04793"
+      },
+      {
+       "titulo": "Paso 5: Presentación",
+       "autor": "Melisa Fardin (CE) – Sofía Stafforini (DC)",
+       "duracion": "03:08",
+       "url": "/tematica/339/video/paso-5-presentacion",
+       "stream": "V_04794"
+      },
+      {
+       "titulo": "Paso 6: seguimiento",
+       "autor": "Melisa Fardin (CE) – Sofía Stafforini (DC)",
+       "duracion": "06:28",
+       "url": "/tematica/339/video/paso-6-seguimiento",
+       "stream": "V_04795"
+      },
+      {
+       "titulo": "Paso 7: Chequeo de acciones",
+       "autor": "Melisa Fardin (CE) – Sofía Stafforini (DC)",
+       "duracion": "06:00",
+       "url": "/tematica/339/video/paso-7-chequeo-de-acciones",
+       "stream": "V_04796"
+      },
+      {
+       "titulo": "Paso 8: Duplicación",
+       "autor": "Melisa Fardin (CE) – Sofía Stafforini (DC)",
+       "duracion": "04:00",
+       "url": "/tematica/339/video/paso-8-duplicacion",
+       "stream": "V_04797"
+      }
+     ]
+    },
+    {
+     "id": "341",
+     "tipo": "tematica",
+     "titulo": "Encontrar tu para qué",
+     "url": "/tematica/listadoclases/341",
+     "clases": [
+      {
+       "titulo": "Bloque 1 - Por qué un para qué",
+       "autor": "Franco Sosa (CE) - Belén Alvarado (DC)",
+       "duracion": "05:06",
+       "url": "/tematica/341/video/bloque-1-por-que-un-para-que",
+       "stream": "V_04887"
+      },
+      {
+       "titulo": "Bloque 2 - Trabajar el para qué de tus vínculos",
+       "autor": "Franco Sosa (CE) - Belén Alvarado (DC)",
+       "duracion": "03:46",
+       "url": "/tematica/341/video/bloque-2-trabajar-el-para-que-de-tus-vinculos",
+       "stream": "V_04832"
+      },
+      {
+       "titulo": "Bloque 3 - Formarse para el propósito",
+       "autor": "Franco Sosa (CE) - Belén Alvarado (DC)",
+       "duracion": "02:32",
+       "url": "/tematica/341/video/bloque-3-formarse-para-el-proposito",
+       "stream": "V_04833"
+      },
+      {
+       "titulo": "Bloque 4 - Elegir el para que y visualizarlo",
+       "autor": "Franco Sosa (CE) - Belén Alvarado (DC)",
+       "duracion": "03:44",
+       "url": "/tematica/341/video/bloque-4-elegir-el-para-que-y-visualizarlo",
+       "stream": "V_04888"
+      },
+      {
+       "titulo": "Bloque 5 - Conectar con el para qué de tu equipo",
+       "autor": "Franco Sosa (CE) - Belén Alvarado (DC)",
+       "duracion": "05:13",
+       "url": "/tematica/341/video/bloque-5-conectar-con-el-para-que-de-tu-equipo",
+       "stream": "V_04889"
+      }
+     ]
+    },
+    {
+     "id": "141",
+     "tipo": "tematica",
+     "titulo": "Agenda PSA: planificación, acción y resultados",
+     "url": "/tematica/listadoclases/141",
+     "clases": [
+      {
+       "titulo": "Bloque 1 - Agenda de 4ta generación",
+       "autor": "Melisa Fardín (DC) - Alex Blanco (DC) |",
+       "duracion": "01:39",
+       "url": "/tematica/141/video/bloque-1-agenda-de-4ta-generacion",
+       "stream": "V_03574"
+      },
+      {
+       "titulo": "Bloque 2 - Agenda anual",
+       "autor": "Melisa Fardín (DC) - Alex Blanco (DC) |",
+       "duracion": "04:03",
+       "url": "/tematica/141/video/bloque-2-agenda-anual",
+       "stream": "V_04293"
+      },
+      {
+       "titulo": "Bloque 3 - Ruedas de la vida, del Negocio y metas",
+       "autor": "Melisa Fardín (DC) - Alex Blanco (DC) |",
+       "duracion": "01:51",
+       "url": "/tematica/141/video/bloque-3-ruedas-de-la-vida-del-negocio-y-metas",
+       "stream": "V_03576"
+      },
+      {
+       "titulo": "Bloque 4 - Presupuesto y planificación",
+       "autor": "Melisa Fardín (DC) - Alex Blanco (DC) |",
+       "duracion": "05:02",
+       "url": "/tematica/141/video/bloque-4-presupuesto-y-planificacion",
+       "stream": "V_03577"
+      },
+      {
+       "titulo": "Bloque 5 - Definición de prioridades, primera parte",
+       "autor": "Melisa Fardín (DC) - Alex Blanco (DC) |",
+       "duracion": "04:33",
+       "url": "/tematica/141/video/bloque-5-definicion-de-prioridades-primera-parte",
+       "stream": "V_04294"
+      },
+      {
+       "titulo": "Bloque 6 - Definición de prioridades, segunda parte",
+       "autor": "Melisa Fardín (DC) - Alex Blanco (DC) |",
+       "duracion": "02:49",
+       "url": "/tematica/141/video/bloque-6-definicion-de-prioridades-segunda-parte",
+       "stream": "V_04295"
+      },
+      {
+       "titulo": "Bloque 7 - Coordinación de acciones",
+       "autor": "Melisa Fardín (DC) - Alex Blanco (DC) |",
+       "duracion": "01:55",
+       "url": "/tematica/141/video/bloque-7-coordinacion-de-acciones",
+       "stream": "V_04296"
+      },
+      {
+       "titulo": "Bloque 8 - Chequeo diario",
+       "autor": "Melisa Fardín (DC) - Alex Blanco (DC) |",
+       "duracion": "01:17",
+       "url": "/tematica/141/video/bloque-8-chequeo-diario",
+       "stream": "V_04297"
+      },
+      {
+       "titulo": "Bloque 9 - Chequeo diario- pasaje de demostraciones",
+       "autor": "Melisa Fardín (DC) - Alex Blanco (DC) |",
+       "duracion": "02:41",
+       "url": "/tematica/141/video/bloque-9-chequeo-diario-pasaje-de-demostraciones",
+       "stream": "V_04298"
+      },
+      {
+       "titulo": "Bloque 10 - Chequeo diario- pasaje de presentaciones",
+       "autor": "Melisa Fardín (DC) - Alex Blanco (DC) |",
+       "duracion": "01:30",
+       "url": "/tematica/141/video/bloque-10-chequeo-diario-pasaje-de-presentaciones",
+       "stream": "V_04299"
+      },
+      {
+       "titulo": "Bloque 11 - Chequeo diario- movimientos en cuenta PSA",
+       "autor": "Melisa Fardín (DC) - Alex Blanco (DC) |",
+       "duracion": "02:50",
+       "url": "/tematica/141/video/bloque-11-chequeo-diario-movimientos-en-cuenta-psa",
+       "stream": "V_04300"
+      },
+      {
+       "titulo": "Bloque 12 - Cierre de mes",
+       "autor": "Melisa Fardín (DC) - Alex Blanco (DC) |",
+       "duracion": "03:13",
+       "url": "/tematica/141/video/bloque-12-cierre-de-mes",
+       "stream": "V_04301"
+      }
+     ]
+    },
+    {
+     "id": "363",
+     "tipo": "tematica",
+     "titulo": "Inteligencia Financiera en el Negocio",
+     "url": "/tematica/listadoclases/363",
+     "clases": [
+      {
+       "titulo": "B1 - Cómo ser libre financieramente",
+       "autor": "Alan Stevenson (Líder de Equipo)",
+       "duracion": "01:41",
+       "url": "/tematica/363/video/b1-como-ser-libre-financieramente",
+       "stream": "V_05184"
+      },
+      {
+       "titulo": "B2 - Cómo vivir bien",
+       "autor": "Alan Stevenson (Líder de Equipo)",
+       "duracion": "02:16",
+       "url": "/tematica/363/video/b2-como-vivir-bien",
+       "stream": "V_05185"
+      },
+      {
+       "titulo": "B3 - Cómo cumplir grandes sueños",
+       "autor": "Alan Stevenson (Líder de Equipo)",
+       "duracion": "03:35",
+       "url": "/tematica/363/video/b3-como-cumplir-grandes-suenos",
+       "stream": "V_05186"
+      },
+      {
+       "titulo": "B4 - Cómo trabajar el sueño con el nuevo",
+       "autor": "Alan Stevenson (Líder de equipo)",
+       "duracion": "03:56",
+       "url": "/tematica/363/video/b4-como-trabajar-el-sueno-con-el-nuevo",
+       "stream": "V_05191"
+      },
+      {
+       "titulo": "B5 - Por qué ganar el bonus",
+       "autor": "Alan Stevenson (Líder de Equipo)",
+       "duracion": "03:35",
+       "url": "/tematica/363/video/b5-por-que-ganar-el-bonus",
+       "stream": "V_05195"
+      },
+      {
+       "titulo": "B6 - Cuánto invertir en el Negocio",
+       "autor": "Alan Stevenson (Líder de Equipo)",
+       "duracion": "05:52",
+       "url": "/tematica/363/video/b6-cuanto-invertir-en-el-negocio",
+       "stream": "V_05192"
+      }
+     ]
+    },
+    {
+     "id": "337",
+     "tipo": "tematica",
+     "titulo": "Autodisciplina: cambiar desde adentro",
+     "url": "/tematica/listadoclases/337",
+     "clases": [
+      {
+       "titulo": "B1 – Lo invisible de la Carrera Empresarial",
+       "autor": "Matias Bustos (LE)",
+       "duracion": "02:40",
+       "url": "/tematica/337/video/b1-lo-invisible-de-la-carrera-empresarial",
+       "stream": "V_04852"
+      },
+      {
+       "titulo": "B2 – Prepararse para el Liderazgo",
+       "autor": "Matías Bustos (LE)",
+       "duracion": "04:08",
+       "url": "/tematica/337/video/b2-prepararse-para-el-liderazgo",
+       "stream": "V_04853"
+      },
+      {
+       "titulo": "B3 – Hábitos invisibles – Parte I",
+       "autor": "Matías Bustos (LE)",
+       "duracion": "02:10",
+       "url": "/tematica/337/video/b3-habitos-invisibles-parte-i",
+       "stream": "V_04767"
+      },
+      {
+       "titulo": "B4 – Hábitos invisibles – Parte II",
+       "autor": "Matías Bustos (LE)",
+       "duracion": "03:53",
+       "url": "/tematica/337/video/b4-habitos-invisibles-parte-ii",
+       "stream": "V_04768"
+      },
+      {
+       "titulo": "B5 – Trabajar lo invisible",
+       "autor": "Matías Bustos (LE)",
+       "duracion": "03:43",
+       "url": "/tematica/337/video/b5-trabajar-lo-invisible",
+       "stream": "V_04769"
+      },
+      {
+       "titulo": "B6 – Garantía para tu futuro",
+       "autor": "Matías Bustos (LE)",
+       "duracion": "04:41",
+       "url": "/tematica/337/video/b6-garantia-para-tu-futuro",
+       "stream": "V_04770"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "slug": "sustentabilidad",
+   "id": 1,
+   "titulo": "Sustentabilidad",
+   "url": "/kit/sustentabilidad",
+   "secciones": [
+    {
+     "id": "desarrollo-sostenible",
+     "tipo": "curso",
+     "titulo": "Desarrollo sostenible",
+     "url": "/kit/sustentabilidad/curso/desarrollo-sostenible",
+     "clases": [
+      {
+       "titulo": "B1- Qué es el desarrollo sostenible",
+       "autor": "",
+       "duracion": "02:05",
+       "url": "/curso/desarrollo-sostenible/video/b1-que-es-el-desarrollo-sostenible",
+       "stream": "V_05730"
+      },
+      {
+       "titulo": "B2 - PSA y la sustentabilidad",
+       "autor": "",
+       "duracion": "01:56",
+       "url": "/curso/desarrollo-sostenible/video/b2-psa-y-la-sustentabilidad",
+       "stream": "V_05731"
+      },
+      {
+       "titulo": "B3 - DIPs, agentes de cambio",
+       "autor": "",
+       "duracion": "03:49",
+       "url": "/curso/desarrollo-sostenible/video/b3-dips-agentes-de-cambio",
+       "stream": "V_05732"
+      }
+     ]
+    },
+    {
+     "id": "empresas-b",
+     "tipo": "curso",
+     "titulo": "Empresas B",
+     "url": "/kit/sustentabilidad/curso/empresas-b",
+     "clases": [
+      {
+       "titulo": "B1 - Qué es Sistema B",
+       "autor": "",
+       "duracion": "02:24",
+       "url": "/curso/empresas-b/video/b1-que-es-sistema-b",
+       "stream": "V_05735"
+      },
+      {
+       "titulo": "B2 - Qué son las Empresas B",
+       "autor": "",
+       "duracion": "05:49",
+       "url": "/curso/empresas-b/video/b2-que-son-las-empresas-b",
+       "stream": "V_05736"
+      },
+      {
+       "titulo": "B3 - PSA como Empresa B",
+       "autor": "",
+       "duracion": "02:24",
+       "url": "/curso/empresas-b/video/b3-psa-como-empresa-b",
+       "stream": "V_05737"
+      }
+     ]
+    },
+    {
+     "id": "economia-circular",
+     "tipo": "curso",
+     "titulo": "Economía Circular",
+     "url": "/kit/sustentabilidad/curso/economia-circular",
+     "clases": [
+      {
+       "titulo": "B1- Qué es la economía circular",
+       "autor": "",
+       "duracion": "02:38",
+       "url": "/curso/economia-circular/video/b1-que-es-la-economia-circular",
+       "stream": "V_05733"
+      },
+      {
+       "titulo": "B2 - PSA y la economía circular",
+       "autor": "",
+       "duracion": "01:24",
+       "url": "/curso/economia-circular/video/b2-psa-y-la-economia-circular",
+       "stream": "V_05751"
+      }
+     ]
+    },
+    {
+     "id": "huella-de-carbono",
+     "tipo": "curso",
+     "titulo": "Huella de Carbono",
+     "url": "/kit/sustentabilidad/curso/huella-de-carbono",
+     "clases": [
+      {
+       "titulo": "B1 - Qué es el cambio climático",
+       "autor": "",
+       "duracion": "04:02",
+       "url": "/curso/huella-de-carbono/video/b1-que-es-el-cambio-climatico",
+       "stream": "V_05738"
+      },
+      {
+       "titulo": "B2 - Qué es la huella de carbono",
+       "autor": "",
+       "duracion": "02:08",
+       "url": "/curso/huella-de-carbono/video/b2-que-es-la-huella-de-carbono",
+       "stream": "V_05739"
+      },
+      {
+       "titulo": "B3 - PSA y la reducción de la huella",
+       "autor": "",
+       "duracion": "01:14",
+       "url": "/curso/huella-de-carbono/video/b3-psa-y-la-reduccion-de-la-huella",
+       "stream": "V_05740"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "slug": "eventos-de-formacion-psa",
+   "id": 15,
+   "titulo": "Eventos de Formación PSA",
+   "url": "/kit/eventos-de-formacion-psa",
+   "secciones": [
+    {
+     "id": "381",
+     "tipo": "tematica",
+     "titulo": "Encuentro Internacional de Liderazgo 2026",
+     "url": "/tematica/listadoclases/381",
+     "clases": [
+      {
+       "titulo": "Encuentro Internacional de Liderazgo 2026",
+       "autor": "",
+       "duracion": "01:14",
+       "url": "/tematica/381/video/encuentro-internacional-de-liderazgo-2026",
+       "stream": "V_05502"
+      }
+     ]
+    },
+    {
+     "id": "357",
+     "tipo": "tematica",
+     "titulo": "Encuentro Distribuidores Calificados 2025",
+     "url": "/tematica/listadoclases/357",
+     "clases": [
+      {
+       "titulo": "Encuentro Distribuidores Calificados 2025",
+       "autor": "",
+       "duracion": "01:37",
+       "url": "/tematica/357/video/encuentro-distribuidores-calificados-2025",
+       "stream": "V_05126"
+      }
+     ]
+    },
+    {
+     "id": "315",
+     "tipo": "tematica",
+     "titulo": "Encuentro de Liderazgo 2024",
+     "url": "/tematica/listadoclases/315",
+     "clases": [
+      {
+       "titulo": "Encuentro de Liderazgo Abril 2024",
+       "autor": "",
+       "duracion": "02:21",
+       "url": "/tematica/315/video/encuentro-de-liderazgo-abril-2024",
+       "stream": "V_04531"
+      }
+     ]
+    },
+    {
+     "id": "334",
+     "tipo": "tematica",
+     "titulo": "Seminario de Distribuidores Calificados 2024",
+     "url": "/tematica/listadoclases/334",
+     "clases": [
+      {
+       "titulo": "Seminario de Distribuidores Calificados 2024",
+       "autor": "",
+       "duracion": "02:17",
+       "url": "/tematica/334/video/seminario-de-distribuidores-calificados-2024",
+       "stream": "V_04709"
+      }
+     ]
+    },
+    {
+     "id": "312",
+     "tipo": "tematica",
+     "titulo": "Encuentro de Liderazgo 2023",
+     "url": "/tematica/listadoclases/312",
+     "clases": [
+      {
+       "titulo": "Encuentro de Liderazgo 2023",
+       "autor": "",
+       "duracion": "02:17",
+       "url": "/tematica/312/video/encuentro-de-liderazgo-2023",
+       "stream": "V_04511"
+      }
+     ]
+    },
+    {
+     "id": "311",
+     "tipo": "tematica",
+     "titulo": "Reencuentro PSA 2022",
+     "url": "/tematica/listadoclases/311",
+     "clases": [
+      {
+       "titulo": "Reencuentro PSA 2022",
+       "autor": "",
+       "duracion": "02:08",
+       "url": "/tematica/311/video/reencuentro-psa-2022",
+       "stream": "V_04510"
+      }
+     ]
+    },
+    {
+     "id": "310",
+     "tipo": "tematica",
+     "titulo": "Seminario Ismael Cala 2019",
+     "url": "/tematica/listadoclases/310",
+     "clases": [
+      {
+       "titulo": "Seminario PSA - Ismael Cala",
+       "autor": "",
+       "duracion": "01:01",
+       "url": "/tematica/310/video/seminario-psa-ismael-cala",
+       "stream": "V_04509"
+      }
+     ]
+    },
+    {
+     "id": "309",
+     "tipo": "tematica",
+     "titulo": "Seminario para Distribuidores Calificados 2019",
+     "url": "/tematica/listadoclases/309",
+     "clases": [
+      {
+       "titulo": "Seminario de Distribuidores Calificados - Carlos Paez",
+       "autor": "2019 -",
+       "duracion": "01:49",
+       "url": "/tematica/309/video/seminario-de-distribuidores-calificados-carlos-paez",
+       "stream": "V_04508"
+      }
+     ]
+    },
+    {
+     "id": "308",
+     "tipo": "tematica",
+     "titulo": "Seminario Estanislao Bachrach 2018",
+     "url": "/tematica/listadoclases/308",
+     "clases": [
+      {
+       "titulo": "Seminario Internacional - Estanislao Bachrach",
+       "autor": "2018",
+       "duracion": "00:43",
+       "url": "/tematica/308/video/seminario-internacional-estanislao-bachrach",
+       "stream": "V_04507"
+      }
+     ]
+    },
+    {
+     "id": "307",
+     "tipo": "tematica",
+     "titulo": "Seminario Sergio Fernandez 2018",
+     "url": "/tematica/listadoclases/307",
+     "clases": [
+      {
+       "titulo": "Seminario 2018: Sergio Fernandez",
+       "autor": "",
+       "duracion": "00:47",
+       "url": "/tematica/307/video/seminario-2018-sergio-fernandez",
+       "stream": "V_04506"
+      }
+     ]
+    },
+    {
+     "id": "306",
+     "tipo": "tematica",
+     "titulo": "Seminario Octubre 2016",
+     "url": "/tematica/listadoclases/306",
+     "clases": [
+      {
+       "titulo": "Encuentro Internacional - 2016",
+       "autor": "Entrevista Flia Pugliese | Adriana Macías | Helios Herrera",
+       "duracion": "02:21",
+       "url": "/tematica/306/video/encuentro-internacional-2016",
+       "stream": "V_04505"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "slug": "dip-tecnico",
+   "id": 16,
+   "titulo": "DIP Técnico",
+   "url": "/kit/dip-tecnico",
+   "secciones": [
+    {
+     "id": "323",
+     "tipo": "tematica",
+     "titulo": "Presentación DIP Técnico",
+     "url": "/tematica/listadoclases/323",
+     "clases": [
+      {
+       "titulo": "B1 - Qué es ser DIP Técnico",
+       "autor": "",
+       "duracion": "01:58",
+       "url": "/tematica/323/video/b1-que-es-ser-dip-tecnico",
+       "stream": "V_04593"
+      },
+      {
+       "titulo": "B2 - Beneficios DIP Técnico",
+       "autor": "",
+       "duracion": "03:33",
+       "url": "/tematica/323/video/b2-beneficios-dip-tecnico",
+       "stream": "V_04594"
+      },
+      {
+       "titulo": "B3 - Requisitos y suscripción",
+       "autor": "",
+       "duracion": "01:52",
+       "url": "/tematica/323/video/b3-requisitos-y-suscripcion",
+       "stream": "V_04595"
+      },
+      {
+       "titulo": "B4 - Cómo buscar un DIP Técnico",
+       "autor": "",
+       "duracion": "01:18",
+       "url": "/tematica/323/video/b4-como-buscar-un-dip-tecnico",
+       "stream": "V_04596"
+      },
+      {
+       "titulo": "B5 - Coordinación de la visita de instalación",
+       "autor": "",
+       "duracion": "01:11",
+       "url": "/tematica/323/video/b5-coordinacion-de-la-visita-de-instalacion",
+       "stream": "V_04597"
+      }
+     ]
+    },
+    {
+     "id": "instalacion-griferia-bm",
+     "tipo": "curso",
+     "titulo": "Instalación Grifería BM",
+     "url": "/kit/dip-tecnico/curso/instalacion-griferia-bm",
+     "clases": [
+      {
+       "titulo": "Grifería PSA BM | Consideraciones previas",
+       "autor": "",
+       "duracion": "02:58",
+       "url": "/curso/instalacion-griferia-bm/video/griferia-psa-bm-consideraciones-previas",
+       "stream": "V_04939"
+      }
+     ]
+    },
+    {
+     "id": "psa-senior-4-bm",
+     "tipo": "curso",
+     "titulo": "PSA Senior 4 BM",
+     "url": "/kit/dip-tecnico/curso/psa-senior-4-bm",
+     "clases": [
+      {
+       "titulo": "PSA Senior4 BM | Puesta a punto",
+       "autor": "",
+       "duracion": "02:58",
+       "url": "/curso/psa-senior-4-bm/video/psa-senior4-bm-puesta-a-punto",
+       "stream": "V_05121"
+      }
+     ]
+    },
+    {
+     "id": "psa-s1000-2-bm",
+     "tipo": "curso",
+     "titulo": "PSA S1000 2 BM",
+     "url": "/kit/dip-tecnico/curso/psa-s1000-2-bm",
+     "clases": [
+      {
+       "titulo": "PSA S1000 2 BM | Puesta a punto",
+       "autor": "",
+       "duracion": "02:47",
+       "url": "/curso/psa-s1000-2-bm/video/psa-s1000-2-bm-puesta-a-punto",
+       "stream": "V_04590"
+      }
+     ]
+    },
+    {
+     "id": "psa-senik-bm",
+     "tipo": "curso",
+     "titulo": "PSA Senik BM",
+     "url": "/kit/dip-tecnico/curso/psa-senik-bm",
+     "clases": [
+      {
+       "titulo": "PSA Senik BM | Puesta a punto",
+       "autor": "",
+       "duracion": "02:45",
+       "url": "/curso/psa-senik-bm/video/psa-senik-bm-puesta-a-punto",
+       "stream": "V_04591"
+      }
+     ]
+    },
+    {
+     "id": "psa-quantum-bm",
+     "tipo": "curso",
+     "titulo": "PSA Quantum BM",
+     "url": "/kit/dip-tecnico/curso/psa-quantum-bm",
+     "clases": [
+      {
+       "titulo": "PSA Quantum BM | Puesta a punto",
+       "autor": "",
+       "duracion": "02:46",
+       "url": "/curso/psa-quantum-bm/video/psa-quantum-bm-puesta-a-punto",
+       "stream": "V_04592"
+      }
+     ]
+    },
+    {
+     "id": "griferia-bicomando-bm",
+     "tipo": "curso",
+     "titulo": "Grifería Bicomando BM",
+     "url": "/kit/dip-tecnico/curso/griferia-bicomando-bm",
+     "clases": [
+      {
+       "titulo": "Grifería Bicomando | Instalación",
+       "autor": "",
+       "duracion": "02:53",
+       "url": "/curso/griferia-bicomando-bm/video/griferia-bicomando-instalacion",
+       "stream": "V_05200"
+      }
+     ]
+    },
+    {
+     "id": "psa-domus",
+     "tipo": "curso",
+     "titulo": "PSA DOMUS",
+     "url": "/kit/dip-tecnico/curso/psa-domus",
+     "clases": [
+      {
+       "titulo": "PSA DOMUS | Instalación",
+       "autor": "",
+       "duracion": "04:41",
+       "url": "/curso/psa-domus/video/psa-domus-instalacion",
+       "stream": "V_04823"
+      }
+     ]
+    },
+    {
+     "id": "psa-mini-domus",
+     "tipo": "curso",
+     "titulo": "PSA MINI DOMUS",
+     "url": "/kit/dip-tecnico/curso/psa-mini-domus",
+     "clases": [
+      {
+       "titulo": "PSA MINI DOMUS | Instalación",
+       "autor": "",
+       "duracion": "",
+       "url": "/curso/psa-mini-domus/video/psa-mini-domus-instalacion",
+       "stream": "V_05128"
+      }
+     ]
+    },
+    {
+     "id": "psa-rotech-uv-bm",
+     "tipo": "curso",
+     "titulo": "PSA ROTECH UV BM",
+     "url": "/kit/dip-tecnico/curso/psa-rotech-uv-bm",
+     "clases": [
+      {
+       "titulo": "PSA ROtech UV BM | Presentación",
+       "autor": "",
+       "duracion": "03:38",
+       "url": "/curso/psa-rotech-uv-bm/video/psa-rotech-uv-bm-presentacion",
+       "stream": "V_05769"
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "playlists": [
+  {
+   "slug": "autoliderazgo",
+   "titulo": "Autoliderazgo",
+   "descripcion": "Aquí vas a encontrar todas las entrevistas relacionadas con el poder de la autoformación y el liderazgo. El secreto para crecer en el Negocio PSA es siempre estar en Modo Aprendíz.",
+   "audios": [
+    {
+     "titulo": "LA PREVIA DEL VIVO 22/04 | Negocio PSA: El valor del sistema",
+     "audioId": 19,
+     "stream": "A_00716"
+    },
+    {
+     "titulo": "PSA Podcast Temporada 2 - Episodio 2",
+     "audioId": 5018,
+     "stream": "A_00451"
+    },
+    {
+     "titulo": "Vibrar el Negocio PSA",
+     "audioId": 5052,
+     "stream": "A_00461"
+    },
+    {
+     "titulo": "Tomar la iniciativa y capacitarse",
+     "audioId": 5206,
+     "stream": "A_00468"
+    },
+    {
+     "titulo": "Planificación y Acción para un Año Extraordinario",
+     "audioId": 5352,
+     "stream": "A_00470"
+    },
+    {
+     "titulo": "Redes Sociales cómo potenciar nuestro Negocio",
+     "audioId": 5397,
+     "stream": "A_00471"
+    },
+    {
+     "titulo": "Qué es lo que aprendí en el Negocio PSA",
+     "audioId": 5615,
+     "stream": "A_00475"
+    },
+    {
+     "titulo": "Comenzar en el Negocio PSA dejando de lado el ego",
+     "audioId": 5671,
+     "stream": "A_00476"
+    },
+    {
+     "titulo": "Planificación y metas claras",
+     "audioId": 5699,
+     "stream": "A_00477"
+    },
+    {
+     "titulo": "El tipo de Líder que me gustaría ser",
+     "audioId": 5802,
+     "stream": "A_00480"
+    },
+    {
+     "titulo": "Entablar un vínculo y planificar tu liderazgo",
+     "audioId": 5803,
+     "stream": "A_00481"
+    },
+    {
+     "titulo": "Claridad en la planificación",
+     "audioId": 6027,
+     "stream": "A_00490"
+    },
+    {
+     "titulo": "El poder de los cambios",
+     "audioId": 6352,
+     "stream": "A_00501"
+    },
+    {
+     "titulo": "Liderarse es planificar",
+     "audioId": 6386,
+     "stream": "A_00503"
+    },
+    {
+     "titulo": "Duplicar la planificación",
+     "audioId": 6652,
+     "stream": "A_00512"
+    },
+    {
+     "titulo": "Agenda PSA: Planificando resultados",
+     "audioId": 6703,
+     "stream": "A_00514"
+    },
+    {
+     "titulo": "Construyendo hábitos, creando consciencia",
+     "audioId": 6771,
+     "stream": "A_00522"
+    },
+    {
+     "titulo": "Construyendo un autoliderazgo consciente",
+     "audioId": 7000,
+     "stream": "A_00531"
+    },
+    {
+     "titulo": "Disfrutar el Negocio. Darse la oportunidad",
+     "audioId": 7855,
+     "stream": "A_00564"
+    },
+    {
+     "titulo": "Ganarle tiempo al calendario",
+     "audioId": 7884,
+     "stream": "A_00565"
+    },
+    {
+     "titulo": "Hacer el Negocio en grande",
+     "audioId": 7898,
+     "stream": "A_00568"
+    },
+    {
+     "titulo": "Planificar tu vida",
+     "audioId": 7932,
+     "stream": "A_00570"
+    },
+    {
+     "titulo": "Manejar los tiempos con responsabilidad",
+     "audioId": 7948,
+     "stream": "A_00572"
+    },
+    {
+     "titulo": "Estar conectado para que las cosas pasen",
+     "audioId": 7981,
+     "stream": "A_00574"
+    },
+    {
+     "titulo": "Adaptarse para crecer en el Negocio PSA",
+     "audioId": 8019,
+     "stream": "A_00578"
+    },
+    {
+     "titulo": "PSA: Un negocio de personas",
+     "audioId": 8049,
+     "stream": "A_00580"
+    },
+    {
+     "titulo": "El camino al éxito",
+     "audioId": 8073,
+     "stream": "A_00581"
+    },
+    {
+     "titulo": "Las acciones necesarias para cumplir tus metas",
+     "audioId": 8149,
+     "stream": "A_00588"
+    },
+    {
+     "titulo": "Confiar en el proceso para llegar a los resultados",
+     "audioId": 8235,
+     "stream": "A_00595"
+    },
+    {
+     "titulo": "Sostener las acciones en el tiempo",
+     "audioId": 8252,
+     "stream": "A_00597"
+    },
+    {
+     "titulo": "PSA: Un camino de éxito",
+     "audioId": 8323,
+     "stream": "A_00603"
+    },
+    {
+     "titulo": "Cambiar la mentalidad para crecer",
+     "audioId": 8355,
+     "stream": "A_00605"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 8/05 | Ser Líder PSA",
+     "audioId": 8426,
+     "stream": "A_00609"
+    },
+    {
+     "titulo": "La creencia como motor para el Negocio",
+     "audioId": 8436,
+     "stream": "A_00610"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 15/05 | El poder del ejemplo",
+     "audioId": 8450,
+     "stream": "A_00611"
+    },
+    {
+     "titulo": "Un liderazgo conciente",
+     "audioId": 8456,
+     "stream": "A_00612"
+    },
+    {
+     "titulo": "Acciones pequeñas para tener resultados grandes",
+     "audioId": 8517,
+     "stream": "A_00616"
+    },
+    {
+     "titulo": "Los desafíos del Negocio PSA",
+     "audioId": 8538,
+     "stream": "A_00618"
+    },
+    {
+     "titulo": "Resultados a día 15",
+     "audioId": 8566,
+     "stream": "A_00620"
+    },
+    {
+     "titulo": "Concretando sueños",
+     "audioId": 8609,
+     "stream": "A_00624"
+    },
+    {
+     "titulo": "Construir Negocio",
+     "audioId": 8672,
+     "stream": "A_00628"
+    },
+    {
+     "titulo": "Somos nuestras decisiones",
+     "audioId": 8715,
+     "stream": "A_00634"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 11/09 | Camino al liderazgo",
+     "audioId": 8939,
+     "stream": "A_00639"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 25/09 | Camino a Ejecutivo PSA",
+     "audioId": 8940,
+     "stream": "A_00640"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 23/10 | Autodisciplina: pilar del liderazgo",
+     "audioId": 9045,
+     "stream": "A_00644"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 06/11 | Inspirar para crecer",
+     "audioId": 9069,
+     "stream": "A_00645"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 15/01 | Tu para qué en el Negocio PSA",
+     "audioId": 9310,
+     "stream": "A_00652"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 7/02 | El poder exponencial del Negocio",
+     "audioId": 9406,
+     "stream": "A_00654"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 12/02 | Libertad financiera en el Negocio PSA",
+     "audioId": 9434,
+     "stream": "A_00656"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 26/02 | El motor de la Carrera Empresarial",
+     "audioId": 9462,
+     "stream": "A_00658"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 12/03 | Ser Coordinador PSA",
+     "audioId": 9498,
+     "stream": "A_00659"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 23/04 | El Corazón de la Carrera Empresarial",
+     "audioId": 9657,
+     "stream": "A_00665"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 02/06 | Plan de Crecimiento en PSA",
+     "audioId": 9924,
+     "stream": "A_00677"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 01/08 | Foco en el crecimiento",
+     "audioId": 10028,
+     "stream": "A_00679"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 06/08 | Resolver la venta en Plan",
+     "audioId": 10068,
+     "stream": "A_00680"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 13/08 | BONUS PSA: estrategia para la abundancia",
+     "audioId": 10123,
+     "stream": "A_00685"
+    }
+   ]
+  },
+  {
+   "slug": "comercializacion",
+   "titulo": "Comercialización",
+   "descripcion": "Aquí vas a encontrar todas las entrevistas referidas a uno de los aspectos esenciales del Negocio PSA: La Comercialización. Abarcando desde distintas técnicas de venta, hasta cómo comunicar los beneficios de los productos.",
+   "audios": [
+    {
+     "titulo": "Técnicas para resultados en ventas todos los meses",
+     "audioId": 5544,
+     "stream": "A_00473"
+    },
+    {
+     "titulo": "Como superé la situación más difícil que tuve en la casa de un usuario",
+     "audioId": 5614,
+     "stream": "A_00474"
+    },
+    {
+     "titulo": "Comercializar Packs es brindar soluciones",
+     "audioId": 5834,
+     "stream": "A_00482"
+    },
+    {
+     "titulo": "Un vínculo fluido para facilitar la comercialización",
+     "audioId": 5835,
+     "stream": "A_00483"
+    },
+    {
+     "titulo": "Los primeros pasos de la comercialización de Packs",
+     "audioId": 5906,
+     "stream": "A_00485"
+    },
+    {
+     "titulo": "Confiar en uno mismo y en la capacitación que brinda la empresa",
+     "audioId": 5907,
+     "stream": "A_00484"
+    },
+    {
+     "titulo": "Senior 4: Subiendo la vara a la par de PSA",
+     "audioId": 6312,
+     "stream": "A_00499"
+    },
+    {
+     "titulo": "Los 12 Cierres puestos en práctica",
+     "audioId": 6353,
+     "stream": "A_00502"
+    },
+    {
+     "titulo": "Los 12 Cierres bajo la lupa",
+     "audioId": 6411,
+     "stream": "A_00504"
+    },
+    {
+     "titulo": "Los 12 Cierres y el vínculo con el Usuario",
+     "audioId": 6468,
+     "stream": "A_00506"
+    },
+    {
+     "titulo": "Comienza la temporada PSA",
+     "audioId": 6526,
+     "stream": "A_00508"
+    },
+    {
+     "titulo": "Los 12 Cierres aplicados a los resultados",
+     "audioId": 6546,
+     "stream": "A_00509"
+    },
+    {
+     "titulo": "Un verano de acciones y resultados",
+     "audioId": 6600,
+     "stream": "A_00511"
+    },
+    {
+     "titulo": "Sin llamado, no hay Negocio",
+     "audioId": 6814,
+     "stream": "A_00523"
+    },
+    {
+     "titulo": "Asesorar con compromiso",
+     "audioId": 6886,
+     "stream": "A_00527"
+    },
+    {
+     "titulo": "Cada contacto es una oportunidad",
+     "audioId": 6922,
+     "stream": "A_00528"
+    },
+    {
+     "titulo": "Fortalecer el vínculo",
+     "audioId": 8172,
+     "stream": "A_00589"
+    },
+    {
+     "titulo": "Multiplicar tus cierres positivos",
+     "audioId": 8293,
+     "stream": "A_00601"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 9/04 | Resolver la venta para la Carrera Empresarial",
+     "audioId": 9599,
+     "stream": "A_00663"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 10/12 | Packs: Más para tu carrera empresarial",
+     "audioId": 10555,
+     "stream": "A_00703"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 07/01 | Expansión de ventas en la Carrera Empresarial",
+     "audioId": 10649,
+     "stream": "A_00705"
+    }
+   ]
+  },
+  {
+   "slug": "general",
+   "titulo": "General",
+   "descripcion": "Colección de todos los Audios PSA",
+   "audios": [
+    {
+     "titulo": "El crecimiento",
+     "audioId": 1,
+     "stream": "A_00146"
+    },
+    {
+     "titulo": "La guía que te ayudará a detectar tus áreas más débiles",
+     "audioId": 4,
+     "stream": "A_00143"
+    },
+    {
+     "titulo": "La esencia de PSA",
+     "audioId": 9,
+     "stream": "A_00139"
+    },
+    {
+     "titulo": "Los sueños",
+     "audioId": 10,
+     "stream": "A_00138"
+    },
+    {
+     "titulo": "Tips para dar una Presentación de Negocio",
+     "audioId": 11,
+     "stream": "A_00137"
+    },
+    {
+     "titulo": "Historia de PSA",
+     "audioId": 21,
+     "stream": "A_00130"
+    },
+    {
+     "titulo": "El estado de confort",
+     "audioId": 23,
+     "stream": "A_00128"
+    },
+    {
+     "titulo": "La tarea de un DIP",
+     "audioId": 25,
+     "stream": "A_00126"
+    },
+    {
+     "titulo": "Voy a ser feliz cuando pueda hacer lo que amo",
+     "audioId": 27,
+     "stream": "A_00124"
+    },
+    {
+     "titulo": "Proceso de liderazgo",
+     "audioId": 29,
+     "stream": "A_00122"
+    },
+    {
+     "titulo": "¿Qué es PSA?",
+     "audioId": 31,
+     "stream": "A_00120"
+    },
+    {
+     "titulo": "Conciencia",
+     "audioId": 38,
+     "stream": "A_00094"
+    },
+    {
+     "titulo": "El formato del Negocio PSA",
+     "audioId": 39,
+     "stream": "A_00117"
+    },
+    {
+     "titulo": "La responsabilidad",
+     "audioId": 40,
+     "stream": "A_00092"
+    },
+    {
+     "titulo": "Tu primer círculo",
+     "audioId": 41,
+     "stream": "A_00091"
+    },
+    {
+     "titulo": "Creer en vos",
+     "audioId": 42,
+     "stream": "A_00089"
+    },
+    {
+     "titulo": "Consideraciones básicas para un mejor rendimiento en el Negocio PSA",
+     "audioId": 43,
+     "stream": "A_00086"
+    },
+    {
+     "titulo": "Empezar a hacer lo que amás",
+     "audioId": 47,
+     "stream": "A_00079"
+    },
+    {
+     "titulo": "Qué llevar a la demostración",
+     "audioId": 48,
+     "stream": "A_00085"
+    },
+    {
+     "titulo": "Disfrutar del Negocio PSA",
+     "audioId": 50,
+     "stream": "A_00084"
+    },
+    {
+     "titulo": "Cómo armar un equipo",
+     "audioId": 52,
+     "stream": "A_00087"
+    },
+    {
+     "titulo": "Los valores",
+     "audioId": 53,
+     "stream": "A_00142"
+    },
+    {
+     "titulo": "La importancia del desarrollo",
+     "audioId": 54,
+     "stream": "A_00083"
+    },
+    {
+     "titulo": "La culpa",
+     "audioId": 55,
+     "stream": "A_00078"
+    },
+    {
+     "titulo": "Consciencia ambiental",
+     "audioId": 56,
+     "stream": "A_00080"
+    },
+    {
+     "titulo": "Consideraciones importantes para el Negocio PSA",
+     "audioId": 57,
+     "stream": "A_00077"
+    },
+    {
+     "titulo": "El formato PSA",
+     "audioId": 58,
+     "stream": "A_00076"
+    },
+    {
+     "titulo": "¿Qué es la realidad?",
+     "audioId": 59,
+     "stream": "A_00075"
+    },
+    {
+     "titulo": "La consciencia del negocio",
+     "audioId": 60,
+     "stream": "A_00135"
+    },
+    {
+     "titulo": "Los 4 pilares",
+     "audioId": 61,
+     "stream": "A_00074"
+    },
+    {
+     "titulo": "Actitud: Un camino a la excelencia",
+     "audioId": 62,
+     "stream": "A_00001"
+    },
+    {
+     "titulo": "El Plan Canje en tiempo y forma",
+     "audioId": 63,
+     "stream": "A_00002"
+    },
+    {
+     "titulo": "Me enamoré de la capacitación",
+     "audioId": 64,
+     "stream": "A_00003"
+    },
+    {
+     "titulo": "Tips para organizar tu Negocio PSA",
+     "audioId": 65,
+     "stream": "A_00004"
+    },
+    {
+     "titulo": "El prejuicio",
+     "audioId": 66,
+     "stream": "A_00005"
+    },
+    {
+     "titulo": "Poner el foco",
+     "audioId": 67,
+     "stream": "A_00006"
+    },
+    {
+     "titulo": "Autoformación y expansión de conocimiento",
+     "audioId": 68,
+     "stream": "A_00072"
+    },
+    {
+     "titulo": "La invitación",
+     "audioId": 69,
+     "stream": "A_00071"
+    },
+    {
+     "titulo": "¿Cuántos años tenés?",
+     "audioId": 70,
+     "stream": "A_00007"
+    },
+    {
+     "titulo": "Qué es un compromiso",
+     "audioId": 71,
+     "stream": "A_00008"
+    },
+    {
+     "titulo": "Detectar cuando estás en víctima",
+     "audioId": 72,
+     "stream": "A_00070"
+    },
+    {
+     "titulo": "El compromiso",
+     "audioId": 73,
+     "stream": "A_00009"
+    },
+    {
+     "titulo": "Qué entendemos por contactar",
+     "audioId": 74,
+     "stream": "A_00013"
+    },
+    {
+     "titulo": "PSA: Un negocio de duplicación",
+     "audioId": 75,
+     "stream": "A_00015"
+    },
+    {
+     "titulo": "Por qué hago PSA",
+     "audioId": 76,
+     "stream": "A_00023"
+    },
+    {
+     "titulo": "El producto tangible e intangible",
+     "audioId": 77,
+     "stream": "A_00069"
+    },
+    {
+     "titulo": "Los valores",
+     "audioId": 78,
+     "stream": "A_00142"
+    },
+    {
+     "titulo": "Hacernos cargo de nuestras opiniones",
+     "audioId": 79,
+     "stream": "A_00032"
+    },
+    {
+     "titulo": "¿Querés ser tu propio jefe?",
+     "audioId": 81,
+     "stream": "A_00012"
+    },
+    {
+     "titulo": "Todos toman agua",
+     "audioId": 82,
+     "stream": "A_00024"
+    },
+    {
+     "titulo": "Lista de fríos",
+     "audioId": 83,
+     "stream": "A_00014"
+    },
+    {
+     "titulo": "Pasarla bien",
+     "audioId": 84,
+     "stream": "A_00019"
+    },
+    {
+     "titulo": "Expansión de consciencia",
+     "audioId": 85,
+     "stream": "A_00028"
+    },
+    {
+     "titulo": "Introducción al catálogo de Productos PSA, Línea Senior y Vero",
+     "audioId": 86,
+     "stream": "A_00052"
+    },
+    {
+     "titulo": "Dónde solicitar referidos",
+     "audioId": 87,
+     "stream": "A_00043"
+    },
+    {
+     "titulo": "Ganar - Ganar",
+     "audioId": 88,
+     "stream": "A_00010"
+    },
+    {
+     "titulo": "Comunicar las expectativas",
+     "audioId": 89,
+     "stream": "A_00030"
+    },
+    {
+     "titulo": "Modelo proactivo",
+     "audioId": 90,
+     "stream": "A_00067"
+    },
+    {
+     "titulo": "Sembrar para cosechar",
+     "audioId": 92,
+     "stream": "A_00026"
+    },
+    {
+     "titulo": "Hacer lo correcto",
+     "audioId": 93,
+     "stream": "A_00031"
+    },
+    {
+     "titulo": "Momentos de impacto en la demo",
+     "audioId": 94,
+     "stream": "A_00051"
+    },
+    {
+     "titulo": "Principio +1",
+     "audioId": 95,
+     "stream": "A_00048"
+    },
+    {
+     "titulo": "Qué es la posventa",
+     "audioId": 96,
+     "stream": "A_00054"
+    },
+    {
+     "titulo": "¿Qué es el profesionalismo?",
+     "audioId": 97,
+     "stream": "A_00055"
+    },
+    {
+     "titulo": "¿Qué rol cumplís en PSA?",
+     "audioId": 98,
+     "stream": "A_00056"
+    },
+    {
+     "titulo": "Disfrutar de la demo",
+     "audioId": 99,
+     "stream": "A_00050"
+    },
+    {
+     "titulo": "Realizar un banco de Nombres",
+     "audioId": 102,
+     "stream": "A_00058"
+    },
+    {
+     "titulo": "La misión y la visión de la empresa",
+     "audioId": 103,
+     "stream": "A_00066"
+    },
+    {
+     "titulo": "Hacer lo correcto",
+     "audioId": 104,
+     "stream": "A_00031"
+    },
+    {
+     "titulo": "Romper creencias limitantes",
+     "audioId": 105,
+     "stream": "A_00029"
+    },
+    {
+     "titulo": "Tu círculo",
+     "audioId": 106,
+     "stream": "A_00016"
+    },
+    {
+     "titulo": "¿Qué es el tiempo?",
+     "audioId": 108,
+     "stream": "A_00047"
+    },
+    {
+     "titulo": "El Plan Canje empieza en la demo",
+     "audioId": 109,
+     "stream": "A_00059"
+    },
+    {
+     "titulo": "¿Cuál es nuestra misión y visión?",
+     "audioId": 111,
+     "stream": "A_00060"
+    },
+    {
+     "titulo": "Herramientas en la posventa",
+     "audioId": 112,
+     "stream": "A_00057"
+    },
+    {
+     "titulo": "Experiencia en STAND de Rural",
+     "audioId": 113,
+     "stream": "A_00063"
+    },
+    {
+     "titulo": "El orgullo de pertenecer a PSA",
+     "audioId": 114,
+     "stream": "A_00062"
+    },
+    {
+     "titulo": "Hacer lo que tenemos que hacer",
+     "audioId": 115,
+     "stream": "A_00065"
+    },
+    {
+     "titulo": "La administración del tiempo",
+     "audioId": 116,
+     "stream": "A_00061"
+    },
+    {
+     "titulo": "Querer es poder",
+     "audioId": 117,
+     "stream": "A_00064"
+    },
+    {
+     "titulo": "La felicidad de hacer PSA",
+     "audioId": 121,
+     "stream": "A_00049"
+    },
+    {
+     "titulo": "Excusas al momento de completar los referidos",
+     "audioId": 122,
+     "stream": "A_00046"
+    },
+    {
+     "titulo": "Pilares de formación PSA",
+     "audioId": 123,
+     "stream": "A_00025"
+    },
+    {
+     "titulo": "¿Para qué?",
+     "audioId": 124,
+     "stream": "A_00037"
+    },
+    {
+     "titulo": "¿Cómo obtener referidos?",
+     "audioId": 125,
+     "stream": "A_00053"
+    },
+    {
+     "titulo": "Creer en uno mismo",
+     "audioId": 126,
+     "stream": "A_00017"
+    },
+    {
+     "titulo": "Entrevista PSA",
+     "audioId": 127,
+     "stream": "A_00099"
+    },
+    {
+     "titulo": "Entrevista PSA",
+     "audioId": 128,
+     "stream": "A_00096"
+    },
+    {
+     "titulo": "Entrevista PSA",
+     "audioId": 129,
+     "stream": "A_00095"
+    },
+    {
+     "titulo": "Entrevista PSA",
+     "audioId": 130,
+     "stream": "A_00098"
+    },
+    {
+     "titulo": "Ganar - Perder",
+     "audioId": 131,
+     "stream": "A_00011"
+    },
+    {
+     "titulo": "Historias inspiradoras PSA",
+     "audioId": 132,
+     "stream": "A_00102"
+    },
+    {
+     "titulo": "PSA Senik, PSA Quantum, PSA S100II",
+     "audioId": 134,
+     "stream": "A_00105"
+    },
+    {
+     "titulo": "Entrevista PSA",
+     "audioId": 135,
+     "stream": "A_00106"
+    },
+    {
+     "titulo": "Historias inspiradoras PSA",
+     "audioId": 136,
+     "stream": "A_00107"
+    },
+    {
+     "titulo": "Las áreas de ganancia en PSA",
+     "audioId": 137,
+     "stream": "A_00108"
+    },
+    {
+     "titulo": "Entrevista PSA",
+     "audioId": 138,
+     "stream": "A_00112"
+    },
+    {
+     "titulo": "Historias inspiradoras PSA",
+     "audioId": 139,
+     "stream": "A_00113"
+    },
+    {
+     "titulo": "Recomendaciones al momento de compartir el Negocio PSA",
+     "audioId": 140,
+     "stream": "A_00114"
+    },
+    {
+     "titulo": "Historias inspiradoras PSA",
+     "audioId": 141,
+     "stream": "A_00116"
+    },
+    {
+     "titulo": "Entrevista PSA",
+     "audioId": 142,
+     "stream": "A_00149"
+    },
+    {
+     "titulo": "Consideraciones al Presentar el Negocio PSA",
+     "audioId": 143,
+     "stream": "A_00147"
+    },
+    {
+     "titulo": "Entrevista PSA",
+     "audioId": 144,
+     "stream": "A_00109"
+    },
+    {
+     "titulo": "Historias inspiradoras PSA",
+     "audioId": 145,
+     "stream": "A_00110"
+    },
+    {
+     "titulo": "Ser eficiente en el Negocio PSA",
+     "audioId": 146,
+     "stream": "A_00111"
+    },
+    {
+     "titulo": "Historias inspiradoras PSA",
+     "audioId": 147,
+     "stream": "A_00150"
+    },
+    {
+     "titulo": "Tips para reconocer al DIP nuevo",
+     "audioId": 148,
+     "stream": "A_00151"
+    },
+    {
+     "titulo": "Entrevista PSA",
+     "audioId": 149,
+     "stream": "A_00152"
+    },
+    {
+     "titulo": "Historias inspiradoras PSA",
+     "audioId": 150,
+     "stream": "A_00153"
+    },
+    {
+     "titulo": "Principios de éxitos",
+     "audioId": 151,
+     "stream": "A_00154"
+    },
+    {
+     "titulo": "Historias inspiradoras PSA",
+     "audioId": 152,
+     "stream": "A_00155"
+    },
+    {
+     "titulo": "Hacer algo diferente sinonimo de libertad",
+     "audioId": 153,
+     "stream": "A_00156"
+    },
+    {
+     "titulo": "Entrevista PSA",
+     "audioId": 154,
+     "stream": "A_00157"
+    },
+    {
+     "titulo": "Historias inspiradoras PSA",
+     "audioId": 155,
+     "stream": "A_00158"
+    },
+    {
+     "titulo": "PSA; comaprtir un negocio integrado",
+     "audioId": 156,
+     "stream": "A_00159"
+    },
+    {
+     "titulo": "Entrevista PSA",
+     "audioId": 157,
+     "stream": "A_00160"
+    },
+    {
+     "titulo": "Historias inspiradoras PSA",
+     "audioId": 158,
+     "stream": "A_00161"
+    },
+    {
+     "titulo": "Entrevista PSA",
+     "audioId": 159,
+     "stream": "A_00100"
+    },
+    {
+     "titulo": "Entrevista PSA",
+     "audioId": 160,
+     "stream": "A_00148"
+    },
+    {
+     "titulo": "La importancia de hacer para sentir",
+     "audioId": 164,
+     "stream": "A_00162"
+    },
+    {
+     "titulo": "Entrevista PSA",
+     "audioId": 165,
+     "stream": "A_00163"
+    },
+    {
+     "titulo": "Historias inspiradoras PSA",
+     "audioId": 166,
+     "stream": "A_00164"
+    },
+    {
+     "titulo": "Entrevista PSA",
+     "audioId": 167,
+     "stream": "A_00165"
+    },
+    {
+     "titulo": "Historias inspiradoras PSA",
+     "audioId": 168,
+     "stream": "A_00166"
+    },
+    {
+     "titulo": "Dejarse guiar para crecer",
+     "audioId": 169,
+     "stream": "A_00167"
+    },
+    {
+     "titulo": "Entrevista PSA",
+     "audioId": 170,
+     "stream": "A_00160"
+    },
+    {
+     "titulo": "Historias inspiradoras PSA",
+     "audioId": 171,
+     "stream": "A_00169"
+    },
+    {
+     "titulo": "Herramientas de concientización",
+     "audioId": 172,
+     "stream": "A_00170"
+    },
+    {
+     "titulo": "Entrevista PSA",
+     "audioId": 173,
+     "stream": "A_00171"
+    },
+    {
+     "titulo": "Historias inspiradoras PSA",
+     "audioId": 174,
+     "stream": "A_00172"
+    },
+    {
+     "titulo": "El cuerpo habla",
+     "audioId": 175,
+     "stream": "A_00035"
+    },
+    {
+     "titulo": "Ser mejores personas",
+     "audioId": 176,
+     "stream": "A_00027"
+    },
+    {
+     "titulo": "Entrevista PSA",
+     "audioId": 179,
+     "stream": "A_00173"
+    },
+    {
+     "titulo": "Historias inspiradoras PSA",
+     "audioId": 180,
+     "stream": "A_00174"
+    },
+    {
+     "titulo": "Beneficios del PSA Iontrix 2",
+     "audioId": 181,
+     "stream": "A_00175"
+    },
+    {
+     "titulo": "Entrevista PSA",
+     "audioId": 182,
+     "stream": "A_00176"
+    },
+    {
+     "titulo": "Medios de pagos",
+     "audioId": 184,
+     "stream": "A_00178"
+    },
+    {
+     "titulo": "Entrevista PSA",
+     "audioId": 185,
+     "stream": "A_00179"
+    },
+    {
+     "titulo": "Historias inspiradoras PSA",
+     "audioId": 186,
+     "stream": "A_00180"
+    },
+    {
+     "titulo": "Capacitarse",
+     "audioId": 187,
+     "stream": "A_00181"
+    },
+    {
+     "titulo": "Entrevista PSA",
+     "audioId": 189,
+     "stream": "A_00182"
+    },
+    {
+     "titulo": "Historias inspiradoras PSA",
+     "audioId": 190,
+     "stream": "A_00183"
+    },
+    {
+     "titulo": "Líderar la mente",
+     "audioId": 191,
+     "stream": "A_00018"
+    },
+    {
+     "titulo": "Entrevista PSA",
+     "audioId": 192,
+     "stream": "A_00184"
+    },
+    {
+     "titulo": "Historias inspiradoras PSA",
+     "audioId": 197,
+     "stream": "A_00183"
+    },
+    {
+     "titulo": "Recomendaciones para desarrollar el Negocio PSA",
+     "audioId": 198,
+     "stream": "A_00186"
+    },
+    {
+     "titulo": "Entrevista PSA",
+     "audioId": 199,
+     "stream": "A_00187"
+    },
+    {
+     "titulo": "Historias inspiradoras PSA",
+     "audioId": 200,
+     "stream": "A_00188"
+    },
+    {
+     "titulo": "Beneficios de la APP Garantias PSA",
+     "audioId": 201,
+     "stream": "A_00189"
+    },
+    {
+     "titulo": "Entrevista PSA",
+     "audioId": 202,
+     "stream": "A_00190"
+    },
+    {
+     "titulo": "Historias inspiradoras PSA",
+     "audioId": 203,
+     "stream": "A_00191"
+    },
+    {
+     "titulo": "Clase Especial: Somos oportunidad",
+     "audioId": 206,
+     "stream": "A_00197"
+    },
+    {
+     "titulo": "Metas claras, resultados claros",
+     "audioId": 208,
+     "stream": "A_00192"
+    },
+    {
+     "titulo": "Entrevista PSA",
+     "audioId": 209,
+     "stream": "A_00182"
+    },
+    {
+     "titulo": "Historias inspiradoras PSA",
+     "audioId": 210,
+     "stream": "A_00194"
+    },
+    {
+     "titulo": "Aprender y hacer",
+     "audioId": 211,
+     "stream": "A_00039"
+    },
+    {
+     "titulo": "Entrevista PSA",
+     "audioId": 212,
+     "stream": "A_00184"
+    },
+    {
+     "titulo": "Historias inspiradoras PSA",
+     "audioId": 2261,
+     "stream": "A_00209"
+    },
+    {
+     "titulo": "¿Dónde comienza la demo?",
+     "audioId": 2262,
+     "stream": "A_00044"
+    },
+    {
+     "titulo": "Entrevista PSA",
+     "audioId": 2263,
+     "stream": "A_00199"
+    },
+    {
+     "titulo": "Historias inspiradoras PSA",
+     "audioId": 2264,
+     "stream": "A_00200"
+    },
+    {
+     "titulo": "Entrevista PSA",
+     "audioId": 2265,
+     "stream": "A_00202"
+    },
+    {
+     "titulo": "Historias inspiradoras PSA",
+     "audioId": 2266,
+     "stream": "A_00203"
+    },
+    {
+     "titulo": "Entrevista PSA",
+     "audioId": 2267,
+     "stream": "A_00204"
+    },
+    {
+     "titulo": "Historias inspiradoras PSA",
+     "audioId": 2268,
+     "stream": "A_00205"
+    },
+    {
+     "titulo": "PSA Ropot",
+     "audioId": 2269,
+     "stream": "A_00206"
+    },
+    {
+     "titulo": "Entrevista PSA",
+     "audioId": 2270,
+     "stream": "A_00207"
+    },
+    {
+     "titulo": "Historias inspiradoras PSA",
+     "audioId": 2271,
+     "stream": "A_00208"
+    },
+    {
+     "titulo": "Superar los obtstaculos",
+     "audioId": 2272,
+     "stream": "A_00201"
+    },
+    {
+     "titulo": "Charla Reunión de Cierre",
+     "audioId": 2273,
+     "stream": "A_00198"
+    },
+    {
+     "titulo": "El poder de la confianza",
+     "audioId": 2357,
+     "stream": "A_00036"
+    },
+    {
+     "titulo": "Entrevista PSA",
+     "audioId": 2358,
+     "stream": "A_00219"
+    },
+    {
+     "titulo": "Historias inspiradoras PSA",
+     "audioId": 2359,
+     "stream": "A_00210"
+    },
+    {
+     "titulo": "Entrevista PSA",
+     "audioId": 2360,
+     "stream": "A_00212"
+    },
+    {
+     "titulo": "Historias inspiradoras PSA",
+     "audioId": 2361,
+     "stream": "A_00213"
+    },
+    {
+     "titulo": "¿Por qué no obtengo referidos?",
+     "audioId": 2362,
+     "stream": "A_00041"
+    },
+    {
+     "titulo": "Entrevista PSA",
+     "audioId": 2371,
+     "stream": "A_00214"
+    },
+    {
+     "titulo": "Historias inspiradoras PSA",
+     "audioId": 2372,
+     "stream": "A_00215"
+    },
+    {
+     "titulo": "Recomendaciones para el Negocio",
+     "audioId": 2373,
+     "stream": "A_00216"
+    },
+    {
+     "titulo": "Entrevista PSA",
+     "audioId": 2374,
+     "stream": "A_00217"
+    },
+    {
+     "titulo": "Historias inspiradoras PSA",
+     "audioId": 2375,
+     "stream": "A_00218"
+    },
+    {
+     "titulo": "Claridad en nuestras metas",
+     "audioId": 2376,
+     "stream": "A_00021"
+    },
+    {
+     "titulo": "¿Que tenes para perder?",
+     "audioId": 2450,
+     "stream": "A_00211"
+    },
+    {
+     "titulo": "Entrevista PSA",
+     "audioId": 2482,
+     "stream": "A_00220"
+    },
+    {
+     "titulo": "Historias Inspiradoras PSA",
+     "audioId": 2552,
+     "stream": "A_00221"
+    },
+    {
+     "titulo": "El día de la demostración",
+     "audioId": 2553,
+     "stream": "A_00042"
+    },
+    {
+     "titulo": "Entrevista PSA",
+     "audioId": 2554,
+     "stream": "A_00222"
+    },
+    {
+     "titulo": "Historias Inspiradoras PSA",
+     "audioId": 2555,
+     "stream": "A_00223"
+    },
+    {
+     "titulo": "Las 4 \"C\"",
+     "audioId": 2556,
+     "stream": "A_00038"
+    },
+    {
+     "titulo": "Entrevista PSA",
+     "audioId": 2557,
+     "stream": "A_00224"
+    },
+    {
+     "titulo": "Historias Inspiradoras PSA",
+     "audioId": 2558,
+     "stream": "A_00225"
+    },
+    {
+     "titulo": "Primero creer, para después crear",
+     "audioId": 2559,
+     "stream": "A_00226"
+    },
+    {
+     "titulo": "Entrevista PSA",
+     "audioId": 2560,
+     "stream": "A_00227"
+    },
+    {
+     "titulo": "Historias Inspiradoras PSA",
+     "audioId": 2561,
+     "stream": "A_00228"
+    },
+    {
+     "titulo": "Tomar desiciones",
+     "audioId": 2562,
+     "stream": "A_00020"
+    },
+    {
+     "titulo": "Entrevista PSA",
+     "audioId": 2563,
+     "stream": "A_00229"
+    },
+    {
+     "titulo": "Historias Inspiradoras PSA",
+     "audioId": 2564,
+     "stream": "A_00230"
+    },
+    {
+     "titulo": "Entrevista PSA",
+     "audioId": 2646,
+     "stream": "A_00231"
+    },
+    {
+     "titulo": "Historias Inspiradoras PSA",
+     "audioId": 2647,
+     "stream": "A_00247"
+    }
+   ]
+  },
+  {
+   "slug": "identidad-psa",
+   "titulo": "Identidad PSA",
+   "descripcion": "Aquí vas a poder encontrar todas las entrevistas vinculadas a la misión, la visión y los valores institucionales de PSA. La esencia del Negocio contada por sus mayores referentes.",
+   "audios": [
+    {
+     "titulo": "Sustentabilidad: Compromiso compartido",
+     "audioId": 5306,
+     "stream": "A_00469"
+    },
+    {
+     "titulo": "Comunicar Sustentabilidad: El Compromiso de PSA",
+     "audioId": 6584,
+     "stream": "A_00510"
+    },
+    {
+     "titulo": "Ser protagonistas del cambio",
+     "audioId": 6950,
+     "stream": "A_00529"
+    },
+    {
+     "titulo": "Transformar tu realidad",
+     "audioId": 8637,
+     "stream": "A_00626"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 24/09 | Negocio PSA: Una oportunidad de transformación",
+     "audioId": 10254,
+     "stream": "A_00689"
+    }
+   ]
+  },
+  {
+   "slug": "la-previa-del-vivo",
+   "titulo": "LA PREVIA DEL VIVO",
+   "descripcion": "La mejor forma de conocer un poco más a los protagonistas de cada VIVO PSA.",
+   "audios": [
+    {
+     "titulo": "LA PREVIA DEL VIVO 04/02 | Transformación, propósito y compromiso",
+     "audioId": 2,
+     "stream": "A_00707"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 18/02 | Resolver la venta: Metodología para crecer en equipo",
+     "audioId": 5,
+     "stream": "A_00709"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 04/03 | Bases para un Negocio Integrado",
+     "audioId": 6,
+     "stream": "A_00141"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 04/18 | Crecimiento de calidad",
+     "audioId": 15,
+     "stream": "A_00712"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 15/04 | La decisión de crecer",
+     "audioId": 18,
+     "stream": "A_00714"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 29/04 | Primeros 3 meses: Presente y futuro de tu Negocio",
+     "audioId": 20,
+     "stream": "A_00717"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 03/06 | Liderazgo: Visión, acción y resultados",
+     "audioId": 22,
+     "stream": "A_00724"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 06/05 | Lista de contactos, pilar de la productividad",
+     "audioId": 24,
+     "stream": "A_00720"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 13/05 | Transformación en el Negocio PSA",
+     "audioId": 26,
+     "stream": "A_00722"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 10/06 | Construcción sólida: Invitación, llamados y Patrocinio",
+     "audioId": 28,
+     "stream": "A_00725"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 24/06 | Referidos: Claves para más efectividad",
+     "audioId": 30,
+     "stream": "A_00726"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 29/07 | Presente y futuro con la Carrera Empresarial",
+     "audioId": 32,
+     "stream": "A_00728"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 20/05 | PSA: Negocio de acción",
+     "audioId": 33,
+     "stream": "A_00093"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 12/08 | Acciones efectivas en ventas",
+     "audioId": 34,
+     "stream": "A_00729"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 02/09 | Plan Canje: Resultados hoy",
+     "audioId": 44,
+     "stream": "A_00088"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 09/09 | PSA: Un camino de transformación",
+     "audioId": 45,
+     "stream": "A_00732"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 22/07 | Coordinador de Equipo: Más allá del pase",
+     "audioId": 46,
+     "stream": "A_00727"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 07/10 | PSA: Soñar y construir tu vida",
+     "audioId": 49,
+     "stream": "A_00081"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 03/05 | Vamos por más",
+     "audioId": 7100,
+     "stream": "A_00534"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 10/05 | Arquitectura del crecimiento",
+     "audioId": 7122,
+     "stream": "A_00536"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 17/05 | El gran año del Plan Canje",
+     "audioId": 7148,
+     "stream": "A_00538"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 22/05 | Tu negocio en España",
+     "audioId": 7170,
+     "stream": "A_00539"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 24/05 | BONUS: El GPS del crecimiento",
+     "audioId": 7188,
+     "stream": "A_00540"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 07/06 | Invitación sin fronteras",
+     "audioId": 7234,
+     "stream": "A_00542"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 21/06 | Paso a paso para la concientización",
+     "audioId": 7270,
+     "stream": "A_00544"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 05/07 | Estrategias para un Negocio Integrado",
+     "audioId": 7320,
+     "stream": "A_00546"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 12/07 | Estrategias para un Negocio Integrado",
+     "audioId": 7357,
+     "stream": "A_00547"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 19/07 | Beneficios de los Productos PSA",
+     "audioId": 7374,
+     "stream": "A_00548"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 26/07 | Inspiración en la Carrera Empresarial",
+     "audioId": 7417,
+     "stream": "A_00549"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 09/08 | Negocio PSA: Liderá tu vida",
+     "audioId": 7445,
+     "stream": "A_00550"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 16/08 | Hábitos efectivos para la venta",
+     "audioId": 7472,
+     "stream": "A_00549"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 23/08 | Hábitos efectivos para la venta",
+     "audioId": 7502,
+     "stream": "A_00552"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 06/09 | Entrevistas de Liderazgo",
+     "audioId": 7548,
+     "stream": "A_00553"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 13/09 | Cultura de Crecimiento Empresarial",
+     "audioId": 7571,
+     "stream": "A_00553"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 20/09 | Desarrollo de Equipos",
+     "audioId": 7602,
+     "stream": "A_00555"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 29/09 | Invitación a Usuarios",
+     "audioId": 7628,
+     "stream": "A_00556"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 4/10 | Ventas: Creencia en la acción",
+     "audioId": 7655,
+     "stream": "A_00557"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 11/10 | Ventas: Foco en los resultados",
+     "audioId": 7674,
+     "stream": "A_00558"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 18/10 | Temporada Primavera/Verano: Nuevo Iontrix 3",
+     "audioId": 7691,
+     "stream": "A_00559"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 25/10 | El ABC para presentar el Negocio",
+     "audioId": 7727,
+     "stream": "A_00560"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 08/11 | Acciones Extraordinarias: Ganancias a corto y largo plazo",
+     "audioId": 7747,
+     "stream": "A_00561"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 15/11 | Redes: Creencia en la carrera empresarial",
+     "audioId": 7793,
+     "stream": "A_00562"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 22/11 | Nuevo Módulo 7: Flex Marketing Plan PSA",
+     "audioId": 7815,
+     "stream": "A_00563"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 13/12 | Las etapas del liderazgo",
+     "audioId": 7897,
+     "stream": "A_00567"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 27/12 | VIVO ESPECIAL",
+     "audioId": 7936,
+     "stream": "A_005741"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 03/01 | Primer gran objetivo: Encuentro de Liderazgo 2024",
+     "audioId": 7955,
+     "stream": "A_00573"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 10/01 | Certificaciones PSA: Herramientas para tu Negocio",
+     "audioId": 7982,
+     "stream": "A_00575"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 17/01 | Entrevistas de Liderazgo",
+     "audioId": 8013,
+     "stream": "A_00577"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 26/01 | PSA: Un mundo de oportunidades",
+     "audioId": 8048,
+     "stream": "A_00579"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 07/02 | 5 Estrategias para la producción de resultados",
+     "audioId": 8087,
+     "stream": "A_00582"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 14/02 | Encuentro de Liderazgo 2024: Experiencia de transformación",
+     "audioId": 8119,
+     "stream": "A_00585"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 21/02 | Seguimiento de invitados",
+     "audioId": 8146,
+     "stream": "A_00587"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 06/03 | Plan Canje: Cosecha de resultados",
+     "audioId": 8200,
+     "stream": "A_00590"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 13/03 | Análisis de Referidos: abundancia de resultados",
+     "audioId": 8234,
+     "stream": "A_00594"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 20/03 | Día Mundial del Agua",
+     "audioId": 8251,
+     "stream": "A_00596"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 27/03 | Seguimiento Parte II: Construcción de creencia",
+     "audioId": 8278,
+     "stream": "A_00600"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 10/04 | Pasaje de Precios: Todo lo que hay que saber",
+     "audioId": 8316,
+     "stream": "A_00602"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 10/04 | Arranque explosivo: Primeros pasos en PSA",
+     "audioId": 8354,
+     "stream": "A_00604"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 25/04 | Pasión PSA",
+     "audioId": 8378,
+     "stream": "A_00607"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 22/05 | Pase a DC: Todo lo que hay que saber",
+     "audioId": 8490,
+     "stream": "A_00613"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 5/06 | Venta + Posventa: Acciones de éxito",
+     "audioId": 8523,
+     "stream": "A_00617"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 5/06 | Patrocinio de calidad: Antes de la invitación",
+     "audioId": 8563,
+     "stream": "A_00619"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 19/06 | Ser Coordinador PSA",
+     "audioId": 8580,
+     "stream": "A_00621"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 26/06 | El desafío de ir por más",
+     "audioId": 8608,
+     "stream": "A_00623"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 03/07 | Casos de éxito: Negocio Integrado",
+     "audioId": 8636,
+     "stream": "A_00625"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 10/07 | Cultura de presentación de Negocio",
+     "audioId": 8661,
+     "stream": "A_00627"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 17/07 | Agenda en acción",
+     "audioId": 8686,
+     "stream": "A_00629"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 24/07 | Ser Calificado PSA",
+     "audioId": 8709,
+     "stream": "A_00632"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 07/08 | Foco en calidad de vida = Foco en la Carrera",
+     "audioId": 8757,
+     "stream": "A_00635"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 14/08 | Estrategias de venta para potenciar la carrera empresarial",
+     "audioId": 8781,
+     "stream": "A_00636"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 21/08 | Cambio de paradigma: De empleado a empresario",
+     "audioId": 8807,
+     "stream": "A_00637"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 04/09 | Negocio integrado YA",
+     "audioId": 8856,
+     "stream": "A_00638"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 02/10 | Ser Lider PSA",
+     "audioId": 8949,
+     "stream": "A_00641"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 13/11 | El premio del Flex Marketing Plan PSA®",
+     "audioId": 9108,
+     "stream": "A_00646"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 20/11 | Los 8 pasos del patrón del éxito en PSA",
+     "audioId": 9142,
+     "stream": "A_00648"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 27/11 | Plan de crecimiento: Ser protagonista",
+     "audioId": 9143,
+     "stream": "A_00649"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 11/12 | Por qué liderar",
+     "audioId": 9213,
+     "stream": "A_00651"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 19/03 | Vivir la oportunidad",
+     "audioId": 9529,
+     "stream": "A_00660"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 7/05 | La acción a la altura de los sueños",
+     "audioId": 9700,
+     "stream": "A_00666"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 14/05 | Ser Coordinador/a PSA",
+     "audioId": 9733,
+     "stream": "A_00667"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 28/05 | 80/20 La receta del crecimiento",
+     "audioId": 9778,
+     "stream": "A_00669"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 04/06 | Liderazgo en PSA: Soñar en grande",
+     "audioId": 9818,
+     "stream": "A_00669"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 11/06 | El poder transformador del Negocio",
+     "audioId": 9847,
+     "stream": "A_00671"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 18/06 | Lista de invitados: La materia prima del Negocio",
+     "audioId": 9857,
+     "stream": "A_00672"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 25/06 | Productividad en el Negocio PSA",
+     "audioId": 9905,
+     "stream": "A_00676"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 20/08 | Crecer con decisión",
+     "audioId": 10124,
+     "stream": "A_00682"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 27/08 | Negocio PSA: una carrera con futuro",
+     "audioId": 10154,
+     "stream": "A_00686"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 10/09 | Concretar Demos: ¿Pilar para el crecimiento?",
+     "audioId": 10205,
+     "stream": "A_00687"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 22/10| Mi compromiso con el crecimiento",
+     "audioId": 10371,
+     "stream": "A_00695"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 29/10| Tu momento de transformación",
+     "audioId": 10419,
+     "stream": "A_00697"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 05/11 | Venta en la carrera. Llamados, referidos y cierres",
+     "audioId": 10420,
+     "stream": "A_00698"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 19/11 | Evolucionar y crecer con PSA",
+     "audioId": 10484,
+     "stream": "A_00700"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 26/11 | Desarrollo de DC",
+     "audioId": 10505,
+     "stream": "A_00701"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 3/12 | PSA, una pasión compartida",
+     "audioId": 10533,
+     "stream": "A_00702"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 17/12 | El poder de la sustentabilidad",
+     "audioId": 10585,
+     "stream": "A_00704"
+    }
+   ]
+  },
+  {
+   "slug": "negocio-internacional",
+   "titulo": "Negocio Internacional",
+   "descripcion": "Aquí vas a encontrar todas las entrevistas relacionadas con la formación de equipos de trabajo en distintos lugares del mundo. No importa el lugar donde estés, lo que importa es el compromiso para trabajar en equipo.",
+   "audios": [
+    {
+     "titulo": "Bienvenidos a PSA Paraguay",
+     "audioId": 5933,
+     "stream": "A_00486"
+    },
+    {
+     "titulo": "Haciendo mi primer ingreso en el exterior",
+     "audioId": 5965,
+     "stream": "A_00487"
+    },
+    {
+     "titulo": "PSA Internacional: Animarse a la aventura",
+     "audioId": 8004,
+     "stream": "A_00576"
+    },
+    {
+     "titulo": "PSA: Una Aventura Internacional",
+     "audioId": 8265,
+     "stream": "A_00599"
+    }
+   ]
+  },
+  {
+   "slug": "patrocinio",
+   "titulo": "Patrocinio",
+   "descripcion": "Aquí vas a encontrar todas las entrevistas relacionadas con el Patrocinio. La mejor manera de guiar a tu equipo y de formar nuevos Distribuidores Independientes, de la mano de los que mejor saben.",
+   "audios": [
+    {
+     "titulo": "LA PREVIA DEL VIVO 11/02 | Duplicación de un Negocio integrado",
+     "audioId": 3,
+     "stream": "A_00708"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 08/04 | Resolver la venta: Metodologías duplicables",
+     "audioId": 12,
+     "stream": "A_00713"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 05/08 | Patrocinio: proyección de crecimiento",
+     "audioId": 51,
+     "stream": "A_00728"
+    },
+    {
+     "titulo": "Guiar al nuevo, un paso a la vez",
+     "audioId": 5734,
+     "stream": "A_00478"
+    },
+    {
+     "titulo": "Crear compromiso para lograr metas",
+     "audioId": 5735,
+     "stream": "A_00479"
+    },
+    {
+     "titulo": "Construir vínculos",
+     "audioId": 6657,
+     "stream": "A_00513"
+    },
+    {
+     "titulo": "Comprender la magnitud del Negocio PSA",
+     "audioId": 6712,
+     "stream": "A_00515"
+    },
+    {
+     "titulo": "Los primeros pasos del nuevo Distribuidor PSA",
+     "audioId": 6752,
+     "stream": "A_00519"
+    },
+    {
+     "titulo": "Conocer el motor de cada persona",
+     "audioId": 6979,
+     "stream": "A_00530"
+    },
+    {
+     "titulo": "Formación y acción: El equilibrio del Negocio",
+     "audioId": 7023,
+     "stream": "A_00532"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 28/01 | El factor humano del patrocinio",
+     "audioId": 7262,
+     "stream": "A_00706"
+    },
+    {
+     "titulo": "Seamos oportunidad",
+     "audioId": 8106,
+     "stream": "A_00584"
+    },
+    {
+     "titulo": "El patrocinio de equipo",
+     "audioId": 8121,
+     "stream": "A_00586"
+    },
+    {
+     "titulo": "Adaptar el Negocio a la necesidad de cada uno",
+     "audioId": 8491,
+     "stream": "A_00615"
+    },
+    {
+     "titulo": "Patrocinar con conciencia",
+     "audioId": 8581,
+     "stream": "A_00622"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 16/10 | 15 Líneas: Construcción permanente",
+     "audioId": 8986,
+     "stream": "A_00643"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 16/10 | 15 Líneas: Construcción permanente",
+     "audioId": 8994,
+     "stream": "A_00643"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 13/11 | El premio del Flex Marketing Plan PSA®",
+     "audioId": 9090,
+     "stream": "A_00646"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 22/01 | Acciones de construcción y crecimiento",
+     "audioId": 9346,
+     "stream": "A_00653"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 19/02 | Guía al nuevo: lograr resultados desde el principio",
+     "audioId": 9437,
+     "stream": "A_00657"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 16/04 | Resolver la venta para la Carrera Empresarial",
+     "audioId": 9628,
+     "stream": "A_00664"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 21/05 | Construir en equipo la Carrera Empresarial",
+     "audioId": 9762,
+     "stream": "A_00668"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 17/09 | Primeros 3 meses: Arrancar con futuro",
+     "audioId": 10233,
+     "stream": "A_00688"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 08/10| La responsabilidad de liderar",
+     "audioId": 10315,
+     "stream": "A_00690"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 15/10| Ritmo de venta y patrocinio",
+     "audioId": 10342,
+     "stream": "A_00692"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 12/11 | Sistema de trabajo en equipo",
+     "audioId": 10462,
+     "stream": "A_00699"
+    }
+   ]
+  },
+  {
+   "slug": "posventa",
+   "titulo": "Posventa",
+   "descripcion": "Aquí vas a encontrar todas las entrevistas referidas a la Posventa, incluyendo las herramientas necesarias para brindar un servicio de excelencia a tus usuarios",
+   "audios": [
+    {
+     "titulo": "LA PREVIA DEL VIVO 04/11 | Resolver el Canje para la Carrera Empresarial",
+     "audioId": 8,
+     "stream": "A_00711"
+    },
+    {
+     "titulo": "El foco en la concientización",
+     "audioId": 6026,
+     "stream": "A_00489"
+    },
+    {
+     "titulo": "PSA ROPOT: Brindar soluciones",
+     "audioId": 6455,
+     "stream": "A_00505"
+    },
+    {
+     "titulo": "PSA ROPOT: Beneficios para compartir",
+     "audioId": 6469,
+     "stream": "A_00507"
+    },
+    {
+     "titulo": "Planificar el canje desde el primer día",
+     "audioId": 8201,
+     "stream": "A_00591"
+    },
+    {
+     "titulo": "Canjes asegurados: Responsabilidad desde el primer día",
+     "audioId": 8376,
+     "stream": "A_00606"
+    }
+   ]
+  },
+  {
+   "slug": "productos-psa",
+   "titulo": "Productos PSA",
+   "descripcion": "Aquí vas a encontrar todas las entrevistas relacionadas con los Productos PSA, con comentarios en primera persona del Staff de la Gerencia de Producto de la empresa.",
+   "audios": [
+    {
+     "titulo": "Los diferenciales de nuestra excelencia en purificación",
+     "audioId": 5500,
+     "stream": "A_00472"
+    }
+   ]
+  },
+  {
+   "slug": "seminarios-psa",
+   "titulo": "Seminarios PSA",
+   "descripcion": "Aquí vas a poder encontrar todas las entrevistas vinculadas a los seminarios de la empresa, abarcando desde la planificación de sus requisitos, hasta el análisis aplicado al Negocio de sus oradores.",
+   "audios": [
+    {
+     "titulo": "Con la cabeza puesta en el Reencuentro PSA",
+     "audioId": 6012,
+     "stream": "A_00488"
+    },
+    {
+     "titulo": "Reencuentro PSA: Estar presente y que no te lo cuenten",
+     "audioId": 6087,
+     "stream": "A_00491"
+    },
+    {
+     "titulo": "Reencuentro PSA: Compartir experiencias",
+     "audioId": 6093,
+     "stream": "A_00492"
+    },
+    {
+     "titulo": "Reencuentro PSA: Tomar dimensión de la empresa que representamos",
+     "audioId": 6144,
+     "stream": "A_00493"
+    },
+    {
+     "titulo": "Reencuentro PSA: Tomar dimensión de la empresa que representamos",
+     "audioId": 6145,
+     "stream": "A_00493"
+    },
+    {
+     "titulo": "Reencuentro PSA: Llegar con mentalidad de aprendiz",
+     "audioId": 6162,
+     "stream": "A_00494"
+    },
+    {
+     "titulo": "Reencuentro PSA: La cuenta regresiva (Parte 1)",
+     "audioId": 6200,
+     "stream": "A_00495"
+    },
+    {
+     "titulo": "Reencuentro PSA: La cuenta regresiva (Parte 2)",
+     "audioId": 6228,
+     "stream": "A_00496"
+    },
+    {
+     "titulo": "Accionar después del Reencuentro PSA",
+     "audioId": 6288,
+     "stream": "A_00498"
+    },
+    {
+     "titulo": "Llevarse algo de cada Seminario PSA",
+     "audioId": 6832,
+     "stream": "A_00525"
+    },
+    {
+     "titulo": "La magnitud de los Seminarios PSA",
+     "audioId": 6874,
+     "stream": "A_00526"
+    },
+    {
+     "titulo": "LA PREVIA DEL VIVO 04/12 | Encuentro de Liderazgo 2025: Pilar para tu Carrera Empresarial",
+     "audioId": 9184,
+     "stream": "A_00650"
+    }
+   ]
+  }
+ ],
+ "vivo": [
+  {
+   "equipo": "Equipo Sin Fronteras",
+   "inicio": "21-10 10:00",
+   "fin": "21-10 11:35",
+   "titulo": "Reunión de Equipo"
+  },
+  {
+   "equipo": "Equipo Espigas Doradas",
+   "inicio": "21-10 12:00",
+   "fin": "21-10 13:35",
+   "titulo": "Reunión de Equipo"
+  },
+  {
+   "equipo": "Equipo Alpinistas",
+   "inicio": "21-10 16:00",
+   "fin": "21-10 17:35",
+   "titulo": "Reunión de Equipo"
+  },
+  {
+   "equipo": "Equipo MegaRed 1",
+   "inicio": "22-10 10:00",
+   "fin": "22-10 11:35",
+   "titulo": "Reunión de Equipo"
+  },
+  {
+   "equipo": "Equipo MegaRed 2",
+   "inicio": "22-10 10:00",
+   "fin": "22-10 11:35",
+   "titulo": "Reunión de Equipo"
+  },
+  {
+   "equipo": "Equipo Visión 360",
+   "inicio": "22-10 13:00",
+   "fin": "22-10 14:35",
+   "titulo": "Reunión de Equipo"
+  },
+  {
+   "equipo": "Equipo Liderazgo 360",
+   "inicio": "22-10 13:00",
+   "fin": "22-10 14:35",
+   "titulo": "Reunión de Equipo"
+  },
+  {
+   "equipo": "Equipo Raíces",
+   "inicio": "22-10 15:00",
+   "fin": "22-10 16:35",
+   "titulo": "Reunión de Equipo"
+  },
+  {
+   "equipo": "Equipo Red Lider",
+   "inicio": "23-10 10:00",
+   "fin": "23-10 11:35",
+   "titulo": "Reunión de Equipo"
+  },
+  {
+   "equipo": "Equipo Namasté",
+   "inicio": "23-10 14:00",
+   "fin": "23-10 15:35",
+   "titulo": "Reunión de Equipo"
+  },
+  {
+   "equipo": "Equipo Enfoque",
+   "inicio": "20-10 10:00",
+   "fin": "20-10 11:35",
+   "titulo": "Reunión de Equipo"
+  },
+  {
+   "equipo": "Equipo Sueño de Águilas",
+   "inicio": "20-10 12:00",
+   "fin": "20-10 13:35",
+   "titulo": "Reunión de Equipo"
+  },
+  {
+   "equipo": "Equipo Los Osos",
+   "inicio": "20-10 12:00",
+   "fin": "20-10 13:35",
+   "titulo": "Reunión de Equipo"
+  },
+  {
+   "equipo": "Equipo Girasoles Libertadores",
+   "inicio": "20-10 12:00",
+   "fin": "20-10 13:35",
+   "titulo": "Reunión de Equipo"
+  },
+  {
+   "equipo": "Equipo MasterSol",
+   "inicio": "20-10 14:00",
+   "fin": "20-10 16:00",
+   "titulo": "Reunión de Equipo"
+  },
+  {
+   "equipo": "Equipo Aconcagua",
+   "inicio": "20-10 14:00",
+   "fin": "20-10 16:00",
+   "titulo": "Reunión de Equipo"
+  },
+  {
+   "equipo": "Equipo Girasoles",
+   "inicio": "20-10 14:00",
+   "fin": "20-10 15:35",
+   "titulo": "Reunión de Equipo"
+  }
+ ],
+ "stats": {
+  "kits": 9,
+  "secciones": 62,
+  "clases": 204,
+  "conStream": 204,
+  "playlists": 10,
+  "audios": 425,
+  "vivo": 17
+ }
+}
