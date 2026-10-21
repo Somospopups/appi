@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v645-vivo-psa';
+const CACHE_NAME = 'appi-v646-quiz-racha';
 const CACHE_PREFIX = 'appi-';
 // Donde el SW aparta una compartición hasta que la app la consume. No
 // empieza con el prefijo de la app para que el prune del activate no la borre.
@@ -34,6 +34,7 @@ const APP_SHELL = [
   './usuarios-botones.js',
   './mensajes-hielo.js',
   './mensajes-usuarios.js',
+  './campus-preguntas.js',
   './campus-psa.js',
   './campus-catalogo.json',
   './vendor/hls.min.js',

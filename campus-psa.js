@@ -337,6 +337,156 @@
     return { total: todas.length, vistas: vistas, pct: todas.length ? Math.round((vistas / todas.length) * 100) : 0 };
   }
 
+  /* ---------- Preguntas post-video (v646) ----------
+     Al terminar una clase con banco se abren 3 preguntas originales de
+     APPI. Si la errás no se revela cuál era la correcta: se reintenta
+     hasta acertar. Las clases sin banco siguen marcándose "vista ✓". */
+  function bancoDe(url){
+    try {
+      if (window.APPICampusPreguntas && typeof window.APPICampusPreguntas.preguntasDeClase === 'function'){
+        return window.APPICampusPreguntas.preguntasDeClase(url);
+      }
+    } catch(e){}
+    return null;
+  }
+  function clasePorId(id){
+    var all = aplanarClases();
+    for (var i = 0; i < all.length; i++) if (all[i].id === id) return all[i];
+    return null;
+  }
+  function quizPasado(url){
+    try {
+      var data = leer();
+      return !!(data.quiz && data.quiz[url] && data.quiz[url].ok);
+    } catch(e){ return false; }
+  }
+
+  /* ---------- Racha de días con clase (v646) ----------
+     Días seguidos con al menos una clase completada. Vive en el mismo
+     estado que ya sincroniza data-sync (prefijo appi_campus_psa_v1_). */
+  function diaClave(d){
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+  function rachaDeClases(){
+    try {
+      var data = leer();
+      var dias = (data.racha && data.racha.dias) || {};
+      var d = new Date();
+      if (!dias[diaClave(d)]) d.setDate(d.getDate() - 1); // hoy aún sin clase: la racha se mantiene desde ayer
+      var n = 0;
+      while (dias[diaClave(d)]){ n++; d.setDate(d.getDate() - 1); }
+      return { actual: n, max: (data.racha && data.racha.max) || 0, hoyHecha: !!dias[hoyKey()] };
+    } catch(e){ return { actual:0, max:0, hoyHecha:false }; }
+  }
+  function registrarClaseCompleta(){
+    try {
+      var data = leer();
+      if (!data.racha || typeof data.racha !== 'object') data.racha = { dias:{}, max:0 };
+      if (!data.racha.dias || typeof data.racha.dias !== 'object') data.racha.dias = {};
+      var hoy = hoyKey();
+      data.racha.dias[hoy] = (Number(data.racha.dias[hoy]) || 0) + 1;
+      var claves = Object.keys(data.racha.dias);
+      if (claves.length > 150){
+        claves.sort();
+        for (var i = 0; i < claves.length - 150; i++) delete data.racha.dias[claves[i]];
+      }
+      guardar(data);
+      var r = rachaDeClases();
+      if (r.actual > (data.racha.max || 0)){
+        data.racha.max = r.actual;
+        guardar(data);
+      }
+      return r;
+    } catch(e){ return { actual:0, max:0, hoyHecha:false }; }
+  }
+  function chipRacha(){
+    try {
+      var r = rachaDeClases();
+      if (r.actual <= 0) return '';
+      return '<span class="cp-racha' + (r.hoyHecha ? ' on' : '') + '" data-cp-racha="' + r.actual + '">🔥 ' + r.actual + ' día' + (r.actual === 1 ? '' : 's') + ' seguido' + (r.actual === 1 ? '' : 's') + (r.hoyHecha ? ' ✓' : '') + '</span>';
+    } catch(e){ return ''; }
+  }
+
+  var pvSession = null;
+  function iniciarQuizPostVideo(clase, preguntas){
+    pvSession = { id: clase.id, titulo: clase.titulo, area: clase.area, seccion: clase.seccion, index:0, correctas:0, preguntas:preguntas, esperando:false };
+    pintarPreguntaPV();
+  }
+  function pintarPreguntaPV(){
+    var p = pvSession.preguntas[pvSession.index];
+    if (!p){ finalizarQuizPV(); return; }
+    var opciones = p.opciones.map(function(txt, i){
+      return '<button type="button" class="cp-option" data-pv-answer="' + i + '"><b>' + String.fromCharCode(65 + i) + '.</b>&nbsp; ' + esc(txt) + '</button>';
+    }).join('');
+    abrirModal(
+      '<div class="cp-quiz-top"><button type="button" class="cp-back" id="cpPvBack" aria-label="Volver">‹</button><span class="cp-question-label" style="flex:1">🎓 Revisá lo que viste</span><span class="cp-q-count" id="cpPvCount">' + (pvSession.index + 1) + '/' + pvSession.preguntas.length + '</span></div>' +
+      '<div class="cp-quiz-body"><span class="cp-question-label">' + esc(pvSession.area) + '</span><span class="cp-question-topic">' + esc(pvSession.seccion || pvSession.titulo) + '</span><h2 class="cp-question">' + esc(p.pregunta) + '</h2><div class="cp-options">' + opciones + '</div><div class="cp-feedback" id="cpPvFeedback"></div><button type="button" class="cp-primary cp-next" id="cpPvNext"></button></div>'
+    );
+    document.getElementById('cpPvBack').onclick = cerrarModal;
+    document.querySelectorAll('[data-pv-answer]').forEach(function(btn){
+      btn.onclick = function(){ responderPV(Number(btn.getAttribute('data-pv-answer'))); };
+    });
+  }
+  function responderPV(indice){
+    if (!pvSession || pvSession.esperando) return;
+    var p = pvSession.preguntas[pvSession.index];
+    var ok = indice === p.correcta;
+    var all = Array.prototype.slice.call(document.querySelectorAll('[data-pv-answer]'));
+    all.forEach(function(btn, i){
+      btn.disabled = true;
+      // Sin regalar el acierto: al errar sólo se marca la opción elegida.
+      if (i === indice) btn.classList.add(ok ? 'correct' : 'wrong');
+    });
+    var feed = document.getElementById('cpPvFeedback');
+    var next = document.getElementById('cpPvNext');
+    feed.innerHTML = ok
+      ? '<b>¡Bien!</b>' + esc(p.explicacion || 'Buena respuesta.')
+      : '<b>Casi: revisá esa opción otra vez.</b>' + esc(p.explicacion || 'Volvé a intentarlo.');
+    feed.classList.add('show');
+    if (ok){
+      pvSession.correctas++;
+      next.textContent = pvSession.index === pvSession.preguntas.length - 1 ? 'Terminar' : 'Seguir';
+      next.onclick = function(){ pvSession.index++; pintarPreguntaPV(); };
+    } else {
+      next.textContent = 'Reintentar esta pregunta';
+      next.onclick = function(){ pintarPreguntaPV(); };
+    }
+    next.classList.add('show');
+  }
+  function finalizarQuizPV(){
+    try {
+      var data = leer();
+      if (!data.quiz || typeof data.quiz !== 'object') data.quiz = {};
+      data.quiz[pvSession.id] = { ok:true, ts:Date.now(), dia:hoyKey() };
+      guardar(data);
+    } catch(e){}
+    var r = { actual:0 };
+    try { r = registrarClaseCompleta(); } catch(e){}
+    var sub = r.actual >= 3
+      ? '<b>¡' + r.actual + ' días seguidos! 🔥</b> Tu constancia en el Campus se nota: mañana sumás uno más.'
+      : (r.actual > 1 ? '<b>' + r.actual + ' días seguidos.</b> Mañana tenés una clase para sostener la racha.' : '<b>Clase completada.</b> Mañana sumá otra para encadenar días.');
+    try { window.dispatchEvent(new CustomEvent('appi-campus-avance', { detail:{ id: pvSession.id, pct:100, visto:true, racha: r.actual } })); } catch(e){}
+    pvSession = null;
+    abrirModal(
+      '<section class="cp-celebrate"><div class="cp-trophy">🎓</div><h2>¡Clase<br>completa!</h2><p>' + sub + '</p></section>' +
+      '<div class="cp-modal-foot"><button type="button" class="cp-primary" id="cpPvDone">Seguir aprendiendo</button></div>'
+    );
+    document.getElementById('cpPvDone').onclick = cerrarModal;
+  }
+  /** Se dispara al llegar al 90% (o al terminar) de una clase con banco. */
+  function ofrecerPostVideo(id, tipo){
+    try {
+      if (tipo && tipo !== 'video') return;
+      if (document.getElementById('campusPsaOverlay')) return;
+      if (quizPasado(id)) { registrarClaseCompleta(); return; }
+      var preg = bancoDe(id);
+      if (!preg || preg.length < 3) { registrarClaseCompleta(); return; }
+      var clase = clasePorId(id);
+      if (!clase) { registrarClaseCompleta(); return; }
+      iniciarQuizPostVideo(clase, preg);
+    } catch(e){}
+  }
+
   /** La próxima clase de la ruta: según el contexto del negocio y siempre la
       más corta entre las pendientes (3 a 10 minutos, para el hueco del día). */
   function proximaClase(contexto){
@@ -406,6 +556,7 @@
           ultimoGuardado = 100;
           marcarVisto(id, 100, tipo);
           marcarHechoUI();
+          ofrecerPostVideo(id, tipo);
         } else {
           var decena = Math.floor(pct / 10) * 10;
           if (decena > ultimoGuardado){
@@ -418,6 +569,7 @@
     mediaEl.addEventListener('ended', function(){
       try { marcarVisto(id, 100, tipo); } catch(e){}
       marcarHechoUI();
+      ofrecerPostVideo(id, tipo);
     });
     var nativo = mediaEl.canPlayType && mediaEl.canPlayType('application/vnd.apple.mpegurl');
     if (nativo){ mediaEl.src = url; return; }
@@ -983,6 +1135,9 @@
       st.textContent = [
         '.cp-neg{margin:4px 14px 18px;padding:14px;border-radius:18px;background:linear-gradient(160deg,#0e2a3d,#123b52);color:#e8f4fa;box-shadow:0 10px 24px rgba(9,25,40,.18)}',
         '.cp-neg-k{font-size:9.5px;font-weight:1000;letter-spacing:1.4px;text-transform:uppercase;color:#8fd6ff}',
+        '.cp-neg-titlerow{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}',
+        '.cp-racha{flex:none;padding:5px 9px;border-radius:999px;background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.18);color:#ffd9a0;font-size:10px;font-weight:1000;letter-spacing:.2px}',
+        '.cp-racha.on{background:rgba(58,208,164,.22);border-color:rgba(58,208,164,.5);color:#a9ffe8}',
         '.cp-neg h3{margin:6px 0 2px;font-size:17px;letter-spacing:-.5px}',
         '.cp-neg-sub{font-size:10.5px;color:#a9c4d6;font-weight:700}',
         '.cp-neg-bar{height:9px;border-radius:99px;background:rgba(255,255,255,.14);margin:11px 0 5px;overflow:hidden}',
@@ -1001,7 +1156,7 @@
       avisoCuentaHTML() +
       '<div class="cp-neg" id="cpNeg">' +
         '<span class="cp-neg-k">Campus PSA · tu capacitación</span>' +
-        '<h3>Mi capacitación</h3>' +
+        '<div class="cp-neg-titlerow"><h3>Mi capacitación</h3>' + chipRacha() + '</div>' +
         '<div class="cp-neg-sub" id="cpNegSub">' + res.vistas + ' de ' + res.total + ' clases vistas · ' + res.pct + '%</div>' +
         '<div class="cp-neg-bar"><i style="width:' + res.pct + '%"></i></div>' +
         (prox ?
@@ -1049,7 +1204,15 @@
     abrirCuentaPSA: abrirCuentaPSA,
     // Vivo PSA semanal (v645)
     proximoVivoPsa: proximoVivoPsaRef,
-    audioPreviaVivo: audioPreviaVivo
+    audioPreviaVivo: audioPreviaVivo,
+    // Preguntas post-video y racha (v646)
+    bancoPreguntas: function(){ return (window.APPICampusPreguntas && window.APPICampusPreguntas.totalClases) || 0; },
+    preguntasDeClase: bancoDe,
+    quizPasado: quizPasado,
+    rachaDeClases: rachaDeClases,
+    registrarClaseCompleta: registrarClaseCompleta,
+    chipRacha: chipRacha,
+    ofrecerPostVideo: ofrecerPostVideo
   };
 
   window.addEventListener('appi-datasync-applied', function(){ try{ render(); revisarJornada(); }catch(e){} });

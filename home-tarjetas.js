@@ -1312,6 +1312,41 @@
     }catch(e){ return null; }
   }
 
+  // v646 · Racha del Campus: días seguidos con al menos una clase completada.
+  // Si hoy todavía no hiciste ninguna, avisa que falta 1 para no cortarla.
+  function tarjetaRacha(){
+    try{
+      var c = window.APPICampusPSA;
+      if (!c || typeof c.rachaDeClases !== 'function') return null;
+      var r = c.rachaDeClases();
+      if (!r || !r.actual) return null;
+      if (r.hoyHecha && r.actual < 3) return null; // ya cumpliste hoy y no hay nada que recordar
+      var n = r.actual;
+      var titulo, nota, cta;
+      if (r.hoyHecha){
+        titulo = '¡' + n + ' días seguidos! 🔥';
+        nota = 'Constancia real en el Campus: ' + n + ' día' + (n === 1 ? '' : 's') + ' con clase completada. Mañana sumás uno más.';
+        cta = { label:'Ver mi avance 🎓', go:function(){ try{ if (window.openCampusPSA) window.openCampusPSA(); }catch(e){} } };
+      } else {
+        titulo = 'Te falta 1 clase para mantener la racha';
+        nota = 'Ya van ' + n + ' día' + (n === 1 ? '' : 's') + ' seguido' + (n === 1 ? '' : 's') + ' con clase. Con una sola de hoy no se corta.';
+        cta = { label:'Hacer mi clase de hoy 🎓', go:function(){
+          try{
+            var clase = (typeof c.proximaClase === 'function') ? c.proximaClase('') : null;
+            if (clase && c.abrirClase) c.abrirClase(clase);
+            else if (window.openCampusPSA) window.openCampusPSA();
+          }catch(e){}
+        } };
+      }
+      return {
+        cat: 'racha', icono: '🔥', kicker: 'Campus PSA · racha',
+        titulo: titulo,
+        html: '<p class="ht-nota">' + esc(nota) + '</p><div class="ht-chips"><span>🔥 ' + n + ' día' + (n === 1 ? '' : 's') + ' seguido' + (n === 1 ? '' : 's') + '</span>' + (r.max > n ? '<span>🏆 máx. ' + r.max + '</span>' : '') + '</div>',
+        cta: cta
+      };
+    }catch(e){ return null; }
+  }
+
   function tarjetaGanaste(){
     var p = partidoDe();
     if (!p.ganado) return null;
@@ -1587,7 +1622,7 @@
     // v805: mazo unificado sobre el modelo de reempadronamiento (lista de
     // gente + colores por estado, sin botones abajo). "Hoy te conviene" se
     // quitó a pedido y el Plan Canje vive dentro de la tarjeta Usuarios.
-    [tarjetaPbEquipo(), tarjetaJornada(), tarjetaPromoBotella(), tarjetaGanaste(), tarjetaVivoPsa(), tarjetaCampus(), tarjetaCampusCuenta(), tarjetaCapacitacion(), tarjetaMetodoEnvio(), tarjetaLlegamos(), tarjetaDuchaRinnova(), tarjetaCumples(), tarjetaReempadronar(), tarjetaEquipo(), tarjetaPanel(), tarjetaUsuarios()].forEach(function(t){
+    [tarjetaPbEquipo(), tarjetaJornada(), tarjetaPromoBotella(), tarjetaGanaste(), tarjetaRacha(), tarjetaVivoPsa(), tarjetaCampus(), tarjetaCampusCuenta(), tarjetaCapacitacion(), tarjetaMetodoEnvio(), tarjetaLlegamos(), tarjetaDuchaRinnova(), tarjetaCumples(), tarjetaReempadronar(), tarjetaEquipo(), tarjetaPanel(), tarjetaUsuarios()].forEach(function(t){
       if (t) lista.push(t);
     });
     return lista;
@@ -1774,6 +1809,7 @@
       '.ht-card.ht-poster.ht-cat-promo,body.dark .ht-card.ht-poster.ht-cat-promo{background:linear-gradient(150deg,#0e6a8c,#0b5878 58%,#1a9ab0) !important;border:0;box-shadow:0 22px 60px rgba(14,106,140,.34) !important}',
       '.ht-card.ht-poster.ht-cat-otra,body.dark .ht-card.ht-poster.ht-cat-otra{background:linear-gradient(150deg,#0e6a8c,#0b5878) !important}',
     '.ht-card.ht-poster.ht-cat-vivoPsa,body.dark .ht-card.ht-poster.ht-cat-vivoPsa{background:linear-gradient(150deg,#b0321f,#8e2416) !important;border:0;box-shadow:0 22px 60px rgba(140,40,25,.36) !important}',
+    '.ht-card.ht-poster.ht-cat-racha,body.dark .ht-card.ht-poster.ht-cat-racha{background:linear-gradient(150deg,#c2560c,#93400a) !important;border:0;box-shadow:0 22px 60px rgba(160,70,15,.36) !important}',
       'body.dark .ht-card.ht-poster h3,body.dark .ht-card.ht-poster.ht-esp h3,body.dark .ht-card.ht-poster.ht-hoy h3,body.dark .ht-card.ht-poster.ht-alerta h3,body.dark .ht-card.ht-poster.ht-ganaste h3{color:#fff}',
       'body.dark .ht-card.ht-poster .ht-frase,body.dark .ht-card.ht-poster.ht-alerta .ht-frase,body.dark .ht-card.ht-poster .ht-kicker,body.dark .ht-card.ht-poster.ht-hoy .ht-kicker,body.dark .ht-card.ht-poster.ht-alerta .ht-kicker,body.dark .ht-card.ht-poster.ht-ganaste .ht-kicker{color:#fff}',
       'body.dark .ht-card.ht-poster .ht-lista li,body.dark .ht-card.ht-poster .ht-pasos li,body.dark .ht-card.ht-poster.ht-alerta .ht-pasos li{background:rgba(0,0,0,.28);color:#fff}',
@@ -2397,6 +2433,7 @@
     tarjetaCampus: tarjetaCampus,
     tarjetaCapacitacion: tarjetaCapacitacion,
     tarjetaVivoPsa: tarjetaVivoPsa,
+    tarjetaRacha: tarjetaRacha,
     contextoCapacitacion: contextoCapacitacion,
     tarjetaPromoBotella: tarjetaPromoBotella,
     textoMarcador: textoMarcador

@@ -4,6 +4,14 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v646 · Terminaste la clase: 3 preguntas para verificar lo que aprendiste
+
+- **Preguntas post-video**: al terminar una clase (90% o `ended`) con banco, APPI abre un quiz de **3 preguntas originales de APPI** con 4 opciones cada una. El banco `campus-preguntas.js` arranca con **50 clases y 137 preguntas** escritas por nosotros; las clases sin banco siguen marcándose "vista ✓" y el resto queda cubierto por el curso, sin bloquear el avance.
+- **Sin regalar el acierto**: si errás sólo se marca la opción elegida como incorrecta (nunca se revela cuál era la buena) y se reintenta esa pregunta hasta acertar. Al terminar las 3 se guarda el resultado en el mismo estado sincronizado (`appi_campus_psa_v1_`).
+- **Racha**: días seguidos con al menos una clase completada. Vive en el mismo storage de Campus, se muestra como chip en **Mi capacitación** y como tarjeta nueva en el mazo del Home. Con clase hecha hoy muestra "¡N días seguidos! 🔥" (con felicitación especial a partir de 3); sin clase de hoy avisa **"Te falta 1 clase para mantener la racha"** y abriéndola desde la tarjeta encadenás el día. Si falta un día, la racha vuelve a 0.
+- El spec `campus-racha.spec.js` cubre el banco (50 clases / 137 preguntas / sin malformadas), el quiz sin regalar el acierto, el registro de racha al completar y el corte por días incompletos.
+- Versión: **v646 · Segura** → Cache `appi-v646-quiz-racha`.
+
 ## v645 · El Vivo PSA te avisa, te previa y te deja ver la grabación
 
 - **Vivo PSA semanal**: APPI ubica el vivo que el Campus transmite todos los **miércoles a las 15:00 (ART)**. La agenda del catálogo trae las reuniones de equipo, no el vivo general, así que se calcula por fecha.
