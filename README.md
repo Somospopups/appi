@@ -4,6 +4,14 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v648 · El último Vivo PSA queda toda la semana para verlo cuando quieras
+
+- **Sección «🎬 Vivos anteriores»**: en v645 el replay del vivo de los miércoles vivía sólo esa noche; el jueves APPI ya anunciaba el próximo y la grabación quedaba sin lugar en la app. Ahora la vista Campus suma una sección propia con el **último Vivo PSA** (fecha incluida) que queda visible **toda la semana, hasta el próximo miércoles**: botón **Ver en Campus ↗** a la transmisión publicada y, si la previa de *ese* vivo está en el catálogo, **▶ Escuchar previa** adentro de APPI. El miércoles a la mañana muestra el vivo de la semana pasada, debajo del aviso del vivo de hoy.
+- **Sin duplicados ni previas cruzadas**: mientras el vivo está en curso manda el directo y la sección se oculta; la noche del miércoles el replay de hoy (v645) ya es el último y no se repite. `ultimoVivoPsaRef()` ubica el miércoles 15:00 ya terminado (95 minutos, como v645) y la previa se busca **sólo por la fecha exacta de ese vivo** (`audioPreviaVivo(fecha, true)`): si todavía no está, la tarjeta va sin ▶ en vez de pasar la previa del próximo como si fuera la anterior. Como ahora puede haber dos ▶ en pantalla, cada botón se cablea con los datos de su propia tarjeta.
+- **El video sigue en el Campus**: APPI no re-copia la transmisión (mismo criterio de v641/v645); guarda el acceso y la previa. La tarjeta del mazo del Home sigue apareciendo sólo el miércoles, para no ocupar el mazo todos los días.
+- Tests: `campus-vivo.spec.js` suma la lógica del último vivo (jueves y martes sigue el mismo miércoles; en vivo todavía no terminó), la previa exacta sin respaldo cruzado y la sección visible del jueves al martes con su ▶ abriendo la previa de su fecha.
+- Versión: **v648 · Segura** → Cache `appi-v648-vivo-toda-semana`.
+
 ## v647 · Se retira el catálogo volcado y la cuenta fija que lo generaba
 
 - **Baja de la cuenta fija**: ya no existe el rastreo automático con credenciales compartidas. Se borraron los secrets `PSA_DIP_NUMERO` / `PSA_DIP_CLAVE`, el workflow `.github/workflows/campus-psa.yml` (corría 2 veces por día) y el script `scripts/actualizar-campus-psa.mjs`. El catálogo de cada distribuidor lo arma **sólo** la función edge `campus-catalogo` con las credenciales MI PSA de ese usuario (v644), nunca una cuenta genérica.

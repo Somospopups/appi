@@ -899,7 +899,25 @@
     var estado = diasHasta > 0 ? 'proximo' : (now < ini ? 'hoy' : (now <= fin ? 'vivo' : 'pasado'));
     return { ini: ini, fin: fin, estado: estado };
   }
-  function audioPreviaVivo(fecha){
+  /* v648: el Vivo PSA más reciente ya transmitido. El miércoles antes de
+     las 15:00 es el de la semana pasada; durante la transmisión el de hoy
+     todavía no está "terminado". Dura 95 minutos, igual que en v645. */
+  function ultimoVivoPsaRef(now){
+    now = now || new Date();
+    var ini = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 15, 0, 0, 0);
+    var diasDesde = (now.getDay() - 3 + 7) % 7; // 3 = miércoles
+    ini = new Date(ini.getTime() - diasDesde * 86400000);
+    if (ini.getTime() > now.getTime()) ini = new Date(ini.getTime() - 7 * 86400000);
+    var fin = new Date(ini.getTime() + 95 * 60000);
+    return { ini: ini, fin: fin, terminado: now > fin };
+  }
+  function fechaClaveVivo(d){
+    function p(n){ return (n < 10 ? '0' : '') + n; }
+    return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate());
+  }
+  /* soloExacta (v648): para el vivo anterior no vale el respaldo a la
+     previa más reciente, porque esa puede ser ya la del próximo vivo. */
+  function audioPreviaVivo(fecha, soloExacta){
     try {
       var listas = (catalogoMem && catalogoMem.playlists) || [];
       var mejor = null, maxId = -1;
@@ -915,7 +933,7 @@
           if (+m[1] === fecha.getDate() && +m[2] === fecha.getMonth() + 1) return a;
         }
       }
-      return mejor;
+      return soloExacta ? null : mejor;
     } catch(e){ return null; }
   }
   function seccionReplayVivo(ref, previa){
@@ -931,6 +949,35 @@
       (stream ? '<button type="button" class="cp-vpsa-play" data-cp-vpsa-play="replay">▶ Escuchar previa</button>' : '') +
       '<a class="cp-vpsa-go" href="https://campus.psa.com.ar/clases-en-vivo" target="_blank" rel="noopener">Ver en Campus ↗</a>' +
       '</div></div>';
+  }
+  /* ---------- Vivos anteriores (v648) ----------
+     En v645 el replay vivía sólo la noche del miércoles: el jueves APPI ya
+     mostraba el próximo vivo y la grabación quedaba sin lugar en la app.
+     Ahora el último Vivo PSA tiene su sección propia en el Campus y queda
+     visible toda la semana, hasta que llega el próximo miércoles. El video
+     completo sigue publicado en el Campus (APPI no lo re-copia, como en
+     v641/v645); la previa de ese vivo, si está en el catálogo, suena acá.
+     Mientras hay vivo en curso, o la noche del miércoles con el replay de
+     hoy en pantalla, la sección no se duplica. */
+  function seccionUltimoVivo(){
+    try {
+      if (!catalogoMem) return '';
+      var prox = proximoVivoPsaRef();
+      if (prox.estado === 'vivo' || prox.estado === 'pasado') return '';
+      var ult = ultimoVivoPsaRef();
+      if (!ult || !ult.terminado) return '';
+      var previa = audioPreviaVivo(ult.ini, true);
+      var stream = previa && previa.stream ? previa.stream : '';
+      return '<div class="cp-section-head"><h3>🎬 Vivos anteriores</h3><span>para ver cuando quieras</span></div>' +
+        '<div class="cp-vpsa cp-vpsa-replay" data-cp-vpsa="ultimo" data-cp-ultimo-vivo="' + fechaClaveVivo(ult.ini) + '"' +
+        (stream ? ' data-cp-replay-stream="' + esc(stream) + '" data-cp-replay-id="audio:' + previa.audioId + '"' : '') + '>' +
+        '<div class="cp-vpsa-t">🎬 Último Vivo PSA · ' + esc(fechaLindaVivo(ult.ini)) + '</div>' +
+        '<p>La transmisión del último miércoles quedó publicada en el Campus: mirala cuando quieras, queda acá hasta el próximo vivo.' + (stream ? ' Su previa se escucha acá mismo.' : '') + '</p>' +
+        '<div class="cp-vpsa-btns">' +
+        (stream ? '<button type="button" class="cp-vpsa-play" data-cp-vpsa-play="ultimo" data-cp-previa-id="audio:' + previa.audioId + '">▶ Escuchar previa</button>' : '') +
+        '<a class="cp-vpsa-go" href="https://campus.psa.com.ar/clases-en-vivo" target="_blank" rel="noopener">Ver en Campus ↗</a>' +
+        '</div></div>';
+    } catch(e){ return ''; }
   }
   function seccionVivoPsa(){
     try {
@@ -953,16 +1000,32 @@
       '</div>';
     } catch(e){ return ''; }
   }
+  /* v648: puede haber más de un ▶ en pantalla (la previa del próximo vivo
+     y la del último), así que se cablea cada botón con los datos de su
+     propia tarjeta en vez del primero que aparezca en la vista. */
   function cablearVivoPsa(host){
     if (!host) return;
-    var play = host.querySelector('[data-cp-vpsa-play]');
-    if (!play) return;
+    var plays = host.querySelectorAll('[data-cp-vpsa-play]');
+    for (var b = 0; b < plays.length; b++) cablearPlayVivo(plays[b], host);
+  }
+  function cablearPlayVivo(play, host){
     play.onclick = function(){
       try {
+        var card = play.closest ? play.closest('[data-cp-vpsa]') : null;
+        var root = card || host;
         var pid = play.getAttribute('data-cp-previa-id') || '';
-        var streamEl = host.querySelector('[data-cp-replay-stream]');
-        var idEl = host.querySelector('[data-cp-replay-id]');
-        if (!pid && idEl) pid = idEl.getAttribute('data-cp-replay-id') || '';
+        var stream = '';
+        if (root.getAttribute){
+          if (!pid) pid = root.getAttribute('data-cp-replay-id') || '';
+          stream = root.getAttribute('data-cp-replay-stream') || '';
+        }
+        if ((!pid || !stream) && root.querySelector){
+          var streamEl = root.querySelector('[data-cp-replay-stream]');
+          if (streamEl){
+            if (!pid) pid = streamEl.getAttribute('data-cp-replay-id') || '';
+            if (!stream) stream = streamEl.getAttribute('data-cp-replay-stream') || '';
+          }
+        }
         var aid = Number(String(pid).replace(/^audio:/, ''));
         var listas = (catalogoMem && catalogoMem.playlists) || [];
         var audio = null;
@@ -973,8 +1036,8 @@
           }
         }
         if (audio && audio.stream) abrirAudio(audio, 'La Previa del Vivo');
-        else if (streamEl && streamEl.getAttribute('data-cp-replay-stream')){
-          abrirAudio({ audioId: aid, stream: streamEl.getAttribute('data-cp-replay-stream'), titulo: 'La Previa del Vivo' }, 'La Previa del Vivo');
+        else if (stream){
+          abrirAudio({ audioId: aid, stream: stream, titulo: 'La Previa del Vivo' }, 'La Previa del Vivo');
         }
       } catch(e){}
     };
@@ -1088,7 +1151,7 @@
       '<div class="cp-section-head"><h3>Tu camino de hoy</h3><span>5 aciertos activan el impulso</span></div>' +
       '<section class="cp-path"><div class="cp-step done"><i>✓</i><b>Tu día</b><small>completo</small></div><div class="cp-step ' + (ready ? 'live' : '') + '"><i>✦</i><b>Desafío</b><small>5 aciertos</small></div><div class="cp-step ' + (unlocked ? 'done' : '') + '"><i>⚡</i><b>+3 acciones</b><small>' + (unlocked ? 'activado' : 'por ganar') + '</small></div><div class="cp-step ' + (unlocked ? 'live' : '') + '"><i>↗</i><b>Aplicar</b><small>en tu negocio</small></div><div class="cp-step"><i>★</i><b>Tu logro</b><small>del día</small></div></section>' +
       '<section class="cp-grid"><article class="cp-card featured"><span class="cp-eyebrow">RECOMENDADO PARA TU CATEGORÍA</span><h4>' + (esLider() ? 'Construcción de equipos sólidos' : esJunior() ? 'Tus primeros pasos comerciales' : 'Acciones que hacen crecer tu negocio') + '</h4><p>' + (esLider() ? 'Practicá decisiones sobre acompañamiento, permanencia y crecimiento del equipo.' : 'Preguntas breves para llevar el aprendizaje del Campus a conversaciones reales.') + '</p><button type="button" id="cpTopicGo">Empezar desafío</button></article><article class="cp-card"><span class="cp-eyebrow">APLICACIÓN DE HOY</span><h4>Posventa que genera vínculo</h4><p>Canje, fidelización y oportunidades reales con tus usuarios.</p><button type="button" id="cpTopicInfo">Ver tema</button></article></section>' +
-      seccionVivoPsa() + seccionVivo() + seccionAudios() +
+      seccionVivoPsa() + seccionUltimoVivo() + seccionVivo() + seccionAudios() +
       '<button type="button" class="cp-main-btn ' + (ready ? 'ready' : '') + '" id="cpMainAction" ' + (!ready && !unlocked ? 'disabled' : '') + '>' + esc(actionLabel) + '</button><p class="cp-note">Las preguntas son originales de APPI, organizadas por los temas de formación de Campus Appi. No reemplazan sus capacitaciones oficiales.</p></div>';
     document.getElementById('cpTopicGo').onclick = function(){ if (ready) iniciarDesafio(); else if (unlocked) abrir(); else avisoFaltante(); };
     document.getElementById('cpTopicInfo').onclick = function(){
@@ -1194,8 +1257,9 @@
     estadoCatalogo: function(){ return catalogoEstado; },
     reintentarCatalogo: reintentarCatalogo,
     abrirCuentaPSA: abrirCuentaPSA,
-    // Vivo PSA semanal (v645)
+    // Vivo PSA semanal (v645) y último vivo toda la semana (v648)
     proximoVivoPsa: proximoVivoPsaRef,
+    ultimoVivoPsa: ultimoVivoPsaRef,
     audioPreviaVivo: audioPreviaVivo,
     // Preguntas post-video y racha (v646)
     bancoPreguntas: function(){ return (window.APPICampusPreguntas && window.APPICampusPreguntas.totalClases) || 0; },

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v647-baja-cuenta-fija';
+const CACHE_NAME = 'appi-v648-vivo-toda-semana';
 const CACHE_PREFIX = 'appi-';
 // Donde el SW aparta una compartición hasta que la app la consume. No
 // empieza con el prefijo de la app para que el prune del activate no la borre.
