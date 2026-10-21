@@ -1,6 +1,6 @@
 {
  "version": 1,
- "generado": "2026-10-20T22:27:20.643Z",
+ "generado": "2026-10-21T01:36:36.384Z",
  "fuente": "campus.psa.com.ar",
  "kits": [
   {
@@ -516,7 +516,7 @@
      "url": "/tematica/listadoclases/352",
      "clases": [
       {
-       "titulo": "PSA ROtech UV PSA Airpurifier PSA Rinnova PSA Senior4 PSA Iontrix3 PSA DUCHA 2 PSA S•1000•2 PSA Senik PSA Quantum PSA ROPOT PSA DOMUS PSA MINI DOMUS PSA Senior PSA Mini PSA Vero PSA eco-D Purificador de Aire PSA SodaBurby PSA C3 PSA Senior 3 PSA Dispenser 2 Video LINEA DE PRODUCTOS",
+       "titulo": "PSA ROtech UV PSA Airpurifier PSA Rinnova PSA Senior4 PSA Iontrix3 PSA DUCHA 2 PSA S•1000•2 PSA Senik PSA Quantum PSA ROPOT PSA DOMUS PSA Senior PSA MINI DOMUS PSA Mini PSA Vero PSA eco-D Purificador de Aire PSA SodaBurby PSA C3 PSA Senior 3 PSA Dispenser 2 Video LINEA DE PRODUCTOS",
        "autor": "",
        "duracion": "00:18",
        "url": "/tematica/352/video/linea-de-productos",
@@ -4217,13 +4217,13 @@
    "titulo": "Reunión de Equipo"
   },
   {
-   "equipo": "Equipo MegaRed 1",
+   "equipo": "Equipo MegaRed 2",
    "inicio": "22-10 10:00",
    "fin": "22-10 11:35",
    "titulo": "Reunión de Equipo"
   },
   {
-   "equipo": "Equipo MegaRed 2",
+   "equipo": "Equipo MegaRed 1",
    "inicio": "22-10 10:00",
    "fin": "22-10 11:35",
    "titulo": "Reunión de Equipo"
@@ -4283,6 +4283,12 @@
    "titulo": "Reunión de Equipo"
   },
   {
+   "equipo": "Equipo Girasoles",
+   "inicio": "20-10 14:00",
+   "fin": "20-10 15:35",
+   "titulo": "Reunión de Equipo"
+  },
+  {
    "equipo": "Equipo MasterSol",
    "inicio": "20-10 14:00",
    "fin": "20-10 16:00",
@@ -4292,12 +4298,6 @@
    "equipo": "Equipo Aconcagua",
    "inicio": "20-10 14:00",
    "fin": "20-10 16:00",
-   "titulo": "Reunión de Equipo"
-  },
-  {
-   "equipo": "Equipo Girasoles",
-   "inicio": "20-10 14:00",
-   "fin": "20-10 15:35",
    "titulo": "Reunión de Equipo"
   }
  ],
