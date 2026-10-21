@@ -1209,6 +1209,26 @@
     }catch(e){ return null; }
   }
 
+  // v644 · Sin cuenta MI PSA no hay rastreo propio del Campus: la tarjeta
+  // invita a cargarla (popup existente) en el único hueco que necesita.
+  function tarjetaCampusCuenta(){
+    try{
+      var c = window.APPICampusPSA;
+      if (!c || typeof c.estadoCatalogo !== 'function') return null;
+      if (c.estadoCatalogo() !== 'sinCuenta') return null;
+      return {
+        cat: 'campusCuenta', icono: '🔑', kicker: 'Campus PSA · tu cuenta',
+        titulo: 'Cargá tu cuenta MI PSA',
+        html: '<p class="ht-nota">El catálogo de tu Campus se arma con tus propios datos de distribuidor: clases, audios y vivos siempre al día. Se guarda una sola vez, sólo en tu dispositivo.</p><div class="ht-chips"><span>🔒 Sólo en tu equipo</span><span>⚡ 1 sola vez</span></div>',
+        cta: { label: 'Cargar mi MI PSA 🔑', go: function(){
+          if (window.APPICampusPSA && typeof window.APPICampusPSA.abrirCuentaPSA === 'function') window.APPICampusPSA.abrirCuentaPSA();
+          else if (typeof window.mostrarPopupPSA === 'function') window.mostrarPopupPSA();
+          else if (typeof window.psaAbrirPopup === 'function') window.psaAbrirPopup();
+        } }
+      };
+    }catch(e){ return null; }
+  }
+
   // v642 · Capacitación: el mazo llena UN hueco (nunca más de ~25% y jamás
   // antes que las tarjetas del negocio) con la próxima clase real del Campus
   // PSA, elegida por el momento que vive el distribuidor hoy.
@@ -1227,6 +1247,8 @@
     try{
       var c = window.APPICampusPSA;
       if (!c || typeof c.proximaClase !== 'function') return null;
+      // v644: sin cuenta MI PSA manda el aviso de cuenta (tarjetaCampusCuenta).
+      if (typeof c.estadoCatalogo === 'function' && c.estadoCatalogo() === 'sinCuenta') return null;
       if (!c.catalogo || !c.catalogo()){
         if (typeof c.cargarCatalogo === 'function' && !window.__htCapPidiendo){
           window.__htCapPidiendo = true;
@@ -1527,7 +1549,7 @@
     // v805: mazo unificado sobre el modelo de reempadronamiento (lista de
     // gente + colores por estado, sin botones abajo). "Hoy te conviene" se
     // quitó a pedido y el Plan Canje vive dentro de la tarjeta Usuarios.
-    [tarjetaPbEquipo(), tarjetaJornada(), tarjetaPromoBotella(), tarjetaGanaste(), tarjetaCampus(), tarjetaCapacitacion(), tarjetaMetodoEnvio(), tarjetaLlegamos(), tarjetaDuchaRinnova(), tarjetaCumples(), tarjetaReempadronar(), tarjetaEquipo(), tarjetaPanel(), tarjetaUsuarios()].forEach(function(t){
+    [tarjetaPbEquipo(), tarjetaJornada(), tarjetaPromoBotella(), tarjetaGanaste(), tarjetaCampus(), tarjetaCampusCuenta(), tarjetaCapacitacion(), tarjetaMetodoEnvio(), tarjetaLlegamos(), tarjetaDuchaRinnova(), tarjetaCumples(), tarjetaReempadronar(), tarjetaEquipo(), tarjetaPanel(), tarjetaUsuarios()].forEach(function(t){
       if (t) lista.push(t);
     });
     return lista;
@@ -2367,6 +2389,10 @@
       mazo.i = nuevas.length ? (mazo.i % nuevas.length) : 0;
       mazo.tarjetas = nuevas;
       mazo.demoHecha = true; // el vaivén ya se vio al abrir; no lo re-encendemos
+      // v644: si la lista cambió con la misma cantidad de tarjetas (p. ej. la
+      // capacitación sale y entra la de cuenta MI PSA), el DOM del cover hay
+      // que rearmarlo: sin esto las cartas viejas quedan pegadas.
+      mazo.coverDOM = false;
       pintar();
     }catch(e){}
   }
@@ -2390,6 +2416,10 @@
     }
   }catch(e){}
   window.addEventListener('appi-campus-avance', function(){ setTimeout(refrescarPorCapacitacion, 80); });
+  // v644: cuando cambia el estado de la cuenta MI PSA entra/sale la tarjeta
+  // de aviso y la de capacitación se reevalúa.
+  window.addEventListener('appi-campus-estado', function(){ setTimeout(refrescarPorCapacitacion, 80); });
+  window.addEventListener('appi-campus-catalogo', function(){ setTimeout(refrescarPorCapacitacion, 80); });
 
   function intentarEnvolver(){
     try{ css(); }catch(e){}

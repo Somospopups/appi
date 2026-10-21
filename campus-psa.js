@@ -119,36 +119,138 @@
     return { total:BASE_ACCIONES, hechas:0, noHechas:0, pendientes:BASE_ACCIONES };
   }
 
-  /* ---------- Catálogo real del Campus (v640) ----------
-     campus-catalogo.json llega de red (lo publica el workflow cada día) y
-     queda en memoria + una copia local de emergencia. La clave del respaldo
-     NO entra en la lista de sincronización: es un artefacto de red, no dato
-     de la cuenta. */
+  /* ---------- Catálogo real del Campus (v640 · v644) ----------
+     El catálogo sale de la edge campus-catalogo con las credenciales MI PSA
+     de CADA usuario (caché compartida en la nube, refrescada por quien
+     primero la pida). Sin cuenta MI PSA no hay rastreo propio: se usa la
+     última copia (respaldo local) y aparece el aviso para cargarla. La
+     clave del respaldo NO sincroniza: es artefacto de red, no dato. */
   var CATALOGO_LOCAL = 'appi_campus_catalogo_v1';
   var catalogoMem = null;
   var catalogoPidiendo = null;
+  var catalogoEstado = null; // null | 'cargando' | 'ok' | 'sinCuenta' | 'error'
 
+  function credsCampus(){
+    try { return (typeof window.psaGetCreds === 'function') ? window.psaGetCreds() : null; } catch(e){ return null; }
+  }
+  function tieneCuentaCampus(){
+    var c = credsCampus();
+    return !!(c && c.center && c.number && c.password);
+  }
+  function nubeCfg(){
+    var cfg = (window.APPI_AUTH && window.APPI_AUTH.url && window.APPI_AUTH.anonKey) ? window.APPI_AUTH : null;
+    if (!cfg) return null;
+    var token = '';
+    try {
+      if (window.APPIAuth && typeof window.APPIAuth.accessToken === 'function') token = window.APPIAuth.accessToken();
+      if (!token){
+        var v = JSON.parse(localStorage.getItem('appi_auth_session_v1') || 'null');
+        token = v && v.session && v.session.access_token || '';
+      }
+    } catch(e){}
+    return { url: cfg.url, anonKey: cfg.anonKey, token: token };
+  }
+  function catalogoValido(cat){ return !!(cat && cat.kits && cat.kits.length); }
+  function respaldoCatalogo(maxDias){
+    try {
+      var prev = JSON.parse(localStorage.getItem(CATALOGO_LOCAL) || 'null');
+      if (!catalogoValido(prev)) return null;
+      if (maxDias && prev.generado){
+        var t = Date.parse(prev.generado);
+        if (t && Date.now() - t > maxDias * 86400000) return null;
+      }
+      return prev;
+    } catch(e){ return null; }
+  }
+  function guardarCatalogo(cat){
+    catalogoMem = cat;
+    try { localStorage.setItem(CATALOGO_LOCAL, JSON.stringify(cat)); } catch(e){}
+  }
+  function fijarEstado(estado){
+    if (catalogoEstado === estado) return;
+    catalogoEstado = estado;
+    try {
+      window.dispatchEvent(new CustomEvent('appi-campus-estado', { detail: { estado: estado } }));
+    } catch(e){}
+  }
+  function pedirCatalogoNube(){
+    var cfg = nubeCfg();
+    var c = credsCampus();
+    if (!cfg || !c) return Promise.reject(new Error('sin cuenta MI PSA'));
+    return fetch(cfg.url + '/functions/v1/campus-catalogo', {
+      method: 'POST',
+      headers: { 'Content-Type':'application/json', 'apikey': cfg.anonKey, 'Authorization': 'Bearer ' + (cfg.token || cfg.anonKey) },
+      body: JSON.stringify({ center: c.center, number: c.number, password: c.password })
+    }).then(function(r){ return r.json(); }).then(function(j){
+      if (!j || j.error || !catalogoValido(j.cat)) throw new Error((j && j.error) || 'catálogo inválido');
+      return j.cat;
+    });
+  }
+  function pedirRepoJson(){
+    return fetch('./campus-catalogo.json', { cache: 'no-store' })
+      .then(function(r){ if (!r.ok) throw new Error('catálogo HTTP ' + r.status); return r.json(); })
+      .then(function(cat){ if (!catalogoValido(cat)) throw new Error('catálogo vacío'); return cat; });
+  }
+  /** Refresco en segundo plano: la pantalla ya muestra la última copia. */
+  function refrescarNube(){
+    pedirCatalogoNube().then(function(cat){
+      guardarCatalogo(cat);
+      fijarEstado('ok');
+      try { window.dispatchEvent(new Event('appi-campus-catalogo')); } catch(e){}
+    }).catch(function(){
+      fijarEstado('error');
+    });
+  }
   function cargarCatalogo(){
     if (catalogoMem) return Promise.resolve(catalogoMem);
     if (catalogoPidiendo) return catalogoPidiendo;
-    catalogoPidiendo = fetch('./campus-catalogo.json', { cache: 'no-store' })
-      .then(function(r){ if (!r.ok) throw new Error('catálogo HTTP ' + r.status); return r.json(); })
+    // v644: este módulo se carga en el <head> y el script de credenciales
+    // (psaGetCreds) es inline, más abajo en el body. Si se decide "sin cuenta"
+    // antes de que exista, el estado queda mentido para toda la sesión:
+    // se espera al load y recién ahí se pregunta por las credenciales.
+    if (typeof window.psaGetCreds !== 'function' && document.readyState !== 'complete'){
+      return new Promise(function(res, rej){
+        window.addEventListener('load', function(){
+          setTimeout(function(){ cargarCatalogo().then(res, rej); }, 0);
+        });
+      });
+    }
+    var conCuenta = tieneCuentaCampus();
+    if (!conCuenta) fijarEstado('sinCuenta');
+    else fijarEstado('cargando');
+    var local = respaldoCatalogo(7);
+    if (local){
+      guardarCatalogo(local);
+      if (conCuenta) refrescarNube();
+      catalogoPidiendo = Promise.resolve(local);
+      return catalogoPidiendo;
+    }
+    // Sin copia local: la nube (o el JSON del repo, mientras exista) es el único camino.
+    catalogoPidiendo = (conCuenta ? pedirCatalogoNube() : Promise.reject(new Error('sin cuenta MI PSA')))
       .then(function(cat){
-        if (!cat || !cat.kits || !cat.kits.length) throw new Error('catálogo vacío');
-        catalogoMem = cat;
-        try { localStorage.setItem(CATALOGO_LOCAL, JSON.stringify(cat)); } catch(e){}
+        guardarCatalogo(cat);
+        fijarEstado('ok');
         return cat;
       })
-      .catch(function(err){
-        try {
-          var prev = JSON.parse(localStorage.getItem(CATALOGO_LOCAL) || 'null');
-          if (prev && prev.kits && prev.kits.length) { catalogoMem = prev; return prev; }
-        } catch(e){}
-        throw err;
+      .catch(function(){
+        return pedirRepoJson().then(function(cat){
+          guardarCatalogo(cat);
+          fijarEstado(conCuenta ? 'error' : 'sinCuenta');
+          return cat;
+        }).catch(function(){
+          fijarEstado(conCuenta ? 'error' : 'sinCuenta');
+          throw new Error('No hay catálogo del Campus disponible.');
+        });
       })
       .then(function(cat){ catalogoPidiendo = null; return cat; },
             function(e){ catalogoPidiendo = null; throw e; });
     return catalogoPidiendo;
+  }
+  function reintentarCatalogo(){
+    catalogoMem = null;
+    catalogoPidiendo = null;
+    catalogoEstado = null;
+    return cargarCatalogo();
   }
   function catalogo(){ return catalogoMem; }
   function norm(s){
@@ -423,6 +525,17 @@
       '.cp-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:11px;margin-top:25px}.cp-card{padding:15px;border:1px solid #dce8ed;border-radius:18px;background:#fff;box-shadow:0 6px 17px rgba(27,64,84,.04)}.cp-card.featured{border-color:#ddd7fb;background:linear-gradient(135deg,#f4f0ff,#f5fcff)}.cp-card .cp-eyebrow{font-size:9px;letter-spacing:.7px;font-weight:950;text-transform:uppercase;color:#7465db}.cp-card:not(.featured) .cp-eyebrow{color:#b57816}.cp-card h4{margin:6px 0;color:#273d56;font-size:14px;letter-spacing:-.25px}.cp-card p{margin:0;color:#738299;font-size:11px;line-height:1.4}.cp-card button,.cp-main-btn{margin-top:12px;border:0;border-radius:11px;padding:9px 12px;background:#7566dc;color:#fff;font:inherit;font-size:10.5px;font-weight:950;cursor:pointer}.cp-card:not(.featured) button{background:#efa840}',
       '.cp-main-btn{width:100%;min-height:49px;margin-top:19px;font-size:13px;background:linear-gradient(135deg,#7566dc,#9582f0);box-shadow:0 6px 0 #5547b7}.cp-main-btn:active{transform:translateY(3px);box-shadow:0 3px 0 #5547b7}.cp-main-btn.ready{background:linear-gradient(135deg,#0d8b84,#38cda4);box-shadow:0 6px 0 #087064}.cp-main-btn[disabled]{cursor:default;background:#cbd7dd;box-shadow:none;color:#6c8090}',
       '.cp-note{margin:11px 5px 0;color:#718099;font-size:10.5px;text-align:center;font-weight:650;line-height:1.4}',
+      '.cp-aviso{margin:13px 0 5px;padding:14px 15px;border-radius:17px;border:1.5px solid #ffe08a;background:linear-gradient(150deg,#fff9e8,#fffdf6);box-shadow:0 6px 16px rgba(214,166,44,.13);text-align:left}',
+      '.cp-aviso.err{border-color:#bcd7ff;background:linear-gradient(150deg,#eff5ff,#f8fbff);box-shadow:0 6px 16px rgba(58,110,206,.1)}',
+      '.cp-aviso-t{font-size:13px;font-weight:1000;color:#7a5b06;letter-spacing:-.2px}',
+      '.cp-aviso.err .cp-aviso-t{color:#1d4fa8}',
+      '.cp-aviso p{margin:6px 0 0;color:#6b6553;font-size:11px;line-height:1.45;font-weight:650}',
+      '.cp-aviso.err p{color:#5a6b83}',
+      '.cp-aviso button{margin-top:10px;width:100%;min-height:42px;border:0;border-radius:13px;background:linear-gradient(135deg,#f0b429,#f5cd62);color:#3d2e00;font:inherit;font-size:12.5px;font-weight:1000;cursor:pointer;box-shadow:0 4px 0 #c99514}',
+      '.cp-aviso button:active{transform:translateY(2px);box-shadow:0 2px 0 #c99514}',
+      '.cp-aviso.err button{background:linear-gradient(135deg,#4f7fe8,#6f9dff);color:#fff;box-shadow:0 4px 0 #3a62bd}',
+      '.cp-aviso small{display:block;margin-top:8px;color:#8a8168;font-size:9.5px;font-weight:750}',
+      '.dark .cp-aviso{background:linear-gradient(150deg,#3a331d,#2a2c26);border-color:#8a7534}.dark .cp-aviso p{color:#cfc7ae}.dark .cp-aviso-t{color:#ffd977}.dark .cp-aviso.err{background:linear-gradient(150deg,#22304a,#232a38);border-color:#4a6aa8}.dark .cp-aviso.err .cp-aviso-t{color:#9fc1ff}.dark .cp-aviso.err p{color:#aebed4}',
       '.cp-overlay{position:fixed;z-index:46000;inset:0;display:none;place-items:center;padding:18px;background:rgba(3,25,45,.63);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}.cp-overlay.open{display:grid}.cp-modal{width:min(100%,440px);max-height:calc(100vh - 36px);overflow:auto;border-radius:29px;background:#fff;box-shadow:0 30px 85px rgba(0,0,0,.38);animation:cpPop .4s cubic-bezier(.2,1.28,.3,1)}@keyframes cpPop{from{opacity:0;transform:translateY(22px) scale(.88)}to{opacity:1;transform:none}}',
       '.cp-celebrate{position:relative;overflow:hidden;padding:31px 25px 27px;background:linear-gradient(150deg,#083c5e,#0c7e89 54%,#2ac5bf);color:#fff;text-align:center}.cp-celebrate:after{content:"";position:absolute;left:-8%;right:-8%;bottom:-43px;height:100px;opacity:.26;background:radial-gradient(ellipse at 20% 0,transparent 49%,#d6ffff 50% 63%,transparent 64%),radial-gradient(ellipse at 77% 8%,transparent 49%,#d6ffff 50% 63%,transparent 64%)}.cp-trophy{position:relative;z-index:1;width:84px;height:84px;display:grid;place-items:center;margin:0 auto 14px;border-radius:29px;background:linear-gradient(145deg,#d7fff8,#7ae4ca);color:#0a5c69;font-size:41px;box-shadow:0 12px 0 rgba(0,0,0,.1),inset 0 2px 3px rgba(255,255,255,.85);transform:rotate(-7deg)}.cp-celebrate h2{position:relative;z-index:1;margin:0;font-size:26px;letter-spacing:-1px}.cp-celebrate p{position:relative;z-index:1;max-width:320px;margin:9px auto 0;color:#dcffff;font-size:13px;line-height:1.43}.cp-reward{position:relative;z-index:1;display:inline-flex;margin-top:15px;padding:8px 13px;border:1px solid rgba(255,255,255,.26);border-radius:999px;background:rgba(0,37,55,.24);font-size:11px;font-weight:950}',
       '.cp-modal-foot{padding:18px 22px 21px}.cp-hint{margin:0 0 14px;color:#708099;text-align:center;font-size:11px;line-height:1.4;font-weight:700}.cp-primary,.cp-secondary{width:100%;min-height:48px;border:0;border-radius:15px;font:inherit;font-size:13px;font-weight:950;cursor:pointer}.cp-primary{background:linear-gradient(135deg,#7566dc,#8d7bed);color:#fff;box-shadow:0 6px 0 #5547b7}.cp-primary:active{transform:translateY(3px);box-shadow:0 3px 0 #5547b7}.cp-secondary{margin-top:11px;background:#eef5f7;color:#58708a}',
@@ -660,6 +773,47 @@
     if (chips.length) pintarAudios(0);
   }
 
+  /* ---------- Aviso de cuenta MI PSA (v644) ----------
+     Sin credenciales de MI PSA no hay rastreo propio del Campus: el aviso
+     invita a cargarla (una sola vez, en el dispositivo) y deja ver la
+     última copia mientras tanto. Si la nube falló con cuenta cargada,
+     muestra el error con reintento. */
+  function avisoCuentaHTML(){
+    if (catalogoEstado === 'sinCuenta'){
+      return '<div class="cp-aviso" data-cp-aviso="cuenta">' +
+        '<div class="cp-aviso-t">🔑 Cargá tu cuenta MI PSA</div>' +
+        '<p>Tu Campus en APPI se arma con tus propios datos de distribuidor: clases, audios y vivos siempre al día. Se guarda una sola vez y sólo en este dispositivo.</p>' +
+        '<button type="button" data-cp-cuenta>Cargar mi cuenta MI PSA</button>' +
+        (catalogoMem ? '' : '<small>Con tu cuenta cargada vas a tener el catálogo completo acá mismo.</small>') +
+      '</div>';
+    }
+    if (catalogoEstado === 'error'){
+      return '<div class="cp-aviso err" data-cp-aviso="error">' +
+        '<div class="cp-aviso-t">📡 No pudimos actualizar el catálogo</div>' +
+        '<p>La nube de APPI no respondió ahora. Se muestra la última copia guardada.</p>' +
+        '<button type="button" data-cp-reintentar>Reintentar</button>' +
+      '</div>';
+    }
+    return '';
+  }
+  function pintarAvisos(host){
+    if (!host) return;
+    var c = host.querySelector('[data-cp-cuenta]');
+    if (c) c.onclick = abrirCuentaPSA;
+    var r = host.querySelector('[data-cp-reintentar]');
+    if (r) r.onclick = function(){
+      r.disabled = true;
+      reintentarCatalogo().then(function(){ render(); }, function(){ render(); });
+    };
+  }
+  function abrirCuentaPSA(){
+    try {
+      if (typeof window.mostrarPopupPSA === 'function') window.mostrarPopupPSA();
+      else if (typeof window.psaAbrirPopup === 'function') window.psaAbrirPopup();
+      else if (typeof window.psaProbar === 'function') window.psaProbar();
+    } catch(e){}
+  }
+
   function render(){
     css();
     var host = document.getElementById('campusCont');
@@ -677,7 +831,7 @@
       : (Math.min(base.hechas || 0, BASE_ACCIONES) + ' de 10 acciones hechas');
     var actionLabel = unlocked ? '⚡ Ver mi Impulso activado' : ready ? '🎓 Ganar 3 acciones más' : 'Completá tus 10 acciones para activar el desafío';
     host.innerHTML =
-      '<div class="cp-wrap"><section class="cp-hero"><div><span class="cp-kicker">✦ CAMPUS PSA × APPI</span><h2>Tu Campus,<br>en movimiento.</h2><p>Aprendé, aplicá y ganá oportunidades reales para hacer crecer tu negocio.</p></div><div class="cp-category">🎓 TU CATEGORÍA<span>' + esc(categoria()) + '</span></div></section>' +
+      '<div class="cp-wrap"><section class="cp-hero"><div><span class="cp-kicker">✦ CAMPUS PSA × APPI</span><h2>Tu Campus,<br>en movimiento.</h2><p>Aprendé, aplicá y ganá oportunidades reales para hacer crecer tu negocio.</p></div><div class="cp-category">🎓 TU CATEGORÍA<span>' + esc(categoria()) + '</span></div></section>' + avisoCuentaHTML() +
       '<section class="cp-progress"><div class="cp-progress-row"><div><h3>' + (unlocked ? 'Impulso del día activado' : 'Impulso del día') + '</h3><p>' + (unlocked ? 'Tu aprendizaje abrió nuevas prioridades de la jornada.' : 'Terminá tus acciones y desbloqueá una nueva oportunidad.') + '</p></div><b class="cp-score">' + hechas + '/' + totalVista + '</b></div><div class="cp-meter"><i style="width:' + pct + '%"></i></div><small>' + esc(progressText) + (unlocked && disponibles ? ' · ' + disponibles + ' extra disponibles' : '') + '</small></section>' +
       '<div class="cp-section-head"><h3>Tu camino de hoy</h3><span>5 aciertos activan el impulso</span></div>' +
       '<section class="cp-path"><div class="cp-step done"><i>✓</i><b>Tu día</b><small>completo</small></div><div class="cp-step ' + (ready ? 'live' : '') + '"><i>✦</i><b>Desafío</b><small>5 aciertos</small></div><div class="cp-step ' + (unlocked ? 'done' : '') + '"><i>⚡</i><b>+3 acciones</b><small>' + (unlocked ? 'activado' : 'por ganar') + '</small></div><div class="cp-step ' + (unlocked ? 'live' : '') + '"><i>↗</i><b>Aplicar</b><small>en tu negocio</small></div><div class="cp-step"><i>★</i><b>Tu logro</b><small>del día</small></div></section>' +
@@ -690,6 +844,7 @@
     };
     document.getElementById('cpMainAction').onclick = function(){ if (unlocked) abrir(); else if (ready) iniciarDesafio(); };
     cablearAudios();
+    pintarAvisos(host);
   }
   function avisoFaltante(){
     if (window.APPIDialog && window.APPIDialog.alert) window.APPIDialog.alert('El desafío se activa cuando las 10 acciones base del día están hechas. No cuenta marcar una acción como no realizada: el Impulso celebra trabajo concreto.', { title:'Todavía falta un paso', icon:'🎯', okText:'Entendido' });
@@ -706,11 +861,11 @@
     if (!host) return;
     if (!catalogoMem){
       cargarCatalogo().then(function(){ pintarNegocio(); })
-        .catch(function(){ try{ host.innerHTML = ''; }catch(e){} });
+        .catch(function(){ try{ host.innerHTML = avisoCuentaHTML(); pintarAvisos(host); }catch(e){} });
       return;
     }
     var res = avanceResumen();
-    if (!res.total){ try{ host.innerHTML = ''; }catch(e){} return; }
+    if (!res.total){ try{ host.innerHTML = avisoCuentaHTML(); pintarAvisos(host); }catch(e){} return; }
     var prox = proximaClase('');
     var st = document.getElementById('cpNegEstilos');
     if (!st){
@@ -734,6 +889,7 @@
       document.head.appendChild(st);
     }
     host.innerHTML =
+      avisoCuentaHTML() +
       '<div class="cp-neg" id="cpNeg">' +
         '<span class="cp-neg-k">Campus PSA · tu capacitación</span>' +
         '<h3>Mi capacitación</h3>' +
@@ -751,6 +907,7 @@
     }
     var ruta = document.getElementById('cpNegRuta');
     if (ruta) ruta.onclick = function(){ abrir(); };
+    pintarAvisos(host);
   }
 
   window.openCampusPSA = abrir;
@@ -776,7 +933,11 @@
     avanceResumen: avanceResumen,
     abrirClase: abrirClase,
     abrirAudio: abrirAudio,
-    pintarNegocio: pintarNegocio
+    pintarNegocio: pintarNegocio,
+    // Estado del catálogo por cuenta (v644)
+    estadoCatalogo: function(){ return catalogoEstado; },
+    reintentarCatalogo: reintentarCatalogo,
+    abrirCuentaPSA: abrirCuentaPSA
   };
 
   window.addEventListener('appi-datasync-applied', function(){ try{ render(); revisarJornada(); }catch(e){} });
@@ -788,6 +949,17 @@
       if (v && v.id === 'view-negocio') pintarNegocio();
     }catch(e){}
   });
+  // v644: el estado del catálogo (cuenta MI PSA / nube) repinta la vista y
+  // Mi negocio, así el aviso aparece o desaparece sin recargar.
+  function repintarEstadoCampus(){
+    try{
+      render();
+      var v = document.querySelector('.view.active');
+      if (v && v.id === 'view-negocio') pintarNegocio();
+    }catch(e){}
+  }
+  window.addEventListener('appi-campus-estado', repintarEstadoCampus);
+  window.addEventListener('appi-campus-catalogo', repintarEstadoCampus);
   if (document.readyState === 'complete') setTimeout(revisarJornada, 800);
   else window.addEventListener('load', function(){ setTimeout(revisarJornada, 900); });
   // El catálogo se adelanta en segundo plano: la ruta diaria, la vista

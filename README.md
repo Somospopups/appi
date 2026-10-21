@@ -4,6 +4,15 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v644 · Tu cuenta MI PSA arma tu Campus dentro de APPI
+
+- **Catálogo por usuario**: la vista Campus se arma ahora con las credenciales MI PSA de **cada distribuidor**. La nueva función `campus-catalogo` (Supabase Edge) ingresa a mi.psa.com.ar con los datos guardados en tu dispositivo, hace SSO al Campus y rastrea tu catálogo (kits, secciones y clases con su stream, playlists de audio y agenda de vivo completa) devolviéndolo como JSON: APPI guarda sólo metadatos y enlaces, nunca re-copia contenido.
+- **Caché compartida en la nube**: el resultado vive en la tabla `appi_campus_cache` (migración `SUPABASE_CAMPUS_CACHE.sql`); con menos de 12 horas se sirve tal cual y si está vencida lo refresca el primero que lo pida, así cada carga cuesta un solo request en vez de cientos.
+- **Flujo del cliente**: si el respaldo local tiene menos de 7 días se muestra de inmediato y la nube refresca en segundo plano; sin respaldo se espera la nube y, si no responde, se cae al `campus-catalogo.json` del repo. Los estados (`ok`, `cargando`, `sinCuenta`, `error`) viajan en el evento `appi-campus-estado`.
+- **Aviso de cuenta**: sin credenciales MI PSA aparece "Cargá tu cuenta MI PSA" en la vista Campus y en Mi negocio, más una tarjeta nueva en el Home que abre el popup de carga existente (una sola vez, sólo en ese dispositivo). Con cuenta cargada pero nube caída aparece el aviso de error con **Reintentar**; el contenido de respaldo nunca desaparece.
+- `deploy-backend.yml` publica la migración y la función en cada push; el spec nuevo `campus-usuario.spec.js` cubre los tres caminos (nube con las credenciales del usuario, sin cuenta con aviso + popup, nube caída con fallback).
+- Versión: **v644 · Segura** → Cache `appi-v644-cuenta-usuario`.
+
 ## v643 · El vivo se agenda y los audios suenan adentro de APPI
 
 - **Próximos en vivo**: la vista Campus suma la agenda real del catálogo (hasta 4 transmisiones, ordenadas por fecha con año corregido si el vivo ya pasó) con equipo, título y horario, y botón **Agendar** que abre Google Calendar con el evento armado (título, fechas y detalle del Campus).
