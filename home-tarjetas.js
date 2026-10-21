@@ -1274,6 +1274,44 @@
     }catch(e){ return null; }
   }
 
+  // v645 · Vivo PSA: el miércoles (o cuando ya pasó) el mazo ubica el vivo
+  // semanal con su previa y el botón para entrar desde el Campus.
+  function tarjetaVivoPsa(){
+    try{
+      var c = window.APPICampusPSA;
+      if (!c || typeof c.proximoVivoPsa !== 'function') return null;
+      var ref = c.proximoVivoPsa();
+      if (!ref || (ref.estado !== 'hoy' && ref.estado !== 'vivo' && ref.estado !== 'pasado')) return null;
+      var previa = (typeof c.audioPreviaVivo === 'function') ? c.audioPreviaVivo(ref.ini) : null;
+      var vivoAhora = ref.estado === 'vivo';
+      var pasado = ref.estado === 'pasado';
+      var tienePrevia = !!(previa && previa.stream);
+      var titulo = vivoAhora ? '🔴 El Vivo PSA está en vivo' : pasado ? '🎬 El Vivo de hoy ya está disponible' : 'Hoy 15:00 · Vivo PSA';
+      var nota = vivoAhora
+        ? 'La transmisión ya arrancó en el Campus. Entrá desde APPI y no te la pierdas.'
+        : pasado
+          ? 'La transmisión del miércoles quedó publicada en el Campus. Mirala cuando quieras.'
+          : 'El vivo de la semana arranca a las 15:00. Escuchá la previa mientras tanto.';
+      var chips = '';
+      if (tienePrevia) chips += '<span>🎧 ' + esc(previa.titulo) + '</span>';
+      chips += '<span>📅 Miércoles 15:00</span>';
+      return {
+        cat: 'vivoPsa', icono: vivoAhora ? '🔴' : pasado ? '🎬' : '📅', kicker: 'Campus PSA · vivo',
+        titulo: titulo,
+        html: '<p class="ht-nota">' + esc(nota) + '</p><div class="ht-chips">' + chips + '</div>',
+        cta: {
+          label: vivoAhora ? 'Entrar al vivo 🔴' : pasado ? 'Ver el vivo 🎬' : 'Ver Vivo PSA 📅',
+          go: function(){
+            try{
+              if (typeof window.showView === 'function') window.showView('view-campus');
+              else if (c.abrir) c.abrir();
+            }catch(e){}
+          }
+        }
+      };
+    }catch(e){ return null; }
+  }
+
   function tarjetaGanaste(){
     var p = partidoDe();
     if (!p.ganado) return null;
@@ -1549,7 +1587,7 @@
     // v805: mazo unificado sobre el modelo de reempadronamiento (lista de
     // gente + colores por estado, sin botones abajo). "Hoy te conviene" se
     // quitó a pedido y el Plan Canje vive dentro de la tarjeta Usuarios.
-    [tarjetaPbEquipo(), tarjetaJornada(), tarjetaPromoBotella(), tarjetaGanaste(), tarjetaCampus(), tarjetaCampusCuenta(), tarjetaCapacitacion(), tarjetaMetodoEnvio(), tarjetaLlegamos(), tarjetaDuchaRinnova(), tarjetaCumples(), tarjetaReempadronar(), tarjetaEquipo(), tarjetaPanel(), tarjetaUsuarios()].forEach(function(t){
+    [tarjetaPbEquipo(), tarjetaJornada(), tarjetaPromoBotella(), tarjetaGanaste(), tarjetaVivoPsa(), tarjetaCampus(), tarjetaCampusCuenta(), tarjetaCapacitacion(), tarjetaMetodoEnvio(), tarjetaLlegamos(), tarjetaDuchaRinnova(), tarjetaCumples(), tarjetaReempadronar(), tarjetaEquipo(), tarjetaPanel(), tarjetaUsuarios()].forEach(function(t){
       if (t) lista.push(t);
     });
     return lista;
@@ -1735,6 +1773,7 @@
       '.ht-card.ht-poster.ht-cat-rinnova,body.dark .ht-card.ht-poster.ht-cat-rinnova{background:linear-gradient(150deg,#7f1d1d,#5b1313) !important}',
       '.ht-card.ht-poster.ht-cat-promo,body.dark .ht-card.ht-poster.ht-cat-promo{background:linear-gradient(150deg,#0e6a8c,#0b5878 58%,#1a9ab0) !important;border:0;box-shadow:0 22px 60px rgba(14,106,140,.34) !important}',
       '.ht-card.ht-poster.ht-cat-otra,body.dark .ht-card.ht-poster.ht-cat-otra{background:linear-gradient(150deg,#0e6a8c,#0b5878) !important}',
+    '.ht-card.ht-poster.ht-cat-vivoPsa,body.dark .ht-card.ht-poster.ht-cat-vivoPsa{background:linear-gradient(150deg,#b0321f,#8e2416) !important;border:0;box-shadow:0 22px 60px rgba(140,40,25,.36) !important}',
       'body.dark .ht-card.ht-poster h3,body.dark .ht-card.ht-poster.ht-esp h3,body.dark .ht-card.ht-poster.ht-hoy h3,body.dark .ht-card.ht-poster.ht-alerta h3,body.dark .ht-card.ht-poster.ht-ganaste h3{color:#fff}',
       'body.dark .ht-card.ht-poster .ht-frase,body.dark .ht-card.ht-poster.ht-alerta .ht-frase,body.dark .ht-card.ht-poster .ht-kicker,body.dark .ht-card.ht-poster.ht-hoy .ht-kicker,body.dark .ht-card.ht-poster.ht-alerta .ht-kicker,body.dark .ht-card.ht-poster.ht-ganaste .ht-kicker{color:#fff}',
       'body.dark .ht-card.ht-poster .ht-lista li,body.dark .ht-card.ht-poster .ht-pasos li,body.dark .ht-card.ht-poster.ht-alerta .ht-pasos li{background:rgba(0,0,0,.28);color:#fff}',
@@ -2357,6 +2396,7 @@
     tarjetaGanaste: tarjetaGanaste,
     tarjetaCampus: tarjetaCampus,
     tarjetaCapacitacion: tarjetaCapacitacion,
+    tarjetaVivoPsa: tarjetaVivoPsa,
     contextoCapacitacion: contextoCapacitacion,
     tarjetaPromoBotella: tarjetaPromoBotella,
     textoMarcador: textoMarcador

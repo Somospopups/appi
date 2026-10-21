@@ -4,6 +4,15 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v645 · El Vivo PSA te avisa, te previa y te deja ver la grabación
+
+- **Vivo PSA semanal**: APPI ubica el vivo que el Campus transmite todos los **miércoles a las 15:00 (ART)**. La agenda del catálogo trae las reuniones de equipo, no el vivo general, así que se calcula por fecha.
+- **Aviso el miércoles**: el mazo del Home muestra la tarjeta "Hoy 15:00 · Vivo PSA" con la previa publicada ("La Previa del VIVO") y el botón para entrar al vivo desde el Campus. Cuando la transmisión ya arrancó, la tarjeta y la sección de Campus cambian a "En vivo ahora" con **Entrar al vivo**.
+- **Replay**: cuando el vivo del miércoles ya pasó, la sección de Campus muestra "El Vivo de hoy ya está disponible" con la previa del día y el enlace a la grabación en el Campus.
+- **Previa por fecha**: la previa se elige por la fecha del vivo (DD/MM del título), con respaldo al audio más reciente si no hay coincidencia exacta.
+- El spec `campus-vivo.spec.js` congela el reloj para cubrir los cuatro estados (hoy, en vivo, replay, próximo) sin depender de la hora real.
+- Versión: **v645 · Segura** → Cache `appi-v645-vivo-psa`.
+
 ## v644 · Tu cuenta MI PSA arma tu Campus dentro de APPI
 
 - **Catálogo por usuario**: la vista Campus se arma ahora con las credenciales MI PSA de **cada distribuidor**. La nueva función `campus-catalogo` (Supabase Edge) ingresa a mi.psa.com.ar con los datos guardados en tu dispositivo, hace SSO al Campus y rastrea tu catálogo (kits, secciones y clases con su stream, playlists de audio y agenda de vivo completa) devolviéndolo como JSON: APPI guarda sólo metadatos y enlaces, nunca re-copia contenido.
