@@ -186,11 +186,6 @@
       return j.cat;
     });
   }
-  function pedirRepoJson(){
-    return fetch('./campus-catalogo.json', { cache: 'no-store' })
-      .then(function(r){ if (!r.ok) throw new Error('catálogo HTTP ' + r.status); return r.json(); })
-      .then(function(cat){ if (!catalogoValido(cat)) throw new Error('catálogo vacío'); return cat; });
-  }
   /** Refresco en segundo plano: la pantalla ya muestra la última copia. */
   function refrescarNube(){
     pedirCatalogoNube().then(function(cat){
@@ -225,7 +220,8 @@
       catalogoPidiendo = Promise.resolve(local);
       return catalogoPidiendo;
     }
-    // Sin copia local: la nube (o el JSON del repo, mientras exista) es el único camino.
+    // Sin copia local: la nube de tu cuenta MI PSA es el único camino.
+    // v647: se retiró el JSON de respaldo del repo (volcado de una cuenta fija).
     catalogoPidiendo = (conCuenta ? pedirCatalogoNube() : Promise.reject(new Error('sin cuenta MI PSA')))
       .then(function(cat){
         guardarCatalogo(cat);
@@ -233,14 +229,8 @@
         return cat;
       })
       .catch(function(){
-        return pedirRepoJson().then(function(cat){
-          guardarCatalogo(cat);
-          fijarEstado(conCuenta ? 'error' : 'sinCuenta');
-          return cat;
-        }).catch(function(){
-          fijarEstado(conCuenta ? 'error' : 'sinCuenta');
-          throw new Error('No hay catálogo del Campus disponible.');
-        });
+        fijarEstado(conCuenta ? 'error' : 'sinCuenta');
+        throw new Error('No hay catálogo del Campus disponible.');
       })
       .then(function(cat){ catalogoPidiendo = null; return cat; },
             function(e){ catalogoPidiendo = null; throw e; });
@@ -1050,7 +1040,9 @@
     if (catalogoEstado === 'error'){
       return '<div class="cp-aviso err" data-cp-aviso="error">' +
         '<div class="cp-aviso-t">📡 No pudimos actualizar el catálogo</div>' +
-        '<p>La nube de APPI no respondió ahora. Se muestra la última copia guardada.</p>' +
+        '<p>' + (catalogoMem
+          ? 'La nube de APPI no respondió ahora. Se muestra la última copia guardada.'
+          : 'La nube de APPI no respondió ahora y todavía no hay una copia guardada en este dispositivo.') + '</p>' +
         '<button type="button" data-cp-reintentar>Reintentar</button>' +
       '</div>';
     }

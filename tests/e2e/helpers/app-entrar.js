@@ -1,5 +1,10 @@
 // Helpers de autenticación para specs E2E. No es un archivo .spec.js: puede
 // compartirse sin que Playwright intente cargar pruebas dentro de otras pruebas.
+// Desde v647 la app ya no trae campus-catalogo.json: el catálogo en tests llega
+// por la nube (edge campus-catalogo) con este fixture local.
+const fs = require('fs');
+const path = require('path');
+const CATALOGO_FIXTURE = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'fixtures', 'campus-catalogo.json'), 'utf8'));
 const USER_ID = '11111111-1111-4111-8111-111111111113';
 
 function tokenFor(sub) {
@@ -39,6 +44,7 @@ async function entrar(page, { usuarios = USUARIOS } = {}) {
     if (url.pathname === '/auth/v1/token') return route.fulfill({ status: 200, headers: cors, body: JSON.stringify({ access_token: accessToken, refresh_token: 'r', expires_in: 3600, user: { id: USER_ID } }) });
     if (url.pathname === '/rest/v1/appi_perfiles') return route.fulfill({ status: 200, headers: cors, body: JSON.stringify([profile]) });
     if (url.pathname === '/functions/v1/dispositivo-puente') return route.fulfill({ status: 200, headers: cors, body: JSON.stringify({ devices: [] }) });
+    if (url.pathname === '/functions/v1/campus-catalogo') return route.fulfill({ status: 200, headers: cors, body: JSON.stringify({ cat: CATALOGO_FIXTURE }) });
     return route.fulfill({ status: 200, headers: cors, body: '[]' });
   });
   await page.route('**/tile.openstreetmap.org/**', route => route.abort());

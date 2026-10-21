@@ -118,15 +118,15 @@ test('sin cuenta MI PSA: aviso en Campus, tarjeta de aviso en el Home y popup de
   await expect(page.locator('#psaPopupNumero')).toBeVisible();
 });
 
-test('si la nube falla con cuenta cargada: aviso de error, reintento y contenido de respaldo', async ({ page }) => {
+test('si la nube falla con cuenta cargada: aviso de error, reintento y no se pierde el respaldo', async ({ page }) => {
   await entrar(page);
-  await page.route('https://mock.supabase.co/functions/v1/campus-catalogo', route => json(route, 500, { error: 'nube caída' }));
+  // Primera carga normal: guarda la copia en el dispositivo.
   await catalogoCargado(page);
+  await expect.poll(() => estado(page)).toBe('ok');
 
-  await page.evaluate(() => {
-    localStorage.removeItem('appi_campus_catalogo_v1');
-    return window.APPICampusPSA.reintentarCatalogo().then(c => !!(c && c.kits), () => false);
-  });
+  // La nube se cae: el campus usa la última copia guardada y avisa.
+  await page.route('https://mock.supabase.co/functions/v1/campus-catalogo', route => json(route, 500, { error: 'nube caída' }));
+  await page.evaluate(() => window.APPICampusPSA.reintentarCatalogo().then(c => !!(c && c.kits), () => false));
   await expect.poll(() => estado(page)).toBe('error');
 
   await page.evaluate(() => window.openCampusPSA());
@@ -140,4 +140,15 @@ test('si la nube falla con cuenta cargada: aviso de error, reintento y contenido
   await expect.poll(() => estado(page)).toBe('error');
   await expect(page.locator('[data-cp-aviso="error"]')).toBeVisible();
   await expect(page.locator('#campusCont')).toContainText('Próximos en vivo');
+
+  // Sin respaldo local no hay de dónde recatar: v647 retiró el JSON del repo.
+  await page.evaluate(() => {
+    localStorage.removeItem('appi_campus_catalogo_v1');
+    return window.APPICampusPSA.reintentarCatalogo().then(() => true, () => true);
+  });
+  await expect.poll(() => estado(page)).toBe('error');
+  await page.evaluate(() => window.openCampusPSA());
+  await expect(page.locator('[data-cp-aviso="error"]')).toBeVisible();
+  await expect(page.locator('[data-cp-aviso="error"]')).toContainText('todavía no hay una copia guardada');
+  await expect(page.locator('#campusCont')).not.toContainText('Próximos en vivo');
 });

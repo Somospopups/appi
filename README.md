@@ -4,6 +4,14 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v647 · Se retira el catálogo volcado y la cuenta fija que lo generaba
+
+- **Baja de la cuenta fija**: ya no existe el rastreo automático con credenciales compartidas. Se borraron los secrets `PSA_DIP_NUMERO` / `PSA_DIP_CLAVE`, el workflow `.github/workflows/campus-psa.yml` (corría 2 veces por día) y el script `scripts/actualizar-campus-psa.mjs`. El catálogo de cada distribuidor lo arma **sólo** la función edge `campus-catalogo` con las credenciales MI PSA de ese usuario (v644), nunca una cuenta genérica.
+- **`campus-catalogo.json` fuera de la app**: el artefacto que se publicaba en la raíz se eliminó del repo, del precache (`APP_SHELL`) y de la cadena de fallback. Si la nube falla sin respaldo local, el Campus muestra el aviso de error con **Reintentar** (y aclara que todavía no hay copia guardada); con respaldo local se sigue mostrando la última copia.
+- **Tests**: el catálogo de pruebas ahora llega como si fuera la nube: `tests/e2e/fixtures/campus-catalogo.json` se sirve desde el helper `helpers/app-entrar.js` en `/functions/v1/campus-catalogo`. El spec `campus-catalogo.spec.js` (validaba el volcado) se reemplazó por la validación de ese fixture dentro de los specs de Campus.
+- Se corrigió un test con carrera propia: `home-limpio.spec.js` leía la animación de entrada afuera de la ventana de 380ms de `page-enter`.
+- Versión: **v647 · Segura** → Cache `appi-v647-baja-cuenta-fija`.
+
 ## v646 · Terminaste la clase: 3 preguntas para verificar lo que aprendiste
 
 - **Preguntas post-video**: al terminar una clase (90% o `ended`) con banco, APPI abre un quiz de **3 preguntas originales de APPI** con 4 opciones cada una. El banco `campus-preguntas.js` arranca con **50 clases y 137 preguntas** escritas por nosotros; las clases sin banco siguen marcándose "vista ✓" y el resto queda cubierto por el curso, sin bloquear el avance.

@@ -184,8 +184,13 @@ test('el indicador glass del selector sigue a la pagina activa', async ({ page }
 
 test('los titulos entran animados desde arriba al cambiar de pantalla', async ({ page }) => {
   await entrar(page);
-  await page.evaluate(() => window.showView('view-negocio'));
-  const name = await page.evaluate(() => getComputedStyle(document.querySelector('#view-negocio header h1')).animationName);
+  // page-enter sólo vive 380ms: la lectura se hace en la MISMA evaluación que
+  // cambia de pantalla, porque la ida y vuelta del protocolo corre más que la
+  // animación y el test quedaba en carrera con el timer de salida.
+  const name = await page.evaluate(() => {
+    window.showView('view-negocio');
+    return getComputedStyle(document.querySelector('#view-negocio header.top h1')).animationName;
+  });
   expect(name).toContain('titleSlideDown');
 });
 
