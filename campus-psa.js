@@ -1129,6 +1129,18 @@
     } catch(e){}
   }
 
+  /* v649: firma del último HTML pintado. El Campus escucha eventos de sync,
+     de persona y del catálogo que en una cuenta real pueden llegar seguido;
+     repintar el innerHTML entero ante cada uno —aunque no haya cambiado
+     nada— se ve como un parpadeo constante de toda la pantalla. Si la firma
+     coincide, el DOM (y el scroll, y la playlist elegida) quedan como están. */
+  var ultimoHtmlCampus = '';
+  function firmaRenderCampus(html){
+    var firma = html;
+    try { firma += '\n' + JSON.stringify(leer().avance || {}); } catch(e){}
+    try { firma += '\n' + (catalogoMem ? String(catalogoMem.generado || '') : ''); } catch(e){}
+    return firma;
+  }
   function render(){
     css();
     var host = document.getElementById('campusCont');
@@ -1145,7 +1157,7 @@
       ? (hechas + ' hechas · ' + (jornada.pendientes || 0) + ' pendientes')
       : (Math.min(base.hechas || 0, BASE_ACCIONES) + ' de 10 acciones hechas');
     var actionLabel = unlocked ? '⚡ Ver mi Impulso activado' : ready ? '🎓 Ganar 3 acciones más' : 'Completá tus 10 acciones para activar el desafío';
-    host.innerHTML =
+    var htmlCampus =
       '<div class="cp-wrap"><section class="cp-hero"><div><span class="cp-kicker">✦ CAMPUS PSA × APPI</span><h2>Tu Campus,<br>en movimiento.</h2><p>Aprendé, aplicá y ganá oportunidades reales para hacer crecer tu negocio.</p></div><div class="cp-category">🎓 TU CATEGORÍA<span>' + esc(categoria()) + '</span></div></section>' + avisoCuentaHTML() +
       '<section class="cp-progress"><div class="cp-progress-row"><div><h3>' + (unlocked ? 'Impulso del día activado' : 'Impulso del día') + '</h3><p>' + (unlocked ? 'Tu aprendizaje abrió nuevas prioridades de la jornada.' : 'Terminá tus acciones y desbloqueá una nueva oportunidad.') + '</p></div><b class="cp-score">' + hechas + '/' + totalVista + '</b></div><div class="cp-meter"><i style="width:' + pct + '%"></i></div><small>' + esc(progressText) + (unlocked && disponibles ? ' · ' + disponibles + ' extra disponibles' : '') + '</small></section>' +
       '<div class="cp-section-head"><h3>Tu camino de hoy</h3><span>5 aciertos activan el impulso</span></div>' +
@@ -1153,6 +1165,11 @@
       '<section class="cp-grid"><article class="cp-card featured"><span class="cp-eyebrow">RECOMENDADO PARA TU CATEGORÍA</span><h4>' + (esLider() ? 'Construcción de equipos sólidos' : esJunior() ? 'Tus primeros pasos comerciales' : 'Acciones que hacen crecer tu negocio') + '</h4><p>' + (esLider() ? 'Practicá decisiones sobre acompañamiento, permanencia y crecimiento del equipo.' : 'Preguntas breves para llevar el aprendizaje del Campus a conversaciones reales.') + '</p><button type="button" id="cpTopicGo">Empezar desafío</button></article><article class="cp-card"><span class="cp-eyebrow">APLICACIÓN DE HOY</span><h4>Posventa que genera vínculo</h4><p>Canje, fidelización y oportunidades reales con tus usuarios.</p><button type="button" id="cpTopicInfo">Ver tema</button></article></section>' +
       seccionVivoPsa() + seccionUltimoVivo() + seccionVivo() + seccionAudios() +
       '<button type="button" class="cp-main-btn ' + (ready ? 'ready' : '') + '" id="cpMainAction" ' + (!ready && !unlocked ? 'disabled' : '') + '>' + esc(actionLabel) + '</button><p class="cp-note">Las preguntas son originales de APPI, organizadas por los temas de formación de Campus Appi. No reemplazan sus capacitaciones oficiales.</p></div>';
+    // v649: mismo contenido = cero repintado (nada de parpadeo).
+    var firmaCampus = firmaRenderCampus(htmlCampus);
+    if (firmaCampus === ultimoHtmlCampus && host.firstChild) return;
+    ultimoHtmlCampus = firmaCampus;
+    host.innerHTML = htmlCampus;
     document.getElementById('cpTopicGo').onclick = function(){ if (ready) iniciarDesafio(); else if (unlocked) abrir(); else avisoFaltante(); };
     document.getElementById('cpTopicInfo').onclick = function(){
       if (window.APPIDialog && window.APPIDialog.alert) window.APPIDialog.alert('Posventa combina servicio y crecimiento: fidelización, vencimientos, mantenimiento y Plan Canje. Estos temas entrarán en tus próximos desafíos.', { title:'Posventa que genera vínculo', icon:'💧', okText:'Entendido' });

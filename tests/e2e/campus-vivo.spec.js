@@ -258,3 +258,43 @@ test('v648: del jueves al martes el Campus conserva el último vivo para verlo c
   await expect(page.locator('#campusCont [data-cp-vpsa="ultimo"]')).toHaveCount(0);
   await expect(page.locator('#campusCont [data-cp-vpsa="vivo"]')).toBeVisible();
 });
+
+test('v649: repintar el Campus sin cambios no reemplaza el DOM (sin parpadeo)', async ({ page }) => {
+  await entrar(page);
+  await activarCatalogoMock(page);
+
+  await page.clock.setFixedTime(JUEVES);
+  await page.evaluate(() => window.openCampusPSA());
+  const ultimo = page.locator('#campusCont [data-cp-vpsa="ultimo"]');
+  await expect(ultimo).toBeVisible();
+
+  // Se marca el nodo pintado: si el DOM se reconstruye, la marca se pierde.
+  await page.evaluate(() => {
+    const el = document.querySelector('#campusCont [data-cp-vpsa="ultimo"]');
+    el.setAttribute('data-marca649', 'queda');
+    window.__nodo649 = el;
+  });
+
+  // La rafaga de eventos que en una cuenta real llega seguido (sync, estado,
+  // render directo) ya no puede hacer titilar la pantalla: mismo nodo.
+  await page.evaluate(() => {
+    for (let i = 0; i < 5; i++) window.dispatchEvent(new CustomEvent('appi-datasync-applied'));
+    window.APPICampusPSA.render();
+    window.APPICampusPSA.render();
+  });
+  await page.waitForTimeout(400);
+  const intacto = await page.evaluate(() => {
+    const el = document.querySelector('#campusCont [data-cp-vpsa="ultimo"]');
+    return el === window.__nodo649 && el.getAttribute('data-marca649') === 'queda';
+  });
+  expect(intacto, 'el DOM del Campus no se reemplaza si nada cambio').toBe(true);
+
+  // Un cambio real (avance nuevo) SI repinta: el nodo es otro y la fila del
+  // audio 21/10 queda con su tilde de escuchado.
+  await page.evaluate(() => window.APPICampusPSA.marcarVisto('audio:999', 100, 'audio'));
+  await expect.poll(() => page.evaluate(() => {
+    const el = document.querySelector('#campusCont [data-cp-vpsa="ultimo"]');
+    return !!el && el !== window.__nodo649;
+  })).toBe(true);
+  await expect(page.locator('#cpAudioLista')).toContainText('✓');
+});

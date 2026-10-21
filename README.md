@@ -4,6 +4,13 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v649 · El Campus deja de parpadear
+
+- **Sin repintado si nada cambió**: la vista Campus escucha los eventos de sync, de persona y del catálogo, que en una cuenta real pueden llegar seguido. Hasta ahora cada evento reconstruía todo el HTML (`innerHTML` desde cero) aunque el contenido fuera idéntico, y eso se veía como un parpadeo constante de la pantalla (reportado en PC apenas subió la v648). Ahora `render()` firma el HTML junto con el avance y la versión del catálogo: si la firma coincide con lo ya pintado, el DOM no se toca — quedan el scroll, los botones cableados y la playlist de audios elegida como estaban.
+- **Los cambios reales sí repintan**: un avance nuevo, un catálogo refrescado o un cambio de estado de la cuenta MI PSA alteran la firma y la pantalla se actualiza como siempre.
+- Tests: `campus-vivo.spec.js` suma la regresión «repintar sin cambios no reemplaza el DOM» (una ráfaga de eventos deja el mismo nodo pintado; un avance nuevo sí repinta y marca el audio escuchado). Sin el arreglo, ese test falla.
+- Versión: **v649 · Segura** → Cache `appi-v649-campus-sin-parpadeo`.
+
 ## v648 · El último Vivo PSA queda toda la semana para verlo cuando quieras
 
 - **Sección «🎬 Vivos anteriores»**: en v645 el replay del vivo de los miércoles vivía sólo esa noche; el jueves APPI ya anunciaba el próximo y la grabación quedaba sin lugar en la app. Ahora la vista Campus suma una sección propia con el **último Vivo PSA** (fecha incluida) que queda visible **toda la semana, hasta el próximo miércoles**: botón **Ver en Campus ↗** a la transmisión publicada y, si la previa de *ese* vivo está en el catálogo, **▶ Escuchar previa** adentro de APPI. El miércoles a la mañana muestra el vivo de la semana pasada, debajo del aviso del vivo de hoy.
