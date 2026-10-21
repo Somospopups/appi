@@ -4,6 +4,14 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v643 · El vivo se agenda y los audios suenan adentro de APPI
+
+- **Próximos en vivo**: la vista Campus suma la agenda real del catálogo (hasta 4 transmisiones, ordenadas por fecha con año corregido si el vivo ya pasó) con equipo, título y horario, y botón **Agendar** que abre Google Calendar con el evento armado (título, fechas y detalle del Campus).
+- **Audios del Campus**: las 10 playlists del catálogo viven como chips dentro de la vista; al elegir una se listan sus audios (los escuchados muestran ✓) y el ▶ abre la hoja de audio con el stream `A_XXXXX` y el mismo avance sincronizado que las clases.
+- El catálogo llega en segundo plano y, si la vista está abierta, la pantalla se repinta sola con vivo y audios.
+- Tests: `tests/e2e/campus-vivo-audio.spec.js` (agenda + agendar a Google Calendar, chips de playlist y hoja de audio).
+- Versión: **v643 · Segura** → Cache `appi-v643-vivo-y-audio`.
+
 ## v642 · El Campus llena los huecos del mazo y aparece en Mi negocio
 
 - **Tarjeta Capacitación en el Home**: `tarjetaCapacitacion()` suma **una sola** tarjeta al mazo (regla: el negocio manda, la capacitación nunca encabeza y llena ≤25% del mazo) con la próxima clase real del catálogo elegida por contexto — `contextoCapacitacion()` mira usuarios vencidos → *canje* (Posventa), equipo chico → *Básica*, y si no, PB flojo → *Comercialización*. El botón **Ver clase** abre la hoja Clase sin salir del Home. Cuando llega el catálogo o avanza el avance, el mazo se repinta solo (`refrescarPorCapacitacion`).

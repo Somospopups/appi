@@ -433,6 +433,14 @@
       '.cp-repro video,.cp-repro audio{display:block;width:100%;background:#0b1620}.cp-repro video{aspect-ratio:16/9;object-fit:contain}.cp-repro audio{height:44px}',
       '.cp-repro-note{padding:9px 12px;color:#7e8fa3;font-size:10px;line-height:1.4;font-weight:700;text-align:center}',
       'a.cp-secondary{display:block;box-sizing:border-box;text-decoration:none;text-align:center;line-height:46px;padding:0}',
+      '.cp-lista,.cp-audios{margin:-4px 0 14px;display:flex;flex-direction:column;gap:8px}',
+      '.cp-vivo-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #d7e3ec;border-radius:14px;background:#fff}',
+      '.cp-vivo-txt{flex:1;min-width:0}.cp-vivo-txt b{display:block;font-size:12px;color:#233950}.cp-vivo-txt small{display:block;margin-top:2px;font-size:9.5px;color:#728199;font-weight:800}',
+      '.cp-vivo-go{flex:none;padding:8px 12px;border-radius:999px;background:linear-gradient(135deg,#5b8def,#3ad0a4);color:#062033;font-size:10.5px;font-weight:1000;text-decoration:none;white-space:nowrap}',
+      '.cp-audio-chips{display:flex;flex-wrap:wrap;gap:6px}.cp-audio-chip{border:0;cursor:pointer;font:inherit}.cp-audio-chip.on{background:#0e2a3d;color:#8fd6ff}',
+      '.cp-audio-list{display:flex;flex-direction:column;gap:6px}',
+      '.cp-audio-row{display:flex;align-items:center;gap:9px;width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid #d7e3ec;border-radius:13px;background:#fff;font:inherit;font-size:11.5px;font-weight:800;color:#2e3a4a;text-align:left;cursor:pointer}',
+      '.cp-audio-row i{flex:none;width:22px;height:22px;display:grid;place-items:center;border-radius:50%;background:#eef4f7;color:#3d63c9;font-style:normal;font-size:10px}',
       'body.dark #view-campus{background:radial-gradient(circle at 4% 0,rgba(64,208,201,.12),transparent 28%),#191d2b}.dark .cp-hero h2,.dark .cp-section-head h3{color:#edf5f6}.dark .cp-hero p,.dark .cp-section-head span,.dark .cp-note{color:#aab9ca}.dark .cp-card{background:#252b3a;border-color:rgba(255,255,255,.1)}.dark .cp-card.featured{background:linear-gradient(135deg,#302957,#252b3a)}.dark .cp-card h4{color:#eef5f6}.dark .cp-card p{color:#afbed0}.dark .cp-step b{color:#d8e6ed}.dark .cp-step i{border-color:#1b202d;background:#34404b}.dark .cp-path:before{background:#34454d}',
       '@media(max-width:520px){.cp-hero h2{font-size:25px}.cp-category{max-width:120px}.cp-grid{grid-template-columns:1fr}.cp-step i{width:51px;height:51px;border-radius:18px;font-size:20px}.cp-path:before{top:32px}.cp-step b{font-size:8px}.cp-step small{font-size:7px}.cp-question{font-size:18px}.cp-quiz-body{padding:8px 18px 21px}}'
     ].join('');
@@ -561,6 +569,97 @@
     }, 40);
   }
 
+  /* ---------- Agenda de vivo (v643) ---------- */
+  function fechaVivo(txt){
+    var m = /^(\d{2})-(\d{2})\s+(\d{2}):(\d{2})$/.exec(String(txt || '').trim());
+    if (!m) return null;
+    var anio = new Date().getFullYear();
+    var d = new Date(anio, +m[2] - 1, +m[1], +m[3], +m[4], 0, 0);
+    if (isNaN(d.getTime())) return null;
+    // Un vivo del año que ya pasó es del próximo ciclo.
+    if (d.getTime() < Date.now() - 86400000) d = new Date(anio + 1, +m[2] - 1, +m[1], +m[3], +m[4], 0, 0);
+    return d;
+  }
+  function listaVivo(){
+    if (!catalogoMem || !catalogoMem.vivo) return [];
+    return (catalogoMem.vivo || []).map(function(v){
+      var ini = fechaVivo(v.inicio);
+      var fin = fechaVivo(v.fin) || (ini ? new Date(ini.getTime() + 3600000) : null);
+      return { equipo: v.equipo, titulo: v.titulo, ini: ini, fin: fin };
+    }).filter(function(v){ return !!v.ini; })
+      .sort(function(a, b){ return a.ini - b.ini; })
+      .slice(0, 4);
+  }
+  function gcalLink(titulo, ini, fin, detalle){
+    function f(d){ return d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z'); }
+    return 'https://calendar.google.com/calendar/render?action=TEMPLATE' +
+      '&text=' + encodeURIComponent(titulo) +
+      '&dates=' + f(ini) + '/' + f(fin || new Date(ini.getTime() + 3600000)) +
+      '&details=' + encodeURIComponent(detalle || '');
+  }
+  function fechaLindaVivo(d){
+    try {
+      return d.toLocaleDateString('es-AR', { weekday:'short', day:'2-digit', month:'short' }) +
+        ' · ' + d.toLocaleTimeString('es-AR', { hour:'2-digit', minute:'2-digit' });
+    } catch(e){ return ''; }
+  }
+  function seccionVivo(){
+    var items = listaVivo();
+    if (!items.length) return '';
+    var filas = items.map(function(v, i){
+      var desc = v.titulo + ' · ' + v.equipo + ' — transmisión en vivo de Campus PSA (vista desde APPI).';
+      return '<div class="cp-vivo-row">' +
+        '<div class="cp-vivo-txt"><b>' + esc(v.titulo) + '</b><small>' + esc(v.equipo) + ' · ' + esc(fechaLindaVivo(v.ini)) + '</small></div>' +
+        '<a class="cp-vivo-go" data-cp-agendar="' + i + '" href="' + esc(gcalLink(v.titulo + ' · ' + v.equipo, v.ini, v.fin, desc)) + '" target="_blank" rel="noopener">Agendar</a>' +
+      '</div>';
+    }).join('');
+    return '<div class="cp-section-head"><h3>📅 Próximos en vivo</h3><span>' + items.length + ' transmisiones</span></div>' +
+      '<section class="cp-lista" id="cpVivo" data-cp-vivo="' + items.length + '">' + filas + '</section>';
+  }
+
+  /* ---------- Audios del Campus (v643) ---------- */
+  function seccionAudios(){
+    var listas = (catalogoMem && catalogoMem.playlists) || [];
+    if (!listas.length) return '';
+    var chips = listas.map(function(l, i){
+      return '<button type="button" class="cp-chip cp-audio-chip' + (i === 0 ? ' on' : '') + '" data-cp-lista="' + i + '">' + esc(l.titulo) + '</button>';
+    }).join('');
+    var totalAudios = (catalogoMem.stats && catalogoMem.stats.audios) || '';
+    return '<div class="cp-section-head"><h3>🎧 Audios del Campus</h3><span>' + (totalAudios ? totalAudios + ' audios' : listas.length + ' listas') + '</span></div>' +
+      '<section class="cp-audios"><div class="cp-audio-chips" id="cpAudioChips">' + chips + '</div><div class="cp-audio-list" id="cpAudioLista" data-i="0"></div></section>';
+  }
+  function pintarAudios(i){
+    var host = document.getElementById('cpAudioLista');
+    if (!host || !catalogoMem) return;
+    var listas = catalogoMem.playlists || [];
+    var l = listas[i] || listas[0];
+    if (!l){ host.innerHTML = ''; return; }
+    var audios = (l.audios || []).slice(0, 8);
+    host.innerHTML = audios.map(function(a, k){
+      var visto = esVisto('audio:' + a.audioId);
+      return '<button type="button" class="cp-audio-row" data-cp-audio="' + k + '">' +
+        '<i>' + (visto ? '✓' : '▶') + '</i><span>' + esc(a.titulo) + '</span></button>';
+    }).join('');
+    host.setAttribute('data-i', String(i));
+    host.querySelectorAll('[data-cp-audio]').forEach(function(btn){
+      btn.onclick = function(){
+        var a = audios[+btn.getAttribute('data-cp-audio')];
+        if (a) abrirAudio(a, l.titulo);
+      };
+    });
+  }
+  function cablearAudios(){
+    var chips = document.querySelectorAll('#cpAudioChips [data-cp-lista]');
+    chips.forEach(function(ch){
+      ch.onclick = function(){
+        chips.forEach(function(x){ x.classList.remove('on'); });
+        ch.classList.add('on');
+        pintarAudios(+ch.getAttribute('data-cp-lista'));
+      };
+    });
+    if (chips.length) pintarAudios(0);
+  }
+
   function render(){
     css();
     var host = document.getElementById('campusCont');
@@ -583,12 +682,14 @@
       '<div class="cp-section-head"><h3>Tu camino de hoy</h3><span>5 aciertos activan el impulso</span></div>' +
       '<section class="cp-path"><div class="cp-step done"><i>✓</i><b>Tu día</b><small>completo</small></div><div class="cp-step ' + (ready ? 'live' : '') + '"><i>✦</i><b>Desafío</b><small>5 aciertos</small></div><div class="cp-step ' + (unlocked ? 'done' : '') + '"><i>⚡</i><b>+3 acciones</b><small>' + (unlocked ? 'activado' : 'por ganar') + '</small></div><div class="cp-step ' + (unlocked ? 'live' : '') + '"><i>↗</i><b>Aplicar</b><small>en tu negocio</small></div><div class="cp-step"><i>★</i><b>Tu logro</b><small>del día</small></div></section>' +
       '<section class="cp-grid"><article class="cp-card featured"><span class="cp-eyebrow">RECOMENDADO PARA TU CATEGORÍA</span><h4>' + (esLider() ? 'Construcción de equipos sólidos' : esJunior() ? 'Tus primeros pasos comerciales' : 'Acciones que hacen crecer tu negocio') + '</h4><p>' + (esLider() ? 'Practicá decisiones sobre acompañamiento, permanencia y crecimiento del equipo.' : 'Preguntas breves para llevar el aprendizaje del Campus a conversaciones reales.') + '</p><button type="button" id="cpTopicGo">Empezar desafío</button></article><article class="cp-card"><span class="cp-eyebrow">APLICACIÓN DE HOY</span><h4>Posventa que genera vínculo</h4><p>Canje, fidelización y oportunidades reales con tus usuarios.</p><button type="button" id="cpTopicInfo">Ver tema</button></article></section>' +
+      seccionVivo() + seccionAudios() +
       '<button type="button" class="cp-main-btn ' + (ready ? 'ready' : '') + '" id="cpMainAction" ' + (!ready && !unlocked ? 'disabled' : '') + '>' + esc(actionLabel) + '</button><p class="cp-note">Las preguntas son originales de APPI, organizadas por los temas de formación de Campus Appi. No reemplazan sus capacitaciones oficiales.</p></div>';
     document.getElementById('cpTopicGo').onclick = function(){ if (ready) iniciarDesafio(); else if (unlocked) abrir(); else avisoFaltante(); };
     document.getElementById('cpTopicInfo').onclick = function(){
       if (window.APPIDialog && window.APPIDialog.alert) window.APPIDialog.alert('Posventa combina servicio y crecimiento: fidelización, vencimientos, mantenimiento y Plan Canje. Estos temas entrarán en tus próximos desafíos.', { title:'Posventa que genera vínculo', icon:'💧', okText:'Entendido' });
     };
     document.getElementById('cpMainAction').onclick = function(){ if (unlocked) abrir(); else if (ready) iniciarDesafio(); };
+    cablearAudios();
   }
   function avisoFaltante(){
     if (window.APPIDialog && window.APPIDialog.alert) window.APPIDialog.alert('El desafío se activa cuando las 10 acciones base del día están hechas. No cuenta marcar una acción como no realizada: el Impulso celebra trabajo concreto.', { title:'Todavía falta un paso', icon:'🎯', okText:'Entendido' });
@@ -689,7 +790,15 @@
   });
   if (document.readyState === 'complete') setTimeout(revisarJornada, 800);
   else window.addEventListener('load', function(){ setTimeout(revisarJornada, 900); });
-  // El catálogo se adelanta en segundo plano: la ruta diaria y la vista
-  // encuentran las clases listas sin esperar un clic.
-  setTimeout(function(){ cargarCatalogo().catch(function(){}); }, 1200);
+  // El catálogo se adelanta en segundo plano: la ruta diaria, la vista
+  // y las secciones de vivo/audios encuentran las clases listas sin clic.
+  setTimeout(function(){
+    cargarCatalogo().then(function(){
+      try {
+        var v = document.querySelector('.view.active');
+        if (v && v.id === 'view-campus') render();
+        if (v && v.id === 'view-negocio') pintarNegocio();
+      }catch(e){}
+    }).catch(function(){});
+  }, 1200);
 })();
