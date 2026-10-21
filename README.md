@@ -4,6 +4,14 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v642 · El Campus llena los huecos del mazo y aparece en Mi negocio
+
+- **Tarjeta Capacitación en el Home**: `tarjetaCapacitacion()` suma **una sola** tarjeta al mazo (regla: el negocio manda, la capacitación nunca encabeza y llena ≤25% del mazo) con la próxima clase real del catálogo elegida por contexto — `contextoCapacitacion()` mira usuarios vencidos → *canje* (Posventa), equipo chico → *Básica*, y si no, PB flojo → *Comercialización*. El botón **Ver clase** abre la hoja Clase sin salir del Home. Cuando llega el catálogo o avanza el avance, el mazo se repinta solo (`refrescarPorCapacitacion`).
+- **Mi capacitación en Mi negocio**: `pintarNegocio()` llena `#negWrap` con una sección de progreso real (vistas/total, barra %), la próxima clase con su área y duración, y botones **Continuar clase** / **Ver ruta**. Se repinta al abrir la vista y en cada avance.
+- Sin catálogo la tarjeta simplemente no aparece (el hueco queda para las tarjetas del negocio) y todo se rescata con el respaldo local.
+- Tests: `tests/e2e/campus-ruta.spec.js` — el mazo (regla del hueco), el CTA que abre la clase y la sección de Mi negocio con su avance.
+- Versión: **v642 · Segura** → Cache `appi-v642-ruta-capacitacion`.
+
 ## v641 · La clase del Campus se ve adentro de APPI
 
 - **Hoja Clase**: al tocar una clase del catálogo ahora se abre una hoja con título, autor, duración y chips de estado; el video HLS se reproduce **inline** con `vendor/hls.min.js` (hls.js 1.5.13, Apache-2.0, cargado bajo demanda; Safari usa HLS nativo). Nada se re-copia: solo se apunta al stream público del Campus y queda el botón **Abrir en Campus ↗**.

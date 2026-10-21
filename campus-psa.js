@@ -598,6 +598,60 @@
     setTimeout(render, 0);
   }
 
+  /** Sección "Mi capacitación" dentro de Mi negocio (v642):
+      progreso real + la próxima clase con un toque para continuar. */
+  function pintarNegocio(){
+    var host = document.getElementById('negWrap');
+    if (!host) return;
+    if (!catalogoMem){
+      cargarCatalogo().then(function(){ pintarNegocio(); })
+        .catch(function(){ try{ host.innerHTML = ''; }catch(e){} });
+      return;
+    }
+    var res = avanceResumen();
+    if (!res.total){ try{ host.innerHTML = ''; }catch(e){} return; }
+    var prox = proximaClase('');
+    var st = document.getElementById('cpNegEstilos');
+    if (!st){
+      st = document.createElement('style');
+      st.id = 'cpNegEstilos';
+      st.textContent = [
+        '.cp-neg{margin:4px 14px 18px;padding:14px;border-radius:18px;background:linear-gradient(160deg,#0e2a3d,#123b52);color:#e8f4fa;box-shadow:0 10px 24px rgba(9,25,40,.18)}',
+        '.cp-neg-k{font-size:9.5px;font-weight:1000;letter-spacing:1.4px;text-transform:uppercase;color:#8fd6ff}',
+        '.cp-neg h3{margin:6px 0 2px;font-size:17px;letter-spacing:-.5px}',
+        '.cp-neg-sub{font-size:10.5px;color:#a9c4d6;font-weight:700}',
+        '.cp-neg-bar{height:9px;border-radius:99px;background:rgba(255,255,255,.14);margin:11px 0 5px;overflow:hidden}',
+        '.cp-neg-bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#3ad0a4,#5b8def)}',
+        '.cp-neg-prox{margin-top:11px;padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12)}',
+        '.cp-neg-prox b{display:block;font-size:12.5px;line-height:1.3}',
+        '.cp-neg-prox span{display:block;margin-top:3px;font-size:10px;color:#a9c4d6;font-weight:800}',
+        '.cp-neg-btns{display:flex;gap:8px;margin-top:11px}',
+        '.cp-neg-btn{flex:1;padding:11px 8px;border:0;border-radius:13px;font:inherit;font-size:11.5px;font-weight:1000;cursor:pointer}',
+        '.cp-neg-go{background:linear-gradient(135deg,#3ad0a4,#5b8def);color:#062033}',
+        '.cp-neg-ruta{background:rgba(255,255,255,.12);color:#e8f4fa}'
+      ].join('');
+      document.head.appendChild(st);
+    }
+    host.innerHTML =
+      '<div class="cp-neg" id="cpNeg">' +
+        '<span class="cp-neg-k">Campus PSA · tu capacitación</span>' +
+        '<h3>Mi capacitación</h3>' +
+        '<div class="cp-neg-sub" id="cpNegSub">' + res.vistas + ' de ' + res.total + ' clases vistas · ' + res.pct + '%</div>' +
+        '<div class="cp-neg-bar"><i style="width:' + res.pct + '%"></i></div>' +
+        (prox ?
+          '<div class="cp-neg-prox"><b id="cpNegTit">' + esc(prox.titulo) + '</b><span id="cpNegMeta">' + esc(prox.area) + (prox.duracion ? ' · ⏱ ' + esc(prox.duracion) : '') + '</span></div>' +
+          '<div class="cp-neg-btns"><button type="button" class="cp-neg-btn cp-neg-go" id="cpNegGo">Continuar clase ▶</button><button type="button" class="cp-neg-btn cp-neg-ruta" id="cpNegRuta">Ver ruta</button></div>'
+          :
+          '<div class="cp-neg-prox"><b>¡Ruta completa!</b><span>Ya viste todas las clases del catálogo.</span></div>') +
+      '</div>';
+    if (prox){
+      var go = document.getElementById('cpNegGo');
+      if (go) go.onclick = function(){ abrirClase(prox); };
+    }
+    var ruta = document.getElementById('cpNegRuta');
+    if (ruta) ruta.onclick = function(){ abrir(); };
+  }
+
   window.openCampusPSA = abrir;
   window.APPICampusPSA = {
     abrir: abrir,
@@ -620,12 +674,19 @@
     marcarVisto: marcarVisto,
     avanceResumen: avanceResumen,
     abrirClase: abrirClase,
-    abrirAudio: abrirAudio
+    abrirAudio: abrirAudio,
+    pintarNegocio: pintarNegocio
   };
 
   window.addEventListener('appi-datasync-applied', function(){ try{ render(); revisarJornada(); }catch(e){} });
   window.addEventListener('appi-person-change', function(){ setTimeout(function(){ render(); revisarJornada(); }, 60); });
-  window.addEventListener('appi-campus-avance', function(){ try{ render(); }catch(e){} });
+  window.addEventListener('appi-campus-avance', function(){
+    try{
+      render();
+      var v = document.querySelector('.view.active');
+      if (v && v.id === 'view-negocio') pintarNegocio();
+    }catch(e){}
+  });
   if (document.readyState === 'complete') setTimeout(revisarJornada, 800);
   else window.addEventListener('load', function(){ setTimeout(revisarJornada, 900); });
   // El catálogo se adelanta en segundo plano: la ruta diaria y la vista

@@ -1209,6 +1209,49 @@
     }catch(e){ return null; }
   }
 
+  // v642 · Capacitación: el mazo llena UN hueco (nunca más de ~25% y jamás
+  // antes que las tarjetas del negocio) con la próxima clase real del Campus
+  // PSA, elegida por el momento que vive el distribuidor hoy.
+  function contextoCapacitacion(){
+    try{
+      var us = JSON.parse(localStorage.getItem('usuarios_garantias') || '[]');
+      if (Array.isArray(us) && us.some(function(u){ return u && u.estado === 'vencida'; })) return 'canje';
+    }catch(e){}
+    try{
+      var eq = (typeof personasEquipo === 'function') ? personasEquipo() : [];
+      if (eq.length <= 2) return 'equipo';
+    }catch(e){}
+    return 'pb';
+  }
+  function tarjetaCapacitacion(){
+    try{
+      var c = window.APPICampusPSA;
+      if (!c || typeof c.proximaClase !== 'function') return null;
+      if (!c.catalogo || !c.catalogo()){
+        if (typeof c.cargarCatalogo === 'function' && !window.__htCapPidiendo){
+          window.__htCapPidiendo = true;
+          c.cargarCatalogo().then(function(){ window.__htCapPidiendo = false; refrescarPorCapacitacion(); })
+            .catch(function(){ window.__htCapPidiendo = false; });
+        }
+        return null;
+      }
+      var clase = c.proximaClase(contextoCapacitacion());
+      if (!clase) return null; // todo visto: el negocio manda y el hueco no se llena
+      var res = (typeof c.avanceResumen === 'function') ? c.avanceResumen() : { total:0, vistas:0, pct:0 };
+      return {
+        cat: 'capacitacion', icono: '🎓', kicker: 'Campus PSA · capacitación',
+        titulo: clase.titulo,
+        html: '<p class="ht-nota">Clase de ' + esc(clase.area) + (clase.seccion ? ' · ' + esc(clase.seccion) : '') + '. Se ve acá mismo, sin salir de APPI, y se marca sola al 90%.</p>' +
+              '<div class="ht-chips">' +
+              (clase.duracion ? '<span>⏱ ' + esc(clase.duracion) + '</span>' : '') +
+              '<span>✓ ' + res.vistas + ' de ' + res.total + ' vistas</span>' +
+              (clase.autor ? '<span>👤 ' + esc(clase.autor) + '</span>' : '') +
+              '</div>',
+        cta: { label:'Ver clase 🎓', go:function(){ try{ c.abrirClase(clase); }catch(e){} } }
+      };
+    }catch(e){ return null; }
+  }
+
   function tarjetaGanaste(){
     var p = partidoDe();
     if (!p.ganado) return null;
@@ -1484,7 +1527,7 @@
     // v805: mazo unificado sobre el modelo de reempadronamiento (lista de
     // gente + colores por estado, sin botones abajo). "Hoy te conviene" se
     // quitó a pedido y el Plan Canje vive dentro de la tarjeta Usuarios.
-    [tarjetaPbEquipo(), tarjetaJornada(), tarjetaPromoBotella(), tarjetaGanaste(), tarjetaCampus(), tarjetaMetodoEnvio(), tarjetaLlegamos(), tarjetaDuchaRinnova(), tarjetaCumples(), tarjetaReempadronar(), tarjetaEquipo(), tarjetaPanel(), tarjetaUsuarios()].forEach(function(t){
+    [tarjetaPbEquipo(), tarjetaJornada(), tarjetaPromoBotella(), tarjetaGanaste(), tarjetaCampus(), tarjetaCapacitacion(), tarjetaMetodoEnvio(), tarjetaLlegamos(), tarjetaDuchaRinnova(), tarjetaCumples(), tarjetaReempadronar(), tarjetaEquipo(), tarjetaPanel(), tarjetaUsuarios()].forEach(function(t){
       if (t) lista.push(t);
     });
     return lista;
@@ -2291,6 +2334,8 @@
     tarjetaLlegamos: tarjetaLlegamos,
     tarjetaGanaste: tarjetaGanaste,
     tarjetaCampus: tarjetaCampus,
+    tarjetaCapacitacion: tarjetaCapacitacion,
+    contextoCapacitacion: contextoCapacitacion,
     tarjetaPromoBotella: tarjetaPromoBotella,
     textoMarcador: textoMarcador
   };
@@ -2329,6 +2374,22 @@
   window.addEventListener('appi-datasync-applied', repintarSiCambio);
   window.addEventListener('appi-linea-cambiaron', function(){ setTimeout(repintarSiCambio, 120); });
   window.addEventListener('appi-bonos-cambiaron', function(){ setTimeout(repintarSiCambio, 120); });
+
+  // v642 · El mazo se refresca cuando llega el catálogo del Campus o cuando
+  // avanza el avance de una clase (la tarjeta cambia sus chips al instante).
+  function refrescarPorCapacitacion(){
+    try{
+      if (!mazo || !mazo.tarjetas) return;
+      if (!document.getElementById('htOverlay')){ mazo.tarjetas = armarTarjetas(); return; }
+      repintarSiCambio();
+    }catch(e){}
+  }
+  try{
+    if (window.APPICampusPSA && typeof window.APPICampusPSA.cargarCatalogo === 'function'){
+      window.APPICampusPSA.cargarCatalogo().then(refrescarPorCapacitacion).catch(function(){});
+    }
+  }catch(e){}
+  window.addEventListener('appi-campus-avance', function(){ setTimeout(refrescarPorCapacitacion, 80); });
 
   function intentarEnvolver(){
     try{ css(); }catch(e){}
