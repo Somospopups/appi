@@ -119,6 +119,287 @@
     return { total:BASE_ACCIONES, hechas:0, noHechas:0, pendientes:BASE_ACCIONES };
   }
 
+  /* ---------- Catálogo real del Campus (v640) ----------
+     campus-catalogo.json llega de red (lo publica el workflow cada día) y
+     queda en memoria + una copia local de emergencia. La clave del respaldo
+     NO entra en la lista de sincronización: es un artefacto de red, no dato
+     de la cuenta. */
+  var CATALOGO_LOCAL = 'appi_campus_catalogo_v1';
+  var catalogoMem = null;
+  var catalogoPidiendo = null;
+
+  function cargarCatalogo(){
+    if (catalogoMem) return Promise.resolve(catalogoMem);
+    if (catalogoPidiendo) return catalogoPidiendo;
+    catalogoPidiendo = fetch('./campus-catalogo.json', { cache: 'no-store' })
+      .then(function(r){ if (!r.ok) throw new Error('catálogo HTTP ' + r.status); return r.json(); })
+      .then(function(cat){
+        if (!cat || !cat.kits || !cat.kits.length) throw new Error('catálogo vacío');
+        catalogoMem = cat;
+        try { localStorage.setItem(CATALOGO_LOCAL, JSON.stringify(cat)); } catch(e){}
+        return cat;
+      })
+      .catch(function(err){
+        try {
+          var prev = JSON.parse(localStorage.getItem(CATALOGO_LOCAL) || 'null');
+          if (prev && prev.kits && prev.kits.length) { catalogoMem = prev; return prev; }
+        } catch(e){}
+        throw err;
+      })
+      .then(function(cat){ catalogoPidiendo = null; return cat; },
+            function(e){ catalogoPidiendo = null; throw e; });
+    return catalogoPidiendo;
+  }
+  function catalogo(){ return catalogoMem; }
+  function norm(s){
+    return String(s == null ? '' : s).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('es-AR');
+  }
+  function segs(d){
+    var m = /(\d{1,2}):(\d{2})/.exec(String(d || ''));
+    return m ? (+m[1]) * 60 + (+m[2]) : 9999;
+  }
+
+  /** Todas las clases del catálogo aplanadas, con su área y sección. */
+  function aplanarClases(){
+    var out = [];
+    var cat = catalogoMem;
+    if (!cat) return out;
+    (cat.kits || []).forEach(function(kit){
+      (kit.secciones || []).forEach(function(sec){
+        (sec.clases || []).forEach(function(clase){
+          out.push({
+            id: clase.url,
+            titulo: clase.titulo,
+            autor: clase.autor || '',
+            duracion: clase.duracion || '',
+            stream: clase.stream || '',
+            url: clase.url,
+            area: kit.titulo,
+            areaSlug: kit.slug,
+            seccion: sec.titulo
+          });
+        });
+      });
+    });
+    return out;
+  }
+
+  function buscar(q){
+    var nq = norm(q).trim();
+    if (!nq) return [];
+    return aplanarClases().filter(function(c){
+      return norm(c.titulo + ' ' + c.seccion + ' ' + c.area + ' ' + c.autor).indexOf(nq) >= 0;
+    });
+  }
+
+  /* ---------- Avance propio (v641) ----------
+     Vive dentro del mismo estado que ya sincroniza data-sync con la cuenta
+     (prefijo appi_campus_psa_v1_): nube, backup y titular/socio compartido,
+     sin tabla nueva. */
+  function avanceDe(id){
+    try {
+      var data = leer();
+      return (data.avance && data.avance[id]) || null;
+    } catch(e){ return null; }
+  }
+  function esVisto(id){
+    var a = avanceDe(id);
+    return !!(a && Number(a.pct) >= 90);
+  }
+  function marcarVisto(id, pct, tipo){
+    try {
+      var data = leer();
+      if (!data.avance || typeof data.avance !== 'object') data.avance = {};
+      var prev = data.avance[id] || {};
+      var nuevo = Math.max(Number(prev.pct) || 0, Number(pct) || 0);
+      if (nuevo > 100) nuevo = 100;
+      data.avance[id] = {
+        pct: Math.round(nuevo),
+        estado: nuevo >= 90 ? 'visto' : (prev.estado || ''),
+        tipo: tipo || prev.tipo || 'video',
+        ts: Date.now(),
+        dia: hoyKey()
+      };
+      guardar(data);
+      try {
+        window.dispatchEvent(new CustomEvent('appi-campus-avance', {
+          detail: { id: id, pct: data.avance[id].pct, visto: nuevo >= 90 }
+        }));
+      } catch(e){}
+      return data.avance[id];
+    } catch(e){ return null; }
+  }
+  function avanceResumen(){
+    var todas = aplanarClases();
+    var vistas = todas.filter(function(c){ return esVisto(c.id); }).length;
+    return { total: todas.length, vistas: vistas, pct: todas.length ? Math.round((vistas / todas.length) * 100) : 0 };
+  }
+
+  /** La próxima clase de la ruta: según el contexto del negocio y siempre la
+      más corta entre las pendientes (3 a 10 minutos, para el hueco del día). */
+  function proximaClase(contexto){
+    var pend = aplanarClases().filter(function(c){ return !esVisto(c.id); });
+    if (!pend.length) return null;
+    var por = {
+      canje: function(c){ return /posventa/.test(norm(c.area)) && /canje/.test(norm(c.titulo + ' ' + c.seccion)); },
+      equipo: function(c){ return /capacitacion basica/.test(norm(c.area)) && /(demostracion|patrocinio|contactos)/.test(norm(c.seccion + ' ' + c.titulo)); },
+      visita: function(c){ return /dip tecnico/.test(norm(c.area)); },
+      pb: function(c){ return /comercializacion/.test(norm(c.area)); }
+    }[norm(contexto)];
+    var elegidas = por ? pend.filter(por) : pend;
+    if (!elegidas.length) elegidas = pend;
+    elegidas.sort(function(a, b){ return segs(a.duracion) - segs(b.duracion); });
+    return elegidas[0];
+  }
+
+  /* ---------- Reproductor de la hoja Clase ---------- */
+  var reproductor = { hls: null, media: null, id: null };
+  function soltarReproductor(){
+    try { if (reproductor.hls) reproductor.hls.destroy(); } catch(e){}
+    try {
+      if (reproductor.media) {
+        reproductor.media.pause();
+        reproductor.media.removeAttribute('src');
+        reproductor.media.load();
+      }
+    } catch(e){}
+    reproductor = { hls: null, media: null, id: null };
+  }
+  function cargarHls(cb){
+    if (window.Hls) return cb(null);
+    var existente = document.querySelector('script[data-appi-hls]');
+    if (existente){
+      existente.addEventListener('load', function(){ cb(window.Hls ? null : new Error('sin hls')); });
+      existente.addEventListener('error', function(){ cb(new Error('sin hls')); });
+      return;
+    }
+    var s = document.createElement('script');
+    s.src = './vendor/hls.min.js';
+    s.setAttribute('data-appi-hls', '1');
+    s.onload = function(){ cb(window.Hls ? null : new Error('sin hls')); };
+    s.onerror = function(){ cb(new Error('sin hls')); };
+    document.head.appendChild(s);
+  }
+  function notaReproductor(txt){
+    var el = document.getElementById('cpClassNote');
+    if (el) el.textContent = txt;
+  }
+  function marcarHechoUI(){
+    var btn = document.getElementById('cpClassDone');
+    if (btn){ btn.disabled = true; btn.textContent = 'Vista ✓'; }
+    var chip = document.getElementById('cpClassState');
+    if (chip){ chip.classList.add('ok'); chip.textContent = '✓ vista'; }
+  }
+  function cablearReproductor(mediaEl, url, id, tipo){
+    soltarReproductor();
+    reproductor.media = mediaEl;
+    reproductor.id = id;
+    try { mediaEl.setAttribute('data-stream', url); } catch(e){}
+    var ultimoGuardado = 0;
+    mediaEl.addEventListener('timeupdate', function(){
+      try {
+        if (!mediaEl.duration || !isFinite(mediaEl.duration)) return;
+        var pct = (mediaEl.currentTime / mediaEl.duration) * 100;
+        if (pct >= 90 && ultimoGuardado < 90){
+          ultimoGuardado = 100;
+          marcarVisto(id, 100, tipo);
+          marcarHechoUI();
+        } else {
+          var decena = Math.floor(pct / 10) * 10;
+          if (decena > ultimoGuardado){
+            ultimoGuardado = decena;
+            marcarVisto(id, decena, tipo);
+          }
+        }
+      } catch(e){}
+    });
+    mediaEl.addEventListener('ended', function(){
+      try { marcarVisto(id, 100, tipo); } catch(e){}
+      marcarHechoUI();
+    });
+    var nativo = mediaEl.canPlayType && mediaEl.canPlayType('application/vnd.apple.mpegurl');
+    if (nativo){ mediaEl.src = url; return; }
+    cargarHls(function(err){
+      if (err || !window.Hls || !window.Hls.isSupported()){
+        notaReproductor('Este navegador no puede reproducir el stream. Abrilo en Campus con el botón de abajo.');
+        return;
+      }
+      try {
+        var hls = new window.Hls();
+        reproductor.hls = hls;
+        hls.loadSource(url);
+        hls.attachMedia(mediaEl);
+        hls.on(window.Hls.Events.ERROR, function(ev, data){
+          if (data && data.fatal) notaReproductor('No se pudo cargar el video ahora. Probá “Abrir en Campus” o dejalo para más tarde.');
+        });
+      } catch(e){
+        notaReproductor('No se pudo iniciar el reproductor. Abrilo en Campus.');
+      }
+    });
+  }
+
+  /** Hoja Clase: video HLS inline (o audio), avance propio y salida al Campus. */
+  function abrirClase(clase){
+    if (!clase || !clase.id) return;
+    var av = avanceDe(clase.id);
+    var hecho = av && Number(av.pct) >= 90;
+    var parcial = av && Number(av.pct) > 0 && !hecho;
+    abrirModal(
+      '<div class="cp-quiz-top"><button type="button" class="cp-back" id="cpClassBack" aria-label="Volver">‹</button><span class="cp-question-label" style="flex:1">🎓 ' + esc(clase.area) + '</span></div>' +
+      '<div class="cp-quiz-body"><span class="cp-question-topic">' + esc(clase.seccion) + '</span><h2 class="cp-question" id="cpClassTitle">' + esc(clase.titulo) + '</h2>' +
+      '<div class="cp-class-chips">' +
+        '<span class="cp-chip' + (hecho ? ' ok' : '') + '" id="cpClassState">' + (hecho ? '✓ vista' : (parcial ? Math.round(av.pct) + '% vista' : 'por ver')) + '</span>' +
+        (clase.autor ? '<span class="cp-chip">' + esc(clase.autor) + '</span>' : '') +
+        (clase.duracion ? '<span class="cp-chip">⏱ ' + esc(clase.duracion) + '</span>' : '') +
+      '</div>' +
+      '<div class="cp-repro" id="cpClassMedia"><video controls playsinline preload="metadata" id="cpClassVideo"></video></div>' +
+      '<div class="cp-repro-note" id="cpClassNote">Se reproduce desde el Campus PSA (no se copia el video). Al llegar al 90% se marca solo.</div></div>' +
+      '<div class="cp-modal-foot"><button type="button" class="cp-primary" id="cpClassDone"' + (hecho ? ' disabled' : '') + '>' + (hecho ? 'Vista ✓' : 'Marcar como vista') + '</button>' +
+      '<a class="cp-secondary" id="cpClassOpen" href="https://campus.psa.com.ar' + esc(clase.url) + '" target="_blank" rel="noopener">Abrir en Campus ↗</a></div>'
+    );
+    document.getElementById('cpClassBack').onclick = cerrarModal;
+    document.getElementById('cpClassDone').onclick = function(){
+      marcarVisto(clase.id, 100, 'video');
+      marcarHechoUI();
+    };
+    var media = document.getElementById('cpClassVideo');
+    if (media && clase.stream){
+      cablearReproductor(media,
+        'https://psavod-ns.akamaized.net/delivery/Campus/Videos/HLS/' + clase.stream + '/playlist.m3u8',
+        clase.id, 'video');
+    } else if (media){
+      notaReproductor('Esta clase no tiene stream disponible. Abrila en Campus.');
+    }
+  }
+
+  /** Hoja de audio (playlists del Campus): mismo avance, sin video. */
+  function abrirAudio(audio, listaTitulo){
+    if (!audio || !audio.stream) return;
+    var id = 'audio:' + audio.audioId;
+    var av = avanceDe(id);
+    var hecho = av && Number(av.pct) >= 90;
+    abrirModal(
+      '<div class="cp-quiz-top"><button type="button" class="cp-back" id="cpClassBack" aria-label="Volver">‹</button><span class="cp-question-label" style="flex:1">🎧 ' + esc(listaTitulo || 'Audios del Campus') + '</span></div>' +
+      '<div class="cp-quiz-body"><h2 class="cp-question" id="cpClassTitle">' + esc(audio.titulo) + '</h2>' +
+      '<div class="cp-class-chips"><span class="cp-chip' + (hecho ? ' ok' : '') + '" id="cpClassState">' + (hecho ? '✓ escuchado' : 'por escuchar') + '</span><span class="cp-chip">audio</span></div>' +
+      '<div class="cp-repro" id="cpClassMedia"><audio controls preload="metadata" id="cpClassAudio"></audio></div>' +
+      '<div class="cp-repro-note" id="cpClassNote">Se reproduce desde el Campus PSA. Tu avance queda guardado en APPI.</div></div>' +
+      '<div class="cp-modal-foot"><button type="button" class="cp-primary" id="cpClassDone"' + (hecho ? ' disabled' : '') + '>' + (hecho ? 'Escuchado ✓' : 'Marcar como escuchado') + '</button>' +
+      '<a class="cp-secondary" id="cpClassOpen" href="https://campus.psa.com.ar/audio/transmitidos" target="_blank" rel="noopener">Abrir en Campus ↗</a></div>'
+    );
+    document.getElementById('cpClassBack').onclick = cerrarModal;
+    document.getElementById('cpClassDone').onclick = function(){
+      marcarVisto(id, 100, 'audio');
+      marcarHechoUI();
+    };
+    var media = document.getElementById('cpClassAudio');
+    if (media){
+      cablearReproductor(media,
+        'https://psavod-ns.akamaized.net/delivery/Campus/Audios/HLS/' + audio.stream + '/playlist.m3u8',
+        id, 'audio');
+    }
+  }
+
   function css(){
     if (document.getElementById('campusPsaStyle')) return;
     var st = document.createElement('style');
@@ -147,6 +428,11 @@
       '.cp-modal-foot{padding:18px 22px 21px}.cp-hint{margin:0 0 14px;color:#708099;text-align:center;font-size:11px;line-height:1.4;font-weight:700}.cp-primary,.cp-secondary{width:100%;min-height:48px;border:0;border-radius:15px;font:inherit;font-size:13px;font-weight:950;cursor:pointer}.cp-primary{background:linear-gradient(135deg,#7566dc,#8d7bed);color:#fff;box-shadow:0 6px 0 #5547b7}.cp-primary:active{transform:translateY(3px);box-shadow:0 3px 0 #5547b7}.cp-secondary{margin-top:11px;background:#eef5f7;color:#58708a}',
       '.cp-quiz-top{display:flex;align-items:center;gap:10px;padding:17px 19px 12px}.cp-back{width:30px;height:30px;border:0;border-radius:10px;background:#edf4f6;color:#506780;font-size:18px;cursor:pointer}.cp-q-progress{height:10px;flex:1;border-radius:999px;background:#e2eef0;overflow:hidden}.cp-q-progress i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#2ac9b7,#79dfa7);transition:width .3s}.cp-q-count{color:#73829b;font-size:10px;font-weight:950;white-space:nowrap}.cp-quiz-body{padding:9px 23px 23px}.cp-question-label{color:#218e81;font-size:9px;font-weight:1000;letter-spacing:.75px;text-transform:uppercase}.cp-question-topic{display:block;margin-top:3px;color:#8291a6;font-size:10px;font-weight:750}.cp-question{margin:8px 0 17px;color:#223950;font-size:20px;line-height:1.19;letter-spacing:-.55px}.cp-options{display:grid;gap:9px}.cp-option{border:2px solid #dfe9ed;border-bottom-width:5px;border-radius:15px;padding:12px;text-align:left;background:#fff;color:#30465f;font:inherit;font-size:11.5px;line-height:1.33;font-weight:800;cursor:pointer}.cp-option:hover{background:#f6fffd;border-color:#a4d9d5}.cp-option:disabled{cursor:default}.cp-option.correct{border-color:#35bc91;background:#edfff6;color:#117356}.cp-option.wrong{border-color:#ffaaa4;background:#fff4f3;color:#af5653}.cp-feedback{display:none;margin-top:14px;padding:11px 12px;border-radius:13px;background:#ecfff6;color:#17745b;font-size:11px;line-height:1.4;font-weight:700}.cp-feedback.show{display:block}.cp-feedback b{display:block;margin-bottom:3px;font-size:12px}.cp-next{display:none;margin-top:13px}.cp-next.show{display:block}',
       '.cp-unlock{text-align:center;padding:32px 25px 5px}.cp-unlock-icon{width:88px;height:88px;display:grid;place-items:center;margin:auto;border-radius:30px;background:linear-gradient(135deg,#ffe48b,#f4b94f);font-size:42px;box-shadow:0 12px 0 #e59b2f,0 21px 31px rgba(242,183,77,.27);transform:rotate(5deg)}.cp-unlock h2{margin:22px 0 8px;color:#233950;font-size:26px;line-height:1.05;letter-spacing:-1px}.cp-unlock p{margin:0;color:#728199;font-size:12.5px;line-height:1.45}.cp-unlock-big{margin:14px 0;color:#167b69;font-size:22px;font-weight:1000;letter-spacing:-.8px}.cp-extra-list{margin:16px 22px 0;padding:11px 12px;border:1px solid #cdeee4;border-radius:14px;background:#f1fcf8;color:#48716c;text-align:left;font-size:10.5px;line-height:1.55}.cp-extra-list b{color:#147b68}',
+      '.cp-class-chips{display:flex;flex-wrap:wrap;gap:6px;margin:2px 0 12px}.cp-chip{padding:4px 9px;border-radius:999px;background:#eef4f7;color:#5b7186;font-size:9.5px;font-weight:900}.cp-chip.ok{background:#e6fbf2;color:#12855f}',
+      '.cp-repro{position:relative;margin:4px 0 12px;border-radius:16px;overflow:hidden;background:#0b1620;box-shadow:0 8px 20px rgba(9,25,40,.22)}',
+      '.cp-repro video,.cp-repro audio{display:block;width:100%;background:#0b1620}.cp-repro video{aspect-ratio:16/9;object-fit:contain}.cp-repro audio{height:44px}',
+      '.cp-repro-note{padding:9px 12px;color:#7e8fa3;font-size:10px;line-height:1.4;font-weight:700;text-align:center}',
+      'a.cp-secondary{display:block;box-sizing:border-box;text-decoration:none;text-align:center;line-height:46px;padding:0}',
       'body.dark #view-campus{background:radial-gradient(circle at 4% 0,rgba(64,208,201,.12),transparent 28%),#191d2b}.dark .cp-hero h2,.dark .cp-section-head h3{color:#edf5f6}.dark .cp-hero p,.dark .cp-section-head span,.dark .cp-note{color:#aab9ca}.dark .cp-card{background:#252b3a;border-color:rgba(255,255,255,.1)}.dark .cp-card.featured{background:linear-gradient(135deg,#302957,#252b3a)}.dark .cp-card h4{color:#eef5f6}.dark .cp-card p{color:#afbed0}.dark .cp-step b{color:#d8e6ed}.dark .cp-step i{border-color:#1b202d;background:#34404b}.dark .cp-path:before{background:#34454d}',
       '@media(max-width:520px){.cp-hero h2{font-size:25px}.cp-category{max-width:120px}.cp-grid{grid-template-columns:1fr}.cp-step i{width:51px;height:51px;border-radius:18px;font-size:20px}.cp-path:before{top:32px}.cp-step b{font-size:8px}.cp-step small{font-size:7px}.cp-question{font-size:18px}.cp-quiz-body{padding:8px 18px 21px}}'
     ].join('');
@@ -175,6 +461,7 @@
   function cerrarModal(){
     var ov = document.getElementById('campusPsaOverlay');
     if (ov) ov.classList.remove('open');
+    soltarReproductor();
     render();
   }
 
@@ -321,11 +608,27 @@
     retoDesbloqueado: retoDesbloqueado,
     desafioDisponible: desafioDisponible,
     categoria: categoria,
-    preguntasParaCategoria: preguntasParaCategoria
+    preguntasParaCategoria: preguntasParaCategoria,
+    // Catálogo real y avance (v641)
+    cargarCatalogo: cargarCatalogo,
+    catalogo: catalogo,
+    clases: aplanarClases,
+    buscar: buscar,
+    proximaClase: proximaClase,
+    avanceDe: avanceDe,
+    esVisto: esVisto,
+    marcarVisto: marcarVisto,
+    avanceResumen: avanceResumen,
+    abrirClase: abrirClase,
+    abrirAudio: abrirAudio
   };
 
   window.addEventListener('appi-datasync-applied', function(){ try{ render(); revisarJornada(); }catch(e){} });
   window.addEventListener('appi-person-change', function(){ setTimeout(function(){ render(); revisarJornada(); }, 60); });
+  window.addEventListener('appi-campus-avance', function(){ try{ render(); }catch(e){} });
   if (document.readyState === 'complete') setTimeout(revisarJornada, 800);
   else window.addEventListener('load', function(){ setTimeout(revisarJornada, 900); });
+  // El catálogo se adelanta en segundo plano: la ruta diaria y la vista
+  // encuentran las clases listas sin esperar un clic.
+  setTimeout(function(){ cargarCatalogo().catch(function(){}); }, 1200);
 })();

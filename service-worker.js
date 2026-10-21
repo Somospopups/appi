@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v640-campus-catalogo';
+const CACHE_NAME = 'appi-v641-clase-hls';
 const CACHE_PREFIX = 'appi-';
 // Donde el SW aparta una compartición hasta que la app la consume. No
 // empieza con el prefijo de la app para que el prune del activate no la borre.
@@ -35,6 +35,8 @@ const APP_SHELL = [
   './mensajes-hielo.js',
   './mensajes-usuarios.js',
   './campus-psa.js',
+  './campus-catalogo.json',
+  './vendor/hls.min.js',
   './reactivacion.js',
   './escalera-suenos.js',
   './demo-guia.js',

@@ -4,6 +4,17 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v641 · La clase del Campus se ve adentro de APPI
+
+- **Hoja Clase**: al tocar una clase del catálogo ahora se abre una hoja con título, autor, duración y chips de estado; el video HLS se reproduce **inline** con `vendor/hls.min.js` (hls.js 1.5.13, Apache-2.0, cargado bajo demanda; Safari usa HLS nativo). Nada se re-copia: solo se apunta al stream público del Campus y queda el botón **Abrir en Campus ↗**.
+- **Avance propio**: cada clase/audio guarda `avance[id]` (pct/estado/ts/dia) dentro del estado que `data-sync.js` ya sincroniza con la cuenta (prefijo `appi_campus_psa_v1_`), así que el progreso viaja a la nube y se comparte entre titular y socio sin tabla nueva. Al 90% (o al `ended`) se marca solo, con botón manual **Marcar como vista**.
+- **Catálogo con red offline**: `campus-catalogo.json` se trae con `fetch`, se guarda como respaldo en `appi_campus_catalogo_v1` (clave fuera de la sincronización: es artefacto de red, no dato de la cuenta) y el módulo funciona aunque hoy no haya conexión.
+- **Ruta**: `proximaClase(contexto)` elige la próxima clase pendiente según el área que pide el momento del negocio (canje→Posventa, equipo→Básica, visita→DIP Técnico, PB→Comercialización) y siempre la más corta, para el hueco del día.
+- **Audio**: `abrirAudio()` reproduce los `A_XXXXX` de las playlists con el mismo patrón de avance.
+- `APP_SHELL` ahora precachea `campus-catalogo.json` y `vendor/hls.min.js`.
+- Tests: `tests/e2e/campus-reproductor.spec.js` (catálogo, hoja Clase, avance y audio).
+- Versión: **v641 · Segura** → Cache `appi-v641-clase-hls`.
+
 ## v640 · El catálogo real del Campus PSA llega a APPI
 
 - **Catálogo vivo**: nuevo script `scripts/actualizar-campus-psa.mjs` (Node puro, sin dependencias) que ingresa a mi.psa.com.ar con las credenciales del distribuidor (variables de entorno, nunca en el repo), hace SSO a campus.psa.com.ar y rastrea todo el Campus: **9 áreas, 62 secciones, 204 clases** (cada una con el id de su stream HLS público), **10 playlists con 425 audios** y **17 transmisiones de la agenda de vivo**.
