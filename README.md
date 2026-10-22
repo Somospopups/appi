@@ -4,6 +4,13 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v651 · Se va el recuadro rojo del catálogo caído
+
+- **Nube caída con copia guardada: silencio**: si el Campus ya tiene una última copia en el dispositivo y la nube no responde, ahora no aparece ningún recuadro — se muestra la copia tal cual. El aviso "📡 No pudimos actualizar el catálogo" resultaba ruidoso para un problema que la propia copia ya resuelve.
+- **Sólo si no hay nada que mostrar**: sin copia guardada queda un aviso chico en una línea (`.cp-aviso.mini`) con **Reintentar**: la pantalla no puede quedar vacía sin explicar por qué.
+- Tests: `campus-usuario.spec.js` cubre los dos casos — con respaldo no hay `[data-cp-aviso="error"]` y el contenido se ve; sin respaldo aparece el mini con reintento.
+- Versión: **v651 · Segura** → Cache `appi-v651-aviso-discreto`.
+
 ## v650 · Marcar una clase vista cierra la hoja (y su quiz de verificación)
 
 - **Marcar como vista / escuchado cierra el popup**: antes el botón sólo dejaba el botón en "Vista ✓" con la hoja abierta. Ahora guarda el avance y cierra: con clase sin banco cierra directo; con banco sin aprobar, el quiz de 3 preguntas reemplaza la hoja y recién ahí se da la clase por terminada (igual para audio, que cierra siempre).

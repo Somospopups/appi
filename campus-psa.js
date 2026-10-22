@@ -685,6 +685,10 @@
       '.cp-aviso.err button{background:linear-gradient(135deg,#4f7fe8,#6f9dff);color:#fff;box-shadow:0 4px 0 #3a62bd}',
       '.cp-aviso small{display:block;margin-top:8px;color:#8a8168;font-size:9.5px;font-weight:750}',
       '.dark .cp-aviso{background:linear-gradient(150deg,#3a331d,#2a2c26);border-color:#8a7534}.dark .cp-aviso p{color:#cfc7ae}.dark .cp-aviso-t{color:#ffd977}.dark .cp-aviso.err{background:linear-gradient(150deg,#22304a,#232a38);border-color:#4a6aa8}.dark .cp-aviso.err .cp-aviso-t{color:#9fc1ff}.dark .cp-aviso.err p{color:#aebed4}',
+      '.cp-aviso.mini{display:flex;align-items:center;gap:10px;padding:9px 12px;margin:10px 0 4px}',
+      '.cp-aviso.mini .cp-aviso-t{font-size:11.5px}',
+      '.cp-aviso.mini p{margin:2px 0 0;font-size:10px}',
+      '.cp-aviso.mini button{margin-top:0;width:auto;min-height:32px;padding:0 14px;flex:none;font-size:11.5px;border-radius:11px}',
       '.cp-vpsa{margin:13px 0 5px;padding:14px 15px;border-radius:17px;border:1.5px solid #ffd0d0;background:linear-gradient(150deg,#fff2f2,#fff8f5);box-shadow:0 6px 16px rgba(180,40,40,.08)}',
       '.cp-vpsa-live{border-color:#ffbcbc;background:linear-gradient(150deg,#ffecec,#fff4f0)}',
       '.cp-vpsa-replay{border-color:#cfe0ff;background:linear-gradient(150deg,#eff5ff,#f6faff);box-shadow:0 6px 16px rgba(40,90,180,.08)}',
@@ -1109,11 +1113,12 @@
       '</div>';
     }
     if (catalogoEstado === 'error'){
-      return '<div class="cp-aviso err" data-cp-aviso="error">' +
-        '<div class="cp-aviso-t">📡 No pudimos actualizar el catálogo</div>' +
-        '<p>' + (catalogoMem
-          ? 'La nube de APPI no respondió ahora. Se muestra la última copia guardada.'
-          : 'La nube de APPI no respondió ahora y todavía no hay una copia guardada en este dispositivo.') + '</p>' +
+      // v651: si hay una copia guardada, la nube caída se banca en silencio —
+      // el recuadro de error sólo aparece cuando no hay NADA que mostrar.
+      if (catalogoMem) return '';
+      return '<div class="cp-aviso err mini" data-cp-aviso="error">' +
+        '<div><div class="cp-aviso-t">📡 Sin copia del catálogo todavía</div>' +
+        '<p>La nube no respondió y en este dispositivo todavía no hay una copia guardada.</p></div>' +
         '<button type="button" data-cp-reintentar>Reintentar</button>' +
       '</div>';
     }
