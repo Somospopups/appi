@@ -849,52 +849,16 @@
     }, 40);
   }
 
-  /* ---------- Agenda de vivo (v643) ---------- */
-  function fechaVivo(txt){
-    var m = /^(\d{2})-(\d{2})\s+(\d{2}):(\d{2})$/.exec(String(txt || '').trim());
-    if (!m) return null;
-    var anio = new Date().getFullYear();
-    var d = new Date(anio, +m[2] - 1, +m[1], +m[3], +m[4], 0, 0);
-    if (isNaN(d.getTime())) return null;
-    // Un vivo del año que ya pasó es del próximo ciclo.
-    if (d.getTime() < Date.now() - 86400000) d = new Date(anio + 1, +m[2] - 1, +m[1], +m[3], +m[4], 0, 0);
-    return d;
-  }
-  function listaVivo(){
-    if (!catalogoMem || !catalogoMem.vivo) return [];
-    return (catalogoMem.vivo || []).map(function(v){
-      var ini = fechaVivo(v.inicio);
-      var fin = fechaVivo(v.fin) || (ini ? new Date(ini.getTime() + 3600000) : null);
-      return { equipo: v.equipo, titulo: v.titulo, ini: ini, fin: fin };
-    }).filter(function(v){ return !!v.ini; })
-      .sort(function(a, b){ return a.ini - b.ini; })
-      .slice(0, 4);
-  }
-  function gcalLink(titulo, ini, fin, detalle){
-    function f(d){ return d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z'); }
-    return 'https://calendar.google.com/calendar/render?action=TEMPLATE' +
-      '&text=' + encodeURIComponent(titulo) +
-      '&dates=' + f(ini) + '/' + f(fin || new Date(ini.getTime() + 3600000)) +
-      '&details=' + encodeURIComponent(detalle || '');
-  }
+  /* ---------- Agenda de vivo (v643) ----------
+     v652: la agenda rastreada (/proximas-clases-en-vivo) traía SÓLO las
+     reuniones internas de los equipos del Campus — datos de otros equipos que
+     no corresponden publicar en APPI—, nunca el vivo general. Se dejó de
+     mostrar y de rastrear; el Vivo PSA se ubica por fecha (v645). */
   function fechaLindaVivo(d){
     try {
       return d.toLocaleDateString('es-AR', { weekday:'short', day:'2-digit', month:'short' }) +
         ' · ' + d.toLocaleTimeString('es-AR', { hour:'2-digit', minute:'2-digit' });
     } catch(e){ return ''; }
-  }
-  function seccionVivo(){
-    var items = listaVivo();
-    if (!items.length) return '';
-    var filas = items.map(function(v, i){
-      var desc = v.titulo + ' · ' + v.equipo + ' — transmisión en vivo de Campus PSA (vista desde APPI).';
-      return '<div class="cp-vivo-row">' +
-        '<div class="cp-vivo-txt"><b>' + esc(v.titulo) + '</b><small>' + esc(v.equipo) + ' · ' + esc(fechaLindaVivo(v.ini)) + '</small></div>' +
-        '<a class="cp-vivo-go" data-cp-agendar="' + i + '" href="' + esc(gcalLink(v.titulo + ' · ' + v.equipo, v.ini, v.fin, desc)) + '" target="_blank" rel="noopener">Agendar</a>' +
-      '</div>';
-    }).join('');
-    return '<div class="cp-section-head"><h3>📅 Próximos en vivo</h3><span>' + items.length + ' transmisiones</span></div>' +
-      '<section class="cp-lista" id="cpVivo" data-cp-vivo="' + items.length + '">' + filas + '</section>';
   }
 
   /* ---------- Vivo PSA semanal (v645) ----------
@@ -1176,7 +1140,7 @@
       '<div class="cp-section-head"><h3>Tu camino de hoy</h3><span>5 aciertos activan el impulso</span></div>' +
       '<section class="cp-path"><div class="cp-step done"><i>✓</i><b>Tu día</b><small>completo</small></div><div class="cp-step ' + (ready ? 'live' : '') + '"><i>✦</i><b>Desafío</b><small>5 aciertos</small></div><div class="cp-step ' + (unlocked ? 'done' : '') + '"><i>⚡</i><b>+3 acciones</b><small>' + (unlocked ? 'activado' : 'por ganar') + '</small></div><div class="cp-step ' + (unlocked ? 'live' : '') + '"><i>↗</i><b>Aplicar</b><small>en tu negocio</small></div><div class="cp-step"><i>★</i><b>Tu logro</b><small>del día</small></div></section>' +
       '<section class="cp-grid"><article class="cp-card featured"><span class="cp-eyebrow">RECOMENDADO PARA TU CATEGORÍA</span><h4>' + (esLider() ? 'Construcción de equipos sólidos' : esJunior() ? 'Tus primeros pasos comerciales' : 'Acciones que hacen crecer tu negocio') + '</h4><p>' + (esLider() ? 'Practicá decisiones sobre acompañamiento, permanencia y crecimiento del equipo.' : 'Preguntas breves para llevar el aprendizaje del Campus a conversaciones reales.') + '</p><button type="button" id="cpTopicGo">Empezar desafío</button></article><article class="cp-card"><span class="cp-eyebrow">APLICACIÓN DE HOY</span><h4>Posventa que genera vínculo</h4><p>Canje, fidelización y oportunidades reales con tus usuarios.</p><button type="button" id="cpTopicInfo">Ver tema</button></article></section>' +
-      seccionVivoPsa() + seccionUltimoVivo() + seccionVivo() + seccionAudios() +
+      seccionVivoPsa() + seccionUltimoVivo() + seccionAudios() +
       '<button type="button" class="cp-main-btn ' + (ready ? 'ready' : '') + '" id="cpMainAction" ' + (!ready && !unlocked ? 'disabled' : '') + '>' + esc(actionLabel) + '</button><p class="cp-note">Las preguntas son originales de APPI, organizadas por los temas de formación de Campus Appi. No reemplazan sus capacitaciones oficiales.</p></div>';
     // v649: mismo contenido = cero repintado (nada de parpadeo).
     var firmaCampus = firmaRenderCampus(htmlCampus);

@@ -13,7 +13,10 @@
 //   · kits → secciones → clases (título/autor/duración/url), y el stream
 //     HLS sólo de las clases nuevas (se reutiliza el mapa anterior).
 //   · playlists de audio + Biblioteca de transmitidos (sus A_ ya vienen).
-//   · agenda de vivo con TODAS las páginas (próximas y en curso).
+//
+// v652: NO se rastrea la agenda de "próximas clases en vivo": esa página del
+// Campus lista las reuniones internas de los equipos (otros equipos), que no
+// corresponden publicar en APPI. El Vivo PSA se ubica por fecha en el cliente.
 //
 // Si el rastreo no alcanza los mínimos o se corta, se devuelve la última
 // copia buena (stale) en vez de publicar un catálogo roto.
@@ -263,14 +266,6 @@ function parsePlaylistsIndex(html: string): { slug: string; titulo: string; desc
   return listas;
 }
 
-function parseVivo(html: string): { equipo: string; inicio: string; fin: string; titulo: string }[] {
-  const vivo: { equipo: string; inicio: string; fin: string; titulo: string }[] = [];
-  const re = /<div class="boxList card-audio">\s*<div class="widget">\s*<div class="sectorTitle">\s*<i[^>]*><\/i>\s*<p>([^<]*)<\/p>[\s\S]*?Fecha Inicio\s*:\s*([^<]+)<\/p>[\s\S]*?Fecha Fin\s*:\s*([^<]+)<\/p>[\s\S]*?sector info[^>]*>\s*<p>([^<]*)<\/p>/g;
-  let m: RegExpExecArray | null;
-  while ((m = re.exec(html))) vivo.push({ equipo: dec(m[1]), inicio: dec(m[2]), fin: dec(m[3]), titulo: dec(m[4]) });
-  return vivo;
-}
-
 /* ---------- rastreo ---------- */
 async function pool<T, R>(items: T[], limit: number, fn: (item: T, idx: number) => Promise<R>): Promise<R[]> {
   const out = new Array<R>(items.length);
@@ -295,12 +290,12 @@ function streamsAnteriores(catAnterior: unknown): Map<string, string> {
   return mapa;
 }
 
-function statsDe(kits: any[], listas: any[], vivo: any[]) {
+function statsDe(kits: any[], listas: any[]) {
   const secciones = kits.reduce((n, k) => n + k.secciones.length, 0);
   const clases = kits.reduce((n, k) => n + k.secciones.reduce((m: number, s: any) => m + s.clases.length, 0), 0);
   const conStream = kits.reduce((n, k) => n + k.secciones.reduce((m: number, s: any) => m + s.clases.filter((c: any) => c.stream).length, 0), 0);
   const audios = listas.reduce((n: number, l: any) => n + l.audios.length, 0);
-  return { kits: kits.length, secciones, clases, conStream, playlists: listas.length, audios, vivo: vivo.length };
+  return { kits: kits.length, secciones, clases, conStream, playlists: listas.length, audios };
 }
 
 function completo(cat: any): boolean {
@@ -414,33 +409,13 @@ async function rastrear(jar: Jar, catAnterior: unknown, hasta: number): Promise<
     }
   } catch (_) { /* sin biblioteca sigue el resto */ }
 
-  // 5) Agenda de vivo con TODAS las páginas (próximas + en curso)
-  const vivo: { equipo: string; inicio: string; fin: string; titulo: string }[] = [];
-  for (const path of ['/proximas-clases-en-vivo', '/clases-en-vivo']) {
-    try {
-      const html1 = await getText(jar, CAMPUS + path);
-      vivo.push(...parseVivo(html1));
-      const paginas = maxPage(html1);
-      for (let p = 2; p <= paginas; p++) {
-        vivo.push(...parseVivo(await getText(jar, CAMPUS + path + '?page=' + p)));
-        await sleep(40);
-      }
-    } catch (_) { motivos.push(`agenda ${path} sin leer`); }
-  }
-  const vivoSeen = new Set<string>();
-  const vivoUnico = vivo.filter((v) => {
-    const k = v.equipo + '|' + v.inicio + '|' + v.titulo;
-    return vivoSeen.has(k) ? false : (vivoSeen.add(k), true);
-  });
-
   const cat = {
     version: 1,
     generado: new Date().toISOString(),
     fuente: 'campus.psa.com.ar',
     kits,
     playlists: listas,
-    vivo: vivoUnico,
-    stats: statsDe(kits, listas, vivoUnico),
+    stats: statsDe(kits, listas),
   };
   if (!valido(cat)) {
     if (cat.stats.clases < MIN_CLASES) motivos.push(`sólo ${cat.stats.clases} clases`);

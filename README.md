@@ -4,6 +4,14 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v652 · Se va la agenda de "Reunión de Equipo" de otros equipos
+
+- **`📅 Próximos en vivo` deja de existir**: la agenda que el Campus publica en `/proximas-clases-en-vivo` traía SÓLO las reuniones internas de los equipos del distribuidor ( Equipos Sin Fronteras, Espigas Doradas, Alpinistas, MegaRed… con sus horarios): datos internos de otros equipos que no corresponden publicar en APPI ni compartir con la nube de todos. La sección se eliminó del todo — ni se lista ni se ofrece "Agendar".
+- **La función edge tampoco los rastrea**: `campus-catalogo` dejó de scrapea esa agenda, así que esos nombres y horarios ya no entran en el catálogo compartido (`appi_campus_cache`) ni en el respaldo local de cada dispositivo.
+- **El Vivo PSA no se toca**: el vivo del miércoles 15:00, su previa y "🎬 Vivos anteriores" (v645/v648) se ubican por fecha y playlists — nunca usaron esa agenda.
+- Tests: `campus-vivo-audio.spec.js` pasa a regresión de privacidad: el fixture real trae 17 reuniones y APPI debe mostrar **cero**; `campus-usuario.spec.js` ya no espera "Próximos en vivo" y afirma el contenido de kits en su lugar.
+- Versión: **v652 · Segura** → Cache `appi-v652-agenda-fuera`.
+
 ## v651 · Se va el recuadro rojo del catálogo caído
 
 - **Nube caída con copia guardada: silencio**: si el Campus ya tiene una última copia en el dispositivo y la nube no responde, ahora no aparece ningún recuadro — se muestra la copia tal cual. El aviso "📡 No pudimos actualizar el catálogo" resultaba ruidoso para un problema que la propia copia ya resuelve.

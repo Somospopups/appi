@@ -70,11 +70,11 @@ test('la nube responde con el catálogo de la cuenta MI PSA del usuario (no un J
   expect(resumen.clase).toBe('Clase Mock Uno');
   expect(resumen.guardado, 'el respaldo local guarda el catálogo de la nube').toBe('Kit Mock Usuario');
 
-  // Con cuenta conectada y nube OK no hay ningún aviso en la vista y lo que
-  // se ve viene del catálogo que devolvió la nube.
+  // Con cuenta conectada y nube OK no hay ningún aviso en la vista. Aunque
+  // el catálogo de la nube traiga agenda de equipos, APPI no la publica (v652).
   await page.evaluate(() => window.openCampusPSA());
   await expect(page.locator('#view-campus')).toHaveClass(/active/);
-  await expect(page.locator('#campusCont')).toContainText('Vivo Mock Usuario');
+  await expect(page.locator('#campusCont')).not.toContainText('Vivo Mock Usuario');
   await expect(page.locator('#view-campus [data-cp-aviso]')).toHaveCount(0);
   await expect(page.locator('.ht-card.ht-cat-campusCuenta')).toHaveCount(0);
 });
@@ -108,7 +108,7 @@ test('sin cuenta MI PSA: aviso en Campus, tarjeta de aviso en el Home y popup de
   await expect(page.locator('#view-campus')).toHaveClass(/active/);
   await expect(page.locator('[data-cp-aviso="cuenta"]')).toBeVisible();
   await expect(page.locator('[data-cp-aviso="cuenta"]')).toContainText('Cargá tu cuenta MI PSA');
-  await expect(page.locator('#campusCont')).toContainText('Próximos en vivo');
+  await expect(page.locator('#campusCont')).toContainText('Audios del Campus');
 
   // El aviso abre el popup existente de carga de cuenta MI PSA.
   await page.locator('[data-cp-cuenta]').click();
@@ -131,7 +131,7 @@ test('si la nube falla con copia guardada no hay recuadro; sin copia, aviso chic
 
   await page.evaluate(() => window.openCampusPSA());
   await expect(page.locator('[data-cp-aviso="error"]')).toHaveCount(0);
-  await expect(page.locator('#campusCont')).toContainText('Próximos en vivo');
+  await expect(page.locator('#campusCont')).toContainText('Audios del Campus');
 
   // Sin respaldo local no hay de dónde recatar: queda el aviso chico.
   await page.evaluate(() => {
@@ -143,7 +143,7 @@ test('si la nube falla con copia guardada no hay recuadro; sin copia, aviso chic
   await expect(page.locator('[data-cp-aviso="error"]')).toBeVisible();
   await expect(page.locator('[data-cp-aviso="error"]')).toHaveClass(/mini/);
   await expect(page.locator('[data-cp-aviso="error"]')).toContainText('todavía no hay una copia guardada');
-  await expect(page.locator('#campusCont')).not.toContainText('Próximos en vivo');
+  await expect(page.locator('#campusCont')).not.toContainText('Audios del Campus');
 
   // El Reintentar del aviso vuelve a consultar la nube.
   await page.route('https://mock.supabase.co/functions/v1/campus-catalogo', route => json(route, 500, { error: 'nube caída' }));

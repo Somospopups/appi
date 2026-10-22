@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "651.0.0",
-  "cacheName": "appi-v651-aviso-discreto",
+  "version": "652.0.0",
+  "cacheName": "appi-v652-agenda-fuera",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

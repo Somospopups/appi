@@ -1,24 +1,19 @@
 const { test, expect } = require('@playwright/test');
 const { entrar } = require('./helpers/app-entrar.js');
 
-test('la agenda de vivo muestra las transmisiones y cada Agendar arma el evento de Google', async ({ page }) => {
+test('las reuniones internas de otros equipos del catálogo no se muestran en APPI (v652)', async ({ page }) => {
   await entrar(page);
   await page.evaluate(() => window.APPICampusPSA.cargarCatalogo());
   await page.evaluate(() => window.openCampusPSA());
 
-  await expect(page.locator('#cpVivo')).toBeVisible();
-  const n = await page.locator('#cpVivo .cp-vivo-row').count();
-  expect(n).toBeGreaterThan(0);
-  expect(n).toBeLessThanOrEqual(4);
-  await expect(page.locator('#cpVivo .cp-vivo-row').first()).toContainText('Equipo');
-
-  const href = await page.locator('#cpVivo a[data-cp-agendar]').first().getAttribute('href');
-  expect(href).toContain('https://calendar.google.com/calendar/render?action=TEMPLATE');
-  expect(href).toContain('text=');
-  expect(href).toContain('dates=');
-  // Cada fila agenda su propio evento (no un link repetido genérico).
-  const hrefs = await page.locator('#cpVivo a[data-cp-agendar]').evaluateAll(as => as.map(a => a.href));
-  expect(new Set(hrefs).size).toBe(hrefs.length);
+  // El catálogo real de MI PSA trae la agenda del Campus llena de
+  // "Reunión de Equipo" de equipos ajenos: son datos internos que no se
+  // publican. APPI no lista esa sección ni ofrece agendarlas.
+  const agenda = await page.evaluate(() => (window.APPICampusPSA.catalogo().vivo || []).length);
+  expect(agenda).toBeGreaterThan(0);
+  await expect(page.locator('#cpVivo')).toHaveCount(0);
+  await expect(page.locator('#campusCont')).not.toContainText('Próximos en vivo');
+  await expect(page.locator('#campusCont')).not.toContainText('Reunión de Equipo');
 });
 
 test('los audios se listan por playlist y la hoja de audio abre con su stream', async ({ page }) => {
