@@ -31,17 +31,17 @@ const json = (route, status, body) => route.fulfill({
   body: JSON.stringify(body)
 });
 
-const catalogoCargado = page => page.waitForFunction(
-  () => !!(window.APPICampusPSA && typeof window.APPICampusPSA.catalogo === 'function' && window.APPICampusPSA.catalogo()),
+const contenidoCargado = page => page.waitForFunction(
+  () => !!(window.APPICampusPSA && typeof window.APPICampusPSA.contenido === 'function' && window.APPICampusPSA.contenido()),
   null, { timeout: 15000 }
 );
 
 const cargarMock = async page => {
-  await page.route('https://mock.supabase.co/functions/v1/campus-catalogo', route => json(route, 200, { cat: CAT_MOCK }));
-  await catalogoCargado(page);
+  await page.route('https://mock.supabase.co/functions/v1/campus-contenido', route => json(route, 200, { cont: CAT_MOCK }));
+  await contenidoCargado(page);
   await page.evaluate(() => {
-    localStorage.removeItem('appi_campus_catalogo_v1');
-    return window.APPICampusPSA.reintentarCatalogo().then(c => !!(c && c.kits), () => false);
+    localStorage.removeItem('appi_campus_contenido_v1');
+    return window.APPICampusPSA.reintentarContenido().then(c => !!(c && c.kits), () => false);
   });
 };
 

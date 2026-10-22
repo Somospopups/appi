@@ -89,5 +89,9 @@ jobs:
       - name: Publicar consulta de seriales y garantías PSA
         run: supabase functions deploy consulta-serial --project-ref "$SUPABASE_PROJECT_ID"
 
-      - name: Publicar catálogo del Campus PSA por usuario
-        run: supabase functions deploy campus-catalogo --project-ref "$SUPABASE_PROJECT_ID"
+      - name: Publicar contenido del Campus PSA por usuario
+        run: supabase functions deploy campus-contenido --project-ref "$SUPABASE_PROJECT_ID"
+
+      - name: Retirar la función con el nombre anterior
+        continue-on-error: true
+        run: supabase functions delete campus-catalogo --project-ref "$SUPABASE_PROJECT_ID"

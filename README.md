@@ -4,6 +4,14 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v654 · Todo el Campus pasa a llamarse "contenido del Campus" y el Vivo se reproduce adentro de APPI
+
+- **Renombrado total de la capa Campus**: la palabra "catálogo" desaparece de la vista, el respaldo local, los eventos y los nombres internos — todo pasa a llamarse **contenido del Campus**. La clave de respaldo es `appi_campus_contenido_v1` (con migración automática en el dispositivo que todavía tenga la clave vieja: nadie pierde su copia), el evento es `appi-campus-contenido`, los métodos son `contenido()` / `cargarContenido()` / `estadoContenido()`, la función edge es `campus-contenido` y su respuesta trae `cont` en lugar de `cat`. La caché en la nube se escribe con la clave `contenido` y todavía **lee la clave vieja como respaldo**. El fixture de tests también cambió a `tests/e2e/fixtures/campus-contenido.json`. Los catálogos de productos PSA (lista de precios, stock, imágenes `catalogo-img/`) **no se tocan**: son otra cosa.
+- **El Vivo PSA se reproduce dentro de APPI**: el contenido del Campus ahora trae el player de la transmisión (`vivoPlayer`: embed de la plataforma o stream HLS del propio Campus, extraído de la página del vivo — **nunca la agenda de reuniones**, que sigue fuera desde v652). Cada tarjeta del vivo (en directo, replay del miércoles y "🎬 Vivos anteriores" hasta el próximo miércoles) suma un ▶ que abre el modal con el video **acá mismo, sin registrar avance y sin quiz**: es vivo, no una clase. Si todavía no hay player detectado, queda sólo el texto — **nunca un link al sitio**.
+- **Se van los links al sitio**: "Entrar al vivo ↗", "Entrar al vivo 🔴" y "Ver en Campus ↗" dejan de existir en las secciones del vivo.
+- Tests: los specs de Campus usan los nombres, rutas y claves nuevos (`campus-contenido`, `cont`, `appi_campus_contenido_v1`); `campus-vivo.spec.js` afirma el ▶ del vivo con `vivoPlayer` en el mock y `campus-vivo-audio.spec.js` sigue verificando que las reuniones internas no se muestren.
+- Versión: **v654 · Segura** → Cache `appi-v654-vivo-adentro`.
+
 ## v653 · La tarjeta de PB del Home suma los movimientos uno a uno, con racha y récord
 
 - **Feed de PB en la tarjeta del mazo**: la tarjeta ⭐ Producción del Equipo ahora lista los movimientos del día **uno a uno con hora** ("10:42 · Juan · +30 PB"), desde el mismo registro diario que alimenta los avisos "⚡ Juan sumó +X PB" (`appi_pb_mov_v1`) — así el Home refleja lo que fue pasando durante el día, no sólo un top 3 al cierre.

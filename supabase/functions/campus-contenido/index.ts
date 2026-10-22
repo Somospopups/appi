@@ -1,6 +1,6 @@
-// APPI · Catálogo del Campus PSA rastreado con la cuenta de cada usuario.
+// APPI · Contenido del Campus PSA rastreado con la cuenta de cada usuario.
 //
-// v644: el catálogo deja de vivir en campus-catalogo.json (que era de una
+// v644: el contenido deja de vivir en campus-contenido.json (que era de una
 // sola cuenta) y pasa a rastrearse ACÁ, con las credenciales MI PSA que el
 // usuario ya guardó en la app (sección MI PSA). El resultado se guarda en
 // la tabla compartida appi_campus_cache:
@@ -19,11 +19,11 @@
 // corresponden publicar en APPI. El Vivo PSA se ubica por fecha en el cliente.
 //
 // Si el rastreo no alcanza los mínimos o se corta, se devuelve la última
-// copia buena (stale) en vez de publicar un catálogo roto.
+// copia buena (stale) en vez de publicar un contenido roto.
 //
-// POST /functions/v1/campus-catalogo
+// POST /functions/v1/campus-contenido
 // body: { center: "02", number: "98020174", password: "..." }
-// resp: { ok, cat, actualizado, cached, stale?, aviso? }
+// resp: { ok, cont, actualizado, cached, stale?, aviso? }
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.8';
 
@@ -39,8 +39,11 @@ const UA = 'Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 (KHTML, like Geck
 const MI = 'https://mi.psa.com.ar';
 const CAMPUS = 'https://campus.psa.com.ar';
 
-const CLAVE_CACHE = 'catalogo';
-const TTL_OK_MS = 12 * 3600 * 1000;      // catálogo completo: 12 horas
+const CLAVE_CACHE = 'contenido';
+// v654: la clave de la caché pasó a llamarse "contenido"; mientras exista
+// caché escrita con el nombre anterior todavía se lee como respaldo.
+const CLAVE_CACHE_VIEJA = 'catalogo';
+const TTL_OK_MS = 12 * 3600 * 1000;      // contenido completo: 12 horas
 const TTL_PEND_MS = 5 * 60 * 1000;       // le faltan streams/secciones: 5 minutos
 const DEADLINE_MS = 70_000;              // techo del rastreo dentro de una invocación
 const MIN_CLASES = 50;
@@ -242,6 +245,25 @@ function parseVideo(html: string): string | null {
   return m2 ? m2[2] : null;
 }
 
+/* v654: el player de la transmisión del Vivo PSA, sea cual sea la
+   plataforma: iframe embebido (YouTube/Vimeo) o stream HLS del propio
+   Campus. Sólo se extrae el player — nunca la agenda de reuniones. */
+function parseVivoPlayer(html: string): { embed?: string; hls?: string } {
+  const re = /<iframe[^>]*\ssrc=["']([^"']+)["']/gi;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(html))) {
+    const src = m[1];
+    if (/youtube\.com\/(embed|live)|youtu\.be\/|player\.vimeo\.com|vimeo\.com\/video/i.test(src)) {
+      return { embed: src.startsWith('//') ? 'https:' + src : src };
+    }
+  }
+  const v = parseVideo(html);
+  if (v) return { hls: 'https://psavod-ns.akamaized.net/delivery/Campus/Videos/HLS/' + v + '/playlist.m3u8' };
+  const mv = /<video[^>]*\ssrc=["']([^"']+\.m3u8[^"']*)["']/i.exec(html);
+  if (mv) return { hls: mv[1].startsWith('//') ? 'https:' + mv[1] : mv[1] };
+  return {};
+}
+
 function parseAudios(html: string): { titulo: string; audioId: number; stream: string }[] {
   const audios: { titulo: string; audioId: number; stream: string }[] = [];
   const re = /data-title="([^"]*)"[\s\S]{0,900}?data-audio-id="(\d+)"[\s\S]{0,900}?Audios\/HLS\/(A_\d+)\/playlist\.m3u8/g;
@@ -280,11 +302,11 @@ async function pool<T, R>(items: T[], limit: number, fn: (item: T, idx: number) 
   return out;
 }
 
-/** Mapa url→stream del catálogo anterior (sólo se resuelven los nuevos). */
-function streamsAnteriores(catAnterior: unknown): Map<string, string> {
+/** Mapa url→stream del contenido anterior (sólo se resuelven los nuevos). */
+function streamsAnteriores(contAnterior: unknown): Map<string, string> {
   const mapa = new Map<string, string>();
-  const cat = catAnterior as { kits?: { secciones?: { clases?: { url?: string; stream?: string }[] }[] }[] } | null;
-  for (const k of cat?.kits || []) for (const s of k.secciones || []) for (const c of s.clases || []) {
+  const cont = contAnterior as { kits?: { secciones?: { clases?: { url?: string; stream?: string }[] }[] }[] } | null;
+  for (const k of cont?.kits || []) for (const s of k.secciones || []) for (const c of s.clases || []) {
     if (c.url && c.stream) mapa.set(c.url, c.stream);
   }
   return mapa;
@@ -298,19 +320,19 @@ function statsDe(kits: any[], listas: any[]) {
   return { kits: kits.length, secciones, clases, conStream, playlists: listas.length, audios };
 }
 
-function completo(cat: any): boolean {
-  const s = cat && cat.stats;
+function completo(cont: any): boolean {
+  const s = cont && cont.stats;
   return !!(s && s.secciones >= MIN_SECCIONES && s.conStream >= s.clases);
 }
 
-function valido(cat: any): boolean {
-  const s = cat && cat.stats;
+function valido(cont: any): boolean {
+  const s = cont && cont.stats;
   return !!(s && s.clases >= MIN_CLASES && s.audios >= MIN_AUDIOS && s.playlists >= MIN_PLAYLISTS);
 }
 
-async function rastrear(jar: Jar, catAnterior: unknown, hasta: number): Promise<{ cat: any; motivos: string[] }> {
+async function rastrear(jar: Jar, contAnterior: unknown, hasta: number): Promise<{ cont: any; motivos: string[] }> {
   const motivos: string[] = [];
-  const anterior = streamsAnteriores(catAnterior);
+  const anterior = streamsAnteriores(contAnterior);
 
   // 1) Kits (páginas de índice)
   const kitsBase = await pool(KITS, 3, async (kit) => {
@@ -409,20 +431,32 @@ async function rastrear(jar: Jar, catAnterior: unknown, hasta: number): Promise<
     }
   } catch (_) { /* sin biblioteca sigue el resto */ }
 
-  const cat = {
+  // 5) v654: el player de la transmisión (Vivo PSA) para reproducirlo dentro
+  // de APPI. Se busca en la página del vivo y, si no está, en la home del
+  // Campus. Sólo el player: la agenda de reuniones no se rastrea (v652).
+  let vivoPlayer: { embed?: string; hls?: string } = {};
+  try {
+    vivoPlayer = parseVivoPlayer(await getText(jar, CAMPUS + '/clases-en-vivo'));
+    if (!vivoPlayer.embed && !vivoPlayer.hls) {
+      vivoPlayer = parseVivoPlayer(await getText(jar, CAMPUS + '/'));
+    }
+  } catch (_) { /* sin player el contenido sigue sin vivo */ }
+
+  const cont = {
     version: 1,
     generado: new Date().toISOString(),
     fuente: 'campus.psa.com.ar',
     kits,
     playlists: listas,
+    vivoPlayer,
     stats: statsDe(kits, listas),
   };
-  if (!valido(cat)) {
-    if (cat.stats.clases < MIN_CLASES) motivos.push(`sólo ${cat.stats.clases} clases`);
-    if (cat.stats.audios < MIN_AUDIOS) motivos.push(`sólo ${cat.stats.audios} audios`);
-    if (cat.stats.playlists < MIN_PLAYLISTS) motivos.push(`sólo ${cat.stats.playlists} playlists`);
+  if (!valido(cont)) {
+    if (cont.stats.clases < MIN_CLASES) motivos.push(`sólo ${cont.stats.clases} clases`);
+    if (cont.stats.audios < MIN_AUDIOS) motivos.push(`sólo ${cont.stats.audios} audios`);
+    if (cont.stats.playlists < MIN_PLAYLISTS) motivos.push(`sólo ${cont.stats.playlists} playlists`);
   }
-  return { cat, motivos };
+  return { cont, motivos };
 }
 
 /* ---------- handler ---------- */
@@ -459,18 +493,22 @@ Deno.serve(async (req) => {
     return json({ error: 'Faltan tus datos de MI PSA. Cargalos en APPI (Ajustes → MI PSA) para armar tu Campus.' }, 400);
   }
 
-  // Caché compartida en la nube
-  let catPrev: any = null;
+  // Caché compartida en la nube (con respaldo a la clave anterior)
+  let contPrev: any = null;
   let actualizadoPrev: string | null = null;
   try {
-    const { data } = await supabase.from('appi_campus_cache').select('json, actualizado').eq('clave', CLAVE_CACHE).maybeSingle();
-    if (data && data.json) { catPrev = data.json; actualizadoPrev = data.actualizado; }
+    let { data } = await supabase.from('appi_campus_cache').select('json, actualizado').eq('clave', CLAVE_CACHE).maybeSingle();
+    if ((!data || !data.json)) {
+      const legacy = await supabase.from('appi_campus_cache').select('json, actualizado').eq('clave', CLAVE_CACHE_VIEJA).maybeSingle();
+      if (legacy.data && legacy.data.json) data = legacy.data;
+    }
+    if (data && data.json) { contPrev = data.json; actualizadoPrev = data.actualizado; }
   } catch (_) { /* sin caché se rastrea igual */ }
 
-  if (catPrev && actualizadoPrev) {
-    const ttl = completo(catPrev) ? TTL_OK_MS : TTL_PEND_MS;
+  if (contPrev && actualizadoPrev) {
+    const ttl = completo(contPrev) ? TTL_OK_MS : TTL_PEND_MS;
     if (Date.now() - Date.parse(actualizadoPrev) < ttl) {
-      return json({ ok: true, cat: catPrev, actualizado: actualizadoPrev, cached: true });
+      return json({ ok: true, cont: contPrev, actualizado: actualizadoPrev, cached: true });
     }
   }
 
@@ -486,19 +524,19 @@ Deno.serve(async (req) => {
     catch (_) { ssoOk = false; }
     if (!ssoOk) return json({ error: 'La sesión no habilitó el Campus PSA para este distribuidor.' }, 502);
 
-    const { cat, motivos } = await rastrear(jar, catPrev, Date.now() + DEADLINE_MS);
+    const { cont, motivos } = await rastrear(jar, contPrev, Date.now() + DEADLINE_MS);
 
-    if (valido(cat)) {
+    if (valido(cont)) {
       const actualizado = new Date().toISOString();
       try {
-        await supabase.from('appi_campus_cache').upsert({ clave: CLAVE_CACHE, json: cat, actualizado }, { onConflict: 'clave' });
-      } catch (_) { /* aunque no se pueda guardar, el catálogo sirve */ }
-      return json({ ok: true, cat, actualizado, cached: false });
+        await supabase.from('appi_campus_cache').upsert({ clave: CLAVE_CACHE, json: cont, actualizado }, { onConflict: 'clave' });
+      } catch (_) { /* aunque no se pueda guardar, el contenido sirve */ }
+      return json({ ok: true, cont, actualizado, cached: false });
     }
-    if (catPrev) return json({ ok: true, cat: catPrev, actualizado: actualizadoPrev, cached: true, stale: true, aviso: 'Rastreo incompleto: ' + motivos.join('; ') });
+    if (contPrev) return json({ ok: true, cont: contPrev, actualizado: actualizadoPrev, cached: true, stale: true, aviso: 'Rastreo incompleto: ' + motivos.join('; ') });
     return json({ error: 'El rastreo del Campus no alcanzó los mínimos: ' + motivos.join('; ') }, 502);
   } catch (e) {
-    if (catPrev) return json({ ok: true, cat: catPrev, actualizado: actualizadoPrev, cached: true, stale: true });
+    if (contPrev) return json({ ok: true, cont: contPrev, actualizado: actualizadoPrev, cached: true, stale: true });
     return json({ error: 'No se pudo rastrear el Campus ahora: ' + String((e as any)?.message || e) }, 502);
   }
 });

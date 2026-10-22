@@ -6,6 +6,8 @@ const { entrar } = require('./helpers/app-entrar.js');
 // con su previa y, cuando ya pasó, muestra la sección de replay.
 // v648 · El último vivo queda en la sección "Vivos anteriores" del Campus
 // toda la semana (hasta el próximo miércoles), no sólo la noche del vivo.
+// v654 · El player de la transmisión viene en el contenido (vivoPlayer) y el
+// vivo se reproduce adentro de APPI: los links al sitio dejaron de existir.
 
 const MIERCOLES_14 = new Date(2026, 9, 21, 14, 0, 0); // mié 21/10 14:00 (antes del vivo)
 const MIERCOLES_1530 = new Date(2026, 9, 21, 15, 30, 0); // en vivo
@@ -28,7 +30,8 @@ const CAT_MOCK = {
     { titulo: 'LA PREVIA DEL VIVO 21/10 | Tema de prueba', audioId: 999, stream: 'A_99999' },
     { titulo: 'LA PREVIA DEL VIVO 28/10 | Tema siguiente', audioId: 1000, stream: 'A_88888' }
   ] }],
-  vivo: [{ equipo: 'Equipo Mock', titulo: 'Reunión de Equipo', inicio: '30-06 15:00', fin: '30-06 16:00' }]
+  vivo: [{ equipo: 'Equipo Mock', titulo: 'Reunión de Equipo', inicio: '30-06 15:00', fin: '30-06 16:00' }],
+  vivoPlayer: { embed: 'https://www.youtube-nocookie.com/embed/live_MOCK21?rel=0' }
 };
 
 const json = (route, status, body) => route.fulfill({
@@ -37,25 +40,25 @@ const json = (route, status, body) => route.fulfill({
   body: JSON.stringify(body)
 });
 
-const catalogoCargado = page => page.waitForFunction(
-  () => !!(window.APPICampusPSA && typeof window.APPICampusPSA.catalogo === 'function' && window.APPICampusPSA.catalogo()),
+const contenidoCargado = page => page.waitForFunction(
+  () => !!(window.APPICampusPSA && typeof window.APPICampusPSA.contenido === 'function' && window.APPICampusPSA.contenido()),
   null, { timeout: 15000 }
 );
 
 // Con copia local el refresco es en 2º plano: se limpia y se reintenta para
-// que el catálogo mock (con las previas del 21/10 y 28/10) sea el activo.
-const activarCatalogoMock = async page => {
-  await page.route('https://mock.supabase.co/functions/v1/campus-catalogo', route => json(route, 200, { cat: CAT_MOCK }));
-  await catalogoCargado(page);
+// que el contenido mock (con las previas del 21/10 y 28/10) sea el activo.
+const activarContenidoMock = async page => {
+  await page.route('https://mock.supabase.co/functions/v1/campus-contenido', route => json(route, 200, { cont: CAT_MOCK }));
+  await contenidoCargado(page);
   await page.evaluate(() => {
-    localStorage.removeItem('appi_campus_catalogo_v1');
-    return window.APPICampusPSA.reintentarCatalogo().then(c => !!(c && c.kits), () => false);
+    localStorage.removeItem('appi_campus_contenido_v1');
+    return window.APPICampusPSA.reintentarContenido().then(c => !!(c && c.kits), () => false);
   });
 };
 
 test('la lógica del Vivo PSA ubica hoy, en vivo, replay y próximo según el día y la hora', async ({ page }) => {
   await entrar(page);
-  await catalogoCargado(page);
+  await contenidoCargado(page);
 
   const estados = await page.evaluate((fechas) => {
     const f = s => new Date(s);
@@ -82,7 +85,7 @@ test('la lógica del Vivo PSA ubica hoy, en vivo, replay y próximo según el d�
 
 test('v648: el último vivo es el miércoles ya terminado y dura toda la semana', async ({ page }) => {
   await entrar(page);
-  await catalogoCargado(page);
+  await contenidoCargado(page);
 
   const ultimos = await page.evaluate((fechas) => {
     const f = s => new Date(s);
@@ -122,11 +125,11 @@ test('v648: el último vivo es el miércoles ya terminado y dura toda la semana'
 
 test('la previa del vivo se elige por la fecha del vivo, con respaldo al audio más reciente', async ({ page }) => {
   await entrar(page);
-  await page.route('https://mock.supabase.co/functions/v1/campus-catalogo', route => json(route, 200, { cat: CAT_MOCK }));
-  await catalogoCargado(page);
+  await page.route('https://mock.supabase.co/functions/v1/campus-contenido', route => json(route, 200, { cont: CAT_MOCK }));
+  await contenidoCargado(page);
   await page.evaluate(() => {
-    localStorage.removeItem('appi_campus_catalogo_v1');
-    return window.APPICampusPSA.reintentarCatalogo().then(c => !!(c && c.kits), () => false);
+    localStorage.removeItem('appi_campus_contenido_v1');
+    return window.APPICampusPSA.reintentarContenido().then(c => !!(c && c.kits), () => false);
   });
 
   const r = await page.evaluate(() => {
@@ -153,15 +156,15 @@ test('la previa del vivo se elige por la fecha del vivo, con respaldo al audio m
   expect(r.sinExactaEstricta, 'sin previa de esa fecha no inventa otra').toBe(true);
 });
 
-test('el miércoles antes del vivo: tarjeta en el mazo y sección en Campus con previa y Entrar al vivo', async ({ page }) => {
+test('el miércoles antes del vivo: tarjeta en el mazo, sección con previa y sin link al sitio', async ({ page }) => {
   await entrar(page);
-  await page.route('https://mock.supabase.co/functions/v1/campus-catalogo', route => json(route, 200, { cat: CAT_MOCK }));
-  await catalogoCargado(page);
+  await page.route('https://mock.supabase.co/functions/v1/campus-contenido', route => json(route, 200, { cont: CAT_MOCK }));
+  await contenidoCargado(page);
   // Con copia local el refresco es en 2º plano: se limpia y se reintenta para
-  // que el catálogo de la nube (con la previa del 21/10) pase a ser el activo.
+  // que el contenido de la nube (con la previa del 21/10) pase a ser el activo.
   await page.evaluate(() => {
-    localStorage.removeItem('appi_campus_catalogo_v1');
-    return window.APPICampusPSA.reintentarCatalogo().then(c => !!(c && c.kits), () => false);
+    localStorage.removeItem('appi_campus_contenido_v1');
+    return window.APPICampusPSA.reintentarContenido().then(c => !!(c && c.kits), () => false);
   });
 
   await page.clock.setFixedTime(MIERCOLES_14);
@@ -181,25 +184,28 @@ test('el miércoles antes del vivo: tarjeta en el mazo y sección en Campus con 
   await expect(seccion).toBeVisible();
   await expect(seccion).toContainText('Hoy 15:00 · Vivo PSA');
   await expect(seccion.locator('.cp-vpsa-play')).toContainText('21/10');
-  await expect(seccion.locator('.cp-vpsa-go')).toContainText('Entrar al vivo');
+  await expect(seccion, 'antes del vivo sólo avisa: sin link al sitio').toContainText('El vivo arranca a las 15:00');
+  await expect(seccion.locator('.cp-vpsa-go')).toHaveCount(0);
 
   // v648: el vivo anterior (14/10) sigue a mano en Vivos anteriores. Como el
-  // mock no trae la previa del 14/10, no le inventa la de hoy: va sin ▶.
+  // mock no trae la previa del 14/10, no le inventa la de hoy: va sin ▶ de
+  // previa — pero su▶ "Ver el vivo" está (v654: el player viene en el contenido).
   const anterior = page.locator('#campusCont [data-cp-vpsa="ultimo"]');
   await expect(anterior).toBeVisible();
   await expect(anterior).toHaveAttribute('data-cp-ultimo-vivo', '2026-10-14');
   await expect(anterior).toContainText('Último Vivo PSA');
-  await expect(anterior.locator('.cp-vpsa-play')).toHaveCount(0);
-  await expect(anterior.locator('.cp-vpsa-go')).toContainText('Ver en Campus');
+  await expect(anterior.locator('.cp-vpsa-play')).toHaveCount(1);
+  await expect(anterior.locator('.cp-vpsa-play')).toContainText('Ver el vivo');
+  await expect(anterior.locator('.cp-vpsa-go')).toHaveCount(0);
 });
 
 test('en vivo ahora la sección invita a entrar en directo; al pasar el vivo muestra el replay', async ({ page }) => {
   await entrar(page);
-  await page.route('https://mock.supabase.co/functions/v1/campus-catalogo', route => json(route, 200, { cat: CAT_MOCK }));
-  await catalogoCargado(page);
+  await page.route('https://mock.supabase.co/functions/v1/campus-contenido', route => json(route, 200, { cont: CAT_MOCK }));
+  await contenidoCargado(page);
   await page.evaluate(() => {
-    localStorage.removeItem('appi_campus_catalogo_v1');
-    return window.APPICampusPSA.reintentarCatalogo().then(c => !!(c && c.kits), () => false);
+    localStorage.removeItem('appi_campus_contenido_v1');
+    return window.APPICampusPSA.reintentarContenido().then(c => !!(c && c.kits), () => false);
   });
 
   await page.clock.setFixedTime(MIERCOLES_1530);
@@ -207,19 +213,28 @@ test('en vivo ahora la sección invita a entrar en directo; al pasar el vivo mue
   const enVivo = page.locator('#campusCont [data-cp-vpsa="vivo"]');
   await expect(enVivo).toBeVisible();
   await expect(enVivo).toContainText('En vivo ahora');
-  await expect(enVivo.locator('.cp-vpsa-go')).toContainText('Entrar al vivo');
+  // v654: en directo el▶ abre el player acá mismo; el link al sitio no existe.
+  await expect(enVivo.locator('.cp-vpsa-play')).toContainText('Ver el vivo ahora');
+  await expect(enVivo.locator('.cp-vpsa-go')).toHaveCount(0);
+  await page.route('**/*youtube*', r => r.abort());
+  await enVivo.locator('.cp-vpsa-play').click();
+  await expect(page.locator('.cp-vivo-frame iframe')).toBeVisible();
+  await page.locator('#cpVivoClose').click();
+  await expect(page.locator('#campusPsaOverlay')).not.toHaveClass(/open/);
+  await expect(page.locator('.cp-vivo-frame iframe')).not.toBeVisible();
 
   await page.clock.setFixedTime(MIERCOLES_17);
   await page.evaluate(() => window.APPICampusPSA.render());
   const replay = page.locator('#campusCont [data-cp-vpsa="pasado"]');
   await expect(replay).toBeVisible();
   await expect(replay).toContainText('El Vivo de hoy ya está disponible');
-  await expect(replay.locator('.cp-vpsa-go')).toContainText('Ver en Campus');
+  await expect(replay.locator('.cp-vpsa-play').filter({ hasText: 'Ver el vivo' })).toHaveCount(1);
+  await expect(replay.locator('.cp-vpsa-go')).toHaveCount(0);
 });
 
 test('v648: del jueves al martes el Campus conserva el último vivo para verlo cuando quieras', async ({ page }) => {
   await entrar(page);
-  await activarCatalogoMock(page);
+  await activarContenidoMock(page);
 
   await page.clock.setFixedTime(JUEVES);
   await page.evaluate(() => window.openCampusPSA());
@@ -233,14 +248,14 @@ test('v648: del jueves al martes el Campus conserva el último vivo para verlo c
   await expect(ultimo).toBeVisible();
   await expect(ultimo).toHaveAttribute('data-cp-ultimo-vivo', '2026-10-21');
   await expect(ultimo).toContainText('Último Vivo PSA');
-  await expect(ultimo).toContainText('mirala cuando quieras');
+  await expect(ultimo, 'v654: el player está en el contenido, sin link al sitio').toContainText('se reproduce acá mismo');
   await expect(ultimo).toHaveAttribute('data-cp-replay-stream', 'A_99999');
-  await expect(ultimo.locator('.cp-vpsa-go')).toContainText('Ver en Campus');
-  await expect(ultimo.locator('.cp-vpsa-go')).toHaveAttribute('href', 'https://campus.psa.com.ar/clases-en-vivo');
+  await expect(ultimo.locator('.cp-vpsa-play').filter({ hasText: 'Ver el vivo' })).toHaveCount(1);
+  await expect(ultimo.locator('.cp-vpsa-go')).toHaveCount(0);
 
-  // El ▶ del último vivo abre SU previa (21/10), no la del próximo (28/10):
-  // cada botón se cablea con los datos de su propia tarjeta.
-  await ultimo.locator('.cp-vpsa-play').click();
+  // El▶ de la previa del último vivo abre SU fecha (21/10), no la del próximo
+  // (28/10): cada botón se cablea con los datos de su propia tarjeta.
+  await ultimo.locator('.cp-vpsa-play').filter({ hasText: 'Escuchar previa' }).click();
   await expect(page.locator('#cpClassTitle')).toBeVisible();
   await expect(page.locator('#cpClassTitle')).toContainText('21/10');
   await page.locator('#cpClassBack').click();
@@ -261,7 +276,7 @@ test('v648: del jueves al martes el Campus conserva el último vivo para verlo c
 
 test('v649: repintar el Campus sin cambios no reemplaza el DOM (sin parpadeo)', async ({ page }) => {
   await entrar(page);
-  await activarCatalogoMock(page);
+  await activarContenidoMock(page);
 
   await page.clock.setFixedTime(JUEVES);
   await page.evaluate(() => window.openCampusPSA());

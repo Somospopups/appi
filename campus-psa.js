@@ -119,16 +119,26 @@
     return { total:BASE_ACCIONES, hechas:0, noHechas:0, pendientes:BASE_ACCIONES };
   }
 
-  /* ---------- Catálogo real del Campus (v640 · v644) ----------
-     El catálogo sale de la edge campus-catalogo con las credenciales MI PSA
+  /* ---------- Contenido real del Campus (v640 · v644) ----------
+     El contenido del Campus sale de la edge campus-contenido con las credenciales MI PSA
      de CADA usuario (caché compartida en la nube, refrescada por quien
      primero la pida). Sin cuenta MI PSA no hay rastreo propio: se usa la
      última copia (respaldo local) y aparece el aviso para cargarla. La
      clave del respaldo NO sincroniza: es artefacto de red, no dato. */
-  var CATALOGO_LOCAL = 'appi_campus_catalogo_v1';
-  var catalogoMem = null;
-  var catalogoPidiendo = null;
-  var catalogoEstado = null; // null | 'cargando' | 'ok' | 'sinCuenta' | 'error'
+  var CONTENIDO_LOCAL = 'appi_campus_contenido_v1';
+  // v654: la clave se renombró (antes se llamaba como el término que ya no
+  // usamos). Si el dispositivo todavía tiene la copia vieja, se migra acá
+  // mismo: nadie pierde su contenido guardado del Campus.
+  try {
+    var _claveVieja = localStorage.getItem('appi_campus_catalogo_v1');
+    if (_claveVieja && !localStorage.getItem(CONTENIDO_LOCAL)){
+      localStorage.setItem(CONTENIDO_LOCAL, _claveVieja);
+    }
+    if (_claveVieja) localStorage.removeItem('appi_campus_catalogo_v1');
+  } catch(e){}
+  var contenidoMem = null;
+  var contenidoPidiendo = null;
+  var contenidoEstado = null; // null | 'cargando' | 'ok' | 'sinCuenta' | 'error'
 
   function credsCampus(){
     try { return (typeof window.psaGetCreds === 'function') ? window.psaGetCreds() : null; } catch(e){ return null; }
@@ -150,11 +160,11 @@
     } catch(e){}
     return { url: cfg.url, anonKey: cfg.anonKey, token: token };
   }
-  function catalogoValido(cat){ return !!(cat && cat.kits && cat.kits.length); }
-  function respaldoCatalogo(maxDias){
+  function contenidoValido(cont){ return !!(cont && cont.kits && cont.kits.length); }
+  function respaldoContenido(maxDias){
     try {
-      var prev = JSON.parse(localStorage.getItem(CATALOGO_LOCAL) || 'null');
-      if (!catalogoValido(prev)) return null;
+      var prev = JSON.parse(localStorage.getItem(CONTENIDO_LOCAL) || 'null');
+      if (!contenidoValido(prev)) return null;
       if (maxDias && prev.generado){
         var t = Date.parse(prev.generado);
         if (t && Date.now() - t > maxDias * 86400000) return null;
@@ -162,43 +172,43 @@
       return prev;
     } catch(e){ return null; }
   }
-  function guardarCatalogo(cat){
-    catalogoMem = cat;
-    try { localStorage.setItem(CATALOGO_LOCAL, JSON.stringify(cat)); } catch(e){}
+  function guardarContenido(cont){
+    contenidoMem = cont;
+    try { localStorage.setItem(CONTENIDO_LOCAL, JSON.stringify(cont)); } catch(e){}
   }
   function fijarEstado(estado){
-    if (catalogoEstado === estado) return;
-    catalogoEstado = estado;
+    if (contenidoEstado === estado) return;
+    contenidoEstado = estado;
     try {
       window.dispatchEvent(new CustomEvent('appi-campus-estado', { detail: { estado: estado } }));
     } catch(e){}
   }
-  function pedirCatalogoNube(){
+  function pedirContenidoNube(){
     var cfg = nubeCfg();
     var c = credsCampus();
     if (!cfg || !c) return Promise.reject(new Error('sin cuenta MI PSA'));
-    return fetch(cfg.url + '/functions/v1/campus-catalogo', {
+    return fetch(cfg.url + '/functions/v1/campus-contenido', {
       method: 'POST',
       headers: { 'Content-Type':'application/json', 'apikey': cfg.anonKey, 'Authorization': 'Bearer ' + (cfg.token || cfg.anonKey) },
       body: JSON.stringify({ center: c.center, number: c.number, password: c.password })
     }).then(function(r){ return r.json(); }).then(function(j){
-      if (!j || j.error || !catalogoValido(j.cat)) throw new Error((j && j.error) || 'catálogo inválido');
-      return j.cat;
+      if (!j || j.error || !contenidoValido(j.cont)) throw new Error((j && j.error) || 'contenido del Campus inválido');
+      return j.cont;
     });
   }
   /** Refresco en segundo plano: la pantalla ya muestra la última copia. */
   function refrescarNube(){
-    pedirCatalogoNube().then(function(cat){
-      guardarCatalogo(cat);
+    pedirContenidoNube().then(function(cont){
+      guardarContenido(cont);
       fijarEstado('ok');
-      try { window.dispatchEvent(new Event('appi-campus-catalogo')); } catch(e){}
+      try { window.dispatchEvent(new Event('appi-campus-contenido')); } catch(e){}
     }).catch(function(){
       fijarEstado('error');
     });
   }
-  function cargarCatalogo(){
-    if (catalogoMem) return Promise.resolve(catalogoMem);
-    if (catalogoPidiendo) return catalogoPidiendo;
+  function cargarContenido(){
+    if (contenidoMem) return Promise.resolve(contenidoMem);
+    if (contenidoPidiendo) return contenidoPidiendo;
     // v644: este módulo se carga en el <head> y el script de credenciales
     // (psaGetCreds) es inline, más abajo en el body. Si se decide "sin cuenta"
     // antes de que exista, el estado queda mentido para toda la sesión:
@@ -206,43 +216,43 @@
     if (typeof window.psaGetCreds !== 'function' && document.readyState !== 'complete'){
       return new Promise(function(res, rej){
         window.addEventListener('load', function(){
-          setTimeout(function(){ cargarCatalogo().then(res, rej); }, 0);
+          setTimeout(function(){ cargarContenido().then(res, rej); }, 0);
         });
       });
     }
     var conCuenta = tieneCuentaCampus();
     if (!conCuenta) fijarEstado('sinCuenta');
     else fijarEstado('cargando');
-    var local = respaldoCatalogo(7);
+    var local = respaldoContenido(7);
     if (local){
-      guardarCatalogo(local);
+      guardarContenido(local);
       if (conCuenta) refrescarNube();
-      catalogoPidiendo = Promise.resolve(local);
-      return catalogoPidiendo;
+      contenidoPidiendo = Promise.resolve(local);
+      return contenidoPidiendo;
     }
     // Sin copia local: la nube de tu cuenta MI PSA es el único camino.
     // v647: se retiró el JSON de respaldo del repo (volcado de una cuenta fija).
-    catalogoPidiendo = (conCuenta ? pedirCatalogoNube() : Promise.reject(new Error('sin cuenta MI PSA')))
-      .then(function(cat){
-        guardarCatalogo(cat);
+    contenidoPidiendo = (conCuenta ? pedirContenidoNube() : Promise.reject(new Error('sin cuenta MI PSA')))
+      .then(function(cont){
+        guardarContenido(cont);
         fijarEstado('ok');
-        return cat;
+        return cont;
       })
       .catch(function(){
         fijarEstado(conCuenta ? 'error' : 'sinCuenta');
-        throw new Error('No hay catálogo del Campus disponible.');
+        throw new Error('No hay contenido del Campus disponible.');
       })
-      .then(function(cat){ catalogoPidiendo = null; return cat; },
-            function(e){ catalogoPidiendo = null; throw e; });
-    return catalogoPidiendo;
+      .then(function(cont){ contenidoPidiendo = null; return cont; },
+            function(e){ contenidoPidiendo = null; throw e; });
+    return contenidoPidiendo;
   }
-  function reintentarCatalogo(){
-    catalogoMem = null;
-    catalogoPidiendo = null;
-    catalogoEstado = null;
-    return cargarCatalogo();
+  function reintentarContenido(){
+    contenidoMem = null;
+    contenidoPidiendo = null;
+    contenidoEstado = null;
+    return cargarContenido();
   }
-  function catalogo(){ return catalogoMem; }
+  function contenido(){ return contenidoMem; }
   function norm(s){
     return String(s == null ? '' : s).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('es-AR');
   }
@@ -251,12 +261,12 @@
     return m ? (+m[1]) * 60 + (+m[2]) : 9999;
   }
 
-  /** Todas las clases del catálogo aplanadas, con su área y sección. */
+  /** Todas las clases del contenido del Campus aplanadas, con su área y sección. */
   function aplanarClases(){
     var out = [];
-    var cat = catalogoMem;
-    if (!cat) return out;
-    (cat.kits || []).forEach(function(kit){
+    var cont = contenidoMem;
+    if (!cont) return out;
+    (cont.kits || []).forEach(function(kit){
       (kit.secciones || []).forEach(function(sec){
         (sec.clases || []).forEach(function(clase){
           out.push({
@@ -537,7 +547,7 @@
     var chip = document.getElementById('cpClassState');
     if (chip){ chip.classList.add('ok'); chip.textContent = '✓ vista'; }
   }
-  function cablearReproductor(mediaEl, url, id, tipo){
+  function cablearReproductor(mediaEl, url, id, tipo, libre){
     soltarReproductor();
     reproductor.media = mediaEl;
     reproductor.id = id;
@@ -545,6 +555,8 @@
     var ultimoGuardado = 0;
     mediaEl.addEventListener('timeupdate', function(){
       try {
+        // v654: el Vivo se reproduce libre — no se guarda avance ni se marca.
+        if (libre) return;
         if (!mediaEl.duration || !isFinite(mediaEl.duration)) return;
         var pct = (mediaEl.currentTime / mediaEl.duration) * 100;
         if (pct >= 90 && ultimoGuardado < 90){
@@ -562,6 +574,7 @@
       } catch(e){}
     });
     mediaEl.addEventListener('ended', function(){
+      if (libre) return;
       try { marcarVisto(id, 100, tipo); } catch(e){}
       marcarHechoUI();
       ofrecerPostVideo(id, tipo);
@@ -699,6 +712,8 @@
       '.cp-vpsa-play{width:100%;min-height:40px;border:0;border-radius:12px;background:linear-gradient(135deg,#e14b3a,#c2372a);color:#fff;font:inherit;font-size:12px;font-weight:1000;cursor:pointer;box-shadow:0 3px 0 #9c2b20}',
       '.cp-vpsa-play:active{transform:translateY(2px);box-shadow:0 1px 0 #9c2b20}',
       '.cp-vpsa-replay .cp-vpsa-play{background:linear-gradient(135deg,#4f7fe8,#6f9dff);box-shadow:0 3px 0 #3a62bd}',
+      '.cp-vivo-frame{position:relative;width:100%;padding-top:56.25%;border-radius:14px;overflow:hidden;background:#000;margin-top:6px}',
+      '.cp-vivo-frame iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0}',
       '.cp-vpsa-btns{display:flex;gap:8px;margin-top:11px;flex-wrap:wrap}',
       '.cp-vpsa-go{flex:1;min-width:120px;min-height:40px;display:grid;place-items:center;padding:0 12px;border-radius:12px;background:linear-gradient(135deg,#5b8def,#3ad0a4);color:#062033;font-size:12px;font-weight:1000;text-decoration:none;box-shadow:0 3px 0 #2f8f7a}',
       '.dark .cp-vpsa{background:linear-gradient(150deg,#3a2626,#2a2326);border-color:#8a4a44}.dark .cp-vpsa p{color:#d8c4c2}.dark .cp-vpsa-t{color:#ffb0a8}.dark .cp-vpsa-replay{background:linear-gradient(150deg,#243046,#20263a);border-color:#4a5e8a}.dark .cp-vpsa-replay .cp-vpsa-t{color:#a8c4ff}',
@@ -863,7 +878,7 @@
 
   /* ---------- Vivo PSA semanal (v645) ----------
      El Vivo PSA se transmite todos los miércoles a las 15:00 (ART) en el
-     Campus. La agenda del catálogo trae las reuniones de equipo, no el vivo
+     Campus. La agenda de reuniones del Campus trae las de equipo, no el vivo
      general, así que APPI lo ubica por fecha. La previa se publica como audio
      (playlist "La Previa del VIVO") con la fecha del vivo. */
   function proximoVivoPsaRef(now){
@@ -895,7 +910,7 @@
      previa más reciente, porque esa puede ser ya la del próximo vivo. */
   function audioPreviaVivo(fecha, soloExacta){
     try {
-      var listas = (catalogoMem && catalogoMem.playlists) || [];
+      var listas = (contenidoMem && contenidoMem.playlists) || [];
       var mejor = null, maxId = -1;
       for (var i = 0; i < listas.length; i++){
         var audios = listas[i].audios || [];
@@ -912,18 +927,67 @@
       return soloExacta ? null : mejor;
     } catch(e){ return null; }
   }
+  /* ---------- Vivo dentro de APPI (v654) ----------
+     El contenido del Campus trae el player de la transmisión (embed de la
+     plataforma o stream HLS del propio Campus). APPI lo reproduce acá mismo:
+     en el directo y, una vez terminado cada miércoles, hasta el próximo.
+     Nunca link al sitio del Campus: si no hay player, sólo queda el texto. */
+  function vivoPlayerDe(){
+    try {
+      var vp = contenidoMem && contenidoMem.vivoPlayer;
+      if (!vp || typeof vp !== 'object') return null;
+      var embed = vp.embed ? String(vp.embed) : '';
+      var hls = vp.hls ? String(vp.hls) : '';
+      if (embed){
+        if (embed.indexOf('//') === 0) embed = 'https:' + embed;
+        return { url: embed, tipo: 'embed' };
+      }
+      if (hls){
+        if (hls.indexOf('//') === 0) hls = 'https:' + hls;
+        return { url: hls, tipo: 'hls' };
+      }
+      return null;
+    } catch(e){ return null; }
+  }
+  function abrirVivo(url, tipo){
+    if (!url) return;
+    if (tipo === 'hls'){
+      abrirModal(
+        '<div class="cp-quiz-top"><button type="button" class="cp-back" id="cpVivoBack" aria-label="Volver">‹</button><span class="cp-question-label" style="flex:1">🔴 Vivo PSA</span></div>' +
+        '<div class="cp-quiz-body"><h2 class="cp-question">Vivo PSA</h2>' +
+        '<div class="cp-repro" id="cpClassMedia"><video controls playsinline preload="metadata" id="cpClassVideo"></video></div>' +
+        '<div class="cp-repro-note">Se reproduce acá mismo, sin registrar avance: miralo cuando quieras.</div></div>' +
+        '<div class="cp-modal-foot"><button type="button" class="cp-secondary" id="cpVivoClose">Cerrar</button></div>'
+      );
+      document.getElementById('cpVivoBack').onclick = cerrarModal;
+      document.getElementById('cpVivoClose').onclick = cerrarModal;
+      var media = document.getElementById('cpClassVideo');
+      if (media) cablearReproductor(media, url, 'vivo:' + (fechaClaveVivo(new Date()) || 'libre'), 'video', true);
+      return;
+    }
+    abrirModal(
+      '<div class="cp-quiz-top"><button type="button" class="cp-back" id="cpVivoBack" aria-label="Volver">‹</button><span class="cp-question-label" style="flex:1">🔴 Vivo PSA</span></div>' +
+      '<div class="cp-quiz-body"><h2 class="cp-question">Vivo PSA</h2>' +
+      '<div class="cp-vivo-frame"><iframe src="' + esc(url) + '" title="Vivo PSA" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>' +
+      '<div class="cp-repro-note">Se reproduce acá mismo: miralo cuando quieras.</div></div>' +
+      '<div class="cp-modal-foot"><button type="button" class="cp-secondary" id="cpVivoClose">Cerrar</button></div>'
+    );
+    document.getElementById('cpVivoBack').onclick = cerrarModal;
+    document.getElementById('cpVivoClose').onclick = cerrarModal;
+  }
   function seccionReplayVivo(ref, previa){
-    // Cuando el vivo del miércoles ya pasó, el Campus publica su contenido.
-    // El audio de la previa del día queda como puerta de entrada acá mismo;
-    // el enlace al Campus lleva a la transmisión completa.
+    // Cuando el vivo del miércoles ya pasó, la transmisión se reproduce
+    // acá mismo (v654): el player del contenido del Campus manda y el link
+    // al sitio dejó de existir. La previa del día queda como entrada.
+    var vp = vivoPlayerDe();
     var stream = previa && previa.stream ? previa.stream : '';
     return '<div class="cp-vpsa cp-vpsa-replay" data-cp-vpsa="pasado"' +
       (stream ? ' data-cp-replay-stream="' + esc(stream) + '" data-cp-replay-id="audio:' + previa.audioId + '"' : '') + '>' +
       '<div class="cp-vpsa-t">🎬 El Vivo de hoy ya está disponible</div>' +
-      '<p>La transmisión del miércoles quedó publicada en el Campus. Escuchá la previa acá o mirá la clase completa en el Campus.</p>' +
+      '<p>' + (vp ? 'La transmisión del miércoles quedó publicada: reproducila acá cuando quieras.' : 'La transmisión del miércoles ya terminó.') + (stream ? ' Escuchá la previa mientras tanto.' : '') + '</p>' +
       '<div class="cp-vpsa-btns">' +
+      (vp ? '<button type="button" class="cp-vpsa-play" data-cp-vivo="' + esc(vp.url) + '" data-cp-vivo-tipo="' + vp.tipo + '">▶ Ver el vivo</button>' : '') +
       (stream ? '<button type="button" class="cp-vpsa-play" data-cp-vpsa-play="replay">▶ Escuchar previa</button>' : '') +
-      '<a class="cp-vpsa-go" href="https://campus.psa.com.ar/clases-en-vivo" target="_blank" rel="noopener">Ver en Campus ↗</a>' +
       '</div></div>';
   }
   /* ---------- Vivos anteriores (v648) ----------
@@ -932,47 +996,49 @@
      Ahora el último Vivo PSA tiene su sección propia en el Campus y queda
      visible toda la semana, hasta que llega el próximo miércoles. El video
      completo sigue publicado en el Campus (APPI no lo re-copia, como en
-     v641/v645); la previa de ese vivo, si está en el catálogo, suena acá.
+     v641/v645); la previa de ese vivo, si está en el contenido, suena acá.
      Mientras hay vivo en curso, o la noche del miércoles con el replay de
      hoy en pantalla, la sección no se duplica. */
   function seccionUltimoVivo(){
     try {
-      if (!catalogoMem) return '';
+      if (!contenidoMem) return '';
       var prox = proximoVivoPsaRef();
       if (prox.estado === 'vivo' || prox.estado === 'pasado') return '';
       var ult = ultimoVivoPsaRef();
       if (!ult || !ult.terminado) return '';
+      var vp = vivoPlayerDe();
       var previa = audioPreviaVivo(ult.ini, true);
       var stream = previa && previa.stream ? previa.stream : '';
       return '<div class="cp-section-head"><h3>🎬 Vivos anteriores</h3><span>para ver cuando quieras</span></div>' +
         '<div class="cp-vpsa cp-vpsa-replay" data-cp-vpsa="ultimo" data-cp-ultimo-vivo="' + fechaClaveVivo(ult.ini) + '"' +
         (stream ? ' data-cp-replay-stream="' + esc(stream) + '" data-cp-replay-id="audio:' + previa.audioId + '"' : '') + '>' +
         '<div class="cp-vpsa-t">🎬 Último Vivo PSA · ' + esc(fechaLindaVivo(ult.ini)) + '</div>' +
-        '<p>La transmisión del último miércoles quedó publicada en el Campus: mirala cuando quieras, queda acá hasta el próximo vivo.' + (stream ? ' Su previa se escucha acá mismo.' : '') + '</p>' +
+        '<p>' + (vp ? 'La transmisión del último miércoles se reproduce acá mismo, hasta el próximo vivo.' : 'La transmisión del último miércoles ya terminó. El video no está disponible acá ahora.') + (stream ? ' Su previa se escucha acá mismo.' : '') + '</p>' +
         '<div class="cp-vpsa-btns">' +
+        (vp ? '<button type="button" class="cp-vpsa-play" data-cp-vivo="' + esc(vp.url) + '" data-cp-vivo-tipo="' + vp.tipo + '">▶ Ver el vivo</button>' : '') +
         (stream ? '<button type="button" class="cp-vpsa-play" data-cp-vpsa-play="ultimo" data-cp-previa-id="audio:' + previa.audioId + '">▶ Escuchar previa</button>' : '') +
-        '<a class="cp-vpsa-go" href="https://campus.psa.com.ar/clases-en-vivo" target="_blank" rel="noopener">Ver en Campus ↗</a>' +
         '</div></div>';
     } catch(e){ return ''; }
   }
   function seccionVivoPsa(){
     try {
-      if (!catalogoMem) return '';
+      if (!contenidoMem) return '';
       var ref = proximoVivoPsaRef();
       var previa = audioPreviaVivo(ref.ini);
       if (ref.estado === 'vivo'){
+        var vpHoy = vivoPlayerDe();
         return '<div class="cp-vpsa cp-vpsa-live" data-cp-vpsa="vivo">' +
           '<div class="cp-vpsa-t">🔴 En vivo ahora · Vivo PSA</div>' +
-          '<p>La transmisión del Vivo PSA está en curso desde el Campus. Entrá desde APPI.</p>' +
-          '<div class="cp-vpsa-btns"><a class="cp-vpsa-go" href="https://campus.psa.com.ar/clases-en-vivo" target="_blank" rel="noopener">Entrar al vivo 🔴</a></div>' +
+          '<p>' + (vpHoy ? 'La transmisión está en curso: reproducila acá mismo, sin salir de APPI.' : 'El vivo está en curso y el video todavía no está disponible acá.') + '</p>' +
+          (vpHoy ? '<div class="cp-vpsa-btns"><button type="button" class="cp-vpsa-play" data-cp-vivo="' + esc(vpHoy.url) + '" data-cp-vivo-tipo="' + vpHoy.tipo + '">▶ Ver el vivo ahora</button></div>' : '') +
         '</div>';
       }
       if (ref.estado === 'pasado') return seccionReplayVivo(ref, previa);
+      // v654: antes del vivo no hay link al sitio — sólo el aviso y la previa.
       return '<div class="cp-vpsa" data-cp-vpsa="' + ref.estado + '">' +
         '<div class="cp-vpsa-t">' + (ref.estado === 'hoy' ? 'Hoy 15:00 · Vivo PSA' : 'Miércoles 15:00 · Vivo PSA') + '</div>' +
         '<p>' + (ref.estado === 'hoy' ? 'El vivo arranca a las 15:00. Escuchá la previa mientras tanto.' : 'La previa del vivo ya está publicada. Escuchala antes del miércoles.') + '</p>' +
         (previa ? '<div class="cp-vpsa-previa"><button type="button" class="cp-vpsa-play" data-cp-vpsa-play="previa" data-cp-previa-id="audio:' + previa.audioId + '">▶ ' + esc(previa.titulo) + '</button></div>' : '') +
-        '<div class="cp-vpsa-btns"><a class="cp-vpsa-go" href="https://campus.psa.com.ar/clases-en-vivo" target="_blank" rel="noopener">Entrar al vivo ↗</a></div>' +
       '</div>';
     } catch(e){ return ''; }
   }
@@ -983,6 +1049,13 @@
     if (!host) return;
     var plays = host.querySelectorAll('[data-cp-vpsa-play]');
     for (var b = 0; b < plays.length; b++) cablearPlayVivo(plays[b], host);
+    // v654: los▶ del Vivo reproducen acá mismo (embed o HLS), sin salir.
+    var vivos = host.querySelectorAll('[data-cp-vivo]');
+    for (var v = 0; v < vivos.length; v++) (function(btn){
+      btn.onclick = function(){
+        try { abrirVivo(btn.getAttribute('data-cp-vivo'), btn.getAttribute('data-cp-vivo-tipo')); } catch(e){}
+      };
+    })(vivos[v]);
   }
   function cablearPlayVivo(play, host){
     play.onclick = function(){
@@ -1003,7 +1076,7 @@
           }
         }
         var aid = Number(String(pid).replace(/^audio:/, ''));
-        var listas = (catalogoMem && catalogoMem.playlists) || [];
+        var listas = (contenidoMem && contenidoMem.playlists) || [];
         var audio = null;
         for (var i = 0; i < listas.length && !audio; i++){
           var l = listas[i];
@@ -1021,19 +1094,19 @@
 
   /* ---------- Audios del Campus (v643) ---------- */
   function seccionAudios(){
-    var listas = (catalogoMem && catalogoMem.playlists) || [];
+    var listas = (contenidoMem && contenidoMem.playlists) || [];
     if (!listas.length) return '';
     var chips = listas.map(function(l, i){
       return '<button type="button" class="cp-chip cp-audio-chip' + (i === 0 ? ' on' : '') + '" data-cp-lista="' + i + '">' + esc(l.titulo) + '</button>';
     }).join('');
-    var totalAudios = (catalogoMem.stats && catalogoMem.stats.audios) || '';
+    var totalAudios = (contenidoMem.stats && contenidoMem.stats.audios) || '';
     return '<div class="cp-section-head"><h3>🎧 Audios del Campus</h3><span>' + (totalAudios ? totalAudios + ' audios' : listas.length + ' listas') + '</span></div>' +
       '<section class="cp-audios"><div class="cp-audio-chips" id="cpAudioChips">' + chips + '</div><div class="cp-audio-list" id="cpAudioLista" data-i="0"></div></section>';
   }
   function pintarAudios(i){
     var host = document.getElementById('cpAudioLista');
-    if (!host || !catalogoMem) return;
-    var listas = catalogoMem.playlists || [];
+    if (!host || !contenidoMem) return;
+    var listas = contenidoMem.playlists || [];
     var l = listas[i] || listas[0];
     if (!l){ host.innerHTML = ''; return; }
     var audios = (l.audios || []).slice(0, 8);
@@ -1068,20 +1141,20 @@
      última copia mientras tanto. Si la nube falló con cuenta cargada,
      muestra el error con reintento. */
   function avisoCuentaHTML(){
-    if (catalogoEstado === 'sinCuenta'){
+    if (contenidoEstado === 'sinCuenta'){
       return '<div class="cp-aviso" data-cp-aviso="cuenta">' +
         '<div class="cp-aviso-t">🔑 Cargá tu cuenta MI PSA</div>' +
         '<p>Tu Campus en APPI se arma con tus propios datos de distribuidor: clases, audios y vivos siempre al día. Se guarda una sola vez y sólo en este dispositivo.</p>' +
         '<button type="button" data-cp-cuenta>Cargar mi cuenta MI PSA</button>' +
-        (catalogoMem ? '' : '<small>Con tu cuenta cargada vas a tener el catálogo completo acá mismo.</small>') +
+        (contenidoMem ? '' : '<small>Con tu cuenta cargada vas a tener todo el Campus acá mismo.</small>') +
       '</div>';
     }
-    if (catalogoEstado === 'error'){
+    if (contenidoEstado === 'error'){
       // v651: si hay una copia guardada, la nube caída se banca en silencio —
       // el recuadro de error sólo aparece cuando no hay NADA que mostrar.
-      if (catalogoMem) return '';
+      if (contenidoMem) return '';
       return '<div class="cp-aviso err mini" data-cp-aviso="error">' +
-        '<div><div class="cp-aviso-t">📡 Sin copia del catálogo todavía</div>' +
+        '<div><div class="cp-aviso-t">📡 Sin copia del Campus todavía</div>' +
         '<p>La nube no respondió y en este dispositivo todavía no hay una copia guardada.</p></div>' +
         '<button type="button" data-cp-reintentar>Reintentar</button>' +
       '</div>';
@@ -1095,7 +1168,7 @@
     var r = host.querySelector('[data-cp-reintentar]');
     if (r) r.onclick = function(){
       r.disabled = true;
-      reintentarCatalogo().then(function(){ render(); }, function(){ render(); });
+      reintentarContenido().then(function(){ render(); }, function(){ render(); });
     };
   }
   function abrirCuentaPSA(){
@@ -1107,7 +1180,7 @@
   }
 
   /* v649: firma del último HTML pintado. El Campus escucha eventos de sync,
-     de persona y del catálogo que en una cuenta real pueden llegar seguido;
+     de persona y del contenido que en una cuenta real pueden llegar seguido;
      repintar el innerHTML entero ante cada uno —aunque no haya cambiado
      nada— se ve como un parpadeo constante de toda la pantalla. Si la firma
      coincide, el DOM (y el scroll, y la playlist elegida) quedan como están. */
@@ -1115,7 +1188,7 @@
   function firmaRenderCampus(html){
     var firma = html;
     try { firma += '\n' + JSON.stringify(leer().avance || {}); } catch(e){}
-    try { firma += '\n' + (catalogoMem ? String(catalogoMem.generado || '') : ''); } catch(e){}
+    try { firma += '\n' + (contenidoMem ? String(contenidoMem.generado || '') : ''); } catch(e){}
     return firma;
   }
   function render(){
@@ -1169,8 +1242,8 @@
   function pintarNegocio(){
     var host = document.getElementById('negWrap');
     if (!host) return;
-    if (!catalogoMem){
-      cargarCatalogo().then(function(){ pintarNegocio(); })
+    if (!contenidoMem){
+      cargarContenido().then(function(){ pintarNegocio(); })
         .catch(function(){ try{ host.innerHTML = avisoCuentaHTML(); pintarAvisos(host); }catch(e){} });
       return;
     }
@@ -1212,7 +1285,7 @@
           '<div class="cp-neg-prox"><b id="cpNegTit">' + esc(prox.titulo) + '</b><span id="cpNegMeta">' + esc(prox.area) + (prox.duracion ? ' · ⏱ ' + esc(prox.duracion) : '') + '</span></div>' +
           '<div class="cp-neg-btns"><button type="button" class="cp-neg-btn cp-neg-go" id="cpNegGo">Continuar clase ▶</button><button type="button" class="cp-neg-btn cp-neg-ruta" id="cpNegRuta">Ver ruta</button></div>'
           :
-          '<div class="cp-neg-prox"><b>¡Ruta completa!</b><span>Ya viste todas las clases del catálogo.</span></div>') +
+          '<div class="cp-neg-prox"><b>¡Ruta completa!</b><span>Ya viste todas las clases del Campus.</span></div>') +
       '</div>';
     if (prox){
       var go = document.getElementById('cpNegGo');
@@ -1234,9 +1307,9 @@
     desafioDisponible: desafioDisponible,
     categoria: categoria,
     preguntasParaCategoria: preguntasParaCategoria,
-    // Catálogo real y avance (v641)
-    cargarCatalogo: cargarCatalogo,
-    catalogo: catalogo,
+    // Contenido real y avance (v641)
+    cargarContenido: cargarContenido,
+    contenido: contenido,
     clases: aplanarClases,
     buscar: buscar,
     proximaClase: proximaClase,
@@ -1247,9 +1320,9 @@
     abrirClase: abrirClase,
     abrirAudio: abrirAudio,
     pintarNegocio: pintarNegocio,
-    // Estado del catálogo por cuenta (v644)
-    estadoCatalogo: function(){ return catalogoEstado; },
-    reintentarCatalogo: reintentarCatalogo,
+    // Estado del contenido por cuenta (v644)
+    estadoContenido: function(){ return contenidoEstado; },
+    reintentarContenido: reintentarContenido,
     abrirCuentaPSA: abrirCuentaPSA,
     // Vivo PSA semanal (v645) y último vivo toda la semana (v648)
     proximoVivoPsa: proximoVivoPsaRef,
@@ -1274,7 +1347,7 @@
       if (v && v.id === 'view-negocio') pintarNegocio();
     }catch(e){}
   });
-  // v644: el estado del catálogo (cuenta MI PSA / nube) repinta la vista y
+  // v644: el estado del contenido (cuenta MI PSA / nube) repinta la vista y
   // Mi negocio, así el aviso aparece o desaparece sin recargar.
   function repintarEstadoCampus(){
     try{
@@ -1284,13 +1357,13 @@
     }catch(e){}
   }
   window.addEventListener('appi-campus-estado', repintarEstadoCampus);
-  window.addEventListener('appi-campus-catalogo', repintarEstadoCampus);
+  window.addEventListener('appi-campus-contenido', repintarEstadoCampus);
   if (document.readyState === 'complete') setTimeout(revisarJornada, 800);
   else window.addEventListener('load', function(){ setTimeout(revisarJornada, 900); });
-  // El catálogo se adelanta en segundo plano: la ruta diaria, la vista
+  // El contenido se adelanta en segundo plano: la ruta diaria, la vista
   // y las secciones de vivo/audios encuentran las clases listas sin clic.
   setTimeout(function(){
-    cargarCatalogo().then(function(){
+    cargarContenido().then(function(){
       try {
         var v = document.querySelector('.view.active');
         if (v && v.id === 'view-campus') render();

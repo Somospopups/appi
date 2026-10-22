@@ -1,8 +1,8 @@
 const { test, expect } = require('@playwright/test');
 const { entrar } = require('./helpers/app-entrar.js');
 
-// v644 · El catálogo del Campus dentro de APPI se arma con las credenciales
-// MI PSA de CADA usuario (edge campus-catalogo + caché compartida en la nube).
+// v644 · El contenido del Campus dentro de APPI se arma con las credenciales
+// MI PSA de CADA usuario (edge campus-contenido + caché compartida en la nube).
 // Sin cuenta no hay rastreo propio: aparece el aviso para cargarla (en Campus
 // y como tarjeta del Home) con el popup de carga existente.
 
@@ -32,28 +32,28 @@ const json = (route, status, body) => route.fulfill({
   body: JSON.stringify(body)
 });
 
-const catalogoCargado = page => page.waitForFunction(
-  () => !!(window.APPICampusPSA && typeof window.APPICampusPSA.catalogo === 'function' && window.APPICampusPSA.catalogo()),
+const contenidoCargado = page => page.waitForFunction(
+  () => !!(window.APPICampusPSA && typeof window.APPICampusPSA.contenido === 'function' && window.APPICampusPSA.contenido()),
   null, { timeout: 15000 }
 );
-const estado = page => page.evaluate(() => window.APPICampusPSA.estadoCatalogo());
+const estado = page => page.evaluate(() => window.APPICampusPSA.estadoContenido());
 
-test('la nube responde con el catálogo de la cuenta MI PSA del usuario (no un JSON fijo)', async ({ page }) => {
+test('la nube responde con el contenido de la cuenta MI PSA del usuario (no un JSON fijo)', async ({ page }) => {
   await entrar(page);
 
   let enviado = null;
   // Se registra DESPUÉS del catch-all del helper: la ruta más nueva gana.
-  await page.route('https://mock.supabase.co/functions/v1/campus-catalogo', route => {
+  await page.route('https://mock.supabase.co/functions/v1/campus-contenido', route => {
     enviado = route.request().postDataJSON();
-    return json(route, 200, { cat: CAT_MOCK });
+    return json(route, 200, { cont: CAT_MOCK });
   });
 
-  await catalogoCargado(page);
+  await contenidoCargado(page);
   // Con respaldo local la app muestra ya y refresca en 2º plano: para pedir
   // de nuevo a la nube se limpia la copia y se reintenta.
   await page.evaluate(() => {
-    localStorage.removeItem('appi_campus_catalogo_v1');
-    return window.APPICampusPSA.reintentarCatalogo().then(c => !!(c && c.kits), () => false);
+    localStorage.removeItem('appi_campus_contenido_v1');
+    return window.APPICampusPSA.reintentarContenido().then(c => !!(c && c.kits), () => false);
   });
 
   await expect.poll(() => estado(page)).toBe('ok');
@@ -62,16 +62,16 @@ test('la nube responde con el catálogo de la cuenta MI PSA del usuario (no un J
   });
 
   const resumen = await page.evaluate(() => ({
-    kit: window.APPICampusPSA.catalogo().kits[0].titulo,
+    kit: window.APPICampusPSA.contenido().kits[0].titulo,
     clase: window.APPICampusPSA.clases()[0].titulo,
-    guardado: (JSON.parse(localStorage.getItem('appi_campus_catalogo_v1') || 'null') || {}).kits?.[0]?.titulo
+    guardado: (JSON.parse(localStorage.getItem('appi_campus_contenido_v1') || 'null') || {}).kits?.[0]?.titulo
   }));
   expect(resumen.kit).toBe('Kit Mock Usuario');
   expect(resumen.clase).toBe('Clase Mock Uno');
-  expect(resumen.guardado, 'el respaldo local guarda el catálogo de la nube').toBe('Kit Mock Usuario');
+  expect(resumen.guardado, 'el respaldo local guarda el contenido de la nube').toBe('Kit Mock Usuario');
 
   // Con cuenta conectada y nube OK no hay ningún aviso en la vista. Aunque
-  // el catálogo de la nube traiga agenda de equipos, APPI no la publica (v652).
+  // el contenido de la nube traiga agenda de equipos, APPI no la publica (v652).
   await page.evaluate(() => window.openCampusPSA());
   await expect(page.locator('#view-campus')).toHaveClass(/active/);
   await expect(page.locator('#campusCont')).not.toContainText('Vivo Mock Usuario');
@@ -85,20 +85,20 @@ test('sin cuenta MI PSA: aviso en Campus, tarjeta de aviso en el Home y popup de
   // popup de PSA. Se marca como ya visto para ejercer a propósito el clic
   // del aviso: el camino que interesa es aviso → popup → formulario.
   await page.evaluate(() => sessionStorage.setItem('psaPopupYaMostrado', '1'));
-  await catalogoCargado(page);
+  await contenidoCargado(page);
 
-  // El mazo abierto muestra la capacitación (hay catálogo de respaldo).
+  // El mazo abierto muestra la capacitación (hay contenido de respaldo).
   await page.evaluate(() => window.APPIHomeTarjetas.abrir());
   await expect(page.locator('#htOverlay')).toBeVisible();
   await expect(page.locator('.ht-card.ht-cat-capacitacion')).toHaveCount(1);
 
   await page.evaluate(() => {
     localStorage.removeItem('appsi_psa_creds');
-    return window.APPICampusPSA.reintentarCatalogo().then(() => true, () => true);
+    return window.APPICampusPSA.reintentarContenido().then(() => true, () => true);
   });
   await expect.poll(() => estado(page)).toBe('sinCuenta');
 
-  // La capacitación se apaga (no hay catálogo propio) y entra la tarjeta de
+  // La capacitación se apaga (no hay contenido propio) y entra la tarjeta de
   // cuenta en su hueco, repintando el mazo abierto.
   await expect(page.locator('.ht-card.ht-cat-capacitacion')).toHaveCount(0);
   await expect(page.locator('.ht-card.ht-cat-campusCuenta')).toHaveCount(1);
@@ -121,12 +121,12 @@ test('sin cuenta MI PSA: aviso en Campus, tarjeta de aviso en el Home y popup de
 test('si la nube falla con copia guardada no hay recuadro; sin copia, aviso chico con reintento', async ({ page }) => {
   await entrar(page);
   // Primera carga normal: guarda la copia en el dispositivo.
-  await catalogoCargado(page);
+  await contenidoCargado(page);
   await expect.poll(() => estado(page)).toBe('ok');
 
   // La nube se cae con respaldo: se usa la última copia en silencio (v651).
-  await page.route('https://mock.supabase.co/functions/v1/campus-catalogo', route => json(route, 500, { error: 'nube caída' }));
-  await page.evaluate(() => window.APPICampusPSA.reintentarCatalogo().then(c => !!(c && c.kits), () => false));
+  await page.route('https://mock.supabase.co/functions/v1/campus-contenido', route => json(route, 500, { error: 'nube caída' }));
+  await page.evaluate(() => window.APPICampusPSA.reintentarContenido().then(c => !!(c && c.kits), () => false));
   await expect.poll(() => estado(page)).toBe('error');
 
   await page.evaluate(() => window.openCampusPSA());
@@ -135,8 +135,8 @@ test('si la nube falla con copia guardada no hay recuadro; sin copia, aviso chic
 
   // Sin respaldo local no hay de dónde recatar: queda el aviso chico.
   await page.evaluate(() => {
-    localStorage.removeItem('appi_campus_catalogo_v1');
-    return window.APPICampusPSA.reintentarCatalogo().then(() => true, () => true);
+    localStorage.removeItem('appi_campus_contenido_v1');
+    return window.APPICampusPSA.reintentarContenido().then(() => true, () => true);
   });
   await expect.poll(() => estado(page)).toBe('error');
   await page.evaluate(() => window.openCampusPSA());
@@ -146,7 +146,7 @@ test('si la nube falla con copia guardada no hay recuadro; sin copia, aviso chic
   await expect(page.locator('#campusCont')).not.toContainText('Audios del Campus');
 
   // El Reintentar del aviso vuelve a consultar la nube.
-  await page.route('https://mock.supabase.co/functions/v1/campus-catalogo', route => json(route, 500, { error: 'nube caída' }));
+  await page.route('https://mock.supabase.co/functions/v1/campus-contenido', route => json(route, 500, { error: 'nube caída' }));
   await page.locator('[data-cp-reintentar]').click();
   await expect.poll(() => estado(page)).toBe('error');
   await expect(page.locator('[data-cp-aviso="error"]')).toBeVisible();

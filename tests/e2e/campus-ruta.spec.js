@@ -3,7 +3,7 @@ const { entrar } = require('./helpers/app-entrar.js');
 
 test('la tarjeta de capacitación llena UN hueco del mazo, nunca antes que el negocio', async ({ page }) => {
   await entrar(page);
-  await page.evaluate(() => window.APPICampusPSA.cargarCatalogo());
+  await page.evaluate(() => window.APPICampusPSA.cargarContenido());
 
   const r = await page.evaluate(() => {
     const ctx = window.APPIHomeTarjetas.contextoCapacitacion();
@@ -42,7 +42,7 @@ test('la tarjeta de capacitación llena UN hueco del mazo, nunca antes que el ne
 
 test('Mi capacitación en Mi negocio muestra el avance y continúa en la clase', async ({ page }) => {
   await entrar(page);
-  await page.evaluate(() => window.APPICampusPSA.cargarCatalogo());
+  await page.evaluate(() => window.APPICampusPSA.cargarContenido());
   await page.evaluate(() => window.showView('view-negocio'));
 
   await expect(page.locator('#cpNeg')).toBeVisible();
@@ -67,12 +67,12 @@ test('Mi capacitación en Mi negocio muestra el avance y continúa en la clase',
   await expect(page.locator('#cpClassTitle')).toHaveText(tituloSeccion);
 });
 
-test('sin catálogo el mazo no se rompe: la capacitación espera su turno', async ({ page }) => {
+test('sin contenido el mazo no se rompe: la capacitación espera su turno', async ({ page }) => {
   await entrar(page);
   const r = await page.evaluate(() => {
-    // Sin catálogo en memoria ni respaldo: la tarjeta no puede existir.
-    localStorage.removeItem('appi_campus_catalogo_v1');
-    window.APPICampusPSA.catalogo = () => null;
+    // Sin contenido en memoria ni respaldo: la tarjeta no puede existir.
+    localStorage.removeItem('appi_campus_contenido_v1');
+    window.APPICampusPSA.contenido = () => null;
     const cats = window.APPIHomeTarjetas.armarTarjetas().map(t => t.cat);
     return { primero: cats[0], conCap: cats.includes('capacitacion') };
   });

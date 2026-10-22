@@ -1,20 +1,20 @@
 const { test, expect } = require('@playwright/test');
 const { entrar } = require('./helpers/app-entrar.js');
 
-test('el catálogo real carga, se busca y arma la ruta por contexto', async ({ page }) => {
+test('el contenido real carga, se busca y arma la ruta por contexto', async ({ page }) => {
   await entrar(page);
 
   const res = await page.evaluate(async () => {
     const c = window.APPICampusPSA;
-    const cat = await c.cargarCatalogo();
+    const cont = await c.cargarContenido();
     const clases = c.clases();
     return {
-      kits: cat.kits.length,
-      secciones: cat.kits.reduce((n, k) => n + (k.secciones || []).length, 0),
+      kits: cont.kits.length,
+      secciones: cont.kits.reduce((n, k) => n + (k.secciones || []).length, 0),
       clases: clases.length,
       conStream: clases.filter(cl => cl.stream).length,
       canje: c.buscar('canje').map(cl => ({ area: cl.area, titulo: cl.titulo })),
-      canje2: (await c.cargarCatalogo()) ? c.buscar('canje').length : -1,
+      canje2: (await c.cargarContenido()) ? c.buscar('canje').length : -1,
       rutaCanje: c.proximaClase('canje'),
       rutaVisita: c.proximaClase('visita'),
       avance: c.avanceResumen()
@@ -35,7 +35,7 @@ test('el catálogo real carga, se busca y arma la ruta por contexto', async ({ p
   expect(res.avance.total).toBe(res.clases);
 
   const respaldo = await page.evaluate(() => {
-    const guardado = JSON.parse(localStorage.getItem('appi_campus_catalogo_v1') || 'null');
+    const guardado = JSON.parse(localStorage.getItem('appi_campus_contenido_v1') || 'null');
     return guardado ? guardado.kits.length : 0;
   });
   expect(respaldo).toBe(res.kits);
@@ -46,7 +46,7 @@ test('la hoja Clase abre con título, chips y enlace al Campus', async ({ page }
 
   const clase = await page.evaluate(async () => {
     const c = window.APPICampusPSA;
-    await c.cargarCatalogo();
+    await c.cargarContenido();
     const lista = c.clases().filter(cl => /posventa/i.test(cl.area) && cl.stream);
     const cl = lista[0];
     c.abrirClase(cl);
@@ -71,7 +71,7 @@ test('marcar vista cierra la hoja, guarda el avance y al reabrir queda "vista"',
   // Una clase SIN banco: marcarla a mano sólo guarda y cierra (v648).
   const id = await page.evaluate(async () => {
     const c = window.APPICampusPSA;
-    await c.cargarCatalogo();
+    await c.cargarContenido();
     const cl = c.clases().filter(x => x.stream && !c.preguntasDeClase(x.id))[0];
     c.abrirClase(cl);
     return cl.id;
@@ -111,7 +111,7 @@ test('marcar vista de una clase con banco reemplaza la hoja por el quiz (1/3)', 
   // tomar el popup igual (el guard viejo la frenaba y el quiz no se abría).
   await page.evaluate(async () => {
     const c = window.APPICampusPSA;
-    await c.cargarCatalogo();
+    await c.cargarContenido();
     const cl = c.clases().filter(x => x.stream && c.preguntasDeClase(x.id))[0];
     c.abrirClase(cl);
   });
@@ -127,15 +127,15 @@ test('el audio del Campus abre con su stream A_ y su estado', async ({ page }) =
 
   const audio = await page.evaluate(async () => {
     const c = window.APPICampusPSA;
-    const cat = await c.cargarCatalogo();
-    const lista = (cat.listas || cat.playlists || cat.audios || []).find(l => (l.audios || []).some(a => a.stream));
+    const cont = await c.cargarContenido();
+    const lista = (cont.listas || cont.playlists || cont.audios || []).find(l => (l.audios || []).some(a => a.stream));
     if (!lista) return null;
     const a = (lista.audios || []).find(x => x.stream);
     c.abrirAudio(a, lista.titulo);
     return { titulo: a.titulo, stream: a.stream, audioId: a.audioId };
   });
 
-  test.skip(!audio, 'el catálogo no trae audios con stream');
+  test.skip(!audio, 'el contenido no trae audios con stream');
   await expect(page.locator('#campusPsaOverlay.open')).toBeVisible();
   await expect(page.locator('#cpClassTitle')).toHaveText(audio.titulo);
   await expect(page.locator('#cpClassState')).toContainText('por escuchar');

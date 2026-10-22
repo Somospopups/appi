@@ -1,15 +1,15 @@
 const { test, expect } = require('@playwright/test');
 const { entrar } = require('./helpers/app-entrar.js');
 
-test('las reuniones internas de otros equipos del catálogo no se muestran en APPI (v652)', async ({ page }) => {
+test('las reuniones internas de otros equipos del contenido no se muestran en APPI (v652)', async ({ page }) => {
   await entrar(page);
-  await page.evaluate(() => window.APPICampusPSA.cargarCatalogo());
+  await page.evaluate(() => window.APPICampusPSA.cargarContenido());
   await page.evaluate(() => window.openCampusPSA());
 
-  // El catálogo real de MI PSA trae la agenda del Campus llena de
+  // El contenido real de MI PSA trae la agenda del Campus llena de
   // "Reunión de Equipo" de equipos ajenos: son datos internos que no se
   // publican. APPI no lista esa sección ni ofrece agendarlas.
-  const agenda = await page.evaluate(() => (window.APPICampusPSA.catalogo().vivo || []).length);
+  const agenda = await page.evaluate(() => (window.APPICampusPSA.contenido().vivo || []).length);
   expect(agenda).toBeGreaterThan(0);
   await expect(page.locator('#cpVivo')).toHaveCount(0);
   await expect(page.locator('#campusCont')).not.toContainText('Próximos en vivo');
@@ -18,7 +18,7 @@ test('las reuniones internas de otros equipos del catálogo no se muestran en AP
 
 test('los audios se listan por playlist y la hoja de audio abre con su stream', async ({ page }) => {
   await entrar(page);
-  await page.evaluate(() => window.APPICampusPSA.cargarCatalogo());
+  await page.evaluate(() => window.APPICampusPSA.cargarContenido());
   await page.evaluate(() => window.openCampusPSA());
 
   await expect(page.locator('#cpAudioChips')).toBeVisible();
@@ -49,8 +49,8 @@ test('un audio escuchado queda marcado con ✓ en la lista', async ({ page }) =>
   await entrar(page);
   const marcado = await page.evaluate(async () => {
     const c = window.APPICampusPSA;
-    const cat = await c.cargarCatalogo();
-    const a = cat.playlists[0].audios[0];
+    const cont = await c.cargarContenido();
+    const a = cont.playlists[0].audios[0];
     c.marcarVisto('audio:' + a.audioId, 100, 'audio');
     c.abrir();
     return { id: 'audio:' + a.audioId, visto: c.esVisto('audio:' + a.audioId) };

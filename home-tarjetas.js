@@ -1214,12 +1214,12 @@
   function tarjetaCampusCuenta(){
     try{
       var c = window.APPICampusPSA;
-      if (!c || typeof c.estadoCatalogo !== 'function') return null;
-      if (c.estadoCatalogo() !== 'sinCuenta') return null;
+      if (!c || typeof c.estadoContenido !== 'function') return null;
+      if (c.estadoContenido() !== 'sinCuenta') return null;
       return {
         cat: 'campusCuenta', icono: '🔑', kicker: 'Campus PSA · tu cuenta',
         titulo: 'Cargá tu cuenta MI PSA',
-        html: '<p class="ht-nota">El catálogo de tu Campus se arma con tus propios datos de distribuidor: clases, audios y vivos siempre al día. Se guarda una sola vez, sólo en tu dispositivo.</p><div class="ht-chips"><span>🔒 Sólo en tu equipo</span><span>⚡ 1 sola vez</span></div>',
+        html: '<p class="ht-nota">El contenido de tu Campus se arma con tus propios datos de distribuidor: clases, audios y vivos siempre al día. Se guarda una sola vez, sólo en tu dispositivo.</p><div class="ht-chips"><span>🔒 Sólo en tu equipo</span><span>⚡ 1 sola vez</span></div>',
         cta: { label: 'Cargar mi MI PSA 🔑', go: function(){
           if (window.APPICampusPSA && typeof window.APPICampusPSA.abrirCuentaPSA === 'function') window.APPICampusPSA.abrirCuentaPSA();
           else if (typeof window.mostrarPopupPSA === 'function') window.mostrarPopupPSA();
@@ -1248,11 +1248,11 @@
       var c = window.APPICampusPSA;
       if (!c || typeof c.proximaClase !== 'function') return null;
       // v644: sin cuenta MI PSA manda el aviso de cuenta (tarjetaCampusCuenta).
-      if (typeof c.estadoCatalogo === 'function' && c.estadoCatalogo() === 'sinCuenta') return null;
-      if (!c.catalogo || !c.catalogo()){
-        if (typeof c.cargarCatalogo === 'function' && !window.__htCapPidiendo){
+      if (typeof c.estadoContenido === 'function' && c.estadoContenido() === 'sinCuenta') return null;
+      if (!c.contenido || !c.contenido()){
+        if (typeof c.cargarContenido === 'function' && !window.__htCapPidiendo){
           window.__htCapPidiendo = true;
-          c.cargarCatalogo().then(function(){ window.__htCapPidiendo = false; refrescarPorCapacitacion(); })
+          c.cargarContenido().then(function(){ window.__htCapPidiendo = false; refrescarPorCapacitacion(); })
             .catch(function(){ window.__htCapPidiendo = false; });
         }
         return null;
@@ -2564,7 +2564,7 @@
   window.addEventListener('appi-linea-cambiaron', function(){ setTimeout(repintarSiCambio, 120); });
   window.addEventListener('appi-bonos-cambiaron', function(){ setTimeout(repintarSiCambio, 120); });
 
-  // v642 · El mazo se refresca cuando llega el catálogo del Campus o cuando
+  // v642 · El mazo se refresca cuando llega el contenido del Campus o cuando
   // avanza el avance de una clase (la tarjeta cambia sus chips al instante).
   function refrescarPorCapacitacion(){
     try{
@@ -2574,15 +2574,15 @@
     }catch(e){}
   }
   try{
-    if (window.APPICampusPSA && typeof window.APPICampusPSA.cargarCatalogo === 'function'){
-      window.APPICampusPSA.cargarCatalogo().then(refrescarPorCapacitacion).catch(function(){});
+    if (window.APPICampusPSA && typeof window.APPICampusPSA.cargarContenido === 'function'){
+      window.APPICampusPSA.cargarContenido().then(refrescarPorCapacitacion).catch(function(){});
     }
   }catch(e){}
   window.addEventListener('appi-campus-avance', function(){ setTimeout(refrescarPorCapacitacion, 80); });
   // v644: cuando cambia el estado de la cuenta MI PSA entra/sale la tarjeta
   // de aviso y la de capacitación se reevalúa.
   window.addEventListener('appi-campus-estado', function(){ setTimeout(refrescarPorCapacitacion, 80); });
-  window.addEventListener('appi-campus-catalogo', function(){ setTimeout(refrescarPorCapacitacion, 80); });
+  window.addEventListener('appi-campus-contenido', function(){ setTimeout(refrescarPorCapacitacion, 80); });
 
   function intentarEnvolver(){
     try{ css(); }catch(e){}
