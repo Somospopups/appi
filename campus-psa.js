@@ -463,18 +463,23 @@
     );
     document.getElementById('cpPvDone').onclick = cerrarModal;
   }
-  /** Se dispara al llegar al 90% (o al terminar) de una clase con banco. */
+  /** Se dispara al llegar al 90%, al terminar o al marcar a mano una clase.
+      Devuelve true si tomó el popup con el quiz (la hoja de clase queda
+      reemplazada); si no hay banco —o ya está aprobado— sólo registra la
+      racha y devuelve false para que el llamador cierre la hoja. */
   function ofrecerPostVideo(id, tipo){
     try {
-      if (tipo && tipo !== 'video') return;
-      if (document.getElementById('campusPsaOverlay')) return;
-      if (quizPasado(id)) { registrarClaseCompleta(); return; }
+      if (tipo && tipo !== 'video') return false;
+      if (pvSession) return false; // ya hay un quiz abierto
+      if (quizPasado(id)) { registrarClaseCompleta(); return false; }
       var preg = bancoDe(id);
-      if (!preg || preg.length < 3) { registrarClaseCompleta(); return; }
+      if (!preg || preg.length < 3) { registrarClaseCompleta(); return false; }
       var clase = clasePorId(id);
-      if (!clase) { registrarClaseCompleta(); return; }
+      if (!clase) { registrarClaseCompleta(); return false; }
+      soltarReproductor(); // el quiz reemplaza la hoja: corta el stream antes
       iniciarQuizPostVideo(clase, preg);
-    } catch(e){}
+      return true;
+    } catch(e){ return false; }
   }
 
   /** La próxima clase de la ruta: según el contexto del negocio y siempre la
@@ -604,7 +609,9 @@
     document.getElementById('cpClassBack').onclick = cerrarModal;
     document.getElementById('cpClassDone').onclick = function(){
       marcarVisto(clase.id, 100, 'video');
-      marcarHechoUI();
+      // Marcar a mano cierra la hoja: si la clase tiene banco sin aprobar,
+      // el quiz de verificación toma el popup en su lugar.
+      if (!ofrecerPostVideo(clase.id, 'video')) cerrarModal();
     };
     var media = document.getElementById('cpClassVideo');
     if (media && clase.stream){
@@ -634,7 +641,7 @@
     document.getElementById('cpClassBack').onclick = cerrarModal;
     document.getElementById('cpClassDone').onclick = function(){
       marcarVisto(id, 100, 'audio');
-      marcarHechoUI();
+      cerrarModal(); // los audios no tienen banco de preguntas
     };
     var media = document.getElementById('cpClassAudio');
     if (media){
@@ -737,6 +744,7 @@
   function cerrarModal(){
     var ov = document.getElementById('campusPsaOverlay');
     if (ov) ov.classList.remove('open');
+    pvSession = null;
     soltarReproductor();
     render();
   }

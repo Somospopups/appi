@@ -65,21 +65,20 @@ test('la hoja Clase abre con título, chips y enlace al Campus', async ({ page }
   await expect(page.locator('#campusPsaOverlay.open')).toHaveCount(0);
 });
 
-test('marcar vista guarda el avance en la clave que sincroniza la cuenta', async ({ page }) => {
+test('marcar vista cierra la hoja, guarda el avance y al reabrir queda "vista"', async ({ page }) => {
   await entrar(page);
 
+  // Una clase SIN banco: marcarla a mano sólo guarda y cierra (v648).
   const id = await page.evaluate(async () => {
     const c = window.APPICampusPSA;
     await c.cargarCatalogo();
-    const cl = c.clases().filter(x => x.stream)[0];
+    const cl = c.clases().filter(x => x.stream && !c.preguntasDeClase(x.id))[0];
     c.abrirClase(cl);
     return cl.id;
   });
 
   await page.locator('#cpClassDone').click();
-  await expect(page.locator('#cpClassDone')).toBeDisabled();
-  await expect(page.locator('#cpClassDone')).toHaveText('Vista ✓');
-  await expect(page.locator('#cpClassState')).toHaveClass(/ok/);
+  await expect(page.locator('#campusPsaOverlay')).not.toHaveClass(/open/);
 
   const luego = await page.evaluate((idClase) => ({
     visto: window.APPICampusPSA.esVisto(idClase),
@@ -99,11 +98,28 @@ test('marcar vista guarda el avance en la clave que sincroniza la cuenta', async
   expect(luego.blob).toBeGreaterThan(0);
 
   // Reabrir la misma clase: ya no aparece "por ver".
-  await page.locator('#cpClassBack').click();
   await page.evaluate((idClase) => window.APPICampusPSA.abrirClase(
     window.APPICampusPSA.clases().find(x => x.id === idClase)), id);
   await expect(page.locator('#cpClassState')).toContainText('✓ vista');
   await expect(page.locator('#cpClassDone')).toBeDisabled();
+});
+
+test('marcar vista de una clase con banco reemplaza la hoja por el quiz (1/3)', async ({ page }) => {
+  await entrar(page);
+
+  // La hoja de clase está abierta cuando se marca: el quiz tiene que poder
+  // tomar el popup igual (el guard viejo la frenaba y el quiz no se abría).
+  await page.evaluate(async () => {
+    const c = window.APPICampusPSA;
+    await c.cargarCatalogo();
+    const cl = c.clases().filter(x => x.stream && c.preguntasDeClase(x.id))[0];
+    c.abrirClase(cl);
+  });
+
+  await page.locator('#cpClassDone').click();
+  await expect(page.locator('#campusPsaOverlay')).toHaveClass(/open/);
+  await expect(page.locator('#cpPvCount')).toContainText('1/3');
+  await expect(page.locator('.cp-question')).toBeVisible();
 });
 
 test('el audio del Campus abre con su stream A_ y su estado', async ({ page }) => {

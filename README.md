@@ -4,6 +4,13 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v650 · Marcar una clase vista cierra la hoja (y su quiz de verificación)
+
+- **Marcar como vista / escuchado cierra el popup**: antes el botón sólo dejaba el botón en "Vista ✓" con la hoja abierta. Ahora guarda el avance y cierra: con clase sin banco cierra directo; con banco sin aprobar, el quiz de 3 preguntas reemplaza la hoja y recién ahí se da la clase por terminada (igual para audio, que cierra siempre).
+- **Bug del quiz post-video (v646)**: `ofrecerPostVideo` frenaba si existía el overlay del popup… y la hoja de clase vive en ese mismo overlay. En uso real el quiz nunca se abría y la racha no se registraba al ver un video. El guard ahora chequea "ya hay un quiz activo" (`pvSession`, que se limpia al cerrar cualquier modal) y suelta el reproductor antes de abrir el quiz.
+- **Tests**: `campus-reproductor.spec.js` cubre los dos caminos — clase sin banco → clic → popup cerrado + avance 100 + reapertura "✓ vista"; clase con banco → clic → quiz "1/3" con la hoja previa abierta.
+- Versión: **v650 · Segura** → Cache `appi-v650-vista-cierra`.
+
 ## v649 · El Campus deja de parpadear
 
 - **Sin repintado si nada cambió**: la vista Campus escucha los eventos de sync, de persona y del catálogo, que en una cuenta real pueden llegar seguido. Hasta ahora cada evento reconstruía todo el HTML (`innerHTML` desde cero) aunque el contenido fuera idéntico, y eso se veía como un parpadeo constante de la pantalla (reportado en PC apenas subió la v648). Ahora `render()` firma el HTML junto con el avance y la versión del catálogo: si la firma coincide con lo ya pintado, el DOM no se toca — quedan el scroll, los botones cableados y la playlist de audios elegida como estaban.
