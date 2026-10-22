@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "654.0.0",
-  "cacheName": "appi-v654-vivo-adentro",
+  "version": "655.0.0",
+  "cacheName": "appi-v655-vivo-miercoles",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

@@ -1274,33 +1274,31 @@
     }catch(e){ return null; }
   }
 
-  // v645 · Vivo PSA: el miércoles (o cuando ya pasó) el mazo ubica el vivo
-  // semanal con su previa y el botón para entrar desde el Campus.
+  // v645 · Vivo PSA (v655: sólo el miércoles): el mazo ubica el vivo
+  // semanal con su previa y el botón para entrar desde el Campus. En cuanto
+  // termina el directo (y el resto de la semana) la tarjeta no aparece.
   function tarjetaVivoPsa(){
     try{
       var c = window.APPICampusPSA;
       if (!c || typeof c.proximoVivoPsa !== 'function') return null;
       var ref = c.proximoVivoPsa();
-      if (!ref || (ref.estado !== 'hoy' && ref.estado !== 'vivo' && ref.estado !== 'pasado')) return null;
+      if (!ref || (ref.estado !== 'hoy' && ref.estado !== 'vivo')) return null;
       var previa = (typeof c.audioPreviaVivo === 'function') ? c.audioPreviaVivo(ref.ini) : null;
       var vivoAhora = ref.estado === 'vivo';
-      var pasado = ref.estado === 'pasado';
       var tienePrevia = !!(previa && previa.stream);
-      var titulo = vivoAhora ? '🔴 El Vivo PSA está en vivo' : pasado ? '🎬 El Vivo de hoy ya está disponible' : 'Hoy 15:00 · Vivo PSA';
+      var titulo = vivoAhora ? '🔴 El Vivo PSA está en vivo' : 'Hoy 15:00 · Vivo PSA';
       var nota = vivoAhora
-        ? 'La transmisión ya arrancó en el Campus. Entrá desde APPI y no te la pierdas.'
-        : pasado
-          ? 'La transmisión del miércoles quedó publicada en el Campus. Mirala cuando quieras.'
-          : 'El vivo de la semana arranca a las 15:00. Escuchá la previa mientras tanto.';
+        ? 'La transmisión ya arrancó en el Campus: mirala desde APPI, sin salir.'
+        : 'El vivo de la semana arranca a las 15:00. Escuchá la previa mientras tanto.';
       var chips = '';
       if (tienePrevia) chips += '<span>🎧 ' + esc(previa.titulo) + '</span>';
       chips += '<span>📅 Miércoles 15:00</span>';
       return {
-        cat: 'vivoPsa', icono: vivoAhora ? '🔴' : pasado ? '🎬' : '📅', kicker: 'Campus PSA · vivo',
+        cat: 'vivoPsa', icono: vivoAhora ? '🔴' : '📅', kicker: 'Campus PSA · vivo',
         titulo: titulo,
         html: '<p class="ht-nota">' + esc(nota) + '</p><div class="ht-chips">' + chips + '</div>',
         cta: {
-          label: vivoAhora ? 'Entrar al vivo 🔴' : pasado ? 'Ver el vivo 🎬' : 'Ver Vivo PSA 📅',
+          label: vivoAhora ? 'Ver el vivo 🔴' : 'Ver Vivo PSA 📅',
           go: function(){
             try{
               if (typeof window.showView === 'function') window.showView('view-campus');

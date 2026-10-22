@@ -4,6 +4,14 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v655 · El Vivo PSA existe sólo el miércoles
+
+- **Se van el replay y "🎬 Vivos anteriores"**: la grabación publicada del vivo no siempre existe (el video de la semana pasada no se pudo ver), así que esas dos tarjetas dejan de existir — ni en la vista del Campus ni en el mazo del Home. Del jueves al martes APPI no muestra absolutamente nada de vivo: tampoco queda el anuncio "Miércoles 15:00" de las semanas anteriores.
+- **El Vivo PSA sólo aparece el miércoles**: antes de las 15:00 la tarjeta avisa "Hoy 15:00 · Vivo PSA" con su previa para escucharla, y mientras dura el directo (15:00–16:35) invita a verlo **acá mismo en APPI** con el player del contenido (`vivoPlayer`, v654). En cuanto termina el directo, la tarjeta desaparece hasta el próximo miércoles.
+- **Mazo del Home**: la tarjeta `vivoPsa` sigue la misma regla — sólo el miércoles, nunca el resto de la semana, con CTA "Ver el vivo 🔴" cuando está en curso.
+- Tests: `campus-vivo.spec.js` se ajusta — terminado el directo no queda ninguna tarjeta; del jueves al martes no hay nada de vivo (y el miércoles siguiente vuelve el directo); el ▶ de la previa se abre desde la tarjeta del día; el test de repintado (v649) usa las filas de audios como referencia.
+- Versión: **v655 · Segura** → Cache `appi-v655-vivo-miercoles`.
+
 ## v654 · Todo el Campus pasa a llamarse "contenido del Campus" y el Vivo se reproduce adentro de APPI
 
 - **Renombrado total de la capa Campus**: la palabra "catálogo" desaparece de la vista, el respaldo local, los eventos y los nombres internos — todo pasa a llamarse **contenido del Campus**. La clave de respaldo es `appi_campus_contenido_v1` (con migración automática en el dispositivo que todavía tenga la clave vieja: nadie pierde su copia), el evento es `appi-campus-contenido`, los métodos son `contenido()` / `cargarContenido()` / `estadoContenido()`, la función edge es `campus-contenido` y su respuesta trae `cont` en lugar de `cat`. La caché en la nube se escribe con la clave `contenido` y todavía **lee la clave vieja como respaldo**. El fixture de tests también cambió a `tests/e2e/fixtures/campus-contenido.json`. Los catálogos de productos PSA (lista de precios, stock, imágenes `catalogo-img/`) **no se tocan**: son otra cosa.
