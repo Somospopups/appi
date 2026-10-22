@@ -174,7 +174,7 @@ window.openStock=function(){
 <script src="./porque-vivo.js?v=618"></script>
 <script src="./home-limpio.js?v=618"></script>
 <script src="./reporte-bonos.js?v=633"></script>
-  <script src="./home-tarjetas.js?v=646"></script>
+  <script src="./home-tarjetas.js?v=653"></script>
   <script src="./appi-eventos.js?v=618"></script>
   <script src="./tu-mes.js?v=618"></script>
   <script src="./device-bridge.js?v=618"></script>
@@ -4659,7 +4659,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v652 · Segura</div>
+  <div class="ds-foot">APPI · v653 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -14211,8 +14211,8 @@ function cerrarToolsMenu(){
   // con archivos viejos en pantalla.
   if ('serviceWorker' in navigator) {
     (async () => {
-const swVersion='652';
-  const CACHE_NAME='appi-v652-agenda-fuera';
+const swVersion='653';
+const CACHE_NAME='appi-v653-pb-record';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
@@ -20119,6 +20119,17 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
         });
         s.dias[diaISO] = dia.slice(-80);
         window.appiPBDiario.guardar(s);
+        // v653: récord histórico del equipo — el día con más PB sumados.
+        // Se guarda aparte del mes para atravesar los periodos, y conserva
+        // el récord anterior para poder festejar "superó el de X día".
+        try {
+          const pbDia = dia.reduce((a, m) => a + (Number(m.pb) || 0), 0);
+          let rec = JSON.parse(localStorage.getItem('appi_pb_record_v1') || 'null') || null;
+          if (pbDia > 0 && pbDia > ((rec && Number(rec.pb)) || 0)) {
+            const ant = (rec && rec.dia && rec.dia !== diaISO && rec.pb) ? { pb: rec.pb, dia: rec.dia } : ((rec && rec.ant) || null);
+            localStorage.setItem('appi_pb_record_v1', JSON.stringify({ pb: pbDia, dia: diaISO, ant: ant }));
+          }
+        } catch(e){}
       }catch(e){}
     },
     dias: function(){
@@ -20128,6 +20139,9 @@ setTimeout(()=>{ try{ psaRender(); }catch(e){} }, 800);
         if(!s || s.periodo !== p || !s.dias) return null;
         return s.dias;
       }catch(e){ return null; }
+    },
+    record: function(){
+      try{ return JSON.parse(localStorage.getItem('appi_pb_record_v1') || 'null') || null; }catch(e){ return null; }
     }
   };
 

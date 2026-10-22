@@ -1556,6 +1556,56 @@
       return num % 1 === 0 ? num.toLocaleString("es-AR", { maximumFractionDigits: 0 }) : num.toLocaleString("es-AR", { minimumFractionDigits: 1, maximumFractionDigits: 2 });
     }
 
+    // v653: el registro diario (el mismo que alimenta los avisos "⚡ sumó +X PB")
+    // es la fuente del feed — cada movimiento uno a uno, con hora.
+    var feedHoy = [];
+    try {
+      if (window.appiPBDiario && typeof window.appiPBDiario.dias === "function") {
+        var diasPB = window.appiPBDiario.dias();
+        feedHoy = (diasPB && diasPB[hoy]) ? diasPB[hoy].slice() : [];
+      }
+    } catch(e){}
+    var pbFeed = 0;
+    feedHoy.forEach(function(m){ pbFeed += (Number(m.pb) || 0); });
+    if (pbFeed > pbHoy) pbHoy = pbFeed;
+
+    // v653: racha — días seguidos con al menos un PB, como la del Campus.
+    function diaConPB(dias, key){
+      var arr = dias && dias[key];
+      if (!arr || !arr.length) return false;
+      for (var i = 0; i < arr.length; i++) if ((Number(arr[i].pb) || 0) > 0) return true;
+      return false;
+    }
+    var racha = 0;
+    var hoyConPB = false;
+    try {
+      var diasRacha = (window.appiPBDiario && typeof window.appiPBDiario.dias === "function") ? window.appiPBDiario.dias() : null;
+      if (diasRacha) {
+        hoyConPB = diaConPB(diasRacha, hoy);
+        var dRacha = new Date();
+        if (!hoyConPB) dRacha.setDate(dRacha.getDate() - 1); // si hoy todavía no sumó, la racha se sostiene desde ayer
+        for (var g = 0; g < 400; g++) {
+          var kRacha = dRacha.getFullYear() + "-" + String(dRacha.getMonth() + 1).padStart(2, "0") + "-" + String(dRacha.getDate()).padStart(2, "0");
+          if (!diaConPB(diasRacha, kRacha)) break;
+          racha++;
+          dRacha.setDate(dRacha.getDate() - 1);
+        }
+      }
+    } catch(e){}
+
+    // v653: récord — el día con más PB sumados (histórico). Si hoy es el
+    // récord, la tarjeta lo festeja y cuenta cuál batieron.
+    var rec = null;
+    try { rec = (window.appiPBDiario && typeof window.appiPBDiario.record === "function") ? window.appiPBDiario.record() : null; } catch(e){}
+    var esRecord = !!(rec && rec.dia === hoy && (Number(rec.pb) || 0) > 0);
+    function fechaCorta(iso){
+      try {
+        var partes = String(iso).split("-");
+        var meses = ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
+        return Number(partes[2]) + " " + (meses[Number(partes[1]) - 1] || "");
+      } catch(e){ return String(iso || ""); }
+    }
+
     var activos = eq.filter(function(p){ return Number(p.pnAct != null ? p.pnAct : (p.pbPersonal || 0)) > 0; }).length;
     var pctActivos = eq.length ? Math.round((activos / eq.length) * 100) : 0;
 
@@ -1567,7 +1617,20 @@
     }).slice(0, 3);
 
     var bloqueDetalle = "";
-    if (movimientosHoy.length > 0) {
+    if (feedHoy.length > 0) {
+      var filasFeed = feedHoy.slice(-6).reverse().map(function(m){
+        var hora = "";
+        try { hora = m.ts ? new Date(m.ts).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" }) : ""; } catch(e){}
+        return '<div class="ht-pb-mov-row"><span>' + esc(hora ? (hora + " · " + m.n) : m.n) + '</span><b>+' + fmtPB(m.pb) + ' PB</b></div>';
+      }).join("");
+      var restoFeed = feedHoy.length - 6;
+      bloqueDetalle = '<div class="ht-pb-destacados">' +
+        '<span class="ht-pb-dest-tit">⚡ Sumando PB, uno a uno:</span>' +
+        '<div class="ht-pb-mov-list">' + filasFeed +
+          (restoFeed > 0 ? '<div class="ht-pb-mov-row ht-pb-mov-mas"><span>…y ' + restoFeed + ' movimiento' + (restoFeed === 1 ? "" : "s") + ' más</span></div>' : "") +
+        '</div>' +
+      '</div>';
+    } else if (movimientosHoy.length > 0) {
       bloqueDetalle = '<div class="ht-pb-destacados">' +
         '<span class="ht-pb-dest-tit">🔥 Sumaron hoy:</span>' +
         '<div class="ht-pb-mov-list">' +
@@ -1589,24 +1652,40 @@
       '</div>';
     }
 
-    var html = '<div class="ht-pb-grid">' +
+    var sumaronHoy = feedHoy.length || movimientosHoy.length;
+    var lineaRacha = "";
+    if (racha > 0) {
+      lineaRacha = hoyConPB
+        ? '<div class="ht-pb-racha">🔥 ' + racha + (racha === 1 ? " día" : " días") + (racha === 1 ? " seguido" : " seguidos") + ' con PB</div>'
+        : '<div class="ht-pb-racha">Sumá PB hoy para mantener la racha de ' + racha + (racha === 1 ? " día" : " días") + ' 🔥</div>';
+    }
+    var bandaRecord = "";
+    if (esRecord) {
+      bandaRecord = '<div class="ht-pb-record">🏆 ¡Mejor día del equipo! ' +
+        (rec.ant ? ('Superaron el récord de ' + fmtPB(rec.ant.pb) + ' PB (' + esc(fechaCorta(rec.ant.dia)) + ')') : 'Nunca habían sumado tanto') +
+        ' 🎉</div>';
+    }
+
+    var html = bandaRecord + '<div class="ht-pb-grid">' +
       '<div class="ht-pb-card pb-hoy">' +
         '<span class="ht-pb-card-lbl">⚡ PB de Hoy</span>' +
         '<b class="ht-pb-card-val">' + (pbHoy > 0 ? ("+" + fmtPB(pbHoy)) : "0") + ' <small>PB</small></b>' +
-        '<span class="ht-pb-card-sub">' + (pbHoy > 0 ? (movimientosHoy.length + (movimientosHoy.length === 1 ? " sumó hoy" : " sumaron hoy")) : "Sin cargas hoy") + '</span>' +
+        '<span class="ht-pb-card-sub">' + (pbHoy > 0 ? (sumaronHoy + (sumaronHoy === 1 ? " sumó hoy" : " sumaron hoy")) : "Sin cargas hoy") + '</span>' +
       '</div>' +
       '<div class="ht-pb-card pb-acum">' +
         '<span class="ht-pb-card-lbl">📈 Total del Mes</span>' +
         '<b class="ht-pb-card-val">' + fmtPB(totalAcumulado) + ' <small>PB</small></b>' +
         '<span class="ht-pb-card-sub">' + activos + ' de ' + eq.length + ' activos (' + pctActivos + '%)</span>' +
       '</div>' +
-    '</div>' + bloqueDetalle;
+    '</div>' + lineaRacha + bloqueDetalle;
 
     return {
       cat: "pb_equipo",
       icono: "⭐",
       kicker: "Producción · Mi Equipo",
-      titulo: pbHoy > 0 ? ("¡Hoy el equipo sumó " + fmtPB(pbHoy) + " PB!") : "Producción del Equipo",
+      titulo: esRecord
+        ? ("🏆 ¡Mejor día! El equipo sumó " + fmtPB(pbHoy) + " PB 🎉")
+        : (pbHoy > 0 ? ("¡Hoy el equipo sumó " + fmtPB(pbHoy) + " PB!") : "Producción del Equipo"),
       html: html,
       fab: null,
       cta: {
@@ -1750,6 +1829,9 @@
       '.ht-pb-mov-row span{display:flex;align-items:center;gap:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
       '.ht-pb-mov-row span small{font-size:9.5px;color:#64748b;font-weight:700}',
       '.ht-pb-mov-row b{color:#0b5878;font-size:12px;font-weight:950;flex:none}',
+      '.ht-pb-mov-row.ht-pb-mov-mas{color:#64748b;font-style:italic}',
+      '.ht-pb-racha{font-size:11.5px;font-weight:900;color:#b45309;background:rgba(254,249,195,.55);border:1px dashed rgba(234,179,8,.45);border-radius:12px;padding:6px 10px;margin:2px 0 6px;text-align:center}',
+      '.ht-pb-record{font-size:12px;font-weight:900;color:#146b54;background:linear-gradient(145deg,rgba(212,250,229,.85),rgba(255,255,255,.9));border:1.5px solid rgba(58,208,164,.5);border-radius:14px;padding:8px 12px;margin:2px 0 8px;text-align:center;line-height:1.35}',
       'body.dark .ht-pb-card{background:#232536;border-color:rgba(255,255,255,.1)}',
       'body.dark .ht-pb-card.pb-hoy{background:linear-gradient(145deg,rgba(180,83,9,.25),#232536);border-color:rgba(245,158,11,.35)}',
       'body.dark .ht-pb-card.pb-acum{background:linear-gradient(145deg,rgba(79,70,229,.25),#232536);border-color:rgba(99,102,241,.35)}',
@@ -1762,6 +1844,9 @@
       'body.dark .ht-pb-mov-row{color:#f1f5f9}',
       'body.dark .ht-pb-mov-row span small{color:#94a3b8}',
       'body.dark .ht-pb-mov-row b{color:#38bdf8}',
+      'body.dark .ht-pb-mov-row.ht-pb-mov-mas{color:#94a3b8}',
+      'body.dark .ht-pb-racha{color:#fbbf24;background:rgba(180,83,9,.2);border-color:rgba(245,158,11,.4)}',
+      'body.dark .ht-pb-record{color:#d8f5e6;background:linear-gradient(145deg,rgba(26,51,40,.85),#232536);border-color:rgba(58,208,164,.45)}',
       'body.dark .ht-card.ht-ganaste .ht-kicker{color:#3ad0a4}',
       '.ht-card.ht-ganaste h3{color:#146b54}',
       'body.dark .ht-card.ht-ganaste h3{color:#d8f5e6}',
@@ -2434,6 +2519,7 @@
     tarjetaCapacitacion: tarjetaCapacitacion,
     tarjetaVivoPsa: tarjetaVivoPsa,
     tarjetaRacha: tarjetaRacha,
+    tarjetaPbEquipo: tarjetaPbEquipo,
     contextoCapacitacion: contextoCapacitacion,
     tarjetaPromoBotella: tarjetaPromoBotella,
     textoMarcador: textoMarcador

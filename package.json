@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "652.0.0",
-  "cacheName": "appi-v652-agenda-fuera",
+  "version": "653.0.0",
+  "cacheName": "appi-v653-pb-record",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

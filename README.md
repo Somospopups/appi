@@ -4,6 +4,14 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v653 · La tarjeta de PB del Home suma los movimientos uno a uno, con racha y récord
+
+- **Feed de PB en la tarjeta del mazo**: la tarjeta ⭐ Producción del Equipo ahora lista los movimientos del día **uno a uno con hora** ("10:42 · Juan · +30 PB"), desde el mismo registro diario que alimenta los avisos "⚡ Juan sumó +X PB" (`appi_pb_mov_v1`) — así el Home refleja lo que fue pasando durante el día, no sólo un top 3 al cierre.
+- **Total del día y racha**: el titular suma todo lo del día (el feed manda si el snapshot del día no lo capturó) y aparece la **racha de días seguidos con PB**, con la misma semántica del Campus: si hoy todavía no sumó, la tarjeta avisa "Sumá PB hoy para mantener la racha de N días".
+- **Festejo del mejor día**: `appiPBDiario` guarda el **récord histórico** (`appi_pb_record_v1`, atraviesa los meses y conserva el récord anterior). Cuando hoy es el día que más PB hizo de la historia del equipo, la tarjeta lo festeja: "🏆 ¡Mejor día del equipo! Superaron el récord de X PB (fecha) 🎉".
+- Tests: `pb-tarjeta.spec.js` (nuevo) cubre feed + racha, festejo de récord, racha viva sin PB de hoy y el caso sin movimientos.
+- Versión: **v653 · Segura** → Cache `appi-v653-pb-record`.
+
 ## v652 · Se va la agenda de "Reunión de Equipo" de otros equipos
 
 - **`📅 Próximos en vivo` deja de existir**: la agenda que el Campus publica en `/proximas-clases-en-vivo` traía SÓLO las reuniones internas de los equipos del distribuidor ( Equipos Sin Fronteras, Espigas Doradas, Alpinistas, MegaRed… con sus horarios): datos internos de otros equipos que no corresponden publicar en APPI ni compartir con la nube de todos. La sección se eliminó del todo — ni se lista ni se ofrece "Agendar".
