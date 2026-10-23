@@ -141,9 +141,9 @@ window.openStock=function(){
 <script src="./recordatorios-app.js?v=618"></script>
 <script src="./telefono.js?v=639"></script>
 <script src="./whatsapp-app.js?v=618"></script>
-<script src="./auth-client.js?v=618"></script>
+<script src="./auth-client.js?v=853"></script>
 <script src="./prueba-banner.js?v=618"></script>
-<script src="./data-sync.js?v=618"></script>
+<script src="./data-sync.js?v=853"></script>
 <script src="./js/membership-admin.js?v=618"></script>
 <script src="./admin-panel.js?v=618"></script>
 <script src="./js/compromiso-pago.js?v=618"></script>
@@ -4659,7 +4659,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v655 · Segura</div>
+  <div class="ds-foot">APPI · v853 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -14211,8 +14211,8 @@ function cerrarToolsMenu(){
   // con archivos viejos en pantalla.
   if ('serviceWorker' in navigator) {
     (async () => {
-    const swVersion='655';
-    const CACHE_NAME='appi-v655-vivo-miercoles';
+    const swVersion='853';
+    const CACHE_NAME='appi-v853-psa-conexion';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
@@ -19138,6 +19138,49 @@ function psaGuardarIdx(idx){ try{ if(idx && (idx.linea||idx.garantiasOrg||idx.ga
 /* v618: los 3 archivos (Línea descendente, Garantías por organización y
    Garantías) se bajan en UNA sola llamada al servidor (action:'sync') con
    una sola sesión de PSA, y se aplican a la app lo más silencioso posible. */
+
+/*
+ * Todas las lecturas de MI PSA pasan por la misma puerta. Antes cada función
+ * hacía su propio fetch y, si el JWT de APPI había vencido mientras la app
+ * seguía abierta, mandaba la clave pública como Bearer: la Edge Function
+ * respondía 401 y la pantalla sólo decía "error de conexión". Además, el
+ * status HTTP se perdía al hacer .json().catch().
+ */
+async function psaConsultaEdge(body, reintentar=true){
+  const cfg=(window.APPI_AUTH&&window.APPI_AUTH.url&&window.APPI_AUTH.anonKey)?window.APPI_AUTH:null;
+  if(!cfg) throw new Error('Sin conexión con la nube de APPI.');
+  const tokenActual=()=>{
+    try{
+      if(window.APPIAuth&&typeof window.APPIAuth.accessToken==='function'){
+        const t=window.APPIAuth.accessToken(); if(t) return t;
+      }
+      const v=JSON.parse(localStorage.getItem('appi_auth_session_v1')||'null');
+      return v&&v.session&&v.session.access_token||'';
+    }catch(e){ return ''; }
+  };
+  let response;
+  try{
+    response=await fetch(cfg.url.replace(/\/$/,'')+'/functions/v1/consulta-serial',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','apikey':cfg.anonKey,'Authorization':'Bearer '+(tokenActual()||cfg.anonKey)},
+      body:JSON.stringify(body),
+      cache:'no-store'
+    });
+  }catch(e){ throw new Error('No se pudo conectar con APPI. Revisá tu conexión.'); }
+  let data={};
+  try{ data=await response.json(); }catch(e){ data={}; }
+  if(response.status===401&&reintentar&&window.APPIAuth&&typeof window.APPIAuth.refresh==='function'){
+    try{ await window.APPIAuth.refresh(); return psaConsultaEdge(body,false); }catch(e){}
+  }
+  if(!response.ok||!data||data.error){
+    const fallback=response.status===401?'La sesión de APPI venció. Volvé a ingresar.':
+      response.status===403?'Tu cuenta de APPI no está activa.':
+      'No se pudo conectar con PSA.';
+    throw new Error(String((data&&data.error)||fallback));
+  }
+  return data;
+}
+
 async function sincronizarTodoPSA(creds, opts){
   opts = opts || {};
   const c = creds || psaGetCreds();
@@ -19162,14 +19205,6 @@ async function sincronizarTodoPSA(creds, opts){
     if(typeof opts.done === 'function') opts.done(false, 'Sin datasets');
     return false;
   }
-  let token = '';
-  try{
-    if(window.APPIAuth && typeof window.APPIAuth.accessToken === 'function') token = window.APPIAuth.accessToken();
-    if(!token){
-      const v = JSON.parse(localStorage.getItem('appi_auth_session_v1') || 'null');
-      token = v && v.session && v.session.access_token || '';
-    }
-  }catch(e){}
   const body = {
     action: 'sync',
     center: c.center,
@@ -19182,19 +19217,8 @@ async function sincronizarTodoPSA(creds, opts){
 
   if(typeof psaSetStatus === 'function') psaSetStatus('Sincronizando los 3 archivos de MI PSA…', '');
   try{
-    const j = await fetch(cfg.url + '/functions/v1/consulta-serial', {
-      method: 'POST',
-      headers: { 'Content-Type':'application/json', 'apikey': cfg.anonKey, 'Authorization': 'Bearer ' + (token || cfg.anonKey) },
-      body: JSON.stringify(body)
-    }).then(r => r.json()).catch(() => ({}));
-
-    if(!j || j.error){
-      const err = (j && j.error) || 'No se pudo conectar a PSA. Verificá Centro/Número/Clave.';
-      if(typeof psaSetStatus === 'function') psaSetStatus(err, 'err');
-      if(typeof opts.done === 'function') opts.done(false, err);
-      return false;
-    }
-
+    const j = await psaConsultaEdge(body);
+    const serverIdx=(j&&j.idx&&typeof j.idx==='object')?j.idx:{};
     const nuevos = {};
     const errores = [];
     let alguno = false;
@@ -19210,13 +19234,13 @@ async function sincronizarTodoPSA(creds, opts){
             try{ if(window.appiGuardarLinea) window.appiGuardarLinea(j.linea.par || []); }catch(e){}
             try{ localStorage.setItem('appi_linea_lastFetch', String(Date.now())); }catch(e){}
             try{ localStorage.setItem('lastUpdate_equipo', Date.now().toString()); }catch(e){}
-            nuevos.linea = j.idx.linea;
+            nuevos.linea = serverIdx.linea || (prev&&prev.linea) || '';
             alguno = true;
           } else {
             errores.push('Línea: no se pudo leer el archivo de PSA');
           }
         }catch(e){ errores.push('Línea: ' + String((e && e.message) || e)); }
-      } else if(j.idx.linea){
+      } else if(serverIdx.linea){
         errores.push('Línea: el informe salió vacío');
       }
 
@@ -19241,7 +19265,7 @@ async function sincronizarTodoPSA(creds, opts){
             if(cruzados){
               saveEquipoToStorage();
               try{ localStorage.setItem('lastUpdate_garantiasOrg', Date.now().toString()); }catch(e){}
-              nuevos.garantiasOrg = j.idx.garantiasOrg;
+              nuevos.garantiasOrg = serverIdx.garantiasOrg || (prev&&prev.garantiasOrg) || '';
               alguno = true;
             } else {
               errores.push('Garantías por organización: no calzó ningún DIP con tu equipo');
@@ -19250,7 +19274,7 @@ async function sincronizarTodoPSA(creds, opts){
             errores.push('Garantías por organización: no se pudo leer el archivo');
           }
         }catch(e){ errores.push('Garantías por org: ' + String((e && e.message) || e)); }
-      } else if(j.idx.garantiasOrg){
+      } else if(serverIdx.garantiasOrg){
         if(!equipoData || !equipoData.personas) errores.push('Garantías por organización: cargá primero la Línea descendente');
         else errores.push('Garantías por organización: el informe salió vacío');
       }
@@ -19260,10 +19284,10 @@ async function sincronizarTodoPSA(creds, opts){
         try{
           const parsed = psaMapearGarantias(j.garantias.filas);
           psaAplicarGarantiasBase(parsed);
-          nuevos.garantias = j.idx.garantias;
+          nuevos.garantias = serverIdx.garantias || (prev&&prev.garantias) || '';
           alguno = true;
         }catch(e){ errores.push('Garantías: ' + String((e && e.message) || e)); }
-      } else if(j.idx.garantias){
+      } else if(serverIdx.garantias){
         errores.push('Garantías: el reporte salió vacío');
       }
     } finally {
@@ -19285,8 +19309,9 @@ async function sincronizarTodoPSA(creds, opts){
     }
     return alguno;
   }catch(e){
-    if(typeof psaSetStatus === 'function') psaSetStatus('Error de conexión con PSA.', 'err');
-    if(typeof opts.done === 'function') opts.done(false, String((e && e.message) || e));
+    const msg=String((e&&e.message)||e||'Error de conexión con PSA.');
+    if(typeof psaSetStatus === 'function') psaSetStatus(msg, 'err');
+    if(typeof opts.done === 'function') opts.done(false, msg);
     return false;
   }
 }
@@ -19308,34 +19333,16 @@ async function sincronizarGarantiasPSA(creds, done){
     return false;
   }
   
-  let token = '';
-  try{
-    if(window.APPIAuth && typeof window.APPIAuth.accessToken === 'function') token = window.APPIAuth.accessToken();
-    if(!token){
-      const v = JSON.parse(localStorage.getItem('appi_auth_session_v1') || 'null');
-      token = v && v.session && v.session.access_token || '';
-    }
-  }catch(e){}
-
   if(typeof psaSetStatus === 'function') psaSetStatus('Conectando a MI PSA y descargando garantías…', '');
 
   try{
-    const r = await fetch(cfg.url + '/functions/v1/consulta-serial', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'apikey': cfg.anonKey,
-        'Authorization': 'Bearer ' + (token || cfg.anonKey)
-      },
-      body: JSON.stringify({
-        action: 'report',
-        center: c.center,
-        number: c.number,
-        password: c.password
-      })
+    const j = await psaConsultaEdge({
+      action: 'report',
+      center: c.center,
+      number: c.number,
+      password: c.password
     });
-    const j = await r.json().catch(() => ({}));
-    if(r.ok && j && j.ok && Array.isArray(j.filas) && j.filas.length){
+    if(j && j.ok && Array.isArray(j.filas) && j.filas.length){
       const parsed = psaMapearGarantias(j.filas);
 
       try{
@@ -19381,7 +19388,7 @@ async function sincronizarGarantiasPSA(creds, done){
     }
   }catch(e){
     psaActualizarTimestampsLocal();
-    const errMsg = 'Error de conexión con PSA.';
+    const errMsg = String((e&&e.message)||e||'Error de conexión con PSA.');
     if(typeof psaSetStatus === 'function') psaSetStatus(errMsg, 'err');
     if(typeof done === 'function') done(false, errMsg);
     return false;

@@ -39,15 +39,71 @@ function normSerie(s: string): string {
 }
 
 type Jar = Record<string, string>;
+
+/*
+ * Deno/Undici no siempre expone Set-Cookie de la misma manera: en algunas
+ * versiones existe getSetCookie(), mientras que en otras sólo queda el
+ * header combinado. Si perdemos la cookie psagw en el primer redirect, el
+ * login de todos los distribuidores parece fallar aunque la clave sea
+ * correcta. Mantener el fallback acá evita depender de una versión puntual
+ * del runtime de Supabase.
+ */
+function splitSetCookieHeader(raw: string): string[] {
+  return String(raw || '').split(/,(?=\s*[^;,=\s]+\s*=)/g).map(v => v.trim()).filter(Boolean);
+}
+function setCookieValues(h: Headers): string[] {
+  try {
+    const getter = (h as Headers & { getSetCookie?: () => string[] }).getSetCookie;
+    if (typeof getter === 'function') {
+      const values = getter.call(h);
+      if (Array.isArray(values) && values.length) return values;
+    }
+  } catch (_) {}
+  const raw = h.get('set-cookie') || h.get('set-cookie2') || '';
+  return splitSetCookieHeader(raw);
+}
 function putCookies(h: Headers, jar: Jar) {
-  const sc = h.getSetCookie ? h.getSetCookie() : [];
-  for (const c of sc) {
+  for (const c of setCookieValues(h)) {
     const [par] = c.split(';');
     const i = par.indexOf('=');
     if (i > 0) jar[par.slice(0, i).trim()] = par.slice(i + 1).trim();
   }
 }
 const cookieH = (jar: Jar) => Object.entries(jar).map(([k, v]) => k + '=' + v).join('; ');
+
+function inputValue(html: string, name: string): string {
+  const inputs = html.match(/<input\b[^>]*>/gi) || [];
+  for (const input of inputs) {
+    const nm = input.match(/\bname\s*=\s*["']([^"']+)["']/i);
+    if (!nm || nm[1] !== name) continue;
+    const value = input.match(/\bvalue\s*=\s*["']([^"']*)["']/i);
+    return value ? value[1] : '';
+  }
+  return '';
+}
+function formAction(html: string, fallback: string): string {
+  const form = html.match(/<form\b[^>]*>/i)?.[0] || '';
+  const action = form.match(/\baction\s*=\s*["']([^"']+)["']/i)?.[1];
+  return action || fallback;
+}
+function isLoginPage(html: string): boolean {
+  return /<form\b[^>]*(?:action\s*=\s*["'][^"']*login|name\s*=\s*["']formKey["'])/i.test(String(html || ''))
+    && /(?:name|id)\s*=\s*["']_?password["']/i.test(String(html || ''));
+}
+function isLoginUrl(url: string): boolean {
+  try { return /\/login(?:[/?#]|$)/i.test(new URL(url).pathname); }
+  catch (_) { return /\/login(?:[/?#]|$)/i.test(String(url || '')); }
+}
+function psaDigits(value: unknown): string {
+  return String(value ?? '').replace(/\D/g, '');
+}
+function normalizePSACenter(value: unknown): string {
+  return psaDigits(value).slice(-2).padStart(2, '0');
+}
+function normalizePSANumber(value: unknown): string {
+  const digits = psaDigits(value);
+  return digits.length > 8 ? digits.slice(-8) : digits.padStart(8, '0');
+}
 
 /**
  * Login en mi.psa.com.ar → cookies de la sesión (psagw).
@@ -57,35 +113,60 @@ const cookieH = (jar: Jar) => Object.entries(jar).map(([k, v]) => k + '=' + v).j
  */
 async function loginPSA(center: string, number: string, password: string): Promise<Jar | null> {
   const mi: Jar = {};
-  const r1 = await fetch(MI + '/login', { headers: { 'User-Agent': UA } });
+  const getHeaders = () => ({ 'User-Agent': UA, Cookie: cookieH(mi) });
+  const r1 = await fetch(MI + '/login', { headers: { 'User-Agent': UA }, redirect: 'manual' });
   putCookies(r1.headers, mi);
   const html1 = await r1.text();
-  const m = html1.match(/name="_csrf_token" value="([^"]+)"/);
-  if (!m) return null;
+  const csrf = inputValue(html1, '_csrf_token');
+  if (!csrf) return null;
+
   const fd = new URLSearchParams();
-  fd.set('_center', center);
-  fd.set('_number', number);
-  fd.set('_password', password);
+  fd.set('_center', String(center || '').trim());
+  fd.set('_number', String(number || '').trim());
+  fd.set('_password', String(password || ''));
   fd.set('_term_use', 'accept');
-  fd.set('_csrf_token', m[1]);
-  const r2 = await fetch(MI + '/login_check', {
+  fd.set('_csrf_token', csrf);
+  const action = new URL(formAction(html1, '/login_check'), MI).href;
+  let current = action;
+  let response = await fetch(current, {
     method: 'POST',
     headers: { 'User-Agent': UA, 'Content-Type': 'application/x-www-form-urlencoded', Cookie: cookieH(mi) },
     body: fd.toString(),
     redirect: 'manual'
   });
-  putCookies(r2.headers, mi);
-  const loc = r2.headers.get('location');
-  if (loc) {
-    // Seguir el 302 manualmente (la cookie ya está en el jar).
-    const r3 = await fetch(new URL(loc, MI).href, { headers: { 'User-Agent': UA, Cookie: cookieH(mi) } });
-    putCookies(r3.headers, mi);
+  putCookies(response.headers, mi);
+
+  // PSA responde también con 302 → /login cuando la clave no coincide. El
+  // código anterior sólo comprobaba que existiera psagw (cookie que PSA crea
+  // incluso antes de autenticar) y que el HTML contuviera "Mi PSA" (también
+  // aparece en el <title> de la pantalla de login), por lo que una clave
+  // inválida se diagnosticaba como un fallo genérico de SSO. Seguimos los
+  // redirects y rechazamos explícitamente ese camino.
+  let landing = '';
+  for (let i = 0; i < 6; i++) {
+    const loc = response.headers.get('location');
+    if (!loc) {
+      landing = await response.text();
+      break;
+    }
+    current = new URL(loc, current).href;
+    if (isLoginUrl(current)) return null;
+    response = await fetch(current, { headers: getHeaders(), redirect: 'manual' });
+    putCookies(response.headers, mi);
   }
-  if (!mi['psagw']) return null;
-  // Verificar que la sesión quedó logueada.
-  const r4 = await fetch(MI + '/', { headers: { 'User-Agent': UA, Cookie: cookieH(mi) } });
-  const h4 = await r4.text();
-  if (!h4.includes('Mi PSA')) return null;
+  if (!landing) {
+    const r4 = await fetch(MI + '/', { headers: getHeaders(), redirect: 'manual' });
+    putCookies(r4.headers, mi);
+    current = r4.url || MI + '/';
+    const rootLoc = r4.headers.get('location');
+    if (rootLoc) {
+      current = new URL(rootLoc, current).href;
+      if (isLoginUrl(current)) return null;
+    }
+    landing = await r4.text();
+  }
+  if (isLoginUrl(current) || isLoginPage(landing)) return null;
+  if (!Object.keys(mi).length) return null;
   return mi;
 }
 
@@ -117,10 +198,14 @@ async function ssoDip(mi: Jar): Promise<Jar | null> {
     const loc3 = await hop(new URL(loc2, DIP_HUB).href, dip, false);
     if (!loc3) return null;
     await hop(new URL(loc3, DIP_HUB).href, dip, false);
-    // Verificar: el hub debe traer la grilla de reportes.
+    // Verificar que el SSO terminó en el módulo y no volvió a la pantalla de
+    // login. "txtCons" era un id interno del hub: PSA lo cambió en algunos
+    // despliegues y dejó a todos sin datos aunque la sesión siguiera viva.
     const r5 = await fetch(DIP_HUB, { headers: { 'User-Agent': UA, Cookie: cookieH(dip) } });
+    putCookies(r5.headers, dip);
+    if (isLoginUrl(r5.url || DIP_HUB)) return null;
     const h5 = await r5.text();
-    if (!h5.includes('txtCons')) return null;
+    if (isLoginPage(h5)) return null;
     return dip;
   } catch (_) {
     return null;
@@ -235,19 +320,55 @@ interface Fila { usuario: string; telefono: string; domicilio: string; cp: strin
 
 /** Parsea el reporte de Garantías (tabla HTML; col 12 = "Dip reasignado",
  *    col 13 = "E Mail", col 14 = "Cumpleaños", v817). */
+function normCol(s: string): string {
+  return String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+}
 function parsearGarantias(html: string): Fila[] {
   const out: Fila[] = [];
   const trs = html.match(/<tr[^>]*>[\s\S]*?<\/tr>/g) || [];
+  let header: string[] | null = null;
+  const cellText = (c: string) => c.replace(/<[^>]+>/g, '')
+    .replace(/&nbsp;/gi, ' ').replace(/&amp;/gi, '&').replace(/&eacute;/gi, 'é')
+    .replace(/&iacute;/gi, 'í').replace(/&oacute;/gi, 'ó').replace(/&aacute;/gi, 'á')
+    .replace(/&uacute;/gi, 'ú').replace(/&ntilde;/gi, 'ñ')
+    .replace(/\s+/g, ' ').trim();
+  const find = (names: RegExp[], fallback: number) => {
+    if (!header) return fallback;
+    const idx = header.findIndex(v => names.some(re => re.test(v)));
+    return idx >= 0 ? idx : fallback;
+  };
   for (const tr of trs) {
-    const cells = (tr.match(/<td[^>]*>[\s\S]*?<\/td>/g) || [])
-      .map(c => c.replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&eacute;/g, 'é').replace(/&iacute;/g, 'í').replace(/\s+/g, ' ').trim());
-    if (cells.length < 12) continue;
-    const serie = normSerie(cells[5]);
-    if (!serie) continue;
+    const cellsAll = tr.match(/<t[dh][^>]*>[\s\S]*?<\/t[dh]>/g) || [];
+    const cells = cellsAll.map(cellText);
+    if (!cells.length) continue;
+    const hasTh = /<th\b/i.test(tr);
+    const rowNorm = cells.map(normCol);
+    if (hasTh || (!header && rowNorm.some(v => /(^| )serie( |$)/.test(v)) && rowNorm.some(v => /(^| )(usuario|cliente|titular)( |$)/.test(v)))) {
+      header = rowNorm;
+      continue;
+    }
+    // Si PSA cambia el orden o agrega columnas, usamos los encabezados. Los
+    // offsets de abajo quedan como respaldo para el HTML histórico.
+    const iUsuario = find([/^usuario$/, /nombre.*(usuario|cliente)/, /^cliente$/, /titular/], 0);
+    const iTelefono = find([/^telf/, /^telefono/, /^celular/, /tel/], 1);
+    const iDomicilio = find([/^domicilio$/, /direccion/], 2);
+    const iCp = find([/^c ?p$/, /^codigo postal/, /^cp$/], 3);
+    const iLocalidad = find([/^localidad$/, /ciudad/], 4);
+    const iSerie = find([/^serie$/, /nro.*serie/, /numero.*serie/], 5);
+    const iProducto = find([/^producto$/, /modelo/], 6);
+    const iCompra = find([/^f compra$/, /fecha.*compra/, /compra/], 7);
+    const iVence = find([/^f vence$/, /fecha.*vence/, /vencimiento/, /vence/], 8);
+    const iCanje = find([/^canje$/, /tipo.*canje/], 11);
+    const iDr = find([/dip.*reasign/, /reasign/], 12);
+    const iEmail = find([/^e mail$/, /^email$/, /correo/], 13);
+    const iCumple = find([/^cumple/, /cumpleanos/], 14);
+    if (cells.length <= iSerie) continue;
+    const serie = normSerie(cells[iSerie]);
+    if (!serie || !/[A-Z0-9]{4,}/.test(serie)) continue;
     out.push({
-      usuario: cells[0], telefono: cells[1], domicilio: cells[2], cp: cells[3],
-      localidad: cells[4], serie, producto: cells[6], compra: cells[7], vence: cells[8], canje: cells[11] || '',
-      dr: cells[12] || '', e: cells[13] || '', cn: cells[14] || ''
+      usuario: cells[iUsuario] || '', telefono: cells[iTelefono] || '', domicilio: cells[iDomicilio] || '', cp: cells[iCp] || '',
+      localidad: cells[iLocalidad] || '', serie, producto: cells[iProducto] || '', compra: cells[iCompra] || '', vence: cells[iVence] || '',
+      canje: cells[iCanje] || '', dr: cells[iDr] || '', e: cells[iEmail] || '', cn: cells[iCumple] || ''
     });
   }
   return out;
@@ -325,14 +446,25 @@ function columnasHtml(h: string): string[] {
 function parsearLineaHtml(html: string): LineaFila[] | null {
   const filas = filasHtml(html);
   const out: LineaFila[] = [];
+  let nombreOffset = 4;
+  // El formato habitual tiene "Nombre" y "PB Mes Actual" en la fila de
+  // títulos. Calcular el desplazamiento permite tolerar que PSA agregue o
+  // quite una columna sin dejar la línea vacía.
   for (const f of filas) {
-    if (!f || f.length < 5) continue;
+    const n = f.map(normCol);
+    const iNombre = n.findIndex(v => /(^| )(nombre|distribuidor|dip)( |$)/.test(v));
+    const iPB = n.findIndex(v => /(^| )(pb|puntos pb|pb mes|pb mes actual|puntos personales)( |$)/.test(v));
+    if (iNombre >= 0 && iPB > iNombre) { nombreOffset = iPB - iNombre; break; }
+  }
+  for (const f of filas) {
+    if (!f || f.length < 2) continue;
     let idxNombre = -1;
     for (let i = 0; i < f.length; i++) if (/^\[\s*\d{1,3}-\d+\s*\]/.test(f[i] || '')) { idxNombre = i; break; }
     if (idxNombre < 0) continue;
-    const pb = numPB(f[idxNombre + 4] || '');
+    const pbCell = f[idxNombre + nombreOffset] || '';
+    const pb = numPB(pbCell);
     const nombre = String(f[idxNombre]).replace(/^\[\s*\d{1,3}-\d+\s*\]\s*/, '').replace(/\s*\[\s*[^\]\[]+\s*\]\s*$/, '').trim();
-    out.push({ n: nombre, pb });
+    if (nombre) out.push({ n: nombre, pb });
   }
   return out.length ? out : null;
 }
@@ -578,10 +710,16 @@ Deno.serve(async (req) => {
   if (body.action !== 'report' && body.action !== 'bonos' && body.action !== 'perfil' && body.action !== 'linea' && body.action !== 'sync' && serie.length < 4) return json({ error: 'Escribí el número de serie (el del QR de la base).' }, 400);
 
   // Credenciales PSA: las trae la app (sección MI PSA) o secrets del proyecto.
-  const center = String(body.center || Deno.env.get('PSA_CENTER') || '').trim();
-  const number = String(body.number || Deno.env.get('PSA_NUMBER') || '').trim().replace(/^0+/, '');
+  // El formulario de PSA pide los 8 últimos dígitos del distribuidor. La
+  // interfaz de APPI suele recibirlos desde un input numérico y puede perder
+  // el cero inicial; normalizar acá evita que cada cuenta tenga que adivinar
+  // si debe escribir 7 u 8 dígitos. Nunca se modifica la clave.
+  const centerRaw = body.center || Deno.env.get('PSA_CENTER') || '';
+  const numberRaw = body.number || Deno.env.get('PSA_NUMBER') || '';
+  const center = normalizePSACenter(centerRaw);
+  const number = normalizePSANumber(numberRaw);
   const password = String(body.password || Deno.env.get('PSA_PASSWORD') || '');
-  if (!center || !number || !password) {
+  if (!psaDigits(centerRaw) || !psaDigits(numberRaw) || !password) {
     return json({ error: 'Faltan tus datos de MI PSA. Guardalos en APPI (Ajustes → MI PSA) o como secrets PSA_CENTER / PSA_NUMBER / PSA_PASSWORD.' }, 400);
   }
 

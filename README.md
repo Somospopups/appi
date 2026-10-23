@@ -4,6 +4,13 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v853 · Conexión MI PSA recuperada
+
+- La autenticación server-side de MI PSA conserva las cookies aunque Supabase exponga `Set-Cookie` en formatos distintos y valida de verdad la respuesta del login; una clave incorrecta ya no se confunde con un fallo de SSO.
+- La sincronización renueva el JWT de APPI si venció mientras la aplicación seguía abierta y deja visible el error real devuelto por la Edge Function.
+- Los reportes de Línea y Garantías toleran cambios de columnas del portal de PSA, y el número de distribuidor se normaliza a los 8 dígitos que pide el formulario oficial.
+- Versión: **v853 · Segura** → Cache `appi-v853-psa-conexion`.
+
 ## v655 · El Vivo PSA existe sólo el miércoles
 
 - **Se van el replay y "🎬 Vivos anteriores"**: la grabación publicada del vivo no siempre existe (el video de la semana pasada no se pudo ver), así que esas dos tarjetas dejan de existir — ni en la vista del Campus ni en el mazo del Home. Del jueves al martes APPI no muestra absolutamente nada de vivo: tampoco queda el anuncio "Miércoles 15:00" de las semanas anteriores.

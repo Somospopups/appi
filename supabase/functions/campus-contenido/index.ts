@@ -101,8 +101,18 @@ class Jar {
     }
   }
   putFrom(res: Response) {
-    const sc = res.headers.getSetCookie ? res.headers.getSetCookie() : [];
-    for (const c of sc) {
+    let values: string[] = [];
+    try {
+      const getter = (res.headers as Headers & { getSetCookie?: () => string[] }).getSetCookie;
+      if (typeof getter === 'function') values = getter.call(res.headers) || [];
+    } catch (_) {}
+    if (!values.length) {
+      const raw = res.headers.get('set-cookie') || res.headers.get('set-cookie2') || '';
+      // A combined header is safe to split at a comma that starts the next
+      // cookie name; commas inside Expires=... are left untouched.
+      values = String(raw).split(/,(?=\s*[^;,=\s]+\s*=)/g).map(v => v.trim()).filter(Boolean);
+    }
+    for (const c of values) {
       const dm = /domain=([^;]+)/i.exec(c);
       let host = new URL(res.url).hostname;
       if (dm) {
@@ -148,28 +158,72 @@ async function getText(jar: Jar, url: string): Promise<string> {
 }
 
 /* ---------- login MI PSA (mismo flujo que consulta-serial) ---------- */
+function loginInputValue(html: string, name: string): string {
+  const inputs = html.match(/<input\b[^>]*>/gi) || [];
+  for (const input of inputs) {
+    const nm = input.match(/\bname\s*=\s*["']([^"']+)["']/i);
+    if (!nm || nm[1] !== name) continue;
+    return input.match(/\bvalue\s*=\s*["']([^"']*)["']/i)?.[1] || '';
+  }
+  return '';
+}
+function loginFormAction(html: string): string {
+  const form = html.match(/<form\b[^>]*>/i)?.[0] || '';
+  return form.match(/\baction\s*=\s*["']([^"']+)["']/i)?.[1] || '/login_check';
+}
+function isMiLoginPage(html: string): boolean {
+  return /<form\b[^>]*(?:action\s*=\s*["'][^"']*login|name\s*=\s*["']formKey["'])/i.test(String(html || ''))
+    && /(?:name|id)\s*=\s*["']_?password["']/i.test(String(html || ''));
+}
+function isMiLoginUrl(url: string): boolean {
+  try { return /\/login(?:[/?#]|$)/i.test(new URL(url).pathname); }
+  catch (_) { return /\/login(?:[/?#]|$)/i.test(String(url || '')); }
+}
+function psaDigits(value: unknown): string { return String(value ?? '').replace(/\D/g, ''); }
+function normalizePSACenter(value: unknown): string { return psaDigits(value).slice(-2).padStart(2, '0'); }
+function normalizePSANumber(value: unknown): string {
+  const digits = psaDigits(value);
+  return digits.length > 8 ? digits.slice(-8) : digits.padStart(8, '0');
+}
+
 async function loginMiPsa(jar: Jar, center: string, number: string, password: string): Promise<boolean> {
-  const r1 = await get(jar, MI + '/login');
+  const r1 = await get(jar, MI + '/login', { redirect: 'manual' });
   const html1 = await r1.text();
-  const m = html1.match(/name="_csrf_token" value="([^"]+)"/);
-  if (!m) return false;
+  const csrf = loginInputValue(html1, '_csrf_token');
+  if (!csrf) return false;
   const fd = new URLSearchParams();
   fd.set('_center', center);
   fd.set('_number', number);
   fd.set('_password', password);
   fd.set('_term_use', 'accept');
-  fd.set('_csrf_token', m[1]);
-  const r2 = await get(jar, MI + '/login_check', {
+  fd.set('_csrf_token', csrf);
+  const r2 = await get(jar, new URL(loginFormAction(html1), MI).href, {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: fd.toString(),
     redirect: 'manual',
   });
-  const loc = r2.headers.get('location');
-  if (loc) await get(jar, new URL(loc, MI).href);
-  if (!jar.has('psagw')) return false;
-  const home = await (await get(jar, MI + '/')).text();
-  return home.includes('Mi PSA');
+  let current = r2.url || MI + '/login_check';
+  let response = r2;
+  let landing = '';
+  for (let i = 0; i < 6; i++) {
+    const loc = response.headers.get('location');
+    if (!loc) { landing = await response.text(); break; }
+    current = new URL(loc, current).href;
+    if (isMiLoginUrl(current)) return false;
+    response = await get(jar, current, { redirect: 'manual' });
+  }
+  if (!landing) {
+    const homeResponse = await get(jar, MI + '/', { redirect: 'manual' });
+    current = homeResponse.url || MI + '/';
+    if (homeResponse.headers.get('location')) {
+      const loc = new URL(homeResponse.headers.get('location')!, current).href;
+      if (isMiLoginUrl(loc)) return false;
+    }
+    landing = await homeResponse.text();
+  }
+  if (isMiLoginUrl(current) || isMiLoginPage(landing)) return false;
+  return jar.has('psagw') || jar.has('PHPSESSID');
 }
 
 /* ---------- SSO al Campus (cadena verificada en el crawler) ---------- */
@@ -486,10 +540,12 @@ Deno.serve(async (req) => {
 
   let body: any;
   try { body = await req.json(); } catch (_) { body = {}; }
-  const center = String(body.center || '').trim();
-  const number = String(body.number || '').trim().replace(/^0+/, '');
+  const centerRaw = body.center || '';
+  const numberRaw = body.number || '';
+  const center = normalizePSACenter(centerRaw);
+  const number = normalizePSANumber(numberRaw);
   const password = String(body.password || '');
-  if (!center || !number || !password) {
+  if (!psaDigits(centerRaw) || !psaDigits(numberRaw) || !password) {
     return json({ error: 'Faltan tus datos de MI PSA. Cargalos en APPI (Ajustes → MI PSA) para armar tu Campus.' }, 400);
   }
 
