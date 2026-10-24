@@ -22,7 +22,7 @@
         15,
         18
       ],
-      "tarjetas": "Visa, Mastercard, American Express, Cordobesa"
+      "tarjetas": "Visa, Mastercard"
     },
     {
       "id": "tarjeta-naranja",
@@ -40,9 +40,10 @@
         3,
         6,
         9,
-        12
+        12,
+        15
       ],
-      "tarjetas": "Visa, Mastercard, American Express"
+      "tarjetas": "Visa, Mastercard"
     },
     {
       "id": "bbva",
@@ -81,7 +82,7 @@
         15,
         18
       ],
-      "tarjetas": "Visa, Mastercard, American Express"
+      "tarjetas": "Visa, Mastercard"
     },
     {
       "id": "santander",
@@ -94,7 +95,7 @@
         15,
         18
       ],
-      "tarjetas": "Visa, Mastercard, American Express"
+      "tarjetas": "Visa, Mastercard"
     },
     {
       "id": "hipotecario",
@@ -107,7 +108,7 @@
         15,
         18
       ],
-      "tarjetas": "Visa, Mastercard, American Express"
+      "tarjetas": "Visa, Mastercard"
     },
     {
       "id": "cabal",
@@ -132,7 +133,7 @@
         15,
         18
       ],
-      "tarjetas": "American Express"
+      "tarjetas": "Cabal"
     },
     {
       "id": "tarjeta-data",
