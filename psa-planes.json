@@ -1,5 +1,5 @@
 {
-  "actualizado": "24-Oct-2026",
+  "actualizado": "25-Oct-2026",
   "vigencia": "22-Oct-2026 al 31-Oct-2026",
   "fuente": "https://tienda.psa.com.ar/promociones_vigentes",
   "cuotas": [
@@ -22,7 +22,7 @@
         15,
         18
       ],
-      "tarjetas": "Visa, Mastercard"
+      "tarjetas": "Visa, Mastercard, American Express, Cordobesa"
     },
     {
       "id": "tarjeta-naranja",
@@ -40,10 +40,9 @@
         3,
         6,
         9,
-        12,
-        15
+        12
       ],
-      "tarjetas": "Visa, Mastercard"
+      "tarjetas": "Visa, Mastercard, American Express"
     },
     {
       "id": "bbva",
@@ -82,7 +81,7 @@
         15,
         18
       ],
-      "tarjetas": "Visa, Mastercard"
+      "tarjetas": "Visa, Mastercard, American Express"
     },
     {
       "id": "santander",
@@ -95,7 +94,7 @@
         15,
         18
       ],
-      "tarjetas": "Visa, Mastercard"
+      "tarjetas": "Visa, Mastercard, American Express"
     },
     {
       "id": "hipotecario",
@@ -108,7 +107,7 @@
         15,
         18
       ],
-      "tarjetas": "Visa, Mastercard"
+      "tarjetas": "Visa, Mastercard, American Express"
     },
     {
       "id": "cabal",
@@ -133,7 +132,7 @@
         15,
         18
       ],
-      "tarjetas": "Cabal"
+      "tarjetas": "American Express"
     },
     {
       "id": "tarjeta-data",
