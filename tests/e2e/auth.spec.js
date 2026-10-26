@@ -206,7 +206,9 @@ test('cada distribuidor sincroniza y ve únicamente sus datos', async ({ page })
   expect(cloud.get(USER_A).has(`appi_porque_v1_${USER_A}`)).toBe(true);
 
   backend.setOffline(true);
-  await page.reload({ waitUntil: 'networkidle' });
+  // Sin networkidle: con el backend caído la app reintenta y la red nunca
+  // se queda 500 ms en silencio, así que la espera se iba hasta el timeout.
+  await page.reload({ waitUntil: 'domcontentloaded' });
   await expect(page.locator('#view-home')).toHaveClass(/active/);
   await expect(page.locator('#distributorLoginPanel')).toBeHidden();
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem('presu_2026_7')).propietario)).toBe('A');

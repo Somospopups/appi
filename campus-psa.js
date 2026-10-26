@@ -183,6 +183,45 @@
       window.dispatchEvent(new CustomEvent('appi-campus-estado', { detail: { estado: estado } }));
     } catch(e){}
   }
+  // Aviso pop-up: hasta v651 un fallo de la nube con copia guardada pasaba en
+  // silencio y el usuario seguía viendo datos viejos sin enterarse. Ahora se
+  // explica de una, con la fecha de la copia y las causas más probables.
+  // Una sola vez por día y por sesión de error, para no volverlo insoportable.
+  var AVISO_FALLO_CLAVE = 'appi_campus_aviso_fallo';
+  function fechaCorta(iso){
+    try {
+      var d = new Date(iso);
+      if (isNaN(d.getTime())) return '';
+      return d.toLocaleDateString('es-AR', { day:'2-digit', month:'2-digit', year:'numeric' }) +
+             ' ' + d.toLocaleTimeString('es-AR', { hour:'2-digit', minute:'2-digit' });
+    } catch(e){ return ''; }
+  }
+  function avisarFalloCampus(){
+    try {
+      if (!window.APPIDialog) return;
+      // Las pruebas automatizadas no quieren modales sueltos en pantalla.
+      if (localStorage.getItem('appi_aviso_psa_off') === '1') return;
+      var hoy = new Date().toISOString().slice(0, 10);
+      if (localStorage.getItem(AVISO_FALLO_CLAVE) === hoy) return;
+      localStorage.setItem(AVISO_FALLO_CLAVE, hoy);
+      var prev = respaldoContenido();
+      var lineas = [];
+      if (prev && prev.generado) lineas.push('Estás viendo la copia guardada del ' + fechaCorta(prev.generado) + '.');
+      else lineas.push('No hay ninguna copia guardada en este teléfono.');
+      lineas.push('');
+      lineas.push('No se pudo conectar con PSA ahora mismo. Puede ser que:');
+      lineas.push('· PSA esté caído o con lentitud.');
+      lineas.push('· Haya cambiado la clave de MI PSA.');
+      lineas.push('· No haya internet en este momento.');
+      lineas.push('');
+      lineas.push('Si te pasa seguido, entrá a Ajustes → MI PSA y revisá que la clave siga siendo la correcta.');
+      window.APPIDialog.alert(lineas.join('\n'), {
+        title: 'No se pudieron actualizar los datos de PSA',
+        icon: '!',
+        okText: 'Entendido'
+      });
+    } catch(e){}
+  }
   function pedirContenidoNube(){
     var cfg = nubeCfg();
     var c = credsCampus();
@@ -201,9 +240,11 @@
     pedirContenidoNube().then(function(cont){
       guardarContenido(cont);
       fijarEstado('ok');
+      try { localStorage.removeItem(AVISO_FALLO_CLAVE); } catch(e){}
       try { window.dispatchEvent(new Event('appi-campus-contenido')); } catch(e){}
     }).catch(function(){
       fijarEstado('error');
+      avisarFalloCampus();
     });
   }
   function cargarContenido(){
@@ -240,6 +281,7 @@
       })
       .catch(function(){
         fijarEstado(conCuenta ? 'error' : 'sinCuenta');
+        if (conCuenta) avisarFalloCampus();
         throw new Error('No hay contenido del Campus disponible.');
       })
       .then(function(cont){ contenidoPidiendo = null; return cont; },

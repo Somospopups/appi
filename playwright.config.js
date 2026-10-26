@@ -32,14 +32,24 @@ module.exports = defineConfig({
           // Cuenta PSA "conectada": sin esto el popup obligatorio de PSA
           // (v725) abre sobre el modal compartido y le roba los clics a
           // cualquier prueba que entre al panel.
-          { name: 'appsi_psa_creds', value: '{"center":"02","number":"9802014","password":"clave-de-prueba","remember":true,"ts":0}' }
+          { name: 'appsi_psa_creds', value: '{"center":"02","number":"9802014","password":"clave-de-prueba","remember":true,"ts":0}' },
+          // Aviso "no se pudieron actualizar los datos de PSA" (v854): como
+          // las credenciales de arriba están inventadas, la edge falla siempre
+          // y el pop-up se abriría solo y le robaría los clics al resto de la
+          // suite. Las pruebas que lo quieren ejercitar lo encienden a mano.
+          { name: 'appi_aviso_psa_off', value: '1' }
         ]
       }]
     },
     ...devices['Desktop Chrome']
   },
   webServer: {
-    command: 'python3 -m http.server 8123 --bind 127.0.0.1',
+    // En Windows no existe `python3` (es un alias de la Microsoft Store que
+    // sólo abre la tienda): ahí se usa el launcher `py`. En CI (Linux) se
+    // mantiene `python3` tal cual.
+    command: process.platform === 'win32'
+      ? 'py -m http.server 8123 --bind 127.0.0.1'
+      : 'python3 -m http.server 8123 --bind 127.0.0.1',
     url: 'http://127.0.0.1:8123/index.html',
     reuseExistingServer: !process.env.CI,
     timeout: 30_000

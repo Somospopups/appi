@@ -1,6 +1,6 @@
 {
   "name": "appi",
-  "version": "853.0.0",
+  "version": "854.0.0",
   "cacheName": "appi-v853-psa-conexion",
   "private": true,
   "description": "Pruebas de regresión de APPI",

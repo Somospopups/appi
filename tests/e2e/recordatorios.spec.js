@@ -18,10 +18,20 @@ function seedScript() {
   };
   const p = (n) => String(n).padStart(2, '0');
   const hoy = new Date();
+  // Las fechas de garantía se calculan RELATIVAS al día de la corrida.
+  // Con fechas fijas del calendario el test se rompe solo en cuanto pasan
+  // (así falló la CI en oct-2026: la garantía "por vencer" de 10/10 ya había
+  // vencido, el plan quedaba con 5 avisos en vez de 6 y todo el pipeline de
+  // publicación quedaba bloqueado).
+  const iso = (d) => d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + 'T00:00:00.000Z';
+  const raw = (d) => p(d.getDate()) + '/' + p(d.getMonth() + 1) + '/' + d.getFullYear();
+  const enDias = (n) => new Date(hoy.getTime() + n * 86400000);
+  const vigente = enDias(120);   // garantía vigente, lejos del vencimiento
+  const porVencer = enDias(10);  // entra en la ventana de los próximos 30 días
   const usuarios = [
-    { id: 0, usuario: 'MARTA CUMPLE', telf: '3511110001', domicilio: 'Calle 1 100', cp: '5000', localidad: 'Centro', producto: 'PSA Senik', serie: '', fCompra: '01/01/2024', fVenceRaw: '30/12/2026', fVence: '2026-12-30T00:00:00.000Z', email: '', dipReasignado: '', reasignado: false, estado: 'vigente', nombreNorm: 'marta cumple', cumpleRaw: p(hoy.getDate()) + '/' + p(hoy.getMonth() + 1) },
-    { id: 1, usuario: 'JOSE VENCE', telf: '3511110002', domicilio: 'Calle 2 200', cp: '5000', localidad: 'Centro', producto: 'PSA Domus', serie: '', fCompra: '01/05/2025', fVenceRaw: '10/10/2026', fVence: '2026-10-10T00:00:00.000Z', email: '', dipReasignado: '', reasignado: false, estado: 'porVencer', nombreNorm: 'jose vence' },
-    { id: 2, usuario: 'ANA REASIG', telf: '3511110003', domicilio: 'Calle 3 300', cp: '5000', localidad: 'Centro', producto: 'PSA Vero', serie: '', fCompra: '01/03/2024', fVenceRaw: '30/12/2026', fVence: '2026-12-30T00:00:00.000Z', email: '', dipReasignado: 'PECORA, NORMA BEATRIZ', reasignado: true, estado: 'vigente', nombreNorm: 'ana reasig' }
+    { id: 0, usuario: 'MARTA CUMPLE', telf: '3511110001', domicilio: 'Calle 1 100', cp: '5000', localidad: 'Centro', producto: 'PSA Senik', serie: '', fCompra: '01/01/2024', fVenceRaw: raw(vigente), fVence: iso(vigente), email: '', dipReasignado: '', reasignado: false, estado: 'vigente', nombreNorm: 'marta cumple', cumpleRaw: p(hoy.getDate()) + '/' + p(hoy.getMonth() + 1) },
+    { id: 1, usuario: 'JOSE VENCE', telf: '3511110002', domicilio: 'Calle 2 200', cp: '5000', localidad: 'Centro', producto: 'PSA Domus', serie: '', fCompra: '01/05/2025', fVenceRaw: raw(porVencer), fVence: iso(porVencer), email: '', dipReasignado: '', reasignado: false, estado: 'porVencer', nombreNorm: 'jose vence' },
+    { id: 2, usuario: 'ANA REASIG', telf: '3511110003', domicilio: 'Calle 3 300', cp: '5000', localidad: 'Centro', producto: 'PSA Vero', serie: '', fCompra: '01/03/2024', fVenceRaw: raw(vigente), fVence: iso(vigente), email: '', dipReasignado: 'PECORA, NORMA BEATRIZ', reasignado: true, estado: 'vigente', nombreNorm: 'ana reasig' }
   ];
   localStorage.setItem('usuarios_garantias', JSON.stringify(usuarios));
 }

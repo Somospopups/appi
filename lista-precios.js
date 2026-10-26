@@ -2236,6 +2236,19 @@
       .catch(function(e){ aviso(String(e.message||e)); if(btn){ btn.textContent='🔄 Actualizar precios'; } })
       .finally(function(){ _lpActualizando=false; if(btn) btn.disabled=false; setTimeout(function(){ if(btn && btn.classList.contains('ok')){ btn.textContent='🔄 Actualizar precios'; btn.classList.remove('ok'); } }, 3500); });
   }
+  // "25-Oct-2026" -> timestamp. Devuelve 0 si no se puede leer: así una fuente
+  // sin fecha nunca pisa a una que sí la tiene.
+  function fechaMs(txt) {
+    var m = String(txt == null ? '' : txt).trim().match(/^(\d{1,2})[-\/]([A-Za-z]{3})[-\/](\d{4})$/);
+    if (m) {
+      var meses = { jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11 };
+      var mes = meses[m[2].toLowerCase()];
+      if (mes === undefined) return 0;
+      return new Date(+m[3], mes, +m[1]).getTime();
+    }
+    var d = Date.parse(txt);
+    return isNaN(d) ? 0 : d;
+  }
   function cargar(done) {
     var bust = '?t=' + Date.now();
     var cfg=supabaseCfg();
@@ -2257,7 +2270,14 @@
       var catElegido = fileCat && fileCat.productos ? fileCat : supaCatJ;
       var planElegido = filePlan && (filePlan.cuotas || filePlan.bancos) ? filePlan : supaPlanJ;
 
-      if (catElegido && supaCatJ && supaCatJ.productos && catElegido === fileCat) {
+      // v854: el Storage sólo manda si su lista es MÁS nueva que la del repo.
+      // Antes pisaba siempre, y como el workflow de precios escribe en el repo
+      // mientras el Storage sólo se toca a mano, todo el mundo terminaba viendo
+      // la lista vieja aunque la fresca ya estaba publicada.
+      var overlayVigente = !!(catElegido === fileCat &&
+        supaCatJ && supaCatJ.productos && fileCat &&
+        fechaMs(supaCatJ.actualizado) >= fechaMs(fileCat.actualizado));
+      if (overlayVigente) {
         var precioPorSku = {}, precioPorNom = {}, canjePorSku = {}, canjePorNom = {};
         supaCatJ.productos.forEach(function(sp){
           if (!sp) return;
