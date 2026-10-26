@@ -4,6 +4,14 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v854 · Aviso claro cuando PSA no responde y lista de precios que no se atrasa
+
+- **Pop-up de datos sin actualizar**: cuando la nube del Campus falla con copia guardada, la app ya no se queda en silencio mostrando datos viejos. Aparece un pop-up que dice desde qué fecha es la copia que se está viendo y las causas más probables (PSA caído o lento, clave de MI PSA cambiada, sin internet), con la sugerencia de revisar Ajustes → MI PSA. Se muestra una sola vez por día.
+- **La lista de precios deja de pisar datos frescos por viejos**: el overlay del bucket `catalogo-psa` sólo se aplica si su `actualizado` es más nuevo que el del repositorio. Antes pisaba siempre, y como el workflow de precios refresca el repo dos veces por día mientras el Storage sólo se toca con el botón "🔄 Actualizar precios", todos terminaban viendo la lista del 15/10 aunque la del 25/10 ya estaba publicada.
+- **CI vuelve a quedar verde**: las fechas de garantía de `recordatorios.spec.js` pasan a ser relativas al día de la corrida (la fecha fija de octubre ya había vencido y dejaba el plan con 5 avisos en vez de 6), y el reload del test de offline de `auth.spec.js` deja de esperar `networkidle` — con el backend caído la app reintenta y esa espera nunca se cumplía. Con la suite verde, `deploy-backend.yml` vuelve a publicar el backend solo.
+- Tests nuevos: `campus-aviso-fallo.spec.js` (el pop-up aparece, no se repite el mismo día y no se abre sin cuenta MI PSA) y `lista-precios-frescos.spec.js` (Storage viejo no pisa, Storage nuevo sí manda y una fuente sin fecha nunca gana).
+- Versión: **v854 · Segura** → Cache `appi-v854-avisos-psa`.
+
 ## v853 · Conexión MI PSA recuperada
 
 - La autenticación server-side de MI PSA conserva las cookies aunque Supabase exponga `Set-Cookie` en formatos distintos y valida de verdad la respuesta del login; una clave incorrecta ya no se confunde con un fallo de SSO.
