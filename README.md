@@ -4,6 +4,14 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v855 · Se va el apartado Novedades de la lista de precios
+
+- Desaparece la pestaña **✨ Novedades** de los filtros de la Lista de precios.
+- Desaparece la etiqueta **NUEVO** con su descripción que aparecía sobre las fichas de los productos recién lanzados, y el resaltado de color que esa etiqueta le daba a la tarjeta.
+- El campo sigue existiendo en los JSON del catálogo (lo escribe el script de precios); simplemente la app ya no lo interpreta ni lo muestra.
+- Test nuevo: `lista-precios-frescos.spec.js` verifica que ni la pestaña ni la etiqueta vuelvan a aparecer aunque el catálogo los traiga marcados.
+- Versión: **v855 · Segura** → Cache `appi-v855-sin-novedades`.
+
 ## v854 · Aviso claro cuando PSA no responde y lista de precios que no se atrasa
 
 - **Pop-up de datos sin actualizar**: cuando la nube del Campus falla con copia guardada, la app ya no se queda en silencio mostrando datos viejos. Aparece un pop-up que dice desde qué fecha es la copia que se está viendo y las causas más probables (PSA caído o lento, clave de MI PSA cambiada, sin internet), con la sugerencia de revisar Ajustes → MI PSA. Se muestra una sola vez por día.
