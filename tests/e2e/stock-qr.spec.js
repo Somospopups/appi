@@ -446,9 +446,10 @@ test('lista de precios: plan canje figura como línea propia con su precio', asy
   const items = page.locator('#lpList .lp-item');
   await expect(items.first()).toBeVisible({ timeout: 15000 });
   const total = await items.count();
-  // 356 productos + 35 sublíneas canje del PDF. La lista creció con la
-  // actualización de "precios: lista tienda PSA".
-  expect(total).toBe(391);
+  // 356 productos, pero "Todos" ya no muestra Packs ni Opciones de ingreso
+  // (33 en total: sólo se ven al picar su píldora) → 323 + 35 sublíneas
+  // canje del PDF = 358.
+  expect(total).toBe(358);
   await page.locator('#lpSearch').fill('canje');
   const canjes = page.locator('#lpList .lp-item');
   await expect(canjes.first()).toContainText('PLAN CANJE');

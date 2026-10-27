@@ -4,6 +4,16 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v856 · Packs y Opciones de ingreso sólo se ven al tocar su píldora
+
+- En **Todos** ya no aparecen los **Packs PSA** ni las **Opciones de ingreso**: eran 33 productos caros (11 packs + 22 ingresos) que se mezclaban con el catálogo habitual y ensuciaban el listado.
+- Cada uno se muestra únicamente cuando se toca su píldora: **Packs PSA** y **Opciones de ingreso**.
+- El buscador es **estricto**: en "Todos" tampoco trae packs ni ingresos (decisión de Germán). Si ya estás en la píldora, la búsqueda sí funciona dentro de esa categoría.
+- El carrito no se ve afectado: si ya tenías un pack agregado, el resumen lo sigue sumando aunque no esté visible en la lista.
+- Tests nuevos en `lista-precios-frescos.spec.js` (4) que comparan contra las claves reales del catálogo — incluye `SUPER-PACK`, que no arranca con el prefijo `PACK-`.
+- Se ajusta `stock-qr.spec.js`: el total de fichas en "Todos" pasa de 391 a 358 (323 visibles + 35 líneas de canje).
+- Versión: **v856 · Segura** → Cache `appi-v856-solo-por-pill`.
+
 ## v855 · Se va el apartado Novedades de la lista de precios
 
 - Desaparece la pestaña **✨ Novedades** de los filtros de la Lista de precios.

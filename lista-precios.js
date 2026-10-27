@@ -217,10 +217,15 @@
   function filtrados() {
     var q = busca.trim().toLowerCase();
     var list = lineasLista();
-    var res = list.filter(function (L) {
-      if (filtro !== 'todos' && L.grupo !== filtro) {
-        return false;
-      }
+      var res = list.filter(function (L) {
+        if (filtro === 'todos') {
+          // Packs y Opciones de ingreso no se mezclan con el catálogo
+          // general: sólo aparecen cuando se pica su píldora. El buscador
+          // tampoco los trae en "Todos".
+          if (L.grupo === 'ingreso' || L.grupo === 'packs') return false;
+        } else if (L.grupo !== filtro) {
+          return false;
+        }
       if (!q) return true;
       return (L.nombre || '').toLowerCase().indexOf(q) >= 0 || String(L.sku).indexOf(q) >= 0;
     });
