@@ -16,6 +16,12 @@ module.exports = defineConfig({
     // y además cubren el camino real de los usuarios que la activan.
     reducedMotion: 'reduce',
     serviceWorkers: 'block',
+    // La app calcula "hoy" por Buenos Aires (appiFechaBA, v631) pero los
+    // tests escribían fechas con la zona del sistema. En tu máquina eso es
+    // Argentina y en CI es UTC: entre las 00:00 y las 03:00 UTC eran días
+    // distintos y los tests que comparan "hoy" se caían sólo en CI.
+    // Fijamos la zona para que CI corra igual que las corridas locales.
+    timezoneId: 'America/Argentina/Buenos_Aires',
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
     // El cartel "¿Recibís los avisos de APPI?" (appi-notif.js) sale al entrar a

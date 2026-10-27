@@ -370,11 +370,14 @@ const res = await page.evaluate(async () => {
     });
 
     const res = await page.evaluate(() => {
-      const y = new Date();
-      const anio = y.getFullYear();
-      const mes = String(y.getMonth() + 1).padStart(2, '0');
+      // Mismo criterio que la app: fecha por Buenos Aires. Con la fecha en
+      // UTC, la noche del día 1 el período escrito no coincide con el que
+      // la app está leyendo y el test se cae en esa franja horaria.
+      const fecha = window.appiFechaBA();
+      const anio = fecha.slice(0, 4);
+      const mes = fecha.slice(5, 7);
       const clave = d => anio + '-' + mes + '-' + String(d).padStart(2, '0');
-      const hoy = y.getDate();
+      const hoy = parseInt(fecha.slice(8, 10), 10);
       const ayer = hoy === 1 ? 1 : hoy - 1;
       const store = {
         periodo: anio + '-' + mes,
@@ -514,9 +517,12 @@ return {
       window.showView('view-equipo');
     });
 
-    const res = await page.evaluate(() => {
-      const hoy = new Date().getDate();
-      window.abrirModalDetallePB(0);
+      const res = await page.evaluate(() => {
+        // Hoy por Buenos Aires (igual que la app desde v631): el CI corre en
+        // UTC y entre las 00:00 y las 03:00 UTC allá todavía es otro día,
+        // con lo que `esHoy` daba false y salía otro texto.
+        const hoy = parseInt(window.appiFechaBA().slice(8, 10), 10);
+        window.abrirModalDetallePB(0);
       const cuerpo = (document.getElementById('modalBody') || { innerText: '' }).innerText;
       window.abrirDetalleDiaPB(hoy, 0);
       const detalle = (document.getElementById('modalBody') || { innerText: '' }).innerText;
