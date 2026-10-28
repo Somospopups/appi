@@ -348,6 +348,56 @@ test('Iontrix respeta lista oficial y los botones centran su contenido', async (
   }
 });
 
+test('presupuesto renovado muestra total grande, fotos, tarjetas y permite deslizar para eliminar', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await entrar(page);
+  await page.evaluate(() => { if (typeof openLista === 'function') openLista(); });
+  await page.waitForSelector('.lp-item', { timeout: 10000 });
+  await page.fill('#lpSearch', '611010510');
+  await page.locator('#lpList .lp-price-choice').nth(1).click();
+  await page.locator('#lpFab').click();
+
+  const sheet = page.locator('#lpSheet');
+  await expect(sheet).toHaveClass(/open/);
+  await expect(sheet.locator('.lp-sheet-top')).toContainText('Presupuesto');
+  await expect.poll(() => sheet.locator('.lp-sheet-top').evaluate(el => getComputedStyle(el).backgroundImage)).toContain('linear-gradient');
+  await expect(sheet.locator('.lp-total-card')).toContainText('TOTAL DEL PRESUPUESTO');
+  await expect(sheet.locator('.lp-total-card')).toContainText('$950.000');
+
+  const lineBlock = sheet.locator('.lp-line-block').first();
+  const line = lineBlock.locator('.lp-line');
+  await expect(line.locator('.lp-line-photo')).toBeVisible();
+  await expect(line.locator('.lp-line-name')).toHaveCSS('white-space', 'nowrap');
+  expect(await line.evaluate(el => getComputedStyle(el).display)).toBe('grid');
+  expect((await line.boundingBox()).height).toBeLessThanOrEqual(64);
+  await expect(lineBlock.locator('.lp-desc-toggle')).toHaveCount(0);
+
+  const payOptions = sheet.locator('.lp-pay-option');
+  expect(await payOptions.count()).toBeGreaterThanOrEqual(5);
+  await expect(sheet.getByRole('button', { name: 'Contado', exact: true }).locator('.lp-pay-art')).toBeVisible();
+  await expect(sheet.getByRole('button', { name: 'Cuota Simple', exact: true }).locator('.lp-pay-art')).toBeVisible();
+  await expect(sheet.getByRole('button', { name: 'Naranja', exact: true }).locator('.lp-pay-art')).toBeVisible();
+  await expect(sheet.getByRole('button', { name: 'Galicia', exact: true }).locator('.lp-pay-art')).toBeVisible();
+  await expect(sheet.getByRole('button', { name: 'BBVA', exact: true }).locator('.lp-pay-art')).toBeVisible();
+
+  const price = line.locator('.lp-price-touch');
+  await price.click();
+  await lineBlock.locator('[data-set-desc="10"]').click();
+  await expect(lineBlock.locator('.lp-price-touch')).toContainText('10%');
+
+  const product = lineBlock.locator('.lp-line-product');
+  const box = await product.boundingBox();
+  await page.mouse.move(box.x + box.width * 0.8, box.y + box.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(box.x - 110, box.y + box.height / 2, { steps: 8 });
+  await page.mouse.up();
+  await expect(sheet.locator('#lpUndoToast')).toBeVisible({ timeout: 2000 });
+  await expect(sheet.locator('.lp-empty')).toContainText('vacío');
+  await sheet.getByRole('button', { name: 'Deshacer', exact: true }).click();
+  await expect(sheet.locator('.lp-line-block')).toHaveCount(1);
+  await expect(sheet.locator('.lp-price-touch')).toContainText('10%');
+});
+
 test('presupuesto compacto despliega ganancias y descuentos por producto', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await entrar(page);

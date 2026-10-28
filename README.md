@@ -6,6 +6,14 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v872 · Presupuesto visual y deslizable
+
+- El presupuesto abierto estrena encabezado camel, total grande en naranja y una fila compacta por artículo con foto, cantidad y precio.
+- El precio abre las opciones de descuento; al deslizar una fila hacia la izquierda se elimina el producto con animación y opción para deshacer.
+- Las formas de pago muestran una tarjeta ilustrada para Contado, Cuota Simple, Naranja, Galicia, BBVA y el resto de entidades disponibles.
+- El diseño conserva ganancias desplegables, cuotas, modo oscuro y adaptación a móvil y escritorio.
+- Versión: **v872 · Segura** → Cache `appi-v872-presupuesto-deslizable`.
+
 ## v871 · Bandeja naranja con carrito animado
 
 - La bandeja inferior del presupuesto usa un fondo naranja degradado, alto contraste y un botón verde con icono de carrito.

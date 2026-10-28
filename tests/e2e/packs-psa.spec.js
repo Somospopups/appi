@@ -106,12 +106,11 @@ test.describe('Packs PSA en Lista de Precios', () => {
     const sheet = page.locator('#lpSheet');
     await expect(sheet).toHaveClass(/open/);
 
-    // Verificar la línea en el presupuesto (el atributo data-sku vive en el
-    // bloque contenedor .lp-line-block; la línea es su primer hijo).
+    // Verificar la fila compacta del presupuesto con foto, nombre y precio.
     const sheetLine = page.locator('.lp-line-block[data-sku="PACK-BASICO"]');
     await expect(sheetLine).toBeVisible();
-    await expect(sheetLine.locator('b')).toHaveText('PACK BÁSICO');
-    await expect(sheetLine.locator('span')).toHaveText('$1.376.000');
+    await expect(sheetLine.locator('.lp-line-name')).toHaveText('PACK BÁSICO');
+    await expect(sheetLine.locator('.lp-price-touch')).toContainText('$1.376.000');
   });
 
   test('generación de PDF de Pack desglosa componentes en tabla sin precios y genera fichas individuales', async ({ page }) => {
