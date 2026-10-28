@@ -223,8 +223,13 @@ test('producto con plan canje aparece en un renglón y conserva su foto', async 
   await expect(rows).toHaveCount(1);
   await expect(rows.first()).not.toContainText('PLAN CANJE');
   await expect(rows.first().locator('.lp-price-choice')).toHaveCount(2);
-  await expect(rows.first().locator('.lp-price-choice').nth(0)).toContainText('Precio normal');
-  await expect(rows.first().locator('.lp-price-choice').nth(1)).toContainText('Precio de canje');
+  const opciones = rows.first().locator('.lp-price-choice');
+  await expect(opciones.nth(0)).toContainText('Precio de canje');
+  await expect(opciones.nth(1)).toContainText('Precio normal');
+  await opciones.nth(0).click();
+  await expect(rows.first()).toHaveClass(/lp-item-selected/);
+  await expect(opciones.nth(0)).toHaveClass(/is-in-cart/);
+  await expect(opciones.nth(1)).not.toHaveClass(/is-in-cart/);
 
   const foto = rows.first().locator(".lp-item-foto");
   await expect(foto).toBeVisible();

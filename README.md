@@ -6,10 +6,17 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v858 · Canje primero y productos seleccionados
+
+- En las fichas de una sola fila, **Precio de canje** queda a la izquierda y **Precio normal** a la derecha.
+- Al elegir una opción, se resalta su botón y queda resaltada la ficha completa; el contador indica cuántas unidades se agregaron.
+- El orden y el estado seleccionado se verifican en las pruebas de la Lista de precios.
+- Versión: **v858 · Segura** → Cache `appi-v858-canje-seleccionado`.
+
 ## v857 · Catálogo sin promociones y Plan Canje en una sola ficha
 
 - La Lista de precios excluye productos marcados como promoción o llamados **PROMO/COMBO**; las fichas restantes ya no llevan distintivos, precios tachados ni resaltado naranja.
-- Los productos con Plan Canje aparecen una sola vez, con dos botones de precio (normal y canje); cada botón agrega esa variante al presupuesto y muestra su cantidad.
+- Los productos con Plan Canje aparecen una sola vez, con dos botones de precio: **Canje a la izquierda** y **Normal a la derecha**. El botón elegido y la ficha quedan resaltados; cada botón agrega esa variante al presupuesto.
 - Se agregan pruebas para las promociones y para el uso conjunto de los precios normal/canje.
 - Se documenta el flujo condicional de Arena.ai en [`AGENTE.md`](AGENTE.md) y [`PUBLICAR_CAMBIOS.md`](PUBLICAR_CAMBIOS.md); si el propietario confirma que trabaja desde Arena, la entrega final será un ZIP con `PUBLICAR.bat` y un Git bundle.
 - Versión: **v857 · Segura** → Cache `appi-v857-catalogo-limpio-canje-en-fila`.

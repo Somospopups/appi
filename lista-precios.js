@@ -605,15 +605,17 @@
       '.lp-item-has-canje .lp-item-txt{grid-column:2}' +
       '.lp-item-has-canje.lp-item-no-photo .lp-item-txt{grid-column:1}' +
       '.lp-price-options{grid-column:1/-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;width:100%}' +
-      '.lp-price-choice{min-width:0;min-height:58px;border:1px solid rgba(11,88,120,.2);border-radius:12px;padding:7px 9px;background:#fff;color:#0b5878;text-align:left;font:inherit;cursor:pointer;display:flex;flex-direction:column;justify-content:center;gap:2px;transition:transform .1s ease,background .15s ease}' +
+      '.lp-item-selected{background:rgba(11,88,120,.075)!important;border:1.5px solid rgba(11,88,120,.55)!important;box-shadow:0 3px 12px rgba(11,88,120,.12)!important}' +
+      'body.dark .lp-item-selected{background:rgba(20,126,168,.14)!important;border-color:rgba(56,189,248,.48)!important;box-shadow:0 3px 12px rgba(0,0,0,.18)!important}' +
+      '.lp-price-choice{min-width:0;min-height:58px;border:1px solid #0b5878;border-radius:12px;padding:7px 9px;background:#0b5878;color:#fff;text-align:left;font:inherit;cursor:pointer;display:flex;flex-direction:column;justify-content:center;gap:2px;transition:transform .1s ease,filter .15s ease,box-shadow .15s ease}' +
       '.lp-price-choice:active{transform:scale(.98)}' +
-      '.lp-price-choice-canje{background:#eef6fa;border-color:rgba(61,99,201,.3);color:#3d63c9}' +
+      '.lp-price-choice-canje{background:#4169c8;border-color:#4169c8;color:#fff}' +
+      '.lp-price-choice.is-in-cart{box-shadow:inset 0 0 0 2px rgba(255,255,255,.85),0 2px 7px rgba(0,0,0,.13);filter:brightness(1.08)}' +
       '.lp-price-choice-label{font-size:10px;font-weight:800;line-height:1.15}' +
       '.lp-price-choice strong{font-size:13px;font-weight:950;line-height:1.2;white-space:nowrap}' +
-      '.lp-price-choice-count{font-size:9px;font-weight:750;line-height:1.15;opacity:.78}' +
-      'body.dark .lp-price-choice{background:#1c2630;border-color:rgba(56,189,248,.22);color:#7dd3fc}' +
-      'body.dark .lp-price-choice-canje{background:#20243a;border-color:rgba(129,140,248,.28);color:#a5b4fc}' +
-      'body.dark .lp-price-choice-count{color:#cbd5e1}' +
+      '.lp-price-choice-count{font-size:9px;font-weight:750;line-height:1.15;opacity:.88;color:#fff}' +
+      'body.dark .lp-price-choice{background:#0e6b91;border-color:#0e6b91;color:#fff}' +
+      'body.dark .lp-price-choice-canje{background:#4d68c8;border-color:#4d68c8;color:#fff}' +
       '.lp-item-txt b{display:block;font-size:13px;font-weight:900;color:#2a2a32;line-height:1.25}' +
       '.lp-item-txt span{display:block;margin-top:2px;font-size:11px;font-weight:750;color:#686977}' +
       '.lp-item-txt em{display:block;margin-top:2px;font-size:13px;font-weight:950;color:#0b5878;font-style:normal}' +
@@ -837,20 +839,21 @@
       }
       var subTxt = L.sku ? 'SKU ' + esc(L.sku) : esc(L.seccion || 'Lista con acuerdo');
       var tieneCanje = Number(L.plan_canje) > 0;
-      var clsItem = 'lp-item' + (tieneCanje ? ' lp-item-has-canje' : '') + (tieneCanje && !L.foto ? ' lp-item-no-photo' : '') + ((L.grupo === 'packs' || L.grupo === 'ingreso') ? ' lp-item-is-pack' : '');
+      var qCanje = tieneCanje ? qty(L.canjeClave) : 0;
+      var seleccionado = q > 0 || qCanje > 0;
+      var clsItem = 'lp-item' + (tieneCanje ? ' lp-item-has-canje' : '') + (tieneCanje && !L.foto ? ' lp-item-no-photo' : '') + (seleccionado ? ' lp-item-selected' : '') + ((L.grupo === 'packs' || L.grupo === 'ingreso') ? ' lp-item-is-pack' : '');
       html += '<div class="' + clsItem + '" data-sku="' + esc(L.clave) + '">' +
         fotoHtml +
         '<div class="lp-item-txt"><b>' + esc(L.nombre) + '</b><span>' + subTxt + '</span>' + descHtml + (tieneCanje ? '' : '<em>' + money(L.precio) + '</em>') + '</div>';
       if (tieneCanje) {
-        var qCanje = qty(L.canjeClave);
         html += '<div class="lp-price-options">' +
-          '<button type="button" class="lp-price-choice" data-act="mas" data-price-sku="' + esc(L.clave) + '" aria-label="Agregar a precio normal">' +
-            '<span class="lp-price-choice-label">Precio normal</span><strong>' + money(L.precio) + '</strong>' +
-            '<small class="lp-price-choice-count">' + (q ? 'En presupuesto: ' + q : 'Tocar para agregar') + '</small>' +
-          '</button>' +
-          '<button type="button" class="lp-price-choice lp-price-choice-canje" data-act="mas" data-price-sku="' + esc(L.canjeClave) + '" aria-label="Agregar a precio de canje">' +
+          '<button type="button" class="lp-price-choice lp-price-choice-canje' + (qCanje ? ' is-in-cart' : '') + '" data-act="mas" data-price-sku="' + esc(L.canjeClave) + '" aria-label="Agregar a precio de canje">' +
             '<span class="lp-price-choice-label">Precio de canje</span><strong>' + money(L.plan_canje) + '</strong>' +
-            '<small class="lp-price-choice-count">' + (qCanje ? 'En presupuesto: ' + qCanje : 'Tocar para agregar') + '</small>' +
+            '<small class="lp-price-choice-count">' + (qCanje ? '✓ Elegido · ' + qCanje : 'Tocar para agregar') + '</small>' +
+          '</button>' +
+          '<button type="button" class="lp-price-choice' + (q ? ' is-in-cart' : '') + '" data-act="mas" data-price-sku="' + esc(L.clave) + '" aria-label="Agregar a precio normal">' +
+            '<span class="lp-price-choice-label">Precio normal</span><strong>' + money(L.precio) + '</strong>' +
+            '<small class="lp-price-choice-count">' + (q ? '✓ Elegido · ' + q : 'Tocar para agregar') + '</small>' +
           '</button>' +
         '</div>';
       } else {
@@ -2128,13 +2131,18 @@
     var opcion = document.querySelector('#lpList .lp-price-choice[data-price-sku="' + CSS.escape(sku) + '"]');
     if (opcion) {
       var cuenta = opcion.querySelector('.lp-price-choice-count');
-      if (cuenta) cuenta.textContent = q ? 'En presupuesto: ' + q : 'Tocar para agregar';
+      if (cuenta) cuenta.textContent = q ? '✓ Elegido · ' + q : 'Tocar para agregar';
+      opcion.classList.toggle('is-in-cart', q > 0);
+      var baseSku = esClaveCanje(sku) ? String(sku).slice(0, -CANJE_SUF.length) : sku;
+      var filaCanje = document.querySelector('#lpList .lp-item[data-sku="' + CSS.escape(baseSku) + '"]');
+      if (filaCanje) filaCanje.classList.toggle('lp-item-selected', qty(baseSku) > 0 || qty(baseSku + CANJE_SUF) > 0);
       return true;
     }
     var row = document.querySelector('#lpList .lp-item[data-sku="' + CSS.escape(sku) + '"]');
     if (!row) return false;
     var qtyDiv = row.querySelector('.lp-qty');
     if (!qtyDiv) return false;
+    row.classList.toggle('lp-item-selected', q > 0);
     if (q > 0) {
       qtyDiv.innerHTML = '<button type="button" class="ghost" data-act="menos" aria-label="Quitar">−</button><i>' + q + '</i><button type="button" data-act="mas" aria-label="Agregar">+</button>';
     } else {

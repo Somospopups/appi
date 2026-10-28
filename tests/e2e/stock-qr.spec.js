@@ -450,14 +450,17 @@ test('lista de precios: un renglón ofrece precio normal y precio de canje', asy
 
   const opciones = senior4.locator('.lp-price-choice');
   await expect(opciones).toHaveCount(2);
-  await expect(opciones.nth(0)).toContainText('Precio normal');
-  await expect(opciones.nth(0)).toContainText('$950.000');
-  await expect(opciones.nth(1)).toContainText('Precio de canje');
-  await expect(opciones.nth(1)).toContainText('$855.000');
+  await expect(opciones.nth(0)).toContainText('Precio de canje');
+  await expect(opciones.nth(0)).toContainText('$855.000');
+  await expect(opciones.nth(1)).toContainText('Precio normal');
+  await expect(opciones.nth(1)).toContainText('$950.000');
+  await expect(senior4).not.toHaveClass(/lp-item-selected/);
 
-  await opciones.nth(1).click();
-  await expect(page.locator('#lpFab')).toContainText('$855.000');
   await opciones.nth(0).click();
+  await expect(page.locator('#lpFab')).toContainText('$855.000');
+  await expect(senior4).toHaveClass(/lp-item-selected/);
+  await expect(opciones.nth(0)).toHaveClass(/is-in-cart/);
+  await opciones.nth(1).click();
   await expect(page.locator('#lpFab')).toContainText('$1.805.000');
 
   await page.locator('#lpFab').click();
