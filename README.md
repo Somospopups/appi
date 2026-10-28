@@ -6,6 +6,13 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v863 · Botones centrados y precio Iontrix
+
+- Se centra el contenido de los botones de precio.
+- Se corrige el precio normal de Iontrix 3 a $1.223.000 según la lista con acuerdo vigente desde el 9 de septiembre de 2026; canje $1.100.700.
+- Se evita mostrar un canje que no sea menor al precio normal y se rechazan combinaciones incompatibles del Storage.
+- Versión: **v863 · Segura** → Cache `appi-v863-precios-centrados-iontrix`.
+
 ## v862 · Canje primero e imágenes
 
 - La lista muestra primero los productos con Plan Canje; después aparecen los demás por categoría. Se respeta el orden original dentro de cada bloque.

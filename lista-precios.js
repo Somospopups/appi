@@ -194,6 +194,7 @@
   function lineasLista() {
     var out = [];
     productos().forEach(function (p) {
+      var canjeValido = Number(p.plan_canje) > 0 && Number(p.plan_canje) < Number(p.precio);
       out.push({
         clave: claveSku(p),
         sku: p.sku || '',
@@ -204,8 +205,8 @@
         seccion: p.seccion,
         composicion: p.composicion || '',
         url: p.url || '',
-        plan_canje: Number(p.plan_canje) || 0,
-        canjeClave: p.plan_canje ? claveSku(p) + CANJE_SUF : ''
+        plan_canje: canjeValido ? Number(p.plan_canje) : 0,
+        canjeClave: canjeValido ? claveSku(p) + CANJE_SUF : ''
       });
     });
     return out;
@@ -609,7 +610,7 @@
       '.lp-item-has-canje .lp-price-options{grid-column:auto;display:contents}' +
       '.lp-item-selected{background:rgba(11,88,120,.075)!important;border:1.5px solid rgba(11,88,120,.55)!important;box-shadow:0 3px 12px rgba(11,88,120,.12)!important}' +
       'body.dark .lp-item-selected{background:rgba(20,126,168,.14)!important;border-color:rgba(56,189,248,.48)!important;box-shadow:0 3px 12px rgba(0,0,0,.18)!important}' +
-      '.lp-price-choice{box-sizing:border-box;width:100%;min-width:0;height:56px;min-height:56px;border:1px solid #0b5878;border-radius:12px;padding:6px 6px;background:#0b5878;color:#fff;text-align:left;font:inherit;cursor:pointer;display:flex;flex-direction:column;justify-content:center;gap:2px;transition:transform .1s ease,filter .15s ease,box-shadow .15s ease}' +
+      '.lp-price-choice{box-sizing:border-box;width:100%;min-width:0;height:56px;min-height:56px;border:1px solid #0b5878;border-radius:12px;padding:6px 6px;background:#0b5878;color:#fff;text-align:center;font:inherit;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;transition:transform .1s ease,filter .15s ease,box-shadow .15s ease}' +
       '.lp-price-choice:active{transform:scale(.98)}' +
       '.lp-price-choice-canje{background:#4169c8;border-color:#4169c8;color:#fff}' +
       '.lp-price-choice.is-in-cart{box-shadow:inset 0 0 0 2px rgba(255,255,255,.85),0 2px 7px rgba(0,0,0,.13);filter:brightness(1.08)}' +
@@ -2317,8 +2318,13 @@
           var n = (p.nombre || '').trim().toUpperCase();
           var nuevoPre = (p.sku && precioPorSku[p.sku]) || precioPorNom[n];
           var nuevoCanje = (p.sku && canjePorSku[p.sku]) || canjePorNom[n];
-          if (nuevoPre && nuevoPre > 0) { p.precio = nuevoPre; p.lista = nuevoPre; }
-          if (nuevoCanje && nuevoCanje > 0) { p.plan_canje = nuevoCanje; }
+          // No mezclar precios incompatibles de fuentes distintas.
+          var preFinal = Number(nuevoPre) > 0 ? Number(nuevoPre) : Number(p.precio);
+          var canjeFinal = Number(nuevoCanje) > 0 ? Number(nuevoCanje) : Number(p.plan_canje);
+          if (!canjeFinal || canjeFinal < preFinal) {
+            if (nuevoPre && nuevoPre > 0) { p.precio = nuevoPre; p.lista = nuevoPre; }
+            if (nuevoCanje && nuevoCanje > 0) { p.plan_canje = nuevoCanje; }
+          }
         });
       }
       if (catElegido) {

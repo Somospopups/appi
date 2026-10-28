@@ -432,6 +432,10 @@ def scrape_todos(productos):
     import time
     actualizados = 0
     for p in productos:
+        # La tienda puede mostrar promociones: no mezclar ese precio con
+        # el canje de la lista oficial con acuerdo.
+        if p.get('plan_canje'):
+            continue
         url = p.get('url') or ''
         if not url: continue
         try:

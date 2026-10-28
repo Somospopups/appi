@@ -312,3 +312,21 @@ test('los productos con canje aparecen primero', async ({ page }) => {
   await expect(page.locator('#lpList .lp-item').first()).toContainText(/senior/i);
   await verify();
 });
+
+test('Iontrix respeta lista oficial y los botones centran su contenido', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.route('**/storage/v1/object/public/catalogo-psa/psa-catalogo.json*', route => route.fulfill({ json: {
+    actualizado: '31-Dec-2099', productos: [{ sku: '611290050', nombre: 'PSA IONTRIX 3', precio: 917250, plan_canje: 1100700 }]
+  }}));
+  await entrar(page);
+  await page.evaluate(() => { if (typeof openLista === 'function') openLista(); });
+  await page.waitForSelector('.lp-item', { timeout: 10000 });
+  await page.fill('#lpSearch', '611290050');
+  const row = page.locator('#lpList .lp-item').first();
+  await expect(row.locator('.lp-price-choice').nth(0)).toContainText('1.100.700');
+  await expect(row.locator('.lp-price-choice').nth(1)).toContainText('1.223.000');
+  for (const btn of await row.locator('.lp-price-choice').all()) {
+    expect(await btn.evaluate(el => getComputedStyle(el).textAlign)).toBe('center');
+    expect(await btn.evaluate(el => getComputedStyle(el).alignItems)).toBe('center');
+  }
+});
