@@ -250,6 +250,8 @@ test('producto con plan canje aparece en un renglón y conserva su foto', async 
   await page.fill("#lpSearch", "611010730");
   const sinFoto = page.locator("#lpList .lp-item").first();
   await expect(sinFoto).toHaveCount(1);
+  // Simular una imagen rota: el producto ahora sí tiene una foto disponible.
+  await sinFoto.locator('.lp-item-foto').evaluate(img => { img.src = '/imagen-inexistente-test.png'; });
   await expect(sinFoto).toHaveClass(/lp-item-no-photo/);
   const alineacionSinFoto = await sinFoto.evaluate((row) => {
     const r = (el) => el.getBoundingClientRect();
@@ -289,4 +291,24 @@ test('producto con plan canje aparece en un renglón y conserva su foto', async 
   await page.locator("#lpFotoModalClose").click();
   await page.waitForTimeout(300);
   await expect(modal).not.toHaveClass(/open/);
+});
+
+test('los productos con canje aparecen primero', async ({ page }) => {
+  await entrar(page);
+  await page.evaluate(() => { if (typeof openLista === 'function') openLista(); });
+  await page.waitForSelector('.lp-item', { timeout: 10000 });
+  const verify = async () => {
+    const filas = await page.locator('#lpList .lp-item').evaluateAll(items => items.map(el => ({
+      canje: el.classList.contains('lp-item-has-canje'), clave: el.dataset.sku
+    })));
+    expect(filas.some(x => x.canje)).toBe(true);
+    expect(filas.some(x => !x.canje)).toBe(true);
+    const primeroSinCanje = filas.findIndex(x => !x.canje);
+    expect(filas.slice(primeroSinCanje).every(x => !x.canje)).toBe(true);
+  };
+  await verify();
+  await expect(page.locator('#lpList .lp-sec').first()).toHaveText('Productos con plan canje');
+  await page.fill('#lpSearch', 'senior');
+  await expect(page.locator('#lpList .lp-item').first()).toContainText(/senior/i);
+  await verify();
 });

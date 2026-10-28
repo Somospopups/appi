@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "861.0.0",
-  "cacheName": "appi-v861-botones-precio-uniformes",
+  "version": "862.0.0",
+  "cacheName": "appi-v862-canje-primero-imagenes",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

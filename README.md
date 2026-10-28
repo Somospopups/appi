@@ -6,6 +6,12 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v862 · Canje primero e imágenes
+
+- La lista muestra primero los productos con Plan Canje; después aparecen los demás por categoría. Se respeta el orden original dentro de cada bloque.
+- Se agregan imágenes para 13 productos; cinco siguen sin foto identificada.
+- Versión: **v862 · Segura** → Cache `appi-v862-canje-primero-imagenes`.
+
 ## v861 · Botones de precio uniformes
 
 - Los botones **Precio de canje** y **Precio normal** usan el mismo ancho y alto en todas las fichas con Plan Canje, tengan o no miniatura.

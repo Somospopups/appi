@@ -237,7 +237,9 @@
       if (!q) return true;
       return (L.nombre || '').toLowerCase().indexOf(q) >= 0 || String(L.sku).indexOf(q) >= 0;
     });
-    return res;
+    // Mantener el orden original dentro de cada bloque, con canje primero.
+    return res.filter(function (L) { return Number(L.plan_canje) > 0; })
+      .concat(res.filter(function (L) { return !(Number(L.plan_canje) > 0); }));
   }
   function resumen() {
     var c = carrito(), n = 0, tot = 0, lineas = [];
@@ -821,8 +823,14 @@
     }
     var html = '';
     var last = '';
+    var enCanje = false;
     list.forEach(function (L) {
-      if (filtro === 'todos' && L.grupo !== last) {
+      var esCanje = Number(L.plan_canje) > 0;
+      if (filtro === 'todos' && esCanje && !enCanje) {
+        enCanje = true;
+        html += '<div class="lp-sec">Productos con plan canje</div>';
+      }
+      if (filtro === 'todos' && !esCanje && L.grupo !== last) {
         last = L.grupo;
         html += '<div class="lp-sec">' + esc(GRUPO_TIT[L.grupo] || L.grupo) + '</div>';
       }
