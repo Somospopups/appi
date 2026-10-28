@@ -6,6 +6,12 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v864 · Presupuesto compacto
+
+- Ganancias privadas ocultas inicialmente, accesibles desde el botón 💵.
+- Cada producto tiene un botón −$ para desplegar descuentos; se conserva el porcentaje aplicado y el total.
+- Versión: **v864 · Segura** → Cache `appi-v864-presupuesto-compacto`.
+
 ## v863 · Botones centrados y precio Iontrix
 
 - Se centra el contenido de los botones de precio.

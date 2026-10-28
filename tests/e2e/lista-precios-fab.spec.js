@@ -330,3 +330,32 @@ test('Iontrix respeta lista oficial y los botones centran su contenido', async (
     expect(await btn.evaluate(el => getComputedStyle(el).alignItems)).toBe('center');
   }
 });
+
+test('presupuesto compacto despliega ganancias y descuentos por producto', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await entrar(page);
+  await page.evaluate(() => { if (typeof openLista === 'function') openLista(); });
+  await page.waitForSelector('.lp-item', { timeout: 10000 });
+  await page.fill('#lpSearch', '611010510');
+  await page.locator('#lpList .lp-price-choice').nth(1).click();
+  await page.locator('#lpFab').click();
+  const sheet = page.locator('#lpSheet');
+  const gain = sheet.locator('#lpSheetGanancia');
+  const toggle = sheet.getByRole('button', { name: /Ver ganancias/ });
+  await expect(gain).toBeHidden();
+  await toggle.click();
+  await expect(gain).toBeVisible();
+  await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+  const line = sheet.locator('.lp-line-block').first();
+  await expect(line.locator('[data-set-desc="10"]')).toBeHidden();
+  await line.locator('[data-toggle-desc]').click();
+  await line.locator('[data-set-desc="10"]').click();
+  await expect(line.locator('[data-toggle-desc]')).toContainText('10%');
+  await expect(line.locator('[data-set-desc="10"]')).toBeHidden();
+  await expect(sheet.locator('#lpSheetTot')).toContainText('$855.000');
+  await expect(gain).toBeVisible();
+  await sheet.getByRole('button', { name: 'Cerrar', exact: true }).click();
+  await page.locator('#lpFab').click();
+  await expect(gain).toBeHidden();
+  await expect(line.locator('[data-toggle-desc]')).toContainText('10%');
+});

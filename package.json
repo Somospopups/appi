@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "863.0.0",
-  "cacheName": "appi-v863-precios-centrados-iontrix",
+  "version": "864.0.0",
+  "cacheName": "appi-v864-presupuesto-compacto",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

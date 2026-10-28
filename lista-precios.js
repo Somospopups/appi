@@ -9,6 +9,7 @@
   var LS_PAGO = 'appi_lista_pago_v1';
   var LS_BOT = 'appi_lista_bot_v1';
   var CAT = null;
+  var descuentoAbierto = '';
   var BOT_G = 44;
   var BOT_ANIOS = 450;
   var BOT_M2 = 0.018;
@@ -651,6 +652,8 @@
       '.lp-sheet{width:100%;max-height:86%;overflow:auto;background:#f3eee3;border-radius:22px 22px 0 0;padding:14px 14px calc(18px + env(safe-area-inset-bottom))}' +
       '.lp-sheet h2{margin:0;font-size:16px;font-weight:950;color:#2a2a32}' +
       '.lp-sheet-top{display:flex;align-items:center;justify-content:space-between;margin:0 0 10px}' +
+      '.lp-sheet-top-actions{display:flex;align-items:center;gap:10px}.lp-sheet-top button.lp-gan-toggle{background:#dcefe6;color:#075d52;border-radius:12px;padding:9px 12px;font-size:19px}.lp-sheet-top button.lp-gan-toggle[aria-expanded="true"]{background:#bbdfd1}' +
+      '#lpSheetGanancia[hidden],.lp-desc-options[hidden]{display:none!important}.lp-line{flex-wrap:wrap}.lp-line-main{display:flex;align-items:baseline;gap:8px;width:100%}.lp-line-main b{min-width:0}.lp-line-actions{display:flex;align-items:center;justify-content:space-between;width:100%}.lp-desc-toggle{border:1px solid #a9c4c3;border-radius:10px;padding:6px 10px;color:#0b5878;background:#fff;font:inherit;font-size:12px;font-weight:850;cursor:pointer}.lp-desc-toggle.on{background:#0b5878;color:#fff}.lp-desc-options{display:flex;flex-wrap:wrap;gap:6px;padding:4px 0 10px}.lp-desc-options .lp-chip{padding:7px 11px}body.dark .lp-desc-toggle{background:#25273a;color:#d7f4f2;border-color:#557578}body.dark .lp-desc-toggle.on{background:#0e6b91;color:#fff}' +
       '.lp-sheet-top button{border:0;background:transparent;font-size:22px;line-height:1;color:#2a2a32;cursor:pointer}' +
       '.lp-gan{margin:0 0 14px;border:1px solid rgba(11,88,120,.22);border-radius:16px;background:linear-gradient(135deg,rgba(11,88,120,.07),rgba(58,208,164,.10));padding:12px 14px}' +
       '.lp-gan-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px}' +
@@ -781,8 +784,8 @@
       sh.id = 'lpSheet';
       sh.setAttribute('aria-hidden', 'true');
       sh.innerHTML = '<div class="lp-sheet" role="dialog" aria-label="Presupuesto">' +
-        '<div class="lp-sheet-top"><h2>Presupuesto</h2><button type="button" data-cerrar aria-label="Cerrar">×</button></div>' +
-        '<div id="lpSheetGanancia"></div>' +
+        '<div class="lp-sheet-top"><h2>Presupuesto</h2><div class="lp-sheet-top-actions"><button type="button" class="lp-gan-toggle" aria-label="Ver ganancias, solo para vos" aria-controls="lpSheetGanancia" aria-expanded="false" title="Ganancias · solo para vos">💵</button><button type="button" data-cerrar aria-label="Cerrar">×</button></div></div>' +
+        '<div id="lpSheetGanancia" hidden></div>' +
         '<div id="lpSheetLines"></div>' +
         '<div class="lp-tot" id="lpSheetTot"></div>' +
         '<div class="lp-sec">Pago</div>' +
@@ -797,6 +800,12 @@
       sh.addEventListener('click', function (e) { if (e.target === sh) cerrarSheet(); });
       var x = sh.querySelector('[data-cerrar]');
       if (x) x.onclick = cerrarSheet;
+      var ganToggle = sh.querySelector('.lp-gan-toggle');
+      ganToggle.onclick = function () {
+        var panel = $('lpSheetGanancia');
+        panel.hidden = !panel.hidden;
+        ganToggle.setAttribute('aria-expanded', String(!panel.hidden));
+      };
     }
   }
 
@@ -1363,13 +1372,14 @@
         ? ('<s style="font-size:11px;font-weight:600;opacity:0.45;margin-right:5px">' + money(ln.q * ln.precioOriginal) + '</s><b style="color:#0b5878">' + money(ln.q * ln.precioFinal) + '</b>')
         : money(ln.q * ln.precioFinal);
 
+      var abierto = descuentoAbierto === (ln.p.clave || claveSku(ln.p));
       return '<div class="lp-line-block" data-sku="' + k + '">' +
         '<div class="lp-line">' +
-          '<div class="lp-qty"><button type="button" class="ghost" data-act="menos">−</button><i>' + ln.q + '</i><button type="button" data-act="mas">+</button></div>' +
-          '<b>' + esc(ln.p.nombre) + '</b>' +
-          '<span>' + precioStr + '</span>' +
+          '<div class="lp-line-main"><b>' + esc(ln.p.nombre) + '</b><span>' + precioStr + '</span></div>' +
+          '<div class="lp-line-actions"><div class="lp-qty"><button type="button" class="ghost" data-act="menos" aria-label="Quitar una unidad">−</button><i>' + ln.q + '</i><button type="button" data-act="mas" aria-label="Agregar una unidad">+</button></div>' +
+          '<button type="button" class="lp-desc-toggle' + (d ? ' on' : '') + '" data-toggle-desc aria-expanded="' + (abierto ? 'true' : 'false') + '" aria-label="Descuento para ' + esc(ln.p.nombre) + '">−$' + (d ? ' · −' + d + '%' : ' Descuento') + '</button></div>' +
         '</div>' +
-        '<div class="lp-chips-in" style="padding:4px 0 10px 0;gap:6px">' +
+        '<div class="lp-desc-options"' + (abierto ? '' : ' hidden') + '>' +
           '<button type="button" class="lp-chip' + (d === 0 ? ' on' : '') + '" data-set-desc="0">Precio lista</button>' +
           '<button type="button" class="lp-chip' + (d === 5 ? ' on' : '') + '" data-set-desc="5">-5%</button>' +
           '<button type="button" class="lp-chip' + (d === 10 ? ' on' : '') + '" data-set-desc="10">-10%</button>' +
@@ -1444,6 +1454,9 @@
     if (!sh) return;
     sh.classList.remove('open');
     sh.setAttribute('aria-hidden', 'true');
+    var gan = $('lpSheetGanancia'); if (gan) gan.hidden = true;
+    var ganBtn = sh.querySelector('.lp-gan-toggle'); if (ganBtn) ganBtn.setAttribute('aria-expanded', 'false');
+    descuentoAbierto = '';
   }
 
   function qrDataUrl(text) {
@@ -2217,10 +2230,18 @@
       sheet.onclick = function (e) {
         var descBtn = e.target.closest('[data-set-desc]');
         var row = e.target.closest('[data-sku]');
+        var toggleDesc = e.target.closest('[data-toggle-desc]');
+        if (toggleDesc && row) {
+          var key = row.getAttribute('data-sku');
+          descuentoAbierto = descuentoAbierto === key ? '' : key;
+          pintarSheet();
+          return;
+        }
         if (descBtn && row) {
           var skuD = row.getAttribute('data-sku');
           var pVal = Number(descBtn.getAttribute('data-set-desc')) || 0;
           setDesc(skuD, pVal);
+          descuentoAbierto = '';
           pintarSheet();
           return;
         }
