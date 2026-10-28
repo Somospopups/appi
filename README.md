@@ -6,6 +6,12 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v865 · Rebote y gotita en ventanas emergentes
+
+- Animación de rebote suave al abrir diálogos y paneles emergentes, con sonido breve de gota después de interactuar con la app.
+- Se respeta la preferencia de movimiento reducido; el audio puede estar limitado por el navegador o el dispositivo.
+- Versión: **v865 · Segura** → Cache `appi-v865-popups-gota`.
+
 ## v864 · Presupuesto compacto
 
 - Ganancias privadas ocultas inicialmente, accesibles desde el botón 💵.

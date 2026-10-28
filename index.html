@@ -137,6 +137,7 @@ window.openStock=function(){
 <script src="./panel-atras.js?v=618"></script>
 <script src="./auth-config.js"></script>
 <script src="./appi-dialog.js?v=618"></script>
+<script src="./appi-popup-effects.js?v=865"></script>
 <script src="./appi-notif.js?v=618"></script>
 <script src="./recordatorios-app.js?v=618"></script>
 <script src="./telefono.js?v=639"></script>
@@ -4659,7 +4660,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v864 · Segura</div>
+  <div class="ds-foot">APPI · v865 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -14211,8 +14212,8 @@ function cerrarToolsMenu(){
   // con archivos viejos en pantalla.
   if ('serviceWorker' in navigator) {
     (async () => {
-    const swVersion='864';
-    const CACHE_NAME='appi-v864-presupuesto-compacto';
+    const swVersion='865';
+    const CACHE_NAME='appi-v865-popups-gota';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}

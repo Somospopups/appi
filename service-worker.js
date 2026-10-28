@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v864-presupuesto-compacto';
+const CACHE_NAME = 'appi-v865-popups-gota';
 const CACHE_PREFIX = 'appi-';
 // Donde el SW aparta una compartición hasta que la app la consume. No
 // empieza con el prefijo de la app para que el prune del activate no la borre.
@@ -13,6 +13,7 @@ const APP_SHELL = [
   './revisar-contactos.html',
   './auth-config.js',
   './appi-dialog.js',
+  './appi-popup-effects.js',
   './appi-notif.js',
   './recordatorios-app.js',
   './reporte-bonos.js',
