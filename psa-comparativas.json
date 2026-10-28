@@ -1,0 +1,55 @@
+{
+  "fuente": "PSA DIP · Comparativas de costos Argentina",
+  "comparativas": [
+    {
+      "id": "senior4",
+      "producto": "PSA Senior4 + Kit Posventa",
+      "url": "https://dip.psa.com.ar/adjuntos/Image/promociones/exterior/argentina/comparativas/comparativo-senior-4-kit.pdf",
+      "imagen": "comparativas-img/senior4.jpg",
+      "vigencia": "9 septiembre, 2026",
+      "sha256": "771bd210833358a4256d546283eb44d46615f16241624c0d2821b89ba1f3a7f4",
+      "ancho": 1800,
+      "alto": 1391
+    },
+    {
+      "id": "senior",
+      "producto": "PSA Senior Bianco + Kit Posventa",
+      "url": "https://dip.psa.com.ar/adjuntos/Image/promociones/exterior/argentina/comparativas/comparativo-senior-kit.pdf",
+      "imagen": "comparativas-img/senior.jpg",
+      "vigencia": "9 septiembre, 2026",
+      "sha256": "943afb53e48770789c8c3040d2b230fe2235d77a6bc306d897ec30387276a027",
+      "ancho": 1800,
+      "alto": 1391
+    },
+    {
+      "id": "s1000",
+      "producto": "PSA S-1000-2",
+      "url": "https://dip.psa.com.ar/adjuntos/Image/promociones/exterior/argentina/comparativas/comparativo-S1000-II.pdf",
+      "imagen": "comparativas-img/s1000.jpg",
+      "vigencia": "9 septiembre, 2026",
+      "sha256": "a714eec1a42946c602813f89348146d6cfbacfd7c4256bb5161da8cc4f62d69c",
+      "ancho": 1800,
+      "alto": 1391
+    },
+    {
+      "id": "senik",
+      "producto": "PSA Senik + Kit Posventa",
+      "url": "https://dip.psa.com.ar/adjuntos/Image/promociones/exterior/argentina/comparativas/comparativo-senik.pdf",
+      "imagen": "comparativas-img/senik.jpg",
+      "vigencia": "9 septiembre, 2026",
+      "sha256": "a4f37fff140385038f03a1a046e3c341de80bccafd4c01c55418878816d38fbf",
+      "ancho": 1800,
+      "alto": 2330
+    },
+    {
+      "id": "burby",
+      "producto": "PSA SodaBurby",
+      "url": "https://dip.psa.com.ar/adjuntos/Image/promociones/exterior/argentina/comparativas/comparativo-burby.pdf",
+      "imagen": "comparativas-img/burby.jpg",
+      "vigencia": "9 septiembre, 2026",
+      "sha256": "22a812da9a75071a833127a010df9f88dd91eed32ea6f28a1cafd4bb88a7795c",
+      "ancho": 1800,
+      "alto": 1391
+    }
+  ]
+}

@@ -74,6 +74,33 @@
     { k: ['GRIFERÍA', 'GRIFERIA', 'BICOMANDO'], keys: ['cloro', 'plomo'] },
     { k: ['BOTELLA', 'TERMO', 'MATE'], keys: ['hidra_toxinas'] }
   ];
+  // PDF oficiales que PSA publica en DIP. El workflow de precios controla el
+  // hash de cada PDF y regenera estas imágenes cuando PSA reemplaza el archivo
+  // aun si conserva el mismo enlace.
+  var CMP_OFICIAL_SKU = {
+    '611010510': 'senior4', // Senior4 Bianco
+    '611010530': 'senior4', // Senior4 Nero
+    '611010560': 'senior4', // Senior4 Grigio
+    '611010730': 'senior4', // Senior4 Terra
+    '611010580': 'senior',
+    '611120200': 's1000',
+    '611120210': 's1000',
+    '611120220': 's1000',
+    '611030540': 'senik',
+    '611030560': 'senik',
+    '617110040': 'burby',
+    '617110050': 'burby'
+  };
+  var TRATA_CORTO = {
+    cloro: 'Mejora el olor y el sabor del agua.',
+    thm: 'Compuestos derivados de la cloración.',
+    hierro: 'Reduce sabor metálico y manchas.',
+    plomo: 'Metal que puede acumularse en el cuerpo.',
+    solidos: 'Disminuye partículas en suspensión.',
+    dureza: 'Reduce sarro e incrustaciones.',
+    arsenico: 'Contaminante invisible del agua.',
+    gasificado_salud: 'Menos envases y bebidas comerciales.'
+  };
   var PLANES = { cuotas: [3, 6, 9, 12, 15, 18], bancos: [], vigencia: '' };
   var filtro = 'todos';
   var busca = '';
@@ -1232,6 +1259,10 @@
     if (p.grupo === 'equipos') return ['cloro', 'thm'];
     return [];
   }
+  function comparativaIdDe(p) {
+    var sku = String((p && p.sku) || '').trim();
+    return CMP_OFICIAL_SKU[sku] || '';
+  }
   function botFmt(n, d) {
     return Number(n).toLocaleString('es-AR', { maximumFractionDigits: d || 0, minimumFractionDigits: 0 });
   }
@@ -1474,10 +1505,11 @@
   }
 
 
-  function loadFoto(p) {
-    var src = p && p.foto ? String(p.foto) : '';
+  function loadDataUrl(src) {
+    src = String(src || '');
     if (!src) return Promise.resolve('');
-    if (src.indexOf('./') !== 0 && src.indexOf('http') !== 0) src = './' + src;
+    if (src.indexOf('./') !== 0 && src.indexOf('http') !== 0 && src.indexOf('data:') !== 0) src = './' + src;
+    if (src.indexOf('data:') === 0) return Promise.resolve(src);
     return fetch(src, { cache: 'force-cache' })
       .then(function (r) { return r.ok ? r.blob() : null; })
       .then(function (blob) {
@@ -1490,6 +1522,24 @@
         });
       })
       .catch(function () { return ''; });
+  }
+  function loadFoto(p) {
+    return loadDataUrl(p && p.foto ? p.foto : '');
+  }
+  function loadComparativaOficial(p) {
+    var id = comparativaIdDe(p);
+    return id ? loadDataUrl('comparativas-img/' + id + '.jpg') : Promise.resolve('');
+  }
+  function cargarMetaComparativas() {
+    return fetch('./psa-comparativas.json', { cache: 'no-store' })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (data) {
+        var map = {};
+        var arr = data && Array.isArray(data.comparativas) ? data.comparativas : [];
+        arr.forEach(function (x) { if (x && x.id) map[x.id] = x; });
+        return map;
+      })
+      .catch(function () { return {}; });
   }
   function datosDistribuidor() {
     var perfil = (window.APPIAuth && window.APPIAuth.currentProfile) ? (window.APPIAuth.currentProfile() || {}) : {};
@@ -1565,10 +1615,14 @@
 
     Promise.all([
       Promise.all(fichasProd.map(function (fp) { return loadFoto(fp.p); })),
-      loadFotoCirculo(fotoRaw)
+      Promise.all(fichasProd.map(function (fp) { return loadComparativaOficial(fp.p); })),
+      loadFotoCirculo(fotoRaw),
+      cargarMetaComparativas()
     ]).then(function (pack) {
     var fotos = pack[0];
-    var fotoCirculo = pack[1];
+    var comparativasOficiales = pack[1];
+    var fotoCirculo = pack[2];
+    var metaComparativas = pack[3] || {};
     try {
       var pdf = new JsPDF({ unit: 'mm', format: 'a4', compress: true });
       var W = pdf.internal.pageSize.getWidth();
@@ -1985,6 +2039,75 @@
         return yy;
       }
 
+      function dibujarTrataCompacta(keys, yy) {
+        if (!keys || !keys.length) return yy;
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(8.5);
+        pdf.setTextColor.apply(pdf, azul);
+        pdf.text('Qué trata y por qué sacarlo', m, yy);
+        yy += 4.5;
+        var gap = 2;
+        var count = Math.min(5, keys.length);
+        var boxW = (usable - gap * (count - 1)) / count;
+        var boxH = 17.5;
+        keys.slice(0, count).forEach(function (k, i) {
+          var info = TRATA[k] || {};
+          var x = m + i * (boxW + gap);
+          pdf.setFillColor(252, 249, 242);
+          pdf.setDrawColor(207, 198, 181);
+          pdf.setLineWidth(0.25);
+          pdf.roundedRect(x, yy, boxW, boxH, 1.4, 1.4, 'FD');
+          pdf.setFont('helvetica', 'bold');
+          pdf.setFontSize(count >= 5 ? 5.7 : 6.3);
+          pdf.setTextColor.apply(pdf, azul);
+          var nom = pdf.splitTextToSize(info.nom || k, boxW - 4);
+          pdf.text(nom[0] || '', x + 2, yy + 4.2);
+          pdf.setFont('helvetica', 'normal');
+          pdf.setFontSize(count >= 5 ? 4.4 : 4.8);
+          pdf.setTextColor.apply(pdf, gris);
+          var corto = TRATA_CORTO[k] || '';
+          var body = pdf.splitTextToSize(corto, boxW - 4);
+          if (body.length > 2) body = body.slice(0, 2);
+          pdf.text(body, x + 2, yy + 8.2);
+        });
+        return yy + boxH + 4.5;
+      }
+
+      function dibujarCmpOficial(imgData, info, yy) {
+        if (!imgData) return yy;
+        info = info || {};
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(9);
+        pdf.setTextColor.apply(pdf, azul);
+        pdf.text('Comparativa oficial de costos PSA', m, yy);
+        var vig = info.vigencia ? ('Vigencia: ' + info.vigencia) : 'Fuente oficial PSA';
+        pdf.setFontSize(6.5);
+        var tagW = Math.min(62, Math.max(36, pdf.getTextWidth(vig) + 8));
+        pdf.setFillColor(255, 244, 232);
+        pdf.roundedRect(W - m - tagW, yy - 4.3, tagW, 6.8, 2.8, 2.8, 'F');
+        pdf.setTextColor.apply(pdf, naranja);
+        pdf.text(vig, W - m - tagW / 2, yy, { align: 'center' });
+        pdf.setFont('helvetica', 'italic');
+        pdf.setFontSize(5.6);
+        pdf.setTextColor.apply(pdf, gris);
+        pdf.text('Imagen original publicada por PSA, sin recalcular ni modificar sus datos.', m, yy + 4.4);
+        var yImg = yy + 7.5;
+        var maxH = Math.max(30, H - 16 - yImg);
+        var props = pdf.getImageProperties(imgData);
+        var imgW = usable;
+        var imgH = imgW * props.height / props.width;
+        if (imgH > maxH) {
+          imgH = maxH;
+          imgW = imgH * props.width / props.height;
+        }
+        var xImg = m + (usable - imgW) / 2;
+        pdf.setFillColor(220, 213, 198);
+        pdf.roundedRect(xImg - 1.5, yImg - 1.5, imgW + 3, imgH + 3, 1.6, 1.6, 'F');
+        pdf.addImage(imgData, 'JPEG', xImg, yImg, imgW, imgH, undefined, 'FAST');
+        if (info.url) pdf.link(xImg, yImg, imgW, imgH, { url: info.url });
+        return yImg + imgH + 3;
+      }
+
       function nuevaFicha() {
         pdf.addPage();
         // Las fichas y sus continuaciones usan el mismo fondo arena del presupuesto.
@@ -2006,6 +2129,9 @@
         var imgW = 36;
         var c = cmpDe(p, itemFicha.q);
         var keys = trataDe(p);
+        var cmpOficialId = comparativaIdDe(p);
+        var cmpOficialImg = comparativasOficiales[ix] || '';
+        var cmpOficialMeta = cmpOficialId ? (metaComparativas[cmpOficialId] || {}) : {};
         var hasVid = !!videoDe(p);
         var qrW = hasVid ? 24 : 0;
         var tx = m;
@@ -2073,11 +2199,13 @@
         pdf.setFontSize(8);
         var cuerpo = p.composicion ? ('Incluye: ' + p.composicion) : sinMarca(p.desc || p.para || 'Sin descripción cargada.').replace(/\n+/g, ' ');
         var lineasTxt = pdf.splitTextToSize(cuerpo, usable);
-        var maxL = keys.length ? 4 : 8;
+        var maxL = cmpOficialImg ? 2 : (keys.length ? 4 : 8);
         if (lineasTxt.length > maxL) lineasTxt = lineasTxt.slice(0, maxL);
         pdf.text(lineasTxt, m, yy);
         yy += lineasTxt.length * 3.8 + 7;
-        if (keys.length) {
+        if (cmpOficialImg && keys.length) {
+          yy = dibujarTrataCompacta(keys, yy);
+        } else if (keys.length) {
           pdf.setFont('helvetica', 'bold');
           pdf.setFontSize(9);
           pdf.setTextColor.apply(pdf, azul);
@@ -2118,7 +2246,8 @@
           });
           yy = (col ? Math.max(yCol[0], yCol[1]) : yy) + 4;
         }
-        if (c) yy = dibujarCmp(c, yy);
+        if (cmpOficialImg) yy = dibujarCmpOficial(cmpOficialImg, cmpOficialMeta, yy);
+        else if (c) yy = dibujarCmp(c, yy);
       });
 
       var pages = pdf.internal.getNumberOfPages();

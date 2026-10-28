@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v866-presupuesto-fondo-arena';
+const CACHE_NAME = 'appi-v868-comparativas-oficiales-pdf';
 const CACHE_PREFIX = 'appi-';
 // Donde el SW aparta una compartición hasta que la app la consume. No
 // empieza con el prefijo de la app para que el prune del activate no la borre.
@@ -77,7 +77,13 @@ const APP_SHELL = [
   './icon-512-maskable.png',
   './apple-touch-icon.png',
   './img/rinnova-ducha.jpg',
-  './promo-botella-psa-500ml.jpg'
+  './promo-botella-psa-500ml.jpg',
+  './psa-comparativas.json',
+  './comparativas-img/senior4.jpg',
+  './comparativas-img/senior.jpg',
+  './comparativas-img/s1000.jpg',
+  './comparativas-img/senik.jpg',
+  './comparativas-img/burby.jpg'
 ];
 
 self.addEventListener('message', event=>{ if(event.data && event.data.type==='SKIP_WAITING') self.skipWaiting(); });

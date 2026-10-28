@@ -145,8 +145,12 @@ test.describe('Packs PSA en Lista de Precios', () => {
         const origSave = inst.save.bind(inst);
         const origSetFill = inst.setFillColor.bind(inst);
         const origRect = inst.rect.bind(inst);
+        const origAddImage = inst.addImage.bind(inst);
+        const origText = inst.text.bind(inst);
         let fill = [];
         const backgrounds = [];
+        const officialComparisons = [];
+        const officialLabels = [];
         inst.setFillColor = function(...colors) { fill = colors; return origSetFill(...colors); };
         inst.rect = function(x, y, w, h, style) {
           if (x === 0 && y === 0 && Math.abs(w - inst.internal.pageSize.getWidth()) < .01 && Math.abs(h - inst.internal.pageSize.getHeight()) < .01 && style === 'F') {
@@ -154,10 +158,32 @@ test.describe('Packs PSA en Lista de Precios', () => {
           }
           return origRect(x, y, w, h, style);
         };
+        inst.addImage = function(...args) {
+          const width = Number(args[4]) || 0;
+          const height = Number(args[5]) || 0;
+          if (width > 100 && height > 70) {
+            officialComparisons.push({
+              page: inst.internal.getCurrentPageInfo().pageNumber,
+              format: String(args[1] || ''),
+              width: Math.round(width),
+              height: Math.round(height)
+            });
+          }
+          return origAddImage(...args);
+        };
+        inst.text = function(...args) {
+          const value = Array.isArray(args[0]) ? args[0].join(' ') : String(args[0] || '');
+          if (value.indexOf('Comparativa oficial de costos PSA') >= 0) {
+            officialLabels.push({ page: inst.internal.getCurrentPageInfo().pageNumber, value });
+          }
+          return origText(...args);
+        };
         inst.save = function(name) {
           window._pdfResult = {
             totalPages: inst.internal.getNumberOfPages(),
             backgrounds,
+            officialComparisons,
+            officialLabels,
             name: name
           };
           return origSave(name);
@@ -176,5 +202,93 @@ test.describe('Packs PSA en Lista de Precios', () => {
     // Con la página 1 de presupuesto + 3 páginas de fichas individuales = 4 páginas.
     expect(res.totalPages).toBe(4);
     expect(res.backgrounds).toEqual([1, 2, 3, 4].map(page => ({page, color: [243, 238, 227]})));
+    // La ficha de Senior4 (página 2) lleva la página oficial de PSA como una
+    // imagen grande en esa misma hoja. Portátil y Rinnova no tienen una de
+    // las cinco comparativas oficiales aprobadas.
+    expect(res.officialComparisons).toHaveLength(1);
+    expect(res.officialComparisons[0]).toMatchObject({ page: 2, format: 'JPEG' });
+    expect(res.officialComparisons[0].width).toBeGreaterThan(160);
+    expect(res.officialComparisons[0].height).toBeGreaterThan(100);
+    expect(res.officialLabels).toEqual([{ page: 2, value: 'Comparativa oficial de costos PSA' }]);
+  });
+
+  test('incorpora las cinco comparativas oficiales en la misma hoja de cada ficha', async ({ page }) => {
+    const comparativaSkus = new Set(['611010510', '611010580', '611120200', '611030560', '617110040']);
+    // La fixture puede traer promociones temporales ya vencidas; para esta
+    // prueba de ficha se usan los productos base a precio normal.
+    await page.route('**/psa-catalogo.json*', async route => {
+      const response = await route.fetch();
+      const data = await response.json();
+      (data.productos || []).forEach(p => { if (comparativaSkus.has(String(p.sku || ''))) p.promo = false; });
+      await route.fulfill({ response, json: data });
+    });
+    await entrar(page);
+    await page.evaluate(() => { if (typeof openLista === 'function') openLista(); });
+    await page.waitForSelector('.lp-item', { timeout: 10000 });
+
+    const skus = ['611010510', '611010580', '611120200', '611030560', '617110040'];
+    for (const sku of skus) {
+      const normal = page.locator(`.lp-item[data-sku="${sku}"] button[data-price-sku="${sku}"]`);
+      await expect(normal).toBeVisible();
+      await normal.click();
+    }
+
+    await page.locator('#lpFab').click();
+    await expect(page.locator('#lpSheet')).toHaveClass(/open/);
+    await page.evaluate(() => {
+      window._pdfResult = null;
+      window.navigator.canShare = null;
+      if (!window.APPIDialog) window.APPIDialog = {};
+      window.APPIDialog.prompt = function() { return Promise.resolve('Cliente Comparativas'); };
+      const Orig = window.jspdf.jsPDF;
+      window.jspdf.jsPDF = function(...args) {
+        const inst = new Orig(...args);
+        const origSave = inst.save.bind(inst);
+        const origAddImage = inst.addImage.bind(inst);
+        const origText = inst.text.bind(inst);
+        const comparisons = [];
+        const labels = [];
+        inst.addImage = function(...imageArgs) {
+          const width = Number(imageArgs[4]) || 0;
+          const height = Number(imageArgs[5]) || 0;
+          if (width > 100 && height > 70) {
+            comparisons.push({
+              page: inst.internal.getCurrentPageInfo().pageNumber,
+              format: String(imageArgs[1] || ''),
+              width: Math.round(width),
+              height: Math.round(height)
+            });
+          }
+          return origAddImage(...imageArgs);
+        };
+        inst.text = function(...textArgs) {
+          const value = Array.isArray(textArgs[0]) ? textArgs[0].join(' ') : String(textArgs[0] || '');
+          if (value.indexOf('Comparativa oficial de costos PSA') >= 0) {
+            labels.push(inst.internal.getCurrentPageInfo().pageNumber);
+          }
+          return origText(...textArgs);
+        };
+        inst.save = function(name) {
+          window._pdfResult = {
+            totalPages: inst.internal.getNumberOfPages(),
+            comparisons,
+            labels,
+            name
+          };
+          return origSave(name);
+        };
+        return inst;
+      };
+    });
+
+    await page.locator('#lpSheetPdf').click();
+    await page.waitForFunction(() => !!window._pdfResult, { timeout: 30000 });
+    const res = await page.evaluate(() => window._pdfResult);
+
+    expect(res.totalPages).toBe(6);
+    expect(res.comparisons).toHaveLength(5);
+    expect(res.comparisons.map(x => x.page)).toEqual([2, 3, 4, 5, 6]);
+    expect(res.comparisons.every(x => x.format === 'JPEG' && x.width > 100 && x.height > 70)).toBe(true);
+    expect(res.labels).toEqual([2, 3, 4, 5, 6]);
   });
 });

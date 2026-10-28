@@ -6,6 +6,13 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v868 · Comparativas oficiales dentro de las fichas PDF
+
+- Senior4, Senior Bianco, S·1000·2, Senik y SodaBurby incorporan la imagen de la comparativa oficial de PSA en la misma hoja de su ficha técnica.
+- La ficha conserva foto, precio, descripción y tratamientos en formato compacto; la imagen oficial muestra su vigencia y enlaza al PDF fuente.
+- El workflow de precios verifica dos veces al día el contenido de los cinco PDF y regenera la imagen si PSA reemplaza el archivo aun conservando el mismo enlace.
+- Versión: **v868 · Segura** → Cache `appi-v868-comparativas-oficiales-pdf`.
+
 ## v866 · Fondo uniforme en presupuestos PDF
 
 - Las fichas de producto y sus continuaciones usan el mismo fondo arena que las páginas del presupuesto.

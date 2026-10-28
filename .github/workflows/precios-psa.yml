@@ -1,8 +1,9 @@
 name: Precios lista PSA
 
-# Lee tienda.psa.com.ar y actualiza psa-precios.json, psa-catalogo.json y psa-planes.json
-# (cuotas y bancos). Dos veces por día (8 y 17 ART) y a mano con workflow_dispatch.
-# Comparativas y Lista de precios / Cotizar leen esos archivos siempre de red.
+# Lee tienda.psa.com.ar y actualiza precios, catálogo, planes e imágenes.
+# También verifica los PDF de comparativas oficiales de PSA: si el contenido
+# cambia aunque conserve la URL, regenera la imagen usada en las fichas.
+# Dos veces por día (8 y 17 ART) y a mano con workflow_dispatch.
 on:
   schedule:
     - cron: "0 11,20 * * *"
@@ -18,16 +19,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Leer precios, fotos y planes
+      - name: Leer precios, fotos, planes y comparativas
         run: |
-          python3 -m pip install --quiet pillow pypdf
+          python3 -m pip install --quiet pillow pypdf pymupdf
           python3 scripts/actualizar-precios-psa.py
+          python3 scripts/actualizar-comparativas-psa.py
 
       - name: Publicar si cambiaron
         run: |
           git config user.name "APPI precios"
           git config user.email "298482267+arena-ai-coding-agent[bot]@users.noreply.github.com"
-          git add psa-precios.json psa-catalogo.json psa-planes.json catalogo-img
+          git add psa-precios.json psa-catalogo.json psa-planes.json psa-comparativas.json catalogo-img comparativas-img
           if git diff --cached --quiet; then
             echo "Sin cambios"
             exit 0
