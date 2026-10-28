@@ -6,6 +6,11 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v866 · Fondo uniforme en presupuestos PDF
+
+- Las fichas de producto y sus continuaciones usan el mismo fondo arena que las páginas del presupuesto.
+- Versión: **v866 · Segura** → Cache `appi-v866-presupuesto-fondo-arena`.
+
 ## v865 · Rebote y gotita en ventanas emergentes
 
 - Animación de rebote suave al abrir diálogos y paneles emergentes, con sonido breve de gota después de interactuar con la app.

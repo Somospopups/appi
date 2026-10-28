@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "865.0.0",
-  "cacheName": "appi-v865-popups-gota",
+  "version": "866.0.0",
+  "cacheName": "appi-v866-presupuesto-fondo-arena",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

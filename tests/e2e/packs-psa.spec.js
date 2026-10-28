@@ -143,9 +143,21 @@ test.describe('Packs PSA en Lista de Precios', () => {
       window.jspdf.jsPDF = function(...args) {
         const inst = new Orig(...args);
         const origSave = inst.save.bind(inst);
+        const origSetFill = inst.setFillColor.bind(inst);
+        const origRect = inst.rect.bind(inst);
+        let fill = [];
+        const backgrounds = [];
+        inst.setFillColor = function(...colors) { fill = colors; return origSetFill(...colors); };
+        inst.rect = function(x, y, w, h, style) {
+          if (x === 0 && y === 0 && Math.abs(w - inst.internal.pageSize.getWidth()) < .01 && Math.abs(h - inst.internal.pageSize.getHeight()) < .01 && style === 'F') {
+            backgrounds.push({page: inst.internal.getCurrentPageInfo().pageNumber, color: [...fill]});
+          }
+          return origRect(x, y, w, h, style);
+        };
         inst.save = function(name) {
           window._pdfResult = {
             totalPages: inst.internal.getNumberOfPages(),
+            backgrounds,
             name: name
           };
           return origSave(name);
@@ -163,5 +175,6 @@ test.describe('Packs PSA en Lista de Precios', () => {
     // PACK BÁSICO tiene 3 componentes: Senior 4, 1-P Portatil, Ducha Rinnova.
     // Con la página 1 de presupuesto + 3 páginas de fichas individuales = 4 páginas.
     expect(res.totalPages).toBe(4);
+    expect(res.backgrounds).toEqual([1, 2, 3, 4].map(page => ({page, color: [243, 238, 227]})));
   });
 });

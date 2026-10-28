@@ -1987,6 +1987,9 @@
 
       function nuevaFicha() {
         pdf.addPage();
+        // Las fichas y sus continuaciones usan el mismo fondo arena del presupuesto.
+        pdf.setFillColor.apply(pdf, crema);
+        pdf.rect(0, 0, W, H, 'F');
         encabezado('Ficha de producto');
         return 36;
       }
