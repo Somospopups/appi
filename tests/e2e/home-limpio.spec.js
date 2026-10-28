@@ -109,6 +109,50 @@ test('el selector de páginas navega y cada página tiene lo suyo', async ({ pag
   await expect(page.locator('#homeLimpio')).toBeVisible();
 });
 
+test('Herramientas usa tarjetas compactas con icono a la derecha y sin datos secundarios', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 840 });
+  await entrar(page);
+  await page.locator('#pageTabs button[data-view="view-herramientas"]').click();
+
+  const cards = page.locator('#herrGrid .quick-tool-card');
+  expect(await cards.count()).toBeGreaterThanOrEqual(12);
+  await expect(cards.first().locator('.quick-state')).toBeHidden();
+  await expect(cards.first().locator('.quick-updated')).toBeHidden();
+
+  const metricas = await cards.evaluateAll(items => items.slice(0, 12).map(card => {
+    const icon = card.querySelector('.quick-icon');
+    const title = card.querySelector('h3');
+    const subtitle = card.querySelector('p');
+    const c = card.getBoundingClientRect();
+    const i = icon.getBoundingClientRect();
+    const t = title.getBoundingClientRect();
+    return {
+      alto: c.height,
+      iconoDerecha: i.left > c.left + c.width / 2,
+      textoAntesDelIcono: t.right <= i.left + 1,
+      titulo: title.textContent.trim(),
+      subtitulo: subtitle.textContent.trim(),
+      estadoOculto: getComputedStyle(card.querySelector('.quick-state')).display === 'none',
+      actualizadoOculto: getComputedStyle(card.querySelector('.quick-updated')).display === 'none'
+    };
+  }));
+  expect(metricas).toHaveLength(12);
+  expect(metricas.every(x => x.alto >= 86 && x.alto <= 90)).toBe(true);
+  expect(metricas.every(x => x.iconoDerecha && x.textoAntesDelIcono)).toBe(true);
+  expect(metricas.every(x => x.titulo && x.subtitulo && x.estadoOculto && x.actualizadoOculto)).toBe(true);
+
+  const doce = await cards.nth(11).boundingBox();
+  const dock = await page.locator('#pageTabs').boundingBox();
+  expect(doce.y + doce.height).toBeLessThanOrEqual(dock.y + 2);
+
+  // El cambio es exclusivo de Herramientas: Mi mes y Mi negocio conservan
+  // sus indicadores porque allí sí contienen información dinámica útil.
+  await page.locator('#pageTabs button[data-view="view-mes"]').click();
+  await expect(page.locator('#mesGrid .quick-state').first()).toBeVisible();
+  await page.locator('#pageTabs button[data-view="view-negocio"]').click();
+  await expect(page.locator('#negGrid .quick-state').first()).toBeVisible();
+});
+
 test('en pantalla de PC el selector se esconde y manda la sidebar', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 800 });
   await entrar(page, false);

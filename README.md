@@ -6,6 +6,14 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v875 · Herramientas compactas con iconos a la derecha
+
+- La pantalla **Mis herramientas** conserva los iconos y colores actuales, pero los ubica a la derecha de cada tarjeta.
+- Las tarjetas reducen su altura y agrupan nombre y descripción para aprovechar mejor el espacio.
+- Se ocultan únicamente en esta pantalla las etiquetas superiores y la línea inferior con reloj/dato secundario, tal como se aprobó en la maqueta.
+- Las tarjetas de Mi mes y Mi negocio conservan sus indicadores y datos actuales.
+- Versión: **v875 · Segura** → Cache `appi-v875-herramientas-compactas`.
+
 ## v874 · Presupuesto verde y tarjetas fáciles de distinguir
 
 - El encabezado de **Presupuesto** abandona el marrón y usa el mismo fondo crema que la hoja.

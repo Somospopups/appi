@@ -160,13 +160,13 @@ window.openStock=function(){
 <script src="./mensajes-hielo.js?v=618"></script>
 <script src="./mensajes-usuarios.js?v=639"></script>
   <script src="./campus-preguntas.js?v=646"></script>
-  <script src="./campus-psa.js?v=870"></script>
+  <script src="./campus-psa.js?v=875"></script>
 <script src="./reactivacion.js?v=618"></script>
 
 <script src="./escalera-suenos.js?v=618"></script>
 <script src="./demo-guia.js?v=618"></script>
 <script src="./tablero-negocio.js?v=618"></script>
-<script src="./lista-precios.js?v=874"></script>
+<script src="./lista-precios.js?v=875"></script>
 <script src="./vendor/pdf.min.js?v=618"></script>
 <script src="./canillas-adaptadores.js?v=618"></script>
 <script src="./vendor/zxing.min.js?v=618"></script>
@@ -4165,6 +4165,53 @@ body.dark .admin-login-card{background:#242638}body.dark .admin-login-card h2{co
     font-size: 10.5px;
     font-weight: 700;
   }
+  /* Herramientas compactas: se conservan los iconos actuales, ahora a la
+     derecha; se omiten la etiqueta superior y la línea informativa inferior. */
+  #herrGrid .quick-tool-card {
+    min-height: 88px;
+    padding: 12px 58px 12px 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  #herrGrid .quick-tool-card::before {
+    background: radial-gradient(circle at 100% 50%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 55%);
+  }
+  #herrGrid .quick-tool-top {
+    position: static;
+    display: block;
+    margin: 0;
+  }
+  #herrGrid .quick-icon {
+    position: absolute;
+    z-index: 2;
+    right: 11px;
+    top: 50%;
+    width: 42px;
+    height: 42px;
+    border-radius: 13px;
+    font-size: 20px;
+    transform: translateY(-50%);
+  }
+  #herrGrid .quick-state,
+  #herrGrid .quick-updated {
+    display: none;
+  }
+  #herrGrid .quick-tool-card h3 {
+    margin: 0 0 4px;
+    max-height: 28px;
+    overflow: hidden;
+    line-height: 1.08;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+  #herrGrid .quick-tool-card p {
+    margin: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
   .business-card {
     width: 100%;
     position: relative;
@@ -4660,7 +4707,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v874 · Segura</div>
+  <div class="ds-foot">APPI · v875 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -14212,8 +14259,8 @@ function cerrarToolsMenu(){
   // con archivos viejos en pantalla.
   if ('serviceWorker' in navigator) {
     (async () => {
-    const swVersion='874';
-    const CACHE_NAME='appi-v874-presupuesto-verde';
+    const swVersion='875';
+    const CACHE_NAME='appi-v875-herramientas-compactas';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}

@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "874.0.0",
-  "cacheName": "appi-v874-presupuesto-verde",
+  "version": "875.0.0",
+  "cacheName": "appi-v875-herramientas-compactas",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {
