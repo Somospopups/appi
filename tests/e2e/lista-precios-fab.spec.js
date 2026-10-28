@@ -242,6 +242,7 @@ test('producto con plan canje aparece en un renglón y conserva su foto', async 
   });
   expect(alineacion.texto.right).toBeLessThanOrEqual(alineacion.canje.left + 1);
   expect(alineacion.canje.right).toBeLessThanOrEqual(alineacion.normal.left + 1);
+  expect(Math.abs(alineacion.canje.right - alineacion.canje.left - (alineacion.normal.right - alineacion.normal.left))).toBeLessThanOrEqual(1);
   expect(Math.min(alineacion.texto.bottom, alineacion.canje.bottom) - Math.max(alineacion.texto.top, alineacion.canje.top)).toBeGreaterThan(0);
   expect(alineacion.overflow).toBe(false);
 
@@ -257,11 +258,14 @@ test('producto con plan canje aparece en un renglón y conserva su foto', async 
     return {
       textoAntesDeBotones: texto.right <= opciones[0].left + 1,
       ordenDeBotones: opciones[0].right <= opciones[1].left + 1,
+      mismoAncho: Math.abs((opciones[0].right - opciones[0].left) - (opciones[1].right - opciones[1].left)) <= 1,
+      anchoCanje: opciones[0].right - opciones[0].left,
       mismaFila: Math.min(texto.bottom, opciones[0].bottom) > Math.max(texto.top, opciones[0].top),
       overflow: row.scrollWidth > row.clientWidth
     };
   });
-  expect(alineacionSinFoto).toEqual({ textoAntesDeBotones: true, ordenDeBotones: true, mismaFila: true, overflow: false });
+  expect(alineacionSinFoto).toMatchObject({ textoAntesDeBotones: true, ordenDeBotones: true, mismoAncho: true, mismaFila: true, overflow: false });
+  expect(Math.abs(alineacionSinFoto.anchoCanje - (alineacion.canje.right - alineacion.canje.left))).toBeLessThanOrEqual(1);
 
   await page.fill("#lpSearch", "611010510");
   await expect(rows).toHaveCount(1);

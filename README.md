@@ -6,6 +6,12 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v861 · Botones de precio uniformes
+
+- Los botones **Precio de canje** y **Precio normal** usan el mismo ancho y alto en todas las fichas con Plan Canje, tengan o no miniatura.
+- Se conserva el nombre y SKU a la izquierda y las dos opciones de precio en la misma fila.
+- Versión: **v861 · Segura** → Cache `appi-v861-botones-precio-uniformes`.
+
 ## v860 · Vivo PSA especial del 28/10/2026
 
 - Sólo para el **miércoles 28 de octubre de 2026**, el Vivo PSA comienza a las **13:00** (ART), en lugar de las 15:00 habituales.
