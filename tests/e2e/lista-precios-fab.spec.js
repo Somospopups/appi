@@ -210,6 +210,7 @@ test.describe('Píldora de Lista de Precios sobre el dock', () => {
 });
 
 test('producto con plan canje aparece en un renglón y conserva su foto', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
   await entrar(page);
   await page.evaluate(() => {
     if (typeof openLista === "function") openLista();
@@ -226,6 +227,44 @@ test('producto con plan canje aparece en un renglón y conserva su foto', async 
   const opciones = rows.first().locator('.lp-price-choice');
   await expect(opciones.nth(0)).toContainText('Precio de canje');
   await expect(opciones.nth(1)).toContainText('Precio normal');
+  const alineacion = await rows.first().evaluate((row) => {
+    const box = (el) => {
+      const r = el.getBoundingClientRect();
+      return { left: r.left, right: r.right, top: r.top, bottom: r.bottom };
+    };
+    return {
+      item: box(row),
+      texto: box(row.querySelector('.lp-item-txt')),
+      canje: box(row.querySelectorAll('.lp-price-choice')[0]),
+      normal: box(row.querySelectorAll('.lp-price-choice')[1]),
+      overflow: row.scrollWidth > row.clientWidth
+    };
+  });
+  expect(alineacion.texto.right).toBeLessThanOrEqual(alineacion.canje.left + 1);
+  expect(alineacion.canje.right).toBeLessThanOrEqual(alineacion.normal.left + 1);
+  expect(Math.min(alineacion.texto.bottom, alineacion.canje.bottom) - Math.max(alineacion.texto.top, alineacion.canje.top)).toBeGreaterThan(0);
+  expect(alineacion.overflow).toBe(false);
+
+  // También conserva la misma distribución cuando una miniatura no existe.
+  await page.fill("#lpSearch", "611010730");
+  const sinFoto = page.locator("#lpList .lp-item").first();
+  await expect(sinFoto).toHaveCount(1);
+  await expect(sinFoto).toHaveClass(/lp-item-no-photo/);
+  const alineacionSinFoto = await sinFoto.evaluate((row) => {
+    const r = (el) => el.getBoundingClientRect();
+    const texto = r(row.querySelector('.lp-item-txt'));
+    const opciones = [...row.querySelectorAll('.lp-price-choice')].map(r);
+    return {
+      textoAntesDeBotones: texto.right <= opciones[0].left + 1,
+      ordenDeBotones: opciones[0].right <= opciones[1].left + 1,
+      mismaFila: Math.min(texto.bottom, opciones[0].bottom) > Math.max(texto.top, opciones[0].top),
+      overflow: row.scrollWidth > row.clientWidth
+    };
+  });
+  expect(alineacionSinFoto).toEqual({ textoAntesDeBotones: true, ordenDeBotones: true, mismaFila: true, overflow: false });
+
+  await page.fill("#lpSearch", "611010510");
+  await expect(rows).toHaveCount(1);
   await opciones.nth(0).click();
   await expect(rows.first()).toHaveClass(/lp-item-selected/);
   await expect(opciones.nth(0)).toHaveClass(/is-in-cart/);

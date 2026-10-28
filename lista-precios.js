@@ -600,20 +600,20 @@
       '.lp-sec{margin:12px 0 6px;font-size:11px;font-weight:900;color:#0b5878;letter-spacing:.4px;text-transform:uppercase}' +
       '.lp-canje{ background:rgba(91,141,239,0.06); border-left:3px solid #5b8def; } .lp-canje .lp-item-txt b{ color:#3d63c9; } .lp-item{display:flex;align-items:center;gap:10px;padding:10px 12px;margin:0 0 8px;border-radius:16px;background:rgba(255,255,255,.72);border:1px solid rgba(255,255,255,.8);position:relative;transition:all .2s ease}' +
       '.lp-item-txt{flex:1;min-width:0}' +
-      '.lp-item-has-canje{display:grid;grid-template-columns:44px minmax(0,1fr);align-items:center;column-gap:10px;row-gap:8px}' +
-      '.lp-item-has-canje.lp-item-no-photo{grid-template-columns:minmax(0,1fr)}' +
-      '.lp-item-has-canje .lp-item-txt{grid-column:2}' +
-      '.lp-item-has-canje.lp-item-no-photo .lp-item-txt{grid-column:1}' +
+      '.lp-item-has-canje{display:grid;grid-template-columns:44px minmax(68px,.9fr) repeat(2,minmax(0,1fr));align-items:center;column-gap:6px;row-gap:0}' +
+      '.lp-item-has-canje.lp-item-no-photo{grid-template-columns:minmax(68px,.9fr) repeat(2,minmax(0,1fr))}' +
+      '.lp-item-has-canje .lp-item-txt,.lp-item-has-canje.lp-item-no-photo .lp-item-txt{grid-column:auto}' +
       '.lp-price-options{grid-column:1/-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;width:100%}' +
+      '.lp-item-has-canje .lp-price-options{grid-column:auto;display:contents}' +
       '.lp-item-selected{background:rgba(11,88,120,.075)!important;border:1.5px solid rgba(11,88,120,.55)!important;box-shadow:0 3px 12px rgba(11,88,120,.12)!important}' +
       'body.dark .lp-item-selected{background:rgba(20,126,168,.14)!important;border-color:rgba(56,189,248,.48)!important;box-shadow:0 3px 12px rgba(0,0,0,.18)!important}' +
-      '.lp-price-choice{min-width:0;min-height:58px;border:1px solid #0b5878;border-radius:12px;padding:7px 9px;background:#0b5878;color:#fff;text-align:left;font:inherit;cursor:pointer;display:flex;flex-direction:column;justify-content:center;gap:2px;transition:transform .1s ease,filter .15s ease,box-shadow .15s ease}' +
+      '.lp-price-choice{min-width:0;min-height:56px;border:1px solid #0b5878;border-radius:12px;padding:6px 6px;background:#0b5878;color:#fff;text-align:left;font:inherit;cursor:pointer;display:flex;flex-direction:column;justify-content:center;gap:2px;transition:transform .1s ease,filter .15s ease,box-shadow .15s ease}' +
       '.lp-price-choice:active{transform:scale(.98)}' +
       '.lp-price-choice-canje{background:#4169c8;border-color:#4169c8;color:#fff}' +
       '.lp-price-choice.is-in-cart{box-shadow:inset 0 0 0 2px rgba(255,255,255,.85),0 2px 7px rgba(0,0,0,.13);filter:brightness(1.08)}' +
-      '.lp-price-choice-label{font-size:10px;font-weight:800;line-height:1.15}' +
-      '.lp-price-choice strong{font-size:13px;font-weight:950;line-height:1.2;white-space:nowrap}' +
-      '.lp-price-choice-count{font-size:9px;font-weight:750;line-height:1.15;opacity:.88;color:#fff}' +
+      '.lp-price-choice-label{font-size:9px;font-weight:800;line-height:1.15}' +
+      '.lp-price-choice strong{font-size:12px;font-weight:950;line-height:1.2;white-space:nowrap}' +
+      '.lp-price-choice-count{font-size:8px;font-weight:750;line-height:1.15;opacity:.88;color:#fff}' +
       'body.dark .lp-price-choice{background:#0e6b91;border-color:#0e6b91;color:#fff}' +
       'body.dark .lp-price-choice-canje{background:#4d68c8;border-color:#4d68c8;color:#fff}' +
       '.lp-item-txt b{display:block;font-size:13px;font-weight:900;color:#2a2a32;line-height:1.25}' +
@@ -830,7 +830,7 @@
       var fotoHtml = '';
       if (L.foto) {
         fotoHtml = '<div class="lp-item-foto-wrap" data-foto-popup="' + esc(L.foto) + '" data-foto-tit="' + esc(L.nombre) + '" data-foto-sub="' + esc((L.sku ? 'SKU ' + L.sku : (L.seccion || '')))  + '" data-foto-sku="' + esc(L.sku || '') + '">' +
-          '<img class="lp-item-foto" loading="lazy" src="' + esc(L.foto) + '" alt="" onerror="this.parentElement.remove()">' +
+          '<img class="lp-item-foto" loading="lazy" src="' + esc(L.foto) + '" alt="" onerror="if(this.closest(\'.lp-item-has-canje\'))this.closest(\'.lp-item-has-canje\').classList.add(\'lp-item-no-photo\');this.parentElement.remove()">' +
           '</div>';
       }
       var descHtml = '';

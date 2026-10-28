@@ -6,6 +6,12 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v859 · Opciones de precio en el mismo renglón
+
+- Las fichas con Plan Canje muestran nombre, referencia y los dos botones de precio en una sola fila, también en pantallas angostas.
+- Si falta una miniatura, la ficha se reacomoda sin reservar el espacio de la imagen.
+- Versión: **v859 · Segura** → Cache `appi-v859-precios-misma-fila`.
+
 ## v858 · Canje primero y productos seleccionados
 
 - En las fichas de una sola fila, **Precio de canje** queda a la izquierda y **Precio normal** a la derecha.

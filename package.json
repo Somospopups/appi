@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "858.0.0",
-  "cacheName": "appi-v858-canje-seleccionado",
+  "version": "859.0.0",
+  "cacheName": "appi-v859-precios-misma-fila",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

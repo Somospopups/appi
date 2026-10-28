@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v858-canje-seleccionado';
+const CACHE_NAME = 'appi-v859-precios-misma-fila';
 const CACHE_PREFIX = 'appi-';
 // Donde el SW aparta una compartición hasta que la app la consume. No
 // empieza con el prefijo de la app para que el prune del activate no la borre.
