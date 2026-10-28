@@ -435,30 +435,35 @@ test('el PRODUCTO manual sugiere los nombres del catálogo', async ({ page }) =>
   expect(input).toBe('stCatDl');
 });
 
-/* v744 · La lista "Precios Sugeridos con Acuerdo" imprime "Plan canje"
-   como sublínea del producto, con su propio precio en la primera
-   columna. En la Lista de precios esas sublíneas figuran como línea
-   propia (buscá "canje"), con el precio de canje, para poder cotizar
-   con canje o sin canje. */
-test('lista de precios: plan canje figura como línea propia con su precio', async ({ page }) => {
+/* v858 · Los productos con Plan Canje se muestran en una sola ficha
+   con dos botones de precio. Cada botón agrega la variante correcta al
+   presupuesto, sin duplicar la fila del producto. */
+test('lista de precios: un renglón ofrece precio normal y precio de canje', async ({ page }) => {
   await entrar(page);
   await page.evaluate(() => window.abrirLista());
-  const items = page.locator('#lpList .lp-item');
-  await expect(items.first()).toBeVisible({ timeout: 15000 });
-  const total = await items.count();
-  // 356 productos, pero "Todos" ya no muestra Packs ni Opciones de ingreso
-  // (33 en total: sólo se ven al picar su píldora) → 323 + 35 sublíneas
-  // canje del PDF = 358.
-  expect(total).toBe(358);
-  await page.locator('#lpSearch').fill('canje');
-  const canjes = page.locator('#lpList .lp-item');
-  await expect(canjes.first()).toContainText('PLAN CANJE');
-  expect(await canjes.count()).toBe(35);
-  // La sublínea del Senior 4 Bianco cotiza al precio de canje.
-  const senior4 = canjes.filter({ hasText: 'PSA SENIOR 4 BIANCO + KIT POSV. (PLAN CANJE)' }).first();
-  await expect(senior4).toContainText('$855.000');
-  await senior4.locator('[data-act="mas"]').click();
+  await page.locator('#lpList .lp-item').first().waitFor({ state: 'visible', timeout: 15000 });
+
+  await page.locator('#lpSearch').fill('611010510');
+  const senior4 = page.locator('#lpList .lp-item').filter({ hasText: '611010510' });
+  await expect(senior4).toHaveCount(1);
+  await expect(senior4).not.toContainText('PLAN CANJE');
+
+  const opciones = senior4.locator('.lp-price-choice');
+  await expect(opciones).toHaveCount(2);
+  await expect(opciones.nth(0)).toContainText('Precio normal');
+  await expect(opciones.nth(0)).toContainText('$950.000');
+  await expect(opciones.nth(1)).toContainText('Precio de canje');
+  await expect(opciones.nth(1)).toContainText('$855.000');
+
+  await opciones.nth(1).click();
   await expect(page.locator('#lpFab')).toContainText('$855.000');
+  await opciones.nth(0).click();
+  await expect(page.locator('#lpFab')).toContainText('$1.805.000');
+
+  await page.locator('#lpFab').click();
+  const lineas = page.locator('#lpSheetLines .lp-line-block');
+  await expect(lineas).toHaveCount(2);
+  await expect(lineas.filter({ hasText: 'PLAN CANJE' })).toHaveCount(1);
 });
 
 /* v745 · Tocar un producto cargado en Mi Stock abre el editor: se

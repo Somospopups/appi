@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "856.0.0",
-  "cacheName": "appi-v856-solo-por-pill",
+  "version": "857.0.0",
+  "cacheName": "appi-v857-catalogo-limpio-canje-en-fila",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

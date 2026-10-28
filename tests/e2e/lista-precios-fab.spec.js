@@ -209,28 +209,27 @@ test.describe('Píldora de Lista de Precios sobre el dock', () => {
   });
 });
 
-test("productos de canje tienen foto con insignia y abrir popup al clickear", async ({ page }) => {
+test('producto con plan canje aparece en un renglón y conserva su foto', async ({ page }) => {
   await entrar(page);
   await page.evaluate(() => {
     if (typeof openLista === "function") openLista();
   });
   await page.waitForSelector(".lp-item", { timeout: 10000 });
 
-  await page.fill("#lpSearch", "SENIOR 4 BIANCO");
+  await page.fill("#lpSearch", "611010510");
   await page.waitForTimeout(300);
 
-  // Fila de canje
-  const canjeRow = page.locator(".lp-item.lp-canje").first();
-  await expect(canjeRow).toBeVisible();
+  const rows = page.locator("#lpList .lp-item");
+  await expect(rows).toHaveCount(1);
+  await expect(rows.first()).not.toContainText('PLAN CANJE');
+  await expect(rows.first().locator('.lp-price-choice')).toHaveCount(2);
+  await expect(rows.first().locator('.lp-price-choice').nth(0)).toContainText('Precio normal');
+  await expect(rows.first().locator('.lp-price-choice').nth(1)).toContainText('Precio de canje');
 
-  // Debe tener foto y badge de canje
-  const canjeFoto = canjeRow.locator(".lp-item-foto");
-  await expect(canjeFoto).toBeVisible();
-  const canjeBadge = canjeRow.locator(".lp-badge-canje");
-  await expect(canjeBadge).toBeVisible();
-
-  // Click en la foto abre el modal popup
-  await canjeFoto.click();
+  const foto = rows.first().locator(".lp-item-foto");
+  await expect(foto).toBeVisible();
+  await expect(foto).toHaveAttribute("src", "catalogo-img/611010510.png");
+  await foto.click();
   await page.waitForTimeout(300);
 
   const modal = page.locator("#lpFotoModal");
@@ -239,9 +238,7 @@ test("productos de canje tienen foto con insignia y abrir popup al clickear", as
   await expect(modalImg).toBeVisible();
   await expect(modalImg).toHaveAttribute("src", "catalogo-img/611010510.png");
 
-  // Cerrar modal
-  const closeBtn = page.locator("#lpFotoModalClose");
-  await closeBtn.click();
+  await page.locator("#lpFotoModalClose").click();
   await page.waitForTimeout(300);
   await expect(modal).not.toHaveClass(/open/);
 });

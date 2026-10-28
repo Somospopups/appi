@@ -115,6 +115,29 @@ test('ya no existe el apartado Novedades ni la etiqueta NUEVO', async ({ page })
 const skusEn = page => page.locator('#lpList .lp-item')
   .evaluateAll(els => els.map(e => e.getAttribute('data-sku') || ''));
 
+const esPromocional = p => !!p.promo || /\b(?:PROMO|COMBO)\b/i.test(String(p.nombre || ''));
+const clavesPromocionales = catalogoRepo.productos
+  .filter(esPromocional)
+  .map(p => p.sku || ('n:' + String(p.nombre || '').toLowerCase().trim()));
+
+test('la Lista de precios excluye promociones y no resalta fichas en naranja', async ({ page }) => {
+  await entrar(page);
+  await servirListas(page, '25-Oct-2026', '');
+
+  await page.evaluate(() => window.abrirLista());
+
+  const skus = await skusEn(page);
+  expect(skus.filter(s => clavesPromocionales.includes(s)),
+    'no aparece ninguna línea promocional del catálogo').toEqual([]);
+  await expect(page.locator('#lpList .lp-promo-card')).toHaveCount(0);
+  await expect(page.locator('#lpList .lp-promo-badge')).toHaveCount(0);
+  await expect(page.locator('#lpList .lp-precio-tachado')).toHaveCount(0);
+
+  // El catálogo normal sigue disponible; la limpieza no vacía la lista.
+  expect(skus.length).toBeGreaterThan(0);
+  await expect(page.locator('#lpList')).not.toContainText(/\bPROMO\b|\bCOMBO\b/i);
+});
+
 const CLAVES_PACKS = clavesDe(['packs']);
 const CLAVES_INGRESO = clavesDe(['ingreso']);
 const CLAVES_OCULTAS = new Set([...CLAVES_PACKS, ...CLAVES_INGRESO]);

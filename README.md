@@ -2,7 +2,17 @@
 
 PWA local-first para planificación mensual, presupuesto, equipo, garantías, contactos, notas, grabadora, Histórico, encuestas y gestión de referidos.
 
+> **Agentes:** al retomar el trabajo, leer [`AGENTE.md`](AGENTE.md) y preguntar si el propietario está trabajando desde Arena.ai. Si confirma que sí, seguir [`PUBLICAR_CAMBIOS.md`](PUBLICAR_CAMBIOS.md) y entregar al final un ZIP con `PUBLICAR.bat` y un Git bundle.
+
 ## Estado actual
+
+## v857 · Catálogo sin promociones y Plan Canje en una sola ficha
+
+- La Lista de precios excluye productos marcados como promoción o llamados **PROMO/COMBO**; las fichas restantes ya no llevan distintivos, precios tachados ni resaltado naranja.
+- Los productos con Plan Canje aparecen una sola vez, con dos botones de precio (normal y canje); cada botón agrega esa variante al presupuesto y muestra su cantidad.
+- Se agregan pruebas para las promociones y para el uso conjunto de los precios normal/canje.
+- Se documenta el flujo condicional de Arena.ai en [`AGENTE.md`](AGENTE.md) y [`PUBLICAR_CAMBIOS.md`](PUBLICAR_CAMBIOS.md); si el propietario confirma que trabaja desde Arena, la entrega final será un ZIP con `PUBLICAR.bat` y un Git bundle.
+- Versión: **v857 · Segura** → Cache `appi-v857-catalogo-limpio-canje-en-fila`.
 
 ## v856 · Packs y Opciones de ingreso sólo se ven al tocar su píldora
 

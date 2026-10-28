@@ -158,7 +158,19 @@
     guardarCarrito(c);
   }
 
-  function productos() { return (CAT && CAT.productos) ? CAT.productos : []; }
+  // La Lista de precios no ofrece líneas promocionales: se excluyen tanto los
+  // productos marcados por el catálogo como los combos/promos que el proveedor
+  // publique sin metadatos. El resto del catálogo conserva su precio publicado.
+  function esProductoPromocional(p) {
+    if (!p) return false;
+    var nombre = String(p.nombre || '').toUpperCase();
+    return !!p.promo || /\b(?:PROMO|COMBO)\b/.test(nombre);
+  }
+  function productos() {
+    return (CAT && CAT.productos ? CAT.productos : []).filter(function (p) {
+      return !esProductoPromocional(p);
+    });
+  }
   // Clave de carrito: el sku; para los productos que solo figuran en la
   // lista con acuerdo (sin sku de tienda) se usa el nombre, para que cada
   // uno tenga su propia línea en el presupuesto.
@@ -182,10 +194,6 @@
   function lineasLista() {
     var out = [];
     productos().forEach(function (p) {
-      var promo = p.promo || null;
-      if (!promo && p.nombre && (p.nombre.toUpperCase().indexOf('PROMO') >= 0 || p.nombre.toUpperCase().indexOf('COMBO') >= 0)) {
-        promo = { activa: true, etiqueta: 'PROMO', detalle: 'Promoción especial vigente', vigencia: 'Hasta fin de mes' };
-      }
       out.push({
         clave: claveSku(p),
         sku: p.sku || '',
@@ -196,9 +204,9 @@
         seccion: p.seccion,
         composicion: p.composicion || '',
         url: p.url || '',
-        promo: promo
+        plan_canje: Number(p.plan_canje) || 0,
+        canjeClave: p.plan_canje ? claveSku(p) + CANJE_SUF : ''
       });
-      if (p.plan_canje) out.push(lineaCanje(p));
     });
     return out;
   }
@@ -590,8 +598,22 @@
       '.lp-cuotas-in{animation:lpIn .35s ease}' +
       'body.dark .lp-chips-wrap.lp-more:after{background:linear-gradient(90deg,rgba(28,30,42,0),#1c1e2a)}' +
       '.lp-sec{margin:12px 0 6px;font-size:11px;font-weight:900;color:#0b5878;letter-spacing:.4px;text-transform:uppercase}' +
-      '.lp-canje{ background:rgba(91,141,239,0.06); border-left:3px solid #5b8def; } .lp-canje .lp-item-txt b{ color:#3d63c9; } .lp-item{display:flex;align-items:center;gap:10px;padding:10px 12px;margin:0 0 8px;border-radius:16px;background:rgba(255,255,255,.72);border:1px solid rgba(255,255,255,.8);position:relative;transition:all .2s ease}' + '.lp-promo-card{background:linear-gradient(135deg,rgba(255,247,237,.96),rgba(255,237,213,.85))!important;border:1.5px solid #fb923c!important;box-shadow:0 4px 14px rgba(249,115,22,.12)!important}' + 'body.dark .lp-promo-card{background:linear-gradient(135deg,rgba(124,45,18,.35),rgba(154,52,18,.45))!important;border-color:#ea580c!important;box-shadow:0 4px 14px rgba(234,88,12,.2)!important}' + '.lp-promo-badge{display:flex;flex-direction:column;gap:3px;margin-bottom:4px}' + '.lp-promo-badge-top{display:flex;align-items:center;gap:6px;flex-wrap:wrap}' + '.lp-promo-vig{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:800;color:#9a3412;background:rgba(251,146,60,.18);border:1px solid rgba(234,88,12,.22);border-radius:6px;padding:1px 6px;width:fit-content;margin-top:1px}' + 'body.dark .lp-promo-vig{color:#fdba74;background:rgba(234,88,12,.25);border-color:rgba(234,88,12,.45)}' + '.lp-promo-badge span:first-child{background:linear-gradient(135deg,#ea580c,#f97316);color:#fff;font-size:10px;font-weight:950;padding:2px 7px;border-radius:6px;letter-spacing:.3px;text-transform:uppercase;display:inline-flex;align-items:center;box-shadow:0 2px 6px rgba(234,88,12,.3)}' + '.lp-promo-det{font-size:10.5px;font-weight:750;color:#c2410c;line-height:1.2}' + 'body.dark .lp-promo-det{color:#fdba74}' + '.lp-precio-promo-row{display:flex;align-items:baseline;gap:8px;margin-top:2px}' + '.lp-precio-tachado{font-size:11px;font-weight:700;color:#9ca3af;text-decoration:line-through}' + 'body.dark .lp-precio-tachado{color:#6b7280}' +
+      '.lp-canje{ background:rgba(91,141,239,0.06); border-left:3px solid #5b8def; } .lp-canje .lp-item-txt b{ color:#3d63c9; } .lp-item{display:flex;align-items:center;gap:10px;padding:10px 12px;margin:0 0 8px;border-radius:16px;background:rgba(255,255,255,.72);border:1px solid rgba(255,255,255,.8);position:relative;transition:all .2s ease}' +
       '.lp-item-txt{flex:1;min-width:0}' +
+      '.lp-item-has-canje{display:grid;grid-template-columns:44px minmax(0,1fr);align-items:center;column-gap:10px;row-gap:8px}' +
+      '.lp-item-has-canje.lp-item-no-photo{grid-template-columns:minmax(0,1fr)}' +
+      '.lp-item-has-canje .lp-item-txt{grid-column:2}' +
+      '.lp-item-has-canje.lp-item-no-photo .lp-item-txt{grid-column:1}' +
+      '.lp-price-options{grid-column:1/-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;width:100%}' +
+      '.lp-price-choice{min-width:0;min-height:58px;border:1px solid rgba(11,88,120,.2);border-radius:12px;padding:7px 9px;background:#fff;color:#0b5878;text-align:left;font:inherit;cursor:pointer;display:flex;flex-direction:column;justify-content:center;gap:2px;transition:transform .1s ease,background .15s ease}' +
+      '.lp-price-choice:active{transform:scale(.98)}' +
+      '.lp-price-choice-canje{background:#eef6fa;border-color:rgba(61,99,201,.3);color:#3d63c9}' +
+      '.lp-price-choice-label{font-size:10px;font-weight:800;line-height:1.15}' +
+      '.lp-price-choice strong{font-size:13px;font-weight:950;line-height:1.2;white-space:nowrap}' +
+      '.lp-price-choice-count{font-size:9px;font-weight:750;line-height:1.15;opacity:.78}' +
+      'body.dark .lp-price-choice{background:#1c2630;border-color:rgba(56,189,248,.22);color:#7dd3fc}' +
+      'body.dark .lp-price-choice-canje{background:#20243a;border-color:rgba(129,140,248,.28);color:#a5b4fc}' +
+      'body.dark .lp-price-choice-count{color:#cbd5e1}' +
       '.lp-item-txt b{display:block;font-size:13px;font-weight:900;color:#2a2a32;line-height:1.25}' +
       '.lp-item-txt span{display:block;margin-top:2px;font-size:11px;font-weight:750;color:#686977}' +
       '.lp-item-txt em{display:block;margin-top:2px;font-size:13px;font-weight:950;color:#0b5878;font-style:normal}' +
@@ -778,7 +800,7 @@
     var chips = GRUPOS.map(function (g) {
       return '<button type="button" class="lp-chip' + (filtro === g.id ? ' on' : '') + '" data-g="' + g.id + '">' + esc(g.t) + '</button>';
     }).join('');
-    var totalProds = (CAT && CAT.productos) ? CAT.productos.length : 0;
+    var totalProds = productos().length;
     return '<div class="lp-wrap">' +
       '<p class="lp-note"><span>Lista \'Precios Sugeridos con Acuerdo\' de PSA' + (fecha ? ' · ' + esc(fecha) : '') + (totalProds ? ' <b style="opacity:.85;font-weight:700">(' + totalProds + ' productos)</b>' : '') + '. Elegí productos y cotizá.</span>' +
       '<button type="button" class="lp-actualizar" id="lpActualizar" title="Actualizar precios desde la lista de PSA">🔄 Actualizar precios</button></p>' +
@@ -803,47 +825,41 @@
         html += '<div class="lp-sec">' + esc(GRUPO_TIT[L.grupo] || L.grupo) + '</div>';
       }
       var q = qty(L.clave);
-      var esCanje = !!L.canje;
       var fotoHtml = '';
       if (L.foto) {
-        fotoHtml = '<div class="lp-item-foto-wrap" data-foto-popup="' + esc(L.foto) + '" data-foto-tit="' + esc(L.nombre) + '" data-foto-sub="' + esc((L.sku ? 'SKU ' + L.sku : (L.seccion || '')) + (esCanje ? ' · Plan canje' : '')) + '" data-foto-sku="' + esc(L.sku || '') + '">' +
+        fotoHtml = '<div class="lp-item-foto-wrap" data-foto-popup="' + esc(L.foto) + '" data-foto-tit="' + esc(L.nombre) + '" data-foto-sub="' + esc((L.sku ? 'SKU ' + L.sku : (L.seccion || '')))  + '" data-foto-sku="' + esc(L.sku || '') + '">' +
           '<img class="lp-item-foto" loading="lazy" src="' + esc(L.foto) + '" alt="" onerror="this.parentElement.remove()">' +
-          (esCanje ? '<span class="lp-badge-canje" title="Plan Canje">🔄</span>' : '') +
           '</div>';
       }
       var descHtml = '';
       if (L.composicion) {
         descHtml = '<span class="lp-item-pack-desc">📦 ' + esc(L.composicion) + '</span>';
       }
-      var subTxt = (L.sku ? 'SKU ' + esc(L.sku) : esc(L.seccion || 'Lista con acuerdo')) + (esCanje ? ' · Plan canje' : '');
-      var isPromo = !!(L.promo && L.promo.activa);
-      var promoBadgeHtml = '';
-      var precioHtml = '<em>' + money(L.precio) + '</em>';
-      if (isPromo) {
-        var etiq = L.promo.etiqueta || 'PROMO';
-        var det = L.promo.detalle ? '<span class="lp-promo-det">' + esc(L.promo.detalle) + '</span>' : '';
-        var vigTxt = '';
-        if (L.promo.vigencia) {
-          vigTxt = L.promo.vigencia;
-        } else if (L.promo.desde && L.promo.hasta) {
-          vigTxt = 'Del ' + L.promo.desde + ' al ' + L.promo.hasta;
-        } else if (L.promo.hasta) {
-          vigTxt = 'Hasta el ' + L.promo.hasta;
-        }
-        var vigHtml = vigTxt ? '<span class="lp-promo-vig">📅 ' + esc(vigTxt) + '</span>' : '';
-        promoBadgeHtml = '<div class="lp-promo-badge"><div class="lp-promo-badge-top"><span>🔥 ' + esc(etiq) + '</span>' + det + '</div>' + vigHtml + '</div>';
-        if (L.promo.precio_original && Number(L.promo.precio_original) > Number(L.precio)) {
-          precioHtml = '<div class="lp-precio-promo-row"><s class="lp-precio-tachado">' + money(L.promo.precio_original) + '</s><em>' + money(L.precio) + '</em></div>';
-        }
-      }
-      var clsItem = 'lp-item' + (isPromo ? ' lp-promo-card' : '') + (esCanje ? ' lp-canje' : '') + ((L.grupo === 'packs' || L.grupo === 'ingreso') ? ' lp-item-is-pack' : '');
+      var subTxt = L.sku ? 'SKU ' + esc(L.sku) : esc(L.seccion || 'Lista con acuerdo');
+      var tieneCanje = Number(L.plan_canje) > 0;
+      var clsItem = 'lp-item' + (tieneCanje ? ' lp-item-has-canje' : '') + (tieneCanje && !L.foto ? ' lp-item-no-photo' : '') + ((L.grupo === 'packs' || L.grupo === 'ingreso') ? ' lp-item-is-pack' : '');
       html += '<div class="' + clsItem + '" data-sku="' + esc(L.clave) + '">' +
         fotoHtml +
-        '<div class="lp-item-txt">' + promoBadgeHtml + '<b>' + esc(L.nombre) + '</b><span>' + subTxt + '</span>' + descHtml + precioHtml + '</div>' +
-        '<div class="lp-qty">' +
+        '<div class="lp-item-txt"><b>' + esc(L.nombre) + '</b><span>' + subTxt + '</span>' + descHtml + (tieneCanje ? '' : '<em>' + money(L.precio) + '</em>') + '</div>';
+      if (tieneCanje) {
+        var qCanje = qty(L.canjeClave);
+        html += '<div class="lp-price-options">' +
+          '<button type="button" class="lp-price-choice" data-act="mas" data-price-sku="' + esc(L.clave) + '" aria-label="Agregar a precio normal">' +
+            '<span class="lp-price-choice-label">Precio normal</span><strong>' + money(L.precio) + '</strong>' +
+            '<small class="lp-price-choice-count">' + (q ? 'En presupuesto: ' + q : 'Tocar para agregar') + '</small>' +
+          '</button>' +
+          '<button type="button" class="lp-price-choice lp-price-choice-canje" data-act="mas" data-price-sku="' + esc(L.canjeClave) + '" aria-label="Agregar a precio de canje">' +
+            '<span class="lp-price-choice-label">Precio de canje</span><strong>' + money(L.plan_canje) + '</strong>' +
+            '<small class="lp-price-choice-count">' + (qCanje ? 'En presupuesto: ' + qCanje : 'Tocar para agregar') + '</small>' +
+          '</button>' +
+        '</div>';
+      } else {
+        html += '<div class="lp-qty">' +
           (q ? '<button type="button" class="ghost" data-act="menos" aria-label="Quitar">−</button><i>' + q + '</i>' : '') +
           '<button type="button" data-act="mas" aria-label="Agregar">+</button>' +
-        '</div></div>';
+        '</div>';
+      }
+      html += '</div>';
     });
     host.innerHTML = html;
   }
@@ -2109,6 +2125,12 @@
 
   function actualizarFilaQty(sku) {
     var q = qty(sku);
+    var opcion = document.querySelector('#lpList .lp-price-choice[data-price-sku="' + CSS.escape(sku) + '"]');
+    if (opcion) {
+      var cuenta = opcion.querySelector('.lp-price-choice-count');
+      if (cuenta) cuenta.textContent = q ? 'En presupuesto: ' + q : 'Tocar para agregar';
+      return true;
+    }
     var row = document.querySelector('#lpList .lp-item[data-sku="' + CSS.escape(sku) + '"]');
     if (!row) return false;
     var qtyDiv = row.querySelector('.lp-qty');
@@ -2156,9 +2178,10 @@
         return;
       }
       var btn = e.target.closest('[data-act]');
-      var row = e.target.closest('[data-sku]');
+      var opcionPrecio = e.target.closest('[data-price-sku]');
+      var row = e.target.closest('.lp-item[data-sku]');
       if (!row) return;
-      var sku = row.getAttribute('data-sku');
+      var sku = opcionPrecio ? opcionPrecio.getAttribute('data-price-sku') : row.getAttribute('data-sku');
       var act = btn ? btn.getAttribute('data-act') : 'mas';
       var n = qty(sku);
       if (act === 'menos') {
@@ -2334,14 +2357,6 @@
               if (p.sku) skuPorNombre[nomNorm] = p.sku;
             }
           });
-          var promoPorSku = {}, promoPorNombre = {};
-          fileCat.productos.forEach(function(p){
-            var nomK = (p.nombre || "").trim().toUpperCase();
-            if (p && p.promo) {
-              if (p.sku) promoPorSku[p.sku] = p.promo;
-              if (nomK) promoPorNombre[nomK] = p.promo;
-            }
-          });
           catElegido.productos.forEach(function (p) {
             if (!p) return;
             var nom = (p.nombre || "").trim().toUpperCase();
@@ -2356,10 +2371,6 @@
             }
             if (!p.composicion && p.sku && compPorSku[p.sku]) p.composicion = compPorSku[p.sku];
             if (!p.items_skus && p.sku && itemsPorSku[p.sku]) p.items_skus = itemsPorSku[p.sku];
-            if (!p.promo) {
-              if (p.sku && promoPorSku[p.sku]) p.promo = promoPorSku[p.sku];
-              else if (nom && promoPorNombre[nom]) p.promo = promoPorNombre[nom];
-            }
           });
         }
         CAT = catElegido;
