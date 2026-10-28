@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "868.0.0",
-  "cacheName": "appi-v868-comparativas-oficiales-pdf",
+  "version": "869.0.0",
+  "cacheName": "appi-v869-bandeja-presupuesto",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

@@ -6,6 +6,13 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v869 · Bandeja desplegable de presupuesto
+
+- La Lista de precios reemplaza la píldora flotante por una bandeja fija sobre la navegación inferior.
+- La bandeja muestra cantidad de productos, total, miniaturas y un control ascendente para abrir el presupuesto completo.
+- Al agregar un producto, confirma la acción con texto, rebote suave y sonido de gota; también adapta sus colores al modo oscuro y su posición a escritorio.
+- Versión: **v869 · Segura** → Cache `appi-v869-bandeja-presupuesto`.
+
 ## v868 · Comparativas oficiales dentro de las fichas PDF
 
 - Senior4, Senior Bianco, S·1000·2, Senik y SodaBurby incorporan la imagen de la comparativa oficial de PSA en la misma hoja de su ficha técnica.

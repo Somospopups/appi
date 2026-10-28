@@ -82,10 +82,10 @@ test('cada producto muestra la foto del Portal PCD en la lista de precios', asyn
   }).toPass({ timeout: 10000 });
 });
 
-test.describe('Píldora de Lista de Precios sobre el dock', () => {
+test.describe('Bandeja desplegable de presupuesto sobre el dock', () => {
   test.use({ viewport: { width: 390, height: 844 } });
 
-  test('MOBILE: la píldora aparece fija sobre el dock al agregar productos y no se mueve al scrollear', async ({ page }) => {
+  test('MOBILE: la bandeja confirma lo agregado, muestra fotos y queda fija sobre el dock', async ({ page }) => {
     await entrar(page);
     await page.evaluate(() => {
       if (typeof openLista === 'function') openLista();
@@ -101,6 +101,16 @@ test.describe('Píldora de Lista de Precios sobre el dock', () => {
     await page.waitForTimeout(300);
 
     await expect(fab).toBeVisible();
+    await expect(fab).toHaveClass(/is-feedback/);
+    await expect(fab.locator('.lp-tray-title-text')).toContainText('agregado');
+    await expect(fab.locator('.lp-fab-badge')).toHaveText('1');
+    await expect(fab.locator('.lp-fab-tot')).not.toBeEmpty();
+    await expect(fab.locator('.lp-tray-face')).toHaveCount(1);
+    await expect(fab.locator('.lp-tray-open')).toBeVisible();
+
+    await page.evaluate(() => document.body.classList.add('dark'));
+    await expect(fab).toHaveCSS('background-color', 'rgb(37, 39, 58)');
+    await page.evaluate(() => document.body.classList.remove('dark'));
 
     const mBefore = await page.evaluate(() => {
       const f = document.getElementById('lpFab');
@@ -116,7 +126,7 @@ test.describe('Píldora de Lista de Precios sobre el dock', () => {
       };
     });
 
-    // Debe estar visible sobre el dock (clearance positivo entre 5 y 25px)
+    // La bandeja debe quedar visible sobre el dock, sin taparlo.
     expect(mBefore.dockVisible).toBe(true);
     expect(mBefore.fBottom).toBeLessThan(mBefore.dTop);
     expect(mBefore.clearance).toBeGreaterThanOrEqual(8);
@@ -142,13 +152,13 @@ test.describe('Píldora de Lista de Precios sobre el dock', () => {
       };
     });
 
-    // La posición de la píldora NO debe cambiar al scrollear (debe permanecer fija)
+    // La posición de la bandeja NO debe cambiar al scrollear.
     expect(Math.abs(mAfter.fTop - mBefore.fTop)).toBeLessThanOrEqual(1);
     expect(Math.abs(mAfter.fBottom - mBefore.fBottom)).toBeLessThanOrEqual(1);
     expect(mAfter.clearance).toBeGreaterThanOrEqual(8);
   });
 
-  test('MOBILE: tocar la píldora fija abre correctamente el presupuesto (modal sheet)', async ({ page }) => {
+  test('MOBILE: tocar la bandeja abre correctamente el presupuesto completo', async ({ page }) => {
     await entrar(page);
     await page.evaluate(() => {
       if (typeof openLista === 'function') openLista();
@@ -162,7 +172,7 @@ test.describe('Píldora de Lista de Precios sobre el dock', () => {
     const fab = page.locator('#lpFab');
     await expect(fab).toBeVisible();
 
-    // Clic en la píldora
+    // Clic en la bandeja
     await fab.click();
     await page.waitForTimeout(300);
 
@@ -203,8 +213,7 @@ test.describe('Píldora de Lista de Precios sobre el dock', () => {
 
     expect(metrics.dockDisplay).toBe('none');
     expect(metrics.winHeight - metrics.fBottom).toBeLessThanOrEqual(36);
-    // v891 centró la píldora en pantalla ancha (antes, esquina inferior
-    // derecha): tiene que quedar sobre el eje del viewport.
+    // En pantalla ancha, la bandeja queda centrada sobre el eje del viewport.
     expect(Math.abs(metrics.winWidth / 2 - metrics.fCenter)).toBeLessThanOrEqual(4);
   });
 });

@@ -166,7 +166,7 @@ window.openStock=function(){
 <script src="./escalera-suenos.js?v=618"></script>
 <script src="./demo-guia.js?v=618"></script>
 <script src="./tablero-negocio.js?v=618"></script>
-<script src="./lista-precios.js?v=868"></script>
+<script src="./lista-precios.js?v=869"></script>
 <script src="./vendor/pdf.min.js?v=618"></script>
 <script src="./canillas-adaptadores.js?v=618"></script>
 <script src="./vendor/zxing.min.js?v=618"></script>
@@ -4660,7 +4660,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v868 · Segura</div>
+  <div class="ds-foot">APPI · v869 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -14213,7 +14213,7 @@ function cerrarToolsMenu(){
   if ('serviceWorker' in navigator) {
     (async () => {
     const swVersion='866';
-    const CACHE_NAME='appi-v868-comparativas-oficiales-pdf';
+    const CACHE_NAME='appi-v869-bandeja-presupuesto';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}

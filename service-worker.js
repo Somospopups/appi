@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v868-comparativas-oficiales-pdf';
+const CACHE_NAME = 'appi-v869-bandeja-presupuesto';
 const CACHE_PREFIX = 'appi-';
 // Donde el SW aparta una compartición hasta que la app la consume. No
 // empieza con el prefijo de la app para que el prune del activate no la borre.
