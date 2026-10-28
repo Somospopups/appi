@@ -6,6 +6,13 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v871 · Bandeja naranja con carrito animado
+
+- La bandeja inferior del presupuesto usa un fondo naranja degradado, alto contraste y un botón verde con icono de carrito.
+- Al sumar un producto, su foto vuela desde la ficha hasta la bandeja y el carrito reacciona al recibirla; la animación se omite cuando el dispositivo solicita movimiento reducido.
+- Tocar la bandeja continúa abriendo el presupuesto completo, tanto en móvil como en escritorio.
+- Versión: **v871 · Segura** → Cache `appi-v871-bandeja-carrito`.
+
 ## v870 · Verificación directa de MI PSA y versión visible
 
 - La versión visible, el paquete y el Service Worker vuelven a quedar alineados en v870; se corrige el valor interno que había quedado detenido en v866.

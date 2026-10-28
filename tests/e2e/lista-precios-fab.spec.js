@@ -83,7 +83,7 @@ test('cada producto muestra la foto del Portal PCD en la lista de precios', asyn
 });
 
 test.describe('Bandeja desplegable de presupuesto sobre el dock', () => {
-  test.use({ viewport: { width: 390, height: 844 } });
+  test.use({ viewport: { width: 390, height: 844 }, reducedMotion: 'no-preference' });
 
   test('MOBILE: la bandeja confirma lo agregado, muestra fotos y queda fija sobre el dock', async ({ page }) => {
     await entrar(page);
@@ -98,6 +98,9 @@ test.describe('Bandeja desplegable de presupuesto sobre el dock', () => {
     // Agregar un producto a cotizar
     const plusBtn = page.locator('.lp-qty button[data-act="mas"]').first();
     await plusBtn.click();
+    // La foto sale de la ficha y vuela hasta el carrito de la bandeja.
+    const fly = page.locator('.lp-fly-product');
+    await expect(fly).toHaveCount(1, { timeout: 500 });
     await page.waitForTimeout(300);
 
     await expect(fab).toBeVisible();
@@ -107,9 +110,14 @@ test.describe('Bandeja desplegable de presupuesto sobre el dock', () => {
     await expect(fab.locator('.lp-fab-tot')).not.toBeEmpty();
     await expect(fab.locator('.lp-tray-face')).toHaveCount(1);
     await expect(fab.locator('.lp-tray-open')).toBeVisible();
+    await expect(fab.locator('.lp-tray-open svg')).toHaveCount(1);
+    await expect(fab).toHaveCSS('background-color', 'rgb(239, 106, 31)');
+    await expect.poll(() => fab.evaluate(el => getComputedStyle(el).backgroundImage)).toContain('linear-gradient');
+
+    await expect(fly).toHaveCount(0, { timeout: 2000 });
 
     await page.evaluate(() => document.body.classList.add('dark'));
-    await expect(fab).toHaveCSS('background-color', 'rgb(37, 39, 58)');
+    await expect(fab).toHaveCSS('background-color', 'rgb(180, 70, 18)');
     await page.evaluate(() => document.body.classList.remove('dark'));
 
     const mBefore = await page.evaluate(() => {
