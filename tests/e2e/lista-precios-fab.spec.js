@@ -359,10 +359,20 @@ test('presupuesto renovado muestra total grande, fotos, tarjetas y permite desli
 
   const sheet = page.locator('#lpSheet');
   await expect(sheet).toHaveClass(/open/);
-  await expect(sheet.locator('.lp-sheet-top')).toContainText('Presupuesto');
-  await expect.poll(() => sheet.locator('.lp-sheet-top').evaluate(el => getComputedStyle(el).backgroundImage)).toContain('linear-gradient');
-  await expect(sheet.locator('.lp-total-card')).toContainText('TOTAL DEL PRESUPUESTO');
-  await expect(sheet.locator('.lp-total-card')).toContainText('$950.000');
+  const sheetTop = sheet.locator('.lp-sheet-top');
+  await expect(sheetTop).toContainText('Presupuesto');
+  const fondos = await sheet.evaluate((root) => ({
+    presupuesto: getComputedStyle(root.querySelector('.lp-sheet-top')).backgroundColor,
+    presupuestoImagen: getComputedStyle(root.querySelector('.lp-sheet-top')).backgroundImage,
+    hoja: getComputedStyle(root.querySelector('.lp-sheet')).backgroundColor
+  }));
+  expect(fondos.presupuesto).toBe(fondos.hoja);
+  expect(fondos.presupuesto).toBe('rgb(255, 246, 236)');
+  expect(fondos.presupuestoImagen).toBe('none');
+  const totalCard = sheet.locator('.lp-total-card');
+  await expect(totalCard).toContainText('TOTAL DEL PRESUPUESTO');
+  await expect(totalCard).toContainText('$950.000');
+  await expect.poll(() => totalCard.evaluate(el => getComputedStyle(el).backgroundImage)).toContain('rgb(8, 122, 91)');
 
   const lineBlock = sheet.locator('.lp-line-block').first();
   const line = lineBlock.locator('.lp-line');
@@ -380,30 +390,31 @@ test('presupuesto renovado muestra total grande, fotos, tarjetas y permite desli
   await expect(sheet.getByRole('button', { name: 'Galicia', exact: true }).locator('.lp-pay-art')).toBeVisible();
   await expect(sheet.getByRole('button', { name: 'BBVA', exact: true }).locator('.lp-pay-art')).toBeVisible();
 
-  // Sólo las cuatro marcas auditadas usan paleta corporativa; el resto queda
-  // deliberadamente neutro y sigue identificado con sigla + nombre visible.
+  // Las cuatro marcas auditadas mantienen su paleta real; las demás reciben
+  // acentos decorativos variados y estables, siempre con nombre y sigla.
   const paletas = await sheet.locator('.lp-pay-options').evaluate((host) => {
     const colores = (id) => {
-      const el = host.querySelector('[data-banco="' + id + '"] .lp-pay-art');
+      const option = host.querySelector('[data-banco="' + id + '"]');
+      const el = option.querySelector('.lp-pay-art');
       const cs = getComputedStyle(el);
-      return { clase: el.className, a: cs.getPropertyValue('--pay-a').trim().toLowerCase(), b: cs.getPropertyValue('--pay-b').trim().toLowerCase(), sigla: el.textContent.trim() };
+      return { id, clase: el.className, a: cs.getPropertyValue('--pay-a').trim().toLowerCase(), b: cs.getPropertyValue('--pay-b').trim().toLowerCase(), sigla: el.textContent.trim(), nombre: option.querySelector('b').textContent.trim() };
     };
+    const idsOtros = ['banco-nacion', 'macro', 'santander', 'hipotecario', 'cabal', 'american-express', 'tarjeta-data', 'tarjeta-patagonia-365', 'tarjeta-tuya', 'tarjeta-sol', 'banco-del-sol'];
     return {
       simple: colores('cuota-simple'),
       naranja: colores('tarjeta-naranja'),
       galicia: colores('banco-galicia'),
       bbva: colores('bbva'),
-      macro: colores('macro'),
-      tonosArbitrarios: host.querySelectorAll('.tone-0,.tone-1,.tone-2,.tone-3,.tone-4').length
+      otros: idsOtros.map(colores)
     };
   });
   expect(paletas.simple).toMatchObject({ a: '#547ea8', b: '#1b2d51', sigla: 'CS' });
   expect(paletas.naranja).toMatchObject({ a: '#f75000', b: '#f75000', sigla: 'N×' });
   expect(paletas.galicia).toMatchObject({ a: '#fa6400', b: '#fa6400', sigla: 'G' });
   expect(paletas.bbva).toMatchObject({ a: '#004481', b: '#072146', sigla: 'BBVA' });
-  expect(paletas.macro.clase).toContain('neutral');
-  expect(paletas.macro).toMatchObject({ a: '#69727b', b: '#343b43', sigla: 'M' });
-  expect(paletas.tonosArbitrarios).toBe(0);
+  expect(paletas.otros.every(x => /\btone-[0-7]\b/.test(x.clase) && x.sigla && x.nombre)).toBe(true);
+  expect(new Set(paletas.otros.map(x => x.clase.match(/tone-[0-7]/)[0])).size).toBeGreaterThanOrEqual(6);
+  expect(new Set(paletas.otros.map(x => x.a + '/' + x.b)).size).toBeGreaterThanOrEqual(6);
 
   const price = line.locator('.lp-price-touch');
   await price.click();

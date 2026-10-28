@@ -6,6 +6,14 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v874 · Presupuesto verde y tarjetas fáciles de distinguir
+
+- El encabezado de **Presupuesto** abandona el marrón y usa el mismo fondo crema que la hoja.
+- La tarjeta del total cambia del naranja fuerte a un degradado verde de alto contraste.
+- Cuota Simple, Naranja X, Galicia y BBVA mantienen sus colores auditados; las demás tarjetas recuperan acentos variados y estables para reconocerlas rápidamente, siempre acompañadas por nombre y sigla.
+- Se conserva la caída de la fila al cesto, Deshacer, descuentos y movimiento reducido de v873.
+- Versión: **v874 · Segura** → Cache `appi-v874-presupuesto-verde`.
+
 ## v873 · Swipe al cesto y medios de pago auditados
 
 - Al completar el swipe de una fila, el artículo se desprende y cae hacia el cesto inferior con desplazamiento, reducción, giro y reacción del botón.
