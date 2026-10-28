@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "872.0.0",
-  "cacheName": "appi-v872-presupuesto-deslizable",
+  "version": "873.0.0",
+  "cacheName": "appi-v873-swipe-al-cesto",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

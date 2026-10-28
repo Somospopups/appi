@@ -6,6 +6,13 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v873 · Swipe al cesto y medios de pago auditados
+
+- Al completar el swipe de una fila, el artículo se desprende y cae hacia el cesto inferior con desplazamiento, reducción, giro y reacción del botón.
+- La eliminación conserva el aviso **Deshacer** y restaura tanto la cantidad como el descuento; con movimiento reducido se omite el vuelo.
+- Cuota Simple, Naranja X, Galicia y BBVA usan paletas verificadas; las demás entidades se muestran en gris neutro con nombre y sigla visibles, sin atribuir colores corporativos no auditados.
+- Versión: **v873 · Segura** → Cache `appi-v873-swipe-al-cesto`.
+
 ## v872 · Presupuesto visual y deslizable
 
 - El presupuesto abierto estrena encabezado camel, total grande en naranja y una fila compacta por artículo con foto, cantidad y precio.

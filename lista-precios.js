@@ -813,6 +813,9 @@
       '.lp-desc-options{position:relative;z-index:3;background:#fff8f2;padding:7px 9px 9px;border-top:1px dashed #edc9ad}.lp-desc-options .lp-chip{padding:6px 9px;font-size:10px}' +
       '.lp-line-block.swipe-hint .lp-line{animation:lpSwipeHint 3.7s cubic-bezier(.25,.8,.25,1) .65s 1}.lp-line-block.swipe-hint .lp-line-delete-bg{animation:lpDeleteGlow 3.7s ease .65s 1}' +
       '@keyframes lpSwipeHint{0%,18%,86%,100%{transform:translateX(0)}42%,60%{transform:translateX(-92px)}72%{transform:translateX(-72px)}}@keyframes lpDeleteGlow{0%,18%,86%,100%{filter:brightness(.92)}42%,72%{filter:brightness(1.12)}}' +
+      '@keyframes lpTrashReceive{0%{transform:scale(1) rotate(0)}38%{transform:scale(1.2) rotate(-9deg)}70%{transform:scale(.9) rotate(6deg)}100%{transform:scale(1) rotate(0)}}' +
+      '.lp-trash-fly{position:fixed!important;z-index:300!important;margin:0!important;border-radius:14px!important;overflow:hidden!important;pointer-events:none!important;box-shadow:0 14px 28px rgba(55,31,16,.28)!important;transform-origin:center!important;will-change:transform,opacity!important}' +
+      '.lp-line-block.is-flying .lp-line,.lp-line-block.is-flying .lp-line-delete-bg{opacity:0}.lp-actions .lp-clear.is-receiving{animation:lpTrashReceive .58s cubic-bezier(.34,1.56,.64,1) both}' +
       '.lp-line-block.is-removing{height:0!important;opacity:0;border:0;transition:height .28s ease,opacity .22s ease}' +
       '.lp-discount-help{margin:6px 4px 2px;text-align:right;color:#81766e;font-size:9px;font-weight:750}' +
       '.lp-sheet-body>.lp-sec{margin-top:13px;color:#c54b12;font-size:10.5px}' +
@@ -822,8 +825,8 @@
       '.lp-pay-art{--pay-a:#506a82;--pay-b:#27465e;position:relative;width:43px;height:27px;border-radius:6px;display:block;overflow:hidden;background:linear-gradient(135deg,var(--pay-a),var(--pay-b));box-shadow:0 3px 6px rgba(30,35,38,.17);color:#fff}' +
       '.lp-pay-art i{position:absolute;width:10px;height:7px;border-radius:2px;background:#f2d477;left:6px;top:7px}.lp-pay-art em{position:absolute;right:5px;bottom:4px;font-style:normal;font-size:8px;font-weight:950;letter-spacing:.1px}' +
       '.lp-pay-art.cash{--pay-a:#75b86d;--pay-b:#248a59;display:grid;place-items:center}.lp-pay-art.cash:before{content:"";position:absolute;inset:4px;border:1px solid rgba(255,255,255,.65);border-radius:3px}.lp-pay-art.cash em{position:relative;right:auto;bottom:auto;font-size:13px}' +
-      '.lp-pay-art.simple{--pay-a:#087a5b;--pay-b:#0b6687}.lp-pay-art.naranja{--pay-a:#ff8a2c;--pay-b:#e75114}.lp-pay-art.galicia{--pay-a:#ec6a28;--pay-b:#d73835}.lp-pay-art.bbva{--pay-a:#0b4c90;--pay-b:#073365}' +
-      '.lp-pay-art.tone-0{--pay-a:#5a72c8;--pay-b:#33499d}.lp-pay-art.tone-1{--pay-a:#159e91;--pay-b:#087066}.lp-pay-art.tone-2{--pay-a:#a763b8;--pay-b:#774087}.lp-pay-art.tone-3{--pay-a:#d8732d;--pay-b:#a74419}.lp-pay-art.tone-4{--pay-a:#3b7fba;--pay-b:#235982}' +
+      // Paletas verificadas: Cuota Simple oficial (#547EA8/#1B2D51), Naranja X (#F75000), Galicia (#FA6400) y BBVA (#004481/#072146).
+      '.lp-pay-art.simple{--pay-a:#547ea8;--pay-b:#1b2d51}.lp-pay-art.naranja{--pay-a:#f75000;--pay-b:#f75000}.lp-pay-art.galicia{--pay-a:#fa6400;--pay-b:#fa6400}.lp-pay-art.bbva{--pay-a:#004481;--pay-b:#072146}.lp-pay-art.neutral{--pay-a:#69727b;--pay-b:#343b43}' +
       '.lp-cuotas-in .lp-chip.on{background:#087a5b}.lp-actions{position:sticky;bottom:-1px;z-index:6;margin:15px -2px -8px;padding:10px 2px 3px;background:linear-gradient(180deg,rgba(255,246,236,0),#fff6ec 30%)}' +
       '.lp-actions .lp-pdf{background:linear-gradient(135deg,#087a5b,#06664d);box-shadow:0 8px 18px rgba(3,93,68,.2)}' +
       '.lp-undo-toast{position:fixed;z-index:250;left:50%;bottom:calc(86px + env(safe-area-inset-bottom));transform:translate(-50%,25px);opacity:0;border-radius:999px;padding:11px 15px;background:#203039;color:#fff;font-size:11px;font-weight:850;box-shadow:0 8px 20px rgba(0,0,0,.25);transition:opacity .2s ease,transform .2s ease;white-space:nowrap}.lp-undo-toast.show{opacity:1;transform:translate(-50%,0)}.lp-undo-toast button{border:0;background:transparent;color:#7fe0bd;font:inherit;font-weight:950;margin-left:9px;cursor:pointer}' +
@@ -832,7 +835,7 @@
       'body.dark .lp-line-name{color:#f2f2f7}body.dark .lp-line-photo{border-color:#514b45;background:#fff}body.dark .lp-line .lp-qty i{color:#f2f2f7}body.dark .lp-price-touch{color:#ffad78}body.dark .lp-discount-help{color:#b9afa6}' +
       'body.dark .lp-pay-option{background:#25273a;border-color:rgba(255,255,255,.11);color:#f2f2f7}body.dark .lp-pay-option.on{background:#143a31;border-color:#36c69b}body.dark .lp-actions{background:linear-gradient(180deg,rgba(33,29,26,0),#211d1a 30%)}' +
       '@media (max-width:480px){.lp-sheet-body{padding-left:10px;padding-right:10px}.lp-line{grid-template-columns:minmax(0,1fr) 76px minmax(68px,auto);gap:4px;padding-left:7px!important;padding-right:7px!important}.lp-line-photo{width:34px;height:34px}.lp-line-product{gap:5px}.lp-line-name{font-size:10px}.lp-line .lp-qty{width:76px;min-width:76px;gap:3px}.lp-line .lp-qty button{width:26px;height:28px}.lp-price-touch{font-size:10px}.lp-total-num{font-size:30px}.lp-pay-option{width:91px}}' +
-      '@media (prefers-reduced-motion:reduce){.lp-line-block.swipe-hint .lp-line,.lp-line-block.swipe-hint .lp-line-delete-bg{animation:none!important}}' +
+      '@media (prefers-reduced-motion:reduce){.lp-line-block.swipe-hint .lp-line,.lp-line-block.swipe-hint .lp-line-delete-bg,.lp-actions .lp-clear.is-receiving{animation:none!important}.lp-line-block.is-removing,.lp-undo-toast{transition:none!important}}' +
       'body.dark .lp-item-foto{background:#1c1e2e;border-color:rgba(255,255,255,.09)}' +
       'body.dark .lp-item-txt b,body.dark .lp-sheet h2,body.dark .lp-line b{color:#f2f2f7}' +
       'body.dark .lp-search,body.dark .lp-para{background:#25273a;color:#f2f2f7}' +
@@ -1312,9 +1315,9 @@
     if (id.indexOf('bbva') >= 0) return { clase: 'bbva', sigla: 'BBVA' };
     var palabras = nombre.replace(/[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ0-9 ]/g, ' ').trim().split(/\s+/);
     var sigla = palabras.slice(0, 2).map(function (p) { return p.charAt(0); }).join('').toUpperCase() || 'TC';
-    var hash = 0;
-    for (var i = 0; i < id.length; i++) hash = ((hash << 5) - hash + id.charCodeAt(i)) | 0;
-    return { clase: 'tone-' + Math.abs(hash % 5), sigla: sigla };
+    // Para entidades sin una paleta auditada usamos una tarjeta neutra: el
+    // nombre visible identifica el medio sin atribuirle colores de otra marca.
+    return { clase: 'neutral', sigla: sigla };
   }
   function htmlOpcionPago(id, nombre, activo) {
     var v = visualPago(id, nombre);
@@ -1642,20 +1645,70 @@
       _lpUndoTimer = 0;
     }, 4200);
   }
+  function animarLineaAlCesto(bloque, listo) {
+    var fila = bloque && bloque.querySelector('.lp-line');
+    var cesto = $('lpSheetClear');
+    var reducir = false;
+    try { reducir = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); } catch (e) {}
+    if (!fila || !cesto || reducir || typeof fila.animate !== 'function') { listo(); return; }
+    var origen = fila.getBoundingClientRect();
+    var destino = cesto.getBoundingClientRect();
+    if (!origen.width || !origen.height || !destino.width || !destino.height) { listo(); return; }
+
+    var vuelo = fila.cloneNode(true);
+    vuelo.className = 'lp-line lp-trash-fly';
+    vuelo.setAttribute('aria-hidden', 'true');
+    vuelo.querySelectorAll('button').forEach(function (b) { b.setAttribute('tabindex', '-1'); });
+    vuelo.style.left = origen.left + 'px';
+    vuelo.style.top = origen.top + 'px';
+    vuelo.style.width = origen.width + 'px';
+    vuelo.style.height = origen.height + 'px';
+    vuelo.style.transform = 'none';
+    document.body.appendChild(vuelo);
+    bloque.classList.add('is-flying');
+
+    var dx = destino.left + destino.width / 2 - (origen.left + origen.width / 2);
+    var dy = destino.top + destino.height / 2 - (origen.top + origen.height / 2);
+    var terminado = false;
+    function finalizar() {
+      if (terminado) return;
+      terminado = true;
+      try { vuelo.remove(); } catch (e) {}
+      bloque.classList.remove('is-flying');
+      listo();
+    }
+    setTimeout(function () {
+      cesto.classList.remove('is-receiving');
+      void cesto.offsetWidth;
+      cesto.classList.add('is-receiving');
+      setTimeout(function () { cesto.classList.remove('is-receiving'); }, 650);
+    }, 540);
+    var anim = vuelo.animate([
+      { transform: 'translate3d(0,0,0) scale(1) rotate(0deg)', opacity: 1, offset: 0 },
+      { transform: 'translate3d(' + (dx * .12) + 'px,' + Math.max(24, dy * .14) + 'px,0) scale(.94) rotate(-4deg)', opacity: 1, offset: .25 },
+      { transform: 'translate3d(' + (dx * .62) + 'px,' + (dy * .58 - 32) + 'px,0) scale(.58) rotate(10deg)', opacity: .92, offset: .66 },
+      { transform: 'translate3d(' + dx + 'px,' + dy + 'px,0) scale(.08) rotate(22deg)', opacity: .08, offset: 1 }
+    ], { duration: 760, easing: 'cubic-bezier(.2,.78,.2,1)', fill: 'forwards' });
+    anim.onfinish = finalizar;
+    anim.oncancel = finalizar;
+    setTimeout(finalizar, 900);
+  }
   function eliminarLineaSwipe(sku, bloque) {
     var cantidad = qty(sku);
-    if (!cantidad || !bloque || bloque.classList.contains('is-removing')) return;
+    if (!cantidad || !bloque || bloque.classList.contains('is-removing') || bloque.classList.contains('is-flying')) return;
     var item = { sku: sku, cantidad: cantidad, descuento: getDesc(sku) };
     sonarQuitar();
-    bloque.style.height = bloque.offsetHeight + 'px';
-    bloque.classList.add('is-removing');
-    setTimeout(function () {
-      setQty(sku, 0);
-      setDesc(sku, 0);
-      descuentoAbierto = '';
-      pintarTodo();
-      mostrarUndoLinea(item);
-    }, 260);
+    animarLineaAlCesto(bloque, function () {
+      bloque.style.height = bloque.offsetHeight + 'px';
+      bloque.classList.add('is-removing');
+      setTimeout(function () {
+        setQty(sku, 0);
+        setDesc(sku, 0);
+        descuentoAbierto = '';
+        pintarTodo();
+        mostrarUndoLinea(item);
+      }, 260);
+    });
   }
   function activarSwipeLineas(host) {
     if (!host) return;
