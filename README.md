@@ -6,6 +6,12 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v860 · Vivo PSA especial del 28/10/2026
+
+- Sólo para el **miércoles 28 de octubre de 2026**, el Vivo PSA comienza a las **13:00** (ART), en lugar de las 15:00 habituales.
+- El aviso del Home y la sección del Campus muestran el horario especial; el estado pasa a “en vivo” desde las 13:00. El horario de los miércoles siguientes queda en 15:00.
+- Versión: **v860 · Segura** → Cache `appi-v860-vivo-especial-28oct`.
+
 ## v859 · Opciones de precio en el mismo renglón
 
 - Las fichas con Plan Canje muestran nombre, referencia y los dos botones de precio en una sola fila, también en pantallas angostas.

@@ -1285,14 +1285,15 @@
       if (!ref || (ref.estado !== 'hoy' && ref.estado !== 'vivo')) return null;
       var previa = (typeof c.audioPreviaVivo === 'function') ? c.audioPreviaVivo(ref.ini) : null;
       var vivoAhora = ref.estado === 'vivo';
+      var hora = ref.hora || (typeof c.horaVivoPsa === 'function' ? c.horaVivoPsa(ref.ini) : '15:00');
       var tienePrevia = !!(previa && previa.stream);
-      var titulo = vivoAhora ? '🔴 El Vivo PSA está en vivo' : 'Hoy 15:00 · Vivo PSA';
+      var titulo = vivoAhora ? '🔴 El Vivo PSA está en vivo' : 'Hoy ' + hora + ' · Vivo PSA';
       var nota = vivoAhora
         ? 'La transmisión ya arrancó en el Campus: mirala desde APPI, sin salir.'
-        : 'El vivo de la semana arranca a las 15:00. Escuchá la previa mientras tanto.';
+        : 'El vivo de la semana arranca a las ' + hora + '. Escuchá la previa mientras tanto.';
       var chips = '';
       if (tienePrevia) chips += '<span>🎧 ' + esc(previa.titulo) + '</span>';
-      chips += '<span>📅 Miércoles 15:00</span>';
+      chips += '<span>📅 Miércoles ' + hora + '</span>';
       return {
         cat: 'vivoPsa', icono: vivoAhora ? '🔴' : '📅', kicker: 'Campus PSA · vivo',
         titulo: titulo,

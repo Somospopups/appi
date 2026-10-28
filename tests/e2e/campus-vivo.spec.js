@@ -10,12 +10,15 @@ const { entrar } = require('./helpers/app-entrar.js');
 // y el resto de la semana — no queda tarjeta, ni replay, ni "Vivos
 // anteriores": la grabación publicada no siempre existe.
 
-const MIERCOLES_14 = new Date(2026, 9, 21, 14, 0, 0); // mié 21/10 14:00 (antes del vivo)
-const MIERCOLES_1530 = new Date(2026, 9, 21, 15, 30, 0); // en vivo
-const MIERCOLES_17 = new Date(2026, 9, 21, 17, 0, 0); // vivo terminado → ya no existe
-const JUEVES = new Date(2026, 9, 22, 10, 0, 0); // día siguiente → nada
-const MARTES_20 = new Date(2026, 9, 27, 20, 0, 0); // mar 27/10: último día antes del próximo vivo
-const MIERCOLES28_1530 = new Date(2026, 9, 28, 15, 30, 0); // mié 28/10: vivo siguiente en curso
+const enBA = iso => new Date(iso + '-03:00');
+const MIERCOLES_14 = enBA('2026-10-21T14:00:00'); // mié 21/10 antes del vivo
+const MIERCOLES_1530 = enBA('2026-10-21T15:30:00'); // mié 21/10 en vivo
+const MIERCOLES_17 = enBA('2026-10-21T17:00:00'); // vivo terminado
+const JUEVES = enBA('2026-10-22T10:00:00'); // día siguiente → nada
+const MARTES_20 = enBA('2026-10-27T20:00:00'); // último día antes del vivo
+const MIERCOLES28_1230 = enBA('2026-10-28T12:30:00'); // previo al vivo especial
+const MIERCOLES28_1330 = enBA('2026-10-28T13:30:00'); // vivo especial en curso
+const MIERCOLES28_1500 = enBA('2026-10-28T15:00:00'); // vivo especial terminado
 
 const CAT_MOCK = {
   version: 1,
@@ -82,6 +85,43 @@ test('la lógica del Vivo PSA ubica hoy, en vivo, replay y próximo según el d�
   expect(estados.pasado).toBe('pasado');
   expect(estados.jueves).toBe('proximo');
   expect(estados.iniEsMiercoles, 'el próximo vivo cae siempre un miércoles').toBe(true);
+});
+
+test('el vivo especial del 28/10 se anuncia y empieza a las 13:00, sin mover el horario semanal', async ({ page }) => {
+  await entrar(page);
+  await activarContenidoMock(page);
+
+  const horarios = await page.evaluate(() => {
+    const c = window.APPICampusPSA;
+    const especial = c.proximoVivoPsa(new Date(2026, 9, 28, 12, 30, 0));
+    const siguiente = c.proximoVivoPsa(new Date(2026, 9, 29, 12, 30, 0));
+    return {
+      especial: [especial.ini.getFullYear(), especial.ini.getMonth(), especial.ini.getDate(), especial.hora, especial.fin.getHours(), especial.fin.getMinutes()],
+      siguiente: [siguiente.ini.getFullYear(), siguiente.ini.getMonth(), siguiente.ini.getDate(), siguiente.hora]
+    };
+  });
+  expect(horarios.especial).toEqual([2026, 9, 28, '13:00', 14, 35]);
+  expect(horarios.siguiente).toEqual([2026, 10, 4, '15:00']);
+
+  await page.clock.setFixedTime(MIERCOLES28_1230);
+  await page.evaluate(() => window.APPIHomeTarjetas.abrir());
+  const card = page.locator('.ht-card.ht-cat-vivoPsa');
+  await expect(card).toContainText('Hoy 13:00 · Vivo PSA');
+  await expect(card).toContainText('Miércoles 13:00');
+  await expect(card).toContainText('arranca a las 13:00');
+
+  await page.evaluate(() => window.openCampusPSA());
+  const seccion = page.locator('#campusCont [data-cp-vpsa="hoy"]');
+  await expect(seccion).toContainText('Hoy 13:00 · Vivo PSA');
+  await expect(seccion).toContainText('El vivo arranca a las 13:00');
+
+  await page.clock.setFixedTime(MIERCOLES28_1330);
+  await page.evaluate(() => window.APPICampusPSA.render());
+  await expect(page.locator('#campusCont [data-cp-vpsa="vivo"]')).toBeVisible();
+
+  await page.clock.setFixedTime(MIERCOLES28_1500);
+  await page.evaluate(() => window.APPICampusPSA.render());
+  await expect(page.locator('#campusCont [data-cp-vpsa]')).toHaveCount(0);
 });
 
 test('la previa del vivo se elige por la fecha del vivo, con respaldo al audio más reciente', async ({ page }) => {
@@ -204,8 +244,8 @@ test('v655: del jueves al martes no queda nada de vivo; el miércoles siguiente 
   await page.evaluate(() => window.APPICampusPSA.render());
   await expect(page.locator('#campusCont [data-cp-vpsa]')).toHaveCount(0);
 
-  // Con el vivo siguiente en curso manda el directo.
-  await page.clock.setFixedTime(MIERCOLES28_1530);
+  // El vivo especial del 28/10 está en curso a las 13:30.
+  await page.clock.setFixedTime(MIERCOLES28_1330);
   await page.evaluate(() => window.APPICampusPSA.render());
   await expect(page.locator('#campusCont [data-cp-vpsa="vivo"]')).toBeVisible();
   await expect(page.locator('#campusCont [data-cp-vpsa="ultimo"]')).toHaveCount(0);

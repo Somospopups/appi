@@ -909,20 +909,25 @@
      no corresponden publicar en APPI—, nunca el vivo general. Se dejó de
      mostrar y de rastrear; el Vivo PSA se ubica por fecha (v645). */
   /* ---------- Vivo PSA semanal (v645) ----------
-     El Vivo PSA se transmite todos los miércoles a las 15:00 (ART) en el
-     Campus. La agenda de reuniones del Campus trae las de equipo, no el vivo
-     general, así que APPI lo ubica por fecha. La previa se publica como audio
-     (playlist "La Previa del VIVO") con la fecha del vivo. v655: la tarjeta
-     sólo existe el miércoles (aviso antes de las 15:00 y directo en curso);
-     en cuanto termina desaparece hasta el próximo miércoles. */
+     El Vivo PSA se transmite los miércoles a las 15:00 (ART), con una
+     excepción: el 28/10/2026 empieza a las 13:00. La agenda de reuniones
+     trae las de equipo, no el vivo general, así que APPI lo ubica por fecha.
+     La previa se publica como audio con la fecha del vivo. v655: la tarjeta
+     sólo existe el miércoles y desaparece cuando termina el directo. */
+  function horaVivoPsa(fecha){
+    var h = String(fecha.getHours());
+    var m = String(fecha.getMinutes());
+    return (h.length < 2 ? '0' : '') + h + ':' + (m.length < 2 ? '0' : '') + m;
+  }
   function proximoVivoPsaRef(now){
     now = now || new Date();
-    var ini = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 15, 0, 0, 0);
     var diasHasta = (3 - now.getDay() + 7) % 7; // 3 = miércoles
-    ini = new Date(ini.getTime() + diasHasta * 86400000);
+    var fecha = new Date(now.getFullYear(), now.getMonth(), now.getDate() + diasHasta);
+    var hora = fechaClaveVivo(fecha) === '2026-10-28' ? 13 : 15;
+    var ini = new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate(), hora, 0, 0, 0);
     var fin = new Date(ini.getTime() + 95 * 60000);
     var estado = diasHasta > 0 ? 'proximo' : (now < ini ? 'hoy' : (now <= fin ? 'vivo' : 'pasado'));
-    return { ini: ini, fin: fin, estado: estado };
+    return { ini: ini, fin: fin, estado: estado, hora: horaVivoPsa(ini) };
   }
   function fechaClaveVivo(d){
     function p(n){ return (n < 10 ? '0' : '') + n; }
@@ -997,14 +1002,13 @@
     document.getElementById('cpVivoClose').onclick = cerrarModal;
   }
   /* v655: el Vivo PSA existe sólo el miércoles — el aviso con su previa
-     antes de las 15:00 y, mientras dura el directo, el ▶ para verlo acá
-     mismo. En cuanto termina (y el resto de la semana) la tarjeta
-     desaparece: no hay replay ni "Vivos anteriores", porque la grabación
-     publicada no siempre existe. */
+     antes del inicio programado y, mientras dura el directo, el ▶ para verlo
+     acá mismo. En cuanto termina desaparece hasta el próximo miércoles. */
   function seccionVivoPsa(){
     try {
       if (!contenidoMem) return '';
       var ref = proximoVivoPsaRef();
+      var hora = ref.hora || horaVivoPsa(ref.ini);
       if (ref.estado === 'vivo'){
         var vpHoy = vivoPlayerDe();
         return '<div class="cp-vpsa cp-vpsa-live" data-cp-vpsa="vivo">' +
@@ -1016,8 +1020,8 @@
       if (ref.estado !== 'hoy') return '';
       var previa = audioPreviaVivo(ref.ini);
       return '<div class="cp-vpsa" data-cp-vpsa="hoy">' +
-        '<div class="cp-vpsa-t">Hoy 15:00 · Vivo PSA</div>' +
-        '<p>El vivo arranca a las 15:00. Escuchá la previa mientras tanto.</p>' +
+        '<div class="cp-vpsa-t">Hoy ' + hora + ' · Vivo PSA</div>' +
+        '<p>El vivo arranca a las ' + hora + '. Escuchá la previa mientras tanto.</p>' +
         (previa ? '<div class="cp-vpsa-previa"><button type="button" class="cp-vpsa-play" data-cp-vpsa-play="previa" data-cp-previa-id="audio:' + previa.audioId + '">▶ ' + esc(previa.titulo) + '</button></div>' : '') +
       '</div>';
     } catch(e){ return ''; }
@@ -1288,6 +1292,7 @@
     abrirCuentaPSA: abrirCuentaPSA,
     // Vivo PSA semanal (v645): v655 — sólo existe el miércoles
     proximoVivoPsa: proximoVivoPsaRef,
+    horaVivoPsa: horaVivoPsa,
     audioPreviaVivo: audioPreviaVivo,
     // Preguntas post-video y racha (v646)
     bancoPreguntas: function(){ return (window.APPICampusPreguntas && window.APPICampusPreguntas.totalClases) || 0; },
