@@ -573,7 +573,7 @@ Deno.serve(async (req) => {
     let loginOk = false;
     try { loginOk = await loginMiPsa(jar, center, number, password); }
     catch (e) { return json({ error: 'No se pudo conectar con PSA: ' + String((e as any)?.message || e) }, 502); }
-    if (!loginOk) return json({ error: 'No se pudo entrar a mi.psa.com.ar con esos datos (¿clave correcta?).' }, 401);
+    if (!loginOk) return json({ code: 'psa_credentials', error: 'No se pudo entrar a mi.psa.com.ar con esos datos (¿clave correcta?).' }, 401);
 
     let ssoOk = false;
     try { ssoOk = await ssoCampus(jar); }

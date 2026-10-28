@@ -6,6 +6,13 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v870 · Verificación directa de MI PSA y versión visible
+
+- La versión visible, el paquete y el Service Worker vuelven a quedar alineados en v870; se corrige el valor interno que había quedado detenido en v866.
+- Un fallo general de red o de PSA ya no abre el aviso bloqueante al entrar: el Home usa la copia guardada y continúa cargando.
+- Si PSA rechaza específicamente Sucursal, Distribuidor o Contraseña, APPI abre un formulario directo con los datos actuales para revisarlos y volver a probar.
+- Versión: **v870 · Segura** → Cache `appi-v870-credenciales-psa`.
+
 ## v869 · Bandeja desplegable de presupuesto
 
 - La Lista de precios reemplaza la píldora flotante por una bandeja fija sobre la navegación inferior.

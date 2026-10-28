@@ -1,28 +1,10 @@
 const { test, expect } = require('@playwright/test');
 const { entrar } = require('./helpers/app-entrar.js');
 
-// v854 · Cuando PSA no responde, el usuario tenía que adivinar que lo que veía
-// estaba viejo. Ahora aparece un pop-up que lo dice con la fecha de la copia
-// guardada y las causas más probables. Se muestra una sola vez por día.
-// El helper de la suite deja el aviso apagado (appi_aviso_psa_off) así los
-// tests viejos siguen igual; acá se enciende a propósito.
-
-const CAT_MOCK = {
-  version: 1,
-  generado: new Date().toISOString(),
-  stats: { kits: 1, clases: 2, audios: 0, playlists: 0 },
-  kits: [{
-    slug: 'mock-aviso',
-    titulo: 'Kit Mock Aviso',
-    secciones: [{
-      titulo: 'Sección Mock',
-      url: '/tematica/mock',
-      clases: [{ titulo: 'Clase Mock', url: '/tematica/mock/1', stream: 'V_99999', duracion: '05:00' }]
-    }]
-  }],
-  playlists: [],
-  vivo: []
-};
+// v870 · La carga del Home puede comprobar MI PSA en segundo plano, pero un
+// fallo general de red o de PSA no debe interrumpir la entrada. Sólo cuando la
+// respuesta identifica credenciales inválidas se abre el formulario directo
+// para corregir Sucursal, Distribuidor y Contraseña.
 
 const json = (route, status, body) => route.fulfill({
   status,
@@ -35,59 +17,96 @@ const contenidoCargado = page => page.waitForFunction(
   null, { timeout: 15000 }
 );
 
-const encenderAviso = page => page.evaluate(() => {
-  localStorage.setItem('appi_aviso_psa_off', '0');
-  localStorage.removeItem('appi_campus_aviso_fallo');
-});
+const modalPSA = page => page.locator('#modalOverlay.open');
+const dialogoGenerico = page => page.locator('.appi-dialog-overlay:not([hidden])');
 
-const popup = page => page.locator('.appi-dialog-overlay:not([hidden])');
+async function fallarCampus(page, status, body) {
+  await page.route('https://mock.supabase.co/functions/v1/campus-contenido', route => json(route, status, body));
+  await page.evaluate(() => {
+    sessionStorage.removeItem('psaCredsErrorMostrado');
+    return window.APPICampusPSA.reintentarContenido().then(() => true, () => true);
+  });
+}
 
-test('si la nube falla aparece el pop-up explicando que los datos no se actualizaron', async ({ page }) => {
+test('un fallo general de PSA usa la copia guardada y no abre un popup al entrar', async ({ page }) => {
   await entrar(page);
-  await page.route('https://mock.supabase.co/functions/v1/campus-contenido', route => json(route, 200, { cont: CAT_MOCK }));
   await contenidoCargado(page);
   await expect.poll(() => page.evaluate(() => window.APPICampusPSA.estadoContenido())).toBe('ok');
+  await page.evaluate(() => {
+    const copia = JSON.parse(localStorage.getItem('appi_campus_contenido_v1') || '{}');
+    copia.generado = new Date().toISOString();
+    localStorage.setItem('appi_campus_contenido_v1', JSON.stringify(copia));
+  });
 
-  await encenderAviso(page);
-  await page.route('https://mock.supabase.co/functions/v1/campus-contenido', route => json(route, 500, { error: 'nube caída' }));
-  await page.evaluate(() => window.APPICampusPSA.reintentarContenido().then(() => true, () => true));
+  await fallarCampus(page, 503, { error: 'PSA temporalmente fuera de servicio' });
+  await expect.poll(() => page.evaluate(() => window.APPICampusPSA.estadoContenido())).toBe('error');
 
-  await expect(popup(page), 'se abre el pop-up de datos sin actualizar').toBeVisible();
-  await expect(page.locator('#appiDialogTitle')).toHaveText('No se pudieron actualizar los datos de PSA');
-  await expect(page.locator('#appiDialogMessage')).toContainText('copia guardada del');
-  await expect(page.locator('#appiDialogMessage')).toContainText('PSA esté caído');
-  await expect(page.locator('#appiDialogMessage')).toContainText('Ajustes → MI PSA');
-
-  await page.locator('#appiDialogOk').click();
-  await expect(popup(page), 'se cierra al aceptar').toHaveCount(0);
+  await expect(dialogoGenerico(page), 'no aparece el aviso genérico que bloqueaba el inicio').toHaveCount(0);
+  await expect(modalPSA(page), 'una caída de red no se confunde con una clave incorrecta').toHaveCount(0);
+  await expect(page.evaluate(() => !!window.APPICampusPSA.contenido())).resolves.toBe(true);
 });
 
-test('una vez cerrado no vuelve a aparecer el mismo día', async ({ page }) => {
+test('credenciales inválidas abren el formulario directo con los datos actuales', async ({ page }) => {
   await entrar(page);
-  await page.route('https://mock.supabase.co/functions/v1/campus-contenido', route => json(route, 200, { cont: CAT_MOCK }));
   await contenidoCargado(page);
-  await encenderAviso(page);
 
-  await page.route('https://mock.supabase.co/functions/v1/campus-contenido', route => json(route, 500, { error: 'nube caída' }));
-  await page.evaluate(() => window.APPICampusPSA.reintentarContenido().then(() => true, () => true));
-  await expect(popup(page)).toBeVisible();
-  await page.locator('#appiDialogOk').click();
+  await fallarCampus(page, 401, {
+    code: 'psa_credentials',
+    error: 'No se pudo entrar a mi.psa.com.ar con esos datos (¿clave correcta?).'
+  });
 
-  // Segundo intento fallido en el mismo día: ya se avisó, no se insiste.
-  await page.evaluate(() => window.APPICampusPSA.reintentarContenido().then(() => true, () => true));
-  await page.waitForTimeout(400);
-  await expect(popup(page), 'no se repite el aviso el mismo día').toHaveCount(0);
+  await expect(modalPSA(page)).toBeVisible();
+  await expect(page.locator('#modalTitle')).toHaveText('Verificá tus datos de MI PSA');
+  await expect(page.locator('#modalSub')).toHaveText('No pudimos validar la cuenta');
+  await expect(page.locator('#psaPopupCentro')).toHaveValue('02');
+  await expect(page.locator('#psaPopupNumero')).toHaveValue('9802014');
+  await expect(page.locator('#psaPopupClave')).not.toHaveValue('');
+  await expect(page.locator('#modalConfirmBtn')).toHaveText('Guardar y volver a probar');
+  await expect(dialogoGenerico(page)).toHaveCount(0);
+
+  await page.locator('#modalCancelBtn').click();
+  await expect(modalPSA(page)).toHaveCount(0);
 });
 
-test('sin cuenta MI PSA no hay pop-up de datos viejos (es otro estado)', async ({ page }) => {
+test('la sincronización principal también abre el formulario si MI PSA rechaza la cuenta', async ({ page }) => {
+  await entrar(page);
+  await page.evaluate(() => sessionStorage.removeItem('psaCredsErrorMostrado'));
+  await page.route('https://mock.supabase.co/functions/v1/consulta-serial', route => json(route, 401, {
+    code: 'psa_credentials',
+    error: 'No se pudo entrar a mi.psa.com.ar con esos datos (¿clave correcta?).'
+  }));
+
+  await page.evaluate(() => window.sincronizarTodoPSA());
+  await expect(modalPSA(page)).toBeVisible();
+  await expect(page.locator('#modalTitle')).toHaveText('Verificá tus datos de MI PSA');
+  await expect(page.locator('#psaPopupCentro')).toHaveValue('02');
+  await expect(page.locator('#psaPopupNumero')).toHaveValue('9802014');
+  await page.locator('#modalCancelBtn').click();
+});
+
+test('el aviso de credenciales no insiste más de una vez en la misma sesión', async ({ page }) => {
+  await entrar(page);
+  await contenidoCargado(page);
+
+  await fallarCampus(page, 401, { code: 'psa_credentials', error: 'Credenciales de MI PSA inválidas.' });
+  await expect(modalPSA(page)).toBeVisible();
+  await page.locator('#modalCancelBtn').click();
+  await expect(modalPSA(page)).toHaveCount(0);
+
+  await page.evaluate(() => window.APPICampusPSA.reintentarContenido().then(() => true, () => true));
+  await page.waitForTimeout(500);
+  await expect(modalPSA(page), 'no vuelve a interrumpir durante la sesión').toHaveCount(0);
+});
+
+test('sin cuenta MI PSA no hay popup de error: el Home ofrece cargarla por separado', async ({ page }) => {
   await entrar(page);
   await page.evaluate(() => {
-    localStorage.setItem('appi_aviso_psa_off', '0');
-    localStorage.removeItem('appi_campus_aviso_fallo');
+    sessionStorage.removeItem('psaCredsErrorMostrado');
     localStorage.removeItem('appsi_psa_creds');
+    localStorage.removeItem('appi_campus_contenido_v1');
   });
-  await page.route('https://mock.supabase.co/functions/v1/campus-contenido', route => json(route, 500, { error: 'nube caída' }));
   await page.evaluate(() => window.APPICampusPSA.reintentarContenido().then(() => true, () => true));
   await expect(page.evaluate(() => window.APPICampusPSA.estadoContenido())).resolves.toBe('sinCuenta');
-  await expect(popup(page), 'sin credenciales no hay aviso de datos desactualizados').toHaveCount(0);
+  await expect(modalPSA(page)).toHaveCount(0);
+  await expect(dialogoGenerico(page)).toHaveCount(0);
 });

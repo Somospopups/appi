@@ -730,7 +730,7 @@ Deno.serve(async (req) => {
   } catch (e) {
     return json({ error: 'No se pudo conectar con PSA: ' + String((e as any)?.message || e) }, 502);
   }
-  if (!mi) return json({ error: 'No se pudo entrar a mi.psa.com.ar con esos datos (¿clave correcta?).' }, 401);
+  if (!mi) return json({ code: 'psa_credentials', error: 'No se pudo entrar a mi.psa.com.ar con esos datos (¿clave correcta?).' }, 401);
 
   // 2) SSO a dip (Autoconsulta)
   let dip: Jar | null;

@@ -20,6 +20,8 @@ test('la versión visible, el paquete y el Service Worker están alineados', () 
   expect(read('README.md')).toContain(`v${v} · Segura`);
   expect(read('README.md')).toContain(`\`${cacheName}\``);
   expect(html).toContain(`const swVersion='${v}'`);
+  expect(html).toContain(`lista-precios.js?v=${v}`);
+  expect(html).toContain(`campus-psa.js?v=${v}`);
   expect(html).toContain("{updateViaCache:'none'}");
   expect(html).toContain('await registration.update()');
   expect(sw).toContain(`CACHE_NAME = '${cacheName}'`);

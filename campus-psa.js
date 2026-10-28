@@ -183,44 +183,30 @@
       window.dispatchEvent(new CustomEvent('appi-campus-estado', { detail: { estado: estado } }));
     } catch(e){}
   }
-  // Aviso pop-up: hasta v651 un fallo de la nube con copia guardada pasaba en
-  // silencio y el usuario seguía viendo datos viejos sin enterarse. Ahora se
-  // explica de una, con la fecha de la copia y las causas más probables.
-  // Una sola vez por día y por sesión de error, para no volverlo insoportable.
-  var AVISO_FALLO_CLAVE = 'appi_campus_aviso_fallo';
-  function fechaCorta(iso){
-    try {
-      var d = new Date(iso);
-      if (isNaN(d.getTime())) return '';
-      return d.toLocaleDateString('es-AR', { day:'2-digit', month:'2-digit', year:'numeric' }) +
-             ' ' + d.toLocaleTimeString('es-AR', { hour:'2-digit', minute:'2-digit' });
-    } catch(e){ return ''; }
+  // Los fallos generales de red o de PSA no deben interrumpir la entrada a
+  // APPI: si hay copia local se usa en silencio y, si no, la vista muestra su
+  // estado. Sólo una respuesta inequívoca de credenciales inválidas abre el
+  // formulario de MI PSA para corregir los datos directamente.
+  function esErrorCredencialesPSA(error){
+    var codigo = String((error && (error.code || error.codigo)) || '');
+    var mensaje = String((error && error.message) || error || '');
+    return codigo === 'psa_credentials' ||
+      /mi\.psa\.com\.ar.*(?:esos datos|clave correcta)|credenciales?\s+(?:de\s+)?(?:mi\s+)?psa\s+(?:inv[aá]lidas?|incorrectas?)/i.test(mensaje);
   }
-  function avisarFalloCampus(){
-    try {
-      if (!window.APPIDialog) return;
-      // Las pruebas automatizadas no quieren modales sueltos en pantalla.
-      if (localStorage.getItem('appi_aviso_psa_off') === '1') return;
-      var hoy = new Date().toISOString().slice(0, 10);
-      if (localStorage.getItem(AVISO_FALLO_CLAVE) === hoy) return;
-      localStorage.setItem(AVISO_FALLO_CLAVE, hoy);
-      var prev = respaldoContenido();
-      var lineas = [];
-      if (prev && prev.generado) lineas.push('Estás viendo la copia guardada del ' + fechaCorta(prev.generado) + '.');
-      else lineas.push('No hay ninguna copia guardada en este teléfono.');
-      lineas.push('');
-      lineas.push('No se pudo conectar con PSA ahora mismo. Puede ser que:');
-      lineas.push('· PSA esté caído o con lentitud.');
-      lineas.push('· Haya cambiado la clave de MI PSA.');
-      lineas.push('· No haya internet en este momento.');
-      lineas.push('');
-      lineas.push('Si te pasa seguido, entrá a Ajustes → MI PSA y revisá que la clave siga siendo la correcta.');
-      window.APPIDialog.alert(lineas.join('\n'), {
-        title: 'No se pudieron actualizar los datos de PSA',
-        icon: '!',
-        okText: 'Entendido'
-      });
-    } catch(e){}
+  function avisarCredencialesCampus(error){
+    if (!esErrorCredencialesPSA(error)) return false;
+    var mensaje = String((error && error.message) || 'No pudimos ingresar a MI PSA con los datos guardados.');
+    try{
+      if (typeof window.mostrarPopupPSAVerificar === 'function'){
+        return !!window.mostrarPopupPSAVerificar(mensaje);
+      }
+      // El formulario vive al final de index.html. Si el chequeo terminó antes
+      // de que ese bloque se cargara, se le da una única oportunidad más.
+      setTimeout(function(){
+        try{ if (typeof window.mostrarPopupPSAVerificar === 'function') window.mostrarPopupPSAVerificar(mensaje); }catch(e){}
+      }, 500);
+    }catch(e){}
+    return false;
   }
   function pedirContenidoNube(){
     var cfg = nubeCfg();
@@ -230,9 +216,17 @@
       method: 'POST',
       headers: { 'Content-Type':'application/json', 'apikey': cfg.anonKey, 'Authorization': 'Bearer ' + (cfg.token || cfg.anonKey) },
       body: JSON.stringify({ center: c.center, number: c.number, password: c.password })
-    }).then(function(r){ return r.json(); }).then(function(j){
-      if (!j || j.error || !contenidoValido(j.cont)) throw new Error((j && j.error) || 'contenido del Campus inválido');
-      return j.cont;
+    }).then(function(r){
+      return r.json().catch(function(){ return {}; }).then(function(j){
+        if (!r.ok || !j || j.error || !contenidoValido(j.cont)){
+          var error = new Error((j && j.error) || 'No se pudo actualizar el contenido del Campus.');
+          error.code = (j && j.code) || '';
+          // Compatibilidad con una función anterior al código explícito.
+          if (!error.code && r.status === 401 && /mi\.psa\.com\.ar.*(?:esos datos|clave correcta)/i.test(error.message)) error.code = 'psa_credentials';
+          throw error;
+        }
+        return j.cont;
+      });
     });
   }
   /** Refresco en segundo plano: la pantalla ya muestra la última copia. */
@@ -240,11 +234,10 @@
     pedirContenidoNube().then(function(cont){
       guardarContenido(cont);
       fijarEstado('ok');
-      try { localStorage.removeItem(AVISO_FALLO_CLAVE); } catch(e){}
       try { window.dispatchEvent(new Event('appi-campus-contenido')); } catch(e){}
-    }).catch(function(){
+    }).catch(function(error){
       fijarEstado('error');
-      avisarFalloCampus();
+      avisarCredencialesCampus(error);
     });
   }
   function cargarContenido(){
@@ -279,10 +272,10 @@
         fijarEstado('ok');
         return cont;
       })
-      .catch(function(){
+      .catch(function(error){
         fijarEstado(conCuenta ? 'error' : 'sinCuenta');
-        if (conCuenta) avisarFalloCampus();
-        throw new Error('No hay contenido del Campus disponible.');
+        if (conCuenta) avisarCredencialesCampus(error);
+        throw error || new Error('No hay contenido del Campus disponible.');
       })
       .then(function(cont){ contenidoPidiendo = null; return cont; },
             function(e){ contenidoPidiendo = null; throw e; });
@@ -1326,15 +1319,7 @@
   window.addEventListener('appi-campus-contenido', repintarEstadoCampus);
   if (document.readyState === 'complete') setTimeout(revisarJornada, 800);
   else window.addEventListener('load', function(){ setTimeout(revisarJornada, 900); });
-  // El contenido se adelanta en segundo plano: la ruta diaria, la vista
-  // y las secciones de vivo/audios encuentran las clases listas sin clic.
-  setTimeout(function(){
-    cargarContenido().then(function(){
-      try {
-        var v = document.querySelector('.view.active');
-        if (v && v.id === 'view-campus') render();
-        if (v && v.id === 'view-negocio') pintarNegocio();
-      }catch(e){}
-    }).catch(function(){});
-  }, 1200);
+  // La primera comprobación de MI PSA la inicia home-tarjetas.js al armar las
+  // tarjetas. No se hace otro chequeo autónomo al entrar a APPI: así un fallo
+  // general de red nunca abre una ventana durante el arranque.
 })();

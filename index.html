@@ -160,13 +160,13 @@ window.openStock=function(){
 <script src="./mensajes-hielo.js?v=618"></script>
 <script src="./mensajes-usuarios.js?v=639"></script>
   <script src="./campus-preguntas.js?v=646"></script>
-  <script src="./campus-psa.js?v=860"></script>
+  <script src="./campus-psa.js?v=870"></script>
 <script src="./reactivacion.js?v=618"></script>
 
 <script src="./escalera-suenos.js?v=618"></script>
 <script src="./demo-guia.js?v=618"></script>
 <script src="./tablero-negocio.js?v=618"></script>
-<script src="./lista-precios.js?v=869"></script>
+<script src="./lista-precios.js?v=870"></script>
 <script src="./vendor/pdf.min.js?v=618"></script>
 <script src="./canillas-adaptadores.js?v=618"></script>
 <script src="./vendor/zxing.min.js?v=618"></script>
@@ -4660,7 +4660,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v869 · Segura</div>
+  <div class="ds-foot">APPI · v870 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -14212,8 +14212,8 @@ function cerrarToolsMenu(){
   // con archivos viejos en pantalla.
   if ('serviceWorker' in navigator) {
     (async () => {
-    const swVersion='866';
-    const CACHE_NAME='appi-v869-bandeja-presupuesto';
+    const swVersion='870';
+    const CACHE_NAME='appi-v870-credenciales-psa';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
@@ -19177,7 +19177,14 @@ async function psaConsultaEdge(body, reintentar=true){
     const fallback=response.status===401?'La sesión de APPI venció. Volvé a ingresar.':
       response.status===403?'Tu cuenta de APPI no está activa.':
       'No se pudo conectar con PSA.';
-    throw new Error(String((data&&data.error)||fallback));
+    const error=new Error(String((data&&data.error)||fallback));
+    error.code=String((data&&data.code)||'');
+    // Compatibilidad con una Edge Function anterior al código explícito.
+    if(!error.code&&response.status===401&&/mi\.psa\.com\.ar.*(?:esos datos|clave correcta)/i.test(error.message)) error.code='psa_credentials';
+    if(error.code==='psa_credentials'&&typeof window.mostrarPopupPSAVerificar==='function'){
+      try{ window.mostrarPopupPSAVerificar(error.message); }catch(e){}
+    }
+    throw error;
   }
   return data;
 }
@@ -20326,7 +20333,10 @@ body.dark .modal-overlay.psa-popup-blur .modal{background:rgba(28,29,46,0.96);bo
       localStorage.setItem('appsi_psa_creds', JSON.stringify(creds));
       localStorage.setItem('appsi_psa_lastSync', new Date().toISOString());
       localStorage.removeItem('appsi_psa_desconectado');
-      try{ sessionStorage.removeItem('psaPopupYaMostrado'); }catch(e){}
+      try{
+        sessionStorage.removeItem('psaPopupYaMostrado');
+        sessionStorage.removeItem('psaCredsErrorMostrado');
+      }catch(e){}
       try{
         const ce=document.getElementById('psaCentro'); if(ce) ce.value=centro;
         const nu=document.getElementById('psaNumero'); if(nu) nu.value=numero;
@@ -20375,11 +20385,19 @@ body.dark .modal-overlay.psa-popup-blur .modal{background:rgba(28,29,46,0.96);bo
     }, 80);
     return true;
   }
-  function mostrarPopupPSAFormulario(){
+  function mostrarPopupPSAFormulario(opciones){
+    opciones=opciones||{};
+    const esRevision=!!opciones.verificar;
     const m=getModal();
     if(!m) return false;
+    const avisoRevision = esRevision ? `
+      <div style="padding:10px 12px;border-radius:12px;background:#fff3e8;border:1px solid #f2c49f;color:#7a3d12;font-size:12px;line-height:1.4;text-align:left">
+        <b>No pudimos iniciar sesión con los datos guardados.</b><br>Revisá los tres campos y volvé a conectar tu cuenta.
+      </div>
+    ` : '';
     const html = `
       <div style="display:grid;gap:14px;text-align:left">
+        ${avisoRevision}
         <div class="ios-group">
           <label class="ios-row" for="psaPopupCentro"><span class="ios-row-label">Sucursal</span><input id="psaPopupCentro" type="text" inputmode="numeric" placeholder="02" class="ios-row-input" autocomplete="off"></label>
           <label class="ios-row" for="psaPopupNumero"><span class="ios-row-label">Distribuidor</span><input id="psaPopupNumero" type="text" inputmode="numeric" placeholder="98020174" class="ios-row-input" autocomplete="off"></label>
@@ -20390,13 +20408,14 @@ body.dark .modal-overlay.psa-popup-blur .modal{background:rgba(28,29,46,0.96);bo
         <div style="font-size:11px;color:#8e8e93;text-align:center;background:#f2f2f7;padding:8px 10px;border-radius:10px">🔒 Solo queda en este dispositivo.</div>
       </div>
     `;
+    const textoGuardar=esRevision?'Guardar y volver a probar':'Guardar y conectar';
     m.open({
       hideIcon:true,
-      title:'Conectá tu MI PSA',
-      sub:'Actualización automática',
+      title:esRevision?'Verificá tus datos de MI PSA':'Conectá tu MI PSA',
+      sub:esRevision?'No pudimos validar la cuenta':'Actualización automática',
       html: html,
-      okText:'Guardar y conectar',
-      cancelText:'Atrás',
+      okText:textoGuardar,
+      cancelText:esRevision?'Más tarde':'Atrás',
       confirm:true,
       onConfirm:()=>{
         const ok = guardarDesdePopup();
@@ -20411,8 +20430,9 @@ body.dark .modal-overlay.psa-popup-blur .modal{background:rgba(28,29,46,0.96);bo
         }, 300);
       },
       onCancel:()=>{
-        setTimeout(()=>mostrarPopupPSAInformativo(), 180);
         try{ document.getElementById('modalOverlay')?.classList.remove('psa-popup-blur'); }catch(e){}
+        if(esRevision) return;
+        setTimeout(()=>mostrarPopupPSAInformativo(), 180);
         return false;
       }
     });
@@ -20424,15 +20444,29 @@ body.dark .modal-overlay.psa-popup-blur .modal{background:rgba(28,29,46,0.96);bo
           const ce=document.getElementById('psaPopupCentro'); if(ce && c.center) ce.value=c.center;
           const nu=document.getElementById('psaPopupNumero'); if(nu && c.number) nu.value=c.number;
           const cl=document.getElementById('psaPopupClave'); if(cl && c.password) cl.value=c.password;
+          const rec=document.getElementById('psaPopupRecordar'); if(rec) rec.checked=c.remember!==false;
         }
       }catch(e){}
       const ok=document.getElementById('modalConfirmBtn');
       const cancel=document.getElementById('modalCancelBtn');
-      if(ok){ ok.textContent='Guardar y conectar'; ok.style.background='#0b5878'; }
-      if(cancel){ cancel.textContent='Atrás'; }
+      if(ok){ ok.textContent=textoGuardar; ok.style.background='#0b5878'; }
+      if(cancel){ cancel.textContent=esRevision?'Más tarde':'Atrás'; }
       try{ document.getElementById('psaPopupCentro')?.focus(); }catch(e){}
     }, 80);
     return true;
+  }
+  function mostrarPopupPSAVerificar(){
+    try{
+      if(!sesionAppiOk()) return false;
+      if(sessionStorage.getItem('psaCredsErrorMostrado')==='1') return false;
+      const overlay=document.getElementById('modalOverlay');
+      if(overlay && overlay.classList.contains('open')) return false;
+      const dialog=document.querySelector('.appi-dialog-overlay:not([hidden])');
+      if(dialog) return false;
+      const ok=mostrarPopupPSAFormulario({verificar:true});
+      if(ok) sessionStorage.setItem('psaCredsErrorMostrado','1');
+      return ok;
+    }catch(e){ return false; }
   }
   function pedirPopupPSA(force){
     try{
@@ -20471,6 +20505,7 @@ body.dark .modal-overlay.psa-popup-blur .modal{background:rgba(28,29,46,0.96);bo
   window.mostrarPopupPSA = function(){ return pedirPopupPSA(true); };
   window.mostrarPopupPSAInformativo = mostrarPopupPSAInformativo;
   window.mostrarPopupPSAFormulario = mostrarPopupPSAFormulario;
+  window.mostrarPopupPSAVerificar = mostrarPopupPSAVerificar;
   window.psaConectado = psaConectado;
   window.pedirPopupPSA = pedirPopupPSA;
   wrapShowView();

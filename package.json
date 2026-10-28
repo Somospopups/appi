@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "869.0.0",
-  "cacheName": "appi-v869-bandeja-presupuesto",
+  "version": "870.0.0",
+  "cacheName": "appi-v870-credenciales-psa",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {
