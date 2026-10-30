@@ -537,4 +537,39 @@ test.describe('Histórico: cierre automático desde MI PSA', () => {
     const stored = await page.evaluate(() => window.__APPI_HISTORICO__.state.periods.some(item => item.id === '2026-10'));
     expect(stored).toBe(false);
   });
+
+  test('recupera automáticamente todos los meses anteriores que faltan', async ({ page }) => {
+    await abrirHistorico(page);
+    const result = await page.evaluate(async () => {
+      const api = window.__APPI_HISTORICO__, H = api.state;
+      const expected = api.expectedHistoricalPeriodIds();
+      const missing = ['2025-11', '2025-12'];
+      H.periods = expected.filter(id => !missing.includes(id)).map(id => ({ id, year: Number(id.slice(0, 4)), month: Number(id.slice(5)) - 1, people: [], incomes: [], summary: {} }));
+      const calls = [];
+      window.psaTieneCredenciales = () => true;
+      window.psaSincronizarHistorico = async id => {
+        calls.push(id);
+        const year = id.slice(0, 4), month = Number(id.slice(5)), names = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'], label = names[month - 1];
+        return {
+          periodo: id, errores: [],
+          linea: { filas: [
+            [`DIP Nro : 02-9802014 Nombre y Apellido : MARÍA PÉREZ Socio : Sucursal : 02 Categoría : L País : Argentina`],
+            [`Período Consultado: ${label} - ${year}`],
+            ['', '', '', 'Nombre', 'Cat.', 'Teléfono', 'Estado', 'PB Mes Actual', '1°Mes Ant.', '2°Mes Ant.', '3°Mes Ant.', 'Alta', 'Cumpleaños', 'Correo electrónico'],
+            ['', '', '1', '[02-1000001] JUAN RAMA [AR-B]', 'D', '', 'C', '12', '0', '0', '0', '', '', ''],
+            ['', '', '1', '[02-1000002] ANA HOJA [AR-B]', 'DJ', '', 'C', '9', '0', '0', '0', '', '', ''],
+            ['', '', '1', '[02-1000003] LUIS QUIETO [AR-B]', 'D', '', 'C', '1', '0', '0', '0', '', '', '']
+          ] },
+          garantiasOrg: { filas: [['Nombre','DIP','Presentadas','Vencidas','%','Pendientes'],['JUAN','02-1000001','1','0','0','0']] },
+          ingresos: { filas: [[`Período Consultado ${label} - ${year}`], ['Total de 0 ingresos']], resumen: `Período Consultado ${label} - ${year} · Total de 0 ingresos` }
+        };
+      };
+      const sync = await api.syncMissingPSAPeriods({ user: true });
+      return { status: sync.status, calls, saved: H.periods.map(item => item.id).sort(), backfilling: H.autoBackfilling };
+    });
+    expect(result.status).toBe('complete');
+    expect(result.calls).toEqual(['2025-12', '2025-11']);
+    expect(result.saved).toEqual(['2025-11', '2025-12']);
+    expect(result.backfilling).toBe(false);
+  });
 });
