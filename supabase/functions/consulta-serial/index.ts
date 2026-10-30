@@ -34,6 +34,16 @@ const DIP = 'https://dip.psa.com.ar';
 const DIP_HUB = DIP + '/home/auto_consultas.php';
 const DIP_EXEC = DIP + '/home/autoconsulta_exec.php';
 
+// Enlaces directos confirmados en Autoconsulta WEB. PSA permite recuperar
+// períodos que ya no aparecen en sus selectores cambiando solamente AAAA-MM.
+// Se conservan el discovery y los overrides como respaldo si PSA cambia un idx.
+const HISTORICAL_DIRECT_REPORTS = {
+  linea: { idx: '69', consulta: 'Línea_Descendente_' },
+  garantiasOrg: { idx: '34', consulta: 'Garantías_por_Organización' },
+  ingresos: { idx: '71', consulta: 'Patrocinios_por_Organización_' },
+} as const;
+type HistoricalDirectKey = keyof typeof HISTORICAL_DIRECT_REPORTS;
+
 function normSerie(s: string): string {
   return String(s || '').replace(/\s+/g, '').toUpperCase();
 }
@@ -469,14 +479,11 @@ function parsearLineaHtml(html: string): LineaFila[] | null {
   return out.length ? out : null;
 }
 
-/* ===== Sincronización completa (v618) =====
-   Los archivos que APPI actualiza al entrar (Línea descendente,
-   Garantías por organización y Garantías) se bajan en UNA sola sesión
-   con action:'sync'. Los índices de los informes se descubren por
-   categoría en el hub (ac_cat=20 → informes de organización, ac_cat=21 →
-   garantías); la app puede pasar índices ya resueltos (body.idx, cache
-   appsi_psa_idx) para saltear el discovery, y si algo no se ubica la
-   respuesta trae el `menu` de lo que PSA expone para poder avisarnos. */
+/* ===== Sincronización completa =====
+   Los archivos que APPI actualiza al entrar se bajan en UNA sola sesión con
+   action:'sync'. Histórico usa las URL directas confirmadas; los índices del
+   hub, los secrets y el cache appsi_psa_idx quedan como respaldo. La respuesta
+   conserva el `menu` descubierto para poder diagnosticar futuros cambios. */
 
 const dipFetch = (jar: Jar, url: string, opts: { method?: string; body?: string } = {}): Promise<Response> =>
   fetch(url, {
@@ -600,6 +607,23 @@ function resumenVisibleInforme(html: string): string {
   if (vacio) partes.push(vacio[0]);
   return partes.join(' · ');
 }
+const HISTORICAL_MONTH_NUMBER: Record<string, string> = {
+  enero: '01', febrero: '02', marzo: '03', abril: '04', mayo: '05', junio: '06',
+  julio: '07', agosto: '08', septiembre: '09', setiembre: '09', octubre: '10',
+  noviembre: '11', diciembre: '12',
+};
+function periodoVisibleInforme(html: string): string {
+  const texto = limpiarCelda(html);
+  const iso = texto.match(/per[ií]odo consultado\s*[:\-]?\s*(20\d{2})-(0[1-9]|1[0-2])/i);
+  if (iso) return `${iso[1]}-${iso[2]}`;
+  const visible = texto.match(/per[ií]odo consultado\s*[:\-]?\s*(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|setiembre|octubre|noviembre|diciembre)\s*[-\/]\s*(20\d{2})/i);
+  if (!visible) return '';
+  return `${visible[2]}-${HISTORICAL_MONTH_NUMBER[normL(visible[1])] || ''}`;
+}
+function informeCoincidePeriodo(html: string, solicitado: string): boolean {
+  const visible = periodoVisibleInforme(html);
+  return !visible || visible === solicitado;
+}
 function pareceInformeIngresos(html: string): boolean {
   if (resumenVisibleInforme(html)) return true;
   return filasHtml(html).some(fila => {
@@ -665,6 +689,41 @@ async function bajarReporte(jar: Jar, idx: string, consulta: string, periodo: st
     return { html: decodificarLatin1(new Uint8Array(await rp.arrayBuffer())), via: 'POST' };
   } catch (_) {}
   return { html: '', via: 'NONE' };
+}
+
+/** Prioriza la URL directa confirmada para cada informe histórico. Si PSA
+ *  cambia el idx o la descripción, prueba después los índices descubiertos,
+ *  configurados o recordados por la app. */
+async function bajarReporteHistorico(
+  jar: Jar,
+  key: HistoricalDirectKey,
+  periodo: string,
+  alternativos: string[],
+  reportes: Map<string, string>,
+  verifica: (h: string) => boolean,
+): Promise<{ html: string; via: string; idx: string; fuente: 'directa' | 'respaldo' }> {
+  const directo = HISTORICAL_DIRECT_REPORTS[key];
+  const candidatos: Array<{ idx: string; consulta: string; fuente: 'directa' | 'respaldo' }> = [
+    { ...directo, fuente: 'directa' },
+  ];
+  const vistos = new Set([directo.idx]);
+  for (const raw of alternativos) {
+    const idx = String(raw || '').trim();
+    if (!idx || vistos.has(idx)) continue;
+    vistos.add(idx);
+    candidatos.push({ idx, consulta: reportes.get(idx) || directo.consulta, fuente: 'respaldo' });
+  }
+  let ultimo: { html: string; via: string; idx: string; fuente: 'directa' | 'respaldo' } = {
+    html: '', via: 'NONE', idx: directo.idx, fuente: 'directa'
+  };
+  for (const candidato of candidatos) {
+    try {
+      const reporte = await bajarReporte(jar, candidato.idx, candidato.consulta, periodo, verifica);
+      ultimo = { ...reporte, idx: candidato.idx, fuente: candidato.fuente };
+      if (verifica(reporte.html)) return ultimo;
+    } catch (_) {}
+  }
+  return ultimo;
 }
 
 /* ===== Perfil del distribuidor (v827) =====
@@ -839,13 +898,12 @@ Deno.serve(async (req) => {
     }
   }
 
-  /* ===== Sincronización de informes PSA (v876) =====
-     Línea descendente, Garantías por organización, Garantías e Ingresos
-     en UNA sola sesión. La app manda en body.idx los índices
-     que ya resolvió (appsi_psa_idx) para saltear el discovery. */
+  /* ===== Sincronización de informes PSA (v878) =====
+     Línea descendente, Garantías por organización e Ingresos priorizan las
+     URL directas confirmadas. El discovery, los secrets y los índices que la
+     app recuerda quedan únicamente como respaldo ante cambios futuros de PSA. */
   if (body.action === 'sync') {
     const periodo = (body.periodo ? String(body.periodo) : periodoActualBA()).replace(/[^0-9\-]/g, '');
-    const descrip = (id: string, fb: string) => (reportes.get(id) || fb);
     const permitidos = new Set(['linea', 'garantiasOrg', 'garantias', 'ingresos']);
     const datasets: string[] = Array.isArray(body.datasets) && body.datasets.length
       ? body.datasets.map(String).filter((item: string) => permitidos.has(item))
@@ -855,24 +913,25 @@ Deno.serve(async (req) => {
       ? Object.fromEntries(Object.entries(body.idx).map(([k, v]) => [k, String(v)])) : {};
 
     const idx: Record<string, string> = {};
+    const alternativas: Record<string, string[]> = { linea: [], garantiasOrg: [], ingresos: [] };
     const errores: string[] = [];
     const { reportes, menu } = await descubrir(dip);
+    const agregarAlternativa = (key: string, value: unknown) => {
+      const id = String(value || '').trim();
+      if (id && !alternativas[key].includes(id)) alternativas[key].push(id);
+    };
 
     if (quiero('linea')) {
-      idx.linea = override.linea || Deno.env.get('PSA_LINEA_IDX') || '';
-      if (!idx.linea) {
-        const e = elegir(reportes, [[/linea/, /descend/], [/linea/], [/descend/]]);
-        if (e) idx.linea = e;
-      }
-      if (!idx.linea) errores.push('Línea descendente: no encontré el informe en Autoconsulta (revisá «menu»).');
+      idx.linea = HISTORICAL_DIRECT_REPORTS.linea.idx;
+      agregarAlternativa('linea', override.linea);
+      agregarAlternativa('linea', Deno.env.get('PSA_LINEA_IDX'));
+      agregarAlternativa('linea', elegir(reportes, [[/linea/, /descend/], [/linea/], [/descend/]]));
     }
     if (quiero('garantiasOrg')) {
-      idx.garantiasOrg = override.garantiasOrg || Deno.env.get('PSA_GO_IDX') || '';
-      if (!idx.garantiasOrg) {
-        const e = elegir(reportes, [[/garant/, /por\s*org/], [/garant/, /orga/], [/orga/], [/por\s*org/]]);
-        if (e) idx.garantiasOrg = e;
-      }
-      if (!idx.garantiasOrg) errores.push('Garantías por organización: no encontré el informe en Autoconsulta (revisá «menu»).');
+      idx.garantiasOrg = HISTORICAL_DIRECT_REPORTS.garantiasOrg.idx;
+      agregarAlternativa('garantiasOrg', override.garantiasOrg);
+      agregarAlternativa('garantiasOrg', Deno.env.get('PSA_GO_IDX'));
+      agregarAlternativa('garantiasOrg', elegir(reportes, [[/garant/, /por\s*org/], [/garant/, /orga/], [/orga/], [/por\s*org/]]));
     }
     if (quiero('garantias')) {
       idx.garantias = override.garantias || '';
@@ -889,25 +948,27 @@ Deno.serve(async (req) => {
       if (!idx.garantias) errores.push('Garantías: no encontré el informe en Autoconsulta (revisá «menu»).');
     }
     if (quiero('ingresos')) {
-      idx.ingresos = override.ingresos || Deno.env.get('PSA_INGRESOS_IDX') || '';
-      if (!idx.ingresos) {
-        const e = elegir(reportes, [
-          [/(^|\s)ingresos?(\s|$)/],
-          [/(^|\s)incorporaciones?(\s|$)/],
-          [/altas?/, /distribuidor|organizacion/]
-        ]);
-        if (e) idx.ingresos = e;
-      }
-      if (!idx.ingresos) errores.push('Ingresos: no encontré el informe en Autoconsulta (revisá «menu»).');
+      idx.ingresos = HISTORICAL_DIRECT_REPORTS.ingresos.idx;
+      agregarAlternativa('ingresos', override.ingresos);
+      agregarAlternativa('ingresos', Deno.env.get('PSA_INGRESOS_IDX'));
+      agregarAlternativa('ingresos', elegir(reportes, [
+        [/patrocinios?/, /organizacion/],
+        [/(^|\s)ingresos?(\s|$)/],
+        [/(^|\s)incorporaciones?(\s|$)/],
+        [/altas?/, /distribuidor|organizacion/]
+      ]));
     }
 
-    const out: any = { ok: true, periodo, idx, errores, menu, linea: null, garantiasOrg: null, garantias: null, ingresos: null };
+    const out: any = { ok: true, periodo, idx, fuentes: {}, errores, menu, linea: null, garantiasOrg: null, garantias: null, ingresos: null };
 
     if (idx.linea) {
       try {
-        const { html } = await bajarReporte(dip, idx.linea, descrip(idx.linea, 'Linea'), periodo, h => !!parsearLineaHtml(h));
+        const reporte = await bajarReporteHistorico(dip, 'linea', periodo, alternativas.linea, reportes, h => !!parsearLineaHtml(h) && informeCoincidePeriodo(h, periodo));
+        const { html } = reporte;
+        idx.linea = reporte.idx;
+        out.fuentes.linea = reporte.fuente;
         const par = parsearLineaHtml(html);
-        if (par && par.length) {
+        if (par && par.length && informeCoincidePeriodo(html, periodo)) {
           out.linea = {
             filas: filasHtml(html),
             par: par.map(f => ({ n: f.n, pb: f.pb })),
@@ -922,9 +983,12 @@ Deno.serve(async (req) => {
     }
     if (idx.garantiasOrg) {
       try {
-        const { html } = await bajarReporte(dip, idx.garantiasOrg, descrip(idx.garantiasOrg, 'GarantiasPorOrg'), periodo, h => filasHtml(h).length > 1);
+        const reporte = await bajarReporteHistorico(dip, 'garantiasOrg', periodo, alternativas.garantiasOrg, reportes, h => filasHtml(h).length > 1 && informeCoincidePeriodo(h, periodo));
+        const { html } = reporte;
+        idx.garantiasOrg = reporte.idx;
+        out.fuentes.garantiasOrg = reporte.fuente;
         const filas = filasHtml(html).filter(f => f.length > 1);
-        if (filas.length) {
+        if (filas.length && informeCoincidePeriodo(html, periodo)) {
           out.garantiasOrg = { filas };
         } else {
           errores.push('Garantías por organización: el informe salió vacío (¿cambió el formato de PSA?).');
@@ -935,7 +999,7 @@ Deno.serve(async (req) => {
     }
     if (idx.garantias) {
       try {
-        const { html } = await bajarReporte(dip, idx.garantias, descrip(idx.garantias, 'Garantias'), periodo, h => parsearGarantias(h).length > 0);
+        const { html } = await bajarReporte(dip, idx.garantias, reportes.get(idx.garantias) || 'Garantias', periodo, h => parsearGarantias(h).length > 0);
         const filas = parsearGarantias(html);
         if (filas.length) {
           out.garantias = { filas: filas.map(f => ({ s: f.serie, u: f.usuario, t: f.telefono, d: f.domicilio, c: f.cp, l: f.localidad, p: f.producto, c2: f.compra, v: f.vence, e: f.e, cn: f.cn })) };
@@ -948,16 +1012,20 @@ Deno.serve(async (req) => {
     }
     if (idx.ingresos) {
       try {
-        const { html } = await bajarReporte(
+        const reporte = await bajarReporteHistorico(
           dip,
-          idx.ingresos,
-          descrip(idx.ingresos, 'Ingresos'),
+          'ingresos',
           periodo,
-          h => pareceInformeIngresos(h)
+          alternativas.ingresos,
+          reportes,
+          h => pareceInformeIngresos(h) && informeCoincidePeriodo(h, periodo)
         );
+        const { html } = reporte;
+        idx.ingresos = reporte.idx;
+        out.fuentes.ingresos = reporte.fuente;
         const filas = filasHtml(html).filter(f => f.some(cell => String(cell || '').trim()));
         const resumen = resumenVisibleInforme(html);
-        if (pareceInformeIngresos(html)) {
+        if (pareceInformeIngresos(html) && informeCoincidePeriodo(html, periodo)) {
           out.ingresos = { filas, resumen };
         } else {
           errores.push('Ingresos: el informe salió vacío y no confirmó cero ingresos.');

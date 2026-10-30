@@ -890,17 +890,21 @@ return {
   });
 });
 
-test('la sincronización PSA descubre y devuelve Ingresos para Histórico sin fijar un índice', () => {
+test('la sincronización histórica prioriza las URL directas de PSA y conserva el discovery como respaldo', () => {
   const edge = fs.readFileSync('supabase/functions/consulta-serial/index.ts', 'utf8');
   const html = fs.readFileSync('index.html', 'utf8');
 
-  expect(edge).toContain("new Set(['linea', 'garantiasOrg', 'garantias', 'ingresos'])");
+  expect(edge).toContain("linea: { idx: '69', consulta: 'Línea_Descendente_' }");
+  expect(edge).toContain("garantiasOrg: { idx: '34', consulta: 'Garantías_por_Organización' }");
+  expect(edge).toContain("ingresos: { idx: '71', consulta: 'Patrocinios_por_Organización_' }");
+  expect(edge).toContain("DIP_EXEC + '?idx=' + idx + '&periodo=' + periodo + '&Consulta=' + encL1(consulta)");
+  expect(edge).toContain('async function bajarReporteHistorico(');
+  expect(edge).toContain("fuente: 'directa' | 'respaldo'");
+  expect(edge).toContain('informeCoincidePeriodo(h, periodo)');
   expect(edge).toContain("Deno.env.get('PSA_INGRESOS_IDX')");
-  expect(edge).toContain("idx.ingresos = override.ingresos");
   expect(edge).toContain('descubrirCategorias(html)');
+  expect(edge).toContain("[/patrocinios?/, /organizacion/]");
   expect(edge).toContain("out.ingresos = { filas, resumen }");
-  expect(edge).toContain("errores.push('Ingresos: no encontré el informe");
-  expect(edge).not.toMatch(/idx\.ingresos\s*=\s*['"]\d+['"]/);
 
   expect(html).toContain("datasets:['linea','garantiasOrg','ingresos']");
   expect(html).toContain('window.psaSincronizarHistorico=psaSincronizarHistorico');
