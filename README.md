@@ -6,6 +6,23 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v876 · Histórico automático desde MI PSA
+
+- **Histórico** trae automáticamente Línea Descendente, Garantías por Organización e Ingresos del mismo período usando la cuenta de MI PSA ya configurada.
+- Al abrir el módulo se actualiza el mes actual; las tarjetas permiten traer o actualizar meses del año vigente y del anterior sin descargar planillas.
+- Se conservan las validaciones de titular, período, coincidencia de DIPs e integridad; un informe de Ingresos con cero personas continúa siendo válido.
+- Sólo el año vigente y el anterior permanecen navegables y comparables. No se permite importar automáticamente un período más antiguo.
+- Cada año que sale de esa ventana se convierte automáticamente en **un PDF anual resumido independiente** y aparece en el listado de años archivados.
+- APPI sube y vuelve a descargar el PDF para verificarlo en la nube; recién entonces elimina los cierres mensuales y las planillas originales de ese año. Si la verificación falla, conserva todos los originales.
+- El backup ZIP incluye también los PDF anuales que estén disponibles localmente.
+- La pantalla de Histórico fue reconstruida con letras grandes, contraste fuerte, botones con texto y navegación explícita para facilitar el uso por personas mayores.
+- El inicio separa claramente Línea Descendente y PB, Ingresos, Garantías, planillas comparativas, gráficas y PDF anuales.
+- Las planillas comparan mes a mes el año vigente con el anterior; se conservan las cinco gráficas de PB, actividad, pendientes, ingresos y personas.
+- Los PDF anuales visibles llegan hasta 2020, cada año con su descarga independiente.
+- La selección manual de archivos queda dentro de **Administrar cierres y recuperación** y sólo se usa si PSA no responde.
+- La Edge Function descubre Ingresos por nombre en el menú de Autoconsulta, admite override seguro y no fija un índice frágil.
+- Versión: **v876 · Segura** → Cache `appi-v876-historico-automatico`.
+
 ## v875 · Herramientas compactas con iconos a la derecha
 
 - La pantalla **Mis herramientas** conserva los iconos y colores actuales, pero los ubica a la derecha de cada tarjeta.

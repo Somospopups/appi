@@ -1,4 +1,5 @@
 const { test, expect } = require('@playwright/test');
+const fs = require('fs');
 
 const USER_ID = '11111111-1111-4111-8111-111111111111';
 
@@ -887,4 +888,21 @@ return {
     expect(res.sinMovDia1).toBe(true);
     expect(res.sinFilaMov).toBe(true);
   });
+});
+
+test('la sincronización PSA descubre y devuelve Ingresos para Histórico sin fijar un índice', () => {
+  const edge = fs.readFileSync('supabase/functions/consulta-serial/index.ts', 'utf8');
+  const html = fs.readFileSync('index.html', 'utf8');
+
+  expect(edge).toContain("new Set(['linea', 'garantiasOrg', 'garantias', 'ingresos'])");
+  expect(edge).toContain("Deno.env.get('PSA_INGRESOS_IDX')");
+  expect(edge).toContain("idx.ingresos = override.ingresos");
+  expect(edge).toContain('descubrirCategorias(html)');
+  expect(edge).toContain("out.ingresos = { filas, resumen }");
+  expect(edge).toContain("errores.push('Ingresos: no encontré el informe");
+  expect(edge).not.toMatch(/idx\.ingresos\s*=\s*['"]\d+['"]/);
+
+  expect(html).toContain("datasets:['linea','garantiasOrg','ingresos']");
+  expect(html).toContain('window.psaSincronizarHistorico=psaSincronizarHistorico');
+  expect(html).toContain('idx.linea||idx.garantiasOrg||idx.garantias||idx.ingresos');
 });

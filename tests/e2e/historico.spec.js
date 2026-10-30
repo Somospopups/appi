@@ -431,3 +431,110 @@ test.describe('Histórico: los datos son de cada persona', () => {
     expect(errores.filter(e => !/favicon|manifest/i.test(e))).toEqual([]);
   });
 });
+
+test.describe('Histórico: cierre automático desde MI PSA', () => {
+  test('crea, valida y actualiza un cierre con LD + GO + Ingresos sin pedir archivos', async ({ page }) => {
+    await abrirHistorico(page);
+
+    const result = await page.evaluate(async () => {
+      const response = {
+        ok: true,
+        periodo: '2026-10',
+        idx: { linea: '100', garantiasOrg: '101', ingresos: '102' },
+        errores: [],
+        linea: {
+          filas: [
+            ['Línea Descendente'],
+            ['DIP Nro : 02-9802014 Nombre y Apellido : MARÍA PÉREZ Socio : Sucursal : 02 - MI CENTRO Categoría : L País : Argentina'],
+            ['Período Consultado: Octubre - 2026'],
+            ['', '', '', 'Nombre', 'Cat.', 'Teléfono', 'Estado', 'PB Mes Actual', '1°Mes Ant.', '2°Mes Ant.', '3°Mes Ant.', 'Alta', 'Cumpleaños', 'Correo electrónico'],
+            ['', '', '1', '[02-1000001] JUAN RAMA [AR-B]', 'D', '3515550001', 'C', '12', '10', '8', '6', '01/02/2020', '20/03', 'juan@correo.com'],
+            ['', '', '2', '[02-1000002] ANA HOJA [AR-B]', 'DJ', '3515550002', 'C', '9', '7', '5', '3', '05/06/2021', '11/09', 'ana@correo.com'],
+            ['', '', '1', '[02-1000003] LUIS QUIETO [AR-B]', 'D', '3515550003', 'C', '0', '0', '0', '0', '10/07/2022', '18/10', 'luis@correo.com']
+          ]
+        },
+        garantiasOrg: {
+          filas: [
+            ['Nombre', 'DIP', 'Presentadas', 'Vencidas', '% Vencidas', 'Pendientes'],
+            ['JUAN RAMA', '02-1000001', '4', '1', '25', '2'],
+            ['ANA HOJA', '02-1000002', '2', '0', '0', '1'],
+            ['LUIS QUIETO', '02-1000003', '1', '0', '0', '0']
+          ]
+        },
+        ingresos: {
+          resumen: 'Período Consultado Octubre - 2026 · Total de 1 ingresos',
+          filas: [
+            ['DIP', 'Nombre', 'Cat.', 'Teléfono', 'E Mail', 'Fecha Alta', 'Ult Compra', 'Patrocinante', 'Nombre', 'Cat.', 'Capacitación'],
+            ['02-1000002', 'ANA HOJA', 'DJ', '3515550002', 'ana@correo.com', '05/10/2026', '20/10/2026', '02-1000001', 'JUAN RAMA', 'D', '1']
+          ]
+        }
+      };
+      const api = window.__APPI_HISTORICO__;
+      const first = await api.importPSAResponse(response, { period: '2026-10' });
+      const same = await api.importPSAResponse(response, { period: '2026-10' });
+      response.linea.filas[4][7] = '18';
+      const changed = await api.importPSAResponse(response, { period: '2026-10' });
+      const record = api.state.periods.find(item => item.id === '2026-10');
+      const files = await Promise.all(['equipo', 'garantias', 'ingresos'].map(type => api.dbGetAll('files').then(all => all.find(item => item.key === `2026-10:${type}`))));
+      return {
+        first: first.status,
+        same: same.status,
+        changed: changed.status,
+        source: record.source,
+        version: record.version,
+        people: record.summary.people,
+        active: record.summary.active,
+        pb: record.summary.pbPersonal,
+        pending: record.summary.pending,
+        incomeCount: record.summary.incomeCount,
+        incomePeriod: record.incomeValidation.periodo,
+        incomeLinked: record.summary.incomeMatched,
+        fileNames: files.map(file => file && file.name)
+      };
+    });
+
+    expect(result.first).toBe('created');
+    expect(result.same).toBe('unchanged');
+    expect(result.changed).toBe('updated');
+    expect(result.source).toBe('psa-auto');
+    expect(result.version).toBe(2);
+    expect(result.people).toBe(3);
+    expect(result.active).toBe(2);
+    expect(result.pb).toBe(27);
+    expect(result.pending).toBe(3);
+    expect(result.incomeCount).toBe(1);
+    expect(result.incomePeriod).toBe('2026-10');
+    expect(result.incomeLinked).toBe(1);
+    expect(result.fileNames).toEqual([
+      'linea_descendente_2026-10_PSA.xls',
+      'garantias_organizacion_2026-10_PSA.xls',
+      'ingresos_2026-10_PSA.xls'
+    ]);
+  });
+
+  test('rechaza Ingresos de otro período antes de guardar', async ({ page }) => {
+    await abrirHistorico(page);
+    const message = await page.evaluate(async () => {
+      const api = window.__APPI_HISTORICO__;
+      const rows = [
+        ['DIP Nro : 02-9802014 Nombre y Apellido : MARÍA PÉREZ Socio : Sucursal : 02 Categoría : L País : Argentina'],
+        ['', '', '', 'Nombre', 'Cat.', 'Teléfono', 'Estado', 'PB Mes Actual', '1°Mes Ant.', '2°Mes Ant.', '3°Mes Ant.', 'Alta', 'Cumpleaños', 'Correo electrónico'],
+        ['', '', '1', '[02-1000001] JUAN RAMA [AR-B]', 'D', '', 'C', '12', '0', '0', '0', '', '', ''],
+        ['', '', '1', '[02-1000002] ANA HOJA [AR-B]', 'DJ', '', 'C', '9', '0', '0', '0', '', '', ''],
+        ['', '', '1', '[02-1000003] LUIS QUIETO [AR-B]', 'D', '', 'C', '1', '0', '0', '0', '', '', '']
+      ];
+      try {
+        await api.importPSAResponse({
+          periodo: '2026-10', errores: [], linea: { filas: rows },
+          garantiasOrg: { filas: [['Nombre','DIP','Presentadas','Vencidas','%','Pendientes'],['JUAN','02-1000001','1','0','0','0']] },
+          ingresos: { filas: [['Período Consultado Septiembre - 2026'], ['Total de 0 ingresos']], resumen: 'Período Consultado Septiembre - 2026 · Total de 0 ingresos' }
+        }, { period: '2026-10' });
+        return '';
+      } catch (error) { return error.message; }
+    });
+    expect(message).toContain('2026-09');
+    expect(message).toContain('no a 2026-10');
+    const stored = await page.evaluate(() => window.__APPI_HISTORICO__.state.periods.some(item => item.id === '2026-10'));
+    expect(stored).toBe(false);
+  });
+});

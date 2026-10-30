@@ -539,10 +539,27 @@ function descubrirReportes(html: string): Map<string, string> {
   return reportes;
 }
 
+function descubrirCategorias(html: string): string[] {
+  const categorias = new Set<string>();
+  const re = /(?:ac_cat|cat)[=_](\d{1,3})/gi;
+  let match: RegExpExecArray | null;
+  while ((match = re.exec(html)) !== null) categorias.add(match[1]);
+  return [...categorias];
+}
+
 async function descubrir(jar: Jar): Promise<{ reportes: Map<string, string>; menu: Record<string, string[]> }> {
   const reportes = new Map<string, string>();
   const menu: Record<string, string[]> = {};
-  for (const [clave, acCat] of [['hub', ''], ['ac_cat=20', '20'], ['ac_cat=21', '21']] as const) {
+  const pendientes = ['', '20', '21'];
+  const visitadas = new Set<string>();
+  // PSA puede mover un informe de categoría. Además de las dos categorías
+  // históricas, recorremos únicamente las categorías que el propio menú
+  // anuncie (con un límite para no convertir un cambio de HTML en un barrido).
+  for (let cursor = 0; cursor < pendientes.length && cursor < 18; cursor++) {
+    const acCat = pendientes[cursor];
+    if (visitadas.has(acCat)) continue;
+    visitadas.add(acCat);
+    const clave = acCat ? 'ac_cat=' + acCat : 'hub';
     const url = acCat ? DIP_HUB + '?ac_cat=' + acCat : DIP_HUB;
     try {
       const r = await fetch(url, { headers: { 'User-Agent': UA, Cookie: cookieH(jar) } });
@@ -550,6 +567,9 @@ async function descubrir(jar: Jar): Promise<{ reportes: Map<string, string>; men
       const rep = descubrirReportes(html);
       for (const [id, lbl] of rep) if (!reportes.has(id)) reportes.set(id, lbl);
       menu[clave] = [...rep.entries()].slice(0, 60).map(([i, l]) => i + '=' + l);
+      for (const categoria of descubrirCategorias(html)) {
+        if (!visitadas.has(categoria) && !pendientes.includes(categoria)) pendientes.push(categoria);
+      }
     } catch (_) {
       menu[clave] = [];
     }
@@ -567,6 +587,25 @@ function encL1(s: string): string {
     out += '%' + c.toString(16).toUpperCase().padStart(2, '0');
   }
   return out;
+}
+
+function resumenVisibleInforme(html: string): string {
+  const texto = limpiarCelda(html);
+  const partes: string[] = [];
+  const periodo = texto.match(/(?:per[ií]odo consultado\s*[:\-]?\s*)?(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|setiembre|octubre|noviembre|diciembre)\s*[-\/]\s*(20\d{2})/i);
+  const total = texto.match(/total de\s+\d+\s+(?:incorporaciones|ingresos)/i);
+  const vacio = texto.match(/(?:sin|no (?:se )?(?:encontraron|registraron))\s+(?:personas|ingresos|incorporaciones)/i);
+  if (periodo) partes.push(periodo[0]);
+  if (total) partes.push(total[0]);
+  if (vacio) partes.push(vacio[0]);
+  return partes.join(' · ');
+}
+function pareceInformeIngresos(html: string): boolean {
+  if (resumenVisibleInforme(html)) return true;
+  return filasHtml(html).some(fila => {
+    const celdas = fila.map(normL);
+    return celdas.includes('dip') && celdas.filter(celda => celda === 'nombre').length >= 2 && celdas.some(celda => celda.includes('fecha alta')) && celdas.some(celda => celda.includes('patrocinante'));
+  });
 }
 
 /** Baja un informe de autoconsulta con la URL real del navegador:
@@ -800,14 +839,17 @@ Deno.serve(async (req) => {
     }
   }
 
-  /* ===== Sincronización de los 3 archivos al entrar (v618) =====
-     Línea descendente (ac_cat=20), Garantías por organización y Garantías
-     (ac_cat=21) en UNA sola sesión. La app manda en body.idx los índices
+  /* ===== Sincronización de informes PSA (v876) =====
+     Línea descendente, Garantías por organización, Garantías e Ingresos
+     en UNA sola sesión. La app manda en body.idx los índices
      que ya resolvió (appsi_psa_idx) para saltear el discovery. */
   if (body.action === 'sync') {
     const periodo = (body.periodo ? String(body.periodo) : periodoActualBA()).replace(/[^0-9\-]/g, '');
     const descrip = (id: string, fb: string) => (reportes.get(id) || fb);
-    const datasets: string[] = Array.isArray(body.datasets) && body.datasets.length ? body.datasets.map(String) : ['linea', 'garantiasOrg', 'garantias'];
+    const permitidos = new Set(['linea', 'garantiasOrg', 'garantias', 'ingresos']);
+    const datasets: string[] = Array.isArray(body.datasets) && body.datasets.length
+      ? body.datasets.map(String).filter((item: string) => permitidos.has(item))
+      : ['linea', 'garantiasOrg', 'garantias'];
     const quiero = (k: string) => datasets.includes(k);
     const override: Record<string, string> = (body.idx && typeof body.idx === 'object')
       ? Object.fromEntries(Object.entries(body.idx).map(([k, v]) => [k, String(v)])) : {};
@@ -846,8 +888,20 @@ Deno.serve(async (req) => {
       }
       if (!idx.garantias) errores.push('Garantías: no encontré el informe en Autoconsulta (revisá «menu»).');
     }
+    if (quiero('ingresos')) {
+      idx.ingresos = override.ingresos || Deno.env.get('PSA_INGRESOS_IDX') || '';
+      if (!idx.ingresos) {
+        const e = elegir(reportes, [
+          [/(^|\s)ingresos?(\s|$)/],
+          [/(^|\s)incorporaciones?(\s|$)/],
+          [/altas?/, /distribuidor|organizacion/]
+        ]);
+        if (e) idx.ingresos = e;
+      }
+      if (!idx.ingresos) errores.push('Ingresos: no encontré el informe en Autoconsulta (revisá «menu»).');
+    }
 
-    const out: any = { ok: true, periodo, idx, errores, menu, linea: null, garantiasOrg: null, garantias: null };
+    const out: any = { ok: true, periodo, idx, errores, menu, linea: null, garantiasOrg: null, garantias: null, ingresos: null };
 
     if (idx.linea) {
       try {
@@ -890,6 +944,26 @@ Deno.serve(async (req) => {
         }
       } catch (_) {
         errores.push('Garantías: no se pudo bajar el reporte.');
+      }
+    }
+    if (idx.ingresos) {
+      try {
+        const { html } = await bajarReporte(
+          dip,
+          idx.ingresos,
+          descrip(idx.ingresos, 'Ingresos'),
+          periodo,
+          h => pareceInformeIngresos(h)
+        );
+        const filas = filasHtml(html).filter(f => f.some(cell => String(cell || '').trim()));
+        const resumen = resumenVisibleInforme(html);
+        if (pareceInformeIngresos(html)) {
+          out.ingresos = { filas, resumen };
+        } else {
+          errores.push('Ingresos: el informe salió vacío y no confirmó cero ingresos.');
+        }
+      } catch (_) {
+        errores.push('Ingresos: no se pudo bajar el informe.');
       }
     }
 

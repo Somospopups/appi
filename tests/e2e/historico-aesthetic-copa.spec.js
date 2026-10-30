@@ -73,18 +73,55 @@ test('en PC aparece la comparación tradicional completa de enero a diciembre', 
   await expect(page.locator('.hist-annual-desktop thead')).toContainText('Total');
 });
 
-test('la carga mensual mantiene los tres archivos y sus controles originales', () => {
+test('los cierres se actualizan desde MI PSA y la carga manual queda como recuperación', () => {
   const html=fs.readFileSync('index.html','utf8'),js=fs.readFileSync('historico.js','utf8');
   for(const text of ['Línea Descendente','Garantías por Organización','Ingresos']){
     expect(html).toContain(text);
     expect(js).toContain(text);
   }
-  expect(html).toContain('data-file-slot');
-  expect(js).toContain('data-file-slot');
-  expect(html).toContain('data-save-month');
-  expect(js).toContain('data-save-month');
-  expect(html).toContain('Cada archivo correcto mostrará un check verde. Después guardá ese mes.');
-  expect(js).toContain('Cada archivo correcto mostrará un check verde. Después guardá ese mes.');
+  expect(html).toContain('data-auto-month');
+  expect(js).toContain('data-auto-month');
+  expect(html).toContain('Carga manual de recuperación');
+  expect(js).toContain('Carga manual de recuperación');
+  expect(html).toContain("datasets:['linea','garantiasOrg','ingresos']");
+  expect(html).toContain('importPSAResponse:importPSAHistoricalResponse');
+  expect(js).toContain('importPSAResponse:importPSAHistoricalResponse');
   expect(html).toContain("addHeader('Lectura COPA'");
   expect(js).toContain("addHeader('Lectura COPA'");
+
+  const marker='/* APPI v264 · Histórico: Centro de Acción local-first */';
+  const start=html.indexOf(marker),end=html.indexOf('\n</script>',start);
+  expect(html.slice(start,end).trim()).toBe(js.trim());
+});
+
+test('la pantalla de carga abre los 12 meses en modo automático sin errores', async ({ page }) => {
+  await page.route('**/auth-config.js', route => route.fulfill({
+    contentType:'application/javascript',
+    body:"window.APPI_AUTH={enabled:false,url:'',anonKey:''};"
+  }));
+  await page.addInitScript(() => {
+    localStorage.setItem('welcomeSeen','1');
+    localStorage.setItem('tutoVisto_v2','1');
+    localStorage.setItem('appi_notif_listo_v1','1');
+    localStorage.setItem('appsi_psa_creds', JSON.stringify({ center:'02', number:'9802014', password:'prueba', remember:false }));
+    const now=new Date(),id=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+    localStorage.setItem(`hist_psa_auto_${id}`, String(Date.now()));
+  });
+  await page.goto('/index.html', { waitUntil:'domcontentloaded' });
+  await page.waitForFunction(() => window.__APPI_HISTORICO__?.state?.ready);
+  await page.evaluate(async () => {
+    document.getElementById('lockScreen')?.classList.add('hidden');
+    document.getElementById('bootScreen')?.remove();
+    document.body.classList.remove('appi-login-abierto');
+    await window.openHistorico();
+  });
+  await page.locator('[data-hs-manage]').click();
+
+  await expect(page.locator('.hist-toast-inline.error')).toHaveCount(0);
+  await expect(page.locator('.hist-manual-fallback')).toHaveCount(12);
+  await expect(page.locator('.hist-manual-fallback[open]')).toHaveCount(0);
+  await expect(page.locator('[data-auto-month]')).toHaveCount(12);
+  await expect(page.locator('#histAutoCurrent')).toContainText('desde MI PSA');
+  await expect(page.locator('.hist-annual-help')).toContainText('La carga de archivos quedó únicamente como alternativa de recuperación');
+  expect(await page.evaluate(() => document.documentElement.scrollWidth-document.documentElement.clientWidth)).toBeLessThanOrEqual(1);
 });
