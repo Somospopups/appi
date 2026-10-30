@@ -26,6 +26,7 @@ const H={
   actionPlans:[],actionTab:'today',actionContext:null,
   autoSyncing:false,autoPeriod:'',autoMessage:'',autoError:'',archiving:false,
   autoBackfilling:false,autoQueueTotal:0,autoQueueDone:0,autoQueueCurrent:'',autoQueueErrors:[],
+  archiveBackfilling:false,archiveQueueTotal:0,archiveQueueDone:0,archiveQueueYear:0,archiveQueueCurrent:'',archiveQueueErrors:[],
   simpleView:'home',simplePeriod:'',simplePicker:false,simpleCompareMetric:'pb',simpleGraphMetric:'pb',simpleCompareView:'table',simpleScope:'team',simpleSearch:'',simplePeopleVisible:false
 };
 
@@ -381,7 +382,7 @@ async function automaticDraftMatchesSaved(existing,draft){
 async function importPSAHistoricalResponse(data,options={}){
   const id=String(options.period||data&&data.periodo||'');
   if(!/^20\d{2}-(0[1-9]|1[0-2])$/.test(id))throw new Error('PSA no informó un período mensual válido.');
-  if(Number(id.slice(0,4))<currentHistoricalPeriod().year-1)throw new Error('Ese año ya salió de la ventana activa y sólo está disponible como PDF anual.');
+  if(Number(id.slice(0,4))<currentHistoricalPeriod().year-1&&!options.archive)throw new Error('Ese año ya salió de la ventana activa y sólo está disponible como PDF anual.');
   const missing=[];
   if(!data||!data.linea||!Array.isArray(data.linea.filas))missing.push('Línea Descendente');
   if(!data||!data.garantiasOrg||!Array.isArray(data.garantiasOrg.filas))missing.push('Garantías por Organización');
@@ -418,29 +419,30 @@ async function importPSAHistoricalResponse(data,options={}){
   const record=await buildPeriodRecord(draft);record.source='psa-auto';record.psaPeriod=id;
   const db=await openDB();
   await new Promise((resolve,reject)=>{const tx=db.transaction(['periods','files'],'readwrite');tx.objectStore('periods').put(record);for(const type of Object.keys(FILE_TYPES)){const file=draft.files[type];tx.objectStore('files').put({key:`${record.id}:${type}`,periodId:record.id,type,name:file.name,size:file.size,mime:file.type||'',lastModified:file.lastModified||0,blob:file})}tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)});
-  delete H.uploads[id];await refreshData();ensureDefaultSelection(true);await reconcileActionPlans();notifyActionDueOnce();
+  delete H.uploads[id];await refreshData();
+  if(!options.archive){ensureDefaultSelection(true);await reconcileActionPlans();notifyActionDueOnce()}
   if(!options.deferCloud&&navigator.onLine&&cloudReady()&&getSession())setTimeout(()=>syncAll(false),400);
   return {status:existing?'updated':'created',id,record};
 }
 async function syncHistoricalPeriod(id,options={}){
+  const current=currentHistoricalPeriod(),requestedYear=Number(String(id).slice(0,4));
+  if(requestedYear<current.year-1&&!options.archive){const error=new Error('Histórico mantiene navegables sólo el año actual y el anterior. Los años previos quedan en PDF.');if(options.user)toast(error.message,3400);return {status:'error',error};}
+  if(id>current.id){const error=new Error('Ese período todavía no comenzó.');if(options.user)toast(error.message,2600);return {status:'error',error};}
   if(H.autoSyncing)return {status:'busy',id:H.autoPeriod};
   if(!navigator.onLine){const error=new Error('Sin conexión. La carga manual sigue disponible como respaldo.');if(options.user)toast(error.message,3000);return {status:'error',error};}
   if(typeof window.psaSincronizarHistorico!=='function'){const error=new Error('La conexión automática con MI PSA no está disponible.');if(options.user)toast(error.message,3200);return {status:'error',error};}
-  const current=currentHistoricalPeriod(),requestedYear=Number(String(id).slice(0,4));
-  if(requestedYear<current.year-1){const error=new Error('Histórico mantiene navegables sólo el año actual y el anterior. Los años previos quedan en PDF.');if(options.user)toast(error.message,3400);return {status:'error',error};}
-  if(id>current.id){const error=new Error('Ese período todavía no comenzó.');if(options.user)toast(error.message,2600);return {status:'error',error};}
   H.autoSyncing=true;H.autoPeriod=id;H.autoError='';H.autoMessage=`Consultando ${id} en MI PSA…`;if(H.ready)render();
   try{
     const response=await window.psaSincronizarHistorico(id);
     if(!response||response.motor!=='historico-directo-v879')throw new Error('La función segura de Histórico todavía no está actualizada. Esperá que termine la publicación e intentá nuevamente.');
-    const result=await importPSAHistoricalResponse(response,{period:id,silent:!!options.silent,deferCloud:!!options.deferCloud});
+    const result=await importPSAHistoricalResponse(response,{period:id,silent:!!options.silent,deferCloud:!!options.deferCloud,archive:!!options.archive});
     const label=result.status==='created'?'Cierre creado':result.status==='updated'?'Cierre actualizado':result.status==='manual-pending'?'Hay una carga manual pendiente':'El cierre ya estaba al día';
     H.autoMessage=`${label} · ${id}`;H.autoError='';
     if(result.status!=='manual-pending')localStorage.setItem(`hist_psa_auto_${id}`,String(Date.now()));
     if(options.user)toast(`✓ ${label} desde MI PSA`,2800);
     return result;
   }catch(error){
-    console.error('Histórico automático',error);H.autoError=String(error&&error.message||error);H.autoMessage='No se pudo completar la actualización automática';
+    (options.user?console.error:console.warn)('Histórico automático',error);H.autoError=String(error&&error.message||error);H.autoMessage='No se pudo completar la actualización automática';
     if(options.user)toast(`${H.autoMessage}. ${H.autoError}`,4200);
     return {status:'error',error};
   }finally{H.autoSyncing=false;H.autoPeriod='';if(H.ready)render()}
@@ -456,7 +458,7 @@ function missingHistoricalPeriodIds(){
   return expectedHistoricalPeriodIds().filter(id=>!saved.has(id)&&!(H.uploads[id]&&H.uploads[id].changed));
 }
 async function syncMissingPSAPeriods(options={}){
-  if(H.autoBackfilling||H.autoSyncing)return {status:'busy',id:H.autoQueueCurrent||H.autoPeriod};
+  if(H.autoBackfilling||H.archiveBackfilling||H.autoSyncing)return {status:'busy',id:H.autoQueueCurrent||H.archiveQueueCurrent||H.autoPeriod};
   if(!navigator.onLine)return {status:'offline'};
   if(typeof window.psaTieneCredenciales==='function'&&!window.psaTieneCredenciales())return {status:'missing-credentials'};
   const current=currentHistoricalPeriod(),missing=missingHistoricalPeriodIds(),lastCurrent=Number(localStorage.getItem(`hist_psa_auto_${current.id}`)||0),queue=[...missing];
@@ -469,28 +471,81 @@ async function syncMissingPSAPeriods(options={}){
   if(!unique.length)return {status:missing.length?'waiting-retry':'up-to-date',missing:missing.length};
   H.autoBackfilling=true;H.autoQueueTotal=unique.length;H.autoQueueDone=0;H.autoQueueErrors=[];H.autoError='';render();
   try{
+    let consecutiveErrors=0;
     for(const id of unique){
       H.autoQueueCurrent=id;H.autoMessage=`Recuperando ${MONTHS_H[Number(id.slice(5))-1]} ${id.slice(0,4)}…`;render();
       const result=await syncHistoricalPeriod(id,{silent:true,deferCloud:true});
       if(result.status==='error'){
-        H.autoQueueErrors.push({id,message:String(result.error&&result.error.message||'No se pudo recuperar')});
+        consecutiveErrors++;H.autoQueueErrors.push({id,message:String(result.error&&result.error.message||'No se pudo recuperar')});
         localStorage.setItem(`hist_psa_auto_error_${id}`,String(Date.now()));
-      }else localStorage.removeItem(`hist_psa_auto_error_${id}`);
+      }else{consecutiveErrors=0;localStorage.removeItem(`hist_psa_auto_error_${id}`)}
       H.autoQueueDone++;render();
+      if(consecutiveErrors>=3){H.autoMessage='La recuperación quedó en pausa y se reintentará automáticamente';break}
       if(H.autoQueueDone<unique.length)await sleep(420);
     }
     H.autoMessage=H.autoQueueErrors.length?`${H.autoQueueDone-H.autoQueueErrors.length} de ${H.autoQueueTotal} meses recuperados`:'Histórico actualizado';
     if(options.user)toast(H.autoQueueErrors.length?`Se recuperaron ${H.autoQueueDone-H.autoQueueErrors.length} meses. Los demás se reintentarán.`:'✓ Todos los meses disponibles quedaron actualizados',3400);
-    if(navigator.onLine&&cloudReady()&&getSession())setTimeout(()=>syncAll(false),400);
+    if(!options.deferCloud&&navigator.onLine&&cloudReady()&&getSession())setTimeout(()=>syncAll(false),400);
     return {status:H.autoQueueErrors.length?'partial':'complete',total:H.autoQueueTotal,done:H.autoQueueDone,errors:[...H.autoQueueErrors]};
   }finally{
     H.autoBackfilling=false;H.autoQueueCurrent='';H.autoPeriod='';render();
   }
 }
+function expectedArchivedYears(){
+  const newest=currentHistoricalPeriod().year-2,years=[];
+  for(let year=newest;year>=2020;year--)years.push(year);
+  return years;
+}
+function archivedYearPeriodIds(year){return Array.from({length:12},(_,month)=>periodId(year,month))}
+async function syncArchivedPSAYears(){
+  if(H.archiveBackfilling||H.autoBackfilling||H.autoSyncing)return {status:'busy'};
+  if(!navigator.onLine||!cloudReady()||!getSession())return {status:'unavailable'};
+  if(typeof window.psaTieneCredenciales==='function'&&!window.psaTieneCredenciales())return {status:'missing-credentials'};
+  const archived=new Set(H.archives.map(item=>item.year)),saved=new Set(H.periods.map(period=>period.id)),years=expectedArchivedYears().filter(year=>!archived.has(year));
+  if(!years.length)return {status:'up-to-date'};
+  const missing=years.flatMap(year=>archivedYearPeriodIds(year).filter(id=>!saved.has(id))),now=Date.now(),queue=new Set(missing.filter(id=>{const failedAt=Number(localStorage.getItem(`hist_psa_archive_error_${id}`)||0);return !failedAt||now-failedAt>=3*60*60*1000}));
+  H.archiveBackfilling=true;H.archiveQueueTotal=missing.length;H.archiveQueueDone=0;H.archiveQueueErrors=[];render();
+  try{
+    let consecutiveErrors=0;
+    yearsLoop: for(const year of years){
+      H.archiveQueueYear=year;logSync(`Preparando el resumen anual ${year}`);render();
+      for(const id of archivedYearPeriodIds(year)){
+        if(saved.has(id)||!queue.has(id))continue;
+        H.archiveQueueCurrent=id;H.autoMessage=`Preparando PDF ${year} · ${MONTHS_H[Number(id.slice(5))-1]}`;render();
+        const result=await syncHistoricalPeriod(id,{silent:true,deferCloud:true,archive:true});
+        if(result.status==='error'){
+          consecutiveErrors++;H.archiveQueueErrors.push({id,message:String(result.error&&result.error.message||'No se pudo recuperar')});
+          localStorage.setItem(`hist_psa_archive_error_${id}`,String(Date.now()));
+        }else{
+          consecutiveErrors=0;saved.add(id);localStorage.removeItem(`hist_psa_archive_error_${id}`);
+        }
+        H.archiveQueueDone++;render();
+        if(consecutiveErrors>=3){logSync('La recuperación anual quedó en pausa y se reintentará automáticamente.');break yearsLoop}
+        await sleep(420);
+      }
+      await refreshData();
+      const periods=H.periods.filter(period=>period.year===year);
+      if(periods.length!==12){logSync(`${year} queda en espera: ${periods.length} de 12 meses recuperados`);continue}
+      let waits=0;while(H.syncing&&waits<300){await sleep(200);waits++}
+      if(H.syncing){H.archiveQueueErrors.push({id:String(year),message:'La nube sigue ocupada; APPI lo reintentará.'});continue}
+      await syncAll(false);await refreshData();
+      if(H.archives.some(item=>item.year===year)){archived.add(year);logSync(`PDF ${year} guardado y verificado en la nube`)}
+      else H.archiveQueueErrors.push({id:String(year),message:'El PDF no pudo guardarse en la nube; los meses se conservaron para reintentar.'});
+      render();
+    }
+    return {status:H.archiveQueueErrors.length?'partial':'complete',errors:[...H.archiveQueueErrors]};
+  }finally{
+    H.archiveBackfilling=false;H.archiveQueueYear=0;H.archiveQueueCurrent='';H.autoPeriod='';render();
+  }
+}
 function maybeSyncHistoricalPeriods(){
   if(!navigator.onLine)return;
   if(typeof window.psaTieneCredenciales==='function'&&!window.psaTieneCredenciales())return;
-  setTimeout(()=>syncMissingPSAPeriods({user:false}),180);
+  setTimeout(async()=>{
+    await syncMissingPSAPeriods({user:false,deferCloud:true});
+    if(navigator.onLine&&cloudReady()&&getSession()&&!H.syncing)await syncAll(false);
+    await syncArchivedPSAYears();
+  },180);
 }
 
 function normalizeHistTab(tab){
@@ -536,26 +591,23 @@ function simpleSyncCard(){
   return `<button type="button" class="hs-auto-compact ${busy?'working':missing?'pending':'ready'}" data-hs-sync-view><i></i><span><b>${esc(title)}</b><small>${esc(detail)}</small></span><em>${esc(status)} ›</em></button>`;
 }
 function simpleHome(c){
-  const period=simpleSelectedPeriod(),current=currentHistoricalPeriod(),complete=!!period,scope=H.simpleScope==='personal'?'personal':'team',stats=period?simpleScopeStats(period,scope):{},picker=H.simplePicker?`<div class="hs-picker hs-motion-card"><div class="hs-picker-head"><h3>Elegí el cierre</h3><button type="button" data-hs-close-picker>Cerrar</button></div>${[current.year,current.year-1].map(year=>{const list=simpleAvailablePeriods().filter(item=>item.year===year);return `<section><h4>${year}</h4><div>${list.length?list.map(item=>`<button type="button" class="${item.id===H.simplePeriod?'selected':''}" data-hs-period="${item.id}">${MONTHS_H[item.month]}</button>`).join(''):'<p>APPI todavía está recuperando estos meses.</p>'}</div></section>`}).join('')}</div>`:'',alerts=period?Number(stats.pending>0)+Number((stats.people-stats.active)>0)+Number(period.summary&&period.summary.incomeNoPurchase>0):0;
+  const period=simpleSelectedPeriod(),current=currentHistoricalPeriod(),complete=!!period,scope=H.simpleScope==='personal'?'personal':'team',stats=period?simpleScopeStats(period,scope):{},picker=H.simplePicker?`<div class="hs-picker hs-motion-card"><div class="hs-picker-head"><h3>Elegí el cierre</h3><button type="button" data-hs-close-picker>Cerrar</button></div>${[current.year,current.year-1].map(year=>{const list=simpleAvailablePeriods().filter(item=>item.year===year);return `<section><h4>${year}</h4><div>${list.length?list.map(item=>`<button type="button" class="${item.id===H.simplePeriod?'selected':''}" data-hs-period="${item.id}">${MONTHS_H[item.month]}</button>`).join(''):'<p>APPI todavía está recuperando estos meses.</p>'}</div></section>`}).join('')}</div>`:'',alerts=period?Number(stats.activity<100)+Number(period.summary&&period.summary.incomeNoPurchase>0):0;
   const cards='<div class="hs-empty">APPI está buscando los cierres disponibles en MI PSA.</div>';
   const personalCards=period?[
     simpleKpiCard({label:'PB personal',value:stats.pb==null?'—':`${fmt(stats.pb)} PB`,delta:simpleMetricDelta(period,scope,'pb',' PB'),view:'pb'}),
-    simpleKpiCard({label:'Actividad',value:stats.activity==null?'—':stats.activity?'Activa':'Sin actividad',delta:simpleMetricDelta(period,scope,'activity',' pp'),view:'pb'}),
-    simpleKpiCard({label:'Ingresos directos',value:fmt(stats.incomes),delta:simpleMetricDelta(period,scope,'incomes'),view:'ingresos'}),
-    simpleKpiCard({label:'Garantías pendientes',value:fmt(stats.pending),delta:simpleMetricDelta(period,scope,'pending','',true),view:'garantias'})
+    simpleKpiCard({label:'Actividad',value:stats.activity==null?'—':`${fmt(stats.activity)}%`,delta:simpleMetricDelta(period,scope,'activity','%'),view:'pb'}),
+    simpleKpiCard({label:'Ingresos directos',value:fmt(stats.incomes),delta:simpleMetricDelta(period,scope,'incomes'),view:'ingresos',wide:true})
   ].join(''):cards;
   const teamCards=period?[
     simpleKpiCard({label:'PB del equipo',value:`${fmt(stats.pb)} PB`,delta:simpleMetricDelta(period,scope,'pb',' PB'),view:'pb'}),
-    simpleKpiCard({label:'Actividad',value:`${fmt(stats.activity)}%`,delta:simpleMetricDelta(period,scope,'activity',' pp'),view:'pb'}),
-    simpleKpiCard({label:'Personas',value:fmt(stats.people),delta:simpleMetricDelta(period,scope,'people'),view:'pb'}),
-    simpleKpiCard({label:'Ingresos',value:fmt(stats.incomes),delta:simpleMetricDelta(period,scope,'incomes'),view:'ingresos'}),
-    simpleKpiCard({label:'Pendientes',value:fmt(stats.pending),delta:simpleMetricDelta(period,scope,'pending','',true),view:'garantias',wide:true})
+    simpleKpiCard({label:'Actividad',value:`${fmt(stats.activity)}%`,delta:simpleMetricDelta(period,scope,'activity','%'),view:'pb'}),
+    simpleKpiCard({label:'Ingresos',value:fmt(stats.incomes),delta:simpleMetricDelta(period,scope,'incomes'),view:'ingresos',wide:true})
   ].join(''):cards;
   c.innerHTML=`<section class="hs-home hs-v877">${simpleSyncCard()}<article class="hs-period-compact"><div><span>Cierre que estás viendo</span><b>${period?esc(period.label):`${MONTHS_H[current.month]} ${current.year}`}</b></div><button type="button" data-hs-picker>Cambiar</button></article>${picker}<article class="hs-summary-board hs-motion-card"><header><b>Resumen</b><span>${complete?'✓ Datos verificados':'Esperando datos'}</span></header><div class="hs-scope-switch"><button type="button" class="${scope==='personal'?'active':''}" data-hs-scope="personal">Personal</button><button type="button" class="${scope==='team'?'active':''}" data-hs-scope="team">Equipo</button></div><div class="hs-kpi-board">${scope==='personal'?personalCards:teamCards}</div></article>${period?`<button type="button" class="hs-compact-alert" data-hs-go="${alerts?'pb':'comparar'}"><i>${alerts?'!':'✓'}</i><span><b>${alerts?`${alerts} dato${alerts===1?'':'s'} requiere${alerts===1?'':'n'} atención`:'El cierre no presenta alertas principales'}</b><small>${alerts?'Ver el resumen sin mostrar distribuidores':'Comparar con meses anteriores'}</small></span><em>Ver ›</em></button>`:''}<div class="hs-main-actions"><button type="button" class="primary" data-hs-go="comparar"><i>↗</i><span><b>Comparar años y ver gráficas</b><small>${current.year} contra ${current.year-1}, mes por mes</small></span><em>›</em></button><button type="button" data-hs-go="archivos"><i>PDF</i><span><b>PDF de años anteriores</b><small>Un archivo por año, disponibles hasta 2020</small></span><em>›</em></button></div><button type="button" class="hs-manage-link" data-hs-manage>Administrar cierres y recuperación</button></section>`;
   bindSimpleCommon(c);c.querySelector('[data-hs-sync-view]')?.addEventListener('click',()=>simpleGo('sync'));c.querySelector('[data-hs-picker]')?.addEventListener('click',()=>{H.simplePicker=true;render()});c.querySelector('[data-hs-close-picker]')?.addEventListener('click',()=>{H.simplePicker=false;render()});c.querySelectorAll('[data-hs-period]').forEach(button=>button.onclick=()=>{H.simplePeriod=button.dataset.hsPeriod;H.simplePicker=false;render()});c.querySelectorAll('[data-hs-scope]').forEach(button=>button.onclick=()=>{H.simpleScope=button.dataset.hsScope;render()});c.querySelector('[data-hs-manage]')?.addEventListener('click',()=>simpleGo('manage'));
 }
 function simpleSummary(period,type){
-  const s=period.summary||{},personal=simpleScopeStats(period,'personal'),team=simpleScopeStats(period,'team');if(type==='pb')return `<div class="hs-summary hs-summary-aggregate"><div><span>PB personal</span><b>${personal.pb==null?'—':`${fmt(personal.pb)} PB`}</b><small>Producción del titular</small></div><div><span>PB del equipo</span><b>${fmt(team.pb)} PB</b><small>Sin mostrar distribuidores</small></div><div><span>Personas activas</span><b>${team.active} de ${team.people}</b><small>${team.activity}% de actividad</small></div><div><span>PB total</span><b>${fmt(num(personal.pb)+num(team.pb))} PB</b><small>Personal + equipo</small></div></div>`;
+  const s=period.summary||{},personal=simpleScopeStats(period,'personal'),team=simpleScopeStats(period,'team');if(type==='pb')return `<div class="hs-summary hs-summary-aggregate"><div><span>PB personal</span><b>${personal.pb==null?'—':`${fmt(personal.pb)} PB`}</b><small>Producción del titular</small></div><div><span>PB del equipo</span><b>${fmt(team.pb)} PB</b><small>Sin mostrar distribuidores</small></div><div><span>Actividad del equipo</span><b>${fmt(team.activity)}%</b><small>Porcentaje de actividad</small></div><div><span>PB total</span><b>${fmt(num(personal.pb)+num(team.pb))} PB</b><small>Personal + equipo</small></div></div>`;
   if(type==='ingresos')return `<div class="hs-summary hs-summary-aggregate"><div><span>Ingresos directos</span><b>${personal.incomes}</b><small>Patrocinados por el titular</small></div><div><span>Ingresos del equipo</span><b>${team.incomes}</b><small>Durante ${MONTHS_H[period.month]}</small></div><div class="wide"><span>Sin compra posterior</span><b>${s.incomeNoPurchase}</b><small>Requieren seguimiento</small></div></div>`;
   return `<div class="hs-summary hs-summary-aggregate"><div><span>Pendientes personales</span><b>${fmt(personal.pending)}</b><small>Del titular</small></div><div><span>Pendientes del equipo</span><b>${fmt(team.pending)}</b><small>Sin mostrar distribuidores</small></div><div><span>Presentadas por el equipo</span><b>${fmt(team.presented)}</b><small>Total del cierre</small></div><div><span>Vencidas</span><b>${fmt(team.expired)}</b><small>Requieren revisión</small></div></div>`;
 }
@@ -570,22 +622,22 @@ function simpleDataset(c,type){
   c.innerHTML=`${simpleBackHeader(titles[type])}<section class="hs-detail hs-v877">${simpleMonthBar(period)}<h2>Resumen del informe</h2>${simpleSummary(period,type)}${visible?`<div class="hs-private-open"><b>Detalle individual abierto</b><span>Esta información estaba oculta en el resumen.</span></div><h2>${detailTitle}</h2><label class="hs-search"><span>Buscar por nombre o DIP</span><input value="${esc(H.simpleSearch)}" placeholder="Escribí un nombre…"></label><div class="hs-people">${rows||'<div class="hs-empty">Este informe no tiene personas para mostrar.</div>'}</div><button type="button" class="hs-primary hs-secondary-action" data-hs-hide-people>Ocultar distribuidores y volver</button>`:`<div class="hs-private-note"><b>Información individual oculta</b><span>Los nombres y DIP aparecen únicamente si elegís verlos.</span></div><button type="button" class="hs-primary" data-hs-show-people>${showLabel}</button>`}<button type="button" class="hs-primary hs-secondary-action" data-hs-go="home">Volver al resumen</button></section>`;bindSimpleCommon(c);c.querySelector('[data-hs-show-people]')?.addEventListener('click',()=>{H.simplePeopleVisible=true;render()});c.querySelector('[data-hs-hide-people]')?.addEventListener('click',()=>{H.simplePeopleVisible=false;H.simpleSearch='';render()});const input=c.querySelector('.hs-search input');if(input)input.oninput=()=>{H.simpleSearch=input.value;const q=normalize(input.value);c.querySelectorAll('[data-hs-name]').forEach(card=>card.hidden=!card.dataset.hsName.includes(q))};
 }
 function simpleSyncView(c){
-  const expected=expectedHistoricalPeriodIds(),current=currentHistoricalPeriod(),saved=new Set(H.periods.map(period=>period.id)),years=[current.year,current.year-1],blocks=years.map(year=>{const ids=expected.filter(id=>Number(id.slice(0,4))===year),ready=ids.filter(id=>saved.has(id)).length;return `<article class="hs-sync-year"><header><h3>${year}</h3><span>${ready} de ${ids.length} listos</span></header><div>${ids.map(id=>{const month=Number(id.slice(5))-1,active=H.autoQueueCurrent===id,done=saved.has(id),failed=H.autoQueueErrors.some(item=>item.id===id);return `<div class="hs-sync-month ${done?'done':active?'working':failed?'error':'pending'}"><b>${SHORT_H[month]}</b><small>${done?'✓ Listo':active?'Descargando…':failed?'Se reintentará':'Pendiente'}</small></div>`}).join('')}</div></article>`}).join(''),errorCard=H.autoQueueErrors.length?`<article class="hs-sync-errors"><h3>La última recuperación no terminó</h3>${H.autoQueueErrors.slice(-3).map(item=>`<p><b>${esc(item.id)}:</b> ${esc(item.message)}</p>`).join('')}<small>Podés volver a intentar con el botón de abajo.</small></article>`:'';
-  c.innerHTML=`${simpleBackHeader('Actualización')}<section class="hs-detail hs-v877"><div class="hs-sync-intro"><h2>APPI completa lo que falta</h2><p>Los meses del año vigente y del anterior se descargan automáticamente desde MI PSA, uno por uno.</p><div><b>${expected.filter(id=>saved.has(id)).length}/${expected.length}</b><span>cierres listos</span></div></div>${errorCard}${blocks}<button type="button" class="hs-primary" data-hs-sync-all>${H.autoBackfilling?'Actualizando meses…':'Completar meses faltantes ahora'}</button><div class="hs-private-note"><b>Recuperación manual</b><span>Queda disponible solamente si MI PSA no puede entregar un archivo.</span></div><button type="button" class="hs-primary hs-secondary-action" data-hs-manage>Administrar recuperación</button></section>`;bindSimpleCommon(c);const sync=c.querySelector('[data-hs-sync-all]');if(sync){sync.disabled=H.autoBackfilling;sync.onclick=()=>syncMissingPSAPeriods({user:true})}c.querySelector('[data-hs-manage]')?.addEventListener('click',()=>simpleGo('manage'));
+  const expected=expectedHistoricalPeriodIds(),current=currentHistoricalPeriod(),saved=new Set(H.periods.map(period=>period.id)),years=[current.year,current.year-1],blocks=years.map(year=>{const ids=expected.filter(id=>Number(id.slice(0,4))===year),ready=ids.filter(id=>saved.has(id)).length;return `<article class="hs-sync-year"><header><h3>${year}</h3><span>${ready} de ${ids.length} listos</span></header><div>${ids.map(id=>{const month=Number(id.slice(5))-1,active=H.autoQueueCurrent===id,done=saved.has(id),failed=H.autoQueueErrors.some(item=>item.id===id);return `<div class="hs-sync-month ${done?'done':active?'working':failed?'error':'pending'}"><b>${SHORT_H[month]}</b><small>${done?'✓ Listo':active?'Descargando…':failed?'Se reintentará':'Pendiente'}</small></div>`}).join('')}</div></article>`}).join(''),errorCard=H.autoQueueErrors.length?`<article class="hs-sync-errors"><h3>La última recuperación no terminó</h3>${H.autoQueueErrors.slice(-3).map(item=>`<p><b>${esc(item.id)}:</b> ${esc(item.message)}</p>`).join('')}<small>APPI volverá a intentarlo automáticamente, sin que tengas que hacer nada.</small></article>`:'';
+  c.innerHTML=`${simpleBackHeader('Actualización automática')}<section class="hs-detail hs-v877"><div class="hs-sync-intro"><h2>APPI completa lo que falta</h2><p>Los meses del año vigente y del anterior se descargan automáticamente desde MI PSA, uno por uno.</p><div><b>${expected.filter(id=>saved.has(id)).length}/${expected.length}</b><span>cierres listos</span></div></div>${errorCard}${blocks}<div class="hs-private-note"><b>Recuperación automática</b><span>Podés salir de esta pantalla: APPI seguirá trabajando y reintentará lo que falte.</span></div><button type="button" class="hs-primary hs-secondary-action" data-hs-manage>Administrar recuperación</button></section>`;bindSimpleCommon(c);c.querySelector('[data-hs-manage]')?.addEventListener('click',()=>simpleGo('manage'));
 }
-const SIMPLE_GRAPH={pb:{label:'PB del equipo',hint:'Evolución mensual en PB',suffix:' PB',value:p=>simpleScopeStats(p,'team').pb},actividad:{label:'Actividad',hint:'Porcentaje de personas activas',suffix:'%',value:p=>simpleScopeStats(p,'team').activity},pendientes:{label:'Pendientes',hint:'Garantías pendientes entre cierres',suffix:'',value:p=>simpleScopeStats(p,'team').pending},ingresos:{label:'Ingresos',hint:'Cantidad de ingresos por cierre',suffix:'',value:p=>simpleScopeStats(p,'team').incomes},personas:{label:'Personas',hint:'Tamaño del equipo en cada cierre',suffix:'',value:p=>simpleScopeStats(p,'team').people}};
+const SIMPLE_GRAPH={pb:{label:'PB del equipo',hint:'Evolución mensual en PB',suffix:' PB',value:p=>simpleScopeStats(p,'team').pb},actividad:{label:'Actividad',hint:'Porcentaje de personas activas',suffix:'%',value:p=>simpleScopeStats(p,'team').activity},ingresos:{label:'Ingresos',hint:'Cantidad de ingresos por cierre',suffix:'',value:p=>simpleScopeStats(p,'team').incomes}};
 const SIMPLE_METRICS=SIMPLE_GRAPH;
 function simpleGraphValues(year,metric){const def=SIMPLE_GRAPH[metric],map=new Map(H.periods.filter(p=>p.year===year).map(p=>[p.month,def.value(p)]));return Array.from({length:12},(_,month)=>map.has(month)?map.get(month):null)}
 function simpleDualChart(year,metric){
-  const def=SIMPLE_GRAPH[metric],a=simpleGraphValues(year,metric),b=simpleGraphValues(year-1,metric),values=[...a,...b].filter(v=>v!=null);if(!values.length)return '<div class="hs-empty">Todavía no hay datos para graficar.</div>';const minRaw=Math.min(...values),maxRaw=Math.max(...values),range=Math.max(1,maxRaw-minRaw),min=Math.max(0,minRaw-range*.24),max=maxRaw+range*.22,left=42,right=378,top=29,bottom=218,w=right-left,h=bottom-top,x=i=>left+i*w/11,y=v=>top+(max-v)/(max-min)*h,groups=list=>{const out=[];let group=[];list.forEach((v,i)=>{if(v==null){if(group.length)out.push(group);group=[]}else group.push({i,v})});if(group.length)out.push(group);return out},lineMarkup=(list,cls)=>groups(list).map(group=>`<polyline class="${cls}" points="${group.map(point=>`${x(point.i).toFixed(1)},${y(point.v).toFixed(1)}`).join(' ')}"/>`).join(''),areas=groups(a).filter(group=>group.length>1).map(group=>`<path class="current-area" d="M ${x(group[0].i)} ${bottom} L ${group.map(point=>`${x(point.i)} ${y(point.v)}`).join(' L ')} L ${x(group[group.length-1].i)} ${bottom} Z"/>`).join('');let grid='';for(let i=0;i<4;i++){const py=top+i*h/3,val=max-i*(max-min)/3;grid+=`<line x1="${left}" y1="${py}" x2="${right}" y2="${py}"/><text x="2" y="${py+4}">${Math.round(val)}${def.suffix==='%'?'%':''}</text>`}const labels=SHORT_H.map((m,i)=>i%2===0||i===11?`<text x="${x(i)}" y="246" text-anchor="middle">${m}</text>`:'').join(''),previousPoints=b.map((v,i)=>v==null?'':`<circle class="previous-point" cx="${x(i)}" cy="${y(v)}" r="4"/>`).join(''),currentPoints=a.map((v,i)=>{if(v==null)return '';const show=i%2===0||i===a.map((value,index)=>value==null?-1:index).filter(index=>index>=0).pop(),label=fmt(v),bw=Math.max(25,label.length*6+8);return `<circle class="current-point" cx="${x(i)}" cy="${y(v)}" r="4"/>${show?`<g class="value-bubble"><rect x="${x(i)-bw/2}" y="${Math.max(3,y(v)-27)}" width="${bw}" height="18" rx="6"/><text x="${x(i)}" y="${Math.max(16,y(v)-14)}" text-anchor="middle">${label}</text></g>`:''}`}).join(''),common=a.map((value,index)=>value!=null&&b[index]!=null?index:-1).filter(index=>index>=0),last=common[common.length-1],diff=last==null?null:a[last]-b[last];return `<div class="hs-chart"><div class="legend"><span><i></i>${year}</span><span><i></i>${year-1}</span></div><div class="hs-chart-canvas"><svg viewBox="0 0 390 270"><defs><linearGradient id="hsAreaGradient" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3ad0a4" stop-opacity=".34"/><stop offset="1" stop-color="#3ad0a4" stop-opacity=".03"/></linearGradient></defs><g class="grid">${grid}${labels}</g>${areas}<g class="previous">${lineMarkup(b,'hist-chart-line')}</g><g class="current">${lineMarkup(a,'hist-chart-line')}</g>${previousPoints}${currentPoints}</svg></div>${last==null?'':`<p><b>Lectura sencilla:</b> en ${MONTHS_H[last].toLowerCase()} de ${year} el valor es ${fmt(Math.abs(diff))}${def.suffix} ${diff>=0?'mayor':'menor'} que en ${year-1}.</p>`}</div>`}
+  const def=SIMPLE_GRAPH[metric],a=simpleGraphValues(year,metric),b=simpleGraphValues(year-1,metric),values=[...a,...b].filter(v=>v!=null);if(!values.length)return '<div class="hs-empty">Todavía no hay datos para graficar.</div>';const minRaw=Math.min(...values),maxRaw=Math.max(...values),range=Math.max(1,maxRaw-minRaw),min=Math.max(0,minRaw-range*.24),max=maxRaw+range*.22,left=42,right=378,top=29,bottom=218,w=right-left,h=bottom-top,x=i=>left+i*w/11,y=v=>top+(max-v)/(max-min)*h,groups=list=>{const out=[];let group=[];list.forEach((v,i)=>{if(v==null){if(group.length)out.push(group);group=[]}else group.push({i,v})});if(group.length)out.push(group);return out},lineMarkup=(list,cls)=>groups(list).map(group=>`<polyline class="${cls}" points="${group.map(point=>`${x(point.i).toFixed(1)},${y(point.v).toFixed(1)}`).join(' ')}"/>`).join(''),areas=groups(a).filter(group=>group.length>1).map(group=>`<path class="current-area" d="M ${x(group[0].i)} ${bottom} L ${group.map(point=>`${x(point.i)} ${y(point.v)}`).join(' L ')} L ${x(group[group.length-1].i)} ${bottom} Z"/>`).join('');let grid='';for(let i=0;i<4;i++){const py=top+i*h/3,val=max-i*(max-min)/3;grid+=`<line x1="${left}" y1="${py}" x2="${right}" y2="${py}"/><text x="2" y="${py+4}">${Math.round(val)}${def.suffix==='%'?'%':''}</text>`}const labels=SHORT_H.map((m,i)=>i%2===0||i===11?`<text x="${x(i)}" y="246" text-anchor="middle">${m}</text>`:'').join(''),previousPoints=b.map((v,i)=>v==null?'':`<circle class="previous-point" cx="${x(i)}" cy="${y(v)}" r="4"/>`).join(''),currentPoints=a.map((v,i)=>{if(v==null)return '';const show=i%2===0||i===a.map((value,index)=>value==null?-1:index).filter(index=>index>=0).pop(),label=`${fmt(v)}${def.suffix}`,bw=Math.max(25,label.length*6+8);return `<circle class="current-point" cx="${x(i)}" cy="${y(v)}" r="4"/>${show?`<g class="value-bubble"><rect x="${x(i)-bw/2}" y="${Math.max(3,y(v)-27)}" width="${bw}" height="18" rx="6"/><text x="${x(i)}" y="${Math.max(16,y(v)-14)}" text-anchor="middle">${label}</text></g>`:''}`}).join(''),common=a.map((value,index)=>value!=null&&b[index]!=null?index:-1).filter(index=>index>=0),last=common[common.length-1],diff=last==null?null:a[last]-b[last];return `<div class="hs-chart"><div class="legend"><span><i></i>${year}</span><span><i></i>${year-1}</span></div><div class="hs-chart-canvas"><svg viewBox="0 0 390 270"><defs><linearGradient id="hsAreaGradient" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3ad0a4" stop-opacity=".34"/><stop offset="1" stop-color="#3ad0a4" stop-opacity=".03"/></linearGradient></defs><g class="grid">${grid}${labels}</g>${areas}<g class="previous">${lineMarkup(b,'hist-chart-line')}</g><g class="current">${lineMarkup(a,'hist-chart-line')}</g>${previousPoints}${currentPoints}</svg></div>${last==null?'':`<p><b>Lectura sencilla:</b> en ${MONTHS_H[last].toLowerCase()} de ${year} el valor es ${fmt(Math.abs(diff))}${def.suffix} ${diff>=0?'mayor':'menor'} que en ${year-1}.</p>`}</div>`}
 function simpleCompare(c){
-  const current=currentHistoricalPeriod().year,metric=SIMPLE_GRAPH[H.simpleCompareMetric]?H.simpleCompareMetric:'pb',def=SIMPLE_GRAPH[metric],view=H.simpleCompareView==='chart'?'chart':'table',a=simpleGraphValues(current,metric),b=simpleGraphValues(current-1,metric),common=a.map((value,index)=>value!=null&&b[index]!=null?index:-1).filter(index=>index>=0),sumA=common.reduce((sum,index)=>sum+a[index],0),sumB=common.reduce((sum,index)=>sum+b[index],0),rows=Array.from({length:12},(_,month)=>{const av=a[month],bv=b[month],diff=av!=null&&bv!=null?av-bv:null;return `<tr><th>${SHORT_H[month]}</th><td>${av==null?'—':fmt(av)}</td><td>${bv==null?'—':fmt(bv)}</td><td class="${diff==null?'neutral':diff>=0?'up':'down'}">${diff==null?'—':`${diff>0?'+':''}${fmt(diff)}`}</td></tr>`}).join('');
-  c.innerHTML=`${simpleBackHeader('Comparar años')}<section class="hs-detail hs-v877"><div class="hs-info hs-compare-intro"><h2>${current} contra ${current-1}</h2><p>Planilla y gráfica en el mismo lugar, sin mostrar distribuidores.</p></div><div class="hs-view-switch"><button type="button" class="${view==='table'?'active':''}" data-hs-compare-view="table">Planilla</button><button type="button" class="${view==='chart'?'active':''}" data-hs-compare-view="chart">Gráfica</button></div><div class="hs-metric-picker graphs">${Object.entries(SIMPLE_GRAPH).map(([key,item])=>`<button type="button" class="${key===metric?'active':''}" data-hs-compare="${key}" data-hs-graph="${key}">${esc(item.label)}</button>`).join('')}</div>${view==='table'?`<div class="hs-compare-card"><header><h3>${esc(def.label)}</h3><p>${esc(def.hint)}</p></header><table><thead><tr><th>Mes</th><th>${current}</th><th>${current-1}</th><th>Diferencia</th></tr></thead><tbody>${rows}</tbody><tfoot><tr><th>Total*</th><td>${fmt(sumA)}</td><td>${fmt(sumB)}</td><td>${sumA-sumB>0?'+':''}${fmt(sumA-sumB)}</td></tr></tfoot></table></div><p class="hs-compare-help"><b>* Comparación justa:</b> el total usa solamente los meses disponibles en ambos años.</p>`:`<div class="hs-chart-card"><header><div><h3>${esc(def.label)}</h3><p>${esc(def.hint)}</p></div><b>${[...a].reverse().find(value=>value!=null)==null?'—':`${fmt([...a].reverse().find(value=>value!=null))}${def.suffix}`}</b></header>${simpleDualChart(current,metric)}</div>`}<button type="button" class="hs-primary hs-secondary-action" data-hs-go="home">Volver al resumen</button></section>`;bindSimpleCommon(c);c.querySelectorAll('[data-hs-compare]').forEach(button=>button.onclick=()=>{H.simpleCompareMetric=button.dataset.hsCompare;H.simpleGraphMetric=button.dataset.hsCompare;render()});c.querySelectorAll('[data-hs-compare-view]').forEach(button=>button.onclick=()=>{H.simpleCompareView=button.dataset.hsCompareView;render()});
+  const current=currentHistoricalPeriod().year,metric=SIMPLE_GRAPH[H.simpleCompareMetric]?H.simpleCompareMetric:'pb',def=SIMPLE_GRAPH[metric],view=H.simpleCompareView==='chart'?'chart':'table',a=simpleGraphValues(current,metric),b=simpleGraphValues(current-1,metric),common=a.map((value,index)=>value!=null&&b[index]!=null?index:-1).filter(index=>index>=0),rawA=common.reduce((sum,index)=>sum+a[index],0),rawB=common.reduce((sum,index)=>sum+b[index],0),isAverage=metric==='actividad',sumA=isAverage&&common.length?rawA/common.length:rawA,sumB=isAverage&&common.length?rawB/common.length:rawB,show=value=>`${fmt(value)}${def.suffix}`,rows=Array.from({length:12},(_,month)=>{const av=a[month],bv=b[month],diff=av!=null&&bv!=null?av-bv:null;return `<tr><th>${SHORT_H[month]}</th><td>${av==null?'—':show(av)}</td><td>${bv==null?'—':show(bv)}</td><td class="${diff==null?'neutral':diff>=0?'up':'down'}">${diff==null?'—':`${diff>0?'+':''}${show(diff)}`}</td></tr>`}).join('');
+  c.innerHTML=`${simpleBackHeader('Comparar años')}<section class="hs-detail hs-v877"><div class="hs-info hs-compare-intro"><h2>${current} contra ${current-1}</h2><p>Planilla y gráfica en el mismo lugar, sin mostrar distribuidores.</p></div><div class="hs-view-switch"><button type="button" class="${view==='table'?'active':''}" data-hs-compare-view="table">Planilla</button><button type="button" class="${view==='chart'?'active':''}" data-hs-compare-view="chart">Gráfica</button></div><div class="hs-metric-picker graphs">${Object.entries(SIMPLE_GRAPH).map(([key,item])=>`<button type="button" class="${key===metric?'active':''}" data-hs-compare="${key}" data-hs-graph="${key}">${esc(item.label)}</button>`).join('')}</div>${view==='table'?`<div class="hs-compare-card"><header><h3>${esc(def.label)}</h3><p>${esc(def.hint)}</p></header><table><thead><tr><th>Mes</th><th>${current}</th><th>${current-1}</th><th>Diferencia</th></tr></thead><tbody>${rows}</tbody><tfoot><tr><th>${isAverage?'Promedio*':'Total*'}</th><td>${show(sumA)}</td><td>${show(sumB)}</td><td>${sumA-sumB>0?'+':''}${show(sumA-sumB)}</td></tr></tfoot></table></div><p class="hs-compare-help"><b>* Comparación justa:</b> ${isAverage?'el promedio':'el total'} usa solamente los meses disponibles en ambos años.</p>`:`<div class="hs-chart-card"><header><div><h3>${esc(def.label)}</h3><p>${esc(def.hint)}</p></div><b>${[...a].reverse().find(value=>value!=null)==null?'—':`${fmt([...a].reverse().find(value=>value!=null))}${def.suffix}`}</b></header>${simpleDualChart(current,metric)}</div>`}<button type="button" class="hs-primary hs-secondary-action" data-hs-go="home">Volver al resumen</button></section>`;bindSimpleCommon(c);c.querySelectorAll('[data-hs-compare]').forEach(button=>button.onclick=()=>{H.simpleCompareMetric=button.dataset.hsCompare;H.simpleGraphMetric=button.dataset.hsCompare;render()});c.querySelectorAll('[data-hs-compare-view]').forEach(button=>button.onclick=()=>{H.simpleCompareView=button.dataset.hsCompareView;render()});
 }
 function simpleGraphs(c){H.simpleCompareView='chart';if(SIMPLE_GRAPH[H.simpleGraphMetric])H.simpleCompareMetric=H.simpleGraphMetric;simpleCompare(c)}
 function simpleArchives(c){
-  const current=currentHistoricalPeriod().year,archives=H.archives.filter(item=>item.year>=2020&&item.year<current-1).sort((a,b)=>b.year-a.year),rows=archives.map(item=>`<article class="hs-archive-row"><i>PDF</i><div><header><h3>Resumen anual ${item.year}</h3><span>✓ Nube</span></header><p>${item.months||0} cierres resumidos · ${humanBytes(item.size||0)}</p><button type="button" data-hist-archive="${item.year}">Descargar PDF ${item.year}</button></div></article>`).join('');
-  c.innerHTML=`${simpleBackHeader('Años anteriores')}<section class="hs-detail"><div class="hs-info"><h2>PDF desde ${current-2} hasta 2020</h2><p>Cada año está guardado en un único PDF verificado en la nube.</p></div><div class="hs-archive-list">${rows||'<div class="hs-empty">Los PDF aparecerán acá cuando existan cierres de años anteriores.</div>'}</div><button type="button" class="hs-primary" data-hs-go="home">Volver al resumen</button></section>`;bindSimpleCommon(c);bindArchiveLibrary(c);
+  const current=currentHistoricalPeriod().year,years=expectedArchivedYears(),archives=new Map(H.archives.filter(item=>item.year>=2020&&item.year<current-1).map(item=>[item.year,item])),rows=years.map(year=>{const item=archives.get(year);if(item)return `<article class="hs-archive-row ready"><i>PDF</i><div><header><h3>Resumen anual ${year}</h3><span>✓ Listo en la nube</span></header><p>${item.months||12} cierres resumidos en un único archivo</p><button type="button" data-hist-archive="${year}">Descargar PDF ${year}</button></div></article>`;const ready=H.periods.filter(period=>period.year===year).length,working=H.archiveBackfilling&&H.archiveQueueYear===year,currentMonth=working&&H.archiveQueueCurrent?MONTHS_H[Number(H.archiveQueueCurrent.slice(5))-1]:'';return `<article class="hs-archive-row pending"><i>PDF</i><div><header><h3>Resumen anual ${year}</h3><span>${working?'Preparando…':'Automático'}</span></header><p>${working&&currentMonth?`Recuperando ${currentMonth} · ${ready} de 12 meses listos`:ready?`${ready} de 12 meses recuperados · APPI continuará automáticamente`:'APPI recuperará los cierres y preparará este PDF automáticamente'}</p></div></article>`}).join('');
+  c.innerHTML=`${simpleBackHeader('Años anteriores')}<section class="hs-detail"><div class="hs-info"><h2>PDF desde ${current-2} hasta 2020</h2><p>APPI prepara cada año automáticamente y lo muestra cuando el PDF queda verificado en la nube.</p></div><div class="hs-archive-list">${rows}</div><button type="button" class="hs-primary" data-hs-go="home">Volver al resumen</button></section>`;bindSimpleCommon(c);bindArchiveLibrary(c);
 }
 function bindSimpleCommon(root){root.querySelectorAll('[data-hs-go]').forEach(button=>button.onclick=()=>simpleGo(button.dataset.hsGo));root.querySelectorAll('[data-hs-help]').forEach(button=>button.onclick=showHelp)}
 function renderSimpleHistorico(c){
@@ -1355,11 +1407,14 @@ async function deleteLocalYear(periods){
   H.selected=new Set([...H.selected].filter(id=>!ids.has(id)));await refreshData();
 }
 async function archiveOldYearsInCloud(){
-  if(H.archiving||!cloudReady()||!getSession())return 0;const limit=currentHistoricalPeriod().year-1,years=[...new Set(H.periods.filter(period=>period.year<limit).map(period=>period.year))].sort((a,b)=>a-b);if(!years.length)return 0;
+  if(H.archiving||!cloudReady()||!getSession())return 0;const limit=currentHistoricalPeriod().year-1,years=[...new Set(H.periods.filter(period=>period.year>=2020&&period.year<limit).map(period=>period.year))].sort((a,b)=>a-b);if(!years.length)return 0;
   H.archiving=true;let archived=0;
   try{for(const year of years){
-    const periods=H.periods.filter(period=>period.year===year).sort((a,b)=>a.id.localeCompare(b.id));if(!periods.length)continue;logSync(`Creando PDF resumido ${year}`);
-    let archive=H.archives.find(item=>item.year===year);if(!archive||archive.cloudStatus!=='synced'){
+    const periods=H.periods.filter(period=>period.year===year).sort((a,b)=>a.id.localeCompare(b.id));if(!periods.length)continue;
+    let archive=H.archives.find(item=>item.year===year);
+    if((!archive||archive.cloudStatus!=='synced')&&periods.length!==12){logSync(`${year} todavía no se archiva: ${periods.length} de 12 meses recuperados`);continue}
+    logSync(`Creando PDF resumido ${year}`);
+    if(!archive||archive.cloudStatus!=='synced'){
       const built=archive&&archive.blob?archive:await createAnnualPdf(year,'blob');if(!built)throw new Error(`No se pudo generar el PDF ${year}.`);archive=await uploadArchiveToCloud({...built,year,months:periods.length,size:built.blob.size,cloudStatus:'synced'});
     }else{try{archive=await cloudDownloadArchive(year)}catch(error){if(archive.blob)archive=await uploadArchiveToCloud({...archive,year,months:periods.length,size:archive.blob.size});else throw error}if(!archive||!archive.blob||!archive.blob.size)throw new Error(`No se pudo verificar el PDF ${year} en la nube. Los originales se conservaron.`)}
     await deleteCloudYear(periods);await deleteLocalYear(periods);archived++;logSync(`${year} archivado en un único PDF`);
@@ -1409,7 +1464,7 @@ function renderCloud(c){
 }
 
 function showHelp(){
-  const html=`<p>Histórico empieza con un resumen simple de tu información personal o la de tu equipo.</p><div class="tip"><b>Distribuidores ocultos:</b><br>Primero ves sólo los totales. Los nombres y DIP aparecen únicamente cuando elegís “Ver distribuidores”.</div><div class="tip"><b>Comparación:</b><br>Planilla y gráfica están juntas. Podés comparar PB, actividad, pendientes, ingresos y personas entre el año vigente y el anterior.</div><div class="tip"><b>Actualización automática:</b><br>APPI detecta los meses faltantes de ambos años y los recupera desde MI PSA, uno por uno. La carga manual queda sólo como respaldo.</div><div class="tip"><b>PDF anuales:</b><br>Los años anteriores, hasta 2020, quedan disponibles como un PDF separado y verificado en la nube.</div><p>Antes de guardar cada cierre APPI verifica titular, período, DIPs e integridad para no mezclar meses.</p>`;
+  const html=`<p>Histórico empieza con un resumen simple de tu información personal o la de tu equipo.</p><div class="tip"><b>Distribuidores ocultos:</b><br>Primero ves sólo los totales. Los nombres y DIP aparecen únicamente cuando elegís “Ver distribuidores”.</div><div class="tip"><b>Comparación:</b><br>Planilla y gráfica están juntas. Podés comparar PB, Actividad e Ingresos entre el año vigente y el anterior. Actividad siempre se muestra como porcentaje.</div><div class="tip"><b>Actualización automática:</b><br>APPI detecta los meses faltantes y los recupera desde MI PSA, uno por uno, sin botones ni pasos adicionales. La carga manual queda sólo como respaldo.</div><div class="tip"><b>PDF anuales:</b><br>APPI recupera y resume automáticamente los años anteriores. Desde 2024 hasta 2020, cada año queda disponible como un PDF separado y verificado en la nube.</div><p>Antes de guardar cada cierre APPI verifica titular, período, DIPs e integridad para no mezclar meses.</p>`;
   try{modal.open({icon:'📈',iconBg:'linear-gradient(135deg,#0b5878,#3ad0a4)',title:'Cómo usar el Histórico',sub:'Control mensual y anual',html})}catch(e){window.APPIDialog.alert('APPI actualiza los cierres desde MI PSA y conserva la carga manual sólo como respaldo.',{title:'Cómo usar el Histórico',icon:'📈'})}
 }
 async function openHistorico(){
@@ -1440,7 +1495,7 @@ async function initHistorico(){
 }
 window.openHistorico=openHistorico;
 window.initHistoricoAPPI=initHistorico;
-window.__APPI_HISTORICO__={state:H,open:openHistorico,refresh:refreshData,parseFile:parseHistoricalFile,parseIngresosRows,saveMonth:saveMonthPeriod,importPSAResponse:importPSAHistoricalResponse,syncPSAPeriod:syncHistoricalPeriod,syncMissingPSAPeriods,expectedHistoricalPeriodIds,missingHistoricalPeriodIds,simpleScopeStats,analyze:analyzePeriods,strategies:buildStrategies,buildStrategies,affectedForStrategy,reconcileActionPlans,notifyActionDueOnce,openActionCenter,renderActionSummary:actionCenterSummaryHtml,strategyHtml,dbGetAll,annualMatrix,albumMonthStats,ensureAlbumMonth,renderAlbumReadout,renderAnnualSummary,renderCOPA,animateCharts:animateHistCharts,lineChart,navigablePeriods,createAnnualPdf,archiveOldYears:archiveOldYearsInCloud,syncAll,archiveLibraryHtml,downloadArchivePdf};
+window.__APPI_HISTORICO__={state:H,open:openHistorico,refresh:refreshData,parseFile:parseHistoricalFile,parseIngresosRows,saveMonth:saveMonthPeriod,importPSAResponse:importPSAHistoricalResponse,syncPSAPeriod:syncHistoricalPeriod,syncMissingPSAPeriods,syncArchivedPSAYears,expectedHistoricalPeriodIds,expectedArchivedYears,missingHistoricalPeriodIds,simpleScopeStats,analyze:analyzePeriods,strategies:buildStrategies,buildStrategies,affectedForStrategy,reconcileActionPlans,notifyActionDueOnce,openActionCenter,renderActionSummary:actionCenterSummaryHtml,strategyHtml,dbGetAll,annualMatrix,albumMonthStats,ensureAlbumMonth,renderAlbumReadout,renderAnnualSummary,renderCOPA,animateCharts:animateHistCharts,lineChart,navigablePeriods,createAnnualPdf,archiveOldYears:archiveOldYearsInCloud,syncAll,archiveLibraryHtml,downloadArchivePdf};
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initHistorico);else initHistorico();
 setTimeout(initHistorico,1200);
 

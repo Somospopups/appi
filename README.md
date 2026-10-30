@@ -6,6 +6,18 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v881 · Histórico automático, PDF anuales y precios conservados
+
+- Conserva la actualización **“precios: lista tienda PSA”** publicada en `4513612`, sin reemplazar ni retroceder sus archivos de catálogo, planes y precios.
+- Histórico completa automáticamente los meses del año vigente y del anterior; se eliminó el botón **Completar meses faltantes ahora**.
+- La vista principal y las comparaciones conservan únicamente **PB, Actividad e Ingresos**. Actividad muestra siempre el signo `%`, tanto en tarjetas como en planillas, gráficas y diferencias.
+- Los años 2024 a 2020 se recuperan automáticamente con las consultas directas de PSA 69, 34 y 71, sin exponer esos meses como cierres navegables.
+- Cada año antiguo se archiva únicamente cuando están disponibles sus 12 cierres: APPI crea un PDF anual, lo sube, vuelve a descargarlo y verifica su integridad antes de retirar las planillas mensuales.
+- La recuperación anual es reanudable: si se interrumpe, conserva lo ya recuperado, muestra el avance por año y vuelve a intentarlo automáticamente.
+- El listado muestra un renglón explícito por cada año hasta 2020 y habilita la descarga cuando el PDF quedó verificado en la nube.
+- El backend seguro publicado conserva el marcador `historico-directo-v879`; v881 reutiliza ese motor ya validado y cambia la automatización del cliente.
+- Versión: **v881 · Segura** → Cache `appi-v881-historico-y-precios`.
+
 ## v879 · Campus ordenado y despliegue seguro del Histórico
 
 - **Mi capacitación** ya no aparece en la portada de Mi negocio: se muestra al final de **Campus Appi**, después de todo el contenido del Campus.

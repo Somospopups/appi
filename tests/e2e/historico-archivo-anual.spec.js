@@ -138,14 +138,30 @@ test('sólo permite navegar e importar automáticamente el año actual y el ante
   expect(oldImport.message).toContain('año actual y el anterior');
 });
 
-test('verifica el PDF anual en la nube antes de retirar cierres y planillas', async ({ page }) => {
+test('no crea un PDF engañoso mientras el año antiguo esté incompleto', async ({ page }) => {
   const cloud = await abrirApp(page);
   await page.context().setOffline(true);
   await guardarCierreViejo(page, 0);
   await guardarCierreViejo(page, 1);
+  await page.context().setOffline(false);
+  await expect.poll(async () => page.evaluate(() => window.__APPI_HISTORICO__.state.syncing), { timeout: 15000 }).toBe(false);
+  const archived = await page.evaluate(() => window.__APPI_HISTORICO__.archiveOldYears());
+
+  expect(archived).toBe(0);
+  expect(await page.evaluate(() => window.__APPI_HISTORICO__.state.periods.filter(item => item.year === 2024).map(item => item.id))).toEqual(['2024-01', '2024-02']);
+  expect(await page.evaluate(() => window.__APPI_HISTORICO__.state.archives.map(item => item.year))).toEqual([]);
+  expect(cloud.cloudRows.has('archive__2024')).toBe(false);
+  expect(cloud.deletedRows).toEqual([]);
+  expect(cloud.deletedFiles).toEqual([]);
+});
+
+test('verifica el PDF anual en la nube antes de retirar cierres y planillas', async ({ page }) => {
+  const cloud = await abrirApp(page);
+  await page.context().setOffline(true);
+  for (let month = 0; month < 12; month++) await guardarCierreViejo(page, month);
 
   expect(await page.evaluate(() => window.__APPI_HISTORICO__.navigablePeriods().map(item => item.id))).toEqual([]);
-  expect(await page.evaluate(() => window.__APPI_HISTORICO__.state.periods.map(item => item.id))).toEqual(['2024-01', '2024-02']);
+  expect(await page.evaluate(() => window.__APPI_HISTORICO__.state.periods.map(item => item.id))).toEqual(Array.from({ length: 12 }, (_, month) => `2024-${String(month + 1).padStart(2, '0')}`));
 
   await page.context().setOffline(false);
   await expect.poll(async () => page.evaluate(() => ({
@@ -156,12 +172,11 @@ test('verifica el PDF anual en la nube antes de retirar cierres y planillas', as
 
   const archiveRow = cloud.cloudRows.get('archive__2024');
   expect(archiveRow.data.kind).toBe('annual-pdf');
-  expect(archiveRow.data.months).toBe(2);
+  expect(archiveRow.data.months).toBe(12);
   expect(archiveRow.data.hash).toMatch(/^[a-f0-9]{64}$/);
-  expect(cloud.cloudRows.has('2024-01')).toBe(false);
-  expect(cloud.cloudRows.has('2024-02')).toBe(false);
-  expect(cloud.deletedRows).toEqual(expect.arrayContaining(['2024-01', '2024-02']));
-  expect(cloud.deletedFiles).toHaveLength(6);
+  for (let month = 1; month <= 12; month++) expect(cloud.cloudRows.has(`2024-${String(month).padStart(2, '0')}`)).toBe(false);
+  expect(cloud.deletedRows).toHaveLength(12);
+  expect(cloud.deletedFiles).toHaveLength(36);
 
   const pdfEntry = [...cloud.storage.entries()].find(([path]) => path.includes('/archives/2024/'));
   expect(pdfEntry).toBeTruthy();
@@ -176,7 +191,58 @@ test('verifica el PDF anual en la nube antes de retirar cierres y planillas', as
   expect(download.suggestedFilename()).toBe('APPI-Resumen-Anual-2024.pdf');
 });
 
-test('la nueva pantalla legible muestra informes, planillas y las cinco gráficas sin desborde', async ({ page }) => {
+test('recupera automáticamente los 12 meses antiguos, crea el PDF, lo verifica y retira las planillas', async ({ page }) => {
+  const cloud = await abrirApp(page);
+  const result = await page.evaluate(async () => {
+    const api = window.__APPI_HISTORICO__, H = api.state;
+    H.archives = [2023, 2022, 2021, 2020].map(year => ({ year, cloudStatus: 'synced' }));
+    const calls = [];
+    window.psaTieneCredenciales = () => true;
+    window.psaSincronizarHistorico = async id => {
+      calls.push(id);
+      const year = id.slice(0, 4), month = Number(id.slice(5));
+      const names = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+      const label = names[month - 1];
+      return {
+        motor: 'historico-directo-v879', periodo: id, errores: [],
+        linea: { filas: [
+          ['DIP Nro : 02-9802014 Nombre y Apellido : MARÍA PÉREZ Socio : Sucursal : 02 Categoría : L País : Argentina'],
+          [`Período Consultado: ${label} - ${year}`],
+          ['', '', '', 'Nombre', 'Cat.', 'Teléfono', 'Estado', 'PB Mes Actual', '1°Mes Ant.', '2°Mes Ant.', '3°Mes Ant.', 'Alta', 'Cumpleaños', 'Correo electrónico'],
+          ['', '', '1', '[02-1000001] JUAN RAMA [AR-B]', 'D', '', 'C', String(10 + month), '0', '0', '0', '', '', ''],
+          ['', '', '1', '[02-1000002] ANA HOJA [AR-B]', 'DJ', '', 'C', '9', '0', '0', '0', '', '', ''],
+          ['', '', '1', '[02-1000003] LUIS QUIETO [AR-B]', 'D', '', 'C', '1', '0', '0', '0', '', '', '']
+        ] },
+        garantiasOrg: { filas: [['Nombre','DIP','Presentadas','Vencidas','%','Pendientes'],['JUAN','02-1000001','1','0','0','0']] },
+        ingresos: { filas: [[`Período Consultado ${label} - ${year}`], ['Total de 0 ingresos']], resumen: `Período Consultado ${label} - ${year} · Total de 0 ingresos` }
+      };
+    };
+    const sync = await api.syncArchivedPSAYears();
+    return {
+      status: sync.status,
+      calls,
+      archives: H.archives.map(item => ({ year: item.year, months: item.months, size: item.size })),
+      oldPeriods: H.periods.filter(item => item.year === 2024).map(item => item.id),
+      oldFiles: (await api.dbGetAll('files')).filter(item => item.periodId.startsWith('2024-')).length,
+      backfilling: H.archiveBackfilling
+    };
+  });
+
+  expect(result.status).toBe('complete');
+  expect(result.calls).toEqual(Array.from({ length: 12 }, (_, month) => `2024-${String(month + 1).padStart(2, '0')}`));
+  expect(result.archives).toEqual([expect.objectContaining({ year: 2024, months: 12 })]);
+  expect(result.archives[0].size).toBeGreaterThan(1000);
+  expect(result.oldPeriods).toEqual([]);
+  expect(result.oldFiles).toBe(0);
+  expect(result.backfilling).toBe(false);
+  expect(cloud.cloudRows.has('archive__2024')).toBe(true);
+  expect(cloud.deletedRows).toHaveLength(12);
+  expect(cloud.deletedFiles).toHaveLength(36);
+  const pdfEntry = [...cloud.storage.entries()].find(([path]) => path.includes('/archives/2024/'));
+  expect(pdfEntry && pdfEntry[1].subarray(0, 4).toString()).toBe('%PDF');
+});
+
+test('la pantalla legible deja sólo PB, Actividad e Ingresos, con porcentaje y sin desborde', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await abrirApp(page);
   await page.context().setOffline(true);
@@ -185,17 +251,20 @@ test('la nueva pantalla legible muestra informes, planillas y las cinco gráfica
     H.uploads[id]={id,year:2026,month:9,changed:true,files:{equipo:new File(['e'],'equipo.xlsx'),garantias:new File(['g'],'garantias.xlsx'),ingresos:new File(['i'],'ingresos.xlsx')},parsed:{equipo:{result:{titular,personas:[{id:1,codigo:titular.dip,nombre:titular.nombre,cat:'L',nivel:0,padreId:null,pnAct:50},{id:2,codigo:'02-1000001',nombre:'Juan Rama',cat:'D',nivel:1,padreId:1,pnAct:20}]}},garantias:{result:{garantiasMap:{'02-1000001':{presentadas:4,vencidas:1,porcVencidas:25,pendientes:2}}}},ingresos:{result:{ingresos:[{id:1,dip:'02-1000001',nombre:'Juan Rama',cat:'D',fechaAlta:'2026-10-02',ultimaCompra:'2026-10-08',patrocinanteNombre:titular.nombre,patrocinanteDip:titular.dip,capacitacion:1,diasHastaCompra:6,compraPosterior:true}],subtotales:[],totalReportado:1,periodo:id}}},status:{}};await api.saveMonth(id);
   }, TITULAR);
   await page.evaluate(() => window.__APPI_HISTORICO__.open());
-  await expect(page.locator('.hs-kpi-box')).toHaveCount(5);
+  await expect(page.locator('.hs-kpi-box')).toHaveCount(3);
   await expect(page.locator('.hs-main-actions > button')).toHaveCount(2);
-  await expect(page.locator('.hs-kpi-box').filter({ hasText: 'Personas' }).locator('b')).toHaveText('1');
-  await expect(page.locator('.hs-kpi-box').filter({ hasText: 'Pendientes' }).locator('b')).toHaveText('2');
+  await expect(page.locator('.hs-kpi-box').filter({ hasText: 'Actividad' }).locator('b')).toHaveText('100%');
+  await expect(page.getByText('Personas', { exact: true })).toHaveCount(0);
+  await expect(page.getByText('Pendientes', { exact: true })).toHaveCount(0);
+  await expect(page.getByText('Completar meses faltantes ahora')).toHaveCount(0);
   await expect(page.locator('.hs-person')).toHaveCount(0);
   await expect(page.getByText('Juan Rama')).toHaveCount(0);
   await page.locator('[data-hs-scope="personal"]').click();
-  await expect(page.locator('.hs-kpi-box')).toHaveCount(4);
+  await expect(page.locator('.hs-kpi-box')).toHaveCount(3);
   await expect(page.locator('.hs-kpi-box').filter({ hasText: 'PB personal' }).locator('b')).toHaveText('50 PB');
+  await expect(page.locator('.hs-kpi-box').filter({ hasText: 'Actividad' }).locator('b')).toHaveText('100%');
   await page.locator('[data-hs-scope="team"]').click();
-  await expect(page.locator('.hs-kpi-box')).toHaveCount(5);
+  await expect(page.locator('.hs-kpi-box')).toHaveCount(3);
 
   await page.locator('.hs-kpi-box[data-hs-go="pb"]').first().click();
   await expect(page.locator('.hs-summary-aggregate')).toBeVisible();
@@ -210,24 +279,27 @@ test('la nueva pantalla legible muestra informes, planillas y las cinco gráfica
 
   await page.locator('.hs-main-actions [data-hs-go="comparar"]').click();
   await expect(page.locator('.hs-compare-card tbody tr')).toHaveCount(12);
+  await page.locator('[data-hs-compare="actividad"]').click();
+  await expect(page.locator('.hs-compare-card tbody tr').nth(9).locator('td').nth(0)).toHaveText('100%');
   await page.locator('[data-hs-compare-view="chart"]').click();
-  await expect(page.locator('[data-hs-graph]')).toHaveCount(5);
+  await expect(page.locator('[data-hs-graph]')).toHaveCount(3);
   await expect(page.locator('.hs-chart svg')).toBeVisible();
+  await expect(page.locator('.hs-chart .value-bubble text').last()).toContainText('%');
   expect(await page.evaluate(() => document.documentElement.scrollWidth-document.documentElement.clientWidth)).toBeLessThanOrEqual(1);
 });
 
 test('si la nube no puede verificar el PDF conserva todos los originales', async ({ page }) => {
   const cloud = await abrirApp(page, { failArchiveVerification: true });
   await page.context().setOffline(true);
-  await guardarCierreViejo(page, 0);
+  for (let month = 0; month < 12; month++) await guardarCierreViejo(page, month);
   await page.context().setOffline(false);
 
   await expect.poll(async () => page.evaluate(() => window.__APPI_HISTORICO__.state.syncLog.join('\n')), { timeout: 20000 }).toContain('verificación simulada fallida');
   await expect.poll(async () => page.evaluate(() => window.__APPI_HISTORICO__.state.syncing)).toBe(false);
 
-  expect(await page.evaluate(() => window.__APPI_HISTORICO__.state.periods.map(item => item.id))).toEqual(['2024-01']);
-  expect(await page.evaluate(() => window.__APPI_HISTORICO__.dbGetAll('files').then(items => items.length))).toBe(3);
-  expect(cloud.cloudRows.has('2024-01')).toBe(true);
+  expect(await page.evaluate(() => window.__APPI_HISTORICO__.state.periods.map(item => item.id))).toEqual(Array.from({ length: 12 }, (_, month) => `2024-${String(month + 1).padStart(2, '0')}`));
+  expect(await page.evaluate(() => window.__APPI_HISTORICO__.dbGetAll('files').then(items => items.length))).toBe(36);
+  for (let month = 1; month <= 12; month++) expect(cloud.cloudRows.has(`2024-${String(month).padStart(2, '0')}`)).toBe(true);
   expect(cloud.deletedRows).toEqual([]);
   expect(cloud.deletedFiles).toEqual([]);
 });
