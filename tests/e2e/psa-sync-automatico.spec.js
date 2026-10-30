@@ -893,6 +893,7 @@ return {
 test('la sincronización histórica prioriza las URL directas de PSA y conserva el discovery como respaldo', () => {
   const edge = fs.readFileSync('supabase/functions/consulta-serial/index.ts', 'utf8');
   const html = fs.readFileSync('index.html', 'utf8');
+  const deploy = fs.readFileSync('.github/workflows/deploy-consulta-serial.yml', 'utf8');
 
   expect(edge).toContain("linea: { idx: '69', consulta: 'Línea_Descendente_' }");
   expect(edge).toContain("garantiasOrg: { idx: '34', consulta: 'Garantías_por_Organización' }");
@@ -904,9 +905,16 @@ test('la sincronización histórica prioriza las URL directas de PSA y conserva 
   expect(edge).toContain("Deno.env.get('PSA_INGRESOS_IDX')");
   expect(edge).toContain('descubrirCategorias(html)');
   expect(edge).toContain("[/patrocinios?/, /organizacion/]");
+  expect(edge).toContain("motor: 'historico-directo-v879'");
   expect(edge).toContain("out.ingresos = { filas, resumen }");
 
   expect(html).toContain("datasets:['linea','garantiasOrg','ingresos']");
   expect(html).toContain('window.psaSincronizarHistorico=psaSincronizarHistorico');
   expect(html).toContain('idx.linea||idx.garantiasOrg||idx.garantias||idx.ingresos');
+
+  expect(deploy).toContain("'supabase/functions/consulta-serial/**'");
+  expect(deploy).toContain('Validar sintaxis de la función segura');
+  expect(deploy).toContain('-g "URL directas"');
+  expect(deploy).toContain('supabase functions deploy consulta-serial');
+  expect(deploy).not.toContain('workflow_run:');
 });

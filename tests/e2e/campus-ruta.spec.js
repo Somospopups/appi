@@ -40,13 +40,22 @@ test('la tarjeta de capacitación llena UN hueco del mazo, nunca antes que el ne
   await expect(page.locator('#cpClassTitle')).toHaveText(r.cap.titulo);
 });
 
-test('Mi capacitación en Mi negocio muestra el avance y continúa en la clase', async ({ page }) => {
+test('Mi capacitación está al final de Campus Appi y continúa en la clase', async ({ page }) => {
   await entrar(page);
   await page.evaluate(() => window.APPICampusPSA.cargarContenido());
   await page.evaluate(() => window.showView('view-negocio'));
+  await expect(page.locator('#view-negocio #cpNeg')).toHaveCount(0);
 
-  await expect(page.locator('#cpNeg')).toBeVisible();
+  await page.evaluate(() => window.APPICampusPSA.abrir());
+  await expect(page.locator('#view-campus')).toHaveClass(/active/);
+  await expect(page.locator('#pageTabs button[data-view="view-negocio"]')).toHaveClass(/active/);
+  await expect(page.locator('#campusTrainingWrap #cpNeg')).toBeVisible();
   await expect(page.locator('#cpNeg')).toContainText('Mi capacitación');
+  expect(await page.evaluate(() => {
+    const contenido = document.getElementById('campusCont');
+    const capacitacion = document.getElementById('campusTrainingWrap');
+    return !!(contenido.compareDocumentPosition(capacitacion) & Node.DOCUMENT_POSITION_FOLLOWING);
+  })).toBe(true);
   const sub = await page.locator('#cpNegSub').textContent();
   expect(sub).toMatch(/0 de \d+ clases vistas · 0%/);
   await expect(page.locator('#cpNegGo')).toContainText('Continuar clase');

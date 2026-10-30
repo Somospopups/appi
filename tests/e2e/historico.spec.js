@@ -538,6 +538,18 @@ test.describe('Histórico: cierre automático desde MI PSA', () => {
     expect(stored).toBe(false);
   });
 
+  test('detiene la recuperación si la función segura todavía no fue publicada', async ({ page }) => {
+    await abrirHistorico(page);
+    const result = await page.evaluate(async () => {
+      window.psaTieneCredenciales = () => true;
+      window.psaSincronizarHistorico = async () => ({ ok: true, periodo: '2026-10', errores: [] });
+      const sync = await window.__APPI_HISTORICO__.syncPSAPeriod('2026-10');
+      return { status: sync.status, message: String(sync.error && sync.error.message || '') };
+    });
+    expect(result.status).toBe('error');
+    expect(result.message).toContain('función segura de Histórico todavía no está actualizada');
+  });
+
   test('recupera automáticamente todos los meses anteriores que faltan', async ({ page }) => {
     await abrirHistorico(page);
     const result = await page.evaluate(async () => {
@@ -551,7 +563,7 @@ test.describe('Histórico: cierre automático desde MI PSA', () => {
         calls.push(id);
         const year = id.slice(0, 4), month = Number(id.slice(5)), names = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'], label = names[month - 1];
         return {
-          periodo: id, errores: [],
+          motor: 'historico-directo-v879', periodo: id, errores: [],
           linea: { filas: [
             [`DIP Nro : 02-9802014 Nombre y Apellido : MARÍA PÉREZ Socio : Sucursal : 02 Categoría : L País : Argentina`],
             [`Período Consultado: ${label} - ${year}`],

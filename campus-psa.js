@@ -1176,7 +1176,10 @@
       '<button type="button" class="cp-main-btn ' + (ready ? 'ready' : '') + '" id="cpMainAction" ' + (!ready && !unlocked ? 'disabled' : '') + '>' + esc(actionLabel) + '</button><p class="cp-note">Las preguntas son originales de APPI, organizadas por los temas de formación de Campus Appi. No reemplazan sus capacitaciones oficiales.</p></div>';
     // v649: mismo contenido = cero repintado (nada de parpadeo).
     var firmaCampus = firmaRenderCampus(htmlCampus);
-    if (firmaCampus === ultimoHtmlCampus && host.firstChild) return;
+    if (firmaCampus === ultimoHtmlCampus && host.firstChild){
+      pintarCapacitacionCampus();
+      return;
+    }
     ultimoHtmlCampus = firmaCampus;
     host.innerHTML = htmlCampus;
     document.getElementById('cpTopicGo').onclick = function(){ if (ready) iniciarDesafio(); else if (unlocked) abrir(); else avisoFaltante(); };
@@ -1187,6 +1190,7 @@
     cablearAudios();
     cablearVivoPsa(host);
     pintarAvisos(host);
+    pintarCapacitacionCampus();
   }
   function avisoFaltante(){
     if (window.APPIDialog && window.APPIDialog.alert) window.APPIDialog.alert('El desafío se activa cuando las 10 acciones base del día están hechas. No cuenta marcar una acción como no realizada: el Impulso celebra trabajo concreto.', { title:'Todavía falta un paso', icon:'🎯', okText:'Entendido' });
@@ -1196,13 +1200,13 @@
     setTimeout(render, 0);
   }
 
-  /** Sección "Mi capacitación" dentro de Mi negocio (v642):
+  /** Sección "Mi capacitación" al final de Campus Appi:
       progreso real + la próxima clase con un toque para continuar. */
-  function pintarNegocio(){
-    var host = document.getElementById('negWrap');
+  function pintarCapacitacionCampus(){
+    var host = document.getElementById('campusTrainingWrap');
     if (!host) return;
     if (!contenidoMem){
-      cargarContenido().then(function(){ pintarNegocio(); })
+      cargarContenido().then(function(){ pintarCapacitacionCampus(); })
         .catch(function(){ try{ host.innerHTML = avisoCuentaHTML(); pintarAvisos(host); }catch(e){} });
       return;
     }
@@ -1278,7 +1282,9 @@
     avanceResumen: avanceResumen,
     abrirClase: abrirClase,
     abrirAudio: abrirAudio,
-    pintarNegocio: pintarNegocio,
+    pintarCapacitacion: pintarCapacitacionCampus,
+    // Alias compatible para instalaciones que todavía invoquen el nombre anterior.
+    pintarNegocio: pintarCapacitacionCampus,
     // Estado del contenido por cuenta (v644)
     estadoContenido: function(){ return contenidoEstado; },
     reintentarContenido: reintentarContenido,
@@ -1303,16 +1309,16 @@
     try{
       render();
       var v = document.querySelector('.view.active');
-      if (v && v.id === 'view-negocio') pintarNegocio();
+      if (v && v.id === 'view-campus') pintarCapacitacionCampus();
     }catch(e){}
   });
-  // v644: el estado del contenido (cuenta MI PSA / nube) repinta la vista y
-  // Mi negocio, así el aviso aparece o desaparece sin recargar.
+  // El estado del contenido (cuenta MI PSA / nube) repinta Campus y su bloque
+  // de capacitación, así el aviso aparece o desaparece sin recargar.
   function repintarEstadoCampus(){
     try{
       render();
       var v = document.querySelector('.view.active');
-      if (v && v.id === 'view-negocio') pintarNegocio();
+      if (v && v.id === 'view-campus') pintarCapacitacionCampus();
     }catch(e){}
   }
   window.addEventListener('appi-campus-estado', repintarEstadoCampus);

@@ -6,6 +6,16 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v879 · Campus ordenado y despliegue seguro del Histórico
+
+- **Mi capacitación** ya no aparece en la portada de Mi negocio: se muestra al final de **Campus Appi**, después de todo el contenido del Campus.
+- Campus conserva el acceso desde Mi negocio, el botón Volver regresa allí y la navegación inferior mantiene seleccionado **Mi negocio**.
+- Histórico exige que la función segura responda con el motor de recuperación directa v879; si el backend todavía no fue publicado, muestra un mensaje claro y no guarda respuestas antiguas.
+- La función `consulta-serial` cuenta con un despliegue dedicado que valida su sintaxis y las URL directas antes de publicarla, sin depender de pruebas antiguas no relacionadas.
+- La recuperación conserva los índices directos 69, 34 y 71, su validación de período y el descubrimiento alternativo como respaldo.
+- La pantalla de recuperación muestra el último motivo de error para poder distinguir una función pendiente de un informe faltante.
+- Versión: **v879 · Segura** → Cache `appi-v879-campus-y-recuperacion`.
+
 ## v876 · Histórico automático desde MI PSA
 
 - **Histórico** trae automáticamente Línea Descendente, Garantías por Organización e Ingresos del mismo período usando la cuenta de MI PSA ya configurada.
@@ -284,7 +294,7 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 ## v642 · El Campus llena los huecos del mazo y aparece en Mi negocio
 
 - **Tarjeta Capacitación en el Home**: `tarjetaCapacitacion()` suma **una sola** tarjeta al mazo (regla: el negocio manda, la capacitación nunca encabeza y llena ≤25% del mazo) con la próxima clase real del catálogo elegida por contexto — `contextoCapacitacion()` mira usuarios vencidos → *canje* (Posventa), equipo chico → *Básica*, y si no, PB flojo → *Comercialización*. El botón **Ver clase** abre la hoja Clase sin salir del Home. Cuando llega el catálogo o avanza el avance, el mazo se repinta solo (`refrescarPorCapacitacion`).
-- **Mi capacitación en Mi negocio**: `pintarNegocio()` llena `#negWrap` con una sección de progreso real (vistas/total, barra %), la próxima clase con su área y duración, y botones **Continuar clase** / **Ver ruta**. Se repinta al abrir la vista y en cada avance.
+- **Mi capacitación dentro de Campus Appi**: `pintarCapacitacion()` llena `#campusTrainingWrap`, al final de la pantalla, con una sección de progreso real (vistas/total, barra %), la próxima clase con su área y duración, y botones **Continuar clase** / **Ver ruta**. Se repinta al abrir Campus y en cada avance.
 - Sin catálogo la tarjeta simplemente no aparece (el hueco queda para las tarjetas del negocio) y todo se rescata con el respaldo local.
 - Tests: `tests/e2e/campus-ruta.spec.js` — el mazo (regla del hueco), el CTA que abre la clase y la sección de Mi negocio con su avance.
 - Versión: **v642 · Segura** → Cache `appi-v642-ruta-capacitacion`.

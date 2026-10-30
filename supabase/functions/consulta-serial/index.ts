@@ -959,7 +959,7 @@ Deno.serve(async (req) => {
       ]));
     }
 
-    const out: any = { ok: true, periodo, idx, fuentes: {}, errores, menu, linea: null, garantiasOrg: null, garantias: null, ingresos: null };
+    const out: any = { ok: true, motor: 'historico-directo-v879', periodo, idx, fuentes: {}, errores, menu, linea: null, garantiasOrg: null, garantias: null, ingresos: null };
 
     if (idx.linea) {
       try {
