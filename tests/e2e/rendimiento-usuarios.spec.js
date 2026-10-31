@@ -82,6 +82,61 @@ test('1.500 garantías no bloquean Home y el scroll nunca deja huecos', async ({
     expect(estado.renderizados).toBeLessThan(120);
   }
 
+  // En un desplazamiento continuo, la ficha que ya está preparada debe seguir
+  // siendo exactamente el mismo nodo. Antes de v887 se destruían y recreaban
+  // decenas de fichas cada vez que avanzaba apenas un renglón.
+  const fluidez = await page.evaluate(async () => {
+    const lista = document.getElementById('usuariosList');
+    const canvas = lista.querySelector('.u-virtual-canvas');
+    const bodyEsScroller = document.body.scrollHeight > document.documentElement.scrollHeight;
+    const scrollActual = () => bodyEsScroller ? document.body.scrollTop : window.scrollY;
+    const moverA = y => bodyEsScroller ? document.body.scrollTo(0, y) : window.scrollTo(0, y);
+    const inicioLista = scrollActual() + lista.getBoundingClientRect().top;
+    moverA(inicioLista + canvas.getBoundingClientRect().height * 0.5 - window.innerHeight / 2);
+    await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    const visibles = [...canvas.querySelectorAll('.tree-node')].filter(node => {
+      const r = node.getBoundingClientRect();
+      return r.bottom > 0 && r.top < window.innerHeight;
+    });
+    const ficha = visibles[Math.floor(visibles.length / 2)];
+    let movimientos = 0;
+    const sumar = records => records.forEach(record => {
+      movimientos += record.addedNodes.length + record.removedNodes.length;
+    });
+    const observador = new MutationObserver(sumar);
+    observador.observe(canvas, { childList: true });
+    for(let i=0;i<72;i++){
+      moverA(scrollActual() + 24);
+      await new Promise(resolve => requestAnimationFrame(resolve));
+    }
+    sumar(observador.takeRecords());
+    observador.disconnect();
+    return {
+      mismoNodo: !!ficha && document.contains(ficha),
+      movimientos,
+      renderizados: canvas.querySelectorAll('.tree-node').length
+    };
+  });
+  expect(fluidez.mismoNodo).toBe(true);
+  expect(fluidez.movimientos).toBeLessThan(120);
+  expect(fluidez.renderizados).toBeLessThan(120);
+  console.log(`FLUIDEZ_USUARIOS mismo_nodo=${fluidez.mismoNodo} movimientos_dom=${fluidez.movimientos} renderizados=${fluidez.renderizados}`);
+
+  // Las fichas agregadas al avanzar conservan la apertura completa.
+  const indiceNuevo = await page.evaluate(() => {
+    const ficha = [...document.querySelectorAll('#usuariosList .tree-node')].find(node => {
+      const r = node.getBoundingClientRect();
+      return r.top > 80 && r.bottom < window.innerHeight - 80;
+    });
+    if(!ficha) return '';
+    const indice = ficha.dataset.uToggle;
+    ficha.click();
+    return indice;
+  });
+  expect(indiceNuevo).not.toBe('');
+  await expect(page.locator(`#usuariosList .tree-node.expanded[data-u-toggle="${indiceNuevo}"]`)).toHaveCount(1);
+  await expect(page.locator(`#usuariosList [data-u-details="${indiceNuevo}"] .u-product`)).toHaveCount(1);
+
   // La búsqueda sigue usando las 1.500 personas en memoria, no sólo las
   // cabeceras que existen en el DOM en ese instante.
   await page.evaluate(() => {

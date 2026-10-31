@@ -6,6 +6,15 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v887 · Scroll siempre fluido en Usuarios
+
+- El desplazamiento continuo ya no destruye y reconstruye las fichas visibles al avanzar cada renglón.
+- La ventana virtual se prepara por bloques amplios y conserva exactamente los mismos nodos mientras permanecen cerca de la pantalla.
+- Al avanzar sólo se agregan las fichas nuevas y se retiran las que quedaron lejos, sin destellos ni espacios vacíos.
+- El diseño aprobado de v886, la apertura de detalles, la búsqueda, los filtros, los contadores y todas las funciones permanecen iguales.
+- La prueba focalizada recorre 1.500 garantías, conserva la misma ficha durante un desplazamiento continuo de 1.728 píxeles y comprueba que las fichas nuevas sigan abriendo sus productos y acciones.
+- Versión: **v887 · Segura** → Cache `appi-v887-scroll-usuarios-fluido`.
+
 ## v886 · Renglones simples en Usuarios
 
 - Cada renglón de Usuarios muestra únicamente la cantidad de productos, el nombre y apellido, el estado del producto más reciente y su fecha de vencimiento.

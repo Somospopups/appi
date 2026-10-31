@@ -160,13 +160,13 @@ window.openStock=function(){
 <script src="./mensajes-hielo.js?v=618"></script>
 <script src="./mensajes-usuarios.js?v=639"></script>
   <script src="./campus-preguntas.js?v=646"></script>
-  <script src="./campus-psa.js?v=886"></script>
+  <script src="./campus-psa.js?v=887"></script>
 <script src="./reactivacion.js?v=618"></script>
 
 <script src="./escalera-suenos.js?v=618"></script>
 <script src="./demo-guia.js?v=618"></script>
 <script src="./tablero-negocio.js?v=618"></script>
-<script src="./lista-precios.js?v=886"></script>
+<script src="./lista-precios.js?v=887"></script>
 <script src="./vendor/pdf.min.js?v=618"></script>
 <script src="./canillas-adaptadores.js?v=618"></script>
 <script src="./vendor/zxing.min.js?v=618"></script>
@@ -4743,7 +4743,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v886 · Segura</div>
+  <div class="ds-foot">APPI · v887 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -14279,8 +14279,8 @@ function cerrarToolsMenu(){
   // con archivos viejos en pantalla.
   if ('serviceWorker' in navigator) {
     (async () => {
-    const swVersion='886';
-    const CACHE_NAME='appi-v886-filas-usuarios-simples';
+    const swVersion='887';
+    const CACHE_NAME='appi-v887-scroll-usuarios-fluido';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
@@ -17748,6 +17748,28 @@ function alternarUsuarioVirtualU(node){
   renderVentanaUsuariosU(true);
   programarMedicionVirtualU();
 }
+function htmlItemVirtualU(index){
+  const u=filtradosU[index], clave=clavePersonaVirtualU(u,index);
+  const abierto=usuariosAbiertosU.has(clave);
+  return `<div class="u-virtual-item${abierto?' u-open':''}" data-u-v-index="${index}" data-u-v-clave="${escU(clave)}" style="top:${virtualUsuariosU.posiciones[index]}px">${cabeceraUsuarioHtmlU(u,index,abierto)}</div>`;
+}
+function enlazarItemVirtualU(item){
+  const node=item&&item.querySelector('[data-u-toggle]');
+  if(!node) return;
+  node.onclick=()=>alternarUsuarioVirtualU(node);
+  node.onkeydown=event=>{
+    if(event.key==='Enter'||event.key===' '){ event.preventDefault(); alternarUsuarioVirtualU(node); }
+  };
+  if(node.classList.contains('expanded')) montarDetalleUsuarioU(node.nextElementSibling,Number(node.dataset.uToggle));
+}
+function observarItemsVirtualesU(canvas){
+  if(virtualUsuariosU.observador) virtualUsuariosU.observador.disconnect();
+  if(typeof ResizeObserver==='function'){
+    if(!virtualUsuariosU.observador) virtualUsuariosU.observador=new ResizeObserver(programarMedicionVirtualU);
+    canvas.querySelectorAll('.u-virtual-item.u-open').forEach(item=>virtualUsuariosU.observador.observe(item));
+  }
+  if(canvas.querySelector('.u-virtual-item.u-open')) programarMedicionVirtualU();
+}
 function renderVentanaUsuariosU(forzar){
   const cont=document.getElementById('usuariosList');
   const canvas=cont&&cont.querySelector('.u-virtual-canvas');
@@ -17762,31 +17784,54 @@ function renderVentanaUsuariosU(forzar){
   const margen=Math.max(1500,Math.round(viewport*1.8));
   let inicio=indiceVirtualPorY_U(Math.max(0,visibleTop-margen));
   let fin=Math.min(filtradosU.length,indiceVirtualPorY_U(Math.min(total,visibleBottom+margen))+1);
-  // Las listas pequeñas siguen completas, igual que antes.
-  if(filtradosU.length<=120){ inicio=0; fin=filtradosU.length; }
+  // v887: la ventana avanza por bloques. Así un desplazamiento continuo no
+  // recalcula el DOM por cada renglón y siempre hay varias pantallas listas.
+  if(filtradosU.length>120){
+    const bloque=24;
+    inicio=Math.floor(inicio/bloque)*bloque;
+    fin=Math.min(filtradosU.length,Math.ceil(fin/bloque)*bloque);
+  }else{
+    inicio=0;
+    fin=filtradosU.length;
+  }
   if(!forzar&&inicio===virtualUsuariosU.inicio&&fin===virtualUsuariosU.fin) return;
   virtualUsuariosU.inicio=inicio;
   virtualUsuariosU.fin=fin;
-  let html='';
-  for(let index=inicio;index<fin;index++){
-    const u=filtradosU[index], clave=clavePersonaVirtualU(u,index);
-    const abierto=usuariosAbiertosU.has(clave);
-    html+=`<div class="u-virtual-item${abierto?' u-open':''}" data-u-v-index="${index}" data-u-v-clave="${escU(clave)}" style="top:${virtualUsuariosU.posiciones[index]}px">${cabeceraUsuarioHtmlU(u,index,abierto)}</div>`;
+
+  if(forzar||!canvas.children.length){
+    let html='';
+    for(let index=inicio;index<fin;index++) html+=htmlItemVirtualU(index);
+    canvas.innerHTML=html;
+    Array.from(canvas.children).forEach(enlazarItemVirtualU);
+  }else{
+    // Conservar los nodos que continúan dentro de la ventana evita el destello
+    // y el costo de volver a crear las fichas que la persona está mirando.
+    const existentes=new Map();
+    Array.from(canvas.children).forEach(item=>{
+      const index=Number(item.dataset.uVIndex);
+      if(index<inicio||index>=fin) item.remove();
+      else existentes.set(index,item);
+    });
+    const faltantes=[];
+    for(let index=inicio;index<fin;index++) if(!existentes.has(index)) faltantes.push(index);
+    const nuevos=new Map();
+    if(faltantes.length){
+      const plantilla=document.createElement('template');
+      plantilla.innerHTML=faltantes.map(htmlItemVirtualU).join('');
+      Array.from(plantilla.content.children).forEach(item=>{
+        nuevos.set(Number(item.dataset.uVIndex),item);
+        enlazarItemVirtualU(item);
+      });
+    }
+    let cursor=canvas.firstElementChild;
+    for(let index=inicio;index<fin;index++){
+      const item=existentes.get(index)||nuevos.get(index);
+      if(existentes.has(index)) item.style.top=virtualUsuariosU.posiciones[index]+'px';
+      if(item!==cursor) canvas.insertBefore(item,cursor);
+      cursor=item.nextElementSibling;
+    }
   }
-  canvas.innerHTML=html;
-  canvas.querySelectorAll('[data-u-toggle]').forEach(node=>{
-    node.onclick=()=>alternarUsuarioVirtualU(node);
-    node.onkeydown=event=>{
-      if(event.key==='Enter'||event.key===' '){ event.preventDefault(); alternarUsuarioVirtualU(node); }
-    };
-    if(node.classList.contains('expanded')) montarDetalleUsuarioU(node.nextElementSibling,Number(node.dataset.uToggle));
-  });
-  if(virtualUsuariosU.observador) virtualUsuariosU.observador.disconnect();
-  if(typeof ResizeObserver==='function'){
-    if(!virtualUsuariosU.observador) virtualUsuariosU.observador=new ResizeObserver(programarMedicionVirtualU);
-    canvas.querySelectorAll('.u-virtual-item.u-open').forEach(item=>virtualUsuariosU.observador.observe(item));
-  }
-  if(canvas.querySelector('.u-virtual-item.u-open')) programarMedicionVirtualU();
+  observarItemsVirtualesU(canvas);
 }
 function programarVentanaUsuariosU(){
   if(virtualUsuariosU.raf) return;
