@@ -160,13 +160,13 @@ window.openStock=function(){
 <script src="./mensajes-hielo.js?v=618"></script>
 <script src="./mensajes-usuarios.js?v=639"></script>
   <script src="./campus-preguntas.js?v=646"></script>
-  <script src="./campus-psa.js?v=885"></script>
+  <script src="./campus-psa.js?v=886"></script>
 <script src="./reactivacion.js?v=618"></script>
 
 <script src="./escalera-suenos.js?v=618"></script>
 <script src="./demo-guia.js?v=618"></script>
 <script src="./tablero-negocio.js?v=618"></script>
-<script src="./lista-precios.js?v=885"></script>
+<script src="./lista-precios.js?v=886"></script>
 <script src="./vendor/pdf.min.js?v=618"></script>
 <script src="./canillas-adaptadores.js?v=618"></script>
 <script src="./vendor/zxing.min.js?v=618"></script>
@@ -4743,7 +4743,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v885 · Segura</div>
+  <div class="ds-foot">APPI · v886 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -14279,8 +14279,8 @@ function cerrarToolsMenu(){
   // con archivos viejos en pantalla.
   if ('serviceWorker' in navigator) {
     (async () => {
-    const swVersion='885';
-    const CACHE_NAME='appi-v885-usuarios-automaticos';
+    const swVersion='886';
+    const CACHE_NAME='appi-v886-filas-usuarios-simples';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
@@ -16048,7 +16048,7 @@ body.dark #view-usuarios .filter.active{
    pero sólo existen en el DOM las fichas cercanas a la pantalla. */
 #usuariosList.u-virtual{display:block;position:relative;gap:0;overflow:visible}
 #usuariosList .u-virtual-canvas{position:relative;width:100%;contain:layout style}
-#usuariosList .u-virtual-item{position:absolute;left:0;right:0;height:64px;padding-bottom:12px;box-sizing:border-box}
+#usuariosList .u-virtual-item{position:absolute;left:0;right:0;height:72px;padding-bottom:10px;box-sizing:border-box}
 #usuariosList .u-virtual-item.u-open{height:auto}
 #usuariosList .u-virtual-item>.tree-node{margin-bottom:0}
 #view-usuarios .tree-node{
@@ -16082,7 +16082,18 @@ body.dark #view-usuarios .filter.active{
   from{opacity:0; transform:translateY(-6px)}
   to{opacity:1; transform:translateY(0)}
 }
-.u-product-count{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;min-height:24px;padding:4px 9px;border-radius:999px;background:linear-gradient(135deg,#ad7100,#f1b928);color:#fff;font-size:9px;font-weight:900;white-space:nowrap;box-shadow:0 3px 9px rgba(173,113,0,.18)}
+/* v886 · Opción visual 2 aprobada: sólo cantidad, nombre, estado y vencimiento. */
+#usuariosList .tree-node{gap:10px;min-height:62px;padding:8px 10px;box-sizing:border-box}
+#usuariosList .u-product-count{flex:0 0 54px;height:44px;display:grid;place-items:center;align-content:center;padding:3px 5px;border-radius:13px;background:linear-gradient(135deg,#ad7100,#f1b928);color:#fff;line-height:1;white-space:nowrap;box-shadow:0 4px 11px rgba(173,113,0,.22)}
+#usuariosList .u-product-count b{font-size:19px;font-weight:950}
+#usuariosList .u-product-count small{margin-top:3px;font-size:6.5px;font-weight:900;letter-spacing:.25px;text-transform:uppercase}
+#usuariosList .u-user-summary{flex:0 0 auto;display:grid;justify-items:end;gap:5px;min-width:82px}
+#usuariosList .u-user-state{padding:5px 8px;border-radius:999px;font-size:8.5px;font-weight:950;line-height:1;white-space:nowrap}
+#usuariosList .u-user-state.vencida{background:rgba(217,79,85,.14);color:#bd3e46}
+#usuariosList .u-user-state.porVencer{background:rgba(245,179,1,.17);color:#8b6500}
+#usuariosList .u-user-state.vigente{background:rgba(58,208,164,.16);color:#168765}
+#usuariosList .u-user-expiry{padding:0 2px;color:#315dbd;font-size:9.5px;font-weight:900;line-height:1;white-space:nowrap}
+#usuariosList .tree-node.expanded{outline:2px solid rgba(91,141,239,.38);outline-offset:0;background:rgba(255,255,255,.82)}
 .u-person-contact{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:11px 12px;margin-bottom:10px;border-radius:14px;background:rgba(91,141,239,.07);font-size:11px}
 .u-products-title{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:3px 2px 8px;color:#30303d;font-size:12px;font-weight:900}
 .u-products{display:grid;gap:8px}
@@ -16098,7 +16109,7 @@ body.dark #view-usuarios .filter.active{
 .u-star-contact{background:linear-gradient(135deg,#ad7100,#f1b928)!important;color:#fff!important;border-color:transparent!important}
 .u-identity-cards{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}.u-identity-card{padding:12px;border:1px solid rgba(80,90,130,.12);border-radius:14px;background:rgba(255,255,255,.72)}.u-identity-card b{display:block;color:#292938;font-size:12.5px}.u-identity-card small{display:block;margin-top:5px;color:#6f707d;font-size:10.5px;line-height:1.45}.u-identity-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.u-identity-actions button,.u-star-send{min-height:46px;border:0;border-radius:13px;font:inherit;font-size:11px;font-weight:900;cursor:pointer}.u-identity-merge{background:linear-gradient(135deg,#0b5878,#3ad0a4);color:#fff}.u-identity-separate{background:rgba(91,141,239,.1);color:#3d63c9}.u-star-choices{display:grid;gap:7px;margin-bottom:10px}.u-star-choice{min-height:43px;padding:9px 11px;border:1px solid rgba(80,90,130,.12);border-radius:12px;background:rgba(255,255,255,.72);color:#454653;font:inherit;font-size:11px;font-weight:800;text-align:left;cursor:pointer}.u-star-choice.on{background:linear-gradient(135deg,#ad7100,#f1b928);border-color:transparent;color:#fff}.u-star-editor{width:100%;min-height:118px;padding:11px;border:1px solid rgba(80,90,130,.16);border-radius:13px;background:rgba(255,255,255,.8);color:#292938;font:inherit;font-size:12px;line-height:1.5;resize:vertical;box-sizing:border-box}.u-star-send{width:100%;margin-top:9px;background:#25d366;color:#fff;font-size:12px}
 body.dark .u-person-contact,body.dark .u-product,body.dark .u-identity-card,body.dark .u-star-choice,body.dark .u-star-editor{background:rgba(31,32,49,.78);border-color:rgba(255,255,255,.09);color:#ececf2}body.dark .u-products-title,body.dark .u-product-head strong,body.dark .u-product-meta b,body.dark .u-identity-card b{color:#f1f1f6}
-@media(max-width:520px){.u-person-contact,.u-product-meta{grid-template-columns:1fr}.u-product-series{grid-column:1}.u-identity-cards{grid-template-columns:1fr}.u-product-count{padding:4px 7px;font-size:8px}}
+@media(max-width:520px){.u-person-contact,.u-product-meta{grid-template-columns:1fr}.u-product-series{grid-column:1}.u-identity-cards{grid-template-columns:1fr}#usuariosList .tree-node{gap:8px;padding:8px 10px}#usuariosList .u-product-count{flex-basis:52px;height:44px}#usuariosList .u-user-summary{min-width:78px}#usuariosList .u-user-expiry{font-size:9px}}
 #view-usuarios .action-btn{
   padding:8px 13px;
   border-radius:999px;
@@ -16175,6 +16186,8 @@ body.dark #view-usuarios .tree-node{
 body.dark #view-usuarios .tree-node:hover{
   background:rgba(45,45,65,0.72);
 }
+body.dark #usuariosList .tree-node.expanded{background:rgba(52,53,76,.86);outline-color:rgba(160,230,208,.4)}
+body.dark #usuariosList .u-user-expiry{color:#a8c7ff}
 body.dark #view-usuarios .tree-children{
   background:rgba(35,35,55,0.62);
   border-color:rgba(255,255,255,0.08);
@@ -16809,7 +16822,7 @@ let filtroVencU='all', filtroZonaU='all', filtroReasigU=false, filtroEstrellaU=f
 let listadoUsuariosSucioU=true, usuariosStorageCargadoU=false, cargaUsuariosEnCursoU=false;
 let identidadCacheU=new WeakMap(), registroCacheU=new WeakMap();
 const usuariosAbiertosU=new Set();
-const virtualUsuariosU={altoFila:64,posiciones:[0],alturasAbiertas:new Map(),inicio:-1,fin:-1,raf:0,medirRaf:0,enlazado:false,observador:null};
+const virtualUsuariosU={altoFila:72,posiciones:[0],alturasAbiertas:new Map(),inicio:-1,fin:-1,raf:0,medirRaf:0,enlazado:false,observador:null};
 
 function escU(value){
   return String(value==null?'':value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -17684,18 +17697,18 @@ function indiceVirtualPorY_U(y){
 }
 function cabeceraUsuarioHtmlU(u,index,abierto){
   const venceRaw=u.fVenceRaw||'Fecha no informada';
-  const estadoColor=u.estado==='vencida'?'#d9534f':(u.estado==='porVencer'?'#f5b301':'#3ad0a4');
-  const estadoTxt=u.estado==='vencida'?'VENC':(u.estado==='porVencer'?'POR VENC':'VIG');
+  const estadoClase=u.estado==='vencida'?'vencida':(u.estado==='porVencer'?'porVencer':'vigente');
+  const estadoTxt=estadoClase==='vencida'?'VENCIDO':(estadoClase==='porVencer'?'POR VENCER':'VIGENTE');
   const productos=(Array.isArray(u.productos)&&u.productos.length?u.productos:[u]);
   const clave=clavePersonaVirtualU(u,index);
   return `<div class="tree-node${abierto?' expanded':''}" data-u-toggle="${index}" data-u-persona="${escU(clave)}" role="button" tabindex="0" aria-expanded="${abierto?'true':'false'}">
-    <span class="tree-arrow">›</span>
-    <span class="tree-cat-badge" style="background:${estadoColor}">${estadoTxt}</span>
-    ${u.reasignado?`<span class="tree-cat-badge" style="background:#5b8def" title="Reasignado de: ${escU(u.dipReasignado)}">↻</span>`:''}
-    <span class="tree-name" title="${escU(`${u.usuario||''} - ${u.domicilio||''}`)}">${escU(u.usuario)}</span>
-    <span class="u-product-count">${productos.length} ${productos.length===1?'producto':'productos'}</span>
-    <span class="tree-pts" style="background:rgba(0,0,0,0.06);color:#1c1c1e">${escU(u.localidad||'')}</span>
-    <span class="tree-pts" style="min-width:70px;text-align:right" title="Vencimiento del producto más reciente">${escU(venceRaw)}</span>
+    <span class="u-product-count"><b>${productos.length}</b>
+      <small>${productos.length===1?'producto':'productos'}</small></span>
+    <span class="tree-name" title="${escU(u.usuario||'')}">${escU(u.usuario)}</span>
+    <span class="u-user-summary">
+      <span class="u-user-state ${estadoClase}">${estadoTxt}</span>
+      <span class="u-user-expiry" title="Vencimiento del producto más reciente">${escU(venceRaw)}</span>
+    </span>
   </div>
   <div class="tree-children${abierto?' open':''}" data-u-details="${index}" style="padding:8px;background:rgba(255,255,255,0.5);border-radius:12px;margin-bottom:8px"></div>`;
 }

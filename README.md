@@ -6,6 +6,15 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v886 · Renglones simples en Usuarios
+
+- Cada renglón de Usuarios muestra únicamente la cantidad de productos, el nombre y apellido, el estado del producto más reciente y su fecha de vencimiento.
+- La cantidad aparece destacada a la izquierda, el nombre ocupa el centro y el estado con su fecha queda ordenado a la derecha.
+- Los estados **VENCIDO**, **POR VENCER** y **VIGENTE** se identifican automáticamente en rojo, ámbar y verde.
+- Todo el renglón continúa siendo tocable para abrir productos, historial, datos de contacto y acciones.
+- La agrupación, búsqueda, filtros, contadores, virtualización y demás funciones de Usuarios se conservan sin cambios.
+- Versión: **v886 · Segura** → Cache `appi-v886-filas-usuarios-simples`.
+
 ## v885 · Usuarios completamente automático
 
 - Se eliminó de la cabecera de Usuarios la tarjeta que mostraba “GARANTÍAS · fecha/hora”.

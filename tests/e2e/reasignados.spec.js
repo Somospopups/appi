@@ -66,14 +66,15 @@ test('la columna "DIP reasignado" de la planilla se detecta y marca al usuario',
   expect(res[1].re).toBe(false);
 });
 
-test('el reasignado lleva pildora ↻ y al abrirlo dice de quién es (v813)', async ({ page }) => {
+test('el reasignado conserva el detalle sin agregar una quinta marca al renglón', async ({ page }) => {
   await abrirUsuarios(page);
 
   const filaMaria = page.locator('#usuariosList .tree-node', { hasText: 'MARIA GONZALEZ' });
-  await expect(filaMaria).toContainText('↻');
-  // El usuario normal no la lleva
   const filaPedro = page.locator('#usuariosList .tree-node', { hasText: 'PEDRO LUIZ' });
+  // v886: todas las filas muestran sólo cantidad, nombre, estado y fecha.
+  await expect(filaMaria).not.toContainText('↻');
   await expect(filaPedro).not.toContainText('↻');
+  await expect(filaMaria.locator('.tree-cat-badge, .tree-arrow, .tree-pts')).toHaveCount(0);
 
   // Contador del botón de filtro (badge con la cantidad)
   await expect(page.locator('#usuariosStReasig')).toHaveText('1');
@@ -257,10 +258,11 @@ test('la sync automática de PSA trae los reasignados sola, sin carga manual (v8
   expect(res.stored[0].cumpleRaw).toBe('08/03');
   expect(res.stored[1].reasignado).toBe(false);
 
-  // El badge del botón Reasignados muestra 1 y la fila lleva la pildora ↻
+  // El badge del botón Reasignados muestra 1 y la fila conserva el diseño simple de v886.
   await expect(page.locator('#usuariosStReasig')).toHaveText('1');
   await expect(page.locator('#usuariosStReasig')).toHaveClass(/on/);
-  await expect(page.locator('#usuariosList .tree-node', { hasText: 'ALONSO, ARTURO ALONSO' })).toContainText('↻');
+  // La reasignación sigue contándose y filtrándose, pero v886 ya no agrega una marca al renglón.
+  await expect(page.locator('#usuariosList .tree-node', { hasText: 'ALONSO, ARTURO ALONSO' })).not.toContainText('↻');
   // La base es "nueva" (trae el campo) → no aparece el aviso de planilla vieja
   await expect(page.locator('#usuariosAvisoReasig')).toBeHidden();
 });

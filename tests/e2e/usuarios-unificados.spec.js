@@ -20,6 +20,12 @@ const AMBIGUOS = [
   { id: 11, usuario: 'LOPEZ, CARLOS', telf: '3515552999', domicilio: 'Segunda 20', localidad: 'Córdoba', producto: 'PSA SENIOR 4', serie: 'CARLOS-B', fCompra: '01/08/2025', fVenceRaw: '01/08/2028', fVence: '2028-08-01T03:00:00.000Z', estado: 'vigente' }
 ];
 
+const VARIANTES_ESTADO = [
+  { id: 20, usuario: 'VENCIDA, PERSONA', telf: '3515553020', domicilio: 'Roja 20', localidad: 'Córdoba', producto: 'PSA VERO', serie: 'ESTADO-VENCIDA', fCompra: '01/06/2022', fVenceRaw: '01/06/2025', fVence: '2025-06-01T03:00:00.000Z', estado: 'vencida' },
+  { id: 21, usuario: 'POR VENCER, PERSONA', telf: '3515553021', domicilio: 'Ámbar 21', localidad: 'Córdoba', producto: 'PSA SENIOR 4', serie: 'ESTADO-POR-VENCER', fCompra: '15/11/2023', fVenceRaw: '15/11/2026', fVence: '2026-11-15T03:00:00.000Z', estado: 'porVencer' },
+  { id: 22, usuario: 'VIGENTE, PERSONA', telf: '3515553022', domicilio: 'Verde 22', localidad: 'Córdoba', producto: 'PSA MINI', serie: 'ESTADO-VIGENTE', fCompra: '18/05/2025', fVenceRaw: '18/05/2028', fVence: '2028-05-18T03:00:00.000Z', estado: 'vigente' }
+];
+
 async function entrar(page, users) {
   const accessToken = tokenFor(USER_ID);
   const now = new Date().toISOString();
@@ -69,15 +75,42 @@ test('agrupa a la persona, cuenta modelos iguales y deduplica sólo la misma ser
   expect(r).toEqual({ personas: 2, productos: 2, series: ['SERIE-ACTUAL', 'SERIE-ANTERIOR'], productoActual: 'PSA SENIOR 4', compraActual: '18/05/2024', vencimientoActual: '18/05/2027', estado: 'vigente', estrella: true, grupoMensajes: 'vigente' });
 });
 
+test('las tres variantes muestran sólo el estado aprobado con su clase de color', async ({ page }) => {
+  await entrar(page, VARIANTES_ESTADO);
+  const vencida = page.locator('#usuariosList .tree-node', { hasText: 'VENCIDA, PERSONA' });
+  const porVencer = page.locator('#usuariosList .tree-node', { hasText: 'POR VENCER, PERSONA' });
+  const vigente = page.locator('#usuariosList .tree-node', { hasText: 'VIGENTE, PERSONA' });
+
+  await expect(vencida.locator('.u-user-state')).toHaveText('VENCIDO');
+  await expect(vencida.locator('.u-user-state')).toHaveClass(/vencida/);
+  await expect(vencida.locator('.u-user-expiry')).toHaveText('01/06/2025');
+  await expect(porVencer.locator('.u-user-state')).toHaveText('POR VENCER');
+  await expect(porVencer.locator('.u-user-state')).toHaveClass(/porVencer/);
+  await expect(porVencer.locator('.u-user-expiry')).toHaveText('15/11/2026');
+  await expect(vigente.locator('.u-user-state')).toHaveText('VIGENTE');
+  await expect(vigente.locator('.u-user-state')).toHaveClass(/vigente/);
+  await expect(vigente.locator('.u-user-expiry')).toHaveText('18/05/2028');
+  await expect(page.locator('#usuariosList .tree-arrow, #usuariosList .tree-cat-badge, #usuariosList .tree-pts')).toHaveCount(0);
+});
+
 test('muestra una persona con todos sus productos, fechas y sólo la última compra como vigente', async ({ page }) => {
   await entrar(page, REPETIDOS);
   await expect(page.locator('#usuariosStTotal')).toHaveText('2');
   await expect(page.locator('#usuariosStEstrella')).toHaveText('1');
   await expect(page.locator('#usuariosList .tree-name')).toHaveCount(2);
   await expect(page.locator('#usuariosList .tree-name').first()).toContainText('GONZALEZ, MARIA');
-  await expect(page.locator('#usuariosList .u-product-count').first()).toHaveText('2 productos');
+  const filaMaria = page.locator('#usuariosList .tree-node').first();
+  await expect(filaMaria.locator('.u-product-count')).toHaveText('2 productos');
+  await expect(filaMaria.locator('.tree-name')).toHaveText('GONZALEZ, MARIA');
+  await expect(filaMaria.locator('.u-user-state')).toHaveText('VIGENTE');
+  await expect(filaMaria.locator('.u-user-expiry')).toHaveText('18/05/2027');
+  // El renglón muestra únicamente los cuatro datos aprobados: sin flecha,
+  // localidad, modelo ni distintivos adicionales.
+  await expect(filaMaria.locator('.tree-arrow, .tree-cat-badge, .tree-pts')).toHaveCount(0);
+  await expect(filaMaria).not.toContainText('Alta Gracia');
+  await expect(filaMaria).not.toContainText('PSA SENIOR 4');
 
-  await page.locator('#usuariosList .tree-node').first().click();
+  await filaMaria.click();
   const detalle = page.locator('#usuariosList .tree-children').first();
   await expect(detalle.locator('.u-product')).toHaveCount(2);
   await expect(detalle).toContainText('Fecha de compra: 18/05/2024');
