@@ -160,13 +160,13 @@ window.openStock=function(){
 <script src="./mensajes-hielo.js?v=618"></script>
 <script src="./mensajes-usuarios.js?v=639"></script>
   <script src="./campus-preguntas.js?v=646"></script>
-  <script src="./campus-psa.js?v=882"></script>
+  <script src="./campus-psa.js?v=883"></script>
 <script src="./reactivacion.js?v=618"></script>
 
 <script src="./escalera-suenos.js?v=618"></script>
 <script src="./demo-guia.js?v=618"></script>
 <script src="./tablero-negocio.js?v=618"></script>
-<script src="./lista-precios.js?v=882"></script>
+<script src="./lista-precios.js?v=883"></script>
 <script src="./vendor/pdf.min.js?v=618"></script>
 <script src="./canillas-adaptadores.js?v=618"></script>
 <script src="./vendor/zxing.min.js?v=618"></script>
@@ -4743,7 +4743,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v882 · Segura</div>
+  <div class="ds-foot">APPI · v883 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -7690,6 +7690,12 @@ function showView(id,opts){
   if(id==='view-negocio'){
     setTimeout(function(){ try{ if(window.actualizarLineaPB) window.actualizarLineaPB({}); }catch(e){} }, 1400);
   }
+  // v883: el listado grande de Usuarios se dibuja sólo al entrar a esa vista.
+  // Los datos y contadores ya están listos, pero el Home no queda bloqueado
+  // creando miles de fichas que todavía no se ven.
+  if(id==='view-usuarios') requestAnimationFrame(function(){
+    try{ if(window.renderUsuariosPendientes) window.renderUsuariosPendientes(); }catch(e){ console.error(e); }
+  });
   document.body.classList.toggle('evaluar-hint', id === 'view-wheel');
   window.scrollTo(0,0);
   try{ window.scrollTo({top:0,left:0,behavior:'instant'}); }catch(e){}
@@ -14295,8 +14301,8 @@ function cerrarToolsMenu(){
   // con archivos viejos en pantalla.
   if ('serviceWorker' in navigator) {
     (async () => {
-    const swVersion='882';
-    const CACHE_NAME='appi-v882-usuarios-unificados';
+    const swVersion='883';
+    const CACHE_NAME='appi-v883-rendimiento-usuarios';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
@@ -16815,6 +16821,8 @@ window.transcribeUniversal=transcribeUniversal;window.loadModelUniversal=loadMod
 const LS_KEY_U='usuarios_garantias';
 let productosFuenteU=[], usuariosU=[], filtradosU=[], coincidenciasU=[];
 let filtroVencU='all', filtroZonaU='all', filtroReasigU=false, filtroEstrellaU=false, ordenAscU=true;
+let listadoUsuariosSucioU=true, usuariosStorageCargadoU=false, cargaUsuariosEnCursoU=false;
+let identidadCacheU=new WeakMap(), registroCacheU=new WeakMap();
 
 function escU(value){
   return String(value==null?'':value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -16991,25 +16999,38 @@ function hashCortoU(value){
   for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619); }
   return (h>>>0).toString(36);
 }
+function datosIdentidadU(u){
+  if(u&&typeof u==='object'&&identidadCacheU.has(u)) return identidadCacheU.get(u);
+  const d={
+    nombre:nombreClaveU(u&&u.usuario||''),
+    telefono:telefonoClaveU(u&&u.telf||''),
+    email:emailClaveU(u&&u.email||''),
+    cumple:cumpleClaveU(u&&(u.cumpleRaw||u.cumple)||''),
+    domicilio:domicilioClaveU(u||{})
+  };
+  if(u&&typeof u==='object') identidadCacheU.set(u,d);
+  return d;
+}
 function claveRegistroU(u){
+  if(u&&typeof u==='object'&&registroCacheU.has(u)) return registroCacheU.get(u);
   const serie=serieClaveU(u&&u.serie||'');
-  if(serie) return 'serie:'+serie;
-  return 'compra:'+hashCortoU([
+  const key=serie?'serie:'+serie:'compra:'+hashCortoU([
     nombreClaveU(u&&u.usuario||''), normU(u&&u.producto||''),
     fechaDeCeldaU(u&&u.fCompra||''), fechaDeCeldaU(u&&u.fVenceRaw||''),
     telefonoClaveU(u&&u.telf||''), emailClaveU(u&&u.email||''),
     domicilioClaveU(u||{}), String(u&&u.id||'')
   ].join('|'));
+  if(u&&typeof u==='object') registroCacheU.set(u,key);
+  return key;
 }
 function parRegistrosU(a,b){ return [claveRegistroU(a),claveRegistroU(b)].sort().join('||'); }
 function mismosCamposIdentidadU(a,b){
-  const nombreA=nombreClaveU(a&&a.usuario||''), nombreB=nombreClaveU(b&&b.usuario||'');
-  const mismoNombre=!!(nombreA&&nombreA===nombreB);
-  const ta=telefonoClaveU(a&&a.telf||''), tb=telefonoClaveU(b&&b.telf||'');
-  const ea=emailClaveU(a&&a.email||''), eb=emailClaveU(b&&b.email||'');
-  const ca=cumpleClaveU(a&&(a.cumpleRaw||a.cumple)||''), cb=cumpleClaveU(b&&(b.cumpleRaw||b.cumple)||'');
-  const da=domicilioClaveU(a||{}), db=domicilioClaveU(b||{});
-  const telefono=!!(ta&&ta===tb), email=!!(ea&&ea===eb), cumple=!!(ca&&ca===cb), domicilio=!!(da&&da===db);
+  const ia=datosIdentidadU(a), ib=datosIdentidadU(b);
+  const mismoNombre=!!(ia.nombre&&ia.nombre===ib.nombre);
+  const telefono=!!(ia.telefono&&ia.telefono===ib.telefono);
+  const email=!!(ia.email&&ia.email===ib.email);
+  const cumple=!!(ia.cumple&&ia.cumple===ib.cumple);
+  const domicilio=!!(ia.domicilio&&ia.domicilio===ib.domicilio);
   const fuertes=[telefono,email,cumple].filter(Boolean).length;
   return {mismoNombre,telefono,email,cumple,domicilio,fuertes};
 }
@@ -17098,19 +17119,55 @@ function construirPersonaU(productos,manualId){
   u._busqueda=normU([u.usuario,u.telf,u.domicilio,u.localidad,u.cp,u.email].concat(ordenados.flatMap(p=>[p.producto,p.serie,p.fCompra,p.fVenceRaw])).join(' '));
   return u;
 }
+function clavesIndiceIdentidadU(p){
+  const d=datosIdentidadU(p), out=[];
+  if(d.nombre){
+    if(d.telefono) out.push('nt|'+d.nombre+'|'+d.telefono);
+    if(d.email) out.push('ne|'+d.nombre+'|'+d.email);
+    if(d.cumple) out.push('nc|'+d.nombre+'|'+d.cumple);
+    if(d.domicilio) out.push('nd|'+d.nombre+'|'+d.domicilio);
+  }
+  // Para nombres con una pequeña variación hacen falta dos datos fuertes,
+  // igual que en registrosMismaPersonaU.
+  if(d.telefono&&d.email) out.push('te|'+d.telefono+'|'+d.email);
+  if(d.telefono&&d.cumple) out.push('tc|'+d.telefono+'|'+d.cumple);
+  if(d.email&&d.cumple) out.push('ec|'+d.email+'|'+d.cumple);
+  return out;
+}
+function indexarGrupoIdentidadU(indices,grupo,p){
+  clavesIndiceIdentidadU(p).forEach(k=>{
+    let set=indices.get(k);
+    if(!set){ set=new Set(); indices.set(k,set); }
+    set.add(grupo);
+  });
+}
 function agruparUsuariosU(lista){
+  // Las cachés duran sólo una reconstrucción: si se corrigió un teléfono o
+  // llegó una planilla nueva no puede quedar una identidad anterior guardada.
+  identidadCacheU=new WeakMap();
+  registroCacheU=new WeakMap();
   const productos=deduplicarProductosU(lista);
   const estado=identidadLeerU();
-  const grupos=[];
+  const grupos=[], gruposManuales=new Map(), indices=new Map();
   productos.forEach(p=>{
     const key=claveRegistroU(p), manualId=estado.grupos[key]||'';
     let grupo=null;
-    if(manualId) grupo=grupos.find(g=>g.manualId===manualId)||null;
+    if(manualId) grupo=gruposManuales.get(manualId)||null;
     if(!grupo&&!manualId){
-      grupo=grupos.find(g=>!g.manualId&&!separadosDeGrupoU(p,g,estado)&&(g.productos||[]).some(q=>registrosMismaPersonaU(p,q)))||null;
+      const candidatos=new Set();
+      clavesIndiceIdentidadU(p).forEach(k=>{
+        const set=indices.get(k);
+        if(set) set.forEach(g=>candidatos.add(g));
+      });
+      grupo=[...candidatos].find(g=>!g.manualId&&!separadosDeGrupoU(p,g,estado)&&(g.productos||[]).some(q=>registrosMismaPersonaU(p,q)))||null;
     }
-    if(!grupo){ grupo={manualId,productos:[]}; grupos.push(grupo); }
+    if(!grupo){
+      grupo={manualId,productos:[]};
+      grupos.push(grupo);
+      if(manualId) gruposManuales.set(manualId,grupo);
+    }
     grupo.productos.push(p);
+    if(!grupo.manualId) indexarGrupoIdentidadU(indices,grupo,p);
   });
   return grupos.map(g=>construirPersonaU(g.productos,g.manualId));
 }
@@ -17123,16 +17180,38 @@ function motivoCoincidenciaU(a,b){
   if(m.cumple&&m.domicilio) return 'Coinciden cumpleaños y domicilio.';
   return '';
 }
+function personasSeparadasU(a,b,estado){
+  const pa=a.productos||[a], pb=b.productos||[b];
+  for(const x of pa) for(const y of pb) if(estado.separados[parRegistrosU(x,y)]) return true;
+  return false;
+}
+function clavesRevisionU(u){
+  const p=(u.productos&&u.productos[0])||u;
+  const d=datosIdentidadU(p), out=[];
+  if(d.nombre) out.push('n|'+d.nombre);
+  if(d.email) out.push('e|'+d.email);
+  if(d.telefono) out.push('t|'+d.telefono);
+  if(d.cumple&&d.domicilio) out.push('cd|'+d.cumple+'|'+d.domicilio);
+  return out;
+}
 function buscarCoincidenciasU(personas){
-  const estado=identidadLeerU(), out=[];
-  for(let i=0;i<personas.length;i++) for(let j=i+1;j<personas.length;j++){
-    const a=personas[i],b=personas[j];
-    const pares=[];
-    (a.productos||[a]).forEach(x=>(b.productos||[b]).forEach(y=>pares.push(parRegistrosU(x,y))));
-    if(pares.some(k=>estado.separados[k])) continue;
-    const motivo=motivoCoincidenciaU(a,b);
-    if(motivo) out.push({a,b,motivo});
-  }
+  const estado=identidadLeerU(), out=[], indices=new Map(), vistos=new Set();
+  (personas||[]).forEach((persona,actual)=>{
+    clavesRevisionU(persona).forEach(k=>{
+      const anteriores=indices.get(k)||[];
+      anteriores.forEach(prev=>{
+        const a=personas[prev], b=persona;
+        const pair=prev+'|'+actual;
+        if(vistos.has(pair)) return;
+        vistos.add(pair);
+        if(personasSeparadasU(a,b,estado)) return;
+        const motivo=motivoCoincidenciaU(a,b);
+        if(motivo) out.push({a,b,motivo});
+      });
+      anteriores.push(actual);
+      indices.set(k,anteriores);
+    });
+  });
   return out;
 }
 function actualizarIndicadoresIdentidadU(){
@@ -17147,6 +17226,7 @@ function actualizarIndicadoresIdentidadU(){
 function reagruparUsuariosU(){
   usuariosU=agruparUsuariosU(productosFuenteU);
   coincidenciasU=buscarCoincidenciasU(usuariosU);
+  listadoUsuariosSucioU=true;
   window.usuariosU=usuariosU;
   actualizarIndicadoresIdentidadU();
   return usuariosU;
@@ -17377,7 +17457,9 @@ function aplicarFiltrosU(){
     btnLimpiar.hidden=!isFiltered;
     btnLimpiar.onclick=()=>{ resetFiltrosU(); };
   }
-  renderListU();
+  listadoUsuariosSucioU=true;
+  const vista=document.getElementById('view-usuarios');
+  if(vista&&vista.classList.contains('active')) renderListU();
 }
 /* ---------- WhatsApp desde el listado (v813) ----------
    Usuario normal: saludo corto. Usuario REASIGNADO (la planilla trae la
@@ -17486,39 +17568,122 @@ function abrirCoincidenciasU(){
 window.abrirCoincidenciasUsuarios=abrirCoincidenciasU;
 window.abrirContactoEstrella=abrirContactoEstrellaU;
 
+function detalleUsuarioHtmlU(u,index){
+  const productos=(Array.isArray(u.productos)&&u.productos.length?u.productos:[u]);
+  const zonaCp=[u.localidad,u.cp?'CP '+u.cp:''].filter(Boolean).join(' ');
+  const diasNum=u.fVence?Math.ceil((u.fVence-new Date())/(1000*60*60*24)):null;
+  const diasLabel=diasNum!==null?(diasNum<0?`${Math.abs(diasNum)}d vencida`:`${diasNum}d`):'';
+  const productosHtml=productos.map((p,pi)=>{
+    const ultimo=pi===0;
+    const estado=p.estado||'vigente';
+    const label=ultimo?(estado==='vencida'?'Vencido':(estado==='porVencer'?'Por vencer':'Vigente')):'Equipo anterior renovado';
+    const clase=ultimo?estado:'renovado';
+    return `<div class="u-product ${ultimo?'latest':'old'}" data-u-product="${pi}">
+      <div class="u-product-head"><strong>${escU(p.producto||'Producto sin informar')}</strong><span class="u-product-state ${clase}">${escU(label)}</span></div>
+      <div class="u-product-meta">
+        <span>🛒 Fecha de compra: <b>${escU(p.fCompra||'Fecha no informada')}</b></span>
+        <span>📅 Vencimiento: <b>${escU(p.fVenceRaw||'Fecha no informada')}</b></span>
+        ${p.serie?`<span class="u-product-series">🔖 Serie: <b>${escU(p.serie)}</b></span>`:''}
+        ${ultimo?'<span class="u-product-series">La renovación o el Plan Canje se gestiona únicamente sobre este producto.</span>':''}
+      </div>
+    </div>`;
+  }).join('');
+  return `<div class="u-person-contact">
+      <div>📞 <b>${escU(u.telf||'—')}</b>${u.telfEditado?' <span title="Número corregido a mano" style="font-size:9px">✏️</span>':''}</div>
+      <div>🏠 <b>${escU(u.domicilio||'—')}</b></div>
+      <div>📍 <b>${escU(zonaCp||'—')}</b></div>
+      ${u.email?`<div>✉️ <b>${escU(u.email)}</b></div>`:'<div>✉️ <b>—</b></div>'}
+      ${u.reasignado?`<div style="grid-column:1/-1">↻ Reasignado de: <b style="color:#0b5878">${escU(u.dipReasignado)}</b></div>`:''}
+    </div>
+    <div class="u-products-title"><span>Productos adquiridos</span><span>${productos.length}</span></div>
+    <div class="u-products">${productosHtml}</div>
+    <div class="u-fila">
+      <div class="tp-slot" data-tp-scope="usuarios" data-tp-index="${index}"></div>
+      ${u.esEstrella&&u.telf?`<button type="button" class="action-btn u-star-contact" data-u-action="star" data-u-index="${index}">⭐ Contactar</button>`:''}
+      ${u.telf?`
+      <button type="button" class="action-btn wa" data-u-action="whatsapp" data-u-index="${index}">💬 WhatsApp</button>
+      <button type="button" class="action-btn call" data-u-action="call" data-u-index="${index}" data-appi-call-phone="${escU(window.APPITel?window.APPITel.normalizar(u.telf||''):'')}" data-appi-call-name="${escU(u.usuario||'Contacto')}" data-appi-call-label="1">📲 Llamar en teléfono</button>`:''}
+      <button type="button" class="action-btn neighbors" data-u-action="neighbors" data-u-index="${index}">👥 Vecinos</button>
+      <button type="button" class="action-btn mail" data-u-action="google" data-u-index="${index}">🧭 ¿Cómo llego?</button>
+      <button type="button" class="action-btn editar-tel" data-u-action="editartel" data-u-index="${index}">✏️ Teléfono</button>
+      <button type="button" class="action-btn depurar" data-u-action="depurar" data-u-index="${index}">🧹 Depurar</button>
+    </div>
+    ${diasLabel?`<div style="margin-top:7px;color:#777887;font-size:9.5px;text-align:right">Producto más reciente · ${escU(diasLabel)}</div>`:''}`;
+}
+function ejecutarAccionUsuarioU(button,u){
+  if(!u) return;
+  const action=button.dataset.uAction;
+  if(action==='star'){
+    abrirContactoEstrellaU(u);
+  }else if(action==='neighbors'){
+    if(window.APPIUsuariosBotones&&window.APPIUsuariosBotones.abrirVecinos){
+      window.APPIUsuariosBotones.abrirVecinos(u.localidad||'', u.id);
+    }else{
+      window.APPIDialog.alert('El listado de vecinos todavía no está disponible.',{title:'Vecinos',icon:'👥'});
+    }
+  }else if(action==='whatsapp'){
+    const link=getWhatsAppLinkU(u);
+    if(link) window.open(link,'_blank','noopener');
+    else if(window.APPITel&&window.APPITel.avisarInvalido) window.APPITel.avisarInvalido(u.telf||'',nombreDePila(u.usuario)||u.usuario,u);
+    else window.APPIDialog.alert('Este usuario no tiene un teléfono válido cargado.',{title:'Sin teléfono',icon:'📵'});
+  }else if(action==='call'){
+    const digits=window.APPITel?window.APPITel.normalizar(u.telf||''):'';
+    if(digits) window.location.href='tel:'+digits;
+  }else if(action==='google'){
+    const query=[u.domicilio,u.localidad].filter(Boolean).join(' ');
+    window.open('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(query),'_blank','noopener');
+  }else if(action==='editartel'){
+    editarTelfDeU(u);
+  }else if(action==='depurar'){
+    if(depuradosEsUsuario(u)){
+      if(window.showToast) showToast('Este contacto ya está depurado',2000);
+      return;
+    }
+    confirmarAccion({
+      title:'Depurar contacto',
+      sub:'El contacto y todos sus productos saldrán de la lista.',
+      html:'<p style="margin:0;color:#30303d;font-size:13px"><b>'+escU(u.usuario||'Sin nombre')+'</b> · '+escU(u.telf||'Sin teléfono')+'</p><p style="margin:8px 0 0;color:#777887;font-size:11.5px;line-height:1.5">Queda registrado en la planilla de depurados, lista para descargar y pasársela a la empresa.</p>',
+      okText:'Depurar',cancelText:'Cancelar',danger:true,
+      onConfirm:function(){
+        depurarUsuario(u);
+        if(window.showToast) showToast('Contacto depurado 🧹',2200);
+      }
+    });
+  }
+}
+function montarDetalleUsuarioU(panel,index){
+  if(!panel||panel.dataset.ready==='1') return;
+  const u=filtradosU[Number(index)];
+  if(!u) return;
+  panel.innerHTML=detalleUsuarioHtmlU(u,Number(index));
+  panel.dataset.ready='1';
+  panel.querySelectorAll('[data-u-action]').forEach(button=>{
+    button.onclick=()=>ejecutarAccionUsuarioU(button,filtradosU[Number(button.dataset.uIndex)]);
+  });
+  if(window.APPIDeviceBridge) window.APPIDeviceBridge.decorateCallButtons();
+  const cont=document.getElementById('usuariosList');
+  if(window.APPITarjetas&&window.APPITarjetas.pintarListaUsuarios) window.APPITarjetas.pintarListaUsuarios(cont,filtradosU);
+}
+window.montarDetalleUsuarioU=montarDetalleUsuarioU;
+
 function renderListU(){
   const cont=document.getElementById('usuariosList');
   if(!cont) return;
+  const abiertos=new Set([...cont.querySelectorAll('.tree-node.expanded[data-u-persona]')].map(n=>n.getAttribute('data-u-persona')));
   if(filtradosU.length===0){
     cont.innerHTML='<div class="empty">Sin usuarios con esos filtros</div>';
+    listadoUsuariosSucioU=false;
     if(window.APPITarjetas&&window.APPITarjetas.pintarListaUsuarios) window.APPITarjetas.pintarListaUsuarios(cont, filtradosU);
     return;
   }
+  // v883: al inicio sólo se crean las cabeceras. El detalle completo y todos
+  // los productos se dibujan al desplegar la persona, no miles de veces en Home.
   cont.innerHTML=filtradosU.map((u,index)=>{
     const venceRaw=u.fVenceRaw||'Fecha no informada';
-    const diasNum=u.fVence?Math.ceil((u.fVence-new Date())/(1000*60*60*24)):null;
-    const diasLabel=diasNum!==null?(diasNum<0?`${Math.abs(diasNum)}d vencida`:`${diasNum}d`):'';
     const estadoColor=u.estado==='vencida'?'#d9534f':(u.estado==='porVencer'?'#f5b301':'#3ad0a4');
     const estadoTxt=u.estado==='vencida'?'VENC':(u.estado==='porVencer'?'POR VENC':'VIG');
-    const zonaCp=[u.localidad,u.cp?'CP '+u.cp:''].filter(Boolean).join(' ');
     const productos=(Array.isArray(u.productos)&&u.productos.length?u.productos:[u]);
-    const productosHtml=productos.map((p,pi)=>{
-      const ultimo=pi===0;
-      const estado=p.estado||'vigente';
-      const label=ultimo?(estado==='vencida'?'Vencido':(estado==='porVencer'?'Por vencer':'Vigente')):'Equipo anterior renovado';
-      const clase=ultimo?estado:'renovado';
-      return `<div class="u-product ${ultimo?'latest':'old'}" data-u-product="${pi}">
-        <div class="u-product-head"><strong>${escU(p.producto||'Producto sin informar')}</strong><span class="u-product-state ${clase}">${escU(label)}</span></div>
-        <div class="u-product-meta">
-          <span>🛒 Fecha de compra: <b>${escU(p.fCompra||'Fecha no informada')}</b></span>
-          <span>📅 Vencimiento: <b>${escU(p.fVenceRaw||'Fecha no informada')}</b></span>
-          ${p.serie?`<span class="u-product-series">🔖 Serie: <b>${escU(p.serie)}</b></span>`:''}
-          ${ultimo?'<span class="u-product-series">La renovación o el Plan Canje se gestiona únicamente sobre este producto.</span>':''}
-        </div>
-      </div>`;
-    }).join('');
-    return `
-    <div class="tree-node" data-u-toggle="${index}" role="button" tabindex="0" aria-expanded="false">
+    return `<div class="tree-node" data-u-toggle="${index}" data-u-persona="${escU(u.personaId||u.id||index)}" role="button" tabindex="0" aria-expanded="false">
       <span class="tree-arrow">›</span>
       <span class="tree-cat-badge" style="background:${estadoColor}">${estadoTxt}</span>
       ${u.reasignado?`<span class="tree-cat-badge" style="background:#5b8def" title="Reasignado de: ${escU(u.dipReasignado)}">↻</span>`:''}
@@ -17527,34 +17692,13 @@ function renderListU(){
       <span class="tree-pts" style="background:rgba(0,0,0,0.06);color:#1c1c1e">${escU(u.localidad||'')}</span>
       <span class="tree-pts" style="min-width:70px;text-align:right" title="Vencimiento del producto más reciente">${escU(venceRaw)}</span>
     </div>
-    <div class="tree-children" style="padding:8px;background:rgba(255,255,255,0.5);border-radius:12px;margin-bottom:8px">
-      <div class="u-person-contact">
-        <div>📞 <b>${escU(u.telf||'—')}</b>${u.telfEditado?' <span title="Número corregido a mano" style="font-size:9px">✏️</span>':''}</div>
-        <div>🏠 <b>${escU(u.domicilio||'—')}</b></div>
-        <div>📍 <b>${escU(zonaCp||'—')}</b></div>
-        ${u.email?`<div>✉️ <b>${escU(u.email)}</b></div>`:'<div>✉️ <b>—</b></div>'}
-        ${u.reasignado?`<div style="grid-column:1/-1">↻ Reasignado de: <b style="color:#0b5878">${escU(u.dipReasignado)}</b></div>`:''}
-      </div>
-      <div class="u-products-title"><span>Productos adquiridos</span><span>${productos.length}</span></div>
-      <div class="u-products">${productosHtml}</div>
-      <div class="u-fila">
-        <div class="tp-slot" data-tp-scope="usuarios" data-tp-index="${index}"></div>
-        ${u.esEstrella&&u.telf?`<button type="button" class="action-btn u-star-contact" data-u-action="star" data-u-index="${index}">⭐ Contactar</button>`:''}
-        ${u.telf?`
-        <button type="button" class="action-btn wa" data-u-action="whatsapp" data-u-index="${index}">💬 WhatsApp</button>
-        <button type="button" class="action-btn call" data-u-action="call" data-u-index="${index}" data-appi-call-phone="${escU(window.APPITel?window.APPITel.normalizar(u.telf||''):'')}" data-appi-call-name="${escU(u.usuario||'Contacto')}" data-appi-call-label="1">📲 Llamar en teléfono</button>`:''}
-        <button type="button" class="action-btn neighbors" data-u-action="neighbors" data-u-index="${index}">👥 Vecinos</button>
-        <button type="button" class="action-btn mail" data-u-action="google" data-u-index="${index}">🧭 ¿Cómo llego?</button>
-        <button type="button" class="action-btn editar-tel" data-u-action="editartel" data-u-index="${index}">✏️ Teléfono</button>
-        <button type="button" class="action-btn depurar" data-u-action="depurar" data-u-index="${index}">🧹 Depurar</button>
-      </div>
-      ${diasLabel?`<div style="margin-top:7px;color:#777887;font-size:9.5px;text-align:right">Producto más reciente · ${escU(diasLabel)}</div>`:''}
-    </div>`;
+    <div class="tree-children" data-u-details="${index}" style="padding:8px;background:rgba(255,255,255,0.5);border-radius:12px;margin-bottom:8px"></div>`;
   }).join('');
 
   const toggleNode=node=>{
     const children=node.nextElementSibling;
     const open=!node.classList.contains('expanded');
+    if(open) montarDetalleUsuarioU(children,Number(node.dataset.uToggle));
     node.classList.toggle('expanded',open);
     node.setAttribute('aria-expanded',String(open));
     if(children) children.classList.toggle('open',open);
@@ -17564,55 +17708,23 @@ function renderListU(){
     node.onkeydown=event=>{
       if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleNode(node)}
     };
+    if(abiertos.has(node.getAttribute('data-u-persona'))){
+      montarDetalleUsuarioU(node.nextElementSibling,Number(node.dataset.uToggle));
+      node.classList.add('expanded');
+      node.setAttribute('aria-expanded','true');
+      if(node.nextElementSibling) node.nextElementSibling.classList.add('open');
+    }
   });
-  cont.querySelectorAll('[data-u-action]').forEach(button=>{
-    button.onclick=()=>{
-      const u=filtradosU[Number(button.dataset.uIndex)];
-      if(!u) return;
-      const action=button.dataset.uAction;
-      if(action==='star'){
-        abrirContactoEstrellaU(u);
-      }else if(action==='neighbors'){
-        if(window.APPIUsuariosBotones&&window.APPIUsuariosBotones.abrirVecinos){
-          window.APPIUsuariosBotones.abrirVecinos(u.localidad||'', u.id);
-        }else{
-          window.APPIDialog.alert('El listado de vecinos todavía no está disponible.',{title:'Vecinos',icon:'👥'});
-        }
-      }else if(action==='whatsapp'){
-        const link=getWhatsAppLinkU(u);
-        if(link) window.open(link,'_blank','noopener');
-        else if(window.APPITel&&window.APPITel.avisarInvalido) window.APPITel.avisarInvalido(u.telf||'',nombreDePila(u.usuario)||u.usuario,u);
-        else window.APPIDialog.alert('Este usuario no tiene un teléfono válido cargado.',{title:'Sin teléfono',icon:'📵'});
-      }else if(action==='call'){
-        const digits=window.APPITel?window.APPITel.normalizar(u.telf||''):'';
-        if(digits) window.location.href='tel:'+digits;
-      }else if(action==='google'){
-        const query=[u.domicilio,u.localidad].filter(Boolean).join(' ');
-        window.open('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(query),'_blank','noopener');
-      }else if(action==='editartel'){
-        editarTelfDeU(u);
-      }else if(action==='depurar'){
-        if(depuradosEsUsuario(u)){
-          if(window.showToast) showToast('Este contacto ya está depurado',2000);
-          return;
-        }
-        confirmarAccion({
-          title:'Depurar contacto',
-          sub:'El contacto y todos sus productos saldrán de la lista.',
-          html:'<p style="margin:0;color:#30303d;font-size:13px"><b>'+escU(u.usuario||'Sin nombre')+'</b> · '+escU(u.telf||'Sin teléfono')+'</p><p style="margin:8px 0 0;color:#777887;font-size:11.5px;line-height:1.5">Queda registrado en la planilla de depurados, lista para descargar y pasársela a la empresa.</p>',
-          okText:'Depurar',cancelText:'Cancelar',danger:true,
-          onConfirm:function(){
-            depurarUsuario(u);
-            if(window.showToast) showToast('Contacto depurado 🧹',2200);
-          }
-        });
-      }
-    };
-  });
-  if(window.APPIDeviceBridge) window.APPIDeviceBridge.decorateCallButtons();
+  listadoUsuariosSucioU=false;
   if(window.APPITarjetas&&window.APPITarjetas.pintarListaUsuarios) window.APPITarjetas.pintarListaUsuarios(cont,filtradosU);
 }
 window.aplicarFiltrosU=aplicarFiltrosU;
+window.renderUsuariosPendientes=function(){
+  // Si la persona entró antes de la precarga ociosa, cargar ahora. En Home no
+  // se parsea ni agrupa la planilla pesada durante el arranque.
+  try{ if(window.asegurarUsuariosCargados) window.asegurarUsuariosCargados(); }catch(e){ console.error(e); }
+  if(listadoUsuariosSucioU) renderListU();
+};
 window.usuariosFiltradosActual=function(){ return filtradosU.slice(); };
 // Las usa el módulo de mensajes, que vive en otro archivo.
 window.parseFechaU=parseFechaU;
@@ -17640,7 +17752,13 @@ function depuradosEsUsuario(u){
   });
 }
 function depuradosContar(){ return depuradosLeer().lista.length; }
-function depuradosAplicar(lista){ return (lista||[]).filter(function(u){ return !depuradosEsUsuario(u); }); }
+function depuradosAplicar(lista){
+  // Leer una sola vez: con miles de garantías, consultar y parsear localStorage
+  // por cada fila frenaba también el arranque.
+  const telefonos=new Set(depuradosLeer().lista.map(d=>d&&d.telDig).filter(Boolean));
+  if(!telefonos.size) return (lista||[]).slice();
+  return (lista||[]).filter(u=>!telefonos.has(telDigitosDep(u&&u.telf)));
+}
 function productosSerializadosU(){
   return (productosFuenteU||[]).map(p=>{
     const copia=Object.assign({},p);
@@ -18161,6 +18279,9 @@ function initUsuarios(){
   if(btnCumples) btnCumples.onclick=()=>abrirCumplesUsuarios();
 
   function recargarUsuariosDeStorage(){
+    if(cargaUsuariosEnCursoU) return;
+    cargaUsuariosEnCursoU=true;
+    usuariosStorageCargadoU=true;
     try{
       const saved=JSON.parse(localStorage.getItem('usuarios_garantias')||'[]');
       try{ setTimeout(actualizarUsuariosMetaBar, 300); }catch(e){}
@@ -18196,12 +18317,21 @@ function initUsuarios(){
         if(upCard) upCard.style.display='block';
       }
     }catch(e){ console.log('load usuarios fail',e); }
+    finally{ cargaUsuariosEnCursoU=false; }
   }
   window.recargarUsuariosDeStorage=recargarUsuariosDeStorage;
+  window.asegurarUsuariosCargados=function(){
+    if(!usuariosStorageCargadoU) recargarUsuariosDeStorage();
+    return usuariosU;
+  };
   window.mostrarDashboardU=mostrarDashboardU;
 
-  // Cargar de localStorage
-  recargarUsuariosDeStorage();
+  // v883: primero termina de abrir Home. La planilla de Usuarios se prepara
+  // en segundo plano bastante después, o inmediatamente si se entra a esa
+  // vista. El evento final preserva mensajes y recordatorios sin meter este
+  // trabajo pesado dentro del arranque de Home.
+  const precargarUsuariosU=()=>{ if(!usuariosStorageCargadoU) recargarUsuariosDeStorage(); };
+  setTimeout(precargarUsuariosU,8000);
 }
 document.addEventListener('DOMContentLoaded', initUsuarios);
 setTimeout(initUsuarios, 1200);

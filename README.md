@@ -6,6 +6,15 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v883 · Recuperación de velocidad en Usuarios
+
+- El Home deja para después la preparación de la planilla y ya no construye miles de fichas invisibles durante el inicio.
+- La unificación y la revisión de coincidencias usan índices de identidad y comparan únicamente candidatos posibles, sin recorrer toda la base contra toda la base.
+- Al entrar a Usuarios se muestran las cabeceras y cada historial completo se crea recién cuando se despliega la persona.
+- Se mantiene todo el comportamiento de v882: identidad segura, decisiones manuales, historial, Usuarios estrella, filtros, mensajes y Plan Canje sobre la compra más reciente.
+- Se agregó una prueba de volumen con 1.500 garantías; en el entorno de prueba el Home bajó de aproximadamente 30 segundos a alrededor de 1,5 segundos.
+- Versión: **v883 · Segura** → Cache `appi-v883-rendimiento-usuarios`.
+
 ## v882 · Usuarios unificados y Usuarios estrella
 
 - Usuarios representa personas y no renglones de garantía: reúne automáticamente las compras corroborando nombre con teléfono, correo, cumpleaños o domicilio.
