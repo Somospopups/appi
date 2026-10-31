@@ -150,13 +150,12 @@ test('las herramientas viven arriba y Tarjetas abre su popup', async ({ page }) 
     tarjetas: { byKey: { 'tel:3515551001': [{ marca: 'visa', banco: 'galicia' }] } }
   });
 
-  // Siete a la vista: Tarjetas, Ordenar, Zonas, Reasignados, Mensajes,
-  // Depurados y Cumpleaños (Mapa se quitó en v332; Depurados se sumó en
-  // v350; Cumpleaños en v543; Reasignados siempre visible en v814; el
-  // botón Plantillas salió de la barra con la llegada de Mensajes).
-  // Limpiar aparece sólo con un filtro.
+  // Ocho a la vista: Usuarios estrella, Tarjetas, Ordenar, Zonas,
+  // Reasignados, Mensajes, Depurados y Cumpleaños. Revisar coincidencias
+  // aparece únicamente cuando APPI encuentra identidades dudosas y Limpiar
+  // sólo cuando hay un filtro activo.
   const tools = page.locator('.u-tools button:visible');
-  await expect(tools).toHaveCount(7);
+  await expect(tools).toHaveCount(8);
   await expect(page.locator('#usuariosBtnLimpiar')).toBeHidden();
   await expect(page.locator('#usuariosBtnTarjetas')).toBeVisible();
   await expect(page.locator('#usuariosBtnZonas')).toBeVisible();

@@ -160,13 +160,13 @@ window.openStock=function(){
 <script src="./mensajes-hielo.js?v=618"></script>
 <script src="./mensajes-usuarios.js?v=639"></script>
   <script src="./campus-preguntas.js?v=646"></script>
-  <script src="./campus-psa.js?v=881"></script>
+  <script src="./campus-psa.js?v=882"></script>
 <script src="./reactivacion.js?v=618"></script>
 
 <script src="./escalera-suenos.js?v=618"></script>
 <script src="./demo-guia.js?v=618"></script>
 <script src="./tablero-negocio.js?v=618"></script>
-<script src="./lista-precios.js?v=881"></script>
+<script src="./lista-precios.js?v=882"></script>
 <script src="./vendor/pdf.min.js?v=618"></script>
 <script src="./canillas-adaptadores.js?v=618"></script>
 <script src="./vendor/zxing.min.js?v=618"></script>
@@ -4743,7 +4743,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v881 · Segura</div>
+  <div class="ds-foot">APPI · v882 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -5639,7 +5639,7 @@ body.dark #pageTabs button.active{color:#c5d6ff}
       <button class="help-btn" id="btnHelpUsuarios" aria-label="Ayuda">?</button>
       <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
       <h1>Usuarios</h1><div class="script">Garantías</div>
-      <p>Gestión por zona y vencimiento - Estilo Mi Equipo</p>
+      <p>Una persona, todos sus productos y vencimientos</p>
       <div id="usuariosMetaBar" style="display:none; margin:6px 14px 10px; padding:6px 10px 6px 10px; border-radius:10px; background:rgba(255,255,255,0.55); border:1px solid rgba(255,255,255,0.7); font-size:11px; color:#65676b; line-height:1.3; display:flex; align-items:center; gap:8px;">
         <div id="usuariosMetaFecha" style="flex:1; text-align:center; display:flex; flex-wrap:wrap; justify-content:center; gap:4px 6px;"></div>
         <button type="button" class="eq-meta-refresh" id="btnUsuariosActualizar" aria-label="Actualizar Garantías" title="Actualizar Garantías">↻</button>
@@ -5681,6 +5681,8 @@ body.dark #pageTabs button.active{color:#c5d6ff}
       <!-- Las herramientas van arriba, pegadas a los contadores: son la forma
            de recortar la lista, así que se usan antes de mirarla. -->
       <div class="u-tools">
+        <button type="button" id="usuariosBtnEstrella" style="position:relative"><span>⭐</span>Usuarios estrella<b id="usuariosStEstrella" class="u-star-badge">0</b></button>
+        <button type="button" id="usuariosBtnCoincidencias" style="position:relative" hidden><span>⚠️</span>Revisar coincidencias<b id="usuariosStCoincidencias" class="u-review-badge">0</b></button>
         <button type="button" id="usuariosBtnTarjetas"><span>💳</span>Tarjetas</button>
         <button type="button" id="usuariosBtnOrdenVence"><span>📅</span>Ordenar</button>
         <button type="button" id="usuariosBtnZonas"><span>📍</span>Zonas</button>
@@ -5695,7 +5697,7 @@ body.dark #pageTabs button.active{color:#c5d6ff}
       <div class="glass">
         <div id="usuariosFiltroBotones"></div>
         <div class="search-box">
-          <span>🔍</span><input type="text" id="usuariosSearch" placeholder="Buscar por nombre, domicilio, localidad...">
+          <span>🔍</span><input type="text" id="usuariosSearch" placeholder="Buscar por nombre, producto, serie o localidad...">
           <button id="usuariosClearSearch" style="border:none;background:none;cursor:pointer">✕</button>
         </div>
         <div id="usuariosTarjetasBar"></div>
@@ -14293,8 +14295,8 @@ function cerrarToolsMenu(){
   // con archivos viejos en pantalla.
   if ('serviceWorker' in navigator) {
     (async () => {
-    const swVersion='881';
-    const CACHE_NAME='appi-v881-historico-y-precios';
+    const swVersion='882';
+    const CACHE_NAME='appi-v882-usuarios-unificados';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
@@ -15920,9 +15922,15 @@ body.dark .hist-search input::placeholder{color:#f0d78a!important}
 /* Con el mapa abierto el botón queda marcado: así se sabe que ese mismo toque
    lo vuelve a cerrar. */
 .u-tools button.activo{background:linear-gradient(135deg,#0b5878,#3ad0a4);border-color:transparent;color:#fff;box-shadow:0 6px 16px rgba(91,112,210,.26)}
-.u-re-badge{position:absolute;top:3px;right:6px;min-width:16px;height:16px;padding:0 4px;border-radius:99px;background:#5b8def;color:#fff;font-size:9px;font-weight:900;line-height:16px;display:none}
+.u-re-badge,.u-star-badge,.u-review-badge{position:absolute;top:3px;right:6px;min-width:16px;height:16px;padding:0 4px;border-radius:99px;color:#fff;font-size:9px;font-weight:900;line-height:16px}
+.u-re-badge{background:#5b8def;display:none}
 .u-re-badge.on{display:block}
-.u-tools button.activo .u-re-badge{background:#fff;color:#0b5878}
+.u-star-badge{background:#d58a00}
+.u-review-badge{background:#d9534f}
+.u-tools button.activo .u-re-badge,.u-tools button.activo .u-star-badge,.u-tools button.activo .u-review-badge{background:#fff;color:#0b5878}
+.u-tools #usuariosBtnEstrella{border-color:rgba(213,138,0,.24);background:linear-gradient(135deg,rgba(255,245,191,.88),rgba(255,255,255,.8));color:#795b05}
+.u-tools #usuariosBtnEstrella.activo{background:linear-gradient(135deg,#ad7100,#f1b928);border-color:transparent;color:#fff}
+.u-tools #usuariosBtnCoincidencias{border-color:rgba(217,83,79,.2);color:#a23f47}
 .u-tools button.activo:hover{background:linear-gradient(135deg,#0b5878,#3ad0a4)}
 /* Limpiar sólo existe mientras haya un filtro puesto. */
 .u-tools button.limpiar{background:linear-gradient(135deg,#ff6b6b,#ff8f6b);border-color:transparent;color:#fff;box-shadow:0 5px 14px rgba(255,107,107,.32)}
@@ -16083,6 +16091,23 @@ body.dark #view-usuarios .filter.active{
   from{opacity:0; transform:translateY(-6px)}
   to{opacity:1; transform:translateY(0)}
 }
+.u-product-count{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;min-height:24px;padding:4px 9px;border-radius:999px;background:linear-gradient(135deg,#ad7100,#f1b928);color:#fff;font-size:9px;font-weight:900;white-space:nowrap;box-shadow:0 3px 9px rgba(173,113,0,.18)}
+.u-person-contact{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:11px 12px;margin-bottom:10px;border-radius:14px;background:rgba(91,141,239,.07);font-size:11px}
+.u-products-title{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:3px 2px 8px;color:#30303d;font-size:12px;font-weight:900}
+.u-products{display:grid;gap:8px}
+.u-product{padding:11px 12px;border:1px solid rgba(80,90,130,.1);border-radius:14px;background:rgba(255,255,255,.72)}
+.u-product.latest{border-color:rgba(58,208,164,.34);background:rgba(58,208,164,.08)}
+.u-product.old{border-color:rgba(91,141,239,.2);background:rgba(91,141,239,.055)}
+.u-product-head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.u-product-head strong{min-width:0;color:#292938;font-size:12.5px;line-height:1.3}
+.u-product-state{flex:0 0 auto;padding:4px 7px;border-radius:999px;font-size:8px;font-weight:900;white-space:nowrap}
+.u-product-state.vigente{background:rgba(58,208,164,.16);color:#168765}.u-product-state.porVencer{background:rgba(245,179,1,.16);color:#8b6500}.u-product-state.vencida{background:rgba(217,83,79,.13);color:#b7444c}.u-product-state.renovado{background:rgba(91,141,239,.13);color:#3d63c9}
+.u-product-meta{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px;color:#626371;font-size:10.5px;line-height:1.35}
+.u-product-meta b{color:#343541}.u-product-series{grid-column:1/-1;color:#777887;font-size:9.5px}
+.u-star-contact{background:linear-gradient(135deg,#ad7100,#f1b928)!important;color:#fff!important;border-color:transparent!important}
+.u-identity-cards{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}.u-identity-card{padding:12px;border:1px solid rgba(80,90,130,.12);border-radius:14px;background:rgba(255,255,255,.72)}.u-identity-card b{display:block;color:#292938;font-size:12.5px}.u-identity-card small{display:block;margin-top:5px;color:#6f707d;font-size:10.5px;line-height:1.45}.u-identity-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.u-identity-actions button,.u-star-send{min-height:46px;border:0;border-radius:13px;font:inherit;font-size:11px;font-weight:900;cursor:pointer}.u-identity-merge{background:linear-gradient(135deg,#0b5878,#3ad0a4);color:#fff}.u-identity-separate{background:rgba(91,141,239,.1);color:#3d63c9}.u-star-choices{display:grid;gap:7px;margin-bottom:10px}.u-star-choice{min-height:43px;padding:9px 11px;border:1px solid rgba(80,90,130,.12);border-radius:12px;background:rgba(255,255,255,.72);color:#454653;font:inherit;font-size:11px;font-weight:800;text-align:left;cursor:pointer}.u-star-choice.on{background:linear-gradient(135deg,#ad7100,#f1b928);border-color:transparent;color:#fff}.u-star-editor{width:100%;min-height:118px;padding:11px;border:1px solid rgba(80,90,130,.16);border-radius:13px;background:rgba(255,255,255,.8);color:#292938;font:inherit;font-size:12px;line-height:1.5;resize:vertical;box-sizing:border-box}.u-star-send{width:100%;margin-top:9px;background:#25d366;color:#fff;font-size:12px}
+body.dark .u-person-contact,body.dark .u-product,body.dark .u-identity-card,body.dark .u-star-choice,body.dark .u-star-editor{background:rgba(31,32,49,.78);border-color:rgba(255,255,255,.09);color:#ececf2}body.dark .u-products-title,body.dark .u-product-head strong,body.dark .u-product-meta b,body.dark .u-identity-card b{color:#f1f1f6}
+@media(max-width:520px){.u-person-contact,.u-product-meta{grid-template-columns:1fr}.u-product-series{grid-column:1}.u-identity-cards{grid-template-columns:1fr}.u-product-count{padding:4px 7px;font-size:8px}}
 #view-usuarios .action-btn{
   padding:8px 13px;
   border-radius:999px;
@@ -16788,7 +16813,8 @@ window.transcribeUniversal=transcribeUniversal;window.loadModelUniversal=loadMod
 // ===== USUARIOS GARANTIAS - INTEGRADO EN MI NEGOCIO =====
 (function(){
 const LS_KEY_U='usuarios_garantias';
-let usuariosU=[], filtradosU=[], filtroVencU='all', filtroZonaU='all', filtroReasigU=false, ordenAscU=true;
+let productosFuenteU=[], usuariosU=[], filtradosU=[], coincidenciasU=[];
+let filtroVencU='all', filtroZonaU='all', filtroReasigU=false, filtroEstrellaU=false, ordenAscU=true;
 
 function escU(value){
   return String(value==null?'':value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -16857,8 +16883,10 @@ async function editarTelfDeU(u){
   u.telf=String(pedido.valor||'').slice(0,30);
   claves.forEach(k=>window.APPITel.edicion.guardar(k, u.telf));
   u.telfEditado=!!u.telf;
+  const compras=new Set((u.productos||[u]).map(claveRegistroU));
+  productosFuenteU.forEach(p=>{ if(compras.has(claveRegistroU(p))){ p.telf=u.telf; p.telfEditado=!!u.telf; } });
   try{ depuradosGuardarUsuarios(); }catch(e){}
-  try{ window.usuariosU=usuariosU; }catch(e){}
+  try{ reagruparUsuariosU(); }catch(e){}
   try{ aplicarFiltrosU(); }catch(e){}
   if(window.showToast) showToast(u.telf?'Teléfono actualizado ✓':'Teléfono quitado de la ficha', 2200);
 }
@@ -16891,6 +16919,11 @@ function parseFechaU(str){
    evita que las fechas reales se muestren como "44663" o se pierdan. */
 function fechaDeCeldaU(v){
   if(v==null || v==='') return '';
+  const corto=String(v).trim().match(/^(\d{1,2})[\/\-](\d{1,2})$/);
+  if(corto){
+    const d=Number(corto[1]),m=Number(corto[2]);
+    if(d>=1&&d<=31&&m>=1&&m<=12) return padFecha2(d)+'/'+padFecha2(m);
+  }
   const ymd=typeof ymdDesdeCelda==='function' ? ymdDesdeCelda(v) : null;
   if(ymd) return padFecha2(ymd.d)+'/'+padFecha2(ymd.m)+'/'+ymd.y;
   return String(v).trim();
@@ -16903,6 +16936,225 @@ function estadoVencU(fecha){
   if(diff<=30) return 'porVencer';
   return 'vigente';
 }
+
+/* v882 · Una persona, todos sus productos.
+   PSA no entrega DNI. Para no unir homónimos a ciegas se corrobora la
+   identidad con nombre + teléfono/correo/cumpleaños/domicilio. Las dudas
+   quedan para revisión manual. La serie identifica al producto físico: una
+   misma serie repetida cuenta una vez; dos series del mismo modelo cuentan
+   como dos compras y convierten a la persona en Usuario estrella. */
+function nombreClaveU(value){
+  return normU(value).split(' ').filter(Boolean).sort().join(' ');
+}
+function telefonoClaveU(value){
+  let digits=String(value==null?'':value).replace(/\D/g,'');
+  if(digits.length>10) digits=digits.slice(-10);
+  return digits.length>=8?digits:'';
+}
+function emailClaveU(value){
+  const mail=String(value==null?'':value).trim().toLowerCase();
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)?mail:'';
+}
+function cumpleClaveU(value){
+  const raw=fechaDeCeldaU(value);
+  const ymd=typeof ymdDesdeCelda==='function'?ymdDesdeCelda(raw):null;
+  if(ymd) return [ymd.y||'',String(ymd.m||'').padStart(2,'0'),String(ymd.d||'').padStart(2,'0')].join('-');
+  return normNoSpaceU(raw);
+}
+function domicilioClaveU(u){
+  const dom=normU(u&&u.domicilio||'');
+  const loc=normU(u&&u.localidad||'');
+  const cp=normNoSpaceU(u&&u.cp||'');
+  return dom?(dom+'|'+loc+'|'+cp):'';
+}
+function serieClaveU(value){ return normNoSpaceU(value); }
+function fechaCompraMsU(u){
+  const d=parseFechaU(u&&u.fCompra||'');
+  return d&&!isNaN(d.getTime())?d.getTime():0;
+}
+function identidadStorageKeyU(){
+  let uid='local';
+  try{ if(window.APPIAuth&&window.APPIAuth.userId) uid=window.APPIAuth.userId()||uid; }catch(e){}
+  return 'appi_usuarios_identidad_v882_'+uid;
+}
+function identidadLeerU(){
+  try{
+    const data=JSON.parse(localStorage.getItem(identidadStorageKeyU())||'{}');
+    return {grupos:data&&data.grupos&&typeof data.grupos==='object'?data.grupos:{}, separados:data&&data.separados&&typeof data.separados==='object'?data.separados:{}};
+  }catch(e){ return {grupos:{},separados:{}}; }
+}
+function identidadGuardarU(data){
+  try{ localStorage.setItem(identidadStorageKeyU(),JSON.stringify(data||{grupos:{},separados:{}})); }catch(e){}
+}
+function hashCortoU(value){
+  let h=2166136261, s=String(value||'');
+  for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619); }
+  return (h>>>0).toString(36);
+}
+function claveRegistroU(u){
+  const serie=serieClaveU(u&&u.serie||'');
+  if(serie) return 'serie:'+serie;
+  return 'compra:'+hashCortoU([
+    nombreClaveU(u&&u.usuario||''), normU(u&&u.producto||''),
+    fechaDeCeldaU(u&&u.fCompra||''), fechaDeCeldaU(u&&u.fVenceRaw||''),
+    telefonoClaveU(u&&u.telf||''), emailClaveU(u&&u.email||''),
+    domicilioClaveU(u||{}), String(u&&u.id||'')
+  ].join('|'));
+}
+function parRegistrosU(a,b){ return [claveRegistroU(a),claveRegistroU(b)].sort().join('||'); }
+function mismosCamposIdentidadU(a,b){
+  const nombreA=nombreClaveU(a&&a.usuario||''), nombreB=nombreClaveU(b&&b.usuario||'');
+  const mismoNombre=!!(nombreA&&nombreA===nombreB);
+  const ta=telefonoClaveU(a&&a.telf||''), tb=telefonoClaveU(b&&b.telf||'');
+  const ea=emailClaveU(a&&a.email||''), eb=emailClaveU(b&&b.email||'');
+  const ca=cumpleClaveU(a&&(a.cumpleRaw||a.cumple)||''), cb=cumpleClaveU(b&&(b.cumpleRaw||b.cumple)||'');
+  const da=domicilioClaveU(a||{}), db=domicilioClaveU(b||{});
+  const telefono=!!(ta&&ta===tb), email=!!(ea&&ea===eb), cumple=!!(ca&&ca===cb), domicilio=!!(da&&da===db);
+  const fuertes=[telefono,email,cumple].filter(Boolean).length;
+  return {mismoNombre,telefono,email,cumple,domicilio,fuertes};
+}
+function registrosMismaPersonaU(a,b){
+  const m=mismosCamposIdentidadU(a,b);
+  if(m.mismoNombre&&(m.telefono||m.email||m.cumple||m.domicilio)) return true;
+  // Tolera una pequeña variación en el nombre sólo cuando coinciden dos datos
+  // fuertes. Un teléfono compartido por una familia, por sí solo, no alcanza.
+  return !m.mismoNombre&&m.fuertes>=2;
+}
+function registroMasCompletoU(a,b){
+  const score=x=>['usuario','telf','domicilio','cp','localidad','producto','serie','fCompra','fVenceRaw','cumpleRaw','email','dipReasignado'].reduce((n,k)=>n+(String(x&&x[k]||'').trim()?1:0),0);
+  const usarB=score(b)>score(a);
+  const base=Object.assign({},usarB?b:a);
+  const otro=usarB?a:b;
+  ['usuario','telf','domicilio','cp','localidad','producto','serie','fCompra','fVenceRaw','cumpleRaw','email','dipReasignado'].forEach(k=>{ if(!String(base[k]||'').trim()&&String(otro&&otro[k]||'').trim()) base[k]=otro[k]; });
+  const raw=base.fVenceRaw||'';
+  base.fVence=base.fVence instanceof Date?base.fVence:(base.fVence?new Date(base.fVence):parseFechaU(raw));
+  if(base.fVence&&isNaN(base.fVence.getTime())) base.fVence=null;
+  base.estado=base.fVence?estadoVencU(base.fVence):(base.estado||'vigente');
+  base.nombreNorm=normU(base.usuario||'');
+  return base;
+}
+function deduplicarProductosU(lista){
+  const out=[], porSerie=new Map();
+  (Array.isArray(lista)?lista:[]).forEach((original,pos)=>{
+    if(!original) return;
+    const p=Object.assign({},original);
+    p.id=p.id==null?pos+1:p.id;
+    p.fCompra=fechaDeCeldaU(p.fCompra||'');
+    p.fVenceRaw=fechaDeCeldaU(p.fVenceRaw||p.fVence||'');
+    p.cumpleRaw=fechaDeCeldaU(p.cumpleRaw||p.cumple||'');
+    p.fVence=p.fVence instanceof Date?p.fVence:(p.fVence?new Date(p.fVence):parseFechaU(p.fVenceRaw));
+    if(p.fVence&&isNaN(p.fVence.getTime())) p.fVence=parseFechaU(p.fVenceRaw);
+    p.estado=p.fVence?estadoVencU(p.fVence):(p.estado||'vigente');
+    p.nombreNorm=normU(p.usuario||'');
+    p._ordenFuente=pos;
+    const serie=serieClaveU(p.serie||'');
+    if(serie&&porSerie.has(serie)){
+      const idx=porSerie.get(serie);
+      out[idx]=registroMasCompletoU(out[idx],p);
+      out[idx]._ordenFuente=Math.max(Number(out[idx]._ordenFuente)||0,pos);
+    }else{
+      if(serie) porSerie.set(serie,out.length);
+      out.push(p);
+    }
+  });
+  return out;
+}
+function separadosDeGrupoU(p,grupo,estado){
+  return (grupo.productos||[]).some(q=>estado.separados[parRegistrosU(p,q)]);
+}
+function construirPersonaU(productos,manualId){
+  const ordenados=(productos||[]).slice().sort((a,b)=>fechaCompraMsU(b)-fechaCompraMsU(a)||(Number(b._ordenFuente)||Number(b.id)||0)-(Number(a._ordenFuente)||Number(a.id)||0));
+  const ultimo=ordenados[0]||{};
+  const primeroNoVacio=campo=>{
+    const hit=ordenados.find(p=>String(p&&p[campo]||'').trim());
+    return hit?hit[campo]:'';
+  };
+  const claves=ordenados.map(claveRegistroU).sort();
+  const id='persona-'+hashCortoU(manualId||claves.join('|'));
+  const u=Object.assign({},ultimo,{
+    id,
+    personaId:id,
+    manualId:manualId||'',
+    productos:ordenados,
+    cantidadProductos:ordenados.length,
+    esEstrella:ordenados.length>1,
+    producto:ultimo.producto||'Producto sin informar',
+    serie:ultimo.serie||'',
+    fCompra:ultimo.fCompra||'',
+    fVenceRaw:ultimo.fVenceRaw||'',
+    fVence:ultimo.fVence||null,
+    estado:ultimo.fVence?estadoVencU(ultimo.fVence):(ultimo.estado||'vigente'),
+    usuario:primeroNoVacio('usuario')||'Usuario sin nombre',
+    telf:primeroNoVacio('telf'),
+    domicilio:primeroNoVacio('domicilio'),
+    cp:primeroNoVacio('cp'),
+    localidad:primeroNoVacio('localidad'),
+    email:primeroNoVacio('email'),
+    cumpleRaw:primeroNoVacio('cumpleRaw'),
+    dipReasignado:primeroNoVacio('dipReasignado')
+  });
+  u.reasignado=ordenados.some(p=>!!p.reasignado)||String(u.dipReasignado||'').length>=3;
+  u.nombreNorm=normU(u.usuario||'');
+  u._busqueda=normU([u.usuario,u.telf,u.domicilio,u.localidad,u.cp,u.email].concat(ordenados.flatMap(p=>[p.producto,p.serie,p.fCompra,p.fVenceRaw])).join(' '));
+  return u;
+}
+function agruparUsuariosU(lista){
+  const productos=deduplicarProductosU(lista);
+  const estado=identidadLeerU();
+  const grupos=[];
+  productos.forEach(p=>{
+    const key=claveRegistroU(p), manualId=estado.grupos[key]||'';
+    let grupo=null;
+    if(manualId) grupo=grupos.find(g=>g.manualId===manualId)||null;
+    if(!grupo&&!manualId){
+      grupo=grupos.find(g=>!g.manualId&&!separadosDeGrupoU(p,g,estado)&&(g.productos||[]).some(q=>registrosMismaPersonaU(p,q)))||null;
+    }
+    if(!grupo){ grupo={manualId,productos:[]}; grupos.push(grupo); }
+    grupo.productos.push(p);
+  });
+  return grupos.map(g=>construirPersonaU(g.productos,g.manualId));
+}
+function motivoCoincidenciaU(a,b){
+  const pa=(a.productos&&a.productos[0])||a, pb=(b.productos&&b.productos[0])||b;
+  const m=mismosCamposIdentidadU(pa,pb);
+  if(m.mismoNombre) return 'El nombre coincide, pero falta otro dato para confirmarlo.';
+  if(m.email) return 'Comparten el mismo correo, pero el nombre es diferente.';
+  if(m.telefono) return 'Comparten el mismo teléfono, pero podrían ser personas de una familia.';
+  if(m.cumple&&m.domicilio) return 'Coinciden cumpleaños y domicilio.';
+  return '';
+}
+function buscarCoincidenciasU(personas){
+  const estado=identidadLeerU(), out=[];
+  for(let i=0;i<personas.length;i++) for(let j=i+1;j<personas.length;j++){
+    const a=personas[i],b=personas[j];
+    const pares=[];
+    (a.productos||[a]).forEach(x=>(b.productos||[b]).forEach(y=>pares.push(parRegistrosU(x,y))));
+    if(pares.some(k=>estado.separados[k])) continue;
+    const motivo=motivoCoincidenciaU(a,b);
+    if(motivo) out.push({a,b,motivo});
+  }
+  return out;
+}
+function actualizarIndicadoresIdentidadU(){
+  const stars=usuariosU.filter(u=>u.esEstrella).length;
+  const star=document.getElementById('usuariosStEstrella');
+  if(star) star.textContent=stars;
+  const review=document.getElementById('usuariosBtnCoincidencias');
+  const badge=document.getElementById('usuariosStCoincidencias');
+  if(badge) badge.textContent=coincidenciasU.length;
+  if(review) review.hidden=coincidenciasU.length===0;
+}
+function reagruparUsuariosU(){
+  usuariosU=agruparUsuariosU(productosFuenteU);
+  coincidenciasU=buscarCoincidenciasU(usuariosU);
+  window.usuariosU=usuariosU;
+  actualizarIndicadoresIdentidadU();
+  return usuariosU;
+}
+window.agruparUsuariosU=agruparUsuariosU;
+window.reagruparUsuariosU=reagruparUsuariosU;
+window.productosUsuariosActual=function(){ return productosFuenteU.slice(); };
+
 function detectarColumnasU(headers){
   const map={}; const debug=[];
   headers.forEach((h,i)=>{
@@ -16933,7 +17185,7 @@ function detectarColumnasU(headers){
   return {map, debug};
 }
 function parseRowsU(rows){
-  if(!rows||rows.length<2) return {data:[], debug:'Sin filas'};
+  if(!rows||rows.length<2) return {data:[], rawData:[], debug:'Sin filas'};
   let hr=-1, bestScore=-1;
   for(let i=0;i<Math.min(rows.length,15);i++){
     const r=rows[i]||[];
@@ -16992,8 +17244,9 @@ function parseRowsU(rows){
     const estado=fVence? estadoVencU(fVence) : 'vigente';
     out.push({id:i, usuario, telf, domicilio:domFinal, cp, localidad, producto, serie, fCompra, fVenceRaw, fVence, cumpleRaw, email, dipReasignado, reasignado:dipReasignado.length>=3, estado, nombreNorm:normU(usuario)});
   }
-  debugText+=`Filas totales: ${rows.length}, Usuarios: ${out.length}`;
-  return {data:out, debug:debugText};
+  const personas=agruparUsuariosU(out);
+  debugText+=`Filas totales: ${rows.length}, Productos: ${out.length}, Personas unificadas: ${personas.length}`;
+  return {data:personas, rawData:out, debug:debugText};
 }
 
 // Render
@@ -17026,8 +17279,11 @@ function resetFiltrosU(){
   filtroVencU='all';
   filtroZonaU='all';
   filtroReasigU=false;
+  filtroEstrellaU=false;
   const btnReasigR=document.getElementById('usuariosBtnReasig');
   if(btnReasigR) btnReasigR.classList.remove('activo');
+  const btnEstrellaR=document.getElementById('usuariosBtnEstrella');
+  if(btnEstrellaR) btnEstrellaR.classList.remove('activo');
   // Los botones de Barrios y Tarjetas vuelven a su estado neutro junto con el
   // resto: si no, seguirían mostrando un filtro que ya no se aplica.
   window.filtroZonaUExterno='all';
@@ -17074,10 +17330,8 @@ function aplicarFiltrosU(){
     if(filtroVencU!=='all' && u.estado!==filtroVencU) return false;
     if(filtroZonaU!=='all' && u.localidad!==filtroZonaU) return false;
     if(filtroReasigU && !u.reasignado) return false;
-    if(q){
-      const txt=(u.usuario+' '+u.domicilio+' '+u.localidad+' '+u.producto+' '+(u.cp||'')).toLowerCase();
-      if(!normU(txt).includes(q)) return false;
-    }
+    if(filtroEstrellaU && !u.esEstrella) return false;
+    if(q && !String(u._busqueda||normU((u.usuario||'')+' '+(u.domicilio||'')+' '+(u.localidad||'')+' '+(u.producto||'')+' '+(u.cp||''))).includes(q)) return false;
     return true;
   });
   if(window.APPITarjetas&&window.APPITarjetas.filterPersonas) filtradosU=window.APPITarjetas.filterPersonas(filtradosU);
@@ -17087,12 +17341,14 @@ function aplicarFiltrosU(){
       if(!b.fVence) return -1;
       return ordenAscU? a.fVence - b.fVence : b.fVence - a.fVence;
     });
+  }else if(filtroEstrellaU){
+    filtradosU.sort((a,b)=>(b.cantidadProductos||1)-(a.cantidadProductos||1)||fechaCompraMsU(b)-fechaCompraMsU(a)||String(a.usuario||'').localeCompare(String(b.usuario||''),'es'));
   }
   // Mostrar banner de filtros activos y, con filtro, el botón Limpiar.
   const activeDiv=document.getElementById('usuariosActiveFilters');
   const btnVerTodos=document.getElementById('usuariosBtnVerTodos');
   const cardOn = window.APPITarjetas&&window.APPITarjetas.filtroActivo&&window.APPITarjetas.filtroActivo();
-  const isFiltered = filtroVencU!=='all' || filtroZonaU!=='all' || filtroReasigU || q || !!cardOn;
+  const isFiltered = filtroVencU!=='all' || filtroZonaU!=='all' || filtroReasigU || filtroEstrellaU || q || !!cardOn;
   if(activeDiv){
     if(isFiltered){
       const parts=[];
@@ -17102,6 +17358,7 @@ function aplicarFiltrosU(){
         parts.push(labels[filtroVencU]||filtroVencU);
       }
       if(filtroReasigU) parts.push('↻ Solo reasignados');
+      if(filtroEstrellaU) parts.push('⭐ Usuarios estrella');
       if(q) parts.push(`🔍 "${qEl.value}"`);
       if(cardOn) parts.push('💳 Promo con tarjeta');
       activeDiv.textContent=`🔎 Filtrando ${filtradosU.length} de ${usuariosU.length} → ${parts.join(' · ')}`;
@@ -17143,6 +17400,92 @@ function getWhatsAppLinkU(u){
 window.getWhatsAppLinkU=getWhatsAppLinkU;
 window.parseRowsU=parseRowsU;
 
+function plantillaEstrellaU(tipo,u){
+  const nombre=nombreDePila(u&&u.usuario||'')||'¿cómo estás?';
+  const textos={
+    gracias:`Hola ${nombre}! 😊 Queríamos agradecerte por volver a elegir nuestros productos. Tu confianza es muy importante para nosotros y queríamos hacértelo saber.`,
+    promo:`Hola ${nombre}! 😊 Gracias por volver a confiar en nosotros. Por eso pensamos especialmente en vos para una promoción y quería contarte los detalles.`,
+    obsequio:`Hola ${nombre}! 😊 Queremos agradecerte por habernos elegido más de una vez. Pensamos especialmente en vos para un obsequio y quería contarte.`,
+    recontacto:`Hola ${nombre}! 😊 ¿Cómo estás? Hace un tiempo quería volver a contactarte y saber cómo vienen funcionando tus productos PSA.`,
+    propio:`Hola ${nombre}! 😊 `
+  };
+  return textos[tipo]||textos.gracias;
+}
+function abrirContactoEstrellaU(u){
+  const digits=window.APPITel?window.APPITel.normalizar(u&&u.telf||''):telefonoClaveU(u&&u.telf||'');
+  if(!digits){
+    window.APPIDialog.alert('Esta persona no tiene un teléfono válido. Podés corregirlo desde el botón Teléfono de su ficha.',{title:'Sin teléfono',icon:'📵'});
+    return;
+  }
+  const opciones=[
+    ['gracias','🙏 Agradecer su confianza'],['promo','🎁 Promoción especial'],
+    ['obsequio','⭐ Comunicar un obsequio'],['recontacto','👋 Volver a contactarlo'],
+    ['propio','✏️ Escribir otro mensaje']
+  ];
+  const html='<div class="u-star-choices">'+opciones.map((o,i)=>'<button type="button" class="u-star-choice'+(i===0?' on':'')+'" data-star-template="'+o[0]+'">'+o[1]+'</button>').join('')+'</div>'+
+    '<textarea id="uStarTexto" class="u-star-editor" aria-label="Mensaje editable">'+escU(plantillaEstrellaU('gracias',u))+'</textarea>'+
+    '<button type="button" id="uStarEnviar" class="u-star-send">💬 Abrir en WhatsApp</button>'+
+    '<p style="margin:8px 2px 0;color:#777887;font-size:10.5px;line-height:1.45">El mensaje se puede editar y nunca se envía automáticamente.</p>';
+  modal.open({icon:'⭐',iconBg:'linear-gradient(135deg,#ad7100,#f1b928)',title:'Contactar Usuario estrella',sub:(u.usuario||'')+' · '+(u.cantidadProductos||1)+' productos',html,hideFooter:true});
+  document.querySelectorAll('[data-star-template]').forEach(b=>{
+    b.onclick=()=>{
+      document.querySelectorAll('[data-star-template]').forEach(x=>x.classList.remove('on'));
+      b.classList.add('on');
+      const ta=document.getElementById('uStarTexto');
+      if(ta){ ta.value=plantillaEstrellaU(b.getAttribute('data-star-template'),u); ta.focus(); }
+    };
+  });
+  const enviar=document.getElementById('uStarEnviar');
+  if(enviar) enviar.onclick=()=>{
+    const ta=document.getElementById('uStarTexto');
+    const texto=String(ta&&ta.value||'').trim();
+    if(!texto){ if(ta) ta.focus(); return; }
+    const url='https://wa.me/'+digits+'?text='+encodeURIComponent(texto);
+    if(window.APPIWhatsApp&&window.APPIWhatsApp.abrir) window.APPIWhatsApp.abrir(url);
+    else window.open(url,'_blank','noopener');
+    modal.close();
+  };
+}
+function resumenIdentidadU(u){
+  const contacto=[u.telf?('Tel. '+u.telf):'',u.email||'',u.cumpleRaw?('Cumpleaños '+u.cumpleRaw):'',u.domicilio||'',u.localidad||''].filter(Boolean).join(' · ');
+  return '<div class="u-identity-card"><b>'+escU(u.usuario||'Sin nombre')+'</b><small>'+escU(contacto||'Sin otro dato de identidad')+'</small><small><b style="display:inline">'+(u.cantidadProductos||1)+'</b> '+((u.cantidadProductos||1)===1?'producto':'productos')+'</small></div>';
+}
+function aplicarDecisionIdentidadU(tipo,candidato){
+  if(!candidato) return;
+  const estado=identidadLeerU();
+  const prodsA=candidato.a.productos||[candidato.a], prodsB=candidato.b.productos||[candidato.b];
+  if(tipo==='unir'){
+    let gid='manual-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,6);
+    prodsA.concat(prodsB).some(p=>{ const previo=estado.grupos[claveRegistroU(p)]; if(previo){ gid=previo; return true; } return false; });
+    prodsA.concat(prodsB).forEach(p=>{ estado.grupos[claveRegistroU(p)]=gid; });
+  }else{
+    prodsA.forEach(a=>prodsB.forEach(b=>{ estado.separados[parRegistrosU(a,b)]=true; }));
+  }
+  identidadGuardarU(estado);
+  reagruparUsuariosU();
+  mostrarDashboardU();
+  modal.close();
+  if(coincidenciasU.length) setTimeout(abrirCoincidenciasU,180);
+  else if(window.showToast) showToast(tipo==='unir'?'Perfiles unidos ✓':'Se mantendrán separados ✓',2200);
+}
+function abrirCoincidenciasU(){
+  const c=coincidenciasU[0];
+  if(!c){
+    window.APPIDialog.alert('No quedan coincidencias dudosas por revisar.',{title:'Identidades revisadas',icon:'✓'});
+    return;
+  }
+  const html='<p style="margin:0;color:#555664;font-size:12px;line-height:1.5">'+escU(c.motivo)+'</p>'+
+    '<div class="u-identity-cards">'+resumenIdentidadU(c.a)+resumenIdentidadU(c.b)+'</div>'+
+    '<div class="u-identity-actions"><button type="button" id="uIdentidadSeparar" class="u-identity-separate">Mantener separados</button><button type="button" id="uIdentidadUnir" class="u-identity-merge">Unir perfiles</button></div>'+
+    '<p style="margin:9px 2px 0;color:#777887;font-size:10.5px">Quedan '+coincidenciasU.length+' '+(coincidenciasU.length===1?'caso':'casos')+' por revisar. La decisión quedará guardada.</p>';
+  modal.open({icon:'⚠️',iconBg:'linear-gradient(135deg,#f5b301,#ff8f6b)',title:'¿Es la misma persona?',sub:'APPI no une sólo por el nombre',html,hideFooter:true});
+  const unir=document.getElementById('uIdentidadUnir'), separar=document.getElementById('uIdentidadSeparar');
+  if(unir) unir.onclick=()=>aplicarDecisionIdentidadU('unir',c);
+  if(separar) separar.onclick=()=>aplicarDecisionIdentidadU('separar',c);
+}
+window.abrirCoincidenciasUsuarios=abrirCoincidenciasU;
+window.abrirContactoEstrella=abrirContactoEstrellaU;
+
 function renderListU(){
   const cont=document.getElementById('usuariosList');
   if(!cont) return;
@@ -17151,43 +17494,52 @@ function renderListU(){
     if(window.APPITarjetas&&window.APPITarjetas.pintarListaUsuarios) window.APPITarjetas.pintarListaUsuarios(cont, filtradosU);
     return;
   }
-  // El barrio es la estructura de la pantalla, no un filtro aparte: se sale a
-  // recorrer una zona, así que la lista se agrupa por barrio y cada grupo se
-  // abre en el lugar. Los barrios abiertos se recuerdan entre repintados.
-  // Listado plano: los nombres de las personas, que es lo que se viene a
-  // buscar. Las zonas se filtran desde el botón "Zonas".
   cont.innerHTML=filtradosU.map((u,index)=>{
-    const venceRaw=u.fVenceRaw||'—';
-    const compraRaw=u.fCompra||'—';
-    const diasNum=u.fVence? Math.ceil((u.fVence-new Date())/(1000*60*60*24)) : null;
-    const diasLabel=diasNum!==null? (diasNum<0? `${Math.abs(diasNum)}d vencida` : `${diasNum}d`) : '';
+    const venceRaw=u.fVenceRaw||'Fecha no informada';
+    const diasNum=u.fVence?Math.ceil((u.fVence-new Date())/(1000*60*60*24)):null;
+    const diasLabel=diasNum!==null?(diasNum<0?`${Math.abs(diasNum)}d vencida`:`${diasNum}d`):'';
     const estadoColor=u.estado==='vencida'?'#d9534f':(u.estado==='porVencer'?'#f5b301':'#3ad0a4');
     const estadoTxt=u.estado==='vencida'?'VENC':(u.estado==='porVencer'?'POR VENC':'VIG');
     const zonaCp=[u.localidad,u.cp?'CP '+u.cp:''].filter(Boolean).join(' ');
+    const productos=(Array.isArray(u.productos)&&u.productos.length?u.productos:[u]);
+    const productosHtml=productos.map((p,pi)=>{
+      const ultimo=pi===0;
+      const estado=p.estado||'vigente';
+      const label=ultimo?(estado==='vencida'?'Vencido':(estado==='porVencer'?'Por vencer':'Vigente')):'Equipo anterior renovado';
+      const clase=ultimo?estado:'renovado';
+      return `<div class="u-product ${ultimo?'latest':'old'}" data-u-product="${pi}">
+        <div class="u-product-head"><strong>${escU(p.producto||'Producto sin informar')}</strong><span class="u-product-state ${clase}">${escU(label)}</span></div>
+        <div class="u-product-meta">
+          <span>🛒 Fecha de compra: <b>${escU(p.fCompra||'Fecha no informada')}</b></span>
+          <span>📅 Vencimiento: <b>${escU(p.fVenceRaw||'Fecha no informada')}</b></span>
+          ${p.serie?`<span class="u-product-series">🔖 Serie: <b>${escU(p.serie)}</b></span>`:''}
+          ${ultimo?'<span class="u-product-series">La renovación o el Plan Canje se gestiona únicamente sobre este producto.</span>':''}
+        </div>
+      </div>`;
+    }).join('');
     return `
     <div class="tree-node" data-u-toggle="${index}" role="button" tabindex="0" aria-expanded="false">
       <span class="tree-arrow">›</span>
       <span class="tree-cat-badge" style="background:${estadoColor}">${estadoTxt}</span>
       ${u.reasignado?`<span class="tree-cat-badge" style="background:#5b8def" title="Reasignado de: ${escU(u.dipReasignado)}">↻</span>`:''}
       <span class="tree-name" title="${escU(`${u.usuario||''} - ${u.domicilio||''}`)}">${escU(u.usuario)}</span>
+      <span class="u-product-count">${productos.length} ${productos.length===1?'producto':'productos'}</span>
       <span class="tree-pts" style="background:rgba(0,0,0,0.06);color:#1c1c1e">${escU(u.localidad||'')}</span>
-      <span class="tree-pts" style="min-width:70px;text-align:right">${escU(venceRaw)}</span>
+      <span class="tree-pts" style="min-width:70px;text-align:right" title="Vencimiento del producto más reciente">${escU(venceRaw)}</span>
     </div>
     <div class="tree-children" style="padding:8px;background:rgba(255,255,255,0.5);border-radius:12px;margin-bottom:8px">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:11px">
+      <div class="u-person-contact">
         <div>📞 <b>${escU(u.telf||'—')}</b>${u.telfEditado?' <span title="Número corregido a mano" style="font-size:9px">✏️</span>':''}</div>
         <div>🏠 <b>${escU(u.domicilio||'—')}</b></div>
-        <div>📍 <b>${escU(zonaCp)}</b></div>
-        <div>📦 <b>${escU(u.producto||'—')}</b></div>
-        ${u.serie?`<div>🔖 Serie: <b>${escU(u.serie)}</b></div>`:''}
-        ${u.reasignado?`<div>↻ Reasignado de: <b style="color:#0b5878">${escU(u.dipReasignado)}</b></div>`:''}
-        <div>🛒 Compra: <b>${escU(compraRaw)}</b></div>
-        <div>📅 Vence: <b>${escU(venceRaw)}</b> <small>${escU(diasLabel)}</small></div>
+        <div>📍 <b>${escU(zonaCp||'—')}</b></div>
+        ${u.email?`<div>✉️ <b>${escU(u.email)}</b></div>`:'<div>✉️ <b>—</b></div>'}
+        ${u.reasignado?`<div style="grid-column:1/-1">↻ Reasignado de: <b style="color:#0b5878">${escU(u.dipReasignado)}</b></div>`:''}
       </div>
-      <!-- Todas las acciones en un solo renglón (v335): tarjetas + contacto
-           + cómo llegar. Si no entran, la fila se desliza horizontal. -->
+      <div class="u-products-title"><span>Productos adquiridos</span><span>${productos.length}</span></div>
+      <div class="u-products">${productosHtml}</div>
       <div class="u-fila">
         <div class="tp-slot" data-tp-scope="usuarios" data-tp-index="${index}"></div>
+        ${u.esEstrella&&u.telf?`<button type="button" class="action-btn u-star-contact" data-u-action="star" data-u-index="${index}">⭐ Contactar</button>`:''}
         ${u.telf?`
         <button type="button" class="action-btn wa" data-u-action="whatsapp" data-u-index="${index}">💬 WhatsApp</button>
         <button type="button" class="action-btn call" data-u-action="call" data-u-index="${index}" data-appi-call-phone="${escU(window.APPITel?window.APPITel.normalizar(u.telf||''):'')}" data-appi-call-name="${escU(u.usuario||'Contacto')}" data-appi-call-label="1">📲 Llamar en teléfono</button>`:''}
@@ -17196,6 +17548,7 @@ function renderListU(){
         <button type="button" class="action-btn editar-tel" data-u-action="editartel" data-u-index="${index}">✏️ Teléfono</button>
         <button type="button" class="action-btn depurar" data-u-action="depurar" data-u-index="${index}">🧹 Depurar</button>
       </div>
+      ${diasLabel?`<div style="margin-top:7px;color:#777887;font-size:9.5px;text-align:right">Producto más reciente · ${escU(diasLabel)}</div>`:''}
     </div>`;
   }).join('');
 
@@ -17217,7 +17570,9 @@ function renderListU(){
       const u=filtradosU[Number(button.dataset.uIndex)];
       if(!u) return;
       const action=button.dataset.uAction;
-      if(action==='neighbors'){
+      if(action==='star'){
+        abrirContactoEstrellaU(u);
+      }else if(action==='neighbors'){
         if(window.APPIUsuariosBotones&&window.APPIUsuariosBotones.abrirVecinos){
           window.APPIUsuariosBotones.abrirVecinos(u.localidad||'', u.id);
         }else{
@@ -17226,7 +17581,7 @@ function renderListU(){
       }else if(action==='whatsapp'){
         const link=getWhatsAppLinkU(u);
         if(link) window.open(link,'_blank','noopener');
-        else if(window.APPITel && window.APPITel.avisarInvalido) window.APPITel.avisarInvalido(u.telf||'', nombreDePila(u.usuario)||u.usuario, u);
+        else if(window.APPITel&&window.APPITel.avisarInvalido) window.APPITel.avisarInvalido(u.telf||'',nombreDePila(u.usuario)||u.usuario,u);
         else window.APPIDialog.alert('Este usuario no tiene un teléfono válido cargado.',{title:'Sin teléfono',icon:'📵'});
       }else if(action==='call'){
         const digits=window.APPITel?window.APPITel.normalizar(u.telf||''):'';
@@ -17238,24 +17593,24 @@ function renderListU(){
         editarTelfDeU(u);
       }else if(action==='depurar'){
         if(depuradosEsUsuario(u)){
-          if(window.showToast) showToast('Este contacto ya está depurado', 2000);
+          if(window.showToast) showToast('Este contacto ya está depurado',2000);
           return;
         }
         confirmarAccion({
           title:'Depurar contacto',
-          sub:'El contacto saldrá de la lista y se ignorará en las futuras cargas.',
+          sub:'El contacto y todos sus productos saldrán de la lista.',
           html:'<p style="margin:0;color:#30303d;font-size:13px"><b>'+escU(u.usuario||'Sin nombre')+'</b> · '+escU(u.telf||'Sin teléfono')+'</p><p style="margin:8px 0 0;color:#777887;font-size:11.5px;line-height:1.5">Queda registrado en la planilla de depurados, lista para descargar y pasársela a la empresa.</p>',
-          okText:'Depurar', cancelText:'Cancelar', danger:true,
-          onConfirm: function(){
+          okText:'Depurar',cancelText:'Cancelar',danger:true,
+          onConfirm:function(){
             depurarUsuario(u);
-            if(window.showToast) showToast('Contacto depurado 🧹', 2200);
+            if(window.showToast) showToast('Contacto depurado 🧹',2200);
           }
         });
       }
     };
   });
-  if(window.APPIDeviceBridge)window.APPIDeviceBridge.decorateCallButtons();
-  if(window.APPITarjetas&&window.APPITarjetas.pintarListaUsuarios) window.APPITarjetas.pintarListaUsuarios(cont, filtradosU);
+  if(window.APPIDeviceBridge) window.APPIDeviceBridge.decorateCallButtons();
+  if(window.APPITarjetas&&window.APPITarjetas.pintarListaUsuarios) window.APPITarjetas.pintarListaUsuarios(cont,filtradosU);
 }
 window.aplicarFiltrosU=aplicarFiltrosU;
 window.usuariosFiltradosActual=function(){ return filtradosU.slice(); };
@@ -17286,8 +17641,16 @@ function depuradosEsUsuario(u){
 }
 function depuradosContar(){ return depuradosLeer().lista.length; }
 function depuradosAplicar(lista){ return (lista||[]).filter(function(u){ return !depuradosEsUsuario(u); }); }
+function productosSerializadosU(){
+  return (productosFuenteU||[]).map(p=>{
+    const copia=Object.assign({},p);
+    delete copia._ordenFuente;
+    copia.fVence=p&&p.fVence?(p.fVence instanceof Date?p.fVence.toISOString():p.fVence):null;
+    return copia;
+  });
+}
 function depuradosGuardarUsuarios(){
-  try{ localStorage.setItem('usuarios_garantias', JSON.stringify(usuariosU.map(u=>({...u, fVence:u.fVence?u.fVence.toISOString():null})))); localStorage.setItem('lastUpdate_usuarios', Date.now().toString()); localStorage.setItem('lastUpdate_garantias', Date.now().toString()); try{ actualizarUsuariosMetaBar(); }catch(e){} }catch(e){}
+  try{ localStorage.setItem('usuarios_garantias',JSON.stringify(productosSerializadosU())); localStorage.setItem('lastUpdate_usuarios',Date.now().toString()); localStorage.setItem('lastUpdate_garantias',Date.now().toString()); try{ actualizarUsuariosMetaBar(); }catch(e){} }catch(e){}
 }
 function actualizarBadgeDepurados(){
   var b=document.getElementById('usuariosBtnDepurados');
@@ -17308,7 +17671,9 @@ function depurarUsuario(u){
     motivo: 'Teléfono no corresponde', fecha: new Date().toISOString()
   });
   depuradosGuardar(d);
-  usuariosU=usuariosU.filter(function(x){ return !depuradosEsUsuario(x); });
+  const compras=new Set(((u&&u.productos)||[u]).filter(Boolean).map(claveRegistroU));
+  productosFuenteU=productosFuenteU.filter(function(x){ return !compras.has(claveRegistroU(x)); });
+  reagruparUsuariosU();
   depuradosGuardarUsuarios();
   aplicarFiltrosU();
   actualizarBadgeDepurados();
@@ -17395,7 +17760,7 @@ function cargarArchivoU(file){
         }
         console.log('📑 Hojas encontradas:', wb.SheetNames);
         if(infoEl) infoEl.innerHTML=`⏳ Hojas: <b>${escU(wb.SheetNames.join(', '))}</b> - analizando...`;
-        let mejor={data:[], debug:''};
+        let mejor={data:[], rawData:[], debug:''};
         let debugAll=[];
         wb.SheetNames.forEach(name=>{
           try{
@@ -17403,8 +17768,8 @@ function cargarArchivoU(file){
             const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:'', blankrows:false, raw:true, dateNF:'dd/mm/yyyy'});
             console.log(`Hoja ${name}: ${rows.length} filas`);
             const res=parseRowsU(rows);
-            debugAll.push(`Hoja "${name}": ${rows.length} filas, ${res.data.length} usuarios detectados | Header: ${res.debug.substring(0,120)}`);
-            if(res.data.length>mejor.data.length) mejor=res;
+            debugAll.push(`Hoja "${name}": ${rows.length} filas, ${(res.rawData||[]).length} productos y ${res.data.length} personas detectadas | Header: ${res.debug.substring(0,120)}`);
+            if((res.rawData||res.data).length>(mejor.rawData||mejor.data).length) mejor=res;
           }catch(err){
             console.error('Error procesando hoja', name, err);
             debugAll.push(`Hoja "${name}" ERROR: ${err.message}`);
@@ -17413,7 +17778,8 @@ function cargarArchivoU(file){
         const fullDebug=debugAll.join('\n\n') + '\n\n' + (mejor.debug||'');
         if(dbgEl) dbgEl.textContent=fullDebug;
         const parsed=mejor.data;
-        console.log('✅ Total usuarios parseados:', parsed.length);
+        const productosParsed=mejor.rawData||[];
+        console.log('✅ Personas unificadas:',parsed.length,'· productos:',productosParsed.length);
         if(parsed.length===0){
           const msg='No se detectaron usuarios. Revisá que el Excel tenga columnas Usuario, Domicilio, etc.\n\n'+fullDebug.substring(0,800);
           window.APPIDialog.alert(msg,{title:'No se detectaron usuarios',icon:'🤔'});
@@ -17425,23 +17791,23 @@ function cargarArchivoU(file){
           if(dbgEl) dbgEl.style.display='block';
           return;
         }
-        usuariosU=depuradosAplicar(parsed);
-        window.usuariosU=usuariosU;
+        productosFuenteU=depuradosAplicar(productosParsed);
+        reagruparUsuariosU();
         try{ window.dispatchEvent(new Event('appi-usuarios-cambiaron')); }catch(e){}
-        const depuradosIgnorados=parsed.length-usuariosU.length;
-        if(depuradosIgnorados>0 && infoEl) infoEl.innerHTML=`✅ <b>${usuariosU.length}</b> usuarios cargados · 🧹 ${depuradosIgnorados} depurado${depuradosIgnorados===1?'':'s'} ignorado${depuradosIgnorados===1?'':'s'}`;
-        try{ 
-          localStorage.setItem('usuarios_garantias', JSON.stringify(usuariosU.map(u=>({...u, fVence:u.fVence?u.fVence.toISOString():null})))); localStorage.setItem('lastUpdate_usuarios', Date.now().toString()); localStorage.setItem('lastUpdate_garantias', Date.now().toString()); try{ actualizarUsuariosMetaBar(); }catch(e){}
-          console.log('💾 Guardado en localStorage', usuariosU.length);
+        const depuradosIgnorados=productosParsed.length-productosFuenteU.length;
+        if(depuradosIgnorados>0&&infoEl) infoEl.innerHTML=`✅ <b>${usuariosU.length}</b> personas · <b>${productosFuenteU.length}</b> productos · 🧹 ${depuradosIgnorados} registro${depuradosIgnorados===1?'':'s'} ignorado${depuradosIgnorados===1?'':'s'}`;
+        try{
+          depuradosGuardarUsuarios();
+          console.log('💾 Guardado en localStorage',usuariosU.length,'personas y',productosFuenteU.length,'productos');
         }catch(err){ console.log('localStorage fail',err); }
         mostrarDashboardU();
         const info=document.getElementById('usuariosFileInfo');
-        if(info){ info.style.display='block'; info.innerHTML=`✅ <b>${parsed.length} usuarios</b> cargados de <b>${escU(file.name)}</b> · ${new Date().toLocaleString('es-AR')}<br/><small>Hojas analizadas: ${escU(wb.SheetNames.join(', '))}</small>`; }
+        if(info){ info.style.display='block'; info.innerHTML=`✅ <b>${usuariosU.length} personas</b> · <b>${productosFuenteU.length} productos</b> cargados de <b>${escU(file.name)}</b> · ${new Date().toLocaleString('es-AR')}<br/><small>Hojas analizadas: ${escU(wb.SheetNames.join(', '))}</small>`; }
         const btnClear=document.getElementById('usuariosBtnClear');
         if(btnClear) btnClear.style.display='inline-flex';
         if(dbgEl) dbgEl.style.display='none';
         if(typeof haptic==='function') haptic(20);
-        if(typeof showToast==='function') showToast(`✅ ${parsed.length} usuarios cargados`);
+        if(typeof showToast==='function') showToast(`✅ ${usuariosU.length} personas · ${productosFuenteU.length} productos`);
       }catch(err){
         console.error('Error procesando Excel', err);
         window.APPIDialog.alert('Error procesando Excel: '+err.message+'\n\nProbá con otro archivo o revisá que sea .xls/.xlsx válido.\n\nTip: si es .csv, guardalo como .xlsx.',{title:'Error procesando Excel',icon:'❌'});
@@ -17497,14 +17863,15 @@ function mostrarDashboardU(){
           if(!('email' in u)) u.email='';
           if(!('cumpleRaw' in u)) u.cumpleRaw='';
         });
-        localStorage.setItem('usuarios_garantias', JSON.stringify(usuariosU.map(u=>({...u, fVence:u.fVence?u.fVence.toISOString():null}))));
-        try{ if(window.APPIDataSync&&typeof window.APPIDataSync.saveKey==='function') window.APPIDataSync.saveKey('usuarios_garantias', localStorage.getItem('usuarios_garantias')); }catch(e){}
+        depuradosGuardarUsuarios();
+        try{ if(window.APPIDataSync&&typeof window.APPIDataSync.saveKey==='function') window.APPIDataSync.saveKey('usuarios_garantias',localStorage.getItem('usuarios_garantias')); }catch(e){}
       }catch(e){}
     }
     avisReasig.style.display='none';
   }
   // v814: el botón de filtro está siempre visible (aunque haya 0 reasignados).
-  // Actualizar también total en statAll si existe
+  // Actualizar también total en statAll si existe.
+  actualizarIndicadoresIdentidadU();
   renderZonasU();
   if(window.APPITarjetas&&window.APPITarjetas.montarBarraUsuarios) window.APPITarjetas.montarBarraUsuarios();
   aplicarFiltrosU();
@@ -17662,7 +18029,7 @@ function initUsuarios(){
   if(btnClear) btnClear.onclick=async()=>{
     if(await window.APPIDialog.confirm('Se borrará la lista de usuarios cargada en este dispositivo.',{title:'Limpiar lista',icon:'🗑️',okText:'Borrar',danger:true})){
       try{ localStorage.removeItem('usuarios_garantias'); }catch(_){}
-      usuariosU=[]; filtradosU=[]; window.usuariosU=[];
+      productosFuenteU=[]; usuariosU=[]; filtradosU=[]; coincidenciasU=[]; window.usuariosU=[];
       const dash=document.getElementById('usuariosDashboard');
       if(dash) dash.style.display='none';
       const upCard=document.getElementById('usuariosUploadCard');
@@ -17768,6 +18135,15 @@ function initUsuarios(){
     btnReasig.classList.toggle('activo',filtroReasigU);
     aplicarFiltrosU();
   };
+  const btnEstrella=document.getElementById('usuariosBtnEstrella');
+  if(btnEstrella) btnEstrella.onclick=()=>{
+    filtroEstrellaU=!filtroEstrellaU;
+    btnEstrella.classList.toggle('activo',filtroEstrellaU);
+    aplicarFiltrosU();
+    if(typeof haptic==='function') haptic(10);
+  };
+  const btnCoincidencias=document.getElementById('usuariosBtnCoincidencias');
+  if(btnCoincidencias) btnCoincidencias.onclick=()=>abrirCoincidenciasU();
   // v816: el botón del aviso de planilla vieja abre el selector de archivo.
   const btnReasigRecargar=document.getElementById('usuariosBtnReasigRecargar');
   if(btnReasigRecargar) btnReasigRecargar.onclick=()=>{
@@ -17789,17 +18165,30 @@ function initUsuarios(){
       const saved=JSON.parse(localStorage.getItem('usuarios_garantias')||'[]');
       try{ setTimeout(actualizarUsuariosMetaBar, 300); }catch(e){}
       if(saved.length>0){
-        usuariosU=depuradosAplicar(aplicarTelfsEditadosU(saved.map(u=>({...u, cumpleRaw:fechaDeCeldaU(u.cumpleRaw||u.cumple||''), fVence:u.fVence? new Date(u.fVence):null, estado:u.fVence? ( (new Date(u.fVence)-new Date())/(1000*60*60*24)<0?'vencida': ( (new Date(u.fVence)-new Date())/(1000*60*60*24)<=30?'porVencer':'vigente')):'vigente'}))));
-        window.usuariosU=usuariosU;
+        const fuente=saved.flatMap(u=>Array.isArray(u&&u.productos)&&u.productos.length?u.productos:[u]).filter(Boolean);
+        productosFuenteU=depuradosAplicar(aplicarTelfsEditadosU(fuente.map(u=>Object.assign({},u,{
+          cumpleRaw:fechaDeCeldaU(u.cumpleRaw||u.cumple||''),
+          fCompra:fechaDeCeldaU(u.fCompra||''),
+          fVenceRaw:fechaDeCeldaU(u.fVenceRaw||''),
+          fVence:u.fVence?new Date(u.fVence):parseFechaU(u.fVenceRaw||''),
+          dipReasignado:String(u.dipReasignado||''),
+          reasignado:!!u.reasignado||String(u.dipReasignado||'').length>=3,
+          email:String(u.email||''),
+          nombreNorm:normU(u.usuario||'')
+        }))));
+        reagruparUsuariosU();
+        try{ localStorage.setItem('usuarios_garantias',JSON.stringify(productosSerializadosU())); }catch(e){}
         mostrarDashboardU();
         try{ window.dispatchEvent(new Event('appi-usuarios-cambiaron')); }catch(e){}
 
         const info=document.getElementById('usuariosFileInfo');
-        if(info){ info.style.display='block'; info.innerHTML=`💾 ${usuariosU.length} usuarios recuperados de memoria`; }
+        if(info){ info.style.display='block'; info.innerHTML=`💾 ${usuariosU.length} personas · ${productosFuenteU.length} productos recuperados de memoria`; }
         const bc=document.getElementById('usuariosBtnClear');
         if(bc) bc.style.display='inline-flex';
       } else {
+        productosFuenteU=[];
         usuariosU=[];
+        coincidenciasU=[];
         window.usuariosU=[];
         const dash=document.getElementById('usuariosDashboard');
         if(dash) dash.style.display='none';

@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "881.0.0",
-  "cacheName": "appi-v881-historico-y-precios",
+  "version": "882.0.0",
+  "cacheName": "appi-v882-usuarios-unificados",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

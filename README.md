@@ -6,6 +6,17 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v882 · Usuarios unificados y Usuarios estrella
+
+- Usuarios representa personas y no renglones de garantía: reúne automáticamente las compras corroborando nombre con teléfono, correo, cumpleaños o domicilio.
+- Las coincidencias dudosas nunca se unen sólo por el nombre; aparecen en **Revisar coincidencias** para decidir entre unir perfiles o mantenerlos separados, y la decisión queda guardada.
+- Cada persona muestra todos sus productos, incluso modelos repetidos, con serie, fecha de compra y fecha de vencimiento.
+- Una serie repetida se considera el mismo producto; dos series del mismo modelo cuentan como dos compras.
+- El estado, las estadísticas, los filtros y cualquier acción de renovación o Plan Canje se calculan únicamente con el producto adquirido más recientemente.
+- Los productos anteriores permanecen visibles como **Equipo anterior renovado** y no generan canjes incorrectos.
+- **Usuarios estrella** identifica desde la segunda compra, ordena por cantidad de productos y ofrece mensajes editables para agradecimiento, promoción, obsequio o recontacto, sin envío automático.
+- Versión: **v882 · Segura** → Cache `appi-v882-usuarios-unificados`.
+
 ## v881 · Histórico automático, PDF anuales y precios conservados
 
 - Conserva la actualización **“precios: lista tienda PSA”** publicada en `4513612`, sin reemplazar ni retroceder sus archivos de catálogo, planes y precios.

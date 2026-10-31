@@ -24,7 +24,10 @@ const ddmmyyyy = n => {
 // meses justos" no son 182 días, es restar 6 meses al día de hoy.
 const hace6mCal = () => {
   const d = new Date();
+  const dia = d.getDate();
+  d.setDate(1);
   d.setMonth(d.getMonth() - 6);
+  d.setDate(Math.min(dia, new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate()));
   return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
 };
 
