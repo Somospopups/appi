@@ -6,6 +6,16 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v888 · Histórico visible y reintento inmediato
+
+- Si Histórico todavía no tiene cierres, ya no queda vacío ni esperando en silencio: muestra el motivo exacto de la falla.
+- **Reintentar ahora** vuelve a consultar MI PSA inmediatamente, sin esperar el bloqueo automático de tres horas.
+- **Verificar datos de MI PSA** abre los campos editables de Centro, Número y Clave cuando faltan datos o el acceso no es válido.
+- Un fallo de sincronización con la nube ya no impide que comience la recuperación directa desde PSA.
+- Los PDF de años anteriores continúan accesibles aunque todavía no exista un cierre del año vigente.
+- Se conserva el diseño aprobado de Histórico y toda la recuperación automática mediante los informes PSA 69, 34 y 71.
+- Versión: **v888 · Segura** → Cache `appi-v888-historico-visible-y-reintento`.
+
 ## v887 · Scroll siempre fluido en Usuarios
 
 - El desplazamiento continuo ya no destruye y reconstruye las fichas visibles al avanzar cada renglón.

@@ -24,7 +24,7 @@ const H={
   uploadYear:new Date().getFullYear(),uploads:{},fileTarget:null,
   selected:new Set(),openMenu:'',personSearch:'',lastReport:null,syncing:false,syncLog:[],chartMetric:'pbPersonal',albumMonth:null,
   actionPlans:[],actionTab:'today',actionContext:null,
-  autoSyncing:false,autoPeriod:'',autoMessage:'',autoError:'',archiving:false,
+  autoSyncing:false,autoPeriod:'',autoMessage:'',autoError:'',autoAttempted:false,missingCredentials:false,archiving:false,
   autoBackfilling:false,autoQueueTotal:0,autoQueueDone:0,autoQueueCurrent:'',autoQueueErrors:[],
   archiveBackfilling:false,archiveQueueTotal:0,archiveQueueDone:0,archiveQueueYear:0,archiveQueueCurrent:'',archiveQueueErrors:[],
   simpleView:'home',simplePeriod:'',simplePicker:false,simpleCompareMetric:'pb',simpleGraphMetric:'pb',simpleCompareView:'table',simpleScope:'team',simpleSearch:'',simplePeopleVisible:false
@@ -459,8 +459,12 @@ function missingHistoricalPeriodIds(){
 }
 async function syncMissingPSAPeriods(options={}){
   if(H.autoBackfilling||H.archiveBackfilling||H.autoSyncing)return {status:'busy',id:H.autoQueueCurrent||H.archiveQueueCurrent||H.autoPeriod};
-  if(!navigator.onLine)return {status:'offline'};
-  if(typeof window.psaTieneCredenciales==='function'&&!window.psaTieneCredenciales())return {status:'missing-credentials'};
+  H.autoAttempted=true;
+  if(!navigator.onLine){H.autoError='No hay conexión a internet. APPI volverá a intentarlo cuando se recupere.';H.autoMessage='Sin conexión';if(H.ready)render();return {status:'offline'};}
+  if(typeof window.psaTieneCredenciales==='function'&&!window.psaTieneCredenciales()){
+    H.missingCredentials=true;H.autoError='Faltan los datos de MI PSA. Verificá Centro, Número y Clave para traer los cierres.';H.autoMessage='Faltan datos de MI PSA';if(H.ready)render();return {status:'missing-credentials'};
+  }
+  H.missingCredentials=false;
   const current=currentHistoricalPeriod(),missing=missingHistoricalPeriodIds(),lastCurrent=Number(localStorage.getItem(`hist_psa_auto_${current.id}`)||0),queue=[...missing];
   if(!queue.length&&Date.now()-lastCurrent>=15*60*1000)queue.push(current.id);
   const unique=[...new Set(queue)].sort((a,b)=>b.localeCompare(a)).filter(id=>{
@@ -468,7 +472,10 @@ async function syncMissingPSAPeriods(options={}){
     const failedAt=Number(localStorage.getItem(`hist_psa_auto_error_${id}`)||0);
     return !failedAt||Date.now()-failedAt>=3*60*60*1000;
   });
-  if(!unique.length)return {status:missing.length?'waiting-retry':'up-to-date',missing:missing.length};
+  if(!unique.length){
+    if(missing.length&&!H.autoError)H.autoError='La recuperación automática está esperando para reintentarse. Podés reintentar ahora sin esperar.';
+    if(H.ready)render();return {status:missing.length?'waiting-retry':'up-to-date',missing:missing.length};
+  }
   H.autoBackfilling=true;H.autoQueueTotal=unique.length;H.autoQueueDone=0;H.autoQueueErrors=[];H.autoError='';render();
   try{
     let consecutiveErrors=0;
@@ -480,11 +487,14 @@ async function syncMissingPSAPeriods(options={}){
         localStorage.setItem(`hist_psa_auto_error_${id}`,String(Date.now()));
       }else{consecutiveErrors=0;localStorage.removeItem(`hist_psa_auto_error_${id}`)}
       H.autoQueueDone++;render();
-      if(consecutiveErrors>=3){H.autoMessage='La recuperación quedó en pausa y se reintentará automáticamente';break}
+      if(consecutiveErrors>=3){H.autoMessage='La recuperación quedó en pausa';break}
       if(H.autoQueueDone<unique.length)await sleep(420);
     }
-    H.autoMessage=H.autoQueueErrors.length?`${H.autoQueueDone-H.autoQueueErrors.length} de ${H.autoQueueTotal} meses recuperados`:'Histórico actualizado';
-    if(options.user)toast(H.autoQueueErrors.length?`Se recuperaron ${H.autoQueueDone-H.autoQueueErrors.length} meses. Los demás se reintentarán.`:'✓ Todos los meses disponibles quedaron actualizados',3400);
+    if(H.autoQueueErrors.length){
+      H.autoError=H.autoQueueErrors[H.autoQueueErrors.length-1].message;
+      H.autoMessage=`${H.autoQueueDone-H.autoQueueErrors.length} de ${H.autoQueueTotal} meses recuperados`;
+    }else{H.autoError='';H.autoMessage='Histórico actualizado'}
+    if(options.user)toast(H.autoQueueErrors.length?`No se completó la recuperación. Revisá el motivo y volvé a intentar.`:'✓ Todos los meses disponibles quedaron actualizados',3400);
     if(!options.deferCloud&&navigator.onLine&&cloudReady()&&getSession())setTimeout(()=>syncAll(false),400);
     return {status:H.autoQueueErrors.length?'partial':'complete',total:H.autoQueueTotal,done:H.autoQueueDone,errors:[...H.autoQueueErrors]};
   }finally{
@@ -590,8 +600,27 @@ function simpleSyncCard(){
   const expected=expectedHistoricalPeriodIds(),saved=new Set(H.periods.map(period=>period.id)),loaded=expected.filter(id=>saved.has(id)).length,missing=expected.length-loaded,busy=H.autoBackfilling||H.autoSyncing,current=H.autoQueueCurrent||H.autoPeriod,status=busy?`Recuperando ${H.autoQueueDone+1} de ${Math.max(H.autoQueueTotal,1)}`:missing?`${missing} mes${missing===1?'':'es'} pendiente${missing===1?'':'s'}`:'Completo',title=busy?'Actualizando meses anteriores':missing?'APPI completará los meses que faltan':'Histórico actualizado',detail=busy&&current?`${MONTHS_H[Number(current.slice(5))-1]} ${current.slice(0,4)} · ${loaded} de ${expected.length} meses listos`:`${loaded} de ${expected.length} meses listos · Actualización automática`;
   return `<button type="button" class="hs-auto-compact ${busy?'working':missing?'pending':'ready'}" data-hs-sync-view><i></i><span><b>${esc(title)}</b><small>${esc(detail)}</small></span><em>${esc(status)} ›</em></button>`;
 }
+function simpleNoDataState(){
+  const busy=H.autoBackfilling||H.autoSyncing,reason=H.autoError||(busy?'APPI está consultando MI PSA. El primer cierre aparecerá apenas quede verificado.':'APPI verificará la conexión con MI PSA y buscará el primer cierre automáticamente.'),title=busy?'Buscando tus cierres':'Todavía no hay cierres para mostrar';
+  return `<article class="hs-no-data-state ${busy?'working':''}"><i>${busy?'↻':'!'}</i><h2>${esc(title)}</h2><p>${busy?'Podés permanecer en esta pantalla o volver más tarde. La recuperación continúa automáticamente.':'APPI intentó traer la información automáticamente y todavía no pudo completar el primer cierre.'}</p><div class="hs-no-data-reason"><span>${busy?'Estado actual':'Qué ocurrió'}</span><b>${esc(reason)}</b></div>${busy?`<div class="hs-no-data-progress"><i></i><span>${esc(H.autoMessage||'Consultando MI PSA…')}</span></div>`:`<button type="button" class="hs-no-data-primary" data-hs-retry>Reintentar ahora</button><button type="button" class="hs-no-data-secondary" data-hs-verify-psa>Verificar datos de MI PSA</button>`}</article><article class="hs-no-data-info"><h3>APPI no quedará esperando en silencio</h3><p>Si vuelve a fallar, vas a ver el motivo exacto y podrás reintentar sin esperar. Si el problema son los datos de acceso, se abrirán los campos para corregirlos.</p></article><div class="hs-main-actions"><button type="button" data-hs-go="archivos"><i>PDF</i><span><b>PDF de años anteriores</b><small>Los años ya archivados siguen disponibles</small></span><em>›</em></button></div><button type="button" class="hs-manage-link" data-hs-manage>Administrar recuperación manual</button>`;
+}
+function bindSimpleNoData(c){
+  bindSimpleCommon(c);
+  c.querySelector('[data-hs-manage]')?.addEventListener('click',()=>simpleGo('manage'));
+  c.querySelector('[data-hs-verify-psa]')?.addEventListener('click',()=>{
+    if(typeof window.mostrarPopupPSAFormulario==='function')window.mostrarPopupPSAFormulario({verificar:true});
+    else if(typeof window.mostrarPopupPSA==='function')window.mostrarPopupPSA();
+  });
+  c.querySelector('[data-hs-retry]')?.addEventListener('click',async()=>{
+    H.autoError='';H.autoMessage='Reintentando ahora…';
+    await syncMissingPSAPeriods({user:true,deferCloud:true});
+    if(navigator.onLine&&cloudReady()&&getSession()&&H.periods.length)setTimeout(()=>syncAll(false),300);
+  });
+}
 function simpleHome(c){
-  const period=simpleSelectedPeriod(),current=currentHistoricalPeriod(),complete=!!period,scope=H.simpleScope==='personal'?'personal':'team',stats=period?simpleScopeStats(period,scope):{},picker=H.simplePicker?`<div class="hs-picker hs-motion-card"><div class="hs-picker-head"><h3>Elegí el cierre</h3><button type="button" data-hs-close-picker>Cerrar</button></div>${[current.year,current.year-1].map(year=>{const list=simpleAvailablePeriods().filter(item=>item.year===year);return `<section><h4>${year}</h4><div>${list.length?list.map(item=>`<button type="button" class="${item.id===H.simplePeriod?'selected':''}" data-hs-period="${item.id}">${MONTHS_H[item.month]}</button>`).join(''):'<p>APPI todavía está recuperando estos meses.</p>'}</div></section>`}).join('')}</div>`:'',alerts=period?Number(stats.activity<100)+Number(period.summary&&period.summary.incomeNoPurchase>0):0;
+  const period=simpleSelectedPeriod(),current=currentHistoricalPeriod();
+  if(!period){c.innerHTML=`<section class="hs-home hs-v877">${simpleNoDataState()}</section>`;bindSimpleNoData(c);return}
+  const complete=true,scope=H.simpleScope==='personal'?'personal':'team',stats=simpleScopeStats(period,scope),picker=H.simplePicker?`<div class="hs-picker hs-motion-card"><div class="hs-picker-head"><h3>Elegí el cierre</h3><button type="button" data-hs-close-picker>Cerrar</button></div>${[current.year,current.year-1].map(year=>{const list=simpleAvailablePeriods().filter(item=>item.year===year);return `<section><h4>${year}</h4><div>${list.length?list.map(item=>`<button type="button" class="${item.id===H.simplePeriod?'selected':''}" data-hs-period="${item.id}">${MONTHS_H[item.month]}</button>`).join(''):'<p>APPI todavía está recuperando estos meses.</p>'}</div></section>`}).join('')}</div>`:'',alerts=Number(stats.activity<100)+Number(period.summary&&period.summary.incomeNoPurchase>0);
   const cards='<div class="hs-empty">APPI está buscando los cierres disponibles en MI PSA.</div>';
   const personalCards=period?[
     simpleKpiCard({label:'PB personal',value:stats.pb==null?'—':`${fmt(stats.pb)} PB`,delta:simpleMetricDelta(period,scope,'pb',' PB'),view:'pb'}),
@@ -1472,8 +1501,10 @@ async function openHistorico(){
   try{
     await refreshData();H.ready=true;render();notifyActionDueOnce();
     if(navigator.onLine&&cloudReady()&&getSession()){
-      if(c)c.innerHTML='<div class="hist-loading"><span></span>Sincronizando Histórico…</div>';
-      await syncAll(false);
+      try{
+        if(c)c.innerHTML='<div class="hist-loading"><span></span>Sincronizando Histórico…</div>';
+        await syncAll(false);
+      }catch(cloudError){console.warn('Sincronización de nube del Histórico',cloudError);render()}
     }
     maybeSyncHistoricalPeriods();
   }catch(e){console.error('Abrir histórico',e);if(c)c.innerHTML=`<div class="hist-toast-inline error">No se pudo abrir el almacenamiento: ${esc(e.message)}</div>`}

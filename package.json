@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "887.0.0",
-  "cacheName": "appi-v887-scroll-usuarios-fluido",
+  "version": "888.0.0",
+  "cacheName": "appi-v888-historico-visible-y-reintento",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {
