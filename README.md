@@ -6,6 +6,14 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v885 · Usuarios completamente automático
+
+- Se eliminó de la cabecera de Usuarios la tarjeta que mostraba “GARANTÍAS · fecha/hora”.
+- También se quitó el botón manual de actualización de Garantías: ya no es necesario porque APPI sincroniza automáticamente con MI PSA.
+- El bloque de acciones del día sube y aprovecha el espacio liberado, sin dejar un hueco en la pantalla.
+- La sincronización automática, los datos guardados y todas las funciones de Usuarios permanecen activos.
+- Versión: **v885 · Segura** → Cache `appi-v885-usuarios-automaticos`.
+
 ## v884 · Scroll inmediato en listas grandes de Usuarios
 
 - Usuarios conserva todas las personas en memoria para búsquedas, filtros, estadísticas, zonas, tarjetas, cumpleaños, reasignados, Usuarios estrella, coincidencias y mensajes.

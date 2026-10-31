@@ -273,7 +273,7 @@ const res = await page.evaluate(async () => {
     await expect(uploadCard).not.toContainText('Elegir archivo');
   });
 
-  test('el botón ↻ en usuariosMetaBar dispara la sincronización automática de PSA', async ({ page }) => {
+  test('Usuarios oculta el banner manual y mantiene la sincronización automática de PSA', async ({ page }) => {
     let syncCallCount = 0;
 
     await page.route('**/auth-config.js', route => route.fulfill({
@@ -332,13 +332,11 @@ const res = await page.evaluate(async () => {
       window.showView('view-usuarios');
     });
 
-    const btnActualizar = page.locator('#btnUsuariosActualizar');
-    await expect(btnActualizar).toBeVisible();
-    const prevCalls = syncCallCount;
-    await btnActualizar.click();
-
-    // Esperar a que la sincronización termine y haya incrementado la llamada
-    await expect.poll(() => syncCallCount).toBeGreaterThan(prevCalls);
+    // La fecha y el botón manual ya no ocupan lugar en Usuarios: la carga
+    // continúa sola con las credenciales guardadas.
+    await expect(page.locator('#usuariosMetaBar')).toHaveCount(0);
+    await expect(page.locator('#btnUsuariosActualizar')).toHaveCount(0);
+    await expect.poll(() => syncCallCount, { timeout: 10000 }).toBeGreaterThan(0);
   });
 
   test('el desglose semanal/diario muestra delta y acumulado por día', async ({ page }) => {
