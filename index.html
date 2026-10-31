@@ -160,13 +160,13 @@ window.openStock=function(){
 <script src="./mensajes-hielo.js?v=618"></script>
 <script src="./mensajes-usuarios.js?v=639"></script>
   <script src="./campus-preguntas.js?v=646"></script>
-  <script src="./campus-psa.js?v=883"></script>
+  <script src="./campus-psa.js?v=884"></script>
 <script src="./reactivacion.js?v=618"></script>
 
 <script src="./escalera-suenos.js?v=618"></script>
 <script src="./demo-guia.js?v=618"></script>
 <script src="./tablero-negocio.js?v=618"></script>
-<script src="./lista-precios.js?v=883"></script>
+<script src="./lista-precios.js?v=884"></script>
 <script src="./vendor/pdf.min.js?v=618"></script>
 <script src="./canillas-adaptadores.js?v=618"></script>
 <script src="./vendor/zxing.min.js?v=618"></script>
@@ -4743,7 +4743,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v883 · Segura</div>
+  <div class="ds-foot">APPI · v884 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -14301,8 +14301,8 @@ function cerrarToolsMenu(){
   // con archivos viejos en pantalla.
   if ('serviceWorker' in navigator) {
     (async () => {
-    const swVersion='883';
-    const CACHE_NAME='appi-v883-rendimiento-usuarios';
+    const swVersion='884';
+    const CACHE_NAME='appi-v884-scroll-usuarios';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
@@ -16066,6 +16066,13 @@ body.dark #view-usuarios .filter.active{
   gap:8px;
   margin-top:16px;
 }
+/* v884 · Ventana virtual. La altura completa conserva el scroll natural,
+   pero sólo existen en el DOM las fichas cercanas a la pantalla. */
+#usuariosList.u-virtual{display:block;position:relative;gap:0;overflow:visible}
+#usuariosList .u-virtual-canvas{position:relative;width:100%;contain:layout style}
+#usuariosList .u-virtual-item{position:absolute;left:0;right:0;height:64px;padding-bottom:12px;box-sizing:border-box}
+#usuariosList .u-virtual-item.u-open{height:auto}
+#usuariosList .u-virtual-item>.tree-node{margin-bottom:0}
 #view-usuarios .tree-node{
   background:rgba(255,255,255,0.60);
   -webkit-backdrop-filter:blur(20px) saturate(180%);
@@ -16823,6 +16830,8 @@ let productosFuenteU=[], usuariosU=[], filtradosU=[], coincidenciasU=[];
 let filtroVencU='all', filtroZonaU='all', filtroReasigU=false, filtroEstrellaU=false, ordenAscU=true;
 let listadoUsuariosSucioU=true, usuariosStorageCargadoU=false, cargaUsuariosEnCursoU=false;
 let identidadCacheU=new WeakMap(), registroCacheU=new WeakMap();
+const usuariosAbiertosU=new Set();
+const virtualUsuariosU={altoFila:64,posiciones:[0],alturasAbiertas:new Map(),inicio:-1,fin:-1,raf:0,medirRaf:0,enlazado:false,observador:null};
 
 function escU(value){
   return String(value==null?'':value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -17666,58 +17675,175 @@ function montarDetalleUsuarioU(panel,index){
 }
 window.montarDetalleUsuarioU=montarDetalleUsuarioU;
 
+function clavePersonaVirtualU(u,index){
+  return String(u&&(u.personaId||u.id)||index);
+}
+function altoPersonaVirtualU(index){
+  const u=filtradosU[index], clave=clavePersonaVirtualU(u,index);
+  if(usuariosAbiertosU.has(clave)){
+    const productos=Array.isArray(u&&u.productos)&&u.productos.length?u.productos.length:1;
+    return virtualUsuariosU.alturasAbiertas.get(clave)||Math.max(360,250+productos*105);
+  }
+  return virtualUsuariosU.altoFila;
+}
+function reconstruirPosicionesVirtualesU(){
+  const posiciones=new Array(filtradosU.length+1);
+  posiciones[0]=0;
+  for(let i=0;i<filtradosU.length;i++) posiciones[i+1]=posiciones[i]+altoPersonaVirtualU(i);
+  virtualUsuariosU.posiciones=posiciones;
+  const canvas=document.querySelector('#usuariosList .u-virtual-canvas');
+  if(canvas) canvas.style.height=(posiciones[posiciones.length-1]||0)+'px';
+}
+function indiceVirtualPorY_U(y){
+  const pos=virtualUsuariosU.posiciones;
+  let lo=0, hi=Math.max(0,pos.length-1);
+  while(lo<hi){
+    const mid=(lo+hi)>>1;
+    if(pos[mid+1]<=y) lo=mid+1;
+    else hi=mid;
+  }
+  return Math.min(filtradosU.length-1,Math.max(0,lo));
+}
+function cabeceraUsuarioHtmlU(u,index,abierto){
+  const venceRaw=u.fVenceRaw||'Fecha no informada';
+  const estadoColor=u.estado==='vencida'?'#d9534f':(u.estado==='porVencer'?'#f5b301':'#3ad0a4');
+  const estadoTxt=u.estado==='vencida'?'VENC':(u.estado==='porVencer'?'POR VENC':'VIG');
+  const productos=(Array.isArray(u.productos)&&u.productos.length?u.productos:[u]);
+  const clave=clavePersonaVirtualU(u,index);
+  return `<div class="tree-node${abierto?' expanded':''}" data-u-toggle="${index}" data-u-persona="${escU(clave)}" role="button" tabindex="0" aria-expanded="${abierto?'true':'false'}">
+    <span class="tree-arrow">›</span>
+    <span class="tree-cat-badge" style="background:${estadoColor}">${estadoTxt}</span>
+    ${u.reasignado?`<span class="tree-cat-badge" style="background:#5b8def" title="Reasignado de: ${escU(u.dipReasignado)}">↻</span>`:''}
+    <span class="tree-name" title="${escU(`${u.usuario||''} - ${u.domicilio||''}`)}">${escU(u.usuario)}</span>
+    <span class="u-product-count">${productos.length} ${productos.length===1?'producto':'productos'}</span>
+    <span class="tree-pts" style="background:rgba(0,0,0,0.06);color:#1c1c1e">${escU(u.localidad||'')}</span>
+    <span class="tree-pts" style="min-width:70px;text-align:right" title="Vencimiento del producto más reciente">${escU(venceRaw)}</span>
+  </div>
+  <div class="tree-children${abierto?' open':''}" data-u-details="${index}" style="padding:8px;background:rgba(255,255,255,0.5);border-radius:12px;margin-bottom:8px"></div>`;
+}
+function medirAbiertosVirtualesU(){
+  virtualUsuariosU.medirRaf=0;
+  const cont=document.getElementById('usuariosList');
+  if(!cont) return;
+  let cambio=false;
+  cont.querySelectorAll('.u-virtual-item.u-open').forEach(item=>{
+    const index=Number(item.dataset.uVIndex), u=filtradosU[index];
+    if(!u) return;
+    const clave=clavePersonaVirtualU(u,index);
+    const alto=Math.max(virtualUsuariosU.altoFila,Math.ceil(item.getBoundingClientRect().height));
+    const previo=virtualUsuariosU.alturasAbiertas.get(clave)||0;
+    if(Math.abs(previo-alto)>1){ virtualUsuariosU.alturasAbiertas.set(clave,alto); cambio=true; }
+  });
+  if(cambio){
+    reconstruirPosicionesVirtualesU();
+    virtualUsuariosU.inicio=-1;
+    renderVentanaUsuariosU(true);
+  }
+}
+function programarMedicionVirtualU(){
+  if(virtualUsuariosU.medirRaf) cancelAnimationFrame(virtualUsuariosU.medirRaf);
+  virtualUsuariosU.medirRaf=requestAnimationFrame(()=>{
+    virtualUsuariosU.medirRaf=requestAnimationFrame(medirAbiertosVirtualesU);
+  });
+}
+function alternarUsuarioVirtualU(node){
+  const index=Number(node&&node.dataset.uToggle), u=filtradosU[index];
+  if(!u) return;
+  const clave=clavePersonaVirtualU(u,index);
+  if(usuariosAbiertosU.has(clave)) usuariosAbiertosU.delete(clave);
+  else usuariosAbiertosU.add(clave);
+  reconstruirPosicionesVirtualesU();
+  virtualUsuariosU.inicio=-1;
+  renderVentanaUsuariosU(true);
+  programarMedicionVirtualU();
+}
+function renderVentanaUsuariosU(forzar){
+  const cont=document.getElementById('usuariosList');
+  const canvas=cont&&cont.querySelector('.u-virtual-canvas');
+  if(!cont||!canvas||!filtradosU.length) return;
+  const total=virtualUsuariosU.posiciones[filtradosU.length]||0;
+  const rect=cont.getBoundingClientRect();
+  const viewport=Math.max(500,window.innerHeight||800);
+  let visibleTop=Math.max(0,-rect.top);
+  let visibleBottom=Math.max(visibleTop,Math.min(total,viewport-rect.top));
+  if(rect.top>=viewport){ visibleTop=0; visibleBottom=Math.min(total,viewport); }
+  if(rect.bottom<=0){ visibleBottom=total; visibleTop=Math.max(0,total-viewport); }
+  const margen=Math.max(1500,Math.round(viewport*1.8));
+  let inicio=indiceVirtualPorY_U(Math.max(0,visibleTop-margen));
+  let fin=Math.min(filtradosU.length,indiceVirtualPorY_U(Math.min(total,visibleBottom+margen))+1);
+  // Las listas pequeñas siguen completas, igual que antes.
+  if(filtradosU.length<=120){ inicio=0; fin=filtradosU.length; }
+  if(!forzar&&inicio===virtualUsuariosU.inicio&&fin===virtualUsuariosU.fin) return;
+  virtualUsuariosU.inicio=inicio;
+  virtualUsuariosU.fin=fin;
+  let html='';
+  for(let index=inicio;index<fin;index++){
+    const u=filtradosU[index], clave=clavePersonaVirtualU(u,index);
+    const abierto=usuariosAbiertosU.has(clave);
+    html+=`<div class="u-virtual-item${abierto?' u-open':''}" data-u-v-index="${index}" data-u-v-clave="${escU(clave)}" style="top:${virtualUsuariosU.posiciones[index]}px">${cabeceraUsuarioHtmlU(u,index,abierto)}</div>`;
+  }
+  canvas.innerHTML=html;
+  canvas.querySelectorAll('[data-u-toggle]').forEach(node=>{
+    node.onclick=()=>alternarUsuarioVirtualU(node);
+    node.onkeydown=event=>{
+      if(event.key==='Enter'||event.key===' '){ event.preventDefault(); alternarUsuarioVirtualU(node); }
+    };
+    if(node.classList.contains('expanded')) montarDetalleUsuarioU(node.nextElementSibling,Number(node.dataset.uToggle));
+  });
+  if(virtualUsuariosU.observador) virtualUsuariosU.observador.disconnect();
+  if(typeof ResizeObserver==='function'){
+    if(!virtualUsuariosU.observador) virtualUsuariosU.observador=new ResizeObserver(programarMedicionVirtualU);
+    canvas.querySelectorAll('.u-virtual-item.u-open').forEach(item=>virtualUsuariosU.observador.observe(item));
+  }
+  if(canvas.querySelector('.u-virtual-item.u-open')) programarMedicionVirtualU();
+}
+function programarVentanaUsuariosU(){
+  if(virtualUsuariosU.raf) return;
+  virtualUsuariosU.raf=requestAnimationFrame(()=>{
+    virtualUsuariosU.raf=0;
+    const vista=document.getElementById('view-usuarios');
+    if(vista&&vista.classList.contains('active')) renderVentanaUsuariosU(false);
+  });
+}
+function enlazarVentanaUsuariosU(){
+  if(virtualUsuariosU.enlazado) return;
+  virtualUsuariosU.enlazado=true;
+  // En APPI el desplazamiento puede pertenecer al documento o al body según
+  // el navegador. Capturar scroll en document cubre ambos casos sin trabajo
+  // extra por evento; el repintado queda agrupado en requestAnimationFrame.
+  document.addEventListener('scroll',programarVentanaUsuariosU,{passive:true,capture:true});
+  window.addEventListener('scroll',programarVentanaUsuariosU,{passive:true});
+  window.addEventListener('resize',programarVentanaUsuariosU,{passive:true});
+  window.addEventListener('pageshow',programarVentanaUsuariosU,{passive:true});
+}
 function renderListU(){
   const cont=document.getElementById('usuariosList');
   if(!cont) return;
-  const abiertos=new Set([...cont.querySelectorAll('.tree-node.expanded[data-u-persona]')].map(n=>n.getAttribute('data-u-persona')));
+  // Conservar cualquier ficha abierta por integraciones anteriores.
+  cont.querySelectorAll('.tree-node.expanded[data-u-persona]').forEach(n=>usuariosAbiertosU.add(n.getAttribute('data-u-persona')));
   if(filtradosU.length===0){
+    cont.classList.remove('u-virtual');
     cont.innerHTML='<div class="empty">Sin usuarios con esos filtros</div>';
     listadoUsuariosSucioU=false;
     if(window.APPITarjetas&&window.APPITarjetas.pintarListaUsuarios) window.APPITarjetas.pintarListaUsuarios(cont, filtradosU);
     return;
   }
-  // v883: al inicio sólo se crean las cabeceras. El detalle completo y todos
-  // los productos se dibujan al desplegar la persona, no miles de veces en Home.
-  cont.innerHTML=filtradosU.map((u,index)=>{
-    const venceRaw=u.fVenceRaw||'Fecha no informada';
-    const estadoColor=u.estado==='vencida'?'#d9534f':(u.estado==='porVencer'?'#f5b301':'#3ad0a4');
-    const estadoTxt=u.estado==='vencida'?'VENC':(u.estado==='porVencer'?'POR VENC':'VIG');
-    const productos=(Array.isArray(u.productos)&&u.productos.length?u.productos:[u]);
-    return `<div class="tree-node" data-u-toggle="${index}" data-u-persona="${escU(u.personaId||u.id||index)}" role="button" tabindex="0" aria-expanded="false">
-      <span class="tree-arrow">›</span>
-      <span class="tree-cat-badge" style="background:${estadoColor}">${estadoTxt}</span>
-      ${u.reasignado?`<span class="tree-cat-badge" style="background:#5b8def" title="Reasignado de: ${escU(u.dipReasignado)}">↻</span>`:''}
-      <span class="tree-name" title="${escU(`${u.usuario||''} - ${u.domicilio||''}`)}">${escU(u.usuario)}</span>
-      <span class="u-product-count">${productos.length} ${productos.length===1?'producto':'productos'}</span>
-      <span class="tree-pts" style="background:rgba(0,0,0,0.06);color:#1c1c1e">${escU(u.localidad||'')}</span>
-      <span class="tree-pts" style="min-width:70px;text-align:right" title="Vencimiento del producto más reciente">${escU(venceRaw)}</span>
-    </div>
-    <div class="tree-children" data-u-details="${index}" style="padding:8px;background:rgba(255,255,255,0.5);border-radius:12px;margin-bottom:8px"></div>`;
-  }).join('');
-
-  const toggleNode=node=>{
-    const children=node.nextElementSibling;
-    const open=!node.classList.contains('expanded');
-    if(open) montarDetalleUsuarioU(children,Number(node.dataset.uToggle));
-    node.classList.toggle('expanded',open);
-    node.setAttribute('aria-expanded',String(open));
-    if(children) children.classList.toggle('open',open);
-  };
-  cont.querySelectorAll('[data-u-toggle]').forEach(node=>{
-    node.onclick=()=>toggleNode(node);
-    node.onkeydown=event=>{
-      if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleNode(node)}
-    };
-    if(abiertos.has(node.getAttribute('data-u-persona'))){
-      montarDetalleUsuarioU(node.nextElementSibling,Number(node.dataset.uToggle));
-      node.classList.add('expanded');
-      node.setAttribute('aria-expanded','true');
-      if(node.nextElementSibling) node.nextElementSibling.classList.add('open');
-    }
-  });
+  // v884: el scroll conserva la altura total, pero sólo prepara las fichas
+  // cercanas a la pantalla. Un margen amplio antes y después evita huecos aun
+  // cuando la persona desliza rápido. El diseño y los datos no cambian.
+  cont.classList.add('u-virtual');
+  cont.innerHTML='<div class="u-virtual-canvas" aria-label="Listado de usuarios"></div>';
+  virtualUsuariosU.inicio=-1;
+  virtualUsuariosU.fin=-1;
+  reconstruirPosicionesVirtualesU();
+  enlazarVentanaUsuariosU();
+  renderVentanaUsuariosU(true);
   listadoUsuariosSucioU=false;
-  if(window.APPITarjetas&&window.APPITarjetas.pintarListaUsuarios) window.APPITarjetas.pintarListaUsuarios(cont,filtradosU);
 }
+window.estadoVirtualUsuarios=function(){
+  const cont=document.getElementById('usuariosList');
+  return {total:filtradosU.length,renderizados:cont?cont.querySelectorAll('.tree-node').length:0,inicio:virtualUsuariosU.inicio,fin:virtualUsuariosU.fin,abiertos:usuariosAbiertosU.size};
+};
 window.aplicarFiltrosU=aplicarFiltrosU;
 window.renderUsuariosPendientes=function(){
   // Si la persona entró antes de la precarga ociosa, cargar ahora. En Home no

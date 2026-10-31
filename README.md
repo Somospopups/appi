@@ -6,6 +6,15 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v884 · Scroll inmediato en listas grandes de Usuarios
+
+- Usuarios conserva todas las personas en memoria para búsquedas, filtros, estadísticas, zonas, tarjetas, cumpleaños, reasignados, Usuarios estrella, coincidencias y mensajes.
+- En listas grandes, el navegador crea sólo las fichas cercanas a la pantalla, con un margen preventivo antes y después; la altura y la posición natural del desplazamiento no cambian.
+- Al desplegar una persona siguen apareciendo bajo demanda todos sus productos, fechas, historial y acciones, y la ficha permanece abierta aunque salga momentáneamente de la pantalla.
+- La regresión de 1.500 garantías exige menos de 120 cabeceras simultáneas, cuatro saltos rápidos sin huecos y respuesta inferior a un segundo. En las mediciones finales, el salto más lento tardó alrededor de 140 ms.
+- El comportamiento y la apariencia aprobados en v883 se mantienen sin paginación, botones “Cargar más” ni pérdida de funciones.
+- Versión: **v884 · Segura** → Cache `appi-v884-scroll-usuarios`.
+
 ## v883 · Recuperación de velocidad en Usuarios
 
 - El Home deja para después la preparación de la planilla y ya no construye miles de fichas invisibles durante el inicio.

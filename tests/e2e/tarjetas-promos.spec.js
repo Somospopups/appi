@@ -174,10 +174,9 @@ test('recargar el Excel no borra las tarjetas guardadas', async ({ page }) => {
 
   const gomez = page.locator('#usuariosList .tree-node', { hasText: 'GOMEZ, JUAN PEREZ' });
   await gomez.click();
-  const slot = page.locator('.tp-slot[data-tp-scope="usuarios"]').nth(
-    await page.locator('#usuariosList .tree-node').evaluateAll((nodes, name) =>
-      nodes.findIndex(n => n.textContent.includes(name)), 'GOMEZ, JUAN PEREZ')
-  );
+  // Desde v883 el detalle se crea bajo demanda: la tarjeta pertenece al panel
+  // contiguo de Gómez, no a una lista de paneles invisibles anteriores.
+  const slot = gomez.locator('xpath=following-sibling::*[1]').locator('.tp-slot[data-tp-scope="usuarios"]');
   await expect(slot).toContainText('Naranja');
 });
 
