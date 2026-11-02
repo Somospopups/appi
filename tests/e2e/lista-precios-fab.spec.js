@@ -1,6 +1,9 @@
 import { test, expect } from '@playwright/test';
 
 async function entrar(page) {
+  // Regresiones generales del diseño y descuentos manuales: catálogo base
+  // fuera de la ventana CyberMonday.
+  await page.addInitScript(() => { window.__APPI_FECHA_PROMO__ = '2026-11-05'; });
   await page.goto('/index.html');
   await page.evaluate(() => {
     localStorage.clear();

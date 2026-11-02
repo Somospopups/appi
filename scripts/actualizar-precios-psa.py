@@ -14,6 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 OUT_CAT = ROOT / "psa-catalogo.json"
 OUT_PRE = ROOT / "psa-precios.json"
 OUT_PLAN = ROOT / "psa-planes.json"
+OUT_BEN = ROOT / "psa-beneficios.json"
 PLANES_VERIFICADOS = ROOT / "scripts" / "planes-psa-verificados.json"
 IMG_DIR = ROOT / "catalogo-img"
 # CDN público de PSA: las fotos del Portal PCD de compras (PNG 200x200),
@@ -381,8 +382,11 @@ def graphql_catalogo():
             {
                 "sku": sku,
                 "nombre": nombre,
-                "precio": int(round(float(pr or 0))),
+                # El precio de catálogo siempre es el regular. El precio final
+                # de la tienda se usa sólo para auditar beneficios temporales.
+                "precio": int(round(float(rg or pr or 0))),
                 "lista": int(round(float(rg or pr or 0))),
+                "_precio_tienda": int(round(float(pr or rg or 0))),
                 "url": ("https://tienda.psa.com.ar/" + uk + ".html") if uk else "",
                 "grupo": grp,
                 "stock": it.get("stock_status") or "",
@@ -666,6 +670,84 @@ def extraer_planes():
     }
 
 
+def fusionar_catalogo_anterior(productos, previo):
+    """GraphQL aporta precios regulares y finales, pero no Plan Canje ni los
+    packs de la lista con acuerdo. Conserva esos metadatos y el orden local sin
+    permitir que un precio promocional reemplace al precio base."""
+    anteriores = (previo or {}).get("productos") or []
+    nuevos_sku = {str(p.get("sku")): p for p in productos if p.get("sku")}
+    nuevos_nom = {(p.get("nombre") or "").strip().upper(): p for p in productos if p.get("nombre")}
+    usados = set()
+    salida = []
+    conservar = ("plan_canje", "seccion", "grupo", "composicion", "items_skus")
+    for viejo in anteriores:
+        nuevo = nuevos_sku.get(str(viejo.get("sku") or "")) or nuevos_nom.get((viejo.get("nombre") or "").strip().upper())
+        if not nuevo:
+            salida.append(dict(viejo))
+            continue
+        usados.add(id(nuevo))
+        for clave in conservar:
+            if viejo.get(clave) not in (None, "", []):
+                nuevo[clave] = viejo[clave]
+        salida.append(nuevo)
+    salida.extend(p for p in productos if id(p) not in usados)
+    return salida
+
+CYBER_2026 = {
+    "actualizado": "2-Nov-2026",
+    "fuente": "https://tienda.psa.com.ar/cyber.html",
+    "campanas": [
+        {
+            "id": "cyber-monday-2026",
+            "nombre": "CyberMonday",
+            "desde": "2026-11-02",
+            "hasta": "2026-11-04",
+            "aplica": ["normal", "canje"],
+            "no_acumulable": True,
+            "financiacion": "Cuotas sin interés y reintegros según banco y tarjeta seleccionados; el reintegro no se descuenta del total.",
+            "productos": [
+                {"familia": "PSA Vero", "porcentaje": 45, "skus": ["611030420"]},
+                {"familia": "PSA Iontrix 3", "porcentaje": 25, "skus": ["611290050"]},
+                {"familia": "PSA Senior4", "porcentaje": 10, "skus": ["611010510", "611010530", "611010550", "611010560", "611010730"]},
+            ],
+        }
+    ],
+}
+
+
+def validar_cyber_2026(productos, now=None):
+    """Durante la campaña, la tienda debe confirmar los porcentajes oficiales.
+    Si cambia una regla, no se publica un catálogo mezclado o con doble rebaja."""
+    hoy = (now or datetime.now(ZoneInfo("America/Argentina/Buenos_Aires"))).date().isoformat()
+    camp = CYBER_2026["campanas"][0]
+    if hoy < camp["desde"] or hoy > camp["hasta"]:
+        return
+    esperados = {}
+    for regla in camp["productos"]:
+        for sku in regla["skus"]:
+            esperados[sku] = regla["porcentaje"]
+    obligatorios = {"611030420", "611290050", "611010510"}
+    vistos = set()
+    errores = []
+    for p in productos:
+        sku = str(p.get("sku") or "")
+        if sku not in esperados or not p.get("_precio_tienda"):
+            continue
+        base = float(p.get("lista") or p.get("precio") or 0)
+        final = float(p.get("_precio_tienda") or 0)
+        if base <= 0 or final <= 0:
+            continue
+        pct = round((1 - final / base) * 100, 2)
+        if abs(pct - esperados[sku]) > 0.15:
+            errores.append(f"{sku}: tienda {pct}% / esperado {esperados[sku]}%")
+        vistos.add(sku)
+    faltan = sorted(obligatorios - vistos)
+    if faltan:
+        errores.append("sin confirmación de tienda: " + ", ".join(faltan))
+    if errores:
+        raise RuntimeError("CyberMonday 2026 no pasó la auditoría: " + "; ".join(errores))
+
+
 def leer_prev(path):
     if not path.exists():
         return {}
@@ -679,8 +761,10 @@ def main():
     prev_cat = leer_prev(OUT_CAT)
     prev_pre = leer_prev(OUT_PRE)
     productos = []
+    desde_graphql = False
     try:
         productos = graphql_catalogo()
+        desde_graphql = bool(productos)
         print(f"graphql catálogo {len(productos)}")
     except (urllib.error.URLError, TimeoutError, json.JSONDecodeError) as e:
         print(f"graphql no disponible: {e}")
@@ -693,6 +777,12 @@ def main():
             scrape_todos(productos)
         except Exception as e:
             print(f"scrape_todos falló: {e}")
+
+    if desde_graphql:
+        productos = fusionar_catalogo_anterior(productos, prev_cat)
+        validar_cyber_2026(productos)
+    for p in productos:
+        p.pop("_precio_tienda", None)
 
     by_sku = {p.get("sku"): p for p in productos if p.get("sku")}
     precios = {}
@@ -733,6 +823,7 @@ def main():
         + "\n",
         encoding="utf-8",
     )
+    OUT_BEN.write_text(json.dumps(CYBER_2026, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     try:
         planes = extraer_planes()
         planes["actualizado"] = fecha

@@ -1,0 +1,45 @@
+{
+  "actualizado": "2-Nov-2026",
+  "fuente": "https://tienda.psa.com.ar/cyber.html",
+  "campanas": [
+    {
+      "id": "cyber-monday-2026",
+      "nombre": "CyberMonday",
+      "desde": "2026-11-02",
+      "hasta": "2026-11-04",
+      "aplica": [
+        "normal",
+        "canje"
+      ],
+      "no_acumulable": true,
+      "financiacion": "Cuotas sin interés y reintegros según banco y tarjeta seleccionados; el reintegro no se descuenta del total.",
+      "productos": [
+        {
+          "familia": "PSA Vero",
+          "porcentaje": 45,
+          "skus": [
+            "611030420"
+          ]
+        },
+        {
+          "familia": "PSA Iontrix 3",
+          "porcentaje": 25,
+          "skus": [
+            "611290050"
+          ]
+        },
+        {
+          "familia": "PSA Senior4",
+          "porcentaje": 10,
+          "skus": [
+            "611010510",
+            "611010530",
+            "611010550",
+            "611010560",
+            "611010730"
+          ]
+        }
+      ]
+    }
+  ]
+}

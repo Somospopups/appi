@@ -439,6 +439,8 @@ test('el PRODUCTO manual sugiere los nombres del catálogo', async ({ page }) =>
    con dos botones de precio. Cada botón agrega la variante correcta al
    presupuesto, sin duplicar la fila del producto. */
 test('lista de precios: un renglón ofrece precio normal y precio de canje', async ({ page }) => {
+  // Regresión permanente del precio base: se prueba luego de CyberMonday.
+  await page.addInitScript(() => { window.__APPI_FECHA_PROMO__ = '2026-11-05'; });
   await entrar(page);
   await page.evaluate(() => window.abrirLista());
   await page.locator('#lpList .lp-item').first().waitFor({ state: 'visible', timeout: 15000 });

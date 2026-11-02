@@ -6,6 +6,16 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v892 · Beneficios CyberMonday PSA
+
+- Del 2 al 4 de noviembre de 2026 aplica automáticamente 45% OFF a PSA Vero, 25% OFF a PSA Iontrix 3 y 10% OFF a todas las variantes PSA Senior4.
+- Los beneficios alcanzan precio normal y Plan Canje, sin modificar los precios base ni acumular otros descuentos de producto.
+- Lista, Presupuesto y PDF muestran precio anterior, porcentaje y precio final; el 5 de noviembre la campaña vence automáticamente.
+- Se conserva el diseño de financiación aprobado en v891, con cuotas y reintegros según banco/tarjeta y sin descontar el reintegro del total.
+- El actualizador audita los porcentajes temporales contra Tienda PSA y conserva Plan Canje, packs, categorías y orden del catálogo.
+- Se incorpora `FINANCIACION_TARJETAS_APPI.md` como regla permanente de diseño y actualización segura.
+- Versión: **v892 · Segura** → Cache `appi-v892-cybermonday-2026`.
+
 ## v891 · Financiación de tarjetas actualizada
 
 - Presupuesto incorpora la financiación oficial publicada por PSA el 2 de noviembre de 2026.

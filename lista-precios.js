@@ -9,6 +9,7 @@
   var LS_PAGO = 'appi_lista_pago_v1';
   var LS_BOT = 'appi_lista_bot_v1';
   var CAT = null;
+  var BENEFICIOS = { campanas: [] };
   var descuentoAbierto = '';
   var BOT_G = 44;
   var BOT_ANIOS = 450;
@@ -145,6 +146,59 @@
     });
   }
   function money(n) { return '$' + Math.round(Number(n) || 0).toLocaleString('es-AR'); }
+
+  // Las promociones de producto viven separadas de los precios base. De este
+  // modo vencen solas y nunca convierten un precio temporal en precio de lista.
+  function fechaArgentinaISO() {
+    try {
+      if (window.__APPI_FECHA_PROMO__) return String(window.__APPI_FECHA_PROMO__).slice(0, 10);
+      var partes = new Intl.DateTimeFormat('en-US', {
+        timeZone: 'America/Argentina/Buenos_Aires', year: 'numeric', month: '2-digit', day: '2-digit'
+      }).formatToParts(new Date());
+      var out = {};
+      partes.forEach(function (x) { if (x.type !== 'literal') out[x.type] = x.value; });
+      return out.year + '-' + out.month + '-' + out.day;
+    } catch (e) {
+      var d = new Date();
+      return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    }
+  }
+  function beneficioProducto(p) {
+    if (!p || !p.sku || !BENEFICIOS || !Array.isArray(BENEFICIOS.campanas)) return null;
+    var hoy = fechaArgentinaISO();
+    for (var i = 0; i < BENEFICIOS.campanas.length; i++) {
+      var c = BENEFICIOS.campanas[i] || {};
+      if (!c.desde || !c.hasta || hoy < c.desde || hoy > c.hasta) continue;
+      var productosPromo = Array.isArray(c.productos) ? c.productos : [];
+      for (var j = 0; j < productosPromo.length; j++) {
+        var regla = productosPromo[j] || {};
+        if ((regla.skus || []).map(String).indexOf(String(p.sku)) < 0) continue;
+        var pct = Number(regla.porcentaje) || 0;
+        if (pct <= 0 || pct >= 100) continue;
+        return {
+          id: c.id || '', nombre: c.nombre || 'Promoción', desde: c.desde, hasta: c.hasta,
+          porcentaje: pct, familia: regla.familia || '', noAcumulable: c.no_acumulable !== false
+        };
+      }
+    }
+    return null;
+  }
+  function productoConBeneficio(p) {
+    if (!p) return p;
+    var ben = beneficioProducto(p);
+    if (!ben) return p;
+    var out = Object.assign({}, p);
+    var precioBase = Number(p.precio) || 0;
+    var canjeBase = Number(p.plan_canje) || 0;
+    out.precio_original = precioBase;
+    out.precio = Math.round(precioBase * (1 - ben.porcentaje / 100));
+    if (canjeBase > 0) {
+      out.plan_canje_original = canjeBase;
+      out.plan_canje = Math.round(canjeBase * (1 - ben.porcentaje / 100));
+    }
+    out.beneficio_producto = ben;
+    return out;
+  }
   function sinMarca(s) {
     return String(s || '')
       .replace(/\bAPPI\b/gi, '')
@@ -216,24 +270,30 @@
     return {
       clave: claveSku(p) + CANJE_SUF, sku: p.sku || '',
       nombre: p.nombre + ' (PLAN CANJE)', precio: p.plan_canje,
+      precio_original: p.plan_canje_original || p.plan_canje,
+      beneficio_producto: p.beneficio_producto || null,
       foto: p.foto, grupo: p.grupo, seccion: p.seccion, canje: true
     };
   }
   function lineasLista() {
     var out = [];
-    productos().forEach(function (p) {
+    productos().forEach(function (base) {
+      var p = productoConBeneficio(base);
       var canjeValido = Number(p.plan_canje) > 0 && Number(p.plan_canje) < Number(p.precio);
       out.push({
         clave: claveSku(p),
         sku: p.sku || '',
         nombre: p.nombre,
         precio: p.precio,
+        precio_original: p.precio_original || p.precio,
+        beneficio_producto: p.beneficio_producto || null,
         foto: p.foto,
         grupo: p.grupo,
         seccion: p.seccion,
         composicion: p.composicion || '',
         url: p.url || '',
         plan_canje: canjeValido ? Number(p.plan_canje) : 0,
+        plan_canje_original: canjeValido ? Number(p.plan_canje_original || p.plan_canje) : 0,
         canjeClave: canjeValido ? claveSku(p) + CANJE_SUF : ''
       });
     });
@@ -244,11 +304,14 @@
     if (esClaveCanje(sku)) {
       var base = String(sku).slice(0, -CANJE_SUF.length);
       for (var j = 0; j < list.length; j++) {
-        if (list[j].plan_canje && claveSku(list[j]) === base) return lineaCanje(list[j]);
+        var pCanje = productoConBeneficio(list[j]);
+        if (pCanje.plan_canje && claveSku(pCanje) === base) return lineaCanje(pCanje);
       }
       return null;
     }
-    for (var i = 0; i < list.length; i++) if (claveSku(list[i]) === sku) return list[i];
+    for (var i = 0; i < list.length; i++) {
+      if (claveSku(list[i]) === sku) return productoConBeneficio(list[i]);
+    }
     return null;
   }
   function filtrados() {
@@ -277,11 +340,17 @@
       var q = Number(c[sku]) || 0;
       if (!p || q <= 0) return;
       n += q;
-      var pctDesc = getDesc(sku);
+      var beneficio = p.beneficio_producto || null;
+      // CyberMonday no se acumula con el descuento manual del presupuesto.
+      var pctDesc = beneficio ? 0 : getDesc(sku);
       var precioBase = Number(p.precio) || 0;
+      var precioOriginal = beneficio ? Number(p.precio_original || precioBase) : precioBase;
       var precioFinal = pctDesc > 0 ? Math.round(precioBase * (1 - pctDesc / 100)) : precioBase;
       tot += q * precioFinal;
-      lineas.push({ p: p, q: q, descPct: pctDesc, precioOriginal: precioBase, precioFinal: precioFinal });
+      lineas.push({
+        p: p, q: q, descPct: pctDesc, promoPct: beneficio ? beneficio.porcentaje : 0,
+        beneficio: beneficio, precioOriginal: precioOriginal, precioFinal: precioFinal
+      });
     });
     return { n: n, tot: tot, lineas: lineas };
   }
@@ -617,6 +686,9 @@
       '.lp-actualizar:disabled{opacity:.55;cursor:wait}' +
       '.lp-actualizar.ok{background:#e6f4ee;color:#1a6b4a;border-color:rgba(26,107,74,.18)}' +
       '.lp-note small{font-size:10px;font-weight:700;color:#8a8d9e}' +
+      '.lp-promo-strip{margin:0 0 10px;padding:9px 11px;border:1px solid #e8b43f;border-radius:13px;background:#fff3cb;color:#684300;font-size:10.5px;font-weight:850;line-height:1.35}' +
+      '.lp-promo-strip b{font-weight:950}.lp-promo-strip small{display:block;margin-top:2px;font-size:9px;font-weight:750;color:#7b5b20}' +
+      'body.dark .lp-promo-strip{background:#4f3908;border-color:#9a7424;color:#fff1bd}body.dark .lp-promo-strip small{color:#ead49c}' +
       '.lp-search{width:100%;min-height:44px;border:1px solid rgba(196,164,92,.45);border-radius:14px;padding:10px 12px;font:inherit;font-size:14px;background:#faf6ee;color:#2a2a32;margin:0 0 10px}' +
       '.lp-chips-wrap{position:relative;margin:0 0 6px}' +
       '.lp-chips-wrap.lp-more:after{content:"";position:absolute;right:0;top:0;bottom:10px;width:52px;pointer-events:none;background:linear-gradient(90deg,rgba(243,238,227,0),#f3eee3 70%)}' +
@@ -644,11 +716,16 @@
       '.lp-price-choice.is-in-cart{box-shadow:inset 0 0 0 2px rgba(255,255,255,.85),0 2px 7px rgba(0,0,0,.13);filter:brightness(1.08)}' +
       '.lp-price-choice-label{font-size:9px;font-weight:800;line-height:1.15}' +
       '.lp-price-choice strong{font-size:12px;font-weight:950;line-height:1.2;white-space:nowrap}' +
+      '.lp-price-choice.has-product-promo{height:70px;min-height:70px;gap:1px}' +
+      '.lp-price-choice.has-product-promo s{font-size:8px;font-weight:750;line-height:1.05;opacity:.78;white-space:nowrap}' +
+      '.lp-price-choice.has-product-promo strong{font-size:13px}' +
       '.lp-price-choice-count{font-size:8px;font-weight:750;line-height:1.15;opacity:.88;color:#fff}' +
       'body.dark .lp-price-choice{background:#0e6b91;border-color:#0e6b91;color:#fff}' +
       'body.dark .lp-price-choice-canje{background:#4d68c8;border-color:#4d68c8;color:#fff}' +
       '.lp-item-txt b{display:block;font-size:13px;font-weight:900;color:#2a2a32;line-height:1.25}' +
       '.lp-item-txt span{display:block;margin-top:2px;font-size:11px;font-weight:750;color:#686977}' +
+      '.lp-item-txt .lp-product-promo{display:inline-flex;align-items:center;margin-top:4px;padding:3px 7px;border-radius:999px;background:#fff0c7;color:#7b4b00;font-size:9px;font-weight:950;line-height:1.15;white-space:nowrap}' +
+      'body.dark .lp-item-txt .lp-product-promo{background:#614000;color:#fff1c0}' +
       '.lp-item-txt em{display:block;margin-top:2px;font-size:13px;font-weight:950;color:#0b5878;font-style:normal}' +
       '.lp-item-pack-desc{display:block;margin-top:3px;font-size:10.5px;font-weight:700;color:#496677;line-height:1.3}' +
       'body.dark .lp-item-pack-desc{color:#8ea6b8}' +
@@ -810,6 +887,10 @@
       '.lp-line .lp-qty{width:82px;min-width:82px;gap:4px}.lp-line .lp-qty button{width:27px;height:29px;border-radius:9px;background:#087a5b}.lp-line .lp-qty button.ghost{background:#dfeae6;color:#076c53}.lp-line .lp-qty i{width:15px;font-size:11px}' +
       '.lp-price-touch{min-width:0;border:0;background:transparent;padding:8px 0;text-align:right;color:#d85212;font:inherit;font-size:11px;font-weight:950;white-space:nowrap;cursor:pointer;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:4px}' +
       '.lp-price-touch s{display:none}.lp-price-touch b{color:inherit;font:inherit}.lp-price-touch small{display:block;margin-top:2px;font-size:8px;color:#087a5b;text-decoration:none}' +
+      '.lp-price-touch.auto-promo{text-decoration:none;cursor:default;padding:4px 0}' +
+      '.lp-price-touch.auto-promo s{display:block;color:#777;font-size:9px;font-weight:750;line-height:1.15}' +
+      '.lp-price-touch.auto-promo b{display:block;color:#087a5b;font-size:12px;line-height:1.2}' +
+      '.lp-price-touch.auto-promo small{color:#7b4b00;font-size:8px;font-weight:900}' +
       '.lp-desc-options{position:relative;z-index:3;background:#fff8f2;padding:7px 9px 9px;border-top:1px dashed #edc9ad}.lp-desc-options .lp-chip{padding:6px 9px;font-size:10px}' +
       '.lp-line-block.swipe-hint .lp-line{animation:lpSwipeHint 3.7s cubic-bezier(.25,.8,.25,1) .65s 1}.lp-line-block.swipe-hint .lp-line-delete-bg{animation:lpDeleteGlow 3.7s ease .65s 1}' +
       '@keyframes lpSwipeHint{0%,18%,86%,100%{transform:translateX(0)}42%,60%{transform:translateX(-92px)}72%{transform:translateX(-72px)}}@keyframes lpDeleteGlow{0%,18%,86%,100%{filter:brightness(.92)}42%,72%{filter:brightness(1.12)}}' +
@@ -908,9 +989,23 @@
       return '<button type="button" class="lp-chip' + (filtro === g.id ? ' on' : '') + '" data-g="' + g.id + '">' + esc(g.t) + '</button>';
     }).join('');
     var totalProds = productos().length;
+    var hoyPromo = fechaArgentinaISO();
+    var campanaActiva = (BENEFICIOS.campanas || []).find(function (c) {
+      return c && c.desde && c.hasta && hoyPromo >= c.desde && hoyPromo <= c.hasta;
+    });
+    var promoStrip = '';
+    if (campanaActiva) {
+      var promos = (campanaActiva.productos || []).map(function (p) {
+        return esc(String(p.familia || '').replace(/^PSA\s+/i, '')) + ' ' + (Number(p.porcentaje) || 0) + '%';
+      }).join(' · ');
+      var dDesde = String(campanaActiva.desde).split('-');
+      var dHasta = String(campanaActiva.hasta).split('-');
+      var vigCorta = Number(dDesde[2]) + ' al ' + Number(dHasta[2]) + '/' + Number(dHasta[1]);
+      promoStrip = '<div class="lp-promo-strip">⚡ <b>' + esc(campanaActiva.nombre || 'Promoción') + ' · ' + esc(vigCorta) + '</b> · ' + promos + '<small>Precio normal y Plan Canje · No acumulable con otras promociones de producto</small></div>';
+    }
     return '<div class="lp-wrap">' +
       '<p class="lp-note"><span>Lista \'Precios Sugeridos con Acuerdo\' de PSA' + (fecha ? ' · ' + esc(fecha) : '') + (totalProds ? ' <b style="opacity:.85;font-weight:700">(' + totalProds + ' productos)</b>' : '') + '. Elegí productos y cotizá.</span>' +
-      '<button type="button" class="lp-actualizar" id="lpActualizar" title="Actualizar precios desde la lista de PSA">🔄 Actualizar precios</button></p>' +
+      '<button type="button" class="lp-actualizar" id="lpActualizar" title="Actualizar precios desde la lista de PSA">🔄 Actualizar precios</button></p>' + promoStrip +
       '<input class="lp-search" id="lpSearch" type="search" placeholder="Buscar modelo, recarga o SKU" value="' + esc(busca) + '">' +
       '<div class="lp-chips" id="lpChips">' + chips + '</div>' +
       '<div id="lpList"></div></div>';
@@ -952,18 +1047,25 @@
       var tieneCanje = Number(L.plan_canje) > 0;
       var qCanje = tieneCanje ? qty(L.canjeClave) : 0;
       var seleccionado = q > 0 || qCanje > 0;
+      var ben = L.beneficio_producto || null;
+      var promoBadge = ben
+        ? '<small class="lp-product-promo">⚡ CYBER · ' + ben.porcentaje + '% OFF</small>'
+        : '';
       var clsItem = 'lp-item' + (tieneCanje ? ' lp-item-has-canje' : '') + (tieneCanje && !L.foto ? ' lp-item-no-photo' : '') + (seleccionado ? ' lp-item-selected' : '') + ((L.grupo === 'packs' || L.grupo === 'ingreso') ? ' lp-item-is-pack' : '');
       html += '<div class="' + clsItem + '" data-sku="' + esc(L.clave) + '">' +
         fotoHtml +
-        '<div class="lp-item-txt"><b>' + esc(L.nombre) + '</b><span>' + subTxt + '</span>' + descHtml + (tieneCanje ? '' : '<em>' + money(L.precio) + '</em>') + '</div>';
+        '<div class="lp-item-txt"><b>' + esc(L.nombre) + '</b><span>' + subTxt + '</span>' + promoBadge + descHtml +
+          (tieneCanje ? '' : (ben ? '<em><s>' + money(L.precio_original) + '</s> ' + money(L.precio) + '</em>' : '<em>' + money(L.precio) + '</em>')) + '</div>';
       if (tieneCanje) {
         html += '<div class="lp-price-options">' +
-          '<button type="button" class="lp-price-choice lp-price-choice-canje' + (qCanje ? ' is-in-cart' : '') + '" data-act="mas" data-price-sku="' + esc(L.canjeClave) + '" aria-label="Agregar a precio de canje">' +
-            '<span class="lp-price-choice-label">Precio de canje</span><strong>' + money(L.plan_canje) + '</strong>' +
+          '<button type="button" class="lp-price-choice lp-price-choice-canje' + (ben ? ' has-product-promo' : '') + (qCanje ? ' is-in-cart' : '') + '" data-act="mas" data-price-sku="' + esc(L.canjeClave) + '" aria-label="Agregar a precio de canje' + (ben ? ' con ' + ben.porcentaje + ' por ciento de descuento' : '') + '">' +
+            '<span class="lp-price-choice-label">Precio de canje' + (ben ? ' · −' + ben.porcentaje + '%' : '') + '</span>' +
+            (ben ? '<s>' + money(L.plan_canje_original) + '</s>' : '') + '<strong>' + money(L.plan_canje) + '</strong>' +
             '<small class="lp-price-choice-count">' + (qCanje ? '✓ Elegido · ' + qCanje : 'Tocar para agregar') + '</small>' +
           '</button>' +
-          '<button type="button" class="lp-price-choice' + (q ? ' is-in-cart' : '') + '" data-act="mas" data-price-sku="' + esc(L.clave) + '" aria-label="Agregar a precio normal">' +
-            '<span class="lp-price-choice-label">Precio normal</span><strong>' + money(L.precio) + '</strong>' +
+          '<button type="button" class="lp-price-choice' + (ben ? ' has-product-promo' : '') + (q ? ' is-in-cart' : '') + '" data-act="mas" data-price-sku="' + esc(L.clave) + '" aria-label="Agregar a precio normal' + (ben ? ' con ' + ben.porcentaje + ' por ciento de descuento' : '') + '">' +
+            '<span class="lp-price-choice-label">Precio normal' + (ben ? ' · −' + ben.porcentaje + '%' : '') + '</span>' +
+            (ben ? '<s>' + money(L.precio_original) + '</s>' : '') + '<strong>' + money(L.precio) + '</strong>' +
             '<small class="lp-price-choice-count">' + (q ? '✓ Elegido · ' + q : 'Tocar para agregar') + '</small>' +
           '</button>' +
         '</div>';
@@ -1794,26 +1896,29 @@
       var clave = ln.p.clave || claveSku(ln.p);
       var k = esc(clave);
       var d = ln.descPct || 0;
-      var abierto = descuentoAbierto === clave;
+      var ben = ln.beneficio || null;
+      var abierto = !ben && descuentoAbierto === clave;
       var foto = ln.p.foto
         ? '<img class="lp-line-photo" src="' + esc(ln.p.foto) + '" alt="" onerror="this.style.visibility=\'hidden\'">'
         : '<span class="lp-line-photo" aria-hidden="true"></span>';
-      return '<div class="lp-line-block" data-sku="' + k + '">' +
-        '<div class="lp-line-delete-bg" aria-hidden="true"><span>🗑</span><b>Eliminar</b></div>' +
-        '<div class="lp-line">' +
-          '<div class="lp-line-product" title="' + esc(ln.p.nombre) + '">' + foto + '<span class="lp-line-name">' + esc(ln.p.nombre) + '</span></div>' +
-          '<div class="lp-qty"><button type="button" class="ghost" data-act="menos" aria-label="Quitar una unidad">−</button><i>' + ln.q + '</i><button type="button" data-act="mas" aria-label="Agregar una unidad">+</button></div>' +
-          '<button type="button" class="lp-price-touch' + (d ? ' has-desc' : '') + '" data-toggle-desc data-desc="' + (d ? '−' + d + '% aplicado' : '') + '" aria-expanded="' + (abierto ? 'true' : 'false') + '" aria-label="Precio de ' + esc(ln.p.nombre) + '. Tocar para aplicar descuento">' +
-            (d ? '<s>' + money(ln.q * ln.precioOriginal) + '</s><b>' + money(ln.q * ln.precioFinal) + '</b><small>−' + d + '% aplicado</small>' : '<b>' + money(ln.q * ln.precioFinal) + '</b>') +
-          '</button>' +
-        '</div>' +
-        '<div class="lp-desc-options"' + (abierto ? '' : ' hidden') + '>' +
+      var precioHtml = ben
+        ? '<div class="lp-price-touch auto-promo" aria-label="' + esc(ben.nombre) + ': ' + ben.porcentaje + ' por ciento de descuento ya aplicado"><s>' + money(ln.q * ln.precioOriginal) + '</s><b>' + money(ln.q * ln.precioFinal) + '</b><small>' + esc(ben.nombre) + ' · −' + ben.porcentaje + '%</small></div>'
+        : '<button type="button" class="lp-price-touch' + (d ? ' has-desc' : '') + '" data-toggle-desc data-desc="' + (d ? '−' + d + '% aplicado' : '') + '" aria-expanded="' + (abierto ? 'true' : 'false') + '" aria-label="Precio de ' + esc(ln.p.nombre) + '. Tocar para aplicar descuento">' +
+            (d ? '<s>' + money(ln.q * ln.precioOriginal) + '</s><b>' + money(ln.q * ln.precioFinal) + '</b><small>−' + d + '% aplicado</small>' : '<b>' + money(ln.q * ln.precioFinal) + '</b>') + '</button>';
+      var opcionesDesc = ben ? '' : '<div class="lp-desc-options"' + (abierto ? '' : ' hidden') + '>' +
           '<button type="button" class="lp-chip' + (d === 0 ? ' on' : '') + '" data-set-desc="0">Precio lista</button>' +
           '<button type="button" class="lp-chip' + (d === 5 ? ' on' : '') + '" data-set-desc="5">-5%</button>' +
           '<button type="button" class="lp-chip' + (d === 10 ? ' on' : '') + '" data-set-desc="10">-10%</button>' +
           '<button type="button" class="lp-chip' + (d === 15 ? ' on' : '') + '" data-set-desc="15">-15%</button>' +
           '<button type="button" class="lp-chip' + (d === 20 ? ' on' : '') + '" data-set-desc="20">-20%</button>' +
-        '</div>' +
+        '</div>';
+      return '<div class="lp-line-block" data-sku="' + k + '">' +
+        '<div class="lp-line-delete-bg" aria-hidden="true"><span>🗑</span><b>Eliminar</b></div>' +
+        '<div class="lp-line">' +
+          '<div class="lp-line-product" title="' + esc(ln.p.nombre) + '">' + foto + '<span class="lp-line-name">' + esc(ln.p.nombre) + '</span></div>' +
+          '<div class="lp-qty"><button type="button" class="ghost" data-act="menos" aria-label="Quitar una unidad">−</button><i>' + ln.q + '</i><button type="button" data-act="mas" aria-label="Agregar una unidad">+</button></div>' +
+          precioHtml +
+        '</div>' + opcionesDesc +
       '</div>';
     }).join('');
     activarSwipeLineas(host);
@@ -2133,9 +2238,12 @@
       r.lineas.forEach(function (ln) {
         var p = ln.p;
         var descP = ln.descPct || 0;
+        var promoP = ln.promoPct || 0;
         var pFinal = ln.precioFinal || (Number(p.precio) || 0);
         var nomBase = sinMarca(p.nombre) || p.nombre || "";
-        if (descP > 0) {
+        if (promoP > 0) {
+          nomBase += " *CYBERMONDAY " + promoP + "% OFF*";
+        } else if (descP > 0) {
           nomBase += " *PROMO " + descP + "% DESCUENTO*";
         }
         if (p.grupo === "packs" && Array.isArray(p.items_skus) && p.items_skus.length > 0) {
@@ -2170,6 +2278,12 @@
             esPack: false
           });
         }
+        if (promoP > 0) {
+          filasTabla.push({
+            nom: "  Antes " + money(ln.precioOriginal) + " · −" + promoP + "% · Final " + money(pFinal),
+            cant: "", unit: "", subt: "", esSub: true, esPromo: true, esPack: false
+          });
+        }
       });
 
       filasTabla.forEach(function (row, i) {
@@ -2199,9 +2313,10 @@
           pdf.rect(m, y, usable, rowH, 'F');
         }
         if (row.esSub) {
-          pdf.setFont('helvetica', 'italic');
-          pdf.setFontSize(8);
-          pdf.setTextColor.apply(pdf, gris);
+          pdf.setFont('helvetica', row.esPromo ? 'bold' : 'italic');
+          pdf.setFontSize(row.esPromo ? 7.7 : 8);
+          if (row.esPromo) pdf.setTextColor(8, 122, 91);
+          else pdf.setTextColor.apply(pdf, gris);
         } else if (row.esPack) {
           pdf.setFont('helvetica', 'bold');
           pdf.setFontSize(8.5);
@@ -2325,6 +2440,8 @@
       pdf.setFontSize(7.5);
       pdf.setTextColor.apply(pdf, gris);
       var cond = 'Los precios de lista pueden variar según las promociones vigentes de cada tarjeta y el criterio de la empresa.';
+      var tienePromoProducto = r.lineas.some(function (ln) { return Number(ln.promoPct) > 0; });
+      if (tienePromoProducto) cond += '  CyberMonday válido del 2 al 4/11/2026, en precio normal y Plan Canje, no acumulable con otras promociones de producto.';
       if (fecha) cond += '  ·  ' + fecha;
       pdf.text(pdf.splitTextToSize(cond, W - 2 * m), m, H - 17);
 
@@ -2858,9 +2975,10 @@
       pPlanS,
       pGan,
       fetch('./psa-catalogo.json' + bust, { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }),
-      fetch('./psa-planes.json' + bust, { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; })
+      fetch('./psa-planes.json' + bust, { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }),
+      fetch('./psa-beneficios.json' + bust, { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; })
     ]).then(function (arr) {
-      var supaCatJ = arr[0], supaPlanJ = arr[1], ganJ = arr[2], fileCat = arr[3], filePlan = arr[4];
+      var supaCatJ = arr[0], supaPlanJ = arr[1], ganJ = arr[2], fileCat = arr[3], filePlan = arr[4], benJ = arr[5];
       // La fuente de verdad del catálogo oficial, sus categorías exactas del PDF y fotos del PCD
       // es psa-catalogo.json auditado del repositorio. Si Supabase tiene precios actualizados más recientes,
       // se aplican sobre la estructura oficial sin alterar su orden ni duplicar productos.
@@ -2973,6 +3091,7 @@
         CAT = catElegido;
       }
       if (planElegido) PLANES = planElegido;
+      if (benJ && Array.isArray(benJ.campanas)) BENEFICIOS = benJ;
       if (ganJ && ganJ.productos) GAN = ganJ;
       GAN_STATE = GAN ? 'ok' : 'fail';
       if (done) done();

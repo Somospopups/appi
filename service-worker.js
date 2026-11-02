@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v891-financiacion-tarjetas';
+const CACHE_NAME = 'appi-v892-cybermonday-2026';
 const CACHE_PREFIX = 'appi-';
 // Donde el SW aparta una compartición hasta que la app la consume. No
 // empieza con el prefijo de la app para que el prune del activate no la borre.
@@ -78,6 +78,7 @@ const APP_SHELL = [
   './apple-touch-icon.png',
   './img/rinnova-ducha.jpg',
   './promo-botella-psa-500ml.jpg',
+  './psa-beneficios.json',
   './psa-comparativas.json',
   './comparativas-img/senior4.jpg',
   './comparativas-img/senior.jpg',
@@ -175,11 +176,14 @@ self.addEventListener('fetch', event => {
   // Los CDN, Supabase, mapas y APIs conservan su comportamiento de red normal.
   if (url.origin !== self.location.origin) return;
 
-  // Precios de lista: siempre la red, nunca el cache del SW.
-  if (/\/psa-(precios|catalogo|planes|ganancias)\.json$/.test(url.pathname)) {
+  // Precios y beneficios: se busca siempre la fuente más nueva. Si no hay
+  // conexión, se usa la copia instalada; las campañas igual vencen por fecha.
+  if (/\/psa-(precios|catalogo|planes|ganancias|beneficios)\.json$/.test(url.pathname)) {
     event.respondWith(
       fetch(event.request, { cache: 'no-store' }).catch(function(){
-        return new Response('{}', { status: 503, headers: { 'Content-Type': 'application/json' } });
+        return caches.match(event.request, { ignoreSearch: true }).then(function (hit) {
+          return hit || new Response('{}', { status: 503, headers: { 'Content-Type': 'application/json' } });
+        });
       })
     );
     return;
