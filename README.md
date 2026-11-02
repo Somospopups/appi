@@ -6,6 +6,16 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v889 · Rankings mensuales en Histórico
+
+- Cada cierre guardado muestra la misma tarjeta **Ranking de Ventas** de Mi negocio.
+- Incluye los dos rankings aprobados: **Personal** por PB individual y **Organización** por PB total de cada organización.
+- El Top 10 se reconstruye exclusivamente con la Línea Descendente del mes elegido, por lo que octubre no se mezcla con noviembre.
+- Conserva puestos, nombres, categorías, colores y formato de PB de la tarjeta original.
+- Los nombres siguen ocultos en el resumen y sólo aparecen al abrir deliberadamente **Rankings del cierre**.
+- También incorpora la recuperación visible y el reintento inmediato preparados para v888.
+- Versión: **v889 · Segura** → Cache `appi-v889-rankings-historicos`.
+
 ## v888 · Histórico visible y reintento inmediato
 
 - Si Histórico todavía no tiene cierres, ya no queda vacío ni esperando en silencio: muestra el motivo exacto de la falla.

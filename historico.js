@@ -27,7 +27,7 @@ const H={
   autoSyncing:false,autoPeriod:'',autoMessage:'',autoError:'',autoAttempted:false,missingCredentials:false,archiving:false,
   autoBackfilling:false,autoQueueTotal:0,autoQueueDone:0,autoQueueCurrent:'',autoQueueErrors:[],
   archiveBackfilling:false,archiveQueueTotal:0,archiveQueueDone:0,archiveQueueYear:0,archiveQueueCurrent:'',archiveQueueErrors:[],
-  simpleView:'home',simplePeriod:'',simplePicker:false,simpleCompareMetric:'pb',simpleGraphMetric:'pb',simpleCompareView:'table',simpleScope:'team',simpleSearch:'',simplePeopleVisible:false
+  simpleView:'home',simplePeriod:'',simplePicker:false,simpleCompareMetric:'pb',simpleGraphMetric:'pb',simpleCompareView:'table',simpleScope:'team',simpleSearch:'',simplePeopleVisible:false,simpleRankMode:'organizacion'
 };
 
 const $=id=>document.getElementById(id);
@@ -458,7 +458,11 @@ function missingHistoricalPeriodIds(){
   return expectedHistoricalPeriodIds().filter(id=>!saved.has(id)&&!(H.uploads[id]&&H.uploads[id].changed));
 }
 async function syncMissingPSAPeriods(options={}){
-  if(H.autoBackfilling||H.archiveBackfilling||H.autoSyncing)return {status:'busy',id:H.autoQueueCurrent||H.archiveQueueCurrent||H.autoPeriod};
+  if(H.autoBackfilling||H.archiveBackfilling||H.autoSyncing){
+    if(!options.user)return {status:'busy',id:H.autoQueueCurrent||H.archiveQueueCurrent||H.autoPeriod};
+    let waits=0;while((H.autoBackfilling||H.archiveBackfilling||H.autoSyncing)&&waits<100){await sleep(100);waits++}
+    if(H.autoBackfilling||H.archiveBackfilling||H.autoSyncing)return {status:'busy',id:H.autoQueueCurrent||H.archiveQueueCurrent||H.autoPeriod};
+  }
   H.autoAttempted=true;
   if(!navigator.onLine){H.autoError='No hay conexión a internet. APPI volverá a intentarlo cuando se recupere.';H.autoMessage='Sin conexión';if(H.ready)render();return {status:'offline'};}
   if(typeof window.psaTieneCredenciales==='function'&&!window.psaTieneCredenciales()){
@@ -617,6 +621,30 @@ function bindSimpleNoData(c){
     if(navigator.onLine&&cloudReady()&&getSession()&&H.periods.length)setTimeout(()=>syncAll(false),300);
   });
 }
+function simpleRankingFormat(value){
+  const n=num(value);try{if(typeof formatPB==='function')return formatPB(n)}catch(e){}return n.toLocaleString('en-US',n%1===0?{maximumFractionDigits:0}:{minimumFractionDigits:2,maximumFractionDigits:2})
+}
+function simpleRankingOrganizationValue(period,person){
+  if(Object.prototype.hasOwnProperty.call(person||{},'totalPB'))return num(person.totalPB);
+  const people=period&&period.people||[],children=new Map();for(const item of people){const parent=String(item.parentKey||'');if(!parent)continue;if(!children.has(parent))children.set(parent,[]);children.get(parent).push(item)}
+  const seen=new Set();function total(item){if(!item||seen.has(item.key))return 0;seen.add(item.key);const value=num(item.pnAct)+(children.get(String(item.key||''))||[]).reduce((sum,child)=>sum+total(child),0);seen.delete(item.key);return value}return total(person)
+}
+function simpleRankingList(period,mode){
+  const organization=mode==='organizacion';return [...(period&&period.people||[])].map(person=>({person,value:organization?simpleRankingOrganizationValue(period,person):num(person.pnAct)})).filter(item=>item.value>0).sort((a,b)=>b.value-a.value).slice(0,10)
+}
+function simpleRankingCategoryStyle(category){
+  try{if(typeof catInfoOf==='function'&&typeof catBadgeStyle==='function')return catBadgeStyle(catInfoOf(category))}catch(e){}
+  const key=String(category||'').trim().toUpperCase(),colors={DJ:['#e8e8ec','#1c1c1e'],D:['#ffffff','#1c1c1e'],DC:['#f7c630','#1c1c1e'],CE:['#4b7a55','#ffffff'],L:['#7a4bd9','#ffffff'],LE:['#006fb2','#ffffff'],EJ:['#dd2c33','#ffffff'],E:['#111111','#ffffff']},pair=colors[key]||['#6b6b76','#ffffff'],border=key==='D'?'border:1.5px solid #d0d0d8;':'';return `background:${pair[0]};color:${pair[1]};${border}`
+}
+function simpleRankingRows(period,mode){
+  const list=simpleRankingList(period,mode);if(!list.length)return '<div class="hs-ranking-empty">Este cierre no registra PB para mostrar en este ranking.</div>';return list.map(({person,value},index)=>`<button type="button" class="hs-ranking-row" data-hs-ranking-person="${esc(person.key)}"><span class="hs-ranking-place rank-${index+1}">${index+1}</span><span class="hs-ranking-name">${esc(person.nombre||'Sin nombre')}</span><span class="hs-ranking-cat" style="${simpleRankingCategoryStyle(person.cat)}">${esc(person.cat||'—')}</span><strong>${esc(simpleRankingFormat(value))}</strong></button>`).join('')
+}
+function simpleRankingEntry(period){return `<button type="button" class="hs-ranking-entry" data-hs-go="rankings"><i>🏆</i><span><b>Rankings del cierre</b><small>Personal y Organización · ${esc(period.label)}</small></span><em>›</em></button>`}
+function simpleRankings(c){
+  const period=simpleSelectedPeriod();if(!period){simpleGo('home');return}const mode=H.simpleRankMode==='personal'?'personal':'organizacion',source=period.source==='psa-auto'?'Datos recuperados del cierre mensual de PSA':'Datos del cierre mensual guardado en APPI',description=mode==='personal'?'Ordenado por el PB personal alcanzado durante el mes.':'Ordenado por el PB total de la organización de cada persona.';
+  c.innerHTML=`${simpleBackHeader('Rankings del cierre')}<section class="hs-detail hs-v877 hs-ranking-view">${simpleMonthBar(period)}<div class="hs-ranking-status"><i></i><span><b>Cierre recuperado y guardado</b><small>${esc(source)}</small></span><em>✓ Listo</em></div><article class="hs-ranking-card"><header><h2>🏆 RANKING DE VENTAS</h2><span>PB</span></header><div class="hs-ranking-tabs"><button type="button" class="${mode==='personal'?'active':''}" data-hs-rank-mode="personal">👤 Personal</button><button type="button" class="${mode==='organizacion'?'active':''}" data-hs-rank-mode="organizacion">👥 Organización</button></div><p class="hs-ranking-description">${esc(description)}</p><div class="hs-ranking-list">${simpleRankingRows(period,mode)}</div></article><div class="hs-ranking-note"><b>No se mezcla con otros meses.</b><span>Estos puestos pertenecen solamente al cierre de ${esc(period.label)}.</span></div><button type="button" class="hs-primary" data-hs-ranking-change>Elegir otro cierre</button><button type="button" class="hs-primary hs-secondary-action" data-hs-go="home">Volver al resumen</button></section>`;
+  bindSimpleCommon(c);c.querySelectorAll('[data-hs-rank-mode]').forEach(button=>button.onclick=()=>{H.simpleRankMode=button.dataset.hsRankMode;render()});c.querySelectorAll('[data-hs-ranking-person]').forEach(button=>button.onclick=()=>openHistPerson(button.dataset.hsRankingPerson,period));c.querySelector('[data-hs-ranking-change]')?.addEventListener('click',()=>{H.simpleView='home';H.simplePicker=true;H.simpleSearch='';H.simplePeopleVisible=false;render()});
+}
 function simpleHome(c){
   const period=simpleSelectedPeriod(),current=currentHistoricalPeriod();
   if(!period){c.innerHTML=`<section class="hs-home hs-v877">${simpleNoDataState()}</section>`;bindSimpleNoData(c);return}
@@ -632,7 +660,7 @@ function simpleHome(c){
     simpleKpiCard({label:'Actividad',value:`${fmt(stats.activity)}%`,delta:simpleMetricDelta(period,scope,'activity','%'),view:'pb'}),
     simpleKpiCard({label:'Ingresos',value:fmt(stats.incomes),delta:simpleMetricDelta(period,scope,'incomes'),view:'ingresos',wide:true})
   ].join(''):cards;
-  c.innerHTML=`<section class="hs-home hs-v877">${simpleSyncCard()}<article class="hs-period-compact"><div><span>Cierre que estás viendo</span><b>${period?esc(period.label):`${MONTHS_H[current.month]} ${current.year}`}</b></div><button type="button" data-hs-picker>Cambiar</button></article>${picker}<article class="hs-summary-board hs-motion-card"><header><b>Resumen</b><span>${complete?'✓ Datos verificados':'Esperando datos'}</span></header><div class="hs-scope-switch"><button type="button" class="${scope==='personal'?'active':''}" data-hs-scope="personal">Personal</button><button type="button" class="${scope==='team'?'active':''}" data-hs-scope="team">Equipo</button></div><div class="hs-kpi-board">${scope==='personal'?personalCards:teamCards}</div></article>${period?`<button type="button" class="hs-compact-alert" data-hs-go="${alerts?'pb':'comparar'}"><i>${alerts?'!':'✓'}</i><span><b>${alerts?`${alerts} dato${alerts===1?'':'s'} requiere${alerts===1?'':'n'} atención`:'El cierre no presenta alertas principales'}</b><small>${alerts?'Ver el resumen sin mostrar distribuidores':'Comparar con meses anteriores'}</small></span><em>Ver ›</em></button>`:''}<div class="hs-main-actions"><button type="button" class="primary" data-hs-go="comparar"><i>↗</i><span><b>Comparar años y ver gráficas</b><small>${current.year} contra ${current.year-1}, mes por mes</small></span><em>›</em></button><button type="button" data-hs-go="archivos"><i>PDF</i><span><b>PDF de años anteriores</b><small>Un archivo por año, disponibles hasta 2020</small></span><em>›</em></button></div><button type="button" class="hs-manage-link" data-hs-manage>Administrar cierres y recuperación</button></section>`;
+  c.innerHTML=`<section class="hs-home hs-v877">${simpleSyncCard()}<article class="hs-period-compact"><div><span>Cierre que estás viendo</span><b>${period?esc(period.label):`${MONTHS_H[current.month]} ${current.year}`}</b></div><button type="button" data-hs-picker>Cambiar</button></article>${picker}<article class="hs-summary-board hs-motion-card"><header><b>Resumen</b><span>${complete?'✓ Datos verificados':'Esperando datos'}</span></header><div class="hs-scope-switch"><button type="button" class="${scope==='personal'?'active':''}" data-hs-scope="personal">Personal</button><button type="button" class="${scope==='team'?'active':''}" data-hs-scope="team">Equipo</button></div><div class="hs-kpi-board">${scope==='personal'?personalCards:teamCards}</div></article>${period?`<button type="button" class="hs-compact-alert" data-hs-go="${alerts?'pb':'comparar'}"><i>${alerts?'!':'✓'}</i><span><b>${alerts?`${alerts} dato${alerts===1?'':'s'} requiere${alerts===1?'':'n'} atención`:'El cierre no presenta alertas principales'}</b><small>${alerts?'Ver el resumen sin mostrar distribuidores':'Comparar con meses anteriores'}</small></span><em>Ver ›</em></button>${simpleRankingEntry(period)}`:''}<div class="hs-main-actions"><button type="button" class="primary" data-hs-go="comparar"><i>↗</i><span><b>Comparar años y ver gráficas</b><small>${current.year} contra ${current.year-1}, mes por mes</small></span><em>›</em></button><button type="button" data-hs-go="archivos"><i>PDF</i><span><b>PDF de años anteriores</b><small>Un archivo por año, disponibles hasta 2020</small></span><em>›</em></button></div><button type="button" class="hs-manage-link" data-hs-manage>Administrar cierres y recuperación</button></section>`;
   bindSimpleCommon(c);c.querySelector('[data-hs-sync-view]')?.addEventListener('click',()=>simpleGo('sync'));c.querySelector('[data-hs-picker]')?.addEventListener('click',()=>{H.simplePicker=true;render()});c.querySelector('[data-hs-close-picker]')?.addEventListener('click',()=>{H.simplePicker=false;render()});c.querySelectorAll('[data-hs-period]').forEach(button=>button.onclick=()=>{H.simplePeriod=button.dataset.hsPeriod;H.simplePicker=false;render()});c.querySelectorAll('[data-hs-scope]').forEach(button=>button.onclick=()=>{H.simpleScope=button.dataset.hsScope;render()});c.querySelector('[data-hs-manage]')?.addEventListener('click',()=>simpleGo('manage'));
 }
 function simpleSummary(period,type){
@@ -670,7 +698,7 @@ function simpleArchives(c){
 }
 function bindSimpleCommon(root){root.querySelectorAll('[data-hs-go]').forEach(button=>button.onclick=()=>simpleGo(button.dataset.hsGo));root.querySelectorAll('[data-hs-help]').forEach(button=>button.onclick=showHelp)}
 function renderSimpleHistorico(c){
-  if(H.simpleView==='pb'||H.simpleView==='ingresos'||H.simpleView==='garantias')return simpleDataset(c,H.simpleView);if(H.simpleView==='sync')return simpleSyncView(c);if(H.simpleView==='comparar')return simpleCompare(c);if(H.simpleView==='graficas')return simpleGraphs(c);if(H.simpleView==='archivos')return simpleArchives(c);if(H.simpleView==='manage'){renderUpload(c);c.insertAdjacentHTML('afterbegin','<div class="hs-manage-back"><button type="button" data-hs-go="home">‹ Volver al Histórico</button><h2>Administrar cierres</h2></div>');bindSimpleCommon(c);return}simpleHome(c);
+  if(H.simpleView==='pb'||H.simpleView==='ingresos'||H.simpleView==='garantias')return simpleDataset(c,H.simpleView);if(H.simpleView==='rankings')return simpleRankings(c);if(H.simpleView==='sync')return simpleSyncView(c);if(H.simpleView==='comparar')return simpleCompare(c);if(H.simpleView==='graficas')return simpleGraphs(c);if(H.simpleView==='archivos')return simpleArchives(c);if(H.simpleView==='manage'){renderUpload(c);c.insertAdjacentHTML('afterbegin','<div class="hs-manage-back"><button type="button" data-hs-go="home">‹ Volver al Histórico</button><h2>Administrar cierres</h2></div>');bindSimpleCommon(c);return}simpleHome(c);
 }
 function render(){
   const c=$('historicoContent');if(!c||H.rendering)return;H.rendering=true;

@@ -259,6 +259,24 @@ test('la pantalla legible deja sólo PB, Actividad e Ingresos, con porcentaje y 
   await expect(page.getByText('Completar meses faltantes ahora')).toHaveCount(0);
   await expect(page.locator('.hs-person')).toHaveCount(0);
   await expect(page.getByText('Juan Rama')).toHaveCount(0);
+  await expect(page.locator('.hs-ranking-entry')).toContainText('Rankings del cierre');
+  await expect(page.locator('.hs-ranking-entry')).toContainText('Personal y Organización · Octubre 2026');
+
+  await page.locator('.hs-ranking-entry').click();
+  await expect(page.locator('.hs-ranking-card')).toContainText('RANKING DE VENTAS');
+  await expect(page.locator('[data-hs-rank-mode="organizacion"]')).toHaveClass(/active/);
+  await expect(page.locator('.hs-ranking-row')).toHaveCount(2);
+  await expect(page.locator('.hs-ranking-row').nth(0)).toContainText('María Pérez');
+  await expect(page.locator('.hs-ranking-row').nth(0).locator('strong')).toHaveText('70');
+  await expect(page.locator('.hs-ranking-row').nth(1)).toContainText('Juan Rama');
+  await expect(page.locator('.hs-ranking-row').nth(1).locator('strong')).toHaveText('20');
+  await page.locator('[data-hs-rank-mode="personal"]').click();
+  await expect(page.locator('[data-hs-rank-mode="personal"]')).toHaveClass(/active/);
+  await expect(page.locator('.hs-ranking-row').nth(0).locator('strong')).toHaveText('50');
+  await expect(page.locator('.hs-ranking-row').nth(1).locator('strong')).toHaveText('20');
+  await expect(page.getByText('No se mezcla con otros meses.')).toBeVisible();
+  await page.locator('.hs-detail-head [data-hs-go="home"]').click();
+
   await page.locator('[data-hs-scope="personal"]').click();
   await expect(page.locator('.hs-kpi-box')).toHaveCount(3);
   await expect(page.locator('.hs-kpi-box').filter({ hasText: 'PB personal' }).locator('b')).toHaveText('50 PB');
