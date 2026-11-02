@@ -160,13 +160,13 @@ window.openStock=function(){
 <script src="./mensajes-hielo.js?v=618"></script>
 <script src="./mensajes-usuarios.js?v=639"></script>
   <script src="./campus-preguntas.js?v=646"></script>
-  <script src="./campus-psa.js?v=889"></script>
+  <script src="./campus-psa.js?v=890"></script>
 <script src="./reactivacion.js?v=618"></script>
 
 <script src="./escalera-suenos.js?v=618"></script>
 <script src="./demo-guia.js?v=618"></script>
 <script src="./tablero-negocio.js?v=618"></script>
-<script src="./lista-precios.js?v=889"></script>
+<script src="./lista-precios.js?v=890"></script>
 <script src="./vendor/pdf.min.js?v=618"></script>
 <script src="./canillas-adaptadores.js?v=618"></script>
 <script src="./vendor/zxing.min.js?v=618"></script>
@@ -669,6 +669,9 @@ body.dark .hs-ranking-entry,body.dark .hs-ranking-card{background:#fffdf8!import
 @media(max-width:430px){.hs-ranking-entry{grid-template-columns:49px minmax(0,1fr) auto}.hs-ranking-entry i{width:49px;height:49px}.hs-ranking-card{padding-left:12px;padding-right:12px}.hs-ranking-row{grid-template-columns:43px minmax(0,1fr) 37px 57px;gap:6px}.hs-ranking-name{font-size:12px}.hs-ranking-row>strong{font-size:13px}}
 @media(max-width:350px){.hs-ranking-row{grid-template-columns:40px minmax(0,1fr) 34px 51px;gap:5px}.hs-ranking-place{width:37px;height:37px}.hs-ranking-cat{min-width:32px;padding-left:3px;padding-right:3px}.hs-ranking-tabs button{font-size:14px}}
 @media(prefers-reduced-motion:reduce){.hs-ranking-entry:active{transform:none}}
+
+/* v890 · Mantener presionado para compartir el ranking como imagen */
+.hs-ranking-tabs button{position:relative;overflow:hidden;touch-action:manipulation;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}.hs-ranking-tabs button.holding:after{content:"";position:absolute;left:8px;right:8px;bottom:4px;height:4px;border-radius:999px;background:currentColor;transform-origin:left center;animation:hs890Hold .55s linear forwards}.hs-ranking-share-hint{margin:0 4px 9px;padding:10px 11px;border-radius:13px;background:#e9f5f0;color:#315e51;font-size:12px;line-height:1.42;font-weight:750}.hs-ranking-share-hint b{color:#0b5878}.hs-ranking-description{margin-top:0!important}@keyframes hs890Hold{from{transform:scaleX(0);opacity:.45}to{transform:scaleX(1);opacity:1}}body.dark .hs-ranking-share-hint{background:#e9f5f0!important;color:#315e51!important}@media(prefers-reduced-motion:reduce){.hs-ranking-tabs button.holding:after{animation:none;transform:scaleX(1)}}
 </style>
 
 <script src="./vendor/xlsx.full.min.js" integrity="sha384-vtjasyidUo0kW94K5MXDXntzOJpQgBKXmE7e2Ga4LG0skTTLeBi97eFAXsqewJjw"></script>
@@ -4763,7 +4766,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v889 · Segura</div>
+  <div class="ds-foot">APPI · v890 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -14299,8 +14302,8 @@ function cerrarToolsMenu(){
   // con archivos viejos en pantalla.
   if ('serviceWorker' in navigator) {
     (async () => {
-    const swVersion='889';
-    const CACHE_NAME='appi-v889-rankings-historicos';
+    const swVersion='890';
+    const CACHE_NAME='appi-v890-compartir-ranking';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
@@ -18550,7 +18553,7 @@ const H={
   autoSyncing:false,autoPeriod:'',autoMessage:'',autoError:'',autoAttempted:false,missingCredentials:false,archiving:false,
   autoBackfilling:false,autoQueueTotal:0,autoQueueDone:0,autoQueueCurrent:'',autoQueueErrors:[],
   archiveBackfilling:false,archiveQueueTotal:0,archiveQueueDone:0,archiveQueueYear:0,archiveQueueCurrent:'',archiveQueueErrors:[],
-  simpleView:'home',simplePeriod:'',simplePicker:false,simpleCompareMetric:'pb',simpleGraphMetric:'pb',simpleCompareView:'table',simpleScope:'team',simpleSearch:'',simplePeopleVisible:false,simpleRankMode:'organizacion'
+  simpleView:'home',simplePeriod:'',simplePicker:false,simpleCompareMetric:'pb',simpleGraphMetric:'pb',simpleCompareView:'table',simpleScope:'team',simpleSearch:'',simplePeopleVisible:false,simpleRankMode:'organizacion',simpleRankShareFiles:null
 };
 
 const $=id=>document.getElementById(id);
@@ -19159,14 +19162,44 @@ function simpleRankingCategoryStyle(category){
   try{if(typeof catInfoOf==='function'&&typeof catBadgeStyle==='function')return catBadgeStyle(catInfoOf(category))}catch(e){}
   const key=String(category||'').trim().toUpperCase(),colors={DJ:['#e8e8ec','#1c1c1e'],D:['#ffffff','#1c1c1e'],DC:['#f7c630','#1c1c1e'],CE:['#4b7a55','#ffffff'],L:['#7a4bd9','#ffffff'],LE:['#006fb2','#ffffff'],EJ:['#dd2c33','#ffffff'],E:['#111111','#ffffff']},pair=colors[key]||['#6b6b76','#ffffff'],border=key==='D'?'border:1.5px solid #d0d0d8;':'';return `background:${pair[0]};color:${pair[1]};${border}`
 }
+function simpleRankingCanvasRound(ctx,x,y,width,height,radius){
+  const r=Math.min(radius,width/2,height/2);ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+width,y,x+width,y+height,r);ctx.arcTo(x+width,y+height,x,y+height,r);ctx.arcTo(x,y+height,x,y,r);ctx.arcTo(x,y,x+width,y,r);ctx.closePath()
+}
+function simpleRankingCanvasText(ctx,value,maxWidth){
+  const text=String(value||'').toUpperCase();if(ctx.measureText(text).width<=maxWidth)return text;let out=text;while(out.length>1&&ctx.measureText(`${out}…`).width>maxWidth)out=out.slice(0,-1);return `${out}…`
+}
+function simpleRankingCanvasCategory(category){
+  const key=String(category||'—').trim().toUpperCase(),colors={DJ:['#e8e8ec','#1c1c1e'],D:['#ffffff','#1c1c1e'],DC:['#f7c630','#1c1c1e'],CE:['#4b7a55','#ffffff'],L:['#7a4bd9','#ffffff'],LE:['#006fb2','#ffffff'],EJ:['#dd2c33','#ffffff'],E:['#111111','#ffffff']};return {key,...{background:(colors[key]||['#6b6b76','#ffffff'])[0],color:(colors[key]||['#6b6b76','#ffffff'])[1]}}
+}
+function simpleRankingImageFile(period,mode){
+  const items=simpleRankingList(period,mode),width=1080,rowHeight=116,rows=Math.max(items.length,1),height=480+rows*rowHeight+145,canvas=document.createElement('canvas'),ctx=canvas.getContext('2d');canvas.width=width;canvas.height=height;
+  ctx.fillStyle='#f3eee4';ctx.fillRect(0,0,width,height);simpleRankingCanvasRound(ctx,42,42,width-84,height-84,42);ctx.fillStyle='#fffdf8';ctx.fill();
+  const gradient=ctx.createLinearGradient(70,70,1010,70);gradient.addColorStop(0,'#0b5878');gradient.addColorStop(.58,'#128c7e');gradient.addColorStop(1,'#3ad0a4');simpleRankingCanvasRound(ctx,70,70,width-140,13,7);ctx.fillStyle=gradient;ctx.fill();
+  ctx.textBaseline='middle';ctx.fillStyle='#20212b';ctx.font='900 45px Arial, sans-serif';ctx.fillText('🏆  RANKING DE VENTAS',88,145);simpleRankingCanvasRound(ctx,902,114,88,55,14);ctx.fillStyle='#dff4eb';ctx.fill();ctx.fillStyle='#7253c6';ctx.font='900 28px Arial, sans-serif';ctx.textAlign='center';ctx.fillText('PB',946,142);ctx.textAlign='left';
+  const owner=String(period&&period.titular&&(period.titular.nombre||period.titular.name)||'').trim();ctx.fillStyle='#64666f';ctx.font='700 27px Arial, sans-serif';ctx.fillText(`${period.label}${owner?` · ${owner}`:''}`,90,207);
+  simpleRankingCanvasRound(ctx,80,250,920,115,27);ctx.fillStyle='#efefed';ctx.fill();const personal=mode==='personal',tabX=personal?88:544;simpleRankingCanvasRound(ctx,tabX,258,448,99,23);ctx.fillStyle=gradient;ctx.fill();ctx.font='900 34px Arial, sans-serif';ctx.textAlign='center';ctx.fillStyle=personal?'#ffffff':'#686872';ctx.fillText('👤  Personal',312,308);ctx.fillStyle=personal?'#686872':'#ffffff';ctx.fillText('👥  Organización',768,308);ctx.textAlign='left';
+  const startY=410,rankColors=['#ffad2d','#aeb2bc','#c4772f'];if(!items.length){ctx.fillStyle='#686a72';ctx.font='700 30px Arial, sans-serif';ctx.textAlign='center';ctx.fillText('Este cierre no registra PB para mostrar.',width/2,startY+58);ctx.textAlign='left'}
+  items.forEach(({person,value},index)=>{const center=startY+index*rowHeight+55;if(index){ctx.save();ctx.setLineDash([8,8]);ctx.strokeStyle='rgba(85,80,75,.18)';ctx.beginPath();ctx.moveTo(86,center-rowHeight/2);ctx.lineTo(994,center-rowHeight/2);ctx.stroke();ctx.restore()}ctx.beginPath();ctx.arc(125,center,39,0,Math.PI*2);ctx.fillStyle=rankColors[index]||'#149a97';ctx.fill();ctx.fillStyle='#ffffff';ctx.font='900 27px Arial, sans-serif';ctx.textAlign='center';ctx.fillText(String(index+1),125,center+1);ctx.textAlign='left';ctx.fillStyle='#20212b';ctx.font='850 29px Arial, sans-serif';ctx.fillText(simpleRankingCanvasText(ctx,person.nombre||'Sin nombre',555),190,center);const cat=simpleRankingCanvasCategory(person.cat),badgeWidth=Math.max(64,ctx.measureText(cat.key).width+30);simpleRankingCanvasRound(ctx,776-badgeWidth/2,center-27,badgeWidth,54,14);ctx.fillStyle=cat.background;ctx.fill();if(cat.key==='D'){ctx.strokeStyle='#d0d0d8';ctx.lineWidth=3;ctx.stroke()}ctx.fillStyle=cat.color;ctx.font='900 25px Arial, sans-serif';ctx.textAlign='center';ctx.fillText(cat.key,776,center+1);ctx.fillStyle='#365ba8';ctx.font='900 30px Arial, sans-serif';ctx.textAlign='right';ctx.fillText(simpleRankingFormat(value),980,center+1);ctx.textAlign='left'});
+  const footerY=startY+rows*rowHeight+38;ctx.strokeStyle='rgba(85,80,75,.16)';ctx.beginPath();ctx.moveTo(85,footerY);ctx.lineTo(995,footerY);ctx.stroke();ctx.fillStyle='#5f6568';ctx.font='700 24px Arial, sans-serif';ctx.fillText(`APPI · Histórico mensual · ${mode==='personal'?'Ranking Personal':'Ranking Organización'}`,88,footerY+55);ctx.fillStyle='#168765';ctx.font='900 24px Arial, sans-serif';ctx.textAlign='right';ctx.fillText('Cierre guardado',990,footerY+55);ctx.textAlign='left';
+  const data=canvas.toDataURL('image/png').split(',')[1],binary=atob(data),bytes=new Uint8Array(binary.length);for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);const safeMode=mode==='personal'?'Personal':'Organizacion';return new File([bytes],`APPI_Ranking_${safeMode}_${period.id}.png`,{type:'image/png',lastModified:Date.now()})
+}
+function prepareSimpleRankingShareFiles(period){
+  const key=`${period.id}:${period.version||''}:${period.updatedAt||''}`;if(H.simpleRankShareFiles&&H.simpleRankShareFiles.key===key)return H.simpleRankShareFiles;try{H.simpleRankShareFiles={key,personal:simpleRankingImageFile(period,'personal'),organizacion:simpleRankingImageFile(period,'organizacion')}}catch(error){console.warn('Ranking imagen',error);H.simpleRankShareFiles={key,personal:null,organizacion:null}}return H.simpleRankShareFiles
+}
+function shareSimpleRankingImage(period,mode){
+  const files=prepareSimpleRankingShareFiles(period),file=files&&files[mode],title=`Ranking ${mode==='personal'?'Personal':'Organización'} · ${period.label}`;if(!file){toast('No se pudo preparar la imagen del ranking',2800);return}try{if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){const sharing=navigator.share({files:[file],title,text:`${title} · APPI`});Promise.resolve(sharing).then(()=>toast('Imagen compartida',1800)).catch(error=>{if(error&&error.name==='AbortError')return;downloadBlob(file,file.name);toast('La imagen se descargó para enviarla por WhatsApp',3200)});return}}catch(error){console.warn('Compartir ranking',error)}downloadBlob(file,file.name);toast('La imagen se descargó. Adjuntala en WhatsApp.',3200)
+}
+function bindSimpleRankingMode(button,period){
+  let pressedAt=0,pressed=false,suppressClick=false;const cancel=()=>{pressed=false;pressedAt=0;button.classList.remove('holding')};button.addEventListener('pointerdown',event=>{if(event.pointerType==='mouse'&&event.button!==0)return;pressed=true;pressedAt=performance.now();button.classList.add('holding')});button.addEventListener('pointerup',event=>{if(!pressed)return;const held=performance.now()-pressedAt>=550;cancel();if(!held)return;suppressClick=true;event.preventDefault();event.stopPropagation();try{haptic(18)}catch(e){}shareSimpleRankingImage(period,button.dataset.hsRankMode);setTimeout(()=>{suppressClick=false},500)});button.addEventListener('pointerleave',cancel);button.addEventListener('pointercancel',cancel);button.addEventListener('contextmenu',event=>event.preventDefault());button.onclick=event=>{if(suppressClick){event.preventDefault();event.stopPropagation();suppressClick=false;return}H.simpleRankMode=button.dataset.hsRankMode;render()}
+}
 function simpleRankingRows(period,mode){
   const list=simpleRankingList(period,mode);if(!list.length)return '<div class="hs-ranking-empty">Este cierre no registra PB para mostrar en este ranking.</div>';return list.map(({person,value},index)=>`<button type="button" class="hs-ranking-row" data-hs-ranking-person="${esc(person.key)}"><span class="hs-ranking-place rank-${index+1}">${index+1}</span><span class="hs-ranking-name">${esc(person.nombre||'Sin nombre')}</span><span class="hs-ranking-cat" style="${simpleRankingCategoryStyle(person.cat)}">${esc(person.cat||'—')}</span><strong>${esc(simpleRankingFormat(value))}</strong></button>`).join('')
 }
 function simpleRankingEntry(period){return `<button type="button" class="hs-ranking-entry" data-hs-go="rankings"><i>🏆</i><span><b>Rankings del cierre</b><small>Personal y Organización · ${esc(period.label)}</small></span><em>›</em></button>`}
 function simpleRankings(c){
   const period=simpleSelectedPeriod();if(!period){simpleGo('home');return}const mode=H.simpleRankMode==='personal'?'personal':'organizacion',source=period.source==='psa-auto'?'Datos recuperados del cierre mensual de PSA':'Datos del cierre mensual guardado en APPI',description=mode==='personal'?'Ordenado por el PB personal alcanzado durante el mes.':'Ordenado por el PB total de la organización de cada persona.';
-  c.innerHTML=`${simpleBackHeader('Rankings del cierre')}<section class="hs-detail hs-v877 hs-ranking-view">${simpleMonthBar(period)}<div class="hs-ranking-status"><i></i><span><b>Cierre recuperado y guardado</b><small>${esc(source)}</small></span><em>✓ Listo</em></div><article class="hs-ranking-card"><header><h2>🏆 RANKING DE VENTAS</h2><span>PB</span></header><div class="hs-ranking-tabs"><button type="button" class="${mode==='personal'?'active':''}" data-hs-rank-mode="personal">👤 Personal</button><button type="button" class="${mode==='organizacion'?'active':''}" data-hs-rank-mode="organizacion">👥 Organización</button></div><p class="hs-ranking-description">${esc(description)}</p><div class="hs-ranking-list">${simpleRankingRows(period,mode)}</div></article><div class="hs-ranking-note"><b>No se mezcla con otros meses.</b><span>Estos puestos pertenecen solamente al cierre de ${esc(period.label)}.</span></div><button type="button" class="hs-primary" data-hs-ranking-change>Elegir otro cierre</button><button type="button" class="hs-primary hs-secondary-action" data-hs-go="home">Volver al resumen</button></section>`;
-  bindSimpleCommon(c);c.querySelectorAll('[data-hs-rank-mode]').forEach(button=>button.onclick=()=>{H.simpleRankMode=button.dataset.hsRankMode;render()});c.querySelectorAll('[data-hs-ranking-person]').forEach(button=>button.onclick=()=>openHistPerson(button.dataset.hsRankingPerson,period));c.querySelector('[data-hs-ranking-change]')?.addEventListener('click',()=>{H.simpleView='home';H.simplePicker=true;H.simpleSearch='';H.simplePeopleVisible=false;render()});
+  c.innerHTML=`${simpleBackHeader('Rankings del cierre')}<section class="hs-detail hs-v877 hs-ranking-view">${simpleMonthBar(period)}<div class="hs-ranking-status"><i></i><span><b>Cierre recuperado y guardado</b><small>${esc(source)}</small></span><em>✓ Listo</em></div><article class="hs-ranking-card"><header><h2>🏆 RANKING DE VENTAS</h2><span>PB</span></header><div class="hs-ranking-tabs"><button type="button" class="${mode==='personal'?'active':''}" data-hs-rank-mode="personal">👤 Personal</button><button type="button" class="${mode==='organizacion'?'active':''}" data-hs-rank-mode="organizacion">👥 Organización</button></div><p class="hs-ranking-share-hint"><b>Mantené presionado</b> Personal u Organización para enviar la imagen. Después elegí WhatsApp.</p><p class="hs-ranking-description">${esc(description)}</p><div class="hs-ranking-list">${simpleRankingRows(period,mode)}</div></article><div class="hs-ranking-note"><b>No se mezcla con otros meses.</b><span>Estos puestos pertenecen solamente al cierre de ${esc(period.label)}.</span></div><button type="button" class="hs-primary" data-hs-ranking-change>Elegir otro cierre</button><button type="button" class="hs-primary hs-secondary-action" data-hs-go="home">Volver al resumen</button></section>`;
+  bindSimpleCommon(c);prepareSimpleRankingShareFiles(period);c.querySelectorAll('[data-hs-rank-mode]').forEach(button=>bindSimpleRankingMode(button,period));c.querySelectorAll('[data-hs-ranking-person]').forEach(button=>button.onclick=()=>openHistPerson(button.dataset.hsRankingPerson,period));c.querySelector('[data-hs-ranking-change]')?.addEventListener('click',()=>{H.simpleView='home';H.simplePicker=true;H.simpleSearch='';H.simplePeopleVisible=false;render()});
 }
 function simpleHome(c){
   const period=simpleSelectedPeriod(),current=currentHistoricalPeriod();

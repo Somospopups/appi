@@ -270,7 +270,38 @@ test('la pantalla legible deja sólo PB, Actividad e Ingresos, con porcentaje y 
   await expect(page.locator('.hs-ranking-row').nth(0).locator('strong')).toHaveText('70');
   await expect(page.locator('.hs-ranking-row').nth(1)).toContainText('Juan Rama');
   await expect(page.locator('.hs-ranking-row').nth(1).locator('strong')).toHaveText('20');
+  await expect(page.locator('.hs-ranking-share-hint')).toContainText('Mantené presionado');
+  await page.evaluate(() => {
+    window.__rankingShared = null;
+    Object.defineProperty(navigator, 'canShare', { configurable: true, value: data => !!(data && data.files && data.files.length) });
+    Object.defineProperty(navigator, 'share', { configurable: true, value: async data => {
+      const file = data.files[0];
+      window.__rankingShared = { title: data.title, text: data.text, name: file.name, type: file.type, size: file.size };
+    } });
+  });
+  const personalTab = page.locator('[data-hs-rank-mode="personal"]');
+  await personalTab.dispatchEvent('pointerdown', { pointerType: 'touch', button: 0 });
+  await page.waitForTimeout(620);
+  await personalTab.dispatchEvent('pointerup', { pointerType: 'touch', button: 0 });
+  await expect.poll(() => page.evaluate(() => window.__rankingShared)).toEqual(expect.objectContaining({
+    title: 'Ranking Personal · Octubre 2026',
+    text: 'Ranking Personal · Octubre 2026 · APPI',
+    name: 'APPI_Ranking_Personal_2026-10.png',
+    type: 'image/png'
+  }));
+  expect(await page.evaluate(() => window.__rankingShared.size)).toBeGreaterThan(10000);
+  await expect(page.locator('[data-hs-rank-mode="organizacion"]')).toHaveClass(/active/);
+  await page.waitForTimeout(550);
   await page.locator('[data-hs-rank-mode="personal"]').click();
+  await expect(page.locator('[data-hs-rank-mode="personal"]')).toHaveClass(/active/);
+  await page.evaluate(() => Object.defineProperty(navigator, 'canShare', { configurable: true, value: () => false }));
+  const downloadPromise = page.waitForEvent('download');
+  const organizationTab = page.locator('[data-hs-rank-mode="organizacion"]');
+  await organizationTab.dispatchEvent('pointerdown', { pointerType: 'touch', button: 0 });
+  await page.waitForTimeout(620);
+  await organizationTab.dispatchEvent('pointerup', { pointerType: 'touch', button: 0 });
+  const rankingDownload = await downloadPromise;
+  expect(rankingDownload.suggestedFilename()).toBe('APPI_Ranking_Organizacion_2026-10.png');
   await expect(page.locator('[data-hs-rank-mode="personal"]')).toHaveClass(/active/);
   await expect(page.locator('.hs-ranking-row').nth(0).locator('strong')).toHaveText('50');
   await expect(page.locator('.hs-ranking-row').nth(1).locator('strong')).toHaveText('20');

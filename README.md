@@ -6,6 +6,15 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v890 · Compartir rankings como imagen
+
+- En Histórico, el toque normal continúa alternando entre **Personal** y **Organización**.
+- Al mantener presionado cualquiera de esos botones, APPI genera el PNG del ranking correspondiente al cierre elegido.
+- La imagen conserva el Top 10, los puestos, los nombres, las categorías, los colores y los PB del mes, sin mezclar cierres.
+- En dispositivos compatibles se abre el menú nativo para elegir WhatsApp; si no se pueden compartir archivos, el PNG se descarga para adjuntarlo manualmente.
+- Una indicación visible explica el gesto y una barra muestra el avance de la pulsación prolongada.
+- Versión: **v890 · Segura** → Cache `appi-v890-compartir-ranking`.
+
 ## v889 · Rankings mensuales en Histórico
 
 - Cada cierre guardado muestra la misma tarjeta **Ranking de Ventas** de Mi negocio.
