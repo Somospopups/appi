@@ -1,14 +1,26 @@
 {
-  "actualizado": "1-Nov-2026",
-  "vigencia": "22-Oct-2026 al 1-Nov-2026",
+  "actualizado": "2-Nov-2026",
+  "vigencia": "2-Nov-2026 al 11-Nov-2026",
   "fuente": "https://tienda.psa.com.ar/promociones_vigentes",
+  "fuente_legal": "https://contenidos.psa.com.ar/uploads/legales-financiacion-vigencia_2-11-2026.pdf",
+  "fuente_imagenes": [
+    "https://tienda.psa.com.ar/media/wysiwyg/Resumidas-Nacionales_66.jpg",
+    "https://tienda.psa.com.ar/media/wysiwyg/Resumidas-Nacionales_67.jpg",
+    "https://tienda.psa.com.ar/media/wysiwyg/Resumidas-Nacionales-2_35.jpg",
+    "https://tienda.psa.com.ar/media/wysiwyg/Resumidas-Nacionales-2_36.jpg",
+    "https://tienda.psa.com.ar/media/wysiwyg/Resumidas_Provinciales_nuevas_Usuario_PSAAccion_1.jpg",
+    "https://tienda.psa.com.ar/media/wysiwyg/Resumidas_Provinciales_nuevas_Usuario_PSAAccion_2.jpg"
+  ],
   "cuotas": [
+    2,
     3,
+    5,
     6,
     9,
     12,
     15,
-    18
+    18,
+    24
   ],
   "bancos": [
     {
@@ -22,16 +34,49 @@
         15,
         18
       ],
-      "tarjetas": "Visa, Mastercard, American Express, Cordobesa"
+      "tarjetas": "Visa, Mastercard y Cordobesa Mastercard",
+      "desde": "2026-11-02",
+      "hasta": "2026-11-11",
+      "vigencia": "2 al 11 de noviembre de 2026",
+      "beneficio": "3, 6, 9, 12, 15 y 18 cuotas sin interés",
+      "canal": "Exclusivo a través de MODO",
+      "condiciones": "No aplica a tarjetas emitidas por BBVA, Santander, Galicia, Banco Nación, Macro ni Hipotecario."
     },
     {
       "id": "tarjeta-naranja",
-      "nombre": "Naranja",
+      "nombre": "Naranja X",
       "cuotas": [
         6,
-        9
+        9,
+        12,
+        18
       ],
-      "tarjetas": "Naranja"
+      "tarjetas": "Naranja X",
+      "desde": "2026-11-02",
+      "hasta": "2026-11-08",
+      "vigencia": "2 al 8 de noviembre de 2026",
+      "beneficio": "6, 9, 12 y 18 cuotas sin interés, además de Plan Z",
+      "canal": "ATM > Link de Pago",
+      "condiciones": "No participan tarjetas cuya numeración comience con 402917 o 402918."
+    },
+    {
+      "id": "macro",
+      "nombre": "Macro",
+      "cuotas": [
+        3,
+        6,
+        9,
+        12,
+        15,
+        18,
+        24
+      ],
+      "tarjetas": "Visa, Mastercard y American Express",
+      "desde": "2026-11-02",
+      "hasta": "2026-11-08",
+      "vigencia": "2 al 8 de noviembre de 2026",
+      "beneficio": "3, 6, 9, 12, 15, 18 y 24 cuotas sin interés",
+      "canal": "Exclusivo a través de MODO"
     },
     {
       "id": "banco-galicia",
@@ -42,11 +87,16 @@
         9,
         12
       ],
-      "tarjetas": "Visa, Mastercard"
+      "tarjetas": "Visa, Mastercard y American Express",
+      "desde": "2026-11-02",
+      "hasta": "2026-11-10",
+      "vigencia": "2 al 10 de noviembre de 2026",
+      "beneficio": "3, 6, 9 y 12 cuotas sin interés + 10% de reintegro sin tope",
+      "canal": "Exclusivo a través de MODO"
     },
     {
-      "id": "bbva",
-      "nombre": "BBVA",
+      "id": "banco-provincia",
+      "nombre": "Banco Provincia",
       "cuotas": [
         3,
         6,
@@ -55,7 +105,61 @@
         15,
         18
       ],
-      "tarjetas": "Visa, Mastercard"
+      "tarjetas": "Visa y Mastercard",
+      "desde": "2026-11-02",
+      "hasta": "2026-11-11",
+      "vigencia": "2 al 11 de noviembre de 2026",
+      "beneficio": "3, 6, 9, 12 y 15 cuotas sin interés; o 18 cuotas sin interés + 10% de reintegro sin tope",
+      "canal": "Según condiciones de la promoción oficial"
+    },
+    {
+      "id": "american-express",
+      "nombre": "American Express",
+      "cuotas": [
+        3,
+        6,
+        9,
+        12
+      ],
+      "tarjetas": "Tarjetas emitidas directamente por American Express",
+      "desde": "2026-11-02",
+      "hasta": "2026-11-11",
+      "vigencia": "2 al 11 de noviembre de 2026",
+      "beneficio": "3, 6, 9 y 12 cuotas sin interés",
+      "canal": "Medios habilitados por PSA"
+    },
+    {
+      "id": "bbva",
+      "nombre": "BBVA",
+      "cuotas": [
+        3,
+        6,
+        9,
+        12
+      ],
+      "tarjetas": "Visa y Mastercard BBVA",
+      "desde": "2026-11-02",
+      "hasta": "2026-11-11",
+      "vigencia": "2 al 11 de noviembre de 2026",
+      "beneficio": "3, 6, 9 y 12 cuotas sin interés",
+      "canal": "Exclusivo a través de MODO"
+    },
+    {
+      "id": "cabal",
+      "nombre": "Cabal / Credicoop",
+      "cuotas": [
+        3,
+        6,
+        9,
+        12,
+        18
+      ],
+      "tarjetas": "Cabal emitida por Banco Credicoop",
+      "desde": "2026-11-02",
+      "hasta": "2026-11-04",
+      "vigencia": "2 al 4 de noviembre de 2026",
+      "beneficio": "3, 6, 9 y 12 cuotas sin interés + 10% de reintegro sin tope; o 18 cuotas sin interés sin descuento",
+      "canal": "Exclusivo a través de MODO"
     },
     {
       "id": "banco-nacion",
@@ -68,20 +172,12 @@
         15,
         18
       ],
-      "tarjetas": "Visa, Mastercard"
-    },
-    {
-      "id": "macro",
-      "nombre": "Macro",
-      "cuotas": [
-        3,
-        6,
-        9,
-        12,
-        15,
-        18
-      ],
-      "tarjetas": "Visa, Mastercard, American Express"
+      "tarjetas": "Visa y Mastercard Banco Nación",
+      "desde": "2026-11-02",
+      "hasta": "2026-11-11",
+      "vigencia": "2 al 11 de noviembre de 2026",
+      "beneficio": "3, 6, 9, 12, 15 y 18 cuotas sin interés",
+      "canal": "Exclusivo a través de MODO"
     },
     {
       "id": "santander",
@@ -90,62 +186,28 @@
         3,
         6,
         9,
-        12,
-        15,
-        18
+        12
       ],
-      "tarjetas": "Visa, Mastercard, American Express"
+      "tarjetas": "Visa, Mastercard y American Express Santander",
+      "desde": "2026-11-02",
+      "hasta": "2026-11-11",
+      "vigencia": "2 al 11 de noviembre de 2026",
+      "beneficio": "3, 6, 9 y 12 cuotas sin interés",
+      "canal": "Exclusivo a través de MODO"
     },
     {
       "id": "hipotecario",
       "nombre": "Hipotecario",
       "cuotas": [
-        3,
-        6,
         9,
-        12,
-        15,
-        18
+        12
       ],
-      "tarjetas": "Visa, Mastercard"
-    },
-    {
-      "id": "cabal",
-      "nombre": "Cabal",
-      "cuotas": [
-        3,
-        6,
-        9,
-        12,
-        18
-      ],
-      "tarjetas": "Cabal"
-    },
-    {
-      "id": "american-express",
-      "nombre": "American Express",
-      "cuotas": [
-        3,
-        6,
-        9,
-        12,
-        15,
-        18
-      ],
-      "tarjetas": "American Express"
-    },
-    {
-      "id": "tarjeta-data",
-      "nombre": "Data",
-      "cuotas": [
-        3,
-        6,
-        9,
-        12,
-        15,
-        18
-      ],
-      "tarjetas": ""
+      "tarjetas": "Visa y Mastercard Hipotecario",
+      "desde": "2026-11-02",
+      "hasta": "2026-11-11",
+      "vigencia": "2 al 11 de noviembre de 2026",
+      "beneficio": "9 y 12 cuotas sin interés",
+      "canal": "Exclusivo a través de MODO"
     },
     {
       "id": "tarjeta-patagonia-365",
@@ -153,51 +215,74 @@
       "cuotas": [
         3,
         6,
-        9,
-        12,
-        15,
-        18
+        12
       ],
-      "tarjetas": ""
+      "tarjetas": "Patagonia 365",
+      "desde": "2026-11-02",
+      "hasta": "2026-11-11",
+      "vigencia": "2 al 11 de noviembre de 2026",
+      "beneficio": "3, 6 y 12 cuotas sin interés",
+      "canal": "Medios habilitados por PSA"
     },
     {
       "id": "tarjeta-tuya",
       "nombre": "Tuya",
       "cuotas": [
         3,
-        6,
-        9,
-        12,
-        15,
-        18
+        5,
+        9
       ],
-      "tarjetas": ""
+      "tarjetas": "Tuya NBCH",
+      "desde": "2026-11-02",
+      "hasta": "2026-11-11",
+      "vigencia": "2 al 11 de noviembre de 2026",
+      "beneficio": "3, 5 y 9 cuotas sin interés",
+      "canal": "Medios habilitados por PSA"
     },
     {
-      "id": "tarjeta-sol",
-      "nombre": "Sol",
+      "id": "tarjeta-data",
+      "nombre": "Data",
       "cuotas": [
+        2,
         3,
-        6,
-        9,
-        12,
-        15,
-        18
+        6
       ],
-      "tarjetas": ""
+      "tarjetas": "Tarjeta Data",
+      "desde": "2026-11-02",
+      "hasta": "2026-11-11",
+      "vigencia": "2 al 11 de noviembre de 2026",
+      "beneficio": "2, 3 y 6 cuotas sin interés",
+      "canal": "Medios habilitados por PSA"
     },
     {
       "id": "banco-del-sol",
-      "nombre": "Del Sol",
+      "nombre": "Banco del Sol",
+      "cuotas": [
+        15,
+        18
+      ],
+      "tarjetas": "Mastercard Banco del Sol",
+      "desde": "2026-11-02",
+      "hasta": "2026-11-11",
+      "vigencia": "2 al 11 de noviembre de 2026",
+      "beneficio": "15 y 18 cuotas sin interés",
+      "canal": "Medios habilitados por PSA"
+    },
+    {
+      "id": "tarjeta-sol",
+      "nombre": "Tarjeta Sol",
       "cuotas": [
         3,
         6,
         9,
-        12,
-        15,
-        18
+        12
       ],
-      "tarjetas": ""
+      "tarjetas": "Tarjeta Sol",
+      "desde": "2026-11-02",
+      "hasta": "2026-11-11",
+      "vigencia": "2 al 11 de noviembre de 2026",
+      "beneficio": "3, 6, 9 y 12 cuotas sin interés",
+      "canal": "Medios habilitados por PSA"
     }
   ]
 }

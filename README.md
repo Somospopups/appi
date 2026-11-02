@@ -6,6 +6,16 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v891 · Financiación de tarjetas actualizada
+
+- Presupuesto incorpora la financiación oficial publicada por PSA el 2 de noviembre de 2026.
+- Cada entidad ofrece sólo sus cuotas reales; se elimina el plan genérico que agregaba opciones inexistentes.
+- Al seleccionar una tarjeta se muestran beneficio, tarjetas admitidas, canal y vigencia.
+- Se incorpora Banco Provincia y se actualizan Naranja X, Macro, Galicia, BBVA, Nación, Santander, Hipotecario, Cabal/Credicoop, American Express y las tarjetas provinciales.
+- Los PDF incluyen las condiciones correspondientes a la entidad elegida.
+- El actualizador conserva la última tabla verificada si una publicación futura no permite interpretar todos los planes de forma segura.
+- Versión: **v891 · Segura** → Cache `appi-v891-financiacion-tarjetas`.
+
 ## v890 · Compartir rankings como imagen
 
 - En Histórico, el toque normal continúa alternando entre **Personal** y **Organización**.

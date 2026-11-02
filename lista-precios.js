@@ -820,6 +820,7 @@
       '.lp-discount-help{margin:6px 4px 2px;text-align:right;color:#81766e;font-size:9px;font-weight:750}' +
       '.lp-sheet-body>.lp-sec{margin-top:13px;color:#c54b12;font-size:10.5px}' +
       '.lp-pay-wrap{margin-bottom:8px}.lp-pay-options{padding-bottom:7px}.lp-pay-options .lp-chips-in{gap:8px}' +
+      '.lp-plan-info{margin:7px 0 11px;padding:11px 12px;border:1px solid rgba(8,122,91,.17);border-radius:13px;background:#eff8f4;color:#34463f}.lp-plan-info b{display:block;color:#087a5b;font-size:12px;line-height:1.35}.lp-plan-info span,.lp-plan-info small{display:block;margin-top:4px;font-size:10px;line-height:1.4}.lp-plan-info small{color:#68746f}.lp-plan-info em{font-style:normal;font-weight:850;color:#4d625a}' +
       '.lp-pay-option{width:98px;height:76px;flex:none;border:1px solid #eadfd4;border-radius:15px;background:#fff;padding:7px 5px 6px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;color:#30353a;font:inherit;cursor:pointer}' +
       '.lp-pay-option.on{border:2px solid #087a5b;background:#effaf6;color:#23342e;box-shadow:0 5px 12px rgba(8,122,91,.11)}.lp-pay-option b{max-width:90px;overflow:hidden;text-overflow:ellipsis;font-size:10px;line-height:1;white-space:nowrap}' +
       '.lp-pay-art{--pay-a:#506a82;--pay-b:#27465e;position:relative;width:43px;height:27px;border-radius:6px;display:block;overflow:hidden;background:linear-gradient(135deg,var(--pay-a),var(--pay-b));box-shadow:0 3px 6px rgba(30,35,38,.17);color:#fff}' +
@@ -834,7 +835,7 @@
       'body.dark .lp-sheet{background:#211d1a}body.dark .lp-sheet-top{background:#211d1a;border-bottom-color:rgba(255,255,255,.08);box-shadow:none}body.dark .lp-sheet-top h2,body.dark .lp-sheet-top button{color:#fff}' +
       'body.dark .lp-total-card{background:linear-gradient(145deg,#087a5b,#044b39)}body.dark #lpSheetLines,body.dark .lp-line,body.dark .lp-desc-options{background:#25273a;border-color:rgba(255,255,255,.09)}body.dark .lp-line-block{border-color:rgba(255,255,255,.08)}' +
       'body.dark .lp-line-name{color:#f2f2f7}body.dark .lp-line-photo{border-color:#514b45;background:#fff}body.dark .lp-line .lp-qty i{color:#f2f2f7}body.dark .lp-price-touch{color:#ffad78}body.dark .lp-discount-help{color:#b9afa6}' +
-      'body.dark .lp-pay-option{background:#25273a;border-color:rgba(255,255,255,.11);color:#f2f2f7}body.dark .lp-pay-option.on{background:#143a31;border-color:#36c69b}body.dark .lp-actions{background:linear-gradient(180deg,rgba(33,29,26,0),#211d1a 30%)}' +
+      'body.dark .lp-pay-option{background:#25273a;border-color:rgba(255,255,255,.11);color:#f2f2f7}body.dark .lp-pay-option.on{background:#143a31;border-color:#36c69b}body.dark .lp-plan-info{background:#143a31;border-color:rgba(54,198,155,.28);color:#dfeee8}body.dark .lp-plan-info b{color:#5fe0b8}body.dark .lp-plan-info small{color:#b6c8c1}body.dark .lp-plan-info em{color:#d7e8e2}body.dark .lp-actions{background:linear-gradient(180deg,rgba(33,29,26,0),#211d1a 30%)}' +
       '@media (max-width:480px){.lp-sheet-body{padding-left:10px;padding-right:10px}.lp-line{grid-template-columns:minmax(0,1fr) 76px minmax(68px,auto);gap:4px;padding-left:7px!important;padding-right:7px!important}.lp-line-photo{width:34px;height:34px}.lp-line-product{gap:5px}.lp-line-name{font-size:10px}.lp-line .lp-qty{width:76px;min-width:76px;gap:3px}.lp-line .lp-qty button{width:26px;height:28px}.lp-price-touch{font-size:10px}.lp-total-num{font-size:30px}.lp-pay-option{width:91px}}' +
       '@media (prefers-reduced-motion:reduce){.lp-line-block.swipe-hint .lp-line,.lp-line-block.swipe-hint .lp-line-delete-bg,.lp-actions .lp-clear.is-receiving{animation:none!important}.lp-line-block.is-removing,.lp-undo-toast{transition:none!important}}' +
       'body.dark .lp-item-foto{background:#1c1e2e;border-color:rgba(255,255,255,.09)}' +
@@ -880,6 +881,7 @@
           '<div class="lp-chips-wrap lp-pay-wrap"><div class="lp-chips lp-pay-options" id="lpBancos"></div></div>' +
           '<div class="lp-sec" id="lpCuotasLab" hidden>Cuotas</div>' +
           '<div class="lp-chips-wrap" id="lpCuotasWrap" hidden><div class="lp-chips" id="lpCuotas"></div></div>' +
+          '<div class="lp-plan-info" id="lpPlanInfo" hidden></div>' +
           '<div class="lp-actions">' +
             '<button type="button" class="lp-pdf" id="lpSheetPdf">📝 Presupuestar</button>' +
             '<button type="button" class="lp-clear" id="lpSheetClear" title="Vaciar pedido" aria-label="Vaciar pedido">🗑️</button>' +
@@ -1342,7 +1344,7 @@
   }
   function pintarPago() {
     var hostC = $('lpCuotas'), hostB = $('lpBancos');
-    var lab = $('lpCuotasLab'), wrapC = $('lpCuotasWrap');
+    var lab = $('lpCuotasLab'), wrapC = $('lpCuotasWrap'), info = $('lpPlanInfo');
     if (!hostB) return;
     var g = pagoGet();
     var bancos = PLANES.bancos || [];
@@ -1362,6 +1364,19 @@
       }).join('') + '</div>';
     if (lab) lab.hidden = !bAct;
     if (wrapC) wrapC.hidden = !bAct;
+    if (info) {
+      info.hidden = !bAct;
+      if (!bAct) info.innerHTML = '';
+      else {
+        var detallePlan = [];
+        if (bAct.tarjetas) detallePlan.push(bAct.tarjetas);
+        if (bAct.canal) detallePlan.push(bAct.canal);
+        if (bAct.vigencia) detallePlan.push('Vigencia: ' + bAct.vigencia);
+        info.innerHTML = '<b>' + esc(bAct.beneficio || 'Cuotas sin interés según promoción vigente') + '</b>' +
+          (detallePlan.length ? '<span>' + detallePlan.map(esc).join(' · ') + '</span>' : '') +
+          (bAct.condiciones ? '<small><em>Importante:</em> ' + esc(bAct.condiciones) + '</small>' : '');
+      }
+    }
     if (hostC) {
       if (!bAct) hostC.innerHTML = '';
       else {
@@ -2233,8 +2248,9 @@
 
       var pago = pagoActual();
       var ops = pago.banco ? opsCuotas(pago.banco) : [];
+      var notasBanco = pago.banco ? [pago.banco.beneficio, pago.banco.condiciones].filter(Boolean) : [];
       var filasFin = 1 + ops.length;
-      var altoFin = 10 + filasFin * 7.2 + 6;
+      var altoFin = 10 + filasFin * 7.2 + 10 + notasBanco.length * 11;
       if (y + altoFin > H - 28) {
         pie(pdf.internal.getNumberOfPages(), '?');
         pdf.addPage();
@@ -2276,9 +2292,26 @@
         pdf.setTextColor.apply(pdf, gris);
         var det = [pago.banco.nombre];
         if (pago.banco.tarjetas) det.push(pago.banco.tarjetas);
-        if (PLANES.vigencia) det.push('Vigencia ' + PLANES.vigencia);
-        pdf.text(det.join('  ·  '), m, y);
-        y += 8;
+        if (pago.banco.canal) det.push(pago.banco.canal);
+        if (pago.banco.vigencia) det.push('Vigencia ' + pago.banco.vigencia);
+        else if (PLANES.vigencia) det.push('Vigencia ' + PLANES.vigencia);
+        var lineasDet = pdf.splitTextToSize(det.join('  ·  '), W - 2 * m);
+        pdf.text(lineasDet, m, y);
+        y += lineasDet.length * 3.8 + 2;
+        if (pago.banco.beneficio) {
+          pdf.setFont('helvetica', 'bold');
+          pdf.setTextColor(8, 122, 91);
+          var lineasBeneficio = pdf.splitTextToSize(pago.banco.beneficio, W - 2 * m);
+          pdf.text(lineasBeneficio, m, y);
+          y += lineasBeneficio.length * 3.8 + 2;
+        }
+        if (pago.banco.condiciones) {
+          pdf.setFont('helvetica', 'normal');
+          pdf.setTextColor.apply(pdf, gris);
+          var lineasCond = pdf.splitTextToSize('Importante: ' + pago.banco.condiciones, W - 2 * m);
+          pdf.text(lineasCond, m, y);
+          y += lineasCond.length * 3.8 + 2;
+        }
       }
 
       pdf.setDrawColor.apply(pdf, azul);

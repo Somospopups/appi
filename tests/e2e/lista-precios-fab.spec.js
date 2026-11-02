@@ -386,7 +386,7 @@ test('presupuesto renovado muestra total grande, fotos, tarjetas y permite desli
   expect(await payOptions.count()).toBeGreaterThanOrEqual(5);
   await expect(sheet.getByRole('button', { name: 'Contado', exact: true }).locator('.lp-pay-art')).toBeVisible();
   await expect(sheet.getByRole('button', { name: 'Cuota Simple', exact: true }).locator('.lp-pay-art')).toBeVisible();
-  await expect(sheet.getByRole('button', { name: 'Naranja', exact: true }).locator('.lp-pay-art')).toBeVisible();
+  await expect(sheet.getByRole('button', { name: 'Naranja X', exact: true }).locator('.lp-pay-art')).toBeVisible();
   await expect(sheet.getByRole('button', { name: 'Galicia', exact: true }).locator('.lp-pay-art')).toBeVisible();
   await expect(sheet.getByRole('button', { name: 'BBVA', exact: true }).locator('.lp-pay-art')).toBeVisible();
 
@@ -399,7 +399,7 @@ test('presupuesto renovado muestra total grande, fotos, tarjetas y permite desli
       const cs = getComputedStyle(el);
       return { id, clase: el.className, a: cs.getPropertyValue('--pay-a').trim().toLowerCase(), b: cs.getPropertyValue('--pay-b').trim().toLowerCase(), sigla: el.textContent.trim(), nombre: option.querySelector('b').textContent.trim() };
     };
-    const idsOtros = ['banco-nacion', 'macro', 'santander', 'hipotecario', 'cabal', 'american-express', 'tarjeta-data', 'tarjeta-patagonia-365', 'tarjeta-tuya', 'tarjeta-sol', 'banco-del-sol'];
+    const idsOtros = ['banco-nacion', 'banco-provincia', 'macro', 'santander', 'hipotecario', 'cabal', 'american-express', 'tarjeta-data', 'tarjeta-patagonia-365', 'tarjeta-tuya', 'tarjeta-sol', 'banco-del-sol'];
     return {
       simple: colores('cuota-simple'),
       naranja: colores('tarjeta-naranja'),

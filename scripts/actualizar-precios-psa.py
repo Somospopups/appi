@@ -14,6 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 OUT_CAT = ROOT / "psa-catalogo.json"
 OUT_PRE = ROOT / "psa-precios.json"
 OUT_PLAN = ROOT / "psa-planes.json"
+PLANES_VERIFICADOS = ROOT / "scripts" / "planes-psa-verificados.json"
 IMG_DIR = ROOT / "catalogo-img"
 # CDN público de PSA: las fotos del Portal PCD de compras (PNG 200x200),
 # la MISMA imagen que el distribuidor ve al comprar.
@@ -501,6 +502,10 @@ def extraer_planes():
     pdfs = re.findall(r"https://[^\"'\s]+legales[^\"'\s]+\.pdf", html, re.I)
     if not pdfs:
         pdfs = re.findall(r"https://contenidos\.psa\.com\.ar/[^\"'\s]+\.pdf", html, re.I)
+    imagenes = [
+        url for url in dict.fromkeys(re.findall(r"https://[^\"'\s]+\.(?:jpg|jpeg|png)", html, re.I))
+        if "resumidas" in url.lower()
+    ]
     texto = ""
     fuente_pdf = pdfs[0] if pdfs else ""
     if fuente_pdf:
@@ -513,18 +518,35 @@ def extraer_planes():
             texto = "\n".join((p.extract_text() or "") for p in reader.pages)
         except Exception as e:
             print(f"pdf planes: {e}")
-    # cuotas genéricas de una ficha de la tienda
-    cuotas_tienda = [3, 6, 9, 12, 15, 18]
+
+    # Las piezas de financiación son imágenes y varios legales nombran el banco
+    # sin repetir sus cuotas. Nunca completar esos huecos con el plan genérico de
+    # una ficha de producto: fue la causa de que APPI ofreciera cuotas inexistentes.
+    # Cada edición auditada queda ligada al nombre exacto de su PDF oficial.
+    clave_legal = fuente_pdf.rsplit("/", 1)[-1].split("?", 1)[0] if fuente_pdf else ""
     try:
-        ficha = get("https://tienda.psa.com.ar/psa-senior-4-bianco.html", timeout=25)
-        m = re.search(r"(\d+)\s*cuotas sin inter[eé]s", ficha, re.I)
-        if m:
-            n = int(m.group(1))
-            if n not in cuotas_tienda:
-                cuotas_tienda.append(n)
-                cuotas_tienda.sort()
+        verificadas = json.loads(PLANES_VERIFICADOS.read_text(encoding="utf-8"))
     except Exception:
-        pass
+        verificadas = {}
+    plan_verificado = verificadas.get(clave_legal)
+    if plan_verificado:
+        salida = json.loads(json.dumps(plan_verificado, ensure_ascii=False))
+        salida.update({
+            "actualizado": fecha_ar(),
+            "fuente": PROMO_URL,
+            "fuente_legal": fuente_pdf,
+            "fuente_imagenes": imagenes,
+        })
+        # Mantener un orden legible y estable en el archivo publicado.
+        return {
+            "actualizado": salida["actualizado"],
+            "vigencia": salida.get("vigencia", ""),
+            "fuente": salida["fuente"],
+            "fuente_legal": salida["fuente_legal"],
+            "fuente_imagenes": salida["fuente_imagenes"],
+            "cuotas": salida.get("cuotas", []),
+            "bancos": salida.get("bancos", []),
+        }
 
     vigencia = ""
     vm3 = re.search(r"(\d{1,2})/(\d{1,2})/(\d{4})\s*al\s*(\d{1,2})/(\d{1,2})/(\d{4})", texto)
@@ -561,6 +583,7 @@ def extraer_planes():
         "TARJETA NARANJA",
         "BANCO GALICIA",
         "BBVA",
+        "BAPRO",
         "BANCO NACIÓN",
         "MACRO",
         "SANTANDER",
@@ -588,7 +611,9 @@ def extraer_planes():
             if j > idx:
                 nxt = min(nxt, j)
         bloque = raw_up[idx:nxt]
-        cuotas = cuotas_de(bloque) or list(cuotas_tienda)
+        cuotas = cuotas_de(bloque)
+        if not cuotas:
+            continue
         tarjetas = ""
         if re.search(r"Visa", bloque, re.I):
             tarjetas = "Visa"
@@ -621,11 +646,22 @@ def extraer_planes():
                 "tarjetas": tarjetas,
             }
         )
+    # Una edición desconocida con bloques sin cuotas no se publica a medias.
+    # Así el workflow conserva la última tabla verificada en vez de inventar
+    # 3/6/9/12/15/18 para todas las tarjetas.
+    if len(bancos) < 8:
+        raise RuntimeError(
+            f"financiación nueva sin auditar ({clave_legal or 'sin PDF'}): "
+            f"sólo {len(bancos)} entidades tienen cuotas explícitas"
+        )
+    cuotas_publicadas = sorted({n for banco in bancos for n in (banco.get("cuotas") or [])})
     return {
         "actualizado": fecha_ar(),
         "vigencia": vigencia,
         "fuente": PROMO_URL,
-        "cuotas": cuotas_tienda,
+        "fuente_legal": fuente_pdf,
+        "fuente_imagenes": imagenes,
+        "cuotas": cuotas_publicadas,
         "bancos": bancos,
     }
 
