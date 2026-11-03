@@ -31,7 +31,8 @@ test('la alerta roja aparece en cada ingreso y actualiza los precios directament
   await expect(alerta.getByRole('heading')).toHaveText('Verificá el precio antes de cada venta');
   await expect(alerta).toContainText('comprobá siempre el precio vigente');
   await expect(alerta).toContainText('evitar diferencias e inconvenientes con tus clientes');
-  await expect(alerta.getByRole('button', { name: 'ACTUALIZAR Y VERIFICAR PRECIOS' })).toBeVisible();
+  await expect(alerta.getByRole('button', { name: 'CONTINUAR', exact: true })).toBeVisible();
+  await expect(alerta.getByText('Continuar a la lista')).toHaveCount(0);
 
   const colores = await alerta.evaluate(el => {
     const head = el.querySelector('.lp-price-alert-head');
@@ -46,7 +47,7 @@ test('la alerta roja aparece en cada ingreso y actualiza los precios directament
   expect(colores.boton).toBe('rgb(169, 50, 50)');
   expect(colores.z).toBeGreaterThan(30000);
 
-  await alerta.getByRole('button', { name: 'ACTUALIZAR Y VERIFICAR PRECIOS' }).click();
+  await alerta.getByRole('button', { name: 'CONTINUAR', exact: true }).click();
   await expect(alerta).toBeHidden();
   await expect.poll(() => actualizaciones).toBe(1);
   await expect(page.locator('#lpActualizar')).toContainText('Al día');
@@ -55,7 +56,8 @@ test('la alerta roja aparece en cada ingreso y actualiza los precios directament
   await page.evaluate(() => window.showView('view-home'));
   await abrirLista(page);
   await expect(alerta).toBeVisible();
-  await alerta.getByRole('button', { name: 'Continuar a la lista' }).click();
+  await expect(alerta.getByText('Continuar a la lista')).toHaveCount(0);
+  await alerta.getByRole('button', { name: 'Cerrar alerta' }).click();
   await expect(alerta).toBeHidden();
   expect(actualizaciones).toBe(1);
 });

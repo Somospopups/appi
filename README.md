@@ -6,6 +6,15 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v896 · Primeros pasos desde Mi perfil y alerta simplificada
+
+- **Mi perfil** incorpora **Revisar primeros pasos** dentro de una sección clara de preparación de APPI.
+- El botón vuelve a abrir desde la bienvenida el recorrido de acceso directo, MI PSA y avisos todas las veces que la persona lo necesite.
+- La alerta preventiva de Lista de precios conserva su diseño aprobado, pero el botón rojo ahora dice solamente **CONTINUAR**.
+- Al tocar **CONTINUAR**, APPI mantiene la actualización y verificación directa de precios antes de mostrar la lista.
+- Se elimina por completo el enlace inferior **Continuar a la lista**; la X continúa disponible para cerrar sin actualizar.
+- Versión: **v896 · Segura** → Cache `appi-v896-perfil-y-alerta-precios`.
+
 ## v895 · Instalación directa en Android
 
 - Al tocar **Tengo Android** en el primer ingreso, APPI abre inmediatamente la instalación nativa cuando el navegador la ofrece.

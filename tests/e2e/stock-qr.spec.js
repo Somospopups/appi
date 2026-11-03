@@ -86,7 +86,7 @@ async function entrar(page) {
 async function continuarLista(page) {
   const alerta = page.locator('#lpPriceAlertOverlay');
   await alerta.waitFor({ state: 'visible', timeout: 10000 });
-  await alerta.getByRole('button', { name: 'Continuar a la lista' }).click();
+  await alerta.getByRole('button', { name: 'Cerrar alerta' }).click();
   await alerta.waitFor({ state: 'hidden' });
 }
 

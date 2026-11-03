@@ -1,4 +1,5 @@
 const { test, expect } = require('@playwright/test');
+const { entrar } = require('./helpers/app-entrar.js');
 
 const USER_ID = '22222222-2222-4222-8222-222222222222';
 function tokenFor(sub) {
@@ -60,7 +61,7 @@ async function llegarHastaEleccion(page) {
   return overlay;
 }
 
-test.describe('Primer ingreso acompañado v895', () => {
+test.describe('Primer ingreso acompañado v896', () => {
   test.use({ viewport: { width: 390, height: 844 } });
 
   test('recorre iPhone, guarda MI PSA y activa avisos reales sin popups superpuestos', async ({ page }) => {
@@ -155,5 +156,20 @@ test.describe('Primer ingreso acompañado v895', () => {
     await page.locator('#appiOnboardingPending button').click();
     await expect(page.locator('#appiOnboardingOverlay')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Primero, dejemos APPI a mano' })).toBeVisible();
+  });
+
+  test('Mi perfil permite volver a revisar todos los primeros pasos desde la bienvenida', async ({ page }) => {
+    await entrar(page);
+    await page.evaluate(() => window.abrirCuentaDesdeMenu());
+
+    const button = page.locator('#btnAccountPrimerosPasos');
+    await expect(button).toBeVisible();
+    await expect(button).toContainText('Revisar primeros pasos');
+    await button.click();
+
+    const overlay = page.locator('#appiOnboardingOverlay');
+    await expect(overlay).toBeVisible();
+    await expect(overlay.getByRole('heading', { name: /Bienvenida a APPI/ })).toBeVisible();
+    await expect(page.locator('#modalOverlay')).not.toHaveClass(/open/);
   });
 });

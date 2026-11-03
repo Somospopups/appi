@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v895-instalacion-android-directa';
+const CACHE_NAME = 'appi-v896-perfil-y-alerta-precios';
 const CACHE_PREFIX = 'appi-';
 // Donde el SW aparta una compartición hasta que la app la consume. No
 // empieza con el prefijo de la app para que el prune del activate no la borre.

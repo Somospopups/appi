@@ -704,7 +704,6 @@
       '.lp-price-alert-reason{display:flex;gap:9px;align-items:flex-start;margin:16px 0;padding:11px 12px;border:1px solid #efc2b9;border-radius:13px;background:#fff0eb;color:#7e3030;font-size:12px;line-height:1.35;font-weight:750}' +
       '.lp-price-alert-reason span:first-child{font-size:17px}' +
       '.lp-price-alert-primary{width:100%;min-height:49px;border:0;border-radius:14px;background:#a93232;color:#fff;font:950 13px/1.15 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;letter-spacing:.01em;box-shadow:0 7px 16px rgba(169,50,50,.25);cursor:pointer}' +
-      '.lp-price-alert-secondary{width:100%;border:0;background:transparent;color:#74777d;font:800 11px/1.2 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding:13px 8px 1px;cursor:pointer}' +
       'body.dark .lp-price-alert{background:#28242a}body.dark .lp-price-alert-body>p{color:#d7d1d4}body.dark .lp-price-alert-body>p b{color:#fff}body.dark .lp-price-alert-reason{background:#3c292b;border-color:#714044;color:#f2b9b4}' +
       '.lp-search{width:100%;min-height:44px;border:1px solid rgba(196,164,92,.45);border-radius:14px;padding:10px 12px;font:inherit;font-size:14px;background:#faf6ee;color:#2a2a32;margin:0 0 10px}' +
       '.lp-chips-wrap{position:relative;margin:0 0 6px}' +
@@ -1012,8 +1011,7 @@
         '<div class="lp-price-alert-body">' +
           '<p id="lpPriceAlertText">Los valores pueden cambiar. Antes de confirmar una operación o enviar un presupuesto, <b>comprobá siempre el precio vigente.</b></p>' +
           '<div class="lp-price-alert-reason"><span aria-hidden="true">🛡</span><span>Una verificación a tiempo ayuda a evitar diferencias e inconvenientes con tus clientes.</span></div>' +
-          '<button type="button" class="lp-price-alert-primary" data-price-alert-update>ACTUALIZAR Y VERIFICAR PRECIOS</button>' +
-          '<button type="button" class="lp-price-alert-secondary" data-price-alert-close>Continuar a la lista</button>' +
+          '<button type="button" class="lp-price-alert-primary" data-price-alert-update>CONTINUAR</button>' +
         '</div>' +
       '</div>';
       document.body.appendChild(alertOv);

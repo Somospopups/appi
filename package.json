@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "895.0.0",
-  "cacheName": "appi-v895-instalacion-android-directa",
+  "version": "896.0.0",
+  "cacheName": "appi-v896-perfil-y-alerta-precios",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {
