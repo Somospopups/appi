@@ -140,10 +140,10 @@ window.openStock=function(){
 <script src="./appi-popup-effects.js?v=865"></script>
 <script src="./appi-notif.js?v=894"></script>
 <script src="./recordatorios-app.js?v=618"></script>
-<script src="./appi-onboarding.js?v=897"></script>
+<script src="./appi-onboarding.js?v=898"></script>
 <script src="./telefono.js?v=639"></script>
 <script src="./whatsapp-app.js?v=618"></script>
-<script src="./auth-client.js?v=897"></script>
+<script src="./auth-client.js?v=898"></script>
 <script src="./prueba-banner.js?v=618"></script>
 <script src="./data-sync.js?v=853"></script>
 <script src="./js/membership-admin.js?v=618"></script>
@@ -161,13 +161,13 @@ window.openStock=function(){
 <script src="./mensajes-hielo.js?v=618"></script>
 <script src="./mensajes-usuarios.js?v=639"></script>
   <script src="./campus-preguntas.js?v=646"></script>
-  <script src="./campus-psa.js?v=897"></script>
+  <script src="./campus-psa.js?v=898"></script>
 <script src="./reactivacion.js?v=618"></script>
 
 <script src="./escalera-suenos.js?v=618"></script>
 <script src="./demo-guia.js?v=618"></script>
 <script src="./tablero-negocio.js?v=618"></script>
-<script src="./lista-precios.js?v=897"></script>
+<script src="./lista-precios.js?v=898"></script>
 <script src="./vendor/pdf.min.js?v=618"></script>
 <script src="./canillas-adaptadores.js?v=618"></script>
 <script src="./vendor/zxing.min.js?v=618"></script>
@@ -3410,12 +3410,23 @@ body.dark .lock-error.login-info{background:rgba(91,141,239,.16);color:#a0e6d0}
 #distributorLoginPanel .lock-input.login-input{min-height:52px;padding:14px 15px;border-radius:15px;background:rgba(255,255,255,.82)}
 #btnDistributorLogin,#btnRequestAccount{min-height:52px;margin:8px 0 14px}
 #btnLoginSupport,.request-whatsapp-link{margin-top:12px;text-decoration:none}
-.login-tabs{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin:0 0 20px;padding:4px;border-radius:14px;background:rgba(80,90,130,.07)}
-.login-tabs button{min-height:42px;border:0;border-radius:11px;background:transparent;color:#747583;font:inherit;font-size:12px;font-weight:850;cursor:pointer}.login-tabs button.active{background:#fff;color:#3d63c9;box-shadow:0 5px 14px rgba(66,74,115,.10)}
+.login-tabs{display:grid;grid-template-columns:1fr 1.18fr;gap:7px;margin:0 0 8px;padding:4px;border-radius:14px;background:rgba(80,90,130,.07)}
+.login-tabs button{position:relative;min-height:48px;border:0;border-radius:11px;background:transparent;color:#747583;font:inherit;font-size:12px;font-weight:850;cursor:pointer;overflow:visible}.login-tabs button.active{background:#fff;color:#3d63c9;box-shadow:0 5px 14px rgba(66,74,115,.10)}
+#loginTabCreate{color:#053d50;background:linear-gradient(135deg,#7ee7b8,#50d2cc);box-shadow:0 8px 18px rgba(42,178,158,.28);animation:loginCreatePulse 1.2s ease-in-out .5s 3}
+#loginTabCreate::before{content:'NUEVO';position:absolute;right:6px;top:-11px;padding:4px 7px;border:2px solid #f7f3ea;border-radius:999px;background:#ffb449;color:#553100;font-size:8px;font-weight:950;letter-spacing:.08em;box-shadow:0 4px 10px rgba(80,52,0,.15)}
+#loginTabCreate::after{content:'';position:absolute;inset:-4px;border:2px solid rgba(84,214,176,.72);border-radius:15px;opacity:0;pointer-events:none;animation:loginCreateRing 1.2s ease-out .5s 3}
+#loginTabCreate.active{background:#0b5878;color:#fff;box-shadow:0 8px 18px rgba(11,88,120,.28);animation:none}
+#loginTabCreate.active::after{display:none}
+.login-create-hint{display:flex;align-items:center;justify-content:center;gap:7px;min-height:30px;margin:0 0 12px;color:#27725f;font-size:11px;font-weight:850;text-align:center}
+.login-create-hint span{display:grid;place-items:center;width:19px;height:19px;flex:0 0 19px;border-radius:50%;background:#d7f4e8;color:#17624f}
+.login-create-hint[hidden]{display:none!important}
+@keyframes loginCreatePulse{0%,100%{transform:scale(1)}50%{transform:scale(1.035);box-shadow:0 10px 27px rgba(42,178,158,.43)}}
+@keyframes loginCreateRing{0%{opacity:.7;transform:scale(.98)}100%{opacity:0;transform:scale(1.1)}}
+@media(prefers-reduced-motion:reduce){#loginTabCreate,#loginTabCreate::after{animation:none!important}}
 .login-pane[hidden]{display:none!important}.login-pane{animation:loginPaneIn .18s ease}@keyframes loginPaneIn{from{opacity:.25;transform:translateY(3px)}to{opacity:1;transform:none}}
 .login-honeypot{position:fixed!important;left:-9999px!important;opacity:0!important;pointer-events:none!important}.request-whatsapp-link{display:flex}.request-whatsapp-link[hidden]{display:none!important}
 .person-partner-toggle{display:grid!important;grid-template-columns:24px 1fr!important;align-items:center;gap:10px!important;padding:11px 12px;border:1px solid rgba(91,141,239,.15);border-radius:14px;background:rgba(91,141,239,.07);text-align:left;cursor:pointer}.person-partner-toggle input{width:20px!important;height:20px!important;min-height:0!important;accent-color:#5b8def}.person-partner-toggle b{display:block;color:#3d3e4c;font-size:13px}.person-partner-toggle small{display:block;margin-top:2px;color:#777887;font-size:10px;line-height:1.35}.person-partner-toggle[hidden],#requestPartnerField[hidden],#adminPartnerField[hidden]{display:none!important}body.dark .person-partner-toggle{background:rgba(91,141,239,.13);border-color:rgba(255,255,255,.08)}body.dark .person-partner-toggle b{color:#f1f1f6}
-body.dark .login-tabs{background:rgba(255,255,255,.07)}body.dark .login-tabs button.active{background:#313349;color:#b9c9ff}
+body.dark .login-tabs{background:rgba(255,255,255,.07)}body.dark .login-tabs button.active{background:#313349;color:#b9c9ff}body.dark #loginTabCreate{background:linear-gradient(135deg,#7ee7b8,#50d2cc);color:#053d50}body.dark #loginTabCreate.active{background:#0e6a90;color:#fff}body.dark #loginTabCreate::before{border-color:#25273a}body.dark .login-create-hint{color:#98e8d2}body.dark .login-create-hint span{background:rgba(84,214,176,.16);color:#98e8d2}
 .admin-login-lock{position:absolute;top:15px;right:15px;width:40px;height:40px;border:1px solid rgba(91,141,239,.18);border-radius:50%;display:grid;place-items:center;background:rgba(91,141,239,.10);color:#3d63c9;font-size:17px;cursor:pointer;box-shadow:0 5px 16px rgba(80,90,130,.10);transition:.18s}
 .admin-login-lock:hover{background:rgba(91,141,239,.18);transform:translateY(-1px)}
 .admin-login-lock:active{transform:scale(.92)}
@@ -4767,7 +4778,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v897 · Segura</div>
+  <div class="ds-foot">APPI · v898 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -4973,6 +4984,7 @@ body.dark #pageTabs button.active{color:#c5d6ff}
         <button type="button" class="active" id="loginTabSignIn" role="tab" aria-selected="true">Ingresar</button>
         <button type="button" id="loginTabCreate" role="tab" aria-selected="false">Crear una cuenta</button>
       </div>
+      <p class="login-create-hint" id="loginCreateHint"><span aria-hidden="true">↓</span> ¿Es tu primera vez? Tocá “Crear una cuenta”</p>
       <div id="loginSignInPane" class="login-pane">
         <label class="lock-field">
           <span>Número de distribuidor</span>
@@ -13327,9 +13339,9 @@ function mostrarErrorLogin(message,type='error'){
   if(info){info.textContent=type==='info'?String(message||''):'';info.classList.toggle('show',type==='info'&&!!message)}
 }
 function setLoginAccessTab(mode){
-  const signButton=document.getElementById('loginTabSignIn'),createButton=document.getElementById('loginTabCreate'),signPane=document.getElementById('loginSignInPane'),createPane=document.getElementById('loginCreatePane'),subtitle=document.getElementById('loginPanelSubtitle'),creating=mode==='create';
+  const signButton=document.getElementById('loginTabSignIn'),createButton=document.getElementById('loginTabCreate'),signPane=document.getElementById('loginSignInPane'),createPane=document.getElementById('loginCreatePane'),subtitle=document.getElementById('loginPanelSubtitle'),hint=document.getElementById('loginCreateHint'),creating=mode==='create';
   if(!signButton||!createButton)return;
-  signButton.classList.toggle('active',!creating);createButton.classList.toggle('active',creating);signButton.setAttribute('aria-selected',String(!creating));createButton.setAttribute('aria-selected',String(creating));signPane.hidden=creating;createPane.hidden=!creating;
+  signButton.classList.toggle('active',!creating);createButton.classList.toggle('active',creating);signButton.setAttribute('aria-selected',String(!creating));createButton.setAttribute('aria-selected',String(creating));signPane.hidden=creating;createPane.hidden=!creating;if(hint)hint.hidden=creating;
   if(subtitle)subtitle.textContent=creating?'Completá tus datos para solicitar acceso.':'Ingresá con tu número de distribuidor.';
   const target=document.getElementById(creating?'requestFullName':'distributorInput');requestAnimationFrame(()=>{if(target&&!/^(INPUT|TEXTAREA)$/.test(document.activeElement&&document.activeElement.tagName||''))target.focus()});
 }
@@ -14322,8 +14334,8 @@ function cerrarToolsMenu(){
   // con archivos viejos en pantalla.
   if ('serviceWorker' in navigator) {
     (async () => {
-    const swVersion='897';
-    const CACHE_NAME='appi-v897-reactivacion-acompanada';
+    const swVersion='898';
+    const CACHE_NAME='appi-v898-crear-cuenta-visible';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}

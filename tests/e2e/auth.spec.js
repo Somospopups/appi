@@ -117,6 +117,17 @@ test('en escritorio los botones del login reciben el clic', async ({ page }) => 
   await page.goto('/index.html', { waitUntil: 'networkidle' });
   await expect(page.locator('#distributorLoginPanel')).toBeVisible();
   await expect(page.locator('#btnDistributorLogin')).toBeVisible();
+  await expect(page.locator('#loginTabCreate')).toBeVisible();
+  await expect(page.locator('#loginCreateHint')).toBeVisible();
+  await expect(page.locator('#loginCreateHint')).toContainText('¿Es tu primera vez?');
+  const createVisual = await page.locator('#loginTabCreate').evaluate(button => ({
+    background: getComputedStyle(button).backgroundImage,
+    badge: getComputedStyle(button, '::before').content,
+    animationCount: getComputedStyle(button).animationIterationCount
+  }));
+  expect(createVisual.background).toContain('linear-gradient');
+  expect(createVisual.badge).toContain('NUEVO');
+  expect(createVisual.animationCount).toBe('3');
 
   const hit = await page.evaluate(() => {
     const btn = document.getElementById('btnDistributorLogin');
@@ -149,6 +160,8 @@ test('en escritorio los botones del login reciben el clic', async ({ page }) => 
   await expect(page.locator('#loginError')).toContainText(/sucursal|contraseña|distribuidor/i);
 
   await page.locator('#loginTabCreate').click();
+  await expect(page.locator('#loginTabCreate')).toHaveClass(/active/);
+  await expect(page.locator('#loginCreateHint')).toBeHidden();
   await expect(page.locator('#loginCreatePane')).toBeVisible();
   await expect(page.locator('#btnRequestAccount')).toBeVisible();
 });

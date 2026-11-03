@@ -61,7 +61,7 @@ async function llegarHastaEleccion(page) {
   return overlay;
 }
 
-test.describe('Primer ingreso acompañado v897', () => {
+test.describe('Primer ingreso acompañado v898', () => {
   test.use({ viewport: { width: 390, height: 844 } });
 
   test('recorre iPhone, guarda MI PSA y activa avisos reales sin popups superpuestos', async ({ page }) => {

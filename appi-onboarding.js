@@ -1,5 +1,5 @@
 /* ============================================================
-   APPI · Primer ingreso acompañado (v897)
+   APPI · Primer ingreso acompañado (v898)
    Un único recorrido amable: acceso directo, MI PSA y avisos.
    Evita que los popups anteriores se superpongan y deja lo
    pendiente como una tarjeta tranquila en el Home.

@@ -6,6 +6,15 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v898 · Crear una cuenta más visible
+
+- La opción **Crear una cuenta** ahora se destaca en turquesa desde la pantalla de acceso.
+- Incorpora la etiqueta **NUEVO** y un pulso suave de tres repeticiones que luego se detiene.
+- Una indicación clara explica: **¿Es tu primera vez? Tocá “Crear una cuenta”**.
+- Al abrir el formulario, la indicación desaparece para mantener una pantalla limpia.
+- Se respeta la preferencia del dispositivo para reducir movimientos y se conserva el acceso habitual para quienes ya tienen cuenta.
+- Versión: **v898 · Segura** → Cache `appi-v898-crear-cuenta-visible`.
+
 ## v897 · Acompañamiento después de una reactivación
 
 - Cuando APPI detecta una cuenta desactivada, sin membresía o con la membresía vencida, guarda localmente que esa persona necesitará revisar la preparación al volver.
