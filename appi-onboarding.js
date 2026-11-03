@@ -1,5 +1,5 @@
 /* ============================================================
-   APPI · Primer ingreso acompañado (v894)
+   APPI · Primer ingreso acompañado (v895)
    Un único recorrido amable: acceso directo, MI PSA y avisos.
    Evita que los popups anteriores se superpongan y deja lo
    pendiente como una tarjeta tranquila en el Home.
@@ -116,7 +116,7 @@
       '<p class="aob-lead">Podemos crear un acceso directo para que APPI aparezca como un ícono en la pantalla de tu teléfono, igual que las demás aplicaciones.</p>' +
       (isStandalone() ? '<div class="aob-note"><i>✓</i><span>APPI ya está abierta desde su propio ícono. Este paso está listo.</span></div>' : '<div class="aob-note"><i>ℹ</i><span>Para mostrarte las indicaciones correctas, elegí el tipo de teléfono que estás usando.</span></div>') +
       '<div class="aob-devices"><button type="button" class="aob-device" data-aob="iphone"><i>🍎</i><b>Tengo iPhone</b><small>Teléfono de Apple</small></button>' +
-      '<button type="button" class="aob-device" data-aob="android"><i>🤖</i><b>Tengo Android</b><small>Samsung, Motorola, Xiaomi y otros</small></button></div>' +
+      '<button type="button" class="aob-device" data-aob="android"><i>🤖</i><b>Tengo Android</b><small>Instalar APPI con un toque</small></button></div>' +
       '<button type="button" class="aob-primary" data-aob="shortcut-done">Ya tengo el ícono de APPI</button>' +
       '<button type="button" class="aob-secondary" data-aob="shortcut-later">Prefiero crear el acceso directo más tarde</button>' +
       '<button type="button" class="aob-secondary" data-aob="welcome">Volver a la bienvenida</button>');
@@ -266,15 +266,38 @@
       setStatus('El teléfono no activó los avisos. Podés volver a intentar o continuar sin ellos.', true);
     }
   }
-  async function installAndroid() {
-    if (!deferredInstall) { state.shortcut = true; go('psa'); return; }
+  async function installAndroid(fromDeviceChoice, button) {
+    // Si APPI ya está abierta desde su ícono, el acceso directo está listo.
+    if (isStandalone()) { state.shortcut = true; go('psa'); return; }
+
+    // Chrome/Android sólo entrega beforeinstallprompt cuando la aplicación
+    // cumple las condiciones de instalación. Si todavía no está disponible,
+    // mostramos la guía habitual; nunca fingimos que quedó instalada.
+    if (!deferredInstall) {
+      if (fromDeviceChoice) go('android');
+      else { state.shortcut = true; go('psa'); }
+      return;
+    }
+
+    if (button) {
+      button.disabled = true;
+      var detail = button.querySelector('small');
+      if (detail) detail.textContent = 'Abriendo la instalación…';
+      else button.textContent = 'Abriendo la instalación…';
+    }
     try {
-      deferredInstall.prompt();
-      var result = await deferredInstall.userChoice;
-      deferredInstall = null;
+      var request = deferredInstall;
+      deferredInstall = null; // el navegador permite usar cada invitación una sola vez
+      await request.prompt();
+      var result = await request.userChoice;
       state.shortcut = !!(result && result.outcome === 'accepted');
-      if (state.shortcut) go('psa'); else render();
-    } catch (e) { state.shortcut = false; render(); }
+      // Si la persona cancela, no la frenamos: recibe las instrucciones
+      // manuales y puede continuar cuando quiera.
+      if (state.shortcut) go('psa'); else go('android');
+    } catch (e) {
+      state.shortcut = false;
+      go('android');
+    }
   }
 
   function bind(card) {
@@ -285,7 +308,8 @@
       if (action === 'close') return finish();
       if (action === 'skip-all') { state.shortcut = false; state.psa = hasPsa(); state.notifications = hasNotifications(); return finish(); }
       if (action === 'shortcut-done' || action === 'iphone-done') { state.shortcut = true; return go('psa'); }
-      if (action === 'android-done') return installAndroid();
+      if (action === 'android') return installAndroid(true, button);
+      if (action === 'android-done') return installAndroid(false, button);
       if (action === 'shortcut-later') { state.shortcut = false; return go('psa'); }
       if (action === 'save-psa') return savePsa();
       if (action === 'psa-later') { state.psa = false; return go('notifications'); }

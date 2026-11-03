@@ -6,6 +6,15 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v895 · Instalación directa en Android
+
+- Al tocar **Tengo Android** en el primer ingreso, APPI abre inmediatamente la instalación nativa cuando el navegador la ofrece.
+- Después de confirmar la instalación, el recorrido continúa directamente con MI PSA, sin obligar a leer pasos que ya no son necesarios.
+- Si el teléfono no ofrece instalación automática o la persona la cancela, APPI muestra la guía Android habitual y permite continuar más tarde.
+- Si APPI ya está abierta desde su ícono, el acceso directo se reconoce como listo y se avanza automáticamente.
+- iPhone conserva la guía obligatoria de Safari porque Apple no permite iniciar esa instalación desde un botón web.
+- Versión: **v895 · Segura** → Cache `appi-v895-instalacion-android-directa`.
+
 ## v894 · Primer ingreso acompañado
 
 - El primer ingreso ahora es un único recorrido progresivo, con textos claros, botones grandes y la posibilidad de volver atrás o continuar más tarde.

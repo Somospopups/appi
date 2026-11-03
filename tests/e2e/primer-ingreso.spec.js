@@ -60,7 +60,7 @@ async function llegarHastaEleccion(page) {
   return overlay;
 }
 
-test.describe('Primer ingreso acompañado v894', () => {
+test.describe('Primer ingreso acompañado v895', () => {
   test.use({ viewport: { width: 390, height: 844 } });
 
   test('recorre iPhone, guarda MI PSA y activa avisos reales sin popups superpuestos', async ({ page }) => {
@@ -104,6 +104,24 @@ test.describe('Primer ingreso acompañado v894', () => {
     expect(stored.tuto).toBe('1');
     await expect(page.locator('#appiNotifPop')).toHaveCount(0);
     await expect(page.locator('#modalOverlay')).not.toHaveClass(/open/);
+  });
+
+  test('al tocar Android abre inmediatamente la instalación y evita la guía si el navegador lo permite', async ({ page }) => {
+    await prepararPrimerIngreso(page);
+    const overlay = await llegarHastaEleccion(page);
+
+    await page.evaluate(() => {
+      window.__instalacionAndroidAbierta = 0;
+      const event = new Event('beforeinstallprompt', { cancelable: true });
+      event.prompt = async () => { window.__instalacionAndroidAbierta += 1; };
+      event.userChoice = Promise.resolve({ outcome: 'accepted', platform: 'web' });
+      window.dispatchEvent(event);
+    });
+
+    await overlay.locator('[data-aob="android"]').click();
+    await expect(overlay.getByRole('heading', { name: 'Ahora, conectemos tu cuenta de MI PSA' })).toBeVisible();
+    await expect(overlay.getByRole('heading', { name: 'Cómo crear el acceso directo en Android' })).toHaveCount(0);
+    expect(await page.evaluate(() => window.__instalacionAndroidAbierta)).toBe(1);
   });
 
   test('muestra la guía Android y deja lo pendiente en una sola tarjeta del Home', async ({ page }) => {
