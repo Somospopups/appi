@@ -100,7 +100,12 @@
     try { if (navigator.vibrate) navigator.vibrate([80, 40, 80]); } catch (e) {}
     try {
       if ('serviceWorker' in navigator) {
-        var reg = await navigator.serviceWorker.ready;
+        // Si la instalación del Service Worker todavía no terminó (o el
+        // navegador la bloqueó), no dejamos el botón esperando para siempre.
+        var reg = await Promise.race([
+          navigator.serviceWorker.ready,
+          new Promise(function (resolve) { setTimeout(function () { resolve(null); }, 1400); })
+        ]);
         if (reg && reg.showNotification) {
           await reg.showNotification('APPI', options);
           return true;
@@ -215,11 +220,11 @@
     var ok = await pedirSiHaceFalta();
     if (!ok) {
       if (btn) { btn.disabled = false; btn.textContent = 'Activar'; }
-      if (permiso() === 'denied') {
+      if (permiso() === 'denied' && popAbierto) {
         cerrarPopup();
         pintarPopup();
       }
-      return;
+      return false;
     }
     try { localStorage.setItem('appi_avisos_ok', '1'); localStorage.setItem('appi_notif_listo_v1', '1'); } catch (e) {}
     masTarde(400 * 24 * 3600 * 1000);
@@ -243,9 +248,13 @@
     }
     cerrarPopup();
     if (typeof showToast === 'function') showToast('Avisos activados 🔔', 2400);
+    return true;
   }
 
   function maybePopup() {
+    // v894: el recorrido unificado es el único que explica y solicita avisos
+    // durante el primer ingreso. Así nunca se superponen dos carteles.
+    if (window.APPIOnboarding && typeof window.APPIOnboarding.suprimeAutomaticos === 'function' && window.APPIOnboarding.suprimeAutomaticos()) return;
     if (popAbierto || yaListo()) return;
     if (enEspera()) return;
     if (permiso() === 'unsupported') return;
@@ -323,5 +332,13 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', arranque);
   else arranque();
 
-  window.APPINotif = { permiso: permiso, mostrar: mostrar, probar: probar, abrir: abrir };
+  window.APPINotif = {
+    permiso: permiso,
+    mostrar: mostrar,
+    probar: probar,
+    abrir: abrir,
+    // Acción explícita reutilizable por el primer ingreso. Conserva el permiso,
+    // el registro del dispositivo y la notificación de prueba reales de APPI.
+    activar: activarDesdePopup
+  };
 })();

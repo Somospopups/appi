@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v893-alerta-precios';
+const CACHE_NAME = 'appi-v894-primer-ingreso';
 const CACHE_PREFIX = 'appi-';
 // Donde el SW aparta una compartición hasta que la app la consume. No
 // empieza con el prefijo de la app para que el prune del activate no la borre.
@@ -16,6 +16,7 @@ const APP_SHELL = [
   './appi-popup-effects.js',
   './appi-notif.js',
   './recordatorios-app.js',
+  './appi-onboarding.js',
   './reporte-bonos.js',
   './telefono.js',
   './whatsapp-app.js',

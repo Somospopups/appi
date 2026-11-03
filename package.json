@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "893.0.0",
-  "cacheName": "appi-v893-alerta-precios",
+  "version": "894.0.0",
+  "cacheName": "appi-v894-primer-ingreso",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

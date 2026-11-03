@@ -138,8 +138,9 @@ window.openStock=function(){
 <script src="./auth-config.js"></script>
 <script src="./appi-dialog.js?v=618"></script>
 <script src="./appi-popup-effects.js?v=865"></script>
-<script src="./appi-notif.js?v=618"></script>
+<script src="./appi-notif.js?v=894"></script>
 <script src="./recordatorios-app.js?v=618"></script>
+<script src="./appi-onboarding.js?v=894"></script>
 <script src="./telefono.js?v=639"></script>
 <script src="./whatsapp-app.js?v=618"></script>
 <script src="./auth-client.js?v=853"></script>
@@ -160,13 +161,13 @@ window.openStock=function(){
 <script src="./mensajes-hielo.js?v=618"></script>
 <script src="./mensajes-usuarios.js?v=639"></script>
   <script src="./campus-preguntas.js?v=646"></script>
-  <script src="./campus-psa.js?v=892"></script>
+  <script src="./campus-psa.js?v=894"></script>
 <script src="./reactivacion.js?v=618"></script>
 
 <script src="./escalera-suenos.js?v=618"></script>
 <script src="./demo-guia.js?v=618"></script>
 <script src="./tablero-negocio.js?v=618"></script>
-<script src="./lista-precios.js?v=893"></script>
+<script src="./lista-precios.js?v=894"></script>
 <script src="./vendor/pdf.min.js?v=618"></script>
 <script src="./canillas-adaptadores.js?v=618"></script>
 <script src="./vendor/zxing.min.js?v=618"></script>
@@ -4766,7 +4767,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v893 · Segura</div>
+  <div class="ds-foot">APPI · v894 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -12277,6 +12278,7 @@ function obtenerProximoPaso(){
 // ==== TUTORIAL ONBOARDING ====
 const TUTO_KEY='tutoVisto_v2';
 function mostrarTutorialSiNuevo(){
+  if(window.APPIOnboarding && typeof window.APPIOnboarding.gestionaPrimerIngreso==='function' && window.APPIOnboarding.gestionaPrimerIngreso()) return;
   if(window.APPIAuth&&window.APPIAuth.isEnabled()){
     const profile=window.APPIAuth.currentProfile();
     if(!window.APPIAuth.isLocallyAuthorized()||!profile||profile.rol==='admin')return;
@@ -14302,8 +14304,8 @@ function cerrarToolsMenu(){
   // con archivos viejos en pantalla.
   if ('serviceWorker' in navigator) {
     (async () => {
-    const swVersion='893';
-    const CACHE_NAME='appi-v893-alerta-precios';
+    const swVersion='894';
+    const CACHE_NAME='appi-v894-primer-ingreso';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
@@ -21723,6 +21725,7 @@ body.dark .modal-overlay.psa-popup-blur .modal{background:rgba(28,29,46,0.96);bo
   }
   function pedirPopupPSA(force){
     try{
+      if(!force && window.APPIOnboarding && typeof window.APPIOnboarding.suprimeAutomaticos==='function' && window.APPIOnboarding.suprimeAutomaticos()) return false;
       if(psaConectado()) return false;
       if(!sesionAppiOk()) return false;
       const m=getModal();
@@ -21747,7 +21750,8 @@ body.dark .modal-overlay.psa-popup-blur .modal{background:rgba(28,29,46,0.96);bo
     window.showView=function(id, opts){
       const r=orig.apply(this, arguments);
       try{
-        if(!psaConectado() && sesionAppiOk()){
+        const guiado=window.APPIOnboarding && typeof window.APPIOnboarding.suprimeAutomaticos==='function' && window.APPIOnboarding.suprimeAutomaticos();
+        if(!guiado && !psaConectado() && sesionAppiOk()){
           if(esVistaDatosPSA(id)) setTimeout(()=>pedirPopupPSA(true), 220);
           else if(id==='view-home') setTimeout(()=>pedirPopupPSA(false), 500);
         }
@@ -21775,6 +21779,7 @@ body.dark .modal-overlay.psa-popup-blur .modal{background:rgba(28,29,46,0.96);bo
   setTimeout(intentarAlEntrar, 2400);
   setInterval(()=>{
     try{
+      if(window.APPIOnboarding && typeof window.APPIOnboarding.suprimeAutomaticos==='function' && window.APPIOnboarding.suprimeAutomaticos()) return;
       if(psaConectado() || !sesionAppiOk()) return;
       const overlay=document.getElementById('modalOverlay');
       if(overlay && overlay.classList.contains('open')) return;

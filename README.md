@@ -6,6 +6,16 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v894 · Primer ingreso acompañado
+
+- El primer ingreso ahora es un único recorrido progresivo, con textos claros, botones grandes y la posibilidad de volver atrás o continuar más tarde.
+- La persona elige iPhone o Android y recibe indicaciones específicas para crear el acceso directo de APPI.
+- El mismo recorrido conecta MI PSA con los campos reales de APPI y permite elegir y activar los avisos reales del teléfono.
+- El tutorial anterior y los popups automáticos de MI PSA y notificaciones quedan coordinados para no superponerse.
+- Los pasos no completados se guardan y aparecen como una tarjeta discreta en el Home, sin volver a interrumpir cada ingreso.
+- Se validaron los recorridos completos de iPhone y Android, la persistencia, los permisos, el caché offline y la compatibilidad con autenticación.
+- Versión: **v894 · Segura** → Cache `appi-v894-primer-ingreso`.
+
 ## v893 · Verificación preventiva de precios
 
 - Al ingresar a Lista de precios aparece una alerta preventiva bordó para recordar que los valores pueden cambiar.
