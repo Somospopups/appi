@@ -61,7 +61,7 @@ async function llegarHastaEleccion(page) {
   return overlay;
 }
 
-test.describe('Primer ingreso acompañado v896', () => {
+test.describe('Primer ingreso acompañado v897', () => {
   test.use({ viewport: { width: 390, height: 844 } });
 
   test('recorre iPhone, guarda MI PSA y activa avisos reales sin popups superpuestos', async ({ page }) => {
@@ -171,5 +171,76 @@ test.describe('Primer ingreso acompañado v896', () => {
     await expect(overlay).toBeVisible();
     await expect(overlay.getByRole('heading', { name: /Bienvenida a APPI/ })).toBeVisible();
     await expect(page.locator('#modalOverlay')).not.toHaveClass(/open/);
+  });
+
+  test('una cuenta suspendida o vencida recibe los primeros pasos una sola vez cuando vuelve a activarse', async ({ page }) => {
+    let bloqueo = 'disabled';
+    const accessToken = tokenFor(USER_ID);
+    const perfil = () => ({
+      user_id: USER_ID, username: null, dip: '02-9802014', sucursal: '02', numero_distribuidor: '9802014',
+      nombre: 'María Pérez', socio_nombre: null, rol: 'usuario', activo: bloqueo !== 'disabled', debe_cambiar_password: false,
+      membresia_meses: 1,
+      membresia_inicio: new Date().toISOString(),
+      membresia_vence: bloqueo === 'missing' ? null : new Date(Date.now() + (bloqueo === 'expired' ? -30 : 30) * 86400000).toISOString()
+    });
+
+    await page.route('**/auth-config.js', route => route.fulfill({
+      contentType: 'application/javascript',
+      body: "window.APPI_AUTH={enabled:true,url:'https://mock.supabase.co',anonKey:'anon-key-publica-de-prueba',distributorEmailDomain:'distribuidores.appi.invalid',adminLogin:{username:'popups',email:'admin-popups@appi.invalid'},loginAliases:{},offlineDays:7};"
+    }));
+    await page.route('https://mock.supabase.co/**', route => {
+      const url = new URL(route.request().url());
+      const headers = { 'access-control-allow-origin': '*', 'content-type': 'application/json' };
+      if (url.pathname === '/auth/v1/token') return route.fulfill({ status: 200, headers, body: JSON.stringify({ access_token: accessToken, refresh_token: 'r', expires_in: 3600, user: { id: USER_ID } }) });
+      if (url.pathname === '/rest/v1/appi_perfiles') return route.fulfill({ status: 200, headers, body: JSON.stringify([perfil()]) });
+      return route.fulfill({ status: 200, headers, body: '[]' });
+    });
+    await page.addInitScript(() => {
+      localStorage.setItem('tutoVisto_v2', '1');
+      localStorage.setItem('welcomeSeen', '1');
+      localStorage.setItem('appi_onboarding_v1', JSON.stringify({ done: true, shortcut: true, psa: true, notifications: true, ts: 1 }));
+    });
+
+    await page.goto('/index.html', { waitUntil: 'networkidle' });
+    await page.locator('#distributorInput').fill('02-9802014');
+    const intentarIngreso = async (mensaje, motivo) => {
+      await page.locator('#distributorPassword').fill('Clave1234');
+      await page.locator('#btnDistributorLogin').click();
+      await expect(page.locator('#loginError')).toContainText(mensaje);
+      expect(await page.evaluate(({ userId, expectedReason }) => {
+        const raw = localStorage.getItem('appi_onboarding_reactivar_v1_' + userId);
+        const marker = raw ? JSON.parse(raw) : null;
+        return {
+          correct: !!marker && marker.reason === expectedReason,
+          other: window.APPIAuth.needsReactivationReview('otro-usuario')
+        };
+      }, { userId: USER_ID, expectedReason: motivo })).toEqual({ correct: true, other: false });
+    };
+
+    await intentarIngreso(/desactivada/i, 'account_disabled');
+    await page.evaluate(userId => window.APPIAuth.completeReactivationReview(userId), USER_ID);
+
+    bloqueo = 'missing';
+    await intentarIngreso(/todavía no tiene una membresía activa/i, 'membership_missing');
+    await page.evaluate(userId => window.APPIAuth.completeReactivationReview(userId), USER_ID);
+
+    bloqueo = 'expired';
+    await intentarIngreso(/membresía de APPI venció/i, 'membership_expired');
+
+    bloqueo = 'active';
+    await page.locator('#distributorPassword').fill('Clave1234');
+    await page.locator('#btnDistributorLogin').click();
+    await page.locator('#lockScreen').waitFor({ state: 'hidden' });
+
+    const overlay = page.locator('#appiOnboardingOverlay');
+    await expect(overlay).toBeVisible();
+    await expect(overlay.getByRole('heading', { name: /Bienvenida a APPI/ })).toBeVisible();
+    await overlay.getByRole('button', { name: 'Cerrar y continuar después' }).click();
+    await expect(overlay).toBeHidden();
+    expect(await page.evaluate(() => Object.keys(localStorage).some(key => key.startsWith('appi_onboarding_reactivar_v1_')))).toBe(false);
+
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await page.locator('#lockScreen').waitFor({ state: 'hidden' });
+    await expect(page.locator('#appiOnboardingOverlay')).toHaveCount(0);
   });
 });

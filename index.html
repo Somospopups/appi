@@ -140,10 +140,10 @@ window.openStock=function(){
 <script src="./appi-popup-effects.js?v=865"></script>
 <script src="./appi-notif.js?v=894"></script>
 <script src="./recordatorios-app.js?v=618"></script>
-<script src="./appi-onboarding.js?v=895"></script>
+<script src="./appi-onboarding.js?v=897"></script>
 <script src="./telefono.js?v=639"></script>
 <script src="./whatsapp-app.js?v=618"></script>
-<script src="./auth-client.js?v=853"></script>
+<script src="./auth-client.js?v=897"></script>
 <script src="./prueba-banner.js?v=618"></script>
 <script src="./data-sync.js?v=853"></script>
 <script src="./js/membership-admin.js?v=618"></script>
@@ -161,13 +161,13 @@ window.openStock=function(){
 <script src="./mensajes-hielo.js?v=618"></script>
 <script src="./mensajes-usuarios.js?v=639"></script>
   <script src="./campus-preguntas.js?v=646"></script>
-  <script src="./campus-psa.js?v=896"></script>
+  <script src="./campus-psa.js?v=897"></script>
 <script src="./reactivacion.js?v=618"></script>
 
 <script src="./escalera-suenos.js?v=618"></script>
 <script src="./demo-guia.js?v=618"></script>
 <script src="./tablero-negocio.js?v=618"></script>
-<script src="./lista-precios.js?v=896"></script>
+<script src="./lista-precios.js?v=897"></script>
 <script src="./vendor/pdf.min.js?v=618"></script>
 <script src="./canillas-adaptadores.js?v=618"></script>
 <script src="./vendor/zxing.min.js?v=618"></script>
@@ -4767,7 +4767,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v896 · Segura</div>
+  <div class="ds-foot">APPI · v897 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -14322,8 +14322,8 @@ function cerrarToolsMenu(){
   // con archivos viejos en pantalla.
   if ('serviceWorker' in navigator) {
     (async () => {
-    const swVersion='896';
-    const CACHE_NAME='appi-v896-perfil-y-alerta-precios';
+    const swVersion='897';
+    const CACHE_NAME='appi-v897-reactivacion-acompanada';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}

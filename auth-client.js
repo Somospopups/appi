@@ -3,6 +3,7 @@
 
 const SESSION_KEY='appi_auth_session_v1';
 const ACTIVE_PERSON_KEY='appi_active_person_v1';
+const REACTIVATION_PREFIX='appi_onboarding_reactivar_v1_';
 const DEFAULTS={
   enabled:false,
   url:'',
@@ -72,6 +73,22 @@ function save(value){
 }
 function clearActivePerson(){try{sessionStorage.removeItem(ACTIVE_PERSON_KEY)}catch(e){}}
 function clear(){clearActivePerson();save(null)}
+function reactivationKey(id){return REACTIVATION_PREFIX+String(id||'').trim()}
+function markReactivationReview(id,reason){
+  if(!id)return false;
+  try{
+    localStorage.setItem(reactivationKey(id),JSON.stringify({reason:String(reason||'suspended'),detectedAt:Date.now()}));
+    return true;
+  }catch(e){return false}
+}
+function needsReactivationReview(id=userId()){
+  if(!id)return false;
+  try{return !!localStorage.getItem(reactivationKey(id))}catch(e){return false}
+}
+function completeReactivationReview(id=userId()){
+  if(!id)return false;
+  try{localStorage.removeItem(reactivationKey(id));return true}catch(e){return false}
+}
 function offlineLimitMs(){return Math.max(1,Number(config().offlineDays)||7)*86400000}
 function offlineEligible(value=load()){
   return !!(value&&value.profile&&value.profile.activo!==false&&value.lastValidatedAt&&Date.now()-Number(value.lastValidatedAt)<=offlineLimitMs());
@@ -145,14 +162,21 @@ async function fetchProfile(session){
   }
   const profile=Array.isArray(rows)?rows[0]:null;
   if(!profile)throw authError('La cuenta no tiene un perfil de distribuidor.','profile_missing',403);
-  if(profile.activo===false)throw authError('Esta cuenta está desactivada. Contactá al administrador.','account_disabled',403);
+  if(profile.activo===false){
+    if(profile.rol!=='admin')markReactivationReview(payload.sub,'account_disabled');
+    throw authError('Esta cuenta está desactivada. Contactá al administrador.','account_disabled',403);
+  }
   if(profile.rol!=='admin'){
     /* El último día de membresía cuenta entero (hora Argentina del teléfono).
        Antes se cortaba al instante guardado, a menudo a las 00:00 UTC:
        con 1 día en el cartel, ya no dejaba entrar. */
     const expires=finMembresiaMs(profile.membresia_vence);
-    if(!expires)throw authError('Tu cuenta todavía no tiene una membresía activa. Contactá a administración.','membership_missing',403);
+    if(!expires){
+      markReactivationReview(payload.sub,'membership_missing');
+      throw authError('Tu cuenta todavía no tiene una membresía activa. Contactá a administración.','membership_missing',403);
+    }
     if(Date.now()>expires){
+      markReactivationReview(payload.sub,'membership_expired');
       // Si la cuenta estaba en modo PRUEBA, el mensaje lo dice con todas las
       // letras. La consulta va aparte y protegida: si la migración de la
       // prueba todavía no corrió, el bloqueo genérico sigue funcionando.
@@ -278,7 +302,8 @@ function status(){
 }
 
 window.APPIAuth={
-  SESSION_KEY,ACTIVE_PERSON_KEY,config,isEnabled,isConfigured,normalizeDip,normalizeLoginIdentifier,resolveLoginIdentifier,parseDip,emailForDip,login,loginAdmin,changePassword,authorize,refresh,validate,logout,
-  load,clear,clearActivePerson,offlineEligible,isLocallyAuthorized,accessToken,userId,currentProfile,accountPeople,activePerson,selectPerson,needsPersonChoice,status
+  SESSION_KEY,ACTIVE_PERSON_KEY,REACTIVATION_PREFIX,config,isEnabled,isConfigured,normalizeDip,normalizeLoginIdentifier,resolveLoginIdentifier,parseDip,emailForDip,login,loginAdmin,changePassword,authorize,refresh,validate,logout,
+  load,clear,clearActivePerson,offlineEligible,isLocallyAuthorized,accessToken,userId,currentProfile,accountPeople,activePerson,selectPerson,needsPersonChoice,status,
+  markReactivationReview,needsReactivationReview,completeReactivationReview
 };
 })();

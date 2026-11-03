@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "896.0.0",
-  "cacheName": "appi-v896-perfil-y-alerta-precios",
+  "version": "897.0.0",
+  "cacheName": "appi-v897-reactivacion-acompanada",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

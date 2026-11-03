@@ -6,6 +6,15 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v897 · Acompañamiento después de una reactivación
+
+- Cuando APPI detecta una cuenta desactivada, sin membresía o con la membresía vencida, guarda localmente que esa persona necesitará revisar la preparación al volver.
+- En el primer ingreso exitoso después de reactivar la cuenta, el recorrido de primeros pasos aparece automáticamente desde la bienvenida.
+- Se muestra una sola vez: al cerrarlo o terminarlo, la marca de reactivación se elimina.
+- La marca está asociada a la cuenta, por lo que no afecta a otros distribuidores que usen el mismo dispositivo.
+- Los usuarios habituales no reciben un popup adicional y conservan el acceso manual desde **Mi perfil → Revisar primeros pasos**.
+- Versión: **v897 · Segura** → Cache `appi-v897-reactivacion-acompanada`.
+
 ## v896 · Primeros pasos desde Mi perfil y alerta simplificada
 
 - **Mi perfil** incorpora **Revisar primeros pasos** dentro de una sección clara de preparación de APPI.

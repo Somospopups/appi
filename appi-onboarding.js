@@ -1,5 +1,5 @@
 /* ============================================================
-   APPI · Primer ingreso acompañado (v895)
+   APPI · Primer ingreso acompañado (v897)
    Un único recorrido amable: acceso directo, MI PSA y avisos.
    Evita que los popups anteriores se superpongan y deja lo
    pendiente como una tarjeta tranquila en el Home.
@@ -21,7 +21,13 @@
   }
   function read() { try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { return null; } }
   function hasOldTutorial() { try { return localStorage.getItem(TUTO_KEY) === '1'; } catch (e) { return false; } }
-  function firstTimePending() { return !read() && !hasOldTutorial(); }
+  function reactivationPending() {
+    try { return !!(window.APPIAuth && typeof window.APPIAuth.needsReactivationReview === 'function' && window.APPIAuth.needsReactivationReview()); }
+    catch (e) { return false; }
+  }
+  // Los usuarios nuevos lo ven una vez. Quien vuelve después de una cuenta
+  // suspendida también lo recibe una vez, aunque ya hubiera hecho el tutorial.
+  function firstTimePending() { return reactivationPending() || (!read() && !hasOldTutorial()); }
   function managesFirstEntry() { return active || firstTimePending(); }
   function suppressAutomaticPopups() { return managesFirstEntry() || !!read(); }
   function isStandalone() {
@@ -349,6 +355,9 @@
         localStorage.setItem('appi_notif_listo_v1', '1');
         localStorage.setItem('appi_notif_popup_later', String(Date.now() + 400 * 24 * 3600 * 1000));
       }
+    } catch (e) {}
+    try {
+      if (window.APPIAuth && typeof window.APPIAuth.completeReactivationReview === 'function') window.APPIAuth.completeReactivationReview();
     } catch (e) {}
     var overlay = $('appiOnboardingOverlay');
     if (overlay) overlay.hidden = true;
