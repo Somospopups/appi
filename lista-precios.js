@@ -689,6 +689,23 @@
       '.lp-promo-strip{margin:0 0 10px;padding:9px 11px;border:1px solid #e8b43f;border-radius:13px;background:#fff3cb;color:#684300;font-size:10.5px;font-weight:850;line-height:1.35}' +
       '.lp-promo-strip b{font-weight:950}.lp-promo-strip small{display:block;margin-top:2px;font-size:9px;font-weight:750;color:#7b5b20}' +
       'body.dark .lp-promo-strip{background:#4f3908;border-color:#9a7424;color:#fff1bd}body.dark .lp-promo-strip small{color:#ead49c}' +
+      '#lpPriceAlertOverlay{position:fixed;inset:0;z-index:30100;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(28,20,22,.62);backdrop-filter:blur(7px)}' +
+      '#lpPriceAlertOverlay[hidden]{display:none!important}' +
+      '.lp-price-alert{position:relative;width:min(100%,410px);max-height:min(88vh,88dvh);overflow:auto;border-radius:25px;background:#fffaf5;box-shadow:0 25px 75px rgba(70,12,12,.42);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}' +
+      '.lp-price-alert-head{position:relative;overflow:hidden;padding:22px 50px 19px;background:linear-gradient(140deg,#bd463b,#8f292d);color:#fff;text-align:center}' +
+      '.lp-price-alert-head:after{content:"$";position:absolute;right:15px;top:-32px;font-size:104px;font-weight:950;color:rgba(255,255,255,.07);transform:rotate(8deg)}' +
+      '.lp-price-alert-close{position:absolute;z-index:2;right:13px;top:12px;width:34px;height:34px;border:1px solid rgba(255,255,255,.38);border-radius:50%;background:rgba(255,255,255,.13);color:#fff;font:700 20px/1 sans-serif;cursor:pointer}' +
+      '.lp-price-alert-icon{position:relative;z-index:1;width:58px;height:58px;margin:0 auto 9px;border-radius:18px;background:#fff;color:#a43131;display:grid;place-items:center;font-size:31px;font-weight:950;box-shadow:0 8px 18px rgba(66,10,10,.22)}' +
+      '.lp-price-alert-tag{position:relative;z-index:1;display:inline-block;margin-bottom:6px;padding:4px 8px;border-radius:999px;background:rgba(255,255,255,.17);font-size:9px;font-weight:950;letter-spacing:.08em;text-transform:uppercase}' +
+      '.lp-price-alert h2{position:relative;z-index:1;margin:0;color:#fff;font-size:21px;line-height:1.15}' +
+      '.lp-price-alert-body{padding:20px}' +
+      '.lp-price-alert-body>p{margin:0;color:#51555b;font-size:14px;line-height:1.48;text-align:center}' +
+      '.lp-price-alert-body>p b{color:#292c31}' +
+      '.lp-price-alert-reason{display:flex;gap:9px;align-items:flex-start;margin:16px 0;padding:11px 12px;border:1px solid #efc2b9;border-radius:13px;background:#fff0eb;color:#7e3030;font-size:12px;line-height:1.35;font-weight:750}' +
+      '.lp-price-alert-reason span:first-child{font-size:17px}' +
+      '.lp-price-alert-primary{width:100%;min-height:49px;border:0;border-radius:14px;background:#a93232;color:#fff;font:950 13px/1.15 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;letter-spacing:.01em;box-shadow:0 7px 16px rgba(169,50,50,.25);cursor:pointer}' +
+      '.lp-price-alert-secondary{width:100%;border:0;background:transparent;color:#74777d;font:800 11px/1.2 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding:13px 8px 1px;cursor:pointer}' +
+      'body.dark .lp-price-alert{background:#28242a}body.dark .lp-price-alert-body>p{color:#d7d1d4}body.dark .lp-price-alert-body>p b{color:#fff}body.dark .lp-price-alert-reason{background:#3c292b;border-color:#714044;color:#f2b9b4}' +
       '.lp-search{width:100%;min-height:44px;border:1px solid rgba(196,164,92,.45);border-radius:14px;padding:10px 12px;font:inherit;font-size:14px;background:#faf6ee;color:#2a2a32;margin:0 0 10px}' +
       '.lp-chips-wrap{position:relative;margin:0 0 6px}' +
       '.lp-chips-wrap.lp-more:after{content:"";position:absolute;right:0;top:0;bottom:10px;width:52px;pointer-events:none;background:linear-gradient(90deg,rgba(243,238,227,0),#f3eee3 70%)}' +
@@ -981,6 +998,50 @@
         ganToggle.setAttribute('aria-expanded', String(!panel.hidden));
       };
     }
+    if (!$('lpPriceAlertOverlay')) {
+      var alertOv = document.createElement('div');
+      alertOv.id = 'lpPriceAlertOverlay';
+      alertOv.hidden = true;
+      alertOv.innerHTML = '<div class="lp-price-alert" role="dialog" aria-modal="true" aria-labelledby="lpPriceAlertTitle" aria-describedby="lpPriceAlertText">' +
+        '<div class="lp-price-alert-head">' +
+          '<button type="button" class="lp-price-alert-close" data-price-alert-close aria-label="Cerrar alerta">×</button>' +
+          '<div class="lp-price-alert-icon" aria-hidden="true">!</div>' +
+          '<span class="lp-price-alert-tag">Importante</span>' +
+          '<h2 id="lpPriceAlertTitle">Verificá el precio antes de cada venta</h2>' +
+        '</div>' +
+        '<div class="lp-price-alert-body">' +
+          '<p id="lpPriceAlertText">Los valores pueden cambiar. Antes de confirmar una operación o enviar un presupuesto, <b>comprobá siempre el precio vigente.</b></p>' +
+          '<div class="lp-price-alert-reason"><span aria-hidden="true">🛡</span><span>Una verificación a tiempo ayuda a evitar diferencias e inconvenientes con tus clientes.</span></div>' +
+          '<button type="button" class="lp-price-alert-primary" data-price-alert-update>ACTUALIZAR Y VERIFICAR PRECIOS</button>' +
+          '<button type="button" class="lp-price-alert-secondary" data-price-alert-close>Continuar a la lista</button>' +
+        '</div>' +
+      '</div>';
+      document.body.appendChild(alertOv);
+      alertOv.querySelectorAll('[data-price-alert-close]').forEach(function (btn) {
+        btn.onclick = cerrarAlertaPrecios;
+      });
+      alertOv.querySelector('[data-price-alert-update]').onclick = function () {
+        cerrarAlertaPrecios();
+        setTimeout(actualizarPrecios, 140);
+      };
+      alertOv.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') cerrarAlertaPrecios();
+      });
+    }
+  }
+
+  function cerrarAlertaPrecios() {
+    var alerta = $('lpPriceAlertOverlay');
+    if (alerta) alerta.hidden = true;
+  }
+  function mostrarAlertaPrecios() {
+    var alerta = $('lpPriceAlertOverlay');
+    if (!alerta) return;
+    alerta.hidden = false;
+    setTimeout(function () {
+      var btn = alerta.querySelector('[data-price-alert-update]');
+      if (btn) btn.focus();
+    }, 80);
   }
 
   function htmlLista() {
@@ -3106,6 +3167,8 @@
     if (cont) cont.innerHTML = htmlLista();
     bind();
     pintarTodo();
+    // Pedido del usuario: la advertencia aparece en cada ingreso a la Lista.
+    setTimeout(mostrarAlertaPrecios, 120);
     cargar(function () {
       var cont2 = $('lpCont');
       if (cont2) cont2.innerHTML = htmlLista();

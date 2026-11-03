@@ -1,5 +1,5 @@
 const { test, expect } = require('@playwright/test');
-const { entrar } = require('./helpers/app-entrar.js');
+const { entrar, continuarLista } = require('./helpers/app-entrar.js');
 
 // v854 · La lista se armaba con el psa-catalogo.json del repo (que es el que
 // refresca el workflow de precios dos veces por día) y después se PISABA con el
@@ -15,6 +15,11 @@ const PRECIO_REPO = 1111111;
 const PRECIO_STORAGE = 2222222;
 
 const esGeneral = p => p.grupo !== 'packs' && p.grupo !== 'ingreso';
+
+async function abrirListaParaPrueba(page) {
+  await page.evaluate(() => window.abrirLista());
+  await continuarLista(page);
+}
 
 const clon = (base, actualizado, precio) => {
   const c = JSON.parse(JSON.stringify(base));
@@ -56,7 +61,7 @@ test('si el Storage tiene la lista más vieja no pisa los precios del repo', asy
   // Caso real de octubre: repo 25-Oct, Storage 15-Oct.
   await servirListas(page, '25-Oct-2026', '15-Oct-2026');
 
-  await page.evaluate(() => window.abrirLista());
+  await abrirListaParaPrueba(page);
 
   await expect(page.locator('#lpCont'), 'se ve el precio fresco del repo').toContainText('$1.111.111');
   await expect(page.locator('#lpCont'), 'el precio viejo del Storage no aparece').not.toContainText('$2.222.222');
@@ -67,7 +72,7 @@ test('si el Storage tiene la lista más nueva sí se aplica encima', async ({ pa
   // El camino que el comentario del código prometía desde el principio.
   await servirListas(page, '15-Oct-2026', '25-Oct-2026');
 
-  await page.evaluate(() => window.abrirLista());
+  await abrirListaParaPrueba(page);
 
   await expect(page.locator('#lpCont'), 'la lista más nueva del Storage manda').toContainText('$2.222.222');
   await expect(page.locator('#lpCont')).not.toContainText('$1.111.111');
@@ -77,7 +82,7 @@ test('una fuente sin fecha no pisa a una que sí la tiene', async ({ page }) => 
   await entrar(page);
   await servirListas(page, '25-Oct-2026', '');
 
-  await page.evaluate(() => window.abrirLista());
+  await abrirListaParaPrueba(page);
 
   await expect(page.locator('#lpCont'), 'sin fecha no hay de qué saber si es más nueva').toContainText('$1.111.111');
   await expect(page.locator('#lpCont')).not.toContainText('$2.222.222');
@@ -98,7 +103,7 @@ test('ya no existe el apartado Novedades ni la etiqueta NUEVO', async ({ page })
   await page.route('**/psa-planes.json*', route => json(route, clon(planesRepo, '25-Oct-2026')));
   await page.route('**/storage/v1/object/public/catalogo-psa/**', route => json(route, {}));
 
-  await page.evaluate(() => window.abrirLista());
+  await abrirListaParaPrueba(page);
 
   await expect(page.locator('#lpCont'), 'no queda la pestaña Novedades').not.toContainText('Novedades');
   await expect(page.locator('#lpCont'), 'no queda la etiqueta NUEVO').not.toContainText('NUEVO');
@@ -124,7 +129,7 @@ test('la Lista de precios excluye promociones y no resalta fichas en naranja', a
   await entrar(page);
   await servirListas(page, '25-Oct-2026', '');
 
-  await page.evaluate(() => window.abrirLista());
+  await abrirListaParaPrueba(page);
 
   const skus = await skusEn(page);
   expect(skus.filter(s => clavesPromocionales.includes(s)),
@@ -146,7 +151,7 @@ test('en "Todos" no aparecen ni Packs ni Opciones de ingreso', async ({ page }) 
   await entrar(page);
   await servirListas(page, '25-Oct-2026', '');
 
-  await page.evaluate(() => window.abrirLista());
+  await abrirListaParaPrueba(page);
 
   const skus = await skusEn(page);
   expect(skus.length, 'sigue mostrando el catálogo general').toBeGreaterThan(0);
@@ -161,7 +166,7 @@ test('la píldora Packs PSA muestra sólo los packs', async ({ page }) => {
   await entrar(page);
   await servirListas(page, '25-Oct-2026', '');
 
-  await page.evaluate(() => window.abrirLista());
+  await abrirListaParaPrueba(page);
   await page.getByRole('button', { name: 'Packs PSA', exact: true }).click();
 
   // Equivalencia exacta: ni falta ni sobra. No sirve mirar prefijos porque
@@ -177,7 +182,7 @@ test('la píldora Opciones de ingreso muestra sólo los ingresos', async ({ page
   await entrar(page);
   await servirListas(page, '25-Oct-2026', '');
 
-  await page.evaluate(() => window.abrirLista());
+  await abrirListaParaPrueba(page);
   await page.getByRole('button', { name: 'Opciones de ingreso', exact: true }).click();
 
   const skus = new Set(await skusEn(page));
@@ -191,7 +196,7 @@ test('ni el buscador trae packs ni ingresos en "Todos"', async ({ page }) => {
   await entrar(page);
   await servirListas(page, '25-Oct-2026', '');
 
-  await page.evaluate(() => window.abrirLista());
+  await abrirListaParaPrueba(page);
 
   // "PACK BELLEZA" sólo existe como pack: si aparece es que se coló.
   await page.fill('#lpSearch', 'PACK BELLEZA');

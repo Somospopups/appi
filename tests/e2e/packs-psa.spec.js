@@ -45,6 +45,13 @@ async function entrar(page) {
   });
 }
 
+async function continuarLista(page) {
+  const alerta = page.locator('#lpPriceAlertOverlay');
+  await alerta.waitFor({ state: 'visible', timeout: 10000 });
+  await alerta.getByRole('button', { name: 'Continuar a la lista' }).click();
+  await alerta.waitFor({ state: 'hidden' });
+}
+
 test.describe('Packs PSA en Lista de Precios', () => {
   test('muestra chip de Packs PSA, productos con composición, fotos y agrega al presupuesto', async ({ page }) => {
     await entrar(page);
@@ -56,6 +63,7 @@ test.describe('Packs PSA en Lista de Precios', () => {
     const hostList = page.locator('#lpList');
     await expect(hostList).toBeVisible({ timeout: 10000 });
     await page.waitForSelector('.lp-item', { timeout: 10000 });
+    await continuarLista(page);
 
     // Verificar que existe el chip de Packs PSA
     const chipPacks = page.locator('.lp-chip[data-g="packs"]');
@@ -119,6 +127,7 @@ test.describe('Packs PSA en Lista de Precios', () => {
       if (typeof openLista === 'function') openLista();
     });
     await page.waitForSelector('.lp-item', { timeout: 10000 });
+    await continuarLista(page);
 
     const chipPacks = page.locator('.lp-chip[data-g="packs"]');
     await chipPacks.click();
@@ -224,6 +233,7 @@ test.describe('Packs PSA en Lista de Precios', () => {
     await entrar(page);
     await page.evaluate(() => { if (typeof openLista === 'function') openLista(); });
     await page.waitForSelector('.lp-item', { timeout: 10000 });
+    await continuarLista(page);
 
     const skus = ['611010510', '611010580', '611120200', '611030560', '617110040'];
     for (const sku of skus) {

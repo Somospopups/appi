@@ -43,6 +43,7 @@ async function abrirSheetCon(page, cart, perfil) {
   mockGan(page);
   await page.evaluate(() => window.abrirLista());
   await expect(page.locator('#lpFab')).toBeVisible({ timeout: 15000 });
+  await base.continuarLista(page);
   await page.locator('#lpFab').click();
   await expect(page.locator('#lpSheet')).toHaveClass(/open/);
   await expect(page.locator('#lpSheetGanancia')).toContainText('SOLO PARA VOS', { timeout: 15000 });
@@ -126,6 +127,7 @@ test('sync de perfil: perfil viejo → se refresca solo con action "perfil"', as
   });
   await page.evaluate(() => window.abrirLista());
   await expect(page.locator('#lpFab')).toBeVisible({ timeout: 15000 });
+  await base.continuarLista(page);
   await page.locator('#lpFab').click();
   await expect(page.locator('#lpSheet')).toHaveClass(/open/);
   await page.waitForFunction(() => {

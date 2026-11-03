@@ -51,12 +51,20 @@ async function entrar(page) {
   });
 }
 
+async function continuarLista(page) {
+  const alerta = page.locator('#lpPriceAlertOverlay');
+  await alerta.waitFor({ state: 'visible', timeout: 10000 });
+  await alerta.getByRole('button', { name: 'Continuar a la lista' }).click();
+  await alerta.waitFor({ state: 'hidden' });
+}
+
 test('cada producto muestra la foto del Portal PCD en la lista de precios', async ({ page }) => {
   await entrar(page);
   await page.evaluate(() => {
     if (typeof openLista === 'function') openLista();
   });
   await page.waitForSelector('.lp-item', { timeout: 10000 });
+  await continuarLista(page);
 
   await page.fill('#lpSearch', 'SENIOR 4 BIANCO');
   await page.waitForTimeout(300);
@@ -94,6 +102,7 @@ test.describe('Bandeja desplegable de presupuesto sobre el dock', () => {
       if (typeof openLista === 'function') openLista();
     });
     await page.waitForSelector('.lp-item', { timeout: 10000 });
+    await continuarLista(page);
 
     const fab = page.locator('#lpFab');
     await expect(fab).toBeHidden();
@@ -175,6 +184,7 @@ test.describe('Bandeja desplegable de presupuesto sobre el dock', () => {
       if (typeof openLista === 'function') openLista();
     });
     await page.waitForSelector('.lp-item', { timeout: 10000 });
+    await continuarLista(page);
 
     const plusBtn = page.locator('.lp-qty button[data-act="mas"]').first();
     await plusBtn.click();
@@ -204,6 +214,7 @@ test.describe('Bandeja desplegable de presupuesto sobre el dock', () => {
       if (typeof openLista === 'function') openLista();
     });
     await page.waitForSelector('.lp-item', { timeout: 10000 });
+    await continuarLista(page);
 
     const plusBtn = page.locator('.lp-qty button[data-act="mas"]').first();
     await plusBtn.click();
@@ -236,6 +247,7 @@ test('producto con plan canje aparece en un renglón y conserva su foto', async 
     if (typeof openLista === "function") openLista();
   });
   await page.waitForSelector(".lp-item", { timeout: 10000 });
+  await continuarLista(page);
 
   await page.fill("#lpSearch", "611010510");
   await page.waitForTimeout(300);
@@ -317,6 +329,7 @@ test('los productos con canje aparecen primero', async ({ page }) => {
   await entrar(page);
   await page.evaluate(() => { if (typeof openLista === 'function') openLista(); });
   await page.waitForSelector('.lp-item', { timeout: 10000 });
+  await continuarLista(page);
   const verify = async () => {
     const filas = await page.locator('#lpList .lp-item').evaluateAll(items => items.map(el => ({
       canje: el.classList.contains('lp-item-has-canje'), clave: el.dataset.sku
@@ -341,6 +354,7 @@ test('Iontrix respeta lista oficial y los botones centran su contenido', async (
   await entrar(page);
   await page.evaluate(() => { if (typeof openLista === 'function') openLista(); });
   await page.waitForSelector('.lp-item', { timeout: 10000 });
+  await continuarLista(page);
   await page.fill('#lpSearch', '611290050');
   const row = page.locator('#lpList .lp-item').first();
   await expect(row.locator('.lp-price-choice').nth(0)).toContainText('1.100.700');
@@ -356,6 +370,7 @@ test('presupuesto renovado muestra total grande, fotos, tarjetas y permite desli
   await entrar(page);
   await page.evaluate(() => { if (typeof openLista === 'function') openLista(); });
   await page.waitForSelector('.lp-item', { timeout: 10000 });
+  await continuarLista(page);
   await page.fill('#lpSearch', '611010510');
   await page.locator('#lpList .lp-price-choice').nth(1).click();
   await page.locator('#lpFab').click();
@@ -454,6 +469,7 @@ test('swipe respeta movimiento reducido sin crear el vuelo al cesto', async ({ p
   await entrar(page);
   await page.evaluate(() => { if (typeof openLista === 'function') openLista(); });
   await page.waitForSelector('.lp-item', { timeout: 10000 });
+  await continuarLista(page);
   await page.fill('#lpSearch', '611010510');
   await page.locator('#lpList .lp-price-choice').nth(1).click();
   await page.locator('#lpFab').click();
@@ -477,6 +493,7 @@ test('presupuesto compacto despliega ganancias y descuentos por producto', async
   await entrar(page);
   await page.evaluate(() => { if (typeof openLista === 'function') openLista(); });
   await page.waitForSelector('.lp-item', { timeout: 10000 });
+  await continuarLista(page);
   await page.fill('#lpSearch', '611010510');
   await page.locator('#lpList .lp-price-choice').nth(1).click();
   await page.locator('#lpFab').click();

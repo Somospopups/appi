@@ -1,5 +1,5 @@
 const { test, expect } = require('@playwright/test');
-const { entrar } = require('./helpers/app-entrar.js');
+const { entrar, continuarLista } = require('./helpers/app-entrar.js');
 const fs = require('fs');
 const path = require('path');
 const planes = require('../../psa-planes.json');
@@ -48,6 +48,7 @@ test('Presupuesto ofrece las cuotas exactas y explica beneficio, canal y vigenci
   await entrar(page);
   await page.evaluate(() => { if (typeof openLista === 'function') openLista(); });
   await page.waitForSelector('.lp-item', { timeout: 10000 });
+  await continuarLista(page);
   await page.fill('#lpSearch', '611010510');
   await page.locator('#lpList .lp-price-choice').nth(1).click();
   await page.locator('#lpFab').click();

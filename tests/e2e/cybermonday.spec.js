@@ -1,7 +1,7 @@
 const { test, expect } = require('@playwright/test');
 const fs = require('fs');
 const path = require('path');
-const { entrar } = require('./helpers/app-entrar.js');
+const { entrar, continuarLista } = require('./helpers/app-entrar.js');
 const beneficios = require('../../psa-beneficios.json');
 
 const ROOT = path.join(__dirname, '..', '..');
@@ -11,6 +11,7 @@ async function abrirListaEn(page, fecha) {
   await entrar(page);
   await page.evaluate(() => window.abrirLista());
   await page.locator('#lpList .lp-item').first().waitFor({ state: 'visible', timeout: 15000 });
+  await continuarLista(page);
 }
 
 async function producto(page, sku) {

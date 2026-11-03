@@ -6,6 +6,15 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v893 · Verificación preventiva de precios
+
+- Al ingresar a Lista de precios aparece una alerta preventiva bordó para recordar que los valores pueden cambiar.
+- La advertencia se muestra en cada ingreso y puede cerrarse para continuar sin actualizar.
+- **ACTUALIZAR Y VERIFICAR PRECIOS** cierra la alerta y ejecuta directamente la actualización existente.
+- El popup reutiliza la animación 4 de APPI, con rebote suave y sonido de gota, e incluye modo oscuro y controles accesibles.
+- Se conservan la lista, los precios, los beneficios CyberMonday y la financiación publicados en v892.
+- Versión: **v893 · Segura** → Cache `appi-v893-alerta-precios`.
+
 ## v892 · Beneficios CyberMonday PSA
 
 - Del 2 al 4 de noviembre de 2026 aplica automáticamente 45% OFF a PSA Vero, 25% OFF a PSA Iontrix 3 y 10% OFF a todas las variantes PSA Senior4.

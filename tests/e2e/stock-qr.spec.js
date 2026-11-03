@@ -83,6 +83,13 @@ async function entrar(page) {
   await expect(page.locator('#lockScreen')).toHaveClass(/hidden/);
 }
 
+async function continuarLista(page) {
+  const alerta = page.locator('#lpPriceAlertOverlay');
+  await alerta.waitFor({ state: 'visible', timeout: 10000 });
+  await alerta.getByRole('button', { name: 'Continuar a la lista' }).click();
+  await alerta.waitFor({ state: 'hidden' });
+}
+
 /* Genera el SVG de un QR con el generador local del repo (qr-code.js). */
 async function svgQR(page, texto) {
   return page.evaluate((t) => {
@@ -444,6 +451,7 @@ test('lista de precios: un renglón ofrece precio normal y precio de canje', asy
   await entrar(page);
   await page.evaluate(() => window.abrirLista());
   await page.locator('#lpList .lp-item').first().waitFor({ state: 'visible', timeout: 15000 });
+  await continuarLista(page);
 
   await page.locator('#lpSearch').fill('611010510');
   const senior4 = page.locator('#lpList .lp-item').filter({ hasText: '611010510' });

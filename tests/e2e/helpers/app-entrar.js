@@ -65,4 +65,14 @@ async function entrar(page, { usuarios = USUARIOS } = {}) {
   await page.evaluate(() => window.showView('view-home'));
 }
 
-module.exports = { USER_ID, dias, ddmmyyyy, USUARIOS, entrar };
+// Desde v893 la advertencia de precios es parte del ingreso real. Los specs que
+// prueban acciones dentro de la lista la cierran de forma explícita; el spec
+// dedicado a la alerta no usa este helper y verifica el popup completo.
+async function continuarLista(page) {
+  const alerta = page.locator('#lpPriceAlertOverlay');
+  await alerta.waitFor({ state: 'visible', timeout: 10000 });
+  await alerta.getByRole('button', { name: 'Continuar a la lista' }).click();
+  await alerta.waitFor({ state: 'hidden' });
+}
+
+module.exports = { USER_ID, dias, ddmmyyyy, USUARIOS, entrar, continuarLista };

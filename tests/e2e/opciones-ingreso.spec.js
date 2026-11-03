@@ -45,12 +45,20 @@ async function entrar(page) {
   });
 }
 
+async function continuarLista(page) {
+  const alerta = page.locator('#lpPriceAlertOverlay');
+  await alerta.waitFor({ state: 'visible', timeout: 10000 });
+  await alerta.getByRole('button', { name: 'Continuar a la lista' }).click();
+  await alerta.waitFor({ state: 'hidden' });
+}
+
 test('la lista de precios muestra Opciones de ingreso con foto y precio oficial', async ({ page }) => {
   await entrar(page);
   await page.evaluate(() => {
     if (typeof openLista === 'function') openLista();
   });
   await page.waitForSelector('.lp-item', { timeout: 15000 });
+  await continuarLista(page);
 
   const chip = page.locator('#lpChips [data-g="ingreso"]');
   await expect(chip).toBeVisible();
