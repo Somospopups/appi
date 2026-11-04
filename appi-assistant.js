@@ -1,4 +1,4 @@
-/* APPI v904 · Appi, asistente animada con la gotita vectorial, voz y navegación segura. */
+/* APPI v905 · Appi, asistente animada con la gotita vectorial, voz y navegación segura. */
 (function(){
   'use strict';
   const STATES=new Set(['normal','thinking','happy','surprise','alert']);
@@ -12,48 +12,81 @@
   }
   function normalize(text){return String(text||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase('es-AR').replace(/[¿?¡!.,;:]/g,' ').replace(/\s+/g,' ').trim()}
   function firstName(){try{const p=window.APPIAuth&&window.APPIAuth.currentProfile&&window.APPIAuth.currentProfile();return String(p&&p.nombre||'').trim().split(/\s+/)[0]||''}catch(e){return''}}
-  // --- Appi en el dock -------------------------------------------------
-  // "guardada" = adentro del dock (no se ve). "afuera" = parada arriba del
-  // dock, saludando. El botón Appi del dock la saca y la vuelve a guardar.
-  const DOCK_KEY='appi_dock_estado';
-  function dockButton(){return document.getElementById('ptAppi')}
-  function dockState(){return root&&root.dataset.dock==='afuera'?'afuera':'guardada'}
-  function dockButtonVisible(){const b=dockButton();if(!b)return false;const r=b.getBoundingClientRect();return r.width>0&&r.height>0}
-  function paintDock(){
-    const out=dockState()==='afuera',b=dockButton();
-    if(b){b.classList.toggle('pt-appi-on',out);b.setAttribute('aria-pressed',out?'true':'false')}
-  }
+  // --- Appi asomada en el borde derecho ---------------------------------
+  // "asomada" = en el borde derecho de la pantalla, inclinada hacia adentro y
+  // saludando cada tanto. "afuera" = parada arriba del dock con el panel
+  // abierto. Un toque la saca de su escondite; al cerrar, vuelve sola.
+  let greetTimer=0,idleTimer=0,backTimer=0,waveTimer=0,saludosOn=true;
+  function dockState(){return root&&root.dataset.dock==='afuera'?'afuera':'asomada'}
   function setDock(state,options){
     options=options||{};
     if(!root)return dockState();
-    const next=state==='afuera'?'afuera':'guardada';
-    // Sin dock a la vista (por ejemplo en una computadora) no hay dónde
-    // guardarla: Appi se queda afuera, como siempre.
-    if(next==='guardada'&&!dockButtonVisible())return dockState();
-    root.dataset.dock=next;paintDock();
-    // El salto se anima una sola vez: se marca y se saca enseguida.
-    if(next==='afuera'){root.classList.remove('appi-jump');void root.offsetWidth;root.classList.add('appi-jump');setTimeout(()=>root&&root.classList.remove('appi-jump'),720)}
-    if(!options.silent){try{localStorage.setItem(DOCK_KEY,next)}catch(e){}}
-    if(next==='guardada'){close();lastAnswer='';if(window.APPIGotita)window.APPIGotita.setState(gotita,'normal')}
+    const next=state==='afuera'?'afuera':'asomada';
+    const cambio=root.dataset.dock!==next;
+    root.dataset.dock=next;
+    if(next==='afuera'&&cambio){
+      // El salto se anima una sola vez: se marca y se saca enseguida.
+      root.classList.remove('appi-jump');void root.offsetWidth;root.classList.add('appi-jump');
+      setTimeout(()=>root&&root.classList.remove('appi-jump'),720);
+    }
+    if(next==='asomada'){
+      if(options.silent!==true)close();
+      if(window.APPIGotita)window.APPIGotita.setState(gotita,'normal');
+    }
     return next;
   }
   function toggleFromDock(){
     if(!root)return;
-    if(dockState()==='afuera'){setDock('guardada');return}
+    if(dockState()==='afuera'&&!root.classList.contains('appi-open')){setDock('asomada');return}
+    if(root.classList.contains('appi-open')){close();return}
     setDock('afuera');
-    // Primero salta y se acomoda sobre el dock; recién ahí abre el panel.
-    setTimeout(()=>{if(dockState()==='afuera'&&!root.classList.contains('appi-open'))open()},520);
+    // Primero sale de su escondite y se acomoda sobre el dock; ahí se abre.
+    setTimeout(()=>{if(root&&!root.classList.contains('appi-open'))open()},520);
+  }
+  // El saludo: se estira hacia la pantalla y levanta la mano. Nunca con el
+  // panel abierto ni con la app en segundo plano.
+  function saludar(ms){
+    if(!root||!saludosOn)return;
+    if(root.classList.contains('appi-open'))return;
+    if(document.hidden)return;
+    root.classList.add('appi-greeting');
+    const go=gotita&&gotita.querySelector('svg.go');
+    if(go){go.classList.remove('is-blinking');void go.offsetWidth;go.classList.add('go-wave-l')}
+    clearTimeout(waveTimer);
+    waveTimer=setTimeout(function(){
+      if(!root)return;
+      root.classList.remove('appi-greeting');
+      const g=gotita&&gotita.querySelector('svg.go');if(g)g.classList.remove('go-wave-l');
+    },ms||3400);
+  }
+  // Los saludos automáticos se pueden apagar (por ejemplo en una prueba o
+  // cuando la persona prefiere que Appi no se mueva sola).
+  function saludos(on){
+    saludosOn=on!==false;
+    if(!saludosOn&&root){
+      root.classList.remove('appi-greeting');
+      const g=gotita&&gotita.querySelector('svg.go');if(g)g.classList.remove('go-wave-l');
+    }
+    return saludosOn;
   }
   function initDock(){
-    let saved='';try{saved=localStorage.getItem(DOCK_KEY)||''}catch(e){}
-    if(!dockButtonVisible()){root.dataset.dock='afuera';paintDock();return}
-    root.dataset.dock=saved==='afuera'?'afuera':'guardada';paintDock();
+    // Siempre arranca asomada: no ocupa lugar y está a la vista.
+    root.dataset.dock='asomada';
+    if(window.APPIGotita)window.APPIGotita.setState(gotita,'normal');
+    // Cada tanto saluda sola, sin interrumpir nada.
+    clearInterval(idleTimer);
+    idleTimer=setInterval(function(){
+      if(!root||!saludosOn||document.hidden)return;
+      if(root.classList.contains('appi-open'))return;
+      if(root.classList.contains('appi-greeting'))return;
+      saludar();
+    },15000);
   }
 
   function build(){
     if(root)return;
     root=document.createElement('aside');
-    root.id='appiAssistant';root.dataset.state='normal';root.dataset.dock='guardada';root.setAttribute('aria-label','Appi, asistente personal');
+    root.id='appiAssistant';root.dataset.state='normal';root.dataset.dock='asomada';root.setAttribute('aria-label','Appi, asistente personal');
     root.innerHTML=`
       <div class="appi-avatar-shell" aria-hidden="true">
         <div class="appi-gotita" id="appiGotita"></div>
@@ -110,7 +143,7 @@
     actionBtn.addEventListener('click',()=>{const fn=currentAction;currentAction=null;setAction();if(typeof fn==='function'){try{fn();setTimeout(close,260)}catch(e){console.error(e);setState('alert');setCopy('No pude abrir esa sección','Probá nuevamente desde el dock.')}}});
     document.addEventListener('keydown',event=>{if(event.key==='Escape'&&root.classList.contains('appi-open'))close()});
     document.addEventListener('click',event=>{if(!root.classList.contains('appi-open'))return;if(event.target.closest('#appiAssistant'))return;close()},true);
-    document.querySelectorAll('#pageTabs button').forEach(button=>{if(button.id==='ptAppi')return;button.addEventListener('click',()=>{if(root.classList.contains('appi-open'))close()})});
+    document.querySelectorAll('#pageTabs button').forEach(button=>{button.addEventListener('click',()=>{if(root.classList.contains('appi-open'))close()})});
     pintarDestinos();
     waitUntilAppReady();
   }
@@ -134,22 +167,16 @@
     let seen=false;try{seen=localStorage.getItem(key)==='1'}catch(e){}
     if(seen)return;
     clearTimeout(greetingTimer);
-    greetingTimer=setTimeout(()=>{
-      if(!root||root.classList.contains('appi-open'))return;
+    greetingTimer=setTimeout(function(){
+      if(!root||!saludosOn||root.classList.contains('appi-open'))return;
       try{localStorage.setItem(key,'1')}catch(e){}
-      if(dockState()==='guardada'){
-        // Guardada no se la ve: el aviso es un latido en su botón del dock.
-        const b=dockButton();
-        if(b){b.classList.add('pt-appi-hi');setTimeout(()=>b.classList.remove('pt-appi-hi'),4600)}
-        return;
-      }
-      root.classList.add('appi-greeting');
-      setTimeout(()=>root&&root.classList.remove('appi-greeting'),4300);
-    },1800);
+      saludar(4300);
+    },1600);
   }
   function open(){
     if(!root)return;
-    if(dockState()==='guardada')setDock('afuera');
+    clearTimeout(backTimer);
+    if(dockState()!=='afuera')setDock('afuera');
     pintarDestinos();
     root.classList.remove('appi-greeting');root.classList.add('appi-open');el('appiAvatarHit').setAttribute('aria-expanded','true');
     if(!lastAnswer){setState('normal');setCopy('¿Qué necesitás?','');}
@@ -165,6 +192,14 @@
     if(input)input.value='';
     mostrarDestinos();
     root.classList.remove('appi-open','appi-listening');el('appiAvatarHit').setAttribute('aria-expanded','false');setAction();setTimeout(()=>setState('normal'),360);
+    // Al cerrar el panel vuelve sola a asomarse al borde: no queda en el medio.
+    clearTimeout(backTimer);
+    backTimer=setTimeout(function(){
+      if(!root||!root.classList.contains('appi-open')){
+        root&&root.classList.remove('appi-greeting');
+        root&&(root.dataset.dock='asomada');
+      }
+    },1100);
   }
   function setState(state){
     state=STATES.has(state)?state:'normal';
@@ -507,7 +542,7 @@
     build();
     vigilarVistas();
     window.APPIToggle=toggleFromDock;
-    window.APPIAssistant={open,close,setState,ask,respond,speak,stopSpeaking,setDock,toggleDock:toggleFromDock,get dock(){return dockState()},get state(){return root&&root.dataset.state},get isOpen(){return !!(root&&root.classList.contains('appi-open'))}};
+    window.APPIAssistant={open,close,setState,ask,respond,speak,stopSpeaking,setDock,saludar,saludos,toggleDock:toggleFromDock,get dock(){return dockState()},get state(){return root&&root.dataset.state},get isOpen(){return !!(root&&root.classList.contains('appi-open'))}};
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();

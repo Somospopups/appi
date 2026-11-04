@@ -6,13 +6,22 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v905 · Appi se asoma desde el borde derecho
+
+- **El dock vuelve a tener cuatro botones.** Se quitó el quinto botón de Appi que achicaba a los demás: Home, Mi mes, Mi negocio y Herramientas recuperan su tamaño y su etiqueta completos.
+- **Appi vive asomada en el borde derecho** de la pantalla, inclinada hacia adentro y con el costado cortado por el borde: no tapa el dock ni la navegación.
+- **Saluda cada tanto:** se estira hacia la pantalla, levanta la mano y aparece la viñeta *"¡Hola! Tocame y hablamos."*. El primer saludo del día llega a los dos segundos de abrir la app.
+- **Un toque y sale de su escondite:** se desliza hasta pararse sobre el dock con el panel abierto, como siempre. **Al cerrar el panel vuelve sola** al borde derecho.
+- Los saludos automáticos se pueden apagar con `APPIAssistant.saludos(false)`.
+- Versión: **v905 · Segura** → Cache `appi-v905-asomada`.
+
 ## v904 · La gotita Appi, dibujada y animada de verdad
 
 - La asistente dejó de ser cinco imágenes WebP que se movían: ahora es **un dibujo vectorial propio (SVG)** con piezas separadas, en celeste sólido y sin degradés.
 - Se animan de verdad el cuerpo, los párpados, las pupilas, las cejas, la boca, los brazos y los pies.
 - En reposo respira, parpadea y saluda con la mano; al pensar se inclina y le aparecen burbujas; al festejar salta con destellos; al sorprenderse se estira con admiración; al alertar se acerca con un pulso ámbar.
 - La boca se mueve sílaba por sílaba mientras Appi lee en voz alta, y el botón pasa a **Detener** para cortar la lectura.
-- **Appi ahora vive en el dock:** hay un botón suyo al final. Un toque la saca y salta para pararse sobre el dock con el panel abierto; otro toque la guarda y la pantalla queda limpia.
+- **Appi vive en el dock:** hay un botón suyo al final. *(Reemplazado en la v905 por la gotita asomada: el quinto botón achicaba los otros cuatro.)*
 - El panel es un buscador con cuatro accesos directos que son **las pantallas que más usa cada persona** (se cuentan en el propio teléfono).
 - Ese buscador también busca **en los datos**: usuarios, distribuidores del equipo, números de serie de los purificadores, productos de la lista, contactos y pantallas, cada grupo por separado, con acceso directo al resultado y la coincidencia resaltada.
 - Se retiró la carrera que podía pisar una respuesta con el estado "normal" al terminar de cargar la app.

@@ -38,7 +38,7 @@ async function entrar(page){
   await page.waitForFunction(()=>window.APPIAssistant&&document.getElementById('appiAssistant')&&document.getElementById('appiAssistant').dataset.ready==='true'&&window.APPIBuscar);
 }
 async function abrirAppi(page){
-  await page.locator('#ptAppi').click();
+  await page.locator('#appiAvatarHit').click();
   await expect(page.locator('#appiAssistant')).toHaveClass(/appi-open/);
 }
 async function buscar(page,texto){

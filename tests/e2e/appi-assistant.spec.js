@@ -20,41 +20,64 @@ async function entrar(page,{desktop=false}={}){
   await page.locator('#distributorInput').fill('02-9802014');await page.locator('#distributorPassword').fill('Clave1234');await page.locator('#btnDistributorLogin').click();await expect(page.locator('#lockScreen')).toHaveClass(/hidden/);await page.waitForFunction(()=>window.APPIAssistant&&document.getElementById('appiAssistant')&&document.getElementById('appiAssistant').dataset.ready==='true');
 }
 
+// Appi está asomada en el borde derecho: tocarla la saca y abre el panel.
 async function sacarAppi(page){
-  await page.locator('#ptAppi').click();
+  await page.locator('#appiAvatarHit').click();
   await expect(page.locator('#appiAssistant')).toHaveClass(/appi-open/);
 }
-// Ya afuera, tocarla a ella vuelve a abrir el panel (el botón del dock la guarda).
+// Con el panel cerrado vuelve a asomarse; se la vuelve a tocar a ella.
 async function abrirPanelDeAppi(page){
   await page.locator('#appiAvatarHit').click();
   await expect(page.locator('#appiAssistant')).toHaveClass(/appi-open/);
 }
 
-test('Appi vive en el dock: un toque la saca y otro la guarda',async({page})=>{
+test('Appi se asoma desde el borde derecho y no achica el dock',async({page})=>{
   await entrar(page);
-  const asist=page.locator('#appiAssistant'),boton=page.locator('#ptAppi'),shell=page.locator('.appi-avatar-shell');
-  // El botón está en el dock, al final, y arranca guardada.
-  await expect(boton).toBeVisible();await expect(boton).toContainText('Appi');
-  await expect(asist).toHaveAttribute('data-dock','guardada');
-  expect(await shell.evaluate(n=>getComputedStyle(n).opacity)).toBe('0');
-  expect(await page.locator('#appiAvatarHit').evaluate(n=>getComputedStyle(n).pointerEvents)).toBe('none');
-  // Un toque: salta y se para sobre el dock, con el panel abierto.
-  await boton.click();
+  const asist=page.locator('#appiAssistant');
+  // El dock vuelve a tener cuatro botones: no hay quinto botón de Appi.
+  await expect(page.locator('#pageTabs button')).toHaveCount(4);
+  await expect(page.locator('#ptAppi')).toHaveCount(0);
+  // Sus cuatro botones conservan el tamaño de siempre.
+  const anchos=await page.locator('#pageTabs button').evaluateAll(ns=>ns.map(n=>n.getBoundingClientRect().width));
+  anchos.forEach(w=>expect(w).toBeGreaterThan(80));
+  await expect(asist).toHaveAttribute('data-dock','asomada');
+  // Se la ve asomada: pegada al borde derecho y cortada por la pantalla.
+  const m=await page.evaluate(()=>{const s=document.querySelector('.appi-avatar-shell').getBoundingClientRect(),d=document.querySelector('#pageTabs').getBoundingClientRect();
+    return{left:s.left,right:s.right,vw:innerWidth,shellBottom:s.bottom,dockTop:d.top,opacity:getComputedStyle(document.querySelector('.appi-avatar-shell')).opacity}});
+  expect(m.opacity).toBe('1');
+  expect(m.right).toBeGreaterThan(m.vw);
+  expect(m.left).toBeGreaterThan(m.vw-110);
+  expect(m.shellBottom).toBeLessThan(m.dockTop+2);
+  // Un toque: sale de su escondite, se para sobre el dock y abre el panel.
+  await page.locator('#appiAvatarHit').click();
   await expect(asist).toHaveAttribute('data-dock','afuera');
-  await expect(asist).toHaveClass(/appi-open/);await expect(boton).toHaveAttribute('aria-pressed','true');
+  await expect(asist).toHaveClass(/appi-open/);
   await expect(page.locator('#appiGotita svg.go')).toHaveCount(1);
   await expect(page.locator('#appiAssistant img')).toHaveCount(0);
-  const m=await page.evaluate(()=>{const s=document.querySelector('.appi-avatar-shell').getBoundingClientRect(),d=document.querySelector('#pageTabs').getBoundingClientRect();
-    return{shellBottom:s.bottom,dockTop:d.top,opacity:getComputedStyle(document.querySelector('.appi-avatar-shell')).opacity}});
-  expect(m.opacity).toBe('1');expect(Math.abs(m.shellBottom-m.dockTop)).toBeLessThan(16);
-  // Otro toque: se guarda y el panel se cierra.
-  await boton.click();
-  await expect(asist).toHaveAttribute('data-dock','guardada');
+  const n=await page.evaluate(()=>{const s=document.querySelector('.appi-avatar-shell').getBoundingClientRect(),d=document.querySelector('#pageTabs').getBoundingClientRect();return{shellBottom:s.bottom,dockTop:d.top}});
+  expect(Math.abs(n.shellBottom-n.dockTop)).toBeLessThan(16);
+  // Al cerrar, vuelve sola al borde: no queda en el medio de la pantalla.
+  await page.locator('#appiClose').click();
+  await expect(asist).toHaveAttribute('data-dock','asomada',{timeout:4000});
   await expect(asist).not.toHaveClass(/appi-open/);
 });
 
+test('cuando saluda levanta la mano hacia la pantalla',async({page})=>{
+  await entrar(page);
+  await page.evaluate(()=>window.APPIAssistant.saludar(4200));
+  await expect(page.locator('#appiAssistant')).toHaveClass(/appi-greeting/);
+  const brazo=page.locator('#appiGotita .go-arm-l');
+  await expect(brazo).toHaveCount(1);
+  expect(await brazo.evaluate(el=>getComputedStyle(el).animationName)).toBe('goWaveArmL');
+  await expect(page.locator('#appiMiniBubble')).toBeVisible();
+  // Con el panel abierto no saluda: sería molesto.
+  await page.locator('#appiAvatarHit').click();
+  await expect(page.locator('#appiAssistant')).toHaveClass(/appi-open/);
+  expect(await page.locator('#appiAssistant').evaluate(el=>el.classList.contains('appi-greeting'))).toBe(false);
+});
+
 test('el mensaje abre hacia la izquierda, arriba del dock, sin tapar la navegación',async({page})=>{
-  await entrar(page);await sacarAppi(page);await expect(page.locator('#appiPanel')).toBeVisible();await page.waitForTimeout(120);
+  await entrar(page);await sacarAppi(page);await expect(page.locator('#appiPanel')).toBeVisible();await page.waitForTimeout(420);
   const m=await page.evaluate(()=>{const p=document.querySelector('#appiPanel').getBoundingClientRect(),s=document.querySelector('.appi-avatar-shell').getBoundingClientRect(),d=document.querySelector('#pageTabs').getBoundingClientRect();return{panelRight:p.right,shellLeft:s.left,panelBottom:p.bottom,dockTop:d.top}});
   expect(m.panelRight).toBeLessThanOrEqual(m.shellLeft+24);expect(m.panelBottom).toBeLessThanOrEqual(m.dockTop+1);
 });
@@ -102,8 +125,8 @@ test('los atajos del panel abren la pantalla de verdad, en un solo toque',async(
   await entrar(page);await sacarAppi(page);
   await page.locator('.appi-row',{hasText:'Mis contactos'}).click();
   await expect(page.locator('#view-gestion')).toHaveClass(/active/);await expect(page.locator('#appiAssistant')).not.toHaveClass(/appi-open/);
-  // Sigue afuera, parada sobre el dock: se la vuelve a tocar a ella.
-  await expect(page.locator('#appiAssistant')).toHaveAttribute('data-dock','afuera');
+  // Vuelve sola a asomarse al borde: se la vuelve a tocar a ella.
+  await expect(page.locator('#appiAssistant')).toHaveAttribute('data-dock','asomada',{timeout:4000});
   await abrirPanelDeAppi(page);await page.locator('.appi-row',{hasText:'Histórico'}).click();
   await expect(page.locator('#view-historico')).toHaveClass(/active/);
   await abrirPanelDeAppi(page);await page.locator('.appi-row',{hasText:'Mi Encuesta'}).click();

@@ -1,4 +1,4 @@
-/* APPI v904 · La gotita Appi: dibujo vectorial y animaciones propias.
+/* APPI v905 · La gotita Appi: dibujo vectorial y animaciones propias.
    Todo el personaje es SVG + CSS: no hay imágenes WebP ni fotogramas.
    Las piezas que se mueven son nodos reales del dibujo:
    cuerpo, párpados/ojos, pupilas, cejas, boca, brazos, pies y efectos. */
@@ -192,6 +192,16 @@
   76%{transform:rotate(8deg)}
   82%{transform:rotate(-14deg)}
   88%{transform:rotate(4deg)}
+}
+/* Saludo hacia la pantalla: cuando Appi se asoma desde el borde derecho, la
+   mano que se ve es la izquierda del dibujo, así que es la que saluda. */
+.go.go-wave-l .go-arm-l{animation:goWaveArmL 1.05s ease-in-out 3}
+@keyframes goWaveArmL{
+  0%,100%{transform:translate(0,0) rotate(0)}
+  14%{transform:translate(-20px,-27px) rotate(26deg)}
+  40%{transform:translate(-23px,-32px) rotate(0deg)}
+  66%{transform:translate(-20px,-27px) rotate(-24deg)}
+  86%{transform:translate(-8px,-12px) rotate(8deg)}
 }
 @keyframes goArmSway{
   0%,100%{transform:rotate(0)}

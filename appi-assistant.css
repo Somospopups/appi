@@ -190,52 +190,70 @@ body.appi-login-abierto #appiAssistant,body.appi-admin #appiAssistant{display:no
 @media(max-width:360px){.appi-panel{right:98px;width:calc(100vw - 110px);padding:12px}.appi-avatar-shell{right:-2px;width:116px;height:116px}.appi-avatar-hit{right:5px;width:92px}}
 @media(prefers-reduced-motion:reduce){#appiAssistant *,#appiAssistant *::before,#appiAssistant *::after{animation:none!important;transition-duration:.01ms!important}}
 
-/* === APPI EN EL DOCK ================================================
-   Pedido del propietario: Appi tiene su lugar en el dock. Un toque la
-   saca y salta arriba del dock; otro toque la vuelve a guardar. */
-#pageTabs button.pt-appi{position:relative}
-.pt-appi-face{
-  display:grid;place-items:center;width:24px;height:24px;
-  color:#5ec1f2;
-  transition:transform .35s cubic-bezier(.34,1.56,.64,1);
+/* === APPI SE ASOMA DESDE LA DERECHA =================================
+   Pedido del propietario: nada de un quinto botón que achique el dock.
+   Appi vive asomada en el borde derecho, se inclina hacia la pantalla y
+   saluda cada tanto. Cuando la tocan, sale de su escondite, se para arriba
+   del dock y ahí se abre el panel. Al cerrarlo vuelve a asomarse. */
+#appiAssistant[data-dock="asomada"] .appi-avatar-shell{
+  right:-46px;
+  bottom:calc(var(--appi-safe) + 110px);
+  width:112px;height:112px;
+  transform:translateY(0) rotate(-8deg);
+  opacity:1;visibility:visible;
+  transition:right .48s cubic-bezier(.2,1.16,.4,1),bottom .48s cubic-bezier(.2,1.16,.4,1),
+             transform .48s cubic-bezier(.2,1.16,.4,1),opacity .34s ease;
 }
-#pageTabs .pt-appi-face svg{width:26px;height:26px;stroke-width:0;filter:drop-shadow(0 2px 3px rgba(18,60,99,.16))}
-.pt-appi-face::after{
-  content:"";position:absolute;top:6px;width:7px;height:7px;border-radius:50%;
-  background:#e5a036;box-shadow:0 0 0 2px #f3eee3;opacity:0;transition:opacity .3s ease;
+/* La mano de la pantalla se mueve despacio mientras espera. */
+#appiAssistant[data-dock="asomada"] .appi-gotita svg.go .go-arm-l{animation:goArmSway 4.4s ease-in-out infinite}
+/* Y cuando saluda, esa misma mano se levanta: gana a la anterior. */
+#appiAssistant .appi-gotita svg.go.go-wave-l .go-arm-l{animation:goWaveArmL 1.05s ease-in-out 3}
+#appiAssistant[data-dock="asomada"] .appi-avatar-hit{
+  right:0;bottom:calc(var(--appi-safe) + 104px);
+  width:86px;height:126px;pointer-events:auto;opacity:1;
 }
-#pageTabs button.pt-appi-hi .pt-appi-face::after{opacity:1}
-#pageTabs button.pt-appi-hi .pt-appi-face{animation:appiDockHi 1.1s ease-in-out 3}
-@keyframes appiDockHi{
-  0%,100%{transform:translateY(0) scale(1)}
-  45%{transform:translateY(-4px) scale(1.14)}
+/* El saludo: se estira hacia la pantalla, levanta la mano y dice hola. */
+#appiAssistant.appi-greeting[data-dock="asomada"] .appi-avatar-shell{
+  animation:appiPeekLean 3.4s cubic-bezier(.2,1.16,.4,1);
 }
-#pageTabs button.pt-appi-on{color:#0b5878;background:rgba(94,193,242,.16)}
-#pageTabs button.pt-appi-on .pt-appi-face{transform:scale(1.08)}
-
-/* Guardada: adentro del dock, sin asomar. */
-#appiAssistant[data-dock="guardada"] .appi-avatar-shell{
-  transform:translateY(126px) scale(.94);
-  opacity:0;
-  transition:transform .42s cubic-bezier(.4,0,.68,1),opacity .26s ease;
+@keyframes appiPeekLean{
+  0%,100%{transform:translate(0,0) rotate(-7deg)}
+  14%{transform:translate(-16px,-3px) rotate(-10deg)}
+  38%{transform:translate(-20px,-5px) rotate(-4deg)}
+  62%{transform:translate(-17px,-3px) rotate(-11deg)}
+  84%{transform:translate(-8px,0) rotate(-7deg)}
 }
-#appiAssistant[data-dock="guardada"] .appi-avatar-hit{pointer-events:none;opacity:0}
-#appiAssistant[data-dock="guardada"] .appi-mini-bubble{display:none}
-
+#appiAssistant.appi-greeting[data-dock="asomada"] .appi-mini-bubble{
+  right:74px;bottom:calc(var(--appi-safe) + 176px);
+}
+/* La burbuja del saludo apunta a ella, que está a la derecha. */
+#appiAssistant.appi-greeting[data-dock="asomada"] .appi-mini-bubble::after{
+  content:"";position:absolute;right:-5px;bottom:9px;width:10px;height:10px;
+  background:inherit;border-right:1px solid var(--appi-globo-borde);
+  border-bottom:1px solid var(--appi-globo-borde);transform:rotate(-45deg);border-radius:0 0 3px 0;
+}
 /* Afuera: parada arriba del dock, con los pies sobre el borde. */
-#appiAssistant[data-dock="afuera"] .appi-avatar-shell{transform:translateY(-18px);opacity:1}
+#appiAssistant[data-dock="afuera"] .appi-avatar-shell{
+  right:4px;bottom:calc(var(--appi-safe) + 68px);
+  width:122px;height:122px;
+  transform:translateY(-18px);opacity:1;
+  transition:right .48s cubic-bezier(.2,1.16,.4,1),bottom .48s cubic-bezier(.2,1.16,.4,1),
+             transform .48s cubic-bezier(.2,1.16,.4,1),opacity .3s ease;
+}
 #appiAssistant[data-dock="afuera"].appi-open .appi-avatar-shell{transform:translateY(-25px)}
-#appiAssistant[data-dock="afuera"] .appi-avatar-hit{bottom:calc(var(--appi-safe) + 80px);height:128px}
+#appiAssistant[data-dock="afuera"] .appi-avatar-hit{
+  right:10px;bottom:calc(var(--appi-safe) + 80px);width:98px;height:128px;
+  pointer-events:auto;opacity:1;
+}
 #appiAssistant.appi-jump .appi-avatar-shell{animation:appiJumpOut .68s cubic-bezier(.3,1.42,.5,1)}
 @keyframes appiJumpOut{
-  0%{transform:translateY(126px) scaleY(.9);opacity:0}
-  28%{opacity:1}
-  55%{transform:translateY(-44px) scaleY(1.06)}
-  78%{transform:translateY(-6px) scaleY(.98)}
-  100%{transform:translateY(-18px) scaleY(1);opacity:1}
+  0%{transform:translate(0,0) rotate(-7deg)}
+  30%{transform:translate(-14px,-30px) rotate(-12deg)}
+  60%{transform:translate(-6px,-24px) rotate(2deg)}
+  100%{transform:translateY(-18px) rotate(0)}
 }
 @media(prefers-reduced-motion:reduce){
   #appiAssistant.appi-jump .appi-avatar-shell,
-  #pageTabs button.pt-appi-hi .pt-appi-face{animation:none!important}
+  #appiAssistant.appi-greeting[data-dock="asomada"] .appi-avatar-shell{animation:none!important}
   #appiAssistant .appi-avatar-shell{transition:opacity .2s linear!important}
 }

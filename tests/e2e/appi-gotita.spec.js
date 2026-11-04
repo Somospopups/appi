@@ -66,6 +66,8 @@ test('la gotita es un dibujo vectorial con piezas propias, no una foto que se mu
 test('cada estado mueve piezas distintas y el dibujo no cambia de tamaño', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await entrar(page);
+  // Sin saludos automáticos: se miden los estados, no el saludo.
+  await page.evaluate(() => window.APPIAssistant.saludos(false));
 
   const estados = ['normal', 'thinking', 'happy', 'surprise', 'alert'];
   const mapa = {}, cajas = [];
@@ -174,7 +176,7 @@ test('mientras escucha muestra las ondas y no queda escuchando sola', async ({ p
     window.SpeechRecognition = Falsa; window.webkitSpeechRecognition = Falsa;
   });
   await entrar(page);
-  await page.locator('#ptAppi').click();
+  await page.locator('#appiAvatarHit').click();
   await expect(page.locator('#appiAssistant')).toHaveClass(/appi-open/);
   await page.locator('#appiMic').click();
   const go = page.locator('#appiGotita svg.go');
