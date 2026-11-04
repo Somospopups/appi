@@ -17,39 +17,63 @@ async function entrar(page,{desktop=false}={}){
     localStorage.setItem('welcomeSeen','1');localStorage.setItem('tutoVisto_v2','1');localStorage.setItem('appi_tarjetas_auto','0');localStorage.setItem('appi_notif_listo_v1','1');localStorage.setItem('appi_notif_popup_later',String(Date.now()+400*86400000));localStorage.setItem('appi_aviso_psa_off','1');localStorage.setItem('equipoData',JSON.stringify({titular:{dip:'02-9802014',nombre:'María Pérez',categoria:'DC'},personas:[]}));localStorage.setItem(`appi_gestion_cache_v1_${uid}`,JSON.stringify({contacts,surveys:[],activities:[],savedAt:Date.now()}));localStorage.setItem(`appi_porque_v1_${uid}`,JSON.stringify({niveles:['Ayudar a mi familia']}));localStorage.setItem(`appi_tour_parque_v1_${uid}`,'1');
   },[USER_ID,CONTACTOS]);
   await page.goto('/index.html',{waitUntil:'networkidle'});
-  await page.locator('#distributorInput').fill('02-9802014');await page.locator('#distributorPassword').fill('Clave1234');await page.locator('#btnDistributorLogin').click();await expect(page.locator('#lockScreen')).toHaveClass(/hidden/);await page.waitForFunction(()=>window.APPIAssistant&&document.getElementById('appiAssistant'));
+  await page.locator('#distributorInput').fill('02-9802014');await page.locator('#distributorPassword').fill('Clave1234');await page.locator('#btnDistributorLogin').click();await expect(page.locator('#lockScreen')).toHaveClass(/hidden/);await page.waitForFunction(()=>window.APPIAssistant&&document.getElementById('appiAssistant')&&document.getElementById('appiAssistant').dataset.ready==='true');
 }
 
-test('Appi se asoma desde atrás del dock y el área visible se puede tocar',async({page})=>{
+async function sacarAppi(page){
+  await page.locator('#ptAppi').click();
+  await expect(page.locator('#appiAssistant')).toHaveClass(/appi-open/);
+}
+// Ya afuera, tocarla a ella vuelve a abrir el panel (el botón del dock la guarda).
+async function abrirPanelDeAppi(page){
+  await page.locator('#appiAvatarHit').click();
+  await expect(page.locator('#appiAssistant')).toHaveClass(/appi-open/);
+}
+
+test('Appi vive en el dock: un toque la saca y otro la guarda',async({page})=>{
   await entrar(page);
-  const assistant=page.locator('#appiAssistant'),dock=page.locator('#pageTabs'),shell=page.locator('.appi-avatar-shell'),hit=page.locator('#appiAvatarHit');
-  await expect(assistant).toBeVisible();await expect(dock).toBeVisible();
-  await expect(page.locator('#appiAvatarImage')).toHaveJSProperty('naturalWidth',480);
-  const m=await page.evaluate(()=>{const s=document.querySelector('.appi-avatar-shell').getBoundingClientRect(),d=document.querySelector('#pageTabs').getBoundingClientRect(),h=document.querySelector('#appiAvatarHit').getBoundingClientRect();return{shellTop:s.top,shellBottom:s.bottom,dockTop:d.top,hitCenter:h.top+h.height/2}});
-  expect(m.shellTop).toBeLessThan(m.dockTop);expect(m.shellBottom).toBeGreaterThan(m.dockTop);expect(m.hitCenter).toBeLessThan(m.dockTop);
-  await hit.click();await expect(assistant).toHaveClass(/appi-open/);await expect(page.locator('#appiPanel')).toBeVisible();
+  const asist=page.locator('#appiAssistant'),boton=page.locator('#ptAppi'),shell=page.locator('.appi-avatar-shell');
+  // El botón está en el dock, al final, y arranca guardada.
+  await expect(boton).toBeVisible();await expect(boton).toContainText('Appi');
+  await expect(asist).toHaveAttribute('data-dock','guardada');
+  expect(await shell.evaluate(n=>getComputedStyle(n).opacity)).toBe('0');
+  expect(await page.locator('#appiAvatarHit').evaluate(n=>getComputedStyle(n).pointerEvents)).toBe('none');
+  // Un toque: salta y se para sobre el dock, con el panel abierto.
+  await boton.click();
+  await expect(asist).toHaveAttribute('data-dock','afuera');
+  await expect(asist).toHaveClass(/appi-open/);await expect(boton).toHaveAttribute('aria-pressed','true');
+  await expect(page.locator('#appiGotita svg.go')).toHaveCount(1);
+  await expect(page.locator('#appiAssistant img')).toHaveCount(0);
+  const m=await page.evaluate(()=>{const s=document.querySelector('.appi-avatar-shell').getBoundingClientRect(),d=document.querySelector('#pageTabs').getBoundingClientRect();
+    return{shellBottom:s.bottom,dockTop:d.top,opacity:getComputedStyle(document.querySelector('.appi-avatar-shell')).opacity}});
+  expect(m.opacity).toBe('1');expect(Math.abs(m.shellBottom-m.dockTop)).toBeLessThan(16);
+  // Otro toque: se guarda y el panel se cierra.
+  await boton.click();
+  await expect(asist).toHaveAttribute('data-dock','guardada');
+  await expect(asist).not.toHaveClass(/appi-open/);
 });
 
 test('el mensaje abre hacia la izquierda, arriba del dock, sin tapar la navegación',async({page})=>{
-  await entrar(page);await page.locator('#appiAvatarHit').click();await expect(page.locator('#appiPanel')).toBeVisible();await page.waitForTimeout(120);
+  await entrar(page);await sacarAppi(page);await expect(page.locator('#appiPanel')).toBeVisible();await page.waitForTimeout(120);
   const m=await page.evaluate(()=>{const p=document.querySelector('#appiPanel').getBoundingClientRect(),s=document.querySelector('.appi-avatar-shell').getBoundingClientRect(),d=document.querySelector('#pageTabs').getBoundingClientRect();return{panelRight:p.right,shellLeft:s.left,panelBottom:p.bottom,dockTop:d.top}});
   expect(m.panelRight).toBeLessThanOrEqual(m.shellLeft+24);expect(m.panelBottom).toBeLessThanOrEqual(m.dockTop+1);
 });
 
-test('los cinco estados usan imágenes y movimientos realmente diferentes',async({page})=>{
-  await page.emulateMedia({reducedMotion:'no-preference'});await entrar(page);await page.locator('#appiAvatarHit').click();
+test('los cinco estados mueven el dibujo de formas realmente diferentes',async({page})=>{
+  await page.emulateMedia({reducedMotion:'no-preference'});await entrar(page);await sacarAppi(page);
   const states=['normal','thinking','happy','surprise','alert'],animations={};
-  for(const state of states){await page.evaluate(s=>window.APPIAssistant.setState(s),state);animations[state]=await page.locator('#appiAvatarImage').evaluate(e=>({src:e.getAttribute('src'),animation:getComputedStyle(e).animationName}));expect(animations[state].src).toContain(`/appi/${state}.webp`);expect(animations[state].animation).not.toBe('none')}
-  expect(new Set(Object.values(animations).map(x=>x.animation)).size).toBe(5);
+  for(const state of states){await page.evaluate(s=>window.APPIAssistant.setState(s),state);await page.waitForTimeout(360);animations[state]=await page.locator('#appiGotita svg.go').evaluate((go,s)=>({state:go.dataset.state,body:getComputedStyle(go.querySelector('.go-body')).animationName,arm:getComputedStyle(go.querySelector('.go-arm-r')).animationName}),state);expect(animations[state].state).toBe(state);expect(animations[state].body).not.toBe('none')}
+  expect(new Set(Object.values(animations).map(x=>x.body)).size).toBe(5);
+  expect(new Set(Object.values(animations).map(x=>x.arm)).size).toBe(5);
 });
 
 test('Appi entiende la jornada, piensa y muestra una acción útil',async({page})=>{
   await entrar(page);await page.evaluate(()=>window.APPIAssistant.ask('¿Qué tengo que hacer hoy?'));
-  await expect(page.locator('#appiAssistant')).toHaveAttribute('data-state','surprise');await expect(page.locator('#appiMessage')).toContainText('2 contactos');await expect(page.locator('#appiAction')).toBeVisible();await expect(page.locator('#appiAction')).toContainText('Ver contactos');
+  await expect(page.locator('#appiAssistant')).toHaveAttribute('data-state','surprise');await expect(page.locator('#appiMessage')).toContainText('2 contactos');await expect(page.locator('#appiAction')).toBeVisible();await expect(page.locator('#appiAction')).toContainText('Ver mis contactos');
 });
 
 test('un comando escrito abre Mi Encuesta y Appi vuelve al dock',async({page})=>{
-  await entrar(page);await page.locator('#appiAvatarHit').click();await page.locator('#appiInput').fill('Abrí Mi Encuesta');await page.locator('#appiForm').evaluate(form=>form.requestSubmit());
+  await entrar(page);await sacarAppi(page);await page.locator('#appiInput').fill('Abrí Mi Encuesta');await page.locator('#appiForm').evaluate(form=>form.requestSubmit());
   await expect(page.locator('#view-encuesta')).toHaveClass(/active/);await expect(page.locator('#appiAssistant')).not.toHaveClass(/appi-open/);
 });
 
@@ -60,9 +84,47 @@ test('explica la pantalla actual con palabras simples',async({page})=>{
 
 test('el micrófono convierte voz en comando sin quedar escuchando',async({page})=>{
   await page.addInitScript(()=>{const FakeSpeechRecognition=class{start(){this.onstart&&this.onstart();setTimeout(()=>{this.onresult&&this.onresult({resultIndex:0,results:[Object.assign([{transcript:'Mostrame mis cierres anteriores'}],{isFinal:true})]});this.onend&&this.onend()},30)}abort(){}};window.SpeechRecognition=FakeSpeechRecognition;window.webkitSpeechRecognition=FakeSpeechRecognition;});
-  await entrar(page);await page.locator('#appiAvatarHit').click();await page.locator('#appiMic').click();await expect(page.locator('#view-historico')).toHaveClass(/active/);await expect(page.locator('#appiAssistant')).not.toHaveClass(/appi-listening/);
+  await entrar(page);await sacarAppi(page);await page.locator('#appiMic').click();await expect(page.locator('#view-historico')).toHaveClass(/active/);await expect(page.locator('#appiAssistant')).not.toHaveClass(/appi-listening/);
 });
 
 test('en escritorio no invade la barra lateral',async({page})=>{
   await entrar(page,{desktop:true});await expect(page.locator('#deskSidebar')).toBeVisible();await expect(page.locator('#appiAssistant')).toBeHidden();
+});
+
+test('si nombra un lugar, Appi la lleva ahí sin pedir confirmación',async({page})=>{
+  await entrar(page);await page.evaluate(()=>window.APPIAssistant.ask('lista de precios'));
+  await expect(page.locator('#view-lista')).toHaveClass(/active/);
+  await expect(page.locator('#appiAssistant')).not.toHaveClass(/appi-open/);
+  await expect(page.locator('#appiAction')).toBeHidden();
+});
+
+test('los atajos del panel abren la pantalla de verdad, en un solo toque',async({page})=>{
+  await entrar(page);await sacarAppi(page);
+  await page.locator('.appi-row',{hasText:'Mis contactos'}).click();
+  await expect(page.locator('#view-gestion')).toHaveClass(/active/);await expect(page.locator('#appiAssistant')).not.toHaveClass(/appi-open/);
+  // Sigue afuera, parada sobre el dock: se la vuelve a tocar a ella.
+  await expect(page.locator('#appiAssistant')).toHaveAttribute('data-dock','afuera');
+  await abrirPanelDeAppi(page);await page.locator('.appi-row',{hasText:'Histórico'}).click();
+  await expect(page.locator('#view-historico')).toHaveClass(/active/);
+  await abrirPanelDeAppi(page);await page.locator('.appi-row',{hasText:'Mi Encuesta'}).click();
+  await expect(page.locator('#view-encuesta')).toHaveClass(/active/);
+});
+
+test('el panel muestra las cuatro pantallas que más se usan',async({page})=>{
+  await entrar(page);
+  // La primera vez ofrece las cuatro de arranque.
+  await sacarAppi(page);
+  expect(await page.locator('.appi-row b').allTextContents()).toEqual(['Lista de precios','Mis contactos','Histórico','Mi Encuesta']);
+  await page.locator('#appiClose').click();
+  // Se usa Mi stock tres veces: pasa a encabezar la lista.
+  for(let i=0;i<3;i++){await page.evaluate(()=>window.showView('view-home'));await page.evaluate(()=>window.showView('view-stock'))}
+  await abrirPanelDeAppi(page);
+  expect(await page.locator('.appi-row b').first().textContent()).toBe('Mi stock');
+  expect((await page.locator('.appi-row b').allTextContents()).length).toBe(4);
+});
+
+test('cuando no entiende, propone lugares con palabras simples',async({page})=>{
+  await entrar(page);await page.evaluate(()=>window.APPIAssistant.ask('quiero pintar la casa'));
+  await expect(page.locator('#appiMessage')).toContainText('lista de precios');
+  await expect(page.locator('#appiAssistant')).toHaveClass(/appi-open/);
 });

@@ -3412,4 +3412,30 @@
     host.innerHTML = html;
   }
   window.abrirLista = abrirLista;
+
+  /* Buscador de Appi (v904): la lista expone sus productos sin abrir la
+     pantalla, para que escribir "senior" o "6110105" encuentre el producto.
+     Si el catálogo todavía no se cargó, se dispara la carga en segundo plano. */
+  window.APPILista = {
+    listo: function () { return !!(CAT && Array.isArray(CAT.productos) && CAT.productos.length > 0); },
+    pedir: function () {
+      if (window.APPILista.listo() || window.__appiListaPedida) return;
+      window.__appiListaPedida = true;
+      try { cargar(function () {}); } catch (e) { window.__appiListaPedida = false; }
+    },
+    productos: function () {
+      try {
+        if (!CAT || !Array.isArray(CAT.productos)) { window.APPILista.pedir(); return []; }
+        return CAT.productos.map(function (p) {
+          return {
+            sku: String((p && p.sku) || ''),
+            nombre: String((p && p.nombre) || ''),
+            grupo: String((p && p.grupo) || ''),
+            precio: Number(p && p.precio) || 0,
+            canje: Number(p && p.plan_canje) || 0
+          };
+        }).filter(function (p) { return !!p.nombre; });
+      } catch (e) { return []; }
+    }
+  };
 })();

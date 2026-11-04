@@ -6,6 +6,19 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v904 · La gotita Appi, dibujada y animada de verdad
+
+- La asistente dejó de ser cinco imágenes WebP que se movían: ahora es **un dibujo vectorial propio (SVG)** con piezas separadas, en celeste sólido y sin degradés.
+- Se animan de verdad el cuerpo, los párpados, las pupilas, las cejas, la boca, los brazos y los pies.
+- En reposo respira, parpadea y saluda con la mano; al pensar se inclina y le aparecen burbujas; al festejar salta con destellos; al sorprenderse se estira con admiración; al alertar se acerca con un pulso ámbar.
+- La boca se mueve sílaba por sílaba mientras Appi lee en voz alta, y el botón pasa a **Detener** para cortar la lectura.
+- **Appi ahora vive en el dock:** hay un botón suyo al final. Un toque la saca y salta para pararse sobre el dock con el panel abierto; otro toque la guarda y la pantalla queda limpia.
+- El panel es un buscador con cuatro accesos directos que son **las pantallas que más usa cada persona** (se cuentan en el propio teléfono).
+- Ese buscador también busca **en los datos**: usuarios, distribuidores del equipo, números de serie de los purificadores, productos de la lista, contactos y pantallas, cada grupo por separado, con acceso directo al resultado y la coincidencia resaltada.
+- Se retiró la carrera que podía pisar una respuesta con el estado "normal" al terminar de cargar la app.
+- El dibujo no pesa: no hay imágenes ni descargas, funciona sin conexión y respeta el movimiento reducido.
+- Versión: **v904 · Segura** → Cache `appi-v904-gotita-animada`.
+
 ## v903 · Precios verificados contra la lista oficial del 1 al 4 de noviembre
 
 - Corrige 25 importes finales de Plan Canje que necesitaban un 10% adicional durante la promoción.
