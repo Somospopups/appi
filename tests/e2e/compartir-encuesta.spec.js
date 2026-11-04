@@ -64,11 +64,11 @@ async function abrirComoDistribuidor(page, invitaciones) {
   await page.locator('#btnDistributorLogin').click();
   await expect(page.locator('#lockScreen')).toHaveClass(/hidden/);
   await page.evaluate(() => openEncuestaTool());
-  await expect(page.locator('#view-gestion')).toHaveClass(/active/);
+  await expect(page.locator('#view-encuesta')).toHaveClass(/active/);
   await expect(page.locator('#surveyShareBtn')).toBeVisible();
 }
 
-test('el Panel de Contactos muestra el botón de enviar arriba, sin datos técnicos', async ({ page }) => {
+test('Mi Encuesta muestra un solo botón de envío, sin datos técnicos', async ({ page }) => {
   await abrirComoDistribuidor(page, []);
 
   const boton = page.locator('#surveyShareBtn');
@@ -80,7 +80,7 @@ test('el Panel de Contactos muestra el botón de enviar arriba, sin datos técni
   await expect(page.locator('#surveyShareBtn')).toHaveCount(1);
 
   // Nada de jerga interna ni enlaces a la vista del distribuidor.
-  const texto = await page.locator('.gente-acciones').innerText();
+  const texto = await page.locator('#surveyToolContent').innerText();
   for (const prohibido of ['token', 'http', '24 horas', 'dispositivo', 'vence', 'Copiar', 'cola']) {
     expect(texto.toLowerCase()).not.toContain(prohibido.toLowerCase());
   }

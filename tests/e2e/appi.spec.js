@@ -63,8 +63,8 @@ test('arranca, navega e importa Garantías una sola vez', async ({ page }) => {
     ["openRueda('vida')", 'view-wheel'],
     ["openEquipo()", 'view-equipo'],
     ["openSeguimiento()", 'view-seguimiento'],
-    // Mi Encuesta se unificó en Mi Gente: el atajo viejo debe caer en la pantalla nueva.
-    ["openEncuestaTool()", 'view-gestion'],
+    // Mi Encuesta vive como herramienta independiente.
+    ["openEncuestaTool()", 'view-encuesta'],
     ["openMiGestion()", 'view-gestion'],
     ["openGrabadora()", 'view-grabadora'],
     ["showView('view-notas')", 'view-notas'],

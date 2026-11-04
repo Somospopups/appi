@@ -6,6 +6,17 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v900 · Contactos claros y encuesta en Herramientas
+
+- **Mi Encuesta** aparece como primera tarjeta de **Mis herramientas** y vuelve a abrir su propia pantalla.
+- El Panel de Contactos queda dedicado a agregar personas y dar seguimiento: Hoy, Todos y Resultados.
+- Hoy muestra una única frase con la cantidad de personas que requieren atención y pone primero los vencidos.
+- Las fichas ya no exponen puntos ni niveles de prioridad; APPI sigue ordenando internamente.
+- Todos usa cuatro filtros simples y Resultados muestra primero contactos nuevos, presentaciones y cierres.
+- Agenda del teléfono, opciones de lista, estadísticas completas, mensajes, respuestas e historial siguen disponibles como detalles secundarios.
+- Después de una llamada o WhatsApp se ofrecen cuatro resultados claros y el cierre se completa sólo cuando corresponde.
+- Versión: **v900 · Segura** → Cache `appi-v900-contactos-claros`.
+
 ## v899 · Puntajes mensuales verificados
 
 - Corrige la lectura de PB con separador de miles de PSA: valores como `1.234` vuelven a representar **1234 PB**, no 1,234.

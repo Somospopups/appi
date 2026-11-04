@@ -73,66 +73,37 @@ test('la página Mi negocio tiene el Panel una sola vez; Herramientas no lo dupl
   await expect(herramientas).not.toContainText('Panel de Contactos');
 });
 
-test('el Panel de Contactos reúne el envío de encuestas y los contactos en una sola pantalla', async ({ page }) => {
+test('el Panel de Contactos separa la encuesta y deja sólo el seguimiento', async ({ page }) => {
   await abrirMiGente(page);
+
+  // Mi Encuesta aparece primero en Herramientas y abre su propia pantalla.
+  await page.evaluate(() => { window.renderHomeCompleto(); window.showView('view-herramientas'); });
+  await expect(page.locator('#herrGrid .quick-tool-card').first()).toContainText('Mi Encuesta');
+  await page.locator('#herrGrid .quick-tool-card').first().click();
+  await expect(page.locator('#view-encuesta')).toHaveClass(/active/);
+  await expect(page.locator('#surveyShareBtn')).toBeVisible();
+
+  // El Panel queda enfocado en agregar y seguir personas.
   await page.evaluate(() => openMiGestion());
   await expect(page.locator('#view-gestion')).toHaveClass(/active/);
-
-  // Enviar la encuesta y agregar a alguien están arriba de todo, antes de las solapas.
-  await expect(page.locator('#surveyShareBtn')).toBeVisible();
+  await expect(page.locator('#gestionContent #surveyShareBtn')).toHaveCount(0);
+  await expect(page.locator('#surveyShareBtn')).toBeHidden();
   await expect(page.locator('#genteNuevo')).toBeVisible();
-
-  // Tres solapas, no siete pantallas sueltas.
   await expect(page.locator('.gestion-main-tab')).toHaveText([/Hoy/, /Todos/, /Resultados/]);
+  await expect(page.locator('.gestion-stats')).toHaveCount(0);
+  await expect(page.locator('.gestion-priority-pill')).toHaveCount(0);
 
-  // El menú lateral ya no ofrece las tres entradas viejas.
+  // El menú lateral conserva el Panel en Mi negocio, sin duplicarlo.
   const menu = await page.locator('#deskSidebar').innerText();
   expect(menu).toContain('Panel de Contactos');
   expect(menu).not.toContain('Mi Gestión');
-  expect(menu).not.toContain('Mi Encuesta');
   expect(menu).not.toContain('Mi Gente');
-
-  // Vive en "Mi negocio", no en "Mis herramientas".
-  const negocio = page.locator('#deskSidebar .ds-section-label', { hasText: 'Mi negocio' });
   const entrada = page.locator('#deskSidebar [data-ds="view-gestion"]');
-  const orden = await page.evaluate(() => {
-    const nodos = [...document.querySelectorAll('#deskSidebar .ds-section-label, #deskSidebar .ds-btn')];
-    return nodos.map(n => n.className.includes('ds-section-label') ? `SECCION:${n.textContent.trim()}` : `BOTON:${n.dataset.ds}`);
-  });
-  const iNegocio = orden.indexOf('SECCION:Mi negocio');
-  const iHerramientas = orden.indexOf('SECCION:Mis herramientas');
-  const iPanel = orden.indexOf('BOTON:view-gestion');
-  expect(iNegocio).toBeGreaterThanOrEqual(0);
-  expect(iPanel).toBeGreaterThan(iNegocio);
-  expect(iPanel).toBeLessThan(iHerramientas);
-  await expect(negocio).toBeVisible();
   await expect(entrada).toContainText('Panel de Contactos');
 
-  // El cartel "Tu gente en un solo lugar" se sacó.
-  await expect(page.locator('.gestion-hero')).toHaveCount(0);
-  const pantalla = await page.locator('#gestionContent').innerText();
-  expect(pantalla).not.toContain('Tu gente, en un solo lugar');
-  expect(pantalla).not.toContain('Tu trabajo de hoy');
-
-  // La encuesta se presenta como herramienta de retorno, no como el contacto real.
-  const nota = await page.locator('.gente-nota').innerText();
-  expect(nota.toLowerCase()).toContain('herramienta de retorno');
-  expect(nota.toLowerCase()).toContain('demostración');
-
-  // Los dos accesos comparten fila y miden lo mismo.
-  const enviar = await page.locator('#surveyShareBtn').boundingBox();
-  const agregar = await page.locator('#genteNuevo').boundingBox();
-  expect(Math.abs(enviar.width - agregar.width)).toBeLessThanOrEqual(2);
-  expect(Math.abs(enviar.height - agregar.height)).toBeLessThanOrEqual(2);
-  expect(Math.abs(enviar.y - agregar.y)).toBeLessThanOrEqual(2);
-
-  // Las tres solapas quedan centradas respecto del contenedor.
-  const caja = await page.locator('.gestion-main-tabs').boundingBox();
-  const primera = await page.locator('.gestion-main-tab').first().boundingBox();
-  const ultima = await page.locator('.gestion-main-tab').last().boundingBox();
-  const izquierda = primera.x - caja.x;
-  const derecha = (caja.x + caja.width) - (ultima.x + ultima.width);
-  expect(Math.abs(izquierda - derecha)).toBeLessThanOrEqual(2);
+  // La agenda del teléfono se abre como pantalla secundaria, no como doble solapa.
+  await expect(page.locator('[data-agenda-vista="personal"]')).toContainText('Contactos del teléfono');
+  await expect(page.locator('[data-agenda-vista="appi"]')).toHaveCount(0);
 });
 
 test('los Contactos guardados en el teléfono se ofrecen para subir una sola vez', async ({ page }) => {

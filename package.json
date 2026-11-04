@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "899.0.0",
-  "cacheName": "appi-v899-ranking-pb-validado",
+  "version": "900.0.0",
+  "cacheName": "appi-v900-contactos-claros",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {

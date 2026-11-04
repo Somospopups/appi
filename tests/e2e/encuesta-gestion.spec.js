@@ -223,11 +223,11 @@ test('Mi Encuesta y Mi Gestión usan la cuenta autenticada y guardan el seguimie
   await expect(page.locator('#bootScreen')).toHaveCount(0, { timeout: 15000 });
 
   await page.evaluate(() => openEncuestaTool());
-  // Mi Encuesta se unificó en Mi Gente: el atajo viejo cae en la pantalla nueva.
-  await expect(page.locator('#view-gestion')).toHaveClass(/active/);
+  // Mi Encuesta vive en Herramientas y abre su propia pantalla.
+  await expect(page.locator('#view-encuesta')).toHaveClass(/active/);
   // El envío se reduce a un botón: sin URLs, tokens ni vencimientos a la vista.
   await expect(page.locator('#surveyShareBtn')).toContainText('Enviar encuesta');
-  const textoVisible = await page.locator('.gente-acciones').innerText();
+  const textoVisible = await page.locator('#surveyToolContent').innerText();
   expect(textoVisible).not.toContain('token');
   expect(textoVisible).not.toContain('http');
   expect(textoVisible).not.toContain('24 horas');
@@ -254,13 +254,16 @@ test('Mi Encuesta y Mi Gestión usan la cuenta autenticada y guardan el seguimie
   await expect(page.locator('.gestion-main-tab')).toHaveCount(3);
   await expect(page.locator('.gestion-main-tab')).toHaveText([/Hoy/, /Todos/, /Resultados/]);
   await expect(page.locator('.gestion-contact')).toHaveCount(2);
-  await expect(page.locator(`.gestion-contact[data-contact-id="${CONTACT_ID}"]`)).toHaveClass(/priority-high/);
+  await expect(page.locator(`.gestion-contact[data-contact-id="${CONTACT_ID}"]`)).not.toHaveClass(/priority-/);
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(390);
-  await expect(page.locator('.gestion-stat').first().locator('b')).toHaveText('1');
+  await expect(page.locator('.gestion-stats')).toHaveCount(0);
+  await expect(page.locator('.gestion-today-summary')).toContainText('2 personas para atender');
   await expect(page.locator('#gestionSidebarBadge')).toHaveText('2');
-  // El embudo dejó de ser una solapa propia: ahora se ve dentro de Resultados.
+  // Resultados muestra tres números; el detalle y las etapas quedan plegados.
   await page.locator('[data-gestion-view="resultados"]').click();
-  await expect(page.locator('.gestion-result')).toHaveCount(7);
+  await expect(page.locator('.gestion-result-main .gestion-result')).toHaveCount(3);
+  await expect(page.locator('.gestion-funnel-stage').first()).toBeHidden();
+  await page.locator('.gestion-results-more > summary').click();
   await expect(page.locator('.gestion-funnel-stage')).toHaveCount(5);
   await page.locator('[data-gestion-view="hoy"]').click();
 

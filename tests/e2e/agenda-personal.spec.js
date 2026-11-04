@@ -149,30 +149,32 @@ async function abrirAgendaPersonal(page, opciones) {
   return mocks;
 }
 
-test('el switch AGENDA APPI / AGENDA PERSONAL está arriba del panel y cambia de vista', async ({ page }) => {
+test('Contactos del teléfono se abre aparte y ofrece una vuelta clara al Panel', async ({ page }) => {
   await abrirPanel(page);
-  const appi = page.locator('[data-agenda-vista="appi"]');
   const personal = page.locator('[data-agenda-vista="personal"]');
-  await expect(appi).toBeVisible();
-  await expect(appi).toContainText('AGENDA APPI (1)');
-  await expect(personal).toContainText('AGENDA PERSONAL');
+  await expect(personal).toBeVisible();
+  await expect(personal).toContainText('Contactos del teléfono');
+  await expect(page.locator('[data-agenda-vista="appi"]')).toHaveCount(0);
 
   await personal.click();
   await expect(page.locator('#apSubirVcf')).toBeVisible();
   await expect(page.locator('[data-gestion-view="hoy"]')).toHaveCount(0);
+  await expect(page.locator('.gestion-back-contacts')).toBeVisible();
 
-  await appi.click();
+  await page.locator('.gestion-back-contacts').click();
   await expect(page.locator('[data-gestion-view="hoy"]')).toBeVisible();
   await expect(page.locator('#apSubirVcf')).toHaveCount(0);
 });
 
-test('al abrir APPI con Agenda Personal guardada, primero pinta esa solapa y descarga la agenda remota', async ({ page }) => {
+test('el Panel siempre abre en Contactos y la agenda remota queda disponible al pedirla', async ({ page }) => {
   const remota = [{
     nombre: 'Contacto desde el celular', telefono: '3515559090',
     telefono_normalizado: '3515559090', estado: 'nuevo', contacto_id: null,
     origen: 'telefono', created_at: HOY
   }];
   await abrirPanel(page, { contactos: [], agendaRemota: remota, agendaVista: 'personal' });
+  await expect(page.locator('[data-gestion-view="hoy"]')).toBeVisible();
+  await page.locator('[data-agenda-vista="personal"]').click();
   await expect(page.locator('#apSubirVcf')).toBeVisible();
   await expect(page.locator('.ap-item').filter({ hasText: 'Contacto desde el celular' })).toBeVisible();
 });

@@ -4778,7 +4778,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v899 · Segura</div>
+  <div class="ds-foot">APPI · v900 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -7013,6 +7013,9 @@ const HELP = {
     icon:'🧰', iconBg:'linear-gradient(135deg,#128C7E,#ff6bcf)',
     title:'Mis Herramientas', sub:'Tu caja de apoyo para el negocio',
     html:`<p>Esta pantalla es tu <strong>caja de herramientas</strong>. Acá tenés todas las herramientas que te acompañan en el día a día del negocio.</p>
+
+    <div class="tip"><strong>📨 MI ENCUESTA</strong><br/>
+    Compartila por WhatsApp. Cada envío es privado y las respuestas aparecen solas en el Panel de Contactos.</div>
 
     <div class="tip"><strong>🧭 LOS 8 PASOS</strong><br/>
     El ciclo completo del negocio en 8 pasos:<br/>
@@ -12602,7 +12605,7 @@ function renderToolsList(){
   });
 
   const seguimientoCard = renderHomeQuickCard({
-    icon:'📇', title:'Panel de Contactos', sub:'Encuestas y seguimiento',
+    icon:'📇', title:'Panel de Contactos', sub:'Seguimiento de personas',
     statusVal: `${seguimientoPendientes()}`,
     statusClass: seguimientoPendientes()>0 ? 'pending' : 'empty',
     progressPct: seguimientoProgreso(),
@@ -12649,6 +12652,11 @@ function renderToolsList(){
   // === HERRAMIENTAS GRID ===
   const herrHost = document.getElementById('herrGrid');
   if(herrHost){
+    const hEncuesta = renderHomeQuickCard({
+      icon:'📨', title:'Mi Encuesta', sub:'Compartila por WhatsApp',
+      statusVal:'Enviar', statusClass:'pending', progressPct:100,
+      timeAgo:'Respuestas a Contactos', onClick:'openEncuestaTool()', accent:'#735bd6', gradient:'linear-gradient(135deg,#3c67ca,#735bd6 62%,#3ad0a4)'
+    });
     const h1 = renderHomeQuickCard({
       icon:'🧭', title:'Los 8 Pasos', sub:'El ciclo del negocio',
       statusVal:'Guía', statusClass:'pending', progressPct:100,
@@ -12726,7 +12734,7 @@ function renderToolsList(){
         <span style="font-size:14px;font-weight:900;letter-spacing:-0.2px;color:#fff">Tablero PSA</span>
         <span style="font-size:11px;font-weight:700;color:rgba(255,255,255,.90);line-height:1.2">Acceso directo · Mi PSA Distribuidor</span>
       </button>`;
-    herrHost.innerHTML = h1 + h2 + h3 + h4 + hCanillas + hLista + hReu + hBanco + h5 + hStock + h6 + h7 + hAgenda + hPSA;
+    herrHost.innerHTML = hEncuesta + h1 + h2 + h3 + h4 + hCanillas + hLista + hReu + hBanco + h5 + hStock + h6 + h7 + hAgenda + hPSA;
   }
   if(!mesHost){const toolsList=document.getElementById('toolsList');if(toolsList)toolsList.innerHTML = `
     <details class="home-section-block" data-home-sec="mes" ${openMes?'open':''}>
@@ -14402,8 +14410,8 @@ function cerrarToolsMenu(){
   // con archivos viejos en pantalla.
   if ('serviceWorker' in navigator) {
     (async () => {
-    const swVersion='899';
-    const CACHE_NAME='appi-v899-ranking-pb-validado';
+    const swVersion='900';
+    const CACHE_NAME='appi-v900-contactos-claros';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
