@@ -6,6 +6,17 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v902 · Appi animada desde el dock
+
+- **Appi** se asoma desde el borde inferior derecho, detrás del dock, y saluda una vez por día.
+- Al tocarla sube completa y despliega su conversación hacia la izquierda sin tapar la navegación.
+- Tiene cinco estados visuales realmente distintos: normal, pensando, feliz, sorprendida y alerta.
+- Permite hablar con el micrófono o escribir; muestra siempre lo que entendió y nunca queda escuchando sola.
+- Responde consultas de la jornada, explica pantallas y abre por voz las principales herramientas de APPI.
+- Incluye lectura opcional de la respuesta, alternativa escrita, modo oscuro y movimiento reducido.
+- No agrega contraseñas, tokens ni servicios externos.
+- Versión: **v902 · Segura** → Cache `appi-v902-appi-animada`.
+
 ## v901 · Mi Encuesta explicada paso a paso
 
 - **Mi Encuesta** incorpora una guía visible que explica qué hace y cómo utilizarla.

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v901-encuesta-clara';
+const CACHE_NAME = 'appi-v902-appi-animada';
 const CACHE_PREFIX = 'appi-';
 // Donde el SW aparta una compartición hasta que la app la consume. No
 // empieza con el prefijo de la app para que el prune del activate no la borre.
@@ -29,6 +29,13 @@ const APP_SHELL = [
   './account-request.js',
   './qr-code.js',
   './gestion-client.js',
+  './appi-assistant.css',
+  './appi-assistant.js',
+  './assets/appi/normal.webp',
+  './assets/appi/thinking.webp',
+  './assets/appi/happy.webp',
+  './assets/appi/surprise.webp',
+  './assets/appi/alert.webp',
   './agenda-personal.js',
   './margarita-contactos.js',
   './panel-atras.js',
