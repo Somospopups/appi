@@ -20,66 +20,71 @@ async function entrar(page,{desktop=false}={}){
   await page.locator('#distributorInput').fill('02-9802014');await page.locator('#distributorPassword').fill('Clave1234');await page.locator('#btnDistributorLogin').click();await expect(page.locator('#lockScreen')).toHaveClass(/hidden/);await page.waitForFunction(()=>window.APPIAssistant&&document.getElementById('appiAssistant')&&document.getElementById('appiAssistant').dataset.ready==='true');
 }
 
-// Appi está asomada en el borde derecho: tocarla la saca y abre el panel.
+// El botón de ayuda de la pantalla es el círculo de Appi: un toque abre la caja.
 async function sacarAppi(page){
-  await page.locator('#appiAvatarHit').click();
-  await expect(page.locator('#appiAssistant')).toHaveClass(/appi-open/);
+  await abrirConElCirculo(page);
 }
-// Con el panel cerrado vuelve a asomarse; se la vuelve a tocar a ella.
 async function abrirPanelDeAppi(page){
-  await page.locator('#appiAvatarHit').click();
+  await abrirConElCirculo(page);
+}
+async function abrirConElCirculo(page){
+  const circulo=page.locator('.appi-help-btn:visible').first();
+  await circulo.click();
   await expect(page.locator('#appiAssistant')).toHaveClass(/appi-open/);
 }
 
-test('Appi se asoma desde el borde derecho y no achica el dock',async({page})=>{
+test('el «?» de cada pantalla es el círculo de Appi',async({page})=>{
   await entrar(page);
-  const asist=page.locator('#appiAssistant');
-  // El dock vuelve a tener cuatro botones: no hay quinto botón de Appi.
+  // Ninguna pantalla tiene ya un signo de pregunta suelto: todos son Appi.
+  const botones=page.locator('.help-btn');
+  expect(await botones.count()).toBeGreaterThan(10);
+  await expect(page.locator('.help-btn.appi-help-btn')).toHaveCount(await botones.count());
+  await expect(page.locator('.appi-help-btn svg.appi-btn-face').first()).toBeVisible();
+  const primero=page.locator('.appi-help-btn').first();
+  await expect(primero).toHaveAttribute('aria-label','Appi, tu asistente');
+  expect(await primero.innerText()).not.toContain('?');
+  // Tiene que moverse solo: el cuerpo y los ojos están animados.
+  const anima=await primero.evaluate(el=>{
+    const cuerpo=el.querySelector('.bf-body'),ojo=el.querySelector('.bf-eye');
+    return{cuerpo:getComputedStyle(cuerpo).animationName,ojo:getComputedStyle(ojo).animationName,halo:getComputedStyle(el,'::after').animationName};
+  });
+  expect(anima.cuerpo).not.toBe('none');
+  expect(anima.ojo).not.toBe('none');
+  expect(anima.halo).not.toBe('none');
+  // El dock queda con sus cuatro botones, sin Appi adentro.
   await expect(page.locator('#pageTabs button')).toHaveCount(4);
   await expect(page.locator('#ptAppi')).toHaveCount(0);
-  // Sus cuatro botones conservan el tamaño de siempre.
-  const anchos=await page.locator('#pageTabs button').evaluateAll(ns=>ns.map(n=>n.getBoundingClientRect().width));
-  anchos.forEach(w=>expect(w).toBeGreaterThan(80));
-  await expect(asist).toHaveAttribute('data-dock','asomada');
-  // Se la ve asomada: pegada al borde derecho y cortada por la pantalla.
-  const m=await page.evaluate(()=>{const s=document.querySelector('.appi-avatar-shell').getBoundingClientRect(),d=document.querySelector('#pageTabs').getBoundingClientRect();
-    return{left:s.left,right:s.right,vw:innerWidth,shellBottom:s.bottom,dockTop:d.top,opacity:getComputedStyle(document.querySelector('.appi-avatar-shell')).opacity}});
-  expect(m.opacity).toBe('1');
-  expect(m.right).toBeGreaterThan(m.vw);
-  expect(m.left).toBeGreaterThan(m.vw-110);
-  expect(m.shellBottom).toBeLessThan(m.dockTop+2);
-  // Un toque: sale de su escondite, se para sobre el dock y abre el panel.
-  await page.locator('#appiAvatarHit').click();
-  await expect(asist).toHaveAttribute('data-dock','afuera');
-  await expect(asist).toHaveClass(/appi-open/);
+  // Un toque abre la caja con la gotita entera adentro y su nombre.
+  await abrirConElCirculo(page);
+  await expect(page.locator('#appiPanel')).toBeVisible();
   await expect(page.locator('#appiGotita svg.go')).toHaveCount(1);
-  await expect(page.locator('#appiAssistant img')).toHaveCount(0);
-  const n=await page.evaluate(()=>{const s=document.querySelector('.appi-avatar-shell').getBoundingClientRect(),d=document.querySelector('#pageTabs').getBoundingClientRect();return{shellBottom:s.bottom,dockTop:d.top}});
-  expect(Math.abs(n.shellBottom-n.dockTop)).toBeLessThan(16);
-  // Al cerrar, vuelve sola al borde: no queda en el medio de la pantalla.
+  await expect(page.locator('.appi-chip')).toHaveText('Appi');
+  const caja=await page.evaluate(()=>{const p=document.querySelector('#appiPanel').getBoundingClientRect();return{top:p.top,right:p.right,vw:innerWidth}});
+  expect(caja.top).toBeLessThan(90);              // pegada arriba, debajo del círculo
+  expect(Math.abs(caja.right-(caja.vw-8))).toBeLessThan(3);
+  // Y se cierra con la ×.
   await page.locator('#appiClose').click();
-  await expect(asist).toHaveAttribute('data-dock','asomada',{timeout:4000});
-  await expect(asist).not.toHaveClass(/appi-open/);
+  await expect(page.locator('#appiAssistant')).not.toHaveClass(/appi-open/);
 });
 
-test('cuando saluda levanta la mano hacia la pantalla',async({page})=>{
+test('la ayuda de la pantalla sigue disponible adentro de Appi',async({page})=>{
   await entrar(page);
-  await page.evaluate(()=>window.APPIAssistant.saludar(4200));
-  await expect(page.locator('#appiAssistant')).toHaveClass(/appi-greeting/);
-  const brazo=page.locator('#appiGotita .go-arm-l');
-  await expect(brazo).toHaveCount(1);
-  expect(await brazo.evaluate(el=>getComputedStyle(el).animationName)).toBe('goWaveArmL');
-  await expect(page.locator('#appiMiniBubble')).toBeVisible();
-  // Con el panel abierto no saluda: sería molesto.
-  await page.locator('#appiAvatarHit').click();
-  await expect(page.locator('#appiAssistant')).toHaveClass(/appi-open/);
-  expect(await page.locator('#appiAssistant').evaluate(el=>el.classList.contains('appi-greeting'))).toBe(false);
+  await abrirConElCirculo(page);
+  const fila=page.locator('#appiHelpRow');
+  await expect(fila).toContainText('¿Cómo funciona esta pantalla?');
+  await fila.click();
+  // Se cierra Appi y aparece la explicación de la pantalla en la que estaba.
+  await expect(page.locator('#appiAssistant')).not.toHaveClass(/appi-open/);
+  await expect(page.locator('.modal-overlay.open')).toBeVisible();
+  await expect(page.locator('.modal-overlay.open')).toContainText('Pantalla principal');
 });
 
-test('el mensaje abre hacia la izquierda, arriba del dock, sin tapar la navegación',async({page})=>{
+test('la caja abre arriba a la derecha y no tapa el dock',async({page})=>{
   await entrar(page);await sacarAppi(page);await expect(page.locator('#appiPanel')).toBeVisible();await page.waitForTimeout(420);
-  const m=await page.evaluate(()=>{const p=document.querySelector('#appiPanel').getBoundingClientRect(),s=document.querySelector('.appi-avatar-shell').getBoundingClientRect(),d=document.querySelector('#pageTabs').getBoundingClientRect();return{panelRight:p.right,shellLeft:s.left,panelBottom:p.bottom,dockTop:d.top}});
-  expect(m.panelRight).toBeLessThanOrEqual(m.shellLeft+24);expect(m.panelBottom).toBeLessThanOrEqual(m.dockTop+1);
+  const m=await page.evaluate(()=>{const p=document.querySelector('#appiPanel').getBoundingClientRect(),d=document.querySelector('#pageTabs').getBoundingClientRect();return{panelRight:p.right,panelTop:p.top,panelBottom:p.bottom,dockTop:d.top,vw:innerWidth}});
+  expect(Math.abs(m.panelRight-(m.vw-8))).toBeLessThan(3);
+  expect(m.panelTop).toBeLessThan(90);
+  expect(m.panelBottom).toBeLessThanOrEqual(m.dockTop);
 });
 
 test('los cinco estados mueven el dibujo de formas realmente diferentes',async({page})=>{
@@ -110,8 +115,13 @@ test('el micrófono convierte voz en comando sin quedar escuchando',async({page}
   await entrar(page);await sacarAppi(page);await page.locator('#appiMic').click();await expect(page.locator('#view-historico')).toHaveClass(/active/);await expect(page.locator('#appiAssistant')).not.toHaveClass(/appi-listening/);
 });
 
-test('en escritorio no invade la barra lateral',async({page})=>{
-  await entrar(page,{desktop:true});await expect(page.locator('#deskSidebar')).toBeVisible();await expect(page.locator('#appiAssistant')).toBeHidden();
+test('en escritorio la caja abre a la derecha y no tapa la barra lateral',async({page})=>{
+  await entrar(page,{desktop:true});
+  await expect(page.locator('#deskSidebar')).toBeVisible();
+  const circulo=page.locator('.appi-help-btn:visible').first();
+  if(await circulo.count()){await circulo.click();await expect(page.locator('#appiPanel')).toBeVisible();
+    const m=await page.evaluate(()=>{const p=document.querySelector('#appiPanel').getBoundingClientRect(),s=document.querySelector('#deskSidebar').getBoundingClientRect();return{panelLeft:p.left,sidebarRight:s.right}});
+    expect(m.panelLeft).toBeGreaterThan(m.sidebarRight);}
 });
 
 test('si nombra un lugar, Appi la lleva ahí sin pedir confirmación',async({page})=>{
@@ -123,13 +133,13 @@ test('si nombra un lugar, Appi la lleva ahí sin pedir confirmación',async({pag
 
 test('los atajos del panel abren la pantalla de verdad, en un solo toque',async({page})=>{
   await entrar(page);await sacarAppi(page);
-  await page.locator('.appi-row',{hasText:'Mis contactos'}).click();
+  await page.locator('#appiRows .appi-row',{hasText:'Mis contactos'}).click();
   await expect(page.locator('#view-gestion')).toHaveClass(/active/);await expect(page.locator('#appiAssistant')).not.toHaveClass(/appi-open/);
   // Vuelve sola a asomarse al borde: se la vuelve a tocar a ella.
   await expect(page.locator('#appiAssistant')).toHaveAttribute('data-dock','asomada',{timeout:4000});
-  await abrirPanelDeAppi(page);await page.locator('.appi-row',{hasText:'Histórico'}).click();
+  await abrirPanelDeAppi(page);await page.locator('#appiRows .appi-row',{hasText:'Histórico'}).click();
   await expect(page.locator('#view-historico')).toHaveClass(/active/);
-  await abrirPanelDeAppi(page);await page.locator('.appi-row',{hasText:'Mi Encuesta'}).click();
+  await abrirPanelDeAppi(page);await page.locator('#appiRows .appi-row',{hasText:'Mi Encuesta'}).click();
   await expect(page.locator('#view-encuesta')).toHaveClass(/active/);
 });
 
@@ -137,13 +147,13 @@ test('el panel muestra las cuatro pantallas que más se usan',async({page})=>{
   await entrar(page);
   // La primera vez ofrece las cuatro de arranque.
   await sacarAppi(page);
-  expect(await page.locator('.appi-row b').allTextContents()).toEqual(['Lista de precios','Mis contactos','Histórico','Mi Encuesta']);
+  expect(await page.locator('#appiRows .appi-row b').allTextContents()).toEqual(['Lista de precios','Mis contactos','Histórico','Mi Encuesta']);
   await page.locator('#appiClose').click();
   // Se usa Mi stock tres veces: pasa a encabezar la lista.
   for(let i=0;i<3;i++){await page.evaluate(()=>window.showView('view-home'));await page.evaluate(()=>window.showView('view-stock'))}
   await abrirPanelDeAppi(page);
-  expect(await page.locator('.appi-row b').first().textContent()).toBe('Mi stock');
-  expect((await page.locator('.appi-row b').allTextContents()).length).toBe(4);
+  expect(await page.locator('#appiRows .appi-row b').first().textContent()).toBe('Mi stock');
+  expect((await page.locator('#appiRows .appi-row b').allTextContents()).length).toBe(4);
 });
 
 test('cuando no entiende, propone lugares con palabras simples',async({page})=>{

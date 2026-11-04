@@ -6,9 +6,18 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v906 · Appi es el círculo del «?»
+
+- **Se van los signos de pregunta.** El botón de ayuda de todas las pantallas (25 en total) es ahora el **círculo de Appi**: crema, con anillo celeste y su carita animada.
+- **El círculo se mueve para que lo vean:** respira, el anillo late cada tanto, parpadea, mira para los costados y, cuando hace el saludo del día, se hamaca tres veces. `aria-label="Appi, tu asistente"`.
+- **Un toque y se abre la caja**, en la familia crema del dock: la gotita entera a la izquierda con su nombre *Appi*, la pregunta, el buscador de siempre (usuarios, series, productos, contactos y pantallas), los accesos más usados y el botón de escuchar.
+- **La ayuda no se pierde:** adentro hay una fila, *"¿Cómo funciona esta pantalla?"*, que abre la explicación de la pantalla en la que estabas.
+- **Se cierra tocando afuera**, con la × o con Escape; nunca queda un signo de pregunta suelto en el camino.
+- Versión: **v906 · Segura** → Cache `appi-v906-circulo-de-appi`.
+
 ## v905 · Appi se asoma desde el borde derecho
 
-- **El dock vuelve a tener cuatro botones.** Se quitó el quinto botón de Appi que achicaba a los demás: Home, Mi mes, Mi negocio y Herramientas recuperan su tamaño y su etiqueta completos.
+- *(Reemplazado en la v906: la gotita asomada dio lugar al círculo del «?».)* **El dock vuelve a tener cuatro botones.** Se quitó el quinto botón de Appi que achicaba a los demás: Home, Mi mes, Mi negocio y Herramientas recuperan su tamaño y su etiqueta completos.
 - **Appi vive asomada en el borde derecho** de la pantalla, inclinada hacia adentro y con el costado cortado por el borde: no tapa el dock ni la navegación.
 - **Saluda cada tanto:** se estira hacia la pantalla, levanta la mano y aparece la viñeta *"¡Hola! Tocame y hablamos."*. El primer saludo del día llega a los dos segundos de abrir la app.
 - **Un toque y sale de su escondite:** se desliza hasta pararse sobre el dock con el panel abierto, como siempre. **Al cerrar el panel vuelve sola** al borde derecho.

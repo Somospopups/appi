@@ -16,102 +16,52 @@
   font-family:Inter,"Segoe UI",system-ui,-apple-system,sans-serif;
 }
 #appiAssistant[hidden]{display:none!important}
-.appi-avatar-shell{
-  position:fixed;
-  right:4px;
-  bottom:calc(var(--appi-safe) + 68px);
-  width:122px;
-  height:122px;
-  z-index:2;
-  pointer-events:none;
-  transform:translateY(30px);
-  transform-origin:52% 88%;
-  transition:transform .58s cubic-bezier(.2,1.16,.4,1),filter .25s ease;
-}
-#appiAssistant.appi-open .appi-avatar-shell{transform:translateY(-7px)}
+
+
 .appi-gotita{
   width:100%;height:100%;display:block;
   transform-origin:50% 88%;
   filter:drop-shadow(0 10px 9px rgba(25,49,78,.2));
   -webkit-user-select:none;user-select:none;
 }
-.appi-avatar-hit{
-  position:fixed;
-  z-index:4;
-  right:10px;
-  bottom:calc(var(--appi-safe) + 84px);
-  width:98px;
-  height:58px;
-  border:0;
-  border-radius:48px 48px 16px 16px;
-  background:transparent;
-  pointer-events:auto;
-  cursor:pointer;
-  touch-action:manipulation;
-  -webkit-tap-highlight-color:transparent;
-}
-.appi-avatar-hit:focus-visible{outline:3px solid rgba(90,141,216,.55);outline-offset:3px}
-#appiAssistant.appi-open .appi-avatar-hit{
-  bottom:calc(var(--appi-safe) + 77px);
-  height:126px;
-}
-.appi-mini-bubble{
-  position:fixed;
-  z-index:3;
-  right:82px;
-  bottom:calc(var(--appi-safe) + 158px);
-  max-width:190px;
-  padding:9px 11px;
-  border:1px solid var(--appi-globo-borde);
-  border-radius:var(--appi-globo-radio) var(--appi-globo-radio) 5px var(--appi-globo-radio);
-  background:rgba(255,255,255,.98);
-  color:#30394a;
-  box-shadow:var(--appi-globo-sombra);
-  font-size:11px;
-  font-weight:850;
-  line-height:1.32;
-  opacity:0;
-  visibility:hidden;
-  transform:translate(8px,8px) scale(.92);
-  transition:.25s ease;
-}
-#appiAssistant.appi-greeting:not(.appi-open) .appi-mini-bubble{
-  opacity:1;visibility:visible;transform:none;
-  animation:appiBubbleIn .45s cubic-bezier(.2,1.3,.4,1);
-}
+
+
+
+
+
 .appi-panel{
   position:fixed;
   z-index:3;
-  right:106px;
-  bottom:calc(var(--appi-safe) + 105px);
-  width:min(306px,calc(100vw - 124px));
+  top:calc(env(safe-area-inset-top,0px) + 54px);
+  right:8px;
+  width:min(346px,calc(100vw - 16px));
   padding:0;
-  border:1px solid var(--appi-globo-borde);
-  border-radius:23px 23px 8px 23px;
-  background:rgba(255,255,255,.985);
+  border:1px solid rgba(40,36,28,.13);
+  border-radius:24px;
+  background:linear-gradient(168deg,#fdfbf6,#f2ecdf);
   color:#283143;
-  box-shadow:0 20px 48px rgba(35,43,73,.23);
+  box-shadow:0 22px 52px rgba(35,29,17,.24),0 2px 8px rgba(35,29,17,.10),inset 0 1px 0 #fff;
   pointer-events:auto;
   opacity:0;
   visibility:hidden;
-  transform:translate(12px,13px) scale(.94);
-  transform-origin:bottom right;
-  transition:.3s cubic-bezier(.2,1,.4,1);
+  transform:translate(10px,-10px) scale(.94);
+  transform-origin:100% 0;
+  transition:.3s cubic-bezier(.2,1.14,.4,1);
 }
 #appiAssistant.appi-open .appi-panel{opacity:1;visibility:visible;transform:none}
 /* la colita: mismo pico que la viñeta chica, apuntando a la gotita */
 .appi-panel-tail{
   position:absolute;
   z-index:-1;
-  right:16px;
-  bottom:-9px;
-  width:20px;
-  height:20px;
-  background:inherit;
-  border-right:1px solid var(--appi-globo-borde);
-  border-bottom:1px solid var(--appi-globo-borde);
+  right:26px;
+  top:-7px;
+  width:16px;
+  height:16px;
+  background:#fdfbf6;
+  border-right:1px solid rgba(40,36,28,.13);
+  border-bottom:1px solid rgba(40,36,28,.13);
   border-radius:0 0 5px 0;
-  transform:rotate(45deg);
+  transform:rotate(-135deg);
 }
 .appi-panel-scroll{
   max-height:min(550px,calc(100dvh - 145px));
@@ -184,76 +134,75 @@ body.dark .appi-speak{background:#2c3f3a;color:#8ee0c6}
 @keyframes appiPeekHello{0%,100%{transform:translateY(0) rotate(0)}16%{transform:translateY(-13px) rotate(-2deg)}34%{transform:translateY(-18px) rotate(5deg)}50%{transform:translateY(-17px) rotate(-5deg)}68%{transform:translateY(-15px) rotate(2deg)}}
 @keyframes appiMicWave{0%{opacity:.8;transform:scale(.8)}100%{opacity:0;transform:scale(1.42)}}
 body.dark .appi-panel-tail{border-color:rgba(255,255,255,.1)}
-body.dark .appi-panel{background:rgba(38,37,49,.985);border-color:rgba(255,255,255,.1);color:#f4f2f7;box-shadow:0 20px 48px rgba(0,0,0,.42)}body.dark .appi-panel h2,body.dark .appi-talk-copy b{color:#f2f0f7}body.dark .appi-message{color:#c9c5d2}body.dark .appi-panel-close{background:#474453;color:#eeeaf4}body.dark .appi-search{background:#34323f;border-color:rgba(255,255,255,.12)}body.dark .appi-search input{color:#f0edf5}body.dark .appi-row{background:#34323f;border-color:rgba(255,255,255,.09)}body.dark .appi-row-txt b{color:#f0edf5}body.dark .appi-row-txt i{color:#b6b1c2}body.dark .appi-heard{background:#293b52;color:#d9e8ff}body.dark .appi-mini-bubble{background:#34323f;color:#f3eff7;border-color:rgba(255,255,255,.09)}
+body.dark .appi-panel{background:rgba(38,37,49,.985);border-color:rgba(255,255,255,.1);color:#f4f2f7;box-shadow:0 20px 48px rgba(0,0,0,.42)}body.dark .appi-panel h2,body.dark .appi-talk-copy b{color:#f2f0f7}body.dark .appi-message{color:#c9c5d2}body.dark .appi-panel-close{background:#474453;color:#eeeaf4}body.dark .appi-search{background:#34323f;border-color:rgba(255,255,255,.12)}body.dark .appi-search input{color:#f0edf5}body.dark .appi-row{background:#34323f;border-color:rgba(255,255,255,.09)}body.dark .appi-row-txt b{color:#f0edf5}body.dark .appi-row-txt i{color:#b6b1c2}body.dark .appi-heard{background:#293b52;color:#d9e8ff}
 body.appi-login-abierto #appiAssistant,body.appi-admin #appiAssistant{display:none!important}
-@media(min-width:1024px){#appiAssistant{display:none!important}}
-@media(max-width:360px){.appi-panel{right:98px;width:calc(100vw - 110px);padding:12px}.appi-avatar-shell{right:-2px;width:116px;height:116px}.appi-avatar-hit{right:5px;width:92px}}
+body.appi-login-abierto .help-btn,body.appi-admin .help-btn{display:none!important}
 @media(prefers-reduced-motion:reduce){#appiAssistant *,#appiAssistant *::before,#appiAssistant *::after{animation:none!important;transition-duration:.01ms!important}}
 
-/* === APPI SE ASOMA DESDE LA DERECHA =================================
-   Pedido del propietario: nada de un quinto botón que achique el dock.
-   Appi vive asomada en el borde derecho, se inclina hacia la pantalla y
-   saluda cada tanto. Cuando la tocan, sale de su escondite, se para arriba
-   del dock y ahí se abre el panel. Al cerrarlo vuelve a asomarse. */
-#appiAssistant[data-dock="asomada"] .appi-avatar-shell{
-  right:-46px;
-  bottom:calc(var(--appi-safe) + 110px);
-  width:112px;height:112px;
-  transform:translateY(0) rotate(-8deg);
-  opacity:1;visibility:visible;
-  transition:right .48s cubic-bezier(.2,1.16,.4,1),bottom .48s cubic-bezier(.2,1.16,.4,1),
-             transform .48s cubic-bezier(.2,1.16,.4,1),opacity .34s ease;
+/* === APPI EN EL CÍRCULO DEL «?» =====================================
+   Pedido del propietario: fuera los signos de pregunta. Cada botón de ayuda
+   de la app es ahora el círculo de Appi —crema, con anillo celeste y su
+   carita animada—, y abre su caja con la gotita adentro. */
+.appi-help-btn{
+  background:linear-gradient(168deg,#fdfbf6,#f1ebde)!important;
+  border:1.5px solid rgba(94,193,242,.62)!important;
+  color:#123c63!important;
+  box-shadow:0 5px 14px rgba(23,74,116,.16),inset 0 1px 0 #fff!important;
+  overflow:visible!important;
+  transition:transform .2s ease,box-shadow .2s ease;
+  animation:appiCircBreath 4.6s ease-in-out infinite;
 }
-/* La mano de la pantalla se mueve despacio mientras espera. */
-#appiAssistant[data-dock="asomada"] .appi-gotita svg.go .go-arm-l{animation:goArmSway 4.4s ease-in-out infinite}
-/* Y cuando saluda, esa misma mano se levanta: gana a la anterior. */
-#appiAssistant .appi-gotita svg.go.go-wave-l .go-arm-l{animation:goWaveArmL 1.05s ease-in-out 3}
-#appiAssistant[data-dock="asomada"] .appi-avatar-hit{
-  right:0;bottom:calc(var(--appi-safe) + 104px);
-  width:86px;height:126px;pointer-events:auto;opacity:1;
+.appi-help-btn::after{
+  content:"";position:absolute;inset:-4px;border-radius:50%;
+  border:2px solid rgba(94,193,242,.55);opacity:0;
+  animation:appiCircHalo 7.4s ease-out infinite;
 }
-/* El saludo: se estira hacia la pantalla, levanta la mano y dice hola. */
-#appiAssistant.appi-greeting[data-dock="asomada"] .appi-avatar-shell{
-  animation:appiPeekLean 3.4s cubic-bezier(.2,1.16,.4,1);
-}
-@keyframes appiPeekLean{
-  0%,100%{transform:translate(0,0) rotate(-7deg)}
-  14%{transform:translate(-16px,-3px) rotate(-10deg)}
-  38%{transform:translate(-20px,-5px) rotate(-4deg)}
-  62%{transform:translate(-17px,-3px) rotate(-11deg)}
-  84%{transform:translate(-8px,0) rotate(-7deg)}
-}
-#appiAssistant.appi-greeting[data-dock="asomada"] .appi-mini-bubble{
-  right:74px;bottom:calc(var(--appi-safe) + 176px);
-}
-/* La burbuja del saludo apunta a ella, que está a la derecha. */
-#appiAssistant.appi-greeting[data-dock="asomada"] .appi-mini-bubble::after{
-  content:"";position:absolute;right:-5px;bottom:9px;width:10px;height:10px;
-  background:inherit;border-right:1px solid var(--appi-globo-borde);
-  border-bottom:1px solid var(--appi-globo-borde);transform:rotate(-45deg);border-radius:0 0 3px 0;
-}
-/* Afuera: parada arriba del dock, con los pies sobre el borde. */
-#appiAssistant[data-dock="afuera"] .appi-avatar-shell{
-  right:4px;bottom:calc(var(--appi-safe) + 68px);
-  width:122px;height:122px;
-  transform:translateY(-18px);opacity:1;
-  transition:right .48s cubic-bezier(.2,1.16,.4,1),bottom .48s cubic-bezier(.2,1.16,.4,1),
-             transform .48s cubic-bezier(.2,1.16,.4,1),opacity .3s ease;
-}
-#appiAssistant[data-dock="afuera"].appi-open .appi-avatar-shell{transform:translateY(-25px)}
-#appiAssistant[data-dock="afuera"] .appi-avatar-hit{
-  right:10px;bottom:calc(var(--appi-safe) + 80px);width:98px;height:128px;
-  pointer-events:auto;opacity:1;
-}
-#appiAssistant.appi-jump .appi-avatar-shell{animation:appiJumpOut .68s cubic-bezier(.3,1.42,.5,1)}
-@keyframes appiJumpOut{
-  0%{transform:translate(0,0) rotate(-7deg)}
-  30%{transform:translate(-14px,-30px) rotate(-12deg)}
-  60%{transform:translate(-6px,-24px) rotate(2deg)}
-  100%{transform:translateY(-18px) rotate(0)}
+.appi-help-btn:active{transform:scale(.93)}
+.appi-btn-face{width:72%;height:72%;display:block;overflow:visible}
+.appi-btn-face .bf-eye{transform-origin:center;transform-box:fill-box;animation:appiCircBlink 5.4s infinite}
+.appi-btn-face .bf-body{animation:appiCircBob 4.6s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 70%}
+/* cuando saluda: se hamaca y el anillo se agranda */
+.appi-help-btn.appi-help-hi{animation:appiCircHi 1.15s ease-in-out 3}
+.appi-help-btn.appi-help-hi::after{animation:appiCircHalo 1.15s ease-out 3}
+/* los ojos miran para los costados cada tanto */
+.appi-help-btn.appi-help-look .bf-eyes{animation:appiCircLook 2.2s ease-in-out}
+@keyframes appiCircBreath{0%,100%{box-shadow:0 5px 14px rgba(23,74,116,.16),inset 0 1px 0 #fff}
+  50%{box-shadow:0 7px 18px rgba(23,74,116,.22),inset 0 1px 0 #fff}}
+@keyframes appiCircHalo{0%,72%{opacity:0;transform:scale(.92)}78%{opacity:.85}100%{opacity:0;transform:scale(1.35)}}
+@keyframes appiCircBlink{0%,93%,100%{transform:scaleY(1)}96%{transform:scaleY(.12)}}
+@keyframes appiCircBob{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-.6px) scale(1.03)}}
+@keyframes appiCircHi{0%,100%{transform:rotate(0) scale(1)}35%{transform:rotate(-9deg) scale(1.07)}70%{transform:rotate(8deg) scale(1.04)}}
+@keyframes appiCircLook{0%,100%{transform:translateX(0)}25%{transform:translateX(-1.4px)}70%{transform:translateX(1.4px)}}
+/* la caja: la gotita a la izquierda, con su nombre, y el contenido al lado */
+.appi-top{display:flex;gap:10px;align-items:flex-start}
+.appi-hero{flex:none;width:78px;display:flex;flex-direction:column;align-items:center;padding-top:2px}
+.appi-hero .appi-gotita{width:74px;height:74px}
+.appi-chip{margin-top:-2px;padding:2px 9px;border-radius:9px;background:#fff;border:1px solid rgba(40,36,28,.13);
+  color:#6f6757;font-size:9.5px;font-weight:900;letter-spacing:.2px;box-shadow:0 1px 3px rgba(35,29,17,.07)}
+.appi-top-txt{flex:1;min-width:0}
+.appi-top-txt h2{margin:6px 0 0}
+.appi-panel-close{background:#fff!important;border:1px solid rgba(40,36,28,.12)!important;color:#6b6455!important}
+.appi-search{background:#fff!important;border-color:rgba(40,36,28,.13)!important}
+.appi-row{background:#fff!important;border-color:rgba(40,36,28,.1)!important;box-shadow:0 1px 3px rgba(35,29,17,.05)}
+.appi-row:active{background:#f7f2e6!important}
+.appi-row-help{margin-top:7px}
+.appi-row-cara{background:#e8f6fe!important;padding:5px}
+.appi-row-cara svg{width:22px;height:22px}
+.appi-rows-title{color:#8d8577!important}
+.appi-sec-title{color:#8d8577!important}
+.appi-empty{background:#fff!important;border-color:rgba(40,36,28,.1)!important}
+.appi-more{background:#fff!important;border-color:rgba(94,193,242,.5)!important;color:#2b6f9e!important}
+.appi-sec-title b{background:#e8f6fe!important;color:#2b6f9e!important}
+.appi-speak{background:#eaf7f3!important}
+body.dark .appi-panel{background:linear-gradient(168deg,#2a2833,#221f29);border-color:rgba(255,255,255,.12);color:#f4f2f7}
+body.dark .appi-chip{background:#3a3745;border-color:rgba(255,255,255,.12);color:#cfc9d8}
+body.dark .appi-row,body.dark .appi-search,body.dark .appi-panel-close,body.dark .appi-empty{background:#343340!important;border-color:rgba(255,255,255,.1)!important}
+body.dark .appi-help-btn{background:linear-gradient(168deg,#33303d,#282631)!important;border-color:rgba(94,193,242,.5)!important;color:#dfe8f7!important}
+@media(max-width:360px){
+  .appi-panel{width:calc(100vw - 12px);right:6px}
+  .appi-hero{width:64px}.appi-hero .appi-gotita{width:60px;height:60px}
 }
 @media(prefers-reduced-motion:reduce){
-  #appiAssistant.appi-jump .appi-avatar-shell,
-  #appiAssistant.appi-greeting[data-dock="asomada"] .appi-avatar-shell{animation:none!important}
-  #appiAssistant .appi-avatar-shell{transition:opacity .2s linear!important}
+  .appi-help-btn,.appi-help-btn::after,.appi-btn-face .bf-eye,.appi-btn-face .bf-body{animation:none!important}
+  .appi-panel{transition-duration:.01ms}
 }

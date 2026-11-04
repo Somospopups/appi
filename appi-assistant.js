@@ -1,4 +1,4 @@
-/* APPI v905 · Appi, asistente animada con la gotita vectorial, voz y navegación segura. */
+/* APPI v906 · Appi, asistente animada con la gotita vectorial, voz y navegación segura. */
 (function(){
   'use strict';
   const STATES=new Set(['normal','thinking','happy','surprise','alert']);
@@ -12,75 +12,106 @@
   }
   function normalize(text){return String(text||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase('es-AR').replace(/[¿?¡!.,;:]/g,' ').replace(/\s+/g,' ').trim()}
   function firstName(){try{const p=window.APPIAuth&&window.APPIAuth.currentProfile&&window.APPIAuth.currentProfile();return String(p&&p.nombre||'').trim().split(/\s+/)[0]||''}catch(e){return''}}
-  // --- Appi asomada en el borde derecho ---------------------------------
-  // "asomada" = en el borde derecho de la pantalla, inclinada hacia adentro y
-  // saludando cada tanto. "afuera" = parada arriba del dock con el panel
-  // abierto. Un toque la saca de su escondite; al cerrar, vuelve sola.
-  let greetTimer=0,idleTimer=0,backTimer=0,waveTimer=0,saludosOn=true;
-  function dockState(){return root&&root.dataset.dock==='afuera'?'afuera':'asomada'}
-  function setDock(state,options){
-    options=options||{};
-    if(!root)return dockState();
-    const next=state==='afuera'?'afuera':'asomada';
-    const cambio=root.dataset.dock!==next;
-    root.dataset.dock=next;
-    if(next==='afuera'&&cambio){
-      // El salto se anima una sola vez: se marca y se saca enseguida.
-      root.classList.remove('appi-jump');void root.offsetWidth;root.classList.add('appi-jump');
-      setTimeout(()=>root&&root.classList.remove('appi-jump'),720);
-    }
-    if(next==='asomada'){
-      if(options.silent!==true)close();
-      if(window.APPIGotita)window.APPIGotita.setState(gotita,'normal');
-    }
-    return next;
+  // --- Appi vive en el círculo del «?» ---------------------------------
+  // Todos los botones de ayuda de la app son ahora el círculo de Appi: un
+  // botón redondo, crema y celeste, con su carita animada. Un toque abre la
+  // caja y adentro está el buscador, los accesos y la ayuda de la pantalla.
+  const CARA_BTN='<svg class="appi-btn-face" viewBox="0 0 24 24" aria-hidden="true" focusable="false">'
+    +'<path class="bf-body" d="M12 2.1c3.7 4.1 6.5 7.4 6.5 11.1a6.5 6.5 0 1 1-13 0c0-3.7 2.8-7 6.5-11.1z" fill="#5ec1f2"/>'
+    +'<g class="bf-eyes"><circle class="bf-eye" cx="9.8" cy="12.7" r="1.05" fill="#123c63"/>'
+    +'<circle class="bf-eye" cx="14.2" cy="12.7" r="1.05" fill="#123c63"/></g>'
+    +'<path class="bf-smile" d="M10 15.6c.55.65 1.2 1 2 1s1.45-.35 2-1" stroke="#123c63" stroke-width="1.3" stroke-linecap="round" fill="none"/></svg>';
+  let ultimoHelp=null,greetTimer=0,idleTimer=0,waveTimer=0,saludosOn=true,ojosTimer=0;
+  function dockState(){return root&&root.classList.contains('appi-open')?'afuera':'asomada'}
+
+  // El «?» de todas las pantallas se viste de Appi: carita, anillo celeste y
+  // latido. Se puede llamar las veces que haga falta (las pantallas se
+  // dibujan de nuevo al navegar).
+  function vestirBotonesDeAyuda(){
+    document.querySelectorAll('.help-btn,.hs-help').forEach(function(b){
+      if(b.dataset.appiBtn==='1')return;
+      b.dataset.appiBtn='1';
+      b.classList.add('appi-help-btn');
+      b.setAttribute('aria-label','Appi, tu asistente');
+      b.setAttribute('title','Appi');
+      b.innerHTML=CARA_BTN;
+    });
   }
-  function toggleFromDock(){
-    if(!root)return;
-    if(dockState()==='afuera'&&!root.classList.contains('appi-open')){setDock('asomada');return}
-    if(root.classList.contains('appi-open')){close();return}
-    setDock('afuera');
-    // Primero sale de su escondite y se acomoda sobre el dock; ahí se abre.
-    setTimeout(()=>{if(root&&!root.classList.contains('appi-open'))open()},520);
+  // Un toque en cualquiera de esos botones abre la caja de Appi. La ayuda
+  // propia de la pantalla queda adentro, en una fila.
+  function vigilarBotonesDeAyuda(){
+    document.addEventListener('click',function(ev){
+      const b=ev.target&&ev.target.closest?ev.target.closest('.help-btn,.hs-help'):null;
+      if(!b||window.__appiHelpPassthrough)return;
+      ev.preventDefault();ev.stopPropagation();
+      ultimoHelp=b;
+      if(root&&root.classList.contains('appi-open'))close();else open();
+    },true);
+    if(window.MutationObserver){
+      const mo=new MutationObserver(function(){vestirBotonesDeAyuda()});
+      mo.observe(document.body,{childList:true,subtree:true});
+    }
   }
-  // El saludo: se estira hacia la pantalla y levanta la mano. Nunca con el
-  // panel abierto ni con la app en segundo plano.
+  // Abre la ayuda que tenía ese botón, sin que la intercepte Appi.
+  function ayudaDeLaPantalla(){
+    const b=ultimoHelp;
+    close();
+    if(!b)return;
+    window.__appiHelpPassthrough=true;
+    setTimeout(function(){
+      try{b.click()}catch(e){console.error(e)}
+      finally{setTimeout(function(){window.__appiHelpPassthrough=false},60)}
+    },120);
+  }
   function saludar(ms){
     if(!root||!saludosOn)return;
-    if(root.classList.contains('appi-open'))return;
     if(document.hidden)return;
+    const b=document.querySelector('.appi-help-btn');
+    if(b){b.classList.remove('appi-help-hi');void b.offsetWidth;b.classList.add('appi-help-hi');
+      clearTimeout(waveTimer);waveTimer=setTimeout(function(){b.classList.remove('appi-help-hi')},3400)}
+    if(root.classList.contains('appi-open'))return;
     root.classList.add('appi-greeting');
     const go=gotita&&gotita.querySelector('svg.go');
     if(go){go.classList.remove('is-blinking');void go.offsetWidth;go.classList.add('go-wave-l')}
-    clearTimeout(waveTimer);
-    waveTimer=setTimeout(function(){
+    clearTimeout(greetTimer);
+    greetTimer=setTimeout(function(){
       if(!root)return;
       root.classList.remove('appi-greeting');
       const g=gotita&&gotita.querySelector('svg.go');if(g)g.classList.remove('go-wave-l');
     },ms||3400);
   }
-  // Los saludos automáticos se pueden apagar (por ejemplo en una prueba o
-  // cuando la persona prefiere que Appi no se mueva sola).
   function saludos(on){
     saludosOn=on!==false;
-    if(!saludosOn&&root){
-      root.classList.remove('appi-greeting');
-      const g=gotita&&gotita.querySelector('svg.go');if(g)g.classList.remove('go-wave-l');
-    }
+    if(!saludosOn&&root){root.classList.remove('appi-greeting');
+      const g=gotita&&gotita.querySelector('svg.go');if(g)g.classList.remove('go-wave-l')}
     return saludosOn;
   }
+  function setDock(state){
+    // Compatibilidad: "afuera" abre la caja, "asomada" la cierra.
+    if(state==='afuera')open();else close();
+    return dockState();
+  }
+  function toggleFromDock(){
+    if(!root)return;
+    if(root.classList.contains('appi-open'))close();else open();
+  }
   function initDock(){
-    // Siempre arranca asomada: no ocupa lugar y está a la vista.
-    root.dataset.dock='asomada';
-    if(window.APPIGotita)window.APPIGotita.setState(gotita,'normal');
-    // Cada tanto saluda sola, sin interrumpir nada.
+    vestirBotonesDeAyuda();
+    // Los ojos del círculo miran cada tanto hacia los costados: se mueve,
+    // se nota que está viva y llama a tocarla.
+    clearInterval(ojosTimer);
+    ojosTimer=setInterval(function(){
+      const b=document.querySelector('.appi-help-btn');
+      if(!b||document.hidden)return;
+      b.classList.remove('appi-help-look');void b.offsetWidth;b.classList.add('appi-help-look');
+      setTimeout(function(){b.classList.remove('appi-help-look')},2200);
+    },9000);
     clearInterval(idleTimer);
     idleTimer=setInterval(function(){
       if(!root||!saludosOn||document.hidden)return;
       if(root.classList.contains('appi-open'))return;
-      if(root.classList.contains('appi-greeting'))return;
-      saludar();
-    },15000);
+      if(!root.dataset.saludado){root.dataset.saludado='1';saludar()}
+    },20000);
   }
 
   function build(){
@@ -88,36 +119,44 @@
     root=document.createElement('aside');
     root.id='appiAssistant';root.dataset.state='normal';root.dataset.dock='asomada';root.setAttribute('aria-label','Appi, asistente personal');
     root.innerHTML=`
-      <div class="appi-avatar-shell" aria-hidden="true">
-        <div class="appi-gotita" id="appiGotita"></div>
-      </div>
-      <button type="button" class="appi-avatar-hit" id="appiAvatarHit" aria-label="Hablar con Appi" aria-expanded="false"></button>
-      <div class="appi-mini-bubble" id="appiMiniBubble">¡Hola! Tocame y hablamos.</div>
-      <section class="appi-panel" id="appiPanel" role="dialog" aria-modal="false" aria-label="Hablar con Appi">
+      <section class="appi-panel" id="appiPanel" role="dialog" aria-modal="false" aria-label="Appi, tu asistente">
         <i class="appi-panel-tail" aria-hidden="true"></i>
         <div class="appi-panel-scroll">
-        <div class="appi-panel-head"><div class="appi-panel-status"><i></i><span id="appiStatus">Para ayudarte</span></div><button type="button" class="appi-panel-close" id="appiClose" aria-label="Cerrar Appi">×</button></div>
-        <h2 id="appiPanelTitle">¿Qué necesitás?</h2>
-        <p class="appi-message" id="appiMessage" aria-live="polite"></p>
-        <div class="appi-heard" id="appiHeard"></div>
-        <form class="appi-search" id="appiForm">
-          <svg class="appi-search-ico" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="6.6" stroke="currentColor" stroke-width="2.2"/><path d="M16 16l4.4 4.4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
-          <input id="appiInput" autocomplete="off" placeholder="Nombre, DIP o serie…" aria-label="Buscar una pantalla o preguntarle a Appi">
-          <button type="button" class="appi-search-mic" id="appiMic" aria-label="Hablar con Appi"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="9" y="3" width="6" height="10" rx="3" stroke="currentColor" stroke-width="2"/><path d="M6 11a6 6 0 0 0 12 0M12 17v3M9 20h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
-          <button type="submit" class="appi-send" aria-label="Buscar">›</button>
-        </form>
-        <div class="appi-rows-title" id="appiRowsTitle">Lo que más usás</div>
-        <div class="appi-rows" id="appiRows"></div>
-        <div class="appi-results" id="appiResults" hidden></div>
-        <button type="button" class="appi-action" id="appiAction"></button>
-        <div class="appi-panel-foot"><span>Appi escucha sólo cuando la tocás.</span><button type="button" class="appi-speak" id="appiSpeak"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 9.5h3.2L12 5.6v12.8L7.2 14.5H4z" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/><path d="M15.4 8.6a4.6 4.6 0 0 1 0 6.8" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg><span id="appiSpeakLabel">Escuchar</span></button></div>
+          <div class="appi-top">
+            <div class="appi-hero" aria-hidden="true">
+              <div class="appi-gotita" id="appiGotita"></div>
+              <span class="appi-chip">Appi</span>
+            </div>
+            <div class="appi-top-txt">
+              <div class="appi-panel-head"><div class="appi-panel-status"><i></i><span id="appiStatus">Para ayudarte</span></div><button type="button" class="appi-panel-close" id="appiClose" aria-label="Cerrar Appi">×</button></div>
+              <h2 id="appiPanelTitle">¿Qué necesitás?</h2>
+            </div>
+          </div>
+          <p class="appi-message" id="appiMessage" aria-live="polite"></p>
+          <div class="appi-heard" id="appiHeard"></div>
+          <form class="appi-search" id="appiForm">
+            <svg class="appi-search-ico" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="6.6" stroke="currentColor" stroke-width="2.2"/><path d="M16 16l4.4 4.4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+            <input id="appiInput" autocomplete="off" placeholder="Nombre, DIP o serie…" aria-label="Buscar una pantalla o preguntarle a Appi">
+            <button type="button" class="appi-search-mic" id="appiMic" aria-label="Hablar con Appi"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="9" y="3" width="6" height="10" rx="3" stroke="currentColor" stroke-width="2"/><path d="M6 11a6 6 0 0 0 12 0M12 17v3M9 20h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+            <button type="submit" class="appi-send" aria-label="Buscar">›</button>
+          </form>
+          <div class="appi-rows-title" id="appiRowsTitle">Lo que más usás</div>
+          <div class="appi-rows" id="appiRows"></div>
+          <button type="button" class="appi-row appi-row-help" id="appiHelpRow">
+            <span class="appi-row-ico c4 appi-row-cara">${CARA_BTN}</span>
+            <span class="appi-row-txt"><b>¿Cómo funciona esta pantalla?</b><i>Te lo explico paso a paso</i></span>
+            <span class="appi-row-chev" aria-hidden="true">›</span>
+          </button>
+          <div class="appi-results" id="appiResults" hidden></div>
+          <button type="button" class="appi-action" id="appiAction"></button>
+          <div class="appi-panel-foot"><span>Appi escucha sólo cuando la tocás.</span><button type="button" class="appi-speak" id="appiSpeak"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 9.5h3.2L12 5.6v12.8L7.2 14.5H4z" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/><path d="M15.4 8.6a4.6 4.6 0 0 1 0 6.8" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg><span id="appiSpeakLabel">Escuchar</span></button></div>
         </div>
       </section>`;
     root.style.display='none';
     document.body.appendChild(root);
     gotita=el('appiGotita');if(window.APPIGotita)window.APPIGotita.mount(gotita);panelTitle=el('appiPanelTitle');message=el('appiMessage');heard=el('appiHeard');status=el('appiStatus');actionBtn=el('appiAction');input=el('appiInput');rowsHost=el('appiRows');rowsTitle=el('appiRowsTitle');resultsHost=el('appiResults');
-    el('appiAvatarHit').addEventListener('click',()=>root.classList.contains('appi-open')?close():open());
     el('appiClose').addEventListener('click',close);
+    el('appiHelpRow').addEventListener('click',ayudaDeLaPantalla);
     el('appiMic').addEventListener('click',startVoice);
     el('appiForm').addEventListener('submit',event=>{
       event.preventDefault();
@@ -175,10 +214,9 @@
   }
   function open(){
     if(!root)return;
-    clearTimeout(backTimer);
-    if(dockState()!=='afuera')setDock('afuera');
+    vestirBotonesDeAyuda();
     pintarDestinos();
-    root.classList.remove('appi-greeting');root.classList.add('appi-open');el('appiAvatarHit').setAttribute('aria-expanded','true');
+    root.classList.remove('appi-greeting');root.classList.add('appi-open');
     if(!lastAnswer){setState('normal');setCopy('¿Qué necesitás?','');}
     if(input&&!input.value)mostrarDestinos();
     setTimeout(()=>input&&input.focus({preventScroll:true}),330);
@@ -191,15 +229,8 @@
     clearTimeout(buscarTimer);
     if(input)input.value='';
     mostrarDestinos();
-    root.classList.remove('appi-open','appi-listening');el('appiAvatarHit').setAttribute('aria-expanded','false');setAction();setTimeout(()=>setState('normal'),360);
-    // Al cerrar el panel vuelve sola a asomarse al borde: no queda en el medio.
-    clearTimeout(backTimer);
-    backTimer=setTimeout(function(){
-      if(!root||!root.classList.contains('appi-open')){
-        root&&root.classList.remove('appi-greeting');
-        root&&(root.dataset.dock='asomada');
-      }
-    },1100);
+    root.classList.remove('appi-open','appi-listening');setAction();setTimeout(()=>setState('normal'),360);
+    root.classList.remove('appi-greeting');
   }
   function setState(state){
     state=STATES.has(state)?state:'normal';
@@ -541,6 +572,7 @@
   function init(){
     build();
     vigilarVistas();
+    vigilarBotonesDeAyuda();
     window.APPIToggle=toggleFromDock;
     window.APPIAssistant={open,close,setState,ask,respond,speak,stopSpeaking,setDock,saludar,saludos,toggleDock:toggleFromDock,get dock(){return dockState()},get state(){return root&&root.dataset.state},get isOpen(){return !!(root&&root.classList.contains('appi-open'))}};
   }

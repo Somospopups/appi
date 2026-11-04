@@ -30,7 +30,10 @@ async function entrar(page){
   // a que Appi esté lista y visible, como la ve la persona.
   await page.waitForFunction(()=>window.APPIGotita&&document.querySelector('#appiGotita svg.go')&&document.getElementById('appiAssistant').dataset.ready==='true');
   await expect(page.locator('#appiAssistant')).toBeVisible();
-  await expect(page.locator('.appi-avatar-shell')).toBeVisible();
+  // La gotita vive adentro de la caja de Appi: se abre con el círculo del «?».
+  await page.locator('.appi-help-btn:visible').first().click();
+  await expect(page.locator('#appiAssistant')).toHaveClass(/appi-open/);
+  await expect(page.locator('#appiGotita')).toBeVisible();
 }
 
 const LEER_PIEZAS=()=>{
@@ -77,7 +80,7 @@ test('cada estado mueve piezas distintas y el dibujo no cambia de tamaño', asyn
     // que termine para leer la animación propia del estado.
     await page.waitForTimeout(360);
     mapa[estado] = await page.evaluate(LEER_PIEZAS);
-    cajas.push(await page.locator('.appi-avatar-shell').evaluate(el => { const r = el.getBoundingClientRect(); return [Math.round(r.width), Math.round(r.height)]; }));
+    cajas.push(await page.locator('#appiGotita').evaluate(el => { const r = el.getBoundingClientRect(); return [Math.round(r.width), Math.round(r.height)]; }));
   }
 
   for (const estado of estados) {
@@ -176,7 +179,7 @@ test('mientras escucha muestra las ondas y no queda escuchando sola', async ({ p
     window.SpeechRecognition = Falsa; window.webkitSpeechRecognition = Falsa;
   });
   await entrar(page);
-  await page.locator('#appiAvatarHit').click();
+  await page.locator('.appi-help-btn:visible').first().click();
   await expect(page.locator('#appiAssistant')).toHaveClass(/appi-open/);
   await page.locator('#appiMic').click();
   const go = page.locator('#appiGotita svg.go');
