@@ -38,6 +38,10 @@ function mockGan(page) {
 }
 
 async function abrirSheetCon(page, cart, perfil) {
+  // Estas pruebas verifican la tabla permanente de ganancia, no una campaña
+  // temporal. Fijar el día posterior evita que un descuento vigente cambie
+  // importes o visibilidad de una regresión que no trata sobre promociones.
+  await page.addInitScript(() => { window.__APPI_FECHA_PROMO__ = '2026-11-05'; });
   await initComun(cart, perfil)(page);
   await base.entrar(page);
   mockGan(page);
@@ -100,7 +104,9 @@ test('la ganancia no se manda a WhatsApp: el botón se quitó (f2d4931, v890)', 
     window.__waUrl = null;
     window.open = (u) => { window.__waUrl = u; return null; };
   });
-  await gan.click({ position: { x: 12, y: 12 } });
+  // El contenedor puede permanecer oculto según el modo privado; despachar el
+  // evento comprueba la ausencia de una acción WhatsApp sin exigir visibilidad.
+  await gan.dispatchEvent('click');
   expect(await page.evaluate(() => window.__waUrl)).toBeNull();
 });
 

@@ -163,21 +163,28 @@
       return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
     }
   }
-  function beneficioProducto(p) {
-    if (!p || !p.sku || !BENEFICIOS || !Array.isArray(BENEFICIOS.campanas)) return null;
+  function beneficioProducto(p, modalidad) {
+    if (!p || !BENEFICIOS || !Array.isArray(BENEFICIOS.campanas)) return null;
     var hoy = fechaArgentinaISO();
+    var sku = String(p.sku || '');
+    var nombre = String(p.nombre || '').trim().toUpperCase();
     for (var i = 0; i < BENEFICIOS.campanas.length; i++) {
       var c = BENEFICIOS.campanas[i] || {};
       if (!c.desde || !c.hasta || hoy < c.desde || hoy > c.hasta) continue;
       var productosPromo = Array.isArray(c.productos) ? c.productos : [];
       for (var j = 0; j < productosPromo.length; j++) {
         var regla = productosPromo[j] || {};
-        if ((regla.skus || []).map(String).indexOf(String(p.sku)) < 0) continue;
+        var modalidades = Array.isArray(regla.aplica) ? regla.aplica : (Array.isArray(c.aplica) ? c.aplica : ['normal', 'canje']);
+        if (modalidad && modalidades.indexOf(modalidad) < 0) continue;
+        var coincideSku = !!sku && (regla.skus || []).map(String).indexOf(sku) >= 0;
+        var coincideNombre = !!nombre && (regla.nombres || []).map(function (n) { return String(n || '').trim().toUpperCase(); }).indexOf(nombre) >= 0;
+        if (!coincideSku && !coincideNombre) continue;
         var pct = Number(regla.porcentaje) || 0;
         if (pct <= 0 || pct >= 100) continue;
         return {
           id: c.id || '', nombre: c.nombre || 'Promoción', desde: c.desde, hasta: c.hasta,
-          porcentaje: pct, familia: regla.familia || '', noAcumulable: c.no_acumulable !== false
+          porcentaje: pct, familia: regla.familia || '', modalidad: modalidad || '',
+          noAcumulable: c.no_acumulable !== false
         };
       }
     }
@@ -185,18 +192,22 @@
   }
   function productoConBeneficio(p) {
     if (!p) return p;
-    var ben = beneficioProducto(p);
-    if (!ben) return p;
+    var benNormal = beneficioProducto(p, 'normal');
+    var benCanje = beneficioProducto(p, 'canje');
+    if (!benNormal && !benCanje) return p;
     var out = Object.assign({}, p);
     var precioBase = Number(p.precio) || 0;
     var canjeBase = Number(p.plan_canje) || 0;
-    out.precio_original = precioBase;
-    out.precio = Math.round(precioBase * (1 - ben.porcentaje / 100));
-    if (canjeBase > 0) {
-      out.plan_canje_original = canjeBase;
-      out.plan_canje = Math.round(canjeBase * (1 - ben.porcentaje / 100));
+    if (benNormal && precioBase > 0) {
+      out.precio_original = precioBase;
+      out.precio = Math.round(precioBase * (1 - benNormal.porcentaje / 100));
+      out.beneficio_producto = benNormal;
     }
-    out.beneficio_producto = ben;
+    if (benCanje && canjeBase > 0) {
+      out.plan_canje_original = canjeBase;
+      out.plan_canje = Math.round(canjeBase * (1 - benCanje.porcentaje / 100));
+      out.beneficio_canje = benCanje;
+    }
     return out;
   }
   function sinMarca(s) {
@@ -246,7 +257,10 @@
   function esProductoPromocional(p) {
     if (!p) return false;
     var nombre = String(p.nombre || '').toUpperCase();
-    return !!p.promo || /\b(?:PROMO|COMBO)\b/.test(nombre);
+    // La tienda también marca como `promo` productos normales con un beneficio
+    // temporal (Senik y Soda, por ejemplo). Sólo se ocultan las líneas cuyo
+    // nombre oficial es realmente un combo o una promoción independiente.
+    return !p.lista_oficial && /\b(?:PROMO|COMBO)\b/.test(nombre);
   }
   function productos() {
     return (CAT && CAT.productos ? CAT.productos : []).filter(function (p) {
@@ -271,7 +285,7 @@
       clave: claveSku(p) + CANJE_SUF, sku: p.sku || '',
       nombre: p.nombre + ' (PLAN CANJE)', precio: p.plan_canje,
       precio_original: p.plan_canje_original || p.plan_canje,
-      beneficio_producto: p.beneficio_producto || null,
+      beneficio_producto: p.beneficio_canje || null,
       foto: p.foto, grupo: p.grupo, seccion: p.seccion, canje: true
     };
   }
@@ -287,6 +301,7 @@
         precio: p.precio,
         precio_original: p.precio_original || p.precio,
         beneficio_producto: p.beneficio_producto || null,
+        beneficio_canje: p.beneficio_canje || null,
         foto: p.foto,
         grupo: p.grupo,
         seccion: p.seccion,
@@ -1055,12 +1070,14 @@
     var promoStrip = '';
     if (campanaActiva) {
       var promos = (campanaActiva.productos || []).map(function (p) {
-        return esc(String(p.familia || '').replace(/^PSA\s+/i, '')) + ' ' + (Number(p.porcentaje) || 0) + '%';
+        var modalidades = Array.isArray(p.aplica) ? p.aplica : (campanaActiva.aplica || []);
+        var soloCanje = modalidades.length === 1 && modalidades[0] === 'canje';
+        return (soloCanje ? 'Plan Canje: ' : '') + esc(String(p.familia || '').replace(/^PSA\s+/i, '')) + ' ' + (Number(p.porcentaje) || 0) + '%';
       }).join(' · ');
       var dDesde = String(campanaActiva.desde).split('-');
       var dHasta = String(campanaActiva.hasta).split('-');
       var vigCorta = Number(dDesde[2]) + ' al ' + Number(dHasta[2]) + '/' + Number(dHasta[1]);
-      promoStrip = '<div class="lp-promo-strip">⚡ <b>' + esc(campanaActiva.nombre || 'Promoción') + ' · ' + esc(vigCorta) + '</b> · ' + promos + '<small>Precio normal y Plan Canje · No acumulable con otras promociones de producto</small></div>';
+      promoStrip = '<div class="lp-promo-strip">⚡ <b>' + esc(campanaActiva.nombre || 'Promoción') + ' · ' + esc(vigCorta) + '</b> · ' + promos + '<small>El descuento se aplica sólo a la modalidad indicada · No acumulable con otras promociones de producto</small></div>';
     }
     return '<div class="lp-wrap">' +
       '<p class="lp-note"><span>Lista \'Precios Sugeridos con Acuerdo\' de PSA' + (fecha ? ' · ' + esc(fecha) : '') + (totalProds ? ' <b style="opacity:.85;font-weight:700">(' + totalProds + ' productos)</b>' : '') + '. Elegí productos y cotizá.</span>' +
@@ -1106,25 +1123,28 @@
       var tieneCanje = Number(L.plan_canje) > 0;
       var qCanje = tieneCanje ? qty(L.canjeClave) : 0;
       var seleccionado = q > 0 || qCanje > 0;
-      var ben = L.beneficio_producto || null;
+      var benNormal = L.beneficio_producto || null;
+      var benCanje = L.beneficio_canje || null;
+      var ben = benNormal || benCanje;
+      var mismoBeneficio = benNormal && benCanje && benNormal.porcentaje === benCanje.porcentaje;
       var promoBadge = ben
-        ? '<small class="lp-product-promo">⚡ CYBER · ' + ben.porcentaje + '% OFF</small>'
+        ? '<small class="lp-product-promo">⚡ CYBER · ' + (mismoBeneficio ? '' : (benCanje && !benNormal ? 'CANJE ' : 'NORMAL ')) + ben.porcentaje + '% OFF</small>'
         : '';
       var clsItem = 'lp-item' + (tieneCanje ? ' lp-item-has-canje' : '') + (tieneCanje && !L.foto ? ' lp-item-no-photo' : '') + (seleccionado ? ' lp-item-selected' : '') + ((L.grupo === 'packs' || L.grupo === 'ingreso') ? ' lp-item-is-pack' : '');
       html += '<div class="' + clsItem + '" data-sku="' + esc(L.clave) + '">' +
         fotoHtml +
         '<div class="lp-item-txt"><b>' + esc(L.nombre) + '</b><span>' + subTxt + '</span>' + promoBadge + descHtml +
-          (tieneCanje ? '' : (ben ? '<em><s>' + money(L.precio_original) + '</s> ' + money(L.precio) + '</em>' : '<em>' + money(L.precio) + '</em>')) + '</div>';
+          (tieneCanje ? '' : (benNormal ? '<em><s>' + money(L.precio_original) + '</s> ' + money(L.precio) + '</em>' : '<em>' + money(L.precio) + '</em>')) + '</div>';
       if (tieneCanje) {
         html += '<div class="lp-price-options">' +
-          '<button type="button" class="lp-price-choice lp-price-choice-canje' + (ben ? ' has-product-promo' : '') + (qCanje ? ' is-in-cart' : '') + '" data-act="mas" data-price-sku="' + esc(L.canjeClave) + '" aria-label="Agregar a precio de canje' + (ben ? ' con ' + ben.porcentaje + ' por ciento de descuento' : '') + '">' +
-            '<span class="lp-price-choice-label">Precio de canje' + (ben ? ' · −' + ben.porcentaje + '%' : '') + '</span>' +
-            (ben ? '<s>' + money(L.plan_canje_original) + '</s>' : '') + '<strong>' + money(L.plan_canje) + '</strong>' +
+          '<button type="button" class="lp-price-choice lp-price-choice-canje' + (benCanje ? ' has-product-promo' : '') + (qCanje ? ' is-in-cart' : '') + '" data-act="mas" data-price-sku="' + esc(L.canjeClave) + '" aria-label="Agregar a precio de canje' + (benCanje ? ' con ' + benCanje.porcentaje + ' por ciento de descuento' : '') + '">' +
+            '<span class="lp-price-choice-label">Precio de canje' + (benCanje ? ' · −' + benCanje.porcentaje + '%' : '') + '</span>' +
+            (benCanje ? '<s>' + money(L.plan_canje_original) + '</s>' : '') + '<strong>' + money(L.plan_canje) + '</strong>' +
             '<small class="lp-price-choice-count">' + (qCanje ? '✓ Elegido · ' + qCanje : 'Tocar para agregar') + '</small>' +
           '</button>' +
-          '<button type="button" class="lp-price-choice' + (ben ? ' has-product-promo' : '') + (q ? ' is-in-cart' : '') + '" data-act="mas" data-price-sku="' + esc(L.clave) + '" aria-label="Agregar a precio normal' + (ben ? ' con ' + ben.porcentaje + ' por ciento de descuento' : '') + '">' +
-            '<span class="lp-price-choice-label">Precio normal' + (ben ? ' · −' + ben.porcentaje + '%' : '') + '</span>' +
-            (ben ? '<s>' + money(L.precio_original) + '</s>' : '') + '<strong>' + money(L.precio) + '</strong>' +
+          '<button type="button" class="lp-price-choice' + (benNormal ? ' has-product-promo' : '') + (q ? ' is-in-cart' : '') + '" data-act="mas" data-price-sku="' + esc(L.clave) + '" aria-label="Agregar a precio normal' + (benNormal ? ' con ' + benNormal.porcentaje + ' por ciento de descuento' : '') + '">' +
+            '<span class="lp-price-choice-label">Precio normal' + (benNormal ? ' · −' + benNormal.porcentaje + '%' : '') + '</span>' +
+            (benNormal ? '<s>' + money(L.precio_original) + '</s>' : '') + '<strong>' + money(L.precio) + '</strong>' +
             '<small class="lp-price-choice-count">' + (q ? '✓ Elegido · ' + q : 'Tocar para agregar') + '</small>' +
           '</button>' +
         '</div>';
@@ -2500,7 +2520,7 @@
       pdf.setTextColor.apply(pdf, gris);
       var cond = 'Los precios de lista pueden variar según las promociones vigentes de cada tarjeta y el criterio de la empresa.';
       var tienePromoProducto = r.lineas.some(function (ln) { return Number(ln.promoPct) > 0; });
-      if (tienePromoProducto) cond += '  CyberMonday válido del 2 al 4/11/2026, en precio normal y Plan Canje, no acumulable con otras promociones de producto.';
+      if (tienePromoProducto) cond += '  CyberMonday válido del 1 al 4/11/2026. El descuento corresponde a la modalidad indicada (precio normal y/o Plan Canje) y no es acumulable con otras promociones de producto.';
       if (fecha) cond += '  ·  ' + fecha;
       pdf.text(pdf.splitTextToSize(cond, W - 2 * m), m, H - 17);
 

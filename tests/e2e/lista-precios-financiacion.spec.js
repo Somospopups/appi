@@ -27,8 +27,10 @@ const cuotasVisibles = page => page.locator('#lpCuotas [data-cuotas]').evaluateA
   botones => botones.map(b => Number(b.getAttribute('data-cuotas')))
 );
 
-test('la tabla publicada coincide con la financiación oficial del 2 de noviembre', async () => {
-  expect(planes.actualizado).toBe('2-Nov-2026');
+test('la tabla publicada coincide con la financiación oficial vigente desde el 2 de noviembre', async () => {
+  // `actualizado` refleja el último control automático y puede avanzar cada
+  // día; la vigencia y el PDF legal son los que identifican la promoción.
+  expect(planes.actualizado).toMatch(/^\d{1,2}-Nov-2026$/);
   expect(planes.fuente_legal).toContain('legales-financiacion-vigencia_2-11-2026.pdf');
   expect(Object.fromEntries(planes.bancos.map(b => [b.id, b.cuotas]))).toEqual(esperado);
   expect(planes.bancos.find(b => b.id === 'tarjeta-naranja')).toMatchObject({

@@ -120,12 +120,12 @@ test('ya no existe el apartado Novedades ni la etiqueta NUEVO', async ({ page })
 const skusEn = page => page.locator('#lpList .lp-item')
   .evaluateAll(els => els.map(e => e.getAttribute('data-sku') || ''));
 
-const esPromocional = p => !!p.promo || /\b(?:PROMO|COMBO)\b/i.test(String(p.nombre || ''));
+const esPromocional = p => !p.lista_oficial && /\b(?:PROMO|COMBO)\b/i.test(String(p.nombre || ''));
 const clavesPromocionales = catalogoRepo.productos
   .filter(esPromocional)
   .map(p => p.sku || ('n:' + String(p.nombre || '').toLowerCase().trim()));
 
-test('la Lista de precios excluye promociones y no resalta fichas en naranja', async ({ page }) => {
+test('la Lista excluye combos ajenos al PDF pero conserva promociones de la lista oficial', async ({ page }) => {
   await entrar(page);
   await servirListas(page, '25-Oct-2026', '');
 
@@ -138,9 +138,11 @@ test('la Lista de precios excluye promociones y no resalta fichas en naranja', a
   await expect(page.locator('#lpList .lp-promo-badge')).toHaveCount(0);
   await expect(page.locator('#lpList .lp-precio-tachado')).toHaveCount(0);
 
-  // El catálogo normal sigue disponible; la limpieza no vacía la lista.
+  // La promoción que sí figura en la lista oficial se conserva; el combo S4
+  // Terra + Burby que no aparece en ese PDF continúa fuera del presupuesto.
   expect(skus.length).toBeGreaterThan(0);
-  await expect(page.locator('#lpList')).not.toContainText(/\bPROMO\b|\bCOMBO\b/i);
+  await expect(page.locator('#lpList')).toContainText('PROMO CILINDRO + PACK RENDIMIENTO II');
+  await expect(page.locator('#lpList')).not.toContainText('PROMO S4 TERRA + BURBY TERRA');
 });
 
 const CLAVES_PACKS = clavesDe(['packs']);

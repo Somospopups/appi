@@ -679,7 +679,7 @@ def fusionar_catalogo_anterior(productos, previo):
     nuevos_nom = {(p.get("nombre") or "").strip().upper(): p for p in productos if p.get("nombre")}
     usados = set()
     salida = []
-    conservar = ("plan_canje", "seccion", "grupo", "composicion", "items_skus")
+    conservar = ("plan_canje", "seccion", "grupo", "composicion", "items_skus", "lista_oficial")
     for viejo in anteriores:
         nuevo = nuevos_sku.get(str(viejo.get("sku") or "")) or nuevos_nom.get((viejo.get("nombre") or "").strip().upper())
         if not nuevo:
@@ -694,21 +694,31 @@ def fusionar_catalogo_anterior(productos, previo):
     return salida
 
 CYBER_2026 = {
-    "actualizado": "2-Nov-2026",
-    "fuente": "https://tienda.psa.com.ar/cyber.html",
+    "actualizado": "4-Nov-2026",
+    "fuente": "Lista de Precios Sugeridos PSA · Promo del 1 al 4 de noviembre de 2026",
     "campanas": [
         {
             "id": "cyber-monday-2026",
             "nombre": "CyberMonday",
-            "desde": "2026-11-02",
+            "desde": "2026-11-01",
             "hasta": "2026-11-04",
             "aplica": ["normal", "canje"],
             "no_acumulable": True,
             "financiacion": "Cuotas sin interés y reintegros según banco y tarjeta seleccionados; el reintegro no se descuenta del total.",
             "productos": [
-                {"familia": "PSA Vero", "porcentaje": 45, "skus": ["611030420"]},
-                {"familia": "PSA Iontrix 3", "porcentaje": 25, "skus": ["611290050"]},
-                {"familia": "PSA Senior4", "porcentaje": 10, "skus": ["611010510", "611010530", "611010550", "611010560", "611010730"]},
+                {"familia": "PSA Vero", "porcentaje": 45, "aplica": ["normal", "canje"], "skus": ["611030420"]},
+                {"familia": "PSA Iontrix 3", "porcentaje": 25, "aplica": ["normal", "canje"], "skus": ["611290050"]},
+                {"familia": "PSA Senior4", "porcentaje": 10, "aplica": ["normal", "canje"], "skus": ["611010510", "611010530", "611010550", "611010560"]},
+                {
+                    "familia": "Productos seleccionados", "porcentaje": 10, "aplica": ["canje"],
+                    "skus": [
+                        "611010580", "611030430", "613030480", "613030470", "611030410", "611030400",
+                        "611030610", "611030620", "611100240", "611100250", "611100280", "611100290",
+                        "611100320", "611100330", "611120220", "611120200", "611120210", "611030560",
+                        "611030540", "617110040", "617110050", "611310070"
+                    ],
+                    "nombres": ["PSA OSMOSIS ROTECH BM UV", "PSA OSMOSIS ROTECH SM UV", "PSA AIRPURIFIER 220V"],
+                },
             ],
         }
     ],
@@ -724,7 +734,13 @@ def validar_cyber_2026(productos, now=None):
         return
     esperados = {}
     for regla in camp["productos"]:
-        for sku in regla["skus"]:
+        modalidades = regla.get("aplica") or camp.get("aplica") or ["normal", "canje"]
+        # GraphQL expone el precio normal de tienda, no el valor especial de
+        # Plan Canje. Las reglas exclusivas de canje se auditan contra la lista
+        # oficial y no deben compararse con el precio final de la tienda.
+        if "normal" not in modalidades:
+            continue
+        for sku in regla.get("skus") or []:
             esperados[sku] = regla["porcentaje"]
     obligatorios = {"611030420", "611290050", "611010510"}
     vistos = set()
@@ -783,6 +799,11 @@ def main():
         validar_cyber_2026(productos)
     for p in productos:
         p.pop("_precio_tienda", None)
+        # `promo` quedó históricamente también en productos normales con una
+        # rebaja vencida. Sólo se conserva en líneas cuyo nombre es realmente
+        # PROMO/COMBO; de otro modo la Lista de precios oculta productos válidos.
+        if p.get("promo") and not re.search(r"\b(?:PROMO|COMBO)\b", str(p.get("nombre") or ""), re.I):
+            p.pop("promo", None)
 
     by_sku = {p.get("sku"): p for p in productos if p.get("sku")}
     precios = {}

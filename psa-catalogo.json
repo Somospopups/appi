@@ -1014,16 +1014,6 @@
       "plan_canje": 1168200,
       "seccion": "Purificadores",
       "novedad": false,
-      "promo": {
-        "activa": true,
-        "etiqueta": "10% OFF",
-        "detalle": "10% OFF Promoción especial PSA Senik",
-        "descuento": 10,
-        "precio_original": 1370000,
-        "desde": "01/09/2026",
-        "hasta": "30/09/2026",
-        "vigencia": "Del 01/09 al 30/09/2026"
-      },
       "desc": "Purificador selectivo de arsénico con resina arsénico-selectiva, carbón activado granular con plata y KDF. Diseñado especialmente para zonas con presencia de arsénico en agua potable o de red. Vida útil: 18 meses u 8.000 litros."
     },
     {
@@ -1037,16 +1027,6 @@
       "plan_canje": 1168200,
       "seccion": "Purificadores",
       "novedad": false,
-      "promo": {
-        "activa": true,
-        "etiqueta": "10% OFF",
-        "detalle": "10% OFF Promoción especial PSA Senik",
-        "descuento": 10,
-        "precio_original": 1370000,
-        "desde": "01/09/2026",
-        "hasta": "30/09/2026",
-        "vigencia": "Del 01/09 al 30/09/2026"
-      },
       "desc": "Purificador selectivo de arsénico con resina arsénico-selectiva, carbón activado granular con plata y KDF. Diseñado especialmente para zonas con presencia de arsénico en agua potable o de red. Vida útil: 18 meses u 8.000 litros."
     },
     {
@@ -1086,16 +1066,6 @@
       "plan_canje": 399600,
       "seccion": "Gasificador",
       "novedad": false,
-      "promo": {
-        "activa": true,
-        "etiqueta": "10% OFF",
-        "detalle": "10% OFF Promoción Soda Burby",
-        "descuento": 10,
-        "precio_original": 468600,
-        "desde": "01/09/2026",
-        "hasta": "30/09/2026",
-        "vigencia": "Del 01/09 al 30/09/2026"
-      },
       "desc": "Gasificador de agua para preparar soda al instante con Agua Purificada PSA. Incluye cilindro de dióxido de carbono (CO2) de calidad alimentaria para hasta 60 litros y botella reutilizable libre de BPA."
     },
     {
@@ -1112,16 +1082,6 @@
       "fecha_novedad": "2026-09-01",
       "novedad_tag": "NUEVO LANZAMIENTO",
       "novedad_desc": "Novedad oficial del mes en catálogo PSA",
-      "promo": {
-        "activa": true,
-        "etiqueta": "10% OFF",
-        "detalle": "10% OFF Promoción Soda Burby",
-        "descuento": 10,
-        "precio_original": 468600,
-        "desde": "01/09/2026",
-        "hasta": "30/09/2026",
-        "vigencia": "Del 01/09 al 30/09/2026"
-      },
       "desc": "Gasificador de agua edición especial color Terra para preparar soda al instante con Agua Purificada PSA. Incluye cilindro de dióxido de carbono (CO2) de calidad alimentaria para hasta 60 litros y botella reutilizable libre de BPA."
     },
     {
@@ -3316,7 +3276,18 @@
         "hasta": "30/09/2026",
         "vigencia": "Del 01/09 al 30/09/2026"
       },
-      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (PROMO CILINDRO + PACK RENDIMIENTO II)."
+      "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (PROMO CILINDRO + PACK RENDIMIENTO II).",
+      "lista_oficial": true
+    },
+    {
+      "sku": "",
+      "nombre": "PSA UV LED",
+      "precio": 285000,
+      "lista": 285000,
+      "url": "",
+      "grupo": "Repuestos/mantenim. productos",
+      "plan_canje": null,
+      "seccion": "Repuestos/mantenim. productos"
     },
     {
       "sku": "614070010",
@@ -3436,6 +3407,16 @@
       "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (REPUESTO N°1 SEDIMENTOS OSMOSIS PSA ROPOT)."
     },
     {
+      "sku": "",
+      "nombre": "REPUESTO N°1 SEDIMENTOS PSA ROTECH UV",
+      "precio": 101100,
+      "lista": 101100,
+      "url": "",
+      "grupo": "Repuestos/mantenim. productos",
+      "plan_canje": null,
+      "seccion": "Repuestos/mantenim. productos"
+    },
+    {
       "sku": "612060030",
       "nombre": "REPUESTO N°2 CARBON BLOQUE OSMOSIS PSA ROPOT",
       "precio": 56750,
@@ -3447,6 +3428,16 @@
       "seccion": "Repuestos/mantenim. productos",
       "novedad": false,
       "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (REPUESTO N°2 CARBON BLOQUE OSMOSIS PSA ROPOT)."
+    },
+    {
+      "sku": "",
+      "nombre": "REPUESTO N°2 CARBON BLOQUE PSA ROTECH UV",
+      "precio": 56800,
+      "lista": 56800,
+      "url": "",
+      "grupo": "Repuestos/mantenim. productos",
+      "plan_canje": null,
+      "seccion": "Repuestos/mantenim. productos"
     },
     {
       "sku": "612060020",
@@ -3462,6 +3453,16 @@
       "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (REPUESTO N°3 MEMBRANA OSMOSIS PSA ROPOT)."
     },
     {
+      "sku": "",
+      "nombre": "REPUESTO N°3 MEMBRANA PSA ROTECH UV",
+      "precio": 164300,
+      "lista": 164300,
+      "url": "",
+      "grupo": "Repuestos/mantenim. productos",
+      "plan_canje": null,
+      "seccion": "Repuestos/mantenim. productos"
+    },
+    {
       "sku": "612060040",
       "nombre": "REPUESTO N°4 POST MEMBRANA OSMOSIS PSA ROPOT",
       "precio": 57800,
@@ -3473,6 +3474,16 @@
       "seccion": "Repuestos/mantenim. productos",
       "novedad": false,
       "desc": "Repuesto y accesorio oficial PSA para mantenimiento preventivo y reposición de componentes (REPUESTO N°4 POST MEMBRANA OSMOSIS PSA ROPOT)."
+    },
+    {
+      "sku": "",
+      "nombre": "REPUESTO N°4 POST. MEMBRANA PSA ROTECH UV",
+      "precio": 57800,
+      "lista": 57800,
+      "url": "",
+      "grupo": "Repuestos/mantenim. productos",
+      "plan_canje": null,
+      "seccion": "Repuestos/mantenim. productos"
     },
     {
       "sku": "612100030",
@@ -3928,6 +3939,16 @@
       "seccion": "Servicios",
       "novedad": false,
       "desc": "Purificador compacto ideal para cocinas pequeñas o consumo moderado. Con Carbón Activado Granular y CAG impregnado en plata, autopurga y nuevo elemento filtrante Fipor n.° 3. Vida útil: 12 meses o 12.000 litros."
+    },
+    {
+      "sku": "",
+      "nombre": "INSTALACION ROTECH",
+      "precio": 175500,
+      "lista": 175500,
+      "url": "",
+      "grupo": "Servicios",
+      "plan_canje": null,
+      "seccion": "Servicios"
     },
     {
       "sku": "623030130",

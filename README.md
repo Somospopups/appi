@@ -6,6 +6,16 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v903 · Precios verificados contra la lista oficial del 1 al 4 de noviembre
+
+- Corrige 25 importes finales de Plan Canje que necesitaban un 10% adicional durante la promoción.
+- Distingue descuentos de precio normal y descuentos exclusivos de Plan Canje.
+- La vigencia oficial comienza el 1 de noviembre y vence automáticamente al finalizar el 4.
+- Recupera Senik y Soda Burby, que estaban ocultos por una marca promocional vencida.
+- Incorpora seis repuestos/servicios presentes en el PDF oficial y conserva la promoción de cilindro incluida en esa lista.
+- Mantiene Appi animada y todas las funciones publicadas en v902.
+- Versión: **v903 · Segura** → Cache `appi-v903-precios-verificados`.
+
 ## v902 · Appi animada desde el dock
 
 - **Appi** se asoma desde el borde inferior derecho, detrás del dock, y saluda una vez por día.
