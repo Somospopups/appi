@@ -6,6 +6,16 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v901 · Mi Encuesta explicada paso a paso
+
+- **Mi Encuesta** incorpora una guía visible que explica qué hace y cómo utilizarla.
+- Un aviso destacado aclara que cada invitación es única y que cada nuevo envío debe comenzar desde esta pantalla.
+- Tres pasos muestran cómo crear la invitación, elegir la persona en WhatsApp y recibir automáticamente la respuesta en el Panel de Contactos.
+- Un recordatorio indica que no se deben reutilizar invitaciones anteriores, incluso si se vuelve a enviar a la misma persona.
+- Se agrega el acceso **Ver respuestas en Panel de Contactos**.
+- Se conservan el envío privado, WhatsApp, la animación del avión y el ingreso automático de respuestas y personas recomendadas.
+- Versión: **v901 · Segura** → Cache `appi-v901-encuesta-clara`.
+
 ## v900 · Contactos claros y encuesta en Herramientas
 
 - **Mi Encuesta** aparece como primera tarjeta de **Mis herramientas** y vuelve a abrir su propia pantalla.

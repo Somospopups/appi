@@ -103,8 +103,13 @@ test('Mi Encuesta es la primera herramienta y abre su propia pantalla', async ({
 
   await expect(page.locator('#view-encuesta')).toHaveClass(/active/);
   await expect(page.locator('#surveyShareBtn')).toBeVisible();
-  await expect(page.locator('#surveyToolContent')).toContainText('Las respuestas y los referidos aparecerán automáticamente');
+  await expect(page.locator('.survey-unique')).toContainText('Cada invitación es única');
+  await expect(page.locator('.survey-how')).toContainText('¿Cómo usar Mi Encuesta?');
+  await expect(page.locator('.survey-how')).toContainText('aparecerán automáticamente en el Panel de Contactos');
+  await expect(page.locator('.survey-reminder')).toContainText('Cada envío necesita su propio enlace');
+  await expect(page.locator('#surveyGoContacts')).toBeVisible();
   await expect(page.locator('#view-gestion')).not.toHaveClass(/active/);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(390);
 
   await page.locator('#btnBackEncuesta').click();
   await expect(page.locator('#view-herramientas')).toHaveClass(/active/);

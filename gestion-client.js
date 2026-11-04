@@ -130,7 +130,29 @@ function installShareStyles(){
   @keyframes shareDone{to{opacity:1;transform:scale(1)}}
   .share-done .tick{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.2);font-size:25px}
   .share-done b{font-size:14px}
-  .share-hint{margin:11px auto 0;max-width:330px;text-align:center;color:#777887;font-size:10.5px;line-height:1.5}
+  /* v901 · Guía visible y amable para que cada envío nazca siempre desde APPI. */
+  .survey-guide{width:min(100%,430px);margin:14px auto 0;display:grid;gap:10px;padding:0 0 120px}
+  .survey-unique{display:grid;grid-template-columns:42px minmax(0,1fr);gap:11px;align-items:start;padding:15px;border-radius:19px;background:linear-gradient(135deg,rgba(91,141,239,.13),rgba(58,208,164,.10));border:1px solid rgba(91,141,239,.18);box-shadow:0 8px 22px rgba(68,76,118,.07)}
+  .survey-unique .icon{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,#3c67ca,#725bd6 65%,#3ad0a4);font-size:20px;box-shadow:0 6px 14px rgba(72,82,180,.18)}
+  .survey-unique h2{margin:0;color:#30303d;font-size:15px;line-height:1.25}
+  .survey-unique p{margin:5px 0 0;color:#596174;font-size:11.5px;line-height:1.5}
+  .survey-how{padding:16px;border-radius:20px;background:rgba(255,255,255,.68);border:1px solid rgba(255,255,255,.88);box-shadow:0 8px 22px rgba(68,76,118,.07)}
+  .survey-how h2{margin:0 0 13px;color:#30303d;font-size:15px}
+  .survey-step{display:grid;grid-template-columns:34px minmax(0,1fr);gap:10px;align-items:start;padding:0 0 13px;margin:0 0 13px;border-bottom:1px solid rgba(80,90,130,.09)}
+  .survey-step:last-child{padding-bottom:0;margin-bottom:0;border-bottom:0}
+  .survey-step .number{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,#0b5878,#3ad0a4);font-size:13px;font-weight:950}
+  .survey-step strong{display:block;color:#363642;font-size:12.5px;line-height:1.3}
+  .survey-step p{margin:4px 0 0;color:#686f7e;font-size:11px;line-height:1.45}
+  .survey-reminder{padding:14px 15px;border-radius:18px;background:rgba(245,179,1,.09);border:1px solid rgba(245,179,1,.20);color:#6f5720}
+  .survey-reminder strong{display:block;font-size:12.5px;line-height:1.3}
+  .survey-reminder p{margin:5px 0 0;font-size:11px;line-height:1.5}
+  .survey-panel-link{width:100%;min-height:47px;border:1px solid rgba(91,141,239,.18);border-radius:15px;background:rgba(255,255,255,.58);color:#3d63c9;font:inherit;font-size:11.5px;font-weight:950;cursor:pointer;box-shadow:0 7px 18px rgba(68,76,118,.05)}
+  .survey-panel-link:active{transform:scale(.985)}
+  body.dark .survey-unique,body.dark .survey-how,body.dark .survey-panel-link{background:rgba(30,30,50,.62);border-color:rgba(255,255,255,.09)}
+  body.dark .survey-unique h2,body.dark .survey-how h2,body.dark .survey-step strong{color:#f0f0f5}
+  body.dark .survey-unique p,body.dark .survey-step p{color:#b9bbc7}
+  body.dark .survey-reminder{background:rgba(245,179,1,.11);color:#ead8a8}
+  @media(max-width:359px){.survey-unique{grid-template-columns:36px minmax(0,1fr);padding:13px}.survey-unique .icon{width:36px;height:36px}.survey-how{padding:14px}}
   .share-recent{margin-top:13px}
   .share-recent h3{margin:0 0 9px;color:#3d63c9;font-size:10px;text-transform:uppercase;letter-spacing:.4px}
   .share-row{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:14px;background:rgba(255,255,255,.62);border:1px solid rgba(255,255,255,.8);margin-bottom:6px}
@@ -266,8 +288,22 @@ function renderSurveyTool(){
         <span class="share-done" aria-hidden="true"><span class="tick">✓</span><b>¡Lista para enviar!</b></span>
       </button>
     </div>
-    <p class="share-hint">Las respuestas y los referidos aparecerán automáticamente en Panel de Contactos.</p>`;
+    <div class="survey-guide" aria-label="Cómo usar Mi Encuesta">
+      <section class="survey-unique">
+        <span class="icon" aria-hidden="true">🔗</span>
+        <div><h2>Cada invitación es única</h2><p>Cada vez que quieras compartir la encuesta, volvé a esta pantalla y tocá <strong>Enviar encuesta</strong>. APPI creará un enlace nuevo y único para ese envío. No reutilices ni reenvíes una invitación anterior.</p></div>
+      </section>
+      <section class="survey-how">
+        <h2>¿Cómo usar Mi Encuesta?</h2>
+        <div class="survey-step"><span class="number">1</span><div><strong>Tocá “Enviar encuesta”</strong><p>APPI preparará una invitación nueva con su propio enlace.</p></div></div>
+        <div class="survey-step"><span class="number">2</span><div><strong>Elegí a la persona en WhatsApp</strong><p>WhatsApp se abrirá automáticamente para que elijas el contacto y envíes el mensaje.</p></div></div>
+        <div class="survey-step"><span class="number">3</span><div><strong>Esperá su respuesta</strong><p>Sus respuestas y las personas que recomiende aparecerán automáticamente en el Panel de Contactos. No necesitás cargar nada manualmente.</p></div></div>
+      </section>
+      <aside class="survey-reminder"><strong>¿Querés enviarla nuevamente?</strong><p>Aunque sea para la misma persona, entrá otra vez a <strong>Mi Encuesta</strong> y generá una invitación nueva. Cada envío necesita su propio enlace.</p></aside>
+      <button type="button" class="survey-panel-link" id="surveyGoContacts">Ver respuestas en Panel de Contactos</button>
+    </div>`;
   if($('surveyShareBtn'))$('surveyShareBtn').onclick=startShareFlow;
+  if($('surveyGoContacts'))$('surveyGoContacts').onclick=()=>{if(typeof window.openMiGestion==='function')window.openMiGestion()};
 }
 
 // Un solo toque: se crea la invitación, vuela el avión y WhatsApp abre su

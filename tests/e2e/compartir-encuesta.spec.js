@@ -58,6 +58,7 @@ async function abrirComoDistribuidor(page, invitaciones) {
       return ventana;
     };
   });
+  await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/index.html', { waitUntil: 'networkidle' });
   await page.locator('#distributorInput').fill('02-9802014');
   await page.locator('#distributorPassword').fill('Clave1234');
@@ -85,6 +86,20 @@ test('Mi Encuesta muestra un solo botón de envío, sin datos técnicos', async 
     expect(texto.toLowerCase()).not.toContain(prohibido.toLowerCase());
   }
   await expect(page.locator('.survey-link-value')).toHaveCount(0);
+
+  // La guía explica todo el recorrido sin esconder instrucciones importantes.
+  await expect(page.locator('.survey-unique')).toContainText('Cada invitación es única');
+  await expect(page.locator('.survey-unique')).toContainText('No reutilices ni reenvíes una invitación anterior');
+  await expect(page.locator('.survey-how .survey-step')).toHaveCount(3);
+  await expect(page.locator('.survey-how')).toContainText('Elegí a la persona en WhatsApp');
+  await expect(page.locator('.survey-how')).toContainText('No necesitás cargar nada manualmente');
+  await expect(page.locator('.survey-reminder')).toContainText('Cada envío necesita su propio enlace');
+  await expect(page.locator('#surveyGoContacts')).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(390);
+
+  // El acceso secundario lleva directamente al lugar donde llegan las respuestas.
+  await page.locator('#surveyGoContacts').click();
+  await expect(page.locator('#view-gestion')).toHaveClass(/active/);
 });
 
 test('el botón crea la encuesta, la anima y deja elegir el contacto en WhatsApp', async ({ page }) => {
