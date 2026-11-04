@@ -6,6 +6,16 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v899 · Puntajes mensuales verificados
+
+- Corrige la lectura de PB con separador de miles de PSA: valores como `1.234` vuelven a representar **1234 PB**, no 1,234.
+- La corrección se aplica al Ranking de Ventas **Personal** y **Organización** de Mi negocio y a cada cierre mensual de Histórico.
+- Antes de guardar, APPI contrasta personas, PB individuales y total contra la normalización del informe de origen.
+- Una Línea Descendente con DIPs repetidos o valores que no coinciden no se guarda, para evitar duplicaciones silenciosas.
+- Histórico detecta automáticamente los cierres PSA creados con el lector anterior y vuelve a recuperarlos para el año vigente y el anterior.
+- Se conserva la regla aprobada: Organización suma el PB propio y el de todos los descendientes.
+- Versión: **v899 · Segura** → Cache `appi-v899-ranking-pb-validado`.
+
 ## v898 · Crear una cuenta más visible
 
 - La opción **Crear una cuenta** ahora se destaca en turquesa desde la pantalla de acceso.

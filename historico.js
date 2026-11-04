@@ -4,6 +4,7 @@
 
 const BASE_DB_NAME='appi-historico-v1';
 const DB_VERSION=2;
+const HIST_PB_DATA_VERSION=2;
 function historicalPersonType(){const person=window.APPIAuth&&window.APPIAuth.activePerson?window.APPIAuth.activePerson():null;return person&&person.tipo==='socio'?'socio':'titular'}
 function historicalDbName(){
   if(window.APPIAuth&&window.APPIAuth.isEnabled()){
@@ -248,6 +249,7 @@ async function parseHistoricalFile(type,file){
   if(type==='equipo'){
     const result=typeof procesarExcel==='function'?procesarExcel(sheets[0].rows):null;
     if(!result||!result.personas||!result.personas.length)throw new Error('No se pudo reconocer la Línea Descendente.');
+    if(typeof window.validarIntegridadPBEquipo==='function')window.validarIntegridadPBEquipo(result);
     return {result,detail:`${result.personas.length} personas detectadas`};
   }
   if(type==='garantias'){
@@ -324,7 +326,7 @@ async function buildPeriodRecord(draft){
   const existing=H.periods.find(p=>p.id===draft.id);
   const normalized=normalizePeriod(draft.parsed.equipo.result,draft.parsed.garantias.result,draft.parsed.ingresos.result,draft.year,draft.month);
   const filesMeta=[];for(const type of Object.keys(FILE_TYPES)){const file=draft.files[type];filesMeta.push({type,name:file.name,size:file.size,mime:file.type||'application/octet-stream',lastModified:file.lastModified||0,hash:await sha256(file)})}
-  return {id:draft.id,year:draft.year,month:draft.month,label:`${MONTHS_H[draft.month]} ${draft.year}`,version:existing?num(existing.version)+1:1,createdAt:existing?existing.createdAt:new Date().toISOString(),updatedAt:new Date().toISOString(),syncStatus:'pending',filesMeta,_actionPlans:cloneClean(H.actionPlans),...normalized};
+  return {id:draft.id,year:draft.year,month:draft.month,label:`${MONTHS_H[draft.month]} ${draft.year}`,version:existing?num(existing.version)+1:1,pbDataVersion:HIST_PB_DATA_VERSION,createdAt:existing?existing.createdAt:new Date().toISOString(),updatedAt:new Date().toISOString(),syncStatus:'pending',filesMeta,_actionPlans:cloneClean(H.actionPlans),...normalized};
 }
 async function saveMonthPeriod(id){
   const draft=H.uploads[id],existing=H.periods.find(p=>p.id===id);if(!draft)return;
@@ -360,6 +362,7 @@ function automaticParsedDataset(type,dataset,id){
   if(type==='equipo'){
     const result=typeof procesarExcel==='function'?procesarExcel(rows):null;
     if(!result||!Array.isArray(result.personas)||!result.personas.length)throw new Error('PSA no devolvió una Línea Descendente reconocible.');
+    if(typeof window.validarIntegridadPBEquipo==='function')window.validarIntegridadPBEquipo(result,dataset);
     return {rows,parsed:{result,detail:`${result.personas.length} personas recibidas de PSA`}};
   }
   if(type==='garantias'){
@@ -373,6 +376,7 @@ function automaticParsedDataset(type,dataset,id){
 }
 async function automaticDraftMatchesSaved(existing,draft){
   if(!existing||!Array.isArray(existing.filesMeta)||existing.filesMeta.length<3)return false;
+  if(existing.source==='psa-auto'&&num(existing.pbDataVersion)<HIST_PB_DATA_VERSION)return false;
   for(const type of Object.keys(FILE_TYPES)){
     const meta=existing.filesMeta.find(item=>item.type===type);
     if(!meta||!meta.hash||meta.hash!==await sha256(draft.files[type]))return false;
@@ -454,8 +458,11 @@ function expectedHistoricalPeriodIds(){
   return ids;
 }
 function missingHistoricalPeriodIds(){
-  const saved=new Set(H.periods.map(period=>period.id));
-  return expectedHistoricalPeriodIds().filter(id=>!saved.has(id)&&!(H.uploads[id]&&H.uploads[id].changed));
+  const saved=new Map(H.periods.map(period=>[period.id,period]));
+  return expectedHistoricalPeriodIds().filter(id=>{
+    const period=saved.get(id),outdated=period&&period.source==='psa-auto'&&num(period.pbDataVersion)<HIST_PB_DATA_VERSION;
+    return (!period||outdated)&&!(H.uploads[id]&&H.uploads[id].changed);
+  });
 }
 async function syncMissingPSAPeriods(options={}){
   if(H.autoBackfilling||H.archiveBackfilling||H.autoSyncing){

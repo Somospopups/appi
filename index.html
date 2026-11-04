@@ -4778,7 +4778,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v898 · Segura</div>
+  <div class="ds-foot">APPI · v899 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -8276,15 +8276,29 @@ function formatPB(n){
 }
 function parsePB(v){
   if(v == null || v === '') return 0;
-  let s = (''+v).trim();
+  // XLSX entrega números reales: nunca reinterpretar sus decimales como miles.
+  if(typeof v === 'number') return Number.isFinite(v) ? v : 0;
+  // Los informes HTML de PSA usan formato argentino. Un entero como "1.234"
+  // significa 1234 PB, mientras que "1234.50" conserva el punto decimal.
+  // Esta regla coincide con numPB() de la conexión segura a PSA.
+  const s = String(v).trim().replace(/[^0-9.,-]/g,'');
   if(!s) return 0;
-  if(s.includes(',') && s.includes('.')){
-    s = s.replace(/\./g,'').replace(',','.');
-  } else if(s.includes(',')){
-    s = s.replace(',','.');
+  const comma = s.lastIndexOf(','), dot = s.lastIndexOf('.');
+  let normalized = s;
+  if(comma > dot){
+    normalized = s.slice(0, comma).replace(/[.,]/g,'') + '.' + s.slice(comma + 1);
+  } else if(dot > -1){
+    const decimals = s.slice(dot + 1);
+    if(comma > -1 || /^\d{1,2}$/.test(decimals)){
+      normalized = s.slice(0, dot).replace(/[.,]/g,'') + '.' + decimals;
+    } else {
+      normalized = s.replace(/[.,]/g,'');
+    }
+  } else {
+    normalized = s.replace(/,/g,'.');
   }
-  const n = parseFloat(s);
-  return isNaN(n) ? 0 : n;
+  const n = parseFloat(normalized);
+  return Number.isFinite(n) ? n : 0;
 }
 function catTotal(catKey){
   return (presuState.cats[catKey]||[]).reduce((s,it)=>{
@@ -9161,6 +9175,7 @@ function procesarExcel(rows){
   console.log('📍 Índices detectados:', idx);
 
   const personas = [];
+  const filasPBOrigen = [];
   for(let i = headerRow + 1; i < rows.length; i++){
     const r = rows[i] || [];
     const nivelRaw = r[idx.nivel];
@@ -9170,9 +9185,11 @@ function procesarExcel(rows){
     if(!nomCell) continue;
     const nc = parseNombreCodigo(nomCell);
     if(!nc.nombre || nc.nombre.length < 3) continue;
+    const pbActual = parsePB(r[idx.pnAct]);
+    filasPBOrigen.push({fila:i,nivel,codigo:nc.codigo,nombre:nc.nombre,pb:pbActual});
     // Nivel 0 = fila del titular (figura primero). No entra al árbol: sólo su PB.
     if(nivel === 0){
-      if(titular.pbPersonal==null || titular.pbPersonal==='') titular.pbPersonal = parsePB(r[idx.pnAct]);
+      if(titular.pbPersonal==null || titular.pbPersonal==='') titular.pbPersonal = pbActual;
       if(!titular.nombre) titular.nombre = nc.nombre;
       if(!titular.dip && nc.codigo) titular.dip = nc.codigo;
       continue;
@@ -9185,7 +9202,7 @@ function procesarExcel(rows){
       cat: (r[idx.cat]||'').toString().trim().toUpperCase(),
       tel: (r[idx.tel]||'').toString().trim(),
       estado: (r[idx.estado]||'').toString().trim(),
-      pnAct: parsePB(r[idx.pnAct]),
+      pnAct: pbActual,
       m1: parsePB(r[idx.m1]),
       m2: parsePB(r[idx.m2]),
       m3: parsePB(r[idx.m3]),
@@ -9226,6 +9243,11 @@ function procesarExcel(rows){
 
   return {
     titular, raices, personas,
+    pbDataVersion: 2,
+    pbOrigen: {
+      filas: filasPBOrigen,
+      total: filasPBOrigen.reduce((sum,item)=>sum + (Number(item.pb)||0), 0)
+    },
     fechaCarga: Date.now(),
     fileName: '',
     fileSize: 0,
@@ -9233,6 +9255,51 @@ function procesarExcel(rows){
     anioReporte: new Date().getFullYear()
   };
 }
+
+function pbNombreComparable(value){
+  return String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+}
+function validarIntegridadPBEquipo(teamData,dataset){
+  if(!teamData || !Array.isArray(teamData.personas)) throw new Error('No se pudo verificar la Línea Descendente.');
+  const filas = teamData.pbOrigen && Array.isArray(teamData.pbOrigen.filas)
+    ? teamData.pbOrigen.filas
+    : teamData.personas.map((p,index)=>({fila:index,nivel:p.nivel,codigo:p.codigo,nombre:p.nombre,pb:Number(p.pnAct)||0}));
+  const vistos = new Map(), repetidos = new Set();
+  filas.forEach(item=>{
+    const code=String(item.codigo||'').trim().replace(/\s+/g,'').toUpperCase();
+    if(!code)return;
+    if(vistos.has(code))repetidos.add(code);else vistos.set(code,item.fila);
+  });
+  if(repetidos.size){
+    const lista=[...repetidos].slice(0,3).join(', ');
+    throw new Error(`La Línea Descendente repite ${repetidos.size===1?'el DIP':'los DIPs'} ${lista}. APPI no la guardó para evitar sumar puntos dos veces.`);
+  }
+  const sourceRows=Array.isArray(dataset&&dataset.par)?dataset.par.filter(item=>item&&item.n!=null):[];
+  if(!sourceRows.length)return {ok:true,count:filas.length,total:filas.reduce((sum,item)=>sum+(Number(item.pb)||0),0)};
+  if(sourceRows.length!==filas.length){
+    throw new Error(`PSA informó ${sourceRows.length} personas con PB, pero la Línea Descendente permitió verificar ${filas.length}. APPI no guardó datos incompletos.`);
+  }
+  const actualTotal=filas.reduce((sum,item)=>sum+(Number(item.pb)||0),0);
+  const sourceTotal=Number.isFinite(Number(dataset.pb))?Number(dataset.pb):sourceRows.reduce((sum,item)=>sum+(Number(item.pb)||0),0);
+  if(Math.abs(actualTotal-sourceTotal)>.01){
+    throw new Error('Los puntos de la Línea Descendente no coinciden con el total informado por PSA. APPI no guardó el cierre y volverá a intentarlo.');
+  }
+  const grouped=rows=>{
+    const map=new Map();
+    rows.forEach(item=>{const key=pbNombreComparable(item.nombre!=null?item.nombre:item.n);if(!map.has(key))map.set(key,[]);map.get(key).push(Number(item.pb)||0)});
+    map.forEach(values=>values.sort((a,b)=>a-b));
+    return map;
+  };
+  const actualByName=grouped(filas),sourceByName=grouped(sourceRows.map(item=>({nombre:item.n,pb:item.pb})));
+  for(const [name,expected] of sourceByName){
+    const actual=actualByName.get(name)||[];
+    if(actual.length!==expected.length||expected.some((value,index)=>Math.abs(value-actual[index])>.01)){
+      throw new Error('APPI detectó una diferencia en los PB individuales informados por PSA. No guardó el cierre para evitar un ranking incorrecto.');
+    }
+  }
+  return {ok:true,count:filas.length,total:actualTotal};
+}
+window.validarIntegridadPBEquipo=validarIntegridadPBEquipo;
 
 function openEquipo(){
   loadEquipoFromStorage();
@@ -9399,6 +9466,7 @@ document.getElementById('equipoFileInput').onchange = (e)=>{
       
       const procesado = procesarExcel(rows);
       if(procesado){
+        validarIntegridadPBEquipo(procesado);
         procesado.fileName = file.name;
         procesado.fileSize = file.size;
         equipoData = procesado;
@@ -14334,8 +14402,8 @@ function cerrarToolsMenu(){
   // con archivos viejos en pantalla.
   if ('serviceWorker' in navigator) {
     (async () => {
-    const swVersion='898';
-    const CACHE_NAME='appi-v898-crear-cuenta-visible';
+    const swVersion='899';
+    const CACHE_NAME='appi-v899-ranking-pb-validado';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}
@@ -18562,6 +18630,7 @@ setTimeout(initUsuarios, 1200);
 
 const BASE_DB_NAME='appi-historico-v1';
 const DB_VERSION=2;
+const HIST_PB_DATA_VERSION=2;
 function historicalPersonType(){const person=window.APPIAuth&&window.APPIAuth.activePerson?window.APPIAuth.activePerson():null;return person&&person.tipo==='socio'?'socio':'titular'}
 function historicalDbName(){
   if(window.APPIAuth&&window.APPIAuth.isEnabled()){
@@ -18806,6 +18875,7 @@ async function parseHistoricalFile(type,file){
   if(type==='equipo'){
     const result=typeof procesarExcel==='function'?procesarExcel(sheets[0].rows):null;
     if(!result||!result.personas||!result.personas.length)throw new Error('No se pudo reconocer la Línea Descendente.');
+    if(typeof window.validarIntegridadPBEquipo==='function')window.validarIntegridadPBEquipo(result);
     return {result,detail:`${result.personas.length} personas detectadas`};
   }
   if(type==='garantias'){
@@ -18882,7 +18952,7 @@ async function buildPeriodRecord(draft){
   const existing=H.periods.find(p=>p.id===draft.id);
   const normalized=normalizePeriod(draft.parsed.equipo.result,draft.parsed.garantias.result,draft.parsed.ingresos.result,draft.year,draft.month);
   const filesMeta=[];for(const type of Object.keys(FILE_TYPES)){const file=draft.files[type];filesMeta.push({type,name:file.name,size:file.size,mime:file.type||'application/octet-stream',lastModified:file.lastModified||0,hash:await sha256(file)})}
-  return {id:draft.id,year:draft.year,month:draft.month,label:`${MONTHS_H[draft.month]} ${draft.year}`,version:existing?num(existing.version)+1:1,createdAt:existing?existing.createdAt:new Date().toISOString(),updatedAt:new Date().toISOString(),syncStatus:'pending',filesMeta,_actionPlans:cloneClean(H.actionPlans),...normalized};
+  return {id:draft.id,year:draft.year,month:draft.month,label:`${MONTHS_H[draft.month]} ${draft.year}`,version:existing?num(existing.version)+1:1,pbDataVersion:HIST_PB_DATA_VERSION,createdAt:existing?existing.createdAt:new Date().toISOString(),updatedAt:new Date().toISOString(),syncStatus:'pending',filesMeta,_actionPlans:cloneClean(H.actionPlans),...normalized};
 }
 async function saveMonthPeriod(id){
   const draft=H.uploads[id],existing=H.periods.find(p=>p.id===id);if(!draft)return;
@@ -18918,6 +18988,7 @@ function automaticParsedDataset(type,dataset,id){
   if(type==='equipo'){
     const result=typeof procesarExcel==='function'?procesarExcel(rows):null;
     if(!result||!Array.isArray(result.personas)||!result.personas.length)throw new Error('PSA no devolvió una Línea Descendente reconocible.');
+    if(typeof window.validarIntegridadPBEquipo==='function')window.validarIntegridadPBEquipo(result,dataset);
     return {rows,parsed:{result,detail:`${result.personas.length} personas recibidas de PSA`}};
   }
   if(type==='garantias'){
@@ -18931,6 +19002,7 @@ function automaticParsedDataset(type,dataset,id){
 }
 async function automaticDraftMatchesSaved(existing,draft){
   if(!existing||!Array.isArray(existing.filesMeta)||existing.filesMeta.length<3)return false;
+  if(existing.source==='psa-auto'&&num(existing.pbDataVersion)<HIST_PB_DATA_VERSION)return false;
   for(const type of Object.keys(FILE_TYPES)){
     const meta=existing.filesMeta.find(item=>item.type===type);
     if(!meta||!meta.hash||meta.hash!==await sha256(draft.files[type]))return false;
@@ -19012,8 +19084,11 @@ function expectedHistoricalPeriodIds(){
   return ids;
 }
 function missingHistoricalPeriodIds(){
-  const saved=new Set(H.periods.map(period=>period.id));
-  return expectedHistoricalPeriodIds().filter(id=>!saved.has(id)&&!(H.uploads[id]&&H.uploads[id].changed));
+  const saved=new Map(H.periods.map(period=>[period.id,period]));
+  return expectedHistoricalPeriodIds().filter(id=>{
+    const period=saved.get(id),outdated=period&&period.source==='psa-auto'&&num(period.pbDataVersion)<HIST_PB_DATA_VERSION;
+    return (!period||outdated)&&!(H.uploads[id]&&H.uploads[id].changed);
+  });
 }
 async function syncMissingPSAPeriods(options={}){
   if(H.autoBackfilling||H.archiveBackfilling||H.autoSyncing){
@@ -20522,6 +20597,7 @@ async function sincronizarTodoPSA(creds, opts){
         try{
           const eq = procesarExcel(j.linea.filas);
           if(eq && eq.personas && eq.personas.length){
+            validarIntegridadPBEquipo(eq,j.linea);
             equipoData = eq;
             saveEquipoToStorage();
             try{ if(window.appiGuardarLinea) window.appiGuardarLinea(j.linea.par || []); }catch(e){}
