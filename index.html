@@ -145,7 +145,7 @@ window.openStock=function(){
 <script src="./whatsapp-app.js?v=618"></script>
 <script src="./auth-client.js?v=898"></script>
 <script src="./prueba-banner.js?v=618"></script>
-<script src="./data-sync.js?v=914"></script>
+<script src="./data-sync.js?v=915"></script>
 <script src="./js/membership-admin.js?v=618"></script>
 <script src="./admin-panel.js?v=618"></script>
 <script src="./js/compromiso-pago.js?v=618"></script>
@@ -167,7 +167,7 @@ window.openStock=function(){
 <script src="./escalera-suenos.js?v=618"></script>
 <script src="./demo-guia.js?v=618"></script>
 <script src="./tablero-negocio.js?v=618"></script>
-<script src="./lista-precios.js?v=914"></script>
+<script src="./lista-precios.js?v=915"></script>
 <script src="./vendor/pdf.min.js?v=618"></script>
 <script src="./canillas-adaptadores.js?v=618"></script>
 <script src="./vendor/zxing.min.js?v=618"></script>
@@ -4665,13 +4665,15 @@ html body .lp-fab{
 }
 </style>
 
-<link rel="stylesheet" href="./appi-gotita.css?v=914">
-<link rel="stylesheet" href="./appi-assistant.css?v=914">
+<link rel="stylesheet" href="./appi-gotita.css?v=915">
+<link rel="stylesheet" href="./appi-progreso.css?v=915">
+<link rel="stylesheet" href="./appi-assistant.css?v=915">
 <link rel="stylesheet" href="./appi-tour.css?v=914">
-<script src="./appi-gotita.js?v=914" defer></script>
-<script src="./appi-assistant.js?v=914" defer></script>
-<script src="./appi-buscar.js?v=914" defer></script>
-<script src="./appi-tour.js?v=914" defer></script>
+<script src="./appi-gotita.js?v=915" defer></script>
+<script src="./appi-progreso.js?v=915" defer></script>
+<script src="./appi-assistant.js?v=915" defer></script>
+<script src="./appi-buscar.js?v=915" defer></script>
+<script src="./appi-tour.js?v=915" defer></script>
 </head>
 <body>
 
@@ -4785,7 +4787,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v914 · Segura</div>
+  <div class="ds-foot">APPI · v915 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -5122,6 +5124,19 @@ body.dark #pageTabs button.active{color:#c5d6ff}
       Tu mes en foco, tus datos ordenados y tu próximo paso siempre claro.
     </div>
   </section>
+
+  <!-- MI AVANCE · acompañamiento comercial con evidencia real -->
+  <section id="view-progreso" class="view">
+    <header class="top apg-view-top">
+      <button class="back-btn" type="button" onclick="APPIProgreso.cerrar()" aria-label="Volver">‹</button>
+      <button class="help-btn" type="button" onclick="APPITour.empezar('view-progreso')" aria-label="Ayuda">?</button>
+      <button class="tools-btn" onclick="toggleToolsMenu(event)" aria-label="Herramientas" title="Herramientas">⚙️</button>
+      <h1 class="title">Mi avance</h1>
+      <p>evidencia real y próximo paso</p>
+    </header>
+    <div id="appiProgresoDetalle" aria-live="polite"></div>
+  </section>
+
   <!-- PLANIFICANDO MI MES -->
   <section id="view-planning" class="view">
     <header class="top">
@@ -7699,22 +7714,22 @@ function showView(id,opts){
     b.classList.toggle('active', b.dataset.view===id);
   });
   // Sidebar escritorio: marcar activo (con equivalencias de sub-vistas)
-  const dsMap = {'view-home':'view-home','view-presu':'view-presu','view-presu-hist':'view-presu','view-equipo':'view-equipo','view-historico':'view-historico','view-usuarios':'view-usuarios','view-campus':'view-campus','view-margarita':'view-margarita','view-seguimiento':'view-seguimiento','view-encuesta':'view-encuesta','view-gestion':'view-gestion','view-grabadora':'view-grabadora','view-notas':'view-notas','view-tumes':'view-tumes','view-siete':'view-siete','view-siete-detail':'view-siete','view-ocho':'view-ocho','view-suenos':'view-suenos','view-demo':'view-demo','view-botella':'view-botella','view-simulador':'view-simulador','view-stock':'view-stock','view-reuniones':'view-reuniones','view-lista':'view-lista','view-canillas':'view-canillas'};
+  const dsMap = {'view-home':'view-home','view-progreso':'view-negocio','view-presu':'view-presu','view-presu-hist':'view-presu','view-equipo':'view-equipo','view-historico':'view-historico','view-usuarios':'view-usuarios','view-campus':'view-campus','view-margarita':'view-margarita','view-seguimiento':'view-seguimiento','view-encuesta':'view-encuesta','view-gestion':'view-gestion','view-grabadora':'view-grabadora','view-notas':'view-notas','view-tumes':'view-tumes','view-siete':'view-siete','view-siete-detail':'view-siete','view-ocho':'view-ocho','view-suenos':'view-suenos','view-demo':'view-demo','view-botella':'view-botella','view-simulador':'view-simulador','view-stock':'view-stock','view-reuniones':'view-reuniones','view-lista':'view-lista','view-canillas':'view-canillas'};
   const dsTarget = (id==='view-wheel'||id==='view-eval') ? `rueda-${currentRueda||'vida'}` : (dsMap[id] || '');
   document.querySelectorAll('#deskSidebar .ds-btn').forEach(b=>{
     b.classList.toggle('active', b.dataset.ds===dsTarget);
   });
-  const hideTabsOn = ['view-home','view-tumes','view-siete','view-siete-detail','view-ocho','view-suenos','view-demo','view-botella','view-simulador','view-stock','view-presu','view-presu-hist','view-equipo','view-historico','view-seguimiento','view-planning','view-encuesta','view-gestion','view-grabadora','view-notas','view-usuarios','view-admin','view-canillas'];
+  const hideTabsOn = ['view-home','view-progreso','view-tumes','view-siete','view-siete-detail','view-ocho','view-suenos','view-demo','view-botella','view-simulador','view-stock','view-presu','view-presu-hist','view-equipo','view-historico','view-seguimiento','view-planning','view-encuesta','view-gestion','view-grabadora','view-notas','view-usuarios','view-admin','view-canillas'];
   document.getElementById('tabs').style.display = (id==='view-wheel'||id==='view-eval') ? 'flex' : 'none';
   const _pageHub={
     'view-home':'view-home','view-mes':'view-mes','view-tumes':'view-mes','view-siete':'view-mes','view-siete-detail':'view-mes','view-presu':'view-mes','view-presu-hist':'view-mes','view-wheel':'view-mes','view-eval':'view-mes','view-planning':'view-mes',
-    'view-negocio':'view-negocio','view-equipo':'view-negocio','view-historico':'view-negocio','view-usuarios':'view-negocio','view-campus':'view-negocio','view-margarita':'view-negocio','view-seguimiento':'view-negocio','view-gestion':'view-negocio',
+    'view-negocio':'view-negocio','view-progreso':'view-negocio','view-equipo':'view-negocio','view-historico':'view-negocio','view-usuarios':'view-negocio','view-campus':'view-negocio','view-margarita':'view-negocio','view-seguimiento':'view-negocio','view-gestion':'view-negocio',
     'view-herramientas':'view-herramientas','view-stock':'view-herramientas','view-ocho':'view-herramientas','view-suenos':'view-herramientas','view-demo':'view-herramientas','view-botella':'view-herramientas','view-simulador':'view-herramientas','view-grabadora':'view-herramientas','view-notas':'view-herramientas','view-encuesta':'view-herramientas','view-lista':'view-herramientas','view-canillas':'view-herramientas'
   };
   const _hub=_pageHub[id]||'view-home';
   const _isPage = ['view-home','view-mes','view-negocio','view-herramientas'].includes(id);
   const pt=document.getElementById('pageTabs');
-  const _hidePt = id==='view-admin' || document.body.classList.contains('appi-login-abierto') || document.body.classList.contains('appi-admin');
+  const _hidePt = id==='view-admin' || id==='view-progreso' || document.body.classList.contains('appi-login-abierto') || document.body.classList.contains('appi-admin');
   if(pt) pt.style.display = _hidePt ? 'none' : 'flex';
   document.querySelectorAll('#pageTabs button').forEach(b=>b.classList.toggle('active', b.dataset.view===_hub));
   const _pageIdx = {'view-home':0,'view-mes':1,'view-negocio':2,'view-herramientas':3};
@@ -7727,7 +7742,8 @@ function showView(id,opts){
   }
   if(id==='view-eval')    try{ renderAreas(); }catch(e){ console.error(e); }
   if(id==='view-wheel')   try{ renderWheel(); }catch(e){ console.error(e); }
-  if(id==='view-home')    try{ if(typeof renderHomeCompleto==='function') renderHomeCompleto(); }catch(e){ console.error(e); }
+  if(id==='view-home')    try{ if(typeof renderHomeCompleto==='function') renderHomeCompleto(); if(window.APPIProgreso) setTimeout(()=>window.APPIProgreso.refresh(),80); }catch(e){ console.error(e); }
+  if(id==='view-progreso') try{ if(window.APPIProgreso) setTimeout(()=>window.APPIProgreso.refresh(),0); }catch(e){ console.error(e); }
   if(id==='view-planning') try{ renderPlanningTools(); }catch(e){ console.error(e); }
   if(id==='view-seguimiento') try{ renderSeguimiento(); }catch(e){ console.error(e); }
   if(id==='view-negocio'){
@@ -12691,6 +12707,20 @@ function renderToolsList(){
     onClick:'openHistorico()', accent:'#5b8def', gradient:'linear-gradient(135deg,#3d63c9,#3ad0a4)'
   });
 
+  let progresoInfo=null;
+  try{ progresoInfo=window.APPIProgreso&&window.APPIProgreso.analizar?window.APPIProgreso.analizar():null; }catch(e){}
+  const progresoAreas=progresoInfo?Number(progresoInfo.activeAreas||0):0;
+  const progresoNext=progresoInfo&&progresoInfo.plan&&progresoInfo.plan.items
+    ? (progresoInfo.plan.items.find(x=>!x.done)||progresoInfo.plan.items[0]) : null;
+  const progresoCard = renderHomeQuickCard({
+    icon:'↗', title:'Mi avance', sub:progresoNext?progresoNext.title:'Evidencia real y próximo paso',
+    statusVal:`${progresoAreas}/4`,
+    statusClass:progresoAreas>0?'pending':'empty',
+    progressPct:progresoAreas*25,
+    timeAgo:'Plan comercial de hoy',
+    onClick:'APPIProgreso.abrir()', accent:'#6f62c7', gradient:'linear-gradient(135deg,#0b5878,#6f62c7)'
+  });
+
   const seguimientoCard = renderHomeQuickCard({
     icon:'📇', title:'Panel de Contactos', sub:'Seguimiento de personas',
     statusVal: `${seguimientoPendientes()}`,
@@ -12734,7 +12764,7 @@ function renderToolsList(){
   const mesHost=document.getElementById('mesGrid');
   const negHost=document.getElementById('negGrid');
   if(mesHost) mesHost.innerHTML = c2 + c1 + c3 + c4;
-  if(negHost) negHost.innerHTML = seguimientoCard + equipoCard + historicoCard + usuariosCard + campusCard + margaritaCard;
+  if(negHost) negHost.innerHTML = progresoCard + seguimientoCard + equipoCard + historicoCard + usuariosCard + campusCard + margaritaCard;
   
   // === HERRAMIENTAS GRID ===
   const herrHost = document.getElementById('herrGrid');
@@ -14497,8 +14527,8 @@ function cerrarToolsMenu(){
   // con archivos viejos en pantalla.
   if ('serviceWorker' in navigator) {
     (async () => {
-    const swVersion='914';
-    const CACHE_NAME='appi-v914-cyberweek';
+    const swVersion='915';
+    const CACHE_NAME='appi-v915-mi-avance';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}

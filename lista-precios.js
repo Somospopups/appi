@@ -2911,6 +2911,13 @@
       var nombre = 'Presupuesto' + (para ? '-' + para.replace(/[^\wáéíóúñüÁÉÍÓÚÑ ]+/g, '').trim().replace(/\s+/g, '-') : '') + '.pdf';
       var blob = pdf.output('blob');
       var file = new File([blob], nombre, { type: 'application/pdf' });
+      // Mi avance cuenta únicamente el presupuesto que llegó a generarse.
+      // Su firma evita duplicarlo si la persona vuelve a descargar el mismo PDF.
+      try {
+        if (window.APPIProgreso && window.APPIProgreso.registrarPresupuesto) {
+          window.APPIProgreso.registrarPresupuesto({ para: para, total: r.tot, lineas: r.lineas });
+        }
+      } catch (eRegistro) {}
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
         navigator.share({ files: [file], title: 'Presupuesto', text: para ? ('Presupuesto para ' + para) : 'Presupuesto' }).catch(function () {
           pdf.save(nombre);

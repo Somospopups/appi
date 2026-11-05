@@ -17,7 +17,7 @@ const EXACT_KEYS=new Set([
 const PREFIXES=[
   'rueda','siete_','presu_','lastUpdate_','bonus_notif_',
   'appi_suenos_v1_','appi_porque_v1_','appi_stock_v1_','appi_prestamos_v1_','appi_pendientes_v1_','appi_cal_tareas_v1_','appi_tarjetas_v1_',
-  'appi_acciones_v1_','appi_agenda_personal_v1_','appi_wa_cuidado_','appi_ducha_rinnova_v1_','appi_metodo_envio_v1_','appi_metodo_envio_v2_',
+  'appi_acciones_v1_','appi_progreso_v1_','appi_agenda_personal_v1_','appi_wa_cuidado_','appi_ducha_rinnova_v1_','appi_metodo_envio_v1_','appi_metodo_envio_v2_',
   'appi_mensajes_v1_','appi_tu_mes_eventos_v1_','appi_campus_psa_v1_','appi_margarita_contactos_v1_',
   // Las correcciones de teléfono (v633) viven con la cuenta: si la persona
   // entra desde otro equipo o borra los datos del navegador, la lista vuelve
@@ -35,6 +35,7 @@ function isDataKey(key){
 }
 function activePersonType(){const person=window.APPIAuth&&window.APPIAuth.activePerson?window.APPIAuth.activePerson():null;return person&&person.tipo==='socio'?'socio':'titular'}
 function isAccionesKey(key){return String(key||'').startsWith('appi_acciones_v1_')}
+function isProgresoKey(key){return String(key||'').startsWith('appi_progreso_v1_')}
 function isMensajesKey(key){return String(key||'').startsWith('appi_mensajes_v1_')}
 function isCampusKey(key){return String(key||'').startsWith('appi_campus_psa_v1_')}
 function accionesLegacyCloudKey(key){return String(key||'').startsWith(PERSON_PREFIX+'appi_acciones_v1_')}
@@ -42,7 +43,7 @@ function isSharedKey(key){
   key=String(key||'');
   // La jornada y su Impulso pertenecen a la cuenta: titular y socio comparten
   // las mismas acciones y no pueden ganar el bonus dos veces en un día.
-  return SHARED_KEYS.has(key)||isAccionesKey(key)||isMensajesKey(key)||isCampusKey(key);
+  return SHARED_KEYS.has(key)||isAccionesKey(key)||isProgresoKey(key)||isMensajesKey(key)||isCampusKey(key);
 }
 function cloudDataKey(key,personType=state.personType){return personType==='socio'&&!isSharedKey(key)?PERSON_PREFIX+key:key}
 function localDataKey(cloudKey,personType=state.personType){
@@ -112,6 +113,41 @@ function mergeAccionesValue(left,right){
     dias[k]={marcas,acc,lista,relleno,total,hechas,noHechas,ganado:!!(total&&hechas===total)};
   });
   return JSON.stringify({dias,completadas,asignadas});
+}
+// Mi avance guarda una línea de partida, fotografías diarias, eventos y planes.
+// Se unen por identidad para que dos dispositivos no pisen evidencia entre sí.
+function mergeProgresoValue(left,right){
+  const a=parseJsonObj(left),b=parseJsonObj(right);
+  const at=v=>String(v&&v.at||v&&v.capturedAt||v&&v.updatedAt||v&&v.createdAt||'');
+  const pickNewer=(x,y)=>{if(!x)return y;if(!y)return x;return at(x)>=at(y)?x:y};
+  const pickOlder=(x,y)=>{if(!x)return y;if(!y)return x;const ax=at(x),ay=at(y);if(!ax)return y;if(!ay)return x;return ax<=ay?x:y};
+  const mergeMap=(x,y,picker)=>{
+    const out={};
+    new Set([...Object.keys(x||{}),...Object.keys(y||{})]).forEach(k=>{out[k]=picker((x||{})[k],(y||{})[k])});
+    return out;
+  };
+  const snapshots=mergeMap(a.snapshots,b.snapshots,pickNewer);
+  const events=mergeMap(a.events,b.events,pickOlder);
+  const plans={};
+  new Set([...Object.keys(a.plans||{}),...Object.keys(b.plans||{})]).forEach(day=>{
+    const x=(a.plans||{})[day],y=(b.plans||{})[day];
+    if(!x||!y){plans[day]=x||y;return}
+    const newest=pickNewer(x,y),oldest=pickOlder(x,y),items={};
+    [...(Array.isArray(x.items)?x.items:[]),...(Array.isArray(y.items)?y.items:[])].forEach(item=>{
+      const id=String(item&&item.id||item&&item.type||'');if(!id)return;
+      const prev=items[id];
+      if(!prev){items[id]=item;return}
+      const detail=at(item)>=at(prev)?item:prev;
+      const baseline=pickOlder(prev.baseline,item.baseline);
+      items[id]={...detail,baseline:baseline||detail.baseline};
+    });
+    const planOrder={seguimientos:0,demostraciones:1,visitas:2,contactos:3,presupuestos:4};
+    const ordered=Object.keys(items).map(k=>items[k]).sort((p,q)=>(planOrder[p&&p.type]??9)-(planOrder[q&&q.type]??9)||String(p&&p.id||'').localeCompare(String(q&&q.id||'')));
+    plans[day]={...newest,date:newest.date||day,createdAt:oldest.createdAt||newest.createdAt,updatedAt:newest.updatedAt||newest.createdAt,items:ordered};
+  });
+  const baseline=pickOlder(a.baseline,b.baseline);
+  const createdAt=pickOlder({at:a.createdAt},{at:b.createdAt});
+  return JSON.stringify({version:1,createdAt:createdAt&&createdAt.at||a.createdAt||b.createdAt||new Date().toISOString(),baseline,snapshots,events,plans});
 }
 function rememberLegacyAcciones(cloudKeys,personType=state.personType){
   (cloudKeys||[]).forEach(cloudKey=>{
@@ -252,6 +288,12 @@ function merge(local,remote,preferLocal=false){
       if(merged!==String(remote.values[key]||''))dirty.push(key);
       continue;
     }
+    if(isProgresoKey(key)&&localHas&&remoteHas){
+      const merged=mergeProgresoValue(local.values[key],remote.values[key]);
+      values[key]=merged;changedAt[key]=Math.max(lt,rt,Date.now());
+      if(merged!==String(remote.values[key]||''))dirty.push(key);
+      continue;
+    }
     const useLocal=localHas&&(!remoteHas||preferLocal||lt>rt);
     if(useLocal){values[key]=local.values[key];changedAt[key]=lt||Date.now();if(!remoteHas||local.values[key]!==remote.values[key])dirty.push(key)}
     else if(remoteHas){values[key]=remote.values[key];changedAt[key]=rt}
@@ -381,5 +423,5 @@ document.addEventListener('visibilitychange',()=>{
 window.addEventListener('pagehide',()=>{if(state.ready)syncNow(false).catch(()=>{})});
 setInterval(()=>{if(state.ready&&navigator.onLine&&(state.dirty.size||state.deleted.size||state.dropCloudKeys.size))syncNow(false).catch(()=>{})},30000);
 
-window.APPIDataSync={isDataKey,isSharedKey,isAccionesKey,cloudDataKey,localDataKey,mergeAccionesValue,collect,start,syncNow,logoutAndLock,status,cacheDelete};
+window.APPIDataSync={isDataKey,isSharedKey,isAccionesKey,isProgresoKey,cloudDataKey,localDataKey,mergeAccionesValue,mergeProgresoValue,collect,start,syncNow,logoutAndLock,status,cacheDelete};
 })();

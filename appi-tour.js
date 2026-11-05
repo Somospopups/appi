@@ -22,6 +22,18 @@
       {sel:['#pageTabs'], titulo:'La barra de abajo',
        texto:'Cuatro lugares fijos: Home, Mi mes, Mi negocio y Herramientas. Arriba a la derecha está el círculo de Appi, que es donde estamos ahora.'}
     ],
+    'view-progreso':[
+      {sel:['.apg-hero'], titulo:'Evidencia, no suposiciones',
+       texto:'Mi avance usa lo que ya guardaste en la jornada, contactos, agenda, reactivación y presupuestos. Una venta sólo cuenta si quedó confirmada.'},
+      {sel:['.apg-areas'], titulo:'Las cuatro áreas',
+       texto:'Orden, constancia, movimiento comercial y resultados. Cada número indica su origen para que sepas exactamente qué estás viendo.'},
+      {sel:['.apg-plan-list'], titulo:'Tu plan de hoy',
+       texto:'Appi detecta seguimientos, candidatos para demostraciones, usuarios anteriores y oportunidades para sumar gente. Abre el lugar correcto, pero vos decidís y confirmás.'},
+      {sel:['.apg-compare'], titulo:'Cuando empezaste y hoy',
+       texto:'Tu primera medición queda guardada. Así podés ver el cambio real sin borrar el punto de partida.'},
+      {sel:['.apg-next'], titulo:'Un próximo paso concreto',
+       texto:'En vez de mostrarte sólo números, Appi termina con una acción posible para mover el negocio hoy.'}
+    ],
     'view-mes':[
       {sel:['#scoreCompactWrap'], titulo:'Cómo venís este mes',
        texto:'Tu puntaje y lo que falta para llegar al objetivo. Se arma con lo que cargás durante el mes.'},

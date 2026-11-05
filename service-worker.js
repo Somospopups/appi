@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v914-cyberweek';
+const CACHE_NAME = 'appi-v915-mi-avance';
 const CACHE_PREFIX = 'appi-';
 // Donde el SW aparta una compartición hasta que la app la consume. No
 // empieza con el prefijo de la app para que el prune del activate no la borre.
@@ -36,6 +36,8 @@ const APP_SHELL = [
   './appi-tour.css',
   './appi-gotita.css',
   './appi-gotita.js',
+  './appi-progreso.css',
+  './appi-progreso.js',
   './agenda-personal.js',
   './margarita-contactos.js',
   './panel-atras.js',

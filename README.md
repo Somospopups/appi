@@ -6,6 +6,17 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v915 · Mi avance con evidencia real y próximo paso comercial
+
+- El Home suma una tarjeta compacta **debajo del calendario** y una nueva pantalla completa **Mi avance**, también accesible desde Mi negocio y desde el asistente Appi.
+- Las cuatro áreas —**Orden, Constancia, Movimiento comercial y Resultados**— se calculan sólo con evidencia ya guardada en la jornada, el Panel de Contactos, la agenda, la reactivación y los presupuestos generados.
+- Appi conserva la primera medición y fotografías diarias para comparar **Cuando empezaste / Hoy**, mostrar el resumen semanal y explicar el origen de cada número. No se atribuye ventas ni completa resultados automáticamente.
+- El plan diario detecta seguimientos sin próximo paso, candidatos reales para demostraciones, usuarios anteriores para retomar, necesidad de sumar contactos y presupuestos pendientes. Appi abre la ficha o herramienta correcta; **el distribuidor siempre decide y confirma**.
+- La preparación de visitas a usuarios anteriores requiere dos confirmaciones y crea un seguimiento con fecha sin duplicar contactos. Los presupuestos se registran al generar el PDF y una firma determinística evita contarlos dos veces.
+- El progreso forma parte de la sincronización y del backup de la cuenta. La fusión conserva la línea de partida más antigua y une eventos, planes y fotografías de distintos dispositivos, titular y socio.
+- Diseño responsive profesional con animación interna de Appi, modo oscuro, recorrido guiado y respeto por `prefers-reduced-motion`.
+- Versión: **v915 · Segura** → Cache `appi-v915-mi-avance`.
+
 ## v914 · CyberWeek temporal y financiación con vencimiento automático
 
 - **CyberWeek del 5 al 8/11/2026:** PSA Iontrix 3 tiene 25% OFF en precio normal y Plan Canje; las cinco PSA Senior4 (Bianco, Nero, BM, Grigio y Terra) tienen 10% OFF en ambas modalidades.

@@ -293,6 +293,7 @@
   const routes=[
     {label:'Historial de presupuesto',keys:/\b(historial de presupuesto|presupuestos anteriores|mis presupuestos)\b/,go:view('view-presu-hist'),view:'view-presu-hist'},
     {label:'Mi Encuesta',keys:/\b(encuesta|invitaciones?|referidos?)\b/,go:call('openEncuestaTool'),view:'view-encuesta',quick:1,icon:'target',sub:'Invitá y sumá contactos',tone:'c4'},
+    {label:'Mi avance',keys:/\b(mi avance|avance comercial|como voy|cómo voy|proximo paso|próximo paso|plan de hoy)\b/,go:call('openMiAvance'),view:'view-progreso',quick:1,icon:'chart',sub:'Evidencia real y próximo paso',tone:'c3'},
     {label:'Panel de Contactos',short:'Mis contactos',keys:/\b(panel de contactos|mis contactos|contactos|seguimientos?|clientes|prospectos?|agenda)\b/,go:call('openMiGestion'),view:'view-gestion',quick:1,icon:'users',sub:'A quién contactar hoy',tone:'c2'},
     {label:'Histórico',keys:/\b(historico|cierres?( de mes)?|cierres anteriores|archivo|ranking|pb)\b/,go:call('openHistorico'),view:'view-historico',quick:1,icon:'chart',sub:'Tus cierres anteriores',tone:'c3'},
     {label:'Lista de precios',keys:/\b(lista de precios|precios?|lista|catalogo|cuanto (sale|cuesta)|valores)\b/,go:call('openLista'),view:'view-lista',quick:1,icon:'tag',sub:'Precios y presupuestos',tone:'c1'},
@@ -402,6 +403,7 @@
     const active=document.querySelector('.view.active');const id=active&&active.id||'view-home';
     const help={
       'view-home':'Este es tu inicio. Acá encontrás tu jornada, accesos principales y lo más importante del día.',
+      'view-progreso':'Este es Mi avance. Compara tu punto de partida con datos reales, te muestra cuatro áreas del negocio y prepara acciones concretas. Vos siempre decidís y confirmás.',
       'view-mes':'En Mi mes reunís planificación, presupuesto y herramientas para organizarte.',
       'view-negocio':'En Mi negocio consultás tu equipo, usuarios, histórico y contactos.',
       'view-herramientas':'En Herramientas encontrás recursos prácticos como precios, stock, encuesta, grabadora y simulador.',
