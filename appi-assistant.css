@@ -145,6 +145,11 @@ body.appi-login-abierto .help-btn,body.appi-admin .help-btn{display:none!importa
    de la app es ahora el círculo de Appi —crema, con anillo celeste y su
    carita animada—, y abre su caja con la gotita adentro. */
 .appi-help-btn{
+  /* el halo de adentro tiene que medir lo mismo que el círculo: sin esto se
+     estiraba hasta el ancho del encabezado donde vive (el Histórico lo tiene
+     sticky) y tapaba los botones de al lado. `contain` lo logra sin tocar el
+     `position`, que en algunas pantallas ya viene puesto desde el HTML. */
+  contain:layout;
   background:linear-gradient(168deg,#fdfbf6,#f1ebde)!important;
   border:1.5px solid rgba(94,193,242,.62)!important;
   color:#123c63!important;
@@ -154,7 +159,7 @@ body.appi-login-abierto .help-btn,body.appi-admin .help-btn{display:none!importa
   animation:appiCircBreath 4.6s ease-in-out infinite;
 }
 .appi-help-btn::after{
-  content:"";position:absolute;inset:-4px;border-radius:50%;
+  content:"";position:absolute;inset:-4px;border-radius:50%;pointer-events:none;
   border:2px solid rgba(94,193,242,.55);opacity:0;
   animation:appiCircHalo 7.4s ease-out infinite;
 }

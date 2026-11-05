@@ -156,3 +156,94 @@ test('marca para recuperación automática los cierres PSA guardados con el lect
   expect(result.before).toEqual([result.stale]);
   expect(result.after).toEqual([]);
 });
+
+// El titular (nivel 0 del reporte) no forma parte del árbol de personas: su PB
+// personal vive en period.titular.pbPersonal, el mismo "Volumen personal" que
+// muestra el reporte de bonos. Antes quedaba afuera de los rankings.
+function respuestaPSA(rows, periodo = '2026-10') {
+  return {
+    periodo, errores: [],
+    linea: { filas: rows, par: [{ n: 'TITULAR PRUEBA', pb: 1500 }], pb: 6029 },
+    garantiasOrg: { filas: [
+      ['Nombre', 'DIP', 'Presentadas', 'Vencidas', '% Vencidas', 'Pendientes'],
+      ['RAIZ MIL', '02-1000001', '1', '0', '0', '0'],
+      ['HIJO DOS MIL', '02-1000002', '1', '0', '0', '0'],
+      ['RAIZ NOVECIENTOS', '02-1000003', '1', '0', '0', '0']
+    ] },
+    ingresos: {
+      filas: [['Período Consultado Octubre - 2026'], ['Total de 0 ingresos']],
+      resumen: 'Período Consultado Octubre - 2026 · Total de 0 ingresos'
+    }
+  };
+}
+
+test('el titular figura en el ranking de PB personales con su volumen personal', async ({ page }) => {
+  await abrirApp(page);
+  const rows = lineaConMiles();
+  const result = await page.evaluate(async rows => {
+    const api = window.__APPI_HISTORICO__;
+    await api.importPSAResponse({
+      periodo: '2026-10', errores: [],
+      linea: { filas: rows, par: [
+        { n: 'TITULAR PRUEBA', pb: 1500 }, { n: 'RAIZ MIL', pb: 1234 },
+        { n: 'HIJO DOS MIL', pb: 2345 }, { n: 'RAIZ NOVECIENTOS', pb: 950 }
+      ], pb: 6029 },
+      garantiasOrg: { filas: [
+        ['Nombre', 'DIP', 'Presentadas', 'Vencidas', '% Vencidas', 'Pendientes'],
+        ['RAIZ MIL', '02-1000001', '1', '0', '0', '0'],
+        ['HIJO DOS MIL', '02-1000002', '1', '0', '0', '0'],
+        ['RAIZ NOVECIENTOS', '02-1000003', '1', '0', '0', '0']
+      ] },
+      ingresos: { filas: [['Período Consultado Octubre - 2026'], ['Total de 0 ingresos']], resumen: '' }
+    }, { period: '2026-10', deferCloud: true });
+    const period = api.state.periods.find(item => item.id === '2026-10');
+    const aplanar = list => list.map(item => ({ nombre: item.person.nombre, pb: item.value, key: item.person.key }));
+    return {
+      volumenDelReporte: period.titular.pbPersonal,
+      enElArbol: period.people.some(person => /TITULAR PRUEBA/i.test(person.nombre)),
+      personal: aplanar(api.simpleRankingList(period, 'personal')),
+      organizacion: aplanar(api.simpleRankingList(period, 'organizacion')),
+      pbPersonalVista: api.simpleScopeStats(period, 'personal').pb
+    };
+  }, rows);
+
+  // Su fila no está en el árbol: por eso había que sumarlo aparte.
+  expect(result.enElArbol).toBe(false);
+  expect(result.volumenDelReporte).toBe(1500);
+  // El ranking personal lo incluye con su volumen personal, en el puesto que le toca.
+  expect(result.personal).toEqual([
+    { nombre: 'HIJO DOS MIL', pb: 2345, key: 'c:02-1000002' },
+    { nombre: 'TITULAR PRUEBA', pb: 1500, key: 'titular' },
+    { nombre: 'RAIZ MIL', pb: 1234, key: 'c:02-1000001' },
+    { nombre: 'RAIZ NOVECIENTOS', pb: 950, key: 'c:02-1000003' }
+  ]);
+  // En organización aparece con su red completa (1500 propios + 4529 del equipo).
+  expect(result.organizacion[0]).toEqual({ nombre: 'TITULAR PRUEBA', pb: 6029, key: 'titular' });
+  // Y el "PB personal" del resumen ya no queda vacío.
+  expect(result.pbPersonalVista).toBe(1500);
+});
+
+test('el titular no se duplica si su fila viene dentro de las personas', async ({ page }) => {
+  await abrirApp(page);
+  // Mismo reporte, pero con la fila del titular dentro del árbol (nivel 1).
+  const rows = lineaConMiles().map(row => row[2] === '0' ? Object.assign([], row, {2: '1'}) : row);
+  const result = await page.evaluate(async rows => {
+    const api = window.__APPI_HISTORICO__;
+    await api.importPSAResponse({
+      periodo: '2026-10', errores: [],
+      linea: { filas: rows, par: [
+        { n: 'TITULAR PRUEBA', pb: 1500 }, { n: 'RAIZ MIL', pb: 1234 },
+        { n: 'HIJO DOS MIL', pb: 2345 }, { n: 'RAIZ NOVECIENTOS', pb: 950 }
+      ], pb: 6029 },
+      garantiasOrg: { filas: [
+        ['Nombre', 'DIP', 'Presentadas', 'Vencidas', '% Vencidas', 'Pendientes'],
+        ['RAIZ MIL', '02-1000001', '1', '0', '0', '0']
+      ] },
+      ingresos: { filas: [['Período Consultado Octubre - 2026'], ['Total de 0 ingresos']], resumen: '' }
+    }, { period: '2026-10', deferCloud: true });
+    const period = api.state.periods.find(item => item.id === '2026-10');
+    const personal = api.simpleRankingList(period, 'personal').map(item => item.person.nombre);
+    return { personal, titulares: personal.filter(nombre => /TITULAR PRUEBA/i.test(nombre)).length };
+  }, rows);
+  expect(result.titulares).toBe(1);
+});

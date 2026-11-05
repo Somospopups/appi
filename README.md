@@ -6,6 +6,16 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v909 · El titular entra al ranking y el círculo deja de tapar
+
+- **El titular ya figura en el ranking de PB personales.** Su fila (nivel 0 del reporte de PSA) no forma parte del árbol de personas: vivía sólo en `period.titular`. Por eso, aunque el reporte de bonos mostrara el **volumen personal** (por ejemplo 50 PB), en *Histórico → Rankings del cierre → Personal* no aparecía. Ahora se suma con ese mismo PB, en el puesto que le corresponde.
+- **En Organización** aparece con lo suyo más toda su red, y **el "PB personal" del resumen** dejó de mostrarse vacío cuando el titular no estaba en la lista.
+- **Tocar su fila abre su ficha**: PB personal (el mismo del reporte de bonos), PB del equipo y PB total.
+- **No se duplica**: si su DIP ya viene dentro de las personas, no se agrega dos veces.
+- **El círculo de Appi ya no se come los toques.** Su aro decorativo se estiraba hasta el ancho del encabezado donde vive (el del Histórico es sticky) y bloqueaba botones vecinos como **"‹ Volver"**. Ahora el aro mide lo mismo que el círculo y no recibe toques.
+- **Desborde del archivo anual:** el globito del encabezado ("Todos los datos del año") ya no estira la tarjeta 16 px fuera de la pantalla.
+- Versión: **v909 · Segura** → Cache `appi-v909-ranking-personal`.
+
 ## v908 · La caja de Appi, más clara
 
 - **Se fue la opción repetida.** "¿Cómo funciona esta pantalla?" explicaba lo mismo que el recorrido nuevo: ahora hay **una sola** forma de pedir la explicación de la pantalla, *"¿Qué hay en mi pantalla?"*.

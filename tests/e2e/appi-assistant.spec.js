@@ -164,3 +164,23 @@ test('cuando no entiende, propone lugares con palabras simples',async({page})=>{
   await expect(page.locator('#appiMessage')).toContainText('lista de precios');
   await expect(page.locator('#appiAssistant')).toHaveClass(/appi-open/);
 });
+
+test('el círculo no estira su halo ni se come los toques de los botones de al lado',async({page})=>{
+  await entrar(page);
+  // En el Histórico el círculo convive con «‹ Volver» en una fila que es
+  // sticky: ahí el aro decorativo se estiraba hasta el ancho del encabezado
+  // y dejaba el botón de volver sin poder tocarse.
+  await page.evaluate(()=>window.__APPI_HISTORICO__.open());
+  await page.waitForTimeout(900);
+  const m=await page.evaluate(()=>{
+    const boton=document.querySelector('#view-historico .appi-help-btn');
+    if(!boton)return null;
+    const r=boton.getBoundingClientRect(),aro=getComputedStyle(boton,'::after');
+    return {ancho:Math.round(r.width),halo:Math.round(parseFloat(aro.width)),altoHalo:Math.round(parseFloat(aro.height)),eventos:aro.pointerEvents};
+  });
+  expect(m).not.toBeNull();
+  // el aro mide lo mismo que el botón (más 4 px de cada lado), no el ancho de la pantalla
+  expect(m.halo).toBeLessThanOrEqual(m.ancho+12);
+  expect(m.altoHalo).toBeLessThanOrEqual(m.ancho+12);
+  expect(m.eventos).toBe('none');
+});
