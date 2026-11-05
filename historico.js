@@ -602,36 +602,63 @@ function simpleOwner(period){
 // PB personal (el mismo "Volumen personal" del reporte de bonos).
 function simpleTitularPerson(period){
   if(!period)return null;
-  const titular=period.titular||{},pb=volumenPersonalTitular(period),team=num(period.summary&&period.summary.pbPersonal);
-  return {key:'titular',isTitular:true,nombre:titular.nombre||titular.name||'Titular del reporte',codigo:titular.dip||'',
+  const titular=period.titular||{},pb=volumenPersonalTitular(period),team=num(period.summary&&period.summary.pbPersonal),bonos=datosVolumenPersonalBonos()||{};
+  return {key:'titular',isTitular:true,nombre:titular.nombre||titular.name||bonos.nombre||'Titular del reporte',codigo:titular.dip||bonos.dip||'',
     cat:(function(){try{return histCategoryCode(titular.categoria||titular.cat)||''}catch(e){return String(titular.categoria||titular.cat||'').toUpperCase()}})(),
     pnAct:pb,teamPB:team,totalPB:pb+team,garantias:{presentadas:0,vencidas:0,pendientes:0}};
 }
 // El "Volumen Personal" del Reporte de Bonos (el número que la persona ve en
-// Mi negocio) es la misma producción personal del cierre. Se usa cuando la
-// Línea Descendente no trae el PB del titular, para que nunca quede afuera.
-function volumenPersonalDelReporteDeBonos(period){
+// Mi negocio) es la producción personal del titular. Se usa cuando la Línea
+// Descendente no trae su PB, para que nunca quede afuera del ranking.
+function mesDeBonosTexto(texto){
+  const s=String(texto||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+  const meses=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  const palabra=(s.match(/[a-z]+/)||[])[0]||'';
+  let mes=palabra==='setiembre'?8:meses.indexOf(palabra);
+  let anio=Number((s.match(/(20\d{2})/)||[])[1]||0);
+  if(mes<0){const suelto=Number((s.match(/(?:^|\D)(\d{1,2})(?:\D|$)/)||[])[1]||0);if(suelto>=1&&suelto<=12)mes=suelto-1}
+  if(!anio){const m2=s.match(/(?:^|\D)(\d{1,2})\D+(20\d{2})/);if(m2){anio=Number(m2[2]);if(mes<0){const n=Number(m2[1]);if(n>=1&&n<=12)mes=n-1}}}
+  if(mes<0||mes>11||!anio)return null;
+  return {month:mes,year:anio};
+}
+function datosVolumenPersonalBonos(){
   try{
     const guardado=JSON.parse(localStorage.getItem('appi_bonos_v1')||'null');
     const bonos=guardado&&guardado.bonos;if(!bonos)return null;
-    const partes=String(bonos.periodo||'').toLowerCase().trim().split(/[-\s/]+/);
-    const meses=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
-    let mes=meses.indexOf(partes[0]);if(mes<0&&partes[0]==='setiembre')mes=8;
-    const anio=Number(partes[1]||0);
-    if(mes<0||!anio)return null;
-    // sólo sirve si el reporte es del mismo mes que el cierre
-    if(Number(period&&period.year)!==anio||Number(period&&period.month)!==mes)return null;
     const fila=(bonos.acumulacion||[]).find(item=>/volumen\s*personal/i.test(String(item&&item.r||'')));
     if(!fila)return null;
-    return num(String(fila.pb==null?'':fila.pb).replace(/,/g,''));
+    const valor=num(String(fila.pb==null?'':fila.pb).replace(/,/g,''));
+    if(!(valor>0))return null;
+    const cuando=mesDeBonosTexto(bonos.periodo);
+    return {valor,month:cuando?cuando.month:null,year:cuando?cuando.year:null,
+      etiqueta:String(bonos.periodo||'').trim(),nombre:bonos.nombre||'',dip:bonos.dip||''};
   }catch(e){return null}
 }
-// El mejor número disponible para el PB personal del titular.
+// Devuelve el volumen personal del reporte de Bonos junto con su período y si
+// corresponde al mismo mes del cierre que se está mirando.
+function volumenPersonalDelReporteDeBonos(period){
+  const datos=datosVolumenPersonalBonos();if(!datos)return null;
+  const mismoMes=datos.month!=null&&Number(period&&period.month)===datos.month&&Number(period&&period.year)===datos.year;
+  return {valor:datos.valor,mismoMes,etiqueta:datos.etiqueta,nombre:datos.nombre,dip:datos.dip,month:datos.month,year:datos.year};
+}
+// El PB personal del titular: primero lo que dice el cierre (su fila del árbol o
+// el dato guardado); si el cierre no lo trae, se usa el Reporte de Bonos.
 function volumenPersonalTitular(period){
   const delCierre=num(period&&period.titular&&period.titular.pbPersonal);
-  const deBonos=num(volumenPersonalDelReporteDeBonos(period));
   const deSuFila=(function(){const p=simpleOwner(period);return p?num(p.pnAct):0})();
-  return Math.max(delCierre,deBonos,deSuFila);
+  const enElCierre=Math.max(delCierre,deSuFila);
+  if(enElCierre>0)return enElCierre;
+  const bonos=volumenPersonalDelReporteDeBonos(period);
+  return bonos?bonos.valor:0;
+}
+// De dónde salió ese número, para poder explicarlo en pantalla sin mentir.
+function fuenteVolumenPersonalTitular(period){
+  const delCierre=num(period&&period.titular&&period.titular.pbPersonal);
+  const deSuFila=(function(){const p=simpleOwner(period);return p?num(p.pnAct):0})();
+  if(Math.max(delCierre,deSuFila)>0)return {origen:'cierre',etiqueta:'',mismoMes:true};
+  const bonos=volumenPersonalDelReporteDeBonos(period);
+  if(bonos)return {origen:'bonos',etiqueta:bonos.etiqueta,mismoMes:bonos.mismoMes};
+  return null;
 }
 function simpleTeamPeople(period){const owner=simpleOwner(period);return (period&&period.people||[]).filter(person=>!owner||person.key!==owner.key)}
 function simplePreviousPeriod(period){if(!period)return null;return [...H.periods].filter(item=>item.id<period.id).sort((a,b)=>b.id.localeCompare(a.id))[0]||null}
@@ -730,8 +757,13 @@ function simpleRankingRows(period,mode){
 }
 function simpleRankingEntry(period){return `<button type="button" class="hs-ranking-entry" data-hs-go="rankings"><i>🏆</i><span><b>Rankings del cierre</b><small>Personal y Organización · ${esc(period.label)}</small></span><em>›</em></button>`}
 function simpleRankings(c){
-  const period=simpleSelectedPeriod();if(!period){simpleGo('home');return}const mode=H.simpleRankMode==='personal'?'personal':'organizacion',source=period.source==='psa-auto'?'Datos recuperados del cierre mensual de PSA':'Datos del cierre mensual guardado en APPI',description=mode==='personal'?'Ordenado por el PB personal alcanzado durante el mes.':'Ordenado por el PB total de la organización de cada persona.';
-  c.innerHTML=`${simpleBackHeader('Rankings del cierre')}<section class="hs-detail hs-v877 hs-ranking-view">${simpleMonthBar(period)}<div class="hs-ranking-status"><i></i><span><b>Cierre recuperado y guardado</b><small>${esc(source)}</small></span><em>✓ Listo</em></div><article class="hs-ranking-card"><header><h2>🏆 RANKING DE VENTAS</h2><span>PB</span></header><div class="hs-ranking-tabs"><button type="button" class="${mode==='personal'?'active':''}" data-hs-rank-mode="personal">👤 Personal</button><button type="button" class="${mode==='organizacion'?'active':''}" data-hs-rank-mode="organizacion">👥 Organización</button></div><p class="hs-ranking-share-hint"><b>Mantené presionado</b> Personal u Organización para enviar la imagen. Después elegí WhatsApp.</p><p class="hs-ranking-description">${esc(description)}</p><div class="hs-ranking-list">${simpleRankingRows(period,mode)}</div></article><div class="hs-ranking-note"><b>No se mezcla con otros meses.</b><span>Estos puestos pertenecen solamente al cierre de ${esc(period.label)}.</span></div><button type="button" class="hs-primary" data-hs-ranking-change>Elegir otro cierre</button><button type="button" class="hs-primary hs-secondary-action" data-hs-go="home">Volver al resumen</button></section>`;
+  const period=simpleSelectedPeriod();if(!period){simpleGo('home');return}const mode=H.simpleRankMode==='personal'?'personal':'organizacion',fuenteVolumen=fuenteVolumenPersonalTitular(period),source=period.source==='psa-auto'?'Datos recuperados del cierre mensual de PSA':'Datos del cierre mensual guardado en APPI',description=mode==='personal'?'Ordenado por el PB personal alcanzado durante el mes.':'Ordenado por el PB total de la organización de cada persona.';
+  const notaRanking=fuenteVolumen&&fuenteVolumen.origen==='bonos'
+    ?`<div class="hs-ranking-note"><b>Tu volumen personal viene del Reporte de Bonos${fuenteVolumen.etiqueta?` de ${esc(fuenteVolumen.etiqueta)}`:''}.</b><span>La Línea Descendente del cierre de ${esc(period.label)} no trae tu PB personal, así que APPI usa el mismo número de tu Reporte de Bonos. Los demás puestos son solamente de ${esc(period.label)}.</span></div>`
+    :volumenPersonalTitular(period)>0
+      ?`<div class="hs-ranking-note"><b>No se mezcla con otros meses.</b><span>Estos puestos pertenecen solamente al cierre de ${esc(period.label)}.</span></div>`
+      :`<div class="hs-ranking-note"><b>Todavía no tenemos tu volumen personal.</b><span>Abrí Mi negocio → Reporte de Bonos una vez: APPI lee tu Volumen Personal y tu PB entra a este ranking.</span></div>`;
+  c.innerHTML=`${simpleBackHeader('Rankings del cierre')}<section class="hs-detail hs-v877 hs-ranking-view">${simpleMonthBar(period)}<div class="hs-ranking-status"><i></i><span><b>Cierre recuperado y guardado</b><small>${esc(source)}</small></span><em>✓ Listo</em></div><article class="hs-ranking-card"><header><h2>🏆 RANKING DE VENTAS</h2><span>PB</span></header><div class="hs-ranking-tabs"><button type="button" class="${mode==='personal'?'active':''}" data-hs-rank-mode="personal">👤 Personal</button><button type="button" class="${mode==='organizacion'?'active':''}" data-hs-rank-mode="organizacion">👥 Organización</button></div><p class="hs-ranking-share-hint"><b>Mantené presionado</b> Personal u Organización para enviar la imagen. Después elegí WhatsApp.</p><p class="hs-ranking-description">${esc(description)}</p><div class="hs-ranking-list">${simpleRankingRows(period,mode)}</div></article>${notaRanking}<button type="button" class="hs-primary" data-hs-ranking-change>Elegir otro cierre</button><button type="button" class="hs-primary hs-secondary-action" data-hs-go="home">Volver al resumen</button></section>`;
   bindSimpleCommon(c);prepareSimpleRankingShareFiles(period);c.querySelectorAll('[data-hs-rank-mode]').forEach(button=>bindSimpleRankingMode(button,period));c.querySelectorAll('[data-hs-ranking-person]').forEach(button=>button.onclick=()=>openHistPerson(button.dataset.hsRankingPerson,period));c.querySelector('[data-hs-ranking-change]')?.addEventListener('click',()=>{H.simpleView='home';H.simplePicker=true;H.simpleSearch='';H.simplePeopleVisible=false;render()});
 }
 function simpleHome(c){
@@ -1060,7 +1092,7 @@ function openHistPerson(key,period){
   if(p.isTitular){
     const total=num(p.pnAct)+num(p.teamPB);
     openHistDrawer(p.nombre,`${p.codigo||'Sin DIP'} · Titular ${period.label}`,
-      `<div class="hist-person-kpis"><div><b>${fmt(p.pnAct)} PB</b><span>PB Personal</span></div><div><b>${fmt(p.teamPB)} PB</b><span>PB de Equipo</span></div><div><b>${fmt(total)} PB</b><span>PB Total</span></div></div><div class="hist-drill-note"><b>Volumen personal:</b> es el mismo PB que muestra el reporte de bonos de ${esc(period.label)}.<br><b>Tu red:</b> ${fmt(p.teamPB)} PB del equipo, sin contarte a vos.</div>`);
+      `<div class="hist-person-kpis"><div><b>${fmt(p.pnAct)} PB</b><span>PB Personal</span></div><div><b>${fmt(p.teamPB)} PB</b><span>PB de Equipo</span></div><div><b>${fmt(total)} PB</b><span>PB Total</span></div></div><div class="hist-drill-note"><b>Volumen personal:</b> ${(()=>{const f=fuenteVolumenPersonalTitular(period);return f&&f.origen==='bonos'?`es el mismo PB que muestra tu Reporte de Bonos${f.etiqueta?` de ${esc(f.etiqueta)}`:''} (la Línea Descendente de este cierre no lo trae).`:`es el mismo PB que muestra el reporte de bonos de ${esc(period.label)}.`})()}<br><b>Tu red:</b> ${fmt(p.teamPB)} PB del equipo, sin contarte a vos.</div>`);
     return;
   }const income=(period.incomes||[]).find(i=>i.matchKey===p.matchKey),digits=window.APPITel?window.APPITel.normalizar(p.tel||income&&income.telefono||''):'';openHistDrawer(p.nombre,`${p.codigo||'Sin DIP'} · Categoría ${p.cat||'—'}`,`<div class="hist-person-kpis"><div><b>${fmt(p.pnAct)} PB</b><span>PB Personal</span></div><div><b>${fmt(p.teamPB)} PB</b><span>PB de Equipo</span></div><div><b>${fmt(p.garantias&&p.garantias.pendientes)}</b><span>Pendientes</span></div><div><b>${income?'Sí':'No'}</b><span>Ingreso del mes</span></div></div>${income?`<div class="hist-drill-note"><b>Fecha de alta:</b> ${esc(income.fechaAlta||'—')}<br><b>Última compra:</b> ${esc(income.ultimaCompra||'—')}<br><b>Patrocinante:</b> ${esc(income.patrocinanteNombre||'—')}</div>`:''}<div class="hist-contact-actions"><a class="wa" href="${digits?`https://wa.me/${digits}`:'#'}" ${digits?'target="_blank"':''}>WhatsApp</a><a class="call" href="${digits?`tel:${digits}`:'#'}">Llamar</a></div>`)}
 function openHistIncome(item,period){const digits=window.APPITel?window.APPITel.normalizar(item.telefono||''):'';openHistDrawer(item.nombre,`${item.dip} · Ingreso de ${period.label}`,`<div class="hist-person-kpis"><div><b>${esc(item.cat||'—')}</b><span>Categoría</span></div><div><b>${item.compraPosterior?'Sí':'No'}</b><span>Compra posterior</span></div><div><b>${item.diasHastaCompra===null?'—':item.diasHastaCompra}</b><span>Días hasta compra</span></div><div><b>${item.capacitacion?'Sí':'No'}</b><span>Capacitación</span></div></div><div class="hist-drill-note"><b>Alta:</b> ${esc(item.fechaAlta||'—')}<br><b>Última compra:</b> ${esc(item.ultimaCompra||'—')}<br><b>Patrocinante:</b> ${esc(item.patrocinanteNombre||'—')} · ${esc(item.patrocinanteDip||'')}</div><div class="hist-contact-actions"><a class="wa" href="${digits?`https://wa.me/${digits}`:'#'}" ${digits?'target="_blank"':''}>WhatsApp</a><a class="call" href="${digits?`tel:${digits}`:'#'}">Llamar</a></div>`)}
@@ -1650,7 +1682,7 @@ async function initHistorico(){
 }
 window.openHistorico=openHistorico;
 window.initHistoricoAPPI=initHistorico;
-window.__APPI_HISTORICO__={state:H,open:openHistorico,refresh:refreshData,parseFile:parseHistoricalFile,parseIngresosRows,saveMonth:saveMonthPeriod,importPSAResponse:importPSAHistoricalResponse,syncPSAPeriod:syncHistoricalPeriod,syncMissingPSAPeriods,syncArchivedPSAYears,expectedHistoricalPeriodIds,expectedArchivedYears,missingHistoricalPeriodIds,simpleScopeStats,simpleRankingList,simpleTitularPerson,volumenPersonalTitular,analyze:analyzePeriods,strategies:buildStrategies,buildStrategies,affectedForStrategy,reconcileActionPlans,notifyActionDueOnce,openActionCenter,renderActionSummary:actionCenterSummaryHtml,strategyHtml,dbGetAll,annualMatrix,albumMonthStats,ensureAlbumMonth,renderAlbumReadout,renderAnnualSummary,renderCOPA,animateCharts:animateHistCharts,lineChart,navigablePeriods,createAnnualPdf,archiveOldYears:archiveOldYearsInCloud,syncAll,archiveLibraryHtml,downloadArchivePdf};
+window.__APPI_HISTORICO__={state:H,open:openHistorico,refresh:refreshData,parseFile:parseHistoricalFile,parseIngresosRows,saveMonth:saveMonthPeriod,importPSAResponse:importPSAHistoricalResponse,syncPSAPeriod:syncHistoricalPeriod,syncMissingPSAPeriods,syncArchivedPSAYears,expectedHistoricalPeriodIds,expectedArchivedYears,missingHistoricalPeriodIds,simpleScopeStats,simpleRankingList,simpleTitularPerson,volumenPersonalTitular,fuenteVolumenPersonalTitular,volumenPersonalDelReporteDeBonos,datosVolumenPersonalBonos,analyze:analyzePeriods,strategies:buildStrategies,buildStrategies,affectedForStrategy,reconcileActionPlans,notifyActionDueOnce,openActionCenter,renderActionSummary:actionCenterSummaryHtml,strategyHtml,dbGetAll,annualMatrix,albumMonthStats,ensureAlbumMonth,renderAlbumReadout,renderAnnualSummary,renderCOPA,animateCharts:animateHistCharts,lineChart,navigablePeriods,createAnnualPdf,archiveOldYears:archiveOldYearsInCloud,syncAll,archiveLibraryHtml,downloadArchivePdf};
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initHistorico);else initHistorico();
 setTimeout(initHistorico,1200);
 

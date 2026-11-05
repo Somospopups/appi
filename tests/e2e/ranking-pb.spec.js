@@ -290,7 +290,8 @@ async function importarConBonos(page, { periodoBonos, volumen }) {
     return {
       volumenDelCierre: period.titular.pbPersonal,
       personal: api.simpleRankingList(period, 'personal').map(item => ({ nombre: item.person.nombre, pb: item.value })),
-      pbPersonalVista: api.simpleScopeStats(period, 'personal').pb
+      pbPersonalVista: api.simpleScopeStats(period, 'personal').pb,
+      fuente: api.fuenteVolumenPersonalTitular(period)
     };
   }, { rows: lineaSinTitular(), par: PAR_SIN_TITULAR, periodoBonos, volumen });
 }
@@ -306,9 +307,64 @@ test('el titular aparece en el ranking aunque su PB venga sólo del Reporte de B
   expect(r.pbPersonalVista).toBe(47.65);
 });
 
-test('el volumen de bonos de otro mes no se mezcla con el cierre', async ({ page }) => {
+test('el volumen de bonos de otro mes se usa sólo si el cierre no trae tu PB', async ({ page }) => {
+  await abrirApp(page);
+  // El caso real: cierre de octubre, Reporte de Bonos de noviembre y la Línea
+  // Descendente sin el PB del titular. Tiene que aparecer igual.
+  const r = await importarConBonos(page, { periodoBonos: 'Noviembre-2026', volumen: '47.65' });
+  expect(r.volumenDelCierre == null || Number(r.volumenDelCierre) === 0).toBe(true);
+  expect(r.personal[0]).toEqual({ nombre: 'SILVIA DEL VALLE TOLEDO', pb: 47.65 });
+  expect(r.pbPersonalVista).toBe(47.65);
+  // ...y la app explica de dónde salió el número, sin ocultarlo.
+  expect(r.fuente).toEqual({ origen: 'bonos', etiqueta: 'Noviembre-2026', mismoMes: false });
+});
+
+test('si el cierre ya trae el PB del titular, el reporte de bonos no lo pisa', async ({ page }) => {
+  await abrirApp(page);
+  const r = await page.evaluate(async () => {
+    localStorage.setItem('appi_bonos_v1', JSON.stringify({ ts: Date.now(), bonos: {
+      dip: '2-98020174', nombre: 'SILVIA DEL VALLE TOLEDO', periodo: 'Noviembre-2026',
+      acumulacion: [{ c: '1', r: 'Volumen Personal', pb: '99.90', pi: '0.00' }]
+    } }));
+    const api = window.__APPI_HISTORICO__;
+    const rows = [
+      ['DIP Nro : 2-98020174  Nombre y Apellido : SILVIA DEL VALLE TOLEDO  Socio : DIAZ,GERMAN EZEQUIEL  Sucursal : 2  Categoría : L  País : Argentina'],
+      ['Período Consultado: Octubre - 2026'],
+      ['', '', '', 'Nombre', 'Cat.', 'Teléfono', 'Estado', 'PB Mes Actual', '1°Mes Ant.', '2°Mes Ant.', '3°Mes Ant.', 'Alta', 'Cumpleaños', 'Correo'],
+      ['', '', '0', '[2-98020174] SILVIA DEL VALLE TOLEDO [AR-B]', 'L', '', 'C', '30,00', '0', '0', '0', '', '', ''],
+      ['', '', '1', '[2-1100001] LODEIRO, ENRIQUE MARIANO [AR-B]', 'D', '', 'C', '24,80', '0', '0', '0', '', '', '']
+    ];
+    const par = [{ n: 'SILVIA DEL VALLE TOLEDO', pb: 30 }, { n: 'LODEIRO, ENRIQUE MARIANO', pb: 24.8 }];
+    await api.importPSAResponse({
+      periodo: '2026-10', errores: [],
+      linea: { filas: rows, par, pb: 54.8 },
+      garantiasOrg: { filas: [
+        ['Nombre', 'DIP', 'Presentadas', 'Vencidas', '% Vencidas', 'Pendientes'],
+        ['LODEIRO, ENRIQUE MARIANO', '2-1100001', '1', '0', '0', '0']
+      ] },
+      ingresos: { filas: [['Período Consultado Octubre - 2026'], ['Total de 0 ingresos']], resumen: '' }
+    }, { period: '2026-10', deferCloud: true });
+    const period = api.state.periods.find(item => item.id === '2026-10');
+    return {
+      personal: api.simpleRankingList(period, 'personal').map(item => ({ nombre: item.person.nombre, pb: item.value })),
+      fuente: api.fuenteVolumenPersonalTitular(period)
+    };
+  });
+  // Vale lo del cierre (30), no los 99,90 de un reporte de otro mes.
+  expect(r.personal[0]).toEqual({ nombre: 'SILVIA DEL VALLE TOLEDO', pb: 30 });
+  expect(r.fuente.origen).toBe('cierre');
+});
+
+test('aunque el cierre no tenga bloque de titular, aparece con los datos de Bonos', async ({ page }) => {
   await abrirApp(page);
   const r = await importarConBonos(page, { periodoBonos: 'Noviembre-2026', volumen: '47.65' });
-  expect(r.personal.map(item => item.nombre)).not.toContain('SILVIA DEL VALLE TOLEDO');
-  expect(r.personal[0]).toEqual({ nombre: 'LODEIRO, ENRIQUE MARIANO', pb: 24.8 });
+  const sinTitular = await page.evaluate(async () => {
+    const api = window.__APPI_HISTORICO__;
+    const period = api.state.periods.find(item => item.id === '2026-10');
+    period.titular = {};                     // cierre viejo, guardado sin titular
+    const lista = api.simpleRankingList(period, 'personal');
+    return lista.map(item => ({ nombre: item.person.nombre, pb: item.value }));
+  });
+  expect(r.personal[0].nombre).toBe('SILVIA DEL VALLE TOLEDO');
+  expect(sinTitular[0]).toEqual({ nombre: 'SILVIA DEL VALLE TOLEDO', pb: 47.65 });
 });

@@ -1,4 +1,4 @@
-/* APPI v910 · La gotita Appi, personaje vectorial animado.
+/* APPI v911 · La gotita Appi, personaje vectorial animado.
    Dibujo propio en SVG: no usa imágenes ni servicios externos.
    Cada parte (cuerpo, ojos, párpados, boca, brazos, pies, burbujas) es un
    nodo independiente que se anima con CSS según el estado. */

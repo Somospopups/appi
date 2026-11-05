@@ -6,6 +6,15 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v911 · Tu volumen personal entra al ranking aunque Bonos sea de otro mes
+
+- **Caso real que seguía fallando**: cierre de *octubre* y Reporte de Bonos de *noviembre*. La v910 exigía el mismo mes, así que el 47,65 del titular no se usaba y volvía a quedar afuera.
+- **Nueva regla**: primero manda el cierre (tu fila del árbol o el PB guardado). **Si el cierre no trae tu PB**, se usa el "Volumen Personal" del Reporte de Bonos **aunque sea de otro mes**, y la app lo dice en pantalla: *"Tu volumen personal viene del Reporte de Bonos de Noviembre-2026"*.
+- **Si el cierre sí trae tu PB, Bonos no lo pisa** (nunca se mezclan números de dos meses).
+- **Funciona aunque el cierre guardado no tenga bloque de titular**: el nombre y el DIP se toman del Reporte de Bonos.
+- El período del reporte se lee en varios formatos (`Noviembre-2026`, `Noviembre 2026`, `11/2026`, `2026-11`).
+- Versión: **v911 · Segura** → Cache `appi-v911-ranking-completo`.
+
 ## v910 · Tu volumen personal también cuenta cuando viene de Bonos
 
 - **El ranking personal ahora usa el "Volumen Personal" del Reporte de Bonos** cuando la Línea Descendente no trae el PB del titular. Antes, si tu fila venía sin PB (o no venía), tu producción existía —la veías en Bonos— pero el ranking no tenía de dónde sacarla y quedabas afuera.

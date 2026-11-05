@@ -1,7 +1,7 @@
 {
   "name": "appi",
-  "version": "910.0.0",
-  "cacheName": "appi-v910-ranking-completo",
+  "version": "911.0.0",
+  "cacheName": "appi-v911-ranking-completo",
   "private": true,
   "description": "Pruebas de regresión de APPI",
   "scripts": {
