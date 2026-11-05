@@ -99,6 +99,21 @@ test('prepara una visita sólo después de dos confirmaciones explícitas',async
   expect(newContact.estado).toBe('seguimiento');expect(newContact.proximo_contacto).toMatch(/^\d{4}-\d{2}-\d{2}$/);
 });
 
+test('una planilla grande no bloquea el arranque ni repite miles de lecturas',async({page})=>{
+  await login(page);
+  const result=await page.evaluate(uid=>{
+    const users=Array.from({length:4000},(_,i)=>({usuario:'Usuario '+i,telf:'351'+String(5000000+i),fVence:'2020-01-01'}));
+    const revived={};for(let i=0;i<1000;i++)revived[APPITel.primeroValido(users[i].telf)]={at:'2025-01-01T00:00:00.000Z'};
+    localStorage.setItem(`appi_reactivacion_v1_${uid}`,JSON.stringify({revividos:revived,estados:{}}));
+    window.usuariosTodosActual=()=>users;
+    const start=performance.now(),analysis=APPIProgreso.refresh({force:true});
+    return {elapsed:performance.now()-start,contactable:analysis.metrics.contactableOld.length,revived:analysis.metrics.revivedCount};
+  },USER_ID);
+  expect(result.contactable).toBe(3000);
+  expect(result.revived).toBe(1000);
+  expect(result.elapsed).toBeLessThan(1500);
+});
+
 test('no duplica un presupuesto y la sincronización une evidencias de dos dispositivos',async({page})=>{
   await login(page);
   const result=await page.evaluate(()=>{

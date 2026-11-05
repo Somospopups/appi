@@ -1,4 +1,4 @@
-const CACHE_NAME = 'appi-v915-mi-avance';
+const CACHE_NAME = 'appi-v916-arranque-rapido';
 const CACHE_PREFIX = 'appi-';
 // Donde el SW aparta una compartición hasta que la app la consume. No
 // empieza con el prefijo de la app para que el prune del activate no la borre.

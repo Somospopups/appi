@@ -4666,11 +4666,11 @@ html body .lp-fab{
 </style>
 
 <link rel="stylesheet" href="./appi-gotita.css?v=915">
-<link rel="stylesheet" href="./appi-progreso.css?v=915">
+<link rel="stylesheet" href="./appi-progreso.css?v=916">
 <link rel="stylesheet" href="./appi-assistant.css?v=915">
 <link rel="stylesheet" href="./appi-tour.css?v=914">
 <script src="./appi-gotita.js?v=915" defer></script>
-<script src="./appi-progreso.js?v=915" defer></script>
+<script src="./appi-progreso.js?v=916" defer></script>
 <script src="./appi-assistant.js?v=915" defer></script>
 <script src="./appi-buscar.js?v=915" defer></script>
 <script src="./appi-tour.js?v=915" defer></script>
@@ -4787,7 +4787,7 @@ html body .lp-fab{
     <button class="ds-btn" data-ds="view-grabadora" onclick="openGrabadora()"><span>🎙️</span> Grabadora</button>
     <button class="ds-btn" data-ds="view-notas" onclick="showView('view-notas')"><span>📝</span> Notas Keep</button>
   </nav>
-  <div class="ds-foot">APPI · v915 · Segura</div>
+  <div class="ds-foot">APPI · v916 · Segura</div>
 </aside>
 <!-- Botón flotante para reabrir la barra (cuando está oculta) - oculto, reemplazado por nuevo -->
 <button class="ds-reopen" style="display:none !important" id="dsReopenBtn" onclick="toggleSidebar()" title="Abrir barra lateral" aria-label="Abrir barra lateral">☰</button>
@@ -7742,8 +7742,8 @@ function showView(id,opts){
   }
   if(id==='view-eval')    try{ renderAreas(); }catch(e){ console.error(e); }
   if(id==='view-wheel')   try{ renderWheel(); }catch(e){ console.error(e); }
-  if(id==='view-home')    try{ if(typeof renderHomeCompleto==='function') renderHomeCompleto(); if(window.APPIProgreso) setTimeout(()=>window.APPIProgreso.refresh(),80); }catch(e){ console.error(e); }
-  if(id==='view-progreso') try{ if(window.APPIProgreso) setTimeout(()=>window.APPIProgreso.refresh(),0); }catch(e){ console.error(e); }
+  if(id==='view-home')    try{ if(typeof renderHomeCompleto==='function') renderHomeCompleto(); if(window.APPIProgreso) window.APPIProgreso.programar(900); }catch(e){ console.error(e); }
+  if(id==='view-progreso') try{ if(window.APPIProgreso) window.APPIProgreso.programar(0,true); }catch(e){ console.error(e); }
   if(id==='view-planning') try{ renderPlanningTools(); }catch(e){ console.error(e); }
   if(id==='view-seguimiento') try{ renderSeguimiento(); }catch(e){ console.error(e); }
   if(id==='view-negocio'){
@@ -12707,16 +12707,11 @@ function renderToolsList(){
     onClick:'openHistorico()', accent:'#5b8def', gradient:'linear-gradient(135deg,#3d63c9,#3ad0a4)'
   });
 
-  let progresoInfo=null;
-  try{ progresoInfo=window.APPIProgreso&&window.APPIProgreso.analizar?window.APPIProgreso.analizar():null; }catch(e){}
-  const progresoAreas=progresoInfo?Number(progresoInfo.activeAreas||0):0;
-  const progresoNext=progresoInfo&&progresoInfo.plan&&progresoInfo.plan.items
-    ? (progresoInfo.plan.items.find(x=>!x.done)||progresoInfo.plan.items[0]) : null;
+  // Mi avance se calcula fuera del render crítico del Home. Antes, analizar
+  // contactos y garantías acá demoraba el arranque en cuentas grandes.
   const progresoCard = renderHomeQuickCard({
-    icon:'↗', title:'Mi avance', sub:progresoNext?progresoNext.title:'Evidencia real y próximo paso',
-    statusVal:`${progresoAreas}/4`,
-    statusClass:progresoAreas>0?'pending':'empty',
-    progressPct:progresoAreas*25,
+    icon:'↗', title:'Mi avance', sub:'Evidencia real y próximo paso',
+    statusVal:'Ver', statusClass:'empty', progressPct:0,
     timeAgo:'Plan comercial de hoy',
     onClick:'APPIProgreso.abrir()', accent:'#6f62c7', gradient:'linear-gradient(135deg,#0b5878,#6f62c7)'
   });
@@ -14527,8 +14522,8 @@ function cerrarToolsMenu(){
   // con archivos viejos en pantalla.
   if ('serviceWorker' in navigator) {
     (async () => {
-    const swVersion='915';
-    const CACHE_NAME='appi-v915-mi-avance';
+    const swVersion='916';
+    const CACHE_NAME='appi-v916-arranque-rapido';
       const _hv=document.getElementById('homeAppVer');
       if(_hv) _hv.textContent=' · '+swVersion;
       try{ document.querySelectorAll('.ds-foot').forEach(function(el){ el.textContent='APPI · v'+swVersion+' · Segura'; }); }catch(e){}

@@ -6,6 +6,16 @@ PWA local-first para planificación mensual, presupuesto, equipo, garantías, co
 
 ## Estado actual
 
+## v916 · Arranque rápido y protección para cuentas grandes
+
+- **Mi avance ya no compite con el inicio de APPI:** el login, la sincronización inicial y el primer render terminan antes de calcular el progreso comercial.
+- Se eliminó el análisis pesado que se ejecutaba dentro de cada render del Home y podía repetir el trabajo varias veces durante el arranque.
+- La pantalla completa de Mi avance se construye sólo al abrirla; mientras está cerrada no genera todo su DOM ni monta animaciones ocultas.
+- El análisis de usuarios anteriores ahora hace **una sola lectura** del estado de reactivación y una pasada lineal por la planilla. Antes podía leer y parsear el mismo dato por cada usuario, varias veces, congelando cuentas con muchas garantías.
+- Los resultados de reactivación se cachean brevemente y se invalidan al sincronizar, cambiar datos o abrir Mi avance, conservando información actual sin bloquear la interfaz.
+- Se agregó una regresión de rendimiento con **4.000 usuarios y 1.000 reactivaciones** para evitar que el problema vuelva.
+- Versión: **v916 · Segura** → Cache `appi-v916-arranque-rapido`.
+
 ## v915 · Mi avance con evidencia real y próximo paso comercial
 
 - El Home suma una tarjeta compacta **debajo del calendario** y una nueva pantalla completa **Mi avance**, también accesible desde Mi negocio y desde el asistente Appi.

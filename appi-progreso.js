@@ -1,4 +1,4 @@
-/* APPI v915 · Mi avance
+/* APPI v916 · Mi avance
    Acompañamiento comercial basado únicamente en evidencia guardada en APPI.
    No inventa ventas ni completa acciones: prepara el próximo paso y el
    distribuidor siempre decide y confirma. */
@@ -14,6 +14,10 @@
   var lastAnalysis=null;
   var lastKey='';
   var store=null;
+  var running=false;
+  var reactivationCache=null;
+  var reactivationCacheAt=0;
+  var reactivationSignature='';
 
   function uid(){
     try{return window.APPIAuth&&window.APPIAuth.userId?String(window.APPIAuth.userId()||'local'):'local'}catch(e){return 'local'}
@@ -98,18 +102,49 @@
   function isDemoActivity(activity){return /presentaci|demo|demostraci/i.test(text(activity&&(activity.tipo||activity.type||activity.resultado||activity.nota)))}
   function getAgendaCount(){try{return window.APPIAgendaPersonal&&window.APPIAgendaPersonal.lista?arr(window.APPIAgendaPersonal.lista()).length:0}catch(e){return 0}}
   function reactivationRaw(){try{return obj(safeParse(localStorage.getItem('appi_reactivacion_v1_'+uid()),{}))}catch(e){return {}}}
+  function allPreviousUsers(){
+    try{if(typeof window.usuariosTodosActual==='function')return arr(window.usuariosTodosActual())}catch(e){}
+    return arr(window.usuariosU);
+  }
+  function previousUserPhone(user){
+    try{if(window.APPITel&&window.APPITel.primeroValido)return text(window.APPITel.primeroValido(user&&user.telf||''))}catch(e){}
+    return text(user&&(user.telf||user.telefono||'')).replace(/\D/g,'');
+  }
+  function previousUserExpired(user){
+    var date=null;
+    try{if(typeof window.parseFechaU==='function')date=window.parseFechaU(user&&user.fVence)}catch(e){}
+    if(!date){date=new Date(user&&user.fVence||0)}
+    if(!date||isNaN(date.getTime()))return false;
+    return (startDay(new Date())-startDay(date))/DAY>365;
+  }
   function getReactivation(){
-    var dormant=[],revived=[],contactable=[];
-    try{
-      if(window.APPIReactivacion){
-        dormant=arr(window.APPIReactivacion.dormidos&&window.APPIReactivacion.dormidos());
-        revived=arr(window.APPIReactivacion.revividos&&window.APPIReactivacion.revividos());
-        contactable=arr(window.APPIReactivacion.porContactar&&window.APPIReactivacion.porContactar());
-      }
-    }catch(e){}
-    var raw=reactivationRaw(),recentRevived=0;
-    Object.keys(obj(raw.revividos)).forEach(function(k){if(inLastDays(raw.revividos[k]&&raw.revividos[k].at,7))recentRevived++});
-    return {dormant:dormant,revived:revived,contactable:contactable,recentRevived:recentRevived};
+    var all=allPreviousUsers(),rawText='{}';
+    try{rawText=localStorage.getItem('appi_reactivacion_v1_'+uid())||'{}'}catch(e){}
+    var signature=all.length+'|'+rawText;
+    if(reactivationCache&&reactivationSignature===signature&&Date.now()-reactivationCacheAt<30000)return reactivationCache;
+    var raw=obj(safeParse(rawText,{})),states=obj(raw.estados),revivedMap=obj(raw.revividos),dormant=[],revived=[],contactable=[];
+    // No usamos APPIReactivacion.dormidos/revividos acá: esas funciones leen y
+    // parsean el mismo localStorage por cada usuario. Con planillas grandes eso
+    // podía bloquear el hilo principal durante el arranque.
+    if(all.length){
+      all.forEach(function(user){
+        var phone=previousUserPhone(user);if(!phone)return;
+        if(revivedMap[phone]){revived.push(Object.assign({usuario:user&&user.usuario||'',telefono:phone},revivedMap[phone]));return}
+        if(!previousUserExpired(user))return;
+        dormant.push(user);
+        var status=states[phone]&&states[phone].estado;
+        if(status!=='nomolestar'&&status!=='equivocado'&&status!=='interesado')contactable.push(user);
+      });
+    }else{
+      // Fallback liviano para cuentas sin planilla y para integraciones que
+      // proveen candidatos directamente.
+      try{if(window.APPIReactivacion){dormant=arr(window.APPIReactivacion.dormidos&&window.APPIReactivacion.dormidos());revived=arr(window.APPIReactivacion.revividos&&window.APPIReactivacion.revividos());contactable=arr(window.APPIReactivacion.porContactar&&window.APPIReactivacion.porContactar())}}catch(e){}
+    }
+    var revivedKeys=Object.keys(revivedMap),recentRevived=0;
+    revivedKeys.forEach(function(k){if(inLastDays(revivedMap[k]&&revivedMap[k].at,7))recentRevived++});
+    reactivationCache={dormant:dormant,revived:revived,contactable:contactable,recentRevived:recentRevived};
+    reactivationCacheAt=Date.now();reactivationSignature=signature;
+    return reactivationCache;
   }
   function sourceReady(){
     var state=window.APPIGestion&&window.APPIGestion.state;
@@ -398,28 +433,50 @@
     var card='<button class="home-quick-card" type="button" data-apg-business onclick="APPIProgreso.abrir()" style="--accent:#6f62c7;--grad:linear-gradient(135deg,#0b5878,#6f62c7)"><div class="hqc-glow"></div><div class="hqc-top"><span class="hqc-icon">↗</span><span class="hqc-status pending">'+a.activeAreas+'/4</span></div><h3>Mi avance</h3><p>'+(next?esc(next.title):'Tu negocio en movimiento')+'</p><div class="hqc-progress"><i style="width:'+(a.activeAreas*25)+'%"></i></div><small>Datos reales · plan de hoy</small></button>';
     host.insertAdjacentHTML('afterbegin',card);
   }
-  function refresh(){
-    clearTimeout(timer);
-    var a=analyze();renderHome(a);renderDetail(a);mountMascots();
-    return a;
+  function detailIsOpen(){var view=document.getElementById('view-progreso');return !!(view&&view.classList.contains('active'))}
+  function bootIsCovering(){
+    var boot=document.getElementById('bootScreen');
+    return !!(boot&&!boot.classList.contains('gone')&&!boot.classList.contains('leaving'));
   }
-  function scheduleRefresh(delay){clearTimeout(timer);timer=setTimeout(refresh,delay==null?100:delay)}
-  function open(){if(typeof window.showView==='function')window.showView('view-progreso');refresh();setTimeout(function(){var el=document.getElementById('view-progreso');if(el)el.scrollTop=0},40)}
-  function close(){if(typeof window.showView==='function')window.showView('view-home');if(typeof window.renderHomeCompleto==='function')window.renderHomeCompleto();scheduleRefresh(80)}
+  function refresh(options){
+    var directCall=arguments.length===0;
+    options=obj(options);if(directCall)options.force=true;clearTimeout(timer);
+    if(running)return lastAnalysis;
+    // Mi avance nunca compite con autenticación, sincronización inicial ni el
+    // primer render. Si todavía está el agua de arranque, espera en silencio.
+    if(bootIsCovering()&&!options.force){scheduleRefresh(900,false);return lastAnalysis}
+    running=true;
+    try{
+      if(options.force){reactivationCache=null;store=null;lastKey=''}
+      var a=analyze();renderHome(a);
+      if(options.detail||detailIsOpen())renderDetail(a);
+      mountMascots();
+      return a;
+    }catch(error){console.warn('Mi avance se pospuso:',error);return lastAnalysis}
+    finally{running=false}
+  }
+  function scheduleRefresh(delay,force){
+    clearTimeout(timer);
+    timer=setTimeout(function(){refresh({force:!!force,detail:detailIsOpen()})},delay==null?250:delay);
+  }
+  function open(){if(typeof window.showView==='function')window.showView('view-progreso');scheduleRefresh(0,true);setTimeout(function(){var el=document.getElementById('view-progreso');if(el)el.scrollTop=0},40)}
+  function close(){if(typeof window.showView==='function')window.showView('view-home');if(typeof window.renderHomeCompleto==='function')window.renderHomeCompleto();scheduleRefresh(700,false)}
   function init(){
-    refresh();
-    setTimeout(refresh,900);setTimeout(refresh,2400);
-    window.addEventListener('storage',function(event){if(event.key&&(/^(appi_acciones_v1_|appi_reactivacion_v1_|appi_gestion_|agenda_personal_|appi_progreso_v1_)/.test(event.key)))scheduleRefresh(80)});
-    window.addEventListener('appi-datasync-applied',function(){lastKey='';store=null;scheduleRefresh(120)});
-    document.addEventListener('visibilitychange',function(){if(!document.hidden)scheduleRefresh(100)});
-    window.addEventListener('online',function(){scheduleRefresh(300)});
+    // El cálculo queda fuera de la ruta crítica. En equipos rápidos aparece
+    // apenas termina el arranque; en cuentas grandes espera a que el navegador
+    // quede libre, sin congelar el login ni el Home.
+    scheduleRefresh(3400,false);
+    window.addEventListener('storage',function(event){if(event.key&&(/^(appi_acciones_v1_|appi_reactivacion_v1_|appi_gestion_|agenda_personal_|appi_progreso_v1_)/.test(event.key))){reactivationCache=null;scheduleRefresh(500,false)}});
+    window.addEventListener('appi-datasync-applied',function(){lastKey='';store=null;reactivationCache=null;scheduleRefresh(900,false)});
+    document.addEventListener('visibilitychange',function(){if(!document.hidden)scheduleRefresh(700,false)});
+    window.addEventListener('online',function(){scheduleRefresh(1200,false)});
   }
 
   window.openMiAvance=open;
   window.APPIProgreso={
-    init:init,refresh:refresh,abrir:open,cerrar:close,ejecutar:runAction,
+    init:init,refresh:refresh,programar:scheduleRefresh,abrir:open,cerrar:close,ejecutar:runAction,
     registrarEvento:registerEvent,registrarPresupuesto:registerBudget,
-    analizar:analyze,clave:key
+    analizar:analyze,resumen:function(){return lastAnalysis},clave:key
   };
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
